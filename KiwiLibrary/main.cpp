@@ -10,9 +10,11 @@
 
 using namespace std;
 
-
 #include "KTrie.h"
+#include "KForm.h"
 #include "Utils.h"
+
+vector<KForm> formList(2500);
 
 shared_ptr<KTrie> buildTrie()
 {
@@ -21,6 +23,7 @@ shared_ptr<KTrie> buildTrie()
 	if (fopen_s(&file, "../ModelGenerator/model.txt", "r")) throw exception();
 	char buf[2048];
 	wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
+	int noForm = 0;
 	while (fgets(buf, 2048, file))
 	{
 		auto wstr = converter.from_bytes(buf);
@@ -34,7 +37,8 @@ shared_ptr<KTrie> buildTrie()
 		}
 		if (!i) continue;
 		buf[i] = 0;
-		kt->build(buf);
+		formList[noForm] = {buf}; // duplication of forms possible. should remove
+		kt->build(buf, &formList[noForm++]);
 	}
 	fclose(file);
 	kt->fillFail();
@@ -44,10 +48,22 @@ shared_ptr<KTrie> buildTrie()
 void printJM(const char* c, size_t len)
 {
 	auto e = c + len;
-	for (;*c && c < e;c++)
+	for (; *c && c < e; c++)
 	{
 		wprintf(L"%c", *c + 0x3130);
 	}
+}
+
+void printJM(const vector<char>& c)
+{
+	if (c.empty()) return;
+	return printJM(&c[0], c.size());
+}
+
+void printJM(const KChunk& c)
+{
+	if (c.isStr()) return printJM(&c.str[0], 16);
+	return printJM(c.form->form);
 }
 
 int main()
@@ -85,11 +101,21 @@ int main()
 		if (w.empty()) continue;
 		printJM(&w[0], w.size());
 		printf("\n");
-		auto pats = kt->searchAllPatterns(w);
+		/*auto pats = kt->searchAllPatterns(w);
 		for (auto pat : pats)
 		{
-			printJM(&w[pat.first], pat.second - pat.first);
+			printJM(pat.first->form);
 			printf(", ");
+		}*/
+		auto ss = kt->split(w);
+		for (auto s : ss)
+		{
+			for (auto p : s)
+			{
+				printJM(p);
+				printf(", ");
+			}
+			printf("\n");
 		}
 		printf("\n\n");
 	}

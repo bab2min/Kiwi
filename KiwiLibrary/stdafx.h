@@ -7,6 +7,7 @@
 #include <tchar.h>
 
 
+#include <array>
 #include <vector>
 #include <cassert>
 

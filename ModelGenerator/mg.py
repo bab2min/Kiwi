@@ -41,7 +41,7 @@ class ModelGenerator:
             return new_string
 
         s = split_syllables(s)
-        for k, v in {'ᆫ':'ㄴ','ᆯ':'ㄹ','ᄆ':'ㅁ','ᄇ':'ㅂ'}.items():
+        for k, v in {'ᆫ':'ㄴ','ᆯ':'ㄹ','ᄆ':'ㅁ','ᄇ':'ㅂ','ᆼ':'ㅇ'}.items():
             s = s.replace(k, v)
 
         return s
