@@ -1,7 +1,7 @@
 #pragma once
 struct KForm
 {
-	vector<char> form;
+	string form;
 	KForm(const char* _form = nullptr);
 };
 

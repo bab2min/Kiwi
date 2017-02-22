@@ -45,20 +45,7 @@ shared_ptr<KTrie> buildTrie()
 	return kt;
 }
 
-void printJM(const char* c, size_t len)
-{
-	auto e = c + len;
-	for (; *c && c < e; c++)
-	{
-		wprintf(L"%c", *c + 0x3130);
-	}
-}
 
-void printJM(const vector<char>& c)
-{
-	if (c.empty()) return;
-	return printJM(&c[0], c.size());
-}
 
 void printJM(const KChunk& c)
 {
@@ -86,8 +73,7 @@ int main()
 		{
 			if (0xAC00 <= c && c < 0xD7A4)
 			{
-				auto jm = splitJamo(c);
-				wordList.back().insert(wordList.back().end(), jm.begin(), jm.end());
+				splitJamo(c, wordList.back());
 			}
 			else
 			{
@@ -101,12 +87,6 @@ int main()
 		if (w.empty()) continue;
 		printJM(&w[0], w.size());
 		printf("\n");
-		/*auto pats = kt->searchAllPatterns(w);
-		for (auto pat : pats)
-		{
-			printJM(pat.first->form);
-			printf(", ");
-		}*/
 		auto ss = kt->split(w);
 		for (auto s : ss)
 		{

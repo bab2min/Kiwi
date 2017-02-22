@@ -23,7 +23,7 @@ struct KChunk
 			str[end - begin] = 0;
 		}
 	}
-	bool isStr() const { return str[0]; }
+	bool isStr() const { return !!str[0]; }
 };
 
 struct KTrie

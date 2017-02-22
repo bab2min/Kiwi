@@ -148,6 +148,7 @@
     <ClInclude Include="HangulMacro.h" />
     <ClInclude Include="KEndingMaker.h" />
     <ClInclude Include="KForm.h" />
+    <ClInclude Include="KModelMgr.h" />
     <ClInclude Include="KTrie.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -156,6 +157,7 @@
   <ItemGroup>
     <ClCompile Include="KEndingMaker.cpp" />
     <ClCompile Include="KForm.cpp" />
+    <ClCompile Include="KModelMgr.cpp" />
     <ClCompile Include="KTrie.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="stdafx.cpp">
