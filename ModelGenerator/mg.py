@@ -1,8 +1,11 @@
+import utils
+
 class ModelGenerator:
     def __init__(self):
         self.words = {}
         self.pos = {}
         self.biPos = {}
+        self.formDict = {}
 
     def isVowel(s):
         return 'ㅏ' <= s[-1] <= 'ㅣ'
@@ -20,40 +23,17 @@ class ModelGenerator:
             if c != 'ㅡ': return False
         return False
 
-    def normalizeHangul(s):
-        def split(c):
-            from hangul_utils import split_syllable_char
-            jm = split_syllable_char(c)
-            if jm[0] == 'ㅇ': return jm[1:]
-            return jm
-
-        def split_syllables(string):
-            from hangul_utils import check_syllable
-            new_string = ""
-            for c in string:
-                if not check_syllable(c):
-                    new_c = c
-                else:
-                    new_c = "".join(split(c))
-                new_string += new_c
-            return new_string
-
-        s = split_syllables(s)
-        for k, v in {'ᆫ':'ㄴ','ᆯ':'ㄹ','ᄆ':'ㅁ','ᄇ':'ㅂ','ᆼ':'ㅇ'}.items():
-            s = s.replace(k, v)
-
-        return s
-
     def procLine(self, str):
         sp = line.strip().split('\t')
         if len(sp) <= 3: return
-        ws = list(map(lambda x, y: (ModelGenerator.normalizeHangul(x), y), sp[1::2], sp[2::2]))
+        ws = list(map(lambda x, y: (utils.normalizeHangul(x), y), sp[1::2], sp[2::2]))
         self.pos['^'] = self.pos.get('^', 0) + 1
         self.biPos['^', ws[0][1]] = self.biPos.get(('^', ws[0][1]), 0) + 1
         for i, w in enumerate(ws):
             self.pos[w[1]] = self.pos.get(w[1], 0) + 1
             bg = (w[1], ws[i+1][1] if i+1 < len(ws) else '^')
             self.biPos[bg] = self.biPos.get(bg, 0) + 1
+            self.formDict[w[0]] = self.formDict.get(w[0], 0) + 1
             if i == 0: continue
             bw = ws[i - 1]
             if w not in self.words: self.words[w] = [0] * 5 + [{}]
@@ -70,8 +50,18 @@ class ModelGenerator:
         for k in sorted(self.words):
             d = self.words[k]
             if d[0] < 10: continue
-            if not (k[1].startswith('E') or k[1].startswith('J')): continue
-            f.write("%s\t%s\t%d\t%g\t%g\t%g\t%g\t" % (k[0], k[1], d[0], d[1]/d[0], d[2]/d[0], d[3]/d[0], d[4]/d[0]))
+            if not (k[1].startswith('E') or k[1].startswith('J') or k[1].startswith('VC')): continue
+            if (len(k[0]) < 2 and not ModelGenerator.isVowel(k[0])) or (len(k[0]) >= 2 and not ModelGenerator.isVowel(k[0][0]) and not ModelGenerator.isVowel(k[0][1])) and d[3]/d[0] > 0.5:
+                d[1] += d[0] - d[3]
+                d[2] += d[0] - d[3]
+                d[3] += d[0] - d[3]
+                if k[1].startswith('E'):
+                    d[1] -= 1
+                    d[2] -= 1
+                else:
+                    d[2] -= 1
+                    d[3] -= 1
+            f.write("%s\t%s\t%g\t%g\t%g\t%g\t%g\t" % (k[0], k[1], d[0]/self.formDict[k[0]], d[1]/d[0], d[2]/d[0], d[3]/d[0], d[4]/d[0]))
             for tag in sorted(d[5], key=d[5].get, reverse=True):
                 f.write("%s:%g\t" % (tag, d[5][tag]/d[0]))
             f.write('\n')
@@ -94,5 +84,5 @@ for line in open('ML_lit.txt', encoding='utf-8'):
 for line in open('ML_spo.txt', encoding='utf-8'):
     mg.procLine(line)
 
-#mg.writeForm('model.txt')
-mg.writePos('pos.txt')
+mg.writeForm('model.txt')
+#mg.writePos('pos.txt')

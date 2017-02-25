@@ -1,16 +1,18 @@
 #pragma once
 
+#define LEN_ARRAY(p) (sizeof(p)/sizeof(p[0]))
+
 vector<char> splitJamo(wstring hangul);
 void splitJamo(wchar_t hangul, vector<char>& ret);
 void printJM(const char* c, size_t len = -1);
 void printJM(const string& c);
 
 template<typename Iter>
-vector<char> encodeJamo(Iter begin, Iter end) {
-	vector<char> ret;
+string encodeJamo(Iter begin, Iter end) {
+	string ret;
 	for (; begin != end; ++begin)
 	{
-		assert(*begin > 0x3130 && *begin < 0x3130 + 51);
+		assert(*begin > 0x3130 && *begin <= 0x3130 + 51);
 		ret.push_back(*begin - 0x3130);
 	}
 	return ret;

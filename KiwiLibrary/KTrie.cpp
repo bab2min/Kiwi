@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "KTrie.h"
 #include "KForm.h"
+#include "KFeatureTestor.h"
 #ifdef _DEBUG
 int KTrie::rootID = 0;
 #endif // _DEBUG
@@ -117,10 +118,22 @@ vector<vector<KChunk>> KTrie::split(const vector<char>& str) const
 {
 	auto curTrie = this;
 	size_t n = 0;
-	vector<vector<pair<const KForm*, size_t>>> branches;
+	vector<pair<vector<pair<const KForm*, size_t>>, float>> branches;
 	branches.emplace_back();
 	vector<const KForm*> candidates;
-
+	static bool (*vowelFunc[])(const char*, const char*) = {
+		KFeatureTestor::isPostposition,
+		KFeatureTestor::isVowel,
+		KFeatureTestor::isVocalic,
+		KFeatureTestor::isVocalicH,
+		KFeatureTestor::notVowel,
+		KFeatureTestor::notVocalic,
+		KFeatureTestor::notVocalicH,
+	};
+	static bool(*polarFunc[])(const char*, const char*) = {
+		KFeatureTestor::isPositive,
+		KFeatureTestor::notPositive
+	};
 	auto brachOut = [&]()
 	{
 		if (!candidates.empty())
@@ -130,9 +143,23 @@ vector<vector<KChunk>> KTrie::split(const vector<char>& str) const
 			{
 				for (auto cand : candidates)
 				{
-					if (!branches[i].empty() && branches[i].back().second > n - cand->form.size()) continue;
+					auto& pl = branches[i].first;
+
+					if (!pl.empty() && pl.back().second > n - cand->form.size()) continue;
+					size_t bEnd = n - cand->form.size();
+					size_t bBegin = pl.empty() ? 0 : pl.back().second;
+					if (bBegin == bEnd && !pl.empty()) bBegin -= pl.back().first->form.size();
+
+					if ((size_t)cand->vowel && 
+						!vowelFunc[(size_t)cand->vowel - 1](&str[0] + bBegin, &str[0] + bEnd)) continue;
+					if ((size_t)cand->polar &&
+						!polarFunc[(size_t)cand->polar - 1](&str[0] + bBegin, &str[0] + bEnd)) continue;
+					if (!cand->hasFirstV && !KFeatureTestor::isCorrectEnd(&str[0] + bBegin, &str[0] + bEnd)) continue;
+					if (!KFeatureTestor::isCorrectStart(&str[0] + n, &str[0] + str.size())) continue;
 					branches.push_back(branches[i]);
-					branches.back().emplace_back(cand, n);
+					branches.back().first.emplace_back(cand, n);
+					branches.back().second += cand->maxP;
+					//if (pl.empty() || pl.back().second < bEnd) branches.back().second += mdl.;
 				}
 			}
 			candidates.clear();
@@ -142,6 +169,7 @@ vector<vector<KChunk>> KTrie::split(const vector<char>& str) const
 	for (auto c : str)
 	{
 		assert(c < 52);
+		
 		while (!curTrie->next[c - 1]) // if curTrie has no exact next node, goto fail
 		{
 			if (curTrie->fail)
@@ -152,17 +180,21 @@ vector<vector<KChunk>> KTrie::split(const vector<char>& str) const
 					candidates.emplace_back(curTrie->exit);
 				}
 			}
-			else goto continueFor; // root node has no exact next node, continue
+			else
+			{
+				brachOut();
+				goto continueFor; // root node has no exact next node, continue
+			}
 		}
 		brachOut();
-		n++;
 		// from this, curTrie has exact node
 		curTrie = curTrie->next[c - 1];
 		if (curTrie->exit) // if it has exit node, a pattern has found
 		{
 			candidates.emplace_back(curTrie->exit);
 		}
-	continueFor:;
+	continueFor:
+		n++;
 	}
 	while (curTrie->fail)
 	{
@@ -172,6 +204,7 @@ vector<vector<KChunk>> KTrie::split(const vector<char>& str) const
 			candidates.emplace_back(curTrie->exit);
 		}
 	}
+	//n++;
 	brachOut();
 
 	vector<vector<KChunk>> ret;
@@ -179,19 +212,20 @@ vector<vector<KChunk>> KTrie::split(const vector<char>& str) const
 	{
 		ret.emplace_back();
 		size_t c = 0;
-		for (auto p : branch)
+		//printf("%g\n", branch.second);
+		for (auto p : branch.first)
 		{
 			size_t s = p.second - p.first->form.size();
 			if (c < s)
 			{
-				ret.back().emplace_back(&str[0] + c, &str[0] + s);
+				ret.back().emplace_back(c, s);
 			}
 			ret.back().emplace_back(p.first);
 			c = p.second;
 		}
 		if (c < str.size())
 		{
-			ret.back().emplace_back(&str[c], &str[0] + str.size());
+			ret.back().emplace_back(c, str.size());
 		}
 	}
 	return ret;

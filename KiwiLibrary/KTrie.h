@@ -6,24 +6,18 @@ struct KChunk
 {
 	union 
 	{
-		array<char, 16> str;
+		const KForm* form;
 		struct
 		{
-			array<char, 8> _;
-			const KForm* form;
+			unsigned short _;
+			unsigned char begin;
+			unsigned char end;
 		};
 	};
 
-	KChunk(const KForm* _form) : form(_form) { _.fill(0); }
-	KChunk(const char* begin, const char* end)
-	{
-		if (end - begin < 16)
-		{
-			copy(begin, end, str.begin());
-			str[end - begin] = 0;
-		}
-	}
-	bool isStr() const { return !!str[0]; }
+	KChunk(const KForm* _form) : form(_form) {  }
+	KChunk(unsigned char _begin, unsigned char _end) : _(0xFFFF), begin(_begin), end(_end) {}
+	bool isStr() const { return _ == 0xFFFF; }
 };
 
 struct KTrie

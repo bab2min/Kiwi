@@ -10,7 +10,7 @@ void splitJamo(wchar_t c, vector<char>& ret)
 	int jong = t % 28;
 	int jung = (t / 28) % 21;
 	int cho = (t / 28 / 21);
-	if(cho != 11) ret.push_back(choTable[cho]);
+	ret.push_back(choTable[cho]);
 	ret.push_back(jung + 31);
 	if (jong) ret.push_back(jongTable[jong - 1]);
 }

@@ -147,6 +147,7 @@
   <ItemGroup>
     <ClInclude Include="HangulMacro.h" />
     <ClInclude Include="KEndingMaker.h" />
+    <ClInclude Include="KFeatureTestor.h" />
     <ClInclude Include="KForm.h" />
     <ClInclude Include="KModelMgr.h" />
     <ClInclude Include="KTrie.h" />
@@ -156,6 +157,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="KEndingMaker.cpp" />
+    <ClCompile Include="KFeatureTestor.cpp" />
     <ClCompile Include="KForm.cpp" />
     <ClCompile Include="KModelMgr.cpp" />
     <ClCompile Include="KTrie.cpp" />
