@@ -188,7 +188,13 @@ int main()
 		vector<pair<vector<pair<string, KPOSTag>>, float>> cands;
 		for (auto s : ss)
 		{
-			enumPossible(mdl, s, &w[0], cands);
+			for (auto t : s)
+			{
+				printJM(t, &w[0]);
+				printf(", ");
+			}
+			printf("\n");
+			//enumPossible(mdl, s, &w[0], cands);
 		}
 		int n = 0;
 		sort(cands.begin(), cands.end(), [](const pair<vector<pair<string, KPOSTag>>, float>& a, const pair<vector<pair<string, KPOSTag>>, float>& b)

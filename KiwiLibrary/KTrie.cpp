@@ -33,7 +33,14 @@ void KTrie::build(const char * str, const KForm * _form)
 		return;
 	}
 	int idx = str[0] - 1;
-	if (!next[idx]) next[idx] = new KTrie();
+	if (!next[idx])
+	{
+		next[idx] = new KTrie();
+#ifdef _DEBUG
+		next[idx]->currentChar = str[0];
+#endif // _DEBUG
+
+	}
 	next[idx]->build(str + 1, _form);
 }
 
@@ -139,9 +146,9 @@ vector<vector<KChunk>> KTrie::split(const vector<char>& str) const
 		if (!candidates.empty())
 		{
 			size_t base = branches.size();
-			for (size_t i = 0; i < base; i++)
+			for (auto cand : candidates)
 			{
-				for (auto cand : candidates)
+				for (size_t i = 0; i < base; i++)
 				{
 					auto& pl = branches[i].first;
 
