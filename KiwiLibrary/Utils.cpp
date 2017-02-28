@@ -2,7 +2,7 @@
 
 #include "Utils.h"
 
-void splitJamo(wchar_t c, vector<char>& ret)
+void splitJamo(wchar_t c, string& ret)
 {
 	static char choTable[] = { 1, 2, 4, 7, 8, 9, 17, 18, 19, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30 };
 	static char jongTable[] = { 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 20, 21, 22, 23, 24, 26, 27, 28, 29, 30 };
@@ -16,9 +16,9 @@ void splitJamo(wchar_t c, vector<char>& ret)
 }
 
 
-vector<char> splitJamo(wstring hangul)
+string splitJamo(wstring hangul)
 {
-	vector<char> ret;
+	string ret;
 	for (auto c : hangul)
 	{
 		splitJamo(c, ret);

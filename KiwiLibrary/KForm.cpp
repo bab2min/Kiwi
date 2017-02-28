@@ -93,7 +93,7 @@ void KForm::updateCond()
 	{
 		if (cv != m->vowel)
 		{
-			cv = (int)cv ? KCondVowel::any : KCondVowel::none;
+			cv = (int)cv && (int)m->vowel ? KCondVowel::any : KCondVowel::none;
 		}
 		if (cp != m->polar) cp = KCondPolarity::none;
 		if (!m->chunks.empty() && m->chunks[0]->tag == KPOSTag::V) hasFirstV = true;

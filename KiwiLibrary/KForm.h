@@ -1,6 +1,6 @@
 #pragma once
 
-#define P_MIN -20.f
+#define P_MIN -30.f
 
 enum class KPOSTag : char
 {

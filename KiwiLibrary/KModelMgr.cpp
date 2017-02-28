@@ -113,27 +113,29 @@ void KModelMgr::loadMMFromTxt(const char * filename, unordered_map<string, size_
 		float vowel = _wtof(fields[3].c_str());
 		float vocalic = _wtof(fields[4].c_str());
 		float vocalicH = _wtof(fields[5].c_str());
+		float positive = _wtof(fields[6].c_str());
 
 		KCondVowel cvowel = KCondVowel::none;
-		float t[] = { vowel, vocalic, vocalicH, 1 - vowel, 1 - vocalic, 1 - vocalicH };
-		size_t pmIdx = max_element(t, t + LEN_ARRAY(t)) - t;
-		if (t[pmIdx] >= 0.95f)
-		{
-			cvowel = (KCondVowel)(pmIdx + 2);
-		}
-		else if (tag >= KPOSTag::JKS && tag <= KPOSTag::ETM)
-		{
-			cvowel = KCondVowel::any;
-		}
-		
-		float positive = _wtof(fields[6].c_str());
-		
 		KCondPolarity polar = KCondPolarity::none;
-		float u[] = { positive, 1 - positive };
-		pmIdx = max_element(u, u + 2) - u;
-		if (t[pmIdx] >= 0.95f)
+		if (tag >= KPOSTag::JKS && tag <= KPOSTag::ETM)
 		{
-			polar = (KCondPolarity)(pmIdx + 1);
+			float t[] = { vowel, vocalic, vocalicH, 1 - vowel, 1 - vocalic, 1 - vocalicH };
+			size_t pmIdx = max_element(t, t + LEN_ARRAY(t)) - t;
+			if (t[pmIdx] >= 0.80f)
+			{
+				cvowel = (KCondVowel)(pmIdx + 2);
+			}
+			else
+			{
+				cvowel = KCondVowel::any;
+			}
+
+			float u[] = { positive, 1 - positive };
+			pmIdx = max_element(u, u + 2) - u;
+			if (u[pmIdx] >= 0.80f)
+			{
+				polar = (KCondPolarity)(pmIdx + 1);
+			}
 		}
 		size_t mid = morphemes.size();
 		morphMap.emplace(make_pair(form, tag), mid);

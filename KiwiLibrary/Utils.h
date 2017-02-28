@@ -2,8 +2,8 @@
 
 #define LEN_ARRAY(p) (sizeof(p)/sizeof(p[0]))
 
-vector<char> splitJamo(wstring hangul);
-void splitJamo(wchar_t hangul, vector<char>& ret);
+string splitJamo(wstring hangul);
+void splitJamo(wchar_t hangul, string& ret);
 void printJM(const char* c, size_t len = -1);
 void printJM(const string& c);
 

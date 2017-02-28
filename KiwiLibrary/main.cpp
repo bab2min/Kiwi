@@ -16,38 +16,6 @@ using namespace std;
 #include "KFeatureTestor.h"
 #include "Utils.h"
 
-vector<KForm> formList(2500);
-
-shared_ptr<KTrie> buildTrie()
-{
-	shared_ptr<KTrie> kt = make_shared<KTrie>();
-	FILE* file;
-	if (fopen_s(&file, "../ModelGenerator/model.txt", "r")) throw exception();
-	char buf[2048];
-	wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
-	int noForm = 0;
-	while (fgets(buf, 2048, file))
-	{
-		auto wstr = converter.from_bytes(buf);
-		auto p = wstr.find('\t');
-		if (p == wstr.npos) continue;
-		int i = 0;
-		for (auto w : wstr.substr(0, p))
-		{
-			if (w < 0x3130) continue;
-			buf[i++] = w - 0x3130;
-		}
-		if (!i) continue;
-		buf[i] = 0;
-		formList[noForm] = {buf}; // duplication of forms possible. should remove
-		kt->build(buf, &formList[noForm++]);
-	}
-	fclose(file);
-	kt->fillFail();
-	return kt;
-}
-
-
 
 void printJM(const KChunk& c, const char* p)
 {
@@ -55,7 +23,7 @@ void printJM(const KChunk& c, const char* p)
 	return printf("*"), printJM(c.form->form);
 }
 
-void enumPossible(const KModelMgr& mdl, const vector<KChunk>& ch, const char* ostr, vector<pair<vector<pair<string, KPOSTag>>, float>>& ret)
+void enumPossible(const KModelMgr& mdl, const KTrie* kt, const vector<KChunk>& ch, const char* ostr, vector<pair<vector<pair<string, KPOSTag>>, float>>& ret)
 {
 	static bool(*vowelFunc[])(const char*, const char*) = {
 		KFeatureTestor::isPostposition,
@@ -72,6 +40,7 @@ void enumPossible(const KModelMgr& mdl, const vector<KChunk>& ch, const char* os
 	};
 
 	vector<size_t> idx(ch.size());
+	string tmpChr;
 	while (1)
 	{
 		const KMorpheme* before = nullptr;
@@ -80,18 +49,29 @@ void enumPossible(const KModelMgr& mdl, const vector<KChunk>& ch, const char* os
 		vector<pair<string, KPOSTag>> mj;
 		for (size_t i = 0; i < idx.size(); i++)
 		{
-			if (ch[i].isStr())
+			auto chi = ch[i];
+			if (ch[i].isStr() && i + 1 < idx.size() 
+				&& !ch[i + 1].form->candidate[idx[i + 1]]->chunks.empty()
+				&& ch[i + 1].form->candidate[idx[i + 1]]->chunks[0]->tag == KPOSTag::V)
 			{
+				tmpChr = { ostr + ch[i].begin, ostr + ch[i].end };
+				tmpChr += ch[i + 1].form->candidate[idx[i + 1]]->chunks[0]->form;
+				auto f = kt->search(&tmpChr[0], &tmpChr[0] + tmpChr.size());
+				if (f) chi = f;
+			}
+			
+			if (chi.isStr())
+			{	
 				auto curTag = mdl.findMaxiumTag(before, i + 1 < idx.size() && !ch[i + 1].isStr() ? ch[i + 1].form->candidate[idx[i + 1]] : nullptr);
-				ps += powf(ch[i].end - ch[i].begin, 2.0f) * -0.0625f;
+				ps += powf(chi.end - chi.begin, 1.0f) * -1.0f - 0;
 				ps += mdl.getTransitionP(bfTag, curTag);
 				bfTag = curTag;
 				if (ps < P_MIN) goto next;
-				mj.emplace_back(string(ostr + ch[i].begin, ostr + ch[i].end), bfTag);
+				mj.emplace_back(string(ostr + chi.begin, ostr + chi.end), bfTag);
 				before = nullptr;
 				continue;
 			}
-			auto& c = ch[i].form->candidate[idx[i]];
+			auto& c = chi.form->candidate[idx[i]];
 			ps += c->p;
 			const char* bBegin = nullptr;
 			const char* bEnd = nullptr;
@@ -115,7 +95,7 @@ void enumPossible(const KModelMgr& mdl, const vector<KChunk>& ch, const char* os
 				if (mj.size() && c->chunks[0]->tag == KPOSTag::V)
 				{
 					if (before) goto next;
-					mj.back().first += c->chunks[0]->form;
+					//mj.back().first += c->chunks[0]->form;
 					x++;
 				}
 				if(!KFeatureTestor::isCorrectEnd(&mj.back().first[0], &mj.back().first[0] + mj.back().first.size())) goto next;
@@ -152,15 +132,15 @@ int main()
 	system("chcp 65001");
 	_wsetlocale(LC_ALL, L"korean");
 
-	KModelMgr mdl("../ModelGenerator/pos.txt", "../ModelGenerator/model.txt", /*"../ModelGenerator/combined.txt"*/ nullptr);
+	KModelMgr mdl("../ModelGenerator/pos.txt", "../ModelGenerator/fullmodel.txt", "../ModelGenerator/combined.txt" /*nullptr*/);
 	mdl.solidify();
 	shared_ptr<KTrie> kt = mdl.makeTrie();
 
 	FILE* file;
-	if (fopen_s(&file, "../TestFiles/01.txt", "r")) throw exception();
+	if (fopen_s(&file, "../TestFiles/verbChart.txt", "r")) throw exception();
 	char buf[2048];
 	wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
-	vector<vector<char>> wordList;
+	vector<string> wordList;
 	wordList.emplace_back();
 	while (fgets(buf, 2048, file))
 	{
@@ -194,7 +174,7 @@ int main()
 				printf(", ");
 			}
 			printf("\n");
-			//enumPossible(mdl, s, &w[0], cands);
+			enumPossible(mdl, kt.get(), s, &w[0], cands);
 		}
 		int n = 0;
 		sort(cands.begin(), cands.end(), [](const pair<vector<pair<string, KPOSTag>>, float>& a, const pair<vector<pair<string, KPOSTag>>, float>& b)

@@ -12,6 +12,9 @@
 #include <array>
 #include <vector>
 #include <unordered_map>
+#include <deque>
+#include <bitset>
+
 #include <algorithm>
 
 #include <string>
