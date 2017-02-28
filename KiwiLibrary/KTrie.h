@@ -25,6 +25,7 @@ struct KTrie
 #ifdef  _DEBUG
 	static int rootID;
 	int id;
+	char currentChar = 0;
 #endif //  _DEBUG
 
 	KTrie* next[51] = {nullptr,};
