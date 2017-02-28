@@ -152,7 +152,7 @@ int main()
 	system("chcp 65001");
 	_wsetlocale(LC_ALL, L"korean");
 
-	KModelMgr mdl("../ModelGenerator/pos.txt", "../ModelGenerator/model.txt", "../ModelGenerator/combined.txt");
+	KModelMgr mdl("../ModelGenerator/pos.txt", "../ModelGenerator/model.txt", /*"../ModelGenerator/combined.txt"*/ nullptr);
 	mdl.solidify();
 	shared_ptr<KTrie> kt = mdl.makeTrie();
 

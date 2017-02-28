@@ -64,7 +64,7 @@ KTrie * KTrie::findFail(char i) const
 	}
 }
 
-void KTrie::fillFail()
+void KTrie::fillFail() // 너비우선탐색이 안되고, 깊이우선탐색이 되어서 fail노드를 잘못 생성하는 버그가 있음.
 {
 	for (int i = 0; i < 51; i++)
 	{
@@ -157,12 +157,12 @@ vector<vector<KChunk>> KTrie::split(const vector<char>& str) const
 					size_t bBegin = pl.empty() ? 0 : pl.back().second;
 					if (bBegin == bEnd && !pl.empty()) bBegin -= pl.back().first->form.size();
 
-					if ((size_t)cand->vowel && 
-						!vowelFunc[(size_t)cand->vowel - 1](&str[0] + bBegin, &str[0] + bEnd)) continue;
-					if ((size_t)cand->polar &&
-						!polarFunc[(size_t)cand->polar - 1](&str[0] + bBegin, &str[0] + bEnd)) continue;
-					if (!cand->hasFirstV && !KFeatureTestor::isCorrectEnd(&str[0] + bBegin, &str[0] + bEnd)) continue;
-					if (!KFeatureTestor::isCorrectStart(&str[0] + n, &str[0] + str.size())) continue;
+					//if ((size_t)cand->vowel && 
+					//	!vowelFunc[(size_t)cand->vowel - 1](&str[0] + bBegin, &str[0] + bEnd)) continue;
+					//if ((size_t)cand->polar &&
+					//	!polarFunc[(size_t)cand->polar - 1](&str[0] + bBegin, &str[0] + bEnd)) continue;
+					//if (!cand->hasFirstV && !KFeatureTestor::isCorrectEnd(&str[0] + bBegin, &str[0] + bEnd)) continue;
+					//if (!KFeatureTestor::isCorrectStart(&str[0] + n, &str[0] + str.size())) continue;
 					branches.push_back(branches[i]);
 					branches.back().first.emplace_back(cand, n);
 					branches.back().second += cand->maxP;
@@ -182,9 +182,9 @@ vector<vector<KChunk>> KTrie::split(const vector<char>& str) const
 			if (curTrie->fail)
 			{
 				curTrie = curTrie->fail;
-				if (curTrie->exit)
+				for (auto submatcher = curTrie; submatcher; submatcher = submatcher->fail)
 				{
-					candidates.emplace_back(curTrie->exit);
+					if(submatcher->exit) candidates.emplace_back(submatcher->exit);
 				}
 			}
 			else
@@ -198,7 +198,11 @@ vector<vector<KChunk>> KTrie::split(const vector<char>& str) const
 		curTrie = curTrie->next[c - 1];
 		if (curTrie->exit) // if it has exit node, a pattern has found
 		{
-			candidates.emplace_back(curTrie->exit);
+			for (auto submatcher = curTrie; submatcher; submatcher = submatcher->fail)
+			{
+				if (submatcher->exit) candidates.emplace_back(submatcher->exit);
+			}
+			//candidates.emplace_back(curTrie->exit);
 		}
 	continueFor:
 		n++;
