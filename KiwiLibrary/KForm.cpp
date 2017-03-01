@@ -101,4 +101,5 @@ void KForm::updateCond()
 	}
 	vowel = cv;
 	polar = cp;
+	if (suffix.find(0) != suffix.end()) suffix = {};
 }

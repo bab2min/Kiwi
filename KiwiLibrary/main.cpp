@@ -23,7 +23,7 @@ void printJM(const KChunk& c, const char* p)
 	return printf("*"), printJM(c.form->form);
 }
 
-void enumPossible(const KModelMgr& mdl, const KTrie* kt, const vector<KChunk>& ch, const char* ostr, vector<pair<vector<pair<string, KPOSTag>>, float>>& ret)
+void enumPossible(const KModelMgr& mdl, const vector<KChunk>& ch, const char* ostr, vector<pair<vector<pair<string, KPOSTag>>, float>>& ret)
 {
 	static bool(*vowelFunc[])(const char*, const char*) = {
 		KFeatureTestor::isPostposition,
@@ -50,7 +50,7 @@ void enumPossible(const KModelMgr& mdl, const KTrie* kt, const vector<KChunk>& c
 		for (size_t i = 0; i < idx.size(); i++)
 		{
 			auto chi = ch[i];
-			if (ch[i].isStr() && i + 1 < idx.size() 
+			/*if (ch[i].isStr() && i + 1 < idx.size() 
 				&& !ch[i + 1].form->candidate[idx[i + 1]]->chunks.empty()
 				&& ch[i + 1].form->candidate[idx[i + 1]]->chunks[0]->tag == KPOSTag::V)
 			{
@@ -58,12 +58,12 @@ void enumPossible(const KModelMgr& mdl, const KTrie* kt, const vector<KChunk>& c
 				tmpChr += ch[i + 1].form->candidate[idx[i + 1]]->chunks[0]->form;
 				auto f = kt->search(&tmpChr[0], &tmpChr[0] + tmpChr.size());
 				if (f) chi = f;
-			}
+			}*/
 			
 			if (chi.isStr())
 			{	
 				auto curTag = mdl.findMaxiumTag(before, i + 1 < idx.size() && !ch[i + 1].isStr() ? ch[i + 1].form->candidate[idx[i + 1]] : nullptr);
-				ps += powf(chi.end - chi.begin, 1.0f) * -1.0f - 0;
+				ps += powf(chi.end - chi.begin, 1.f) * -3.9f - 1;
 				ps += mdl.getTransitionP(bfTag, curTag);
 				bfTag = curTag;
 				if (ps < P_MIN) goto next;
@@ -92,13 +92,13 @@ void enumPossible(const KModelMgr& mdl, const KTrie* kt, const vector<KChunk>& c
 			else
 			{
 				size_t x = 0;
-				if (mj.size() && c->chunks[0]->tag == KPOSTag::V)
+				if (!mj.empty() && c->chunks[0]->tag == KPOSTag::V)
 				{
-					if (before) goto next;
-					//mj.back().first += c->chunks[0]->form;
+					if (before && before->combineSocket != c->combineSocket) goto next;
+					mj.back().first += c->chunks[0]->form;
 					x++;
 				}
-				if(!KFeatureTestor::isCorrectEnd(&mj.back().first[0], &mj.back().first[0] + mj.back().first.size())) goto next;
+				if(!mj.empty() && !KFeatureTestor::isCorrectEnd(&mj.back().first[0], &mj.back().first[0] + mj.back().first.size())) goto next;
 				for (; x < c->chunks.size(); x++)
 				{
 					auto& ch = c->chunks[x];
@@ -132,12 +132,12 @@ int main()
 	system("chcp 65001");
 	_wsetlocale(LC_ALL, L"korean");
 
-	KModelMgr mdl("../ModelGenerator/pos.txt", "../ModelGenerator/fullmodel.txt", "../ModelGenerator/combined.txt" /*nullptr*/);
+	KModelMgr mdl("../ModelGenerator/pos.txt", "../ModelGenerator/fullmodel.txt", "../ModelGenerator/combined.txt", "../ModelGenerator/precombined.txt");
 	mdl.solidify();
 	shared_ptr<KTrie> kt = mdl.makeTrie();
 
 	FILE* file;
-	if (fopen_s(&file, "../TestFiles/verbChart.txt", "r")) throw exception();
+	if (fopen_s(&file, "../TestFiles/01.txt", "r")) throw exception();
 	char buf[2048];
 	wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
 	vector<string> wordList;
@@ -174,7 +174,7 @@ int main()
 				printf(", ");
 			}
 			printf("\n");
-			enumPossible(mdl, kt.get(), s, &w[0], cands);
+			enumPossible(mdl, s, &w[0], cands);
 		}
 		int n = 0;
 		sort(cands.begin(), cands.end(), [](const pair<vector<pair<string, KPOSTag>>, float>& a, const pair<vector<pair<string, KPOSTag>>, float>& b)

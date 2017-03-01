@@ -46,7 +46,7 @@ void KModelMgr::loadPOSFromTxt(const char * filename)
 	for (size_t i = 0; i < (size_t)KPOSTag::MAX; i++)
 	{
 		size_t maxPos = 0;
-		for (size_t j = 1; j <= (size_t)KPOSTag::XR; j++)
+		for (size_t j = 1; j <= (size_t)KPOSTag::IC; j++)
 		{
 			if (posTransition[j][i] > posTransition[maxPos][i]) maxPos = j;
 		}
@@ -56,11 +56,11 @@ void KModelMgr::loadPOSFromTxt(const char * filename)
 	for (size_t i = 0; i < (size_t)KPOSTag::MAX; i++) for (size_t j = 0; j < (size_t)KPOSTag::MAX; j++)
 	{
 		static KPOSTag vOnly[] = {
-			KPOSTag::VV, KPOSTag::VA, KPOSTag::VX, KPOSTag::XSV, KPOSTag::XSA
+			KPOSTag::VV, KPOSTag::VA, KPOSTag::VX
 		};
 		size_t maxPos = 1;
 		float maxValue = posTransition[i][1] + posTransition[1][j];
-		for (size_t n = 1; n <= (size_t)KPOSTag::XR; n++)
+		for (size_t n = 1; n <= (size_t)KPOSTag::IC; n++)
 		{
 			if (posTransition[i][n] + posTransition[n][j] > maxValue)
 			{
@@ -139,7 +139,9 @@ void KModelMgr::loadMMFromTxt(const char * filename, unordered_map<string, size_
 		}
 		size_t mid = morphemes.size();
 		morphMap.emplace(make_pair(form, tag), mid);
-		formMapper(form).candidate.emplace_back((KMorpheme*)mid);
+		auto& fm = formMapper(form);
+		fm.candidate.emplace_back((KMorpheme*)mid);
+		fm.suffix.insert(0);
 		morphemes.emplace_back(form, tag, cvowel, polar, logf(tagWeight));
 	}
 	fclose(file);
@@ -210,22 +212,71 @@ void KModelMgr::loadCMFromTxt(const char * filename, unordered_map<string, size_
 		{
 			vowel = (KCondVowel)(pm - conds + 1);
 		}
+		char combineSocket = 0;
+		if (fields.size() >= 4)
+		{
+			combineSocket = _wtoi(fields[3].c_str());
+		}
 
 		size_t mid = morphemes.size();
-		formMapper(form).candidate.emplace_back((KMorpheme*)mid);
-		morphemes.emplace_back(form, KPOSTag::UNKNOWN, vowel, polar, ps);
+		auto& fm = formMapper(form);
+		fm.candidate.emplace_back((KMorpheme*)mid);
+		fm.suffix.insert(0);
+		morphemes.emplace_back(form, KPOSTag::UNKNOWN, vowel, polar, ps, combineSocket);
 		morphemes.back().chunks = move(chunkIds);
 	}
 	fclose(file);
 }
 
-KModelMgr::KModelMgr(const char * posFile, const char * morphemeFile, const char * combinedFile)
+
+void KModelMgr::loadPCMFromTxt(const char * filename, unordered_map<string, size_t>& formMap, unordered_map<pair<string, KPOSTag>, size_t>& morphMap)
+{
+	auto formMapper = [&formMap, this](string form) -> KForm&
+	{
+		auto it = formMap.find(form);
+		if (it != formMap.end()) return forms[it->second];
+		size_t id = formMap.size();
+		formMap.emplace(form, id);
+		forms.emplace_back(form);
+		return forms[id];
+	};
+
+	FILE* file;
+	if (fopen_s(&file, filename, "r")) throw exception();
+	char buf[2048];
+	wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
+	while (fgets(buf, 2048, file))
+	{
+		auto wstr = converter.from_bytes(buf);
+		if (wstr.back() == '\n') wstr.pop_back();
+		auto fields = split(wstr, '\t');
+		if (fields.size() < 5) continue;
+
+		auto combs = split(fields[0], '+');
+		auto form = encodeJamo(combs[0].cbegin(), combs[0].cend());
+		auto tag = makePOSTag(fields[1]);
+		float tagWeight = _wtof(fields[2].c_str());
+		string suffixes = encodeJamo(fields[3].cbegin(), fields[3].cend());
+		char socket = _wtoi(fields[4].c_str());
+
+		size_t mid = morphemes.size();
+		morphMap.emplace(make_pair(form, tag), mid);
+		auto& fm = formMapper(form);
+		fm.candidate.emplace_back((KMorpheme*)mid);
+		fm.suffix.insert(suffixes.begin(), suffixes.end());
+		morphemes.emplace_back(form, tag, KCondVowel::none, KCondPolarity::none, logf(tagWeight), socket);
+	}
+	fclose(file);
+}
+
+KModelMgr::KModelMgr(const char * posFile, const char * morphemeFile, const char * combinedFile, const char* precombinedFile)
 {
 	unordered_map<string, size_t> formMap;
 	unordered_map<pair<string, KPOSTag>, size_t> morphMap;
 	if (posFile) loadPOSFromTxt(posFile);
 	if (morphemeFile) loadMMFromTxt(morphemeFile, formMap, morphMap);
 	if (combinedFile) loadCMFromTxt(combinedFile, formMap, morphMap);
+	if (precombinedFile) loadPCMFromTxt(precombinedFile, formMap, morphMap);
 }
 
 void KModelMgr::solidify()

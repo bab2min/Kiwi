@@ -95,6 +95,7 @@ bool KFeatureTestor::isPostposition(const char * begin, const char * end)
 bool KFeatureTestor::isCorrectStart(const char * begin, const char * end)
 {
 	return !(end - begin >= 2 && begin[0] <= 30 && begin[1] <= 30)
+		&& !(end - begin >= 1 && begin[0] > 30);
 		/*&& !(end - begin == 1 && begin[0] <= 30)*/;
 }
 

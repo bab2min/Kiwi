@@ -175,10 +175,16 @@ vector<vector<KChunk>> KTrie::split(const string& str) const
 					auto& pl = branches[i].chunks;
 					// if there are intersected chunk, pass
 					if (!pl.empty() && pl.back().second > n - cand->form.size()) continue;
+					// if current chunk is precombined, test next character
+					if (!cand->suffix.empty() && n + 1 < str.size()
+						&& cand->suffix.find(str[n]) == cand->suffix.end())
+					{
+						continue;
+					}
 
 					// find whether the same splitter appears before
 					auto tSplitter = branches[i].splitter;
-					tSplitter.set(n - 1);
+					if (n < str.size()) tSplitter.set(n - 1);
 					if (n - cand->form.size() > 0) tSplitter.set(n - cand->form.size() - 1);
 					auto it = branchMap.find(tSplitter);
 					size_t idxRepl = -1;
@@ -186,7 +192,7 @@ vector<vector<KChunk>> KTrie::split(const string& str) const
 					{
 						const auto& b = branches[it->second];
 						// if the same splitter exists and has fewer matches, update
-						if (b.chunks.size() <= branches[i].chunks.size() + 1)
+						if (b.chunks.size() < branches[i].chunks.size() + 1)
 						{
 							idxRepl = it->second;
 						}
@@ -271,6 +277,10 @@ vector<vector<KChunk>> KTrie::split(const string& str) const
 	vector<vector<KChunk>> ret;
 	for (auto branch : branches)
 	{
+		if (!branch.chunks.empty() && branch.chunks.back().second < str.size())
+		{
+			if (!KFeatureTestor::isCorrectStart(&str[0] + branch.chunks.back().second, &str[0] + str.size())) continue;
+		}
 		ret.emplace_back();
 		size_t c = 0;
 		//printf("%g\n", branch.second);

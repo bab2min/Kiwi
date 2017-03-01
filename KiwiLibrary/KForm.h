@@ -1,6 +1,6 @@
 #pragma once
 
-#define P_MIN -30.f
+#define P_MIN -20.f
 
 enum class KPOSTag : char
 {
@@ -53,8 +53,8 @@ struct KMorpheme
 		KPOSTag _tag = KPOSTag::UNKNOWN, 
 		KCondVowel _vowel = KCondVowel::none,
 		KCondPolarity _polar = KCondPolarity::none, 
-		float _p = 0)
-		: tag(_tag), vowel(_vowel), polar(_polar), p(_p)
+		float _p = 0, char _combineSocket = 0)
+		: tag(_tag), vowel(_vowel), polar(_polar), p(_p), combineSocket(_combineSocket)
 //#ifdef  _DEBUG
 		, form(_form), id(uid++)
 //#endif //  _DEBUG
@@ -63,6 +63,7 @@ struct KMorpheme
 	KPOSTag tag = KPOSTag::UNKNOWN;
 	KCondVowel vowel = KCondVowel::none;
 	KCondPolarity polar = KCondPolarity::none;
+	char combineSocket = 0;
 	float p = 0;
 	vector<const KMorpheme*> chunks;
 };
@@ -75,6 +76,7 @@ struct KForm
 	KCondPolarity polar = KCondPolarity::none;
 	bool hasFirstV = false;
 	float maxP = 0;
+	unordered_set<char> suffix;
 	KForm(const char* _form = nullptr);
 	KForm(const string& _form) : form(_form) {}
 	void updateCond();

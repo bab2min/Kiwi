@@ -143,7 +143,7 @@ precondList = ['V', 'VV', 'XSV', 'XSA']
 precond = {pos:[(i, pos) for i in rm.getPrecond(pos)] for pos in precondList}
 precond['V'] += [('ㅇㅣ', 'VCP'), ('ㅇㅏㄴㅣ', 'VCN')]
 precond['VA'] = [(utils.normalizeHangul(line.strip()), 'VA') for line in open('hAdj.txt', encoding='utf-8').readlines()]
-
+#print(precond['V'])
 emptyPos = set()
 
 def enumForms(tag):
@@ -185,7 +185,11 @@ for pk in [''] + list(precond):
                 btag = p[1]
             if not nform: continue
             count += 1
-            for i in nform: output.write(i + '\t' + str('+'.join(map(mToStr, ps))) + '\t' + (bcond or '') + '\n')
+            socket = ''
+            for i in nform:
+                if pk == 'V' and ps[0][1] == 'V':
+                    socket = precond['V'].index(ps[0])+1
+                output.write(i + '\t' + str('+'.join(map(mToStr, ps))) + '\t' + (bcond or '') + '\t' + (str(socket) or '')+ '\n')
         if not count: emptyPos.add(k)
 
 output.close()
