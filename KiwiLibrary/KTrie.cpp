@@ -137,7 +137,8 @@ vector<vector<KChunk>> KTrie::split(const string& str) const
 	struct ChunkInfo
 	{
 		vector<pair<const KForm*, size_t>> chunks;
-		float p;
+		float p = 0;
+		size_t count = 0;
 		bitset<64> splitter;
 	};
 
@@ -163,6 +164,7 @@ vector<vector<KChunk>> KTrie::split(const string& str) const
 		KFeatureTestor::isPositive,
 		KFeatureTestor::notPositive
 	};
+	size_t maxChunk = (str.size() + 8) / 4;
 	auto brachOut = [&]()
 	{
 		if (!candidates.empty())
@@ -181,6 +183,8 @@ vector<vector<KChunk>> KTrie::split(const string& str) const
 					{
 						continue;
 					}
+
+					if (branches[i].count >= maxChunk) continue;
 
 					// find whether the same splitter appears before
 					auto tSplitter = branches[i].splitter;
@@ -224,6 +228,7 @@ vector<vector<KChunk>> KTrie::split(const string& str) const
 					bInsertor.chunks.emplace_back(cand, n);
 					bInsertor.p += cand->maxP;
 					bInsertor.splitter = tSplitter;
+					bInsertor.count += (beforeMatched || bBegin == bEnd) ? 1 : 2;
 					//if (pl.empty() || pl.back().second < bEnd) branches.back().second += mdl.;
 				}
 			}
@@ -283,7 +288,8 @@ vector<vector<KChunk>> KTrie::split(const string& str) const
 		}
 		ret.emplace_back();
 		size_t c = 0;
-		//printf("%g\n", branch.second);
+		//printf("%g\n", branch.p);
+		//printf("%d\n", branch.count);
 		for (auto p : branch.chunks)
 		{
 			size_t s = p.second - p.first->form.size();

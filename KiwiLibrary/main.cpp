@@ -23,7 +23,7 @@ void printJM(const KChunk& c, const char* p)
 	return printf("*"), printJM(c.form->form);
 }
 
-void enumPossible(const KModelMgr& mdl, const vector<KChunk>& ch, const char* ostr, vector<pair<vector<pair<string, KPOSTag>>, float>>& ret)
+void enumPossible(const KModelMgr& mdl, const vector<KChunk>& ch, const char* ostr, size_t len, vector<pair<vector<pair<string, KPOSTag>>, float>>& ret)
 {
 	static bool(*vowelFunc[])(const char*, const char*) = {
 		KFeatureTestor::isPostposition,
@@ -41,6 +41,7 @@ void enumPossible(const KModelMgr& mdl, const vector<KChunk>& ch, const char* os
 
 	vector<size_t> idx(ch.size());
 	string tmpChr;
+	float minThreshold = len * -2.f - 8;
 	while (1)
 	{
 		const KMorpheme* before = nullptr;
@@ -63,10 +64,11 @@ void enumPossible(const KModelMgr& mdl, const vector<KChunk>& ch, const char* os
 			if (chi.isStr())
 			{	
 				auto curTag = mdl.findMaxiumTag(before, i + 1 < idx.size() && !ch[i + 1].isStr() ? ch[i + 1].form->candidate[idx[i + 1]] : nullptr);
-				ps += powf(chi.end - chi.begin, 1.f) * -3.9f - 1;
+				ps += powf(chi.end - chi.begin, 1.f) * -2.f - 6.f;
+				if (curTag == KPOSTag::VV || curTag == KPOSTag::VA) ps += -10.f;
 				ps += mdl.getTransitionP(bfTag, curTag);
 				bfTag = curTag;
-				if (ps < P_MIN) goto next;
+				if (!mj.empty() && ps < minThreshold) goto next;
 				mj.emplace_back(string(ostr + chi.begin, ostr + chi.end), bfTag);
 				before = nullptr;
 				continue;
@@ -107,7 +109,8 @@ void enumPossible(const KModelMgr& mdl, const vector<KChunk>& ch, const char* os
 				ps += mdl.getTransitionP(bfTag, c->chunks[c->chunks[0]->tag == KPOSTag::V ? 1 : 0]->tag);
 				bfTag = c->chunks.back()->tag;
 			}
-			if (ps < P_MIN) goto next;
+			ps += mdl.getTransitionP(bfTag, KPOSTag::UNKNOWN);
+			if (!mj.empty() && ps < minThreshold) goto next;
 			before = c;
 		}
 		ret.emplace_back(move(mj), ps);
@@ -174,7 +177,7 @@ int main()
 				printf(", ");
 			}
 			printf("\n");
-			enumPossible(mdl, s, &w[0], cands);
+			enumPossible(mdl, s, &w[0], w.size(), cands);
 		}
 		int n = 0;
 		sort(cands.begin(), cands.end(), [](const pair<vector<pair<string, KPOSTag>>, float>& a, const pair<vector<pair<string, KPOSTag>>, float>& b)

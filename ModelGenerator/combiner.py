@@ -18,7 +18,7 @@ class MorphemeModel:
             if m[0] > 0.95: cond = [m[1]]
             else: cond = []
             p = {}
-            for i in c[8:]:
+            for i in c[7:]:
                 x = i.split(':')
                 p[x[0]] = float(x[1])
             p2 = {}
@@ -139,11 +139,11 @@ chain = {}
 for k, p in cand.items():
     chain[k[1:]] =chain.get(k[1:], 0) + pm.pos[k[0]] * p
 
-precondList = ['V', 'VV', 'XSV', 'XSA']
+precondList = ['V', 'VV', 'VX', 'XSV', 'XSA']
 precond = {pos:[(i, pos) for i in rm.getPrecond(pos)] for pos in precondList}
 precond['V'] += [('ㅇㅣ', 'VCP'), ('ㅇㅏㄴㅣ', 'VCN')]
 precond['VA'] = [(utils.normalizeHangul(line.strip()), 'VA') for line in open('hAdj.txt', encoding='utf-8').readlines()]
-#print(precond['V'])
+#print(precond['VV'])
 emptyPos = set()
 
 def enumForms(tag):

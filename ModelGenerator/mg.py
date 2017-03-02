@@ -55,6 +55,7 @@ class ModelGenerator:
             d = self.words[k]
             if d[0] < 5: continue
             if not all(map(lambda x:'ㄱ'<=x<='ㅣ', k[0])): continue
+            if d[5]/self.formDict[k[0]] < 0.00005: continue
             #if not (k[1].startswith('E') or k[1].startswith('J') or k[1].startswith('VC')): continue
             '''if (len(k[0]) < 2 and not ModelGenerator.isVowel(k[0])) or (len(k[0]) >= 2 and not ModelGenerator.isVowel(k[0][0]) and not ModelGenerator.isVowel(k[0][1])) and d[3]/d[0] > 0.5:
                 d[1] += d[0] - d[3]
