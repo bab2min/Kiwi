@@ -31,6 +31,7 @@ void KModelMgr::loadPOSFromTxt(const char * filename)
 		auto fields = split(wstr, '\t');
 		if (fields.size() < 3) continue;
 		auto tagA = makePOSTag(fields[0]);
+		if (tagA == KPOSTag::MAX) continue;
 		if (fields[1].empty())
 		{
 			//posTransition[(int)tagA][0] = _wtof(fields[2].c_str());
@@ -38,6 +39,7 @@ void KModelMgr::loadPOSFromTxt(const char * filename)
 		else
 		{
 			auto tagB = makePOSTag(fields[1]);
+			if (tagB == KPOSTag::MAX) continue;
 			auto p = _wtof(fields[2].c_str());
 			if (p < 0.00005) continue;
 			posTransition[(int)tagA][(int)tagB] = logf(p);
@@ -45,7 +47,7 @@ void KModelMgr::loadPOSFromTxt(const char * filename)
 	}
 	fclose(file);
 
-	for (size_t i = 0; i < (size_t)KPOSTag::MAX; i++)
+	/*for (size_t i = 0; i < (size_t)KPOSTag::MAX; i++)
 	{
 		size_t maxPos = 0;
 		for (size_t j = 1; j <= (size_t)KPOSTag::IC; j++)
@@ -53,16 +55,16 @@ void KModelMgr::loadPOSFromTxt(const char * filename)
 			if (posTransition[j][i] > posTransition[maxPos][i]) maxPos = j;
 		}
 		maxiumBf[i] = (KPOSTag)maxPos;
-	}
+	}*/
 
 	for (size_t i = 0; i < (size_t)KPOSTag::MAX; i++) for (size_t j = 0; j < (size_t)KPOSTag::MAX; j++)
 	{
 		static KPOSTag vOnly[] = {
-			KPOSTag::VV, KPOSTag::VA, KPOSTag::VX
+			KPOSTag::VV, KPOSTag::VA
 		};
 		size_t maxPos = 1;
 		float maxValue = posTransition[i][1] + posTransition[1][j];
-		for (size_t n = 1; n <= (size_t)KPOSTag::IC; n++)
+		for (size_t n = 1; n <= (size_t)KPOSTag::NR; n++)
 		{
 			if (posTransition[i][n] + posTransition[n][j] > maxValue)
 			{
@@ -107,7 +109,7 @@ void KModelMgr::loadMMFromTxt(const char * filename, unordered_map<string, size_
 		auto wstr = converter.from_bytes(buf);
 		if (wstr.back() == '\n') wstr.pop_back();
 		auto fields = split(wstr, '\t');
-		if (fields.size() < 8) continue;
+		if (fields.size() < 7) continue;
 
 		auto form = encodeJamo(fields[0].cbegin(), fields[0].cend());
 		auto tag = makePOSTag(fields[1]);
@@ -323,13 +325,13 @@ float KModelMgr::getTransitionP(KPOSTag a, KPOSTag b) const
 	return posTransition[(size_t)a][(size_t)b];
 }
 
-KPOSTag KModelMgr::findMaxiumTag(const KMorpheme * b) const
+/*KPOSTag KModelMgr::findMaxiumTag(const KMorpheme * b) const
 {
 	if (!b) return KPOSTag::UNKNOWN;
 	if (b->chunks.empty()) return maxiumBf[(size_t)b->tag];
 	if (b->chunks.front()->tag == KPOSTag::V) return KPOSTag::UNKNOWN;
 	return maxiumBf[(size_t)b->chunks.front()->tag];
-}
+}*/
 
 KPOSTag KModelMgr::findMaxiumTag(const KMorpheme * a, const KMorpheme * b) const
 {

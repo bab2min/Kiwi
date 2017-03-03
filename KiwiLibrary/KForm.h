@@ -1,13 +1,16 @@
 #pragma once
 
-#define P_MIN -20.f
+#define P_MIN -40.f
 
 enum class KPOSTag : char
 {
 	UNKNOWN,
-	NNG, NNP, NNB, NR, NP,
-	VV, VA, VX,
-	MM, MAG, MAJ,
+	NNG, NNP, NNB, 
+	VV, VA, 
+	MAG, 
+	NR, NP,
+	VX,
+	MM, MAJ,
 	IC,
 	XPN, XSN, XSV, XSA, XR,
 	VCP, VCN,
@@ -41,25 +44,26 @@ enum class KCondPolarity : char
 
 KPOSTag makePOSTag(wstring tagStr);
 const char* tagToString(KPOSTag t);
+struct KForm;
 
 struct KMorpheme
 {
-//#ifdef _DEBUG
+#ifdef _DEBUG
 	static size_t uid;
-	string form;
 	size_t id;
-//#endif
-	KMorpheme(string _form = "", 
+#endif
+	KMorpheme(const string& _form = "", 
 		KPOSTag _tag = KPOSTag::UNKNOWN, 
 		KCondVowel _vowel = KCondVowel::none,
 		KCondPolarity _polar = KCondPolarity::none, 
 		float _p = 0, char _combineSocket = 0)
-		: tag(_tag), vowel(_vowel), polar(_polar), p(_p), combineSocket(_combineSocket)
-//#ifdef  _DEBUG
-		, form(_form), id(uid++)
-//#endif //  _DEBUG
-	{}
-
+		: tag(_tag), vowel(_vowel), polar(_polar), p(_p), combineSocket(_combineSocket), form(_form)
+#ifdef  _DEBUG
+		, id(uid++)
+#endif //  _DEBUG
+	{
+	}
+	string form;
 	KPOSTag tag = KPOSTag::UNKNOWN;
 	KCondVowel vowel = KCondVowel::none;
 	KCondPolarity polar = KCondPolarity::none;

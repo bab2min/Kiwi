@@ -7,7 +7,7 @@ class KModelMgr
 protected:
 	vector<KForm> forms;
 	vector<KMorpheme> morphemes;
-	KPOSTag maxiumBf[(size_t)KPOSTag::MAX];
+	//KPOSTag maxiumBf[(size_t)KPOSTag::MAX];
 	KPOSTag maxiumBtwn[(size_t)KPOSTag::MAX][(size_t)KPOSTag::MAX];
 	KPOSTag maxiumVBtwn[(size_t)KPOSTag::MAX][(size_t)KPOSTag::MAX];
 	float posTransition[(size_t)KPOSTag::MAX][(size_t)KPOSTag::MAX];
@@ -21,7 +21,7 @@ public:
 	shared_ptr<KTrie> makeTrie() const;
 	float getTransitionP(const KMorpheme* a, const KMorpheme* b) const;
 	float getTransitionP(KPOSTag a, KPOSTag b) const;
-	KPOSTag findMaxiumTag(const KMorpheme* b) const;
+	//KPOSTag findMaxiumTag(const KMorpheme* b) const;
 	KPOSTag findMaxiumTag(const KMorpheme* a, const KMorpheme* c) const;
 	float getMaxInOpend(KPOSTag a);
 };

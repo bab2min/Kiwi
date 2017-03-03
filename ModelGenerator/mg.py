@@ -53,7 +53,7 @@ class ModelGenerator:
         f = open(filename, 'w', encoding='utf-8')
         for k in sorted(self.words):
             d = self.words[k]
-            if d[0] < 5: continue
+            if d[5] < 5: continue
             if not all(map(lambda x:'ㄱ'<=x<='ㅣ', k[0])): continue
             if d[5]/self.formDict[k[0]] < 0.00005: continue
             #if not (k[1].startswith('E') or k[1].startswith('J') or k[1].startswith('VC')): continue

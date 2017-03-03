@@ -41,7 +41,7 @@ void enumPossible(const KModelMgr& mdl, const vector<KChunk>& ch, const char* os
 
 	vector<size_t> idx(ch.size());
 	string tmpChr;
-	float minThreshold = len * -2.f - 8;
+	float minThreshold = len * -1.5f - 15.f;
 	while (1)
 	{
 		const KMorpheme* before = nullptr;
@@ -51,24 +51,14 @@ void enumPossible(const KModelMgr& mdl, const vector<KChunk>& ch, const char* os
 		for (size_t i = 0; i < idx.size(); i++)
 		{
 			auto chi = ch[i];
-			/*if (ch[i].isStr() && i + 1 < idx.size() 
-				&& !ch[i + 1].form->candidate[idx[i + 1]]->chunks.empty()
-				&& ch[i + 1].form->candidate[idx[i + 1]]->chunks[0]->tag == KPOSTag::V)
-			{
-				tmpChr = { ostr + ch[i].begin, ostr + ch[i].end };
-				tmpChr += ch[i + 1].form->candidate[idx[i + 1]]->chunks[0]->form;
-				auto f = kt->search(&tmpChr[0], &tmpChr[0] + tmpChr.size());
-				if (f) chi = f;
-			}*/
-			
 			if (chi.isStr())
 			{	
 				auto curTag = mdl.findMaxiumTag(before, i + 1 < idx.size() && !ch[i + 1].isStr() ? ch[i + 1].form->candidate[idx[i + 1]] : nullptr);
-				ps += powf(chi.end - chi.begin, 1.f) * -2.f - 6.f;
-				if (curTag == KPOSTag::VV || curTag == KPOSTag::VA) ps += -10.f;
+				ps += powf(chi.end - chi.begin, 1.f) * -1.5f - 6.f;
+				if (curTag == KPOSTag::VV || curTag == KPOSTag::VA) ps += -5.f;
 				ps += mdl.getTransitionP(bfTag, curTag);
 				bfTag = curTag;
-				if (!mj.empty() && ps < minThreshold) goto next;
+				if (ps < minThreshold) goto next;
 				mj.emplace_back(string(ostr + chi.begin, ostr + chi.end), bfTag);
 				before = nullptr;
 				continue;
@@ -100,6 +90,7 @@ void enumPossible(const KModelMgr& mdl, const vector<KChunk>& ch, const char* os
 					mj.back().first += c->chunks[0]->form;
 					x++;
 				}
+
 				if(!mj.empty() && !KFeatureTestor::isCorrectEnd(&mj.back().first[0], &mj.back().first[0] + mj.back().first.size())) goto next;
 				for (; x < c->chunks.size(); x++)
 				{
@@ -109,10 +100,12 @@ void enumPossible(const KModelMgr& mdl, const vector<KChunk>& ch, const char* os
 				ps += mdl.getTransitionP(bfTag, c->chunks[c->chunks[0]->tag == KPOSTag::V ? 1 : 0]->tag);
 				bfTag = c->chunks.back()->tag;
 			}
-			ps += mdl.getTransitionP(bfTag, KPOSTag::UNKNOWN);
-			if (!mj.empty() && ps < minThreshold) goto next;
+			if (ps < minThreshold) goto next;
 			before = c;
 		}
+		if (before && before->tag != KPOSTag::UNKNOWN && before->combineSocket) goto next;
+		ps += mdl.getTransitionP(bfTag, KPOSTag::UNKNOWN);
+		if (ps < minThreshold) goto next;
 		ret.emplace_back(move(mj), ps);
 	next:;
 
