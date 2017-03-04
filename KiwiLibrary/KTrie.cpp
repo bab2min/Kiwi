@@ -132,7 +132,7 @@ vector<pair<const KForm*, int>> KTrie::searchAllPatterns(const string& str) cons
 	return found;
 }
 
-vector<vector<KChunk>> KTrie::split(const string& str) const
+vector<vector<KChunk>> KTrie::split(const string& str, bool hasPrefix) const
 {
 	struct ChunkInfo
 	{
@@ -185,7 +185,31 @@ vector<vector<KChunk>> KTrie::split(const string& str) const
 					}
 
 					if (branches[i].count >= maxChunk) continue;
+					if (branches[i].chunks.size() >= 2
+						&& cand->form.size() == 1
+						&& (branches[i].chunks.end() - 1)->first->form.size() == 1
+						&& (branches[i].chunks.end() - 2)->first->form.size() == 1) continue;
 
+					size_t bEnd = n - cand->form.size();
+					size_t bBegin = pl.empty() ? 0 : pl.back().second;
+					bool beforeMatched;
+					if (beforeMatched = (bBegin == bEnd && !pl.empty())) bBegin -= pl.back().first->form.size();
+
+					if (bEnd == 0 && !hasPrefix)
+					{
+						// if the form has constraints, do test
+						if ((size_t)cand->vowel &&
+							!vowelFunc[(size_t)cand->vowel - 1](&str[0] + bBegin, &str[0] + bEnd)) continue;
+						if ((size_t)cand->polar &&
+							!polarFunc[(size_t)cand->polar - 1](&str[0] + bBegin, &str[0] + bEnd)) continue;
+					}
+					// if former ends with ¤· and next begin vowel, pass
+					if (bEnd && str[bEnd - 1] == 23 && cand->form[0] > 30) continue;
+
+					if (!beforeMatched && !cand->hasFirstV && !KFeatureTestor::isCorrectEnd(&str[0] + bBegin, &str[0] + bEnd)) continue;
+					if (!beforeMatched && !KFeatureTestor::isCorrectStart(&str[0] + bBegin, &str[0] + bEnd)) continue;
+					//if (!KFeatureTestor::isCorrectStart(&str[0] + n, &str[0] + str.size())) continue;
+					
 					// find whether the same splitter appears before
 					auto tSplitter = branches[i].splitter;
 					if (n < str.size()) tSplitter.set(n - 1);
@@ -204,20 +228,6 @@ vector<vector<KChunk>> KTrie::split(const string& str) const
 						else continue;
 					}
 
-					size_t bEnd = n - cand->form.size();
-					size_t bBegin = pl.empty() ? 0 : pl.back().second;
-					bool beforeMatched;
-					if (beforeMatched = (bBegin == bEnd && !pl.empty())) bBegin -= pl.back().first->form.size();
-
-					// if the form has constraints, do test
-					if ((size_t)cand->vowel && 
-						!vowelFunc[(size_t)cand->vowel - 1](&str[0] + bBegin, &str[0] + bEnd)) continue;
-					if ((size_t)cand->polar &&
-						!polarFunc[(size_t)cand->polar - 1](&str[0] + bBegin, &str[0] + bEnd)) continue;
-					if (!beforeMatched && !cand->hasFirstV && !KFeatureTestor::isCorrectEnd(&str[0] + bBegin, &str[0] + bEnd)) continue;
-					if (!beforeMatched && !KFeatureTestor::isCorrectStart(&str[0] + bBegin, &str[0] + bEnd)) continue;
-					//if (!KFeatureTestor::isCorrectStart(&str[0] + n, &str[0] + str.size())) continue;
-					
 					if (idxRepl == -1)
 					{
 						branchMap[tSplitter] = branches.size();

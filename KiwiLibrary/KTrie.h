@@ -38,6 +38,6 @@ struct KTrie
 	void fillFail();
 	const KForm* search(const char* begin, const char* end) const;
 	vector<pair<const KForm*, int>> searchAllPatterns(const string& str) const;
-	vector<vector<KChunk>> split(const string& str) const;
+	vector<vector<KChunk>> split(const string& str, bool hasPrefix = false) const;
 };
 

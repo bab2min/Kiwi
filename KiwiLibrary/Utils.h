@@ -3,9 +3,11 @@
 #define LEN_ARRAY(p) (sizeof(p)/sizeof(p[0]))
 
 string splitJamo(wstring hangul);
+wstring joinJamo(string jm);
 void splitJamo(wchar_t hangul, string& ret);
 void printJM(const char* c, size_t len = -1);
 void printJM(const string& c);
+void printJM(const KChunk& c, const char* p);
 
 template<typename Iter>
 string encodeJamo(Iter begin, Iter end) {

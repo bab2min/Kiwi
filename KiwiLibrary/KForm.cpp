@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "KForm.h"
 
-#ifdef _DEBUG
+//#ifdef _DEBUG
 size_t KMorpheme::uid = 0;
-#endif
+//#endif
 
 KPOSTag makePOSTag(wstring tagStr)
 {
@@ -62,7 +62,7 @@ const char * tagToString(KPOSTag t)
 {
 	static const char* tags[] = 
 	{
-		"UNKNOWN",
+		"UN",
 		"NNG", "NNP", "NNB", 
 		"VV", "VA", 
 		"MAG", 
@@ -79,6 +79,7 @@ const char * tagToString(KPOSTag t)
 		"EP", "EF", "EC", "ETN", "ETM",
 		"V"
 	};
+	assert(t < KPOSTag::MAX);
 	return tags[(size_t)t];
 }
 
