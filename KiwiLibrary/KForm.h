@@ -48,19 +48,19 @@ struct KForm;
 
 struct KMorpheme
 {
-#ifdef _DEBUG
+//#ifdef _DEBUG
 	static size_t uid;
 	size_t id;
-#endif
+//#endif
 	KMorpheme(const string& _form = "", 
 		KPOSTag _tag = KPOSTag::UNKNOWN, 
 		KCondVowel _vowel = KCondVowel::none,
 		KCondPolarity _polar = KCondPolarity::none, 
 		float _p = 0, char _combineSocket = 0)
 		: tag(_tag), vowel(_vowel), polar(_polar), p(_p), combineSocket(_combineSocket), form(_form)
-#ifdef  _DEBUG
+//#ifdef  _DEBUG
 		, id(uid++)
-#endif //  _DEBUG
+//#endif //  _DEBUG
 	{
 	}
 	string form;

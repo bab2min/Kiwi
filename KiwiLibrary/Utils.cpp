@@ -1,5 +1,6 @@
 #include "stdafx.h"
-
+#include "KTrie.h"
+#include "KForm.h"
 #include "Utils.h"
 
 void splitJamo(wchar_t c, string& ret)
@@ -26,6 +27,91 @@ string splitJamo(wstring hangul)
 	return move(ret);
 }
 
+wstring joinJamo(string jm)
+{
+	static char choInvTable[] = { -1, 0, 1, -1, 2, -1, -1, 3, 4, 5, -1, -1, -1, -1, -1, -1, -1, 6, 7, 8, -1, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18};
+	static char jongInvTable[] = { 0, 1, 2, 3, 4, 5, 6, 7, -1, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, -1, 18, 19, 20, 21, 22, -1, 23, 24, 25, 26, 27};
+	wstring ret;
+	char cho = 0, jung = 0, jong = 0;
+	auto flush = [&]()
+	{
+		if (!cho && jung)
+		{
+			ret.push_back(0x3130 + jung);
+			jung = 0;
+			return;
+		}
+		if (!jung && cho)
+		{
+			ret.push_back(0x3130 + cho);
+			cho = 0;
+			return;
+		}
+
+		wchar_t hangul = (choInvTable[cho] * 21 + (jung-31)) * 28 + jongInvTable[jong] + 0xAC00;
+		ret.push_back(hangul);
+		cho = jung = jong = 0;
+	};
+
+	for (auto c : jm)
+	{
+		if (c <= 30)
+		{
+			if (!cho)
+			{
+				cho = c;
+			}
+			else if (!jung || jongInvTable[c] < 0)
+			{
+				flush();
+				cho = c;
+			}
+			else  if(!jong)
+			{
+				jong = c;
+			}
+			else
+			{
+				flush();
+				cho = c;
+			}
+		}
+		else
+		{
+			if (!cho)
+			{
+				jung = c;
+				flush();
+			}
+			else if (!jung)
+			{
+				jung = c;
+			}
+			else if (!jong)
+			{
+				flush();
+				jung = c;
+			}
+			else if(choInvTable[jong] >= 0)
+			{
+				auto t = jong;
+				jong = 0;
+				flush();
+				cho = t;
+				jung = c;
+			}
+			else
+			{
+				flush();
+				jung = c;
+				flush();
+			}
+		}
+	}
+	flush();
+	return ret;
+}
+
 void printJM(const char* c, size_t len)
 {
 	auto e = c + len;
@@ -39,4 +125,10 @@ void printJM(const string& c)
 {
 	if (c.empty()) return;
 	return printJM(&c[0], c.size());
+}
+
+void printJM(const KChunk& c, const char* p)
+{
+	if (c.isStr()) return printJM(p + c.begin, c.end - c.begin);
+	return printf("*"), printJM(c.form->form);
 }

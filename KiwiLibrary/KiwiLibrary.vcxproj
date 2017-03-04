@@ -149,6 +149,7 @@
     <ClInclude Include="KEndingMaker.h" />
     <ClInclude Include="KFeatureTestor.h" />
     <ClInclude Include="KForm.h" />
+    <ClInclude Include="Kiwi.h" />
     <ClInclude Include="KModelMgr.h" />
     <ClInclude Include="KTrie.h" />
     <ClInclude Include="stdafx.h" />
@@ -159,6 +160,7 @@
     <ClCompile Include="KEndingMaker.cpp" />
     <ClCompile Include="KFeatureTestor.cpp" />
     <ClCompile Include="KForm.cpp" />
+    <ClCompile Include="Kiwi.cpp" />
     <ClCompile Include="KModelMgr.cpp" />
     <ClCompile Include="KTrie.cpp" />
     <ClCompile Include="main.cpp" />

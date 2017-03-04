@@ -2,197 +2,70 @@
 
 #include "stdafx.h"
 #include "locale.h"
-#include <memory>
-#include <iostream>
-#include <string>
-#include <locale>
-#include <codecvt>
+#include <chrono>
 
 using namespace std;
+#include "Kiwi.h"
 
-#include "KTrie.h"
-#include "KForm.h"
-#include "KModelMgr.h"
-#include "KFeatureTestor.h"
-#include "Utils.h"
-
-
-void printJM(const KChunk& c, const char* p)
+class Timer
 {
-	if (c.isStr()) return printJM(p + c.begin, c.end - c.begin);
-	return printf("*"), printJM(c.form->form);
-}
-
-void enumPossible(const KModelMgr& mdl, const vector<KChunk>& ch, const char* ostr, size_t len, vector<pair<vector<pair<string, KPOSTag>>, float>>& ret)
-{
-	static bool(*vowelFunc[])(const char*, const char*) = {
-		KFeatureTestor::isPostposition,
-		KFeatureTestor::isVowel,
-		KFeatureTestor::isVocalic,
-		KFeatureTestor::isVocalicH,
-		KFeatureTestor::notVowel,
-		KFeatureTestor::notVocalic,
-		KFeatureTestor::notVocalicH,
-	};
-	static bool(*polarFunc[])(const char*, const char*) = {
-		KFeatureTestor::isPositive,
-		KFeatureTestor::notPositive
-	};
-
-	vector<size_t> idx(ch.size());
-	string tmpChr;
-	float minThreshold = len * -1.5f - 15.f;
-	while (1)
+public:
+	chrono::steady_clock::time_point point;
+	Timer()
 	{
-		const KMorpheme* before = nullptr;
-		KPOSTag bfTag = KPOSTag::UNKNOWN;
-		float ps = 0;
-		vector<pair<string, KPOSTag>> mj;
-		for (size_t i = 0; i < idx.size(); i++)
-		{
-			auto chi = ch[i];
-			if (chi.isStr())
-			{	
-				auto curTag = mdl.findMaxiumTag(before, i + 1 < idx.size() && !ch[i + 1].isStr() ? ch[i + 1].form->candidate[idx[i + 1]] : nullptr);
-				ps += powf(chi.end - chi.begin, 1.f) * -1.5f - 6.f;
-				if (curTag == KPOSTag::VV || curTag == KPOSTag::VA) ps += -5.f;
-				ps += mdl.getTransitionP(bfTag, curTag);
-				bfTag = curTag;
-				if (ps < minThreshold) goto next;
-				mj.emplace_back(string(ostr + chi.begin, ostr + chi.end), bfTag);
-				before = nullptr;
-				continue;
-			}
-			auto& c = chi.form->candidate[idx[i]];
-			ps += c->p;
-			const char* bBegin = nullptr;
-			const char* bEnd = nullptr;
-			if (!mj.empty())
-			{
-				bBegin = &mj.back().first[0];
-				bEnd = bBegin + mj.back().first.size();
-			}
-			if ((int)c->vowel && !vowelFunc[(int)c->vowel - 1](bBegin, bEnd)) goto next;
-			if ((int)c->polar && !polarFunc[(int)c->polar - 1](bBegin, bEnd)) goto next;
-			if (c->chunks.empty())
-			{
-				if (!KFeatureTestor::isCorrectEnd(bBegin, bEnd)) goto next;
-				mj.emplace_back(c->form, c->tag);
-				ps += mdl.getTransitionP(bfTag, c->tag);
-				bfTag = c->tag;
-			}
-			else
-			{
-				size_t x = 0;
-				if (!mj.empty() && c->chunks[0]->tag == KPOSTag::V)
-				{
-					if (before && before->combineSocket != c->combineSocket) goto next;
-					mj.back().first += c->chunks[0]->form;
-					x++;
-				}
-
-				if(!mj.empty() && !KFeatureTestor::isCorrectEnd(&mj.back().first[0], &mj.back().first[0] + mj.back().first.size())) goto next;
-				for (; x < c->chunks.size(); x++)
-				{
-					auto& ch = c->chunks[x];
-					mj.emplace_back(ch->form, ch->tag);
-				}
-				ps += mdl.getTransitionP(bfTag, c->chunks[c->chunks[0]->tag == KPOSTag::V ? 1 : 0]->tag);
-				bfTag = c->chunks.back()->tag;
-			}
-			if (ps < minThreshold) goto next;
-			before = c;
-		}
-		if (before && before->tag != KPOSTag::UNKNOWN && before->combineSocket) goto next;
-		ps += mdl.getTransitionP(bfTag, KPOSTag::UNKNOWN);
-		if (ps < minThreshold) goto next;
-		ret.emplace_back(move(mj), ps);
-	next:;
-
-		idx[0]++;
-		for (size_t i = 0; i < idx.size(); i++)
-		{
-			if (idx[i] >= (ch[i].isStr() ? 1 : ch[i].form->candidate.size()))
-			{
-				idx[i] = 0;
-				if (i + 1 >= idx.size()) goto exit;
-				idx[i + 1]++;
-			}
-		}
+		reset();
 	}
-exit:;
-}
+	void reset()
+	{
+		point = chrono::high_resolution_clock::now();
+	}
+
+	double getElapsed() const
+	{
+		return chrono::duration <double, milli>(chrono::high_resolution_clock::now() - point).count();
+	}
+};
 
 int main()
 {
 	system("chcp 65001");
 	_wsetlocale(LC_ALL, L"korean");
-
-	KModelMgr mdl("../ModelGenerator/pos.txt", "../ModelGenerator/fullmodel.txt", "../ModelGenerator/combined.txt", "../ModelGenerator/precombined.txt");
-	mdl.solidify();
-	shared_ptr<KTrie> kt = mdl.makeTrie();
-
+	Timer total, timer;
+	Kiwi kw;
+	kw.prepare();
+	printf("Loading Time : %g ms\n", timer.getElapsed());
 	FILE* file;
-	if (fopen_s(&file, "../TestFiles/01.txt", "r")) throw exception();
+	if (fopen_s(&file, "../TestFiles/Spok.txt", "r")) throw exception();
 	char buf[2048];
 	wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
 	vector<string> wordList;
 	wordList.emplace_back();
+	size_t unit = 0;
 	while (fgets(buf, 2048, file))
 	{
 		auto wstr = converter.from_bytes(buf);
-		for (auto c : wstr)
+		timer.reset();
+		auto res = kw.analyze(wstr);
+		double tm = timer.getElapsed();
+		unit += res.first.size();
+		if (!res.first.empty()) printf("Analyze (%zd) Time : %g ms\n", res.first.size(), tm);
+		if (tm > 10 && false)
 		{
-			if (0xAC00 <= c && c < 0xD7A4)
+			for (auto w : res.first)
 			{
-				splitJamo(c, wordList.back());
-			}
-			else
-			{
-				if (wordList.back().empty()) continue;
-				else wordList.emplace_back();
-			}
-		}
-	}
-	for (auto w : wordList) 
-	{
-		if (w.empty()) continue;
-		printJM(&w[0], w.size());
-		printf("\n");
-		auto ss = kt->split(w);
-		printf("Splited : %zd\n", ss.size());
-		vector<pair<vector<pair<string, KPOSTag>>, float>> cands;
-		for (auto s : ss)
-		{
-			for (auto t : s)
-			{
-				printJM(t, &w[0]);
-				printf(", ");
-			}
-			printf("\n");
-			enumPossible(mdl, s, &w[0], w.size(), cands);
-		}
-		int n = 0;
-		sort(cands.begin(), cands.end(), [](const pair<vector<pair<string, KPOSTag>>, float>& a, const pair<vector<pair<string, KPOSTag>>, float>& b)
-		{
-			return a.second > b.second;
-		});
-		for (auto c : cands)
-		{
-			printf("%03d\t%g\t", n++, c.second);
-			for (auto d : c.first)
-			{
-				printJM(d.first);
+				wprintf(w.first.c_str());
 				printf("/");
-				printf(tagToString(d.second));
+				printf(tagToString(w.second));
 				printf(" + ");
 			}
-			printf("\n");
+			getchar();
 		}
-		printf("\n\n");
-		getchar();
+		//printf("\n");
 	}
 	fclose(file);
+	double tm = total.getElapsed();
+	printf("Total (%zd) Time : %g ms\n", unit, tm);
+	printf("Time per Unit : %g ms\n", tm / unit);
     return 0;
 }
 
