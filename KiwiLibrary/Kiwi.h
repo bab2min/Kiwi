@@ -15,6 +15,8 @@ protected:
 	static KPOSTag identifySpecialChr(wchar_t chr);
 	static vector<vector<KWordPair>> splitPart(const wstring& str);
 	void enumPossible(KPOSTag prefixTag, const vector<KChunk>& ch, const char* ostr, size_t len, vector<pair<vector<pair<string, KPOSTag>>, float>>& ret) const;
+	static vector<const KChunk*> divideChunk(const vector<KChunk>& ch);
+	vector<vector<pair<vector<char>, float>>> calcProbabilities(const KChunk* pre, const KChunk* begin, const KChunk* end, const char* ostr, size_t len) const;
 public:
 	Kiwi(const char* modelPath = "");
 	int loadUserDictionary(const char* userDictPath = "");

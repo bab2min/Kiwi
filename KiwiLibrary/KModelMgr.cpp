@@ -216,10 +216,16 @@ void KModelMgr::loadCMFromTxt(const char * filename, unordered_map<string, size_
 		KCondVowel vowel = morphemes[((size_t)chunkIds[0])].vowel;
 		KCondPolarity polar = morphemes[((size_t)chunkIds[0])].polar;
 		wstring conds[] = { L"+", L"+Vowel", L"+Vocalic", L"+VocalicH" };
+		wstring conds2[] = { L"+", L"Positive", L"Negative"};
 		auto pm = find(conds, conds + LEN_ARRAY(conds), fields[2]);
 		if (pm < conds + LEN_ARRAY(conds))
 		{
 			vowel = (KCondVowel)(pm - conds + 1);
+		}
+		pm = find(conds2, conds2 + LEN_ARRAY(conds2), fields[2]);
+		if (pm < conds2 + LEN_ARRAY(conds2))
+		{
+			polar = (KCondPolarity)(pm - conds2);
 		}
 		char combineSocket = 0;
 		if (fields.size() >= 4)
@@ -310,7 +316,7 @@ shared_ptr<KTrie> KModelMgr::makeTrie() const
 		kt->build(f.form.c_str(), &f);
 	}
 	kt->fillFail();
-	return move(kt);
+	return kt;
 }
 
 float KModelMgr::getTransitionP(const KMorpheme * a, const KMorpheme * b) const

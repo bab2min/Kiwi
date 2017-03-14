@@ -102,7 +102,7 @@ vector<vector<KWordPair>> Kiwi::splitPart(const wstring & str)
 		if (ret.back().back().second == KPOSTag::SF) ret.emplace_back();
 		ret.back().emplace_back(wstring{ &c , 1 }, tag);
 	}
-	return move(ret);
+	return ret;
 }
 
 Kiwi::Kiwi(const char * modelPath)
@@ -122,6 +122,22 @@ int Kiwi::prepare()
 	return 0;
 }
 
+vector<char> getBacks(const vector<pair<vector<char>, float>>& cands)
+{
+	char buf[128] = { 0 };
+	vector<char> ret;
+	for (auto c : cands)
+	{
+		auto back = c.first.back();
+		assert(back >= 0);
+		if (!buf[back])
+		{
+			ret.emplace_back(back);
+			buf[back] = 1;
+		}
+	}
+	return ret;
+}
 
 KResult Kiwi::analyze(const wstring & str) const
 {
@@ -151,10 +167,86 @@ KResult Kiwi::analyze(const wstring & str) const
 				}
 				printf("\n");
 #endif
-				enumPossible(cid ? p[cid-1].second : KPOSTag::UNKNOWN, s, &jm[0], jm.size(), cands);
+				//enumPossible(cid ? p[cid-1].second : KPOSTag::UNKNOWN, s, &jm[0], jm.size(), cands);
+				s.emplace_back(0, 0);
+				auto chunks = divideChunk(s);
+				chunks.emplace_back(&s[0] + s.size());
+				KMorpheme preMorpheme{ "", cid ? p[cid - 1].second : KPOSTag::UNKNOWN };
+				KForm preForm;
+				preForm.candidate.emplace_back(&preMorpheme);
+				KChunk preTemp{&preForm};
+				const KChunk* pre = &preTemp;
+				vector<pair<vector<char>, float>> pbFinal;
+				size_t topN = 5;
+
+				auto sortFunc = [](auto x, auto y)
+				{
+					return x.second > y.second;
+				};
+
+				for (size_t i = 1; i < chunks.size(); i++)
+				{
+					auto pb = calcProbabilities(pre, chunks[i - 1], chunks[i], &jm[0], jm.size());
+					if (i == 1)
+					{
+						sort(pb[0].begin(), pb[0].end(), sortFunc);
+						for (size_t n = 0; n < topN && n < pb[0].size(); n++)
+						{
+							pbFinal.emplace_back(pb[0][n]);
+						}
+					}
+					else
+					{
+						for (auto b : getBacks(pbFinal))
+						{
+							sort(pb[b].begin(), pb[b].end(), sortFunc);
+						}
+						vector<pair<vector<char>, float>> tmpFinal;
+						for (auto cand : pbFinal)
+						{
+							auto& pbBack = pb[cand.first.back()];
+							for (size_t n = 0; n < topN && n < pbBack.size(); n++)
+							{
+								auto newP = cand.second + pbBack[n].second;
+								if (newP <= P_MIN) continue;
+								tmpFinal.emplace_back(cand.first, newP);
+								tmpFinal.back().first.insert(tmpFinal.back().first.end(), pbBack[n].first.begin(), pbBack[n].first.end());
+							}
+						}
+						sort(tmpFinal.begin(), tmpFinal.end(), sortFunc);
+						pbFinal = {tmpFinal.begin(), tmpFinal.begin() + min(topN, tmpFinal.size())};
+					}
+					pre = chunks[i] - 1;
+				}
+				for (auto pb : pbFinal)
+				{
+					cands.emplace_back();
+					cands.back().second = pb.second;
+					size_t n = 0;
+					for (auto pbc : pb.first)
+					{
+						auto morpheme = s[n++].getMorpheme(pbc, &preMorpheme, &jm[0]);
+						if (!morpheme) continue;
+						// If is simple morpheme
+						if (morpheme->chunks.empty())
+						{
+							cands.back().first.emplace_back(morpheme->form, morpheme->tag);
+						}
+						// complex morpheme
+						else for(auto pbcc : morpheme->chunks)
+						{
+							// if post morpheme must be combined
+							if (pbcc->tag == KPOSTag::V)
+							{
+								cands.back().first.back().first += pbcc->form;
+							}
+							else cands.back().first.emplace_back(pbcc->form, pbcc->tag);
+						}
+					}
+				}
 			}
 
-#ifdef _DEBUG
+//#ifdef _DEBUG
 			sort(cands.begin(), cands.end(), [](const pair<vector<pair<string, KPOSTag>>, float>& a, const pair<vector<pair<string, KPOSTag>>, float>& b)
 			{
 				return a.second > b.second;
@@ -173,7 +265,8 @@ KResult Kiwi::analyze(const wstring & str) const
 				printf("\n");
 			}
 			printf("\n\n");
-#endif // DEBUG
+			getchar();
+//#endif // DEBUG
 			if (cands.empty())
 			{
 				ret.first.emplace_back(c.first, KPOSTag::UNKNOWN);
@@ -299,4 +392,103 @@ void Kiwi::enumPossible(KPOSTag prefixTag, const vector<KChunk>& ch, const char*
 		}
 	}
 exit:;
+}
+
+#define DIVIDE_BOUND 12
+
+vector<const KChunk*> Kiwi::divideChunk(const vector<KChunk>& ch)
+{
+	vector<const KChunk*> ret;
+	const KChunk* s = &ch[0];
+	size_t n = 1;
+	for (auto& c : ch)
+	{
+		if (n >= DIVIDE_BOUND)
+		{
+			ret.emplace_back(s);
+			s = &c;
+			n = 1;
+		}
+		if (c.isStr()) continue;
+		n *= c.form->candidate.size();
+	}
+	if (s != &ch[0] + ch.size())
+	{
+		ret.emplace_back(s);
+	}
+	return ret;
+}
+
+vector<vector<pair<vector<char>, float>>> Kiwi::calcProbabilities(const KChunk * pre, const KChunk * ch, const KChunk * end, const char* ostr, size_t len) const
+{
+	static bool(*vowelFunc[])(const char*, const char*) = {
+		KFeatureTestor::isPostposition,
+		KFeatureTestor::isVowel,
+		KFeatureTestor::isVocalic,
+		KFeatureTestor::isVocalicH,
+		KFeatureTestor::notVowel,
+		KFeatureTestor::notVocalic,
+		KFeatureTestor::notVocalicH,
+	};
+	static bool(*polarFunc[])(const char*, const char*) = {
+		KFeatureTestor::isPositive,
+		KFeatureTestor::notPositive
+	};
+
+	vector<vector<pair<vector<char>, float>>> ret(pre->getCandSize());
+	vector<char> idx(end - ch + 1);
+	float minThreshold = P_MIN;
+	while (1)
+	{
+		float ps = 0;
+		KMorpheme tmpMorpheme;
+		const KMorpheme* beforeMorpheme = pre->getMorpheme(idx[0], &tmpMorpheme, ostr);
+		for (size_t i = 1; i < idx.size(); i++)
+		{
+			auto curMorpheme = ch[i - 1].getMorpheme(idx[i], &tmpMorpheme, ostr);
+			if (!curMorpheme)
+			{
+				ps += mdl->getTransitionP(beforeMorpheme, curMorpheme);
+				beforeMorpheme = curMorpheme;
+				continue;
+			}
+			// if is unknown morpheme
+			if (curMorpheme->chunks.empty() && !curMorpheme->form.empty() && curMorpheme->tag == KPOSTag::UNKNOWN)
+			{
+				tmpMorpheme.tag = mdl->findMaxiumTag(beforeMorpheme, i + 1 < idx.size() ? ch[i].getMorpheme(idx[i + 1], nullptr, nullptr) : nullptr);
+			}
+
+			if (curMorpheme->combineSocket && curMorpheme->tag == KPOSTag::UNKNOWN && beforeMorpheme->combineSocket != curMorpheme->combineSocket)
+			{
+				goto next;
+			}
+
+			if (beforeMorpheme->form.size())
+			{
+				const char* bBegin = &beforeMorpheme->form[0];
+				const char* bEnd = bBegin + beforeMorpheme->form.size();
+				if ((int)curMorpheme->vowel && !vowelFunc[(int)curMorpheme->vowel - 1](bBegin, bEnd)) goto next;
+				if ((int)curMorpheme->polar && !polarFunc[(int)curMorpheme->polar - 1](bBegin, bEnd)) goto next;
+			}
+			ps += mdl->getTransitionP(beforeMorpheme, curMorpheme);
+			ps += curMorpheme->p;
+			beforeMorpheme = curMorpheme;
+			if (ps <= minThreshold) goto next;
+		}
+		ret[idx[0]].emplace_back(vector<char>{ idx.begin() + 1, idx.end() }, ps);
+	next:;
+
+		idx[0]++;
+		for (size_t i = 0; i < idx.size(); i++)
+		{
+			if (i ? (idx[i] >= ch[i - 1].getCandSize()) : (idx[i] >= pre->getCandSize()))
+			{
+				idx[i] = 0;
+				if (i + 1 >= idx.size()) goto exit;
+				idx[i + 1]++;
+			}
+		}
+	}
+exit:;
+	return ret;
 }
