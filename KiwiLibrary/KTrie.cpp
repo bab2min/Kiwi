@@ -318,3 +318,17 @@ vector<vector<KChunk>> KTrie::split(const string& str, bool hasPrefix) const
 	return ret;
 }
 
+const KMorpheme * KChunk::getMorpheme(size_t idx, KMorpheme * tmp, const char * ostr) const
+{
+	if (!isStr()) return form->candidate[idx];
+	if (!begin && !end) return nullptr;
+	*tmp = KMorpheme{ string{ ostr + begin, ostr + end } };
+	tmp->p = (end - begin) * -1.5f - 6.f;
+	return tmp;
+}
+
+size_t KChunk::getCandSize() const
+{
+	if (isStr()) return 1;
+	return form->candidate.size();
+}

@@ -66,6 +66,7 @@ int main()
 	double tm = total.getElapsed();
 	printf("Total (%zd) Time : %g ms\n", unit, tm);
 	printf("Time per Unit : %g ms\n", tm / unit);
+	getchar();
     return 0;
 }
 

@@ -24,7 +24,7 @@ string splitJamo(wstring hangul)
 	{
 		splitJamo(c, ret);
 	}
-	return move(ret);
+	return ret;
 }
 
 wstring joinJamo(string jm)
