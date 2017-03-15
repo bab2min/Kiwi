@@ -51,3 +51,22 @@ inline vector<string> split(const string &s, char delim) {
 	split(s, delim, back_inserter(elems));
 	return elems;
 }
+
+class Timer
+{
+public:
+	chrono::steady_clock::time_point point;
+	Timer()
+	{
+		reset();
+	}
+	void reset()
+	{
+		point = chrono::high_resolution_clock::now();
+	}
+
+	double getElapsed() const
+	{
+		return chrono::duration <double, milli>(chrono::high_resolution_clock::now() - point).count();
+	}
+};

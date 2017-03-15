@@ -242,3 +242,5 @@ ModelManifest.xml
 .fake/
 /ModelGenerator/ML_spo.txt
 /ModelGenerator/ML_lit.txt
+/KiwiLibrary/wrongs.txt
+/KiwiLibrary/wrongs.txt

@@ -246,7 +246,7 @@ KResult Kiwi::analyze(const wstring & str) const
 				}
 			}
 
-//#ifdef _DEBUG
+#ifdef _DEBUG
 			sort(cands.begin(), cands.end(), [](const pair<vector<pair<string, KPOSTag>>, float>& a, const pair<vector<pair<string, KPOSTag>>, float>& b)
 			{
 				return a.second > b.second;
@@ -266,7 +266,7 @@ KResult Kiwi::analyze(const wstring & str) const
 			}
 			printf("\n\n");
 			getchar();
-//#endif // DEBUG
+#endif // DEBUG
 			if (cands.empty())
 			{
 				ret.first.emplace_back(c.first, KPOSTag::UNKNOWN);
@@ -287,6 +287,11 @@ KResult Kiwi::analyze(const wstring & str) const
 		}
 	}
 	return ret;
+}
+
+vector<KResult> Kiwi::analyze(const wstring & str, size_t topN) const
+{
+
 }
 
 void Kiwi::enumPossible(KPOSTag prefixTag, const vector<KChunk>& ch, const char* ostr, size_t len, vector<pair<vector<pair<string, KPOSTag>>, float>>& ret) const
