@@ -2,39 +2,53 @@
 
 #include "stdafx.h"
 #include "locale.h"
-#include <chrono>
-
 using namespace std;
 #include "Kiwi.h"
-
-class Timer
-{
-public:
-	chrono::steady_clock::time_point point;
-	Timer()
-	{
-		reset();
-	}
-	void reset()
-	{
-		point = chrono::high_resolution_clock::now();
-	}
-
-	double getElapsed() const
-	{
-		return chrono::duration <double, milli>(chrono::high_resolution_clock::now() - point).count();
-	}
-};
+#include "Utils.h"
+#include "KTest.h"
 
 int main()
 {
 	system("chcp 65001");
 	_wsetlocale(LC_ALL, L"korean");
-	Timer total, timer;
+	Timer timer;
 	Kiwi kw;
 	kw.prepare();
 	printf("Loading Time : %g ms\n", timer.getElapsed());
-	FILE* file;
+	Timer total;
+	KTest test { "../TestSets/01.txt", &kw };
+	double tm = total.getElapsed();
+	
+	printf("%g\n", test.getScore());
+	printf("Total (%zd) Time : %g ms\n", test.getTotalCount(), tm);
+	printf("Time per Unit : %g ms\n", tm / test.getTotalCount());
+	
+	FILE* out;
+	fopen_s(&out, "wrongs.txt", "w");
+	for (auto t : test.getWrongList())
+	{
+		fputws(t.q.c_str(), out);
+		fputwc('\t', out);
+		for (auto r : t.r)
+		{
+			fputws(r.first.c_str(), out);
+			fputwc('/', out);
+			fputs(tagToString(r.second), out);
+			fputwc('\t', out);
+		}
+		fputs("\t:\t", out);
+		for (auto r : t.a)
+		{
+			fputws(r.first.c_str(), out);
+			fputwc('/', out);
+			fputs(tagToString(r.second), out);
+			fputwc('\t', out);
+		}
+		fputwc('\n', out);
+	}
+	fclose(out);
+	getchar();
+	/*FILE* file;
 	if (fopen_s(&file, "../TestFiles/Spok.txt", "r")) throw exception();
 	char buf[2048];
 	wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
@@ -66,7 +80,7 @@ int main()
 	double tm = total.getElapsed();
 	printf("Total (%zd) Time : %g ms\n", unit, tm);
 	printf("Time per Unit : %g ms\n", tm / unit);
-	getchar();
+	getchar();*/
     return 0;
 }
 
