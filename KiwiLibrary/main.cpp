@@ -16,7 +16,7 @@ int main()
 	kw.prepare();
 	printf("Loading Time : %g ms\n", timer.getElapsed());
 	Timer total;
-	KTest test { "../TestSets/01.txt", &kw };
+	KTest test { "../TestSets/03.txt", &kw };
 	double tm = total.getElapsed();
 	
 	printf("%g\n", test.getScore());
@@ -24,7 +24,10 @@ int main()
 	printf("Time per Unit : %g ms\n", tm / test.getTotalCount());
 	
 	FILE* out;
-	fopen_s(&out, "wrongs.txt", "w");
+	fopen_s(&out, "wrongs03.txt", "w");
+	fprintf(out, "%g\n", test.getScore());
+	fprintf(out, "Total (%zd) Time : %g ms\n", test.getTotalCount(), tm);
+	fprintf(out, "Time per Unit : %g ms\n", tm / test.getTotalCount());
 	for (auto t : test.getWrongList())
 	{
 		fputws(t.q.c_str(), out);
