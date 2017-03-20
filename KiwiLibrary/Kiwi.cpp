@@ -152,146 +152,24 @@ KResult Kiwi::analyze(const wstring & str) const
 	};
 	for (auto p : parts)
 	{
-		int cid = 0;
-		for (auto c : p)
+		for (size_t cid = 0; cid < p.size(); cid++)
 		{
+			auto& c = p[cid];
 			if (c.second != KPOSTag::MAX)
 			{
 				ret.first.emplace_back(c);
-				cid++;
 				continue;
 			}
 			auto jm = splitJamo(c.first);
-			auto chunks = kt->split(jm, !!cid);
-			vector<pair<vector<pair<string, KPOSTag>>, float>> cands;
-			for (auto s : chunks)
-			{
-#ifdef _DEBUG
-				for (auto t : s)
-				{
-					printJM(t, &jm[0]);
-					printf(", ");
-				}
-				printf("\n");
-#endif
-				//enumPossible(cid ? p[cid-1].second : KPOSTag::UNKNOWN, s, &jm[0], jm.size(), cands);
-				s.emplace_back(0, 0);
-				auto chunks = divideChunk(s);
-				chunks.emplace_back(&s[0] + s.size());
-				KMorpheme preMorpheme{ "", cid ? p[cid - 1].second : KPOSTag::UNKNOWN };
-				KForm preForm;
-				preForm.candidate.emplace_back(&preMorpheme);
-				KChunk preTemp{&preForm};
-				const KChunk* pre = &preTemp;
-				vector<pair<vector<char>, float>> pbFinal;
-				size_t topN = 3;
-
-				for (size_t i = 1; i < chunks.size(); i++)
-				{
-					auto pb = calcProbabilities(pre, chunks[i - 1], chunks[i], &jm[0], jm.size());
-					if (i == 1)
-					{
-						sort(pb[0].begin(), pb[0].end(), sortFunc);
-						for (size_t n = 0; n < topN && n < pb[0].size(); n++)
-						{
-							pbFinal.emplace_back(pb[0][n]);
-						}
-					}
-					else
-					{
-						for (auto b : getBacks(pbFinal))
-						{
-							sort(pb[b].begin(), pb[b].end(), sortFunc);
-						}
-						vector<pair<vector<char>, float>> tmpFinal;
-						for (auto cand : pbFinal)
-						{
-							auto& pbBack = pb[cand.first.back()];
-							for (size_t n = 0; n < topN && n < pbBack.size(); n++)
-							{
-								auto newP = cand.second + pbBack[n].second;
-								if (newP <= P_MIN) continue;
-								tmpFinal.emplace_back(cand.first, newP);
-								tmpFinal.back().first.insert(tmpFinal.back().first.end(), pbBack[n].first.begin(), pbBack[n].first.end());
-							}
-						}
-						sort(tmpFinal.begin(), tmpFinal.end(), sortFunc);
-						pbFinal = {tmpFinal.begin(), tmpFinal.begin() + min(topN, tmpFinal.size())};
-					}
-					pre = chunks[i] - 1;
-				}
-				for (auto pb : pbFinal)
-				{
-					cands.emplace_back();
-					cands.back().second = pb.second;
-					size_t n = 0;
-					for (auto pbc : pb.first)
-					{
-						auto morpheme = s[n++].getMorpheme(pbc, &preMorpheme, &jm[0]);
-						if (!morpheme) continue;
-						// If is simple morpheme
-						if (morpheme->chunks.empty())
-						{
-							cands.back().first.emplace_back(morpheme->form, morpheme->tag);
-						}
-						// complex morpheme
-						else for(auto pbcc : morpheme->chunks)
-						{
-							// if post morpheme must be combined
-							if (pbcc->tag == KPOSTag::V)
-							{
-								cands.back().first.back().first += pbcc->form;
-							}
-							else cands.back().first.emplace_back(pbcc->form, pbcc->tag);
-						}
-					}
-				}
-			}
-
-#ifdef _DEBUG
-			sort(cands.begin(), cands.end(), [](const pair<vector<pair<string, KPOSTag>>, float>& a, const pair<vector<pair<string, KPOSTag>>, float>& b)
-			{
-				return a.second > b.second;
-			});
-			int n = 0;
-			for (auto ic : cands)
-			{
-				printf("%03d\t%g\t", n++, ic.second);
-				for (auto d : ic.first)
-				{
-					printJM(d.first);
-					printf("/");
-					printf(tagToString(d.second));
-					printf(" + ");
-				}
-				printf("\n");
-			}
-			printf("\n\n");
-			getchar();
-#endif // DEBUG
-			if (cands.empty())
-			{
-				ret.first.emplace_back(c.first, KPOSTag::UNKNOWN);
-			}
-			else
-			{
-				auto m = max_element(cands.begin(), cands.end(), [](const pair<vector<pair<string, KPOSTag>>, float>& a, const pair<vector<pair<string, KPOSTag>>, float>& b)
-				{
-					return a.second < b.second;
-				});
-				ret.second += m->second;
-				for (auto r : m->first)
-				{
-					ret.first.emplace_back(joinJamo(r.first), r.second);
-				}
-			}
-			cid++;
+			auto ar = analyzeJM(jm, 1, cid ? p[cid - 1].second : KPOSTag::UNKNOWN, cid+1 < p.size() ? p[cid + 1].second : KPOSTag::UNKNOWN);
+			ret.first.insert(ret.first.end(), ar[0].first.begin(), ar[0].first.end());
+			ret.second += ar[0].second;
 		}
 	}
 	return ret;
 }
 
-vector<KResult> Kiwi::analyze(const wstring & str, size_t topN) const
+/*vector<KResult> Kiwi::analyze(const wstring & str, size_t topN) const
 {
 	vector<vector<KResult>> ret;
 	auto parts = splitPart(str);
@@ -412,7 +290,7 @@ vector<KResult> Kiwi::analyze(const wstring & str, size_t topN) const
 			cid++;
 		}
 	}
-}
+}*/
 
 void Kiwi::enumPossible(KPOSTag prefixTag, const vector<KChunk>& ch, const char* ostr, size_t len, vector<pair<vector<pair<string, KPOSTag>>, float>>& ret) const
 {
@@ -569,7 +447,7 @@ vector<vector<pair<vector<char>, float>>> Kiwi::calcProbabilities(const KChunk *
 		for (size_t i = 1; i < idx.size(); i++)
 		{
 			auto curMorpheme = ch[i - 1].getMorpheme(idx[i], &tmpMorpheme, ostr);
-			if (!curMorpheme)
+			if (!curMorpheme || ( KPOSTag::SF <= curMorpheme->tag && curMorpheme->tag <= KPOSTag::SN))
 			{
 				ps += mdl->getTransitionP(beforeMorpheme, curMorpheme);
 				beforeMorpheme = curMorpheme;
@@ -613,5 +491,123 @@ vector<vector<pair<vector<char>, float>>> Kiwi::calcProbabilities(const KChunk *
 		}
 	}
 exit:;
+	return ret;
+}
+
+vector<KResult> Kiwi::analyzeJM(const string & jm, size_t topN, KPOSTag prefix, KPOSTag suffix) const
+{
+	vector<KResult> ret;
+	auto sortFunc = [](auto x, auto y)
+	{
+		return x.second > y.second;
+	};
+	topN = max((size_t)3, topN);
+	vector<pair<vector<pair<string, KPOSTag>>, float>> cands;
+	KMorpheme preMorpheme{ "", prefix }, sufMorpheme{ "", suffix };
+	KForm preForm, sufForm;
+	preForm.candidate.emplace_back(&preMorpheme);
+	sufForm.candidate.emplace_back(&sufMorpheme);
+	KChunk preTemp{ &preForm }, sufTemp{ &sufForm };
+
+	auto chunks = kt->split(jm, prefix != KPOSTag::UNKNOWN);
+	for (auto& s : chunks)
+	{
+		if (suffix != KPOSTag::UNKNOWN)
+		{
+			s.push_back(sufTemp);
+		}
+		else
+		{
+			s.emplace_back(0, 0);
+		}
+		auto chunks = divideChunk(s);
+		chunks.emplace_back(&s[0] + s.size());
+		const KChunk* pre = &preTemp;
+		vector<pair<vector<char>, float>> pbFinal;
+
+		for (size_t i = 1; i < chunks.size(); i++)
+		{
+			auto pb = calcProbabilities(pre, chunks[i - 1], chunks[i], &jm[0], jm.size());
+			if (i == 1)
+			{
+				sort(pb[0].begin(), pb[0].end(), sortFunc);
+				for (size_t n = 0; n < topN && n < pb[0].size(); n++)
+				{
+					pbFinal.emplace_back(pb[0][n]);
+				}
+			}
+			else
+			{
+				for (auto b : getBacks(pbFinal))
+				{
+					sort(pb[b].begin(), pb[b].end(), sortFunc);
+				}
+				vector<pair<vector<char>, float>> tmpFinal;
+				for (auto cand : pbFinal)
+				{
+					auto& pbBack = pb[cand.first.back()];
+					for (size_t n = 0; n < topN && n < pbBack.size(); n++)
+					{
+						auto newP = cand.second + pbBack[n].second;
+						if (newP <= P_MIN) continue;
+						tmpFinal.emplace_back(cand.first, newP);
+						tmpFinal.back().first.insert(tmpFinal.back().first.end(), pbBack[n].first.begin(), pbBack[n].first.end());
+					}
+				}
+				sort(tmpFinal.begin(), tmpFinal.end(), sortFunc);
+				pbFinal = { tmpFinal.begin(), tmpFinal.begin() + min(topN, tmpFinal.size()) };
+			}
+			pre = chunks[i] - 1;
+		}
+		for (auto pb : pbFinal)
+		{
+			cands.emplace_back();
+			cands.back().second = pb.second;
+			size_t n = 0;
+			pb.first.pop_back();
+			for (auto pbc : pb.first)
+			{
+				auto morpheme = s[n++].getMorpheme(pbc, &preMorpheme, &jm[0]);
+				//if (!morpheme) continue;
+				// If is simple morpheme
+				if (morpheme->chunks.empty())
+				{
+					cands.back().first.emplace_back(morpheme->form, morpheme->tag);
+				}
+				// complex morpheme
+				else for (auto pbcc : morpheme->chunks)
+				{
+					// if post morpheme must be combined
+					if (pbcc->tag == KPOSTag::V)
+					{
+						cands.back().first.back().first += pbcc->form;
+					}
+					else cands.back().first.emplace_back(pbcc->form, pbcc->tag);
+				}
+			}
+		}
+	}
+
+	if (cands.empty())
+	{
+		ret.emplace_back();
+		ret.back().first.emplace_back(joinJamo(jm), KPOSTag::UNKNOWN);
+		ret.back().second = P_MIN;
+	}
+	else
+	{
+		sort(cands.begin(), cands.end(), sortFunc);
+		transform(cands.begin(), cands.begin() + min(topN, cands.size()), back_inserter(ret), [](const pair<vector<pair<string, KPOSTag>>, float>& e)
+		{
+			KResult kr;
+			for (auto& i : e.first)
+			{
+				kr.first.emplace_back(joinJamo(i.first), i.second);
+			}
+			kr.second = e.second;
+			return kr;
+		});
+	}
+
 	return ret;
 }
