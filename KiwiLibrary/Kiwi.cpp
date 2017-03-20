@@ -404,7 +404,7 @@ vector<const KChunk*> Kiwi::divideChunk(const vector<KChunk>& ch)
 	size_t n = 1;
 	for (auto& c : ch)
 	{
-		if (n >= DIVIDE_BOUND)
+		if (n >= DIVIDE_BOUND && &c > s + 1)
 		{
 			ret.emplace_back(s);
 			s = &c;
@@ -459,6 +459,10 @@ vector<vector<pair<vector<char>, float>>> Kiwi::calcProbabilities(const KChunk *
 				tmpMorpheme.tag = mdl->findMaxiumTag(beforeMorpheme, i + 1 < idx.size() ? ch[i].getMorpheme(idx[i + 1], nullptr, nullptr) : nullptr);
 			}
 
+			if (beforeMorpheme->combineSocket && beforeMorpheme->tag != KPOSTag::UNKNOWN && beforeMorpheme->combineSocket != curMorpheme->combineSocket)
+			{
+				goto next;
+			}
 			if (curMorpheme->combineSocket && curMorpheme->tag == KPOSTag::UNKNOWN && beforeMorpheme->combineSocket != curMorpheme->combineSocket)
 			{
 				goto next;

@@ -57,6 +57,12 @@ void KModelMgr::loadPOSFromTxt(const char * filename)
 		maxiumBf[i] = (KPOSTag)maxPos;
 	}*/
 
+	/* 시작부분 조건 완화 */
+	for (size_t i = 0; i < (size_t)KPOSTag::MAX; i++)
+	{
+		if (posTransition[0][i] > P_MIN) posTransition[0][i] *= 0.1f;
+	}
+
 	for (size_t i = 0; i < (size_t)KPOSTag::MAX; i++) for (size_t j = 0; j < (size_t)KPOSTag::MAX; j++)
 	{
 		static KPOSTag vOnly[] = {
