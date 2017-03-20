@@ -17,6 +17,7 @@ protected:
 	void enumPossible(KPOSTag prefixTag, const vector<KChunk>& ch, const char* ostr, size_t len, vector<pair<vector<pair<string, KPOSTag>>, float>>& ret) const;
 	static vector<const KChunk*> divideChunk(const vector<KChunk>& ch);
 	vector<vector<pair<vector<char>, float>>> calcProbabilities(const KChunk* pre, const KChunk* begin, const KChunk* end, const char* ostr, size_t len) const;
+	vector<KResult> analyzeJM(const string& jm, size_t topN, KPOSTag prefix, KPOSTag suffix) const;
 public:
 	Kiwi(const char* modelPath = "");
 	int loadUserDictionary(const char* userDictPath = "");
