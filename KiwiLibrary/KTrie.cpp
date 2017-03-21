@@ -204,7 +204,7 @@ vector<vector<KChunk>> KTrie::split(const string& str, bool hasPrefix) const
 							!polarFunc[(size_t)cand->polar - 1](&str[0] + bBegin, &str[0] + bEnd)) continue;
 					}
 					// if former ends with ¤· and next begin vowel, pass
-					if (bEnd && str[bEnd - 1] == 23 && cand->form[0] > 30) continue;
+					if (!beforeMatched && bEnd && str[bEnd - 1] == 23 && cand->form[0] > 30) continue;
 
 					if (!beforeMatched && !cand->hasFirstV && !KFeatureTestor::isCorrectEnd(&str[0] + bBegin, &str[0] + bEnd)) continue;
 					if (!beforeMatched && !KFeatureTestor::isCorrectStart(&str[0] + bBegin, &str[0] + bEnd)) continue;

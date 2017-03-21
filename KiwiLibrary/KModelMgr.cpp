@@ -60,7 +60,7 @@ void KModelMgr::loadPOSFromTxt(const char * filename)
 	/* 시작부분 조건 완화 */
 	for (size_t i = 0; i < (size_t)KPOSTag::MAX; i++)
 	{
-		if (posTransition[0][i] > P_MIN) posTransition[0][i] *= 0.1f;
+		if (posTransition[0][i] > P_MIN) posTransition[0][i] = 0;
 	}
 
 	for (size_t i = 0; i < (size_t)KPOSTag::MAX; i++) for (size_t j = 0; j < (size_t)KPOSTag::MAX; j++)
@@ -222,7 +222,7 @@ void KModelMgr::loadCMFromTxt(const char * filename, unordered_map<string, size_
 		KCondVowel vowel = morphemes[((size_t)chunkIds[0])].vowel;
 		KCondPolarity polar = morphemes[((size_t)chunkIds[0])].polar;
 		wstring conds[] = { L"+", L"+Vowel", L"+Vocalic", L"+VocalicH" };
-		wstring conds2[] = { L"+", L"Positive", L"Negative"};
+		wstring conds2[] = { L"+", L"+Positive", L"-Positive"};
 		auto pm = find(conds, conds + LEN_ARRAY(conds), fields[2]);
 		if (pm < conds + LEN_ARRAY(conds))
 		{
