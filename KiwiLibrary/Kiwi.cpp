@@ -516,6 +516,15 @@ vector<KResult> Kiwi::analyzeJM(const string & jm, size_t topN, KPOSTag prefix, 
 	auto chunks = kt->split(jm, prefix != KPOSTag::UNKNOWN);
 	for (auto& s : chunks)
 	{
+#ifdef _DEBUG
+		for (auto& t : s)
+		{
+			printJM(t, &jm[0]);
+			printf(", ");
+		}
+		printf("\n");
+#endif
+
 		if (suffix != KPOSTag::UNKNOWN)
 		{
 			s.push_back(sufTemp);

@@ -64,8 +64,9 @@ class RuleModel:
         def appendRule(self, formA, formB, result, bcond):
             self.rules.append((formA, formB, re.compile(formA + '\t' + formB), result.split(','), bcond))
 
-        def applyRule(self, formA, formB):
+        def applyRule(self, formA, formB, bcond):
             for rule in self.rules:
+                if bcond and bcond != rule[4]: continue
                 res = [rule[2].sub(i, formA + '\t' + formB) for i in rule[3]]
                 if res[0].find('\t') < 0: return res
             return None
@@ -83,10 +84,10 @@ class RuleModel:
             else:
                 self.rules[-1].appendRule(c[0], c[1], c[2], c[3] if len(c) > 3 else None)
 
-    def applyRules(self, formA, posA, formB, posB):
+    def applyRules(self, formA, posA, formB, posB, bcond):
         for rule in self.rules:
             if not (any(map(posA.startswith, rule.posA)) and any(map(posB.startswith, rule.posB))): continue
-            res = rule.applyRule(formA, formB)
+            res = rule.applyRule(formA, formB, bcond)
             if res: return res
         return None
 
@@ -169,6 +170,7 @@ for pk in [''] + list(precond):
             else: bform, bcond = ps[0][0], None
             btag = ps[0][1]
             bform = [bform]
+            bpcond = bcond
             res = None
             for p in ps[1:]:
                 cond = mm.morphemes[p][0]
@@ -177,12 +179,13 @@ for pk in [''] + list(precond):
                     if not all(map(lambda x:x(bf), cond)) or mm.morphemes[p][6].get(btag, 0) < 0.01:
                         res = None
                         break
-                    res = rm.applyRules(bf, btag, *p)
+                    res = rm.applyRules(bf, btag, *p, bpcond)
                     if not res: break
                     nform += res
                 if not nform: break
                 bform = nform
                 btag = p[1]
+                bpcond = False
             if not nform: continue
             count += 1
             socket = ''
