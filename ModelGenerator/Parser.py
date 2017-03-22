@@ -96,5 +96,5 @@ def extract2():
             raise e
     out.close()
 
-#extract1()
+extract1()
 extract2()

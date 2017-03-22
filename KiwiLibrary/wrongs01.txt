@@ -1,6 +1,6 @@
-0.771683
-Total (19324) Time : 16870 ms
-Time per Unit : 0.873006 ms
+0.77427
+Total (19324) Time : 25517 ms
+Time per Unit : 1.32048 ms
 의상	의상/NNP		:	의상/NNG	
 엠마누엘	엠/NNG	마/NNG	누에/NNG	ㄹ/JKO		:	엠마누엘/NNP	
 웅가로가	웅/NNP	가로/NNG	가/VV	아/EC		:	웅가로/NNP	가/JKS	
@@ -40,18 +40,18 @@ Time per Unit : 0.873006 ms
 안방서	안방/NNG	스/VV	어/EC		:	안방/NNG	서/JKB	
 쓰는	쓸/VV	는/ETM		:	쓰/VV	는/ETM	
 없어	없/VA	어/EF		:	없/VA	어/EC	
-빙수기,	빙/UN	수기/NNG	,/SP		:	빙수기/NNG	,/SP	
+빙수기,	비/XPN	ㅇ/NNG	수기/NNG	,/SP		:	빙수기/NNG	,/SP	
 샤베트기,	샤베/UN	트기/NNG	,/SP		:	샤베트기/NNG	,/SP	
 인기다.	인기다/UN	./SF		:	인기/NNG	이/VCP	다/EF	./SF	
 최고인	최/XPN	고인/NNG		:	최고/NNG	이/VCP	ㄴ/ETM	
-빙수기가	빙수/NNG	기가/NNG		:	빙수기/NNG	가/JKS	
+빙수기가	비/XPN	ㅇ/NNG	수기/NNG	가/JKS		:	빙수기/NNG	가/JKS	
 많아져	많아져/UN		:	많/VA	아/EC	지/VX	어/EC	
 더한다.	더하/VV	ㄴ다/EF	./SF		:	더/MAG	하/XSV	ㄴ다/EF	./SF	
 '홈스타'(영풍화학	'/SS	홈/NNG	스타/NNG	'(/SS	영풍/NNP	화학/NNG		:	'/SS	홈스타/NNG	'/SS	(/SS	영풍화학/NNP	
 -	-/SO		:	-/SS	
 -	-/SO		:	-/SS	
 3511)와	3511/SN	)/SS	와/JKB		:	3511/SN	)/SS	와/JC	
-'빙수팥'(해성마트	'/SS	빙수/NNG	팥/NNG	'(/SS	해/NNG	성/XSN	마트/NNG		:	'/SS	빙수팥/NNG	'/SS	(/SS	해성마트/NNP	
+'빙수팥'(해성마트	'/SS	빙수/NNG	팥/NNG	'(/SS	해서/NNG	ㅇ/NNG	마트/NNG		:	'/SS	빙수팥/NNG	'/SS	(/SS	해성마트/NNP	
 -	-/SO		:	-/SS	
 -	-/SO		:	-/SS	
 있으며	있/VV	으며/EC		:	있/VX	으며/EC	
@@ -60,7 +60,6 @@ Time per Unit : 0.873006 ms
 있다.	있/VX	다/EF	./SF		:	있/VV	다/EF	./SF	
 수동식과	수동식/NNG	과/JKB		:	수동식/NNG	과/JC	
 자동식	자동/NNG	식/XSN		:	자동식/NNG	
-두	두/JX		:	두/MM	
 1만	1/SN	만/NNB		:	1/SN	만/NR	
 9천∼2만원,	9/SN	천/NR	∼/SO	2/SN	만원/NNG	,/SP		:	9/SN	천/NR	∼/SO	2/SN	만/NR	원/NNB	,/SP	
 자동식은	자동/NNG	식/NNG	은/JX		:	자동식/NNG	은/JX	
@@ -74,7 +73,7 @@ Time per Unit : 0.873006 ms
 삶은	삶/NNG	은/JX		:	삶/VV	은/ETM	
 단팥과	단팥/NNG	과/JKB		:	단팥/NNG	과/JC	
 2인분	2/SN	인분/NNG		:	2/SN	인/NNG	분/XSN	
-포장부터	포/NNG	장부/NNG	트/VV	어/EC		:	포장/NNG	부터/JX	
+포장부터	포자/NNG	ㅇ/NNG	부터/JX		:	포장/NNG	부터/JX	
 30인분(3㎏)까지	30/SN	인분/NNG	(/SS	3/SN	㎏/SW	)/SS	까지/JX		:	30/SN	인/NNG	분/XSN	(/SS	3/SN	㎏/SW	)/SS	까지/JX	
 다양한	다양/XR	하/XSA	ㄴ/ETM		:	다양/NNG	하/XSA	ㄴ/ETM	
 크기로,	크/VA	기로/EC	,/SP		:	크기/NNG	로/JKB	,/SP	
@@ -86,12 +85,11 @@ Time per Unit : 0.873006 ms
 쓰는	쓸/VV	는/ETM		:	쓰/VV	는/ETM	
 물이	묻/VV	이/EC		:	물/NNG	이/JKS	
 통	통/NNB		:	통/NNG	
-얼었다	얻/VV	었/EP	다/EC		:	얼/VV	었/EP	다/EC	
 녹았다해서	녹았/UN	다하/VV	아서/EC		:	녹/VV	았/EP	다/EC	하/VX	아서/EC	
 반영구적으로	반영/NNG	구적/NNG	으로/JKB		:	반영구/NNG	적/XSN	으로/JKB	
 쓸	쓸/VV	ㄹ/ETM		:	쓰/VV	ㄹ/ETM	
 있다.	있/VX	다/EF	./SF		:	있/VV	다/EF	./SF	
-대	대/NA		:	대/NNG	
+대	대/VV	어/EC		:	대/NNG	
 -	-/SO		:	-/SS	
 중	중/NNB		:	중/NNG	
 -	-/SO		:	-/SS	
@@ -110,10 +108,10 @@ Time per Unit : 0.873006 ms
 물안경은	물/NNG	안경/NNG	은/JX		:	물안경/NNG	은/JX	
 0.03에서	0.03/SN	에서/JKB		:	0/SN	./SP	03/SN	에서/JKB	
 0.3까지	0.3/SN	까지/JX		:	0/SN	./SP	3/SN	까지/JX	
-따라	따라/JX		:	따르/VV	아/EC	
+따라	따/VV	아라/EC		:	따르/VV	아/EC	
 있다.	있/VX	다/EF	./SF		:	있/VV	다/EF	./SF	
 코팅방법이나	코팅/NNG	방법/NNG	이나/JX		:	코팅/NNG	방법/NNG	이나/JC	
-따라	따라/JX		:	따르/VV	아/EC	
+따라	따/VV	아라/EC		:	따르/VV	아/EC	
 5천∼1만	5/SN	천/NR	∼/SO	1/SN	만/NNB		:	5/SN	천/NR	∼/SO	1/SN	만/NR	
 2배인	2/SN	배이/VV	ㄴ/ETM		:	2/SN	배/NNG	이/VCP	ㄴ/ETM	
 3만원선.	3/SN	만원/NNG	선/NNG	./SF		:	3/SN	만/NR	원/NNB	선/NNG	./SF	
@@ -145,7 +143,7 @@ Time per Unit : 0.873006 ms
 리복(AU.22701)	리/NNG	복/NNG	(/SS	AU/SL	./SF	22701/SN	)/SS		:	리복/NNP	(/SS	AU/SL	./SP	22701/SN	)/SS	
 아레나(ARN.11)	아레나/UN	(/SS	ARN/SL	./SF	11/SN	)/SS		:	아레나/NNP	(/SS	ARN/SL	./SP	11/SN	)/SS	
 스완스(SW.AF6DX)였다.	스완스/UN	(/SS	SW/SL	./SF	AF/SL	6/SN	DX/SL	)/SS	이/VV	었/EP	다/EF	./SF		:	스완스/NNP	(/SS	SW/SL	./SP	AF/SL	6/SN	DX/SL	)/SS	
-따라	따라/JX		:	따르/VV	아/EC	
+따라	따/VV	아라/EC		:	따르/VV	아/EC	
 게	게/NNG		:	것/NNB	이/JKS	
 매일	매이/VV	ㄹ/ETM		:	매일/MAG	
 직접	직접/NNG		:	직접/MAG	
@@ -172,7 +170,6 @@ Time per Unit : 0.873006 ms
 50여개	50/SN	여/NNG	개/NNB		:	50/SN	여/XSN	개/NNB	
 9분의	9/SN	분/NNB	의/JKG		:	9/SN	분/XSN	의/JKG	
 있으며,	있/VV	으며/EC	,/SP		:	있/VX	으며/EC	,/SP	
-후	후/NA		:	후/NNG	
 취항까지	취항/NNG	까/VV	지/EC		:	취항/NNG	까지/JX	
 자메이카	자메이/UN	카/VV	아/EC		:	자메이카/NNP	
 우리	울/VV	리/EC		:	우리/NP	
@@ -217,14 +214,14 @@ Time per Unit : 0.873006 ms
 그런	그렇/VA	ㄴ/ETM		:	그런/MM	
 높았다고	높았/UN	다고/EC		:	높/VA	았/EP	다고/EC	
 자연농원	자연/NNG	농원/NNG		:	자연농원/NNP	
-레이싱팀	레이/NNG	싱/UN	팀/NNG		:	레이싱/NNG	팀/NNG	
+레이싱팀	레이/NNG	시/NNG	ㅇ/NNG	팀/NNG		:	레이싱/NNG	팀/NNG	
 송호진	송/NNP	호/NNG	진/NNG		:	송호진/NNP	
 말한다.	말하/VV	ㄴ다/EF	./SF		:	말/NNG	하/XSV	ㄴ다/EF	./SF	
 자연농원	자연/NNG	농원/NNG		:	자연농원/NNP	
 모터파크의	모터/NNG	파크/NNG	의/JKG		:	모터파크/NNP	의/JKG	
-'서킷(CIRCUIT)'이라고	'/SS	서/NNG	킷/UN	(/SS	CIRCUIT/SL	)'/SS	이라고/JKQ		:	'/SS	서킷/NNG	(/SS	CIRCUIT/SL	)/SS	'/SS	이라고/JKQ	
+'서킷(CIRCUIT)'이라고	'/SS	서/NNG	키/NNG	ㅅ/NNG	(/SS	CIRCUIT/SL	)'/SS	이라고/JKQ		:	'/SS	서킷/NNG	(/SS	CIRCUIT/SL	)/SS	'/SS	이라고/JKQ	
 경주	경주/NNP		:	경주/NNG	
-서킷	서킷/UN		:	서킷/NNG	
+서킷	서/NNG	키/NNG	ㅅ/NNG		:	서킷/NNG	
 국내용으로,	국/NNG	내용/NNG	으로/JKB	,/SP		:	국내/NNG	용/XSN	으로/JKB	,/SP	
 우리	울/VV	리/EC		:	우리/NP	
 경주	경주/NNP		:	경주/NNG	
@@ -288,7 +285,6 @@ Time per Unit : 0.873006 ms
 있는	있/VX	는/ETM		:	있/VV	는/ETM	
 웨이스트	웨/UN	이스트/NNG		:	웨이스트/NNG	
 니퍼형거들	니퍼형/UN	거들/VV	ㄹ/ETM		:	니퍼/NNG	형/XSN	거들/NNG	
-두	두/JX		:	두/MM	
 있다.	있/VX	다/EF	./SF		:	있/VV	다/EF	./SF	
 있으나	있/VV	으나/EC		:	있/VX	으나/EC	
 미국산	미/XPN	국산/NNG		:	미국/NNP	산/XSN	
@@ -296,7 +292,7 @@ Time per Unit : 0.873006 ms
 번	벌/VV	ㄴ/ETM		:	번/NNB	
 정도	정/NNP	도/JX		:	정도/NNG	
 앙드레	앙드레/UN		:	앙드레/NNP	
-오늘부터	오늘/NNG	부터/JKB		:	오늘/NNG	부터/JX	
+오늘부터	오늘/NNG	부/NNG	트/VV	어/EC		:	오늘/NNG	부터/JX	
 3일간	3/SN	일간/NNG		:	3/SN	일/NNB	간/NNG	
 의상	의상/NNP		:	의상/NNG	
 앙드레김	앙드레김/UN		:	앙드레김/NNP	
@@ -306,7 +302,6 @@ Time per Unit : 0.873006 ms
 이브닝	이브/NNP	닝/UN		:	이브닝/NNG	
 2백여점.	2/SN	백/NR	여/XSN	점/NNG	./SF		:	2/SN	백/NR	여/XSN	점/NNB	
 앙드레김	앙드레김/UN		:	앙드레김/NNP	
-돌아	돋/VV	아/EC		:	돌/VV	아/EC	
 보고	보/VV	고/EC		:	보/VX	고/EC	
 모습과	모습/NNG	과/JKB		:	모습/NNG	과/JC	
 형상화하려고	형상/NNG	화하/VV	려고/EC		:	형상/NNG	화/XSN	하/XSV	려고/EC	
@@ -316,7 +311,7 @@ Time per Unit : 0.873006 ms
 사용하고	사용/NNG	하고/JKB		:	사용/NNG	하/XSV	고/EC	
 여러	열/VV	러/EC		:	여러/MM	
 겹겹이	겹겹/NNG	이/JKS		:	겹겹이/MAG	
-많아졌다	많아졌다/UN		:	많/VA	아/EC	지/VX	었/EP	다/EC	
+많아졌다	많아졌/UN	다/EC		:	많/VA	아/EC	지/VX	었/EP	다/EC	
 심영희	심/NNP	영희/NNP		:	심영희/NNP	
 우리	울/VV	리/EC		:	우리/NP	
 준	주/VX	ㄴ/ETM		:	줄/VV	ㄴ/ETM	
@@ -349,7 +344,6 @@ Time per Unit : 0.873006 ms
 피해자며	피하/VV	아/EC	자/VV	며/EC		:	피해자/NNG	이/VCP	며/EC	
 1위가	1/SN	위/NNG	가/JKS		:	1/SN	위/NNB	가/JKS	
 불화'(14%)인	불화/NNG	'(/SS	14/SN	%/SW	)/SS	인/NNG		:	불화/NNG	'/SS	(/SS	14/SN	%/SW	)/SS	이/VCP	ㄴ/ETM	
-그	그/NA		:	그/MM	
 -	-/SO		:	-/SS	
 59.8%,	59.8/SN	%/SW	,/SP		:	59/SN	./SP	8/SN	%/SW	,/SP	
 성별로는	성별/NNG	로/JKB	는/JX		:	성/NNG	별/XSN	로/JKB	는/JX	
@@ -387,7 +381,7 @@ Time per Unit : 0.873006 ms
 대산면	대/XPN	산/NNG	면/NNG		:	대산면/NNP	
 평기리	평기/UN	리/NNB		:	평기리/NNP	
 소망농장	소망/NNG	농장/NNG		:	소망농장/NNP	
-문은섭씨(41).	문/NNG	은/JX	섭씨/NNG	(/SS	41/SN	)/SS	./SF		:	문은섭/NNP	씨/NNB	(/SS	41/SN	)/SS	./SF	
+문은섭씨(41).	문은/UN	섭씨/NNG	(/SS	41/SN	)/SS	./SF		:	문은섭/NNP	씨/NNB	(/SS	41/SN	)/SS	./SF	
 문씨는	문/NNG	씨/NNB	는/JX		:	문/NNP	씨/NNB	는/JX	
 "평기리는	"/SS	평/NNG	기리/VV	는/ETM		:	"/SS	평기리/NNP	는/JX	
 일교차가	일교차/NNG	가/VV	아/EC		:	일교차/NNG	가/JKS	
@@ -441,7 +435,7 @@ Time per Unit : 0.873006 ms
 오성진	오성/NNG	진/NNG		:	오성진/NNP	
 -	-/SO		:	-/SS	
 김석균	김/NNP	석/NNG	균/NNG		:	김석균/NNP	
-김수홍	김/NNP	수/NNG	홍/NNG		:	김수홍/NNP	
+김수홍	김/NNP	수호/NNG	ㅇ/NNG		:	김수홍/NNP	
 직접	직접/NNG		:	직접/MAG	
 회사가	회/NNB	사가/NNG		:	회사/NNG	가/JKS	
 모아	모/VV	아/EC		:	모으/VV	아/EC	
@@ -450,7 +444,7 @@ Time per Unit : 0.873006 ms
 -	-/SO		:	-/SS	
 -	-/SO		:	-/SS	
 연세대세브란스병원과	연세대/NNP	세브란스/UN	병원/NNG	과/JKB		:	연세대/NNP	세브란스병원/NNP	과/JC	
-대웅제약,	대/XPN	웅/NNP	제약/NNG	,/SP		:	대웅제약/NNP	,/SP	
+대웅제약,	대우/NNP	ㅇ/NNG	제약/NNG	,/SP		:	대웅제약/NNP	,/SP	
 동아제약,	동아/NNP	제약/NNG	,/SP		:	동아제약/NNP	,/SP	
 -	-/SO		:	-/SS	
 한다.	하/VX	ㄴ다/EF	./SF		:	하/VV	ㄴ다/EF	./SF	
@@ -520,7 +514,7 @@ Time per Unit : 0.873006 ms
 로즈병원	로즈/NNP	병원/NNG		:	로즈병원/NNP	
 있는	있/VX	는/ETM		:	있/VV	는/ETM	
 충전식	충전/NNG	식/XSN		:	충전식/NNG	
-자유스러우며	자유/NNG	스럽/XSA	으며/EC		:	자유/NNG	스럽/XSA	며/EC	
+자유스러우며	자유/NNG	스럽/VA	으며/EC		:	자유/NNG	스럽/XSA	며/EC	
 흡사한	흡사/MAG	하/XSV	ㄴ/ETM		:	흡사/MAG	하/XSA	ㄴ/ETM	
 황충진	황/NNP	충/NNG	진/NNG		:	황충진/NNP	
 교수(신경외과)팀은	교수/NNG	(/SS	신경/NNG	외과/NNG	)/SS	팀/NNG	은/JX		:	교수/NNG	(/SS	신경외과/NNG	)/SS	팀/NNG	은/JX	
@@ -556,15 +550,14 @@ Time per Unit : 0.873006 ms
 친구들로부터	친/XPN	구들/NNG	로부터/JKB		:	친구/NNG	들/XSN	로부터/JKB	
 이상한	이상/NNG	하/XSV	ㄴ/ETM		:	이상/NNG	하/XSA	ㄴ/ETM	
 다른	다르/VA	ㄴ/ETM		:	다른/MM	
-그	그/NA		:	그/NP	
+그	그/MM		:	그/NP	
 있었는지를	있/VX	었/EP	는지/EC	를/JKO		:	있/VV	었/EP	는지/EC	를/JKO	
-놀랍게도	놀랍/VA	게도/EC		:	놀랍/VA	게/EC	도/JX	
 전	전/MM		:	전/NNG	
 유사한	유사/XR	하/XSA	ㄴ/ETM		:	유사/NNG	하/XSA	ㄴ/ETM	
 요시이	요시이/UN		:	요시이/NNP	
 이를	이르/VV	ㄹ/ETM		:	이/NP	를/JKO	
 다른	다르/VA	ㄴ/ETM		:	다른/MM	
-만들었다.	만/JX	듣/VV	었/EP	다/EF	./SF		:	만들/VV	었/EP	다/EF	./SF	
+만들었다.	만/NR	듣/VV	었/EP	다/EF	./SF		:	만들/VV	었/EP	다/EF	./SF	
 주요	주/VX	요/EC		:	주요/NNG	
 뇌졸중이나	뇌졸중/NNG	이나/JX		:	뇌졸중/NNG	이나/JC	
 요시이	요시이/UN		:	요시이/NNP	
@@ -639,7 +632,6 @@ Time per Unit : 0.873006 ms
 41.3%로	41.3/SN	%/SW	로/JKB		:	41/SN	./SP	3/SN	%/SW	로/JKB	
 많았고	많았/UN	고/EC		:	많/VA	았/EP	고/EC	
 17.7%를	17.7/SN	%/SW	를/JKO		:	17/SN	./SP	7/SN	%/SW	를/JKO	
-그	그/NA		:	그/MM	
 안	알/VV	ㄴ/ETM		:	안/NNG	
 찾아	찾/VV	아/EF		:	찾/VV	아/EC	
 온	온/MM		:	오/VV	ㄴ/ETM	
@@ -693,11 +685,11 @@ Time per Unit : 0.873006 ms
 사고가	사/NNG	고가/NNG		:	사고/NNG	가/JKS	
 있다	있/VV	다/EC		:	있/VX	다/EC	
 싸게	싸/VV	게/EC		:	싸/VA	게/EC	
-120여곳	120/SN	여/NNG	곳/NNG		:	120/SN	여/XSN	곳/NNG	
+120여곳	120/SN	여고/NNG	ㅅ/NNG		:	120/SN	여/XSN	곳/NNG	
 부쩍	부/XPN	쩍/MAG		:	부쩍/MAG	
 중소기업체들의	중소/NNG	기업체/NNG	들/XSN	의/JKG		:	중소기업체/NNG	들/XSN	의/JKG	
 전국적으로	전/MM	국적/NNG	으로/JKB		:	전국/NNG	적/XSN	으로/JKB	
-20여곳을	20/SN	여/NNG	곳/NNG	을/JKO		:	20/SN	여/XSN	곳/NNG	을/JKO	
+20여곳을	20/SN	여고/NNG	ㅅ/NNG	을/JKO		:	20/SN	여/XSN	곳/NNG	을/JKO	
 이들	이드/NNG	ㄹ/JKO		:	이/NP	들/XSN	
 4백∼6백여종의	4/SN	백/NR	∼/SO	6/SN	백/NR	여종/NNG	의/JKG		:	4/SN	백/NR	∼/SO	6/SN	백/NR	여/XSN	종/NNG	의/JKG	
 3분의	3/SN	분/NNB	의/JKG		:	3/SN	분/XSN	의/JKG	
@@ -718,7 +710,7 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 전기제품과	전기/NNG	제품/NNG	과/JKB		:	전기/NNG	제품/NNG	과/JC	
 -	-/SO		:	-/SS	
 3백여종이다.	3/SN	백/NR	여종/NNG	이/VCP	다/EF	./SF		:	3/SN	백/NR	여/XSN	종/NNG	이/VCP	다/EF	./SF	
-빙수기,	빙/UN	수기/NNG	,/SP		:	빙수기/NNG	,/SP	
+빙수기,	비/XPN	ㅇ/NNG	수기/NNG	,/SP		:	빙수기/NNG	,/SP	
 전용호본부장은	전용/NNG	호/NNG	본부장/NNG	은/JX		:	전용호/NNP	본부장/NNG	은/JX	
 하자가	하자/NNG	가/VV	아/EC		:	하자/NNG	가/JKS	
 있어서가	있/VV	어서/EC	가/JKS		:	있/VV	어서/EC	가/JKC	
@@ -732,9 +724,8 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 '동양	'/SS	동양/NNG		:	'/SS	동양/NNP	
 생활용품	생/XPN	활용품/NNG		:	생활/NNG	용품/NNG	
 구판장'	구/XPN	판장/NNG	'/SS		:	구판장/NNG	'/SS	
-정재웅	정재/NNG	웅/NNP		:	정재웅/NNP	
+정재웅	정재/NNG	우/NNG	ㅇ/NNG		:	정재웅/NNP	
 있는데	있/VV	는데/EC		:	있/VX	는데/EC	
-그	그/NA		:	그/MM	
 품질보증마크가	품질/NNG	보증/NNG	마크/NNG	가/VV	아/EC		:	품질/NNG	보증/NNG	마크/NNG	가/JKS	
 있는	있/VX	는/ETM		:	있/VV	는/ETM	
 말한다.	말하/VV	ㄴ다/EF	./SF		:	말/NNG	하/XSV	ㄴ다/EF	./SF	
@@ -754,7 +745,7 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 화마	화/NNG	마/NNG		:	화마/NNG	
 한국소방검정공사가	한국/NNP	소방/NNG	검정/NNG	공/NNG	사가/NNG		:	한국소방검정공사/NNP	가/JKS	
 서울과	서울/NNP	과/JKB		:	서울/NNP	과/JC	
-화재감지기(차동식)	화재/NNG	감지기/NNG	(/SS	차/NNG	동/NNG	식/NNG	)/SS		:	화재/NNG	감지기/NNG	(/SS	차동식/NNG	)/SS	
+화재감지기(차동식)	화재/NNG	감지기/NNG	(/SS	차도/NNG	ㅇ/NNG	식/NNG	)/SS		:	화재/NNG	감지기/NNG	(/SS	차동식/NNG	)/SS	
 않았고,	않았/UN	고/EC	,/SP		:	않/VX	았/EP	고/EC	,/SP	
 고장난	고장/NNG	난/NNG		:	고장/NNG	나/VV	ㄴ/ETM	
 상태만을	상/NNG	태만/NNG	을/JKO		:	상태/NNG	만/JX	을/JKO	
@@ -834,7 +825,7 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 대한	대하/VV	ㄴ/ETM		:	대한/NNP	
 현재	현재/NNG		:	현재/MAG	
 마련중일	마련/NNG	중이/NNG	ㄹ/JKO		:	마련/NNG	중/NNB	이/VCP	ㄹ/ETM	
-뿐	뿐/JX		:	뿐/NNB	
+뿐	뿌/VX	ㄴ/ETM		:	뿐/NNB	
 아무런	아무렇/VA	ㄴ/ETM		:	아무런/MM	
 기준이	기준이/NNP		:	기준/NNG	이/JKS	
 일정한	일정/XR	하/XSA	ㄴ/ETM		:	일정/NNG	하/XSA	ㄴ/ETM	
@@ -842,7 +833,6 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 필요하다고	필요/NNG	하/XSV	다/EC	고/EC		:	필요/NNG	하/XSA	다고/EC	
 말한다.	말하/VV	ㄴ다/EF	./SF		:	말/NNG	하/XSV	ㄴ다/EF	./SF	
 물	물/VV	ㄹ/ETM		:	물/NNG	
-후	후/NA		:	후/NNG	
 있다는	있/VX	다는/ETM		:	있/VV	다는/ETM	
 야생조	야생/NNG	조/NNG		:	야생조/NNG	
 줄	주/VX	ㄹ/ETM		:	줄/NNG	
@@ -907,7 +897,7 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 -	-/SO		:	-/SS	
 아쿠아	아쿠아/UN		:	아쿠아/NNG	
 로빅스는	로빅스/UN	는/ETM		:	로빅스/NNG	는/JX	
-뿐	뿐/JX		:	뿐/NNB	
+뿐	뿌/VX	ㄴ/ETM		:	뿐/NNB	
 이뤄져	이뤄져/UN		:	이루어지/VV	어/EC	
 비만이나	비만/NNG	이나/JX		:	비만/NNG	이나/JC	
 말한다.	말하/VV	ㄴ다/EF	./SF		:	말/NNG	하/XSV	ㄴ다/EF	./SF	
@@ -956,7 +946,7 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 하기도	하기/NNG	도/JX		:	하/VV	기/ETN	도/JX	
 -	-/SO		:	-/SS	
 본떠	본/NNG	뜨/VV	어/EC		:	본뜨/VV	어/EC	
-만들어버린	만/JX	듣/VV	어/EC	버리/VX	ㄴ/ETM		:	만들/VV	어/EC	버리/VX	ㄴ/ETM	
+만들어버린	만/NR	듣/VV	어/EC	버리/VX	ㄴ/ETM		:	만들/VV	어/EC	버리/VX	ㄴ/ETM	
 장	장/NNB		:	장/NNP	
 고티에의	고/XPN	티/NNG	에/JKB	의/JKG		:	고티에/NNP	의/JKG	
 지포라이터를	지/NNG	포/NNG	라이터/NNG	를/JKO		:	지포라이터/NNG	를/JKO	
@@ -964,7 +954,6 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 라반의	라/NNG	반/NNG	의/JKG		:	라반/NNP	의/JKG	
 엑세스.	엑세스/UN	./SF		:	엑세스/NNG	./SF	
 쇼킹한	쇼/NNG	킹/NNG	하/XSV	ㄴ/ETM		:	쇼킹하/VA	ㄴ/ETM	
-두	두/JX		:	두/MM	
 이들	이드/NNG	ㄹ/JKO		:	이/NP	들/XSN	
 쓰는	쓸/VV	는/ETM		:	쓰/VV	는/ETM	
 쇼킹경쟁을	쇼/NNG	킹/NNG	경쟁/NNG	을/JKO		:	쇼킹/NNG	경쟁/NNG	을/JKO	
@@ -1021,7 +1010,7 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 맥시가	맥/NNG	시가/NNG		:	맥시/NNG	가/JKS	
 꼭붙어	꼭/MAG	붙/VV	어/EF		:	꼭/MAG	붙/VV	어/EC	
 인기다.	인기다/UN	./SF		:	인기/NNG	이/VCP	다/EF	./SF	
-아랫	아랫/UN		:	아랫/NNG	
+아랫	아래/NNG	ㅅ/NNG		:	아랫/NNG	
 슬쩍슬쩍	슬쩍/MAG	슬쩍/MAG		:	슬쩍슬쩍/MAG	
 온통	온/MM	통/NNB		:	온통/MAG	
 아래야	알/VV	래야/EC		:	아래/NNG	야/JX	
@@ -1093,6 +1082,7 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 -	-/SO		:	-/SS	
 -	-/SO		:	-/SS	
 있나"하고	있/VV	나/EC	"/SS	하고/JKB		:	있/VV	나/EC	"/SS	하고/JKQ	
+찾아나온	찾아/UN	나오/VV	ㄴ/ETM		:	찾/VV	아나/EC	오/VX	ㄴ/ETM	
 번	벌/VV	ㄴ/ETM		:	번/NNB	
 교환전을	교/NNG	환전/NNG	을/JKO		:	교환전/NNG	을/JKO	
 좋았어요.	좋/VA	아/EC	ㅆ/UN	어요/EF	./SF		:	좋/VA	았/EP	어요/EF	./SF	
@@ -1112,7 +1102,6 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 제공과	제공/NNG	과/JKB		:	제공/NNG	과/JC	
 중개료는	중개/NNG	료/NNG	는/JX		:	중개료/NNG	는/JX	
 사람이	사람/NNG	이/JKS		:	사람/NNG	이/JKC	
-그	그/NA		:	그/MM	
 70여점.	70/SN	여/NNG	점/NNG	./SF		:	70/SN	여/XSN	점/NNB	./SF	
 버너와	버너/NNG	와/JKB		:	버너/NNG	와/JC	
 침낭도	침/NNG	낭/NNG	도/JX		:	침낭/NNG	도/JX	
@@ -1140,8 +1129,6 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 일	일/NNB		:	일/NNG	
 아닙니까?"	아니/VCN	ㅂ니까/EF	?/SF	"/SS		:	아니/VCN	ㅂ니까/EF	?/SF	"/SS	
 살	살/VV	ㄹ/ETM		:	사/VV	ㄹ/ETM	
-사람	사/VV	람/EC		:	사람/NNG	
-사람	사/VV	람/EC		:	사람/NNG	
 지금	지금/NNG		:	지금/MAG	
 급하다고	급하/VA	다/EC	고/EC		:	급하/VA	다고/EC	
 했다.	하/VV	았/EP	다/EF	./SF		:	하/VX	았/EP	다/EF	./SF	
@@ -1184,7 +1171,7 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 살라는	사르/VV	아/EC	는/JX		:	살/VV	라는/ETM	
 우리	울/VV	리/EC		:	우리/NP	
 나이가	나이/NNG	가/JKS		:	나이/NNG	가/JKC	
-부모로부터	부/XPN	모로/NNP	부터/JKB		:	부모/NNG	로부터/JKB	
+부모로부터	부/XPN	모로/NNP	부/NNG	터/NNB		:	부모/NNG	로부터/JKB	
 수	수/NNB		:	수/NNG	
 이런	이렇/VA	ㄴ/ETM		:	이런/MM	
 닦았지요.	닦았/UN	지요/EF	./SF		:	닦/VV	았/EP	지요/EF	./SF	
@@ -1193,11 +1180,10 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 절실하다고	절실/XR	하/XSA	다/EC	고/EC		:	절실/XR	하/XSA	다고/EC	
 말한다.	말하/VV	ㄴ다/EF	./SF		:	말/NNG	하/XSV	ㄴ다/EF	./SF	
 상담역	상담/NNG	역/NNG		:	상담역/NNG	
-가을부터	가을/NNG	부터/JKB		:	가을/NNG	부터/JX	
+가을부터	가을/NNG	부/NNG	트/VV	어/EC		:	가을/NNG	부터/JX	
 제일	제일/NNG		:	제/XPN	일/NR	
 -	-/SO		:	-/SS	
 19∼24일과	19/SN	∼/SO	24/SN	일/NNB	과/JKB		:	19/SN	∼/SO	24/SN	일/NNB	과/JC	
-두	두/JX		:	두/MM	
 여러	열/VV	러/EC		:	여러/MM	
 다른	다르/VA	ㄴ/ETM		:	다른/MM	
 내가	내가/VV	아/EC		:	내/NP	가/JKS	
@@ -1210,9 +1196,8 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 "내가	"/SS	내가/VV	아/EC		:	"/SS	내/NP	가/JKS	
 백만장자라면	백만장자/NNG	라면/NNG		:	백만장자/NNG	이/VCP	라면/EC	
 제일	제일/NNG		:	제/XPN	일/NR	
-싶은가"	싶/VX	으/EC	ㄴ가/EC	"/SS		:	싶/VX	은가/EC	"/SS	
+싶은가"	싶/VX	은/ETM	가/NNG	"/SS		:	싶/VX	은가/EC	"/SS	
 여러	열/VV	러/EC		:	여러/MM	
-후	후/NA		:	후/NNG	
 각자	각자/NNG		:	각자/MAG	
 말하게	말하/VV	게/EC		:	말/NNG	하/XSV	게/EC	
 하면서	하/VV	면서/EC		:	하/VX	면서/EC	
@@ -1244,7 +1229,7 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 말한다.	말하/VV	ㄴ다/EF	./SF		:	말/NNG	하/XSV	ㄴ다/EF	./SF	
 거친	거칠/VA	ㄴ/ETM		:	거치/VV	ㄴ/ETM	
 1박2일간	1/SN	박/NNB	2/SN	일간/NNG		:	1/SN	박/NNB	2/SN	일/NNB	간/NNB	
-가을부터	가을/NNG	부터/JKB		:	가을/NNG	부터/JX	
+가을부터	가을/NNG	부/NNG	트/VV	어/EC		:	가을/NNG	부터/JX	
 수영미숙	수영/NNG	미숙/NNG		:	수영/NNG	미숙/XR	
 -	-/SO		:	-/SS	
 -	-/SO		:	-/SS	
@@ -1258,12 +1243,11 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 -	-/SO		:	-/SS	
 경기	경기/NNG		:	경기/NNP	
 -	-/SO		:	-/SS	
-시	시/NA		:	시/NNG	
+시	시/NNB		:	시/NNG	
 -	-/SO		:	-/SS	
-도	도/JX		:	도/NNG	
+도	도/NNB		:	도/NNG	
 -	-/SO		:	-/SS	
 -	-/SO		:	-/SS	
-두	두/JX		:	두/MM	
 달간에	달/NNG	간/NNG	에/JKB		:	달/NNG	간/NNB	에/JKB	
 44.5%로	44.5/SN	%/SW	로/JKB		:	44/SN	./SP	5/SN	%/SW	로/JKB	
 10.8%,	10.8/SN	%/SW	,/SP		:	10/SN	./SP	8/SN	%/SW	,/SP	
@@ -1365,8 +1349,8 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 동양	동양/NNG		:	동양/NNP	
 채썰기와	채/NNB	썰/NNG	기와/NNG		:	채/NNG	썰/VV	기/ETN	와/JC	
 모양내서	모양/NNG	내/VV	어서/EC		:	모양내/VV	어서/EC	
-뿐	뿐/JX		:	뿐/NNB	
-만들어	만/JX	듣/VV	어/EC		:	만들/VV	어/EC	
+뿐	뿌/VX	ㄴ/ETM		:	뿐/NNB	
+만들어	만들/VV	어/EF		:	만들/VV	어/EC	
 12만	12/SN	만/NNB		:	12/SN	만/NR	
 19만	19/SN	만/NNB		:	19/SN	만/NR	
 있다.	있/VX	다/EF	./SF		:	있/VV	다/EF	./SF	
@@ -1394,7 +1378,7 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 등에도	등에/NNG	도/JX		:	등/NNB	에/JKB	도/JX	
 이	이/MM		:	이/NP	
 여부와	여부/NNG	와/JKB		:	여부/NNG	와/JC	
-따라	따라/JX		:	따르/VV	아/EC	
+따라	따/VV	아라/EC		:	따르/VV	아/EC	
 1천원대,	1/SN	천/NR	원대/NNG	,/SP		:	1/SN	천/NR	원/NNB	대/XSN	,/SP	
 빵틀은	빵/NNG	틀/NNG	은/JX		:	빵틀/NNG	은/JX	
 1만∼2만원까지	1/SN	만/NR	∼/SO	2/SN	만원/NNG	까지/JX		:	1/SN	만/NR	∼/SO	2/SN	만/NR	원/NNB	까지/JX	
@@ -1408,6 +1392,7 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 둔	두/VV	ㄴ/ETM		:	두/VX	ㄴ/ETM	
 손님이	손님/NNG	이/JKS		:	손/NNG	님/XSN	이/JKS	
 직접	직접/NNG		:	직접/MAG	
+듣는답니다.	듣느/UN	ㄴ답니다/EF	./SF		:	듣/VV	는답니다/EF	./SF	
 녹음해가는	녹음/NNG	해/NNG	갈/VV	는/ETM		:	녹음/NNG	하/XSV	아/EC	가/VX	는/ETM	
 가족이나	가족/NNG	이나/JX		:	가족/NNG	이나/JC	
 '스타노래방'	'/SS	스타/NNG	노래방/NNG	'/SS		:	'/SS	스타노래방/NNP	'/SS	
@@ -1426,6 +1411,7 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 손님들도	손님/NNG	들/XSN	도/JX		:	손/NNG	님/XSN	들/XSN	도/JX	
 있다는	있/VX	다는/ETM		:	있/VV	다는/ETM	
 해도	해/NNG	도/JX		:	하/VV	아도/EC	
+5천여곳에	5/SN	천/NR	여고/NNG	ㅅ/NNG	에/JKB		:	5/SN	천/NR	여/XSN	곳/NNG	에/JKB	
 업소간	업소/NNG	갈/VV	ㄴ/ETM		:	업소/NNG	간/NNB	
 치열해진	치열/NNG	해지/VV	ㄴ/ETM		:	치열/NNG	하/XSA	아/EC	지/VX	ㄴ/ETM	
 데다	데/VV	어다/EC		:	데/NNB	다/JX	
@@ -1453,7 +1439,7 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 앞서	앞서/VV	어/EC		:	앞서/MAG	
 작품과	작품/NNG	과/JKB		:	작품/NNG	과/JC	
 김정무	김/NNP	정무/NNG		:	김정무/NNP	
-따라,	따라/JX	,/SP		:	따르/VV	아/EC	,/SP	
+따라,	따/VV	아라/EC	,/SP		:	따르/VV	아/EC	,/SP	
 오려	오/VV	려/EC		:	오리/VV	어/EC	
 -	-/SO		:	-/SS	
 -	-/SO		:	-/SS	
@@ -1471,13 +1457,12 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 류창열	류/NNP	창/NNG	열/VV	ㄹ/ETM		:	류창열/NNP	
 씨(44.회사원)는	씨/NNB	(/SS	44./SN	회사원/NNG	)/SS	는/JX		:	씨/NNB	(/SS	44/SN	./SF	회사원/NNG	)/SS	는/JX	
 뭔가	뭔/MM	가/NNG		:	뭐/NP	이/VCP	ㄴ가/EC	
-보람	보/VV	람/EC		:	보람/NNG	
 있는	있/VX	는/ETM		:	있/VV	는/ETM	
 참여했다"고	참여/NNG	하/XSV	았/EP	다/EF	"/SS	고/EC		:	참여/NNG	하/XSV	았/EP	다/EC	"/SS	고/JKQ	
 말했다.	말하/VV	았/EP	다/EF	./SF		:	말/NNG	하/XSV	았/EP	다/EF	./SF	
 재민	재민/NNG		:	재민/NNP	
 군(13)은	군/NNG	(/SS	13/SN	)/SS	은/JX		:	군/NNB	(/SS	13/SN	)/SS	은/JX	
-만들어	만/JX	듣/VV	어/EC		:	만들/VV	어/EC	
+만들어	만들/VV	어/EF		:	만들/VV	어/EC	
 보긴	보기/NNG	ㄴ/JX		:	보/VX	기/ETN	ㄴ/JX	
 했지만,	하/VV	았/EP	지만/EC	,/SP		:	하/VX	았/EP	지만/EC	,/SP	
 직접	직접/NNG		:	직접/MAG	
@@ -1500,7 +1485,7 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 27.4도,	27.4/SN	도/JX	,/SP		:	27/SN	./SP	4/SN	도/NNB	,/SP	
 18.5도로	18.5/SN	도로/NNG		:	18/SN	./SP	5/SN	도/NNB	로/JKB	
 일교차가	일교차/NNG	가/VV	아/EC		:	일교차/NNG	가/JKS	
-8.9도였고,	8.9/SN	도/JX	이/VCP	었/EP	고/EC	,/SP		:	8/SN	./SP	9/SN	도/NNB	이/VCP	었/EP	고/EC	,/SP	
+8.9도였고,	8.9/SN	도/NNB	이/VCP	었/EP	고/EC	,/SP		:	8/SN	./SP	9/SN	도/NNB	이/VCP	었/EP	고/EC	,/SP	
 4일에는	4/SN	일/NNG	에/JKB	는/JX		:	4/SN	일/NNB	에/JKB	는/JX	
 9.3도의	9.3/SN	도의/NNG		:	9/SN	./SP	3/SN	도/NNB	의/JKG	
 낮과	낮/NNG	과/JKB		:	낮/NNG	과/JC	
@@ -1524,12 +1509,11 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 박용우	박/NNP	용/NNG	우/NNG		:	박용우/NNP	
 환자가	환/NNG	자가/NNG		:	환자/NNG	가/JKS	
 많아졌는데,	많아졌/UN	는데/EC	,/SP		:	많/VA	아/EC	지/VX	었/EP	는데/EC	,/SP	
-그	그/NA		:	그/MM	
 어린이	어린/NNG	이/JKS		:	어린이/NNG	
 환자가	환/NNG	자가/NNG		:	환자/NNG	가/JKS	
 증가했다"고	증가/NNG	하/XSV	았/EP	다/EF	"/SS	고/EC		:	증가/NNG	하/XSV	았/EP	다/EC	"/SS	고/JKQ	
 말했다.	말하/VV	았/EP	다/EF	./SF		:	말/NNG	하/XSV	았/EP	다/EF	./SF	
-따라	따라/JX		:	따르/VV	아/EC	
+따라	따/VV	아라/EC		:	따르/VV	아/EC	
 환절기가	환절기/NNG	가/JKS		:	환절기/NNG	가/JKC	
 누구나	누/VV	구나/EC		:	누구/NP	나/JX	
 감기에	감/VV	기에/EC		:	감기/NNG	에/JKB	
@@ -1574,7 +1558,6 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 19만	19/SN	만/NNB		:	19/SN	만/NR	
 6백∼21만	6/SN	백/NR	∼/SO	21/SN	만/NNB		:	6/SN	백/NR	∼/SO	21/SN	만/NR	
 24일과	24/SN	일/NNB	과/JKB		:	24/SN	일/NNB	과/JC	
-두	두/JX		:	두/MM	
 -	-/SO		:	-/SS	
 -	-/SO		:	-/SS	
 매일	매이/VV	ㄹ/ETM		:	매일/MAG	
@@ -1593,7 +1576,7 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 외산…	외/NNG	산/NNG	…/SE		:	외산/NNG	…/SE	
 우리	울/VV	리/EC		:	우리/NP	
 시급	시급/NNG		:	시급/XR	
-캅,	캅/UN	,/SP		:	캅/NNG	,/SP	
+캅,	카/NNG	ㅂ/NNG	,/SP		:	캅/NNG	,/SP	
 일제히	일제/NNG	히/NNG		:	일제히/MAG	
 이들	이드/NNG	ㄹ/JKO		:	이/NP	들/XSN	
 주인공이나	주인공/NNG	이나/JX		:	주인공/NNG	이나/JC	
@@ -1601,7 +1584,7 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 자리잡는	자리잡/VV	는/ETM		:	자리/NNG	잡/VV	는/ETM	
 증거라고	증거라/UN	고/EC		:	증거/NNG	이/VCP	라고/EC	
 말한다.	말하/VV	ㄴ다/EF	./SF		:	말/NNG	하/XSV	ㄴ다/EF	./SF	
-캅'은	캅/UN	'/SS	은/JX		:	캅/NNG	'/SS	은/JX	
+캅'은	카/NNG	ㅂ/NNG	'/SS	은/JX		:	캅/NNG	'/SS	은/JX	
 우리	울/VV	리/EC		:	우리/NP	
 기획단계서부터	기획단/NNG	계/XSN	서부터/JKB		:	기획/NNG	단계/NNG	서부터/JKB	
 상품화권자를	상품/NNG	화/XSN	권/XSN	자르/VV	ㄹ/ETM		:	상품/NNG	화/XSN	권/XSN	자/NNG	를/JKO	
@@ -1609,7 +1592,7 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 드림박스	드림/NNG	박스/NNG		:	드림박스/NNP	
 이현열	이현/NNP	열/NNG		:	이현열/NNP	
 얘기다.	얘기다/UN	./SF		:	얘기/NNG	이/VCP	다/EF	./SF	
-캅의	캅/UN	의/JKG		:	캅/NNG	의/JKG	
+캅의	카/NNG	ㅂ/NNG	의/JKG		:	캅/NNG	의/JKG	
 20여종으로,	20/SN	여종/NNG	으로/JKB	,/SP		:	20/SN	여/XSN	종/NNG	으로/JKB	,/SP	
 8백원)과	8/SN	백/NR	원/NNB	)/SS	과/JKB		:	8/SN	백/NR	원/NNB	)/SS	과/JC	
 -	-/SO		:	-/SS	
@@ -1634,7 +1617,7 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 1만원대이다.	1/SN	만원/NNG	대이/VV	다/EF	./SF		:	1/SN	만/NR	원/NNB	대/XSN	이/VCP	다/EF	./SF	
 이들	이드/NNG	ㄹ/JKO		:	이/NP	들/XSN	
 외국산이란	외국/NNG	산/NNG	이란/JX		:	외국/NNG	산/XSN	이/VCP	란/ETM	
-'키드캅'	'/SS	키드/NNG	캅/UN	'/SS		:	'/SS	키드캅/NNP	'/SS	
+'키드캅'	'/SS	키드/NNG	카/NNG	ㅂ/NNG	'/SS		:	'/SS	키드캅/NNP	'/SS	
 하는	하/VV	는/ETM		:	하/VX	는/ETM	
 정서면에서나	정/NNG	서면/NNG	에서/JKB	나/JX		:	정서/NNG	면/NNG	에서/JKB	나/JX	
 우리	울/VV	리/EC		:	우리/NP	
@@ -1661,13 +1644,13 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 쉬운책을	쉽/VA	은/ETM	책/NNG	을/JKO		:	쉽/VA	ㄴ/ETM	책/NNG	을/JKO	
 모았습니다."	모/VV	았/EP	습니다/EF	./SF	"/SS		:	모으/VV	았/EP	습니다/EF	./SF	"/SS	
 직접	직접/NNG		:	직접/MAG	
-만들어	만/JX	듣/VV	어/EC		:	만들/VV	어/EC	
+만들어	만들/VV	어/EF		:	만들/VV	어/EC	
 윤숙자교수는	윤/NNP	숙/NNG	자/NNG	교수/NNG	는/JX		:	윤숙자/NNP	교수/NNG	는/JX	
 말한다.	말하/VV	ㄴ다/EF	./SF		:	말/NNG	하/XSV	ㄴ다/EF	./SF	
 시루떡-녹두찰떡-무지개떡	시루/NNG	뜨/VV	어/EC	ㄱ/UN	-/SO	녹두찰떡/UN	-/SO	무지개/NNG	떡/NNG		:	시루떡/NNG	-/SS	녹두/NNG	찰떡/NNG	-/SS	무지개떡/NNG	
 떡과	떡/NNG	과/JKB		:	떡/NNG	과/JC	
 인절미-단자	인/NNG	절/NNG	미/NNP	-/SO	단자/NNG		:	인절미/NNG	-/SS	단자/NNG	
-떡-경단-오메기떡	뜨/VV	어/EC	ㄱ/UN	-/SO	경단/NNG	-/SO	오/NNP	메기/NNG	떡/NNG		:	떡/NNG	-/SS	경단/NNG	-/SS	오메기떡/NNG	
+떡-경단-오메기떡	뜨/VV	어/EC	ㄱ/UN	-/SO	겨/NNG	ㅇ/NNG	단/NNB	-/SO	오/NNP	메기/NNG	떡/NNG		:	떡/NNG	-/SS	경단/NNG	-/SS	오메기떡/NNG	
 떡-다식-강정	뜨/VV	어/EC	ㄱ/UN	-/SO	다/NNG	식/NNB	-/SO	강정/NNG		:	떡/NNG	-/SS	다식/NNG	-/SS	강정/NNG	
 한과와	한과/NNG	와/JKB		:	한과/NNG	와/JC	
 한번	한번/MAG		:	한번/NNG	
@@ -1679,7 +1662,7 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 있어요.	있/VX	어요/EF	./SF		:	있/VV	어요/EF	./SF	
 내는	내/NP	는/JX		:	내/VV	는/ETM	
 호박고지떡을	호박/NNG	고지/NNG	떡/NNG	을/JKO		:	호박고지/NNG	떡/NNG	을/JKO	
-만들었죠."	만/JX	듣/VV	었/EP	죠/EF	./SF	"/SS		:	만들/VV	었/EP	죠/EF	./SF	"/SS	
+만들었죠."	만/NR	듣/VV	었/EP	죠/EF	./SF	"/SS		:	만들/VV	었/EP	죠/EF	./SF	"/SS	
 우리	울/VV	리/EC		:	우리/NP	
 떡과	떡/NNG	과/JKB		:	떡/NNG	과/JC	
 있다고	있/VV	다고/EC		:	있/VX	다고/EC	
@@ -1693,7 +1676,6 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 대한양계협회	대한/NNP	양계/NNG	협회/NNG		:	대한양계협회/NNP	
 종합전시장서	종합/NNG	전시/NNG	장서/NNG		:	종합/NNG	전시장/NNG	서/JKB	
 닭고기-달걀	닭고기/NNG	-/SO	달걀/NNG		:	닭고기/NNG	-/SS	달걀/NNG	
-그	그/NA		:	그/MM	
 요오드란,	요오드란/UN	,/SP		:	요오드란/NNG	,/SP	
 유정란,	유/NNP	정란/NNP	,/SP		:	유정란/NNG	,/SP	
 영양란	영/NNG	양란/NNG		:	영양/NNG	란/NNG	
@@ -1714,6 +1696,7 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 오믈렛만들기	오/NR	믈렛/UN	만들/VV	기/ETN		:	오믈렛/NNG	만들/VV	기/ETN	
 실연회,	실/NNG	연회/NNG	,/SP		:	실연회/NNG	,/SP	
 참관자들이	참/NNG	관자/NNG	들/XSN	이/JKS		:	참관자/NNG	들/XSN	이/JKS	
+뿐	뿌/VX	ㄴ/ETM		:	뿐/JX	
 직접	직접/NNG		:	직접/MAG	
 할	할/NNB		:	하/VV	ㄹ/ETM	
 있는	있/VX	는/ETM		:	있/VV	는/ETM	
@@ -1730,7 +1713,6 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 양계홍보관에선	양계/NNG	홍보/NNG	관/NNG	에서/JKB	ㄴ/JX		:	양계/NNG	홍보관/NNG	에서/JKB	ㄴ/JX	
 보여주며,	보여주/VV	며/EC	,/SP		:	보이/VV	어/EC	주/VX	며/EC	,/SP	
 주고	주/VX	고/EC		:	주/VV	고/EC	
-도에서	도/JX	에서/JKB		:	도/NNG	에서/JKB	
 심사위원이	심사/NNG	위원/NNG	이/JKS		:	심사/NNG	위원/NNG	이/JKC	
 알을	알/VV	을/ETM		:	알/NNG	을/JKO	
 다산계	다산/NNP	계/XSN		:	다산/NNG	계/XSN	
@@ -1753,7 +1735,7 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 할	할/NNB		:	하/VV	ㄹ/ETM	
 쓰는	쓸/VV	는/ETM		:	쓰/VV	는/ETM	
 부쩍	부/XPN	쩍/MAG		:	부쩍/MAG	
-달부터	달/NNG	부터/JKB		:	달/NNG	부터/JX	
+달부터	달/NNG	부/NNG	터/NNB		:	달/NNG	부터/JX	
 전-출입,	전/NNP	-/SO	출입/NNG	,/SP		:	전/NNG	-/SS	출입/NNG	,/SP	
 비롯한	비롯/XR	하/XSA	ㄴ/ETM		:	비롯/XR	하/XSV	ㄴ/ETM	
 결재하고	결재/NNG	하고/JKB		:	결재/NNG	하/XSV	고/EC	
@@ -1765,7 +1747,7 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 "부장급쯤	"/SS	부장/NNG	급/NNG	쯤/XSN		:	"/SS	부장/NNG	급쯤/NNG	
 많다"고	많/VA	다/EF	"/SS	고/EC		:	많/VA	다/EC	"/SS	고/JKQ	
 롯데쇼핑의	롯데/NNP	쇼핑/NNG	의/JKG		:	롯데쇼핑/NNP	의/JKG	
-"기안자	"/SS	기안/NNG	자/VV	아/EC		:	"/SS	기안자/NNG	
+"기안자	"/SS	기안/NNG	자/XSN		:	"/SS	기안자/NNG	
 건방지다는	건방지/VA	다/EC	는/JX		:	건방지/VA	다는/ETM	
 말한다.	말하/VV	ㄴ다/EF	./SF		:	말/NNG	하/XSV	ㄴ다/EF	./SF	
 간편하다는	간편/XR	하/XSA	아다/EC	는/JX		:	간편/XR	하/XSA	다는/ETM	
@@ -1799,8 +1781,8 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 향수의세계'란	향/NNG	수의/NNG	세계/NNG	'/SS	란/JX		:	향수/NNG	의/JKG	세계/NNG	'/SS	이/VCP	란/ETM	
 유화와	유화/NNG	와/JKB		:	유화/NNG	와/JC	
 과슈,	과슈/UN	,/SP		:	과슈/NNG	,/SP	
-뿐	뿐/JX		:	뿐/NNB	
-이다	이다/UN		:	이다/NNP	
+뿐	뿌/VX	ㄴ/ETM		:	뿐/NNB	
+이다	이/NP	다/JX		:	이다/NNP	
 소장하고	소장/NNG	하고/JKB		:	소장/NNG	하/XSV	고/EC	
 미공개작들도	미/XPN	공/NNG	개작/NNG	들/XSN	도/JX		:	미/XPN	공개작/NNG	들/XSN	도/JX	
 포함하고	포함/NNG	하고/JKB		:	포함/NNG	하/XSV	고/EC	
@@ -1812,7 +1794,6 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 뜨거운	뜨겁/VA	은/ETM		:	뜨겁/VA	ㄴ/ETM	
 사랑과	사랑/NNG	과/JKB		:	사랑/NNG	과/JC	
 온	온/MM		:	오/VV	ㄴ/ETM	
-후	후/NA		:	후/NNG	
 태양과	태양/NNG	과/JKB		:	태양/NNG	과/JC	
 그려져	그려져/UN		:	그리/VV	어/EC	지/VX	어/EC	
 연변대	연변/NNP	대/NNB		:	연변대/NNP	
@@ -1820,15 +1801,14 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 한금옥부연구원	한/MM	금/NNG	옥/NNG	부연/NNG	구원/NNG		:	한금옥/NNP	부연구원/NNG	
 성차별	성차/NNG	별/XSN		:	성/NNG	차별/NNG	
 여성연구소와	여성/NNG	연구소/NNG	와/JKB		:	여성/NNG	연구소/NNG	와/JC	
-따라	따라/JX		:	따르/VV	아/EC	
+따라	따/VV	아라/EC		:	따르/VV	아/EC	
 연변대	연변/NNP	대/NNB		:	연변대/NNP	
 한금옥	한/MM	금/NNG	옥/NNG		:	한금옥/NNP	
 부연구원(48)이	부/XPN	연구원/NNG	(/SS	48/SN	)/SS	이/JKS		:	부연구원/NNG	(/SS	48/SN	)/SS	이/JKS	
 할	할/NNB		:	하/VV	ㄹ/ETM	
 개혁-개방정책이	개/NNB	혁/NNP	-/SO	개방/NNG	정책/NNG	이/JKS		:	개혁/NNG	-/SS	개방/NNG	정책/NNG	이/JKS	
-후	후/NA		:	후/NNG	
 새로운	새롭/VA	은/ETM		:	새롭/VA	ㄴ/ETM	
-따라	따라/JX		:	따르/VV	아/EC	
+따라	따/VV	아라/EC		:	따르/VV	아/EC	
 중국과	중국/NNP	과/JKB		:	중국/NNP	과/JC	
 연변대에도	연변/NNP	대/NNB	에/JKB	도/JX		:	연변대/NNP	에/JKB	도/JX	
 여성학연구소가	여성학/NNG	연구소/NNG	가/VV	아/EC		:	여성학/NNG	연구소/NNG	가/JKS	
@@ -1875,8 +1855,8 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 현재	현재/NNG		:	현재/MAG	
 받아	받/VV	아/EF		:	받/VV	아/EC	
 있고,	있/VV	고/EC	,/SP		:	있/VX	고/EC	,/SP	
-따라	따라/JX		:	따르/VV	아/EC	
-흥미로운	흥미/NNG	롭/XSA	은/ETM		:	흥미/NNG	롭/XSA	ㄴ/ETM	
+따라	따/VV	아라/EC		:	따르/VV	아/EC	
+흥미로운	흥/NNG	미로/NNG	운/NNG		:	흥미/NNG	롭/XSA	ㄴ/ETM	
 연구과제라고	연구과제/UN	라고/EC		:	연구/NNG	과제/NNG	이/VCP	라고/EC	
 말한다.	말하/VV	ㄴ다/EF	./SF		:	말/NNG	하/XSV	ㄴ다/EF	./SF	
 소보원서	소보원/NNG	스/VV	어/EC		:	소보원/NNG	서/JKB	
@@ -1900,7 +1880,7 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 본다"고	보/VX	ㄴ다/EF	"/SS	고/EC		:	보/VV	ㄴ다/EC	"/SS	고/JKQ	
 말했다.	말하/VV	았/EP	다/EF	./SF		:	말/NNG	하/XSV	았/EP	다/EF	./SF	
 이뤄진다.	이루/VV	어/EC	지/VX	ㄴ다/EF	./SF		:	이루어지/VV	ㄴ다/EF	./SF	
-따라	따라/JX		:	따르/VV	아/EC	
+따라	따/VV	아라/EC		:	따르/VV	아/EC	
 이뤄진다는	이루/VV	어/EC	지/VX	ㄴ다는/ETM		:	이루어지/VV	ㄴ다는/ETM	
 주	주/NNB		:	주/MM	
 이용층은	이용/NNG	층/XSN	은/JX		:	이용/NNG	층/NNG	은/JX	
@@ -1935,7 +1915,7 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 윤기선)이	윤기/NNG	선/NNG	)/SS	이/JKS		:	윤기선/NNP	)/SS	이/JKS	
 고용과	고용/NNG	과/JKB		:	고용/NNG	과/JC	
 성차별을	성차/NNG	별/XSN	을/JKO		:	성/NNG	차별/NNG	을/JKO	
-이날부터	이날/NNG	부터/JKB		:	이날/NNG	부터/JX	
+이날부터	이날/NNG	부/NNG	트/VV	어/EC		:	이날/NNG	부터/JX	
 활용안'은	활용/NNG	안/NNG	'/SS	은/JX		:	활용안/NNG	'/SS	은/JX	
 근무와	근무/NNG	와/JKB		:	근무/NNG	와/JC	
 후에도	후에/NNP	도/JX		:	후/NNG	에/JKB	도/JX	
@@ -1968,7 +1948,7 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 한다는	하/VV	ㄴ다는/ETM		:	하/VX	ㄴ다는/ETM	
 있으나	있/VV	으나/EC		:	있/VX	으나/EC	
 무실할	무실/NNG	하/XSV	ㄹ/ETM		:	무실/NNG	하/XSA	ㄹ/ETM	
-뿐	뿐/JX		:	뿐/NNB	
+뿐	뿌/VX	ㄴ/ETM		:	뿐/NNB	
 이를	이르/VV	ㄹ/ETM		:	이/NP	를/JKO	
 적은	적/NNB	은/JX		:	적/VA	은/ETM	
 한국여성노동자회협의회	한국/NNP	여성/NNG	노동자/NNG	회/NNG	협의회/NNG		:	한국여성노동자회협의회/NNP	
@@ -2012,13 +1992,13 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 나이별로	나이/NNG	벼/NNG	ㄹ로/JKB		:	나이/NNG	별/XSN	로/JKB	
 찾아	찾/VV	아/EF		:	찾/VV	아/EC	
 볼만한	볼/NNG	만하/XSA	ㄴ/ETM		:	보/VX	ㄹ/ETM	만/NNB	하/XSA	ㄴ/ETM	
-공연-전시행사를	공연/NNG	-/SO	전시/NNG	행사/NNG	를/JKO		:	공연/NNG	-/SS	전시/NNG	행사/NNG	를/JKO	
+공연-전시행사를	고/XPN	ㅇ/NNG	연/NNP	-/SO	전시/NNG	행사/NNG	를/JKO		:	공연/NNG	-/SS	전시/NNG	행사/NNG	를/JKO	
 한편	한편/MAG		:	한편/NNG	
-따라	따라/JX		:	따르/VV	아/EC	
+따라	따/VV	아라/EC		:	따르/VV	아/EC	
 르뽀'는	르/NNG	뽀/MAG	'/SS	는/JX		:	르뽀/NNG	'/SS	는/JX	
 국내관과	국내/NNG	관/NNG	과/JKB		:	국내관/NNG	과/JC	
 나이와	나이/NNG	와/JKB		:	나이/NNG	와/JC	
-따라	따라/JX		:	따르/VV	아/EC	
+따라	따/VV	아라/EC		:	따르/VV	아/EC	
 나이	낫/VA	이/EC		:	나이/NNG	
 '효도	'/SS	효/NNG	도/JX		:	'/SS	효도/NNG	
 정부관과	정부/NNG	관/NNG	과/JKB		:	정부관/NNG	과/JC	
@@ -2057,7 +2037,7 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 '에스모드	'/SS	에스/NNG	모드/NNG		:	'/SS	에스모드/NNP	
 아르누보	아르누보/UN		:	아르누보/NNP	
 올	오/VV	ㄹ/ETM		:	올/MM	
-윤유자씨의	윤/NNP	유자/NNG	씨/NNB	의/JKG		:	윤유자/NNP	씨/NNB	의/JKG	
+윤유자씨의	윤/NNP	유자/NNG	씨/NNG	의/JKG		:	윤유자/NNP	씨/NNB	의/JKG	
 '미스박'은	'/SS	미스/NNG	박/NNG	'/SS	은/JX		:	'/SS	미스/NNG	박/NNP	'/SS	은/JX	
 화려하면서도	화려/XR	하/XSA	면서도/EC		:	화려/XR	하/XSA	면서/EC	도/JX	
 입을	입/NNG	을/JKO		:	입/VV	을/ETM	
@@ -2162,6 +2142,7 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 페스티발'(30일	페스티발/NNG	'(/SS	30/SN	일/NNB		:	페스티발/NNG	'/SS	(/SS	30/SN	일/NNB	
 역도	역/NNG	도/JX		:	역도/NNG	
 홀리데이인	홀/NNG	리/NNG	데이/NNG	이/VCP	ㄴ/ETM		:	홀리데이인/NNP	
+해외여행객을	해외여행/NNG	객/NNG	을/JKO		:	해외/NNG	여행객/NNG	을/JKO	
 것입니다.	것/NNB	이/VCP	ㅂ니다/EF	./SF		:	것/NNB	이/VCP	ㅂ니다/EF	./SF	
 해도	해/NNG	도/JX		:	하/VV	아도/EC	
 게	게/NNG		:	것/NNB	이/JKS	
@@ -2184,7 +2165,6 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 평형별	평형/NNG	별/XSN		:	평/NNB	형/XSN	별/XSN	
 평면도와	평면도/NNG	와/JKB		:	평면도/NNG	와/JC	
 위치도,	위치/NNG	도/JX	,/SP		:	위치도/NNG	,/SP	
-면적)이다.	면적/NNG	)/SS	이다/UN	./SF		:	면적/NNG	)/SS	이/VCP	다/EF	./SF	
 번호(02-759-3841∼2)로	번호/NNG	(/SS	02/SN	-/SO	759/SN	-/SO	3841/SN	∼/SO	2/SN	)/SS	로/JKB		:	번호/NNG	(/SS	02/SN	-/SS	759/SN	-/SS	3841/SN	∼/SO	2/SN	)/SS	로/JKB	
 선택하고	선택/NNG	하고/JKB		:	선택/NNG	하/XSV	고/EC	
 선택하고	선택/NNG	하고/JKB		:	선택/NNG	하/XSV	고/EC	
@@ -2228,10 +2208,11 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 말했다.	말하/VV	았/EP	다/EF	./SF		:	말/NNG	하/XSV	았/EP	다/EF	./SF	
 현대	현대/NNG		:	현대/NNP	
 그랜드	그랜드/NNG		:	그랜드/NNP	
-만들었고,	만/JX	듣/VV	었/EP	고/EC	,/SP		:	만들/VV	었/EP	고/EC	,/SP	
+만들었고,	만/NR	듣/VV	었/EP	고/EC	,/SP		:	만들/VV	었/EP	고/EC	,/SP	
 박태우과장은	박/NNP	태/NNG	우/NNG	과장/NNG	은/JX		:	박태우/NNP	과장/NNG	은/JX	
 있어	있/VX	어/EF		:	있/VX	어/EC	
 말했다.	말하/VV	았/EP	다/EF	./SF		:	말/NNG	하/XSV	았/EP	다/EF	./SF	
+1천곳에서	1/SN	천고/NNG	ㅅ/NNG	에서/JKB		:	1/SN	천/NR	곳/NNG	에서/JKB	
 날인	날인/NNG		:	날/NNG	이/VCP	ㄴ/ETM	
 읍-면단위로	읍/VV	-/SO	면/NNG	단위/NNG	로/JKB		:	읍/NNG	-/SS	면/NNG	단위/NNG	로/JKB	
 읍-면-동사무소에	읍/VV	-/SO	면/NNG	-/SO	동사무소/NNG	에/JKB		:	읍/NNG	-/SS	면/NNG	-/SS	동사무소/NNG	에/JKB	
@@ -2242,7 +2223,6 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 동사무소와	동사무소/NNG	와/JKB		:	동사무소/NNG	와/JC	
 행정과	행정/NNG	과/JKB		:	행정과/NNG	
 "가정용과	"/SS	가정/NNG	용/XSN	과/JKB		:	"/SS	가정/NNG	용/XSN	과/JC	
-두	두/JX		:	두/MM	
 연금매장과	연금/NNG	매장/NNG	과/JKB		:	연금/NNG	매장/NNG	과/JC	
 취급토록	취급/NNG	토/NNG	록/NNG		:	취급/NNG	하/XSV	도록/EC	
 하고	하/VV	고/EC		:	하/VX	고/EC	
@@ -2269,7 +2249,7 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 싸게	싸/VV	게/EC		:	싸/VA	게/EC	
 팝니다"	팔/VV	ㅂ니다/EF	"/SS		:	팔/VV	ㅂ니다/EC	"/SS	
 산림조합중앙회직매장	산림/NNG	조합/NNG	중앙회/NNG	직/NNG	매장/NNG		:	산림/NNG	조합/NNG	중앙회/NNG	직매장/NNG	
-삼전동	삼/NR	전동/NNG		:	삼전동/NNP	
+삼전동	삼전도/NNP	ㅇ/NNG		:	삼전동/NNP	
 직매장(잠실	직/NNG	매장/NNG	(/SS	잠실/NNP		:	직매장/NNG	(/SS	잠실/NNP	
 후문앞)에선	후문/NNG	앞/NNG	)/SS	에/IC	서/VV	ㄴ/ETM		:	후문/NNG	앞/NNG	)/SS	에서/JKB	ㄴ/JX	
 맞아	맞/VV	아/EF		:	맞/VV	아/EC	
@@ -2278,7 +2258,7 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 온갖	온갖/UN		:	온갖/MM	
 18만∼45만원	18/SN	만/NR	∼/SO	45/SN	만원/NNG		:	18/SN	만/NR	∼/SO	45/SN	만/NR	원/NNB	
 5만	5/SN	만/NNB		:	5/SN	만/NR	
-찻상	찻/UN	상/XSN		:	찻상/NNG	
+찻상	차/NNG	ㅅ/NNG	상/XSN		:	찻상/NNG	
 2만	2/SN	만/NNB		:	2/SN	만/NR	
 산채-버섯류	산/NNG	채/NNB	-/SO	버섯/NNG	류/XSN		:	산채/NNG	-/SS	버섯/NNG	류/XSN	
 표고버섯'백화고'	표고버섯/NNG	'/SS	백화/NNP	고/NNG	'/SS		:	표고버섯/NNG	'/SS	백화고/NNP	'/SS	
@@ -2323,7 +2303,7 @@ A.ve'란	A/SL	./SF	ve/SL	'/SS	란/JX		:	A/SL	./SP	ve/SL	'/SS	이/VCP	란/ETM
 온	온/MM		:	오/VX	ㄴ/ETM	
 해도	해/NNG	도/JX		:	하/VV	아도/EC	
 있을	있/VX	을/ETM		:	있/VV	을/ETM	
-뿐	뿐/JX		:	뿐/NNB	
+뿐	뿌/VX	ㄴ/ETM		:	뿐/NNB	
 사적	사적/NNG		:	사/NNG	적/XSN	
 못했었다"는	못하/VX	았었/EP	다/EF	"/SS	는/JX		:	못하/VX	았었/EP	다/EC	"/SS	는/ETM	
 고씨는	고/XPN	씨/NNG	는/JX		:	고/NNP	씨/NNB	는/JX	
@@ -2389,7 +2369,7 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 이브닝	이브/NNP	닝/UN		:	이브닝/NNG	
 페레의	페레/UN	의/JKG		:	페레/NNP	의/JKG	
 감아	감/VV	아/EF		:	감/VV	아/EC	
-시퐁	시퐁/UN		:	시퐁/NNG	
+시퐁	시/NNG	포/NNG	ㅇ/NNG		:	시퐁/NNG	
 숄과	숄/NNP	과/JKB		:	숄/NNG	과/JC	
 베르사체의	베/NNG	르/NNG	사체/NNG	의/JKG		:	베르사체/NNP	의/JKG	
 이브닝	이브/NNP	닝/UN		:	이브닝/NNG	
@@ -2399,18 +2379,15 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 힘입어	힘입/VV	어/EF		:	힘입/VV	어/EC	
 보통	보통/NNG		:	보통/MAG	
 다소	다소/NNG		:	다소/MAG	
-그	그/NA		:	그/MM	
 망원동,	망/NNG	원동/NNG	,/SP		:	망원동/NNP	,/SP	
-30여곳	30/SN	여/NNG	곳/NNG		:	30/SN	여/XSN	곳/NNG	
+30여곳	30/SN	여고/NNG	ㅅ/NNG		:	30/SN	여/XSN	곳/NNG	
 40여분간	40/SN	여분/NNG	갈/VV	ㄴ/ETM		:	40/SN	여/XSN	분/NNB	간/NNB	
 3백∼4백도의	3/SN	백/NR	∼/SO	4/SN	백/NR	도의/NNG		:	3/SN	백/NR	4/SN	백/NR	도/NNB	의/JKG	
 열을	열/VV	을/ETM		:	열/NNG	을/JKO	
 원래	원래/MAG		:	원래/NNG	
-발라서	받/VV	라서/EC		:	바르/VV	아서/EC	
-그	그/NA		:	그/MM	
 산이나	산/NNG	이나/JX		:	산/NNG	이나/JC	
 익혀먹을	익히/VV	어/EC	먹/VV	을/ETM		:	익히/VV	어/EC	먹/VX	을/ETM	
-만들어	만/JX	듣/VV	어/EC		:	만들/VV	어/EC	
+만들어	만들/VV	어/EF		:	만들/VV	어/EC	
 보급하고	보급/NNG	하고/JKB		:	보급/NNG	하/XSV	고/EC	
 김명호씨는	김/NNP	명호/NNP	씨/NNB	는/JX		:	김명호/NNP	씨/NNB	는/JX	
 담아	담/VV	아/EF		:	담/VV	아/EC	
@@ -2422,10 +2399,10 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 10여개의	10/SN	여/NNG	개의/NNG		:	10/SN	여/XSN	개/NNB	의/JKG	
 가스불로	가스/NNG	부/NNG	ㄹ로/JKB		:	가스/NNG	불/NNG	로/JKB	
 직접	직접/NNG		:	직접/MAG	
-다릿살처럼	다릿/UN	살/NNB	처럼/JKB		:	다릿살/NNG	처럼/JKB	
+다릿살처럼	다리/NNG	ㅅ/NNG	살/NNG	처럼/JKB		:	다릿살/NNG	처럼/JKB	
 경기도	경기/NNG	도/JX		:	경기도/NNP	
 있는	있/VX	는/ETM		:	있/VV	는/ETM	
-만들어	만/JX	듣/VV	어/EC		:	만들/VV	어/EC	
+만들어	만들/VV	어/EF		:	만들/VV	어/EC	
 오는	오/VV	는/ETM		:	오/VX	는/ETM	
 여러	열/VV	러/EC		:	여러/MM	
 번	벌/VV	ㄴ/ETM		:	번/NNB	
@@ -2479,8 +2456,6 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 확인하고	확인/NNG	하고/JKB		:	확인/NNG	하/XSV	고/EC	
 할	할/NNB		:	하/VV	ㄹ/ETM	
 사례다.	사례다/UN	./SF		:	사례/NNG	이/VCP	다/EF	./SF	
-아이	앗/VV	이/EC		:	아이/NNG	
-후	후/NA		:	후/NNG	
 잡지	잡/VV	지/EC		:	잡지/NNG	
 한	한/MM		:	하/VV	ㄴ/ETM	
 임신이	임신/NNG	이/JKS		:	임신/NNG	이/JKC	
@@ -2601,7 +2576,6 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 말한다.	말하/VV	ㄴ다/EF	./SF		:	말/NNG	하/XSV	ㄴ다/EF	./SF	
 '남희'가	'/SS	남/NNG	희/NNG	'/SS	가/JKS		:	'/SS	남희/NNP	'/SS	가/JKS	
 여성가정의학'(박인서	여성/NNG	가정/NNG	의학/NNG	'(/SS	박/NNP	인/NNG	스/VV	어/EC		:	여성/NNG	가정/NNG	의학/NNG	'/SS	(/SS	박인서/NNP	
-감수)이다.	감수/NNG	)/SS	이다/UN	./SF		:	감수/NNG	)/SS	이/VCP	다/EF	./SF	
 두어야	두/VV	어야/EC		:	두/VX	어야/EC	
 할	할/NNB		:	하/VX	ㄹ/ETM	
 의학지식과	의학/NNG	지식/NNG	과/JKB		:	의학/NNG	지식/NNG	과/JC	
@@ -2619,7 +2593,7 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 병명별로	병명/NNG	벼/NNG	ㄹ로/JKB		:	병명/NNG	별/XSN	로/JKB	
 증상과	증상/NNG	과/JKB		:	증상/NNG	과/JC	
 이해하기	이해/NNG	하기/NNG		:	이해/NNG	하/XSV	기/ETN	
-양방-한방치료법이	양방/UN	-/SO	한방/NNG	치료법/NNG	이/JKS		:	양방/NNG	-/SS	한방/NNG	치료법/NNG	이/JKS	
+양방-한방치료법이	양/MM	바/NNB	ㅇ/SO	-/SO	한방/NNG	치료법/NNG	이/JKS		:	양방/NNG	-/SS	한방/NNG	치료법/NNG	이/JKS	
 점이	점이/NNG		:	점/NNG	이/JKS	
 생리불순이나	생리/NNG	불순/NNG	이나/JX		:	생리/NNG	불순/NNG	이나/JC	
 자궁출혈생리통	자궁/NNG	출혈/NNG	생리/NNG	통/NNG		:	자궁/NNG	출혈/NNG	생리통/NNG	
@@ -2629,7 +2603,7 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 말한다.	말하/VV	ㄴ다/EF	./SF		:	말/NNG	하/XSV	ㄴ다/EF	./SF	
 심지출판사의	심지/NNG	출판사/NNG	의/JKG		:	심지출판사/NNP	의/JKG	
 의학책'(송봉수미	의학/NNG	책/NNG	'(/SS	송/NNP	봉/NNG	수/NNG	미/NNG		:	의학/NNG	책/NNG	'/SS	(/SS	송봉수미/NNP	
-저)은	저/NA	)/SS	은/JX		:	저/NNG	)/SS	은/JX	
+저)은	저/NP	)/SS	은/JX		:	저/NNG	)/SS	은/JX	
 신체와	신체/NNG	와/JKB		:	신체/NNG	와/JC	
 할	할/NNB		:	하/VX	ㄹ/ETM	
 신체'(보스턴	신체/NNG	'(/SS	보스턴/NNP		:	신체/NNG	'/SS	(/SS	보스턴/NNP	
@@ -2657,7 +2631,7 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 해야합니다."	하/VV	아야/EC	하/VX	ㅂ니다/EF	./SF	"/SS		:	하/VV	아야/EC	하/VX	ㅂ니다/EF	./SF	"/SS	
 이런	이렇/VA	ㄴ/ETM		:	이런/MM	
 5년간	5/SN	년/NNB	간/NNB		:	5/SN	년/NNB	간/NNG	
-만들었다고	만/JX	듣/VV	었/EP	다고/EC		:	만들/VV	었/EP	다고/EC	
+만들었다고	만/NR	듣/VV	었/EP	다고/EC		:	만들/VV	었/EP	다고/EC	
 한다.	하/VX	ㄴ다/EF	./SF		:	하/VV	ㄴ다/EF	./SF	
 우아하면서도	우아/XR	하/XSA	면서도/EC		:	우아/XR	하/XSA	면서/EC	도/JX	
 우리	울/VV	리/EC		:	우리/NP	
@@ -2670,10 +2644,9 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 한복전문가"라고	한복/NNG	전문가/NNG	"/SS	라고/EC		:	한복/NNG	전문가/NNG	"/SS	라고/JKQ	
 학교나	학교/NNG	나/JX		:	학교/NNG	나/JC	
 잘하기로	잘하/VV	기로/EC		:	잘/MAG	하/XSV	기/ETN	로/JKB	
-만들었다고	만/JX	듣/VV	었/EP	다고/EC		:	만들/VV	었/EP	다고/EC	
+만들었다고	만/NR	듣/VV	었/EP	다고/EC		:	만들/VV	었/EP	다고/EC	
 한다.	하/VX	ㄴ다/EF	./SF		:	하/VV	ㄴ다/EF	./SF	
-후	후/NA		:	후/NNG	
-도맡아만들다가	도맡아/UN	만들/VV	다가/EC		:	도맡/VV	아/EC	만들/VV	다가/EC	
+도맡아만들다가	도마/NNG	ㅌ/NNG	아/NNG	만들/VV	다가/EC		:	도맡/VV	아/EC	만들/VV	다가/EC	
 싶어	싶/VX	어/EF		:	싶/VX	어/EC	
 하는	하/VV	는/ETM		:	하/VX	는/ETM	
 주기	주기/NNG		:	주/VV	기/ETN	
@@ -2715,7 +2688,6 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 빈	빌/VV	ㄴ/ETM		:	비/VA	ㄴ/ETM	
 안돼	안되/VA	어/EC		:	안/MAG	되/XSV	어/EC	
 소비자가	소비/NNG	자가/NNG		:	소비자/NNG	가/JKS	
-다	다/JX		:	다/MAG	
 온	온/MM		:	오/VX	ㄴ/ETM	
 재활용과	재/XPN	활용/NNG	과/JKB		:	재/XPN	활용/NNG	과/JC	
 공병보증금제도가	공병/NNG	보증/NNG	금제/NNG	도가/NNG		:	공병/NNG	보증금/NNG	제도/NNG	가/JKS	
@@ -2729,12 +2701,12 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 가는	가늘/VA	ㄴ/ETM		:	가/VV	는/ETM	
 맥주(5백㎖,	맥주/NNG	(/SS	5/SN	백/NR	㎖/SW	,/SP		:	맥주/NNG	(/SS	5/SN	백/NR	,/SP	
 40㎖)와	40/SN	㎖/SW	)/SS	와/JKB		:	40/SN	㎖/SW	)/SS	와/JC	
-사이다-콜라(3백	사/VV	아/EC	이다/UN	-/SO	콜라/NNG	(/SS	3/SN	백/NR		:	사이다/NNG	-/SS	콜라/NNG	(/SS	3/SN	백/NR	
+사이다-콜라(3백	사이다/NNG	-/SO	콜라/NNG	(/SS	3/SN	백/NR		:	사이다/NNG	-/SS	콜라/NNG	(/SS	3/SN	백/NR	
 빈	빌/VV	ㄴ/ETM		:	비/VA	ㄴ/ETM	
 병뚜껑이나	병뚜껑/NNG	이나/JX		:	병뚜껑/NNG	이나/JC	
 있고,	있/VV	고/EC	,/SP		:	있/VX	고/EC	,/SP	
 제품종류와	제품/NNG	종류/NNG	와/JKB		:	제품/NNG	종류/NNG	와/JC	
-따라	따라/JX		:	따르/VV	아/EC	
+따라	따/VV	아라/EC		:	따르/VV	아/EC	
 빈	빌/VV	ㄴ/ETM		:	비/VA	ㄴ/ETM	
 제외하고는	제외/NNG	하/XSV	고는/EC		:	제외/NNG	하/XSV	고/EC	는/JX	
 불과하다고	불과/MAG	하다/UN	고/EC		:	불과/MAG	하/XSA	다고/EC	
@@ -2744,6 +2716,7 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 1백∼1백	1/SN	백/NR	∼/SO	1/SN	백/NR		:	1/SN	백/NR	~/SO	1/SN	백/NR	
 한양유통	한양/NNP	유통/NNG		:	한양유통/NNP	
 구매부의	구/XPN	매부/NNG	의/JKG		:	구매부/NNG	의/JKG	
+뿐	뿌/VX	ㄴ/ETM		:	뿐/JX	
 '빈병'과	'/SS	빈/NNP	병/NNG	'/SS	과/JKB		:	'/SS	빈병/NNG	'/SS	과/JC	
 있다고	있/VV	다고/EC		:	있/VX	다고/EC	
 가능한	가능/NNG	하/XSV	ㄴ/ETM		:	가능/NNG	하/XSA	ㄴ/ETM	
@@ -2828,7 +2801,7 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 최근형과장은	최근/NNG	형/NNG	과장/NNG	은/JX		:	최근형/NNP	과장/NNG	은/JX	
 말한다.	말하/VV	ㄴ다/EF	./SF		:	말/NNG	하/XSV	ㄴ다/EF	./SF	
 자리잡음에	자리/NNG	잡음/NNG	에/JKB		:	자리/NNG	잡/VV	음/ETN	에/JKB	
-따라	따라/JX		:	따르/VV	아/EC	
+따라	따/VV	아라/EC		:	따르/VV	아/EC	
 갈수록	갈/VV	ㄹ수록/EC		:	갈수록/MAG	
 최영규씨(마케팅부	최영/NNP	규씨/UN	(/SS	마케팅/NNG	부/NNG		:	최영규/NNP	씨/NNB	(/SS	마케팅/NNG	부/NNG	
 "여름철과	"/SS	여름철/NNG	과/JKB		:	"/SS	여름철/NNG	과/JC	
@@ -2842,7 +2815,7 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 우수하나	우수/NNG	하/XSV	나/EC		:	우수/NNG	하/XSA	나/EC	
 있는	있/VX	는/ETM		:	있/VV	는/ETM	
 유통중인	유통/NNG	중인/NNG		:	유통/NNG	중/NNB	이/VCP	ㄴ/ETM	
-제	제/MM		:	제/NNG	
+제	저/NP	의/JKG		:	제/NNG	
 중국제	중국/NNP	제/XSN		:	중국제/NNG	
 빨리	빠르/VA	이/EC		:	빨리/MAG	
 물기를	물기/NNG	를/JKO		:	물/NNG	기/XSN	를/JKO	
@@ -2886,6 +2859,7 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 다른	다르/VA	ㄴ/ETM		:	다른/MM	
 달리	다르/VA	이/EC		:	달리/MAG	
 엑스포가	엑스포/NNG	가/VV	아/EC		:	엑스포/NNG	가/JKS	
+27만여평중	27/SN	만/NR	여/XSN	평주/NNG	ㅇ/NNG		:	27/SN	만/NR	여/XSN	평/NNB	중/NNB	
 8만	8/SN	만/NNB		:	8/SN	만/NR	
 철거하고	철거/NNG	하고/JKB		:	철거/NNG	하/XSV	고/EC	
 그대로	그/NP	대로/JX		:	그대로/MAG	
@@ -2947,11 +2921,11 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 엑스포극장에서는	엑스포/NNG	극장/NNG	에서/JKB	는/JX		:	엑스포극장/NNP	에서/JKB	는/JX	
 국제민속축제와	국제/NNG	민속/NNG	축제/NNG	와/JKB		:	국제/NNG	민속/NNG	축제/NNG	와/JC	
 있다.	있/VX	다/EF	./SF		:	있/VV	다/EF	./SF	
-상속-증여세,	상속/NNG	-/SO	증여세/NNG	,/SP		:	상속/NNG	-/SS	증여세/NNG	,/SP	
+상속-증여세,	사/NNG	ㅇ/NNG	속/NNB	-/SO	증여세/NNG	,/SP		:	상속/NNG	-/SS	증여세/NNG	,/SP	
 민법과	민법/NNG	과/JKB		:	민법/NNG	과/JC	
 문제위	문/NNG	제위/NNG		:	문제위/NNG	
 배우자간에	배우자/NNG	간/NNG	에/JKB		:	배우자/NNG	간/NNB	에/JKB	
-상속-증여세를	상속/NNG	-/SO	증여세/NNG	를/JKO		:	상속/NNG	-/SS	증여세/NNG	를/JKO	
+상속-증여세를	사/NNG	ㅇ/NNG	속/NNB	-/SO	증여세/NNG	를/JKO		:	상속/NNG	-/SS	증여세/NNG	를/JKO	
 한다는	하/VV	ㄴ다는/ETM		:	하/VX	ㄴ다는/ETM	
 국회의원회관	국회의원/NNG	회관/NNG		:	국회의원회관/NNP	
 재산권과	재산/NNG	권/XSN	과/JKB		:	재산/NNG	권/XSN	과/JC	
@@ -2961,11 +2935,10 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 기여분제도,	기여/NNG	분/NNG	제도/NNG	,/SP		:	기여분/NNG	제도/NNG	,/SP	
 이혼시재산분할	이혼/NNG	시재/NNG	산/NNG	분할/NNG		:	이혼/NNG	시/NNB	재산/NNG	분할/NNG	
 재산이라도	재산/NNG	이라도/JX		:	재산/NNG	이/VCP	라도/EC	
-상속-증여세를	상속/NNG	-/SO	증여세/NNG	를/JKO		:	상속/NNG	-/SS	증여세/NNG	를/JKO	
+상속-증여세를	사/NNG	ㅇ/NNG	속/NNB	-/SO	증여세/NNG	를/JKO		:	상속/NNG	-/SS	증여세/NNG	를/JKO	
 서로	서로/NNG		:	서로/MAG	
 탁아비와	탁/NNP	아비/NNG	와/JKB		:	탁아비/NNG	와/JC	
 필요한	필요/NNG	하/XSV	ㄴ/ETM		:	필요/NNG	하/XSA	ㄴ/ETM	
-두	두/JX		:	두/MM	
 순소득에	순/MM	소득/NNG	에/JKB		:	순소득/NNG	에/JKB	
 한다고	하/VV	ㄴ다고/EC		:	하/VX	ㄴ다고/EC	
 말했다.	말하/VV	았/EP	다/EF	./SF		:	말/NNG	하/XSV	았/EP	다/EF	./SF	
@@ -3000,14 +2973,14 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 나는	나/NP	는/JX		:	나/VV	는/ETM	
 냄새와	냄새/NNG	와/JKB		:	냄새/NNG	와/JC	
 불구하고	불구/XR	하/XSA	고/EC		:	불구/XR	하/XSV	고/EC	
-뿐	뿐/JX		:	뿐/NNB	
+뿐	뿌/VX	ㄴ/ETM		:	뿐/NNB	
 돋운다"는	돋우/VV	ㄴ다/EC	"/SS	는/JX		:	돋우/VV	ㄴ다/EC	"/SS	는/ETM	
 비롯해	비롯/XR	하/XSA	아/EC		:	비롯/XR	하/XSV	아/EC	
 손님이	손님/NNG	이/JKS		:	손/NNG	님/XSN	이/JKS	
 들끓자	들끓자/UN		:	들끓/VV	자/EC	
 낸	내/VX	ㄴ/ETM		:	내/VV	ㄴ/ETM	
 속속	속/NNG	속/NNG		:	속속/MAG	
-정도라고	정도라/UN	고/EC		:	정도/NNG	이/VCP	라고/EC	
+정도라고	저/XPN	ㅇ/NNG	돌/VV	라고/EC		:	정도/NNG	이/VCP	라고/EC	
 한다.	하/VX	ㄴ다/EF	./SF		:	하/VV	ㄴ다/EF	./SF	
 요새	요새/MAG		:	요새/NNG	
 한창	한창/NNG		:	한창/MAG	
@@ -3087,7 +3060,7 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 업체(12.7%)는	업체/NNG	(/SS	12.7/SN	%/SW	)/SS	는/JX		:	업체/NNG	(/SS	12/SN	./SP	7/SN	%/SW	)/SS	는/JX	
 산이나	산/NNG	이나/JX		:	산/NNG	이나/JC	
 있는	있/VX	는/ETM		:	있/VV	는/ETM	
-가양동의	가/XPN	양동/NNG	의/JKG		:	가양동/NNP	의/JKG	
+가양동의	가야/NNP	ㅇ/NNG	동/NNG	의/JKG		:	가양동/NNP	의/JKG	
 '한보아파트'	'/SS	한보/NNP	아파트/NNG	'/SS		:	'/SS	한보아파트/NNP	'/SS	
 업체(21.2%)의	업체/NNG	(/SS	21.2/SN	%/SW	)/SS	의/JKG		:	업체/NNG	(/SS	21/SN	./SP	2/SN	%/SW	)/SS	의/JKG	
 분양가'	분/NNB	양가/NNG	'/SS		:	분양/NNG	가/XSN	'/SS	
@@ -3096,7 +3069,7 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 할	할/NNB		:	하/VX	ㄹ/ETM	
 있었다고	있/VX	었/EP	다고/EC		:	있/VV	었/EP	다고/EC	
 최충대	최/XPN	충/NNG	대/XSN		:	최충대/NNP	
-만들어	만/JX	듣/VV	어/EC		:	만들/VV	어/EC	
+만들어	만들/VV	어/EF		:	만들/VV	어/EC	
 심사하고	심사/NNG	하고/JKB		:	심사/NNG	하/XSV	고/EC	
 있으나,	있/VV	으나/EC	,/SP		:	있/VX	으나/EC	,/SP	
 기준이	기준이/NNP		:	기준/NNG	이/JKS	
@@ -3119,12 +3092,11 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 제도다.	제도다/UN	./SF		:	제도/NNG	이/VCP	다/EF	./SF	
 여사원제,	여사/NNG	원제/NNG	,/SP		:	여사원/NNG	제/XSN	,/SP	
 성차별	성차/NNG	별/XSN		:	성/NNG	차별/NNG	
-후	후/NA		:	후/NNG	
 한명숙)는	한/MM	명/NNB	숙/NNG	)/SS	는/JX		:	한명숙/NNP	)/SS	는/JX	
 남대문로	남대문/NNP	로/NNG		:	남대문로/NNP	
 대한화재해상보험빌딩	대한/NNP	화재/NNG	해상/NNG	보험/NNG	빌딩/NNG		:	대한화재해상보험/NNP	빌딩/NNG	
 도입실태와	도입/NNG	실태/NNG	와/JKB		:	도입/NNG	실태/NNG	와/JC	
-정강자씨(여성민우회	정강/NNG	자/NNG	씨/NNB	(/SS	여성/NNG	민우회/NNG		:	정강자/NNP	씨/NNB	(/SS	여성/NNG	민우회/NNG	
+정강자씨(여성민우회	정/NNG	강자/NNG	씨/NNB	(/SS	여성/NNG	민우회/NNG		:	정강자/NNP	씨/NNB	(/SS	여성/NNG	민우회/NNG	
 "이	"/SS	이/JKS		:	"/SS	이/MM	
 제도가	제/XPN	도가/NNG		:	제도/NNG	가/JKS	
 표면상으로는	표/NNG	면상/NNG	으로/JKB	는/JX		:	표면/NNG	상/XSN	으로/JKB	는/JX	
@@ -3142,7 +3114,7 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 말한다.	말하/VV	ㄴ다/EF	./SF		:	말/NNG	하/XSV	ㄴ다/EF	./SF	
 이사까지,	이사/NNG	까/VV	지/EC	,/SP		:	이사/NNG	까지/JX	,/SP	
 사무직은	사무직/NNG	은/JX		:	사무/NNG	직/NNG	은/JX	
-과장까지	과장/NNG	까/VV	지/EC		:	과장/NNG	까지/JX	
+과장까지	과자/NNG	ㅇ/NNG	까지/JX		:	과장/NNG	까지/JX	
 가능케	가능/NNG	케/UN		:	가능/NNG	하/XSA	게/EC	
 하는	하/VV	는/ETM		:	하/VX	는/ETM	
 승진과	승진/NNG	과/JKB		:	승진/NNG	과/JC	
@@ -3167,7 +3139,6 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 지난해말	지난해/NNG	말/NNG		:	지난해/NNG	말/NNB	
 뇌성마비	뇌성/NNG	마비/NNG		:	뇌/NNG	성/XSN	마비/NNG	
 그들이	그들/NP	이/JKS		:	그/NP	들/XSN	이/JKS	
-그	그/NA		:	그/MM	
 오기	오기/NNG		:	오/VV	기/ETN	
 수	수/NNB		:	수/NNG	
 모아	모/VV	아/EC		:	모으/VV	아/EC	
@@ -3214,7 +3185,7 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 말했다.	말하/VV	았/EP	다/EF	./SF		:	말/NNG	하/XSV	았/EP	다/EF	./SF	
 적합한	적합/XR	하/XSA	ㄴ/ETM		:	적합/NNG	하/XSA	ㄴ/ETM	
 2∼3.3㎏정도의	2/SN	∼/SO	3.3/SN	㎏/SW	정도/NNG	의/JKG		:	2/SN	∼/SO	3/SN	./SP	3/SN	㎏/SW	정도/NNG	의/JKG	
-분말소화기다.	분말/NNG	소화/NNG	기다/UN	./SF		:	분말/NNG	소화기/NNG	이/VCP	다/EF	./SF	
+분말소화기다.	분말/NNG	소/NNG	화/XSN	기/VV	다/EF	./SF		:	분말/NNG	소화기/NNG	이/VCP	다/EF	./SF	
 5백원정도.	5/SN	백/NR	원정/NNG	도/JX	./SF		:	5/SN	백/NR	원/NNB	정도/NNG	./SF	
 0.7∼1㎏	0.7/SN	∼/SO	1/SN	㎏/SW		:	0/SN	./SP	7/SN	∼/SO	1/SN	㎏/SW	
 1만	1/SN	만/NNB		:	1/SN	만/NR	
@@ -3223,10 +3194,10 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 이산화탄소가	이산화탄소/NNG	가/VV	아/EC		:	이산화탄소/NNG	가/JKS	
 3배가량	3/SN	배가/NNG	량/XSN		:	3/SN	배/NNG	가량/NNG	
 충분하다고	충/NNG	분하/VA	다/EC	고/EC		:	충분/XR	하/XSA	다고/EC	
-내용물(제1인산암모늄)과	내용물/NNG	(/SS	제/XPN	1/SN	인산/NNG	암/NNG	모늄/UN	)/SS	과/JKB		:	내용물/NNG	(/SS	제/XPN	1/SN	인산암모늄/NNG	)/SS	과/JC	
+내용물(제1인산암모늄)과	내용물/NNG	(/SS	제/XPN	1/SN	인산/NNG	암/NNG	모/NNG	뉴/NNG	ㅁ/NNG	)/SS	과/JKB		:	내용물/NNG	(/SS	제/XPN	1/SN	인산암모늄/NNG	)/SS	과/JC	
 가스가	가스/NNG	가/VV	아/EC		:	가스/NNG	가/JKS	
 가압식과	가압/UN	식/NNB	과/JKB		:	가압식/NNG	과/JC	
-축압식이	축/NNG	압/UN	식이/NNG		:	축압식/NNG	이/JKS	
+축압식이	축/NNG	아/NNG	ㅂ/NNG	식이/NNG		:	축압식/NNG	이/JKS	
 있다.	있/VX	다/EF	./SF		:	있/VV	다/EF	./SF	
 가압식은	가압/UN	식/NNB	은/JX		:	가압식/NNG	은/JX	
 번	벌/VV	ㄴ/ETM		:	번/NNB	
@@ -3261,7 +3232,7 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 주초	주초/NNG		:	주/NNB	초/NNB	
 스릴과	스릴/NNG	과/JKB		:	스릴/NNG	과/JC	
 하는	하/VV	는/ETM		:	하/VX	는/ETM	
-주말부터	주말/NNG	부터/JKB		:	주말/NNG	부터/JX	
+주말부터	주말/NNG	부/NNG	트/VV	어/EC		:	주말/NNG	부터/JX	
 무주리조트,	무주/NNP	리조트/NNG	,/SP		:	무주리조트/NNP	,/SP	
 알프스리조트,	알프스/NNP	리조트/NNG	,/SP		:	알프스리조트/NNP	,/SP	
 베어스타운	베어/NNG	스타/NNG	운/NNG		:	베어스타운/NNP	
@@ -3282,7 +3253,7 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 준비하고	준비/NNG	하고/JKB		:	준비/NNG	하/XSV	고/EC	
 강습료는	강습/NNG	료/NNG	는/JX		:	강습료/NNG	는/JX	
 2만	2/SN	만/NNB		:	2/SN	만/NR	
-중급자	중급/NNG	자/VV	아/EC		:	중급자/NNG	
+중급자	중급/NNG	자/XSN		:	중급자/NNG	
 4만	4/SN	만/NNB		:	4/SN	만/NR	
 무주리조트는	무주/NNP	리조트/NNG	는/JX		:	무주리조트/NNP	는/JX	
 내달	내달/VV	ㄹ/ETM		:	내달/NNG	
@@ -3293,7 +3264,7 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 18만원	18/SN	만원/NNG		:	18/SN	만/NR	원/NNB	
 1박2일간	1/SN	박/NNB	2/SN	일간/NNG		:	1/SN	박/NNB	2/SN	일/NNB	간/NNB	
 내달말에는	내달/NNG	말/NNG	에/JKB	는/JX		:	내달/NNG	말/NNB	에/JKB	는/JX	
-'아람다람	'/SS	아람다/UN	람/EC		:	'/SS	아람/NNG	다람/NNG	
+'아람다람	'/SS	아람/NNP	다람/UN		:	'/SS	아람/NNG	다람/NNG	
 13만	13/SN	만/NNB		:	13/SN	만/NR	
 내달	내달/VV	ㄹ/ETM		:	내달/NNG	
 무주리조트	무주/NNP	리조트/NNG		:	무주리조트/NNP	
@@ -3336,7 +3307,7 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 5기가	5/SN	기가/NNG		:	5/SN	기/NNB	가/JKS	
 매봉산	매봉/NNP	산/NNG		:	매봉산/NNP	
 적설기간이	적/NNG	설/NNG	기간/NNG	이/JKS		:	적설/NNG	기간/NNG	이/JKS	
-12월초부터	12/SN	월초/NNG	부터/JKB		:	12/SN	월/NNB	초/NNB	부터/JX	
+12월초부터	12/SN	월초/NNG	부/NNG	트/VV	어/EC		:	12/SN	월/NNB	초/NNB	부터/JX	
 3월말까지로	3/SN	월말/NNG	까/VV	지/EC	로/JKB		:	3/SN	월/NNB	말/NNB	까지/JX	로/JKB	
 있는	있/VX	는/ETM		:	있/VV	는/ETM	
 팔봉산	팔/NNG	봉/NNG	산/XSN		:	팔봉산/NNP	
@@ -3381,7 +3352,7 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 '한-중여성의	'/SS	한/NNP	-/SO	중/NNB	여성/NNG	의/JKG		:	'/SS	한/NNP	-/SS	중/NNP	여성/NNG	의/JKG	
 높아져	높아져/UN		:	높/VA	아/EC	지/VX	어/EC	
 2만	2/SN	만/NNB		:	2/SN	만/NR	
-정치-경제-사회-가정에서의	정치/NNG	-/SO	경제/NNG	-/SO	사/NNG	회/NNB	-/SO	가정/NNG	에서/JKB	의/JKG		:	정치/NNG	-/SS	경제/NNG	-/SS	사회/NNG	-/SS	가정/NNG	에서/JKB	의/JKG	
+정치-경제-사회-가정에서의	저/XPN	ㅇ/NNG	치/NNB	-/SO	겨/NNG	ㅇ/NNG	제/NNB	-/SO	사/NNG	회/NNB	-/SO	가정/NNG	에서/JKB	의/JKG		:	정치/NNG	-/SS	경제/NNG	-/SS	사회/NNG	-/SS	가정/NNG	에서/JKB	의/JKG	
 볼	보/VV	ㄹ/ETM		:	보/VX	ㄹ/ETM	
 있는	있/VX	는/ETM		:	있/VV	는/ETM	
 내달	내달/VV	ㄹ/ETM		:	내달/NNG	
@@ -3394,7 +3365,6 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 토론하고	토론/NNG	하고/JKB		:	토론/NNG	하/XSV	고/EC	
 이를	이르/VV	ㄹ/ETM		:	이/NP	를/JKO	
 어떤	어떻/VA	ㄴ/ETM		:	어떤/MM	
-두	두/JX		:	두/MM	
 정-부시장	정/NNP	-/SO	부시장/NNG		:	정/NNG	-/SS	부시장/NNG	
 의정참여'라는	의정/NNG	참여/NNG	'/SS	라는/ETM		:	의정/NNG	참여/NNG	'/SS	이/VCP	라는/ETM	
 조위	조/NR	위/NNB		:	조위/NNP	
@@ -3403,7 +3373,6 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 21.03%를	21.03/SN	%/SW	를/JKO		:	21/SN	./SP	03/SN	%/SW	를/JKO	
 정-부시장도	정/NNP	-/SO	부시장/NNG	도/JX		:	정/NNG	-/SS	부시장/NNG	도/JX	
 일정한	일정/XR	하/XSA	ㄴ/ETM		:	일정/NNG	하/XSA	ㄴ/ETM	
-그	그/NA		:	그/MM	
 명중	명중/NNG		:	명/NNB	중/NNB	
 명(54.6%)이라는	명/NNB	(/SS	54.6/SN	%/SW	)/SS	일/VV	라는/ETM		:	명/NNB	(/SS	54/SN	./SP	6/SN	)/SS	이/VCP	라는/ETM	
 게	게/NNG		:	것/NNB	이/JKS	
@@ -3412,7 +3381,7 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 부주임의	부/XPN	주임/NNG	의/JKG		:	부주임/NNG	의/JKG	
 김죽화	김/NNP	죽/NNG	화/XSN		:	김죽화/NNP	
 무순시	무/XPN	순시/NNG		:	무순시/NNP	
-요녕성	요녕/UN	성/XSN		:	요녕성/NNP	
+요녕성	요/MM	녀/NNG	ㅇ/NNG	성/XSN		:	요녕성/NNP	
 내의	내/NP	의/JKG		:	내/NNB	의/JKG	
 1만	1/SN	만/NNB		:	1/SN	만/NR	
 명중	명중/NNG		:	명/NNB	중/NNB	
@@ -3441,10 +3410,10 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 박영혜	박/NNP	영혜/NNP		:	박영혜/NNP	
 장필화,	장/NNG	필화/NNG	,/SP		:	장필화/NNP	,/SP	
 '여성한방'	'/SS	여성/NNG	한방/NNG	'/SS		:	'/SS	여성한방/NNP	'/SS	
-고광순씨	고/XPN	광/NNG	순/NNG	씨/NNB		:	고광순/NNP	씨/NNB	
+고광순씨	고과/NNG	ㅇ/NNG	순/NNG	씨/NNB		:	고광순/NNP	씨/NNB	
 "사회편견서	"/SS	사회/NNG	편견/NNG	스/VV	어/EC		:	"/SS	사회/NNG	편견/NNG	서/JKB	
 많아요"	많/VA	아요/EF	"/SS		:	많/VA	아요/EC	"/SS	
-고광순씨(38)가	고/XPN	광/NNG	순/NNG	씨/NNB	(/SS	38/SN	)/SS	가/JKS		:	고광순/NNP	씨/NNB	(/SS	38/SN	)/SS	가/JKS	
+고광순씨(38)가	고과/NNG	ㅇ/NNG	순/NNG	씨/NNB	(/SS	38/SN	)/SS	가/JKS		:	고광순/NNP	씨/NNB	(/SS	38/SN	)/SS	가/JKS	
 부인병	부인/NNG	병/NNG		:	부인병/NNG	
 '아름다운	'/SS	아름답/VA	은/ETM		:	'/SS	아름답/VA	ㄴ/ETM	
 여성한방'(까치간,	여성/NNG	한방/NNG	'(/SS	까치/NNG	간/NNG	,/SP		:	여성/NNG	한방/NNG	'/SS	(/SS	까치/NNP	간/NNG	,/SP	
@@ -3458,7 +3427,7 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 주부나	주부/NNG	나/JX		:	주부/NNG	나/JC	
 심적-물리적	심적/NNG	-/SO	물리/NNG	적/XSN		:	심/NNG	적/XSN	-/SS	물리/NNG	적/XSN	
 대하증이나	대하증/NNG	이나/JX		:	대하증/NNG	이나/JC	
-고광순씨는	고/XPN	광/NNG	순/NNG	씨/NNB	는/JX		:	고광순/NNP	씨/NNB	는/JX	
+고광순씨는	고과/NNG	ㅇ/NNG	순/NNG	씨/NNB	는/JX		:	고광순/NNP	씨/NNB	는/JX	
 민주화	민주화/NNG		:	민주/NNG	화/XSN	
 사회학도에서	사회/NNG	학도/NNG	에서/JKB		:	사회학도/NNG	에서/JKB	
 특이한	특이/XR	하/XSA	ㄴ/ETM		:	특이/NNG	하/XSA	ㄴ/ETM	
@@ -3471,7 +3440,6 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 "자격과	"/SS	자격/NNG	과/JKB		:	"/SS	자격/NNG	과/JC	
 택하기로	택하/VV	기로/EC		:	택하/VV	기/ETN	로/JKB	
 했다"고	하/VV	았/EP	다/EF	"/SS	고/EC		:	하/VV	았/EP	다/EC	"/SS	고/JKQ	
-그	그/NA		:	그/MM	
 말한다.	말하/VV	ㄴ다/EF	./SF		:	말/NNG	하/XSV	ㄴ다/EF	./SF	
 신세대	신세대/NNG		:	신/XPN	세대/NNG	
 바람	바람/NNB		:	바람/NNG	
@@ -3488,7 +3456,7 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 문화비등	문화/NNG	비등/NNG		:	문화비/NNG	등/NNB	
 정해진	정해지/VV	ㄴ/ETM		:	정하/VV	아/EC	지/VX	ㄴ/ETM	
 주부와	주부/NNG	와/JKB		:	주부/NNG	와/JC	
-따라	따라/JX		:	따르/VV	아/EC	
+따라	따/VV	아라/EC		:	따르/VV	아/EC	
 신세대	신세대/NNG		:	신/XPN	세대/NNG	
 한다는	하/VV	ㄴ다는/ETM		:	하/VX	ㄴ다는/ETM	
 높았다고	높았/UN	다고/EC		:	높/VA	았/EP	다고/EC	
@@ -3514,7 +3482,7 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 요리란,	요리/NNG	란/JX	,/SP		:	요리/NNG	란/NNG	,/SP	
 없앴다"고	없애/VV	었/EP	다/EF	"/SS	고/EC		:	없애/VV	었/EP	다/EC	"/SS	고/JKQ	
 말한다.	말하/VV	ㄴ다/EF	./SF		:	말/NNG	하/XSV	ㄴ다/EF	./SF	
-리빙센스,	리/NNG	빙/UN	센스/NNG	,/SP		:	리빙센스/NNP	,/SP	
+리빙센스,	리/NNG	비/NNG	ㅇ/NNG	센스/NNG	,/SP		:	리빙센스/NNP	,/SP	
 내놨지만,	내놨/UN	지만/EC	,/SP		:	내놓/VV	았/EP	지만/EC	,/SP	
 이라는	일/VV	라는/ETM		:	이/NP	이/VCP	라는/ETM	
 주부생활과	주부/NNG	생활/NNG	과/JKB		:	주부/NNG	생활/NNG	과/JC	
@@ -3522,22 +3490,20 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 가득한	가득/MAG	하/XSV	ㄴ/ETM		:	가득/MAG	하/XSA	ㄴ/ETM	
 다른	다르/VA	ㄴ/ETM		:	다른/MM	
 대폭	대폭/NNG		:	대폭/MAG	
-외식비란을	외식/NNG	비/NNG	란/NNG	을/JKO		:	외식비/NNG	란/NNG	을/JKO	
+외식비란을	외식/NNG	비/NNG	란/JX	을/JKO		:	외식비/NNG	란/NNG	을/JKO	
 신세대	신세대/NNG		:	신/XPN	세대/NNG	
 여원은	여/NNG	원/NNG	은/JX		:	여원/NNP	은/JX	
-가계부시장이	가계/NNG	부시장/NNG	이/JKS		:	가계부/NNG	시장/NNG	이/JKS	
 마음대로	마음대로/MAG		:	마음/NNG	대로/JX	
 조립식	조립/NNG	식/XSN		:	조립식/NNG	
-패널-수납형	패/VV	어/EC	너/NP	ㄹ/UN	-/SO	수납/NNG	형/XSN		:	패널/NNG	-/SS	수납/NNG	형/XSN	
+패널-수납형	패널/NNG	-/SO	수납/NNG	형/XSN		:	패널/NNG	-/SS	수납/NNG	형/XSN	
 불법개조가	불법/NNG	개조/NNG	가/VV	아/EC		:	불법/NNG	개조/NNG	가/JKS	
 입주자가	입주/NNG	자가/NNG		:	입주자/NNG	가/JKS	
 한국건설기술연구원은	한국/NNP	건설/NNG	기술/NNG	연구원/NNG	은/JX		:	한국건설기술연구원/NNP	은/JX	
 모두	모/NP	두/JX		:	모두/MAG	
-그	그/NA		:	그/MM	
 지금이라도	지금/NNG	이라도/JX		:	지금/NNG	이/VCP	라도/EC	
 97년쯤	97/SN	년/NNB	쯤/XSN		:	97/SN	년/NNB	쯤/NNG	
 널리	너르/VA	이/EC		:	널리/MAG	
-합판-석고보드등으로	합/NNG	파/VV	아/EC	ㄴ/UN	-/SO	석고/NNG	보드/NNG	등/NNG	으로/JKB		:	합판/NNG	-/SS	석고/NNG	보드/NNG	등/NNB	으로/JKB	
+합판-석고보드등으로	하/NNG	ㅂ/NNG	판/NNB	-/SO	석고/NNG	보드/NNG	등/NNG	으로/JKB		:	합판/NNG	-/SS	석고/NNG	보드/NNG	등/NNB	으로/JKB	
 조립식	조립/NNG	식/XSN		:	조립식/NNG	
 입주자가	입주/NNG	자가/NNG		:	입주자/NNG	가/JKS	
 얼마든지	얼마/NNG	든지/JX		:	얼마/NNG	이/VCP	든지/EC	
@@ -3589,7 +3555,6 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 보수-진보	보/NNB	수/NNB	-/SO	진보/NNG		:	보수/NNG	-/SS	진보/NNG	
 보수-진보적	보/NNB	수/NNB	-/SO	진보/NNG	적/XSN		:	보수/NNG	-/SS	진보/NNG	적/XSN	
 세계여성대회와	세계/NNG	여성/NNG	대회/NNG	와/JKB		:	세계/NNG	여성/NNG	대회/NNG	와/JC	
-두	두/JX		:	두/MM	
 여성단체협의회와	여성/NNG	단체/NNG	협의회/NNG	와/JKB		:	여성/NNG	단체/NNG	협의회/NNG	와/JC	
 여성단체연합과	여성/NNG	단체/NNG	연합/NNG	과/JKB		:	여성/NNG	단체/NNG	연합/NNG	과/JC	
 전문직업여성클럽	전문/NNG	직업/NNG	여성/NNG	클럽/NNG		:	전문/NNG	직업여성/NNG	클럽/NNG	
@@ -3604,9 +3569,8 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 다양한	다양/XR	하/XSA	ㄴ/ETM		:	다양/NNG	하/XSA	ㄴ/ETM	
 아-태지역	아/IC	-/SO	태/NNG	지역/NNG		:	아/NNP	-/SS	태/NNP	지역/NNG	
 준비하고	준비/NNG	하고/JKB		:	준비/NNG	하/XSV	고/EC	
-후	후/NA		:	후/NNG	
-문화-교육,	문화/NNG	-/SO	교육/NNG	,/SP		:	문화/NNG	-/SS	교육/NNG	,/SP	
-발표-토론했다.	발표/NNG	-/SO	토론/NNG	하/XSV	았/EP	다/EF	./SF		:	발표/NNG	-/SS	토론/NNG	하/XSV	았/EP	다/EF	./SF	
+문화-교육,	무/XPN	ㄴ/NNG	화/NNP	-/SO	교육/NNG	,/SP		:	문화/NNG	-/SS	교육/NNG	,/SP	
+발표-토론했다.	바/NNB	ㄹ/NNG	표/NNP	-/SO	토론/NNG	하/XSV	았/EP	다/EF	./SF		:	발표/NNG	-/SS	토론/NNG	하/XSV	았/EP	다/EF	./SF	
 손봉숙	손/NNG	봉/NNG	숙/NNG		:	손봉숙/NNP	
 한다는	하/VV	ㄴ다는/ETM		:	하/VX	ㄴ다는/ETM	
 오갔다"고	오가/VV	았/EP	다/EF	"/SS	고/EC		:	오가/VV	았/EP	다/EC	"/SS	고/JKQ	
@@ -3633,17 +3597,13 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 장숙희씨(75)가	장/NNP	숙희/NNP	씨/NNB	(/SS	75/SN	)/SS	가/JKS		:	장숙희/NNP	씨/NNB	(/SS	75/SN	)/SS	가/JKS	
 윤석인씨등	윤/NNP	석/NNG	인/NNG	씨/NNB	등/NNB		:	윤석인/NNP	씨/NNB	등/NNB	
 박영원씨등	박/NNP	영원/NNG	씨/NNB	등/NNB		:	박영원/NNP	씨/NNB	등/NNB	
-보람	보/VV	람/EC		:	보람/NNG	
 있어	있/VX	어/EF		:	있/VV	어/EC	
 일했을	일하/VV	았/EP	을/ETM		:	일/NNG	하/XSV	았/EP	을/ETM	
 뿐입니다.	뿐/NNB	이/VCP	ㅂ니다/EF	./SF		:	뿐/NNB	이/VCP	ㅂ니다/EF	./SF	
 윤용자씨의	윤/NNP	용/NNG	자/XSN	씨/NNB	의/JKG		:	윤용자/NNP	씨/NNB	의/JKG	
 풀타임	풀/NNG	타임/NNG		:	풀타임/NNG	
 영문과를	영문과/NNG	를/JKO		:	영문/NNG	과/NNG	를/JKO	
-후	후/NA		:	후/NNG	
 걸스카우트연맹	걸/NNG	스카우트/NNG	연맹/NNG		:	걸스카우트/NNG	연맹/NNG	
-그	그/NA		:	그/MM	
-후	후/NA		:	후/NNG	
 죽	죽/NNG		:	죽/MAG	
 청소년-여성단체에서	청소/NNG	년/NNB	-/SO	여성/NNG	단체/NNG	에서/JKB		:	청소년/NNG	-/SS	여성/NNG	단체/NNG	에서/JKB	
 보수직이든	보수/NNG	직이/VV	든/EC		:	보수/NNG	직/NNG	이/VCP	든/EC	
@@ -3658,18 +3618,18 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 걸스카우트연맹	걸/NNG	스카우트/NNG	연맹/NNG		:	걸스카우트/NNG	연맹/NNG	
 일했던	일하/VV	았/EP	던/ETM		:	일/NNG	하/XSV	았/EP	던/ETM	
 능력과	능력/NNG	과/JKB		:	능력/NNG	과/JC	
-따라	따라/JX		:	따르/VV	아/EC	
+따라	따/VV	아라/EC		:	따르/VV	아/EC	
 일할	일하/VV	ㄹ/ETM		:	일/NNG	하/XSV	ㄹ/ETM	
 한다고	하/VV	ㄴ다고/EC		:	하/VX	ㄴ다고/EC	
 말한다.	말하/VV	ㄴ다/EF	./SF		:	말/NNG	하/XSV	ㄴ다/EF	./SF	
-유추-응용력	유추/NNG	-/SO	응용력/NNG		:	유추/NNG	-/SS	응용력/NNG	
+유추-응용력	유추/NNG	-/SO	응용/NNG	력/XSN		:	유추/NNG	-/SS	응용력/NNG	
 방향'이라는	방향/NNG	'/SS	일/VV	라는/ETM		:	방향/NNG	'/SS	이/VCP	라는/ETM	
 모두	모/NP	두/JX		:	모두/MAG	
 1-2학년의	1/SN	-/SO	2/SN	학년/NNG	의/JKG		:	1/SN	-/SS	2/SN	학년/NNG	의/JKG	
 매학기	매/NNG	학기/NNG		:	매/MM	학기/NNG	
 하며	하/VV	며/EC		:	하/VX	며/EC	
 한다"고	하/VV	ㄴ다/EC	"/SS	고/EC		:	하/VX	ㄴ다/EC	"/SS	고/JKQ	
-박도순교수(고려대)는	박/NNP	도/JX	순/NNG	교수/NNG	(/SS	고려대/NNP	)/SS	는/JX		:	박도순/NNP	교수/NNG	(/SS	고려대/NNP	)/SS	는/JX	
+박도순교수(고려대)는	박/NNP	도순/UN	교수/NNG	(/SS	고려대/NNP	)/SS	는/JX		:	박도순/NNP	교수/NNG	(/SS	고려대/NNP	)/SS	는/JX	
 평가관은	평가/NNG	관/NNG	은/JX		:	평가관/NNG	은/JX	
 길러놨다"고	길러놨다/UN	"/SS	고/EC		:	기르/VV	어/EC	놓/VX	았/EP	다/EC	"/SS	고/JKQ	
 말했다.	말하/VV	았/EP	다/EF	./SF		:	말/NNG	하/XSV	았/EP	다/EF	./SF	
@@ -3677,18 +3637,17 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 있다는	있/VX	다는/ETM		:	있/VV	다는/ETM	
 평가관을	평가/NNG	관/NNG	을/JKO		:	평가관/NNG	을/JKO	
 한다는	하/VV	ㄴ다는/ETM		:	하/VX	ㄴ다는/ETM	
-계성국민학교	계/NNG	성/XSN	국민학교/NNG		:	계성국민학교/NNP	
+계성국민학교	계서/NNG	ㅇ/NNG	국민학교/NNG		:	계성국민학교/NNP	
 고성옥교사는	고성/NNG	옥/NNG	교사/NNG	는/JX		:	고성옥/NNP	교사/NNG	는/JX	
 까다로운	까다롭/VA	은/ETM		:	까다롭/VA	ㄴ/ETM	
 한다고	하/VV	ㄴ다고/EC		:	하/VX	ㄴ다고/EC	
-그	그/NA		:	그/MM	
 양승실씨는	양/MM	승/NNG	실/NNG	씨/NNB	는/JX		:	양승실/NNP	씨/NNB	는/JX	
 새로운	새롭/VA	은/ETM		:	새롭/VA	ㄴ/ETM	
 평가제도가	평/NNG	가제/NNG	도가/NNG		:	평가/NNG	제도/NNG	가/JKS	
 검토와	검토/NNG	와/JKB		:	검토/NNG	와/JC	
 다양한	다양/XR	하/XSA	ㄴ/ETM		:	다양/NNG	하/XSA	ㄴ/ETM	
 필요하다고	필요/NNG	하/XSV	다/EC	고/EC		:	필요/NNG	하/XSA	다고/EC	
-철봉-미끄럼틀등	철봉/NNG	-/SO	미끄럼틀/NNG	등/NNB		:	철봉/NNG	-/SS	미끄럼틀/NNG	등/NNB	
+철봉-미끄럼틀등	처/NNG	ㄹ/NNG	봉/NNB	-/SO	미끄럼틀/NNG	등/NNB		:	철봉/NNG	-/SS	미끄럼틀/NNG	등/NNB	
 불량-관리부실…	불/VV	ㄹ/ETM	량/NNB	-/SO	관리/NNG	부실/NNG	…/SE		:	불량/NNG	-/SS	관리/NNG	부실/NNG	…/SE	
 많다"	많/VA	다/EF	"/SS		:	많/VA	다/EC	"/SS	
 구름사다리,	구름/NNG	사다리/NNG	,/SP		:	구름사다리/NNG	,/SP	
@@ -3733,13 +3692,13 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 최저임금심위	최저/NNG	임금/NNG	심/NNG	위/NNG		:	최저/NNG	임금/NNG	심위/NNG	
 여성개발원장	여성/NNG	개발/NNG	원장/NNG		:	여성/NNG	개발원장/NNG	
 51%…	51/SN	%/SW	…/SE		:	51/SN	…/SE	
-뿐	뿐/JX		:	뿐/NNB	
+뿐	뿌/VX	ㄴ/ETM		:	뿐/NNB	
 그리고	그리/VV	고/EC		:	그리고/MAJ	
 각각9	각각/NNG	9/SN		:	각각/MAG	9/SN	
 심위에의	심/NNG	위/NNG	에/JKB	의/JKG		:	심위/NNG	에/JKB	의/JKG	
 사항입니다.	사항/NNG	이/VCP	ㅂ니다/EF	./SF		:	사항/NNG	이/VCP	ㅂ니다/EF	./SF	
 여성이기	여성/NNG	이기/NNG		:	여성/NNG	이/VCP	기/ETN	
-여성저임금을	여성/NNG	저임/UN	금/NNG	을/JKO		:	여성/NNG	저/XPN	임금/NNG	을/JKO	
+여성저임금을	여성/NNG	저/NNG	임금/NNG	을/JKO		:	여성/NNG	저/XPN	임금/NNG	을/JKO	
 말했다.	말하/VV	았/EP	다/EF	./SF		:	말/NNG	하/XSV	았/EP	다/EF	./SF	
 심의제도가	심/NNG	의제/NNG	도가/NNG		:	심의/NNG	제도/NNG	가/JKS	
 줄이는데	줄이/VV	는데/EC		:	줄이/VV	는/ETM	데/NNB	
@@ -3783,7 +3742,7 @@ S008'(6만원)은	S/SL	008/SN	'(/SS	6/SN	만원/NNG	)/SS	은/JX		:	S/SL	008/SN	'/SS	(/
 출동케	출동/NNG	케/UN		:	출동/NNG	하/XSV	게/EC	
 하고,	하/VV	고/EC	,/SP		:	하/VX	고/EC	,/SP	
 한다.	하/VX	ㄴ다/EF	./SF		:	하/VV	ㄴ다/EF	./SF	
-성병-임신방지를	성병/NNG	-/SO	임신/NNG	방지/NNG	를/JKO		:	성병/NNG	-/SS	임신/NNG	방지/NNG	를/JKO	
+성병-임신방지를	서/NNG	ㅇ/NNG	벼/NNG	ㅇ/UN	-/SO	임신/NNG	방지/NNG	를/JKO		:	성병/NNG	-/SS	임신/NNG	방지/NNG	를/JKO	
 필요한	필요/NNG	하/XSV	ㄴ/ETM		:	필요/NNG	하/XSA	ㄴ/ETM	
 법	법/NNB		:	법/NNG	
 주고	주/VX	고/EC		:	주/VV	고/EC	
@@ -3808,14 +3767,14 @@ PVC크리스마스트리가	PVC/SL	크리스마스/NNG	트리/NNG	가/JKS		:	PVC/SL	크리스마스트
 22만원선.	22/SN	만원/NNG	선/NNG	./SF		:	22/SN	만/NR	원/NNB	선/NNG	./SF	
 1만	1/SN	만/NNB		:	1/SN	만/NR	
 2천원정도.	2/SN	천/NR	원정/NNG	도/JX	./SF		:	2/SN	천/NR	원/NNB	정도/NNG	./SF	
-3만원이상까지	3/SN	만원/NNG	이상/NNG	까/VV	지/EC		:	3/SN	만/NR	원/NNB	이상/NNG	까지/JX	
+3만원이상까지	3/SN	만원/NNG	이사/NNG	ㅇ/NNG	까지/JX		:	3/SN	만/NR	원/NNB	이상/NNG	까지/JX	
 줄전구의	줄/NNG	전구/NNG	의/JKG		:	줄전구/NNG	의/JKG	
 1만원정도.	1/SN	만원/NNG	정도/NNG	./SF		:	1/SN	만/NR	원/NNB	정도/NNG	./SF	
 산타클로스,	산타클로스/NNP	,/SP		:	산타클로스/NNG	,/SP	
 포인세티아,	포/NNG	인세/NNG	티아/UN	,/SP		:	포인세티아/NNG	,/SP	
 1만∼2만원까지	1/SN	만/NR	∼/SO	2/SN	만원/NNG	까지/JX		:	1/SN	만/NR	~/SO	2/SN	만/NR	원/NNB	까지/JX	
 다양하다.	다양/XR	하/XSA	다/EF	./SF		:	다양/NNG	하/XSA	다/EF	./SF	
-따라	따라/JX		:	따르/VV	아/EC	
+따라	따/VV	아라/EC		:	따르/VV	아/EC	
 20∼30%정도	20/SN	∼/SO	30/SN	%/SW	정/NNG	도/JX		:	20/SN	∼/SO	30/SN	%/SW	정도/NNG	
 싸게	싸/VV	게/EC		:	싸/VA	게/EC	
 살	살/VV	ㄹ/ETM		:	사/VV	ㄹ/ETM	
@@ -3839,11 +3798,11 @@ PVC크리스마스트리가	PVC/SL	크리스마스/NNG	트리/NNG	가/JKS		:	PVC/SL	크리스마스트
 있다.	있/VX	다/EF	./SF		:	있/VV	다/EF	./SF	
 멋과	멋/NNG	과/JKB		:	멋/NNG	과/JC	
 올	오/VV	ㄹ/ETM		:	올/MM	
-벨벳바지	벨벳바/UN	지/EC		:	벨벳/NNG	바지/NNG	
+벨벳바지	벨/NNG	베/NNG	ㅅ/NNG	바지/NNG		:	벨벳/NNG	바지/NNG	
 입어	입/VV	어/EF		:	입/VV	어/EC	
-여성스러움을	여성/NNG	스럽/XSA	음/ETN	을/JKO		:	여성/NNG	스럽/XSA	ㅁ/ETN	을/JKO	
+여성스러움을	여/NNG	성스럽/VA	음/ETN	을/JKO		:	여성/NNG	스럽/XSA	ㅁ/ETN	을/JKO	
 시간과	시간/NNG	과/JKB		:	시간/NNG	과/JC	
-따라	따라/JX		:	따르/VV	아/EC	
+따라	따/VV	아라/EC		:	따르/VV	아/EC	
 각기	각기/NNG		:	각기/MAG	
 다른	다르/VA	ㄴ/ETM		:	다른/MM	
 있다는	있/VX	다는/ETM		:	있/VV	다는/ETM	
@@ -3863,7 +3822,7 @@ PVC크리스마스트리가	PVC/SL	크리스마스/NNG	트리/NNG	가/JKS		:	PVC/SL	크리스마스트
 삼풍아트	삼/NR	풍/NNG	아트/NNG		:	삼풍아트/NNP	
 '이신옥	'/SS	이/MM	신/NNG	옥/NNG		:	'/SS	이신옥/NNP	
 초대회장인	초/XPN	대회장/NNG	이/VCP	ㄴ/ETM		:	초대/NNG	회장/NNG	이/VCP	ㄴ/ETM	
-이신옥씨의	이/MM	신/NNG	옥/NNG	씨/NNB	의/JKG		:	이신옥/NNP	씨/NNB	의/JKG	
+이신옥씨의	이/MM	신/NNG	옥/NNG	씨/NNG	의/JKG		:	이신옥/NNP	씨/NNB	의/JKG	
 맞아	맞/VV	아/EF		:	맞/VV	아/EC	
 이신옥씨는	이/MM	신/NNG	옥/NNG	씨/NNB	는/JX		:	이신옥/NNP	씨/NNB	는/JX	
 꽃과	꽃/NNG	과/JKB		:	꽃/NNG	과/JC	
@@ -3871,17 +3830,16 @@ PVC크리스마스트리가	PVC/SL	크리스마스/NNG	트리/NNG	가/JKS		:	PVC/SL	크리스마스트
 내놨다.	내놨/UN	다/EF	./SF		:	내놓/VV	았/EP	다/EF	./SF	
 허락지	헐/VV	락/EC	지/EC		:	허락/NNG	하/XSV	지/EC	
 있어	있/VX	어/EF		:	있/VV	어/EC	
-그려	그려/JX		:	그리/VV	어/EC	
 건축공학과를	건축/NNG	공/NNG	학과/NNG	를/JKO		:	건축/NNG	공학/NNG	과/NNG	를/JKO	
 이씨는	이씨/IC	는/JX		:	이/NNP	씨/NNB	는/JX	
 맡아	맡/VV	아/EF		:	맡/VV	아/EC	
 서로	서로/NNG		:	서로/MAG	
-만들었다.	만/JX	듣/VV	었/EP	다/EF	./SF		:	만들/VV	었/EP	다/EF	./SF	
+만들었다.	만/NR	듣/VV	었/EP	다/EF	./SF		:	만들/VV	었/EP	다/EF	./SF	
 50여명으로	50/SN	여명/NNG	으로/JKB		:	50/SN	여/XSN	명/NNB	으로/JKB	
 활성화됐다는	활/NNG	성화/NNG	되/XSV	었/EP	다는/ETM		:	활성/NNG	화/XSN	되/XSV	었/EP	다는/ETM	
 수세미-콩의	수세/NNG	미/NNP	-/SO	콩/NNG	의/JKG		:	수세미/NNG	-/SS	콩/NNG	의/JKG	
 눈	누/VV	ㄴ/ETM		:	눈/NNG	
-등서	등/NNB	스/VV	어/EC		:	등/NNB	서/JKB	
+등서	등/NNB	서/NNG		:	등/NNB	서/JKB	
 녹황색	녹/NNG	황색/NNG		:	녹황색/NNG	
 눈	누/VV	ㄴ/ETM		:	눈/NNG	
 이	이/MM		:	이/NP	
@@ -3896,7 +3854,6 @@ PVC크리스마스트리가	PVC/SL	크리스마스/NNG	트리/NNG	가/JKS		:	PVC/SL	크리스마스트
 '라피네	'/SS	라/NNG	피/NNG	네/XSN		:	'/SS	라피네/NNP	
 내놨다.	내놨/UN	다/EF	./SF		:	내놓/VV	았/EP	다/EF	./SF	
 이들	이드/NNG	ㄹ/JKO		:	이/NP	들/XSN	
-그	그/NA		:	그/MM	
 화장과	화장/NNG	과/JKB		:	화장/NNG	과/JC	
 온	온/MM		:	오/VX	ㄴ/ETM	
 하는	하/VV	는/ETM		:	하/VX	는/ETM	
@@ -3912,26 +3869,25 @@ PVC크리스마스트리가	PVC/SL	크리스마스/NNG	트리/NNG	가/JKS		:	PVC/SL	크리스마스트
 강한	강하/VA	ㄴ/ETM		:	강하/VV	ㄴ/ETM	
 알려져	알려져/UN		:	알리/VV	어/EC	지/VX	어/EC	
 회사측은	회사/NNG	측은/NNG		:	회사/NNG	측/NNB	은/JX	
-만들어	만/JX	듣/VV	어/EC		:	만들/VV	어/EC	
+만들어	만들/VV	어/EF		:	만들/VV	어/EC	
 온	온/MM		:	오/VX	ㄴ/ETM	
 했다"고	하/VV	았/EP	다/EF	"/SS	고/EC		:	하/VX	았/EP	다/EC	"/SS	고/JKQ	
 한	한/MM		:	하/VV	ㄴ/ETM	
 '뜨레아'브랜드	'/SS	뜨레아/UN	'/SS	브랜드/NNG		:	'/SS	뜨레아/NNP	'/SS	브랜드/NNG	
 뛰어나다는	뛰어나/VA	아다/EC	는/JX		:	뛰어나/VA	다는/ETM	
-가양은	가/XPN	양/NNG	은/JX		:	가양/NNP	은/JX	
+가양은	가야/NNP	ㅇ/NNG	은/JX		:	가양/NNP	은/JX	
 칠레산	칠레/NNP	산/NNG		:	칠레/NNP	산/XSN	
 해조류,	해/NNG	조류/NNG	,/SP		:	해조/NNG	류/XSN	,/SP	
 마제스티'를	마/NNP	제스/NNP	티/NNG	'/SS	를/JKO		:	마제스티/NNG	'/SS	를/JKO	
 내놨다.	내놨/UN	다/EF	./SF		:	내놓/VV	았/EP	다/EF	./SF	
 피부독성을	피부/NNG	독성/NNG	을/JKO		:	피부/NNG	독/NNG	성/XSN	을/JKO	
 제거하고	제거/NNG	하고/JKB		:	제거/NNG	하/XSV	고/EC	
-가양은	가/XPN	양/NNG	은/JX		:	가양/NNP	은/JX	
+가양은	가야/NNP	ㅇ/NNG	은/JX		:	가양/NNP	은/JX	
 '이노센스'라는	'/SS	이/MM	노/NNG	센스/NNG	'/SS	라는/ETM		:	'/SS	이노센스/NNP	'/SS	이/VCP	라는/ETM	
 이런	이렇/VA	ㄴ/ETM		:	이런/MM	
 허충림교수(피부과)는	허충림/UN	교수/NNG	(/SS	피부과/NNG	)/SS	는/JX		:	허충림/NNP	교수/NNG	(/SS	피부과/NNG	)/SS	는/JX	
 "이들	"/SS	이드/NNG	ㄹ/JKO		:	"/SS	이/NP	들/XSN	
 있는	있/VX	는/ETM		:	있/VV	는/ETM	
-그	그/NA		:	그/MM	
 정도인지는	정도/NNG	인지/NNG	는/JX		:	정도/NNG	이/VCP	ㄴ지/EC	는/JX	
 않았다"면서	않았다/UN	"/SS	면서/EC		:	않/VX	았/EP	다/EC	"/SS	면서/EC	
 중요하다"고	중요/NNG	하/XSV	아다/EC	"/SS	고/EC		:	중요/NNG	하/XSA	다/EC	"/SS	고/JKQ	
@@ -3995,14 +3951,14 @@ PVC크리스마스트리가	PVC/SL	크리스마스/NNG	트리/NNG	가/JKS		:	PVC/SL	크리스마스트
 직장-사업서	직/NNG	장/NNB	-/SO	사업/NNG	스/VV	어/EC		:	직장/NNG	-/SS	사업/NNG	서/JKB	
 40대부터'.	40/SN	대부/NNG	터/NNG	'/SS	./SF		:	40/SN	대/NNB	부터/JX	'/SS	./SF	
 미국과	미국/NNP	과/JKB		:	미국/NNP	과/JC	
-못지	못지/UN		:	못하/VA	지/EC	
+못지	모/MM	ㅅ/NNG	지/NNG		:	못하/VA	지/EC	
 미모로화장품	미/XPN	모로/NNP	화장품/NNG		:	미모로화장품/NNP	
 부상하고	부상/NNG	하고/JKB		:	부상/NNG	하/XSV	고/EC	
 있다고	있/VV	다고/EC		:	있/VX	다고/EC	
 피가로'지는	피가로/NNP	'/SS	지/VX	는/ETM		:	피가로/NNG	'/SS	지/NNG	는/JX	
 수적으로	수/NNB	적/XSN	으로/JKB		:	수/NNG	적/XSN	으로/JKB	
 우세할	우세/NNG	하/XSV	ㄹ/ETM		:	우세/NNG	하/XSA	ㄹ/ETM	
-뿐	뿐/JX		:	뿐/NNB	
+뿐	뿌/VX	ㄴ/ETM		:	뿐/NNB	
 있는	있/VX	는/ETM		:	있/VV	는/ETM	
 베이붐세대	베이붐/UN	세대/NNG		:	베이붐/NNG	세대/NNG	
 40대들을	40/SN	대들/VV	을/ETM		:	40/SN	대/NNB	들/XSN	을/JKO	
@@ -4013,7 +3969,7 @@ PVC크리스마스트리가	PVC/SL	크리스마스/NNG	트리/NNG	가/JKS		:	PVC/SL	크리스마스트
 새로운	새롭/VA	은/ETM		:	새롭/VA	ㄴ/ETM	
 가능하게	가능/NNG	하/XSV	게/EC		:	가능/NNG	하/XSA	게/EC	
 해	하/VV	아/EC		:	하/VX	아/EC	
-로랑의	로/NNG	랑/JKB	의/JKG		:	로랑/NNP	의/JKG	
+로랑의	로라/NNP	ㅇ/NNG	의/JKG		:	로랑/NNP	의/JKG	
 카트린느	카트린/NNP	느/NP		:	카트린느/NNP	
 현재	현재/NNG		:	현재/MAG	
 화제가	화제/NNG	가/JKS		:	화제/NNG	가/JKC	
@@ -4074,7 +4030,6 @@ PVC크리스마스트리가	PVC/SL	크리스마스/NNG	트리/NNG	가/JKS		:	PVC/SL	크리스마스트
 하기보다는	하기/NNG	보다/JKB	는/JX		:	하/VX	기/ETN	보다/JKB	는/JX	
 하겠다"는	하/VV	겠/EP	다/EF	"/SS	는/JX		:	하/VV	겠/EP	다/EC	"/SS	는/ETM	
 있는	있/VX	는/ETM		:	있/VV	는/ETM	
-이와	입/VV	아/EC		:	이/NP	와/JKB	
 희생하고	희생/NNG	하고/JKB		:	희생/NNG	하/XSV	고/EC	
 아등바등	아등바/UN	등/NNB		:	아등바등/MAG	
 일해봤자	일/NNG	해봤/UN	자/VV	아/EC		:	일/NNG	하/XSV	아/EC	보/VX	았/EP	자/EC	
@@ -4090,15 +4045,14 @@ PVC크리스마스트리가	PVC/SL	크리스마스/NNG	트리/NNG	가/JKS		:	PVC/SL	크리스마스트
 딸	따/VV	ㄹ/ETM		:	딸/NNG	
 유명한	유명/XR	하/XSA	ㄴ/ETM		:	유명/NNG	하/XSA	ㄴ/ETM	
 배우어머니와	배우/NNG	어머니/NNG	와/JKB		:	배우/NNG	어머니/NNG	와/JC	
-그	그/NA		:	그/MM	
-협조자인가	협조/NNG	자/NNG	이/VCP	ㄴ가/EC		:	협조자/NNG	이/VCP	ㄴ가/EC	
+협조자인가	협조/NNG	자/XSN	이/VCP	ㄴ가/EC		:	협조자/NNG	이/VCP	ㄴ가/EC	
 최근호는	최근/NNG	호/NNG	는/JX		:	최근/NNG	호/NNB	는/JX	
 카트린느	카트린/NNP	느/NP		:	카트린느/NNP	
 드뇌브와	드뇌브/NNP	와/JKB		:	드뇌브/NNP	와/JC	
 시아라	시/NNG	알/VV	라/EC		:	시아라/NNP	
 마스트로야니,	마스트로야/UN	니/EC	,/SP		:	마스트로야니/NNP	,/SP	
 브리짓	브리짓/UN		:	브리짓/NNP	
-포세이와	포/NNG	세/NNG	입/VV	아/EC		:	포세이/NNP	와/JC	
+포세이와	포/NNG	세/NNG	이/XSN	와/JKB		:	포세이/NNP	와/JC	
 아당,	아/NNG	당/NNG	,/SP		:	아당/NNP	,/SP	
 잉그리드	잉그/UN	리드/NNG		:	잉그리드/NNP	
 버그만과	버그만/NNP	과/JKB		:	버그만/NNP	과/JC	
@@ -4111,13 +4065,12 @@ PVC크리스마스트리가	PVC/SL	크리스마스/NNG	트리/NNG	가/JKS		:	PVC/SL	크리스마스트
 살로트	살로트/UN		:	살로트/NNP	
 갱스부르	갱/NNG	스부/UN	르/NNG		:	갱스부르/NNP	
 배우와	배우/NNG	와/JKB		:	배우/NNG	와/JC	
-그	그/NA		:	그/MM	
 화려함	화려/XR	하/XSA	ㅁ/ETN		:	화려/XR	하/XSA	ㅁ/ETN	
 갈등과	갈등/NNG	과/JKB		:	갈등/NNG	과/JC	
 성적인	성적/NNG	이/VCP	ㄴ/ETM		:	성/NNG	적/XSN	이/VCP	ㄴ/ETM	
 매력과	매력/NNG	과/JKB		:	매력/NNG	과/JC	
 우아함으로	우아/XR	하/XSA	ㅁ/ETN	으로/JKB		:	우아/XR	하/XSA	ㅁ/ETN	으로/JKB	
-나	나/JX		:	나/NP	
+나	나/VV	아/EC		:	나/NP	
 나가는	나가/VV	는/ETM		:	나가/VX	는/ETM	
 힘들었다"고	힘들/VA	었/EP	다/EF	"/SS	고/EC		:	힘들/VA	었/EP	다/EC	"/SS	고/JKQ	
 그들은	그들/NP	은/JX		:	그/NP	들/XSN	은/JX	
@@ -4144,7 +4097,6 @@ PVC크리스마스트리가	PVC/SL	크리스마스/NNG	트리/NNG	가/JKS		:	PVC/SL	크리스마스트
 6살때영화	6/SN	살/NNG	때/NNG	영화/NNG		:	6/SN	살/NNB	때/NNG	영화/NNG	
 '올리비에성'에	'/SS	올리비에/NNP	성/XSN	'/SS	에/JKB		:	'/SS	올리비에성/NNP	'/SS	에/JKB	
 내게	내/VV	게/EC		:	나/NP	에게/JKB	
-두	두/JX		:	두/MM	
 살	살/VV	ㄹ/ETM		:	살/NNB	
 한다는	하/VV	ㄴ다는/ETM		:	하/VX	ㄴ다는/ETM	
 독립했다"고	독립/NNG	하/XSV	았/EP	다/EF	"/SS	고/EC		:	독립/NNG	하/XSV	았/EP	다/EC	"/SS	고/JKQ	
@@ -4161,11 +4113,9 @@ PVC크리스마스트리가	PVC/SL	크리스마스/NNG	트리/NNG	가/JKS		:	PVC/SL	크리스마스트
 알콜과	알콜/NNG	과/JKB		:	알콜/NNG	과/JC	
 찌든	찌/VV	든/EC		:	찌들/VV	ㄴ/ETM	
 했던	하/VV	았/EP	던/ETM		:	하/VX	았/EP	던/ETM	
-그	그/NA		:	그/MM	
 밟았다는	밟았/UN	다는/ETM		:	밟/VV	았/EP	다는/ETM	
 어린이	어린/NNG	이/JKS		:	어린이/NNG	
-비슷…	비/XPN	슷/UN	…/SE		:	비슷/XR	…/SE	
-박멸될듯	박멸/NNG	되/XSV	ㄹ듯/EC		:	박멸/NNG	되/XSV	ㄹ/ETM	듯/NNB	
+비슷…	비스/NNG	ㅅ/NNG	…/SE		:	비슷/XR	…/SE	
 에이즈-미국	에이즈/NNG	-/SO	미국/NNP		:	에이즈/NNG	-/SS	미국/NNP	
 보고서	보/VV	고서/EC		:	보고서/NNG	
 국제연합아동기금(UNICEF)은	국제/NNG	연합/NNG	아동/NNG	기금/NNG	(/SS	UNICEF/SL	)/SS	은/JX		:	국제연합아동기금/NNP	(/SS	UNICEF/SL	)/SS	은/JX	
@@ -4179,7 +4129,7 @@ PVC크리스마스트리가	PVC/SL	크리스마스/NNG	트리/NNG	가/JKS		:	PVC/SL	크리스마스트
 남아	남아/NNG		:	남/VV	아/EC	
 있다"고	있/VX	다/EF	"/SS	고/EC		:	있/VX	다/EC	"/SS	고/JKQ	
 어린이	어린/NNG	이/JKS		:	어린이/NNG	
-앗아가는	앗아가/UN	는/ETM		:	앗/VV	아/EC	가/VX	는/ETM	
+앗아가는	아/NNG	ㅅ/NNG	아가/NNG	는/JX		:	앗/VV	아/EC	가/VX	는/ETM	
 홍역과	홍역/NNG	과/JKB		:	홍역/NNG	과/JC	
 백일해,	백일/NNG	하/XSV	아/EC	,/SP		:	백일해/NNG	,/SP	
 줄고	주/VX	ㄹ고/EC		:	줄/VV	고/EC	
@@ -4257,7 +4207,7 @@ PVC크리스마스트리가	PVC/SL	크리스마스/NNG	트리/NNG	가/JKS		:	PVC/SL	크리스마스트
 철도	철/NNG	도/JX		:	철도/NNG	
 개소(29.4%)에	개소/NNB	(/SS	29.4/SN	%/SW	)/SS	에/JKB		:	개소/NNB	(/SS	29/SN	./SP	4/SN	%/SW	)/SS	에/JKB	
 불과했으며,	불과/MAG	하/XSV	았/EP	으며/EC	,/SP		:	불과/MAG	하/XSA	았/EP	으며/EC	,/SP	
-접근로에	접/NNG	근로/NNG	에/JKB		:	접근로/NNG	에/JKB	
+접근로에	저/XPN	ㅂ/NNG	근로/NNG	에/JKB		:	접근로/NNG	에/JKB	
 모두	모/NP	두/JX		:	모두/MAG	
 개소(9.8%)밖에	개소/NNB	(/SS	9.8/SN	%/SW	)/SS	밖에/JX		:	개소/NNB	(/SS	9/SN	./SP	8/SN	%/SW	)/SS	밖에/JX	
 개소(60.7%)의	개소/NNB	(/SS	60.7/SN	%/SW	)/SS	의/JKG		:	개소/NNB	(/SS	60/SN	./SP	7/SN	%/SW	)/SS	의/JKG	
@@ -4267,7 +4217,7 @@ PVC크리스마스트리가	PVC/SL	크리스마스/NNG	트리/NNG	가/JKS		:	PVC/SL	크리스마스트
 철도	철/NNG	도/JX		:	철도/NNG	
 함에도	함/NNG	에/JKB	도/JX		:	하/VX	ㅁ/ETN	에/JKB	도/JX	
 불구하고	불구/XR	하/XSA	고/EC		:	불구/XR	하/XSV	고/EC	
-접근로에만	접/NNG	근로/NNG	에/JKB	만/JX		:	접근로/NNG	에/JKB	만/JX	
+접근로에만	저/XPN	ㅂ/NNG	근로/NNG	에/JKB	만/JX		:	접근로/NNG	에/JKB	만/JX	
 개소(11.8%)였고,	개소/NNB	(/SS	11.8/SN	%/SW	)/SS	이/VV	었/EP	고/EC	,/SP		:	개소/NNB	(/SS	11/SN	./SP	8/SN	%/SW	)/SS	이/VCP	었/EP	고/EC	,/SP	
 있었다.	있/VX	었/EP	다/EF	./SF		:	있/VV	었/EP	다/EF	./SF	
 철도	철/NNG	도/JX		:	철도/NNG	
@@ -4291,12 +4241,12 @@ PVC크리스마스트리가	PVC/SL	크리스마스/NNG	트리/NNG	가/JKS		:	PVC/SL	크리스마스트
 곤란한	곤란/NNG	하/XSV	ㄴ/ETM		:	곤란/NNG	하/XSA	ㄴ/ETM	
 구별법	구별/NNG	법/NNG		:	구별법/NNG	
 이무하-한재용	이무하/UN	-/SO	한/MM	재용/NNG		:	이무하/NNP	-/SS	한재용/NNP	
-젖소-수입고기	저/XPN	ㅈ/UN	소/NNP	-/SO	수입/NNG	고기/NNG		:	젖소/NNG	-/SS	수입/NNG	고기/NNG	
+젖소-수입고기	젖소/NNG	-/SO	수입/NNG	고기/NNG		:	젖소/NNG	-/SS	수입/NNG	고기/NNG	
 동물자원과학과	동물/NNG	자원/NNG	과학/NNG	과/JKB		:	동물/NNG	자원/NNG	과학/NNG	과/NNG	
 이무하(45)-한재용(32)교수팀은	이무하/UN	(/SS	45/SN	)/SS	-/SO	한/MM	재용/NNG	(/SS	32/SN	)/SS	교수/NNG	팀/NNG	은/JX		:	이무하/NNP	(/SS	45/SN	)/SS	-/SS	한재용/NNP	(/SS	32/SN	)/SS	교수/NNG	팀/NNG	은/JX	
 전기영동(유전자의	전기/NNG	영/NNG	동/NNG	(/SS	유전자/NNG	의/JKG		:	전기영동/NNG	(/SS	유전자/NNG	의/JKG	
 크기에	크/VA	기에/EC		:	크기/NNG	에/JKB	
-따라	따라/JX		:	따르/VV	아/EC	
+따라	따/VV	아라/EC		:	따르/VV	아/EC	
 것)시켜	것/NNB	)/SS	시키/VV	어/EC		:	것/NNB	)/SS	시키/XSV	어/EC	
 표지인자가	표/NNG	지인/NNG	자가/NNG		:	표지/NNG	인자/NNG	가/JKC	
 있는	있/VX	는/ETM		:	있/VV	는/ETM	
@@ -4371,7 +4321,7 @@ YJ학사고시사로	YJ/SL	학/NNG	사고/NNG	시사/NNG	로/JKB		:	YJ/SL	학사/NNG	고시/NNG	
 귀뚜라미보일러.	귀뚜라미/NNG	보일러/NNG	./SF		:	귀뚜라미보일러/NNP	./SF	
 호텔-여관	호/NNB	텔/NNP	-/SO	여관/NNG		:	호텔/NNG	-/SS	여관/NNG	
 만원…	만원/NNG	…/SE		:	만/NR	원/NNB	…/SE	
-따라	따라/JX		:	따르/VV	아/EC	
+따라	따/VV	아라/EC		:	따르/VV	아/EC	
 손님을	손님/NNG	을/JKO		:	손/NNG	님/XSN	을/JKO	
 여관이나	여관/NNG	이나/JX		:	여관/NNG	이나/JC	
 별따기'라고	별따기/NNG	'/SS	라고/EC		:	별/NNG	따/VV	기/ETN	'/SS	라고/JKQ	
