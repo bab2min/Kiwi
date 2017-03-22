@@ -140,7 +140,7 @@ chain = {}
 for k, p in cand.items():
     chain[k[1:]] =chain.get(k[1:], 0) + pm.pos[k[0]] * p
 
-precondList = ['V', 'VV', 'VX', 'XSV', 'XSA']
+precondList = ['V', 'VV', 'VX', 'XSV', 'XSA', 'NP']
 precond = {pos:[(i, pos) for i in rm.getPrecond(pos)] for pos in precondList}
 precond['V'] += [('ㅇㅣ', 'VCP'), ('ㅇㅏㄴㅣ', 'VCN')]
 precond['VA'] = [(utils.normalizeHangul(line.strip()), 'VA') for line in open('hAdj.txt', encoding='utf-8').readlines()]

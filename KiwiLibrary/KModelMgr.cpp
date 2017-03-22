@@ -41,7 +41,7 @@ void KModelMgr::loadPOSFromTxt(const char * filename)
 			auto tagB = makePOSTag(fields[1]);
 			if (tagB == KPOSTag::MAX) continue;
 			auto p = _wtof(fields[2].c_str());
-			if (p < 0.00005) continue;
+			if (p < 0.00007) continue;
 			posTransition[(int)tagA][(int)tagB] = logf(p);
 		}
 	}
@@ -115,20 +115,25 @@ void KModelMgr::loadMMFromTxt(const char * filename, unordered_map<string, size_
 		auto wstr = converter.from_bytes(buf);
 		if (wstr.back() == '\n') wstr.pop_back();
 		auto fields = split(wstr, '\t');
-		if (fields.size() < 7) continue;
+		if (fields.size() < 9) continue;
 
 		auto form = encodeJamo(fields[0].cbegin(), fields[0].cend());
 		auto tag = makePOSTag(fields[1]);
-		float tagWeight = _wtof(fields[2].c_str());
+		float morphWeight = _wtof(fields[2].c_str());
+		if (morphWeight < 10 && tag >= KPOSTag::JKS)
+		{
+			continue;
+		}
+		float tagWeight = _wtof(fields[3].c_str());
 		if (tagWeight < 0.00005)
 		{
 			//wprintf(L"Skipped : %s\n", fields[0].c_str());
 			continue;
 		}
-		float vowel = _wtof(fields[3].c_str());
-		float vocalic = _wtof(fields[4].c_str());
-		float vocalicH = _wtof(fields[5].c_str());
-		float positive = _wtof(fields[6].c_str());
+		float vowel = _wtof(fields[5].c_str());
+		float vocalic = _wtof(fields[6].c_str());
+		float vocalicH = _wtof(fields[7].c_str());
+		float positive = _wtof(fields[8].c_str());
 
 		KCondVowel cvowel = KCondVowel::none;
 		KCondPolarity polar = KCondPolarity::none;

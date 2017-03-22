@@ -21,14 +21,17 @@ class PrecombinedModelGenerator:
             if len(ch) < 3: continue
             if not ch[1].startswith('V') and ch[1] not in ('XSV', 'XSA'): continue
             if ch[1].startswith('VC'): continue
+            if ch[0][-1] in ['ㄷ', 'ㅂ', 'ㅅ'] and float(ch[4]) >= 0.95: continue
             if ch[0][-2:] in self.vCond and len(ch[0]) > 2:
                 suf = ch[0][-2:]
                 ch[0] = ch[0][:-2] + '+' + suf
+                ch[2] = ch[3]
                 ch[3:] = [''.join(self.vCond[suf][0]), str(self.vCond[suf][1])]
                 ret.append(ch)
             elif ch[0][-1] in self.vCond and len(ch[0]) > 1:
                 suf = ch[0][-1:]
                 ch[0] = ch[0][:-1] + '+' + suf
+                ch[2] = ch[3]
                 ch[3:] = [''.join(self.vCond[suf][0]), str(self.vCond[suf][1])]
                 ret.append(ch)
         return ret
