@@ -137,7 +137,7 @@ vector<vector<KChunk>> KTrie::split(const string& str, bool hasPrefix) const
 	struct ChunkInfo
 	{
 		vector<pair<const KForm*, size_t>> chunks;
-		float p = 0;
+		//float p = 0;
 		size_t count = 0;
 		bitset<64> splitter;
 	};
@@ -164,7 +164,7 @@ vector<vector<KChunk>> KTrie::split(const string& str, bool hasPrefix) const
 		KFeatureTestor::isPositive,
 		KFeatureTestor::notPositive
 	};
-	size_t maxChunk = (str.size() + 8) / 4;
+	size_t maxChunk = (str.size() + 9) / 4;
 	auto brachOut = [&]()
 	{
 		if (!candidates.empty())
@@ -236,7 +236,7 @@ vector<vector<KChunk>> KTrie::split(const string& str, bool hasPrefix) const
 					else branches[idxRepl] = branches[i];
 					auto& bInsertor = idxRepl == -1 ? branches.back() : branches[idxRepl];
 					bInsertor.chunks.emplace_back(cand, n);
-					bInsertor.p += cand->maxP;
+					//bInsertor.p += cand->maxP;
 					bInsertor.splitter = tSplitter;
 					bInsertor.count += (beforeMatched || bBegin == bEnd) ? 1 : 2;
 					//if (pl.empty() || pl.back().second < bEnd) branches.back().second += mdl.;
@@ -258,7 +258,11 @@ vector<vector<KChunk>> KTrie::split(const string& str, bool hasPrefix) const
 				for (auto submatcher = curTrie; submatcher; submatcher = submatcher->fail)
 				{
 					if (!submatcher->exit) break;
-					else if(submatcher->exit != (void*)-1) candidates.emplace_back(submatcher->exit);
+					else if (submatcher->exit != (void*)-1 
+						&& (candidates.empty() || candidates.back() != submatcher->exit))
+					{
+						candidates.emplace_back(submatcher->exit);
+					}
 				}
 			}
 			else
@@ -274,7 +278,11 @@ vector<vector<KChunk>> KTrie::split(const string& str, bool hasPrefix) const
 		for (auto submatcher = curTrie; submatcher; submatcher = submatcher->fail)
 		{
 			if (!submatcher->exit) break;
-			else if (submatcher->exit != (void*)-1) candidates.emplace_back(submatcher->exit);
+			else if (submatcher->exit != (void*)-1 &&
+				(candidates.empty() || candidates.back() != submatcher->exit))
+			{
+				candidates.emplace_back(submatcher->exit);
+			}
 		}
 	continueFor:
 		n++;
