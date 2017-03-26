@@ -141,7 +141,7 @@ void KModelMgr::loadMMFromTxt(const char * filename, unordered_map<string, size_
 		{
 			float t[] = { vowel, vocalic, vocalicH, 1 - vowel, 1 - vocalic, 1 - vocalicH };
 			size_t pmIdx = max_element(t, t + LEN_ARRAY(t)) - t;
-			if (t[pmIdx] >= 0.80f)
+			if (t[pmIdx] >= 0.825f)
 			{
 				cvowel = (KCondVowel)(pmIdx + 2);
 			}
@@ -152,7 +152,7 @@ void KModelMgr::loadMMFromTxt(const char * filename, unordered_map<string, size_
 
 			float u[] = { positive, 1 - positive };
 			pmIdx = max_element(u, u + 2) - u;
-			if (u[pmIdx] >= 0.80f)
+			if (u[pmIdx] >= 0.825f)
 			{
 				polar = (KCondPolarity)(pmIdx + 1);
 			}

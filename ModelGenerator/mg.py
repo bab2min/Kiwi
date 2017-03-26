@@ -79,22 +79,15 @@ class ModelGenerator:
             if d.totalCount < 5: continue
             if not all(map(lambda x:'ㄱ'<=x<='ㅣ', k[0])): continue
             if d.totalCount/self.formDict[k[0]] < 0.00005: continue
-            #if not (k[1].startswith('E') or k[1].startswith('J') or k[1].startswith('VC')): continue
-            '''if (len(k[0]) < 2 and not ModelGenerator.isVowel(k[0])) or (len(k[0]) >= 2 and not ModelGenerator.isVowel(k[0][0]) and not ModelGenerator.isVowel(k[0][1])) and d[3]/d[0] > 0.5:
-                d[1] += d[0] - d[3]
-                d[2] += d[0] - d[3]
-                d[3] += d[0] - d[3]
-                if k[1].startswith('E'):
-                    d[1] -= 1
-                    d[2] -= 1
-                else:
-                    d[2] -= 1
-                    d[3] -= 1'''
-            d.postCount += 4
-            d.vowelCount += 2
-            d.vocalicCount += 2
-            d.vocalicHCount += 2
-            d.positiveCount += 2
+            # 빈도가 적은 단어가 극단적인 값을 갖지 않도록 기본수치를 늘려줌
+            d.postCount += 20
+            d.vowelCount += 10
+            d.vocalicCount += 10
+            d.vocalicHCount += 10
+            d.positiveCount += 10
+            # 조사의 경우 극성이 없으므로 극성 수치를 50%에 맞춘다.
+            if k[1].startswith('J'):
+                d.positiveCount = int(d.postCount / 2)
             f.write("%s\t%s\t%d\t%g\t%g\t%g\t%g\t%g\t%g\t" % (k[0], k[1], d.totalCount, d.totalCount/self.formDict[k[0]], (d.regularityCount+1) / (d.rTotalCount+1), d.vowelCount/d.postCount, d.vocalicCount/d.postCount, d.vocalicHCount/d.postCount, d.positiveCount/d.postCount))
             for tag in sorted(d.prePos, key=d.prePos.get, reverse=True):
                 f.write("%s:%g\t" % (tag, d.prePos[tag]/d.postCount))

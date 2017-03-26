@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "KForm.h"
 
-//#ifdef _DEBUG
+#ifdef _DEBUG
 size_t KMorpheme::uid = 0;
-//#endif
+#endif
 
 KPOSTag makePOSTag(wstring tagStr)
 {
@@ -92,7 +92,7 @@ void KForm::updateCond()
 {
 	KCondVowel cv = candidate[0]->vowel;
 	KCondPolarity cp = candidate[0]->polar;
-	maxP = candidate[0]->p;
+	//maxP = candidate[0]->p;
 	for (auto m : candidate)
 	{
 		if (cv != m->vowel)
@@ -101,7 +101,7 @@ void KForm::updateCond()
 		}
 		if (cp != m->polar) cp = KCondPolarity::none;
 		if (!m->chunks.empty() && m->chunks[0]->tag == KPOSTag::V) hasFirstV = true;
-		if (m->p > maxP) maxP = m->p;
+		//if (m->p > maxP) maxP = m->p;
 	}
 	vowel = cv;
 	polar = cp;
