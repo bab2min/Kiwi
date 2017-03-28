@@ -125,11 +125,6 @@ void KModelMgr::loadMMFromTxt(const char * filename, unordered_map<string, size_
 			continue;
 		}
 		float tagWeight = _wtof(fields[3].c_str());
-		if (tagWeight < 0.00005)
-		{
-			//wprintf(L"Skipped : %s\n", fields[0].c_str());
-			continue;
-		}
 		float vowel = _wtof(fields[5].c_str());
 		float vocalic = _wtof(fields[6].c_str());
 		float vocalicH = _wtof(fields[7].c_str());
