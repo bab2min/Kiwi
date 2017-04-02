@@ -34,8 +34,8 @@ class Test:
     def writeToFile(self, output):
         with open(output, 'w', encoding='utf-8') as o:
             o.write('%g\n' % self.getScore())
-            o.write('Total (%d) Time: %g ms\n' % (self.totalCount, self.totalTime))
-            o.write('Time per Unit: %g ms\n\n' % (self.totalTime / self.totalCount))
+            o.write('Total (%d) Time: %g ms\n' % (self.totalCount, self.totalTime * 1000))
+            o.write('Time per Unit: %g ms\n\n' % (self.totalTime / self.totalCount * 1000))
             for wl in self.wrongList:
                 o.write('%s\t%g\n' % (wl[0], wl[3]))
                 o.write('\t'.join(wl[2]) + '\n')
@@ -47,7 +47,7 @@ def posTest(s):
     return ['/'.join(i) for i in p.pos(s)]
 
 start = time.time()
-p = Kkma()
+p = Komoran()
 p.pos("")
 print("Loading: " + str(time.time() - start))
 
@@ -57,3 +57,9 @@ print("Total: %g" % t.totalTime)
 t.refineScore()
 print("Score: %g" % t.getScore())
 t.writeToFile('wrong01s.txt')
+
+t = Test("../TestSets/02s.txt", posTest)
+print("Total: %g" % t.totalTime)
+t.refineScore()
+print("Score: %g" % t.getScore())
+t.writeToFile('wrong02s.txt')
