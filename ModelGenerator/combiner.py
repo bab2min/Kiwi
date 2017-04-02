@@ -138,11 +138,19 @@ for i in range(8):
 
 chain = {}
 for k, p in cand.items():
-    chain[k[1:]] =chain.get(k[1:], 0) + pm.pos[k[0]] * p
+    chain[k[1:]] = chain.get(k[1:], 0) + pm.pos[k[0]] * p
 
-precondList = ['V', 'VV', 'VX', 'XSV', 'XSA', 'NP']
+for d, p in pm.transition.get('NP', {}).items():
+    if not d.startswith('J'): continue
+    chain[(d,)] = p
+
+
+precondList = ['V', 'VA', 'VV', 'VX', 'NP']
 precond = {pos:[(i, pos) for i in rm.getPrecond(pos)] for pos in precondList}
 precond['V'] += [('ㅇㅣ', 'VCP'), ('ㅇㅏㄴㅣ', 'VCN')]
+#precond['VA'] += [('ㅇㅣㄹㅓㅎ', 'VA'), ('ㄱㅡㄹㅓㅎ', 'VA'), ('ㅈㅓㄹㅓㅎ', 'VA'), ('ㅇㅓㄸㅓㅎ', 'VA'), ('ㅈㅓㄸㅓㅎ', 'VA')]
+precond['XSV'] = [(utils.normalizeHangul(line.strip()), 'XSV') for line in open('XSV.txt', encoding='utf-8').readlines()]
+precond['XSA'] = [(utils.normalizeHangul(line.strip()), 'XSA') for line in open('XSA.txt', encoding='utf-8').readlines()]
 precond['VA'] = [(utils.normalizeHangul(line.strip()), 'VA') for line in open('hAdj.txt', encoding='utf-8').readlines()]
 #print(precond['VV'])
 emptyPos = set()
@@ -176,7 +184,7 @@ for pk in [''] + list(precond):
                 cond = mm.morphemes[p][0]
                 nform = []
                 for bf in bform:
-                    if not all(map(lambda x:x(bf), cond)) or mm.morphemes[p][6].get(btag, 0) < 0.01:
+                    if not all(map(lambda x:x(bf), cond)) or mm.morphemes[p][6].get(btag, 0) < 0.001:
                         res = None
                         break
                     res = rm.applyRules(bf, btag, *p, bpcond)

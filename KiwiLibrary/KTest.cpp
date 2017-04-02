@@ -13,42 +13,68 @@ KWordPair parseWordPOS(wstring str)
 	return { str.substr(0, p), makePOSTag(str.substr(p + 1)) };
 }
 
-KTest::KTest(const char * testSetFile, Kiwi* kw, size_t topN) : totalCount(0)
+struct Counter
 {
+	struct value_type { template<typename T> value_type(const T&) { } };
+	void push_back(const value_type&) { ++count; }
+	size_t count = 0;
+};
+
+KTest::KTest(const char * testSetFile, Kiwi* kw, size_t topN) : totalCount(0), totalScore(0)
+{
+
 	FILE* f = nullptr;
 	if (fopen_s(&f, testSetFile, "r")) throw exception();
-	char buf[2048];
+	char buf[4096];
 	wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
-	while (fgets(buf, 2048, f))
+	while (fgets(buf, 4096, f))
 	{
-		auto wstr = converter.from_bytes(buf);
-		if (wstr.back() == '\n') wstr.pop_back();
-		auto fd = split(wstr, '\t');
-		if (fd.size() < 2) continue;
-		TestResult tr;
-		tr.q = fd[0];
-		for (size_t i = 1; i < fd.size(); i++) tr.a.emplace_back(parseWordPOS(fd[i]));
-		auto cands = kw->analyze(tr.q, topN);
-		tr.r = cands[0].first;
-		if (tr.a != tr.r)
+		try 
 		{
-			tr.cands = cands;
-			wrongList.emplace_back(tr);
+			auto wstr = converter.from_bytes(buf);
+			if (wstr.back() == '\n') wstr.pop_back();
+			auto fd = split(wstr, '\t');
+			if (fd.size() < 2) continue;
+			TestResult tr;
+			tr.q = fd[0];
+			for (size_t i = 1; i < fd.size(); i++) tr.a.emplace_back(parseWordPOS(fd[i]));
+			auto cands = kw->analyze(tr.q, topN);
+			tr.r = cands[0].first;
+			if (tr.a != tr.r)
+			{
+				auto setA = tr.a, setR = tr.r;
+				sort(setA.begin(), setA.end());
+				sort(setR.begin(), setR.end());
+				Counter c;
+				set_intersection(setA.begin(), setA.end(), setR.begin(), setR.end(), back_inserter(c));
+				tr.score = c.count / float(setA.size() + setR.size() - c.count);
+				totalScore += tr.score;
+				tr.cands = cands;
+				wrongList.emplace_back(tr);
+			}
+			else
+			{
+				totalScore += 1;
+			}
+			totalCount++;
 		}
-		totalCount++;
+		catch (exception) 
+		{
+
+		}
 	}
 	fclose(f);
 }
 
 float KTest::getScore() const
 {
-	return 1 - wrongList.size() / (float)totalCount;
+	return totalScore / totalCount;
 }
 
 void KTest::TestResult::writeResult(FILE * output) const
 {
 	fputws(q.c_str(), output);
-	fputwc('\t', output);
+	fprintf(output, "\t%.3g\n", score);
 	for (auto _r : a)
 	{
 		fputws(_r.first.c_str(), output);
