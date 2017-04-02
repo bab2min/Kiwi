@@ -1,6 +1,6 @@
-0.802111
-Total (19324) Time : 10898.6 ms
-Time per Unit : 0.563993 ms
+0.792279
+Total (19324) Time : 11072.5 ms
+Time per Unit : 0.572993 ms
 
 엠마누엘	엠마누엘/NNP	
 엠마누에/UN	ㄹ/ETM	-20.37
@@ -29,6 +29,13 @@ Time per Unit : 0.563993 ms
 침/NNG	실/NNG	과/JKB	-14.74
 침/NNG	실/NNG	과/JC	-15.09
 침/NNG	실과/NNG	-16.53
+
+디자인해	디자인/NNG	하/XSV	아/EC	
+디자인/NNG	하/XSA	아/EC	-10.63
+디자인/NNG	하/VV	아/EC	-12.16
+디자인/NNG	해/NNG	-12.94
+디자/UN	인하/VV	아/EC	-18.61
+디자인/NNG	하/XSA	아/EF	-20.74
 
 라파예트백화점에서	라파예트/NNP	백화점/NNG	에서/JKB	
 라파예트/UN	백화점/NNG	에서/JKB	-26.49
@@ -108,11 +115,11 @@ Time per Unit : 0.563993 ms
 주/NNB	는/JX	-10.63
 
 중요시해	중요/NNG	시/XSN	하/XSV	아/EC	
-중요시/NNG	하/XSV	아/EC	-10.65
-중요/NNG	시/NNG	하/XSV	아/EC	-12.62
 중요시/NNG	하/XSA	아/EC	-13.95
 중요/NNG	시해/NNG	-14.97
 중요시/NNG	하/VV	아/EC	-15.48
+중요/NNG	시/NNG	하/XSA	아/EC	-15.92
+중요시/NNG	해/NNG	-16.27
 
 왔다.	오/VX	았/EP	다/EF	./SF	
 오/VV	았/EP	다/EF	./SF	-3.721
@@ -480,11 +487,11 @@ Time per Unit : 0.563993 ms
 얼었/UN	다/EF	-20.62
 
 녹았다해서	녹/VV	았/EP	다/EC	하/VX	아서/EC	
-녹았다/UN	하/XSV	아서/EC	-21.78
 녹았다/UN	하/XSA	아서/EC	-23.69
 녹았/UN	다하/VV	아서/EC	-23.95
 녹았다/UN	하/VV	아서/EC	-24.25
 녹았다해/UN	서/JKB	-25.5
+녹았다해서/UN	-25.61
 
 있다.	있/VV	다/EF	./SF	
 있/VX	다/EF	./SF	-2.01
@@ -1030,6 +1037,13 @@ Time per Unit : 0.563993 ms
 한/MM	국/NNG	과/JC	-11.74
 한/XPN	국/NNG	과/JKB	-13.79
 
+취소했던	취소/NNG	하/XSV	았/EP	던/ETM	
+취소/NNG	하/XSA	았/EP	던/ETM	-15.12
+취소/NNG	하/VV	았/EP	던/ETM	-16.1
+취소했/UN	던/ETM	-18.16
+취소했더/UN	ㄴ/ETM	-19.66
+취소했던/UN	-22.61
+
 자메이카	자메이카/NNP	
 자메이카/UN	-19.61
 자메이/UN	카/VV	아/EC	-24.43
@@ -1208,10 +1222,10 @@ Time per Unit : 0.563993 ms
 
 한해	한/MM	해/NNG	
 한하/VV	아/EC	-5.839
-한/NNG	하/XSV	아/EC	-9.267
 한/MM	해/NNG	-9.574
 한/XPN	해/NNG	-11.97
 한/NNP	해/NNG	-14.63
+한/NNG	해/NNG	-14.88
 
 경주	경주/NNG	
 경주/NNP	-8.103
@@ -1453,7 +1467,7 @@ Time per Unit : 0.563993 ms
 2/SN	∼/SO	3/SN	년/NNB	전/NNG	만하/XSA	아/EC	도/JX	-21.96
 2/SN	∼/SO	3/SN	년/NNB	전/NNG	만/JX	하/VV	아도/EC	-23.14
 2/SN	∼/SO	3/SN	년전만해/UN	도/JX	-24.34
-2/SN	∼/SO	3/SN	년전만/UN	하/XSV	아도/EC	-24.39
+2/SN	∼/SO	3/SN	년/NNB	전/NNG	만/JX	하/VV	아/EC	도/JX	-24.45
 
 귀여운	귀엽/VA	ㄴ/ETM	
 귀엽/VA	은/ETM	-6.367
@@ -1587,6 +1601,13 @@ Time per Unit : 0.563993 ms
 줄/NNB	-6.248
 줄/VV	ㄹ/ETM	-6.593
 줄/NNG	-7.816
+
+주의해야	주의/NNG	하/XSV	아야/EC	
+주의/NNG	하/XSA	아야/EC	-10.95
+주의/NNG	하/VV	아야/EC	-12.48
+주의/NNG	해/NNG	야/JX	-15.36
+주/NNG	의하/VV	아야/EC	-15.67
+주의/NNG	하/XSA	아/EC	야/JX	-17.37
 
 한다.	하/VX	ㄴ다/EF	./SF	
 하/VV	ㄴ다/EF	./SF	-4.798
@@ -1890,6 +1911,13 @@ Time per Unit : 0.563993 ms
 높아/UN	지면/NNG	-23.9
 높아/UN	지/EC	면/EC	-24.82
 
+남성화해서	남성/NNG	화/XSN	하/XSV	아서/EC	
+남성/NNG	화해/NNG	서/JKB	-14.19
+남성/NNG	화하/VV	아서/EC	-15.9
+남/NNG	성화/NNG	하/XSA	아서/EC	-18.22
+남성/NNG	화/XSN	하/VV	아서/EC	-18.35
+남성/NNG	화해/NNG	서/JKS	-19.07
+
 다르다"며	다르/VA	다/EC	"/SS	며/EC	
 다르/VA	다/EF	"/SS	며/EC	-15.03
 다르/VA	다/EC	"/SS	며/EC	-17.53
@@ -1952,8 +1980,8 @@ Time per Unit : 0.563993 ms
 피하/VV	아/EC	자/VV	며/EC	-15.55
 피해/NNG	자/VV	며/EC	-15.67
 피하/VV	아/EC	자며/EC	-18.22
-피/NNG	하/XSV	아/EC	자/VV	며/EC	-18.76
 피해자며/UN	-19.61
+피해자/NNG	며/JC	-20.58
 
 1위가	1/SN	위/NNB	가/JKS	
 1/SN	위/NNG	가/JKS	-4.495
@@ -2014,7 +2042,7 @@ Time per Unit : 0.563993 ms
 피해,	피해/NNG	,/SP	
 피하/VV	아/EC	,/SP	-6.018
 피해/NNG	,/SP	-7.126
-피/NNG	하/XSV	아/EC	,/SP	-9.231
+피/NNG	하/XSA	아/EC	,/SP	-12.53
 피/NNG	해/NNG	,/SP	-12.86
 피/XPN	해/NNG	,/SP	-13.13
 
@@ -2129,6 +2157,13 @@ Time per Unit : 0.563993 ms
 크/VV	기/ETN	-12.99
 크/VA	기/EC	-14.07
 크/VA	기/ETM	-16.04
+
+부착해	부착/NNG	하/XSV	아/EC	
+부착/NNG	하/XSA	아/EC	-11.42
+부착/NNG	하/VV	아/EC	-12.95
+부착/NNG	해/NNG	-13.73
+부/NNG	착하/VA	아/EC	-16
+부착해/UN	-18.11
 
 생산지와	생산지/NNG	와/JC	
 생산지/NNG	와/JKB	-10.14
@@ -2315,12 +2350,26 @@ Time per Unit : 0.563993 ms
 인입선/UN	이/JKS	-22.18
 인입/UN	선/NNG	이/JKS	-23.17
 
+말했다.	말/NNG	하/XSV	았/EP	다/EF	./SF	
+말하/VV	았/EP	다/EF	./SF	-8.016
+말/NNG	하/XSA	았/EP	다/EF	./SF	-8.724
+말/NNG	하/VV	았/EP	다/EF	./SF	-9.706
+말/NNB	하/XSA	았/EP	다/EF	./SF	-15.34
+말했/UN	다/EF	./SF	-16.46
+
 태훈산업의	태훈산업/NNP	의/JKG	
 태훈/UN	산업/NNG	의/JKG	-20.41
 태후/UN	ㄴ/ETM	산업/NNG	의/JKG	-22.91
 태훈산업/UN	의/JKG	-23.62
 태/NNP	훈/NNP	산업/NNG	의/JKG	-24.9
 태/NNG	훈/NNP	산업/NNG	의/JKG	-26.94
+
+기록했고,	기록/NNG	하/XSV	았/EP	고/EC	,/SP	
+기록/NNG	하/XSA	았/EP	고/EC	,/SP	-14.01
+기록/NNG	하/VV	았/EP	고/EC	,/SP	-14.99
+기록했/UN	고/EC	,/SP	-20.66
+기록/NNG	했고/UN	,/SP	-22.48
+기록했고/UN	,/SP	-22.76
 
 호산실업	호산실업/NNP	
 호/NNB	산/NNG	실업/NNG	-21.04
@@ -2578,6 +2627,13 @@ Time per Unit : 0.563993 ms
 "/SS	이렇/VA	ㄴ/EF	-12.74
 "/SS	이런/IC	-14.58
 
+공급해	공급/NNG	하/XSV	아/EC	
+공급/NNG	하/XSA	아/EC	-9.91
+공급/NNG	하/VV	아/EC	-11.44
+공급/NNG	해/NNG	-12.23
+공/NNG	급하/VA	아/EC	-15.88
+공/NNG	급/NNG	하/XSA	아/EC	-15.98
+
 있다"고	있/VX	다/EC	"/SS	고/JKQ	
 있/VX	다/EF	"/SS	고/EC	-12.13
 있/VV	다/EF	"/SS	고/EC	-12.99
@@ -2633,6 +2689,13 @@ Time per Unit : 0.563993 ms
 있/VA	으며/EC	-7.627
 있으/UN	며/EC	-15.41
 있으며/UN	-18.11
+
+적용했다는	적용/NNG	하/XSV	았/EP	다는/ETM	
+적용/NNG	하/XSA	았/EP	다는/ETM	-14.37
+적용/NNG	하/VV	았/EP	다는/ETM	-15.36
+적용/NNG	하/XSA	았/EP	다/EF	는/JX	-19.58
+적용/NNG	하/XSA	았/EP	다/EC	는/JX	-20.27
+적용/NNG	하/VV	았/EP	다/EF	는/JX	-20.56
 
 공경엽	공경엽/NNP	
 공경/NNG	엽/NNG	-18.13
@@ -2833,6 +2896,13 @@ Time per Unit : 0.563993 ms
 스텐트르/UN	ㄹ/JKO	-25.99
 스텐트/UN	르/NNG	ㄹ/JKO	-31.85
 
+개발했다고	개발/NNG	하/XSV	았/EP	다고/EC	
+개발/NNG	하/XSA	았/EP	다고/EC	-13.45
+개발/NNG	하/VV	았/EP	다고/EC	-14.43
+개발했/UN	다고/EC	-20.23
+개/NNB	발/NNG	하/XSA	았/EP	다고/EC	-20.47
+개/NNB	발/NNG	하/VV	았/EP	다고/EC	-21.45
+
 -	-/SS	
 -/SO	0
 
@@ -2880,6 +2950,20 @@ Time per Unit : 0.563993 ms
 있/VA	는/ETM	-5.746
 있느/UN	ㄴ/ETM	-13.66
 있는/UN	-16.61
+
+개발했다고	개발/NNG	하/XSV	았/EP	다고/EC	
+개발/NNG	하/XSA	았/EP	다고/EC	-13.45
+개발/NNG	하/VV	았/EP	다고/EC	-14.43
+개발했/UN	다고/EC	-20.23
+개/NNB	발/NNG	하/XSA	았/EP	다고/EC	-20.47
+개/NNB	발/NNG	하/VV	았/EP	다고/EC	-21.45
+
+발표했다.	발표/NNG	하/XSV	았/EP	다/EF	./SF	
+발표/NNG	하/XSA	았/EP	다/EF	./SF	-10.56
+발표/NNG	하/VV	았/EP	다/EF	./SF	-11.54
+발/NNG	표하/VV	았/EP	다/EF	./SF	-15.54
+발/NNG	표/NNG	하/XSA	았/EP	다/EF	./SF	-16.53
+발/NNG	표/NNG	하/VV	았/EP	다/EF	./SF	-17.51
 
 이	이/MM	
 이/NP	-9.459
@@ -2937,6 +3021,13 @@ Time per Unit : 0.563993 ms
 있/VV	다/EC	는/JX	-9.335
 있/VX	다/EC	는/JX	-9.85
 
+발표했다.	발표/NNG	하/XSV	았/EP	다/EF	./SF	
+발표/NNG	하/XSA	았/EP	다/EF	./SF	-10.56
+발표/NNG	하/VV	았/EP	다/EF	./SF	-11.54
+발/NNG	표하/VV	았/EP	다/EF	./SF	-15.54
+발/NNG	표/NNG	하/XSA	았/EP	다/EF	./SF	-16.53
+발/NNG	표/NNG	하/VV	았/EP	다/EF	./SF	-17.51
+
 많아	많/VA	아/EC	
 많/VA	아/EF	-12.25
 많아/UN	-15.11
@@ -2976,6 +3067,13 @@ Time per Unit : 0.563993 ms
 많았/UN	다/EC	고/EC	-28.24
 많았/UN	다고/EF	-28.93
 
+발표했다.	발표/NNG	하/XSV	았/EP	다/EF	./SF	
+발표/NNG	하/XSA	았/EP	다/EF	./SF	-10.56
+발표/NNG	하/VV	았/EP	다/EF	./SF	-11.54
+발/NNG	표하/VV	았/EP	다/EF	./SF	-15.54
+발/NNG	표/NNG	하/XSA	았/EP	다/EF	./SF	-16.53
+발/NNG	표/NNG	하/VV	았/EP	다/EF	./SF	-17.51
+
 있는가를	있/VX	는가/EC	를/JKO	
 있/VV	는가/EC	를/JKO	-10.27
 있/VX	는가/EC	를/JKO	-10.78
@@ -2990,12 +3088,19 @@ Time per Unit : 0.563993 ms
 본/NNG	-9.306
 본/NNP	-11.61
 
+대답했고	대답/NNG	하/XSV	았/EP	고/EC	
+대답/NNG	하/XSA	았/EP	고/EC	-11.91
+대답/NNG	하/VV	았/EP	고/EC	-12.89
+대/XPN	답/NNG	하/XSA	았/EP	고/EC	-18.24
+대답했/UN	고/EC	-18.55
+대/XPN	답/NNG	하/VV	았/EP	고/EC	-19.23
+
 답했다고	답/NNG	하/XSV	았/EP	다고/EC	
 답하/VV	았/EP	다고/EC	-10.36
-답/NNG	하/XSV	았/EP	다고/EC	-11.66
 답/NNG	하/XSA	았/EP	다고/EC	-15.85
 답/NNG	하/VV	았/EP	다고/EC	-16.83
 답했/UN	다고/EC	-17.23
+답했다/UN	고/EC	-18.55
 
 일	일/NNP	
 일/NNB	-4.659
@@ -3123,6 +3228,13 @@ Time per Unit : 0.563993 ms
 있/VA	었/EP	는지/EC	를/JKO	-15.84
 있/VX	었/EP	는지/EF	를/JKO	-17.98
 있/VV	었/EP	는지/EF	를/JKO	-18.36
+
+조사했다.	조사/NNG	하/XSV	았/EP	다/EF	./SF	
+조사/NNG	하/XSA	았/EP	다/EF	./SF	-10.27
+조사/NNG	하/VV	았/EP	다/EF	./SF	-11.25
+조사했/UN	다/EF	./SF	-17.96
+조/NR	사/NNG	하/XSA	았/EP	다/EF	./SF	-19.91
+조/NNG	사/NNG	하/XSA	았/EP	다/EF	./SF	-20.45
 
 유사한	유사/NNG	하/XSA	ㄴ/ETM	
 유사/NNG	하/XSV	ㄴ/ETM	-6.645
@@ -3346,6 +3458,13 @@ Time per Unit : 0.563993 ms
 이/NNP	를/JKO	-12.02
 이/NR	를/JKO	-12.26
 
+발표했다.	발표/NNG	하/XSV	았/EP	다/EF	./SF	
+발표/NNG	하/XSA	았/EP	다/EF	./SF	-10.56
+발표/NNG	하/VV	았/EP	다/EF	./SF	-11.54
+발/NNG	표하/VV	았/EP	다/EF	./SF	-15.54
+발/NNG	표/NNG	하/XSA	았/EP	다/EF	./SF	-16.53
+발/NNG	표/NNG	하/VV	았/EP	다/EF	./SF	-17.51
+
 '정조에	'/SS	정조/NNG	에/JKB	
 '/SS	정조/NNP	에/JKB	-6.451
 '/SS	정조/NNG	에/JKB	-7.787
@@ -3438,6 +3557,13 @@ Time per Unit : 0.563993 ms
 온/MM	-6.475
 온/NNG	-12.18
 오/NNP	ㄴ/JX	-13.12
+
+요구했다.	요구/NNG	하/XSV	았/EP	다/EF	./SF	
+요구/NNG	하/XSA	았/EP	다/EF	./SF	-10.32
+요구/NNG	하/VV	았/EP	다/EF	./SF	-11.31
+요구했/UN	다/EF	./SF	-17.96
+요/NNG	구하/VV	았/EP	다/EF	./SF	-19.53
+요구/NNG	하/XSA	았/EP	다/EC	./SF	-21.4
 
 -	-/SS	
 -/SO	0
@@ -3560,6 +3686,13 @@ Time per Unit : 0.563993 ms
 17.7/SN	%/SW	르/NNG	ㄹ/JKO	-14.6
 17.7/SN	%/SW	를/JX	-18.14
 
+차지했다.	차지/NNG	하/XSV	았/EP	다/EF	./SF	
+차지/NNG	하/XSA	았/EP	다/EF	./SF	-10.74
+차지/NNG	하/VV	았/EP	다/EF	./SF	-11.73
+차/VV	지/EC	하/VX	았/EP	다/EF	./SF	-12.55
+차/VV	지/EC	하/VV	았/EP	다/EF	./SF	-14.25
+차/VA	지/EC	하/VX	았/EP	다/EF	./SF	-15.95
+
 그	그/MM	
 그/NP	-5.497
 그/MM	-6.544
@@ -3617,6 +3750,13 @@ Time per Unit : 0.563993 ms
 13.2/SN	%/SW	르/NNG	ㄹ/JKO	-14.6
 13.2/SN	%/SW	를/JX	-18.14
 
+차지했다.	차지/NNG	하/XSV	았/EP	다/EF	./SF	
+차지/NNG	하/XSA	았/EP	다/EF	./SF	-10.74
+차지/NNG	하/VV	았/EP	다/EF	./SF	-11.73
+차/VV	지/EC	하/VX	았/EP	다/EF	./SF	-12.55
+차/VV	지/EC	하/VV	았/EP	다/EF	./SF	-14.25
+차/VA	지/EC	하/VX	았/EP	다/EF	./SF	-15.95
+
 12.7%,	12/SN	./SP	7/SN	%/SW	,/SP	
 12.7/SN	%/SW	,/SP	0
 
@@ -3624,6 +3764,13 @@ Time per Unit : 0.563993 ms
 10.0/SN	%/SW	를/JKO	-2.894
 10.0/SN	%/SW	르/NNG	ㄹ/JKO	-14.6
 10.0/SN	%/SW	를/JX	-18.14
+
+차지해	차지/NNG	하/XSV	아/EC	
+차지/NNG	하/XSA	아/EC	-9.502
+차지/NNG	하/VV	아/EC	-11.03
+차지/NNG	해/NNG	-11.82
+차/VV	지/EC	하/VX	아/EC	-12.75
+차/VV	지/EC	하/VV	아/EC	-13.55
 
 20.3%,	20/SN	./SP	3/SN	%/SW	,/SP	
 20.3/SN	%/SW	,/SP	0
@@ -3753,6 +3900,13 @@ Time per Unit : 0.563993 ms
 많았다/UN	"/SS	고/JKQ	-29.26
 많았/UN	다/EF	"/SS	고/JKQ	-30.8
 
+설명했다.	설명/NNG	하/XSV	았/EP	다/EF	./SF	
+설명/NNG	하/XSA	았/EP	다/EF	./SF	-10.21
+설명/NNG	하/VV	았/EP	다/EF	./SF	-11.19
+설/NNG	명하/VV	았/EP	다/EF	./SF	-18.67
+서/VV	ㄹ/ETM	명/NNB	하/XSA	았/EP	다/EF	./SF	-20.25
+설/NNB	명/NNB	하/XSA	았/EP	다/EF	./SF	-20.36
+
 78.3%로	78/SN	./SP	3/SN	%/SW	로/JKB	
 78.3/SN	%/SW	로/JKB	-2.681
 78.3/SN	%/SW	로/NNG	-19.09
@@ -3776,6 +3930,13 @@ Time per Unit : 0.563993 ms
 5.8/SN	%/SW	를/JKO	-2.894
 5.8/SN	%/SW	르/NNG	ㄹ/JKO	-14.6
 5.8/SN	%/SW	를/JX	-18.14
+
+차지했다.	차지/NNG	하/XSV	았/EP	다/EF	./SF	
+차지/NNG	하/XSA	았/EP	다/EF	./SF	-10.74
+차지/NNG	하/VV	았/EP	다/EF	./SF	-11.73
+차/VV	지/EC	하/VX	았/EP	다/EF	./SF	-12.55
+차/VV	지/EC	하/VV	았/EP	다/EF	./SF	-14.25
+차/VA	지/EC	하/VX	았/EP	다/EF	./SF	-15.95
 
 월등히	월등히/MAG	
 월등히/UN	-19.61
@@ -4075,9 +4236,9 @@ A/SL	./SF	ve/SL	'/SS	란/XSN	-20.07
 안돼	안/MAG	되/XSV	어/EC	
 안되/VA	어/EC	-5.962
 안/NNG	되/XSV	어/EC	-6.634
+안/NNG	되/XSV	어/EC	-6.634
 안/MAG	되/XSV	어/EC	-7.637
-안/MAG	되/VV	어/EC	-8.732
-안/NNG	되/VV	어/EC	-10.09
+안/MAG	되/XSV	어/EC	-7.637
 
 연한	연한/NNG	
 연하/VA	ㄴ/ETM	-5.234
@@ -4233,6 +4394,13 @@ A/SL	./SF	ve/SL	'/SS	란/XSN	-20.07
 직/NNG	접/VV	-52.84
 직/NNG	접/VV	-53.12
 
+확인해	확인/NNG	하/XSV	아/EC	
+확인/NNG	하/XSA	아/EC	-9.231
+확인/NNG	하/VV	아/EC	-10.76
+확인/NNG	해/NNG	-11.55
+확/MAG	인하/VV	아/EC	-13.01
+확/NNG	인하/VV	아/EC	-17.73
+
 보는	보/VX	는/ETM	
 보/VV	는/ETM	-2.809
 보/VX	는/ETM	-3.422
@@ -4246,6 +4414,13 @@ A/SL	./SF	ve/SL	'/SS	란/XSN	-20.07
 필요/NNG	하다/UN	고/EC	-19.79
 필요하다/UN	고/EC	-20.05
 필요/NNG	하/XSA	다/EC	고/EC	-20.7
+
+확인해	확인/NNG	하/XSV	아/EC	
+확인/NNG	하/XSA	아/EC	-9.231
+확인/NNG	하/VV	아/EC	-10.76
+확인/NNG	해/NNG	-11.55
+확/MAG	인하/VV	아/EC	-13.01
+확/NNG	인하/VV	아/EC	-17.73
 
 볼	보/VX	ㄹ/ETM	
 보/VV	ㄹ/ETM	-2.66
@@ -4448,6 +4623,13 @@ A/SL	./SF	ve/SL	'/SS	란/XSN	-20.07
 사/VV	아/EC	고/EC	-11.89
 사/VV	고/EF	-17.81
 
+지적했다.	지적/NNG	하/XSV	았/EP	다/EF	./SF	
+지적/NNG	하/XSA	았/EP	다/EF	./SF	-10.54
+지적/NNG	하/VV	았/EP	다/EF	./SF	-11.53
+지적했/UN	다/EF	./SF	-19.46
+지적/NNG	하/XSA	았/EP	다/EC	./SF	-21.62
+지/NNG	적/XSN	하/VV	았/EP	다/EF	./SF	-22.19
+
 안벽과	안벽/NNG	과/JKB	
 안/NNG	벽/NNG	과/JKB	-12.52
 안/NNG	벽/NNG	과/JC	-12.87
@@ -4511,6 +4693,13 @@ A/SL	./SF	ve/SL	'/SS	란/XSN	-20.07
 '/SS	위치/NNG	'/SS	지/EC	가/VX	아/EC	-23.4
 '/SS	위치/NNG	'/SS	지/EC	가/VV	아/EC	-23.66
 
+영국내	영국/NNP	내/NNB	
+영국/NNP	나/NP	의/JKG	-11.83
+영국/NNP	내/NNB	-13.88
+영/NNG	국내/NNG	-14.39
+영/NNP	국내/NNG	-15.5
+영/NR	국내/NNG	-16.01
+
 있었다고	있/VV	었/EP	다고/EC	
 있/VX	었/EP	다고/EC	-5.161
 있/VV	었/EP	다고/EC	-5.538
@@ -4545,6 +4734,13 @@ A/SL	./SF	ve/SL	'/SS	란/XSN	-20.07
 아무렇/VA	ㄴ/EF	-10.22
 아물/VV	러/EC	ㄴ/JX	-16.31
 아무/MM	런/NNG	-16.64
+
+통과해	통과/NNG	하/XSV	아/EC	
+통과/NNG	하/XSA	아/EC	-10.12
+통과/NNG	하/VV	아/EC	-11.64
+통과/NNG	해/NNG	-12.43
+통과해/UN	-18.11
+통과/NNG	하/XSA	아/EF	-20.22
 
 일정한	일정/NNG	하/XSA	ㄴ/ETM	
 일정/NNG	하/XSV	ㄴ/ETM	-5.862
@@ -4747,6 +4943,20 @@ A/SL	./SF	ve/SL	'/SS	란/XSN	-20.07
 괭이/NNG	갈매기/NNG	들/NNG	을/JKO	-27.51
 괭이갈매기/UN	들/XSN	을/JKO	-28.55
 
+목격했다고	목격/NNG	하/XSV	았/EP	다고/EC	
+목격/NNG	하/XSA	았/EP	다고/EC	-15.21
+목격/NNG	하/VV	았/EP	다고/EC	-16.19
+목격했/UN	다고/EC	-21.73
+목/NNG	격하/VA	았/EP	다고/EC	-22.14
+목/NNG	격하/VV	았/EP	다고/EC	-22.66
+
+말했다.	말/NNG	하/XSV	았/EP	다/EF	./SF	
+말하/VV	았/EP	다/EF	./SF	-8.016
+말/NNG	하/XSA	았/EP	다/EF	./SF	-8.724
+말/NNG	하/VV	았/EP	다/EF	./SF	-9.706
+말/NNB	하/XSA	았/EP	다/EF	./SF	-15.34
+말했/UN	다/EF	./SF	-16.46
+
 들어	들/VV	어/EC	
 듣/VV	어/EC	-2.718
 들/VV	어/EC	-4.654
@@ -4777,6 +4987,13 @@ A/SL	./SF	ve/SL	'/SS	란/XSN	-20.07
 같/VA	다/EF	"/SS	고/JKQ	-16.74
 같/VA	다/EC	"/SS	고/JKQ	-19.24
 같다/UN	"/SS	고/EC	-20.54
+
+우려했다.	우려/NNG	하/XSV	았/EP	다/EF	./SF	
+우려/NNG	하/XSA	았/EP	다/EF	./SF	-11.13
+우려/NNG	하/VV	았/EP	다/EF	./SF	-12.11
+울/VV	려/EC	하/VX	았/EP	다/EF	./SF	-12.98
+울/VV	려/EC	하/VV	았/EP	다/EF	./SF	-14.68
+우려했/UN	다/EF	./SF	-17.96
 
 -	-/SS	
 -/SO	0
@@ -5378,6 +5595,13 @@ A/SL	./SF	ve/SL	'/SS	란/XSN	-20.07
 회전/NNG	판/XSN	은/JX	-18.67
 회/NNB	전/NNG	판/NNG	은/JX	-19.25
 
+잠수했다가	잠수/NNG	하/XSV	았/EP	다가/EC	
+잠수/NNG	하/XSA	았/EP	다가/EC	-17.87
+잠수/NNG	하/VV	았/EP	다가/EC	-18.85
+잠수했/UN	다가/EC	-20.76
+잠/NNG	수/NNG	하/XSA	았/EP	다가/EC	-22.02
+잠/NNG	수/NNB	하/XSA	았/EP	다가/EC	-22.27
+
 하는	하/VX	는/ETM	
 하/VV	는/ETM	-3.186
 하/VX	는/ETM	-4.206
@@ -5811,9 +6035,9 @@ A/SL	./SF	ve/SL	'/SS	란/XSN	-20.07
 새로운	새롭/VA	ㄴ/ETM	
 새롭/VA	은/ETM	-4.518
 새로/MAG	울/VV	ㄴ/ETM	-11.78
+새/NNG	롭/XSA	은/ETM	-12.33
 새로우/UN	ㄴ/ETM	-15.16
 새로/MAG	울/VV	ㄴ/EF	-18
-새로운/UN	-18.11
 
 것이	것/NNB	이/JKC	
 것/NNB	이/JKS	-2.55
@@ -6033,6 +6257,13 @@ A/SL	./SF	ve/SL	'/SS	란/XSN	-20.07
 등산/NNG	인/XSN	들/XSN	에게/JKB	-21.05
 등/NNG	산/NNG	인/NNG	들/XSN	에게/JKB	-23.59
 
+시작했습니다."	시작/NNG	하/XSV	았/EP	습니다/EF	./SF	"/SS	
+시작/NNG	하/XSA	았/EP	습니다/EF	./SF	"/SS	-11.43
+시작/NNG	하/VV	았/EP	습니다/EF	./SF	"/SS	-12.41
+시작했/UN	습니다/EF	./SF	"/SS	-21.32
+시작/NNG	해/NNG	ㅆ/UN	습니다/EF	./SF	"/SS	-23.84
+시작/NNG	하/XSA	았/EP	습니다/EC	./SF	"/SS	-24.08
+
 최경화	최경화/NNP	
 최/XPN	경화/NNG	-14.01
 최/XPN	경화/NNP	-15.85
@@ -6088,6 +6319,13 @@ A/SL	./SF	ve/SL	'/SS	란/XSN	-20.07
 그/IC	-11.19
 그/VV	-44.06
 그/VA	-44.65
+
+조정해주는	조정/NNG	하/XSV	아/EC	주/VX	는/ETM	
+조정/NNG	하/XSA	아/EC	주/VX	는/ETM	-14.87
+조정/NNG	하/VV	아/EC	주/VX	는/ETM	-16.4
+조정/NNG	해/NNG	주/VV	는/ETM	-18.62
+조정/NNG	하/XSA	아/EC	주/VV	는/ETM	-19.28
+조/NNG	정하/VV	아/EC	주/VX	는/ETM	-19.74
 
 70여점.	70/SN	여/XSN	점/NNB	./SF	
 70/SN	여/NNG	점/NNG	./SF	-17.88
@@ -6380,11 +6618,11 @@ A/SL	./SF	ve/SL	'/SS	란/XSN	-20.07
 하/VV	ㄴ/ETM	겨울/NNG	에/JKB	-13.3
 
 낚시질해	낚시/NNG	질/XSN	하/XSV	아/EC	
-낚시/NNG	질/NNG	하/XSV	아/EC	-14.77
-낚시/NNG	질/XSN	하/XSV	아/EC	-15.09
 낚시/NNG	질/NNG	하/XSA	아/EC	-18.07
+낚시/NNG	질/NNG	하/VV	아/EC	-19.6
 낚시/NNG	질/NNG	해/NNG	-20.39
-낚시질/UN	하/XSV	아/EC	-20.98
+낚시/NNG	질/XSN	하/VV	아/EC	-20.45
+낚시/NNG	질/XSN	해/NNG	-21.25
 
 이	이/MM	
 이/NP	-9.459
@@ -6392,6 +6630,13 @@ A/SL	./SF	ve/SL	'/SS	란/XSN	-20.07
 이/NR	-10.39
 이/NNB	-12.4
 이/NNP	-12.61
+
+하사했는데,	하사/NNG	하/XSV	았/EP	는데/EC	,/SP	
+하사/NNG	하/XSA	았/EP	는데/EC	,/SP	-18.01
+하사/NNG	하/VV	았/EP	는데/EC	,/SP	-18.99
+하사했/UN	는데/EC	,/SP	-20.76
+하/VV	아/EC	사하/VV	았/EP	는데/EC	,/SP	-21.31
+하/VX	아/EC	사하/VV	았/EP	는데/EC	,/SP	-22.88
 
 이를	이/NP	를/JKO	
 이르/VV	ㄹ/ETM	-3.758
@@ -6448,6 +6693,13 @@ A/SL	./SF	ve/SL	'/SS	란/XSN	-20.07
 구연/NNG	동/NNG	화/XSN	로/JKB	-19.07
 구/XPN	연/NNG	동화/NNG	로/JKB	-19.56
 구/NR	연동/NNG	화/XSN	로/JKB	-21.92
+
+각색했다고	각색/NNG	하/XSV	았/EP	다고/EC	
+각색/NNG	하/XSA	았/EP	다고/EC	-16.08
+각색/NNG	하/VV	았/EP	다고/EC	-17.06
+각/MM	색/NNG	하/XSA	았/EP	다고/EC	-20.15
+각/MM	색/NNG	하/VV	았/EP	다고/EC	-21.13
+각색했/UN	다고/EC	-21.73
 
 한국아동문학연구소의	한국아동문학연구소/NNP	의/JKG	
 한국/NNP	아동/NNG	문학/NNG	연구소/NNG	의/JKG	-21.26
@@ -6530,7 +6782,7 @@ A/SL	./SF	ve/SL	'/SS	란/XSN	-20.07
 상담역/UN	-21.11
 상/NNG	담/NNG	역/NNG	-21.7
 상/NNG	담역/UN	-25.62
-상/NNP	담/NNG	역/NNG	-30.01
+상담/NNG	이/VCP	여/EC	ㄱ/VX	-28.5
 
 제일	제/XPN	일/NR	
 제일/NNG	-8.113
@@ -6563,6 +6815,13 @@ A/SL	./SF	ve/SL	'/SS	란/XSN	-20.07
 다/MAG	르/NNG	ㄴ/JX	-26.37
 다/NNG	르/NNG	ㄴ/JX	-26.51
 
+내가	내/NP	가/JKS	
+나/NP	가/JKS	-3.059
+내/NP	가/JKS	-4.192
+내가/VV	아/EC	-6.727
+내/NNB	가/JKS	-7.591
+내/NNG	가/JKS	-10.67
+
 이런	이런/MM	
 이렇/VA	ㄴ/ETM	-2.076
 이러/VV	ㄴ/ETM	-5.158
@@ -6590,6 +6849,20 @@ A/SL	./SF	ve/SL	'/SS	란/XSN	-20.07
 짜이/VV	어/EC	져/UN	-25.77
 짜여/UN	지/VX	여/EC	-26.12
 짜/VV	아/EC	여져/UN	-28.01
+
+"내가	"/SS	내/NP	가/JKS	
+"/SS	나/NP	가/JKS	-6.63
+"/SS	내/NP	가/JKS	-7.762
+"/SS	내가/VV	아/EC	-10.97
+"/SS	내/NNG	가/JKS	-12.34
+"/SS	내/NNB	가/JKS	-13.27
+
+"내가	"/SS	내/NP	가/JKS	
+"/SS	나/NP	가/JKS	-6.63
+"/SS	내/NP	가/JKS	-7.762
+"/SS	내가/VV	아/EC	-10.97
+"/SS	내/NNG	가/JKS	-12.34
+"/SS	내/NNB	가/JKS	-13.27
 
 백만장자라면	백만장자/NNG	이/VCP	라면/EC	
 백만장자/NNG	라면/NNG	-19.78
@@ -7117,6 +7390,13 @@ TV/SL	와/NNG	-22.57
 모니터와/UN	-19.61
 모니/UN	터/NNB	와/JKB	-20.52
 
+구입해도	구입/NNG	하/XSV	아도/EC	
+구입/NNG	해/NNG	도/JX	-11.31
+구입/NNG	하/XSA	아도/EC	-12
+구입/NNG	하/XSA	아/EC	도/JX	-13.32
+구입/NNG	하/VV	아도/EC	-13.53
+구입/NNG	하/VV	아/EC	도/JX	-14.85
+
 -	-/SS	
 -/SO	0
 
@@ -7543,7 +7823,7 @@ TV/SL	와/NNG	-22.57
 제/MM	과제/NNG	빵/NNG	-20.49
 제과제빵/UN	-21.11
 제/NP	과제/NNG	빵/NNG	-22.33
-제과제/UN	빵/NNG	-24.84
+저/NP	의/JKG	과제/NNG	빵/NNG	-24.04
 
 방산	방산/NNP	
 방/NNG	살/VV	ㄴ/ETM	-10.15
@@ -7642,6 +7922,20 @@ TV/SL	와/NNG	-22.57
 손님/NNG	들/NNG	의/JKG	-19.2
 손님들/UN	의/JKG	-20.62
 
+녹음해주는	녹음/NNG	하/XSV	아/EC	주/VX	는/ETM	
+녹음/NNG	하/XSA	아/EC	주/VX	는/ETM	-15.75
+녹음/NNG	하/VV	아/EC	주/VX	는/ETM	-17.28
+녹음/NNG	해/NNG	주/VV	는/ETM	-19.5
+녹음/NNG	하/XSA	아/EC	주/VV	는/ETM	-20.16
+녹음/NNG	해/NNG	주/NNG	는/JX	-20.7
+
+설치해	설치/NNG	하/XSV	아/EC	
+설치/NNG	하/XSA	아/EC	-9.856
+설치/NNG	하/VV	아/EC	-11.38
+설치/NNG	해/NNG	-12.17
+설치해/UN	-18.11
+설치/NNG	하/XSA	아/EF	-19.96
+
 둔	두/VX	ㄴ/ETM	
 두/VV	ㄴ/ETM	-3.778
 두/VX	ㄴ/ETM	-4.285
@@ -7663,12 +7957,33 @@ TV/SL	와/NNG	-22.57
 직/NNG	접/VV	-52.84
 직/NNG	접/VV	-53.12
 
+조작해	조작/NNG	하/XSV	아/EC	
+조작/NNG	하/XSA	아/EC	-10.31
+조작/NNG	하/VV	아/EC	-11.84
+조작/NNG	해/NNG	-12.62
+조작해/UN	-18.11
+조작/NNG	하/XSA	아/EF	-20.42
+
+녹음해서	녹음/NNG	하/XSV	아서/EC	
+녹음/NNG	하/XSA	아서/EC	-11.31
+녹음/NNG	하/VV	아서/EC	-12.83
+녹음/NNG	해/NNG	서/JKB	-13.74
+녹음/NNG	해서/NNG	-17.27
+녹음/NNG	해/NNG	서/JKS	-18.63
+
 듣는답니다.	듣/VV	는답니다/EF	./SF	
 듣느/UN	ㄴ답니다/EF	./SF	-20.54
 듣는/UN	답니다/EF	./SF	-21.39
 듣는다/UN	ㅂ니다/EF	./SF	-21.54
 듣는답니/UN	다/EF	./SF	-23.96
 듣는/UN	달/VV	ㅂ니다/EF	./SF	-26.49
+
+녹음해가는	녹음/NNG	하/XSV	아/EC	가/VX	는/ETM	
+녹음/NNG	해/NNG	가/JKS	는/JX	-18.46
+녹음/NNG	하/XSA	아/EC	가/VX	는/ETM	-19.44
+녹음/NNG	해/NNG	가/VV	는/ETM	-19.59
+녹음/NNG	해/NNG	갈/VV	는/ETM	-19.78
+녹음/NNG	하/XSA	아/EC	가/VV	는/ETM	-20.24
 
 '스타노래방'	'/SS	스타노래방/NNP	'/SS	
 '/SS	스타/NNG	노래방/NNG	'/SS	-14.9
@@ -7775,11 +8090,11 @@ TV/SL	와/NNG	-22.57
 업소가/UN	ㄴ/ETM	-16.66
 
 치열해진	치열/NNG	하/XSA	아/EC	지/VX	ㄴ/ETM	
-치열/NNG	하/XSV	아/EC	지/VX	ㄴ/ETM	-12.64
 치열/XR	하/XSA	아/EC	지/VX	ㄴ/ETM	-14.35
-치열/XR	하/XSV	아/EC	지/VX	ㄴ/ETM	-15.72
 치열/NNG	하/XSA	아/EC	지/VX	ㄴ/ETM	-15.94
 치열/NNG	해지/VV	ㄴ/ETM	-16.41
+치열/NNG	하/VV	아/EC	지/VX	ㄴ/ETM	-17.47
+치열/NNG	해지/NNG	ㄴ/JX	-19.32
 
 손님이	손/NNG	님/XSN	이/JKS	
 손님/NNG	이/JKS	-7.068
@@ -7843,6 +8158,13 @@ TV/SL	와/NNG	-22.57
 있/VA	는/ETM	-5.746
 있느/UN	ㄴ/ETM	-13.66
 있는/UN	-16.61
+
+경주보문단지내	경주/NNP	보문단지/NNP	내/NNB	
+경주/NNP	보문단지/NNP	나/NP	의/JKG	-26.3
+경주/NNP	보문단지/NNP	내/NNB	-28.35
+경주/NNP	보문단지/NNP	내/VV	어/EC	-30.54
+경주/NNP	보문단지/NNP	내/NP	-30.75
+경주/NNP	보문단지/NNP	내/NNG	-31.86
 
 이세득)	이세득/NNP	)/SS	
 이세득/UN	)/SS	-18.63
@@ -8013,11 +8335,18 @@ TV/SL	와/NNG	-22.57
 이/NNP	-12.61
 
 참여했다"고	참여/NNG	하/XSV	았/EP	다/EC	"/SS	고/JKQ	
-참여/NNG	하/XSV	았/EP	다/EF	"/SS	고/EC	-16.4
 참여/NNG	하/XSA	았/EP	다/EF	"/SS	고/EC	-20.58
-참여/NNG	하/XSV	았/EP	다/EF	"/SS	고/JKQ	-20.62
-참여/NNG	하/XSV	았/EP	다/EC	"/SS	고/EC	-20.92
 참여/NNG	하/VV	았/EP	다/EF	"/SS	고/EC	-21.57
+참여/NNG	하/XSA	았/EP	다/EF	"/SS	고/JKQ	-24.8
+참여/NNG	하/XSA	았/EP	다/EC	"/SS	고/EC	-25.11
+참여/NNG	하/VV	았/EP	다/EF	"/SS	고/JKQ	-25.79
+
+말했다.	말/NNG	하/XSV	았/EP	다/EF	./SF	
+말하/VV	았/EP	다/EF	./SF	-8.016
+말/NNG	하/XSA	았/EP	다/EF	./SF	-8.724
+말/NNG	하/VV	았/EP	다/EF	./SF	-9.706
+말/NNB	하/XSA	았/EP	다/EF	./SF	-15.34
+말했/UN	다/EF	./SF	-16.46
 
 재민	재민/NNP	
 재미/NNG	ㄴ/JX	-9.995
@@ -8110,6 +8439,13 @@ TV/SL	와/NNG	-22.57
 서울이/UN	-18.11
 서/NNG	울/NNG	이/JKS	-24.28
 
+염려했는데,	염려/NNG	하/XSV	았/EP	는데/EC	,/SP	
+염려/NNG	하/XSA	았/EP	는데/EC	,/SP	-16.87
+염려/NNG	하/VV	았/EP	는데/EC	,/SP	-17.85
+염려/NNG	하/XSA	았/EP	는데/EF	,/SP	-22.19
+염려했/UN	는데/EC	,/SP	-22.26
+염려/NNG	하/VV	았/EP	는데/EF	,/SP	-23.17
+
 31일에	31/SN	일/NNB	에/JKB	
 31/SN	일/NNG	에/JKB	-3.088
 31/SN	일/NNB	에/JKB	-4.01
@@ -8158,8 +8494,8 @@ TV/SL	와/NNG	-22.57
 8.9/SN	도/NNB	이/VCP	었/EP	고/EC	,/SP	-15.9
 8.9/SN	도였/UN	고/EC	,/SP	-16.16
 8.9/SN	도/NNG	이/VCP	었/EP	고/EC	,/SP	-16.75
-8.9/SN	도였고/UN	,/SP	-21.24
-8.9/SN	도/NNP	이/VCP	었/EP	고/EC	,/SP	-24.88
+8.9/SN	도/NNB	이/VCP	였/EP	고/EC	,/SP	-18.37
+8.9/SN	도/NNG	이/VCP	였/EP	고/EC	,/SP	-19.22
 
 4일에는	4/SN	일/NNB	에/JKB	는/JX	
 4/SN	일/NNG	에/JKB	는/JX	-5.322
@@ -8173,6 +8509,13 @@ TV/SL	와/NNG	-22.57
 9.3/SN	도/JX	의/JKG	-11.38
 9.3/SN	도/NNB	의/JKG	-12.15
 9.3/SN	도/NNG	의/JKG	-12.41
+
+기록했다.	기록/NNG	하/XSV	았/EP	다/EF	./SF	
+기록/NNG	하/XSA	았/EP	다/EF	./SF	-10.46
+기록/NNG	하/VV	았/EP	다/EF	./SF	-11.45
+기록했/UN	다/EF	./SF	-19.46
+기록/NNG	하/XSA	았/EP	다/EC	./SF	-21.54
+기록/NNG	하/VV	았/EP	다/EC	./SF	-22.52
 
 낮과	낮/NNG	과/JC	
 낮/NNG	과/JKB	-9.239
@@ -8294,11 +8637,18 @@ TV/SL	와/NNG	-22.57
 가/VV	까/EC	이/XSN	-31.81
 
 증가했다"고	증가/NNG	하/XSV	았/EP	다/EC	"/SS	고/JKQ	
-증가/NNG	하/XSV	았/EP	다/EF	"/SS	고/EC	-16.56
 증가/NNG	하/XSA	았/EP	다/EF	"/SS	고/EC	-20.74
-증가/NNG	하/XSV	았/EP	다/EF	"/SS	고/JKQ	-20.78
-증가/NNG	하/XSV	았/EP	다/EC	"/SS	고/EC	-21.08
 증가/NNG	하/VV	았/EP	다/EF	"/SS	고/EC	-21.73
+증가/NNG	하/XSA	았/EP	다/EF	"/SS	고/JKQ	-24.97
+증가/NNG	하/XSA	았/EP	다/EC	"/SS	고/EC	-25.27
+증/NNG	가하/VV	았/EP	다/EF	"/SS	고/EC	-25.92
+
+말했다.	말/NNG	하/XSV	았/EP	다/EF	./SF	
+말하/VV	았/EP	다/EF	./SF	-8.016
+말/NNG	하/XSA	았/EP	다/EF	./SF	-8.724
+말/NNG	하/VV	았/EP	다/EF	./SF	-9.706
+말/NNB	하/XSA	았/EP	다/EF	./SF	-15.34
+말했/UN	다/EF	./SF	-16.46
 
 따라	따르/VV	아/EC	
 따/VV	아라/EC	-9.311
@@ -8357,10 +8707,10 @@ TV/SL	와/NNG	-22.57
 
 달리해야	달리/MAG	하/XSV	아야/EC	
 달리하/VV	아야/EC	-7.844
-달리/MAG	하/XSV	아야/EC	-10.17
 다르/VA	이/EC	하/VX	아야/EC	-11.48
 달리/MAG	하/XSA	아야/EC	-12.07
 다르/VA	이/EC	하/VV	아야/EC	-12.29
+달리/MAG	하/VV	아야/EC	-12.63
 
 한다고	하/VX	ㄴ다고/EC	
 하/VV	ㄴ다고/EC	-4.678
@@ -8368,6 +8718,13 @@ TV/SL	와/NNG	-22.57
 하/VV	아/EC	ㄴ다고/EC	-13.38
 한다/UN	고/EC	-14.05
 하/VX	아/EC	ㄴ다고/EC	-14.95
+
+말했다.	말/NNG	하/XSV	았/EP	다/EF	./SF	
+말하/VV	았/EP	다/EF	./SF	-8.016
+말/NNG	하/XSA	았/EP	다/EF	./SF	-8.724
+말/NNG	하/VV	았/EP	다/EF	./SF	-9.706
+말/NNB	하/XSA	았/EP	다/EF	./SF	-15.34
+말했/UN	다/EF	./SF	-16.46
 
 일찌감치	일찌감치/MAG	
 일찌감치/UN	-22.61
@@ -8382,6 +8739,13 @@ TV/SL	와/NNG	-22.57
 차/NNG	ㅈ/UN	아/JKV	-31.32
 차/NNG	ㅈ/UN	아/NNG	-32.04
 차/VV	아/EC	ㅈ/UN	아/JKV	-39.64
+
+대비해야	대비/NNG	하/XSV	아야/EC	
+대비/NNG	하/XSA	아야/EC	-11.29
+대비/NNG	하/VV	아야/EC	-12.82
+대비/NNG	해/NNG	야/JX	-15.71
+대/NNG	비하/VV	아야/EC	-15.78
+대/VV	어/EC	비하/VV	아야/EC	-15.89
 
 한다는	하/VX	ㄴ다는/ETM	
 하/VV	ㄴ다는/ETM	-4.611
@@ -8551,11 +8915,11 @@ TV/SL	와/NNG	-22.57
 식사/NNG	비/XPN	-21.38
 
 등을포함해	등/NNB	을/JKO	포함/NNG	하/XSV	아/EC	
-등을/UN	포함/NNG	하/XSV	아/EC	-23.45
-등을포함/UN	하/XSV	아/EC	-25.48
-등으/UN	ㄹ/ETM	포함/NNG	하/XSV	아/EC	-26.65
 등을/UN	포함/NNG	하/XSA	아/EC	-26.75
 등을포함해/UN	-27.11
+등을포함/UN	하/XSA	아/EC	-27.39
+등을포함/UN	하/VV	아/EC	-27.95
+등을/UN	포함/NNG	하/VV	아/EC	-28.27
 
 19만	19/SN	만/NR	
 19/SN	만/JX	-7.371
@@ -8648,6 +9012,13 @@ TV/SL	와/NNG	-22.57
 식/NNG	사비/NNG	-18.72
 식사/NNG	비/XPN	-21.38
 
+포함해	포함/NNG	하/XSV	아/EC	
+포함/NNG	하/XSA	아/EC	-9.265
+포함/NNG	하/VV	아/EC	-10.79
+포함/NNG	해/NNG	-11.58
+포함해/UN	-18.11
+포/NNG	함/NNG	하/XSA	아/EC	-18.93
+
 30만원이다.	30/SN	만/NR	원/NNB	이/VCP	다/EF	./SF	
 30/SN	만원/NNG	이/VCP	다/EF	./SF	-8.787
 30/SN	만/NR	원/NNB	이/VCP	다/EF	./SF	-9.241
@@ -8693,7 +9064,7 @@ TV/SL	와/NNG	-22.57
 이제/MAG	-7.036
 이제/IC	-11.59
 이/NP	제/XSN	-12.86
-이/NR	제/XSN	-17.42
+이/NP	저/NP	의/JKG	-16.64
 
 자리잡는	자리/NNG	잡/VV	는/ETM	
 자리잡/VV	는/ETM	-6.331
@@ -8724,11 +9095,11 @@ TV/SL	와/NNG	-22.57
 상품/NNG	화/XSN	권자/UN	를/JKO	-26.97
 
 모집했다"는	모집/NNG	하/XSV	았/EP	다/EC	"/SS	는/ETM	
-모집/NNG	하/XSV	았/EP	다/EF	"/SS	는/JX	-16.93
-모집/NNG	하/XSV	았/EP	다/EF	"/SS	는/ETM	-18.39
 모집/NNG	하/XSA	았/EP	다/EF	"/SS	는/JX	-21.12
-모집/NNG	하/XSV	았/EP	다/EF	"/SS	늘/VV	ㄴ/ETM	-21.12
-모집/NNG	하/XSV	았/EP	다/EC	"/SS	는/JX	-21.45
+모집/NNG	하/VV	았/EP	다/EF	"/SS	는/JX	-22.1
+모집/NNG	하/XSA	았/EP	다/EF	"/SS	는/ETM	-22.58
+모집/NNG	하/VV	았/EP	다/EF	"/SS	는/ETM	-23.56
+모집/NNG	하/XSA	았/EP	다/EF	"/SS	늘/VV	ㄴ/ETM	-25.3
 
 드림박스	드림박스/NNP	
 드림/NNG	박스/NNG	-16.63
@@ -8740,9 +9111,9 @@ TV/SL	와/NNG	-22.57
 이현열	이현열/NNP	
 이현/NNP	열/NNG	-16.95
 이현여/UN	ㄹ/ETM	-17.37
-이현/NNP	열/VV	ㄹ/ETM	-17.71
 이현/NNP	여/XSN	ㄹ/JKO	-19.54
 이현열/UN	-19.61
+이현/NNP	여/NNG	ㄹ/JKO	-21.76
 
 얘기다.	얘기/NNG	이/VCP	다/EF	./SF	
 얘기다/UN	./SF	-17.91
@@ -9470,6 +9841,13 @@ TV/SL	와/NNG	-22.57
 있느/UN	ㄴ/ETM	-13.66
 있는/UN	-16.61
 
+포함해	포함/NNG	하/XSV	아/EC	
+포함/NNG	하/XSA	아/EC	-9.265
+포함/NNG	하/VV	아/EC	-10.79
+포함/NNG	해/NNG	-11.58
+포함해/UN	-18.11
+포/NNG	함/NNG	하/XSA	아/EC	-18.93
+
 알	알/NNG	
 알/VV	ㄹ/ETM	-2.631
 알/NNG	-10.75
@@ -9569,11 +9947,18 @@ TV/SL	와/NNG	-22.57
 양계/NNG	인/XSN	들/XSN	이/JKS	-22.44
 
 마련했다"고	마련/NNG	하/XSV	았/EP	다/EC	"/SS	고/JKQ	
-마련/NNG	하/XSV	았/EP	다/EF	"/SS	고/EC	-16.79
 마련/NNG	하/XSA	았/EP	다/EF	"/SS	고/EC	-20.98
-마련/NNG	하/XSV	았/EP	다/EF	"/SS	고/JKQ	-21.01
-마련/NNG	하/XSV	았/EP	다/EC	"/SS	고/EC	-21.31
 마련/NNG	하/VV	았/EP	다/EF	"/SS	고/EC	-21.96
+마련/NNB	하/XSA	았/EP	다/EF	"/SS	고/EC	-22.87
+마련/NNG	하/XSA	았/EP	다/EF	"/SS	고/JKQ	-25.2
+마련/NNG	하/XSA	았/EP	다/EC	"/SS	고/EC	-25.5
+
+말했다.	말/NNG	하/XSV	았/EP	다/EF	./SF	
+말하/VV	았/EP	다/EF	./SF	-8.016
+말/NNG	하/XSA	았/EP	다/EF	./SF	-8.724
+말/NNG	하/VV	았/EP	다/EF	./SF	-9.706
+말/NNB	하/XSA	았/EP	다/EF	./SF	-15.34
+말했/UN	다/EF	./SF	-16.46
 
 양계	양계/NNG	
 양/NNG	계/XSN	-10.03
@@ -9604,11 +9989,11 @@ TV/SL	와/NNG	-22.57
 독특/NNG	하/VV	ㄴ/ETM	-11.75
 
 곤란해지는	곤란/NNG	하/XSA	아/EC	지/VX	는/ETM	
-곤란/NNG	하/XSV	아/EC	지/VX	는/ETM	-13.17
 곤란/NNG	해지/NNG	는/JX	-15.24
 곤란/NNG	하/XSA	아/EC	지/VX	는/ETM	-16.47
 곤란/NNG	해지/VV	는/ETM	-16.95
 곤란/NNG	하/VV	아/EC	지/VX	는/ETM	-18
+곤란/NNG	해지/NNG	늘/VV	ㄴ/ETM	-21.79
 
 시대가	시대/NNG	가/JKC	
 시대/NNG	가/JKS	-4.449
@@ -10042,6 +10427,13 @@ TV/SL	와/NNG	-22.57
 부/NNB	연구원/NNG	(/SS	48/SN	)/SS	이/JKS	-22.12
 부/XPN	연구원/NNG	(/SS	48/SN	)/SS	이/JKC	-22.96
 
+내한했다.	내한/NNG	하/XSV	았/EP	다/EF	./SF	
+내한/NNG	하/XSA	았/EP	다/EF	./SF	-13.08
+내한/NNG	하/VV	았/EP	다/EF	./SF	-14.06
+내/NP	한하/VV	았/EP	다/EF	./SF	-15.52
+내한했/UN	다/EF	./SF	-19.46
+내/NP	한/NNG	하/XSA	았/EP	다/EF	./SF	-21.27
+
 개혁-개방정책이	개혁/NNG	-/SS	개방/NNG	정책/NNG	이/JKS	
 개/NNB	혁/NNP	-/SO	개방/NNG	정책/NNG	이/JKS	-36.5
 개/NNG	혁/NNP	-/SO	개방/NNG	정책/NNG	이/JKS	-40.48
@@ -10052,9 +10444,9 @@ TV/SL	와/NNG	-22.57
 새로운	새롭/VA	ㄴ/ETM	
 새롭/VA	은/ETM	-4.518
 새로/MAG	울/VV	ㄴ/ETM	-11.78
+새/NNG	롭/XSA	은/ETM	-12.33
 새로우/UN	ㄴ/ETM	-15.16
 새로/MAG	울/VV	ㄴ/EF	-18
-새로운/UN	-18.11
 
 따라	따르/VV	아/EC	
 따/VV	아라/EC	-9.311
@@ -10068,6 +10460,13 @@ TV/SL	와/NNG	-22.57
 연변/NNP	대/XSN	에/JKB	도/JX	-20.03
 연변대/UN	에/JKB	도/JX	-21.37
 연/NNG	변/NNG	대/NNG	에/JKB	도/JX	-22.27
+
+시작했다고	시작/NNG	하/XSV	았/EP	다고/EC	
+시작/NNG	하/XSA	았/EP	다고/EC	-12.69
+시작/NNG	하/VV	았/EP	다고/EC	-13.67
+시작했/UN	다고/EC	-20.23
+시작/NNG	했다/UN	고/EC	-21.21
+시작했다/UN	고/EC	-21.55
 
 참여율은	참여/NNG	율/XSN	은/JX	
 참여율/NNG	은/JX	-9.497
@@ -10208,6 +10607,13 @@ TV/SL	와/NNG	-22.57
 조선/NNP	문/NNG	학과/NNG	-18.49
 조선/NNG	문학/NNG	과/JC	-18.64
 
+연구해	연구/NNG	하/XSV	아/EC	
+연구/NNG	하/XSA	아/EC	-8.796
+연구/NNG	하/VV	아/EC	-10.32
+연구/NNG	해/NNG	-11.11
+연/NNG	구하/VV	아/EC	-13.38
+연구해/UN	-18.11
+
 온	오/VX	ㄴ/ETM	
 오/VV	ㄴ/ETM	-2.665
 오/VX	ㄴ/ETM	-3.177
@@ -10246,8 +10652,8 @@ TV/SL	와/NNG	-22.57
 모시/VV	어/EC	오/VX	ㄴ/ETM	-9.927
 모시/VV	어/EC	오/VV	ㄴ/ETM	-11.79
 모시/VV	여/EC	오/VX	ㄴ/ETM	-13.06
+몰/VV	시/EP	어/EC	오/VX	ㄴ/ETM	-14.62
 모시/VV	여/EC	오/VV	ㄴ/ETM	-14.93
-모셔오/UN	ㄴ/ETM	-15.16
 
 여성관과	여성관/NNG	과/JC	
 여성관/NNG	과/JKB	-10.58
@@ -10269,6 +10675,13 @@ TV/SL	와/NNG	-22.57
 어떻/VA	ㄴ/EF	-8.153
 어떠/XR	ㄴ/JX	-14.64
 어/IC	떨/VV	ㄴ/ETM	-17.18
+
+취사선택해야	취사선택/NNG	하/XSV	아야/EC	
+취사선택/NNG	하/XSA	아야/EC	-13.54
+취사선택/NNG	하/VV	아야/EC	-15.06
+취사선택/NNG	해/NNG	야/JX	-17.95
+취사/NNG	선택/NNG	하/XSA	아야/EC	-19.04
+취사선택/NNG	하/XSA	아/EC	야/JX	-19.96
 
 할지가	하/VX	ㄹ지/EC	가/JKS	
 하/VV	ㄹ지/EC	가/JKS	-12
@@ -10318,6 +10731,13 @@ TV/SL	와/NNG	-22.57
 따/VV	라/EF	-16.06
 따라/VV	-46.03
 
+변화해	변화/NNG	하/XSV	아/EC	
+변화/NNG	하/XSA	아/EC	-8.897
+변화/NNG	하/VV	아/EC	-10.42
+변화/NNG	해/NNG	-11.21
+변/NNG	화해/NNG	-14.5
+변/NNG	화하/VV	아/EC	-16.33
+
 왔는지가	오/VX	았/EP	는지/EC	가/JKS	
 오/VV	았/EP	는지/EC	가/JKS	-14.3
 오/VX	았/EP	는지/EC	가/JKS	-14.47
@@ -10326,11 +10746,11 @@ TV/SL	와/NNG	-22.57
 왔/UN	는지/EC	가/JKS	-20.19
 
 흥미로운	흥미/NNG	롭/XSA	ㄴ/ETM	
+흥미/NNG	롭/XSA	은/ETM	-12
 흥미/NNG	로/JKB	울/VV	ㄴ/ETM	-18.05
 흥미로우/UN	ㄴ/ETM	-19.66
-흥미/NNG	로우/UN	ㄴ/ETM	-21.52
+흥/NNG	미/NNG	롭/XSA	은/ETM	-20.78
 흥미로/UN	울/VV	ㄴ/ETM	-22.6
-흥미로운/UN	-22.61
 
 연구과제라고	연구/NNG	과제/NNG	이/VCP	라고/EC	
 연구과제/UN	라고/EC	-21.88
@@ -10360,6 +10780,20 @@ TV/SL	와/NNG	-22.57
 고장나서/UN	-21.11
 고/XPN	장/NNG	나서/VV	어/EC	-21.81
 
+의뢰했으나	의뢰/NNG	하/XSV	았/EP	으나/EC	
+의뢰/NNG	하/XSA	았/EP	으나/EC	-16.08
+의뢰/NNG	하/VV	았/EP	으나/EC	-17.06
+의뢰했/UN	으나/EC	-19.48
+의뢰했으나/UN	-24.11
+의뢰/NNG	해/NNG	ㅆ/UN	으나/EC	-25.62
+
+환불해	환불/NNG	하/XSV	아/EC	
+환불/NNG	하/XSA	아/EC	-12.17
+환불/NNG	하/VV	아/EC	-13.7
+환불/NNG	해/NNG	-14.49
+환/NNG	불/NNG	하/XSA	아/EC	-19.33
+환불해/UN	-19.61
+
 합니다.	하/VV	ㅂ니다/EF	./SF	
 하/VV	ㅂ니다/EF	./SF	-5.805
 하/VX	ㅂ니다/EF	./SF	-5.996
@@ -10380,6 +10814,13 @@ TV/SL	와/NNG	-22.57
 있/VA	지/EC	-6.85
 있/VX	지/EF	-11.03
 있/VV	지/EF	-11.89
+
+가산해	가산/NNG	하/XSV	아/EC	
+가산/NNG	하/XSA	아/EC	-11.76
+가산/NNG	하/VV	아/EC	-13.29
+가산/NNG	해/NNG	-14.08
+가산해/UN	-18.11
+가산/NNP	해/NNG	-18.27
 
 있습니다."한	있/VV	습니다/EF	./SF	"/SS	하/VV	ㄴ/ETM	
 있/VX	습니다/EF	./SF	"/SS	하/XSV	ㄴ/ETM	-9.72
@@ -10405,9 +10846,9 @@ TV/SL	와/NNG	-22.57
 새로운	새롭/VA	ㄴ/ETM	
 새롭/VA	은/ETM	-4.518
 새로/MAG	울/VV	ㄴ/ETM	-11.78
+새/NNG	롭/XSA	은/ETM	-12.33
 새로우/UN	ㄴ/ETM	-15.16
 새로/MAG	울/VV	ㄴ/EF	-18
-새로운/UN	-18.11
 
 21일까지	21/SN	일/NNB	까지/JX	
 21/SN	일/NNG	까지/JX	-5.274
@@ -10437,6 +10878,13 @@ TV/SL	와/NNG	-22.57
 정보/NNG	관리실/NNG	장/NNB	은/JX	-22.85
 정보/NNG	관리/NNG	실/NNG	장/NNG	은/JX	-23.13
 
+예상했던	예상/NNG	하/XSV	았/EP	던/ETM	
+예상/NNG	하/XSA	았/EP	던/ETM	-14.08
+예상/NNG	하/VV	았/EP	던/ETM	-15.06
+예/NNG	상하/VV	았/EP	던/ETM	-17.24
+예상했/UN	던/ETM	-19.66
+예/IC	상하/VV	았/EP	던/ETM	-20.13
+
 있다"면서	있/VX	다/EC	"/SS	면서/EC	
 있/VX	다/EF	"/SS	면서/EC	-13.73
 있/VV	다/EF	"/SS	면서/EC	-14.59
@@ -10465,6 +10913,13 @@ TV/SL	와/NNG	-22.57
 보/VX	ㄴ다/EC	"/SS	고/EC	-16.94
 보/VX	ㄴ다/EF	"/SS	고/JKQ	-18.55
 
+말했다.	말/NNG	하/XSV	았/EP	다/EF	./SF	
+말하/VV	았/EP	다/EF	./SF	-8.016
+말/NNG	하/XSA	았/EP	다/EF	./SF	-8.724
+말/NNG	하/VV	았/EP	다/EF	./SF	-9.706
+말/NNB	하/XSA	았/EP	다/EF	./SF	-15.34
+말했/UN	다/EF	./SF	-16.46
+
 이뤄진다.	이루어지/VV	ㄴ다/EF	./SF	
 이루/VV	어/EC	지/VX	ㄴ다/EF	./SF	-10.11
 이뤄지/UN	ㄴ다/EF	./SF	-17.53
@@ -10477,6 +10932,13 @@ TV/SL	와/NNG	-22.57
 따/VV	아라/EF	-13.64
 따/VV	라/EF	-16.06
 따라/VV	-46.03
+
+이용해	이용/NNG	하/XSV	아/EC	
+이용/NNG	하/XSA	아/EC	-9.032
+이용/NNG	하/VV	아/EC	-10.56
+이용/NNG	해/NNG	-11.35
+이/NP	용하/VA	아/EC	-17.01
+이/MM	용해/NNG	-18
 
 이뤄진다는	이루어지/VV	ㄴ다는/ETM	
 이루/VV	어/EC	지/VX	ㄴ다는/ETM	-10.75
@@ -10561,6 +11023,13 @@ TV/SL	와/NNG	-22.57
 연건동개발/UN	원/NNB	-32.49
 연건/UN	동/NNG	개발원/NNG	-32.91
 연건동개발원/UN	-33.11
+
+제막했다.	제막/NNG	하/XSV	았/EP	다/EF	./SF	
+제막/NNG	하/XSA	았/EP	다/EF	./SF	-14.12
+제막/NNG	하/VV	았/EP	다/EF	./SF	-15.1
+제/XPN	막/NNG	하/XSA	았/EP	다/EF	./SF	-17.47
+제/XPN	막/NNG	하/VV	았/EP	다/EF	./SF	-18.46
+제막했/UN	다/EF	./SF	-19.46
 
 백금남	백금남/NNP	
 백금/NNG	남/NNG	-15.88
@@ -10789,6 +11258,13 @@ TV/SL	와/NNG	-22.57
 말/NNG	단급/UN	으로/JKB	-20.62
 말/VX	단/ETM	급/NNG	으로/JKB	-20.87
 
+구성해	구성/NNG	하/XSV	아/EC	
+구성/NNG	하/XSA	아/EC	-9.225
+구성/NNG	하/VV	아/EC	-10.75
+구성/NNG	해/NNG	-11.54
+구성해/UN	-18.11
+구/XPN	성/NNG	하/XSA	아/EC	-18.4
+
 전담케	전담/NNG	하/XSV	게/EC	
 전담케/UN	-19.61
 전담/NNG	케/UN	-19.84
@@ -10900,6 +11376,13 @@ TV/SL	와/NNG	-22.57
 제도/NNG	가/VV	아/EC	-12.24
 제/XPN	도가/NNG	-12.44
 
+말했다.	말/NNG	하/XSV	았/EP	다/EF	./SF	
+말하/VV	았/EP	다/EF	./SF	-8.016
+말/NNG	하/XSA	았/EP	다/EF	./SF	-8.724
+말/NNG	하/VV	았/EP	다/EF	./SF	-9.706
+말/NNB	하/XSA	았/EP	다/EF	./SF	-15.34
+말했/UN	다/EF	./SF	-16.46
+
 다른	다른/MM	
 다르/VA	ㄴ/ETM	-2.248
 다른/MM	-5.383
@@ -10927,6 +11410,13 @@ TV/SL	와/NNG	-22.57
 피/VV	어/EC	는데/EC	-15.03
 펴느/UN	ㄴ데/EC	-15.03
 펴/VV	는데/EF	-16.22
+
+대표해	대표/NNG	하/XSV	아/EC	
+대표/NNG	하/XSA	아/EC	-9.052
+대표/NNG	하/VV	아/EC	-10.58
+대표/NNG	해/NNG	-11.37
+대/XPN	표/NNG	하/XSA	아/EC	-13.78
+대/XPN	표/NNG	하/VV	아/EC	-15.31
 
 지지와	지지/NNG	와/JC	
 지지/NNG	와/JKB	-8.053
@@ -10990,11 +11480,11 @@ TV/SL	와/NNG	-22.57
 내용별/UN	-/SO	취향/NNG	별/NNP	-/SO	나이/NNG	별/NNG	로/JKB	-67.96
 
 다양해	다양/NNG	하/XSA	아/EC	
-다양/NNG	하/XSV	아/EC	-6.345
 다양/XR	하/XSA	아/EC	-7.592
-다양/XR	하/XSV	아/EC	-8.967
 다양/NNG	하/XSA	아/EC	-9.645
+다양/NNG	하/VV	아/EC	-11.17
 다양/NNG	해/NNG	-11.96
+다양/XR	해/NNG	-16.66
 
 '차림'은	'/SS	차림/NNP	'/SS	은/JX	
 '/SS	차림/NNG	'/SS	은/JX	-12.96
@@ -11512,19 +12002,26 @@ TV/SL	와/NNG	-22.57
 2/SN	층/XSN	-9.122
 2/SN	층/NNG	-9.254
 
-찾아서'가	찾/VV	아서/EC	'/SS	가/JKS	
-찾아서/UN	'/SS	가/JKS	-22.54
-찾/VV	아서/EF	'/SS	가/JKS	-24.07
-찾아서/UN	'/SS	가/VV	아/EC	-27.28
-찾아/UN	서/VV	어/EC	'/SS	가/JKS	-28.18
-찾아/UN	서/JKB	'/SS	가/JKS	-28.58
-
 시폰,	시폰/NNG	,/SP	
 시폰/UN	,/SP	-15.26
 시/NNG	폰/NNG	,/SP	-16.99
 시포/UN	ㄴ/ETM	,/SP	-17.52
 시/NNB	폰/NNG	,/SP	-18.73
 시포/UN	ㄴ/JX	,/SP	-21.81
+
+이용해	이용/NNG	하/XSV	아/EC	
+이용/NNG	하/XSA	아/EC	-9.032
+이용/NNG	하/VV	아/EC	-10.56
+이용/NNG	해/NNG	-11.35
+이/NP	용하/VA	아/EC	-17.01
+이/MM	용해/NNG	-18
+
+재해석했다.	재/XPN	해석/NNG	하/XSV	았/EP	다/EF	./SF	
+재/XPN	해석/NNG	하/XSA	았/EP	다/EF	./SF	-13.82
+재/XPN	해석/NNG	하/VV	았/EP	다/EF	./SF	-14.8
+재/NNG	해석/NNG	하/XSA	았/EP	다/EF	./SF	-20.51
+재/NNG	해석/NNG	하/VV	았/EP	다/EF	./SF	-21.49
+재해/NNG	석/NNG	하/XSA	았/EP	다/EF	./SF	-22.34
 
 서로	서로/MAG	
 서로/NNG	-6.957
@@ -11586,8 +12083,8 @@ TV/SL	와/NNG	-22.57
 내년/NNG	도/JX	-6.404
 내/NP	년/NNB	도/JX	-11.72
 내/NNB	년/NNB	도/JX	-13.67
+나/NP	의/JKG	년/NNB	도/JX	-14.04
 내/NP	년도/NNB	-14.78
-내/VV	어/EC	년/NNB	도/JX	-16.71
 
 한일여성	한/NNP	일/NNP	여성/NNG	
 한/MM	일/NNG	여성/NNG	-13.32
@@ -11665,6 +12162,13 @@ TV/SL	와/NNG	-22.57
 넘/VV	어/EC	서/VV	어/EC	-12.42
 넘/VV	어/EC	서/JKB	-12.58
 넘어서/VV	어/EF	-14.28
+
+기록했다.	기록/NNG	하/XSV	았/EP	다/EF	./SF	
+기록/NNG	하/XSA	았/EP	다/EF	./SF	-10.46
+기록/NNG	하/VV	았/EP	다/EF	./SF	-11.45
+기록했/UN	다/EF	./SF	-19.46
+기록/NNG	하/XSA	았/EP	다/EC	./SF	-21.54
+기록/NNG	하/VV	았/EP	다/EC	./SF	-22.52
 
 한	한/MM	
 하/VV	ㄴ/ETM	-2.33
@@ -11837,12 +12341,26 @@ TV/SL	와/NNG	-22.57
 하/VX	아/EC	는/JX	-7.767
 하느/UN	ㄴ/ETM	-12.16
 
+대비해야	대비/NNG	하/XSV	아야/EC	
+대비/NNG	하/XSA	아야/EC	-11.29
+대비/NNG	하/VV	아야/EC	-12.82
+대비/NNG	해/NNG	야/JX	-15.71
+대/NNG	비하/VV	아야/EC	-15.78
+대/VV	어/EC	비하/VV	아야/EC	-15.89
+
 할	하/VX	ㄹ/ETM	
 하/VV	ㄹ/ETM	-3.037
 하/VX	ㄹ/ETM	-4.056
 할/NNB	-7.143
 하/NNG	ㄹ/JKO	-17.52
 하/VV	아/EC	ㄹ/UN	-21.57
+
+분석했다.	분석/NNG	하/XSV	았/EP	다/EF	./SF	
+분석/NNG	하/XSA	았/EP	다/EF	./SF	-10.54
+분석/NNG	하/VV	았/EP	다/EF	./SF	-11.52
+분석했/UN	다/EF	./SF	-20.96
+분/NNB	석/NNB	하/XSA	았/EP	다/EF	./SF	-21.31
+분/NNB	석/NNG	하/XSA	았/EP	다/EF	./SF	-21.57
 
 이신우씨	이신우/NNP	씨/NNB	
 이신우씨/UN	-21.11
@@ -12066,11 +12584,11 @@ TV/SL	와/NNG	-22.57
 아/IC	-/SO	태/NNG	지역/NNG	본/NNG	부/NNG	-42.19
 
 정씨(여)는	정/NNP	씨/NNB	(/SS	여/NNG	)/SS	는/JX	
+정/NNP	씨/NNB	(/SS	이/VCP	여/EC	)/SS	는/JX	-29.48
 정/NNP	씨/NNB	(/SS	여/EC	)/SS	는/JX	-29.91
 정/NNP	씨/NNB	(/SS	여/NNG	)/SS	는/JX	-30.52
-정/NNP	씨/NNB	(/SS	여/XSN	)/SS	는/JX	-31.17
-정/NNP	씨/NNB	(/SS	여/EC	)/SS	는/ETM	-31.37
-정/NNP	씨/NNB	(/SS	이/VCP	여/EF	)/SS	는/JX	-31.75
+정/NNP	씨/NNB	(/SS	이/VCP	여/EC	)/SS	는/ETM	-30.94
+정/NNP	씨/NNB	(/SS	이/VCP	어/EF	)/SS	는/JX	-31.14
 
 아-태지역	아/NNP	-/SS	태/NNP	지역/NNG	
 아/IC	-/SO	태/NNG	지역/NNG	-27.53
@@ -12436,6 +12954,20 @@ TV/SL	와/NNG	-22.57
 부/XPN	족/NNG	하/XSV	ㄴ/ETM	-12.2
 부/NNG	족/NNG	하/XSV	ㄴ/ETM	-13.34
 
+말했다.	말/NNG	하/XSV	았/EP	다/EF	./SF	
+말하/VV	았/EP	다/EF	./SF	-8.016
+말/NNG	하/XSA	았/EP	다/EF	./SF	-8.724
+말/NNG	하/VV	았/EP	다/EF	./SF	-9.706
+말/NNB	하/XSA	았/EP	다/EF	./SF	-15.34
+말했/UN	다/EF	./SF	-16.46
+
+시작했다.	시작/NNG	하/XSV	았/EP	다/EF	./SF	
+시작/NNG	하/XSA	았/EP	다/EF	./SF	-9.567
+시작/NNG	하/VV	았/EP	다/EF	./SF	-10.55
+시작했/UN	다/EF	./SF	-19.46
+시작/NNG	하/XSA	았/EP	다/EC	./SF	-20.65
+시작/NNG	하/VV	았/EP	다/EC	./SF	-21.63
+
 현대	현대/NNP	
 현대/NNG	-6.871
 현대/NNP	-8.191
@@ -12476,6 +13008,13 @@ TV/SL	와/NNG	-22.57
 있/VA	어/EC	-5.967
 있/VX	어/EF	-10.71
 있/VV	어/EF	-11.57
+
+말했다.	말/NNG	하/XSV	았/EP	다/EF	./SF	
+말하/VV	았/EP	다/EF	./SF	-8.016
+말/NNG	하/XSA	았/EP	다/EF	./SF	-8.724
+말/NNG	하/VV	았/EP	다/EF	./SF	-9.706
+말/NNB	하/XSA	았/EP	다/EF	./SF	-15.34
+말했/UN	다/EF	./SF	-16.46
 
 읍-면단위로	읍/NNG	-/SS	면/NNG	단위/NNG	로/JKB	
 읍/NNG	-/SO	면/NNG	단위/NNG	로/JKB	-58.05
@@ -12574,6 +13113,13 @@ TV/SL	와/NNG	-22.57
 있/VV	다/EC	"/SS	고/EC	-14.64
 있/VX	다/EC	"/SS	고/EC	-15.16
 있/VA	다/EF	"/SS	고/EC	-16.31
+
+말했다.	말/NNG	하/XSV	았/EP	다/EF	./SF	
+말하/VV	았/EP	다/EF	./SF	-8.016
+말/NNG	하/XSA	았/EP	다/EF	./SF	-8.724
+말/NNG	하/VV	았/EP	다/EF	./SF	-9.706
+말/NNB	하/XSA	았/EP	다/EF	./SF	-15.34
+말했/UN	다/EF	./SF	-16.46
 
 세로	세로/NNG	
 세/NNB	로/JKB	-5.647
@@ -12683,6 +13229,13 @@ TV/SL	와/NNG	-22.57
 공휴일/NNG	이/JKC	-14.15
 공/NR	휴일/NNG	이/JKS	-16.77
 공휴/UN	일/NNB	이/JKS	-20.26
+
+게양해야	게양/NNG	하/XSV	아야/EC	
+게양/NNG	하/XSA	아야/EC	-13.71
+게양/NNG	하/VV	아야/EC	-15.23
+게양/NNG	해/NNG	야/JX	-18.12
+게양/NNG	하/XSA	아/EC	야/JX	-20.13
+게양해야/UN	-21.11
 
 한다.	하/VX	ㄴ다/EF	./SF	
 하/VV	ㄴ다/EF	./SF	-4.798
@@ -13027,6 +13580,13 @@ TV/SL	와/NNG	-22.57
 가/VX	아/EC	까이/UN	-29.9
 가/VV	까/EC	이/XSN	-31.81
 
+활동해	활동/NNG	하/XSV	아/EC	
+활동/NNG	하/XSA	아/EC	-8.836
+활동/NNG	하/VV	아/EC	-10.36
+활동/NNG	해/NNG	-11.15
+활/NNG	동하/VV	아/EC	-17.86
+활/NNG	동/NNG	하/XSA	아/EC	-17.95
+
 온	오/VX	ㄴ/ETM	
 오/VV	ㄴ/ETM	-2.665
 오/VX	ㄴ/ETM	-3.177
@@ -13096,6 +13656,13 @@ TV/SL	와/NNG	-22.57
 계/NNG	속/NNG	-16.59
 계/NNG	속/NNB	-28.86
 
+손질해	손질/NNG	하/XSV	아/EC	
+손질/NNG	하/XSA	아/EC	-11.03
+손질/NNG	하/VV	아/EC	-12.56
+손질/NNG	해/NNG	-13.34
+손/NNG	질/NNG	하/XSA	아/EC	-15.78
+손/NNG	질/NNG	하/VV	아/EC	-17.31
+
 온	오/VX	ㄴ/ETM	
 오/VV	ㄴ/ETM	-2.665
 오/VX	ㄴ/ETM	-3.177
@@ -13122,7 +13689,7 @@ TV/SL	와/NNG	-22.57
 못하/VX	았/EP	었/EP	다/EF	"/SS	는/JX	-16.02
 못하/VX	았었/EP	다/EF	"/SS	는/ETM	-16.26
 못하/VX	았/EP	었/EP	다/EF	"/SS	는/ETM	-17.48
-못/MAG	하/XSV	았었/EP	다/EF	"/SS	는/JX	-18.15
+못하/VX	았었/EP	다/EF	"/SS	늘/VV	ㄴ/ETM	-18.99
 
 고씨는	고/NNP	씨/NNB	는/JX	
 고씨/UN	는/ETM	-13.02
@@ -13198,8 +13765,8 @@ TV/SL	와/NNG	-22.57
 풀어쓰/VV	려/EC	-10.27
 풀/VV	어/EC	쓰/VV	려/EC	-14.06
 풀/VV	어/EC	쓸/VV	려/EC	-16.7
+풀어쓰/VV	리/EP	어/EC	-19.49
 풀/VV	어/EC	쓰리/VA	어/EC	-19.83
-풀어쓰려/UN	-21.11
 
 애썼다"고	애쓰/VV	었/EP	다/EC	"/SS	고/JKQ	
 애썼다/UN	"/SS	고/EC	-23.54
@@ -13214,6 +13781,13 @@ TV/SL	와/NNG	-22.57
 고씨느/UN	ㄴ/ETM	-15.16
 고씨는/UN	-18.11
 고씨/UN	늘/VV	ㄴ/ETM	-18.64
+
+설명했다.	설명/NNG	하/XSV	았/EP	다/EF	./SF	
+설명/NNG	하/XSA	았/EP	다/EF	./SF	-10.21
+설명/NNG	하/VV	았/EP	다/EF	./SF	-11.19
+설/NNG	명하/VV	았/EP	다/EF	./SF	-18.67
+서/VV	ㄹ/ETM	명/NNB	하/XSA	았/EP	다/EF	./SF	-20.25
+설/NNB	명/NNB	하/XSA	았/EP	다/EF	./SF	-20.36
 
 이날과	이날/NNG	과/JC	
 이날/NNG	과/JKB	-8.787
@@ -13432,6 +14006,13 @@ TV/SL	와/NNG	-22.57
 철제문/UN	은/ETM	-20.45
 철/NNG	제/XSN	문/NNG	은/JX	-20.69
 
+흡수해	흡수/NNG	하/XSV	아/EC	
+흡수/NNG	하/XSA	아/EC	-10.39
+흡수/NNG	하/VV	아/EC	-11.92
+흡수/NNG	해/NNG	-12.71
+흡수해/UN	-18.11
+흡수/NNG	하/XSA	아/EF	-20.5
+
 이	이/MM	
 이/NP	-9.459
 이/MM	-9.826
@@ -13593,6 +14174,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 이/MM	브니/UN	ㅇ/VX	-33.3
 이/NR	브니/UN	ㅇ/VX	-34.16
 
+연결했다.	연결/NNG	하/XSV	았/EP	다/EF	./SF	
+연결/NNG	하/XSA	았/EP	다/EF	./SF	-10.76
+연결/NNG	하/VV	았/EP	다/EF	./SF	-11.74
+연/NNG	결하/VV	았/EP	다/EF	./SF	-17.8
+연/NNG	결/NNG	하/XSA	았/EP	다/EF	./SF	-20.35
+연결했/UN	다/EF	./SF	-20.96
+
 부드러운	부드럽/VA	ㄴ/ETM	
 부드럽/VA	은/ETM	-5.84
 부드러우/UN	ㄴ/ETM	-18.16
@@ -13606,6 +14194,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 닭서/UN	리/NNB	-20.79
 닭/NNG	서/VV	리/EC	-22.15
 닭서/UN	리/EC	-23.08
+
+등장했다.	등장/NNG	하/XSV	았/EP	다/EF	./SF	
+등장/NNG	하/XSA	았/EP	다/EF	./SF	-10.72
+등장/NNG	하/VV	았/EP	다/EF	./SF	-11.7
+등/NNB	장/NNG	하/XSA	았/EP	다/EF	./SF	-17.44
+등/NNB	장하/VA	았/EP	다/EF	./SF	-17.57
+등/NNB	장/NNG	하/VV	았/EP	다/EF	./SF	-18.42
 
 효과와	효과/NNG	와/JC	
 효과/NNG	와/JKB	-7.003
@@ -13676,6 +14271,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 익히/VV	여/EC	먹/VV	을/ETM	-18.86
 익혀먹/UN	을/JKO	-19.27
 익히/VV	여/EC	먹/VX	을/ETM	-21.46
+
+사용해	사용/NNG	하/XSV	아/EC	
+사용/NNG	하/XSA	아/EC	-8.695
+사용/NNG	하/VV	아/EC	-10.22
+사용/NNG	해/NNG	-11.01
+사/NNG	용해/NNG	-16.24
+사/NR	용해/NNG	-17.56
 
 왔다.	오/VX	았/EP	다/EF	./SF	
 오/VV	았/EP	다/EF	./SF	-3.721
@@ -13789,13 +14391,6 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 굳어/UN	-15.11
 굳/VV	어/EF	-16.32
 
-담아서	담/VV	아서/EC	
-담아/UN	서/JKB	-18
-담아서/UN	-18.11
-담/VV	아서/EF	-20.32
-담아/UN	서/VV	어/EC	-20.36
-담/VV	아/EF	서/JKB	-21.84
-
 장어나	장어/NNG	나/JC	
 장어/NNG	나/JX	-13.48
 장어/NNG	나/JC	-13.88
@@ -13809,6 +14404,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 하/VV	ㄴ다/EC	./SF	-12.59
 하/VX	ㄴ다/EC	./SF	-14.16
 한다/UN	./SF	-16.41
+
+포장해서	포장/NNG	하/XSV	아서/EC	
+포장/NNG	하/XSA	아서/EC	-11.26
+포장/NNG	하/VV	아서/EC	-12.79
+포장/NNG	해/NNG	서/JKB	-13.7
+포/NNG	장해/NNG	서/JKB	-16.55
+포장/NNG	해서/NNG	-17.23
 
 있다.	있/VV	다/EF	./SF	
 있/VX	다/EF	./SF	-2.01
@@ -13995,9 +14597,9 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 새로운	새롭/VA	ㄴ/ETM	
 새롭/VA	은/ETM	-4.518
 새로/MAG	울/VV	ㄴ/ETM	-11.78
+새/NNG	롭/XSA	은/ETM	-12.33
 새로우/UN	ㄴ/ETM	-15.16
 새로/MAG	울/VV	ㄴ/EF	-18
-새로운/UN	-18.11
 
 중대	중대/NNP	
 중대/NNG	-7.787
@@ -14012,6 +14614,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 주인/NNG	들/XSN	이/VCP	나/EC	-14.43
 주인/NNG	들이/VV	나/EC	-18.07
 주인/NNG	듣/VV	이/EC	나/JX	-19.08
+
+배출했다.	배출/NNG	하/XSV	았/EP	다/EF	./SF	
+배출/NNG	하/XSA	았/EP	다/EF	./SF	-11.96
+배출/NNG	하/VV	았/EP	다/EF	./SF	-12.94
+배출했/UN	다/EF	./SF	-19.46
+배/NNG	출/NNG	하/XSA	았/EP	다/EF	./SF	-19.6
+배/NNG	출/NNG	하/VV	았/EP	다/EF	./SF	-20.59
 
 주고	주/VV	고/EC	
 주/VX	고/EC	-2.43
@@ -14048,6 +14657,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 줄/VV	ㄹ/ETM	-6.593
 줄/NNG	-7.816
 
+복용했으나	복용/NNG	하/XSV	았/EP	으나/EC	
+복용/NNG	하/XSA	았/EP	으나/EC	-16.32
+복용/NNG	하/VV	았/EP	으나/EC	-17.3
+복용했/UN	으나/EC	-22.48
+복/NNG	용하/VA	았/EP	으나/EC	-22.78
+복/NNG	용/XSN	하/VV	았/EP	으나/EC	-24.5
+
 사례다.	사례/NNG	이/VCP	다/EF	./SF	
 사례다/UN	./SF	-17.91
 사례/NNG	다/JX	./SF	-20.31
@@ -14082,6 +14698,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 치료차/UN	-16.61
 치료/NNG	차/VA	아/EC	-19.07
 
+복용했으나	복용/NNG	하/XSV	았/EP	으나/EC	
+복용/NNG	하/XSA	았/EP	으나/EC	-16.32
+복용/NNG	하/VV	았/EP	으나/EC	-17.3
+복용했/UN	으나/EC	-22.48
+복/NNG	용하/VA	았/EP	으나/EC	-22.78
+복/NNG	용/XSN	하/VV	았/EP	으나/EC	-24.5
+
 없자	없/VA	자/EC	
 없자/UN	-15.11
 
@@ -14099,12 +14722,26 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 본/NNG	-9.306
 본/NNP	-11.61
 
+확인했다.	확인/NNG	하/XSV	았/EP	다/EF	./SF	
+확인/NNG	하/XSA	았/EP	다/EF	./SF	-10.47
+확인/NNG	하/VV	았/EP	다/EF	./SF	-11.46
+확/MAG	인하/VV	았/EP	다/EF	./SF	-13.7
+확/NNG	인하/VV	았/EP	다/EF	./SF	-18.43
+확인했/UN	다/EF	./SF	-20.96
+
 이런	이런/MM	
 이렇/VA	ㄴ/ETM	-2.076
 이러/VV	ㄴ/ETM	-5.158
 이런/MM	-5.707
 이렇/VA	ㄴ/EF	-8.196
 이런/IC	-10.64
+
+과신해서는	과신/NNG	하/XSV	아서/EC	는/JX	
+과신/NNG	하/XSA	아서/EC	는/JX	-16.7
+과신/NNG	해/NNG	서/JKB	는/JX	-17.85
+과신/NNG	하/VV	아서/EC	는/JX	-18.22
+과신/NNG	해서/NNG	는/JX	-18.34
+과신해서/UN	는/ETM	-20.52
 
 안	안/MAG	
 알/VV	ㄴ/ETM	-1.925
@@ -14366,10 +15003,10 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 
 더해준다.	더/MAG	하/XSV	아/EC	주/VX	ㄴ다/EF	./SF	
 더하/VV	아/EC	주/VX	ㄴ다/EF	./SF	-11.55
-더/MAG	하/XSV	아/EC	주/VX	ㄴ다/EF	./SF	-11.66
 더/MAG	하/XSA	아/EC	주/VX	ㄴ다/EF	./SF	-13.57
 더/MAG	하/VV	아/EC	주/VX	ㄴ다/EF	./SF	-14.13
 더하/VA	아/EC	주/VX	ㄴ다/EF	./SF	-15.18
+더해주/UN	ㄴ다/EF	./SF	-17.53
 
 출산과	출산/NNG	과/JC	
 출산/NNG	과/JKB	-8.353
@@ -14788,6 +15425,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 증/NNG	상/XSN	과/JC	-15.63
 증/NNG	상/NNG	과/JKB	-16.4
 
+설명했다.	설명/NNG	하/XSV	았/EP	다/EF	./SF	
+설명/NNG	하/XSA	았/EP	다/EF	./SF	-10.21
+설명/NNG	하/VV	았/EP	다/EF	./SF	-11.19
+설/NNG	명하/VV	았/EP	다/EF	./SF	-18.67
+서/VV	ㄹ/ETM	명/NNB	하/XSA	았/EP	다/EF	./SF	-20.25
+설/NNB	명/NNB	하/XSA	았/EP	다/EF	./SF	-20.36
+
 양방-한방치료법이	양방/NNG	-/SS	한방/NNG	치료법/NNG	이/JKS	
 양방/UN	-/SO	한방/NNG	치료법/NNG	이/JKS	-35.26
 양방/UN	-/SO	한/MM	방/NNG	치료법/NNG	이/JKS	-36.04
@@ -14891,19 +15535,19 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 다양/NNG	하/XSA	ㄴ/ETM	-8.148
 다양/NNG	하/VV	ㄴ/ETM	-10.81
 
+소개했다.	소개/NNG	하/XSV	았/EP	다/EF	./SF	
+소개/NNG	하/XSA	았/EP	다/EF	./SF	-10.81
+소개/NNG	하/VV	았/EP	다/EF	./SF	-11.79
+소개했/UN	다/EF	./SF	-17.96
+소/XPN	개/NNG	하/XSA	았/EP	다/EF	./SF	-18.71
+소/XPN	개/NNG	하/VV	았/EP	다/EF	./SF	-19.69
+
 220여점	220/SN	여/XSN	점/NNB	
 220/SN	여/NNG	점/NNG	-16.07
 220/SN	여점/UN	-16.38
 220/SN	여저/UN	ㅁ/ETN	-17.6
 220/SN	여/NNG	점/NNB	-19.76
 220/SN	여/XPN	점/NNG	-20.46
-
-내	나/NP	의/JKG	
-내/VV	어/EC	-4.439
-내/VX	어/EC	-4.911
-내/NP	-7.057
-내/NNB	-7.348
-내/NNG	-11.82
 
 43년간의	43/SN	년/NNB	간/NNG	의/JKG	
 43/SN	년/NNB	간/NNB	의/JKG	-11.25
@@ -15087,6 +15731,20 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 도맡아만들다/UN	가/JKS	-30.82
 도맡아/UN	만들/VV	다/EF	가/JKS	-31.85
 
+시작했다.	시작/NNG	하/XSV	았/EP	다/EF	./SF	
+시작/NNG	하/XSA	았/EP	다/EF	./SF	-9.567
+시작/NNG	하/VV	았/EP	다/EF	./SF	-10.55
+시작했/UN	다/EF	./SF	-19.46
+시작/NNG	하/XSA	았/EP	다/EC	./SF	-20.65
+시작/NNG	하/VV	았/EP	다/EC	./SF	-21.63
+
+표기했다.	표기/NNG	하/XSV	았/EP	다/EF	./SF	
+표기/NNG	하/XSA	았/EP	다/EF	./SF	-12.23
+표기/NNG	하/VV	았/EP	다/EF	./SF	-13.21
+표/NNG	기하/VV	았/EP	다/EF	./SF	-15
+표기했/UN	다/EF	./SF	-17.96
+표/NNG	기/NNG	하/XSA	았/EP	다/EF	./SF	-20.68
+
 하는	하/VX	는/ETM	
 하/VV	는/ETM	-3.186
 하/VX	는/ETM	-4.206
@@ -15178,6 +15836,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 달라/VV	았/EP	다/EF	"/SS	고/EC	-19.37
 다르/VA	았/EP	다/EC	"/SS	고/JKQ	-23.12
 
+말했다고	말/NNG	하/XSV	았/EP	다고/EC	
+말하/VV	았/EP	다고/EC	-11.13
+말/NNG	하/XSA	았/EP	다고/EC	-11.84
+말/NNG	하/VV	았/EP	다고/EC	-12.82
+말했/UN	다고/EC	-17.23
+말/NNB	하/XSA	았/EP	다고/EC	-18.46
+
 '회비외에도	'/SS	회비/NNG	외/NNB	에/JKB	도/JX	
 '/SS	회비/NNG	외/NNG	에/JKB	도/JX	-17.11
 '/SS	회비/NNG	외/NNB	에/JKB	도/JX	-17.32
@@ -15186,11 +15851,11 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 '/SS	회비/NNG	외에/UN	도/JX	-22.02
 
 내야했다'(33.9%)	내/VV	어야/EC	하/VX	았/EP	다/EC	'/SS	(/SS	33/SN	./SP	9/SN	%/SW	)/SS	
-내야/NNG	하/XSV	았/EP	다/EF	'(/SS	33.9/SN	%/SW	)/SS	-14.7
 내/VV	어야/EC	하/VX	았/EP	다/EF	'(/SS	33.9/SN	%/SW	)/SS	-17.65
 내/VX	어야/EC	하/VX	았/EP	다/EF	'(/SS	33.9/SN	%/SW	)/SS	-18.12
 내야/NNG	하/XSA	았/EP	다/EF	'(/SS	33.9/SN	%/SW	)/SS	-18.89
-내야/NNG	하/XSV	았/EP	다/EC	'(/SS	33.9/SN	%/SW	)/SS	-19.22
+내/VV	어야/EC	하/VV	았/EP	다/EF	'(/SS	33.9/SN	%/SW	)/SS	-19.35
+내/VX	어야/EC	하/VV	았/EP	다/EF	'(/SS	33.9/SN	%/SW	)/SS	-19.82
 
 않았다'(30.8%)	않/VX	았/EP	다/EC	'/SS	(/SS	30/SN	./SP	8/SN	%/SW	)/SS	
 않았다/UN	'(/SS	30.8/SN	%/SW	)/SS	-20.13
@@ -15218,6 +15883,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 많았다/UN	'(/SS	15.8/SN	%/SW	)/SS	고/JKQ	-29.26
 많았/UN	다/EF	'(/SS	15.8/SN	%/SW	)/SS	고/JKQ	-30.8
 
+말했다.	말/NNG	하/XSV	았/EP	다/EF	./SF	
+말하/VV	았/EP	다/EF	./SF	-8.016
+말/NNG	하/XSA	았/EP	다/EF	./SF	-8.724
+말/NNG	하/VV	았/EP	다/EF	./SF	-9.706
+말/NNB	하/XSA	았/EP	다/EF	./SF	-15.34
+말했/UN	다/EF	./SF	-16.46
+
 않았다'(41.0%)	않/VX	았/EP	다/EC	'/SS	(/SS	41/SN	./SP	0/SN	%/SW	)/SS	
 않았다/UN	'(/SS	41.0/SN	%/SW	)/SS	-20.13
 않았/UN	다/EF	'(/SS	41.0/SN	%/SW	)/SS	-21.67
@@ -15244,12 +15916,26 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 없/VA	다/EC	'(/SS	49.3/SN	%/SW	)/SS	등/NNG	을/JKO	-17.33
 없다/UN	'(/SS	49.3/SN	%/SW	)/SS	등/NNB	을/JKO	-19.01
 
+지적했다고	지적/NNG	하/XSV	았/EP	다고/EC	
+지적/NNG	하/XSA	았/EP	다고/EC	-13.66
+지적/NNG	하/VV	았/EP	다고/EC	-14.65
+지적했/UN	다고/EC	-20.23
+지적했다/UN	고/EC	-21.55
+지적/NNG	했다/UN	고/EC	-22.19
+
+말했다.	말/NNG	하/XSV	았/EP	다/EF	./SF	
+말하/VV	았/EP	다/EF	./SF	-8.016
+말/NNG	하/XSA	았/EP	다/EF	./SF	-8.724
+말/NNG	하/VV	았/EP	다/EF	./SF	-9.706
+말/NNB	하/XSA	았/EP	다/EF	./SF	-15.34
+말했/UN	다/EF	./SF	-16.46
+
 불리해,	불리/NNG	하/XSA	아/EC	,/SP	
-불리/NNG	하/XSV	아/EC	,/SP	-11.81
 부르/VV	이/EC	하/VX	아/EC	,/SP	-11.98
 불리/XR	하/XSA	아/EC	,/SP	-12.52
 부르/VV	이/EC	하/VV	아/EC	,/SP	-12.78
-불리/XR	하/XSV	아/EC	,/SP	-13.9
+불리/NNG	하/XSA	아/EC	,/SP	-15.11
+불/XPN	리해/UN	,/SP	-15.12
 
 그대로	그대로/MAG	
 그/NP	대로/JX	-5.088
@@ -15303,9 +15989,9 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 안돼	안/MAG	되/XSV	어/EC	
 안되/VA	어/EC	-5.962
 안/NNG	되/XSV	어/EC	-6.634
+안/NNG	되/XSV	어/EC	-6.634
 안/MAG	되/XSV	어/EC	-7.637
-안/MAG	되/VV	어/EC	-8.732
-안/NNG	되/VV	어/EC	-10.09
+안/MAG	되/XSV	어/EC	-7.637
 
 온	오/VX	ㄴ/ETM	
 오/VV	ㄴ/ETM	-2.665
@@ -15345,6 +16031,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 빈/NNP	-7.92
 비/VA	ㄴ/ETM	-8.256
 빌/VV	ㄴ/EF	-10.52
+
+환불해주기	환불/NNG	하/XSV	아/EC	주/VX	기/ETN	
+환불/NNG	하/XSA	아/EC	주/VX	기/ETN	-20.95
+환불/NNG	해/NNG	주기/NNG	-21.45
+환불/NNG	하/VV	아/EC	주/VX	기/ETN	-22.48
+환불/NNG	해/NNG	주/VV	기/ETN	-24.45
+환불/NNG	하/XSA	아/EC	주/VV	기/ETN	-25.1
 
 현재	현재/MAG	
 현재/NNG	-6.476
@@ -15429,6 +16122,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 비/VA	ㄴ/ETM	-8.256
 빌/VV	ㄴ/EF	-10.52
 
+환불해주는	환불/NNG	하/XSV	아/EC	주/VX	는/ETM	
+환불/NNG	하/XSA	아/EC	주/VX	는/ETM	-17.41
+환불/NNG	하/VV	아/EC	주/VX	는/ETM	-18.94
+환불/NNG	해/NNG	주/VV	는/ETM	-21.17
+환불/NNG	하/XSA	아/EC	주/VV	는/ETM	-21.82
+환불해주/UN	는/ETM	-22.02
+
 불과하다고	불과/MAG	하/XSA	다고/EC	
 불과/MAG	하/XSV	다/EC	고/EC	-18.87
 불과/MAG	하다/UN	고/EC	-18.89
@@ -15449,6 +16149,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 대/NNB	체로/UN	30/SN	%/SW	이상/NNG	-28.46
 대/XPN	체로/UN	30/SN	%/SW	이상/NNP	-31.43
 대/XPN	체로/UN	30/SN	%/SW	이/NP	상/XSN	-33.1
+
+환불해	환불/NNG	하/XSV	아/EC	
+환불/NNG	하/XSA	아/EC	-12.17
+환불/NNG	하/VV	아/EC	-13.7
+환불/NNG	해/NNG	-14.49
+환/NNG	불/NNG	하/XSA	아/EC	-19.33
+환불해/UN	-19.61
 
 1백∼1백	1/SN	백/NR	~/SO	1/SN	백/NR	
 1/SN	백/NR	∼/SO	1/SN	백/NR	-15.26
@@ -15524,6 +16231,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 비/VA	ㄴ/ETM	-8.256
 빌/VV	ㄴ/EF	-10.52
 
+회수해줄	회수/NNG	하/XSV	아/EC	주/VX	ㄹ/ETM	
+회수/NNG	하/XSA	아/EC	주/VX	ㄹ/ETM	-16.03
+회수/NNG	하/VV	아/EC	주/VX	ㄹ/ETM	-17.56
+회수해주/UN	ㄹ/ETM	-18.87
+회수/NNG	해/NNG	주/VV	ㄹ/ETM	-19.79
+회수/NNG	해/NNG	줄/NNG	-20.16
+
 어디에서고	어디/NP	에서/JKB	이/VCP	고/EC	
 어디/NP	에/JKB	서/VV	고/EC	-16.31
 어디에서/UN	고/EC	-18.55
@@ -15580,6 +16294,20 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 바람직/XR	하/XSV	아다/EC	고/EC	-20.27
 바람직/XR	하다/UN	고/EC	-24.34
 
+주장했다.	주장/NNG	하/XSV	았/EP	다/EF	./SF	
+주장/NNG	하/XSA	았/EP	다/EF	./SF	-10.09
+주장/NNG	하/VV	았/EP	다/EF	./SF	-11.07
+주장했/UN	다/EF	./SF	-19.46
+주/NNG	장/NNG	하/XSA	았/EP	다/EF	./SF	-20.17
+주/NNG	장/NNG	하/VV	았/EP	다/EF	./SF	-21.15
+
+강화해야	강화/NNG	하/XSV	아야/EC	
+강화/NNG	하/XSA	아야/EC	-11.03
+강화/NNG	하/VV	아야/EC	-12.56
+강화/NNG	해/NNG	야/JX	-15.44
+강화/NNG	하/XSA	아/EC	야/JX	-17.45
+강/NNG	화해/NNG	야/JX	-17.59
+
 한다고	하/VX	ㄴ다고/EC	
 하/VV	ㄴ다고/EC	-4.678
 하/VX	ㄴ다고/EC	-6.244
@@ -15625,9 +16353,9 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 새로운	새롭/VA	ㄴ/ETM	
 새롭/VA	은/ETM	-4.518
 새로/MAG	울/VV	ㄴ/ETM	-11.78
+새/NNG	롭/XSA	은/ETM	-12.33
 새로우/UN	ㄴ/ETM	-15.16
 새로/MAG	울/VV	ㄴ/EF	-18
-새로운/UN	-18.11
 
 다양한	다양/NNG	하/XSA	ㄴ/ETM	
 다양/NNG	하/XSV	ㄴ/ETM	-5.496
@@ -16076,18 +16804,18 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 있는/UN	-16.61
 
 제	제/NNG	
+저/NP	의/JKG	-3.494
 제/MM	-7.941
 제/NP	-8.734
 제/XPN	-8.995
 제/NNG	-13.75
-제/NNB	-13.91
 
 중국제	중국제/NNG	
 중국/NNP	제/XSN	-12.05
+중국/NNP	저/NP	의/JKG	-12.23
 중/NNB	국제/NNG	-12.98
 중/NNG	국제/NNG	-15.13
 중/NNP	국제/NNG	-17.28
-중국/NNP	제/NP	-17.47
 
 빨리	빨리/MAG	
 빠르/VA	이/EC	-4.247
@@ -16109,6 +16837,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 있/VA	는/ETM	-5.746
 있느/UN	ㄴ/ETM	-13.66
 있는/UN	-16.61
+
+발표했다.	발표/NNG	하/XSV	았/EP	다/EF	./SF	
+발표/NNG	하/XSA	았/EP	다/EF	./SF	-10.56
+발표/NNG	하/VV	았/EP	다/EF	./SF	-11.54
+발/NNG	표하/VV	았/EP	다/EF	./SF	-15.54
+발/NNG	표/NNG	하/XSA	았/EP	다/EF	./SF	-16.53
+발/NNG	표/NNG	하/VV	았/EP	다/EF	./SF	-17.51
 
 우수'란	우수/NNG	'/SS	이/VCP	란/ETM	
 우수/NNG	'/SS	란/ETM	-15.26
@@ -16297,6 +17032,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 하/VX	ㄴ다/EC	"/SS	고/EC	-17.73
 하/VV	ㄴ다/EF	"/SS	고/JKQ	-19.14
 
+강조했다.	강조/NNG	하/XSV	았/EP	다/EF	./SF	
+강조/NNG	하/XSA	았/EP	다/EF	./SF	-10.59
+강조/NNG	하/VV	았/EP	다/EF	./SF	-11.57
+강조했/UN	다/EF	./SF	-19.46
+강/NNG	조/NNG	하/XSA	았/EP	다/EF	./SF	-19.58
+강/NNG	조/NNG	하/VV	았/EP	다/EF	./SF	-20.56
+
 엑스포폐막10일전	엑스포/NNG	폐막/NNG	10/SN	일/NNB	전/NNG	
 엑스포/NNG	폐막/NNG	10/SN	일전/NNG	-33.15
 엑스포/NNG	폐막/NNG	10/SN	일/NNG	전/NNG	-34.09
@@ -16432,10 +17174,10 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 
 비롯하여	비롯/XR	하/XSV	아/EC	
 비롯/XR	하/XSA	아/EC	-5.552
-비롯/XR	하/XSV	아/EC	-6.927
 비롯/XR	하/XSA	여/EC	-8.66
 비롯/XR	하/XSV	여/EC	-10.03
 비롯/XR	하/VV	아/EC	-13.95
+비롯/XR	하/XSA	여/EF	-15.61
 
 대전관	대전관/NNG	
 대전/NNG	관/NNG	-14.54
@@ -16633,6 +17375,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 이탈/NNG	리아관/UN	을/JKO	-24.68
 이탈리아관/UN	을/JKO	-25.27
 
+포함해서	포함/NNG	하/XSV	아서/EC	
+포함/NNG	하/XSA	아서/EC	-10.06
+포함/NNG	하/VV	아서/EC	-11.59
+포함/NNG	해/NNG	서/JKB	-12.5
+포함/NNG	해서/NNG	-16.03
+포함/NNG	해/NNG	서/JKS	-17.38
+
 프랑스관이	프랑스관/NNG	이/JKS	
 프랑스/NNP	관/NNG	이/JKS	-12.37
 프랑스/NNP	관이/UN	-22.17
@@ -16684,10 +17433,10 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 
 비롯해	비롯/XR	하/XSV	아/EC	
 비롯/XR	하/XSA	아/EC	-5.552
-비롯/XR	하/XSV	아/EC	-6.927
+비롯/XR	하/VV	아/EC	-13.95
 비롯/XR	해/NNG	-14.62
 비롯/XR	하/XSA	아/EF	-15.66
-비/XPN	롯/UN	하/XSV	아/EC	-17.04
+비롯/XR	하/VX	아/EC	-16.41
 
 모두	모두/MAG	
 모두/NNG	-6.463
@@ -16696,12 +17445,26 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 모/NNG	두/JX	-12.3
 모두/VV	-51.34
 
+마련했고,	마련/NNG	하/XSV	았/EP	고/EC	,/SP	
+마련/NNG	하/XSA	았/EP	고/EC	,/SP	-14.4
+마련/NNG	하/VV	았/EP	고/EC	,/SP	-15.39
+마련/NNB	하/XSA	았/EP	고/EC	,/SP	-16.29
+마련/NNB	하/VX	았/EP	고/EC	,/SP	-19.47
+마련/NNB	하/VV	았/EP	고/EC	,/SP	-19.58
+
 동구권국가는	동구/NNP	권/XSN	국가/NNG	는/JX	
 동/NNG	구권/NNG	국가/NNG	는/JX	-20.36
 동구/NNG	권/XSN	국가/NNG	는/JX	-20.53
 동구/NNP	권/XSN	국가/NNG	는/JX	-21.51
 동/MM	구권/NNG	국가/NNG	는/JX	-22.28
 동구/NNP	권/NNG	국가/NNG	는/JX	-22.87
+
+전시해	전시/NNG	하/XSV	아/EC	
+전시/NNG	하/XSA	아/EC	-10.37
+전시/NNG	하/VV	아/EC	-11.9
+전시/NNG	해/NNG	-12.69
+전/NNG	시해/NNG	-14.66
+전/MM	시해/NNG	-15.51
 
 할	하/VX	ㄹ/ETM	
 하/VV	ㄹ/ETM	-3.037
@@ -16815,6 +17578,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 사/NNG	ㅇ/UN	소/XPN	ㄱ/UN	-/SO	증/NNG	여세/NNG	를/JKO	-51.23
 사/NR	ㅇ/UN	소/XPN	ㄱ/UN	-/SO	증여/NNG	세/NNG	를/JKO	-51.58
 
+폐지해야	폐지/NNG	하/XSV	아야/EC	
+폐지/NNG	하/XSA	아야/EC	-11.91
+폐지/NNG	하/VV	아야/EC	-13.43
+폐지/NNG	해/NNG	야/JX	-16.32
+폐지/NNG	하/XSA	아/EC	야/JX	-18.33
+폐지해야/UN	-19.61
+
 한다는	하/VX	ㄴ다는/ETM	
 하/VV	ㄴ다는/ETM	-4.611
 하/VX	ㄴ다는/ETM	-5.631
@@ -16885,6 +17655,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 서/VV	어/EC	로/JKB	-11
 서/NNP	로/JKB	-11.98
 
+지적했다.	지적/NNG	하/XSV	았/EP	다/EF	./SF	
+지적/NNG	하/XSA	았/EP	다/EF	./SF	-10.54
+지적/NNG	하/VV	았/EP	다/EF	./SF	-11.53
+지적했/UN	다/EF	./SF	-19.46
+지적/NNG	하/XSA	았/EP	다/EC	./SF	-21.62
+지/NNG	적/XSN	하/VV	았/EP	다/EF	./SF	-22.19
+
 탁아비와	탁아비/NNG	와/JC	
 탁/NNP	아비/NNG	와/JKB	-17.19
 탁아/NNG	비/NNG	와/JKB	-17.43
@@ -16912,6 +17689,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 하/VV	아/EC	ㄴ다고/EC	-13.38
 한다/UN	고/EC	-14.05
 하/VX	아/EC	ㄴ다고/EC	-14.95
+
+말했다.	말/NNG	하/XSV	았/EP	다/EF	./SF	
+말하/VV	았/EP	다/EF	./SF	-8.016
+말/NNG	하/XSA	았/EP	다/EF	./SF	-8.724
+말/NNG	하/VV	았/EP	다/EF	./SF	-9.706
+말/NNB	하/XSA	았/EP	다/EF	./SF	-15.34
+말했/UN	다/EF	./SF	-16.46
 
 한국가정법률상담소	한국한국가정법률상담소/NNP	
 한국/NNP	가정/NNG	법률/NNG	상담소/NNG	-25.16
@@ -16941,6 +17725,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 있다/UN	고/EC	-14.05
 있/VV	다/EC	고/EC	-14.13
 
+지적했다.	지적/NNG	하/XSV	았/EP	다/EF	./SF	
+지적/NNG	하/XSA	았/EP	다/EF	./SF	-10.54
+지적/NNG	하/VV	았/EP	다/EF	./SF	-11.53
+지적했/UN	다/EF	./SF	-19.46
+지적/NNG	하/XSA	았/EP	다/EC	./SF	-21.62
+지/NNG	적/XSN	하/VV	았/EP	다/EF	./SF	-22.19
+
 손봉숙	손봉숙/NNP	
 손봉숙/UN	-21.11
 손/NNG	봉숙/UN	-23.19
@@ -16961,6 +17752,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 합당하다/UN	고/EC	-21.55
 합당/XR	하/XSV	다/EC	고/EC	-21.61
 합당/NNG	하/XSV	다/EC	고/EC	-22.06
+
+주장했다.	주장/NNG	하/XSV	았/EP	다/EF	./SF	
+주장/NNG	하/XSA	았/EP	다/EF	./SF	-10.09
+주장/NNG	하/VV	았/EP	다/EF	./SF	-11.07
+주장했/UN	다/EF	./SF	-19.46
+주/NNG	장/NNG	하/XSA	았/EP	다/EF	./SF	-20.17
+주/NNG	장/NNG	하/VV	았/EP	다/EF	./SF	-21.15
 
 당연시하는	당연/XR	시/XSN	하/XSV	는/ETM	
 당/NNG	연시/NNG	하/XSV	는/ETM	-15.71
@@ -17104,10 +17902,10 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 
 비롯해	비롯/XR	하/XSV	아/EC	
 비롯/XR	하/XSA	아/EC	-5.552
-비롯/XR	하/XSV	아/EC	-6.927
+비롯/XR	하/VV	아/EC	-13.95
 비롯/XR	해/NNG	-14.62
 비롯/XR	하/XSA	아/EF	-15.66
-비/XPN	롯/UN	하/XSV	아/EC	-17.04
+비롯/XR	하/VX	아/EC	-16.41
 
 손님이	손/NNG	님/XSN	이/JKS	
 손님/NNG	이/JKS	-7.068
@@ -17178,6 +17976,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 다르/VA	아/EC	고/EC	-11.67
 달/VA	ㄹ라고/EC	-13.58
 
+부탁해	부탁/NNG	하/XSV	아/EC	
+부탁/NNG	하/XSA	아/EC	-9.952
+부탁/NNG	하/VV	아/EC	-11.48
+부탁/NNG	해/NNG	-12.27
+부/NNG	탁하/VA	아/EC	-17.52
+부탁해/UN	-18.11
+
 오고	오/VX	고/EC	
 오/VV	고/EC	-2.628
 오/VX	고/EC	-3.687
@@ -17219,6 +18024,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 않았던/UN	-21.11
 않았/UN	덜/VV	ㄴ/ETM	-23.29
 않았더/UN	ㄴ/JX	-23.9
+
+당황해	당황/NNG	하/XSV	아/EC	
+당황/NNG	하/XSA	아/EC	-10.44
+당황/NNG	하/VV	아/EC	-11.97
+당황/XR	하/XSA	아/EC	-12.26
+당황/NNG	해/NNG	-12.76
+당황해/UN	-19.61
 
 하는	하/VX	는/ETM	
 하/VV	는/ETM	-3.186
@@ -17296,13 +18108,6 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 이/NR	-10.39
 이/NNB	-12.4
 이/NNP	-12.61
-
-불과했던	불과/MAG	하/XSA	았/EP	던/ETM	
-불과/MAG	하/XSV	았/EP	던/ETM	-10.02
-불과/MAG	하/XSA	았/EP	던/ETM	-12.81
-불과/MAG	하/VV	았/EP	던/ETM	-12.83
-불과/XR	하/XSA	았/EP	던/ETM	-12.87
-불과/XR	하/XSV	았/EP	던/ETM	-13.36
 
 출하량이	출하량/NNG	이/JKS	
 출하/NNG	량/NNG	이/JKS	-15.21
@@ -17430,6 +18235,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 있느/UN	ㄴ/ETM	-13.66
 있는/UN	-16.61
 
+표시했고,	표시/NNG	하/XSV	았/EP	고/EC	,/SP	
+표시/NNG	하/XSA	았/EP	고/EC	,/SP	-14.64
+표시/NNG	하/VV	았/EP	고/EC	,/SP	-15.63
+표시했/UN	고/EC	,/SP	-19.16
+표시했고/UN	,/SP	-21.26
+표/NNG	시/NNG	하/XSA	았/EP	고/EC	,/SP	-21.35
+
 내의	내/NNB	의/JKG	
 내/NP	의/JKG	-3.732
 내/NNB	의/JKG	-7.508
@@ -17443,6 +18255,20 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 다르/VA	ㄴ/JX	-15.72
 다/MAG	르/NNG	ㄴ/JX	-26.37
 다/NNG	르/NNG	ㄴ/JX	-26.51
+
+과장해	과장/NNG	하/XSV	아/EC	
+과장/NNG	하/XSA	아/EC	-9.923
+과장/NNG	하/VV	아/EC	-11.45
+과장/NNG	해/NNG	-12.24
+과장해/UN	-18.11
+과/NNG	장해/NNG	-18.45
+
+표시했다고	표시/NNG	하/XSV	았/EP	다고/EC	
+표시/NNG	하/XSA	았/EP	다고/EC	-14.21
+표시/NNG	하/VV	았/EP	다고/EC	-15.2
+표시했/UN	다고/EC	-18.73
+표시했다/UN	고/EC	-20.05
+표/NNG	시/NNG	하/XSA	았/EP	다고/EC	-20.92
 
 업체(8.7%)는	업체/NNG	(/SS	8/SN	./SP	7/SN	%/SW	)/SS	는/JX	
 업체/NNG	(/SS	8.7/SN	%/SW	)/SS	는/JX	-10.59
@@ -17464,6 +18290,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 유일한/NNP	-9.745
 유일/NNG	하/VV	ㄴ/ETM	-11.13
 유/NNP	일/NNG	하/XSV	ㄴ/ETM	-11.67
+
+광고했고,	광고/NNG	하/XSV	았/EP	고/EC	,/SP	
+광고/NNG	하/XSA	았/EP	고/EC	,/SP	-14.09
+광고/NNG	하/VV	았/EP	고/EC	,/SP	-15.07
+광고했/UN	고/EC	,/SP	-20.66
+광/NNG	고하/VV	았/EP	고/EC	,/SP	-21.01
+광고/NNG	했고/UN	,/SP	-22.56
 
 '대명프라자'	'/SS	대명프라자/NNP	'/SS	
 '/SS	대/XPN	명프라자/UN	'/SS	-23.58
@@ -17492,6 +18325,20 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 상/NNG	권/NNG	(/SS	상가/NNG	)'/SS	-27.93
 상권/NNG	(/SS	상/NNG	가/VV	아/EC	)'/SS	-28.87
 상/NNG	권/NNB	(/SS	상가/NNG	)'/SS	-29.25
+
+사용했다고	사용/NNG	하/XSV	았/EP	다고/EC	
+사용/NNG	하/XSA	았/EP	다고/EC	-13.06
+사용/NNG	하/VV	았/EP	다고/EC	-14.04
+사용했/UN	다고/EC	-20.23
+사용했다/UN	고/EC	-21.55
+사용/NNG	했다/UN	고/EC	-21.58
+
+말했다.	말/NNG	하/XSV	았/EP	다/EF	./SF	
+말하/VV	았/EP	다/EF	./SF	-8.016
+말/NNG	하/XSA	았/EP	다/EF	./SF	-8.724
+말/NNG	하/VV	았/EP	다/EF	./SF	-9.706
+말/NNB	하/XSA	았/EP	다/EF	./SF	-15.34
+말했/UN	다/EF	./SF	-16.46
 
 상주인구	상주인구/NNG	
 상주/NNP	인구/NNG	-14.33
@@ -17997,11 +18844,11 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 근로자/NNG	가/JKS	ㄴ/JX	-16.81
 
 손해라는	손해/NNG	이/VCP	라는/ETM	
-손/NNG	하/XSV	아라/EC	는/JX	-13.81
 손/NNG	하/XSA	아라/EC	는/JX	-17.11
 손해라/UN	는/ETM	-17.52
 손해라/UN	는/JX	-18.64
 손/NNG	하/VV	아라/EC	는/JX	-18.64
+손해라느/UN	ㄴ/ETM	-19.66
 
 "장애인	"/SS	장애인/NNG	
 "/SS	장애/NNG	이/VCP	ㄴ/ETM	-7.104
@@ -18087,6 +18934,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 시급/XR	하/XSA	아다/EC	"/SS	고/EC	-20.44
 시급/XR	하/XSV	다/EC	"/SS	고/EC	-21.31
 
+준비했다.	준비/NNG	하/XSV	았/EP	다/EF	./SF	
+준비/NNG	하/XSA	았/EP	다/EF	./SF	-10.5
+준비/NNG	하/VV	았/EP	다/EF	./SF	-11.48
+준/XPN	비하/VV	았/EP	다/EF	./SF	-16.65
+준/XPN	비/NNG	하/XSA	았/EP	다/EF	./SF	-16.95
+준/XPN	비/NNG	하/VV	았/EP	다/EF	./SF	-17.94
+
 지난해말	지난해/NNG	말/NNB	
 지난해/NNG	말/NNG	-11.04
 지난/MM	해/NNG	말/NNG	-16.76
@@ -18114,12 +18968,26 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 수/MM	-9.754
 수/NNP	-16.71
 
+절감했다는	절감/NNG	하/XSV	았/EP	다는/ETM	
+절감/NNG	하/XSA	았/EP	다는/ETM	-15.64
+절감/NNG	하/VV	았/EP	다는/ETM	-16.62
+절/NNG	감하/VV	았/EP	다는/ETM	-20.61
+절감/NNG	하/XSA	았/EP	다/EF	는/JX	-20.84
+절감했/UN	다는/ETM	-21.51
+
 7인승	7/SN	인/NNG	승/NNG	
 7/SN	인승/NNB	-9.715
 7/SN	인/NNG	승/NNG	-16.47
 7/SN	인/NNG	승/NNB	-18.57
 7/SN	이/VCP	ㄴ/ETM	승/NNB	-20.28
 7/SN	인/NNB	승/NNB	-21.51
+
+모집했다.	모집/NNG	하/XSV	았/EP	다/EF	./SF	
+모집/NNG	하/XSA	았/EP	다/EF	./SF	-11.97
+모집/NNG	하/VV	았/EP	다/EF	./SF	-12.95
+모/MM	집/NNG	하/XSA	았/EP	다/EF	./SF	-16.67
+모/MM	집/NNG	하/VV	았/EP	다/EF	./SF	-17.65
+모/NNG	집/NNG	하/XSA	았/EP	다/EF	./SF	-18.09
 
 한벗회의	한벗회/NNP	의/JKG	
 한/MM	벗회/UN	의/JKG	-18.7
@@ -18155,6 +19023,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 수를/UN	-15.11
 수/NNP	를/JKO	-16.12
 
+제한해도,	제한/NNG	하/XSV	아도/EC	,/SP	
+제한/NNG	하/XSA	아도/EC	,/SP	-13.75
+제한/NNG	해/NNG	도/JX	,/SP	-14.87
+제한/NNG	하/VV	아도/EC	,/SP	-15.28
+제한/NNG	하/XSA	아/EC	도/JX	,/SP	-16.88
+제한/NNG	하/VV	아/EC	도/JX	,/SP	-18.41
+
 그때그때	그때그때/MAG	
 그때그때/NNG	-9.373
 그때/NNG	그때/NNG	-11.81
@@ -18175,6 +19050,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 직장/NNG	인/NNG	-12.86
 직장/NNG	인/XSN	-13.57
 직/NNG	장/NNG	이/VCP	ㄴ/ETM	-13.79
+
+지원했다.	지원/NNG	하/XSV	았/EP	다/EF	./SF	
+지원/NNG	하/XSA	았/EP	다/EF	./SF	-10.54
+지원/NNG	하/VV	았/EP	다/EF	./SF	-11.52
+지/NNG	원하/VV	았/EP	다/EF	./SF	-18.37
+지원했/UN	다/EF	./SF	-19.46
+지원/NNG	하/XSA	았/EP	다/EC	./SF	-21.62
 
 장애인	장애인/NNG	
 장애/NNG	이/VCP	ㄴ/ETM	-7.104
@@ -18227,10 +19109,10 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 
 채워주기위해	채우/VV	어/EC	주/VX	기/ETN	위하/VV	아/EC	
 채워주기/UN	위하/VV	아/EC	-22.91
-채워주기위/UN	하/XSV	아/EC	-23.98
 채워주기위해/UN	-25.61
-채워주기/UN	위/NNG	하/XSV	아/EC	-25.85
 채워주기위/UN	하/XSA	아/EC	-25.89
+채워/UN	주기/NNG	위하/VV	아/EC	-26.38
+채워주기위/UN	하/VV	아/EC	-26.45
 
 한	한/MM	
 하/VV	ㄴ/ETM	-2.33
@@ -18256,9 +19138,9 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 위해서다.	위하/VV	아서/EC	이/VCP	다/EF	./SF	
 위하/VV	아서다/EF	./SF	-9.103
 위하/VV	아/EC	서/VV	다/EF	./SF	-12.15
-위/NNG	하/XSV	아서다/EF	./SF	-12.39
-위/NNG	하/XSV	아/EC	서/VV	다/EF	./SF	-15.37
 위해/NNG	서/VV	다/EF	./SF	-15.86
+위해서/UN	다/EF	./SF	-16.46
+위/NNG	하/VV	아서다/EF	./SF	-17.14
 
 못냈는데	못/MAG	내/VV	았/EP	는데/EC	
 못/MAG	내/VV	었/EP	는데/EC	-13.57
@@ -18308,6 +19190,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 김/NNG	부/NNG	일/NNG	회장/NNG	은/JX	-25.45
 김부/UN	일/NNG	회장/NNG	은/JX	-25.81
 김부일/UN	회장/NNG	은/JX	-25.98
+
+운전해주거나	운전/NNG	하/XSV	아/EC	주/VX	거나/EC	
+운전/NNG	하/XSA	아/EC	주/VX	거나/EC	-17.85
+운전/NNG	하/VV	아/EC	주/VX	거나/EC	-19.38
+운/NNG	전하/VV	아/EC	주/VX	거나/EC	-20.72
+운전/NNG	해/NNG	주/VV	거나/EC	-21.06
+운전/NNG	하/XSA	아/EC	주/VV	거나/EC	-21.72
 
 필요하다고	필요/NNG	하/XSA	다고/EC	
 필요/NNG	하/XSV	다/EC	고/EC	-17.41
@@ -18374,6 +19263,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 불과/MAG	하/XSV	아다/EC	고/EC	-19.37
 불과하다/UN	고/EC	-20.05
 불과/MAG	하/XSA	다/EC	고/EC	-20.77
+
+말했다.	말/NNG	하/XSV	았/EP	다/EF	./SF	
+말하/VV	았/EP	다/EF	./SF	-8.016
+말/NNG	하/XSA	았/EP	다/EF	./SF	-8.724
+말/NNG	하/VV	았/EP	다/EF	./SF	-9.706
+말/NNB	하/XSA	았/EP	다/EF	./SF	-15.34
+말했/UN	다/EF	./SF	-16.46
 
 상비용으로	상비/NNG	용/XSN	으로/JKB	
 상/NNG	비용/NNG	으로/JKB	-12.36
@@ -18482,6 +19378,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 한/MM	-3.961
 한/NNP	-9.068
 한/NNG	-9.542
+
+사용해야	사용/NNG	하/XSV	아야/EC	
+사용/NNG	하/XSA	아야/EC	-10.06
+사용/NNG	하/VV	아야/EC	-11.59
+사용/NNG	해/NNG	야/JX	-14.47
+사용/NNG	하/XSA	아/EC	야/JX	-16.48
+사용/NNG	하/VV	아/EC	야/JX	-18.01
 
 한다.	하/VX	ㄴ다/EF	./SF	
 하/VV	ㄴ다/EF	./SF	-4.798
@@ -18602,6 +19505,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 다양/NNG	하/XSA	ㄴ/ETM	-8.148
 다양/NNG	하/VV	ㄴ/ETM	-10.81
 
+등장했다.	등장/NNG	하/XSV	았/EP	다/EF	./SF	
+등장/NNG	하/XSA	았/EP	다/EF	./SF	-10.72
+등장/NNG	하/VV	았/EP	다/EF	./SF	-11.7
+등/NNB	장/NNG	하/XSA	았/EP	다/EF	./SF	-17.44
+등/NNB	장하/VA	았/EP	다/EF	./SF	-17.57
+등/NNB	장/NNG	하/VV	았/EP	다/EF	./SF	-18.42
+
 오일금속이	오일금속/NNP	이/JKS	
 오일/NNG	금속/NNG	이/JKS	-14.7
 오일/NNG	금/NNG	속/NNG	이/JKS	-18.56
@@ -18622,6 +19532,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 다양/XR	하/XSV	ㄴ/ETM	-8.118
 다양/NNG	하/XSA	ㄴ/ETM	-8.148
 다양/NNG	하/VV	ㄴ/ETM	-10.81
+
+이용해	이용/NNG	하/XSV	아/EC	
+이용/NNG	하/XSA	아/EC	-9.032
+이용/NNG	하/VV	아/EC	-10.56
+이용/NNG	해/NNG	-11.35
+이/NP	용하/VA	아/EC	-17.01
+이/MM	용해/NNG	-18
 
 3.3㎏의	3/SN	./SP	3/SN	㎏/SW	의/JKG	
 3.3/SN	㎏/SW	의/JKG	-2.597
@@ -19067,6 +19984,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 대/XPN	명/NNG	레저/NNG	산업/NNG	이/JKS	-27.86
 대/NNB	명/NNB	레저/NNG	산업/NNG	이/JKS	-28.58
 
+추진해	추진/NNG	하/XSV	아/EC	
+추진/NNG	하/XSA	아/EC	-9.539
+추진/NNG	하/VV	아/EC	-11.07
+추진/NNG	해/NNG	-11.85
+추진해/UN	-18.11
+추진/NNG	하/XSA	아/EF	-19.65
+
 온	오/VX	ㄴ/ETM	
 오/VV	ㄴ/ETM	-2.665
 오/VX	ㄴ/ETM	-3.177
@@ -19213,6 +20137,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 매/NNG	봉사/NNG	ㄴ/JX	-17.85
 매봉/NNP	산/XSN	-18.4
 
+위치해	위치/NNG	하/XSV	아/EC	
+위치/NNG	하/XSA	아/EC	-9.521
+위치/NNG	하/VV	아/EC	-11.05
+위치/NNG	해/NNG	-11.84
+위치해/UN	-16.61
+위치/NNG	하/XSA	아/EF	-19.63
+
 이	이/MM	
 이/NP	-9.459
 이/MM	-9.826
@@ -19311,6 +20242,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 있/VX	다/EC	"/SS	고/EC	-15.16
 있/VA	다/EF	"/SS	고/EC	-16.31
 
+말했다.	말/NNG	하/XSV	았/EP	다/EF	./SF	
+말하/VV	았/EP	다/EF	./SF	-8.016
+말/NNG	하/XSA	았/EP	다/EF	./SF	-8.724
+말/NNG	하/VV	았/EP	다/EF	./SF	-9.706
+말/NNB	하/XSA	았/EP	다/EF	./SF	-15.34
+말했/UN	다/EF	./SF	-16.46
+
 모두	모두/MAG	
 모두/NNG	-6.463
 모/NP	두/JX	-9.782
@@ -19381,19 +20319,26 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 있/VX	다/EC	"/SS	고/EC	-15.16
 있/VA	다/EF	"/SS	고/EC	-16.31
 
+역설했다.	역설/NNG	하/XSV	았/EP	다/EF	./SF	
+역설/NNG	하/XSA	았/EP	다/EF	./SF	-11.81
+역설/NNG	하/VV	았/EP	다/EF	./SF	-12.79
+역/NNG	설하/VV	았/EP	다/EF	./SF	-16.83
+역/NNG	설/NNG	하/XSA	았/EP	다/EF	./SF	-19.27
+역/NNG	설/NNG	하/VV	았/EP	다/EF	./SF	-20.26
+
 새로운	새롭/VA	ㄴ/ETM	
 새롭/VA	은/ETM	-4.518
 새로/MAG	울/VV	ㄴ/ETM	-11.78
+새/NNG	롭/XSA	은/ETM	-12.33
 새로우/UN	ㄴ/ETM	-15.16
 새로/MAG	울/VV	ㄴ/EF	-18
-새로운/UN	-18.11
 
 합해지고	합하/VV	어/EC	지/VX	고/EC	
 합하/VV	아/EC	지/VX	고/EC	-11.25
-합/NNG	하/XSV	아/EC	지/VX	고/EC	-13.54
 합/NNG	해지/VV	고/EC	-16.76
 합/NNG	하/XSA	아/EC	지/VX	고/EC	-16.84
 합해지/UN	고/EC	-17.05
+합하/VV	아/EC	지/VV	고/EC	-17.96
 
 있다"면서	있/VX	다/EC	"/SS	면서/EC	
 있/VX	다/EF	"/SS	면서/EC	-13.73
@@ -19426,9 +20371,9 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 아름다움을	아름답/VA	ㅁ/ETN	을/JKO	
 아름다움/NNG	을/JKO	-6.08
 아름답/VA	음/ETN	을/JKO	-10.77
+아름/XR	답/XSA	음/ETN	을/JKO	-19.85
 아름답/VA	음/EC	을/JKO	-20.62
 아름답/VA	음/ETN	을/ETM	-20.99
-아름다움/NNG	으/NNG	ㄹ/JKO	-22.5
 
 동양과	동양/NNG	과/JC	
 동양/NNG	과/JKB	-8.009
@@ -19460,9 +20405,9 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 새로운	새롭/VA	ㄴ/ETM	
 새롭/VA	은/ETM	-4.518
 새로/MAG	울/VV	ㄴ/ETM	-11.78
+새/NNG	롭/XSA	은/ETM	-12.33
 새로우/UN	ㄴ/ETM	-15.16
 새로/MAG	울/VV	ㄴ/EF	-18
-새로운/UN	-18.11
 
 전인대대표	전인대/NNP	대표/NNG	
 전/NNG	인대/NNG	대표/NNG	-19.3
@@ -19555,6 +20500,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 이/NNB	-12.4
 이/NNP	-12.61
 
+포함해	포함/NNG	하/XSV	아/EC	
+포함/NNG	하/XSA	아/EC	-9.265
+포함/NNG	하/VV	아/EC	-10.79
+포함/NNG	해/NNG	-11.58
+포함해/UN	-18.11
+포/NNG	함/NNG	하/XSA	아/EC	-18.93
+
 이뤄지는	이루어지/VV	는/ETM	
 이루/VV	어/EC	지/VX	는/ETM	-9.328
 이뤄지/UN	는/ETM	-16.02
@@ -19629,6 +20581,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 일정/NNG	하/XSA	ㄴ/ETM	-8.513
 일정/XR	하/XSV	ㄴ/ETM	-9.104
 일/NNG	정하/VV	ㄴ/ETM	-10.62
+
+보장해주며	보장/NNG	하/XSV	아/EC	주/VX	며/EC	
+보장/NNG	하/XSA	아/EC	주/VX	며/EC	-15.98
+보장/NNG	하/VV	아/EC	주/VX	며/EC	-17.51
+보장/NNG	해/NNG	주/VV	며/EC	-19.19
+보장/NNG	하/XSA	아/EC	주/VV	며/EC	-19.85
+보장/NNG	하/VV	아/EC	주/VV	며/EC	-21.38
 
 그	그/MM	
 그/NP	-5.497
@@ -19730,19 +20689,19 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 중요/XR	하/XSV	ㄴ/ETM	-7.853
 중요/NNG	하/VV	ㄴ/ETM	-10.23
 
+증가해	증가/NNG	하/XSV	아/EC	
+증가/NNG	하/XSA	아/EC	-9.381
+증가/NNG	하/VV	아/EC	-10.91
+증가/NNG	해/NNG	-11.7
+증/NNG	가하/VV	아/EC	-15.1
+증/NNG	가해/NNG	-17.13
+
 한국과	한국/NNP	과/JKB	
 한국/NNP	과/JC	-6.311
 한국/NNP	과/JKB	-6.468
 한/MM	국/NNG	과/JKB	-11.39
 한/MM	국/NNG	과/JC	-11.74
 한/XPN	국/NNG	과/JKB	-13.79
-
-지대해	지대/XR	하/XSA	아/EC	
-지대/NNG	하/XSV	아/EC	-7.107
-지대/XR	하/XSA	아/EC	-9.885
-지대/NNG	하/XSA	아/EC	-10.41
-지대/XR	하/XSV	아/EC	-11.26
-지대/NNG	해/NNG	-12.72
 
 전	전/MM	
 전/NNG	-5.725
@@ -19851,9 +20810,9 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 강해지고	강하/VV	아/EC	지/VX	고/EC	
 강하/VA	아/EC	지/VX	고/EC	-10.84
 강하/VV	아/EC	지/VX	고/EC	-11.4
-강/NNG	하/XSV	아/EC	지/VX	고/EC	-12.93
 강/XR	하/XSA	아/EC	지/VX	고/EC	-12.94
-강/XR	하/XSV	아/EC	지/VX	고/EC	-14.31
+강/NNG	해지/VV	고/EC	-16.15
+강/NNG	하/XSA	아/EC	지/VX	고/EC	-16.23
 
 이경숙,	이경숙/NNP	,/SP	
 이/MM	경숙/NNG	,/SP	-19
@@ -19927,10 +20886,10 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 
 '아름다운	'/SS	아름답/VA	ㄴ/ETM	
 '/SS	아름답/VA	은/ETM	-5.058
+'/SS	아름/XR	답/XSA	은/ETM	-14.27
+'/SS	아름/NNB	답/XSA	은/ETM	-15.59
+'/SS	아름/NNG	답/XSA	은/ETM	-17.69
 '/SS	아름/NNB	다운/NNG	-19.27
-'/SS	아름다우/UN	ㄴ/ETM	-19.66
-'/SS	아름/NNG	다운/NNG	-19.83
-'/SS	아름/XR	다운/NNG	-23.16
 
 여성한방'(까치간,	여성/NNG	한방/NNG	'/SS	(/SS	까치/NNP	간/NNG	,/SP	
 여성/NNG	한방/NNG	'(/SS	까치/NNG	간/NNG	,/SP	-28.88
@@ -19981,9 +20940,9 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 아름다움을	아름답/VA	ㅁ/ETN	을/JKO	
 아름다움/NNG	을/JKO	-6.08
 아름답/VA	음/ETN	을/JKO	-10.77
+아름/XR	답/XSA	음/ETN	을/JKO	-19.85
 아름답/VA	음/EC	을/JKO	-20.62
 아름답/VA	음/ETN	을/ETM	-20.99
-아름다움/NNG	으/NNG	ㄹ/JKO	-22.5
 
 주부나	주부/NNG	나/JC	
 주부/NNG	나/JX	-10.61
@@ -20048,6 +21007,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 한/MM	의과대/UN	에/JKB	-19.74
 한/MM	의과/NNG	대/XSN	에/JKB	-19.9
 
+입학했다.	입학/NNG	하/XSV	았/EP	다/EF	./SF	
+입학/NNG	하/XSA	았/EP	다/EF	./SF	-11.64
+입학/NNG	하/VV	았/EP	다/EF	./SF	-12.63
+입/NNG	학/NNG	하/XSA	았/EP	다/EF	./SF	-17.73
+입/NNG	학/NNG	하/VV	았/EP	다/EF	./SF	-18.71
+입학했/UN	다/EF	./SF	-20.96
+
 허리와	허리/NNG	와/JC	
 허리/NNG	와/JKB	-7.833
 허리/NNG	와/JC	-8.389
@@ -20111,6 +21077,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 주거/NNG	광열비/UN	…/SE	./SF	-33.21
 주/XPN	거광열비/UN	…/SE	./SF	-33.67
 
+세분화했던	세분/NNG	화/XSN	하/XSV	았/EP	던/ETM	
+세분/NNG	화하/VV	았/EP	던/ETM	-20.47
+세/MM	분화/NNG	하/XSA	았/EP	던/ETM	-21.74
+세분화했/UN	던/ETM	-22.66
+세/MM	분화/NNG	하/VV	았/EP	던/ETM	-22.72
+세분/NNG	화/XSN	하/VV	았/EP	던/ETM	-22.92
+
 대폭	대폭/MAG	
 대폭/NNG	-8.977
 대/XPN	폭/NNG	-11.02
@@ -20155,7 +21128,7 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 정해진	정하/VV	아/EC	지/VX	ㄴ/ETM	
 정해지/VV	ㄴ/ETM	-7.082
 정하/VV	아/EC	지/VX	ㄴ/ETM	-9.103
-정/NNG	하/XSV	아/EC	지/VX	ㄴ/ETM	-12.59
+정/NNG	하/XSA	아/EC	지/VX	ㄴ/ETM	-15.89
 정하/VV	아/EC	지/VV	ㄴ/ETM	-16.36
 정/NNG	해지/VV	ㄴ/ETM	-16.37
 
@@ -20262,11 +21235,11 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 김/NNG	창/NNG	완/NNG	편집장/NNG	은/JX	-33.21
 
 복잡-다양해지면서	복잡/XR	-/SS	다양/NNG	하/XSA	아/EC	지/VX	면서/EC	
-복잡/XR	-/SO	다양/NNG	하/XSV	아/EC	지/VX	면서/EC	-56.87
 복잡/XR	-/SO	다양/XR	하/XSA	아/EC	지/VX	면서/EC	-58.12
-복잡/XR	-/SO	다양/XR	하/XSV	아/EC	지/VX	면서/EC	-59.49
 복잡/XR	-/SO	다양/NNG	해지/VV	면서/EC	-60.1
 복잡/XR	-/SO	다양/NNG	하/XSA	아/EC	지/VX	면서/EC	-60.17
+복잡/XR	-/SO	다양/NNG	하/VV	아/EC	지/VX	면서/EC	-61.7
+복잡/XR	-/SO	다양/XR	하/XSA	아/EC	지/VV	면서/EC	-64.82
 
 있는	있/VV	는/ETM	
 있/VX	는/ETM	-2.301
@@ -20429,6 +21402,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 그/VV	-44.06
 그/VA	-44.65
 
+보고했다.	보고/NNG	하/XSV	았/EP	다/EF	./SF	
+보/VV	고/EC	하/VX	았/EP	다/EF	./SF	-8.439
+보/VX	고/EC	하/VX	았/EP	다/EF	./SF	-9.598
+보/VV	고/EC	하/VV	았/EP	다/EF	./SF	-10.14
+보/VX	고/EC	하/VV	았/EP	다/EF	./SF	-11.3
+보고/NNG	하/XSA	았/EP	다/EF	./SF	-11.48
+
 이	이/MM	
 이/NP	-9.459
 이/MM	-9.826
@@ -20442,6 +21422,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 97/SN	년/NNB	쯤/NNG	-14.54
 97/SN	년쯤/UN	-17.88
 97/SN	년쯔/UN	ㅁ/ETN	-19.1
+
+등장해	등장/NNG	하/XSV	아/EC	
+등장/NNG	하/XSA	아/EC	-9.479
+등장/NNG	하/VV	아/EC	-11.01
+등장/NNG	해/NNG	-11.79
+등/NNB	장해/NNG	-14.31
+등/NNB	장/NNG	하/XSA	아/EC	-16.2
 
 널리	널리/MAG	
 너르/VA	이/EC	-6.634
@@ -20566,8 +21553,8 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 분하/VA	아/EC	-6.364
 분해/NNG	-7.875
 분/NNB	하/XSA	아/EC	-9.338
-분/NNB	하/XSV	아/EC	-10.12
-분/NNG	하/XSV	아/EC	-10.47
+분/NNB	해/NNG	-13.2
+분하/VA	아/EF	-15.91
 
 가능한	가능/NNG	하/XSA	ㄴ/ETM	
 가능/NNG	하/XSV	ㄴ/ETM	-4.53
@@ -20660,6 +21647,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 걸레받이르/UN	ㄹ/ETM	-24.87
 걸레받이를/UN	-27.11
 
+제거해	제거/NNG	하/XSV	아/EC	
+제거/NNG	하/XSA	아/EC	-10.3
+제거/NNG	하/VV	아/EC	-11.83
+제거/NNG	해/NNG	-12.61
+제/MM	거/NNB	하/XSA	아/EC	-15.78
+제거해/UN	-16.61
+
 있다.	있/VV	다/EF	./SF	
 있/VX	다/EF	./SF	-2.01
 있/VV	다/EF	./SF	-2.87
@@ -20714,6 +21708,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 보/NNB	를/JKO	-14.5
 보를/UN	-15.11
 보르/UN	ㄹ/JKO	-18.49
+
+보완했다.	보완/NNG	하/XSV	았/EP	다/EF	./SF	
+보완/NNG	하/XSA	았/EP	다/EF	./SF	-11.7
+보완/NNG	하/VV	았/EP	다/EF	./SF	-12.69
+보완했/UN	다/EF	./SF	-19.46
+보완/NNG	하/XSA	았/EP	다/EC	./SF	-22.78
+보완/NNG	하/VV	았/EP	다/EC	./SF	-23.76
 
 경량화함으로써	경량/NNG	화/XSN	하/XSV	ㅁ/ETN	으로써/JKB	
 경량/NNG	화/XSN	하/XSV	ㅁ/ETN	으로써/JKB	-22.43
@@ -20799,6 +21800,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 보/VX	고/EC	와/JKB	-12.08
 보고/NNG	오/VV	아/EC	-12.1
 
+발표했다.	발표/NNG	하/XSV	았/EP	다/EF	./SF	
+발표/NNG	하/XSA	았/EP	다/EF	./SF	-10.56
+발표/NNG	하/VV	았/EP	다/EF	./SF	-11.54
+발/NNG	표하/VV	았/EP	다/EF	./SF	-15.54
+발/NNG	표/NNG	하/XSA	았/EP	다/EF	./SF	-16.53
+발/NNG	표/NNG	하/VV	았/EP	다/EF	./SF	-17.51
+
 4번째	4/SN	번/NNB	째/XSN	
 4/SN	번째/NNB	-7.136
 4/SN	번/NNB	째/XSN	-10.19
@@ -20856,11 +21864,18 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 문화/NNG	-/SO	교/NNP	육/NNP	,/SP	-73.01
 
 발표-토론했다.	발표/NNG	-/SS	토론/NNG	하/XSV	았/EP	다/EF	./SF	
-발/NNG	표/NNP	-/SO	토론/NNG	하/XSV	았/EP	다/EF	./SF	-37.77
 발/NNG	표/NNP	-/SO	토론/NNG	하/XSA	았/EP	다/EF	./SF	-41.95
 발/NNG	표/NNP	-/SO	토론/NNG	하/VV	았/EP	다/EF	./SF	-42.93
-발/NNG	표/NNP	-/SO	토/NNG	론/XSN	하/XSV	았/EP	다/EF	./SF	-45.98
-발/NNG	표/NNP	-/SO	토론/NNG	하/XSV	았/EP	다/EC	./SF	-48.85
+발/NNG	표/NNP	-/SO	토론했/UN	다/EF	./SF	-50.13
+발/NNG	표/NNP	-/SO	토/NNG	론/XSN	하/VV	았/EP	다/EF	./SF	-51.68
+발/NNG	표/NNP	-/SO	토로/NNG	ㄴ/JX	하/VV	았/EP	다/EF	./SF	-52.52
+
+참가했던	참가/NNG	하/XSV	았/EP	던/ETM	
+참가/NNG	하/XSA	았/EP	던/ETM	-14.34
+참가/NNG	하/VV	았/EP	던/ETM	-15.32
+참/MAG	가하/VV	았/EP	던/ETM	-18.38
+참가했/UN	던/ETM	-19.66
+참가했더/UN	ㄴ/ETM	-21.16
 
 손봉숙	손봉숙/NNP	
 손봉숙/UN	-21.11
@@ -21016,6 +22031,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 박/NNP	영원/NNG	씨/NNG	등/NNB	-29.41
 박/NNP	영원/NNG	씨등/UN	-29.62
 
+일했을	일/NNG	하/XSV	았/EP	을/ETM	
+일하/VV	았/EP	을/ETM	-14.24
+일/NNG	하/XSA	았/EP	을/ETM	-15.11
+일/NNG	하/VV	았/EP	을/ETM	-16.1
+일했/UN	을/JKO	-16.27
+일/NNB	하/XSA	았/EP	을/ETM	-16.41
+
 뿐입니다.	뿐/NNB	이/VCP	ㅂ니다/EF	./SF	
 뿐/NNB	이/VCP	ㅂ니다/EF	./SF	-6.791
 뿐이/UN	ㅂ니다/EF	./SF	-17.04
@@ -21071,6 +22093,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 청/NNP	소/NNG	년/NNB	-/SO	여성/NNG	단체/NNG	에서/JKB	-37.65
 청소/NNG	년/NNB	-/SO	여성/NNG	단/NNG	체/NNG	에서/JKB	-39.18
 
+일했다.	일/NNG	하/XSV	았/EP	다/EF	./SF	
+일하/VV	았/EP	다/EF	./SF	-8.635
+일/NNG	하/XSA	았/EP	다/EF	./SF	-9.509
+일/NNG	하/VV	았/EP	다/EF	./SF	-10.49
+일/NNB	하/XSA	았/EP	다/EF	./SF	-10.81
+일/NNB	하/VX	았/EP	다/EF	./SF	-13.98
+
 키워달라고	키우/VV	어/EC	달/VX	라고/EC	
 키우/VV	어/EC	달/VX	ㄹ라고/EC	-17.05
 키우/VV	어/EC	달라/VV	고/EC	-17.08
@@ -21078,12 +22107,33 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 키워달라/UN	고/EC	-20.05
 키워다/UN	ㄹ라고/EC	-20.77
 
+권유했어요.	권유/NNG	하/XSV	았/EP	어요/EF	./SF	
+권유/NNG	하/XSA	았/EP	어요/EF	./SF	-14.39
+권유/NNG	하/VV	았/EP	어요/EF	./SF	-15.37
+권유했/UN	어요/EF	./SF	-21.74
+권유/NNG	하/XSA	았/EP	어요/EC	./SF	-25.33
+권유/NNG	하/XSA	았/EP	어/EC	요/JX	./SF	-25.86
+
 10여년간	10/SN	여/XSN	년/NNB	간/NNG	
 10/SN	여년가/UN	ㄴ/ETM	-16.66
 10/SN	여년/UN	간/NNB	-19.58
 10/SN	여년/UN	가/VV	ㄴ/ETM	-20.3
 10/SN	여년/UN	갈/VV	ㄴ/ETM	-20.5
 10/SN	여년간/UN	-20.88
+
+일했던	일/NNG	하/XSV	았/EP	던/ETM	
+일하/VV	았/EP	던/ETM	-11.73
+일/NNG	하/XSA	았/EP	던/ETM	-12.61
+일/NNG	하/VV	았/EP	던/ETM	-13.59
+일/NNB	하/XSA	았/EP	던/ETM	-13.91
+일했/UN	던/ETM	-16.66
+
+변신했다.	변신/NNG	하/XSV	았/EP	다/EF	./SF	
+변신/NNG	하/XSA	았/EP	다/EF	./SF	-11.99
+변신/NNG	하/VV	았/EP	다/EF	./SF	-12.98
+변/NNG	신/NNG	하/XSA	았/EP	다/EF	./SF	-18.53
+변/NNG	신/NNG	하/VV	았/EP	다/EF	./SF	-19.51
+변신했/UN	다/EF	./SF	-20.96
 
 걸스카우트뿐	걸스카우트/NNG	뿐/JX	
 걸/NNG	스카우트/NNG	뿐/JX	-20.68
@@ -21105,6 +22155,20 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 걸/NNP	스카우트/NNG	연맹/NNG	-30.55
 걸스카우트/UN	연맹/NNG	-33.02
 걸스카우트연맹/UN	-33.11
+
+일했던	일/NNG	하/XSV	았/EP	던/ETM	
+일하/VV	았/EP	던/ETM	-11.73
+일/NNG	하/XSA	았/EP	던/ETM	-12.61
+일/NNG	하/VV	았/EP	던/ETM	-13.59
+일/NNB	하/XSA	았/EP	던/ETM	-13.91
+일했/UN	던/ETM	-16.66
+
+사직했다.	사직/NNG	하/XSV	았/EP	다/EF	./SF	
+사/NNG	직하/XSA	았/EP	다/EF	./SF	-11.32
+사직/NNG	하/XSA	았/EP	다/EF	./SF	-13.2
+사직/NNG	하/VV	았/EP	다/EF	./SF	-14.19
+사/NNG	직/NNG	하/XSA	았/EP	다/EF	./SF	-18.91
+사직했/UN	다/EF	./SF	-19.46
 
 능력과	능력/NNG	과/JC	
 능력/NNG	과/JKB	-6.885
@@ -21187,6 +22251,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 하/VX	ㄴ다/EC	"/SS	고/EC	-17.73
 하/VV	ㄴ다/EF	"/SS	고/JKQ	-19.14
 
+지적했다.	지적/NNG	하/XSV	았/EP	다/EF	./SF	
+지적/NNG	하/XSA	았/EP	다/EF	./SF	-10.54
+지적/NNG	하/VV	았/EP	다/EF	./SF	-11.53
+지적했/UN	다/EF	./SF	-19.46
+지적/NNG	하/XSA	았/EP	다/EC	./SF	-21.62
+지/NNG	적/XSN	하/VV	았/EP	다/EF	./SF	-22.19
+
 박도순교수(고려대)는	박도순/NNP	교수/NNG	(/SS	고려대/NNP	)/SS	는/JX	
 박도순교수/UN	(/SS	고려대/NNP	)/SS	는/JX	-40.01
 박도순/UN	교수/NNG	(/SS	고려대/NNP	)/SS	는/JX	-40.56
@@ -21208,6 +22279,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 기르/VV	어/EC	놨/UN	다/EF	"/SS	고/EC	-31.59
 길러놨/UN	다/EC	"/SS	고/EC	-31.75
 
+말했다.	말/NNG	하/XSV	았/EP	다/EF	./SF	
+말하/VV	았/EP	다/EF	./SF	-8.016
+말/NNG	하/XSA	았/EP	다/EF	./SF	-8.724
+말/NNG	하/VV	았/EP	다/EF	./SF	-9.706
+말/NNB	하/XSA	았/EP	다/EF	./SF	-15.34
+말했/UN	다/EF	./SF	-16.46
+
 있다는	있/VV	다는/ETM	
 있/VX	다는/ETM	-3.292
 있/VV	다는/ETM	-3.323
@@ -21221,6 +22299,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 평/NNG	가관/NNG	을/JKO	-15.19
 평가/NNG	관/NNB	을/JKO	-18.99
 평가관/UN	을/JKO	-19.27
+
+도입해야	도입/NNG	하/XSV	아야/EC	
+도입/NNG	하/XSA	아야/EC	-11.14
+도입/NNG	하/VV	아야/EC	-12.66
+도입/NNG	해/NNG	야/JX	-15.55
+도입/NNG	하/XSA	아/EC	야/JX	-17.56
+도입/NNG	하/VV	아/EC	야/JX	-19.09
 
 한다는	하/VX	ㄴ다는/ETM	
 하/VV	ㄴ다는/ETM	-4.611
@@ -21246,9 +22331,9 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 까다로운	까다롭/VA	ㄴ/ETM	
 까다롭/VA	은/ETM	-6.682
 까다로우/UN	ㄴ/ETM	-18.16
+까다/UN	롭/XSA	은/ETM	-18.79
 까다로운/UN	-21.11
 까다로우/UN	ㄴ/JX	-23.9
-까다/UN	로/JKB	울/VV	ㄴ/ETM	-26.55
 
 한다고	하/VX	ㄴ다고/EC	
 하/VV	ㄴ다고/EC	-4.678
@@ -21264,6 +22349,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 그/VV	-44.06
 그/VA	-44.65
 
+제시했다.	제시/NNG	하/XSV	았/EP	다/EF	./SF	
+제시/NNG	하/XSA	았/EP	다/EF	./SF	-10.62
+제시/NNG	하/VV	았/EP	다/EF	./SF	-11.6
+제/XPN	시/NNG	하/XSA	았/EP	다/EF	./SF	-15.32
+제/XPN	시/NNG	하/VV	았/EP	다/EF	./SF	-16.3
+제시했/UN	다/EF	./SF	-17.96
+
 양승실씨는	양승실/NNP	씨/NNB	는/JX	
 양승실씨/UN	는/ETM	-23.52
 양승실씨/UN	는/JX	-24.64
@@ -21274,9 +22366,9 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 새로운	새롭/VA	ㄴ/ETM	
 새롭/VA	은/ETM	-4.518
 새로/MAG	울/VV	ㄴ/ETM	-11.78
+새/NNG	롭/XSA	은/ETM	-12.33
 새로우/UN	ㄴ/ETM	-15.16
 새로/MAG	울/VV	ㄴ/EF	-18
-새로운/UN	-18.11
 
 검토와	검토/NNG	와/JC	
 검토/NNG	와/JKB	-7.615
@@ -21298,6 +22390,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 필요/NNG	하다/UN	고/EC	-19.79
 필요하다/UN	고/EC	-20.05
 필요/NNG	하/XSA	다/EC	고/EC	-20.7
+
+강조했다.	강조/NNG	하/XSV	았/EP	다/EF	./SF	
+강조/NNG	하/XSA	았/EP	다/EF	./SF	-10.59
+강조/NNG	하/VV	았/EP	다/EF	./SF	-11.57
+강조했/UN	다/EF	./SF	-19.46
+강/NNG	조/NNG	하/XSA	았/EP	다/EF	./SF	-19.58
+강/NNG	조/NNG	하/VV	았/EP	다/EF	./SF	-20.56
 
 철봉-미끄럼틀등	철봉/NNG	-/SS	미끄럼틀/NNG	등/NNB	
 철/NNG	봉/NNP	-/SO	미끄럼틀/NNG	등/NNB	-42.15
@@ -21337,6 +22436,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 사고/NNG	-6.341
 사/VV	아/EC	고/EC	-11.89
 사/VV	고/EF	-17.81
+
+말했다.	말/NNG	하/XSV	았/EP	다/EF	./SF	
+말하/VV	았/EP	다/EF	./SF	-8.016
+말/NNG	하/XSA	았/EP	다/EF	./SF	-8.724
+말/NNG	하/VV	았/EP	다/EF	./SF	-9.706
+말/NNB	하/XSA	았/EP	다/EF	./SF	-15.34
+말했/UN	다/EF	./SF	-16.46
 
 대전	대전/NNP	
 대전/NNG	-7.936
@@ -21588,12 +22694,26 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 심위/UN	에/JKB	의/JKG	-18.29
 심위에의/UN	-21.11
 
+주장해오던	주장/NNG	하/XSV	아/EC	오/VX	던/ETM	
+주장/NNG	하/XSA	아/EC	오/VX	던/ETM	-15.99
+주장/NNG	해/NNG	오/VV	던/ETM	-17.19
+주장/NNG	하/VV	아/EC	오/VX	던/ETM	-17.52
+주장/NNG	하/XSA	아/EC	오/VV	던/ETM	-17.85
+주장/NNG	하/VV	아/EC	오/VV	던/ETM	-19.38
+
 사항입니다.	사항/NNG	이/VCP	ㅂ니다/EF	./SF	
 사항/NNG	이/VCP	ㅂ니다/EF	./SF	-8.859
 사/NNG	항/NNG	이/VCP	ㅂ니다/EF	./SF	-17.04
 사/NR	항/NNG	이/VCP	ㅂ니다/EF	./SF	-18.35
 사항/NNG	이/VCP	ㅂ니다/EC	./SF	-19.89
 사항이/UN	ㅂ니다/EF	./SF	-20.04
+
+말했다.	말/NNG	하/XSV	았/EP	다/EF	./SF	
+말하/VV	았/EP	다/EF	./SF	-8.016
+말/NNG	하/XSA	았/EP	다/EF	./SF	-8.724
+말/NNG	하/VV	았/EP	다/EF	./SF	-9.706
+말/NNB	하/XSA	았/EP	다/EF	./SF	-15.34
+말했/UN	다/EF	./SF	-16.46
 
 줄이는데	줄이/VV	는/ETM	데/NNB	
 줄이/VV	는데/EC	-5.34
@@ -21711,7 +22831,7 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 피해	피해/NNG	
 피하/VV	아/EC	-3.909
 피해/NNG	-7.001
-피/NNG	하/XSV	아/EC	-7.122
+피/NNG	하/XSA	아/EC	-10.42
 피/NNG	해/NNG	-12.74
 피/XPN	해/NNG	-13
 
@@ -21775,12 +22895,19 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 세워/UN	지/VX	었/EP	다/EF	./SF	-22.7
 세워/UN	지/VX	였/EP	다/EF	./SF	-25.18
 
+결성해	결성/NNG	하/XSV	아/EC	
+결성/NNG	하/XSA	아/EC	-10.71
+결성/NNG	하/VV	아/EC	-12.24
+결성/NNG	해/NNG	-13.03
+결/NNG	성하/VA	아/EC	-19.2
+결성해/UN	-19.61
+
 7천여만원을	7/SN	천/NR	여/XSN	만/NR	원/NNB	을/JKO	
 7/SN	천/NR	여/XSN	만원/NNG	을/JKO	-20.24
-7/SN	천/NR	여/NNG	만원/NNG	을/JKO	-22.4
 7/SN	천여/UN	만원/NNG	을/JKO	-22.54
 7/SN	천여만/UN	원/NNB	을/JKO	-23.42
 7/SN	천/NR	여만/UN	원/NNB	을/JKO	-23.58
+7/SN	천여만원/UN	을/JKO	-23.77
 
 30여평	30/SN	여/XSN	평/NNB	
 30/SN	여평/UN	-16.38
@@ -21851,6 +22978,13 @@ S/SL	008/SN	'(/SS	6/SN	만/NNB	원/NNB	)/SS	은/JX	-20.52
 주고/UN	-13.61
 주/VX	고/EF	-15.68
 주/VV	고/EF	-18.55
+
+동행해	동행/NNG	하/XSV	아/EC	
+동행/NNG	하/XSA	아/EC	-10.85
+동행/NNG	하/VV	아/EC	-12.38
+동행/NNG	해/NNG	-13.17
+동/NNG	행하/VV	아/EC	-13.56
+동/NNG	행/NNG	하/XSA	아/EC	-17.6
 
 지킴이와	지킴이/NNG	와/JC	
 지킴이/NNG	와/JKB	-11.14
@@ -22182,11 +23316,11 @@ PVC/SL	크리스마스트리/UN	가/JKS	-29.32
 벨/NNG	벳바지/UN	-28.2
 
 여성스러움을	여성/NNG	스럽/XSA	ㅁ/ETN	을/JKO	
-여성/NNG	스러움/UN	을/JKO	-22.54
+여성/NNG	스럽/XSA	음/ETN	을/JKO	-15.75
 여성스러움/UN	을/JKO	-25.27
+여성/NNG	스럽/XSA	음/ETN	을/ETM	-25.97
 여성스러움으/UN	ㄹ/ETM	-27.87
 여성스러움/UN	을/ETM	-28.17
-여성/NNG	스러움으/UN	ㄹ/ETM	-28.34
 
 시간과	시간/NNG	과/JC	
 시간/NNG	과/JKB	-6.12
@@ -22409,6 +23543,13 @@ PVC/SL	크리스마스트리/UN	가/JKS	-29.32
 오/VV	았/EP	다/EC	./SF	-14.8
 오/VX	았/EP	다/EC	./SF	-14.97
 
+결성해	결성/NNG	하/XSV	아/EC	
+결성/NNG	하/XSA	아/EC	-10.71
+결성/NNG	하/VV	아/EC	-12.24
+결성/NNG	해/NNG	-13.03
+결/NNG	성하/VA	아/EC	-19.2
+결성해/UN	-19.61
+
 서로	서로/MAG	
 서로/NNG	-6.957
 서/NNG	로/JKB	-9.989
@@ -22428,7 +23569,7 @@ PVC/SL	크리스마스트리/UN	가/JKS	-29.32
 이제/MAG	-7.036
 이제/IC	-11.59
 이/NP	제/XSN	-12.86
-이/NR	제/XSN	-17.42
+이/NP	저/NP	의/JKG	-16.64
 
 50여명으로	50/SN	여/XSN	명/NNB	으로/JKB	
 50/SN	여명/NNG	으로/JKB	-8.33
@@ -22490,15 +23631,15 @@ PVC/SL	크리스마스트리/UN	가/JKS	-29.32
 '/SS	라피/UN	네/XSN	-19.54
 '/SS	라피/UN	네/EC	-20.19
 '/SS	라피네/UN	-20.24
+'/SS	라피/UN	너/NP	의/JKG	-21.61
 '/SS	라피/UN	네/EF	-22.52
-'/SS	라/NNG	피/NNG	네/XSN	-24.79
 
 '라피네	'/SS	라피네/NNP	
 '/SS	라피/UN	네/XSN	-19.54
 '/SS	라피/UN	네/EC	-20.19
 '/SS	라피네/UN	-20.24
+'/SS	라피/UN	너/NP	의/JKG	-21.61
 '/SS	라피/UN	네/EF	-22.52
-'/SS	라/NNG	피/NNG	네/XSN	-24.79
 
 내놨다.	내놓/VV	았/EP	다/EF	./SF	
 내놨/UN	다/EF	./SF	-14.96
@@ -22548,6 +23689,13 @@ PVC/SL	크리스마스트리/UN	가/JKS	-29.32
 "/SS	이런/MM	-10.14
 "/SS	이렇/VA	ㄴ/EF	-12.74
 "/SS	이런/IC	-14.58
+
+작용해	작용/NNG	하/XSV	아/EC	
+작용/NNG	하/XSA	아/EC	-9.395
+작용/NNG	하/VV	아/EC	-10.92
+작용/NNG	해/NNG	-11.71
+작용/NNG	하/XSA	아/EF	-19.5
+작용해/UN	-19.61
 
 주는	주/VV	는/ETM	
 주/VX	는/ETM	-2.776
@@ -22639,6 +23787,13 @@ PVC/SL	크리스마스트리/UN	가/JKS	-29.32
 이/NR	-10.39
 이/NNB	-12.4
 이/NNP	-12.61
+
+보강해	보강/NNG	하/XSV	아/EC	
+보강/NNG	하/XSA	아/EC	-11.41
+보강/NNG	하/VV	아/EC	-12.93
+보강/NNG	해/NNG	-13.72
+보강해/UN	-18.11
+보강/NNG	하/XSA	아/EF	-21.52
 
 뛰어나다는	뛰어나/VA	다는/ETM	
 뛰어나/VA	다/EC	는/JX	-12.32
@@ -22850,11 +24005,11 @@ PVC/SL	크리스마스트리/UN	가/JKS	-29.32
 있으며/UN	-18.11
 
 불행해진다'는	불행/NNG	하/XSA	아/EC	지/VX	ㄴ다/EC	'/SS	는/ETM	
-불행/NNG	하/XSV	아/EC	지/VX	ㄴ다/EF	'/SS	는/JX	-22.81
-불행/NNG	하/XSV	아/EC	지/VX	ㄴ다/EF	'/SS	는/ETM	-24.27
-불행/NNG	하/XSV	아/EC	지/VX	ㄴ다/EC	'/SS	는/JX	-25.42
 불행/NNG	하/XSA	아/EC	지/VX	ㄴ다/EF	'/SS	는/JX	-26.11
-불행/NNG	하/XSV	아/EC	지/VX	ㄴ다/EC	'/SS	는/ETM	-26.88
+불행/NNG	해지/VV	ㄴ다/EF	'/SS	는/JX	-27.41
+불행/NNG	하/XSA	아/EC	지/VX	ㄴ다/EF	'/SS	는/ETM	-27.57
+불행/NNG	하/VV	아/EC	지/VX	ㄴ다/EF	'/SS	는/JX	-27.63
+불/XPN	행해진다/UN	'/SS	는/JX	-28.05
 
 사고	사고/NNG	
 사/VV	고/EC	-3.186
@@ -22876,6 +24031,13 @@ PVC/SL	크리스마스트리/UN	가/JKS	-29.32
 이/NNB	-12.4
 이/NNP	-12.61
 
+취직했을	취직/NNG	하/XSV	았/EP	을/ETM	
+취직/NNG	하/XSA	았/EP	을/ETM	-17.53
+취직/NNG	하/VV	았/EP	을/ETM	-18.51
+취/NNG	직하/XSA	았/EP	을/ETM	-19.01
+취직했/UN	을/JKO	-19.27
+취직/NNG	해/NNG	ㅆ/UN	을/JKO	-20.85
+
 기뻐했다'가	기뻐하/VV	았/EP	다/EC	'/SS	가/JKS	
 기뻐하/VV	았/EP	다/EF	'/SS	가/JKS	-15.09
 기뻐하/VV	았/EP	다/EC	'/SS	가/JKS	-19.62
@@ -22892,6 +24054,13 @@ PVC/SL	크리스마스트리/UN	가/JKS	-29.32
 좋아하/VV	았/EP	다/EF	'/SS	가/VV	아/EC	-18.33
 좋/VA	아/EC	하/VX	았/EP	다/EF	'/SS	가/JKS	-18.35
 좋아하/VV	았/EP	다/EF	'/SS	가/JKC	-19.87
+
+평가했을	평가/NNG	하/XSV	았/EP	을/ETM	
+평가/NNG	하/XSA	았/EP	을/ETM	-15.96
+평가/NNG	하/VV	았/EP	을/ETM	-16.94
+평가했/UN	을/JKO	-19.27
+평가/NNG	해/NNG	ㅆ/UN	을/JKO	-19.28
+평가했으/UN	ㄹ/ETM	-21.87
 
 본인(4.33),	본인/NNG	(/SS	4/SN	./SP	33/SN	)/SS	,/SP	
 본인/NNG	(/SS	4.33/SN	)/SS	,/SP	-7.524
@@ -22949,6 +24118,13 @@ PVC/SL	크리스마스트리/UN	가/JKS	-29.32
 81.9/SN	%/SW	정/NNG	도로/NNG	-13.74
 81.9/SN	%/SW	정/NNP	도로/NNG	-14.12
 
+작용했다고	작용/NNG	하/XSV	았/EP	다고/EC	
+작용/NNG	하/XSA	았/EP	다고/EC	-13.76
+작용/NNG	하/VV	았/EP	다고/EC	-14.74
+작용했/UN	다고/EC	-21.73
+작용/NNG	했다/UN	고/EC	-22.28
+작용했다/UN	고/EC	-23.05
+
 여기는	여기/VV	는/ETM	
 여기/NP	는/JX	-3.79
 여기/VV	는/ETM	-5.867
@@ -22969,6 +24145,13 @@ PVC/SL	크리스마스트리/UN	가/JKS	-29.32
 중요/NNG	하/XSV	아/EC	달/VX	는/ETM	-13.86
 중요/XR	하/XSA	다/EC	는/JX	-14.83
 중요/XR	하/XSA	아다/EC	는/JX	-15.34
+
+반대했다.	반대/NNG	하/XSV	았/EP	다/EF	./SF	
+반대/NNG	하/XSA	았/EP	다/EF	./SF	-10.6
+반/NNG	대하/VV	았/EP	다/EF	./SF	-11.34
+반대/NNG	하/VV	았/EP	다/EF	./SF	-11.58
+반/XPN	대/NNG	하/XSA	았/EP	다/EF	./SF	-17.64
+반/XPN	대/NNG	하/VV	았/EP	다/EF	./SF	-18.62
 
 월	월/NNG	
 월/NNB	-3.736
@@ -23024,6 +24207,13 @@ PVC/SL	크리스마스트리/UN	가/JKS	-29.32
 가능/NNG	하/XSV	아다/EC	'/SS	는/JX	-17.72
 가능/NNG	하/XSA	다/EF	'/SS	는/JX	-18.58
 
+선택했음에도	선택/NNG	하/XSV	았/EP	음/ETN	에/JKB	도/JX	
+선택/NNG	하/XSA	았/EP	음/ETN	에/JKB	도/JX	-20.73
+선택/NNG	하/VV	았/EP	음/ETN	에/JKB	도/JX	-21.71
+선택/NNG	했음/UN	에/JKB	도/JX	-23.74
+선/NNG	택하/VV	았/EP	음/ETN	에/JKB	도/JX	-23.76
+선택/NNG	했음에/UN	도/JX	-25.85
+
 불구하고	불구/XR	하/XSV	고/EC	
 불구/XR	하/XSA	고/EC	-5.367
 불구/XR	하/XSV	고/EC	-6.742
@@ -23051,6 +24241,13 @@ PVC/SL	크리스마스트리/UN	가/JKS	-29.32
 단순/NNG	성/NNG	'(/SS	15.3/SN	%/SW	)/SS	으로/JKB	-18.32
 단순/XR	성/NNG	'(/SS	15.3/SN	%/SW	)/SS	으로/JKB	-23.02
 단순/NNG	성/XSN	'(/SS	15.3/SN	%/SW	)/SS	으/NNG	로/JKB	-24.16
+
+답변했다.	답변/NNG	하/XSV	았/EP	다/EF	./SF	
+답변/NNG	하/XSA	았/EP	다/EF	./SF	-11.83
+답변/NNG	하/VV	았/EP	다/EF	./SF	-12.82
+답/NNG	변하/VV	았/EP	다/EF	./SF	-14.82
+답/NNG	변/NNG	하/XSA	았/EP	다/EF	./SF	-19.65
+답/NNG	변/NNG	하/VV	았/EP	다/EF	./SF	-20.64
 
 어려운	어렵/VA	ㄴ/ETM	
 어렵/VA	은/ETM	-4.598
@@ -23158,19 +24355,12 @@ PVC/SL	크리스마스트리/UN	가/JKS	-29.32
 상품/NNG	과/NNG	-16.56
 상/NNG	품/NNG	과/JC	-16.85
 
-불과했던	불과/MAG	하/XSA	았/EP	던/ETM	
-불과/MAG	하/XSV	았/EP	던/ETM	-10.02
-불과/MAG	하/XSA	았/EP	던/ETM	-12.81
-불과/MAG	하/VV	았/EP	던/ETM	-12.83
-불과/XR	하/XSA	았/EP	던/ETM	-12.87
-불과/XR	하/XSV	았/EP	던/ETM	-13.36
-
 새로운	새롭/VA	ㄴ/ETM	
 새롭/VA	은/ETM	-4.518
 새로/MAG	울/VV	ㄴ/ETM	-11.78
+새/NNG	롭/XSA	은/ETM	-12.33
 새로우/UN	ㄴ/ETM	-15.16
 새로/MAG	울/VV	ㄴ/EF	-18
-새로운/UN	-18.11
 
 가능하게	가능/NNG	하/XSA	게/EC	
 가능/NNG	하/XSV	게/EC	-5.592
@@ -23233,7 +24423,7 @@ PVC/SL	크리스마스트리/UN	가/JKS	-29.32
 이제/MAG	-7.036
 이제/IC	-11.59
 이/NP	제/XSN	-12.86
-이/NR	제/XSN	-17.42
+이/NP	저/NP	의/JKG	-16.64
 
 50세가	50/SN	세/NNB	가/JKC	
 50/SN	세/NNB	가/JKS	-6.464
@@ -23460,7 +24650,15 @@ PVC/SL	크리스마스트리/UN	가/JKS	-29.32
 무려	무려/MAG	
 물/VV	려/EC	-8.791
 무려/UN	-13.61
+물/VV	리/EP	어/EC	-18.01
 물/VV	리/EP	어/EF	-24.9
+
+출마해	출마/NNG	하/XSV	아/EC	
+출마/NNG	하/XSA	아/EC	-11.04
+출마/NNG	하/VV	아/EC	-12.57
+출마/NNG	해/NNG	-13.35
+출마해/UN	-18.11
+출마/NNG	하/XSA	아/EF	-21.15
 
 돈-출세서	돈/NNG	-/SS	출세/NNG	서/JKB	
 돈/NNP	-/SO	출세/NNG	서/JKB	-30.36
@@ -23486,9 +24684,9 @@ PVC/SL	크리스마스트리/UN	가/JKS	-29.32
 못했다	못하/VX	았/EP	다/EC	
 못하/VX	았/EP	다/EF	-6.866
 못하/VX	았/EP	다/EC	-8.524
-못/MAG	하/XSV	았/EP	다/EF	-10.21
-못/MAG	하/XSV	았/EP	다/EC	-11.87
 못/MAG	하/XSA	았/EP	다/EF	-13
+못/MAG	하/VV	았/EP	다/EF	-13.02
+못/MAG	하/XSA	았/EP	다/EC	-14.66
 
 돈과	돈/NNG	과/JC	
 돈/NNG	과/JKB	-6.465
@@ -23503,6 +24701,13 @@ PVC/SL	크리스마스트리/UN	가/JKS	-29.32
 우먼/NNG	'/SS	지/NNB	-27.44
 우먼/NNG	'/SS	지/NP	-28.96
 우먼/NNG	'/SS	지/NNP	-29.1
+
+소개했다.	소개/NNG	하/XSV	았/EP	다/EF	./SF	
+소개/NNG	하/XSA	았/EP	다/EF	./SF	-10.81
+소개/NNG	하/VV	았/EP	다/EF	./SF	-11.79
+소개했/UN	다/EF	./SF	-17.96
+소/XPN	개/NNG	하/XSA	았/EP	다/EF	./SF	-18.71
+소/XPN	개/NNG	하/VV	았/EP	다/EF	./SF	-19.69
 
 '결혼'(50년대)→'사회운동'(60년대)→'직업적	'/SS	결혼/NNG	'/SS	(/SS	50/SN	년대/NNB	)/SS	→/SW	'/SS	사회/NNG	운동/NNG	'/SS	(/SS	60/SN	년대/NNB	)/SS	→/SW	'/SS	직업/NNG	적/XSN	
 '/SS	결혼/NNG	'(/SS	50/SN	년대/NNB	)/SS	→/SW	'/SS	사회/NNG	운동/NNG	'(/SS	60/SN	년대/NNB	)/SS	→/SW	'/SS	직업/NNG	적/XSN	-39.5
@@ -23525,12 +24730,26 @@ PVC/SL	크리스마스트리/UN	가/JKS	-29.32
 성취/NNG	'(/SS	90/SN	년/NNB	대/XSN	)/SS	-24.43
 성/NNG	취/NNG	'(/SS	90/SN	년대/NNB	)/SS	-25.33
 
+변화했다고	변화/NNG	하/XSV	았/EP	다고/EC	
+변화/NNG	하/XSA	았/EP	다고/EC	-13.26
+변화/NNG	하/VV	았/EP	다고/EC	-14.24
+변/NNG	화하/VV	았/EP	다고/EC	-20.14
+변화했/UN	다고/EC	-20.23
+변화했다/UN	고/EC	-21.55
+
 이	이/MM	
 이/NP	-9.459
 이/MM	-9.826
 이/NR	-10.39
 이/NNB	-12.4
 이/NNP	-12.61
+
+규정했다.	규정/NNG	하/XSV	았/EP	다/EF	./SF	
+규정/NNG	하/XSA	았/EP	다/EF	./SF	-10.76
+규정/NNG	하/VV	았/EP	다/EF	./SF	-11.74
+규/UN	정하/VV	았/EP	다/EF	./SF	-16.34
+규정했/UN	다/EF	./SF	-19.46
+규정/NNG	하/XSA	았/EP	다/EC	./SF	-21.84
 
 사회가	사회/NNG	가/JKC	
 사회/NNG	가/JKS	-3.876
@@ -23594,6 +24813,13 @@ PVC/SL	크리스마스트리/UN	가/JKS	-29.32
 한/MM	-3.961
 한/NNP	-9.068
 한/NNG	-9.542
+
+분석했다.	분석/NNG	하/XSV	았/EP	다/EF	./SF	
+분석/NNG	하/XSA	았/EP	다/EF	./SF	-10.54
+분석/NNG	하/VV	았/EP	다/EF	./SF	-11.52
+분석했/UN	다/EF	./SF	-20.96
+분/NNB	석/NNB	하/XSA	았/EP	다/EF	./SF	-21.31
+분/NNB	석/NNG	하/XSA	았/EP	다/EF	./SF	-21.57
 
 아등바등	아등바등/MAG	
 아등바/UN	등/NNB	-21.45
@@ -23838,6 +25064,13 @@ PVC/SL	크리스마스트리/UN	가/JKS	-29.32
 갈/VV	ㄹ/ETM	등/NNB	과/JKB	-16.39
 갈등/NNG	과/NNG	-16.75
 
+공개해	공개/NNG	하/XSV	아/EC	
+공개/NNG	하/XSA	아/EC	-9.879
+공개/NNG	하/VV	아/EC	-11.41
+공개/NNG	해/NNG	-12.19
+공/NR	개/NNB	하/XSA	아/EC	-16.41
+공개해/UN	-18.11
+
 성적인	성/NNG	적/XSN	이/VCP	ㄴ/ETM	
 성적/NNG	이/VCP	ㄴ/ETM	-7.488
 성/NNG	적/XSN	이/VCP	ㄴ/ETM	-10.62
@@ -23903,17 +25136,17 @@ PVC/SL	크리스마스트리/UN	가/JKS	-29.32
 
 커야했다는	크/VA	어야/EC	하/VX	았/EP	다는/ETM	
 커야했/UN	다는/ETM	-18.51
-커야/UN	하/XSV	았/EP	다는/ETM	-18.78
 커야했다/UN	는/ETM	-20.52
 커야/UN	하/XSA	았/EP	다는/ETM	-21.57
 커야/UN	하/VV	았/EP	다는/ETM	-21.59
+커야했다/UN	는/JX	-21.64
 
 이제	이제/MAG	
 이제/NNG	-6.41
 이제/MAG	-7.036
 이제/IC	-11.59
 이/NP	제/XSN	-12.86
-이/NR	제/XSN	-17.42
+이/NP	저/NP	의/JKG	-16.64
 
 시아라	시아라/NNP	
 시/NNG	알/VV	라/EC	-13.31
@@ -23964,19 +25197,19 @@ PVC/SL	크리스마스트리/UN	가/JKS	-29.32
 현/NNP	재/NNG	-18.02
 현/NNG	재/NNG	-20.24
 
+'내가	'/SS	내/NP	가/JKS	
+'/SS	나/NP	가/JKS	-6.63
+'/SS	내/NP	가/JKS	-7.762
+'/SS	내가/VV	아/EC	-10.97
+'/SS	내/NNG	가/JKS	-12.34
+'/SS	내/NNB	가/JKS	-13.27
+
 어머니와	어머니/NNG	와/JC	
 어머니/NNG	와/JKB	-6.395
 어머니/NNG	와/JC	-6.951
 어머니/NNG	오/VV	아/EC	-10.46
 어머니/NNP	와/JKB	-18.64
 어머니/NNP	와/JC	-18.69
-
-친숙해졌다는	친숙/NNG	하/XSA	아/EC	지/VX	었/EP	다는/ETM	
-친숙/NNG	하/XSV	아/EC	지/VX	었/EP	다는/ETM	-17.12
-친숙/NNG	하/XSV	아/EC	지/VX	였/EP	다는/ETM	-19.6
-친숙/NNG	하/XSA	아/EC	지/VX	었/EP	다는/ETM	-20.42
-친숙/NNG	해지/VV	었/EP	다는/ETM	-21.24
-친숙/NNG	하/VV	아/EC	지/VX	었/EP	다는/ETM	-21.95
 
 주는	주/VV	는/ETM	
 주/VX	는/ETM	-2.776
@@ -24041,6 +25274,13 @@ PVC/SL	크리스마스트리/UN	가/JKS	-29.32
 살/NNG	-10.25
 사/NNG	ㄹ/JKO	-11.26
 
+구축해야	구축/NNG	하/XSV	아야/EC	
+구축/NNG	하/XSA	아야/EC	-11.51
+구축/NNG	하/VV	아야/EC	-13.04
+구축/NNG	해/NNG	야/JX	-15.92
+구축/NNG	하/XSA	아/EC	야/JX	-17.93
+구/XPN	축/NNG	하/XSA	아야/EC	-19.27
+
 한다는	하/VX	ㄴ다는/ETM	
 하/VV	ㄴ다는/ETM	-4.611
 하/VX	ㄴ다는/ETM	-5.631
@@ -24049,11 +25289,11 @@ PVC/SL	크리스마스트리/UN	가/JKS	-29.32
 하/VV	ㄴ다/EF	는/JX	-13.44
 
 독립했다"고	독립/NNG	하/XSV	았/EP	다/EC	"/SS	고/JKQ	
-독립/NNG	하/XSV	았/EP	다/EF	"/SS	고/EC	-16.92
 독립/NNG	하/XSA	았/EP	다/EF	"/SS	고/EC	-21.1
-독립/NNG	하/XSV	았/EP	다/EF	"/SS	고/JKQ	-21.14
-독립/NNG	하/XSV	았/EP	다/EC	"/SS	고/EC	-21.44
 독립/NNG	하/VV	았/EP	다/EF	"/SS	고/EC	-22.08
+독립/NNG	하/XSA	았/EP	다/EF	"/SS	고/JKQ	-25.32
+독립/NNG	하/XSA	았/EP	다/EC	"/SS	고/EC	-25.62
+독립/NNG	하/VV	았/EP	다/EF	"/SS	고/JKQ	-26.3
 
 딸	딸/NNG	
 따/VV	ㄹ/ETM	-4.615
@@ -24242,11 +25482,11 @@ PVC/SL	크리스마스트리/UN	가/JKS	-29.32
 홍/NNG	역/NNG	과/JKB	-18.78
 
 백일해,	백일해/NNG	,/SP	
-백일/NNG	하/XSV	아/EC	,/SP	-11.32
-백/NR	일/NNG	하/XSV	아/EC	,/SP	-12.54
 백일/NNG	하/XSA	아/EC	,/SP	-14.62
 백일/NNG	해/NNG	,/SP	-14.95
 백/NR	일/NNB	하/XSA	아/EC	,/SP	-15.38
+백/NR	일/NNG	하/XSA	아/EC	,/SP	-15.84
+백일/NNG	하/VV	아/EC	,/SP	-16.15
 
 있고,	있/VX	고/EC	,/SP	
 있/VV	고/EC	,/SP	-3.549
@@ -24256,11 +25496,18 @@ PVC/SL	크리스마스트리/UN	가/JKS	-29.32
 있고/UN	,/SP	-15.26
 
 백일해	백일해/NNG	
-백일/NNG	하/XSV	아/EC	-9.214
-백/NR	일/NNG	하/XSV	아/EC	-10.43
 백일/NNG	하/XSA	아/EC	-12.51
 백/NR	일/NNB	하/XSA	아/EC	-13.27
 백/NR	일/NNG	하/XSA	아/EC	-13.73
+백일/NNG	하/VV	아/EC	-14.04
+백일/NNG	해/NNG	-14.83
+
+말했다.	말/NNG	하/XSV	았/EP	다/EF	./SF	
+말하/VV	았/EP	다/EF	./SF	-8.016
+말/NNG	하/XSA	았/EP	다/EF	./SF	-8.724
+말/NNG	하/VV	았/EP	다/EF	./SF	-9.706
+말/NNB	하/XSA	았/EP	다/EF	./SF	-15.34
+말했/UN	다/EF	./SF	-16.46
 
 있을	있/VV	을/ETM	
 있/VX	을/ETM	-5.454
@@ -24284,11 +25531,11 @@ PVC/SL	크리스마스트리/UN	가/JKS	-29.32
 8/SN	백여/UN	만/NR	명/NNB	의/JKG	-25.21
 
 백일해,	백일해/NNG	,/SP	
-백일/NNG	하/XSV	아/EC	,/SP	-11.32
-백/NR	일/NNG	하/XSV	아/EC	,/SP	-12.54
 백일/NNG	하/XSA	아/EC	,/SP	-14.62
 백일/NNG	해/NNG	,/SP	-14.95
 백/NR	일/NNB	하/XSA	아/EC	,/SP	-15.38
+백/NR	일/NNG	하/XSA	아/EC	,/SP	-15.84
+백일/NNG	하/VV	아/EC	,/SP	-16.15
 
 있다고	있/VX	다고/EC	
 있/VV	다고/EC	-3.119
@@ -24332,6 +25579,13 @@ PVC/SL	크리스마스트리/UN	가/JKS	-29.32
 있다/UN	고/EC	-14.05
 있/VV	다/EC	고/EC	-14.13
 
+지적했다.	지적/NNG	하/XSV	았/EP	다/EF	./SF	
+지적/NNG	하/XSA	았/EP	다/EF	./SF	-10.54
+지적/NNG	하/VV	았/EP	다/EF	./SF	-11.53
+지적했/UN	다/EF	./SF	-19.46
+지적/NNG	하/XSA	았/EP	다/EC	./SF	-21.62
+지/NNG	적/XSN	하/VV	았/EP	다/EF	./SF	-22.19
+
 마약중독과	마약/NNG	중독/NNG	과/JC	
 마약/NNG	중독/NNG	과/JKB	-15.62
 마약/NNG	중독/NNG	과/JC	-15.97
@@ -24358,6 +25612,13 @@ PVC/SL	크리스마스트리/UN	가/JKS	-29.32
 15/SN	살/NNG	이/JKS	-11.57
 15/SN	살이/NNG	-12.13
 15/SN	살/NNB	이/JKC	-14.4
+
+지적했다.	지적/NNG	하/XSV	았/EP	다/EF	./SF	
+지적/NNG	하/XSA	았/EP	다/EF	./SF	-10.54
+지적/NNG	하/VV	았/EP	다/EF	./SF	-11.53
+지적했/UN	다/EF	./SF	-19.46
+지적/NNG	하/XSA	았/EP	다/EC	./SF	-21.62
+지/NNG	적/XSN	하/VV	았/EP	다/EF	./SF	-22.19
 
 매일	매일/MAG	
 매이/VV	ㄹ/ETM	-6.252
@@ -24408,6 +25669,13 @@ PVC/SL	크리스마스트리/UN	가/JKS	-29.32
 있/VV	다/EC	"/SS	고/EC	-14.64
 있/VX	다/EC	"/SS	고/EC	-15.16
 있/VA	다/EF	"/SS	고/EC	-16.31
+
+경고했다.	경고/NNG	하/XSV	았/EP	다/EF	./SF	
+경고/NNG	하/XSA	았/EP	다/EF	./SF	-11.79
+경고/NNG	하/VV	았/EP	다/EF	./SF	-12.77
+경/NNG	고하/VV	았/EP	다/EF	./SF	-18.61
+경고했/UN	다/EF	./SF	-19.46
+경고/NNG	하/XSA	았/EP	다/EC	./SF	-22.87
 
 이신우씨	이신우/NNP	씨/NNB	
 이신우씨/UN	-21.11
@@ -24521,6 +25789,13 @@ PVC/SL	크리스마스트리/UN	가/JKS	-29.32
 손/NNG	정/NNG	완/NNG	씨/NNB	-27.57
 손정와/UN	ㄴ/ETM	씨/NNB	-27.73
 
+발표했다.	발표/NNG	하/XSV	았/EP	다/EF	./SF	
+발표/NNG	하/XSA	았/EP	다/EF	./SF	-10.56
+발표/NNG	하/VV	았/EP	다/EF	./SF	-11.54
+발/NNG	표하/VV	았/EP	다/EF	./SF	-15.54
+발/NNG	표/NNG	하/XSA	았/EP	다/EF	./SF	-16.53
+발/NNG	표/NNG	하/VV	았/EP	다/EF	./SF	-17.51
+
 김석원씨는	김석원/NNP	씨/NNB	는/JX	
 김석원씨/UN	는/ETM	-23.52
 김석원씨/UN	는/JX	-24.64
@@ -24541,6 +25816,13 @@ PVC/SL	크리스마스트리/UN	가/JKS	-29.32
 캐주얼/NNG	하/VV	ㄴ/ETM	-13.49
 캐주얼/NNG	한/NNG	-17.92
 캐주얼하/UN	ㄴ/ETM	-19.66
+
+소화해내는	소화/NNG	하/XSV	아/EC	내/VX	는/ETM	
+소화/NNG	해내/VV	는/ETM	-14.98
+소화/NNG	하/XSA	아/EC	내/VX	는/ETM	-17.92
+소화/NNG	해내/VV	어/EC	는/JX	-17.96
+소화해내/UN	는/ETM	-19.02
+소화/NNG	하/VV	아/EC	내/VX	는/ETM	-19.45
 
 평가받았다.	평가/NNG	받/VV	았/EP	다/EF	./SF	
 평가받았/UN	다/EF	./SF	-23.96
@@ -24590,13 +25872,6 @@ PVC/SL	크리스마스트리/UN	가/JKS	-29.32
 송병준/UN	씨/NNB	는/JX	-24.9
 송병준씨느/UN	ㄴ/ETM	-25.66
 송/NNP	병준씨/UN	는/JX	-27.58
-
-편안해	편안/NNG	하/XSA	아/EC	
-편안/NNG	하/XSV	아/EC	-7.138
-편안/NNG	하/XSA	아/EC	-10.44
-편안/NNG	하/VV	아/EC	-11.96
-편안/NNG	해/NNG	-12.75
-편/NNB	안/NNG	하/XSV	아/EC	-13.27
 
 송창의씨는	송창의/NNP	씨/NNB	는/JX	
 송/NNP	창의/NNG	씨/NNB	는/JX	-20.6
@@ -24716,13 +25991,6 @@ PVC/SL	크리스마스트리/UN	가/JKS	-29.32
 개/NNG	소/NNG	(/SS	29.4/SN	%/SW	)/SS	에/JKB	-19.23
 개/NNB	소/NNP	(/SS	29.4/SN	%/SW	)/SS	에/JKB	-22.56
 
-불과했으며,	불과/MAG	하/XSA	았/EP	으며/EC	,/SP	
-불과/MAG	하/XSV	았/EP	으며/EC	,/SP	-12.5
-불과/MAG	하/XSA	았/EP	으며/EC	,/SP	-15.29
-불과/MAG	하/VV	았/EP	으며/EC	,/SP	-15.31
-불과/XR	하/XSA	았/EP	으며/EC	,/SP	-15.34
-불과/XR	하/XSV	았/EP	으며/EC	,/SP	-15.83
-
 접근로에	접근로/NNG	에/JKB	
 접/NNG	근로/NNG	에/JKB	-18.45
 접근로/UN	에/JKB	-19.42
@@ -24764,6 +26032,13 @@ PVC/SL	크리스마스트리/UN	가/JKS	-29.32
 철/NNP	도/JX	-12.41
 철/NNG	도/NNG	-18.51
 처/NNG	ㄹ/JKO	도/JX	-19.92
+
+설치해야	설치/NNG	하/XSV	아야/EC	
+설치/NNG	하/XSA	아야/EC	-11.22
+설치/NNG	하/VV	아야/EC	-12.75
+설치/NNG	해/NNG	야/JX	-15.63
+설치/NNG	하/XSA	아/EC	야/JX	-17.64
+설치/NNG	하/VV	아/EC	야/JX	-19.17
 
 함에도	하/VX	ㅁ/ETN	에/JKB	도/JX	
 함/NNG	에/JKB	도/JX	-8.4
@@ -24863,6 +26138,13 @@ PVC/SL	크리스마스트리/UN	가/JKS	-29.32
 있느/UN	ㄴ/ETM	-13.66
 있는/UN	-16.61
 
+표시해야	표시/NNG	하/XSV	아야/EC	
+표시/NNG	하/XSA	아야/EC	-11.22
+표시/NNG	하/VV	아야/EC	-12.75
+표시/NNG	해/NNG	야/JX	-15.63
+표시/NNG	하/XSA	아/EC	야/JX	-17.64
+표/NNG	시/NNG	하/XSA	아야/EC	-17.93
+
 하지만	하/VX	지만/EC	
 하/VV	지만/EC	-3.838
 하/VX	지만/EC	-5.404
@@ -24938,6 +26220,20 @@ PVC/SL	크리스마스트리/UN	가/JKS	-29.32
 이무하/UN	(/SS	45/SN	)/SS	-/SO	한/MM	재용/NNP	(/SS	32/SN	)/SS	교수/NNG	팀/NNG	은/JX	-45.24
 이무/UN	하/XSA	아/EC	(/SS	45/SN	)/SS	-/SO	한/MM	재용/NNG	(/SS	32/SN	)/SS	교수/NNG	팀/NNG	은/JX	-46.03
 
+개발했다고	개발/NNG	하/XSV	았/EP	다고/EC	
+개발/NNG	하/XSA	았/EP	다고/EC	-13.45
+개발/NNG	하/VV	았/EP	다고/EC	-14.43
+개발했/UN	다고/EC	-20.23
+개/NNB	발/NNG	하/XSA	았/EP	다고/EC	-20.47
+개/NNB	발/NNG	하/VV	았/EP	다고/EC	-21.45
+
+발표했다.	발표/NNG	하/XSV	았/EP	다/EF	./SF	
+발표/NNG	하/XSA	았/EP	다/EF	./SF	-10.56
+발표/NNG	하/VV	았/EP	다/EF	./SF	-11.54
+발/NNG	표하/VV	았/EP	다/EF	./SF	-15.54
+발/NNG	표/NNG	하/XSA	았/EP	다/EF	./SF	-16.53
+발/NNG	표/NNG	하/VV	았/EP	다/EF	./SF	-17.51
+
 전기영동(유전자의	전기영동/NNG	(/SS	유전자/NNG	의/JKG	
 전기/NNG	영동/NNP	(/SS	유전자/NNG	의/JKG	-25.27
 전기/NNG	영/NNG	동/NNG	(/SS	유전자/NNG	의/JKG	-26.65
@@ -24950,13 +26246,6 @@ PVC/SL	크리스마스트리/UN	가/JKS	-29.32
 따/VV	아라/EF	-13.64
 따/VV	라/EF	-16.06
 따라/VV	-46.03
-
-것)시켜	것/NNB	)/SS	시키/XSV	어/EC	
-것/NNB	)/SS	시키/VV	어/EC	-9.483
-것/NNB	)/SS	시키/VV	여/EC	-12.62
-것/NNB	)/SS	시키/VV	어/EF	-19.25
-것/NNB	)/SS	시키/VV	여/EF	-19.85
-것/NNB	)/SS	시켜/UN	-20.98
 
 표지인자가	표지/NNG	인자/NNG	가/JKC	
 표지/NNG	인자/NNG	가/JKS	-15.13
@@ -25056,6 +26345,13 @@ PVC/SL	크리스마스트리/UN	가/JKS	-29.32
 바람직/XR	하/XSA	아다/EC	"/SS	고/EC	-19.4
 바람직/XR	하/XSV	다/EC	"/SS	고/EC	-20.27
 
+말했다.	말/NNG	하/XSV	았/EP	다/EF	./SF	
+말하/VV	았/EP	다/EF	./SF	-8.016
+말/NNG	하/XSA	았/EP	다/EF	./SF	-8.724
+말/NNG	하/VV	았/EP	다/EF	./SF	-9.706
+말/NNB	하/XSA	았/EP	다/EF	./SF	-15.34
+말했/UN	다/EF	./SF	-16.46
+
 이	이/MM	
 이/NP	-9.459
 이/MM	-9.826
@@ -25104,6 +26400,20 @@ YJ/SL	학사고/UN	시사/NNG	로/JKB	-25.17
 1/SN	-/SO	2/SN	위르/UN	ㄹ/ETM	-12.87
 1/SN	-/SO	2/SN	위/NNP	를/JKO	-14.35
 1/SN	-/SO	2/SN	위를/UN	-16.38
+
+차지했다고	차지/NNG	하/XSV	았/EP	다고/EC	
+차지/NNG	하/XSA	았/EP	다고/EC	-13.86
+차지/NNG	하/VV	았/EP	다고/EC	-14.85
+차/VV	지/EC	하/VX	았/EP	다고/EC	-15.67
+차/VV	지/EC	하/VV	았/EP	다고/EC	-17.37
+차지했/UN	다고/EC	-18.73
+
+발표했다.	발표/NNG	하/XSV	았/EP	다/EF	./SF	
+발표/NNG	하/XSA	았/EP	다/EF	./SF	-10.56
+발표/NNG	하/VV	았/EP	다/EF	./SF	-11.54
+발/NNG	표하/VV	았/EP	다/EF	./SF	-15.54
+발/NNG	표/NNG	하/XSA	았/EP	다/EF	./SF	-16.53
+발/NNG	표/NNG	하/VV	았/EP	다/EF	./SF	-17.51
 
 가전3사와	가전/NNG	3/SN	사/NNG	와/JC	
 가전/NNG	3/SN	사/NNG	와/JKB	-22.1
@@ -25207,6 +26517,13 @@ YJ/SL	학사고/UN	시사/NNG	로/JKB	-25.17
 다/MAG	류/NNG	-26.96
 다/NNG	류/NNG	-27.1
 
+말했다.	말/NNG	하/XSV	았/EP	다/EF	./SF	
+말하/VV	았/EP	다/EF	./SF	-8.016
+말/NNG	하/XSA	았/EP	다/EF	./SF	-8.724
+말/NNG	하/VV	았/EP	다/EF	./SF	-9.706
+말/NNB	하/XSA	았/EP	다/EF	./SF	-15.34
+말했/UN	다/EF	./SF	-16.46
+
 가까이	가까이/MAG	
 가까이/NNG	-7.988
 가까이/MAG	-9.104
@@ -25288,6 +26605,13 @@ OB/SL	씨/NNG	그램/NNG	의/JKG	-21.19
 다/NNG	류/XSN	-18.25
 다/MAG	류/NNG	-26.96
 다/NNG	류/NNG	-27.1
+
+말했다.	말/NNG	하/XSV	았/EP	다/EF	./SF	
+말하/VV	았/EP	다/EF	./SF	-8.016
+말/NNG	하/XSA	았/EP	다/EF	./SF	-8.724
+말/NNG	하/VV	았/EP	다/EF	./SF	-9.706
+말/NNB	하/XSA	았/EP	다/EF	./SF	-15.34
+말했/UN	다/EF	./SF	-16.46
 
 가까이	가까이/MAG	
 가까이/NNG	-7.988
@@ -25424,6 +26748,20 @@ YJ/SL	학사고/UN	시사/NNG	로/JKB	-25.17
 1/SN	-/SO	2/SN	위/NNP	를/JKO	-14.35
 1/SN	-/SO	2/SN	위를/UN	-16.38
 
+차지했다고	차지/NNG	하/XSV	았/EP	다고/EC	
+차지/NNG	하/XSA	았/EP	다고/EC	-13.86
+차지/NNG	하/VV	았/EP	다고/EC	-14.85
+차/VV	지/EC	하/VX	았/EP	다고/EC	-15.67
+차/VV	지/EC	하/VV	았/EP	다고/EC	-17.37
+차지했/UN	다고/EC	-18.73
+
+발표했다.	발표/NNG	하/XSV	았/EP	다/EF	./SF	
+발표/NNG	하/XSA	았/EP	다/EF	./SF	-10.56
+발표/NNG	하/VV	았/EP	다/EF	./SF	-11.54
+발/NNG	표하/VV	았/EP	다/EF	./SF	-15.54
+발/NNG	표/NNG	하/XSA	았/EP	다/EF	./SF	-16.53
+발/NNG	표/NNG	하/VV	았/EP	다/EF	./SF	-17.51
+
 가전3사와	가전/NNG	3/SN	사/NNG	와/JC	
 가전/NNG	3/SN	사/NNG	와/JKB	-22.1
 가전/NNG	3/SN	사/NNG	와/JC	-22.65
@@ -25511,13 +26849,6 @@ YJ/SL	학사고/UN	시사/NNG	로/JKB	-25.17
 귀뚜라미보/UN	이르/VV	어/EC	./SF	-32.4
 귀뚜라미보/UN	이르/VV	어/EF	./SF	-32.74
 귀뚜라미/NNG	보/NNG	이르/VV	어/EC	./SF	-33.93
-
-새해	새해/NNG	
-새/NNG	하/XSV	아/EC	-7.126
-새해/NNG	-8.406
-새/NNG	하/XSA	아/EC	-10.43
-새/NNG	하/VV	아/EC	-11.95
-새/MM	해/NNG	-12.5
 
 호텔-여관	호텔/NNG	-/SS	여관/NNG	
 호/NNB	텔/NNP	-/SO	여관/NNG	-37.04

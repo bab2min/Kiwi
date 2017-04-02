@@ -77,7 +77,8 @@ const char * tagToString(KPOSTag t)
 		"SL", "SH", "SN",
 		"JKS", "JKC", "JKG", "JKO", "JKB", "JKV", "JKQ", "JX", "JC",
 		"EP", "EF", "EC", "ETN", "ETM",
-		"V"
+		"V",
+		"@"
 	};
 	assert(t < KPOSTag::MAX);
 	return tags[(size_t)t];

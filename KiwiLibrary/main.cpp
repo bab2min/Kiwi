@@ -15,7 +15,7 @@ int main()
 	Kiwi kw;
 	kw.prepare();
 	printf("Loading Time : %g ms\n", timer.getElapsed());
-	string testFiles[] = { "01.txt", "02.txt", "03.txt" };
+	string testFiles[] = { "01s.txt", "02s.txt", "03s.txt" };
 	for (auto tf : testFiles)
 	{
 		Timer total;
