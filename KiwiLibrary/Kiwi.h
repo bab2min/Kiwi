@@ -12,6 +12,7 @@ class Kiwi
 protected:
 	shared_ptr<KModelMgr> mdl;
 	shared_ptr<KTrie> kt;
+	mutable unordered_map<string, vector<KResult>> analyzeCache;
 	static KPOSTag identifySpecialChr(wchar_t chr);
 	static vector<vector<KWordPair>> splitPart(const wstring& str);
 	static vector<const KChunk*> divideChunk(const vector<KChunk>& ch);

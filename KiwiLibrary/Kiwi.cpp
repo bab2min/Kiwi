@@ -315,6 +315,12 @@ exit:;
 
 vector<KResult> Kiwi::analyzeJM(const string & jm, size_t topN, KPOSTag prefix, KPOSTag suffix) const
 {
+	string cfind = jm;
+	cfind.push_back((char)prefix + 64);
+	cfind.push_back((char)suffix + 64);
+	auto cit = analyzeCache.find(cfind);
+	if (cit != analyzeCache.end()) return cit->second;
+
 	vector<KResult> ret;
 	auto sortFunc = [](const auto& x, const auto& y)
 	{
@@ -433,6 +439,6 @@ vector<KResult> Kiwi::analyzeJM(const string & jm, size_t topN, KPOSTag prefix, 
 			return kr;
 		});
 	}
-
+	analyzeCache.emplace(cfind, ret);
 	return ret;
 }
