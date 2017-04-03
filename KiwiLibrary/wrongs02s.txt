@@ -1,6 +1,6 @@
 0.76344
-Total (4533) Time : 9880.96 ms
-Time per Unit : 2.17978 ms
+Total (4533) Time : 6844.37 ms
+Time per Unit : 1.5099 ms
 
 석 달하고도 며칠이 더 지나갔다.	0.571
 석/MM	달/NNG	하고/JC	도/JX	며칠/NNG	이/JKS	더/MAG	지나가/VV	았/EP	다/EF	./SF	
