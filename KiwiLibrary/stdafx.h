@@ -17,6 +17,7 @@
 #include <bitset>
 
 #include <algorithm>
+#include <functional>
 
 #include <string>
 #include <sstream>
@@ -29,3 +30,5 @@
 #include <chrono>
 
 using namespace std;
+
+#define TRIE_ALLOC_ARRAY

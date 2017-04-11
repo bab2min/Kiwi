@@ -70,6 +70,9 @@ struct KMorpheme
 	char combineSocket = 0;
 	float p = 0;
 	vector<const KMorpheme*> chunks;
+
+	void readFromBin(FILE* f, const function<const KMorpheme*(size_t)>& mapper);
+	void writeToBin(FILE* f, const function<size_t(const KMorpheme*)>& mapper) const;
 };
 
 struct KForm
@@ -84,5 +87,8 @@ struct KForm
 	KForm(const char* _form = nullptr);
 	KForm(const string& _form) : form(_form) {}
 	void updateCond();
+
+	void readFromBin(FILE* f, const function<const KMorpheme*(size_t)>& mapper);
+	void writeToBin(FILE* f, const function<size_t(const KMorpheme*)>& mapper) const;
 };
 

@@ -108,7 +108,7 @@ vector<vector<KWordPair>> Kiwi::splitPart(const wstring & str)
 	return ret;
 }
 
-Kiwi::Kiwi(const char * modelPath)
+Kiwi::Kiwi(const char * modelPath, size_t _maxCache) : maxCache(_maxCache)
 {
 	mdl = make_shared<KModelMgr>("../ModelGenerator/pos.txt", "../ModelGenerator/fullmodel.txt", "../ModelGenerator/combined.txt", "../ModelGenerator/precombined.txt");
 }
@@ -121,7 +121,7 @@ int Kiwi::loadUserDictionary(const char * userDictPath)
 int Kiwi::prepare()
 {
 	mdl->solidify();
-	kt = mdl->makeTrie();
+	kt = mdl->getTrie();
 	return 0;
 }
 
@@ -210,6 +210,11 @@ vector<KResult> Kiwi::analyze(const wstring & str, size_t topN) const
 		}
 	}
 	return cands;
+}
+
+void Kiwi::clearCache()
+{
+	analyzedCache = {};
 }
 
 vector<const KChunk*> Kiwi::divideChunk(const vector<KChunk>& ch)
@@ -318,8 +323,8 @@ vector<KResult> Kiwi::analyzeJM(const string & jm, size_t topN, KPOSTag prefix, 
 	string cfind = jm;
 	cfind.push_back((char)prefix + 64);
 	cfind.push_back((char)suffix + 64);
-	auto cit = analyzeCache.find(cfind);
-	if (cit != analyzeCache.end()) return cit->second;
+	auto cit = analyzedCache.find(cfind);
+	if (cit != analyzedCache.end()) return cit->second;
 
 	vector<KResult> ret;
 	auto sortFunc = [](const auto& x, const auto& y)
@@ -439,6 +444,6 @@ vector<KResult> Kiwi::analyzeJM(const string & jm, size_t topN, KPOSTag prefix, 
 			return kr;
 		});
 	}
-	analyzeCache.emplace(cfind, ret);
+	if(analyzedCache.size() < maxCache)	analyzedCache.emplace(cfind, ret);
 	return ret;
 }

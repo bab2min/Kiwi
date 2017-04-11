@@ -30,14 +30,32 @@ struct KTrie
 	char currentChar = 0;
 #endif //  _DEBUG
 
+#ifdef TRIE_ALLOC_ARRAY
+	int next[51];
+	//int fail;
+	KTrie* fail = nullptr;
+#else
 	KTrie* next[51] = {nullptr,};
 	KTrie* fail = nullptr;
+#endif
 	const KForm* exit = nullptr;
 	KTrie();
 	~KTrie();
+#ifdef TRIE_ALLOC_ARRAY
+	void build(const char* str, const KForm* form, const function<KTrie*()>& alloc);
+#else
 	void build(const char* str, const KForm* form);
+#endif
 	KTrie* findFail(char i) const;
 	void fillFail();
+	KTrie* getNext(int i) const 
+	{
+#ifdef TRIE_ALLOC_ARRAY
+		return next[i] ? (KTrie*)this + next[i] : nullptr;
+#else
+		return next[i];
+#endif
+	}
 	const KForm* search(const char* begin, const char* end) const;
 	vector<pair<const KForm*, int>> searchAllPatterns(const string& str) const;
 	vector<vector<KChunk>> split(const string& str, bool hasPrefix = false) const;

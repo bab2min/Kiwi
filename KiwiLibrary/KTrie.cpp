@@ -17,13 +17,19 @@ KTrie::KTrie()
 
 KTrie::~KTrie()
 {
+#ifdef TRIE_ALLOC_ARRAY
+#else
 	for (auto p : next)
 	{
 		if(p) delete p;
 	}
+#endif
 }
-
+#ifdef TRIE_ALLOC_ARRAY
+void KTrie::build(const char * str, const KForm * _form, const function<KTrie*()>& alloc)
+#else
 void KTrie::build(const char * str, const KForm * _form)
+#endif
 {
 	assert(str);
 	assert(str[0] < 52);
@@ -33,15 +39,24 @@ void KTrie::build(const char * str, const KForm * _form)
 		return;
 	}
 	int idx = str[0] - 1;
-	if (!next[idx])
+	if (!getNext(idx))
 	{
+#ifdef TRIE_ALLOC_ARRAY
+		next[idx] = alloc() - this;
+#else
 		next[idx] = new KTrie();
+#endif
 #ifdef _DEBUG
 		next[idx]->currentChar = str[0];
 #endif // _DEBUG
 
 	}
+
+#ifdef TRIE_ALLOC_ARRAY
+	getNext(idx)->build(str + 1, _form, alloc);
+#else
 	next[idx]->build(str + 1, _form);
+#endif
 }
 
 KTrie * KTrie::findFail(char i) const
@@ -53,9 +68,9 @@ KTrie * KTrie::findFail(char i) const
 	}
 	else
 	{
-		if (fail->next[i]) // if 'i' node exists
+		if (fail->getNext(i)) // if 'i' node exists
 		{
-			return fail->next[i];
+			return fail->getNext(i);
 		}
 		else // or loop for failure of this
 		{
@@ -72,9 +87,9 @@ void KTrie::fillFail() //
 		auto p = dq.front();
 		for (int i = 0; i < 51; i++)
 		{
-			if (!p->next[i]) continue;
-			p->next[i]->fail = p->findFail(i);
-			dq.emplace_back(p->next[i]);
+			if (!p->getNext(i)) continue;
+			p->getNext(i)->fail = p->findFail(i);
+			dq.emplace_back(p->getNext(i));
 
 			if (!p->exit)
 			{
@@ -94,7 +109,7 @@ void KTrie::fillFail() //
 const KForm * KTrie::search(const char* begin, const char* end) const
 {
 	if(begin == end) return exit;
-	if (next[*begin - 1]) return next[*begin - 1]->search(begin + 1, end);
+	if (getNext(*begin - 1)) return getNext(*begin - 1)->search(begin + 1, end);
 	return nullptr;
 }
 
@@ -106,7 +121,7 @@ vector<pair<const KForm*, int>> KTrie::searchAllPatterns(const string& str) cons
 	for (auto c : str)
 	{
 		assert(c < 52);
-		while (!curTrie->next[c - 1]) // if curTrie has no exact next node, goto fail
+		while (!curTrie->getNext(c - 1)) // if curTrie has no exact next node, goto fail
 		{
 			if (curTrie->fail)
 			{
@@ -117,7 +132,7 @@ vector<pair<const KForm*, int>> KTrie::searchAllPatterns(const string& str) cons
 		}
 		n++;
 		// from this, curTrie has exact node
-		curTrie = curTrie->next[c - 1];
+		curTrie = curTrie->getNext(c - 1);
 		if (curTrie->exit) // if it has exit node, a pattern has found
 		{
 			found.emplace_back(curTrie->exit, n);
@@ -250,7 +265,7 @@ vector<vector<KChunk>> KTrie::split(const string& str, bool hasPrefix) const
 	{
 		assert(c < 52);
 		
-		while (!curTrie->next[c - 1]) // if curTrie has no exact next node, goto fail
+		while (!curTrie->getNext(c - 1)) // if curTrie has no exact next node, goto fail
 		{
 			if (curTrie->fail)
 			{
@@ -273,7 +288,7 @@ vector<vector<KChunk>> KTrie::split(const string& str, bool hasPrefix) const
 		}
 		brachOut();
 		// from this, curTrie has exact node
-		curTrie = curTrie->next[c - 1];
+		curTrie = curTrie->getNext(c - 1);
 		// if it has exit node, a pattern has found
 		for (auto submatcher = curTrie; submatcher; submatcher = submatcher->fail)
 		{
