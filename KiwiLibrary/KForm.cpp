@@ -108,3 +108,103 @@ void KForm::updateCond()
 	polar = cp;
 	if (suffix.find(0) != suffix.end()) suffix = {};
 }
+
+void writeString(const string& str, FILE* f)
+{
+	size_t s = str.size();
+	fwrite(&s, 1, 4, f);
+	if (s) fwrite(&str[0], 1, s, f);
+}
+
+void readString(string& str, FILE* f)
+{
+	size_t s = 0;
+	fread(&s, 1, 4, f);
+	str.resize(s);
+	if (s) fread(&str[0], 1, s, f);
+}
+
+void KForm::readFromBin(FILE * f, const function<const KMorpheme*(size_t)>& mapper)
+{
+	readString(form, f);
+	size_t s = 0;
+	fread(&s, 1, 4, f);
+	candidate.resize(s);
+	for (auto& c : candidate)
+	{
+		size_t cid = 0;
+		fread(&cid, 1, 4, f);
+		c = mapper(cid);
+	}
+	fread(&vowel, 1, 1, f);
+	fread(&polar, 1, 1, f);
+	fread(&hasFirstV, 1, 1, f);
+
+	fread(&s, 1, 4, f);
+	for (size_t i = 0; i < s; i++)
+	{
+		char c;
+		fread(&c, 1, 1, f);
+		suffix.insert(c);
+	}
+}
+
+void KForm::writeToBin(FILE * f, const function<size_t(const KMorpheme*)>& mapper) const
+{
+	writeString(form, f);
+	size_t s = candidate.size();
+	fwrite(&s, 1, 4, f);
+	for (auto c : candidate)
+	{
+		size_t cid = mapper(c);
+		fwrite(&cid, 1, 4, f);
+	}
+	fwrite(&vowel, 1, 1, f);
+	fwrite(&polar, 1, 1, f);
+	fwrite(&hasFirstV, 1, 1, f);
+
+	s = suffix.size();
+	fwrite(&s, 1, 4, f);
+	for (auto c : suffix)
+	{
+		fwrite(&c, 1, 1, f);
+	}
+}
+
+void KMorpheme::readFromBin(FILE * f, const function<const KMorpheme*(size_t)>& mapper)
+{
+	readString(form, f);
+	fread(&tag, 1, 1, f);
+	fread(&vowel, 1, 1, f);
+	fread(&polar, 1, 1, f);
+	fread(&combineSocket, 1, 1, f);
+	fread(&p, 1, 4, f);
+
+	size_t s = 0;
+	fread(&s, 1, 4, f);
+	chunks.resize(s);
+	for (auto& c : chunks)
+	{
+		size_t cid = 0;
+		fread(&cid, 1, 4, f);
+		c = mapper(cid);
+	}
+}
+
+void KMorpheme::writeToBin(FILE * f, const function<size_t(const KMorpheme*)>& mapper) const
+{
+	writeString(form, f);
+	fwrite(&tag, 1, 1, f);
+	fwrite(&vowel, 1, 1, f);
+	fwrite(&polar, 1, 1, f);
+	fwrite(&combineSocket, 1, 1, f);
+	fwrite(&p, 1, 4, f);
+
+	size_t s = chunks.size();
+	fwrite(&s, 1, 4, f);
+	for (auto c : chunks)
+	{
+		size_t cid = mapper(c);
+		fwrite(&cid, 1, 4, f);
+	}
+}

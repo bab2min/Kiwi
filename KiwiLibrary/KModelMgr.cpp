@@ -94,6 +94,26 @@ void KModelMgr::loadPOSFromTxt(const char * filename)
 	}
 }
 
+void KModelMgr::savePOSBin(const char * filename) const
+{
+	FILE* f;
+	if (fopen_s(&f, filename, "wb")) throw exception();
+	fwrite(posTransition, 1, sizeof(posTransition), f);
+	fwrite(maxiumBtwn, 1, sizeof(maxiumBtwn), f);
+	fwrite(maxiumVBtwn, 1, sizeof(maxiumVBtwn), f);
+	fclose(f);
+}
+
+void KModelMgr::loadPOSBin(const char * filename)
+{
+	FILE* f;
+	if (fopen_s(&f, filename, "rb")) throw exception();
+	fread(posTransition, 1, sizeof(posTransition), f);
+	fread(maxiumBtwn, 1, sizeof(maxiumBtwn), f);
+	fread(maxiumVBtwn, 1, sizeof(maxiumVBtwn), f);
+	fclose(f);
+}
+
 void KModelMgr::loadMMFromTxt(const char * filename, unordered_map<string, size_t>& formMap, unordered_map<pair<string, KPOSTag>, size_t>& morphMap)
 {
 	auto formMapper = [&formMap, this](string form) -> KForm&
@@ -290,14 +310,76 @@ void KModelMgr::loadPCMFromTxt(const char * filename, unordered_map<string, size
 	fclose(file);
 }
 
+void KModelMgr::saveMorphBin(const char * filename) const
+{
+	FILE* f;
+	if (fopen_s(&f, filename, "wb")) throw exception();
+	fwrite("KIWI", 1, 4, f);
+	size_t s = forms.size();
+	fwrite(&s, 1, 4, f);
+	s = morphemes.size();
+	fwrite(&s, 1, 4, f);
+
+	auto mapper = [this](const KMorpheme* p)->size_t
+	{
+		return (size_t)p;
+	};
+
+	for (const auto& form : forms)
+	{
+		form.writeToBin(f, mapper);
+	}
+	for (const auto& morph : morphemes)
+	{
+		morph.writeToBin(f, mapper);
+	}
+	fclose(f);
+}
+
+void KModelMgr::loadMorphBin(const char * filename)
+{
+	FILE* f;
+	if (fopen_s(&f, filename, "rb")) throw exception();
+	size_t formSize = 0, morphemeSize = 0;
+	fread(&formSize, 1, 4, f);
+	fread(&formSize, 1, 4, f);
+	fread(&morphemeSize, 1, 4, f);
+	
+	forms.resize(formSize);
+	morphemes.resize(morphemeSize);
+
+	auto mapper = [this](size_t p)->const KMorpheme*
+	{
+		return (const KMorpheme*)p;
+	};
+
+	for (auto& form : forms)
+	{
+		form.readFromBin(f, mapper);
+	}
+	for (auto& morph : morphemes)
+	{
+		morph.readFromBin(f, mapper);
+	}
+	fclose(f);
+}
+
 KModelMgr::KModelMgr(const char * posFile, const char * morphemeFile, const char * combinedFile, const char* precombinedFile)
 {
 	unordered_map<string, size_t> formMap;
 	unordered_map<pair<string, KPOSTag>, size_t> morphMap;
+
+	/*
 	if (posFile) loadPOSFromTxt(posFile);
 	if (morphemeFile) loadMMFromTxt(morphemeFile, formMap, morphMap);
 	if (combinedFile) loadCMFromTxt(combinedFile, formMap, morphMap);
 	if (precombinedFile) loadPCMFromTxt(precombinedFile, formMap, morphMap);
+	savePOSBin((posFile + string(".bin")).c_str());
+	saveMorphBin((morphemeFile + string(".bin")).c_str());
+	/*/
+	loadPOSBin((posFile + string(".bin")).c_str());
+	loadMorphBin((morphemeFile + string(".bin")).c_str());
+	//*/
 }
 
 void KModelMgr::solidify()
@@ -312,17 +394,28 @@ void KModelMgr::solidify()
 		for (auto& p : f.candidate) p = &morphemes[(size_t)p];
 		f.updateCond();
 	}
-}
 
-shared_ptr<KTrie> KModelMgr::makeTrie() const
-{
-	shared_ptr<KTrie> kt = make_shared<KTrie>();
+#ifdef TRIE_ALLOC_ARRAY
+	trieRoot.reserve(150000);
+	trieRoot.emplace_back();
 	for (auto& f : forms)
 	{
-		kt->build(f.form.c_str(), &f);
+		trieRoot[0].build(f.form.c_str(), &f, [this]()
+		{
+			trieRoot.emplace_back();
+			return &trieRoot.back();
+		});
 	}
-	kt->fillFail();
-	return kt;
+	trieRoot[0].fillFail();
+#else
+	trieRoot = make_shared<KTrie>();
+	for (auto& f : forms)
+	{
+		trieRoot->build(f.form.c_str(), &f);
+	}
+	trieRoot->fillFail();
+#endif
+	
 }
 
 float KModelMgr::getTransitionP(const KMorpheme * a, const KMorpheme * b) const
