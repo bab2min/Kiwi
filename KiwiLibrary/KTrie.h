@@ -31,7 +31,7 @@ struct KTrie
 #endif //  _DEBUG
 
 #ifdef TRIE_ALLOC_ARRAY
-	int next[51];
+	array<int, 51> next = { 0, };
 	//int fail;
 	KTrie* fail = nullptr;
 #else

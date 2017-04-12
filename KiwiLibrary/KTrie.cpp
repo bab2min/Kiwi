@@ -47,7 +47,7 @@ void KTrie::build(const char * str, const KForm * _form)
 		next[idx] = new KTrie();
 #endif
 #ifdef _DEBUG
-		next[idx]->currentChar = str[0];
+		getNext(idx)->currentChar = str[0];
 #endif // _DEBUG
 
 	}

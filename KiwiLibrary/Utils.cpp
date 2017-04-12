@@ -22,6 +22,7 @@ string splitJamo(wstring hangul)
 	string ret;
 	for (auto c : hangul)
 	{
+		assert(0xac00 <= c && c < 0xd7a4);
 		splitJamo(c, ret);
 	}
 	return ret;
