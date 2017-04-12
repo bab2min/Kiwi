@@ -113,6 +113,17 @@ Kiwi::Kiwi(const char * modelPath, size_t _maxCache) : maxCache(_maxCache)
 	mdl = make_shared<KModelMgr>("../ModelGenerator/pos.txt", "../ModelGenerator/fullmodel.txt", "../ModelGenerator/combined.txt", "../ModelGenerator/precombined.txt");
 }
 
+int Kiwi::addUserWord(const wstring & str, KPOSTag tag)
+{
+	mdl->addUserWord(splitJamo(str), tag);
+	return 0;
+}
+
+int Kiwi::addUserRule(const wstring & str, const vector<pair<wstring, KPOSTag>>& morph)
+{
+	return 0;
+}
+
 int Kiwi::loadUserDictionary(const char * userDictPath)
 {
 	return 0;

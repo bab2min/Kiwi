@@ -21,6 +21,8 @@ protected:
 	vector<KResult> analyzeJM(const string& jm, size_t topN, KPOSTag prefix, KPOSTag suffix) const;
 public:
 	Kiwi(const char* modelPath = "", size_t maxCache = -1);
+	int addUserWord(const wstring& str, KPOSTag tag);
+	int addUserRule(const wstring& str, const vector<pair<wstring, KPOSTag>>& morph);
 	int loadUserDictionary(const char* userDictPath = "");
 	int prepare();
 	KResult analyze(const wstring& str) const;

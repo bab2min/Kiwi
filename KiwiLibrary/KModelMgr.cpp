@@ -114,18 +114,8 @@ void KModelMgr::loadPOSBin(const char * filename)
 	fclose(f);
 }
 
-void KModelMgr::loadMMFromTxt(const char * filename, unordered_map<string, size_t>& formMap, unordered_map<pair<string, KPOSTag>, size_t>& morphMap)
+void KModelMgr::loadMMFromTxt(const char * filename, unordered_map<pair<string, KPOSTag>, size_t>& morphMap)
 {
-	auto formMapper = [&formMap, this](string form) -> KForm&
-	{
-		auto it = formMap.find(form);
-		if (it != formMap.end()) return forms[it->second];
-		size_t id = formMap.size();
-		formMap.emplace(form, id);
-		forms.emplace_back(form);
-		return forms[id];
-	};
-
 	FILE* file;
 	if (fopen_s(&file, filename, "r")) throw exception();
 	char buf[2048];
@@ -183,18 +173,8 @@ void KModelMgr::loadMMFromTxt(const char * filename, unordered_map<string, size_
 }
 
 
-void KModelMgr::loadCMFromTxt(const char * filename, unordered_map<string, size_t>& formMap, unordered_map<pair<string, KPOSTag>, size_t>& morphMap)
+void KModelMgr::loadCMFromTxt(const char * filename, unordered_map<pair<string, KPOSTag>, size_t>& morphMap)
 {
-	auto formMapper = [&formMap, this](string form) -> KForm&
-	{
-		auto it = formMap.find(form);
-		if (it != formMap.end()) return forms[it->second];
-		size_t id = formMap.size();
-		formMap.emplace(form, id);
-		forms.emplace_back(form);
-		return forms[id];
-	};
-
 	FILE* file;
 	if (fopen_s(&file, filename, "r")) throw exception();
 	char buf[2048];
@@ -270,18 +250,8 @@ void KModelMgr::loadCMFromTxt(const char * filename, unordered_map<string, size_
 }
 
 
-void KModelMgr::loadPCMFromTxt(const char * filename, unordered_map<string, size_t>& formMap, unordered_map<pair<string, KPOSTag>, size_t>& morphMap)
+void KModelMgr::loadPCMFromTxt(const char * filename, unordered_map<pair<string, KPOSTag>, size_t>& morphMap)
 {
-	auto formMapper = [&formMap, this](string form) -> KForm&
-	{
-		auto it = formMap.find(form);
-		if (it != formMap.end()) return forms[it->second];
-		size_t id = formMap.size();
-		formMap.emplace(form, id);
-		forms.emplace_back(form);
-		return forms[id];
-	};
-
 	FILE* file;
 	if (fopen_s(&file, filename, "r")) throw exception();
 	char buf[2048];
@@ -356,6 +326,7 @@ void KModelMgr::loadMorphBin(const char * filename)
 	for (auto& form : forms)
 	{
 		form.readFromBin(f, mapper);
+		formMap.emplace(form.form, formMap.size());
 	}
 	for (auto& morph : morphemes)
 	{
@@ -366,14 +337,12 @@ void KModelMgr::loadMorphBin(const char * filename)
 
 KModelMgr::KModelMgr(const char * posFile, const char * morphemeFile, const char * combinedFile, const char* precombinedFile)
 {
-	unordered_map<string, size_t> formMap;
-	unordered_map<pair<string, KPOSTag>, size_t> morphMap;
-
 	/*
+	unordered_map<pair<string, KPOSTag>, size_t> morphMap;
 	if (posFile) loadPOSFromTxt(posFile);
-	if (morphemeFile) loadMMFromTxt(morphemeFile, formMap, morphMap);
-	if (combinedFile) loadCMFromTxt(combinedFile, formMap, morphMap);
-	if (precombinedFile) loadPCMFromTxt(precombinedFile, formMap, morphMap);
+	if (morphemeFile) loadMMFromTxt(morphemeFile, morphMap);
+	if (combinedFile) loadCMFromTxt(combinedFile, morphMap);
+	if (precombinedFile) loadPCMFromTxt(precombinedFile, morphMap);
 	savePOSBin((posFile + string(".bin")).c_str());
 	saveMorphBin((morphemeFile + string(".bin")).c_str());
 	/*/
@@ -382,21 +351,30 @@ KModelMgr::KModelMgr(const char * posFile, const char * morphemeFile, const char
 	//*/
 }
 
+void KModelMgr::addUserWord(const string & form, KPOSTag tag)
+{
+#ifdef TRIE_ALLOC_ARRAY
+	if (!form.empty()) extraTrieSize += form.size() - 1;
+#else
+#endif
+
+	auto& f = formMapper(form);
+	f.candidate.emplace_back((const KMorpheme*)morphemes.size());
+	morphemes.emplace_back(form, tag);
+}
+
+void KModelMgr::addUserRule(const string & form, const vector<pair<string, KPOSTag>>& morphs)
+{
+#ifdef TRIE_ALLOC_ARRAY
+	if (!form.empty()) extraTrieSize += form.size() - 1;
+#else
+#endif
+}
+
 void KModelMgr::solidify()
 {
-	for (auto& f : morphemes)
-	{
-		for (auto& p : f.chunks) p = &morphemes[(size_t)p];
-	}
-
-	for (auto& f : forms)
-	{
-		for (auto& p : f.candidate) p = &morphemes[(size_t)p];
-		f.updateCond();
-	}
-
 #ifdef TRIE_ALLOC_ARRAY
-	trieRoot.reserve(150000);
+	trieRoot.reserve(150000 + extraTrieSize);
 	trieRoot.emplace_back();
 	for (auto& f : forms)
 	{
@@ -415,7 +393,18 @@ void KModelMgr::solidify()
 	}
 	trieRoot->fillFail();
 #endif
-	
+
+	for (auto& f : morphemes)
+	{
+		for (auto& p : f.chunks) p = &morphemes[(size_t)p];
+	}
+
+	for (auto& f : forms)
+	{
+		for (auto& p : f.candidate) p = &morphemes[(size_t)p];
+		f.updateCond();
+	}
+	formMap = {};
 }
 
 float KModelMgr::getTransitionP(const KMorpheme * a, const KMorpheme * b) const
@@ -430,14 +419,6 @@ float KModelMgr::getTransitionP(KPOSTag a, KPOSTag b) const
 	return posTransition[(size_t)a][(size_t)b];
 }
 
-/*KPOSTag KModelMgr::findMaxiumTag(const KMorpheme * b) const
-{
-	if (!b) return KPOSTag::UNKNOWN;
-	if (b->chunks.empty()) return maxiumBf[(size_t)b->tag];
-	if (b->chunks.front()->tag == KPOSTag::V) return KPOSTag::UNKNOWN;
-	return maxiumBf[(size_t)b->chunks.front()->tag];
-}*/
-
 KPOSTag KModelMgr::findMaxiumTag(const KMorpheme * a, const KMorpheme * b) const
 {
 	KPOSTag tagA = KPOSTag::UNKNOWN;
@@ -449,10 +430,3 @@ KPOSTag KModelMgr::findMaxiumTag(const KMorpheme * a, const KMorpheme * b) const
 	//if (b->chunks.front()->tag == KPOSTag::V) return KPOSTag::UNKNOWN;
 	return (b->chunks[0]->tag == KPOSTag::V ? maxiumVBtwn : maxiumBtwn)[(size_t)tagA][(size_t)b->chunks[b->chunks[0]->tag == KPOSTag::V ? 1 : 0]->tag];
 }
-
-float KModelMgr::getMaxInOpend(KPOSTag a)
-{
-	//return max_element(&posTransition[(size_t)a][1], posTransition[(size_t)a][])
-	return 0;
-}
-
