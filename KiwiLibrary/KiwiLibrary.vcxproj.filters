@@ -24,9 +24,6 @@
     <ClInclude Include="targetver.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="KEndingMaker.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="HangulMacro.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -48,18 +45,9 @@
     <ClInclude Include="Kiwi.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="KTest.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="KEndingMaker.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="main.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="KTrie.cpp">
@@ -78,9 +66,6 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Kiwi.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="KTest.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

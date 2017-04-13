@@ -1,9 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KiwiLibrary", "KiwiLibrary\KiwiLibrary.vcxproj", "{F790BC37-2732-4ED1-9CA5-7248BED3588E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KiwiTester", "KiwiTester\KiwiTester.vcxproj", "{06D21E1F-AA67-4C06-8C8C-90307A49603D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F790BC37-2732-4ED1-9CA5-7248BED3588E} = {F790BC37-2732-4ED1-9CA5-7248BED3588E}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KiwiRun", "KiwiRun\KiwiRun.vcxproj", "{1B5AD766-36DC-4207-8B0E-F45CBEF473AB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +28,22 @@ Global
 		{F790BC37-2732-4ED1-9CA5-7248BED3588E}.Release|x64.Build.0 = Release|x64
 		{F790BC37-2732-4ED1-9CA5-7248BED3588E}.Release|x86.ActiveCfg = Release|Win32
 		{F790BC37-2732-4ED1-9CA5-7248BED3588E}.Release|x86.Build.0 = Release|Win32
+		{06D21E1F-AA67-4C06-8C8C-90307A49603D}.Debug|x64.ActiveCfg = Debug|x64
+		{06D21E1F-AA67-4C06-8C8C-90307A49603D}.Debug|x64.Build.0 = Debug|x64
+		{06D21E1F-AA67-4C06-8C8C-90307A49603D}.Debug|x86.ActiveCfg = Debug|Win32
+		{06D21E1F-AA67-4C06-8C8C-90307A49603D}.Debug|x86.Build.0 = Debug|Win32
+		{06D21E1F-AA67-4C06-8C8C-90307A49603D}.Release|x64.ActiveCfg = Release|x64
+		{06D21E1F-AA67-4C06-8C8C-90307A49603D}.Release|x64.Build.0 = Release|x64
+		{06D21E1F-AA67-4C06-8C8C-90307A49603D}.Release|x86.ActiveCfg = Release|Win32
+		{06D21E1F-AA67-4C06-8C8C-90307A49603D}.Release|x86.Build.0 = Release|Win32
+		{1B5AD766-36DC-4207-8B0E-F45CBEF473AB}.Debug|x64.ActiveCfg = Debug|x64
+		{1B5AD766-36DC-4207-8B0E-F45CBEF473AB}.Debug|x64.Build.0 = Debug|x64
+		{1B5AD766-36DC-4207-8B0E-F45CBEF473AB}.Debug|x86.ActiveCfg = Debug|Win32
+		{1B5AD766-36DC-4207-8B0E-F45CBEF473AB}.Debug|x86.Build.0 = Debug|Win32
+		{1B5AD766-36DC-4207-8B0E-F45CBEF473AB}.Release|x64.ActiveCfg = Release|x64
+		{1B5AD766-36DC-4207-8B0E-F45CBEF473AB}.Release|x64.Build.0 = Release|x64
+		{1B5AD766-36DC-4207-8B0E-F45CBEF473AB}.Release|x86.ActiveCfg = Release|Win32
+		{1B5AD766-36DC-4207-8B0E-F45CBEF473AB}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

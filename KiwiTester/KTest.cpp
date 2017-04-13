@@ -1,6 +1,7 @@
 #include "stdafx.h"
+#include "../KiwiLibrary/Kiwi.h"
 #include "KTest.h"
-#include "Utils.h"
+#include "../KiwiLibrary/Utils.h"
 
 KWordPair parseWordPOS(wstring str)
 {
@@ -22,7 +23,6 @@ struct Counter
 
 KTest::KTest(const char * testSetFile, Kiwi* kw, size_t topN) : totalCount(0), totalScore(0)
 {
-
 	FILE* f = nullptr;
 	if (fopen_s(&f, testSetFile, "r")) throw exception();
 	char buf[4096];

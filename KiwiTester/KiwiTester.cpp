@@ -1,10 +1,8 @@
 //
 
 #include "stdafx.h"
-#include "locale.h"
-using namespace std;
-#include "Kiwi.h"
-#include "Utils.h"
+#include "../KiwiLibrary/Kiwi.h"
+#include "../KiwiLibrary/Utils.h"
 #include "KTest.h"
 
 int main()
@@ -12,7 +10,7 @@ int main()
 	system("chcp 65001");
 	_wsetlocale(LC_ALL, L"korean");
 	Timer timer;
-	Kiwi kw;
+	Kiwi kw("../ModelGenerator/");
 	kw.prepare();
 	printf("Loading Time : %g ms\n", timer.getElapsed());
 	string testFiles[] = { "01s.txt", "02s.txt", "03s.txt" };
@@ -38,6 +36,6 @@ int main()
 		fclose(out);
 	}
 	getchar();
-    return 0;
+	return 0;
 }
 

@@ -4,6 +4,7 @@
 
 string splitJamo(wstring hangul);
 wstring joinJamo(string jm);
+bool verifyHangul(wstring hangul);
 void splitJamo(wchar_t hangul, string& ret);
 void printJM(const char* c, size_t len = -1);
 void printJM(const string& c);

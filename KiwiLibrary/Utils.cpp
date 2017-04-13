@@ -28,6 +28,15 @@ string splitJamo(wstring hangul)
 	return ret;
 }
 
+bool verifyHangul(wstring hangul)
+{
+	for (auto c : hangul)
+	{
+		if (!(0xac00 <= c && c < 0xd7a4)) return false;
+	}
+	return true;
+}
+
 wstring joinJamo(string jm)
 {
 	static char choInvTable[] = { -1, 0, 1, -1, 2, -1, -1, 3, 4, 5, -1, -1, -1, -1, -1, -1, -1, 6, 7, 8, -1, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18};
