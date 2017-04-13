@@ -3,7 +3,7 @@
 #include "Utils.h"
 #include "KFeatureTestor.h"
 
-#define DIVIDE_BOUND 8
+#define DIVIDE_BOUND 6
 
 
 KPOSTag Kiwi::identifySpecialChr(wchar_t chr)
@@ -110,22 +110,65 @@ vector<vector<KWordPair>> Kiwi::splitPart(const wstring & str)
 
 Kiwi::Kiwi(const char * modelPath, size_t _maxCache) : maxCache(_maxCache)
 {
-	mdl = make_shared<KModelMgr>("../ModelGenerator/pos.txt", "../ModelGenerator/fullmodel.txt", "../ModelGenerator/combined.txt", "../ModelGenerator/precombined.txt");
+	mdl = make_shared<KModelMgr>(modelPath);
 }
 
 int Kiwi::addUserWord(const wstring & str, KPOSTag tag)
 {
+	if (!verifyHangul(str)) return -1;
 	mdl->addUserWord(splitJamo(str), tag);
 	return 0;
 }
 
 int Kiwi::addUserRule(const wstring & str, const vector<pair<wstring, KPOSTag>>& morph)
 {
+	if (!verifyHangul(str)) return -1;
+	vector<pair<string, KPOSTag>> jmMorph;
+	jmMorph.reserve(morph.size());
+	for (auto& m : morph)
+	{
+		if (!verifyHangul(m.first)) return -1;
+		jmMorph.emplace_back(splitJamo(m.first), m.second);
+	}
+	mdl->addUserRule(splitJamo(str), jmMorph);
 	return 0;
 }
 
 int Kiwi::loadUserDictionary(const char * userDictPath)
 {
+	FILE* file = nullptr;
+	if (fopen_s(&file, userDictPath, "r")) return -1;
+	char buf[4096];
+	wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
+	while (fgets(buf, 4096, file))
+	{
+		if (buf[0] == '#') continue;
+		auto wstr = converter.from_bytes(buf);
+		auto chunks = split(wstr, '\t');
+		if (chunks.size() < 2) continue;
+		if (!chunks[1].empty()) 
+		{
+			auto pos = makePOSTag(chunks[1]);
+			if (pos != KPOSTag::MAX)
+			{
+				addUserWord(chunks[0], pos);
+				continue;
+			}
+		}
+		
+		vector<pair<wstring, KPOSTag>> morphs;
+		for (size_t i = 1; i < chunks.size(); i++) 
+		{
+			auto cc = split(chunks[i], '/');
+			if (cc.size() != 2) goto loopContinue;
+			auto pos = makePOSTag(cc[1]);
+			if (pos == KPOSTag::MAX) goto loopContinue;
+			morphs.emplace_back(cc[0], pos);
+		}
+		addUserRule(chunks[0], morphs);
+	loopContinue:;
+	}
+	fclose(file);
 	return 0;
 }
 

@@ -35,7 +35,7 @@ protected:
 		return forms[id];
 	};
 public:
-	KModelMgr(const char* posFile = nullptr, const char* morphemeFile = nullptr, const char* combinedFile = nullptr, const char* precombinedFile = nullptr);
+	KModelMgr(const char* modelPath = "");
 	void addUserWord(const string& form, KPOSTag tag);
 	void addUserRule(const string& form, const vector<pair<string, KPOSTag>>& morphs);
 	void solidify();

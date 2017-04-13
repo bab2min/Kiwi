@@ -1,6 +1,6 @@
-0.81077
-Total (3252) Time : 6378.26 ms
-Time per Unit : 1.96134 ms
+0.810728
+Total (3252) Time : 6484.63 ms
+Time per Unit : 1.99404 ms
 
 고등학교를 졸업할 무렵 담임선생님께서 내게 이런 말씀을 하셨다.	0.696
 고등학교/NNG	를/JKO	졸업/NNG	하/XSV	ㄹ/ETM	무렵/NNB	담임선생/NNG	님/XSN	께서/JKS	나/NP	에게/JKB	이런/MM	말씀/NNG	을/JKO	하/VV	시/EP	었/EP	다/EF	./SF	
@@ -906,7 +906,7 @@ S/SL	생명/NNG	사람/NNG	들/XSN	은/JX	기업/NNG	대출/NNG	보다/JKB	주로/MAG	직장/NNG
 이사/NNG	님/XSN	이/JKS	없/VA	었/EP	다면/EC	오늘/NNG	의/JKG	저/NP	도/JX	없/VA	었/EP	을/ETM	것/NNB	이/VCP	ㅂ니다/EF	./SF	"/SS	"/SS	아니야/IC	./SF	
 이사/NNG	님/XSN	이/JKS	없/VA	었/EP	다면/EC	오늘/NNG	의/JKG	저/NP	도/JX	없/VA	었/EP	을/ETM	걸/VV	ㅂ니다/EF	./SF	"/SS	"/SS	아니야/IC	./SF	-48.88
 이사/NNG	님/XSN	이/JKS	없/VA	었/EP	다면/EC	오늘/NNG	의/JKG	저/NP	도/JX	없/VA	었/EP	을/ETM	걸/VV	ㅂ니다/EF	./SF	"/SS	"/SS	아니/VCN	야/EF	./SF	-51.31
-이사/NNG	님/XSN	이/JKS	없/VA	었/EP	다면/EC	오늘/MAG	의/JKG	저/NP	도/JX	없/VA	었/EP	을/ETM	걸/VV	ㅂ니다/EF	./SF	"/SS	"/SS	아니야/IC	./SF	-55.44
+이사/NNG	님/NNG	이/JKS	없/VA	었/EP	다면/EC	오늘/NNG	의/JKG	저/NP	도/JX	없/VA	었/EP	을/ETM	걸/VV	ㅂ니다/EF	./SF	"/SS	"/SS	아니야/IC	./SF	-56.28
 
 앞으로 살아가면서 내가 자네에게 진 빚을 하나하나 갚겠네" 나는 A이사님과 선배소장에게 추호도 원망의 감정이 없다.	0.732
 앞/NNG	으로/JKB	살아가/VV	면서/EC	내/NP	가/JKS	자네/NP	에게/JKB	지/VV	ㄴ/ETM	빚/NNG	을/JKO	하나하나/MAG	갚/VV	겠/EP	네/EC	"/SS	나/NP	는/JX	A/SL	이사/NNG	님/XSN	과/JC	선배/NNG	소장/NNG	에게/JKB	추호/NNG	도/JX	원망/NNG	의/JKG	감정/NNG	이/JKS	없/VA	다/EF	./SF	
@@ -1534,9 +1534,9 @@ K/SL	기업/NNG	은/JX	우리/NP	회사/NNG	에/JKB	월/NNB	보험료/NNG	5000/SN	만/NR	원/N
 
 K기업 사람들은 "그렇게 좋은 보험을 왜 나에게는 권하지 않았느냐"고 하면서 내일 당장 만나 계약을 맺자고 신신당부를 했다.	0.612
 K/SL	기업/NNG	사람/NNG	들/XSN	은/JX	"/SS	그러게/IC	좋/VA	은/ETM	보험/NNG	을/JKO	왜/MAG	나/NP	에게/JKB	는/JX	권/NNG	하/XSV	지/EC	않/VX	았/EP	느냐/EC	"/SS	고/JKQ	하/VV	면서/EC	내일/NNG	당장/NNG	만나/VV	아/EC	계약/NNG	을/JKO	맺/VV	자고/EC	신신당부/NNG	를/JKO	하/VV	았/EP	다/EF	./SF	
-K/SL	기업/NNG	사람/NNG	들/XSN	은/JX	"/SS	그렇/VA	게/EC	좋/VA	은/ETM	보험/NNG	을/JKO	왜/MAG	나/NP	에게/JKB	는/JX	권하/VV	지/EC	않았/UN	느냐/EC	"/SS	고/EC	하/VV	면서/EC	내/NP	이/VCP	ㄹ/ETM	당장/NNG	만나/VV	아/EC	계약/NNG	을/JKO	맺자/UN	고/EC	신신당부/NNG	를/JKO	하/VV	았/EP	다/EF	./SF	-121
-K/SL	기업/NNG	사람/NNG	들/XSN	은/JX	"/SS	그렇/VA	게/EC	좋/VA	은/ETM	보험/NNG	을/JKO	왜/MAG	나/NP	에게/JKB	는/JX	권하/VV	지/EC	않았느냐/UN	"/SS	고/EC	하/VV	면서/EC	내/NP	이/VCP	ㄹ/ETM	당장/NNG	만나/VV	아/EC	계약/NNG	을/JKO	맺자/UN	고/EC	신신당부/NNG	를/JKO	하/VV	았/EP	다/EF	./SF	-121
-K/SL	기업/NNG	사람/NNG	들/XSN	은/JX	"/SS	그렇/VA	게/EC	좋/VA	은/ETM	보험/NNG	을/JKO	왜/MAG	나/NP	에게/JKB	는/JX	권하/VV	지/EC	않았/UN	느냐/EC	"/SS	고/EC	하/VV	면서/EC	내일/NNG	당장/NNG	만나/VV	아/EC	계약/NNG	을/JKO	맺자/UN	고/EC	신신당부/NNG	를/JKO	하/VV	았/EP	다/EF	./SF	-121.4
+K/SL	기업/NNG	사람/NNG	들/XSN	은/JX	"/SS	그렇/VA	게/EC	좋/VA	은/ETM	보험/NNG	을/JKO	왜/MAG	나/NP	에게/JKB	는/JX	권하/VV	지/EC	않았/UN	느냐/EC	"/SS	고/EC	하/VV	면서/EC	내/NP	이/VCP	ㄹ/ETM	당장/NNG	만나/VV	아/EC	계약/NNG	을/JKO	맺자/UN	고/EC	신신당부/NNG	를/JKO	하/VV	았/EP	다/EF	./SF	-125.5
+K/SL	기업/NNG	사람/NNG	들/XSN	은/JX	"/SS	그렇/VA	게/EC	좋/VA	은/ETM	보험/NNG	을/JKO	왜/MAG	나/NP	에게/JKB	는/JX	권하/VV	지/EC	않았느냐/UN	"/SS	고/EC	하/VV	면서/EC	내/NP	이/VCP	ㄹ/ETM	당장/NNG	만나/VV	아/EC	계약/NNG	을/JKO	맺자/UN	고/EC	신신당부/NNG	를/JKO	하/VV	았/EP	다/EF	./SF	-125.6
+K/SL	기업/NNG	사람/NNG	들/XSN	은/JX	"/SS	그렇/VA	게/EC	좋/VA	은/ETM	보험/NNG	을/JKO	왜/MAG	나/NP	에게/JKB	는/JX	권하/VV	지/EC	않았/UN	느냐/EC	"/SS	고/EC	하/VV	면서/EC	내일/NNG	당장/NNG	만나/VV	아/EC	계약/NNG	을/JKO	맺자/UN	고/EC	신신당부/NNG	를/JKO	하/VV	았/EP	다/EF	./SF	-125.9
 
 H대리의 미망인은 생각지도 않은 보험금 1억이 생겨 나중에 과천의 한 학교 앞에 문방구를 차려 어린 아들을 잘 키우며 살 수 있었다.	0.755
 H/SL	대리/NNG	의/JKG	미/XPN	망인/NNG	은/JX	생각/NNG	하/XSV	지/EC	도/JX	않/VX	은/ETM	보험금/NNG	1/SN	억/NR	이/JKS	생기/VV	어/EC	나중/NNG	에/JKB	과천/NNP	의/JKG	한/MM	학교/NNG	앞/NNG	에/JKB	문방구/NNG	를/JKO	차리/VV	어/EC	어리/VA	ㄴ/ETM	아들/NNG	을/JKO	잘/MAG	키우/VV	며/EC	살/VV	ㄹ/ETM	수/NNB	있/VV	었/EP	다/EF	./SF	
@@ -3180,7 +3180,7 @@ B/SL	는/JX	버스/NNG	나/JC	지하철/NNG	을/JKO	타/VV	고/EC	졸/VV	면서/EC	가/VV	아서
 목욕탕/NNG	한증탕/NNG	에서/JKB	자신/NNG	을/JKO	실험/NNG	하/XSV	ㄴ/ETM	결과/NNG	가/JKS	이토록/MAG	상쾌/XR	하/XSA	ㄹ진대/EC	일/NNG	과/JKB	관련/NNG	되/XSV	어서/EC	야/JX	오죽/MAG	하/XSA	겠/EP	는가/EF	!/SF	
 목욕탕/NNG	한/MM	증/NNG	탕/NNG	에서/JKB	자신/NNG	을/JKO	실험/NNG	하/XSV	ㄴ/ETM	결과/NNG	가/JKS	이토록/UN	상쾌/XR	하/XSA	ㄹ진대/EC	일/NNG	과/JKB	관련/NNG	되/XSV	어서/EC	야/JX	오죽/MAG	하/XSV	겠/EP	는가/EF	!/SF	-107
 목욕탕/NNG	한/MM	증/NNG	탕/NNG	에서/JKB	자신/NNG	을/JKO	실험/NNG	하/XSV	ㄴ/ETM	결과/NNG	가/JKS	이토록/UN	상쾌/XR	하/XSA	ㄹ진대/EC	일/NNG	과/JC	관련/NNG	되/XSV	어서/EC	야/JX	오죽/MAG	하/XSV	겠/EP	는가/EF	!/SF	-107.3
-목욕탕/NNG	한/MM	증탕/UN	에서/JKB	자신/NNG	을/JKO	실험/NNG	하/XSV	ㄴ/ETM	결과/NNG	가/JKS	이토록/UN	상쾌/XR	하/XSA	ㄹ진대/EC	일/NNG	과/JKB	관련/NNG	되/XSV	어서/EC	야/JX	오죽/MAG	하/XSV	겠/EP	는가/EF	!/SF	-107.8
+목욕탕/NNG	한/MM	증/NNG	탕/NNG	에서/JKB	자신/NNG	을/JKO	실험/NNG	하/XSV	ㄴ/ETM	결과/NNG	가/JKS	이토록/UN	상쾌/XR	하/XSA	ㄹ진대/EC	일/NNB	과/JKB	관련/NNG	되/XSV	어서/EC	야/JX	오죽/MAG	하/XSV	겠/EP	는가/EF	!/SF	-107.9
 
 오기에도 아름다운 오기가 있다.	0.5
 오/VV	기/ETN	에/JKB	도/JX	아름답/VA	ㄴ/ETM	오기/NNG	가/JKS	있/VV	다/EF	./SF	
@@ -3506,9 +3506,9 @@ B/SL	는/JX	버스/NNG	나/JC	지하철/NNG	을/JKO	타/VV	고/EC	졸/VV	면서/EC	가/VV	아서
 
 그런데 노후준비는 하고 계신가요?" "우리 나이가 30대 중반인데 무슨 노후준비란 말입니까?" "그러면 언제부터 노후준비를 시작하시려고 하십니까?" "쉰은 넘어서 생각해볼 문제 아닙니까?" "쉰 살이면 지금부터 15년 후인데 지금 가입한 보험에 의해 받을 수 있는 연금만큼 받으시려면 그때 가서 얼마를 내셔야 되는지 생각해 보셨습니까?" "조금만 더 내면 되겠지요, 뭐." "현재 쉰 살인 사람이 보험에 가입하여 남편께서 가입하신 보험만큼 연금을 받으시려면 200만 원 정도를 내셔야 합니다.	0.742
 그런데/MAJ	노후/NNG	준비/NNG	는/JX	하/VV	고/EC	계시/VX	ㄴ가요/EF	?/SF	"/SS	"/SS	우리/NP	나이/NNG	가/JKS	30/SN	대/NNB	중반/NNG	이/VCP	ㄴ데/EC	무슨/MM	노후/NNG	준비/NNG	이/VCP	란/ETM	말/NNG	이/VCP	ㅂ니까/EF	?/SF	"/SS	"/SS	그러면/MAJ	언제/NP	부터/JX	노후/NNG	준비/NNG	를/JKO	시작/NNG	하/XSV	시/EP	려고/EC	하/VV	시/EP	ㅂ니까/EF	?/SF	"/SS	"/SS	쉰/NR	은/JX	넘/VV	어서/EC	생각/NNG	하/XSV	아/EC	보/VX	ㄹ/ETM	문제/NNG	아니/VCN	ㅂ니까/EF	?/SF	"/SS	"/SS	쉰/NR	살/NNB	이/VCP	면/EC	지금/NNG	부터/JX	15/SN	년/NNB	후/NNG	이/VCP	ㄴ데/EC	지금/MAG	가입/NNG	하/XSV	ㄴ/ETM	보험/NNG	에/JKB	의하/VV	아/EC	받/VV	을/ETM	수/NNB	있/VV	는/ETM	연금/NNG	만큼/JKB	받/VV	으시/EP	려면/EC	그때/NNG	가/VV	아서/EC	얼마/NNG	를/JKO	내/VV	시/EP	어야/EC	되/VV	는지/EC	생각/NNG	하/XSV	아/EC	보/VX	시/EP	었/EP	습니까/EF	?/SF	"/SS	"/SS	조금/NNG	만/JX	더/MAG	내/VV	면/EC	되/VV	겠/EP	지요/EC	,/SP	뭐/IC	./SF	"/SS	"/SS	현재/MAG	쉰/NR	살/NNB	이/VCP	ㄴ/ETM	사람/NNG	이/JKS	보험/NNG	에/JKB	가입/NNG	하/XSV	아/EC	남편/NNG	께서/JKS	가입/NNG	하/XSV	시/EP	ㄴ/ETM	보험/NNG	만큼/JKB	연금/NNG	을/JKO	받/VV	으시/EP	려면/EC	200/SN	만/NR	원/NNB	정도/NNG	를/JKO	내/VV	시/EP	어야/EC	하/VX	ㅂ니다/EF	./SF	
-그렇/VA	ㄴ데/EC	노후/NNG	준비/NNG	는/JX	하/VV	고/EC	계시/VX	ㄴ가요/EF	?/SF	"/SS	"/SS	우리/NP	나이/NNG	가/JKS	30/SN	대/NNB	중반/NNG	이/VCP	ㄴ데/EC	무슨/MM	노후/NNG	준비/NNG	란/JX	말/NNG	이/VCP	ㅂ니까/EF	?/SF	"/SS	"/SS	그러/VV	면/EC	언제/NP	부터/JX	노후/NNG	준비/NNG	를/JKO	시작/NNG	하/XSV	시/EP	려고/EC	하/VV	시/EP	ㅂ니까/EF	?/SF	"/SS	"/SS	쉰/NR	은/JX	넘어서/VV	어/EC	생각/NNG	해보/VV	ㄹ/ETM	문제/NNG	아니/VCN	ㅂ니까/EF	?/SF	"/SS	"/SS	쉬/VV	ㄴ/ETM	살/NNB	이/VCP	면/EC	지금/NNG	부터/JX	15/SN	년/NNB	후/NNG	이/VCP	ㄴ데/EC	지금/NNG	가입/NNG	하/XSV	ㄴ/ETM	보험/NNG	에/JKB	의하/VV	아/EC	받/VV	을/ETM	수/NNB	있/VX	는/ETM	연금/NNG	만큼/JKB	받/VV	으시/EP	려면/EC	그때/NNG	가/VV	아서/EC	얼마/NNG	를/JKO	내/VX	시/EP	어야/EC	되/VV	는지/EC	생각/NNG	하/XSA	아/EC	보/VV	시/EP	었/EP	습니까/EF	?/SF	"/SS	"/SS	조금/NNG	만/JX	더/MAG	내/VV	면/EC	되/VV	겠/EP	지요/EF	,/SP	뭐/IC	./SF	"/SS	"/SS	현재/NNG	쉬/VV	ㄴ/ETM	살인/NNG	사람/NNG	이/JKS	보험/NNG	에/JKB	가입/NNG	하/XSV	여/EC	남편/NNG	께서/JKS	가입/NNG	하/XSV	시/EP	ㄴ/ETM	보험/NNG	만큼/JKB	연금/NNG	을/JKO	받/VV	으시/EP	려면/EC	200/SN	만/JX	원/NNB	정도/NNG	를/JKO	내/VX	시/EP	어야/EC	하/VV	ㅂ니다/EF	./SF	-452.8
-그렇/VA	ㄴ데/EC	노후/NNG	준비/NNG	는/JX	하/VV	고/EC	계시/VX	ㄴ가요/EF	?/SF	"/SS	"/SS	우리/NP	나이/NNG	가/JKS	30/SN	대/NNB	중반/NNG	이/VCP	ㄴ데/EC	무슨/MM	노후/NNG	준비/NNG	란/JX	말/NNG	이/VCP	ㅂ니까/EF	?/SF	"/SS	"/SS	그러/VV	면/EC	언제/NP	부터/JX	노후/NNG	준비/NNG	를/JKO	시작/NNG	하/XSV	시/EP	려고/EC	하/VV	시/EP	ㅂ니까/EF	?/SF	"/SS	"/SS	쉰/NR	은/JX	넘어서/VV	어/EC	생각/NNG	해보/VV	ㄹ/ETM	문제/NNG	아니/VCN	ㅂ니까/EF	?/SF	"/SS	"/SS	쉬/VV	ㄴ/ETM	살/NNB	이/VCP	면/EC	지금/NNG	부터/JX	15/SN	년/NNB	후/NNG	이/VCP	ㄴ데/EC	지금/NNG	가입/NNG	하/XSV	ㄴ/ETM	보험/NNG	에/JKB	의하/VV	아/EC	받/VV	을/ETM	수/NNB	있/VV	는/ETM	연금/NNG	만큼/JKB	받/VV	으시/EP	려면/EC	그때/NNG	가/VV	아서/EC	얼마/NNG	를/JKO	내/VX	시/EP	어야/EC	되/VV	는지/EC	생각/NNG	하/XSA	아/EC	보/VV	시/EP	었/EP	습니까/EF	?/SF	"/SS	"/SS	조금/NNG	만/JX	더/MAG	내/VV	면/EC	되/VV	겠/EP	지요/EF	,/SP	뭐/IC	./SF	"/SS	"/SS	현재/NNG	쉬/VV	ㄴ/ETM	살인/NNG	사람/NNG	이/JKS	보험/NNG	에/JKB	가입/NNG	하/XSV	여/EC	남편/NNG	께서/JKS	가입/NNG	하/XSV	시/EP	ㄴ/ETM	보험/NNG	만큼/JKB	연금/NNG	을/JKO	받/VV	으시/EP	려면/EC	200/SN	만/JX	원/NNB	정도/NNG	를/JKO	내/VX	시/EP	어야/EC	하/VV	ㅂ니다/EF	./SF	-452.8
-그러/VV	ㄴ데/EC	노후/NNG	준비/NNG	는/JX	하/VV	고/EC	계시/VX	ㄴ가요/EF	?/SF	"/SS	"/SS	우리/NP	나이/NNG	가/JKS	30/SN	대/NNB	중반/NNG	이/VCP	ㄴ데/EC	무슨/MM	노후/NNG	준비/NNG	란/JX	말/NNG	이/VCP	ㅂ니까/EF	?/SF	"/SS	"/SS	그러/VV	면/EC	언제/NP	부터/JX	노후/NNG	준비/NNG	를/JKO	시작/NNG	하/XSV	시/EP	려고/EC	하/VV	시/EP	ㅂ니까/EF	?/SF	"/SS	"/SS	쉰/NR	은/JX	넘어서/VV	어/EC	생각/NNG	해보/VV	ㄹ/ETM	문제/NNG	아니/VCN	ㅂ니까/EF	?/SF	"/SS	"/SS	쉬/VV	ㄴ/ETM	살/NNB	이/VCP	면/EC	지금/NNG	부터/JX	15/SN	년/NNB	후/NNG	이/VCP	ㄴ데/EC	지금/NNG	가입/NNG	하/XSV	ㄴ/ETM	보험/NNG	에/JKB	의하/VV	아/EC	받/VV	을/ETM	수/NNB	있/VX	는/ETM	연금/NNG	만큼/JKB	받/VV	으시/EP	려면/EC	그때/NNG	가/VV	아서/EC	얼마/NNG	를/JKO	내/VX	시/EP	어야/EC	되/VV	는지/EC	생각/NNG	하/XSA	아/EC	보/VV	시/EP	었/EP	습니까/EF	?/SF	"/SS	"/SS	조금/NNG	만/JX	더/MAG	내/VV	면/EC	되/VV	겠/EP	지요/EF	,/SP	뭐/IC	./SF	"/SS	"/SS	현재/NNG	쉬/VV	ㄴ/ETM	살인/NNG	사람/NNG	이/JKS	보험/NNG	에/JKB	가입/NNG	하/XSV	여/EC	남편/NNG	께서/JKS	가입/NNG	하/XSV	시/EP	ㄴ/ETM	보험/NNG	만큼/JKB	연금/NNG	을/JKO	받/VV	으시/EP	려면/EC	200/SN	만/JX	원/NNB	정도/NNG	를/JKO	내/VX	시/EP	어야/EC	하/VV	ㅂ니다/EF	./SF	-452.9
+그렇/VA	ㄴ데/EC	노후/NNG	준비/NNG	는/JX	하/VV	고/EC	계시/VX	ㄴ가요/EF	?/SF	"/SS	"/SS	우리/NP	나이/NNG	가/JKS	30/SN	대/NNB	중반/NNG	이/VCP	ㄴ데/EC	무슨/MM	노후/NNG	준비/NNG	란/JX	말/NNG	이/VCP	ㅂ니까/EF	?/SF	"/SS	"/SS	그러/VV	면/EC	언제/NP	부터/JX	노후/NNG	준비/NNG	를/JKO	시작/NNG	하/XSV	시/EP	려고/EC	하/VV	시/EP	ㅂ니까/EF	?/SF	"/SS	"/SS	쉰/NR	은/JX	넘어서/VV	어/EC	생각/NNG	해보/VV	ㄹ/ETM	문제/NNG	아니/VCN	ㅂ니까/EF	?/SF	"/SS	"/SS	쉬/VV	ㄴ/ETM	살/NNB	이/VCP	면/EC	지금/NNG	부터/JX	15/SN	년/NNB	후/NNG	이/VCP	ㄴ데/EC	지금/NNG	가입/NNG	하/XSV	ㄴ/ETM	보험/NNG	에/JKB	의하/VV	아/EC	받/VV	을/ETM	수/NNB	있/VX	는/ETM	연금/NNG	만큼/JKB	받/VV	으시/EP	려면/EC	그때/NNG	가/VV	아서/EC	얼마/NNG	를/JKO	내/VX	시/EP	어야/EC	되/VV	는지/EC	생각/NNG	하/XSA	아/EC	보/VV	시/EP	었/EP	습니까/EF	?/SF	"/SS	"/SS	조금/NNG	만/JX	더/MAG	내/VV	면/EC	되/VV	겠/EP	지요/EF	,/SP	뭐/IC	./SF	"/SS	"/SS	현재/NNG	쉬/VV	ㄴ/ETM	살인/NNG	사람/NNG	이/JKS	보험/NNG	에/JKB	가입/NNG	하/XSV	여/EC	남편/NNG	께서/JKS	가입/NNG	하/XSV	시/EP	ㄴ/ETM	보험/NNG	만큼/JKB	연금/NNG	을/JKO	받/VV	으시/EP	려면/EC	200/SN	만/JX	원/NNB	정도/NNG	를/JKO	내/VX	시/EP	어야/EC	하/VV	ㅂ니다/EF	./SF	-457.1
+그렇/VA	ㄴ데/EC	노후/NNG	준비/NNG	는/JX	하/VV	고/EC	계시/VX	ㄴ가요/EF	?/SF	"/SS	"/SS	우리/NP	나이/NNG	가/JKS	30/SN	대/NNB	중반/NNG	이/VCP	ㄴ데/EC	무슨/MM	노후/NNG	준비/NNG	란/JX	말/NNG	이/VCP	ㅂ니까/EF	?/SF	"/SS	"/SS	그러/VV	면/EC	언제/NP	부터/JX	노후/NNG	준비/NNG	를/JKO	시작/NNG	하/XSV	시/EP	려고/EC	하/VV	시/EP	ㅂ니까/EF	?/SF	"/SS	"/SS	쉰/NR	은/JX	넘어서/VV	어/EC	생각/NNG	해보/VV	ㄹ/ETM	문제/NNG	아니/VCN	ㅂ니까/EF	?/SF	"/SS	"/SS	쉬/VV	ㄴ/ETM	살/NNB	이/VCP	면/EC	지금/NNG	부터/JX	15/SN	년/NNB	후/NNG	이/VCP	ㄴ데/EC	지금/NNG	가입/NNG	하/XSV	ㄴ/ETM	보험/NNG	에/JKB	의하/VV	아/EC	받/VV	을/ETM	수/NNB	있/VV	는/ETM	연금/NNG	만큼/JKB	받/VV	으시/EP	려면/EC	그때/NNG	가/VV	아서/EC	얼마/NNG	를/JKO	내/VX	시/EP	어야/EC	되/VV	는지/EC	생각/NNG	하/XSA	아/EC	보/VV	시/EP	었/EP	습니까/EF	?/SF	"/SS	"/SS	조금/NNG	만/JX	더/MAG	내/VV	면/EC	되/VV	겠/EP	지요/EF	,/SP	뭐/IC	./SF	"/SS	"/SS	현재/NNG	쉬/VV	ㄴ/ETM	살인/NNG	사람/NNG	이/JKS	보험/NNG	에/JKB	가입/NNG	하/XSV	여/EC	남편/NNG	께서/JKS	가입/NNG	하/XSV	시/EP	ㄴ/ETM	보험/NNG	만큼/JKB	연금/NNG	을/JKO	받/VV	으시/EP	려면/EC	200/SN	만/JX	원/NNB	정도/NNG	를/JKO	내/VX	시/EP	어야/EC	하/VV	ㅂ니다/EF	./SF	-457.1
+그러/VV	ㄴ데/EC	노후/NNG	준비/NNG	는/JX	하/VV	고/EC	계시/VX	ㄴ가요/EF	?/SF	"/SS	"/SS	우리/NP	나이/NNG	가/JKS	30/SN	대/NNB	중반/NNG	이/VCP	ㄴ데/EC	무슨/MM	노후/NNG	준비/NNG	란/JX	말/NNG	이/VCP	ㅂ니까/EF	?/SF	"/SS	"/SS	그러/VV	면/EC	언제/NP	부터/JX	노후/NNG	준비/NNG	를/JKO	시작/NNG	하/XSV	시/EP	려고/EC	하/VV	시/EP	ㅂ니까/EF	?/SF	"/SS	"/SS	쉰/NR	은/JX	넘어서/VV	어/EC	생각/NNG	해보/VV	ㄹ/ETM	문제/NNG	아니/VCN	ㅂ니까/EF	?/SF	"/SS	"/SS	쉬/VV	ㄴ/ETM	살/NNB	이/VCP	면/EC	지금/NNG	부터/JX	15/SN	년/NNB	후/NNG	이/VCP	ㄴ데/EC	지금/NNG	가입/NNG	하/XSV	ㄴ/ETM	보험/NNG	에/JKB	의하/VV	아/EC	받/VV	을/ETM	수/NNB	있/VX	는/ETM	연금/NNG	만큼/JKB	받/VV	으시/EP	려면/EC	그때/NNG	가/VV	아서/EC	얼마/NNG	를/JKO	내/VX	시/EP	어야/EC	되/VV	는지/EC	생각/NNG	하/XSA	아/EC	보/VV	시/EP	었/EP	습니까/EF	?/SF	"/SS	"/SS	조금/NNG	만/JX	더/MAG	내/VV	면/EC	되/VV	겠/EP	지요/EF	,/SP	뭐/IC	./SF	"/SS	"/SS	현재/NNG	쉬/VV	ㄴ/ETM	살인/NNG	사람/NNG	이/JKS	보험/NNG	에/JKB	가입/NNG	하/XSV	여/EC	남편/NNG	께서/JKS	가입/NNG	하/XSV	시/EP	ㄴ/ETM	보험/NNG	만큼/JKB	연금/NNG	을/JKO	받/VV	으시/EP	려면/EC	200/SN	만/JX	원/NNB	정도/NNG	를/JKO	내/VX	시/EP	어야/EC	하/VV	ㅂ니다/EF	./SF	-457.2
 
 즉 내는 돈은 일곱 배가 많고 타는 돈은 오히려 적을 수도 있습니다." "설마 그럴리가요?" "보험의 원리상 모든 보험은 만약의 사고시 보장을 받을 수 있습니다.	0.667
 즉/MAG	내/VV	는/ETM	돈/NNG	은/JX	일곱/NR	배/NNG	가/JKS	많/VA	고/EC	타/VV	는/ETM	돈/NNG	은/JX	오히려/MAG	적/VA	을/ETM	수/NNB	도/JX	있/VV	습니다/EF	./SF	"/SS	"/SS	설마/MAG	그러/VV	ㄹ/ETM	리/NNB	가/JKS	요/JX	?/SF	"/SS	"/SS	보험/NNG	의/JKG	원리/NNG	상/XSN	모든/MM	보험/NNG	은/JX	만약/NNG	의/JKG	사고/NNG	시/NNB	보장/NNG	을/JKO	받/VV	을/ETM	수/NNB	있/VV	습니다/EF	./SF	
@@ -3530,9 +3530,9 @@ B/SL	는/JX	버스/NNG	나/JC	지하철/NNG	을/JKO	타/VV	고/EC	졸/VV	면서/EC	가/VV	아서
 
 그리고 내는 기간 대비 타는 시기가 짧을수록 돈이 적게 나오게 돼 있습니다." "그러면 오늘 사고가 나도 3억이 나온다는 말입니까?" "교통사고시 그렇고, 암진단시 3천만 원의 치료비가 나옵니다.	0.788
 그리고/MAJ	내/VV	는/ETM	기간/NNG	대비/NNG	타/VV	는/ETM	시기/NNG	가/JKS	짧/VA	을수록/EC	돈/NNG	이/JKS	적/VA	게/EC	나오/VV	게/EC	되/VV	어/EC	있/VX	습니다/EF	./SF	"/SS	"/SS	그러면/MAJ	오늘/NNG	사고/NNG	가/JKS	나/NP	도/JX	3/SN	억/NR	이/JKS	나오/VV	ㄴ다는/ETM	말/NNG	이/VCP	ㅂ니까/EF	?/SF	"/SS	"/SS	교통사고/NNG	시/NNB	그렇/VA	고/EC	,/SP	암/NNG	진단/NNG	시/XSN	3/SN	천만/NR	원/NNB	의/JKG	치료비/NNG	가/JKS	나오/VV	ㅂ니다/EF	./SF	
-그리/VV	고/EC	내/NP	는/JX	기간/NNG	대비/NNG	타/VV	는/ETM	시기/NNG	가/JKS	짧/VA	을수록/EC	돈/NNG	이/JKS	적/VA	게/EC	나오/VV	게/EC	되/VV	어/EC	있/VX	습니다/EF	./SF	"/SS	"/SS	그러/VV	면/EC	오늘/NNG	사고/NNG	가/JKS	나/NP	도/JX	3/SN	억/NR	이/JKS	나오/VV	ㄴ다는/ETM	말/NNG	이/VCP	ㅂ니까/EF	?/SF	"/SS	"/SS	교통사고/NNG	시/NNG	그렇/VA	고/EC	,/SP	암/NNG	진단/NNG	시/NNG	3/SN	천만/NR	원/NNB	의/JKG	치료비/NNG	가/JKS	나오/VV	ㅂ니다/EF	./SF	-160.9
-그리/VV	고/EC	내/NP	는/JX	기간/NNG	대비/NNG	타/VV	는/ETM	시기/NNG	가/JKS	짧/VA	을수록/EC	돈/NNG	이/JKS	적/VA	게/EC	나오/VV	게/EC	되/VV	어/EC	있/VX	습니다/EF	./SF	"/SS	"/SS	그러/VV	면/EC	오늘/NNG	사고/NNG	가/JKS	나/NP	도/JX	3/SN	억/NR	이/JKS	나오/VV	ㄴ다는/ETM	말/NNG	이/VCP	ㅂ니까/EF	?/SF	"/SS	"/SS	교통사고/NNG	시/NNG	그렇/VA	고/EC	,/SP	암/NNG	진단/NNG	시/XSN	3/SN	천만/NR	원/NNB	의/JKG	치료비/NNG	가/JKS	나오/VV	ㅂ니다/EF	./SF	-161.4
-그리/VV	고/EC	내/NP	는/JX	기간/NNG	대비/NNG	타/VV	는/ETM	시기/NNG	가/JKS	짧/VA	을수록/EC	돈/NNG	이/JKS	적/VA	게/EC	나오/VV	게/EC	되/VV	어/EC	있/VX	습니다/EF	./SF	"/SS	"/SS	그러/VV	면/EC	오늘/NNG	사고/NNG	가/JKS	나/NP	도/JX	3/SN	억/NR	이/JKS	나오/VV	ㄴ다는/ETM	말/NNG	이/VCP	ㅂ니까/EF	?/SF	"/SS	"/SS	교통사고/NNG	시/XSN	그렇/VA	고/EC	,/SP	암/NNG	진단/NNG	시/NNG	3/SN	천만/NR	원/NNB	의/JKG	치료비/NNG	가/JKS	나오/VV	ㅂ니다/EF	./SF	-161.4
+그리/VV	고/EC	내/NP	는/JX	기간/NNG	대비/NNG	타/VV	는/ETM	시기/NNG	가/JKS	짧/VA	을수록/EC	돈/NNG	이/JKS	적/VA	게/EC	나오/VV	게/EC	되/VV	어/EC	있/VX	습니다/EF	./SF	"/SS	"/SS	그러/VV	면/EC	오늘/NNG	사고/NNG	가/JKS	나/NP	도/JX	3/SN	억/NR	이/JKS	나오/VV	ㄴ다는/ETM	말/NNG	이/VCP	ㅂ니까/EF	?/SF	"/SS	"/SS	교통사고/NNG	시/NNG	그렇/VA	고/EC	,/SP	암/NNG	진단/NNG	시/NNG	3/SN	천만/NR	원/NNB	의/JKG	치료비/NNG	가/JKS	나오/VV	ㅂ니다/EF	./SF	-165.1
+그리/VV	고/EC	내/NP	는/JX	기간/NNG	대비/NNG	타/VV	는/ETM	시기/NNG	가/JKS	짧/VA	을수록/EC	돈/NNG	이/JKS	적/VA	게/EC	나오/VV	게/EC	되/VV	어/EC	있/VX	습니다/EF	./SF	"/SS	"/SS	그렇/VA	면/EC	오늘/NNG	사고/NNG	가/JKS	나/NP	도/JX	3/SN	억/NR	이/JKS	나오/VV	ㄴ다는/ETM	말/NNG	이/VCP	ㅂ니까/EF	?/SF	"/SS	"/SS	교통사고/NNG	시/NNG	그렇/VA	고/EC	,/SP	암/NNG	진단/NNG	시/NNG	3/SN	천만/NR	원/NNB	의/JKG	치료비/NNG	가/JKS	나오/VV	ㅂ니다/EF	./SF	-165.3
+그리/VV	고/EC	내/NP	는/JX	기간/NNG	대비/NNG	타/VV	는/ETM	시기/NNG	가/JKS	짧/VA	을수록/EC	돈/NNG	이/JKS	적/VA	게/EC	나오/VV	게/EC	되/VV	어/EC	있/VX	습니다/EF	./SF	"/SS	"/SS	그러/VV	면/EC	오늘/NNG	사고/NNG	가/JKS	나/NP	도/JX	3/SN	억/NR	이/JKS	나오/VV	ㄴ다는/ETM	말/NNG	이/VCP	ㅂ니까/EF	?/SF	"/SS	"/SS	교통사고/NNG	시/NNG	그렇/VA	고/EC	,/SP	암/NNG	진단/NNG	시/XSN	3/SN	천만/NR	원/NNB	의/JKG	치료비/NNG	가/JKS	나오/VV	ㅂ니다/EF	./SF	-165.6
 
 그밖에도 질병사망시, 장해시, 입원시 보험금을 받을 수 있고 더불어 60세부터는 평생동안 연금을 받을 수 있고요.	0.75
 그/NP	밖에/JX	도/JX	질병/NNG	사망/NNG	시/NNB	,/SP	장해/NNG	시/NNB	,/SP	입원/NNG	시/NNB	보험금/NNG	을/JKO	받/VV	을/ETM	수/NNB	있/VV	고/EC	더불/VV	어/EC	60/SN	세/NNB	부터/JX	는/JX	평생/NNG	동안/NNG	연금/NNG	을/JKO	받/VV	을/ETM	수/NNB	있/VV	고요/EF	./SF	
@@ -3542,15 +3542,15 @@ B/SL	는/JX	버스/NNG	나/JC	지하철/NNG	을/JKO	타/VV	고/EC	졸/VV	면서/EC	가/VV	아서
 
 1급 이상 장해를 입게 되면 보험료를 내지 않아도 되고, 부부계약이기 때문에 부인께서 평생 동안 연금을 받을 수 있습니다." "그러면 생각보다 괜찮은 거네요." "담당 영업사원은 저의 후배입니다.	0.831
 1/SN	급/NNG	이상/NNG	장해/NNG	를/JKO	입/VV	게/EC	되/VV	면/EC	보험료/NNG	를/JKO	내/VV	지/EC	않/VX	아도/EC	되/VV	고/EC	,/SP	부부/NNG	계약/NNG	이/VCP	기/ETN	때문/NNB	에/JKB	부인/NNG	께서/JKS	평생/NNG	동안/NNG	연금/NNG	을/JKO	받/VV	을/ETM	수/NNB	있/VV	습니다/EF	./SF	"/SS	"/SS	그러면/MAJ	생각/NNG	보다/JKB	괜찮/VA	은/ETM	것/NNB	이/VCP	네요/EF	./SF	"/SS	"/SS	담당/NNG	영업/NNG	사원/NNG	은/JX	저/NP	의/JKG	후배/NNG	이/VCP	ㅂ니다/EF	./SF	
-1/SN	급/NNG	이상/NNG	장해/NNG	를/JKO	입/VV	게/EC	되/VV	면/EC	보험료/NNG	를/JKO	내/VV	지/EC	않/VX	아/EF	도/JX	되/VV	고/EC	,/SP	부부/NNG	계약/NNG	이/VCP	기/ETN	때문/NNB	에/JKB	부인/NNG	께서/JKS	평생/NNG	동안/NNG	연금/NNG	을/JKO	받/VV	을/ETM	수/NNB	있/VX	습니다/EF	./SF	"/SS	"/SS	그러/VV	면/EC	생각/NNG	보다/JKB	괜찮/VA	은/ETM	걸/VV	네요/EF	./SF	"/SS	"/SS	담당/NNG	영업/NNG	사원/NNG	은/JX	저/NP	의/JKG	후배/NNG	이/VCP	ㅂ니다/EF	./SF	-176.6
-1/SN	급/NNG	이상/NNG	장해/NNG	를/JKO	입/VV	게/EC	되/VV	면/EC	보험료/NNG	를/JKO	내/VV	지/EC	않아/UN	도/JX	되/VV	고/EC	,/SP	부부/NNG	계약/NNG	이/VCP	기/ETN	때문/NNB	에/JKB	부인/NNG	께서/JKS	평생/NNG	동안/NNG	연금/NNG	을/JKO	받/VV	을/ETM	수/NNB	있/VX	습니다/EF	./SF	"/SS	"/SS	그러/VV	면/EC	생각/NNG	보다/JKB	괜찮/VA	은/ETM	걸/VV	네요/EF	./SF	"/SS	"/SS	담당/NNG	영업/NNG	사원/NNG	은/JX	저/NP	의/JKG	후배/NNG	이/VCP	ㅂ니다/EF	./SF	-176.7
-1/SN	급/NNG	이상/NNG	장해/NNG	를/JKO	입/VV	게/EC	되/VV	면/EC	보험료/NNG	를/JKO	내/VX	지/EC	않/VX	아/EF	도/JX	되/VV	고/EC	,/SP	부부/NNG	계약/NNG	이/VCP	기/ETN	때문/NNB	에/JKB	부인/NNG	께서/JKS	평생/NNG	동안/NNG	연금/NNG	을/JKO	받/VV	을/ETM	수/NNB	있/VX	습니다/EF	./SF	"/SS	"/SS	그러/VV	면/EC	생각/NNG	보다/JKB	괜찮/VA	은/ETM	걸/VV	네요/EF	./SF	"/SS	"/SS	담당/NNG	영업/NNG	사원/NNG	은/JX	저/NP	의/JKG	후배/NNG	이/VCP	ㅂ니다/EF	./SF	-177
+1/SN	급/NNG	이상/NNG	장해/NNG	를/JKO	입/VV	게/EC	되/VV	면/EC	보험료/NNG	를/JKO	내/VV	지/EC	않/VX	아/EF	도/JX	되/VV	고/EC	,/SP	부부/NNG	계약/NNG	이/VCP	기/ETN	때문/NNB	에/JKB	부인/NNG	께서/JKS	평생/NNG	동안/NNG	연금/NNG	을/JKO	받/VV	을/ETM	수/NNB	있/VX	습니다/EF	./SF	"/SS	"/SS	그러/VV	면/EC	생각/NNG	보다/JKB	괜찮/VA	은/ETM	걸/VV	네요/EF	./SF	"/SS	"/SS	담당/NNG	영업/NNG	사원/NNG	은/JX	저/NP	의/JKG	후배/NNG	이/VCP	ㅂ니다/EF	./SF	-180.8
+1/SN	급/NNG	이상/NNG	장해/NNG	를/JKO	입/VV	게/EC	되/VV	면/EC	보험료/NNG	를/JKO	내/VV	지/EC	않아/UN	도/JX	되/VV	고/EC	,/SP	부부/NNG	계약/NNG	이/VCP	기/ETN	때문/NNB	에/JKB	부인/NNG	께서/JKS	평생/NNG	동안/NNG	연금/NNG	을/JKO	받/VV	을/ETM	수/NNB	있/VX	습니다/EF	./SF	"/SS	"/SS	그러/VV	면/EC	생각/NNG	보다/JKB	괜찮/VA	은/ETM	걸/VV	네요/EF	./SF	"/SS	"/SS	담당/NNG	영업/NNG	사원/NNG	은/JX	저/NP	의/JKG	후배/NNG	이/VCP	ㅂ니다/EF	./SF	-180.9
+1/SN	급/NNG	이상/NNG	장해/NNG	를/JKO	입/VV	게/EC	되/VV	면/EC	보험료/NNG	를/JKO	내/VV	지/EC	않/VX	아/EF	도/JX	되/VV	고/EC	,/SP	부부/NNG	계약/NNG	이/VCP	기/ETN	때문/NNB	에/JKB	부인/NNG	께서/JKS	평생/NNG	동안/NNG	연금/NNG	을/JKO	받/VV	을/ETM	수/NNB	있/VX	습니다/EF	./SF	"/SS	"/SS	그렇/VA	면/EC	생각/NNG	보다/JKB	괜찮/VA	은/ETM	걸/VV	네요/EF	./SF	"/SS	"/SS	담당/NNG	영업/NNG	사원/NNG	은/JX	저/NP	의/JKG	후배/NNG	이/VCP	ㅂ니다/EF	./SF	-181
 
 남편께서도 군대를 갔다오셨습니까?" "그런데요?" "그러면 저의 후배되는군요.	0.733
 남편/NNG	께서/JKS	도/JX	군대/NNG	를/JKO	가/VV	았/EP	다/EC	오/VX	시/EP	었/EP	습니까/EF	?/SF	"/SS	"/SS	그러/VV	ㄴ데요/EF	?/SF	"/SS	"/SS	그러면/MAJ	저/NP	의/JKG	후배/NNG	되/XSV	는군요/EF	./SF	
-남편/NNG	께서/JKS	도/JX	군대/NNG	를/JKO	갔다오/VV	시/EP	었/EP	습니까/EF	?/SF	"/SS	"/SS	그러/VV	ㄴ데요/EF	?/SF	"/SS	"/SS	그러/VV	면/EC	저/NP	의/JKG	후배/NNG	되/XSV	는군요/EF	./SF	-65.42
-남편/NNG	께/XSN	서/JKB	도/JX	군대/NNG	를/JKO	갔다오/VV	시/EP	었/EP	습니까/EF	?/SF	"/SS	"/SS	그러/VV	ㄴ데요/EF	?/SF	"/SS	"/SS	그러/VV	면/EC	저/NP	의/JKG	후배/NNG	되/XSV	는군요/EF	./SF	-68
-남편/NNG	께서/JKS	도/JX	군대/NNG	를/JKO	갔다오/VV	시/EP	었/EP	습니까/EF	?/SF	"/SS	"/SS	그러/VV	ㄴ데요/EF	?/SF	"/SS	"/SS	그러/VV	면/EC	저/NP	의/JKG	후배/NNG	되/VV	는군요/EF	./SF	-68.8
+남편/NNG	께서/JKS	도/JX	군대/NNG	를/JKO	갔다오/VV	시/EP	었/EP	습니까/EF	?/SF	"/SS	"/SS	그렇/VA	ㄴ데요/EF	?/SF	"/SS	"/SS	그러/VV	면/EC	저/NP	의/JKG	후배/NNG	되/XSV	는군요/EF	./SF	-73.25
+남편/NNG	께서/JKS	도/JX	군대/NNG	를/JKO	갔다오/VV	시/EP	었/EP	습니까/EF	?/SF	"/SS	"/SS	그렇/VA	ㄴ데요/EF	?/SF	"/SS	"/SS	그렇/VA	면/EC	저/NP	의/JKG	후배/NNG	되/XSV	는군요/EF	./SF	-73.43
+남편/NNG	께서/JKS	도/JX	군대/NNG	를/JKO	갔다오/VV	시/EP	었/EP	습니까/EF	?/SF	"/SS	"/SS	그러/VV	ㄴ데요/EF	?/SF	"/SS	"/SS	그러/VV	면/EC	저/NP	의/JKG	후배/NNG	되/XSV	는군요/EF	./SF	-73.91
 
 우리 후배님 부인께서 이렇게 화가 나셨으니 죄송합니다.	0.833
 우리/NP	후배/NNG	님/XSN	부인/NNG	께서/JKS	이렇/VA	게/EC	화/NNG	가/JKS	나/VV	시/EP	었/EP	으니/EC	죄송/XR	하/XSA	ㅂ니다/EF	./SF	
@@ -3776,7 +3776,7 @@ B/SL	는/JX	버스/NNG	나/JC	지하철/NNG	을/JKO	타/VV	고/EC	졸/VV	면서/EC	가/VV	아서
 그러나/MAJ	회사/NNG	와/JC	종업원/NNG	이/JKS	2/SN	만/NR	5000/SN	원/NNB	씩/XSN	부담/NNG	하/XSV	아/EC	5/SN	만/NR	원/NNB	짜리/XSN	단체/NNG	보험/NNG	을/JKO	가입/NNG	하/XSV	기/ETN	로/JKB	단체/NNG	협약/NNG	이/JKS	체결/NNG	되/XSV	고/EC	나/VX	자/EC	다음날/NNG	부터/JX	각/MM	보험/NNG	회사/NNG	의/JKG	각축장/NNG	이/JKC	되/VV	었/EP	다/EC	노조/NNG	나/JC	회사/NNG	측/NNB	에서/JKB	는/JX	이제/NNG	까지/JX	도와주/VV	ㄴ/ETM	것/NNB	은/JX	고맙/VA	나/EC	가입처/NNG	를/JKO	선택/NNG	하/XSV	는/ETM	것/NNB	은/JX	공정/NNG	하/XSA	게/EC	하/VV	겠/EP	다는/ETM	윗분/NNG	들/XSN	의/JKG	뜻/NNG	을/JKO	거스르/VV	ㄹ/ETM	수/NNB	없/VA	다며/EC	한/MM	발짝/NNB	뒤/NNG	로/JKB	물러서/VV	었/EP	다/EF	./SF	
 그러나/MAJ	회사/NNG	와/JKB	종업원/NNG	이/JKS	2/SN	만/JX	5000/SN	원/NNB	씩/XSN	부담/NNG	하/XSV	여/EC	5/SN	만/JX	원/NNB	짜리/XSN	단체/NNG	보험/NNG	을/JKO	가입/NNG	하/XSV	기/ETN	로/JKB	단체/NNG	협약/NNG	이/JKS	체결/NNG	되/XSV	고/EC	나/VV	자/EC	다음날/NNG	부터/JX	각/MM	보험/NNG	회사/NNG	의/JKG	각축장/NNG	이/JKS	되/VV	었/EP	다/EF	./SF	노조/NNG	나/JX	회사/NNG	측/NNB	에서/JKB	는/JX	이제/NNG	까지/JX	도와주/VV	ㄴ/ETM	것/NNB	은/JX	고맙/VA	으나/EC	가입/NNG	처/NNG	를/JKO	선택/NNG	하/XSV	는/ETM	것/NNB	은/JX	공정/NNG	하/XSV	게/EC	하/VV	겠/EP	다는/ETM	윗분/NNG	들/XSN	의/JKG	뜻/NNG	을/JKO	거스르/VV	ㄹ/ETM	수/NNB	없/VA	다며/EC	한/MM	발짝/NNB	뒤/NNG	로/JKB	물러서/VV	었/EP	다/EF	./SF	-278.7
 그러나/MAJ	회사/NNG	와/JKB	종업원/NNG	이/JKS	2/SN	만/JX	5000/SN	원/NNB	씩/XSN	부담/NNG	하/XSA	아/EC	5/SN	만/JX	원/NNB	짜리/XSN	단체/NNG	보험/NNG	을/JKO	가입/NNG	하/XSV	기/ETN	로/JKB	단체/NNG	협약/NNG	이/JKS	체결/NNG	되/XSV	고/EC	나/VV	자/EC	다음날/NNG	부터/JX	각/MM	보험/NNG	회사/NNG	의/JKG	각축장/NNG	이/JKS	되/VV	었/EP	다/EF	./SF	노조/NNG	나/JX	회사/NNG	측/NNB	에서/JKB	는/JX	이제/NNG	까지/JX	도와주/VV	ㄴ/ETM	것/NNB	은/JX	고맙/VA	으나/EC	가입/NNG	처/NNG	를/JKO	선택/NNG	하/XSV	는/ETM	것/NNB	은/JX	공정/NNG	하/XSV	게/EC	하/VV	겠/EP	다는/ETM	윗분/NNG	들/XSN	의/JKG	뜻/NNG	을/JKO	거스르/VV	ㄹ/ETM	수/NNB	없/VA	다며/EC	한/MM	발짝/NNB	뒤/NNG	로/JKB	물러서/VV	었/EP	다/EF	./SF	-278.9
-그러나/MAJ	회사/NNG	와/JKB	종업원/NNG	이/JKS	2/SN	만/NNB	5000/SN	원/NNB	씩/XSN	부담/NNG	하/XSV	여/EC	5/SN	만/JX	원/NNB	짜리/XSN	단체/NNG	보험/NNG	을/JKO	가입/NNG	하/XSV	기/ETN	로/JKB	단체/NNG	협약/NNG	이/JKS	체결/NNG	되/XSV	고/EC	나/VV	자/EC	다음날/NNG	부터/JX	각/MM	보험/NNG	회사/NNG	의/JKG	각축장/NNG	이/JKS	되/VV	었/EP	다/EF	./SF	노조/NNG	나/JX	회사/NNG	측/NNB	에서/JKB	는/JX	이제/NNG	까지/JX	도와주/VV	ㄴ/ETM	것/NNB	은/JX	고맙/VA	으나/EC	가입/NNG	처/NNG	를/JKO	선택/NNG	하/XSV	는/ETM	것/NNB	은/JX	공정/NNG	하/XSV	게/EC	하/VV	겠/EP	다는/ETM	윗분/NNG	들/XSN	의/JKG	뜻/NNG	을/JKO	거스르/VV	ㄹ/ETM	수/NNB	없/VA	다며/EC	한/MM	발짝/NNB	뒤/NNG	로/JKB	물러서/VV	었/EP	다/EF	./SF	-279
+그러나/MAJ	회사/NNG	와/JKB	종업원/NNG	이/JKS	2/SN	만/JX	5000/SN	원/NNB	씩/XSN	부담/NNG	하/XSV	여/EC	5/SN	만/NNB	원/NNB	짜리/XSN	단체/NNG	보험/NNG	을/JKO	가입/NNG	하/XSV	기/ETN	로/JKB	단체/NNG	협약/NNG	이/JKS	체결/NNG	되/XSV	고/EC	나/VV	자/EC	다음날/NNG	부터/JX	각/MM	보험/NNG	회사/NNG	의/JKG	각축장/NNG	이/JKS	되/VV	었/EP	다/EF	./SF	노조/NNG	나/JX	회사/NNG	측/NNB	에서/JKB	는/JX	이제/NNG	까지/JX	도와주/VV	ㄴ/ETM	것/NNB	은/JX	고맙/VA	으나/EC	가입/NNG	처/NNG	를/JKO	선택/NNG	하/XSV	는/ETM	것/NNB	은/JX	공정/NNG	하/XSV	게/EC	하/VV	겠/EP	다는/ETM	윗분/NNG	들/XSN	의/JKG	뜻/NNG	을/JKO	거스르/VV	ㄹ/ETM	수/NNB	없/VA	다며/EC	한/MM	발짝/NNB	뒤/NNG	로/JKB	물러서/VV	었/EP	다/EF	./SF	-279
 
 결국은 사장이 지목한 새로 생긴 D보험회사로 결정이 되고 말았다.	0.8
 결국/NNG	은/JX	사장/NNG	이/JKS	지목/NNG	하/XSV	ㄴ/ETM	새로/MAG	생기/VV	ㄴ/ETM	D/SL	보험/NNG	회사/NNG	로/JKB	결정/NNG	이/JKC	되/VV	고/EC	말/VX	았/EP	다/EF	./SF	
@@ -4934,11 +4934,11 @@ S/SL	팀장/NNG	이/JKS	그분/NP	을/JKO	뛰어넘/VV	을/ETM	수/NNB	있/VX	다면/EC	영업/N
 끝/NNG	까지/JX	물/VV	고/EC	늘어지/VV	어라/EC	주변/NNG	사람/NNG	에게/JKB	일시/NNG	적/XSN	이/VCP	ㄴ/ETM	호감/NNG	을/JKO	얻/VV	을/ETM	생각/NNG	보다/JKB	는/JX	그/NP	들/XSN	에게/JKB	장기/NNG	적/XSN	이/VCP	ㄴ/ETM	존경/NNG	을/JKO	받/VV	을/ETM	수/NNB	있/VX	도록/EC	노력/NNG	하/XSV	아라/EF	./SF	-111.2
 끝/NNG	까지/JX	물고/NNG	늘어지/VV	어라/EC	주변/NNG	사람/NNG	에게/JKB	일시/NNG	적/XSN	이/VCP	ㄴ/ETM	호감/NNG	을/JKO	얻/VV	을/ETM	생각/NNG	보다/JKB	는/JX	그/NP	들/XSN	에게/JKB	장기/NNG	적/XSN	이/VCP	ㄴ/ETM	존경/NNG	을/JKO	받/VV	을/ETM	수/NNB	있/VV	도록/EC	노력/NNG	하/XSV	아라/EF	./SF	-112.3
 
-영업관리자는 실적이 없는 영업사원에게 "그럴 수도 있다"라는 등의 위로의 말로 일시적인 인기를 얻으려 해서는 안 된다.	0.783
+영업관리자는 실적이 없는 영업사원에게 "그럴 수도 있다"라는 등의 위로의 말로 일시적인 인기를 얻으려 해서는 안 된다.	0.745
 영업/NNG	관리자/NNG	는/JX	실적/NNG	이/JKS	없/VA	는/ETM	영업/NNG	사원/NNG	에게/JKB	"/SS	그러/VV	ㄹ/ETM	수/NNB	도/JX	있/VV	다/EC	"/SS	이/VCP	라는/ETM	등/NNB	의/JKG	위로/NNG	의/JKG	말/NNG	로/JKB	일시/NNG	적/XSN	이/VCP	ㄴ/ETM	인기/NNG	를/JKO	얻/VV	으려/EC	하/VX	아서/EC	는/JX	안/MAG	되/VV	ㄴ다/EF	./SF	
-영업/NNG	관리자/NNG	는/JX	실적/NNG	이/JKS	없/VA	는/ETM	영업/NNG	사원/NNG	에게/JKB	"/SS	그러/VV	ㄹ/ETM	수/NNB	도/JX	있/VX	다/EF	"/SS	라는/ETM	등/NNB	의/JKG	위로/NNG	의/JKG	말/NNG	로/JKB	일시/NNG	적/XSN	이/VCP	ㄴ/ETM	인기/NNG	를/JKO	얻/VV	으려/EC	하/VV	아서/EC	는/JX	알/VV	ㄴ/ETM	되/VV	ㄴ다/EF	./SF	-101.1
-영업/NNG	관리자/NNG	는/JX	실적/NNG	이/JKS	없/VA	는/ETM	영업/NNG	사원/NNG	에게/JKB	"/SS	그러/VV	ㄹ/ETM	수/NNB	도/JX	있/VV	다/EF	"/SS	라는/ETM	등/NNB	의/JKG	위로/NNG	의/JKG	말/NNG	로/JKB	일시/NNG	적/XSN	이/VCP	ㄴ/ETM	인기/NNG	를/JKO	얻/VV	으려/EC	하/VV	아서/EC	는/JX	알/VV	ㄴ/ETM	되/VV	ㄴ다/EF	./SF	-101.9
-영업/NNG	관리자/NNG	는/JX	실적/NNG	이/JKS	없/VA	는/ETM	영업/NNG	사원/NNG	에게/JKB	"/SS	그러/VV	ㄹ/ETM	수/NNB	도/JX	있/VX	다/EF	"/SS	라는/ETM	등/NNB	의/JKG	위로/NNG	의/JKG	말/NNG	로/JKB	일시/NNG	적/XSN	이/VCP	ㄴ/ETM	인기/NNG	를/JKO	얻/VV	으려/EC	하/VX	아서/EC	는/JX	알/VV	ㄴ/ETM	되/VV	ㄴ다/EF	./SF	-102.6
+영업/NNG	관리자/NNG	는/JX	실적/NNG	이/JKS	없/VA	는/ETM	영업/NNG	사원/NNG	에게/JKB	"/SS	그렇/VA	ㄹ/ETM	수/NNB	도/JX	있/VX	다/EF	"/SS	라는/ETM	등/NNB	의/JKG	위로/NNG	의/JKG	말/NNG	로/JKB	일시/NNG	적/XSN	이/VCP	ㄴ/ETM	인기/NNG	를/JKO	얻/VV	으려/EC	하/VV	아서/EC	는/JX	알/VV	ㄴ/ETM	되/VV	ㄴ다/EF	./SF	-104.8
+영업/NNG	관리자/NNG	는/JX	실적/NNG	이/JKS	없/VA	는/ETM	영업/NNG	사원/NNG	에게/JKB	"/SS	그러/VV	ㄹ/ETM	수/NNB	도/JX	있/VX	다/EF	"/SS	라는/ETM	등/NNB	의/JKG	위로/NNG	의/JKG	말/NNG	로/JKB	일시/NNG	적/XSN	이/VCP	ㄴ/ETM	인기/NNG	를/JKO	얻/VV	으려/EC	하/VV	아서/EC	는/JX	알/VV	ㄴ/ETM	되/VV	ㄴ다/EF	./SF	-105.3
+영업/NNG	관리자/NNG	는/JX	실적/NNG	이/JKS	없/VA	는/ETM	영업/NNG	사원/NNG	에게/JKB	"/SS	그렇/VA	ㄹ/ETM	수/NNB	도/JX	있/VV	다/EF	"/SS	라는/ETM	등/NNB	의/JKG	위로/NNG	의/JKG	말/NNG	로/JKB	일시/NNG	적/XSN	이/VCP	ㄴ/ETM	인기/NNG	를/JKO	얻/VV	으려/EC	하/VV	아서/EC	는/JX	알/VV	ㄴ/ETM	되/VV	ㄴ다/EF	./SF	-105.6
 
 계속해서 실적이 없으면 소득이 줄어들게 되고 곧 회사를 그만두는 위치에 처해질 수 있다는 사실을 주지시켜 자극을 주는 것이 장기적으로 존경받는 관리자다.	0.808
 계속/NNG	하/XSV	아서/EC	실적/NNG	이/JKS	없/VA	으면/EC	소득/NNG	이/JKS	줄어들/VV	게/EC	되/VV	고/EC	곧/MAG	회사/NNG	를/JKO	그만두/VV	는/ETM	위치/NNG	에/JKB	처하/VV	아/EC	지/VX	ㄹ/ETM	수/NNB	있/VV	다는/ETM	사실/NNG	을/JKO	주지/NNG	시키/XSV	어/EC	자극/NNG	을/JKO	주/VV	는/ETM	것/NNB	이/JKS	장기/NNG	적/XSN	으로/JKB	존경/NNG	받/VV	는/ETM	관리자/NNG	이/VCP	다/EF	./SF	
@@ -5026,9 +5026,9 @@ S/SL	팀장/NNG	이/JKS	그분/NP	을/JKO	뛰어넘/VV	을/ETM	수/NNB	있/VX	다면/EC	영업/N
 
 영업사원은 보험 가입을 회피하는 고객에게 "그러면 다음에 가입하라"든지 "안 해도 괜찮다"라는 등 일시적으로 듣기 좋은 말을 함으로써 호감을 얻으려 해서는 안 된다.	0.754
 영업/NNG	사원/NNG	은/JX	보험/NNG	가입/NNG	을/JKO	회피/NNG	하/XSV	는/ETM	고객/NNG	에게/JKB	"/SS	그러면/MAJ	다음/NNG	에/JKB	가입/NNG	하/XSV	라/EC	"/SS	든지/EC	"/SS	안/MAG	하/VV	아도/EC	괜찮/VA	다/EF	"/SS	이/VCP	라는/ETM	등/NNB	일시/NNG	적/XSN	으로/JKB	듣/VV	기/ETN	좋/VA	은/ETM	말/NNG	을/JKO	하/VV	ㅁ/ETN	으로써/JKB	호감/NNG	을/JKO	얻/VV	으려/EC	하/VX	아서/EC	는/JX	안/MAG	되/VV	ㄴ다/EF	./SF	
-영업/NNG	사원/NNG	은/JX	보험/NNG	가입/NNG	을/JKO	회피/NNG	하/XSV	는/ETM	고객/NNG	에게/JKB	"/SS	그러/VV	면/EC	다음/NNG	에/JKB	가입/NNG	하/XSV	아라/EC	"/SS	든지/EC	"/SS	알/VV	ㄴ/ETM	하/VV	아도/EC	괜찮/VA	다/EF	"/SS	라는/ETM	등/NNB	일시/NNG	적/XSN	으로/JKB	듣/VV	기/ETN	좋/VA	은/ETM	말/NNG	을/JKO	함/NNG	으로써/JKB	호감/NNG	을/JKO	얻/VV	으려/EC	하/VV	아서/EC	는/JX	알/VV	ㄴ/ETM	되/VV	ㄴ다/EF	./SF	-155.5
-영업/NNG	사원/NNG	은/JX	보험/NNG	가입/NNG	을/JKO	회피/NNG	하/XSV	는/ETM	고객/NNG	에게/JKB	"/SS	그러/VV	면/EC	다음/NNG	에/JKB	가입/NNG	하/XSV	아라/EC	"/SS	든지/EC	"/SS	알/VV	ㄴ/ETM	해/NNG	도/JX	괜찮/VA	다/EF	"/SS	라는/ETM	등/NNB	일시/NNG	적/XSN	으로/JKB	듣/VV	기/ETN	좋/VA	은/ETM	말/NNG	을/JKO	함/NNG	으로써/JKB	호감/NNG	을/JKO	얻/VV	으려/EC	하/VV	아서/EC	는/JX	알/VV	ㄴ/ETM	되/VV	ㄴ다/EF	./SF	-156.1
-영업/NNG	사원/NNG	은/JX	보험/NNG	가입/NNG	을/JKO	회피/NNG	하/XSV	는/ETM	고객/NNG	에게/JKB	"/SS	그러/VV	면/EC	다음/NNG	에/JKB	가입/NNG	하/XSV	아라/EC	"/SS	든지/EC	"/SS	알/VV	ㄴ/ETM	하/VV	아/EC	도/JX	괜찮/VA	다/EF	"/SS	라는/ETM	등/NNB	일시/NNG	적/XSN	으로/JKB	듣/VV	기/ETN	좋/VA	은/ETM	말/NNG	을/JKO	함/NNG	으로써/JKB	호감/NNG	을/JKO	얻/VV	으려/EC	하/VV	아서/EC	는/JX	알/VV	ㄴ/ETM	되/VV	ㄴ다/EF	./SF	-156.8
+영업/NNG	사원/NNG	은/JX	보험/NNG	가입/NNG	을/JKO	회피/NNG	하/XSV	는/ETM	고객/NNG	에게/JKB	"/SS	그러/VV	면/EC	다음/NNG	에/JKB	가입/NNG	하/XSV	아라/EC	"/SS	든지/EC	"/SS	알/VV	ㄴ/ETM	하/VV	아도/EC	괜찮/VA	다/EF	"/SS	라는/ETM	등/NNB	일시/NNG	적/XSN	으로/JKB	듣/VV	기/ETN	좋/VA	은/ETM	말/NNG	을/JKO	함/NNG	으로써/JKB	호감/NNG	을/JKO	얻/VV	으려/EC	하/VV	아서/EC	는/JX	알/VV	ㄴ/ETM	되/VV	ㄴ다/EF	./SF	-159.7
+영업/NNG	사원/NNG	은/JX	보험/NNG	가입/NNG	을/JKO	회피/NNG	하/XSV	는/ETM	고객/NNG	에게/JKB	"/SS	그렇/VA	면/EC	다음/NNG	에/JKB	가입/NNG	하/XSV	아라/EC	"/SS	든지/EC	"/SS	알/VV	ㄴ/ETM	하/VV	아도/EC	괜찮/VA	다/EF	"/SS	라는/ETM	등/NNB	일시/NNG	적/XSN	으로/JKB	듣/VV	기/ETN	좋/VA	은/ETM	말/NNG	을/JKO	함/NNG	으로써/JKB	호감/NNG	을/JKO	얻/VV	으려/EC	하/VV	아서/EC	는/JX	알/VV	ㄴ/ETM	되/VV	ㄴ다/EF	./SF	-159.9
+영업/NNG	사원/NNG	은/JX	보험/NNG	가입/NNG	을/JKO	회피/NNG	하/XSV	는/ETM	고객/NNG	에게/JKB	"/SS	그러/VV	면/EC	다음/NNG	에/JKB	가입/NNG	하/XSV	아라/EC	"/SS	든지/EC	"/SS	알/VV	ㄴ/ETM	해/NNG	도/JX	괜찮/VA	다/EF	"/SS	라는/ETM	등/NNB	일시/NNG	적/XSN	으로/JKB	듣/VV	기/ETN	좋/VA	은/ETM	말/NNG	을/JKO	함/NNG	으로써/JKB	호감/NNG	을/JKO	얻/VV	으려/EC	하/VV	아서/EC	는/JX	알/VV	ㄴ/ETM	되/VV	ㄴ다/EF	./SF	-160.3
 
 보험가입을 미루는 것이 본인과 가족을 위해 매우 위험한 행위라는 것을 설득시켜서 경제적 위험에 대비하도록 하는 것이 바람직한 태도이다.	0.771
 보험/NNG	가입/NNG	을/JKO	미루/VV	는/ETM	것/NNB	이/JKS	본인/NNG	과/JC	가족/NNG	을/JKO	위하/VV	아/EC	매우/MAG	위험/NNG	하/XSA	ㄴ/ETM	행위/NNG	이/VCP	라는/ETM	것/NNB	을/JKO	설득/NNG	시키/XSV	어서/EC	경제/NNG	적/XSN	위험/NNG	에/JKB	대비/NNG	하/XSV	도록/EC	하/VX	는/ETM	것/NNB	이/JKS	바람직/XR	하/XSA	ㄴ/ETM	태도/NNG	이/VCP	다/EF	./SF	
@@ -5532,7 +5532,7 @@ M/SL	16/SN	소총/NNG	을/JKO	아무리/MAG	잘/MAG	쏘/VV	는/ETM	사람/NNG	도/JX	기관총/
 둘째/NR	,/SP	경쟁자/NNG	를/JKO	분석/NNG	하/XSV	ㄴ다/EC	-/SS	나/NP	의/JKG	경쟁자/NNG	는/JX	누구/NP	이/VCP	ㄴ가/EF	?/SF	
 둘째/NR	,/SP	경쟁자/NNG	를/JKO	분석/NNG	하/XSV	ㄴ다/EC	-/SO	나/NP	의/JKG	경쟁자/NNG	는/JX	누구/NP	이/VCP	ㄴ가/EF	?/SF	-42.31
 둘째/NR	,/SP	경쟁자/NNG	를/JKO	분석/NNG	하/XSV	ㄴ다/EF	-/SO	나/NP	의/JKG	경쟁자/NNG	는/JX	누구/NP	이/VCP	ㄴ가/EF	?/SF	-44.01
-둘째/NR	,/SP	경쟁자/NNG	를/JKO	분석/NNG	하/XSA	ㄴ다/EF	-/SO	나/NP	의/JKG	경쟁자/NNG	는/JX	누구/NP	이/VCP	ㄴ가/EF	?/SF	-46.95
+둘째/NR	,/SP	경쟁자/NNG	를/JKO	분석/NNG	하/XSA	ㄴ다/EC	-/SO	나/NP	의/JKG	경쟁자/NNG	는/JX	누구/NP	이/VCP	ㄴ가/EF	?/SF	-45.61
 
 -경쟁자는 어느 정도의 실력을 갖추었는가?	0.846
 -/SS	경쟁자/NNG	는/JX	어느/MM	정도/NNG	의/JKG	실력/NNG	을/JKO	갖추/VV	었/EP	는가/EF	?/SF	
@@ -5580,7 +5580,7 @@ M/SL	16/SN	소총/NNG	을/JKO	아무리/MAG	잘/MAG	쏘/VV	는/ETM	사람/NNG	도/JX	기관총/
 시장/NNG	에서/JKB	경쟁자/NNG	를/JKO	제치/VV	고/EC	고객/NNG	의/JKG	선택/NNG	을/JKO	받/VV	기/ETN	위하/VV	아서/EC	격렬/XR	하/XSA	ㄴ/ETM	경쟁/NNG	과/JC	전투/NNG	(/SS	?/SF	)/SS	가/JKS	벌어지/VV	지만/EC	,/SP	경쟁/NNG	에서/JKB	승리/NNG	하/XSV	기/ETN	위하/VV	아서/EC	는/JX	경쟁자/NNG	의/JKG	강점/NNG	과/JC	약점/NNG	에/JKB	대하/VV	아/EC	사전/NNG	에/JKB	먼저/MAG	파악/NNG	하/XSV	아/EC	약점/NNG	을/JKO	무력/NNG	화/XSN	시키/XSV	고/EC	,/SP	강점/NNG	을/JKO	우회/NNG	하/XSV	는/ETM	전략/NNG	으로/JKB	선수/NNG	를/JKO	치/VV	는/ETM	것/NNB	이/JKS	좋/VA	다/EF	./SF	
 시장/NNG	에서/JKB	경쟁자/NNG	를/JKO	제치/VV	고/EC	고객/NNG	의/JKG	선택/NNG	을/JKO	받/VV	기/ETN	위하/VV	아서/EC	격렬/XR	하/XSA	ㄴ/ETM	경쟁/NNG	과/JKB	전투/NNG	(/SS	?/SF	)/SS	가/JKS	벌어지/VV	지만/EC	,/SP	경쟁/NNG	에서/JKB	승리/NNG	하/XSV	기/ETN	위하/VV	아서/EC	는/JX	경쟁자/NNG	의/JKG	강점/NNG	과/JKB	약점/NNG	에/JKB	대하/VV	아/EC	사전/NNG	에/JKB	먼저/MAG	파악/NNG	하/XSV	여/EC	약점/NNG	을/JKO	무력/NNG	화/XSN	시키/XSV	고/EC	,/SP	강점/NNG	을/JKO	우회/NNG	하/XSV	는/ETM	전략/NNG	으로/JKB	선수/NNG	를/JKO	치/VV	는/ETM	것/NNB	이/JKS	좋/VA	다/EF	./SF	-186.1
 시장/NNG	에서/JKB	경쟁자/NNG	를/JKO	제치/VV	고/EC	고객/NNG	의/JKG	선택/NNG	을/JKO	받/VV	기/ETN	위하/VV	아서/EC	격렬/XR	하/XSA	ㄴ/ETM	경쟁/NNG	과/JKB	전투/NNG	(/SS	?/SF	)/SS	가/JKS	벌어지/VV	지만/EC	,/SP	경쟁/NNG	에서/JKB	승리/NNG	하/XSV	기/ETN	위하/VV	아서/EC	는/JX	경쟁자/NNG	의/JKG	강점/NNG	과/JKB	약점/NNG	에/JKB	대하/VV	아/EC	사전/NNG	에/JKB	먼저/MAG	파악/NNG	하/XSA	아/EC	약점/NNG	을/JKO	무력/NNG	화/XSN	시키/XSV	고/EC	,/SP	강점/NNG	을/JKO	우회/NNG	하/XSV	는/ETM	전략/NNG	으로/JKB	선수/NNG	를/JKO	치/VV	는/ETM	것/NNB	이/JKS	좋/VA	다/EF	./SF	-186.3
-시장/NNG	에서/JKB	경쟁자/NNG	를/JKO	제치/VV	고/EC	고객/NNG	의/JKG	선택/NNG	을/JKO	받/VV	기/ETN	위하/VV	아서/EC	격렬/XR	하/XSA	ㄴ/ETM	경쟁/NNG	과/JKB	전투/NNG	(/SS	?/SF	)/SS	가/JKS	벌어지/VV	지만/EC	,/SP	경쟁/NNG	에서/JKB	승리/NNG	하/XSV	기/ETN	위하/VV	아서/EC	는/JX	경쟁자/NNG	의/JKG	강점/NNG	과/JC	약점/NNG	에/JKB	대하/VV	아/EC	사전/NNG	에/JKB	먼저/MAG	파악/NNG	하/XSV	여/EC	약점/NNG	을/JKO	무력/NNG	화/XSN	시키/XSV	고/EC	,/SP	강점/NNG	을/JKO	우회/NNG	하/XSV	는/ETM	전략/NNG	으로/JKB	선수/NNG	를/JKO	치/VV	는/ETM	것/NNB	이/JKS	좋/VA	다/EF	./SF	-186.5
+시장/NNG	에서/JKB	경쟁자/NNG	를/JKO	제치/VV	고/EC	고객/NNG	의/JKG	선택/NNG	을/JKO	받/VV	기/ETN	위하/VV	아서/EC	격렬/XR	하/XSA	ㄴ/ETM	경쟁/NNG	과/JC	전투/NNG	(/SS	?/SF	)/SS	가/JKS	벌어지/VV	지만/EC	,/SP	경쟁/NNG	에서/JKB	승리/NNG	하/XSV	기/ETN	위하/VV	아서/EC	는/JX	경쟁자/NNG	의/JKG	강점/NNG	과/JKB	약점/NNG	에/JKB	대하/VV	아/EC	사전/NNG	에/JKB	먼저/MAG	파악/NNG	하/XSV	여/EC	약점/NNG	을/JKO	무력/NNG	화/XSN	시키/XSV	고/EC	,/SP	강점/NNG	을/JKO	우회/NNG	하/XSV	는/ETM	전략/NNG	으로/JKB	선수/NNG	를/JKO	치/VV	는/ETM	것/NNB	이/JKS	좋/VA	다/EF	./SF	-186.5
 
 셋째, 시장을 분석한다 -내가 일하려고 하는 시장의 크기는 어느 정도인가?	0.778
 셋째/NR	,/SP	시장/NNG	을/JKO	분석/NNG	하/XSV	ㄴ다/EC	-/SS	내/NP	가/JKS	일/NNG	하/XSV	려고/EC	하/VX	는/ETM	시장/NNG	의/JKG	크기/NNG	는/JX	어느/MM	정도/NNG	이/VCP	ㄴ가/EF	?/SF	
@@ -6208,7 +6208,7 @@ DM/SL	은/JX	방문/NNG	개척/NNG	보다/JKB	는/JX	시간/NNG	과/JKB	에너지/NNG	를/JKO	�
 -/SS	스크립트/NNG	를/JKO	준비/NNG	하/XSV	ㄴ다/EF	./SF	
 -/SO	스크립트/NNG	를/JKO	준비/NNG	하/XSV	ㄴ다/EF	./SF	-15.83
 -/SO	스크립트/NNG	를/JKO	준비/NNG	하/XSA	ㄴ다/EF	./SF	-18.77
--/SO	스크립트/NNG	를/JKO	준/XPN	비/NNG	하/XSV	ㄴ다/EF	./SF	-22.29
+-/SO	스크립트/NNG	를/JKO	준비/NNG	하/VV	ㄴ다/EF	./SF	-20.59
 
 첫인사와 전화를 한 목적, 통화 가능여부, 통화불가시 통화가능 시간예약, 거절시 대응화법, 면담요청화법 등을 치밀하게 준비하여 고객이 어떻게 나오더라도 면담할 수 있는 대응책을 세워야 한다.	0.774
 첫인사/NNG	와/JC	전화/NNG	를/JKO	하/VV	ㄴ/ETM	목적/NNG	,/SP	통화/NNG	가능/NNG	여부/NNG	,/SP	통화/NNG	불가/NNG	시/XSN	통화/NNG	가능/NNG	시간/NNG	예약/NNG	,/SP	거절/NNG	시/NNB	대응/NNG	화법/NNG	,/SP	면담/NNG	요청/NNG	화법/NNG	등/NNB	을/JKO	치밀/XR	하/XSA	게/EC	준비/NNG	하/XSV	아/EC	고객/NNG	이/JKS	어떻/VA	게/EC	나오/VV	더라도/EC	면담/NNG	하/XSV	ㄹ/ETM	수/NNB	있/VV	는/ETM	대응책/NNG	을/JKO	세우/VV	어야/EC	하/VX	ㄴ다/EF	./SF	
@@ -6256,7 +6256,7 @@ DM/SL	은/JX	방문/NNG	개척/NNG	보다/JKB	는/JX	시간/NNG	과/JKB	에너지/NNG	를/JKO	�
 -/SS	고객/NNG	의/JKG	말/NNG	을/JKO	끝/NNG	까지/JX	경청/NNG	하/XSV	ㄴ다/EF	./SF	
 -/SO	고객/NNG	의/JKG	말/NNG	을/JKO	끝/NNG	까지/JX	경청/NNG	하/XSV	ㄴ다/EF	./SF	-23.38
 -/SO	고객/NNG	의/JKG	말/NNG	을/JKO	끝/NNG	까지/JX	경청/NNG	하/XSA	ㄴ다/EF	./SF	-26.31
--/SO	고객/NNG	의/JKG	말/VX	을/ETM	끝/NNG	까지/JX	경청/NNG	하/XSV	ㄴ다/EF	./SF	-29.75
+-/SO	고객/NNG	의/JKG	말/NNG	을/JKO	끝/NNG	까지/JX	경청/NNG	하/VV	ㄴ다/EF	./SF	-28.13
 
 - 고객의 말을 듣고 있다는 것을 표현한다("저도 그렇게 생각합니다" "훌륭하시군요" "대단하십니다" "역시!" 등).	0.809
 -/SS	고객/NNG	의/JKG	말/NNG	을/JKO	듣/VV	고/EC	있/VX	다는/ETM	것/NNB	을/JKO	표현/NNG	하/XSV	ㄴ다/EC	(/SS	"/SS	저/NP	도/JX	그렇/VA	게/EC	생각/NNG	하/XSV	ㅂ니다/EC	"/SS	"/SS	훌륭/XR	하/XSA	시/EP	군요/EF	"/SS	"/SS	대단/XR	하/XSA	시/EP	ㅂ니다/EF	"/SS	"/SS	역시/MAG	!/SF	"/SS	등/NNB	)/SS	./SF	
@@ -7392,7 +7392,7 @@ K/SL	팀장/NNG	때문/NNB	에/JKB	은행장/NNG	을/JKO	하/VX	시/EP	었/EP	다니요/EF	?/SF
 새롭/VA	ㄴ/ETM	패러다임/NNG	을/JKO	따르/VV	겠/EP	다고/EC	결정/NNG	하/XSV	는/ETM	것/NNB	은/JX	실패/NNG	보다/JKB	는/JX	성공/NNG	하/XSV	ㄹ/ETM	가능/NNG	성/XSN	이/JKS	높/VA	다고/EC	생각/NNG	하/XSV	ㄴ/ETM	규칙/NNG	을/JKO	근거/NNG	로/JKB	자신/NNG	의/JKG	평판/NNG	이나/JC	지위/NNG	,/SP	심지어/MAG	경제/NNG	적/XSN	위험/NNG	까지/JX	감수/NNG	하/XSV	는/ETM	것/NNB	이/VCP	ㄴ지/EC	도/JX	모르/VV	ㄴ다/EF	./SF	
 새롭/VA	은/ETM	패러다임/NNG	을/JKO	따르/VV	겠/EP	다고/EC	결정/NNG	하/XSV	는/ETM	것/NNB	은/JX	실패/NNG	보다/JKB	는/JX	성공/NNG	하/XSV	ㄹ/ETM	가능/NNG	성/XSN	이/JKS	높/VA	다고/EC	생각/NNG	하/XSV	ㄴ/ETM	규칙/NNG	을/JKO	근거/NNG	로/JKB	자신/NNG	의/JKG	평판/NNG	이나/JC	지위/NNG	,/SP	심지어/MAG	경제/NNG	적/XSN	위험/NNG	까지/JX	감수/NNG	하/XSV	는/ETM	것/NNB	이/VCP	ㄴ지/EC	도/JX	모르/VV	ㄴ다/EF	./SF	-127.4
 새롭/VA	은/ETM	패러다임/NNG	을/JKO	따르/VV	겠/EP	다고/EC	결정/NNG	하/XSV	는/ETM	것/NNB	은/JX	실패/NNG	보다/JKB	는/JX	성공/NNG	하/XSV	ㄹ/ETM	가능/NNG	성/XSN	이/JKS	높/VA	다고/EC	생각/NNG	하/XSV	ㄴ/ETM	규칙/NNG	을/JKO	근거/NNG	로/JKB	자신/NNG	의/JKG	평판/NNG	이나/JX	지위/NNG	,/SP	심지어/MAG	경제/NNG	적/XSN	위험/NNG	까지/JX	감수/NNG	하/XSV	는/ETM	것/NNB	이/VCP	ㄴ지/EC	도/JX	모르/VV	ㄴ다/EF	./SF	-128
-새롭/VA	은/ETM	패러다임/NNG	을/JKO	따르/VV	겠/EP	다고/EC	결정/NNG	하/XSV	는/ETM	것/NNB	은/JX	실패/NNG	보다/JKB	는/JX	성공/NNG	하/XSV	ㄹ/ETM	가능/NNG	성/XSN	이/JKS	높/VA	다고/EC	생각/NNG	하/XSA	ㄴ/ETM	규칙/NNG	을/JKO	근거/NNG	로/JKB	자신/NNG	의/JKG	평판/NNG	이나/JC	지위/NNG	,/SP	심지어/MAG	경제/NNG	적/XSN	위험/NNG	까지/JX	감수/NNG	하/XSV	는/ETM	것/NNB	이/VCP	ㄴ지/EC	도/JX	모르/VV	ㄴ다/EF	./SF	-130.1
+새롭/VA	은/ETM	패러다임/NNG	을/JKO	따르/VV	겠/EP	다고/EC	결정/NNG	하/XSV	는/ETM	것/NNB	은/JX	실패/NNG	보다/JKB	는/JX	성공/NNG	하/XSV	ㄹ/ETM	가능/NNG	성/XSN	이/JKS	높/VA	다고/EC	생각/NNG	하/XSV	ㄴ/ETM	규칙/NNG	을/JKO	근거/NNG	로/JKB	자신/NNG	의/JKG	평판/NNG	이나/JC	지위/NNG	,/SP	심지어/MAG	경제/NNG	적/XSN	위험/NNG	까지/JX	감수/NNG	하/XSA	는/ETM	것/NNB	이/VCP	ㄴ지/EC	도/JX	모르/VV	ㄴ다/EF	./SF	-130.1
 
 이런 결정은 새로운 패러다임으로 문제를 해결한다는 사실 그 자체에 호감을 품은 사람들만이 내릴 수 있는 결정이다.	0.811
 이런/MM	결정/NNG	은/JX	새롭/VA	ㄴ/ETM	패러다임/NNG	으로/JKB	문제/NNG	를/JKO	해결/NNG	하/XSV	ㄴ다는/ETM	사실/NNG	그/MM	자체/NNG	에/JKB	호감/NNG	을/JKO	품/VV	은/ETM	사람/NNG	들/XSN	만/JX	이/JKS	내리/VV	ㄹ/ETM	수/NNB	있/VV	는/ETM	결정/NNG	이/VCP	다/EF	./SF	
@@ -8194,7 +8194,7 @@ CEO/SL	와/JC	정치가/NNG	와/JKB	같/VA	은/ETM	사회/NNG	의/JKG	지도/NNG	층/XSN	인사
 이렇/VA	게/EC	하/VV	는/ETM	것/NNB	이/JKS	하자/NNG	가/JKS	있/VV	는/ETM	완성품/NNG	을/JKO	출고/NNG	하/XSV	고/EC	나/VX	아서/EC	리콜/NNG	하/VV	는/ETM	것/NNB	보다/JKB	비용/NNG	이/JKS	적/VA	게/EC	들/VV	고/EC	고객/NNG	의/JKG	신뢰/NNG	를/JKO	잃/VV	지/EC	않/VX	는/ETM	방법/NNG	이/VCP	다/EF	./SF	
 이렇/VA	게/EC	하/VV	는/ETM	것/NNB	이/JKS	하자/NNG	가/JKS	있/VX	는/ETM	완성품/NNG	을/JKO	출고/NNG	하/XSV	고/EC	나서/VV	어/EC	리콜/NNG	하/VV	는/ETM	것/NNB	보다/JKB	비용/NNG	이/JKS	적/VA	게/EC	들/VV	고/EC	고객/NNG	의/JKG	신뢰/NNG	를/JKO	잃/VV	지/EC	않/VX	는/ETM	방법/NNG	이/VCP	다/EF	./SF	-96.4
 이렇/VA	게/EC	하/VV	는/ETM	것/NNB	이/JKS	하자/NNG	가/JKS	있/VV	는/ETM	완성품/NNG	을/JKO	출고/NNG	하/XSV	고/EC	나서/VV	어/EC	리콜/NNG	하/VV	는/ETM	것/NNB	보다/JKB	비용/NNG	이/JKS	적/VA	게/EC	들/VV	고/EC	고객/NNG	의/JKG	신뢰/NNG	를/JKO	잃/VV	지/EC	않/VX	는/ETM	방법/NNG	이/VCP	다/EF	./SF	-96.43
-이렇/VA	게/EC	하/VX	는/ETM	것/NNB	이/JKS	하자/NNG	가/JKS	있/VX	는/ETM	완성품/NNG	을/JKO	출고/NNG	하/XSV	고/EC	나서/VV	어/EC	리콜/NNG	하/VV	는/ETM	것/NNB	보다/JKB	비용/NNG	이/JKS	적/VA	게/EC	들/VV	고/EC	고객/NNG	의/JKG	신뢰/NNG	를/JKO	잃/VV	지/EC	않/VX	는/ETM	방법/NNG	이/VCP	다/EF	./SF	-97.42
+이렇/VA	게/EC	하/VV	는/ETM	것/NNB	이/JKS	하자/NNG	가/JKS	있/VX	는/ETM	완성품/NNG	을/JKO	출고/NNG	하/XSV	고/EC	나서/VV	어/EC	리콜/NNG	하/VX	는/ETM	것/NNB	보다/JKB	비용/NNG	이/JKS	적/VA	게/EC	들/VV	고/EC	고객/NNG	의/JKG	신뢰/NNG	를/JKO	잃/VV	지/EC	않/VX	는/ETM	방법/NNG	이/VCP	다/EF	./SF	-97.42
 
 업무진행중 잘못이 발견되면 직위에 상관없이 즉각 잘못을 인정하고 수정하는 것 또한 경영의 지혜이다.	0.871
 업무/NNG	진행/NNG	중/NNB	잘못/NNG	이/JKS	발견/NNG	되/XSV	면/EC	직위/NNG	에/JKB	상관없이/MAG	즉각/MAG	잘못/NNG	을/JKO	인정/NNG	하/XSV	고/EC	수정/NNG	하/XSV	는/ETM	것/NNB	또한/MAG	경영/NNG	의/JKG	지혜/NNG	이/VCP	다/EF	./SF	
@@ -8842,7 +8842,7 @@ EMM/SL	의/JKG	문서/NNG	작성/NNG	/SW	이메일/NNG	을/JKO	구성/NNG	하/XSV	는/ETM	요�
 ■/SW	휴대/NNG	전화/NNG	EMM/SL	의/JKG	추진/NNG	방법/NNG	첫째/NR	,/SP	설계사/NNG	를/JKO	활용/NNG	하/XSV	아/EC	휴대/NNG	전화/NNG	이메일/NNG	주소/NNG	를/JKO	수집/NNG	하/XSV	ㄴ다/EF	./SF	
 ■/SW	휴대/NNG	전화/NNG	EMM/SL	의/JKG	추진/NNG	방법/NNG	첫째/NR	,/SP	설계사/NNG	를/JKO	활용/NNG	하/XSV	여/EC	휴대/NNG	전화/NNG	이메일/NNG	주소/NNG	를/JKO	수집/NNG	하/XSV	ㄴ다/EF	./SF	-85.33
 ■/SW	휴대/NNG	전화/NNG	EMM/SL	의/JKG	추진/NNG	방법/NNG	첫째/NR	,/SP	설계사/NNG	를/JKO	활용/NNG	하/XSA	아/EC	휴대/NNG	전화/NNG	이메일/NNG	주소/NNG	를/JKO	수집/NNG	하/XSV	ㄴ다/EF	./SF	-85.52
-■/SW	휴대/NNG	전화/NNG	EMM/SL	의/JKG	추진/NNG	방법/NNG	첫째/NR	,/SP	설계사/NNG	를/JKO	활용/NNG	하/XSV	여/EC	휴대/NNG	전/NNG	화/XSN	이메일/NNG	주소/NNG	를/JKO	수집/NNG	하/XSV	ㄴ다/EF	./SF	-86.85
+■/SW	휴대/NNG	전/NNG	화/XSN	EMM/SL	의/JKG	추진/NNG	방법/NNG	첫째/NR	,/SP	설계사/NNG	를/JKO	활용/NNG	하/XSV	여/EC	휴대/NNG	전화/NNG	이메일/NNG	주소/NNG	를/JKO	수집/NNG	하/XSV	ㄴ다/EF	./SF	-86.85
 
 둘째, 적시성이 있는 정보를 제공한다.	0.857
 둘째/NR	,/SP	적시/NNG	성/XSN	이/JKS	있/VV	는/ETM	정보/NNG	를/JKO	제공/NNG	하/XSV	ㄴ다/EF	./SF	
@@ -9650,9 +9650,9 @@ A/SL	사장/NNG	은/JX	12/SN	일/NNB	퇴근/NNG	무렵/NNB	휴대폰/NNG	에서/JKB	이메일/NN
 
 당장 교보 해약해." "그렇게 회사 일을 감정으로 처리하시면 안 됩니다.	0.667
 당장/NNG	교보/NNP	해약/NNG	하/XSV	아/EF	./SF	"/SS	"/SS	그러게/IC	회사/NNG	일/NNG	을/JKO	감정/NNG	으로/JKB	처리/NNG	하/XSV	시/EP	면/EC	안/MAG	되/VV	ㅂ니다/EF	./SF	
-당장/NNG	교보/NNP	해약/NNG	해/NNG	./SF	"/SS	"/SS	그렇/VA	게/EC	회사/NNG	일/NNG	을/JKO	감정/NNG	으로/JKB	처리/NNG	하/XSV	시/EP	면/EC	알/VV	ㄴ/ETM	되/VV	ㅂ니다/EF	./SF	-68.18
-당장/NNG	교보/NNP	해약/NNG	하/XSA	아/EC	./SF	"/SS	"/SS	그렇/VA	게/EC	회사/NNG	일/NNG	을/JKO	감정/NNG	으로/JKB	처리/NNG	하/XSV	시/EP	면/EC	알/VV	ㄴ/ETM	되/VV	ㅂ니다/EF	./SF	-69.31
-당장/NNG	교보/NNP	해약/NNG	해/NNG	./SF	"/SS	"/SS	그렇/VA	게/EC	회사/NNG	일/NNB	을/JKO	감정/NNG	으로/JKB	처리/NNG	하/XSV	시/EP	면/EC	알/VV	ㄴ/ETM	되/VV	ㅂ니다/EF	./SF	-69.83
+당장/NNG	교보/NNP	해약/NNG	해/NNG	./SF	"/SS	"/SS	그렇/VA	게/EC	회사/NNG	일/NNG	을/JKO	감정/NNG	으로/JKB	처리/NNG	하/XSV	시/EP	면/EC	알/VV	ㄴ/ETM	되/VV	ㅂ니다/EF	./SF	-72.72
+당장/NNG	교보/NNP	해약/NNG	하/XSA	아/EC	./SF	"/SS	"/SS	그렇/VA	게/EC	회사/NNG	일/NNG	을/JKO	감정/NNG	으로/JKB	처리/NNG	하/XSV	시/EP	면/EC	알/VV	ㄴ/ETM	되/VV	ㅂ니다/EF	./SF	-73.86
+당장/NNG	교보/NNP	해약/NNG	해/NNG	./SF	"/SS	"/SS	그렇/VA	게/EC	회사/NNG	일/NNB	을/JKO	감정/NNG	으로/JKB	처리/NNG	하/XSV	시/EP	면/EC	알/VV	ㄴ/ETM	되/VV	ㅂ니다/EF	./SF	-74.38
 
 큰 회사의 부장이면 점잖게 처신하시는 게 좋습니다." "꼴 보기 싫으니 가시오." 사무실로 돌아오니 벌써 최 대리는 해약서류를 들고 영업소에 도착해 있었다.	0.907
 크/VA	ㄴ/ETM	회사/NNG	의/JKG	부장/NNG	이/VCP	면/EC	점잖/VA	게/EC	처신/NNG	하/XSV	시/EP	는/ETM	것/NNB	이/JKS	좋/VA	습니다/EF	./SF	"/SS	"/SS	꼴/NNG	보/VV	기/ETN	싫/VA	으니/EC	가/VV	시/EP	오/EF	./SF	"/SS	사무실/NNG	로/JKB	돌아오/VV	니/EC	벌써/MAG	최/NNP	대리/NNG	는/JX	해약/NNG	서류/NNG	를/JKO	들/VV	고/EC	영업소/NNG	에/JKB	도착/NNG	하/XSV	아/EC	있/VX	었/EP	다/EF	./SF	
@@ -10064,9 +10064,9 @@ A/SL	설계사/NNG	를/JKO	해촉해야/UN	겠/EP	습니다/EF	./SF	"/SS	"/SS	알/VV	니/EC	그
 
 그래서 영업소 전체를 통제하기가 어렵습니다." "김 소장 영업소는 월납을 얼마나 하지?" "월 8백만 원 정도 합니다." "그 영업소의 S팀장은 어떤가?" "영업소에 꼭 필요한 사람입니다." "그 S팀장은 한달에 월납을 얼마나 하지?" "매월 30만 원은 합니다" "그런데 그 팀장이 영업소에 꼭 필요한 이유는 뭔가?" "제가 하자고 하면 잘 따라옵니다." "김 소장이 해촉시키려는 A팀장은 월납을 얼마나 하는가?" "매월 4백만 원은 합니다." A팀장 업적을 빼면 영업소 업적이 얼마인가?	0.782
 그래서/MAJ	영업소/NNG	전체/NNG	를/JKO	통제/NNG	하/XSV	기/ETN	가/JKS	어렵/VA	습니다/EF	./SF	"/SS	"/SS	김/NNP	소장/NNG	영업소/NNG	는/JX	월납/NNG	을/JKO	얼마나/MAG	하/VV	지/EF	?/SF	"/SS	"/SS	월/NNG	8/SN	백만/NR	원/NNB	정도/NNG	하/VV	ㅂ니다/EF	./SF	"/SS	"/SS	그/MM	영업소/NNG	의/JKG	S/SL	팀장/NNG	은/JX	어떻/VA	ㄴ가/EF	?/SF	"/SS	"/SS	영업소/NNG	에/JKB	꼭/MAG	필요/NNG	하/XSA	ㄴ/ETM	사람/NNG	이/VCP	ㅂ니다/EF	./SF	"/SS	"/SS	그/MM	S/SL	팀장/NNG	은/JX	한/MM	달/NNG	에/JKB	월납/NNG	을/JKO	얼마나/MAG	하/VV	지/EF	?/SF	"/SS	"/SS	매월/MAG	30/SN	만/NR	원/NNB	은/JX	하/VV	ㅂ니다/EC	"/SS	"/SS	그런데/MAJ	그/MM	팀장/NNG	이/JKS	영업소/NNG	에/JKB	꼭/MAG	필요/NNG	하/XSA	ㄴ/ETM	이유/NNG	는/JX	뭐/NP	이/VCP	ㄴ가/EF	?/SF	"/SS	"/SS	제/NP	가/JKS	하/VV	자고/EC	하/VX	면/EC	잘/MAG	따라오/VV	ㅂ니다/EF	./SF	"/SS	"/SS	김/NNP	소장/NNG	이/JKS	해촉/NNG	시키/XSV	려는/ETM	A/SL	팀장/NNG	은/JX	월납/NNG	을/JKO	얼마나/MAG	하/VV	는가/EF	?/SF	"/SS	"/SS	매월/MAG	4/SN	백만/NR	원/NNB	은/JX	하/VV	ㅂ니다/EF	./SF	"/SS	A/SL	팀장/NNG	업적/NNG	을/JKO	빼/VV	면/EC	영업소/NNG	업적/NNG	이/JKS	얼마/NNG	이/VCP	ㄴ가/EF	?/SF	
-그렇/VA	아서/EC	영업소/NNG	전체/NNG	를/JKO	통제/NNG	하/XSV	기/ETN	가/JKS	어렵/VA	습니다/EF	./SF	"/SS	"/SS	김/NNP	소장/NNG	영업소/NNG	는/JX	월납/NNG	을/JKO	얼마나/MAG	하/VV	지/EF	?/SF	"/SS	"/SS	월/NNB	8/SN	백만/NR	원/NNB	정도/NNG	하/VV	ㅂ니다/EF	./SF	"/SS	"/SS	그/NP	영업소/NNG	의/JKG	S/SL	팀장/NNG	은/JX	어떻/VA	ㄴ가/EF	?/SF	"/SS	"/SS	영업소/NNG	에/JKB	꼭/MAG	필요/NNG	하/XSV	ㄴ/ETM	사람/NNG	이/VCP	ㅂ니다/EF	./SF	"/SS	"/SS	그/NP	S/SL	팀장/NNG	은/JX	한/MM	달/NNG	에/JKB	월납/NNG	을/JKO	얼마나/MAG	하/VV	지/EF	?/SF	"/SS	"/SS	매월/NNP	30/SN	만/JX	원/NNB	은/JX	하/VV	ㅂ니다/EF	"/SS	"/SS	그러/VV	ㄴ데/EC	그/NP	팀장/NNG	이/JKS	영업소/NNG	에/JKB	꼭/MAG	필요/NNG	하/XSV	ㄴ/ETM	이유/NNG	는/JX	뭔가/UN	?/SF	"/SS	"/SS	저/NP	가/JKS	하/VV	자고/EC	하/VV	면/EC	잘/MAG	따라오/VV	ㅂ니다/EF	./SF	"/SS	"/SS	김/NNP	소장/NNG	이/JKS	해/NNG	촉/NNG	시키/XSV	려는/ETM	A/SL	팀장/NNG	은/JX	월납/NNG	을/JKO	얼마나/MAG	하/VV	는가/EF	?/SF	"/SS	"/SS	매월/NNP	4/SN	백만/NR	원/NNB	은/JX	하/VV	ㅂ니다/EF	./SF	"/SS	A/SL	팀장/NNG	업적/NNG	을/JKO	빼/VV	면/EC	영업소/NNG	업적/NNG	이/JKS	얼마/NNG	이/VCP	ㄴ가/EF	?/SF	-473.3
-그렇/VA	아서/EC	영업소/NNG	전체/NNG	를/JKO	통제/NNG	하/XSV	기/ETN	가/JKS	어렵/VA	습니다/EF	./SF	"/SS	"/SS	김/NNP	소장/NNG	영업소/NNG	는/JX	월납/NNG	을/JKO	얼마나/MAG	하/VV	지/EF	?/SF	"/SS	"/SS	월/NNB	8/SN	백만/NR	원/NNB	정도/NNG	하/VX	ㅂ니다/EF	./SF	"/SS	"/SS	그/NP	영업소/NNG	의/JKG	S/SL	팀장/NNG	은/JX	어떻/VA	ㄴ가/EF	?/SF	"/SS	"/SS	영업소/NNG	에/JKB	꼭/MAG	필요/NNG	하/XSV	ㄴ/ETM	사람/NNG	이/VCP	ㅂ니다/EF	./SF	"/SS	"/SS	그/NP	S/SL	팀장/NNG	은/JX	한/MM	달/NNG	에/JKB	월납/NNG	을/JKO	얼마나/MAG	하/VV	지/EF	?/SF	"/SS	"/SS	매월/NNP	30/SN	만/JX	원/NNB	은/JX	하/VV	ㅂ니다/EF	"/SS	"/SS	그러/VV	ㄴ데/EC	그/NP	팀장/NNG	이/JKS	영업소/NNG	에/JKB	꼭/MAG	필요/NNG	하/XSV	ㄴ/ETM	이유/NNG	는/JX	뭔가/UN	?/SF	"/SS	"/SS	저/NP	가/JKS	하/VV	자고/EC	하/VV	면/EC	잘/MAG	따라오/VV	ㅂ니다/EF	./SF	"/SS	"/SS	김/NNP	소장/NNG	이/JKS	해/NNG	촉/NNG	시키/XSV	려는/ETM	A/SL	팀장/NNG	은/JX	월납/NNG	을/JKO	얼마나/MAG	하/VV	는가/EF	?/SF	"/SS	"/SS	매월/NNP	4/SN	백만/NR	원/NNB	은/JX	하/VV	ㅂ니다/EF	./SF	"/SS	A/SL	팀장/NNG	업적/NNG	을/JKO	빼/VV	면/EC	영업소/NNG	업적/NNG	이/JKS	얼마/NNG	이/VCP	ㄴ가/EF	?/SF	-473.5
-그렇/VA	아서/EC	영업소/NNG	전체/NNG	를/JKO	통제/NNG	하/XSV	기/ETN	가/JKS	어렵/VA	습니다/EF	./SF	"/SS	"/SS	김/NNP	소장/NNG	영업소/NNG	는/JX	월납/NNG	을/JKO	얼마나/MAG	하/VV	지/EF	?/SF	"/SS	"/SS	월/NNB	8/SN	백만/NR	원/NNB	정도/NNG	하/VV	ㅂ니다/EF	./SF	"/SS	"/SS	그/NP	영업소/NNG	의/JKG	S/SL	팀장/NNG	은/JX	어떻/VA	ㄴ가/EF	?/SF	"/SS	"/SS	영업소/NNG	에/JKB	꼭/MAG	필요/NNG	하/XSV	ㄴ/ETM	사람/NNG	이/VCP	ㅂ니다/EF	./SF	"/SS	"/SS	그/NP	S/SL	팀장/NNG	은/JX	한/MM	달/NNG	에/JKB	월납/NNG	을/JKO	얼마나/MAG	하/VV	지/EF	?/SF	"/SS	"/SS	매월/NNP	30/SN	만/JX	원/NNB	은/JX	하/VV	ㅂ니다/EF	"/SS	"/SS	그러/VV	ㄴ데/EC	그/NP	팀장/NNG	이/JKS	영업소/NNG	에/JKB	꼭/MAG	필요/NNG	하/XSV	ㄴ/ETM	이유/NNG	는/JX	뭔가/UN	?/SF	"/SS	"/SS	저/NP	가/JKS	하/VV	자고/EC	하/VV	면/EC	잘/MAG	따라오/VV	ㅂ니다/EF	./SF	"/SS	"/SS	김/NNP	소장/NNG	이/JKS	해/NNG	촉/NNG	시키/XSV	려는/ETM	A/SL	팀장/NNG	은/JX	월납/NNG	을/JKO	얼마나/MAG	하/VV	는가/EF	?/SF	"/SS	"/SS	매월/NNP	4/SN	백만/NR	원/NNB	은/JX	하/VX	ㅂ니다/EF	./SF	"/SS	A/SL	팀장/NNG	업적/NNG	을/JKO	빼/VV	면/EC	영업소/NNG	업적/NNG	이/JKS	얼마/NNG	이/VCP	ㄴ가/EF	?/SF	-473.5
+그렇/VA	아서/EC	영업소/NNG	전체/NNG	를/JKO	통제/NNG	하/XSV	기/ETN	가/JKS	어렵/VA	습니다/EF	./SF	"/SS	"/SS	김/NNP	소장/NNG	영업소/NNG	는/JX	월납/NNG	을/JKO	얼마나/MAG	하/VV	지/EF	?/SF	"/SS	"/SS	월/NNB	8/SN	백만/NR	원/NNB	정도/NNG	하/VV	ㅂ니다/EF	./SF	"/SS	"/SS	그/NP	영업소/NNG	의/JKG	S/SL	팀장/NNG	은/JX	어떻/VA	ㄴ가/EF	?/SF	"/SS	"/SS	영업소/NNG	에/JKB	꼭/MAG	필요/NNG	하/XSV	ㄴ/ETM	사람/NNG	이/VCP	ㅂ니다/EF	./SF	"/SS	"/SS	그/NP	S/SL	팀장/NNG	은/JX	한/MM	달/NNG	에/JKB	월납/NNG	을/JKO	얼마나/MAG	하/VV	지/EF	?/SF	"/SS	"/SS	매월/NNP	30/SN	만/JX	원/NNB	은/JX	하/VV	ㅂ니다/EF	"/SS	"/SS	그러/VV	ㄴ데/EC	그/NP	팀장/NNG	이/JKS	영업소/NNG	에/JKB	꼭/MAG	필요/NNG	하/XSV	ㄴ/ETM	이유/NNG	는/JX	뭔가/UN	?/SF	"/SS	"/SS	저/NP	가/JKS	하/VV	자고/EC	하/VV	면/EC	잘/MAG	따라오/VV	ㅂ니다/EF	./SF	"/SS	"/SS	김/NNP	소장/NNG	이/JKS	해/NNG	촉/NNG	시키/XSV	려는/ETM	A/SL	팀장/NNG	은/JX	월납/NNG	을/JKO	얼마나/MAG	하/VV	는가/EF	?/SF	"/SS	"/SS	매월/NNP	4/SN	백만/NR	원/NNB	은/JX	하/VV	ㅂ니다/EF	./SF	"/SS	A/SL	팀장/NNG	업적/NNG	을/JKO	빼/VV	면/EC	영업소/NNG	업적/NNG	이/JKS	얼마/NNG	이/VCP	ㄴ가/EF	?/SF	-477.6
+그렇/VA	아서/EC	영업소/NNG	전체/NNG	를/JKO	통제/NNG	하/XSV	기/ETN	가/JKS	어렵/VA	습니다/EF	./SF	"/SS	"/SS	김/NNP	소장/NNG	영업소/NNG	는/JX	월납/NNG	을/JKO	얼마나/MAG	하/VV	지/EF	?/SF	"/SS	"/SS	월/NNB	8/SN	백만/NR	원/NNB	정도/NNG	하/VV	ㅂ니다/EF	./SF	"/SS	"/SS	그/NP	영업소/NNG	의/JKG	S/SL	팀장/NNG	은/JX	어떻/VA	ㄴ가/EF	?/SF	"/SS	"/SS	영업소/NNG	에/JKB	꼭/MAG	필요/NNG	하/XSV	ㄴ/ETM	사람/NNG	이/VCP	ㅂ니다/EF	./SF	"/SS	"/SS	그/NP	S/SL	팀장/NNG	은/JX	한/MM	달/NNG	에/JKB	월납/NNG	을/JKO	얼마나/MAG	하/VV	지/EF	?/SF	"/SS	"/SS	매월/NNP	30/SN	만/JX	원/NNB	은/JX	하/VV	ㅂ니다/EF	"/SS	"/SS	그렇/VA	ㄴ데/EC	그/NP	팀장/NNG	이/JKS	영업소/NNG	에/JKB	꼭/MAG	필요/NNG	하/XSV	ㄴ/ETM	이유/NNG	는/JX	뭔가/UN	?/SF	"/SS	"/SS	저/NP	가/JKS	하/VV	자고/EC	하/VV	면/EC	잘/MAG	따라오/VV	ㅂ니다/EF	./SF	"/SS	"/SS	김/NNP	소장/NNG	이/JKS	해/NNG	촉/NNG	시키/XSV	려는/ETM	A/SL	팀장/NNG	은/JX	월납/NNG	을/JKO	얼마나/MAG	하/VV	는가/EF	?/SF	"/SS	"/SS	매월/NNP	4/SN	백만/NR	원/NNB	은/JX	하/VV	ㅂ니다/EF	./SF	"/SS	A/SL	팀장/NNG	업적/NNG	을/JKO	빼/VV	면/EC	영업소/NNG	업적/NNG	이/JKS	얼마/NNG	이/VCP	ㄴ가/EF	?/SF	-477.7
+그렇/VA	아서/EC	영업소/NNG	전체/NNG	를/JKO	통제/NNG	하/XSV	기/ETN	가/JKS	어렵/VA	습니다/EF	./SF	"/SS	"/SS	김/NNP	소장/NNG	영업소/NNG	는/JX	월납/NNG	을/JKO	얼마나/MAG	하/VV	지/EF	?/SF	"/SS	"/SS	월/NNB	8/SN	백만/NR	원/NNB	정도/NNG	하/VX	ㅂ니다/EF	./SF	"/SS	"/SS	그/NP	영업소/NNG	의/JKG	S/SL	팀장/NNG	은/JX	어떻/VA	ㄴ가/EF	?/SF	"/SS	"/SS	영업소/NNG	에/JKB	꼭/MAG	필요/NNG	하/XSV	ㄴ/ETM	사람/NNG	이/VCP	ㅂ니다/EF	./SF	"/SS	"/SS	그/NP	S/SL	팀장/NNG	은/JX	한/MM	달/NNG	에/JKB	월납/NNG	을/JKO	얼마나/MAG	하/VV	지/EF	?/SF	"/SS	"/SS	매월/NNP	30/SN	만/JX	원/NNB	은/JX	하/VV	ㅂ니다/EF	"/SS	"/SS	그러/VV	ㄴ데/EC	그/NP	팀장/NNG	이/JKS	영업소/NNG	에/JKB	꼭/MAG	필요/NNG	하/XSV	ㄴ/ETM	이유/NNG	는/JX	뭔가/UN	?/SF	"/SS	"/SS	저/NP	가/JKS	하/VV	자고/EC	하/VV	면/EC	잘/MAG	따라오/VV	ㅂ니다/EF	./SF	"/SS	"/SS	김/NNP	소장/NNG	이/JKS	해/NNG	촉/NNG	시키/XSV	려는/ETM	A/SL	팀장/NNG	은/JX	월납/NNG	을/JKO	얼마나/MAG	하/VV	는가/EF	?/SF	"/SS	"/SS	매월/NNP	4/SN	백만/NR	원/NNB	은/JX	하/VV	ㅂ니다/EF	./SF	"/SS	A/SL	팀장/NNG	업적/NNG	을/JKO	빼/VV	면/EC	영업소/NNG	업적/NNG	이/JKS	얼마/NNG	이/VCP	ㄴ가/EF	?/SF	-477.7
 
 "4백만 원입니다." "월납 4백만 원 하는 영업소는 회사에서 어떻게 할 것 같은가?" "아무래도 폐쇄를 할 것 같습니다" "영업소를 폐쇄시킨 영업소장은 어떤 대접을 받을 것 같은가?" "물론 안 좋겠지요" "내가 낳은 자식도 내 마음대로 안되는 세상이네.	0.82
 "/SS	4/SN	백만/NR	원/NNB	이/VCP	ㅂ니다/EF	./SF	"/SS	"/SS	월납/NNG	4/SN	백만/NR	원/NNB	하/VV	는/ETM	영업소/NNG	는/JX	회사/NNG	에서/JKB	어떻/VA	게/EC	하/VV	ㄹ/ETM	것/NNB	같/VA	은가/EF	?/SF	"/SS	"/SS	아무래도/MAG	폐쇄/NNG	를/JKO	하/VV	ㄹ/ETM	것/NNB	같/VA	습니다/EF	"/SS	"/SS	영업소/NNG	를/JKO	폐쇄/NNG	시키/XSV	ㄴ/ETM	영업소장/NNG	은/JX	어떤/MM	대접/NNG	을/JKO	받/VV	을/ETM	것/NNB	같/VA	은가/EF	?/SF	"/SS	"/SS	물론/MAG	안/MAG	좋/VA	겠/EP	지요/EF	"/SS	"/SS	내/NP	가/JKS	낳/VV	은/ETM	자식/NNG	도/JX	나/NP	의/JKG	마음대로/MAG	안/MAG	되/XSV	는/ETM	세상/NNG	이/VCP	네/EF	./SF	
@@ -10088,9 +10088,9 @@ A/SL	설계사/NNG	를/JKO	해촉해야/UN	겠/EP	습니다/EF	./SF	"/SS	"/SS	알/VV	니/EC	그
 
 그게 가능할 것 같은가?" "불가능할 것 같습니다." "그러면 어떻게 해야 되겠는가?" "제가 잘못 생각한 것 같습니다." "자네 그릇 정도라면 충분히 A팀장이 일을 잘할 수 있도록 포용할 것이라고 믿네.	0.805
 그것/NP	이/JKS	가능/NNG	하/XSA	ㄹ/ETM	것/NNB	같/VA	은가/EF	?/SF	"/SS	"/SS	불/XPN	가능/NNG	하/XSA	ㄹ/ETM	것/NNB	같/VA	습니다/EF	./SF	"/SS	"/SS	그러면/MAJ	어떻/VA	게/EC	하/VV	아야/EC	되/VV	겠/EP	는가/EF	?/SF	"/SS	"/SS	제/NP	가/JKS	잘못/MAG	생각/NNG	하/XSV	ㄴ/ETM	것/NNB	같/VA	습니다/EF	./SF	"/SS	"/SS	자네/NP	그릇/NNG	정도/NNG	이/VCP	라면/EC	충분히/MAG	A/SL	팀장/NNG	이/JKS	일/NNG	을/JKO	잘/MAG	하/XSV	ㄹ/ETM	수/NNB	있/VV	도록/EC	포용/NNG	하/XSV	ㄹ/ETM	것/NNB	이/VCP	라고/EC	믿/VV	네/EF	./SF	
-그게/UN	가능/NNG	하/XSV	ㄹ/ETM	것/NNB	같/VA	은가/EF	?/SF	"/SS	"/SS	불/XPN	가능/NNG	하/XSV	ㄹ/ETM	것/NNB	같/VA	습니다/EF	./SF	"/SS	"/SS	그러/VV	면/EC	어떻/VA	게/EC	하/VV	아야/EC	되/VV	겠/EP	는가/EF	?/SF	"/SS	"/SS	저/NP	가/JKS	잘못/MAG	생각/NNG	하/XSV	ㄴ/ETM	것/NNB	같/VA	습니다/EF	./SF	"/SS	"/SS	자네/NP	그릇/NNG	정도/NNG	라면/NNG	충분히/MAG	A/SL	팀장/NNG	이/JKS	일/NNG	을/JKO	잘/MAG	하/XSV	ㄹ/ETM	수/NNB	있/VV	도록/EC	포용/NNG	하/XSV	ㄹ/ETM	것/NNB	이/VCP	라고/EC	믿/VV	네/EF	./SF	-171.1
-그게/UN	가능/NNG	하/XSV	ㄹ/ETM	것/NNB	같/VA	은가/EF	?/SF	"/SS	"/SS	불/XPN	가능/NNG	하/XSV	ㄹ/ETM	것/NNB	같/VA	습니다/EF	./SF	"/SS	"/SS	그러/VV	면/EC	어떻/VA	게/EC	하/VV	아야/EC	되/VV	겠/EP	는가/EF	?/SF	"/SS	"/SS	저/NP	가/JKS	잘못/MAG	생각/NNG	하/XSV	ㄴ/ETM	것/NNB	같/VA	습니다/EF	./SF	"/SS	"/SS	자네/NP	그릇/NNG	정도/NNG	라면/NNG	충분히/MAG	A/SL	팀장/NNG	이/JKS	일/NNG	을/JKO	잘/MAG	하/XSV	ㄹ/ETM	수/NNB	있/VX	도록/EC	포용/NNG	하/XSV	ㄹ/ETM	것/NNB	이/VCP	라고/EC	믿/VV	네/EF	./SF	-171.6
-그게/UN	가능/NNG	하/XSV	ㄹ/ETM	것/NNB	같/VA	은가/EF	?/SF	"/SS	"/SS	불/XPN	가능/NNG	하/XSV	ㄹ/ETM	것/NNB	같/VA	습니다/EF	./SF	"/SS	"/SS	그러/VV	면/EC	어떻/VA	게/EC	하/VV	아야/EC	되/VV	겠/EP	는가/EF	?/SF	"/SS	"/SS	저/NP	가/JKS	잘못/MAG	생각/NNG	하/XSV	ㄴ/ETM	것/NNB	같/VA	습니다/EF	./SF	"/SS	"/SS	자네/NP	그릇/MAG	정도/NNG	라면/NNG	충분히/MAG	A/SL	팀장/NNG	이/JKS	일/NNG	을/JKO	잘/MAG	하/XSV	ㄹ/ETM	수/NNB	있/VV	도록/EC	포용/NNG	하/XSV	ㄹ/ETM	것/NNB	이/VCP	라고/EC	믿/VV	네/EF	./SF	-172
+그게/UN	가능/NNG	하/XSV	ㄹ/ETM	것/NNB	같/VA	은가/EF	?/SF	"/SS	"/SS	불/XPN	가능/NNG	하/XSV	ㄹ/ETM	것/NNB	같/VA	습니다/EF	./SF	"/SS	"/SS	그러/VV	면/EC	어떻/VA	게/EC	하/VV	아야/EC	되/VV	겠/EP	는가/EF	?/SF	"/SS	"/SS	저/NP	가/JKS	잘못/MAG	생각/NNG	하/XSV	ㄴ/ETM	것/NNB	같/VA	습니다/EF	./SF	"/SS	"/SS	자네/NP	그릇/NNG	정도/NNG	라면/NNG	충분히/MAG	A/SL	팀장/NNG	이/JKS	일/NNG	을/JKO	잘/MAG	하/XSV	ㄹ/ETM	수/NNB	있/VV	도록/EC	포용/NNG	하/XSV	ㄹ/ETM	것/NNB	이/VCP	라고/EC	믿/VV	네/EF	./SF	-175.3
+그게/UN	가능/NNG	하/XSV	ㄹ/ETM	것/NNB	같/VA	은가/EF	?/SF	"/SS	"/SS	불/XPN	가능/NNG	하/XSV	ㄹ/ETM	것/NNB	같/VA	습니다/EF	./SF	"/SS	"/SS	그렇/VA	면/EC	어떻/VA	게/EC	하/VV	아야/EC	되/VV	겠/EP	는가/EF	?/SF	"/SS	"/SS	저/NP	가/JKS	잘못/MAG	생각/NNG	하/XSV	ㄴ/ETM	것/NNB	같/VA	습니다/EF	./SF	"/SS	"/SS	자네/NP	그릇/NNG	정도/NNG	라면/NNG	충분히/MAG	A/SL	팀장/NNG	이/JKS	일/NNG	을/JKO	잘/MAG	하/XSV	ㄹ/ETM	수/NNB	있/VV	도록/EC	포용/NNG	하/XSV	ㄹ/ETM	것/NNB	이/VCP	라고/EC	믿/VV	네/EF	./SF	-175.5
+그게/UN	가능/NNG	하/XSV	ㄹ/ETM	것/NNB	같/VA	은가/EF	?/SF	"/SS	"/SS	불/XPN	가능/NNG	하/XSV	ㄹ/ETM	것/NNB	같/VA	습니다/EF	./SF	"/SS	"/SS	그러/VV	면/EC	어떻/VA	게/EC	하/VV	아야/EC	되/VV	겠/EP	는가/EF	?/SF	"/SS	"/SS	저/NP	가/JKS	잘못/MAG	생각/NNG	하/XSV	ㄴ/ETM	것/NNB	같/VA	습니다/EF	./SF	"/SS	"/SS	자네/NP	그릇/NNG	정도/NNG	라면/NNG	충분히/MAG	A/SL	팀장/NNG	이/JKS	일/NNG	을/JKO	잘/MAG	하/XSV	ㄹ/ETM	수/NNB	있/VX	도록/EC	포용/NNG	하/XSV	ㄹ/ETM	것/NNB	이/VCP	라고/EC	믿/VV	네/EF	./SF	-175.8
 
 그래야 다음에 과장이나 더 큰 직책도 맡을 수 있어." "알겠습니다.	0.769
 그러/VV	어야/EC	다음/NNG	에/JKB	과장/NNG	이나/JC	더/MAG	크/VA	ㄴ/ETM	직책/NNG	도/JX	맡/VV	을/ETM	수/NNB	있/VV	어/EF	./SF	"/SS	"/SS	알/VV	겠/EP	습니다/EF	./SF	
@@ -10660,11 +10660,11 @@ A/SL	는/JX	신/XPN	계약/NNG	은/JX	잘/MAG	하/XSV	는데/EC	도입/NNG	을/JKO	안/MAG	하
 그러/VV	므로/EC	전/NNG	조직원/NNG	을/JKO	공평무사/NNG	하/XSV	게/EC	대하/VV	아야/EC	하/VX	ㄴ다/EF	./SF	-35.93
 그러/VV	므로/EC	전조/NNG	직원/NNG	을/JKO	공평무사/NNG	하/XSV	게/EC	대하/VV	아야/EC	하/VV	ㄴ다/EF	./SF	-36.23
 
-근대 일본의 기틀을 다진 오다 노부나가는 도요토미 히데요시에게 '원교근공(遠郊近攻)'을 가르쳤다고 한다.	0.677
+근대 일본의 기틀을 다진 오다 노부나가는 도요토미 히데요시에게 '원교근공(遠郊近攻)'을 가르쳤다고 한다.	0.656
 근대/NNG	일본/NNP	의/JKG	기틀/NNG	을/JKO	다지/VV	ㄴ/ETM	오다/NNP	노부나가/NNP	는/JX	도요토미/NNP	히데요시/NNP	에게/JKB	'/SS	원교근공/NNG	(/SS	遠郊近攻/SH	)/SS	'/SS	을/JKO	가르치/VV	었/EP	다고/EC	하/VV	ㄴ다/EF	./SF	
-근대/NNG	일본/NNP	의/JKG	기틀/NNG	을/JKO	다지/VV	ㄴ/ETM	오/VV	다/EC	노부나가/NNP	는/JX	도요토미/UN	히데요시/NNP	에게/JKB	'/SS	원교근공/UN	(/SS	遠郊近攻/SH	)'/SS	을/JKO	가르치/VV	었/EP	다고/EC	하/VV	ㄴ다/EF	./SF	-107.8
-근대/NNG	일본/NNP	의/JKG	기틀/NNG	을/JKO	다지/VV	ㄴ/ETM	오/VV	다/EC	노부나가/NNP	는/JX	도요토미/UN	히데요시/NNP	에게/JKB	'/SS	원교근/UN	공/NNG	(/SS	遠郊近攻/SH	)'/SS	을/JKO	가르치/VV	었/EP	다고/EC	하/VV	ㄴ다/EF	./SF	-107.9
-근대/NNG	일본/NNP	의/JKG	기틀/NNG	을/JKO	다지/VV	ㄴ/ETM	오/VV	다/EC	노부나가/NNP	는/JX	도요토미/UN	히데요시/NNP	에게/JKB	'/SS	원교근공/UN	(/SS	遠郊近攻/SH	)'/SS	을/JKO	가르치/VV	었/EP	다고/EC	하/VX	ㄴ다/EF	./SF	-108
+근대/NNG	일본/NNP	의/JKG	기틀/NNG	을/JKO	다지/VV	ㄴ/ETM	오/VV	다/EC	노부나가/NNP	는/JX	도요토미/UN	히데요시/NNP	에게/JKB	'/SS	원/NNB	교근공/UN	(/SS	遠郊近攻/SH	)'/SS	을/JKO	가르치/VV	었/EP	다고/EC	하/VV	ㄴ다/EF	./SF	-105.7
+근대/NNG	일본/NNP	의/JKG	기틀/NNG	을/JKO	다지/VV	ㄴ/ETM	오/VV	다/EC	노부나가/NNP	는/JX	도요토미/UN	히데요시/NNP	에게/JKB	'/SS	원/NNB	교근공/UN	(/SS	遠郊近攻/SH	)'/SS	을/JKO	가르치/VV	었/EP	다고/EC	하/VX	ㄴ다/EF	./SF	-105.9
+근대/NNG	일본/NNP	의/JKG	기틀/NNG	을/JKO	다지/VV	ㄴ/ETM	오/VX	다/EF	노부나가/NNP	는/JX	도요토미/UN	히데요시/NNP	에게/JKB	'/SS	원/NNB	교근공/UN	(/SS	遠郊近攻/SH	)'/SS	을/JKO	가르치/VV	었/EP	다고/EC	하/VV	ㄴ다/EF	./SF	-106.6
 
 모든 외교나 정치도 멀리 있는 사람과는 친해지려고 노력하고, 가깝다고 함부로 행동하는 사람은 엄하게 다스려 조직의 영(領)을 세우라는 것이다.	0.837
 모든/MM	외교/NNG	나/JC	정치/NNG	도/JX	멀리/MAG	있/VV	는/ETM	사람/NNG	과/JKB	는/JX	친하/VA	아/EC	지/VX	려고/EC	노력/NNG	하/XSV	고/EC	,/SP	가깝/VA	다고/EC	함부로/MAG	행동/NNG	하/XSV	는/ETM	사람/NNG	은/JX	엄하/VA	게/EC	다스리/VV	어/EC	조직/NNG	의/JKG	영/NNP	(/SS	領/SH	)/SS	을/JKO	세우/VV	라는/ETM	것/NNB	이/VCP	다/EF	./SF	
@@ -10741,8 +10741,8 @@ A/SL	는/JX	신/XPN	계약/NNG	은/JX	잘/MAG	하/XSV	는데/EC	도입/NNG	을/JKO	안/MAG	하
 아웃 소싱(out-sourcing)을 하더라도 내용을 정확히 파악한 상태에서 아웃 소싱을 해야지 일을 하기 귀찮으니까 외부에 맡기는 일은 없도록 해야 한다.	0.826
 아웃/NNG	소싱/NNG	(/SS	out/SL	-/SS	sourcing/SL	)/SS	을/JKO	하/VV	더라도/EC	내용/NNG	을/JKO	정확히/MAG	파악/NNG	하/XSV	ㄴ/ETM	상태/NNG	에서/JKB	아웃/NNG	소싱/NNG	을/JKO	하/VV	아야지/EC	일/NNG	을/JKO	하/VV	기/ETN	귀찮/VA	으니까/EC	외부/NNG	에/JKB	맡기/VV	는/ETM	일/NNG	은/JX	없/VA	도록/EC	하/VV	아야/EC	하/VX	ㄴ다/EF	./SF	
 아웃/NNG	소싱/UN	(/SS	out/SL	-/SO	sourcing/SL	)/SS	을/JKO	하/VV	더라도/EC	내용/NNG	을/JKO	정확히/MAG	파악/NNG	하/XSV	ㄴ/ETM	상태/NNG	에서/JKB	아웃/NNG	소싱/UN	을/JKO	하/VV	아야지/EC	일/NNG	을/JKO	하/VV	기/ETN	귀찮/VA	으니까/EC	외부/NNG	에/JKB	맡기/VV	는/ETM	일/NNG	은/JX	없/VA	도록/EC	하/VV	아야/EC	하/VV	ㄴ다/EF	./SF	-127.9
+아웃/NNG	소/XPN	싱/UN	(/SS	out/SL	-/SO	sourcing/SL	)/SS	을/JKO	하/VV	더라도/EC	내용/NNG	을/JKO	정확히/MAG	파악/NNG	하/XSV	ㄴ/ETM	상태/NNG	에서/JKB	아웃/NNG	소싱/UN	을/JKO	하/VV	아야지/EC	일/NNG	을/JKO	하/VV	기/ETN	귀찮/VA	으니까/EC	외부/NNG	에/JKB	맡기/VV	는/ETM	일/NNG	은/JX	없/VA	도록/EC	하/VV	아야/EC	하/VV	ㄴ다/EF	./SF	-128
 아웃/NNG	소싱/UN	(/SS	out/SL	-/SO	sourcing/SL	)/SS	을/JKO	하/VV	더라도/EC	내용/NNG	을/JKO	정확히/MAG	파악/NNG	하/XSV	ㄴ/ETM	상태/NNG	에서/JKB	아웃/NNG	소싱/UN	을/JKO	하/VV	아야지/EC	일/NNG	을/JKO	하/VV	기/ETN	귀찮/VA	으니까/EC	외부/NNG	에/JKB	맡기/VV	는/ETM	일/NNG	은/JX	없/VA	도록/EC	하/VV	아야/EC	하/VX	ㄴ다/EF	./SF	-128.1
-아웃/NNG	소싱/UN	(/SS	out/SL	-/SO	sourcing/SL	)/SS	을/JKO	하/VV	더라도/EC	내용/NNG	을/JKO	정확히/MAG	파악/NNG	하/XSV	ㄴ/ETM	상태/NNG	에서/JKB	아웃/NNG	소싱/UN	을/JKO	하/VV	아야지/EC	일/NNG	을/JKO	하/VV	기/ETN	귀찮/VA	으니까/EC	외부/NNG	에/JKB	맡기/VV	는/ETM	일/NNB	은/JX	없/VA	도록/EC	하/VV	아야/EC	하/VV	ㄴ다/EF	./SF	-128.2
 
 어떤 리더라도 조직을 장악하려 한다.	0.5
 어떤/MM	리더/NNG	이/VCP	라도/EC	조직/NNG	을/JKO	장악/NNG	하/XSV	려/EC	하/VX	ㄴ다/EF	./SF	
@@ -10825,8 +10825,8 @@ A/SL	는/JX	신/XPN	계약/NNG	은/JX	잘/MAG	하/XSV	는데/EC	도입/NNG	을/JKO	안/MAG	하
 중국 당나라 황제의 업적을 모아놓은 《정관정요(貞觀政要)》라는 책에는 이런 말이 있다.	0.606
 중국/NNP	당나라/NNP	황제/NNG	의/JKG	업적/NNG	을/JKO	모으/VV	아/EC	놓/VX	은/ETM	《/SS	정관정요/NNP	(/SS	貞觀政要/SH	)/SS	》/SS	이/VCP	라는/ETM	책/NNG	에/JKB	는/JX	이런/MM	말/NNG	이/JKS	있/VV	다/EF	./SF	
 중국/NNP	당나라/NNP	황제/NNG	의/JKG	업적/NNG	을/JKO	모으/VV	아/EC	놓/VX	은/ETM	정관정요/UN	(/SS	貞觀政要/SH	)/SS	라느/UN	ㄴ/ETM	책/NNG	에/JKB	는/JX	이렇/VA	ㄴ/ETM	말/NNG	이/JKS	있/VX	다/EF	./SF	-86.6
+중국/NNP	당나라/NNP	황제/NNG	의/JKG	업적/NNG	을/JKO	모으/VV	아/EC	놓/VX	은/ETM	정/NNG	관정요/UN	(/SS	貞觀政要/SH	)/SS	라느/UN	ㄴ/ETM	책/NNG	에/JKB	는/JX	이렇/VA	ㄴ/ETM	말/NNG	이/JKS	있/VX	다/EF	./SF	-86.7
 중국/NNP	당나라/NNP	황제/NNG	의/JKG	업적/NNG	을/JKO	모으/VV	아/EC	놓/VX	은/ETM	정관정요/UN	(/SS	貞觀政要/SH	)/SS	라느/UN	ㄴ/ETM	책/NNG	에/JKB	는/JX	이렇/VA	ㄴ/ETM	말/NNG	이/JKS	있/VV	다/EF	./SF	-87.46
-중국/NNP	당나라/NNP	황제/NNG	의/JKG	업적/NNG	을/JKO	모으/VV	아/EC	놓/VX	은/ETM	정관/NNG	정요/UN	(/SS	貞觀政要/SH	)/SS	라느/UN	ㄴ/ETM	책/NNG	에/JKB	는/JX	이렇/VA	ㄴ/ETM	말/NNG	이/JKS	있/VX	다/EF	./SF	-87.49
 
 "물은 배를 잘 띄워주지만 다른 한편으로는 배를 뒤집기도 한다." 물을 부하로, 배를 리더로 본 것이다.	0.791
 "/SS	물/NNG	은/JX	배/NNG	를/JKO	잘/MAG	띄우/VV	어/EC	주/VX	지만/EC	다른/MM	한편/NNG	으로/JKB	는/JX	배/NNG	를/JKO	뒤집/VV	기/ETN	도/JX	하/VX	ㄴ다/EF	./SF	"/SS	물/NNG	을/JKO	부하/NNG	로/JKB	,/SP	배/NNG	를/JKO	리더/NNG	로/JKB	보/VV	ㄴ/ETM	것/NNB	이/VCP	다/EF	./SF	
@@ -10894,11 +10894,11 @@ A/SL	는/JX	신/XPN	계약/NNG	은/JX	잘/MAG	하/XSV	는데/EC	도입/NNG	을/JKO	안/MAG	하
 그리하여/MAJ	조직원/NNG	에게/JKB	현재/NNG	보다/JKB	낫/VA	은/ETM	희망/NNG	을/JKO	제시/NNG	하/XSV	ㅁ/ETN	으로써/JKB	역경/NNG	을/JKO	극복/NNG	하/XSV	는/ETM	힘/NNG	을/JKO	기르/VV	어/EC	주/VX	어야/EC	하/VX	ㄴ다/EF	./SF	-79.6
 그리하/VV	아/EC	조직원/NNG	에게/JKB	현재/NNG	보다/JKB	낫/VA	은/ETM	희망/NNG	을/JKO	제시/NNG	하/XSV	ㅁ/ETN	으로써/JKB	역경/NNG	을/JKO	극복/NNG	하/XSV	는/ETM	힘/NNG	을/JKO	기르/VV	어/EC	주/VX	어야/EC	하/VV	ㄴ다/EF	./SF	-79.67
 
-제5장 조직관리의 노하우 1.신인, 발로 뛰며 찾아라 보험회사들은 우수영업사원을 도입하기 위해 총력을 기울이고 있다.	0.8
+제5장 조직관리의 노하우 1.신인, 발로 뛰며 찾아라 보험회사들은 우수영업사원을 도입하기 위해 총력을 기울이고 있다.	0.744
 제/XPN	5/SN	장/NNG	조직/NNG	관리/NNG	의/JKG	노하우/NNG	1/SN	./SF	신인/NNG	,/SP	발/NNG	로/JKB	뛰/VV	며/EC	찾/VV	아라/EC	보험/NNG	회사/NNG	들/XSN	은/JX	우수/NNG	영업/NNG	사원/NNG	을/JKO	도입/NNG	하/XSV	기/ETN	위하/VV	아/EC	총력/NNG	을/JKO	기울이/VV	고/EC	있/VX	다/EF	./SF	
+제/XPN	5/SN	장/NNB	조직/NNG	관리/NNG	의/JKG	노하우/NNG	1./SN	신인/NNG	,/SP	발/NNG	로/JKB	뛰/VV	며/EC	차/NNG	ㅈ/UN	알/VV	라/EC	보험/NNG	회사/NNG	들/XSN	은/JX	우수/NNG	영업/NNG	사원/NNG	을/JKO	도입/NNG	하/XSV	기/ETN	위하/VV	아/EC	총력/NNG	을/JKO	기울이/VV	고/EC	있/VX	다/EF	./SF	-123.1
 제/XPN	5/SN	장/NNB	조직/NNG	관리/NNG	의/JKG	노하우/NNG	1./SN	신인/NNG	,/SP	발/NNG	로/JKB	뛰/VV	며/EC	찾아라/UN	보험/NNG	회사/NNG	들/XSN	은/JX	우수/NNG	영업/NNG	사원/NNG	을/JKO	도입/NNG	하/XSV	기/ETN	위하/VV	아/EC	총력/NNG	을/JKO	기울이/VV	고/EC	있/VX	다/EF	./SF	-123.8
-제/XPN	5/SN	장/NNB	조직/NNG	관리/NNG	의/JKG	노하우/NNG	1./SN	신인/NNG	,/SP	발/NNG	로/JKB	뛰/VV	며/EC	찾아라/UN	보험/NNG	회사/NNG	들/XSN	은/JX	우수/NNG	영업/NNG	사원/NNG	을/JKO	도입/NNG	하/XSV	기/ETN	위하/VV	아/EC	총력/NNG	을/JKO	기울이/VV	고/EC	있/VV	다/EF	./SF	-124.7
-제/XPN	5/SN	장/NNG	조직/NNG	관리/NNG	의/JKG	노하우/NNG	1./SN	신인/NNG	,/SP	발/NNG	로/JKB	뛰/VV	며/EC	찾아라/UN	보험/NNG	회사/NNG	들/XSN	은/JX	우수/NNG	영업/NNG	사원/NNG	을/JKO	도입/NNG	하/XSV	기/ETN	위하/VV	아/EC	총력/NNG	을/JKO	기울이/VV	고/EC	있/VX	다/EF	./SF	-126.2
+제/XPN	5/SN	장/NNB	조직/NNG	관리/NNG	의/JKG	노하우/NNG	1./SN	신인/NNG	,/SP	발/NNG	로/JKB	뛰/VV	며/EC	차/NNG	ㅈ/UN	알/VV	라/EC	보험/NNG	회사/NNG	들/XSN	은/JX	우수/NNG	영업/NNG	사원/NNG	을/JKO	도입/NNG	하/XSV	기/ETN	위하/VV	아/EC	총력/NNG	을/JKO	기울이/VV	고/EC	있/VV	다/EF	./SF	-123.9
 
 경험과 좋은 인맥을 갖춘 인재를 대량으로 도입하여 고능률 설계사로 육성하는 것은 모든 영업관리자의 희망이다.	0.778
 경험/NNG	과/JC	좋/VA	은/ETM	인맥/NNG	을/JKO	갖추/VV	ㄴ/ETM	인재/NNG	를/JKO	대량/NNG	으로/JKB	도입/NNG	하/XSV	아/EC	고/XPN	능률/NNG	설계사/NNG	로/JKB	육성/NNG	하/XSV	는/ETM	것/NNB	은/JX	모든/MM	영업/NNG	관리자/NNG	의/JKG	희망/NNG	이/VCP	다/EF	./SF	
@@ -11266,11 +11266,11 @@ A/SL	는/JX	신/XPN	계약/NNG	은/JX	잘/MAG	하/XSV	는데/EC	도입/NNG	을/JKO	안/MAG	하
 나/NP	가/JKS	이렇/VA	게/EC	찾아오/VV	ㄴ/ETM	것/NNB	은/JX	남편/NNG	의/JKG	능력/NNG	이/JKS	너무/MAG	안타깝/VA	어서/EC	그렇/VA	ㄴ/ETM	것/NNB	이/VCP	라고/EC	말/NNG	하/XSV	고/EC	,/SP	전도/NNG	양/NNG	양/NNG	하/XSV	ㄴ/ETM	그녀/NP	의/JKG	남편/NNG	과/JC	보험업/NNG	의/JKG	장미/NNG	빛/NNG	청사진/NNG	을/JKO	보여주/VV	었/EP	더니/EC	결국/NNG	그녀/NP	는/JX	앞/NNG	으로/JKB	적극/NNG	적/XSN	이/VCP	ㄴ/ETM	지원자/NNG	가/JKS	되/VV	어/EC	주/VX	ㄹ/ETM	것/NNB	을/JKO	약속/NNG	하/XSA	았/EP	다/EF	./SF	-163.5
 나/NP	가/JKS	이렇/VA	게/EC	찾아오/VV	ㄴ/ETM	것/NNB	은/JX	남편/NNG	의/JKG	능력/NNG	이/JKS	너무/MAG	안타깝/VA	어서/EC	그러/VV	ㄴ/ETM	것/NNB	이/VCP	라고/EC	말/NNG	하/XSV	고/EC	,/SP	전도/NNG	양/NNG	양/NNG	하/XSV	ㄴ/ETM	그녀/NP	의/JKG	남편/NNG	과/JKB	보험업/NNG	의/JKG	장미/NNG	빛/NNG	청사진/NNG	을/JKO	보여주/VV	었/EP	더니/EC	결국/NNG	그녀/NP	는/JX	앞/NNG	으로/JKB	적극/NNG	적/XSN	이/VCP	ㄴ/ETM	지원자/NNG	가/JKS	되/VV	어/EC	주/VX	ㄹ/ETM	것/NNB	을/JKO	약속/NNG	하/XSA	았/EP	다/EF	./SF	-164.1
 
-남편들의 반대로 일을 할 수 없다고 말하는 주부사원을 대하면 대부분의 영업관리자들은 "이렇게 저렇게 말해봐라"고 코치를 한다.	0.867
+남편들의 반대로 일을 할 수 없다고 말하는 주부사원을 대하면 대부분의 영업관리자들은 "이렇게 저렇게 말해봐라"고 코치를 한다.	0.844
 남편/NNG	들/XSN	의/JKG	반대/NNG	로/JKB	일/NNG	을/JKO	하/VV	ㄹ/ETM	수/NNB	없/VA	다고/EC	말/NNG	하/XSV	는/ETM	주부/NNG	사원/NNG	을/JKO	대하/VV	면/EC	대부분/NNG	의/JKG	영업/NNG	관리자/NNG	들/XSN	은/JX	"/SS	이렇/VA	게/EC	저렇/VA	게/EC	말/NNG	하/XSV	아/EC	보/VX	아라/EC	"/SS	고/JKQ	코치/NNG	를/JKO	하/VV	ㄴ다/EF	./SF	
-남편/NNG	들/XSN	의/JKG	반대/NNG	로/JKB	일/NNG	을/JKO	하/VV	ㄹ/ETM	수/NNB	없/VA	다고/EC	말/NNG	하/XSV	는/ETM	주부/NNG	사원/NNG	을/JKO	대하/VV	면/EC	대부분/NNG	의/JKG	영업/NNG	관리자/NNG	들/XSN	은/JX	"/SS	이렇/VA	게/EC	저렇/VA	게/EC	말/NNG	해보/VV	아라/EC	"/SS	고/EC	코치/NNG	를/JKO	하/VV	ㄴ다/EF	./SF	-111.6
-남편/NNG	들/XSN	의/JKG	반대/NNG	로/JKB	일/NNG	을/JKO	하/VV	ㄹ/ETM	수/NNB	없/VA	다고/EC	말/NNG	하/XSV	는/ETM	주부/NNG	사원/NNG	을/JKO	대하/VV	면/EC	대부분/NNG	의/JKG	영업/NNG	관리자/NNG	들/XSN	은/JX	"/SS	이렇/VA	게/EC	저렇/VA	게/EC	말/NNG	해보/VV	아라/EC	"/SS	고/EC	코치/NNG	를/JKO	하/VX	ㄴ다/EF	./SF	-111.8
-남편/NNG	들/XSN	의/JKG	반대/NNG	로/JKB	일/NNG	을/JKO	하/VX	ㄹ/ETM	수/NNB	없/VA	다고/EC	말/NNG	하/XSV	는/ETM	주부/NNG	사원/NNG	을/JKO	대하/VV	면/EC	대부분/NNG	의/JKG	영업/NNG	관리자/NNG	들/XSN	은/JX	"/SS	이렇/VA	게/EC	저렇/VA	게/EC	말/NNG	해보/VV	아라/EC	"/SS	고/EC	코치/NNG	를/JKO	하/VV	ㄴ다/EF	./SF	-112.6
+남편/NNG	들/XSN	의/JKG	반대/NNG	로/JKB	일/NNG	을/JKO	하/VV	ㄹ/ETM	수/NNB	없/VA	다고/EC	말/NNG	하/XSV	는/ETM	주부/NNG	사원/NNG	을/JKO	대하/VV	면/EC	대부분/NNG	의/JKG	영업/NNG	관리자/NNG	들/XSN	은/JX	"/SS	이렇/VA	게/EC	저렇/VA	게/EC	말/NNG	해봐라/UN	"/SS	고/EC	코치/NNG	를/JKO	하/VV	ㄴ다/EF	./SF	-109.9
+남편/NNG	들/XSN	의/JKG	반대/NNG	로/JKB	일/NNG	을/JKO	하/VV	ㄹ/ETM	수/NNB	없/VA	다고/EC	말/NNG	하/XSV	는/ETM	주부/NNG	사원/NNG	을/JKO	대하/VV	면/EC	대부분/NNG	의/JKG	영업/NNG	관리자/NNG	들/XSN	은/JX	"/SS	이렇/VA	게/EC	저렇/VA	게/EC	말/NNG	해봐라/UN	"/SS	고/EC	코치/NNG	를/JKO	하/VX	ㄴ다/EF	./SF	-110.1
+남편/NNG	들/XSN	의/JKG	반대/NNG	로/JKB	일/NNG	을/JKO	하/VX	ㄹ/ETM	수/NNB	없/VA	다고/EC	말/NNG	하/XSV	는/ETM	주부/NNG	사원/NNG	을/JKO	대하/VV	면/EC	대부분/NNG	의/JKG	영업/NNG	관리자/NNG	들/XSN	은/JX	"/SS	이렇/VA	게/EC	저렇/VA	게/EC	말/NNG	해봐라/UN	"/SS	고/EC	코치/NNG	를/JKO	하/VV	ㄴ다/EF	./SF	-110.9
 
 그러면 문제는 더욱 꼬이고 풀리지 않는다.	0.769
 그러면/MAJ	문제/NNG	는/JX	더욱/MAG	꼬이/VV	고/EC	풀리/VV	지/EC	않/VX	는다/EF	./SF	
@@ -11442,7 +11442,7 @@ A/SL	는/JX	신/XPN	계약/NNG	은/JX	잘/MAG	하/XSV	는데/EC	도입/NNG	을/JKO	안/MAG	하
 -/SS	고객/NNG	을/JKO	파악/NNG	하/XSV	ㄴ다/EF	./SF	
 -/SO	고객/NNG	을/JKO	파악/NNG	하/XSV	ㄴ다/EF	./SF	-12.72
 -/SO	고객/NNG	을/JKO	파악/NNG	하/XSA	ㄴ다/EF	./SF	-15.66
--/SO	고객/NNG	을/JKO	파/NNG	악/NNG	하/XSV	ㄴ다/EF	./SF	-20.32
+-/SO	고객/NNG	을/JKO	파악/NNG	하/VV	ㄴ다/EF	./SF	-17.48
 
 - 고객의 신상을 파악한다(이름은?	0.714
 -/SS	고객/NNG	의/JKG	신상/NNG	을/JKO	파악/NNG	하/XSV	ㄴ다/EC	(/SS	이름/NNG	은/JX	?/SF	
@@ -12570,9 +12570,9 @@ A/SL	는/JX	신/XPN	계약/NNG	은/JX	잘/MAG	하/XSV	는데/EC	도입/NNG	을/JKO	안/MAG	하
 
 저는 부대까지 걸어갈 수 있습니다." "그러면 부대까지 앞사람하고 1미터 이상 떨어지면 바로 의무대 차에 태울 것이다." 정 일병은 고참들의 발길질과 소총 개머리판으로 맞아도 누워 꼼짝도 않더니 '휴가'와 '부모님'이라는 말에 벌떡 일어나 부대까지 잘도 걸어왔다.	0.717
 저/NP	는/JX	부대/NNG	까지/JX	걸어가/VV	ㄹ/ETM	수/NNB	있/VV	습니다/EF	./SF	"/SS	"/SS	그러면/MAJ	부대/NNG	까지/JX	앞사람/NNG	하/XSV	고/EC	1/SN	미터/NNB	이상/NNG	떨어지/VV	면/EC	바로/MAG	의무대/NNG	차/NNG	에/JKB	태우/VV	ㄹ/ETM	것/NNB	이/VCP	다/EF	./SF	"/SS	정/NNP	일병/NNG	은/JX	고참/NNG	들/XSN	의/JKG	발길/NNG	질/XSN	과/JC	소총/NNG	개머리판/NNG	으로/JKB	맞/VV	아도/EC	눕/VV	어/EC	꼼짝/MAG	도/JX	않/VX	더니/EC	'/SS	휴가/NNG	'/SS	와/JC	'/SS	부모/NNG	님/XSN	'/SS	이/VCP	라는/ETM	말/NNG	에/JKB	벌떡/MAG	일어나/VV	아/EC	부대/NNG	까지/JX	잘/MAG	도/JX	걸어오/VV	았/EP	다/EF	./SF	
-저/NP	는/JX	부대/NNG	까지/JX	걸어가/VV	ㄹ/ETM	수/NNB	있/VX	습니다/EF	./SF	"/SS	"/SS	그러/VV	면/EC	부대/NNG	까지/JX	앞/NNG	사람/NNG	하/XSV	고/EC	1/SN	미터/NNB	이상/NNG	떨어지/VV	면/EC	바/NNB	로/JKB	의무/NNG	대/NNG	차/NNG	에/JKB	태우/VV	ㄹ/ETM	것/NNB	이/VCP	다/EF	./SF	"/SS	정/NNG	일병/NNG	은/JX	고참/NNG	들/XSN	의/JKG	발길/NNG	질/XSN	과/JKB	소총/NNG	개머리판/NNG	으로/JKB	맞아/UN	도/JX	눕/VV	어/EC	꼼짝/MAG	도/JX	않/VX	더니/EC	'/SS	휴가/NNG	'/SS	와/JKB	'/SS	부모/NNG	님/XSN	'/SS	일/VV	라는/ETM	말/NNG	에/JKB	벌떡/MAG	일어나/VV	아/EC	부대/NNG	까지/JX	잘/MAG	도/JX	걸어오/VV	았/EP	다/EF	./SF	-246.9
-저/NP	는/JX	부대/NNG	까지/JX	걸어가/VV	ㄹ/ETM	수/NNB	있/VX	습니다/EF	./SF	"/SS	"/SS	그러/VV	면/EC	부대/NNG	까지/JX	앞/NNG	사람/NNG	하/XSV	고/EC	1/SN	미터/NNB	이상/NNG	떨어지/VV	면/EC	바/NNB	로/JKB	의무/NNG	대/NNB	차/NNG	에/JKB	태우/VV	ㄹ/ETM	것/NNB	이/VCP	다/EF	./SF	"/SS	정/NNG	일병/NNG	은/JX	고참/NNG	들/XSN	의/JKG	발길/NNG	질/XSN	과/JKB	소총/NNG	개머리판/NNG	으로/JKB	맞아/UN	도/JX	눕/VV	어/EC	꼼짝/MAG	도/JX	않/VX	더니/EC	'/SS	휴가/NNG	'/SS	와/JKB	'/SS	부모/NNG	님/XSN	'/SS	일/VV	라는/ETM	말/NNG	에/JKB	벌떡/MAG	일어나/VV	아/EC	부대/NNG	까지/JX	잘/MAG	도/JX	걸어오/VV	았/EP	다/EF	./SF	-246.9
-저/NP	는/JX	부대/NNG	까지/JX	걸어가/VV	ㄹ/ETM	수/NNB	있/VX	습니다/EF	./SF	"/SS	"/SS	그러/VV	면/EC	부대/NNG	까지/JX	앞/NNG	사람/NNG	하/XSV	고/EC	1/SN	미터/NNB	이상/NNG	떨어지/VV	면/EC	바/NNB	로/JKB	의무/NNG	대/NNG	차/NNG	에/JKB	태우/VV	ㄹ/ETM	것/NNB	이/VCP	다/EF	./SF	"/SS	정/NNG	일병/NNG	은/JX	고참/NNG	들/XSN	의/JKG	발길/NNG	질/XSN	과/JKB	소총/NNG	개머리판/NNG	으로/JKB	맞아/UN	도/JX	눕/VV	어/EC	꼼짝/MAG	도/JX	않/VX	더니/EC	'/SS	휴가/NNG	'/SS	와/JC	'/SS	부모/NNG	님/XSN	'/SS	일/VV	라는/ETM	말/NNG	에/JKB	벌떡/MAG	일어나/VV	아/EC	부대/NNG	까지/JX	잘/MAG	도/JX	걸어오/VV	았/EP	다/EF	./SF	-247
+저/NP	는/JX	부대/NNG	까지/JX	걸어가/VV	ㄹ/ETM	수/NNB	있/VX	습니다/EF	./SF	"/SS	"/SS	그러/VV	면/EC	부대/NNG	까지/JX	앞/NNG	사람/NNG	하/XSV	고/EC	1/SN	미터/NNB	이상/NNG	떨어지/VV	면/EC	바/NNB	로/JKB	의무/NNG	대/NNG	차/NNG	에/JKB	태우/VV	ㄹ/ETM	것/NNB	이/VCP	다/EF	./SF	"/SS	정/NNG	일병/NNG	은/JX	고참/NNG	들/XSN	의/JKG	발길/NNG	질/XSN	과/JKB	소총/NNG	개머리판/NNG	으로/JKB	맞아/UN	도/JX	눕/VV	어/EC	꼼짝/MAG	도/JX	않/VX	더니/EC	'/SS	휴가/NNG	'/SS	와/JKB	'/SS	부모/NNG	님/XSN	'/SS	일/VV	라는/ETM	말/NNG	에/JKB	벌떡/MAG	일어나/VV	아/EC	부대/NNG	까지/JX	잘/MAG	도/JX	걸어오/VV	았/EP	다/EF	./SF	-251.2
+저/NP	는/JX	부대/NNG	까지/JX	걸어가/VV	ㄹ/ETM	수/NNB	있/VX	습니다/EF	./SF	"/SS	"/SS	그러/VV	면/EC	부대/NNG	까지/JX	앞/NNG	사람/NNG	하/XSV	고/EC	1/SN	미터/NNB	이상/NNG	떨어지/VV	면/EC	바/NNB	로/JKB	의무/NNG	대/NNB	차/NNG	에/JKB	태우/VV	ㄹ/ETM	것/NNB	이/VCP	다/EF	./SF	"/SS	정/NNG	일병/NNG	은/JX	고참/NNG	들/XSN	의/JKG	발길/NNG	질/XSN	과/JKB	소총/NNG	개머리판/NNG	으로/JKB	맞아/UN	도/JX	눕/VV	어/EC	꼼짝/MAG	도/JX	않/VX	더니/EC	'/SS	휴가/NNG	'/SS	와/JKB	'/SS	부모/NNG	님/XSN	'/SS	일/VV	라는/ETM	말/NNG	에/JKB	벌떡/MAG	일어나/VV	아/EC	부대/NNG	까지/JX	잘/MAG	도/JX	걸어오/VV	았/EP	다/EF	./SF	-251.2
+저/NP	는/JX	부대/NNG	까지/JX	걸어가/VV	ㄹ/ETM	수/NNB	있/VX	습니다/EF	./SF	"/SS	"/SS	그러/VV	면/EC	부대/NNG	까지/JX	앞/NNG	사람/NNG	하/XSV	고/EC	1/SN	미터/NNB	이상/NNG	떨어지/VV	면/EC	바/NNB	로/JKB	의무/NNG	대/NNG	차/NNG	에/JKB	태우/VV	ㄹ/ETM	것/NNB	이/VCP	다/EF	./SF	"/SS	정/NNG	일병/NNG	은/JX	고참/NNG	들/XSN	의/JKG	발길/NNG	질/XSN	과/JKB	소총/NNG	개머리판/NNG	으로/JKB	맞아/UN	도/JX	눕/VV	어/EC	꼼짝/MAG	도/JX	않/VX	더니/EC	'/SS	휴가/NNG	'/SS	와/JC	'/SS	부모/NNG	님/XSN	'/SS	일/VV	라는/ETM	말/NNG	에/JKB	벌떡/MAG	일어나/VV	아/EC	부대/NNG	까지/JX	잘/MAG	도/JX	걸어오/VV	았/EP	다/EF	./SF	-251.3
 
 밖으로 나타난 말과 행동보다 인간의 근본심리와 인간을 읽을 수 있어야 한다.	0.769
 밖/NNG	으로/JKB	나타나/VV	ㄴ/ETM	말/NNG	과/JC	행동/NNG	보다/JKB	인간/NNG	의/JKG	근본/NNG	심리/NNG	와/JC	인간/NNG	을/JKO	읽/VV	을/ETM	수/NNB	있/VV	어야/EC	하/VX	ㄴ다/EF	./SF	
@@ -15598,7 +15598,7 @@ L/SL	은/JX	고객/NNG	에/JKB	대하/VV	아/EC	철저히/MAG	봉사/NNG	하고/JKB	약속/NNG	�
 특히/MAG	나이/NNG	가/JKS	어리/VA	ㄴ/ETM	고객/NNG	에게/JKB	먼저/MAG	인사/NNG	하/XSV	면/EC	고객/NNG	은/JX	여러분/NP	을/JKO	겸손/NNG	하/XSA	ㄴ/ETM	사람/NNG	으로/JKB	보/VV	고/EC	다음/NNG	부터/JX	는/JX	먼저/MAG	인사/NNG	하/XSV	ㄹ/ETM	것/NNB	이/VCP	다/EF	./SF	
 특히/MAG	나이/NNG	가/JKS	어리/VA	ㄴ/ETM	고객/NNG	에게/JKB	먼저/MAG	인사/NNG	하/XSV	면/EC	고객/NNG	은/JX	여러분/NP	을/JKO	겸손/NNG	하/XSV	ㄴ/ETM	사람/NNG	으로/JKB	보/VV	고/EC	다음/NNG	부터/JX	는/JX	먼저/MAG	인사/NNG	하/XSV	ㄹ/ETM	것/NNB	이/VCP	다/EF	./SF	-80.84
 특히/MAG	나이/NNG	가/JKS	어리/VA	ㄴ/ETM	고객/NNG	에게/JKB	먼저/MAG	인사/NNG	하/XSV	면/EC	고객/NNG	은/JX	여러분/NP	을/JKO	겸손/NNG	하/XSV	ㄴ/ETM	사람/NNG	으로/JKB	보/VX	고/EC	다음/NNG	부터/JX	는/JX	먼저/MAG	인사/NNG	하/XSV	ㄹ/ETM	것/NNB	이/VCP	다/EF	./SF	-82
-특히/MAG	나이/NNG	가/JKS	어리/VA	ㄴ/ETM	고객/NNG	에게/JKB	먼저/MAG	인사/NNG	하/XSV	면/EC	고객/NNG	은/JX	여러분/NP	을/JKO	겸손/NNG	하/XSV	ㄴ/ETM	사람/NNG	으로/JKB	보/VV	고/EC	다음/NNG	부터/JX	는/JX	먼저/MAG	인사/NNG	하/XSA	ㄹ/ETM	것/NNB	이/VCP	다/EF	./SF	-83.49
+특히/MAG	나이/NNG	가/JKS	어리/VA	ㄴ/ETM	고객/NNG	에게/JKB	먼저/MAG	인사/NNG	하/XSV	면/EC	고객/NNG	은/JX	여러분/NP	을/JKO	겸손/NNG	하/XSA	ㄴ/ETM	사람/NNG	으로/JKB	보/VV	고/EC	다음/NNG	부터/JX	는/JX	먼저/MAG	인사/NNG	하/XSV	ㄹ/ETM	것/NNB	이/VCP	다/EF	./SF	-83.49
 
 바야흐로 계약을 위한 첫걸음이 시작되는 것이다.	0.813
 바야흐로/MAG	계약/NNG	을/JKO	위하/VV	ㄴ/ETM	첫걸음/NNG	이/JKS	시작/NNG	되/XSV	는/ETM	것/NNB	이/VCP	다/EF	./SF	
@@ -15742,7 +15742,7 @@ L/SL	은/JX	고객/NNG	에/JKB	대하/VV	아/EC	철저히/MAG	봉사/NNG	하고/JKB	약속/NNG	�
 -/SS	한꺼번에/MAG	여러/MM	명/NNB	의/JKG	명함/NNG	을/JKO	받/VV	았/EP	을/ETM	경우/NNG	에/JKB	는/JX	탁자/NNG	위/NNG	에/JKB	순서/NNG	대로/JX	올려놓/VV	고/EC	이름/NNG	과/JC	얼굴/NNG	을/JKO	익히/VV	면서/EC	대화/NNG	하/XSV	는/ETM	것/NNB	이/JKS	좋/VA	다/EF	./SF	
 -/SO	한/MM	꺼/NNB	번/NNB	에/JKB	여러/MM	명/NNB	의/JKG	명함/NNG	을/JKO	받았/UN	을/JKO	경우/NNG	에/JKB	는/JX	탁자/NNG	위/NNG	에/JKB	순서/NNG	대로/JX	올려놓/VV	고/EC	이름/NNG	과/JKB	얼굴/NNG	을/JKO	익히/VV	면서/EC	대화/NNG	하/XSV	는/ETM	것/NNB	이/JKS	좋/VA	다/EF	./SF	-107.3
 -/SO	한/MM	꺼/NNB	번/NNB	에/JKB	여러/MM	명/NNB	의/JKG	명함/NNG	을/JKO	받았/UN	을/JKO	경우/NNG	에/JKB	는/JX	탁자/NNG	위/NNG	에/JKB	순서/NNG	대로/JX	올려놓/VV	고/EC	이름/NNG	과/JC	얼굴/NNG	을/JKO	익히/VV	면서/EC	대화/NNG	하/XSV	는/ETM	것/NNB	이/JKS	좋/VA	다/EF	./SF	-107.6
--/SO	한/MM	꺼번/UN	에/JKB	여러/MM	명/NNB	의/JKG	명함/NNG	을/JKO	받았/UN	을/JKO	경우/NNG	에/JKB	는/JX	탁자/NNG	위/NNG	에/JKB	순서/NNG	대로/JX	올려놓/VV	고/EC	이름/NNG	과/JKB	얼굴/NNG	을/JKO	익히/VV	면서/EC	대화/NNG	하/XSV	는/ETM	것/NNB	이/JKS	좋/VA	다/EF	./SF	-107.9
+-/SO	한꺼/UN	번/NNB	에/JKB	여러/MM	명/NNB	의/JKG	명함/NNG	을/JKO	받았/UN	을/JKO	경우/NNG	에/JKB	는/JX	탁자/NNG	위/NNG	에/JKB	순서/NNG	대로/JX	올려놓/VV	고/EC	이름/NNG	과/JKB	얼굴/NNG	을/JKO	익히/VV	면서/EC	대화/NNG	하/XSV	는/ETM	것/NNB	이/JKS	좋/VA	다/EF	./SF	-107.9
 
 이런 경우 일어설 때 필히 명함을 소중히 챙겨 와야 한다.	0.5
 이런/MM	경우/NNG	일어서/VV	ㄹ/ETM	때/NNG	필히/MAG	명함/NNG	을/JKO	소중히/MAG	챙기/VV	어/EC	오/VX	아야/EC	하/VX	ㄴ다/EF	./SF	
@@ -16408,7 +16408,7 @@ L/SL	은/JX	고객/NNG	에/JKB	대하/VV	아/EC	철저히/MAG	봉사/NNG	하고/JKB	약속/NNG	�
 지점장/NNG	이/JKS	처음/NNG	에/JKB	뭐/NP	이/VCP	든지/EC	말/NNG	하/XSV	아/EC	보/VX	라며/EC	부추기/VV	기/ETN	도/JX	하/VX	았/EP	다/EF	./SF	
 지점장/NNG	이/JKS	처음/NNG	에/JKB	뭐/NP	든지/JX	말해보라/UN	며/EC	부추기/VV	기/ETN	도/JX	하/VV	았/EP	다/EF	./SF	-56.39
 지점장/NNG	이/JKS	처음/NNG	에/JKB	뭐/NP	든지/JX	말해보라/UN	며/EC	부추기/VV	기/ETN	도/JX	하/VX	았/EP	다/EF	./SF	-57.06
-지점장/NNG	이/JKS	처음/NNG	에/JKB	뭐/NP	든지/JX	말/NNG	해보라/UN	며/EC	부추기/VV	기/ETN	도/JX	하/VV	았/EP	다/EF	./SF	-58.21
+지점장/NNG	이/JKS	처음/NNG	에/JKB	뭐/NP	든지/JX	말해보라며/UN	부추기/VV	기/ETN	도/JX	하/VV	았/EP	다/EF	./SF	-59.09
 
 소장은 신이 나서 더욱 떠들었고, 급기야는 지점장이 화를 내자 소장은 말을 하라고 해놓고 왜 화를 내느냐고 항의하다가 주먹다짐으로 번지는 사태가 발생했다.	0.83
 소장/NNG	은/JX	신/NNG	이/JKS	나/VV	아서/EC	더욱/MAG	떠들/VV	었/EP	고/EC	,/SP	급기야/MAG	는/JX	지점장/NNG	이/JKS	화/NNG	를/JKO	내/VV	자/EC	소장/NNG	은/JX	말/NNG	을/JKO	하/VV	라고/EC	하/VV	아/EC	놓/VX	고/EC	왜/MAG	화/NNG	를/JKO	내/VV	느냐고/EC	항의/NNG	하/XSV	다가/EC	주먹다짐/NNG	으로/JKB	번지/VV	는/ETM	사태/NNG	가/JKS	발생/NNG	하/XSV	았/EP	다/EF	./SF	
@@ -16478,9 +16478,9 @@ L/SL	은/JX	고객/NNG	에/JKB	대하/VV	아/EC	철저히/MAG	봉사/NNG	하고/JKB	약속/NNG	�
 
 양식이 좋으시겠습니까?" -"한식이 좋겠는데요." -"그러면 제가 된장찌개 잘하는 집을 알고 있는데 어떻습니까?" -또한 음식을 시킬 때도 "뭘 드시겠습니까?" "아무거나!" 류의 멋없는 대화보다는, "이 집은 해물된장찌개가 일품입니다.	0.677
 양식/NNG	이/JKS	좋/VA	으시/EP	겠/EP	습니까/EF	?/SF	"/SS	-/SS	"/SS	한식/NNG	이/JKS	좋/VA	겠/EP	는데요/EF	./SF	"/SS	-/SS	"/SS	그러면/MAJ	제/NP	가/JKS	된장찌개/NNG	잘/MAG	하/XSV	는/ETM	집/NNG	을/JKO	알/VV	고/EC	있/VX	는데/EC	어떻/VA	습니까/EF	?/SF	"/SS	-/SS	또한/MAG	음식/NNG	을/JKO	시키/VV	ㄹ/ETM	때/NNG	도/JX	"/SS	무엇/NP	ㄹ/JKO	들/VV	시/EP	겠/EP	습니까/EF	?/SF	"/SS	"/SS	아무것/NNG	이/VCP	나/EF	!/SF	"/SS	류/NNG	의/JKG	멋/NNG	없/VA	는/ETM	대화/NNG	보다/JKB	는/JX	,/SP	"/SS	이/MM	집/NNG	은/JX	해물/NNG	된장찌개/NNG	가/JKS	일품/NNG	이/VCP	ㅂ니다/EF	./SF	
-양식/NNG	이/JKS	좋/VA	으시/EP	겠/EP	습니까/EF	?/SF	"/SS	-/SO	"/SS	한식/NNG	이/JKS	좋/VA	겠/EP	는데요/EF	./SF	"/SS	-/SO	"/SS	그러/VV	면/EC	저/NP	가/JKS	된장찌개/NNG	잘/MAG	하/XSV	는/ETM	집/NNG	을/JKO	알/VV	고/EC	있/VV	는데/EC	어떻/VA	습니까/EF	?/SF	"/SS	-/SO	또한/UN	음식/NNG	을/JKO	시키/VV	ㄹ/ETM	때/NNG	도/JX	"/SS	뭘/IC	드시/VV	겠/EP	습니까/EF	?/SF	"/SS	"/SS	아무거/NP	나/JX	!/SF	"/SS	류/NNP	의/JKG	멋/NNG	없/VA	는/ETM	대화/NNG	보다/JKB	는/JX	,/SP	"/SS	이/JKS	집/NNG	은/JX	해물/NNG	된장찌개/NNG	가/JKS	일품/NNG	이/VCP	ㅂ니다/EF	./SF	-243.8
-양식/NNG	이/JKS	좋/VA	으시/EP	겠/EP	습니까/EF	?/SF	"/SS	-/SO	"/SS	한식/NNG	이/JKS	좋/VA	겠/EP	는데요/EF	./SF	"/SS	-/SO	"/SS	그러/VV	면/EC	저/NP	가/JKS	된장찌개/NNG	잘/MAG	하/XSV	는/ETM	집/NNG	을/JKO	알/VV	고/EC	있/VV	는데/EC	어떻/VA	습니까/EF	?/SF	"/SS	-/SO	또한/UN	음식/NNG	을/JKO	시키/VV	ㄹ/ETM	때/NNG	도/JX	"/SS	뭐/NP	ㄹ/JKO	드시/VV	겠/EP	습니까/EF	?/SF	"/SS	"/SS	아무거/NP	나/JX	!/SF	"/SS	류/NNP	의/JKG	멋/NNG	없/VA	는/ETM	대화/NNG	보다/JKB	는/JX	,/SP	"/SS	이/JKS	집/NNG	은/JX	해물/NNG	된장찌개/NNG	가/JKS	일품/NNG	이/VCP	ㅂ니다/EF	./SF	-243.8
-양식/NNG	이/JKS	좋/VA	으시/EP	겠/EP	습니까/EF	?/SF	"/SS	-/SO	"/SS	한식/NNG	이/JKS	좋/VA	겠/EP	는데요/EF	./SF	"/SS	-/SO	"/SS	그러/VV	면/EC	저/NP	가/JKS	된장찌개/NNG	잘/MAG	하/XSV	는/ETM	집/NNG	을/JKO	알/VV	고/EC	있/VX	는데/EC	어떻/VA	습니까/EF	?/SF	"/SS	-/SO	또한/UN	음식/NNG	을/JKO	시키/VV	ㄹ/ETM	때/NNG	도/JX	"/SS	뭘/IC	드시/VV	겠/EP	습니까/EF	?/SF	"/SS	"/SS	아무거/NP	나/JX	!/SF	"/SS	류/NNP	의/JKG	멋/NNG	없/VA	는/ETM	대화/NNG	보다/JKB	는/JX	,/SP	"/SS	이/JKS	집/NNG	은/JX	해물/NNG	된장찌개/NNG	가/JKS	일품/NNG	이/VCP	ㅂ니다/EF	./SF	-244.3
+양식/NNG	이/JKS	좋/VA	으시/EP	겠/EP	습니까/EF	?/SF	"/SS	-/SO	"/SS	한식/NNG	이/JKS	좋/VA	겠/EP	는데요/EF	./SF	"/SS	-/SO	"/SS	그러/VV	면/EC	저/NP	가/JKS	된장찌개/NNG	잘/MAG	하/XSV	는/ETM	집/NNG	을/JKO	알/VV	고/EC	있/VV	는데/EC	어떻/VA	습니까/EF	?/SF	"/SS	-/SO	또한/UN	음식/NNG	을/JKO	시키/VV	ㄹ/ETM	때/NNG	도/JX	"/SS	뭘/IC	드시/VV	겠/EP	습니까/EF	?/SF	"/SS	"/SS	아무거/NP	나/JX	!/SF	"/SS	류/NNP	의/JKG	멋/NNG	없/VA	는/ETM	대화/NNG	보다/JKB	는/JX	,/SP	"/SS	이/JKS	집/NNG	은/JX	해물/NNG	된장찌개/NNG	가/JKS	일품/NNG	이/VCP	ㅂ니다/EF	./SF	-248
+양식/NNG	이/JKS	좋/VA	으시/EP	겠/EP	습니까/EF	?/SF	"/SS	-/SO	"/SS	한식/NNG	이/JKS	좋/VA	겠/EP	는데요/EF	./SF	"/SS	-/SO	"/SS	그러/VV	면/EC	저/NP	가/JKS	된장찌개/NNG	잘/MAG	하/XSV	는/ETM	집/NNG	을/JKO	알/VV	고/EC	있/VV	는데/EC	어떻/VA	습니까/EF	?/SF	"/SS	-/SO	또한/UN	음식/NNG	을/JKO	시키/VV	ㄹ/ETM	때/NNG	도/JX	"/SS	뭐/NP	ㄹ/JKO	드시/VV	겠/EP	습니까/EF	?/SF	"/SS	"/SS	아무거/NP	나/JX	!/SF	"/SS	류/NNP	의/JKG	멋/NNG	없/VA	는/ETM	대화/NNG	보다/JKB	는/JX	,/SP	"/SS	이/JKS	집/NNG	은/JX	해물/NNG	된장찌개/NNG	가/JKS	일품/NNG	이/VCP	ㅂ니다/EF	./SF	-248.1
+양식/NNG	이/JKS	좋/VA	으시/EP	겠/EP	습니까/EF	?/SF	"/SS	-/SO	"/SS	한식/NNG	이/JKS	좋/VA	겠/EP	는데요/EF	./SF	"/SS	-/SO	"/SS	그렇/VA	면/EC	저/NP	가/JKS	된장찌개/NNG	잘/MAG	하/XSV	는/ETM	집/NNG	을/JKO	알/VV	고/EC	있/VV	는데/EC	어떻/VA	습니까/EF	?/SF	"/SS	-/SO	또한/UN	음식/NNG	을/JKO	시키/VV	ㄹ/ETM	때/NNG	도/JX	"/SS	뭘/IC	드시/VV	겠/EP	습니까/EF	?/SF	"/SS	"/SS	아무거/NP	나/JX	!/SF	"/SS	류/NNP	의/JKG	멋/NNG	없/VA	는/ETM	대화/NNG	보다/JKB	는/JX	,/SP	"/SS	이/JKS	집/NNG	은/JX	해물/NNG	된장찌개/NNG	가/JKS	일품/NNG	이/VCP	ㅂ니다/EF	./SF	-248.2
 
 한번 드셔 보시지요"라고 말할 수 있을 정도가 돼야 한다.	0.517
 한번/NNG	들/VV	시/EP	어/EC	보/VV	시/EP	지요/EF	"/SS	라고/JKQ	말/NNG	하/XSV	ㄹ/ETM	수/NNB	있/VV	을/ETM	정도/NNG	가/JKC	되/VV	어야/EC	하/VX	ㄴ다/EF	./SF	
@@ -16638,9 +16638,9 @@ L/SL	은/JX	고객/NNG	에/JKB	대하/VV	아/EC	철저히/MAG	봉사/NNG	하고/JKB	약속/NNG	�
 
 "멤버는 어떻게 할까요?" "나는 아무나 좋습니다." 이렇게 말한다면 "그러면 제가 한 분을 모시고 갈 테니 고객께서도 한 분 모시고 오시죠?"라고 의향을 물어보는 것이 좋다.	0.676
 "/SS	멤버/NNG	는/JX	어떻/VA	게/EC	하/VV	ㄹ까요/EF	?/SF	"/SS	"/SS	나/NP	는/JX	아무/NP	나/JX	좋/VA	습니다/EF	./SF	"/SS	이렇/VA	게/EC	말/NNG	하/XSV	ㄴ다면/EC	"/SS	그러면/MAJ	제/NP	가/JKS	한/MM	분/NNB	을/JKO	모시/VV	고/EC	가/VV	ㄹ/ETM	터/NNB	이/VCP	니/EC	고객/NNG	께서/JKS	도/JX	한/MM	분/NNB	모시/VV	고/EC	오/VX	시/EP	죠/EF	?/SF	"/SS	라고/JKQ	의향/NNG	을/JKO	물어보/VV	는/ETM	것/NNB	이/JKS	좋/VA	다/EF	./SF	
-"/SS	멤버/NNG	는/JX	어떻/VA	게/EC	하/VV	ㄹ까요/EF	?/SF	"/SS	"/SS	나/NP	는/JX	아뭏/VA	나/EC	좋/VA	습니다/EF	./SF	"/SS	이렇/VA	게/EC	말/NNG	하/XSV	ㄴ다면/EC	"/SS	그러/VV	면/EC	저/NP	가/JKS	하/VV	ㄴ/ETM	분/NNB	을/JKO	모시/VV	고/EC	가/VV	ㄹ/ETM	테니/UN	고객/NNG	께서/JKS	도/JX	하/VV	ㄴ/ETM	분/NNB	모시/VV	고/EC	오/VV	시/EP	죠/EF	?/SF	"/SS	라고/EC	의향/NNG	을/JKO	물어보/VV	는/ETM	것/NNB	이/JKS	좋/VA	다/EF	./SF	-137.6
-"/SS	멤버/NNG	는/JX	어떻/VA	게/EC	하/VV	ㄹ까요/EF	?/SF	"/SS	"/SS	나/NP	는/JX	아뭏/VA	나/EC	좋/VA	습니다/EF	./SF	"/SS	이렇/VA	게/EC	말/NNG	하/XSV	ㄴ다면/EC	"/SS	그러/VV	면/EC	저/NP	가/JKS	하/VV	ㄴ/ETM	분/NNB	을/JKO	모시/VV	고/EC	가/VV	ㄹ/ETM	테니/UN	고객/NNG	께서/JKS	도/JX	하/VV	ㄴ/ETM	분/NNB	모시/VV	고/EC	오/VX	시/EP	죠/EF	?/SF	"/SS	라고/EC	의향/NNG	을/JKO	물어보/VV	는/ETM	것/NNB	이/JKS	좋/VA	다/EF	./SF	-137.7
-"/SS	멤버/NNG	는/JX	어떻/VA	게/EC	하/VX	ㄹ까요/EF	?/SF	"/SS	"/SS	나/NP	는/JX	아뭏/VA	나/EC	좋/VA	습니다/EF	./SF	"/SS	이렇/VA	게/EC	말/NNG	하/XSV	ㄴ다면/EC	"/SS	그러/VV	면/EC	저/NP	가/JKS	하/VV	ㄴ/ETM	분/NNB	을/JKO	모시/VV	고/EC	가/VV	ㄹ/ETM	테니/UN	고객/NNG	께서/JKS	도/JX	하/VV	ㄴ/ETM	분/NNB	모시/VV	고/EC	오/VV	시/EP	죠/EF	?/SF	"/SS	라고/EC	의향/NNG	을/JKO	물어보/VV	는/ETM	것/NNB	이/JKS	좋/VA	다/EF	./SF	-137.8
+"/SS	멤버/NNG	는/JX	어떻/VA	게/EC	하/VV	ㄹ까요/EF	?/SF	"/SS	"/SS	나/NP	는/JX	아뭏/VA	나/EC	좋/VA	습니다/EF	./SF	"/SS	이렇/VA	게/EC	말/NNG	하/XSV	ㄴ다면/EC	"/SS	그러/VV	면/EC	저/NP	가/JKS	하/VV	ㄴ/ETM	분/NNB	을/JKO	모시/VV	고/EC	가/VV	ㄹ/ETM	테니/UN	고객/NNG	께서/JKS	도/JX	하/VV	ㄴ/ETM	분/NNB	모시/VV	고/EC	오/VV	시/EP	죠/EF	?/SF	"/SS	라고/EC	의향/NNG	을/JKO	물어보/VV	는/ETM	것/NNB	이/JKS	좋/VA	다/EF	./SF	-141.8
+"/SS	멤버/NNG	는/JX	어떻/VA	게/EC	하/VV	ㄹ까요/EF	?/SF	"/SS	"/SS	나/NP	는/JX	아뭏/VA	나/EC	좋/VA	습니다/EF	./SF	"/SS	이렇/VA	게/EC	말/NNG	하/XSV	ㄴ다면/EC	"/SS	그러/VV	면/EC	저/NP	가/JKS	하/VV	ㄴ/ETM	분/NNB	을/JKO	모시/VV	고/EC	가/VV	ㄹ/ETM	테니/UN	고객/NNG	께서/JKS	도/JX	하/VV	ㄴ/ETM	분/NNB	모시/VV	고/EC	오/VX	시/EP	죠/EF	?/SF	"/SS	라고/EC	의향/NNG	을/JKO	물어보/VV	는/ETM	것/NNB	이/JKS	좋/VA	다/EF	./SF	-142
+"/SS	멤버/NNG	는/JX	어떻/VA	게/EC	하/VV	ㄹ까요/EF	?/SF	"/SS	"/SS	나/NP	는/JX	아뭏/VA	나/EC	좋/VA	습니다/EF	./SF	"/SS	이렇/VA	게/EC	말/NNG	하/XSV	ㄴ다면/EC	"/SS	그렇/VA	면/EC	저/NP	가/JKS	하/VV	ㄴ/ETM	분/NNB	을/JKO	모시/VV	고/EC	가/VV	ㄹ/ETM	테니/UN	고객/NNG	께서/JKS	도/JX	하/VV	ㄴ/ETM	분/NNB	모시/VV	고/EC	오/VV	시/EP	죠/EF	?/SF	"/SS	라고/EC	의향/NNG	을/JKO	물어보/VV	는/ETM	것/NNB	이/JKS	좋/VA	다/EF	./SF	-142
 
 멤버가 짜여지면 자연스럽게 한 명의 유망고객을 소개받게 된다.	0.72
 멤버/NNG	가/JKS	짜/VV	아/EC	지/VX	면/EC	자연/NNG	스럽/XSA	게/EC	한/MM	명/NNB	의/JKG	유망/NNG	고객/NNG	을/JKO	소개/NNG	받/VV	게/EC	되/VV	ㄴ다/EF	./SF	
@@ -16680,15 +16680,15 @@ L/SL	은/JX	고객/NNG	에/JKB	대하/VV	아/EC	철저히/MAG	봉사/NNG	하고/JKB	약속/NNG	�
 
 "날짜를 언제로 할까요?" "4월 둘째주 일요일이 좋겠습니다." "그러면 부킹은 어떻게 할까요?	0.771
 "/SS	날짜/NNG	를/JKO	언제/NP	로/JKB	하/VV	ㄹ까요/EF	?/SF	"/SS	"/SS	4/SN	월/NNB	둘째/NR	주/NNG	일요일/NNG	이/JKS	좋/VA	겠/EP	습니다/EF	./SF	"/SS	"/SS	그러면/MAJ	부킹/NNG	은/JX	어떻/VA	게/EC	하/VV	ㄹ까요/EF	?/SF	
-"/SS	날짜/NNG	를/JKO	언제/NP	로/JKB	하/VV	ㄹ까요/EF	?/SF	"/SS	"/SS	4/SN	월/NNB	둘째/NR	주/NNB	일요일/NNG	이/JKS	좋/VA	겠/EP	습니다/EF	./SF	"/SS	"/SS	그러/VV	면/EC	부/XPN	킹/NNG	은/JX	어떻/VA	게/EC	하/VV	ㄹ까요/EF	?/SF	-81.81
-"/SS	날짜/NNG	를/JKO	언제/NP	로/JKB	하/VV	ㄹ까요/EF	?/SF	"/SS	"/SS	4/SN	월/NNB	둘째/NR	주/NNB	일요일/NNG	이/JKS	좋/VA	겠/EP	습니다/EF	./SF	"/SS	"/SS	그러/VV	면/EC	부/XPN	킹/NNG	은/JX	어떻/VA	게/EC	하/VX	ㄹ까요/EF	?/SF	-82
-"/SS	날짜/NNG	를/JKO	언제/NP	로/JKB	하/VX	ㄹ까요/EF	?/SF	"/SS	"/SS	4/SN	월/NNB	둘째/NR	주/NNB	일요일/NNG	이/JKS	좋/VA	겠/EP	습니다/EF	./SF	"/SS	"/SS	그러/VV	면/EC	부/XPN	킹/NNG	은/JX	어떻/VA	게/EC	하/VV	ㄹ까요/EF	?/SF	-82
+"/SS	날짜/NNG	를/JKO	언제/NP	로/JKB	하/VV	ㄹ까요/EF	?/SF	"/SS	"/SS	4/SN	월/NNB	둘째/NR	주/NNB	일요일/NNG	이/JKS	좋/VA	겠/EP	습니다/EF	./SF	"/SS	"/SS	그러/VV	면/EC	부/XPN	킹/NNG	은/JX	어떻/VA	게/EC	하/VV	ㄹ까요/EF	?/SF	-86.06
+"/SS	날짜/NNG	를/JKO	언제/NP	로/JKB	하/VV	ㄹ까요/EF	?/SF	"/SS	"/SS	4/SN	월/NNB	둘째/NR	주/NNB	일요일/NNG	이/JKS	좋/VA	겠/EP	습니다/EF	./SF	"/SS	"/SS	그렇/VA	면/EC	부/XPN	킹/NNG	은/JX	어떻/VA	게/EC	하/VV	ㄹ까요/EF	?/SF	-86.24
+"/SS	날짜/NNG	를/JKO	언제/NP	로/JKB	하/VV	ㄹ까요/EF	?/SF	"/SS	"/SS	4/SN	월/NNB	둘째/NR	주/NNB	일요일/NNG	이/JKS	좋/VA	겠/EP	습니다/EF	./SF	"/SS	"/SS	그러/VV	면/EC	부/XPN	킹/NNG	은/JX	어떻/VA	게/EC	하/VX	ㄹ까요/EF	?/SF	-86.25
 
 제가 할까요, 아니면 선생님께서 하시겠습니까?" "어디가 가능하십니까?" "저는 개인적으로 IR회원권을 갖고 있습니다." "좋습니다." "그러면 4월 둘째주 오전으로 부킹을 하겠습니다.	0.779
 제/NP	가/JKS	하/VV	ㄹ까/EC	요/JX	,/SP	아니/VCN	면/EC	선생/NNG	님/XSN	께서/JKS	하/VV	시/EP	겠/EP	습니까/EF	?/SF	"/SS	"/SS	어디/NP	가/JKS	가능/NNG	하/XSA	시/EP	ㅂ니까/EF	?/SF	"/SS	"/SS	저/NP	는/JX	개인/NNG	적/XSN	으로/JKB	IR/SL	회원권/NNG	을/JKO	갖/VV	고/EC	있/VX	습니다/EF	./SF	"/SS	"/SS	좋/VA	습니다/EF	./SF	"/SS	"/SS	그러면/MAJ	4/SN	월/NNB	둘째/NR	주/NNG	오전/NNG	으로/JKB	부킹/NNG	을/JKO	하/VV	겠/EP	습니다/EF	./SF	
-저/NP	가/JKS	하/VV	ㄹ까요/EF	,/SP	아니/VCN	면/EC	선생/NNG	님/XSN	께서/JKS	하/VV	시/EP	겠/EP	습니까/EF	?/SF	"/SS	"/SS	어디/NP	가/JKS	가능/NNG	하/XSV	시/EP	ㅂ니까/EF	?/SF	"/SS	"/SS	저/NP	는/JX	개인/NNG	적/XSN	으로/JKB	IR/SL	회원권/NNG	을/JKO	갖/VV	고/EC	있/VX	습니다/EF	./SF	"/SS	"/SS	좋/VA	습니다/EF	./SF	"/SS	"/SS	그러/VV	면/EC	4/SN	월/NNB	둘째/NR	주/NNB	오전/NNG	으로/JKB	부/XPN	킹/NNG	을/JKO	하/VV	겠/EP	습니다/EF	./SF	-138.5
-저/NP	가/JKS	하/VX	ㄹ까요/EF	,/SP	아니/VCN	면/EC	선생/NNG	님/XSN	께서/JKS	하/VV	시/EP	겠/EP	습니까/EF	?/SF	"/SS	"/SS	어디/NP	가/JKS	가능/NNG	하/XSV	시/EP	ㅂ니까/EF	?/SF	"/SS	"/SS	저/NP	는/JX	개인/NNG	적/XSN	으로/JKB	IR/SL	회원권/NNG	을/JKO	갖/VV	고/EC	있/VX	습니다/EF	./SF	"/SS	"/SS	좋/VA	습니다/EF	./SF	"/SS	"/SS	그러/VV	면/EC	4/SN	월/NNB	둘째/NR	주/NNB	오전/NNG	으로/JKB	부/XPN	킹/NNG	을/JKO	하/VV	겠/EP	습니다/EF	./SF	-138.7
-저/NP	가/JKS	하/VV	ㄹ까요/EF	,/SP	아니/VCN	면/EC	선생/NNG	님/XSN	께서/JKS	하/VV	시/EP	겠/EP	습니까/EF	?/SF	"/SS	"/SS	어디/NP	가/JKS	가능/NNG	하/XSV	시/EP	ㅂ니까/EF	?/SF	"/SS	"/SS	저/NP	는/JX	개인/NNG	적/XSN	으로/JKB	IR/SL	회원권/NNG	을/JKO	갖/VV	고/EC	있/VX	습니다/EF	./SF	"/SS	"/SS	좋/VA	습니다/EF	./SF	"/SS	"/SS	그러/VV	면/EC	4/SN	월/NNB	둘째/NR	주/NNB	오전/NNG	으로/JKB	부/XPN	킹/NNG	을/JKO	하/VX	겠/EP	습니다/EF	./SF	-139.2
+저/NP	가/JKS	하/VV	ㄹ까요/EF	,/SP	아니/VCN	면/EC	선생/NNG	님/XSN	께서/JKS	하/VV	시/EP	겠/EP	습니까/EF	?/SF	"/SS	"/SS	어디/NP	가/JKS	가능/NNG	하/XSV	시/EP	ㅂ니까/EF	?/SF	"/SS	"/SS	저/NP	는/JX	개인/NNG	적/XSN	으로/JKB	IR/SL	회원권/NNG	을/JKO	갖/VV	고/EC	있/VX	습니다/EF	./SF	"/SS	"/SS	좋/VA	습니다/EF	./SF	"/SS	"/SS	그러/VV	면/EC	4/SN	월/NNB	둘째/NR	주/NNB	오전/NNG	으로/JKB	부/XPN	킹/NNG	을/JKO	하/VV	겠/EP	습니다/EF	./SF	-142.7
+저/NP	가/JKS	하/VV	ㄹ까요/EF	,/SP	아니/VCN	면/EC	선생/NNG	님/XSN	께서/JKS	하/VV	시/EP	겠/EP	습니까/EF	?/SF	"/SS	"/SS	어디/NP	가/JKS	가능/NNG	하/XSV	시/EP	ㅂ니까/EF	?/SF	"/SS	"/SS	저/NP	는/JX	개인/NNG	적/XSN	으로/JKB	IR/SL	회원권/NNG	을/JKO	갖/VV	고/EC	있/VX	습니다/EF	./SF	"/SS	"/SS	좋/VA	습니다/EF	./SF	"/SS	"/SS	그렇/VA	면/EC	4/SN	월/NNB	둘째/NR	주/NNB	오전/NNG	으로/JKB	부/XPN	킹/NNG	을/JKO	하/VV	겠/EP	습니다/EF	./SF	-142.9
+저/NP	가/JKS	하/VX	ㄹ까요/EF	,/SP	아니/VCN	면/EC	선생/NNG	님/XSN	께서/JKS	하/VV	시/EP	겠/EP	습니까/EF	?/SF	"/SS	"/SS	어디/NP	가/JKS	가능/NNG	하/XSV	시/EP	ㅂ니까/EF	?/SF	"/SS	"/SS	저/NP	는/JX	개인/NNG	적/XSN	으로/JKB	IR/SL	회원권/NNG	을/JKO	갖/VV	고/EC	있/VX	습니다/EF	./SF	"/SS	"/SS	좋/VA	습니다/EF	./SF	"/SS	"/SS	그러/VV	면/EC	4/SN	월/NNB	둘째/NR	주/NNB	오전/NNG	으로/JKB	부/XPN	킹/NNG	을/JKO	하/VV	겠/EP	습니다/EF	./SF	-142.9
 
 시간이 확정되면 수요일까지 연락을 드리겠습니다." 날짜는 임박하게 잡지 말고 2～4주 후로 여유를 갖는 것이 좋다.	0.9
 시간/NNG	이/JKS	확정/NNG	되/XSV	면/EC	수요일/NNG	까지/JX	연락/NNG	을/JKO	드리/VV	겠/EP	습니다/EF	./SF	"/SS	날짜/NNG	는/JX	임박/XR	하/XSV	게/EC	잡/VV	지/EC	말/VX	고/EC	2/SN	～/SO	4/SN	주/NNB	후/NNG	로/JKB	여유/NNG	를/JKO	갖/VV	는/ETM	것/NNB	이/JKS	좋/VA	다/EF	./SF	

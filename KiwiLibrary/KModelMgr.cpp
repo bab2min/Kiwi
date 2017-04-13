@@ -21,7 +21,7 @@ void KModelMgr::loadPOSFromTxt(const char * filename)
 		g = P_MIN;
 	}
 	FILE* file;
-	if (fopen_s(&file, filename, "r")) throw exception();
+	if (fopen_s(&file, filename, "r")) throw ios_base::failure{ string("Cannot open ") + filename };
 	char buf[2048];
 	wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
 	while (fgets(buf, 2048, file))
@@ -97,7 +97,7 @@ void KModelMgr::loadPOSFromTxt(const char * filename)
 void KModelMgr::savePOSBin(const char * filename) const
 {
 	FILE* f;
-	if (fopen_s(&f, filename, "wb")) throw exception();
+	if (fopen_s(&f, filename, "wb")) throw ios_base::failure{ string("Cannot open ") + filename };
 	fwrite(posTransition, 1, sizeof(posTransition), f);
 	fwrite(maxiumBtwn, 1, sizeof(maxiumBtwn), f);
 	fwrite(maxiumVBtwn, 1, sizeof(maxiumVBtwn), f);
@@ -107,7 +107,7 @@ void KModelMgr::savePOSBin(const char * filename) const
 void KModelMgr::loadPOSBin(const char * filename)
 {
 	FILE* f;
-	if (fopen_s(&f, filename, "rb")) throw exception();
+	if (fopen_s(&f, filename, "rb")) throw ios_base::failure{string("Cannot open ") + filename};
 	fread(posTransition, 1, sizeof(posTransition), f);
 	fread(maxiumBtwn, 1, sizeof(maxiumBtwn), f);
 	fread(maxiumVBtwn, 1, sizeof(maxiumVBtwn), f);
@@ -117,7 +117,7 @@ void KModelMgr::loadPOSBin(const char * filename)
 void KModelMgr::loadMMFromTxt(const char * filename, unordered_map<pair<string, KPOSTag>, size_t>& morphMap)
 {
 	FILE* file;
-	if (fopen_s(&file, filename, "r")) throw exception();
+	if (fopen_s(&file, filename, "r")) throw ios_base::failure{ string("Cannot open ") + filename };
 	char buf[2048];
 	wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
 	while (fgets(buf, 2048, file))
@@ -176,7 +176,7 @@ void KModelMgr::loadMMFromTxt(const char * filename, unordered_map<pair<string, 
 void KModelMgr::loadCMFromTxt(const char * filename, unordered_map<pair<string, KPOSTag>, size_t>& morphMap)
 {
 	FILE* file;
-	if (fopen_s(&file, filename, "r")) throw exception();
+	if (fopen_s(&file, filename, "r")) throw ios_base::failure{ string("Cannot open ") + filename };
 	char buf[2048];
 	wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
 	while (fgets(buf, 2048, file))
@@ -253,7 +253,7 @@ void KModelMgr::loadCMFromTxt(const char * filename, unordered_map<pair<string, 
 void KModelMgr::loadPCMFromTxt(const char * filename, unordered_map<pair<string, KPOSTag>, size_t>& morphMap)
 {
 	FILE* file;
-	if (fopen_s(&file, filename, "r")) throw exception();
+	if (fopen_s(&file, filename, "r")) throw ios_base::failure{ string("Cannot open ") + filename };
 	char buf[2048];
 	wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
 	while (fgets(buf, 2048, file))
@@ -283,7 +283,7 @@ void KModelMgr::loadPCMFromTxt(const char * filename, unordered_map<pair<string,
 void KModelMgr::saveMorphBin(const char * filename) const
 {
 	FILE* f;
-	if (fopen_s(&f, filename, "wb")) throw exception();
+	if (fopen_s(&f, filename, "wb")) throw ios_base::failure{ string("Cannot open ") + filename };
 	fwrite("KIWI", 1, 4, f);
 	size_t s = forms.size();
 	fwrite(&s, 1, 4, f);
@@ -309,7 +309,7 @@ void KModelMgr::saveMorphBin(const char * filename) const
 void KModelMgr::loadMorphBin(const char * filename)
 {
 	FILE* f;
-	if (fopen_s(&f, filename, "rb")) throw exception();
+	if (fopen_s(&f, filename, "rb")) throw ios_base::failure{ string("Cannot open ") + filename };
 	size_t formSize = 0, morphemeSize = 0;
 	fread(&formSize, 1, 4, f);
 	fread(&formSize, 1, 4, f);
@@ -335,7 +335,7 @@ void KModelMgr::loadMorphBin(const char * filename)
 	fclose(f);
 }
 
-KModelMgr::KModelMgr(const char * posFile, const char * morphemeFile, const char * combinedFile, const char* precombinedFile)
+KModelMgr::KModelMgr(const char * modelPath)
 {
 	/*
 	unordered_map<pair<string, KPOSTag>, size_t> morphMap;
@@ -346,8 +346,8 @@ KModelMgr::KModelMgr(const char * posFile, const char * morphemeFile, const char
 	savePOSBin((posFile + string(".bin")).c_str());
 	saveMorphBin((morphemeFile + string(".bin")).c_str());
 	/*/
-	loadPOSBin((posFile + string(".bin")).c_str());
-	loadMorphBin((morphemeFile + string(".bin")).c_str());
+	loadPOSBin((modelPath + string("pos.bin")).c_str());
+	loadMorphBin((modelPath + string("fullmodel.bin")).c_str());
 	//*/
 }
 
@@ -369,6 +369,16 @@ void KModelMgr::addUserRule(const string & form, const vector<pair<string, KPOST
 	if (!form.empty()) extraTrieSize += form.size() - 1;
 #else
 #endif
+
+	auto& f = formMapper(form);
+	f.candidate.emplace_back((const KMorpheme*)morphemes.size());
+	morphemes.emplace_back(form, KPOSTag::UNKNOWN);
+	morphemes.back().chunks.resize(morphs.size());
+	iota(morphemes.back().chunks.begin(), morphemes.back().chunks.end(), (const KMorpheme*)morphemes.size());
+	for (auto& m : morphs)
+	{
+		morphemes.emplace_back(m.first, m.second);
+	}
 }
 
 void KModelMgr::solidify()
