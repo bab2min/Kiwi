@@ -24,9 +24,6 @@
     <ClInclude Include="targetver.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="HangulMacro.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="KTrie.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -43,6 +40,9 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Kiwi.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="KiwiHeader.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

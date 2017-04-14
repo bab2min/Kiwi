@@ -3,7 +3,7 @@
 #include "KTest.h"
 #include "../KiwiLibrary/Utils.h"
 
-KWordPair parseWordPOS(wstring str)
+KWordPair parseWordPOS(k_wstring str)
 {
 	if (str[0] == '/' && str[1] == '/')
 	{
@@ -26,7 +26,7 @@ KTest::KTest(const char * testSetFile, Kiwi* kw, size_t topN) : totalCount(0), t
 	FILE* f = nullptr;
 	if (fopen_s(&f, testSetFile, "r")) throw exception();
 	char buf[4096];
-	wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
+	wstring_convert<codecvt_utf8_utf16<k_wchar>> converter;
 	while (fgets(buf, 4096, f))
 	{
 		try 

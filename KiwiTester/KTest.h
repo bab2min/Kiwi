@@ -6,7 +6,7 @@ public:
 	typedef vector<KWordPair> AnswerType;
 	struct TestResult
 	{
-		wstring q;
+		k_wstring q;
 		AnswerType a;
 		AnswerType r;
 		vector<KResult> cands;

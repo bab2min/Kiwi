@@ -2,10 +2,10 @@
 
 #define LEN_ARRAY(p) (sizeof(p)/sizeof(p[0]))
 
-string splitJamo(wstring hangul);
-wstring joinJamo(string jm);
-bool verifyHangul(wstring hangul);
-void splitJamo(wchar_t hangul, string& ret);
+string splitJamo(k_wstring hangul);
+k_wstring joinJamo(string jm);
+bool verifyHangul(k_wstring hangul);
+void splitJamo(k_wchar hangul, string& ret);
 void printJM(const char* c, size_t len = -1);
 void printJM(const string& c);
 void printJM(const KChunk& c, const char* p);
@@ -22,20 +22,21 @@ string encodeJamo(Iter begin, Iter end) {
 }
 
 template<typename Out>
-void split(const wstring &s, wchar_t delim, Out result) {
-	wstringstream ss;
+void split(const k_wstring &s, k_wchar delim, Out result) {
+	basic_stringstream<k_wchar> ss;
 	ss.str(s);
-	wstring item;
+	k_wstring item;
 	while (getline(ss, item, delim)) {
 		*(result++) = item;
 	}
 }
 
-inline vector<wstring> split(const wstring &s, wchar_t delim) {
-	vector<wstring> elems;
+inline vector<k_wstring> split(const k_wstring &s, k_wchar delim) {
+	vector<k_wstring> elems;
 	split(s, delim, back_inserter(elems));
 	return elems;
 }
+
 
 template<typename Out>
 void split(const string &s, char delim, Out result) {
@@ -52,22 +53,3 @@ inline vector<string> split(const string &s, char delim) {
 	split(s, delim, back_inserter(elems));
 	return elems;
 }
-
-class Timer
-{
-public:
-	chrono::steady_clock::time_point point;
-	Timer()
-	{
-		reset();
-	}
-	void reset()
-	{
-		point = chrono::high_resolution_clock::now();
-	}
-
-	double getElapsed() const
-	{
-		return chrono::duration <double, milli>(chrono::high_resolution_clock::now() - point).count();
-	}
-};

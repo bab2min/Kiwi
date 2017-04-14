@@ -145,10 +145,10 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="HangulMacro.h" />
     <ClInclude Include="KFeatureTestor.h" />
     <ClInclude Include="KForm.h" />
     <ClInclude Include="Kiwi.h" />
+    <ClInclude Include="KiwiHeader.h" />
     <ClInclude Include="KModelMgr.h" />
     <ClInclude Include="KTrie.h" />
     <ClInclude Include="stdafx.h" />

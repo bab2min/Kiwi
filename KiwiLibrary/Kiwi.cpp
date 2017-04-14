@@ -6,10 +6,19 @@
 #define DIVIDE_BOUND 6
 
 
-KPOSTag Kiwi::identifySpecialChr(wchar_t chr)
+KPOSTag Kiwi::identifySpecialChr(k_wchar chr)
 {
-	if (isspace(chr)) return KPOSTag::UNKNOWN;
-	if (isdigit(chr)) return KPOSTag::SN;
+	switch (chr)
+	{
+	case ' ':
+	case '\t':
+	case '\r':
+	case '\n':
+	case '\v':
+	case '\f':
+		return KPOSTag::UNKNOWN;
+	}
+	if (iswdigit(chr)) return KPOSTag::SN;
 	if (('A' <= chr && chr <= 'Z') ||
 		('a' <= chr && chr <= 'z'))  return KPOSTag::SL;
 	if (0xac00 <= chr && chr < 0xd7a4) return KPOSTag::MAX;
@@ -79,7 +88,7 @@ KPOSTag Kiwi::identifySpecialChr(wchar_t chr)
 	return KPOSTag::SW;
 }
 
-vector<vector<KWordPair>> Kiwi::splitPart(const wstring & str)
+vector<vector<KWordPair>> Kiwi::splitPart(const k_wstring & str)
 {
 	vector<vector<KWordPair>> ret;
 	ret.emplace_back();
@@ -93,7 +102,7 @@ vector<vector<KWordPair>> Kiwi::splitPart(const wstring & str)
 		}
 		if (ret.back().empty())
 		{
-			ret.back().emplace_back(wstring{ &c, 1 }, tag);
+			ret.back().emplace_back(k_wstring{ &c, 1 }, tag);
 			continue;
 		}
 		if ((ret.back().back().second == KPOSTag::SN && c == '.') ||
@@ -103,7 +112,7 @@ vector<vector<KWordPair>> Kiwi::splitPart(const wstring & str)
 			continue;
 		}
 		if (ret.back().back().second == KPOSTag::SF) ret.emplace_back();
-		ret.back().emplace_back(wstring{ &c , 1 }, tag);
+		ret.back().emplace_back(k_wstring{ &c , 1 }, tag);
 	}
 	return ret;
 }
@@ -113,14 +122,14 @@ Kiwi::Kiwi(const char * modelPath, size_t _maxCache) : maxCache(_maxCache)
 	mdl = make_shared<KModelMgr>(modelPath);
 }
 
-int Kiwi::addUserWord(const wstring & str, KPOSTag tag)
+int Kiwi::addUserWord(const k_wstring & str, KPOSTag tag)
 {
 	if (!verifyHangul(str)) return -1;
 	mdl->addUserWord(splitJamo(str), tag);
 	return 0;
 }
 
-int Kiwi::addUserRule(const wstring & str, const vector<pair<wstring, KPOSTag>>& morph)
+int Kiwi::addUserRule(const k_wstring & str, const vector<pair<k_wstring, KPOSTag>>& morph)
 {
 	if (!verifyHangul(str)) return -1;
 	vector<pair<string, KPOSTag>> jmMorph;
@@ -139,7 +148,7 @@ int Kiwi::loadUserDictionary(const char * userDictPath)
 	FILE* file = nullptr;
 	if (fopen_s(&file, userDictPath, "r")) return -1;
 	char buf[4096];
-	wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
+	wstring_convert<codecvt_utf8_utf16<k_wchar>, k_wchar> converter;
 	while (fgets(buf, 4096, file))
 	{
 		if (buf[0] == '#') continue;
@@ -156,7 +165,7 @@ int Kiwi::loadUserDictionary(const char * userDictPath)
 			}
 		}
 		
-		vector<pair<wstring, KPOSTag>> morphs;
+		vector<pair<k_wstring, KPOSTag>> morphs;
 		for (size_t i = 1; i < chunks.size(); i++) 
 		{
 			auto cc = split(chunks[i], '/');
@@ -196,7 +205,7 @@ vector<char> getBacks(const vector<pair<vector<char>, float>>& cands)
 	return ret;
 }
 
-KResult Kiwi::analyze(const wstring & str) const
+KResult Kiwi::analyze(const k_wstring & str) const
 {
 	KResult ret;
 	auto parts = splitPart(str);
@@ -219,7 +228,7 @@ KResult Kiwi::analyze(const wstring & str) const
 	return ret;
 }
 
-vector<KResult> Kiwi::analyze(const wstring & str, size_t topN) const
+vector<KResult> Kiwi::analyze(const k_wstring & str, size_t topN) const
 {
 	vector<KResult> cands(1);
 	auto parts = splitPart(str);
