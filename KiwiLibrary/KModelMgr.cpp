@@ -4,18 +4,21 @@
 #include "KTrie.h"
 #include "Utils.h"
 
-
-template <>
-class hash<pair<string, KPOSTag>> {
-public:
-	size_t operator() (const pair<string, KPOSTag>& o) const
-	{
-		return hash_value(o.first) ^ (size_t)o.second;
+namespace std
+{
+	template <>
+	class hash<pair<string, KPOSTag>> {
+	public:
+		size_t operator() (const pair<string, KPOSTag>& o) const
+		{
+			return hash<string>{}(o.first) ^ (size_t)o.second;
+		};
 	};
-};
+}
 
 void KModelMgr::loadPOSFromTxt(const char * filename)
 {
+#ifdef LOAD_TXT
 	for (auto& f : posTransition) for (auto& g : f)
 	{
 		g = P_MIN;
@@ -23,7 +26,7 @@ void KModelMgr::loadPOSFromTxt(const char * filename)
 	FILE* file;
 	if (fopen_s(&file, filename, "r")) throw ios_base::failure{ string("Cannot open ") + filename };
 	char buf[2048];
-	wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
+	wstring_convert<codecvt_utf8_utf16<k_wchar>, k_wchar> converter;
 	while (fgets(buf, 2048, file))
 	{
 		auto wstr = converter.from_bytes(buf);
@@ -40,7 +43,7 @@ void KModelMgr::loadPOSFromTxt(const char * filename)
 		{
 			auto tagB = makePOSTag(fields[1]);
 			if (tagB == KPOSTag::MAX) continue;
-			auto p = _wtof(fields[2].c_str());
+			auto p = stof(fields[2].c_str());
 			if (p < 0.00007) continue;
 			posTransition[(int)tagA][(int)tagB] = logf(p);
 		}
@@ -92,6 +95,7 @@ void KModelMgr::loadPOSFromTxt(const char * filename)
 		}
 		maxiumVBtwn[i][j] = (KPOSTag)maxPos;
 	}
+#endif
 }
 
 void KModelMgr::savePOSBin(const char * filename) const
@@ -116,10 +120,11 @@ void KModelMgr::loadPOSBin(const char * filename)
 
 void KModelMgr::loadMMFromTxt(const char * filename, unordered_map<pair<string, KPOSTag>, size_t>& morphMap)
 {
+#ifdef LOAD_TXT
 	FILE* file;
 	if (fopen_s(&file, filename, "r")) throw ios_base::failure{ string("Cannot open ") + filename };
 	char buf[2048];
-	wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
+	wstring_convert<codecvt_utf8_utf16<k_wchar>, k_wchar> converter;
 	while (fgets(buf, 2048, file))
 	{
 		auto wstr = converter.from_bytes(buf);
@@ -129,16 +134,16 @@ void KModelMgr::loadMMFromTxt(const char * filename, unordered_map<pair<string, 
 
 		auto form = encodeJamo(fields[0].cbegin(), fields[0].cend());
 		auto tag = makePOSTag(fields[1]);
-		float morphWeight = _wtof(fields[2].c_str());
+		float morphWeight = stof(fields[2]);
 		if (morphWeight < 10 && tag >= KPOSTag::JKS)
 		{
 			continue;
 		}
-		float tagWeight = _wtof(fields[3].c_str());
-		float vowel = _wtof(fields[5].c_str());
-		float vocalic = _wtof(fields[6].c_str());
-		float vocalicH = _wtof(fields[7].c_str());
-		float positive = _wtof(fields[8].c_str());
+		float tagWeight = stof(fields[3]);
+		float vowel = stof(fields[5]);
+		float vocalic = stof(fields[6]);
+		float vocalicH = stof(fields[7]);
+		float positive = stof(fields[8]);
 
 		KCondVowel cvowel = KCondVowel::none;
 		KCondPolarity polar = KCondPolarity::none;
@@ -170,15 +175,17 @@ void KModelMgr::loadMMFromTxt(const char * filename, unordered_map<pair<string, 
 		morphemes.emplace_back(form, tag, cvowel, polar, logf(tagWeight));
 	}
 	fclose(file);
+#endif
 }
 
 
 void KModelMgr::loadCMFromTxt(const char * filename, unordered_map<pair<string, KPOSTag>, size_t>& morphMap)
 {
+#ifdef LOAD_TXT
 	FILE* file;
 	if (fopen_s(&file, filename, "r")) throw ios_base::failure{ string("Cannot open ") + filename };
 	char buf[2048];
-	wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
+	wstring_convert<codecvt_utf8_utf16<k_wchar>, k_wchar> converter;
 	while (fgets(buf, 2048, file))
 	{
 		auto wstr = converter.from_bytes(buf);
@@ -221,8 +228,8 @@ void KModelMgr::loadCMFromTxt(const char * filename, unordered_map<pair<string, 
 
 		KCondVowel vowel = morphemes[((size_t)chunkIds[0])].vowel;
 		KCondPolarity polar = morphemes[((size_t)chunkIds[0])].polar;
-		wstring conds[] = { L"+", L"+Vowel", L"+Vocalic", L"+VocalicH" };
-		wstring conds2[] = { L"+", L"+Positive", L"-Positive"};
+		k_wstring conds[] = { KSTR("+"), KSTR("+Vowel"), KSTR("+Vocalic"), KSTR("+VocalicH") };
+		k_wstring conds2[] = { KSTR("+"), KSTR("+Positive"), KSTR("-Positive")};
 		auto pm = find(conds, conds + LEN_ARRAY(conds), fields[2]);
 		if (pm < conds + LEN_ARRAY(conds))
 		{
@@ -236,7 +243,7 @@ void KModelMgr::loadCMFromTxt(const char * filename, unordered_map<pair<string, 
 		char combineSocket = 0;
 		if (fields.size() >= 4)
 		{
-			combineSocket = _wtoi(fields[3].c_str());
+			combineSocket = stoi(fields[3]);
 		}
 
 		size_t mid = morphemes.size();
@@ -247,15 +254,17 @@ void KModelMgr::loadCMFromTxt(const char * filename, unordered_map<pair<string, 
 		morphemes.back().chunks = move(chunkIds);
 	}
 	fclose(file);
+#endif
 }
 
 
 void KModelMgr::loadPCMFromTxt(const char * filename, unordered_map<pair<string, KPOSTag>, size_t>& morphMap)
 {
+#ifdef LOAD_TXT
 	FILE* file;
 	if (fopen_s(&file, filename, "r")) throw ios_base::failure{ string("Cannot open ") + filename };
 	char buf[2048];
-	wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
+	wstring_convert<codecvt_utf8_utf16<k_wchar>, k_wchar> converter;
 	while (fgets(buf, 2048, file))
 	{
 		auto wstr = converter.from_bytes(buf);
@@ -266,9 +275,9 @@ void KModelMgr::loadPCMFromTxt(const char * filename, unordered_map<pair<string,
 		auto combs = split(fields[0], '+');
 		auto form = encodeJamo(combs[0].cbegin(), combs[0].cend());
 		auto tag = makePOSTag(fields[1]);
-		float tagWeight = _wtof(fields[2].c_str());
+		float tagWeight = stof(fields[2]);
 		string suffixes = encodeJamo(fields[3].cbegin(), fields[3].cend());
-		char socket = _wtoi(fields[4].c_str());
+		char socket = stoi(fields[4]);
 
 		size_t mid = morphemes.size();
 		morphMap.emplace(make_pair(form, tag), mid);
@@ -278,6 +287,7 @@ void KModelMgr::loadPCMFromTxt(const char * filename, unordered_map<pair<string,
 		morphemes.emplace_back(form, tag, KCondVowel::none, KCondPolarity::none, logf(tagWeight), socket);
 	}
 	fclose(file);
+#endif
 }
 
 void KModelMgr::saveMorphBin(const char * filename) const

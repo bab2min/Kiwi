@@ -5,6 +5,25 @@
 #include "../KiwiLibrary/Utils.h"
 #include "KTest.h"
 
+class Timer
+{
+public:
+	chrono::steady_clock::time_point point;
+	Timer()
+	{
+		reset();
+	}
+	void reset()
+	{
+		point = chrono::high_resolution_clock::now();
+	}
+
+	double getElapsed() const
+	{
+		return chrono::duration <double, milli>(chrono::high_resolution_clock::now() - point).count();
+	}
+};
+
 int main()
 {
 	system("chcp 65001");

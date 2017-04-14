@@ -1,21 +1,6 @@
-// stdafx.h : include file for standard system include files,
-// or project specific include files that are used frequently, but
-// are changed infrequently
-//
-
 #pragma once
-#ifdef _WIN32
-#include "targetver.h"
-#endif
 #include <stdio.h>
-#include <tchar.h>
-
-
-
-// TODO: reference additional headers your program requires here
-#include <stdio.h>
-#include <tchar.h>
-
+#include <cstring>
 #include <cassert>
 #include <cmath>
 
@@ -39,4 +24,22 @@
 #include <codecvt>
 
 #include <chrono>
+
 using namespace std;
+
+#define TRIE_ALLOC_ARRAY
+
+#ifdef _WIN32
+typedef wchar_t k_wchar;
+typedef wstring k_wstring;
+#define KSTR(x) L##x
+#else
+typedef char16_t k_wchar;
+typedef u16string k_wstring;
+#define KSTR(x) u##x
+inline int fopen_s(FILE** f, const char* p, const char* m)
+{
+	*f = fopen(p, m);
+	return !*f;
+}
+#endif

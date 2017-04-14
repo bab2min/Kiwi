@@ -1,35 +1,8 @@
-
 #pragma once
 
+#ifdef _WIN32
 #include "targetver.h"
-
-#include <stdio.h>
 #include <tchar.h>
+#endif
 
-#include <cassert>
-#include <cmath>
-
-#include <array>
-#include <vector>
-#include <unordered_map>
-#include <unordered_set>
-#include <deque>
-#include <bitset>
-
-#include <algorithm>
-#include <functional>
-#include <numeric>
-
-#include <string>
-#include <sstream>
-#include <iostream>
-
-#include <memory>
-#include <locale>
-#include <codecvt>
-
-#include <chrono>
-
-using namespace std;
-
-#define TRIE_ALLOC_ARRAY
+#include "KiwiHeader.h"

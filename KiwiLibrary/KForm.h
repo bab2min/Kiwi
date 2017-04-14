@@ -42,7 +42,7 @@ enum class KCondPolarity : char
 	negative
 };
 
-KPOSTag makePOSTag(wstring tagStr);
+KPOSTag makePOSTag(k_wstring tagStr);
 const char* tagToString(KPOSTag t);
 struct KForm;
 

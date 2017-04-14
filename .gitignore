@@ -244,3 +244,14 @@ ModelManifest.xml
 /ModelGenerator/ML_lit.txt
 /KiwiLibrary/wrongs.txt
 /KiwiLibrary/wrongs.txt
+/KiwiRunLinux/readme
+/KiwiRunLinux/readme/stylesheet.css
+/KiwiRunLinux/readme/readme.html
+/KiwiRunLinux/readme/images/postbuild.png
+/KiwiRunLinux/readme/images/OutputTypes.gif
+/KiwiRunLinux/readme/images/ManageConnections.gif
+/KiwiRunLinux/readme/images/linker.png
+/KiwiRunLinux/readme/images/firstconnection.png
+/KiwiRunLinux/readme/images/debuggerexport.png
+/KiwiRunLinux/readme/images/ChangeRemote.gif
+/KiwiRunLinux/readme/images/ArchOptions.gif

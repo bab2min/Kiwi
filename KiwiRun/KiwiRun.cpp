@@ -2,8 +2,13 @@
 //
 
 #include "stdafx.h"
+#ifdef _WIN32
+#include "../KiwiLibrary/KiwiHeader.h"
 #include "../KiwiLibrary/Kiwi.h"
-
+#else
+#include "../KiwiLibraryLinux/KiwiHeader.h"
+#include "../KiwiLibraryLinux/Kiwi.h"
+#endif
 unordered_map<string, vector<string>> parseArg(int argc, const char** argv)
 {
 	unordered_map<string, vector<string>> ret;
@@ -42,9 +47,10 @@ void help()
 
 int main(int argc, const char** argv)
 {
+#ifdef _WIN32
 	system("chcp 65001");
 	_wsetlocale(LC_ALL, L"korean");
-
+#endif
 	auto arg = parseArg(argc - 1, argv + 1);
 	string model = "";
 	string userDict = "";
@@ -114,7 +120,7 @@ int main(int argc, const char** argv)
 			continue;
 		}
 		char buf[8192];
-		wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
+		wstring_convert<codecvt_utf8_utf16<k_wchar>, k_wchar> converter;
 		while (fgets(buf, 8192, f))
 		{
 			try
@@ -125,7 +131,14 @@ int main(int argc, const char** argv)
 				{
 					for (const auto& m : c.first)
 					{
-						if (of == stdout) fputws(m.first.c_str(), of);
+						if (of == stdout)
+						{
+#ifdef _WIN32
+							fputws(m.first.c_str(), of);
+#else
+							fputs(converter.to_bytes(m.first).c_str(), of);
+#endif
+						}
 						else fputs(converter.to_bytes(m.first).c_str(), of);
 						fputc('/', of);
 						fputs(tagToString(m.second), of);
