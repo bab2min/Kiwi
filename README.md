@@ -21,6 +21,10 @@ Kiwi는 C++기반의 한국어 형태소 분석기 라이브러리입니다.
     (정답) 둥글둥글/MAG	하/XSA	ㄴ/ETM	돌/NNG	은/JX	아무리/MAG	구르/VV	어도/EC	흔적/NNG	이/JKS	남/VV	지/EC	않/VX	습니다/EF	./SF
     (Kiwi) 둥글둥글/MAG	하/XSV	ㄴ/ETM	돌/VV	은/ETM	아무리/MAG	구르/VV	어도/EC	흔적/NNG	이/JKS	남/VV	지/EC	않/VX	습니다/EF	./SF
 
+### 데모
+
+https://lab.bab2min.pe.kr/kiwi 에서 데모를 실행해 볼 수 있습니다.
+
 
 ### 라이센스
 Kiwi는 LGPL v3 라이센스로 배포됩니다. 
