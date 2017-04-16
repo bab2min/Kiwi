@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "KForm.h"
-
+struct KChunk;
+#include "Utils.h"
 #ifdef _DEBUG
 size_t KMorpheme::uid = 0;
 #endif
@@ -91,6 +92,7 @@ KForm::KForm(const char * _form)
 
 void KForm::updateCond()
 {
+	if (candidate.empty()) return;
 	KCondVowel cv = candidate[0]->vowel;
 	KCondPolarity cp = candidate[0]->polar;
 	//maxP = candidate[0]->p;
@@ -101,7 +103,7 @@ void KForm::updateCond()
 			cv = (int)cv && (int)m->vowel ? KCondVowel::any : KCondVowel::none;
 		}
 		if (cp != m->polar) cp = KCondPolarity::none;
-		if (!m->chunks.empty() && m->chunks[0]->tag == KPOSTag::V) hasFirstV = true;
+		if (m->chunks && m->chunks->at(0)->tag == KPOSTag::V) hasFirstV = true;
 		//if (m->p > maxP) maxP = m->p;
 	}
 	vowel = cv;
@@ -127,6 +129,7 @@ void readString(string& str, FILE* f)
 void KForm::readFromBin(FILE * f, const function<const KMorpheme*(size_t)>& mapper)
 {
 	readString(form, f);
+	wform = joinJamo(form);
 	size_t s = 0;
 	fread(&s, 1, 4, f);
 	candidate.resize(s);
@@ -173,7 +176,8 @@ void KForm::writeToBin(FILE * f, const function<size_t(const KMorpheme*)>& mappe
 
 void KMorpheme::readFromBin(FILE * f, const function<const KMorpheme*(size_t)>& mapper)
 {
-	readString(form, f);
+	kform = nullptr;
+	fread(&kform, 1, 4, f);
 	fread(&tag, 1, 1, f);
 	fread(&vowel, 1, 1, f);
 	fread(&polar, 1, 1, f);
@@ -182,27 +186,30 @@ void KMorpheme::readFromBin(FILE * f, const function<const KMorpheme*(size_t)>& 
 
 	size_t s = 0;
 	fread(&s, 1, 4, f);
-	chunks.resize(s);
-	for (auto& c : chunks)
+	if (s)
 	{
-		size_t cid = 0;
-		fread(&cid, 1, 4, f);
-		c = mapper(cid);
+		chunks = new vector<const KMorpheme*>(s);
+		for (auto& c : *chunks)
+		{
+			size_t cid = 0;
+			fread(&cid, 1, 4, f);
+			c = mapper(cid);
+		}
 	}
 }
 
 void KMorpheme::writeToBin(FILE * f, const function<size_t(const KMorpheme*)>& mapper) const
 {
-	writeString(form, f);
+	fwrite(&kform, 1, 4, f);
 	fwrite(&tag, 1, 1, f);
 	fwrite(&vowel, 1, 1, f);
 	fwrite(&polar, 1, 1, f);
 	fwrite(&combineSocket, 1, 1, f);
 	fwrite(&p, 1, 4, f);
 
-	size_t s = chunks.size();
+	size_t s = chunks ? chunks->size() : 0;
 	fwrite(&s, 1, 4, f);
-	for (auto c : chunks)
+	if(chunks) for (auto c : *chunks)
 	{
 		size_t cid = mapper(c);
 		fwrite(&cid, 1, 4, f);

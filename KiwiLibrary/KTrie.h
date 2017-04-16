@@ -17,7 +17,7 @@ struct KChunk
 
 	KChunk(const KForm* _form) : form(_form) {  }
 	KChunk(unsigned char _begin, unsigned char _end) : _(0xFFFF), begin(_begin), end(_end) {}
-	const KMorpheme* getMorpheme(size_t idx, KMorpheme* tmp, const char* ostr) const;
+	const KMorpheme* getMorpheme(size_t idx, KMorpheme* tmp) const;
 	size_t getCandSize() const;
 	bool isStr() const { return _ == 0xFFFF; }
 };

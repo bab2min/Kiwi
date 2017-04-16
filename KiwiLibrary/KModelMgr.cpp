@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "KForm.h"
-#include "KModelMgr.h"
 #include "KTrie.h"
 #include "Utils.h"
+#include "KModelMgr.h"
 
 namespace std
 {
@@ -173,6 +173,7 @@ void KModelMgr::loadMMFromTxt(const char * filename, unordered_map<pair<string, 
 		fm.candidate.emplace_back((KMorpheme*)mid);
 		fm.suffix.insert(0);
 		morphemes.emplace_back(form, tag, cvowel, polar, logf(tagWeight));
+		morphemes.back().kform = (const string*)(&fm - &forms[0]);
 	}
 	fclose(file);
 #endif
@@ -194,7 +195,7 @@ void KModelMgr::loadCMFromTxt(const char * filename, unordered_map<pair<string, 
 		if (fields.size() < 2) continue;
 		if (fields.size() == 2) fields.emplace_back();
 		auto form = encodeJamo(fields[0].cbegin(), fields[0].cend());
-		vector<const KMorpheme*> chunkIds;
+		vector<const KMorpheme*>* chunkIds = new vector<const KMorpheme*>;
 		float ps = 0;
 		size_t bTag = 0;
 		for (auto chunk : split(fields[1], '+'))
@@ -206,14 +207,16 @@ void KModelMgr::loadCMFromTxt(const char * filename, unordered_map<pair<string, 
 			auto it = morphMap.find(make_pair(f, tag));
 			if (it != morphMap.end())
 			{
-				chunkIds.emplace_back((KMorpheme*)it->second);
+				chunkIds->emplace_back((KMorpheme*)it->second);
 			}
 			else
 			{
 				size_t mid = morphemes.size();
 				morphMap.emplace(make_pair(f, tag), mid);
+				auto& fm = formMapper(f);
 				morphemes.emplace_back(f, tag);
-				chunkIds.emplace_back((KMorpheme*)mid);
+				morphemes.back().kform = (const string*)(&fm - &forms[0]);
+				chunkIds->emplace_back((KMorpheme*)mid);
 			}
 			if (bTag == (size_t)KPOSTag::V)
 			{
@@ -222,12 +225,12 @@ void KModelMgr::loadCMFromTxt(const char * filename, unordered_map<pair<string, 
 			{
 				ps += posTransition[bTag][(size_t)tag];
 			}
-			ps += morphemes[(size_t)chunkIds.back()].p;
+			ps += morphemes[(size_t)chunkIds->back()].p;
 			bTag = (size_t)tag;
 		}
 
-		KCondVowel vowel = morphemes[((size_t)chunkIds[0])].vowel;
-		KCondPolarity polar = morphemes[((size_t)chunkIds[0])].polar;
+		KCondVowel vowel = morphemes[((size_t)chunkIds->at(0))].vowel;
+		KCondPolarity polar = morphemes[((size_t)chunkIds->at(0))].polar;
 		k_wstring conds[] = { KSTR("+"), KSTR("+Vowel"), KSTR("+Vocalic"), KSTR("+VocalicH") };
 		k_wstring conds2[] = { KSTR("+"), KSTR("+Positive"), KSTR("-Positive")};
 		auto pm = find(conds, conds + LEN_ARRAY(conds), fields[2]);
@@ -241,7 +244,7 @@ void KModelMgr::loadCMFromTxt(const char * filename, unordered_map<pair<string, 
 			polar = (KCondPolarity)(pm - conds2);
 		}
 		char combineSocket = 0;
-		if (fields.size() >= 4)
+		if (fields.size() >= 4 && !fields[3].empty())
 		{
 			combineSocket = stoi(fields[3]);
 		}
@@ -251,7 +254,8 @@ void KModelMgr::loadCMFromTxt(const char * filename, unordered_map<pair<string, 
 		fm.candidate.emplace_back((KMorpheme*)mid);
 		fm.suffix.insert(0);
 		morphemes.emplace_back(form, KPOSTag::UNKNOWN, vowel, polar, ps, combineSocket);
-		morphemes.back().chunks = move(chunkIds);
+		morphemes.back().kform = (const string*)(&fm - &forms[0]);
+		morphemes.back().chunks = chunkIds;
 	}
 	fclose(file);
 #endif
@@ -273,18 +277,24 @@ void KModelMgr::loadPCMFromTxt(const char * filename, unordered_map<pair<string,
 		if (fields.size() < 5) continue;
 
 		auto combs = split(fields[0], '+');
+		auto org = combs[0] + combs[1];
 		auto form = encodeJamo(combs[0].cbegin(), combs[0].cend());
+		auto orgform = encodeJamo(org.cbegin(), org.cend());
 		auto tag = makePOSTag(fields[1]);
 		float tagWeight = stof(fields[2]);
 		string suffixes = encodeJamo(fields[3].cbegin(), fields[3].cend());
 		char socket = stoi(fields[4]);
 
+		auto mit = morphMap.find(make_pair(orgform, tag));
+		assert(mit != morphMap.end());
 		size_t mid = morphemes.size();
 		morphMap.emplace(make_pair(form, tag), mid);
 		auto& fm = formMapper(form);
 		fm.candidate.emplace_back((KMorpheme*)mid);
 		fm.suffix.insert(suffixes.begin(), suffixes.end());
 		morphemes.emplace_back(form, tag, KCondVowel::none, KCondPolarity::none, logf(tagWeight), socket);
+		morphemes.back().kform = (const string*)(&fm - &forms[0]);
+		morphemes.back().combined = (const KMorpheme*)mit->second;
 	}
 	fclose(file);
 #endif
@@ -347,6 +357,7 @@ void KModelMgr::loadMorphBin(const char * filename)
 
 void KModelMgr::loadDMFromTxt(const char * filename)
 {
+#ifdef USE_DIST_MAP
 	FILE* file;
 	if (fopen_s(&file, filename, "r")) throw ios_base::failure{ string("Cannot open ") + filename };
 	char buf[16384];
@@ -384,27 +395,29 @@ void KModelMgr::loadDMFromTxt(const char * filename)
 		{
 			auto m = findMorpheme(parseFormTag(fields[i]));
 			if (!m) continue;
-			tarMorpheme->distMap.emplace(m, stof(fields[i + 1]) * 0.1f);
+			if (!tarMorpheme->distMap) tarMorpheme->distMap = new unordered_map<const KMorpheme*, float>{};
+			tarMorpheme->distMap->emplace(m, stof(fields[i + 1]) * 0.1f);
 		}
 	}
 	fclose(file);
+#endif
 }
 
 KModelMgr::KModelMgr(const char * modelPath)
 {
 	this->modelPath = modelPath;
-	/*
+#ifdef LOAD_TXT
 	unordered_map<pair<string, KPOSTag>, size_t> morphMap;
-	if (posFile) loadPOSFromTxt(posFile);
-	if (morphemeFile) loadMMFromTxt(morphemeFile, morphMap);
-	if (combinedFile) loadCMFromTxt(combinedFile, morphMap);
-	if (precombinedFile) loadPCMFromTxt(precombinedFile, morphMap);
-	savePOSBin((posFile + string(".bin")).c_str());
-	saveMorphBin((morphemeFile + string(".bin")).c_str());
-	/*/
+	loadPOSFromTxt((modelPath + string("pos.txt")).c_str());
+	loadMMFromTxt((modelPath + string("fullmodel.txt")).c_str(), morphMap);
+	loadCMFromTxt((modelPath + string("combined.txt")).c_str(), morphMap);
+	loadPCMFromTxt((modelPath + string("precombined.txt")).c_str(), morphMap);
+	savePOSBin((modelPath + string("pos.bin")).c_str());
+	saveMorphBin((modelPath + string("fullmodel.bin")).c_str());
+#else
 	loadPOSBin((modelPath + string("pos.bin")).c_str());
 	loadMorphBin((modelPath + string("fullmodel.bin")).c_str());
-	//*/
+#endif
 }
 
 void KModelMgr::addUserWord(const string & form, KPOSTag tag)
@@ -429,8 +442,8 @@ void KModelMgr::addUserRule(const string & form, const vector<pair<string, KPOST
 	auto& f = formMapper(form);
 	f.candidate.emplace_back((const KMorpheme*)morphemes.size());
 	morphemes.emplace_back(form, KPOSTag::UNKNOWN);
-	morphemes.back().chunks.resize(morphs.size());
-	iota(morphemes.back().chunks.begin(), morphemes.back().chunks.end(), (const KMorpheme*)morphemes.size());
+	morphemes.back().chunks = new vector<const KMorpheme*>(morphs.size());
+	iota(morphemes.back().chunks->begin(), morphemes.back().chunks->end(), (const KMorpheme*)morphemes.size());
 	for (auto& m : morphs)
 	{
 		morphemes.emplace_back(m.first, m.second);
@@ -444,6 +457,7 @@ void KModelMgr::solidify()
 	trieRoot.emplace_back();
 	for (auto& f : forms)
 	{
+		if (f.candidate.empty()) continue;
 		trieRoot[0].build(f.form.c_str(), &f, [this]()
 		{
 			trieRoot.emplace_back();
@@ -462,7 +476,10 @@ void KModelMgr::solidify()
 
 	for (auto& f : morphemes)
 	{
-		for (auto& p : f.chunks) p = &morphemes[(size_t)p];
+		f.wform = &forms[(size_t)f.kform].wform;
+		f.kform = &forms[(size_t)f.kform].form;
+		if (f.combined) f.combined = &morphemes[(size_t)f.combined];
+		if(f.chunks) for (auto& p : *f.chunks) p = &morphemes[(size_t)p];
 	}
 
 	for (auto& f : forms)
@@ -476,8 +493,8 @@ void KModelMgr::solidify()
 
 float KModelMgr::getTransitionP(const KMorpheme * a, const KMorpheme * b) const
 {
-	size_t tagA = a ? (size_t)(a->chunks.empty() ? a : a->chunks.back())->tag : 0;
-	size_t tagB = b ? (size_t)(b->chunks.empty() ? b : b->chunks[b->chunks[0]->tag == KPOSTag::V ? 1 : 0])->tag : 0;
+	size_t tagA = a ? (size_t)(!a->chunks ? a : a->chunks->back())->tag : 0;
+	size_t tagB = b ? (size_t)(!b->chunks ? b : b->chunks->at(b->chunks->front()->tag == KPOSTag::V ? 1 : 0))->tag : 0;
 	return posTransition[tagA][tagB];
 }
 
@@ -489,11 +506,11 @@ float KModelMgr::getTransitionP(KPOSTag a, KPOSTag b) const
 KPOSTag KModelMgr::findMaxiumTag(const KMorpheme * a, const KMorpheme * b) const
 {
 	KPOSTag tagA = KPOSTag::UNKNOWN;
-	if (a && a->chunks.empty()) tagA = a->tag;
-	else if (a) tagA = a->chunks.back()->tag;
+	if (a && !a->chunks) tagA = a->tag;
+	else if (a) tagA = a->chunks->back()->tag;
 
 	if (!b) return maxiumBtwn[(size_t)tagA][0];
-	if (b->chunks.empty()) return maxiumBtwn[(size_t)tagA][(size_t)b->tag];
+	if (!b->chunks) return maxiumBtwn[(size_t)tagA][(size_t)b->tag];
 	//if (b->chunks.front()->tag == KPOSTag::V) return KPOSTag::UNKNOWN;
-	return (b->chunks[0]->tag == KPOSTag::V ? maxiumVBtwn : maxiumBtwn)[(size_t)tagA][(size_t)b->chunks[b->chunks[0]->tag == KPOSTag::V ? 1 : 0]->tag];
+	return (b->chunks->front()->tag == KPOSTag::V ? maxiumVBtwn : maxiumBtwn)[(size_t)tagA][(size_t)b->chunks->at(b->chunks->front()->tag == KPOSTag::V ? 1 : 0)->tag];
 }

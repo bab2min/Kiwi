@@ -341,11 +341,12 @@ vector<vector<KChunk>> KTrie::split(const string& str, bool hasPrefix) const
 	return ret;
 }
 
-const KMorpheme * KChunk::getMorpheme(size_t idx, KMorpheme * tmp, const char * ostr) const
+const KMorpheme * KChunk::getMorpheme(size_t idx, KMorpheme * tmp) const
 {
 	if (!isStr()) return form->candidate[idx];
 	if (!begin && !end) return nullptr;
-	*tmp = KMorpheme{ string{ ostr + begin, ostr + end } };
+	tmp->kform = nullptr;
+	tmp->tag = KPOSTag::UNKNOWN;
 	tmp->p = (end - begin) * -1.5f - 6.f;
 	return tmp;
 }

@@ -2,6 +2,8 @@
 
 #define LEN_ARRAY(p) (sizeof(p)/sizeof(p[0]))
 
+struct KChunk;
+
 string splitJamo(k_wstring hangul);
 k_wstring joinJamo(string jm);
 bool verifyHangul(k_wstring hangul);

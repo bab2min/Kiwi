@@ -34,6 +34,7 @@ protected:
 		size_t id = formMap.size();
 		formMap.emplace(form, id);
 		forms.emplace_back(form);
+		forms.back().wform = joinJamo(form);
 		return forms[id];
 	};
 public:
