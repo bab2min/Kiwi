@@ -1,6 +1,6 @@
-0.810728
-Total (3252) Time : 6484.63 ms
-Time per Unit : 1.99404 ms
+0.810905
+Total (3252) Time : 6223.69 ms
+Time per Unit : 1.9138 ms
 
 고등학교를 졸업할 무렵 담임선생님께서 내게 이런 말씀을 하셨다.	0.696
 고등학교/NNG	를/JKO	졸업/NNG	하/XSV	ㄹ/ETM	무렵/NNB	담임선생/NNG	님/XSN	께서/JKS	나/NP	에게/JKB	이런/MM	말씀/NNG	을/JKO	하/VV	시/EP	었/EP	다/EF	./SF	
@@ -1602,11 +1602,11 @@ H/SL	대리/NNG	의/JKG	미망인/NNG	은/JX	생각/NNG	지도/NNG	않/VX	은/ETM	보험금/NNG	
 교보생명/NNP	의/JKG	창업자/NNG	대사/NNG	ㄴ/JX	신용/NNG	호/NNB	선생/NNG	은/JX	자신/NNG	의/JKG	사업/NNG	을/JKO	통하/VV	아/EC	교육/NNG	에/JKB	기여/NNG	하/XSV	고/EC	,/SP	민족/NNG	자본/NNG	을/JKO	형성/NNG	하/XSV	여/EC	국가/NNG	발전/NNG	에/JKB	기여해야겠/UN	다는/ETM	결심/NNG	을/JKO	확고히/UN	하/VV	았/EP	다고/EC	하/VV	ㄴ다/EF	./SF	-153.7
 교보생명/NNP	의/JKG	창업자/NNG	대사/NNG	ㄴ/JX	신용/NNG	호/NNB	선생/NNG	은/JX	자신/NNG	의/JKG	사업/NNG	을/JKO	통하/VV	아/EC	교육/NNG	에/JKB	기여/NNG	하/XSV	고/EC	,/SP	민족/NNG	자본/NNG	을/JKO	형성/NNG	하/XSV	여/EC	국가/NNG	발전/NNG	에/JKB	기여/NNG	하/XSA	아야/EC	겠/EP	다는/ETM	결심/NNG	을/JKO	확고히/UN	하/VV	았/EP	다고/EC	하/VV	ㄴ다/EF	./SF	-153.8
 
-그리하여 국민교육진흥(國民敎育振興), 민족자본형성(民族資本形成)이라는 창립이념으로 교보를 일으켜 교육과 생명보험을 세계 최초로 연결, 교육보험 사업을 시작하였다.	0.826
+그리하여 국민교육진흥(國民敎育振興), 민족자본형성(民族資本形成)이라는 창립이념으로 교보를 일으켜 교육과 생명보험을 세계 최초로 연결, 교육보험 사업을 시작하였다.	0.867
 그리하여/MAJ	국민/NNG	교육/NNG	진흥/NNG	(/SS	國民敎育振興/SH	)/SS	,/SP	민족/NNG	자본/NNG	형성/NNG	(/SS	民族資本形成/SH	)/SS	이/VCP	라는/ETM	창립/NNG	이념/NNG	으로/JKB	교보/NNP	를/JKO	일으키/VV	어/EC	교육/NNG	과/JC	생명/NNG	보험/NNG	을/JKO	세계/NNG	최초/NNG	로/JKB	연결/NNG	,/SP	교육/NNG	보험/NNG	사업/NNG	을/JKO	시작/NNG	하/XSV	았/EP	다/EF	./SF	
-그리하여/MAJ	국민/NNG	교육/NNG	진흥/NNG	(/SS	民敎育振興/SH	)/SS	,/SP	민족/NNG	자본/NNG	형성/NNG	(/SS	民族資本形成/SH	)/SS	일/VV	라는/ETM	창립/NNG	이념/NNG	으로/JKB	교보/NNP	를/JKO	일으키/VV	어/EC	교육/NNG	과/JKB	생명/NNG	보험/NNG	을/JKO	세계/NNG	최초/NNG	로/JKB	연결/NNG	,/SP	교육/NNG	보험/NNG	사업/NNG	을/JKO	시작/NNG	하/XSV	였/EP	다/EF	./SF	-135.3
-그리하/VV	아/EC	국민/NNG	교육/NNG	진흥/NNG	(/SS	民敎育振興/SH	)/SS	,/SP	민족/NNG	자본/NNG	형성/NNG	(/SS	民族資本形成/SH	)/SS	일/VV	라는/ETM	창립/NNG	이념/NNG	으로/JKB	교보/NNP	를/JKO	일으키/VV	어/EC	교육/NNG	과/JKB	생명/NNG	보험/NNG	을/JKO	세계/NNG	최초/NNG	로/JKB	연결/NNG	,/SP	교육/NNG	보험/NNG	사업/NNG	을/JKO	시작/NNG	하/XSV	였/EP	다/EF	./SF	-135.6
-그리하여/MAJ	국민/NNG	교육/NNG	진흥/NNG	(/SS	民敎育振興/SH	)/SS	,/SP	민족/NNG	자본/NNG	형성/NNG	(/SS	民族資本形成/SH	)/SS	일/VV	라는/ETM	창립/NNG	이념/NNG	으로/JKB	교보/NNP	를/JKO	일으키/VV	어/EC	교육/NNG	과/JC	생명/NNG	보험/NNG	을/JKO	세계/NNG	최초/NNG	로/JKB	연결/NNG	,/SP	교육/NNG	보험/NNG	사업/NNG	을/JKO	시작/NNG	하/XSV	였/EP	다/EF	./SF	-135.7
+그리하여/MAJ	국민/NNG	교육/NNG	진흥/NNG	(/SS	國民敎育振興/SH	)/SS	,/SP	민족/NNG	자본/NNG	형성/NNG	(/SS	民族資本形成/SH	)/SS	일/VV	라는/ETM	창립/NNG	이념/NNG	으로/JKB	교보/NNP	를/JKO	일으키/VV	어/EC	교육/NNG	과/JKB	생명/NNG	보험/NNG	을/JKO	세계/NNG	최초/NNG	로/JKB	연결/NNG	,/SP	교육/NNG	보험/NNG	사업/NNG	을/JKO	시작/NNG	하/XSV	였/EP	다/EF	./SF	-135.3
+그리하/VV	아/EC	국민/NNG	교육/NNG	진흥/NNG	(/SS	國民敎育振興/SH	)/SS	,/SP	민족/NNG	자본/NNG	형성/NNG	(/SS	民族資本形成/SH	)/SS	일/VV	라는/ETM	창립/NNG	이념/NNG	으로/JKB	교보/NNP	를/JKO	일으키/VV	어/EC	교육/NNG	과/JKB	생명/NNG	보험/NNG	을/JKO	세계/NNG	최초/NNG	로/JKB	연결/NNG	,/SP	교육/NNG	보험/NNG	사업/NNG	을/JKO	시작/NNG	하/XSV	였/EP	다/EF	./SF	-135.6
+그리하여/MAJ	국민/NNG	교육/NNG	진흥/NNG	(/SS	國民敎育振興/SH	)/SS	,/SP	민족/NNG	자본/NNG	형성/NNG	(/SS	民族資本形成/SH	)/SS	일/VV	라는/ETM	창립/NNG	이념/NNG	으로/JKB	교보/NNP	를/JKO	일으키/VV	어/EC	교육/NNG	과/JC	생명/NNG	보험/NNG	을/JKO	세계/NNG	최초/NNG	로/JKB	연결/NNG	,/SP	교육/NNG	보험/NNG	사업/NNG	을/JKO	시작/NNG	하/XSV	였/EP	다/EF	./SF	-135.7
 
 그는 교보문고라든가 교육 관련 혹은 금융 이외의 사업에는 한 번도 한눈팔지 않고 사업을 해왔다.	0.813
 그/NP	는/JX	교보문고/NNP	이/VCP	라든가/EC	교육/NNG	관련/NNG	혹은/MAG	금융/NNG	이외/NNG	의/JKG	사업/NNG	에/JKB	는/JX	한/MM	번/NNB	도/JX	한눈팔/VV	지/EC	않/VX	고/EC	사업/NNG	을/JKO	하/VV	아/EC	오/VX	았/EP	다/EF	./SF	
@@ -7700,11 +7700,11 @@ CEO/SL	와/JC	정치가/NNG	와/JKB	같/VA	은/ETM	사회/NNG	의/JKG	지도/NNG	층/XSN	인사
 약국/NNG	은/JX	전국/NNG	어디/NP	에/JKB	나/JX	있/VX	었/EP	고/EC	,/SP	약사/NNG	회장/NNG	의/JKG	소개/NNG	를/JKO	받/VV	아/EF	우리/NP	설계사/NNG	들/XSN	이/JKS	약국/NNG	을/JKO	방문/NNG	하/XSA	아/EC	계약/NNG	을/JKO	하/VV	ㄴ다면/EC	일사천리/NNG	로/JKB	잘/MAG	되/XSV	ㄹ/ETM	것/NNB	같았/UN	다/EF	./SF	-132.1
 약국/NNG	은/JX	전국/NNG	어디/NP	에/JKB	나/JX	있/VV	었/EP	고/EC	,/SP	약사/NNG	회장/NNG	의/JKG	소개/NNG	를/JKO	받/VV	아/EF	우리/NP	설계사/NNG	들/XSN	이/JKS	약국/NNG	을/JKO	방문/NNG	하/XSV	여/EC	계약/NNG	을/JKO	하/VV	ㄴ다면/EC	일사천리/NNG	로/JKB	잘/MAG	되/XSV	ㄹ/ETM	것/NNB	같았/UN	다/EF	./SF	-132.3
 
-약사회를 방문하여 회원들에게 공문 발송을 의뢰하자 그것은 어렵고 《약사공론》이라는 협회신문에 광고를 하라는 것이었다.	0.683
+약사회를 방문하여 회원들에게 공문 발송을 의뢰하자 그것은 어렵고 《약사공론》이라는 협회신문에 광고를 하라는 것이었다.	0.732
 약사회/NNG	를/JKO	방문/NNG	하/XSV	아/EC	회원/NNG	들/XSN	에게/JKB	공문/NNG	발송/NNG	을/JKO	의뢰/NNG	하/XSV	자/EC	그것/NP	은/JX	어렵/VA	고/EC	《/SS	약사공론/NNP	》/SS	이/VCP	라는/ETM	협회/NNG	신문/NNG	에/JKB	광고/NNG	를/JKO	하/VV	라는/ETM	것/NNB	이/VCP	었/EP	다/EF	./SF	
-약사회/NNG	를/JKO	방문/NNG	하/XSV	여/EC	회원/NNG	들/XSN	에게/JKB	공문/NNG	발송/NNG	을/JKO	의뢰/NNG	하/XSV	자/EC	그것/NP	은/JX	어렵/VA	고/EC	약사/NNG	공론/NNG	일/VV	라는/ETM	협회/NNG	신문/NNG	에/JKB	광고/NNG	를/JKO	하라/NNP	는/JX	것/NNB	이/VCP	었/EP	다/EF	./SF	-108.4
-약사회/NNG	를/JKO	방문/NNG	하/XSA	아/EC	회원/NNG	들/XSN	에게/JKB	공문/NNG	발송/NNG	을/JKO	의뢰/NNG	하/XSV	자/EC	그것/NP	은/JX	어렵/VA	고/EC	약사/NNG	공론/NNG	일/VV	라는/ETM	협회/NNG	신문/NNG	에/JKB	광고/NNG	를/JKO	하라/NNP	는/JX	것/NNB	이/VCP	었/EP	다/EF	./SF	-108.6
-약사회/NNG	를/JKO	방문/NNG	하/XSV	여/EC	회원/NNG	들/XSN	에게/JKB	공문/NNG	발송/NNG	을/JKO	의뢰/NNG	하/XSV	자/EC	그것/NP	은/JX	어렵/VA	고/EC	약사/NNG	공/NNG	론/XSN	일/VV	라는/ETM	협회/NNG	신문/NNG	에/JKB	광고/NNG	를/JKO	하라/NNP	는/JX	것/NNB	이/VCP	었/EP	다/EF	./SF	-109.5
+약사회/NNG	를/JKO	방문/NNG	하/XSV	여/EC	회원/NNG	들/XSN	에게/JKB	공문/NNG	발송/NNG	을/JKO	의뢰/NNG	하/XSV	자/EC	그것/NP	은/JX	어렵/VA	고/EC	《/SS	약사/NNG	공론/NNG	》/SS	일/VV	라는/ETM	협회/NNG	신문/NNG	에/JKB	광고/NNG	를/JKO	하라/NNP	는/JX	것/NNB	이/VCP	었/EP	다/EF	./SF	-108.5
+약사회/NNG	를/JKO	방문/NNG	하/XSA	아/EC	회원/NNG	들/XSN	에게/JKB	공문/NNG	발송/NNG	을/JKO	의뢰/NNG	하/XSV	자/EC	그것/NP	은/JX	어렵/VA	고/EC	《/SS	약사/NNG	공론/NNG	》/SS	일/VV	라는/ETM	협회/NNG	신문/NNG	에/JKB	광고/NNG	를/JKO	하라/NNP	는/JX	것/NNB	이/VCP	었/EP	다/EF	./SF	-108.7
+약사회/NNG	를/JKO	방문/NNG	하/VV	아/EC	회원/NNG	들/XSN	에게/JKB	공문/NNG	발송/NNG	을/JKO	의뢰/NNG	하/XSV	자/EC	그것/NP	은/JX	어렵/VA	고/EC	《/SS	약사/NNG	공론/NNG	》/SS	일/VV	라는/ETM	협회/NNG	신문/NNG	에/JKB	광고/NNG	를/JKO	하라/NNP	는/JX	것/NNB	이/VCP	었/EP	다/EF	./SF	-110.2
 
 영업소 경영비가 30만 원 나오는 상황에서 나는 1회 광고에 250만 원 하는 광고를 여러 차례 냈다.	0.735
 영업소/NNG	경영비/NNG	가/JKS	30/SN	만/NR	원/NNB	나오/VV	는/ETM	상황/NNG	에서/JKB	나/NP	는/JX	1/SN	회/NNB	광고/NNG	에/JKB	250/SN	만/NR	원/NNB	하/VV	는/ETM	광고/NNG	를/JKO	여러/MM	차례/NNG	내/VV	었/EP	다/EF	./SF	
@@ -7736,11 +7736,11 @@ CEO/SL	와/JC	정치가/NNG	와/JKB	같/VA	은/ETM	사회/NNG	의/JKG	지도/NNG	층/XSN	인사
 그/MM	외/NNB	에/JKB	몇/MM	개/NNB	협회/NNG	를/JKO	시도/NNG	하/XSV	다가/EC	마지막/NNG	이/VCP	라고/EC	생각/NNG	하/XSV	고/EC	시도/NNG	하/XSV	ㄴ/ETM	곳/NNG	이/JKS	치과/NNG	의사/NNG	협회/NNG	이/VCP	었/EP	다/EF	./SF	-78.95
 그/NP	외/NNB	에/JKB	몇/MM	개/NNB	협회/NNG	를/JKO	시도/NNG	하/XSV	다가/EC	마지막/NNG	이/VCP	라고/EC	생각/NNG	하/XSV	고/EC	시도/NNG	하/XSV	ㄴ/ETM	곳/NNG	이/JKS	치과/NNG	의사/NNG	협회/NNG	이/VCP	였/EP	다/EF	./SF	-80.38
 
-《치의신보》라는 협회신문에 적극적으로 광고를 실으면서 협회장의 공문을 통해 회원들에게 교보생명의 우수성을 알렸다.	0.778
+《치의신보》라는 협회신문에 적극적으로 광고를 실으면서 협회장의 공문을 통해 회원들에게 교보생명의 우수성을 알렸다.	0.912
 《/SS	치의신보/NNP	》/SS	이/VCP	라는/ETM	협회/NNG	신문/NNG	에/JKB	적극/NNG	적/XSN	으로/JKB	광고/NNG	를/JKO	싣/VV	으면서/EC	협회장/NNG	의/JKG	공문/NNG	을/JKO	통하/VV	아/EC	회원/NNG	들/XSN	에게/JKB	교보생명/NNP	의/JKG	우수/NNG	성/XSN	을/JKO	알리/VV	었/EP	다/EF	./SF	
-치의신보/UN	라느/UN	ㄴ/ETM	협회/NNG	신문/NNG	에/JKB	적극/NNG	적/XSN	으로/JKB	광고/NNG	를/JKO	싣/VV	으면서/EC	협회장/NNG	의/JKG	공문/NNG	을/JKO	통하/VV	아/EC	회원/NNG	들/XSN	에게/JKB	교보생명/NNP	의/JKG	우수/NNG	성/XSN	을/JKO	알리/VV	었/EP	다/EF	./SF	-109.5
-치의신보/UN	라/NNG	는/JX	협회/NNG	신문/NNG	에/JKB	적극/NNG	적/XSN	으로/JKB	광고/NNG	를/JKO	싣/VV	으면서/EC	협회장/NNG	의/JKG	공문/NNG	을/JKO	통하/VV	아/EC	회원/NNG	들/XSN	에게/JKB	교보생명/NNP	의/JKG	우수/NNG	성/XSN	을/JKO	알리/VV	었/EP	다/EF	./SF	-110.9
-치의신보/UN	라느/UN	ㄴ/ETM	협회/NNG	신문/NNG	에/JKB	적극/NNG	적/XSN	으로/JKB	광고/NNG	를/JKO	싣/VV	으면서/EC	협회장/NNG	의/JKG	공문/NNG	을/JKO	통하/VV	아/EC	회원/NNG	들/XSN	에게/JKB	교보생명/NNP	의/JKG	우수/NNG	성/XSN	을/JKO	알리/VV	였/EP	다/EF	./SF	-112
+《/SS	치의신보/UN	》/SS	라는/ETM	협회/NNG	신문/NNG	에/JKB	적극/NNG	적/XSN	으로/JKB	광고/NNG	를/JKO	싣/VV	으면서/EC	협회장/NNG	의/JKG	공문/NNG	을/JKO	통하/VV	아/EC	회원/NNG	들/XSN	에게/JKB	교보생명/NNP	의/JKG	우수/NNG	성/XSN	을/JKO	알리/VV	었/EP	다/EF	./SF	-107
+《/SS	치의/UN	신보/NNG	》/SS	라는/ETM	협회/NNG	신문/NNG	에/JKB	적극/NNG	적/XSN	으로/JKB	광고/NNG	를/JKO	싣/VV	으면서/EC	협회장/NNG	의/JKG	공문/NNG	을/JKO	통하/VV	아/EC	회원/NNG	들/XSN	에게/JKB	교보생명/NNP	의/JKG	우수/NNG	성/XSN	을/JKO	알리/VV	었/EP	다/EF	./SF	-108.2
+《/SS	치의신보/UN	》/SS	라는/ETM	협회/NNG	신문/NNG	에/JKB	적극/NNG	적/XSN	으로/JKB	광고/NNG	를/JKO	싣/VV	으면서/EC	협회장/NNG	의/JKG	공문/NNG	을/JKO	통하/VV	아/EC	회원/NNG	들/XSN	에게/JKB	교보생명/NNP	의/JKG	우수/NNG	성/XSN	을/JKO	알리/VV	였/EP	다/EF	./SF	-109.5
 
 그리고 설계사들의 영업을 직접 지원했다.	0.563
 그리고/MAJ	설계사/NNG	들/XSN	의/JKG	영업/NNG	을/JKO	직접/MAG	지원/NNG	하/XSV	았/EP	다/EF	./SF	
@@ -10756,11 +10756,11 @@ A/SL	는/JX	신/XPN	계약/NNG	은/JX	잘/MAG	하/XSV	는데/EC	도입/NNG	을/JKO	안/MAG	하
 부하/NNG	직원/NNG	을/JKO	손/NNG	안/NNG	에/JKB	넣/VV	고/EC	일사불란/NNG	하/XSV	ㄴ/ETM	조직/NNG	을/JKO	만들/VV	고/EC	싶/VX	어/EC	하/VX	ㄴ다/EF	./SF	-47.45
 부하/NNG	직원/NNG	을/JKO	손안/NNG	에/JKB	넣/VV	고/EC	일사불란/NNG	하/XSV	ㄴ/ETM	조직/NNG	을/JKO	만들/VV	고/EC	싶/VX	어/EC	하/VV	ㄴ다/EF	./SF	-49.2
 
-망아지가 다칠까봐 우리에만 넣고 키우면 잘 달리는 명마(名馬)가 될 수 없다.	0.862
+망아지가 다칠까봐 우리에만 넣고 키우면 잘 달리는 명마(名馬)가 될 수 없다.	0.929
 망아지/NNG	가/JKS	다치/VV	ㄹ까/EC	보/VX	아/EC	우리/NP	에/JKB	만/JX	넣/VV	고/EC	키우/VV	면/EC	잘/MAG	달리/VV	는/ETM	명마/NNG	(/SS	名馬/SH	)/SS	가/JKC	되/VV	ㄹ/ETM	수/NNB	없/VA	다/EF	./SF	
-망아지/NNG	가/JKS	다치/VV	ㄹ까/EC	보/VX	아/EC	우리/NP	에/JKB	만/JX	넣/VV	고/EC	키우/VV	면/EC	잘/MAG	달리/VV	는/ETM	명마/NNG	(/SS	馬/SH	)/SS	가/JKS	되/VV	ㄹ/ETM	수/NNB	없/VA	다/EF	./SF	-68.03
-망아지/NNG	가/JKS	다치/VV	ㄹ까/EC	보/VV	아/EC	우리/NP	에/JKB	만/JX	넣/VV	고/EC	키우/VV	면/EC	잘/MAG	달리/VV	는/ETM	명마/NNG	(/SS	馬/SH	)/SS	가/JKS	되/VV	ㄹ/ETM	수/NNB	없/VA	다/EF	./SF	-69.24
-망아지/NNG	가/JKS	다치/VV	ㄹ까/EC	보/VX	아/EC	우리/NP	에/JKB	만/JX	넣/VV	고/EC	키우/VV	면/EC	자/VV	ㄹ/ETM	달리/VV	는/ETM	명마/NNG	(/SS	馬/SH	)/SS	가/JKS	되/VV	ㄹ/ETM	수/NNB	없/VA	다/EF	./SF	-69.58
+망아지/NNG	가/JKS	다치/VV	ㄹ까/EC	보/VX	아/EC	우리/NP	에/JKB	만/JX	넣/VV	고/EC	키우/VV	면/EC	잘/MAG	달리/VV	는/ETM	명마/NNG	(/SS	名馬/SH	)/SS	가/JKS	되/VV	ㄹ/ETM	수/NNB	없/VA	다/EF	./SF	-68.03
+망아지/NNG	가/JKS	다치/VV	ㄹ까/EC	보/VV	아/EC	우리/NP	에/JKB	만/JX	넣/VV	고/EC	키우/VV	면/EC	잘/MAG	달리/VV	는/ETM	명마/NNG	(/SS	名馬/SH	)/SS	가/JKS	되/VV	ㄹ/ETM	수/NNB	없/VA	다/EF	./SF	-69.24
+망아지/NNG	가/JKS	다치/VV	ㄹ까/EC	보/VX	아/EC	우리/NP	에/JKB	만/JX	넣/VV	고/EC	키우/VV	면/EC	자/VV	ㄹ/ETM	달리/VV	는/ETM	명마/NNG	(/SS	名馬/SH	)/SS	가/JKS	되/VV	ㄹ/ETM	수/NNB	없/VA	다/EF	./SF	-69.58
 
 오히려 들판에 놓아 키우면 튼튼한 근육을 가진 명마로 스스로 성장한다.	0.826
 오히려/MAG	들판/NNG	에/JKB	놓/VV	아/EC	키우/VV	면/EC	튼튼/XR	하/XSA	ㄴ/ETM	근육/NNG	을/JKO	가지/VV	ㄴ/ETM	명마/NNG	로/JKB	스스로/MAG	성장/NNG	하/XSV	ㄴ다/EF	./SF	
@@ -10822,11 +10822,11 @@ A/SL	는/JX	신/XPN	계약/NNG	은/JX	잘/MAG	하/XSV	는데/EC	도입/NNG	을/JKO	안/MAG	하
 리더/NNG	에게/JKB	는/JX	올바르/VA	고/EC	유능/NNG	하/XSA	ㄴ/ETM	중간/NNG	관리자/NNG	를/JKO	얻/VV	기/ETN	위하/VV	아/EC	유비/NNP	의/JKG	삼고초려/NNG	정신/NNG	이/JKS	필요/NNG	하/XSV	다/EF	./SF	-74.74
 리더/NNG	에게/JKB	는/JX	올바르/VA	고/EC	유능/NNG	하/XSV	ㄴ/ETM	중간/NNG	관리자/NNG	를/JKO	얻/VV	기/ETN	위하/VV	아/EC	유비/NNP	의/JKG	삼고초려/NNG	정신/NNG	이/JKS	필요/NNG	하/XSA	다/EF	./SF	-75.03
 
-중국 당나라 황제의 업적을 모아놓은 《정관정요(貞觀政要)》라는 책에는 이런 말이 있다.	0.606
+중국 당나라 황제의 업적을 모아놓은 《정관정요(貞觀政要)》라는 책에는 이런 말이 있다.	0.636
 중국/NNP	당나라/NNP	황제/NNG	의/JKG	업적/NNG	을/JKO	모으/VV	아/EC	놓/VX	은/ETM	《/SS	정관정요/NNP	(/SS	貞觀政要/SH	)/SS	》/SS	이/VCP	라는/ETM	책/NNG	에/JKB	는/JX	이런/MM	말/NNG	이/JKS	있/VV	다/EF	./SF	
-중국/NNP	당나라/NNP	황제/NNG	의/JKG	업적/NNG	을/JKO	모으/VV	아/EC	놓/VX	은/ETM	정관정요/UN	(/SS	貞觀政要/SH	)/SS	라느/UN	ㄴ/ETM	책/NNG	에/JKB	는/JX	이렇/VA	ㄴ/ETM	말/NNG	이/JKS	있/VX	다/EF	./SF	-86.6
-중국/NNP	당나라/NNP	황제/NNG	의/JKG	업적/NNG	을/JKO	모으/VV	아/EC	놓/VX	은/ETM	정/NNG	관정요/UN	(/SS	貞觀政要/SH	)/SS	라느/UN	ㄴ/ETM	책/NNG	에/JKB	는/JX	이렇/VA	ㄴ/ETM	말/NNG	이/JKS	있/VX	다/EF	./SF	-86.7
-중국/NNP	당나라/NNP	황제/NNG	의/JKG	업적/NNG	을/JKO	모으/VV	아/EC	놓/VX	은/ETM	정관정요/UN	(/SS	貞觀政要/SH	)/SS	라느/UN	ㄴ/ETM	책/NNG	에/JKB	는/JX	이렇/VA	ㄴ/ETM	말/NNG	이/JKS	있/VV	다/EF	./SF	-87.46
+중국/NNP	당나라/NNP	황제/NNG	의/JKG	업적/NNG	을/JKO	모으/VV	아/EC	놓/VX	은/ETM	《/SS	정/NNG	관정요/UN	(/SS	貞觀政要/SH	)》/SS	라는/ETM	책/NNG	에/JKB	는/JX	이렇/VA	ㄴ/ETM	말/NNG	이/JKS	있/VX	다/EF	./SF	-80.97
+중국/NNP	당나라/NNP	황제/NNG	의/JKG	업적/NNG	을/JKO	모으/VV	아/EC	놓/VX	은/ETM	《/SS	정관/NNG	정요/UN	(/SS	貞觀政要/SH	)》/SS	라는/ETM	책/NNG	에/JKB	는/JX	이렇/VA	ㄴ/ETM	말/NNG	이/JKS	있/VX	다/EF	./SF	-81.76
+중국/NNP	당나라/NNP	황제/NNG	의/JKG	업적/NNG	을/JKO	모으/VV	아/EC	놓/VX	은/ETM	《/SS	정/NNG	관정요/UN	(/SS	貞觀政要/SH	)》/SS	라는/ETM	책/NNG	에/JKB	는/JX	이렇/VA	ㄴ/ETM	말/NNG	이/JKS	있/VV	다/EF	./SF	-81.83
 
 "물은 배를 잘 띄워주지만 다른 한편으로는 배를 뒤집기도 한다." 물을 부하로, 배를 리더로 본 것이다.	0.791
 "/SS	물/NNG	은/JX	배/NNG	를/JKO	잘/MAG	띄우/VV	어/EC	주/VX	지만/EC	다른/MM	한편/NNG	으로/JKB	는/JX	배/NNG	를/JKO	뒤집/VV	기/ETN	도/JX	하/VX	ㄴ다/EF	./SF	"/SS	물/NNG	을/JKO	부하/NNG	로/JKB	,/SP	배/NNG	를/JKO	리더/NNG	로/JKB	보/VV	ㄴ/ETM	것/NNB	이/VCP	다/EF	./SF	
@@ -12968,11 +12968,11 @@ S/SL	생명/NNG	은/JX	보장/NNG	성/XSN	단체/NNG	보험/NNG	을/JKO	많이/MAG	팔/VV	기/E
 성공/NNG	하/XSV	ㄴ/ETM	사람/NNG	들/XSN	의/JKG	책/NNG	읽기/NNG	서점/NNG	에/JKB	가/VV	면/EC	경영/NNG	고수/NNG	들/XSN	의/JKG	일대기/NNG	가/JKS	많이/MAG	나오/VV	아/EC	있/VV	다/EF	./SF	-69.91
 성공/NNG	하/XSV	ㄴ/ETM	사람/NNG	들/XSN	의/JKG	책/NNG	읽/VV	기/ETN	서점/NNG	에/JKB	가/VV	면/EC	경영/NNG	고수/NNG	들/XSN	의/JKG	일대기/NNG	가/JKS	많이/MAG	나오/VV	아/EC	있/VX	다/EF	./SF	-69.95
 
-정주영 씨의 《시련은 있어도 실패는 없다》, 김우중 씨의 《세계는 넓고 할 일은 많다》, 이명박 씨의 《신화는 없다》, 구자경 씨의 《오직 이길밖에 없다》처럼 경영에 성공한 사람들의 일대기를 읽다보면 내가 지금 겪고 있는 어려움은 아무것도 아니라는 사실을 자각하게 되고, 어려움을 헤쳐나갈 용기를 얻게 된다.	0.745
+정주영 씨의 《시련은 있어도 실패는 없다》, 김우중 씨의 《세계는 넓고 할 일은 많다》, 이명박 씨의 《신화는 없다》, 구자경 씨의 《오직 이길밖에 없다》처럼 경영에 성공한 사람들의 일대기를 읽다보면 내가 지금 겪고 있는 어려움은 아무것도 아니라는 사실을 자각하게 되고, 어려움을 헤쳐나갈 용기를 얻게 된다.	0.869
 정주영/NNP	씨/NNB	의/JKG	《/SS	시련/NNG	은/JX	있/VV	어도/EC	실패/NNG	는/JX	없/VA	다/EF	》/SS	,/SP	김우중/NNP	씨/NNB	의/JKG	《/SS	세계/NNG	는/JX	넓/VA	고/EC	하/VV	ㄹ/ETM	일/NNG	은/JX	많/VA	다/EF	》/SS	,/SP	이명박/NNP	씨/NNB	의/JKG	《/SS	신화/NNG	는/JX	없/VA	다/EF	》/SS	,/SP	구자경/NNP	씨/NNB	의/JKG	《/SS	오직/MAG	이/NP	길/NNG	밖에/JX	없/VA	다/EC	》/SS	처럼/JKB	경영/NNG	에/JKB	성공/NNG	하/XSV	ㄴ/ETM	사람/NNG	들/XSN	의/JKG	일대기/NNG	를/JKO	읽/VV	다/EC	보/VX	면/EC	내/NP	가/JKS	지금/MAG	겪/VV	고/EC	있/VX	는/ETM	어려움/NNG	은/JX	아무것/NNG	도/JX	아니/VCN	라는/ETM	사실/NNG	을/JKO	자각/NNG	하/XSV	게/EC	되/VV	고/EC	,/SP	어려움/NNG	을/JKO	헤치/VV	어/EC	나가/VX	ㄹ/ETM	용기/NNG	를/JKO	얻/VV	게/EC	되/VV	ㄴ다/EF	./SF	
-정주영/NNP	씨/NNB	의/JKG	시련/NNG	은/JX	있/VV	어도/EC	실패/NNG	는/JX	없/VA	다/EC	,/SP	김우중/NNP	씨/NNB	의/JKG	세계/NNG	는/JX	넓/VA	고/EC	하/VV	ㄹ/ETM	일/NNG	은/JX	많/VA	다/EC	,/SP	이명박/NNP	씨/NNB	의/JKG	신화/NNG	는/JX	없/VA	다/EC	,/SP	구/XPN	자경/NNG	씨/NNB	의/JKG	오직/MAG	이기/VV	ㄹ밖에/EC	없/VA	다/EC	처럼/UN	경영/NNG	에/JKB	성공/NNG	하/XSV	ㄴ/ETM	사람/NNG	들/XSN	의/JKG	일대기/NNG	를/JKO	읽/VV	다/EC	보/VX	면/EC	나/NP	가/JKS	지금/NNG	겪/VV	고/EC	있/VX	는/ETM	어려움/NNG	은/JX	아무것/NNG	도/JX	아니/VCN	라는/ETM	사실/NNG	을/JKO	자각/NNG	하/XSV	게/EC	되/VV	고/EC	,/SP	어려움/NNG	을/JKO	헤치/VV	어/EC	나가/VX	ㄹ/ETM	용기/NNG	를/JKO	얻/VV	게/EC	되/VV	ㄴ다/EF	./SF	-268.3
-정주영/NNP	씨/NNB	의/JKG	시련/NNG	은/JX	있/VV	어도/EC	실패/NNG	는/JX	없/VA	다/EC	,/SP	김우중/NNP	씨/NNB	의/JKG	세계/NNG	는/JX	넓/VA	고/EC	하/VV	ㄹ/ETM	일/NNG	은/JX	많/VA	다/EC	,/SP	이명박/NNP	씨/NNB	의/JKG	신화/NNG	는/JX	없/VA	다/EC	,/SP	구/XPN	자경/NNG	씨/NNB	의/JKG	오직/MAG	이기/VV	ㄹ밖에/EC	없/VA	다/EC	처럼/UN	경영/NNG	에/JKB	성공/NNG	하/XSV	ㄴ/ETM	사람/NNG	들/XSN	의/JKG	일대기/NNG	를/JKO	읽/VV	다/EC	보/VX	면/EC	나/NP	가/JKS	지금/NNG	겪/VV	고/EC	있/VV	는/ETM	어려움/NNG	은/JX	아무것/NNG	도/JX	아니/VCN	라는/ETM	사실/NNG	을/JKO	자각/NNG	하/XSV	게/EC	되/VV	고/EC	,/SP	어려움/NNG	을/JKO	헤치/VV	어/EC	나가/VX	ㄹ/ETM	용기/NNG	를/JKO	얻/VV	게/EC	되/VV	ㄴ다/EF	./SF	-268.3
-정주영/NNP	씨/NNB	의/JKG	시련/NNG	은/JX	있/VV	어도/EC	실패/NNG	는/JX	없/VA	다/EC	,/SP	김우중/NNP	씨/NNB	의/JKG	세계/NNG	는/JX	넓/VA	고/EC	하/VV	ㄹ/ETM	일/NNB	은/JX	많/VA	다/EC	,/SP	이명박/NNP	씨/NNB	의/JKG	신화/NNG	는/JX	없/VA	다/EC	,/SP	구/XPN	자경/NNG	씨/NNB	의/JKG	오직/MAG	이기/VV	ㄹ밖에/EC	없/VA	다/EC	처럼/UN	경영/NNG	에/JKB	성공/NNG	하/XSV	ㄴ/ETM	사람/NNG	들/XSN	의/JKG	일대기/NNG	를/JKO	읽/VV	다/EC	보/VX	면/EC	나/NP	가/JKS	지금/NNG	겪/VV	고/EC	있/VX	는/ETM	어려움/NNG	은/JX	아무것/NNG	도/JX	아니/VCN	라는/ETM	사실/NNG	을/JKO	자각/NNG	하/XSV	게/EC	되/VV	고/EC	,/SP	어려움/NNG	을/JKO	헤치/VV	어/EC	나가/VX	ㄹ/ETM	용기/NNG	를/JKO	얻/VV	게/EC	되/VV	ㄴ다/EF	./SF	-268.6
+정주영/NNP	씨/NNB	의/JKG	《/SS	시련/NNG	은/JX	있/VV	어도/EC	실패/NNG	는/JX	없/VA	다/EF	》/SS	,/SP	김우중/NNP	씨/NNB	의/JKG	《/SS	세계/NNG	는/JX	넓/VA	고/EC	하/VV	ㄹ/ETM	일/NNG	은/JX	많/VA	다/EF	》/SS	,/SP	이명박/NNP	씨/NNB	의/JKG	《/SS	신화/NNG	는/JX	없/VA	다/EF	》/SS	,/SP	구/XPN	자경/NNG	씨/NNB	의/JKG	《/SS	오직/MAG	이기/VV	ㄹ밖에/EC	없/VA	다/EF	》/SS	처럼/JKB	경영/NNG	에/JKB	성공/NNG	하/XSV	ㄴ/ETM	사람/NNG	들/XSN	의/JKG	일대기/NNG	를/JKO	읽/VV	다/EC	보/VX	면/EC	나/NP	가/JKS	지금/NNG	겪/VV	고/EC	있/VX	는/ETM	어려움/NNG	은/JX	아무것/NNG	도/JX	아니/VCN	라는/ETM	사실/NNG	을/JKO	자각/NNG	하/XSV	게/EC	되/VV	고/EC	,/SP	어려움/NNG	을/JKO	헤치/VV	어/EC	나가/VX	ㄹ/ETM	용기/NNG	를/JKO	얻/VV	게/EC	되/VV	ㄴ다/EF	./SF	-267.5
+정주영/NNP	씨/NNB	의/JKG	《/SS	시련/NNG	은/JX	있/VV	어도/EC	실패/NNG	는/JX	없/VA	다/EF	》/SS	,/SP	김우중/NNP	씨/NNB	의/JKG	《/SS	세계/NNG	는/JX	넓/VA	고/EC	하/VV	ㄹ/ETM	일/NNG	은/JX	많/VA	다/EF	》/SS	,/SP	이명박/NNP	씨/NNB	의/JKG	《/SS	신화/NNG	는/JX	없/VA	다/EF	》/SS	,/SP	구/XPN	자경/NNG	씨/NNB	의/JKG	《/SS	오직/MAG	이기/VV	ㄹ밖에/EC	없/VA	다/EF	》/SS	처럼/JKB	경영/NNG	에/JKB	성공/NNG	하/XSV	ㄴ/ETM	사람/NNG	들/XSN	의/JKG	일대기/NNG	를/JKO	읽/VV	다/EC	보/VX	면/EC	나/NP	가/JKS	지금/NNG	겪/VV	고/EC	있/VV	는/ETM	어려움/NNG	은/JX	아무것/NNG	도/JX	아니/VCN	라는/ETM	사실/NNG	을/JKO	자각/NNG	하/XSV	게/EC	되/VV	고/EC	,/SP	어려움/NNG	을/JKO	헤치/VV	어/EC	나가/VX	ㄹ/ETM	용기/NNG	를/JKO	얻/VV	게/EC	되/VV	ㄴ다/EF	./SF	-267.5
+정주영/NNP	씨/NNB	의/JKG	《/SS	시련/NNG	은/JX	있/VV	어도/EC	실패/NNG	는/JX	없/VA	다/EF	》/SS	,/SP	김우중/NNP	씨/NNB	의/JKG	《/SS	세계/NNG	는/JX	넓/VA	고/EC	하/VV	ㄹ/ETM	일/NNB	은/JX	많/VA	다/EF	》/SS	,/SP	이명박/NNP	씨/NNB	의/JKG	《/SS	신화/NNG	는/JX	없/VA	다/EF	》/SS	,/SP	구/XPN	자경/NNG	씨/NNB	의/JKG	《/SS	오직/MAG	이기/VV	ㄹ밖에/EC	없/VA	다/EF	》/SS	처럼/JKB	경영/NNG	에/JKB	성공/NNG	하/XSV	ㄴ/ETM	사람/NNG	들/XSN	의/JKG	일대기/NNG	를/JKO	읽/VV	다/EC	보/VX	면/EC	나/NP	가/JKS	지금/NNG	겪/VV	고/EC	있/VX	는/ETM	어려움/NNG	은/JX	아무것/NNG	도/JX	아니/VCN	라는/ETM	사실/NNG	을/JKO	자각/NNG	하/XSV	게/EC	되/VV	고/EC	,/SP	어려움/NNG	을/JKO	헤치/VV	어/EC	나가/VX	ㄹ/ETM	용기/NNG	를/JKO	얻/VV	게/EC	되/VV	ㄴ다/EF	./SF	-267.8
 
 역사적으로 성공한 정치가의 일대기를 읽는 것도 도움이 된다.	0.9
 역사/NNG	적/XSN	으로/JKB	성공/NNG	하/XSV	ㄴ/ETM	정치가/NNG	의/JKG	일대기/NNG	를/JKO	읽/VV	는/ETM	것/NNB	도/JX	도움/NNG	이/JKC	되/VV	ㄴ다/EF	./SF	
@@ -12980,11 +12980,11 @@ S/SL	생명/NNG	은/JX	보장/NNG	성/XSN	단체/NNG	보험/NNG	을/JKO	많이/MAG	팔/VV	기/E
 역사/NNG	적/XSN	으로/JKB	성공/NNG	하/XSV	ㄴ/ETM	정치가/NNG	의/JKG	일/NNG	대기/NNG	를/JKO	읽/VV	는/ETM	것/NNB	도/JX	도움/NNG	이/JKS	되/VV	ㄴ다/EF	./SF	-43.92
 역사/NNG	적/XSN	으로/JKB	성공/NNG	하/XSA	ㄴ/ETM	정치가/NNG	의/JKG	일대기/NNG	를/JKO	읽/VV	는/ETM	것/NNB	도/JX	도움/NNG	이/JKS	되/VV	ㄴ다/EF	./SF	-44.03
 
-청 왕조의 부정부패에 환멸을 느끼고 당을 창업한 이세민의 일대기를 그린 《정관정요》, 오다 노부나가의 일대기라든가, 도쿠가와 이에야스의 《야망》, 조선을 연 이성계의 일대기 등을 읽다보면 책 속에서 지혜와 힘을 빌릴 수 있다.	0.649
+청 왕조의 부정부패에 환멸을 느끼고 당을 창업한 이세민의 일대기를 그린 《정관정요》, 오다 노부나가의 일대기라든가, 도쿠가와 이에야스의 《야망》, 조선을 연 이성계의 일대기 등을 읽다보면 책 속에서 지혜와 힘을 빌릴 수 있다.	0.711
 청/NNP	왕조/NNG	의/JKG	부정부패/NNG	에/JKB	환멸/NNG	을/JKO	느끼/VV	고/EC	당/NNG	을/JKO	창업/NNG	하/XSV	ㄴ/ETM	이세민/NNP	의/JKG	일대기/NNG	를/JKO	그리/VV	ㄴ/ETM	《/SS	정관정요/NNP	》/SS	,/SP	오다/NNP	노부나가/NNP	의/JKG	일대기/NNG	이/VCP	라든가/EC	,/SP	도쿠가와/NNP	이에야스/NNP	의/JKG	《/SS	야망/NNP	》/SS	,/SP	조선/NNP	을/JKO	열/VV	ㄴ/ETM	이성계/NNP	의/JKG	일대기/NNG	등/NNB	을/JKO	읽/VV	다/EC	보/VX	면/EC	책/NNG	속/NNG	에서/JKB	지혜/NNG	와/JC	힘/NNG	을/JKO	빌리/VV	ㄹ/ETM	수/NNB	있/VV	다/EF	./SF	
-청/NNG	왕조/NNG	의/JKG	부정부패/NNG	에/JKB	환멸/NNG	을/JKO	느끼/VV	고/EC	당/NNG	을/JKO	창업/NNG	하/XSV	ㄴ/ETM	이세민/UN	의/JKG	일대기/NNG	를/JKO	그리/VV	ㄴ/ETM	정관/NNG	정/NNG	요/JX	,/SP	오/VV	다/EC	노부나가/NNP	의/JKG	일대기/NNG	라든가/JC	,/SP	도쿠가/UN	와/JKB	이에야스/NNP	의/JKG	야망/NNG	,/SP	조선/NNP	을/JKO	열/VV	ㄴ/ETM	이성계/NNP	의/JKG	일대기/NNG	등/NNB	을/JKO	읽/VV	다/EC	보/VX	면/EC	책/NNG	속/NNG	에서/JKB	지혜/NNG	와/JKB	힘/NNG	을/JKO	빌리/VV	ㄹ/ETM	수/NNB	있/VX	다/EF	./SF	-230.8
-청/NNG	왕조/NNG	의/JKG	부정부패/NNG	에/JKB	환멸/NNG	을/JKO	느끼/VV	고/EC	당/NNG	을/JKO	창업/NNG	하/XSV	ㄴ/ETM	이세민/UN	의/JKG	일대기/NNG	를/JKO	그리/VV	ㄴ/ETM	정관/NNG	정/NNG	요/JX	,/SP	오/VV	다/EC	노부나가/NNP	의/JKG	일대기/NNG	라든가/JC	,/SP	도쿠가와/UN	이에야스/NNP	의/JKG	야망/NNG	,/SP	조선/NNP	을/JKO	열/VV	ㄴ/ETM	이성계/NNP	의/JKG	일대기/NNG	등/NNB	을/JKO	읽/VV	다/EC	보/VX	면/EC	책/NNG	속/NNG	에서/JKB	지혜/NNG	와/JKB	힘/NNG	을/JKO	빌리/VV	ㄹ/ETM	수/NNB	있/VX	다/EF	./SF	-231
-청/NNG	왕조/NNG	의/JKG	부정부패/NNG	에/JKB	환멸/NNG	을/JKO	느끼/VV	고/EC	당/NNG	을/JKO	창업/NNG	하/XSV	ㄴ/ETM	이세민/UN	의/JKG	일대기/NNG	를/JKO	그리/VV	ㄴ/ETM	정관/NNG	정/NNG	요/JX	,/SP	오/VV	다/EC	노부나가/NNP	의/JKG	일대기/NNG	라든가/JC	,/SP	도쿠가/UN	와/JC	이에야스/NNP	의/JKG	야망/NNG	,/SP	조선/NNP	을/JKO	열/VV	ㄴ/ETM	이성계/NNP	의/JKG	일대기/NNG	등/NNB	을/JKO	읽/VV	다/EC	보/VX	면/EC	책/NNG	속/NNG	에서/JKB	지혜/NNG	와/JKB	힘/NNG	을/JKO	빌리/VV	ㄹ/ETM	수/NNB	있/VX	다/EF	./SF	-231
+청/NNG	왕조/NNG	의/JKG	부정부패/NNG	에/JKB	환멸/NNG	을/JKO	느끼/VV	고/EC	당/NNG	을/JKO	창업/NNG	하/XSV	ㄴ/ETM	이세민/UN	의/JKG	일대기/NNG	를/JKO	그리/VV	ㄴ/ETM	《/SS	정/NNG	관정요/UN	》/SS	,/SP	오/VV	다/EC	노부나가/NNP	의/JKG	일대기/NNG	라든가/JC	,/SP	도쿠가/UN	와/JKB	이에야스/NNP	의/JKG	《/SS	야망/NNG	》/SS	,/SP	조선/NNP	을/JKO	열/VV	ㄴ/ETM	이성계/NNP	의/JKG	일대기/NNG	등/NNB	을/JKO	읽/VV	다/EC	보/VX	면/EC	책/NNG	속/NNG	에서/JKB	지혜/NNG	와/JKB	힘/NNG	을/JKO	빌리/VV	ㄹ/ETM	수/NNB	있/VX	다/EF	./SF	-238.7
+청/NNG	왕조/NNG	의/JKG	부정부패/NNG	에/JKB	환멸/NNG	을/JKO	느끼/VV	고/EC	당/NNG	을/JKO	창업/NNG	하/XSV	ㄴ/ETM	이세민/UN	의/JKG	일대기/NNG	를/JKO	그리/VV	ㄴ/ETM	《/SS	정/NNG	관정요/UN	》/SS	,/SP	오/VV	다/EC	노부나가/NNP	의/JKG	일대기/NNG	라든가/JC	,/SP	도쿠가와/UN	이에야스/NNP	의/JKG	《/SS	야망/NNG	》/SS	,/SP	조선/NNP	을/JKO	열/VV	ㄴ/ETM	이성계/NNP	의/JKG	일대기/NNG	등/NNB	을/JKO	읽/VV	다/EC	보/VX	면/EC	책/NNG	속/NNG	에서/JKB	지혜/NNG	와/JKB	힘/NNG	을/JKO	빌리/VV	ㄹ/ETM	수/NNB	있/VX	다/EF	./SF	-239
+청/NNG	왕조/NNG	의/JKG	부정부패/NNG	에/JKB	환멸/NNG	을/JKO	느끼/VV	고/EC	당/NNG	을/JKO	창업/NNG	하/XSV	ㄴ/ETM	이세민/UN	의/JKG	일대기/NNG	를/JKO	그리/VV	ㄴ/ETM	《/SS	정/NNG	관정요/UN	》/SS	,/SP	오/VV	다/EC	노부나가/NNP	의/JKG	일대기/NNG	라든가/JC	,/SP	도쿠가/UN	와/JC	이에야스/NNP	의/JKG	《/SS	야망/NNG	》/SS	,/SP	조선/NNP	을/JKO	열/VV	ㄴ/ETM	이성계/NNP	의/JKG	일대기/NNG	등/NNB	을/JKO	읽/VV	다/EC	보/VX	면/EC	책/NNG	속/NNG	에서/JKB	지혜/NNG	와/JKB	힘/NNG	을/JKO	빌리/VV	ㄹ/ETM	수/NNB	있/VX	다/EF	./SF	-239
 
 책 속 주인공이 만약에 나와 같이 힘든 상황을 맞으면 어떤 행동을 할 것인가, 혹은 내가 만약 주인공이라면 어떻게 생각하고 행동했을까를 생각하면 좋은 방안이 떠오를지도 모른다.	0.847
 책/NNG	속/NNG	주인공/NNG	이/JKS	만약/NNG	에/JKB	나오/VV	아/EC	같이/MAG	힘들/VA	ㄴ/ETM	상황/NNG	을/JKO	맞/VV	으면/EC	어떤/MM	행동/NNG	을/JKO	하/VV	ㄹ/ETM	것/NNB	이/VCP	ㄴ가/EC	,/SP	혹은/MAG	내/NP	가/JKS	만약/NNG	주인공/NNG	이/VCP	라면/EC	어떻/VA	게/EC	생각/NNG	하/XSV	고/EC	행동/NNG	하/XSV	았/EP	을까/EC	를/JKO	생각/NNG	하/XSV	면/EC	좋/VA	은/ETM	방안/NNG	이/JKS	떠오르/VV	ㄹ지/EC	도/JX	모르/VV	ㄴ다/EF	./SF	
@@ -14700,11 +14700,11 @@ L/SL	은/JX	고객/NNG	에/JKB	대하/VV	아/EC	철저히/MAG	봉사/NNG	하고/JKB	약속/NNG	�
 타/MM	금융/NNG	권/XSN	이/JKS	보험업/NNG	에/JKB	진출/NNG	하/XSA	아/EC	성공/NNG	하/XSV	는/ETM	이유/NNG	는/JX	효과/NNG	적/XSN	으로/JKB	대응/NNG	하/XSV	지/EC	못하/VX	ㄴ/ETM	업계/NNG	전체/NNG	의/JKG	잘못/MAG	도/JX	있/VV	지만/EC	궁극/NNG	적/XSN	으로/JKB	각사/NNG	의/JKG	리더/NNG	들/XSN	이/JKS	거시/NNG	적/XSN	안목/NNG	을/JKO	갖추/VV	지/EC	못하/VX	ㅁ/ETN	으로/JKB	인하/VV	아/EC	고객/NNG	의/JKG	외면/NNG	을/JKO	자초/NNG	하/XSV	ㄴ/ETM	것/NNB	이/VCP	다/EF	./SF	-163.1
 타/MM	금융/NNG	권/XSN	이/JKS	보험업/NNG	에/JKB	진출/NNG	하/XSV	여/EC	성공/NNG	하/XSV	는/ETM	이유/NNG	는/JX	효과/NNG	적/XSN	으로/JKB	대응/NNG	하/XSV	지/EC	못하/VX	ㄴ/ETM	업계/NNG	전체/NNG	의/JKG	잘못/MAG	도/JX	있/VX	지만/EC	궁극/NNG	적/XSN	으로/JKB	각사/NNG	의/JKG	리더/NNG	들/XSN	이/JKS	거시/NNG	적/XSN	안목/NNG	을/JKO	갖추/VV	지/EC	못하/VX	ㅁ/ETN	으로/JKB	인하/VV	아/EC	고객/NNG	의/JKG	외면/NNG	을/JKO	자초/NNG	하/XSV	ㄴ/ETM	것/NNB	이/VCP	다/EF	./SF	-163.4
 
-발전적인 경쟁이 필요하다 90년대 들어 생명보험업계의 경쟁이 치열해지면서 보험영업을 하는 사람들은 과도한 경쟁을 하는 이전투구(泥田鬪狗) 현상을 고객들에게 노출시켰다.	0.742
+발전적인 경쟁이 필요하다 90년대 들어 생명보험업계의 경쟁이 치열해지면서 보험영업을 하는 사람들은 과도한 경쟁을 하는 이전투구(泥田鬪狗) 현상을 고객들에게 노출시켰다.	0.797
 발전/NNG	적/XSN	이/VCP	ㄴ/ETM	경쟁/NNG	이/JKS	필요/NNG	하/XSA	다/EC	90/SN	년대/NNB	들/VV	어/EC	생명/NNG	보험업/NNG	계/XSN	의/JKG	경쟁/NNG	이/JKS	치열/NNG	하/XSA	아/EC	지/VX	면서/EC	보험/NNG	영업/NNG	을/JKO	하/VV	는/ETM	사람/NNG	들/XSN	은/JX	과도/NNG	하/XSA	ㄴ/ETM	경쟁/NNG	을/JKO	하/VV	는/ETM	이전투구/NNG	(/SS	泥田鬪狗/SH	)/SS	현상/NNG	을/JKO	고객/NNG	들/XSN	에게/JKB	노출/NNG	시키/XSV	었/EP	다/EF	./SF	
-발전/NNG	적/XSN	이/VCP	ㄴ/ETM	경쟁/NNG	이/JKS	필요/NNG	하/XSV	다/EC	90/SN	년대/NNB	듣/VV	어/EC	생명/NNG	보험/NNG	업계/NNG	의/JKG	경쟁/NNG	이/JKS	치열/XR	하/XSA	아/EC	지/VX	면서/EC	보험/NNG	영업/NNG	을/JKO	하/VV	는/ETM	사람/NNG	들/XSN	은/JX	과도/NNG	하/XSV	ㄴ/ETM	경쟁/NNG	을/JKO	하/VV	는/ETM	이전투구/NNG	(/SS	泥/SH	田/SN	鬪狗/SH	)/SS	현상/NNG	을/JKO	고객/NNG	들/XSN	에게/JKB	노출/NNG	시키/XSV	었/EP	다/EF	./SF	-134.5
-발전/NNG	적/XSN	이/VCP	ㄴ/ETM	경쟁/NNG	이/JKS	필요/NNG	하/XSV	다/EC	90/SN	년대/NNB	듣/VV	어/EC	생명/NNG	보험/NNG	업계/NNG	의/JKG	경쟁/NNG	이/JKS	치열/XR	하/XSA	아/EC	지/VX	면서/EC	보험/NNG	영업/NNG	을/JKO	하/VV	는/ETM	사람/NNG	들/XSN	은/JX	과도/NNG	하/XSV	ㄴ/ETM	경쟁/NNG	을/JKO	하/VV	는/ETM	이전투구/NNG	(/SS	泥/SH	田/SN	鬪狗/SH	)/SS	현상/NNG	을/JKO	고객/NNG	들/XSN	에게/JKB	노출/NNG	시키/XSV	었/EP	다/EF	./SF	-134.5
-발전/NNG	적/XSN	이/VCP	ㄴ/ETM	경쟁/NNG	이/JKS	필요/NNG	하/XSV	아다/EC	90/SN	년대/NNB	듣/VV	어/EC	생명/NNG	보험/NNG	업계/NNG	의/JKG	경쟁/NNG	이/JKS	치열/XR	하/XSA	아/EC	지/VX	면서/EC	보험/NNG	영업/NNG	을/JKO	하/VV	는/ETM	사람/NNG	들/XSN	은/JX	과도/NNG	하/XSV	ㄴ/ETM	경쟁/NNG	을/JKO	하/VV	는/ETM	이전투구/NNG	(/SS	泥/SH	田/SN	鬪狗/SH	)/SS	현상/NNG	을/JKO	고객/NNG	들/XSN	에게/JKB	노출/NNG	시키/XSV	었/EP	다/EF	./SF	-135
+발전/NNG	적/XSN	이/VCP	ㄴ/ETM	경쟁/NNG	이/JKS	필요/NNG	하/XSV	다/EC	90/SN	년대/NNB	듣/VV	어/EC	생명/NNG	보험/NNG	업계/NNG	의/JKG	경쟁/NNG	이/JKS	치열/XR	하/XSA	아/EC	지/VX	면서/EC	보험/NNG	영업/NNG	을/JKO	하/VV	는/ETM	사람/NNG	들/XSN	은/JX	과도/NNG	하/XSV	ㄴ/ETM	경쟁/NNG	을/JKO	하/VV	는/ETM	이전투구/NNG	(/SS	泥田鬪狗/SH	)/SS	현상/NNG	을/JKO	고객/NNG	들/XSN	에게/JKB	노출/NNG	시키/XSV	었/EP	다/EF	./SF	-134.5
+발전/NNG	적/XSN	이/VCP	ㄴ/ETM	경쟁/NNG	이/JKS	필요/NNG	하/XSV	다/EC	90/SN	년대/NNB	듣/VV	어/EC	생명/NNG	보험/NNG	업계/NNG	의/JKG	경쟁/NNG	이/JKS	치열/XR	하/XSA	아/EC	지/VX	면서/EC	보험/NNG	영업/NNG	을/JKO	하/VV	는/ETM	사람/NNG	들/XSN	은/JX	과도/NNG	하/XSV	ㄴ/ETM	경쟁/NNG	을/JKO	하/VV	는/ETM	이전투구/NNG	(/SS	泥田鬪狗/SH	)/SS	현상/NNG	을/JKO	고객/NNG	들/XSN	에게/JKB	노출/NNG	시키/XSV	었/EP	다/EF	./SF	-134.5
+발전/NNG	적/XSN	이/VCP	ㄴ/ETM	경쟁/NNG	이/JKS	필요/NNG	하/XSV	아다/EC	90/SN	년대/NNB	듣/VV	어/EC	생명/NNG	보험/NNG	업계/NNG	의/JKG	경쟁/NNG	이/JKS	치열/XR	하/XSA	아/EC	지/VX	면서/EC	보험/NNG	영업/NNG	을/JKO	하/VV	는/ETM	사람/NNG	들/XSN	은/JX	과도/NNG	하/XSV	ㄴ/ETM	경쟁/NNG	을/JKO	하/VV	는/ETM	이전투구/NNG	(/SS	泥田鬪狗/SH	)/SS	현상/NNG	을/JKO	고객/NNG	들/XSN	에게/JKB	노출/NNG	시키/XSV	었/EP	다/EF	./SF	-135
 
 첫째, 무분별한 설계사의 도입으로 인한 비적성 설계사가 양산되었고, 이들의 부정확한 상품판매는 숱한 민원을 야기시켰고, 이들의 조기퇴직으로 인해 고객들은 보험가입 당시 약속했던 서비스를 충분히 제공받지 못했다.	0.971
 첫째/NR	,/SP	무/XPN	분별/NNG	하/XSA	ㄴ/ETM	설계사/NNG	의/JKG	도입/NNG	으로/JKB	인하/VV	ㄴ/ETM	비/XPN	적성/NNG	설계사/NNG	가/JKS	양산/NNG	되/XSV	었/EP	고/EC	,/SP	이/NP	들/XSN	의/JKG	부/XPN	정확/NNG	하/XSA	ㄴ/ETM	상품/NNG	판매/NNG	는/JX	숱하/VA	ㄴ/ETM	민원/NNG	을/JKO	야기/NNG	시키/XSV	었/EP	고/EC	,/SP	이/NP	들/XSN	의/JKG	조기/NNG	퇴직/NNG	으로/JKB	인하/VV	아/EC	고객/NNG	들/XSN	은/JX	보험/NNG	가입/NNG	당시/NNG	약속/NNG	하/XSV	았/EP	던/ETM	서비스/NNG	를/JKO	충분히/MAG	제공/NNG	받/VV	지/EC	못하/VX	았/EP	다/EF	./SF	
@@ -14776,11 +14776,11 @@ L/SL	은/JX	고객/NNG	에/JKB	대하/VV	아/EC	철저히/MAG	봉사/NNG	하고/JKB	약속/NNG	�
 각자/NNG	의/JKG	역량/NNG	을/JKO	키우/VV	기/ETN	위하/VV	아/EC	노력/NNG	하/XSA	아야/EC	하/VV	ㄹ/ETM	것/NNB	이/VCP	고/EC	,/SP	정보/NNG	를/JKO	공유/NNG	하/XSV	여/EC	고객/NNG	을/JKO	향하/VV	ㄴ/ETM	전선/NNG	을/JKO	새로이/MAG	정비/NNG	하/XSA	아야/EC	하/VX	ㄴ다/EF	./SF	-91.64
 각자/NNG	의/JKG	역량/NNG	을/JKO	키우/VV	기/ETN	위하/VV	아/EC	노력/NNG	하/XSA	아야/EC	하/VV	ㄹ/ETM	것/NNB	이/VCP	고/EC	,/SP	정보/NNG	를/JKO	공유/NNG	하/XSA	아/EC	고객/NNG	을/JKO	향하/VV	ㄴ/ETM	전선/NNG	을/JKO	새로이/MAG	정비/NNG	하/XSA	아야/EC	하/VV	ㄴ다/EF	./SF	-91.64
 
-또한 대(對)정부관계에서도 일방적으로 받는 관계가 아니라 적극적으로 대처하여, 보험이 차지하고 있는 사회적 역할에 걸맞은 대접을 받을 수 있도록 해야 한다.	0.772
+또한 대(對)정부관계에서도 일방적으로 받는 관계가 아니라 적극적으로 대처하여, 보험이 차지하고 있는 사회적 역할에 걸맞은 대접을 받을 수 있도록 해야 한다.	0.789
 또한/MAG	대/NNG	(/SS	對/SH	)/SS	정부/NNG	관계/NNG	에서/JKB	도/JX	일방/NNG	적/XSN	으로/JKB	받/VV	는/ETM	관계/NNG	가/JKC	아니/VCN	라/EC	적극/NNG	적/XSN	으로/JKB	대처/NNG	하/XSV	아/EC	,/SP	보험/NNG	이/JKS	차지/NNG	하/XSV	고/EC	있/VX	는/ETM	사회/NNG	적/XSN	역할/NNG	에/JKB	걸맞/VA	은/ETM	대접/NNG	을/JKO	받/VV	을/ETM	수/NNB	있/VV	도록/EC	하/VV	아야/EC	하/VX	ㄴ다/EF	./SF	
-또/MAG	하/XSV	ㄴ/ETM	대/NNB	(/SS	)/SS	정부/NNG	관계/NNG	에서/JKB	도/JX	일방/NNG	적/XSN	으로/JKB	받/VV	는/ETM	관계/NNG	가/JKS	아니/VCN	라/EC	적극/NNG	적/XSN	으로/JKB	대처/NNG	하/XSV	여/EC	,/SP	보험/NNG	이/JKS	차지/NNG	하/XSV	고/EC	있/VX	는/ETM	사회/NNG	적/XSN	역할/NNG	에/JKB	걸맞/VA	은/ETM	대접/NNG	을/JKO	받/VV	을/ETM	수/NNB	있/VV	도록/EC	하/VV	아야/EC	하/VV	ㄴ다/EF	./SF	-120.9
-또/MAG	하/XSV	ㄴ/ETM	대/NNB	(/SS	)/SS	정부/NNG	관계/NNG	에서/JKB	도/JX	일방/NNG	적/XSN	으로/JKB	받/VV	는/ETM	관계/NNG	가/JKS	아니/VCN	라/EC	적극/NNG	적/XSN	으로/JKB	대처/NNG	하/XSV	여/EC	,/SP	보험/NNG	이/JKS	차지/NNG	하/XSV	고/EC	있/VV	는/ETM	사회/NNG	적/XSN	역할/NNG	에/JKB	걸맞/VA	은/ETM	대접/NNG	을/JKO	받/VV	을/ETM	수/NNB	있/VV	도록/EC	하/VV	아야/EC	하/VV	ㄴ다/EF	./SF	-120.9
-또/MAG	하/XSV	ㄴ/ETM	대/NNB	(/SS	)/SS	정부/NNG	관계/NNG	에서/JKB	도/JX	일방/NNG	적/XSN	으로/JKB	받/VV	는/ETM	관계/NNG	가/JKS	아니/VCN	라/EC	적극/NNG	적/XSN	으로/JKB	대처/NNG	하/XSV	여/EC	,/SP	보험/NNG	이/JKS	차지/NNG	하/XSV	고/EC	있/VX	는/ETM	사회/NNG	적/XSN	역할/NNG	에/JKB	걸맞/VA	은/ETM	대접/NNG	을/JKO	받/VV	을/ETM	수/NNB	있/VV	도록/EC	하/VV	아야/EC	하/VX	ㄴ다/EF	./SF	-121.1
+또/MAG	하/XSV	ㄴ/ETM	대/NNB	(/SS	對/SH	)/SS	정부/NNG	관계/NNG	에서/JKB	도/JX	일방/NNG	적/XSN	으로/JKB	받/VV	는/ETM	관계/NNG	가/JKS	아니/VCN	라/EC	적극/NNG	적/XSN	으로/JKB	대처/NNG	하/XSV	여/EC	,/SP	보험/NNG	이/JKS	차지/NNG	하/XSV	고/EC	있/VX	는/ETM	사회/NNG	적/XSN	역할/NNG	에/JKB	걸맞/VA	은/ETM	대접/NNG	을/JKO	받/VV	을/ETM	수/NNB	있/VV	도록/EC	하/VV	아야/EC	하/VV	ㄴ다/EF	./SF	-120.9
+또/MAG	하/XSV	ㄴ/ETM	대/NNB	(/SS	對/SH	)/SS	정부/NNG	관계/NNG	에서/JKB	도/JX	일방/NNG	적/XSN	으로/JKB	받/VV	는/ETM	관계/NNG	가/JKS	아니/VCN	라/EC	적극/NNG	적/XSN	으로/JKB	대처/NNG	하/XSV	여/EC	,/SP	보험/NNG	이/JKS	차지/NNG	하/XSV	고/EC	있/VV	는/ETM	사회/NNG	적/XSN	역할/NNG	에/JKB	걸맞/VA	은/ETM	대접/NNG	을/JKO	받/VV	을/ETM	수/NNB	있/VV	도록/EC	하/VV	아야/EC	하/VV	ㄴ다/EF	./SF	-120.9
+또/MAG	하/XSV	ㄴ/ETM	대/NNB	(/SS	對/SH	)/SS	정부/NNG	관계/NNG	에서/JKB	도/JX	일방/NNG	적/XSN	으로/JKB	받/VV	는/ETM	관계/NNG	가/JKS	아니/VCN	라/EC	적극/NNG	적/XSN	으로/JKB	대처/NNG	하/XSV	여/EC	,/SP	보험/NNG	이/JKS	차지/NNG	하/XSV	고/EC	있/VX	는/ETM	사회/NNG	적/XSN	역할/NNG	에/JKB	걸맞/VA	은/ETM	대접/NNG	을/JKO	받/VV	을/ETM	수/NNB	있/VV	도록/EC	하/VV	아야/EC	하/VX	ㄴ다/EF	./SF	-121.1
 
 생명보험의 위상을 회복하자 경쟁의 개념정립 점차 가속화되는 경쟁에서 보험인이 살아남기 위해서는 경쟁자의 개념을 명확히 해야 한다.	0.895
 생명/NNG	보험/NNG	의/JKG	위상/NNG	을/JKO	회복/NNG	하/XSV	자/EC	경쟁/NNG	의/JKG	개념/NNG	정립/NNG	점차/MAG	가속/NNG	화/XSN	되/XSV	는/ETM	경쟁/NNG	에서/JKB	보험인/NNG	이/JKS	살아남/VV	기/ETN	위하/VV	아서/EC	는/JX	경쟁자/NNG	의/JKG	개념/NNG	을/JKO	명확히/MAG	하/VV	아야/EC	하/VX	ㄴ다/EF	./SF	

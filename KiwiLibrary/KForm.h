@@ -70,7 +70,7 @@ struct KMorpheme
 	char combineSocket = 0;
 	float p = 0;
 	vector<const KMorpheme*> chunks;
-
+	unordered_map<const KMorpheme*, float> distMap;
 	void readFromBin(FILE* f, const function<const KMorpheme*(size_t)>& mapper);
 	void writeToBin(FILE* f, const function<size_t(const KMorpheme*)>& mapper) const;
 };

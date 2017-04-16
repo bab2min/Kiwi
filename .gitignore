@@ -255,3 +255,6 @@ ModelManifest.xml
 /KiwiRunLinux/readme/images/debuggerexport.png
 /KiwiRunLinux/readme/images/ChangeRemote.gif
 /KiwiRunLinux/readme/images/ArchOptions.gif
+*.pickle
+/ModelGenerator/distModel_5.txt
+/ModelGenerator/distModel.txt

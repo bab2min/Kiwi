@@ -5,6 +5,7 @@ struct KTrie;
 class KModelMgr
 {
 protected:
+	const char* modelPath = nullptr;
 	vector<KForm> forms;
 	vector<KMorpheme> morphemes;
 	unordered_map<string, size_t> formMap;
@@ -25,6 +26,7 @@ protected:
 	void loadPCMFromTxt(const char * filename, unordered_map<pair<string, KPOSTag>, size_t>& morphMap);
 	void saveMorphBin(const char* filename) const;
 	void loadMorphBin(const char* filename);
+	void loadDMFromTxt(const char* filename);
 	KForm& formMapper(string form)
 	{
 		auto it = formMap.find(form);

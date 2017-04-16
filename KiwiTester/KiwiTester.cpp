@@ -1,8 +1,8 @@
 //
 
 #include "stdafx.h"
+#include "../KiwiLibrary/KiwiHeader.h"
 #include "../KiwiLibrary/Kiwi.h"
-#include "../KiwiLibrary/Utils.h"
 #include "KTest.h"
 
 class Timer
@@ -29,7 +29,7 @@ int main()
 	system("chcp 65001");
 	_wsetlocale(LC_ALL, L"korean");
 	Timer timer;
-	Kiwi kw("../ModelGenerator/");
+	Kiwi kw{ "../ModelGenerator/" };
 	kw.prepare();
 	printf("Loading Time : %g ms\n", timer.getElapsed());
 	string testFiles[] = { "01s.txt", "02s.txt", "03s.txt" };

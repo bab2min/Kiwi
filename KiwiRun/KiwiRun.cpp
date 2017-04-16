@@ -75,7 +75,7 @@ int main(int argc, const char** argv)
 	}
 	if (!arg["n"].empty())
 	{
-		maxCache = atoi(arg["n"][0].c_str());
+		topN = atoi(arg["n"][0].c_str());
 	}
 
 	if (arg[""].empty())

@@ -28,6 +28,8 @@
 using namespace std;
 
 #define TRIE_ALLOC_ARRAY
+#define DIVIDE_BOUND 6
+#define MIN_CANDIDATE 3
 
 #ifdef _WIN32
 typedef wchar_t k_wchar;

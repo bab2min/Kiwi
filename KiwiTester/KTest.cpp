@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "../KiwiLibrary/KiwiHeader.h"
 #include "../KiwiLibrary/Kiwi.h"
 #include "KTest.h"
 #include "../KiwiLibrary/Utils.h"
