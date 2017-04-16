@@ -3,8 +3,6 @@
 #include "Utils.h"
 #include "KFeatureTestor.h"
 
-#define DIVIDE_BOUND 6
-
 
 KPOSTag Kiwi::identifySpecialChr(k_wchar chr)
 {
@@ -394,7 +392,7 @@ vector<KResult> Kiwi::analyzeJM(const string & jm, size_t topN, KPOSTag prefix, 
 	{
 		return x.second > y.second;
 	};
-	topN = max((size_t)3, topN);
+	topN = max((size_t)MIN_CANDIDATE, topN);
 	vector<pair<vector<pair<string, KPOSTag>>, float>> cands;
 	KMorpheme preMorpheme{ "", prefix }, sufMorpheme{ "", suffix };
 	KForm preForm, sufForm;

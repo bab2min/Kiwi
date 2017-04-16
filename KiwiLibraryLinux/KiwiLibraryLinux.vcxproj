@@ -74,6 +74,7 @@
     <ClInclude Include="..\KiwiLibrary\KFeatureTestor.h" />
     <ClInclude Include="..\KiwiLibrary\KForm.h" />
     <ClInclude Include="..\KiwiLibrary\Kiwi.h" />
+    <ClInclude Include="..\KiwiLibrary\KiwiHeader.h" />
     <ClInclude Include="..\KiwiLibrary\KModelMgr.h" />
     <ClInclude Include="..\KiwiLibrary\KTrie.h" />
     <ClInclude Include="..\KiwiLibrary\stdafx.h" />

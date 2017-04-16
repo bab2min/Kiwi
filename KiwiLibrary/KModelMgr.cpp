@@ -345,8 +345,54 @@ void KModelMgr::loadMorphBin(const char * filename)
 	fclose(f);
 }
 
+void KModelMgr::loadDMFromTxt(const char * filename)
+{
+	FILE* file;
+	if (fopen_s(&file, filename, "r")) throw ios_base::failure{ string("Cannot open ") + filename };
+	char buf[16384];
+	wstring_convert<codecvt_utf8_utf16<k_wchar>, k_wchar> converter;
+
+	auto parseFormTag = [](const k_wstring& f) -> pair<string, KPOSTag>
+	{
+		auto c = split(f, '/');
+		if (c.size() < 2) return {};
+		string str = encodeJamo(c[0].begin(), c[0].end());
+		KPOSTag tag = makePOSTag(c[1]);
+		return { str, tag };
+	};
+
+	auto findMorpheme = [this](const pair<string, KPOSTag>& m) -> const KMorpheme*
+	{
+		auto form = getTrie()->search(&m.first[0], &m.first[0] + m.first.size());
+		if (!form || form == (void*)-1) return nullptr;
+		for (const auto& cand : form->candidate)
+		{
+			if (cand->tag == m.second) return cand;
+		}
+		return nullptr;
+	};
+
+	while (fgets(buf, 16384, file))
+	{
+		auto wstr = converter.from_bytes(buf);
+		if (wstr.back() == '\n') wstr.pop_back();
+		auto fields = split(wstr, '\t');
+		if (fields.size() < 4) continue;
+		auto tarMorpheme = (KMorpheme*)findMorpheme(parseFormTag(fields[0]));
+		if (!tarMorpheme) continue;
+		for (size_t i = 2; i < fields.size(); i += 2)
+		{
+			auto m = findMorpheme(parseFormTag(fields[i]));
+			if (!m) continue;
+			tarMorpheme->distMap.emplace(m, stof(fields[i + 1]) * 0.1f);
+		}
+	}
+	fclose(file);
+}
+
 KModelMgr::KModelMgr(const char * modelPath)
 {
+	this->modelPath = modelPath;
 	/*
 	unordered_map<pair<string, KPOSTag>, size_t> morphMap;
 	if (posFile) loadPOSFromTxt(posFile);
@@ -425,6 +471,7 @@ void KModelMgr::solidify()
 		f.updateCond();
 	}
 	formMap = {};
+	loadDMFromTxt((modelPath + string("distModel.txt")).c_str());
 }
 
 float KModelMgr::getTransitionP(const KMorpheme * a, const KMorpheme * b) const

@@ -1,6 +1,6 @@
-0.763282
-Total (4533) Time : 7140.03 ms
-Time per Unit : 1.57512 ms
+0.76329
+Total (4533) Time : 6795.65 ms
+Time per Unit : 1.49915 ms
 
 석 달하고도 며칠이 더 지나갔다.	0.571
 석/MM	달/NNG	하고/JC	도/JX	며칠/NNG	이/JKS	더/MAG	지나가/VV	았/EP	다/EF	./SF	
@@ -6114,11 +6114,11 @@ Time per Unit : 1.57512 ms
 또/MAG	하/XSV	ㄴ/ETM	그/NP	속/NNG	에/JKB	는/JX	자기/NP	삶/NNG	에/JKB	대하/VV	아/EC	철저히/MAG	무/XPN	책임/NNG	하/XSA	아/EC	지/VX	어도/EC	좋/VA	다는/ETM	의미/NNG	도/JX	포함/NNG	되/XSV	어/EC	있/VX	었/EP	다/EF	./SF	-74.41
 또/MAG	하/XSV	ㄴ/ETM	그/NP	속/NNG	에/JKB	는/JX	자기/NP	삶/NNG	에/JKB	대하/VV	아/EC	철저히/MAG	무/XPN	책임/NNG	해지/VV	어도/EC	좋/VA	다는/ETM	의미/NNG	도/JX	포함/NNG	되/XSV	어/EC	있/VV	었/EP	다/EF	./SF	-74.71
 
-일단 국고(國庫)에 귀속된다면 그 순간부터 그에게는 개인으로서의 삶을 꾸려 나갈 어떤 권리나 의무도 남지 않게 되는 까닭이었다.	0.761
+일단 국고(國庫)에 귀속된다면 그 순간부터 그에게는 개인으로서의 삶을 꾸려 나갈 어떤 권리나 의무도 남지 않게 되는 까닭이었다.	0.8
 일단/MAG	국고/NNG	(/SS	國庫/SH	)/SS	에/JKB	귀속/NNG	되/XSV	ㄴ다면/EC	그/MM	순간/NNG	부터/JX	그/NP	에게/JKB	는/JX	개인/NNG	으로서/JKB	의/JKG	삶/NNG	을/JKO	꾸리/VV	어/EC	나가/VX	ㄹ/ETM	어떤/MM	권리/NNG	나/JC	의무/NNG	도/JX	남/VV	지/EC	않/VX	게/EC	되/VV	는/ETM	까닭/NNG	이/VCP	었/EP	다/EF	./SF	
-일단/MAG	국고/NNG	(/SS	庫/SH	)/SS	에/JKB	귀속/NNG	되/XSV	ㄴ다면/EC	그/NP	순간/NNG	부터/JX	그/NP	에게/JKB	는/JX	개인/NNG	으로서/JKB	의/JKG	삶/NNG	을/JKO	꾸리/VV	어/EC	나가/VV	ㄹ/ETM	어떻/VA	ㄴ/ETM	권리/NNG	나/JX	의무/NNG	도/JX	남/VV	지/EC	않/VX	게/EC	되/VV	는/ETM	까닭/NNG	이/VCP	었/EP	다/EF	./SF	-106.7
-일단/MAG	국고/NNG	(/SS	庫/SH	)/SS	에/JKB	귀속/NNG	되/XSV	ㄴ다면/EC	그/NP	순간/NNG	부터/JX	그/NP	에게/JKB	는/JX	개인/NNG	으로서/JKB	의/JKG	삶/NNG	을/JKO	꾸리/VV	어/EC	나가/VV	ㄹ/ETM	어떻/VA	ㄴ/ETM	권리/NNG	나/JC	의무/NNG	도/JX	남/VV	지/EC	않/VX	게/EC	되/VV	는/ETM	까닭/NNG	이/VCP	었/EP	다/EF	./SF	-107.1
-일단/MAG	국고/NNG	(/SS	庫/SH	)/SS	에/JKB	귀속/NNG	되/XSV	ㄴ다면/EC	그/NP	순간/NNG	부터/JX	그/NP	에게/JKB	는/JX	개인/NNG	으로서/JKB	의/JKG	삶/NNG	을/JKO	꾸리/VV	어/EC	나가/VX	ㄹ/ETM	어떻/VA	ㄴ/ETM	권리/NNG	나/JX	의무/NNG	도/JX	남/VV	지/EC	않/VX	게/EC	되/VV	는/ETM	까닭/NNG	이/VCP	었/EP	다/EF	./SF	-107.3
+일단/MAG	국고/NNG	(/SS	國庫/SH	)/SS	에/JKB	귀속/NNG	되/XSV	ㄴ다면/EC	그/NP	순간/NNG	부터/JX	그/NP	에게/JKB	는/JX	개인/NNG	으로서/JKB	의/JKG	삶/NNG	을/JKO	꾸리/VV	어/EC	나가/VV	ㄹ/ETM	어떻/VA	ㄴ/ETM	권리/NNG	나/JX	의무/NNG	도/JX	남/VV	지/EC	않/VX	게/EC	되/VV	는/ETM	까닭/NNG	이/VCP	었/EP	다/EF	./SF	-106.7
+일단/MAG	국고/NNG	(/SS	國庫/SH	)/SS	에/JKB	귀속/NNG	되/XSV	ㄴ다면/EC	그/NP	순간/NNG	부터/JX	그/NP	에게/JKB	는/JX	개인/NNG	으로서/JKB	의/JKG	삶/NNG	을/JKO	꾸리/VV	어/EC	나가/VV	ㄹ/ETM	어떻/VA	ㄴ/ETM	권리/NNG	나/JC	의무/NNG	도/JX	남/VV	지/EC	않/VX	게/EC	되/VV	는/ETM	까닭/NNG	이/VCP	었/EP	다/EF	./SF	-107.1
+일단/MAG	국고/NNG	(/SS	國庫/SH	)/SS	에/JKB	귀속/NNG	되/XSV	ㄴ다면/EC	그/NP	순간/NNG	부터/JX	그/NP	에게/JKB	는/JX	개인/NNG	으로서/JKB	의/JKG	삶/NNG	을/JKO	꾸리/VV	어/EC	나가/VX	ㄹ/ETM	어떻/VA	ㄴ/ETM	권리/NNG	나/JX	의무/NNG	도/JX	남/VV	지/EC	않/VX	게/EC	되/VV	는/ETM	까닭/NNG	이/VCP	었/EP	다/EF	./SF	-107.3
 
 내가 감히 영장이 나오기만을 손꼽아 기다렸노라고 말할 수 있다면 그것은 그 말 속에 담겨 있는 마지막 의미 때문이었으리라.	0.85
 내/NP	가/JKS	감히/MAG	영장/NNG	이/JKS	나오/VV	기/ETN	만/JX	을/JKO	손꼽/VV	아/EC	기다리/VV	었/EP	노라고/EC	말/NNG	하/XSV	ㄹ/ETM	수/NNB	있/VV	다면/EC	그것/NP	은/JX	그/MM	말/NNG	속/NNG	에/JKB	담기/VV	어/EC	있/VX	는/ETM	마지막/NNG	의미/NNG	때문/NNB	이/VCP	었/EP	으리라/EF	./SF	

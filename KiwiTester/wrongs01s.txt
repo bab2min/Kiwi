@@ -1,6 +1,6 @@
-0.78132
-Total (1092) Time : 9818.18 ms
-Time per Unit : 8.99101 ms
+0.781286
+Total (1092) Time : 9143.95 ms
+Time per Unit : 8.37358 ms
 
 프랑스의 세계적인 의상 디자이너 엠마누엘 웅가로가 실내 장식용 직물 디자이너로 나섰다.	0.76
 프랑스/NNP	의/JKG	세계/NNG	적/XSN	이/VCP	ㄴ/ETM	의상/NNG	디자이너/NNG	엠마누엘/NNP	웅가로/NNP	가/JKS	실내/NNG	장식/NNG	용/XSN	직물/NNG	디자이너/NNG	로/JKB	나서/VV	었/EP	다/EF	./SF	
@@ -4384,11 +4384,11 @@ KBS/SL	프로듀서/NNG	출신/NNG	들/XSN	로/JKB	구성/NNG	되/XSV	ㄴ/ETM	독립/NNG	프로�
 소화력/NNG	은/JX	분말/NNG	소화기/NNG	보다/JKB	하론/UN	,/SP	이산화탄소/NNG	가/JKS	들어가/VV	ㄴ/ETM	가스/NNG	소화기/NNG	가/JKS	더/MAG	크/VA	지만/EC	가격/NNG	이/JKS	3/SN	배/NNG	가량/NNG	비싸/VA	므로/EC	가정/NNG	용/XSN	은/JX	분말/NNG	소화기/NNG	로/JKB	도/JX	충분/XR	하/XSA	아다/EC	고/EC	전문가/NNG	들/XSN	은/JX	조언/NNG	하/XSV	ㄴ다/EF	./SF	-166.5
 소화력/NNG	은/JX	분말/NNG	소화기/NNG	보다/JKB	하론/UN	,/SP	이산화탄소/NNG	가/JKS	들어가/VV	ㄴ/ETM	가스/NNG	소화기/NNG	가/JKS	더/MAG	크/VA	지만/EC	가격/NNG	이/JKS	3/SN	배/NNG	가량/NNG	비싸/VA	므로/EC	가정/NNG	용/XSN	은/JX	분말/NNG	소화기/NNG	로/JKB	도/JX	충분/XR	하/XSV	다/EC	고/EC	전문가/NNG	들/XSN	은/JX	조언/NNG	하/XSV	ㄴ다/EF	./SF	-167.3
 
-분말소화기는 내용물(제1인산암모늄)과 분사기능을 하는 CO² 가스가 나뉘어 담겨진 가압식과 이 두가지가 함께 들어간 축압식이 있다.	0.717
+분말소화기는 내용물(제1인산암모늄)과 분사기능을 하는 CO² 가스가 나뉘어 담겨진 가압식과 이 두가지가 함께 들어간 축압식이 있다.	0.681
 분말/NNG	소화기/NNG	는/JX	내용물/NNG	(/SS	제/XPN	1/SN	인산암모늄/NNG	)/SS	과/JC	분사/NNG	기능/NNG	을/JKO	하/VV	는/ETM	CO/SL	²/SW	가스/NNG	가/JKS	나뉘/VV	어/EC	담기/VV	어/EC	지/VX	ㄴ/ETM	가압식/NNG	과/JC	이/MM	두/MM	가지/NNB	가/JKS	함께/MAG	들어가/VV	ㄴ/ETM	축압식/NNG	이/JKS	있/VV	다/EF	./SF	
-분말/NNG	소화기/NNG	는/JX	내용물/NNG	(/SS	제/XPN	1/SN	인산/NNG	암모늄/UN	)/SS	과/JC	분사/NNG	기능/NNG	을/JKO	하/VV	는/ETM	CO/SL	²/SW	가스/NNG	가/JKS	나뉘/VV	어/EC	담기/VV	어/EC	지/VX	ㄴ/ETM	가압식/UN	과/JKB	이/NP	두/MM	가지/NNB	가/JKS	함께/MAG	들어가/VV	ㄴ/ETM	축압식/UN	이/JKS	있/VX	다/EF	./SF	-185.2
-분말/NNG	소화기/NNG	는/JX	내용물/NNG	(/SS	제/XPN	1/SN	인산/NNG	암모늄/UN	)/SS	과/JC	분사/NNG	기능/NNG	을/JKO	하/VV	는/ETM	CO/SL	²/SW	가스/NNG	가/JKS	나뉘/VV	어/EC	담기/VV	어/EC	지/VX	ㄴ/ETM	가압식/UN	과/JC	이/NP	두/MM	가지/NNB	가/JKS	함께/MAG	들어가/VV	ㄴ/ETM	축압식/UN	이/JKS	있/VX	다/EF	./SF	-185.2
-분말/NNG	소화기/NNG	는/JX	내용물/NNG	(/SS	제/XPN	1/SN	인산/NNG	암모늄/UN	)/SS	과/JC	분사/NNG	기능/NNG	을/JKO	하/VV	는/ETM	CO/SL	²/SW	가스/NNG	가/JKS	나뉘/VV	어/EC	담기/VV	어/EC	지/VX	ㄴ/ETM	가압식/UN	과/JKB	이/NP	두/MM	가지/NNB	가/JKS	함께/MAG	들어가/VV	ㄴ/ETM	축압/UN	식/NNB	이/JKS	있/VX	다/EF	./SF	-185.3
+분말/NNG	소화기/NNG	는/JX	내용물/NNG	(/SS	제/XPN	1/SN	인산/NNG	암모늄/UN	)/SS	과/JC	분사/NNG	기능/NNG	을/JKO	하/VV	는/ETM	CO/SL	²/SN	가스/NNG	가/JKS	나뉘/VV	어/EC	담기/VV	어/EC	지/VX	ㄴ/ETM	가압식/UN	과/JKB	이/NP	두/MM	가지/NNB	가/JKS	함께/MAG	들어가/VV	ㄴ/ETM	축압식/UN	이/JKS	있/VX	다/EF	./SF	-185.2
+분말/NNG	소화기/NNG	는/JX	내용물/NNG	(/SS	제/XPN	1/SN	인산/NNG	암모늄/UN	)/SS	과/JC	분사/NNG	기능/NNG	을/JKO	하/VV	는/ETM	CO/SL	²/SN	가스/NNG	가/JKS	나뉘/VV	어/EC	담기/VV	어/EC	지/VX	ㄴ/ETM	가압식/UN	과/JC	이/NP	두/MM	가지/NNB	가/JKS	함께/MAG	들어가/VV	ㄴ/ETM	축압식/UN	이/JKS	있/VX	다/EF	./SF	-185.2
+분말/NNG	소화기/NNG	는/JX	내용물/NNG	(/SS	제/XPN	1/SN	인산/NNG	암모늄/UN	)/SS	과/JC	분사/NNG	기능/NNG	을/JKO	하/VV	는/ETM	CO/SL	²/SN	가스/NNG	가/JKS	나뉘/VV	어/EC	담기/VV	어/EC	지/VX	ㄴ/ETM	가압식/UN	과/JKB	이/NP	두/MM	가지/NNB	가/JKS	함께/MAG	들어가/VV	ㄴ/ETM	축압/UN	식/NNB	이/JKS	있/VX	다/EF	./SF	-185.3
 
 가압식은 내용물이 쉽게 응고되고 한 번 사용하면 내용물을 다시넣어 사용해야 한다.	0.7
 가압식/NNG	은/JX	내용물/NNG	이/JKS	쉽/VA	게/EC	응고/NNG	되/XSV	고/EC	한/MM	번/NNB	사용/NNG	하/XSV	면/EC	내용물/NNG	을/JKO	다시/MAG	넣/VV	어/EC	사용/NNG	하/XSV	아야/EC	하/VX	ㄴ다/EF	./SF	
