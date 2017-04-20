@@ -396,7 +396,7 @@ void KModelMgr::loadDMFromTxt(const char * filename)
 			auto m = findMorpheme(parseFormTag(fields[i]));
 			if (!m) continue;
 			if (!tarMorpheme->distMap) tarMorpheme->distMap = new unordered_map<const KMorpheme*, float>{};
-			tarMorpheme->distMap->emplace(m, stof(fields[i + 1]) * 0.1f);
+			tarMorpheme->distMap->emplace(m, stof(fields[i + 1]) * .5f);
 		}
 	}
 	fclose(file);
