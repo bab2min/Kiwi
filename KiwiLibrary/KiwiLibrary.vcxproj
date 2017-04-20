@@ -22,7 +22,7 @@
     <ProjectGuid>{F790BC37-2732-4ED1-9CA5-7248BED3588E}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>KiwiLibrary</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

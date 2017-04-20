@@ -230,7 +230,7 @@ KResult Kiwi::analyze(const k_wstring & str) const
 
 vector<KResult> Kiwi::analyze(const k_wstring & str, size_t topN) const
 {
-	vector<KResult> cands(1);
+	vector<KInterResult> cands(1);
 	auto parts = splitPart(str);
 	auto sortFunc = [](const auto& x, const auto& y)
 	{
@@ -245,7 +245,7 @@ vector<KResult> Kiwi::analyze(const k_wstring & str, size_t topN) const
 			{
 				for (auto& cand : cands)
 				{
-					cand.first.emplace_back(c);
+					cand.first.emplace_back(nullptr, c.first, c.second);
 				}
 				continue;
 			}
@@ -260,26 +260,50 @@ vector<KResult> Kiwi::analyze(const k_wstring & str, size_t topN) const
 			{
 				return get<float>(x) > get<float>(y);
 			});
-			vector<KResult> newCands;
+			vector<KInterResult> newCands;
 			newCands.reserve(min(topN, probs.size()));
 			for_each(probs.begin(), probs.begin() + min(topN, probs.size()), [&newCands, &cands, &ar](auto p)
 			{
 				const KInterResult& arp = ar[get<1>(p)];
 				newCands.emplace_back(cands[get<0>(p)]);
-				newCands.back().first.reserve(newCands.back().first.size() + arp.first.size());
-				//newCands.back().first.insert(newCands.back().first.end(), arp.first.begin(), arp.first.end());
-				for (const auto& m : arp.first)
-				{
-					auto morpheme = get<0>(m);
-					if(morpheme) newCands.back().first.emplace_back(*morpheme->wform, morpheme->tag);
-					else newCands.back().first.emplace_back(get<1>(m), get<2>(m));
-				}
 				newCands.back().second += arp.second;
+				auto& ms = newCands.back().first;
+				size_t inserted = ms.size();
+				ms.insert(ms.end(), arp.first.begin(), arp.first.end());
+#ifdef USE_DIST_MAP
+				for (size_t i = inserted; i < ms.size(); i++)
+				{
+					auto& mi = get<0>(ms[i]);
+					if (!mi) continue;
+					if (!mi->distMap) continue;
+					for (size_t j = inserted < 5 ? 0 : inserted - 5; j < i; j++)
+					{
+						auto& mj = get<0>(ms[j]);
+						if (!mj) continue;
+						auto it = mi->distMap->find(mj);
+						if (it == mi->distMap->end()) continue;
+						newCands.back().second += it->second;
+					}
+				}
+#endif
 			});
 			cands = newCands;
 		}
 	}
-	return cands;
+	vector<KResult> ret;
+	ret.reserve(cands.size());
+	for (const auto& c : cands)
+	{
+		ret.emplace_back(vector<KWordPair>{}, c.second);
+		ret.back().first.reserve(c.first.size());
+		for (const auto& m : c.first)
+		{
+			auto morpheme = get<0>(m);
+			if (morpheme) ret.back().first.emplace_back(*morpheme->wform, morpheme->tag);
+			else ret.back().first.emplace_back(get<1>(m), get<2>(m));
+		}
+	}
+	return ret;
 }
 
 void Kiwi::clearCache()
