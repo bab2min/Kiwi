@@ -32,7 +32,7 @@ int main()
 	Kiwi kw{ "../ModelGenerator/" };
 	kw.prepare();
 	printf("Loading Time : %g ms\n", timer.getElapsed());
-	string testFiles[] = { "17s.txt", "18s.txt", "19s.txt" };
+	string testFiles[] = { "01s.txt", "02s.txt", "03s.txt", "17s.txt", "18s.txt"};
 	for (auto tf : testFiles)
 	{
 		Timer total;
