@@ -66,7 +66,7 @@ class RuleModel:
 
         def applyRule(self, formA, formB, bcond):
             for rule in self.rules:
-                if bcond and bcond != rule[4]: continue
+                if (bcond and bcond != rule[4]) or (self.posA == ['VCP'] and bcond != rule[4]): continue
                 res = [rule[2].sub(i, formA + '\t' + formB) for i in rule[3]]
                 if res[0].find('\t') < 0: return res
             return None
@@ -77,6 +77,7 @@ class RuleModel:
 
     def load(self, filename):
         for line in open(filename, encoding='utf-8'):
+            if line.startswith('#'): continue
             c = line.strip().split('\t')
             if len(c) < 2: continue
             if len(c) < 3:
@@ -144,14 +145,19 @@ for d, p in pm.transition.get('NP', {}).items():
     if not d.startswith('J'): continue
     chain[(d,)] = p
 
+for d, p in pm.transition.get('NNB', {}).items():
+    if not d.startswith('VCP'): continue
+    chain[(d,)] = p
 
-precondList = ['V', 'VA', 'VV', 'VX', 'NP']
+
+precondList = ['V', 'VA', 'VV', 'VX', 'NP', 'NNB']
 precond = {pos:[(i, pos) for i in rm.getPrecond(pos)] for pos in precondList}
-precond['V'] += [('ㅇㅣ', 'VCP'), ('ㅇㅏㄴㅣ', 'VCN')]
+precond['V'] += [('ㅇㅣ', 'VCP'), (('ㅇㅣ', '+Vowel'), 'VCP'), ('ㅇㅏㄴㅣ', 'VCN')]
 #precond['VA'] += [('ㅇㅣㄹㅓㅎ', 'VA'), ('ㄱㅡㄹㅓㅎ', 'VA'), ('ㅈㅓㄹㅓㅎ', 'VA'), ('ㅇㅓㄸㅓㅎ', 'VA'), ('ㅈㅓㄸㅓㅎ', 'VA')]
 precond['XSV'] = [(utils.normalizeHangul(line.strip()), 'XSV') for line in open('XSV.txt', encoding='utf-8').readlines()]
 precond['XSA'] = [(utils.normalizeHangul(line.strip()), 'XSA') for line in open('XSA.txt', encoding='utf-8').readlines()]
-precond['VA'] = [(utils.normalizeHangul(line.strip()), 'VA') for line in open('hAdj.txt', encoding='utf-8').readlines()]
+precond['VA'] = [(utils.normalizeHangul(line.strip()), 'VA') for line in open('VA.txt', encoding='utf-8').readlines()]
+precond['VX'] = [(utils.normalizeHangul(line.strip()), 'VX') for line in open('VX.txt', encoding='utf-8').readlines()]
 #print(precond['VV'])
 emptyPos = set()
 

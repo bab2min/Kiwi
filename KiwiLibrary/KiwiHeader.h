@@ -7,6 +7,7 @@
 #include <array>
 #include <vector>
 #include <unordered_map>
+#include <map>
 #include <unordered_set>
 #include <deque>
 #include <bitset>
@@ -29,9 +30,10 @@ using namespace std;
 
 #define TRIE_ALLOC_ARRAY
 #define DIVIDE_BOUND 6
-#define MIN_CANDIDATE 3
+#define MIN_CANDIDATE 5
 #define USE_DIST_MAP
-#define LOAD_TXT
+#define PMI_WEIGHT 0.67f
+//#define LOAD_TXT
 
 #ifdef _WIN32
 typedef wchar_t k_wchar;

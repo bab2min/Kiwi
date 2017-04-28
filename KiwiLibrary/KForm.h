@@ -79,6 +79,7 @@ struct KMorpheme
 		combineSocket = m.combineSocket;
 		p = m.p;
 		swap(chunks, m.chunks);
+		combined = m.combined;
 #ifdef USE_DIST_MAP
 		swap(distMap, m.distMap);
 #endif
@@ -100,9 +101,23 @@ struct KMorpheme
 	char combineSocket = 0;
 	float p = 0;
 	vector<const KMorpheme*>* chunks = nullptr;
-	const KMorpheme* combined = nullptr;
+	int combined = 0;
+	const KMorpheme* getCombined() const { return this + combined; }
 #ifdef USE_DIST_MAP
-	unordered_map<const KMorpheme*, float>* distMap = nullptr;
+	map<int, float>* distMap = nullptr;
+	void addToDistMap(const KMorpheme* t, float v)
+	{
+		if (!distMap) distMap = new map<int, float>{};
+		distMap->emplace(t - this, v);
+	}
+	float getDistMap(const KMorpheme* t) const 
+	{
+		auto it = distMap->find(t - this);
+		if (it != distMap->end()) return it->second;
+		else return 0;
+	}
+	void readDistMapFromBin(FILE* f);
+	void writeDistMapToBin(FILE* f) const;
 #endif
 	void readFromBin(FILE* f, const function<const KMorpheme*(size_t)>& mapper);
 	void writeToBin(FILE* f, const function<size_t(const KMorpheme*)>& mapper) const;

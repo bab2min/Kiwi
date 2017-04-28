@@ -183,6 +183,7 @@ void KMorpheme::readFromBin(FILE * f, const function<const KMorpheme*(size_t)>& 
 	fread(&polar, 1, 1, f);
 	fread(&combineSocket, 1, 1, f);
 	fread(&p, 1, 4, f);
+	fread(&combined, 1, 4, f);
 
 	size_t s = 0;
 	fread(&s, 1, 4, f);
@@ -206,6 +207,7 @@ void KMorpheme::writeToBin(FILE * f, const function<size_t(const KMorpheme*)>& m
 	fwrite(&polar, 1, 1, f);
 	fwrite(&combineSocket, 1, 1, f);
 	fwrite(&p, 1, 4, f);
+	fwrite(&combined, 1, 4, f);
 
 	size_t s = chunks ? chunks->size() : 0;
 	fwrite(&s, 1, 4, f);
@@ -215,3 +217,39 @@ void KMorpheme::writeToBin(FILE * f, const function<size_t(const KMorpheme*)>& m
 		fwrite(&cid, 1, 4, f);
 	}
 }
+
+#ifdef USE_DIST_MAP
+
+void KMorpheme::readDistMapFromBin(FILE * f)
+{
+	size_t s = 0;
+	fread(&s, 1, 4, f);
+	if (s)
+	{
+		distMap = new map<int, float>;
+		for (size_t i = 0; i < s; i++)
+		{
+			int id = 0;
+			float pmi = 0;
+			fread(&id, 1, 4, f);
+			fread(&pmi, 1, 4, f);
+			distMap->emplace(id, pmi);
+		}
+	}
+}
+
+void KMorpheme::writeDistMapToBin(FILE * f) const
+{
+	size_t s = distMap ? distMap->size() : 0;
+	fwrite(&s, 1, 4, f);
+	if (s)
+	{
+		for (auto& i : *distMap)
+		{
+			fwrite(&i.first, 1, 4, f);
+			fwrite(&i.second, 1, 4, f);
+		}
+	}
+}
+
+#endif

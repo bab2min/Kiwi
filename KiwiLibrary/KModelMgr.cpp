@@ -73,8 +73,9 @@ void KModelMgr::loadPOSFromTxt(const char * filename)
 		};
 		size_t maxPos = 1;
 		float maxValue = posTransition[i][1] + posTransition[1][j];
-		for (size_t n = 1; n <= (size_t)KPOSTag::NR; n++)
+		for (size_t n = 1; n < (size_t)KPOSTag::NR; n++)
 		{
+			if (n == (size_t)KPOSTag::NNB || n == (size_t)KPOSTag::VV || n == (size_t)KPOSTag::VA || n == (size_t)KPOSTag::MAG) continue;
 			if (posTransition[i][n] + posTransition[n][j] > maxValue)
 			{
 				maxPos = n;
@@ -294,7 +295,7 @@ void KModelMgr::loadPCMFromTxt(const char * filename, unordered_map<pair<string,
 		fm.suffix.insert(suffixes.begin(), suffixes.end());
 		morphemes.emplace_back(form, tag, KCondVowel::none, KCondPolarity::none, logf(tagWeight), socket);
 		morphemes.back().kform = (const string*)(&fm - &forms[0]);
-		morphemes.back().combined = (const KMorpheme*)mit->second;
+		morphemes.back().combined = (int)mit->second - ((int)morphemes.size() - 1);
 	}
 	fclose(file);
 #endif
@@ -355,12 +356,12 @@ void KModelMgr::loadMorphBin(const char * filename)
 	fclose(f);
 }
 
+#ifdef USE_DIST_MAP
 void KModelMgr::loadDMFromTxt(const char * filename)
 {
-#ifdef USE_DIST_MAP
 	FILE* file;
 	if (fopen_s(&file, filename, "r")) throw ios_base::failure{ string("Cannot open ") + filename };
-	char buf[16384];
+	char buf[65536*4];
 	wstring_convert<codecvt_utf8_utf16<k_wchar>, k_wchar> converter;
 
 	auto parseFormTag = [](const k_wstring& f) -> pair<string, KPOSTag>
@@ -372,36 +373,71 @@ void KModelMgr::loadDMFromTxt(const char * filename)
 		return { str, tag };
 	};
 
-	auto findMorpheme = [this](const pair<string, KPOSTag>& m) -> const KMorpheme*
+	auto findMorpheme = [this](const pair<string, KPOSTag>& m) -> KMorpheme*
 	{
 		auto form = getTrie()->search(&m.first[0], &m.first[0] + m.first.size());
 		if (!form || form == (void*)-1) return nullptr;
 		for (const auto& cand : form->candidate)
 		{
-			if (cand->tag == m.second) return cand;
+			if (cand->tag == m.second) return (KMorpheme*)cand;
 		}
 		return nullptr;
 	};
 
-	while (fgets(buf, 16384, file))
+	while (fgets(buf, 65536*4, file))
 	{
 		auto wstr = converter.from_bytes(buf);
 		if (wstr.back() == '\n') wstr.pop_back();
 		auto fields = split(wstr, '\t');
 		if (fields.size() < 4) continue;
-		auto tarMorpheme = (KMorpheme*)findMorpheme(parseFormTag(fields[0]));
+		auto tarMorpheme = findMorpheme(parseFormTag(fields[0]));
 		if (!tarMorpheme) continue;
 		for (size_t i = 2; i < fields.size(); i += 2)
 		{
 			auto m = findMorpheme(parseFormTag(fields[i]));
 			if (!m) continue;
-			if (!tarMorpheme->distMap) tarMorpheme->distMap = new unordered_map<const KMorpheme*, float>{};
-			tarMorpheme->distMap->emplace(m, stof(fields[i + 1]) * .5f);
+			float pmi = stof(fields[i + 1]);
+			if (abs(pmi) < 3.f) continue;
+			pmi *= PMI_WEIGHT;
+			tarMorpheme->addToDistMap(m, pmi);
+			m->addToDistMap(tarMorpheme, pmi);
 		}
 	}
 	fclose(file);
-#endif
 }
+
+
+void KModelMgr::saveDMBin(const char * filename) const
+{
+	FILE* f;
+	if (fopen_s(&f, filename, "wb")) throw ios_base::failure{ string("Cannot open ") + filename };
+	fwrite("KIWI", 1, 4, f);
+	size_t s = morphemes.size();
+	fwrite(&s, 1, 4, f);
+
+	for (const auto& morph : morphemes)
+	{
+		morph.writeDistMapToBin(f);
+	}
+	fclose(f);
+}
+
+void KModelMgr::loadDMBin(const char * filename)
+{
+	FILE* f;
+	if (fopen_s(&f, filename, "rb")) throw ios_base::failure{ string("Cannot open ") + filename };
+	size_t morphemeSize = 0;
+	fread(&morphemeSize, 1, 4, f);
+	fread(&morphemeSize, 1, 4, f);
+
+	for (auto& morph : morphemes)
+	{
+		morph.readDistMapFromBin(f);
+	}
+	fclose(f);
+}
+
+#endif
 
 KModelMgr::KModelMgr(const char * modelPath)
 {
@@ -453,7 +489,7 @@ void KModelMgr::addUserRule(const string & form, const vector<pair<string, KPOST
 void KModelMgr::solidify()
 {
 #ifdef TRIE_ALLOC_ARRAY
-	trieRoot.reserve(150000 + extraTrieSize);
+	trieRoot.reserve(152000 + extraTrieSize);
 	trieRoot.emplace_back();
 	for (auto& f : forms)
 	{
@@ -478,8 +514,7 @@ void KModelMgr::solidify()
 	{
 		f.wform = &forms[(size_t)f.kform].wform;
 		f.kform = &forms[(size_t)f.kform].form;
-		if (f.combined) f.combined = &morphemes[(size_t)f.combined];
-		if(f.chunks) for (auto& p : *f.chunks) p = &morphemes[(size_t)p];
+		if (f.chunks) for (auto& p : *f.chunks) p = &morphemes[(size_t)p];
 	}
 
 	for (auto& f : forms)
@@ -488,7 +523,29 @@ void KModelMgr::solidify()
 		f.updateCond();
 	}
 	formMap = {};
+
+#if defined(USE_DIST_MAP) && defined(LOAD_TXT)
 	loadDMFromTxt((modelPath + string("distModel.txt")).c_str());
+	saveDMBin((modelPath + string("distModel.bin")).c_str());
+#endif
+#if defined(USE_DIST_MAP) && !defined(LOAD_TXT)
+	loadDMBin((modelPath + string("distModel.bin")).c_str());
+#endif
+
+	/*FILE* out;
+	fopen_s(&out, "dmTestBin.txt", "w");
+	size_t n = 0;
+	for (auto& m : morphemes)
+	{
+		n++;
+		if (!m.distMap) continue;
+		fprintf(out, "\n%zd\n", n);
+		for (auto& i : *m.distMap)
+		{
+			fprintf(out, "%d\t%g\n", i.first, i.second);
+		}
+	}
+	fclose(out);*/
 }
 
 float KModelMgr::getTransitionP(const KMorpheme * a, const KMorpheme * b) const
