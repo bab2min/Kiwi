@@ -262,7 +262,7 @@ vector<KResult> Kiwi::analyze(const k_wstring & str, size_t topN) const
 			});
 			vector<KInterResult> newCands;
 			newCands.reserve(min(topN, probs.size()));
-			for_each(probs.begin(), probs.begin() + min(topN, probs.size()), [&newCands, &cands, &ar](auto p)
+			for_each(probs.begin(), probs.begin() + min(max(topN, (size_t)MIN_CANDIDATE), probs.size()), [&newCands, &cands, &ar](auto p)
 			{
 				const KInterResult& arp = ar[get<1>(p)];
 				newCands.emplace_back(cands[get<0>(p)]);
@@ -280,9 +280,7 @@ vector<KResult> Kiwi::analyze(const k_wstring & str, size_t topN) const
 					{
 						auto& mj = get<0>(ms[j]);
 						if (!mj) continue;
-						auto it = mi->distMap->find(mj);
-						if (it == mi->distMap->end()) continue;
-						newCands.back().second += it->second;
+						newCands.back().second += mi->getDistMap(mj);
 					}
 				}
 #endif
@@ -294,6 +292,7 @@ vector<KResult> Kiwi::analyze(const k_wstring & str, size_t topN) const
 	ret.reserve(cands.size());
 	for (const auto& c : cands)
 	{
+		if (ret.size() >= topN) break;
 		ret.emplace_back(vector<KWordPair>{}, c.second);
 		ret.back().first.reserve(c.first.size());
 		for (const auto& m : c.first)
@@ -505,7 +504,18 @@ vector<KInterResult> Kiwi::analyzeJM(const string & jm, size_t topN, KPOSTag pre
 				//if (!morpheme) continue;
 				if (s[n].isStr())
 				{
-					cands.back().first.emplace_back(nullptr, string{ &jm[0] + s[n].begin, &jm[0] + s[n].end }, KPOSTag::UNKNOWN);
+					const KMorpheme* before = nullptr;
+					const KMorpheme* next = nullptr;
+					if (n && !s[n - 1].isStr())
+					{
+						before = s[n - 1].form->candidate[pb.first[n - 1]];
+					}
+					if (n + 1 < pb.first.size() && !s[n + 1].isStr())
+					{
+						next = s[n + 1].form->candidate[pb.first[n + 1]];
+					}
+					auto predictTag = mdl->findMaxiumTag(before, next);
+					cands.back().first.emplace_back(nullptr, string{ &jm[0] + s[n].begin, &jm[0] + s[n].end }, predictTag);
 				}
 				else
 				{
@@ -525,8 +535,8 @@ vector<KInterResult> Kiwi::analyzeJM(const string & jm, size_t topN, KPOSTag pre
 							//assert(!get<0>(cands.back().first.back())->chunks.empty());
 							//get<0>(cands.back().first.back()) = get<0>(cands.back().first.back())->chunks[0];
 							auto& bm = get<0>(cands.back().first.back());
-							assert(bm->combined);
-							bm = bm->combined;
+							assert(bm->getCombined());
+							bm = bm->getCombined();
 						}
 						else cands.back().first.emplace_back(pbcc, string{}, KPOSTag{});
 					}

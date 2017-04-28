@@ -26,7 +26,11 @@ protected:
 	void loadPCMFromTxt(const char * filename, unordered_map<pair<string, KPOSTag>, size_t>& morphMap);
 	void saveMorphBin(const char* filename) const;
 	void loadMorphBin(const char* filename);
+#ifdef USE_DIST_MAP
 	void loadDMFromTxt(const char* filename);
+	void saveDMBin(const char* filename) const;
+	void loadDMBin(const char* filename);
+#endif
 	KForm& formMapper(string form)
 	{
 		auto it = formMap.find(form);

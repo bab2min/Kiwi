@@ -24,6 +24,9 @@ public:
 	}
 };
 
+#include "windows.h"
+#include "psapi.h"
+
 int main()
 {
 	system("chcp 65001");
@@ -32,6 +35,11 @@ int main()
 	Kiwi kw{ "../ModelGenerator/" };
 	kw.prepare();
 	printf("Loading Time : %g ms\n", timer.getElapsed());
+	PROCESS_MEMORY_COUNTERS pmc;
+	GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc));
+	SIZE_T memUsed = pmc.WorkingSetSize;
+	printf("Mem Usage : %g MB\n", memUsed / 1024.f / 1024.f);
+
 	string testFiles[] = { "01s.txt", "02s.txt", "03s.txt", "17s.txt", "18s.txt"};
 	for (auto tf : testFiles)
 	{

@@ -53,17 +53,18 @@ class DistModelGenerator:
         for m, d in self.words.items():
             self.allCount += d.c
 
-    def writeToFile(self, file):
+    def writeToFile(self, file, filt = None):
         for (form, tag) in sorted(self.words):
             d = self.words[form, tag]
             if d.c < 30: continue
             if tag.startswith('E') or tag.startswith('J'): continue
             if not self.isValidForm(form): continue
+            if filt and (form + '/' + tag) not in filt: continue
             file.write('%s/%s\t%d\t' % (utils.normalizeHangul(form), tag, d.c))
             pmi = {a:math.log(b / d.c / self.words[a].c * self.allCount) for a, b in d.p.items() if self.words[a].c >= 30}
             for (f, t) in sorted(pmi, key=pmi.get, reverse=True):
                 if not self.isValidForm(f): continue
-                if abs(pmi[f, t]) < 5: continue
+                if abs(pmi[f, t]) < 2: continue
                 file.write('%s/%s\t%g\t' % (utils.normalizeHangul(f), t, pmi[f, t]))
             file.write('\n')
 
@@ -86,6 +87,9 @@ except:
 print('Recalc...')
 mg.recalc()
 print('Writing...')
+filt = set()
+for line in open('ambiguityWords.txt', encoding='utf-8'):
+    filt.add(line.strip())
 with open('distModel.txt', 'w', encoding='utf-8') as output:
-    mg.writeToFile(output)
+    mg.writeToFile(output, filt)
 
