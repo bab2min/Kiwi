@@ -356,7 +356,7 @@ void KModelMgr::loadMorphBin(const char * filename)
 	fclose(f);
 }
 
-#ifdef USE_DIST_MAP
+#if defined(USE_DIST_MAP) && defined(LOAD_TXT)
 void KModelMgr::loadDMFromTxt(const char * filename)
 {
 	FILE* file;
@@ -405,8 +405,9 @@ void KModelMgr::loadDMFromTxt(const char * filename)
 	}
 	fclose(file);
 }
+#endif
 
-
+#ifdef USE_DIST_MAP
 void KModelMgr::saveDMBin(const char * filename) const
 {
 	FILE* f;
@@ -531,7 +532,7 @@ void KModelMgr::solidify()
 #if defined(USE_DIST_MAP) && !defined(LOAD_TXT)
 	loadDMBin((modelPath + string("distModel.bin")).c_str());
 #endif
-
+	
 	/*FILE* out;
 	fopen_s(&out, "dmTestBin.txt", "w");
 	size_t n = 0;

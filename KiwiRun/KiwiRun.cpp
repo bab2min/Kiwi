@@ -33,7 +33,7 @@ unordered_map<string, vector<string>> parseArg(int argc, const char** argv)
 void help()
 {
 	printf("Kiwi : Korean Intelligent Word Identifier\n"
-		"version: 0.1\n"
+		"version: 0.2\n"
 		"\n"
 		"= Usage =\n"
 		"kiwi [-m model] [-u user] [-o output] [-c cache] [-n number] input...\n"
