@@ -4,17 +4,17 @@
 
 struct KChunk;
 
-string splitJamo(k_wstring hangul);
-k_wstring joinJamo(string jm);
+k_string splitJamo(k_wstring hangul);
+k_wstring joinJamo(k_string jm);
 bool verifyHangul(k_wstring hangul);
-void splitJamo(k_wchar hangul, string& ret);
+void splitJamo(k_wchar hangul, k_string& ret);
 void printJM(const char* c, size_t len = -1);
-void printJM(const string& c);
+void printJM(const k_string& c);
 void printJM(const KChunk& c, const char* p);
 
 template<typename Iter>
-string encodeJamo(Iter begin, Iter end) {
-	string ret;
+k_string encodeJamo(Iter begin, Iter end) {
+	k_string ret;
 	for (; begin != end; ++begin)
 	{
 		assert(*begin > 0x3130 && *begin <= 0x3130 + 51);
@@ -41,17 +41,17 @@ inline vector<k_wstring> split(const k_wstring &s, k_wchar delim) {
 
 
 template<typename Out>
-void split(const string &s, char delim, Out result) {
-	stringstream ss;
+void split(const k_string &s, char delim, Out result) {
+	k_stringstream ss;
 	ss.str(s);
-	string item;
+	k_string item;
 	while (getline(ss, item, delim)) {
 		*(result++) = item;
 	}
 }
 
-inline vector<string> split(const string &s, char delim) {
-	vector<string> elems;
+inline vector<k_string> split(const k_string &s, char delim) {
+	vector<k_string> elems;
 	split(s, delim, back_inserter(elems));
 	return elems;
 }

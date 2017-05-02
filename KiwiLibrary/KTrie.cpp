@@ -113,7 +113,7 @@ const KForm * KTrie::search(const char* begin, const char* end) const
 	return nullptr;
 }
 
-vector<pair<const KForm*, int>> KTrie::searchAllPatterns(const string& str) const
+vector<pair<const KForm*, int>> KTrie::searchAllPatterns(const k_string& str) const
 {
 	vector<pair<const KForm*, int>> found;
 	auto curTrie = this;
@@ -147,7 +147,7 @@ vector<pair<const KForm*, int>> KTrie::searchAllPatterns(const string& str) cons
 	return found;
 }
 
-vector<vector<KChunk>> KTrie::split(const string& str, bool hasPrefix) const
+vector<vector<KChunk>> KTrie::split(const k_string& str, bool hasPrefix) const
 {
 	struct ChunkInfo
 	{

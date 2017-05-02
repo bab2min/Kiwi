@@ -51,9 +51,9 @@ struct KMorpheme
 #ifdef _DEBUG
 	static size_t uid;
 	size_t id;
-	string form;
+	k_string form;
 #endif
-	KMorpheme(const string& _form = "", 
+	KMorpheme(const k_string& _form = "", 
 		KPOSTag _tag = KPOSTag::UNKNOWN, 
 		KCondVowel _vowel = KCondVowel::none,
 		KCondPolarity _polar = KCondPolarity::none, 
@@ -92,8 +92,8 @@ struct KMorpheme
 #endif
 		if (chunks) delete chunks;
 	}
-	const string& getForm() const { return *kform; }
-	const string* kform = nullptr;
+	const k_string& getForm() const { return *kform; }
+	const k_string* kform = nullptr;
 	const k_wstring* wform = nullptr;
 	KPOSTag tag = KPOSTag::UNKNOWN;
 	KCondVowel vowel = KCondVowel::none;
@@ -125,7 +125,7 @@ struct KMorpheme
 
 struct KForm
 {
-	string form;
+	k_string form;
 	k_wstring wform;
 	vector<const KMorpheme*> candidate;
 	KCondVowel vowel = KCondVowel::none;
@@ -134,7 +134,7 @@ struct KForm
 	//float maxP = 0;
 	unordered_set<char> suffix;
 	KForm(const char* _form = nullptr);
-	KForm(const string& _form) : form(_form) {}
+	KForm(const k_string& _form) : form(_form) {}
 	void updateCond();
 
 	void readFromBin(FILE* f, const function<const KMorpheme*(size_t)>& mapper);

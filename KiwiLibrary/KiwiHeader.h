@@ -49,3 +49,14 @@ inline int fopen_s(FILE** f, const char* p, const char* m)
 	return !*f;
 }
 #endif
+
+//#define CUSTOM_ALLOC
+
+#ifdef CUSTOM_ALLOC
+#include "KMemory.h"
+typedef basic_string<char, char_traits<char>, log_allocator<char>> k_string;
+typedef basic_stringstream<char, char_traits<char>, log_allocator<char>> k_stringstream;
+#else
+typedef string k_string;
+typedef stringstream k_stringstream;
+#endif
