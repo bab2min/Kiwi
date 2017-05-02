@@ -7,11 +7,11 @@
 namespace std
 {
 	template <>
-	class hash<pair<string, KPOSTag>> {
+	class hash<pair<k_string, KPOSTag>> {
 	public:
-		size_t operator() (const pair<string, KPOSTag>& o) const
+		size_t operator() (const pair<k_string, KPOSTag>& o) const
 		{
-			return hash<string>{}(o.first) ^ (size_t)o.second;
+			return hash<k_string>{}(o.first) ^ (size_t)o.second;
 		};
 	};
 }
@@ -24,7 +24,7 @@ void KModelMgr::loadPOSFromTxt(const char * filename)
 		g = P_MIN;
 	}
 	FILE* file;
-	if (fopen_s(&file, filename, "r")) throw ios_base::failure{ string("Cannot open ") + filename };
+	if (fopen_s(&file, filename, "r")) throw ios_base::failure{ k_string("Cannot open ") + filename };
 	char buf[2048];
 	wstring_convert<codecvt_utf8_utf16<k_wchar>, k_wchar> converter;
 	while (fgets(buf, 2048, file))
@@ -119,7 +119,7 @@ void KModelMgr::loadPOSBin(const char * filename)
 	fclose(f);
 }
 
-void KModelMgr::loadMMFromTxt(const char * filename, unordered_map<pair<string, KPOSTag>, size_t>& morphMap)
+void KModelMgr::loadMMFromTxt(const char * filename, unordered_map<pair<k_string, KPOSTag>, size_t>& morphMap)
 {
 #ifdef LOAD_TXT
 	FILE* file;
@@ -174,14 +174,14 @@ void KModelMgr::loadMMFromTxt(const char * filename, unordered_map<pair<string, 
 		fm.candidate.emplace_back((KMorpheme*)mid);
 		fm.suffix.insert(0);
 		morphemes.emplace_back(form, tag, cvowel, polar, logf(tagWeight));
-		morphemes.back().kform = (const string*)(&fm - &forms[0]);
+		morphemes.back().kform = (const k_string*)(&fm - &forms[0]);
 	}
 	fclose(file);
 #endif
 }
 
 
-void KModelMgr::loadCMFromTxt(const char * filename, unordered_map<pair<string, KPOSTag>, size_t>& morphMap)
+void KModelMgr::loadCMFromTxt(const char * filename, unordered_map<pair<k_string, KPOSTag>, size_t>& morphMap)
 {
 #ifdef LOAD_TXT
 	FILE* file;
@@ -216,7 +216,7 @@ void KModelMgr::loadCMFromTxt(const char * filename, unordered_map<pair<string, 
 				morphMap.emplace(make_pair(f, tag), mid);
 				auto& fm = formMapper(f);
 				morphemes.emplace_back(f, tag);
-				morphemes.back().kform = (const string*)(&fm - &forms[0]);
+				morphemes.back().kform = (const k_string*)(&fm - &forms[0]);
 				chunkIds->emplace_back((KMorpheme*)mid);
 			}
 			if (bTag == (size_t)KPOSTag::V)
@@ -255,7 +255,7 @@ void KModelMgr::loadCMFromTxt(const char * filename, unordered_map<pair<string, 
 		fm.candidate.emplace_back((KMorpheme*)mid);
 		fm.suffix.insert(0);
 		morphemes.emplace_back(form, KPOSTag::UNKNOWN, vowel, polar, ps, combineSocket);
-		morphemes.back().kform = (const string*)(&fm - &forms[0]);
+		morphemes.back().kform = (const k_string*)(&fm - &forms[0]);
 		morphemes.back().chunks = chunkIds;
 	}
 	fclose(file);
@@ -263,7 +263,7 @@ void KModelMgr::loadCMFromTxt(const char * filename, unordered_map<pair<string, 
 }
 
 
-void KModelMgr::loadPCMFromTxt(const char * filename, unordered_map<pair<string, KPOSTag>, size_t>& morphMap)
+void KModelMgr::loadPCMFromTxt(const char * filename, unordered_map<pair<k_string, KPOSTag>, size_t>& morphMap)
 {
 #ifdef LOAD_TXT
 	FILE* file;
@@ -283,7 +283,7 @@ void KModelMgr::loadPCMFromTxt(const char * filename, unordered_map<pair<string,
 		auto orgform = encodeJamo(org.cbegin(), org.cend());
 		auto tag = makePOSTag(fields[1]);
 		float tagWeight = stof(fields[2]);
-		string suffixes = encodeJamo(fields[3].cbegin(), fields[3].cend());
+		k_string suffixes = encodeJamo(fields[3].cbegin(), fields[3].cend());
 		char socket = stoi(fields[4]);
 
 		auto mit = morphMap.find(make_pair(orgform, tag));
@@ -294,7 +294,7 @@ void KModelMgr::loadPCMFromTxt(const char * filename, unordered_map<pair<string,
 		fm.candidate.emplace_back((KMorpheme*)mid);
 		fm.suffix.insert(suffixes.begin(), suffixes.end());
 		morphemes.emplace_back(form, tag, KCondVowel::none, KCondPolarity::none, logf(tagWeight), socket);
-		morphemes.back().kform = (const string*)(&fm - &forms[0]);
+		morphemes.back().kform = (const k_string*)(&fm - &forms[0]);
 		morphemes.back().combined = (int)mit->second - ((int)morphemes.size() - 1);
 	}
 	fclose(file);
@@ -364,16 +364,16 @@ void KModelMgr::loadDMFromTxt(const char * filename)
 	char buf[65536*4];
 	wstring_convert<codecvt_utf8_utf16<k_wchar>, k_wchar> converter;
 
-	auto parseFormTag = [](const k_wstring& f) -> pair<string, KPOSTag>
+	auto parseFormTag = [](const k_wstring& f) -> pair<k_string, KPOSTag>
 	{
 		auto c = split(f, '/');
 		if (c.size() < 2) return {};
-		string str = encodeJamo(c[0].begin(), c[0].end());
+		k_string str = encodeJamo(c[0].begin(), c[0].end());
 		KPOSTag tag = makePOSTag(c[1]);
 		return { str, tag };
 	};
 
-	auto findMorpheme = [this](const pair<string, KPOSTag>& m) -> KMorpheme*
+	auto findMorpheme = [this](const pair<k_string, KPOSTag>& m) -> KMorpheme*
 	{
 		auto form = getTrie()->search(&m.first[0], &m.first[0] + m.first.size());
 		if (!form || form == (void*)-1) return nullptr;
@@ -444,20 +444,20 @@ KModelMgr::KModelMgr(const char * modelPath)
 {
 	this->modelPath = modelPath;
 #ifdef LOAD_TXT
-	unordered_map<pair<string, KPOSTag>, size_t> morphMap;
-	loadPOSFromTxt((modelPath + string("pos.txt")).c_str());
-	loadMMFromTxt((modelPath + string("fullmodel.txt")).c_str(), morphMap);
-	loadCMFromTxt((modelPath + string("combined.txt")).c_str(), morphMap);
-	loadPCMFromTxt((modelPath + string("precombined.txt")).c_str(), morphMap);
-	savePOSBin((modelPath + string("pos.bin")).c_str());
-	saveMorphBin((modelPath + string("fullmodel.bin")).c_str());
+	unordered_map<pair<k_string, KPOSTag>, size_t> morphMap;
+	loadPOSFromTxt((modelPath + k_string("pos.txt")).c_str());
+	loadMMFromTxt((modelPath + k_string("fullmodel.txt")).c_str(), morphMap);
+	loadCMFromTxt((modelPath + k_string("combined.txt")).c_str(), morphMap);
+	loadPCMFromTxt((modelPath + k_string("precombined.txt")).c_str(), morphMap);
+	savePOSBin((modelPath + k_string("pos.bin")).c_str());
+	saveMorphBin((modelPath + k_string("fullmodel.bin")).c_str());
 #else
-	loadPOSBin((modelPath + string("pos.bin")).c_str());
-	loadMorphBin((modelPath + string("fullmodel.bin")).c_str());
+	loadPOSBin((modelPath + k_string("pos.bin")).c_str());
+	loadMorphBin((modelPath + k_string("fullmodel.bin")).c_str());
 #endif
 }
 
-void KModelMgr::addUserWord(const string & form, KPOSTag tag)
+void KModelMgr::addUserWord(const k_string & form, KPOSTag tag)
 {
 #ifdef TRIE_ALLOC_ARRAY
 	if (!form.empty()) extraTrieSize += form.size() - 1;
@@ -469,7 +469,7 @@ void KModelMgr::addUserWord(const string & form, KPOSTag tag)
 	morphemes.emplace_back(form, tag);
 }
 
-void KModelMgr::addUserRule(const string & form, const vector<pair<string, KPOSTag>>& morphs)
+void KModelMgr::addUserRule(const k_string & form, const vector<pair<k_string, KPOSTag>>& morphs)
 {
 #ifdef TRIE_ALLOC_ARRAY
 	if (!form.empty()) extraTrieSize += form.size() - 1;
@@ -526,11 +526,11 @@ void KModelMgr::solidify()
 	formMap = {};
 
 #if defined(USE_DIST_MAP) && defined(LOAD_TXT)
-	loadDMFromTxt((modelPath + string("distModel.txt")).c_str());
-	saveDMBin((modelPath + string("distModel.bin")).c_str());
+	loadDMFromTxt((modelPath + k_string("distModel.txt")).c_str());
+	saveDMBin((modelPath + k_string("distModel.bin")).c_str());
 #endif
 #if defined(USE_DIST_MAP) && !defined(LOAD_TXT)
-	loadDMBin((modelPath + string("distModel.bin")).c_str());
+	loadDMBin((modelPath + k_string("distModel.bin")).c_str());
 #endif
 	
 	/*FILE* out;

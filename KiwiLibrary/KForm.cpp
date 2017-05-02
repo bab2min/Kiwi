@@ -111,14 +111,14 @@ void KForm::updateCond()
 	if (suffix.find(0) != suffix.end()) suffix = {};
 }
 
-void writeString(const string& str, FILE* f)
+void writeString(const k_string& str, FILE* f)
 {
 	size_t s = str.size();
 	fwrite(&s, 1, 4, f);
 	if (s) fwrite(&str[0], 1, s, f);
 }
 
-void readString(string& str, FILE* f)
+void readString(k_string& str, FILE* f)
 {
 	size_t s = 0;
 	fread(&s, 1, 4, f);

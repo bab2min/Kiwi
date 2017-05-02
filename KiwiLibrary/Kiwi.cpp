@@ -131,7 +131,7 @@ int Kiwi::addUserWord(const k_wstring & str, KPOSTag tag)
 int Kiwi::addUserRule(const k_wstring & str, const vector<pair<k_wstring, KPOSTag>>& morph)
 {
 	if (!verifyHangul(str)) return -1;
-	vector<pair<string, KPOSTag>> jmMorph;
+	vector<pair<k_string, KPOSTag>> jmMorph;
 	jmMorph.reserve(morph.size());
 	for (auto& m : morph)
 	{
@@ -350,15 +350,18 @@ vector<vector<pair<vector<char>, float>>> Kiwi::calcProbabilities(const KChunk *
 	};
 
 	vector<vector<pair<vector<char>, float>>> ret(pre->getCandSize());
-	vector<char> idx(end - ch + 1);
+	array<char, 256> idx = { 0, };
+	size_t idxSize = end - ch + 1;
+#define IDX_SIZE idxSize
+	//vector<char> idx(end - ch + 1);
 	float minThreshold = P_MIN;
 	while (1)
 	{
 		float ps = 0;
 		KMorpheme tmpMorpheme;
 		const KMorpheme* beforeMorpheme = pre->getMorpheme(idx[0], &tmpMorpheme);
-		string beforeForm = "";
-		for (size_t i = 1; i < idx.size(); i++)
+		k_string beforeForm = "";
+		for (size_t i = 1; i < IDX_SIZE; i++)
 		{
 			auto curMorpheme = ch[i - 1].getMorpheme(idx[i], &tmpMorpheme);
 			if (!curMorpheme || ( KPOSTag::SF <= curMorpheme->tag && curMorpheme->tag <= KPOSTag::SN))
@@ -368,12 +371,12 @@ vector<vector<pair<vector<char>, float>>> Kiwi::calcProbabilities(const KChunk *
 				beforeForm = "";
 				continue;
 			}
-			string curForm = curMorpheme->kform ? *curMorpheme->kform : string{ ostr + ch[i - 1].begin, ostr + ch[i - 1].end };
+			k_string curForm = curMorpheme->kform ? *curMorpheme->kform : k_string{ ostr + ch[i - 1].begin, ostr + ch[i - 1].end };
 			// if this is unknown morpheme
 			//if (curMorpheme->chunks.empty() && !curMorpheme->getForm().empty() && curMorpheme->tag == KPOSTag::UNKNOWN)
 			if (!curMorpheme->kform)
 			{
-				tmpMorpheme.tag = mdl->findMaxiumTag(beforeMorpheme, i + 1 < idx.size() ? ch[i].getMorpheme(idx[i + 1], nullptr) : nullptr);
+				tmpMorpheme.tag = mdl->findMaxiumTag(beforeMorpheme, i + 1 < IDX_SIZE ? ch[i].getMorpheme(idx[i + 1], nullptr) : nullptr);
 			}
 
 			if (beforeMorpheme->combineSocket && beforeMorpheme->tag != KPOSTag::UNKNOWN && beforeMorpheme->combineSocket != curMorpheme->combineSocket)
@@ -398,16 +401,16 @@ vector<vector<pair<vector<char>, float>>> Kiwi::calcProbabilities(const KChunk *
 			beforeForm = curForm;
 			if (ps <= minThreshold) goto next;
 		}
-		ret[idx[0]].emplace_back(vector<char>{ idx.begin() + 1, idx.end() }, ps);
+		ret[idx[0]].emplace_back(vector<char>{ idx.begin() + 1, idx.begin() + IDX_SIZE }, ps);
 	next:;
 
 		idx[0]++;
-		for (size_t i = 0; i < idx.size(); i++)
+		for (size_t i = 0; i < IDX_SIZE; i++)
 		{
 			if (i ? (idx[i] >= ch[i - 1].getCandSize()) : (idx[i] >= pre->getCandSize()))
 			{
 				idx[i] = 0;
-				if (i + 1 >= idx.size()) goto exit;
+				if (i + 1 >= IDX_SIZE) goto exit;
 				idx[i + 1]++;
 			}
 		}
@@ -416,9 +419,9 @@ exit:;
 	return ret;
 }
 
-vector<KInterResult> Kiwi::analyzeJM(const string & jm, size_t topN, KPOSTag prefix, KPOSTag suffix) const
+vector<KInterResult> Kiwi::analyzeJM(const k_string & jm, size_t topN, KPOSTag prefix, KPOSTag suffix) const
 {
-	string cfind = jm;
+	k_string cfind = jm;
 	cfind.push_back((char)prefix + 64);
 	cfind.push_back((char)suffix + 64);
 	auto cit = analyzedCache.find(cfind);
@@ -430,7 +433,7 @@ vector<KInterResult> Kiwi::analyzeJM(const string & jm, size_t topN, KPOSTag pre
 		return x.second > y.second;
 	};
 	topN = max((size_t)MIN_CANDIDATE, topN);
-	vector<pair<vector<tuple<const KMorpheme*, string, KPOSTag>>, float>> cands;
+	vector<pair<vector<tuple<const KMorpheme*, k_string, KPOSTag>>, float>> cands;
 	KMorpheme preMorpheme{ "", prefix }, sufMorpheme{ "", suffix };
 	KForm preForm, sufForm;
 	preForm.candidate.emplace_back(&preMorpheme);
@@ -515,7 +518,7 @@ vector<KInterResult> Kiwi::analyzeJM(const string & jm, size_t topN, KPOSTag pre
 						next = s[n + 1].form->candidate[pb.first[n + 1]];
 					}
 					auto predictTag = mdl->findMaxiumTag(before, next);
-					cands.back().first.emplace_back(nullptr, string{ &jm[0] + s[n].begin, &jm[0] + s[n].end }, predictTag);
+					cands.back().first.emplace_back(nullptr, k_string{ &jm[0] + s[n].begin, &jm[0] + s[n].end }, predictTag);
 				}
 				else
 				{
@@ -523,7 +526,7 @@ vector<KInterResult> Kiwi::analyzeJM(const string & jm, size_t topN, KPOSTag pre
 					// If is simple morpheme
 					if (!morpheme->chunks)
 					{
-						cands.back().first.emplace_back(morpheme, string{}, KPOSTag{});
+						cands.back().first.emplace_back(morpheme, k_string{}, KPOSTag{});
 					}
 					// complex morpheme
 					else for (auto pbcc : *morpheme->chunks)
@@ -538,7 +541,7 @@ vector<KInterResult> Kiwi::analyzeJM(const string & jm, size_t topN, KPOSTag pre
 							assert(bm->getCombined());
 							bm = bm->getCombined();
 						}
-						else cands.back().first.emplace_back(pbcc, string{}, KPOSTag{});
+						else cands.back().first.emplace_back(pbcc, k_string{}, KPOSTag{});
 					}
 				}
 				n++;
