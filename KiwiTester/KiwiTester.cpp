@@ -61,6 +61,18 @@ int main()
 			t.writeResult(out);
 		}
 		fclose(out);
+
+/*
+		for (auto i : KSingleLogger::getInstance().totalAlloc)
+		{
+			printf("%zd\t%zd\n", i.first, i.second);
+		}
+		printf("\n");
+		for (auto i : KSingleLogger::getInstance().maxAlloc)
+		{
+			printf("%zd\t%zd\n", i.first, i.second);
+		}
+//*/
 	}
 	getchar();
 	return 0;

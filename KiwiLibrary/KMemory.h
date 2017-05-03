@@ -1,6 +1,6 @@
 #pragma once
 
-template<size_t objectSize>
+template<size_t objectSize, size_t poolSize>
 class KPool
 {
 public:
@@ -15,7 +15,11 @@ public:
 
 	void* allocate()
 	{
-		if (!freeList) return nullptr;
+		if (!freeList)
+		{
+			throw bad_alloc();
+			//return nullptr;
+		}
 		void* p = freeList;
 		freeList = (void**)(*freeList);
 		return p;
@@ -30,10 +34,10 @@ public:
 private:
 	KPool() 
 	{
-		poolBuf = new char[1024*32*objectSize];
+		poolBuf = new char[poolSize * objectSize];
 		freeList = (void**)poolBuf;
 		auto p = freeList;
-		for (size_t i = 0; i < 1024 * 1024; i += objectSize)
+		for (size_t i = 0; i < poolSize; i++)
 		{
 			*p = ((char*)p + objectSize);
 			p = (void**)*p;
@@ -43,15 +47,30 @@ private:
 	KPool(const KPool&) {}
 	~KPool()
 	{
-		delete[1024*32*objectSize] poolBuf;
+		delete[poolSize*objectSize] poolBuf;
 	}
 };
 
-template<typename T> struct TypeIsChar { static const bool value = false; };
-template<> struct TypeIsChar<char> { static const bool value = true; };
+class KSingleLogger
+{
+public:
+	map<size_t, size_t> totalAlloc;
+	map<size_t, size_t> currentAlloc;
+	map<size_t, size_t> maxAlloc;
+	static KSingleLogger& getInstance()
+	{
+		static thread_local KSingleLogger inst;
+		return inst;
+	}
+private:
+	KSingleLogger() 
+	{
+	}
+	KSingleLogger(const KSingleLogger&) {}
+};
 
 template <typename T>
-class log_allocator : public allocator<T>
+class logger_allocator : public allocator<T>
 {
 public:
 	typedef size_t size_type;
@@ -61,61 +80,61 @@ public:
 	template<typename _Tp1>
 	struct rebind
 	{
-		typedef log_allocator<_Tp1> other;
+		typedef logger_allocator<_Tp1> other;
 	};
 
 	pointer allocate(size_type n, const void *hint = 0)
 	{
-		//fprintf(stderr, "Alloc %d bytes.\n", n * sizeof(T));
+		//fprintf(stderr, "Alloc %d bytes. (%zd)\n", n * sizeof(T), KSingleLogger::getInstance().counter++);
+		size_t bytes = n * sizeof(T);
+		auto& logger = KSingleLogger::getInstance();
+		logger.totalAlloc[bytes]++;
+		logger.currentAlloc[bytes]++;
+		logger.maxAlloc[bytes] = max(logger.maxAlloc[bytes], logger.currentAlloc[bytes]);
 		return allocator<T>::allocate(n, hint);
 	}
 
 	void deallocate(pointer p, size_type n)
 	{
-		//fprintf(stderr, "Dealloc %d bytes (%p).\n", n * sizeof(T), p);
+		//if (n * sizeof(T) > 128) fprintf(stderr, "Dealloc %d bytes (%p).\n", n * sizeof(T), p);
+		KSingleLogger::getInstance().currentAlloc[n * sizeof(T)]--;
 		return allocator<T>::deallocate(p, n);
 	}
 
-	log_allocator() throw() : allocator<T>() { /*fprintf(stderr, "Hello allocator!\n");*/ }
-	log_allocator(const log_allocator &a) throw() : allocator<T>(a) { }
+	logger_allocator() throw() : allocator<T>() { /*fprintf(stderr, "Hello allocator!\n");*/ }
+	logger_allocator(const logger_allocator &a) throw() : allocator<T>(a) { }
 	template <class U>
-	log_allocator(const log_allocator<U> &a) throw() : allocator<T>(a) { }
-	~log_allocator() throw() { }
+	logger_allocator(const logger_allocator<U> &a) throw() : allocator<T>(a) { }
+	~logger_allocator() throw() { }
 };
 
-template <>
-class log_allocator<char> : public allocator<char>
+template <typename T>
+class pool_allocator : public allocator<T>
 {
 public:
 	typedef size_t size_type;
-	typedef char* pointer;
-	typedef const char* const_pointer;
+	typedef T* pointer;
+	typedef const T* const_pointer;
 
 	template<typename _Tp1>
 	struct rebind
 	{
-		typedef log_allocator<_Tp1> other;
+		typedef pool_allocator<_Tp1> other;
 	};
 
 	pointer allocate(size_type n, const void *hint = 0)
 	{
-		//fprintf(stderr, "Alloc %d bytes.\n", n * sizeof(char));
-		if (n == 16) return (char*)KPool<16>::getInstance().allocate();
-		if (n == 32) return (char*)KPool<32>::getInstance().allocate();
-		return allocator<char>::allocate(n, hint);
+		return allocator<T>::allocate(n, hint);
 	}
 
 	void deallocate(pointer p, size_type n)
 	{
-		//fprintf(stderr, "Dealloc %d bytes (%p).\n", n * sizeof(char), p);
-		if (n == 16) return KPool<16>::getInstance().deallocate(p);
-		if (n == 32) return KPool<32>::getInstance().deallocate(p);
-		return allocator<char>::deallocate(p, n);
+		return allocator<T>::deallocate(p, n);
 	}
 
-	log_allocator() throw() : allocator<char>() { /*fprintf(stderr, "Hello allocator!\n");*/ }
-	log_allocator(const log_allocator &a) throw() : allocator<char>(a) { }
+	pool_allocator() throw() : allocator<T>() { }
+	pool_allocator(const pool_allocator &a) throw() : allocator<T>(a) { }
 	template <class U>
-	log_allocator(const log_allocator<U> &a) throw() : allocator<char>(a) { }
-	~log_allocator() throw() { }
+	pool_allocator(const pool_allocator<U> &a) throw() : allocator<T>(a) { }
+	~pool_allocator() throw() { }
 };
