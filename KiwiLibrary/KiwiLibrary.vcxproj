@@ -152,6 +152,7 @@
     <ClInclude Include="Kiwi.h" />
     <ClInclude Include="KiwiHeader.h" />
     <ClInclude Include="KMemory.h" />
+    <ClInclude Include="KMemorySpec.h" />
     <ClInclude Include="KModelMgr.h" />
     <ClInclude Include="KTrie.h" />
     <ClInclude Include="stdafx.h" />

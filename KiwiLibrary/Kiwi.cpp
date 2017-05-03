@@ -187,10 +187,10 @@ int Kiwi::prepare()
 	return 0;
 }
 
-vector<char> getBacks(const vector<pair<vector<char>, float>>& cands)
+k_vchar getBacks(const k_vpcf& cands)
 {
 	char buf[128] = { 0 };
-	vector<char> ret;
+	k_vchar ret;
 	for (auto c : cands)
 	{
 		auto back = c.first.back();
@@ -333,7 +333,7 @@ vector<const KChunk*> Kiwi::divideChunk(const vector<KChunk>& ch)
 	return ret;
 }
 
-vector<vector<pair<vector<char>, float>>> Kiwi::calcProbabilities(const KChunk * pre, const KChunk * ch, const KChunk * end, const char* ostr, size_t len) const
+vector<k_vpcf> Kiwi::calcProbabilities(const KChunk * pre, const KChunk * ch, const KChunk * end, const char* ostr, size_t len) const
 {
 	static bool(*vowelFunc[])(const char*, const char*) = {
 		KFeatureTestor::isPostposition,
@@ -349,7 +349,7 @@ vector<vector<pair<vector<char>, float>>> Kiwi::calcProbabilities(const KChunk *
 		KFeatureTestor::notPositive
 	};
 
-	vector<vector<pair<vector<char>, float>>> ret(pre->getCandSize());
+	vector<k_vpcf> ret(pre->getCandSize());
 	array<char, 256> idx = { 0, };
 	size_t idxSize = end - ch + 1;
 #define IDX_SIZE idxSize
@@ -360,18 +360,17 @@ vector<vector<pair<vector<char>, float>>> Kiwi::calcProbabilities(const KChunk *
 		float ps = 0;
 		KMorpheme tmpMorpheme;
 		const KMorpheme* beforeMorpheme = pre->getMorpheme(idx[0], &tmpMorpheme);
-		k_string beforeForm = "";
+		bool beforeFormNull = true;
 		for (size_t i = 1; i < IDX_SIZE; i++)
 		{
 			auto curMorpheme = ch[i - 1].getMorpheme(idx[i], &tmpMorpheme);
-			if (!curMorpheme || ( KPOSTag::SF <= curMorpheme->tag && curMorpheme->tag <= KPOSTag::SN))
+			if (!curMorpheme || (KPOSTag::SF <= curMorpheme->tag && curMorpheme->tag <= KPOSTag::SN))
 			{
 				ps += mdl->getTransitionP(beforeMorpheme, curMorpheme);
+				beforeFormNull = true;
 				beforeMorpheme = curMorpheme;
-				beforeForm = "";
 				continue;
 			}
-			k_string curForm = curMorpheme->kform ? *curMorpheme->kform : k_string{ ostr + ch[i - 1].begin, ostr + ch[i - 1].end };
 			// if this is unknown morpheme
 			//if (curMorpheme->chunks.empty() && !curMorpheme->getForm().empty() && curMorpheme->tag == KPOSTag::UNKNOWN)
 			if (!curMorpheme->kform)
@@ -388,20 +387,30 @@ vector<vector<pair<vector<char>, float>>> Kiwi::calcProbabilities(const KChunk *
 				goto next;
 			}
 
-			if (beforeForm.size())
+			if (!beforeFormNull)
 			{
-				const char* bBegin = &beforeForm[0];
-				const char* bEnd = bBegin + beforeForm.size();
+				const char* bBegin;
+				const char* bEnd;
+				if (beforeMorpheme->kform)
+				{
+					bBegin = &(*beforeMorpheme->kform)[0];
+					bEnd = bBegin + beforeMorpheme->kform->size();
+				}
+				else
+				{
+					bBegin = ostr + ch[i - 2].begin;
+					bEnd = ostr + ch[i - 2].end;
+				}
 				if ((int)curMorpheme->vowel && !vowelFunc[(int)curMorpheme->vowel - 1](bBegin, bEnd)) goto next;
 				if ((int)curMorpheme->polar && !polarFunc[(int)curMorpheme->polar - 1](bBegin, bEnd)) goto next;
 			}
 			ps += mdl->getTransitionP(beforeMorpheme, curMorpheme);
 			ps += curMorpheme->p;
+			beforeFormNull = false;
 			beforeMorpheme = curMorpheme;
-			beforeForm = curForm;
 			if (ps <= minThreshold) goto next;
 		}
-		ret[idx[0]].emplace_back(vector<char>{ idx.begin() + 1, idx.begin() + IDX_SIZE }, ps);
+		ret[idx[0]].emplace_back(k_vchar{ idx.begin() + 1, idx.begin() + IDX_SIZE }, ps);
 	next:;
 
 		idx[0]++;
@@ -463,7 +472,7 @@ vector<KInterResult> Kiwi::analyzeJM(const k_string & jm, size_t topN, KPOSTag p
 		auto chunks = divideChunk(s);
 		chunks.emplace_back(&s[0] + s.size());
 		const KChunk* pre = &preTemp;
-		vector<pair<vector<char>, float>> pbFinal;
+		k_vpcf pbFinal;
 
 		for (size_t i = 1; i < chunks.size(); i++)
 		{
@@ -479,7 +488,7 @@ vector<KInterResult> Kiwi::analyzeJM(const k_string & jm, size_t topN, KPOSTag p
 				{
 					sort(pb[b].begin(), pb[b].end(), sortFunc);
 				}
-				vector<pair<vector<char>, float>> tmpFinal;
+				k_vpcf tmpFinal;
 				for (auto cand : pbFinal)
 				{
 					auto& pbBack = pb[cand.first.back()];

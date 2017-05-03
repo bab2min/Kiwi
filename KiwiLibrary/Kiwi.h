@@ -21,7 +21,7 @@ protected:
 	static KPOSTag identifySpecialChr(k_wchar chr);
 	static vector<vector<KWordPair>> splitPart(const k_wstring& str);
 	static vector<const KChunk*> divideChunk(const vector<KChunk>& ch);
-	vector<vector<pair<vector<char>, float>>> calcProbabilities(const KChunk* pre, const KChunk* begin, const KChunk* end, const char* ostr, size_t len) const;
+	vector<k_vpcf> calcProbabilities(const KChunk* pre, const KChunk* begin, const KChunk* end, const char* ostr, size_t len) const;
 	vector<KInterResult> analyzeJM(const k_string& jm, size_t topN, KPOSTag prefix, KPOSTag suffix) const;
 public:
 	Kiwi(const char* modelPath = "", size_t maxCache = -1);

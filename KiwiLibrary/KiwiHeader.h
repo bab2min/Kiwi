@@ -50,13 +50,18 @@ inline int fopen_s(FILE** f, const char* p, const char* m)
 }
 #endif
 
-//#define CUSTOM_ALLOC
+#define CUSTOM_ALLOC
 
 #ifdef CUSTOM_ALLOC
 #include "KMemory.h"
-typedef basic_string<char, char_traits<char>, log_allocator<char>> k_string;
-typedef basic_stringstream<char, char_traits<char>, log_allocator<char>> k_stringstream;
+typedef basic_string<char, char_traits<char>, pool_allocator<char>> k_string;
+typedef basic_stringstream<char, char_traits<char>, pool_allocator<char>> k_stringstream;
+typedef vector<char, pool_allocator<char>> k_vchar;
+typedef vector<pair<k_vchar, float>, pool_allocator<pair<k_vchar, float>>> k_vpcf;
+#include "KMemorySpec.h"
 #else
 typedef string k_string;
 typedef stringstream k_stringstream;
+typedef vector<char> k_vchar;
+typedef vector<pair<k_vchar, float>> k_vpcf;
 #endif

@@ -1,6 +1,6 @@
 0.851773
-Total (3252) Time : 8252.99 ms
-Time per Unit : 2.53782 ms
+Total (3252) Time : 4359.57 ms
+Time per Unit : 1.34058 ms
 
 고등학교를 졸업할 무렵 담임선생님께서 내게 이런 말씀을 하셨다.	0.519
 고등학교/NNG	를/JKO	졸업/NNG	하/XSV	ㄹ/ETM	무렵/NNB	담임선생/NNG	님/XSN	께서/JKS	나/NP	에게/JKB	이런/MM	말씀/NNG	을/JKO	하/VV	시/EP	었/EP	다/EF	./SF	

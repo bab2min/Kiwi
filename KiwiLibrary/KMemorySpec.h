@@ -1,0 +1,80 @@
+#pragma once
+
+
+template <>
+class pool_allocator<char> : public allocator<char>
+{
+public:
+	typedef size_t size_type;
+	typedef value_type* pointer;
+	typedef const value_type* const_pointer;
+
+	template<typename _Tp1>
+	struct rebind
+	{
+		typedef pool_allocator<_Tp1> other;
+	};
+
+	pointer allocate(size_type n, const void *hint = 0)
+	{
+		if (n <= 8) return (pointer)KPool<8, 8192>::getInstance().allocate();
+		if (n <= 16) return (pointer)KPool<16, 8192>::getInstance().allocate();
+		if (n <= 32) return (pointer)KPool<32, 8192>::getInstance().allocate();
+		if (n <= 48) return (pointer)KPool<48, 8192>::getInstance().allocate();
+		//fprintf(stderr, "Alloc %d bytes.\n", n * sizeof(char));
+		return allocator<value_type>::allocate(n, hint);
+	}
+
+	void deallocate(pointer p, size_type n)
+	{
+		//fprintf(stderr, "Dealloc %d bytes (%p).\n", n * sizeof(char), p);
+		if (n <= 8) return KPool<8, 8192>::getInstance().deallocate(p);
+		if (n <= 16) return KPool<16, 8192>::getInstance().deallocate(p);
+		if (n <= 32) return KPool<32, 8192>::getInstance().deallocate(p);
+		if (n <= 48) return KPool<48, 8192>::getInstance().deallocate(p);
+		return allocator<value_type>::deallocate(p, n);
+	}
+
+	pool_allocator() throw() : allocator<value_type>() { /*fprintf(stderr, "Hello allocator!\n");*/ }
+	pool_allocator(const pool_allocator &a) throw() : allocator<value_type>(a) { }
+	template <class U>
+	pool_allocator(const pool_allocator<U> &a) throw() : allocator<value_type>(a) { }
+	~pool_allocator() throw() { }
+};
+
+template <>
+class pool_allocator<pair<k_vchar, float>> : public allocator<pair<k_vchar, float>>
+{
+public:
+	typedef size_t size_type;
+	typedef value_type* pointer;
+	typedef const value_type* const_pointer;
+
+	template<typename _Tp1>
+	struct rebind
+	{
+		typedef pool_allocator<_Tp1> other;
+	};
+
+	pointer allocate(size_type n, const void *hint = 0)
+	{
+		if (n * sizeof(value_type) <= 256) return (pointer)KPool<256, 1024>::getInstance().allocate();
+		if (n * sizeof(value_type) <= 1024) return (pointer)KPool<1024, 256>::getInstance().allocate();
+		//fprintf(stderr, "Alloc %d bytes.\n", n * sizeof(value_type));
+		return allocator<value_type>::allocate(n, hint);
+	}
+
+	void deallocate(pointer p, size_type n)
+	{
+		if (n * sizeof(value_type) <= 256) return KPool<256, 1024>::getInstance().deallocate(p);
+		if (n * sizeof(value_type) <= 1024) return KPool<1024, 256>::getInstance().deallocate(p);
+		//fprintf(stderr, "Dealloc %d bytes (%p).\n", n * sizeof(value_type), p);
+		return allocator<value_type>::deallocate(p, n);
+	}
+
+	pool_allocator() throw() : allocator<value_type>() { /*fprintf(stderr, "Hello allocator!\n");*/ }
+	pool_allocator(const pool_allocator &a) throw() : allocator<value_type>(a) { }
+	template <class U>
+	pool_allocator(const pool_allocator<U> &a) throw() : allocator<value_type>(a) { }
+	~pool_allocator() throw() { }
+};
