@@ -75,6 +75,9 @@
     <ClInclude Include="..\KiwiLibrary\KForm.h" />
     <ClInclude Include="..\KiwiLibrary\Kiwi.h" />
     <ClInclude Include="..\KiwiLibrary\KiwiHeader.h" />
+    <ClInclude Include="..\KiwiLibrary\KMemory.h" />
+    <ClInclude Include="..\KiwiLibrary\KMemoryChar.h" />
+    <ClInclude Include="..\KiwiLibrary\KMemoryKChunk.h" />
     <ClInclude Include="..\KiwiLibrary\KModelMgr.h" />
     <ClInclude Include="..\KiwiLibrary\KTrie.h" />
     <ClInclude Include="..\KiwiLibrary\stdafx.h" />
