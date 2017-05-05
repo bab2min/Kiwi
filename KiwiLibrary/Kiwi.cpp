@@ -206,26 +206,7 @@ k_vchar getBacks(const k_vpcf& cands)
 
 KResult Kiwi::analyze(const k_wstring & str) const
 {
-	KResult ret;
-	/*auto parts = splitPart(str);
-	for (auto p : parts)
-	{
-		for (size_t cid = 0; cid < p.size(); cid++)
-		{
-			auto& c = p[cid];
-			if (c.second != KPOSTag::MAX)
-			{
-				ret.first.emplace_back(c);
-				continue;
-			}
-			auto jm = splitJamo(c.first);
-			auto ar = analyzeJM(jm, 1, cid ? p[cid - 1].second : KPOSTag::UNKNOWN, cid+1 < p.size() ? p[cid + 1].second : KPOSTag::UNKNOWN);
-			ret.first.reserve(ret.first.size() + ar[0].first.size());
-			ret.first.insert(ret.first.end(), ar[0].first.begin(), ar[0].first.end());
-			ret.second += ar[0].second;
-		}
-	}*/
-	return ret;
+	return analyze(str, MIN_CANDIDATE)[0];
 }
 
 vector<KResult> Kiwi::analyze(const k_wstring & str, size_t topN) const
@@ -252,6 +233,7 @@ vector<KResult> Kiwi::analyze(const k_wstring & str, size_t topN) const
 			auto jm = splitJamo(c.first);
 			auto ar = analyzeJM(jm, topN, cid ? p[cid - 1].second : KPOSTag::UNKNOWN, cid + 1 < p.size() ? p[cid + 1].second : KPOSTag::UNKNOWN);
 			vector<tuple<short, short, float>> probs;
+			probs.reserve(cands.size() * ar.size());
 			for (size_t i = 0; i < cands.size(); i++) for (size_t j = 0; j < ar.size(); j++)
 			{
 				probs.emplace_back((short)i, (short)j, cands[i].second + ar[j].second);
@@ -285,7 +267,7 @@ vector<KResult> Kiwi::analyze(const k_wstring & str, size_t topN) const
 				}
 #endif
 			});
-			cands = newCands;
+			swap(cands, newCands);
 		}
 	}
 	vector<KResult> ret;
@@ -307,10 +289,12 @@ vector<KResult> Kiwi::analyze(const k_wstring & str, size_t topN) const
 
 void Kiwi::clearCache()
 {
-	analyzedCache = {};
+	tempCache = {};
+	freqCache = {};
+	cachePriority = {};
 }
 
-vector<const KChunk*> Kiwi::divideChunk(const vector<KChunk>& ch)
+vector<const KChunk*> Kiwi::divideChunk(const k_vchunk& ch)
 {
 	vector<const KChunk*> ret;
 	const KChunk* s = &ch[0];
@@ -430,13 +414,12 @@ exit:;
 
 vector<KInterResult> Kiwi::analyzeJM(const k_string & jm, size_t topN, KPOSTag prefix, KPOSTag suffix) const
 {
-	k_string cfind = jm;
+	string cfind{ jm.begin(), jm.end() };
 	cfind.push_back((char)prefix + 64);
 	cfind.push_back((char)suffix + 64);
-	auto cit = analyzedCache.find(cfind);
-	if (cit != analyzedCache.end()) return cit->second;
+	auto cached = findCache(cfind);
+	if (cached) return *cached;
 
-	vector<KInterResult> ret;
 	auto sortFunc = [](const auto& x, const auto& y)
 	{
 		return x.second > y.second;
@@ -557,7 +540,9 @@ vector<KInterResult> Kiwi::analyzeJM(const k_string & jm, size_t topN, KPOSTag p
 			}
 		}
 	}
-
+	
+	vector<KInterResult> ret;
+	ret.reserve(cands.size());
 	if (cands.empty())
 	{
 		ret.emplace_back();
@@ -579,6 +564,32 @@ vector<KInterResult> Kiwi::analyzeJM(const k_string & jm, size_t topN, KPOSTag p
 			return kr;
 		});
 	}
-	if(analyzedCache.size() < maxCache)	analyzedCache.emplace(cfind, ret);
+	addCache(cfind, ret);
 	return ret;
+}
+
+bool Kiwi::addCache(const string & jm, const vector<KInterResult>& value) const
+{
+	if (maxCache == (size_t)-1) return freqCache.emplace(jm, value).second;
+	if (tempCache.size() >= maxCache) tempCache.clear();
+	++cachePriority[jm];
+	return tempCache.emplace(jm, value).second;
+}
+
+vector<KInterResult>* Kiwi::findCache(const string & jm) const
+{
+	auto cit = freqCache.find(jm);
+	if (cit == freqCache.end())
+	{
+		cit = tempCache.find(jm);
+		++cachePriority[jm];
+		if (cit == tempCache.end()) return nullptr;
+		if (freqCache.size() < maxCache)
+		{
+			auto ret = &freqCache.emplace(*cit).first->second;
+			return ret;
+		}
+		return &cit->second;
+	}
+	return &cit->second;
 }

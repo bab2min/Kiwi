@@ -62,7 +62,8 @@ int main()
 		}
 		fclose(out);
 
-/*
+#ifdef CUSTOM_ALLOC
+//*
 		for (auto i : KSingleLogger::getInstance().totalAlloc)
 		{
 			printf("%zd\t%zd\n", i.first, i.second);
@@ -73,6 +74,7 @@ int main()
 			printf("%zd\t%zd\n", i.first, i.second);
 		}
 //*/
+#endif
 	}
 	getchar();
 	return 0;

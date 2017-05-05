@@ -68,13 +68,13 @@ KTrie * KTrie::findFail(char i) const
 	}
 	else
 	{
-		if (fail->getNext(i)) // if 'i' node exists
+		if (getFail()->getNext(i)) // if 'i' node exists
 		{
-			return fail->getNext(i);
+			return getFail()->getNext(i);
 		}
 		else // or loop for failure of this
 		{
-			return fail->findFail(i);
+			return getFail()->findFail(i);
 		}
 	}
 }
@@ -93,7 +93,7 @@ void KTrie::fillFail() //
 
 			if (!p->exit)
 			{
-				for (auto n = p; n->fail; n = n->fail)
+				for (auto n = p; n->getFail(); n = n->getFail())
 				{
 					if (n->exit)
 					{
@@ -125,7 +125,7 @@ vector<pair<const KForm*, int>> KTrie::searchAllPatterns(const k_string& str) co
 		{
 			if (curTrie->fail)
 			{
-				curTrie = curTrie->fail;
+				curTrie = curTrie->getFail();
 				if(curTrie->exit) found.emplace_back(curTrie->exit, n);
 			}
 			else goto continueFor; // root node has no exact next node, continue
@@ -141,13 +141,13 @@ vector<pair<const KForm*, int>> KTrie::searchAllPatterns(const k_string& str) co
 	}
 	while (curTrie->fail)
 	{
-		curTrie = curTrie->fail;
+		curTrie = curTrie->getFail();
 		if (curTrie->exit) found.emplace_back(curTrie->exit, n);
 	}
 	return found;
 }
 
-vector<vector<KChunk>> KTrie::split(const k_string& str, bool hasPrefix) const
+vector<k_vchunk> KTrie::split(const k_string& str, bool hasPrefix) const
 {
 	struct ChunkInfo
 	{
@@ -269,8 +269,8 @@ vector<vector<KChunk>> KTrie::split(const k_string& str, bool hasPrefix) const
 		{
 			if (curTrie->fail)
 			{
-				curTrie = curTrie->fail;
-				for (auto submatcher = curTrie; submatcher; submatcher = submatcher->fail)
+				curTrie = curTrie->getFail();
+				for (auto submatcher = curTrie; submatcher; submatcher = submatcher->getFail())
 				{
 					if (!submatcher->exit) break;
 					else if (submatcher->exit != (void*)-1 
@@ -290,7 +290,7 @@ vector<vector<KChunk>> KTrie::split(const k_string& str, bool hasPrefix) const
 		// from this, curTrie has exact node
 		curTrie = curTrie->getNext(c - 1);
 		// if it has exit node, a pattern has found
-		for (auto submatcher = curTrie; submatcher; submatcher = submatcher->fail)
+		for (auto submatcher = curTrie; submatcher; submatcher = submatcher->getFail())
 		{
 			if (!submatcher->exit) break;
 			else if (submatcher->exit != (void*)-1 &&
@@ -304,7 +304,7 @@ vector<vector<KChunk>> KTrie::split(const k_string& str, bool hasPrefix) const
 	}
 	while (curTrie->fail)
 	{
-		curTrie = curTrie->fail;
+		curTrie = curTrie->getFail();
 		if (curTrie->exit && curTrie->exit != (void*)-1)
 		{
 			candidates.emplace_back(curTrie->exit);
@@ -312,7 +312,8 @@ vector<vector<KChunk>> KTrie::split(const k_string& str, bool hasPrefix) const
 	}
 	brachOut();
 
-	vector<vector<KChunk>> ret;
+	vector<k_vchunk> ret;
+	ret.reserve(branches.size());
 	for (auto branch : branches)
 	{
 		if (!branch.chunks.empty() && branch.chunks.back().second < str.size())
