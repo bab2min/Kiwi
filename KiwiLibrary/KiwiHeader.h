@@ -55,6 +55,20 @@ inline int fopen_s(FILE** f, const char* p, const char* m)
 #ifdef CUSTOM_ALLOC
 #include "KMemory.h"
 typedef basic_string<char, char_traits<char>, spool_allocator<char>> k_string;
+#ifdef _WIN32
+#else
+namespace std
+{
+	template <>
+	class hash<k_string> {
+	public:
+		size_t operator() (const k_string& o) const
+		{
+			return hash<string>{}(string{ o.begin(), o.end() });
+		};
+	};
+}
+#endif
 typedef basic_stringstream<char, char_traits<char>, spool_allocator<char>> k_stringstream;
 typedef vector<char, pool_allocator<char>> k_vchar;
 typedef vector<pair<k_vchar, float>, pool_allocator<pair<k_vchar, float>>> k_vpcf;

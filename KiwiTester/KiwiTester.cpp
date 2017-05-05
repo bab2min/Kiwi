@@ -39,7 +39,19 @@ int main()
 	GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc));
 	SIZE_T memUsed = pmc.WorkingSetSize;
 	printf("Mem Usage : %g MB\n", memUsed / 1024.f / 1024.f);
-
+#ifdef CUSTOM_ALLOC
+	//*
+	for (auto i : KSingleLogger::getInstance().totalAlloc)
+	{
+		printf("%zd\t%zd\n", i.first, i.second);
+	}
+	printf("\n");
+	for (auto i : KSingleLogger::getInstance().maxAlloc)
+	{
+		printf("%zd\t%zd\n", i.first, i.second);
+	}
+	//*/
+#endif
 	string testFiles[] = { "01s.txt", "02s.txt", "03s.txt", "17s.txt", "18s.txt"};
 	for (auto tf : testFiles)
 	{

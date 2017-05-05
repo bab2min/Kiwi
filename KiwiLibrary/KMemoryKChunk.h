@@ -16,10 +16,10 @@ public:
 
 	pointer allocate(size_type n, const void *hint = 0)
 	{
-		if (n * sizeof(value_type) <= 8) return (pointer)KPool<8, 256>::getInstance().allocate();
-		if (n * sizeof(value_type) <= 16) return (pointer)KPool<16, 512>::getInstance().allocate();
-		if (n * sizeof(value_type) <= 32) return (pointer)KPool<32, 1024>::getInstance().allocate();
-		if (n * sizeof(value_type) <= 48) return (pointer)KPool<48, 4096>::getInstance().allocate();
+		if (n * sizeof(value_type) <= 8) return (pointer)KPool<8, 256, 2>::getInstance().allocate();
+		if (n * sizeof(value_type) <= 16) return (pointer)KPool<16, 512, 2>::getInstance().allocate();
+		if (n * sizeof(value_type) <= 32) return (pointer)KPool<32, 1024, 2>::getInstance().allocate();
+		if (n * sizeof(value_type) <= 48) return (pointer)KPool<48, 4096, 2>::getInstance().allocate();
 		//fprintf(stderr, "Alloc %d bytes.\n", n * sizeof(value_type));
 		return allocator<value_type>::allocate(n, hint);
 	}
@@ -27,10 +27,10 @@ public:
 	void deallocate(pointer p, size_type n)
 	{
 		//fprintf(stderr, "Dealloc %d bytes (%p).\n", n * sizeof(value_type), p);
-		if (n * sizeof(value_type) <= 8) return KPool<8, 256>::getInstance().deallocate(p);
-		if (n * sizeof(value_type) <= 16) return KPool<16, 512>::getInstance().deallocate(p);
-		if (n * sizeof(value_type) <= 32) return KPool<32, 1024>::getInstance().deallocate(p);
-		if (n * sizeof(value_type) <= 48) return KPool<48, 4096>::getInstance().deallocate(p);
+		if (n * sizeof(value_type) <= 8) return KPool<8, 256, 2>::getInstance().deallocate(p);
+		if (n * sizeof(value_type) <= 16) return KPool<16, 512, 2>::getInstance().deallocate(p);
+		if (n * sizeof(value_type) <= 32) return KPool<32, 1024, 2>::getInstance().deallocate(p);
+		if (n * sizeof(value_type) <= 48) return KPool<48, 4096, 2>::getInstance().deallocate(p);
 		return allocator<value_type>::deallocate(p, n);
 	}
 

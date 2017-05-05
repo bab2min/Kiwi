@@ -51,7 +51,7 @@ struct KMorpheme
 #ifdef _DEBUG
 	static size_t uid;
 	size_t id;
-	k_string form;
+	string form;
 #endif
 	KMorpheme(const k_string& _form = "", 
 		KPOSTag _tag = KPOSTag::UNKNOWN, 
@@ -60,7 +60,7 @@ struct KMorpheme
 		float _p = 0, char _combineSocket = 0)
 		: tag(_tag), vowel(_vowel), polar(_polar), p(_p), combineSocket(_combineSocket)
 #ifdef  _DEBUG
-		, id(uid++), form(_form)
+		, id(uid++), form(_form.begin(), _form.end())
 #endif //  _DEBUG
 	{
 	}
