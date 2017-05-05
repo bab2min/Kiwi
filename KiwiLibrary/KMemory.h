@@ -15,11 +15,7 @@ public:
 
 	void* allocate()
 	{
-		if (!freeList)
-		{
-			throw bad_alloc();
-			//return nullptr;
-		}
+		if (!freeList) throw bad_alloc();
 		void* p = freeList;
 		freeList = (void**)(*freeList);
 		return p;

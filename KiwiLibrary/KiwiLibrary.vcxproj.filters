@@ -48,7 +48,10 @@
     <ClInclude Include="KMemory.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="KMemorySpec.h">
+    <ClInclude Include="KMemoryKChunk.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="KMemoryChar.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

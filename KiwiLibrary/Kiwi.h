@@ -17,12 +17,15 @@ protected:
 	size_t maxCache;
 	shared_ptr<KModelMgr> mdl;
 	const KTrie* kt = nullptr;
-	mutable unordered_map<k_string, vector<KInterResult>> analyzedCache;
+	mutable unordered_map<string, vector<KInterResult>> tempCache, freqCache;
+	mutable unordered_map<string, size_t> cachePriority;
 	static KPOSTag identifySpecialChr(k_wchar chr);
 	static vector<vector<KWordPair>> splitPart(const k_wstring& str);
-	static vector<const KChunk*> divideChunk(const vector<KChunk>& ch);
+	static vector<const KChunk*> divideChunk(const k_vchunk& ch);
 	vector<k_vpcf> calcProbabilities(const KChunk* pre, const KChunk* begin, const KChunk* end, const char* ostr, size_t len) const;
 	vector<KInterResult> analyzeJM(const k_string& jm, size_t topN, KPOSTag prefix, KPOSTag suffix) const;
+	bool addCache(const string& jm, const vector<KInterResult>& value) const;
+	vector<KInterResult>* findCache(const string& jm) const;
 public:
 	Kiwi(const char* modelPath = "", size_t maxCache = -1);
 	int addUserWord(const k_wstring& str, KPOSTag tag);

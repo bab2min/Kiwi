@@ -22,6 +22,13 @@ struct KChunk
 	bool isStr() const { return _ == 0xFFFF; }
 };
 
+#ifdef CUSTOM_ALLOC
+#include "KMemoryKChunk.h"
+typedef vector<KChunk, pool_allocator<KChunk>> k_vchunk;
+#else 
+typedef vector<KChunk> k_vchunk;
+#endif
+
 struct KTrie
 {
 #ifdef  _DEBUG
@@ -56,8 +63,12 @@ struct KTrie
 		return next[i];
 #endif
 	}
+	KTrie* getFail() const
+	{
+		return fail;
+	}
 	const KForm* search(const char* begin, const char* end) const;
 	vector<pair<const KForm*, int>> searchAllPatterns(const k_string& str) const;
-	vector<vector<KChunk>> split(const k_string& str, bool hasPrefix = false) const;
+	vector<k_vchunk> split(const k_string& str, bool hasPrefix = false) const;
 };
 
