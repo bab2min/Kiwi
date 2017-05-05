@@ -134,3 +134,38 @@ public:
 	pool_allocator(const pool_allocator<U> &a) throw() : allocator<T>(a) { }
 	~pool_allocator() throw() { }
 };
+
+template<typename T>
+class spool_allocator : public allocator<T>
+{
+public:
+	typedef size_t size_type;
+	typedef value_type* pointer;
+	typedef const value_type* const_pointer;
+
+	template<typename _Tp1>
+	struct rebind
+	{
+		typedef spool_allocator<_Tp1> other;
+	};
+
+	pointer allocate(size_type n, const void *hint = 0)
+	{
+		if (n <= 32) return (pointer)KPool<32, 4096>::getInstance().allocate();
+		if (n <= 48) return (pointer)KPool<48, 4096>::getInstance().allocate();
+		return allocator<value_type>::allocate(n, hint);
+	}
+
+	void deallocate(pointer p, size_type n)
+	{
+		if (n <= 32) return KPool<32, 4096>::getInstance().deallocate(p);
+		if (n <= 48) return KPool<48, 4096>::getInstance().deallocate(p);
+		return allocator<value_type>::deallocate(p, n);
+	}
+
+	spool_allocator() throw() : allocator<value_type>() { /*fprintf(stderr, "Hello allocator!\n");*/ }
+	spool_allocator(const spool_allocator &a) throw() : allocator<value_type>(a) { }
+	template <class U>
+	spool_allocator(const spool_allocator<U> &a) throw() : allocator<value_type>(a) { }
+	~spool_allocator() throw() { }
+};

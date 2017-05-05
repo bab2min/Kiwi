@@ -1,6 +1,5 @@
 #pragma once
 
-
 template <>
 class pool_allocator<char> : public allocator<char>
 {
@@ -17,6 +16,8 @@ public:
 
 	pointer allocate(size_type n, const void *hint = 0)
 	{
+		if (n <= 8) return (pointer)KPool<8, 4096>::getInstance().allocate();
+		if (n <= 16) return (pointer)KPool<16, 4096>::getInstance().allocate();
 		if (n <= 32) return (pointer)KPool<32, 4096>::getInstance().allocate();
 		if (n <= 48) return (pointer)KPool<48, 4096>::getInstance().allocate();
 		//fprintf(stderr, "Alloc %d bytes.\n", n * sizeof(char));
@@ -26,6 +27,8 @@ public:
 	void deallocate(pointer p, size_type n)
 	{
 		//fprintf(stderr, "Dealloc %d bytes (%p).\n", n * sizeof(char), p);
+		if (n <= 8) return KPool<8, 4096>::getInstance().deallocate(p);
+		if (n <= 16) return KPool<16, 4096>::getInstance().deallocate(p);
 		if (n <= 32) return KPool<32, 4096>::getInstance().deallocate(p);
 		if (n <= 48) return KPool<48, 4096>::getInstance().deallocate(p);
 		return allocator<value_type>::deallocate(p, n);
@@ -54,7 +57,7 @@ public:
 
 	pointer allocate(size_type n, const void *hint = 0)
 	{
-		if (n * sizeof(value_type) <= 256) return (pointer)KPool<256, 1024>::getInstance().allocate();
+		if (n * sizeof(value_type) <= 128) return (pointer)KPool<128, 512>::getInstance().allocate();
 		if (n * sizeof(value_type) <= 1024) return (pointer)KPool<1024, 256>::getInstance().allocate();
 		//fprintf(stderr, "Alloc %d bytes.\n", n * sizeof(value_type));
 		return allocator<value_type>::allocate(n, hint);
@@ -62,7 +65,7 @@ public:
 
 	void deallocate(pointer p, size_type n)
 	{
-		if (n * sizeof(value_type) <= 256) return KPool<256, 1024>::getInstance().deallocate(p);
+		if (n * sizeof(value_type) <= 128) return KPool<128, 512>::getInstance().deallocate(p);
 		if (n * sizeof(value_type) <= 1024) return KPool<1024, 256>::getInstance().deallocate(p);
 		//fprintf(stderr, "Dealloc %d bytes (%p).\n", n * sizeof(value_type), p);
 		return allocator<value_type>::deallocate(p, n);
