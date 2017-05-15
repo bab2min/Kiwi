@@ -44,6 +44,7 @@ enum class KCondPolarity : char
 
 KPOSTag makePOSTag(k_wstring tagStr);
 const char* tagToString(KPOSTag t);
+const wchar_t* tagToStringW(KPOSTag t);
 struct KForm;
 
 struct KMorpheme

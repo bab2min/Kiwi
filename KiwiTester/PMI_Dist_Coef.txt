@@ -1,0 +1,220 @@
+2.0 / ABS(i+1)
+
+0.825284
+Total (1092) Time : 5605.49 ms
+Time per Unit : 5.13323 ms
+
+0.826267
+Total (4533) Time : 4750.02 ms
+Time per Unit : 1.04787 ms
+
+0.856609
+Total (3252) Time : 4277.7 ms
+Time per Unit : 1.31541 ms
+
+0.829663
+Total (9444) Time : 8933.53 ms
+Time per Unit : 0.945948 ms
+
+0.843985
+Total (6167) Time : 10586.2 ms
+Time per Unit : 1.71659 ms
+
+1.8 / ABS(i+1)
+
+0.827014
+Total (1092) Time : 5607.15 ms
+Time per Unit : 5.13475 ms
+
+0.827524
+Total (4533) Time : 4776.12 ms
+Time per Unit : 1.05363 ms
+
+0.858409
+Total (3252) Time : 4198.78 ms
+Time per Unit : 1.29114 ms
+
+0.831063
+Total (9444) Time : 8838.62 ms
+Time per Unit : 0.935898 ms
+
+0.844567
+Total (6167) Time : 10623.7 ms
+Time per Unit : 1.72267 ms
+
+1.7 / ABS(i+1)
+
+0.828095
+Total (1092) Time : 5570.98 ms
+Time per Unit : 5.10163 ms
+
+0.828205
+Total (4533) Time : 4759.1 ms
+Time per Unit : 1.04988 ms
+
+0.858782
+Total (3252) Time : 4199.08 ms
+Time per Unit : 1.29123 ms
+
+0.831628
+Total (9444) Time : 8773.33 ms
+Time per Unit : 0.928984 ms
+
+0.844715
+Total (6167) Time : 10546.6 ms
+Time per Unit : 1.71017 ms
+
+1.6 / ABS(i+1)
+
+0.828459
+Total (1092) Time : 5552.27 ms
+Time per Unit : 5.0845 ms
+
+0.828036
+Total (4533) Time : 4752.27 ms
+Time per Unit : 1.04837 ms
+
+0.858134
+Total (3252) Time : 4206.08 ms
+Time per Unit : 1.29338 ms
+
+0.831582
+Total (9444) Time : 8848.13 ms
+Time per Unit : 0.936905 ms
+
+0.844645
+Total (6167) Time : 11153.6 ms
+Time per Unit : 1.80859 ms
+
+2.0 / ABS(i)
+
+0.80627
+Total (1092) Time : 5594.55 ms
+Time per Unit : 5.12322 ms
+
+0.808429
+Total (4533) Time : 4785.04 ms
+Time per Unit : 1.0556 ms
+
+0.834106
+Total (3252) Time : 4211.12 ms
+Time per Unit : 1.29493 ms
+
+0.811055
+Total (9444) Time : 8821.3 ms
+Time per Unit : 0.934064 ms
+
+0.829281
+Total (6167) Time : 10679.9 ms
+Time per Unit : 1.73179 ms
+
+1.0 / ABS(i)
+
+0.825442
+Total (1092) Time : 5912.65 ms
+Time per Unit : 5.41452 ms
+
+0.82766
+Total (4533) Time : 5128.04 ms
+Time per Unit : 1.13127 ms
+
+0.858039
+Total (3252) Time : 4537.87 ms
+Time per Unit : 1.39541 ms
+
+0.830564
+Total (9444) Time : 9475.08 ms
+Time per Unit : 1.00329 ms
+
+0.843768
+Total (6167) Time : 11328.8 ms
+Time per Unit : 1.837 ms
+
+0.8 / ABS(i)
+
+0.828808
+Total (1092) Time : 5850.07 ms
+Time per Unit : 5.3572 ms
+
+0.82746
+Total (4533) Time : 4811.57 ms
+Time per Unit : 1.06145 ms
+
+0.858441
+Total (3252) Time : 4208.16 ms
+Time per Unit : 1.29402 ms
+
+0.831463
+Total (9444) Time : 8959.43 ms
+Time per Unit : 0.94869 ms
+
+0.843487
+Total (6167) Time : 10858.1 ms
+Time per Unit : 1.76068 ms
+
+0.67 / ABS(i)
+
+0.828316
+Total (1092) Time : 5552.24 ms
+Time per Unit : 5.08447 ms
+
+0.827254
+Total (4533) Time : 4725.35 ms
+Time per Unit : 1.04243 ms
+
+0.85747
+Total (3252) Time : 4203.8 ms
+Time per Unit : 1.29268 ms
+
+0.831003
+Total (9444) Time : 8818.92 ms
+Time per Unit : 0.933812 ms
+
+0.843077
+Total (6167) Time : 10598.7 ms
+Time per Unit : 1.71862 ms
+
+1.0
+
+0.817223
+Total (1092) Time : 5629.99 ms
+Time per Unit : 5.15567 ms
+
+0.815828
+Total (4533) Time : 4767.15 ms
+Time per Unit : 1.05166 ms
+
+0.844934
+Total (3252) Time : 4192.26 ms
+Time per Unit : 1.28913 ms
+
+0.819526
+Total (9444) Time : 8800.37 ms
+Time per Unit : 0.931848 ms
+
+0.838164
+Total (6167) Time : 10628.9 ms
+Time per Unit : 1.72352 ms
+
+0.67
+
+0.825756
+Total (1092) Time : 5680.28 ms
+Time per Unit : 5.20172 ms
+
+0.822568
+Total (4533) Time : 4854.66 ms
+Time per Unit : 1.07096 ms
+
+0.851773
+Total (3252) Time : 4269.94 ms
+Time per Unit : 1.31302 ms
+
+0.826741
+Total (9444) Time : 8921.99 ms
+Time per Unit : 0.944725 ms
+
+0.842676
+Total (6167) Time : 10694.4 ms
+Time per Unit : 1.73413 ms
+

@@ -85,6 +85,32 @@ const char * tagToString(KPOSTag t)
 	return tags[(size_t)t];
 }
 
+const wchar_t * tagToStringW(KPOSTag t)
+{
+	static const wchar_t* tags[] =
+	{
+		L"UN",
+		L"NNG", L"NNP", L"NNB",
+		L"VV", L"VA",
+		L"MAG",
+		L"NR", L"NP",
+		L"VX",
+		L"MM", L"MAJ",
+		L"IC",
+		L"XPN", L"XSN", L"XSV", L"XSA", L"XR",
+		L"VCP", L"VCN",
+		L"SF", L"SP", L"SS", L"SE", L"SO", L"SW",
+		L"NF", L"NV", L"NA",
+		L"SL", L"SH", L"SN",
+		L"JKS", L"JKC", L"JKG", L"JKO", L"JKB", L"JKV", L"JKQ", L"JX", L"JC",
+		L"EP", L"EF", L"EC", L"ETN", L"ETM",
+		L"V",
+		L"@"
+	};
+	assert(t < KPOSTag::MAX);
+	return tags[(size_t)t];
+}
+
 KForm::KForm(const char * _form)
 {
 	if (_form) form = {_form, _form + strlen(_form)};

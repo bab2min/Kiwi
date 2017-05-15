@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26228.12
+VisualStudioVersion = 15.0.26403.7
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KiwiLibrary", "KiwiLibrary\KiwiLibrary.vcxproj", "{F790BC37-2732-4ED1-9CA5-7248BED3588E}"
 EndProject
@@ -15,6 +15,12 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KiwiRunLinux", "KiwiRunLinux\KiwiRunLinux.vcxproj", "{48E547B2-E401-4299-A9F1-BDD7F55F8FF6}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KiwiLibraryLinux", "KiwiLibraryLinux\KiwiLibraryLinux.vcxproj", "{505E5316-76FB-4F4B-853C-969C976C8C8A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KiwiC", "KiwiC\KiwiC.vcxproj", "{F91F4D06-6485-4FF0-AB01-C07E9E58A80E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KiwiCTester", "KiwiCTester\KiwiCTester.vcxproj", "{0574781D-6D37-4F56-BF73-3E3219F612F5}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KiwiPy", "KiwiPy\KiwiPy.vcxproj", "{9A0331FB-819F-41B6-AE04-C3AA7A6104A9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -80,6 +86,36 @@ Global
 		{505E5316-76FB-4F4B-853C-969C976C8C8A}.Release|x64.Build.0 = Release|x64
 		{505E5316-76FB-4F4B-853C-969C976C8C8A}.Release|x86.ActiveCfg = Release|x86
 		{505E5316-76FB-4F4B-853C-969C976C8C8A}.Release|x86.Build.0 = Release|x86
+		{F91F4D06-6485-4FF0-AB01-C07E9E58A80E}.Debug|ARM.ActiveCfg = Debug|Win32
+		{F91F4D06-6485-4FF0-AB01-C07E9E58A80E}.Debug|x64.ActiveCfg = Debug|x64
+		{F91F4D06-6485-4FF0-AB01-C07E9E58A80E}.Debug|x64.Build.0 = Debug|x64
+		{F91F4D06-6485-4FF0-AB01-C07E9E58A80E}.Debug|x86.ActiveCfg = Debug|Win32
+		{F91F4D06-6485-4FF0-AB01-C07E9E58A80E}.Debug|x86.Build.0 = Debug|Win32
+		{F91F4D06-6485-4FF0-AB01-C07E9E58A80E}.Release|ARM.ActiveCfg = Release|Win32
+		{F91F4D06-6485-4FF0-AB01-C07E9E58A80E}.Release|x64.ActiveCfg = Release|x64
+		{F91F4D06-6485-4FF0-AB01-C07E9E58A80E}.Release|x64.Build.0 = Release|x64
+		{F91F4D06-6485-4FF0-AB01-C07E9E58A80E}.Release|x86.ActiveCfg = Release|Win32
+		{F91F4D06-6485-4FF0-AB01-C07E9E58A80E}.Release|x86.Build.0 = Release|Win32
+		{0574781D-6D37-4F56-BF73-3E3219F612F5}.Debug|ARM.ActiveCfg = Debug|Win32
+		{0574781D-6D37-4F56-BF73-3E3219F612F5}.Debug|x64.ActiveCfg = Debug|x64
+		{0574781D-6D37-4F56-BF73-3E3219F612F5}.Debug|x64.Build.0 = Debug|x64
+		{0574781D-6D37-4F56-BF73-3E3219F612F5}.Debug|x86.ActiveCfg = Debug|Win32
+		{0574781D-6D37-4F56-BF73-3E3219F612F5}.Debug|x86.Build.0 = Debug|Win32
+		{0574781D-6D37-4F56-BF73-3E3219F612F5}.Release|ARM.ActiveCfg = Release|Win32
+		{0574781D-6D37-4F56-BF73-3E3219F612F5}.Release|x64.ActiveCfg = Release|x64
+		{0574781D-6D37-4F56-BF73-3E3219F612F5}.Release|x64.Build.0 = Release|x64
+		{0574781D-6D37-4F56-BF73-3E3219F612F5}.Release|x86.ActiveCfg = Release|Win32
+		{0574781D-6D37-4F56-BF73-3E3219F612F5}.Release|x86.Build.0 = Release|Win32
+		{9A0331FB-819F-41B6-AE04-C3AA7A6104A9}.Debug|ARM.ActiveCfg = Debug|Win32
+		{9A0331FB-819F-41B6-AE04-C3AA7A6104A9}.Debug|x64.ActiveCfg = Debug|x64
+		{9A0331FB-819F-41B6-AE04-C3AA7A6104A9}.Debug|x64.Build.0 = Debug|x64
+		{9A0331FB-819F-41B6-AE04-C3AA7A6104A9}.Debug|x86.ActiveCfg = Debug|Win32
+		{9A0331FB-819F-41B6-AE04-C3AA7A6104A9}.Debug|x86.Build.0 = Debug|Win32
+		{9A0331FB-819F-41B6-AE04-C3AA7A6104A9}.Release|ARM.ActiveCfg = Release|Win32
+		{9A0331FB-819F-41B6-AE04-C3AA7A6104A9}.Release|x64.ActiveCfg = Release|x64
+		{9A0331FB-819F-41B6-AE04-C3AA7A6104A9}.Release|x64.Build.0 = Release|x64
+		{9A0331FB-819F-41B6-AE04-C3AA7A6104A9}.Release|x86.ActiveCfg = Release|Win32
+		{9A0331FB-819F-41B6-AE04-C3AA7A6104A9}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
