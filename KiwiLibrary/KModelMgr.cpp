@@ -24,7 +24,7 @@ void KModelMgr::loadPOSFromTxt(const char * filename)
 		g = P_MIN;
 	}
 	FILE* file;
-	if (fopen_s(&file, filename, "r")) throw ios_base::failure{ k_string("Cannot open ") + filename };
+	if (fopen_s(&file, filename, "r")) throw ios_base::failure{ string("Cannot open ") + filename };
 	char buf[2048];
 	wstring_convert<codecvt_utf8_utf16<k_wchar>, k_wchar> converter;
 	while (fgets(buf, 2048, file))
@@ -398,7 +398,7 @@ void KModelMgr::loadDMFromTxt(const char * filename)
 			if (!m) continue;
 			float pmi = stof(fields[i + 1]);
 			if (abs(pmi) < 3.f) continue;
-			pmi *= PMI_WEIGHT;
+			//pmi *= PMI_WEIGHT;
 			tarMorpheme->addToDistMap(m, pmi);
 			m->addToDistMap(tarMorpheme, pmi);
 		}
@@ -532,7 +532,10 @@ void KModelMgr::solidify()
 #if defined(USE_DIST_MAP) && !defined(LOAD_TXT)
 	loadDMBin((modelPath + k_string("distModel.bin")).c_str());
 #endif
-	
+	for (auto& m : morphemes)
+	{
+		if (m.distMap) for (auto& p : *m.distMap) p.second *= PMI_WEIGHT;
+	}
 	/*FILE* out;
 	fopen_s(&out, "dmTestBin.txt", "w");
 	size_t n = 0;

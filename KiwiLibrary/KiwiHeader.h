@@ -32,7 +32,7 @@ using namespace std;
 #define DIVIDE_BOUND 6
 #define MIN_CANDIDATE 5
 #define USE_DIST_MAP
-#define PMI_WEIGHT 0.67f
+#define PMI_WEIGHT 1.7f
 //#define LOAD_TXT
 
 #ifdef _WIN32
