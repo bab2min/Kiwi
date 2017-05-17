@@ -399,8 +399,8 @@ void KModelMgr::loadDMFromTxt(const char * filename)
 			float pmi = stof(fields[i + 1]);
 			if (abs(pmi) < 3.f) continue;
 			//pmi *= PMI_WEIGHT;
-			tarMorpheme->addToDistMap(m, pmi);
-			m->addToDistMap(tarMorpheme, pmi);
+			if(tarMorpheme < m) tarMorpheme->addToDistMap(m, pmi);
+			else m->addToDistMap(tarMorpheme, pmi);
 		}
 	}
 	fclose(file);
