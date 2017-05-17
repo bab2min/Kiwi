@@ -262,7 +262,11 @@ vector<KResult> Kiwi::analyze(const k_wstring & str, size_t topN) const
 					{
 						auto& mj = get<0>(ms[j]);
 						if (!mj) continue;
-						newCands.back().second += mi->getDistMap(mj) / (i-j + 1);
+						float pmi;
+						if (mi < mj) pmi = mi->getDistMap(mj);
+						else if (mj->distMap) pmi = mj->getDistMap(mi);
+						else pmi = 0;
+						newCands.back().second += pmi / (i-j + 1);
 					}
 				}
 #endif
