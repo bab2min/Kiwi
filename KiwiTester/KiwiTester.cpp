@@ -37,7 +37,7 @@ int main()
 	for (int i = 0; i < 1; i++)
 	{
 		vector<KMorpheme> tmpMorph;
-		auto graph = kw.kt->splitGM(splitJamo(L"¸Ô´Ù"), tmpMorph);
+		auto graph = kw.kt->splitGM(splitJamo(L"¸Ô¾ú½À´Ï´Ù"), tmpMorph);
 		auto paths = kw.getOptimaPath(graph.get(), 5);
 		for (auto& path : paths)
 		{

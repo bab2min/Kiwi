@@ -463,7 +463,7 @@ shared_ptr<KMorphemeNode> KTrie::splitGM(const k_string & str, vector<KMorpheme>
 				// if former matched with morpheme
 				if (it->second && !nodeToRepairMorph.count(it->second))
 				{
-					auto& beforeMorph = nodes[it->second].morpheme;
+					auto beforeMorph = nodes[it->second].morpheme;
 					for (auto& p : newMorphs)
 					{
 						auto& morph = p.first;
@@ -473,7 +473,7 @@ shared_ptr<KMorphemeNode> KTrie::splitGM(const k_string & str, vector<KMorpheme>
 							&& beforeMorph->combineSocket == morph->combineSocket && morph->tag == KPOSTag::UNKNOWN)
 							&& !morph->chunks->empty() && morph->chunks->front()->tag == KPOSTag::V) //!!!!!!
 						{
-							beforeMorph = beforeMorph->getCombined();
+							nodes[it->second].morpheme = beforeMorph->getCombined();
 						}
 						if(!p.second) p.second = makeNewNode(p.first, n);
 						nodes[it->second].nexts.emplace_back((KMorphemeNode*)p.second);
