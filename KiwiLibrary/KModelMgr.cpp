@@ -455,6 +455,9 @@ KModelMgr::KModelMgr(const char * modelPath)
 	loadPOSBin((modelPath + k_string("pos.bin")).c_str());
 	loadMorphBin((modelPath + k_string("fullmodel.bin")).c_str());
 #endif
+#if defined(USE_DIST_MAP) && !defined(LOAD_TXT)
+	loadDMBin((modelPath + k_string("distModel.bin")).c_str());
+#endif
 }
 
 void KModelMgr::addUserWord(const k_string & form, KPOSTag tag)
@@ -529,13 +532,12 @@ void KModelMgr::solidify()
 	loadDMFromTxt((modelPath + k_string("distModel.txt")).c_str());
 	saveDMBin((modelPath + k_string("distModel.bin")).c_str());
 #endif
-#if defined(USE_DIST_MAP) && !defined(LOAD_TXT)
-	loadDMBin((modelPath + k_string("distModel.bin")).c_str());
-#endif
+#ifdef USE_DIST_MAP
 	for (auto& m : morphemes)
 	{
 		if (m.distMap) for (auto& p : *m.distMap) p.second *= PMI_WEIGHT;
 	}
+#endif
 	/*FILE* out;
 	fopen_s(&out, "dmTestBin.txt", "w");
 	size_t n = 0;

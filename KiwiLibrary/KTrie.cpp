@@ -2,6 +2,7 @@
 #include "KTrie.h"
 #include "KForm.h"
 #include "KFeatureTestor.h"
+
 #ifdef _DEBUG
 int KTrie::rootID = 0;
 #endif // _DEBUG
@@ -177,7 +178,7 @@ vector<k_vchunk> KTrie::split(const k_string& str, bool hasPrefix) const
 	};
 	static bool(*polarFunc[])(const char*, const char*) = {
 		KFeatureTestor::isPositive,
-		KFeatureTestor::notPositive
+		KFeatureTestor::isNegative
 	};
 	size_t maxChunk = (str.size() + 9) / 4;
 	auto brachOut = [&]()
@@ -338,6 +339,264 @@ vector<k_vchunk> KTrie::split(const k_string& str, bool hasPrefix) const
 		{
 			ret.back().emplace_back(c, str.size());
 		}
+	}
+	return ret;
+}
+
+shared_ptr<KMorphemeNode> KTrie::splitGM(const k_string & str, vector<KMorpheme>& tmpMorph, bool hasPrefix) const
+{
+	static bool(*vowelFunc[])(const char*, const char*) = {
+		KFeatureTestor::isPostposition,
+		KFeatureTestor::isVowel,
+		KFeatureTestor::isVocalic,
+		KFeatureTestor::isVocalicH,
+		KFeatureTestor::notVowel,
+		KFeatureTestor::notVocalic,
+		KFeatureTestor::notVocalicH,
+	};
+	static bool(*polarFunc[])(const char*, const char*) = {
+		KFeatureTestor::isPositive,
+		KFeatureTestor::isNegative
+	};
+
+	size_t n = 0;
+	auto curTrie = this;
+	vector<const KForm*> candidates;
+	vector<KMorphemeNode> nodes;
+	vector<size_t> nodeEndPos;
+	multimap<size_t, size_t> nodeAtNthEnd;
+	map<pair<size_t, size_t>, size_t> unknownNodes;
+	unordered_set<size_t> nodeToRepairMorph;
+	nodes.emplace_back();
+	nodeAtNthEnd.emplace(0, 0);
+	nodeEndPos.emplace_back(0);
+	auto makeTmpMorph = [&tmpMorph](const k_string& form)
+	{
+		tmpMorph.emplace_back(form);
+		tmpMorph.back().p = form.size() * -1.5f - 6.f;
+		return tmpMorph.size() - 1;
+	};
+
+	auto makeNewNode = [&nodes, &nodeAtNthEnd, &nodeEndPos](const KMorpheme* morph, size_t endPos) -> size_t
+	{
+		size_t nid = nodes.size();
+		nodes.emplace_back(morph);
+		nodeAtNthEnd.emplace(endPos, nid);
+		nodeEndPos.emplace_back(endPos);
+		return nid;
+	};
+
+	auto brachOut = [&]()
+	{
+		if (candidates.empty()) return;
+		for (auto cand : candidates)
+		{
+			// if current chunk is precombined, test next character
+			if (!cand->suffix.empty() && n + 1 < str.size()
+				&& cand->suffix.find(str[n]) == cand->suffix.end())
+			{
+				continue;
+			}
+			size_t nBegin = n - cand->form.size();
+			// if former ends with ¤· and next begin vowel, pass
+			//if (!beforeMatched && bEnd && str[bEnd - 1] == 23 && cand->form[0] > 30) continue;
+
+			vector<pair<const KMorpheme*, size_t>> newMorphs;
+			newMorphs.reserve(cand->candidate.size());
+			bool unknownFormAvailable = false;
+			for (auto morph : cand->candidate)
+			{
+				// test if current morph satisfies restrictions
+				if (!(nBegin == 0 && hasPrefix))
+				{
+					if ((size_t)morph->vowel &&
+						!vowelFunc[(size_t)morph->vowel - 1](&str[0], &str[0] + nBegin)) continue;
+					if ((size_t)morph->polar &&
+						!polarFunc[(size_t)morph->polar - 1](&str[0], &str[0] + nBegin)) continue;
+				}
+				if (!(morph->combineSocket && morph->tag == KPOSTag::UNKNOWN)) unknownFormAvailable = true;
+				newMorphs.emplace_back(morph, 0);
+			}
+			// if none of morphs were matched, pass
+			if (newMorphs.empty()) continue;
+
+			if (unknownFormAvailable)
+			{
+				size_t startPos = -1;
+				size_t newNodeId = -1;
+				for (auto it = nodeAtNthEnd.lower_bound(0); it != nodeAtNthEnd.lower_bound(nBegin); it++)
+				{
+					// if former matched with morpheme
+					if (it->second && !nodeToRepairMorph.count(it->second))
+					{
+						auto& beforeMorph = nodes[it->second].morpheme;
+						if (beforeMorph->combineSocket && beforeMorph->tag != KPOSTag::UNKNOWN) continue;
+					}
+					if ((!cand->hasFirstV && !KFeatureTestor::isCorrectEnd(&str[0] + it->first, &str[0] + nBegin))
+						|| !KFeatureTestor::isCorrectStart(&str[0] + it->first, &str[0] + nBegin)
+						|| nBegin - it->first == 1)
+					{
+						continue;
+					}
+					if (startPos != it->first)
+					{
+						auto nt = unknownNodes.find(make_pair(it->first, nBegin));
+						if (nt == unknownNodes.end())
+						{
+							const KMorpheme* morph = (KMorpheme*)makeTmpMorph(str.substr(it->first, nBegin - it->first)); // unknown form
+							newNodeId = makeNewNode(morph, nBegin);
+							nodeToRepairMorph.emplace(newNodeId);
+							unknownNodes.emplace(make_pair(it->first, nBegin), newNodeId);
+						}
+						else
+						{
+							newNodeId = nt->second;
+						}
+						startPos = it->first;
+					}
+					nodes[it->second].nexts.emplace_back((KMorphemeNode*)newNodeId);
+				}
+			}
+
+			for (auto it = nodeAtNthEnd.lower_bound(nBegin); it != nodeAtNthEnd.upper_bound(nBegin); it++)
+			{
+				// if former matched with morpheme
+				if (it->second && !nodeToRepairMorph.count(it->second))
+				{
+					auto& beforeMorph = nodes[it->second].morpheme;
+					for (auto& p : newMorphs)
+					{
+						auto& morph = p.first;
+						if ((beforeMorph->combineSocket && beforeMorph->tag != KPOSTag::UNKNOWN)
+							&& (beforeMorph->combineSocket != morph->combineSocket || morph->tag != KPOSTag::UNKNOWN)) continue;
+						if ((beforeMorph->combineSocket && beforeMorph->tag != KPOSTag::UNKNOWN
+							&& beforeMorph->combineSocket == morph->combineSocket && morph->tag == KPOSTag::UNKNOWN)
+							&& !morph->chunks->empty() && morph->chunks->front()->tag == KPOSTag::V) //!!!!!!
+						{
+							beforeMorph = beforeMorph->getCombined();
+						}
+						if(!p.second) p.second = makeNewNode(p.first, n);
+						nodes[it->second].nexts.emplace_back((KMorphemeNode*)p.second);
+					}
+				}
+				else
+				{
+					for (auto& p : newMorphs)
+					{
+						auto& morph = p.first;
+						if (morph->combineSocket && morph->tag == KPOSTag::UNKNOWN) continue;
+						if (!p.second) p.second = makeNewNode(p.first, n);
+						nodes[it->second].nexts.emplace_back((KMorphemeNode*)p.second);
+					}
+				}
+			}
+		}
+		candidates.clear();
+	};
+
+	for (auto c : str)
+	{
+		assert(c < 52);
+
+		while (!curTrie->getNext(c - 1)) // if curTrie has no exact next node, goto fail
+		{
+			if (curTrie->fail)
+			{
+				curTrie = curTrie->getFail();
+				for (auto submatcher = curTrie; submatcher; submatcher = submatcher->getFail())
+				{
+					if (!submatcher->exit) break;
+					else if (submatcher->exit != (void*)-1)
+					{
+						if (find(candidates.begin(), candidates.end(), submatcher->exit) != candidates.end()) break;
+						candidates.emplace_back(submatcher->exit);
+					}
+				}
+			}
+			else
+			{
+				brachOut();
+				goto continueFor; // root node has no exact next node, continue
+			}
+		}
+		brachOut();
+		// from this, curTrie has exact node
+		curTrie = curTrie->getNext(c - 1);
+		// if it has exit node, a pattern has found
+		for (auto submatcher = curTrie; submatcher; submatcher = submatcher->getFail())
+		{
+			if (!submatcher->exit) break;
+			else if (submatcher->exit != (void*)-1)
+			{
+				if (find(candidates.begin(), candidates.end(), submatcher->exit) != candidates.end()) break;
+				candidates.emplace_back(submatcher->exit);
+			}
+		}
+	continueFor:
+		n++;
+	}
+	while (curTrie->fail)
+	{
+		curTrie = curTrie->getFail();
+		if (curTrie->exit && curTrie->exit != (void*)-1)
+		{
+			if (find(candidates.begin(), candidates.end(), curTrie->exit) != candidates.end()) break;
+			candidates.emplace_back(curTrie->exit);
+		}
+	}
+	brachOut();
+
+	// mark acceptable final
+	for (auto it = nodeAtNthEnd.lower_bound(n); it != nodeAtNthEnd.upper_bound(n); it++)
+	{
+		if (it->second && !nodeToRepairMorph.count(it->second))
+		{
+			auto& morph = nodes[it->second].morpheme;
+			if (morph->combineSocket && morph->tag != KPOSTag::UNKNOWN)
+			{
+				nodeEndPos[it->second] = 0;
+				continue;
+			}
+			nodes[it->second].nexts.emplace_back(nullptr);
+		}
+	}
+
+	// repair morph pointer in nodes
+	for (auto id : nodeToRepairMorph)
+	{
+		nodes[id].morpheme = &tmpMorph[(size_t)nodes[id].morpheme];
+	}
+
+	unordered_map<size_t, size_t> realAddress;
+	for (size_t i = 0; i < nodes.size(); i++)
+	{
+		if (nodeEndPos[i] < n && nodes[i].nexts.empty()) continue;
+		realAddress.emplace(i, realAddress.size());
+	}
+	shared_ptr<KMorphemeNode> ret { new KMorphemeNode[realAddress.size()], default_delete<KMorphemeNode[]>() };
+	// repair node pointer in all nodes
+	for (size_t i = 0; i < nodes.size(); i++)
+	{
+		auto it = realAddress.find(i);
+		if (it == realAddress.end()) continue;
+		auto& aNode = ret.get()[it->second];
+		sort(nodes[i].nexts.begin(), nodes[i].nexts.end());
+		KMorphemeNode* beforePtr = nullptr;
+		for (auto ptr : nodes[i].nexts)
+		{
+			if (ptr == nullptr)
+			{
+				// mark acceptable final node
+				aNode.setAcceptableFinal();
+				break;
+			}
+			if (beforePtr == ptr) continue;
+			beforePtr = ptr;
+			auto jt = realAddress.find((size_t)ptr);
+			if (jt == realAddress.end()) continue;
+			aNode.nexts.emplace_back(ret.get() + jt->second);
+		}
+		aNode.morpheme = nodes[i].morpheme;
 	}
 	return ret;
 }

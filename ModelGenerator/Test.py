@@ -1,5 +1,6 @@
 from konlpy.tag import Kkma
 from konlpy.tag import Komoran
+from kiwiPy import Kiwi
 
 import time
 
@@ -42,24 +43,25 @@ class Test:
                 o.write('\t'.join(wl[1]) + '\n')
                 o.write('\n')
 
+def doTest(testFiles, posFunc, outPrefix):
+    for f in testFiles:
+        print('\n' + f)
+        t = Test("../TestSets/" + f, posFunc)
+        print("Total: %gs" % t.totalTime)
+        t.refineScore()
+        print("Score: %g" % t.getScore())
+        t.writeToFile(outPrefix + 'wrong' + f)
 
-def posTest(s):
-    return ['/'.join(i) for i in p.pos(s)]
+testFiles = ['01s.txt', '02s.txt', '03s.txt', '11s.txt']
 
 start = time.time()
 p = Komoran()
 p.pos("")
-print("Loading: " + str(time.time() - start))
-
-
-t = Test("../TestSets/01s.txt", posTest)
-print("Total: %g" % t.totalTime)
-t.refineScore()
-print("Score: %g" % t.getScore())
-t.writeToFile('wrong01s.txt')
-
-t = Test("../TestSets/02s.txt", posTest)
-print("Total: %g" % t.totalTime)
-t.refineScore()
-print("Score: %g" % t.getScore())
-t.writeToFile('wrong02s.txt')
+print("Loading: %gs" % (time.time() - start))
+doTest(testFiles, lambda s:['/'.join(i) for i in p.pos(s)], 'kmr_')
+p = None
+print()
+start = time.time()
+p = Kiwi()
+print("Loading: %gs" % (time.time() - start))
+doTest(testFiles, lambda s:['/'.join(i) for i in p.analyze(s)], 'kiwi_')
