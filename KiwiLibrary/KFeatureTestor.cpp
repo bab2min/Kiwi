@@ -42,9 +42,15 @@ bool KFeatureTestor::_isPositive(const char * begin, const char * end)
 	return false;
 }
 
-bool KFeatureTestor::_notPositive(const char * begin, const char * end)
+bool KFeatureTestor::_isNegative(const char * begin, const char * end)
 {
-	return !_isPositive(begin, end);
+	for (auto e = end - 1; e >= begin; e--)
+	{
+		if (*e <= 30 || *e == 49) continue;
+		if (*e == 31 || *e == 33 || *e == 39) return false;
+		return true;
+	}
+	return false;
 }
 
 bool KFeatureTestor::isVowel(const char * begin, const char * end)
@@ -82,9 +88,9 @@ bool KFeatureTestor::isPositive(const char * begin, const char * end)
 	return begin < end && _isPositive(begin, end);
 }
 
-bool KFeatureTestor::notPositive(const char * begin, const char * end)
+bool KFeatureTestor::isNegative(const char * begin, const char * end)
 {
-	return begin < end && _notPositive(begin, end);
+	return begin < end && _isNegative(begin, end);
 }
 
 bool KFeatureTestor::isPostposition(const char * begin, const char * end)
@@ -94,6 +100,7 @@ bool KFeatureTestor::isPostposition(const char * begin, const char * end)
 
 bool KFeatureTestor::isCorrectStart(const char * begin, const char * end)
 {
+	// not starts with CC- nor V-
 	return !(end - begin >= 2 && begin[0] <= 30 && begin[1] <= 30)
 		&& !(end - begin >= 1 && begin[0] > 30);
 		/*&& !(end - begin == 1 && begin[0] <= 30)*/;
@@ -101,6 +108,7 @@ bool KFeatureTestor::isCorrectStart(const char * begin, const char * end)
 
 bool KFeatureTestor::isCorrectEnd(const char * begin, const char * end)
 {
+	// not ends with -CC nor is V
 	return !(end - begin >= 2 && end[-1] <= 30 && end[-2] <= 30) 
 		&& !(end - begin == 1 && end[-1] <= 30);
 }

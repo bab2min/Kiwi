@@ -29,6 +29,18 @@ typedef vector<KChunk, pool_allocator<KChunk>> k_vchunk;
 typedef vector<KChunk> k_vchunk;
 #endif
 
+class KModelMgr;
+
+struct KMorphemeNode
+{
+	const KMorpheme* morpheme;
+	vector<KMorphemeNode*> nexts;
+	vector<pair<vector<char>, float>>* optimaCache = nullptr;
+	KMorphemeNode(const KMorpheme* _morpheme = nullptr) : morpheme(_morpheme) {}
+	void setAcceptableFinal() { nexts.emplace_back(nullptr); }
+	bool isAcceptableFinal() const { return nexts.size() == 1 && nexts[0] == nullptr; }
+};
+
 struct KTrie
 {
 #ifdef  _DEBUG
@@ -70,5 +82,5 @@ struct KTrie
 	const KForm* search(const char* begin, const char* end) const;
 	vector<pair<const KForm*, int>> searchAllPatterns(const k_string& str) const;
 	vector<k_vchunk> split(const k_string& str, bool hasPrefix = false) const;
+	shared_ptr<KMorphemeNode> splitGM(const k_string& str, vector<KMorpheme>& tmpMorph, bool hasPrefix = false) const;
 };
-

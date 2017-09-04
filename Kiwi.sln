@@ -22,6 +22,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KiwiCTester", "KiwiCTester\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KiwiPy", "KiwiPy\KiwiPy.vcxproj", "{9A0331FB-819F-41B6-AE04-C3AA7A6104A9}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KiwiPyLinux", "KiwiPy\KiwiPyLinux.vcxproj", "{85AF8B33-4D65-4DA3-8369-4BDD4209D063}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -116,6 +118,18 @@ Global
 		{9A0331FB-819F-41B6-AE04-C3AA7A6104A9}.Release|x64.Build.0 = Release|x64
 		{9A0331FB-819F-41B6-AE04-C3AA7A6104A9}.Release|x86.ActiveCfg = Release|Win32
 		{9A0331FB-819F-41B6-AE04-C3AA7A6104A9}.Release|x86.Build.0 = Release|Win32
+		{85AF8B33-4D65-4DA3-8369-4BDD4209D063}.Debug|ARM.ActiveCfg = Debug|ARM
+		{85AF8B33-4D65-4DA3-8369-4BDD4209D063}.Debug|ARM.Build.0 = Debug|ARM
+		{85AF8B33-4D65-4DA3-8369-4BDD4209D063}.Debug|x64.ActiveCfg = Debug|x64
+		{85AF8B33-4D65-4DA3-8369-4BDD4209D063}.Debug|x64.Build.0 = Debug|x64
+		{85AF8B33-4D65-4DA3-8369-4BDD4209D063}.Debug|x86.ActiveCfg = Debug|x86
+		{85AF8B33-4D65-4DA3-8369-4BDD4209D063}.Debug|x86.Build.0 = Debug|x86
+		{85AF8B33-4D65-4DA3-8369-4BDD4209D063}.Release|ARM.ActiveCfg = Release|ARM
+		{85AF8B33-4D65-4DA3-8369-4BDD4209D063}.Release|ARM.Build.0 = Release|ARM
+		{85AF8B33-4D65-4DA3-8369-4BDD4209D063}.Release|x64.ActiveCfg = Release|x64
+		{85AF8B33-4D65-4DA3-8369-4BDD4209D063}.Release|x64.Build.0 = Release|x64
+		{85AF8B33-4D65-4DA3-8369-4BDD4209D063}.Release|x86.ActiveCfg = Release|x86
+		{85AF8B33-4D65-4DA3-8369-4BDD4209D063}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

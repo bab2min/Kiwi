@@ -26,8 +26,39 @@ public:
 
 #include "windows.h"
 #include "psapi.h"
-
+#include "../KiwiLibrary/Utils.h"
 int main()
+{
+	system("chcp 65001");
+	_wsetlocale(LC_ALL, L"korean");
+	Kiwi kw{ "../ModelGenerator/" };
+	kw.prepare();
+	Timer timer;
+	for (int i = 0; i < 1; i++)
+	{
+		vector<KMorpheme> tmpMorph;
+		auto graph = kw.kt->splitGM(splitJamo(L"¸Ô´Ù"), tmpMorph);
+		auto paths = kw.getOptimaPath(graph.get(), 5);
+		for (auto& path : paths)
+		{
+			auto res = Kiwi::pathToResult(graph.get(), path.first);
+			for (auto morph : res)
+			{
+				printf("%s\t", morph->kform->c_str());
+			}
+			printf("\n");
+		}
+	}
+	printf("%gms\n", timer.getElapsed());
+	for (int i = 0; i < 1; i++)
+	{
+		kw.kt->split(splitJamo(L"¿ì¸®´Â¸Ô¾ú½À´Ï´Ù"));
+	}
+	printf("%gms\n", timer.getElapsed());
+	getchar();
+}
+
+int main2()
 {
 	system("chcp 65001");
 	_wsetlocale(LC_ALL, L"korean");

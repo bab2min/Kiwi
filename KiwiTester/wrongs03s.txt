@@ -1,6 +1,6 @@
-0.858799
-Total (3252) Time : 4189.86 ms
-Time per Unit : 1.2884 ms
+0.858782
+Total (3252) Time : 3899.44 ms
+Time per Unit : 1.19909 ms
 
 고등학교를 졸업할 무렵 담임선생님께서 내게 이런 말씀을 하셨다.	0.739
 고등학교/NNG	를/JKO	졸업/NNG	하/XSV	ㄹ/ETM	무렵/NNB	담임선생/NNG	님/XSN	께서/JKS	나/NP	에게/JKB	이런/MM	말씀/NNG	을/JKO	하/VV	시/EP	었/EP	다/EF	./SF	
@@ -152,11 +152,11 @@ Time per Unit : 1.2884 ms
 부당/NNG	하/XSV	다고/EC	생각/NNG	하/XSV	는/ETM	점/NNG	이/JKS	있/VV	으면/EC	개선/NNG	하/XSV	기/ETN	위하/VV	아/EC	상사/NNG	를/JKO	포함/NNG	하/XSV	ㄴ/ETM	이해/NNG	관계자/NNG	를/JKO	설득/NNG	하/XSV	아야/EC	하/VV	고/EC	,/SP	잘못/MAG	되/XSV	ㄴ/ETM	점/NNG	은/JX	바로잡/VV	으려는/ETM	아름답/VA	은/ETM	열정/NNG	으로/JKB	가득/MAG	차/VV	ㄴ/ETM	사람/NNG	이/JKS	좋/VA	다/EF	./SF	-65.32
 부당/NNG	하/XSV	다고/EC	생각/NNG	하/XSV	는/ETM	점/NNG	이/JKS	있/VV	으면/EC	개선/NNG	하/XSV	기/ETN	위하/VV	아/EC	상사/NNG	를/JKO	포함/NNG	하/XSV	ㄴ/ETM	이해관계자/NNG	를/JKO	설득/NNG	하/XSV	아야/EC	하/VV	고/EC	,/SP	잘못/MAG	되/XSV	ㄴ/ETM	점/NNG	은/JX	바로잡/VV	으려는/ETM	아름답/VA	은/ETM	열정/NNG	으로/JKB	가득/MAG	차/VV	ㄴ/ETM	사람/NNG	이/JKS	좋/VA	다/EF	./SF	-65.84
 
-철없는 제자가 못내 걱정스러워 충고해 주셨던 당시 30대였던 선생님은 이제 회갑을 바라보는 교장선생님이 되셨다.	0.854
+철없는 제자가 못내 걱정스러워 충고해 주셨던 당시 30대였던 선생님은 이제 회갑을 바라보는 교장선생님이 되셨다.	0.949
 철없/VA	는/ETM	제자/NNG	가/JKS	못내/MAG	걱정/NNG	스럽/XSA	어/EC	충고/NNG	하/XSV	아/EC	주/VX	시/EP	었/EP	던/ETM	당시/NNG	30/SN	대/NNB	이/VCP	었/EP	던/ETM	선생/NNG	님/XSN	은/JX	이제/MAG	회갑/NNG	을/JKO	바라보/VV	는/ETM	교장/NNG	선생/NNG	님/XSN	이/JKC	되/VV	시/EP	었/EP	다/EF	./SF	
+철없/VA	는/ETM	제자/NNG	가/JKS	못내/MAG	걱정/NNG	스럽/XSA	어/EC	충고/NNG	하/XSV	아/EC	주/VX	시/EP	었/EP	던/ETM	당시/NNG	30/SN	대/NNB	이/VCP	었/EP	던/ETM	선생/NNG	님/XSN	은/JX	이제/MAG	회갑/NNG	을/JKO	바라보/VV	는/ETM	교장/NNG	선생/NNG	님/XSN	이/JKS	되/VV	시/EP	었/EP	다/EF	./SF	-65.23
+철없/VA	는/ETM	제자/NNG	가/JKS	못내/MAG	걱정/NNG	스럽/XSA	어/EC	충고/NNG	하/XSV	아/EC	주/VX	시/EP	었/EP	던/ETM	당시/NNG	30/SN	대/NNB	이/VCP	였/EP	던/ETM	선생/NNG	님/XSN	은/JX	이제/MAG	회갑/NNG	을/JKO	바라보/VV	는/ETM	교장/NNG	선생/NNG	님/XSN	이/JKS	되/VV	시/EP	었/EP	다/EF	./SF	-65.95
 철없/VA	는/ETM	제자/NNG	가/JKS	못내/MAG	걱정/NNG	스럽/XSA	어/EC	충고/NNG	하/XSV	아/EC	주/VX	시/EP	었/EP	던/ETM	당시/NNG	30/SN	대/NNB	이/VCP	였/EP	던/ETM	선생/NNG	님/XSN	은/JX	이제/NNG	회갑/NNG	을/JKO	바라보/VV	는/ETM	교장/NNG	선생/NNG	님/XSN	이/JKS	되/VV	시/EP	었/EP	다/EF	./SF	-67.69
-철없/VA	는/ETM	제자/NNG	가/JKS	못내/MAG	걱정/NNG	스럽/XSA	어/EC	충고/NNG	하/XSV	아/EC	주/VX	시/EP	었/EP	던/ETM	당시/NNG	30/SN	대/NNB	이/VCP	였/EP	던/ETM	선생/NNG	님/XSN	은/JX	이제/NNG	회갑/NNG	을/JKO	바라보/VV	는/ETM	교장/NNG	선생/NNG	님/XSN	이/JKS	되/VV	시/EP	었/EP	다/EF	./SF	-67.69
-철없/VA	는/ETM	제자/NNG	가/JKS	못내/MAG	걱정/NNG	스럽/XSA	어/EC	충고/NNG	하/XSV	아/EC	주/VX	시/EP	었/EP	던/ETM	당시/NNG	30/SN	대/NNB	이/VCP	었/EP	던/ETM	선생/NNG	님/XSN	은/JX	이제/NNG	회갑/NNG	을/JKO	바라보/VV	는/ETM	교장/NNG	선생/NNG	님/XSN	이/JKS	되/VV	시/EP	었/EP	다/EF	./SF	-67.93
 
 그 분의 말씀처럼 나는 모난 돌인지도 모른다.	0.722
 그/MM	분/NNB	의/JKG	말씀/NNG	처럼/JKB	나/NP	는/JX	모나/VA	ㄴ/ETM	돌/NNG	이/VCP	ㄴ지/EC	도/JX	모르/VV	ㄴ다/EF	./SF	
@@ -316,9 +316,9 @@ Time per Unit : 1.2884 ms
 
 회사 내에서 나에게 보험영업의 활로를 열어줄 사람은 아무도 없는 것이 분명했다.	0.929
 회사/NNG	내/NNB	에서/JKB	나/NP	에게/JKB	보험/NNG	영업/NNG	의/JKG	활로/NNG	를/JKO	열/VV	어/EC	주/VX	ㄹ/ETM	사람/NNG	은/JX	아무/NP	도/JX	없/VA	는/ETM	것/NNB	이/JKS	분명/MAG	하/XSA	았/EP	다/EF	./SF	
-회사/NNG	내/NNB	에서/JKB	나/NP	에게/JKB	보험/NNG	영업/NNG	의/JKG	활로/NNG	를/JKO	열/VV	어/EC	주/VX	ㄹ/ETM	사람/NNG	은/JX	아무/NP	도/JX	없/VA	는/ETM	것/NNB	이/JKS	분명/MAG	하/XSV	았/EP	다/EF	./SF	-22.34
-회사/NNG	내/NNB	에서/JKB	나/NP	에게/JKB	보험/NNG	영업/NNG	의/JKG	활로/NNG	를/JKO	열/VV	어/EC	주/VX	ㄹ/ETM	사람/NNG	은/JX	아무/NP	도/JX	없/VA	는/ETM	것/NNB	이/JKC	분명/MAG	하/XSV	았/EP	다/EF	./SF	-25.12
-회사/NNG	내/NNB	에서/JKB	나/NP	에게/JKB	보험/NNG	영업/NNG	의/JKG	활로/NNG	를/JKO	열/VV	어/EC	주/VX	ㄹ/ETM	사람/NNG	은/JX	아무/NP	도/JX	없/VA	는/ETM	것/NNB	이/JKS	분명/MAG	하/XSA	았/EP	다/EF	./SF	-21.44
+회사/NNG	내/NNB	에서/JKB	나/NP	에게/JKB	보험/NNG	영업/NNG	의/JKG	활로/NNG	를/JKO	열/VV	어/EC	주/VX	ㄹ/ETM	사람/NNG	은/JX	아무/NP	도/JX	없/VA	는/ETM	것/NNB	이/JKS	분명/MAG	하/XSV	았/EP	다/EF	./SF	-16.95
+회사/NNG	내/NNB	에서/JKB	나/NP	에게/JKB	보험/NNG	영업/NNG	의/JKG	활로/NNG	를/JKO	열/VV	어/EC	주/VX	ㄹ/ETM	사람/NNG	은/JX	아무/NP	도/JX	없/VA	는/ETM	것/NNB	이/JKC	분명/MAG	하/XSV	았/EP	다/EF	./SF	-19.72
+회사/NNG	내/NNB	에서/JKB	나/NP	에게/JKB	보험/NNG	영업/NNG	의/JKG	활로/NNG	를/JKO	열/VV	어/EC	주/VX	ㄹ/ETM	사람/NNG	은/JX	아무/NP	도/JX	없/VA	는/ETM	것/NNB	이/JKS	분명/MAG	하/XSA	았/EP	다/EF	./SF	-16.04
 
 출근중 차 속에서 차라리 사고가 나서 이 길로 병원에 입원했으면 좋겠다는 생각이 들 정도였다.	0.853
 출근/NNG	중/NNB	차/NNG	속/NNG	에서/JKB	차라리/MAG	사고/NNG	가/JKS	나/VV	아서/EC	이/MM	길/NNG	로/JKB	병원/NNG	에/JKB	입원/NNG	하/XSV	았/EP	으면/EC	좋/VA	겠/EP	다는/ETM	생각/NNG	이/JKS	들/VV	ㄹ/ETM	정도/NNG	이/VCP	었/EP	다/EF	./SF	
@@ -436,9 +436,9 @@ Time per Unit : 1.2884 ms
 
 서류정리, 은행 다녀오는 여사원의 호위 등 시키는 일은 군말없이 했더니 어느날 내게 회의실로 들어오라고 하는 것이었다.	0.889
 서류/NNG	정리/NNG	,/SP	은행/NNG	다녀오/VV	는/ETM	여사원/NNG	의/JKG	호위/NNG	등/NNB	시키/VV	는/ETM	일/NNG	은/JX	군말/NNG	없이/MAG	하/VV	았/EP	더니/EC	어느/MM	날/NNG	나/NP	에게/JKB	회의실/NNG	로/JKB	들어오/VV	라고/EC	하/VX	는/ETM	것/NNB	이/VCP	었/EP	다/EF	./SF	
-서류/NNG	정리/NNG	,/SP	은행/NNG	다녀오/VV	는/ETM	여사원/NNG	의/JKG	호위/NNG	등/NNB	시키/VV	는/ETM	일/NNG	은/JX	군말/NNG	없이/MAG	하/VV	았/EP	더니/EC	어느/MM	날/NNG	나/NP	에게/JKB	회의실/NNG	로/JKB	들어오/VV	라고/EF	하/VV	는/ETM	것/NNB	이/VCP	었/EP	다/EF	./SF	-97.49
-서류/NNG	정리/NNG	,/SP	은행/NNG	다녀오/VV	는/ETM	여사원/NNG	의/JKG	호위/NNG	등/NNB	시키/VV	는/ETM	일/NNG	은/JX	군/NNG	말/NNG	없이/MAG	하/VV	았/EP	더니/EC	어느/MM	날/NNG	나/NP	에게/JKB	회의실/NNG	로/JKB	들어오/VV	라고/EF	하/VV	는/ETM	것/NNB	이/VCP	었/EP	다/EF	./SF	-98.39
-서류/NNG	정리/NNG	,/SP	은행/NNG	다녀오/VV	는/ETM	여사원/NNG	의/JKG	호위/NNG	등/NNB	시키/VV	는/ETM	일/NNG	은/JX	군말/NNG	없이/MAG	하/VV	았/EP	더니/EC	어느/MM	날/NNG	나/NP	에게/JKB	회의실/NNG	로/JKB	들어오/VV	라고/EF	하/VX	는/ETM	것/NNB	이/VCP	었/EP	다/EF	./SF	-98.51
+서류/NNG	정리/NNG	,/SP	은행/NNG	다녀오/VV	는/ETM	여사원/NNG	의/JKG	호위/NNG	등/NNB	시키/VV	는/ETM	일/NNG	은/JX	군말/NNG	없이/MAG	하/VV	았/EP	더니/EC	어느/MM	날/NNG	나/NP	에게/JKB	회의실/NNG	로/JKB	들어오/VV	라고/EF	하/VV	는/ETM	것/NNB	이/VCP	었/EP	다/EF	./SF	-96.51
+서류/NNG	정리/NNG	,/SP	은행/NNG	다녀오/VV	는/ETM	여사원/NNG	의/JKG	호위/NNG	등/NNB	시키/VV	는/ETM	일/NNG	은/JX	군/NNG	말/NNG	없이/MAG	하/VV	았/EP	더니/EC	어느/MM	날/NNG	나/NP	에게/JKB	회의실/NNG	로/JKB	들어오/VV	라고/EF	하/VV	는/ETM	것/NNB	이/VCP	었/EP	다/EF	./SF	-97.4
+서류/NNG	정리/NNG	,/SP	은행/NNG	다녀오/VV	는/ETM	여사원/NNG	의/JKG	호위/NNG	등/NNB	시키/VV	는/ETM	일/NNG	은/JX	군말/NNG	없이/MAG	하/VV	았/EP	더니/EC	어느/MM	날/NNG	나/NP	에게/JKB	회의실/NNG	로/JKB	들어오/VV	라고/EF	하/VX	는/ETM	것/NNB	이/VCP	었/EP	다/EF	./SF	-97.53
 
 S생명 사람들은 기업대출보다 주로 직장인 보장보험 가입을 많이 권유하고 D생명 사람들은 은행이나 다른 금융기관을 통해 대출을 해결해 준다고 찾아오고, 교보생명 사람들은 오로지 대출만 갖고 찾아옵디다." 자금과장은 내게 은행과 단자사, 금고, 보험사의 대출영업 유형과 필요서류, 대출금리와 예금금리를 종합한 실제비용 산출 등 생생한 지식을 전해주었다.	0.894
 S/SL	생명/NNG	사람/NNG	들/XSN	은/JX	기업/NNG	대출/NNG	보다/JKB	주로/MAG	직장인/NNG	보장/NNG	보험/NNG	가입/NNG	을/JKO	많이/MAG	권유/NNG	하/XSV	고/EC	D/SL	생명/NNG	사람/NNG	들/XSN	은/JX	은행/NNG	이나/JC	다른/MM	금융/NNG	기관/NNG	을/JKO	통하/VV	아/EC	대출/NNG	을/JKO	해결/NNG	하/XSV	아/EC	주/VX	ㄴ다고/EC	찾아오/VV	고/EC	,/SP	교보생명/NNP	사람/NNG	들/XSN	은/JX	오로지/MAG	대출/NNG	만/JX	갖/VV	고/EC	찾아오/VV	ㅂ디다/EF	./SF	"/SS	자금/NNG	과장/NNG	은/JX	나/NP	에게/JKB	은행/NNG	과/JC	단자사/NNG	,/SP	금고/NNG	,/SP	보험사/NNG	의/JKG	대출/NNG	영업/NNG	유형/NNG	과/JC	필요/NNG	서류/NNG	,/SP	대출/NNG	금리/NNG	와/JC	예금/NNG	금리/NNG	를/JKO	종합/NNG	하/XSV	ㄴ/ETM	실제/NNG	비용/NNG	산출/NNG	등/NNB	생생/XR	하/XSA	ㄴ/ETM	지식/NNG	을/JKO	전하/VV	아/EC	주/VX	었/EP	다/EF	./SF	
@@ -598,9 +598,9 @@ S/SL	생명/NNG	사람/NNG	들/XSN	은/JX	기업/NNG	대출/NNG	보다/JKB	주로/MAG	직장인/N
 
 "일본의 도요토미 히데요시는 도쿠가와 이에야스의 능력이 너무 출중한 것을 경계하여 물산이 척박한 에도지방 관리로 명령을 냈다네.	0.868
 "/SS	일본/NNP	의/JKG	도요토미/NNP	히데요시/NNP	는/JX	도쿠가와/NNP	이에야스/NNP	의/JKG	능력/NNG	이/JKS	너무/MAG	출중/XR	하/XSA	ㄴ/ETM	것/NNB	을/JKO	경계/NNG	하/XSV	아/EC	물산/NNG	이/JKS	척박/XR	하/XSA	ㄴ/ETM	에도/NNP	지방/NNG	관리/NNG	로/JKB	명령/NNG	을/JKO	내/VV	었/EP	다네/EF	./SF	
-"/SS	일본/NNP	의/JKG	도요토미/NNP	히데요시/NNP	는/JX	도쿠가/NNG	와/JKB	이에야스/NNP	의/JKG	능력/NNG	이/JKS	너무/MAG	출중/XR	하/XSA	ㄴ/ETM	것/NNB	을/JKO	경계/NNG	하/XSV	아/EC	물산/NNG	이/JKS	척박/XR	하/XSA	ㄴ/ETM	에도/NNP	지방/NNG	관리/NNG	로/JKB	명령/NNG	을/JKO	내/VX	었/EP	다네/EF	./SF	-123.7
-"/SS	일본/NNP	의/JKG	도요토미/NNP	히데요시/NNP	는/JX	도쿠가/NNG	와/JKB	이에야스/NNP	의/JKG	능력/NNG	이/JKS	너무/MAG	출중/XR	하/XSA	ㄴ/ETM	것/NNB	을/JKO	경계/NNG	하/XSV	아/EC	물산/NNG	이/JKS	척박/XR	하/XSA	ㄴ/ETM	에도/NNP	지방/NNG	관리/NNG	로/JKB	명령/NNG	을/JKO	내/VX	었/EP	다네/EF	./SF	-123.7
-"/SS	일본/NNP	의/JKG	도요토미/NNP	히데요시/NNP	는/JX	도쿠가/NNP	와/JC	이에야스/NNP	의/JKG	능력/NNG	이/JKS	너무/MAG	출중/XR	하/XSA	ㄴ/ETM	것/NNB	을/JKO	경계/NNG	하/XSV	아/EC	물산/NNG	이/JKS	척박/XR	하/XSA	ㄴ/ETM	에도/NNP	지방/NNG	관리/NNG	로/JKB	명령/NNG	을/JKO	내/VX	었/EP	다네/EF	./SF	-123.9
+"/SS	일본/NNP	의/JKG	도요토미/NNP	히데요시/NNP	는/JX	도쿠가/NNG	와/JKB	이에야스/NNP	의/JKG	능력/NNG	이/JKS	너무/MAG	출중/XR	하/XSA	ㄴ/ETM	것/NNB	을/JKO	경계/NNG	하/XSV	아/EC	물산/NNG	이/JKS	척박/XR	하/XSA	ㄴ/ETM	에도/NNP	지방/NNG	관리/NNG	로/JKB	명령/NNG	을/JKO	내/VX	었/EP	다네/EF	./SF	-121.8
+"/SS	일본/NNP	의/JKG	도요토미/NNP	히데요시/NNP	는/JX	도쿠가/NNG	와/JKB	이에야스/NNP	의/JKG	능력/NNG	이/JKS	너무/MAG	출중/XR	하/XSA	ㄴ/ETM	것/NNB	을/JKO	경계/NNG	하/XSV	아/EC	물산/NNG	이/JKS	척박/XR	하/XSA	ㄴ/ETM	에도/NNP	지방/NNG	관리/NNG	로/JKB	명령/NNG	을/JKO	내/VX	었/EP	다네/EF	./SF	-121.8
+"/SS	일본/NNP	의/JKG	도요토미/NNP	히데요시/NNP	는/JX	도쿠가/NNP	와/JC	이에야스/NNP	의/JKG	능력/NNG	이/JKS	너무/MAG	출중/XR	하/XSA	ㄴ/ETM	것/NNB	을/JKO	경계/NNG	하/XSV	아/EC	물산/NNG	이/JKS	척박/XR	하/XSA	ㄴ/ETM	에도/NNP	지방/NNG	관리/NNG	로/JKB	명령/NNG	을/JKO	내/VX	었/EP	다네/EF	./SF	-122.1
 
 그러나 도쿠가와 이에야스는 그곳에서 남다른 노력으로 힘을 키워 결국 천하통일의 발판을 만들었네.	0.759
 그러나/MAJ	도쿠가와/NNP	이에야스/NNP	는/JX	그곳/NP	에서/JKB	남다르/VA	ㄴ/ETM	노력/NNG	으로/JKB	힘/NNG	을/JKO	키우/VV	어/EC	결국/NNG	천하/NNG	통일/NNG	의/JKG	발판/NNG	을/JKO	만들/VV	었/EP	네/EF	./SF	
@@ -634,9 +634,9 @@ S/SL	생명/NNG	사람/NNG	들/XSN	은/JX	기업/NNG	대출/NNG	보다/JKB	주로/MAG	직장인/N
 
 자네는 보험영업에 노하우가 있고 또한 그곳은 잔소리할 사람도 없는 곳인 것 같으니 혼신의 힘을 다해보게.	0.816
 자네/NP	는/JX	보험/NNG	영업/NNG	에/JKB	노하우/NNG	가/JKS	있/VV	고/EC	또한/MAG	그곳/NP	은/JX	잔소리/NNG	하/XSV	ㄹ/ETM	사람/NNG	도/JX	없/VA	는/ETM	곳/NNG	이/VCP	ㄴ/ETM	것/NNB	같/VA	으니/EC	혼신/NNG	의/JKG	힘/NNG	을/JKO	다/MAG	하/VV	아/EC	보/VX	게/EF	./SF	
-자네/NP	는/JX	보험/NNG	영업/NNG	에/JKB	노하우/NNG	가/JKS	있/VX	고/EC	또한/MAG	그곳/NP	은/JX	잔소리/NNG	하/XSV	ㄹ/ETM	사람/NNG	도/JX	없/VA	는/ETM	곳/NNG	이/VCP	ㄴ/ETM	것/NNB	같/VA	으니/EC	혼신/NNG	의/JKG	힘/NNG	을/JKO	다하/VV	아/EC	보/VX	게/EC	./SF	-50.27
-자네/NP	는/JX	보험/NNG	영업/NNG	에/JKB	노하우/NNG	가/JKS	있/VX	고/EC	또/MAG	하/XSV	ㄴ/ETM	그곳/NP	은/JX	잔소리/NNG	하/XSV	ㄹ/ETM	사람/NNG	도/JX	없/VA	는/ETM	곳/NNG	이/VCP	ㄴ/ETM	것/NNB	같/VA	으니/EC	혼신/NNG	의/JKG	힘/NNG	을/JKO	다하/VV	아/EC	보/VX	게/EC	./SF	-50.37
-자네/NP	는/JX	보험/NNG	영업/NNG	에/JKB	노하우/NNG	가/JKS	있/VX	고/EC	또한/MAG	그곳/NP	은/JX	잔소리/NNG	하/XSV	ㄹ/ETM	사람/NNG	도/JX	없/VA	는/ETM	곳/NNG	이/VCP	ㄴ/ETM	것/NNB	같/VA	으니/EC	혼신/NNG	의/JKG	힘/NNG	을/JKO	다하/VV	아/EC	보/VV	게/EC	./SF	-54.75
+자네/NP	는/JX	보험/NNG	영업/NNG	에/JKB	노하우/NNG	가/JKS	있/VX	고/EC	또한/MAG	그곳/NP	은/JX	잔소리/NNG	하/XSV	ㄹ/ETM	사람/NNG	도/JX	없/VA	는/ETM	곳/NNG	이/VCP	ㄴ/ETM	것/NNB	같/VA	으니/EC	혼신/NNG	의/JKG	힘/NNG	을/JKO	다하/VV	아/EC	보/VX	게/EC	./SF	-46.35
+자네/NP	는/JX	보험/NNG	영업/NNG	에/JKB	노하우/NNG	가/JKS	있/VX	고/EC	또/MAG	하/XSV	ㄴ/ETM	그곳/NP	은/JX	잔소리/NNG	하/XSV	ㄹ/ETM	사람/NNG	도/JX	없/VA	는/ETM	곳/NNG	이/VCP	ㄴ/ETM	것/NNB	같/VA	으니/EC	혼신/NNG	의/JKG	힘/NNG	을/JKO	다하/VV	아/EC	보/VX	게/EC	./SF	-46.45
+자네/NP	는/JX	보험/NNG	영업/NNG	에/JKB	노하우/NNG	가/JKS	있/VX	고/EC	또한/MAG	그곳/NP	은/JX	잔소리/NNG	하/XSV	ㄹ/ETM	사람/NNG	도/JX	없/VA	는/ETM	곳/NNG	이/VCP	ㄴ/ETM	것/NNB	같/VA	으니/EC	혼신/NNG	의/JKG	힘/NNG	을/JKO	다하/VV	아/EC	보/VV	게/EC	./SF	-50.84
 
 그러면 좋은 날이 올 거야.	0.769
 그러면/MAJ	좋/VA	은/ETM	날/NNG	이/JKS	오/VV	ㄹ/ETM	거/NNB	이/VCP	야/EF	./SF	
@@ -772,9 +772,9 @@ S/SL	생명/NNG	사람/NNG	들/XSN	은/JX	기업/NNG	대출/NNG	보다/JKB	주로/MAG	직장인/N
 
 그러는 사이에 일반 회사원 출신 설계사도 열심히 영입하여 그들이 갈 곳을 만들어 주기도 했다.	0.676
 그러/VV	는/ETM	사이/NNG	에/JKB	일반/NNG	회사원/NNG	출신/NNG	설계사/NNG	도/JX	열심히/MAG	영입/NNG	하/XSV	아/EC	그/NP	들/XSN	이/JKS	가/VV	ㄹ/ETM	곳/NNG	을/JKO	만들/VV	어/EC	주/VX	기/ETN	도/JX	하/VX	았/EP	다/EF	./SF	
-그렇/VA	는/ETM	사이/NNG	에/JKB	일반/NNG	회사원/NNG	출신/NNG	설계사/NNG	도/JX	열심히/MAG	영입/NNG	하/XSV	아/EC	그/NP	들/XSN	이/JKS	갈/VV	ㄹ/ETM	곳/NNG	을/JKO	만들/VV	어/EF	주기/NNG	도/JX	하/VV	았/EP	다/EF	./SF	-61.98
-그렇/VA	는/ETM	사이/NNG	에/JKB	일반/NNG	회사원/NNG	출신/NNG	설계사/NNG	도/JX	열심히/MAG	영입/NNG	하/XSV	아/EC	그/NP	들/XSN	이/JKS	갈/VV	ㄹ/ETM	곳/NNG	을/JKO	만들/VV	어/EF	주/VX	기/ETN	도/JX	하/VV	았/EP	다/EF	./SF	-62.36
-그러/VV	는/ETM	사이/NNG	에/JKB	일반/NNG	회사원/NNG	출신/NNG	설계사/NNG	도/JX	열심히/MAG	영입/NNG	하/XSV	아/EC	그/NP	들/XSN	이/JKS	갈/VV	ㄹ/ETM	곳/NNG	을/JKO	만들/VV	어/EF	주기/NNG	도/JX	하/VV	았/EP	다/EF	./SF	-62.84
+그렇/VA	는/ETM	사이/NNG	에/JKB	일반/NNG	회사원/NNG	출신/NNG	설계사/NNG	도/JX	열심히/MAG	영입/NNG	하/XSV	아/EC	그/NP	들/XSN	이/JKS	갈/VV	ㄹ/ETM	곳/NNG	을/JKO	만들/VV	어/EF	주기/NNG	도/JX	하/VV	았/EP	다/EF	./SF	-58.1
+그렇/VA	는/ETM	사이/NNG	에/JKB	일반/NNG	회사원/NNG	출신/NNG	설계사/NNG	도/JX	열심히/MAG	영입/NNG	하/XSV	아/EC	그/NP	들/XSN	이/JKS	갈/VV	ㄹ/ETM	곳/NNG	을/JKO	만들/VV	어/EF	주/VX	기/ETN	도/JX	하/VV	았/EP	다/EF	./SF	-58.48
+그러/VV	는/ETM	사이/NNG	에/JKB	일반/NNG	회사원/NNG	출신/NNG	설계사/NNG	도/JX	열심히/MAG	영입/NNG	하/XSV	아/EC	그/NP	들/XSN	이/JKS	갈/VV	ㄹ/ETM	곳/NNG	을/JKO	만들/VV	어/EF	주기/NNG	도/JX	하/VV	았/EP	다/EF	./SF	-58.96
 
 그러다가 치과의사협회와 의사협회와 협약을 체결하여 전국적인 영업을 시작하다보니 매월 늘어나는 신입사원 때문에 본사에서 책상을 공급받으랴 사무실을 늘이랴 정신없이 지내게 되었다. 드디어 영업소 출근인원이 80명이 넘어섰고, 신계약 월납 보험료가 1억, 보유계약 제로에서 월수금 보험료가 20억이 넘는 초대형 영업소가 되었다. 1998년 나는 영업소장에서 곧바로 지점장으로 발탁이 되었다. 그 사이 나를 이태원 해방촌으로 발령을 냈던 A이사는 회사를 그만두고 어려운 처지에 놓이게 되었다. 지나간 일은 잊기로 하고 나는 여러 번 그를 찾아가 정성을 다해 위로해 드렸다.	0.776
 그러/VV	다가/EC	치과/NNG	의사/NNG	협회/NNG	와/JC	의사/NNG	협회/NNG	와/JC	협약/NNG	을/JKO	체결/NNG	하/XSV	아/EC	전국/NNG	적/XSN	이/VCP	ㄴ/ETM	영업/NNG	을/JKO	시작/NNG	하/XSV	다/EC	보/VX	니/EC	매월/MAG	늘어나/VV	는/ETM	신입/NNG	사원/NNG	때문/NNB	에/JKB	본사/NNG	에서/JKB	책상/NNG	을/JKO	공급/NNG	받/VV	으랴/EC	사무실/NNG	을/JKO	늘이/VV	랴/EC	정신없이/MAG	지내/VV	게/EC	되/VV	었/EP	다/EC	드디어/MAG	영업소/NNG	출근/NNG	인원/NNG	이/JKS	80/SN	명/NNB	이/JKS	넘어서/VV	었/EP	고/EC	,/SP	신/XPN	계약/NNG	월납/NNG	보험료/NNG	가/JKS	1/SN	억/NR	,/SP	보유/NNG	계약/NNG	제로/NNG	에서/JKB	월/NNG	수/NNG	금/NNG	보험료/NNG	가/JKS	20/SN	억/NR	이/JKS	넘/VV	는/ETM	초/XPN	대/NNG	형/XSN	영업소/NNG	가/JKC	되/VV	었/EP	다/EC	1998/SN	년/NNB	나/NP	는/JX	영업소장/NNG	에서/JKB	곧바로/MAG	지점장/NNG	으로/JKB	발탁/NNG	이/JKC	되/VV	었/EP	다/EC	그/MM	사이/NNG	나/NP	를/JKO	이태원/NNP	해방촌/NNP	으로/JKB	발령/NNG	을/JKO	내/VV	었/EP	던/ETM	A/SL	이사/NNG	는/JX	회사/NNG	를/JKO	그만두/VV	고/EC	어렵/VA	ㄴ/ETM	처지/NNG	에/JKB	놓이/VV	게/EC	되/VV	었/EP	다/EC	지나가/VV	ㄴ/ETM	일/NNG	은/JX	잊/VV	기/ETN	로/JKB	하/VV	고/EC	나/NP	는/JX	여러/MM	번/NNB	그/NP	를/JKO	찾아가/VV	아/EC	정성/NNG	을/JKO	다/MAG	하/VV	아/EC	위로/NNG	하/XSV	아/EC	드리/VX	었/EP	다/EF	./SF	
@@ -1006,9 +1006,9 @@ M/SL	영업/NNG	과장/NNG	은/JX	기존/NNG	설계사/NNG	의/JKG	동반/NNG	지도/NNG	뿐/NNB
 
 오히려 지점 관리자들이 이렇게 열심히 하는데 안이하게 영업을 해서는 안 되겠다며 팀장들이 스스로 결의대회를 하면서 힘차게 뛰었다.	0.875
 오히려/MAG	지점/NNG	관리자/NNG	들/XSN	이/JKS	이렇/VA	게/EC	열심히/MAG	하/VV	는데/EC	안이/XR	하/XSA	게/EC	영업/NNG	을/JKO	하/VV	아서/EC	는/JX	안/MAG	되/VV	겠/EP	다며/EC	팀장/NNG	들/XSN	이/JKS	스스로/MAG	결의/NNG	대회/NNG	를/JKO	하/VV	면서/EC	힘차/VA	게/EC	뛰/VV	었/EP	다/EF	./SF	
-오히려/MAG	지점/NNG	관리자/NNG	들/XSN	이/JKS	이렇/VA	게/EC	열심히/MAG	하/VV	는데/EC	안이/XR	하/XSA	게/EC	영업/NNG	을/JKO	하/VV	아서/EC	는/JX	알/VV	ㄴ/ETM	되/VV	겠/EP	다며/EC	팀장/NNG	들/XSN	이/JKS	스스로/NNG	결의/NNG	대회/NNG	를/JKO	하/VV	면서/EC	힘차/VA	게/EC	뛰/VV	었/EP	다/EF	./SF	-73.26
-오히려/MAG	지점/NNG	관리자/NNG	들/XSN	이/JKS	이렇/VA	게/EC	열심히/MAG	하/VV	는데/EC	안이/XR	하/XSA	게/EC	영업/NNG	을/JKO	하/VV	아서/EC	는/JX	알/VV	ㄴ/ETM	되/VV	겠/EP	다며/EC	팀장/NNG	들/XSN	이/JKS	스스로/NNG	결의/NNG	대회/NNG	를/JKO	하/VX	면서/EC	힘차/VA	게/EC	뛰/VV	었/EP	다/EF	./SF	-73.52
-오히려/MAG	지점/NNG	관리자/NNG	들/XSN	이/JKS	이렇/VA	게/EC	열심히/MAG	하/VV	는데/EC	안이/XR	하/XSV	게/EC	영업/NNG	을/JKO	하/VV	아서/EC	는/JX	알/VV	ㄴ/ETM	되/VV	겠/EP	다며/EC	팀장/NNG	들/XSN	이/JKS	스스로/NNG	결의/NNG	대회/NNG	를/JKO	하/VV	면서/EC	힘차/VA	게/EC	뛰/VV	었/EP	다/EF	./SF	-74.63
+오히려/MAG	지점/NNG	관리자/NNG	들/XSN	이/JKS	이렇/VA	게/EC	열심히/MAG	하/VV	는데/EC	안이/XR	하/XSA	게/EC	영업/NNG	을/JKO	하/VV	아서/EC	는/JX	알/VV	ㄴ/ETM	되/VV	겠/EP	다며/EC	팀장/NNG	들/XSN	이/JKS	스스로/NNG	결의/NNG	대회/NNG	를/JKO	하/VV	면서/EC	힘차/VA	게/EC	뛰/VV	었/EP	다/EF	./SF	-72.17
+오히려/MAG	지점/NNG	관리자/NNG	들/XSN	이/JKS	이렇/VA	게/EC	열심히/MAG	하/VV	는데/EC	안이/XR	하/XSA	게/EC	영업/NNG	을/JKO	하/VV	아서/EC	는/JX	알/VV	ㄴ/ETM	되/VV	겠/EP	다며/EC	팀장/NNG	들/XSN	이/JKS	스스로/NNG	결의/NNG	대회/NNG	를/JKO	하/VX	면서/EC	힘차/VA	게/EC	뛰/VV	었/EP	다/EF	./SF	-72.43
+오히려/MAG	지점/NNG	관리자/NNG	들/XSN	이/JKS	이렇/VA	게/EC	열심히/MAG	하/VV	는데/EC	안이/XR	하/XSV	게/EC	영업/NNG	을/JKO	하/VV	아서/EC	는/JX	알/VV	ㄴ/ETM	되/VV	겠/EP	다며/EC	팀장/NNG	들/XSN	이/JKS	스스로/NNG	결의/NNG	대회/NNG	를/JKO	하/VV	면서/EC	힘차/VA	게/EC	뛰/VV	었/EP	다/EF	./SF	-73.54
 
 그야말로 전 지점이 아침부터 저녁까지 펄떡이는 물고기처럼 뛰었다.	0.667
 그야말로/MAG	전/MM	지점/NNG	이/JKS	아침/NNG	부터/JX	저녁/NNG	까지/JX	펄떡이/VV	는/ETM	물고기/NNG	처럼/JKB	뛰/VV	었/EP	다/EF	./SF	
@@ -1318,9 +1318,9 @@ M/SL	영업/NNG	과장/NNG	은/JX	기존/NNG	설계사/NNG	의/JKG	동반/NNG	지도/NNG	뿐/NNB
 
 그리하여 예전보다 훨씬 적극적으로 상대를 설득할 수 있었고, 단기간에 설득되지 않으면 시간이 걸리더라도 끝까지 설득하여 그를 구제(?)해 주어야겠다는 사명감까지 가지게 되었다. 이렇게 자신있게, 단순히 보험을 팔러다니는 게 아니라 보험의 효용가치를 모르는 사람들을 도와준다고 생각하니 일에 힘이 나고 재미가 있었다.	0.911
 그리하여/MAJ	예전/NNG	보다/JKB	훨씬/MAG	적극/NNG	적/XSN	으로/JKB	상대/NNG	를/JKO	설득/NNG	하/XSV	ㄹ/ETM	수/NNB	있/VV	었/EP	고/EC	,/SP	단기간/NNG	에/JKB	설득/NNG	되/XSV	지/EC	않/VX	으면/EC	시간/NNG	이/JKS	걸리/VV	더라도/EC	끝/NNG	까지/JX	설득/NNG	하/XSV	아/EC	그/NP	를/JKO	구제/NNG	(/SS	?/SF	)/SS	하/XSV	아/EC	주/VX	어야/EC	하/VX	겠/EP	다는/ETM	사명감/NNG	까지/JX	가지/VV	게/EC	되/VV	었/EP	다/EC	이렇/VA	게/EC	자신/NNG	있/VV	게/EC	,/SP	단순히/MAG	보험/NNG	을/JKO	팔/VV	러/EC	다니/VV	는/ETM	것/NNB	이/JKC	아니/VCN	라/EC	보험/NNG	의/JKG	효용/NNG	가치/NNG	를/JKO	모르/VV	는/ETM	사람/NNG	들/XSN	을/JKO	도와주/VV	ㄴ다고/EC	생각/NNG	하/XSV	니/EC	일/NNG	에/JKB	힘/NNG	이/JKS	나/VV	고/EC	재미/NNG	가/JKS	있/VV	었/EP	다/EF	./SF	
-그리하여/MAJ	예전/NNG	보다/JKB	훨씬/MAG	적극/NNG	적/XSN	으로/JKB	상대/NNG	를/JKO	설득/NNG	하/XSV	ㄹ/ETM	수/NNB	있/VV	었/EP	고/EC	,/SP	단기간/NNG	에/JKB	설득/NNG	되/XSV	지/EC	않/VX	으면/EC	시간/NNG	이/JKS	걸리/VV	더라도/EC	끝/NNG	까지/JX	설득/NNG	하/XSV	아/EC	그/NP	를/JKO	구제/NNG	(/SS	?/SF	)/SS	하/XSV	아/EC	주/VX	어야/EC	겠/EP	다는/ETM	사명감/NNG	까지/JX	가지/VV	게/EC	되/VV	었/EP	다/EF	./SF	이렇/VA	게/EC	자신/NNG	있/VV	게/EC	,/SP	단순히/MAG	보험/NNG	을/JKO	팔/VV	러/EC	다니/VV	는/ETM	게/NNG	아니/VCN	라/EC	보험/NNG	의/JKG	효용/NNG	가치/NNG	를/JKO	모르/VV	는/ETM	사람/NNG	들/XSN	을/JKO	도와주/VV	ㄴ다고/EC	생각/NNG	하/XSV	니/EC	일/NNG	에/JKB	힘/NNG	이/JKS	나/VV	고/EC	재미/NNG	가/JKS	있/VX	었/EP	다/EF	./SF	-144.9
-그리하여/MAJ	예전/NNG	보다/JKB	훨씬/MAG	적극/NNG	적/XSN	으로/JKB	상대/NNG	를/JKO	설득/NNG	하/XSV	ㄹ/ETM	수/NNB	있/VV	었/EP	고/EC	,/SP	단기간/NNG	에/JKB	설득/NNG	되/XSV	지/EC	않/VX	으면/EC	시간/NNG	이/JKS	걸리/VV	더라도/EC	끝/NNG	까지/JX	설득/NNG	하/XSV	아/EC	그/NP	를/JKO	구제/NNG	(/SS	?/SF	)/SS	하/VV	아/EC	주/VX	어야/EC	겠/EP	다는/ETM	사명감/NNG	까지/JX	가지/VV	게/EC	되/VV	었/EP	다/EF	./SF	이렇/VA	게/EC	자신/NNG	있/VV	게/EC	,/SP	단순히/MAG	보험/NNG	을/JKO	팔/VV	러/EC	다니/VV	는/ETM	게/NNG	아니/VCN	라/EC	보험/NNG	의/JKG	효용/NNG	가치/NNG	를/JKO	모르/VV	는/ETM	사람/NNG	들/XSN	을/JKO	도와주/VV	ㄴ다고/EC	생각/NNG	하/XSV	니/EC	일/NNG	에/JKB	힘/NNG	이/JKS	나/VV	고/EC	재미/NNG	가/JKS	있/VX	었/EP	다/EF	./SF	-145.1
-그리하여/MAJ	예전/NNG	보다/JKB	훨씬/MAG	적극/NNG	적/XSN	으로/JKB	상대/NNG	를/JKO	설득/NNG	하/XSV	ㄹ/ETM	수/NNB	있/VV	었/EP	고/EC	,/SP	단기간/NNG	에/JKB	설득/NNG	되/XSV	지/EC	않/VX	으면/EC	시간/NNG	이/JKS	걸리/VV	더라도/EC	끝/NNG	까지/JX	설득/NNG	하/XSV	아/EC	그/NP	를/JKO	구제/NNG	(/SS	?/SF	)/SS	하/XSV	아/EC	주/VX	어야/EC	겠/EP	다는/ETM	사명감/NNG	까지/JX	가지/VV	게/EC	되/VV	었/EP	다/EF	./SF	이렇/VA	게/EC	자신/NNG	있/VV	게/EC	,/SP	단순히/MAG	보험/NNG	을/JKO	팔/VV	러/EC	다니/VV	는/ETM	게/NNG	아니/VCN	라/EC	보험/NNG	의/JKG	효용/NNG	가치/NNG	를/JKO	모르/VV	는/ETM	사람/NNG	들/XSN	을/JKO	도와주/VV	ㄴ다고/EC	생각/NNG	하/XSV	니/EC	일/NNG	에/JKB	힘/NNG	이/JKS	나/VV	고/EC	재미/NNG	가/JKS	있/VV	었/EP	다/EF	./SF	-144.9
+그리하여/MAJ	예전/NNG	보다/JKB	훨씬/MAG	적극/NNG	적/XSN	으로/JKB	상대/NNG	를/JKO	설득/NNG	하/XSV	ㄹ/ETM	수/NNB	있/VV	었/EP	고/EC	,/SP	단기간/NNG	에/JKB	설득/NNG	되/XSV	지/EC	않/VX	으면/EC	시간/NNG	이/JKS	걸리/VV	더라도/EC	끝/NNG	까지/JX	설득/NNG	하/XSV	아/EC	그/NP	를/JKO	구제/NNG	(/SS	?/SF	)/SS	하/XSV	아/EC	주/VX	어야/EC	겠/EP	다는/ETM	사명감/NNG	까지/JX	가지/VV	게/EC	되/VV	었/EP	다/EF	./SF	이렇/VA	게/EC	자신/NNG	있/VV	게/EC	,/SP	단순히/MAG	보험/NNG	을/JKO	팔/VV	러/EC	다니/VV	는/ETM	게/NNG	아니/VCN	라/EC	보험/NNG	의/JKG	효용/NNG	가치/NNG	를/JKO	모르/VV	는/ETM	사람/NNG	들/XSN	을/JKO	도와주/VV	ㄴ다고/EC	생각/NNG	하/XSV	니/EC	일/NNG	에/JKB	힘/NNG	이/JKS	나/VV	고/EC	재미/NNG	가/JKS	있/VX	었/EP	다/EF	./SF	-141.9
+그리하여/MAJ	예전/NNG	보다/JKB	훨씬/MAG	적극/NNG	적/XSN	으로/JKB	상대/NNG	를/JKO	설득/NNG	하/XSV	ㄹ/ETM	수/NNB	있/VV	었/EP	고/EC	,/SP	단기간/NNG	에/JKB	설득/NNG	되/XSV	지/EC	않/VX	으면/EC	시간/NNG	이/JKS	걸리/VV	더라도/EC	끝/NNG	까지/JX	설득/NNG	하/XSV	아/EC	그/NP	를/JKO	구제/NNG	(/SS	?/SF	)/SS	하/VV	아/EC	주/VX	어야/EC	겠/EP	다는/ETM	사명감/NNG	까지/JX	가지/VV	게/EC	되/VV	었/EP	다/EF	./SF	이렇/VA	게/EC	자신/NNG	있/VV	게/EC	,/SP	단순히/MAG	보험/NNG	을/JKO	팔/VV	러/EC	다니/VV	는/ETM	게/NNG	아니/VCN	라/EC	보험/NNG	의/JKG	효용/NNG	가치/NNG	를/JKO	모르/VV	는/ETM	사람/NNG	들/XSN	을/JKO	도와주/VV	ㄴ다고/EC	생각/NNG	하/XSV	니/EC	일/NNG	에/JKB	힘/NNG	이/JKS	나/VV	고/EC	재미/NNG	가/JKS	있/VX	었/EP	다/EF	./SF	-142.2
+그리하여/MAJ	예전/NNG	보다/JKB	훨씬/MAG	적극/NNG	적/XSN	으로/JKB	상대/NNG	를/JKO	설득/NNG	하/XSV	ㄹ/ETM	수/NNB	있/VV	었/EP	고/EC	,/SP	단기간/NNG	에/JKB	설득/NNG	되/XSV	지/EC	않/VX	으면/EC	시간/NNG	이/JKS	걸리/VV	더라도/EC	끝/NNG	까지/JX	설득/NNG	하/XSV	아/EC	그/NP	를/JKO	구제/NNG	(/SS	?/SF	)/SS	하/XSV	아/EC	주/VX	어야/EC	겠/EP	다는/ETM	사명감/NNG	까지/JX	가지/VV	게/EC	되/VV	었/EP	다/EF	./SF	이렇/VA	게/EC	자신/NNG	있/VV	게/EC	,/SP	단순히/MAG	보험/NNG	을/JKO	팔/VV	러/EC	다니/VV	는/ETM	게/NNG	아니/VCN	라/EC	보험/NNG	의/JKG	효용/NNG	가치/NNG	를/JKO	모르/VV	는/ETM	사람/NNG	들/XSN	을/JKO	도와주/VV	ㄴ다고/EC	생각/NNG	하/XSV	니/EC	일/NNG	에/JKB	힘/NNG	이/JKS	나/VV	고/EC	재미/NNG	가/JKS	있/VV	었/EP	다/EF	./SF	-142
 
 돈을 벌기 위하여 보험을 팔러다니는 세일즈맨의 처지에서, 갑자기 미래의 불행을 예방해 주고 후생복지 향상을 통하여 기업과 종업원을 도와준다고 사고의 틀을 전환하니 이거야말로 재미있고 신나는 일이 아닐 수 없었다.	0.922
 돈/NNG	을/JKO	벌/VV	기/ETN	위하/VV	아/EC	보험/NNG	을/JKO	팔/VV	러/EC	다니/VV	는/ETM	세일즈맨/NNG	의/JKG	처지/NNG	에서/JKB	,/SP	갑자기/MAG	미래/NNG	의/JKG	불행/NNG	을/JKO	예방/NNG	하/XSV	아/EC	주/VX	고/EC	후생/NNG	복지/NNG	향상/NNG	을/JKO	통하/VV	아/EC	기업/NNG	과/JC	종업원/NNG	을/JKO	도와주/VV	ㄴ다고/EC	사고/NNG	의/JKG	틀/NNG	을/JKO	전환/NNG	하/XSV	니/EC	이거/NP	야말로/JX	재미있/VA	고/EC	신/NNG	나/VV	는/ETM	일/NNG	이/JKC	아니/VCN	ㄹ/ETM	수/NNB	없/VA	었/EP	다/EF	./SF	
@@ -1916,11 +1916,11 @@ H/SL	대리/NNG	의/JKG	미/XPN	망인/NNG	은/JX	생각/NNG	지도/NNG	않/VV	은/ETM	보험금
 마찬가지/NNG	로/JKB	돈/NNG	이/JKS	많/VA	은/ETM	사람/NNG	을/JKO	찾아가/VV	아서/EC	재/XPN	태크/NNG	의/JKG	지혜/NNG	를/JKO	배우/VV	고/EC	친하/VA	아/EC	지/VX	려고/EC	노력/NNG	하/XSV	ㄴ다/EF	./SF	-36.96
 마찬가지/NNG	로/JKB	돈/NNG	이/JKS	많/VA	은/ETM	사람/NNG	을/JKO	찾아가/VV	아서/EC	재태크/NNP	의/JKG	지혜/NNG	를/JKO	배우/VV	고/EC	친하/VA	아/EC	지/VX	려고/EC	노력/NNG	하/XSA	ㄴ다/EF	./SF	-41.73
 
-그러는 사이에 서로가 친숙해지고 신뢰가 생기면 자연스럽게 계약이 체결된다.	0.92
+그러는 사이에 서로가 친숙해지고 신뢰가 생기면 자연스럽게 계약이 체결된다.	0.769
 그러/VV	는/ETM	사이/NNG	에/JKB	서로/NNG	가/JKS	친숙/NNG	하/XSA	아/EC	지/VX	고/EC	신뢰/NNG	가/JKS	생기/VV	면/EC	자연/NNG	스럽/XSA	게/EC	계약/NNG	이/JKS	체결/NNG	되/XSV	ㄴ다/EF	./SF	
+그렇/VA	는/ETM	사이/NNG	에/JKB	서로/NNG	가/JKS	친숙/NNG	해지/VV	고/EC	신뢰/NNG	가/JKS	생기/VV	면/EC	자연/NNG	스럽/XSA	게/EC	계약/NNG	이/JKS	체결/NNG	되/XSV	ㄴ다/EF	./SF	-30.71
 그렇/VA	는/ETM	사이/NNG	에/JKB	서로/NNG	가/JKS	친숙/NNG	하/XSA	아/EC	지/VX	고/EC	신뢰/NNG	가/JKS	생기/VV	면/EC	자연/NNG	스럽/XSA	게/EC	계약/NNG	이/JKS	체결/NNG	되/XSV	ㄴ다/EF	./SF	-32.5
 그렇/VA	는/ETM	사이/NNG	에/JKB	서로/NNG	가/JKS	친숙/NNG	하/XSV	아/EC	지/VX	고/EC	신뢰/NNG	가/JKS	생기/VV	면/EC	자연/NNG	스럽/XSA	게/EC	계약/NNG	이/JKS	체결/NNG	되/XSV	ㄴ다/EF	./SF	-33.11
-그러/VV	는/ETM	사이/NNG	에/JKB	서로/NNG	가/JKS	친숙/NNG	하/XSV	아/EC	지/VX	고/EC	신뢰/NNG	가/JKS	생기/VV	면/EC	자연/NNG	스럽/XSA	게/EC	계약/NNG	이/JKS	체결/NNG	되/XSV	ㄴ다/EF	./SF	-33.98
 
 과거에 내가 거래했던 한 업체의 경우 다른 보험회사에서 아무리 좋은 제안을 해도 결국 모든 계약은 나에게로 왔다.	0.842
 과거/NNG	에/JKB	내/NP	가/JKS	거래/NNG	하/XSV	았/EP	던/ETM	한/MM	업체/NNG	의/JKG	경우/NNG	다른/MM	보험/NNG	회사/NNG	에서/JKB	아무리/MAG	좋/VA	은/ETM	제안/NNG	을/JKO	하/VV	아도/EC	결국/NNG	모든/MM	계약/NNG	은/JX	나/NP	에게/JKB	로/JKB	오/VV	았/EP	다/EF	./SF	
@@ -3248,9 +3248,9 @@ B/SL	는/JX	버스/NNG	나/JC	지하철/NNG	을/JKO	타/VV	고/EC	졸/VV	면서/EC	가/VX	아서
 
 결국 그 일이 있은 지 몇 달 후 그분은 남편의 적극적인 지원 아래 우리 회사 설계사로 일을 하게 되었고, 묻혀있던 그의 역량을 발휘하여 활기찬 생활을 하게 되었다. 고객들이 보험회사에 직접 전화를 한다든지 찾아오는 것은 대단한 고민 끝에 하는 행위이다.	0.809
 결국/NNG	그/MM	일/NNG	이/JKS	있/VV	은/ETM	지/NNB	몇/MM	달/NNG	후/NNG	그분/NP	은/JX	남편/NNG	의/JKG	적극/NNG	적/XSN	이/VCP	ㄴ/ETM	지원/NNG	아래/NNG	우리/NP	회사/NNG	설계사/NNG	로/JKB	일/NNG	을/JKO	하/VV	게/EC	되/VV	었/EP	고/EC	,/SP	묻히/VV	어/EC	있/VX	던/ETM	그/NP	의/JKG	역량/NNG	을/JKO	발휘/NNG	하/XSV	아/EC	활기차/VA	ㄴ/ETM	생활/NNG	을/JKO	하/VV	게/EC	되/VV	었/EP	다/EC	고객/NNG	들/XSN	이/JKS	보험/NNG	회사/NNG	에/JKB	직접/MAG	전화/NNG	를/JKO	하/VV	ㄴ다/EC	든지/JX	찾아오/VV	는/ETM	것/NNB	은/JX	대단/XR	하/XSA	ㄴ/ETM	고민/NNG	끝/NNG	에/JKB	하/VV	는/ETM	행위/NNG	이/VCP	다/EF	./SF	
-결국/NNG	그/NP	일/NNG	이/JKS	있/VX	은/ETM	지/NNB	몇/MM	달/NNG	후/NNG	그/MM	분/NNB	은/JX	남편/NNG	의/JKG	적극/NNG	적/XSN	이/VCP	ㄴ/ETM	지원/NNG	아래/NNG	우리/NP	회사/NNG	설계사/NNG	로/JKB	일/NNG	을/JKO	하/VX	게/EC	되/VV	었/EP	고/EC	,/SP	묻히/VV	어/EC	있/VX	던/ETM	그/NP	의/JKG	역량/NNG	을/JKO	발휘/NNG	하/XSV	아/EC	활기차/VA	ㄴ/ETM	생활/NNG	을/JKO	하/VX	게/EC	되/VV	었/EP	다/EF	./SF	고객/NNG	들/XSN	이/JKS	보험/NNG	회사/NNG	에/JKB	직접/NNG	전화/NNG	를/JKO	하/VV	ㄴ다든지/EC	찾아오/VV	는/ETM	것/NNB	은/JX	대단/XR	하/XSA	ㄴ/ETM	고민/NNG	끝/NNG	에/JKB	하/VV	는/ETM	행위/NNG	이/VCP	다/EF	./SF	-132.1
-결국/NNG	그/NP	일/NNG	이/JKS	있/VX	은/ETM	지/NNB	몇/MM	달/NNG	후/NNG	그/MM	분/NNB	은/JX	남편/NNG	의/JKG	적극/NNG	적/XSN	이/VCP	ㄴ/ETM	지원/NNG	아래/NNG	우리/NP	회사/NNG	설계사/NNG	로/JKB	일/NNG	을/JKO	하/VX	게/EC	되/VV	었/EP	고/EC	,/SP	묻히/VV	어/EC	있/VX	던/ETM	그/NP	의/JKG	역량/NNG	을/JKO	발휘/NNG	하/XSV	아/EC	활기차/VA	ㄴ/ETM	생활/NNG	을/JKO	하/VX	게/EC	되/VV	었/EP	다/EF	./SF	고객/NNG	들/XSN	이/JKS	보험/NNG	회사/NNG	에/JKB	직접/NNG	전화/NNG	를/JKO	하/VV	ㄴ다든지/EC	찾아오/VV	는/ETM	것/NNB	은/JX	대단/XR	하/XSV	ㄴ/ETM	고민/NNG	끝/NNG	에/JKB	하/VV	는/ETM	행위/NNG	이/VCP	다/EF	./SF	-132.3
-결국/NNG	그/NP	일/NNG	이/JKS	있/VX	은/ETM	지/NNB	몇/MM	달/NNG	후/NNG	그/MM	분/NNB	은/JX	남편/NNG	의/JKG	적극/NNG	적/XSN	이/VCP	ㄴ/ETM	지원/NNG	아래/NNG	우리/NP	회사/NNG	설계사/NNG	로/JKB	일/NNG	을/JKO	하/VX	게/EC	되/VV	었/EP	고/EC	,/SP	묻히/VV	어/EC	있/VX	던/ETM	그/NP	의/JKG	역량/NNG	을/JKO	발휘/NNG	하/XSV	아/EC	활기차/VA	ㄴ/ETM	생활/NNG	을/JKO	하/VX	게/EC	되/VV	었/EP	다/EF	./SF	고객/NNG	들/XSN	이/JKS	보험/NNG	회사/NNG	에/JKB	직접/NNG	전화/NNG	를/JKO	하/VV	ㄴ다든지/EC	찾아오/VV	는/ETM	것/NNB	은/JX	대단/XR	하/XSA	ㄴ/ETM	고민/NNG	끝/NNG	에/JKB	하/VX	는/ETM	행위/NNG	이/VCP	다/EF	./SF	-133.1
+결국/NNG	그/NP	일/NNG	이/JKS	있/VX	은/ETM	지/NNB	몇/MM	달/NNG	후/NNG	그/MM	분/NNB	은/JX	남편/NNG	의/JKG	적극/NNG	적/XSN	이/VCP	ㄴ/ETM	지원/NNG	아래/NNG	우리/NP	회사/NNG	설계사/NNG	로/JKB	일/NNG	을/JKO	하/VX	게/EC	되/VV	었/EP	고/EC	,/SP	묻히/VV	어/EC	있/VX	던/ETM	그/NP	의/JKG	역량/NNG	을/JKO	발휘/NNG	하/XSV	아/EC	활기차/VA	ㄴ/ETM	생활/NNG	을/JKO	하/VX	게/EC	되/VV	었/EP	다/EF	./SF	고객/NNG	들/XSN	이/JKS	보험/NNG	회사/NNG	에/JKB	직접/NNG	전화/NNG	를/JKO	하/VV	ㄴ다든지/EC	찾아오/VV	는/ETM	것/NNB	은/JX	대단/XR	하/XSA	ㄴ/ETM	고민/NNG	끝/NNG	에/JKB	하/VV	는/ETM	행위/NNG	이/VCP	다/EF	./SF	-128.7
+결국/NNG	그/NP	일/NNG	이/JKS	있/VX	은/ETM	지/NNB	몇/MM	달/NNG	후/NNG	그/MM	분/NNB	은/JX	남편/NNG	의/JKG	적극/NNG	적/XSN	이/VCP	ㄴ/ETM	지원/NNG	아래/NNG	우리/NP	회사/NNG	설계사/NNG	로/JKB	일/NNG	을/JKO	하/VX	게/EC	되/VV	었/EP	고/EC	,/SP	묻히/VV	어/EC	있/VX	던/ETM	그/NP	의/JKG	역량/NNG	을/JKO	발휘/NNG	하/XSV	아/EC	활기차/VA	ㄴ/ETM	생활/NNG	을/JKO	하/VX	게/EC	되/VV	었/EP	다/EF	./SF	고객/NNG	들/XSN	이/JKS	보험/NNG	회사/NNG	에/JKB	직접/NNG	전화/NNG	를/JKO	하/VV	ㄴ다든지/EC	찾아오/VV	는/ETM	것/NNB	은/JX	대단/XR	하/XSV	ㄴ/ETM	고민/NNG	끝/NNG	에/JKB	하/VV	는/ETM	행위/NNG	이/VCP	다/EF	./SF	-129
+결국/NNG	그/NP	일/NNG	이/JKS	있/VX	은/ETM	지/NNB	몇/MM	달/NNG	후/NNG	그/MM	분/NNB	은/JX	남편/NNG	의/JKG	적극/NNG	적/XSN	이/VCP	ㄴ/ETM	지원/NNG	아래/NNG	우리/NP	회사/NNG	설계사/NNG	로/JKB	일/NNG	을/JKO	하/VX	게/EC	되/VV	었/EP	고/EC	,/SP	묻히/VV	어/EC	있/VX	던/ETM	그/NP	의/JKG	역량/NNG	을/JKO	발휘/NNG	하/XSV	아/EC	활기차/VA	ㄴ/ETM	생활/NNG	을/JKO	하/VX	게/EC	되/VV	었/EP	다/EF	./SF	고객/NNG	들/XSN	이/JKS	보험/NNG	회사/NNG	에/JKB	직접/NNG	전화/NNG	를/JKO	하/VV	ㄴ다든지/EC	찾아오/VV	는/ETM	것/NNB	은/JX	대단/XR	하/XSA	ㄴ/ETM	고민/NNG	끝/NNG	에/JKB	하/VX	는/ETM	행위/NNG	이/VCP	다/EF	./SF	-129.7
 
 따라서 그 불만을 인정하고 잘못을 솔직히 인정해 주면 그것만으로도 고객은 분노를 삭일 수 있다.	0.871
 따라서/MAJ	그/MM	불만/NNG	을/JKO	인정/NNG	하/XSV	고/EC	잘못/NNG	을/JKO	솔직히/MAG	인정/NNG	하/XSV	아/EC	주/VX	면/EC	그것/NP	만/JX	으로/JKB	도/JX	고객/NNG	은/JX	분노/NNG	를/JKO	삭이/VV	ㄹ/ETM	수/NNB	있/VV	다/EF	./SF	
@@ -3786,9 +3786,9 @@ S/SL	팀장/NNG	이/JKS	그분/NP	을/JKO	뛰어넘/VV	을/ETM	수/NNB	있/VV	다면/EC	영업/N
 
 그리고 계약자들 중 취미와 격이 맞는 사람들의 모임을 주선한다든지, 자식의 혼사에 중매를 선다든지 하는 등으로 그의 사생활에 적극적으로 개입하여 신임을 얻었고, 그 후 그 고객으로부터 많은 계약을 받고 다른 사람들을 소개받아 큰 이익을 볼 수 있었다.	0.802
 그리고/MAJ	계약자/NNG	들/XSN	중/NNB	취미/NNG	와/JC	격/NNG	이/JKS	맞/VV	는/ETM	사람/NNG	들/XSN	의/JKG	모임/NNG	을/JKO	주선/NNG	하/XSV	ㄴ다/EC	든지/JX	,/SP	자식/NNG	의/JKG	혼사/NNG	에/JKB	중매/NNG	를/JKO	서/VV	ㄴ다/EC	든지/JX	하/VX	는/ETM	등/NNB	으로/JKB	그/NP	의/JKG	사생활/NNG	에/JKB	적극/NNG	적/XSN	으로/JKB	개입/NNG	하/XSV	아/EC	신임/NNG	을/JKO	얻/VV	었/EP	고/EC	,/SP	그/MM	후/NNG	그/MM	고객/NNG	으로부터/JKB	많/VA	은/ETM	계약/NNG	을/JKO	받/VV	고/EC	다른/MM	사람/NNG	들/XSN	을/JKO	소개/NNG	받/VV	아/EC	크/VA	ㄴ/ETM	이익/NNG	을/JKO	보/VV	ㄹ/ETM	수/NNB	있/VV	었/EP	다/EF	./SF	
-그리/VV	고/EC	계약자/NNG	들/XSN	중/NNB	취미/NNG	와/JC	격/NNG	이/JKS	맞/VV	는/ETM	사람/NNG	들/XSN	의/JKG	모임/NNG	을/JKO	주선/NNG	하/XSV	ㄴ다든지/EC	,/SP	자식/NNG	의/JKG	혼사/NNG	에/JKB	중매/NNG	를/JKO	서/VV	ㄴ다든지/EC	하/VV	는/ETM	등/NNB	으로/JKB	그/NP	의/JKG	사생활/NNG	에/JKB	적극/NNG	적/XSN	으로/JKB	개입/NNG	하/XSV	아/EC	신임/NNG	을/JKO	얻/VV	었/EP	고/EC	,/SP	그/MM	후/NNG	그/MM	고객/NNG	으로부터/JKB	많/VA	은/ETM	계약/NNG	을/JKO	받/VV	고/EC	다른/MM	사람/NNG	들/XSN	을/JKO	소개/NNG	받/VV	아/EF	크/VA	ㄴ/ETM	이익/NNG	을/JKO	보/VX	ㄹ/ETM	수/NNB	있/VX	었/EP	다/EF	./SF	-138.7
-그리/VV	고/EC	계약자/NNG	들/XSN	중/NNB	취미/NNG	와/JC	격/NNG	이/JKS	맞/VV	는/ETM	사람/NNG	들/XSN	의/JKG	모임/NNG	을/JKO	주선/NNG	하/XSV	ㄴ다든지/EC	,/SP	자식/NNG	의/JKG	혼사/NNG	에/JKB	중매/NNG	를/JKO	서/VV	ㄴ다든지/EC	하/VV	는/ETM	등/NNB	으로/JKB	그/NP	의/JKG	사생활/NNG	에/JKB	적극/NNG	적/XSN	으로/JKB	개입/NNG	하/XSV	아/EC	신임/NNG	을/JKO	얻/VV	었/EP	고/EC	,/SP	그/MM	후/NNG	그/MM	고객/NNG	으로부터/JKB	많/VA	은/ETM	계약/NNG	을/JKO	받/VV	고/EC	다르/VA	ㄴ/ETM	사람/NNG	들/XSN	을/JKO	소개/NNG	받/VV	아/EF	크/VA	ㄴ/ETM	이익/NNG	을/JKO	보/VX	ㄹ/ETM	수/NNB	있/VX	었/EP	다/EF	./SF	-138.7
-그리/VV	고/EC	계약자/NNG	들/XSN	중/NNB	취미/NNG	와/JC	격/NNG	이/JKS	맞/VV	는/ETM	사람/NNG	들/XSN	의/JKG	모임/NNG	을/JKO	주선/NNG	하/XSV	ㄴ다든지/EC	,/SP	자식/NNG	의/JKG	혼사/NNG	에/JKB	중매/NNG	를/JKO	서/VV	ㄴ다든지/EC	하/VV	는/ETM	등/NNB	으로/JKB	그/NP	의/JKG	사생활/NNG	에/JKB	적극/NNG	적/XSN	으로/JKB	개입/NNG	하/XSV	아/EC	신임/NNG	을/JKO	얻/VV	었/EP	고/EC	,/SP	그/MM	후/NNG	그/MM	고객/NNG	으로부터/JKB	많/VA	은/ETM	계약/NNG	을/JKO	받/VV	고/EC	다른/MM	사람/NNG	들/XSN	을/JKO	소개/NNG	받/VV	아/EF	크/VA	ㄴ/ETM	이익/NNG	을/JKO	보/VX	ㄹ/ETM	수/NNB	있/VV	었/EP	다/EF	./SF	-135.1
+그리/VV	고/EC	계약자/NNG	들/XSN	중/NNB	취미/NNG	와/JC	격/NNG	이/JKS	맞/VV	는/ETM	사람/NNG	들/XSN	의/JKG	모임/NNG	을/JKO	주선/NNG	하/XSV	ㄴ다든지/EC	,/SP	자식/NNG	의/JKG	혼사/NNG	에/JKB	중매/NNG	를/JKO	서/VV	ㄴ다든지/EC	하/VV	는/ETM	등/NNB	으로/JKB	그/NP	의/JKG	사생활/NNG	에/JKB	적극/NNG	적/XSN	으로/JKB	개입/NNG	하/XSV	아/EC	신임/NNG	을/JKO	얻/VV	었/EP	고/EC	,/SP	그/MM	후/NNG	그/MM	고객/NNG	으로부터/JKB	많/VA	은/ETM	계약/NNG	을/JKO	받/VV	고/EC	다른/MM	사람/NNG	들/XSN	을/JKO	소개/NNG	받/VV	아/EF	크/VA	ㄴ/ETM	이익/NNG	을/JKO	보/VX	ㄹ/ETM	수/NNB	있/VX	었/EP	다/EF	./SF	-134.8
+그리/VV	고/EC	계약자/NNG	들/XSN	중/NNB	취미/NNG	와/JC	격/NNG	이/JKS	맞/VV	는/ETM	사람/NNG	들/XSN	의/JKG	모임/NNG	을/JKO	주선/NNG	하/XSV	ㄴ다든지/EC	,/SP	자식/NNG	의/JKG	혼사/NNG	에/JKB	중매/NNG	를/JKO	서/VV	ㄴ다든지/EC	하/VV	는/ETM	등/NNB	으로/JKB	그/NP	의/JKG	사생활/NNG	에/JKB	적극/NNG	적/XSN	으로/JKB	개입/NNG	하/XSV	아/EC	신임/NNG	을/JKO	얻/VV	었/EP	고/EC	,/SP	그/MM	후/NNG	그/MM	고객/NNG	으로부터/JKB	많/VA	은/ETM	계약/NNG	을/JKO	받/VV	고/EC	다르/VA	ㄴ/ETM	사람/NNG	들/XSN	을/JKO	소개/NNG	받/VV	아/EF	크/VA	ㄴ/ETM	이익/NNG	을/JKO	보/VX	ㄹ/ETM	수/NNB	있/VX	었/EP	다/EF	./SF	-134.9
+그리/VV	고/EC	계약자/NNG	들/XSN	중/NNB	취미/NNG	와/JC	격/NNG	이/JKS	맞/VV	는/ETM	사람/NNG	들/XSN	의/JKG	모임/NNG	을/JKO	주선/NNG	하/XSV	ㄴ다든지/EC	,/SP	자식/NNG	의/JKG	혼사/NNG	에/JKB	중매/NNG	를/JKO	서/VV	ㄴ다든지/EC	하/VV	는/ETM	등/NNB	으로/JKB	그/NP	의/JKG	사생활/NNG	에/JKB	적극/NNG	적/XSN	으로/JKB	개입/NNG	하/XSV	아/EC	신임/NNG	을/JKO	얻/VV	었/EP	고/EC	,/SP	그/MM	후/NNG	그/MM	고객/NNG	으로부터/JKB	많/VA	은/ETM	계약/NNG	을/JKO	받/VV	고/EC	다른/MM	사람/NNG	들/XSN	을/JKO	소개/NNG	받/VV	아/EF	크/VA	ㄴ/ETM	이익/NNG	을/JKO	보/VX	ㄹ/ETM	수/NNB	있/VV	었/EP	다/EF	./SF	-131.3
 
 그 희생은 금전적인 것일 수도 있고, 정신적인 것일 수도 있다.	0.8
 그/MM	희생/NNG	은/JX	금전/NNG	적/XSN	이/VCP	ㄴ/ETM	것/NNB	이/VCP	ㄹ/ETM	수/NNB	도/JX	있/VV	고/EC	,/SP	정신/NNG	적/XSN	이/VCP	ㄴ/ETM	것/NNB	이/VCP	ㄹ/ETM	수/NNB	도/JX	있/VV	다/EF	./SF	
@@ -4708,9 +4708,9 @@ S/SL	팀장/NNG	이/JKS	그분/NP	을/JKO	뛰어넘/VV	을/ETM	수/NNB	있/VV	다면/EC	영업/N
 
 그러나 힘이 약한 벌목공은 힘이 약한 자신의 약점을 보완하기 위해 끊임없이 톱과 도끼를 손질하면서 휴식으로 체력을 안배하면서 일을 하다보니 결국은 승리에 이를 수 있었다.	0.926
 그러나/MAJ	힘/NNG	이/JKS	약하/VA	ㄴ/ETM	벌목공/NNG	은/JX	힘/NNG	이/JKS	약하/VA	ㄴ/ETM	자신/NNG	의/JKG	약점/NNG	을/JKO	보완/NNG	하/XSV	기/ETN	위하/VV	아/EC	끊임없이/MAG	톱/NNG	과/JC	도끼/NNG	를/JKO	손질/NNG	하/XSV	면서/EC	휴식/NNG	으로/JKB	체력/NNG	을/JKO	안배/NNG	하/XSV	면서/EC	일/NNG	을/JKO	하/VV	다/EC	보/VX	니/EC	결국/NNG	은/JX	승리/NNG	에/JKB	이르/VV	ㄹ/ETM	수/NNB	있/VV	었/EP	다/EF	./SF	
-그러나/MAJ	힘/NNG	이/JKS	약하/VA	ㄴ/ETM	벌목공/NNG	은/JX	힘/NNG	이/JKS	약하/VA	ㄴ/ETM	자신/NNG	의/JKG	약점/NNG	을/JKO	보완/NNG	하/XSV	기/ETN	위하/VV	아/EC	끊임없이/MAG	톱/NNG	과/JKB	도끼/NNG	를/JKO	손질/NNG	하/XSV	면서/EC	휴식/NNG	으로/JKB	체력/NNG	을/JKO	안배/NNG	하/XSV	면서/EC	일/NNG	을/JKO	하/VV	다/EC	보/VX	니/EC	결국/NNG	은/JX	승리/NNG	에/JKB	이르/VV	ㄹ/ETM	수/NNB	있/VX	었/EP	다/EF	./SF	-84.31
-그러나/MAJ	힘/NNG	이/JKS	약하/VA	ㄴ/ETM	벌목공/NNG	은/JX	힘/NNG	이/JKS	약하/VA	ㄴ/ETM	자신/NNG	의/JKG	약점/NNG	을/JKO	보완/NNG	하/XSV	기/ETN	위하/VV	아/EC	끊임없이/MAG	톱/NNG	과/JC	도끼/NNG	를/JKO	손질/NNG	하/XSV	면서/EC	휴식/NNG	으로/JKB	체력/NNG	을/JKO	안배/NNG	하/XSV	면서/EC	일/NNG	을/JKO	하/VV	다/EC	보/VX	니/EC	결국/NNG	은/JX	승리/NNG	에/JKB	이르/VV	ㄹ/ETM	수/NNB	있/VX	었/EP	다/EF	./SF	-84.66
-그러나/MAJ	힘/NNG	이/JKS	약하/VA	ㄴ/ETM	벌목공/NNG	은/JX	힘/NNG	이/JKS	약하/VA	ㄴ/ETM	자신/NNG	의/JKG	약점/NNG	을/JKO	보완/NNG	하/XSV	기/ETN	위하/VV	아/EC	끊임없이/MAG	톱/NNG	과/JKB	도끼/NNG	를/JKO	손질/NNG	하/XSV	면서/EC	휴식/NNG	으로/JKB	체력/NNG	을/JKO	안배/NNG	하/XSV	면서/EC	일/NNG	을/JKO	하/VV	다/EC	보/VX	니/EC	결국/NNG	은/JX	승리/NNG	에/JKB	이르/VV	ㄹ/ETM	수/NNB	있/VV	었/EP	다/EF	./SF	-80.77
+그러나/MAJ	힘/NNG	이/JKS	약하/VA	ㄴ/ETM	벌목공/NNG	은/JX	힘/NNG	이/JKS	약하/VA	ㄴ/ETM	자신/NNG	의/JKG	약점/NNG	을/JKO	보완/NNG	하/XSV	기/ETN	위하/VV	아/EC	끊임없이/MAG	톱/NNG	과/JKB	도끼/NNG	를/JKO	손질/NNG	하/XSV	면서/EC	휴식/NNG	으로/JKB	체력/NNG	을/JKO	안배/NNG	하/XSV	면서/EC	일/NNG	을/JKO	하/VV	다/EC	보/VX	니/EC	결국/NNG	은/JX	승리/NNG	에/JKB	이르/VV	ㄹ/ETM	수/NNB	있/VX	었/EP	다/EF	./SF	-79.71
+그러나/MAJ	힘/NNG	이/JKS	약하/VA	ㄴ/ETM	벌목공/NNG	은/JX	힘/NNG	이/JKS	약하/VA	ㄴ/ETM	자신/NNG	의/JKG	약점/NNG	을/JKO	보완/NNG	하/XSV	기/ETN	위하/VV	아/EC	끊임없이/MAG	톱/NNG	과/JC	도끼/NNG	를/JKO	손질/NNG	하/XSV	면서/EC	휴식/NNG	으로/JKB	체력/NNG	을/JKO	안배/NNG	하/XSV	면서/EC	일/NNG	을/JKO	하/VV	다/EC	보/VX	니/EC	결국/NNG	은/JX	승리/NNG	에/JKB	이르/VV	ㄹ/ETM	수/NNB	있/VX	었/EP	다/EF	./SF	-80.06
+그러나/MAJ	힘/NNG	이/JKS	약하/VA	ㄴ/ETM	벌목공/NNG	은/JX	힘/NNG	이/JKS	약하/VA	ㄴ/ETM	자신/NNG	의/JKG	약점/NNG	을/JKO	보완/NNG	하/XSV	기/ETN	위하/VV	아/EC	끊임없이/MAG	톱/NNG	과/JKB	도끼/NNG	를/JKO	손질/NNG	하/XSV	면서/EC	휴식/NNG	으로/JKB	체력/NNG	을/JKO	안배/NNG	하/XSV	면서/EC	일/NNG	을/JKO	하/VV	다/EC	보/VX	니/EC	결국/NNG	은/JX	승리/NNG	에/JKB	이르/VV	ㄹ/ETM	수/NNB	있/VV	었/EP	다/EF	./SF	-76.17
 
 모름지기 일을 할 때 자신의 약점을 보완해 가면서, 자신의 도구를 돌보면서 일하라는 충고로 많이 사용되는 일화이다.	0.825
 모름지기/MAG	일/NNG	을/JKO	하/VV	ㄹ/ETM	때/NNG	자신/NNG	의/JKG	약점/NNG	을/JKO	보완/NNG	하/XSV	아/EC	가/VX	면서/EC	,/SP	자신/NNG	의/JKG	도구/NNG	를/JKO	돌보/VV	면서/EC	일/NNG	하/XSV	라는/ETM	충고/NNG	로/JKB	많이/MAG	사용/NNG	되/XSV	는/ETM	일화/NNG	이/VCP	다/EF	./SF	
@@ -6198,9 +6198,9 @@ DM/SL	은/JX	방문/NNG	개척/NNG	보다/JKB	는/JX	시간/NNG	과/JKB	에너지/NNG	를/JKO	�
 
 	0.923
 /SW	파괴/NNG	형/XSN	서비스/NNG	시설/NNG	이나/JC	각종/NNG	기기/NNG	·/SP	장비/NNG	에/JKB	물리/NNG	적/XSN	힘/NNG	을/JKO	가하/VV	아/EC	손상/NNG	시키/XSV	는/ETM	고객/NNG	도/JX	있/VV	다/EF	./SF	
-/SW	파괴/NNG	형/XSN	서비스/NNG	시설/NNG	이나/JC	각종/NNG	기기/NNG	·/SP	장비/NNG	에/JKB	물리/NNG	적/XSN	힘/NNG	을/JKO	가하/VV	아/EC	손상/NNG	시키/XSV	는/ETM	고객/NNG	도/JX	있/VX	다/EF	./SF	-54.58
-/SW	파괴/NNG	형/XSN	서비스/NNG	시설/NNG	이나/JC	각종/NNG	기기/NNG	·/SP	장비/NNG	에/JKB	물리/NNG	적/XSN	힘/NNG	을/JKO	가하/VV	아/EC	손상/NNG	시키/XSV	는/ETM	고객/NNG	도/JX	있/VV	다/EF	./SF	-55.44
-/SW	파괴/NNG	형/NNG	서비스/NNG	시설/NNG	이나/JC	각종/NNG	기기/NNG	·/SP	장비/NNG	에/JKB	물리/NNG	적/XSN	힘/NNG	을/JKO	가하/VV	아/EC	손상/NNG	시키/XSV	는/ETM	고객/NNG	도/JX	있/VX	다/EF	./SF	-56.67
+/SW	파괴/NNG	형/XSN	서비스/NNG	시설/NNG	이나/JC	각종/NNG	기기/NNG	·/SP	장비/NNG	에/JKB	물리/NNG	적/XSN	힘/NNG	을/JKO	가하/VV	아/EC	손상/NNG	시키/XSV	는/ETM	고객/NNG	도/JX	있/VX	다/EF	./SF	-52.16
+/SW	파괴/NNG	형/XSN	서비스/NNG	시설/NNG	이나/JC	각종/NNG	기기/NNG	·/SP	장비/NNG	에/JKB	물리/NNG	적/XSN	힘/NNG	을/JKO	가하/VV	아/EC	손상/NNG	시키/XSV	는/ETM	고객/NNG	도/JX	있/VV	다/EF	./SF	-53.02
+/SW	파괴/NNG	형/NNG	서비스/NNG	시설/NNG	이나/JC	각종/NNG	기기/NNG	·/SP	장비/NNG	에/JKB	물리/NNG	적/XSN	힘/NNG	을/JKO	가하/VV	아/EC	손상/NNG	시키/XSV	는/ETM	고객/NNG	도/JX	있/VX	다/EF	./SF	-54.24
 
 이러한 고객은 시설 파괴시 복구비용을 본인에게 부담시켜야 한다.	0.762
 이러/XR	하/XSA	ㄴ/ETM	고객/NNG	은/JX	시설/NNG	파괴/NNG	시/XSN	복구/NNG	비용/NNG	을/JKO	본인/NNG	에게/JKB	부담/NNG	시키/XSV	어야/EC	하/VX	ㄴ다/EF	./SF	
@@ -6988,9 +6988,9 @@ CEO/SL	와/JKB	정치가/NNG	와/JKB	같/VA	은/ETM	사회/NNG	의/JKG	지도/NNG	층/XSN	인�
 
 나는 꾸준히 협회신문을 통해 노후준비의 필요성과 연금보험 효용가치를 광고했다.	0.846
 나/NP	는/JX	꾸준히/MAG	협회/NNG	신문/NNG	을/JKO	통하/VV	아/EC	노후/NNG	준비/NNG	의/JKG	필요/NNG	성/XSN	과/JC	연금/NNG	보험/NNG	효용/NNG	가치/NNG	를/JKO	광고/NNG	하/XSV	았/EP	다/EF	./SF	
-나/NP	는/JX	꾸준히/NNP	협회/NNG	신문/NNG	을/JKO	통하/VV	아/EC	노후/NNG	준비/NNG	의/JKG	필요/NNG	성/XSN	과/JKB	연금/NNG	보험/NNG	효용/NNG	가치/NNG	를/JKO	광고/NNG	하/XSV	았/EP	다/EF	./SF	-49.38
-나/NP	는/JX	꾸준/XR	히/NNG	협회/NNG	신문/NNG	을/JKO	통하/VV	아/EC	노후/NNG	준비/NNG	의/JKG	필요/NNG	성/XSN	과/JKB	연금/NNG	보험/NNG	효용/NNG	가치/NNG	를/JKO	광고/NNG	하/XSV	았/EP	다/EF	./SF	-49.68
-나/NP	는/JX	꾸준히/NNP	협회/NNG	신문/NNG	을/JKO	통하/VV	아/EC	노후/NNG	준비/NNG	의/JKG	필요/NNG	성과/NNG	연금/NNG	보험/NNG	효용/NNG	가치/NNG	를/JKO	광고/NNG	하/XSV	았/EP	다/EF	./SF	-49.68
+나/NP	는/JX	꾸준히/NNP	협회/NNG	신문/NNG	을/JKO	통하/VV	아/EC	노후/NNG	준비/NNG	의/JKG	필요/NNG	성/XSN	과/JKB	연금/NNG	보험/NNG	효용/NNG	가치/NNG	를/JKO	광고/NNG	하/XSV	았/EP	다/EF	./SF	-41.89
+나/NP	는/JX	꾸준/XR	히/NNG	협회/NNG	신문/NNG	을/JKO	통하/VV	아/EC	노후/NNG	준비/NNG	의/JKG	필요/NNG	성/XSN	과/JKB	연금/NNG	보험/NNG	효용/NNG	가치/NNG	를/JKO	광고/NNG	하/XSV	았/EP	다/EF	./SF	-42.18
+나/NP	는/JX	꾸준히/NNP	협회/NNG	신문/NNG	을/JKO	통하/VV	아/EC	노후/NNG	준비/NNG	의/JKG	필요/NNG	성과/NNG	연금/NNG	보험/NNG	효용/NNG	가치/NNG	를/JKO	광고/NNG	하/XSV	았/EP	다/EF	./SF	-42.19
 
 마음이 바작바작 타들어가는 느낌이었다.	0.5
 마음/NNG	이/JKS	바작바작/MAG	타들/VV	어/EC	가/VX	는/ETM	느낌/NNG	이/VCP	었/EP	다/EF	./SF	
@@ -7454,9 +7454,9 @@ CEO/SL	와/JKB	정치가/NNG	와/JKB	같/VA	은/ETM	사회/NNG	의/JKG	지도/NNG	층/XSN	인�
 
 커뮤니케이션 수단이 획기적으로 변하고 있기 때문에 고객과의 의사소통 채널을 디지털화하는 것은 가장 시급한 일이다.	0.938
 커뮤니케이션/NNG	수단/NNG	이/JKS	획기적/NNG	으로/JKB	변하/VV	고/EC	있/VX	기/ETN	때문/NNB	에/JKB	고객/NNG	과/JKB	의/JKG	의사소통/NNG	채널/NNG	을/JKO	디지털/NNG	화/XSN	하/XSV	는/ETM	것/NNB	은/JX	가장/MAG	시급/XR	하/XSA	ㄴ/ETM	일/NNG	이/VCP	다/EF	./SF	
-커뮤니케이션/NNG	수단/NNG	이/JKS	획기적/NNG	으로/JKB	변하/VV	고/EC	있/VX	기/ETN	때문/NNB	에/JKB	고객/NNG	과/JKB	의/JKG	의사소통/NNG	채널/NNG	을/JKO	디지털/NNG	화/XSN	하/XSV	는/ETM	것/NNB	은/JX	가장/MAG	시급/XR	하/XSA	ㄴ/ETM	일/NNB	이/VCP	다/EF	./SF	-45.09
-커뮤니케이션/NNG	수단/NNG	이/JKS	획기적/NNG	으로/JKB	변하/VV	고/EC	있/VX	기/ETN	때문/NNB	에/JKB	고객/NNG	과/JKB	의/JKG	의사소통/NNG	채널/NNG	을/JKO	디지털/NNG	화/XSN	하/XSV	는/ETM	것/NNB	은/JX	가장/MAG	시급/XR	하/XSA	ㄴ/ETM	일/NNG	이/VCP	다/EF	./SF	-44.27
-커뮤니케이션/NNG	수단/NNG	이/JKS	획기적/NNG	으로/JKB	변하/VV	고/EC	있/VX	기/ETN	때문/NNB	에/JKB	고객/NNG	과/JKB	의/JKG	의사소통/NNG	채널/NNG	을/JKO	디지털/NNG	화/XSN	하/XSV	는/ETM	것/NNB	은/JX	가장/MAG	시급/XR	하/XSV	ㄴ/ETM	일/NNB	이/VCP	다/EF	./SF	-47.12
+커뮤니케이션/NNG	수단/NNG	이/JKS	획기적/NNG	으로/JKB	변하/VV	고/EC	있/VX	기/ETN	때문/NNB	에/JKB	고객/NNG	과/JKB	의/JKG	의사소통/NNG	채널/NNG	을/JKO	디지털/NNG	화/XSN	하/XSV	는/ETM	것/NNB	은/JX	가장/MAG	시급/XR	하/XSA	ㄴ/ETM	일/NNB	이/VCP	다/EF	./SF	-41.5
+커뮤니케이션/NNG	수단/NNG	이/JKS	획기적/NNG	으로/JKB	변하/VV	고/EC	있/VX	기/ETN	때문/NNB	에/JKB	고객/NNG	과/JKB	의/JKG	의사소통/NNG	채널/NNG	을/JKO	디지털/NNG	화/XSN	하/XSV	는/ETM	것/NNB	은/JX	가장/MAG	시급/XR	하/XSA	ㄴ/ETM	일/NNG	이/VCP	다/EF	./SF	-40.67
+커뮤니케이션/NNG	수단/NNG	이/JKS	획기적/NNG	으로/JKB	변하/VV	고/EC	있/VX	기/ETN	때문/NNB	에/JKB	고객/NNG	과/JKB	의/JKG	의사소통/NNG	채널/NNG	을/JKO	디지털/NNG	화/XSN	하/XSV	는/ETM	것/NNB	은/JX	가장/MAG	시급/XR	하/XSV	ㄴ/ETM	일/NNB	이/VCP	다/EF	./SF	-43.52
 
 판매채널에서는 중개인을 제거하고, 상품과 서비스에 관한 정보를 고객에게 창조적으로 제공하는 방법을 끊임없이 개발해야 한다.	0.892
 판매/NNG	채널/NNG	에서/JKB	는/JX	중개인/NNG	을/JKO	제거/NNG	하/XSV	고/EC	,/SP	상품/NNG	과/JC	서비스/NNG	에/JKB	관하/VV	ㄴ/ETM	정보/NNG	를/JKO	고객/NNG	에게/JKB	창조/NNG	적/XSN	으로/JKB	제공/NNG	하/XSV	는/ETM	방법/NNG	을/JKO	끊임없이/MAG	개발/NNG	하/XSV	아야/EC	하/VX	ㄴ다/EF	./SF	
@@ -7652,9 +7652,9 @@ CEO/SL	와/JKB	정치가/NNG	와/JKB	같/VA	은/ETM	사회/NNG	의/JKG	지도/NNG	층/XSN	인�
 
 후생복지시장의 활성화, 기업자금시장(대출, 회사채 발행) 등의 다양한 분야는 영업사원의 고비용을 절약할 수 있는 좋은 수단이 될 것이다.	0.875
 후생/NNG	복지/NNG	시장/NNG	의/JKG	활성/NNG	화/XSN	,/SP	기업/NNG	자금/NNG	시장/NNG	(/SS	대출/NNG	,/SP	회사채/NNG	발행/NNG	)/SS	등/NNB	의/JKG	다양/NNG	하/XSA	ㄴ/ETM	분야/NNG	는/JX	영업/NNG	사원/NNG	의/JKG	고/XPN	비용/NNG	을/JKO	절약/NNG	하/XSV	ㄹ/ETM	수/NNB	있/VV	는/ETM	좋/VA	은/ETM	수단/NNG	이/JKC	되/VV	ㄹ/ETM	것/NNB	이/VCP	다/EF	./SF	
-후생/NNG	복지/NNG	시장/NNG	의/JKG	활성/NNG	화/XSN	,/SP	기업/NNG	자금/NNG	시장/NNG	(/SS	대출/NNG	,/SP	회사채/NNG	발행/NNG	)/SS	등/NNB	의/JKG	다양/NNG	하/XSA	ㄴ/ETM	분야/NNG	는/JX	영업/NNG	사원/NNG	의/JKG	고비/NNG	용/XSN	을/JKO	절약/NNG	하/XSV	ㄹ/ETM	수/NNB	있/VV	는/ETM	좋/VA	은/ETM	수단/NNG	이/JKS	되/VV	ㄹ/ETM	것/NNB	이/VCP	다/EF	./SF	-69.61
-후생/NNG	복지/NNG	시장/NNG	의/JKG	활성/NNG	화/XSN	,/SP	기업/NNG	자금/NNG	시장/NNG	(/SS	대출/NNG	,/SP	회사채/NNG	발행/NNG	)/SS	등/NNB	의/JKG	다양/NNG	하/XSA	ㄴ/ETM	분야/NNG	는/JX	영업/NNG	사원/NNG	의/JKG	고/XPN	비용/NNG	을/JKO	절약/NNG	하/XSV	ㄹ/ETM	수/NNB	있/VV	는/ETM	좋/VA	은/ETM	수단/NNG	이/JKS	되/VV	ㄹ/ETM	것/NNB	이/VCP	다/EF	./SF	-70.15
-후생/NNG	복지/NNG	시장/NNG	의/JKG	활성/NNG	화/XSN	,/SP	기업/NNG	자금/NNG	시장/NNG	(/SS	대출/NNG	,/SP	회사채/NNG	발행/NNG	)/SS	등/NNB	의/JKG	다양/NNG	하/XSA	ㄴ/ETM	분야/NNG	는/JX	영업/NNG	사원/NNG	의/JKG	고비/NNG	용/XSN	을/JKO	절약/NNG	하/XSV	ㄹ/ETM	수/NNB	있/VX	는/ETM	좋/VA	은/ETM	수단/NNG	이/JKS	되/VV	ㄹ/ETM	것/NNB	이/VCP	다/EF	./SF	-73.49
+후생/NNG	복지/NNG	시장/NNG	의/JKG	활성/NNG	화/XSN	,/SP	기업/NNG	자금/NNG	시장/NNG	(/SS	대출/NNG	,/SP	회사채/NNG	발행/NNG	)/SS	등/NNB	의/JKG	다양/NNG	하/XSA	ㄴ/ETM	분야/NNG	는/JX	영업/NNG	사원/NNG	의/JKG	고비/NNG	용/XSN	을/JKO	절약/NNG	하/XSV	ㄹ/ETM	수/NNB	있/VV	는/ETM	좋/VA	은/ETM	수단/NNG	이/JKS	되/VV	ㄹ/ETM	것/NNB	이/VCP	다/EF	./SF	-66.29
+후생/NNG	복지/NNG	시장/NNG	의/JKG	활성/NNG	화/XSN	,/SP	기업/NNG	자금/NNG	시장/NNG	(/SS	대출/NNG	,/SP	회사채/NNG	발행/NNG	)/SS	등/NNB	의/JKG	다양/NNG	하/XSA	ㄴ/ETM	분야/NNG	는/JX	영업/NNG	사원/NNG	의/JKG	고/XPN	비용/NNG	을/JKO	절약/NNG	하/XSV	ㄹ/ETM	수/NNB	있/VV	는/ETM	좋/VA	은/ETM	수단/NNG	이/JKS	되/VV	ㄹ/ETM	것/NNB	이/VCP	다/EF	./SF	-66.83
+후생/NNG	복지/NNG	시장/NNG	의/JKG	활성/NNG	화/XSN	,/SP	기업/NNG	자금/NNG	시장/NNG	(/SS	대출/NNG	,/SP	회사채/NNG	발행/NNG	)/SS	등/NNB	의/JKG	다양/NNG	하/XSA	ㄴ/ETM	분야/NNG	는/JX	영업/NNG	사원/NNG	의/JKG	고비/NNG	용/XSN	을/JKO	절약/NNG	하/XSV	ㄹ/ETM	수/NNB	있/VX	는/ETM	좋/VA	은/ETM	수단/NNG	이/JKS	되/VV	ㄹ/ETM	것/NNB	이/VCP	다/EF	./SF	-70.17
 
 자산운용 분야는 이러한 분야를 활성화할 여지가 많다.	0.842
 자산/NNG	운용/NNG	분야/NNG	는/JX	이러/XR	하/XSA	ㄴ/ETM	분야/NNG	를/JKO	활성/NNG	화/XSN	하/XSV	ㄹ/ETM	여지/NNB	가/JKS	많/VA	다/EF	./SF	
@@ -8048,15 +8048,15 @@ B/SL	이/VCP	라는/ETM	설계사/NNG	는/JX	결혼/NNG	기념일/NNG	축하/NNG	이메일/NNG	을
 
 C라는 설계사는 결혼기념일 축하 이메일을 휴대폰으로 3월 12일 발송했다.	0.864
 C/SL	이/VCP	라는/ETM	설계사/NNG	는/JX	결혼기념일/NNG	축하/NNG	이메일/NNG	을/JKO	휴대폰/NNG	으로/JKB	3/SN	월/NNB	12/SN	일/NNB	발송/NNG	하/XSV	았/EP	다/EF	./SF	
-C/SL	이/VCP	라는/ETM	설계사/NNG	는/JX	결혼/NNG	기념일/NNG	축하/NNG	이메일/NNG	을/JKO	휴대폰/NNG	으로/JKB	3/SN	월/NNB	12/SN	일/NNB	발송/NNG	하/XSV	았/EP	다/EF	./SF	-37.87
-C/SL	이/VCP	라는/ETM	설계사/NNG	는/JX	결혼/NNG	기념일/NNG	축하/NNG	이메일/NNG	을/JKO	휴대폰/NNG	으로/JKB	3/SN	월/NNB	12/SN	일/NNB	발송/NNG	하/XSA	았/EP	다/EF	./SF	-42.05
-C/SL	이/VCP	라는/ETM	설계사/NNG	는/JX	결혼/NNG	기념일/NNG	축하/NNG	이메일/NNG	을/JKO	휴대폰/NNG	으로/JKB	3/SN	월/NNB	12/SN	일/NNG	발송/NNG	하/XSV	았/EP	다/EF	./SF	-46
+C/SL	이/VCP	라는/ETM	설계사/NNG	는/JX	결혼/NNG	기념일/NNG	축하/NNG	이메일/NNG	을/JKO	휴대폰/NNG	으로/JKB	3/SN	월/NNB	12/SN	일/NNB	발송/NNG	하/XSV	았/EP	다/EF	./SF	-35.7
+C/SL	이/VCP	라는/ETM	설계사/NNG	는/JX	결혼/NNG	기념일/NNG	축하/NNG	이메일/NNG	을/JKO	휴대폰/NNG	으로/JKB	3/SN	월/NNB	12/SN	일/NNB	발송/NNG	하/XSA	았/EP	다/EF	./SF	-39.89
+C/SL	이/VCP	라는/ETM	설계사/NNG	는/JX	결혼/NNG	기념일/NNG	축하/NNG	이메일/NNG	을/JKO	휴대폰/NNG	으로/JKB	3/SN	월/NNB	12/SN	일/NNG	발송/NNG	하/XSV	았/EP	다/EF	./SF	-43.83
 
 A사장은 12일 퇴근무렵 휴대폰에서 이메일을 보고 부인에게 줄 선물을 사갖고 일찍 귀가할 수 있었다.	0.8
 A/SL	사장/NNG	은/JX	12/SN	일/NNB	퇴근/NNG	무렵/NNB	휴대폰/NNG	에서/JKB	이메일/NNG	을/JKO	보/VV	고/EC	부인/NNG	에게/JKB	주/VV	ㄹ/ETM	선물/NNG	을/JKO	사/NNG	갖/VV	고/EC	일찍/MAG	귀가/NNG	하/XSV	ㄹ/ETM	수/NNB	있/VV	었/EP	다/EF	./SF	
-A/SL	사장/NNG	은/JX	12/SN	일/NNB	퇴근/NNG	무렵/NNB	휴대폰/NNG	에서/JKB	이메일/NNG	을/JKO	보/VV	고/EC	부인/NNG	에게/JKB	주/VV	ㄹ/ETM	선물/NNG	을/JKO	사/VV	아/EC	갖/VX	고/EC	일찍/MAG	귀가/NNG	하/XSV	ㄹ/ETM	수/NNB	있/VX	었/EP	다/EF	./SF	-53.17
-A/SL	사장/NNG	은/JX	12/SN	일/NNB	퇴근/NNG	무렵/NNB	휴대폰/NNG	에서/JKB	이메일/NNG	을/JKO	보/VV	고/EC	부인/NNG	에게/JKB	주/VV	ㄹ/ETM	선물/NNG	을/JKO	사/VV	아/EC	갖/VV	고/EC	일찍/MAG	귀가/NNG	하/XSV	ㄹ/ETM	수/NNB	있/VX	었/EP	다/EF	./SF	-53.25
-A/SL	사장/NNG	은/JX	12/SN	일/NNB	퇴근/NNG	무렵/NNB	휴대폰/NNG	에서/JKB	이메일/NNG	을/JKO	보/VV	고/EC	부인/NNG	에게/JKB	주/VV	ㄹ/ETM	선물/NNG	을/JKO	사/VV	아/EC	갖/VX	고/EC	일찍/MAG	귀가/NNG	하/XSV	ㄹ/ETM	수/NNB	있/VV	었/EP	다/EF	./SF	-49.63
+A/SL	사장/NNG	은/JX	12/SN	일/NNB	퇴근/NNG	무렵/NNB	휴대폰/NNG	에서/JKB	이메일/NNG	을/JKO	보/VV	고/EC	부인/NNG	에게/JKB	주/VV	ㄹ/ETM	선물/NNG	을/JKO	사/VV	아/EC	갖/VX	고/EC	일찍/MAG	귀가/NNG	하/XSV	ㄹ/ETM	수/NNB	있/VX	었/EP	다/EF	./SF	-48.85
+A/SL	사장/NNG	은/JX	12/SN	일/NNB	퇴근/NNG	무렵/NNB	휴대폰/NNG	에서/JKB	이메일/NNG	을/JKO	보/VV	고/EC	부인/NNG	에게/JKB	주/VV	ㄹ/ETM	선물/NNG	을/JKO	사/VV	아/EC	갖/VV	고/EC	일찍/MAG	귀가/NNG	하/XSV	ㄹ/ETM	수/NNB	있/VX	었/EP	다/EF	./SF	-48.93
+A/SL	사장/NNG	은/JX	12/SN	일/NNB	퇴근/NNG	무렵/NNB	휴대폰/NNG	에서/JKB	이메일/NNG	을/JKO	보/VV	고/EC	부인/NNG	에게/JKB	주/VV	ㄹ/ETM	선물/NNG	을/JKO	사/VV	아/EC	갖/VX	고/EC	일찍/MAG	귀가/NNG	하/XSV	ㄹ/ETM	수/NNB	있/VV	었/EP	다/EF	./SF	-45.31
 
 여섯째, 문서작성시 제목은 과감하게 압축한다.	0.867
 여섯째/NR	,/SP	문서/NNG	작성/NNG	시/NNB	제목/NNG	은/JX	과감/XR	하/XSA	게/EC	압축/NNG	하/XSV	ㄴ다/EF	./SF	
@@ -8498,9 +8498,9 @@ A/SL	사장/NNG	은/JX	12/SN	일/NNB	퇴근/NNG	무렵/NNB	휴대폰/NNG	에서/JKB	이메일/NN
 
 회사에는 보유계약을 늘리고, 어려운 영업소의 활로를 찾는 것이 될 것이다.	0.923
 회사/NNG	에/JKB	는/JX	보유/NNG	계약/NNG	을/JKO	늘리/VV	고/EC	,/SP	어렵/VA	ㄴ/ETM	영업소/NNG	의/JKG	활로/NNG	를/JKO	찾/VV	는/ETM	것/NNB	이/JKC	되/VV	ㄹ/ETM	것/NNB	이/VCP	다/EF	./SF	
-회사/NNG	에/JKB	는/JX	보유/NNG	계약/NNG	을/JKO	늘리/VV	고/EC	,/SP	어렵/VA	은/ETM	영업소/NNG	의/JKG	활로/NNG	를/JKO	찾/VV	는/ETM	것/NNB	이/JKC	되/VV	ㄹ/ETM	것/NNB	이/VCP	다/EF	./SF	-28.85
-회사/NNG	에/JKB	는/JX	보유/NNG	계약/NNG	을/JKO	늘리/VV	고/EC	,/SP	어렵/VA	은/ETM	영업소/NNG	의/JKG	활로/NNG	를/JKO	찾/VV	는/ETM	것/NNB	이/JKS	되/VV	ㄹ/ETM	것/NNB	이/VCP	다/EF	./SF	-31.55
-회/NNB	사/NNG	에/JKB	는/JX	보유/NNG	계약/NNG	을/JKO	늘리/VV	고/EC	,/SP	어렵/VA	은/ETM	영업소/NNG	의/JKG	활로/NNG	를/JKO	찾/VV	는/ETM	것/NNB	이/JKS	되/VV	ㄹ/ETM	것/NNB	이/VCP	다/EF	./SF	-36.85
+회사/NNG	에/JKB	는/JX	보유/NNG	계약/NNG	을/JKO	늘리/VV	고/EC	,/SP	어렵/VA	은/ETM	영업소/NNG	의/JKG	활로/NNG	를/JKO	찾/VV	는/ETM	것/NNB	이/JKC	되/VV	ㄹ/ETM	것/NNB	이/VCP	다/EF	./SF	-23.31
+회사/NNG	에/JKB	는/JX	보유/NNG	계약/NNG	을/JKO	늘리/VV	고/EC	,/SP	어렵/VA	은/ETM	영업소/NNG	의/JKG	활로/NNG	를/JKO	찾/VV	는/ETM	것/NNB	이/JKS	되/VV	ㄹ/ETM	것/NNB	이/VCP	다/EF	./SF	-26.01
+회/NNB	사/NNG	에/JKB	는/JX	보유/NNG	계약/NNG	을/JKO	늘리/VV	고/EC	,/SP	어렵/VA	은/ETM	영업소/NNG	의/JKG	활로/NNG	를/JKO	찾/VV	는/ETM	것/NNB	이/JKS	되/VV	ㄹ/ETM	것/NNB	이/VCP	다/EF	./SF	-31.31
 
 - 시나리오 C:부장은 나에게 관심을 보이지 않으면서 수금을 계속한다.	0.905
 -/SS	시나리오/NNG	C/SL	:/SP	부장/NNG	은/JX	나/NP	에게/JKB	관심/NNG	을/JKO	보이/VV	지/EC	않/VX	으면서/EC	수금/NNG	을/JKO	계속/NNG	하/XSV	ㄴ다/EF	./SF	
@@ -8702,9 +8702,9 @@ A/SL	사장/NNG	은/JX	12/SN	일/NNB	퇴근/NNG	무렵/NNB	휴대폰/NNG	에서/JKB	이메일/NN
 
 부장님의 그러한 태도는 이 회사에 도움이 되지 않습니다." "뭐야, 이 친구 형편없는 놈 아니야.	0.75
 부장/NNG	님/XSN	의/JKG	그러/XR	하/XSA	ㄴ/ETM	태도/NNG	는/JX	이/MM	회사/NNG	에/JKB	도움/NNG	이/JKC	되/VV	지/EC	않/VX	습니다/EF	./SF	"/SS	"/SS	뭐/NP	이/VCP	야/EC	,/SP	이/MM	친구/NNG	형편없/VA	는/ETM	놈/NNB	아니/VCN	야/EF	./SF	
-부장/NNG	님/XSN	의/JKG	그러하/VA	ㄴ/ETM	태도/NNG	는/JX	이/MM	회사/NNG	에/JKB	도움/NNG	이/JKS	되/VV	지/EC	않/VX	습니다/EF	./SF	"/SS	"/SS	뭐/NP	이/VCP	야/EF	,/SP	이/NP	친구/NNG	형편없/VA	는/ETM	놈/NNB	아니/VCN	야/EF	./SF	-60.7
-부장/NNG	님/XSN	의/JKG	그러하/VA	ㄴ/ETM	태도/NNG	는/JX	이/MM	회사/NNG	에/JKB	도움/NNG	이/JKS	되/VV	지/EC	않/VX	습니다/EF	./SF	"/SS	"/SS	뭐/NP	이/VCP	야/EF	,/SP	이/MM	친구/NNG	형편없/VA	는/ETM	놈/NNB	아니/VCN	야/EF	./SF	-61.07
-부장/NNG	님/XSN	의/JKG	그러하/VA	ㄴ/ETM	태도/NNG	는/JX	이/MM	회사/NNG	에/JKB	도움/NNG	이/JKS	되/VV	지/EC	않/VX	습니다/EF	./SF	"/SS	"/SS	뭐/NP	이/VCP	야/EF	,/SP	이/NP	친구/NNG	형편없/VA	는/ETM	놈/NNB	아니야/IC	./SF	-63.59
+부장/NNG	님/XSN	의/JKG	그러하/VA	ㄴ/ETM	태도/NNG	는/JX	이/MM	회사/NNG	에/JKB	도움/NNG	이/JKS	되/VV	지/EC	않/VX	습니다/EF	./SF	"/SS	"/SS	뭐/NP	이/VCP	야/EF	,/SP	이/NP	친구/NNG	형편없/VA	는/ETM	놈/NNB	아니/VCN	야/EF	./SF	-57.74
+부장/NNG	님/XSN	의/JKG	그러하/VA	ㄴ/ETM	태도/NNG	는/JX	이/MM	회사/NNG	에/JKB	도움/NNG	이/JKS	되/VV	지/EC	않/VX	습니다/EF	./SF	"/SS	"/SS	뭐/NP	이/VCP	야/EF	,/SP	이/MM	친구/NNG	형편없/VA	는/ETM	놈/NNB	아니/VCN	야/EF	./SF	-58.11
+부장/NNG	님/XSN	의/JKG	그러하/VA	ㄴ/ETM	태도/NNG	는/JX	이/MM	회사/NNG	에/JKB	도움/NNG	이/JKS	되/VV	지/EC	않/VX	습니다/EF	./SF	"/SS	"/SS	뭐/NP	이/VCP	야/EF	,/SP	이/NP	친구/NNG	형편없/VA	는/ETM	놈/NNB	아니야/IC	./SF	-60.63
 
 당장 교보 해약해." "그렇게 회사 일을 감정으로 처리하시면 안 됩니다.	0.704
 당장/NNG	교보/NNP	해약/NNG	하/XSV	아/EF	./SF	"/SS	"/SS	그러게/IC	회사/NNG	일/NNG	을/JKO	감정/NNG	으로/JKB	처리/NNG	하/XSV	시/EP	면/EC	안/MAG	되/VV	ㅂ니다/EF	./SF	
@@ -9756,9 +9756,9 @@ A/SL	는/JX	신/XPN	계약/NNG	은/JX	잘/MAG	하/XSV	는데/EC	도입/NNG	을/JKO	안/MAG	하
 
 모진 역경이 갈 길을 방해하더라도 뿌리치는 힘이 있어야 한다.	0.905
 모질/VA	ㄴ/ETM	역경/NNG	이/JKS	가/VV	ㄹ/ETM	길/NNG	을/JKO	방해/NNG	하/XSV	더라도/EC	뿌리치/VV	는/ETM	힘/NNG	이/JKS	있/VV	어야/EC	하/VX	ㄴ다/EF	./SF	
-모질/VA	ㄴ/ETM	역경/NNG	이/JKS	가/VV	ㄹ/ETM	길/NNG	을/JKO	방해/NNG	하/XSV	더라도/EC	뿌리치/VV	는/ETM	힘/NNG	이/JKS	있/VV	어야/EC	하/VV	ㄴ다/EF	./SF	-38.15
-모질/VA	ㄴ/ETM	역경/NNG	이/JKS	가/VV	ㄹ/ETM	길/NNG	을/JKO	방해/NNG	하/XSV	더라도/EC	뿌리치/VV	는/ETM	힘/NNG	이/JKS	있/VV	어야/EC	하/VX	ㄴ다/EF	./SF	-33.81
-모질/VA	ㄴ/ETM	역경/NNG	이/JKS	가/VV	ㄹ/ETM	길/NNG	을/JKO	방해/NNG	하/XSV	더라도/EC	뿌리치/VV	는/ETM	힘/NNG	이/JKS	있/VX	어야/EC	하/VV	ㄴ다/EF	./SF	-38.66
+모질/VA	ㄴ/ETM	역경/NNG	이/JKS	가/VV	ㄹ/ETM	길/NNG	을/JKO	방해/NNG	하/XSV	더라도/EC	뿌리치/VV	는/ETM	힘/NNG	이/JKS	있/VV	어야/EC	하/VV	ㄴ다/EF	./SF	-36.28
+모질/VA	ㄴ/ETM	역경/NNG	이/JKS	가/VV	ㄹ/ETM	길/NNG	을/JKO	방해/NNG	하/XSV	더라도/EC	뿌리치/VV	는/ETM	힘/NNG	이/JKS	있/VV	어야/EC	하/VX	ㄴ다/EF	./SF	-31.94
+모질/VA	ㄴ/ETM	역경/NNG	이/JKS	가/VV	ㄹ/ETM	길/NNG	을/JKO	방해/NNG	하/XSV	더라도/EC	뿌리치/VV	는/ETM	힘/NNG	이/JKS	있/VX	어야/EC	하/VV	ㄴ다/EF	./SF	-36.8
 
 구절양장같이 꼬인 일도 간단하게 본질을 파악하고 헤쳐나갈 지혜가 있어야 한다.	0.759
 구절양장/NNG	같이/JKB	꼬이/VV	ㄴ/ETM	일/NNG	도/JX	간단/XR	하/XSA	게/EC	본질/NNG	을/JKO	파악/NNG	하/XSV	고/EC	헤치/VV	어/EC	나가/VX	ㄹ/ETM	지혜/NNG	가/JKS	있/VV	어야/EC	하/VX	ㄴ다/EF	./SF	
@@ -10678,9 +10678,9 @@ A/SL	는/JX	신/XPN	계약/NNG	은/JX	잘/MAG	하/XSV	는데/EC	도입/NNG	을/JKO	안/MAG	하
 
 무조건 따라 나서지 말고 상황을 파악한 후에 영업사원이 새로운 활로를 찾을 수 있도록 해주어야 한다.	0.675
 무조건/MAG	따르/VV	아/EC	나서/VV	지/EC	말/VX	고/EC	상황/NNG	을/JKO	파악/NNG	하/XSV	ㄴ/ETM	후/NNG	에/JKB	영업/NNG	사원/NNG	이/JKS	새롭/VA	ㄴ/ETM	활로/NNG	를/JKO	찾/VV	을/ETM	수/NNB	있/VV	도록/EC	하/VX	아/EC	주/VX	어야/EC	하/VX	ㄴ다/EF	./SF	
-무/XPN	조건/NNG	따/VV	아라/EC	나서/VV	지/EC	말/VX	고/EC	상황/NNG	을/JKO	파악/NNG	하/XSV	ㄴ/ETM	후/NNG	에/JKB	영업/NNG	사원/NNG	이/JKS	새롭/VA	은/ETM	활로/NNG	를/JKO	찾/VV	을/ETM	수/NNB	있/VV	도록/EC	하/VV	아/EC	주/VX	어야/EC	하/VV	ㄴ다/EF	./SF	-36.12
-무/XPN	조건/NNG	따/VV	아라/EC	나서/VV	지/EC	말/VX	고/EC	상황/NNG	을/JKO	파악/NNG	하/XSV	ㄴ/ETM	후/NNG	에/JKB	영업/NNG	사원/NNG	이/JKS	새롭/VA	은/ETM	활로/NNG	를/JKO	찾/VV	을/ETM	수/NNB	있/VV	도록/EC	하/VV	아/EC	주/VX	어야/EC	하/VX	ㄴ다/EF	./SF	-30.51
-무/XPN	조건/NNG	따/VV	아라/EC	나서/VV	지/EC	말/VX	고/EC	상황/NNG	을/JKO	파악/NNG	하/XSV	ㄴ/ETM	후에/NNP	영업/NNG	사원/NNG	이/JKS	새롭/VA	은/ETM	활로/NNG	를/JKO	찾/VV	을/ETM	수/NNB	있/VV	도록/EC	하/VV	아/EC	주/VX	어야/EC	하/VV	ㄴ다/EF	./SF	-38.12
+무/XPN	조건/NNG	따/VV	아라/EC	나서/VV	지/EC	말/VX	고/EC	상황/NNG	을/JKO	파악/NNG	하/XSV	ㄴ/ETM	후/NNG	에/JKB	영업/NNG	사원/NNG	이/JKS	새롭/VA	은/ETM	활로/NNG	를/JKO	찾/VV	을/ETM	수/NNB	있/VV	도록/EC	하/VV	아/EC	주/VX	어야/EC	하/VV	ㄴ다/EF	./SF	-29.68
+무/XPN	조건/NNG	따/VV	아라/EC	나서/VV	지/EC	말/VX	고/EC	상황/NNG	을/JKO	파악/NNG	하/XSV	ㄴ/ETM	후/NNG	에/JKB	영업/NNG	사원/NNG	이/JKS	새롭/VA	은/ETM	활로/NNG	를/JKO	찾/VV	을/ETM	수/NNB	있/VV	도록/EC	하/VV	아/EC	주/VX	어야/EC	하/VX	ㄴ다/EF	./SF	-24.08
+무/XPN	조건/NNG	따/VV	아라/EC	나서/VV	지/EC	말/VX	고/EC	상황/NNG	을/JKO	파악/NNG	하/XSV	ㄴ/ETM	후에/NNP	영업/NNG	사원/NNG	이/JKS	새롭/VA	은/ETM	활로/NNG	를/JKO	찾/VV	을/ETM	수/NNB	있/VV	도록/EC	하/VV	아/EC	주/VX	어야/EC	하/VV	ㄴ다/EF	./SF	-31.69
 
 그 방법으로 영업사원의 제안 내용에 문제가 있다면 제안서를 고쳐주면 되고, 언행에 문제가 있었다면 언행을 고쳐주어야 한다.	0.9
 그/MM	방법/NNG	으로/JKB	영업/NNG	사원/NNG	의/JKG	제안/NNG	내용/NNG	에/JKB	문제/NNG	가/JKS	있/VV	다면/EC	제안서/NNG	를/JKO	고치/VV	어/EC	주/VX	면/EC	되/VV	고/EC	,/SP	언행/NNG	에/JKB	문제/NNG	가/JKS	있/VV	었/EP	다면/EC	언행/NNG	을/JKO	고치/VV	어/EC	주/VX	어야/EC	하/VX	ㄴ다/EF	./SF	
@@ -11602,9 +11602,9 @@ S/SL	사/NNG	의/JKG	전무/NNG	와/JKB	막역/XR	하/XSV	ㄴ/ETM	관계/NNG	이/VCP	어서/EC
 
 청 왕조의 부정부패에 환멸을 느끼고 당을 창업한 이세민의 일대기를 그린 《정관정요》, 오다 노부나가의 일대기라든가, 도쿠가와 이에야스의 《야망》, 조선을 연 이성계의 일대기 등을 읽다보면 책 속에서 지혜와 힘을 빌릴 수 있다.	0.797
 청/NNP	왕조/NNG	의/JKG	부정부패/NNG	에/JKB	환멸/NNG	을/JKO	느끼/VV	고/EC	당/NNG	을/JKO	창업/NNG	하/XSV	ㄴ/ETM	이세민/NNP	의/JKG	일대기/NNG	를/JKO	그리/VV	ㄴ/ETM	《/SS	정관정요/NNP	》/SS	,/SP	오다/NNP	노부나가/NNP	의/JKG	일대기/NNG	이/VCP	라든가/EC	,/SP	도쿠가와/NNP	이에야스/NNP	의/JKG	《/SS	야망/NNP	》/SS	,/SP	조선/NNP	을/JKO	열/VV	ㄴ/ETM	이성계/NNP	의/JKG	일대기/NNG	등/NNB	을/JKO	읽/VV	다/EC	보/VX	면/EC	책/NNG	속/NNG	에서/JKB	지혜/NNG	와/JC	힘/NNG	을/JKO	빌리/VV	ㄹ/ETM	수/NNB	있/VV	다/EF	./SF	
-청/NNP	왕조/NNG	의/JKG	부정부패/NNG	에/JKB	환멸/NNG	을/JKO	느끼/VV	고/EC	당/NNG	을/JKO	창업/NNG	하/XSV	ㄴ/ETM	이세민/NNP	의/JKG	일대기/NNG	를/JKO	그리/VV	ㄴ/ETM	《/SS	정관/NNG	정/NNG	이/VCP	요/EC	》/SS	,/SP	오/VV	다/EC	노부나가/NNP	의/JKG	일대기/NNG	이/VCP	라든가/EC	,/SP	도쿠가/NNG	와/JKB	이에야스/NNP	의/JKG	《/SS	야망/NNG	》/SS	,/SP	조선/NNP	을/JKO	열/VV	ㄴ/ETM	이성계/NNP	의/JKG	일대기/NNG	등/NNB	을/JKO	읽/VV	다/EC	보/VX	면/EC	책/NNG	속/NNG	에서/JKB	지혜/NNG	와/JC	힘/NNG	을/JKO	빌리/VV	ㄹ/ETM	수/NNB	있/VX	다/EF	./SF	-166.8
-청/NNP	왕조/NNG	의/JKG	부정부패/NNG	에/JKB	환멸/NNG	을/JKO	느끼/VV	고/EC	당/NNG	을/JKO	창업/NNG	하/XSV	ㄴ/ETM	이세민/NNP	의/JKG	일대기/NNG	를/JKO	그리/VV	ㄴ/ETM	《/SS	정관/NNG	정/NNG	이/VCP	요/EC	》/SS	,/SP	오/VV	다/EC	노부나가/NNP	의/JKG	일대기/NNG	이/VCP	라든가/EC	,/SP	도쿠가/NNP	와/JC	이에야스/NNP	의/JKG	《/SS	야망/NNG	》/SS	,/SP	조선/NNP	을/JKO	열/VV	ㄴ/ETM	이성계/NNP	의/JKG	일대기/NNG	등/NNB	을/JKO	읽/VV	다/EC	보/VX	면/EC	책/NNG	속/NNG	에서/JKB	지혜/NNG	와/JC	힘/NNG	을/JKO	빌리/VV	ㄹ/ETM	수/NNB	있/VX	다/EF	./SF	-167
-청/NNP	왕조/NNG	의/JKG	부정부패/NNG	에/JKB	환멸/NNG	을/JKO	느끼/VV	고/EC	당/NNG	을/JKO	창업/NNG	하/XSV	ㄴ/ETM	이세민/NNP	의/JKG	일대기/NNG	를/JKO	그리/VV	ㄴ/ETM	《/SS	정관/NNG	정/NNG	이/VCP	요/EC	》/SS	,/SP	오/VV	다/EC	노부나가/NNP	의/JKG	일대기/NNG	이/VCP	라든가/EC	,/SP	도쿠가/NNG	와/JKB	이에야스/NNP	의/JKG	《/SS	야망/NNG	》/SS	,/SP	조선/NNP	을/JKO	열/VV	ㄴ/ETM	이성계/NNP	의/JKG	일대기/NNG	등/NNB	을/JKO	읽/VV	다/EC	보/VX	면/EC	책/NNG	속/NNG	에서/JKB	지혜/NNG	와/JC	힘/NNG	을/JKO	빌리/VV	ㄹ/ETM	수/NNB	있/VV	다/EF	./SF	-163.7
+청/NNP	왕조/NNG	의/JKG	부정부패/NNG	에/JKB	환멸/NNG	을/JKO	느끼/VV	고/EC	당/NNG	을/JKO	창업/NNG	하/XSV	ㄴ/ETM	이세민/NNP	의/JKG	일대기/NNG	를/JKO	그리/VV	ㄴ/ETM	《/SS	정관/NNG	정/NNG	이/VCP	요/EC	》/SS	,/SP	오/VV	다/EC	노부나가/NNP	의/JKG	일대기/NNG	이/VCP	라든가/EC	,/SP	도쿠가/NNG	와/JKB	이에야스/NNP	의/JKG	《/SS	야망/NNG	》/SS	,/SP	조선/NNP	을/JKO	열/VV	ㄴ/ETM	이성계/NNP	의/JKG	일대기/NNG	등/NNB	을/JKO	읽/VV	다/EC	보/VX	면/EC	책/NNG	속/NNG	에서/JKB	지혜/NNG	와/JC	힘/NNG	을/JKO	빌리/VV	ㄹ/ETM	수/NNB	있/VX	다/EF	./SF	-164.8
+청/NNP	왕조/NNG	의/JKG	부정부패/NNG	에/JKB	환멸/NNG	을/JKO	느끼/VV	고/EC	당/NNG	을/JKO	창업/NNG	하/XSV	ㄴ/ETM	이세민/NNP	의/JKG	일대기/NNG	를/JKO	그리/VV	ㄴ/ETM	《/SS	정관/NNG	정/NNG	이/VCP	요/EC	》/SS	,/SP	오/VV	다/EC	노부나가/NNP	의/JKG	일대기/NNG	이/VCP	라든가/EC	,/SP	도쿠가/NNP	와/JC	이에야스/NNP	의/JKG	《/SS	야망/NNG	》/SS	,/SP	조선/NNP	을/JKO	열/VV	ㄴ/ETM	이성계/NNP	의/JKG	일대기/NNG	등/NNB	을/JKO	읽/VV	다/EC	보/VX	면/EC	책/NNG	속/NNG	에서/JKB	지혜/NNG	와/JC	힘/NNG	을/JKO	빌리/VV	ㄹ/ETM	수/NNB	있/VX	다/EF	./SF	-165
+청/NNP	왕조/NNG	의/JKG	부정부패/NNG	에/JKB	환멸/NNG	을/JKO	느끼/VV	고/EC	당/NNG	을/JKO	창업/NNG	하/XSV	ㄴ/ETM	이세민/NNP	의/JKG	일대기/NNG	를/JKO	그리/VV	ㄴ/ETM	《/SS	정관/NNG	정/NNG	이/VCP	요/EC	》/SS	,/SP	오/VV	다/EC	노부나가/NNP	의/JKG	일대기/NNG	이/VCP	라든가/EC	,/SP	도쿠가/NNG	와/JKB	이에야스/NNP	의/JKG	《/SS	야망/NNG	》/SS	,/SP	조선/NNP	을/JKO	열/VV	ㄴ/ETM	이성계/NNP	의/JKG	일대기/NNG	등/NNB	을/JKO	읽/VV	다/EC	보/VX	면/EC	책/NNG	속/NNG	에서/JKB	지혜/NNG	와/JC	힘/NNG	을/JKO	빌리/VV	ㄹ/ETM	수/NNB	있/VV	다/EF	./SF	-161.7
 
 책 속 주인공이 만약에 나와 같이 힘든 상황을 맞으면 어떤 행동을 할 것인가, 혹은 내가 만약 주인공이라면 어떻게 생각하고 행동했을까를 생각하면 좋은 방안이 떠오를지도 모른다.	0.847
 책/NNG	속/NNG	주인공/NNG	이/JKS	만약/NNG	에/JKB	나오/VV	아/EC	같이/MAG	힘들/VA	ㄴ/ETM	상황/NNG	을/JKO	맞/VV	으면/EC	어떤/MM	행동/NNG	을/JKO	하/VV	ㄹ/ETM	것/NNB	이/VCP	ㄴ가/EC	,/SP	혹은/MAG	내/NP	가/JKS	만약/NNG	주인공/NNG	이/VCP	라면/EC	어떻/VA	게/EC	생각/NNG	하/XSV	고/EC	행동/NNG	하/XSV	았/EP	을까/EC	를/JKO	생각/NNG	하/XSV	면/EC	좋/VA	은/ETM	방안/NNG	이/JKS	떠오르/VV	ㄹ지/EC	도/JX	모르/VV	ㄴ다/EF	./SF	
@@ -11716,9 +11716,9 @@ S/SL	사/NNG	의/JKG	전무/NNG	와/JKB	막역/XR	하/XSV	ㄴ/ETM	관계/NNG	이/VCP	어서/EC
 
 결론적으로 말하면 슬럼프에 빠진 조직에 힘을 불어넣기 위해서는 지도자가 앞장서서 열심히 뛰어야 한다.	0.933
 결론/NNG	적/XSN	으로/JKB	말/NNG	하/XSV	면/EC	슬럼프/NNG	에/JKB	빠지/VV	ㄴ/ETM	조직/NNG	에/JKB	힘/NNG	을/JKO	불어넣/VV	기/ETN	위하/VV	아서/EC	는/JX	지도자/NNG	가/JKS	앞장서/VV	어서/EC	열심히/MAG	뛰/VV	어야/EC	하/VX	ㄴ다/EF	./SF	
-결론/NNG	적/XSN	으로/JKB	말/NNG	하/XSV	면/EC	슬럼프/NNG	에/JKB	빠지/VV	ㄴ/ETM	조직/NNG	에/JKB	힘/NNG	을/JKO	불어넣/VV	기/ETN	위하/VV	아서/EC	는/JX	지도자/NNG	가/JKS	앞장서/VV	어서/EC	열심히/MAG	뛰/VV	어야/EC	하/VV	ㄴ다/EF	./SF	-41.79
-결론/NNG	적/XSN	으로/JKB	말/NNG	하/XSV	면/EC	슬럼프/NNG	에/JKB	빠지/VV	ㄴ/ETM	조직/NNG	에/JKB	힘/NNG	을/JKO	불어넣/VV	기/ETN	위하/VV	아서/EC	는/JX	지도자/NNG	가/JKS	앞장서/VV	어서/EC	열심히/MAG	뛰/VV	어야/EC	하/VX	ㄴ다/EF	./SF	-38.98
-결론/NNG	적/XSN	으로/JKB	말/NNG	하/XSV	면/EC	슬럼프/NNG	에/JKB	빠지/VV	ㄴ/ETM	조직/NNG	에/JKB	힘/NNG	을/JKO	불어넣/VV	기/ETN	위하/VV	아서/EC	는/JX	지도자/NNG	이/VCP	가/EC	앞장서/VV	어서/EC	열심히/MAG	뛰/VV	어야/EC	하/VV	ㄴ다/EF	./SF	-44.53
+결론/NNG	적/XSN	으로/JKB	말/NNG	하/XSV	면/EC	슬럼프/NNG	에/JKB	빠지/VV	ㄴ/ETM	조직/NNG	에/JKB	힘/NNG	을/JKO	불어넣/VV	기/ETN	위하/VV	아서/EC	는/JX	지도자/NNG	가/JKS	앞장서/VV	어서/EC	열심히/MAG	뛰/VV	어야/EC	하/VV	ㄴ다/EF	./SF	-40.6
+결론/NNG	적/XSN	으로/JKB	말/NNG	하/XSV	면/EC	슬럼프/NNG	에/JKB	빠지/VV	ㄴ/ETM	조직/NNG	에/JKB	힘/NNG	을/JKO	불어넣/VV	기/ETN	위하/VV	아서/EC	는/JX	지도자/NNG	가/JKS	앞장서/VV	어서/EC	열심히/MAG	뛰/VV	어야/EC	하/VX	ㄴ다/EF	./SF	-37.79
+결론/NNG	적/XSN	으로/JKB	말/NNG	하/XSV	면/EC	슬럼프/NNG	에/JKB	빠지/VV	ㄴ/ETM	조직/NNG	에/JKB	힘/NNG	을/JKO	불어넣/VV	기/ETN	위하/VV	아서/EC	는/JX	지도자/NNG	이/VCP	가/EC	앞장서/VV	어서/EC	열심히/MAG	뛰/VV	어야/EC	하/VV	ㄴ다/EF	./SF	-43.34
 
 그러나 리더가 그런 시각을 갖는 동안 부하직원들은 잘되는 옆사무실 영업소나 지점의 유능한 리더를 부러워하면서 당신이 빨리 다른 곳으로 가고 새로운 유능한 리더가 와서 좋은 길을 알려주기를 바라고 있다는 사실을 명심해야 한다.	0.838
 그러나/MAJ	리더/NNG	가/JKS	그런/MM	시각/NNG	을/JKO	갖/VV	는/ETM	동안/NNG	부하/NNG	직원/NNG	들/XSN	은/JX	잘/MAG	되/XSV	는/ETM	옆/NNG	사무실/NNG	영업소/NNG	나/JC	지점/NNG	의/JKG	유능/NNG	하/XSA	ㄴ/ETM	리더/NNG	를/JKO	부러워하/VV	면서/EC	당신/NP	이/JKS	빨리/MAG	다른/MM	곳/NNG	으로/JKB	가/VV	고/EC	새롭/VA	ㄴ/ETM	유능/NNG	하/XSA	ㄴ/ETM	리더/NNG	가/JKS	오/VV	아서/EC	좋/VA	은/ETM	길/NNG	을/JKO	알리/VV	어/EC	주/VX	기/ETN	를/JKO	바라/VV	고/EC	있/VX	다는/ETM	사실/NNG	을/JKO	명심/NNG	하/XSV	아야/EC	하/VX	ㄴ다/EF	./SF	
@@ -12204,9 +12204,9 @@ S/SL	사/NNG	의/JKG	전무/NNG	와/JKB	막역/XR	하/XSV	ㄴ/ETM	관계/NNG	이/VCP	어서/EC
 
 키울 사람 일을 찾아서 하는 사람 군생활을 할 때 대부분의 사병들은 훈련이 없는 휴일에는 한쪽 구석에 처박혀 잠을 잔다든지 동료들과 잡담을 하곤 했다.	0.94
 키우/VV	ㄹ/ETM	사람/NNG	일/NNG	을/JKO	찾/VV	아서/EC	하/VV	는/ETM	사람/NNG	군/NNG	생활/NNG	을/JKO	하/VV	ㄹ/ETM	때/NNG	대부분/NNG	의/JKG	사병/NNG	들/XSN	은/JX	훈련/NNG	이/JKS	없/VA	는/ETM	휴일/NNG	에/JKB	는/JX	한쪽/NNG	구석/NNG	에/JKB	처박히/VV	어/EC	잠/NNG	을/JKO	자/VV	ㄴ다/EC	든지/JX	동료/NNG	들/XSN	과/JKB	잡담/NNG	을/JKO	하/VV	곤/EC	하/VX	았/EP	다/EF	./SF	
-키우/VV	ㄹ/ETM	사람/NNG	일/NNG	을/JKO	찾/VV	아서/EC	하/VV	는/ETM	사람/NNG	군/NNG	생활/NNG	을/JKO	하/VV	ㄹ/ETM	때/NNG	대부분/NNG	의/JKG	사병/NNG	들/XSN	은/JX	훈련/NNG	이/JKS	없/VA	는/ETM	휴일/NNG	에/JKB	는/JX	한쪽/NNG	구석/NNG	에/JKB	처박히/VV	어/EC	잠/NNG	을/JKO	자/VV	ㄴ다든지/EC	동료/NNG	들/XSN	과/JKB	잡담/NNG	을/JKO	하/VX	곤/EC	하/VV	았/EP	다/EF	./SF	-83.94
-키우/VV	ㄹ/ETM	사람/NNG	일/NNG	을/JKO	찾/VV	아서/EC	하/VV	는/ETM	사람/NNG	군/NNG	생활/NNG	을/JKO	하/VV	ㄹ/ETM	때/NNG	대부분/NNG	의/JKG	사병/NNG	들/XSN	은/JX	훈련/NNG	이/JKS	없/VA	는/ETM	휴일/NNG	에/JKB	는/JX	한쪽/NNG	구석/NNG	에/JKB	처박히/VV	어/EC	잠/NNG	을/JKO	자/VV	ㄴ다든지/EC	동료/NNG	들/XSN	과/JKB	잡담/NNG	을/JKO	하/VV	곤/EC	하/VV	았/EP	다/EF	./SF	-86.97
-키우/VV	ㄹ/ETM	사람/NNG	일/NNG	을/JKO	찾/VV	아서/EC	하/VV	는/ETM	사람/NNG	군/NNG	생활/NNG	을/JKO	하/VX	ㄹ/ETM	때/NNG	대부분/NNG	의/JKG	사병/NNG	들/XSN	은/JX	훈련/NNG	이/JKS	없/VA	는/ETM	휴일/NNG	에/JKB	는/JX	한쪽/NNG	구석/NNG	에/JKB	처박히/VV	어/EC	잠/NNG	을/JKO	자/VV	ㄴ다든지/EC	동료/NNG	들/XSN	과/JKB	잡담/NNG	을/JKO	하/VV	곤/EC	하/VV	았/EP	다/EF	./SF	-87.99
+키우/VV	ㄹ/ETM	사람/NNG	일/NNG	을/JKO	찾/VV	아서/EC	하/VV	는/ETM	사람/NNG	군/NNG	생활/NNG	을/JKO	하/VV	ㄹ/ETM	때/NNG	대부분/NNG	의/JKG	사병/NNG	들/XSN	은/JX	훈련/NNG	이/JKS	없/VA	는/ETM	휴일/NNG	에/JKB	는/JX	한쪽/NNG	구석/NNG	에/JKB	처박히/VV	어/EC	잠/NNG	을/JKO	자/VV	ㄴ다든지/EC	동료/NNG	들/XSN	과/JKB	잡담/NNG	을/JKO	하/VX	곤/EC	하/VV	았/EP	다/EF	./SF	-82.8
+키우/VV	ㄹ/ETM	사람/NNG	일/NNG	을/JKO	찾/VV	아서/EC	하/VV	는/ETM	사람/NNG	군/NNG	생활/NNG	을/JKO	하/VV	ㄹ/ETM	때/NNG	대부분/NNG	의/JKG	사병/NNG	들/XSN	은/JX	훈련/NNG	이/JKS	없/VA	는/ETM	휴일/NNG	에/JKB	는/JX	한쪽/NNG	구석/NNG	에/JKB	처박히/VV	어/EC	잠/NNG	을/JKO	자/VV	ㄴ다든지/EC	동료/NNG	들/XSN	과/JKB	잡담/NNG	을/JKO	하/VV	곤/EC	하/VV	았/EP	다/EF	./SF	-85.83
+키우/VV	ㄹ/ETM	사람/NNG	일/NNG	을/JKO	찾/VV	아서/EC	하/VV	는/ETM	사람/NNG	군/NNG	생활/NNG	을/JKO	하/VX	ㄹ/ETM	때/NNG	대부분/NNG	의/JKG	사병/NNG	들/XSN	은/JX	훈련/NNG	이/JKS	없/VA	는/ETM	휴일/NNG	에/JKB	는/JX	한쪽/NNG	구석/NNG	에/JKB	처박히/VV	어/EC	잠/NNG	을/JKO	자/VV	ㄴ다든지/EC	동료/NNG	들/XSN	과/JKB	잡담/NNG	을/JKO	하/VV	곤/EC	하/VV	았/EP	다/EF	./SF	-86.85
 
 이때 이루어지는 대화의 대부분은 현실에 대한 불만과 사회에 대한 동경이었다.	0.704
 이때/NNG	이루어지/VV	는/ETM	대화/NNG	의/JKG	대부분/NNG	은/JX	현실/NNG	에/JKB	대하/VV	ㄴ/ETM	불만/NNG	과/JC	사회/NNG	에/JKB	대하/VV	ㄴ/ETM	동경/NNG	이/VCP	었/EP	다/EF	./SF	
@@ -12546,9 +12546,9 @@ L/SL	은/JX	고객/NNG	에/JKB	대하/VV	아/EC	철저히/MAG	봉사/NNG	하고/JKB	약속/NNG	�
 
 사생활이 문란한 사람 술을 먹으면 꼭 2차, 3차를 외치다가 결국 집에 안 들어가서 가정불화가 많은 사람, 남녀관계가 불분명하여 스캔들을 일으키는 사람, 금전관계가 흐릿하여 부채가 많은 사람을 가까이하면 누구나 피해를 본다.	0.773
 사생활/NNG	이/JKS	문란/NNG	하/XSA	ㄴ/ETM	사람/NNG	술/NNG	을/JKO	먹/VV	으면/EC	꼭/MAG	2/SN	차/NNB	,/SP	3/SN	차/NNB	를/JKO	외치/VV	다가/EC	결국/NNG	집/NNG	에/JKB	안/MAG	들어가/VV	아서/EC	가정불화/NNG	가/JKS	많/VA	은/ETM	사람/NNG	,/SP	남녀/NNG	관계/NNG	가/JKS	불/XPN	분명/MAG	하/XSA	아/EC	스캔들/NNG	을/JKO	일으키/VV	는/ETM	사람/NNG	,/SP	금전/NNG	관계/NNG	가/JKS	흐릿/XR	하/XSA	아/EC	부채/NNG	가/JKS	많/VA	은/ETM	사람/NNG	을/JKO	가까이/MAG	하/XSV	면/EC	누구/NP	나/JX	피해/NNG	를/JKO	보/VV	ㄴ다/EF	./SF	
-사생활/NNG	이/JKS	문란/NNG	하/XSV	ㄴ/ETM	사람/NNG	술/NNG	을/JKO	먹/VV	으면/EC	꼭/MAG	2/SN	차/NNG	,/SP	3/SN	차/NNG	를/JKO	외치/VV	다가/EC	결국/NNG	집/NNG	에/JKB	알/VV	ㄴ/ETM	들어가/VV	아서/EC	가정불화/NNG	가/JKS	많/VA	은/ETM	사람/NNG	,/SP	남녀/NNG	관계/NNG	가/JKS	불/XPN	분명/NNG	하/XSV	아/EC	스캔들/NNG	을/JKO	일으키/VV	는/ETM	사람/NNG	,/SP	금전/NNG	관계/NNG	가/JKS	흐릿/XR	하/XSA	아/EC	부채/NNG	가/JKS	많/VA	은/ETM	사람/NNG	을/JKO	가까이/NNG	하/XSV	면/EC	누구/NP	나/JX	피해/NNG	를/JKO	보/VX	ㄴ다/EF	./SF	-127.6
-사생활/NNG	이/JKS	문란/NNG	하/XSV	ㄴ/ETM	사람/NNG	술/NNG	을/JKO	먹/VV	으면/EC	꼭/MAG	2/SN	차/NNG	,/SP	3/SN	차/NNG	를/JKO	외치/VV	다가/EC	결국/NNG	집/NNG	에/JKB	알/VV	ㄴ/ETM	들어가/VV	아서/EC	가정불화/NNG	가/JKS	많/VA	은/ETM	사람/NNG	,/SP	남녀/NNG	관계/NNG	가/JKS	불/XPN	분명/NNG	하/XSV	아/EC	스캔들/NNG	을/JKO	일으키/VV	는/ETM	사람/NNG	,/SP	금전/NNG	관계/NNG	가/JKS	흐릿/XR	하/XSA	아/EC	부채/NNG	가/JKS	많/VA	은/ETM	사람/NNG	을/JKO	가까이/NNG	하/XSV	면/EC	누구/NP	나/JX	피해/NNG	를/JKO	보/VV	ㄴ다/EF	./SF	-126
-사생활/NNG	이/JKS	문란/NNG	하/XSV	ㄴ/ETM	사람/NNG	술/NNG	을/JKO	먹/VV	으면/EC	꼭/MAG	2/SN	차/NNG	,/SP	3/SN	차/NNG	를/JKO	외치/VV	다가/EC	결국/NNG	집/NNG	에/JKB	알/VV	ㄴ/ETM	들어가/VV	아서/EC	가정불화/NNG	가/JKS	많/VA	은/ETM	사람/NNG	,/SP	남녀/NNG	관계/NNG	가/JKS	불/XPN	분명/MAG	하/XSV	아/EC	스캔들/NNG	을/JKO	일으키/VV	는/ETM	사람/NNG	,/SP	금전/NNG	관계/NNG	가/JKS	흐릿/XR	하/XSA	아/EC	부채/NNG	가/JKS	많/VA	은/ETM	사람/NNG	을/JKO	가까이/NNG	하/XSV	면/EC	누구/NP	나/JX	피해/NNG	를/JKO	보/VX	ㄴ다/EF	./SF	-128
+사생활/NNG	이/JKS	문란/NNG	하/XSV	ㄴ/ETM	사람/NNG	술/NNG	을/JKO	먹/VV	으면/EC	꼭/MAG	2/SN	차/NNG	,/SP	3/SN	차/NNG	를/JKO	외치/VV	다가/EC	결국/NNG	집/NNG	에/JKB	알/VV	ㄴ/ETM	들어가/VV	아서/EC	가정불화/NNG	가/JKS	많/VA	은/ETM	사람/NNG	,/SP	남녀/NNG	관계/NNG	가/JKS	불/XPN	분명/NNG	하/XSV	아/EC	스캔들/NNG	을/JKO	일으키/VV	는/ETM	사람/NNG	,/SP	금전/NNG	관계/NNG	가/JKS	흐릿/XR	하/XSA	아/EC	부채/NNG	가/JKS	많/VA	은/ETM	사람/NNG	을/JKO	가까이/NNG	하/XSV	면/EC	누구/NP	나/JX	피해/NNG	를/JKO	보/VX	ㄴ다/EF	./SF	-125
+사생활/NNG	이/JKS	문란/NNG	하/XSV	ㄴ/ETM	사람/NNG	술/NNG	을/JKO	먹/VV	으면/EC	꼭/MAG	2/SN	차/NNG	,/SP	3/SN	차/NNG	를/JKO	외치/VV	다가/EC	결국/NNG	집/NNG	에/JKB	알/VV	ㄴ/ETM	들어가/VV	아서/EC	가정불화/NNG	가/JKS	많/VA	은/ETM	사람/NNG	,/SP	남녀/NNG	관계/NNG	가/JKS	불/XPN	분명/NNG	하/XSV	아/EC	스캔들/NNG	을/JKO	일으키/VV	는/ETM	사람/NNG	,/SP	금전/NNG	관계/NNG	가/JKS	흐릿/XR	하/XSA	아/EC	부채/NNG	가/JKS	많/VA	은/ETM	사람/NNG	을/JKO	가까이/NNG	하/XSV	면/EC	누구/NP	나/JX	피해/NNG	를/JKO	보/VV	ㄴ다/EF	./SF	-123.4
+사생활/NNG	이/JKS	문란/NNG	하/XSV	ㄴ/ETM	사람/NNG	술/NNG	을/JKO	먹/VV	으면/EC	꼭/MAG	2/SN	차/NNG	,/SP	3/SN	차/NNG	를/JKO	외치/VV	다가/EC	결국/NNG	집/NNG	에/JKB	알/VV	ㄴ/ETM	들어가/VV	아서/EC	가정불화/NNG	가/JKS	많/VA	은/ETM	사람/NNG	,/SP	남녀/NNG	관계/NNG	가/JKS	불/XPN	분명/MAG	하/XSV	아/EC	스캔들/NNG	을/JKO	일으키/VV	는/ETM	사람/NNG	,/SP	금전/NNG	관계/NNG	가/JKS	흐릿/XR	하/XSA	아/EC	부채/NNG	가/JKS	많/VA	은/ETM	사람/NNG	을/JKO	가까이/NNG	하/XSV	면/EC	누구/NP	나/JX	피해/NNG	를/JKO	보/VX	ㄴ다/EF	./SF	-125.4
 
 이런 사람을 부하직원으로 두고 있으면 결국은 회사의 이미지에 치명타를 입게 된다.	0.88
 이런/MM	사람/NNG	을/JKO	부하/NNG	직원/NNG	으로/JKB	두/VV	고/EC	있/VX	으면/EC	결국/NNG	은/JX	회사/NNG	의/JKG	이미지/NNG	에/JKB	치명타/NNG	를/JKO	입/VV	게/EC	되/VV	ㄴ다/EF	./SF	
@@ -13070,9 +13070,9 @@ L/SL	은/JX	고객/NNG	에/JKB	대하/VV	아/EC	철저히/MAG	봉사/NNG	하고/JKB	약속/NNG	�
 
 어렵게 정치권에 진출한 생명보험회사 출신들도 일단 진출하고 나면 생명보험산업의 발전보다 자신의 입신영달에 급급하여 아무런 역할을 하지 못하고 중도에 하차하는 경우가 많았다.	0.944
 어렵/VA	게/EC	정치/NNG	권/XSN	에/JKB	진출/NNG	하/XSV	ㄴ/ETM	생명/NNG	보험/NNG	회사/NNG	출신/NNG	들/XSN	도/JX	일단/MAG	진출/NNG	하/XSV	고/EC	나/VX	면/EC	생명/NNG	보험/NNG	산업/NNG	의/JKG	발전/NNG	보다/JKB	자신/NNG	의/JKG	입신/NNG	영달/NNG	에/JKB	급급/XR	하/XSA	아/EC	아무런/MM	역할/NNG	을/JKO	하/VV	지/EC	못하/VX	고/EC	중도/NNG	에/JKB	하차/NNG	하/XSV	는/ETM	경우/NNG	가/JKS	많/VA	았/EP	다/EF	./SF	
-어렵/VA	게/EC	정치/NNG	권/XSN	에/JKB	진출/NNG	하/XSV	ㄴ/ETM	생명/NNG	보험/NNG	회사/NNG	출신/NNG	들/XSN	도/JX	일단/MAG	진출/NNG	하/XSV	고/EC	나/VX	면/EC	생명/NNG	보험/NNG	산업/NNG	의/JKG	발전/NNG	보다/JKB	자신/NNG	의/JKG	입신/NNG	영달/NNG	에/JKB	급급/XR	하/XSA	아/EC	아무렇/VA	ㄴ/ETM	역할/NNG	을/JKO	하/VV	지/EC	못하/VX	고/EC	중도/NNG	에/JKB	하차/NNG	하/XSV	는/ETM	경우/NNG	가/JKS	많/VA	았/EP	다/EF	./SF	-87.36
-어렵/VA	게/EC	정치/NNG	권/XSN	에/JKB	진출/NNG	하/XSV	ㄴ/ETM	생명/NNG	보험/NNG	회사/NNG	출신/NNG	들/XSN	도/JX	일단/MAG	진출/NNG	하/XSV	고/EC	나/VX	면/EC	생명/NNG	보험/NNG	산업/NNG	의/JKG	발전/NNG	보다/JKB	자신/NNG	의/JKG	입신/NNG	영달/NNG	에/JKB	급급/XR	하/XSV	아/EC	아무렇/VA	ㄴ/ETM	역할/NNG	을/JKO	하/VV	지/EC	못하/VX	고/EC	중도/NNG	에/JKB	하차/NNG	하/XSV	는/ETM	경우/NNG	가/JKS	많/VA	았/EP	다/EF	./SF	-88.73
-어렵/VA	게/EC	정치/NNG	권/XSN	에/JKB	진출/NNG	하/XSV	ㄴ/ETM	생명/NNG	보험/NNG	회사/NNG	출신/NNG	들/XSN	도/JX	일단/MAG	진출/NNG	하/XSV	고/EC	나/VX	면/EC	생명/NNG	보험/NNG	산업/NNG	의/JKG	발전/NNG	보다/JKB	자신/NNG	의/JKG	입신/NNG	영달/NNP	에/JKB	급급/XR	하/XSA	아/EC	아무렇/VA	ㄴ/ETM	역할/NNG	을/JKO	하/VV	지/EC	못하/VX	고/EC	중도/NNG	에/JKB	하차/NNG	하/XSV	는/ETM	경우/NNG	가/JKS	많/VA	았/EP	다/EF	./SF	-88.97
+어렵/VA	게/EC	정치/NNG	권/XSN	에/JKB	진출/NNG	하/XSV	ㄴ/ETM	생명/NNG	보험/NNG	회사/NNG	출신/NNG	들/XSN	도/JX	일단/MAG	진출/NNG	하/XSV	고/EC	나/VX	면/EC	생명/NNG	보험/NNG	산업/NNG	의/JKG	발전/NNG	보다/JKB	자신/NNG	의/JKG	입신/NNG	영달/NNG	에/JKB	급급/XR	하/XSA	아/EC	아무렇/VA	ㄴ/ETM	역할/NNG	을/JKO	하/VV	지/EC	못하/VX	고/EC	중도/NNG	에/JKB	하차/NNG	하/XSV	는/ETM	경우/NNG	가/JKS	많/VA	았/EP	다/EF	./SF	-81.84
+어렵/VA	게/EC	정치/NNG	권/XSN	에/JKB	진출/NNG	하/XSV	ㄴ/ETM	생명/NNG	보험/NNG	회사/NNG	출신/NNG	들/XSN	도/JX	일단/MAG	진출/NNG	하/XSV	고/EC	나/VX	면/EC	생명/NNG	보험/NNG	산업/NNG	의/JKG	발전/NNG	보다/JKB	자신/NNG	의/JKG	입신/NNG	영달/NNG	에/JKB	급급/XR	하/XSV	아/EC	아무렇/VA	ㄴ/ETM	역할/NNG	을/JKO	하/VV	지/EC	못하/VX	고/EC	중도/NNG	에/JKB	하차/NNG	하/XSV	는/ETM	경우/NNG	가/JKS	많/VA	았/EP	다/EF	./SF	-83.22
+어렵/VA	게/EC	정치/NNG	권/XSN	에/JKB	진출/NNG	하/XSV	ㄴ/ETM	생명/NNG	보험/NNG	회사/NNG	출신/NNG	들/XSN	도/JX	일단/MAG	진출/NNG	하/XSV	고/EC	나/VX	면/EC	생명/NNG	보험/NNG	산업/NNG	의/JKG	발전/NNG	보다/JKB	자신/NNG	의/JKG	입신/NNG	영달/NNP	에/JKB	급급/XR	하/XSA	아/EC	아무렇/VA	ㄴ/ETM	역할/NNG	을/JKO	하/VV	지/EC	못하/VX	고/EC	중도/NNG	에/JKB	하차/NNG	하/XSV	는/ETM	경우/NNG	가/JKS	많/VA	았/EP	다/EF	./SF	-83.45
 
 반면 은행이나 우체국·농협 등은 경영의 어려움을 타개하기 위하여 적극적으로 보험분야에 진출, 이 영역을 지속적으로 확대하고 있다.	0.947
 반면/NNG	은행/NNG	이나/JC	우체국/NNG	·/SP	농협/NNP	등/NNB	은/JX	경영/NNG	의/JKG	어려움/NNG	을/JKO	타개/NNG	하/XSV	기/ETN	위하/VV	아/EC	적극/NNG	적/XSN	으로/JKB	보험/NNG	분야/NNG	에/JKB	진출/NNG	,/SP	이/MM	영역/NNG	을/JKO	지속/NNG	적/XSN	으로/JKB	확대/NNG	하/XSV	고/EC	있/VX	다/EF	./SF	
@@ -15198,9 +15198,9 @@ L/SL	은/JX	고객/NNG	에/JKB	대하/VV	아/EC	철저히/MAG	봉사/NNG	하고/JKB	약속/NNG	�
 
 -경기중에 휴대폰이 울리고 전화를 받으면 '저 사람은 중요한 일이나 하지 왜 골프장에 왔지?'라는 생각을 갖게 한다.	0.86
 -/SS	경기/NNG	중/NNB	에/JKB	휴대폰/NNG	이/JKS	울리/VV	고/EC	전화/NNG	를/JKO	받/VV	으면/EC	'/SS	저/MM	사람/NNG	은/JX	중요/NNG	하/XSA	ㄴ/ETM	일/NNG	이나/JC	하/VV	지/EC	왜/MAG	골프장/NNG	에/JKB	오/VV	았/EP	지/EF	?/SF	'/SS	이/VCP	라는/ETM	생각/NNG	을/JKO	갖/VV	게/EC	하/VV	ㄴ다/EF	./SF	
--/SO	경기/NNG	중/NNB	에/JKB	휴대폰/NNG	이/JKS	울리/VV	고/EC	전화/NNG	를/JKO	받/VV	으면/EC	'/SS	저/MM	사람/NNG	은/JX	중요/NNG	하/XSV	ㄴ/ETM	일/NNG	이나/JC	하/VV	지/EC	왜/MAG	골프장/NNG	에/JKB	오/VX	았/EP	지/EF	?/SF	'/SS	이/VCP	라는/ETM	생각/NNG	을/JKO	갖/VV	게/EC	하/VV	ㄴ다/EF	./SF	-73.18
--/SO	경기/NNG	중/NNB	에/JKB	휴대폰/NNG	이/JKS	울리/VV	고/EC	전화/NNG	를/JKO	받/VV	으면/EC	'/SS	저/MM	사람/NNG	은/JX	중요/NNG	하/XSV	ㄴ/ETM	일/NNG	이나/JC	하/VV	지/EC	왜/MAG	골프장/NNG	에/JKB	오/VX	았/EP	지/EF	?/SF	'/SS	이/VCP	라는/ETM	생각/NNG	을/JKO	갖/VV	게/EC	하/VV	ㄴ다/EF	./SF	-73.18
--/SO	경기/NNG	중/NNB	에/JKB	휴대폰/NNG	이/JKS	울리/VV	고/EC	전화/NNG	를/JKO	받/VV	으면/EC	'/SS	저/MM	사람/NNG	은/JX	중요/NNG	하/XSV	ㄴ/ETM	일/NNG	이나/JC	하/VV	지/EC	왜/MAG	골프장/NNG	에/JKB	오/VX	았/EP	지/EF	?/SF	'/SS	이/VCP	라는/ETM	생각/NNG	을/JKO	갖/VV	게/EC	하/VX	ㄴ다/EF	./SF	-70.77
+-/SO	경기/NNG	중/NNB	에/JKB	휴대폰/NNG	이/JKS	울리/VV	고/EC	전화/NNG	를/JKO	받/VV	으면/EC	'/SS	저/MM	사람/NNG	은/JX	중요/NNG	하/XSV	ㄴ/ETM	일/NNG	이나/JC	하/VV	지/EC	왜/MAG	골프장/NNG	에/JKB	오/VX	았/EP	지/EF	?/SF	'/SS	이/VCP	라는/ETM	생각/NNG	을/JKO	갖/VV	게/EC	하/VV	ㄴ다/EF	./SF	-71.82
+-/SO	경기/NNG	중/NNB	에/JKB	휴대폰/NNG	이/JKS	울리/VV	고/EC	전화/NNG	를/JKO	받/VV	으면/EC	'/SS	저/MM	사람/NNG	은/JX	중요/NNG	하/XSV	ㄴ/ETM	일/NNG	이나/JC	하/VV	지/EC	왜/MAG	골프장/NNG	에/JKB	오/VX	았/EP	지/EF	?/SF	'/SS	이/VCP	라는/ETM	생각/NNG	을/JKO	갖/VV	게/EC	하/VV	ㄴ다/EF	./SF	-71.82
+-/SO	경기/NNG	중/NNB	에/JKB	휴대폰/NNG	이/JKS	울리/VV	고/EC	전화/NNG	를/JKO	받/VV	으면/EC	'/SS	저/MM	사람/NNG	은/JX	중요/NNG	하/XSV	ㄴ/ETM	일/NNG	이나/JC	하/VV	지/EC	왜/MAG	골프장/NNG	에/JKB	오/VX	았/EP	지/EF	?/SF	'/SS	이/VCP	라는/ETM	생각/NNG	을/JKO	갖/VV	게/EC	하/VX	ㄴ다/EF	./SF	-69.4
 
 휴대폰은 로커에 두고 가는 것이 좋다.	0.733
 휴대폰/NNG	은/JX	로커/NNG	에/JKB	두/VV	고/EC	가/VV	는/ETM	것/NNB	이/JKS	좋/VA	다/EF	./SF	

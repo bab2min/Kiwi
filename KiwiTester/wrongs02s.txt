@@ -1,6 +1,6 @@
-0.828188
-Total (4533) Time : 4704.9 ms
-Time per Unit : 1.03792 ms
+0.828205
+Total (4533) Time : 4416.79 ms
+Time per Unit : 0.974364 ms
 
 석 달하고도 며칠이 더 지나갔다.	0.5
 석/MM	달/NNG	하고/JC	도/JX	며칠/NNG	이/JKS	더/MAG	지나가/VV	았/EP	다/EF	./SF	
@@ -346,9 +346,9 @@ Time per Unit : 1.03792 ms
 
 이승범 씨가 세번째 골방으로 이사해 온 이후 성공적으로 히트시킨 유일한 작품이기도 했다.	0.722
 이승범/NNP	씨/NNB	가/JKS	세/MM	번/NNB	째/XSN	골방/NNG	으로/JKB	이사/NNG	하/XSV	아/EC	오/VX	ㄴ/ETM	이후/NNG	성공/NNG	적/XSN	으로/JKB	히트/NNG	시키/XSV	ㄴ/ETM	유일/NNG	하/XSA	ㄴ/ETM	작품/NNG	이/VCP	기/ETN	도/JX	하/VX	았/EP	다/EF	./SF	
-이승/NNG	범/NNG	씨/NNB	가/JKS	세/MM	번째/NNB	골방/NNG	으로/JKB	이사/NNG	하/XSV	아/EC	오/VX	ㄴ/ETM	이후/NNG	성공/NNG	적/XSN	으로/JKB	히트/NNG	시키/XSV	ㄴ/ETM	유일/NNG	하/XSV	ㄴ/ETM	작품/NNG	이/VCP	기/ETN	도/JX	하/VV	았/EP	다/EF	./SF	-77.69
-이승/NNG	범/NNG	씨/NNB	이/VCP	가/EC	세/MM	번째/NNB	골방/NNG	으로/JKB	이사/NNG	하/XSV	아/EC	오/VX	ㄴ/ETM	이후/NNG	성공/NNG	적/XSN	으로/JKB	히트/NNG	시키/XSV	ㄴ/ETM	유일/NNG	하/XSV	ㄴ/ETM	작품/NNG	이/VCP	기/ETN	도/JX	하/VV	았/EP	다/EF	./SF	-78.44
-이승/NNG	범/NNG	씨/NNB	가/JKS	세/MM	번째/NNB	골방/NNG	으로/JKB	이사/NNG	하/XSV	아/EC	오/VV	ㄴ/ETM	이후/NNG	성공/NNG	적/XSN	으로/JKB	히트/NNG	시키/XSV	ㄴ/ETM	유일/NNG	하/XSV	ㄴ/ETM	작품/NNG	이/VCP	기/ETN	도/JX	하/VV	았/EP	다/EF	./SF	-78.6
+이승/NNG	범/NNG	씨/NNB	가/JKS	세/MM	번째/NNB	골방/NNG	으로/JKB	이사/NNG	하/XSV	아/EC	오/VX	ㄴ/ETM	이후/NNG	성공/NNG	적/XSN	으로/JKB	히트/NNG	시키/XSV	ㄴ/ETM	유일/NNG	하/XSV	ㄴ/ETM	작품/NNG	이/VCP	기/ETN	도/JX	하/VV	았/EP	다/EF	./SF	-76.05
+이승/NNG	범/NNG	씨/NNB	이/VCP	가/EC	세/MM	번째/NNB	골방/NNG	으로/JKB	이사/NNG	하/XSV	아/EC	오/VX	ㄴ/ETM	이후/NNG	성공/NNG	적/XSN	으로/JKB	히트/NNG	시키/XSV	ㄴ/ETM	유일/NNG	하/XSV	ㄴ/ETM	작품/NNG	이/VCP	기/ETN	도/JX	하/VV	았/EP	다/EF	./SF	-76.8
+이승/NNG	범/NNG	씨/NNB	가/JKS	세/MM	번째/NNB	골방/NNG	으로/JKB	이사/NNG	하/XSV	아/EC	오/VV	ㄴ/ETM	이후/NNG	성공/NNG	적/XSN	으로/JKB	히트/NNG	시키/XSV	ㄴ/ETM	유일/NNG	하/XSV	ㄴ/ETM	작품/NNG	이/VCP	기/ETN	도/JX	하/VV	았/EP	다/EF	./SF	-76.96
 
 아마 그것은 그의 달착지근한 눈빛과 속삭임이 에로틱한 선동과 가장 잘 맞아떨어지기 때문일 것이었다.	0.788
 아마/MAG	그것/NP	은/JX	그/NP	의/JKG	달착지근/XR	하/XSA	ㄴ/ETM	눈빛/NNG	과/JC	속삭이/VV	ㅁ/ETN	이/JKS	에로틱/NNG	하/XSA	ㄴ/ETM	선동/NNG	과/JKB	가장/MAG	잘/MAG	맞아떨어지/VV	기/ETN	때문/NNB	이/VCP	ㄹ/ETM	것/NNB	이/VCP	었/EP	다/EF	./SF	
@@ -634,9 +634,9 @@ Time per Unit : 1.03792 ms
 
 "맥주 한잔 마실 돈이 없어서 이러고 있는 거예요?" 그녀는 잠시 틈이 날 적이면 내 앞에 마주 앉아 눈을 흘겼다.	0.7
 "/SS	맥주/NNG	한잔/NNG	마시/VV	ㄹ/ETM	돈/NNG	이/JKS	없/VA	어서/EC	이러/VV	고/EC	있/VV	는/ETM	거/NNB	이/VCP	에요/EF	?/SF	"/SS	그녀/NP	는/JX	잠시/MAG	틈/NNG	이/JKS	나/VV	ㄹ/ETM	적/NNB	이/VCP	면/EC	나/NP	의/JKG	앞/NNG	에/JKB	마주/MAG	앉/VV	아/EC	눈/NNG	을/JKO	흘기/VV	었/EP	다/EF	./SF	
-"/SS	맥주/NNG	한/MM	잔/NNG	마시/VV	ㄹ/ETM	돈/NNG	이/JKS	없/VA	어/EC	서/VV	어/EC	이러/VV	고/EC	있/VX	는/ETM	거/NNB	이/VCP	에요/EF	?/SF	"/SS	그녀/NP	는/JX	잠시/MAG	틈/NNG	이/JKS	나/VV	ㄹ/ETM	적/NNB	이/VCP	면/EC	내/VX	어/EC	앞/NNG	에/JKB	마주/MAG	앉/VV	아/EF	눈/NNG	을/JKO	흘기/VV	었/EP	다/EF	./SF	-50.52
-"/SS	맥주/NNG	한/MM	잔/NNG	마시/VV	ㄹ/ETM	돈/NNG	이/JKS	없/VA	어/EC	서/VV	어/EC	이러/VV	고/EC	있/VX	는/ETM	거/NNB	이/VCP	에요/EF	?/SF	"/SS	그녀/NP	는/JX	잠시/MAG	틈/NNG	이/JKS	나/VV	ㄹ/ETM	적/NNB	이/VCP	면/EC	나/NP	의/JKG	앞/NNG	에/JKB	마주/MAG	앉/VV	아/EF	눈/NNG	을/JKO	흘기/VV	었/EP	다/EF	./SF	-51.83
-"/SS	맥주/NNG	한/MM	잔/NNG	마시/VV	ㄹ/ETM	돈/NNG	이/JKS	없/VA	어/EC	서/VV	어/EC	이러/VV	고/EC	있/VX	는/ETM	거/NNB	이/VCP	에요/EF	?/SF	"/SS	그녀/NP	는/JX	잠시/NNG	틈/NNG	이/JKS	나/VV	ㄹ/ETM	적/NNB	이/VCP	면/EC	나/NP	의/JKG	앞/NNG	에/JKB	마주/MAG	앉/VV	아/EF	눈/NNG	을/JKO	흘기/VV	었/EP	다/EF	./SF	-52.14
+"/SS	맥주/NNG	한/MM	잔/NNG	마시/VV	ㄹ/ETM	돈/NNG	이/JKS	없/VA	어/EC	서/VV	어/EC	이러/VV	고/EC	있/VX	는/ETM	거/NNB	이/VCP	에요/EF	?/SF	"/SS	그녀/NP	는/JX	잠시/MAG	틈/NNG	이/JKS	나/VV	ㄹ/ETM	적/NNB	이/VCP	면/EC	내/VX	어/EC	앞/NNG	에/JKB	마주/MAG	앉/VV	아/EF	눈/NNG	을/JKO	흘기/VV	었/EP	다/EF	./SF	-45.54
+"/SS	맥주/NNG	한/MM	잔/NNG	마시/VV	ㄹ/ETM	돈/NNG	이/JKS	없/VA	어/EC	서/VV	어/EC	이러/VV	고/EC	있/VX	는/ETM	거/NNB	이/VCP	에요/EF	?/SF	"/SS	그녀/NP	는/JX	잠시/MAG	틈/NNG	이/JKS	나/VV	ㄹ/ETM	적/NNB	이/VCP	면/EC	나/NP	의/JKG	앞/NNG	에/JKB	마주/MAG	앉/VV	아/EF	눈/NNG	을/JKO	흘기/VV	었/EP	다/EF	./SF	-46.84
+"/SS	맥주/NNG	한/MM	잔/NNG	마시/VV	ㄹ/ETM	돈/NNG	이/JKS	없/VA	어/EC	서/VV	어/EC	이러/VV	고/EC	있/VX	는/ETM	거/NNB	이/VCP	에요/EF	?/SF	"/SS	그녀/NP	는/JX	잠시/NNG	틈/NNG	이/JKS	나/VV	ㄹ/ETM	적/NNB	이/VCP	면/EC	나/NP	의/JKG	앞/NNG	에/JKB	마주/MAG	앉/VV	아/EF	눈/NNG	을/JKO	흘기/VV	었/EP	다/EF	./SF	-47.16
 
 솔직히 털어놓자면 내게는 비디오보다 더 가슴 설레게 하는 게 꼭 한 가지 있었다.	0.531
 솔직히/MAG	털어놓/VV	자면/EC	나/NP	에게/JKB	는/JX	비디오/NNG	보다/JKB	더/MAG	가슴/NNG	설레/VV	게/EC	하/VX	는/ETM	것/NNB	이/JKS	꼭/MAG	한/MM	가지/NNB	있/VV	었/EP	다/EF	./SF	
@@ -670,9 +670,9 @@ Time per Unit : 1.03792 ms
 
 때가 되면 알게 될 테니까." 그녀는 또 눈을 흘겼다.	0.913
 때/NNG	가/JKC	되/VV	면/EC	알/VV	게/EC	되/VV	ㄹ/ETM	터/NNB	이/VCP	니까/EF	./SF	"/SS	그녀/NP	는/JX	또/MAG	눈/NNG	을/JKO	흘기/VV	었/EP	다/EF	./SF	
-때/NNG	가/JKS	되/VV	면/EC	알/VV	게/EC	되/VV	ㄹ/ETM	터/NNB	이/VCP	니까/EF	./SF	"/SS	그녀/NP	는/JX	또/MAG	눈/NNG	을/JKO	흘기/VV	었/EP	다/EF	./SF	-18.51
-때/NNG	가/JKC	되/VV	면/EC	알/VV	게/EC	되/VV	ㄹ/ETM	터/NNB	이/VCP	니까/EF	./SF	"/SS	그녀/NP	는/JX	또/MAG	눈/NNG	을/JKO	흘기/VV	었/EP	다/EF	./SF	-19.09
-때/NNG	이/VCP	가/EC	되/VV	면/EC	알/VV	게/EC	되/VV	ㄹ/ETM	터/NNB	이/VCP	니까/EF	./SF	"/SS	그녀/NP	는/JX	또/MAG	눈/NNG	을/JKO	흘기/VV	었/EP	다/EF	./SF	-20.69
+때/NNG	가/JKS	되/VV	면/EC	알/VV	게/EC	되/VV	ㄹ/ETM	터/NNB	이/VCP	니까/EF	./SF	"/SS	그녀/NP	는/JX	또/MAG	눈/NNG	을/JKO	흘기/VV	었/EP	다/EF	./SF	-14.71
+때/NNG	가/JKC	되/VV	면/EC	알/VV	게/EC	되/VV	ㄹ/ETM	터/NNB	이/VCP	니까/EF	./SF	"/SS	그녀/NP	는/JX	또/MAG	눈/NNG	을/JKO	흘기/VV	었/EP	다/EF	./SF	-15.29
+때/NNG	이/VCP	가/EC	되/VV	면/EC	알/VV	게/EC	되/VV	ㄹ/ETM	터/NNB	이/VCP	니까/EF	./SF	"/SS	그녀/NP	는/JX	또/MAG	눈/NNG	을/JKO	흘기/VV	었/EP	다/EF	./SF	-16.89
 
 그러고는 자기 모르는 사이 새로운 애인이 생겼나 보다고 쫑알거렸다.	0.667
 그러/VV	고는/EC	자기/NP	모르/VV	는/ETM	사이/NNG	새롭/VA	ㄴ/ETM	애인/NNG	이/JKS	생기/VV	었/EP	나/EC	보/VV	다고/EC	쫑알거리/VV	었/EP	다/EF	./SF	
@@ -1412,9 +1412,9 @@ Time per Unit : 1.03792 ms
 
 "기준아……" 누군가 내 이름을 외마디 비명처럼 지르는 소리에 뛰어나가 보니 그가 대문간에 퍼져 앉아 번지수도 없는 노래를 흥얼거리고 있었다.	0.851
 "/SS	기준/NNP	아/JKV	…/SE	…/SE	"/SS	누구/NP	이/VCP	ㄴ가/EC	나/NP	의/JKG	이름/NNG	을/JKO	외마디/NNG	비명/NNG	처럼/JKB	지르/VV	는/ETM	소리/NNG	에/JKB	뛰어나가/VV	아/EC	보/VX	니/EC	그/NP	가/JKS	대문간/NNG	에/JKB	퍼지/VV	어/EC	앉/VV	아/EC	번지수/NNG	도/JX	없/VA	는/ETM	노래/NNG	를/JKO	흥얼거리/VV	고/EC	있/VX	었/EP	다/EF	./SF	
-"/SS	기준/NNG	아/JKV	……/SE	"/SS	누구/NP	이/VCP	ㄴ가/EC	나/NP	의/JKG	이름/NNG	을/JKO	외마디/NNG	비명/NNG	처럼/JKB	지르/VV	는/ETM	소리/NNG	에/JKB	뛰어나가/VV	아/EC	보/VX	니/EC	그/NP	가/JKS	대문간/NNG	에/JKB	퍼지/VV	어/EC	앉/VV	아/EF	번지수/NNG	도/JX	없/VA	는/ETM	노래/NNG	를/JKO	흥얼거리/VV	고/EC	있/VX	었/EP	다/EF	./SF	-71.75
-"/SS	기/NNG	준아/NNG	……/SE	"/SS	누구/NP	이/VCP	ㄴ가/EC	나/NP	의/JKG	이름/NNG	을/JKO	외마디/NNG	비명/NNG	처럼/JKB	지르/VV	는/ETM	소리/NNG	에/JKB	뛰어나가/VV	아/EC	보/VX	니/EC	그/NP	가/JKS	대문간/NNG	에/JKB	퍼지/VV	어/EC	앉/VV	아/EF	번지수/NNG	도/JX	없/VA	는/ETM	노래/NNG	를/JKO	흥얼거리/VV	고/EC	있/VX	었/EP	다/EF	./SF	-72.1
-"/SS	기준/NNG	아/JKV	……/SE	"/SS	누구/NP	이/VCP	ㄴ가/EC	나/NP	의/JKG	이름/NNG	을/JKO	외마디/NNG	비명/NNG	처럼/JKB	지르/VV	는/ETM	소리/NNG	에/JKB	뛰어나가/VV	아/EC	보/VX	니/EC	그/NP	가/JKS	대문간/NNG	에/JKB	퍼지/VV	어/EC	앉/VV	아/EF	번지수/NNG	도/JX	없/VA	는/ETM	노래/NNG	를/JKO	흥얼거리/VV	고/EC	있/VV	었/EP	다/EF	./SF	-75.39
+"/SS	기준/NNG	아/JKV	……/SE	"/SS	누구/NP	이/VCP	ㄴ가/EC	나/NP	의/JKG	이름/NNG	을/JKO	외마디/NNG	비명/NNG	처럼/JKB	지르/VV	는/ETM	소리/NNG	에/JKB	뛰어나가/VV	아/EC	보/VX	니/EC	그/NP	가/JKS	대문간/NNG	에/JKB	퍼지/VV	어/EC	앉/VV	아/EF	번지수/NNG	도/JX	없/VA	는/ETM	노래/NNG	를/JKO	흥얼거리/VV	고/EC	있/VX	었/EP	다/EF	./SF	-67.72
+"/SS	기/NNG	준아/NNG	……/SE	"/SS	누구/NP	이/VCP	ㄴ가/EC	나/NP	의/JKG	이름/NNG	을/JKO	외마디/NNG	비명/NNG	처럼/JKB	지르/VV	는/ETM	소리/NNG	에/JKB	뛰어나가/VV	아/EC	보/VX	니/EC	그/NP	가/JKS	대문간/NNG	에/JKB	퍼지/VV	어/EC	앉/VV	아/EF	번지수/NNG	도/JX	없/VA	는/ETM	노래/NNG	를/JKO	흥얼거리/VV	고/EC	있/VX	었/EP	다/EF	./SF	-68.07
+"/SS	기준/NNG	아/JKV	……/SE	"/SS	누구/NP	이/VCP	ㄴ가/EC	나/NP	의/JKG	이름/NNG	을/JKO	외마디/NNG	비명/NNG	처럼/JKB	지르/VV	는/ETM	소리/NNG	에/JKB	뛰어나가/VV	아/EC	보/VX	니/EC	그/NP	가/JKS	대문간/NNG	에/JKB	퍼지/VV	어/EC	앉/VV	아/EF	번지수/NNG	도/JX	없/VA	는/ETM	노래/NNG	를/JKO	흥얼거리/VV	고/EC	있/VV	었/EP	다/EF	./SF	-71.36
 
 무슨 소용 있나요 무슨 상관 있나요 으으응.	0.5
 무슨/MM	소용/NNG	있/VV	나요/EC	무슨/MM	상관/NNG	있/VV	나요/EC	으으응/MAG	./SF	
@@ -1868,9 +1868,9 @@ Time per Unit : 1.03792 ms
 
 마침내 최 모는 호들갑을 떨더니 배팅으로 백만 원을 걸었다.	0.75
 마침내/MAG	최/NNP	모/NP	는/JX	호들갑/NNG	을/JKO	떨/VV	더니/EC	배팅/NNG	으로/JKB	백만/NR	원/NNB	을/JKO	걸/VV	었/EP	다/EF	./SF	
-마침내/MAG	최/NNP	모/NP	는/JX	호들갑/NNG	을/JKO	떨/VV	더니/EC	배팅/NNG	으로/JKB	백/NR	만/NR	원/NNB	을/JKO	걷/VV	었/EP	다/EF	./SF	-30.63
-마침내/MAG	최/NNP	모/NP	는/JX	호들갑/NNG	을/JKO	떨/VV	더니/EC	배팅/NNG	으로/JKB	백/NR	만/NR	원/NNB	을/JKO	걸/VV	었/EP	다/EF	./SF	-30.93
-마침내/MAG	최/NNP	모/NP	는/JX	호들갑/NNG	을/JKO	떨/VV	더니/EC	배팅/NNG	으로/JKB	백만/NR	원/NNB	을/JKO	걷/VV	었/EP	다/EF	./SF	-32.82
+마침내/MAG	최/NNP	모/NP	는/JX	호들갑/NNG	을/JKO	떨/VV	더니/EC	배팅/NNG	으로/JKB	백/NR	만/NR	원/NNB	을/JKO	걷/VV	었/EP	다/EF	./SF	-25.71
+마침내/MAG	최/NNP	모/NP	는/JX	호들갑/NNG	을/JKO	떨/VV	더니/EC	배팅/NNG	으로/JKB	백/NR	만/NR	원/NNB	을/JKO	걸/VV	었/EP	다/EF	./SF	-26.01
+마침내/MAG	최/NNP	모/NP	는/JX	호들갑/NNG	을/JKO	떨/VV	더니/EC	배팅/NNG	으로/JKB	백만/NR	원/NNB	을/JKO	걷/VV	었/EP	다/EF	./SF	-27.9
 
 그러자 이제는 고민의 시간이 김재홍 씨에게로 이어졌다.	0.789
 그러/VV	자/EC	이제/NNG	는/JX	고민/NNG	의/JKG	시간/NNG	이/JKS	김재홍/NNP	씨/NNB	에게/JKB	로/JKB	이어지/VV	었/EP	다/EF	./SF	
@@ -2396,9 +2396,9 @@ Time per Unit : 1.03792 ms
 
 게다가 그는 바람결에 실려 오는 소식으로 그의 가족 중에서도 꽤 여럿 희생자가 있었음을 알게 되었다.	0.882
 게다가/MAG	그/NP	는/JX	바람결/NNG	에/JKB	실리/VV	어/EC	오/VX	는/ETM	소식/NNG	으로/JKB	그/NP	의/JKG	가족/NNG	중/NNB	에서/JKB	도/JX	꽤/MAG	여럿/NNG	희생자/NNG	가/JKS	있/VV	었/EP	음/ETN	을/JKO	알/VV	게/EC	되/VV	었/EP	다/EF	./SF	
-것/NNB	이/VCP	다가/EC	그/NP	는/JX	바람결/NNG	에/JKB	실리/VV	어/EC	오/VX	는/ETM	소식/NNG	으로/JKB	그/NP	의/JKG	가족/NNG	중/NNB	에서/JKB	도/JX	꽤/MAG	여럿/NNG	희생자/NNG	가/JKS	있/VV	었/EP	음/ETN	을/JKO	알/VV	게/EC	되/VV	었/EP	다/EF	./SF	-44.94
-것/NNB	이/VCP	다가/EC	그/NP	는/JX	바람결/NNG	에/JKB	실리/VV	어/EC	오/VX	는/ETM	소식/NNG	으로/JKB	그/NP	의/JKG	가족/NNG	중/NNB	에서/JKB	도/JX	꽤/MAG	여럿/NNG	희생자/NNG	가/JKS	있/VX	었/EP	음/ETN	을/JKO	알/VV	게/EC	되/VV	었/EP	다/EF	./SF	-45.67
-것/NNB	이/VCP	다가/EC	그/NP	는/JX	바람결/NNG	에/JKB	실리/VV	어/EC	오/VX	는/ETM	소식/NNG	으로/JKB	그/NP	의/JKG	가족/NNG	중/NNB	에서/JKB	도/JX	꽤/MAG	여럿/NNG	희생자/NNG	이/VCP	가/EC	있/VV	었/EP	음/ETN	을/JKO	알/VV	게/EC	되/VV	었/EP	다/EF	./SF	-47.39
+것/NNB	이/VCP	다가/EC	그/NP	는/JX	바람결/NNG	에/JKB	실리/VV	어/EC	오/VX	는/ETM	소식/NNG	으로/JKB	그/NP	의/JKG	가족/NNG	중/NNB	에서/JKB	도/JX	꽤/MAG	여럿/NNG	희생자/NNG	가/JKS	있/VV	었/EP	음/ETN	을/JKO	알/VV	게/EC	되/VV	었/EP	다/EF	./SF	-37.05
+것/NNB	이/VCP	다가/EC	그/NP	는/JX	바람결/NNG	에/JKB	실리/VV	어/EC	오/VX	는/ETM	소식/NNG	으로/JKB	그/NP	의/JKG	가족/NNG	중/NNB	에서/JKB	도/JX	꽤/MAG	여럿/NNG	희생자/NNG	가/JKS	있/VX	었/EP	음/ETN	을/JKO	알/VV	게/EC	되/VV	었/EP	다/EF	./SF	-37.78
+것/NNB	이/VCP	다가/EC	그/NP	는/JX	바람결/NNG	에/JKB	실리/VV	어/EC	오/VX	는/ETM	소식/NNG	으로/JKB	그/NP	의/JKG	가족/NNG	중/NNB	에서/JKB	도/JX	꽤/MAG	여럿/NNG	희생자/NNG	이/VCP	가/EC	있/VV	었/EP	음/ETN	을/JKO	알/VV	게/EC	되/VV	었/EP	다/EF	./SF	-39.5
 
 그는 가죽을 삐뚜름히 잘라 못쓰게 만들기도 했고 엉뚱한 곳에 못을 박아 다 된 제품을 망가뜨리기도 했다.	0.8
 그/NP	는/JX	가죽/NNG	을/JKO	삐뚜름히/MAG	자르/VV	아/EC	못쓰/VV	게/EC	만들/VV	기/ETN	도/JX	하/VX	았/EP	고/EC	엉뚱/XR	하/XSA	ㄴ/ETM	곳/NNG	에/JKB	못/NNG	을/JKO	박/VV	아/EC	다/MAG	되/VV	ㄴ/ETM	제품/NNG	을/JKO	망가뜨리/VV	기/ETN	도/JX	하/VX	았/EP	다/EF	./SF	
@@ -4148,9 +4148,9 @@ Time per Unit : 1.03792 ms
 
 "아니, 열네 살 적부터 광주 바닥을 휘젓고 다녔다는 사람이 그래 그 관계도 몰랐단 말예요.	0.564
 "/SS	아니/IC	,/SP	열/NR	네/MM	살/NNB	적/NNB	부터/JX	광주/NNP	바닥/NNG	을/JKO	휘젓/VV	고/EC	다니/VV	었/EP	다는/ETM	사람/NNG	이/JKC	그래/IC	그/MM	관계/NNG	도/JX	모르/VV	았/EP	단/ETM	말/NNG	이/VCP	에요/EF	./SF	
-"/SS	알/VV	니/EC	,/SP	열/VV	네/EC	살/VV	ㄹ/ETM	적/NNB	부터/JX	광주/NNP	바닥/NNG	을/JKO	휘젓/VV	고/EC	다니/VV	었/EP	다는/ETM	사람/NNG	이/JKS	그렇/VA	어/EC	그/NP	관계/NNG	도/JX	모르/VV	았/EP	단/ETM	말/NNG	이/VCP	에요/EF	./SF	-63.05
-"/SS	알/VV	니/EC	,/SP	열/VV	네/EC	살/VV	ㄹ/ETM	적/NNB	부터/JX	광주/NNP	바닥/NNG	을/JKO	휘젓/VV	고/EC	다니/VV	었/EP	다는/ETM	사람/NNG	이/JKS	그렇/VA	아/EC	그/NP	관계/NNG	도/JX	모르/VV	았/EP	단/ETM	말/NNG	이/VCP	에요/EF	./SF	-63.08
-"/SS	아니/IC	,/SP	열/VV	네/EC	살/VV	ㄹ/ETM	적/NNB	부터/JX	광주/NNP	바닥/NNG	을/JKO	휘젓/VV	고/EC	다니/VV	었/EP	다는/ETM	사람/NNG	이/JKS	그렇/VA	어/EC	그/NP	관계/NNG	도/JX	모르/VV	았/EP	단/ETM	말/NNG	이/VCP	에요/EF	./SF	-63.87
+"/SS	알/VV	니/EC	,/SP	열/VV	네/EC	살/VV	ㄹ/ETM	적/NNB	부터/JX	광주/NNP	바닥/NNG	을/JKO	휘젓/VV	고/EC	다니/VV	었/EP	다는/ETM	사람/NNG	이/JKS	그렇/VA	어/EC	그/NP	관계/NNG	도/JX	모르/VV	았/EP	단/ETM	말/NNG	이/VCP	에요/EF	./SF	-58.54
+"/SS	알/VV	니/EC	,/SP	열/VV	네/EC	살/VV	ㄹ/ETM	적/NNB	부터/JX	광주/NNP	바닥/NNG	을/JKO	휘젓/VV	고/EC	다니/VV	었/EP	다는/ETM	사람/NNG	이/JKS	그렇/VA	아/EC	그/NP	관계/NNG	도/JX	모르/VV	았/EP	단/ETM	말/NNG	이/VCP	에요/EF	./SF	-58.57
+"/SS	아니/IC	,/SP	열/VV	네/EC	살/VV	ㄹ/ETM	적/NNB	부터/JX	광주/NNP	바닥/NNG	을/JKO	휘젓/VV	고/EC	다니/VV	었/EP	다는/ETM	사람/NNG	이/JKS	그렇/VA	어/EC	그/NP	관계/NNG	도/JX	모르/VV	았/EP	단/ETM	말/NNG	이/VCP	에요/EF	./SF	-59.36
 
 난 또 승범 형이 대단한 빽이나 가졌나 보다 생각했죠." 이승범 씨는 군소리 한마디를 덧붙였다.	0.675
 나/NP	ㄴ/JX	또/MAG	승범/NNP	형/NNG	이/JKS	대단/XR	하/XSA	ㄴ/ETM	빽/NNG	이나/JX	가지/VV	었/EP	나/EC	보/VX	다/EC	생각/NNG	하/XSV	았/EP	죠/EF	./SF	"/SS	이승범/NNP	씨/NNB	는/JX	군소리/NNG	한마디/NNG	를/JKO	덧붙이/VV	었/EP	다/EF	./SF	
@@ -4178,9 +4178,9 @@ Time per Unit : 1.03792 ms
 
 그는 성인군자와는 거리가 멀었지만 그런 식으로 후광을 남용할 위인과는 더욱 거리가 멀었다.	0.813
 그/NP	는/JX	성인군자/NNG	와/JKB	는/JX	거리/NNG	가/JKS	멀/VA	었/EP	지만/EC	그런/MM	식/NNB	으로/JKB	후광/NNG	을/JKO	남용/NNG	하/XSV	ㄹ/ETM	위인/NNG	과/JKB	는/JX	더욱/MAG	거리/NNG	가/JKS	멀/VA	었/EP	다/EF	./SF	
-그/NP	는/JX	성인/NNG	군자/NNG	와/JKB	는/JX	거리/NNG	가/JKS	멀/VA	었/EP	지만/EC	그렇/VA	ㄴ/ETM	식/NNB	으로/JKB	후광/NNG	을/JKO	남용/NNG	하/XSV	ㄹ/ETM	위인/NNG	과/JKB	는/JX	더욱/MAG	거리/NNG	가/JKS	멀/VA	었/EP	다/EF	./SF	-54.91
-그/NP	는/JX	성인/NNG	군자/NNG	와/JKB	는/JX	거리/NNG	가/JKS	멀/VA	었/EP	지만/EC	그러/VV	ㄴ/ETM	식/NNB	으로/JKB	후광/NNG	을/JKO	남용/NNG	하/XSV	ㄹ/ETM	위인/NNG	과/JKB	는/JX	더욱/MAG	거리/NNG	가/JKS	멀/VA	었/EP	다/EF	./SF	-55.77
-그/NP	는/JX	성인군자/NNG	와/JKB	는/JX	거리/NNG	가/JKS	멀/VA	었/EP	지만/EC	그렇/VA	ㄴ/ETM	식/NNB	으로/JKB	후광/NNG	을/JKO	남용/NNG	하/XSV	ㄹ/ETM	위인/NNG	과/JKB	는/JX	더욱/MAG	거리/NNG	가/JKS	멀/VA	었/EP	다/EF	./SF	-56.48
+그/NP	는/JX	성인/NNG	군자/NNG	와/JKB	는/JX	거리/NNG	가/JKS	멀/VA	었/EP	지만/EC	그렇/VA	ㄴ/ETM	식/NNB	으로/JKB	후광/NNG	을/JKO	남용/NNG	하/XSV	ㄹ/ETM	위인/NNG	과/JKB	는/JX	더욱/MAG	거리/NNG	가/JKS	멀/VA	었/EP	다/EF	./SF	-52.35
+그/NP	는/JX	성인/NNG	군자/NNG	와/JKB	는/JX	거리/NNG	가/JKS	멀/VA	었/EP	지만/EC	그러/VV	ㄴ/ETM	식/NNB	으로/JKB	후광/NNG	을/JKO	남용/NNG	하/XSV	ㄹ/ETM	위인/NNG	과/JKB	는/JX	더욱/MAG	거리/NNG	가/JKS	멀/VA	었/EP	다/EF	./SF	-53.21
+그/NP	는/JX	성인군자/NNG	와/JKB	는/JX	거리/NNG	가/JKS	멀/VA	었/EP	지만/EC	그렇/VA	ㄴ/ETM	식/NNB	으로/JKB	후광/NNG	을/JKO	남용/NNG	하/XSV	ㄹ/ETM	위인/NNG	과/JKB	는/JX	더욱/MAG	거리/NNG	가/JKS	멀/VA	었/EP	다/EF	./SF	-53.92
 
 짐작컨대 이호섭 씨는 그로부터 한바탕 호통을 들었을 것이었다.	0.727
 짐작/NNG	하/XSV	건대/EC	이호섭/NNP	씨/NNB	는/JX	그/NP	로부터/JKB	한바탕/MAG	호통/NNG	을/JKO	듣/VV	었/EP	을/ETM	것/NNB	이/VCP	었/EP	다/EF	./SF	
@@ -6554,9 +6554,9 @@ Time per Unit : 1.03792 ms
 
 원래의 뜻을 그대로 풀자면 오늘 북경의 공기를 휘젓고 있는 나비 한 마리가 다음달 뉴욕 상공을 강타하는 폭풍구조에 영향을 줄 수도 있다는 거지.	0.933
 원래/NNG	의/JKG	뜻/NNG	을/JKO	그대로/MAG	풀/VV	자면/EC	오늘/NNG	북경/NNP	의/JKG	공기/NNG	를/JKO	휘젓/VV	고/EC	있/VX	는/ETM	나비/NNG	한/MM	마리/NNB	가/JKS	다음/NNG	달/NNG	뉴욕/NNP	상공/NNG	을/JKO	강타/NNG	하/XSV	는/ETM	폭풍/NNG	구조/NNG	에/JKB	영향/NNG	을/JKO	주/VV	ㄹ/ETM	수/NNB	도/JX	있/VV	다는/ETM	거/NNB	이/VCP	지/EF	./SF	
-원래/NNG	의/JKG	뜻/NNG	을/JKO	그/NP	대로/JX	풀/VV	자면/EC	오늘/NNG	북경/NNP	의/JKG	공기/NNG	를/JKO	휘젓/VV	고/EC	있/VX	는/ETM	나비/NNG	한/MM	마리/NNB	가/JKS	다음/NNG	달/NNG	뉴욕/NNP	상공/NNG	을/JKO	강타/NNG	하/XSV	는/ETM	폭풍/NNG	구조/NNG	에/JKB	영향/NNG	을/JKO	주/VV	ㄹ/ETM	수/NNB	도/JX	있/VV	다는/ETM	거/NNB	이/VCP	지/EF	./SF	-65.2
-원래/NNG	의/JKG	뜻/NNG	을/JKO	그/NP	대로/JX	풀/VV	자면/EC	오늘/NNG	북경/NNP	의/JKG	공기/NNG	를/JKO	휘젓/VV	고/EC	있/VX	는/ETM	나비/NNG	한/MM	마리/NNB	가/JKS	다음/NNG	달/NNG	뉴욕/NNP	상공/NNG	을/JKO	강타/NNG	하/XSV	는/ETM	폭풍/NNG	구조/NNG	에/JKB	영향/NNG	을/JKO	주/VX	ㄹ/ETM	수/NNB	도/JX	있/VV	다는/ETM	거/NNB	이/VCP	지/EF	./SF	-65.95
-원래/NNG	의/JKG	뜻/NNG	을/JKO	그/NP	대로/JX	풀/VV	자면/EC	오늘/NNG	북경/NNP	의/JKG	공기/NNG	를/JKO	휘젓/VV	고/EC	있/VX	는/ETM	나비/NNG	한/MM	마리/NNB	가/JKS	다음/NNG	달/NNG	뉴욕/NNP	상공/NNG	을/JKO	강타/NNG	하/XSV	는/ETM	폭풍/NNG	구조/NNG	에/JKB	영향/NNG	을/JKO	주/VV	ㄹ/ETM	수/NNB	도/JX	있/VV	다는/ETM	거지/NNG	./SF	-71.46
+원래/NNG	의/JKG	뜻/NNG	을/JKO	그/NP	대로/JX	풀/VV	자면/EC	오늘/NNG	북경/NNP	의/JKG	공기/NNG	를/JKO	휘젓/VV	고/EC	있/VX	는/ETM	나비/NNG	한/MM	마리/NNB	가/JKS	다음/NNG	달/NNG	뉴욕/NNP	상공/NNG	을/JKO	강타/NNG	하/XSV	는/ETM	폭풍/NNG	구조/NNG	에/JKB	영향/NNG	을/JKO	주/VV	ㄹ/ETM	수/NNB	도/JX	있/VV	다는/ETM	거/NNB	이/VCP	지/EF	./SF	-61.74
+원래/NNG	의/JKG	뜻/NNG	을/JKO	그/NP	대로/JX	풀/VV	자면/EC	오늘/NNG	북경/NNP	의/JKG	공기/NNG	를/JKO	휘젓/VV	고/EC	있/VX	는/ETM	나비/NNG	한/MM	마리/NNB	가/JKS	다음/NNG	달/NNG	뉴욕/NNP	상공/NNG	을/JKO	강타/NNG	하/XSV	는/ETM	폭풍/NNG	구조/NNG	에/JKB	영향/NNG	을/JKO	주/VX	ㄹ/ETM	수/NNB	도/JX	있/VV	다는/ETM	거/NNB	이/VCP	지/EF	./SF	-62.49
+원래/NNG	의/JKG	뜻/NNG	을/JKO	그/NP	대로/JX	풀/VV	자면/EC	오늘/NNG	북경/NNP	의/JKG	공기/NNG	를/JKO	휘젓/VV	고/EC	있/VX	는/ETM	나비/NNG	한/MM	마리/NNB	가/JKS	다음/NNG	달/NNG	뉴욕/NNP	상공/NNG	을/JKO	강타/NNG	하/XSV	는/ETM	폭풍/NNG	구조/NNG	에/JKB	영향/NNG	을/JKO	주/VV	ㄹ/ETM	수/NNB	도/JX	있/VV	다는/ETM	거지/NNG	./SF	-68
 
 원인과 결과가 꼬리를 물며 서로를 증폭시키는 이 우주공간에서는 아무리 사소한 차이라도 무시될 수 없다는 얘기야." 머리 속으로 나는 북경 근교의 밭이랑 위를 나는 나비 한 마리를 그려 보려 했다.	0.771
 원인/NNG	과/JC	결과/NNG	가/JKS	꼬리/NNG	를/JKO	물/VV	며/EC	서로/NNG	를/JKO	증폭/NNG	시키/XSV	는/ETM	이/MM	우주/NNG	공간/NNG	에서/JKB	는/JX	아무리/MAG	사소/XR	하/XSA	ㄴ/ETM	차이/NNG	이/VCP	라도/EC	무시/NNG	되/XSV	ㄹ/ETM	수/NNB	없/VA	다는/ETM	얘기/NNG	이/VCP	야/EF	./SF	"/SS	머리/NNG	속/NNG	으로/JKB	나/NP	는/JX	북경/NNP	근교/NNG	의/JKG	밭이랑/NNG	위/NNG	를/JKO	날/VV	는/ETM	나비/NNG	한/MM	마리/NNB	를/JKO	그리/VV	어/EC	보/VX	려/EC	하/VX	았/EP	다/EF	./SF	
@@ -6842,9 +6842,9 @@ Time per Unit : 1.03792 ms
 
 그리고 나는 서구적 합리성이 비록 엉터리이기는 하지만 인간들의 문제에 접근하는 데는 현실적인 효용성이 있다는 것을 알게 되었어.	0.75
 그리고/MAJ	나/NP	는/JX	서구/NNP	적/XSN	합리/NNG	성/XSN	이/JKS	비록/MAG	엉터리/NNG	이/VCP	기/ETN	는/JX	하/VX	지만/EC	인간/NNG	들/XSN	의/JKG	문제/NNG	에/JKB	접근/NNG	하/XSV	는/ETM	데/NNB	는/JX	현실/NNG	적/XSN	이/VCP	ㄴ/ETM	효용/NNG	성/XSN	이/JKS	있/VV	다는/ETM	것/NNB	을/JKO	알/VV	게/EC	되/VV	었/EP	어/EF	./SF	
-그리/VV	고/EC	나/NP	는/JX	서구/NNG	적/XSN	합리/NNG	성/XSN	이/JKS	비록/MAG	엉터리/NNG	이기/NNG	는/JX	하/VV	지만/EC	인간/NNG	들/XSN	의/JKG	문제/NNG	에/JKB	접근/NNG	하/XSV	는/ETM	데/NNB	는/JX	현실/NNG	적/XSN	이/VCP	ㄴ/ETM	효용/NNG	성/XSN	이/JKS	있/VX	다는/ETM	것/NNB	을/JKO	알/VV	게/EC	되/VV	었/EP	어/EF	./SF	-62.85
-그리/VV	고/EC	나/NP	는/JX	서구/NNG	적/XSN	합리/NNG	성/XSN	이/JKS	비록/MAG	엉터리/NNG	이기/NNG	는/JX	하/VV	지만/EC	인간/NNG	들/XSN	의/JKG	문제/NNG	에/JKB	접근/NNG	하/XSV	는/ETM	데/NNB	는/JX	현실/NNG	적/XSN	이/VCP	ㄴ/ETM	효용/NNG	성/XSN	이/JKS	있/VV	다는/ETM	것/NNB	을/JKO	알/VV	게/EC	되/VV	었/EP	어/EF	./SF	-62.87
-그리/VV	고/EC	나/NP	는/JX	서구/NNG	적/XSN	합리/NNG	성/XSN	이/JKS	비록/MAG	엉터리/NNG	이기/NNG	는/JX	하지만/MAJ	인간/NNG	들/XSN	의/JKG	문제/NNG	에/JKB	접근/NNG	하/XSV	는/ETM	데/NNB	는/JX	현실/NNG	적/XSN	이/VCP	ㄴ/ETM	효용/NNG	성/XSN	이/JKS	있/VX	다는/ETM	것/NNB	을/JKO	알/VV	게/EC	되/VV	었/EP	어/EF	./SF	-64.29
+그리/VV	고/EC	나/NP	는/JX	서구/NNG	적/XSN	합리/NNG	성/XSN	이/JKS	비록/MAG	엉터리/NNG	이기/NNG	는/JX	하/VV	지만/EC	인간/NNG	들/XSN	의/JKG	문제/NNG	에/JKB	접근/NNG	하/XSV	는/ETM	데/NNB	는/JX	현실/NNG	적/XSN	이/VCP	ㄴ/ETM	효용/NNG	성/XSN	이/JKS	있/VX	다는/ETM	것/NNB	을/JKO	알/VV	게/EC	되/VV	었/EP	어/EF	./SF	-61.78
+그리/VV	고/EC	나/NP	는/JX	서구/NNG	적/XSN	합리/NNG	성/XSN	이/JKS	비록/MAG	엉터리/NNG	이기/NNG	는/JX	하/VV	지만/EC	인간/NNG	들/XSN	의/JKG	문제/NNG	에/JKB	접근/NNG	하/XSV	는/ETM	데/NNB	는/JX	현실/NNG	적/XSN	이/VCP	ㄴ/ETM	효용/NNG	성/XSN	이/JKS	있/VV	다는/ETM	것/NNB	을/JKO	알/VV	게/EC	되/VV	었/EP	어/EF	./SF	-61.79
+그리/VV	고/EC	나/NP	는/JX	서구/NNG	적/XSN	합리/NNG	성/XSN	이/JKS	비록/MAG	엉터리/NNG	이기/NNG	는/JX	하지만/MAJ	인간/NNG	들/XSN	의/JKG	문제/NNG	에/JKB	접근/NNG	하/XSV	는/ETM	데/NNB	는/JX	현실/NNG	적/XSN	이/VCP	ㄴ/ETM	효용/NNG	성/XSN	이/JKS	있/VX	다는/ETM	것/NNB	을/JKO	알/VV	게/EC	되/VV	었/EP	어/EF	./SF	-63.22
 
 "너도 이미 알겠지만, 만약 내가 생각을 바꾸지 않았더라면 네게 이런 설명을 하는 것부터가 불가능했을 거야." 그것은 옳은 얘기였다.	0.9
 "/SS	너/NP	도/JX	이미/MAG	알/VV	겠/EP	지만/EC	,/SP	만약/NNG	내/NP	가/JKS	생각/NNG	을/JKO	바꾸/VV	지/EC	않/VX	았/EP	더라면/EC	너/NP	에게/JKB	이런/MM	설명/NNG	을/JKO	하/VV	는/ETM	것/NNB	부터/JX	가/JKS	불/XPN	가능/NNG	하/XSA	았/EP	을/ETM	거/NNB	이/VCP	야/EF	./SF	"/SS	그것/NP	은/JX	옳/VA	은/ETM	얘기/NNG	이/VCP	었/EP	다/EF	./SF	
@@ -6902,9 +6902,9 @@ Time per Unit : 1.03792 ms
 
 서양이니 동양이니 혼돈이니 하는 몇 개의 낱말들이 귓가를 윙윙거렸지만 왜 그가 갑자기 현실적인 효용성을 찾아 서구과학으로 기울게 되었는지는 여전히 애매모호하기만 했다.	0.893
 서양/NNG	이/VCP	니/EC	동양/NNG	이/VCP	니/EC	혼돈/NNG	이/VCP	니/EC	하/VV	는/ETM	몇/MM	개/NNB	의/JKG	낱말/NNG	들/XSN	이/JKS	귓가/NNG	를/JKO	윙윙거리/VV	었/EP	지만/EC	왜/MAG	그/NP	가/JKS	갑자기/MAG	현실/NNG	적/XSN	이/VCP	ㄴ/ETM	효용/NNG	성/XSN	을/JKO	찾/VV	아/EC	서구/NNP	과학/NNG	으로/JKB	기울/VV	게/EC	되/VV	었/EP	는지/EC	는/JX	여전히/MAG	애매모호/NNG	하/XSA	기/ETN	만/JX	하/VX	았/EP	다/EF	./SF	
-서양/NNG	이/VCP	니/EC	동양/NNG	이/VCP	니/EC	혼돈/NNG	이/VCP	니/EC	하/VV	는/ETM	몇/MM	개/NNB	의/JKG	낱말/NNG	들/XSN	이/JKS	귓가/NNG	를/JKO	윙윙거리/VV	었/EP	지만/EC	왜/MAG	그/NP	가/JKS	갑자기/MAG	현실/NNG	적/XSN	이/VCP	ㄴ/ETM	효용/NNG	성/XSN	을/JKO	찾/VV	아/EF	서구/NNP	과학/NNG	으로/JKB	기울/VV	게/EC	되/VV	었/EP	는지/EC	는/JX	여전히/MAG	애매모호/NNG	하/XSV	기/ETN	만/JX	하/VV	았/EP	다/EF	./SF	-134.6
-서양/NNG	이/VCP	니/EC	동양/NNG	이/VCP	니/EC	혼돈/NNG	이니/JC	하/VV	는/ETM	몇/MM	개/NNB	의/JKG	낱말/NNG	들/XSN	이/JKS	귓가/NNG	를/JKO	윙윙거리/VV	었/EP	지만/EC	왜/MAG	그/NP	가/JKS	갑자기/MAG	현실/NNG	적/XSN	이/VCP	ㄴ/ETM	효용/NNG	성/XSN	을/JKO	찾/VV	아/EF	서구/NNP	과학/NNG	으로/JKB	기울/VV	게/EC	되/VV	었/EP	는지/EC	는/JX	여전히/MAG	애매모호/NNG	하/XSV	기/ETN	만/JX	하/VV	았/EP	다/EF	./SF	-134.7
-서양/NNG	이/VCP	니/EC	동양/NNG	이/VCP	니/EC	혼돈/NNG	이/VCP	니/EC	하/VX	는/ETM	몇/MM	개/NNB	의/JKG	낱말/NNG	들/XSN	이/JKS	귓가/NNG	를/JKO	윙윙거리/VV	었/EP	지만/EC	왜/MAG	그/NP	가/JKS	갑자기/MAG	현실/NNG	적/XSN	이/VCP	ㄴ/ETM	효용/NNG	성/XSN	을/JKO	찾/VV	아/EF	서구/NNP	과학/NNG	으로/JKB	기울/VV	게/EC	되/VV	었/EP	는지/EC	는/JX	여전히/MAG	애매모호/NNG	하/XSV	기/ETN	만/JX	하/VV	았/EP	다/EF	./SF	-135.6
+서양/NNG	이/VCP	니/EC	동양/NNG	이/VCP	니/EC	혼돈/NNG	이/VCP	니/EC	하/VV	는/ETM	몇/MM	개/NNB	의/JKG	낱말/NNG	들/XSN	이/JKS	귓가/NNG	를/JKO	윙윙거리/VV	었/EP	지만/EC	왜/MAG	그/NP	가/JKS	갑자기/MAG	현실/NNG	적/XSN	이/VCP	ㄴ/ETM	효용/NNG	성/XSN	을/JKO	찾/VV	아/EF	서구/NNP	과학/NNG	으로/JKB	기울/VV	게/EC	되/VV	었/EP	는지/EC	는/JX	여전히/MAG	애매모호/NNG	하/XSV	기/ETN	만/JX	하/VV	았/EP	다/EF	./SF	-133.5
+서양/NNG	이/VCP	니/EC	동양/NNG	이/VCP	니/EC	혼돈/NNG	이니/JC	하/VV	는/ETM	몇/MM	개/NNB	의/JKG	낱말/NNG	들/XSN	이/JKS	귓가/NNG	를/JKO	윙윙거리/VV	었/EP	지만/EC	왜/MAG	그/NP	가/JKS	갑자기/MAG	현실/NNG	적/XSN	이/VCP	ㄴ/ETM	효용/NNG	성/XSN	을/JKO	찾/VV	아/EF	서구/NNP	과학/NNG	으로/JKB	기울/VV	게/EC	되/VV	었/EP	는지/EC	는/JX	여전히/MAG	애매모호/NNG	하/XSV	기/ETN	만/JX	하/VV	았/EP	다/EF	./SF	-133.7
+서양/NNG	이/VCP	니/EC	동양/NNG	이/VCP	니/EC	혼돈/NNG	이/VCP	니/EC	하/VX	는/ETM	몇/MM	개/NNB	의/JKG	낱말/NNG	들/XSN	이/JKS	귓가/NNG	를/JKO	윙윙거리/VV	었/EP	지만/EC	왜/MAG	그/NP	가/JKS	갑자기/MAG	현실/NNG	적/XSN	이/VCP	ㄴ/ETM	효용/NNG	성/XSN	을/JKO	찾/VV	아/EF	서구/NNP	과학/NNG	으로/JKB	기울/VV	게/EC	되/VV	었/EP	는지/EC	는/JX	여전히/MAG	애매모호/NNG	하/XSV	기/ETN	만/JX	하/VV	았/EP	다/EF	./SF	-134.5
 
 그것은 차라리 다행스러운 일이었다.	0.692
 그것/NP	은/JX	차라리/MAG	다행/NNG	스럽/XSA	ㄴ/ETM	일/NNG	이/VCP	었/EP	다/EF	./SF	
@@ -7082,9 +7082,9 @@ Time per Unit : 1.03792 ms
 
 입놀림이 몹시도 가벼웠던 그는 들은 이야기를 여기저기 흩뿌리고 다니는 재주가 있었다.	0.92
 입놀림/NNG	이/JKS	몹시/MAG	도/JX	가볍/VA	었/EP	던/ETM	그/NP	는/JX	듣/VV	은/ETM	이야기/NNG	를/JKO	여기저기/NNG	흩뿌리/VV	고/EC	다니/VV	는/ETM	재주/NNG	가/JKS	있/VV	었/EP	다/EF	./SF	
-입놀림/NNG	이/JKS	몹시/MAG	도/JX	가볍/VA	었/EP	던/ETM	그/NP	는/JX	듣/VV	은/ETM	이야기/NNG	를/JKO	여기저기/NNG	흩뿌리/VV	고/EC	다니/VV	는/ETM	재주/NNG	가/JKS	있/VX	었/EP	다/EF	./SF	-38.73
-입놀림/NNG	이/JKS	몹시/MAG	도/JX	가볍/VA	었/EP	던/ETM	그/NP	는/JX	듣/VV	은/ETM	이야기/NNG	를/JKO	여기저기/NNG	흩뿌리/VV	고/EC	다니/VV	는/ETM	재주/NNG	가/JKS	있/VV	었/EP	다/EF	./SF	-40.2
-입놀림/NNG	이/JKS	몹시/MAG	도/JX	가볍/VA	었/EP	던/ETM	그/NP	는/JX	듣/VV	은/ETM	이야기/NNG	를/JKO	여기저기/NNG	흩뿌리/VV	고/EC	다니/VV	는/ETM	재주/NNG	가/JKS	있/VA	었/EP	다/EF	./SF	-44.56
+입놀림/NNG	이/JKS	몹시/MAG	도/JX	가볍/VA	었/EP	던/ETM	그/NP	는/JX	듣/VV	은/ETM	이야기/NNG	를/JKO	여기저기/NNG	흩뿌리/VV	고/EC	다니/VV	는/ETM	재주/NNG	가/JKS	있/VX	었/EP	다/EF	./SF	-37.4
+입놀림/NNG	이/JKS	몹시/MAG	도/JX	가볍/VA	었/EP	던/ETM	그/NP	는/JX	듣/VV	은/ETM	이야기/NNG	를/JKO	여기저기/NNG	흩뿌리/VV	고/EC	다니/VV	는/ETM	재주/NNG	가/JKS	있/VV	었/EP	다/EF	./SF	-38.87
+입놀림/NNG	이/JKS	몹시/MAG	도/JX	가볍/VA	었/EP	던/ETM	그/NP	는/JX	듣/VV	은/ETM	이야기/NNG	를/JKO	여기저기/NNG	흩뿌리/VV	고/EC	다니/VV	는/ETM	재주/NNG	가/JKS	있/VA	었/EP	다/EF	./SF	-43.23
 
 장윤 씨로부터 들은 미래인과 타임머신에 대한 얘기를 이승범 씨에게 전한 것도 그였고 또 그 말을 들은 이승범 씨가 코웃음친 일을 장윤 씨에게 다시 옮긴 것도 그였다.	0.825
 장윤/NNP	씨/NNB	로부터/JKB	듣/VV	은/ETM	미래인/NNG	과/JC	타임머신/NNG	에/JKB	대하/VV	ㄴ/ETM	얘기/NNG	를/JKO	이승범/NNP	씨/NNB	에게/JKB	전하/VV	ㄴ/ETM	것/NNB	도/JX	그/NP	이/VCP	었/EP	고/EC	또/MAG	그/MM	말/NNG	을/JKO	듣/VV	은/ETM	이승범/NNP	씨/NNB	가/JKS	코웃음/NNG	치/VV	ㄴ/ETM	일/NNG	을/JKO	장윤/NNP	씨/NNB	에게/JKB	다시/MAG	옮기/VV	ㄴ/ETM	것/NNB	도/JX	그/NP	이/VCP	었/EP	다/EF	./SF	
@@ -7334,9 +7334,9 @@ Time per Unit : 1.03792 ms
 
 사실 이건 내가 혼자 속에만 담아 두려고 했던 건데 말이야, 그날 그 애들이 들어왔을 때 나는 아주 희미하게 풍기는 술 냄새를 맡을 수가 있었어.	0.759
 사실/MAG	이것/NP	ㄴ/JX	내/NP	가/JKS	혼자/NNG	속/NNG	에/JKB	만/JX	담/VV	아/EC	두/VX	려고/EC	하/VX	았/EP	던/ETM	것/NNB	이/VCP	ㄴ데/EC	말/NNG	이/VCP	야/EC	,/SP	그날/NNG	그/MM	애/NNG	들/XSN	이/JKS	들어오/VV	았/EP	을/ETM	때/NNG	나/NP	는/JX	아주/MAG	희미/XR	하/XSA	게/EC	풍기/VV	는/ETM	술/NNG	냄새/NNG	를/JKO	맡/VV	을/ETM	수/NNB	가/JKS	있/VV	었/EP	어/EF	./SF	
-사실/NNG	이거/NP	ㄴ/JX	내/NP	가/JKS	혼자/NNG	속/NNG	에/JKB	만/JX	담/VV	아/EF	두/VX	려고/EC	하/VV	았/EP	던/ETM	거/NNB	이/VCP	ㄴ데/EC	말/NNG	이/VCP	야/EF	,/SP	그날/NNG	그/MM	애/NNG	들/XSN	이/JKS	들어오/VV	았/EP	을/ETM	때/NNG	나/NP	는/JX	아주/MAG	희미/XR	하/XSA	게/EC	풍기/VV	는/ETM	술/NNG	냄새/NNG	를/JKO	맡/VV	을/ETM	수/NNB	가/JKS	있/VX	었/EP	어/EF	./SF	-115
-사실/NNG	이거/NP	ㄴ/JX	내/NP	가/JKS	혼자/NNG	속/NNG	에/JKB	만/JX	담/VV	아/EF	두/VX	려고/EC	하/VV	았/EP	던/ETM	거/NNB	이/VCP	ㄴ데/EC	말/NNG	이/VCP	야/EF	,/SP	그날/NNG	그/NP	애/NNG	들/XSN	이/JKS	들어오/VV	았/EP	을/ETM	때/NNG	나/NP	는/JX	아주/MAG	희미/XR	하/XSA	게/EC	풍기/VV	는/ETM	술/NNG	냄새/NNG	를/JKO	맡/VV	을/ETM	수/NNB	가/JKS	있/VX	었/EP	어/EF	./SF	-115.3
-사실/NNG	이거/NP	ㄴ/JX	내/NP	가/JKS	혼자/NNG	속/NNG	에/JKB	만/JX	담/VV	아/EF	두/VX	려고/EC	하/VV	았/EP	던/ETM	거/NNB	이/VCP	ㄴ데/EC	말/NNG	이/VCP	야/EF	,/SP	그날/NNG	그/MM	애/NNG	들/XSN	이/JKS	들어오/VV	았/EP	을/ETM	때/NNG	나/NP	는/JX	아주/MAG	희미/XR	하/XSA	게/EC	풍기/VV	는/ETM	술/NNG	냄새/NNG	를/JKO	맡/VV	을/ETM	수/NNB	가/JKS	있/VV	었/EP	어/EF	./SF	-111.3
+사실/NNG	이거/NP	ㄴ/JX	내/NP	가/JKS	혼자/NNG	속/NNG	에/JKB	만/JX	담/VV	아/EF	두/VX	려고/EC	하/VV	았/EP	던/ETM	거/NNB	이/VCP	ㄴ데/EC	말/NNG	이/VCP	야/EF	,/SP	그날/NNG	그/MM	애/NNG	들/XSN	이/JKS	들어오/VV	았/EP	을/ETM	때/NNG	나/NP	는/JX	아주/MAG	희미/XR	하/XSA	게/EC	풍기/VV	는/ETM	술/NNG	냄새/NNG	를/JKO	맡/VV	을/ETM	수/NNB	가/JKS	있/VX	었/EP	어/EF	./SF	-111.6
+사실/NNG	이거/NP	ㄴ/JX	내/NP	가/JKS	혼자/NNG	속/NNG	에/JKB	만/JX	담/VV	아/EF	두/VX	려고/EC	하/VV	았/EP	던/ETM	거/NNB	이/VCP	ㄴ데/EC	말/NNG	이/VCP	야/EF	,/SP	그날/NNG	그/NP	애/NNG	들/XSN	이/JKS	들어오/VV	았/EP	을/ETM	때/NNG	나/NP	는/JX	아주/MAG	희미/XR	하/XSA	게/EC	풍기/VV	는/ETM	술/NNG	냄새/NNG	를/JKO	맡/VV	을/ETM	수/NNB	가/JKS	있/VX	었/EP	어/EF	./SF	-111.9
+사실/NNG	이거/NP	ㄴ/JX	내/NP	가/JKS	혼자/NNG	속/NNG	에/JKB	만/JX	담/VV	아/EF	두/VX	려고/EC	하/VV	았/EP	던/ETM	거/NNB	이/VCP	ㄴ데/EC	말/NNG	이/VCP	야/EF	,/SP	그날/NNG	그/MM	애/NNG	들/XSN	이/JKS	들어오/VV	았/EP	을/ETM	때/NNG	나/NP	는/JX	아주/MAG	희미/XR	하/XSA	게/EC	풍기/VV	는/ETM	술/NNG	냄새/NNG	를/JKO	맡/VV	을/ETM	수/NNB	가/JKS	있/VV	었/EP	어/EF	./SF	-107.8
 
 그것도 소주나 맥주 냄새가 아니라 제법 값비싼 양주 냄새였다구.	0.895
 그것/NP	도/JX	소주/NNG	나/JC	맥주/NNG	냄새/NNG	가/JKC	아니/VCN	라/EC	제법/MAG	값비싸/VA	ㄴ/ETM	양주/NNG	냄새/NNG	이/VCP	었/EP	다구/EF	./SF	
@@ -7550,9 +7550,9 @@ Time per Unit : 1.03792 ms
 
 그가 일단 그물을 쳤다면 그것을 빠져 나갈 가능성은 희박했지만 아무튼 최대한 저항해 볼 필요는 있었던 것이다.	0.947
 그/NP	가/JKS	일단/MAG	그물/NNG	을/JKO	치/VV	었/EP	다면/EC	그것/NP	을/JKO	빠지/VV	어/EC	나가/VX	ㄹ/ETM	가능/NNG	성/XSN	은/JX	희박/XR	하/XSA	았/EP	지만/EC	아무튼/MAG	최대한/NNG	저항/NNG	하/XSV	아/EC	보/VX	ㄹ/ETM	필요/NNG	는/JX	있/VV	었/EP	던/ETM	것/NNB	이/VCP	다/EF	./SF	
-그/NP	가/JKS	일단/MAG	그물/NNG	을/JKO	치/VV	었/EP	다면/EC	그것/NP	을/JKO	빠지/VV	어/EC	나가/VX	ㄹ/ETM	가능/NNG	성/XSN	은/JX	희박/XR	하/XSA	았/EP	지만/EC	아무튼/MAG	최대한/NNG	저항/NNG	하/XSV	아/EC	보/VX	ㄹ/ETM	필요/NNG	는/JX	있/VX	었/EP	던/ETM	것/NNB	이/VCP	다/EF	./SF	-47.28
-그/NP	가/JKS	일단/MAG	그물/NNG	을/JKO	치/VV	었/EP	다면/EC	그것/NP	을/JKO	빠지/VV	어/EC	나가/VX	ㄹ/ETM	가능/NNG	성/XSN	은/JX	희박/XR	하/XSA	았/EP	지만/EC	아무튼/MAG	최대한/NNG	저항/NNG	하/XSV	아/EC	보/VX	ㄹ/ETM	필요/NNG	는/JX	있/VV	었/EP	던/ETM	것/NNB	이/VCP	다/EF	./SF	-47.65
-그/NP	가/JKS	일단/MAG	그물/NNG	을/JKO	치/VV	었/EP	다면/EC	그것/NP	을/JKO	빠지/VV	어/EC	나가/VX	ㄹ/ETM	가능/NNG	성/XSN	은/JX	희박/XR	하/XSA	았/EP	지만/EC	아무튼/MAG	최대한/NNG	저항/NNG	하/XSA	아/EC	보/VX	ㄹ/ETM	필요/NNG	는/JX	있/VX	었/EP	던/ETM	것/NNB	이/VCP	다/EF	./SF	-49.19
+그/NP	가/JKS	일단/MAG	그물/NNG	을/JKO	치/VV	었/EP	다면/EC	그것/NP	을/JKO	빠지/VV	어/EC	나가/VX	ㄹ/ETM	가능/NNG	성/XSN	은/JX	희박/XR	하/XSA	았/EP	지만/EC	아무튼/MAG	최대한/NNG	저항/NNG	하/XSV	아/EC	보/VX	ㄹ/ETM	필요/NNG	는/JX	있/VX	었/EP	던/ETM	것/NNB	이/VCP	다/EF	./SF	-44.81
+그/NP	가/JKS	일단/MAG	그물/NNG	을/JKO	치/VV	었/EP	다면/EC	그것/NP	을/JKO	빠지/VV	어/EC	나가/VX	ㄹ/ETM	가능/NNG	성/XSN	은/JX	희박/XR	하/XSA	았/EP	지만/EC	아무튼/MAG	최대한/NNG	저항/NNG	하/XSV	아/EC	보/VX	ㄹ/ETM	필요/NNG	는/JX	있/VV	었/EP	던/ETM	것/NNB	이/VCP	다/EF	./SF	-45.18
+그/NP	가/JKS	일단/MAG	그물/NNG	을/JKO	치/VV	었/EP	다면/EC	그것/NP	을/JKO	빠지/VV	어/EC	나가/VX	ㄹ/ETM	가능/NNG	성/XSN	은/JX	희박/XR	하/XSA	았/EP	지만/EC	아무튼/MAG	최대한/NNG	저항/NNG	하/XSA	아/EC	보/VX	ㄹ/ETM	필요/NNG	는/JX	있/VX	었/EP	던/ETM	것/NNB	이/VCP	다/EF	./SF	-46.73
 
 "그래 그녀하고 한평생을 함께할 각오라도 했니." 그는 아주 단도직입적으로 물었다.	0.897
 "/SS	그래/IC	그녀/NP	하고/JKB	한평생/NNG	을/JKO	함께/MAG	하/XSV	ㄹ/ETM	각오/NNG	이/VCP	라도/EC	하/VV	았/EP	니/EF	./SF	"/SS	그/NP	는/JX	아주/MAG	단도직입/NNG	적/XSN	으로/JKB	묻/VV	었/EP	다/EF	./SF	
@@ -8012,9 +8012,9 @@ Time per Unit : 1.03792 ms
 
 이를테면 나는 등록금이 없어서 대학을 휴학해야만 했을 때나 말도 되지 않는 군대 상관들의 군화에 짓밟혔을 때 보다 자유로운 상태를 갈망했었던 것이다.	0.815
 이를테면/MAG	나/NP	는/JX	등록금/NNG	이/JKS	없/VA	어서/EC	대학/NNG	을/JKO	휴학/NNG	하/XSV	아야/EC	만/JX	하/VX	았/EP	을/ETM	때/NNG	나/JC	말/NNG	도/JX	되/VV	지/EC	않/VX	는/ETM	군대/NNG	상관/NNG	들/XSN	의/JKG	군화/NNG	에/JKB	짓밟히/VV	었/EP	을/ETM	때/NNG	보다/MAG	자유/NNG	롭/XSA	ㄴ/ETM	상태/NNG	를/JKO	갈망/NNG	하/XSV	았었/EP	던/ETM	것/NNB	이/VCP	다/EF	./SF	
-이를테면/MAG	나/NP	는/JX	등록금/NNG	이/JKS	없/VA	어서/EC	대학/NNG	을/JKO	휴학/NNG	하/XSV	아야/EC	말/VX	ㄴ/ETM	하/VV	았/EP	을/ETM	때/NNG	나/JX	말/NNG	도/JX	되/VV	지/EC	않/VX	는/ETM	군대/NNG	상관/NNG	들/XSN	의/JKG	군화/NNG	에/JKB	짓밟히/VV	었/EP	을/ETM	때/NNG	보/VV	다/EC	자유/NNG	롭/XSA	은/ETM	상태/NNG	를/JKO	갈망/NNG	하/XSV	았었/EP	던/ETM	것/NNB	이/VCP	다/EF	./SF	-101.5
-이를테면/MAG	나/NP	는/JX	등록금/NNG	이/JKS	없/VA	어서/EC	대학/NNG	을/JKO	휴학/NNG	하/XSV	아야/EC	말/VX	ㄴ/ETM	하/VV	았/EP	을/ETM	때/NNG	나/JX	말/NNG	도/JX	되/VV	지/EC	않/VX	는/ETM	군대/NNG	상관/NNG	들/XSN	의/JKG	군화/NNG	에/JKB	짓밟히/VV	었/EP	을/ETM	때/NNG	보/VV	다/EC	자유/NNG	롭/XSA	은/ETM	상태/NNG	를/JKO	갈망/NNG	하/XSV	았었/EP	던/ETM	것/NNB	이/VCP	다/EF	./SF	-101.5
-이를테면/MAG	나/NP	는/JX	등록금/NNG	이/JKS	없/VA	어서/EC	대학/NNG	을/JKO	휴학/NNG	하/XSV	아야/EC	말/VX	ㄴ/ETM	하/VV	았/EP	을/ETM	때/NNG	나/JC	말/NNG	도/JX	되/VV	지/EC	않/VX	는/ETM	군대/NNG	상관/NNG	들/XSN	의/JKG	군화/NNG	에/JKB	짓밟히/VV	었/EP	을/ETM	때/NNG	보/VV	다/EC	자유/NNG	롭/XSA	은/ETM	상태/NNG	를/JKO	갈망/NNG	하/XSV	았었/EP	던/ETM	것/NNB	이/VCP	다/EF	./SF	-101.9
+이를테면/MAG	나/NP	는/JX	등록금/NNG	이/JKS	없/VA	어서/EC	대학/NNG	을/JKO	휴학/NNG	하/XSV	아야/EC	말/VX	ㄴ/ETM	하/VV	았/EP	을/ETM	때/NNG	나/JX	말/NNG	도/JX	되/VV	지/EC	않/VX	는/ETM	군대/NNG	상관/NNG	들/XSN	의/JKG	군화/NNG	에/JKB	짓밟히/VV	었/EP	을/ETM	때/NNG	보/VV	다/EC	자유/NNG	롭/XSA	은/ETM	상태/NNG	를/JKO	갈망/NNG	하/XSV	았었/EP	던/ETM	것/NNB	이/VCP	다/EF	./SF	-99.54
+이를테면/MAG	나/NP	는/JX	등록금/NNG	이/JKS	없/VA	어서/EC	대학/NNG	을/JKO	휴학/NNG	하/XSV	아야/EC	말/VX	ㄴ/ETM	하/VV	았/EP	을/ETM	때/NNG	나/JX	말/NNG	도/JX	되/VV	지/EC	않/VX	는/ETM	군대/NNG	상관/NNG	들/XSN	의/JKG	군화/NNG	에/JKB	짓밟히/VV	었/EP	을/ETM	때/NNG	보/VV	다/EC	자유/NNG	롭/XSA	은/ETM	상태/NNG	를/JKO	갈망/NNG	하/XSV	았었/EP	던/ETM	것/NNB	이/VCP	다/EF	./SF	-99.54
+이를테면/MAG	나/NP	는/JX	등록금/NNG	이/JKS	없/VA	어서/EC	대학/NNG	을/JKO	휴학/NNG	하/XSV	아야/EC	말/VX	ㄴ/ETM	하/VV	았/EP	을/ETM	때/NNG	나/JC	말/NNG	도/JX	되/VV	지/EC	않/VX	는/ETM	군대/NNG	상관/NNG	들/XSN	의/JKG	군화/NNG	에/JKB	짓밟히/VV	었/EP	을/ETM	때/NNG	보/VV	다/EC	자유/NNG	롭/XSA	은/ETM	상태/NNG	를/JKO	갈망/NNG	하/XSV	았었/EP	던/ETM	것/NNB	이/VCP	다/EF	./SF	-99.94
 
 그런데 그 결핍과 억압으로부터 격리되었을 때, 그래서 진정 자유롭다고 말할 수 있는 상태가 되었을 때 과연 내가 하고 싶은 일은 어떤 것일까.	0.712
 그런데/MAJ	그/MM	결핍/NNG	과/JC	억압/NNG	으로부터/JKB	격리/NNG	되/XSV	었/EP	을/ETM	때/NNG	,/SP	그래서/MAJ	진정/MAG	자유/NNG	롭/XSA	다고/EC	말/NNG	하/XSV	ㄹ/ETM	수/NNB	있/VV	는/ETM	상태/NNG	가/JKC	되/VV	었/EP	을/ETM	때/NNG	과연/MAG	내/NP	가/JKS	하/VV	고/EC	싶/VX	은/ETM	일/NNG	은/JX	어떤/MM	것/NNB	이/VCP	ㄹ까/EF	./SF	
@@ -8324,9 +8324,9 @@ Time per Unit : 1.03792 ms
 
 그런데 그 충격의 정도는 내 예상을 훨씬 지나치는 것 같기도 했다.	0.654
 그런데/MAJ	그/MM	충격/NNG	의/JKG	정도/NNG	는/JX	나/NP	의/JKG	예상/NNG	을/JKO	훨씬/MAG	지나치/VV	는/ETM	것/NNB	같/VA	기/ETN	도/JX	하/VX	았/EP	다/EF	./SF	
-그렇/VA	ㄴ데/EC	그/NP	충격/NNG	의/JKG	정도/NNG	는/JX	나/NP	의/JKG	예상/NNG	을/JKO	훨씬/MAG	지나치/VA	는/ETM	것/NNB	같/VA	기/ETN	도/JX	하/VV	았/EP	다/EF	./SF	-42.57
-그러/VV	ㄴ데/EC	그/NP	충격/NNG	의/JKG	정도/NNG	는/JX	나/NP	의/JKG	예상/NNG	을/JKO	훨씬/MAG	지나치/VA	는/ETM	것/NNB	같/VA	기/ETN	도/JX	하/VV	았/EP	다/EF	./SF	-42.68
-그런데/MAJ	그/NP	충격/NNG	의/JKG	정도/NNG	는/JX	나/NP	의/JKG	예상/NNG	을/JKO	훨씬/MAG	지나치/VA	는/ETM	것/NNB	같/VA	기/ETN	도/JX	하/VV	았/EP	다/EF	./SF	-42.84
+그렇/VA	ㄴ데/EC	그/NP	충격/NNG	의/JKG	정도/NNG	는/JX	나/NP	의/JKG	예상/NNG	을/JKO	훨씬/MAG	지나치/VA	는/ETM	것/NNB	같/VA	기/ETN	도/JX	하/VV	았/EP	다/EF	./SF	-40.41
+그러/VV	ㄴ데/EC	그/NP	충격/NNG	의/JKG	정도/NNG	는/JX	나/NP	의/JKG	예상/NNG	을/JKO	훨씬/MAG	지나치/VA	는/ETM	것/NNB	같/VA	기/ETN	도/JX	하/VV	았/EP	다/EF	./SF	-40.53
+그런데/MAJ	그/NP	충격/NNG	의/JKG	정도/NNG	는/JX	나/NP	의/JKG	예상/NNG	을/JKO	훨씬/MAG	지나치/VA	는/ETM	것/NNB	같/VA	기/ETN	도/JX	하/VV	았/EP	다/EF	./SF	-40.69
 
 시내 구경도 좀 하고, 그리고 김상철 씨가 일자리를 구해 주겠다는 회사도 평양시 근처에 있는 모양이에요." 자리를 구해 주겠다는 회사며 평양시 근처라는 얘기 따위는 내가 그냥 주워섬긴 것들이었다.	0.831
 시내/NNG	구경/NNG	도/JX	좀/MAG	하/VV	고/EC	,/SP	그리고/MAJ	김상철/NNP	씨/NNB	가/JKS	일자리/NNG	를/JKO	구하/VV	아/EC	주/VX	겠/EP	다는/ETM	회사/NNG	도/JX	평양시/NNP	근처/NNG	에/JKB	있/VV	는/ETM	모양/NNG	이/VCP	에요/EF	./SF	"/SS	자리/NNG	를/JKO	구하/VV	아/EC	주/VX	겠/EP	다는/ETM	회사/NNG	이/VCP	며/EC	평양시/NNP	근처/NNG	이/VCP	라는/ETM	얘기/NNG	따위/NNB	는/JX	내/NP	가/JKS	그냥/MAG	주워섬기/VV	ㄴ/ETM	것/NNB	들/XSN	이/VCP	었/EP	다/EF	./SF	
@@ -9368,9 +9368,9 @@ Time per Unit : 1.03792 ms
 
 7 혼자가 되어 터벅터벅 집으로 돌아오는 길에 나는 가슴을 움켜 쥐느라 혼신의 힘을 기울여야 했다.	0.818
 7/SN	혼자/NNG	가/JKC	되/VV	어/EC	터벅터벅/MAG	집/NNG	으로/JKB	돌아오/VV	는/ETM	길/NNG	에/JKB	나/NP	는/JX	가슴/NNG	을/JKO	움키/VV	어/EC	쥐/VV	느라/EC	혼신/NNG	의/JKG	힘/NNG	을/JKO	기울이/VV	어야/EC	하/VX	았/EP	다/EF	./SF	
-7/SN	혼자/NNG	가/JKS	되/VV	어/EC	터벅터벅/NNP	집/NNG	으로/JKB	돌아오/VV	는/ETM	길/NNG	에/JKB	나/NP	는/JX	가슴/NNG	을/JKO	움키/VV	어/EC	쥐/VV	느라/EC	혼신/NNG	의/JKG	힘/NNG	을/JKO	기울이/VV	어야/EC	하/VV	았/EP	다/EF	./SF	-45.06
-7/SN	혼자/NNG	가/JKC	되/VV	어/EC	터벅터벅/NNP	집/NNG	으로/JKB	돌아오/VV	는/ETM	길/NNG	에/JKB	나/NP	는/JX	가슴/NNG	을/JKO	움키/VV	어/EC	쥐/VV	느라/EC	혼신/NNG	의/JKG	힘/NNG	을/JKO	기울이/VV	어야/EC	하/VV	았/EP	다/EF	./SF	-47.09
-7/SN	혼자/NNG	이/VCP	가/EC	되/VV	어/EC	터벅터벅/NNP	집/NNG	으로/JKB	돌아오/VV	는/ETM	길/NNG	에/JKB	나/NP	는/JX	가슴/NNG	을/JKO	움키/VV	어/EC	쥐/VV	느라/EC	혼신/NNG	의/JKG	힘/NNG	을/JKO	기울이/VV	어야/EC	하/VV	았/EP	다/EF	./SF	-47.24
+7/SN	혼자/NNG	가/JKS	되/VV	어/EC	터벅터벅/NNP	집/NNG	으로/JKB	돌아오/VV	는/ETM	길/NNG	에/JKB	나/NP	는/JX	가슴/NNG	을/JKO	움키/VV	어/EC	쥐/VV	느라/EC	혼신/NNG	의/JKG	힘/NNG	을/JKO	기울이/VV	어야/EC	하/VV	았/EP	다/EF	./SF	-41.14
+7/SN	혼자/NNG	가/JKC	되/VV	어/EC	터벅터벅/NNP	집/NNG	으로/JKB	돌아오/VV	는/ETM	길/NNG	에/JKB	나/NP	는/JX	가슴/NNG	을/JKO	움키/VV	어/EC	쥐/VV	느라/EC	혼신/NNG	의/JKG	힘/NNG	을/JKO	기울이/VV	어야/EC	하/VV	았/EP	다/EF	./SF	-43.18
+7/SN	혼자/NNG	이/VCP	가/EC	되/VV	어/EC	터벅터벅/NNP	집/NNG	으로/JKB	돌아오/VV	는/ETM	길/NNG	에/JKB	나/NP	는/JX	가슴/NNG	을/JKO	움키/VV	어/EC	쥐/VV	느라/EC	혼신/NNG	의/JKG	힘/NNG	을/JKO	기울이/VV	어야/EC	하/VV	았/EP	다/EF	./SF	-43.32
 
 소리를 마구 지르고 싶었지만 입을 여는 순간 온몸이 산산조각 나버릴 것만 같아 그럴 수도 없었다.	0.939
 소리/NNG	를/JKO	마구/MAG	지르/VV	고/EC	싶/VX	었/EP	지만/EC	입/NNG	을/JKO	열/VV	는/ETM	순간/NNG	온몸/NNG	이/JKS	산산조각/NNG	나/VV	아/EC	버리/VX	ㄹ/ETM	것/NNB	만/JX	같/VA	아/EC	그렇/VA	ㄹ/ETM	수/NNB	도/JX	없/VA	었/EP	다/EF	./SF	
@@ -10640,9 +10640,9 @@ Time per Unit : 1.03792 ms
 
 그리고 다행스럽게도 서민욱은 어렸을 적부터 효자로 소문이 난 친구였다는 거야." 김세진이 아들 동훈에게 원한 것은 광주로 내려가 그 모녀의 집 하숙생이 되는 것이었다.	0.879
 그리고/MAJ	다행/NNG	스럽/XSA	게/EC	도/JX	서민욱/NNP	은/JX	어리/VA	었/EP	을/ETM	적/NNB	부터/JX	효자/NNG	로/JKB	소문/NNG	이/JKS	나/VV	ㄴ/ETM	친구/NNG	이/VCP	었/EP	다는/ETM	거/NNB	이/VCP	야/EF	./SF	"/SS	김세진/NNP	이/JKS	아들/NNG	동훈/NNP	에게/JKB	원하/VV	ㄴ/ETM	것/NNB	은/JX	광주/NNP	로/JKB	내려가/VV	아/EC	그/MM	모녀/NNG	의/JKG	집/NNG	하숙/NNG	생/XSN	이/JKC	되/VV	는/ETM	것/NNB	이/VCP	었/EP	다/EF	./SF	
-그리/VV	고/EC	다행/NNG	스럽/XSA	게/EC	도/JX	서민욱/NNP	은/JX	어리/VA	었/EP	을/ETM	적/NNB	부터/JX	효자/NNG	로/JKB	소문/NNG	이/JKS	나/VV	ㄴ/ETM	친구/NNG	이/VCP	었/EP	다는/ETM	거/NNB	이/VCP	야/EF	./SF	"/SS	김세진/NNP	이/JKS	아들/NNG	동훈/NNP	에게/JKB	원하/VV	ㄴ/ETM	것/NNB	은/JX	광주/NNP	로/JKB	내려가/VV	아/EC	그/NP	모녀/NNG	의/JKG	집/NNG	하숙/NNG	생/XSN	이/JKS	되/VV	는/ETM	것/NNB	이/VCP	었/EP	다/EF	./SF	-92.67
-그리/VV	고/EC	다행/NNG	스럽/XSA	게/EC	도/JX	서민욱/NNP	은/JX	어리/VA	었/EP	을/ETM	적/NNB	부터/JX	효자/NNG	로/JKB	소문/NNG	이/JKS	나/VV	ㄴ/ETM	친구/NNG	이/VCP	었/EP	다는/ETM	거/NNB	이/VCP	야/EF	./SF	"/SS	김세진/NNP	이/JKS	아들/NNG	동훈/NNP	에게/JKB	원하/VV	ㄴ/ETM	것/NNB	은/JX	광주/NNP	로/JKB	내려가/VV	아/EC	그/MM	모녀/NNG	의/JKG	집/NNG	하숙/NNG	생/XSN	이/JKS	되/VV	는/ETM	것/NNB	이/VCP	었/EP	다/EF	./SF	-93.72
-그리고/MAJ	다행/NNG	스럽/XSA	게/EC	도/JX	서민욱/NNP	은/JX	어리/VA	었/EP	을/ETM	적/NNB	부터/JX	효자/NNG	로/JKB	소문/NNG	이/JKS	나/VV	ㄴ/ETM	친구/NNG	이/VCP	었/EP	다는/ETM	거/NNB	이/VCP	야/EF	./SF	"/SS	김세진/NNP	이/JKS	아들/NNG	동훈/NNP	에게/JKB	원하/VV	ㄴ/ETM	것/NNB	은/JX	광주/NNP	로/JKB	내려가/VV	아/EC	그/NP	모녀/NNG	의/JKG	집/NNG	하숙/NNG	생/XSN	이/JKS	되/VV	는/ETM	것/NNB	이/VCP	었/EP	다/EF	./SF	-94.36
+그리/VV	고/EC	다행/NNG	스럽/XSA	게/EC	도/JX	서민욱/NNP	은/JX	어리/VA	었/EP	을/ETM	적/NNB	부터/JX	효자/NNG	로/JKB	소문/NNG	이/JKS	나/VV	ㄴ/ETM	친구/NNG	이/VCP	었/EP	다는/ETM	거/NNB	이/VCP	야/EF	./SF	"/SS	김세진/NNP	이/JKS	아들/NNG	동훈/NNP	에게/JKB	원하/VV	ㄴ/ETM	것/NNB	은/JX	광주/NNP	로/JKB	내려가/VV	아/EC	그/NP	모녀/NNG	의/JKG	집/NNG	하숙/NNG	생/XSN	이/JKS	되/VV	는/ETM	것/NNB	이/VCP	었/EP	다/EF	./SF	-87.99
+그리/VV	고/EC	다행/NNG	스럽/XSA	게/EC	도/JX	서민욱/NNP	은/JX	어리/VA	었/EP	을/ETM	적/NNB	부터/JX	효자/NNG	로/JKB	소문/NNG	이/JKS	나/VV	ㄴ/ETM	친구/NNG	이/VCP	었/EP	다는/ETM	거/NNB	이/VCP	야/EF	./SF	"/SS	김세진/NNP	이/JKS	아들/NNG	동훈/NNP	에게/JKB	원하/VV	ㄴ/ETM	것/NNB	은/JX	광주/NNP	로/JKB	내려가/VV	아/EC	그/MM	모녀/NNG	의/JKG	집/NNG	하숙/NNG	생/XSN	이/JKS	되/VV	는/ETM	것/NNB	이/VCP	었/EP	다/EF	./SF	-89.04
+그리고/MAJ	다행/NNG	스럽/XSA	게/EC	도/JX	서민욱/NNP	은/JX	어리/VA	었/EP	을/ETM	적/NNB	부터/JX	효자/NNG	로/JKB	소문/NNG	이/JKS	나/VV	ㄴ/ETM	친구/NNG	이/VCP	었/EP	다는/ETM	거/NNB	이/VCP	야/EF	./SF	"/SS	김세진/NNP	이/JKS	아들/NNG	동훈/NNP	에게/JKB	원하/VV	ㄴ/ETM	것/NNB	은/JX	광주/NNP	로/JKB	내려가/VV	아/EC	그/NP	모녀/NNG	의/JKG	집/NNG	하숙/NNG	생/XSN	이/JKS	되/VV	는/ETM	것/NNB	이/VCP	었/EP	다/EF	./SF	-89.68
 
 안보국 내에서 동훈만큼 얼굴이 알려지지 않은 요원도 없었고 또 그가 절대적으로 신임할 수 있는 요원도 없었던 까닭이었다.	0.951
 안보국/NNG	내/NNB	에서/JKB	동훈/NNP	만큼/JX	얼굴/NNG	이/JKS	알리/VV	어/EC	지/VX	지/EC	않/VX	은/ETM	요원/NNG	도/JX	없/VA	었/EP	고/EC	또/MAG	그/NP	가/JKS	절대/NNG	적/XSN	으로/JKB	신임/NNG	하/XSV	ㄹ/ETM	수/NNB	있/VV	는/ETM	요원/NNG	도/JX	없/VA	었/EP	던/ETM	까닭/NNG	이/VCP	었/EP	다/EF	./SF	
@@ -11198,9 +11198,9 @@ Time per Unit : 1.03792 ms
 
 자그마한 점을 찍고는 송곳 끝에 혼신의 힘을 쏟아 빙글빙글 돌렸다.	0.833
 자그마/XR	하/XSA	ㄴ/ETM	점/NNG	을/JKO	찍/VV	고/EC	는/JX	송곳/NNG	끝/NNG	에/JKB	혼신/NNG	의/JKG	힘/NNG	을/JKO	쏟/VV	아/EC	빙글빙글/MAG	돌리/VV	었/EP	다/EF	./SF	
-자그마/XR	하/XSA	ㄴ/ETM	점/NNG	을/JKO	찍/VV	고/EC	는/JX	송곳/NNG	끝/NNG	에/JKB	혼신/NNG	의/JKG	힘/NNG	을/JKO	쏟/VV	아/EF	빙글빙글/NNP	돌리/VV	었/EP	다/EF	./SF	-68.91
-자그마/XR	하/XSA	ㄴ/ETM	점/NNG	을/JKO	찍/VV	고/EC	는/JX	송곳/NNG	끝/NNG	에/JKB	혼신/NNG	의/JKG	힘/NNG	을/JKO	쏟/VV	아/EF	빙글빙/NNP	글/NNG	돌리/VV	었/EP	다/EF	./SF	-69.61
-자그마/XR	하/XSA	ㄴ/ETM	점/NNG	을/JKO	찍/VV	고/EC	는/JX	송곳/NNG	끝/NNG	에/JKB	혼신/NNG	의/JKG	힘/NNG	을/JKO	쏟/VV	아/EF	빙글빙그/NNG	ㄹ/JKO	돌리/VV	었/EP	다/EF	./SF	-70.73
+자그마/XR	하/XSA	ㄴ/ETM	점/NNG	을/JKO	찍/VV	고/EC	는/JX	송곳/NNG	끝/NNG	에/JKB	혼신/NNG	의/JKG	힘/NNG	을/JKO	쏟/VV	아/EF	빙글빙글/NNP	돌리/VV	었/EP	다/EF	./SF	-63.97
+자그마/XR	하/XSA	ㄴ/ETM	점/NNG	을/JKO	찍/VV	고/EC	는/JX	송곳/NNG	끝/NNG	에/JKB	혼신/NNG	의/JKG	힘/NNG	을/JKO	쏟/VV	아/EF	빙글빙/NNP	글/NNG	돌리/VV	었/EP	다/EF	./SF	-64.67
+자그마/XR	하/XSA	ㄴ/ETM	점/NNG	을/JKO	찍/VV	고/EC	는/JX	송곳/NNG	끝/NNG	에/JKB	혼신/NNG	의/JKG	힘/NNG	을/JKO	쏟/VV	아/EF	빙글빙그/NNG	ㄹ/JKO	돌리/VV	었/EP	다/EF	./SF	-65.79
 
 그러고는 두 구멍 사이에 깊은 골을 파내어 연결하려 했다.	0.81
 그렇/VA	고는/EC	두/MM	구멍/NNG	사이/NNG	에/JKB	깊/VA	은/ETM	골/NNG	을/JKO	파내/VV	어/EC	연결/NNG	하/XSV	려/EC	하/VX	았/EP	다/EF	./SF	
@@ -11906,9 +11906,9 @@ Time per Unit : 1.03792 ms
 
 그렇다면 그녀가 나를 보는 순간 짜릿한 충격과 전율에 휩싸이게 될 테죠." 나는 순전히 순발력으로 생각해 낸 뇌파 속으로의 전송사진에 대해서 몹시 흡족한 느낌이 들었다.	0.929
 그렇/VA	다면/EC	그녀/NP	가/JKS	나/NP	를/JKO	보/VV	는/ETM	순간/NNG	짜릿/XR	하/XSA	ㄴ/ETM	충격/NNG	과/JC	전율/NNG	에/JKB	휩싸이/VV	게/EC	되/VV	ㄹ/ETM	터/NNB	이/VCP	죠/EF	./SF	"/SS	나/NP	는/JX	순전히/MAG	순발력/NNG	으로/JKB	생각/NNG	하/XSV	아/EC	내/VX	ㄴ/ETM	뇌파/NNG	속/NNG	으로/JKB	의/JKG	전송/NNG	사진/NNG	에/JKB	대하/VV	아서/EC	몹시/MAG	흡족/NNG	하/XSA	ㄴ/ETM	느낌/NNG	이/JKS	들/VV	었/EP	다/EF	./SF	
-그렇/VA	다면/EC	그녀/NP	가/JKS	나/NP	를/JKO	보/VV	는/ETM	순간/NNG	짜릿/XR	하/XSA	ㄴ/ETM	충격/NNG	과/JC	전율/NNG	에/JKB	휩싸이/VV	게/EC	되/VV	ㄹ/ETM	터/NNB	이/VCP	죠/EF	./SF	"/SS	나/NP	는/JX	순전히/MAG	순발력/NNG	으로/JKB	생각/NNG	하/XSV	아/EC	내/VX	ㄴ/ETM	뇌파/NNG	속/NNG	으로/JKB	의/JKG	전송/NNG	사진/NNG	에/JKB	대하/VV	아서/EC	몹시/MAG	흡족/NNG	하/XSV	ㄴ/ETM	느낌/NNG	이/JKS	듣/VV	었/EP	다/EF	./SF	-80.71
-그렇/VA	다면/EC	그녀/NP	가/JKS	나/NP	를/JKO	보/VX	는/ETM	순간/NNG	짜릿/XR	하/XSA	ㄴ/ETM	충격/NNG	과/JC	전율/NNG	에/JKB	휩싸이/VV	게/EC	되/VV	ㄹ/ETM	터/NNB	이/VCP	죠/EF	./SF	"/SS	나/NP	는/JX	순전히/MAG	순발력/NNG	으로/JKB	생각/NNG	하/XSV	아/EC	내/VX	ㄴ/ETM	뇌파/NNG	속/NNG	으로/JKB	의/JKG	전송/NNG	사진/NNG	에/JKB	대하/VV	아서/EC	몹시/MAG	흡족/NNG	하/XSV	ㄴ/ETM	느낌/NNG	이/JKS	듣/VV	었/EP	다/EF	./SF	-81.33
-그렇/VA	다면/EC	그녀/NP	가/JKS	나/NP	를/JKO	보/VV	는/ETM	순간/NNG	짜릿/XR	하/XSA	ㄴ/ETM	충격/NNG	과/JC	전율/NNG	에/JKB	휩싸이/VV	게/EC	되/VV	ㄹ/ETM	터/NNB	이/VCP	죠/EF	./SF	"/SS	나/NP	는/JX	순전히/MAG	순발력/NNG	으로/JKB	생각/NNG	하/XSV	아/EC	내/VX	ㄴ/ETM	뇌파/NNG	속/NNG	으로/JKB	의/JKG	전송/NNG	사진/NNG	에/JKB	대하/VV	아서/EC	몹시/MAG	흡족/NNG	하/XSV	ㄴ/ETM	느낌/NNG	이/JKS	들/VV	었/EP	다/EF	./SF	-80.16
+그렇/VA	다면/EC	그녀/NP	가/JKS	나/NP	를/JKO	보/VV	는/ETM	순간/NNG	짜릿/XR	하/XSA	ㄴ/ETM	충격/NNG	과/JC	전율/NNG	에/JKB	휩싸이/VV	게/EC	되/VV	ㄹ/ETM	터/NNB	이/VCP	죠/EF	./SF	"/SS	나/NP	는/JX	순전히/MAG	순발력/NNG	으로/JKB	생각/NNG	하/XSV	아/EC	내/VX	ㄴ/ETM	뇌파/NNG	속/NNG	으로/JKB	의/JKG	전송/NNG	사진/NNG	에/JKB	대하/VV	아서/EC	몹시/MAG	흡족/NNG	하/XSV	ㄴ/ETM	느낌/NNG	이/JKS	듣/VV	었/EP	다/EF	./SF	-79.56
+그렇/VA	다면/EC	그녀/NP	가/JKS	나/NP	를/JKO	보/VX	는/ETM	순간/NNG	짜릿/XR	하/XSA	ㄴ/ETM	충격/NNG	과/JC	전율/NNG	에/JKB	휩싸이/VV	게/EC	되/VV	ㄹ/ETM	터/NNB	이/VCP	죠/EF	./SF	"/SS	나/NP	는/JX	순전히/MAG	순발력/NNG	으로/JKB	생각/NNG	하/XSV	아/EC	내/VX	ㄴ/ETM	뇌파/NNG	속/NNG	으로/JKB	의/JKG	전송/NNG	사진/NNG	에/JKB	대하/VV	아서/EC	몹시/MAG	흡족/NNG	하/XSV	ㄴ/ETM	느낌/NNG	이/JKS	듣/VV	었/EP	다/EF	./SF	-80.17
+그렇/VA	다면/EC	그녀/NP	가/JKS	나/NP	를/JKO	보/VV	는/ETM	순간/NNG	짜릿/XR	하/XSA	ㄴ/ETM	충격/NNG	과/JC	전율/NNG	에/JKB	휩싸이/VV	게/EC	되/VV	ㄹ/ETM	터/NNB	이/VCP	죠/EF	./SF	"/SS	나/NP	는/JX	순전히/MAG	순발력/NNG	으로/JKB	생각/NNG	하/XSV	아/EC	내/VX	ㄴ/ETM	뇌파/NNG	속/NNG	으로/JKB	의/JKG	전송/NNG	사진/NNG	에/JKB	대하/VV	아서/EC	몹시/MAG	흡족/NNG	하/XSV	ㄴ/ETM	느낌/NNG	이/JKS	들/VV	었/EP	다/EF	./SF	-79.01
 
 그건 대단히 효과적일 것임에 분명했다.	0.571
 그것/NP	ㄴ/JX	대단히/MAG	효과/NNG	적/XSN	이/VCP	ㄹ/ETM	것/NNB	이/VCP	ㅁ/ETN	에/JKB	분명/NNG	하/XSA	았/EP	다/EF	./SF	
@@ -12506,9 +12506,9 @@ Time per Unit : 1.03792 ms
 
 갑작스럽게 터진 내 분노 덕분에 그날의 제의는 일단 흐지부지될 수 있었다.	0.704
 갑작/MAG	스럽/XSA	게/EC	터지/VV	ㄴ/ETM	나/NP	의/JKG	분노/NNG	덕분/NNG	에/JKB	그날/NNG	의/JKG	제의/NNG	는/JX	일단/MAG	흐지부지/MAG	되/XSV	ㄹ/ETM	수/NNB	있/VV	었/EP	다/EF	./SF	
-갑작/MAG	스럽/XSA	게/EC	터지/VV	ㄴ/ETM	내/VX	어/EC	분노/NNG	덕분/NNG	에/JKB	그날/NNG	의/JKG	제의/NNG	는/JX	일단/MAG	흐지부지/MAG	되/VV	ㄹ/ETM	수/NNB	있/VX	었/EP	다/EF	./SF	-45.99
-갑작/MAG	스럽/XSA	게/EC	터지/VV	ㄴ/ETM	내/VX	어/EC	분노/NNG	덕분/NNG	에/JKB	그날/NNG	의/JKG	제의/NNG	는/JX	일단/MAG	흐지부지/MAG	되/VV	ㄹ/ETM	수/NNB	있/VX	었/EP	다/EF	./SF	-45.99
-갑작/MAG	스럽/XSA	게/EC	터지/VV	ㄴ/ETM	내/VX	어/EC	분노/NNG	덕분/NNG	에/JKB	그날/NNG	의/JKG	제의/NNG	는/JX	일단/MAG	흐지부지/MAG	되/VV	ㄹ/ETM	수/NNB	있/VV	었/EP	다/EF	./SF	-42.45
+갑작/MAG	스럽/XSA	게/EC	터지/VV	ㄴ/ETM	내/VX	어/EC	분노/NNG	덕분/NNG	에/JKB	그날/NNG	의/JKG	제의/NNG	는/JX	일단/MAG	흐지부지/MAG	되/VV	ㄹ/ETM	수/NNB	있/VX	었/EP	다/EF	./SF	-37.98
+갑작/MAG	스럽/XSA	게/EC	터지/VV	ㄴ/ETM	내/VX	어/EC	분노/NNG	덕분/NNG	에/JKB	그날/NNG	의/JKG	제의/NNG	는/JX	일단/MAG	흐지부지/MAG	되/VV	ㄹ/ETM	수/NNB	있/VX	었/EP	다/EF	./SF	-37.98
+갑작/MAG	스럽/XSA	게/EC	터지/VV	ㄴ/ETM	내/VX	어/EC	분노/NNG	덕분/NNG	에/JKB	그날/NNG	의/JKG	제의/NNG	는/JX	일단/MAG	흐지부지/MAG	되/VV	ㄹ/ETM	수/NNB	있/VV	었/EP	다/EF	./SF	-34.44
 
 그들은 끊임없이 나를 채찍질해 대었을 뿐만 아니라 의심까지 하고 있었던 것이다.	0.867
 그/NP	들/XSN	은/JX	끊임없이/MAG	나/NP	를/JKO	채찍/NNG	질/XSN	하/XSV	아/EC	대/VX	었/EP	을/ETM	뿐/NNB	만/JX	아니/VCN	라/EC	의심/NNG	까지/JX	하/VV	고/EC	있/VX	었/EP	던/ETM	것/NNB	이/VCP	다/EF	./SF	
@@ -12776,9 +12776,9 @@ Time per Unit : 1.03792 ms
 
 토요일 오후에 학교 식당 같은 곳에나 혼자 앉아 있은 벌이에요." 사 년 전의 여학생들도 초면의 남학생에게 이렇게 허물없는 태도를 내보였던가.	0.886
 토요일/NNG	오후/NNG	에/JKB	학교/NNG	식당/NNG	같/VA	은/ETM	곳/NNG	에/JKB	나/JX	혼자/NNG	앉/VV	아/EC	있/VX	은/ETM	벌/NNG	이/VCP	에요/EF	./SF	"/SS	사/NR	년/NNB	전/NNG	의/JKG	여학생/NNG	들/XSN	도/JX	초면/NNG	의/JKG	남학생/NNG	에게/JKB	이렇/VA	게/EC	허물없/VA	는/ETM	태도/NNG	를/JKO	내보이/VV	었/EP	던가/EF	./SF	
-토요일/NNG	오후/NNG	에/JKB	학교/NNG	식당/NNG	같/VA	은/ETM	곳/NNG	에/JKB	나/JX	혼자/NNG	앉/VV	아/EF	있/VX	은/ETM	벌/NNB	이/VCP	에요/EF	./SF	"/SS	사/VV	아/EC	년/NNB	전/NNG	의/JKG	여학생/NNG	들/XSN	도/JX	초면/NNG	의/JKG	남학생/NNG	에게/JKB	이렇/VA	게/EC	허물없/VA	는/ETM	태도/NNG	를/JKO	내보이/VV	었/EP	던가/EF	./SF	-74.93
-토요일/NNG	오후/NNG	에/JKB	학교/NNG	식당/NNG	같/VA	은/ETM	곳/NNG	에/JKB	나/JX	혼자/NNG	앉/VV	아/EF	있/VX	은/ETM	벌/NNG	이/VCP	에요/EF	./SF	"/SS	사/VV	아/EC	년/NNB	전/NNG	의/JKG	여학생/NNG	들/XSN	도/JX	초면/NNG	의/JKG	남학생/NNG	에게/JKB	이렇/VA	게/EC	허물없/VA	는/ETM	태도/NNG	를/JKO	내보이/VV	었/EP	던가/EF	./SF	-75.4
-토요일/NNG	오후/NNG	에/JKB	학교/NNG	식당/NNG	같/VA	은/ETM	곳/NNG	에/JKB	나/JX	혼자/NNG	앉/VV	아/EF	있/VX	은/ETM	벌이/VV	에요/EF	./SF	"/SS	사/VV	아/EC	년/NNB	전/NNG	의/JKG	여학생/NNG	들/XSN	도/JX	초면/NNG	의/JKG	남학생/NNG	에게/JKB	이렇/VA	게/EC	허물없/VA	는/ETM	태도/NNG	를/JKO	내보이/VV	었/EP	던가/EF	./SF	-75.45
+토요일/NNG	오후/NNG	에/JKB	학교/NNG	식당/NNG	같/VA	은/ETM	곳/NNG	에/JKB	나/JX	혼자/NNG	앉/VV	아/EF	있/VX	은/ETM	벌/NNB	이/VCP	에요/EF	./SF	"/SS	사/VV	아/EC	년/NNB	전/NNG	의/JKG	여학생/NNG	들/XSN	도/JX	초면/NNG	의/JKG	남학생/NNG	에게/JKB	이렇/VA	게/EC	허물없/VA	는/ETM	태도/NNG	를/JKO	내보이/VV	었/EP	던가/EF	./SF	-72.38
+토요일/NNG	오후/NNG	에/JKB	학교/NNG	식당/NNG	같/VA	은/ETM	곳/NNG	에/JKB	나/JX	혼자/NNG	앉/VV	아/EF	있/VX	은/ETM	벌/NNG	이/VCP	에요/EF	./SF	"/SS	사/VV	아/EC	년/NNB	전/NNG	의/JKG	여학생/NNG	들/XSN	도/JX	초면/NNG	의/JKG	남학생/NNG	에게/JKB	이렇/VA	게/EC	허물없/VA	는/ETM	태도/NNG	를/JKO	내보이/VV	었/EP	던가/EF	./SF	-72.85
+토요일/NNG	오후/NNG	에/JKB	학교/NNG	식당/NNG	같/VA	은/ETM	곳/NNG	에/JKB	나/JX	혼자/NNG	앉/VV	아/EF	있/VX	은/ETM	벌이/VV	에요/EF	./SF	"/SS	사/VV	아/EC	년/NNB	전/NNG	의/JKG	여학생/NNG	들/XSN	도/JX	초면/NNG	의/JKG	남학생/NNG	에게/JKB	이렇/VA	게/EC	허물없/VA	는/ETM	태도/NNG	를/JKO	내보이/VV	었/EP	던가/EF	./SF	-72.9
 
 하지만 그녀가 경계심이 덜하다는 건 그리 나쁜 조짐은 아니었다.	0.696
 하지만/MAJ	그녀/NP	가/JKS	경계심/NNG	이/JKS	덜/MAG	하/XSA	다는/ETM	것/NNB	ㄴ/JX	그리/MAG	나쁘/VA	ㄴ/ETM	조짐/NNG	은/JX	아니/VCN	었/EP	다/EF	./SF	
@@ -13358,9 +13358,9 @@ Time per Unit : 1.03792 ms
 
 "그런데 노형, 우리 늘 이렇게 기준이한테만 모든 걸 맡겨 놓을 게 아니라 뭔가 도와줄 만한 방법을 강구해야 하지 않겠어요." 장윤 씨를 부르는 그의 호칭은 장윤 형도 되었다가 노형도 되었다가 마음대로였다.	0.655
 "/SS	그런데/MAJ	노/NNP	형/NNG	,/SP	우리/NP	늘/MAG	이렇/VA	게/EC	기준이/NNP	한테/JKB	만/JX	모든/MM	것/NNB	ㄹ/JKO	맡기/VV	어/EC	놓/VX	을/ETM	것/NNB	이/JKC	아니/VCN	라/EC	뭐/NP	이/VCP	ㄴ가/EC	도와주/VV	ㄹ/ETM	만/NNB	하/XSA	ㄴ/ETM	방법/NNG	을/JKO	강구/NNG	하/XSV	아야/EC	하/VX	지/EC	않/VX	겠/EP	어요/EF	./SF	"/SS	장윤/NNP	씨/NNB	를/JKO	부르/VV	는/ETM	그/NP	의/JKG	호칭/NNG	은/JX	장윤/NNP	형/NNG	도/JX	되/VV	었/EP	다가/EC	노/NNP	형/NNG	도/JX	되/VV	었/EP	다가/EC	마음/NNG	대로/JX	이/VCP	었/EP	다/EF	./SF	
-"/SS	그러/VV	ㄴ데/EC	노형/NNG	,/SP	우리/NP	늘/VV	ㄹ/ETM	이렇/VA	게/EC	기준이/NNP	한테/JKB	만/JX	모든/MM	걸/VV	ㄹ/ETM	맡기/VV	어/EC	놓/VX	을/ETM	게/NNG	아니/VCN	라/EC	뭐/NP	이/VCP	ㄴ가/EC	돕/VV	아/EC	주/VX	ㄹ/ETM	만하/VX	ㄴ/ETM	방법/NNG	을/JKO	강구/NNG	하/XSV	아야/EC	하/VX	지/EC	않/VX	겠/EP	어요/EF	./SF	"/SS	장윤/NNP	씨/NNB	를/JKO	부르/VV	는/ETM	그/NP	의/JKG	호칭/NNG	은/JX	장윤/NNP	형/NNG	도/JX	되/VV	었/EP	다가/EC	노형/NNG	도/JX	되/VV	었/EP	다가/EC	마음대로/MAG	이/VCP	었/EP	다/EF	./SF	-148.2
-"/SS	그러/VV	ㄴ데/EC	노형/NNG	,/SP	우리/NP	늘/VV	ㄹ/ETM	이렇/VA	게/EC	기준이/NNP	한테/JKB	만/JX	모든/MM	걸/VV	ㄹ/ETM	맡기/VV	어/EC	놓/VX	을/ETM	게/NNG	아니/VCN	라/EC	뭐/NP	이/VCP	ㄴ가/EC	돕/VV	아/EC	주/VX	ㄹ/ETM	만/NNB	하/XSA	ㄴ/ETM	방법/NNG	을/JKO	강구/NNG	하/XSV	아야/EC	하/VX	지/EC	않/VX	겠/EP	어요/EF	./SF	"/SS	장윤/NNP	씨/NNB	를/JKO	부르/VV	는/ETM	그/NP	의/JKG	호칭/NNG	은/JX	장윤/NNP	형/NNG	도/JX	되/VV	었/EP	다가/EC	노형/NNG	도/JX	되/VV	었/EP	다가/EC	마음대로/MAG	이/VCP	었/EP	다/EF	./SF	-149.1
-"/SS	그러/VV	ㄴ데/EC	노형/NNG	,/SP	우리/NP	늘/VV	ㄹ/ETM	이렇/VA	게/EC	기준이/NNP	한테/JKB	만/JX	모든/MM	걸/VV	ㄹ/ETM	맡기/VV	어/EC	놓/VX	을/ETM	게/NNG	아니/VCN	라/EC	뭐/NP	이/VCP	ㄴ가/EC	돕/VV	아/EC	주/VX	ㄹ/ETM	만하/VX	ㄴ/ETM	방법/NNG	을/JKO	강구/NNG	하/XSV	아야/EC	하/VX	지/EC	않/VX	겠/EP	어요/EF	./SF	"/SS	장윤/NNP	씨/NNB	를/JKO	부르/VV	는/ETM	그/NP	의/JKG	호칭/NNG	은/JX	장윤/NNP	형/NNG	도/JX	되/VX	었/EP	다가/EC	노형/NNG	도/JX	되/VV	었/EP	다가/EC	마음대로/MAG	이/VCP	었/EP	다/EF	./SF	-149.8
+"/SS	그러/VV	ㄴ데/EC	노형/NNG	,/SP	우리/NP	늘/VV	ㄹ/ETM	이렇/VA	게/EC	기준이/NNP	한테/JKB	만/JX	모든/MM	걸/VV	ㄹ/ETM	맡기/VV	어/EC	놓/VX	을/ETM	게/NNG	아니/VCN	라/EC	뭐/NP	이/VCP	ㄴ가/EC	돕/VV	아/EC	주/VX	ㄹ/ETM	만하/VX	ㄴ/ETM	방법/NNG	을/JKO	강구/NNG	하/XSV	아야/EC	하/VX	지/EC	않/VX	겠/EP	어요/EF	./SF	"/SS	장윤/NNP	씨/NNB	를/JKO	부르/VV	는/ETM	그/NP	의/JKG	호칭/NNG	은/JX	장윤/NNP	형/NNG	도/JX	되/VV	었/EP	다가/EC	노형/NNG	도/JX	되/VV	었/EP	다가/EC	마음대로/MAG	이/VCP	었/EP	다/EF	./SF	-146.5
+"/SS	그러/VV	ㄴ데/EC	노형/NNG	,/SP	우리/NP	늘/VV	ㄹ/ETM	이렇/VA	게/EC	기준이/NNP	한테/JKB	만/JX	모든/MM	걸/VV	ㄹ/ETM	맡기/VV	어/EC	놓/VX	을/ETM	게/NNG	아니/VCN	라/EC	뭐/NP	이/VCP	ㄴ가/EC	돕/VV	아/EC	주/VX	ㄹ/ETM	만/NNB	하/XSA	ㄴ/ETM	방법/NNG	을/JKO	강구/NNG	하/XSV	아야/EC	하/VX	지/EC	않/VX	겠/EP	어요/EF	./SF	"/SS	장윤/NNP	씨/NNB	를/JKO	부르/VV	는/ETM	그/NP	의/JKG	호칭/NNG	은/JX	장윤/NNP	형/NNG	도/JX	되/VV	었/EP	다가/EC	노형/NNG	도/JX	되/VV	었/EP	다가/EC	마음대로/MAG	이/VCP	었/EP	다/EF	./SF	-147.4
+"/SS	그러/VV	ㄴ데/EC	노형/NNG	,/SP	우리/NP	늘/VV	ㄹ/ETM	이렇/VA	게/EC	기준이/NNP	한테/JKB	만/JX	모든/MM	걸/VV	ㄹ/ETM	맡기/VV	어/EC	놓/VX	을/ETM	게/NNG	아니/VCN	라/EC	뭐/NP	이/VCP	ㄴ가/EC	돕/VV	아/EC	주/VX	ㄹ/ETM	만하/VX	ㄴ/ETM	방법/NNG	을/JKO	강구/NNG	하/XSV	아야/EC	하/VX	지/EC	않/VX	겠/EP	어요/EF	./SF	"/SS	장윤/NNP	씨/NNB	를/JKO	부르/VV	는/ETM	그/NP	의/JKG	호칭/NNG	은/JX	장윤/NNP	형/NNG	도/JX	되/VX	었/EP	다가/EC	노형/NNG	도/JX	되/VV	었/EP	다가/EC	마음대로/MAG	이/VCP	었/EP	다/EF	./SF	-148.1
 
 정확하게 말하자면 그는 때와 분위기를 보아서 은근슬쩍 노형이라 부름으로써 스스로를 대등한 위치로 끌어올리려는 노력을 게을리하지 않고 있었다.	0.75
 정확/NNG	하/XSA	게/EC	말/NNG	하/XSV	자면/EC	그/NP	는/JX	때/NNG	와/JC	분위기/NNG	를/JKO	보/VV	아서/EC	은근슬쩍/MAG	노/NNP	형/NNG	이/VCP	라/EC	부르/VV	ㅁ/ETN	으로써/JKB	스스로/NNG	를/JKO	대등/NNG	하/XSA	ㄴ/ETM	위치/NNG	로/JKB	끌어올리/VV	려는/ETM	노력/NNG	을/JKO	게을리/MAG	하/VV	지/EC	않/VX	고/EC	있/VX	었/EP	다/EF	./SF	
@@ -13550,9 +13550,9 @@ Time per Unit : 1.03792 ms
 
 마치 내가 영국 왕실의 황태자라도 된 듯한 느낌이로군." "그리고 넌 입버릇처럼 시간은 얼마든지 있다고 말하는데 글쎄 과연 그럴까.	0.929
 마치/MAG	내/NP	가/JKS	영국/NNP	왕실/NNG	의/JKG	황태자/NNG	이/VCP	라도/EC	되/VV	ㄴ/ETM	듯/NNB	하/XSA	ㄴ/ETM	느낌/NNG	이/VCP	로군/EF	./SF	"/SS	"/SS	그리고/MAJ	너/NP	ㄴ/JX	입버릇/NNG	처럼/JKB	시간/NNG	은/JX	얼마/NNG	이/VCP	든지/EC	있/VV	다고/EC	말/NNG	하/XSV	는데/EC	글쎄/IC	과연/MAG	그렇/VA	ㄹ까/EF	./SF	
-마치/MAG	내/NP	가/JKS	영국/NNP	왕실/NNG	의/JKG	황태자/NNG	이/VCP	라도/EC	되/VV	ㄴ/ETM	듯/NNB	하/XSA	ㄴ/ETM	느낌/NNG	이/VCP	로군/EF	./SF	"/SS	"/SS	그리/VV	고/EC	너/NP	ㄴ/JX	입버릇/NNG	처럼/JKB	시간/NNG	은/JX	얼마/NNG	이/VCP	든지/EC	있/VV	다고/EC	말/NNG	하/XSV	는데/EC	글쎄/IC	과연/MAG	그렇/VA	ㄹ까/EF	./SF	-77.02
-마치/MAG	내/NP	가/JKS	영국/NNP	왕실/NNG	의/JKG	황태자/NNG	이/VCP	라도/EC	되/VV	ㄴ/ETM	듯하/VX	ㄴ/ETM	느낌/NNG	이/VCP	로군/EF	./SF	"/SS	"/SS	그리/VV	고/EC	너/NP	ㄴ/JX	입버릇/NNG	처럼/JKB	시간/NNG	은/JX	얼마/NNG	이/VCP	든지/EC	있/VV	다고/EC	말/NNG	하/XSV	는데/EC	글쎄/IC	과연/MAG	그렇/VA	ㄹ까/EF	./SF	-77.15
-마치/MAG	내/NP	가/JKS	영국/NNP	왕실/NNG	의/JKG	황태자/NNG	이/VCP	라도/EC	되/VV	ㄴ/ETM	듯/NNB	하/XSA	ㄴ/ETM	느낌/NNG	이/VCP	로군/EF	./SF	"/SS	"/SS	그리/VV	고/EC	너/NP	ㄴ/JX	입버릇/NNG	처럼/JKB	시간/NNG	은/JX	얼마/NNG	이/VCP	든지/EC	있/VX	다고/EC	말/NNG	하/XSV	는데/EC	글쎄/IC	과연/MAG	그렇/VA	ㄹ까/EF	./SF	-77.54
+마치/MAG	내/NP	가/JKS	영국/NNP	왕실/NNG	의/JKG	황태자/NNG	이/VCP	라도/EC	되/VV	ㄴ/ETM	듯/NNB	하/XSA	ㄴ/ETM	느낌/NNG	이/VCP	로군/EF	./SF	"/SS	"/SS	그리/VV	고/EC	너/NP	ㄴ/JX	입버릇/NNG	처럼/JKB	시간/NNG	은/JX	얼마/NNG	이/VCP	든지/EC	있/VV	다고/EC	말/NNG	하/XSV	는데/EC	글쎄/IC	과연/MAG	그렇/VA	ㄹ까/EF	./SF	-74.69
+마치/MAG	내/NP	가/JKS	영국/NNP	왕실/NNG	의/JKG	황태자/NNG	이/VCP	라도/EC	되/VV	ㄴ/ETM	듯하/VX	ㄴ/ETM	느낌/NNG	이/VCP	로군/EF	./SF	"/SS	"/SS	그리/VV	고/EC	너/NP	ㄴ/JX	입버릇/NNG	처럼/JKB	시간/NNG	은/JX	얼마/NNG	이/VCP	든지/EC	있/VV	다고/EC	말/NNG	하/XSV	는데/EC	글쎄/IC	과연/MAG	그렇/VA	ㄹ까/EF	./SF	-74.82
+마치/MAG	내/NP	가/JKS	영국/NNP	왕실/NNG	의/JKG	황태자/NNG	이/VCP	라도/EC	되/VV	ㄴ/ETM	듯/NNB	하/XSA	ㄴ/ETM	느낌/NNG	이/VCP	로군/EF	./SF	"/SS	"/SS	그리/VV	고/EC	너/NP	ㄴ/JX	입버릇/NNG	처럼/JKB	시간/NNG	은/JX	얼마/NNG	이/VCP	든지/EC	있/VX	다고/EC	말/NNG	하/XSV	는데/EC	글쎄/IC	과연/MAG	그렇/VA	ㄹ까/EF	./SF	-75.21
 
 물론 그 일이 예정된 때까지는 아직 몇 년의 시간이 있어.	0.727
 물론/MAG	그/MM	일/NNG	이/JKS	예정/NNG	되/XSV	ㄴ/ETM	때/NNG	까지/JX	는/JX	아직/MAG	몇/MM	년/NNB	의/JKG	시간/NNG	이/JKS	있/VV	어/EF	./SF	
@@ -13676,9 +13676,9 @@ Time per Unit : 1.03792 ms
 
 몇 개 모이지 않은 잔이며 접시들을 씻었고 행주를 빨아서는 냉장고와 싱크대 위를 닦았다.	0.933
 몇/MM	개/NNB	모이/VV	지/EC	않/VX	은/ETM	잔/NNG	이/VCP	며/EC	접시/NNG	들/XSN	을/JKO	씻/VV	었/EP	고/EC	행주/NNG	를/JKO	빨/VV	아서/EC	는/JX	냉장고/NNG	와/JC	싱크대/NNG	위/NNG	를/JKO	닦/VV	았/EP	다/EF	./SF	
-몇/MM	개/NNB	모이/VV	지/EC	않/VX	은/ETM	잔/NNG	이/VCP	며/EC	접시/NNG	들/XSN	을/JKO	씻/VV	었/EP	고/EC	행주/NNG	를/JKO	빨/VV	아서/EC	는/JX	냉장고/NNG	와/JKB	싱크대/NNG	위/NNG	를/JKO	닦/VV	았/EP	다/EF	./SF	-49.02
-몇/MM	개/NNB	모이/VV	지/EC	않/VX	은/ETM	잔/NNG	이/VCP	며/EC	접시/NNG	들/XSN	을/JKO	씻/VV	었/EP	고/EC	행주/NNG	를/JKO	빨/VV	아서/EC	는/JX	냉장고/NNG	와/JC	싱크대/NNG	위/NNG	를/JKO	닦/VV	았/EP	다/EF	./SF	-50.55
-몇/MM	개/NNB	모이/VV	지/EC	않/VX	은/ETM	잔/NNG	이며/JC	접시/NNG	들/XSN	을/JKO	씻/VV	었/EP	고/EC	행주/NNG	를/JKO	빨/VV	아서/EC	는/JX	냉장고/NNG	와/JKB	싱크대/NNG	위/NNG	를/JKO	닦/VV	았/EP	다/EF	./SF	-50.89
+몇/MM	개/NNB	모이/VV	지/EC	않/VX	은/ETM	잔/NNG	이/VCP	며/EC	접시/NNG	들/XSN	을/JKO	씻/VV	었/EP	고/EC	행주/NNG	를/JKO	빨/VV	아서/EC	는/JX	냉장고/NNG	와/JKB	싱크대/NNG	위/NNG	를/JKO	닦/VV	았/EP	다/EF	./SF	-46.86
+몇/MM	개/NNB	모이/VV	지/EC	않/VX	은/ETM	잔/NNG	이/VCP	며/EC	접시/NNG	들/XSN	을/JKO	씻/VV	었/EP	고/EC	행주/NNG	를/JKO	빨/VV	아서/EC	는/JX	냉장고/NNG	와/JC	싱크대/NNG	위/NNG	를/JKO	닦/VV	았/EP	다/EF	./SF	-48.39
+몇/MM	개/NNB	모이/VV	지/EC	않/VX	은/ETM	잔/NNG	이며/JC	접시/NNG	들/XSN	을/JKO	씻/VV	었/EP	고/EC	행주/NNG	를/JKO	빨/VV	아서/EC	는/JX	냉장고/NNG	와/JKB	싱크대/NNG	위/NNG	를/JKO	닦/VV	았/EP	다/EF	./SF	-48.73
 
 손님의 주문에 따라 모든 것을 준비하는 쪽도 그녀였다.	0.818
 손/NNG	님/XSN	의/JKG	주문/NNG	에/JKB	따르/VV	아/EC	모든/MM	것/NNB	을/JKO	준비/NNG	하/XSV	는/ETM	쪽/NNB	도/JX	그녀/NP	이/VCP	었/EP	다/EF	./SF	
@@ -13844,9 +13844,9 @@ Time per Unit : 1.03792 ms
 
 사람들이 많이 다니는 거리에 헌책을 수백 권쯤 깔아 두고 자그만 연탄화로도 하나 놓아 두고.	0.676
 사람/NNG	들/XSN	이/JKS	많이/MAG	다니/VV	는/ETM	거리/NNG	에/JKB	헌책/NNG	을/JKO	수백/NR	권/NNB	쯤/NNG	깔/VV	아/EC	두/VX	고/EC	자그맣/VA	ㄴ/ETM	연탄/NNG	화로/NNG	도/JX	하나/NR	놓/VV	아/EC	두/VX	고/EF	./SF	
-사람/NNG	들/XSN	이/JKS	많이/MAG	다니/VV	는/ETM	거리/NNG	에/JKB	헌/MM	책/NNG	을/JKO	수백/NR	권/NNB	쯤/XSN	깔/VV	아/EC	두/VX	고/EC	자그맣/VA	ㄴ/ETM	연탄/NNG	화로/NNG	도/JX	하나/NR	놓/VX	아/EC	두/VV	고/EC	./SF	-58.11
-사람/NNG	들/XSN	이/JKS	많이/MAG	다니/VV	는/ETM	거리/NNG	에/JKB	헌/MM	책/NNG	을/JKO	수백/NR	권/NNB	쯤/XSN	깔/VV	아/EC	두/VX	고/EC	자그맣/VA	ㄴ/ETM	연탄/NNG	화/XSN	로/JKB	도/JX	하나/NR	놓/VX	아/EC	두/VV	고/EC	./SF	-58.33
-사람/NNG	들/XSN	이/JKS	많이/MAG	다니/VV	는/ETM	거리/NNG	에/JKB	헌/MM	책/NNG	을/JKO	수백/NR	권/NNB	쯤/XSN	깔/VV	아/EC	두/VX	고/EC	자그맣/VA	ㄴ/ETM	연탄/NNG	화로/NNG	도/JX	하나/NR	놓/VX	아/EC	두/VX	고/EC	./SF	-57.86
+사람/NNG	들/XSN	이/JKS	많이/MAG	다니/VV	는/ETM	거리/NNG	에/JKB	헌/MM	책/NNG	을/JKO	수백/NR	권/NNB	쯤/XSN	깔/VV	아/EC	두/VX	고/EC	자그맣/VA	ㄴ/ETM	연탄/NNG	화로/NNG	도/JX	하나/NR	놓/VX	아/EC	두/VV	고/EC	./SF	-50.21
+사람/NNG	들/XSN	이/JKS	많이/MAG	다니/VV	는/ETM	거리/NNG	에/JKB	헌/MM	책/NNG	을/JKO	수백/NR	권/NNB	쯤/XSN	깔/VV	아/EC	두/VX	고/EC	자그맣/VA	ㄴ/ETM	연탄/NNG	화로/NNG	도/JX	하나/NR	놓/VX	아/EC	두/VX	고/EC	./SF	-49.97
+사람/NNG	들/XSN	이/JKS	많이/MAG	다니/VV	는/ETM	거리/NNG	에/JKB	헌/MM	책/NNG	을/JKO	수백/NR	권/NNB	쯤/XSN	깔/VV	아/EC	두/VX	고/EC	자그맣/VA	ㄴ/ETM	연탄/NNG	화로/NNG	도/JX	하나/NR	놓/VV	아/EC	두/VV	고/EC	./SF	-52.34
 
 서해연이 아직 학생이니까 책이라는 것과 가장 깊은 일체감을 느낄 게 분명해요.	0.741
 서해연/NNP	이/JKS	아직/MAG	학생/NNG	이/VCP	니까/EC	책/NNG	이/VCP	라는/ETM	것/NNB	과/JKB	가장/MAG	깊/VA	은/ETM	일체감/NNG	을/JKO	느끼/VV	ㄹ/ETM	것/NNB	이/JKS	분명/NNG	하/XSA	아요/EF	./SF	
@@ -14384,9 +14384,9 @@ Time per Unit : 1.03792 ms
 
 영화는 영화관이나 백화점 주변에서 신생아들을 시간제로 맡아 보호해 주는 아기 휴게소라는 곳으로부터 비롯되었었다.	0.938
 영화/NNG	는/JX	영화관/NNG	이나/JC	백화점/NNG	주변/NNG	에서/JKB	신생아/NNG	들/XSN	을/JKO	시간/NNG	제/XSN	로/JKB	맡/VV	아/EC	보호/NNG	하/XSV	아/EC	주/VX	는/ETM	아기/NNG	휴게소/NNG	이/VCP	라는/ETM	곳/NNG	으로부터/JKB	비롯/XR	되/XSV	었었/EP	다/EF	./SF	
-영화/NNG	는/JX	영화관/NNG	이나/JC	백화점/NNG	주변/NNG	에서/JKB	신생아/NNG	들/XSN	을/JKO	시간/NNG	제/XSN	로/JKB	맡/VV	아/EF	보호/NNG	하/XSV	아/EC	주/VX	는/ETM	아기/NNG	휴게소/NNG	이/VCP	라는/ETM	곳/NNG	으로부터/JKB	비롯/XR	되/XSV	었었/EP	다/EF	./SF	-67.88
-영화/NNG	는/JX	영화관/NNG	이나/JC	백화점/NNG	주변/NNG	에서/JKB	신생아/NNG	들/XSN	을/JKO	시간/NNG	제/XSN	로/JKB	맡/VV	아/EF	보호/NNG	하/XSV	아/EC	주/VX	는/ETM	아기/NNG	휴게소/NNG	이/VCP	라는/ETM	곳/NNG	으로부터/JKB	비롯/XR	되/XSV	었/EP	었/EP	다/EF	./SF	-68.38
-영화/NNG	는/JX	영화관/NNG	이나/JC	백화점/NNG	주변/NNG	에서/JKB	신생아/NNG	들/XSN	을/JKO	시간/NNG	제/XSN	로/JKB	맡/VV	아/EF	보호/NNG	하/XSA	아/EC	주/VX	는/ETM	아기/NNG	휴게소/NNG	이/VCP	라는/ETM	곳/NNG	으로부터/JKB	비롯/XR	되/XSV	었었/EP	다/EF	./SF	-71.18
+영화/NNG	는/JX	영화관/NNG	이나/JC	백화점/NNG	주변/NNG	에서/JKB	신생아/NNG	들/XSN	을/JKO	시간/NNG	제/XSN	로/JKB	맡/VV	아/EF	보호/NNG	하/XSV	아/EC	주/VX	는/ETM	아기/NNG	휴게소/NNG	이/VCP	라는/ETM	곳/NNG	으로부터/JKB	비롯/XR	되/XSV	었었/EP	다/EF	./SF	-63.9
+영화/NNG	는/JX	영화관/NNG	이나/JC	백화점/NNG	주변/NNG	에서/JKB	신생아/NNG	들/XSN	을/JKO	시간/NNG	제/XSN	로/JKB	맡/VV	아/EF	보호/NNG	하/XSV	아/EC	주/VX	는/ETM	아기/NNG	휴게소/NNG	이/VCP	라는/ETM	곳/NNG	으로부터/JKB	비롯/XR	되/XSV	었/EP	었/EP	다/EF	./SF	-64.4
+영화/NNG	는/JX	영화관/NNG	이나/JC	백화점/NNG	주변/NNG	에서/JKB	신생아/NNG	들/XSN	을/JKO	시간/NNG	제/XSN	로/JKB	맡/VV	아/EF	보호/NNG	하/XSA	아/EC	주/VX	는/ETM	아기/NNG	휴게소/NNG	이/VCP	라는/ETM	곳/NNG	으로부터/JKB	비롯/XR	되/XSV	었었/EP	다/EF	./SF	-67.2
 
 그곳에서의 작은 부주의로 비슷한 옷을 입은 두 아기가 바뀌었고 그래서 소동이 벌어진 것이었다.	0.909
 그곳/NP	에서/JKB	의/JKG	작/VA	은/ETM	부/XPN	주의/NNG	로/JKB	비슷/XR	하/XSA	ㄴ/ETM	옷/NNG	을/JKO	입/VV	은/ETM	두/MM	아기/NNG	가/JKS	바뀌/VV	었/EP	고/EC	그래서/MAJ	소동/NNG	이/JKS	벌어지/VV	ㄴ/ETM	것/NNB	이/VCP	었/EP	다/EF	./SF	
@@ -14622,11 +14622,11 @@ Time per Unit : 1.03792 ms
 어쨌건/NNP	병수/NNP	는/JX	양지/NNG	에서/JKB	자라/VV	지/EC	는/JX	못하/VX	았/EP	고/EC	또/MAG	그러/VV	면서/EC	도/JX	누구/NP	못지않/VA	게/EC	자기/NP	자신/NNG	을/JKO	잘/MAG	관리/NNG	하/XSV	아/EC	오/VX	았/EP	으니까/EF	./SF	-67.25
 어쨌건/NNP	병수/NNP	는/JX	양지/NNG	에서/JKB	자라/VV	지/EC	는/JX	못하/VX	았/EP	고/EC	또/MAG	그러/VV	면서/EC	도/JX	누구/NP	못지않/VA	게/EC	자기/NP	자신/NNG	을/JKO	잘/MAG	관리/NNG	하/XSV	아/EC	오/VX	았/EP	으니까/EF	./SF	-67.25
 
-연탄화로 하나를 둘러싸고 쪼그리고 앉아 서로 고개를 끄덕여 대는 두 사람을 보고 있자니 나는 웬지 살그머니 그 풍경으로부터 빠져 나온 듯한 느낌이었다.	0.66
+연탄화로 하나를 둘러싸고 쪼그리고 앉아 서로 고개를 끄덕여 대는 두 사람을 보고 있자니 나는 웬지 살그머니 그 풍경으로부터 빠져 나온 듯한 느낌이었다.	0.706
 연탄/NNG	화로/NNG	하나/NR	를/JKO	둘러싸/VV	고/EC	쪼그리/VV	고/EC	앉/VV	아/EC	서로/MAG	고개/NNG	를/JKO	끄덕이/VV	어/EC	대/VX	는/ETM	두/MM	사람/NNG	을/JKO	보/VV	고/EC	있/VX	자니/EC	나/NP	는/JX	웬지/MAG	살그머니/MAG	그/MM	풍경/NNG	으로부터/JKB	빠지/VV	어/EC	나오/VV	ㄴ/ETM	듯/NNB	하/XSA	ㄴ/ETM	느낌/NNG	이/VCP	었/EP	다/EF	./SF	
-연탄/NNG	화/XSN	로/JKB	하나/NR	를/JKO	둘러싸/VV	고/EC	쪼그리/VV	고/EC	앉/VV	아/EF	서로/NNG	고개/NNG	를/JKO	끄덕이/VV	어/EC	대/VX	는/ETM	두/MM	사람/NNG	을/JKO	보/VV	고/EC	있/VX	자니/EC	나/NP	는/JX	웨/NNG	이/VCP	ㄴ지/EC	살그머니/NNP	그/NP	풍경/NNG	으로부터/JKB	빠지/VV	어/EC	나오/VV	ㄴ/ETM	듯하/VX	ㄴ/ETM	느낌/NNG	이/VCP	었/EP	다/EF	./SF	-119.5
-연탄/NNG	화/XSN	로/JKB	하나/NR	를/JKO	둘러싸/VV	고/EC	쪼그리/VV	고/EC	앉/VV	아/EF	서로/NNG	고개/NNG	를/JKO	끄덕이/VV	어/EC	대/VX	는/ETM	두/MM	사람/NNG	을/JKO	보/VV	고/EC	있/VX	자니/EC	나/NP	는/JX	웬지/NNP	살그머니/NNP	그/NP	풍경/NNG	으로부터/JKB	빠지/VV	어/EC	나오/VV	ㄴ/ETM	듯하/VX	ㄴ/ETM	느낌/NNG	이/VCP	었/EP	다/EF	./SF	-120.2
-연탄/NNG	화/XSN	로/JKB	하나/NR	를/JKO	둘러싸/VV	고/EC	쪼그리/VV	고/EC	앉/VV	아/EF	서로/NNG	고개/NNG	를/JKO	끄덕이/VV	어/EC	대/VX	는/ETM	두/MM	사람/NNG	을/JKO	보/VV	고/EC	있/VX	자니/EC	나/NP	는/JX	웨/NNG	이/VCP	ㄴ지/EC	살그머니/NNP	그/NP	풍경/NNG	으로/JKB	부터/JX	빠지/VV	어/EC	나오/VV	ㄴ/ETM	듯하/VX	ㄴ/ETM	느낌/NNG	이/VCP	었/EP	다/EF	./SF	-120.4
+연탄/NNG	화로/NNG	하나/NR	를/JKO	둘러싸/VV	고/EC	쪼그리/VV	고/EC	앉/VV	아/EF	서로/NNG	고개/NNG	를/JKO	끄덕이/VV	어/EC	대/VX	는/ETM	두/MM	사람/NNG	을/JKO	보/VV	고/EC	있/VX	자니/EC	나/NP	는/JX	웨/NNG	이/VCP	ㄴ지/EC	살그머니/NNP	그/NP	풍경/NNG	으로부터/JKB	빠지/VV	어/EC	나오/VV	ㄴ/ETM	듯하/VX	ㄴ/ETM	느낌/NNG	이/VCP	었/EP	다/EF	./SF	-114
+연탄/NNG	화로/NNG	하나/NR	를/JKO	둘러싸/VV	고/EC	쪼그리/VV	고/EC	앉/VV	아/EF	서로/NNG	고개/NNG	를/JKO	끄덕이/VV	어/EC	대/VX	는/ETM	두/MM	사람/NNG	을/JKO	보/VV	고/EC	있/VX	자니/EC	나/NP	는/JX	웬지/NNP	살그머니/NNP	그/NP	풍경/NNG	으로부터/JKB	빠지/VV	어/EC	나오/VV	ㄴ/ETM	듯하/VX	ㄴ/ETM	느낌/NNG	이/VCP	었/EP	다/EF	./SF	-114.7
+연탄/NNG	화로/NNG	하나/NR	를/JKO	둘러싸/VV	고/EC	쪼그리/VV	고/EC	앉/VV	아/EF	서로/NNG	고개/NNG	를/JKO	끄덕이/VV	어/EC	대/VX	는/ETM	두/MM	사람/NNG	을/JKO	보/VV	고/EC	있/VX	자니/EC	나/NP	는/JX	웨/NNG	이/VCP	ㄴ지/EC	살그머니/NNP	그/NP	풍경/NNG	으로/JKB	부터/JX	빠지/VV	어/EC	나오/VV	ㄴ/ETM	듯하/VX	ㄴ/ETM	느낌/NNG	이/VCP	었/EP	다/EF	./SF	-115
 
 혹은 어느 틈엔지 밀려나 버린 듯한 느낌이기도 했다.	0.783
 혹은/MAG	어느/MM	틈/NNG	에/JKB	이/VCP	ㄴ지/EC	밀려나/VV	아/EC	버리/VX	ㄴ/ETM	듯/NNB	하/XSA	ㄴ/ETM	느낌/NNG	이/VCP	기/ETN	도/JX	하/VX	았/EP	다/EF	./SF	
@@ -14964,11 +14964,11 @@ Time per Unit : 1.03792 ms
 하지만/MAJ	그/NP	굿판/NNG	에서/JKB	윤병수/NNP	이/VCP	라는/ETM	박수/NNG	무당/NNG	은/JX	왜/MAG	저리/MAG	도/JX	비참/NNG	하/XSA	게/EC	얻어맞/VV	고/EC	피/NNG	를/JKO	줄/NNB	주/VX	ㄹ/ETM	흘리/VV	게/EC	되/VV	었/EP	던/ETM	것/NNB	이/VCP	ㄹ까/EF	./SF	-75.48
 하지만/MAJ	그/NP	굿판/NNG	에서/JKB	윤병수/NNP	이/VCP	라는/ETM	박수/NNG	무당/NNG	은/JX	왜/MAG	저리/MAG	도/JX	비참/NNG	하/XSA	게/EC	얻어맞/VV	고/EC	피/NNG	를/JKO	줄/NNG	주/VV	ㄹ/ETM	흘리/VV	게/EC	되/VV	었/EP	던/ETM	것/NNB	이/VCP	ㄹ까/EF	./SF	-75.69
 
-역사의 액운을 푼다는 것은 이리도 힘겹고 처절한 일이었을까.	0.818
+역사의 액운을 푼다는 것은 이리도 힘겹고 처절한 일이었을까.	0.905
 역사/NNG	의/JKG	액운/NNG	을/JKO	풀/VV	ㄴ다는/ETM	것/NNB	은/JX	이리/MAG	도/JX	힘겹/VA	고/EC	처절/NNG	하/XSA	ㄴ/ETM	일/NNG	이/VCP	었/EP	을까/EF	./SF	
-역사/NNG	의/JKG	액운/NNG	을/JKO	풀/VV	ㄴ다는/ETM	것/NNB	은/JX	이리/MAG	도/JX	힘겹/VA	고/EC	처절/NNG	하/XSV	ㄴ/ETM	일/NNB	이/VCP	었/EP	을까/EF	./SF	-43.58
-역사/NNG	의/JKG	액운/NNG	을/JKO	풀/VV	ㄴ다는/ETM	것/NNB	은/JX	이리/MAG	도/JX	힘겹/VA	고/EC	처절/NNG	하/XSV	ㄴ/ETM	일/NNG	이/VCP	었/EP	을까/EF	./SF	-43.34
-역사/NNG	의/JKG	액운/NNG	을/JKO	푸/VV	ㄴ다는/ETM	것/NNB	은/JX	이리/MAG	도/JX	힘겹/VA	고/EC	처절/NNG	하/XSV	ㄴ/ETM	일/NNB	이/VCP	었/EP	을까/EF	./SF	-44.91
+역사/NNG	의/JKG	액운/NNG	을/JKO	풀/VV	ㄴ다는/ETM	것/NNB	은/JX	이리/MAG	도/JX	힘겹/VA	고/EC	처절/NNG	하/XSA	ㄴ/ETM	일/NNB	이/VCP	었/EP	을까/EF	./SF	-39.66
+역사/NNG	의/JKG	액운/NNG	을/JKO	풀/VV	ㄴ다는/ETM	것/NNB	은/JX	이리/MAG	도/JX	힘겹/VA	고/EC	처절/NNG	하/XSA	ㄴ/ETM	일/NNG	이/VCP	었/EP	을까/EF	./SF	-39.42
+역사/NNG	의/JKG	액운/NNG	을/JKO	풀/VV	ㄴ다는/ETM	것/NNB	은/JX	이리/MAG	도/JX	힘겹/VA	고/EC	처절/NNG	하/XSV	ㄴ/ETM	일/NNB	이/VCP	었/EP	을까/EF	./SF	-40.97
 
 나는 자꾸만 비실비실 웃음이 새어 나는 듯해 입술을 두 손으로 꽉 막았다.	0.724
 나/NP	는/JX	자꾸/MAG	만/JX	비실비실/MAG	웃음/NNG	이/JKS	새/VV	어/EC	나/VX	는/ETM	듯/NNB	하/XSA	아/EC	입술/NNG	을/JKO	두/MM	손/NNG	으로/JKB	꽉/MAG	막/VV	았/EP	다/EF	./SF	
@@ -15788,9 +15788,9 @@ Time per Unit : 1.03792 ms
 
 "뭔데." "넌 서해연이 그렇게 싫든." "갑자기 무슨 뚱딴지 같은 소리야." "내가 보기엔 은지보다 그 애가 훨씬 낫더란 말이야.	0.917
 "/SS	무엇/NP	이/VCP	ㄴ데/EF	./SF	"/SS	"/SS	너/NP	ㄴ/JX	서해연/NNP	이/JKS	그렇/VA	게/EC	싫/VA	든/EF	./SF	"/SS	"/SS	갑자기/MAG	무슨/MM	뚱딴지/NNG	같/VA	은/ETM	소리/NNG	이/VCP	야/EF	./SF	"/SS	"/SS	내/NP	가/JKS	보/VV	기에/EC	ㄴ/JX	은지/NNP	보다/JKB	그/MM	애/NNG	가/JKS	훨씬/MAG	낫/VA	더란/ETM	말/NNG	이/VCP	야/EF	./SF	
-"/SS	뭐/NP	이/VCP	ㄴ데/EF	./SF	"/SS	"/SS	너/NP	ㄴ/JX	서해연/NNP	이/JKS	그렇/VA	게/EC	싫/VA	든/EF	./SF	"/SS	"/SS	갑자기/MAG	무슨/MM	뚱딴지/NNP	같/VA	은/ETM	소리/NNG	이/VCP	야/EF	./SF	"/SS	"/SS	내/NP	가/JKS	보/VV	기에/EC	ㄴ/JX	은지/NNP	보다/JKB	그/MM	애/NNG	가/JKS	훨씬/MAG	낫/VA	더란/ETM	말/NNG	이/VCP	야/EF	./SF	-103.1
-"/SS	뭐/NP	이/VCP	ㄴ데/EF	./SF	"/SS	"/SS	너/NP	ㄴ/JX	서해연/NNP	이/JKS	그렇/VA	게/EC	싫/VA	든/EF	./SF	"/SS	"/SS	갑자기/MAG	무슨/MM	뚱따/NNG	이/VCP	ㄴ지/EC	같/VA	은/ETM	소리/NNG	이/VCP	야/EF	./SF	"/SS	"/SS	내/NP	가/JKS	보/VV	기에/EC	ㄴ/JX	은지/NNP	보다/JKB	그/MM	애/NNG	가/JKS	훨씬/MAG	낫/VA	더란/ETM	말/NNG	이/VCP	야/EF	./SF	-103.6
-"/SS	뭐/NP	이/VCP	ㄴ데/EF	./SF	"/SS	"/SS	너/NP	ㄴ/JX	서해연/NNP	이/JKS	그렇/VA	게/EC	싫/VA	든/EF	./SF	"/SS	"/SS	갑자기/MAG	무슨/MM	뚱딴지/NNP	같/VA	은/ETM	소리/NNG	이/VCP	야/EF	./SF	"/SS	"/SS	내/NP	가/JKS	보/VV	기에/EC	ㄴ/JX	은지/NNP	보다/JKB	그/NP	애/NNG	가/JKS	훨씬/MAG	낫/VA	더란/ETM	말/NNG	이/VCP	야/EF	./SF	-105.3
+"/SS	뭐/NP	이/VCP	ㄴ데/EF	./SF	"/SS	"/SS	너/NP	ㄴ/JX	서해연/NNP	이/JKS	그렇/VA	게/EC	싫/VA	든/EF	./SF	"/SS	"/SS	갑자기/MAG	무슨/MM	뚱딴지/NNP	같/VA	은/ETM	소리/NNG	이/VCP	야/EF	./SF	"/SS	"/SS	내/NP	가/JKS	보/VV	기에/EC	ㄴ/JX	은지/NNP	보다/JKB	그/MM	애/NNG	가/JKS	훨씬/MAG	낫/VA	더란/ETM	말/NNG	이/VCP	야/EF	./SF	-102
+"/SS	뭐/NP	이/VCP	ㄴ데/EF	./SF	"/SS	"/SS	너/NP	ㄴ/JX	서해연/NNP	이/JKS	그렇/VA	게/EC	싫/VA	든/EF	./SF	"/SS	"/SS	갑자기/MAG	무슨/MM	뚱따/NNG	이/VCP	ㄴ지/EC	같/VA	은/ETM	소리/NNG	이/VCP	야/EF	./SF	"/SS	"/SS	내/NP	가/JKS	보/VV	기에/EC	ㄴ/JX	은지/NNP	보다/JKB	그/MM	애/NNG	가/JKS	훨씬/MAG	낫/VA	더란/ETM	말/NNG	이/VCP	야/EF	./SF	-102.5
+"/SS	뭐/NP	이/VCP	ㄴ데/EF	./SF	"/SS	"/SS	너/NP	ㄴ/JX	서해연/NNP	이/JKS	그렇/VA	게/EC	싫/VA	든/EF	./SF	"/SS	"/SS	갑자기/MAG	무슨/MM	뚱딴지/NNP	같/VA	은/ETM	소리/NNG	이/VCP	야/EF	./SF	"/SS	"/SS	내/NP	가/JKS	보/VV	기에/EC	ㄴ/JX	은지/NNP	보다/JKB	그/NP	애/NNG	가/JKS	훨씬/MAG	낫/VA	더란/ETM	말/NNG	이/VCP	야/EF	./SF	-104.2
 
 학벌도 그렇지만 키도 크고 몸매도 늘씬하고 얼굴도 예쁘장하고.	0.9
 학벌/NNG	도/JX	그렇/VA	지만/EC	키/NNG	도/JX	크/VA	고/EC	몸매/NNG	도/JX	늘씬/XR	하/XSA	고/EC	얼굴/NNG	도/JX	예쁘장/XR	하/XSA	고/EF	./SF	
@@ -17042,9 +17042,9 @@ Time per Unit : 1.03792 ms
 
 일 년 열두 달 내 몸 어느 구석에서건 냄새 따위는 나지 않는다구요." 병수는 이승범 씨에게 얼굴을 들이대고 입김을 훅 불었다.	0.625
 일/NR	년/NNB	열/NR	두/MM	달/NNG	내/NP	몸/NNG	어느/MM	구석/NNG	에서/JKB	이/VCP	건/EC	냄새/NNG	따위/NNB	는/JX	나/VV	지/EC	않/VX	는다구요/EF	./SF	"/SS	병수/NNP	는/JX	이승범/NNP	씨/NNB	에게/JKB	얼굴/NNG	을/JKO	들이대/VV	고/EC	입김/NNG	을/JKO	훅/MAG	불/VV	었/EP	다/EF	./SF	
-일/NR	년/NNB	열두/NR	달/NNG	내/VX	어/EC	몸/NNG	어느/MM	구석/NNG	에서/JKB	이/VCP	건/EC	냄새/NNG	따위/NNB	는/JX	나/NP	이/VCP	지/EC	않/VX	는다/EF	이/VCP	구요/EF	./SF	"/SS	병수/NNP	는/JX	이승/NNG	범/NNG	씨/NNB	에게/JKB	얼굴/NNG	을/JKO	들이대/VV	고/EC	입김/NNG	을/JKO	훅/MAG	붇/VV	었/EP	다/EF	./SF	-96.47
-일/NR	년/NNB	열두/NR	달/NNG	내/VX	어/EC	몸/NNG	어느/MM	구석/NNG	에서/JKB	이/VCP	건/EC	냄새/NNG	따위/NNB	는/JX	나/NP	이/VCP	지/EC	않/VX	는다/EF	이/VCP	구요/EF	./SF	"/SS	병수/NNP	는/JX	이승/NNG	범/NNG	씨/NNB	에게/JKB	얼굴/NNG	을/JKO	들이대/VV	고/EC	입김/NNG	을/JKO	훅/MAG	불/VV	었/EP	다/EF	./SF	-86.26
-일/NR	년/NNB	열두/NR	달/NNG	내/VX	어/EC	몸/NNG	어느/MM	구석/NNG	에서/JKB	이/VCP	건/EC	냄새/NNG	따위/NNB	는/JX	나/VV	지/EC	않/VX	는다/EF	이/VCP	구요/EF	./SF	"/SS	병수/NNP	는/JX	이승/NNG	범/NNG	씨/NNB	에게/JKB	얼굴/NNG	을/JKO	들이대/VV	고/EC	입김/NNG	을/JKO	훅/MAG	붇/VV	었/EP	다/EF	./SF	-96.65
+일/NR	년/NNB	열두/NR	달/NNG	내/VX	어/EC	몸/NNG	어느/MM	구석/NNG	에서/JKB	이/VCP	건/EC	냄새/NNG	따위/NNB	는/JX	나/NP	이/VCP	지/EC	않/VX	는다/EF	이/VCP	구요/EF	./SF	"/SS	병수/NNP	는/JX	이승/NNG	범/NNG	씨/NNB	에게/JKB	얼굴/NNG	을/JKO	들이대/VV	고/EC	입김/NNG	을/JKO	훅/MAG	붇/VV	었/EP	다/EF	./SF	-92.33
+일/NR	년/NNB	열두/NR	달/NNG	내/VX	어/EC	몸/NNG	어느/MM	구석/NNG	에서/JKB	이/VCP	건/EC	냄새/NNG	따위/NNB	는/JX	나/NP	이/VCP	지/EC	않/VX	는다/EF	이/VCP	구요/EF	./SF	"/SS	병수/NNP	는/JX	이승/NNG	범/NNG	씨/NNB	에게/JKB	얼굴/NNG	을/JKO	들이대/VV	고/EC	입김/NNG	을/JKO	훅/MAG	불/VV	었/EP	다/EF	./SF	-82.13
+일/NR	년/NNB	열두/NR	달/NNG	내/VX	어/EC	몸/NNG	어느/MM	구석/NNG	에서/JKB	이/VCP	건/EC	냄새/NNG	따위/NNB	는/JX	나/VV	지/EC	않/VX	는다/EF	이/VCP	구요/EF	./SF	"/SS	병수/NNP	는/JX	이승/NNG	범/NNG	씨/NNB	에게/JKB	얼굴/NNG	을/JKO	들이대/VV	고/EC	입김/NNG	을/JKO	훅/MAG	붇/VV	었/EP	다/EF	./SF	-92.52
 
 하기야 그가 겉뿐만 아니라 속까지도 언제나 깨끗이 하고 다닌다는 건 모두가 인정하는 일이었다.	0.686
 하기야/MAJ	그/NP	가/JKS	겉/NNG	뿐/JX	만/JX	아니/VCN	라/EC	속/NNG	까지/JX	도/JX	언제나/MAG	깨끗이/MAG	하/VV	고/EC	다니/VV	ㄴ다는/ETM	것/NNB	ㄴ/JX	모두/NNG	가/JKS	인정/NNG	하/XSV	는/ETM	일/NNG	이/VCP	었/EP	다/EF	./SF	
@@ -17270,9 +17270,9 @@ Time per Unit : 1.03792 ms
 
 마른 장작이 화력이 좋다는 말도 있잖아요.	0.647
 마르/VV	ㄴ/ETM	장작/NNG	이/JKS	화력/NNG	이/JKS	좋/VA	다는/ETM	말/NNG	도/JX	있/VV	지/EC	않/VX	아요/EF	./SF	
-마르/VV	ㄴ/ETM	장작/NNG	이/JKS	화력/NNG	이/JKS	좋/VA	다는/ETM	말/NNG	도/JX	있/VX	잖아요/EF	./SF	-28.6
-마르/VV	ㄴ/ETM	장작/NNG	이/JKS	화력/NNG	이/JKS	좋/VA	다는/ETM	말/NNG	도/JX	있/VV	잖아요/EF	./SF	-29.46
-마르/VV	ㄴ/ETM	장작/NNG	이/JKS	화력/NNG	이/JKS	좋/VA	다는/ETM	말/NNG	도/JX	있/VA	잖아요/EF	./SF	-34.11
+마르/VV	ㄴ/ETM	장작/NNG	이/JKS	화력/NNG	이/JKS	좋/VA	다는/ETM	말/NNG	도/JX	있/VX	잖아요/EF	./SF	-27.2
+마르/VV	ㄴ/ETM	장작/NNG	이/JKS	화력/NNG	이/JKS	좋/VA	다는/ETM	말/NNG	도/JX	있/VV	잖아요/EF	./SF	-28.06
+마르/VV	ㄴ/ETM	장작/NNG	이/JKS	화력/NNG	이/JKS	좋/VA	다는/ETM	말/NNG	도/JX	있/VA	잖아요/EF	./SF	-32.71
 
 더구나 서해연처럼 순진하면서도 호기심 많은 여자애한테는 딱 맞아떨어지는 처방일 겁니다." "글쎄…… 하지만 하룻밤 같이 지낸다고 해서 서해연이 언제까지고 병수 곁에 붙어 있으리라는 보장은 없잖아." "그러니까 내가 마른 장작 이야기를 하는 것 아닙니까.	0.855
 더구나/MAG	서해연/NNP	처럼/JKB	순진/XR	하/XSA	면서/EC	도/JX	호기심/NNG	많/VA	은/ETM	여자/NNG	애/NNG	한테/JKB	는/JX	딱/MAG	맞아떨어지/VV	는/ETM	처방/NNG	이/VCP	ㄹ/ETM	것/NNB	이/VCP	ㅂ니다/EF	./SF	"/SS	"/SS	글쎄/IC	…/SE	…/SE	하지만/MAJ	하룻밤/NNG	같이/MAG	지내/VV	ㄴ다고/EC	하/VV	아서/EC	서해연/NNP	이/JKS	언제/NP	까지/JX	이/VCP	고/EC	병수/NNP	곁/NNG	에/JKB	붙/VV	어/EC	있/VX	으리라는/ETM	보장/NNG	은/JX	없/VA	잖아/EF	./SF	"/SS	"/SS	그러니까/MAJ	내/NP	가/JKS	마르/VV	ㄴ/ETM	장작/NNG	이야기/NNG	를/JKO	하/VV	는/ETM	것/NNB	아니/VCN	ㅂ니까/EF	./SF	
@@ -17414,9 +17414,9 @@ Time per Unit : 1.03792 ms
 
 내가 가장 두려워한 것은 이 모든 준비들이 허사로 돌아가지 않을까 하는 점이었다.	0.923
 내/NP	가/JKS	가장/MAG	두려워하/VV	ㄴ/ETM	것/NNB	은/JX	이/MM	모든/MM	준비/NNG	들/XSN	이/JKS	허사/NNG	로/JKB	돌아가/VV	지/EC	않/VX	을까/EC	하/VV	는/ETM	점/NNG	이/VCP	었/EP	다/EF	./SF	
-내/NP	가/JKS	가장/MAG	두려워하/VV	ㄴ/ETM	것/NNB	은/JX	이/NNB	모든/MM	준비/NNG	들/XSN	이/JKS	허사/NNG	로/JKB	돌아가/VV	지/EC	않/VX	을까/EC	하/VV	는/ETM	점/NNG	이/VCP	었/EP	다/EF	./SF	-41.04
-내/NP	가/JKS	가장/MAG	두려워하/VV	ㄴ/ETM	것/NNB	은/JX	이/NP	모든/MM	준비/NNG	들/XSN	이/JKS	허사/NNG	로/JKB	돌아가/VV	지/EC	않/VX	을까/EC	하/VV	는/ETM	점/NNG	이/VCP	었/EP	다/EF	./SF	-41.15
-내/NP	가/JKS	가장/MAG	두려워하/VV	ㄴ/ETM	것/NNB	은/JX	이/NNB	모든/MM	준비/NNG	들/XSN	이/JKS	허사/NNG	로/JKB	돌아가/VV	지/EC	않/VX	을까/EC	하/VV	는/ETM	점/NNB	이/VCP	었/EP	다/EF	./SF	-41.5
+내/NP	가/JKS	가장/MAG	두려워하/VV	ㄴ/ETM	것/NNB	은/JX	이/NNB	모든/MM	준비/NNG	들/XSN	이/JKS	허사/NNG	로/JKB	돌아가/VV	지/EC	않/VX	을까/EC	하/VV	는/ETM	점/NNG	이/VCP	었/EP	다/EF	./SF	-37.57
+내/NP	가/JKS	가장/MAG	두려워하/VV	ㄴ/ETM	것/NNB	은/JX	이/NP	모든/MM	준비/NNG	들/XSN	이/JKS	허사/NNG	로/JKB	돌아가/VV	지/EC	않/VX	을까/EC	하/VV	는/ETM	점/NNG	이/VCP	었/EP	다/EF	./SF	-37.68
+내/NP	가/JKS	가장/MAG	두려워하/VV	ㄴ/ETM	것/NNB	은/JX	이/NNB	모든/MM	준비/NNG	들/XSN	이/JKS	허사/NNG	로/JKB	돌아가/VV	지/EC	않/VX	을까/EC	하/VV	는/ETM	점/NNB	이/VCP	었/EP	다/EF	./SF	-38.03
 
 그래서 병수에게 묻지 않을 수 없었다.	0.688
 그래서/MAJ	병수/NNP	에게/JKB	묻/VV	지/EC	않/VX	을/ETM	수/NNB	없/VA	었/EP	다/EF	./SF	
@@ -18866,9 +18866,9 @@ Time per Unit : 1.03792 ms
 
 책 몇 권을 폼나게 겨드랑에 낀 여대생하고 식당에서 식탁에 행주질이나 하는 웨이터하고 뭐가 어떻게 잘되어 나가겠어." "서해연도 그렇게 대단한 애는 아니에요.	0.804
 책/NNG	몇/MM	권/NNB	을/JKO	폼/NNG	나/VV	게/EC	겨드랑/NNG	에/JKB	끼/VV	ㄴ/ETM	여대/NNG	생/XSN	하고/JC	식당/NNG	에서/JKB	식탁/NNG	에/JKB	행주/NNG	질/XSN	이나/JX	하/VV	는/ETM	웨이터/NNG	하고/JKB	뭐/NP	가/JKS	어떻/VA	게/EC	잘/MAG	되/XSV	어/EC	나가/VX	겠/EP	어/EF	./SF	"/SS	"/SS	서해연/NNP	도/JX	그렇/VA	게/EC	대단/XR	하/XSA	ㄴ/ETM	애/NNG	는/JX	아니/VCN	에요/EF	./SF	
-책/NNG	몇/MM	권/NNB	을/JKO	폼/NNG	나/VV	게/EC	겨드랑/NNG	에/JKB	끼/VV	ㄴ/ETM	여대생/NNG	하/XSV	고/EC	식당/NNG	에서/JKB	식탁/NNG	에/JKB	행주/NNG	질/XSN	이나/JX	하/VV	는/ETM	웨이터/NNG	하/XSV	고/EC	뭐/NP	가/JKS	어떻/VA	게/EC	잘/MAG	되/VV	어/EC	나가/VX	겠/EP	어/EF	./SF	"/SS	"/SS	서해연/NNP	도/JX	그렇/VA	게/EC	대단/XR	하/XSA	ㄴ/ETM	애/NNG	는/JX	아니/VCN	에요/EF	./SF	-89.22
-책/NNG	몇/MM	권/NNB	을/JKO	폼/NNG	나/VV	게/EC	겨드랑/NNG	에/JKB	끼/VV	ㄴ/ETM	여대생/NNG	하/XSV	고/EC	식당/NNG	에서/JKB	식탁/NNG	에/JKB	행주/NNG	질/XSN	이나/JX	하/VV	는/ETM	웨이터/NNG	하/XSV	고/EC	뭐/NP	가/JKS	어떻/VA	게/EC	잘/MAG	되/XSV	어/EC	나가/VX	겠/EP	어/EF	./SF	"/SS	"/SS	서해연/NNP	도/JX	그렇/VA	게/EC	대단/XR	하/XSA	ㄴ/ETM	애/NNG	는/JX	아니/VCN	에요/EF	./SF	-90.34
-책/NNG	몇/MM	권/NNB	을/JKO	폼/NNG	나/VV	게/EC	겨드랑/NNG	에/JKB	끼/VV	ㄴ/ETM	여대생/NNG	하/XSV	고/EC	식당/NNG	에서/JKB	식탁/NNG	에/JKB	행주/NNG	질/XSN	이나/JX	하/VV	는/ETM	웨이터/NNG	하/XSV	고/EC	뭐/NP	가/JKS	어떻/VA	게/EC	잘/MAG	되/VV	어/EC	나가/VX	겠/EP	어/EF	./SF	"/SS	"/SS	서해연/NNP	도/JX	그렇/VA	게/EC	대단/XR	하/XSV	ㄴ/ETM	애/NNG	는/JX	아니/VCN	에요/EF	./SF	-91.24
+책/NNG	몇/MM	권/NNB	을/JKO	폼/NNG	나/VV	게/EC	겨드랑/NNG	에/JKB	끼/VV	ㄴ/ETM	여대생/NNG	하/XSV	고/EC	식당/NNG	에서/JKB	식탁/NNG	에/JKB	행주/NNG	질/XSN	이나/JX	하/VV	는/ETM	웨이터/NNG	하/XSV	고/EC	뭐/NP	가/JKS	어떻/VA	게/EC	잘/MAG	되/VV	어/EC	나가/VX	겠/EP	어/EF	./SF	"/SS	"/SS	서해연/NNP	도/JX	그렇/VA	게/EC	대단/XR	하/XSA	ㄴ/ETM	애/NNG	는/JX	아니/VCN	에요/EF	./SF	-83.28
+책/NNG	몇/MM	권/NNB	을/JKO	폼/NNG	나/VV	게/EC	겨드랑/NNG	에/JKB	끼/VV	ㄴ/ETM	여대생/NNG	하/XSV	고/EC	식당/NNG	에서/JKB	식탁/NNG	에/JKB	행주/NNG	질/XSN	이나/JX	하/VV	는/ETM	웨이터/NNG	하/XSV	고/EC	뭐/NP	가/JKS	어떻/VA	게/EC	잘/MAG	되/XSV	어/EC	나가/VX	겠/EP	어/EF	./SF	"/SS	"/SS	서해연/NNP	도/JX	그렇/VA	게/EC	대단/XR	하/XSA	ㄴ/ETM	애/NNG	는/JX	아니/VCN	에요/EF	./SF	-84.4
+책/NNG	몇/MM	권/NNB	을/JKO	폼/NNG	나/VV	게/EC	겨드랑/NNG	에/JKB	끼/VV	ㄴ/ETM	여대생/NNG	하/XSV	고/EC	식당/NNG	에서/JKB	식탁/NNG	에/JKB	행주/NNG	질/XSN	이나/JX	하/VV	는/ETM	웨이터/NNG	하/XSV	고/EC	뭐/NP	가/JKS	어떻/VA	게/EC	잘/MAG	되/VV	어/EC	나가/VX	겠/EP	어/EF	./SF	"/SS	"/SS	서해연/NNP	도/JX	그렇/VA	게/EC	대단/XR	하/XSV	ㄴ/ETM	애/NNG	는/JX	아니/VCN	에요/EF	./SF	-85.3
 
 대학생이고 또 큰 어려움 없이 살아가고 있기는 하다지만 광주에서도 홀어머니를 모시고 살아가는 처지라구요." "그 정도도 병수에겐 충분히 높은 하늘이지." "하지만 적어도 이런 식은 아닐 거예요.	0.828
 대학/NNG	생/XSN	이/VCP	고/EC	또/MAG	크/VA	ㄴ/ETM	어려움/NNG	없이/MAG	살아가/VV	고/EC	있/VX	기/ETN	는/JX	하/VX	다지만/EC	광주/NNP	에서/JKB	도/JX	홀어머니/NNG	를/JKO	모시/VV	고/EC	살아가/VV	는/ETM	처지/NNG	이/VCP	라구요/EF	./SF	"/SS	"/SS	그/MM	정도/NNG	도/JX	병수/NNP	에게/JKB	ㄴ/JX	충분히/MAG	높/VA	은/ETM	하늘/NNG	이/VCP	지/EF	./SF	"/SS	"/SS	하지만/MAJ	적어도/MAG	이런/MM	식/NNB	은/JX	아니/VCN	ㄹ/ETM	거/NNB	이/VCP	에요/EF	./SF	
@@ -18974,9 +18974,9 @@ Time per Unit : 1.03792 ms
 
 그들은 벽돌지기로 단련된 만태의 힘이 어느 정도인가를 익히 알고 있었다.	0.7
 그/NP	들/XSN	은/JX	벽돌/NNG	지/VV	기/ETN	로/JKB	단련/NNG	되/XSV	ㄴ/ETM	만태/NNP	의/JKG	힘/NNG	이/JKS	어느/MM	정도/NNG	이/VCP	ㄴ가/EC	를/JKO	익히/MAG	알/VV	고/EC	있/VX	었/EP	다/EF	./SF	
-그/NP	들/XSN	은/JX	벽돌/NNG	지기/NNG	로/JKB	단련/NNG	되/XSV	ㄴ/ETM	만태/NNP	의/JKG	힘/NNG	이/JKS	어느/MM	정도/NNG	인가/NNG	를/JKO	익/NNG	히/NNG	알/VV	고/EC	있/VX	었/EP	다/EF	./SF	-62.18
-그/NP	들/XSN	은/JX	벽돌/NNG	지기/NNG	로/JKB	단련/NNG	되/XSV	ㄴ/ETM	만태/NNP	의/JKG	힘/NNG	이/JKS	어느/MM	정도/NNG	인가/NNG	를/JKO	익/NNG	히/NNG	알/VV	고/EC	있/VV	었/EP	다/EF	./SF	-65.82
-그/NP	들/XSN	은/JX	벽돌/NNG	지기/NNG	로/JKB	단련/NNG	되/XSV	ㄴ/ETM	만태/NNP	의/JKG	힘/NNG	이/JKS	어느/MM	정도/NNG	이/VCP	ㄴ가/EC	를/JKO	익/NNG	히/NNG	알/VV	고/EC	있/VX	었/EP	다/EF	./SF	-65.27
+그/NP	들/XSN	은/JX	벽돌/NNG	지기/NNG	로/JKB	단련/NNG	되/XSV	ㄴ/ETM	만태/NNP	의/JKG	힘/NNG	이/JKS	어느/MM	정도/NNG	인가/NNG	를/JKO	익/NNG	히/NNG	알/VV	고/EC	있/VX	었/EP	다/EF	./SF	-60.47
+그/NP	들/XSN	은/JX	벽돌/NNG	지기/NNG	로/JKB	단련/NNG	되/XSV	ㄴ/ETM	만태/NNP	의/JKG	힘/NNG	이/JKS	어느/MM	정도/NNG	인가/NNG	를/JKO	익/NNG	히/NNG	알/VV	고/EC	있/VV	었/EP	다/EF	./SF	-64.11
+그/NP	들/XSN	은/JX	벽돌/NNG	지기/NNG	로/JKB	단련/NNG	되/XSV	ㄴ/ETM	만태/NNP	의/JKG	힘/NNG	이/JKS	어느/MM	정도/NNG	이/VCP	ㄴ가/EC	를/JKO	익/NNG	히/NNG	알/VV	고/EC	있/VX	었/EP	다/EF	./SF	-63.56
 
 한창때였다면 이승범 씨도 달랐겠지만 지금은 행여라도 다시 허리를 다칠까 노심초사하고 있었던 것이다.	0.757
 한창때/NNG	이/VCP	었/EP	다면/EC	이승범/NNP	씨/NNB	도/JX	다르/VA	았/EP	겠/EP	지만/EC	지금/NNG	은/JX	행여/MAG	이/VCP	라도/EC	다시/MAG	허리/NNG	를/JKO	다치/VV	ㄹ까/EC	노심초사/NNG	하/XSV	고/EC	있/VX	었/EP	던/ETM	것/NNB	이/VCP	다/EF	./SF	
@@ -19568,9 +19568,9 @@ Time per Unit : 1.03792 ms
 
 이제 그들은 지난 수십 년 동안 갈고 닦아 온 밀어붙이기의 힘으로 북한을 짓누르기 시작했다.	0.813
 이제/MAG	그/NP	들/XSN	은/JX	지나/VV	ㄴ/ETM	수십/NR	년/NNB	동안/NNG	갈/VV	고/EC	닦/VV	아/EC	오/VX	ㄴ/ETM	밀어붙이/VV	기/ETN	의/JKG	힘/NNG	으로/JKB	북한/NNP	을/JKO	짓누르/VV	기/ETN	시작/NNG	하/XSV	았/EP	다/EF	./SF	
-이제/NNG	그/NP	들/XSN	은/JX	지나/VV	ㄴ/ETM	수십/NR	년/NNB	동안/NNG	갈/VV	고/EC	닦/VV	아/EF	오/VV	ㄴ/ETM	밀어붙이/VV	기/ETN	의/JKG	힘/NNG	으로/JKB	북한/NNP	을/JKO	짓누르/VV	기/ETN	시작/NNG	하/XSV	았/EP	다/EF	./SF	-51.49
-이제/NNG	그/NP	들/XSN	은/JX	지나/VV	ㄴ/ETM	수십/NR	년/NNB	동안/NNG	갈/VV	고/EC	닦/VV	아/EF	오/VX	ㄴ/ETM	밀어붙이/VV	기/ETN	의/JKG	힘/NNG	으로/JKB	북한/NNP	을/JKO	짓누르/VV	기/ETN	시작/NNG	하/XSV	았/EP	다/EF	./SF	-52
-이제/MAG	그/NP	들/XSN	은/JX	지나/VV	ㄴ/ETM	수십/NR	년/NNB	동안/NNG	갈/VV	고/EC	닦/VV	아/EF	오/VV	ㄴ/ETM	밀어붙이/VV	기/ETN	의/JKG	힘/NNG	으로/JKB	북한/NNP	을/JKO	짓누르/VV	기/ETN	시작/NNG	하/XSV	았/EP	다/EF	./SF	-52.11
+이제/NNG	그/NP	들/XSN	은/JX	지나/VV	ㄴ/ETM	수십/NR	년/NNB	동안/NNG	갈/VV	고/EC	닦/VV	아/EF	오/VV	ㄴ/ETM	밀어붙이/VV	기/ETN	의/JKG	힘/NNG	으로/JKB	북한/NNP	을/JKO	짓누르/VV	기/ETN	시작/NNG	하/XSV	았/EP	다/EF	./SF	-49.36
+이제/NNG	그/NP	들/XSN	은/JX	지나/VV	ㄴ/ETM	수십/NR	년/NNB	동안/NNG	갈/VV	고/EC	닦/VV	아/EF	오/VX	ㄴ/ETM	밀어붙이/VV	기/ETN	의/JKG	힘/NNG	으로/JKB	북한/NNP	을/JKO	짓누르/VV	기/ETN	시작/NNG	하/XSV	았/EP	다/EF	./SF	-49.87
+이제/MAG	그/NP	들/XSN	은/JX	지나/VV	ㄴ/ETM	수십/NR	년/NNB	동안/NNG	갈/VV	고/EC	닦/VV	아/EF	오/VV	ㄴ/ETM	밀어붙이/VV	기/ETN	의/JKG	힘/NNG	으로/JKB	북한/NNP	을/JKO	짓누르/VV	기/ETN	시작/NNG	하/XSV	았/EP	다/EF	./SF	-49.98
 
 아니, 사실은 벌써 오래 전부터 그 과정이 시작되었다.	0.737
 아니/IC	,/SP	사실/NNG	은/JX	벌써/MAG	오래/MAG	전/NNG	부터/JX	그/MM	과정/NNG	이/JKS	시작/NNG	되/XSV	었/EP	다/EF	./SF	
@@ -19808,9 +19808,9 @@ Time per Unit : 1.03792 ms
 
 '역대 프로야구 선수들의 이혼율'이라는 자료가 '히말라야 산맥 적설량의 변동'이라는 것으로 연결되어 있었고 다시 그것은 '흑해에서 멸종되어 간 어종'의 자료로 이어져 있었다.	0.963
 '/SS	역대/NNG	프로/NNG	야구/NNG	선수/NNG	들/XSN	의/JKG	이혼/NNG	율/XSN	'/SS	이/VCP	라는/ETM	자료/NNG	가/JKS	'/SS	히말라야/NNP	산맥/NNG	적설량/NNG	의/JKG	변동/NNG	'/SS	이/VCP	라는/ETM	것/NNB	으로/JKB	연결/NNG	되/XSV	어/EC	있/VX	었/EP	고/EC	다시/MAG	그것/NP	은/JX	'/SS	흑해/NNP	에서/JKB	멸종/NNG	되/XSV	어/EC	가/VX	ㄴ/ETM	어종/NNG	'/SS	의/JKG	자료/NNG	로/JKB	이어지/VV	어/EC	있/VX	었/EP	다/EF	./SF	
-'/SS	역대/NNG	프로/NNG	야구/NNG	선수/NNG	들/XSN	의/JKG	이혼/NNG	율/XSN	'/SS	이/VCP	라는/ETM	자료/NNG	가/JKS	'/SS	히말라야/NNP	산맥/NNG	적설량/NNG	의/JKG	변동/NNG	'/SS	이/VCP	라는/ETM	것/NNB	으로/JKB	연결/NNG	되/XSV	어/EC	있/VX	었/EP	고/EC	다시/MAG	그것/NP	은/JX	'/SS	흑해/NNP	에서/JKB	멸종/NNG	되/XSV	어/EC	가/VV	ㄴ/ETM	어종/NNG	'/SS	의/JKG	자료/NNG	로/JKB	이어지/VV	어/EC	있/VX	었/EP	다/EF	./SF	-105.1
-'/SS	역대/NNG	프로/NNG	야구/NNG	선수/NNG	들/XSN	의/JKG	이혼/NNG	율/XSN	'/SS	이/VCP	라는/ETM	자료/NNG	이/VCP	가/EC	'/SS	히말라야/NNP	산맥/NNG	적설량/NNG	의/JKG	변동/NNG	'/SS	이/VCP	라는/ETM	것/NNB	으로/JKB	연결/NNG	되/XSV	어/EC	있/VX	었/EP	고/EC	다시/MAG	그것/NP	은/JX	'/SS	흑해/NNP	에서/JKB	멸종/NNG	되/XSV	어/EC	가/VV	ㄴ/ETM	어종/NNG	'/SS	의/JKG	자료/NNG	로/JKB	이어지/VV	어/EC	있/VX	었/EP	다/EF	./SF	-105.2
-'/SS	역대/NNG	프로/NNG	야구/NNG	선수/NNG	들/XSN	의/JKG	이혼/NNG	율/XSN	'/SS	이/VCP	라는/ETM	자료/NNG	가/JKS	'/SS	히말라야/NNP	산맥/NNG	적설량/NNG	의/JKG	변동/NNG	'/SS	이/VCP	라는/ETM	것/NNB	으로/JKB	연결/NNG	되/XSV	어/EC	있/VX	었/EP	고/EC	다시/MAG	그것/NP	은/JX	'/SS	흑해/NNP	에서/JKB	멸종/NNG	되/XSV	어/EC	갈/VV	ㄴ/ETM	어종/NNG	'/SS	의/JKG	자료/NNG	로/JKB	이어지/VV	어/EC	있/VX	었/EP	다/EF	./SF	-105.3
+'/SS	역대/NNG	프로/NNG	야구/NNG	선수/NNG	들/XSN	의/JKG	이혼/NNG	율/XSN	'/SS	이/VCP	라는/ETM	자료/NNG	가/JKS	'/SS	히말라야/NNP	산맥/NNG	적설량/NNG	의/JKG	변동/NNG	'/SS	이/VCP	라는/ETM	것/NNB	으로/JKB	연결/NNG	되/XSV	어/EC	있/VX	었/EP	고/EC	다시/MAG	그것/NP	은/JX	'/SS	흑해/NNP	에서/JKB	멸종/NNG	되/XSV	어/EC	가/VV	ㄴ/ETM	어종/NNG	'/SS	의/JKG	자료/NNG	로/JKB	이어지/VV	어/EC	있/VX	었/EP	다/EF	./SF	-103.3
+'/SS	역대/NNG	프로/NNG	야구/NNG	선수/NNG	들/XSN	의/JKG	이혼/NNG	율/XSN	'/SS	이/VCP	라는/ETM	자료/NNG	가/JKS	'/SS	히말라야/NNP	산맥/NNG	적설량/NNG	의/JKG	변동/NNG	'/SS	이/VCP	라는/ETM	것/NNB	으로/JKB	연결/NNG	되/XSV	어/EC	있/VX	었/EP	고/EC	다시/MAG	그것/NP	은/JX	'/SS	흑해/NNP	에서/JKB	멸종/NNG	되/XSV	어/EC	갈/VV	ㄴ/ETM	어종/NNG	'/SS	의/JKG	자료/NNG	로/JKB	이어지/VV	어/EC	있/VX	었/EP	다/EF	./SF	-103.5
+'/SS	역대/NNG	프로/NNG	야구/NNG	선수/NNG	들/XSN	의/JKG	이혼/NNG	율/XSN	'/SS	이/VCP	라는/ETM	자료/NNG	가/JKS	'/SS	히말라야/NNP	산맥/NNG	적설량/NNG	의/JKG	변동/NNG	'/SS	이/VCP	라는/ETM	것/NNB	으로/JKB	연결/NNG	되/XSV	어/EC	있/VX	었/EP	고/EC	다시/MAG	그것/NP	은/JX	'/SS	흑해/NNP	에서/JKB	멸종/NNG	되/XSV	어/EC	가/VV	ㄴ/ETM	어종/NNG	'/SS	의/JKG	자료/NNG	로/JKB	이어지/VV	어/EC	있/VV	었/EP	다/EF	./SF	-106.5
 
 그 자료들은 몹시 정교해 보였지만 실질적으로는 모두 가짜였다.	0.68
 그/MM	자료/NNG	들/XSN	은/JX	몹시/MAG	정교/XR	하/XSA	아/EC	보이/VV	었/EP	지만/EC	실질/NNG	적/XSN	으로/JKB	는/JX	모두/MAG	가짜/NNG	이/VCP	었/EP	다/EF	./SF	
@@ -19838,9 +19838,9 @@ Time per Unit : 1.03792 ms
 
 출근 시간 전철의 전압을 저하시킴으로써 교통 혼잡을 유발시킨다든가 도시간 셔틀 항공기의 이착륙을 몇 분 정도씩 지연시킨다든가 하는.	0.914
 출근/NNG	시간/NNG	전철/NNG	의/JKG	전압/NNG	을/JKO	저하/NNG	시키/XSV	ㅁ/ETN	으로써/JKB	교통/NNG	혼잡/NNG	을/JKO	유발/NNG	시키/XSV	ㄴ다든가/EC	도시/NNG	간/NNB	셔틀/NNG	항공기/NNG	의/JKG	이착륙/NNG	을/JKO	몇/MM	분/NNB	정도/NNG	씩/XSN	지연/NNG	시키/XSV	ㄴ다든가/EC	하/VV	는/ETM	./SF	
-출근/NNG	시간/NNG	전철/NNG	의/JKG	전압/NNG	을/JKO	저하/NNG	시키/XSV	ㅁ/ETN	으로써/JKB	교통/NNG	혼잡/NNG	을/JKO	유발/NNG	시키/XSV	ㄴ다든가/EC	도시/NNG	가/VV	ㄴ/ETM	셔틀/NNG	항공기/NNG	의/JKG	이착륙/NNG	을/JKO	몇/MM	분/NNB	정도/NNG	씩/XSN	지연/NNG	시키/XSV	ㄴ다든가/EC	하/VV	는/ETM	./SF	-107.6
-출근/NNG	시간/NNG	전철/NNG	의/JKG	전압/NNG	을/JKO	저하/NNG	시키/XSV	ㅁ/ETN	으로써/JKB	교통/NNG	혼잡/NNG	을/JKO	유발/NNG	시키/XSV	ㄴ다든가/EC	도시/NNG	갈/VV	ㄴ/ETM	셔틀/NNG	항공기/NNG	의/JKG	이착륙/NNG	을/JKO	몇/MM	분/NNB	정도/NNG	씩/XSN	지연/NNG	시키/XSV	ㄴ다든가/EC	하/VV	는/ETM	./SF	-107.8
-출근/NNG	시간/NNG	전철/NNG	의/JKG	전압/NNG	을/JKO	저하/NNG	시키/XSV	ㅁ/ETN	으로써/JKB	교통/NNG	혼잡/NNG	을/JKO	유발/NNG	시키/XSV	ㄴ다든가/EC	도시/NNG	가/VV	ㄴ/ETM	셔틀/NNG	항공기/NNG	의/JKG	이착륙/NNG	을/JKO	몇/MM	분/NNB	정도/NNG	씩/XSN	지연/NNG	시키/XSV	ㄴ다든가/EC	하/VV	아/EC	는/JX	./SF	-108
+출근/NNG	시간/NNG	전철/NNG	의/JKG	전압/NNG	을/JKO	저하/NNG	시키/XSV	ㅁ/ETN	으로써/JKB	교통/NNG	혼잡/NNG	을/JKO	유발/NNG	시키/XSV	ㄴ다든가/EC	도시/NNG	가/VV	ㄴ/ETM	셔틀/NNG	항공기/NNG	의/JKG	이착륙/NNG	을/JKO	몇/MM	분/NNB	정도/NNG	씩/XSN	지연/NNG	시키/XSV	ㄴ다든가/EC	하/VV	는/ETM	./SF	-98.87
+출근/NNG	시간/NNG	전철/NNG	의/JKG	전압/NNG	을/JKO	저하/NNG	시키/XSV	ㅁ/ETN	으로써/JKB	교통/NNG	혼잡/NNG	을/JKO	유발/NNG	시키/XSV	ㄴ다든가/EC	도시/NNG	갈/VV	ㄴ/ETM	셔틀/NNG	항공기/NNG	의/JKG	이착륙/NNG	을/JKO	몇/MM	분/NNB	정도/NNG	씩/XSN	지연/NNG	시키/XSV	ㄴ다든가/EC	하/VV	는/ETM	./SF	-99.06
+출근/NNG	시간/NNG	전철/NNG	의/JKG	전압/NNG	을/JKO	저하/NNG	시키/XSV	ㅁ/ETN	으로써/JKB	교통/NNG	혼잡/NNG	을/JKO	유발/NNG	시키/XSV	ㄴ다든가/EC	도시/NNG	가/VV	ㄴ/ETM	셔틀/NNG	항공기/NNG	의/JKG	이착륙/NNG	을/JKO	몇/MM	분/NNB	정도/NNG	씩/XSN	지연/NNG	시키/XSV	ㄴ다든가/EC	하/VV	아/EC	는/JX	./SF	-99.22
 
 물론 그 실험들은 아주 교묘하게 계획되어서 어느 누구도 그 배후에 누군가의 조작이 작용하고 있음을 눈치채지 못한다.	0.868
 물론/MAG	그/MM	실험/NNG	들/XSN	은/JX	아주/MAG	교묘/XR	하/XSA	게/EC	계획/NNG	되/XSV	어서/EC	어느/MM	누구/NP	도/JX	그/MM	배후/NNG	에/JKB	누구/NP	이/VCP	ㄴ가/EC	의/JKG	조작/NNG	이/JKS	작용/NNG	하/XSV	고/EC	있/VX	음/ETN	을/JKO	눈치/NNG	채/VV	지/EC	못하/VX	ㄴ다/EF	./SF	
@@ -20570,9 +20570,9 @@ Time per Unit : 1.03792 ms
 
 왜 허구한 날 만태와 병수를 붙들고 같은 얘기를 또 묻고 또 묻고 하였는지.	0.852
 왜/MAG	허구/XR	하/XSA	ㄴ/ETM	날/NNG	만태/NNG	와/JC	병수/NNP	를/JKO	붙들/VV	고/EC	같/VA	은/ETM	얘기/NNG	를/JKO	또/MAG	묻/VV	고/EC	또/MAG	묻/VV	고/EC	하/VX	았/EP	는지/EF	./SF	
-왜/MAG	허구/XR	하/XSA	ㄴ/ETM	날/NNG	만태/NNP	와/JC	병수/NNP	를/JKO	붙들/VV	고/EC	같/VA	은/ETM	얘기/NNG	를/JKO	또/MAG	묻/VV	고/EC	또/MAG	묻/VV	고/EC	하/VV	았/EP	는지/EF	./SF	-52.53
-왜/MAG	허구/XR	하/XSA	ㄴ/ETM	날/NNG	만태/NNP	와/JC	병수/NNP	를/JKO	붙들/VV	고/EC	같/VA	은/ETM	얘기/NNG	를/JKO	또/MAG	묻/VV	고/EC	또/MAG	묻/VV	고/EC	하/VV	았/EP	는지/EC	./SF	-51.8
-왜/MAG	허구/NNG	하/XSV	ㄴ/ETM	나/VV	ㄹ/ETM	만태/NNP	와/JC	병수/NNP	를/JKO	붙들/VV	고/EC	같/VA	은/ETM	얘기/NNG	를/JKO	또/MAG	묻/VV	고/EC	또/MAG	묻/VV	고/EC	하/VV	았/EP	는지/EF	./SF	-53.64
+왜/MAG	허구/XR	하/XSA	ㄴ/ETM	날/NNG	만태/NNP	와/JC	병수/NNP	를/JKO	붙들/VV	고/EC	같/VA	은/ETM	얘기/NNG	를/JKO	또/MAG	묻/VV	고/EC	또/MAG	묻/VV	고/EC	하/VV	았/EP	는지/EF	./SF	-48.62
+왜/MAG	허구/XR	하/XSA	ㄴ/ETM	날/NNG	만태/NNP	와/JC	병수/NNP	를/JKO	붙들/VV	고/EC	같/VA	은/ETM	얘기/NNG	를/JKO	또/MAG	묻/VV	고/EC	또/MAG	묻/VV	고/EC	하/VV	았/EP	는지/EC	./SF	-47.88
+왜/MAG	허구/XR	하/XSA	ㄴ/ETM	나/VV	ㄹ/ETM	만태/NNP	와/JC	병수/NNP	를/JKO	붙들/VV	고/EC	같/VA	은/ETM	얘기/NNG	를/JKO	또/MAG	묻/VV	고/EC	또/MAG	묻/VV	고/EC	하/VV	았/EP	는지/EF	./SF	-50.93
 
 그는 자기 자신부터가 그 이야기를 부정하지 않기를 원하고 있었다.	0.909
 그/NP	는/JX	자기/NP	자신/NNG	부터/JX	가/JKS	그/MM	이야기/NNG	를/JKO	부정/NNG	하/XSV	지/EC	않/VX	기/ETN	를/JKO	원하/VV	고/EC	있/VX	었/EP	다/EF	./SF	
@@ -20990,9 +20990,9 @@ Time per Unit : 1.03792 ms
 
 그리고 그는 목욕탕의 정기 휴일이 나흘 앞으로 다가온 어느 날 우리 집 식구 모두에게 그날을 공휴일로 빼어 둘 것을 지시했다.	0.919
 그리고/MAJ	그/NP	는/JX	목욕탕/NNG	의/JKG	정기/NNG	휴일/NNG	이/JKS	나흘/NNG	앞/NNG	으로/JKB	다가오/VV	ㄴ/ETM	어느/MM	날/NNG	우리/NP	집/NNG	식구/NNG	모두/NNG	에게/JKB	그날/NNG	을/JKO	공휴일/NNG	로/JKB	빼/VV	어/EC	두/VX	ㄹ/ETM	것/NNB	을/JKO	지시/NNG	하/XSV	았/EP	다/EF	./SF	
-그리/VV	고/EC	그/NP	는/JX	목욕탕/NNG	의/JKG	정기/NNG	휴일/NNG	이/JKS	나흘/NNG	앞/NNG	으로/JKB	다가오/VV	ㄴ/ETM	어느/MM	날/NNG	우리/NP	집/NNG	식구/NNG	모두/NNG	에게/JKB	그날/NNG	을/JKO	공휴일/NNG	로/JKB	빼/VV	어/EC	두/VX	ㄹ/ETM	것/NNB	을/JKO	지시/NNG	하/XSV	았/EP	다/EF	./SF	-38.15
-그리/VV	고/EC	그/NP	는/JX	목욕탕/NNG	의/JKG	정기/NNG	휴일/NNG	이/JKS	나흘/NNG	앞/NNG	으로/JKB	다가오/VV	ㄴ/ETM	어느/MM	날/NNG	우리/NP	집/NNG	식구/NNG	모두/NNG	에게/JKB	그날/NNG	을/JKO	공휴일/NNG	로/JKB	빼/VV	어/EC	둘/NR	것/NNB	을/JKO	지시/NNG	하/XSV	았/EP	다/EF	./SF	-42.12
-그리/VV	고/EC	그/NP	는/JX	목욕탕/NNG	의/JKG	정기/NNG	휴일/NNG	이/JKS	나흘/NNG	앞/NNG	으로/JKB	다가오/VV	ㄴ/ETM	어느/MM	날/NNG	우리/NP	집/NNG	식구/NNG	모두/NNG	에게/JKB	그날/NNG	을/JKO	공휴일/NNG	로/JKB	빼/VV	어/EC	두/VV	ㄹ/ETM	것/NNB	을/JKO	지시/NNG	하/XSV	았/EP	다/EF	./SF	-42.15
+그리/VV	고/EC	그/NP	는/JX	목욕탕/NNG	의/JKG	정기/NNG	휴일/NNG	이/JKS	나흘/NNG	앞/NNG	으로/JKB	다가오/VV	ㄴ/ETM	어느/MM	날/NNG	우리/NP	집/NNG	식구/NNG	모두/NNG	에게/JKB	그날/NNG	을/JKO	공휴일/NNG	로/JKB	빼/VV	어/EC	두/VX	ㄹ/ETM	것/NNB	을/JKO	지시/NNG	하/XSV	았/EP	다/EF	./SF	-32.63
+그리/VV	고/EC	그/NP	는/JX	목욕탕/NNG	의/JKG	정기/NNG	휴일/NNG	이/JKS	나흘/NNG	앞/NNG	으로/JKB	다가오/VV	ㄴ/ETM	어느/MM	날/NNG	우리/NP	집/NNG	식구/NNG	모두/NNG	에게/JKB	그날/NNG	을/JKO	공휴일/NNG	로/JKB	빼/VV	어/EC	둘/NR	것/NNB	을/JKO	지시/NNG	하/XSV	았/EP	다/EF	./SF	-36.59
+그리/VV	고/EC	그/NP	는/JX	목욕탕/NNG	의/JKG	정기/NNG	휴일/NNG	이/JKS	나흘/NNG	앞/NNG	으로/JKB	다가오/VV	ㄴ/ETM	어느/MM	날/NNG	우리/NP	집/NNG	식구/NNG	모두/NNG	에게/JKB	그날/NNG	을/JKO	공휴일/NNG	로/JKB	빼/VV	어/EC	두/VV	ㄹ/ETM	것/NNB	을/JKO	지시/NNG	하/XSV	았/EP	다/EF	./SF	-36.63
 
 모처럼 모두 바깥으로 나가서 시원한 공기를 쐬고 들어오자는 것이었다.	0.905
 모처럼/MAG	모두/MAG	바깥/NNG	으로/JKB	나가/VV	아서/EC	시원/XR	하/XSA	ㄴ/ETM	공기/NNG	를/JKO	쐬/VV	고/EC	들어오/VV	자는/ETM	것/NNB	이/VCP	었/EP	다/EF	./SF	
@@ -21426,11 +21426,11 @@ Time per Unit : 1.03792 ms
 그러/VV	고는/EC	천천히/MAG	입/NNG	가로/NNG	가져가/VV	았/EP	다/EF	./SF	-17.27
 그러/VV	고/EC	는/JX	천천히/MAG	입가/NNG	로/JKB	가져가/VV	았/EP	다/EF	./SF	-17.02
 
-그 살점으로부터 풍겨 오는 비린내는 아마 그에게 조금 전 호숫가 구석구석에서 보았던 썩어 가는 쓰레기와 붉은 물을 일깨우고 있었을 것이었다.	0.778
+그 살점으로부터 풍겨 오는 비린내는 아마 그에게 조금 전 호숫가 구석구석에서 보았던 썩어 가는 쓰레기와 붉은 물을 일깨우고 있었을 것이었다.	0.723
 그/MM	살점/NNG	으로부터/JKB	풍기/VV	어/EC	오/VX	는/ETM	비린내/NNG	는/JX	아마/MAG	그/NP	에게/JKB	조금/MAG	전/NNG	호숫가/NNG	구석구석/NNG	에서/JKB	보/VV	았/EP	던/ETM	썩/VV	어/EC	가/VX	는/ETM	쓰레기/NNG	와/JC	붉/VA	은/ETM	물/NNG	을/JKO	일깨우/VV	고/EC	있/VX	었/EP	을/ETM	것/NNB	이/VCP	었/EP	다/EF	./SF	
-그/NP	살점/NNG	으로부터/JKB	풍기/VV	어/EC	오/VX	는/ETM	비린내/NNG	는/JX	아마/MAG	그/NP	에게/JKB	조금/MAG	전/NNG	호숫가/NNG	구석구석/NNG	에서/JKB	보/VX	았/EP	던/ETM	썩/VV	어/EC	가늘/VA	ㄴ/ETM	쓰레기/NNG	와/JKB	붉/VA	은/ETM	물/NNG	을/JKO	일깨우/VV	고/EC	있/VX	었/EP	을/ETM	것/NNB	이/VCP	었/EP	다/EF	./SF	-83.14
-그/NP	살점/NNG	으로부터/JKB	풍기/VV	어/EC	오/VX	는/ETM	비린내/NNG	는/JX	아마/MAG	그/NP	에게/JKB	조금/MAG	전/NNG	호숫가/NNG	구석구석/NNG	에서/JKB	보/VX	았/EP	던/ETM	썩/VV	어/EC	가늘/VA	ㄴ/ETM	쓰레기/NNG	와/JC	붉/VA	은/ETM	물/NNG	을/JKO	일깨우/VV	고/EC	있/VX	었/EP	을/ETM	것/NNB	이/VCP	었/EP	다/EF	./SF	-83.7
-그/NP	살점/NNG	으로부터/JKB	풍기/VV	어/EC	오/VX	는/ETM	비린내/NNG	는/JX	아마/MAG	그/NP	에게/JKB	조금/MAG	전/NNG	호숫가/NNG	구석구석/NNG	에서/JKB	보/VX	았/EP	던/ETM	썩/VV	어/EC	가/VV	는/ETM	쓰레기/NNG	와/JKB	붉/VA	은/ETM	물/NNG	을/JKO	일깨우/VV	고/EC	있/VX	었/EP	을/ETM	것/NNB	이/VCP	었/EP	다/EF	./SF	-83.93
+그/NP	살점/NNG	으로부터/JKB	풍기/VV	어/EC	오/VX	는/ETM	비린내/NNG	는/JX	아마/MAG	그/NP	에게/JKB	조금/MAG	전/NNG	호숫가/NNG	구석/NNG	구석/NNG	에서/JKB	보/VX	았/EP	던/ETM	썩/VV	어/EC	가늘/VA	ㄴ/ETM	쓰레기/NNG	와/JKB	붉/VA	은/ETM	물/NNG	을/JKO	일깨우/VV	고/EC	있/VX	었/EP	을/ETM	것/NNB	이/VCP	었/EP	다/EF	./SF	-70.49
+그/NP	살점/NNG	으로부터/JKB	풍기/VV	어/EC	오/VX	는/ETM	비린내/NNG	는/JX	아마/MAG	그/NP	에게/JKB	조금/MAG	전/NNG	호숫가/NNG	구석/NNG	구석/NNG	에서/JKB	보/VX	았/EP	던/ETM	썩/VV	어/EC	가늘/VA	ㄴ/ETM	쓰레기/NNG	와/JC	붉/VA	은/ETM	물/NNG	을/JKO	일깨우/VV	고/EC	있/VX	었/EP	을/ETM	것/NNB	이/VCP	었/EP	다/EF	./SF	-71.04
+그/NP	살점/NNG	으로부터/JKB	풍기/VV	어/EC	오/VX	는/ETM	비린내/NNG	는/JX	아마/MAG	그/NP	에게/JKB	조금/MAG	전/NNG	호숫가/NNG	구석/NNG	구석/NNG	에서/JKB	보/VX	았/EP	던/ETM	썩/VV	어/EC	가/VV	는/ETM	쓰레기/NNG	와/JKB	붉/VA	은/ETM	물/NNG	을/JKO	일깨우/VV	고/EC	있/VX	었/EP	을/ETM	것/NNB	이/VCP	었/EP	다/EF	./SF	-71.27
 
 그는 두 눈을 질끈 감고 그것을 입 속으로 집어 넣고는 어적어적 씹기 시작했다.	0.71
 그/NP	는/JX	두/MM	눈/NNG	을/JKO	질끈/MAG	감/VV	고/EC	그것/NP	을/JKO	입/NNG	속/NNG	으로/JKB	집/VV	어/EC	넣/VV	고/EC	는/JX	어적어적/MAG	씹/VV	기/ETN	시작/NNG	하/XSV	았/EP	다/EF	./SF	

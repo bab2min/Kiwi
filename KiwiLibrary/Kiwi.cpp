@@ -209,6 +209,12 @@ KResult Kiwi::analyze(const k_wstring & str) const
 	return analyze(str, MIN_CANDIDATE)[0];
 }
 
+KResult Kiwi::analyze(const string & str) const
+{
+	wstring_convert<codecvt_utf8_utf16<k_wchar>, k_wchar> converter;
+	return analyze(converter.from_bytes(str));
+}
+
 vector<KResult> Kiwi::analyze(const k_wstring & str, size_t topN) const
 {
 	vector<KInterResult> cands(1);
@@ -257,15 +263,21 @@ vector<KResult> Kiwi::analyze(const k_wstring & str, size_t topN) const
 				{
 					auto& mi = get<0>(ms[i]);
 					if (!mi) continue;
-					if (!mi->distMap) continue;
 					for (size_t j = inserted < 5 ? 0 : inserted - 5; j < i; j++)
 					{
 						auto& mj = get<0>(ms[j]);
 						if (!mj) continue;
 						float pmi;
-						if (mi < mj) pmi = mi->getDistMap(mj);
-						else if (mj->distMap) pmi = mj->getDistMap(mi);
-						else pmi = 0;
+						if (mi < mj)
+						{
+							if(mi->distMap) pmi = mi->getDistMap(mj);
+							else continue;
+						}
+						else
+						{
+							if (mj->distMap) pmi = mj->getDistMap(mi);
+							else continue;
+						}
 						newCands.back().second += pmi / (i-j + 1);
 					}
 				}
@@ -289,6 +301,12 @@ vector<KResult> Kiwi::analyze(const k_wstring & str, size_t topN) const
 		}
 	}
 	return ret;
+}
+
+vector<KResult> Kiwi::analyze(const string & str, size_t topN) const
+{
+	wstring_convert<codecvt_utf8_utf16<k_wchar>, k_wchar> converter;
+	return analyze(converter.from_bytes(str), topN);
 }
 
 void Kiwi::clearCache()
@@ -321,6 +339,52 @@ vector<const KChunk*> Kiwi::divideChunk(const k_vchunk& ch)
 	return ret;
 }
 
+const vector<pair<vector<char>, float>>& Kiwi::getOptimaPath(KMorphemeNode* node, size_t topN)
+{
+	if (node->optimaCache) return *node->optimaCache;
+
+	node->optimaCache = new vector<pair<vector<char>, float>>();
+	if (node->isAcceptableFinal())
+	{
+		node->optimaCache->emplace_back(vector<char>{}, 0);
+		return *node->optimaCache;
+	}
+	char c = 0;
+	for (auto next : node->nexts)
+	{
+		if (node->morpheme && node->morpheme->tag == KPOSTag::UNKNOWN) continue;
+		float tp = mdl->getTransitionP(node->morpheme, next->morpheme);
+		if (node->morpheme) tp += node->morpheme->p;
+		if (tp <= P_MIN) continue;
+		const auto& paths = getOptimaPath(next, topN);
+		if (!paths.empty()) for (auto& p : paths)
+		{
+			vector<char> l;
+			l.emplace_back(c);
+			l.insert(l.end(), p.first.begin(), p.first.end());
+			node->optimaCache->emplace_back(l, p.second + tp);
+		}
+		c++;
+	}
+	sort(node->optimaCache->begin(), node->optimaCache->end(), [](const auto& a, const auto& b)
+	{
+		return a.second > b.second;
+	});
+	if (node->optimaCache->size() > topN) node->optimaCache->erase(node->optimaCache->begin() + topN, node->optimaCache->end());
+	return *node->optimaCache;
+}
+
+vector<const KMorpheme*> Kiwi::pathToResult(const KMorphemeNode * node, const vector<char>& path)
+{
+	vector<const KMorpheme*> ret;
+	for (char p : path)
+	{
+		node = node->nexts[p];
+		ret.emplace_back(node->morpheme);
+	}
+	return ret;
+}
+
 vector<k_vpcf> Kiwi::calcProbabilities(const KChunk * pre, const KChunk * ch, const KChunk * end, const char* ostr, size_t len) const
 {
 	static bool(*vowelFunc[])(const char*, const char*) = {
@@ -334,7 +398,7 @@ vector<k_vpcf> Kiwi::calcProbabilities(const KChunk * pre, const KChunk * ch, co
 	};
 	static bool(*polarFunc[])(const char*, const char*) = {
 		KFeatureTestor::isPositive,
-		KFeatureTestor::notPositive
+		KFeatureTestor::isNegative
 	};
 
 	vector<k_vpcf> ret(pre->getCandSize());

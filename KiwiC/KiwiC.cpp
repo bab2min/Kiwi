@@ -54,17 +54,8 @@ PKIWIRESULT kiwi_analyze(PKIWI handle, const char * text, int topN)
 {
 	if (!handle) return nullptr;
 	Kiwi* kiwi = (Kiwi*)handle;
-	wstring_convert<codecvt_utf8_utf16<k_wchar>> converter;
-	try
-	{
-		auto wtext = converter.from_bytes(text);
-		auto result = new pair<vector<KResult>, ResultBuffer>{ kiwi->analyze(wtext, topN), {} };
-		return result;
-	}
-	catch (const exception& e)
-	{
-		return nullptr;
-	}
+	auto result = new pair<vector<KResult>, ResultBuffer>{ kiwi->analyze(text, topN),{} };
+	return result;
 }
 
 int kiwi_clearCache(PKIWI handle)
