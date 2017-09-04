@@ -31,10 +31,10 @@ using namespace std;
 #define TRIE_ALLOC_ARRAY
 #define DIVIDE_BOUND 6
 #define MIN_CANDIDATE 5
-//#define USE_DIST_MAP
-//#define PMI_WEIGHT 1.7f
+#define USE_DIST_MAP
+#define PMI_WEIGHT 1.7f
 //#define LOAD_TXT
-//#define CUSTOM_ALLOC
+#define CUSTOM_ALLOC
 
 #ifdef _WIN32
 typedef wchar_t k_wchar;

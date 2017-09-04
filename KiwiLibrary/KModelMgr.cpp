@@ -44,7 +44,7 @@ void KModelMgr::loadPOSFromTxt(const char * filename)
 			auto tagB = makePOSTag(fields[1]);
 			if (tagB == KPOSTag::MAX) continue;
 			auto p = stof(fields[2].c_str());
-			if (p < 0.00007) continue;
+			if (p < 0.00001) continue;
 			posTransition[(int)tagA][(int)tagB] = logf(p);
 		}
 	}

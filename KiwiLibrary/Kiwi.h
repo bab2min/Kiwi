@@ -28,8 +28,9 @@ protected:
 	vector<KInterResult>* findCache(const string& jm) const;
 public:
 	const KTrie* kt = nullptr;
-	const vector<pair<vector<char>, float>>& getOptimaPath(KMorphemeNode* node, size_t topN);
-	static vector<const KMorpheme*> pathToResult(const KMorphemeNode* node, const vector<char>& path);
+	const k_vpcf* getOptimaPath(KMorphemeNode* node, size_t topN, KPOSTag prefix, KPOSTag suffix) const;
+	static vector<const KMorpheme*> pathToResult(const KMorphemeNode* node, const k_vchar& path);
+	
 	Kiwi(const char* modelPath = "", size_t maxCache = -1);
 	int addUserWord(const k_wstring& str, KPOSTag tag);
 	int addUserRule(const k_wstring& str, const vector<pair<k_wstring, KPOSTag>>& morph);
@@ -39,6 +40,8 @@ public:
 	KResult analyze(const string& str) const;
 	vector<KResult> analyze(const k_wstring& str, size_t topN) const;
 	vector<KResult> analyze(const string& str, size_t topN) const;
+
+	vector<KResult> analyzeGM(const k_wstring& str, size_t topN) const;
 	void clearCache();
 };
 

@@ -372,7 +372,8 @@ shared_ptr<KMorphemeNode> KTrie::splitGM(const k_string & str, vector<KMorpheme>
 	nodeEndPos.emplace_back(0);
 	auto makeTmpMorph = [&tmpMorph](const k_string& form)
 	{
-		tmpMorph.emplace_back(form);
+		tmpMorph.emplace_back();
+		tmpMorph.back().kform = new k_string{ form }; // leak warning
 		tmpMorph.back().p = form.size() * -1.5f - 6.f;
 		return tmpMorph.size() - 1;
 	};
@@ -467,14 +468,17 @@ shared_ptr<KMorphemeNode> KTrie::splitGM(const k_string & str, vector<KMorpheme>
 					for (auto& p : newMorphs)
 					{
 						auto& morph = p.first;
-						if ((beforeMorph->combineSocket && beforeMorph->tag != KPOSTag::UNKNOWN)
-							&& (beforeMorph->combineSocket != morph->combineSocket || morph->tag != KPOSTag::UNKNOWN)) continue;
-						if ((beforeMorph->combineSocket && beforeMorph->tag != KPOSTag::UNKNOWN
-							&& beforeMorph->combineSocket == morph->combineSocket && morph->tag == KPOSTag::UNKNOWN)
-							&& !morph->chunks->empty() && morph->chunks->front()->tag == KPOSTag::V) //!!!!!!
+						if (beforeMorph->combineSocket && beforeMorph->tag != KPOSTag::UNKNOWN
+							&& (beforeMorph->combineSocket == morph->combineSocket && morph->tag == KPOSTag::UNKNOWN))
 						{
-							nodes[it->second].morpheme = beforeMorph->getCombined();
+							if (!morph->chunks->empty() && morph->chunks->front()->tag == KPOSTag::V)
+							{
+								nodes[it->second].morpheme = beforeMorph->getCombined();
+							}
 						}
+						else if (beforeMorph->combineSocket && beforeMorph->tag != KPOSTag::UNKNOWN) continue;
+						else if (morph->combineSocket && morph->tag == KPOSTag::UNKNOWN) continue;
+
 						if(!p.second) p.second = makeNewNode(p.first, n);
 						nodes[it->second].nexts.emplace_back((KMorphemeNode*)p.second);
 					}

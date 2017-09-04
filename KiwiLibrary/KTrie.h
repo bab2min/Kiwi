@@ -35,8 +35,9 @@ struct KMorphemeNode
 {
 	const KMorpheme* morpheme;
 	vector<KMorphemeNode*> nexts;
-	vector<pair<vector<char>, float>>* optimaCache = nullptr;
+	k_vpcf* optimaCache = nullptr;
 	KMorphemeNode(const KMorpheme* _morpheme = nullptr) : morpheme(_morpheme) {}
+	~KMorphemeNode() { if (optimaCache) delete optimaCache; }
 	void setAcceptableFinal() { nexts.emplace_back(nullptr); }
 	bool isAcceptableFinal() const { return nexts.size() == 1 && nexts[0] == nullptr; }
 };

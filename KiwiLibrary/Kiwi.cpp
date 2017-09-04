@@ -309,6 +309,110 @@ vector<KResult> Kiwi::analyze(const string & str, size_t topN) const
 	return analyze(converter.from_bytes(str), topN);
 }
 
+vector<KResult> Kiwi::analyzeGM(const k_wstring & str, size_t topN) const
+{
+	vector<KInterResult> cands(1);
+	auto parts = splitPart(str);
+	auto sortFunc = [](const auto& x, const auto& y)
+	{
+		return x.second > y.second;
+	};
+	for (auto p : parts)
+	{
+		for (size_t cid = 0; cid < p.size(); cid++)
+		{
+			auto& c = p[cid];
+			if (c.second != KPOSTag::MAX)
+			{
+				for (auto& cand : cands)
+				{
+					cand.first.emplace_back(nullptr, c.first, c.second);
+				}
+				continue;
+			}
+			auto jm = splitJamo(c.first);
+			vector<KMorpheme> tmpMorph;
+			auto graph = kt->splitGM(jm, tmpMorph, !!cid);
+			auto paths = getOptimaPath(graph.get(), topN, cid ? p[cid - 1].second : KPOSTag::UNKNOWN, cid + 1 < p.size() ? p[cid + 1].second : KPOSTag::UNKNOWN);
+			vector<pair<vector<const KMorpheme*>, float>> ar;
+			for (auto& p : *paths)
+			{
+				ar.emplace_back(pathToResult(graph.get(), p.first), p.second);
+			}
+			vector<tuple<short, short, float>> probs;
+			probs.reserve(cands.size() * ar.size());
+			for (size_t i = 0; i < cands.size(); i++) for (size_t j = 0; j < ar.size(); j++)
+			{
+				probs.emplace_back((short)i, (short)j, cands[i].second + ar[j].second);
+			}
+			sort(probs.begin(), probs.end(), [](const auto& x, const auto& y)
+			{
+				return get<float>(x) > get<float>(y);
+			});
+			vector<KInterResult> newCands;
+			newCands.reserve(min(topN, probs.size()));
+			for_each(probs.begin(), probs.begin() + min(max(topN, (size_t)MIN_CANDIDATE), probs.size()), [&newCands, &cands, &ar](auto p)
+			{
+				const pair<vector<const KMorpheme*>, float>& arp = ar[get<1>(p)];
+				newCands.emplace_back(cands[get<0>(p)]);
+				newCands.back().second += arp.second;
+				auto& ms = newCands.back().first;
+				size_t inserted = ms.size();
+				ms.reserve(ms.size() + arp.first.size());
+				for (auto& f : arp.first)
+				{
+					ms.emplace_back(f, L"", f->tag);
+				}
+#ifdef USE_DIST_MAP
+				for (size_t i = inserted; i < ms.size(); i++)
+				{
+					auto& mi = get<0>(ms[i]);
+					if (!mi) continue;
+					for (size_t j = inserted < 5 ? 0 : inserted - 5; j < i; j++)
+					{
+						auto& mj = get<0>(ms[j]);
+						if (!mj) continue;
+						float pmi;
+						if (mi < mj)
+						{
+							if (mi->distMap) pmi = mi->getDistMap(mj);
+							else continue;
+						}
+						else
+						{
+							if (mj->distMap) pmi = mj->getDistMap(mi);
+							else continue;
+						}
+						newCands.back().second += pmi / (i - j + 1);
+					}
+				}
+#endif
+			});
+			swap(cands, newCands);
+			// clear temporary string
+			for (auto& tm : tmpMorph)
+			{
+				if (tm.kform) delete tm.kform;
+			}
+		}
+	}
+	vector<KResult> ret;
+	ret.reserve(cands.size());
+	for (const auto& c : cands)
+	{
+		if (ret.size() >= topN) break;
+		ret.emplace_back(vector<KWordPair>{}, c.second);
+		ret.back().first.reserve(c.first.size());
+		for (const auto& m : c.first)
+		{
+			auto morpheme = get<0>(m);
+			if (morpheme) ret.back().first.emplace_back(*morpheme->wform, morpheme->tag);
+			else ret.back().first.emplace_back(get<1>(m), get<2>(m));
+		}
+	}
+	return ret;
+}
+
 void Kiwi::clearCache()
 {
 	tempCache = {};
@@ -339,48 +443,123 @@ vector<const KChunk*> Kiwi::divideChunk(const k_vchunk& ch)
 	return ret;
 }
 
-const vector<pair<vector<char>, float>>& Kiwi::getOptimaPath(KMorphemeNode* node, size_t topN)
+void printMorph(const KMorpheme* morph)
 {
-	if (node->optimaCache) return *node->optimaCache;
+	if (morph->chunks)
+	{
+		for (auto m : *morph->chunks)
+		{
+			if (m->tag == KPOSTag::V) continue;
+			fputws(joinJamo(m->getForm()).c_str(), stdout);
+			printf("/%s\t", tagToString(m->tag));
+		}
+	}
+	else
+	{
+		fputws(joinJamo(morph->getForm()).c_str(), stdout);
+		printf("/%s\t", tagToString(morph->tag));
+	}
+}
 
-	node->optimaCache = new vector<pair<vector<char>, float>>();
+inline void debugNodes(KMorphemeNode* node, const pair<vector<char>, float>& path)
+{
+	printf("%.3g\t", path.second);
+	if (node->morpheme)
+	{
+		printMorph(node->morpheme);
+	}
+	for (auto c : path.first)
+	{
+		node = node->nexts[c];
+		printMorph(node->morpheme);
+	}
+	puts("\n");
+}
+
+const k_vpcf* Kiwi::getOptimaPath(KMorphemeNode* node, size_t topN, KPOSTag prefix, KPOSTag suffix) const
+{
+	if (node->optimaCache) return node->optimaCache;
+	if (node->nexts.empty()) return nullptr;
+
+	//if (node->morpheme && node->morpheme->tag != KPOSTag::UNKNOWN) printMorph(node->morpheme);
+
 	if (node->isAcceptableFinal())
 	{
-		node->optimaCache->emplace_back(vector<char>{}, 0);
-		return *node->optimaCache;
+		node->optimaCache = new k_vpcf{};
+		KMorpheme tmp;
+		tmp.tag = suffix;
+		float tp = mdl->getTransitionP(node->morpheme, &tmp);
+		if (node->morpheme) tp += node->morpheme->p;
+		node->optimaCache->emplace_back(k_vchar{}, tp);
+		return node->optimaCache;
 	}
 	char c = 0;
 	for (auto next : node->nexts)
 	{
-		if (node->morpheme && node->morpheme->tag == KPOSTag::UNKNOWN) continue;
-		float tp = mdl->getTransitionP(node->morpheme, next->morpheme);
-		if (node->morpheme) tp += node->morpheme->p;
-		if (tp <= P_MIN) continue;
-		const auto& paths = getOptimaPath(next, topN);
-		if (!paths.empty()) for (auto& p : paths)
+		if (node->morpheme && node->morpheme->tag == KPOSTag::UNKNOWN)
 		{
-			vector<char> l;
+			// to do... inference unknown form type
+			continue;
+		}
+		float tp;
+		if (node->morpheme)
+		{
+			tp = mdl->getTransitionP(node->morpheme, next->morpheme);
+			tp += node->morpheme->p;
+		}
+		else 
+		{
+			KMorpheme tmp;
+			tmp.tag = prefix;
+			tp = mdl->getTransitionP(&tmp, next->morpheme);
+		}
+		if (tp <= P_MIN) goto continueLoop;
+		const auto paths = getOptimaPath(next, topN, prefix, suffix);
+		if (!paths) goto continueLoop;
+		
+		if (!node->optimaCache) node->optimaCache = new k_vpcf{};
+		for (auto& p : *paths)
+		{
+			k_vchar l;
 			l.emplace_back(c);
 			l.insert(l.end(), p.first.begin(), p.first.end());
 			node->optimaCache->emplace_back(l, p.second + tp);
 		}
+	continueLoop:
 		c++;
 	}
+	if (!node->optimaCache) return nullptr;
+
 	sort(node->optimaCache->begin(), node->optimaCache->end(), [](const auto& a, const auto& b)
 	{
 		return a.second > b.second;
 	});
 	if (node->optimaCache->size() > topN) node->optimaCache->erase(node->optimaCache->begin() + topN, node->optimaCache->end());
-	return *node->optimaCache;
+	/*for (auto& p : *node->optimaCache)
+	{
+		debugNodes(node, p);
+	}*/
+	return node->optimaCache;
 }
 
-vector<const KMorpheme*> Kiwi::pathToResult(const KMorphemeNode * node, const vector<char>& path)
+vector<const KMorpheme*> Kiwi::pathToResult(const KMorphemeNode * node, const k_vchar& path)
 {
 	vector<const KMorpheme*> ret;
 	for (char p : path)
 	{
 		node = node->nexts[p];
-		ret.emplace_back(node->morpheme);
+		if (node->morpheme->chunks)
+		{
+			for (auto m : *node->morpheme->chunks)
+			{
+				if (m->tag == KPOSTag::V) continue;
+				ret.emplace_back(m);
+			}
+		}
+		else
+		{
+			ret.emplace_back(node->morpheme);
+		}
 	}
 	return ret;
 }
