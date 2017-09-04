@@ -34,27 +34,38 @@ int main()
 	Kiwi kw{ "../ModelGenerator/" };
 	kw.prepare();
 	Timer timer;
-	for (int i = 0; i < 1; i++)
+	for (int i = 0; i < 1000; i++)
 	{
-		vector<KMorpheme> tmpMorph;
-		auto graph = kw.kt->splitGM(splitJamo(L"먹었습니다"), tmpMorph);
-		auto paths = kw.getOptimaPath(graph.get(), 5);
-		for (auto& path : paths)
+		kw.clearCache();
+		auto res = kw.analyzeGM(L"우리는 빠르게 먹었습니다.", 5);
+		for (auto r : res)
 		{
-			auto res = Kiwi::pathToResult(graph.get(), path.first);
-			for (auto morph : res)
+			printf("%.3g\t", r.second);
+			for (auto& p : r.first)
 			{
-				printf("%s\t", morph->kform->c_str());
+				//wprintf(L"%s/%s\t", p.first.c_str(), tagToStringW(p.second));
 			}
-			printf("\n");
+			//printf("\n");
 		}
+		//printf("\n");
 	}
-	printf("%gms\n", timer.getElapsed());
-	for (int i = 0; i < 1; i++)
+	printf("\n==== %gms\n", timer.getElapsed());
+	for (int i = 0; i < 1000; i++)
 	{
-		kw.kt->split(splitJamo(L"우리는먹었습니다"));
+		kw.clearCache();
+		auto res = kw.analyze(L"우리는 빠르게 먹었습니다.", 5);
+		for (auto r : res)
+		{
+			printf("%.3g\t", r.second);
+			for (auto& p : r.first)
+			{
+				//wprintf(L"%s/%s\t", p.first.c_str(), tagToStringW(p.second));
+			}
+			//printf("\n");
+		}
+		//printf("\n");
 	}
-	printf("%gms\n", timer.getElapsed());
+	printf("\n==== %gms\n", timer.getElapsed());
 	getchar();
 }
 
