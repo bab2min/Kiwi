@@ -215,7 +215,7 @@ KResult Kiwi::analyze(const string & str) const
 	return analyze(converter.from_bytes(str));
 }
 
-vector<KResult> Kiwi::analyze(const k_wstring & str, size_t topN) const
+vector<KResult> Kiwi::analyzeOld(const k_wstring & str, size_t topN) const
 {
 	vector<KInterResult> cands(1);
 	auto parts = splitPart(str);
@@ -317,7 +317,6 @@ vector<KResult> Kiwi::analyzeGM(const k_wstring & str, size_t topN) const
 	{
 		return x.second > y.second;
 	};
-	vector<KMorpheme*> tmpMorph;
 	for (auto p : parts)
 	{
 		for (size_t cid = 0; cid < p.size(); cid++)
@@ -332,13 +331,7 @@ vector<KResult> Kiwi::analyzeGM(const k_wstring & str, size_t topN) const
 				continue;
 			}
 			auto jm = splitJamo(c.first);
-			auto graph = kt->splitGM(jm, tmpMorph, !!cid);
-			auto paths = getOptimaPath(graph.get(), topN, cid ? p[cid - 1].second : KPOSTag::UNKNOWN, cid + 1 < p.size() ? p[cid + 1].second : KPOSTag::UNKNOWN);
-			vector<pair<vector<const KMorpheme*>, float>> ar;
-			for (auto& p : *paths)
-			{
-				ar.emplace_back(pathToResult(graph.get(), p.first), p.second);
-			}
+			auto ar = analyzeJM2(jm, topN, cid ? p[cid - 1].second : KPOSTag::UNKNOWN, cid + 1 < p.size() ? p[cid + 1].second : KPOSTag::UNKNOWN);
 			vector<tuple<short, short, float>> probs;
 			probs.reserve(cands.size() * ar.size());
 			for (size_t i = 0; i < cands.size(); i++) for (size_t j = 0; j < ar.size(); j++)
@@ -353,16 +346,12 @@ vector<KResult> Kiwi::analyzeGM(const k_wstring & str, size_t topN) const
 			newCands.reserve(min(topN, probs.size()));
 			for_each(probs.begin(), probs.begin() + min(max(topN, (size_t)MIN_CANDIDATE), probs.size()), [&newCands, &cands, &ar](auto p)
 			{
-				const pair<vector<const KMorpheme*>, float>& arp = ar[get<1>(p)];
+				const KInterResult& arp = ar[get<1>(p)];
 				newCands.emplace_back(cands[get<0>(p)]);
 				newCands.back().second += arp.second;
 				auto& ms = newCands.back().first;
 				size_t inserted = ms.size();
-				ms.reserve(ms.size() + arp.first.size());
-				for (auto f : arp.first)
-				{
-					ms.emplace_back(f, L"", f->tag);
-				}
+				ms.insert(ms.end(), arp.first.begin(), arp.first.end());
 #ifdef USE_DIST_MAP
 				for (size_t i = inserted; i < ms.size(); i++)
 				{
@@ -389,7 +378,6 @@ vector<KResult> Kiwi::analyzeGM(const k_wstring & str, size_t topN) const
 #endif
 			});
 			swap(cands, newCands);
-			// clear temporary string
 		}
 	}
 	vector<KResult> ret;
@@ -406,12 +394,12 @@ vector<KResult> Kiwi::analyzeGM(const k_wstring & str, size_t topN) const
 			else ret.back().first.emplace_back(get<1>(m), get<2>(m));
 		}
 	}
-	for (auto& tm : tmpMorph)
-	{
-		if (tm->kform) delete tm->kform;
-		delete tm;
-	}
 	return ret;
+}
+
+vector<KResult> Kiwi::analyze(const k_wstring & str, size_t topN) const
+{
+	return analyzeGM(str, topN);
 }
 
 void Kiwi::clearCache()
@@ -810,6 +798,59 @@ vector<KInterResult> Kiwi::analyzeJM(const k_string & jm, size_t topN, KPOSTag p
 			kr.second = e.second;
 			return kr;
 		});
+	}
+	addCache(cfind, ret);
+	return ret;
+}
+
+vector<tuple<const KMorpheme*, k_wstring, KPOSTag>> pathToInterResult(const KMorphemeNode * node, const k_vchar& path)
+{
+	vector<tuple<const KMorpheme*, k_wstring, KPOSTag>> ret;
+	for (char p : path)
+	{
+		node = node->nexts[p];
+		if (node->morpheme->chunks)
+		{
+			for (auto m : *node->morpheme->chunks)
+			{
+				if (m->tag == KPOSTag::V) continue;
+				ret.emplace_back(m, k_wstring{}, m->tag);
+			}
+		}
+		else
+		{
+			if (node->morpheme->wform) ret.emplace_back(node->morpheme, k_wstring{}, node->morpheme->tag);
+			else ret.emplace_back(nullptr, joinJamo(node->morpheme->getForm()), node->morpheme->tag);
+		}
+	}
+	return ret;
+}
+
+vector<KInterResult> Kiwi::analyzeJM2(const k_string & jm, size_t topN, KPOSTag prefix, KPOSTag suffix) const
+{
+	string cfind{ jm.begin(), jm.end() };
+	cfind.push_back((char)prefix + 64);
+	cfind.push_back((char)suffix + 64);
+	auto cached = findCache(cfind);
+	if (cached) return *cached;
+	vector<KInterResult> ret;
+	vector<KMorpheme> tmpMorph;
+	auto graph = kt->splitGM(jm, tmpMorph, prefix != KPOSTag::UNKNOWN);
+	auto paths = getOptimaPath(graph.get(), topN, prefix, suffix);
+	if (paths)
+	{
+		for (auto& p : *paths)
+		{
+			ret.emplace_back(pathToInterResult(graph.get(), p.first), p.second);
+		}
+	}
+	else // if there are no matched path
+	{
+		ret.emplace_back(vector<tuple<const KMorpheme*, k_wstring, KPOSTag>>{ {nullptr, joinJamo(jm), KPOSTag::UNKNOWN} }, P_MIN);
+	}
+	for (auto& tm : tmpMorph)
+	{
+		if (tm.kform) delete tm.kform;
 	}
 	addCache(cfind, ret);
 	return ret;

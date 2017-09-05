@@ -343,7 +343,7 @@ vector<k_vchunk> KTrie::split(const k_string& str, bool hasPrefix) const
 	return ret;
 }
 
-shared_ptr<KMorphemeNode> KTrie::splitGM(const k_string & str, vector<KMorpheme*>& tmpMorph, bool hasPrefix) const
+shared_ptr<KMorphemeNode> KTrie::splitGM(const k_string & str, vector<KMorpheme>& tmpMorph, bool hasPrefix) const
 {
 	static bool(*vowelFunc[])(const char*, const char*) = {
 		KFeatureTestor::isPostposition,
@@ -372,10 +372,9 @@ shared_ptr<KMorphemeNode> KTrie::splitGM(const k_string & str, vector<KMorpheme*
 	nodeEndPos.emplace_back(0);
 	auto makeTmpMorph = [&tmpMorph](const k_string& form)
 	{
-		auto* morph = new KMorpheme;
-		tmpMorph.emplace_back(morph);
-		morph->kform = new k_string{ form }; // to be released
-		morph->p = form.size() * -1.5f - 6.f;
+		tmpMorph.emplace_back();
+		tmpMorph.back().kform = new k_string{ form }; // to be released
+		tmpMorph.back().p = form.size() * -1.5f - 6.f;
 		return tmpMorph.size() - 1;
 	};
 
@@ -476,7 +475,11 @@ shared_ptr<KMorphemeNode> KTrie::splitGM(const k_string & str, vector<KMorpheme*
 						{
 							if (!morph->chunks->empty() && morph->chunks->front()->tag == KPOSTag::V)
 							{
-								nodes[it->second].morpheme = beforeMorph->getCombined();
+								//nodes[it->second].morpheme = beforeMorph->getCombined();
+							}
+							else
+							{
+								int a = 0;
 							}
 						}
 						else if (beforeMorph->combineSocket && beforeMorph->tag != KPOSTag::UNKNOWN) continue;
@@ -484,6 +487,7 @@ shared_ptr<KMorphemeNode> KTrie::splitGM(const k_string & str, vector<KMorpheme*
 
 						if(!p.second) p.second = makeNewNode(p.first, n);
 						nodes[it->second].nexts.emplace_back((KMorphemeNode*)p.second);
+						unknownNodes.emplace(make_pair(it->first, nBegin), 0);
 					}
 				}
 				else
@@ -494,9 +498,9 @@ shared_ptr<KMorphemeNode> KTrie::splitGM(const k_string & str, vector<KMorpheme*
 						if (morph->combineSocket && morph->tag == KPOSTag::UNKNOWN) continue;
 						if (!p.second) p.second = makeNewNode(p.first, n);
 						nodes[it->second].nexts.emplace_back((KMorphemeNode*)p.second);
+						unknownNodes.emplace(make_pair(it->first, nBegin), 0);
 					}
 				}
-				unknownNodes.emplace(make_pair(it->first, nBegin), 0);
 			}
 		}
 		candidates.clear();
@@ -572,7 +576,7 @@ shared_ptr<KMorphemeNode> KTrie::splitGM(const k_string & str, vector<KMorpheme*
 	// repair morph pointer in nodes
 	for (auto id : nodeToRepairMorph)
 	{
-		nodes[id].morpheme = tmpMorph[(size_t)nodes[id].morpheme];
+		nodes[id].morpheme = &tmpMorph[(size_t)nodes[id].morpheme];
 	}
 
 	unordered_map<size_t, size_t> realAddress;
@@ -605,6 +609,7 @@ shared_ptr<KMorphemeNode> KTrie::splitGM(const k_string & str, vector<KMorpheme*
 			aNode.nexts.emplace_back(ret.get() + jt->second);
 		}
 		aNode.morpheme = nodes[i].morpheme;
+		if (aNode.morpheme && aNode.morpheme->combined) aNode.morpheme = aNode.morpheme->getCombined();
 	}
 	return ret;
 }

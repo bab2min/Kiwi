@@ -34,11 +34,11 @@ int main()
 	Kiwi kw{ "../ModelGenerator/" };
 	kw.prepare();
 	Timer timer;
-	auto text = L"우리는 저녁을 빠르게 먹었습니다.";
-	for (int i = 0; i < 5000; i++)
+	auto text = L"마쳤다.";
+	for (int i = 0; i < 1; i++)
 	{
 		kw.clearCache();
-		auto res = kw.analyzeGM(text, 5);
+		auto res = kw.analyzeGM(text, 10);
 		if(i == 0) for (auto r : res)
 		{
 			printf("%.3g\t", r.second);
@@ -50,11 +50,11 @@ int main()
 		}
 	}
 	printf("\n==== %gms\n", timer.getElapsed());
-	timer.reset();
-	for (int i = 0; i < 5000; i++)
+	/*timer.reset();
+	for (int i = 0; i < 500; i++)
 	{
 		kw.clearCache();
-		auto res = kw.analyze(text, 5);
+		auto res = kw.analyzeOld(text, 5);
 		if (i == 0) for (auto r : res)
 		{
 			printf("%.3g\t", r.second);
@@ -65,7 +65,7 @@ int main()
 			printf("\n");
 		}
 	}
-	printf("\n==== %gms\n", timer.getElapsed());
+	printf("\n==== %gms\n", timer.getElapsed());*/
 	getchar();
 }
 
@@ -74,7 +74,7 @@ int main2()
 	system("chcp 65001");
 	_wsetlocale(LC_ALL, L"korean");
 	Timer timer;
-	Kiwi kw{ "../ModelGenerator/" };
+	Kiwi kw{ "../ModelGenerator/", 0};
 	kw.prepare();
 	printf("Loading Time : %g ms\n", timer.getElapsed());
 	PROCESS_MEMORY_COUNTERS pmc;
