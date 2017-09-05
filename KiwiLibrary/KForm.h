@@ -113,6 +113,7 @@ struct KMorpheme
 	}
 	float getDistMap(const KMorpheme* t) const 
 	{
+		//if (!distMap) return 0;
 		auto it = distMap->find(t - this);
 		if (it != distMap->end()) return it->second;
 		else return 0;
