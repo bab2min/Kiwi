@@ -343,7 +343,7 @@ vector<k_vchunk> KTrie::split(const k_string& str, bool hasPrefix) const
 	return ret;
 }
 
-shared_ptr<KMorphemeNode> KTrie::splitGM(const k_string & str, vector<KMorpheme>& tmpMorph, bool hasPrefix) const
+shared_ptr<KMorphemeNode> KTrie::splitGM(const k_string & str, vector<KMorpheme*>& tmpMorph, bool hasPrefix) const
 {
 	static bool(*vowelFunc[])(const char*, const char*) = {
 		KFeatureTestor::isPostposition,
@@ -372,9 +372,10 @@ shared_ptr<KMorphemeNode> KTrie::splitGM(const k_string & str, vector<KMorpheme>
 	nodeEndPos.emplace_back(0);
 	auto makeTmpMorph = [&tmpMorph](const k_string& form)
 	{
-		tmpMorph.emplace_back();
-		tmpMorph.back().kform = new k_string{ form }; // leak warning
-		tmpMorph.back().p = form.size() * -1.5f - 6.f;
+		auto* morph = new KMorpheme;
+		tmpMorph.emplace_back(morph);
+		morph->kform = new k_string{ form }; // to be released
+		morph->p = form.size() * -1.5f - 6.f;
 		return tmpMorph.size() - 1;
 	};
 
@@ -451,6 +452,8 @@ shared_ptr<KMorphemeNode> KTrie::splitGM(const k_string & str, vector<KMorpheme>
 						}
 						else
 						{
+							// if there is already unknown node, pass
+							if (!nt->second) continue;
 							newNodeId = nt->second;
 						}
 						startPos = it->first;
@@ -493,6 +496,7 @@ shared_ptr<KMorphemeNode> KTrie::splitGM(const k_string & str, vector<KMorpheme>
 						nodes[it->second].nexts.emplace_back((KMorphemeNode*)p.second);
 					}
 				}
+				unknownNodes.emplace(make_pair(it->first, nBegin), 0);
 			}
 		}
 		candidates.clear();
@@ -568,7 +572,7 @@ shared_ptr<KMorphemeNode> KTrie::splitGM(const k_string & str, vector<KMorpheme>
 	// repair morph pointer in nodes
 	for (auto id : nodeToRepairMorph)
 	{
-		nodes[id].morpheme = &tmpMorph[(size_t)nodes[id].morpheme];
+		nodes[id].morpheme = tmpMorph[(size_t)nodes[id].morpheme];
 	}
 
 	unordered_map<size_t, size_t> realAddress;

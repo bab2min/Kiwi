@@ -317,6 +317,7 @@ vector<KResult> Kiwi::analyzeGM(const k_wstring & str, size_t topN) const
 	{
 		return x.second > y.second;
 	};
+	vector<KMorpheme*> tmpMorph;
 	for (auto p : parts)
 	{
 		for (size_t cid = 0; cid < p.size(); cid++)
@@ -331,7 +332,6 @@ vector<KResult> Kiwi::analyzeGM(const k_wstring & str, size_t topN) const
 				continue;
 			}
 			auto jm = splitJamo(c.first);
-			vector<KMorpheme> tmpMorph;
 			auto graph = kt->splitGM(jm, tmpMorph, !!cid);
 			auto paths = getOptimaPath(graph.get(), topN, cid ? p[cid - 1].second : KPOSTag::UNKNOWN, cid + 1 < p.size() ? p[cid + 1].second : KPOSTag::UNKNOWN);
 			vector<pair<vector<const KMorpheme*>, float>> ar;
@@ -359,7 +359,7 @@ vector<KResult> Kiwi::analyzeGM(const k_wstring & str, size_t topN) const
 				auto& ms = newCands.back().first;
 				size_t inserted = ms.size();
 				ms.reserve(ms.size() + arp.first.size());
-				for (auto& f : arp.first)
+				for (auto f : arp.first)
 				{
 					ms.emplace_back(f, L"", f->tag);
 				}
@@ -390,10 +390,6 @@ vector<KResult> Kiwi::analyzeGM(const k_wstring & str, size_t topN) const
 			});
 			swap(cands, newCands);
 			// clear temporary string
-			for (auto& tm : tmpMorph)
-			{
-				if (tm.kform) delete tm.kform;
-			}
 		}
 	}
 	vector<KResult> ret;
@@ -409,6 +405,11 @@ vector<KResult> Kiwi::analyzeGM(const k_wstring & str, size_t topN) const
 			if (morpheme) ret.back().first.emplace_back(*morpheme->wform, morpheme->tag);
 			else ret.back().first.emplace_back(get<1>(m), get<2>(m));
 		}
+	}
+	for (auto& tm : tmpMorph)
+	{
+		if (tm->kform) delete tm->kform;
+		delete tm;
 	}
 	return ret;
 }
@@ -496,14 +497,13 @@ const k_vpcf* Kiwi::getOptimaPath(KMorphemeNode* node, size_t topN, KPOSTag pref
 	char c = 0;
 	for (auto next : node->nexts)
 	{
-		if (node->morpheme && node->morpheme->tag == KPOSTag::UNKNOWN)
-		{
-			// to do... inference unknown form type
-			continue;
-		}
 		float tp;
 		if (node->morpheme)
 		{
+			if (node->morpheme->tag == KPOSTag::UNKNOWN)
+			{
+				((KMorpheme*)node->morpheme)->tag = KPOSTag::NNP;
+			}
 			tp = mdl->getTransitionP(node->morpheme, next->morpheme);
 			tp += node->morpheme->p;
 		}

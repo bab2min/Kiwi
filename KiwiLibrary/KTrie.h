@@ -83,5 +83,5 @@ struct KTrie
 	const KForm* search(const char* begin, const char* end) const;
 	vector<pair<const KForm*, int>> searchAllPatterns(const k_string& str) const;
 	vector<k_vchunk> split(const k_string& str, bool hasPrefix = false) const;
-	shared_ptr<KMorphemeNode> splitGM(const k_string& str, vector<KMorpheme>& tmpMorph, bool hasPrefix = false) const;
+	shared_ptr<KMorphemeNode> splitGM(const k_string& str, vector<KMorpheme*>& tmpMorph, bool hasPrefix = false) const;
 };

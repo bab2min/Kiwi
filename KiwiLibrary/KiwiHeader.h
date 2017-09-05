@@ -34,7 +34,9 @@ using namespace std;
 #define USE_DIST_MAP
 #define PMI_WEIGHT 1.7f
 //#define LOAD_TXT
+#ifndef _DEBUG
 #define CUSTOM_ALLOC
+#endif // !_DEBUG
 
 #ifdef _WIN32
 typedef wchar_t k_wchar;

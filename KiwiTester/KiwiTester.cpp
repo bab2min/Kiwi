@@ -34,36 +34,36 @@ int main()
 	Kiwi kw{ "../ModelGenerator/" };
 	kw.prepare();
 	Timer timer;
-	for (int i = 0; i < 1000; i++)
+	auto text = L"우리는 저녁을 빠르게 먹었습니다.";
+	for (int i = 0; i < 5000; i++)
 	{
 		kw.clearCache();
-		auto res = kw.analyzeGM(L"우리는 빠르게 먹었습니다.", 5);
-		for (auto r : res)
+		auto res = kw.analyzeGM(text, 5);
+		if(i == 0) for (auto r : res)
 		{
 			printf("%.3g\t", r.second);
 			for (auto& p : r.first)
 			{
-				//wprintf(L"%s/%s\t", p.first.c_str(), tagToStringW(p.second));
+				wprintf(L"%s/%s\t", p.first.c_str(), tagToStringW(p.second));
 			}
-			//printf("\n");
+			printf("\n");
 		}
-		//printf("\n");
 	}
 	printf("\n==== %gms\n", timer.getElapsed());
-	for (int i = 0; i < 1000; i++)
+	timer.reset();
+	for (int i = 0; i < 5000; i++)
 	{
 		kw.clearCache();
-		auto res = kw.analyze(L"우리는 빠르게 먹었습니다.", 5);
-		for (auto r : res)
+		auto res = kw.analyze(text, 5);
+		if (i == 0) for (auto r : res)
 		{
 			printf("%.3g\t", r.second);
 			for (auto& p : r.first)
 			{
-				//wprintf(L"%s/%s\t", p.first.c_str(), tagToStringW(p.second));
+				wprintf(L"%s/%s\t", p.first.c_str(), tagToStringW(p.second));
 			}
-			//printf("\n");
+			printf("\n");
 		}
-		//printf("\n");
 	}
 	printf("\n==== %gms\n", timer.getElapsed());
 	getchar();
