@@ -488,10 +488,10 @@ const k_vpcf* Kiwi::getOptimaPath(KMorphemeNode* node, size_t topN, KPOSTag pref
 		float tp;
 		if (node->morpheme)
 		{
-			if (node->morpheme->tag == KPOSTag::UNKNOWN)
+			/*if (node->morpheme->tag == KPOSTag::UNKNOWN)
 			{
 				((KMorpheme*)node->morpheme)->tag = KPOSTag::NNP;
-			}
+			}*/
 			tp = mdl->getTransitionP(node->morpheme, next->morpheme);
 			tp += node->morpheme->p;
 		}

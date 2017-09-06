@@ -375,6 +375,7 @@ shared_ptr<KMorphemeNode> KTrie::splitGM(const k_string & str, vector<KMorpheme>
 		tmpMorph.emplace_back();
 		tmpMorph.back().kform = new k_string{ form }; // to be released
 		tmpMorph.back().p = form.size() * -1.5f - 6.f;
+		tmpMorph.back().tag = KPOSTag::NNP; // consider unknown morpheme as NNP
 		return tmpMorph.size() - 1;
 	};
 

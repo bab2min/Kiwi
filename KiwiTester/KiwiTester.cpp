@@ -27,7 +27,7 @@ public:
 #include "windows.h"
 #include "psapi.h"
 #include "../KiwiLibrary/Utils.h"
-int main()
+int main2()
 {
 	system("chcp 65001");
 	_wsetlocale(LC_ALL, L"korean");
@@ -67,14 +67,15 @@ int main()
 	}
 	printf("\n==== %gms\n", timer.getElapsed());*/
 	getchar();
+	return 0;
 }
 
-int main2()
+int main()
 {
 	system("chcp 65001");
 	_wsetlocale(LC_ALL, L"korean");
 	Timer timer;
-	Kiwi kw{ "../ModelGenerator/", 0};
+	Kiwi kw{ "../ModelGenerator/"};
 	kw.prepare();
 	printf("Loading Time : %g ms\n", timer.getElapsed());
 	PROCESS_MEMORY_COUNTERS pmc;
