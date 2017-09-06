@@ -2,6 +2,8 @@
 #include "KTrie.h"
 #include "KForm.h"
 #include "KFeatureTestor.h"
+#include "KMemoryKMorphemeNode.h"
+#include "KModelMgr.h"
 
 #ifdef _DEBUG
 int KTrie::rootID = 0;
@@ -343,7 +345,7 @@ vector<k_vchunk> KTrie::split(const k_string& str, bool hasPrefix) const
 	return ret;
 }
 
-shared_ptr<KMorphemeNode> KTrie::splitGM(const k_string & str, vector<KMorpheme>& tmpMorph, bool hasPrefix) const
+shared_ptr<KMorphemeNode> KTrie::splitGM(const k_string & str, vector<KMorpheme>& tmpMorph, const KModelMgr* mdl, bool hasPrefix) const
 {
 	static bool(*vowelFunc[])(const char*, const char*) = {
 		KFeatureTestor::isPostposition,
@@ -361,12 +363,22 @@ shared_ptr<KMorphemeNode> KTrie::splitGM(const k_string & str, vector<KMorpheme>
 
 	size_t n = 0;
 	auto curTrie = this;
+#ifdef CUSTOM_ALLOC
+	vector<const KForm*, pool_allocator<void*>> candidates;
+	vector<KMorphemeNode, pool_allocator<KMorphemeNode>> nodes;
+	vector<uint16, pool_allocator<void*>> nodeEndPos;
+	multimap<uint16, uint16, less<uint16>, pool_allocator<void*>> nodeAtNthEnd;
+	map<pair<uint16, uint16>, uint16, less<pair<uint16, uint16>>, pool_allocator<void*>> unknownNodes;
+	unordered_set<uint16, hash<uint16>, equal_to<uint16>, pool_allocator<void*>> nodeToRepairMorph;
+#else
 	vector<const KForm*> candidates;
 	vector<KMorphemeNode> nodes;
-	vector<size_t> nodeEndPos;
-	multimap<size_t, size_t> nodeAtNthEnd;
-	map<pair<size_t, size_t>, size_t> unknownNodes;
-	unordered_set<size_t> nodeToRepairMorph;
+	vector<uint16> nodeEndPos;
+	multimap<uint16, uint16> nodeAtNthEnd;
+	map<pair<uint16, uint16>, uint16> unknownNodes;
+	unordered_set<uint16> nodeToRepairMorph;
+#endif
+	nodes.reserve(16);
 	nodes.emplace_back();
 	nodeAtNthEnd.emplace(0, 0);
 	nodeEndPos.emplace_back(0);
@@ -471,17 +483,10 @@ shared_ptr<KMorphemeNode> KTrie::splitGM(const k_string & str, vector<KMorpheme>
 					for (auto& p : newMorphs)
 					{
 						auto& morph = p.first;
+						if (mdl->getTransitionP(beforeMorph, morph) <= P_MIN) continue;
 						if (beforeMorph->combineSocket && beforeMorph->tag != KPOSTag::UNKNOWN
 							&& (beforeMorph->combineSocket == morph->combineSocket && morph->tag == KPOSTag::UNKNOWN))
 						{
-							if (!morph->chunks->empty() && morph->chunks->front()->tag == KPOSTag::V)
-							{
-								//nodes[it->second].morpheme = beforeMorph->getCombined();
-							}
-							else
-							{
-								int a = 0;
-							}
 						}
 						else if (beforeMorph->combineSocket && beforeMorph->tag != KPOSTag::UNKNOWN) continue;
 						else if (morph->combineSocket && morph->tag == KPOSTag::UNKNOWN) continue;
@@ -496,6 +501,7 @@ shared_ptr<KMorphemeNode> KTrie::splitGM(const k_string & str, vector<KMorpheme>
 					for (auto& p : newMorphs)
 					{
 						auto& morph = p.first;
+						//if (morph->getForm().size() < 2) continue;
 						if (morph->combineSocket && morph->tag == KPOSTag::UNKNOWN) continue;
 						if (!p.second) p.second = makeNewNode(p.first, n);
 						nodes[it->second].nexts.emplace_back((KMorphemeNode*)p.second);

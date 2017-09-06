@@ -31,16 +31,7 @@ protected:
 	void saveDMBin(const char* filename) const;
 	void loadDMBin(const char* filename);
 #endif
-	KForm& formMapper(k_string form)
-	{
-		auto it = formMap.find(form);
-		if (it != formMap.end()) return forms[it->second];
-		size_t id = formMap.size();
-		formMap.emplace(form, id);
-		forms.emplace_back(form);
-		forms.back().wform = joinJamo(form);
-		return forms[id];
-	};
+	KForm& formMapper(k_string form);
 public:
 	KModelMgr(const char* modelPath = "");
 	void addUserWord(const k_string& form, KPOSTag tag);

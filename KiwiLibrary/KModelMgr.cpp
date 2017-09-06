@@ -438,6 +438,17 @@ void KModelMgr::loadDMBin(const char * filename)
 	fclose(f);
 }
 
+KForm & KModelMgr::formMapper(k_string form)
+{
+	auto it = formMap.find(form);
+	if (it != formMap.end()) return forms[it->second];
+	size_t id = formMap.size();
+	formMap.emplace(form, id);
+	forms.emplace_back(form);
+	forms.back().wform = joinJamo(form);
+	return forms[id];
+}
+
 #endif
 
 KModelMgr::KModelMgr(const char * modelPath)

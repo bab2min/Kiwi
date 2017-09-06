@@ -3,7 +3,7 @@
 #include "Kiwi.h"
 #include "KFeatureTestor.h"
 #include "KModelMgr.h"
-
+#include "ThreadPool.h"
 
 KPOSTag Kiwi::identifySpecialChr(k_wchar chr)
 {
@@ -309,6 +309,109 @@ vector<KResult> Kiwi::analyze(const string & str, size_t topN) const
 	return analyze(converter.from_bytes(str), topN);
 }
 
+vector<KResult> Kiwi::analyzeMT(const k_wstring & str, size_t topN, size_t pool) const
+{
+	ThreadPool threadPool(pool);
+	vector<future<vector<KInterResult>>> threadResult;
+
+	vector<KInterResult> cands(1);
+	auto parts = splitPart(str);
+	auto sortFunc = [](const auto& x, const auto& y)
+	{
+		return x.second > y.second;
+	};
+	for (auto& p : parts)
+	{
+		for (size_t cid = 0; cid < p.size(); cid++)
+		{
+			threadResult.emplace_back(threadPool.enqueue([this, &p, topN, cid]()
+			{
+				auto& c = p[cid];
+				if (c.second != KPOSTag::MAX)
+				{
+					return vector<KInterResult>{make_pair(vector<tuple<const KMorpheme*, k_wstring, KPOSTag>>{}, 0)};
+				}
+				auto jm = splitJamo(c.first);
+				return analyzeJM2(jm, topN, cid ? p[cid - 1].second : KPOSTag::UNKNOWN, cid + 1 < p.size() ? p[cid + 1].second : KPOSTag::UNKNOWN);
+			}));
+		}
+	}
+	for (auto && arFut : threadResult)
+	{
+		auto ar = arFut.get();
+		/*if (ar.size() == 1)
+		{
+			for (auto& cand : cands)
+			{
+				cand.first.insert(cand.first.end(), ar[0].first.begin(), ar[0].first.end());
+				cand.second += ar[0].second;
+			}
+			continue;
+		}*/
+		vector<tuple<short, short, float>> probs;
+		probs.reserve(cands.size() * ar.size());
+		for (size_t i = 0; i < cands.size(); i++) for (size_t j = 0; j < ar.size(); j++)
+		{
+			probs.emplace_back((short)i, (short)j, cands[i].second + ar[j].second);
+		}
+		sort(probs.begin(), probs.end(), [](const auto& x, const auto& y)
+		{
+			return get<float>(x) > get<float>(y);
+		});
+		vector<KInterResult> newCands;
+		newCands.reserve(min(topN, probs.size()));
+		for_each(probs.begin(), probs.begin() + min(max(topN, (size_t)MIN_CANDIDATE), probs.size()), [&newCands, &cands, &ar](auto p)
+		{
+			const KInterResult& arp = ar[get<1>(p)];
+			newCands.emplace_back(cands[get<0>(p)]);
+			newCands.back().second += arp.second;
+			auto& ms = newCands.back().first;
+			size_t inserted = ms.size();
+			ms.insert(ms.end(), arp.first.begin(), arp.first.end());
+#ifdef USE_DIST_MAP
+			for (size_t i = inserted; i < ms.size(); i++)
+			{
+				auto& mi = get<0>(ms[i]);
+				if (!mi) continue;
+				for (size_t j = inserted < 5 ? 0 : inserted - 5; j < i; j++)
+				{
+					auto& mj = get<0>(ms[j]);
+					if (!mj) continue;
+					float pmi;
+					if (mi < mj)
+					{
+						if (mi->distMap) pmi = mi->getDistMap(mj);
+						else continue;
+					}
+					else
+					{
+						if (mj->distMap) pmi = mj->getDistMap(mi);
+						else continue;
+					}
+					newCands.back().second += pmi / (i - j + 1);
+				}
+			}
+#endif
+		});
+		swap(cands, newCands);
+	}
+	vector<KResult> ret;
+	ret.reserve(cands.size());
+	for (const auto& c : cands)
+	{
+		if (ret.size() >= topN) break;
+		ret.emplace_back(vector<KWordPair>{}, c.second);
+		ret.back().first.reserve(c.first.size());
+		for (const auto& m : c.first)
+		{
+			auto morpheme = get<0>(m);
+			if (morpheme) ret.back().first.emplace_back(*morpheme->wform, morpheme->tag);
+			else ret.back().first.emplace_back(get<1>(m), get<2>(m));
+		}
+	}
+	return ret;
+}
+
 vector<KResult> Kiwi::analyzeGM(const k_wstring & str, size_t topN) const
 {
 	vector<KInterResult> cands(1);
@@ -317,7 +420,7 @@ vector<KResult> Kiwi::analyzeGM(const k_wstring & str, size_t topN) const
 	{
 		return x.second > y.second;
 	};
-	for (auto p : parts)
+	for (auto& p : parts)
 	{
 		for (size_t cid = 0; cid < p.size(); cid++)
 		{
@@ -530,27 +633,6 @@ const k_vpcf* Kiwi::getOptimaPath(KMorphemeNode* node, size_t topN, KPOSTag pref
 	return node->optimaCache;
 }
 
-vector<const KMorpheme*> Kiwi::pathToResult(const KMorphemeNode * node, const k_vchar& path)
-{
-	vector<const KMorpheme*> ret;
-	for (char p : path)
-	{
-		node = node->nexts[p];
-		if (node->morpheme->chunks)
-		{
-			for (auto m : *node->morpheme->chunks)
-			{
-				if (m->tag == KPOSTag::V) continue;
-				ret.emplace_back(m);
-			}
-		}
-		else
-		{
-			ret.emplace_back(node->morpheme);
-		}
-	}
-	return ret;
-}
 
 vector<k_vpcf> Kiwi::calcProbabilities(const KChunk * pre, const KChunk * ch, const KChunk * end, const char* ostr, size_t len) const
 {
@@ -835,7 +917,7 @@ vector<KInterResult> Kiwi::analyzeJM2(const k_string & jm, size_t topN, KPOSTag 
 	if (cached) return *cached;
 	vector<KInterResult> ret;
 	vector<KMorpheme> tmpMorph;
-	auto graph = kt->splitGM(jm, tmpMorph, prefix != KPOSTag::UNKNOWN);
+	auto graph = kt->splitGM(jm, tmpMorph, mdl.get(), prefix != KPOSTag::UNKNOWN);
 	auto paths = getOptimaPath(graph.get(), topN, prefix, suffix);
 	if (paths)
 	{
@@ -858,6 +940,7 @@ vector<KInterResult> Kiwi::analyzeJM2(const k_string & jm, size_t topN, KPOSTag 
 
 bool Kiwi::addCache(const string & jm, const vector<KInterResult>& value) const
 {
+	lock_guard<mutex> lg(lock);
 	if (maxCache == (size_t)-1) return freqCache.emplace(jm, value).second;
 	if (tempCache.size() >= maxCache) tempCache.clear();
 	++cachePriority[jm];
@@ -866,6 +949,7 @@ bool Kiwi::addCache(const string & jm, const vector<KInterResult>& value) const
 
 vector<KInterResult>* Kiwi::findCache(const string & jm) const
 {
+	lock_guard<mutex> lg(lock);
 	auto cit = freqCache.find(jm);
 	if (cit == freqCache.end())
 	{
