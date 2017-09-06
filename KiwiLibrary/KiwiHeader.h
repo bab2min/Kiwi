@@ -25,6 +25,8 @@
 #include <codecvt>
 
 #include <chrono>
+#include <mutex>
+#include <thread>
 
 using namespace std;
 
@@ -37,6 +39,8 @@ using namespace std;
 #ifndef _DEBUG
 #define CUSTOM_ALLOC
 #endif // !_DEBUG
+
+typedef unsigned short uint16;
 
 #ifdef _WIN32
 typedef wchar_t k_wchar;

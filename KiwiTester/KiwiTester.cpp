@@ -38,7 +38,7 @@ int main2()
 	for (int i = 0; i < 1; i++)
 	{
 		kw.clearCache();
-		auto res = kw.analyzeGM(text, 10);
+		auto res = kw.analyze(text, 10);
 		if(i == 0) for (auto r : res)
 		{
 			printf("%.3g\t", r.second);

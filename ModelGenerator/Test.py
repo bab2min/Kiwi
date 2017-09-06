@@ -1,6 +1,6 @@
 from konlpy.tag import Kkma
 from konlpy.tag import Komoran
-from kiwiPy import Kiwi
+#from kiwiPy import Kiwi
 
 import time
 
@@ -52,7 +52,7 @@ def doTest(testFiles, posFunc, outPrefix):
         print("Score: %g" % t.getScore())
         t.writeToFile(outPrefix + 'wrong' + f)
 
-testFiles = ['01s.txt', '02s.txt', '03s.txt', '11s.txt']
+testFiles = ['01s.txt', '02s.txt', '03s.txt', '17s.txt', '18s.txt']
 
 start = time.time()
 p = Komoran()
@@ -61,7 +61,7 @@ print("Loading: %gs" % (time.time() - start))
 doTest(testFiles, lambda s:['/'.join(i) for i in p.pos(s)], 'kmr_')
 p = None
 print()
-start = time.time()
-p = Kiwi()
-print("Loading: %gs" % (time.time() - start))
-doTest(testFiles, lambda s:['/'.join(i) for i in p.analyze(s)], 'kiwi_')
+#start = time.time()
+#p = Kiwi()
+#print("Loading: %gs" % (time.time() - start))
+#doTest(testFiles, lambda s:['/'.join(i) for i in p.analyze(s)], 'kiwi_')

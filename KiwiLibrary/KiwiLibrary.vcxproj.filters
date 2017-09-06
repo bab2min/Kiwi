@@ -54,6 +54,12 @@
     <ClInclude Include="KMemoryChar.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="KMemoryKMorphemeNode.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ThreadPool.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

@@ -2,19 +2,18 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ea9d14d0-41c7-4212-ac80-d26e68d4f1ca" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/KiwiLibrary/KMemory.h" afterPath="$PROJECT_DIR$/KiwiLibrary/KMemory.h" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/KiwiLibrary/KModelMgr.cpp" afterPath="$PROJECT_DIR$/KiwiLibrary/KModelMgr.cpp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/KiwiLibrary/KModelMgr.h" afterPath="$PROJECT_DIR$/KiwiLibrary/KModelMgr.h" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/KiwiLibrary/KTrie.cpp" afterPath="$PROJECT_DIR$/KiwiLibrary/KTrie.cpp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/KiwiLibrary/KTrie.h" afterPath="$PROJECT_DIR$/KiwiLibrary/KTrie.h" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/KiwiLibrary/Kiwi.cpp" afterPath="$PROJECT_DIR$/KiwiLibrary/Kiwi.cpp" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/KiwiLibrary/KiwiHeader.h" afterPath="$PROJECT_DIR$/KiwiLibrary/KiwiHeader.h" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/KiwiLibrary/KiwiLibrary.vcxproj" afterPath="$PROJECT_DIR$/KiwiLibrary/KiwiLibrary.vcxproj" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/KiwiTester/KiwiTester.cpp" afterPath="$PROJECT_DIR$/KiwiTester/KiwiTester.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/KiwiTester/KiwiTester.vcxproj" afterPath="$PROJECT_DIR$/KiwiTester/KiwiTester.vcxproj" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/KiwiTester/wrongs01.txt" afterPath="$PROJECT_DIR$/KiwiTester/wrongs01.txt" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/KiwiLibrary/KiwiLibrary.vcxproj.filters" afterPath="$PROJECT_DIR$/KiwiLibrary/KiwiLibrary.vcxproj.filters" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/KiwiTester/wrongs01s.txt" afterPath="$PROJECT_DIR$/KiwiTester/wrongs01s.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/KiwiTester/wrongs02.txt" afterPath="$PROJECT_DIR$/KiwiTester/wrongs02.txt" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/KiwiTester/wrongs02s.txt" afterPath="$PROJECT_DIR$/KiwiTester/wrongs02s.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/KiwiTester/wrongs03.txt" afterPath="$PROJECT_DIR$/KiwiTester/wrongs03.txt" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/KiwiTester/wrongs03s.txt" afterPath="$PROJECT_DIR$/KiwiTester/wrongs03s.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ModelGenerator/.idea/workspace.xml" afterPath="$PROJECT_DIR$/ModelGenerator/.idea/workspace.xml" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -48,9 +47,22 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="ProjectPane" />
-      <pane id="Scratches" />
       <pane id="Scope" />
+      <pane id="Scratches" />
+      <pane id="ProjectPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Kiwi" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Kiwi" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -85,7 +97,7 @@
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <layout>
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25266525" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2553305" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
