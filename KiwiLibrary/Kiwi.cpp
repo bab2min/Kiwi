@@ -329,7 +329,7 @@ vector<KResult> Kiwi::analyzeMT(const k_wstring & str, size_t topN, size_t pool)
 				auto& c = p[cid];
 				if (c.second != KPOSTag::MAX)
 				{
-					return vector<KInterResult>{make_pair(vector<tuple<const KMorpheme*, k_wstring, KPOSTag>>{}, 0)};
+					return vector<KInterResult>{make_pair(vector<tuple<const KMorpheme*, k_wstring, KPOSTag>>{ {nullptr, c.first, c.second} }, 0)};
 				}
 				auto jm = splitJamo(c.first);
 				return analyzeJM2(jm, topN, cid ? p[cid - 1].second : KPOSTag::UNKNOWN, cid + 1 < p.size() ? p[cid + 1].second : KPOSTag::UNKNOWN);
@@ -339,7 +339,7 @@ vector<KResult> Kiwi::analyzeMT(const k_wstring & str, size_t topN, size_t pool)
 	for (auto && arFut : threadResult)
 	{
 		auto ar = arFut.get();
-		/*if (ar.size() == 1)
+		if (ar.size() == 1)
 		{
 			for (auto& cand : cands)
 			{
@@ -347,7 +347,7 @@ vector<KResult> Kiwi::analyzeMT(const k_wstring & str, size_t topN, size_t pool)
 				cand.second += ar[0].second;
 			}
 			continue;
-		}*/
+		}
 		vector<tuple<short, short, float>> probs;
 		probs.reserve(cands.size() * ar.size());
 		for (size_t i = 0; i < cands.size(); i++) for (size_t j = 0; j < ar.size(); j++)
