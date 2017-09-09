@@ -9,6 +9,7 @@ public:
 		k_wstring q;
 		AnswerType a;
 		AnswerType r;
+		vector<KWordPair> dr, da;
 		vector<KResult> cands;
 		float score;
 		void writeResult(FILE* output) const;

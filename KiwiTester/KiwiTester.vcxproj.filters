@@ -27,6 +27,9 @@
     <ClInclude Include="KTest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LCS.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

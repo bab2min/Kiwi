@@ -4,9 +4,8 @@ template<size_t objectSize, size_t poolSize, size_t type = 0>
 class KPool
 {
 public:
-	char* poolBuf;
+	vector<void*> poolBuf;
 	void** freeList;
-
 	static KPool& getInstance()
 	{
 		thread_local KPool inst;
@@ -15,38 +14,53 @@ public:
 
 	void* allocate()
 	{
+		assert(_CrtCheckMemory());
 		if (!freeList)
 		{
-			throw bad_alloc();
+			//fprintf(stderr, "increasing pool<%zd, %zd, %zd> : at %s(%d) (Total : %g MB)\n", objectSize, poolSize, type, __FILE__, __LINE__, poolBuf.size() / 1024.f / 1024.f * objectSize * poolSize);
+			initPool();
 		}
 		void* p = freeList;
 		freeList = (void**)(*freeList);
+		//fprintf(stderr, "allocate %x\n", p);
 		return p;
 	}
 
 	void deallocate(void* p)
 	{
+		//fprintf(stderr, "deallocate %p\n", p);
 		*((void**)p) = freeList;
 		freeList = (void**)p;
+		assert(_CrtCheckMemory());
 	}
 
 private:
-	KPool() 
+	void initPool()
 	{
-		poolBuf = new char[poolSize * objectSize];
-		freeList = (void**)poolBuf;
+		poolBuf.emplace_back(malloc(poolSize * objectSize));
+		//memset(poolBuf.back(), 0, poolSize * objectSize);
+		freeList = (void**)poolBuf.back();
 		auto p = freeList;
-		for (size_t i = 0; i < poolSize; i++)
+		for (size_t i = 1; i < poolSize; i++)
 		{
 			*p = ((char*)p + objectSize);
 			p = (void**)*p;
 		}
 		*p = nullptr;
+		//usedPool += 1;
 	}
+
+	KPool()
+	{
+		poolBuf.reserve(16);
+		initPool();
+	}
+	
 	KPool(const KPool&) {}
+
 	~KPool()
 	{
-		delete[] poolBuf;
+		for(auto&& buf : poolBuf) free(buf);
 	}
 };
 
@@ -196,15 +210,17 @@ public:
 
 	pointer allocate(size_type n, const void *hint = 0)
 	{
-		if (n <= 32) return (pointer)KPool<32, 4000>::getInstance().allocate();
-		if (n <= 48) return (pointer)KPool<48, 4000>::getInstance().allocate();
+		if (n <= 16) return (pointer)KPool<16, 4000>::getInstance().allocate();
+		if (n <= 32) return (pointer)KPool<32, 2000>::getInstance().allocate();
+		if (n <= 48) return (pointer)KPool<48, 1000>::getInstance().allocate();
 		return allocator<T>::allocate(n, hint);
 	}
 
 	void deallocate(pointer p, size_type n)
 	{
-		if (n <= 32) return KPool<32, 4000>::getInstance().deallocate(p);
-		if (n <= 48) return KPool<48, 4000>::getInstance().deallocate(p);
+		if (n <= 16) return KPool<16, 4000>::getInstance().deallocate(p);
+		if (n <= 32) return KPool<32, 2000>::getInstance().deallocate(p);
+		if (n <= 48) return KPool<48, 1000>::getInstance().deallocate(p);
 		return allocator<T>::deallocate(p, n);
 	}
 
@@ -214,3 +230,38 @@ public:
 	spool_allocator(const spool_allocator<U> &a) throw() : allocator<T>(a) { }
 	~spool_allocator() throw() { }
 };
+
+template<size_t objectSize, size_t poolSize, size_t type>
+void* operator new(size_t byte, KPool<objectSize, poolSize, type>& pool)
+{
+	//fprintf(stderr, "new %d bytes.\n", byte);
+	/*
+	auto&& logger = KSingleLogger::getInstance();
+	logger.totalAlloc[byte]++;
+	logger.currentAlloc[byte]++;
+	logger.maxAlloc[byte] = max(logger.maxAlloc[byte], logger.currentAlloc[byte]);
+	return malloc(byte);
+	/*/
+	return pool.allocate();
+	//*/
+}
+
+template<size_t objectSize, size_t poolSize, size_t type>
+void operator delete(void* ptr, KPool<objectSize, poolSize, type>& pool)
+{
+	//fprintf(stderr, "delete %d bytes.\n", objectSize);
+	/*
+	KSingleLogger::getInstance().currentAlloc[objectSize]--;
+	return free(ptr);
+	/*/
+	pool.deallocate(ptr);
+	//*/
+}
+
+#ifdef CUSTOM_ALLOC
+#define NEW_IN_POOL(T) new(KPool<sizeof(T), 1024, 4>::getInstance())
+#define DELETE_IN_POOL(T, ptr) do{ptr->~T();operator delete((void*)ptr, KPool<sizeof(T), 1024, 4>::getInstance());}while(0)
+#else
+#define NEW_IN_POOL(T) new
+#define DELETE_IN_POOL(T, ptr) delete ptr
+#endif

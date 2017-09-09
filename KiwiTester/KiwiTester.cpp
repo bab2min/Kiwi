@@ -72,6 +72,10 @@ int main2()
 
 int main()
 {
+#ifdef _DEBUG
+	_CrtSetDbgFlag(_CRTDBG_CHECK_ALWAYS_DF);
+#endif
+
 	system("chcp 65001");
 	_wsetlocale(LC_ALL, L"korean");
 	Timer timer;
@@ -95,17 +99,17 @@ int main()
 	}
 	//*/
 #endif
-	string testFiles[] = { "01s.txt", "02s.txt", "03s.txt", "17s.txt", "18s.txt"};
+	string testFiles[] = { "01s.txt", "02s.txt", "03s.txt", "17s.txt", "18s.txt", "13s.txt", "15s.txt", };
 	for (auto tf : testFiles)
 	{
 		Timer total;
 		KTest test{ ("../TestSets/" + tf).c_str(), &kw };
 		double tm = total.getElapsed();
 
-		printf("%g\n", test.getScore());
+		printf("\n%g\n", test.getScore());
 		printf("Total (%zd) Time : %g ms\n", test.getTotalCount(), tm);
 		printf("Time per Unit : %g ms\n", tm / test.getTotalCount());
-
+		
 		FILE* out;
 		fopen_s(&out, ("wrongs" + tf).c_str(), "w");
 		fprintf(out, "%g\n", test.getScore());

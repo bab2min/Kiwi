@@ -3,6 +3,7 @@
 #include "../KiwiLibrary/Kiwi.h"
 #include "KTest.h"
 #include "../KiwiLibrary/Utils.h"
+#include "LCS.hpp"
 
 KWordPair parseWordPOS(k_wstring str)
 {
@@ -26,10 +27,16 @@ KTest::KTest(const char * testSetFile, Kiwi* kw, size_t topN) : totalCount(0), t
 {
 	FILE* f = nullptr;
 	if (fopen_s(&f, testSetFile, "r")) throw exception();
-	char buf[4096];
+	/*fseek(f, 0, SEEK_END);
+	size_t totalSize = ftell(f);
+	size_t printed = 0;
+	rewind(f);*/
+	char buf[32768];
 	wstring_convert<codecvt_utf8_utf16<k_wchar>> converter;
-	while (fgets(buf, 4096, f))
+	while (fgets(buf, 32768, f))
 	{
+		/*size_t cur = ftell(f);
+		for (; printed < cur * 100.0 / totalSize; printed++) printf(".");*/
 		try 
 		{
 			auto wstr = converter.from_bytes(buf);
@@ -43,14 +50,17 @@ KTest::KTest(const char * testSetFile, Kiwi* kw, size_t topN) : totalCount(0), t
 			tr.r = cands[0].first;
 			if (tr.a != tr.r)
 			{
-				auto setA = tr.a, setR = tr.r;
-				sort(setA.begin(), setA.end());
-				sort(setR.begin(), setR.end());
-				Counter c;
-				set_intersection(setA.begin(), setA.end(), setR.begin(), setR.end(), back_inserter(c));
-				tr.score = c.count / float(setA.size() + setR.size() - c.count);
+				auto diff = LCS::getDiff(tr.r.begin(), tr.r.end(), tr.a.begin(), tr.a.end());
+				size_t common = 0;
+				for (auto&& d : diff)
+				{
+					if (d.first < 0) tr.dr.emplace_back(d.second);
+					else if (d.first > 0) tr.da.emplace_back(d.second);
+					else common++;
+				}
+				tr.score = common / (float)diff.size();
 				totalScore += tr.score;
-				tr.cands = cands;
+				//tr.cands = cands;
 				wrongList.emplace_back(tr);
 			}
 			else
@@ -76,7 +86,24 @@ void KTest::TestResult::writeResult(FILE * output) const
 {
 	fputws(q.c_str(), output);
 	fprintf(output, "\t%.3g\n", score);
-	for (auto _r : a)
+	for (auto _r : da)
+	{
+		fputws(_r.first.c_str(), output);
+		fputwc('/', output);
+		fputs(tagToString(_r.second), output);
+		fputwc('\t', output);
+	}
+	fputwc('\n', output);
+	for (auto _r : dr)
+	{
+		fputws(_r.first.c_str(), output);
+		fputwc('/', output);
+		fputs(tagToString(_r.second), output);
+		fputwc('\t', output);
+	}
+	fputwc('\n', output);
+	fputwc('\n', output);
+	/*for (auto _r : a)
 	{
 		fputws(_r.first.c_str(), output);
 		fputwc('/', output);
@@ -95,5 +122,5 @@ void KTest::TestResult::writeResult(FILE * output) const
 		}
 		fprintf(output, "%.4g\n", res.second);
 	}
-	fputwc('\n', output);
+	fputwc('\n', output);*/
 }

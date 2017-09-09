@@ -166,6 +166,7 @@
     <ClCompile Include="KFeatureTestor.cpp" />
     <ClCompile Include="KForm.cpp" />
     <ClCompile Include="Kiwi.cpp" />
+    <ClCompile Include="KMemory.cpp" />
     <ClCompile Include="KModelMgr.cpp" />
     <ClCompile Include="KTrie.cpp" />
     <ClCompile Include="stdafx.cpp">

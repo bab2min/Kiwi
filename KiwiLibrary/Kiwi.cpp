@@ -434,7 +434,7 @@ vector<KResult> Kiwi::analyzeGM(const k_wstring & str, size_t topN) const
 				continue;
 			}
 			auto jm = splitJamo(c.first);
-			auto ar = analyzeJM2(jm, topN, cid ? p[cid - 1].second : KPOSTag::UNKNOWN, cid + 1 < p.size() ? p[cid + 1].second : KPOSTag::UNKNOWN);
+			auto ar = analyzeJM2(jm, max(topN, (size_t)MIN_CANDIDATE), cid ? p[cid - 1].second : KPOSTag::UNKNOWN, cid + 1 < p.size() ? p[cid + 1].second : KPOSTag::UNKNOWN);
 			vector<tuple<short, short, float>> probs;
 			probs.reserve(cands.size() * ar.size());
 			for (size_t i = 0; i < cands.size(); i++) for (size_t j = 0; j < ar.size(); j++)
@@ -577,7 +577,7 @@ const k_vpcf* Kiwi::getOptimaPath(KMorphemeNode* node, size_t topN, KPOSTag pref
 
 	if (node->isAcceptableFinal())
 	{
-		node->optimaCache = new k_vpcf{};
+		node->makeNewCache();
 		KMorpheme tmp;
 		tmp.tag = suffix;
 		float tp = mdl->getTransitionP(node->morpheme, &tmp);
@@ -608,7 +608,7 @@ const k_vpcf* Kiwi::getOptimaPath(KMorphemeNode* node, size_t topN, KPOSTag pref
 		const auto paths = getOptimaPath(next, topN, prefix, suffix);
 		if (!paths) goto continueLoop;
 		
-		if (!node->optimaCache) node->optimaCache = new k_vpcf{};
+		if (!node->optimaCache) node->makeNewCache();
 		for (auto& p : *paths)
 		{
 			k_vchar l;
@@ -917,13 +917,14 @@ vector<KInterResult> Kiwi::analyzeJM2(const k_string & jm, size_t topN, KPOSTag 
 	if (cached) return *cached;
 	vector<KInterResult> ret;
 	vector<KMorpheme> tmpMorph;
-	auto graph = kt->splitGM(jm, tmpMorph, mdl.get(), prefix != KPOSTag::UNKNOWN);
-	auto paths = getOptimaPath(graph.get(), topN, prefix, suffix);
-	if (paths)
+	thread_local vector<KMorphemeNode> nodePool;
+	auto graph = kt->splitGM(jm, tmpMorph, nodePool, mdl.get(), prefix != KPOSTag::UNKNOWN);
+	const k_vpcf* paths;
+	if (graph && (paths = getOptimaPath(graph, topN, prefix, suffix)))
 	{
 		for (auto& p : *paths)
 		{
-			ret.emplace_back(pathToInterResult(graph.get(), p.first), p.second);
+			ret.emplace_back(pathToInterResult(graph, p.first), p.second);
 		}
 	}
 	else // if there are no matched path
@@ -932,15 +933,16 @@ vector<KInterResult> Kiwi::analyzeJM2(const k_string & jm, size_t topN, KPOSTag 
 	}
 	for (auto& tm : tmpMorph)
 	{
-		if (tm.kform) delete tm.kform;
+		if (tm.kform) DELETE_IN_POOL(k_string, tm.kform);
 	}
+	nodePool.clear();
 	addCache(cfind, ret);
 	return ret;
 }
 
 bool Kiwi::addCache(const string & jm, const vector<KInterResult>& value) const
 {
-	lock_guard<mutex> lg(lock);
+	//lock_guard<mutex> lg(lock);
 	if (maxCache == (size_t)-1) return freqCache.emplace(jm, value).second;
 	if (tempCache.size() >= maxCache) tempCache.clear();
 	++cachePriority[jm];
@@ -949,10 +951,10 @@ bool Kiwi::addCache(const string & jm, const vector<KInterResult>& value) const
 
 vector<KInterResult>* Kiwi::findCache(const string & jm) const
 {
-	lock_guard<mutex> lg(lock);
 	auto cit = freqCache.find(jm);
 	if (cit == freqCache.end())
 	{
+		//lock_guard<mutex> lg(lock);
 		cit = tempCache.find(jm);
 		++cachePriority[jm];
 		if (cit == tempCache.end()) return nullptr;

@@ -36,9 +36,7 @@ using namespace std;
 #define USE_DIST_MAP
 #define PMI_WEIGHT 1.7f
 //#define LOAD_TXT
-#ifndef _DEBUG
 #define CUSTOM_ALLOC
-#endif // !_DEBUG
 
 typedef unsigned short uint16;
 
@@ -57,8 +55,9 @@ inline int fopen_s(FILE** f, const char* p, const char* m)
 }
 #endif
 
-#ifdef CUSTOM_ALLOC
 #include "KMemory.h"
+
+#ifdef CUSTOM_ALLOC
 typedef basic_string<char, char_traits<char>, spool_allocator<char>> k_string;
 #ifdef _WIN32
 #else
