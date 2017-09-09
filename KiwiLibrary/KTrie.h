@@ -37,7 +37,8 @@ struct KMorphemeNode
 	vector<KMorphemeNode*> nexts;
 	k_vpcf* optimaCache = nullptr;
 	KMorphemeNode(const KMorpheme* _morpheme = nullptr) : morpheme(_morpheme) {}
-	~KMorphemeNode() { if (optimaCache) delete optimaCache; }
+	~KMorphemeNode();
+	void makeNewCache();
 	void setAcceptableFinal() { nexts.emplace_back(nullptr); }
 	bool isAcceptableFinal() const { return nexts.size() == 1 && nexts[0] == nullptr; }
 };
@@ -83,5 +84,5 @@ struct KTrie
 	const KForm* search(const char* begin, const char* end) const;
 	vector<pair<const KForm*, int>> searchAllPatterns(const k_string& str) const;
 	vector<k_vchunk> split(const k_string& str, bool hasPrefix = false) const;
-	shared_ptr<KMorphemeNode> splitGM(const k_string& str, vector<KMorpheme>& tmpMorph, const KModelMgr* mdl, bool hasPrefix = false) const;
+	KMorphemeNode* splitGM(const k_string & str, vector<KMorpheme>& tmpMorph, vector<KMorphemeNode>& ret, const KModelMgr * mdl, bool hasPrefix = false) const;
 };

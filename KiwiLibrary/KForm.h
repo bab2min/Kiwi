@@ -109,12 +109,12 @@ struct KMorpheme
 	void addToDistMap(const KMorpheme* t, float v)
 	{
 		if (!distMap) distMap = new map<int, float>{};
-		distMap->emplace(t - this, v);
+		distMap->emplace((int)(t - this), v);
 	}
 	float getDistMap(const KMorpheme* t) const 
 	{
 		//if (!distMap) return 0;
-		auto it = distMap->find(t - this);
+		auto it = distMap->find((int)(t - this));
 		if (it != distMap->end()) return it->second;
 		else return 0;
 	}

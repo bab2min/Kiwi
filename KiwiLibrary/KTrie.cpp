@@ -4,6 +4,7 @@
 #include "KFeatureTestor.h"
 #include "KMemoryKMorphemeNode.h"
 #include "KModelMgr.h"
+#include "KMemory.h"
 
 #ifdef _DEBUG
 int KTrie::rootID = 0;
@@ -345,7 +346,7 @@ vector<k_vchunk> KTrie::split(const k_string& str, bool hasPrefix) const
 	return ret;
 }
 
-shared_ptr<KMorphemeNode> KTrie::splitGM(const k_string & str, vector<KMorpheme>& tmpMorph, const KModelMgr* mdl, bool hasPrefix) const
+KMorphemeNode* KTrie::splitGM(const k_string & str, vector<KMorpheme>& tmpMorph, vector<KMorphemeNode>& ret, const KModelMgr* mdl, bool hasPrefix) const
 {
 	static bool(*vowelFunc[])(const char*, const char*) = {
 		KFeatureTestor::isPostposition,
@@ -385,7 +386,7 @@ shared_ptr<KMorphemeNode> KTrie::splitGM(const k_string & str, vector<KMorpheme>
 	auto makeTmpMorph = [&tmpMorph](const k_string& form)
 	{
 		tmpMorph.emplace_back();
-		tmpMorph.back().kform = new k_string{ form }; // to be released
+		tmpMorph.back().kform = NEW_IN_POOL(k_string) k_string{ form }; // to be released
 		tmpMorph.back().p = form.size() * -1.5f - 6.f;
 		tmpMorph.back().tag = KPOSTag::NNP; // consider unknown morpheme as NNP
 		return tmpMorph.size() - 1;
@@ -592,13 +593,21 @@ shared_ptr<KMorphemeNode> KTrie::splitGM(const k_string & str, vector<KMorpheme>
 		if (nodeEndPos[i] < n && nodes[i].nexts.empty()) continue;
 		realAddress.emplace(i, realAddress.size());
 	}
-	shared_ptr<KMorphemeNode> ret { new KMorphemeNode[realAddress.size()], default_delete<KMorphemeNode[]>() };
+
+	// if no match
+	if (realAddress.empty())
+	{
+		return nullptr;
+	}
+
+	ret.resize(realAddress.size());
+
 	// repair node pointer in all nodes
 	for (size_t i = 0; i < nodes.size(); i++)
 	{
 		auto it = realAddress.find(i);
 		if (it == realAddress.end()) continue;
-		auto& aNode = ret.get()[it->second];
+		auto& aNode = ret[it->second];
 		sort(nodes[i].nexts.begin(), nodes[i].nexts.end());
 		KMorphemeNode* beforePtr = nullptr;
 		for (auto ptr : nodes[i].nexts)
@@ -613,12 +622,12 @@ shared_ptr<KMorphemeNode> KTrie::splitGM(const k_string & str, vector<KMorpheme>
 			beforePtr = ptr;
 			auto jt = realAddress.find((size_t)ptr);
 			if (jt == realAddress.end()) continue;
-			aNode.nexts.emplace_back(ret.get() + jt->second);
+			aNode.nexts.emplace_back(&ret[jt->second]);
 		}
 		aNode.morpheme = nodes[i].morpheme;
 		if (aNode.morpheme && aNode.morpheme->combined) aNode.morpheme = aNode.morpheme->getCombined();
 	}
-	return ret;
+	return &ret[0];
 }
 
 const KMorpheme * KChunk::getMorpheme(size_t idx, KMorpheme * tmp) const
@@ -635,4 +644,14 @@ size_t KChunk::getCandSize() const
 {
 	if (isStr()) return 1;
 	return form->candidate.size();
+}
+
+KMorphemeNode::~KMorphemeNode()
+{
+	if (optimaCache) DELETE_IN_POOL(k_vpcf, optimaCache);
+}
+
+void KMorphemeNode::makeNewCache()
+{
+	optimaCache = NEW_IN_POOL(k_vpcf) k_vpcf;
 }
