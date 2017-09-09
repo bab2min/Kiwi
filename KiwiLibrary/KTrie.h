@@ -34,7 +34,11 @@ class KModelMgr;
 struct KMorphemeNode
 {
 	const KMorpheme* morpheme;
+#ifdef CUSTOM_ALLOC
+	vector<KMorphemeNode*, pool_allocator<void*>> nexts;
+#else
 	vector<KMorphemeNode*> nexts;
+#endif
 	k_vpcf* optimaCache = nullptr;
 	KMorphemeNode(const KMorpheme* _morpheme = nullptr) : morpheme(_morpheme) {}
 	~KMorphemeNode();

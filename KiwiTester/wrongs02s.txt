@@ -1,6 +1,6 @@
 0.821391
-Total (4533) Time : 3461.47 ms
-Time per Unit : 0.763615 ms
+Total (4533) Time : 2990.78 ms
+Time per Unit : 0.65978 ms
 
 석 달하고도 며칠이 더 지나갔다.	0.5
 석/MM	달/NNG	하고/JC	도/JX	
