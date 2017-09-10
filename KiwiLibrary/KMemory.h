@@ -259,7 +259,7 @@ void operator delete(void* ptr, KPool<objectSize, poolSize, type>& pool)
 }
 
 #ifdef CUSTOM_ALLOC
-#define NEW_IN_POOL(T) new(KPool<sizeof(T), 1024, 4>::getInstance())
+#define NEW_IN_POOL(T) new(KPool<sizeof(T), 1024, 4>::getInstance()) T
 #define DELETE_IN_POOL(T, ptr) do{ptr->~T();operator delete((void*)ptr, KPool<sizeof(T), 1024, 4>::getInstance());}while(0)
 #else
 #define NEW_IN_POOL(T) new

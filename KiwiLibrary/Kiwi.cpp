@@ -329,7 +329,7 @@ vector<KResult> Kiwi::analyzeMT(const k_wstring & str, size_t topN, size_t pool)
 				auto& c = p[cid];
 				if (c.second != KPOSTag::MAX)
 				{
-					return vector<KInterResult>{make_pair(vector<tuple<const KMorpheme*, k_wstring, KPOSTag>>{ {nullptr, c.first, c.second} }, 0)};
+					return vector<KInterResult>{make_pair(vector<tuple<const KMorpheme*, k_wstring, KPOSTag>>{ tuple<const KMorpheme*, k_wstring, KPOSTag>{nullptr, c.first, c.second} }, 0)};
 				}
 				auto jm = splitJamo(c.first);
 				return analyzeJM2(jm, topN, cid ? p[cid - 1].second : KPOSTag::UNKNOWN, cid + 1 < p.size() ? p[cid + 1].second : KPOSTag::UNKNOWN);
@@ -535,7 +535,7 @@ vector<const KChunk*> Kiwi::divideChunk(const k_vchunk& ch)
 	return ret;
 }
 
-void printMorph(const KMorpheme* morph)
+/*void printMorph(const KMorpheme* morph)
 {
 	if (morph->chunks)
 	{
@@ -566,7 +566,7 @@ inline void debugNodes(KMorphemeNode* node, const pair<vector<char>, float>& pat
 		printMorph(node->morpheme);
 	}
 	puts("\n");
-}
+}*/
 
 const k_vpcf* Kiwi::getOptimaPath(KMorphemeNode* node, size_t topN, KPOSTag prefix, KPOSTag suffix) const
 {
@@ -589,6 +589,7 @@ const k_vpcf* Kiwi::getOptimaPath(KMorphemeNode* node, size_t topN, KPOSTag pref
 	for (auto next : node->nexts)
 	{
 		float tp;
+		const k_vpcf* paths;
 		if (node->morpheme)
 		{
 			/*if (node->morpheme->tag == KPOSTag::UNKNOWN)
@@ -605,7 +606,7 @@ const k_vpcf* Kiwi::getOptimaPath(KMorphemeNode* node, size_t topN, KPOSTag pref
 			tp = mdl->getTransitionP(&tmp, next->morpheme);
 		}
 		if (tp <= P_MIN) goto continueLoop;
-		const auto paths = getOptimaPath(next, topN, prefix, suffix);
+		paths = getOptimaPath(next, topN, prefix, suffix);
 		if (!paths) goto continueLoop;
 		
 		if (!node->optimaCache) node->makeNewCache();
@@ -929,7 +930,7 @@ vector<KInterResult> Kiwi::analyzeJM2(const k_string & jm, size_t topN, KPOSTag 
 	}
 	else // if there are no matched path
 	{
-		ret.emplace_back(vector<tuple<const KMorpheme*, k_wstring, KPOSTag>>{ {nullptr, joinJamo(jm), KPOSTag::UNKNOWN} }, P_MIN);
+		ret.emplace_back(vector<tuple<const KMorpheme*, k_wstring, KPOSTag>>{ tuple<const KMorpheme*, k_wstring, KPOSTag>{nullptr, joinJamo(jm), KPOSTag::UNKNOWN} }, P_MIN);
 	}
 	for (auto& tm : tmpMorph)
 	{

@@ -66,8 +66,10 @@
     <ClCompile Include="..\KiwiLibrary\KFeatureTestor.cpp" />
     <ClCompile Include="..\KiwiLibrary\KForm.cpp" />
     <ClCompile Include="..\KiwiLibrary\Kiwi.cpp" />
+    <ClCompile Include="..\KiwiLibrary\KMemory.cpp" />
     <ClCompile Include="..\KiwiLibrary\KModelMgr.cpp" />
     <ClCompile Include="..\KiwiLibrary\KTrie.cpp" />
+    <ClCompile Include="..\KiwiLibrary\stdafx.cpp" />
     <ClCompile Include="..\KiwiLibrary\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -78,9 +80,12 @@
     <ClInclude Include="..\KiwiLibrary\KMemory.h" />
     <ClInclude Include="..\KiwiLibrary\KMemoryChar.h" />
     <ClInclude Include="..\KiwiLibrary\KMemoryKChunk.h" />
+    <ClInclude Include="..\KiwiLibrary\KMemoryKMorphemeNode.h" />
     <ClInclude Include="..\KiwiLibrary\KModelMgr.h" />
     <ClInclude Include="..\KiwiLibrary\KTrie.h" />
     <ClInclude Include="..\KiwiLibrary\stdafx.h" />
+    <ClInclude Include="..\KiwiLibrary\targetver.h" />
+    <ClInclude Include="..\KiwiLibrary\ThreadPool.h" />
     <ClInclude Include="..\KiwiLibrary\Utils.h" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
