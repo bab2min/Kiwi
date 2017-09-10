@@ -386,7 +386,7 @@ KMorphemeNode* KTrie::splitGM(const k_string & str, vector<KMorpheme>& tmpMorph,
 	auto makeTmpMorph = [&tmpMorph](const k_string& form)
 	{
 		tmpMorph.emplace_back();
-		tmpMorph.back().kform = NEW_IN_POOL(k_string) k_string{ form }; // to be released
+		tmpMorph.back().kform = NEW_IN_POOL(k_string){ form }; // to be released
 		tmpMorph.back().p = form.size() * -1.5f - 6.f;
 		tmpMorph.back().tag = KPOSTag::NNP; // consider unknown morpheme as NNP
 		return tmpMorph.size() - 1;
@@ -653,5 +653,5 @@ KMorphemeNode::~KMorphemeNode()
 
 void KMorphemeNode::makeNewCache()
 {
-	optimaCache = NEW_IN_POOL(k_vpcf) k_vpcf;
+	optimaCache = NEW_IN_POOL(k_vpcf);
 }
