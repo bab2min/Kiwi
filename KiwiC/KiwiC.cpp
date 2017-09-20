@@ -9,6 +9,18 @@
 
 #include "KiwiC.h"
 
+int kiwi_version()
+{
+	return Kiwi::getVersion();
+}
+
+exception currentError;
+
+const char* kiwi_error()
+{
+	return currentError.what();
+}
+
 PKIWI kiwi_init(const char * modelPath, int maxCache)
 {
 	try
@@ -17,6 +29,7 @@ PKIWI kiwi_init(const char * modelPath, int maxCache)
 	}
 	catch (const exception& e)
 	{
+		currentError = e;
 		return nullptr;
 	}
 }

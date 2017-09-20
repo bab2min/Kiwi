@@ -512,6 +512,11 @@ void Kiwi::clearCache()
 	cachePriority = {};
 }
 
+int Kiwi::getVersion()
+{
+	return 40;
+}
+
 vector<const KChunk*> Kiwi::divideChunk(const k_vchunk& ch)
 {
 	vector<const KChunk*> ret;

@@ -43,5 +43,6 @@ public:
 	vector<KResult> analyze(const string& str, size_t topN) const;
 	vector<KResult> analyzeMT(const k_wstring& str, size_t topN, size_t pool) const;
 	void clearCache();
+	static int getVersion();
 };
 
