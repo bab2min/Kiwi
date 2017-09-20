@@ -1,6 +1,6 @@
 0.853916
-Total (3252) Time : 2645.8 ms
-Time per Unit : 0.813593 ms
+Total (3252) Time : 2730.58 ms
+Time per Unit : 0.839661 ms
 
 고등학교를 졸업할 무렵 담임선생님께서 내게 이런 말씀을 하셨다.	0.739
 고등학교/NNG	담임선생/NNG	
