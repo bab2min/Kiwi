@@ -278,3 +278,6 @@ ModelManifest.xml
 /TestSets/11s.txt
 /TestSets/10s.txt
 /TestSets/t.txt
+/KiwiGui/KiwiGui.exe
+/KiwiGui/bin_x86
+/KiwiGui/bin_x64

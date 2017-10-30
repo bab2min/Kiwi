@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -13,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.IO;
 
 namespace KiwiGui
 {
@@ -26,10 +28,10 @@ namespace KiwiGui
         public MainWindow()
         {
             InitializeComponent();
-            int version = KiwiCS.Version();
-            VersionInfo.Header = String.Format("Kiwi 버전 {0}.{1}.{2}", version / 100 % 10, version / 10 % 10, version % 10);
             try
             {
+                int version = KiwiCS.Version();
+                VersionInfo.Header = String.Format("Kiwi 버전 {0}.{1}.{2}", version / 100 % 10, version / 10 % 10, version % 10);
                 instKiwi = new KiwiCS("model/", -1);
             }
             catch(Exception e)
@@ -39,14 +41,43 @@ namespace KiwiGui
             }
         }
 
+        public static string GetFileText(string path)
+        {
+            string ftxt = File.ReadAllText(path);
+            if (ftxt.IndexOf('\xFFFD') >= 0)
+            {
+                ftxt = File.ReadAllText(path, Encoding.Default);
+            }
+            return ftxt;
+        }
+
         private void MenuItem_Open(object sender, RoutedEventArgs e)
         {
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Filter = "텍스트 파일|*.txt|모든 파일|*.*";
+            ofd.Title = "분석할 텍스트 파일 열기";
 
+            if (ofd.ShowDialog() != true) return;
+            InputTxt.Text = GetFileText(ofd.FileName);
+        }
+
+        private void MenuItem_Save(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog ofd = new SaveFileDialog();
+            ofd.Filter = "텍스트 파일|*.txt|모든 파일|*.*";
+            ofd.Title = "분석 결과를 저장할 파일 경로";
+
+            if (ofd.ShowDialog() != true) return;
+            string res = new TextRange(ResultBlock.Document.ContentStart, ResultBlock.Document.ContentEnd).Text;
+            File.WriteAllText(ofd.FileName, res);
         }
 
         private void MenuItem_Batch(object sender, RoutedEventArgs e)
         {
-
+            BatchDlg dlg = new BatchDlg();
+            dlg.Owner = this;
+            dlg.instKiwi = instKiwi;
+            dlg.ShowDialog();
         }
 
         private void MenuItem_Close(object sender, RoutedEventArgs e)
@@ -72,15 +103,17 @@ namespace KiwiGui
         private void AnalyzeBtn_Click(object sender, RoutedEventArgs e)
         {
             ResultBlock.Document.Blocks.Clear();
-            string[] lines = InputTxt.Text.Split('\n');
+            string[] lines = TypeCmb.SelectedIndex == 0 ? InputTxt.Text.Trim().Split('\n') : new string[]{ InputTxt.Text.Trim() };
+            int topN = TopNCmb.SelectedIndex + 1;
             Brush brushDef = new SolidColorBrush(Color.FromRgb(0, 0, 0));
             Brush brushMorph = new SolidColorBrush(Color.FromRgb(0, 150, 0));
             Brush brushTag = new SolidColorBrush(Color.FromRgb(0, 0, 150));
-            
+            bool content = false;
             foreach (var line in lines)
             {
                 if (line.Length == 0) continue;
-                var res = instKiwi.analyze(line.Trim(), 5);
+                content = true;
+                var res = instKiwi.analyze(line.Trim(), topN);
                 Run t = new Run(line.Trim());
                 t.Foreground = brushDef;
                 Paragraph para = new Paragraph();
@@ -112,6 +145,7 @@ namespace KiwiGui
                 }
                 ResultBlock.Document.Blocks.Add(para);
             }
+            MenuSave.IsEnabled = content;
         }
 
         private void Window_Closed(object sender, EventArgs e)

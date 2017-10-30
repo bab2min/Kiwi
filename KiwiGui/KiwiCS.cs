@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.IO;
 
 namespace KiwiGui
 {
@@ -90,9 +89,27 @@ namespace KiwiGui
         }
     }
 
-    class KiwiCS
+    public class KiwiCS
     {
+
         private const string DLLPATH = "KiwiC.dll";
+        static KiwiCS()
+        {
+            var myPath = new Uri(typeof(KiwiCS).Assembly.CodeBase).LocalPath;
+            var myFolder = Path.GetDirectoryName(myPath);
+
+            var is64 = IntPtr.Size == 8;
+            var subfolder = is64 ? "\\bin_x64\\" : "\\bin_x86\\";
+#if DEBUG
+            subfolder = "\\..\\.." + subfolder;
+#endif
+
+            LoadLibrary(myFolder + subfolder + DLLPATH);
+        }
+
+        [DllImport("kernel32.dll")]
+        private static extern IntPtr LoadLibrary(string dllToLoad);
+
         [DllImport(DLLPATH, CallingConvention = CallingConvention.Cdecl)]
         extern public static int kiwi_version();
 
