@@ -1,0 +1,55 @@
+﻿<Window 
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="KiwiGui.BatchDlg"
+    xmlns:local="clr-namespace:KiwiGui"
+    Title="일괄 처리 대화상자"
+    Height="360"
+    Width="500"
+    MinHeight="250"
+    MinWidth="350"
+    ResizeMode="CanResizeWithGrip"
+    ShowInTaskbar="False"
+    WindowStartupLocation="CenterOwner" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="170"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="25"/>
+        </Grid.RowDefinitions>
+        <ListBox Name="FileList" SelectionChanged="FileList_SelectionChanged" SelectionMode="Multiple">
+
+        </ListBox>
+        <StackPanel Grid.Column="1">
+            <Button Name="AddBtn" Content="파일 추가..." Padding="3" Click="AddBtn_Click" />
+            <Button Name="AddFolderBtn" Content="폴더 추가..." Padding="3" Click="AddFolderBtn_Click" />
+            <Button Name="DelBtn" Content="삭제" Padding="3" Click="DelBtn_Click" IsEnabled="False" />
+            <ComboBox SelectedIndex="0" Name="TypeCmb" ToolTip="분석 단위를 선택합니다.">
+                <ComboBoxItem>줄별 분석</ComboBoxItem>
+                <ComboBoxItem>전체 분석</ComboBoxItem>
+            </ComboBox>
+            <ComboBox SelectedIndex="0" Name="TopNCmb" ToolTip="분석 결과를 몇 개까지 출력할 지 선택합니다.">
+                <ComboBoxItem>결과 1개</ComboBoxItem>
+                <ComboBoxItem>결과 2개</ComboBoxItem>
+                <ComboBoxItem>결과 3개</ComboBoxItem>
+                <ComboBoxItem>결과 4개</ComboBoxItem>
+                <ComboBoxItem>결과 5개</ComboBoxItem>
+            </ComboBox>
+            <ComboBox SelectedIndex="1" Name="FormatCmb" ToolTip="분석 결과를 어떤 형태로 저장할지 선택합니다.">
+                <ComboBoxItem>형태소 (탭 구분자)</ComboBoxItem>
+                <ComboBoxItem>형태소/NNG (탭 구분자)</ComboBoxItem>
+                <ComboBoxItem>형태소 ( + 구분자)</ComboBoxItem>
+                <ComboBoxItem>형태소/NNG ( + 구분자)</ComboBoxItem>
+            </ComboBox>
+            <Button Name="StartBtn" Content="분석 시작" Padding="3" Click="StartBtn_Click" IsEnabled="False"/>
+            <Button Name="StopBtn" Content="중단" Padding="3" Click="StopBtn_Click" Visibility="Collapsed"/>
+            <TextBlock TextWrapping="Wrap">분석 결과는 <LineBreak/>"파일이름.tagged"에 저장됩니다.</TextBlock>
+        </StackPanel>
+        <ProgressBar Grid.ColumnSpan="2" Grid.Row="1" Name="Prg"></ProgressBar>
+    </Grid >
+
+</Window>

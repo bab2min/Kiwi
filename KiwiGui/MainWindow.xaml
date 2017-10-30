@@ -5,12 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:KiwiGui"
         mc:Ignorable="d"
-        Title="키위 형태소 분석기 GUI" Height="350" Width="525" WindowStartupLocation="CenterScreen" Closed="Window_Closed">
+        Title="키위 형태소 분석기 GUI" Height="450" Width="625" WindowStartupLocation="CenterScreen" Closed="Window_Closed">
     <DockPanel Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="파일(_F)">
                 <MenuItem Header="열기(_O)" Click="MenuItem_Open" />
                 <MenuItem Header="일괄 분석(_B)" Click="MenuItem_Batch" />
+                <Separator />
+                <MenuItem Header="결과 저장(_V)" Click="MenuItem_Save" Name="MenuSave" IsEnabled="False" />
                 <Separator />
                 <MenuItem Header="종료(_X)" Click="MenuItem_Close"/>
             </MenuItem>
@@ -19,7 +21,7 @@
                 <MenuItem Header="GitHub(_G)" Click="MenuItem_GitHub"/>
                 <MenuItem Header="블로그(_B)" Click="MenuItem_Blog"/>
                 <Separator />
-                <MenuItem Name="VersionInfo" IsEnabled="False" />
+                <MenuItem Name="VersionInfo" />
             </MenuItem>
         </Menu>
         <Grid Margin="3,0">
