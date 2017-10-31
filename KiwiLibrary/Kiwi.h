@@ -2,7 +2,7 @@
 
 #include "KForm.h"
 #include "KTrie.h"
-
+#include "ThreadPool.h"
 
 typedef pair<k_wstring, KPOSTag> KWordPair;
 typedef pair<vector<KWordPair>, float> KResult;
@@ -16,8 +16,10 @@ class Kiwi
 protected:
 	size_t maxCache;
 	shared_ptr<KModelMgr> mdl;
+	mutable ThreadPool threadPool;
 	mutable mutex lock;
 	const KTrie* kt = nullptr;
+	size_t numThread;
 	const k_vpcf* getOptimaPath(KMorphemeNode* node, size_t topN, KPOSTag prefix, KPOSTag suffix) const;
 	mutable unordered_map<string, vector<KInterResult>> tempCache, freqCache;
 	mutable unordered_map<string, size_t> cachePriority;
@@ -32,7 +34,7 @@ protected:
 	bool addCache(const string& jm, const vector<KInterResult>& value) const;
 	vector<KInterResult>* findCache(const string& jm) const;
 public:
-	Kiwi(const char* modelPath = "", size_t maxCache = -1);
+	Kiwi(const char* modelPath = "", size_t maxCache = -1, size_t numThread = 0);
 	int addUserWord(const k_wstring& str, KPOSTag tag);
 	int addUserRule(const k_wstring& str, const vector<pair<k_wstring, KPOSTag>>& morph);
 	int loadUserDictionary(const char* userDictPath = "");
@@ -41,7 +43,7 @@ public:
 	KResult analyze(const string& str) const;
 	vector<KResult> analyze(const k_wstring& str, size_t topN) const;
 	vector<KResult> analyze(const string& str, size_t topN) const;
-	vector<KResult> analyzeMT(const k_wstring& str, size_t topN, size_t pool) const;
+	vector<KResult> analyzeMT(const k_wstring& str, size_t topN) const;
 	void clearCache();
 	static int getVersion();
 };

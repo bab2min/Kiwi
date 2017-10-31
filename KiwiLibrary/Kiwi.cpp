@@ -3,7 +3,6 @@
 #include "Kiwi.h"
 #include "KFeatureTestor.h"
 #include "KModelMgr.h"
-#include "ThreadPool.h"
 
 KPOSTag Kiwi::identifySpecialChr(k_wchar chr)
 {
@@ -116,7 +115,9 @@ vector<vector<KWordPair>> Kiwi::splitPart(const k_wstring & str)
 	return ret;
 }
 
-Kiwi::Kiwi(const char * modelPath, size_t _maxCache) : maxCache(_maxCache)
+Kiwi::Kiwi(const char * modelPath, size_t _maxCache, size_t _numThread) : maxCache(_maxCache),
+	numThread(_numThread ? _numThread : thread::hardware_concurrency()), 
+	threadPool(_numThread ? _numThread : thread::hardware_concurrency())
 {
 	mdl = make_shared<KModelMgr>(modelPath);
 }
@@ -309,9 +310,8 @@ vector<KResult> Kiwi::analyze(const string & str, size_t topN) const
 	return analyze(converter.from_bytes(str), topN);
 }
 
-vector<KResult> Kiwi::analyzeMT(const k_wstring & str, size_t topN, size_t pool) const
+vector<KResult> Kiwi::analyzeMT(const k_wstring & str, size_t topN) const
 {
-	ThreadPool threadPool(pool);
 	vector<future<vector<KInterResult>>> threadResult;
 
 	vector<KInterResult> cands(1);
@@ -332,7 +332,7 @@ vector<KResult> Kiwi::analyzeMT(const k_wstring & str, size_t topN, size_t pool)
 					return vector<KInterResult>{make_pair(vector<tuple<const KMorpheme*, k_wstring, KPOSTag>>{ tuple<const KMorpheme*, k_wstring, KPOSTag>{nullptr, c.first, c.second} }, 0)};
 				}
 				auto jm = splitJamo(c.first);
-				return analyzeJM2(jm, topN, cid ? p[cid - 1].second : KPOSTag::UNKNOWN, cid + 1 < p.size() ? p[cid + 1].second : KPOSTag::UNKNOWN);
+				return analyzeJM2(jm, max(topN, (size_t)MIN_CANDIDATE), cid ? p[cid - 1].second : KPOSTag::UNKNOWN, cid + 1 < p.size() ? p[cid + 1].second : KPOSTag::UNKNOWN);
 			}));
 		}
 	}
@@ -502,7 +502,8 @@ vector<KResult> Kiwi::analyzeGM(const k_wstring & str, size_t topN) const
 
 vector<KResult> Kiwi::analyze(const k_wstring & str, size_t topN) const
 {
-	return analyzeGM(str, topN);
+	if(numThread > 1) return analyzeMT(str, topN);
+	else return analyzeGM(str, topN);
 }
 
 void Kiwi::clearCache()
@@ -948,7 +949,7 @@ vector<KInterResult> Kiwi::analyzeJM2(const k_string & jm, size_t topN, KPOSTag 
 
 bool Kiwi::addCache(const string & jm, const vector<KInterResult>& value) const
 {
-	//lock_guard<mutex> lg(lock);
+	lock_guard<mutex> lg(lock);
 	if (maxCache == (size_t)-1) return freqCache.emplace(jm, value).second;
 	if (tempCache.size() >= maxCache) tempCache.clear();
 	++cachePriority[jm];
@@ -960,7 +961,7 @@ vector<KInterResult>* Kiwi::findCache(const string & jm) const
 	auto cit = freqCache.find(jm);
 	if (cit == freqCache.end())
 	{
-		//lock_guard<mutex> lg(lock);
+		lock_guard<mutex> lg(lock);
 		cit = tempCache.find(jm);
 		++cachePriority[jm];
 		if (cit == tempCache.end()) return nullptr;

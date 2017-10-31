@@ -140,11 +140,12 @@ void KModelMgr::loadMMFromTxt(const char * filename, unordered_map<pair<k_string
 		{
 			continue;
 		}
-		float tagWeight = stof(fields[3]);
-		float vowel = stof(fields[5]);
-		float vocalic = stof(fields[6]);
-		float vocalicH = stof(fields[7]);
-		float positive = stof(fields[8]);
+		float tagWeight = stof(fields[3]) * pow(stof(fields[4]), 0.64f);
+		assert(tagWeight <= 1);
+		float vowel = stof(fields[6]);
+		float vocalic = stof(fields[7]);
+		float vocalicH = stof(fields[8]);
+		float positive = stof(fields[9]);
 
 		KCondVowel cvowel = KCondVowel::none;
 		KCondPolarity polar = KCondPolarity::none;
@@ -293,6 +294,7 @@ void KModelMgr::loadPCMFromTxt(const char * filename, unordered_map<pair<k_strin
 		auto& fm = formMapper(form);
 		fm.candidate.emplace_back((KMorpheme*)mid);
 		fm.suffix.insert(suffixes.begin(), suffixes.end());
+		assert(tagWeight <= 1);
 		morphemes.emplace_back(form, tag, KCondVowel::none, KCondPolarity::none, logf(tagWeight), socket);
 		morphemes.back().kform = (const k_string*)(&fm - &forms[0]);
 		morphemes.back().combined = (int)mit->second - ((int)morphemes.size() - 1);
@@ -437,7 +439,7 @@ void KModelMgr::loadDMBin(const char * filename)
 	}
 	fclose(f);
 }
-
+#endif
 KForm & KModelMgr::formMapper(k_string form)
 {
 	auto it = formMap.find(form);
@@ -448,8 +450,6 @@ KForm & KModelMgr::formMapper(k_string form)
 	forms.back().wform = joinJamo(form);
 	return forms[id];
 }
-
-#endif
 
 KModelMgr::KModelMgr(const char * modelPath)
 {
