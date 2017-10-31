@@ -21,11 +21,11 @@ const char* kiwi_error()
 	return currentError.what();
 }
 
-PKIWI kiwi_init(const char * modelPath, int maxCache)
+PKIWI kiwi_init(const char * modelPath, int maxCache, int numThread)
 {
 	try
 	{
-		return new Kiwi{ modelPath, (size_t)maxCache };
+		return new Kiwi{ modelPath, (size_t)maxCache, (size_t)numThread };
 	}
 	catch (const exception& e)
 	{

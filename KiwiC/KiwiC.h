@@ -15,7 +15,7 @@ extern "C" {
 DECL_DLL int kiwi_version();
 DECL_DLL const char* kiwi_error();
 
-DECL_DLL PKIWI kiwi_init(const char* modelPath, int maxCache);
+DECL_DLL PKIWI kiwi_init(const char* modelPath, int maxCache, int numThread);
 DECL_DLL int kiwi_loadUserDict(PKIWI handle, const char* dictPath);
 DECL_DLL int kiwi_prepare(PKIWI handle);
 DECL_DLL PKIWIRESULT kiwi_analyzeW(PKIWI handle, const wchar_t* text, int topN);

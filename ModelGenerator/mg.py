@@ -91,7 +91,10 @@ class ModelGenerator:
             # 조사의 경우 극성이 없으므로 극성 수치를 50%에 맞춘다.
             if k[1].startswith('J'):
                 d.positiveCount = int(d.postCount / 2)
-            f.write("%s\t%s\t%d\t%g\t%g\t%g\t%g\t%g\t%g\t" % (k[0], k[1], d.totalCount, (d.totalCount*math.exp(-12))**0.67 *d.totalCount/self.formDict[k[0]], (d.regularityCount+1) / (d.rTotalCount+1), d.vowelCount/d.postCount, d.vocalicCount/d.postCount, d.vocalicHCount/d.postCount, d.positiveCount/d.postCount))
+            #prob 0: d.totalCount/self.formDict[k[0]]
+            #prob 1: (d.totalCount*math.exp(-12))**0.67 * d.totalCount/self.formDict[k[0]]
+            #prob 2: d.totalCount / self.allNum
+            f.write("%s\t%s\t%d\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t" % (k[0], k[1], d.totalCount, d.totalCount / self.formDict[k[0]], self.formDict[k[0]] / self.allNum, (d.regularityCount+1) / (d.rTotalCount+1), d.vowelCount/d.postCount, d.vocalicCount/d.postCount, d.vocalicHCount/d.postCount, d.positiveCount/d.postCount))
             for tag in sorted(d.prePos, key=d.prePos.get, reverse=True):
                 f.write("%s:%g\t" % (tag, d.prePos[tag]/d.postCount))
             f.write('\n')

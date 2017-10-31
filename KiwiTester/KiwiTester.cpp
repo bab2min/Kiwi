@@ -79,7 +79,7 @@ int main()
 	system("chcp 65001");
 	_wsetlocale(LC_ALL, L"korean");
 	Timer timer;
-	Kiwi kw{ "../ModelGenerator/"};
+	Kiwi kw{ "../ModelGenerator/", (size_t)-1, 1 };
 	kw.prepare();
 	printf("Loading Time : %g ms\n", timer.getElapsed());
 	PROCESS_MEMORY_COUNTERS pmc;

@@ -45,7 +45,7 @@ class PrecombinedModelGenerator:
                 stem = ch[0][:-1]
             else: continue
             ch[0] = stem + '+' + suf
-            ch[2] = ch[3]
+            ch[2] = str(float(ch[3]) * float(ch[4]) ** 0.64)
             vCond = self.findVCond(suf, stem)
             ch[3:] = [''.join(vCond[0]), str(vCond[1])]
             ret.append(ch)
