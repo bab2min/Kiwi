@@ -1,6 +1,6 @@
 0.863302
-Total (3252) Time : 3002.81 ms
-Time per Unit : 0.923372 ms
+Total (3252) Time : 3063.61 ms
+Time per Unit : 0.94207 ms
 
 모가 난 돌은 정을 맞게 마련이고 정을 맞으면 아픈 법이다.	0.917
 법/NNG	

@@ -30,6 +30,8 @@ DECL_DLL const wchar_t* kiwiResult_getWordFormW(PKIWIRESULT result, int index, i
 DECL_DLL const wchar_t* kiwiResult_getWordTagW(PKIWIRESULT result, int index, int num);
 DECL_DLL const char* kiwiResult_getWordForm(PKIWIRESULT result, int index, int num);
 DECL_DLL const char* kiwiResult_getWordTag(PKIWIRESULT result, int index, int num);
+DECL_DLL int kiwiResult_getWordPosition(PKIWIRESULT result, int index, int num);
+DECL_DLL int kiwiResult_getWordLength(PKIWIRESULT result, int index, int num);
 DECL_DLL int kiwiResult_close(PKIWIRESULT result);
 
 #ifdef __cplusplus  

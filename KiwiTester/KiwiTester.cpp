@@ -44,7 +44,7 @@ int main2()
 			printf("%.3g\t", r.second);
 			for (auto& p : r.first)
 			{
-				wprintf(L"%s/%s\t", p.first.c_str(), tagToStringW(p.second));
+				wprintf(L"%s/%s\t", p.str().c_str(), tagToStringW(p.tag()));
 			}
 			printf("\n");
 		}

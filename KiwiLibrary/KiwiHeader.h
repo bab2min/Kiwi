@@ -38,8 +38,6 @@ using namespace std;
 //#define LOAD_TXT
 #define CUSTOM_ALLOC
 
-typedef unsigned short uint16;
-
 #ifdef _WIN32
 typedef wchar_t k_wchar;
 typedef wstring k_wstring;

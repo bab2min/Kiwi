@@ -115,7 +115,7 @@ const wchar_t * kiwiResult_getWordFormW(PKIWIRESULT result, int index, int num)
 	if (!result) return nullptr;
 	auto k = (pair<vector<KResult>, ResultBuffer>*)result;
 	if (index < 0 || index >= k->first.size() || num < 0 || num >= k->first[index].first.size()) return nullptr;
-	return k->first[index].first[num].first.c_str();
+	return k->first[index].first[num].str().c_str();
 }
 
 const wchar_t * kiwiResult_getWordTagW(PKIWIRESULT result, int index, int num)
@@ -123,7 +123,7 @@ const wchar_t * kiwiResult_getWordTagW(PKIWIRESULT result, int index, int num)
 	if (!result) return nullptr;
 	auto k = (pair<vector<KResult>, ResultBuffer>*)result;
 	if (index < 0 || index >= k->first.size() || num < 0 || num >= k->first[index].first.size()) return nullptr;
-	return tagToStringW(k->first[index].first[num].second);
+	return tagToStringW(k->first[index].first[num].tag());
 }
 
 const char * kiwiResult_getWordForm(PKIWIRESULT result, int index, int num)
@@ -132,7 +132,7 @@ const char * kiwiResult_getWordForm(PKIWIRESULT result, int index, int num)
 	auto k = (pair<vector<KResult>, ResultBuffer>*)result;
 	if (index < 0 || index >= k->first.size() || num < 0 || num >= k->first[index].first.size()) return nullptr;
 	wstring_convert<codecvt_utf8_utf16<k_wchar>> converter;
-	k->second.stringBuf.emplace_back(converter.to_bytes(k->first[index].first[num].first));
+	k->second.stringBuf.emplace_back(converter.to_bytes(k->first[index].first[num].str()));
 	return k->second.stringBuf.back().c_str();
 }
 
@@ -141,7 +141,23 @@ const char * kiwiResult_getWordTag(PKIWIRESULT result, int index, int num)
 	if (!result) return nullptr;
 	auto k = (pair<vector<KResult>, ResultBuffer>*)result;
 	if (index < 0 || index >= k->first.size() || num < 0 || num >= k->first[index].first.size()) return nullptr;
-	return tagToString(k->first[index].first[num].second);
+	return tagToString(k->first[index].first[num].tag());
+}
+
+int kiwiResult_getWordPosition(PKIWIRESULT result, int index, int num)
+{
+	if (!result) return -1;
+	auto k = (pair<vector<KResult>, ResultBuffer>*)result;
+	if (index < 0 || index >= k->first.size() || num < 0 || num >= k->first[index].first.size()) return -1;
+	return k->first[index].first[num].pos();
+}
+
+int kiwiResult_getWordLength(PKIWIRESULT result, int index, int num)
+{
+	if (!result) return -1;
+	auto k = (pair<vector<KResult>, ResultBuffer>*)result;
+	if (index < 0 || index >= k->first.size() || num < 0 || num >= k->first[index].first.size()) return -1;
+	return k->first[index].first[num].len();
 }
 
 
