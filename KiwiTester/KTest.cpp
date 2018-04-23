@@ -9,11 +9,11 @@ KWordPair parseWordPOS(k_wstring str)
 {
 	if (str[0] == '/' && str[1] == '/')
 	{
-		return { L"/", makePOSTag(str.substr(2)) };
+		return { L"/", makePOSTag(str.substr(2)), 0, 0 };
 	}
 	auto p = str.find('/');
 	if (p == str.npos) return {};
-	return { str.substr(0, p), makePOSTag(str.substr(p + 1)) };
+	return { str.substr(0, p), makePOSTag(str.substr(p + 1)), 0, 0 };
 }
 
 struct Counter
@@ -88,17 +88,17 @@ void KTest::TestResult::writeResult(FILE * output) const
 	fprintf(output, "\t%.3g\n", score);
 	for (auto _r : da)
 	{
-		fputws(_r.first.c_str(), output);
+		fputws(_r.str().c_str(), output);
 		fputwc('/', output);
-		fputs(tagToString(_r.second), output);
+		fputs(tagToString(_r.tag()), output);
 		fputwc('\t', output);
 	}
 	fputwc('\n', output);
 	for (auto _r : dr)
 	{
-		fputws(_r.first.c_str(), output);
+		fputws(_r.str().c_str(), output);
 		fputwc('/', output);
-		fputs(tagToString(_r.second), output);
+		fputs(tagToString(_r.tag()), output);
 		fputwc('\t', output);
 	}
 	fputwc('\n', output);

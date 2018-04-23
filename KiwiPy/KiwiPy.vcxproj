@@ -91,6 +91,8 @@
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>C:\Users\Administrator\AppData\Local\Programs\Python\Python36\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\Administrator\AppData\Local\Programs\Python\Python36\libs;$(LibraryPath)</LibraryPath>
+    <TargetName>kiwiPyRaw</TargetName>
+    <TargetExt>.pyd</TargetExt>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -145,6 +147,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;KIWIPY_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

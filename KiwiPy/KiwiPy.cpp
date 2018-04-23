@@ -9,10 +9,11 @@ static PyObject* initKiwi(PyObject* self, PyObject* args)
 {
 	char* modelPath;
 	int cacheSize = -1;
-	if(!PyArg_ParseTuple(args, "si", &modelPath, &cacheSize)) return nullptr;
+	int numThread = 0;
+	if(!PyArg_ParseTuple(args, "sii", &modelPath, &cacheSize, &numThread)) return nullptr;
 	try
 	{
-		Kiwi* inst = new Kiwi(modelPath, cacheSize);
+		Kiwi* inst = new Kiwi(modelPath, cacheSize, numThread);
 		return Py_BuildValue("n", inst);
 	}
 	catch (const exception& e)
@@ -65,7 +66,7 @@ static PyObject* analyzeKiwi(PyObject* self, PyObject* args)
 			size_t jdx = 0;
 			for (auto w : r.first)
 			{
-				PyList_SetItem(t, jdx++, Py_BuildValue("(ss)", converter.to_bytes(w.first).c_str(), tagToString(w.second)));
+				PyList_SetItem(t, jdx++, Py_BuildValue("(ss)", converter.to_bytes(w.str()).c_str(), tagToString(w.tag())));
 			}
 			PyList_SetItem(resList, idx++, Py_BuildValue("(Of)", t, r.second));
 			Py_DECREF(t);

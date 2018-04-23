@@ -367,17 +367,17 @@ KMorphemeNode* KTrie::splitGM(const k_string & str, vector<KMorpheme>& tmpMorph,
 #ifdef CUSTOM_ALLOC
 	vector<const KForm*, pool_allocator<void*>> candidates;
 	vector<KMorphemeNode, pool_allocator<KMorphemeNode>> nodes;
-	vector<uint16, pool_allocator<void*>> nodeEndPos;
-	multimap<uint16, uint16, less<uint16>, pool_allocator<void*>> nodeAtNthEnd;
-	map<pair<uint16, uint16>, uint16, less<pair<uint16, uint16>>, pool_allocator<void*>> unknownNodes;
-	unordered_set<uint16, hash<uint16>, equal_to<uint16>, pool_allocator<void*>> nodeToRepairMorph;
+	vector<uint16_t, pool_allocator<void*>> nodeEndPos;
+	multimap<uint16_t, uint16_t, less<uint16_t>, pool_allocator<void*>> nodeAtNthEnd;
+	map<pair<uint16_t, uint16_t>, uint16_t, less<pair<uint16_t, uint16_t>>, pool_allocator<void*>> unknownNodes;
+	unordered_set<uint16_t, hash<uint16_t>, equal_to<uint16_t>, pool_allocator<void*>> nodeToRepairMorph;
 #else
 	vector<const KForm*> candidates;
 	vector<KMorphemeNode> nodes;
-	vector<uint16> nodeEndPos;
-	multimap<uint16, uint16> nodeAtNthEnd;
-	map<pair<uint16, uint16>, uint16> unknownNodes;
-	unordered_set<uint16> nodeToRepairMorph;
+	vector<uint16_t> nodeEndPos;
+	multimap<uint16_t, uint16_t> nodeAtNthEnd;
+	map<pair<uint16_t, uint16_t>, uint16_t> unknownNodes;
+	unordered_set<uint16_t> nodeToRepairMorph;
 #endif
 	nodes.reserve(16);
 	nodes.emplace_back();

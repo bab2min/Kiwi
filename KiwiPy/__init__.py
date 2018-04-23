@@ -1,8 +1,8 @@
 import kiwiPyRaw
 
 class Kiwi:
-    def __init__(self, modelPath = '', cacheSize = -1, userDicts = []):
-        self.inst = kiwiPyRaw.initKiwi(modelPath, cacheSize)
+    def __init__(self, modelPath = '', cacheSize = -1, numThread = 0, userDicts = []):
+        self.inst = kiwiPyRaw.initKiwi(modelPath, cacheSize, numThread)
         if type(userDicts) == str: userDicts = [userDicts]
         for ud in userDicts:
             kiwiPyRaw.loadUserDictKiwi(self.inst, ud)
