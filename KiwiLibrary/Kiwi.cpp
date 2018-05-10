@@ -648,9 +648,10 @@ exit:;
 	return ret;
 }
 
-vector<KInterWordPair> pathToInterResult(const KMorphemeNode * node, const k_vchar& path, int len, uint16_t pos)
+vector<KInterWordPair> pathToInterResult(const KMorphemeNode * node, const k_vchar& path, int len)
 {
 	vector<KInterWordPair> ret;
+	int pos = 0;
 	for (char p : path)
 	{
 		node = node->nexts[p];
@@ -691,13 +692,25 @@ vector<KInterWordPair> pathToInterResult(const KMorphemeNode * node, const k_vch
 	return ret;
 }
 
+vector<KInterResult>& makeOffset(vector<KInterResult>& rs, int offset)
+{
+	for (auto& r : rs)
+	{
+		for (auto& t : r.first)
+		{
+			t.pos() += offset;
+		}
+	}
+	return rs;
+}
+
 vector<KInterResult> Kiwi::analyzeJM(const k_string & jm, size_t topN, KPOSTag prefix, KPOSTag suffix, uint8_t len, uint16_t pos) const
 {
 	string cfind{ jm.begin(), jm.end() };
 	cfind.push_back((char)prefix + 64);
 	cfind.push_back((char)suffix + 64);
 	auto cached = findCache(cfind);
-	if (cached) return *cached;
+	if (cached) return makeOffset(vector<KInterResult>{ *cached }, pos);
 	vector<KInterResult> ret;
 	vector<KMorpheme> tmpMorph;
 	thread_local vector<KMorphemeNode> nodePool;
@@ -707,12 +720,12 @@ vector<KInterResult> Kiwi::analyzeJM(const k_string & jm, size_t topN, KPOSTag p
 	{
 		for (auto& p : *paths)
 		{
-			ret.emplace_back(pathToInterResult(graph, p.first, len, pos), p.second);
+			ret.emplace_back(pathToInterResult(graph, p.first, len), p.second);
 		}
 	}
 	else // if there are no matched path
 	{
-		ret.emplace_back(vector<KInterWordPair>{ KInterWordPair{nullptr, joinJamo(jm), KPOSTag::UNKNOWN, len, pos} }, P_MIN);
+		ret.emplace_back(vector<KInterWordPair>{ KInterWordPair{nullptr, joinJamo(jm), KPOSTag::UNKNOWN, len, 0} }, P_MIN);
 	}
 	for (auto& tm : tmpMorph)
 	{
@@ -720,7 +733,7 @@ vector<KInterResult> Kiwi::analyzeJM(const k_string & jm, size_t topN, KPOSTag p
 	}
 	nodePool.clear();
 	addCache(cfind, ret);
-	return ret;
+	return makeOffset(ret, pos);
 }
 
 bool Kiwi::addCache(const string & jm, const vector<KInterResult>& value) const
