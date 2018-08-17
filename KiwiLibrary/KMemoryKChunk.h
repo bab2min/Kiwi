@@ -1,7 +1,7 @@
 #pragma once
 
 template <>
-class pool_allocator<KChunk> : public allocator<KChunk>
+class pool_allocator<KChunk> : public std::allocator<KChunk>
 {
 public:
 	typedef size_t size_type;

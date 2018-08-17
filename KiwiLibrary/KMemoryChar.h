@@ -1,7 +1,7 @@
 #pragma once
 
 template <>
-class pool_allocator<char> : public allocator<char>
+class pool_allocator<char> : public std::allocator<char>
 {
 public:
 	typedef size_t size_type;
@@ -42,7 +42,7 @@ public:
 };
 
 template <>
-class pool_allocator<pair<k_vchar, float>> : public allocator<pair<k_vchar, float>>
+class pool_allocator<std::pair<k_vchar, float>> : public std::allocator<std::pair<k_vchar, float>>
 {
 public:
 	typedef size_t size_type;

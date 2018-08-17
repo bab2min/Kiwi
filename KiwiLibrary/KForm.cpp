@@ -1,7 +1,9 @@
 #include "stdafx.h"
 #include "KForm.h"
-struct KChunk;
 #include "Utils.h"
+
+using namespace std;
+
 #ifdef _DEBUG
 size_t KMorpheme::uid = 0;
 #endif
@@ -111,171 +113,78 @@ const wchar_t * tagToStringW(KPOSTag t)
 	return tags[(size_t)t];
 }
 
-KForm::KForm(const char * _form)
+KForm::KForm(const char16_t * _form)
 {
-	if (_form) form = {_form, _form + strlen(_form)};
+	if (_form) form = _form;
 }
 
-void KForm::updateCond()
+void KForm::readFromBin(istream& is, const function<const KMorpheme*(size_t)>& mapper)
 {
-	if (candidate.empty()) return;
-	KCondVowel cv = candidate[0]->vowel;
-	KCondPolarity cp = candidate[0]->polar;
-	//maxP = candidate[0]->p;
-	for (auto m : candidate)
-	{
-		if (cv != m->vowel)
-		{
-			cv = (int)cv && (int)m->vowel ? KCondVowel::any : KCondVowel::none;
-		}
-		if (cp != m->polar) cp = KCondPolarity::none;
-		if (m->chunks && m->chunks->at(0)->tag == KPOSTag::V) hasFirstV = true;
-		//if (m->p > maxP) maxP = m->p;
-	}
-	vowel = cv;
-	polar = cp;
-	if (suffix.find(0) != suffix.end()) suffix = {};
-}
-
-void writeString(const k_string& str, FILE* f)
-{
-	size_t s = str.size();
-	fwrite(&s, 1, 4, f);
-	if (s) fwrite(&str[0], 1, s, f);
-}
-
-void readString(k_string& str, FILE* f)
-{
-	size_t s = 0;
-	fread(&s, 1, 4, f);
-	str.resize(s);
-	if (s) fread(&str[0], 1, s, f);
-}
-
-void KForm::readFromBin(FILE * f, const function<const KMorpheme*(size_t)>& mapper)
-{
-	readString(form, f);
-	wform = joinJamo(form);
-	size_t s = 0;
-	fread(&s, 1, 4, f);
-	candidate.resize(s);
+	form = readFromBinStream<k_string>(is);
+	candidate.resize(readFromBinStream<uint32_t>(is));
 	for (auto& c : candidate)
 	{
-		size_t cid = 0;
-		fread(&cid, 1, 4, f);
-		c = mapper(cid);
+		c = mapper(readFromBinStream<uint32_t>(is));
 	}
-	fread(&vowel, 1, 1, f);
-	fread(&polar, 1, 1, f);
-	fread(&hasFirstV, 1, 1, f);
 
-	fread(&s, 1, 4, f);
+	size_t s = readFromBinStream<uint32_t>(is);
 	for (size_t i = 0; i < s; i++)
 	{
-		char c;
-		fread(&c, 1, 1, f);
-		suffix.insert(c);
+		suffix.insert(readFromBinStream<char>(is));
 	}
 }
 
-void KForm::writeToBin(FILE * f, const function<size_t(const KMorpheme*)>& mapper) const
+void KForm::writeToBin(ostream& os, const function<size_t(const KMorpheme*)>& mapper) const
 {
-	writeString(form, f);
-	size_t s = candidate.size();
-	fwrite(&s, 1, 4, f);
+	writeToBinStream(os, form);
+	writeToBinStream<uint32_t>(os, candidate.size());
 	for (auto c : candidate)
 	{
-		size_t cid = mapper(c);
-		fwrite(&cid, 1, 4, f);
+		writeToBinStream<uint32_t>(os, mapper(c));
 	}
-	fwrite(&vowel, 1, 1, f);
-	fwrite(&polar, 1, 1, f);
-	fwrite(&hasFirstV, 1, 1, f);
 
-	s = suffix.size();
-	fwrite(&s, 1, 4, f);
+	writeToBinStream<uint32_t>(os, suffix.size());
 	for (auto c : suffix)
 	{
-		fwrite(&c, 1, 1, f);
+		writeToBinStream<char>(os, c);
 	}
 }
 
-void KMorpheme::readFromBin(FILE * f, const function<const KMorpheme*(size_t)>& mapper)
+void KMorpheme::readFromBin(istream& is, const function<const KMorpheme*(size_t)>& mapper)
 {
 	kform = nullptr;
-	fread(&kform, 1, 4, f);
-	fread(&tag, 1, 1, f);
-	fread(&vowel, 1, 1, f);
-	fread(&polar, 1, 1, f);
-	fread(&combineSocket, 1, 1, f);
-	fread(&p, 1, 4, f);
-	fread(&combined, 1, 4, f);
+	//fread(&kform, 1, 4, f);
+	readFromBinStream(is, tag);
+	readFromBinStream(is, vowel);
+	readFromBinStream(is, polar);
+	readFromBinStream(is, combineSocket);
+	readFromBinStream(is, p);
+	readFromBinStream(is, combined);
 
-	size_t s = 0;
-	fread(&s, 1, 4, f);
+	size_t s = readFromBinStream<uint32_t>(is);
 	if (s)
 	{
 		chunks = new vector<const KMorpheme*>(s);
 		for (auto& c : *chunks)
 		{
-			size_t cid = 0;
-			fread(&cid, 1, 4, f);
-			c = mapper(cid);
+			c = mapper(readFromBinStream<uint32_t>(is));
 		}
 	}
 }
 
-void KMorpheme::writeToBin(FILE * f, const function<size_t(const KMorpheme*)>& mapper) const
+void KMorpheme::writeToBin(ostream& os, const function<size_t(const KMorpheme*)>& mapper) const
 {
-	fwrite(&kform, 1, 4, f);
-	fwrite(&tag, 1, 1, f);
-	fwrite(&vowel, 1, 1, f);
-	fwrite(&polar, 1, 1, f);
-	fwrite(&combineSocket, 1, 1, f);
-	fwrite(&p, 1, 4, f);
-	fwrite(&combined, 1, 4, f);
+	//fwrite(&kform, 1, 4, f);
+	writeToBinStream(os, tag);
+	writeToBinStream(os, vowel);
+	writeToBinStream(os, polar);
+	writeToBinStream(os, combineSocket);
+	writeToBinStream(os, p);
+	writeToBinStream(os, combined);
 
-	size_t s = chunks ? chunks->size() : 0;
-	fwrite(&s, 1, 4, f);
+	writeToBinStream<uint32_t>(os, chunks ? chunks->size() : 0);
 	if(chunks) for (auto c : *chunks)
 	{
-		size_t cid = mapper(c);
-		fwrite(&cid, 1, 4, f);
+		writeToBinStream<uint32_t>(os, mapper(c));
 	}
 }
-
-#ifdef USE_DIST_MAP
-
-void KMorpheme::readDistMapFromBin(FILE * f)
-{
-	size_t s = 0;
-	fread(&s, 1, 4, f);
-	if (s)
-	{
-		distMap = new map<int, float>;
-		for (size_t i = 0; i < s; i++)
-		{
-			int id = 0;
-			float pmi = 0;
-			fread(&id, 1, 4, f);
-			fread(&pmi, 1, 4, f);
-			distMap->emplace(id, pmi);
-		}
-	}
-}
-
-void KMorpheme::writeDistMapToBin(FILE * f) const
-{
-	size_t s = distMap ? distMap->size() : 0;
-	fwrite(&s, 1, 4, f);
-	if (s)
-	{
-		for (auto& i : *distMap)
-		{
-			fwrite(&i.first, 1, 4, f);
-			fwrite(&i.second, 1, 4, f);
-		}
-	}
-}
-
-#endif

@@ -1,5 +1,8 @@
 #pragma once
 
+#include "BakedMap.hpp"
+#include "Trie.hpp"
+
 struct KForm;
 struct KMorpheme;
 struct KChunk
@@ -24,9 +27,9 @@ struct KChunk
 
 #ifdef CUSTOM_ALLOC
 #include "KMemoryKChunk.h"
-typedef vector<KChunk, pool_allocator<KChunk>> k_vchunk;
+typedef std::vector<KChunk, pool_allocator<KChunk>> k_vchunk;
 #else 
-typedef vector<KChunk> k_vchunk;
+typedef std::vector<KChunk> k_vchunk;
 #endif
 
 class KModelMgr;
@@ -35,9 +38,9 @@ struct KMorphemeNode
 {
 	const KMorpheme* morpheme;
 #ifdef CUSTOM_ALLOC
-	vector<KMorphemeNode*, pool_allocator<void*>> nexts;
+	std::vector<KMorphemeNode*, pool_allocator<void*>> nexts;
 #else
-	vector<KMorphemeNode*> nexts;
+	std::vector<KMorphemeNode*> nexts;
 #endif
 	k_vpcf* optimaCache = nullptr;
 	KMorphemeNode(const KMorpheme* _morpheme = nullptr) : morpheme(_morpheme) {}
@@ -47,46 +50,33 @@ struct KMorphemeNode
 	bool isAcceptableFinal() const { return nexts.size() == 1 && nexts[0] == nullptr; }
 };
 
-struct KTrie
+struct KGraphNode
 {
-#ifdef  _DEBUG
-	static int rootID;
-	int id;
-	char currentChar = 0;
-#endif //  _DEBUG
+	enum { MAX_NEXT = 16 };
+	const KForm* form = nullptr;
+	k_string uform;
+	uint16_t lastPos;
+	uint16_t nexts[MAX_NEXT] = { 0, };
 
-#ifdef TRIE_ALLOC_ARRAY
-	int next[51] = { 0, };
-	//int fail;
-	KTrie* fail = nullptr;
-#else
-	KTrie* next[51] = {nullptr,};
-	KTrie* fail = nullptr;
-#endif
-	const KForm* exit = nullptr;
-	KTrie();
-	~KTrie();
-#ifdef TRIE_ALLOC_ARRAY
-	void build(const char* str, const KForm* form, const function<KTrie*()>& alloc);
-#else
-	void build(const char* str, const KForm* form);
-#endif
-	KTrie* findFail(char i) const;
-	void fillFail();
-	KTrie* getNext(int i) const 
+	KGraphNode(const KForm* _form = nullptr, uint16_t _lastPos = 0) : form(_form), lastPos(_lastPos) {}
+	KGraphNode(const k_string& _uform, uint16_t _lastPos) : uform(_uform), lastPos(_lastPos) {}
+
+	KGraphNode* getNext(size_t idx) const { return nexts[idx] ? (KGraphNode*)this + nexts[idx] : nullptr; }
+	
+	void addNext(KGraphNode* next)
 	{
-#ifdef TRIE_ALLOC_ARRAY
-		return next[i] ? (KTrie*)this + next[i] : nullptr;
-#else
-		return next[i];
-#endif
+		size_t i = 0;
+		while(i < MAX_NEXT && nexts[i]) ++i;
+		nexts[i] = next - this;
 	}
-	KTrie* getFail() const
-	{
-		return fail;
-	}
-	const KForm* search(const char* begin, const char* end) const;
-	vector<pair<const KForm*, int>> searchAllPatterns(const k_string& str) const;
-	vector<k_vchunk> split(const k_string& str, bool hasPrefix = false) const;
-	KMorphemeNode* splitGM(const k_string & str, vector<KMorpheme>& tmpMorph, vector<KMorphemeNode>& ret, const KModelMgr * mdl, bool hasPrefix = false) const;
+};
+
+struct KTrie : public Trie<char16_t, const KForm*, std::map<char16_t, int32_t>>
+{
+	std::vector<KGraphNode> split(const k_string& str) const;
+	KTrie* getNext(char i) const { return (KTrie*)Trie::getNext(i); }
+	KTrie* getFail() const { return (KTrie*)Trie::getFail(); }
+
+	void saveToBin(std::ostream& str, const KForm* base) const;
+	static KTrie loadFromBin(std::istream& str, const KForm* base);
 };

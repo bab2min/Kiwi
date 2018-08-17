@@ -154,10 +154,10 @@ precondList = ['V', 'VA', 'VV', 'VX', 'NP', 'NNB']
 precond = {pos:[(i, pos) for i in rm.getPrecond(pos)] for pos in precondList}
 precond['V'] += [('ㅇㅣ', 'VCP'), (('ㅇㅣ', '+Vowel'), 'VCP'), ('ㅇㅏㄴㅣ', 'VCN')]
 #precond['VA'] += [('ㅇㅣㄹㅓㅎ', 'VA'), ('ㄱㅡㄹㅓㅎ', 'VA'), ('ㅈㅓㄹㅓㅎ', 'VA'), ('ㅇㅓㄸㅓㅎ', 'VA'), ('ㅈㅓㄸㅓㅎ', 'VA')]
-precond['XSV'] = [(utils.normalizeHangul(line.strip()), 'XSV') for line in open('XSV.txt', encoding='utf-8').readlines()]
-precond['XSA'] = [(utils.normalizeHangul(line.strip()), 'XSA') for line in open('XSA.txt', encoding='utf-8').readlines()]
-precond['VA'] = [(utils.normalizeHangul(line.strip()), 'VA') for line in open('VA.txt', encoding='utf-8').readlines()]
-precond['VX'] = [(utils.normalizeHangul(line.strip()), 'VX') for line in open('VX.txt', encoding='utf-8').readlines()]
+precond['XSV'] = [(utils.Hangul.normalizeHangul(line.strip()), 'XSV') for line in open('XSV.txt', encoding='utf-8').readlines()]
+precond['XSA'] = [(utils.Hangul.normalizeHangul(line.strip()), 'XSA') for line in open('XSA.txt', encoding='utf-8').readlines()]
+precond['VA'] = [(utils.Hangul.normalizeHangul(line.strip()), 'VA') for line in open('VA.txt', encoding='utf-8').readlines()]
+precond['VX'] = [(utils.Hangul.normalizeHangul(line.strip()), 'VX') for line in open('VX.txt', encoding='utf-8').readlines()]
 #print(precond['VV'])
 emptyPos = set()
 

@@ -147,6 +147,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BakedMap.hpp" />
     <ClInclude Include="KFeatureTestor.h" />
     <ClInclude Include="KForm.h" />
     <ClInclude Include="Kiwi.h" />
@@ -156,18 +157,20 @@
     <ClInclude Include="KMemoryChar.h" />
     <ClInclude Include="KMemoryKMorphemeNode.h" />
     <ClInclude Include="KModelMgr.h" />
+    <ClInclude Include="KNLangModel.h" />
     <ClInclude Include="KTrie.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="ThreadPool.h" />
+    <ClInclude Include="Trie.hpp" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="KFeatureTestor.cpp" />
     <ClCompile Include="KForm.cpp" />
     <ClCompile Include="Kiwi.cpp" />
-    <ClCompile Include="KMemory.cpp" />
     <ClCompile Include="KModelMgr.cpp" />
+    <ClCompile Include="KNLangModel.cpp" />
     <ClCompile Include="KTrie.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
