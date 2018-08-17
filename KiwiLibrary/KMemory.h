@@ -4,7 +4,7 @@ template<size_t objectSize, size_t poolSize, size_t type = 0>
 class KPool
 {
 public:
-	vector<void*> poolBuf;
+	std::vector<void*> poolBuf;
 	void** freeList;
 	static KPool& getInstance()
 	{
@@ -67,9 +67,9 @@ private:
 class KSingleLogger
 {
 public:
-	map<size_t, size_t> totalAlloc;
-	map<size_t, size_t> currentAlloc;
-	map<size_t, size_t> maxAlloc;
+	std::map<size_t, size_t> totalAlloc;
+	std::map<size_t, size_t> currentAlloc;
+	std::map<size_t, size_t> maxAlloc;
 	static KSingleLogger& getInstance()
 	{
 		thread_local KSingleLogger inst;
@@ -83,7 +83,7 @@ private:
 };
 
 template <typename T>
-class logger_allocator : public allocator<T>
+class logger_allocator : public std::allocator<T>
 {
 public:
 	typedef size_t size_type;
@@ -122,7 +122,7 @@ public:
 };
 
 template <typename T>
-class pool_allocator : public allocator<T>
+class pool_allocator : public std::allocator<T>
 {
 public:
 	typedef size_t size_type;
@@ -153,7 +153,7 @@ public:
 };
 
 template <>
-class pool_allocator<void*> : public allocator<void*>
+class pool_allocator<void*> : public std::allocator<void*>
 {
 public:
 	typedef size_t size_type;
@@ -195,7 +195,7 @@ public:
 
 
 template<typename T>
-class spool_allocator : public allocator<T>
+class spool_allocator : public std::allocator<T>
 {
 public:
 	typedef size_t size_type;

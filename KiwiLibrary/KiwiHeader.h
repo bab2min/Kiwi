@@ -28,8 +28,6 @@
 #include <mutex>
 #include <thread>
 
-using namespace std;
-
 #define TRIE_ALLOC_ARRAY
 #define DIVIDE_BOUND 6
 #define MIN_CANDIDATE 5
@@ -40,11 +38,11 @@ using namespace std;
 
 #ifdef _WIN32
 typedef wchar_t k_wchar;
-typedef wstring k_wstring;
+typedef std::wstring k_wstring;
 #define KSTR(x) L##x
 #else
 typedef char16_t k_wchar;
-typedef u16string k_wstring;
+typedef std::u16string k_wstring;
 #define KSTR(x) u##x
 inline int fopen_s(FILE** f, const char* p, const char* m)
 {
@@ -56,7 +54,7 @@ inline int fopen_s(FILE** f, const char* p, const char* m)
 #include "KMemory.h"
 
 #ifdef CUSTOM_ALLOC
-typedef basic_string<char, char_traits<char>, spool_allocator<char>> k_string;
+typedef std::basic_string<char16_t, std::char_traits<char16_t>, spool_allocator<char16_t>> k_string;
 #ifdef _WIN32
 #else
 namespace std
@@ -71,13 +69,13 @@ namespace std
 	};
 }
 #endif
-typedef basic_stringstream<char, char_traits<char>, spool_allocator<char>> k_stringstream;
-typedef vector<char, pool_allocator<char>> k_vchar;
-typedef vector<pair<k_vchar, float>, pool_allocator<pair<k_vchar, float>>> k_vpcf;
+typedef std::basic_stringstream<char16_t, std::char_traits<char16_t>, spool_allocator<char16_t>> k_stringstream;
+typedef std::vector<char16_t, pool_allocator<char16_t>> k_vchar;
+typedef std::vector<std::pair<k_vchar, float>, pool_allocator<std::pair<k_vchar, float>>> k_vpcf;
 #include "KMemoryChar.h"
 #else
-typedef string k_string;
-typedef stringstream k_stringstream;
-typedef vector<char> k_vchar;
-typedef vector<pair<k_vchar, float>> k_vpcf;
+typedef std::string k_string;
+typedef std::stringstream k_stringstream;
+typedef std::vector<char> k_vchar;
+typedef std::vector<pair<k_vchar, float>> k_vpcf;
 #endif

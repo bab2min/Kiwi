@@ -1,6 +1,6 @@
 #pragma once
 template <>
-class pool_allocator<KMorphemeNode> : public allocator<KMorphemeNode>
+class pool_allocator<KMorphemeNode> : public std::allocator<KMorphemeNode>
 {
 public:
 	typedef size_t size_type;

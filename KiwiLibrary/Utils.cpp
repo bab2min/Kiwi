@@ -3,6 +3,19 @@
 #include "KForm.h"
 #include "Utils.h"
 
+k_string splitCoda(k_wstring hangul)
+{
+	k_string ret;
+	for (auto c : hangul)
+	{
+		assert(0xAC00 <= c && c < 0xD7A4);
+		int coda = (c - 0xAC00) % 28;
+		ret.push_back(c - coda);
+		if (coda) ret.push_back(coda + 0x11A7);
+	}
+	return ret;
+}
+
 void splitJamo(k_wchar c, k_string& ret)
 {
 	static char choTable[] = { 1, 2, 4, 7, 8, 9, 17, 18, 19, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30 };

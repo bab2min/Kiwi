@@ -281,3 +281,13 @@ ModelManifest.xml
 /KiwiGui/KiwiGui.exe
 /KiwiGui/bin_x86
 /KiwiGui/bin_x64
+/ModelGenerator/fullmodel3.txt
+/ModelGenerator/fullmodelNew.txt
+/ModelGenerator/fullmodel_.txt
+/ModelGenerator/ML_namu.txt
+/ModelGenerator/ML_namu_.txt
+/ModelGenerator/ML_namu_r.txt
+/ModelGenerator/mg2.py
+/ModelGenerator/namuWikiParser.py
+/ModelGenerator/OKModel.txt
+/ModelGenerator/unk.xlsx

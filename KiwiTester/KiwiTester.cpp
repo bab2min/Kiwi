@@ -8,21 +8,23 @@
 class Timer
 {
 public:
-	chrono::steady_clock::time_point point;
+	std::chrono::steady_clock::time_point point;
 	Timer()
 	{
 		reset();
 	}
 	void reset()
 	{
-		point = chrono::high_resolution_clock::now();
+		point = std::chrono::high_resolution_clock::now();
 	}
 
 	double getElapsed() const
 	{
-		return chrono::duration <double, milli>(chrono::high_resolution_clock::now() - point).count();
+		return std::chrono::duration <double, std::milli>(std::chrono::high_resolution_clock::now() - point).count();
 	}
 };
+
+using namespace std;
 
 #include "windows.h"
 #include "psapi.h"

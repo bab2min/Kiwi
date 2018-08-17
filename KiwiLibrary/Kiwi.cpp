@@ -4,6 +4,8 @@
 #include "KFeatureTestor.h"
 #include "KModelMgr.h"
 
+using namespace std;
+
 KPOSTag Kiwi::identifySpecialChr(k_wchar chr)
 {
 	switch (chr)
@@ -714,6 +716,8 @@ vector<KInterResult> Kiwi::analyzeJM(const k_string & jm, size_t topN, KPOSTag p
 	vector<KInterResult> ret;
 	vector<KMorpheme> tmpMorph;
 	thread_local vector<KMorphemeNode> nodePool;
+	auto tData = kt->split(jm);
+	printf("%zd", tData.size());
 	auto graph = kt->splitGM(jm, tmpMorph, nodePool, mdl.get(), prefix != KPOSTag::UNKNOWN);
 	const k_vpcf* paths;
 	if (graph && (paths = getOptimalPath(graph, topN, prefix, suffix)))

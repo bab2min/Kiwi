@@ -1,6 +1,6 @@
 0.830525
-Total (4533) Time : 3433.47 ms
-Time per Unit : 0.757438 ms
+Total (4533) Time : 5476.12 ms
+Time per Unit : 1.20806 ms
 
 그럭저럭 꽤 많은 날들이 흘렀다.	0.692
 들/XSN	이/JKS	

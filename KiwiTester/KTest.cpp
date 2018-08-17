@@ -5,6 +5,8 @@
 #include "../KiwiLibrary/Utils.h"
 #include "LCS.hpp"
 
+using namespace std;
+
 KWordPair parseWordPOS(k_wstring str)
 {
 	if (str[0] == '/' && str[1] == '/')

@@ -60,6 +60,15 @@
     <ClInclude Include="ThreadPool.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="KNLangModel.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="BakedMap.hpp">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Trie.hpp">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -83,7 +92,7 @@
     <ClCompile Include="Kiwi.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="KMemory.cpp">
+    <ClCompile Include="KNLangModel.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

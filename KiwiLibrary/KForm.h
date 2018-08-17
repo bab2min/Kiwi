@@ -54,7 +54,7 @@ struct KMorpheme
 	size_t id;
 	string form;
 #endif
-	KMorpheme(const k_string& _form = "", 
+	KMorpheme(const k_string& _form = {},
 		KPOSTag _tag = KPOSTag::UNKNOWN, 
 		KCondVowel _vowel = KCondVowel::none,
 		KCondPolarity _polar = KCondPolarity::none, 
@@ -81,16 +81,10 @@ struct KMorpheme
 		p = m.p;
 		swap(chunks, m.chunks);
 		combined = m.combined;
-#ifdef USE_DIST_MAP
-		swap(distMap, m.distMap);
-#endif
 	}
 
 	~KMorpheme() 
 	{ 
-#ifdef USE_DIST_MAP
-		if (distMap) delete distMap;
-#endif
 		if (chunks) delete chunks;
 	}
 	const k_string& getForm() const { return *kform; }
@@ -101,45 +95,23 @@ struct KMorpheme
 	KCondPolarity polar = KCondPolarity::none;
 	char combineSocket = 0;
 	float p = 0;
-	vector<const KMorpheme*>* chunks = nullptr;
-	int combined = 0;
+	std::vector<const KMorpheme*>* chunks = nullptr;
+	int32_t combined = 0;
 	const KMorpheme* getCombined() const { return this + combined; }
-#ifdef USE_DIST_MAP
-	map<int, float>* distMap = nullptr;
-	void addToDistMap(const KMorpheme* t, float v)
-	{
-		if (!distMap) distMap = new map<int, float>{};
-		distMap->emplace((int)(t - this), v);
-	}
-	float getDistMap(const KMorpheme* t) const 
-	{
-		//if (!distMap) return 0;
-		auto it = distMap->find((int)(t - this));
-		if (it != distMap->end()) return it->second;
-		else return 0;
-	}
-	void readDistMapFromBin(FILE* f);
-	void writeDistMapToBin(FILE* f) const;
-#endif
-	void readFromBin(FILE* f, const function<const KMorpheme*(size_t)>& mapper);
-	void writeToBin(FILE* f, const function<size_t(const KMorpheme*)>& mapper) const;
+	void readFromBin(std::istream& is, const std::function<const KMorpheme*(size_t)>& mapper);
+	void writeToBin(std::ostream& os, const std::function<size_t(const KMorpheme*)>& mapper) const;
 };
 
 struct KForm
 {
 	k_string form;
 	k_wstring wform;
-	vector<const KMorpheme*> candidate;
-	KCondVowel vowel = KCondVowel::none;
-	KCondPolarity polar = KCondPolarity::none;
-	bool hasFirstV = false;
-	//float maxP = 0;
-	unordered_set<char> suffix;
-	KForm(const char* _form = nullptr);
+	std::vector<const KMorpheme*> candidate;
+	std::unordered_set<char> suffix;
+	KForm(const char16_t* _form = nullptr);
 	KForm(const k_string& _form) : form(_form) {}
-	void updateCond();
 
-	void readFromBin(FILE* f, const function<const KMorpheme*(size_t)>& mapper);
-	void writeToBin(FILE* f, const function<size_t(const KMorpheme*)>& mapper) const;
+	void readFromBin(std::istream& is, const std::function<const KMorpheme*(size_t)>& mapper);
+	void writeToBin(std::ostream& os, const std::function<size_t(const KMorpheme*)>& mapper) const;
 };
 

@@ -16,6 +16,8 @@ namespace std
 	};
 }
 
+using namespace std;
+
 void KModelMgr::loadPOSFromTxt(const char * filename)
 {
 #ifdef LOAD_TXT
