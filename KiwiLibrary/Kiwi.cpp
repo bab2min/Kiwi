@@ -5,7 +5,7 @@
 #include "KModelMgr.h"
 
 using namespace std;
-
+/*
 KPOSTag Kiwi::identifySpecialChr(k_wchar chr)
 {
 	switch (chr)
@@ -455,38 +455,6 @@ vector<const KChunk*> Kiwi::divideChunk(const k_vchunk& ch)
 	return ret;
 }
 
-/*void printMorph(const KMorpheme* morph)
-{
-	if (morph->chunks)
-	{
-		for (auto m : *morph->chunks)
-		{
-			if (m->tag == KPOSTag::V) continue;
-			fputws(joinJamo(m->getForm()).c_str(), stdout);
-			printf("/%s\t", tagToString(m->tag));
-		}
-	}
-	else
-	{
-		fputws(joinJamo(morph->getForm()).c_str(), stdout);
-		printf("/%s\t", tagToString(morph->tag));
-	}
-}
-
-inline void debugNodes(KMorphemeNode* node, const pair<vector<char>, float>& path)
-{
-	printf("%.3g\t", path.second);
-	if (node->morpheme)
-	{
-		printMorph(node->morpheme);
-	}
-	for (auto c : path.first)
-	{
-		node = node->nexts[c];
-		printMorph(node->morpheme);
-	}
-	puts("\n");
-}*/
 
 const k_vpcf* Kiwi::getOptimalPath(KMorphemeNode* node, size_t topN, KPOSTag prefix, KPOSTag suffix) const
 {
@@ -512,10 +480,10 @@ const k_vpcf* Kiwi::getOptimalPath(KMorphemeNode* node, size_t topN, KPOSTag pre
 		const k_vpcf* paths;
 		if (node->morpheme)
 		{
-			/*if (node->morpheme->tag == KPOSTag::UNKNOWN)
-			{
-				((KMorpheme*)node->morpheme)->tag = KPOSTag::NNP;
-			}*/
+			//if (node->morpheme->tag == KPOSTag::UNKNOWN)
+			//{
+			//	((KMorpheme*)node->morpheme)->tag = KPOSTag::NNP;
+			//}
 			tp = mdl->getTransitionP(node->morpheme, next->morpheme);
 			tp += node->morpheme->p;
 		}
@@ -547,10 +515,6 @@ const k_vpcf* Kiwi::getOptimalPath(KMorphemeNode* node, size_t topN, KPOSTag pre
 		return a.second > b.second;
 	});
 	if (node->optimaCache->size() > topN) node->optimaCache->erase(node->optimaCache->begin() + topN, node->optimaCache->end());
-	/*for (auto& p : *node->optimaCache)
-	{
-		debugNodes(node, p);
-	}*/
 	return node->optimaCache;
 }
 
@@ -767,3 +731,4 @@ vector<KInterResult>* Kiwi::findCache(const string & jm) const
 	}
 	return &cit->second;
 }
+*/

@@ -19,6 +19,7 @@
 #include <string>
 #include <sstream>
 #include <iostream>
+#include <fstream>
 
 #include <memory>
 #include <locale>
@@ -34,12 +35,11 @@
 #define USE_DIST_MAP
 #define PMI_WEIGHT 1.7f
 //#define LOAD_TXT
-#define CUSTOM_ALLOC
+//#define CUSTOM_ALLOC
 
 #ifdef _WIN32
-typedef wchar_t k_wchar;
-typedef std::wstring k_wstring;
-#define KSTR(x) L##x
+typedef char16_t k_char;
+#define KSTR(x) u##x
 #else
 typedef char16_t k_wchar;
 typedef std::u16string k_wstring;
@@ -54,7 +54,7 @@ inline int fopen_s(FILE** f, const char* p, const char* m)
 #include "KMemory.h"
 
 #ifdef CUSTOM_ALLOC
-typedef std::basic_string<char16_t, std::char_traits<char16_t>, spool_allocator<char16_t>> k_string;
+typedef std::basic_string<k_char, std::char_traits<k_char>, spool_allocator<k_char>> k_string;
 #ifdef _WIN32
 #else
 namespace std
@@ -69,13 +69,13 @@ namespace std
 	};
 }
 #endif
-typedef std::basic_stringstream<char16_t, std::char_traits<char16_t>, spool_allocator<char16_t>> k_stringstream;
-typedef std::vector<char16_t, pool_allocator<char16_t>> k_vchar;
+typedef std::basic_stringstream<k_char, std::char_traits<k_char>, spool_allocator<k_char>> k_stringstream;
+typedef std::vector<k_char, pool_allocator<k_char>> k_vchar;
 typedef std::vector<std::pair<k_vchar, float>, pool_allocator<std::pair<k_vchar, float>>> k_vpcf;
 #include "KMemoryChar.h"
 #else
-typedef std::string k_string;
-typedef std::stringstream k_stringstream;
-typedef std::vector<char> k_vchar;
-typedef std::vector<pair<k_vchar, float>> k_vpcf;
+typedef std::basic_string<k_char> k_string;
+typedef std::basic_stringstream<k_char> k_stringstream;
+typedef std::vector<k_char> k_vchar;
+typedef std::vector<std::pair<k_vchar, float>> k_vpcf;
 #endif

@@ -1,108 +1,147 @@
 #pragma once
 
+#include "KForm.h"
 #define LEN_ARRAY(p) (sizeof(p)/sizeof(p[0]))
 
 struct KChunk;
 
-k_string splitCoda(k_wstring hangul);
-//k_string splitJamo(k_wstring hangul);
-//k_wstring joinJamo(k_string jm);
-bool verifyHangul(k_wstring hangul);
-//void splitJamo(k_wchar hangul, k_string& ret);
-void printJM(const char* c, size_t len = -1);
-void printJM(const k_string& c);
-void printJM(const KChunk& c, const char* p);
+k_string normalizeHangul(k_string hangul);
+k_string joinHangul(k_string hangul);
 
-template<typename Iter>
-k_string encodeJamo(Iter begin, Iter end) {
-	k_string ret;
-	for (; begin != end; ++begin)
-	{
-		assert(*begin > 0x3130 && *begin <= 0x3130 + 51);
-		ret.push_back(*begin - 0x3130);
-	}
-	return ret;
-}
-
-template<typename Out>
-void split(const k_wstring &s, k_wchar delim, Out result) {
-	std::basic_stringstream<k_wchar> ss;
+template<class BaseChr, class OutIterator>
+void split(const std::basic_string<BaseChr>& s, BaseChr delim, OutIterator result) {
+	std::basic_stringstream<BaseChr> ss;
 	ss.str(s);
-	k_wstring item;
+	std::basic_string<BaseChr> item;
 	while (std::getline(ss, item, delim)) {
 		*(result++) = item;
 	}
 }
 
-inline std::vector<k_wstring> split(const k_wstring &s, k_wchar delim) {
-	std::vector<k_wstring> elems;
-	split(s, delim, std::back_inserter(elems));
-	return elems;
-}
-
-
-template<typename Out>
-void split(const k_string &s, char delim, Out result) {
-	k_stringstream ss;
-	ss.str(s);
-	k_string item;
-	while (std::getline(ss, item, delim)) {
-		*(result++) = item;
-	}
-}
-
-inline std::vector<k_string> split(const k_string &s, char delim) {
-	std::vector<k_string> elems;
+template<class BaseChr>
+inline std::vector<std::basic_string<BaseChr>> split(const std::basic_string<BaseChr>&s, BaseChr delim) {
+	std::vector<std::basic_string<BaseChr>> elems;
 	split(s, delim, std::back_inserter(elems));
 	return elems;
 }
 
 template<class _Ty>
-void writeToBinStream(std::ostream& os, const _Ty& v)
+inline void writeToBinStream(std::ostream& os, const _Ty& v)
 {
-	os.write((const char*)&v, sizeof(_Ty));
+	if (!os.write((const char*)&v, sizeof(_Ty))) throw std::ios_base::failure(std::string{ "writing type '" } + typeid(_Ty).name() + "' failed");
 }
 
 template<class _Ty>
-_Ty readFromBinStream(std::istream& is)
+inline _Ty readFromBinStream(std::istream& is)
 {
 	_Ty v;
-	is.read((char*)&v, sizeof(_Ty));
+	if (!is.read((char*)&v, sizeof(_Ty))) throw std::ios_base::failure(std::string{ "reading type '" } +typeid(_Ty).name() + "' failed");
 	return v;
 }
 
 template<class _Ty>
-void readFromBinStream(std::istream& is, _Ty& v)
+inline void readFromBinStream(std::istream& is, _Ty& v)
 {
-	is.read((char*)&v, sizeof(_Ty));
+	if (!is.read((char*)&v, sizeof(_Ty))) throw std::ios_base::failure(std::string{ "reading type '" } +typeid(_Ty).name() + "' failed");
 }
 
 template<class _Ty1, class _Ty2>
-void writeToBinStream(std::ostream& os, const std::pair<_Ty1, _Ty2>& v)
+inline void writeToBinStream(std::ostream& os, const std::pair<_Ty1, _Ty2>& v)
 {
 	writeToBinStream(os, v.first);
 	writeToBinStream(os, v.second);
 }
 
 template<class _Ty1, class _Ty2>
-std::pair<_Ty1, _Ty2> readFromBinStream(std::istream& is)
+inline std::pair<_Ty1, _Ty2> readFromBinStream(std::istream& is)
 {
 	return std::make_pair(readFromBinStream<_Ty1>(is), readFromBinStream<_Ty2>(is));
 }
 
 
 template<>
-void writeToBinStream<k_string>(std::ostream& os, const k_string& v)
+inline void writeToBinStream<k_string>(std::ostream& os, const k_string& v)
 {
 	writeToBinStream<uint32_t>(os, v.size());
-	os.write((const char*)&v[0], v.size() * sizeof(k_string::value_type));
+	if(!os.write((const char*)&v[0], v.size() * sizeof(k_string::value_type))) throw std::ios_base::failure(std::string{ "writing type '" } +typeid(k_string).name() + "' failed");
 }
 
 template<>
-k_string readFromBinStream<k_string>(std::istream& is)
+inline k_string readFromBinStream<k_string>(std::istream& is)
 {
 	k_string v; 
 	v.resize(readFromBinStream<uint32_t>(is));
-	is.read((char*)&v[0], v.size() * sizeof(k_string::value_type));
+	if (!is.read((char*)&v[0], v.size() * sizeof(k_string::value_type))) throw std::ios_base::failure(std::string{ "reading type '" } +typeid(k_string).name() + "' failed");
 	return v;
 }
+
+template<class ChrIterator>
+inline float stof(ChrIterator begin, ChrIterator end)
+{
+	if (begin == end) return 0;
+	bool sign = false;
+	switch (*begin)
+	{
+	case '-': 
+		sign = false;
+	case '+':
+		++begin;
+		break;
+	}
+	double up = 0, down = 0;
+	for (; begin != end; ++begin)
+	{
+		if ('0' <= *begin && *begin <= '9') up = up * 10 + (*begin - '0');
+		else break;
+	}
+	if (begin != end && *begin == '.')
+	{
+		++begin;
+		int cnt = 0;
+		for (; begin != end; ++begin)
+		{
+			if ('0' <= *begin && *begin <= '9')
+			{
+				down = down * 10 + (*begin - '0');
+				++cnt;
+			}
+			else break;
+		}
+		up += down * pow(10, -cnt);
+	}
+	return up * (sign ? -1 : 1);
+}
+
+#if _MSC_VER >= 1900
+
+inline std::u16string utf8_to_utf16(std::string utf8_string)
+{
+	std::wstring_convert<std::codecvt_utf8_utf16<int16_t>, int16_t> convert;
+	auto p = convert.from_bytes(utf8_string);
+	return { p.begin(), p.end() };
+}
+inline std::string utf16_to_utf8(std::u16string utf16_string)
+{
+	std::wstring_convert<std::codecvt_utf8_utf16<int16_t>, int16_t> convert;
+	auto p = reinterpret_cast<const int16_t *>(utf16_string.data());
+	return convert.to_bytes(p, p + utf16_string.size());
+}
+#else
+inline std::u16string utf8_to_utf16(std::string utf18_string)
+{
+	std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
+	return convert.from_bytes(utf16_string);
+}
+inline std::string utf16_to_utf8(std::u16string utf16_string)
+{
+	std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
+	return convert.to_bytes(utf16_string);
+}
+#endif
+
+inline std::ostream& operator <<(std::ostream& os, const k_string& str)
+{
+	return os << utf16_to_utf8(str);
+}
+
+KPOSTag identifySpecialChr(k_char chr);

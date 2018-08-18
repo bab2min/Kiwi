@@ -291,3 +291,11 @@ ModelManifest.xml
 /ModelGenerator/namuWikiParser.py
 /ModelGenerator/OKModel.txt
 /ModelGenerator/unk.xlsx
+/ModelGenerator/vEndsU.txt
+/ModelGenerator/precombinedV2.txt
+/ModelGenerator/morpheme.bin
+/ModelGenerator/langMdl.bin
+/ModelGenerator/fullmodelV2.txt
+/ModelGenerator/fullmodelCnt.txt
+/ModelGenerator/combineRuleV2.txt
+/ModelGenerator/combinedV2.txt

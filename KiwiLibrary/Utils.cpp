@@ -3,155 +3,124 @@
 #include "KForm.h"
 #include "Utils.h"
 
-k_string splitCoda(k_wstring hangul)
+k_string normalizeHangul(k_string hangul)
 {
 	k_string ret;
+	ret.reserve(hangul.size() * 1.5);
 	for (auto c : hangul)
 	{
-		assert(0xAC00 <= c && c < 0xD7A4);
-		int coda = (c - 0xAC00) % 28;
-		ret.push_back(c - coda);
-		if (coda) ret.push_back(coda + 0x11A7);
-	}
-	return ret;
-}
-
-void splitJamo(k_wchar c, k_string& ret)
-{
-	static char choTable[] = { 1, 2, 4, 7, 8, 9, 17, 18, 19, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30 };
-	static char jongTable[] = { 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 20, 21, 22, 23, 24, 26, 27, 28, 29, 30 };
-	auto t = c - 0xAC00;
-	int jong = t % 28;
-	int jung = (t / 28) % 21;
-	int cho = (t / 28 / 21);
-	ret.push_back(choTable[cho]);
-	ret.push_back(jung + 31);
-	if (jong) ret.push_back(jongTable[jong - 1]);
-}
-
-
-k_string splitJamo(k_wstring hangul)
-{
-	k_string ret;
-	for (auto c : hangul)
-	{
-		assert(0xac00 <= c && c < 0xd7a4);
-		splitJamo(c, ret);
-	}
-	return ret;
-}
-
-bool verifyHangul(k_wstring hangul)
-{
-	for (auto c : hangul)
-	{
-		if (!(0xac00 <= c && c < 0xd7a4)) return false;
-	}
-	return true;
-}
-
-k_wstring joinJamo(k_string jm)
-{
-	static char choInvTable[] = { -1, 0, 1, -1, 2, -1, -1, 3, 4, 5, -1, -1, -1, -1, -1, -1, -1, 6, 7, 8, -1, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18};
-	static char jongInvTable[] = { 0, 1, 2, 3, 4, 5, 6, 7, -1, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, -1, 18, 19, 20, 21, 22, -1, 23, 24, 25, 26, 27};
-	k_wstring ret;
-	char cho = 0, jung = 0, jong = 0;
-	auto flush = [&]()
-	{
-		if (!cho && jung)
+		if (0xAC00 <= c && c < 0xD7A4)
 		{
-			ret.push_back(0x3130 + jung);
-			jung = 0;
-			return;
-		}
-		if (!jung && cho)
-		{
-			ret.push_back(0x3130 + cho);
-			cho = 0;
-			return;
-		}
-
-		k_wchar hangul = (choInvTable[cho] * 21 + (jung-31)) * 28 + jongInvTable[jong] + 0xAC00;
-		ret.push_back(hangul);
-		cho = jung = jong = 0;
-	};
-
-	for (auto c : jm)
-	{
-		if (c <= 30)
-		{
-			if (!cho)
-			{
-				cho = c;
-			}
-			else if (!jung || jongInvTable[c] < 0)
-			{
-				flush();
-				cho = c;
-			}
-			else  if(!jong)
-			{
-				jong = c;
-			}
-			else
-			{
-				flush();
-				cho = c;
-			}
+			int coda = (c - 0xAC00) % 28;
+			ret.push_back(c - coda);
+			if (coda) ret.push_back(coda + 0x11A7);
 		}
 		else
 		{
-			if (!cho)
-			{
-				jung = c;
-				flush();
-			}
-			else if (!jung)
-			{
-				jung = c;
-			}
-			else if (!jong)
-			{
-				flush();
-				jung = c;
-			}
-			else if(choInvTable[jong] >= 0)
-			{
-				auto t = jong;
-				jong = 0;
-				flush();
-				cho = t;
-				jung = c;
-			}
-			else
-			{
-				flush();
-				jung = c;
-				flush();
-			}
+			ret.push_back(c);
 		}
 	}
-	flush();
 	return ret;
 }
 
-void printJM(const char* c, size_t len)
+k_string joinHangul(k_string hangul)
 {
-	auto e = c + len;
-	for (; *c && c < e; c++)
+	k_string ret;
+	ret.reserve(hangul.size());
+	for (auto c : hangul)
 	{
-		wprintf(L"%c", *c + 0x3130);
+		if (0x11A8 <= c && c < (0x11A7 + 28) && 0xAC00 <= ret.back() && ret.back() < 0xD7A4)
+		{
+			if ((ret.back() - 0xAC00) % 28) ret.push_back(c);
+			else ret.back() += c - 0x11A7;
+		}
+		else
+		{
+			ret.push_back(c);
+		}
 	}
+	return ret;
 }
 
-void printJM(const k_string& c)
+KPOSTag identifySpecialChr(k_char chr)
 {
-	if (c.empty()) return;
-	return printJM(&c[0], c.size());
-}
-
-void printJM(const KChunk& c, const char* p)
-{
-	if (c.isStr()) return printJM(p + c.begin, c.end - c.begin);
-	return printf("*"), printJM(c.form->form);
+	switch (chr)
+	{
+	case ' ':
+	case '\t':
+	case '\r':
+	case '\n':
+	case '\v':
+	case '\f':
+		return KPOSTag::UNKNOWN;
+	}
+	if (iswdigit(chr)) return KPOSTag::SN;
+	if (('A' <= chr && chr <= 'Z') ||
+		('a' <= chr && chr <= 'z'))  return KPOSTag::SL;
+	if (0xAC00 <= chr && chr < 0xD7A4) return KPOSTag::MAX;
+	if (0x11A8 <= chr && chr < 0x11A7 + 28) return KPOSTag::MAX;
+	switch (chr)
+	{
+	case '.':
+	case '!':
+	case '?':
+		return KPOSTag::SF;
+	case '-':
+	case '~':
+	case 0x223c:
+		return KPOSTag::SO;
+	case 0x2026:
+		return KPOSTag::SE;
+	case ',':
+	case ';':
+	case ':':
+	case '/':
+	case 0xb7:
+		return KPOSTag::SP;
+	case '"':
+	case '\'':
+	case '(':
+	case ')':
+	case '<':
+	case '>':
+	case '[':
+	case ']':
+	case '{':
+	case '}':
+	case 0xad:
+	case 0x2015:
+	case 0x2018:
+	case 0x2019:
+	case 0x201c:
+	case 0x201d:
+	case 0x226a:
+	case 0x226b:
+	case 0x2500:
+	case 0x3008:
+	case 0x3009:
+	case 0x300a:
+	case 0x300b:
+	case 0x300c:
+	case 0x300d:
+	case 0x300e:
+	case 0x300f:
+	case 0x3010:
+	case 0x3011:
+	case 0x3014:
+	case 0x3015:
+	case 0xff0d:
+		return KPOSTag::SS;
+	}
+	if ((0x2e80 <= chr && chr <= 0x2e99) ||
+		(0x2e9b <= chr && chr <= 0x2ef3) ||
+		(0x2f00 <= chr && chr <= 0x2fd5) ||
+		(0x3005 <= chr && chr <= 0x3007) ||
+		(0x3021 <= chr && chr <= 0x3029) ||
+		(0x3038 <= chr && chr <= 0x303b) ||
+		(0x3400 <= chr && chr <= 0x4db5) ||
+		(0x4e00 <= chr && chr <= 0x9fcc) ||
+		(0xf900 <= chr && chr <= 0xfa6d) ||
+		(0xfa70 <= chr && chr <= 0xfad9)) return KPOSTag::SH;
+	if (0xd800 <= chr && chr <= 0xdfff) return KPOSTag::SH;
+	return KPOSTag::SW;
 }

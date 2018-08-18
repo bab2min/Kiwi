@@ -1,5 +1,6 @@
 #pragma once
 
+#include "KNLangModel.h"
 struct KTrie;
 
 class KModelMgr
@@ -15,22 +16,14 @@ protected:
 #else
 	shared_ptr<KTrie> trieRoot;
 #endif
-	KPOSTag maxiumBtwn[(size_t)KPOSTag::MAX][(size_t)KPOSTag::MAX];
-	KPOSTag maxiumVBtwn[(size_t)KPOSTag::MAX][(size_t)KPOSTag::MAX];
-	float posTransition[(size_t)KPOSTag::MAX][(size_t)KPOSTag::MAX];
-	void loadPOSFromTxt(const char* filename);
-	void savePOSBin(const char* filename) const;
-	void loadPOSBin(const char* filename);
-	void loadMMFromTxt(const char * filename, std::unordered_map<std::pair<k_string, KPOSTag>, size_t>& morphMap);
-	void loadCMFromTxt(const char * filename, std::unordered_map<std::pair<k_string, KPOSTag>, size_t>& morphMap);
-	void loadPCMFromTxt(const char * filename, std::unordered_map<std::pair<k_string, KPOSTag>, size_t>& morphMap);
-	void saveMorphBin(const char* filename) const;
-	void loadMorphBin(const char* filename);
-#ifdef USE_DIST_MAP
-	void loadDMFromTxt(const char* filename);
-	void saveDMBin(const char* filename) const;
-	void loadDMBin(const char* filename);
-#endif
+	typedef std::unordered_map<std::pair<k_string, KPOSTag>, size_t> morphemeMap;
+	KNLangModel langMdl;
+	void loadMMFromTxt(std::istream& is, morphemeMap& morphMap);
+	void loadCMFromTxt(std::istream& is, morphemeMap& morphMap);
+	void loadPCMFromTxt(std::istream& is, morphemeMap& morphMap);
+	void loadCorpusFromTxt(std::istream& is, morphemeMap& morphMap);
+	void saveMorphBin(std::ostream& os) const;
+	void loadMorphBin(std::istream& is);
 	KForm& formMapper(k_string form);
 public:
 	KModelMgr(const char* modelPath = "");
@@ -42,8 +35,5 @@ public:
 #else
 	const KTrie* getTrie() const { return trieRoot.get(); }
 #endif
-	float getTransitionP(const KMorpheme* a, const KMorpheme* b) const;
-	float getTransitionP(KPOSTag a, KPOSTag b) const;
-	KPOSTag findMaxiumTag(const KMorpheme* a, const KMorpheme* c) const;
 };
 

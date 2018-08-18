@@ -2,7 +2,7 @@
 
 #define P_MIN -40.f
 
-enum class KPOSTag : char
+enum class KPOSTag : uint8_t
 {
 	UNKNOWN,
 	NNG, NNP, NNB, 
@@ -15,7 +15,6 @@ enum class KPOSTag : char
 	XPN, XSN, XSV, XSA, XR,
 	VCP, VCN,
 	SF, SP, SS, SE, SO, SW,
-	NF, NV, NA,
 	SL, SH, SN,
 	JKS, JKC, JKG, JKO, JKB, JKV, JKQ, JX, JC,
 	EP, EF, EC, ETN, ETM,
@@ -23,7 +22,7 @@ enum class KPOSTag : char
 	MAX,
 };
 
-enum class KCondVowel : char
+enum class KCondVowel : uint8_t
 {
 	none,
 	any,
@@ -42,9 +41,9 @@ enum class KCondPolarity : char
 	negative
 };
 
-KPOSTag makePOSTag(k_wstring tagStr);
+KPOSTag makePOSTag(k_string tagStr);
 const char* tagToString(KPOSTag t);
-const wchar_t* tagToStringW(KPOSTag t);
+const k_char* tagToStringW(KPOSTag t);
 struct KForm;
 
 struct KMorpheme
@@ -52,16 +51,15 @@ struct KMorpheme
 #ifdef _DEBUG
 	static size_t uid;
 	size_t id;
-	string form;
 #endif
 	KMorpheme(const k_string& _form = {},
 		KPOSTag _tag = KPOSTag::UNKNOWN, 
 		KCondVowel _vowel = KCondVowel::none,
 		KCondPolarity _polar = KCondPolarity::none, 
-		float _p = 0, char _combineSocket = 0)
-		: tag(_tag), vowel(_vowel), polar(_polar), p(_p), combineSocket(_combineSocket)
+		uint8_t _combineSocket = 0)
+		: tag(_tag), vowel(_vowel), polar(_polar), combineSocket(_combineSocket)
 #ifdef  _DEBUG
-		, id(uid++), form(_form.begin(), _form.end())
+		, id(uid++)
 #endif //  _DEBUG
 	{
 	}
@@ -70,16 +68,13 @@ struct KMorpheme
 	{
 #ifdef _DEBUG
 		id = m.id;
-		swap(form, m.form);
 #endif
 		kform = m.kform;
-		wform = m.wform;
 		tag = m.tag;
 		vowel = m.vowel;
 		polar = m.polar;
 		combineSocket = m.combineSocket;
-		p = m.p;
-		swap(chunks, m.chunks);
+		std::swap(chunks, m.chunks);
 		combined = m.combined;
 	}
 
@@ -89,12 +84,10 @@ struct KMorpheme
 	}
 	const k_string& getForm() const { return *kform; }
 	const k_string* kform = nullptr;
-	const k_wstring* wform = nullptr;
 	KPOSTag tag = KPOSTag::UNKNOWN;
 	KCondVowel vowel = KCondVowel::none;
 	KCondPolarity polar = KCondPolarity::none;
-	char combineSocket = 0;
-	float p = 0;
+	uint8_t combineSocket = 0;
 	std::vector<const KMorpheme*>* chunks = nullptr;
 	int32_t combined = 0;
 	const KMorpheme* getCombined() const { return this + combined; }
@@ -105,10 +98,9 @@ struct KMorpheme
 struct KForm
 {
 	k_string form;
-	k_wstring wform;
 	std::vector<const KMorpheme*> candidate;
-	std::unordered_set<char> suffix;
-	KForm(const char16_t* _form = nullptr);
+	std::unordered_set<k_char> suffix;
+	KForm(const k_char* _form = nullptr);
 	KForm(const k_string& _form) : form(_form) {}
 
 	void readFromBin(std::istream& is, const std::function<const KMorpheme*(size_t)>& mapper);

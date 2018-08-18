@@ -242,6 +242,12 @@ protected:
 	void calcDiscountedValue(size_t order, const std::vector<uint32_t>& cntNodes);
 public:
 	KNLangModel(size_t _orderN = 3);
+	KNLangModel(KNLangModel&& o)
+	{
+		nodes.swap(o.nodes);
+		orderN = o.orderN;
+		vocabSize = o.vocabSize;
+	}
 	void trainSequence(const WID* seq, size_t len);
 	void optimize();
 	std::vector<float> predictNext(const WID* history, size_t len) const;
@@ -259,6 +265,13 @@ public:
 		{
 			p.writeToStream(str);
 		}
+	}
+
+	KNLangModel& operator=(KNLangModel&& o)
+	{
+		nodes.swap(o.nodes);
+		orderN = o.orderN;
+		vocabSize = o.vocabSize;
 	}
 
 	static KNLangModel readFromStream(std::istream&& str)
