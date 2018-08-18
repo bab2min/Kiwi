@@ -8,7 +8,7 @@ using namespace std;
 size_t KMorpheme::uid = 0;
 #endif
 
-KPOSTag makePOSTag(k_wstring tagStr)
+KPOSTag makePOSTag(k_string tagStr)
 {
 	if (tagStr == KSTR("NNG")) return KPOSTag::NNG;
 	if (tagStr == KSTR("NNP")) return KPOSTag::NNP;
@@ -49,9 +49,9 @@ KPOSTag makePOSTag(k_wstring tagStr)
 	if (tagStr == KSTR("SE")) return KPOSTag::SE;
 	if (tagStr == KSTR("SO")) return KPOSTag::SO;
 	if (tagStr == KSTR("SW")) return KPOSTag::SW;
-	if (tagStr == KSTR("NF")) return KPOSTag::NF;
-	if (tagStr == KSTR("NV")) return KPOSTag::NV;
-	if (tagStr == KSTR("NA")) return KPOSTag::NA;
+	if (tagStr == KSTR("NF")) return KPOSTag::UNKNOWN;
+	if (tagStr == KSTR("NV")) return KPOSTag::UNKNOWN;
+	if (tagStr == KSTR("NA")) return KPOSTag::UNKNOWN;
 	if (tagStr == KSTR("SL")) return KPOSTag::SL;
 	if (tagStr == KSTR("SH")) return KPOSTag::SH;
 	if (tagStr == KSTR("SN")) return KPOSTag::SN;
@@ -76,7 +76,6 @@ const char * tagToString(KPOSTag t)
 		"XPN", "XSN", "XSV", "XSA", "XR",
 		"VCP", "VCN",
 		"SF", "SP", "SS", "SE", "SO", "SW",
-		"NF", "NV", "NA",
 		"SL", "SH", "SN",
 		"JKS", "JKC", "JKG", "JKO", "JKB", "JKV", "JKQ", "JX", "JC",
 		"EP", "EF", "EC", "ETN", "ETM",
@@ -87,27 +86,26 @@ const char * tagToString(KPOSTag t)
 	return tags[(size_t)t];
 }
 
-const wchar_t * tagToStringW(KPOSTag t)
+const k_char * tagToStringW(KPOSTag t)
 {
-	static const wchar_t* tags[] =
+	static const k_char* tags[] =
 	{
-		L"UN",
-		L"NNG", L"NNP", L"NNB",
-		L"VV", L"VA",
-		L"MAG",
-		L"NR", L"NP",
-		L"VX",
-		L"MM", L"MAJ",
-		L"IC",
-		L"XPN", L"XSN", L"XSV", L"XSA", L"XR",
-		L"VCP", L"VCN",
-		L"SF", L"SP", L"SS", L"SE", L"SO", L"SW",
-		L"NF", L"NV", L"NA",
-		L"SL", L"SH", L"SN",
-		L"JKS", L"JKC", L"JKG", L"JKO", L"JKB", L"JKV", L"JKQ", L"JX", L"JC",
-		L"EP", L"EF", L"EC", L"ETN", L"ETM",
-		L"V",
-		L"@"
+		KSTR("UN"),
+		KSTR("NNG"), KSTR("NNP"), KSTR("NNB"),
+		KSTR("VV"), KSTR("VA"),
+		KSTR("MAG"),
+		KSTR("NR"), KSTR("NP"),
+		KSTR("VX"),
+		KSTR("MM"), KSTR("MAJ"),
+		KSTR("IC"),
+		KSTR("XPN"), KSTR("XSN"), KSTR("XSV"), KSTR("XSA"), KSTR("XR"),
+		KSTR("VCP"), KSTR("VCN"),
+		KSTR("SF"), KSTR("SP"), KSTR("SS"), KSTR("SE"), KSTR("SO"), KSTR("SW"),
+		KSTR("SL"), KSTR("SH"), KSTR("SN"),
+		KSTR("JKS"), KSTR("JKC"), KSTR("JKG"), KSTR("JKO"), KSTR("JKB"), KSTR("JKV"), KSTR("JKQ"), KSTR("JX"), KSTR("JC"),
+		KSTR("EP"), KSTR("EF"), KSTR("EC"), KSTR("ETN"), KSTR("ETM"),
+		KSTR("V"),
+		KSTR("@")
 	};
 	assert(t < KPOSTag::MAX);
 	return tags[(size_t)t];
@@ -130,7 +128,7 @@ void KForm::readFromBin(istream& is, const function<const KMorpheme*(size_t)>& m
 	size_t s = readFromBinStream<uint32_t>(is);
 	for (size_t i = 0; i < s; i++)
 	{
-		suffix.insert(readFromBinStream<char>(is));
+		suffix.insert(readFromBinStream<k_char>(is));
 	}
 }
 
@@ -146,19 +144,17 @@ void KForm::writeToBin(ostream& os, const function<size_t(const KMorpheme*)>& ma
 	writeToBinStream<uint32_t>(os, suffix.size());
 	for (auto c : suffix)
 	{
-		writeToBinStream<char>(os, c);
+		writeToBinStream<k_char>(os, c);
 	}
 }
 
 void KMorpheme::readFromBin(istream& is, const function<const KMorpheme*(size_t)>& mapper)
 {
-	kform = nullptr;
-	//fread(&kform, 1, 4, f);
+	kform = (const k_string*)readFromBinStream<uint32_t>(is);
 	readFromBinStream(is, tag);
 	readFromBinStream(is, vowel);
 	readFromBinStream(is, polar);
 	readFromBinStream(is, combineSocket);
-	readFromBinStream(is, p);
 	readFromBinStream(is, combined);
 
 	size_t s = readFromBinStream<uint32_t>(is);
@@ -174,12 +170,11 @@ void KMorpheme::readFromBin(istream& is, const function<const KMorpheme*(size_t)
 
 void KMorpheme::writeToBin(ostream& os, const function<size_t(const KMorpheme*)>& mapper) const
 {
-	//fwrite(&kform, 1, 4, f);
+	writeToBinStream<uint32_t>(os, (uint32_t)kform);
 	writeToBinStream(os, tag);
 	writeToBinStream(os, vowel);
 	writeToBinStream(os, polar);
 	writeToBinStream(os, combineSocket);
-	writeToBinStream(os, p);
 	writeToBinStream(os, combined);
 
 	writeToBinStream<uint32_t>(os, chunks ? chunks->size() : 0);

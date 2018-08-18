@@ -45,6 +45,25 @@ struct EnumerateAdaptor : public _BaseType
 	}
 };
 
+template<class _Map>
+class OverriddenMap : public _Map
+{
+public:
+	auto operator[](typename _Map::key_type key) const -> typename _Map::mapped_type
+	{
+		auto it = find(key);
+		if (it == end()) return {};
+		else return it->second;
+	}
+
+	auto operator[](typename _Map::key_type key) -> typename _Map::mapped_type&
+	{
+		auto it = find(key);
+		if (it == end()) return emplace(key, _Map::mapped_type{}).first->second;
+		else return it->second;
+	}
+};
+
 template<class _Key, class _Value, class _KeyStore = std::unordered_map<_Key, int32_t>>
 struct Trie
 {
@@ -106,7 +125,7 @@ struct Trie
 		for (dq.emplace_back(this); !dq.empty(); dq.pop_front())
 		{
 			auto p = dq.front();
-			for (auto&& kv : next)
+			for (auto&& kv : p->next)
 			{
 				auto i = kv.first;
 				if (!p->getNext(i)) continue;

@@ -3,7 +3,7 @@
 #include "KForm.h"
 #include "KTrie.h"
 #include "ThreadPool.h"
-
+/*
 struct KWordPair : public std::tuple<k_wstring, KPOSTag, uint8_t, uint16_t>
 {
 	using std::tuple<k_wstring, KPOSTag, uint8_t, uint16_t>::tuple;
@@ -92,3 +92,4 @@ public:
 	static int getVersion();
 };
 
+*/

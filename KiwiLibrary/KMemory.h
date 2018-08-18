@@ -210,17 +210,17 @@ public:
 
 	pointer allocate(size_type n, const void *hint = 0)
 	{
-		if (n <= 16) return (pointer)KPool<16, 4000>::getInstance().allocate();
-		if (n <= 32) return (pointer)KPool<32, 2000>::getInstance().allocate();
-		if (n <= 48) return (pointer)KPool<48, 1000>::getInstance().allocate();
+		if (n * sizeof(T) <= 16) return (pointer)KPool<16, 4000>::getInstance().allocate();
+		if (n * sizeof(T) <= 32) return (pointer)KPool<32, 2000>::getInstance().allocate();
+		if (n * sizeof(T) <= 48) return (pointer)KPool<48, 1000>::getInstance().allocate();
 		return allocator<T>::allocate(n, hint);
 	}
 
 	void deallocate(pointer p, size_type n)
 	{
-		if (n <= 16) return KPool<16, 4000>::getInstance().deallocate(p);
-		if (n <= 32) return KPool<32, 2000>::getInstance().deallocate(p);
-		if (n <= 48) return KPool<48, 1000>::getInstance().deallocate(p);
+		if (n * sizeof(T) <= 16) return KPool<16, 4000>::getInstance().deallocate(p);
+		if (n * sizeof(T) <= 32) return KPool<32, 2000>::getInstance().deallocate(p);
+		if (n * sizeof(T) <= 48) return KPool<48, 1000>::getInstance().deallocate(p);
 		return allocator<T>::deallocate(p, n);
 	}
 
@@ -262,6 +262,6 @@ void operator delete(void* ptr, KPool<objectSize, poolSize, type>& pool)
 #define NEW_IN_POOL(T) new(KPool<sizeof(T), 1024, 4>::getInstance()) T
 #define DELETE_IN_POOL(T, ptr) do{ptr->~T();operator delete((void*)ptr, KPool<sizeof(T), 1024, 4>::getInstance());}while(0)
 #else
-#define NEW_IN_POOL(T) new
+#define NEW_IN_POOL(T) new T
 #define DELETE_IN_POOL(T, ptr) delete ptr
 #endif

@@ -71,10 +71,10 @@ struct KGraphNode
 	}
 };
 
-struct KTrie : public Trie<char16_t, const KForm*, std::map<char16_t, int32_t>>
+struct KTrie : public Trie<char16_t, const KForm*, OverriddenMap<std::map<char16_t, int32_t>>>
 {
 	std::vector<KGraphNode> split(const k_string& str) const;
-	KTrie* getNext(char i) const { return (KTrie*)Trie::getNext(i); }
+	KTrie* getNext(k_char i) const { return (KTrie*)Trie::getNext(i); }
 	KTrie* getFail() const { return (KTrie*)Trie::getFail(); }
 
 	void saveToBin(std::ostream& str, const KForm* base) const;

@@ -1,9 +1,13 @@
 //
 
 #include "stdafx.h"
+#include <windows.h>
+#include <psapi.h>
 #include "../KiwiLibrary/KiwiHeader.h"
+#include "../KiwiLibrary/Utils.h"
 #include "../KiwiLibrary/Kiwi.h"
-#include "KTest.h"
+#include "../KiwiLibrary/KModelMgr.h"
+//#include "KTest.h"
 
 class Timer
 {
@@ -26,10 +30,19 @@ public:
 
 using namespace std;
 
-#include "windows.h"
-#include "psapi.h"
-#include "../KiwiLibrary/Utils.h"
-int main2()
+int main()
+{
+	SetConsoleOutputCP(CP_UTF8);
+	setvbuf(stdout, nullptr, _IOFBF, 1000);
+	KModelMgr km{ "../ModelGenerator/" };
+	km.solidify();
+	auto nodes = km.getTrie()->split(normalizeHangul(KSTR("이것은형태소분할테스트입니다. 복잡한동사도될까요? 됐네요! 나는학교에갑니다... 당신은학교에갑니까?")));
+	cout << nodes.size() << endl;
+	return 0;
+}
+
+
+/*int main2()
 {
 	system("chcp 65001");
 	_wsetlocale(LC_ALL, L"korean");
@@ -52,7 +65,7 @@ int main2()
 		}
 	}
 	printf("\n==== %gms\n", timer.getElapsed());
-	/*timer.reset();
+	timer.reset();
 	for (int i = 0; i < 500; i++)
 	{
 		kw.clearCache();
@@ -67,12 +80,13 @@ int main2()
 			printf("\n");
 		}
 	}
-	printf("\n==== %gms\n", timer.getElapsed());*/
+	printf("\n==== %gms\n", timer.getElapsed());
 	getchar();
 	return 0;
 }
+*/
 
-int main()
+/*int main()
 {
 #ifdef _DEBUG
 	_CrtSetDbgFlag(_CRTDBG_CHECK_ALWAYS_DF);
@@ -88,19 +102,6 @@ int main()
 	GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc));
 	SIZE_T memUsed = pmc.WorkingSetSize;
 	printf("Mem Usage : %g MB\n", memUsed / 1024.f / 1024.f);
-#ifdef CUSTOM_ALLOC
-	//*
-	for (auto i : KSingleLogger::getInstance().totalAlloc)
-	{
-		printf("%zd\t%zd\n", i.first, i.second);
-	}
-	printf("\n");
-	for (auto i : KSingleLogger::getInstance().maxAlloc)
-	{
-		printf("%zd\t%zd\n", i.first, i.second);
-	}
-	//*/
-#endif
 	string testFiles[] = { "01s.txt", "02s.txt", "03s.txt", "17s.txt", "18s.txt", "13s.txt", "15s.txt", };
 	for (auto tf : testFiles)
 	{
@@ -122,22 +123,9 @@ int main()
 			t.writeResult(out);
 		}
 		fclose(out);
-
-#ifdef CUSTOM_ALLOC
-//*
-		for (auto i : KSingleLogger::getInstance().totalAlloc)
-		{
-			printf("%zd\t%zd\n", i.first, i.second);
-		}
-		printf("\n");
-		for (auto i : KSingleLogger::getInstance().maxAlloc)
-		{
-			printf("%zd\t%zd\n", i.first, i.second);
-		}
-//*/
 #endif
 	}
 	getchar();
 	return 0;
 }
-
+*/
