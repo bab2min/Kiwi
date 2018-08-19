@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "KForm.h"
 #include "KTrie.h"
 #include "Utils.h"
 #include "KModelMgr.h"
@@ -29,6 +28,7 @@ void KModelMgr::loadMMFromTxt(std::istream& is, morphemeMap& morphMap)
 	for (size_t i = 0; i < (size_t)KPOSTag::SN; ++i)
 	{
 		forms[i].candidate.emplace_back((KMorpheme*)(i + 2));
+		morphemes[i + 2].tag = (KPOSTag)(i + 1);
 	}
 
 	string line;
@@ -113,6 +113,15 @@ void KModelMgr::loadCMFromTxt(std::istream& is, morphemeMap& morphMap)
 			if (it != morphMap.end())
 			{
 				chunkIds->emplace_back((KMorpheme*)it->second);
+			}
+			else if (tag == KPOSTag::V)
+			{
+				size_t mid = morphemes.size();
+				morphMap.emplace(make_pair(f, tag), mid);
+				auto& fm = formMapper(f);
+				morphemes.emplace_back(f, tag);
+				morphemes.back().kform = (const k_string*)(&fm - &forms[0]);
+				chunkIds->emplace_back((KMorpheme*)mid);
 			}
 			else
 			{
@@ -299,16 +308,18 @@ KModelMgr::KModelMgr(const char * modelPath) : langMdl(3)
 {
 	this->modelPath = modelPath;
 #ifdef LOAD_TXT
-	unordered_map<pair<k_string, KPOSTag>, size_t> morphMap;
+	morphemeMap morphMap;
 	loadMMFromTxt(ifstream{ modelPath + string{ "fullmodelV2.txt" } }, morphMap);
+	auto realMorph = morphMap;
 	loadCMFromTxt(ifstream{ modelPath + string{ "combinedV2.txt" } }, morphMap);
 	loadPCMFromTxt(ifstream{ modelPath + string{ "precombinedV2.txt" } }, morphMap);
 	saveMorphBin(ofstream{ modelPath + string{ "morpheme.bin" }, ios_base::binary });
-
-	loadCorpusFromTxt(ifstream{ modelPath + string{ "ML_lit.txt" } }, morphMap);
-	loadCorpusFromTxt(ifstream{ modelPath + string{ "ML_spo.txt" } }, morphMap);
+	
+	loadCorpusFromTxt(ifstream{ modelPath + string{ "ML_lit.txt" } }, realMorph);
+	loadCorpusFromTxt(ifstream{ modelPath + string{ "ML_spo.txt" } }, realMorph);
 	langMdl.optimize();
 	langMdl.writeToStream(ofstream{ modelPath + string{ "langMdl.bin" }, ios_base::binary });
+	
 #else
 	loadMorphBin(ifstream{ modelPath + string{"morpheme.bin"}, ios_base::binary });
 	langMdl = KNLangModel::readFromStream(ifstream{ modelPath + string{ "langMdl.bin" }, ios_base::binary });
@@ -386,4 +397,9 @@ void KModelMgr::solidify()
 		for (auto& p : f.candidate) p = &morphemes[(size_t)p];
 	}
 	formMap = {};
+}
+
+vector<pair<vector<const KMorpheme*>, float>> KModelMgr::findBestPath(const vector<KGraphNode>& nodes, size_t topN) const
+{
+	return KGraphNode::findBestPath(nodes, &langMdl, &morphemes[0], topN);
 }

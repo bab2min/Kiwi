@@ -7,7 +7,7 @@
 #include "../KiwiLibrary/Utils.h"
 #include "../KiwiLibrary/Kiwi.h"
 #include "../KiwiLibrary/KModelMgr.h"
-//#include "KTest.h"
+#include "KTest.h"
 
 class Timer
 {
@@ -30,17 +30,31 @@ public:
 
 using namespace std;
 
+/*
 int main()
 {
-	SetConsoleOutputCP(CP_UTF8);
-	setvbuf(stdout, nullptr, _IOFBF, 1000);
+	//SetConsoleOutputCP(CP_UTF8);
+	//setvbuf(stdout, nullptr, _IOFBF, 1000);
 	KModelMgr km{ "../ModelGenerator/" };
 	km.solidify();
-	auto nodes = km.getTrie()->split(normalizeHangul(KSTR("이것은형태소분할테스트입니다. 복잡한동사도될까요? 됐네요! 나는학교에갑니다... 당신은학교에갑니까?")));
-	cout << nodes.size() << endl;
+	string line;
+	wstring_convert<codecvt_utf8_utf16<wchar_t>, wchar_t> cvt;
+	while (getline(cin, line))
+	{
+		auto nodes = km.getTrie()->split(normalizeHangul(utf8_to_utf16(line)));
+		auto res = km.findBestPath(nodes, 10);
+		for (auto&& r : res)
+		{
+			cout << r.second << '\t';
+			for (auto&& s : r.first)
+			{
+				if (s->kform) cout << utf16_to_utf8(*s->kform) << '/' << tagToString(s->tag);
+			}
+		}
+	}
 	return 0;
 }
-
+*/
 
 /*int main2()
 {
@@ -86,7 +100,7 @@ int main()
 }
 */
 
-/*int main()
+int main()
 {
 #ifdef _DEBUG
 	_CrtSetDbgFlag(_CRTDBG_CHECK_ALWAYS_DF);
@@ -114,7 +128,7 @@ int main()
 		printf("Time per Unit : %g ms\n", tm / test.getTotalCount());
 		
 		FILE* out;
-		fopen_s(&out, ("wrongs" + tf).c_str(), "w");
+		fopen_s(&out, ("wrongsV2" + tf).c_str(), "w");
 		fprintf(out, "%g\n", test.getScore());
 		fprintf(out, "Total (%zd) Time : %g ms\n", test.getTotalCount(), tm);
 		fprintf(out, "Time per Unit : %g ms\n\n", tm / test.getTotalCount());
@@ -123,9 +137,8 @@ int main()
 			t.writeResult(out);
 		}
 		fclose(out);
-#endif
 	}
 	getchar();
 	return 0;
 }
-*/
+

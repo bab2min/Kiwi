@@ -35,7 +35,7 @@
 #define USE_DIST_MAP
 #define PMI_WEIGHT 1.7f
 //#define LOAD_TXT
-//#define CUSTOM_ALLOC
+#define CUSTOM_ALLOC
 
 #ifdef _WIN32
 typedef char16_t k_char;

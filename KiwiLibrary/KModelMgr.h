@@ -2,7 +2,7 @@
 
 #include "KNLangModel.h"
 struct KTrie;
-
+struct KGraphNode;
 class KModelMgr
 {
 protected:
@@ -35,5 +35,6 @@ public:
 #else
 	const KTrie* getTrie() const { return trieRoot.get(); }
 #endif
+	std::vector<std::pair<std::vector<const KMorpheme*>, float>> findBestPath(const std::vector<KGraphNode>& nodes, size_t topN) const;
 };
 

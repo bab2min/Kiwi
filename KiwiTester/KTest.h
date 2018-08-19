@@ -6,7 +6,7 @@ public:
 	typedef std::vector<KWordPair> AnswerType;
 	struct TestResult
 	{
-		k_wstring q;
+		std::u16string q;
 		AnswerType a;
 		AnswerType r;
 		std::vector<KWordPair> dr, da;

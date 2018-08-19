@@ -5,7 +5,7 @@
 
 struct KChunk;
 
-k_string normalizeHangul(k_string hangul);
+k_string normalizeHangul(std::u16string hangul);
 k_string joinHangul(k_string hangul);
 
 template<class BaseChr, class OutIterator>
@@ -141,7 +141,7 @@ inline std::string utf16_to_utf8(std::u16string utf16_string)
 
 inline std::ostream& operator <<(std::ostream& os, const k_string& str)
 {
-	return os << utf16_to_utf8(str);
+	return os << utf16_to_utf8({ str.begin(), str.end() });
 }
 
 KPOSTag identifySpecialChr(k_char chr);
