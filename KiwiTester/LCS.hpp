@@ -156,7 +156,7 @@ namespace LCS
 		auto yDiffBegin = yBegin;
 		auto xDiffEnd = xEnd;
 		auto yDiffEnd = yEnd;
-		while (*xDiffBegin == *yDiffBegin)
+		while (xDiffBegin != xDiffEnd && yDiffBegin != yDiffEnd  && *xDiffBegin == *yDiffBegin)
 		{
 			++xDiffBegin;
 			++yDiffBegin;

@@ -44,10 +44,12 @@ public:
 			std::map<WID, int32_t> next;
 			BakedMap<WID, int32_t> bakedNext;
 		};
-		bool baked = false;
-		int32_t parent = 0, lower = 0;
 	public:
-		uint32_t depth = 0;
+		uint8_t depth = 0;
+	protected:
+		bool baked = false;
+	public:
+		int32_t parent = 0, lower = 0;
 		union
 		{
 			uint32_t count = 0;
@@ -272,6 +274,7 @@ public:
 		nodes.swap(o.nodes);
 		orderN = o.orderN;
 		vocabSize = o.vocabSize;
+		return *this;
 	}
 
 	static KNLangModel readFromStream(std::istream&& str)

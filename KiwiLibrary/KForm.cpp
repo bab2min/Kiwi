@@ -8,7 +8,7 @@ using namespace std;
 size_t KMorpheme::uid = 0;
 #endif
 
-KPOSTag makePOSTag(k_string tagStr)
+KPOSTag makePOSTag(u16string tagStr)
 {
 	if (tagStr == KSTR("NNG")) return KPOSTag::NNG;
 	if (tagStr == KSTR("NNP")) return KPOSTag::NNP;
@@ -56,6 +56,7 @@ KPOSTag makePOSTag(k_string tagStr)
 	if (tagStr == KSTR("SH")) return KPOSTag::SH;
 	if (tagStr == KSTR("SN")) return KPOSTag::SN;
 	if (tagStr == KSTR("V")) return KPOSTag::V;
+	if (tagStr == KSTR("A")) return KPOSTag::V;
 	if (tagStr == KSTR("^")) return KPOSTag::UNKNOWN;
 	//assert(0);
 	return KPOSTag::MAX;
@@ -111,7 +112,7 @@ const k_char * tagToStringW(KPOSTag t)
 	return tags[(size_t)t];
 }
 
-KForm::KForm(const char16_t * _form)
+KForm::KForm(const k_char * _form)
 {
 	if (_form) form = _form;
 }

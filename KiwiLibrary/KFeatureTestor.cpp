@@ -1,114 +1,46 @@
 #include "stdafx.h"
 #include "KFeatureTestor.h"
+#include "KForm.h"
 
-bool KFeatureTestor::_isVowel(const char * begin, const char * end)
+bool KFeatureTestor::isMatched(const k_string * form, KCondVowel vowel)
 {
-	return end[-1] > 30;
-}
-
-bool KFeatureTestor::_isVocalic(const char * begin, const char * end)
-{
-	return _isVowel(begin, end) || end[-1] == 9;
-}
-
-bool KFeatureTestor::_isVocalicH(const char * begin, const char * end)
-{
-	return _isVocalic(begin, end) || end[-1] == 30;
-}
-
-bool KFeatureTestor::_notVowel(const char * begin, const char * end)
-{
-	return !_isVowel(begin, end);
-}
-
-bool KFeatureTestor::_notVocalic(const char * begin, const char * end)
-{
-	return !_isVocalic(begin, end);
-}
-
-bool KFeatureTestor::_notVocalicH(const char * begin, const char * end)
-{
-	return !_isVocalicH(begin, end);
-}
-
-bool KFeatureTestor::_isPositive(const char * begin, const char * end)
-{
-	for (auto e = end - 1; e >= begin; e--)
+	if (vowel == KCondVowel::none || vowel == KCondVowel::any) return true;
+	switch (vowel)
 	{
-		if (*e <= 30 || *e == 49) continue;
-		if (*e == 31 || *e == 33 || *e == 39) return true;
+	case KCondVowel::vocalicH:
+		if (form->back() == 0x11C2) return true;
+	case KCondVowel::vocalic:
+		if (form->back() == 0x11AF) return true;
+	case KCondVowel::vowel:
+		if (0xAC00 <= form->back() && form->back() <= 0xD7A4) return true;
 		return false;
-	}
-	return false;
-}
-
-bool KFeatureTestor::_isNegative(const char * begin, const char * end)
-{
-	for (auto e = end - 1; e >= begin; e--)
-	{
-		if (*e <= 30 || *e == 49) continue;
-		if (*e == 31 || *e == 33 || *e == 39) return false;
+	case KCondVowel::nonVocalicH:
+		if (form->back() == 0x11C2) return false;
+	case KCondVowel::nonVocalic:
+		if (form->back() == 0x11AF) return false;
+	case KCondVowel::nonVowel:
+		if (0xAC00 <= form->back() && form->back() <= 0xD7A4) return false;
 		return true;
 	}
 	return false;
 }
 
-bool KFeatureTestor::isVowel(const char * begin, const char * end)
+bool KFeatureTestor::isMatched(const k_string * form, KCondPolarity polar)
 {
-	return begin < end && _isVowel(begin, end);
+	if (polar == KCondPolarity::none) return true;
+	for (auto it = form->rbegin(); it != form->rend(); ++it)
+	{
+		if (!(0xAC00 <= *it && *it <= 0xD7A4)) continue;
+		int v = (*it / 28) % 21;
+		if (v == 0 || v == 2 || v == 8) return polar == KCondPolarity::positive;
+		if (v == 18) continue;
+		return polar == KCondPolarity::negative;
+	}
+	return false;
 }
 
-bool KFeatureTestor::isVocalic(const char * begin, const char * end)
+bool KFeatureTestor::isMatched(const k_string * form, KCondVowel vowel, KCondPolarity polar)
 {
-	return begin < end && _isVocalic(begin, end);
+	return isMatched(form, vowel) && isMatched(form, polar);
 }
 
-bool KFeatureTestor::isVocalicH(const char * begin, const char * end)
-{
-	return begin < end && _isVocalicH(begin, end);
-}
-
-bool KFeatureTestor::notVowel(const char * begin, const char * end)
-{
-	return begin < end && _notVowel(begin, end);
-}
-
-bool KFeatureTestor::notVocalic(const char * begin, const char * end)
-{
-	return begin < end && _notVocalic(begin, end);
-}
-
-bool KFeatureTestor::notVocalicH(const char * begin, const char * end)
-{
-	return begin < end && _notVocalicH(begin, end);
-}
-
-bool KFeatureTestor::isPositive(const char * begin, const char * end)
-{
-	return begin < end && _isPositive(begin, end);
-}
-
-bool KFeatureTestor::isNegative(const char * begin, const char * end)
-{
-	return begin < end && _isNegative(begin, end);
-}
-
-bool KFeatureTestor::isPostposition(const char * begin, const char * end)
-{
-	return begin < end;
-}
-
-bool KFeatureTestor::isCorrectStart(const char * begin, const char * end)
-{
-	// not starts with CC- nor V-
-	return !(end - begin >= 2 && begin[0] <= 30 && begin[1] <= 30)
-		&& !(end - begin >= 1 && begin[0] > 30);
-		/*&& !(end - begin == 1 && begin[0] <= 30)*/;
-}
-
-bool KFeatureTestor::isCorrectEnd(const char * begin, const char * end)
-{
-	// not ends with -CC nor is V
-	return !(end - begin >= 2 && end[-1] <= 30 && end[-2] <= 30) 
-		&& !(end - begin == 1 && end[-1] <= 30);
-}

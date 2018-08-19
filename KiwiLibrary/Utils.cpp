@@ -3,7 +3,7 @@
 #include "KForm.h"
 #include "Utils.h"
 
-k_string normalizeHangul(k_string hangul)
+k_string normalizeHangul(std::u16string hangul)
 {
 	k_string ret;
 	ret.reserve(hangul.size() * 1.5);

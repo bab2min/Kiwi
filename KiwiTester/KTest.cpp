@@ -7,15 +7,15 @@
 
 using namespace std;
 
-KWordPair parseWordPOS(k_wstring str)
+KWordPair parseWordPOS(const u16string& str)
 {
 	if (str[0] == '/' && str[1] == '/')
 	{
-		return { L"/", makePOSTag(str.substr(2)), 0, 0 };
+		return { u"/", makePOSTag(str.substr(2)), 0, 0 };
 	}
 	auto p = str.find('/');
 	if (p == str.npos) return {};
-	return { str.substr(0, p), makePOSTag(str.substr(p + 1)), 0, 0 };
+	return { k_string{ str.begin(), str.begin() + p }, makePOSTag(str.substr(p + 1)), 0, 0 };
 }
 
 struct Counter
@@ -34,16 +34,15 @@ KTest::KTest(const char * testSetFile, Kiwi* kw, size_t topN) : totalCount(0), t
 	size_t printed = 0;
 	rewind(f);*/
 	char buf[32768];
-	wstring_convert<codecvt_utf8_utf16<k_wchar>> converter;
 	while (fgets(buf, 32768, f))
 	{
 		/*size_t cur = ftell(f);
 		for (; printed < cur * 100.0 / totalSize; printed++) printf(".");*/
 		try 
 		{
-			auto wstr = converter.from_bytes(buf);
+			auto wstr = utf8_to_utf16(buf);
 			if (wstr.back() == '\n') wstr.pop_back();
-			auto fd = split(wstr, '\t');
+			auto fd = split(wstr, u'\t');
 			if (fd.size() < 2) continue;
 			TestResult tr;
 			tr.q = fd[0];
@@ -86,11 +85,11 @@ float KTest::getScore() const
 
 void KTest::TestResult::writeResult(FILE * output) const
 {
-	fputws(q.c_str(), output);
+	fputws((const wchar_t*)q.c_str(), output);
 	fprintf(output, "\t%.3g\n", score);
 	for (auto _r : da)
 	{
-		fputws(_r.str().c_str(), output);
+		fputws((const wchar_t*)_r.str().c_str(), output);
 		fputwc('/', output);
 		fputs(tagToString(_r.tag()), output);
 		fputwc('\t', output);
@@ -98,7 +97,7 @@ void KTest::TestResult::writeResult(FILE * output) const
 	fputwc('\n', output);
 	for (auto _r : dr)
 	{
-		fputws(_r.str().c_str(), output);
+		fputws((const wchar_t*)_r.str().c_str(), output);
 		fputwc('/', output);
 		fputs(tagToString(_r.tag()), output);
 		fputwc('\t', output);

@@ -2,9 +2,8 @@
 
 #include "BakedMap.hpp"
 #include "Trie.hpp"
+#include "KForm.h"
 
-struct KForm;
-struct KMorpheme;
 struct KChunk
 {
 	union 
@@ -50,6 +49,8 @@ struct KMorphemeNode
 	bool isAcceptableFinal() const { return nexts.size() == 1 && nexts[0] == nullptr; }
 };
 
+class KNLangModel;
+
 struct KGraphNode
 {
 	enum { MAX_NEXT = 16 };
@@ -63,6 +64,8 @@ struct KGraphNode
 
 	KGraphNode* getNext(size_t idx) const { return nexts[idx] ? (KGraphNode*)this + nexts[idx] : nullptr; }
 	
+	static std::vector<std::pair<std::vector<const KMorpheme*>, float>> findBestPath(const std::vector<KGraphNode>& graph, const KNLangModel * knlm, const KMorpheme* morphBase, size_t topN);
+
 	void addNext(KGraphNode* next)
 	{
 		size_t i = 0;
