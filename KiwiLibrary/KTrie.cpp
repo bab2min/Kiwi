@@ -1,38 +1,11 @@
 #include "stdafx.h"
 #include "KTrie.h"
 #include "KFeatureTestor.h"
-#include "KMemoryKMorphemeNode.h"
 #include "KModelMgr.h"
 #include "KMemory.h"
 #include "Utils.h"
 
 using namespace std;
-
-const KMorpheme * KChunk::getMorpheme(size_t idx, KMorpheme * tmp) const
-{
-	if (!isStr()) return form->candidate[idx];
-	if (!begin && !end) return nullptr;
-	tmp->kform = nullptr;
-	tmp->tag = KPOSTag::UNKNOWN;
-	//tmp->p = (end - begin) * -1.5f - 6.f;
-	return tmp;
-}
-
-size_t KChunk::getCandSize() const
-{
-	if (isStr()) return 1;
-	return form->candidate.size();
-}
-
-KMorphemeNode::~KMorphemeNode()
-{
-	if (optimaCache) DELETE_IN_POOL(k_vpcf, optimaCache);
-}
-
-void KMorphemeNode::makeNewCache()
-{
-	optimaCache = NEW_IN_POOL(k_vpcf);
-}
 
 vector<KGraphNode> KTrie::split(const k_string& str) const
 {
@@ -69,8 +42,9 @@ vector<KGraphNode> KTrie::split(const k_string& str) const
 	KPOSTag chrType, lastChrType = KPOSTag::UNKNOWN;
 	for (auto c : str)
 	{
+		chrType = identifySpecialChr(c);
 		// space or special character
-		if ((chrType = identifySpecialChr(c)) != KPOSTag::MAX)
+		/*if ( != KPOSTag::MAX)
 		{
 			while (curTrie->fail)
 			{
@@ -83,43 +57,8 @@ vector<KGraphNode> KTrie::split(const k_string& str) const
 			}
 			brachOut();
 			curTrie = this;
-			// space
-			if (chrType == KPOSTag::UNKNOWN)
-			{
-				// insert new space
-				if (chrType != lastChrType)
-				{
-					spacePos[n] = 1;
-				}
-				// extend last space span
-				else
-				{
-					spacePos[n] = spacePos[n - 1] + 1;
-				}
-			}
-			// not space
-			else
-			{
-				// insert new node
-				if (chrType != lastChrType)
-				{
-					for (auto& g : ret)
-					{
-						if (g.lastPos != n) continue;
-						g.addNext(&ret.back() + 1);
-					}
-					ret.emplace_back(k_string{ &c, 1 }, n + 1);
-					ret.back().form = this[(size_t)chrType].val;
-				}
-				// reuse previous node
-				else
-				{
-					ret.back().uform.push_back(c);
-					ret.back().lastPos = n + 1;
-				}
-			}
 			goto continueFor;
-		}
+		}*/
 		// normal character
 		while (!curTrie->getNext(c)) // if curTrie has no exact next node, goto fail
 		{
@@ -139,7 +78,45 @@ vector<KGraphNode> KTrie::split(const k_string& str) const
 			else
 			{
 				brachOut();
-				goto continueFor; // root node has no exact next node, continue
+				// the root node has no exact next node, test special chr
+				// space
+				if (chrType == KPOSTag::UNKNOWN)
+				{
+					// insert new space
+					if (chrType != lastChrType)
+					{
+						spacePos[n] = 1;
+					}
+					// extend last space span
+					else
+					{
+						spacePos[n] = spacePos[n - 1] + 1;
+					}
+				}
+				// not space
+				else
+				{
+					// insert new node
+					if (chrType != lastChrType)
+					{
+						auto it = spacePos.find(n - 1);
+						int space = it == spacePos.end() ? 0 : it->second;
+						for (auto& g : ret)
+						{
+							if (g.lastPos != n - space) continue;
+							g.addNext(&ret.back() + 1);
+						}
+						ret.emplace_back(k_string{ &c, 1 }, n + 1);
+						ret.back().form = this[(size_t)chrType].val;
+					}
+					// reuse previous node
+					else
+					{
+						ret.back().uform.push_back(c);
+						ret.back().lastPos = n + 1;
+					}
+				}
+				goto continueFor; 
 			}
 		}
 		brachOut();
@@ -205,28 +182,32 @@ KTrie KTrie::loadFromBin(std::istream & is, const KForm* base)
 	return t;
 }
 
+struct MInfo
+{
+	KNLangModel::WID wid;
+	uint8_t combineSocket;
+	KCondVowel condVowel;
+	KCondPolarity condPolar;
+	uint8_t ownFormId;
+	MInfo(KNLangModel::WID _wid = 0, uint8_t _combineSocket = 0,
+		KCondVowel _condVowel = KCondVowel::none,
+		KCondPolarity _condPolar = KCondPolarity::none,
+		uint8_t _ownFormId = 0)
+		: wid(_wid), combineSocket(_combineSocket),
+		condVowel(_condVowel), condPolar(_condPolar), ownFormId(_ownFormId)
+	{}
+};
+#include "KMemoryTrie.h"
 
-vector<pair<vector<const KMorpheme*>, float>> KGraphNode::findBestPath(const vector<KGraphNode>& graph, const KNLangModel * knlm, const KMorpheme* morphBase, size_t topN)
+vector<pair<KGraphNode::pathType, float>> KGraphNode::findBestPath(const vector<KGraphNode>& graph, const KNLangModel * knlm, const KMorpheme* morphBase, size_t topN)
 {
 	typedef KNLangModel::WID WID;
-	struct MInfo
-	{
-		WID wid;
-		uint8_t combineSocket;
-		KCondVowel condVowel;
-		KCondPolarity condPolar;
-		MInfo(WID _wid = 0, uint8_t _combineSocket = 0, 
-			KCondVowel _condVowel = KCondVowel::none, 
-			KCondPolarity _condPolar = KCondPolarity::none) 
-			: wid(_wid), combineSocket(_combineSocket),
-			condVowel(_condVowel), condPolar(_condPolar)
-		{}
-	};
-	typedef vector<MInfo, pool_allocator<void*>> MInfos;
-	typedef vector<pair<MInfos, float>> WordLLs;
+	typedef vector<MInfo, pool_allocator<MInfo>> MInfos;
+	typedef vector<pair<MInfos, float>, pool_allocator<void*>> WordLLs;
 	vector<WordLLs, pool_allocator<void*>> cache(graph.size());
 	const KGraphNode* startNode = &graph.front();
 	const KGraphNode* endNode = &graph.back();
+	vector<k_string> ownFormList;
 
 	// end node
 	cache.back().emplace_back(MInfos{ MInfo(1u) }, 0.f);
@@ -235,6 +216,12 @@ vector<pair<vector<const KMorpheme*>, float>> KGraphNode::findBestPath(const vec
 	for (size_t i = graph.size() - 2; i > 0; --i)
 	{
 		auto* node = &graph[i];
+		size_t ownFormId = 0;
+		if (!node->uform.empty())
+		{
+			ownFormList.emplace_back(node->uform);
+			ownFormId = ownFormList.size();
+		}
 		float tMin = INFINITY, tMax = -INFINITY;
 		for (auto& curMorph : node->form->candidate)
 		{
@@ -280,6 +267,10 @@ vector<pair<vector<const KMorpheme*>, float>> KGraphNode::findBestPath(const vec
 						seq[1] = (p.first.end() - 2)->wid;
 						seq[2] = (p.first.end() - 3)->wid;
 					}
+					else if (curMorph->combineSocket && !curMorph->chunks)
+					{
+						continue;
+					}
 					else if(p.first.size() > 1)
 					{
 						seq[0] = orgSeq;
@@ -298,7 +289,19 @@ vector<pair<vector<const KMorpheme*>, float>> KGraphNode::findBestPath(const vec
 						for (size_t ch = 0; ch < chSize; ++ch)
 						{
 							if (any_of(combSocket.begin() + ch, combSocket.end(), [](uint8_t t) { return !!t; })) continue;
-							c += knlm->evaluateLL(&seq[ch], 3);
+							float ct;
+							c += ct = knlm->evaluateLL(&seq[ch], 3);
+#ifdef DEBUG_PRINT
+							if (ct <= -100)
+							{
+								cout << knlm->evaluateLL(&seq[ch], 3);
+								cout << "@Warn\t";
+								cout << morphBase[seq[ch]] << '\t';
+								cout << morphBase[seq[ch + 1]] << '\t';
+								cout << morphBase[seq[ch + 2]] << '\t';
+								cout << endl;
+							}
+#endif
 						}
 					}
 					else
@@ -337,7 +340,10 @@ vector<pair<vector<const KMorpheme*>, float>> KGraphNode::findBestPath(const vec
 					for (size_t ch = chSize; ch-- > 0;)
 					{
 						if(ch) cache[i].back().first.emplace_back(seq[ch], combSocket[ch]);
-						else cache[i].back().first.emplace_back(seq[ch], combSocket[ch], condV, condP);
+						else 
+						{
+							cache[i].back().first.emplace_back(seq[ch], combSocket[ch], condV, condP, ownFormId);
+						}
 					}
 				}
 				else
@@ -353,6 +359,19 @@ vector<pair<vector<const KMorpheme*>, float>> KGraphNode::findBestPath(const vec
 			if (c.second > tMax - 10.f) reduced.emplace_back(move(c));
 		}
 		cache[i] = move(reduced);
+
+#ifdef DEBUG_PRINT
+		for (auto& tt : cache[i])
+		{
+			cout << tt.second << '\t';
+			for (auto it = tt.first.rbegin(); it != tt.first.rend(); ++it)
+			{
+				cout << morphBase[it->wid] << '\t';
+			}
+			cout << endl;
+		}
+		cout << "========" << endl;
+#endif
 	}
 
 	// start node
@@ -363,22 +382,36 @@ vector<pair<vector<const KMorpheme*>, float>> KGraphNode::findBestPath(const vec
 		if (!next) break;
 		for (auto&& p : cache[next - startNode])
 		{
+			if (p.first.back().combineSocket) continue;
+			if (!KFeatureTestor::isMatched(nullptr, p.first.back().condVowel)) continue;
 			seq[1] = p.first.back().wid;
 			seq[2] = (p.first.end() - 2)->wid;
-			float c = knlm->evaluateLL(seq, 3) + knlm->evaluateLL(seq, 2) + p.second;
+			float ct;
+			float c = (ct = knlm->evaluateLL(seq, 3) + knlm->evaluateLL(seq, 2)) + p.second;
+#ifdef DEBUG_PRINT
+			if (ct <= -100)
+			{
+				cout << "@Warn\t";
+				cout << morphBase[seq[0]] << '\t';
+				cout << morphBase[seq[1]] << '\t';
+				cout << morphBase[seq[2]] << '\t';
+				cout << endl;
+			}
+#endif
 			cache[0].emplace_back(p.first, c);
 		}
 	}
 
 	auto& cand = cache[0];
 	sort(cand.begin(), cand.end(), [](const pair<MInfos, float>& a, const pair<MInfos, float>& b) { return a.second > b.second; });
-	vector<pair<vector<const KMorpheme*>, float>> ret;
+	vector<pair<pathType, float>> ret;
 	for (size_t i = 0; i < min(topN, cand.size()); ++i)
 	{
-		vector<const KMorpheme*> mv(cand[i].first.size() - 1);
-		transform(cand[i].first.rbegin(), cand[i].first.rend() - 1, mv.begin(), [morphBase](const MInfo& m)
+		pathType mv(cand[i].first.size() - 1);
+		transform(cand[i].first.rbegin(), cand[i].first.rend() - 1, mv.begin(), [morphBase, &ownFormList](const MInfo& m)
 		{
-			return morphBase + m.wid;
+			if(m.ownFormId)	return make_pair(morphBase + m.wid, move(ownFormList[m.ownFormId - 1]));
+			else return make_pair(morphBase + m.wid, k_string{});
 		});
 		ret.emplace_back(mv, cand[i].second);
 	}

@@ -29,6 +29,8 @@ struct KWordPair : public std::tuple<k_string, KPOSTag, uint8_t, uint16_t>
 	{
 		return !operator ==(o);
 	}
+	
+	friend std::ostream& operator << (std::ostream& os, const KWordPair& kp);
 };
 
 typedef std::pair<std::vector<KWordPair>, float> KResult;

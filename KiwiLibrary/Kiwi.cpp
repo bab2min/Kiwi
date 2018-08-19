@@ -100,7 +100,7 @@ vector<KResult> Kiwi::analyze(const u16string & str, size_t topN) const
 		vector<KWordPair> rarr;
 		for (auto&& s : r.first)
 		{
-			rarr.emplace_back(s->kform ? joinHangul(*s->kform) : u"", s->tag, 0, 0);
+			rarr.emplace_back(s.second.empty() ? joinHangul(*s.first->kform) : s.second, s.first->tag, 0, 0);
 		}
 		ret.emplace_back(rarr, r.second);
 	}
@@ -116,4 +116,9 @@ void Kiwi::clearCache()
 int Kiwi::getVersion()
 {
 	return 50;
+}
+
+std::ostream & operator<<(std::ostream & os, const KWordPair & kp)
+{
+	return os << utf16_to_utf8({ kp.str().begin(), kp.str().end() }) << '/' << tagToString(kp.tag());
 }

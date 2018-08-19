@@ -106,16 +106,17 @@ int main()
 	_CrtSetDbgFlag(_CRTDBG_CHECK_ALWAYS_DF);
 #endif
 
-	system("chcp 65001");
-	_wsetlocale(LC_ALL, L"korean");
+	SetConsoleOutputCP(CP_UTF8);
+	setvbuf(stdout, nullptr, _IOFBF, 1000);
 	Timer timer;
 	Kiwi kw{ "../ModelGenerator/", (size_t)-1, 1 };
 	kw.prepare();
-	printf("Loading Time : %g ms\n", timer.getElapsed());
+	cout << "Loading Time : " << timer.getElapsed() << " ms" << endl;
 	PROCESS_MEMORY_COUNTERS pmc;
 	GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc));
 	SIZE_T memUsed = pmc.WorkingSetSize;
-	printf("Mem Usage : %g MB\n", memUsed / 1024.f / 1024.f);
+	kw.analyze(KSTR("ºù¼ö - »þº£Æ®±â¡¦ "));
+	cout << "Mem Usage : " << memUsed / 1024.f / 1024.f << " MB" << endl;
 	string testFiles[] = { "01s.txt", "02s.txt", "03s.txt", "17s.txt", "18s.txt", "13s.txt", "15s.txt", };
 	for (auto tf : testFiles)
 	{
@@ -123,20 +124,18 @@ int main()
 		KTest test{ ("../TestSets/" + tf).c_str(), &kw };
 		double tm = total.getElapsed();
 
-		printf("\n%g\n", test.getScore());
-		printf("Total (%zd) Time : %g ms\n", test.getTotalCount(), tm);
-		printf("Time per Unit : %g ms\n", tm / test.getTotalCount());
+		cout << endl << test.getScore() << endl;
+		cout << "Total (" << test.getTotalCount() << ") Time : " << tm << " ms" << endl;
+		cout << "Time per Unit : " << tm / test.getTotalCount() << " ms" << endl;
 		
-		FILE* out;
-		fopen_s(&out, ("wrongsV2" + tf).c_str(), "w");
-		fprintf(out, "%g\n", test.getScore());
-		fprintf(out, "Total (%zd) Time : %g ms\n", test.getTotalCount(), tm);
-		fprintf(out, "Time per Unit : %g ms\n\n", tm / test.getTotalCount());
+		ofstream out{ "wrongsV2" + tf };
+		out << test.getScore() << endl;
+		out << "Total (" << test.getTotalCount() << ") Time : " << tm << " ms" << endl;
+		out << "Time per Unit : " << tm / test.getTotalCount() << " ms" << endl;
 		for (auto t : test.getWrongList())
 		{
 			t.writeResult(out);
 		}
-		fclose(out);
 	}
 	getchar();
 	return 0;

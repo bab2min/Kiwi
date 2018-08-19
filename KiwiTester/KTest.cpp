@@ -83,27 +83,20 @@ float KTest::getScore() const
 	return totalScore / totalCount;
 }
 
-void KTest::TestResult::writeResult(FILE * output) const
+void KTest::TestResult::writeResult(ostream& out) const
 {
-	fputws((const wchar_t*)q.c_str(), output);
-	fprintf(output, "\t%.3g\n", score);
-	for (auto _r : da)
+	out << utf16_to_utf8(q) << '\t' << score << endl;
+	for (auto& _r : da)
 	{
-		fputws((const wchar_t*)_r.str().c_str(), output);
-		fputwc('/', output);
-		fputs(tagToString(_r.tag()), output);
-		fputwc('\t', output);
+		out << _r << '\t';
 	}
-	fputwc('\n', output);
-	for (auto _r : dr)
+	out << endl;
+	for (auto& _r : dr)
 	{
-		fputws((const wchar_t*)_r.str().c_str(), output);
-		fputwc('/', output);
-		fputs(tagToString(_r.tag()), output);
-		fputwc('\t', output);
+		out << _r << '\t';
 	}
-	fputwc('\n', output);
-	fputwc('\n', output);
+	out << endl;
+	out << endl;
 	/*for (auto _r : a)
 	{
 		fputws(_r.first.c_str(), output);

@@ -41,6 +41,9 @@ void KModelMgr::loadMMFromTxt(std::istream& is, morphemeMap& morphMap)
 
 		auto form = normalizeHangul({ fields[0].begin(), fields[0].end() });
 		auto tag = makePOSTag({ fields[1].begin(), fields[1].end() });
+
+		if (morphMap.find(make_pair(form, tag)) != morphMap.end()) continue;
+
 		float morphWeight = stof(fields[2].begin(), fields[2].end());
 		if (morphWeight < 10 && tag >= KPOSTag::JKS)
 		{
@@ -66,11 +69,14 @@ void KModelMgr::loadMMFromTxt(std::istream& is, morphemeMap& morphMap)
 				cvowel = KCondVowel::any;
 			}
 
-			float u[] = { positive, 1 - positive };
-			pmIdx = max_element(u, u + 2) - u;
-			if (u[pmIdx] >= 0.825f)
+			if (tag < KPOSTag::EP)
 			{
-				polar = (KCondPolarity)(pmIdx + 1);
+				float u[] = { positive, 1 - positive };
+				pmIdx = max_element(u, u + 2) - u;
+				if (u[pmIdx] >= 0.825f)
+				{
+					polar = (KCondPolarity)(pmIdx + 1);
+				}
 			}
 		}
 		size_t mid = morphemes.size();
@@ -202,6 +208,7 @@ void KModelMgr::loadCorpusFromTxt(std::istream & is, morphemeMap& morphMap)
 	string line;
 	vector<uint32_t> wids;
 	wids.emplace_back(0);
+	//ofstream debug{ "debug.txt" };
 	while (getline(is, line))
 	{
 		auto wstr = utf8_to_utf16(line);
@@ -210,6 +217,11 @@ void KModelMgr::loadCorpusFromTxt(std::istream & is, morphemeMap& morphMap)
 		{
 			wids.emplace_back(1);
 			langMdl.trainSequence(&wids[0], wids.size());
+			/*for (auto w : wids)
+			{
+				debug << w << ' ';
+			}
+			debug << endl;*/
 			wids.erase(wids.begin() + 1, wids.end());
 			continue;
 		}
@@ -399,7 +411,7 @@ void KModelMgr::solidify()
 	formMap = {};
 }
 
-vector<pair<vector<const KMorpheme*>, float>> KModelMgr::findBestPath(const vector<KGraphNode>& nodes, size_t topN) const
+vector<pair<KGraphNode::pathType, float>> KModelMgr::findBestPath(const vector<KGraphNode>& nodes, size_t topN) const
 {
 	return KGraphNode::findBestPath(nodes, &langMdl, &morphemes[0], topN);
 }

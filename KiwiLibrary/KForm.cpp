@@ -184,3 +184,11 @@ void KMorpheme::writeToBin(ostream& os, const function<size_t(const KMorpheme*)>
 		writeToBinStream<uint32_t>(os, mapper(c));
 	}
 }
+
+std::ostream & operator<<(std::ostream & os, const KMorpheme & morph)
+{
+	os << utf16_to_utf8(morph.kform ? u16string{ morph.kform->begin(), morph.kform->end() } : u"_");
+	os << '/';
+	os << tagToString(morph.tag);
+	if (morph.combineSocket) os << '+' << morph.combineSocket;
+}

@@ -35,6 +35,6 @@ public:
 #else
 	const KTrie* getTrie() const { return trieRoot.get(); }
 #endif
-	std::vector<std::pair<std::vector<const KMorpheme*>, float>> findBestPath(const std::vector<KGraphNode>& nodes, size_t topN) const;
+	std::vector<std::pair<KGraphNode::pathType, float>> findBestPath(const std::vector<KGraphNode>& nodes, size_t topN) const;
 };
 

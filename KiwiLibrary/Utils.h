@@ -3,8 +3,6 @@
 #include "KForm.h"
 #define LEN_ARRAY(p) (sizeof(p)/sizeof(p[0]))
 
-struct KChunk;
-
 k_string normalizeHangul(std::u16string hangul);
 k_string joinHangul(k_string hangul);
 

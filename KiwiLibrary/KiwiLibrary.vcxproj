@@ -135,6 +135,8 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <AdditionalOptions>/Qvec-report:1 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -153,9 +155,16 @@
     <ClInclude Include="Kiwi.h" />
     <ClInclude Include="KiwiHeader.h" />
     <ClInclude Include="KMemory.h" />
-    <ClInclude Include="KMemoryKChunk.h" />
+    <ClInclude Include="KMemoryKChunk.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="KMemoryChar.h" />
-    <ClInclude Include="KMemoryKMorphemeNode.h" />
+    <ClInclude Include="KMemoryKMorphemeNode.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="KMemoryTrie.h" />
     <ClInclude Include="KModelMgr.h" />
     <ClInclude Include="KNLangModel.h" />
     <ClInclude Include="KTrie.h" />
