@@ -4,51 +4,7 @@
 #include "Trie.hpp"
 #include "KForm.h"
 
-struct KChunk
-{
-	union 
-	{
-		const KForm* form;
-		struct
-		{
-			unsigned short _;
-			unsigned char begin;
-			unsigned char end;
-		};
-	};
-
-	KChunk(const KForm* _form) : form(_form) {  }
-	KChunk(unsigned char _begin, unsigned char _end) : _(0xFFFF), begin(_begin), end(_end) {}
-	const KMorpheme* getMorpheme(size_t idx, KMorpheme* tmp) const;
-	size_t getCandSize() const;
-	bool isStr() const { return _ == 0xFFFF; }
-};
-
-#ifdef CUSTOM_ALLOC
-#include "KMemoryKChunk.h"
-typedef std::vector<KChunk, pool_allocator<KChunk>> k_vchunk;
-#else 
-typedef std::vector<KChunk> k_vchunk;
-#endif
-
 class KModelMgr;
-
-struct KMorphemeNode
-{
-	const KMorpheme* morpheme;
-#ifdef CUSTOM_ALLOC
-	std::vector<KMorphemeNode*, pool_allocator<void*>> nexts;
-#else
-	std::vector<KMorphemeNode*> nexts;
-#endif
-	k_vpcf* optimaCache = nullptr;
-	KMorphemeNode(const KMorpheme* _morpheme = nullptr) : morpheme(_morpheme) {}
-	~KMorphemeNode();
-	void makeNewCache();
-	void setAcceptableFinal() { nexts.emplace_back(nullptr); }
-	bool isAcceptableFinal() const { return nexts.size() == 1 && nexts[0] == nullptr; }
-};
-
 class KNLangModel;
 
 struct KGraphNode
@@ -57,14 +13,16 @@ struct KGraphNode
 	const KForm* form = nullptr;
 	k_string uform;
 	uint16_t lastPos;
-	uint16_t nexts[MAX_NEXT] = { 0, };
+	std::array<uint16_t, MAX_NEXT> nexts = { 0, };
 
 	KGraphNode(const KForm* _form = nullptr, uint16_t _lastPos = 0) : form(_form), lastPos(_lastPos) {}
 	KGraphNode(const k_string& _uform, uint16_t _lastPos) : uform(_uform), lastPos(_lastPos) {}
 
 	KGraphNode* getNext(size_t idx) const { return nexts[idx] ? (KGraphNode*)this + nexts[idx] : nullptr; }
 	
-	static std::vector<std::pair<std::vector<const KMorpheme*>, float>> findBestPath(const std::vector<KGraphNode>& graph, const KNLangModel * knlm, const KMorpheme* morphBase, size_t topN);
+	typedef std::vector<std::pair<const KMorpheme*, k_string>> pathType;
+	static std::vector<std::pair<pathType, float>> findBestPath(
+		const std::vector<KGraphNode>& graph, const KNLangModel * knlm, const KMorpheme* morphBase, size_t topN);
 
 	void addNext(KGraphNode* next)
 	{

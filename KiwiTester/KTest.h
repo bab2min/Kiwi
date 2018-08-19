@@ -12,7 +12,7 @@ public:
 		std::vector<KWordPair> dr, da;
 		std::vector<KResult> cands;
 		float score;
-		void writeResult(FILE* output) const;
+		void writeResult(std::ostream& out) const;
 	};
 protected:
 	std::vector<TestResult> wrongList;

@@ -5,6 +5,7 @@
 bool KFeatureTestor::isMatched(const k_string * form, KCondVowel vowel)
 {
 	if (vowel == KCondVowel::none || vowel == KCondVowel::any) return true;
+	if (!form) return false;
 	switch (vowel)
 	{
 	case KCondVowel::vocalicH:
@@ -28,6 +29,7 @@ bool KFeatureTestor::isMatched(const k_string * form, KCondVowel vowel)
 bool KFeatureTestor::isMatched(const k_string * form, KCondPolarity polar)
 {
 	if (polar == KCondPolarity::none) return true;
+	if (!form) return false;
 	for (auto it = form->rbegin(); it != form->rend(); ++it)
 	{
 		if (!(0xAC00 <= *it && *it <= 0xD7A4)) continue;

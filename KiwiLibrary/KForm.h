@@ -93,6 +93,8 @@ struct KMorpheme
 	const KMorpheme* getCombined() const { return this + combined; }
 	void readFromBin(std::istream& is, const std::function<const KMorpheme*(size_t)>& mapper);
 	void writeToBin(std::ostream& os, const std::function<size_t(const KMorpheme*)>& mapper) const;
+
+	friend std::ostream& operator<< (std::ostream& os, const KMorpheme& morph);
 };
 
 struct KForm
