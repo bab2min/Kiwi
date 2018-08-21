@@ -12,6 +12,7 @@ class MorphemeModel:
         for line in open(filename, encoding='utf-8'):
             c = line.strip().split('\t')
             if not c[1].startswith('E') and not c[1].startswith('J') and not c[1].startswith('VC'): continue
+            if c[1].startswith('E') and c[0].startswith('아'): continue
             k = tuple(c[0:2])
             if k in self.morphemes: continue
             f = tuple(map(float, c[2:8]))
@@ -24,13 +25,13 @@ class MorphemeModel:
             else: self.index[k[1]].append(k)
 
     def isVowel(s):
-        return 'ㅏ' <= s[-1] <= 'ㅣ'
+        return '가' <= s[-1] <= '히'
 
     def isVocalic(s):
-        return 'ㅏ' <= s[-1] <= 'ㅣ' or s[-1] == 'ㄹ'
+        return '가' <= s[-1] <= '히' or s[-1] == 'ᆯ'
 
     def isVocalicH(s):
-        return 'ㅏ' <= s[-1] <= 'ㅣ' or s[-1] == 'ㄹ' or s[-1] == 'ㅎ'
+        return '가' <= s[-1] <= '히' or s[-1] == 'ᆯ' or s[-1] == 'ᇂ'
 
     def notVowel(s):
         return not MorphemeModel.isVowel(s)
@@ -40,6 +41,9 @@ class MorphemeModel:
 
     def notVocalicH(s):
         return not MorphemeModel.isVocalicH(s)
+
+    def isSingleVowel(s):
+        return 'ㅏ' <= s <= 'ㅣ'
 
     def isPositive(s):
         for c in reversed(s):
@@ -56,7 +60,7 @@ class RuleModel:
             self.rules = []
 
         def appendRule(self, formA, formB, result, bcond):
-            if MorphemeModel.isVowel(formA) and MorphemeModel.isVowel(result):
+            if MorphemeModel.isSingleVowel(formA) and MorphemeModel.isSingleVowel(result):
                 for i in range(19):
                     l = chr(28*(21*i + ord(formA)-0x314F) + 0xAC00)
                     r = chr(28*(21*i + ord(result)-0x314F) + 0xAC00)
@@ -157,13 +161,20 @@ for d, p in pm.transition.get('NNB', {}).items():
     chain[(d,)] = p
 
 
+def parseList(line):
+    ch = line.strip().split('\t')
+    if len(ch) < 2:
+        return utils.Hangul.normalizeSplitCoda(ch[0])
+    return utils.Hangul.normalizeSplitCoda(ch[0]), ch[1]
+
 precondList = ['V', 'A', 'VA', 'VV', 'VX', 'NP', 'NNB']
 precond = {pos:[(i, pos) for i in rm.getPrecond(pos)] for pos in precondList}
 precond['V'] += [('이', 'VCP'), (('이', '-Coda'), 'VCP'), ('아니', 'VCN')]
-precond['XSV'] = [(utils.Hangul.normalizeSplitCoda(line.strip()), 'XSV') for line in open('XSV.txt', encoding='utf-8').readlines()]
-precond['XSA'] = [(utils.Hangul.normalizeSplitCoda(line.strip()), 'XSA') for line in open('XSA.txt', encoding='utf-8').readlines()]
-#precond['VA'] = [(utils.Hangul.normalizeSplitCoda(line.strip()), 'VA') for line in open('VA.txt', encoding='utf-8').readlines()]
-precond['VX'] = [(utils.Hangul.normalizeSplitCoda(line.strip()), 'VX') for line in open('VX.txt', encoding='utf-8').readlines()]
+precond['XSV'] = [(parseList(line), 'XSV') for line in open('XSV.txt', encoding='utf-8').readlines()]
+precond['XSA'] = [(parseList(line), 'XSA') for line in open('XSA.txt', encoding='utf-8').readlines()]
+precond['VA'] = [(parseList(line), 'VA') for line in open('VA.txt', encoding='utf-8').readlines()]
+precond['VX'] = [(parseList(line), 'VX') for line in open('VX.txt', encoding='utf-8').readlines()]
+precond['VV'] += [(parseList(line), 'VV') for line in open('VV.txt', encoding='utf-8').readlines()]
 emptyPos = set()
 
 def enumForms(tag):

@@ -4,6 +4,7 @@
 #include "KModelMgr.h"
 #include "KMemory.h"
 #include "Utils.h"
+#include "logPoisson.h"
 
 using namespace std;
 
@@ -13,53 +14,74 @@ vector<KGraphNode> KTrie::split(const k_string& str) const
 	ret.reserve(8);
 	ret.emplace_back();
 	size_t n = 0;
-	vector<const KForm*, pool_allocator<void*>> candidates;
+	vector<const KForm*, pool_allocator<const KForm*>> candidates;
 	const KTrie* curTrie = this;
 	unordered_map<uint32_t, int> spacePos;
-	auto brachOut = [&]()
+	size_t lastSpecialEndPos = 0;
+	auto brachOut = [&](bool makeLongMatch = false)
 	{
-		if (candidates.empty()) return;
-		for (auto cand : candidates)
+		if (!candidates.empty())
 		{
-			size_t nBegin = n - cand->form.size();
-			auto it = spacePos.find(nBegin - 1);
-			int space = it == spacePos.end() ? 0 : it->second;
-			bool isMatched = false;
+			for (auto& cand : candidates)
+			{
+				size_t nBegin = n - cand->form.size();
+				auto it = spacePos.find(nBegin - 1);
+				int space = it == spacePos.end() ? 0 : it->second;
+				bool isMatched = false;
+				bool longestMatched = any_of(ret.begin() + 1, ret.end(), [lastSpecialEndPos, nBegin](const KGraphNode& g)
+				{
+					return nBegin == g.lastPos && lastSpecialEndPos == g.lastPos - (g.uform.empty() ? g.form->form.size() : g.uform.size());
+				});
+
+				// inserting unknown form 
+				if (nBegin != lastSpecialEndPos && !longestMatched && !(0x11A8 <= cand->form[0] && cand->form[0] < (0x11A7 + 28)))
+				{
+					auto it2 = spacePos.find(lastSpecialEndPos - 1);
+					int space2 = it2 == spacePos.end() ? 0 : it2->second;
+					for (auto& g : ret)
+					{
+						if (g.lastPos != lastSpecialEndPos - space2) continue;
+						g.addNext(&ret.back() + 1);
+					}
+					ret.emplace_back(str.substr(lastSpecialEndPos, nBegin - space - lastSpecialEndPos), nBegin - space);
+				}
+
+				for (auto& g : ret)
+				{
+					if (g.lastPos != nBegin - space) continue;
+					isMatched = true;
+					g.addNext(&ret.back() + 1);
+				}
+
+				if (isMatched)
+				{
+					ret.emplace_back(cand, n);
+				}
+			}
+			candidates.clear();
+		}
+
+		bool duplicated = any_of(ret.begin() + 1, ret.end(), [lastSpecialEndPos, n](const KGraphNode& g)
+		{
+			return n == g.lastPos /*&& lastSpecialEndPos == g.lastPos - (g.uform.empty() ? g.form->form.size() : g.uform.size())*/;
+		});
+		if (makeLongMatch && n != lastSpecialEndPos && !duplicated)
+		{
+			auto it2 = spacePos.find(lastSpecialEndPos - 1);
+			int space2 = it2 == spacePos.end() ? 0 : it2->second;
 			for (auto& g : ret)
 			{
-				if (g.lastPos != nBegin - space) continue;
-				isMatched = true;
+				if (g.lastPos != lastSpecialEndPos - space2) continue;
 				g.addNext(&ret.back() + 1);
 			}
-			if (isMatched)
-			{
-				ret.emplace_back(cand, n);
-			}
+			ret.emplace_back(str.substr(lastSpecialEndPos, n - lastSpecialEndPos), n);
 		}
-		candidates.clear();
 	};
 
 	KPOSTag chrType, lastChrType = KPOSTag::UNKNOWN;
 	for (auto c : str)
 	{
 		chrType = identifySpecialChr(c);
-		// space or special character
-		/*if ( != KPOSTag::MAX)
-		{
-			while (curTrie->fail)
-			{
-				curTrie = curTrie->getFail();
-				if (curTrie->val && curTrie->val != (void*)-1)
-				{
-					if (find(candidates.begin(), candidates.end(), curTrie->val) != candidates.end()) break;
-					candidates.emplace_back(curTrie->val);
-				}
-			}
-			brachOut();
-			curTrie = this;
-			goto continueFor;
-		}*/
-		// normal character
 		while (!curTrie->getNext(c)) // if curTrie has no exact next node, goto fail
 		{
 			if (curTrie->fail)
@@ -77,7 +99,7 @@ vector<KGraphNode> KTrie::split(const k_string& str) const
 			}
 			else
 			{
-				brachOut();
+				brachOut(chrType != KPOSTag::MAX);
 				// the root node has no exact next node, test special chr
 				// space
 				if (chrType == KPOSTag::UNKNOWN)
@@ -92,9 +114,10 @@ vector<KGraphNode> KTrie::split(const k_string& str) const
 					{
 						spacePos[n] = spacePos[n - 1] + 1;
 					}
+					lastSpecialEndPos = n + 1;
 				}
 				// not space
-				else
+				else if(chrType != KPOSTag::MAX)
 				{
 					// insert new node
 					if (chrType != lastChrType)
@@ -115,6 +138,7 @@ vector<KGraphNode> KTrie::split(const k_string& str) const
 						ret.back().uform.push_back(c);
 						ret.back().lastPos = n + 1;
 					}
+					lastSpecialEndPos = n + 1;
 				}
 				goto continueFor; 
 			}
@@ -145,15 +169,17 @@ vector<KGraphNode> KTrie::split(const k_string& str) const
 			candidates.emplace_back(curTrie->val);
 		}
 	}
-	brachOut();
+	brachOut(true);
 	ret.emplace_back();
 	ret.back().lastPos = n;
+	auto it = spacePos.find(n - 1);
+	int space = it == spacePos.end() ? 0 : it->second;
 	for (auto& r : ret)
 	{
-		if (r.lastPos < n) continue;
+		if (r.lastPos < n - space) continue;
 		r.addNext(&ret.back());
 	}
-	return ret;
+	return KGraphNode::removeUnconnected(ret);
 }
 
 void KTrie::saveToBin(std::ostream & os, const KForm* base) const
@@ -199,6 +225,55 @@ struct MInfo
 };
 #include "KMemoryTrie.h"
 
+vector<KGraphNode> KGraphNode::removeUnconnected(const vector<KGraphNode>& graph)
+{
+	vector<uint16_t> connectedList(graph.size()), newIndexDiff(graph.size());
+	connectedList[graph.size() - 1] = true;
+	size_t connectedCnt = 1;
+	for (size_t i = graph.size() - 1; i-- > 0; )
+	{
+		bool connected = false;
+		for (size_t j = 0; j < KGraphNode::MAX_NEXT; ++j)
+		{
+			if (!graph[i].nexts[j]) break;
+			if (connectedList[i + graph[i].nexts[j]])
+			{
+				connected = true;
+				++connectedCnt;
+				break;
+			}
+		}
+		connectedList[i] = connected;
+	}
+	newIndexDiff[0] = connectedList[0];
+	for (size_t i = 1; i < graph.size(); ++i)
+	{
+		newIndexDiff[i] = newIndexDiff[i - 1] + connectedList[i];
+	}
+	for (size_t i = 0; i < graph.size(); ++i)
+	{
+		newIndexDiff[i] = i + 1 - newIndexDiff[i];
+	}
+
+	vector<KGraphNode> ret;
+	ret.reserve(connectedCnt);
+	for (size_t i = 0; i < graph.size(); ++i)
+	{
+		if (!connectedList[i]) continue;
+		ret.emplace_back(graph[i]);
+		auto& newNode = ret.back();
+		size_t n = 0;
+		for (size_t j = 0; j < MAX_NEXT; ++j)
+		{
+			auto idx = newNode.nexts[j];
+			if (!idx) break;
+			if(connectedList[i + idx]) newNode.nexts[n++] = newNode.nexts[j] - (newIndexDiff[i + idx] - newIndexDiff[i]);
+		}
+		newNode.nexts[n] = 0;
+	}
+	return ret;
+}
+
 vector<pair<KGraphNode::pathType, float>> KGraphNode::findBestPath(const vector<KGraphNode>& graph, const KNLangModel * knlm, const KMorpheme* morphBase, size_t topN)
 {
 	typedef KNLangModel::WID WID;
@@ -209,21 +284,16 @@ vector<pair<KGraphNode::pathType, float>> KGraphNode::findBestPath(const vector<
 	const KGraphNode* endNode = &graph.back();
 	vector<k_string> ownFormList;
 
-	// end node
-	cache.back().emplace_back(MInfos{ MInfo(1u) }, 0.f);
+	vector<const KMorpheme*> unknownNodeCands, unknownNodeLCands;
+	unknownNodeCands.emplace_back(morphBase + (size_t)KPOSTag::NNG + 1);
+	unknownNodeCands.emplace_back(morphBase + (size_t)KPOSTag::NNP + 1);
 
-	// middle nodes
-	for (size_t i = graph.size() - 2; i > 0; --i)
+	unknownNodeLCands.emplace_back(morphBase + (size_t)KPOSTag::NNP + 1);
+
+	auto& evalPath = [&](const KGraphNode* node, size_t i, size_t ownFormId, const vector<const KMorpheme*>& cands, bool unknownForm)
 	{
-		auto* node = &graph[i];
-		size_t ownFormId = 0;
-		if (!node->uform.empty())
-		{
-			ownFormList.emplace_back(node->uform);
-			ownFormId = ownFormList.size();
-		}
-		float tMin = INFINITY, tMax = -INFINITY;
-		for (auto& curMorph : node->form->candidate)
+		float tMax = -INFINITY;
+		for (auto& curMorph : cands)
 		{
 			array<WID, 5> seq = { 0, };
 			array<uint8_t, 3> combSocket = { 0, };
@@ -271,14 +341,14 @@ vector<pair<KGraphNode::pathType, float>> KGraphNode::findBestPath(const vector<
 					{
 						continue;
 					}
-					else if(p.first.size() > 1)
+					else if (p.first.size() > 1)
 					{
 						seq[0] = orgSeq;
 						seq[chSize + 1] = (p.first.end() - 2)->wid;
 					}
-					
-					
-					if (!KFeatureTestor::isMatched(curMorph->kform, p.first.back().condVowel, p.first.back().condPolar))
+
+
+					if (!KFeatureTestor::isMatched(node->uform.empty() ? curMorph->kform : &node->uform, p.first.back().condVowel, p.first.back().condPolar))
 					{
 						continue;
 					}
@@ -310,7 +380,7 @@ vector<pair<KGraphNode::pathType, float>> KGraphNode::findBestPath(const vector<
 					}
 
 					auto itp = maxWidLL.equal_range(seq[chSize + 1]);
-					if (std::distance(itp.first, itp.second) < 3)
+					if (std::distance(itp.first, itp.second) < 5)
 					{
 						maxWidLL.emplace(seq[chSize + 1], make_pair(p.first, c));
 					}
@@ -329,9 +399,20 @@ vector<pair<KGraphNode::pathType, float>> KGraphNode::findBestPath(const vector<
 					}
 				}
 			}
+
+			// if a form of the node is unknown, calculate log poisson distribution for word-tag
+			float estimatedLL = 0;
+			if (unknownForm)
+			{
+				if (curMorph->tag == KPOSTag::NNG) estimatedLL = LogPoisson::getLL(4.622955f, node->uform.size());
+				else if (curMorph->tag == KPOSTag::NNP) estimatedLL = LogPoisson::getLL(5.177622f, node->uform.size());
+				else if (curMorph->tag == KPOSTag::MAG) estimatedLL = LogPoisson::getLL(4.557326f, node->uform.size());
+				estimatedLL -= 16;
+			}
+
 			for (auto& p : maxWidLL)
 			{
-				tMin = min(tMin, p.second.second);
+				p.second.second += estimatedLL;
 				tMax = max(tMax, p.second.second);
 				cache[i].emplace_back(p.second);
 				if (!curMorph->combineSocket || curMorph->chunks)
@@ -339,8 +420,8 @@ vector<pair<KGraphNode::pathType, float>> KGraphNode::findBestPath(const vector<
 					cache[i].back().first.reserve(cache[i].back().first.size() + chSize);
 					for (size_t ch = chSize; ch-- > 0;)
 					{
-						if(ch) cache[i].back().first.emplace_back(seq[ch], combSocket[ch]);
-						else 
+						if (ch) cache[i].back().first.emplace_back(seq[ch], combSocket[ch]);
+						else
 						{
 							cache[i].back().first.emplace_back(seq[ch], combSocket[ch], condV, condP, ownFormId);
 						}
@@ -352,13 +433,55 @@ vector<pair<KGraphNode::pathType, float>> KGraphNode::findBestPath(const vector<
 				}
 			}
 		}
+		return tMax;
+	};
+
+	// end node
+	cache.back().emplace_back(MInfos{ MInfo(1u) }, 0.f);
+
+	// middle nodes
+	for (size_t i = graph.size() - 2; i > 0; --i)
+	{
+		auto* node = &graph[i];
+		size_t ownFormId = 0;
+		if (!node->uform.empty())
+		{
+			ownFormList.emplace_back(node->uform);
+			ownFormId = ownFormList.size();
+		}
+		float tMax = -INFINITY;
+		
+		if (node->form)
+		{
+			tMax = evalPath(node, i, ownFormId, node->form->candidate, false);
+			if (all_of(node->form->candidate.begin(), node->form->candidate.end(), [](const KMorpheme* m)
+			{
+				return m->combineSocket || m->chunks;
+			})) 
+			{
+				ownFormList.emplace_back(node->form->form);
+				ownFormId = ownFormList.size();
+				tMax = max(tMax, evalPath(node, i, ownFormId, unknownNodeLCands, true));
+			};
+		}
+		else
+		{
+			tMax = evalPath(node, i, ownFormId, unknownNodeCands, true);
+		}
+
 		// heuristically removing lower ll to speed up
 		WordLLs reduced;
 		for (auto& c : cache[i])
 		{
-			if (c.second > tMax - 10.f) reduced.emplace_back(move(c));
+			if (c.second > tMax - 20.f) reduced.emplace_back(move(c));
 		}
 		cache[i] = move(reduced);
+		sort(cache[i].begin(), cache[i].end(), [](const pair<MInfos, float>& a, const pair<MInfos, float>& b)
+		{
+			return a.second > b.second;
+		});
+		size_t remainCnt = max((node->form ? node->form->candidate.size() : 3u) * topN * 2, (size_t)10);
+		if (remainCnt < cache[i].size()) cache[i].erase(cache[i].begin() + remainCnt, cache[i].end());
 
 #ifdef DEBUG_PRINT
 		for (auto& tt : cache[i])
@@ -410,7 +533,7 @@ vector<pair<KGraphNode::pathType, float>> KGraphNode::findBestPath(const vector<
 		pathType mv(cand[i].first.size() - 1);
 		transform(cand[i].first.rbegin(), cand[i].first.rend() - 1, mv.begin(), [morphBase, &ownFormList](const MInfo& m)
 		{
-			if(m.ownFormId)	return make_pair(morphBase + m.wid, move(ownFormList[m.ownFormId - 1]));
+			if(m.ownFormId)	return make_pair(morphBase + m.wid, ownFormList[m.ownFormId - 1]);
 			else return make_pair(morphBase + m.wid, k_string{});
 		});
 		ret.emplace_back(mv, cand[i].second);

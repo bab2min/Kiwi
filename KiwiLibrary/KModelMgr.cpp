@@ -42,8 +42,6 @@ void KModelMgr::loadMMFromTxt(std::istream& is, morphemeMap& morphMap)
 		auto form = normalizeHangul({ fields[0].begin(), fields[0].end() });
 		auto tag = makePOSTag({ fields[1].begin(), fields[1].end() });
 
-		if (morphMap.find(make_pair(form, tag)) != morphMap.end()) continue;
-
 		float morphWeight = stof(fields[2].begin(), fields[2].end());
 		if (morphWeight < 10 && tag >= KPOSTag::JKS)
 		{
@@ -60,7 +58,7 @@ void KModelMgr::loadMMFromTxt(std::istream& is, morphemeMap& morphMap)
 		{
 			float t[] = { vowel, vocalic, vocalicH, 1 - vowel, 1 - vocalic, 1 - vocalicH };
 			size_t pmIdx = max_element(t, t + LEN_ARRAY(t)) - t;
-			if (t[pmIdx] >= 0.825f)
+			if (t[pmIdx] >= 0.85f)
 			{
 				cvowel = (KCondVowel)(pmIdx + 2);
 			}
@@ -79,13 +77,25 @@ void KModelMgr::loadMMFromTxt(std::istream& is, morphemeMap& morphMap)
 				}
 			}
 		}
-		size_t mid = morphemes.size();
-		morphMap.emplace(make_pair(form, tag), mid);
 		auto& fm = formMapper(form);
-		fm.candidate.emplace_back((KMorpheme*)mid);
-		fm.suffix.insert(0);
-		morphemes.emplace_back(form, tag, cvowel, polar);
-		morphemes.back().kform = (const k_string*)(&fm - &forms[0]);
+		if (tag >= KPOSTag::EP && tag <= KPOSTag::ETM && form[0] == u'¾Æ')
+		{
+			form[0] = u'¾î';
+		}
+		auto it = morphMap.find(make_pair(form, tag));
+		if (it != morphMap.end())
+		{
+			fm.candidate.emplace_back((KMorpheme*)it->second);
+			morphemes[it->second].kform = (const k_string*)(&fm - &forms[0]);
+		}
+		else
+		{
+			size_t mid = morphemes.size();
+			morphMap.emplace(make_pair(form, tag), mid);
+			fm.candidate.emplace_back((KMorpheme*)mid);
+			morphemes.emplace_back(form, tag, cvowel, polar);
+			morphemes.back().kform = (const k_string*)(&fm - &forms[0]);
+		}
 	}
 #endif
 }
@@ -378,7 +388,7 @@ void KModelMgr::solidify()
 		trieRoot[i].val = &forms[i - 1];
 	}
 
-	for (size_t i = (size_t)KPOSTag::SN + 1; i < forms.size(); ++i)
+	for (size_t i = (size_t)KPOSTag::SN; i < forms.size(); ++i)
 	{
 		auto& f = forms[i];
 		if (f.candidate.empty()) continue;
