@@ -77,7 +77,7 @@ int Kiwi::prepare()
 
 KResult Kiwi::analyze(const u16string & str) const
 {
-	return analyze(str, MIN_CANDIDATE)[0];
+	return analyze(str, 1)[0];
 }
 
 KResult Kiwi::analyze(const string & str) const
@@ -100,7 +100,7 @@ vector<KResult> Kiwi::analyze(const u16string & str, size_t topN) const
 		vector<KWordPair> rarr;
 		for (auto&& s : r.first)
 		{
-			rarr.emplace_back(s.second.empty() ? joinHangul(*s.first->kform) : s.second, s.first->tag, 0, 0);
+			rarr.emplace_back(joinHangul(s.second.empty() ? *s.first->kform : s.second), s.first->tag, 0, 0);
 		}
 		ret.emplace_back(rarr, r.second);
 	}

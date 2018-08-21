@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "../KiwiLibrary/KiwiHeader.h"
 #include "../KiwiLibrary/Kiwi.h"
 #include "KTest.h"
@@ -15,7 +15,24 @@ KWordPair parseWordPOS(const u16string& str)
 	}
 	auto p = str.find('/');
 	if (p == str.npos) return {};
-	return { k_string{ str.begin(), str.begin() + p }, makePOSTag(str.substr(p + 1)), 0, 0 };
+	k_string form{ str.begin(), str.begin() + p };
+	if (str[p + 1] == 'E')
+	{
+		if (form[0] == 0xC544) form[0] = 0xC5B4; // 아
+		if (form[0] == 0xC558) form[0] = 0xC5C8; // 았
+	}
+	switch (form[0])
+	{
+	case 0x3134: // ㄴ
+		form[0] = 0x11AB; break;
+	case 0x3139: // ㄹ
+		form[0] = 0x11AF; break;
+	case 0x3141: // ㅁ
+		form[0] = 0x11B7; break;
+	case 0x3142: // ㅂ
+		form[0] = 0x11B8; break;
+	}
+	return { form, makePOSTag(str.substr(p + 1)), 0, 0 };
 }
 
 struct Counter
@@ -27,20 +44,13 @@ struct Counter
 
 KTest::KTest(const char * testSetFile, Kiwi* kw, size_t topN) : totalCount(0), totalScore(0)
 {
-	FILE* f = nullptr;
-	if (fopen_s(&f, testSetFile, "r")) throw exception();
-	/*fseek(f, 0, SEEK_END);
-	size_t totalSize = ftell(f);
-	size_t printed = 0;
-	rewind(f);*/
-	char buf[32768];
-	while (fgets(buf, 32768, f))
+	ifstream f{ testSetFile };
+	string line;
+	while (getline(f, line))
 	{
-		/*size_t cur = ftell(f);
-		for (; printed < cur * 100.0 / totalSize; printed++) printf(".");*/
 		try 
 		{
-			auto wstr = utf8_to_utf16(buf);
+			auto wstr = utf8_to_utf16(line);
 			if (wstr.back() == '\n') wstr.pop_back();
 			auto fd = split(wstr, u'\t');
 			if (fd.size() < 2) continue;
@@ -75,7 +85,6 @@ KTest::KTest(const char * testSetFile, Kiwi* kw, size_t topN) : totalCount(0), t
 
 		}
 	}
-	fclose(f);
 }
 
 float KTest::getScore() const

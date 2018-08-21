@@ -21,9 +21,11 @@ struct KGraphNode
 	KGraphNode* getNext(size_t idx) const { return nexts[idx] ? (KGraphNode*)this + nexts[idx] : nullptr; }
 	
 	typedef std::vector<std::pair<const KMorpheme*, k_string>> pathType;
+
+	static std::vector<KGraphNode> removeUnconnected(const std::vector<KGraphNode>& graph);
+
 	static std::vector<std::pair<pathType, float>> findBestPath(
 		const std::vector<KGraphNode>& graph, const KNLangModel * knlm, const KMorpheme* morphBase, size_t topN);
-
 	void addNext(KGraphNode* next)
 	{
 		size_t i = 0;

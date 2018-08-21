@@ -115,7 +115,7 @@ int main()
 	PROCESS_MEMORY_COUNTERS pmc;
 	GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc));
 	SIZE_T memUsed = pmc.WorkingSetSize;
-	kw.analyze(KSTR("빙수 - 샤베트기… "));
+	kw.analyze(KSTR(R"!(처음 알았을 때)!"), 10);
 	cout << "Mem Usage : " << memUsed / 1024.f / 1024.f << " MB" << endl;
 	string testFiles[] = { "01s.txt", "02s.txt", "03s.txt", "17s.txt", "18s.txt", "13s.txt", "15s.txt", };
 	for (auto tf : testFiles)

@@ -40,6 +40,7 @@ class PrecombinedModelGenerator:
                 suf = ch[0][-1:]
                 stem = ch[0][:-1]
             else: continue
+            if not stem: continue
             ch[0] = stem + '+' + suf
             vCond = self.findVCond(suf, stem, ch[1])
             if not vCond: continue
