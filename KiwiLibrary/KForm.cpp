@@ -191,4 +191,5 @@ std::ostream & operator<<(std::ostream & os, const KMorpheme & morph)
 	os << '/';
 	os << tagToString(morph.tag);
 	if (morph.combineSocket) os << '+' << morph.combineSocket;
+	return os;
 }

@@ -274,6 +274,8 @@ vector<KGraphNode> KGraphNode::removeUnconnected(const vector<KGraphNode>& graph
 	return ret;
 }
 
+//#define DEBUG_PRINT
+
 vector<pair<KGraphNode::pathType, float>> KGraphNode::findBestPath(const vector<KGraphNode>& graph, const KNLangModel * knlm, const KMorpheme* morphBase, size_t topN)
 {
 	typedef KNLangModel::WID WID;
@@ -329,7 +331,8 @@ vector<pair<KGraphNode::pathType, float>> KGraphNode::findBestPath(const vector<
 					seq[chSize] = p.first.back().wid;
 					if (p.first.back().combineSocket)
 					{
-						if (p.first.back().combineSocket != curMorph->combineSocket)
+						// always merge <V> <chunk> with the same socket
+						if (p.first.back().combineSocket != curMorph->combineSocket || curMorph->chunks)
 						{
 							continue;
 						}
@@ -341,10 +344,10 @@ vector<pair<KGraphNode::pathType, float>> KGraphNode::findBestPath(const vector<
 					{
 						continue;
 					}
-					else if (p.first.size() > 1)
+					else if (p.first.size() + chSize > 2)
 					{
 						seq[0] = orgSeq;
-						seq[chSize + 1] = (p.first.end() - 2)->wid;
+						if(p.first.size() > 1) seq[chSize + 1] = (p.first.end() - 2)->wid;
 					}
 
 
@@ -353,10 +356,10 @@ vector<pair<KGraphNode::pathType, float>> KGraphNode::findBestPath(const vector<
 						continue;
 					}
 
-					if (p.first.size() > 1)
+					if (p.first.size() + chSize > 2)
 					{
 						c = p.second;
-						for (size_t ch = 0; ch < chSize; ++ch)
+						for (size_t ch = 0; ch < chSize - (p.first.size() == 1 ? 1 : 0); ++ch)
 						{
 							if (any_of(combSocket.begin() + ch, combSocket.end(), [](uint8_t t) { return !!t; })) continue;
 							float ct;
@@ -527,6 +530,21 @@ vector<pair<KGraphNode::pathType, float>> KGraphNode::findBestPath(const vector<
 
 	auto& cand = cache[0];
 	sort(cand.begin(), cand.end(), [](const pair<MInfos, float>& a, const pair<MInfos, float>& b) { return a.second > b.second; });
+
+#ifdef DEBUG_PRINT
+	for (auto& tt : cache[0])
+	{
+		cout << tt.second << '\t';
+		for (auto it = tt.first.rbegin(); it != tt.first.rend(); ++it)
+		{
+			cout << morphBase[it->wid] << '\t';
+		}
+		cout << endl;
+	}
+	cout << "========" << endl;
+
+#endif
+
 	vector<pair<pathType, float>> ret;
 	for (size_t i = 0; i < min(topN, cand.size()); ++i)
 	{

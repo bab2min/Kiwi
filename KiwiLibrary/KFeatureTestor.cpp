@@ -33,12 +33,12 @@ bool KFeatureTestor::isMatched(const k_string * form, KCondPolarity polar)
 	for (auto it = form->rbegin(); it != form->rend(); ++it)
 	{
 		if (!(0xAC00 <= *it && *it <= 0xD7A4)) continue;
-		int v = (*it / 28) % 21;
+		int v = ((*it - 0xAC00) / 28) % 21;
 		if (v == 0 || v == 2 || v == 8) return polar == KCondPolarity::positive;
 		if (v == 18) continue;
 		return polar == KCondPolarity::negative;
 	}
-	return false;
+	return polar == KCondPolarity::negative;
 }
 
 bool KFeatureTestor::isMatched(const k_string * form, KCondVowel vowel, KCondPolarity polar)

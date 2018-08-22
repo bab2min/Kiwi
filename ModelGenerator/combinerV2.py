@@ -70,7 +70,7 @@ class RuleModel:
 
         def applyRule(self, formA, formB, bcond):
             for rule in self.rules:
-                if (bcond and bcond != rule[4]) or (self.posA == ['VCP'] and bcond != rule[4]): continue
+                if (bcond and bcond != rule[4]) or ((self.posA == ['VCP'] or self.posA == ['V']) and bcond != rule[4]): continue
                 res = [rule[2].sub(i, formA + '\t' + formB) for i in rule[3]]
                 if res[0].find('\t') < 0: return res
             return None
@@ -107,7 +107,8 @@ class RuleModel:
         ret = set()
         for rule in self.rules:
             if posA not in rule.posA: continue
-            for f in map(ruleToPrecond, rule.rules): ret |= set(f)
+            for f in map(ruleToPrecond, rule.rules):
+                ret |= set(f)
         return list(sorted(ret, key=lambda x:(x[0], x[1] or '')))
 
 class PosModel:
@@ -172,7 +173,7 @@ precond = {pos:[(i, pos) for i in rm.getPrecond(pos)] for pos in precondList}
 precond['V'] += [('이', 'VCP'), (('이', '-Coda'), 'VCP'), ('아니', 'VCN')]
 precond['XSV'] = [(parseList(line), 'XSV') for line in open('XSV.txt', encoding='utf-8').readlines()]
 precond['XSA'] = [(parseList(line), 'XSA') for line in open('XSA.txt', encoding='utf-8').readlines()]
-precond['VA'] = [(parseList(line), 'VA') for line in open('VA.txt', encoding='utf-8').readlines()]
+precond['VA'] += [(parseList(line), 'VA') for line in open('VA.txt', encoding='utf-8').readlines()]
 precond['VX'] = [(parseList(line), 'VX') for line in open('VX.txt', encoding='utf-8').readlines()]
 precond['VV'] += [(parseList(line), 'VV') for line in open('VV.txt', encoding='utf-8').readlines()]
 emptyPos = set()
@@ -185,6 +186,7 @@ def mToStr(p):
     else: return p[0] + '/' + p[1]
 
 output = open('combinedV2.txt', 'w', encoding='utf-8')
+socketMap = {}
 
 for pk in [''] + list(precond):
     for k in chain:
@@ -221,8 +223,11 @@ for pk in [''] + list(precond):
             socket = ''
             for i in nform:
                 if (pk == 'V' and ps[0][1] == 'V') or (pk == 'A' and ps[0][1] == 'A'):
-                    socket = precond[pk].index(ps[0])+1
-                    if pk == 'A': socket += len(precond['V'])
+                    key = ps[0] if type(ps[0][0]) == str else (ps[0][0][0], ps[0][1])
+                    if key in socketMap: socket = socketMap[key]
+                    else:
+                        socket = len(socketMap) + 1
+                        socketMap[key] = socket
                 output.write(i + '\t' + str('+'.join(map(mToStr, ps))) + '\t' + (bcond or '') + '\t' + (str(socket) or '')+ '\n')
         if not count: emptyPos.add(k)
 

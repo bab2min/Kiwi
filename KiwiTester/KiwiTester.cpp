@@ -105,7 +105,6 @@ int main()
 #ifdef _DEBUG
 	_CrtSetDbgFlag(_CRTDBG_CHECK_ALWAYS_DF);
 #endif
-
 	SetConsoleOutputCP(CP_UTF8);
 	setvbuf(stdout, nullptr, _IOFBF, 1000);
 	Timer timer;
@@ -115,7 +114,7 @@ int main()
 	PROCESS_MEMORY_COUNTERS pmc;
 	GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc));
 	SIZE_T memUsed = pmc.WorkingSetSize;
-	kw.analyze(KSTR(R"!(Ã³À½ ¾Ë¾ÒÀ» ¶§)!"), 10);
+	kw.analyze(KSTR(R"!(Èê·¶´Ù)!"), 10);
 	cout << "Mem Usage : " << memUsed / 1024.f / 1024.f << " MB" << endl;
 	string testFiles[] = { "01s.txt", "02s.txt", "03s.txt", "17s.txt", "18s.txt", "13s.txt", "15s.txt", };
 	for (auto tf : testFiles)
