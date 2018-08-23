@@ -279,7 +279,7 @@ vector<KGraphNode> KGraphNode::removeUnconnected(const vector<KGraphNode>& graph
 vector<pair<KGraphNode::pathType, float>> KGraphNode::findBestPath(const vector<KGraphNode>& graph, const KNLangModel * knlm, const KMorpheme* morphBase, size_t topN)
 {
 	typedef KNLangModel::WID WID;
-	typedef vector<MInfo, pool_allocator<MInfo>> MInfos;
+	typedef vector<MInfo, pool_allocator<void*>> MInfos;
 	typedef vector<pair<MInfos, float>, pool_allocator<void*>> WordLLs;
 	vector<WordLLs, pool_allocator<void*>> cache(graph.size());
 	const KGraphNode* startNode = &graph.front();
@@ -320,7 +320,7 @@ vector<pair<KGraphNode::pathType, float>> KGraphNode::findBestPath(const vector<
 			orgSeq = seq[0];
 			condV = curMorph->vowel;
 			condP = curMorph->polar;
-			multimap<WID, pair<MInfos, float>> maxWidLL;
+			unordered_multimap<WID, pair<MInfos, float>, hash<WID>, equal_to<WID>, pool_allocator<void*>> maxWidLL;
 			for (size_t i = 0; i < MAX_NEXT; ++i)
 			{
 				auto* next = node->getNext(i);

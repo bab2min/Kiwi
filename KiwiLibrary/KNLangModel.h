@@ -168,7 +168,11 @@ public:
 		void optimize()
 		{
 			std::map<WID, int32_t> tNext = move(next);
+#ifdef USE_UNOREDERED_MAP
+			bakedNext = BakedMap<WID, int32_t>{ tNext.begin(), tNext.end() };
+#else
 			bakedNext = BakedMap<WID, int32_t>{ tNext };
+#endif
 			baked = true;
 		}
 

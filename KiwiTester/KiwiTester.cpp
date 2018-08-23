@@ -114,7 +114,7 @@ int main()
 	PROCESS_MEMORY_COUNTERS pmc;
 	GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc));
 	SIZE_T memUsed = pmc.WorkingSetSize;
-	kw.analyze(KSTR(R"!(»Í∑∂¥Ÿ)!"), 10);
+	kw.analyze(KSTR(R"!(ø√∂Û∞°)!"), 10);
 	cout << "Mem Usage : " << memUsed / 1024.f / 1024.f << " MB" << endl;
 	string testFiles[] = { "01s.txt", "02s.txt", "03s.txt", "17s.txt", "18s.txt", "13s.txt", "15s.txt", };
 	for (auto tf : testFiles)
@@ -134,6 +134,11 @@ int main()
 		for (auto t : test.getWrongList())
 		{
 			t.writeResult(out);
+		}
+
+		for (auto& p : KSingleLogger::getInstance().totalAlloc)
+		{
+			cout << p.first << "bytes\t" << p.second << endl;
 		}
 	}
 	getchar();
