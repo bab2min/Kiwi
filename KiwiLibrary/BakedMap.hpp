@@ -3,6 +3,17 @@
 #include <map>
 #include <algorithm>
 
+#ifdef USE_UNORDERED_MAP
+#include <unordered_map>
+
+template<class Key, class Value>
+class BakedMap : public std::unordered_map<Key, Value>
+{
+public:
+	using std::unordered_map<Key, Value>::unordered_map;
+};
+#else
+
 template<class Key, class Value>
 class BakedMap
 {
@@ -95,3 +106,5 @@ public:
 	const iterator begin() const { return (iterator)elems; }
 	const iterator end() const { return (iterator)elems + length; }
 };
+
+#endif
