@@ -1,8 +1,6 @@
 #pragma once
 
 #include "KNLangModel.h"
-struct KTrie;
-struct KGraphNode;
 class KModelMgr
 {
 protected:
@@ -35,6 +33,8 @@ public:
 #else
 	const KTrie* getTrie() const { return trieRoot.get(); }
 #endif
-	std::vector<std::pair<KGraphNode::pathType, float>> findBestPath(const std::vector<KGraphNode>& nodes, size_t topN) const;
+
+	const KNLangModel* getLangModel() const { return &langMdl; }
+	const KMorpheme* getMorphemes() const { return &morphemes[0]; }
 };
 

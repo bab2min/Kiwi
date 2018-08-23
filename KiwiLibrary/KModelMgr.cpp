@@ -78,15 +78,17 @@ void KModelMgr::loadMMFromTxt(std::istream& is, morphemeMap& morphMap)
 			}
 		}
 		auto& fm = formMapper(form);
+		bool unified = false;
 		if (tag >= KPOSTag::EP && tag <= KPOSTag::ETM && form[0] == u'¾Æ')
 		{
 			form[0] = u'¾î';
+			unified = true;
 		}
 		auto it = morphMap.find(make_pair(form, tag));
 		if (it != morphMap.end())
 		{
 			fm.candidate.emplace_back((KMorpheme*)it->second);
-			morphemes[it->second].kform = (const k_string*)(&fm - &forms[0]);
+			if(!unified) morphemes[it->second].kform = (const k_string*)(&fm - &forms[0]);
 		}
 		else
 		{
@@ -419,9 +421,4 @@ void KModelMgr::solidify()
 		for (auto& p : f.candidate) p = &morphemes[(size_t)p];
 	}
 	formMap = {};
-}
-
-vector<pair<KGraphNode::pathType, float>> KModelMgr::findBestPath(const vector<KGraphNode>& nodes, size_t topN) const
-{
-	return KGraphNode::findBestPath(nodes, &langMdl, &morphemes[0], topN);
 }
