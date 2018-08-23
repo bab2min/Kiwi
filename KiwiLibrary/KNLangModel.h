@@ -103,9 +103,9 @@ public:
 
 		inline Node* getNextFromBaked(WID n) const
 		{
-			auto it = bakedNext.find(n);
-			if (it == bakedNext.end()) return nullptr;
-			return (Node*)this + it->second;
+			auto t = bakedNext[n];
+			if (!t) return nullptr;
+			return (Node*)this + t;
 		}
 
 		template<typename It>
@@ -121,8 +121,9 @@ public:
 		{
 			if (depth == endOrder)
 			{
-				auto it = bakedNext.find(n);
-				if (it != bakedNext.end()) return *(float*)&it->second;
+				union { int32_t t; float u; };
+				t = bakedNext[n];
+				if (t) return u;
 			}
 			else
 			{
@@ -168,11 +169,7 @@ public:
 		void optimize()
 		{
 			std::map<WID, int32_t> tNext = move(next);
-#ifdef USE_UNOREDERED_MAP
 			bakedNext = BakedMap<WID, int32_t>{ tNext.begin(), tNext.end() };
-#else
-			bakedNext = BakedMap<WID, int32_t>{ tNext };
-#endif
 			baked = true;
 		}
 
@@ -299,4 +296,3 @@ public:
 		return n;
 	}
 };
-

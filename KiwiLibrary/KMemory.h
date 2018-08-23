@@ -6,15 +6,17 @@ class KPool
 public:
 	std::vector<void*> poolBuf;
 	void** freeList;
+	std::mutex lock;
 	static KPool& getInstance()
 	{
-		thread_local KPool inst;
+		static KPool inst;
 		return inst;
 	}
 
 	void* allocate()
 	{
 		assert(_CrtCheckMemory());
+		//std::lock_guard<std::mutex> lg(lock);
 		if (!freeList)
 		{
 			//fprintf(stderr, "increasing pool<%zd, %zd, %zd> : at %s(%d) (Total : %g MB)\n", objectSize, poolSize, type, __FILE__, __LINE__, poolBuf.size() / 1024.f / 1024.f * objectSize * poolSize);
@@ -28,6 +30,7 @@ public:
 
 	void deallocate(void* p)
 	{
+		//std::lock_guard<std::mutex> lg(lock);
 		//fprintf(stderr, "deallocate %p\n", p);
 		*((void**)p) = freeList;
 		freeList = (void**)p;
@@ -146,7 +149,7 @@ public:
 		if (n * sizeof(value_type) <= 16384) return (pointer)KPool<16384, 8>::getInstance().allocate();
 		if (n * sizeof(value_type) <= 32768) return (pointer)KPool<32768, 8>::getInstance().allocate();
 		if (n * sizeof(value_type) <= 65536) return (pointer)KPool<65536, 8>::getInstance().allocate();
-		//fprintf(stderr, "Alloc %d bytes.\n", n * sizeof(value_type));
+		fprintf(stderr, "Alloc %d bytes.\n", n * sizeof(value_type));
 		return allocator<value_type>::allocate(n, hint);
 	}
 
@@ -160,7 +163,7 @@ public:
 		if (n * sizeof(value_type) <= 16384) return KPool<16384, 8>::getInstance().deallocate(p);
 		if (n * sizeof(value_type) <= 32768) return KPool<32768, 8>::getInstance().deallocate(p);
 		if (n * sizeof(value_type) <= 65536) return KPool<65536, 8>::getInstance().deallocate(p);
-		//fprintf(stderr, "Dealloc %d bytes (%p).\n", n * sizeof(value_type), p);
+		fprintf(stderr, "Dealloc %d bytes (%p).\n", n * sizeof(value_type), p);
 		return allocator<value_type>::deallocate(p, n);
 	}
 

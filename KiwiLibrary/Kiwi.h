@@ -64,10 +64,12 @@ class Kiwi
 protected:
 	size_t maxCache;
 	std::shared_ptr<KModelMgr> mdl;
-	mutable ThreadPool threadPool;
+	mutable ThreadPool workerPool;
 	mutable std::mutex lock;
 	const KTrie* kt = nullptr;
 	size_t numThread;
+	typedef std::vector<std::pair<const KMorpheme*, k_string>> pathType;
+	std::vector<std::pair<pathType, float>> findBestPath(const std::vector<KGraphNode>& graph, const KNLangModel * knlm, const KMorpheme* morphBase, size_t topN) const;
 public:
 	Kiwi(const char* modelPath = "", size_t maxCache = -1, size_t numThread = 0);
 	int addUserWord(const std::u16string& str, KPOSTag tag);
