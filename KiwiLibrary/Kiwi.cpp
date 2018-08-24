@@ -78,6 +78,29 @@ int Kiwi::prepare()
 
 //#define DEBUG_PRINT
 
+template<class _multimap, class _key, class _value, class _comp>
+void emplaceMaxCnt(_multimap& dest, _key key, _value value, size_t maxCnt, _comp comparator)
+{
+	auto itp = dest.equal_range(key);
+	if (std::distance(itp.first, itp.second) < maxCnt)
+	{
+		dest.emplace(key, value);
+	}
+	else
+	{
+		auto itm = itp.first;
+		++itp.first;
+		for (; itp.first != itp.second; ++itp.first)
+		{
+			if (comparator(itp.first->second, itm->second))
+			{
+				itm = itp.first;
+			}
+		}
+		if (comparator(itm->second, value)) itm->second = value;
+	}
+}
+
 vector<pair<Kiwi::pathType, float>> Kiwi::findBestPath(const vector<KGraphNode>& graph, const KNLangModel * knlm, const KMorpheme* morphBase, size_t topN) const
 {
 	struct MInfo
@@ -110,192 +133,182 @@ vector<pair<Kiwi::pathType, float>> Kiwi::findBestPath(const vector<KGraphNode>&
 
 	unknownNodeLCands.emplace_back(morphBase + (size_t)KPOSTag::NNP + 1);
 
-	const auto& evalCandidate = [&](const KGraphNode* node, size_t ownFormId, const KMorpheme* curMorph, bool unknownForm)
+	const auto& evalTrigram = [&](size_t, size_t wStart, size_t wStride, const WordLLs* list, array<WID, 5> seq, size_t chSize, const KMorpheme* curMorph, const KGraphNode* node, uint8_t combSocket)
 	{
-		float tMax = -INFINITY;
-		array<WID, 5> seq = { 0, };
-		array<uint8_t, 3> combSocket = { 0, };
-		KCondVowel condV = KCondVowel::none;
-		KCondPolarity condP = KCondPolarity::none;
-		size_t chSize = 1;
-		WID orgSeq = 0;
-		// if the morpheme is chunk set
-		if (curMorph->chunks)
+		unordered_multimap<WID, pair<const MInfos*, float>> maxWidLL;
+		for (size_t wid = wStart; wid < list->size(); wid += wStride)
 		{
-			chSize = curMorph->chunks->size();
-			for (size_t i = 0; i < chSize; ++i)
+			const auto* wids = &(*list)[wid].first;
+			float candScore = (*list)[wid].second;
+			seq[chSize] = wids->back().wid;
+			if (wids->back().combineSocket)
 			{
-				seq[i] = (*curMorph->chunks)[i] - morphBase;
+				// always merge <V> <chunk> with the same socket
+				if (wids->back().combineSocket != curMorph->combineSocket || curMorph->chunks)
+				{
+					continue;
+				}
+				seq[0] = curMorph->getCombined() - morphBase;
+				seq[1] = (wids->end() - 2)->wid;
+				seq[2] = (wids->end() - 3)->wid;
 			}
-			combSocket[0] = curMorph->combineSocket;
-		}
-		else
-		{
-			seq[0] = curMorph - morphBase;
-		}
-		orgSeq = seq[0];
-		condV = curMorph->vowel;
-		condP = curMorph->polar;
-
-		unordered_multimap<WID, pair<const MInfos*, float>, hash<WID>, equal_to<WID>, pool_allocator<void*>> maxWidLL;
-		for (size_t i = 0; i < KGraphNode::MAX_NEXT; ++i)
-		{
-			auto* next = node->getNext(i);
-			if (!next) break;
-			for (auto&& p : cache[next - startNode])
+			else if (curMorph->combineSocket && !curMorph->chunks)
 			{
-				float c;
-				seq[chSize] = p.first.back().wid;
-				if (p.first.back().combineSocket)
-				{
-					// always merge <V> <chunk> with the same socket
-					if (p.first.back().combineSocket != curMorph->combineSocket || curMorph->chunks)
-					{
-						continue;
-					}
-					seq[0] = curMorph->getCombined() - morphBase;
-					seq[1] = (p.first.end() - 2)->wid;
-					seq[2] = (p.first.end() - 3)->wid;
-				}
-				else if (curMorph->combineSocket && !curMorph->chunks)
-				{
-					continue;
-				}
-				else if (p.first.size() + chSize > 2)
-				{
-					seq[0] = orgSeq;
-					if (p.first.size() > 1) seq[chSize + 1] = (p.first.end() - 2)->wid;
-				}
+				continue;
+			}
+			else if (wids->size() + chSize > 2)
+			{
+				if (wids->size() > 1) seq[chSize + 1] = (wids->end() - 2)->wid;
+			}
 
 
-				if (!KFeatureTestor::isMatched(node->uform.empty() ? curMorph->kform : &node->uform, p.first.back().condVowel, p.first.back().condPolar))
-				{
-					continue;
-				}
+			if (!KFeatureTestor::isMatched(node->uform.empty() ? curMorph->kform : &node->uform, wids->back().condVowel, wids->back().condPolar))
+			{
+				continue;
+			}
 
-				if (p.first.size() + chSize > 2)
+			if (wids->size() + chSize > 2)
+			{
+				for (size_t ch = 0; ch < chSize - (wids->size() == 1 ? 1 : 0); ++ch)
 				{
-					c = p.second;
-					for (size_t ch = 0; ch < chSize - (p.first.size() == 1 ? 1 : 0); ++ch)
-					{
-						if (any_of(combSocket.begin() + ch, combSocket.end(), [](uint8_t t) { return !!t; })) continue;
-						float ct;
-						c += ct = knlm->evaluateLL(&seq[ch], 3);
+					if (ch == 0 && combSocket) continue;
+					float ct;
+					candScore += ct = knlm->evaluateLL(&seq[ch], 3);
 #ifdef DEBUG_PRINT
-						if (ct <= -100)
-						{
-							cout << knlm->evaluateLL(&seq[ch], 3);
-							cout << "@Warn\t";
-							cout << morphBase[seq[ch]] << '\t';
-							cout << morphBase[seq[ch + 1]] << '\t';
-							cout << morphBase[seq[ch + 2]] << '\t';
-							cout << endl;
-						}
-#endif
-					}
-				}
-				else
-				{
-					c = 0;
-				}
-
-				auto itp = maxWidLL.equal_range(seq[chSize + 1]);
-				if (std::distance(itp.first, itp.second) < 5)
-				{
-					maxWidLL.emplace(seq[chSize + 1], make_pair(&p.first, c));
-				}
-				else
-				{
-					auto itm = itp.first;
-					++itp.first;
-					for (; itp.first != itp.second; ++itp.first)
+					if (ct <= -100)
 					{
-						if (itp.first->second.second < itm->second.second)
-						{
-							itm = itp.first;
-						}
+						cout << knlm->evaluateLL(&seq[ch], 3);
+						cout << "@Warn\t";
+						cout << morphBase[seq[ch]] << '\t';
+						cout << morphBase[seq[ch + 1]] << '\t';
+						cout << morphBase[seq[ch + 2]] << '\t';
+						cout << endl;
 					}
-					if (itm->second.second < c) itm->second = make_pair(&p.first, c);
-				}
-			}
-		}
-
-		// if a form of the node is unknown, calculate log poisson distribution for word-tag
-		float estimatedLL = 0;
-		if (unknownForm)
-		{
-			if (curMorph->tag == KPOSTag::NNG) estimatedLL = LogPoisson::getLL(4.622955f, node->uform.size());
-			else if (curMorph->tag == KPOSTag::NNP) estimatedLL = LogPoisson::getLL(5.177622f, node->uform.size());
-			else if (curMorph->tag == KPOSTag::MAG) estimatedLL = LogPoisson::getLL(4.557326f, node->uform.size());
-			estimatedLL -= 16;
-		}
-
-		for (auto& p : maxWidLL)
-		{
-			p.second.second += estimatedLL;
-			tMax = max(tMax, p.second.second);
-		}
-
-		WordLLs nCache;
-		for (auto& p : maxWidLL)
-		{
-			if (p.second.second <= tMax - 10) continue;
-			nCache.emplace_back(MInfos{}, p.second.second);
-			auto& wids = nCache.back().first;
-			wids.reserve(p.second.first->size() + chSize);
-			wids = *p.second.first;
-			if (!curMorph->combineSocket || curMorph->chunks)
-			{
-				for (size_t ch = chSize; ch-- > 0;)
-				{
-					if (ch) wids.emplace_back(seq[ch], combSocket[ch]);
-					else wids.emplace_back(seq[ch], combSocket[ch], condV, condP, ownFormId);
+#endif
 				}
 			}
 			else
 			{
-				wids.back() = MInfo{ (WID)(curMorph->getCombined() - morphBase) };
+				candScore = 0;
 			}
+
+			emplaceMaxCnt(maxWidLL, seq[chSize + 1], make_pair(wids, candScore), 5, [](const auto& a, const auto& b) { return a.second < b.second; });
 		}
-		return make_pair(move(nCache), tMax);
+		return maxWidLL;
 	};
 
 	const auto& evalPath = [&, this](const KGraphNode* node, size_t i, size_t ownFormId, const vector<const KMorpheme*>& cands, bool unknownForm)
 	{
 		float tMax = -INFINITY;
-		size_t stride = workerPool.getNumWorkers();
-		if (stride > 1 && cands.size() >= stride * 2)
+		for (auto& curMorph : cands)
 		{
-			vector<future<pair<WordLLs, float>>> futures(stride);
-			for (size_t w = 0; w < stride; ++w)
+			array<WID, 5> seq = { 0, };
+			size_t combSocket = 0;
+			KCondVowel condV = KCondVowel::none;
+			KCondPolarity condP = KCondPolarity::none;
+			size_t chSize = 1;
+			WID orgSeq = 0;
+			// if the morpheme is chunk set
+			if (curMorph->chunks)
 			{
-				futures[w] = workerPool.enqueue([&](size_t, size_t id)
+				chSize = curMorph->chunks->size();
+				for (size_t i = 0; i < chSize; ++i)
 				{
-					WordLLs nCache;
-					for (size_t idx = id; idx < cands.size(); idx += stride)
+					seq[i] = (*curMorph->chunks)[i] - morphBase;
+				}
+				combSocket = curMorph->combineSocket;
+			}
+			else
+			{
+				seq[0] = curMorph - morphBase;
+			}
+			orgSeq = seq[0];
+			condV = curMorph->vowel;
+			condP = curMorph->polar;
+
+			unordered_multimap<WID, pair<const MInfos*, float>, hash<WID>, equal_to<WID>, pool_allocator<void*>> maxWidLL;
+			if (workerPool.getNumWorkers() > 1)
+			{
+				size_t wStride = workerPool.getNumWorkers();
+				vector<future<unordered_multimap<WID, pair<const MInfos*, float>>>> futures;
+				futures.reserve(wStride);
+				for (size_t i = 0; i < KGraphNode::MAX_NEXT; ++i)
+				{
+					auto* next = node->getNext(i);
+					if (!next) break;
+					if (cache[next - startNode].size() <= wStride)
 					{
-						auto& p = evalCandidate(node, ownFormId, cands[idx], unknownForm);
-						tMax = max(tMax, p.second);
-						nCache.insert(nCache.end(), make_move_iterator(p.first.begin()), make_move_iterator(p.first.end()));
+						futures.emplace_back(workerPool.enqueue(evalTrigram, 0, 1, &cache[next - startNode], seq, chSize, curMorph, node, combSocket));
 					}
-					return make_pair(move(nCache), tMax);
-				}, w);
+					else
+					{
+						for (size_t wId = 0; wId < wStride; ++wId)
+						{
+							futures.emplace_back(workerPool.enqueue(evalTrigram, wId, wStride, &cache[next - startNode], seq, chSize, curMorph, node, combSocket));
+						}
+					}
+				}
+
+				for (auto&& f : futures)
+				{
+					auto res = f.get();
+					for (auto& r : res)
+					{
+						emplaceMaxCnt(maxWidLL, r.first, r.second, 5, [](const auto& a, const auto& b) { return a.second < b.second; });
+					}
+				}
+			}
+			else
+			{
+				for (size_t i = 0; i < KGraphNode::MAX_NEXT; ++i)
+				{
+					auto* next = node->getNext(i);
+					if (!next) break;
+					auto res = evalTrigram(0, 0, 1, &cache[next - startNode], seq, chSize, curMorph, node, combSocket);
+					//maxWidLL.insert(res.begin(), res.end());
+					for (auto& r : res)
+					{
+						emplaceMaxCnt(maxWidLL, r.first, r.second, 5, [](const auto& a, const auto& b) { return a.second < b.second; });
+					}
+				}
 			}
 
-			for (auto& f : futures)
+			// if a form of the node is unknown, calculate log poisson distribution for word-tag
+			float estimatedLL = 0;
+			if (unknownForm)
 			{
-				auto& p = f.get();
-				tMax = max(tMax, p.second);
-				cache[i].insert(cache[i].end(), make_move_iterator(p.first.begin()), make_move_iterator(p.first.end()));
+				if (curMorph->tag == KPOSTag::NNG) estimatedLL = LogPoisson::getLL(4.622955f, node->uform.size());
+				else if (curMorph->tag == KPOSTag::NNP) estimatedLL = LogPoisson::getLL(5.177622f, node->uform.size());
+				else if (curMorph->tag == KPOSTag::MAG) estimatedLL = LogPoisson::getLL(4.557326f, node->uform.size());
+				estimatedLL -= 16;
 			}
-		}
-		else
-		{
-			for (auto& curMorph : cands)
+
+			for (auto& p : maxWidLL)
 			{
-				auto& p = evalCandidate(node, ownFormId, curMorph, unknownForm);
-				tMax = max(tMax, p.second);
-				cache[i].insert(cache[i].end(), make_move_iterator(p.first.begin()), make_move_iterator(p.first.end()));
+				p.second.second += estimatedLL;
+				tMax = max(tMax, p.second.second);
+			}
+
+			auto& nCache = cache[i];
+			for (auto& p : maxWidLL)
+			{
+				if (p.second.second <= tMax - 10) continue;
+				nCache.emplace_back(MInfos{}, p.second.second);
+				auto& wids = nCache.back().first;
+				wids.reserve(p.second.first->size() + chSize);
+				wids = *p.second.first;
+				if (!curMorph->combineSocket || curMorph->chunks)
+				{
+					for (size_t ch = chSize; ch-- > 0;)
+					{
+						if (ch) wids.emplace_back(seq[ch], 0);
+						else wids.emplace_back(seq[ch], combSocket, condV, condP, ownFormId);
+					}
+				}
+				else
+				{
+					wids.back() = MInfo{ (WID)(curMorph->getCombined() - morphBase) };
+				}
 			}
 		}
 		return tMax;
