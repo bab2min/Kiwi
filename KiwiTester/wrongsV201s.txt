@@ -1,6 +1,6 @@
 0.894621
-Total (1092) Time : 10786.3 ms
-Time per Unit : 9.87753 ms
+Total (1092) Time : 4093.04 ms
+Time per Unit : 3.7482 ms
 프랑스의 세계적인 의상 디자이너 엠마누엘 웅가로가 실내 장식용 직물 디자이너로 나섰다.	0.869565
 엠마누엘/NNP	
 엠마누/NNP	엘/NNG	
