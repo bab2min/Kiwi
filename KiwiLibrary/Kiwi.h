@@ -64,7 +64,8 @@ class Kiwi
 protected:
 	size_t maxCache;
 	std::shared_ptr<KModelMgr> mdl;
-	mutable ThreadPool workerPool;
+	//mutable ThreadPool workerPool;
+	mutable std::vector<ReusableThread> workers;
 	mutable std::mutex lock;
 	const KTrie* kt = nullptr;
 	size_t numThread;

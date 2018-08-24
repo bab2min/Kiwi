@@ -108,7 +108,7 @@ int main()
 	SetConsoleOutputCP(CP_UTF8);
 	setvbuf(stdout, nullptr, _IOFBF, 1000);
 	Timer timer;
-	Kiwi kw{ "../ModelGenerator/", (size_t)-1, 2 };
+	Kiwi kw{ "../ModelGenerator/", (size_t)-1, 0 };
 	kw.prepare();
 	cout << "Loading Time : " << timer.getElapsed() << " ms" << endl;
 	PROCESS_MEMORY_COUNTERS pmc;

@@ -1,6 +1,6 @@
 0.941718
-Total (3252) Time : 9177.6 ms
-Time per Unit : 2.82214 ms
+Total (3252) Time : 9982.35 ms
+Time per Unit : 3.0696 ms
 네 스스로 모를 깎아서 둥글둥글하게 살도록 해라." 나는 이렇게 대답했다.	0.846154
 어서/EC	하/VX	
 아서/EF	하/VV	

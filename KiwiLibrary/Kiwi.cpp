@@ -4,12 +4,13 @@
 #include "KFeatureTestor.h"
 #include "KModelMgr.h"
 #include "logPoisson.h"
+#include <future>
 
 using namespace std;
 
 Kiwi::Kiwi(const char * modelPath, size_t _maxCache, size_t _numThread) : maxCache(_maxCache),
 	numThread(_numThread ? _numThread : thread::hardware_concurrency()), 
-	workerPool(_numThread ? _numThread : thread::hardware_concurrency())
+	workers(_numThread ? _numThread : thread::hardware_concurrency())
 {
 	mdl = make_shared<KModelMgr>(modelPath);
 }
@@ -101,27 +102,91 @@ void emplaceMaxCnt(_multimap& dest, _key key, _value value, size_t maxCnt, _comp
 	}
 }
 
+typedef KNLangModel::WID WID;
+struct MInfo
+{
+	WID wid;
+	uint8_t combineSocket;
+	KCondVowel condVowel;
+	KCondPolarity condPolar;
+	uint8_t ownFormId;
+	MInfo(WID _wid = 0, uint8_t _combineSocket = 0,
+		KCondVowel _condVowel = KCondVowel::none,
+		KCondPolarity _condPolar = KCondPolarity::none,
+		uint8_t _ownFormId = 0)
+		: wid(_wid), combineSocket(_combineSocket),
+		condVowel(_condVowel), condPolar(_condPolar), ownFormId(_ownFormId)
+	{}
+};
+typedef vector<MInfo, pool_allocator<MInfo>> MInfos;
+typedef vector<pair<MInfos, float>, pool_allocator<pair<MInfos, float>>> WordLLs;
+
+template<class _Type>
+auto evalTrigram(const KNLangModel * knlm, const KMorpheme* morphBase, const pair<MInfos, float>** wBegin, const pair<MInfos, float>** wEnd, array<WID, 5> seq, size_t chSize, const KMorpheme* curMorph, const KGraphNode* node, uint8_t combSocket, _Type maxWidLL)
+{
+	for (; wBegin != wEnd; ++wBegin)
+	{
+		const auto* wids = &(*wBegin)->first;
+		float candScore = (*wBegin)->second;
+		seq[chSize] = wids->back().wid;
+		if (wids->back().combineSocket)
+		{
+			// always merge <V> <chunk> with the same socket
+			if (wids->back().combineSocket != curMorph->combineSocket || curMorph->chunks)
+			{
+				continue;
+			}
+			seq[0] = curMorph->getCombined() - morphBase;
+			seq[1] = (wids->end() - 2)->wid;
+			seq[2] = (wids->end() - 3)->wid;
+		}
+		else if (curMorph->combineSocket && !curMorph->chunks)
+		{
+			continue;
+		}
+		else if (wids->size() + chSize > 2)
+		{
+			if (wids->size() > 1) seq[chSize + 1] = (wids->end() - 2)->wid;
+		}
+
+
+		if (!KFeatureTestor::isMatched(node->uform.empty() ? curMorph->kform : &node->uform, wids->back().condVowel, wids->back().condPolar))
+		{
+			continue;
+		}
+
+		if (wids->size() + chSize > 2)
+		{
+			for (size_t ch = 0; ch < chSize - (wids->size() == 1 ? 1 : 0); ++ch)
+			{
+				if (ch == 0 && combSocket) continue;
+				float ct;
+				candScore += ct = knlm->evaluateLL(&seq[ch], 3);
+#ifdef DEBUG_PRINT
+				if (ct <= -100)
+				{
+					cout << knlm->evaluateLL(&seq[ch], 3);
+					cout << "@Warn\t";
+					cout << morphBase[seq[ch]] << '\t';
+					cout << morphBase[seq[ch + 1]] << '\t';
+					cout << morphBase[seq[ch + 2]] << '\t';
+					cout << endl;
+				}
+#endif
+			}
+		}
+		else
+		{
+			candScore = 0;
+		}
+
+		emplaceMaxCnt(maxWidLL, seq[chSize + 1], make_pair(wids, candScore), 5, [](const auto& a, const auto& b) { return a.second < b.second; });
+	}
+	return move(maxWidLL);
+}
+
 vector<pair<Kiwi::pathType, float>> Kiwi::findBestPath(const vector<KGraphNode>& graph, const KNLangModel * knlm, const KMorpheme* morphBase, size_t topN) const
 {
-	struct MInfo
-	{
-		KNLangModel::WID wid;
-		uint8_t combineSocket;
-		KCondVowel condVowel;
-		KCondPolarity condPolar;
-		uint8_t ownFormId;
-		MInfo(KNLangModel::WID _wid = 0, uint8_t _combineSocket = 0,
-			KCondVowel _condVowel = KCondVowel::none,
-			KCondPolarity _condPolar = KCondPolarity::none,
-			uint8_t _ownFormId = 0)
-			: wid(_wid), combineSocket(_combineSocket),
-			condVowel(_condVowel), condPolar(_condPolar), ownFormId(_ownFormId)
-		{}
-	};
-
-	typedef KNLangModel::WID WID;
-	typedef vector<MInfo, pool_allocator<MInfo>> MInfos;
-	typedef vector<pair<MInfos, float>, pool_allocator<pair<MInfos, float>>> WordLLs;
 	vector<WordLLs, pool_allocator<WordLLs>> cache(graph.size());
 	const KGraphNode* startNode = &graph.front();
 	const KGraphNode* endNode = &graph.back();
@@ -132,70 +197,6 @@ vector<pair<Kiwi::pathType, float>> Kiwi::findBestPath(const vector<KGraphNode>&
 	unknownNodeCands.emplace_back(morphBase + (size_t)KPOSTag::NNP + 1);
 
 	unknownNodeLCands.emplace_back(morphBase + (size_t)KPOSTag::NNP + 1);
-
-	const auto& evalTrigram = [&](size_t, size_t wStart, size_t wStride, const WordLLs* list, array<WID, 5> seq, size_t chSize, const KMorpheme* curMorph, const KGraphNode* node, uint8_t combSocket)
-	{
-		unordered_multimap<WID, pair<const MInfos*, float>> maxWidLL;
-		for (size_t wid = wStart; wid < list->size(); wid += wStride)
-		{
-			const auto* wids = &(*list)[wid].first;
-			float candScore = (*list)[wid].second;
-			seq[chSize] = wids->back().wid;
-			if (wids->back().combineSocket)
-			{
-				// always merge <V> <chunk> with the same socket
-				if (wids->back().combineSocket != curMorph->combineSocket || curMorph->chunks)
-				{
-					continue;
-				}
-				seq[0] = curMorph->getCombined() - morphBase;
-				seq[1] = (wids->end() - 2)->wid;
-				seq[2] = (wids->end() - 3)->wid;
-			}
-			else if (curMorph->combineSocket && !curMorph->chunks)
-			{
-				continue;
-			}
-			else if (wids->size() + chSize > 2)
-			{
-				if (wids->size() > 1) seq[chSize + 1] = (wids->end() - 2)->wid;
-			}
-
-
-			if (!KFeatureTestor::isMatched(node->uform.empty() ? curMorph->kform : &node->uform, wids->back().condVowel, wids->back().condPolar))
-			{
-				continue;
-			}
-
-			if (wids->size() + chSize > 2)
-			{
-				for (size_t ch = 0; ch < chSize - (wids->size() == 1 ? 1 : 0); ++ch)
-				{
-					if (ch == 0 && combSocket) continue;
-					float ct;
-					candScore += ct = knlm->evaluateLL(&seq[ch], 3);
-#ifdef DEBUG_PRINT
-					if (ct <= -100)
-					{
-						cout << knlm->evaluateLL(&seq[ch], 3);
-						cout << "@Warn\t";
-						cout << morphBase[seq[ch]] << '\t';
-						cout << morphBase[seq[ch + 1]] << '\t';
-						cout << morphBase[seq[ch + 2]] << '\t';
-						cout << endl;
-					}
-#endif
-				}
-			}
-			else
-			{
-				candScore = 0;
-			}
-
-			emplaceMaxCnt(maxWidLL, seq[chSize + 1], make_pair(wids, candScore), 5, [](const auto& a, const auto& b) { return a.second < b.second; });
-		}
-		return maxWidLL;
-	};
 
 	const auto& evalPath = [&, this](const KGraphNode* node, size_t i, size_t ownFormId, const vector<const KMorpheme*>& cands, bool unknownForm)
 	{
@@ -227,26 +228,28 @@ vector<pair<Kiwi::pathType, float>> Kiwi::findBestPath(const vector<KGraphNode>&
 			condP = curMorph->polar;
 
 			unordered_multimap<WID, pair<const MInfos*, float>, hash<WID>, equal_to<WID>, pool_allocator<void*>> maxWidLL;
-			if (workerPool.getNumWorkers() > 1)
+			vector<const pair<MInfos, float>*, pool_allocator<void*>> works;
+			for (size_t i = 0; i < KGraphNode::MAX_NEXT; ++i)
 			{
-				size_t wStride = workerPool.getNumWorkers();
-				vector<future<unordered_multimap<WID, pair<const MInfos*, float>>>> futures;
-				futures.reserve(wStride);
-				for (size_t i = 0; i < KGraphNode::MAX_NEXT; ++i)
+				auto* next = node->getNext(i);
+				if (!next) break;
+				works.reserve(works.size() + cache[next - startNode].size());
+				for (auto& p : cache[next - startNode])
 				{
-					auto* next = node->getNext(i);
-					if (!next) break;
-					if (cache[next - startNode].size() <= wStride)
-					{
-						futures.emplace_back(workerPool.enqueue(evalTrigram, 0, 1, &cache[next - startNode], seq, chSize, curMorph, node, combSocket));
-					}
-					else
-					{
-						for (size_t wId = 0; wId < wStride; ++wId)
-						{
-							futures.emplace_back(workerPool.enqueue(evalTrigram, wId, wStride, &cache[next - startNode], seq, chSize, curMorph, node, combSocket));
-						}
-					}
+					works.emplace_back(&p);
+				}
+			}
+
+			/*
+			if (workers.size() > 1 && works.size() >= 256)
+			{
+				size_t numWorking = min(works.size() / 64, workers.size());
+				vector<future<unordered_multimap<WID, pair<const MInfos*, float>>>> futures(numWorking);
+				for (size_t id = 0; id < numWorking; ++id)
+				{
+					size_t beginId = works.size() * id / numWorking;
+					size_t endId = works.size() * (id + 1) / numWorking;
+					futures[id] = workers[id].setWork(evalTrigram<unordered_multimap<WID, pair<const MInfos*, float>>>, knlm, morphBase, &works[0] + beginId, &works[0] + endId, seq, chSize, curMorph, node, combSocket, unordered_multimap<WID, pair<const MInfos*, float>>{});
 				}
 
 				for (auto&& f : futures)
@@ -259,18 +262,9 @@ vector<pair<Kiwi::pathType, float>> Kiwi::findBestPath(const vector<KGraphNode>&
 				}
 			}
 			else
+			*/
 			{
-				for (size_t i = 0; i < KGraphNode::MAX_NEXT; ++i)
-				{
-					auto* next = node->getNext(i);
-					if (!next) break;
-					auto res = evalTrigram(0, 0, 1, &cache[next - startNode], seq, chSize, curMorph, node, combSocket);
-					//maxWidLL.insert(res.begin(), res.end());
-					for (auto& r : res)
-					{
-						emplaceMaxCnt(maxWidLL, r.first, r.second, 5, [](const auto& a, const auto& b) { return a.second < b.second; });
-					}
-				}
+				maxWidLL = evalTrigram(knlm, morphBase, &works[0], &works[0] + works.size(), seq, chSize, curMorph, node, combSocket, move(maxWidLL));
 			}
 
 			// if a form of the node is unknown, calculate log poisson distribution for word-tag
