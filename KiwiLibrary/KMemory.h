@@ -9,7 +9,7 @@ public:
 	std::mutex lock;
 	static KPool& getInstance()
 	{
-		static KPool inst;
+		thread_local KPool inst;
 		return inst;
 	}
 
@@ -30,6 +30,7 @@ public:
 
 	void deallocate(void* p)
 	{
+		//if (!isPtrMine(p)) throw std::bad_alloc();
 		//std::lock_guard<std::mutex> lg(lock);
 		//fprintf(stderr, "deallocate %p\n", p);
 		*((void**)p) = freeList;
@@ -38,6 +39,16 @@ public:
 	}
 
 private:
+
+	bool isPtrMine(void* ptr)
+	{
+		for (auto p : poolBuf)
+		{
+			if (ptr >= p && ptr < (char*)p + poolSize * objectSize) return true;
+		}
+		return false;
+	}
+
 	void initPool()
 	{
 		//fprintf(stderr, "KPool<%d, %d, %d> allocation\n", objectSize, poolSize, type);
@@ -149,7 +160,7 @@ public:
 		if (n * sizeof(value_type) <= 16384) return (pointer)KPool<16384, 8>::getInstance().allocate();
 		if (n * sizeof(value_type) <= 32768) return (pointer)KPool<32768, 8>::getInstance().allocate();
 		if (n * sizeof(value_type) <= 65536) return (pointer)KPool<65536, 8>::getInstance().allocate();
-		fprintf(stderr, "Alloc %d bytes.\n", n * sizeof(value_type));
+		//fprintf(stderr, "Alloc %d bytes.\n", n * sizeof(value_type));
 		return allocator<value_type>::allocate(n, hint);
 	}
 
@@ -163,7 +174,7 @@ public:
 		if (n * sizeof(value_type) <= 16384) return KPool<16384, 8>::getInstance().deallocate(p);
 		if (n * sizeof(value_type) <= 32768) return KPool<32768, 8>::getInstance().deallocate(p);
 		if (n * sizeof(value_type) <= 65536) return KPool<65536, 8>::getInstance().deallocate(p);
-		fprintf(stderr, "Dealloc %d bytes (%p).\n", n * sizeof(value_type), p);
+		//fprintf(stderr, "Dealloc %d bytes (%p).\n", n * sizeof(value_type), p);
 		return allocator<value_type>::deallocate(p, n);
 	}
 

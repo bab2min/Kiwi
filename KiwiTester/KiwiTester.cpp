@@ -108,7 +108,7 @@ int main()
 	SetConsoleOutputCP(CP_UTF8);
 	setvbuf(stdout, nullptr, _IOFBF, 1000);
 	Timer timer;
-	Kiwi kw{ "../ModelGenerator/", (size_t)-1, 1 };
+	Kiwi kw{ "../ModelGenerator/", (size_t)-1, 2 };
 	kw.prepare();
 	cout << "Loading Time : " << timer.getElapsed() << " ms" << endl;
 	PROCESS_MEMORY_COUNTERS pmc;
@@ -116,7 +116,7 @@ int main()
 	SIZE_T memUsed = pmc.WorkingSetSize;
 	cout << "Mem Usage : " << memUsed / 1024.f / 1024.f << " MB" << endl;
 	
-	kw.analyze(KSTR(R"!(올라가)!"), 10);
+	kw.analyze(KSTR(R"!(웅가로는 침실과 식당, 욕실에서 사용하는 갖가지 직물제품을 디자인해 )!"), 10);
 	string testFiles[] = { "01s.txt", "02s.txt", "03s.txt", "17s.txt", "18s.txt", "13s.txt", "15s.txt", };
 	for (auto tf : testFiles)
 	{
