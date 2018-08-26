@@ -4,12 +4,12 @@
 #include "KTrie.h"
 #include "ThreadPool.h"
 
-struct KWordPair : public std::tuple<k_string, KPOSTag, uint8_t, uint16_t>
+struct KWordPair : public std::tuple<std::u16string, KPOSTag, uint8_t, uint16_t>
 {
-	using std::tuple<k_string, KPOSTag, uint8_t, uint16_t>::tuple;
+	using std::tuple<std::u16string, KPOSTag, uint8_t, uint16_t>::tuple;
 
-	k_string& str() { return std::get<0>(*this); }
-	const k_string& str() const { return std::get<0>(*this); }
+	std::u16string& str() { return std::get<0>(*this); }
+	const std::u16string& str() const { return std::get<0>(*this); }
 
 	KPOSTag& tag() { return std::get<1>(*this); }
 	const KPOSTag& tag() const { return std::get<1>(*this); }
@@ -35,35 +35,14 @@ struct KWordPair : public std::tuple<k_string, KPOSTag, uint8_t, uint16_t>
 
 typedef std::pair<std::vector<KWordPair>, float> KResult;
 
-struct KInterWordPair : std::tuple<const KMorpheme*, k_string, KPOSTag, uint8_t, uint16_t>
-{
-	using std::tuple<const KMorpheme*, k_string, KPOSTag, uint8_t, uint16_t>::tuple;
-
-	const KMorpheme*& morph() { return std::get<0>(*this); }
-	const KMorpheme* const& morph() const { return std::get<0>(*this); }
-
-	k_string& str() { return std::get<1>(*this); }
-	const k_string& str() const { return std::get<1>(*this); }
-
-	KPOSTag& tag() { return std::get<2>(*this); }
-	const KPOSTag& tag() const { return std::get<2>(*this); }
-
-	uint8_t& len() { return std::get<3>(*this); }
-	const uint8_t& len() const { return std::get<3>(*this); }
-
-	uint16_t& pos() { return std::get<4>(*this); }
-	const uint16_t& pos() const { return std::get<4>(*this); }
-};
-
-typedef std::pair<std::vector<KInterWordPair>, float> KInterResult;
-
 class KModelMgr;
 
 class Kiwi
 {
 protected:
+	float cutOffThreshold = 15.f;
 	size_t maxCache;
-	std::shared_ptr<KModelMgr> mdl;
+	std::unique_ptr<KModelMgr> mdl;
 	//mutable ThreadPool workerPool;
 	mutable std::vector<ReusableThread> workers;
 	mutable std::mutex lock;
@@ -73,7 +52,7 @@ protected:
 	std::vector<std::pair<pathType, float>> findBestPath(const std::vector<KGraphNode>& graph, const KNLangModel * knlm, const KMorpheme* morphBase, size_t topN) const;
 public:
 	Kiwi(const char* modelPath = "", size_t maxCache = -1, size_t numThread = 0);
-	int addUserWord(const std::u16string& str, KPOSTag tag);
+	int addUserWord(const std::u16string& str, KPOSTag tag, float userScore = 10);
 	int addUserRule(const std::u16string& str, const std::vector<std::pair<std::u16string, KPOSTag>>& morph);
 	int loadUserDictionary(const char* userDictPath = "");
 	int prepare();

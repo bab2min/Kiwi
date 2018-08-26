@@ -35,7 +35,7 @@ void KModelMgr::loadMMFromTxt(std::istream& is, morphemeMap& morphMap)
 	while (getline(is, line))
 	{
 		auto wstr = utf8_to_utf16(line);
-		if (wstr.back() == '\n') wstr.pop_back();
+		if (!wstr.empty() && wstr.back() == '\n') wstr.pop_back();
 		auto fields = split(wstr, u'\t');
 		if (fields.size() < 8) continue;
 
@@ -113,7 +113,7 @@ void KModelMgr::loadCMFromTxt(std::istream& is, morphemeMap& morphMap)
 	while (getline(is, line))
 	{
 		auto wstr = utf8_to_utf16(line);
-		if (wstr.back() == '\n') wstr.pop_back();
+		if (!wstr.empty() && wstr.back() == '\n') wstr.pop_back();
 		auto fields = split(wstr, u'\t');
 		if (fields.size() < 2) continue;
 		if (fields.size() == 2) fields.emplace_back();
@@ -169,7 +169,6 @@ void KModelMgr::loadCMFromTxt(std::istream& is, morphemeMap& morphMap)
 		size_t mid = morphemes.size();
 		auto& fm = formMapper(form);
 		fm.candidate.emplace_back((KMorpheme*)mid);
-		//fm.suffix.insert(0);
 		morphemes.emplace_back(form, KPOSTag::UNKNOWN, vowel, polar, combineSocket);
 		morphemes.back().kform = (const k_string*)(&fm - &forms[0]);
 		morphemes.back().chunks = chunkIds;
@@ -186,7 +185,7 @@ void KModelMgr::loadPCMFromTxt(std::istream& is, morphemeMap& morphMap)
 	while (getline(is, line))
 	{
 		auto wstr = utf8_to_utf16(line);
-		if (wstr.back() == '\n') wstr.pop_back();
+		if (!wstr.empty() && wstr.back() == '\n') wstr.pop_back();
 		auto fields = split(wstr, u'\t');
 		if (fields.size() < 4) continue;
 
@@ -206,7 +205,6 @@ void KModelMgr::loadPCMFromTxt(std::istream& is, morphemeMap& morphMap)
 			//morphMap.emplace(make_pair(form, tag), mid);
 			auto& fm = formMapper(form);
 			fm.candidate.emplace_back((KMorpheme*)mid);
-			fm.suffix.insert(suffixes.begin(), suffixes.end());
 			morphemes.emplace_back(form, tag, KCondVowel::none, KCondPolarity::none, socket);
 			morphemes.back().kform = (const k_string*)(&fm - &forms[0]);
 			morphemes.back().combined = (int)mit->second - ((int)morphemes.size() - 1);
@@ -215,25 +213,47 @@ void KModelMgr::loadPCMFromTxt(std::istream& is, morphemeMap& morphMap)
 #endif
 }
 
-void KModelMgr::loadCorpusFromTxt(std::istream & is, morphemeMap& morphMap)
+KNLangModel::AllomorphSet KModelMgr::loadAllomorphFromTxt(std::istream & is, const morphemeMap& morphMap)
+{
+	KNLangModel::AllomorphSet ams;
+	string line;
+	vector<KNLangModel::WID> group;
+	while (getline(is, line))
+	{
+		auto wstr = utf8_to_utf16(line);
+		if (wstr.empty())
+		{
+			ams.addGroup(group.begin(), group.end());
+			group.clear();
+			continue;
+		}
+		if (wstr.back() == '\n') wstr.pop_back();
+		auto fields = split(wstr, u'\t');
+		if (fields.size() < 2) continue;
+		auto form = normalizeHangul({ fields[0].begin(), fields[0].end() });
+		auto tag = makePOSTag({ fields[1].begin(), fields[1].end() });
+		auto it = morphMap.find(make_pair(form, tag));
+		if (it != morphMap.end())
+		{
+			group.emplace_back(it->second);
+		}
+	}
+	return ams;
+}
+
+void KModelMgr::loadCorpusFromTxt(std::istream & is, morphemeMap& morphMap, const KNLangModel::AllomorphSet& ams)
 {
 	string line;
 	vector<uint32_t> wids;
 	wids.emplace_back(0);
-	//ofstream debug{ "debug.txt" };
 	while (getline(is, line))
 	{
 		auto wstr = utf8_to_utf16(line);
-		if (wstr.back() == '\n') wstr.pop_back();
+		if (!wstr.empty() && wstr.back() == '\n') wstr.pop_back();
 		if (wstr.empty() && wids.size() > 1)
 		{
 			wids.emplace_back(1);
 			langMdl.trainSequence(&wids[0], wids.size());
-			/*for (auto w : wids)
-			{
-				debug << w << ' ';
-			}
-			debug << endl;*/
 			wids.erase(wids.begin() + 1, wids.end());
 			continue;
 		}
@@ -266,7 +286,8 @@ void KModelMgr::loadCorpusFromTxt(std::istream & is, morphemeMap& morphMap)
 			}
 			else
 			{
-				wids.emplace_back(it->second);
+				auto& g = ams.getGroupByMorph(it->second);
+				wids.emplace_back(g.empty() ? it->second : g[0]);
 			}
 		}
 	}
@@ -277,6 +298,7 @@ void KModelMgr::saveMorphBin(std::ostream& os) const
 	writeToBinStream(os, 0x4B495749);
 	writeToBinStream<uint32_t>(os, forms.size());
 	writeToBinStream<uint32_t>(os, morphemes.size());
+	writeToBinStream<uint32_t>(os, baseTrieSize);
 
 	auto mapper = [this](const KMorpheme* p)->size_t
 	{
@@ -293,12 +315,35 @@ void KModelMgr::saveMorphBin(std::ostream& os) const
 	}
 }
 
+size_t KModelMgr::estimateTrieSize() const
+{
+	vector<KTrie> tries;
+	size_t est = 0;
+	for (auto& f : forms)
+	{
+		est += f.form.size();
+	}
+	tries.reserve(est);
+	tries.emplace_back();
+	for (auto& f : forms)
+	{
+		if (f.candidate.empty()) continue;
+		tries[0].build(&f.form[0], f.form.size(), &f, [&]()
+		{
+			tries.emplace_back();
+			return &tries.back();
+		});
+	}
+	return tries.size() + (size_t)KPOSTag::SN + 3;
+}
+
 void KModelMgr::loadMorphBin(std::istream& is)
 {
 	if (readFromBinStream<uint32_t>(is) != 0x4B495749) throw exception();
 	size_t formSize = readFromBinStream<uint32_t>(is);
 	size_t morphemeSize = readFromBinStream<uint32_t>(is);
-	
+	baseTrieSize = readFromBinStream<uint32_t>(is);
+
 	forms.resize(formSize);
 	morphemes.resize(morphemeSize);
 
@@ -337,29 +382,43 @@ KModelMgr::KModelMgr(const char * modelPath) : langMdl(3)
 	auto realMorph = morphMap;
 	loadCMFromTxt(ifstream{ modelPath + string{ "combinedV2.txt" } }, morphMap);
 	loadPCMFromTxt(ifstream{ modelPath + string{ "precombinedV2.txt" } }, morphMap);
-	saveMorphBin(ofstream{ modelPath + string{ "morpheme.bin" }, ios_base::binary });
+	baseTrieSize = estimateTrieSize();
+	saveMorphBin(ofstream{ modelPath + string{ "sj.morph" }, ios_base::binary });
 	
-	loadCorpusFromTxt(ifstream{ modelPath + string{ "ML_lit.txt" } }, realMorph);
-	loadCorpusFromTxt(ifstream{ modelPath + string{ "ML_spo.txt" } }, realMorph);
-	langMdl.optimize();
-	langMdl.writeToStream(ofstream{ modelPath + string{ "langMdl.bin" }, ios_base::binary });
+	//auto ams = loadAllomorphFromTxt(ifstream{ modelPath + string{ "allomorphs.txt" } }, morphMap);
+	KNLangModel::AllomorphSet ams;
+	loadCorpusFromTxt(ifstream{ modelPath + string{ "ML_lit.txt" } }, realMorph, ams);
+	loadCorpusFromTxt(ifstream{ modelPath + string{ "ML_spo.txt" } }, realMorph, ams);
+	langMdl.optimize(ams);
+	langMdl.writeToStream(ofstream{ modelPath + string{ "sj.lang" }, ios_base::binary });
 	
 #else
-	loadMorphBin(ifstream{ modelPath + string{"morpheme.bin"}, ios_base::binary });
-	langMdl = KNLangModel::readFromStream(ifstream{ modelPath + string{ "langMdl.bin" }, ios_base::binary });
+	loadMorphBin(ifstream{ modelPath + string{"sj.morph"}, ios_base::binary });
+	langMdl = KNLangModel::readFromStream(ifstream{ modelPath + string{ "sj.lang" }, ios_base::binary });
 #endif
+	dictMorphSize = morphemes.size();
 }
 
-void KModelMgr::addUserWord(const k_string & form, KPOSTag tag)
+void KModelMgr::addUserWord(const k_string & form, KPOSTag tag, float userScore)
 {
+	if (form.empty()) return;
 #ifdef TRIE_ALLOC_ARRAY
-	if (!form.empty()) extraTrieSize += form.size() - 1;
+	extraTrieSize += form.size() - 1;
 #else
 #endif
+	for (size_t i = 1; i < form.size() - 1; ++i)
+	{
+		KPOSTag specialType = identifySpecialChr(form[i - 1]);
+		if (specialType == KPOSTag::MAX) continue;
+		auto& f = formMapper(form.substr(0, i));
+		if (f.candidate.empty()) f.candidate.emplace_back((const KMorpheme*)(getDefaultMorpheme(specialType) - &morphemes[0]));
+	}
 
 	auto& f = formMapper(form);
 	f.candidate.emplace_back((const KMorpheme*)morphemes.size());
 	morphemes.emplace_back(form, tag);
+	morphemes.back().kform = (const k_string*)(&f - &forms[0]);
+	morphemes.back().userScore = userScore;
 }
 
 void KModelMgr::addUserRule(const k_string & form, const vector<pair<k_string, KPOSTag>>& morphs)
@@ -368,7 +427,6 @@ void KModelMgr::addUserRule(const k_string & form, const vector<pair<k_string, K
 	if (!form.empty()) extraTrieSize += form.size() - 1;
 #else
 #endif
-
 	auto& f = formMapper(form);
 	f.candidate.emplace_back((const KMorpheme*)morphemes.size());
 	morphemes.emplace_back(form, KPOSTag::UNKNOWN);
@@ -383,7 +441,7 @@ void KModelMgr::addUserRule(const k_string & form, const vector<pair<k_string, K
 void KModelMgr::solidify()
 {
 #ifdef TRIE_ALLOC_ARRAY
-	trieRoot.reserve(100000 + extraTrieSize);
+	trieRoot.reserve(baseTrieSize + extraTrieSize);
 	trieRoot.resize((size_t)KPOSTag::SN + 1); // preserve places for root node + default tag morphemes
 	for (size_t i = 1; i <= (size_t)KPOSTag::SN; ++i)
 	{

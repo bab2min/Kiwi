@@ -120,7 +120,7 @@ void KNLangModel::calcDiscountedValue(size_t order, const vector<uint32_t>& cntN
 	}
 }
 
-void KNLangModel::optimize()
+void KNLangModel::optimize(const AllomorphSet& ams)
 {
 	{
 		vector<uint32_t> cntNodes(nodes.size());
@@ -140,6 +140,18 @@ void KNLangModel::optimize()
 	{
 		node.ll = log(node.ll);
 		node.gamma = log(node.gamma);
+
+		// duplicate for allomorphs
+		vector<pair<WID, int32_t>> insertionList;
+		for (auto&& p : node.next)
+		{
+			for(auto&& g : ams.getGroupByMorph(p.first))
+			{
+				insertionList.emplace_back(g, p.second);
+			}
+		}
+		node.next.insert(insertionList.begin(), insertionList.end());
+		
 		if (node.depth == orderN - 1)
 		{
 			for (auto&& p : node)

@@ -17,6 +17,7 @@ vector<KGraphNode> KTrie::split(const k_string& str) const
 	const KTrie* curTrie = this;
 	unordered_map<uint32_t, int> spacePos;
 	size_t lastSpecialEndPos = 0;
+	KPOSTag chrType, lastChrType = KPOSTag::UNKNOWN;
 	auto brachOut = [&](bool makeLongMatch = false)
 	{
 		if (!candidates.empty())
@@ -33,7 +34,7 @@ vector<KGraphNode> KTrie::split(const k_string& str) const
 				});
 
 				// inserting unknown form 
-				if (nBegin != lastSpecialEndPos && !longestMatched && !(0x11A8 <= cand->form[0] && cand->form[0] < (0x11A7 + 28)))
+				if (nBegin > lastSpecialEndPos && !longestMatched && !(0x11A8 <= cand->form[0] && cand->form[0] < (0x11A7 + 28)))
 				{
 					auto it2 = spacePos.find(lastSpecialEndPos - 1);
 					int space2 = it2 == spacePos.end() ? 0 : it2->second;
@@ -45,16 +46,40 @@ vector<KGraphNode> KTrie::split(const k_string& str) const
 					ret.emplace_back(str.substr(lastSpecialEndPos, nBegin - space - lastSpecialEndPos), nBegin - space);
 				}
 
-				for (auto& g : ret)
+				// if special character
+				if (cand->candidate[0] <= this[(size_t)KPOSTag::SN].val->candidate[0])
 				{
-					if (g.lastPos != nBegin - space) continue;
-					isMatched = true;
-					g.addNext(&ret.back() + 1);
+					// reuse previous node
+					if (ret.back().lastPos == n - 1 && ret.back().form && ret.back().form->candidate[0]->tag == cand->candidate[0]->tag)
+					{
+						ret.back().uform.push_back(cand->form.back());
+						ret.back().lastPos = n;
+						lastSpecialEndPos = n;
+					}
+					else
+					{
+						for (auto& g : ret)
+						{
+							if (g.lastPos != n - 1 - space) continue;
+							g.addNext(&ret.back() + 1);
+						}
+						ret.emplace_back(cand->form.substr(cand->form.size() - 1), n);
+						ret.back().form = this[(size_t)cand->candidate[0]->tag].val;
+						lastSpecialEndPos = n;
+					}
 				}
-
-				if (isMatched)
+				else
 				{
-					ret.emplace_back(cand, n);
+					for (auto& g : ret)
+					{
+						if (g.lastPos != nBegin - space) continue;
+						isMatched = true;
+						g.addNext(&ret.back() + 1);
+					}
+					if (isMatched)
+					{
+						ret.emplace_back(cand, n);
+					}
 				}
 			}
 			candidates.clear();
@@ -77,7 +102,6 @@ vector<KGraphNode> KTrie::split(const k_string& str) const
 		}
 	};
 
-	KPOSTag chrType, lastChrType = KPOSTag::UNKNOWN;
 	for (auto c : str)
 	{
 		chrType = identifySpecialChr(c);
@@ -143,7 +167,7 @@ vector<KGraphNode> KTrie::split(const k_string& str) const
 			}
 		}
 		brachOut();
-		// from this, curTrie has exact node
+		// from this, curTrie has the exact next node
 		curTrie = curTrie->getNext(c);
 		// if it has exit node, a pattern has found
 		for (auto submatcher = curTrie; submatcher; submatcher = submatcher->getFail())
