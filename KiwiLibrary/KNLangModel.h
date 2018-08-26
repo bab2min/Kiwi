@@ -6,8 +6,37 @@ class KNLangModel
 {
 public:
 	typedef uint32_t WID;
+
+	class AllomorphSet
+	{
+		std::unordered_map<WID, size_t> morphToGroup;
+		std::vector<std::vector<WID>> groupMorph;
+		std::vector<WID> emptyGroup;
+	public:
+		template<class Iter>
+		void addGroup(Iter begin, Iter end)
+		{
+			if (begin == end) return;
+			size_t gId = groupMorph.size();
+			groupMorph.emplace_back(begin, end);
+			for (; begin != end; ++begin)
+			{
+				morphToGroup[*begin] = gId;
+			}
+		}
+
+		const std::vector<WID>& getGroupByMorph(WID mId) const
+		{
+			auto it = morphToGroup.find(mId);
+			if (it == morphToGroup.end()) return emptyGroup;
+			return groupMorph[it->second];
+		}
+	};
+
+
 	struct Node
 	{
+		friend class KNLangModel;
 		class NodeIterator
 		{
 		protected:
@@ -191,11 +220,11 @@ public:
 		{
 			str.write((const char*)&parent, sizeof(uint32_t));
 			str.write((const char*)&lower, sizeof(uint32_t));
-			str.write((const char*)&depth, sizeof(uint32_t));
 			str.write((const char*)&ll, sizeof(uint32_t));
 			str.write((const char*)&gamma, sizeof(uint32_t));
+			str.write((const char*)&depth, sizeof(uint8_t));
 
-			uint32_t size = next.size();
+			uint32_t size = bakedNext.size();
 			str.write((const char*)&size, sizeof(uint32_t));
 			for (auto& p : bakedNext)
 			{
@@ -209,9 +238,9 @@ public:
 			Node n(true);
 			str.read((char*)&n.parent, sizeof(uint32_t));
 			str.read((char*)&n.lower, sizeof(uint32_t));
-			str.read((char*)&n.depth, sizeof(uint32_t));
 			str.read((char*)&n.ll, sizeof(uint32_t));
 			str.read((char*)&n.gamma, sizeof(uint32_t));
+			str.read((char*)&n.depth, sizeof(uint8_t));
 
 			uint32_t size;
 			str.read((char*)&size, sizeof(uint32_t));
@@ -225,7 +254,7 @@ public:
 				str.read((char*)&second, sizeof(uint32_t));
 				tNext.emplace_back(first, second);
 			}
-			n.bakedNext = BakedMap<WID, int32_t>{ tNext.begin(), tNext.end() };
+			n.bakedNext = BakedMap<WID, int32_t>{ tNext.begin(), tNext.end(), true };
 			return n;
 		}
 	};
@@ -252,7 +281,7 @@ public:
 		vocabSize = o.vocabSize;
 	}
 	void trainSequence(const WID* seq, size_t len);
-	void optimize();
+	void optimize(const AllomorphSet& ams = {});
 	std::vector<float> predictNext(const WID* history, size_t len) const;
 	float evaluateLL(const WID* seq, size_t len) const;
 	float evaluateLLSent(const WID* seq, size_t len) const;

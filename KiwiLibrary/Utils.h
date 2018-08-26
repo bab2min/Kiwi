@@ -4,7 +4,7 @@
 #define LEN_ARRAY(p) (sizeof(p)/sizeof(p[0]))
 
 k_string normalizeHangul(std::u16string hangul);
-k_string joinHangul(k_string hangul);
+std::u16string joinHangul(k_string hangul);
 
 template<class BaseChr, class OutIterator>
 void split(const std::basic_string<BaseChr>& s, BaseChr delim, OutIterator result) {

@@ -15,7 +15,7 @@ KWordPair parseWordPOS(const u16string& str)
 	}
 	auto p = str.find('/');
 	if (p == str.npos) return {};
-	k_string form{ str.begin(), str.begin() + p };
+	u16string form{ str.begin(), str.begin() + p };
 	if (str[p + 1] == 'E')
 	{
 		if (form[0] == 0xC544) form[0] = 0xC5B4; // 아
@@ -61,7 +61,22 @@ KTest::KTest(const char * testSetFile, Kiwi* kw, size_t topN) : totalCount(0), t
 			tr.r = cands[0].first;
 			if (tr.a != tr.r)
 			{
-				auto diff = LCS::getDiff(tr.r.begin(), tr.r.end(), tr.a.begin(), tr.a.end());
+				auto diff = LCS::getDiff(tr.r.begin(), tr.r.end(), tr.a.begin(), tr.a.end(), [](const KWordPair& a, const KWordPair& b)
+				{
+					if (a.tag() != b.tag()) return false;
+					if (a.tag() == KPOSTag::JKO) return true;
+					if (a.str() == u"은" && u"ᆫ" == b.str()) return true;
+					if (b.str() == u"은" && u"ᆫ" == a.str()) return true;
+					if (a.str() == u"을" && u"ᆯ" == b.str()) return true;
+					if (b.str() == u"을" && u"ᆯ" == a.str()) return true;
+					if (a.str() == u"음" && u"ᆷ" == b.str()) return true;
+					if (b.str() == u"음" && u"ᆷ" == a.str()) return true;
+					if (a.str() == u"그것" && u"그거" == b.str()) return true;
+					if (b.str() == u"그것" && u"그거" == a.str()) return true;
+					if (a.str() == u"것" && u"거" == b.str()) return true;
+					if (b.str() == u"것" && u"거" == a.str()) return true;
+					return a == b;
+				});
 				size_t common = 0;
 				for (auto&& d : diff)
 				{

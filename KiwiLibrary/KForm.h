@@ -89,7 +89,11 @@ struct KMorpheme
 	KCondPolarity polar = KCondPolarity::none;
 	uint8_t combineSocket = 0;
 	std::vector<const KMorpheme*>* chunks = nullptr;
-	int32_t combined = 0;
+	union
+	{
+		int32_t combined = 0;
+		float userScore;
+	};
 	const KMorpheme* getCombined() const { return this + combined; }
 	void readFromBin(std::istream& is, const std::function<const KMorpheme*(size_t)>& mapper);
 	void writeToBin(std::ostream& os, const std::function<size_t(const KMorpheme*)>& mapper) const;
@@ -101,7 +105,6 @@ struct KForm
 {
 	k_string form;
 	std::vector<const KMorpheme*> candidate;
-	std::unordered_set<k_char> suffix;
 	KForm(const k_char* _form = nullptr);
 	KForm(const k_string& _form) : form(_form) {}
 

@@ -125,12 +125,6 @@ void KForm::readFromBin(istream& is, const function<const KMorpheme*(size_t)>& m
 	{
 		c = mapper(readFromBinStream<uint32_t>(is));
 	}
-
-	size_t s = readFromBinStream<uint32_t>(is);
-	for (size_t i = 0; i < s; i++)
-	{
-		suffix.insert(readFromBinStream<k_char>(is));
-	}
 }
 
 void KForm::writeToBin(ostream& os, const function<size_t(const KMorpheme*)>& mapper) const
@@ -140,12 +134,6 @@ void KForm::writeToBin(ostream& os, const function<size_t(const KMorpheme*)>& ma
 	for (auto c : candidate)
 	{
 		writeToBinStream<uint32_t>(os, mapper(c));
-	}
-
-	writeToBinStream<uint32_t>(os, suffix.size());
-	for (auto c : suffix)
-	{
-		writeToBinStream<k_char>(os, c);
 	}
 }
 

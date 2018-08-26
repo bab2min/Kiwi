@@ -23,9 +23,9 @@ k_string normalizeHangul(std::u16string hangul)
 	return ret;
 }
 
-k_string joinHangul(k_string hangul)
+std::u16string joinHangul(k_string hangul)
 {
-	k_string ret;
+	std::u16string ret;
 	ret.reserve(hangul.size());
 	for (auto c : hangul)
 	{

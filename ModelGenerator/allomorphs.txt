@@ -1,0 +1,71 @@
+을	JKO
+를	JKO
+ᆯ	JKO
+
+는	JX
+은	JX
+ᆫ	JX
+
+나	JX
+이나	JX
+
+란	JX
+이란	JX
+
+나마	JX
+이나마	JX
+
+과	JKB
+와	JKB
+
+으로	JKB
+로	JKB
+
+로부터	JKB
+으로부터	JKB
+
+아	JKV
+야	JKV
+
+이	JKS
+가	JKS
+
+이	JKC
+가	JKC
+
+랑	JC
+이랑	JC
+
+이나	JC
+나	JC
+
+과	JC
+와	JC
+
+
+은	ETM
+ᆫ	ETM
+
+을	ETM
+ᆯ	ETM
+
+음	ETN
+ᆷ	ETN
+
+면	EC
+으면	EC
+
+며	EC
+으며	EC
+
+니	EC
+으니	EC
+
+므로	EC
+으므로	EC
+
+니까	EF
+으니까	EF
+
+ᆯ까	EF
+을까	EF

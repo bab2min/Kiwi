@@ -12,12 +12,12 @@ Kiwi::Kiwi(const char * modelPath, size_t _maxCache, size_t _numThread) : maxCac
 	numThread(_numThread ? _numThread : thread::hardware_concurrency()), 
 	workers(_numThread ? _numThread : thread::hardware_concurrency())
 {
-	mdl = make_shared<KModelMgr>(modelPath);
+	mdl = make_unique<KModelMgr>(modelPath);
 }
 
-int Kiwi::addUserWord(const u16string & str, KPOSTag tag)
+int Kiwi::addUserWord(const u16string & str, KPOSTag tag, float userScore)
 {
-	mdl->addUserWord(normalizeHangul({ str.begin(), str.end() }), tag);
+	mdl->addUserWord(normalizeHangul({ str.begin(), str.end() }), tag, userScore);
 	return 0;
 }
 
@@ -209,6 +209,7 @@ vector<pair<Kiwi::pathType, float>> Kiwi::findBestPath(const vector<KGraphNode>&
 			KCondPolarity condP = KCondPolarity::none;
 			size_t chSize = 1;
 			WID orgSeq = 0;
+			bool isUserWord = false;
 			// if the morpheme is chunk set
 			if (curMorph->chunks)
 			{
@@ -221,7 +222,14 @@ vector<pair<Kiwi::pathType, float>> Kiwi::findBestPath(const vector<KGraphNode>&
 			}
 			else
 			{
-				seq[0] = curMorph - morphBase;
+				if (isUserWord = mdl->isUserWord(curMorph))
+				{
+					seq[0] = mdl->getDefaultMorpheme(curMorph->tag) - morphBase;
+				}
+				else
+				{
+					seq[0] = curMorph - morphBase;
+				}
 			}
 			orgSeq = seq[0];
 			condV = curMorph->vowel;
@@ -269,11 +277,16 @@ vector<pair<Kiwi::pathType, float>> Kiwi::findBestPath(const vector<KGraphNode>&
 
 			// if a form of the node is unknown, calculate log poisson distribution for word-tag
 			float estimatedLL = 0;
-			if (unknownForm)
+			if (isUserWord)
 			{
-				if (curMorph->tag == KPOSTag::NNG) estimatedLL = LogPoisson::getLL(4.622955f, node->uform.size());
-				else if (curMorph->tag == KPOSTag::NNP) estimatedLL = LogPoisson::getLL(5.177622f, node->uform.size());
-				else if (curMorph->tag == KPOSTag::MAG) estimatedLL = LogPoisson::getLL(4.557326f, node->uform.size());
+				estimatedLL += curMorph->userScore;
+			}
+			else if (unknownForm)
+			{
+				size_t unknownLen = node->uform.empty() ? node->form->form.size() : node->uform.size();
+				if (curMorph->tag == KPOSTag::NNG) estimatedLL = LogPoisson::getLL(4.622955f, unknownLen);
+				else if (curMorph->tag == KPOSTag::NNP) estimatedLL = LogPoisson::getLL(5.177622f, unknownLen);
+				else if (curMorph->tag == KPOSTag::MAG) estimatedLL = LogPoisson::getLL(4.557326f, unknownLen);
 				estimatedLL -= 16;
 			}
 
@@ -296,7 +309,7 @@ vector<pair<Kiwi::pathType, float>> Kiwi::findBestPath(const vector<KGraphNode>&
 					for (size_t ch = chSize; ch-- > 0;)
 					{
 						if (ch) wids.emplace_back(seq[ch], 0);
-						else wids.emplace_back(seq[ch], combSocket, condV, condP, ownFormId);
+						else wids.emplace_back(isUserWord ? curMorph - morphBase : seq[ch], combSocket, condV, condP, ownFormId);
 					}
 				}
 				else
@@ -333,7 +346,7 @@ vector<pair<Kiwi::pathType, float>> Kiwi::findBestPath(const vector<KGraphNode>&
 			{
 				ownFormList.emplace_back(node->form->form);
 				ownFormId = ownFormList.size();
-				tMax = max(tMax, evalPath(node, i, ownFormId, unknownNodeLCands, true));
+				tMax = min(tMax, evalPath(node, i, ownFormId, unknownNodeLCands, true));
 			};
 		}
 		else
@@ -345,7 +358,7 @@ vector<pair<Kiwi::pathType, float>> Kiwi::findBestPath(const vector<KGraphNode>&
 		WordLLs reduced;
 		for (auto& c : cache[i])
 		{
-			if (c.second > tMax - 10) reduced.emplace_back(move(c));
+			if (c.second > tMax - cutOffThreshold) reduced.emplace_back(move(c));
 		}
 		cache[i] = move(reduced);
 

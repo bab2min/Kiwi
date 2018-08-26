@@ -117,7 +117,7 @@ public:
 	BakedMap() {}
 
 	template<class Input>
-	BakedMap(Input begin, Input end) : length(std::distance(begin, end))
+	BakedMap(Input begin, Input end, bool useMixed) : length(std::distance(begin, end))
 	{
 		if (length)
 		{
@@ -126,12 +126,25 @@ public:
 			length -= vecInfo.first;
 			elems = operator new[](sizeof(Value) * vecLength + sizeof(std::pair<Key, Value>) * length);
 			std::fill_n((Value*)elems, vecLength, Value{});
-			//std::fill_n(getMap(), length, KVPair{});
-	
+
 			for (size_t i = 0; begin != end; ++begin, ++i)
 			{
 				if (i < vecInfo.first) getVec()[begin->first] = begin->second;
 				else getMap()[i - vecInfo.first] = *begin;
+			}
+		}
+	}
+
+	template<class Input>
+	BakedMap(Input begin, Input end) : length(std::distance(begin, end))
+	{
+		if (length)
+		{
+			vecLength = 0;
+			elems = operator new[](sizeof(std::pair<Key, Value>) * length);
+			for (size_t i = 0; begin != end; ++begin, ++i)
+			{
+				getMap()[i] = *begin;
 			}
 		}
 	}
@@ -176,6 +189,11 @@ public:
 		if (ret == getMap() + length)  return {};
 		if (ret->first == key) return ret->second;
 		return {};
+	}
+
+	size_t size() const
+	{
+		return vecLength + length;
 	}
 
 	const_iterator begin() const { return { (const KVPair*)getVec(), vecLength, 0 }; }
