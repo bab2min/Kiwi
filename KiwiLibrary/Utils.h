@@ -3,6 +3,7 @@
 #include "KForm.h"
 #define LEN_ARRAY(p) (sizeof(p)/sizeof(p[0]))
 
+bool isHangulCoda(char16_t chr);
 k_string normalizeHangul(std::u16string hangul);
 std::u16string joinHangul(k_string hangul);
 
