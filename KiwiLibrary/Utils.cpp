@@ -3,6 +3,11 @@
 #include "KForm.h"
 #include "Utils.h"
 
+bool isHangulCoda(char16_t chr)
+{
+	return 0x11A8 <= chr && chr < (0x11A7 + 28);
+}
+
 k_string normalizeHangul(std::u16string hangul)
 {
 	k_string ret;
@@ -29,7 +34,7 @@ std::u16string joinHangul(k_string hangul)
 	ret.reserve(hangul.size());
 	for (auto c : hangul)
 	{
-		if (0x11A8 <= c && c < (0x11A7 + 28) && 0xAC00 <= ret.back() && ret.back() < 0xD7A4)
+		if (isHangulCoda(c) && 0xAC00 <= ret.back() && ret.back() < 0xD7A4)
 		{
 			if ((ret.back() - 0xAC00) % 28) ret.push_back(c);
 			else ret.back() += c - 0x11A7;
@@ -58,7 +63,7 @@ KPOSTag identifySpecialChr(k_char chr)
 	if (('A' <= chr && chr <= 'Z') ||
 		('a' <= chr && chr <= 'z'))  return KPOSTag::SL;
 	if (0xAC00 <= chr && chr < 0xD7A4) return KPOSTag::MAX;
-	if (0x11A8 <= chr && chr < 0x11A7 + 28) return KPOSTag::MAX;
+	if (isHangulCoda(chr)) return KPOSTag::MAX;
 	switch (chr)
 	{
 	case '.':

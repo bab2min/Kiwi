@@ -117,8 +117,7 @@ int main()
 	SIZE_T memUsed = pmc.WorkingSetSize;
 	cout << "Mem Usage : " << memUsed / 1024.f / 1024.f << " MB" << endl;
 	
-	kw.analyze(KSTR(R"!(¿À´ÃÀº 1993³â 06¿ù 10ÀÏ )!"), 10);
-
+	kw.analyze(KSTR(R"!(Àâ¼ö¼Ì´Ù.)!"), 10);
 
 	string testFiles[] = { "01s.txt", "02s.txt", "03s.txt", "17s.txt", "18s.txt", "13s.txt", "15s.txt", };
 	for (auto tf : testFiles)

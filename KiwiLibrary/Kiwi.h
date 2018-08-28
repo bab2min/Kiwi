@@ -4,9 +4,9 @@
 #include "KTrie.h"
 #include "ThreadPool.h"
 
-struct KWordPair : public std::tuple<std::u16string, KPOSTag, uint8_t, uint16_t>
+struct KWordPair : public std::tuple<std::u16string, KPOSTag, uint16_t, uint32_t>
 {
-	using std::tuple<std::u16string, KPOSTag, uint8_t, uint16_t>::tuple;
+	using std::tuple<std::u16string, KPOSTag, uint16_t, uint32_t>::tuple;
 
 	std::u16string& str() { return std::get<0>(*this); }
 	const std::u16string& str() const { return std::get<0>(*this); }
@@ -14,11 +14,11 @@ struct KWordPair : public std::tuple<std::u16string, KPOSTag, uint8_t, uint16_t>
 	KPOSTag& tag() { return std::get<1>(*this); }
 	const KPOSTag& tag() const { return std::get<1>(*this); }
 
-	uint8_t& len() { return std::get<2>(*this); }
-	const uint8_t& len() const { return std::get<2>(*this); }
+	uint16_t& len() { return std::get<2>(*this); }
+	const uint16_t& len() const { return std::get<2>(*this); }
 
-	uint16_t& pos() { return std::get<3>(*this); }
-	const uint16_t& pos() const { return std::get<3>(*this); }
+	uint32_t& pos() { return std::get<3>(*this); }
+	const uint32_t& pos() const { return std::get<3>(*this); }
 
 	bool operator ==(const KWordPair& o) const
 	{
@@ -40,16 +40,12 @@ class KModelMgr;
 class Kiwi
 {
 protected:
-	float cutOffThreshold = 15.f;
-	size_t maxCache;
+	float cutOffThreshold = 10.f;
 	std::unique_ptr<KModelMgr> mdl;
-	//mutable ThreadPool workerPool;
-	mutable std::vector<ReusableThread> workers;
-	mutable std::mutex lock;
+	mutable ThreadPool workers;
 	const KTrie* kt = nullptr;
-	size_t numThread;
-	typedef std::vector<std::pair<const KMorpheme*, k_string>> pathType;
-	std::vector<std::pair<pathType, float>> findBestPath(const std::vector<KGraphNode>& graph, const KNLangModel * knlm, const KMorpheme* morphBase, size_t topN) const;
+	typedef std::vector<std::tuple<const KMorpheme*, k_string, uint32_t>> path;
+	std::vector<std::pair<path, float>> findBestPath(const std::vector<KGraphNode>& graph, const KNLangModel * knlm, const KMorpheme* morphBase, size_t topN) const;
 public:
 	Kiwi(const char* modelPath = "", size_t maxCache = -1, size_t numThread = 0);
 	int addUserWord(const std::u16string& str, KPOSTag tag, float userScore = 10);
@@ -60,6 +56,7 @@ public:
 	KResult analyze(const std::string& str) const;
 	std::vector<KResult> analyze(const std::u16string& str, size_t topN) const;
 	std::vector<KResult> analyze(const std::string& str, size_t topN) const;
+	void analyze(size_t topN, const std::function<std::u16string(size_t)>& reader, const std::function<void(size_t, std::vector<KResult>&&)>& receiver) const;
 	void clearCache();
 	static int getVersion();
 };
