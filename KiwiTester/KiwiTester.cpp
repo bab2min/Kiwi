@@ -9,6 +9,8 @@
 #include "../KiwiLibrary/KModelMgr.h"
 #include "KTest.h"
 
+#include "../KiwiLibrary/KWordDetector.h"
+
 class Timer
 {
 public:
@@ -108,6 +110,43 @@ int main()
 	SetConsoleOutputCP(CP_UTF8);
 	setvbuf(stdout, nullptr, _IOFBF, 1000);
 	Timer timer;
+	KWordDetector kd{ 25, 12, 0.01f };
+	kd.loadPOSModelFromTxt(ifstream{ "../ModelGenerator/RModel.txt" });
+	{
+		ifstream ifs{ "D:/namu_raw.txt" };
+		auto res = kd.extractWords([&ifs](size_t id) -> u16string
+		{
+			if (id >= 500000) return {};
+			if (id == 0)
+			{
+				ifs.clear();
+				ifs.seekg(0);
+			}
+			string line;
+			while (getline(ifs, line))
+			{
+				auto sstr = line/*.substr(0, line.find('\t'))*/;
+				if(sstr.size()) return utf8_to_utf16(sstr);
+			}
+			return {};
+		});
+		
+		ofstream ofs{ "extractionSample.txt" };
+		for (auto& r : res)
+		{
+			ofs << utf16_to_utf8(r.form) << '\t' << r.score << '\t' << r.freq
+				<< '\t' << r.lBranch << '\t' << r.rBranch
+				<< '\t' << r.lCohesion << '\t' << r.rCohesion
+				<< '\t' << r.posScore[KPOSTag::NNP]
+				<< '\t' << r.posScore[KPOSTag::IC]
+				<< '\t' << r.posScore[KPOSTag::XR]
+				<< '\t' << r.posScore[KPOSTag::EC]
+				<< '\t' << r.posScore[KPOSTag::EF] << endl;
+		}
+		return 0;
+	}
+
+
 	Kiwi kw{ "../ModelGenerator/", (size_t)-1, 0 };
 	//kw.addUserWord(u"1993/06/10", KPOSTag::NNP);
 	kw.prepare();
