@@ -30,8 +30,8 @@ int Kiwi::addUserRule(const u16string & str, const vector<pair<u16string, KPOSTa
 		jmMorph.emplace_back(normalizeHangul({ m.first.begin(), m.first.end() }), m.second);
 	}
 	mdl->addUserRule(normalizeHangul({ str.begin(), str.end() }), jmMorph);
-	return 0;
 	*/
+	return 0;
 }
 
 int Kiwi::loadUserDictionary(const char * userDictPath)
