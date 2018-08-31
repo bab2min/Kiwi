@@ -4,7 +4,7 @@
 
 using namespace std;
 
-void KWordDetector::countUnigram(Counter& cdata, const function<u16string(size_t)>& reader)
+void KWordDetector::countUnigram(Counter& cdata, const function<u16string(size_t)>& reader) const
 {
 	auto ldUnigram = readProc<vector<uint32_t>>(reader, [this, &cdata](u16string ustr, size_t id, vector<uint32_t>& ld)
 	{
@@ -54,7 +54,7 @@ void KWordDetector::countUnigram(Counter& cdata, const function<u16string(size_t
 	cdata.chrDict = move(chrDictShrink);
 }
 
-void KWordDetector::countBigram(Counter& cdata, const function<u16string(size_t)>& reader)
+void KWordDetector::countBigram(Counter& cdata, const function<u16string(size_t)>& reader) const
 {
 	auto ldBigram = readProc<vector<uint32_t>>(reader, [this, &cdata](u16string ustr, size_t id, vector<uint32_t>& ld)
 	{
@@ -86,7 +86,7 @@ void KWordDetector::countBigram(Counter& cdata, const function<u16string(size_t)
 	}
 }
 
-void KWordDetector::countNgram(Counter& cdata, const function<u16string(size_t)>& reader)
+void KWordDetector::countNgram(Counter& cdata, const function<u16string(size_t)>& reader) const
 {
 	vector<ReusableThread> rt(2);
 	vector<future<void>> futures(2);
@@ -267,7 +267,7 @@ void KWordDetector::loadPOSModelFromTxt(std::istream & is)
 	}
 }
 
-vector<KWordDetector::WordInfo> KWordDetector::extractWords(const std::function<std::u16string(size_t)>& reader)
+vector<KWordDetector::WordInfo> KWordDetector::extractWords(const std::function<std::u16string(size_t)>& reader) const
 {
 	Counter cdata;
 	countUnigram(cdata, reader);

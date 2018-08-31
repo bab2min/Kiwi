@@ -3,6 +3,7 @@
 #include <string>
 #include "KTrie.h"
 #include "ThreadPool.h"
+#include "KWordDetector.h"
 
 struct KWordPair : public std::tuple<std::u16string, KPOSTag, uint16_t, uint32_t>
 {
@@ -44,14 +45,17 @@ protected:
 	std::unique_ptr<KModelMgr> mdl;
 	mutable ThreadPool workers;
 	const KTrie* kt = nullptr;
+	KWordDetector detector;
 	typedef std::vector<std::tuple<const KMorpheme*, k_string, uint32_t>> path;
 	std::vector<std::pair<path, float>> findBestPath(const std::vector<KGraphNode>& graph, const KNLangModel * knlm, const KMorpheme* morphBase, size_t topN) const;
 public:
 	Kiwi(const char* modelPath = "", size_t maxCache = -1, size_t numThread = 0);
-	int addUserWord(const std::u16string& str, KPOSTag tag, float userScore = 10);
+	int addUserWord(const std::u16string& str, KPOSTag tag, float userScore = 20);
 	int addUserRule(const std::u16string& str, const std::vector<std::pair<std::u16string, KPOSTag>>& morph);
 	int loadUserDictionary(const char* userDictPath = "");
 	int prepare();
+	std::vector<KWordDetector::WordInfo> extractWords(const std::function<std::u16string(size_t)>& reader, size_t minCnt = 10, size_t maxWordLen = 10, float minScore = 0.25);
+	std::vector<KWordDetector::WordInfo> extractAndAddWords(const std::function<std::u16string(size_t)>& reader, size_t minCnt = 10, size_t maxWordLen = 10, float minScore = 0.25, float posThreshold = 0.5);
 	KResult analyze(const std::u16string& str) const;
 	KResult analyze(const std::string& str) const;
 	std::vector<KResult> analyze(const std::u16string& str, size_t topN) const;

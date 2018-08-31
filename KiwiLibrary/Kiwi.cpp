@@ -9,9 +9,11 @@
 using namespace std;
 
 Kiwi::Kiwi(const char * modelPath, size_t _maxCache, size_t _numThread) 
-	: workers(_numThread ? _numThread : thread::hardware_concurrency())
+	: workers(_numThread ? _numThread : thread::hardware_concurrency()),
+	detector(10, 10, 0.1, _numThread)
 {
 	mdl = make_unique<KModelMgr>(modelPath);
+	detector.loadPOSModelFromTxt(ifstream{ modelPath + string{ "RModel.txt" } });
 }
 
 int Kiwi::addUserWord(const u16string & str, KPOSTag tag, float userScore)
@@ -76,6 +78,28 @@ int Kiwi::prepare()
 	mdl->solidify();
 	kt = mdl->getTrie();
 	return 0;
+}
+
+vector<KWordDetector::WordInfo> Kiwi::extractWords(const function<u16string(size_t)>& reader, size_t minCnt, size_t maxWordLen, float minScore)
+{
+	detector.setParameters(minCnt, maxWordLen, minScore);
+	return detector.extractWords(reader);
+}
+
+vector<KWordDetector::WordInfo> Kiwi::extractAndAddWords(const function<u16string(size_t)>& reader, size_t minCnt, size_t maxWordLen, float minScore, float posThreshold)
+{
+	detector.setParameters(minCnt, maxWordLen, minScore);
+	vector<KWordDetector::WordInfo> ret;
+	auto res = detector.extractWords(reader);
+	for (auto& r : res)
+	{
+		if (r.posScore[KPOSTag::NNP] < posThreshold && r.posScore[KPOSTag::XR] < posThreshold) continue;
+		KPOSTag pos = KPOSTag::NNP;
+		if (r.posScore[KPOSTag::NNP] < r.posScore[KPOSTag::XR]) pos = KPOSTag::XR;
+		addUserWord(r.form, pos);
+		ret.emplace_back(move(r));
+	}
+	return ret;
 }
 
 //#define DEBUG_PRINT
