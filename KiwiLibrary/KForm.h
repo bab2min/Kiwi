@@ -76,6 +76,7 @@ struct KMorpheme
 		combineSocket = m.combineSocket;
 		std::swap(chunks, m.chunks);
 		combined = m.combined;
+		userScore = m.userScore;
 	}
 
 	~KMorpheme() 
@@ -89,11 +90,8 @@ struct KMorpheme
 	KCondPolarity polar = KCondPolarity::none;
 	uint8_t combineSocket = 0;
 	std::vector<const KMorpheme*>* chunks = nullptr;
-	union
-	{
-		int32_t combined = 0;
-		float userScore;
-	};
+	int32_t combined = 0;
+	float userScore = 0;
 	const KMorpheme* getCombined() const { return this + combined; }
 	void readFromBin(std::istream& is, const std::function<const KMorpheme*(size_t)>& mapper);
 	void writeToBin(std::ostream& os, const std::function<size_t(const KMorpheme*)>& mapper) const;

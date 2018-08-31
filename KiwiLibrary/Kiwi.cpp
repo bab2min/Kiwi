@@ -182,8 +182,11 @@ auto evalTrigram(const KNLangModel * knlm, const KMorpheme* morphBase, const pai
 			continue;
 		}
 
+		auto orgSeq = seq[chSize + 1];
 		if (wids->size() + chSize > 2)
 		{
+			if (seq[chSize + 1] >= knlm->getVocabSize()) seq[chSize + 1] = (size_t)morphBase[seq[chSize + 1]].tag + 1;
+			if (seq[chSize + 2] >= knlm->getVocabSize()) seq[chSize + 2] = (size_t)morphBase[seq[chSize + 2]].tag + 1;
 			for (size_t ch = 0; ch < chSize - (wids->size() == 1 ? 1 : 0); ++ch)
 			{
 				if (ch == 0 && combSocket) continue;
@@ -194,9 +197,9 @@ auto evalTrigram(const KNLangModel * knlm, const KMorpheme* morphBase, const pai
 				{
 					cout << knlm->evaluateLL(&seq[ch], 3);
 					cout << "@Warn\t";
-					cout << morphBase[seq[ch]] << '\t';
-					cout << morphBase[seq[ch + 1]] << '\t';
-					cout << morphBase[seq[ch + 2]] << '\t';
+					cout << seq[ch] << ' ' << morphBase[seq[ch]] << '\t';
+					cout << seq[ch + 1] << ' ' << morphBase[seq[ch + 1]] << '\t';
+					cout << seq[ch + 2] << ' ' << morphBase[seq[ch + 2]] << '\t';
 					cout << endl;
 				}
 #endif
@@ -207,7 +210,7 @@ auto evalTrigram(const KNLangModel * knlm, const KMorpheme* morphBase, const pai
 			candScore = 0;
 		}
 
-		emplaceMaxCnt(maxWidLL, seq[chSize + 1], make_pair(wids, candScore), 5, [](const auto& a, const auto& b) { return a.second < b.second; });
+		emplaceMaxCnt(maxWidLL, orgSeq, make_pair(wids, candScore), 5, [](const auto& a, const auto& b) { return a.second < b.second; });
 	}
 	return move(maxWidLL);
 }
@@ -249,7 +252,7 @@ vector<pair<Kiwi::path, float>> Kiwi::findBestPath(const vector<KGraphNode>& gra
 			}
 			else
 			{
-				if (isUserWord = mdl->isUserWord(curMorph))
+				if (isUserWord = (curMorph->getCombined() ? curMorph->getCombined() : curMorph) - morphBase >= knlm->getVocabSize())
 				{
 					seq[0] = mdl->getDefaultMorpheme(curMorph->tag) - morphBase;
 				}
@@ -302,19 +305,19 @@ vector<pair<Kiwi::path, float>> Kiwi::findBestPath(const vector<KGraphNode>& gra
 				maxWidLL = evalTrigram(knlm, morphBase, &works[0], &works[0] + works.size(), seq, chSize, curMorph, node, combSocket, move(maxWidLL));
 			}
 
-			// if a form of the node is unknown, calculate log poisson distribution for word-tag
 			float estimatedLL = 0;
 			if (isUserWord)
 			{
-				estimatedLL += curMorph->userScore;
+				estimatedLL = curMorph->userScore;
 			}
+			// if a form of the node is unknown, calculate log poisson distribution for word-tag
 			else if (unknownForm)
 			{
 				size_t unknownLen = node->uform.empty() ? node->form->form.size() : node->uform.size();
 				if (curMorph->tag == KPOSTag::NNG) estimatedLL = LogPoisson::getLL(4.622955f, unknownLen);
 				else if (curMorph->tag == KPOSTag::NNP) estimatedLL = LogPoisson::getLL(5.177622f, unknownLen);
 				else if (curMorph->tag == KPOSTag::MAG) estimatedLL = LogPoisson::getLL(4.557326f, unknownLen);
-				estimatedLL -= 16;
+				estimatedLL -= 20;
 			}
 
 			for (auto& p : maxWidLL)
@@ -425,15 +428,18 @@ vector<pair<Kiwi::path, float>> Kiwi::findBestPath(const vector<KGraphNode>& gra
 			if (!KFeatureTestor::isMatched(nullptr, p.first.back().condVowel)) continue;
 			seq[1] = p.first.back().wid;
 			seq[2] = (p.first.end() - 2)->wid;
+
+			if (seq[1] >= knlm->getVocabSize()) seq[1] = (size_t)morphBase[seq[1]].tag + 1;
+			if (seq[2] >= knlm->getVocabSize()) seq[2] = (size_t)morphBase[seq[2]].tag + 1;
 			float ct;
 			float c = (ct = knlm->evaluateLL(seq, 3) + knlm->evaluateLL(seq, 2)) + p.second;
 #ifdef DEBUG_PRINT
 			if (ct <= -100)
 			{
 				cout << "@Warn\t";
-				cout << morphBase[seq[0]] << '\t';
-				cout << morphBase[seq[1]] << '\t';
-				cout << morphBase[seq[2]] << '\t';
+				cout << seq[0] << ' ' << morphBase[seq[0]] << '\t';
+				cout << seq[1] << ' ' << morphBase[seq[1]] << '\t';
+				cout << seq[2] << ' ' << morphBase[seq[2]] << '\t';
 				cout << endl;
 			}
 #endif

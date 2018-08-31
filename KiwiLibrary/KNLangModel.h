@@ -280,6 +280,7 @@ public:
 		orderN = o.orderN;
 		vocabSize = o.vocabSize;
 	}
+	size_t getVocabSize() const { return vocabSize; }
 	void trainSequence(const WID* seq, size_t len);
 	void optimize(const AllomorphSet& ams = {});
 	std::vector<float> predictNext(const WID* history, size_t len) const;

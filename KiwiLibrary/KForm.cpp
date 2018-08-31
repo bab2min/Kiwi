@@ -145,6 +145,7 @@ void KMorpheme::readFromBin(istream& is, const function<const KMorpheme*(size_t)
 	readFromBinStream(is, polar);
 	readFromBinStream(is, combineSocket);
 	readFromBinStream(is, combined);
+	readFromBinStream(is, userScore);
 
 	size_t s = readFromBinStream<uint32_t>(is);
 	if (s)
@@ -165,6 +166,7 @@ void KMorpheme::writeToBin(ostream& os, const function<size_t(const KMorpheme*)>
 	writeToBinStream(os, polar);
 	writeToBinStream(os, combineSocket);
 	writeToBinStream(os, combined);
+	writeToBinStream(os, userScore);
 
 	writeToBinStream<uint32_t>(os, chunks ? chunks->size() : 0);
 	if(chunks) for (auto c : *chunks)

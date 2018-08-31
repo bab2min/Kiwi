@@ -1,0 +1,103 @@
+5
+Loading Time : 1484.21 ms
+Mem Usage : 247.719 MB
+
+0.896687
+Total (1092) Time : 4287.66 ms
+Time per Unit : 3.92643 ms
+
+0.938558
+Total (4533) Time : 12023 ms
+Time per Unit : 2.65234 ms
+
+0.945451
+Total (3252) Time : 11337 ms
+Time per Unit : 3.48617 ms
+
+0.936149
+Total (9444) Time : 28075 ms
+Time per Unit : 2.97279 ms
+
+
+10
+Loading Time : 1429.24 ms
+Mem Usage : 231.117 MB
+
+0.89498
+Total (1092) Time : 4634.92 ms
+Time per Unit : 4.24443 ms
+
+0.936632
+Total (4533) Time : 13227.5 ms
+Time per Unit : 2.91805 ms
+
+0.944175
+Total (3252) Time : 11622.1 ms
+Time per Unit : 3.57383 ms
+
+0.933991
+Total (9444) Time : 30465.5 ms
+Time per Unit : 3.22591 ms
+
+
+15
+Loading Time : 1341.51 ms
+Mem Usage : 221.406 MB
+
+0.893072
+Total (1092) Time : 4165.15 ms
+Time per Unit : 3.81424 ms
+
+0.936321
+Total (4533) Time : 12393.9 ms
+Time per Unit : 2.73416 ms
+
+0.942503
+Total (3252) Time : 11149.8 ms
+Time per Unit : 3.4286 ms
+
+0.933118
+Total (9444) Time : 27878 ms
+Time per Unit : 2.95193 ms
+
+
+30
+Loading Time : 1229.79 ms
+Mem Usage : 201.293 MB
+
+0.888761
+Total (1092) Time : 4069.86 ms
+Time per Unit : 3.72698 ms
+
+0.932911
+Total (4533) Time : 11069.8 ms
+Time per Unit : 2.44205 ms
+
+0.940364
+Total (3252) Time : 10394.3 ms
+Time per Unit : 3.19627 ms
+
+0.930895
+Total (9444) Time : 26551.6 ms
+Time per Unit : 2.81148 ms
+
+
+50
+Loading Time : 1115.21 ms
+Mem Usage : 184.02 MB
+
+0.884338
+Total (1092) Time : 4079.75 ms
+Time per Unit : 3.73603 ms
+
+0.929196
+Total (4533) Time : 12789.6 ms
+Time per Unit : 2.82145 ms
+
+0.936719
+Total (3252) Time : 11007.9 ms
+Time per Unit : 3.38497 ms
+
+0.927609
+Total (9444) Time : 26512.7 ms
+Time per Unit : 2.80736 ms

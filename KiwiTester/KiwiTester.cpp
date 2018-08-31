@@ -110,7 +110,7 @@ int main()
 	SetConsoleOutputCP(CP_UTF8);
 	setvbuf(stdout, nullptr, _IOFBF, 1000);
 	Timer timer;
-	KWordDetector kd{ 25, 12, 0.01f };
+	/*KWordDetector kd{ 25, 12, 0.01f };
 	kd.loadPOSModelFromTxt(ifstream{ "../ModelGenerator/RModel.txt" });
 	{
 		ifstream ifs{ "D:/namu_raw.txt" };
@@ -125,7 +125,7 @@ int main()
 			string line;
 			while (getline(ifs, line))
 			{
-				auto sstr = line/*.substr(0, line.find('\t'))*/;
+				auto sstr = line;
 				if(sstr.size()) return utf8_to_utf16(sstr);
 			}
 			return {};
@@ -144,11 +144,11 @@ int main()
 				<< '\t' << r.posScore[KPOSTag::EF] << endl;
 		}
 		return 0;
-	}
+	}*/
 
 
 	Kiwi kw{ "../ModelGenerator/", (size_t)-1, 0 };
-	//kw.addUserWord(u"1993/06/10", KPOSTag::NNP);
+	//kw.addUserWord(u"¿¥¸¶´©¿¤", KPOSTag::NNP);
 	kw.prepare();
 	cout << "Loading Time : " << timer.getElapsed() << " ms" << endl;
 	PROCESS_MEMORY_COUNTERS pmc;
@@ -156,7 +156,7 @@ int main()
 	SIZE_T memUsed = pmc.WorkingSetSize;
 	cout << "Mem Usage : " << memUsed / 1024.f / 1024.f << " MB" << endl;
 	
-	kw.analyze(KSTR(R"!(Àâ¼ö¼Ì´Ù.)!"), 10);
+	kw.analyze(KSTR(R"!(³ì¾Ò´ÙÇØ¼­)!"), 10);
 
 	string testFiles[] = { "01s.txt", "02s.txt", "03s.txt", "17s.txt", "18s.txt", "13s.txt", "15s.txt", };
 	for (auto tf : testFiles)
