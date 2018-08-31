@@ -8,7 +8,6 @@ protected:
 	std::vector<KForm> forms;
 	std::vector<KMorpheme> morphemes;
 	std::unordered_map<k_string, size_t> formMap;
-	size_t dictMorphSize;
 #ifdef TRIE_ALLOC_ARRAY
 	size_t baseTrieSize = 0;
 	size_t extraTrieSize = 0;
@@ -18,7 +17,7 @@ protected:
 #endif
 	typedef std::unordered_map<std::pair<k_string, KPOSTag>, size_t> morphemeMap;
 	KNLangModel langMdl;
-	void loadMMFromTxt(std::istream& is, morphemeMap& morphMap);
+	void loadMMFromTxt(std::istream& is, morphemeMap& morphMap, std::unordered_map<KPOSTag, float>* posWeightSum, const std::function<bool(float, KPOSTag)>& selector);
 	void loadCMFromTxt(std::istream& is, morphemeMap& morphMap);
 	void loadPCMFromTxt(std::istream& is, morphemeMap& morphMap);
 	KNLangModel::AllomorphSet loadAllomorphFromTxt(std::istream& is, const morphemeMap& morphMap);
@@ -41,7 +40,6 @@ public:
 	const KNLangModel* getLangModel() const { return &langMdl; }
 	const KMorpheme* getMorphemes() const { return &morphemes[0]; }
 
-	bool isUserWord(const KMorpheme* morph) const { return morph >= &morphemes[0] + dictMorphSize; }
 	const KMorpheme* getDefaultMorpheme(KPOSTag tag) const { return &morphemes[1] + (size_t)tag; }
 };
 

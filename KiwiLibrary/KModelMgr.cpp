@@ -17,20 +17,8 @@ namespace std
 
 using namespace std;
 
-//#define LOAD_TXT
-
-void KModelMgr::loadMMFromTxt(std::istream& is, morphemeMap& morphMap)
+void KModelMgr::loadMMFromTxt(std::istream& is, morphemeMap& morphMap, std::unordered_map<KPOSTag, float>* posWeightSum, const function<bool(float, KPOSTag)>& selector)
 {
-#ifdef LOAD_TXT
-	// preserve places for default tag forms & morphemes
-	forms.resize((size_t)KPOSTag::SN); 
-	morphemes.resize((size_t)KPOSTag::SN + 2); // additional places for <s> & </s>
-	for (size_t i = 0; i < (size_t)KPOSTag::SN; ++i)
-	{
-		forms[i].candidate.emplace_back((KMorpheme*)(i + 2));
-		morphemes[i + 2].tag = (KPOSTag)(i + 1);
-	}
-
 	string line;
 	while (getline(is, line))
 	{
@@ -43,10 +31,8 @@ void KModelMgr::loadMMFromTxt(std::istream& is, morphemeMap& morphMap)
 		auto tag = makePOSTag({ fields[1].begin(), fields[1].end() });
 
 		float morphWeight = stof(fields[2].begin(), fields[2].end());
-		if (morphWeight < 10 && tag >= KPOSTag::JKS)
-		{
-			continue;
-		}
+		if (!selector(morphWeight, tag)) continue;
+		if (posWeightSum) (*posWeightSum)[tag] += morphWeight;
 		float vowel = stof(fields[4].begin(), fields[4].end());
 		float vocalic = stof(fields[5].begin(), fields[5].end());
 		float vocalicH = stof(fields[6].begin(), fields[6].end());
@@ -97,15 +83,14 @@ void KModelMgr::loadMMFromTxt(std::istream& is, morphemeMap& morphMap)
 			fm.candidate.emplace_back((KMorpheme*)mid);
 			morphemes.emplace_back(form, tag, cvowel, polar);
 			morphemes.back().kform = (const k_string*)(&fm - &forms[0]);
+			morphemes.back().userScore = morphWeight;
 		}
 	}
-#endif
 }
 
 
 void KModelMgr::loadCMFromTxt(std::istream& is, morphemeMap& morphMap)
 {
-#ifdef LOAD_TXT
 	static k_char* conds[] = { KSTR("+"), KSTR("-Coda"), KSTR("+"), KSTR("+") };
 	static k_char* conds2[] = { KSTR("+"), KSTR("+Positive"), KSTR("-Positive") };
 
@@ -174,13 +159,11 @@ void KModelMgr::loadCMFromTxt(std::istream& is, morphemeMap& morphMap)
 		morphemes.back().chunks = chunkIds;
 	continueFor:;
 	}
-#endif
 }
 
 
 void KModelMgr::loadPCMFromTxt(std::istream& is, morphemeMap& morphMap)
 {
-#ifdef LOAD_TXT
 	string line;
 	while (getline(is, line))
 	{
@@ -198,7 +181,7 @@ void KModelMgr::loadPCMFromTxt(std::istream& is, morphemeMap& morphMap)
 		uint8_t socket = (size_t)stof(fields[3].begin(), fields[3].end());
 
 		auto mit = morphMap.find(make_pair(orgform, tag));
-		assert(mit != morphMap.end());
+		if (mit == morphMap.end()) continue;
 		if (!form.empty())
 		{
 			size_t mid = morphemes.size();
@@ -210,7 +193,6 @@ void KModelMgr::loadPCMFromTxt(std::istream& is, morphemeMap& morphMap)
 			morphemes.back().combined = (int)mit->second - ((int)morphemes.size() - 1);
 		}
 	}
-#endif
 }
 
 KNLangModel::AllomorphSet KModelMgr::loadAllomorphFromTxt(std::istream & is, const morphemeMap& morphMap)
@@ -373,13 +355,42 @@ KForm & KModelMgr::formMapper(k_string form)
 	return forms[id];
 }
 
+//#define LOAD_TXT
+
 KModelMgr::KModelMgr(const char * modelPath) : langMdl(3)
 {
 	this->modelPath = modelPath;
 #ifdef LOAD_TXT
+	// reserve places for default tag forms & morphemes
+	forms.resize((size_t)KPOSTag::SN);
+	morphemes.resize((size_t)KPOSTag::SN + 2); // additional places for <s> & </s>
+	for (size_t i = 0; i < (size_t)KPOSTag::SN; ++i)
+	{
+		forms[i].candidate.emplace_back((KMorpheme*)(i + 2));
+		morphemes[i + 2].tag = (KPOSTag)(i + 1);
+	}
+
+	size_t morphIdToUpdate = morphemes.size();
 	morphemeMap morphMap;
-	loadMMFromTxt(ifstream{ modelPath + string{ "fullmodelV2.txt" } }, morphMap);
+	loadMMFromTxt(ifstream{ modelPath + string{ "fullmodelV2.txt" } }, morphMap, nullptr, [](float morphWeight, KPOSTag tag) {
+		return morphWeight >= (tag >= KPOSTag::JKS ? 10 : 10);
+	});
+	for (size_t i = morphIdToUpdate; i < morphemes.size(); ++i)
+	{
+		morphemes[i].userScore = 0;
+	}
+
+	morphIdToUpdate = morphemes.size();
 	auto realMorph = morphMap;
+	unordered_map<KPOSTag, float> unknownWeight;
+	loadMMFromTxt(ifstream{ modelPath + string{ "fullmodelV2.txt" } }, morphMap, &unknownWeight, [](float morphWeight, KPOSTag tag) {
+		return tag < KPOSTag::JKS && morphWeight < 10;
+	});
+	for (size_t i = morphIdToUpdate; i < morphemes.size(); ++i)
+	{
+		morphemes[i].userScore = log(morphemes[i].userScore / unknownWeight[morphemes[i].tag]);
+	}
+
 	loadCMFromTxt(ifstream{ modelPath + string{ "combinedV2.txt" } }, morphMap);
 	loadPCMFromTxt(ifstream{ modelPath + string{ "precombinedV2.txt" } }, morphMap);
 	baseTrieSize = estimateTrieSize();
@@ -393,10 +404,9 @@ KModelMgr::KModelMgr(const char * modelPath) : langMdl(3)
 	langMdl.writeToStream(ofstream{ modelPath + string{ "sj.lang" }, ios_base::binary });
 	
 #else
-	loadMorphBin(ifstream{ modelPath + string{"sj.morph"}, ios_base::binary });
+	loadMorphBin(ifstream{ modelPath + string{ "sj.morph" }, ios_base::binary });
 	langMdl = KNLangModel::readFromStream(ifstream{ modelPath + string{ "sj.lang" }, ios_base::binary });
 #endif
-	dictMorphSize = morphemes.size();
 }
 
 void KModelMgr::addUserWord(const k_string & form, KPOSTag tag, float userScore)
