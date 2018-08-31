@@ -274,11 +274,11 @@ class KWordDetector
 protected:
 	size_t minCnt, maxWordLen;
 	float minScore;
-	ThreadPool workers;
+	mutable ThreadPool workers;
 	std::map<std::pair<KPOSTag, bool>, std::map<char16_t, float>> posDistribution;
 
 	template<class LocalData, class FuncReader, class FuncProc>
-	std::vector<LocalData> readProc(const FuncReader& reader, const FuncProc& processor, LocalData&& ld = {})
+	std::vector<LocalData> readProc(const FuncReader& reader, const FuncProc& processor, LocalData&& ld = {}) const
 	{
 		std::vector<LocalData> ldByTid(workers.getNumWorkers(), ld);
 		std::vector<std::future<void>> futures(workers.getNumWorkers() * 4);
@@ -295,9 +295,9 @@ protected:
 		for (auto& f : futures) f.get();
 		return ldByTid;
 	}
-	void countUnigram(Counter&, const std::function<std::u16string(size_t)>& reader);
-	void countBigram(Counter&, const std::function<std::u16string(size_t)>& reader);
-	void countNgram(Counter&, const std::function<std::u16string(size_t)>& reader);
+	void countUnigram(Counter&, const std::function<std::u16string(size_t)>& reader) const;
+	void countBigram(Counter&, const std::function<std::u16string(size_t)>& reader) const;
+	void countNgram(Counter&, const std::function<std::u16string(size_t)>& reader) const;
 	float branchingEntropy(const std::map<u16light, uint32_t>& cnt, std::map<u16light, uint32_t>::iterator it) const;
 	std::map<KPOSTag, float> inverseKLDivergenceFromPOS(Counter&, const std::map<u16light, uint32_t>& cnt, std::map<u16light, uint32_t>::iterator it, bool coda) const;
 public:
@@ -323,7 +323,13 @@ public:
 		: minCnt(_minCnt), maxWordLen(_maxWordLen), minScore(_minScore),
 		workers(_numThread ? _numThread : std::thread::hardware_concurrency())
 	{}
+	void setParameters(size_t _minCnt = 10, size_t _maxWordLen = 10, float _minScore = 0.1f)
+	{
+		minCnt = _minCnt;
+		maxWordLen = _maxWordLen;
+		minScore = _minScore;
+	}
 	void loadPOSModelFromTxt(std::istream& is);
-	std::vector<WordInfo> extractWords(const std::function<std::u16string(size_t)>& reader);
+	std::vector<WordInfo> extractWords(const std::function<std::u16string(size_t)>& reader) const;
 };
 
