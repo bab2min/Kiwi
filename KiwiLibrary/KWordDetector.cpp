@@ -92,7 +92,6 @@ void KWordDetector::countNgram(Counter& cdata, const function<u16string(size_t)>
 	vector<future<void>> futures(2);
 	for (size_t id = 0; ; ++id)
 	{
-		if(id % 10000 == 0) cerr << id << endl;
 		auto ustr = reader(id);
 		if (ustr.empty()) break;
 		basic_stringstream<char16_t> ss{ ustr };
@@ -252,8 +251,39 @@ map<KPOSTag, float> KWordDetector::inverseKLDivergenceFromPOS(Counter& cdata, co
 	return ret;
 }
 
+map<KPOSTag, float> KWordDetector::getPosScore(Counter & cdata, const std::map<u16light, uint32_t>& cnt, std::map<u16light, uint32_t>::iterator it, bool coda) const
+{
+	map<KPOSTag, float> ret;
+	u16light endKey = it->first;
+	float tot = it->second;
+	size_t len = endKey.size();
+	endKey.back()++;
+	++it;
+	auto eit = cnt.lower_bound(endKey);
+	map<char16_t, float> rParts;
+	float sum = 0;
+	for (; it != eit; ++it)
+	{
+		if (it->first.size() != len + 1) continue;
+		sum += (rParts[it->first.back() > 2 ? cdata.chrDict.getStr(it->first.back()) : u'$'] = it->second);
+	}
+
+	for (auto& posd : posScore)
+	{
+		if (posd.first.second != coda) continue;
+		for (auto& dist : posd.second)
+		{
+			auto qit = rParts.find(dist.first);
+			if (qit == rParts.end()) continue;
+			ret[posd.first.first] += dist.second * qit->second / tot;
+		}
+	}
+	return ret;
+}
+
 void KWordDetector::loadPOSModelFromTxt(std::istream & is)
 {
+	/*
 	string line;
 	while (getline(is, line))
 	{
@@ -264,6 +294,18 @@ void KWordDetector::loadPOSModelFromTxt(std::istream & is)
 		char16_t chr = fields[2][0];
 		float p = stof(fields[3].begin(), fields[3].end());
 		posDistribution[make_pair(pos, coda)][chr] = p;
+	}
+	*/
+	string line;
+	while (getline(is, line))
+	{
+		auto fields = split(utf8_to_utf16(line), u'\t');
+		if (fields.size() < 4) continue;
+		KPOSTag pos = makePOSTag(fields[0]);
+		bool coda = !!stof(fields[1].begin(), fields[1].end());
+		char16_t chr = fields[2][0];
+		float p = stof(fields[3].begin(), fields[3].end());
+		posScore[make_pair(pos, coda)][chr] = p;
 	}
 }
 
@@ -297,7 +339,7 @@ vector<KWordDetector::WordInfo> KWordDetector::extractWords(const std::function<
 
 		bool hasCoda = 0xAC00 <= p.first.back() && p.first.back() <= 0xD7A4 && (p.first.back() - 0xAC00) % 28;
 		ret.emplace_back(form, score, backwardBranch, forwardBranch, backwardCohesion, forwardCohesion,
-			p.second, inverseKLDivergenceFromPOS(cdata, cdata.forwardCnt, it, hasCoda));
+			p.second, getPosScore(cdata, cdata.forwardCnt, it, hasCoda));
 	}
 
 	sort(ret.begin(), ret.end(), [](const auto& a, const auto& b)

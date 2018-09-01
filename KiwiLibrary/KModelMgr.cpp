@@ -412,10 +412,7 @@ KModelMgr::KModelMgr(const char * modelPath) : langMdl(3)
 void KModelMgr::addUserWord(const k_string & form, KPOSTag tag, float userScore)
 {
 	if (form.empty()) return;
-#ifdef TRIE_ALLOC_ARRAY
 	extraTrieSize += form.size() - 1;
-#else
-#endif
 	for (size_t i = 1; i < form.size() - 1; ++i)
 	{
 		KPOSTag specialType = identifySpecialChr(form[i - 1]);
@@ -433,10 +430,7 @@ void KModelMgr::addUserWord(const k_string & form, KPOSTag tag, float userScore)
 
 void KModelMgr::addUserRule(const k_string & form, const vector<pair<k_string, KPOSTag>>& morphs)
 {
-#ifdef TRIE_ALLOC_ARRAY
 	if (!form.empty()) extraTrieSize += form.size() - 1;
-#else
-#endif
 	auto& f = formMapper(form);
 	f.candidate.emplace_back((const KMorpheme*)morphemes.size());
 	morphemes.emplace_back(form, KPOSTag::UNKNOWN);
@@ -450,7 +444,6 @@ void KModelMgr::addUserRule(const k_string & form, const vector<pair<k_string, K
 
 void KModelMgr::solidify()
 {
-#ifdef TRIE_ALLOC_ARRAY
 	trieRoot.reserve(baseTrieSize + extraTrieSize);
 	trieRoot.resize((size_t)KPOSTag::SN + 1); // preserve places for root node + default tag morphemes
 	for (size_t i = 1; i <= (size_t)KPOSTag::SN; ++i)
@@ -469,14 +462,6 @@ void KModelMgr::solidify()
 		});
 	}
 	trieRoot[0].fillFail();
-#else
-	trieRoot = make_shared<KTrie>();
-	for (auto& f : forms)
-	{
-		trieRoot->build(f.form.c_str(), &f);
-	}
-	trieRoot->fillFail();
-#endif
 
 	for (auto& f : morphemes)
 	{
@@ -489,4 +474,14 @@ void KModelMgr::solidify()
 		for (auto& p : f.candidate) p = &morphemes[(size_t)p];
 	}
 	formMap = {};
+}
+
+unordered_set<k_string> KModelMgr::getAllForms() const
+{
+	unordered_set<k_string> ret;
+	for (auto& r : forms)
+	{
+		ret.emplace(r.form);
+	}
+	return ret;
 }

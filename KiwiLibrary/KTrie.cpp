@@ -205,6 +205,18 @@ vector<KGraphNode> KTrie::split(const k_string& str) const
 	return KGraphNode::removeUnconnected(ret);
 }
 
+const KForm * KTrie::findForm(const k_string & str) const
+{
+	const KTrie* curTrie = this;
+	for (auto c : str)
+	{
+		if (!curTrie->getNext(c)) return nullptr;
+		curTrie = curTrie->getNext(c);
+	}
+	if (curTrie->val != (void*)-1) return curTrie->val;
+	return nullptr;
+}
+
 void KTrie::saveToBin(std::ostream & os, const KForm* base) const
 {
 	writeToBinStream<uint16_t>(os, next.size());

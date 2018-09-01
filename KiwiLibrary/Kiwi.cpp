@@ -13,7 +13,7 @@ Kiwi::Kiwi(const char * modelPath, size_t _maxCache, size_t _numThread)
 	detector(10, 10, 0.1, _numThread)
 {
 	mdl = make_unique<KModelMgr>(modelPath);
-	detector.loadPOSModelFromTxt(ifstream{ modelPath + string{ "RModel.txt" } });
+	detector.loadPOSModelFromTxt(ifstream{ modelPath + string{ "RPosModel.txt" } });
 }
 
 int Kiwi::addUserWord(const u16string & str, KPOSTag tag, float userScore)
@@ -91,11 +91,23 @@ vector<KWordDetector::WordInfo> Kiwi::extractAndAddWords(const function<u16strin
 	detector.setParameters(minCnt, maxWordLen, minScore);
 	vector<KWordDetector::WordInfo> ret;
 	auto res = detector.extractWords(reader);
+	auto allForms = mdl->getAllForms();
 	for (auto& r : res)
 	{
 		if (r.posScore[KPOSTag::NNP] < posThreshold && r.posScore[KPOSTag::XR] < posThreshold) continue;
 		KPOSTag pos = KPOSTag::NNP;
 		if (r.posScore[KPOSTag::NNP] < r.posScore[KPOSTag::XR]) pos = KPOSTag::XR;
+		switch (identifySpecialChr(r.form.back()))
+		{
+		case KPOSTag::SF:
+		case KPOSTag::SP:
+		case KPOSTag::SS:
+		case KPOSTag::SE:
+		case KPOSTag::SO:
+		case KPOSTag::SW: 
+			continue;
+		}
+		if(allForms.count(normalizeHangul(r.form))) continue;
 		addUserWord(r.form, pos);
 		ret.emplace_back(move(r));
 	}
@@ -496,7 +508,7 @@ vector<KResult> Kiwi::analyze(const string & str, size_t topN) const
 
 void Kiwi::analyze(size_t topN, const function<u16string(size_t)>& reader, const function<void(size_t, vector<KResult>&&)>& receiver) const
 {
-	vector<future<void>> futures(workers.getNumWorkers() * 2);
+	vector<future<void>> futures(workers.getNumWorkers() * 4);
 	for (size_t id = 0; ; ++id)
 	{
 		auto ustr = reader(id);

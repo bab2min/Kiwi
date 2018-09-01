@@ -82,7 +82,7 @@ inline float stof(ChrIterator begin, ChrIterator end)
 	switch (*begin)
 	{
 	case '-': 
-		sign = false;
+		sign = true;
 	case '+':
 		++begin;
 		break;

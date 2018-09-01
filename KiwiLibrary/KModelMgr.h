@@ -8,13 +8,9 @@ protected:
 	std::vector<KForm> forms;
 	std::vector<KMorpheme> morphemes;
 	std::unordered_map<k_string, size_t> formMap;
-#ifdef TRIE_ALLOC_ARRAY
 	size_t baseTrieSize = 0;
 	size_t extraTrieSize = 0;
 	std::vector<KTrie> trieRoot;
-#else
-	shared_ptr<KTrie> trieRoot;
-#endif
 	typedef std::unordered_map<std::pair<k_string, KPOSTag>, size_t> morphemeMap;
 	KNLangModel langMdl;
 	void loadMMFromTxt(std::istream& is, morphemeMap& morphMap, std::unordered_map<KPOSTag, float>* posWeightSum, const std::function<bool(float, KPOSTag)>& selector);
@@ -31,15 +27,12 @@ public:
 	void addUserWord(const k_string& form, KPOSTag tag, float userScore = 10);
 	void addUserRule(const k_string& form, const std::vector<std::pair<k_string, KPOSTag>>& morphs);
 	void solidify();
-#ifdef TRIE_ALLOC_ARRAY
 	const KTrie* getTrie() const { return &trieRoot[0]; }
-#else
-	const KTrie* getTrie() const { return trieRoot.get(); }
-#endif
 
 	const KNLangModel* getLangModel() const { return &langMdl; }
 	const KMorpheme* getMorphemes() const { return &morphemes[0]; }
 
 	const KMorpheme* getDefaultMorpheme(KPOSTag tag) const { return &morphemes[1] + (size_t)tag; }
+	std::unordered_set<k_string> getAllForms() const;
 };
 

@@ -276,6 +276,7 @@ protected:
 	float minScore;
 	mutable ThreadPool workers;
 	std::map<std::pair<KPOSTag, bool>, std::map<char16_t, float>> posDistribution;
+	std::map<std::pair<KPOSTag, bool>, std::map<char16_t, float>> posScore;
 
 	template<class LocalData, class FuncReader, class FuncProc>
 	std::vector<LocalData> readProc(const FuncReader& reader, const FuncProc& processor, LocalData&& ld = {}) const
@@ -300,6 +301,7 @@ protected:
 	void countNgram(Counter&, const std::function<std::u16string(size_t)>& reader) const;
 	float branchingEntropy(const std::map<u16light, uint32_t>& cnt, std::map<u16light, uint32_t>::iterator it) const;
 	std::map<KPOSTag, float> inverseKLDivergenceFromPOS(Counter&, const std::map<u16light, uint32_t>& cnt, std::map<u16light, uint32_t>::iterator it, bool coda) const;
+	std::map<KPOSTag, float> getPosScore(Counter&, const std::map<u16light, uint32_t>& cnt, std::map<u16light, uint32_t>::iterator it, bool coda) const;
 public:
 
 	struct WordInfo
