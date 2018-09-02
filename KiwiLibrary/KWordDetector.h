@@ -217,7 +217,7 @@ public:
 
 	const char16_t* end() const
 	{
-		if (rawLen <= 7) return &rawData[rawLen];
+		if (rawLen <= 7) return &rawData[0] + rawLen;
 		else return data + len;
 	}
 
@@ -275,8 +275,8 @@ protected:
 	size_t minCnt, maxWordLen;
 	float minScore;
 	mutable ThreadPool workers;
-	std::map<std::pair<KPOSTag, bool>, std::map<char16_t, float>> posDistribution;
 	std::map<std::pair<KPOSTag, bool>, std::map<char16_t, float>> posScore;
+	std::map<std::u16string, float> nounTailScore;
 
 	template<class LocalData, class FuncReader, class FuncProc>
 	std::vector<LocalData> readProc(const FuncReader& reader, const FuncProc& processor, LocalData&& ld = {}) const
@@ -300,8 +300,7 @@ protected:
 	void countBigram(Counter&, const std::function<std::u16string(size_t)>& reader) const;
 	void countNgram(Counter&, const std::function<std::u16string(size_t)>& reader) const;
 	float branchingEntropy(const std::map<u16light, uint32_t>& cnt, std::map<u16light, uint32_t>::iterator it) const;
-	std::map<KPOSTag, float> inverseKLDivergenceFromPOS(Counter&, const std::map<u16light, uint32_t>& cnt, std::map<u16light, uint32_t>::iterator it, bool coda) const;
-	std::map<KPOSTag, float> getPosScore(Counter&, const std::map<u16light, uint32_t>& cnt, std::map<u16light, uint32_t>::iterator it, bool coda) const;
+	std::map<KPOSTag, float> getPosScore(Counter&, const std::map<u16light, uint32_t>& cnt, std::map<u16light, uint32_t>::iterator it, bool coda, const std::u16string& realForm) const;
 public:
 
 	struct WordInfo
@@ -332,6 +331,7 @@ public:
 		minScore = _minScore;
 	}
 	void loadPOSModelFromTxt(std::istream& is);
+	void loadNounTailModelFromTxt(std::istream& is);
 	std::vector<WordInfo> extractWords(const std::function<std::u16string(size_t)>& reader) const;
 };
 

@@ -112,8 +112,9 @@ int main()
 	Timer timer;
 	Kiwi kw{ "../ModelGenerator/", (size_t)-1, 0 };
 	{
-		ifstream ifs{ "../TestSets/03s.txt" };
-		auto res = kw.extractWords([&ifs](size_t id) -> u16string
+		ifstream ifs{ "../TestSets/15s.txt" };
+		//ifstream ifs{ "D:/namu_raw.txt" };
+		auto res = kw.extractAndAddWords([&ifs](size_t id) -> u16string
 		{
 			if (id == 0)
 			{
@@ -127,15 +128,13 @@ int main()
 				if (sstr.size()) return utf8_to_utf16(sstr);
 			}
 			return {};
-		}, 5);
+		}, 4, 15);
 
 		ofstream ofs{ "extracted.txt" };
 		for (auto& r : res)
 		{
 			ofs << utf16_to_utf8(r.form) << '\t' << r.score << '\t' << r.freq
-				<< '\t' << r.posScore[KPOSTag::NNP]
-				<< '\t' << r.posScore[KPOSTag::XR]
-				<< '\t' << r.posScore[KPOSTag::VV] << endl;
+				<< '\t' << r.posScore[KPOSTag::NNP] << endl;
 		}
 	}
 	//kw.addUserWord(u"¿¥¸¶´©¿¤", KPOSTag::NNP);

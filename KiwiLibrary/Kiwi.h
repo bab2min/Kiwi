@@ -55,7 +55,7 @@ public:
 	int loadUserDictionary(const char* userDictPath = "");
 	int prepare();
 	std::vector<KWordDetector::WordInfo> extractWords(const std::function<std::u16string(size_t)>& reader, size_t minCnt = 10, size_t maxWordLen = 10, float minScore = 0.25);
-	std::vector<KWordDetector::WordInfo> extractAndAddWords(const std::function<std::u16string(size_t)>& reader, size_t minCnt = 10, size_t maxWordLen = 10, float minScore = 0.25, float posThreshold = -2);
+	std::vector<KWordDetector::WordInfo> extractAndAddWords(const std::function<std::u16string(size_t)>& reader, size_t minCnt = 10, size_t maxWordLen = 10, float minScore = 0.25, float posThreshold = -3);
 	KResult analyze(const std::u16string& str) const;
 	KResult analyze(const std::string& str) const;
 	std::vector<KResult> analyze(const std::u16string& str, size_t topN) const;

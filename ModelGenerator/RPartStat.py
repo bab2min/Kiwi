@@ -2,28 +2,33 @@ from utils import Hangul
 from collections import Counter
 import math
 
-if 0:
-    rParts = Counter()
+if 1:
+    forms = ['으로','로','으로써','의','이라','이라고','이','가','을','를','은','는',
+            '에','에서','과','와','만','에게','까지','처럼','보다','이나','부터']
+    totalCnt = Counter()
+    nounCnt = Counter()
     def proc(file):
         for line in file:
             sp = line.strip().split('\t')
-            if len(sp) <= 3: continue
-            ws = list(map(lambda x, y: (x, y), sp[1::2], sp[2::2]))
-            if not ws[0][1].startswith('NN'): continue
-            if ws[-1][1].startswith('NN'): continue
-            l = 0
-            for i in range(len(ws) - 1):
-                if not ws[i][1].startswith('NN'): break
-                l += len(ws[i][0])
-            if l < len(sp[0]): rParts.update([sp[0][l:]])
+            if len(sp) < 3: continue
+            for f in forms:
+                if sp[0].endswith(f):
+                    totalCnt.update([f])
+                    break
+            ws = list(zip(sp[1::2], sp[2::2]))
+            w = ws[-1]
+            if not w[1].startswith('NN'): continue
+            for f in forms:
+                if w[0].endswith(f):
+                    nounCnt.update([f])
+                    break
     proc(open('ML_spo.txt', encoding='utf-8'))
     proc(open('ML_lit.txt', encoding='utf-8'))
 
-    with open('NounRPartList.txt', 'w', encoding='utf-8') as out:
-        tot = sum(rParts.values())
-        for w, c in rParts.most_common():
-            if c < 10: break
-            out.write("%s\t%d\t%g\n" % (w, c, c / tot))
+    with open('NounTailList.txt', 'w', encoding='utf-8') as out:
+        for f in forms:
+            w = math.log(nounCnt.get(f, 0.1) / (totalCnt.get(f, 0.1) - nounCnt.get(f, 0)))
+            out.write("%s\t%g\t%d\t%d\n" % (f, w, nounCnt.get(f, 0), totalCnt.get(f, 0) - nounCnt.get(f, 0)))
 
 else:
     byTag = {}
