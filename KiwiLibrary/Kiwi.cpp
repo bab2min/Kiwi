@@ -14,6 +14,7 @@ Kiwi::Kiwi(const char * modelPath, size_t _maxCache, size_t _numThread)
 {
 	mdl = make_unique<KModelMgr>(modelPath);
 	detector.loadPOSModelFromTxt(ifstream{ modelPath + string{ "RPosModel.txt" } });
+	detector.loadNounTailModelFromTxt(ifstream{ modelPath + string{ "NounTailList.txt" } });
 }
 
 int Kiwi::addUserWord(const u16string & str, KPOSTag tag, float userScore)
@@ -94,10 +95,9 @@ vector<KWordDetector::WordInfo> Kiwi::extractAndAddWords(const function<u16strin
 	auto allForms = mdl->getAllForms();
 	for (auto& r : res)
 	{
-		if (r.posScore[KPOSTag::NNP] < posThreshold && r.posScore[KPOSTag::XR] < posThreshold) continue;
-		KPOSTag pos = KPOSTag::NNP;
-		if (r.posScore[KPOSTag::NNP] < r.posScore[KPOSTag::XR]) pos = KPOSTag::XR;
-		switch (identifySpecialChr(r.form.back()))
+		if (r.posScore[KPOSTag::NNP] < posThreshold || !r.posScore[KPOSTag::NNP]) continue;
+		KPOSTag pos;
+		switch (pos = identifySpecialChr(r.form.back()))
 		{
 		case KPOSTag::SF:
 		case KPOSTag::SP:
@@ -106,9 +106,16 @@ vector<KWordDetector::WordInfo> Kiwi::extractAndAddWords(const function<u16strin
 		case KPOSTag::SO:
 		case KPOSTag::SW: 
 			continue;
+		case KPOSTag::SL:
+		case KPOSTag::SN:
+		case KPOSTag::SH:
+			if (all_of(r.form.begin(), r.form.end(), [pos](char16_t c) { 
+				return pos == identifySpecialChr(c); 
+			})) continue;
 		}
+
 		if(allForms.count(normalizeHangul(r.form))) continue;
-		addUserWord(r.form, pos);
+		addUserWord(r.form, KPOSTag::NNP);
 		ret.emplace_back(move(r));
 	}
 	return ret;

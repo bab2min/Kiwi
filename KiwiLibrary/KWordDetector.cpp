@@ -216,42 +216,8 @@ float KWordDetector::branchingEntropy(const map<u16light, uint32_t>& cnt, map<u1
 	return entropy;
 }
 
-map<KPOSTag, float> KWordDetector::inverseKLDivergenceFromPOS(Counter& cdata, const map<u16light, uint32_t>& cnt, map<u16light, uint32_t>::iterator it, bool coda) const
-{
-	map<KPOSTag, float> ret;
-	u16light endKey = it->first;
-	float tot = it->second;
-	size_t len = endKey.size();
-	endKey.back()++;
-	++it;
-	auto eit = cnt.lower_bound(endKey);
-	map<char16_t, float> rParts;
-	for (; it != eit; ++it)
-	{
-		if (it->first.size() != len + 1) continue;
-		rParts[cdata.chrDict.getStr(it->first.back())] = it->second;
-	}
-
-	for (auto& posd : posDistribution)
-	{
-		if (posd.first.second != coda) continue;
-		float smoothing = 10.f / posd.second.size();
-		for (auto& dist : posd.second)
-		{
-			auto qit = rParts.find(dist.first);
-			float q = (qit != rParts.end() ? qit->second + smoothing : smoothing) / (tot + 10);
-			ret[posd.first.first] += dist.second * log(dist.second / q);
-		}
-	}
-	
-	for (auto& p : ret)
-	{
-		p.second = 1 / p.second;
-	}
-	return ret;
-}
-
-map<KPOSTag, float> KWordDetector::getPosScore(Counter & cdata, const std::map<u16light, uint32_t>& cnt, std::map<u16light, uint32_t>::iterator it, bool coda) const
+map<KPOSTag, float> KWordDetector::getPosScore(Counter & cdata, const std::map<u16light, uint32_t>& cnt, std::map<u16light, uint32_t>::iterator it
+	, bool coda, const u16string& realForm) const
 {
 	map<KPOSTag, float> ret;
 	u16light endKey = it->first;
@@ -278,24 +244,21 @@ map<KPOSTag, float> KWordDetector::getPosScore(Counter & cdata, const std::map<u
 			ret[posd.first.first] += dist.second * qit->second / tot;
 		}
 	}
+
+	for (auto& nount : nounTailScore)
+	{
+		if (realForm.size() < nount.first.size()) continue;
+		if (equal(realForm.end() - nount.first.size(), realForm.end(), nount.first.begin()))
+		{
+			ret[KPOSTag::NNP] += nount.second / 10;
+			break;
+		}
+	}
 	return ret;
 }
 
 void KWordDetector::loadPOSModelFromTxt(std::istream & is)
 {
-	/*
-	string line;
-	while (getline(is, line))
-	{
-		auto fields = split(utf8_to_utf16(line), u'\t');
-		if (fields.size() < 4) continue;
-		KPOSTag pos = makePOSTag(fields[0]);
-		bool coda = !!stof(fields[1].begin(), fields[1].end());
-		char16_t chr = fields[2][0];
-		float p = stof(fields[3].begin(), fields[3].end());
-		posDistribution[make_pair(pos, coda)][chr] = p;
-	}
-	*/
 	string line;
 	while (getline(is, line))
 	{
@@ -306,6 +269,18 @@ void KWordDetector::loadPOSModelFromTxt(std::istream & is)
 		char16_t chr = fields[2][0];
 		float p = stof(fields[3].begin(), fields[3].end());
 		posScore[make_pair(pos, coda)][chr] = p;
+	}
+}
+
+void KWordDetector::loadNounTailModelFromTxt(std::istream & is)
+{
+	string line;
+	while (getline(is, line))
+	{
+		auto fields = split(utf8_to_utf16(line), u'\t');
+		if (fields.size() < 4) continue;
+		float p = stof(fields[1].begin(), fields[1].end());
+		nounTailScore[fields[0]] = p;
 	}
 }
 
@@ -339,7 +314,7 @@ vector<KWordDetector::WordInfo> KWordDetector::extractWords(const std::function<
 
 		bool hasCoda = 0xAC00 <= p.first.back() && p.first.back() <= 0xD7A4 && (p.first.back() - 0xAC00) % 28;
 		ret.emplace_back(form, score, backwardBranch, forwardBranch, backwardCohesion, forwardCohesion,
-			p.second, getPosScore(cdata, cdata.forwardCnt, it, hasCoda));
+			p.second, getPosScore(cdata, cdata.forwardCnt, it, hasCoda, form));
 	}
 
 	sort(ret.begin(), ret.end(), [](const auto& a, const auto& b)
