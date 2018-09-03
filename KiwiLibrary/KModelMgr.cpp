@@ -235,7 +235,7 @@ void KModelMgr::loadCorpusFromTxt(std::istream & is, morphemeMap& morphMap, cons
 		if (wstr.empty() && wids.size() > 1)
 		{
 			wids.emplace_back(1);
-			langMdl.trainSequence(&wids[0], wids.size());
+			langMdl->trainSequence(&wids[0], wids.size());
 			wids.erase(wids.begin() + 1, wids.end());
 			continue;
 		}
@@ -357,7 +357,7 @@ KForm & KModelMgr::formMapper(k_string form)
 
 //#define LOAD_TXT
 
-KModelMgr::KModelMgr(const char * modelPath) : langMdl(3)
+KModelMgr::KModelMgr(const char * modelPath)
 {
 	this->modelPath = modelPath;
 #ifdef LOAD_TXT
@@ -398,19 +398,21 @@ KModelMgr::KModelMgr(const char * modelPath) : langMdl(3)
 	
 	//auto ams = loadAllomorphFromTxt(ifstream{ modelPath + string{ "allomorphs.txt" } }, morphMap);
 	KNLangModel::AllomorphSet ams;
+	langMdl = make_shared<KNLangModel>(3);
 	loadCorpusFromTxt(ifstream{ modelPath + string{ "ML_lit.txt" } }, realMorph, ams);
 	loadCorpusFromTxt(ifstream{ modelPath + string{ "ML_spo.txt" } }, realMorph, ams);
-	langMdl.optimize(ams);
-	langMdl.writeToStream(ofstream{ modelPath + string{ "sj.lang" }, ios_base::binary });
+	langMdl->optimize(ams);
+	langMdl->writeToStream(ofstream{ modelPath + string{ "sj.lang" }, ios_base::binary });
 	
 #else
 	loadMorphBin(ifstream{ modelPath + string{ "sj.morph" }, ios_base::binary });
-	langMdl = KNLangModel::readFromStream(ifstream{ modelPath + string{ "sj.lang" }, ios_base::binary });
+	langMdl = make_shared<KNLangModel>(KNLangModel::readFromStream(ifstream{ modelPath + string{ "sj.lang" }, ios_base::binary }));
 #endif
 }
 
 void KModelMgr::addUserWord(const k_string & form, KPOSTag tag, float userScore)
 {
+	if (!trieRoot.empty()) throw bad_exception();
 	if (form.empty()) return;
 	extraTrieSize += form.size() - 1;
 	for (size_t i = 1; i < form.size() - 1; ++i)
@@ -428,22 +430,10 @@ void KModelMgr::addUserWord(const k_string & form, KPOSTag tag, float userScore)
 	morphemes.back().userScore = userScore;
 }
 
-void KModelMgr::addUserRule(const k_string & form, const vector<pair<k_string, KPOSTag>>& morphs)
-{
-	if (!form.empty()) extraTrieSize += form.size() - 1;
-	auto& f = formMapper(form);
-	f.candidate.emplace_back((const KMorpheme*)morphemes.size());
-	morphemes.emplace_back(form, KPOSTag::UNKNOWN);
-	morphemes.back().chunks = new vector<const KMorpheme*>(morphs.size());
-	iota(morphemes.back().chunks->begin(), morphemes.back().chunks->end(), (const KMorpheme*)morphemes.size());
-	for (auto& m : morphs)
-	{
-		morphemes.emplace_back(m.first, m.second);
-	}
-}
-
 void KModelMgr::solidify()
 {
+	if (!trieRoot.empty()) throw bad_exception();
+
 	trieRoot.reserve(baseTrieSize + extraTrieSize);
 	trieRoot.resize((size_t)KPOSTag::SN + 1); // preserve places for root node + default tag morphemes
 	for (size_t i = 1; i <= (size_t)KPOSTag::SN; ++i)

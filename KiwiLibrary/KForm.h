@@ -52,6 +52,15 @@ struct KMorpheme
 	static size_t uid;
 	size_t id;
 #endif
+	const k_string* kform = nullptr;
+	KPOSTag tag = KPOSTag::UNKNOWN;
+	KCondVowel vowel = KCondVowel::none;
+	KCondPolarity polar = KCondPolarity::none;
+	uint8_t combineSocket = 0;
+	std::vector<const KMorpheme*>* chunks = nullptr;
+	int32_t combined = 0;
+	float userScore = 0;
+
 	KMorpheme(const k_string& _form = {},
 		KPOSTag _tag = KPOSTag::UNKNOWN, 
 		KCondVowel _vowel = KCondVowel::none,
@@ -79,19 +88,30 @@ struct KMorpheme
 		userScore = m.userScore;
 	}
 
+	KMorpheme(const KMorpheme& m)
+	{
+		kform = m.kform;
+		tag = m.tag;
+		vowel = m.vowel;
+		polar = m.polar;
+		combineSocket = m.combineSocket;
+		if (m.chunks)
+		{
+			chunks = new std::vector<const KMorpheme*>(*m.chunks);
+		}
+		else
+		{
+			chunks = nullptr;
+		}
+		combined = m.combined;
+		userScore = m.userScore;
+	}
+
 	~KMorpheme() 
 	{ 
 		if (chunks) delete chunks;
 	}
 	const k_string& getForm() const { return *kform; }
-	const k_string* kform = nullptr;
-	KPOSTag tag = KPOSTag::UNKNOWN;
-	KCondVowel vowel = KCondVowel::none;
-	KCondPolarity polar = KCondPolarity::none;
-	uint8_t combineSocket = 0;
-	std::vector<const KMorpheme*>* chunks = nullptr;
-	int32_t combined = 0;
-	float userScore = 0;
 	const KMorpheme* getCombined() const { return this + combined; }
 	void readFromBin(std::istream& is, const std::function<const KMorpheme*(size_t)>& mapper);
 	void writeToBin(std::ostream& os, const std::function<size_t(const KMorpheme*)>& mapper) const;
@@ -105,6 +125,7 @@ struct KForm
 	std::vector<const KMorpheme*> candidate;
 	KForm(const k_char* _form = nullptr);
 	KForm(const k_string& _form) : form(_form) {}
+	KForm(const KForm& o) = default;
 
 	void readFromBin(std::istream& is, const std::function<const KMorpheme*(size_t)>& mapper);
 	void writeToBin(std::ostream& os, const std::function<size_t(const KMorpheme*)>& mapper) const;
