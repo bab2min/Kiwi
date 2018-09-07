@@ -23,29 +23,15 @@ int Kiwi::addUserWord(const u16string & str, KPOSTag tag, float userScore)
 	return 0;
 }
 
-int Kiwi::addUserRule(const u16string & str, const vector<pair<u16string, KPOSTag>>& morph)
-{
-	/*
-	vector<pair<k_string, KPOSTag>> jmMorph;
-	jmMorph.reserve(morph.size());
-	for (auto& m : morph)
-	{
-		jmMorph.emplace_back(normalizeHangul({ m.first.begin(), m.first.end() }), m.second);
-	}
-	mdl->addUserRule(normalizeHangul({ str.begin(), str.end() }), jmMorph);
-	*/
-	return 0;
-}
 
 int Kiwi::loadUserDictionary(const char * userDictPath)
 {
-	FILE* file = nullptr;
-	if (fopen_s(&file, userDictPath, "r")) return -1;
-	char buf[4096];
-	while (fgets(buf, 4096, file))
+	ifstream ifs{ userDictPath };
+	string line;
+	while (getline(ifs, line))
 	{
-		if (buf[0] == '#') continue;
-		auto wstr = utf8_to_utf16(buf);
+		auto wstr = utf8_to_utf16(line);
+		if (wstr[0] == u'#') continue;
 		auto chunks = split(wstr, u'\t');
 		if (chunks.size() < 2) continue;
 		if (!chunks[1].empty()) 
@@ -54,23 +40,13 @@ int Kiwi::loadUserDictionary(const char * userDictPath)
 			if (pos != KPOSTag::MAX)
 			{
 				addUserWord(chunks[0], pos);
-				continue;
+			}
+			else
+			{
+				throw KiwiException("[loadUserDictionary] Unknown Tag '" + utf16_to_utf8(chunks[1]) + "'");
 			}
 		}
-		
-		vector<pair<u16string, KPOSTag>> morphs;
-		for (size_t i = 1; i < chunks.size(); i++) 
-		{
-			auto cc = split(chunks[i], u'/');
-			if (cc.size() != 2) goto loopContinue;
-			auto pos = makePOSTag(cc[1]);
-			if (pos == KPOSTag::MAX) goto loopContinue;
-			morphs.emplace_back(cc[0], pos);
-		}
-		addUserRule(chunks[0], morphs);
-	loopContinue:;
 	}
-	fclose(file);
 	return 0;
 }
 
@@ -96,22 +72,37 @@ vector<KWordDetector::WordInfo> Kiwi::extractAndAddWords(const function<u16strin
 	for (auto& r : res)
 	{
 		if (r.posScore[KPOSTag::NNP] < posThreshold || !r.posScore[KPOSTag::NNP]) continue;
-		KPOSTag pos;
-		switch (pos = identifySpecialChr(r.form.back()))
+		if (r.form.back() == u')')
 		{
-		case KPOSTag::SF:
-		case KPOSTag::SP:
-		case KPOSTag::SS:
-		case KPOSTag::SE:
-		case KPOSTag::SO:
-		case KPOSTag::SW: 
-			continue;
-		case KPOSTag::SL:
-		case KPOSTag::SN:
-		case KPOSTag::SH:
-			if (all_of(r.form.begin(), r.form.end(), [pos](char16_t c) { 
-				return pos == identifySpecialChr(c); 
-			})) continue;
+			if (r.form.find(u'(') == r.form.npos) continue;
+		}
+		else if (r.form.back() == u']')
+		{
+			if (r.form.find(u'[') == r.form.npos) continue;
+		}
+		else if (r.form.back() == u'}')
+		{
+			if (r.form.find(u'{') == r.form.npos) continue;
+		}
+		else
+		{
+			KPOSTag pos;
+			switch (pos = identifySpecialChr(r.form.back()))
+			{
+			case KPOSTag::SF:
+			case KPOSTag::SP:
+			case KPOSTag::SS:
+			case KPOSTag::SE:
+			case KPOSTag::SO:
+			case KPOSTag::SW:
+				continue;
+			case KPOSTag::SL:
+			case KPOSTag::SN:
+			case KPOSTag::SH:
+				if (all_of(r.form.begin(), r.form.end(), [pos](char16_t c) {
+					return pos == identifySpecialChr(c);
+				})) continue;
+			}
 		}
 
 		if(allForms.count(normalizeHangul(r.form))) continue;

@@ -38,6 +38,14 @@ typedef std::pair<std::vector<KWordPair>, float> KResult;
 
 class KModelMgr;
 
+class KiwiException : public std::exception
+{
+	std::string msg;
+public:
+	KiwiException(const std::string& _msg) : msg(_msg) {}
+	const char* what() const override { return msg.c_str(); }
+};
+
 class Kiwi
 {
 protected:
@@ -51,7 +59,6 @@ protected:
 public:
 	Kiwi(const char* modelPath = "", size_t maxCache = -1, size_t numThread = 0);
 	int addUserWord(const std::u16string& str, KPOSTag tag, float userScore = 20);
-	int addUserRule(const std::u16string& str, const std::vector<std::pair<std::u16string, KPOSTag>>& morph);
 	int loadUserDictionary(const char* userDictPath = "");
 	int prepare();
 	std::vector<KWordDetector::WordInfo> extractWords(const std::function<std::u16string(size_t)>& reader, size_t minCnt = 10, size_t maxWordLen = 10, float minScore = 0.25);
