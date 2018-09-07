@@ -114,9 +114,9 @@ int main()
 	{
 		//ifstream ifs{ "../TestSets/15s.txt" };
 		ifstream ifs{ "D:/kornews.txt" };
-		auto res = kw.extractAndAddWords([&ifs](size_t id) -> u16string
+		auto res = kw.extractAddWords([&ifs](size_t id) -> u16string
 		{
-			if (id >= 20000) 
+			if (id >= 20000)
 			{
 				return {};
 			}
@@ -124,6 +124,8 @@ int main()
 			{
 				ifs.clear();
 				ifs.seekg(0);
+				string line;
+				for (size_t i = 0; i < 30000; ++i) getline(ifs, line);
 			}
 			string line;
 			while (getline(ifs, line))

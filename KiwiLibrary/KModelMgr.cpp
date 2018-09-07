@@ -321,7 +321,7 @@ size_t KModelMgr::estimateTrieSize() const
 
 void KModelMgr::loadMorphBin(std::istream& is)
 {
-	if (readFromBinStream<uint32_t>(is) != 0x4B495749) throw exception();
+	if (readFromBinStream<uint32_t>(is) != 0x4B495749) throw KiwiException("[loadMorphBin] Input file is corrupted.");
 	size_t formSize = readFromBinStream<uint32_t>(is);
 	size_t morphemeSize = readFromBinStream<uint32_t>(is);
 	baseTrieSize = readFromBinStream<uint32_t>(is);
@@ -432,8 +432,7 @@ void KModelMgr::addUserWord(const k_string & form, KPOSTag tag, float userScore)
 
 void KModelMgr::solidify()
 {
-	if (!trieRoot.empty()) throw bad_exception();
-
+	if (!trieRoot.empty()) throw KiwiException("[solidify] Cannot solidify twice.");
 	trieRoot.reserve(baseTrieSize + extraTrieSize);
 	trieRoot.resize((size_t)KPOSTag::SN + 1); // preserve places for root node + default tag morphemes
 	for (size_t i = 1; i <= (size_t)KPOSTag::SN; ++i)

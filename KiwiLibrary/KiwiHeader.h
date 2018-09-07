@@ -49,6 +49,16 @@ inline int fopen_s(FILE** f, const char* p, const char* m)
 
 #include "KMemory.h"
 
+
+class KiwiException : public std::exception
+{
+	std::string msg;
+public:
+	KiwiException(const std::string& _msg) : msg(_msg) {}
+	const char* what() const override { return msg.c_str(); }
+};
+
+
 #ifdef CUSTOM_ALLOC
 typedef std::basic_string<k_char, std::char_traits<k_char>, spool_allocator<k_char>> k_string;
 #ifdef _WIN32
