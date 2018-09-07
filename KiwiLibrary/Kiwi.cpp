@@ -27,6 +27,7 @@ int Kiwi::addUserWord(const u16string & str, KPOSTag tag, float userScore)
 int Kiwi::loadUserDictionary(const char * userDictPath)
 {
 	ifstream ifs{ userDictPath };
+	ifs.exceptions(std::istream::failbit | std::istream::badbit);
 	string line;
 	while (getline(ifs, line))
 	{
@@ -62,51 +63,101 @@ vector<KWordDetector::WordInfo> Kiwi::extractWords(const function<u16string(size
 	return detector.extractWords(reader);
 }
 
+vector<KWordDetector::WordInfo> Kiwi::filterExtractedWords(vector<KWordDetector::WordInfo>&& words, float posThreshold) const
+{
+	const auto& specialChrTest = [](const u16string& form) -> bool
+	{
+		KPOSTag pos;
+		switch (pos = identifySpecialChr(form.back()))
+		{
+		case KPOSTag::SF:
+		case KPOSTag::SP:
+		case KPOSTag::SS:
+		case KPOSTag::SE:
+		case KPOSTag::SO:
+		case KPOSTag::SW:
+			return false;
+		case KPOSTag::SL:
+		case KPOSTag::SN:
+		case KPOSTag::SH:
+			if (all_of(form.begin(), form.end(), [pos](char16_t c) {
+				return pos == identifySpecialChr(c);
+			})) return false;
+		}
+		return true;
+	};
+	vector<KWordDetector::WordInfo> ret;
+	auto allForms = mdl->getAllForms();
+	for (auto& r : words)
+	{
+		if (r.posScore[KPOSTag::NNP] < posThreshold || !r.posScore[KPOSTag::NNP]) continue;
+		char16_t bracket = 0;
+		switch (r.form.back())
+		{
+		case u')':
+			if (r.form.find(u'(') == r.form.npos) continue;
+			bracket = u'(';
+			break;
+		case u']':
+			if (r.form.find(u'[') == r.form.npos) continue;
+			bracket = u'[';
+			break;
+		case u'}':
+			if (r.form.find(u'{') == r.form.npos) continue;
+			bracket = u'{';
+			break;
+		case u'(':
+		case u'[':
+		case u'{':
+			r.form.pop_back();
+		default:
+			if (r.form.find(u'(') != r.form.npos && r.form.find(u')') == r.form.npos)
+			{
+				bracket = u'(';
+				goto onlyBracket;
+			}
+			else if (r.form.find(u'[') != r.form.npos && r.form.find(u']') == r.form.npos)
+			{
+				bracket = u'[';
+				goto onlyBracket;
+			}
+			else if (r.form.find(u'{') != r.form.npos && r.form.find(u'}') == r.form.npos)
+			{
+				bracket = u'{';
+				goto onlyBracket;
+			}
+			if (!specialChrTest(r.form)) continue;
+		}
+
+		{
+			auto normForm = normalizeHangul(r.form);
+			if (allForms.count(normForm)) continue;
+			allForms.emplace(normForm);
+			ret.emplace_back(r);
+		}
+	onlyBracket:;
+		if (bracket)
+		{
+			auto subForm = r.form.substr(0, r.form.find(bracket));
+			if (subForm.empty()) continue;
+			if (!specialChrTest(subForm)) continue;
+			auto subNormForm = normalizeHangul(subForm);
+			if (allForms.count(subNormForm)) continue;
+			allForms.emplace(subNormForm);
+			ret.emplace_back(r);
+			ret.back().form = subForm;
+		}
+	}
+	return ret;
+}
+
 vector<KWordDetector::WordInfo> Kiwi::extractAddWords(const function<u16string(size_t)>& reader, size_t minCnt, size_t maxWordLen, float minScore, float posThreshold)
 {
 	detector.setParameters(minCnt, maxWordLen, minScore);
-	vector<KWordDetector::WordInfo> ret;
-	auto res = detector.extractWords(reader);
-	auto allForms = mdl->getAllForms();
-	for (auto& r : res)
+	auto ret = filterExtractedWords(detector.extractWords(reader), posThreshold);
+	for (auto& r : ret)
 	{
-		if (r.posScore[KPOSTag::NNP] < posThreshold || !r.posScore[KPOSTag::NNP]) continue;
-		if (r.form.back() == u')')
-		{
-			if (r.form.find(u'(') == r.form.npos) continue;
-		}
-		else if (r.form.back() == u']')
-		{
-			if (r.form.find(u'[') == r.form.npos) continue;
-		}
-		else if (r.form.back() == u'}')
-		{
-			if (r.form.find(u'{') == r.form.npos) continue;
-		}
-		else
-		{
-			KPOSTag pos;
-			switch (pos = identifySpecialChr(r.form.back()))
-			{
-			case KPOSTag::SF:
-			case KPOSTag::SP:
-			case KPOSTag::SS:
-			case KPOSTag::SE:
-			case KPOSTag::SO:
-			case KPOSTag::SW:
-				continue;
-			case KPOSTag::SL:
-			case KPOSTag::SN:
-			case KPOSTag::SH:
-				if (all_of(r.form.begin(), r.form.end(), [pos](char16_t c) {
-					return pos == identifySpecialChr(c);
-				})) continue;
-			}
-		}
-
-		if(allForms.count(normalizeHangul(r.form))) continue;
-		addUserWord(r.form, KPOSTag::NNP);
-		ret.emplace_back(move(r));
+		addUserWord(r.form, KPOSTag::NNP, 10.f);
 	}
 	return ret;
 }
@@ -505,7 +556,7 @@ vector<KResult> Kiwi::analyze(const string & str, size_t topN) const
 
 void Kiwi::analyze(size_t topN, const function<u16string(size_t)>& reader, const function<void(size_t, vector<KResult>&&)>& receiver) const
 {
-	vector<future<void>> futures(workers.getNumWorkers() * 4);
+	vector<future<void>> futures;
 	struct
 	{
 		map<size_t, vector<KResult>> res;
@@ -533,7 +584,7 @@ void Kiwi::analyze(size_t topN, const function<u16string(size_t)>& reader, const
 	{
 		auto ustr = reader(id);
 		if (ustr.empty()) break;
-		futures[id % futures.size()] = (workers.enqueue([this, topN, id, ustr, &receiver, &sharedResult](size_t tid)
+		futures.emplace_back(workers.enqueue([this, topN, id, ustr, &receiver, &sharedResult](size_t tid)
 		{
 			auto r = analyze(ustr, topN);
 			sharedResult.addResult(id, move(r), receiver);
