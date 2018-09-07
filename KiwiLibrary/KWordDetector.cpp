@@ -10,7 +10,7 @@ void KWordDetector::countUnigram(Counter& cdata, const function<u16string(size_t
 	{
 		basic_stringstream<char16_t> ss{ ustr };
 		istream_iterator<u16string, char16_t> begin{ ss }, end{};
-		vector<int16_t> ids;
+		vector<uint16_t> ids;
 		vector<size_t> chk;
 		chk.emplace_back(0);
 		cdata.chrDict.withLock([&]()
@@ -23,12 +23,12 @@ void KWordDetector::countUnigram(Counter& cdata, const function<u16string(size_t
 			}
 		});
 		if (ids.empty()) return;
-		int16_t maxId = *max_element(ids.begin(), ids.end());
+		uint16_t maxId = *max_element(ids.begin(), ids.end());
 		if (ld.size() <= maxId) ld.resize(maxId + 1);
 		for (auto id : ids) ld[id]++;
 	});
 
-	int16_t maxId = 0;
+	uint16_t maxId = 0;
 	for (auto& t : ldUnigram)
 	{
 		if (maxId < t.size()) maxId = t.size();
@@ -40,7 +40,7 @@ void KWordDetector::countUnigram(Counter& cdata, const function<u16string(size_t
 		for (size_t n = 0; n < ldUnigram[i].size(); ++n) unigramMerged[n] += ldUnigram[i][n];
 	}
 
-	WordDictionary<char16_t, int16_t> chrDictShrink;
+	WordDictionary<char16_t, uint16_t> chrDictShrink;
 	chrDictShrink.add(0);
 	chrDictShrink.add(1);
 	chrDictShrink.add(2);
@@ -62,12 +62,13 @@ void KWordDetector::countBigram(Counter& cdata, const function<u16string(size_t)
 		istream_iterator<u16string, char16_t> begin{ ss }, end{};
 		for (; begin != end; ++begin)
 		{
-			int16_t a = 1;
+			uint16_t a = 1;
 			for (auto c : *begin)
 			{
-				int16_t id = max(cdata.chrDict.get(c), (int16_t)0);
-				if (a && id) ++ld[a * cdata.chrDict.size() + id];
-				a = id;
+				uint16_t wid = cdata.chrDict.get(c);
+				if (wid == cdata.chrDict.npos) wid = 0;
+				if (a && wid) ++ld[a * cdata.chrDict.size() + wid];
+				a = wid;
 			}
 			if (a) ++ld[a * cdata.chrDict.size() + 2];
 		}
@@ -104,7 +105,8 @@ void KWordDetector::countNgram(Counter& cdata, const function<u16string(size_t)>
 			ids.emplace_back(1);
 			for (auto c : *begin)
 			{
-				int16_t id = max(cdata.chrDict.get(c), (int16_t)0);
+				uint16_t id = cdata.chrDict.get(c);
+				if (id == cdata.chrDict.npos) id = 0;
 				ids.emplace_back(id);
 			}
 			ids.emplace_back(2);
@@ -250,7 +252,7 @@ map<KPOSTag, float> KWordDetector::getPosScore(Counter & cdata, const std::map<u
 		if (realForm.size() < nount.first.size()) continue;
 		if (equal(realForm.end() - nount.first.size(), realForm.end(), nount.first.begin()))
 		{
-			ret[KPOSTag::NNP] += nount.second / 10;
+			ret[KPOSTag::NNP] += nount.second * .25f;
 			break;
 		}
 	}
@@ -296,6 +298,7 @@ vector<KWordDetector::WordInfo> KWordDetector::extractWords(const std::function<
 	{
 		auto& p = *it;
 		if (p.second < minCnt) continue;
+		if (p.first.size() >= maxWordLen) continue;
 		auto bit = cdata.backwardCnt.find({ p.first.rbegin(), p.first.rend() });
 		if (bit == cdata.backwardCnt.end()) continue;
 

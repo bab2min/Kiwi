@@ -428,20 +428,6 @@ void KModelMgr::addUserWord(const k_string & form, KPOSTag tag, float userScore)
 	morphemes.back().userScore = userScore;
 }
 
-void KModelMgr::addUserRule(const k_string & form, const vector<pair<k_string, KPOSTag>>& morphs)
-{
-	if (!form.empty()) extraTrieSize += form.size() - 1;
-	auto& f = formMapper(form);
-	f.candidate.emplace_back((const KMorpheme*)morphemes.size());
-	morphemes.emplace_back(form, KPOSTag::UNKNOWN);
-	morphemes.back().chunks = new vector<const KMorpheme*>(morphs.size());
-	iota(morphemes.back().chunks->begin(), morphemes.back().chunks->end(), (const KMorpheme*)morphemes.size());
-	for (auto& m : morphs)
-	{
-		morphemes.emplace_back(m.first, m.second);
-	}
-}
-
 void KModelMgr::solidify()
 {
 	trieRoot.reserve(baseTrieSize + extraTrieSize);

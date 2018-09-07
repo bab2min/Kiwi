@@ -25,7 +25,6 @@ protected:
 public:
 	KModelMgr(const char* modelPath = "");
 	void addUserWord(const k_string& form, KPOSTag tag, float userScore = 10);
-	void addUserRule(const k_string& form, const std::vector<std::pair<k_string, KPOSTag>>& morphs);
 	void solidify();
 	const KTrie* getTrie() const { return &trieRoot[0]; }
 

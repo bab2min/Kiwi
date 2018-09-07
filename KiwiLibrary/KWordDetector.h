@@ -2,7 +2,7 @@
 #include "KForm.h"
 #include "ThreadPool.h"
 
-template<class KeyType = char16_t, class ValueType = int32_t>
+template<class KeyType = char16_t, class ValueType = uint32_t>
 class WordDictionary
 {
 protected:
@@ -87,9 +87,9 @@ public:
 namespace std
 {
 	template<>
-	struct hash<pair<int16_t, int16_t>>
+	struct hash<pair<uint16_t, uint16_t>>
 	{
-		size_t operator()(const pair<int16_t, int16_t>& o) const
+		size_t operator()(const pair<uint16_t, uint16_t>& o) const
 		{
 			return hash_value(o.first) | (hash_value(o.second) << 16);
 		}
@@ -266,34 +266,33 @@ class KWordDetector
 {
 	struct Counter
 	{
-		WordDictionary<char16_t, int16_t> chrDict;
+		WordDictionary<char16_t, uint16_t> chrDict;
 		std::vector<uint32_t> cntUnigram;
-		std::unordered_set<std::pair<int16_t, int16_t>> candBigram;
+		std::unordered_set<std::pair<uint16_t, uint16_t>> candBigram;
 		std::map<u16light, uint32_t> forwardCnt, backwardCnt;
 	};
 protected:
 	size_t minCnt, maxWordLen;
 	float minScore;
-	mutable ThreadPool workers;
+	size_t numThread;
 	std::map<std::pair<KPOSTag, bool>, std::map<char16_t, float>> posScore;
 	std::map<std::u16string, float> nounTailScore;
 
 	template<class LocalData, class FuncReader, class FuncProc>
 	std::vector<LocalData> readProc(const FuncReader& reader, const FuncProc& processor, LocalData&& ld = {}) const
 	{
+		ThreadPool workers(numThread);
 		std::vector<LocalData> ldByTid(workers.getNumWorkers(), ld);
-		std::vector<std::future<void>> futures(workers.getNumWorkers() * 4);
 		for (size_t id = 0; ; ++id)
 		{
 			auto ustr = reader(id);
 			if (ustr.empty()) break;
-			futures[id % futures.size()] = workers.enqueue([this, ustr, id, &ldByTid, &processor](size_t tid)
+			workers.enqueue([this, ustr, id, &ldByTid, &processor](size_t tid)
 			{
 				auto& ld = ldByTid[tid];
 				processor(ustr, id, ld);
 			});
 		}
-		for (auto& f : futures) f.get();
 		return ldByTid;
 	}
 	void countUnigram(Counter&, const std::function<std::u16string(size_t)>& reader) const;
@@ -322,7 +321,7 @@ public:
 	KWordDetector(size_t _minCnt = 10, size_t _maxWordLen = 10, float _minScore = 0.1f,
 		size_t _numThread = 0)
 		: minCnt(_minCnt), maxWordLen(_maxWordLen), minScore(_minScore),
-		workers(_numThread ? _numThread : std::thread::hardware_concurrency())
+		numThread(_numThread ? _numThread : std::thread::hardware_concurrency())
 	{}
 	void setParameters(size_t _minCnt = 10, size_t _maxWordLen = 10, float _minScore = 0.1f)
 	{
