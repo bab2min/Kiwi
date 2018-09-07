@@ -53,7 +53,6 @@ int Kiwi::loadUserDictionary(const char * userDictPath)
 int Kiwi::prepare()
 {
 	mdl->solidify();
-	kt = mdl->getTrie();
 	return 0;
 }
 
@@ -63,7 +62,7 @@ vector<KWordDetector::WordInfo> Kiwi::extractWords(const function<u16string(size
 	return detector.extractWords(reader);
 }
 
-vector<KWordDetector::WordInfo> Kiwi::extractAndAddWords(const function<u16string(size_t)>& reader, size_t minCnt, size_t maxWordLen, float minScore, float posThreshold)
+vector<KWordDetector::WordInfo> Kiwi::extractAddWords(const function<u16string(size_t)>& reader, size_t minCnt, size_t maxWordLen, float minScore, float posThreshold)
 {
 	detector.setParameters(minCnt, maxWordLen, minScore);
 	vector<KWordDetector::WordInfo> ret;
@@ -507,17 +506,51 @@ vector<KResult> Kiwi::analyze(const string & str, size_t topN) const
 void Kiwi::analyze(size_t topN, const function<u16string(size_t)>& reader, const function<void(size_t, vector<KResult>&&)>& receiver) const
 {
 	vector<future<void>> futures(workers.getNumWorkers() * 4);
+	struct
+	{
+		map<size_t, vector<KResult>> res;
+		mutex resMutex;
+		size_t outputId = 0;
+
+		void addResult(size_t id, vector<KResult>&& r, const function<void(size_t, vector<KResult>&&)>& receiver)
+		{
+			lock_guard<mutex> l(resMutex);
+			if (id == outputId) receiver(outputId++, move(r));
+			else
+			{
+				res.emplace(id, r);
+			}
+
+			while (!res.empty() && res.begin()->first == outputId)
+			{
+				receiver(outputId++, move(res.begin()->second));
+				res.erase(res.begin());
+			}
+		}
+	} sharedResult;
+
 	for (size_t id = 0; ; ++id)
 	{
 		auto ustr = reader(id);
 		if (ustr.empty()) break;
-		futures[id % futures.size()] = workers.enqueue([this, topN, id, ustr, &receiver](size_t tid)
+		futures[id % futures.size()] = (workers.enqueue([this, topN, id, ustr, &receiver, &sharedResult](size_t tid)
 		{
-			receiver(id, analyze(ustr, topN));
-		});
+			auto r = analyze(ustr, topN);
+			sharedResult.addResult(id, move(r), receiver);
+		}));
 	}
 
 	for (auto& f : futures) f.get();
+}
+
+void Kiwi::extractAnalyze(size_t topN, const function<u16string(size_t)>& reader, const function<void(size_t, vector<KResult>&&)>& receiver, size_t minCnt, size_t maxWordLen, float minScore, float posThreshold) const
+{
+	auto old = make_unique<KModelMgr>(*mdl);
+	swap(old, const_cast<Kiwi*>(this)->mdl);
+	const_cast<Kiwi*>(this)->extractAddWords(reader, minCnt, maxWordLen, minScore, posThreshold);
+	const_cast<Kiwi*>(this)->prepare();
+	analyze(topN, reader, receiver);
+	swap(old, const_cast<Kiwi*>(this)->mdl);
 }
 
 vector<KResult> Kiwi::analyze(const u16string & str, size_t topN) const
@@ -529,7 +562,7 @@ vector<KResult> Kiwi::analyze(const u16string & str, size_t topN) const
 		posMap[i + 1] = posMap[i] + (isHangulCoda(nstr[i]) ? 0 : 1);
 	}
 
-	auto nodes = kt->split(nstr);
+	auto nodes = mdl->getTrie()->split(nstr);
 	auto res = findBestPath(nodes, mdl->getLangModel(), mdl->getMorphemes(), topN);
 	vector<KResult> ret;
 	for (auto&& r : res)
@@ -557,6 +590,11 @@ void Kiwi::clearCache()
 int Kiwi::getVersion()
 {
 	return 50;
+}
+
+std::u16string Kiwi::toU16(const std::string & str)
+{
+	return utf8_to_utf16(str);
 }
 
 std::ostream & operator<<(std::ostream & os, const KWordPair & kp)

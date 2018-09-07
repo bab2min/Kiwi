@@ -52,7 +52,6 @@ protected:
 	float cutOffThreshold = 10.f;
 	std::unique_ptr<KModelMgr> mdl;
 	mutable ThreadPool workers;
-	const KTrie* kt = nullptr;
 	KWordDetector detector;
 	typedef std::vector<std::tuple<const KMorpheme*, k_string, uint32_t>> path;
 	std::vector<std::pair<path, float>> findBestPath(const std::vector<KGraphNode>& graph, const KNLangModel * knlm, const KMorpheme* morphBase, size_t topN) const;
@@ -62,13 +61,15 @@ public:
 	int loadUserDictionary(const char* userDictPath = "");
 	int prepare();
 	std::vector<KWordDetector::WordInfo> extractWords(const std::function<std::u16string(size_t)>& reader, size_t minCnt = 10, size_t maxWordLen = 10, float minScore = 0.25);
-	std::vector<KWordDetector::WordInfo> extractAndAddWords(const std::function<std::u16string(size_t)>& reader, size_t minCnt = 10, size_t maxWordLen = 10, float minScore = 0.25, float posThreshold = -3);
+	std::vector<KWordDetector::WordInfo> extractAddWords(const std::function<std::u16string(size_t)>& reader, size_t minCnt = 10, size_t maxWordLen = 10, float minScore = 0.25, float posThreshold = -3);
 	KResult analyze(const std::u16string& str) const;
 	KResult analyze(const std::string& str) const;
 	std::vector<KResult> analyze(const std::u16string& str, size_t topN) const;
 	std::vector<KResult> analyze(const std::string& str, size_t topN) const;
 	void analyze(size_t topN, const std::function<std::u16string(size_t)>& reader, const std::function<void(size_t, std::vector<KResult>&&)>& receiver) const;
+	void extractAnalyze(size_t topN, const std::function<std::u16string(size_t)>& reader, const std::function<void(size_t, std::vector<KResult>&&)>& receiver, size_t minCnt = 10, size_t maxWordLen = 10, float minScore = 0.25, float posThreshold = -3) const;
 	void clearCache();
 	static int getVersion();
+	static std::u16string toU16(const std::string& str);
 };
 

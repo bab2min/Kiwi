@@ -11,8 +11,9 @@ protected:
 	size_t baseTrieSize = 0;
 	size_t extraTrieSize = 0;
 	std::vector<KTrie> trieRoot;
+	std::shared_ptr<KNLangModel> langMdl;
+
 	typedef std::unordered_map<std::pair<k_string, KPOSTag>, size_t> morphemeMap;
-	KNLangModel langMdl;
 	void loadMMFromTxt(std::istream& is, morphemeMap& morphMap, std::unordered_map<KPOSTag, float>* posWeightSum, const std::function<bool(float, KPOSTag)>& selector);
 	void loadCMFromTxt(std::istream& is, morphemeMap& morphMap);
 	void loadPCMFromTxt(std::istream& is, morphemeMap& morphMap);
@@ -24,11 +25,12 @@ protected:
 	KForm& formMapper(k_string form);
 public:
 	KModelMgr(const char* modelPath = "");
+	KModelMgr(const KModelMgr&) = default;
 	void addUserWord(const k_string& form, KPOSTag tag, float userScore = 10);
 	void solidify();
 	const KTrie* getTrie() const { return &trieRoot[0]; }
 
-	const KNLangModel* getLangModel() const { return &langMdl; }
+	const KNLangModel* getLangModel() const { return langMdl.get(); }
 	const KMorpheme* getMorphemes() const { return &morphemes[0]; }
 
 	const KMorpheme* getDefaultMorpheme(KPOSTag tag) const { return &morphemes[1] + (size_t)tag; }
