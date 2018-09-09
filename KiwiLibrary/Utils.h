@@ -4,8 +4,8 @@
 #define LEN_ARRAY(p) (sizeof(p)/sizeof(p[0]))
 
 bool isHangulCoda(char16_t chr);
-k_string normalizeHangul(std::u16string hangul);
-std::u16string joinHangul(k_string hangul);
+k_string normalizeHangul(const std::u16string& hangul);
+std::u16string joinHangul(const k_string& hangul);
 
 template<class BaseChr, class OutIterator>
 void split(const std::basic_string<BaseChr>& s, BaseChr delim, OutIterator result) {
@@ -31,18 +31,19 @@ inline void writeToBinStream(std::ostream& os, const _Ty& v)
 }
 
 template<class _Ty>
-inline _Ty readFromBinStream(std::istream& is)
-{
-	_Ty v;
-	if (!is.read((char*)&v, sizeof(_Ty))) throw std::ios_base::failure(std::string{ "reading type '" } +typeid(_Ty).name() + "' failed");
-	return v;
-}
-
-template<class _Ty>
 inline void readFromBinStream(std::istream& is, _Ty& v)
 {
 	if (!is.read((char*)&v, sizeof(_Ty))) throw std::ios_base::failure(std::string{ "reading type '" } +typeid(_Ty).name() + "' failed");
 }
+
+template<class _Ty>
+inline _Ty readFromBinStream(std::istream& is)
+{
+	_Ty v;
+	readFromBinStream(is, v);
+	return v;
+}
+
 
 template<class _Ty1, class _Ty2>
 inline void writeToBinStream(std::ostream& os, const std::pair<_Ty1, _Ty2>& v)
@@ -52,11 +53,12 @@ inline void writeToBinStream(std::ostream& os, const std::pair<_Ty1, _Ty2>& v)
 }
 
 template<class _Ty1, class _Ty2>
-inline std::pair<_Ty1, _Ty2> readFromBinStream(std::istream& is)
+inline void readFromBinStream(std::istream& is, std::pair<_Ty1, _Ty2>& v)
 {
-	return std::make_pair(readFromBinStream<_Ty1>(is), readFromBinStream<_Ty2>(is));
+	auto left = readFromBinStream<_Ty1>(is);
+	auto right = readFromBinStream<_Ty2>(is);
+	v = std::make_pair(std::move(left), std::move(right));
 }
-
 
 template<>
 inline void writeToBinStream<k_string>(std::ostream& os, const k_string& v)
@@ -66,13 +68,48 @@ inline void writeToBinStream<k_string>(std::ostream& os, const k_string& v)
 }
 
 template<>
-inline k_string readFromBinStream<k_string>(std::istream& is)
+inline void readFromBinStream<k_string>(std::istream& is, k_string& v)
 {
-	k_string v; 
 	v.resize(readFromBinStream<uint32_t>(is));
 	if (!is.read((char*)&v[0], v.size() * sizeof(k_string::value_type))) throw std::ios_base::failure(std::string{ "reading type '" } +typeid(k_string).name() + "' failed");
-	return v;
 }
+
+template<>
+inline void writeToBinStream<std::u16string>(std::ostream& os, const std::u16string& v)
+{
+	writeToBinStream<uint32_t>(os, v.size());
+	if (!os.write((const char*)&v[0], v.size() * sizeof(char16_t))) throw std::ios_base::failure(std::string{ "writing type '" } +typeid(k_string).name() + "' failed");
+}
+
+template<>
+inline void readFromBinStream<std::u16string>(std::istream& is, std::u16string& v)
+{
+	v.resize(readFromBinStream<uint32_t>(is));
+	if (!is.read((char*)&v[0], v.size() * sizeof(char16_t))) throw std::ios_base::failure(std::string{ "reading type '" } +typeid(k_string).name() + "' failed");
+}
+
+
+template<class _Ty1, class _Ty2>
+inline void writeToBinStream(std::ostream& os, const std::map<_Ty1, _Ty2>& v)
+{
+	writeToBinStream<uint32_t>(os, v.size());
+	for (auto& p : v)
+	{
+		writeToBinStream(os, p);
+	}
+}
+
+template<class _Ty1, class _Ty2>
+inline void readFromBinStream(std::istream& is, std::map<_Ty1, _Ty2>& v)
+{
+	size_t len = readFromBinStream<uint32_t>(is);
+	v.clear();
+	for (size_t i = 0; i < len; ++i)
+	{
+		v.emplace(readFromBinStream<std::pair<_Ty1, _Ty2>>(is));
+	}
+}
+
 
 template<class ChrIterator>
 inline float stof(ChrIterator begin, ChrIterator end)
@@ -144,3 +181,9 @@ inline std::ostream& operator <<(std::ostream& os, const k_string& str)
 }
 
 KPOSTag identifySpecialChr(k_char chr);
+
+uint32_t readVFromBinStream(std::istream& is);
+void writeVToBinStream(std::ostream& os, uint32_t v);
+
+int32_t readSVFromBinStream(std::istream& is);
+void writeSVToBinStream(std::ostream& os, int32_t v);

@@ -8,7 +8,7 @@ bool isHangulCoda(char16_t chr)
 	return 0x11A8 <= chr && chr < (0x11A7 + 28);
 }
 
-k_string normalizeHangul(std::u16string hangul)
+k_string normalizeHangul(const std::u16string& hangul)
 {
 	k_string ret;
 	ret.reserve(hangul.size() * 1.5);
@@ -28,7 +28,7 @@ k_string normalizeHangul(std::u16string hangul)
 	return ret;
 }
 
-std::u16string joinHangul(k_string hangul)
+std::u16string joinHangul(const k_string& hangul)
 {
 	std::u16string ret;
 	ret.reserve(hangul.size());
@@ -128,4 +128,70 @@ KPOSTag identifySpecialChr(k_char chr)
 		(0xfa70 <= chr && chr <= 0xfad9)) return KPOSTag::SH;
 	if (0xd800 <= chr && chr <= 0xdfff) return KPOSTag::SH;
 	return KPOSTag::SW;
+}
+
+uint32_t readVFromBinStream(std::istream & is)
+{
+	static uint32_t vSize[] = { 0, 0x80, 0x4080, 0x204080, 0x10204080 };
+	char c;
+	uint32_t v = 0;
+	size_t i;
+	for (i = 0; (c = readFromBinStream<uint8_t>(is)) & 0x80; ++i)
+	{
+		v |= (c & 0x7F) << (i * 7);
+	}
+	v |= c << (i * 7);
+	return v + vSize[i];
+}
+
+void writeVToBinStream(std::ostream & os, uint32_t v)
+{
+	static uint32_t vSize[] = {0, 0x80, 0x4080, 0x204080, 0x10204080};
+	size_t i;
+	for (i = 1; i <= 4; ++i)
+	{
+		if (v < vSize[i]) break;
+	}
+	v -= vSize[i - 1];
+	for (size_t n = 0; n < i; ++n)
+	{
+		uint8_t c = (v & 0x7F) | (n + 1 < i ? 0x80 : 0);
+		writeToBinStream(os, c);
+		v >>= 7;
+	}
+}
+
+
+int32_t readSVFromBinStream(std::istream & is)
+{
+	static int32_t vSize[] = { 0x40, 0x2000, 0x100000, 0x8000000 };
+	char c;
+	uint32_t v = 0;
+	size_t i;
+	for (i = 0; (c = readFromBinStream<uint8_t>(is)) & 0x80; ++i)
+	{
+		v |= (c & 0x7F) << (i * 7);
+	}
+	v |= c << (i * 7);
+	if(i >= 4) return (int32_t)v;
+	return v - (v >= vSize[i] ? (1 << ((i + 1) * 7)) : 0);
+}
+
+void writeSVToBinStream(std::ostream & os, int32_t v)
+{
+	static int32_t vSize[] = { 0, 0x40, 0x2000, 0x100000, 0x8000000 };
+	size_t i;
+	for (i = 1; i <= 4; ++i)
+	{
+		if (-vSize[i] <= v && v < vSize[i]) break;
+	}
+	uint32_t u;
+	if (i >= 5) u = (uint32_t)v;
+	else u = v + (v < 0 ? (1 << (i * 7)) : 0);
+	for (size_t n = 0; n < i; ++n)
+	{
+		uint8_t c = (v & 0x7F) | (n + 1 < i ? 0x80 : 0);
+		writeToBinStream(os, c);
+		v >>= 7;
+	}
 }

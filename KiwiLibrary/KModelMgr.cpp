@@ -226,7 +226,7 @@ KNLangModel::AllomorphSet KModelMgr::loadAllomorphFromTxt(std::istream & is, con
 void KModelMgr::loadCorpusFromTxt(std::istream & is, morphemeMap& morphMap, const KNLangModel::AllomorphSet& ams)
 {
 	string line;
-	vector<uint32_t> wids;
+	vector<KNLangModel::WID> wids;
 	wids.emplace_back(0);
 	while (getline(is, line))
 	{
@@ -373,7 +373,7 @@ KModelMgr::KModelMgr(const char * modelPath)
 	size_t morphIdToUpdate = morphemes.size();
 	morphemeMap morphMap;
 	loadMMFromTxt(ifstream{ modelPath + string{ "fullmodelV2.txt" } }, morphMap, nullptr, [](float morphWeight, KPOSTag tag) {
-		return morphWeight >= (tag >= KPOSTag::JKS ? 10 : 10);
+		return morphWeight >= (tag < KPOSTag::JKS ? 10 : 10);
 	});
 	for (size_t i = morphIdToUpdate; i < morphemes.size(); ++i)
 	{

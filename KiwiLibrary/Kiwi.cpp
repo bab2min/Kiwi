@@ -2,19 +2,33 @@
 #include "Utils.h"
 #include "Kiwi.h"
 #include "KFeatureTestor.h"
-#include "KModelMgr.h"
 #include "logPoisson.h"
 #include <future>
 
 using namespace std;
 
+//#define LOAD_TXT
+
 Kiwi::Kiwi(const char * modelPath, size_t _maxCache, size_t _numThread) 
 	: workers(_numThread ? _numThread : thread::hardware_concurrency()),
 	detector(10, 10, 0.1, _numThread)
 {
-	mdl = make_unique<KModelMgr>(modelPath);
+#ifdef LOAD_TXT
 	detector.loadPOSModelFromTxt(ifstream{ modelPath + string{ "RPosModel.txt" } });
 	detector.loadNounTailModelFromTxt(ifstream{ modelPath + string{ "NounTailList.txt" } });
+	{
+		ofstream ofs{ modelPath + string{ "extract.mdl" }, ios_base::binary };
+		detector.savePOSModel(ofs);
+		detector.saveNounTailModel(ofs);
+	}
+#else
+	{
+		ifstream ifs{ modelPath + string{ "extract.mdl" }, ios_base::binary };
+		detector.loadPOSModel(ifs);
+		detector.loadNounTailModel(ifs);
+	}
+#endif
+	mdl = make_unique<KModelMgr>(modelPath);
 }
 
 int Kiwi::addUserWord(const u16string & str, KPOSTag tag, float userScore)
@@ -584,17 +598,28 @@ void Kiwi::analyze(size_t topN, const function<u16string(size_t)>& reader, const
 	{
 		auto ustr = reader(id);
 		if (ustr.empty()) break;
-		futures.emplace_back(workers.enqueue([this, topN, id, ustr, &receiver, &sharedResult](size_t tid)
+		if (workers.getNumWorkers() > 1)
+		{
+			futures.emplace_back(workers.enqueue([this, topN, id, ustr, &receiver, &sharedResult](size_t tid)
+			{
+				auto r = analyze(ustr, topN);
+				sharedResult.addResult(id, move(r), receiver);
+			}));
+		}
+		else
 		{
 			auto r = analyze(ustr, topN);
-			sharedResult.addResult(id, move(r), receiver);
-		}));
+			receiver(id, move(r));
+		}
 	}
 
-	for (auto& f : futures) f.get();
+	if (workers.getNumWorkers() > 1)
+	{
+		for (auto& f : futures) f.get();
+	}
 }
 
-void Kiwi::extractAnalyze(size_t topN, const function<u16string(size_t)>& reader, const function<void(size_t, vector<KResult>&&)>& receiver, size_t minCnt, size_t maxWordLen, float minScore, float posThreshold) const
+void Kiwi::perform(size_t topN, const function<u16string(size_t)>& reader, const function<void(size_t, vector<KResult>&&)>& receiver, size_t minCnt, size_t maxWordLen, float minScore, float posThreshold) const
 {
 	auto old = make_unique<KModelMgr>(*mdl);
 	swap(old, const_cast<Kiwi*>(this)->mdl);
@@ -604,9 +629,9 @@ void Kiwi::extractAnalyze(size_t topN, const function<u16string(size_t)>& reader
 	swap(old, const_cast<Kiwi*>(this)->mdl);
 }
 
-vector<KResult> Kiwi::analyze(const u16string & str, size_t topN) const
+std::vector<KResult> Kiwi::analyzeSent(const std::u16string::const_iterator & sBegin, const std::u16string::const_iterator & sEnd, size_t topN) const
 {
-	auto nstr = normalizeHangul(str);
+	auto nstr = normalizeHangul({ sBegin, sEnd });
 	vector<uint32_t> posMap(nstr.size() + 1);
 	for (auto i = 0; i < nstr.size(); ++i)
 	{
@@ -614,8 +639,9 @@ vector<KResult> Kiwi::analyze(const u16string & str, size_t topN) const
 	}
 
 	auto nodes = mdl->getTrie()->split(nstr);
-	auto res = findBestPath(nodes, mdl->getLangModel(), mdl->getMorphemes(), topN);
 	vector<KResult> ret;
+	if (nodes.size() <= 2) return ret;
+	auto res = findBestPath(nodes, mdl->getLangModel(), mdl->getMorphemes(), topN);
 	for (auto&& r : res)
 	{
 		vector<KWordPair> rarr;
@@ -633,6 +659,61 @@ vector<KResult> Kiwi::analyze(const u16string & str, size_t topN) const
 	return ret;
 }
 
+vector<KResult> Kiwi::analyze(const u16string & str, size_t topN) const
+{
+	auto chunk = str.begin();
+	vector<u16string::const_iterator> sents;
+	sents.emplace_back(chunk);
+	while (1)
+	{
+		KPOSTag tag = identifySpecialChr(*chunk);
+		while (chunk != str.end() && !(tag == KPOSTag::SF || tag == KPOSTag::SS || tag == KPOSTag::SE || tag == KPOSTag::SW || *chunk == u':'))
+		{
+			++chunk;
+			tag = identifySpecialChr(*chunk);
+		}
+		if (chunk == str.end()) break;
+		++chunk;
+		if (tag == KPOSTag::SE)
+		{
+			sents.emplace_back(chunk);
+			continue;
+		}
+		if (chunk != str.end() && (identifySpecialChr(*chunk) == KPOSTag::UNKNOWN || identifySpecialChr(*chunk) == KPOSTag::SF))
+		{
+			while (chunk != str.end() && (identifySpecialChr(*chunk) == KPOSTag::UNKNOWN || identifySpecialChr(*chunk) == KPOSTag::SF))
+			{
+				++chunk;
+			}
+			sents.emplace_back(chunk);
+		}
+	}
+	sents.emplace_back(str.end());
+	vector<KResult> ret = analyzeSent(sents[0], sents[1], topN);
+	if (ret.empty())
+	{
+		ret.emplace_back();
+		return ret;
+	}
+	while (ret.size() < topN) ret.emplace_back(ret.back());
+	for (size_t i = 2; i < sents.size(); ++i)
+	{
+		auto res = analyzeSent(sents[i - 1], sents[i], topN);
+		if (res.empty()) continue;
+		for (size_t n = 0; n < topN; ++n)
+		{
+			auto& r = res[min(n, res.size() - 1)];
+			transform(r.first.begin(), r.first.end(), back_inserter(ret[n].first), [&sents, i](KWordPair& p)
+			{
+				p.pos() += distance(sents[0], sents[i - 1]);
+				return p;
+			});
+			ret[n].second += r.second;
+		}
+	}
+	return ret;
+}
+
 void Kiwi::clearCache()
 {
 
@@ -646,6 +727,11 @@ int Kiwi::getVersion()
 std::u16string Kiwi::toU16(const std::string & str)
 {
 	return utf8_to_utf16(str);
+}
+
+std::string Kiwi::toU8(const std::u16string & str)
+{
+	return utf16_to_utf8(str);
 }
 
 std::ostream & operator<<(std::ostream & os, const KWordPair & kp)

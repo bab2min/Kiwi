@@ -6,7 +6,7 @@ class KNLangModel
 {
 public:
 	typedef uint32_t WID;
-
+	static constexpr WID npos = (WID)-1;
 	class AllomorphSet
 	{
 		std::unordered_map<WID, size_t> morphToGroup;
@@ -216,47 +216,9 @@ public:
 			return { this, next.end() };
 		}
 
-		void writeToStream(std::ostream& str) const
-		{
-			str.write((const char*)&parent, sizeof(uint32_t));
-			str.write((const char*)&lower, sizeof(uint32_t));
-			str.write((const char*)&ll, sizeof(uint32_t));
-			str.write((const char*)&gamma, sizeof(uint32_t));
-			str.write((const char*)&depth, sizeof(uint8_t));
+		void writeToStream(std::ostream& str, size_t leafDepth = 3) const;
 
-			uint32_t size = bakedNext.size();
-			str.write((const char*)&size, sizeof(uint32_t));
-			for (auto& p : bakedNext)
-			{
-				str.write((const char*)&p.first, sizeof(uint32_t));
-				str.write((const char*)&p.second, sizeof(uint32_t));
-			}
-		}
-
-		static Node readFromStream(std::istream& str)
-		{
-			Node n(true);
-			str.read((char*)&n.parent, sizeof(uint32_t));
-			str.read((char*)&n.lower, sizeof(uint32_t));
-			str.read((char*)&n.ll, sizeof(uint32_t));
-			str.read((char*)&n.gamma, sizeof(uint32_t));
-			str.read((char*)&n.depth, sizeof(uint8_t));
-
-			uint32_t size;
-			str.read((char*)&size, sizeof(uint32_t));
-			std::vector<std::pair<WID, int32_t>> tNext;
-			tNext.reserve(size);
-			for (size_t i = 0; i < size; ++i)
-			{
-				uint32_t first;
-				int32_t second;
-				str.read((char*)&first, sizeof(uint32_t));
-				str.read((char*)&second, sizeof(uint32_t));
-				tNext.emplace_back(first, second);
-			}
-			n.bakedNext = BakedMap<WID, int32_t>{ tNext.begin(), tNext.end(), true };
-			return n;
-		}
+		static Node readFromStream(std::istream& str, size_t leafDepth = 3);
 	};
 protected:
 
@@ -296,7 +258,7 @@ public:
 		str.write((const char*)&size, sizeof(uint32_t));
 		for (auto& p : nodes)
 		{
-			p.writeToStream(str);
+			p.writeToStream(str, orderN);
 		}
 	}
 
@@ -321,8 +283,10 @@ public:
 		n.nodes.reserve(size);
 		for (size_t i = 0; i < size; ++i)
 		{
-			n.nodes.emplace_back(Node::readFromStream(str));
+			n.nodes.emplace_back(Node::readFromStream(str, n.orderN));
 		}
 		return n;
 	}
+
+	void printStat() const;
 };

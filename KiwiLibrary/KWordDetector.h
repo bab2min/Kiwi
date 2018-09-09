@@ -98,12 +98,8 @@ namespace std
 
 class u16light
 {
-public:
-	class iterator
-	{
-		
-	};
 private:
+	static constexpr size_t dlen = sizeof(char16_t*) - 1;
 	union
 	{
 		struct
@@ -114,7 +110,7 @@ private:
 		struct
 		{
 			uint16_t rawLen;
-			std::array<char16_t, 7> rawData;
+			std::array<char16_t, dlen> rawData;
 		};
 	};
 public:
@@ -124,7 +120,7 @@ public:
 
 	u16light(const u16light& o)
 	{
-		if (o.rawLen <= 7)
+		if (o.rawLen <= dlen)
 		{
 			rawLen = o.rawLen;
 			rawData = o.rawData;
@@ -146,7 +142,7 @@ public:
 	u16light(Iter begin, Iter end)
 	{
 		size_t l = std::distance(begin, end);
-		if (l <= 7)
+		if (l <= dlen)
 		{
 			rawLen = l;
 			copy(begin, end, rawData.begin());
@@ -161,14 +157,14 @@ public:
 
 	~u16light()
 	{
-		if (rawLen > 7) delete[] data;
+		if (rawLen > dlen) delete[] data;
 	}
 
 	u16light& operator=(const u16light& o)
 	{
-		if (rawLen > 7) delete[] data;
+		if (rawLen > dlen) delete[] data;
 
-		if (o.rawLen <= 7)
+		if (o.rawLen <= dlen)
 		{
 			rawLen = o.rawLen;
 			rawData = o.rawData;
@@ -211,13 +207,13 @@ public:
 
 	const char16_t* begin() const
 	{
-		if (rawLen <= 7) return &rawData[0];
+		if (rawLen <= dlen) return &rawData[0];
 		else return data;
 	}
 
 	const char16_t* end() const
 	{
-		if (rawLen <= 7) return &rawData[0] + rawLen;
+		if (rawLen <= dlen) return &rawData[0] + rawLen;
 		else return data + len;
 	}
 
@@ -233,25 +229,25 @@ public:
 
 	char16_t& front()
 	{
-		if (rawLen <= 7) return rawData[0];
+		if (rawLen <= dlen) return rawData[0];
 		else return data[0];
 	}
 
 	char16_t& back()
 	{
-		if (rawLen <= 7) return rawData[rawLen - 1];
+		if (rawLen <= dlen) return rawData[rawLen - 1];
 		else return data[len - 1];
 	}
 
 	const char16_t& front() const
 	{
-		if (rawLen <= 7) return rawData[0];
+		if (rawLen <= dlen) return rawData[0];
 		else return data[0];
 	}
 
 	const char16_t& back() const
 	{
-		if (rawLen <= 7) return rawData[rawLen - 1];
+		if (rawLen <= dlen) return rawData[rawLen - 1];
 		else return data[len - 1];
 	}
 
@@ -331,6 +327,10 @@ public:
 	}
 	void loadPOSModelFromTxt(std::istream& is);
 	void loadNounTailModelFromTxt(std::istream& is);
+	void loadPOSModel(std::istream& is);
+	void loadNounTailModel(std::istream& is);
+	void savePOSModel(std::ostream& os);
+	void saveNounTailModel(std::ostream& os);
 	std::vector<WordInfo> extractWords(const std::function<std::u16string(size_t)>& reader) const;
 };
 

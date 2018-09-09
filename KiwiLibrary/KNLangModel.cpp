@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "KNLangModel.h"
+#include "Utils.h"
 
 using namespace std;
 
@@ -193,4 +194,86 @@ float KNLangModel::evaluateLLSent(const WID * seq, size_t len) const
 		sum += evaluateLL(seq, i);
 	}
 	return sum;
+}
+
+void KNLangModel::printStat() const
+{
+	float llMin = INFINITY, llMax = -INFINITY;
+	float gMin = INFINITY, gMax = -INFINITY;
+	for (size_t i = 0; i < nodes.size(); ++i)
+	{
+		auto& n = nodes[i];
+		if (isnormal(n.ll))
+		{
+			llMin = min(n.ll, llMin);
+			llMax = max(n.ll, llMax);
+		}
+		if (isnormal(n.gamma))
+		{
+			gMin = min(n.gamma, gMin);
+			gMax = max(n.gamma, gMax);
+		}
+	}
+	cout << llMin << '\t' << llMax << endl;
+	cout << gMin << '\t' << gMax << endl;
+}
+
+void writeNegFixed16(std::ostream& os, float v)
+{
+	assert(v <= 0);
+	auto dv = (uint16_t)min(-v * (1 << 12), 65535.f);
+	writeToBinStream(os, dv);
+}
+
+float readNegFixed16(std::istream& is)
+{
+	auto dv = readFromBinStream<uint16_t>(is);
+	return -(dv / float(1 << 12));
+}
+
+
+void KNLangModel::Node::writeToStream(std::ostream & str, size_t leafDepth) const
+{
+	writeVToBinStream(str, -parent);
+	writeSVToBinStream(str, lower);
+	writeNegFixed16(str, ll);
+	writeNegFixed16(str, gamma);
+	writeToBinStream(str, depth);
+
+	uint32_t size = bakedNext.size();
+	writeVToBinStream(str, size);
+	for (auto& p : bakedNext)
+	{
+		writeVToBinStream(str, p.first);
+		if(depth < leafDepth - 1) writeVToBinStream(str, p.second);
+		else writeNegFixed16(str, *(float*)&p.second);
+	}
+}
+
+KNLangModel::Node KNLangModel::Node::readFromStream(istream & str, size_t leafDepth)
+{
+	Node n(true);
+	n.parent = -(int32_t)readVFromBinStream(str);
+	n.lower = readSVFromBinStream(str);
+	n.ll = readNegFixed16(str);
+	n.gamma = readNegFixed16(str);
+	readFromBinStream(str, n.depth);
+
+	uint32_t size = readVFromBinStream(str);
+	vector<pair<WID, int32_t>> tNext;
+	tNext.reserve(size);
+	for (size_t i = 0; i < size; ++i)
+	{
+		pair<WID, int32_t> p;
+		p.first = readVFromBinStream(str);
+		if(n.depth < leafDepth - 1) p.second = readVFromBinStream(str);
+		else
+		{
+			float f = readNegFixed16(str);
+			p.second = *(int32_t*)&f;
+		}
+		tNext.emplace_back(move(p));
+	}
+	n.bakedNext = BakedMap<WID, int32_t>{ tNext.begin(), tNext.end(), true };
+	return n;
 }

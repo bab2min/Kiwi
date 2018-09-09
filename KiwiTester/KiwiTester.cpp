@@ -111,12 +111,15 @@ int main()
 	setvbuf(stdout, nullptr, _IOFBF, 1000);
 	Timer timer;
 	Kiwi kw{ "../ModelGenerator/", (size_t)-1, 0 };
+	//kw.setCutOffThreshold(5);
+	if(0)
 	{
 		//ifstream ifs{ "../TestSets/15s.txt" };
 		ifstream ifs{ "D:/kornews.txt" };
-		auto res = kw.extractAddWords([&ifs](size_t id) -> u16string
+		ofstream ofs{ "D:/kornews_pp.txt" };
+		kw.perform(1, [&ifs](size_t id) -> u16string
 		{
-			if (id >= 20000)
+			if (id >= 500)
 			{
 				return {};
 			}
@@ -125,7 +128,6 @@ int main()
 				ifs.clear();
 				ifs.seekg(0);
 				string line;
-				for (size_t i = 0; i < 30000; ++i) getline(ifs, line);
 			}
 			string line;
 			while (getline(ifs, line))
@@ -134,14 +136,22 @@ int main()
 				if (sstr.size()) return utf8_to_utf16(sstr);
 			}
 			return {};
-		}, 4, 15);
+		}, [&ofs](size_t id, vector<KResult>&& res)
+		{
+			for (auto& r : res[0].first)
+			{
+				ofs << utf16_to_utf8(r.str()) << '/' << tagToString(r.tag()) << ' ';
+			}
+			ofs << endl;
 
-		ofstream ofs{ "extracted.txt" };
+		}, 5, 15);
+
+		/*ofstream ofs{ "extracted.txt" };
 		for (auto& r : res)
 		{
 			ofs << utf16_to_utf8(r.form) << '\t' << r.score << '\t' << r.freq
 				<< '\t' << r.posScore[KPOSTag::NNP] << endl;
-		}
+		}*/
 		return 0;
 	}
 	//kw.addUserWord(u"¿¥¸¶´©¿¤", KPOSTag::NNP);
@@ -152,7 +162,7 @@ int main()
 	SIZE_T memUsed = pmc.WorkingSetSize;
 	cout << "Mem Usage : " << memUsed / 1024.f / 1024.f << " MB" << endl;
 	
-	kw.analyze(KSTR(R"!(³ì¾Ò´ÙÇØ¼­)!"), 10);
+	kw.analyze(KSTR(R"!(  )!"), 10);
 
 	string testFiles[] = { "01s.txt", "02s.txt", "03s.txt", "17s.txt", "18s.txt", "13s.txt", "15s.txt", };
 	for (auto tf : testFiles)

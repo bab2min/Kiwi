@@ -291,3 +291,5 @@ ModelManifest.xml
 /ModelGenerator/*.lang
 /ModelGenerator/*.morph
 /KiwiTester/test.txt
+/ModelGenerator/extract.mdl
+*.pyd
