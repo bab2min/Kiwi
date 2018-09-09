@@ -4,12 +4,68 @@
 
 using namespace std;
 
+class SpaceSplitIterator
+{
+	static bool isspace(char16_t c)
+	{
+		switch (c)
+		{
+		case u' ':
+		case u'\f':
+		case u'\n':
+		case u'\r':
+		case u'\t':
+		case u'\v':
+			return true;
+		}
+		return false;
+	}
+
+	u16string::const_iterator mBegin, mChunk, mEnd;
+public:
+	SpaceSplitIterator(const u16string::const_iterator& _begin = {}, const u16string::const_iterator& _end = {})
+		: mBegin(_begin), mEnd(_end)
+	{
+		while (mBegin != mEnd && isspace(*mBegin)) ++mBegin;
+		mChunk = mBegin;
+		while (mChunk != mEnd && !isspace(*mChunk)) ++mChunk;
+	}
+
+	SpaceSplitIterator& operator++()
+	{
+		mBegin = mChunk;
+		while (mBegin != mEnd && isspace(*mBegin)) ++mBegin;
+		mChunk = mBegin;
+		while (mChunk != mEnd && !isspace(*mChunk)) ++mChunk;
+		return *this;
+	}
+
+	bool operator==(const SpaceSplitIterator& o) const
+	{
+		if (mBegin == mEnd && o.mBegin == o.mEnd) return true;
+		return mBegin == o.mBegin;
+	}
+
+	bool operator!=(const SpaceSplitIterator& o) const
+	{
+		return !operator==(o);
+	}
+
+	u16string operator*() const
+	{
+		return { mBegin, mChunk };
+	}
+
+	u16string::const_iterator strBegin() const { return mBegin; }
+	u16string::const_iterator strEnd() const { return mChunk; }
+	size_t strSize() const { return distance(mBegin, mChunk); }
+};
+
 void KWordDetector::countUnigram(Counter& cdata, const function<u16string(size_t)>& reader) const
 {
 	auto ldUnigram = readProc<vector<uint32_t>>(reader, [this, &cdata](u16string ustr, size_t id, vector<uint32_t>& ld)
 	{
-		basic_stringstream<char16_t> ss{ ustr };
-		istream_iterator<u16string, char16_t> begin{ ss }, end{};
+		SpaceSplitIterator begin{ ustr.begin(), ustr.end() }, end;
 		vector<uint16_t> ids;
 		vector<size_t> chk;
 		chk.emplace_back(0);
@@ -17,7 +73,7 @@ void KWordDetector::countUnigram(Counter& cdata, const function<u16string(size_t
 		{
 			for (; begin != end; ++begin)
 			{
-				auto r = cdata.chrDict.getOrAddsWithoutLock(begin->begin(), begin->end());
+				auto r = cdata.chrDict.getOrAddsWithoutLock(begin.strBegin(), begin.strEnd());
 				ids.insert(ids.end(), r.begin(), r.end());
 				chk.emplace_back(ids.size());
 			}
@@ -58,8 +114,7 @@ void KWordDetector::countBigram(Counter& cdata, const function<u16string(size_t)
 {
 	auto ldBigram = readProc<vector<uint32_t>>(reader, [this, &cdata](u16string ustr, size_t id, vector<uint32_t>& ld)
 	{
-		basic_stringstream<char16_t> ss{ ustr };
-		istream_iterator<u16string, char16_t> begin{ ss }, end{};
+		SpaceSplitIterator begin{ ustr.begin(), ustr.end() }, end;
 		for (; begin != end; ++begin)
 		{
 			uint16_t a = 1;
@@ -95,13 +150,12 @@ void KWordDetector::countNgram(Counter& cdata, const function<u16string(size_t)>
 	{
 		auto ustr = reader(id);
 		if (ustr.empty()) break;
-		basic_stringstream<char16_t> ss{ ustr };
-		istream_iterator<u16string, char16_t> begin{ ss }, end{};
+		SpaceSplitIterator begin{ ustr.begin(), ustr.end() }, end;
 		auto idss = make_shared<vector<vector<int16_t, pool_allocator<void*>>, pool_allocator<void*>>>();
 		for (; begin != end; ++begin)
 		{
 			vector<int16_t, pool_allocator<void*>> ids;
-			ids.reserve(begin->size() + 2);
+			ids.reserve(begin.strSize() + 2);
 			ids.emplace_back(1);
 			for (auto c : *begin)
 			{
@@ -285,6 +339,27 @@ void KWordDetector::loadNounTailModelFromTxt(std::istream & is)
 		nounTailScore[fields[0]] = p;
 	}
 }
+
+void KWordDetector::savePOSModel(std::ostream & os)
+{
+	writeToBinStream(os, posScore);
+}
+
+void KWordDetector::saveNounTailModel(std::ostream & os)
+{
+	writeToBinStream(os, nounTailScore);
+}
+
+void KWordDetector::loadPOSModel(std::istream & is)
+{
+	readFromBinStream(is, posScore);
+}
+
+void KWordDetector::loadNounTailModel(std::istream & is)
+{
+	readFromBinStream(is, nounTailScore);
+}
+
 
 vector<KWordDetector::WordInfo> KWordDetector::extractWords(const std::function<std::u16string(size_t)>& reader) const
 {

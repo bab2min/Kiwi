@@ -20,6 +20,7 @@
 #include <sstream>
 #include <iostream>
 #include <fstream>
+#include <regex>
 
 #include <memory>
 #include <locale>

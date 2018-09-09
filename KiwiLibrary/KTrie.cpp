@@ -235,7 +235,7 @@ KTrie KTrie::loadFromBin(std::istream & is, const KForm* base)
 	uint16_t len = readFromBinStream<uint16_t>(is);
 	for (size_t i = 0; i < len; ++i)
 	{
-		t.next.emplace(readFromBinStream<char16_t, int32_t>(is));
+		t.next.emplace(readFromBinStream<pair<char16_t, int32_t>>(is));
 	}
 	readFromBinStream(is, t.fail);
 	uint32_t fVal = readFromBinStream<uint32_t>(is);
