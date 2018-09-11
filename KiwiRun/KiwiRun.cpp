@@ -1,14 +1,19 @@
 // KiwiRun.cpp : Defines the entry point for the console application.
 //
 
-#include "stdafx.h"
-#ifdef _WIN32
 #include "../KiwiLibrary/KiwiHeader.h"
 #include "../KiwiLibrary/Kiwi.h"
+
+using namespace std;
+#ifdef _WIN32
 #else
-#include "../KiwiLibraryLinux/KiwiHeader.h"
-#include "../KiwiLibraryLinux/Kiwi.h"
+int fopen_s(FILE** f, const char* a, const char* b)
+{
+	*f = fopen(a, b);
+	return !f;
+}
 #endif
+
 unordered_map<string, vector<string>> parseArg(int argc, const char** argv)
 {
 	unordered_map<string, vector<string>> ret;
@@ -33,14 +38,13 @@ unordered_map<string, vector<string>> parseArg(int argc, const char** argv)
 void help()
 {
 	printf("Kiwi : Korean Intelligent Word Identifier\n"
-		"version: 0.2\n"
+		"version: 0.5\n"
 		"\n"
 		"= Usage =\n"
 		"kiwi [-m model] [-u user] [-o output] [-c cache] [-n number] input...\n"
 		"\tmodel: (Optional) path of model file\n"
 		"\tuser: (Optional) path of user dictionary file\n"
 		"\toutput: (Optional) path of result file\n"
-		"\tcache: (Optional) max size of cache data\n"
 		"\tnumber: (Optional) the number of analyzed result, default = 1\n"
 		"\tinput: path of input file to be analyzed\n");
 }
@@ -87,7 +91,7 @@ int main(int argc, const char** argv)
 	Kiwi* kiwi = nullptr;
 	try
 	{
-		kiwi = new Kiwi{ model.c_str(), maxCache };
+		kiwi = new Kiwi{ model.c_str(), };
 		if (!userDict.empty()) kiwi->loadUserDictionary(userDict.c_str());
 		kiwi->prepare();
 	}
@@ -120,12 +124,11 @@ int main(int argc, const char** argv)
 			continue;
 		}
 		char buf[8192];
-		wstring_convert<codecvt_utf8_utf16<k_wchar>, k_wchar> converter;
 		while (fgets(buf, 8192, f))
 		{
 			try
 			{
-				auto wstr = converter.from_bytes(buf);
+				auto wstr = Kiwi::toU16(buf);
 				auto cands = kiwi->analyze(wstr, topN);
 				for (const auto& c : cands)
 				{
@@ -134,14 +137,14 @@ int main(int argc, const char** argv)
 						if (of == stdout)
 						{
 #ifdef _WIN32
-							fputws(m.first.c_str(), of);
+							fputws((const wchar_t*)m.str().c_str(), of);
 #else
-							fputs(converter.to_bytes(m.first).c_str(), of);
+							fputs(Kiwi::toU8(m.str()).c_str(), of);
 #endif
 						}
-						else fputs(converter.to_bytes(m.first).c_str(), of);
+						else fputs(Kiwi::toU8(m.str()).c_str(), of);
 						fputc('/', of);
-						fputs(tagToString(m.second), of);
+						fputs(tagToString(m.tag()), of);
 						fputc('\t', of);
 					}
 					fputc('\n', of);

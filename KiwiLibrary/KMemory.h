@@ -118,21 +118,21 @@ public:
 		auto& logger = KSingleLogger::getInstance();
 		logger.totalAlloc[bytes]++;
 		logger.currentAlloc[bytes]++;
-		logger.maxAlloc[bytes] = max(logger.maxAlloc[bytes], logger.currentAlloc[bytes]);
-		return allocator<T>::allocate(n, hint);
+		logger.maxAlloc[bytes] = std::max(logger.maxAlloc[bytes], logger.currentAlloc[bytes]);
+		return std::allocator<T>::allocate(n, hint);
 	}
 
 	void deallocate(pointer p, size_type n)
 	{
 		//if (n * sizeof(T) > 128) fprintf(stderr, "Dealloc %d bytes (%p).\n", n * sizeof(T), p);
 		KSingleLogger::getInstance().currentAlloc[n * sizeof(T)]--;
-		return allocator<T>::deallocate(p, n);
+		return std::allocator<T>::deallocate(p, n);
 	}
 
-	logger_allocator() throw() : allocator<T>() { /*fprintf(stderr, "Hello allocator!\n");*/ }
-	logger_allocator(const logger_allocator &a) throw() : allocator<T>(a) { }
+	logger_allocator() throw() : std::allocator<T>() { /*fprintf(stderr, "Hello allocator!\n");*/ }
+	logger_allocator(const logger_allocator &a) throw() : std::allocator<T>(a) { }
 	template <class U>
-	logger_allocator(const logger_allocator<U> &a) throw() : allocator<T>(a) { }
+	logger_allocator(const logger_allocator<U> &a) throw() : std::allocator<T>(a) { }
 	~logger_allocator() throw() { }
 };
 
@@ -152,36 +152,36 @@ public:
 
 	pointer allocate(size_type n, const void *hint = 0)
 	{
-		if (n * sizeof(value_type) <= 16) return (pointer)KPool<16, 4096>::getInstance().allocate();
-		if (n * sizeof(value_type) <= 64) return (pointer)KPool<64, 1024>::getInstance().allocate();
-		if (n * sizeof(value_type) <= 256) return (pointer)KPool<256, 256>::getInstance().allocate();
-		if (n * sizeof(value_type) <= 1024) return (pointer)KPool<1024, 64>::getInstance().allocate();
-		if (n * sizeof(value_type) <= 4096) return (pointer)KPool<4096, 16>::getInstance().allocate();
-		if (n * sizeof(value_type) <= 16384) return (pointer)KPool<16384, 8>::getInstance().allocate();
-		if (n * sizeof(value_type) <= 32768) return (pointer)KPool<32768, 8>::getInstance().allocate();
-		if (n * sizeof(value_type) <= 65536) return (pointer)KPool<65536, 8>::getInstance().allocate();
+		if (n * sizeof(T) <= 16) return (pointer)KPool<16, 4096>::getInstance().allocate();
+		if (n * sizeof(T) <= 64) return (pointer)KPool<64, 1024>::getInstance().allocate();
+		if (n * sizeof(T) <= 256) return (pointer)KPool<256, 256>::getInstance().allocate();
+		if (n * sizeof(T) <= 1024) return (pointer)KPool<1024, 64>::getInstance().allocate();
+		if (n * sizeof(T) <= 4096) return (pointer)KPool<4096, 16>::getInstance().allocate();
+		if (n * sizeof(T) <= 16384) return (pointer)KPool<16384, 8>::getInstance().allocate();
+		if (n * sizeof(T) <= 32768) return (pointer)KPool<32768, 8>::getInstance().allocate();
+		if (n * sizeof(T) <= 65536) return (pointer)KPool<65536, 8>::getInstance().allocate();
 		//fprintf(stderr, "Alloc %d bytes.\n", n * sizeof(value_type));
-		return allocator<value_type>::allocate(n, hint);
+		return std::allocator<T>::allocate(n, hint);
 	}
 
 	void deallocate(pointer p, size_type n)
 	{
-		if (n * sizeof(value_type) <= 16) return KPool<16, 4096>::getInstance().deallocate(p);
-		if (n * sizeof(value_type) <= 64) return KPool<64, 1024>::getInstance().deallocate(p);
-		if (n * sizeof(value_type) <= 256) return KPool<256, 256>::getInstance().deallocate(p);
-		if (n * sizeof(value_type) <= 1024) return KPool<1024, 64>::getInstance().deallocate(p);
-		if (n * sizeof(value_type) <= 4096) return KPool<4096, 16>::getInstance().deallocate(p);
-		if (n * sizeof(value_type) <= 16384) return KPool<16384, 8>::getInstance().deallocate(p);
-		if (n * sizeof(value_type) <= 32768) return KPool<32768, 8>::getInstance().deallocate(p);
-		if (n * sizeof(value_type) <= 65536) return KPool<65536, 8>::getInstance().deallocate(p);
+		if (n * sizeof(T) <= 16) return KPool<16, 4096>::getInstance().deallocate(p);
+		if (n * sizeof(T) <= 64) return KPool<64, 1024>::getInstance().deallocate(p);
+		if (n * sizeof(T) <= 256) return KPool<256, 256>::getInstance().deallocate(p);
+		if (n * sizeof(T) <= 1024) return KPool<1024, 64>::getInstance().deallocate(p);
+		if (n * sizeof(T) <= 4096) return KPool<4096, 16>::getInstance().deallocate(p);
+		if (n * sizeof(T) <= 16384) return KPool<16384, 8>::getInstance().deallocate(p);
+		if (n * sizeof(T) <= 32768) return KPool<32768, 8>::getInstance().deallocate(p);
+		if (n * sizeof(T) <= 65536) return KPool<65536, 8>::getInstance().deallocate(p);
 		//fprintf(stderr, "Dealloc %d bytes (%p).\n", n * sizeof(value_type), p);
-		return allocator<value_type>::deallocate(p, n);
+		return std::allocator<T>::deallocate(p, n);
 	}
 
-	pool_allocator() throw() : allocator<T>() { }
-	pool_allocator(const pool_allocator &a) throw() : allocator<T>(a) { }
+	pool_allocator() throw() : std::allocator<T>() { }
+	pool_allocator(const pool_allocator &a) throw() : std::allocator<T>(a) { }
 	template <class U>
-	pool_allocator(const pool_allocator<U> &a) throw() : allocator<T>(a) { }
+	pool_allocator(const pool_allocator<U> &a) throw() : std::allocator<T>(a) { }
 	~pool_allocator() throw() { }
 };
 
@@ -205,7 +205,7 @@ public:
 		if (n * sizeof(T) <= 16) return (pointer)KPool<16, 4000>::getInstance().allocate();
 		if (n * sizeof(T) <= 32) return (pointer)KPool<32, 2000>::getInstance().allocate();
 		if (n * sizeof(T) <= 48) return (pointer)KPool<48, 1000>::getInstance().allocate();
-		return allocator<T>::allocate(n, hint);
+		return std::allocator<T>::allocate(n, hint);
 	}
 
 	void deallocate(pointer p, size_type n)
@@ -213,13 +213,13 @@ public:
 		if (n * sizeof(T) <= 16) return KPool<16, 4000>::getInstance().deallocate(p);
 		if (n * sizeof(T) <= 32) return KPool<32, 2000>::getInstance().deallocate(p);
 		if (n * sizeof(T) <= 48) return KPool<48, 1000>::getInstance().deallocate(p);
-		return allocator<T>::deallocate(p, n);
+		return std::allocator<T>::deallocate(p, n);
 	}
 
-	spool_allocator() throw() : allocator<T>() { /*fprintf(stderr, "Hello allocator!\n");*/ }
-	spool_allocator(const spool_allocator &a) throw() : allocator<T>(a) { }
+	spool_allocator() throw() : std::allocator<T>() { /*fprintf(stderr, "Hello allocator!\n");*/ }
+	spool_allocator(const spool_allocator &a) throw() : std::allocator<T>(a) { }
 	template <class U>
-	spool_allocator(const spool_allocator<U> &a) throw() : allocator<T>(a) { }
+	spool_allocator(const spool_allocator<U> &a) throw() : std::allocator<T>(a) { }
 	~spool_allocator() throw() { }
 };
 

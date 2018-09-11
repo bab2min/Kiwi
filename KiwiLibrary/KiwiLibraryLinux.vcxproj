@@ -27,14 +27,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{48e547b2-e401-4299-a9f1-bdd7f55f8ff6}</ProjectGuid>
+    <ProjectGuid>{505e5316-76fb-4f4b-853c-969c976c8c8a}</ProjectGuid>
     <Keyword>Linux</Keyword>
-    <RootNamespace>KiwiRunLinux</RootNamespace>
+    <RootNamespace>KiwiLibraryLinux</RootNamespace>
     <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
     <ApplicationType>Linux</ApplicationType>
     <ApplicationTypeRevision>1.0</ApplicationTypeRevision>
     <TargetLinuxPlatform>Generic</TargetLinuxPlatform>
-    <LinuxProjectType>{D51BCBC9-82E9-4017-911E-C93873C4EA2B}</LinuxProjectType>
+    <LinuxProjectType>{2238F9CD-F817-4ECC-BD14-2524D2669B35}</LinuxProjectType>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
@@ -51,9 +51,11 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <UseDebugLibraries>true</UseDebugLibraries>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <UseDebugLibraries>false</UseDebugLibraries>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings" />
@@ -61,34 +63,44 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <ItemGroup>
-    <ProjectReference Include="..\KiwiLibraryLinux\KiwiLibraryLinux.vcxproj">
-      <Project>{505e5316-76fb-4f4b-853c-969c976c8c8a}</Project>
-      <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
-    </ProjectReference>
+    <ClInclude Include="BakedMap.hpp" />
+    <ClInclude Include="KFeatureTestor.h" />
+    <ClInclude Include="KForm.h" />
+    <ClInclude Include="Kiwi.h" />
+    <ClInclude Include="KiwiHeader.h" />
+    <ClInclude Include="KMemory.h" />
+    <ClInclude Include="KMemoryChar.h" />
+    <ClInclude Include="KModelMgr.h" />
+    <ClInclude Include="KNLangModel.h" />
+    <ClInclude Include="KTrie.h" />
+    <ClInclude Include="KWordDetector.h" />
+    <ClInclude Include="logPoisson.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="ThreadPool.h" />
+    <ClInclude Include="Trie.hpp" />
+    <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\KiwiRun\KiwiRun.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\KiwiRun\stdafx.h" />
+    <ClCompile Include="KFeatureTestor.cpp" />
+    <ClCompile Include="KForm.cpp" />
+    <ClCompile Include="Kiwi.cpp" />
+    <ClCompile Include="KModelMgr.cpp" />
+    <ClCompile Include="KNLangModel.cpp" />
+    <ClCompile Include="KTrie.cpp" />
+    <ClCompile Include="KWordDetector.cpp" />
+    <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <CppLanguageStandard>c++1y</CppLanguageStandard>
     </ClCompile>
-    <Link>
-      <LibraryDependencies>KiwiLibraryLinux</LibraryDependencies>
-      <AdditionalLibraryDirectories>/root/projects/KiwiLibraryLinux/bin/x64/Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <CppLanguageStandard>c++1y</CppLanguageStandard>
+      <AdditionalOptions>-fpermissive %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
-    <Link>
-      <LibraryDependencies>KiwiLibraryLinux</LibraryDependencies>
-      <AdditionalLibraryDirectories>/root/projects/KiwiLibraryLinux/bin/x64/Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-    </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

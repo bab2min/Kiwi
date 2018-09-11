@@ -3,6 +3,8 @@
 #include "Utils.h"
 #include "KModelMgr.h"
 
+//#define LOAD_TXT
+
 namespace std
 {
 	template <>
@@ -17,6 +19,7 @@ namespace std
 
 using namespace std;
 
+#ifdef LOAD_TXT
 void KModelMgr::loadMMFromTxt(std::istream& is, morphemeMap& morphMap, std::unordered_map<KPOSTag, float>* posWeightSum, const function<bool(float, KPOSTag)>& selector)
 {
 	string line;
@@ -319,6 +322,8 @@ size_t KModelMgr::estimateTrieSize() const
 	return tries.size() + (size_t)KPOSTag::SN + 3;
 }
 
+#endif
+
 void KModelMgr::loadMorphBin(std::istream& is)
 {
 	if (readFromBinStream<uint32_t>(is) != 0x4B495749) throw KiwiException("[loadMorphBin] Input file is corrupted.");
@@ -355,7 +360,6 @@ KForm & KModelMgr::formMapper(k_string form)
 	return forms[id];
 }
 
-//#define LOAD_TXT
 
 KModelMgr::KModelMgr(const char * modelPath)
 {
@@ -405,8 +409,13 @@ KModelMgr::KModelMgr(const char * modelPath)
 	langMdl->writeToStream(ofstream{ modelPath + string{ "sj.lang" }, ios_base::binary });
 	
 #else
-	loadMorphBin(ifstream{ modelPath + string{ "sj.morph" }, ios_base::binary });
-	langMdl = make_shared<KNLangModel>(KNLangModel::readFromStream(ifstream{ modelPath + string{ "sj.lang" }, ios_base::binary }));
+	{
+		ifstream ifs{ modelPath + string{ "sj.morph" }, ios_base::binary };
+		loadMorphBin(ifs);
+	}
+	{
+		langMdl = make_shared<KNLangModel>(KNLangModel::readFromStream(ifstream{ modelPath + string{ "sj.lang" }, ios_base::binary }));
+	}
 #endif
 }
 

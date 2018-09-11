@@ -70,30 +70,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetExt>.so</TargetExt>
   </PropertyGroup>
-  <ItemGroup>
-    <ClCompile Include="..\KiwiLibrary\KFeatureTestor.cpp" />
-    <ClCompile Include="..\KiwiLibrary\KForm.cpp" />
-    <ClCompile Include="..\KiwiLibrary\Kiwi.cpp" />
-    <ClCompile Include="..\KiwiLibrary\KModelMgr.cpp" />
-    <ClCompile Include="..\KiwiLibrary\KTrie.cpp" />
-    <ClCompile Include="..\KiwiLibrary\stdafx.cpp" />
-    <ClCompile Include="..\KiwiLibrary\Utils.cpp" />
-    <ClCompile Include="KiwiPy.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\KiwiLibrary\KFeatureTestor.h" />
-    <ClInclude Include="..\KiwiLibrary\KForm.h" />
-    <ClInclude Include="..\KiwiLibrary\Kiwi.h" />
-    <ClInclude Include="..\KiwiLibrary\KiwiHeader.h" />
-    <ClInclude Include="..\KiwiLibrary\KMemory.h" />
-    <ClInclude Include="..\KiwiLibrary\KMemoryChar.h" />
-    <ClInclude Include="..\KiwiLibrary\KMemoryKChunk.h" />
-    <ClInclude Include="..\KiwiLibrary\KModelMgr.h" />
-    <ClInclude Include="..\KiwiLibrary\KTrie.h" />
-    <ClInclude Include="..\KiwiLibrary\stdafx.h" />
-    <ClInclude Include="..\KiwiLibrary\targetver.h" />
-    <ClInclude Include="..\KiwiLibrary\Utils.h" />
-  </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Link />
     <ClCompile>
