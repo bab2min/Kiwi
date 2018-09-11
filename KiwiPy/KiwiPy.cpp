@@ -9,19 +9,6 @@ using namespace std;
 
 static PyObject* gModule;
 
-Kiwi* tryLoad(const string& path)
-{
-	Kiwi* inst = nullptr;
-	try
-	{
-		inst = new Kiwi{ path.c_str(), 0, 0 };
-	}
-	catch (const exception&)
-	{
-	}
-	return inst;
-}
-
 static PyObject* kiwi__init(PyObject* self, PyObject* args)
 {
 	PyObject* argSelf;
@@ -30,7 +17,11 @@ static PyObject* kiwi__init(PyObject* self, PyObject* args)
 	try
 	{
 		Kiwi* inst = nullptr;
-		if (!(inst = tryLoad(modelPath)))
+		try
+		{
+			inst = new Kiwi{ modelPath, 0, 0 };
+		}
+		catch (const exception& e)
 		{
 			PyObject* filePath = PyModule_GetFilenameObject(gModule);
 			char16_t path[256] = { 0, };
@@ -45,15 +36,13 @@ static PyObject* kiwi__init(PyObject* self, PyObject* args)
 			{
 				spath = spath.substr(0, spath.rfind('\\') + 1);
 			}
-			inst = tryLoad(spath + modelPath);
+			inst = new Kiwi{ (spath + modelPath).c_str(), 0, 0 };
 		}
-		if (!inst) throw runtime_error((string("Cannot find ") + modelPath).c_str());
 		PyObject_SetAttrString(argSelf, "_inst", PyLong_FromLongLong((long long)inst));
 	}
 	catch (const exception& e)
 	{
-		cerr << e.what() << endl;
-		PyErr_SetString(PyExc_IOError, e.what());
+		PyErr_SetString(PyExc_Exception, e.what());
 		return nullptr;
 	}
 	
@@ -75,8 +64,7 @@ static PyObject* kiwi__close(PyObject* self, PyObject* args)
 	}
 	catch (const exception& e)
 	{
-		cerr << e.what() << endl;
-		PyErr_SetString(PyExc_RuntimeError, e.what());
+		PyErr_SetString(PyExc_Exception, e.what());
 		return nullptr;
 	}
 
@@ -100,8 +88,7 @@ static PyObject* kiwi__addUserWord(PyObject* self, PyObject* args)
 	}
 	catch (const exception& e)
 	{
-		cerr << e.what() << endl;
-		PyErr_SetString(PyExc_RuntimeError, e.what());
+		PyErr_SetString(PyExc_Exception, e.what());
 		return nullptr;
 	}
 }
@@ -120,8 +107,7 @@ static PyObject* kiwi__loadUserDictionary(PyObject* self, PyObject* args)
 	}
 	catch (const exception& e)
 	{
-		cerr << e.what() << endl;
-		PyErr_SetString(PyExc_RuntimeError, e.what());
+		PyErr_SetString(PyExc_Exception, e.what());
 		return nullptr;
 	}
 }
@@ -159,8 +145,7 @@ static PyObject* kiwi__extractWords(PyObject* self, PyObject* args)
 	}
 	catch (const exception& e)
 	{
-		cerr << e.what() << endl;
-		PyErr_SetString(PyExc_RuntimeError, e.what());
+		PyErr_SetString(PyExc_Exception, e.what());
 		return nullptr;
 	}
 
@@ -202,8 +187,7 @@ static PyObject* kiwi__extractFilterWords(PyObject* self, PyObject* args)
 	}
 	catch (const exception& e)
 	{
-		cerr << e.what() << endl;
-		PyErr_SetString(PyExc_RuntimeError, e.what());
+		PyErr_SetString(PyExc_Exception, e.what());
 		return nullptr;
 	}
 
@@ -244,8 +228,7 @@ static PyObject* kiwi__extractAddWords(PyObject* self, PyObject* args)
 	}
 	catch (const exception& e)
 	{
-		cerr << e.what() << endl;
-		PyErr_SetString(PyExc_RuntimeError, e.what());
+		PyErr_SetString(PyExc_Exception, e.what());
 		return nullptr;
 	}
 
@@ -267,8 +250,7 @@ static PyObject* kiwi__setCutOffThreshold(PyObject* self, PyObject* args)
 	}
 	catch (const exception& e)
 	{
-		cerr << e.what() << endl;
-		PyErr_SetString(PyExc_RuntimeError, e.what());
+		PyErr_SetString(PyExc_Exception, e.what());
 		return nullptr;
 	}
 
@@ -289,8 +271,7 @@ static PyObject* kiwi__prepare(PyObject* self, PyObject* args)
 	}
 	catch (const exception& e)
 	{
-		cerr << e.what() << endl;
-		PyErr_SetString(PyExc_RuntimeError, e.what());
+		PyErr_SetString(PyExc_Exception, e.what());
 		return nullptr;
 	}
 }
@@ -331,8 +312,7 @@ static PyObject* kiwi__analyze(PyObject* self, PyObject* args)
 			}
 			catch (const exception& e)
 			{
-				cerr << e.what() << endl;
-				PyErr_SetString(PyExc_RuntimeError, e.what());
+				PyErr_SetString(PyExc_Exception, e.what());
 				return nullptr;
 			}
 		}
@@ -371,8 +351,7 @@ static PyObject* kiwi__analyze(PyObject* self, PyObject* args)
 			}
 			catch (const exception& e)
 			{
-				cerr << e.what() << endl;
-				PyErr_SetString(PyExc_RuntimeError, e.what());
+				PyErr_SetString(PyExc_Exception, e.what());
 				return nullptr;
 			}
 		}
@@ -419,8 +398,7 @@ static PyObject* kiwi__perform(PyObject* self, PyObject* args)
 	}
 	catch (const exception& e)
 	{
-		cerr << e.what() << endl;
-		PyErr_SetString(PyExc_RuntimeError, e.what());
+		PyErr_SetString(PyExc_Exception, e.what());
 		return nullptr;
 	}
 	return nullptr;
@@ -441,7 +419,7 @@ static PyObject* kiwi__version(PyObject* self, PyObject* args)
 	catch (const exception& e)
 	{
 		cerr << e.what() << endl;
-		PyErr_SetString(PyExc_RuntimeError, e.what());
+		PyErr_SetString(PyExc_Exception, e.what());
 		return nullptr;
 	}
 }
@@ -472,7 +450,11 @@ static PyObject *createClassObject(const char *name, PyMethodDef methods[])
 	return pClass;
 }
 
-PyMODINIT_FUNC PyInit_kiwipy()
+#ifdef _WIN64
+PyMODINIT_FUNC PyInit_coreWinx64()
+#elif _WIN32
+PyMODINIT_FUNC PyInit_coreWinx86()
+#endif
 {
 	static PyMethodDef methods[] =
 	{

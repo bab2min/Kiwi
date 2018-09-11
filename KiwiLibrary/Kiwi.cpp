@@ -71,6 +71,11 @@ int Kiwi::prepare()
 	return 0;
 }
 
+void Kiwi::setCutOffThreshold(float _cutOffThreshold)
+{
+	cutOffThreshold = std::max(_cutOffThreshold, 1.f);
+}
+
 vector<KWordDetector::WordInfo> Kiwi::extractWords(const function<u16string(size_t)>& reader, size_t minCnt, size_t maxWordLen, float minScore)
 {
 	detector.setParameters(minCnt, maxWordLen, minScore);
@@ -223,7 +228,7 @@ typedef vector<pair<MInfos, float>, pool_allocator<pair<MInfos, float>>> WordLLs
 
 template<class _Type>
 auto evalTrigram(const KNLangModel * knlm, const KMorpheme* morphBase, const pair<MInfos, float>** wBegin, const pair<MInfos, float>** wEnd, 
-	array<WID, 5> seq, size_t chSize, const KMorpheme* curMorph, const KGraphNode* node, uint8_t combSocket, _Type maxWidLL)
+	array<WID, 6> seq, size_t chSize, const KMorpheme* curMorph, const KGraphNode* node, uint8_t combSocket, _Type maxWidLL)
 {
 	for (; wBegin != wEnd; ++wBegin)
 	{
@@ -307,7 +312,7 @@ vector<pair<Kiwi::path, float>> Kiwi::findBestPath(const vector<KGraphNode>& gra
 		float tMax = -INFINITY;
 		for (auto& curMorph : cands)
 		{
-			array<WID, 5> seq = { 0, };
+			array<WID, 6> seq = { 0, };
 			size_t combSocket = 0;
 			KCondVowel condV = KCondVowel::none;
 			KCondPolarity condP = KCondPolarity::none;
