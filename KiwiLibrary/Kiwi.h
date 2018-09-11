@@ -54,7 +54,7 @@ public:
 	int addUserWord(const std::u16string& str, KPOSTag tag, float userScore = 20);
 	int loadUserDictionary(const char* userDictPath = "");
 	int prepare();
-	void setCutOffThreshold(float _cutOffThreshold) { cutOffThreshold = _cutOffThreshold; }
+	void setCutOffThreshold(float _cutOffThreshold);
 	std::vector<KWordDetector::WordInfo> extractWords(const std::function<std::u16string(size_t)>& reader, size_t minCnt = 10, size_t maxWordLen = 10, float minScore = 0.25);
 	std::vector<KWordDetector::WordInfo> filterExtractedWords(std::vector<KWordDetector::WordInfo>&& words, float posThreshold = -3) const;
 	std::vector<KWordDetector::WordInfo> extractAddWords(const std::function<std::u16string(size_t)>& reader, size_t minCnt = 10, size_t maxWordLen = 10, float minScore = 0.25, float posThreshold = -3);
