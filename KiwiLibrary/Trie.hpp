@@ -51,15 +51,15 @@ class OverriddenMap : public _Map
 public:
 	auto operator[](typename _Map::key_type key) const -> typename _Map::mapped_type
 	{
-		auto it = find(key);
+		auto it = this->find(key);
 		if (it == end()) return {};
 		else return it->second;
 	}
 
 	auto operator[](typename _Map::key_type key) -> typename _Map::mapped_type&
 	{
-		auto it = find(key);
-		if (it == end()) return emplace(key, _Map::mapped_type{}).first->second;
+		auto it = this->find(key);
+		if (it == end()) return this->emplace(key, typename _Map::mapped_type{}).first->second;
 		else return it->second;
 	}
 };

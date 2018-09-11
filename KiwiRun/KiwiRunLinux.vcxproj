@@ -27,14 +27,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{505e5316-76fb-4f4b-853c-969c976c8c8a}</ProjectGuid>
+    <ProjectGuid>{48e547b2-e401-4299-a9f1-bdd7f55f8ff6}</ProjectGuid>
     <Keyword>Linux</Keyword>
-    <RootNamespace>KiwiLibraryLinux</RootNamespace>
+    <RootNamespace>KiwiRunLinux</RootNamespace>
     <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
     <ApplicationType>Linux</ApplicationType>
     <ApplicationTypeRevision>1.0</ApplicationTypeRevision>
     <TargetLinuxPlatform>Generic</TargetLinuxPlatform>
-    <LinuxProjectType>{2238F9CD-F817-4ECC-BD14-2524D2669B35}</LinuxProjectType>
+    <LinuxProjectType>{D51BCBC9-82E9-4017-911E-C93873C4EA2B}</LinuxProjectType>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
@@ -51,11 +51,9 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <UseDebugLibraries>true</UseDebugLibraries>
-    <ConfigurationType>StaticLibrary</ConfigurationType>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <UseDebugLibraries>false</UseDebugLibraries>
-    <ConfigurationType>StaticLibrary</ConfigurationType>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings" />
@@ -63,40 +61,43 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <ItemGroup>
-    <ClCompile Include="..\KiwiLibrary\KFeatureTestor.cpp" />
-    <ClCompile Include="..\KiwiLibrary\KForm.cpp" />
-    <ClCompile Include="..\KiwiLibrary\Kiwi.cpp" />
-    <ClCompile Include="..\KiwiLibrary\KMemory.cpp" />
-    <ClCompile Include="..\KiwiLibrary\KModelMgr.cpp" />
-    <ClCompile Include="..\KiwiLibrary\KTrie.cpp" />
-    <ClCompile Include="..\KiwiLibrary\stdafx.cpp" />
-    <ClCompile Include="..\KiwiLibrary\Utils.cpp" />
+    <ClCompile Include="KiwiRun.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\KiwiLibrary\BakedMap.hpp" />
     <ClInclude Include="..\KiwiLibrary\KFeatureTestor.h" />
     <ClInclude Include="..\KiwiLibrary\KForm.h" />
     <ClInclude Include="..\KiwiLibrary\Kiwi.h" />
     <ClInclude Include="..\KiwiLibrary\KiwiHeader.h" />
     <ClInclude Include="..\KiwiLibrary\KMemory.h" />
     <ClInclude Include="..\KiwiLibrary\KMemoryChar.h" />
-    <ClInclude Include="..\KiwiLibrary\KMemoryKChunk.h" />
-    <ClInclude Include="..\KiwiLibrary\KMemoryKMorphemeNode.h" />
     <ClInclude Include="..\KiwiLibrary\KModelMgr.h" />
+    <ClInclude Include="..\KiwiLibrary\KNLangModel.h" />
     <ClInclude Include="..\KiwiLibrary\KTrie.h" />
-    <ClInclude Include="..\KiwiLibrary\stdafx.h" />
-    <ClInclude Include="..\KiwiLibrary\targetver.h" />
+    <ClInclude Include="..\KiwiLibrary\KWordDetector.h" />
+    <ClInclude Include="..\KiwiLibrary\logPoisson.h" />
     <ClInclude Include="..\KiwiLibrary\ThreadPool.h" />
+    <ClInclude Include="..\KiwiLibrary\Trie.hpp" />
     <ClInclude Include="..\KiwiLibrary\Utils.h" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <CppLanguageStandard>c++1y</CppLanguageStandard>
     </ClCompile>
+    <Link>
+      <LibraryDependencies>KiwiLibraryLinux</LibraryDependencies>
+      <AdditionalLibraryDirectories>/root/projects/KiwiLibraryLinux/bin/x64/Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <CppLanguageStandard>c++1y</CppLanguageStandard>
+      <AdditionalOptions>-fpermissive %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
+    <Link>
+      <LibraryDependencies>KiwiLibraryLinux;pthread</LibraryDependencies>
+      <AdditionalLibraryDirectories>/root/projects/KiwiLibraryLinux/bin/x64/Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

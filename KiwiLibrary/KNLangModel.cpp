@@ -242,7 +242,7 @@ void KNLangModel::Node::writeToStream(std::ostream & str, size_t leafDepth) cons
 
 	uint32_t size = bakedNext.size();
 	writeVToBinStream(str, size);
-	for (auto& p : bakedNext)
+	for (auto p : bakedNext)
 	{
 		writeVToBinStream(str, p.first);
 		if(depth < leafDepth - 1) writeVToBinStream(str, p.second);

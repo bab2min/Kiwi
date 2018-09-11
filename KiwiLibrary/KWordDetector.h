@@ -91,7 +91,7 @@ namespace std
 	{
 		size_t operator()(const pair<uint16_t, uint16_t>& o) const
 		{
-			return hash_value(o.first) | (hash_value(o.second) << 16);
+			return hash<uint16_t>{}(o.first) | (hash<uint16_t>{}(o.second) << 16);
 		}
 	};
 }

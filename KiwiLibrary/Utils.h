@@ -55,9 +55,8 @@ inline void writeToBinStream(std::ostream& os, const std::pair<_Ty1, _Ty2>& v)
 template<class _Ty1, class _Ty2>
 inline void readFromBinStream(std::istream& is, std::pair<_Ty1, _Ty2>& v)
 {
-	auto left = readFromBinStream<_Ty1>(is);
-	auto right = readFromBinStream<_Ty2>(is);
-	v = std::make_pair(std::move(left), std::move(right));
+	v.first = readFromBinStream<_Ty1>(is);
+	v.second = readFromBinStream<_Ty2>(is);
 }
 
 template<>
@@ -150,25 +149,25 @@ inline float stof(ChrIterator begin, ChrIterator end)
 
 #if _MSC_VER >= 1900
 
-inline std::u16string utf8_to_utf16(std::string utf8_string)
+inline std::u16string utf8_to_utf16(const std::string& utf8_string)
 {
 	std::wstring_convert<std::codecvt_utf8_utf16<int16_t>, int16_t> convert;
 	auto p = convert.from_bytes(utf8_string);
 	return { p.begin(), p.end() };
 }
-inline std::string utf16_to_utf8(std::u16string utf16_string)
+inline std::string utf16_to_utf8(const std::u16string& utf16_string)
 {
 	std::wstring_convert<std::codecvt_utf8_utf16<int16_t>, int16_t> convert;
 	auto p = reinterpret_cast<const int16_t *>(utf16_string.data());
 	return convert.to_bytes(p, p + utf16_string.size());
 }
 #else
-inline std::u16string utf8_to_utf16(std::string utf18_string)
+inline std::u16string utf8_to_utf16(const std::string& utf16_string)
 {
 	std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
 	return convert.from_bytes(utf16_string);
 }
-inline std::string utf16_to_utf8(std::u16string utf16_string)
+inline std::string utf16_to_utf8(const std::u16string& utf16_string)
 {
 	std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
 	return convert.to_bytes(utf16_string);

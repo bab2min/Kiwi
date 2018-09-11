@@ -13,7 +13,7 @@ struct KGraphNode
 	const KForm* form = nullptr;
 	k_string uform;
 	uint16_t lastPos;
-	std::array<uint16_t, MAX_NEXT> nexts = { 0, };
+	std::array<uint16_t, MAX_NEXT> nexts = { { 0, } };
 
 	KGraphNode(const KForm* _form = nullptr, uint16_t _lastPos = 0) : form(_form), lastPos(_lastPos) {}
 	KGraphNode(const k_string& _uform, uint16_t _lastPos) : uform(_uform), lastPos(_lastPos) {}

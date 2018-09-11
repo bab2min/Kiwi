@@ -38,14 +38,8 @@
 typedef char16_t k_char;
 #define KSTR(x) u##x
 #else
-typedef char16_t k_wchar;
-typedef std::u16string k_wstring;
+typedef char16_t k_char;
 #define KSTR(x) u##x
-inline int fopen_s(FILE** f, const char* p, const char* m)
-{
-	*f = fopen(p, m);
-	return !*f;
-}
 #endif
 
 #include "KMemory.h"
@@ -56,7 +50,7 @@ class KiwiException : public std::exception
 	std::string msg;
 public:
 	KiwiException(const std::string& _msg) : msg(_msg) {}
-	const char* what() const override { return msg.c_str(); }
+	const char* what() const noexcept override { return msg.c_str(); }
 };
 
 
