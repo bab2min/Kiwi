@@ -293,3 +293,12 @@ ModelManifest.xml
 /KiwiTester/test.txt
 /ModelGenerator/extract.mdl
 *.pyd
+/KiwiTester/extracted_xaf.txt
+/KiwiTester/extracted_xae.txt
+/KiwiTester/extracted_xad.txt
+/KiwiTester/extracted_xac.txt
+/KiwiTester/extracted_xab.txt
+/KiwiTester/extracted_xaa.txt
+/KiwiTester/extracted_xa0_cohesion2.txt
+/KiwiTester/extracted_xa0_cohesion.txt
+/KiwiTester/extracted_xa0.txt

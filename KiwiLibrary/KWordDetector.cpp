@@ -373,18 +373,35 @@ vector<KWordDetector::WordInfo> KWordDetector::extractWords(const std::function<
 	{
 		auto& p = *it;
 		if (p.second < minCnt) continue;
-		if (p.first.size() >= maxWordLen) continue;
+		if (p.first.size() >= maxWordLen || p.first.size() <= 1) continue;
 		auto bit = cdata.backwardCnt.find({ p.first.rbegin(), p.first.rend() });
 		if (bit == cdata.backwardCnt.end()) continue;
-
-		float forwardCohesion = pow(p.second / (float)cdata.cntUnigram[p.first.front()], 1 / (p.first.size() - 1.f));
-		float backwardCohesion = pow(p.second / (float)cdata.cntUnigram[p.first.back()], 1 / (p.first.size() - 1.f));
-
+		
+		//float forwardCohesion = pow(p.second / (float)cdata.cntUnigram[p.first.front()], 1 / (p.first.size() - 1.f));
+		//float backwardCohesion = pow(p.second / (float)cdata.cntUnigram[p.first.back()], 1 / (p.first.size() - 1.f));
+		float forwardCohesion = p.second / (float)cdata.cntUnigram[p.first.front()];
+		float backwardCohesion = p.second / (float)cdata.cntUnigram[p.first.back()];
+		if (p.first.size() == 3)
+		{
+			forwardCohesion *= p.second / (float)cdata.forwardCnt.find({p.first.begin(), p.first.begin() + 2})->second;
+			backwardCohesion *= p.second / (float)cdata.backwardCnt.find({ p.first.rbegin(), p.first.rbegin() + 2 })->second;
+			forwardCohesion = pow(forwardCohesion, 1.f / (p.first.size() * 2 - 3));
+			backwardCohesion = pow(backwardCohesion, 1.f / (p.first.size() * 2 - 3));
+		}
+		else if (p.first.size() > 3)
+		{
+			forwardCohesion *= p.second / (float)cdata.forwardCnt.find({ p.first.begin(), p.first.begin() + 2 })->second;
+			backwardCohesion *= p.second / (float)cdata.backwardCnt.find({ p.first.rbegin(), p.first.rbegin() + 2 })->second;
+			forwardCohesion *= p.second / (float)cdata.forwardCnt.find({ p.first.begin(), p.first.begin() + 3 })->second;
+			backwardCohesion *= p.second / (float)cdata.backwardCnt.find({ p.first.rbegin(), p.first.rbegin() + 3 })->second;
+			forwardCohesion = pow(forwardCohesion, 1.f / (p.first.size() * 3 - 6));
+			backwardCohesion = pow(backwardCohesion, 1.f / (p.first.size() * 3 - 6));
+		}
+		
 		float forwardBranch = branchingEntropy(cdata.forwardCnt, it);
 		float backwardBranch = branchingEntropy(cdata.backwardCnt, bit);
 
-		float score = forwardCohesion * backwardCohesion;
-		score *= forwardBranch * backwardBranch;
+		float score = forwardCohesion * backwardCohesion * forwardBranch * backwardBranch;
 		if (score < minScore) continue;
 		u16string form;
 		form.reserve(p.first.size());
