@@ -112,46 +112,37 @@ int main()
 	Timer timer;
 	Kiwi kw{ "../ModelGenerator/", (size_t)-1, 0 };
 	//kw.setCutOffThreshold(5);
-	if(0)
+	if(1)
 	{
-		//ifstream ifs{ "../TestSets/15s.txt" };
-		ifstream ifs{ "D:/kornews.txt" };
-		ofstream ofs{ "D:/kornews_pp.txt" };
-		kw.perform(1, [&ifs](size_t id) -> u16string
+		auto flist = { "xaa", "xab", "xac", "xad", "xae", "xaf" };
+		for (auto list : flist)
 		{
-			if (id >= 500)
+			ifstream ifs{ string{"D:/"} + list };
+			auto res = kw.extractAddWords([&ifs](size_t id) -> u16string
 			{
-				return {};
-			}
-			if (id == 0)
-			{
-				ifs.clear();
-				ifs.seekg(0);
+				if (id == 0)
+				{
+					ifs.clear();
+					ifs.seekg(0);
+					string line;
+				}
 				string line;
-			}
-			string line;
-			while (getline(ifs, line))
-			{
-				auto sstr = line/*.substr(0, line.find('\t'))*/;
-				if (sstr.size()) return utf8_to_utf16(sstr);
-			}
-			return {};
-		}, [&ofs](size_t id, vector<KResult>&& res)
-		{
-			for (auto& r : res[0].first)
-			{
-				ofs << utf16_to_utf8(r.str()) << '/' << tagToString(r.tag()) << ' ';
-			}
-			ofs << endl;
+				while (getline(ifs, line))
+				{
+					auto sstr = line/*.substr(0, line.find('\t'))*/;
+					if (sstr.size()) return utf8_to_utf16(sstr);
+				}
+				return {};
+			}, 7, 20, 0.2f);
 
-		}, 5, 15);
-
-		/*ofstream ofs{ "extracted.txt" };
-		for (auto& r : res)
-		{
-			ofs << utf16_to_utf8(r.form) << '\t' << r.score << '\t' << r.freq
-				<< '\t' << r.posScore[KPOSTag::NNP] << endl;
-		}*/
+			ofstream ofs{ string{"extracted_"} + list + ".txt" };
+			for (auto& r : res)
+			{
+				ofs << utf16_to_utf8(r.form) << '\t' << r.score << '\t' << r.freq
+					<< '\t' << r.lCohesion << '\t' << r.rCohesion
+					<< '\t' << r.posScore[KPOSTag::NNP] << endl;
+			}
+		}
 		return 0;
 	}
 	//kw.addUserWord(u"¿¥¸¶´©¿¤", KPOSTag::NNP);
