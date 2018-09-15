@@ -112,7 +112,7 @@ int main()
 	Timer timer;
 	Kiwi kw{ "../ModelGenerator/", (size_t)-1, 0 };
 	//kw.setCutOffThreshold(5);
-	if(1)
+	if(0)
 	{
 		auto flist = { "xaa", "xab", "xac", "xad", "xae", "xaf" };
 		for (auto list : flist)
@@ -133,7 +133,7 @@ int main()
 					if (sstr.size()) return utf8_to_utf16(sstr);
 				}
 				return {};
-			}, 7, 20, 0.2f);
+			}, 7, 20, 0.1f);
 
 			ofstream ofs{ string{"extracted_"} + list + ".txt" };
 			for (auto& r : res)
@@ -145,8 +145,40 @@ int main()
 		}
 		return 0;
 	}
-	//kw.addUserWord(u"¿¥¸¶´©¿¤", KPOSTag::NNP);
+	kw.loadUserDictionary("dict_namu.txt");
 	kw.prepare();
+
+	if (1)
+	{
+		Timer tm;
+		ifstream ifs{ "D:/namu_raw.txt" };
+		ofstream ofs{ "D:/namu_tagged.txt" };
+		kw.analyze(1, [&ifs](size_t id) -> u16string
+		{
+			if (id == 0)
+			{
+				ifs.clear();
+				ifs.seekg(0);
+				string line;
+			}
+			string line;
+			while (getline(ifs, line))
+			{
+				auto sstr = line;
+				if (sstr.size()) return utf8_to_utf16(sstr);
+			}
+			return {};
+		}, [&ofs](size_t id, vector<KResult>&& res)
+		{
+			for (auto& r : res[0].first)
+			{
+				ofs << utf16_to_utf8(r.str()) << '/' << tagToString(r.tag()) << '\t';
+			}
+			ofs << endl;
+		});
+		return 0;
+	}
+
 	cout << "Loading Time : " << timer.getElapsed() << " ms" << endl;
 	PROCESS_MEMORY_COUNTERS pmc;
 	GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc));

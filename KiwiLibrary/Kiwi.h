@@ -44,7 +44,7 @@ class Kiwi
 protected:
 	float cutOffThreshold = 10.f;
 	std::unique_ptr<KModelMgr> mdl;
-	mutable ThreadPool workers;
+	size_t numThread;
 	KWordDetector detector;
 	typedef std::vector<std::tuple<const KMorpheme*, k_string, uint32_t>> path;
 	std::vector<std::pair<path, float>> findBestPath(const std::vector<KGraphNode>& graph, const KNLangModel * knlm, const KMorpheme* morphBase, size_t topN) const;

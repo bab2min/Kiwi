@@ -10,7 +10,7 @@ using namespace std;
 //#define LOAD_TXT
 
 Kiwi::Kiwi(const char * modelPath, size_t _maxCache, size_t _numThread) 
-	: workers(_numThread ? _numThread : thread::hardware_concurrency()),
+	: numThread(_numThread ? _numThread : thread::hardware_concurrency()),
 	detector(10, 10, 0.1, _numThread)
 {
 #ifdef LOAD_TXT
@@ -43,7 +43,7 @@ int Kiwi::addUserWord(const u16string & str, KPOSTag tag, float userScore)
 int Kiwi::loadUserDictionary(const char * userDictPath)
 {
 	ifstream ifs{ userDictPath };
-	ifs.exceptions(std::istream::failbit | std::istream::badbit);
+	ifs.exceptions(std::istream::badbit);
 	string line;
 	while (getline(ifs, line))
 	{
@@ -54,9 +54,11 @@ int Kiwi::loadUserDictionary(const char * userDictPath)
 		if (!chunks[1].empty()) 
 		{
 			auto pos = makePOSTag(chunks[1]);
+			float score = 20.f;
+			if (chunks.size() > 2) score = stof(chunks[2].begin(), chunks[2].end());
 			if (pos != KPOSTag::MAX)
 			{
-				addUserWord(chunks[0], pos);
+				addUserWord(chunks[0], pos, score);
 			}
 			else
 			{
@@ -577,52 +579,57 @@ vector<KResult> Kiwi::analyze(const string & str, size_t topN) const
 
 void Kiwi::analyze(size_t topN, const function<u16string(size_t)>& reader, const function<void(size_t, vector<KResult>&&)>& receiver) const
 {
-	vector<future<void>> futures;
-	struct
+	if (numThread > 1)
 	{
-		map<size_t, vector<KResult>> res;
-		mutex resMutex;
-		size_t outputId = 0;
-
-		void addResult(size_t id, vector<KResult>&& r, const function<void(size_t, vector<KResult>&&)>& receiver)
+		ThreadPool workers(numThread - 1);
+		struct
 		{
-			lock_guard<mutex> l(resMutex);
-			if (id == outputId) receiver(outputId++, move(r));
-			else
-			{
-				res.emplace(id, r);
-			}
+			map<size_t, vector<KResult>> res;
+			mutex resMutex, inputMutex;
+			condition_variable inputCond;
+			size_t outputId = 0;
 
-			while (!res.empty() && res.begin()->first == outputId)
+			void addResult(size_t id, vector<KResult>&& r, const function<void(size_t, vector<KResult>&&)>& receiver)
 			{
-				receiver(outputId++, move(res.begin()->second));
-				res.erase(res.begin());
-			}
-		}
-	} sharedResult;
+				lock_guard<mutex> l(resMutex);
+				if (id == outputId) receiver(outputId++, move(r));
+				else
+				{
+					res.emplace(id, r);
+				}
 
-	for (size_t id = 0; ; ++id)
-	{
-		auto ustr = reader(id);
-		if (ustr.empty()) break;
-		if (workers.getNumWorkers() > 1)
+				while (!res.empty() && res.begin()->first == outputId)
+				{
+					receiver(outputId++, move(res.begin()->second));
+					res.erase(res.begin());
+				}
+			}
+		} sharedResult;
+
+		for (size_t id = 0; ; ++id)
 		{
-			futures.emplace_back(workers.enqueue([this, topN, id, ustr, &receiver, &sharedResult](size_t tid)
+			auto ustr = reader(id);
+			if (ustr.empty()) break;
+
+			unique_lock<mutex> l(sharedResult.inputMutex);
+			sharedResult.inputCond.wait(l, [&]() { return workers.getNumEnqued() < workers.getNumWorkers() * 64; });
+			workers.enqueue([this, topN, id, ustr, &receiver, &sharedResult](size_t tid)
 			{
 				auto r = analyze(ustr, topN);
 				sharedResult.addResult(id, move(r), receiver);
-			}));
+				sharedResult.inputCond.notify_one();
+			});
 		}
-		else
+	}
+	else
+	{
+		for (size_t id = 0; ; ++id)
 		{
+			auto ustr = reader(id);
+			if (ustr.empty()) break;
 			auto r = analyze(ustr, topN);
 			receiver(id, move(r));
 		}
-	}
-
-	if (workers.getNumWorkers() > 1)
-	{
-		for (auto& f : futures) f.get();
 	}
 }
 
@@ -647,7 +654,12 @@ std::vector<KResult> Kiwi::analyzeSent(const std::u16string::const_iterator & sB
 
 	auto nodes = mdl->getTrie()->split(nstr);
 	vector<KResult> ret;
-	if (nodes.size() <= 2) return ret;
+	if (nodes.size() <= 2)
+	{
+		ret.emplace_back();
+		ret.back().first.emplace_back(u16string{sBegin, sEnd}, KPOSTag::UNKNOWN, 0, distance(sBegin, sEnd));
+		return ret;
+	}
 	auto res = findBestPath(nodes, mdl->getLangModel(), mdl->getMorphemes(), topN);
 	for (auto&& r : res)
 	{

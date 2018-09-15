@@ -22,6 +22,7 @@ vector<KGraphNode> KTrie::split(const k_string& str) const
 	{
 		if (!candidates.empty())
 		{
+			bool alreadySpecialChrProcessed = false;
 			for (auto& cand : candidates)
 			{
 				size_t nBegin = n - cand->form.size();
@@ -49,15 +50,11 @@ vector<KGraphNode> KTrie::split(const k_string& str) const
 				// if special character
 				if (cand->candidate[0] <= this[(size_t)KPOSTag::SN].val->candidate[0])
 				{
-					// reuse previous node
-					if (ret.back().lastPos == n - 1 && ret.back().form && ret.back().form->candidate[0]->tag == cand->candidate[0]->tag)
+					// special character should be processed one by one chr.
+					if (!alreadySpecialChrProcessed)
 					{
-						ret.back().uform.push_back(cand->form.back());
-						ret.back().lastPos = n;
-						lastSpecialEndPos = n;
-					}
-					else
-					{
+						auto it = spacePos.find(n - 2);
+						space = it == spacePos.end() ? 0 : it->second;
 						for (auto& g : ret)
 						{
 							if (g.lastPos != n - 1 - space) continue;
@@ -66,6 +63,7 @@ vector<KGraphNode> KTrie::split(const k_string& str) const
 						ret.emplace_back(cand->form.substr(cand->form.size() - 1), n);
 						ret.back().form = this[(size_t)cand->candidate[0]->tag].val;
 						lastSpecialEndPos = n;
+						alreadySpecialChrProcessed = true;
 					}
 				}
 				else
@@ -193,6 +191,38 @@ vector<KGraphNode> KTrie::split(const k_string& str) const
 		}
 	}
 	brachOut(true);
+
+	// join splitted special chr node
+
+	for (size_t i = 1; i < ret.size(); ++i)
+	{
+		// if special chr
+		if (!(ret[i].form && ret[i].form->candidate[0] <= this[(size_t)KPOSTag::SN].val->candidate[0]
+			&& ret[i].nexts[0] && !ret[i].nexts[1])) continue;
+
+		auto& joinedNode = ret[i];
+		auto curmorph = ret[i].form->candidate[0];
+		auto j = i;
+		while (ret[j].nexts[0] && !ret[j].nexts[1] && ret[j + ret[j].nexts[0]].form
+			&& curmorph == ret[j + ret[j].nexts[0]].form->candidate[0]
+			&& joinedNode.lastPos == ret[j + ret[j].nexts[0]].lastPos - ret[j + ret[j].nexts[0]].uform.size())
+		{
+			j += ret[j].nexts[0];
+			joinedNode.uform += ret[j].uform;
+			for (size_t k = 0; k < KGraphNode::MAX_NEXT; ++k)
+			{
+				if (!ret[j].nexts[k])
+				{
+					joinedNode.nexts[k] = 0;
+					break;
+				}
+				joinedNode.nexts[k] = j + ret[j].nexts[k] - (&joinedNode - &ret[0]);
+			}
+
+			joinedNode.lastPos = ret[j].lastPos;
+		}
+	}
+
 	ret.emplace_back();
 	ret.back().lastPos = n;
 	auto it = spacePos.find(n - 1);
@@ -247,7 +277,8 @@ vector<KGraphNode> KGraphNode::removeUnconnected(const vector<KGraphNode>& graph
 {
 	vector<uint16_t> connectedList(graph.size()), newIndexDiff(graph.size());
 	connectedList[graph.size() - 1] = true;
-	size_t connectedCnt = 1;
+	connectedList[0] = true;
+	// backward searching
 	for (size_t i = graph.size() - 1; i-- > 0; )
 	{
 		bool connected = false;
@@ -257,12 +288,32 @@ vector<KGraphNode> KGraphNode::removeUnconnected(const vector<KGraphNode>& graph
 			if (connectedList[i + graph[i].nexts[j]])
 			{
 				connected = true;
-				++connectedCnt;
 				break;
 			}
 		}
 		connectedList[i] = connected;
 	}
+	// forward searching
+	for (size_t i = 1; i < graph.size(); ++i)
+	{
+		bool connected = false;
+		for (size_t j = 0; j < i; ++j)
+		{
+			for (size_t k = 0; k < KGraphNode::MAX_NEXT; ++k)
+			{
+				if (!graph[j].nexts[k]) break;
+				if (j + graph[j].nexts[k] > i) break;
+				if (j + graph[j].nexts[k] < i) continue;
+				if (connectedList[j])
+				{
+					connected = true;
+					break;
+				}
+			}
+		}
+		connectedList[i] = connectedList[i] && connected;
+	}
+	size_t connectedCnt = accumulate(connectedList.begin(), connectedList.end(), 0);
 	newIndexDiff[0] = connectedList[0];
 	for (size_t i = 1; i < graph.size(); ++i)
 	{
