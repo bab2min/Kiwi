@@ -423,6 +423,7 @@ void KModelMgr::addUserWord(const k_string & form, KPOSTag tag, float userScore)
 {
 	if (!trieRoot.empty()) throw bad_exception();
 	if (form.empty()) return;
+	if (formMap.find(form) != formMap.end()) return;
 	extraTrieSize += form.size() - 1;
 	for (size_t i = 1; i < form.size() - 1; ++i)
 	{

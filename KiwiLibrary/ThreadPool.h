@@ -24,6 +24,7 @@ public:
 		->std::future<typename std::result_of<F(size_t, Args...)>::type>;
 	~ThreadPool();
 	size_t getNumWorkers() const { return workers.size(); }
+	size_t getNumEnqued() const { return tasks.size(); }
 private:
 	// need to keep track of threads so we can join them
 	std::vector< std::thread > workers;
