@@ -589,36 +589,45 @@ void Kiwi::analyze(size_t topN, const function<u16string(size_t)>& reader, const
 			condition_variable inputCond;
 			size_t outputId = 0;
 
-			void addResult(size_t id, vector<KResult>&& r, const function<void(size_t, vector<KResult>&&)>& receiver)
+			void addResult(size_t id, vector<KResult>&& r)
 			{
 				lock_guard<mutex> l(resMutex);
-				if (id == outputId) receiver(outputId++, move(r));
-				else
-				{
-					res.emplace(id, r);
-				}
+				res.emplace(id, r);
+			}
 
+			void consumeResult(const function<void(size_t, vector<KResult>&&)>& receiver)
+			{
+				lock_guard<mutex> l(resMutex);
 				while (!res.empty() && res.begin()->first == outputId)
 				{
 					receiver(outputId++, move(res.begin()->second));
 					res.erase(res.begin());
 				}
 			}
+
 		} sharedResult;
 
-		for (size_t id = 0; ; ++id)
+		size_t id;
+		for (id = 0; ; ++id)
 		{
 			auto ustr = reader(id);
 			if (ustr.empty()) break;
 
 			unique_lock<mutex> l(sharedResult.inputMutex);
 			sharedResult.inputCond.wait(l, [&]() { return workers.getNumEnqued() < workers.getNumWorkers() * 64; });
+			sharedResult.consumeResult(receiver);
 			workers.enqueue([this, topN, id, ustr, &receiver, &sharedResult](size_t tid)
 			{
 				auto r = analyze(ustr, topN);
-				sharedResult.addResult(id, move(r), receiver);
+				sharedResult.addResult(id, move(r));
 				sharedResult.inputCond.notify_one();
 			});
+		}
+		while (sharedResult.outputId < id)
+		{
+			unique_lock<mutex> l(sharedResult.inputMutex);
+			sharedResult.inputCond.wait(l, [&]() { return !sharedResult.res.empty() || sharedResult.outputId >= id; });
+			sharedResult.consumeResult(receiver);
 		}
 	}
 	else

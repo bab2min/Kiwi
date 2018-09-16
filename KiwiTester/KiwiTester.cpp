@@ -148,7 +148,7 @@ int main()
 	kw.loadUserDictionary("dict_namu.txt");
 	kw.prepare();
 
-	if (1)
+	if (0)
 	{
 		Timer tm;
 		ifstream ifs{ "D:/namu_raw.txt" };

@@ -13,13 +13,14 @@ static PyObject* kiwi__init(PyObject* self, PyObject* args)
 {
 	PyObject* argSelf;
 	const char* modelPath = "./";
-	if (!PyArg_ParseTuple(args, "O|s", &argSelf, &modelPath)) return nullptr;
+	size_t numThread = 0;
+	if (!PyArg_ParseTuple(args, "O|ns", &argSelf, &numThread, &modelPath)) return nullptr;
 	try
 	{
 		Kiwi* inst = nullptr;
 		try
 		{
-			inst = new Kiwi{ modelPath, 0, 0 };
+			inst = new Kiwi{ modelPath, 0, numThread };
 		}
 		catch (const exception& e)
 		{
@@ -36,7 +37,7 @@ static PyObject* kiwi__init(PyObject* self, PyObject* args)
 			{
 				spath = spath.substr(0, spath.rfind('\\') + 1);
 			}
-			inst = new Kiwi{ (spath + modelPath).c_str(), 0, 0 };
+			inst = new Kiwi{ (spath + modelPath).c_str(), 0, numThread };
 		}
 		PyObject_SetAttrString(argSelf, "_inst", PyLong_FromLongLong((long long)inst));
 	}
@@ -118,7 +119,7 @@ static PyObject* kiwi__extractWords(PyObject* self, PyObject* args)
 	size_t minCnt = 10, maxWordLen = 10;
 	float minScore = 0.25f;
 	if (!PyArg_ParseTuple(args, "OO|nnf", &argSelf, &argReader, &minCnt, &maxWordLen, &minScore)) return nullptr;
-	if (!PyCallable_Check(argReader)) return PyErr_SetString(PyExc_TypeError, "extractWords requires 2nd parameter which is callable"), nullptr;
+	if (!PyCallable_Check(argReader)) return PyErr_SetString(PyExc_TypeError, "extractWords requires 1st parameter which is callable"), nullptr;
 	try
 	{
 		PyObject* instObj = PyObject_GetAttrString(argSelf, "_inst");
@@ -126,10 +127,7 @@ static PyObject* kiwi__extractWords(PyObject* self, PyObject* args)
 		Py_DECREF(instObj);
 		auto res = inst->extractWords([argReader](size_t id) -> u16string
 		{
-			PyGILState_STATE gstate;
-			gstate = PyGILState_Ensure();
 			PyObject* retVal = PyEval_CallObject(argReader, Py_BuildValue("(n)", id));
-			PyGILState_Release(gstate);
 			if (PyObject_Not(retVal)) return {};
 			auto* p = PyUnicode_AsUTF8(retVal);
 			return Kiwi::toU16(p);
@@ -159,7 +157,7 @@ static PyObject* kiwi__extractFilterWords(PyObject* self, PyObject* args)
 	size_t minCnt = 10, maxWordLen = 10;
 	float minScore = 0.25f, posScore = -3;
 	if (!PyArg_ParseTuple(args, "OO|nnff", &argSelf, &argReader, &minCnt, &maxWordLen, &minScore, &posScore)) return nullptr;
-	if (!PyCallable_Check(argReader)) return PyErr_SetString(PyExc_TypeError, "extractFilterWords requires 2nd parameter which is callable"), nullptr;
+	if (!PyCallable_Check(argReader)) return PyErr_SetString(PyExc_TypeError, "extractFilterWords requires 1st parameter which is callable"), nullptr;
 	try
 	{
 		PyObject* instObj = PyObject_GetAttrString(argSelf, "_inst");
@@ -167,10 +165,7 @@ static PyObject* kiwi__extractFilterWords(PyObject* self, PyObject* args)
 		Py_DECREF(instObj);
 		auto res = inst->extractWords([argReader](size_t id) -> u16string
 		{
-			PyGILState_STATE gstate;
-			gstate = PyGILState_Ensure();
 			PyObject* retVal = PyEval_CallObject(argReader, Py_BuildValue("(n)", id));
-			PyGILState_Release(gstate);
 			if (PyObject_Not(retVal)) return {};
 			auto* p = PyUnicode_AsUTF8(retVal);
 			return Kiwi::toU16(p);
@@ -201,7 +196,7 @@ static PyObject* kiwi__extractAddWords(PyObject* self, PyObject* args)
 	size_t minCnt = 10, maxWordLen = 10;
 	float minScore = 0.25f, posScore = -3;
 	if (!PyArg_ParseTuple(args, "OO|nnff", &argSelf, &argReader, &minCnt, &maxWordLen, &minScore, &posScore)) return nullptr;
-	if (!PyCallable_Check(argReader)) return PyErr_SetString(PyExc_TypeError, "extractAddWords requires 2nd parameter which is callable"), nullptr;
+	if (!PyCallable_Check(argReader)) return PyErr_SetString(PyExc_TypeError, "extractAddWords requires 1st parameter which is callable"), nullptr;
 	try
 	{
 		PyObject* instObj = PyObject_GetAttrString(argSelf, "_inst");
@@ -209,10 +204,7 @@ static PyObject* kiwi__extractAddWords(PyObject* self, PyObject* args)
 		Py_DECREF(instObj);
 		auto res = inst->extractAddWords([argReader](size_t id) -> u16string
 		{
-			PyGILState_STATE gstate;
-			gstate = PyGILState_Ensure();
 			PyObject* retVal = PyEval_CallObject(argReader, Py_BuildValue("(n)", id));
-			PyGILState_Release(gstate);
 			if (PyObject_Not(retVal)) return {};
 			auto* p = PyUnicode_AsUTF8(retVal);
 			return Kiwi::toU16(p);
@@ -328,23 +320,16 @@ static PyObject* kiwi__analyze(PyObject* self, PyObject* args)
 				PyObject* instObj = PyObject_GetAttrString(argSelf, "_inst");
 				Kiwi* inst = (Kiwi*)PyLong_AsLongLong(instObj);
 				Py_DECREF(instObj);
-
 				inst->analyze(topN, [&reader](size_t id)->u16string
 				{
-					PyGILState_STATE gstate;
-					gstate = PyGILState_Ensure();
 					PyObject* retVal = PyEval_CallObject(reader, Py_BuildValue("(n)", id));
-					PyGILState_Release(gstate);
 					if (PyObject_Not(retVal)) return {};
 					auto* p = PyUnicode_AsUTF8(retVal);
 					return Kiwi::toU16(p);
 				}, [&receiver](size_t id, vector<KResult>&& res)
 				{
 					PyObject* l = resToPyList(res);
-					PyGILState_STATE gstate;
-					gstate = PyGILState_Ensure();
 					PyEval_CallObject(receiver, Py_BuildValue("(nO)", id, l));
-					PyGILState_Release(gstate);
 				});
 				Py_INCREF(Py_None);
 				return Py_None;
@@ -378,20 +363,14 @@ static PyObject* kiwi__perform(PyObject* self, PyObject* args)
 
 		inst->perform(topN, [&reader](size_t id)->u16string
 		{
-			PyGILState_STATE gstate;
-			gstate = PyGILState_Ensure();
 			PyObject* retVal = PyEval_CallObject(reader, Py_BuildValue("(n)", id));
-			PyGILState_Release(gstate);
 			if (PyObject_Not(retVal)) return {};
 			auto* p = PyUnicode_AsUTF8(retVal);
 			return Kiwi::toU16(p);
 		}, [&receiver](size_t id, vector<KResult>&& res)
 		{
 			PyObject* l = resToPyList(res);
-			PyGILState_STATE gstate;
-			gstate = PyGILState_Ensure();
 			PyEval_CallObject(receiver, Py_BuildValue("(nO)", id, l));
-			PyGILState_Release(gstate);
 		}, minCnt, maxWordLen, minScore, posScore);
 		Py_INCREF(Py_None);
 		return Py_None;
