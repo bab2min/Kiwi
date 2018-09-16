@@ -307,3 +307,5 @@ ModelManifest.xml
 /KiwiTester/extracted_x0.txt
 /KiwiTester/extracted_namus.txt
 /KiwiTester/dict_namu.txt
+/ModelGenerator/result.txt
+/ModelGenerator/kiwipiepyTest.py
