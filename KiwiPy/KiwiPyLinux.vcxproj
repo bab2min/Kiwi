@@ -26,6 +26,28 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="KiwiPy.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\KiwiLibrary\BakedMap.hpp" />
+    <ClInclude Include="..\KiwiLibrary\KFeatureTestor.h" />
+    <ClInclude Include="..\KiwiLibrary\KForm.h" />
+    <ClInclude Include="..\KiwiLibrary\Kiwi.h" />
+    <ClInclude Include="..\KiwiLibrary\KiwiHeader.h" />
+    <ClInclude Include="..\KiwiLibrary\KMemory.h" />
+    <ClInclude Include="..\KiwiLibrary\KMemoryChar.h" />
+    <ClInclude Include="..\KiwiLibrary\KModelMgr.h" />
+    <ClInclude Include="..\KiwiLibrary\KNLangModel.h" />
+    <ClInclude Include="..\KiwiLibrary\KTrie.h" />
+    <ClInclude Include="..\KiwiLibrary\KWordDetector.h" />
+    <ClInclude Include="..\KiwiLibrary\logPoisson.h" />
+    <ClInclude Include="..\KiwiLibrary\stdafx.h" />
+    <ClInclude Include="..\KiwiLibrary\targetver.h" />
+    <ClInclude Include="..\KiwiLibrary\ThreadPool.h" />
+    <ClInclude Include="..\KiwiLibrary\Trie.hpp" />
+    <ClInclude Include="..\KiwiLibrary\Utils.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{85af8b33-4d65-4da3-8369-4bdd4209d063}</ProjectGuid>
     <Keyword>Linux</Keyword>
@@ -69,27 +91,31 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetExt>.so</TargetExt>
+    <TargetName>lib\coreLinux64</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Link />
     <ClCompile>
       <CppLanguageStandard>c++1y</CppLanguageStandard>
       <AdditionalIncludeDirectories>/usr/include/python3.5/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>-fPIC %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-fpermissive %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <LibraryDependencies>python3.5m</LibraryDependencies>
+      <AdditionalOptions>-static-libstdc++ %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Link />
     <ClCompile>
-      <CppLanguageStandard>c++1y</CppLanguageStandard>
+      <CppLanguageStandard>c++14</CppLanguageStandard>
       <AdditionalIncludeDirectories>/usr/include/python3.5/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>-fPIC %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-fpermissive %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <LibraryDependencies>python3.5m</LibraryDependencies>
+      <LibraryDependencies>KiwiLibraryLinux;pthread;python3.5m</LibraryDependencies>
+      <AdditionalLibraryDirectories>/root/projects/KiwiLibraryLinux/bin/x64/Release;%(Link.AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>-static-libstdc++ %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

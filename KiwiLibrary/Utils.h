@@ -24,72 +24,75 @@ inline std::vector<std::basic_string<BaseChr>> split(const std::basic_string<Bas
 	return elems;
 }
 
+template<class _Ty> inline void writeToBinStream(std::ostream& os, const _Ty& v);
+template<class _Ty> inline _Ty readFromBinStream(std::istream& is);
+template<class _Ty> inline void readFromBinStream(std::istream& is, _Ty& v);
+
 template<class _Ty>
-inline void writeToBinStream(std::ostream& os, const _Ty& v)
+inline typename std::enable_if<!std::is_fundamental<_Ty>::value && !std::is_enum<_Ty>::value>::type writeToBinStreamImpl(std::ostream& os, const _Ty& v)
+{
+	static_assert(true, "Only fundamental type can be written!");
+}
+
+template<class _Ty>
+inline typename std::enable_if<!std::is_fundamental<_Ty>::value && !std::is_enum<_Ty>::value>::type readFromBinStreamImpl(std::ostream& os, const _Ty& v)
+{
+	static_assert(true, "Only fundamental type can be read!");
+}
+
+template<class _Ty>
+inline typename std::enable_if<std::is_fundamental<_Ty>::value || std::is_enum<_Ty>::value>::type writeToBinStreamImpl(std::ostream& os, const _Ty& v)
 {
 	if (!os.write((const char*)&v, sizeof(_Ty))) throw std::ios_base::failure(std::string{ "writing type '" } + typeid(_Ty).name() + "' failed");
 }
 
 template<class _Ty>
-inline void readFromBinStream(std::istream& is, _Ty& v)
+inline typename std::enable_if<std::is_fundamental<_Ty>::value || std::is_enum<_Ty>::value>::type readFromBinStreamImpl(std::istream& is, _Ty& v)
 {
 	if (!is.read((char*)&v, sizeof(_Ty))) throw std::ios_base::failure(std::string{ "reading type '" } +typeid(_Ty).name() + "' failed");
 }
 
-template<class _Ty>
-inline _Ty readFromBinStream(std::istream& is)
+inline void writeToBinStreamImpl(std::ostream& os, const k_string& v)
 {
-	_Ty v;
-	readFromBinStream(is, v);
-	return v;
+	writeToBinStream<uint32_t>(os, v.size());
+	if(!os.write((const char*)&v[0], v.size() * sizeof(k_string::value_type))) throw std::ios_base::failure(std::string{ "writing type '" } +typeid(k_string).name() + "' failed");
 }
 
+inline void readFromBinStreamImpl(std::istream& is, k_string& v)
+{
+	v.resize(readFromBinStream<uint32_t>(is));
+	if (!is.read((char*)&v[0], v.size() * sizeof(k_string::value_type))) throw std::ios_base::failure(std::string{ "reading type '" } +typeid(k_string).name() + "' failed");
+}
+
+inline void writeToBinStreamImpl(std::ostream& os, const std::u16string& v)
+{
+	writeToBinStream<uint32_t>(os, v.size());
+	if (!os.write((const char*)&v[0], v.size() * sizeof(char16_t))) throw std::ios_base::failure(std::string{ "writing type '" } +typeid(k_string).name() + "' failed");
+}
+
+inline void readFromBinStreamImpl(std::istream& is, std::u16string& v)
+{
+	v.resize(readFromBinStream<uint32_t>(is));
+	if (!is.read((char*)&v[0], v.size() * sizeof(char16_t))) throw std::ios_base::failure(std::string{ "reading type '" } +typeid(k_string).name() + "' failed");
+}
 
 template<class _Ty1, class _Ty2>
-inline void writeToBinStream(std::ostream& os, const std::pair<_Ty1, _Ty2>& v)
+inline void writeToBinStreamImpl(std::ostream& os, const typename std::pair<_Ty1, _Ty2>& v)
 {
 	writeToBinStream(os, v.first);
 	writeToBinStream(os, v.second);
 }
 
 template<class _Ty1, class _Ty2>
-inline void readFromBinStream(std::istream& is, std::pair<_Ty1, _Ty2>& v)
+inline void readFromBinStreamImpl(std::istream& is, typename std::pair<_Ty1, _Ty2>& v)
 {
 	v.first = readFromBinStream<_Ty1>(is);
 	v.second = readFromBinStream<_Ty2>(is);
 }
 
-template<>
-inline void writeToBinStream<k_string>(std::ostream& os, const k_string& v)
-{
-	writeToBinStream<uint32_t>(os, v.size());
-	if(!os.write((const char*)&v[0], v.size() * sizeof(k_string::value_type))) throw std::ios_base::failure(std::string{ "writing type '" } +typeid(k_string).name() + "' failed");
-}
-
-template<>
-inline void readFromBinStream<k_string>(std::istream& is, k_string& v)
-{
-	v.resize(readFromBinStream<uint32_t>(is));
-	if (!is.read((char*)&v[0], v.size() * sizeof(k_string::value_type))) throw std::ios_base::failure(std::string{ "reading type '" } +typeid(k_string).name() + "' failed");
-}
-
-template<>
-inline void writeToBinStream<std::u16string>(std::ostream& os, const std::u16string& v)
-{
-	writeToBinStream<uint32_t>(os, v.size());
-	if (!os.write((const char*)&v[0], v.size() * sizeof(char16_t))) throw std::ios_base::failure(std::string{ "writing type '" } +typeid(k_string).name() + "' failed");
-}
-
-template<>
-inline void readFromBinStream<std::u16string>(std::istream& is, std::u16string& v)
-{
-	v.resize(readFromBinStream<uint32_t>(is));
-	if (!is.read((char*)&v[0], v.size() * sizeof(char16_t))) throw std::ios_base::failure(std::string{ "reading type '" } +typeid(k_string).name() + "' failed");
-}
-
 
 template<class _Ty1, class _Ty2>
-inline void writeToBinStream(std::ostream& os, const std::map<_Ty1, _Ty2>& v)
+inline void writeToBinStreamImpl(std::ostream& os, const typename std::map<_Ty1, _Ty2>& v)
 {
 	writeToBinStream<uint32_t>(os, v.size());
 	for (auto& p : v)
@@ -99,7 +102,7 @@ inline void writeToBinStream(std::ostream& os, const std::map<_Ty1, _Ty2>& v)
 }
 
 template<class _Ty1, class _Ty2>
-inline void readFromBinStream(std::istream& is, std::map<_Ty1, _Ty2>& v)
+inline void readFromBinStreamImpl(std::istream& is, typename std::map<_Ty1, _Ty2>& v)
 {
 	size_t len = readFromBinStream<uint32_t>(is);
 	v.clear();
@@ -107,6 +110,27 @@ inline void readFromBinStream(std::istream& is, std::map<_Ty1, _Ty2>& v)
 	{
 		v.emplace(readFromBinStream<std::pair<_Ty1, _Ty2>>(is));
 	}
+}
+
+template<class _Ty>
+inline void writeToBinStream(std::ostream& os, const _Ty& v)
+{
+	writeToBinStreamImpl(os, v);
+}
+
+
+template<class _Ty>
+inline _Ty readFromBinStream(std::istream& is)
+{
+	_Ty v;
+	readFromBinStreamImpl(is, v);
+	return v;
+}
+
+template<class _Ty>
+inline void readFromBinStream(std::istream& is, _Ty& v)
+{
+	readFromBinStreamImpl(is, v);
 }
 
 
