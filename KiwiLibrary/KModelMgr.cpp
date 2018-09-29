@@ -411,17 +411,20 @@ KModelMgr::KModelMgr(const char * modelPath)
 #else
 	{
 		ifstream ifs{ modelPath + string{ "sj.morph" }, ios_base::binary };
+		if (ifs.fail()) throw KiwiException{ string{"Cannot open file '"} +modelPath + "sj.morph'." };
 		loadMorphBin(ifs);
 	}
 	{
-		langMdl = make_shared<KNLangModel>(KNLangModel::readFromStream(ifstream{ modelPath + string{ "sj.lang" }, ios_base::binary }));
+		ifstream ifs{ modelPath + string{ "sj.lang" }, ios_base::binary };
+		if (ifs.fail()) throw KiwiException{ string{"Cannot open file '"} +modelPath + "sj.lang'." };
+		langMdl = make_shared<KNLangModel>(KNLangModel::readFromStream(move(ifs)));
 	}
 #endif
 }
 
 void KModelMgr::addUserWord(const k_string & form, KPOSTag tag, float userScore)
 {
-	if (!trieRoot.empty()) throw bad_exception();
+	if (!trieRoot.empty()) throw KiwiException{ "Cannot addUserWord() after prepare()" };
 	if (form.empty()) return;
 	if (formMap.find(form) != formMap.end()) return;
 	extraTrieSize += form.size() - 1;

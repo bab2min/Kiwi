@@ -19,6 +19,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KiwiPy", "KiwiPy\KiwiPy.vcxproj", "{9A0331FB-819F-41B6-AE04-C3AA7A6104A9}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KiwiPyLinux", "KiwiPy\KiwiPyLinux.vcxproj", "{85AF8B33-4D65-4DA3-8369-4BDD4209D063}"
+	ProjectSection(ProjectDependencies) = postProject
+		{505E5316-76FB-4F4B-853C-969C976C8C8A} = {505E5316-76FB-4F4B-853C-969C976C8C8A}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KiwiLibraryLinux", "KiwiLibrary\KiwiLibraryLinux.vcxproj", "{505E5316-76FB-4F4B-853C-969C976C8C8A}"
 EndProject

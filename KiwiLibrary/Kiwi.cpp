@@ -22,13 +22,12 @@ Kiwi::Kiwi(const char * modelPath, size_t _maxCache, size_t _numThread)
 		detector.saveNounTailModel(ofs);
 	}
 #else
-#ifdef _WIN32
 	{
 		ifstream ifs{ modelPath + string{ "extract.mdl" }, ios_base::binary };
+		if (ifs.fail()) throw KiwiException{ string{"Cannot open file '"} + modelPath + "extract.mdl'."  };
 		detector.loadPOSModel(ifs);
 		detector.loadNounTailModel(ifs);
 	}
-#endif
 #endif
 	mdl = make_unique<KModelMgr>(modelPath);
 }

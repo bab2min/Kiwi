@@ -1,6 +1,10 @@
 // KiwiPy.cpp : Defines the exported functions for the DLL application.
 //
+#ifdef _WIN32
 #include "stdafx.h"
+#endif
+
+#include <stdexcept>
 #include <Python.h>
 #include "../KiwiLibrary/KiwiHeader.h"
 #include "../KiwiLibrary/Kiwi.h"
@@ -24,11 +28,9 @@ static PyObject* kiwi__init(PyObject* self, PyObject* args)
 		}
 		catch (const exception& e)
 		{
-			PyObject* filePath = PyModule_GetFilenameObject(gModule);
-			char16_t path[256] = { 0, };
-			PyUnicode_AsWideChar(filePath, (wchar_t*)path, 256);
+			PyObject* filePath = PyModule_GetFilenameObject(PyImport_AddModule("kiwipiepy"));
+			string spath = PyUnicode_AsUTF8(filePath);
 			Py_DECREF(filePath);
-			auto spath = Kiwi::toU8(path);
 			if (spath.rfind('/') != spath.npos)
 			{
 				spath = spath.substr(0, spath.rfind('/') + 1);
@@ -43,10 +45,10 @@ static PyObject* kiwi__init(PyObject* self, PyObject* args)
 	}
 	catch (const exception& e)
 	{
+		cerr << e.what() << endl;
 		PyErr_SetString(PyExc_Exception, e.what());
 		return nullptr;
 	}
-	
 	Py_INCREF(Py_None);
 	return Py_None;
 }
@@ -58,6 +60,7 @@ static PyObject* kiwi__close(PyObject* self, PyObject* args)
 	try
 	{
 		PyObject* instObj = PyObject_GetAttrString(argSelf, "_inst");
+		if (!instObj) throw runtime_error{ "_inst is null" };
 		Kiwi* inst = (Kiwi*)PyLong_AsLongLong(instObj);
 		Py_DECREF(instObj);
 		if (inst) delete inst;
@@ -83,6 +86,7 @@ static PyObject* kiwi__addUserWord(PyObject* self, PyObject* args)
 	try
 	{
 		PyObject* instObj = PyObject_GetAttrString(argSelf, "_inst");
+		if (!instObj) throw runtime_error{ "_inst is null" };
 		Kiwi* inst = (Kiwi*)PyLong_AsLongLong(instObj);
 		Py_DECREF(instObj);
 		return Py_BuildValue("n", inst->addUserWord(Kiwi::toU16(word), makePOSTag(Kiwi::toU16(tag)), score));
@@ -102,6 +106,7 @@ static PyObject* kiwi__loadUserDictionary(PyObject* self, PyObject* args)
 	try
 	{
 		PyObject* instObj = PyObject_GetAttrString(argSelf, "_inst");
+		if (!instObj) throw runtime_error{ "_inst is null" };
 		Kiwi* inst = (Kiwi*)PyLong_AsLongLong(instObj);
 		Py_DECREF(instObj);
 		return Py_BuildValue("n", inst->loadUserDictionary(path));
@@ -123,6 +128,7 @@ static PyObject* kiwi__extractWords(PyObject* self, PyObject* args)
 	try
 	{
 		PyObject* instObj = PyObject_GetAttrString(argSelf, "_inst");
+		if (!instObj) throw runtime_error{ "_inst is null" };
 		Kiwi* inst = (Kiwi*)PyLong_AsLongLong(instObj);
 		Py_DECREF(instObj);
 		auto res = inst->extractWords([argReader](size_t id) -> u16string
@@ -161,6 +167,7 @@ static PyObject* kiwi__extractFilterWords(PyObject* self, PyObject* args)
 	try
 	{
 		PyObject* instObj = PyObject_GetAttrString(argSelf, "_inst");
+		if (!instObj) throw runtime_error{ "_inst is null" };
 		Kiwi* inst = (Kiwi*)PyLong_AsLongLong(instObj);
 		Py_DECREF(instObj);
 		auto res = inst->extractWords([argReader](size_t id) -> u16string
@@ -200,6 +207,7 @@ static PyObject* kiwi__extractAddWords(PyObject* self, PyObject* args)
 	try
 	{
 		PyObject* instObj = PyObject_GetAttrString(argSelf, "_inst");
+		if (!instObj) throw runtime_error{ "_inst is null" };
 		Kiwi* inst = (Kiwi*)PyLong_AsLongLong(instObj);
 		Py_DECREF(instObj);
 		auto res = inst->extractAddWords([argReader](size_t id) -> u16string
@@ -236,6 +244,7 @@ static PyObject* kiwi__setCutOffThreshold(PyObject* self, PyObject* args)
 	try
 	{
 		PyObject* instObj = PyObject_GetAttrString(argSelf, "_inst");
+		if (!instObj) throw runtime_error{ "_inst is null" };
 		Kiwi* inst = (Kiwi*)PyLong_AsLongLong(instObj);
 		Py_DECREF(instObj);
 		inst->setCutOffThreshold(threshold);
@@ -257,6 +266,7 @@ static PyObject* kiwi__prepare(PyObject* self, PyObject* args)
 	try
 	{
 		PyObject* instObj = PyObject_GetAttrString(argSelf, "_inst");
+		if (!instObj) throw runtime_error{ "_inst is null" };
 		Kiwi* inst = (Kiwi*)PyLong_AsLongLong(instObj);
 		Py_DECREF(instObj);
 		return Py_BuildValue("n", inst->prepare());
@@ -296,6 +306,7 @@ static PyObject* kiwi__analyze(PyObject* self, PyObject* args)
 			try
 			{
 				PyObject* instObj = PyObject_GetAttrString(argSelf, "_inst");
+				if (!instObj) throw runtime_error{ "_inst is null" };
 				Kiwi* inst = (Kiwi*)PyLong_AsLongLong(instObj);
 				Py_DECREF(instObj);
 
@@ -358,6 +369,7 @@ static PyObject* kiwi__perform(PyObject* self, PyObject* args)
 		if (!PyCallable_Check(reader)) return PyErr_SetString(PyExc_TypeError, "perform requires 1st parameter which is callable"), nullptr;
 		if (!PyCallable_Check(receiver)) return PyErr_SetString(PyExc_TypeError, "perform requires 2nd parameter which is callable"), nullptr;
 		PyObject* instObj = PyObject_GetAttrString(argSelf, "_inst");
+		if (!instObj) throw runtime_error{ "_inst is null" };
 		Kiwi* inst = (Kiwi*)PyLong_AsLongLong(instObj);
 		Py_DECREF(instObj);
 
@@ -391,6 +403,7 @@ static PyObject* kiwi__version(PyObject* self, PyObject* args)
 	try
 	{
 		PyObject* instObj = PyObject_GetAttrString(argSelf, "_inst");
+		if (!instObj) throw runtime_error{ "_inst is null" };
 		Kiwi* inst = (Kiwi*)PyLong_AsLongLong(instObj);
 		Py_DECREF(instObj);
 		return Py_BuildValue("n", inst->getVersion());
@@ -433,6 +446,8 @@ static PyObject *createClassObject(const char *name, PyMethodDef methods[])
 PyMODINIT_FUNC PyInit_coreWinx64()
 #elif _WIN32
 PyMODINIT_FUNC PyInit_coreWinx86()
+#else
+PyMODINIT_FUNC PyInit_kiwipiepycore()
 #endif
 {
 	static PyMethodDef methods[] =

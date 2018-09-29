@@ -190,8 +190,8 @@ void writeSVToBinStream(std::ostream & os, int32_t v)
 	else u = v + (v < 0 ? (1 << (i * 7)) : 0);
 	for (size_t n = 0; n < i; ++n)
 	{
-		uint8_t c = (v & 0x7F) | (n + 1 < i ? 0x80 : 0);
+		uint8_t c = (u & 0x7F) | (n + 1 < i ? 0x80 : 0);
 		writeToBinStream(os, c);
-		v >>= 7;
+		u >>= 7;
 	}
 }
