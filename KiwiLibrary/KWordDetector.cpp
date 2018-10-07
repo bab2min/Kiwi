@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "KWordDetector.h"
 #include "Utils.h"
+#include "Trie.hpp"
 
 using namespace std;
 
@@ -156,14 +157,14 @@ void KWordDetector::countNgram(Counter& cdata, const function<u16string(size_t)>
 		{
 			vector<int16_t, pool_allocator<void*>> ids;
 			ids.reserve(begin.strSize() + 2);
-			ids.emplace_back(1);
+			ids.emplace_back(1); // Begin Chr
 			for (auto c : *begin)
 			{
 				uint16_t id = cdata.chrDict.get(c);
 				if (id == cdata.chrDict.npos) id = 0;
 				ids.emplace_back(id);
 			}
-			ids.emplace_back(2);
+			ids.emplace_back(2); // End Chr
 			idss->emplace_back(move(ids));
 		}
 
@@ -171,14 +172,16 @@ void KWordDetector::countNgram(Counter& cdata, const function<u16string(size_t)>
 		futures[0] = rt[0].setWork([&, idss]()
 		{
 			for (auto& ids : *idss)
-			for (size_t i = 1; i < ids.size(); ++i)
 			{
-				if (!ids[i]) continue;
-				for (size_t j = i + 2; j < min(i + 1 + maxWordLen, ids.size() + 1); ++j)
+				for (size_t i = 1; i < ids.size(); ++i)
 				{
-					if (!ids[j - 1]) break;
-					++cdata.forwardCnt[{ids.begin() + i, ids.begin() + j}];
-					if (!cdata.candBigram.count(make_pair(ids[j - 2], ids[j - 1]))) break;
+					if (!ids[i]) continue; // skip unknown chr
+					for (size_t j = i + 1; j < min(i + 1 + maxWordLen, ids.size() + 1); ++j)
+					{
+						if (!ids[j - 1]) break;
+						++cdata.forwardCnt[{ids.begin() + i, ids.begin() + j}];
+						if (!cdata.candBigram.count(make_pair(ids[j - 2], ids[j - 1]))) break;
+					}
 				}
 			}
 		});
@@ -187,14 +190,16 @@ void KWordDetector::countNgram(Counter& cdata, const function<u16string(size_t)>
 		futures[1] = rt[1].setWork([&, idss]()
 		{
 			for (auto& ids : *idss)
-			for (size_t i = 1; i < ids.size(); ++i)
 			{
-				if (!ids.rbegin()[i]) continue;
-				for (size_t j = i + 2; j < min(i + 1 + maxWordLen, ids.size() + 1); ++j)
+				for (size_t i = 1; i < ids.size(); ++i)
 				{
-					if (!ids.rbegin()[j - 1]) break;
-					++cdata.backwardCnt[{ids.rbegin() + i, ids.rbegin() + j}];
-					if (!cdata.candBigram.count(make_pair(ids.rbegin()[j - 1], ids.rbegin()[j - 2]))) break;
+					if (!ids.rbegin()[i]) continue; // skip unknown chr
+					for (size_t j = i + 1; j < min(i + 1 + maxWordLen, ids.size() + 1); ++j)
+					{
+						if (!ids.rbegin()[j - 1]) break;
+						++cdata.backwardCnt[{ids.rbegin() + i, ids.rbegin() + j}];
+						if (!cdata.candBigram.count(make_pair(ids.rbegin()[j - 1], ids.rbegin()[j - 2]))) break;
+					}
 				}
 			}
 		});
@@ -238,7 +243,7 @@ void KWordDetector::countNgram(Counter& cdata, const function<u16string(size_t)>
 	}
 }
 
-float KWordDetector::branchingEntropy(const map<u16light, uint32_t>& cnt, map<u16light, uint32_t>::iterator it) const
+float KWordDetector::branchingEntropy(const map<u16light, uint32_t>& cnt, map<u16light, uint32_t>::iterator it, float defaultPerp) const
 {
 	u16light endKey = it->first;
 	float tot = it->second;
@@ -253,9 +258,10 @@ float KWordDetector::branchingEntropy(const map<u16light, uint32_t>& cnt, map<u1
 		if (it->first.size() != len + 1) continue;
 		sum += it->second;
 		float p = it->second / tot;
+		// for begin, end, unknown
 		if (it->first.back() < 3)
 		{
-			entropy -= p * log(p / 4);
+			entropy -= p * log(p / defaultPerp);
 		}
 		else
 		{
@@ -360,15 +366,14 @@ void KWordDetector::loadNounTailModel(std::istream & is)
 	readFromBinStream(is, nounTailScore);
 }
 
-
-vector<KWordDetector::WordInfo> KWordDetector::extractWords(const std::function<std::u16string(size_t)>& reader) const
+vector<KWordDetector::WordInfo> KWordDetector::extractWords(const function<u16string(size_t)>& reader) const
 {
 	Counter cdata;
 	countUnigram(cdata, reader);
 	countBigram(cdata, reader);
 	countNgram(cdata, reader);
 
-	vector<WordInfo> ret;
+	vector<WordInfo> cands, ret;
 	for (auto it = cdata.forwardCnt.begin(); it != cdata.forwardCnt.end(); ++it)
 	{
 		auto& p = *it;
@@ -377,8 +382,6 @@ vector<KWordDetector::WordInfo> KWordDetector::extractWords(const std::function<
 		auto bit = cdata.backwardCnt.find({ p.first.rbegin(), p.first.rend() });
 		if (bit == cdata.backwardCnt.end()) continue;
 		
-		//float forwardCohesion = pow(p.second / (float)cdata.cntUnigram[p.first.front()], 1 / (p.first.size() - 1.f));
-		//float backwardCohesion = pow(p.second / (float)cdata.cntUnigram[p.first.back()], 1 / (p.first.size() - 1.f));
 		float forwardCohesion = p.second / (float)cdata.cntUnigram[p.first.front()];
 		float backwardCohesion = p.second / (float)cdata.cntUnigram[p.first.back()];
 		if (p.first.size() == 3)
@@ -398,8 +401,8 @@ vector<KWordDetector::WordInfo> KWordDetector::extractWords(const std::function<
 			backwardCohesion = pow(backwardCohesion, 1.f / (p.first.size() * 3 - 6));
 		}
 		
-		float forwardBranch = branchingEntropy(cdata.forwardCnt, it);
-		float backwardBranch = branchingEntropy(cdata.backwardCnt, bit);
+		float forwardBranch = branchingEntropy(cdata.forwardCnt, it, 6);
+		float backwardBranch = branchingEntropy(cdata.backwardCnt, bit, 6);
 
 		float score = forwardCohesion * backwardCohesion * forwardBranch * backwardBranch;
 		if (score < minScore) continue;
@@ -408,13 +411,135 @@ vector<KWordDetector::WordInfo> KWordDetector::extractWords(const std::function<
 		transform(p.first.begin(), p.first.end(), back_inserter(form), [this, &cdata](char16_t c) { return cdata.chrDict.getStr(c); });
 
 		bool hasCoda = 0xAC00 <= p.first.back() && p.first.back() <= 0xD7A4 && (p.first.back() - 0xAC00) % 28;
-		ret.emplace_back(form, score, backwardBranch, forwardBranch, backwardCohesion, forwardCohesion,
+		cands.emplace_back(form, score, backwardBranch, forwardBranch, backwardCohesion, forwardCohesion,
 			p.second, getPosScore(cdata, cdata.forwardCnt, it, hasCoda, form));
 	}
 
-	sort(ret.begin(), ret.end(), [](const auto& a, const auto& b)
+	map<u16string, float> rPartEntropy;
+	for (auto bit = cdata.backwardCnt.begin(); bit != cdata.backwardCnt.end(); ++bit)
+	{
+		auto& p = *bit;
+		if (p.second < minCnt) continue;
+		if (p.first.size() > 3 || p.first.size() < 1) continue;
+		float r = branchingEntropy(cdata.backwardCnt, bit);
+		if (r >= 1)
+		{
+			u16string form;
+			form.reserve(p.first.size());
+			transform(p.first.begin(), p.first.end(), back_inserter(form), [this, &cdata](char16_t c) { return cdata.chrDict.getStr(c); });
+			if (any_of(form.begin(), form.end(), isalnum)) continue;
+			rPartEntropy[form] = r;
+		}
+	}
+
+	sort(cands.begin(), cands.end(), [](const auto& a, const auto& b)
 	{
 		return a.score > b.score;
 	});
+
+	vector<Trie<char16_t, uint32_t, OverriddenMap<map<char16_t, int32_t>>>> trieNodes(1), trieBackNodes(1);
+	const auto& addNode = [&]()
+	{
+		trieNodes.emplace_back();
+		return &trieNodes.back();
+	};
+	const auto& addBackNode = [&]()
+	{
+		trieBackNodes.emplace_back();
+		return &trieBackNodes.back();
+	};
+
+	for (auto& r : cands)
+	{
+		/*
+		removing hyper-matched forms
+		ex) correct form: ABC, matched forms: ABC, ABC_D, ABC_E ...
+		remove ABC_D, ABC_E ... if branching entropy of D, E ... is higher
+		*/
+		auto pm = trieNodes[0].findMaximumMatch(r.form.begin(), r.form.end());
+		if (pm.first && pm.second)
+		{
+			auto& pr = ret[*pm.first - 1];
+			if (r.form.size() <= pr.form.size() + 3)
+			{
+				float rEntropy = 1;
+				auto rpit = rPartEntropy.find({ r.form.rbegin(), r.form.rbegin() + r.form.size() - pr.form.size() });
+				if (rpit != rPartEntropy.end()) rEntropy = max(rpit->second, rEntropy);
+				if (rEntropy > 2.5f && r.freq < ((rEntropy - 1) / rEntropy) * pr.freq)
+				{
+					//cerr << utf16_to_utf8(r.form) << '\t' << r.freq << '\t' << utf16_to_utf8(pr.form) << '\t' << pr.freq << '\t' << rEntropy << endl;
+					continue;
+				}
+			}
+		}
+
+		/*
+		removing hypo-matched forms
+		ex) correct forms: ABC_D, ABC_E ..., matched form: ABC_D, ABC_E, ... , ABC
+		remove ABC if total number of ABC is nearly same as total number of ABC_D, ABC_E ...
+		*/
+		auto tr = trieNodes[0].findNode(r.form.begin(), r.form.end());
+		if (tr)
+		{
+			vector<uint32_t> childFreqs;
+			tr->traverse([&](uint32_t f)
+			{
+				auto& pr = ret[f - 1];
+				childFreqs.emplace_back(pr.freq);
+				return true;
+			});
+			size_t tot = accumulate(childFreqs.begin(), childFreqs.end(), 0);
+			float entropy = 0;
+			for (auto c : childFreqs)
+			{
+				float p = c / (float)tot;
+				entropy -= p * log(p);
+			}
+			if (entropy < 1.5 && (tot + 25) > (r.freq + 25) * 0.9)
+			{
+				cerr << utf16_to_utf8(r.form) << endl;
+				continue;
+			}
+		}
+
+		auto tbr = trieBackNodes[0].findNode(r.form.rbegin(), r.form.rend());
+		if (tbr)
+		{
+			vector<uint32_t> childFreqs;
+			tbr->traverse([&](uint32_t f)
+			{
+				auto& pr = ret[f - 1];
+				childFreqs.emplace_back(pr.freq);
+				return true;
+			});
+			size_t tot = accumulate(childFreqs.begin(), childFreqs.end(), 0);
+			float entropy = 0;
+			for (auto c : childFreqs)
+			{
+				float p = c / (float)tot;
+				entropy -= p * log(p);
+			}
+			if (entropy < 1.5 && (tot + 25) >(r.freq + 25) * 0.9)
+			{
+				cerr << utf16_to_utf8(r.form) << endl;
+				continue;
+			}
+		}
+
+		if (trieNodes.capacity() < trieNodes.size() + r.form.size())
+		{
+			trieNodes.reserve(max(trieNodes.capacity() * 2, trieNodes.size() + r.form.size()));
+		}
+		trieNodes[0].build(r.form.data(), r.form.size(), ret.size() + 1, addNode);
+
+		if (trieBackNodes.capacity() < trieBackNodes.size() + r.form.size())
+		{
+			trieBackNodes.reserve(max(trieBackNodes.capacity() * 2, trieBackNodes.size() + r.form.size()));
+		}
+		vector<char16_t> revForm{ r.form.rbegin(), r.form.rend() };
+		trieBackNodes[0].build(revForm.data(), r.form.size(), ret.size() + 1, addBackNode);
+		ret.emplace_back(move(r));
+	}
+
 	return ret;
 }

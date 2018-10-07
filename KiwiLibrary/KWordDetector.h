@@ -294,7 +294,7 @@ protected:
 	void countUnigram(Counter&, const std::function<std::u16string(size_t)>& reader) const;
 	void countBigram(Counter&, const std::function<std::u16string(size_t)>& reader) const;
 	void countNgram(Counter&, const std::function<std::u16string(size_t)>& reader) const;
-	float branchingEntropy(const std::map<u16light, uint32_t>& cnt, std::map<u16light, uint32_t>::iterator it) const;
+	float branchingEntropy(const std::map<u16light, uint32_t>& cnt, std::map<u16light, uint32_t>::iterator it, float defaultPerp = 1.f) const;
 	std::map<KPOSTag, float> getPosScore(Counter&, const std::map<u16light, uint32_t>& cnt, std::map<u16light, uint32_t>::iterator it, bool coda, const std::u16string& realForm) const;
 public:
 
