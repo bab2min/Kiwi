@@ -497,7 +497,7 @@ vector<KWordDetector::WordInfo> KWordDetector::extractWords(const function<u16st
 			}
 			if (entropy < 1.5 && (tot + 25) > (r.freq + 25) * 0.9)
 			{
-				cerr << utf16_to_utf8(r.form) << endl;
+				//cerr << utf16_to_utf8(r.form) << endl;
 				continue;
 			}
 		}
@@ -521,7 +521,7 @@ vector<KWordDetector::WordInfo> KWordDetector::extractWords(const function<u16st
 			}
 			if (entropy < 1.5 && (tot + 25) >(r.freq + 25) * 0.9)
 			{
-				cerr << utf16_to_utf8(r.form) << endl;
+				//cerr << utf16_to_utf8(r.form) << endl;
 				continue;
 			}
 		}
