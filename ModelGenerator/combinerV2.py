@@ -2,6 +2,10 @@ import re
 import itertools
 import utils
 
+##
+## 추가적으로 이/VCP+었/EP => 었 으로 잘못 결합되는 쌍을 제거해야함
+##
+
 class MorphemeModel:
     def __init__(self, filename):
         self.morphemes = {}

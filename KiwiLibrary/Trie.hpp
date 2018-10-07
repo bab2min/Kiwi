@@ -64,7 +64,7 @@ public:
 	}
 };
 
-template<class _Key, class _Value, class _KeyStore = std::unordered_map<_Key, int32_t>>
+template<class _Key, class _Value, class _KeyStore = OverriddenMap<std::unordered_map<_Key, int32_t>>>
 struct Trie
 {
 	_KeyStore next = {};
@@ -98,6 +98,45 @@ struct Trie
 		}
 
 		getNext(*keys)->build(keys + 1, len - 1, _val, alloc);
+	}
+
+	template<class _Iterator>
+	Trie* findNode(_Iterator begin, _Iterator end)
+	{
+		if (begin == end) return this;
+		auto n = getNext(*begin);
+		if (n) return n->findNode(++begin, end);
+		return nullptr;
+	}
+
+	template<class _Func>
+	void traverse(_Func func)
+	{
+		if (val)
+		{
+			if (func(val)) return;
+		}
+		for (auto& p : next)
+		{
+			if (getNext(p.first))
+			{
+				getNext(p.first)->traverse(func);
+			}
+		}
+		return;
+	}
+
+	template<class _Iterator>
+	std::pair<_Value*, size_t> findMaximumMatch(_Iterator begin, _Iterator end, size_t idxCnt = 0)
+	{
+		if (begin == end) return std::make_pair(val ? &val : nullptr, idxCnt);
+		auto n = getNext(*begin);
+		if (n)
+		{
+			auto v = n->findMaximumMatch(++begin, end, idxCnt + 1);
+			if (v.first) return v;
+		}
+		return std::make_pair(val ? &val : nullptr, idxCnt);
 	}
 
 	Trie* findFail(_Key i) const

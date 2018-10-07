@@ -14,7 +14,7 @@
 class Timer
 {
 public:
-	std::chrono::steady_clock::time_point point;
+	std::chrono::high_resolution_clock::time_point point;
 	Timer()
 	{
 		reset();
@@ -112,7 +112,7 @@ int main()
 	Timer timer;
 	Kiwi kw{ "../ModelGenerator/", (size_t)-1, 0 };
 	//kw.setCutOffThreshold(5);
-	if(0)
+	if(1)
 	{
 		auto flist = { "xaa", "xab", "xac", "xad", "xae", "xaf" };
 		for (auto list : flist)
@@ -133,19 +133,20 @@ int main()
 					if (sstr.size()) return utf8_to_utf16(sstr);
 				}
 				return {};
-			}, 7, 20, 0.1f);
+			}, 10, 20, 0.015f, -3.6);
 
 			ofstream ofs{ string{"extracted_"} + list + ".txt" };
 			for (auto& r : res)
 			{
 				ofs << utf16_to_utf8(r.form) << '\t' << r.score << '\t' << r.freq
 					<< '\t' << r.lCohesion << '\t' << r.rCohesion
+					<< '\t' << r.lBranch << '\t' << r.rBranch
 					<< '\t' << r.posScore[KPOSTag::NNP] << endl;
 			}
 		}
 		return 0;
 	}
-	kw.loadUserDictionary("dict_namu.txt");
+	//kw.loadUserDictionary("dict_namu.txt");
 	kw.prepare();
 
 	if (0)
