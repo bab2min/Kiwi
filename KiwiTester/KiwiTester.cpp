@@ -111,8 +111,10 @@ int main()
 	setvbuf(stdout, nullptr, _IOFBF, 1000);
 	Timer timer;
 	Kiwi kw{ "../ModelGenerator/", (size_t)-1, 0 };
+	//kw.prepare();
+	//kw.analyze(u"위키같지만.", 10);
 	//kw.setCutOffThreshold(5);
-	if(1)
+	if(0)
 	{
 		auto flist = { "xaa", "xab", "xac", "xad", "xae", "xaf" };
 		for (auto list : flist)
@@ -133,7 +135,7 @@ int main()
 					if (sstr.size()) return utf8_to_utf16(sstr);
 				}
 				return {};
-			}, 10, 20, 0.015f, -3.6);
+			}, 16, 20, 0.015f, -3.6);
 
 			ofstream ofs{ string{"extracted_"} + list + ".txt" };
 			for (auto& r : res)
@@ -146,7 +148,7 @@ int main()
 		}
 		return 0;
 	}
-	//kw.loadUserDictionary("dict_namu.txt");
+	kw.loadUserDictionary("dict_namu2.txt");
 	kw.prepare();
 
 	if (0)
