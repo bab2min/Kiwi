@@ -397,15 +397,17 @@ vector<pair<Kiwi::path, float>> Kiwi::findBestPath(const vector<KGraphNode>& gra
 				if (curMorph->tag == KPOSTag::NNG) estimatedLL = LogPoisson::getLL(4.622955f, unknownLen);
 				else if (curMorph->tag == KPOSTag::NNP) estimatedLL = LogPoisson::getLL(5.177622f, unknownLen);
 				else if (curMorph->tag == KPOSTag::MAG) estimatedLL = LogPoisson::getLL(4.557326f, unknownLen);
+				if ((node->uform.empty() ? node->form->form.back() : node->uform.back()) == 0x11BB) estimatedLL -= 10;
 				estimatedLL -= 20;
 			}
 
+			float discountForCombining = curMorph->combineSocket ? -15.f : 0.f;
 			for (auto& p : maxWidLL)
 			{
 				for (auto& q : p.second)
 				{
 					q.second += estimatedLL;
-					tMax = max(tMax, q.second);
+					tMax = max(tMax, q.second + discountForCombining);
 				}
 			}
 
@@ -489,6 +491,7 @@ vector<pair<Kiwi::path, float>> Kiwi::findBestPath(const vector<KGraphNode>& gra
 		if (remainCnt < cache[i].size()) cache[i].erase(cache[i].begin() + remainCnt, cache[i].end());
 		*/
 #ifdef DEBUG_PRINT
+		cout << "== " << i << " ==" << endl;
 		for (auto& tt : cache[i])
 		{
 			cout << tt.second << '\t';
