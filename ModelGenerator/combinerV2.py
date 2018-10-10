@@ -4,6 +4,7 @@ import utils
 
 ##
 ## 추가적으로 이/VCP+었/EP => 었 으로 잘못 결합되는 쌍을 제거해야함
+## 추가적으로 크, 스, 쓰 와 같은 동사에 -Positive 선행조건이 붙는 오류 수정해야함
 ##
 
 class MorphemeModel:

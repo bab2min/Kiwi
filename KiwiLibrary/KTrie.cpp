@@ -35,7 +35,9 @@ vector<KGraphNode> KTrie::split(const k_string& str) const
 				});
 
 				// inserting unknown form 
-				if (nBegin > lastSpecialEndPos && !longestMatched && !(0x11A8 <= cand->form[0] && cand->form[0] < (0x11A7 + 28)))
+				if (nBegin > lastSpecialEndPos && !longestMatched 
+					&& !(0x11A8 <= cand->form[0] && cand->form[0] < (0x11A7 + 28)) 
+					&& str[nBegin - space -1] != 0x11BB) // cannot ends with ¤¶
 				{
 					auto it2 = spacePos.find(lastSpecialEndPos - 1);
 					int space2 = it2 == spacePos.end() ? 0 : it2->second;
