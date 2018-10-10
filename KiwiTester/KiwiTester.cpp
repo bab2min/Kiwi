@@ -112,7 +112,7 @@ int main()
 	Timer timer;
 	Kiwi kw{ "../ModelGenerator/", (size_t)-1, 0 };
 	//kw.prepare();
-	//kw.analyze(u"위키같지만.", 10);
+	//kw.analyze(u"기대가컸었다.", 10);
 	//kw.setCutOffThreshold(5);
 	if(0)
 	{
@@ -151,7 +151,7 @@ int main()
 	kw.loadUserDictionary("dict_namu2.txt");
 	kw.prepare();
 
-	if (0)
+	if (1)
 	{
 		Timer tm;
 		ifstream ifs{ "D:/namu_raw.txt" };

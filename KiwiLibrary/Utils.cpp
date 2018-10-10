@@ -14,6 +14,7 @@ k_string normalizeHangul(const std::u16string& hangul)
 	ret.reserve(hangul.size() * 1.5);
 	for (auto c : hangul)
 	{
+		if (c == 0xB42C) c = 0xB410; // 됬 -> 됐 으로 강제 교정
 		if (0xAC00 <= c && c < 0xD7A4)
 		{
 			int coda = (c - 0xAC00) % 28;
