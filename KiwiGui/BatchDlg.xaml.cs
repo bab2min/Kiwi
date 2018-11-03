@@ -32,6 +32,7 @@ namespace KiwiGui
             worker.ProgressChanged += Worker_ProgressChanged;
             worker.WorkerReportsProgress = true;
             worker.WorkerSupportsCancellation = true;
+            App.monitor.TrackScreenView("Kiwi_BatchDlg");
         }
 
         private void Worker_ProgressChanged(object sender, ProgressChangedEventArgs e)

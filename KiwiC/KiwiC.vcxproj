@@ -23,7 +23,7 @@
     <ProjectGuid>{F91F4D06-6485-4FF0-AB01-C07E9E58A80E}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>KiwiC</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
     <ProjectName>KiwiC</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

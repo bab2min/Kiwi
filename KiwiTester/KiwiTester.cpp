@@ -116,7 +116,7 @@ int main()
 	//kw.setCutOffThreshold(5);
 	if(0)
 	{
-		auto flist = { "xaa", "xab", "xac", "xad", "xae", "xaf" };
+		auto flist = { "kowiki.txt" };
 		for (auto list : flist)
 		{
 			ifstream ifs{ string{"D:/"} + list };
@@ -148,14 +148,14 @@ int main()
 		}
 		return 0;
 	}
-	kw.loadUserDictionary("dict_namu2.txt");
+	kw.loadUserDictionary("dict_namu3.txt");
 	kw.prepare();
 
 	if (1)
 	{
 		Timer tm;
-		ifstream ifs{ "D:/namu_raw.txt" };
-		ofstream ofs{ "D:/namu_tagged.txt" };
+		ifstream ifs{ "D:/kowiki.txt" };
+		ofstream ofs{ "D:/kowiki_tagged.txt" };
 		kw.analyze(1, [&ifs](size_t id) -> u16string
 		{
 			if (id == 0)
