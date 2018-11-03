@@ -39,6 +39,8 @@ namespace KiwiGui
                 MessageBox.Show(this, "Kiwi 형태소 분석기를 초기화하는 데 실패했습니다. 모델 파일이 없거나 인자가 잘못되었습니다. \n" + e.Message, "Kiwi 오류", MessageBoxButton.OK, MessageBoxImage.Error);
                 Close();
             }
+            App.monitor.TrackScreenView("Kiwi_MainWindow");
+            Title += " v" + App.getRunningVersion().ToString().Substring(0, 3);
         }
 
         public static string GetFileText(string path)
@@ -59,6 +61,7 @@ namespace KiwiGui
 
             if (ofd.ShowDialog() != true) return;
             InputTxt.Text = GetFileText(ofd.FileName);
+            App.monitor.TrackAtomicFeature("Kiwi_Menu", "Open", ofd.FileName);
         }
 
         private void MenuItem_Save(object sender, RoutedEventArgs e)
@@ -70,6 +73,7 @@ namespace KiwiGui
             if (ofd.ShowDialog() != true) return;
             string res = new TextRange(ResultBlock.Document.ContentStart, ResultBlock.Document.ContentEnd).Text;
             File.WriteAllText(ofd.FileName, res);
+            App.monitor.TrackAtomicFeature("Kiwi_Menu", "Save", res);
         }
 
         private void MenuItem_Batch(object sender, RoutedEventArgs e)
@@ -103,6 +107,7 @@ namespace KiwiGui
         private void AnalyzeBtn_Click(object sender, RoutedEventArgs e)
         {
             ResultBlock.Document.Blocks.Clear();
+            App.monitor.TrackAtomicFeature("Kiwi_Menu", "Analyze", InputTxt.Text);
             string[] lines = TypeCmb.SelectedIndex == 0 ? InputTxt.Text.Trim().Split('\n') : new string[]{ InputTxt.Text.Trim() };
             int topN = TopNCmb.SelectedIndex + 1;
             Brush brushDef = new SolidColorBrush(Color.FromRgb(0, 0, 0));
