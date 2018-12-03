@@ -232,6 +232,38 @@ float readNegFixed16(std::istream& is)
 }
 
 
+const KNLangModel::Node * KNLangModel::Node::getNextTransition(WID n, size_t endOrder, float & ll) const
+{
+	ll = 0;
+	const KNLangModel::Node *cNode = this, *p;
+	if (depth == endOrder)
+	{
+		union { int32_t t; float u; };
+		t = bakedNext[n];
+		if (t)
+		{
+			ll = u;
+			return getLower()->getNextFromBaked(n);
+		}
+		ll += gamma;
+		cNode = getLower();
+	}
+
+	while (cNode)
+	{
+		p = cNode->getNextFromBaked(n);
+		if (p)
+		{
+			ll += p->ll;
+			return p;
+		}
+		ll += cNode->gamma;
+		cNode = cNode->getLower();
+	}
+	ll = -100;
+	return nullptr;
+}
+
 void KNLangModel::Node::writeToStream(std::ostream & str, size_t leafDepth) const
 {
 	writeVToBinStream(str, -parent);

@@ -113,7 +113,7 @@ int main()
 	Kiwi kw{ "../ModelGenerator/", (size_t)-1, 0 };
 	//kw.prepare();
 	//kw.analyze(u"기대가컸었다.", 10);
-	//kw.setCutOffThreshold(5);
+	//kw.setCutOffThreshold(10);
 	if(0)
 	{
 		auto flist = { "kowiki.txt" };
@@ -151,7 +151,7 @@ int main()
 	kw.loadUserDictionary("dict_namu3.txt");
 	kw.prepare();
 
-	if (1)
+	if (0)
 	{
 		Timer tm;
 		ifstream ifs{ "D:/kowiki.txt" };
@@ -187,8 +187,6 @@ int main()
 	GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc));
 	SIZE_T memUsed = pmc.WorkingSetSize;
 	cout << "Mem Usage : " << memUsed / 1024.f / 1024.f << " MB" << endl;
-	
-	kw.analyze(KSTR(R"!( )!"), 10);
 
 	string testFiles[] = { "01s.txt", "02s.txt", "03s.txt", "17s.txt", "18s.txt", "13s.txt", "15s.txt", };
 	for (auto tf : testFiles)

@@ -9,24 +9,28 @@ class KNLangModel;
 
 struct KGraphNode
 {
-	enum { MAX_NEXT = 16 };
+	enum { MAX_PREV = 16 };
 	const KForm* form = nullptr;
 	k_string uform;
 	uint16_t lastPos;
-	std::array<uint16_t, MAX_NEXT> nexts = { { 0, } };
+	std::array<uint16_t, MAX_PREV> prevs = { { 0, } };
 
 	KGraphNode(const KForm* _form = nullptr, uint16_t _lastPos = 0) : form(_form), lastPos(_lastPos) {}
 	KGraphNode(const k_string& _uform, uint16_t _lastPos) : uform(_uform), lastPos(_lastPos) {}
 
-	KGraphNode* getNext(size_t idx) const { return nexts[idx] ? (KGraphNode*)this + nexts[idx] : nullptr; }
+	KGraphNode* getPrev(size_t idx) const { return prevs[idx] ? (KGraphNode*)this - prevs[idx] : nullptr; }
 	
 	static std::vector<KGraphNode> removeUnconnected(const std::vector<KGraphNode>& graph);
 
-	void addNext(KGraphNode* next)
+	void addPrev(size_t distance)
 	{
-		size_t i = 0;
-		while(i < MAX_NEXT && nexts[i]) ++i;
-		nexts[i] = next - this;
+		for (size_t i = 0; i < MAX_PREV; ++i)
+		{
+			if (prevs[i]) continue;
+			prevs[i] = distance;
+			return;
+		}
+		throw std::runtime_error{ "'prevs' is overflowed" };
 	}
 };
 

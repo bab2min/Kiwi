@@ -251,72 +251,67 @@ struct MInfo
 		condVowel(_condVowel), condPolar(_condPolar), ownFormId(_ownFormId), lastPos(_lastPos)
 	{}
 };
+
 typedef vector<MInfo, pool_allocator<MInfo>> MInfos;
-typedef vector<pair<MInfos, float>, pool_allocator<pair<MInfos, float>>> WordLLs;
+
+struct WordLL
+{
+	MInfos morphs;
+	float accScore = 0;
+	const KNLangModel::Node* node = nullptr;
+};
+
+struct WordLLP
+{
+	const MInfos* morphs = nullptr;
+	float accScore = 0;
+	const KNLangModel::Node* node = nullptr;
+};
+
+typedef vector<WordLL, pool_allocator<WordLL>> WordLLs;
 
 template<class _Type>
-void evalTrigram(const KNLangModel * knlm, const KMorpheme* morphBase, const pair<MInfos, float>** wBegin, const pair<MInfos, float>** wEnd, 
-	array<WID, 6> seq, size_t chSize, const KMorpheme* curMorph, const KGraphNode* node, uint8_t combSocket, _Type& maxWidLL)
+void evalTrigram(const KNLangModel::Node* rootNode, const KMorpheme* morphBase, const WordLL** wBegin, const WordLL** wEnd, 
+	array<WID, 4> seq, size_t chSize, const KMorpheme* curMorph, const KGraphNode* node, _Type& maxWidLL)
 {
 	for (; wBegin != wEnd; ++wBegin)
 	{
-		const auto* wids = &(*wBegin)->first;
-		float candScore = (*wBegin)->second;
-		seq[chSize] = wids->back().wid;
+		const auto* wids = &(*wBegin)->morphs;
+		float candScore = (*wBegin)->accScore;
 		if (wids->back().combineSocket)
 		{
 			// always merge <V> <chunk> with the same socket
-			if (wids->back().combineSocket != curMorph->combineSocket || curMorph->chunks)
+			if (wids->back().combineSocket != curMorph->combineSocket || !curMorph->chunks)
 			{
 				continue;
 			}
-			seq[0] = curMorph->getCombined() - morphBase;
-			seq[1] = (wids->end() - 2)->wid;
-			seq[2] = (wids->end() - 3)->wid;
+			seq[0] = morphBase[wids->back().wid].getCombined() - morphBase;
 		}
-		else if (curMorph->combineSocket && !curMorph->chunks)
+
+		/*if (!KFeatureTestor::isMatched(node->uform.empty() ? curMorph->kform : &node->uform, wids->back().condVowel, wids->back().condPolar))
 		{
 			continue;
-		}
-		else if (wids->size() + chSize > 2)
-		{
-			if (wids->size() > 1) seq[chSize + 1] = (wids->end() - 2)->wid;
-		}
+		}*/
 
-
-		if (!KFeatureTestor::isMatched(node->uform.empty() ? curMorph->kform : &node->uform, wids->back().condVowel, wids->back().condPolar))
+		auto cNode = (*wBegin)->node;
+		WID lSeq = 0;
+		if (curMorph->combineSocket && !curMorph->chunks)
 		{
-			continue;
-		}
-
-		auto orgSeq = seq[chSize + 1];
-		if (wids->size() + chSize > 2)
-		{
-			if (seq[chSize + 1] >= knlm->getVocabSize()) seq[chSize + 1] = (size_t)morphBase[seq[chSize + 1]].tag + 1;
-			if (seq[chSize + 2] >= knlm->getVocabSize()) seq[chSize + 2] = (size_t)morphBase[seq[chSize + 2]].tag + 1;
-			for (size_t ch = 0; ch < chSize - (wids->size() == 1 ? 1 : 0); ++ch)
-			{
-				if (ch == 0 && combSocket) continue;
-				float ct;
-				candScore += ct = knlm->evaluateLL(&seq[ch], 3);
-#ifdef DEBUG_PRINT
-				if (ct <= -100)
-				{
-					cout << knlm->evaluateLL(&seq[ch], 3);
-					cout << "@Warn\t";
-					cout << seq[ch] << ' ' << morphBase[seq[ch]] << '\t';
-					cout << seq[ch + 1] << ' ' << morphBase[seq[ch + 1]] << '\t';
-					cout << seq[ch + 2] << ' ' << morphBase[seq[ch + 2]] << '\t';
-					cout << endl;
-				}
-#endif
-			}
+			lSeq = wids->back().wid;
 		}
 		else
 		{
-			candScore = 0;
+			lSeq = seq[chSize - 1];
+			for (size_t i = 0; i < chSize; ++i)
+			{
+				auto cn = seq[i];
+				float ll;
+				auto nextNode = cNode->getNextTransition(cn, 2, ll);
+				candScore += ll;
+				cNode = nextNode ? nextNode : rootNode;
+			}
 		}
-		emplaceMaxCnt(maxWidLL, orgSeq, make_pair(wids, candScore), 7, [](const auto& a, const auto& b) { return a.second > b.second; });
+		emplaceMaxCnt(maxWidLL, lSeq, WordLLP{ wids, candScore, cNode }, 3, [](const WordLLP& a, const WordLLP& b) { return a.accScore > b.accScore; });
 	}
 }
 
@@ -338,12 +333,11 @@ vector<pair<Kiwi::path, float>> Kiwi::findBestPath(const vector<KGraphNode>& gra
 		float tMax = -INFINITY;
 		for (auto& curMorph : cands)
 		{
-			array<WID, 6> seq = { 0, };
-			size_t combSocket = 0;
+			array<WID, 4> seq = { 0, };
+			uint8_t combSocket = 0;
 			KCondVowel condV = KCondVowel::none;
 			KCondPolarity condP = KCondPolarity::none;
 			size_t chSize = 1;
-			WID orgSeq = 0;
 			bool isUserWord = false;
 			// if the morpheme is chunk set
 			if (curMorph->chunks)
@@ -353,7 +347,6 @@ vector<pair<Kiwi::path, float>> Kiwi::findBestPath(const vector<KGraphNode>& gra
 				{
 					seq[i] = (*curMorph->chunks)[i] - morphBase;
 				}
-				combSocket = curMorph->combineSocket;
 			}
 			else
 			{
@@ -365,25 +358,25 @@ vector<pair<Kiwi::path, float>> Kiwi::findBestPath(const vector<KGraphNode>& gra
 				{
 					seq[0] = curMorph - morphBase;
 				}
+				combSocket = curMorph->combineSocket;
 			}
-			orgSeq = seq[0];
 			condV = curMorph->vowel;
 			condP = curMorph->polar;
 
-			unordered_map<WID, vector<pair<const MInfos*, float>, pool_allocator<void*>>, hash<WID>, equal_to<WID>, pool_allocator<void*>> maxWidLL;
-			vector<const pair<MInfos, float>*, pool_allocator<void*>> works;
-			for (size_t i = 0; i < KGraphNode::MAX_NEXT; ++i)
+			unordered_map<WID, vector<WordLLP, pool_allocator<void*>>, hash<WID>, equal_to<WID>, pool_allocator<void*>> maxWidLL;
+			vector<const WordLL*, pool_allocator<void*>> works;
+			works.reserve(8);
+			for (size_t i = 0; i < KGraphNode::MAX_PREV; ++i)
 			{
-				auto* next = node->getNext(i);
-				if (!next) break;
-				works.reserve(works.size() + cache[next - startNode].size());
-				for (auto& p : cache[next - startNode])
+				auto* prev = node->getPrev(i);
+				if (!prev) break;
+				for (auto& p : cache[prev - startNode])
 				{
 					works.emplace_back(&p);
 				}
 			}
 
-			evalTrigram(knlm, morphBase, &works[0], &works[0] + works.size(), seq, chSize, curMorph, node, combSocket, maxWidLL);
+			evalTrigram(knlm->getRoot(), morphBase, &works[0], &works[0] + works.size(), seq, chSize, curMorph, node, maxWidLL);
 
 			float estimatedLL = 0;
 			if (isUserWord)
@@ -405,8 +398,8 @@ vector<pair<Kiwi::path, float>> Kiwi::findBestPath(const vector<KGraphNode>& gra
 			{
 				for (auto& q : p.second)
 				{
-					q.second += estimatedLL;
-					tMax = max(tMax, q.second + discountForCombining);
+					q.accScore += estimatedLL;
+					tMax = max(tMax, q.accScore + discountForCombining);
 				}
 			}
 
@@ -415,24 +408,38 @@ vector<pair<Kiwi::path, float>> Kiwi::findBestPath(const vector<KGraphNode>& gra
 			{
 				for (auto& q : p.second)
 				{
-					if (q.second <= tMax - cutOffThreshold) continue;
-					nCache.emplace_back(MInfos{}, q.second);
-					auto& wids = nCache.back().first;
-					wids.reserve(q.first->size() + chSize);
-					wids = *q.first;
-					if (!curMorph->combineSocket || curMorph->chunks)
+					if (q.accScore <= tMax - cutOffThreshold) continue;
+					nCache.emplace_back(WordLL{ MInfos{}, q.accScore, q.node });
+					auto& wids = nCache.back().morphs;
+					wids.reserve(q.morphs->size() + chSize);
+					wids = *q.morphs;
+					if (curMorph->chunks)
 					{
 						size_t lastPos = node->lastPos;
-						for (size_t ch = chSize; ch-- > 0;)
+						if (curMorph->combineSocket)
 						{
-							if (ch) wids.emplace_back(seq[ch], 0, KCondVowel::none, KCondPolarity::none, 0, lastPos);
-							else wids.emplace_back(isUserWord ? curMorph - morphBase : seq[ch], combSocket, condV, condP, ownFormId, lastPos);
-							lastPos -= morphBase[seq[ch]].kform->size() - 1;
+							wids.back() = MInfo{ (WID)(morphBase[wids.back().wid].getCombined() - morphBase),
+								0, KCondVowel::none, KCondPolarity::none, 0, wids.back().lastPos};
+							lastPos += morphBase[seq[0]].kform->size() - 1;
+							for (size_t ch = 1; ch < chSize; ++ch)
+							{
+								wids.emplace_back(seq[ch], 0, condV, condP, 0, lastPos);
+								lastPos += morphBase[seq[ch]].kform->size() - 1;
+							}
+						}
+						else
+						{
+							for (size_t ch = 0; ch < chSize; ++ch)
+							{
+								wids.emplace_back(seq[ch], 0, condV, condP, 0, lastPos);
+								lastPos += morphBase[seq[ch]].kform->size() - 1;
+							}
 						}
 					}
 					else
 					{
-						wids.back() = MInfo{ (WID)(curMorph->getCombined() - morphBase), 0, KCondVowel::none, KCondPolarity::none, 0, wids.back().lastPos };
+						wids.emplace_back(isUserWord ? curMorph - morphBase : seq[0], 
+							combSocket, KCondVowel::none, KCondPolarity::none, ownFormId, node->lastPos);
 					}
 				}
 			}
@@ -440,11 +447,11 @@ vector<pair<Kiwi::path, float>> Kiwi::findBestPath(const vector<KGraphNode>& gra
 		return tMax;
 	};
 
-	// end node
-	cache.back().emplace_back(MInfos{ MInfo(1u) }, 0.f);
+	// start node
+	cache.front().emplace_back(WordLL{ MInfos{ MInfo(0u) }, 0.f, knlm->getRoot()->getNextFromBaked(0) });
 
 	// middle nodes
-	for (size_t i = graph.size() - 2; i > 0; --i)
+	for (size_t i = 1; i < graph.size() - 1; ++i)
 	{
 		auto* node = &graph[i];
 		size_t ownFormId = 0;
@@ -477,7 +484,7 @@ vector<pair<Kiwi::path, float>> Kiwi::findBestPath(const vector<KGraphNode>& gra
 		WordLLs reduced;
 		for (auto& c : cache[i])
 		{
-			if (c.second > tMax - cutOffThreshold) reduced.emplace_back(move(c));
+			if (c.accScore > tMax - cutOffThreshold) reduced.emplace_back(move(c));
 		}
 		cache[i] = move(reduced);
 
@@ -493,10 +500,10 @@ vector<pair<Kiwi::path, float>> Kiwi::findBestPath(const vector<KGraphNode>& gra
 		cout << "== " << i << " ==" << endl;
 		for (auto& tt : cache[i])
 		{
-			cout << tt.second << '\t';
-			for (auto it = tt.first.rbegin(); it != tt.first.rend(); ++it)
+			cout << tt.accScore << '\t';
+			for (auto& m : tt.morphs)
 			{
-				cout << morphBase[it->wid] << '\t';
+				cout << morphBase[m.wid] << '\t';
 			}
 			cout << endl;
 		}
@@ -504,47 +511,33 @@ vector<pair<Kiwi::path, float>> Kiwi::findBestPath(const vector<KGraphNode>& gra
 #endif
 	}
 
-	// start node
-	WID seq[3] = { 0, };
-	for (size_t i = 0; i < KGraphNode::MAX_NEXT; ++i)
+	// end node
+	WID seq[3] = { 0, 0, 1 };
+	for (size_t i = 0; i < KGraphNode::MAX_PREV; ++i)
 	{
-		auto* next = startNode->getNext(i);
-		if (!next) break;
-		for (auto&& p : cache[next - startNode])
+		auto* prev = endNode->getPrev(i);
+		if (!prev) break;
+		for (auto&& p : cache[prev - startNode])
 		{
-			if (p.first.back().combineSocket) continue;
-			if (!KFeatureTestor::isMatched(nullptr, p.first.back().condVowel)) continue;
-			seq[1] = p.first.back().wid;
-			seq[2] = (p.first.end() - 2)->wid;
+			if (p.morphs.back().combineSocket) continue;
+			if (!KFeatureTestor::isMatched(nullptr, p.morphs.back().condVowel)) continue;
 
-			if (seq[1] >= knlm->getVocabSize()) seq[1] = (size_t)morphBase[seq[1]].tag + 1;
-			if (seq[2] >= knlm->getVocabSize()) seq[2] = (size_t)morphBase[seq[2]].tag + 1;
-			float ct;
-			float c = (ct = knlm->evaluateLL(seq, 3) + knlm->evaluateLL(seq, 2)) + p.second;
-#ifdef DEBUG_PRINT
-			if (ct <= -100)
-			{
-				cout << "@Warn\t";
-				cout << seq[0] << ' ' << morphBase[seq[0]] << '\t';
-				cout << seq[1] << ' ' << morphBase[seq[1]] << '\t';
-				cout << seq[2] << ' ' << morphBase[seq[2]] << '\t';
-				cout << endl;
-			}
-#endif
-			cache[0].emplace_back(p.first, c);
+			float c = p.accScore + p.node->getLL(1, 2);
+			cache.back().emplace_back(WordLL{p.morphs, c, nullptr});
 		}
 	}
 
-	auto& cand = cache[0];
-	sort(cand.begin(), cand.end(), [](const pair<MInfos, float>& a, const pair<MInfos, float>& b) { return a.second > b.second; });
+	auto& cand = cache.back();
+	sort(cand.begin(), cand.end(), [](const WordLL& a, const WordLL& b) { return a.accScore > b.accScore; });
 
 #ifdef DEBUG_PRINT
-	for (auto& tt : cache[0])
+	cout << "== LAST ==" << endl;
+	for (auto& tt : cache.back())
 	{
-		cout << tt.second << '\t';
-		for (auto it = tt.first.rbegin(); it != tt.first.rend(); ++it)
+		cout << tt.accScore << '\t';
+		for (auto& m : tt.morphs)
 		{
-			cout << morphBase[it->wid] << '\t';
+			cout << morphBase[m.wid] << '\t';
 		}
 		cout << endl;
 	}
@@ -555,13 +548,13 @@ vector<pair<Kiwi::path, float>> Kiwi::findBestPath(const vector<KGraphNode>& gra
 	vector<pair<path, float>> ret;
 	for (size_t i = 0; i < min(topN, cand.size()); ++i)
 	{
-		path mv(cand[i].first.size() - 1);
-		transform(cand[i].first.rbegin(), cand[i].first.rend() - 1, mv.begin(), [morphBase, &ownFormList](const MInfo& m)
+		path mv(cand[i].morphs.size() - 1);
+		transform(cand[i].morphs.begin() + 1, cand[i].morphs.end(), mv.begin(), [morphBase, &ownFormList](const MInfo& m)
 		{
 			if (m.ownFormId)	return make_tuple(morphBase + m.wid, ownFormList[m.ownFormId - 1], m.lastPos);
 			else return make_tuple(morphBase + m.wid, k_string{}, m.lastPos);
 		});
-		ret.emplace_back(mv, cand[i].second);
+		ret.emplace_back(mv, cand[i].accScore);
 	}
 	return ret;
 }
@@ -697,12 +690,13 @@ vector<KResult> Kiwi::analyze(const u16string & str, size_t topN) const
 	auto chunk = str.begin();
 	vector<u16string::const_iterator> sents;
 	sents.emplace_back(chunk);
-	while (1)
+	while (chunk != str.end())
 	{
 		KPOSTag tag = identifySpecialChr(*chunk);
 		while (chunk != str.end() && !(tag == KPOSTag::SF || tag == KPOSTag::SS || tag == KPOSTag::SE || tag == KPOSTag::SW || *chunk == u':'))
 		{
 			++chunk;
+			if (chunk == str.end()) break;
 			tag = identifySpecialChr(*chunk);
 		}
 		if (chunk == str.end()) break;
