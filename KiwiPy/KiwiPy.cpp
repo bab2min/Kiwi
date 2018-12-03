@@ -370,7 +370,7 @@ static PyObject* kiwi__analyze(PyObject* self, PyObject* args)
 				inst->analyze(topN, [&reader](size_t id)->u16string
 				{
 					PyObject* argList = Py_BuildValue("(n)", id);
-					PyObject* retVal = PyEval_CallObject(argReader, argList);
+					PyObject* retVal = PyEval_CallObject(reader, argList);
 					Py_DECREF(argList);
 					if (!retVal) throw bad_exception();
 					if (PyObject_Not(retVal))
@@ -428,7 +428,7 @@ static PyObject* kiwi__perform(PyObject* self, PyObject* args)
 		inst->perform(topN, [&reader](size_t id)->u16string
 		{
 			PyObject* argList = Py_BuildValue("(n)", id);
-			PyObject* retVal = PyEval_CallObject(argReader, argList);
+			PyObject* retVal = PyEval_CallObject(reader, argList);
 			Py_DECREF(argList);
 			if (!retVal) throw bad_exception();
 			if (PyObject_Not(retVal))

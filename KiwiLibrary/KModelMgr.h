@@ -28,7 +28,7 @@ public:
 	KModelMgr(const KModelMgr&) = default;
 	void addUserWord(const k_string& form, KPOSTag tag, float userScore = 10);
 	void solidify();
-	const KTrie* getTrie() const { return &trieRoot[0]; }
+	const KTrie* getTrie() const { if (trieRoot.empty()) return nullptr; return &trieRoot[0]; }
 
 	const KNLangModel* getLangModel() const { return langMdl.get(); }
 	const KMorpheme* getMorphemes() const { return &morphemes[0]; }

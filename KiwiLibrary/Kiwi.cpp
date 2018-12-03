@@ -687,6 +687,7 @@ std::vector<KResult> Kiwi::analyzeSent(const std::u16string::const_iterator & sB
 
 vector<KResult> Kiwi::analyze(const u16string & str, size_t topN) const
 {
+	if (!mdl->getTrie()) throw KiwiException("Model should be prepared before analyzing.");
 	auto chunk = str.begin();
 	vector<u16string::const_iterator> sents;
 	sents.emplace_back(chunk);

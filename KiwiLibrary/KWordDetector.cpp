@@ -427,7 +427,7 @@ vector<KWordDetector::WordInfo> KWordDetector::extractWords(const function<u16st
 			u16string form;
 			form.reserve(p.first.size());
 			transform(p.first.begin(), p.first.end(), back_inserter(form), [this, &cdata](char16_t c) { return cdata.chrDict.getStr(c); });
-			if (any_of(form.begin(), form.end(), isalnum)) continue;
+			if (any_of(form.begin(), form.end(), [](char16_t c) { return isalnum(c); })) continue;
 			rPartEntropy[form] = r;
 		}
 	}
