@@ -42,7 +42,7 @@ class KModelMgr;
 class Kiwi
 {
 protected:
-	float cutOffThreshold = 10.f;
+	float cutOffThreshold = 7.f;
 	std::unique_ptr<KModelMgr> mdl;
 	size_t numThread;
 	KWordDetector detector;

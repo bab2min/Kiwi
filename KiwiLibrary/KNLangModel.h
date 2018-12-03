@@ -146,6 +146,8 @@ public:
 			return nextNode->getFromBaked(begin + 1, end);
 		}
 
+		const Node* getNextTransition(WID n, size_t endOrder, float& ll) const;
+
 		float getLL(WID n, size_t endOrder) const
 		{
 			if (depth == endOrder)
@@ -288,5 +290,6 @@ public:
 		return n;
 	}
 
+	const Node* getRoot() const { return &nodes[0]; }
 	void printStat() const;
 };
