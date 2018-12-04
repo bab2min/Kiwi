@@ -180,6 +180,6 @@ std::ostream & operator<<(std::ostream & os, const KMorpheme & morph)
 	os << utf16_to_utf8(morph.kform ? u16string{ morph.kform->begin(), morph.kform->end() } : u"_");
 	os << '/';
 	os << tagToString(morph.tag);
-	if (morph.combineSocket) os << '+' << morph.combineSocket;
+	if (morph.combineSocket) os << '+' << (size_t)morph.combineSocket;
 	return os;
 }
