@@ -112,7 +112,8 @@ int main()
 	Timer timer;
 	Kiwi kw{ "../ModelGenerator/", (size_t)-1, 0 };
 	//kw.prepare();
-	//kw.analyze(u"기대가컸었다.", 10);
+	//kw.analyze(u"남미풍의 강렬한 원색끼리의 조화, 수채화 같이 안온한 배색 등 색의 분위기를 강조하는 기하학적 무늬, 꽃무늬 디자인이 주류를 이루고 있다.", 10);
+	//return 0;
 	//kw.setCutOffThreshold(10);
 	if(0)
 	{
@@ -148,7 +149,7 @@ int main()
 		}
 		return 0;
 	}
-	kw.loadUserDictionary("dict_namu3.txt");
+	//kw.loadUserDictionary("dict_namu3.txt");
 	kw.prepare();
 
 	if (0)

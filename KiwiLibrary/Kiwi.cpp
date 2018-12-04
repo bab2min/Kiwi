@@ -488,14 +488,6 @@ vector<pair<Kiwi::path, float>> Kiwi::findBestPath(const vector<KGraphNode>& gra
 		}
 		cache[i] = move(reduced);
 
-		/*
-		sort(cache[i].begin(), cache[i].end(), [](const pair<MInfos, float>& a, const pair<MInfos, float>& b)
-		{
-		return a.second > b.second;
-		});
-		size_t remainCnt = max((node->form ? node->form->candidate.size() : 2u) * topN * 2, (size_t)10);
-		if (remainCnt < cache[i].size()) cache[i].erase(cache[i].begin() + remainCnt, cache[i].end());
-		*/
 #ifdef DEBUG_PRINT
 		cout << "== " << i << " ==" << endl;
 		for (auto& tt : cache[i])
