@@ -1,6 +1,6 @@
 0.950586
-Total (4533) Time : 3805.67 ms
-Time per Unit : 0.839549 ms
+Total (4533) Time : 3756.13 ms
+Time per Unit : 0.828619 ms
 여섯 시면 일어나 아침 체조를 했고 정해진 시각에 세 번의 식사를 했다.	0.821429
 어/EC	정하/VV	어/EC	지/VX	
 정해지/VV	

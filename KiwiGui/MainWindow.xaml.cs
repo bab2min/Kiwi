@@ -28,9 +28,10 @@ namespace KiwiGui
         public MainWindow()
         {
             InitializeComponent();
+            int version = 0;
             try
             {
-                int version = KiwiCS.Version();
+                version = KiwiCS.Version();
                 VersionInfo.Header = String.Format("Kiwi 버전 {0}.{1}.{2}", version / 100 % 10, version / 10 % 10, version % 10);
                 instKiwi = new KiwiCS("model/", -1);
             }
@@ -40,7 +41,7 @@ namespace KiwiGui
                 Close();
             }
             App.monitor.TrackScreenView("Kiwi_MainWindow");
-            Title += " v" + App.getRunningVersion().ToString().Substring(0, 3);
+            Title += " v" + String.Format("{0}.{1}.{2}", version / 100 % 10, version / 10 % 10, version % 10);
         }
 
         public static string GetFileText(string path)
