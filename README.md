@@ -16,13 +16,18 @@ Visual Studio 2015, 2017 환경에서 개발되었고 gcc 5.0 이상에서 컴�
 #### C API
 https://github.com/bab2min/Kiwi/wiki
 
+#### Windows용 DLL
+DLL로 컴파일된 바이너리를 이용하여 다른 프로그램에 Kiwi를 적용할 수도 있습니다. 
+최신 버전의 DLL은 https://github.com/bab2min/Kiwi/releases/tag/GUI_v0.6 에서 구할 수 있습니다.
+
 #### Python3 API
 또한 Python3용 API인 Kiwipiepy가 제공됩니다. 이에 대해서는 https://github.com/bab2min/Kiwi/tree/master/KiwiPy 를 참조하시길 바랍니다.
 
 #### 응용 프로그램
 Kiwi는 C# 기반의 GUI 형태로도 제공됩니다.
 형태소 분석기는 사용해야하지만 별도의 프로그래밍 지식이 없는 경우 이 프로그램을 사용하시면 됩니다.
-https://github.com/bab2min/Kiwi/releases/tag/GUI_v0.5
+다음 프로그램은 Windows에서만 구동 가능합니다.
+https://github.com/bab2min/Kiwi/releases/tag/GUI_v0.6
 
 
 ### 업데이트 내역
@@ -56,6 +61,9 @@ https://github.com/bab2min/Kiwi/releases/tag/GUI_v0.5
 
 
 ### 다른 형태소 분석기와의 비교
+다음의 성능 평가는 konlpy-0.5.1에 포함된 Hannanum, Kkma, Komoran, Okt를 Kiwi와 비교한 것입니다.
+
+평가는 Intel i5-6600 @3.3GHz, RAM 16GB, Windows 10(64bit) 환경에서 진행되었습니다.
 
 ![형태소 분석기 실행 속도 비교](/KiwiChart.PNG)
 
