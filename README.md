@@ -63,7 +63,7 @@ https://github.com/bab2min/Kiwi/releases/tag/GUI_v0.6
 ### 다른 형태소 분석기와의 비교
 다음의 성능 평가는 konlpy-0.5.1에 포함된 Hannanum, Kkma, Komoran, Okt를 Kiwi와 비교한 것입니다.
 
-평가는 Intel i5-6600@3.3GHz, RAM 16GB, Windows 10(64bit) 환경에서 진행되었습니다.
+평가는 Intel i5-6600 @3.3GHz, RAM 16GB, Windows 10(64bit) 환경에서 진행되었습니다.
 
 ![형태소 분석기 실행 속도 비교](/KiwiChart.PNG)
 
