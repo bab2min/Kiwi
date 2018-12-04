@@ -9,8 +9,8 @@ Kiwi 0.5버전부터는 Python3용 API를 제공합니다. 이 프로젝트를 �
 
     pip3 install kiwipiepy
 
-단, 현재 kiwipiepy 패키지는 Vista 버전 이상의 Windows OS만 지원합니다.
-Linux 및 MacOS에 대해서도 구동 가능하도록 빠른 시일내에 지원을 추가할 예정입니다.
+단, 현재 kiwipiepy 패키지는 Vista 버전 이상의 Windows OS 및 Linux를 지원합니다.
+MacOS 경우 대해서는 아직 테스트를 해보지 못했습니다.
 
 ## 시작하기
 
