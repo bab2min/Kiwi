@@ -741,7 +741,7 @@ void Kiwi::clearCache()
 
 int Kiwi::getVersion()
 {
-	return 50;
+	return 60;
 }
 
 std::u16string Kiwi::toU16(const std::string & str)

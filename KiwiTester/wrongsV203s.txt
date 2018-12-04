@@ -1,6 +1,6 @@
 0.963636
-Total (3252) Time : 3432.71 ms
-Time per Unit : 1.05557 ms
+Total (3252) Time : 3345.18 ms
+Time per Unit : 1.02865 ms
 네 스스로 모를 깎아서 둥글둥글하게 살도록 해라." 나는 이렇게 대답했다.	0.92
 하/VX	
 하/VV	
