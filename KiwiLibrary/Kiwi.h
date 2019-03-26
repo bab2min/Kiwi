@@ -50,7 +50,11 @@ protected:
 	std::vector<std::pair<path, float>> findBestPath(const std::vector<KGraphNode>& graph, const KNLangModel * knlm, const KMorpheme* morphBase, size_t topN) const;
 	std::vector<KResult> analyzeSent(const std::u16string::const_iterator& sBegin, const std::u16string::const_iterator& sEnd, size_t topN) const;
 public:
-	Kiwi(const char* modelPath = "", size_t maxCache = -1, size_t numThread = 0);
+	enum 
+	{
+		LOAD_DEFAULT_DICT = 1,
+	};
+	Kiwi(const char* modelPath = "", size_t maxCache = -1, size_t numThread = 0, size_t options = LOAD_DEFAULT_DICT);
 	int addUserWord(const std::u16string& str, KPOSTag tag, float userScore = 20);
 	int loadUserDictionary(const char* userDictPath = "");
 	int prepare();

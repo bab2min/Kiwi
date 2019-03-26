@@ -26,11 +26,11 @@ const char* kiwi_error()
 	return currentError.what();
 }
 
-PKIWI kiwi_init(const char * modelPath, int numThread)
+PKIWI kiwi_init(const char * modelPath, int numThread, int options)
 {
 	try
 	{
-		return (PKIWI)new Kiwi{ modelPath, 0, (size_t)numThread };
+		return (PKIWI)new Kiwi{ modelPath, 0, (size_t)numThread, (size_t)options };
 	}
 	catch (const exception& e)
 	{

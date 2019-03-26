@@ -17,14 +17,14 @@ static PyObject* kiwi__init(PyObject* self, PyObject* args)
 {
 	PyObject* argSelf;
 	const char* modelPath = "./";
-	size_t numThread = 0;
-	if (!PyArg_ParseTuple(args, "O|ns", &argSelf, &numThread, &modelPath)) return nullptr;
+	size_t numThread = 0, options = 1;
+	if (!PyArg_ParseTuple(args, "O|nsn", &argSelf, &numThread, &modelPath, &options)) return nullptr;
 	try
 	{
 		Kiwi* inst = nullptr;
 		try
 		{
-			inst = new Kiwi{ modelPath, 0, numThread };
+			inst = new Kiwi{ modelPath, 0, numThread, options };
 		}
 		catch (const exception& e)
 		{
@@ -39,7 +39,7 @@ static PyObject* kiwi__init(PyObject* self, PyObject* args)
 			{
 				spath = spath.substr(0, spath.rfind('\\') + 1);
 			}
-			inst = new Kiwi{ (spath + modelPath).c_str(), 0, numThread };
+			inst = new Kiwi{ (spath + modelPath).c_str(), 0, numThread, options };
 		}
 		PyObject_SetAttrString(argSelf, "_inst", PyLong_FromLongLong((long long)inst));
 	}

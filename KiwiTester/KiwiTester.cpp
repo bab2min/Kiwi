@@ -149,9 +149,9 @@ int main()
 		}
 		return 0;
 	}
-	//kw.loadUserDictionary("dict_namu3.txt");
 	kw.prepare();
-
+	kw.analyze(u"띄어쓰기안한문장은아예분석을안해버릴수도있는데?", 10);
+	kw.analyze(u"풍월량은 유튜브에서 활동한다.", 10);
 	if (0)
 	{
 		Timer tm;
