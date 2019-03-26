@@ -15,6 +15,11 @@ typedef int(*kiwi_readerW)(int, kchar16_t*, void*);
 
 typedef int(*kiwi_receiver)(int, PKIWIRESULT, void*);
 
+enum
+{
+	KIWI_LOAD_DEFAULT_DICT = 1
+};
+
 #ifdef __cplusplus  
 extern "C" {
 #endif 
@@ -22,7 +27,7 @@ extern "C" {
 DECL_DLL int kiwi_version();
 DECL_DLL const char* kiwi_error();
 
-DECL_DLL PKIWI kiwi_init(const char* modelPath, int numThread);
+DECL_DLL PKIWI kiwi_init(const char* modelPath, int numThread, int options);
 DECL_DLL int kiwi_addUserWord(PKIWI handle, const char* word, const char* pos);
 DECL_DLL int kiwi_loadUserDict(PKIWI handle, const char* dictPath);
 DECL_DLL PKIWIWORDS kiwi_extractWords(PKIWI handle, kiwi_reader reader, void* userData, int minCnt, int maxWordLen, float minScore);

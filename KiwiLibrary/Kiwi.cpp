@@ -9,7 +9,7 @@ using namespace std;
 
 //#define LOAD_TXT
 
-Kiwi::Kiwi(const char * modelPath, size_t _maxCache, size_t _numThread) 
+Kiwi::Kiwi(const char * modelPath, size_t _maxCache, size_t _numThread, size_t options) 
 	: numThread(_numThread ? _numThread : thread::hardware_concurrency()),
 	detector(10, 10, 0.1, _numThread)
 {
@@ -30,6 +30,11 @@ Kiwi::Kiwi(const char * modelPath, size_t _maxCache, size_t _numThread)
 	}
 #endif
 	mdl = make_unique<KModelMgr>(modelPath);
+
+	if (options & LOAD_DEFAULT_DICT)
+	{
+		loadUserDictionary((modelPath + string{ "default.dict" }).c_str());
+	}
 }
 
 int Kiwi::addUserWord(const u16string & str, KPOSTag tag, float userScore)
@@ -390,7 +395,7 @@ vector<pair<Kiwi::path, float>> Kiwi::findBestPath(const vector<KGraphNode>& gra
 				if (curMorph->tag == KPOSTag::NNG) estimatedLL = LogPoisson::getLL(4.622955f, unknownLen);
 				else if (curMorph->tag == KPOSTag::NNP) estimatedLL = LogPoisson::getLL(5.177622f, unknownLen);
 				else if (curMorph->tag == KPOSTag::MAG) estimatedLL = LogPoisson::getLL(4.557326f, unknownLen);
-				estimatedLL -= 20;
+				estimatedLL -= 5 + unknownLen * 3;
 			}
 
 			float discountForCombining = curMorph->combineSocket ? -15.f : 0.f;
@@ -665,6 +670,7 @@ std::vector<KResult> Kiwi::analyzeSent(const std::u16string::const_iterator & sB
 		vector<KWordPair> rarr;
 		for (auto&& s : r.first)
 		{
+			if (!get<1>(s).empty() && get<1>(s)[0] == ' ') continue;
 			rarr.emplace_back(joinHangul(get<1>(s).empty() ? *get<0>(s)->kform : get<1>(s)), get<0>(s)->tag, 0, 0);
 			size_t nlen = (get<1>(s).empty() ? *get<0>(s)->kform : get<1>(s)).size();
 			size_t nlast = get<2>(s);
@@ -741,7 +747,7 @@ void Kiwi::clearCache()
 
 int Kiwi::getVersion()
 {
-	return 60;
+	return 61;
 }
 
 std::u16string Kiwi::toU16(const std::string & str)
