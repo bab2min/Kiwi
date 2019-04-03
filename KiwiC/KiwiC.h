@@ -12,7 +12,7 @@ typedef unsigned short kchar16_t;
 
 /*
 int (*kiwi_reader)(int id, char* buffer, void* userData)
-id: id number of line to be read. if id == 0, kiwi_reader should roll back file and read lines from the begining
+id: id number of line to be read. if id == 0, kiwi_reader should roll back file and read lines from the beginning
 buffer: buffer where string data should be stored. if buffer == null, kiwi_reader provide the length of string as return value.
 userData: userData from kiwi_extract~, kiwi_perform, kiwi_analyzeM functions.
 */
