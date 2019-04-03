@@ -10,8 +10,15 @@ typedef struct KIWIRESULT* PKIWIRESULT;
 typedef struct KIWIWORDS* PKIWIWORDS;
 typedef unsigned short kchar16_t;
 
-typedef int (*kiwi_reader)(int,char*,void*);
+/*
+int (*kiwi_reader)(int id, char* buffer, void* userData)
+id: id number of line to be read. if id == 0, kiwi_reader should roll back file and read lines from the begining
+buffer: buffer where string data should be stored. if buffer == null, kiwi_reader provide the length of string as return value.
+userData: userData from kiwi_extract~, kiwi_perform, kiwi_analyzeM functions.
+*/
+typedef int(*kiwi_reader)(int, char*, void*);
 typedef int(*kiwi_readerW)(int, kchar16_t*, void*);
+
 
 typedef int(*kiwi_receiver)(int, PKIWIRESULT, void*);
 
