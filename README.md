@@ -17,11 +17,14 @@ Visual Studio 2015, 2017 환경에서 개발되었고 gcc 5.0 이상에서 컴�
 컴파일에 필요한 별도의 의존 관계는 없으나, 컴파일러가 C++14 이상을 지원해야 합니다.
 
 #### C API
-https://github.com/bab2min/Kiwi/wiki
+https://github.com/bab2min/Kiwi/wiki 를 참고하시길 바랍니다.
 
 #### Windows용 DLL
 DLL로 컴파일된 바이너리를 이용하여 다른 프로그램에 Kiwi를 적용할 수도 있습니다. 
-최신 버전의 DLL은 https://github.com/bab2min/Kiwi/releases/tag/GUI_v0.6 에서 구할 수 있습니다.
+최신 버전의 DLL은 https://github.com/bab2min/Kiwi/releases/tag/GUI_v0.61 에서 구할 수 있습니다.
+
+#### C# API
+https://github.com/bab2min/Kiwi/blob/master/KiwiGui/KiwiCS.cs
 
 #### Python3 API
 또한 Python3용 API인 Kiwipiepy가 제공됩니다. 이에 대해서는 https://github.com/bab2min/Kiwi/tree/master/KiwiPy 를 참조하시길 바랍니다.
