@@ -238,7 +238,15 @@ namespace KiwiGui
         [DllImport(DLLPATH, CallingConvention = CallingConvention.Cdecl)]
         extern public static int kiwiWords_close(IntPtr result);
 
+        /*
+         * - id: line number of item about to be read. if id == 0, input file should be roll-backed and read from the beginning of the file.
+         */
         public delegate string Reader(int id);
+
+        /*
+         * - id: line number of item read.
+         * - res: analyzed result of input item numbered 'id'
+         */
         public delegate int Receiver(int id, Result[] res);
 
         private IntPtr inst;
@@ -325,9 +333,14 @@ namespace KiwiGui
 
         public const int KIWI_LOAD_DEFAULT_DICT = 1;
 
-        public KiwiCS(string modelPath, int cacheSize, int options = KIWI_LOAD_DEFAULT_DICT)
+        /*
+         * - modelPath: folder path where model files are located
+         * - numThread: the number of threads Kiwi will use. 1 for single thread processing, 0 for all threads available
+         * - options: 0 for not loading default dictionary, 1 for loading default dictionary
+         */
+        public KiwiCS(string modelPath, int numThread, int options = KIWI_LOAD_DEFAULT_DICT)
         {
-            inst = kiwi_init(new Utf8String(modelPath).IntPtr, cacheSize, options);
+            inst = kiwi_init(new Utf8String(modelPath).IntPtr, numThread, options);
             if(inst == IntPtr.Zero)
             {
                 throw new System.Exception(Marshal.PtrToStringAnsi(kiwi_error()));
@@ -343,6 +356,12 @@ namespace KiwiGui
             return ret;
         }
 
+        /*
+         * - reader: a callback function that provides input texts.
+         * - minCnt:
+         * - maxWordLen:
+         * - minScore:
+         */
         public ExtractedWord[] extractWords(Reader reader, int minCnt = 5, int maxWordLen = 10, float minScore = 0.1f)
         {
             GCHandle handle = GCHandle.Alloc(this);
@@ -379,6 +398,10 @@ namespace KiwiGui
             return words;
         }
 
+        /*
+         * - reader: a callback function that provides input texts.
+         * - receiver: a callback function that consumes analyzed results.
+         */
         public int analyze(Reader reader, Receiver receiver, int topN)
         {
             GCHandle handle = GCHandle.Alloc(this);
