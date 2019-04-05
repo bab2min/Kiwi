@@ -147,99 +147,103 @@ namespace KiwiGui
         private static extern void CopyMemory(IntPtr dest, IntPtr src, uint count);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate int CReader(int id, IntPtr buf, IntPtr userData);
+        private delegate int CReader(int id, IntPtr buf, IntPtr userData);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate int CReceiver(int id, IntPtr kiwiResult, IntPtr userData);
+        private delegate int CReceiver(int id, IntPtr kiwiResult, IntPtr userData);
 
         [DllImport(DLLPATH, CallingConvention = CallingConvention.Cdecl)]
-        extern public static int kiwi_version();
+        private static extern int kiwi_version();
 
         [DllImport(DLLPATH, CallingConvention = CallingConvention.Cdecl)]
-        extern public static IntPtr kiwi_error();
+        private static extern IntPtr kiwi_error();
 
         [DllImport(DLLPATH, CallingConvention = CallingConvention.Cdecl)]
-        extern public static IntPtr kiwi_init(IntPtr modelPath, int maxCache, int options);
+        private static extern IntPtr kiwi_init(IntPtr modelPath, int maxCache, int options);
 
         [DllImport(DLLPATH, CallingConvention = CallingConvention.Cdecl)]
-        extern public static int kiwi_prepare(IntPtr handle);
+        private static extern int kiwi_prepare(IntPtr handle);
 
         [DllImport(DLLPATH, CallingConvention = CallingConvention.Cdecl)]
-        extern public static int kiwi_close(IntPtr handle);
-        
+        private static extern int kiwi_close(IntPtr handle);
+
         [DllImport(DLLPATH, CallingConvention = CallingConvention.Cdecl)]
-        extern public static int kiwi_clearCache(IntPtr handle);
+        private static extern int kiwi_addUserWord(IntPtr handle, IntPtr word, IntPtr pos);
+
+        [DllImport(DLLPATH, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int kiwi_loadUserDict(IntPtr handle, IntPtr dictPath);
 
         // analyzing function
         [DllImport(DLLPATH, CallingConvention = CallingConvention.Cdecl)]
-        extern public static IntPtr kiwi_analyzeW(IntPtr handle, IntPtr text, int topN);
+        private static extern IntPtr kiwi_analyzeW(IntPtr handle, IntPtr text, int topN);
 
         [DllImport(DLLPATH, CallingConvention = CallingConvention.Cdecl)]
-        extern public static IntPtr kiwi_analyze(IntPtr handle, IntPtr text, int topN);
+        private static extern IntPtr kiwi_analyze(IntPtr handle, IntPtr text, int topN);
 
         [DllImport(DLLPATH, CallingConvention = CallingConvention.Cdecl)]
-        extern public static int kiwi_analyzeMW(IntPtr handle, CReader reader, CReceiver receiver, IntPtr userData, int topN);
+        private static extern int kiwi_analyzeMW(IntPtr handle, CReader reader, CReceiver receiver, IntPtr userData, int topN);
 
         [DllImport(DLLPATH, CallingConvention = CallingConvention.Cdecl)]
-        extern public static int kiwi_analyzeM(IntPtr handle, CReader reader, CReceiver receiver, IntPtr userData, int topN);
+        private static extern int kiwi_analyzeM(IntPtr handle, CReader reader, CReceiver receiver, IntPtr userData, int topN);
 
         // extraction functions
         [DllImport(DLLPATH, CallingConvention = CallingConvention.Cdecl)]
-        extern public static IntPtr kiwi_extractWordsW(IntPtr handle, CReader reader, IntPtr userData, int minCnt, int maxWordLen, float minScore);
+        private static extern IntPtr kiwi_extractWordsW(IntPtr handle, CReader reader, IntPtr userData, int minCnt, int maxWordLen, float minScore);
 
         [DllImport(DLLPATH, CallingConvention = CallingConvention.Cdecl)]
-        extern public static IntPtr kiwi_extractFilterWordsW(IntPtr handle, CReader reader, IntPtr userData, int minCnt, int maxWordLen, float minScore, float posThreshold);
+        private static extern IntPtr kiwi_extractFilterWordsW(IntPtr handle, CReader reader, IntPtr userData, int minCnt, int maxWordLen, float minScore, float posThreshold);
 
         [DllImport(DLLPATH, CallingConvention = CallingConvention.Cdecl)]
-        extern public static IntPtr kiwi_extractAddWordsW(IntPtr handle, CReader reader, IntPtr userData, int minCnt, int maxWordLen, float minScore, float posThreshold);
+        private static extern IntPtr kiwi_extractAddWordsW(IntPtr handle, CReader reader, IntPtr userData, int minCnt, int maxWordLen, float minScore, float posThreshold);
 
 
         // result management functions
         [DllImport(DLLPATH, CallingConvention = CallingConvention.Cdecl)]
-        extern public static int kiwiResult_getSize(IntPtr result);
+        private static extern int kiwiResult_getSize(IntPtr result);
 
         [DllImport(DLLPATH, CallingConvention = CallingConvention.Cdecl)]
-        extern public static float kiwiResult_getProb(IntPtr result, int index);
+        private static extern float kiwiResult_getProb(IntPtr result, int index);
 
         [DllImport(DLLPATH, CallingConvention = CallingConvention.Cdecl)]
-        extern public static int kiwiResult_getWordNum(IntPtr result, int index);
+        private static extern int kiwiResult_getWordNum(IntPtr result, int index);
 
         [DllImport(DLLPATH, CallingConvention = CallingConvention.Cdecl)]
-        extern public static IntPtr kiwiResult_getWordFormW(IntPtr result, int index, int num);
+        private static extern IntPtr kiwiResult_getWordFormW(IntPtr result, int index, int num);
 
         [DllImport(DLLPATH, CallingConvention = CallingConvention.Cdecl)]
-        extern public static IntPtr kiwiResult_getWordTagW(IntPtr result, int index, int num);
+        private static extern IntPtr kiwiResult_getWordTagW(IntPtr result, int index, int num);
 
         [DllImport(DLLPATH, CallingConvention = CallingConvention.Cdecl)]
-        extern public static IntPtr kiwiResult_getWordForm(IntPtr result, int index, int num);
+        private static extern IntPtr kiwiResult_getWordForm(IntPtr result, int index, int num);
 
         [DllImport(DLLPATH, CallingConvention = CallingConvention.Cdecl)]
-        extern public static IntPtr kiwiResult_getWordTag(IntPtr result, int index, int num);
+        private static extern IntPtr kiwiResult_getWordTag(IntPtr result, int index, int num);
 
         [DllImport(DLLPATH, CallingConvention = CallingConvention.Cdecl)]
-        extern public static int kiwiResult_close(IntPtr result);
+        private static extern int kiwiResult_close(IntPtr result);
 
         // word management functions
         [DllImport(DLLPATH, CallingConvention = CallingConvention.Cdecl)]
-        extern public static int kiwiWords_getSize(IntPtr result);
+        private static extern int kiwiWords_getSize(IntPtr result);
 
         [DllImport(DLLPATH, CallingConvention = CallingConvention.Cdecl)]
-        extern public static IntPtr kiwiWords_getWordFormW(IntPtr result, int index);
+        private static extern IntPtr kiwiWords_getWordFormW(IntPtr result, int index);
 
         [DllImport(DLLPATH, CallingConvention = CallingConvention.Cdecl)]
-        extern public static float kiwiWords_getScore(IntPtr result, int index);
+        private static extern float kiwiWords_getScore(IntPtr result, int index);
 
         [DllImport(DLLPATH, CallingConvention = CallingConvention.Cdecl)]
-        extern public static int kiwiWords_getFreq(IntPtr result, int index);
+        private static extern int kiwiWords_getFreq(IntPtr result, int index);
 
         [DllImport(DLLPATH, CallingConvention = CallingConvention.Cdecl)]
-        extern public static float kiwiWords_getPosScore(IntPtr result, int index);
+        private static extern float kiwiWords_getPosScore(IntPtr result, int index);
 
         [DllImport(DLLPATH, CallingConvention = CallingConvention.Cdecl)]
-        extern public static int kiwiWords_close(IntPtr result);
+        private static extern int kiwiWords_close(IntPtr result);
 
         /*
          * - id: line number of item about to be read. if id == 0, input file should be roll-backed and read from the beginning of the file.
+         * if there is no line to be read, it should return null or ""
          */
         public delegate string Reader(int id);
 
@@ -312,7 +316,7 @@ namespace KiwiGui
             }
             if(buf == IntPtr.Zero)
             {
-                return ki.readResult[id].Length;
+                return ki.readResult[id]?.Length ?? 0;
             }
             CopyMemory(buf, new Utf16String(ki.readResult[id]).IntPtr, (uint)ki.readResult[id].Length * 2);
             return 0;
@@ -336,7 +340,7 @@ namespace KiwiGui
         /*
          * - modelPath: folder path where model files are located
          * - numThread: the number of threads Kiwi will use. 1 for single thread processing, 0 for all threads available
-         * - options: 0 for not loading default dictionary, 1 for loading default dictionary
+         * - options: 0 for not loading default dictionary, KIWI_LOAD_DEFAULT_DICT for loading default dictionary
          */
         public KiwiCS(string modelPath, int numThread, int options = KIWI_LOAD_DEFAULT_DICT)
         {
@@ -345,7 +349,15 @@ namespace KiwiGui
             {
                 throw new System.Exception(Marshal.PtrToStringAnsi(kiwi_error()));
             }
-            kiwi_prepare(inst);
+        }
+
+        /*
+         * 'prepare' should be called before using 'analyze' method.
+         * after 'prepare' is called, 'addUserWord', 'loadUserDictionary' and 'extractAddWords' methods are disabled.
+         */
+        public int prepare()
+        {
+            return kiwi_prepare(inst);
         }
 
         public Result[] analyze(string text, int topN)
@@ -386,6 +398,9 @@ namespace KiwiGui
             return words;
         }
 
+        /*
+        * 'addUserWord', 'loadUserDictionary' and 'extractAddWords' methods only can be called before prepare being called.
+        */
         public ExtractedWord[] extractAddWords(Reader reader, int minCnt = 5, int maxWordLen = 10, float minScore = 0.1f, float posThreshold = -3)
         {
             GCHandle handle = GCHandle.Alloc(this);
@@ -396,6 +411,16 @@ namespace KiwiGui
             ExtractedWord[] words = ToExtractedWord(ret);
             kiwiWords_close(ret);
             return words;
+        }
+
+        public int addUserWord(string word, string pos)
+        {
+            return kiwi_addUserWord(inst, new Utf8String(word).IntPtr, new Utf8String(pos).IntPtr);
+        }
+
+        public int loadUserDictionary(string dictPath)
+        {
+            return kiwi_loadUserDict(inst, new Utf8String(dictPath).IntPtr);
         }
 
         /*
