@@ -69,7 +69,6 @@ namespace KiwiGui
                 KiwiCS.ExtractedWord[] res = instKiwi.extractWords((id)=>
                 {
                     if (id == 0) reader.BaseStream.Seek(0, SeekOrigin.Begin);
-                    if (id > 1000) return null;
                     return reader.ReadLine();
                 });
                 foreach(var r in res)
