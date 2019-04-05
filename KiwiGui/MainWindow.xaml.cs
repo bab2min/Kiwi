@@ -32,6 +32,7 @@ namespace KiwiGui
                     Title += " v" + String.Format("{0}.{1}.{2}", version / 100 % 10, version / 10 % 10, version % 10);
                 }));
                 instKiwi = new KiwiCS("model/", 0, 1);
+                instKiwi.prepare();
             };
             bw.RunWorkerCompleted += (s, args) =>
             {
@@ -59,6 +60,23 @@ namespace KiwiGui
                 ftxt = File.ReadAllText(path, Encoding.Default);
             }
             return ftxt;
+        }
+
+        public void extractWords(string filePath)
+        {
+            using (StreamReader reader = new StreamReader(filePath, Encoding.UTF8, true))
+            {
+                KiwiCS.ExtractedWord[] res = instKiwi.extractWords((id)=>
+                {
+                    if (id == 0) reader.BaseStream.Seek(0, SeekOrigin.Begin);
+                    if (id > 1000) return null;
+                    return reader.ReadLine();
+                });
+                foreach(var r in res)
+                {
+                    Console.Out.WriteLine(r.word);
+                }
+            }
         }
 
         private void MenuItem_Open(object sender, RoutedEventArgs e)
