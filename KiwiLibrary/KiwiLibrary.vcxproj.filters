@@ -17,9 +17,6 @@
     <ClInclude Include="stdafx.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="targetver.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="KTrie.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>

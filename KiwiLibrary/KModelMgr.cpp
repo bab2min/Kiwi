@@ -411,12 +411,12 @@ KModelMgr::KModelMgr(const char * modelPath)
 #else
 	{
 		ifstream ifs{ modelPath + string{ "sj.morph" }, ios_base::binary };
-		if (ifs.fail()) throw KiwiException{ string{"Cannot open file '"} +modelPath + "sj.morph'." };
+		if (ifs.fail()) throw KiwiException{ "[KModelMgr] Failed to find file '"s +modelPath + "sj.morph'." };
 		loadMorphBin(ifs);
 	}
 	{
 		ifstream ifs{ modelPath + string{ "sj.lang" }, ios_base::binary };
-		if (ifs.fail()) throw KiwiException{ string{"Cannot open file '"} +modelPath + "sj.lang'." };
+		if (ifs.fail()) throw KiwiException{ "[KModelMgr] Failed to find file '"s +modelPath + "sj.lang'." };
 		langMdl = make_shared<KNLangModel>(KNLangModel::readFromStream(move(ifs)));
 	}
 #endif

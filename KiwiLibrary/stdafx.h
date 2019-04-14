@@ -1,7 +1,7 @@
 #pragma once
 
 #ifdef _WIN32
-#include "targetver.h"
+#include <SDKDDKVer.h>
 #include <tchar.h>
 #endif
 

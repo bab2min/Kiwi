@@ -39,7 +39,7 @@ namespace KiwiGui
                 splashScreen.Close();
                 if (args.Error != null)
                 {
-                    MessageBox.Show(this, "Kiwi 형태소 분석기를 초기화하는 데 실패했습니다. 모델 파일이 없거나 인자가 잘못되었습니다. \n"
+                    MessageBox.Show(this, "Kiwi 형태소 분석기를 초기화하는 데 실패했습니다. 모델 파일이 없거나 인자가 잘못되었습니다.\n오류 메세지: "
                     + args.Error.Message, "Kiwi 오류", MessageBoxButton.OK, MessageBoxImage.Error);
                     Close();
                     return;
