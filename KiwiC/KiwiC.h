@@ -1,7 +1,8 @@
 #pragma once
 
-#define KIWIERR_INVALID_HANDLE -1
-#define KIWIERR_INVALID_INDEX -2
+#define KIWIERR_FAIL -1
+#define KIWIERR_INVALID_HANDLE -2
+#define KIWIERR_INVALID_INDEX -3
 
 #define DECL_DLL __declspec(dllexport)
 

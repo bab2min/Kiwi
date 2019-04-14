@@ -24,7 +24,7 @@ Kiwi::Kiwi(const char * modelPath, size_t _maxCache, size_t _numThread, size_t o
 #else
 	{
 		ifstream ifs{ modelPath + string{ "extract.mdl" }, ios_base::binary };
-		if (ifs.fail()) throw KiwiException{ string{"Cannot open file '"} + modelPath + "extract.mdl'."  };
+		if (ifs.fail()) throw KiwiException{ "[Kiwi] Failed to find model file '"s + modelPath + "extract.mdl'."  };
 		detector.loadPOSModel(ifs);
 		detector.loadNounTailModel(ifs);
 	}
@@ -47,6 +47,7 @@ int Kiwi::addUserWord(const u16string & str, KPOSTag tag, float userScore)
 int Kiwi::loadUserDictionary(const char * userDictPath)
 {
 	ifstream ifs{ userDictPath };
+	if(ifs.fail()) throw KiwiException("[loadUserDictionary] Failed to open '"s + userDictPath + "'"s);
 	ifs.exceptions(std::istream::badbit);
 	string line;
 	while (getline(ifs, line))

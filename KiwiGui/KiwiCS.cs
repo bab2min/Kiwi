@@ -140,6 +140,21 @@ namespace KiwiGui
             LoadLibrary(myFolder + subfolder + DLLPATH);
         }
 
+        public class KiwiException : Exception
+        {
+            public KiwiException()
+            {
+            }
+
+            public KiwiException(string message) : base(message)
+            {
+            }
+
+            public KiwiException(string message, Exception inner) : base(message, inner)
+            {
+            }
+        }
+
         [DllImport("kernel32.dll")]
         private static extern IntPtr LoadLibrary(string dllToLoad);
 
@@ -274,6 +289,7 @@ namespace KiwiGui
         private static Result[] ToResult(IntPtr kiwiresult)
         {
             int resCount = kiwiResult_getSize(kiwiresult);
+            if (resCount < 0) throw new KiwiException(Marshal.PtrToStringAnsi(kiwi_error()));
             Result[] ret = new Result[resCount];
             for (int i = 0; i < resCount; ++i)
             {
@@ -294,6 +310,7 @@ namespace KiwiGui
         private static ExtractedWord[] ToExtractedWord(IntPtr kiwiresult)
         {
             int resCount = kiwiWords_getSize(kiwiresult);
+            if (resCount < 0) throw new KiwiException(Marshal.PtrToStringAnsi(kiwi_error()));
             ExtractedWord[] ret = new ExtractedWord[resCount];
             for (int i = 0; i < resCount; ++i)
             {
@@ -344,11 +361,9 @@ namespace KiwiGui
          */
         public KiwiCS(string modelPath, int numThread, int options = KIWI_LOAD_DEFAULT_DICT)
         {
+            if(numThread < 0) throw new KiwiException("numThread must > 0");
             inst = kiwi_init(new Utf8String(modelPath).IntPtr, numThread, options);
-            if(inst == IntPtr.Zero)
-            {
-                throw new System.Exception(Marshal.PtrToStringAnsi(kiwi_error()));
-            }
+            if(inst == IntPtr.Zero) throw new KiwiException(Marshal.PtrToStringAnsi(kiwi_error()));
         }
 
         /*
@@ -363,6 +378,7 @@ namespace KiwiGui
         public Result[] analyze(string text, int topN)
         {
             IntPtr res = kiwi_analyzeW(inst, new Utf16String(text).IntPtr, topN);
+            if (inst == IntPtr.Zero) throw new KiwiException(Marshal.PtrToStringAnsi(kiwi_error()));
             Result[] ret = ToResult(res);
             kiwiResult_close(res);
             return ret;
@@ -381,6 +397,7 @@ namespace KiwiGui
             readResult = new Dictionary<int, string>();
             IntPtr ret = kiwi_extractWordsW(inst, readerInst, (IntPtr)handle, minCnt, maxWordLen, minScore);
             handle.Free();
+            if (inst == IntPtr.Zero) throw new KiwiException(Marshal.PtrToStringAnsi(kiwi_error()));
             ExtractedWord[] words = ToExtractedWord(ret);
             kiwiWords_close(ret);
             return words;
@@ -408,6 +425,7 @@ namespace KiwiGui
             readResult = new Dictionary<int, string>();
             IntPtr ret = kiwi_extractAddWordsW(inst, readerInst, (IntPtr)handle, minCnt, maxWordLen, minScore, posThreshold);
             handle.Free();
+            if (inst == IntPtr.Zero) throw new KiwiException(Marshal.PtrToStringAnsi(kiwi_error()));
             ExtractedWord[] words = ToExtractedWord(ret);
             kiwiWords_close(ret);
             return words;
@@ -415,12 +433,16 @@ namespace KiwiGui
 
         public int addUserWord(string word, string pos)
         {
-            return kiwi_addUserWord(inst, new Utf8String(word).IntPtr, new Utf8String(pos).IntPtr);
+            int ret = kiwi_addUserWord(inst, new Utf8String(word).IntPtr, new Utf8String(pos).IntPtr);
+            if (ret < 0) throw new KiwiException(Marshal.PtrToStringAnsi(kiwi_error()));
+            return ret;
         }
 
         public int loadUserDictionary(string dictPath)
         {
-            return kiwi_loadUserDict(inst, new Utf8String(dictPath).IntPtr);
+            int ret = kiwi_loadUserDict(inst, new Utf8String(dictPath).IntPtr);
+            if (ret < 0) throw new KiwiException(Marshal.PtrToStringAnsi(kiwi_error()));
+            return ret;
         }
 
         /*
@@ -435,12 +457,16 @@ namespace KiwiGui
             readResult = new Dictionary<int, string>();
             int ret = kiwi_analyzeMW(inst, readerInst, receiverInst, (IntPtr)handle, topN);
             handle.Free();
+            if (ret < 0) throw new KiwiException(Marshal.PtrToStringAnsi(kiwi_error()));
             return ret;
         }
 
         ~KiwiCS()
         {
-            if(inst != IntPtr.Zero) kiwi_close(inst);
+            if (inst != IntPtr.Zero)
+            {
+                if(kiwi_close(inst) < 0) throw new KiwiException(Marshal.PtrToStringAnsi(kiwi_error()));
+            }
         }
     }
 }

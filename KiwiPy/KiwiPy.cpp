@@ -510,13 +510,7 @@ static PyObject *createClassObject(const char *name, PyMethodDef methods[])
 	return pClass;
 }
 
-#ifdef _WIN64
-PyMODINIT_FUNC PyInit_coreWinx64()
-#elif _WIN32
-PyMODINIT_FUNC PyInit_coreWinx86()
-#else
 PyMODINIT_FUNC PyInit_kiwipiepycore()
-#endif
 {
 	static PyMethodDef methods[] =
 	{
