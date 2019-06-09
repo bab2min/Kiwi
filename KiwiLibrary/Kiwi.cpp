@@ -115,8 +115,9 @@ vector<KWordDetector::WordInfo> Kiwi::filterExtractedWords(vector<KWordDetector:
 			if (all_of(form.begin(), form.end(), [pos](char16_t c) {
 				return pos == identifySpecialChr(c);
 			})) return false;
+		default:
+			return true;
 		}
-		return true;
 	};
 	vector<KWordDetector::WordInfo> ret;
 	auto allForms = mdl->getAllForms();
@@ -510,7 +511,6 @@ vector<pair<Kiwi::path, float>> Kiwi::findBestPath(const vector<KGraphNode>& gra
 	}
 
 	// end node
-	WID seq[3] = { 0, 0, 1 };
 	for (size_t i = 0; i < KGraphNode::MAX_PREV; ++i)
 	{
 		auto* prev = endNode->getPrev(i);
@@ -652,7 +652,7 @@ std::vector<KResult> Kiwi::analyzeSent(const std::u16string::const_iterator & sB
 {
 	auto nstr = normalizeHangul({ sBegin, sEnd });
 	vector<uint32_t> posMap(nstr.size() + 1);
-	for (auto i = 0; i < nstr.size(); ++i)
+	for (size_t i = 0; i < nstr.size(); ++i)
 	{
 		posMap[i + 1] = posMap[i] + (isHangulCoda(nstr[i]) ? 0 : 1);
 	}

@@ -22,8 +22,9 @@ bool KFeatureTestor::isMatched(const k_string * form, KCondVowel vowel)
 	case KCondVowel::nonVowel:
 		if (0xAC00 <= form->back() && form->back() <= 0xD7A4) return false;
 		return true;
+	default:
+		return false;
 	}
-	return false;
 }
 
 bool KFeatureTestor::isMatched(const k_string * form, KCondPolarity polar)

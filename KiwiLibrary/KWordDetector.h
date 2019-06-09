@@ -145,13 +145,13 @@ public:
 		if (l <= dlen)
 		{
 			rawLen = l;
-			copy(begin, end, rawData.begin());
+			std::copy(begin, end, rawData.begin());
 		}
 		else
 		{
 			len = l;
 			data = new char16_t[l];
-			copy(begin, end, data);
+			std::copy(begin, end, data);
 		}
 	}
 
