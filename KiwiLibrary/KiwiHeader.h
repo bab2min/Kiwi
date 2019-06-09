@@ -61,7 +61,7 @@ typedef std::basic_string<k_char, std::char_traits<k_char>, spool_allocator<k_ch
 namespace std
 {
 	template <>
-	class hash<k_string> {
+	struct hash<k_string> {
 	public:
 		size_t operator() (const k_string& o) const
 		{

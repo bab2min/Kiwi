@@ -160,7 +160,7 @@ void KMorpheme::readFromBin(istream& is, const function<const KMorpheme*(size_t)
 
 void KMorpheme::writeToBin(ostream& os, const function<size_t(const KMorpheme*)>& mapper) const
 {
-	writeToBinStream<uint32_t>(os, (uint32_t)kform);
+	writeToBinStream<uint32_t>(os, (uint32_t)(size_t)kform);
 	writeToBinStream(os, tag);
 	writeToBinStream(os, vowel);
 	writeToBinStream(os, polar);
