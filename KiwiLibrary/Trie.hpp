@@ -52,14 +52,14 @@ public:
 	auto operator[](typename _Map::key_type key) const -> typename _Map::mapped_type
 	{
 		auto it = this->find(key);
-		if (it == end()) return {};
+		if (it == this->end()) return {};
 		else return it->second;
 	}
 
 	auto operator[](typename _Map::key_type key) -> typename _Map::mapped_type&
 	{
 		auto it = this->find(key);
-		if (it == end()) return this->emplace(key, typename _Map::mapped_type{}).first->second;
+		if (it == this->end()) return this->emplace(key, typename _Map::mapped_type{}).first->second;
 		else return it->second;
 	}
 };
