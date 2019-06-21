@@ -9,12 +9,13 @@ Kiwi 0.5버전부터는 Python3용 API를 제공합니다. 이 프로젝트를 �
 
     pip3 install kiwipiepy
 
-단, 현재 kiwipiepy 패키지는 Vista 버전 이상의 Windows OS 및 Linux를 지원합니다.
-MacOS 경우 대해서는 아직 테스트를 해보지 못했습니다.
+단, 현재 kiwipiepy 패키지는 Vista 버전 이상의 Windows OS 및 Linux, macOS 10.12 이상을 지원합니다.
 
 0.6.2 이하의 Windows 버전까지는 Python 3.6만 지원하는 문제가 있었으나, 
 0.6.3 버전부터는 Python 3.6, 3.7을 바이너리 wheel 형태로 지원하므로 pip로 쉽게 설치하여 사용하실 수 있습니다.
 기타 버전의 Python에 대해서도 wheel를 추후 지원할 예정입니다.
+
+0.6.5 버전부터 macOS 10.12 이상에서 clang을 이용한 컴파일 설치가 가능합니다. gcc 혹은 xcode가 설치된 시스템에서 pip를 이용해 Kiwi를 설치할 수 있습니다.
 
 ## 테스트해보기
 
