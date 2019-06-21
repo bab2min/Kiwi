@@ -152,10 +152,10 @@ void KWordDetector::countNgram(Counter& cdata, const function<u16string(size_t)>
 		auto ustr = reader(id);
 		if (ustr.empty()) break;
 		SpaceSplitIterator begin{ ustr.begin(), ustr.end() }, end;
-		auto idss = make_shared<vector<vector<int16_t, pool_allocator<void*>>, pool_allocator<void*>>>();
+		auto idss = make_shared<vector<vector<int16_t, pool_allocator<int16_t>>, pool_allocator<vector<int16_t, pool_allocator<int16_t>>>>>();
 		for (; begin != end; ++begin)
 		{
-			vector<int16_t, pool_allocator<void*>> ids;
+			vector<int16_t, pool_allocator<int16_t>> ids;
 			ids.reserve(begin.strSize() + 2);
 			ids.emplace_back(1); // Begin Chr
 			for (auto c : *begin)

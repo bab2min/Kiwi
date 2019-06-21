@@ -370,8 +370,9 @@ vector<pair<Kiwi::path, float>> Kiwi::findBestPath(const vector<KGraphNode>& gra
 			condV = curMorph->vowel;
 			condP = curMorph->polar;
 
-			unordered_map<WID, vector<WordLLP, pool_allocator<void*>>, hash<WID>, equal_to<WID>, pool_allocator<void*>> maxWidLL;
-			vector<const WordLL*, pool_allocator<void*>> works;
+			unordered_map<WID, vector<WordLLP, pool_allocator<WordLLP>>, hash<WID>, equal_to<WID>, 
+				pool_allocator<pair<const WID, vector<WordLLP, pool_allocator<WordLLP>>>>> maxWidLL;
+			vector<const WordLL*, pool_allocator<const WordLL*>> works;
 			works.reserve(8);
 			for (size_t i = 0; i < KGraphNode::MAX_PREV; ++i)
 			{
