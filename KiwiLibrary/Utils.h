@@ -9,11 +9,20 @@ std::u16string joinHangul(const k_string& hangul);
 
 template<class BaseChr, class OutIterator>
 void split(const std::basic_string<BaseChr>& s, BaseChr delim, OutIterator result) {
-	std::basic_stringstream<BaseChr> ss;
-	ss.str(s);
-	std::basic_string<BaseChr> item;
-	while (std::getline(ss, item, delim)) {
-		*(result++) = item;
+	size_t p = 0;
+	while (1)
+	{
+		size_t t = s.find(delim, p);
+		if (t == s.npos)
+		{
+			*(result++) = s.substr(p);
+			break;
+		}
+		else
+		{
+			*(result++) = s.substr(p, t - p);
+			p = t + 1;
+		}
 	}
 }
 
