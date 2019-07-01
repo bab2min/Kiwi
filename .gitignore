@@ -316,3 +316,4 @@ ModelManifest.xml
 *.zip
 /KiwiTester/performances.txt
 /Binary
+/KiwiCTester/longText.txt

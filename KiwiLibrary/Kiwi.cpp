@@ -697,6 +697,11 @@ vector<KResult> Kiwi::analyze(const u16string & str, size_t topN) const
 		while (chunk != str.end() && !(tag == KPOSTag::SF || tag == KPOSTag::SS || tag == KPOSTag::SE || tag == KPOSTag::SW || *chunk == u':'))
 		{
 			++chunk;
+			if (chunk - sents.back() >= 512)
+			{
+				sents.emplace_back(chunk);
+				break;
+			}
 			if (chunk == str.end()) break;
 			tag = identifySpecialChr(*chunk);
 		}
@@ -749,7 +754,7 @@ void Kiwi::clearCache()
 
 int Kiwi::getVersion()
 {
-	return 61;
+	return 66;
 }
 
 std::u16string Kiwi::toU16(const std::string & str)

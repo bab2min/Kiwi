@@ -16,6 +16,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
+    <Text Include="longText.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
