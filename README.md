@@ -24,10 +24,10 @@ DLL로 컴파일된 바이너리를 이용하여 다른 프로그램에 Kiwi를 
 최신 버전의 DLL은 https://github.com/bab2min/Kiwi/releases/tag/GUI_v0.61 에서 구할 수 있습니다.
 
 #### C# API
-https://github.com/bab2min/Kiwi/blob/master/KiwiGui/KiwiCS.cs
+https://github.com/bab2min/kiwi-gui
 
 #### Python3 API
-또한 Python3용 API인 Kiwipiepy가 제공됩니다. 이에 대해서는 https://github.com/bab2min/Kiwi/tree/master/KiwiPy 를 참조하시길 바랍니다.
+또한 Python3용 API인 Kiwipiepy가 제공됩니다. 이에 대해서는 https://github.com/bab2min/kiwipiepy 를 참조하시길 바랍니다.
 
 #### 응용 프로그램
 Kiwi는 C# 기반의 GUI 형태로도 제공됩니다.
@@ -87,7 +87,7 @@ Kiwi의 초기 로딩 시간은 2초 정도로 느린 편에 속하지만,
 로딩 이후의 처리 속도는 기존의 분석기들과 비교할 때 매우 빠른 편임을 확인할 수 있습니다.
 
 위의 성능 평가는
-https://github.com/bab2min/Kiwi/blob/master/evaluate.py 를 통해 직접 실시해볼 수 있습니다.
+https://github.com/bab2min/kiwipiepy/blob/master/evaluate.py 를 통해 직접 실시해볼 수 있습니다.
 
 ### 성능
 
