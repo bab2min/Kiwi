@@ -7,6 +7,7 @@
 #include "kiwi_c.h"
 
 using namespace std;
+using namespace kiwi;
 
 int kiwi_version()
 {
@@ -18,7 +19,7 @@ struct ResultBuffer
 	vector<string> stringBuf;
 };
 
-static exception_ptr currentError;
+thread_local exception_ptr currentError;
 
 const char* kiwi_error()
 {

@@ -1,14 +1,16 @@
 #include "KiwiHeader.h"
 #include "KForm.h"
 #include "Utils.h"
+#include "serializer.hpp"
 
 using namespace std;
+using namespace kiwi;
 
 #ifdef _DEBUG
 size_t KMorpheme::uid = 0;
 #endif
 
-KPOSTag makePOSTag(u16string tagStr)
+KPOSTag kiwi::makePOSTag(const u16string& tagStr)
 {
 	if (tagStr == KSTR("NNG")) return KPOSTag::NNG;
 	if (tagStr == KSTR("NNP")) return KPOSTag::NNP;
@@ -62,7 +64,7 @@ KPOSTag makePOSTag(u16string tagStr)
 	return KPOSTag::MAX;
 }
 
-const char * tagToString(KPOSTag t)
+const char * kiwi::tagToString(KPOSTag t)
 {
 	static const char* tags[] = 
 	{
@@ -87,7 +89,7 @@ const char * tagToString(KPOSTag t)
 	return tags[(size_t)t];
 }
 
-const k_char * tagToStringW(KPOSTag t)
+const k_char * kiwi::tagToStringW(KPOSTag t)
 {
 	static const k_char* tags[] =
 	{
@@ -117,61 +119,69 @@ KForm::KForm(const k_char * _form)
 	if (_form) form = _form;
 }
 
-void KForm::readFromBin(istream& is, const function<const KMorpheme*(size_t)>& mapper)
+template<class _Istream>
+void KForm::readFromBin(_Istream& is, const function<const KMorpheme*(size_t)>& mapper)
 {
-	form = readFromBinStream<k_string>(is);
-	candidate.resize(readFromBinStream<uint32_t>(is));
+	form = serializer::readFromBinStream<k_string>(is);
+	candidate.resize(serializer::readFromBinStream<uint32_t>(is));
 	for (auto& c : candidate)
 	{
-		c = mapper(readFromBinStream<uint32_t>(is));
+		c = mapper(serializer::readFromBinStream<uint32_t>(is));
 	}
 }
+
+template void KForm::readFromBin<istream>(istream& is, const function<const KMorpheme*(size_t)>& mapper);
+template void KForm::readFromBin<serializer::imstream>(serializer::imstream& is, const function<const KMorpheme*(size_t)>& mapper);
 
 void KForm::writeToBin(ostream& os, const function<size_t(const KMorpheme*)>& mapper) const
 {
-	writeToBinStream(os, form);
-	writeToBinStream<uint32_t>(os, candidate.size());
+	serializer::writeToBinStream(os, form);
+	serializer::writeToBinStream<uint32_t>(os, candidate.size());
 	for (auto c : candidate)
 	{
-		writeToBinStream<uint32_t>(os, mapper(c));
+		serializer::writeToBinStream<uint32_t>(os, mapper(c));
 	}
 }
 
-void KMorpheme::readFromBin(istream& is, const function<const KMorpheme*(size_t)>& mapper)
+template<class _Istream>
+void KMorpheme::readFromBin(_Istream& is, const function<const KMorpheme*(size_t)>& mapper)
 {
-	kform = (const k_string*)readFromBinStream<uint32_t>(is);
-	readFromBinStream(is, tag);
-	readFromBinStream(is, vowel);
-	readFromBinStream(is, polar);
-	readFromBinStream(is, combineSocket);
-	readFromBinStream(is, combined);
-	readFromBinStream(is, userScore);
+	kform = (const k_string*)serializer::readFromBinStream<uint32_t>(is);
+	serializer::readFromBinStream(is, tag);
+	serializer::readFromBinStream(is, vowel);
+	serializer::readFromBinStream(is, polar);
+	serializer::readFromBinStream(is, combineSocket);
+	serializer::readFromBinStream(is, combined);
+	serializer::readFromBinStream(is, userScore);
 
-	size_t s = readFromBinStream<uint32_t>(is);
+	size_t s = serializer::readFromBinStream<uint32_t>(is);
 	if (s)
 	{
-		chunks = new vector<const KMorpheme*>(s);
+		chunks.reset(new vector<const KMorpheme*>(s));
 		for (auto& c : *chunks)
 		{
-			c = mapper(readFromBinStream<uint32_t>(is));
+			c = mapper(serializer::readFromBinStream<uint32_t>(is));
 		}
 	}
 }
 
+template void KMorpheme::readFromBin<istream>(istream& is, const function<const KMorpheme*(size_t)>& mapper);
+template void KMorpheme::readFromBin<serializer::imstream>(serializer::imstream& is, const function<const KMorpheme*(size_t)>& mapper);
+
 void KMorpheme::writeToBin(ostream& os, const function<size_t(const KMorpheme*)>& mapper) const
 {
-	writeToBinStream<uint32_t>(os, (uint32_t)(size_t)kform);
-	writeToBinStream(os, tag);
-	writeToBinStream(os, vowel);
-	writeToBinStream(os, polar);
-	writeToBinStream(os, combineSocket);
-	writeToBinStream(os, combined);
-	writeToBinStream(os, userScore);
+	serializer::writeToBinStream<uint32_t>(os, (uint32_t)(size_t)kform);
+	serializer::writeToBinStream(os, tag);
+	serializer::writeToBinStream(os, vowel);
+	serializer::writeToBinStream(os, polar);
+	serializer::writeToBinStream(os, combineSocket);
+	serializer::writeToBinStream(os, combined);
+	serializer::writeToBinStream(os, userScore);
 
-	writeToBinStream<uint32_t>(os, chunks ? chunks->size() : 0);
+	serializer::writeToBinStream<uint32_t>(os, chunks ? chunks->size() : 0);
 	if(chunks) for (auto c : *chunks)
 	{
-		writeToBinStream<uint32_t>(os, mapper(c));
+		serializer::writeToBinStream<uint32_t>(os, mapper(c));
 	}
 }
 
