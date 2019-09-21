@@ -5,6 +5,7 @@
 #include "core/Kiwi.h"
 
 using namespace std;
+using namespace kiwi;
 #ifdef _WIN32
 #else
 int fopen_s(FILE** f, const char* a, const char* b)

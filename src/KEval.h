@@ -3,14 +3,14 @@
 class KEval
 {
 public:
-	typedef std::vector<KWordPair> AnswerType;
+	typedef std::vector<kiwi::KWordPair> AnswerType;
 	struct TestResult
 	{
 		std::u16string q;
 		AnswerType a;
 		AnswerType r;
-		std::vector<KWordPair> dr, da;
-		std::vector<KResult> cands;
+		std::vector<kiwi::KWordPair> dr, da;
+		std::vector<kiwi::KResult> cands;
 		float score;
 		void writeResult(std::ostream& out) const;
 	};
@@ -19,7 +19,7 @@ protected:
 	size_t totalCount;
 	float totalScore;
 public:
-	KEval(const char* testSetFile, Kiwi* kw, size_t topN = 3);
+	KEval(const char* testSetFile, kiwi::Kiwi* kw, size_t topN = 3);
 	float getScore() const ;
 	const std::vector<TestResult>& getWrongList() const { return wrongList; }
 	size_t getTotalCount() const { return totalCount; }

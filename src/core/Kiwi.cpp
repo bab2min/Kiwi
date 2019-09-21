@@ -5,6 +5,7 @@
 #include "logPoisson.h"
 
 using namespace std;
+using namespace kiwi;
 
 //#define LOAD_TXT
 
@@ -675,8 +676,9 @@ std::vector<KResult> Kiwi::analyzeSent(const std::u16string::const_iterator & sB
 			rarr.emplace_back(joinHangul(get<1>(s).empty() ? *get<0>(s)->kform : get<1>(s)), get<0>(s)->tag, 0, 0);
 			size_t nlen = (get<1>(s).empty() ? *get<0>(s)->kform : get<1>(s)).size();
 			size_t nlast = get<2>(s);
-			rarr.back().pos() = posMap[nlast - nlen];
-			rarr.back().len() = posMap[nlast] - posMap[nlast - nlen];
+			size_t nllast = nlast >= nlen ? nlast - nlen : 0;
+			rarr.back().pos() = posMap[nllast];
+			rarr.back().len() = posMap[nlast] - posMap[nllast];
 		}
 		ret.emplace_back(rarr, r.second);
 	}

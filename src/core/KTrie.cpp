@@ -4,8 +4,10 @@
 #include "KModelMgr.h"
 #include "KMemory.h"
 #include "Utils.h"
+#include "serializer.hpp"
 
 using namespace std;
+using namespace kiwi;
 
 vector<KGraphNode> KTrie::split(const k_string& str) const
 {
@@ -251,26 +253,26 @@ const KForm * KTrie::findForm(const k_string & str) const
 
 void KTrie::saveToBin(std::ostream & os, const KForm* base) const
 {
-	writeToBinStream<uint16_t>(os, next.size());
+	serializer::writeToBinStream<uint16_t>(os, next.size());
 	for (auto& p : next)
 	{
-		writeToBinStream(os, p);
+		serializer::writeToBinStream(os, p);
 	}
-	writeToBinStream(os, fail);
+	serializer::writeToBinStream(os, fail);
 	uint32_t fVal = (val == nullptr || val == (KForm*)-1) ? (size_t)val - 1 : val - base;
-	writeToBinStream(os, fVal);
+	serializer::writeToBinStream(os, fVal);
 }
 
 KTrie KTrie::loadFromBin(std::istream & is, const KForm* base)
 {
 	KTrie t;
-	uint16_t len = readFromBinStream<uint16_t>(is);
+	uint16_t len = serializer::readFromBinStream<uint16_t>(is);
 	for (size_t i = 0; i < len; ++i)
 	{
-		t.next.emplace(readFromBinStream<pair<char16_t, int32_t>>(is));
+		t.next.emplace(serializer::readFromBinStream<pair<char16_t, int32_t>>(is));
 	}
-	readFromBinStream(is, t.fail);
-	uint32_t fVal = readFromBinStream<uint32_t>(is);
+	serializer::readFromBinStream(is, t.fail);
+	uint32_t fVal = serializer::readFromBinStream<uint32_t>(is);
 	t.val = (fVal == (uint32_t)-1 || fVal == (uint32_t)-2) ? (KForm*)((int32_t)fVal + 1) : fVal + base;
 	return t;
 }

@@ -33,44 +33,49 @@
 #define TRIE_ALLOC_ARRAY
 #define CUSTOM_ALLOC
 
-typedef char16_t k_char;
 #define KSTR(x) u##x
 
 #include "KMemory.h"
 
-
-class KiwiException : public std::exception
+namespace kiwi
 {
-	std::string msg;
-public:
-	KiwiException(const std::string& _msg) : msg(_msg) {}
-	const char* what() const noexcept override { return msg.c_str(); }
-};
+	typedef char16_t k_char;
+
+	class KiwiException : public std::exception
+	{
+		std::string msg;
+	public:
+		KiwiException(const std::string& _msg) : msg(_msg) {}
+		const char* what() const noexcept override { return msg.c_str(); }
+	};
 
 
 #ifdef CUSTOM_ALLOC
-typedef std::basic_string<k_char, std::char_traits<k_char>, spool_allocator<k_char>> k_string;
+	typedef std::basic_string<k_char, std::char_traits<k_char>, spool_allocator<k_char>> k_string;
+	typedef std::basic_stringstream<k_char, std::char_traits<k_char>, spool_allocator<k_char>> k_stringstream;
+	typedef std::vector<k_char, pool_allocator<k_char>> k_vchar;
+	typedef std::vector<std::pair<k_vchar, float>, pool_allocator<std::pair<k_vchar, float>>> k_vpcf;
+#else
+	typedef std::basic_string<k_char> k_string;
+	typedef std::basic_stringstream<k_char> k_stringstream;
+	typedef std::vector<k_char> k_vchar;
+	typedef std::vector<std::pair<k_vchar, float>> k_vpcf;
+#endif
+}
+
+#ifdef CUSTOM_ALLOC
+#include "KMemoryChar.h"
 
 namespace std
 {
-	template<> struct hash<k_string>
+	template<> struct hash<kiwi::k_string>
 	{
-		size_t operator()(const k_string& s) const noexcept
+		size_t operator()(const kiwi::k_string& s) const noexcept
 		{
-			return hash<basic_string <k_char, char_traits<k_char>>>{}(
-				basic_string <k_char, char_traits<k_char>>{ s.begin(), s.end() }
+			return hash<basic_string <kiwi::k_char, char_traits<kiwi::k_char>>>{}(
+				basic_string <kiwi::k_char, char_traits<kiwi::k_char>>{ s.begin(), s.end() }
 			);
 		}
 	};
 }
-
-typedef std::basic_stringstream<k_char, std::char_traits<k_char>, spool_allocator<k_char>> k_stringstream;
-typedef std::vector<k_char, pool_allocator<k_char>> k_vchar;
-typedef std::vector<std::pair<k_vchar, float>, pool_allocator<std::pair<k_vchar, float>>> k_vpcf;
-#include "KMemoryChar.h"
-#else
-typedef std::basic_string<k_char> k_string;
-typedef std::basic_stringstream<k_char> k_stringstream;
-typedef std::vector<k_char> k_vchar;
-typedef std::vector<std::pair<k_vchar, float>> k_vpcf;
 #endif

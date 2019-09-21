@@ -31,6 +31,7 @@
     <ClInclude Include="src\core\KTrie.h" />
     <ClInclude Include="src\core\KWordDetector.h" />
     <ClInclude Include="src\core\logPoisson.h" />
+    <ClInclude Include="src\core\serializer.hpp" />
     <ClInclude Include="src\core\ThreadPool.h" />
     <ClInclude Include="src\core\Trie.hpp" />
     <ClInclude Include="src\core\Utils.h" />
@@ -43,6 +44,7 @@
     <ClCompile Include="src\core\KNLangModel.cpp" />
     <ClCompile Include="src\core\KTrie.cpp" />
     <ClCompile Include="src\core\KWordDetector.cpp" />
+    <ClCompile Include="src\core\serializer.cpp" />
     <ClCompile Include="src\core\Utils.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

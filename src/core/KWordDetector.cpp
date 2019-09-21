@@ -1,66 +1,11 @@
 #include "KiwiHeader.h"
 #include "KWordDetector.h"
 #include "Utils.h"
+#include "serializer.hpp"
 #include "Trie.hpp"
 
 using namespace std;
-
-class SpaceSplitIterator
-{
-	static bool isspace(char16_t c)
-	{
-		switch (c)
-		{
-		case u' ':
-		case u'\f':
-		case u'\n':
-		case u'\r':
-		case u'\t':
-		case u'\v':
-			return true;
-		}
-		return false;
-	}
-
-	u16string::const_iterator mBegin, mChunk, mEnd;
-public:
-	SpaceSplitIterator(const u16string::const_iterator& _begin = {}, const u16string::const_iterator& _end = {})
-		: mBegin(_begin), mEnd(_end)
-	{
-		while (mBegin != mEnd && isspace(*mBegin)) ++mBegin;
-		mChunk = mBegin;
-		while (mChunk != mEnd && !isspace(*mChunk)) ++mChunk;
-	}
-
-	SpaceSplitIterator& operator++()
-	{
-		mBegin = mChunk;
-		while (mBegin != mEnd && isspace(*mBegin)) ++mBegin;
-		mChunk = mBegin;
-		while (mChunk != mEnd && !isspace(*mChunk)) ++mChunk;
-		return *this;
-	}
-
-	bool operator==(const SpaceSplitIterator& o) const
-	{
-		if (mBegin == mEnd && o.mBegin == o.mEnd) return true;
-		return mBegin == o.mBegin;
-	}
-
-	bool operator!=(const SpaceSplitIterator& o) const
-	{
-		return !operator==(o);
-	}
-
-	u16string operator*() const
-	{
-		return { mBegin, mChunk };
-	}
-
-	u16string::const_iterator strBegin() const { return mBegin; }
-	u16string::const_iterator strEnd() const { return mChunk; }
-	size_t strSize() const { return distance(mBegin, mChunk); }
-};
+using namespace kiwi;
 
 void KWordDetector::countUnigram(Counter& cdata, const function<u16string(size_t)>& reader) const
 {
@@ -348,22 +293,22 @@ void KWordDetector::loadNounTailModelFromTxt(std::istream & is)
 
 void KWordDetector::savePOSModel(std::ostream & os)
 {
-	writeToBinStream(os, posScore);
+	serializer::writeToBinStream(os, posScore);
 }
 
 void KWordDetector::saveNounTailModel(std::ostream & os)
 {
-	writeToBinStream(os, nounTailScore);
+	serializer::writeToBinStream(os, nounTailScore);
 }
 
 void KWordDetector::loadPOSModel(std::istream & is)
 {
-	readFromBinStream(is, posScore);
+	serializer::readFromBinStream(is, posScore);
 }
 
 void KWordDetector::loadNounTailModel(std::istream & is)
 {
-	readFromBinStream(is, nounTailScore);
+	serializer::readFromBinStream(is, nounTailScore);
 }
 
 vector<KWordDetector::WordInfo> KWordDetector::extractWords(const function<u16string(size_t)>& reader) const

@@ -2,6 +2,8 @@
 #include "KFeatureTestor.h"
 #include "KForm.h"
 
+using namespace kiwi;
+
 bool KFeatureTestor::isMatched(const k_string * form, KCondVowel vowel)
 {
 	if (vowel == KCondVowel::none || vowel == KCondVowel::any) return true;
