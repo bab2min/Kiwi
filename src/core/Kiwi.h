@@ -54,6 +54,7 @@ namespace kiwi
 		float cutOffThreshold = 7.f;
 		std::unique_ptr<KModelMgr> mdl;
 		size_t numThread;
+		bool integrateAllomorph;
 		KWordDetector detector;
 		typedef std::vector<std::tuple<const KMorpheme*, k_string, uint32_t>> path;
 		std::vector<std::pair<path, float>> findBestPath(const std::vector<KGraphNode>& graph, const KNLangModel * knlm, const KMorpheme* morphBase, size_t topN) const;
@@ -62,12 +63,15 @@ namespace kiwi
 		enum
 		{
 			LOAD_DEFAULT_DICT = 1,
+			INTEGRATE_ALLOMORPH = 2,
 		};
-		Kiwi(const char* modelPath = "", size_t maxCache = -1, size_t numThread = 0, size_t options = LOAD_DEFAULT_DICT);
+		Kiwi(const char* modelPath = "", size_t maxCache = -1, size_t numThread = 0, size_t options = LOAD_DEFAULT_DICT | INTEGRATE_ALLOMORPH);
 		int addUserWord(const std::u16string& str, KPOSTag tag, float userScore = 20);
 		int loadUserDictionary(const char* userDictPath = "");
 		int prepare();
 		void setCutOffThreshold(float _cutOffThreshold);
+		int getOption(size_t option) const;
+		void setOption(size_t option, int value);
 		std::vector<KWordDetector::WordInfo> extractWords(const std::function<std::u16string(size_t)>& reader, size_t minCnt = 10, size_t maxWordLen = 10, float minScore = 0.25);
 		std::vector<KWordDetector::WordInfo> filterExtractedWords(std::vector<KWordDetector::WordInfo>&& words, float posThreshold = -3) const;
 		std::vector<KWordDetector::WordInfo> extractAddWords(const std::function<std::u16string(size_t)>& reader, size_t minCnt = 10, size_t maxWordLen = 10, float minScore = 0.25, float posThreshold = -3);
