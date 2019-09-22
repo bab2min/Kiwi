@@ -1,6 +1,7 @@
 #include "KiwiHeader.h"
 #include "KTrie.h"
 #include "Utils.h"
+#include "serializer.hpp"
 #include "KModelMgr.h"
 
 //#define LOAD_TXT
@@ -10,16 +11,17 @@ constexpr uint32_t KIWI_MAGICID = 0x4B495749;
 namespace std
 {
 	template <>
-	class hash<pair<k_string, KPOSTag>> {
+	class hash<pair<kiwi::k_string, kiwi::KPOSTag>> {
 	public:
-		size_t operator() (const pair<k_string, KPOSTag>& o) const
+		size_t operator() (const pair<kiwi::k_string, kiwi::KPOSTag>& o) const
 		{
-			return hash<k_string>{}(o.first) ^ (size_t)o.second;
+			return hash<kiwi::k_string>{}(o.first) ^ (size_t)o.second;
 		};
 	};
 }
 
 using namespace std;
+using namespace kiwi;
 
 #ifdef LOAD_TXT
 void KModelMgr::loadMMFromTxt(std::istream& is, morphemeMap& morphMap, std::unordered_map<KPOSTag, float>* posWeightSum, const function<bool(float, KPOSTag)>& selector)
@@ -282,10 +284,10 @@ void KModelMgr::loadCorpusFromTxt(std::istream & is, morphemeMap& morphMap, cons
 
 void KModelMgr::saveMorphBin(std::ostream& os) const
 {
-	writeToBinStream(os, KIWI_MAGICID);
-	writeToBinStream<uint32_t>(os, forms.size());
-	writeToBinStream<uint32_t>(os, morphemes.size());
-	writeToBinStream<uint32_t>(os, baseTrieSize);
+	serializer::writeToBinStream(os, KIWI_MAGICID);
+	serializer::writeToBinStream<uint32_t>(os, forms.size());
+	serializer::writeToBinStream<uint32_t>(os, morphemes.size());
+	serializer::writeToBinStream<uint32_t>(os, baseTrieSize);
 
 	auto mapper = [this](const KMorpheme* p)->size_t
 	{
@@ -326,12 +328,13 @@ size_t KModelMgr::estimateTrieSize() const
 
 #endif
 
-void KModelMgr::loadMorphBin(std::istream& is)
+template<class _Istream>
+void KModelMgr::loadMorphBin(_Istream& is)
 {
-	if (readFromBinStream<uint32_t>(is) != KIWI_MAGICID) throw KiwiException("[loadMorphBin] Input file is corrupted.");
-	size_t formSize = readFromBinStream<uint32_t>(is);
-	size_t morphemeSize = readFromBinStream<uint32_t>(is);
-	baseTrieSize = readFromBinStream<uint32_t>(is);
+	if (serializer::readFromBinStream<uint32_t>(is) != KIWI_MAGICID) throw KiwiException("[loadMorphBin] Input file is corrupted.");
+	size_t formSize = serializer::readFromBinStream<uint32_t>(is);
+	size_t morphemeSize = serializer::readFromBinStream<uint32_t>(is);
+	baseTrieSize = serializer::readFromBinStream<uint32_t>(is);
 
 	forms.resize(formSize);
 	morphemes.resize(morphemeSize);
@@ -414,12 +417,22 @@ KModelMgr::KModelMgr(const char * modelPath)
 	{
 		ifstream ifs{ modelPath + string{ "sj.morph" }, ios_base::binary };
 		if (ifs.fail()) throw KiwiException{ "[KModelMgr] Failed to find file '"s +modelPath + "sj.morph'." };
-		loadMorphBin(ifs);
+		ifs.seekg(0, ios_base::end);
+		string buffer(ifs.tellg(), 0);
+		ifs.seekg(0);
+		ifs.read(&buffer[0], buffer.size());
+		serializer::imstream iss{ buffer.data(), buffer.size() };
+		loadMorphBin(iss);
 	}
 	{
 		ifstream ifs{ modelPath + string{ "sj.lang" }, ios_base::binary };
 		if (ifs.fail()) throw KiwiException{ "[KModelMgr] Failed to find file '"s +modelPath + "sj.lang'." };
-		langMdl = make_shared<KNLangModel>(KNLangModel::readFromStream(move(ifs)));
+		ifs.seekg(0, ios_base::end);
+		string buffer(ifs.tellg(), 0);
+		ifs.seekg(0);
+		ifs.read(&buffer[0], buffer.size());
+		serializer::imstream iss{ buffer.data(), buffer.size() };
+		langMdl = make_shared<KNLangModel>(KNLangModel::readFromStream(move(iss)));
 	}
 #endif
 }

@@ -4,6 +4,7 @@
 #include "LCS.hpp"
 
 using namespace std;
+using namespace kiwi;
 
 KWordPair parseWordPOS(const u16string& str)
 {

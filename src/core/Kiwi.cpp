@@ -5,6 +5,7 @@
 #include "logPoisson.h"
 
 using namespace std;
+using namespace kiwi;
 
 //#define LOAD_TXT
 
@@ -34,6 +35,8 @@ Kiwi::Kiwi(const char * modelPath, size_t _maxCache, size_t _numThread, size_t o
 	{
 		loadUserDictionary((modelPath + string{ "default.dict" }).c_str());
 	}
+
+	integrateAllomorph = options & INTEGRATE_ALLOMORPH;
 }
 
 int Kiwi::addUserWord(const u16string & str, KPOSTag tag, float userScore)
@@ -58,7 +61,7 @@ int Kiwi::loadUserDictionary(const char * userDictPath)
 		if (!chunks[1].empty()) 
 		{
 			auto pos = makePOSTag(chunks[1]);
-			float score = 20.f;
+			float score = 0.f;
 			if (chunks.size() > 2) score = stof(chunks[2].begin(), chunks[2].end());
 			if (pos != KPOSTag::MAX)
 			{
@@ -82,6 +85,23 @@ int Kiwi::prepare()
 void Kiwi::setCutOffThreshold(float _cutOffThreshold)
 {
 	cutOffThreshold = std::max(_cutOffThreshold, 1.f);
+}
+
+int kiwi::Kiwi::getOption(size_t option) const
+{
+	if (option == INTEGRATE_ALLOMORPH)
+	{
+		return integrateAllomorph;
+	}
+	return 0;
+}
+
+void kiwi::Kiwi::setOption(size_t option, int value)
+{
+	if (option == INTEGRATE_ALLOMORPH)
+	{
+		integrateAllomorph = value;
+	}
 }
 
 vector<KWordDetector::WordInfo> Kiwi::extractWords(const function<u16string(size_t)>& reader, size_t minCnt, size_t maxWordLen, float minScore)
@@ -669,14 +689,41 @@ std::vector<KResult> Kiwi::analyzeSent(const std::u16string::const_iterator & sB
 	for (auto&& r : res)
 	{
 		vector<KWordPair> rarr;
+		const k_string* prevMorph = nullptr;
 		for (auto&& s : r.first)
 		{
 			if (!get<1>(s).empty() && get<1>(s)[0] == ' ') continue;
-			rarr.emplace_back(joinHangul(get<1>(s).empty() ? *get<0>(s)->kform : get<1>(s)), get<0>(s)->tag, 0, 0);
+			u16string joined;
+			do
+			{
+				if (!integrateAllomorph)
+				{
+					if (KPOSTag::EP <= get<0>(s)->tag && get<0>(s)->tag <= KPOSTag::ETM)
+					{
+						if ((*get<0>(s)->kform)[0] == u'어')
+						{
+							if (prevMorph && prevMorph[0].back() == u'하')
+							{
+								joined = joinHangul(u"여" + get<0>(s)->kform->substr(1));
+								break;
+							}
+							else if (KFeatureTestor::isMatched(prevMorph, KCondPolarity::positive))
+							{
+								joined = joinHangul(u"아" + get<0>(s)->kform->substr(1));
+								break;
+							}
+						}
+					}
+				}
+				joined = joinHangul(get<1>(s).empty() ? *get<0>(s)->kform : get<1>(s));
+			} while (0);
+			rarr.emplace_back(joined, get<0>(s)->tag, 0, 0);
 			size_t nlen = (get<1>(s).empty() ? *get<0>(s)->kform : get<1>(s)).size();
 			size_t nlast = get<2>(s);
-			rarr.back().pos() = posMap[nlast - nlen];
-			rarr.back().len() = posMap[nlast] - posMap[nlast - nlen];
+			size_t nllast = nlast >= nlen ? nlast - nlen : 0;
+			rarr.back().pos() = posMap[nllast];
+			rarr.back().len() = posMap[nlast] - posMap[nllast];
+			prevMorph = get<0>(s)->kform;
 		}
 		ret.emplace_back(rarr, r.second);
 	}
@@ -753,7 +800,7 @@ void Kiwi::clearCache()
 
 int Kiwi::getVersion()
 {
-	return 66;
+	return 70;
 }
 
 std::u16string Kiwi::toU16(const std::string & str)

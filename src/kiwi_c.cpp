@@ -7,6 +7,7 @@
 #include "kiwi_c.h"
 
 using namespace std;
+using namespace kiwi;
 
 int kiwi_version()
 {
@@ -18,7 +19,7 @@ struct ResultBuffer
 	vector<string> stringBuf;
 };
 
-static exception_ptr currentError;
+thread_local exception_ptr currentError;
 
 const char* kiwi_error()
 {
@@ -236,6 +237,20 @@ int kiwi_prepare(PKIWI handle)
 		currentError = current_exception();
 		return KIWIERR_FAIL;
 	}
+}
+
+DECL_DLL void kiwi_setOption(PKIWI handle, int option, int value)
+{
+	if (!handle) return;
+	Kiwi* kiwi = (Kiwi*)handle;
+	kiwi->setOption(option, value);
+}
+
+DECL_DLL int kiwi_getOption(PKIWI handle, int option)
+{
+	if (!handle) return KIWIERR_INVALID_HANDLE;
+	Kiwi* kiwi = (Kiwi*)handle;
+	return kiwi->getOption(option);
 }
 
 PKIWIRESULT kiwi_analyzeW(PKIWI handle, const kchar16_t * text, int topN)
