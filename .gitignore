@@ -340,3 +340,9 @@ ModelManifest.xml
 /test/evaluation/02s.txt
 /test/evaluation/02.txt
 .idea/
+__pycache__/
+
+/CMakeCache.txt
+/cmake_install.cmake
+/CMakeFiles/
+/Makefile

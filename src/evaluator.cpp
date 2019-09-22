@@ -24,6 +24,7 @@ public:
 };
 
 using namespace std;
+using namespace kiwi;
 
 /*
 int main()
@@ -103,7 +104,7 @@ int main()
 	SetConsoleOutputCP(CP_UTF8);
 	setvbuf(stdout, nullptr, _IOFBF, 1000);
 	Timer timer;
-	Kiwi kw{ "../ModelGenerator/", (size_t)-1, 0 };
+	Kiwi kw{ "ModelGenerator/", (size_t)-1, 0, 3 };
 	//kw.prepare();
 	//kw.analyze(u"남미풍의 강렬한 원색끼리의 조화, 수채화 같이 안온한 배색 등 색의 분위기를 강조하는 기하학적 무늬, 꽃무늬 디자인이 주류를 이루고 있다.", 10);
 	//return 0;
@@ -186,14 +187,14 @@ int main()
 	for (auto tf : testFiles)
 	{
 		Timer total;
-		KEval test{ ("../TestSets/" + tf).c_str(), &kw };
+		KEval test{ ("test/evaluation/" + tf).c_str(), &kw };
 		double tm = total.getElapsed();
 
 		cout << endl << test.getScore() << endl;
 		cout << "Total (" << test.getTotalCount() << ") Time : " << tm << " ms" << endl;
 		cout << "Time per Unit : " << tm / test.getTotalCount() << " ms" << endl;
 		
-		ofstream out{ "wrongsV2" + tf };
+		ofstream out{ "eval_result/wrongsV2" + tf };
 		out << test.getScore() << endl;
 		out << "Total (" << test.getTotalCount() << ") Time : " << tm << " ms" << endl;
 		out << "Time per Unit : " << tm / test.getTotalCount() << " ms" << endl;

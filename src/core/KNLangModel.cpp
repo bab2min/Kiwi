@@ -1,8 +1,10 @@
 #include "KiwiHeader.h"
 #include "KNLangModel.h"
 #include "Utils.h"
+#include "serializer.hpp"
 
 using namespace std;
+using namespace kiwi;
 
 KNLangModel::KNLangModel(size_t _orderN) : orderN(_orderN)
 {
@@ -218,19 +220,6 @@ void KNLangModel::printStat() const
 	cout << gMin << '\t' << gMax << endl;
 }
 
-void writeNegFixed16(std::ostream& os, float v)
-{
-	assert(v <= 0);
-	auto dv = (uint16_t)min(-v * (1 << 12), 65535.f);
-	writeToBinStream(os, dv);
-}
-
-float readNegFixed16(std::istream& is)
-{
-	auto dv = readFromBinStream<uint16_t>(is);
-	return -(dv / float(1 << 12));
-}
-
 
 const KNLangModel::Node * KNLangModel::Node::getNextTransition(WID n, size_t endOrder, float & ll) const
 {
@@ -266,42 +255,43 @@ const KNLangModel::Node * KNLangModel::Node::getNextTransition(WID n, size_t end
 
 void KNLangModel::Node::writeToStream(std::ostream & str, size_t leafDepth) const
 {
-	writeVToBinStream(str, -parent);
-	writeSVToBinStream(str, lower);
-	writeNegFixed16(str, ll);
-	writeNegFixed16(str, gamma);
-	writeToBinStream(str, depth);
+	serializer::writeVToBinStream(str, -parent);
+	serializer::writeSVToBinStream(str, lower);
+	serializer::writeNegFixed16(str, ll);
+	serializer::writeNegFixed16(str, gamma);
+	serializer::writeToBinStream(str, depth);
 
 	uint32_t size = bakedNext.size();
-	writeVToBinStream(str, size);
+	serializer::writeVToBinStream(str, size);
 	for (auto p : bakedNext)
 	{
-		writeVToBinStream(str, p.first);
-		if(depth < leafDepth - 1) writeVToBinStream(str, p.second);
-		else writeNegFixed16(str, *(float*)&p.second);
+		serializer::writeVToBinStream(str, p.first);
+		if(depth < leafDepth - 1) serializer::writeVToBinStream(str, p.second);
+		else serializer::writeNegFixed16(str, *(float*)&p.second);
 	}
 }
 
-KNLangModel::Node KNLangModel::Node::readFromStream(istream & str, size_t leafDepth)
+template<class _Istream>
+KNLangModel::Node KNLangModel::Node::readFromStream(_Istream & str, size_t leafDepth)
 {
 	Node n(true);
-	n.parent = -(int32_t)readVFromBinStream(str);
-	n.lower = readSVFromBinStream(str);
-	n.ll = readNegFixed16(str);
-	n.gamma = readNegFixed16(str);
-	readFromBinStream(str, n.depth);
+	n.parent = -(int32_t)serializer::readVFromBinStream(str);
+	n.lower = serializer::readSVFromBinStream(str);
+	n.ll = serializer::readNegFixed16(str);
+	n.gamma = serializer::readNegFixed16(str);
+	serializer::readFromBinStream(str, n.depth);
 
-	uint32_t size = readVFromBinStream(str);
+	uint32_t size = serializer::readVFromBinStream(str);
 	vector<pair<WID, int32_t>> tNext;
 	tNext.reserve(size);
 	for (size_t i = 0; i < size; ++i)
 	{
 		pair<WID, int32_t> p;
-		p.first = readVFromBinStream(str);
-		if(n.depth < leafDepth - 1) p.second = readVFromBinStream(str);
+		p.first = serializer::readVFromBinStream(str);
+		if(n.depth < leafDepth - 1) p.second = serializer::readVFromBinStream(str);
 		else
 		{
-			float f = readNegFixed16(str);
+			float f = serializer::readNegFixed16(str);
 			p.second = *(int32_t*)&f;
 		}
 		tNext.emplace_back(move(p));
@@ -309,3 +299,6 @@ KNLangModel::Node KNLangModel::Node::readFromStream(istream & str, size_t leafDe
 	n.bakedNext = BakedMap<WID, int32_t>{ tNext.begin(), tNext.end(), true };
 	return n;
 }
+
+template KNLangModel::Node KNLangModel::Node::readFromStream<std::istream>(std::istream & str, size_t leafDepth);
+template KNLangModel::Node KNLangModel::Node::readFromStream<serializer::imstream>(serializer::imstream & str, size_t leafDepth);

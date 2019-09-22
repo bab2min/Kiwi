@@ -25,7 +25,8 @@ typedef int(*kiwi_receiver)(int, PKIWIRESULT, void*);
 
 enum
 {
-	KIWI_LOAD_DEFAULT_DICT = 1
+	KIWI_LOAD_DEFAULT_DICT = 1,
+	KIWI_INTEGRATE_ALLOMORPH = 2,
 };
 
 #ifdef __cplusplus  
@@ -45,6 +46,8 @@ DECL_DLL PKIWIWORDS kiwi_extractWordsW(PKIWI handle, kiwi_readerW reader, void* 
 DECL_DLL PKIWIWORDS kiwi_extractFilterWordsW(PKIWI handle, kiwi_readerW reader, void* userData, int minCnt, int maxWordLen, float minScore, float posThreshold);
 DECL_DLL PKIWIWORDS kiwi_extractAddWordsW(PKIWI handle, kiwi_readerW reader, void* userData, int minCnt, int maxWordLen, float minScore, float posThreshold);
 DECL_DLL int kiwi_prepare(PKIWI handle);
+DECL_DLL void kiwi_setOption(PKIWI handle, int option, int value);
+DECL_DLL int kiwi_getOption(PKIWI handle, int option);
 DECL_DLL PKIWIRESULT kiwi_analyzeW(PKIWI handle, const kchar16_t* text, int topN);
 DECL_DLL PKIWIRESULT kiwi_analyze(PKIWI handle, const char* text, int topN);
 DECL_DLL int kiwi_analyzeMW(PKIWI handle, kiwi_readerW reader, kiwi_receiver receiver, void* userData, int topN);
