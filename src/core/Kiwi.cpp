@@ -700,16 +700,16 @@ std::vector<KResult> Kiwi::analyzeSent(const std::u16string::const_iterator & sB
 				{
 					if (KPOSTag::EP <= get<0>(s)->tag && get<0>(s)->tag <= KPOSTag::ETM)
 					{
-						if ((*get<0>(s)->kform)[0] == u'¾î')
+						if ((*get<0>(s)->kform)[0] == u'ì–´')
 						{
-							if (prevMorph && prevMorph[0].back() == u'ÇÏ')
+							if (prevMorph && prevMorph[0].back() == u'í•˜')
 							{
-								joined = joinHangul(u"¿©" + get<0>(s)->kform->substr(1));
+								joined = joinHangul(u"ì—¬" + get<0>(s)->kform->substr(1));
 								break;
 							}
 							else if (KFeatureTestor::isMatched(prevMorph, KCondPolarity::positive))
 							{
-								joined = joinHangul(u"¾Æ" + get<0>(s)->kform->substr(1));
+								joined = joinHangul(u"ì•„" + get<0>(s)->kform->substr(1));
 								break;
 							}
 						}
