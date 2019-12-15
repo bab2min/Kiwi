@@ -1,4 +1,4 @@
-#include <future>
+﻿#include <future>
 #include "Kiwi.h"
 #include "Utils.h"
 #include "KFeatureTestor.h"

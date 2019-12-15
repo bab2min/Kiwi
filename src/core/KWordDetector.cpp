@@ -90,8 +90,8 @@ void KWordDetector::countBigram(Counter& cdata, const function<u16string(size_t)
 
 void KWordDetector::countNgram(Counter& cdata, const function<u16string(size_t)>& reader) const
 {
-	vector<ReusableThread> rt(2);
-	vector<future<void>> futures(2);
+	//vector<ReusableThread> rt(2);
+	//vector<future<void>> futures(2);
 	for (size_t id = 0; ; ++id)
 	{
 		auto ustr = reader(id);
@@ -113,9 +113,9 @@ void KWordDetector::countNgram(Counter& cdata, const function<u16string(size_t)>
 			idss->emplace_back(move(ids));
 		}
 
-		if (futures[0].valid()) futures[0].get();
-		futures[0] = rt[0].setWork([&, idss]()
-		{
+		//if (futures[0].valid()) futures[0].get();
+		//futures[0] = rt[0].setWork([&, idss]()
+		//{
 			for (auto& ids : *idss)
 			{
 				for (size_t i = 1; i < ids.size(); ++i)
@@ -129,11 +129,11 @@ void KWordDetector::countNgram(Counter& cdata, const function<u16string(size_t)>
 					}
 				}
 			}
-		});
+		//});
 			
-		if (futures[1].valid()) futures[1].get();
-		futures[1] = rt[1].setWork([&, idss]()
-		{
+		//if (futures[1].valid()) futures[1].get();
+		//futures[1] = rt[1].setWork([&, idss]()
+		//{
 			for (auto& ids : *idss)
 			{
 				for (size_t i = 1; i < ids.size(); ++i)
@@ -147,13 +147,13 @@ void KWordDetector::countNgram(Counter& cdata, const function<u16string(size_t)>
 					}
 				}
 			}
-		});
+		//});
 	}
 
-	for (auto& f : futures)
-	{
-		if (f.valid()) f.get();
-	}
+	//for (auto& f : futures)
+	//{
+		//if (f.valid()) f.get();
+	//}
 	
 	u16light prefixToErase = {};
 	for (auto it  = cdata.forwardCnt.cbegin(); it != cdata.forwardCnt.cend();)
