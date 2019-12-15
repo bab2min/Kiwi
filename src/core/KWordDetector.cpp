@@ -90,70 +90,66 @@ void KWordDetector::countBigram(Counter& cdata, const function<u16string(size_t)
 
 void KWordDetector::countNgram(Counter& cdata, const function<u16string(size_t)>& reader) const
 {
-	//vector<ReusableThread> rt(2);
-	//vector<future<void>> futures(2);
-	for (size_t id = 0; ; ++id)
 	{
-		auto ustr = reader(id);
-		if (ustr.empty()) break;
-		SpaceSplitIterator begin{ ustr.begin(), ustr.end() }, end;
-		auto idss = make_shared<vector<vector<int16_t, pool_allocator<int16_t>>, pool_allocator<vector<int16_t, pool_allocator<int16_t>>>>>();
-		for (; begin != end; ++begin)
+		ThreadPool rtForward{ 1, 2 }, rtBackward{ 1, 2 };
+		vector<future<void>> futures;
+		for (size_t id = 0; ; ++id)
 		{
-			vector<int16_t, pool_allocator<int16_t>> ids;
-			ids.reserve(begin.strSize() + 2);
-			ids.emplace_back(1); // Begin Chr
-			for (auto c : *begin)
+			auto ustr = reader(id);
+			if (ustr.empty()) break;
+			SpaceSplitIterator begin{ ustr.begin(), ustr.end() }, end;
+			auto idss = make_shared<vector<vector<int16_t, pool_allocator<int16_t>>, pool_allocator<vector<int16_t, pool_allocator<int16_t>>>>>();
+			for (; begin != end; ++begin)
 			{
-				uint16_t id = cdata.chrDict.get(c);
-				if (id == cdata.chrDict.npos) id = 0;
-				ids.emplace_back(id);
+				vector<int16_t, pool_allocator<int16_t>> ids;
+				ids.reserve(begin.strSize() + 2);
+				ids.emplace_back(1); // Begin Chr
+				for (auto c : *begin)
+				{
+					uint16_t id = cdata.chrDict.get(c);
+					if (id == cdata.chrDict.npos) id = 0;
+					ids.emplace_back(id);
+				}
+				ids.emplace_back(2); // End Chr
+				idss->emplace_back(move(ids));
 			}
-			ids.emplace_back(2); // End Chr
-			idss->emplace_back(move(ids));
+
+			rtForward.enqueue([&, idss](size_t threadId)
+			{
+				for (auto& ids : *idss)
+				{
+					for (size_t i = 1; i < ids.size(); ++i)
+					{
+						if (!ids[i]) continue; // skip unknown chr
+						for (size_t j = i + 1; j < min(i + 1 + maxWordLen, ids.size() + 1); ++j)
+						{
+							if (!ids[j - 1]) break;
+							++cdata.forwardCnt[{ids.begin() + i, ids.begin() + j}];
+							if (!cdata.candBigram.count(make_pair(ids[j - 2], ids[j - 1]))) break;
+						}
+					}
+				}
+			});
+
+			rtBackward.enqueue([&, idss](size_t threadId)
+			{
+				for (auto& ids : *idss)
+				{
+					for (size_t i = 1; i < ids.size(); ++i)
+					{
+						if (!ids.rbegin()[i]) continue; // skip unknown chr
+						for (size_t j = i + 1; j < min(i + 1 + maxWordLen, ids.size() + 1); ++j)
+						{
+							if (!ids.rbegin()[j - 1]) break;
+							++cdata.backwardCnt[{ids.rbegin() + i, ids.rbegin() + j}];
+							if (!cdata.candBigram.count(make_pair(ids.rbegin()[j - 1], ids.rbegin()[j - 2]))) break;
+						}
+					}
+				}
+			});
 		}
 
-		//if (futures[0].valid()) futures[0].get();
-		//futures[0] = rt[0].setWork([&, idss]()
-		//{
-			for (auto& ids : *idss)
-			{
-				for (size_t i = 1; i < ids.size(); ++i)
-				{
-					if (!ids[i]) continue; // skip unknown chr
-					for (size_t j = i + 1; j < min(i + 1 + maxWordLen, ids.size() + 1); ++j)
-					{
-						if (!ids[j - 1]) break;
-						++cdata.forwardCnt[{ids.begin() + i, ids.begin() + j}];
-						if (!cdata.candBigram.count(make_pair(ids[j - 2], ids[j - 1]))) break;
-					}
-				}
-			}
-		//});
-			
-		//if (futures[1].valid()) futures[1].get();
-		//futures[1] = rt[1].setWork([&, idss]()
-		//{
-			for (auto& ids : *idss)
-			{
-				for (size_t i = 1; i < ids.size(); ++i)
-				{
-					if (!ids.rbegin()[i]) continue; // skip unknown chr
-					for (size_t j = i + 1; j < min(i + 1 + maxWordLen, ids.size() + 1); ++j)
-					{
-						if (!ids.rbegin()[j - 1]) break;
-						++cdata.backwardCnt[{ids.rbegin() + i, ids.rbegin() + j}];
-						if (!cdata.candBigram.count(make_pair(ids.rbegin()[j - 1], ids.rbegin()[j - 2]))) break;
-					}
-				}
-			}
-		//});
 	}
-
-	//for (auto& f : futures)
-	//{
-		//if (f.valid()) f.get();
-	//}
 	
 	u16light prefixToErase = {};
 	for (auto it  = cdata.forwardCnt.cbegin(); it != cdata.forwardCnt.cend();)
