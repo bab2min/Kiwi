@@ -109,12 +109,12 @@ int main()
 	//kw.analyze(u"남미풍의 강렬한 원색끼리의 조화, 수채화 같이 안온한 배색 등 색의 분위기를 강조하는 기하학적 무늬, 꽃무늬 디자인이 주류를 이루고 있다.", 10);
 	//return 0;
 	//kw.setCutOffThreshold(10);
-	if(0)
+	if(1)
 	{
 		auto flist = { "kowiki.txt" };
 		for (auto list : flist)
 		{
-			ifstream ifs{ string{"D:/"} + list };
+			ifstream ifs{ string{"G:/"} + list };
 			auto res = kw.extractAddWords([&ifs](size_t id) -> u16string
 			{
 				if (id == 0)
@@ -123,6 +123,7 @@ int main()
 					ifs.seekg(0);
 					string line;
 				}
+				if (id >= 10000) return {};
 				string line;
 				while (getline(ifs, line))
 				{
