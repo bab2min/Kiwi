@@ -17,7 +17,7 @@ namespace kiwi
 
 		void* allocate()
 		{
-			assert(_CrtCheckMemory());
+			//assert(_CrtCheckMemory());
 			//std::lock_guard<std::mutex> lg(lock);
 			if (!freeList)
 			{
@@ -37,7 +37,7 @@ namespace kiwi
 			//fprintf(stderr, "deallocate %p\n", p);
 			*((void**)p) = freeList;
 			freeList = (void**)p;
-			assert(_CrtCheckMemory());
+			//assert(_CrtCheckMemory());
 		}
 
 	private:
