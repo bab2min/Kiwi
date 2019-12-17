@@ -764,12 +764,12 @@ vector<KResult> Kiwi::analyze(const u16string & str, size_t topN) const
 			sents.emplace_back(chunk);
 		}
 	}
-	sents.emplace_back(str.end());
+	if(sents.back() != str.end()) sents.emplace_back(str.end());
+	if (sents.size() <= 1) return vector<KResult>(1);
 	vector<KResult> ret = analyzeSent(sents[0], sents[1], topN);
 	if (ret.empty())
 	{
-		ret.emplace_back();
-		return ret;
+		return vector<KResult>(1);
 	}
 	while (ret.size() < topN) ret.emplace_back(ret.back());
 	for (size_t i = 2; i < sents.size(); ++i)

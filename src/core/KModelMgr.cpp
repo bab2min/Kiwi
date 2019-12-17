@@ -468,12 +468,13 @@ void KModelMgr::solidify()
 		trieRoot[i].val = &forms[i - 1];
 	}
 
+	bool once = false;
 	for (size_t i = (size_t)KPOSTag::SN; i < forms.size(); ++i)
 	{
 		auto& f = forms[i];
 		if (f.candidate.empty()) continue;
 		size_t realSize = f.form.size();
-		if (f.form.find(u'\x2665') != k_string::npos)
+		if (!once && f.form.find(u'\x2665') != k_string::npos)
 		{
 			realSize = f.form.find(u'\x2665') + 1;
 		}
@@ -482,9 +483,10 @@ void KModelMgr::solidify()
 			trieRoot.emplace_back();
 			return &trieRoot.back();
 		});
-		if (f.form.find(u'\x2665') != k_string::npos)
+		if (!once && f.form.find(u'\x2665') != k_string::npos)
 		{
 			f.form = f.form.substr(f.form.find(u'\x2665') + 1);
+			once = true;
 		}
 	}
 	trieRoot[0].fillFail();
