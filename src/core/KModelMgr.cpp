@@ -474,20 +474,11 @@ void KModelMgr::solidify()
 		auto& f = forms[i];
 		if (f.candidate.empty()) continue;
 		size_t realSize = f.form.size();
-		if (!once && f.form.find(u'\x2665') != k_string::npos)
-		{
-			realSize = f.form.find(u'\x2665') + 1;
-		}
 		trieRoot[0].build(&f.form[0], realSize, &f, [this]()
 		{
 			trieRoot.emplace_back();
 			return &trieRoot.back();
 		});
-		if (!once && f.form.find(u'\x2665') != k_string::npos)
-		{
-			f.form = f.form.substr(f.form.find(u'\x2665') + 1);
-			once = true;
-		}
 	}
 	trieRoot[0].fillFail();
 

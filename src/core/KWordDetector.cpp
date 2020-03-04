@@ -393,6 +393,14 @@ vector<KWordDetector::WordInfo> KWordDetector::extractWords(const function<u16st
 	for (auto& r : cands)
 	{
 		/*
+		removing unpaired surrogate
+		*/
+		if ((r.form.back() & 0xFC00) == 0xD800)
+		{
+			r.form.pop_back();
+		}
+
+		/*
 		removing hyper-matched forms
 		ex) correct form: ABC, matched forms: ABC, ABC_D, ABC_E ...
 		remove ABC_D, ABC_E ... if branching entropy of D, E ... is higher
