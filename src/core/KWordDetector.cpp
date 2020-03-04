@@ -373,7 +373,7 @@ vector<KWordDetector::WordInfo> KWordDetector::extractWords(const function<u16st
 		}
 	}
 
-	sort(cands.begin(), cands.end(), [](const auto& a, const auto& b)
+	sort(cands.begin(), cands.end(), [](const WordInfo& a, const WordInfo& b)
 	{
 		return a.score > b.score;
 	});

@@ -124,7 +124,7 @@ namespace kiwi
 			{
 				if (++it == str.end()) throw KiwiUnicodeException{ "unpaired surrogate" };
 				size_t code2 = *it;
-				if((code2 & 0xFC00) != 0xDC00) throw KiwiUnicodeException{ "unpaired surrogate" };
+				if ((code2 & 0xFC00) != 0xDC00) throw KiwiUnicodeException{ "unpaired surrogate" };
 				code = ((code & 0x3FF) << 10) | (code2 & 0x3FF);
 			}
 
