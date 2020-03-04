@@ -24,7 +24,6 @@
 
 #include <memory>
 #include <locale>
-#include <codecvt>
 
 #include <chrono>
 #include <mutex>
@@ -41,12 +40,16 @@ namespace kiwi
 {
 	typedef char16_t k_char;
 
-	class KiwiException : public std::exception
+	class KiwiException : public std::runtime_error
 	{
-		std::string msg;
 	public:
-		KiwiException(const std::string& _msg) : msg(_msg) {}
-		const char* what() const noexcept override { return msg.c_str(); }
+		using std::runtime_error::runtime_error;
+	};
+
+	class KiwiUnicodeException : public std::runtime_error
+	{
+	public:
+		using std::runtime_error::runtime_error;
 	};
 
 
