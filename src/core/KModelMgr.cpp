@@ -416,7 +416,7 @@ KModelMgr::KModelMgr(const char * modelPath)
 #else
 	{
 		ifstream ifs{ modelPath + string{ "sj.morph" }, ios_base::binary };
-		if (ifs.fail()) throw KiwiException{ "[KModelMgr] Failed to find file '"s +modelPath + "sj.morph'." };
+		if (ifs.fail()) throw KiwiException{ std::string{"[KModelMgr] Failed to find file '"} + modelPath + "sj.morph'." };
 		ifs.seekg(0, ios_base::end);
 		string buffer(ifs.tellg(), 0);
 		ifs.seekg(0);
@@ -426,7 +426,7 @@ KModelMgr::KModelMgr(const char * modelPath)
 	}
 	{
 		ifstream ifs{ modelPath + string{ "sj.lang" }, ios_base::binary };
-		if (ifs.fail()) throw KiwiException{ "[KModelMgr] Failed to find file '"s +modelPath + "sj.lang'." };
+		if (ifs.fail()) throw KiwiException{ std::string{"[KModelMgr] Failed to find file '"} + modelPath + "sj.lang'." };
 		ifs.seekg(0, ios_base::end);
 		string buffer(ifs.tellg(), 0);
 		ifs.seekg(0);

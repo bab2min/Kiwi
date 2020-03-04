@@ -221,12 +221,12 @@ namespace kiwi
 
 		std::reverse_iterator<const char16_t*> rbegin() const
 		{
-			return std::make_reverse_iterator(end());
+			return std::reverse_iterator<const char16_t*>(end());
 		}
 
 		std::reverse_iterator<const char16_t*> rend() const
 		{
-			return std::make_reverse_iterator(begin());
+			return std::reverse_iterator<const char16_t*>(begin());
 		}
 
 		char16_t& front()

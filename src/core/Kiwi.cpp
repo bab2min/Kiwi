@@ -4,6 +4,15 @@
 #include "KFeatureTestor.h"
 #include "logPoisson.h"
 
+namespace kiwi
+{
+	template<typename T, typename... Args>
+	std::unique_ptr<T> make_unique(Args&&... args)
+	{
+		return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+	}
+}
+
 using namespace std;
 using namespace kiwi;
 
@@ -24,12 +33,12 @@ Kiwi::Kiwi(const char * modelPath, size_t _maxCache, size_t _numThread, size_t o
 #else
 	{
 		ifstream ifs{ modelPath + string{ "extract.mdl" }, ios_base::binary };
-		if (ifs.fail()) throw KiwiException{ "[Kiwi] Failed to find model file '"s + modelPath + "extract.mdl'."  };
+		if (ifs.fail()) throw KiwiException{ std::string{"[Kiwi] Failed to find model file '"} +modelPath + "extract.mdl'." };
 		detector.loadPOSModel(ifs);
 		detector.loadNounTailModel(ifs);
 	}
 #endif
-	mdl = make_unique<KModelMgr>(modelPath);
+	mdl = kiwi::make_unique<KModelMgr>(modelPath);
 
 	if (options & LOAD_DEFAULT_DICT)
 	{
@@ -49,7 +58,7 @@ int Kiwi::addUserWord(const u16string & str, KPOSTag tag, float userScore)
 int Kiwi::loadUserDictionary(const char * userDictPath)
 {
 	ifstream ifs{ userDictPath };
-	if(ifs.fail()) throw KiwiException("[loadUserDictionary] Failed to open '"s + userDictPath + "'"s);
+	if (ifs.fail()) throw KiwiException(std::string{ "[loadUserDictionary] Failed to open '" } +userDictPath + "'");
 	ifs.exceptions(std::istream::badbit);
 	string line;
 	while (getline(ifs, line))
@@ -112,7 +121,7 @@ vector<KWordDetector::WordInfo> Kiwi::extractWords(const function<u16string(size
 
 vector<KWordDetector::WordInfo> Kiwi::filterExtractedWords(vector<KWordDetector::WordInfo>&& words, float posThreshold) const
 {
-	auto old = make_unique<KModelMgr>(*mdl);
+	auto old = kiwi::make_unique<KModelMgr>(*mdl);
 	swap(old, const_cast<Kiwi*>(this)->mdl);
 	const_cast<Kiwi*>(this)->prepare();
 	
@@ -285,6 +294,15 @@ struct WordLL
 	MInfos morphs;
 	float accScore = 0;
 	const KNLangModel::Node* node = nullptr;
+
+	WordLL()
+	{
+	}
+
+	WordLL(const MInfos& _morphs, float _accScore, const KNLangModel::Node* _node)
+		: morphs{_morphs}, accScore{_accScore}, node{_node}
+	{
+	}
 };
 
 struct WordLLP
@@ -292,6 +310,15 @@ struct WordLLP
 	const MInfos* morphs = nullptr;
 	float accScore = 0;
 	const KNLangModel::Node* node = nullptr;
+
+	WordLLP()
+	{
+	}
+
+	WordLLP(const MInfos* _morphs, float _accScore, const KNLangModel::Node* _node)
+		: morphs{_morphs}, accScore{_accScore}, node{_node}
+	{
+	}
 };
 
 typedef vector<WordLL, pool_allocator<WordLL>> WordLLs;
@@ -657,7 +684,7 @@ void Kiwi::analyze(size_t topN, const function<u16string(size_t)>& reader, const
 
 void Kiwi::perform(size_t topN, const function<u16string(size_t)>& reader, const function<void(size_t, vector<KResult>&&)>& receiver, size_t minCnt, size_t maxWordLen, float minScore, float posThreshold) const
 {
-	auto old = make_unique<KModelMgr>(*mdl);
+	auto old = kiwi::make_unique<KModelMgr>(*mdl);
 	swap(old, const_cast<Kiwi*>(this)->mdl);
 	const_cast<Kiwi*>(this)->extractAddWords(reader, minCnt, maxWordLen, minScore, posThreshold);
 	const_cast<Kiwi*>(this)->prepare();
