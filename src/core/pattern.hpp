@@ -133,7 +133,7 @@ namespace pattern
 		class CharSet<_negate, CharOr<_S1, _S2, _S3, _SRest...>>
 		{
 			using Trait = CharTrait<CharOr<_S1, _S2, _S3, _SRest...>>;
-			std::array<int8_t, Trait::span> lut = { 0, };
+			std::array<int8_t, Trait::span> lut = { { 0, } };
 		public:
 			CharSet()
 			{
