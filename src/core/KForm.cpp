@@ -60,6 +60,9 @@ KPOSTag kiwi::makePOSTag(const u16string& tagStr)
 	if (tagStr == KSTR("V")) return KPOSTag::V;
 	if (tagStr == KSTR("A")) return KPOSTag::V;
 	if (tagStr == KSTR("^")) return KPOSTag::UNKNOWN;
+	if (tagStr == KSTR("W_URL")) return KPOSTag::W_URL;
+	if (tagStr == KSTR("W_EMAIL")) return KPOSTag::W_EMAIL;
+	if (tagStr == KSTR("W_HASHTAG")) return KPOSTag::W_HASHTAG;
 	//assert(0);
 	return KPOSTag::MAX;
 }
@@ -80,6 +83,7 @@ const char * kiwi::tagToString(KPOSTag t)
 		"VCP", "VCN",
 		"SF", "SP", "SS", "SE", "SO", "SW",
 		"SL", "SH", "SN",
+		"W_URL", "W_EMAIL", "W_HASHTAG",
 		"JKS", "JKC", "JKG", "JKO", "JKB", "JKV", "JKQ", "JX", "JC",
 		"EP", "EF", "EC", "ETN", "ETM",
 		"V",
@@ -105,6 +109,7 @@ const k_char * kiwi::tagToStringW(KPOSTag t)
 		KSTR("VCP"), KSTR("VCN"),
 		KSTR("SF"), KSTR("SP"), KSTR("SS"), KSTR("SE"), KSTR("SO"), KSTR("SW"),
 		KSTR("SL"), KSTR("SH"), KSTR("SN"),
+		KSTR("W_URL"), KSTR("W_EMAIL"), KSTR("W_HASHTAG"),
 		KSTR("JKS"), KSTR("JKC"), KSTR("JKG"), KSTR("JKO"), KSTR("JKB"), KSTR("JKV"), KSTR("JKQ"), KSTR("JX"), KSTR("JC"),
 		KSTR("EP"), KSTR("EF"), KSTR("EC"), KSTR("ETN"), KSTR("ETM"),
 		KSTR("V"),

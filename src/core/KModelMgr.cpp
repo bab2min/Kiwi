@@ -49,8 +49,8 @@ void KModelMgr::loadMMFromTxt(std::istream& is, morphemeMap& morphMap, std::unor
 		KCondPolarity polar = KCondPolarity::none;
 		if (tag >= KPOSTag::JKS && tag <= KPOSTag::ETM)
 		{
-			float t[] = { vowel, vocalic, vocalicH, 1 - vowel, 1 - vocalic, 1 - vocalicH };
-			size_t pmIdx = max_element(t, t + LEN_ARRAY(t)) - t;
+			std::array<float, 6> t = { vowel, vocalic, vocalicH, 1 - vowel, 1 - vocalic, 1 - vocalicH };
+			size_t pmIdx = max_element(t.begin(), t.end()) - t.begin();
 			if (t[pmIdx] >= 0.85f)
 			{
 				cvowel = (KCondVowel)(pmIdx + 2);
@@ -98,8 +98,8 @@ void KModelMgr::loadMMFromTxt(std::istream& is, morphemeMap& morphMap, std::unor
 
 void KModelMgr::loadCMFromTxt(std::istream& is, morphemeMap& morphMap)
 {
-	static k_char* conds[] = { KSTR("+"), KSTR("-Coda"), KSTR("+"), KSTR("+") };
-	static k_char* conds2[] = { KSTR("+"), KSTR("+Positive"), KSTR("-Positive") };
+	static std::array<k_char*, 4> conds = { KSTR("+"), KSTR("-Coda"), KSTR("+"), KSTR("+") };
+	static std::array<k_char*, 3> conds2 = { KSTR("+"), KSTR("+Positive"), KSTR("-Positive") };
 
 	string line;
 	while (getline(is, line))
@@ -110,7 +110,7 @@ void KModelMgr::loadCMFromTxt(std::istream& is, morphemeMap& morphMap)
 		if (fields.size() < 2) continue;
 		if (fields.size() == 2) fields.emplace_back();
 		auto form = normalizeHangul({ fields[0].begin(), fields[0].end() });
-		vector<const KMorpheme*>* chunkIds = new vector<const KMorpheme*>;
+		unique_ptr<vector<const KMorpheme*>> chunkIds = make_unique<vector<const KMorpheme*>>();
 		float ps = 0;
 		size_t bTag = 0;
 		for (auto chunk : split(fields[1], u'+'))
@@ -142,15 +142,19 @@ void KModelMgr::loadCMFromTxt(std::istream& is, morphemeMap& morphMap)
 
 		KCondVowel vowel = morphemes[((size_t)chunkIds->at(0))].vowel;
 		KCondPolarity polar = morphemes[((size_t)chunkIds->at(0))].polar;
-		auto pm = find(conds, conds + LEN_ARRAY(conds), fields[2]);
-		if (pm < conds + LEN_ARRAY(conds))
 		{
-			vowel = (KCondVowel)(pm - conds + 1);
+			auto pm = find(conds.begin(), conds.end(), fields[2]);
+			if (pm != conds.end())
+			{
+				vowel = (KCondVowel)(pm - conds.begin() + 1);
+			}
 		}
-		pm = find(conds2, conds2 + LEN_ARRAY(conds2), fields[2]);
-		if (pm < conds2 + LEN_ARRAY(conds2))
 		{
-			polar = (KCondPolarity)(pm - conds2);
+			auto pm = find(conds2.begin(), conds2.end(), fields[2]);
+			if (pm != conds2.end())
+			{
+				polar = (KCondPolarity)(pm - conds2.begin());
+			}
 		}
 		uint8_t combineSocket = 0;
 		if (fields.size() >= 4 && !fields[3].empty())
@@ -163,7 +167,7 @@ void KModelMgr::loadCMFromTxt(std::istream& is, morphemeMap& morphMap)
 		fm.candidate.emplace_back((KMorpheme*)mid);
 		morphemes.emplace_back(form, KPOSTag::UNKNOWN, vowel, polar, combineSocket);
 		morphemes.back().kform = (const k_string*)(&fm - &forms[0]);
-		morphemes.back().chunks = chunkIds;
+		morphemes.back().chunks = move(chunkIds);
 	continueFor:;
 	}
 }
@@ -252,9 +256,10 @@ void KModelMgr::loadCorpusFromTxt(std::istream & is, morphemeMap& morphMap, cons
 		for (size_t i = 1; i < fields.size(); i += 2)
 		{
 			auto f = normalizeHangul(fields[i]);
+			if (f.empty()) continue;
+
 			auto t = makePOSTag(fields[i + 1]);
 
-			if (f.empty()) continue;
 			if ((f[0] == u'아' || f[0] == u'야') && fields[i + 1][0] == 'E')
 			{
 				if(f[0] == u'아') f[0] == u'어';
@@ -371,9 +376,9 @@ KModelMgr::KModelMgr(const char * modelPath)
 	this->modelPath = modelPath;
 #ifdef LOAD_TXT
 	// reserve places for default tag forms & morphemes
-	forms.resize((size_t)KPOSTag::SN);
-	morphemes.resize((size_t)KPOSTag::SN + 2); // additional places for <s> & </s>
-	for (size_t i = 0; i < (size_t)KPOSTag::SN; ++i)
+	forms.resize((size_t)KPOSTag::DEFAULT_TAG_SIZE);
+	morphemes.resize((size_t)KPOSTag::DEFAULT_TAG_SIZE + 2); // additional places for <s> & </s>
+	for (size_t i = 0; i < (size_t)KPOSTag::DEFAULT_TAG_SIZE; ++i)
 	{
 		forms[i].candidate.emplace_back((KMorpheme*)(i + 2));
 		morphemes[i + 2].tag = (KPOSTag)(i + 1);
@@ -443,13 +448,6 @@ void KModelMgr::addUserWord(const k_string & form, KPOSTag tag, float userScore)
 	if (form.empty()) return;
 	if (formMap.find(form) != formMap.end()) return;
 	extraTrieSize += form.size() - 1;
-	for (size_t i = 1; i < form.size() - 1; ++i)
-	{
-		KPOSTag specialType = identifySpecialChr(form[i - 1]);
-		if (specialType == KPOSTag::MAX) continue;
-		auto& f = formMapper(form.substr(0, i));
-		if (f.candidate.empty()) f.candidate.emplace_back((const KMorpheme*)(getDefaultMorpheme(specialType) - &morphemes[0]));
-	}
 
 	auto& f = formMapper(form);
 	f.candidate.emplace_back((const KMorpheme*)morphemes.size());
@@ -462,14 +460,14 @@ void KModelMgr::solidify()
 {
 	if (!trieRoot.empty()) throw KiwiException("[solidify] Cannot solidify twice.");
 	trieRoot.reserve(baseTrieSize + extraTrieSize);
-	trieRoot.resize((size_t)KPOSTag::SN + 1); // preserve places for root node + default tag morphemes
-	for (size_t i = 1; i <= (size_t)KPOSTag::SN; ++i)
+	trieRoot.resize((size_t)KPOSTag::DEFAULT_TAG_SIZE + 1); // preserve places for root node + default tag morphemes
+	for (size_t i = 1; i <= (size_t)KPOSTag::DEFAULT_TAG_SIZE; ++i)
 	{
 		trieRoot[i].val = &forms[i - 1];
 	}
 
 	bool once = false;
-	for (size_t i = (size_t)KPOSTag::SN; i < forms.size(); ++i)
+	for (size_t i = (size_t)KPOSTag::DEFAULT_TAG_SIZE; i < forms.size(); ++i)
 	{
 		auto& f = forms[i];
 		if (f.candidate.empty()) continue;

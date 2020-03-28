@@ -4,14 +4,6 @@
 #include "KFeatureTestor.h"
 #include "logPoisson.h"
 
-namespace kiwi
-{
-	template<typename T, typename... Args>
-	std::unique_ptr<T> make_unique(Args&&... args)
-	{
-		return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-	}
-}
 
 using namespace std;
 using namespace kiwi;
@@ -46,6 +38,8 @@ Kiwi::Kiwi(const char * modelPath, size_t _maxCache, size_t _numThread, size_t o
 	}
 
 	integrateAllomorph = options & INTEGRATE_ALLOMORPH;
+
+	pm = kiwi::make_unique<PatternMatcher>();
 }
 
 int Kiwi::addUserWord(const u16string & str, KPOSTag tag, float userScore)
@@ -88,6 +82,7 @@ int Kiwi::loadUserDictionary(const char * userDictPath)
 int Kiwi::prepare()
 {
 	mdl->solidify();
+	workers = unique_ptr<ThreadPool>{ new ThreadPool{ numThread - 1, numThread * 64 } };
 	return 0;
 }
 
@@ -194,7 +189,7 @@ vector<KWordDetector::WordInfo> Kiwi::filterExtractedWords(vector<KWordDetector:
 			auto normForm = normalizeHangul(r.form);
 			if (allForms.count(normForm)) continue;
 
-			KResult kr = analyze(r.form);
+			KResult kr = analyze(r.form, 0);
 			if (any_of(kr.first.begin(), kr.first.end(), [](const KWordPair& kp)
 			{
 				return KPOSTag::JKS <= kp.tag() && kp.tag() <= KPOSTag::ETM;
@@ -215,7 +210,7 @@ vector<KWordDetector::WordInfo> Kiwi::filterExtractedWords(vector<KWordDetector:
 			auto subNormForm = normalizeHangul(subForm);
 			if (allForms.count(subNormForm)) continue;
 
-			KResult kr = analyze(subForm);
+			KResult kr = analyze(subForm, 0);
 			if (any_of(kr.first.begin(), kr.first.end(), [](const KWordPair& kp)
 			{
 				return KPOSTag::JKS <= kp.tag() && kp.tag() <= KPOSTag::ETM;
@@ -392,6 +387,8 @@ vector<pair<Kiwi::path, float>> Kiwi::findBestPath(const vector<KGraphNode>& gra
 			KCondPolarity condP = KCondPolarity::none;
 			size_t chSize = 1;
 			bool isUserWord = false;
+			bool leftBoundary = !node->getPrev(0)->lastPos || 
+				node->getPrev(0)->lastPos < node->lastPos - (node->form ? node->form->form.size() : node->uform.size());
 			// if the morpheme is chunk set
 			if (curMorph->chunks)
 			{
@@ -403,8 +400,9 @@ vector<pair<Kiwi::path, float>> Kiwi::findBestPath(const vector<KGraphNode>& gra
 			}
 			else
 			{
-				if (isUserWord = (curMorph->getCombined() ? curMorph->getCombined() : curMorph) - morphBase >= knlm->getVocabSize())
+				if ((curMorph->getCombined() ? curMorph->getCombined() : curMorph) - morphBase >= knlm->getVocabSize())
 				{
+					isUserWord = true;
 					seq[0] = mdl->getDefaultMorpheme(curMorph->tag) - morphBase;
 				}
 				else
@@ -420,6 +418,8 @@ vector<pair<Kiwi::path, float>> Kiwi::findBestPath(const vector<KGraphNode>& gra
 				pool_allocator<pair<const WID, vector<WordLLP, pool_allocator<WordLLP>>>>> maxWidLL;
 			vector<const WordLL*, pool_allocator<const WordLL*>> works;
 			works.reserve(8);
+			float discountForCombining = 0;
+
 			for (size_t i = 0; i < KGraphNode::MAX_PREV; ++i)
 			{
 				auto* prev = node->getPrev(i);
@@ -447,7 +447,12 @@ vector<pair<Kiwi::path, float>> Kiwi::findBestPath(const vector<KGraphNode>& gra
 				estimatedLL -= 5 + unknownLen * 3;
 			}
 
-			float discountForCombining = curMorph->combineSocket ? -15.f : 0.f;
+			if (curMorph->combineSocket) discountForCombining -= 15.f;
+			if (isUserWord && !leftBoundary)
+			{
+				estimatedLL -= 10.f;
+			}
+
 			for (auto& p : maxWidLL)
 			{
 				for (auto& q : p.second)
@@ -605,22 +610,30 @@ vector<pair<Kiwi::path, float>> Kiwi::findBestPath(const vector<KGraphNode>& gra
 }
 
 
-KResult Kiwi::analyze(const u16string & str) const
+KResult Kiwi::analyze(const u16string & str, size_t matchOptions) const
 {
-	return analyze(str, 1)[0];
+	return analyze(str, 1, matchOptions)[0];
 }
 
-KResult Kiwi::analyze(const string & str) const
+KResult Kiwi::analyze(const string & str, size_t matchOptions) const
 {
-	return analyze(utf8_to_utf16(str));
+	return analyze(utf8_to_utf16(str), matchOptions);
 }
 
-vector<KResult> Kiwi::analyze(const string & str, size_t topN) const
+vector<KResult> Kiwi::analyze(const string & str, size_t topN, size_t matchOptions) const
 {
-	return analyze(utf8_to_utf16(str), topN);
+	return analyze(utf8_to_utf16(str), topN, matchOptions);
 }
 
-void Kiwi::analyze(size_t topN, const function<u16string(size_t)>& reader, const function<void(size_t, vector<KResult>&&)>& receiver) const
+future<vector<KResult>> Kiwi::asyncAnalyze(const string & str, size_t topN, size_t matchOptions) const
+{
+	return workers->enqueue([&, str, topN, matchOptions](size_t)
+	{
+		return analyze(str, topN, matchOptions);
+	});
+}
+
+void Kiwi::analyze(size_t topN, const function<u16string(size_t)>& reader, const function<void(size_t, vector<KResult>&&)>& receiver, size_t matchOptions) const
 {
 	if (numThread > 1)
 	{
@@ -650,16 +663,15 @@ void Kiwi::analyze(size_t topN, const function<u16string(size_t)>& reader, const
 
 		size_t id;
 		{
-			ThreadPool workers{ numThread - 1, numThread * 64 };
 			for (id = 0; ; ++id)
 			{
 				auto ustr = reader(id);
 				if (ustr.empty()) break;
 
 				sharedResult.consumeResult(receiver);
-				workers.enqueue([this, topN, id, ustr, &receiver, &sharedResult](size_t tid)
+				workers->enqueue([this, topN, matchOptions, id, ustr, &receiver, &sharedResult](size_t tid)
 				{
-					auto r = analyze(ustr, topN);
+					auto r = analyze(ustr, topN, matchOptions);
 					sharedResult.addResult(id, move(r));
 				});
 			}
@@ -676,23 +688,23 @@ void Kiwi::analyze(size_t topN, const function<u16string(size_t)>& reader, const
 		{
 			auto ustr = reader(id);
 			if (ustr.empty()) break;
-			auto r = analyze(ustr, topN);
+			auto r = analyze(ustr, topN, matchOptions);
 			receiver(id, move(r));
 		}
 	}
 }
 
-void Kiwi::perform(size_t topN, const function<u16string(size_t)>& reader, const function<void(size_t, vector<KResult>&&)>& receiver, size_t minCnt, size_t maxWordLen, float minScore, float posThreshold) const
+void Kiwi::perform(size_t topN, const function<u16string(size_t)>& reader, const function<void(size_t, vector<KResult>&&)>& receiver, size_t matchOptions, size_t minCnt, size_t maxWordLen, float minScore, float posThreshold) const
 {
 	auto old = kiwi::make_unique<KModelMgr>(*mdl);
 	swap(old, const_cast<Kiwi*>(this)->mdl);
 	const_cast<Kiwi*>(this)->extractAddWords(reader, minCnt, maxWordLen, minScore, posThreshold);
 	const_cast<Kiwi*>(this)->prepare();
-	analyze(topN, reader, receiver);
+	analyze(topN, reader, receiver, matchOptions);
 	swap(old, const_cast<Kiwi*>(this)->mdl);
 }
 
-std::vector<KResult> Kiwi::analyzeSent(const std::u16string::const_iterator & sBegin, const std::u16string::const_iterator & sEnd, size_t topN) const
+std::vector<KResult> Kiwi::analyzeSent(const std::u16string::const_iterator & sBegin, const std::u16string::const_iterator & sEnd, size_t topN, size_t matchOptions) const
 {
 	auto nstr = normalizeHangul({ sBegin, sEnd });
 	vector<uint32_t> posMap(nstr.size() + 1);
@@ -701,7 +713,7 @@ std::vector<KResult> Kiwi::analyzeSent(const std::u16string::const_iterator & sB
 		posMap[i + 1] = posMap[i] + (isHangulCoda(nstr[i]) ? 0 : 1);
 	}
 
-	auto nodes = mdl->getTrie()->split(nstr);
+	auto nodes = mdl->getTrie()->split(nstr, pm.get(), matchOptions);
 	vector<KResult> ret;
 	if (nodes.size() <= 2)
 	{
@@ -755,7 +767,7 @@ std::vector<KResult> Kiwi::analyzeSent(const std::u16string::const_iterator & sB
 	return ret;
 }
 
-vector<KResult> Kiwi::analyze(const u16string & str, size_t topN) const
+vector<KResult> Kiwi::analyze(const u16string & str, size_t topN, size_t matchOptions) const
 {
 	if (!mdl->getTrie()) throw KiwiException("Model should be prepared before analyzing.");
 	auto chunk = str.begin();
@@ -793,7 +805,7 @@ vector<KResult> Kiwi::analyze(const u16string & str, size_t topN) const
 	}
 	if(sents.back() != str.end()) sents.emplace_back(str.end());
 	if (sents.size() <= 1) return vector<KResult>(1);
-	vector<KResult> ret = analyzeSent(sents[0], sents[1], topN);
+	vector<KResult> ret = analyzeSent(sents[0], sents[1], topN, matchOptions);
 	if (ret.empty())
 	{
 		return vector<KResult>(1);
@@ -801,7 +813,7 @@ vector<KResult> Kiwi::analyze(const u16string & str, size_t topN) const
 	while (ret.size() < topN) ret.emplace_back(ret.back());
 	for (size_t i = 2; i < sents.size(); ++i)
 	{
-		auto res = analyzeSent(sents[i - 1], sents[i], topN);
+		auto res = analyzeSent(sents[i - 1], sents[i], topN, matchOptions);
 		if (res.empty()) continue;
 		for (size_t n = 0; n < topN; ++n)
 		{

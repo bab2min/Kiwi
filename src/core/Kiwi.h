@@ -5,6 +5,7 @@
 #include "ThreadPool.h"
 #include "KWordDetector.h"
 #include "KModelMgr.h"
+#include "PatternMatcher.h"
 
 namespace kiwi
 {
@@ -53,12 +54,14 @@ namespace kiwi
 	protected:
 		float cutOffThreshold = 7.f;
 		std::unique_ptr<KModelMgr> mdl;
+		std::unique_ptr<ThreadPool> workers;
 		size_t numThread;
 		bool integrateAllomorph;
+		std::unique_ptr<PatternMatcher> pm;
 		KWordDetector detector;
 		typedef std::vector<std::tuple<const KMorpheme*, k_string, uint32_t>> path;
 		std::vector<std::pair<path, float>> findBestPath(const std::vector<KGraphNode>& graph, const KNLangModel * knlm, const KMorpheme* morphBase, size_t topN) const;
-		std::vector<KResult> analyzeSent(const std::u16string::const_iterator& sBegin, const std::u16string::const_iterator& sEnd, size_t topN) const;
+		std::vector<KResult> analyzeSent(const std::u16string::const_iterator& sBegin, const std::u16string::const_iterator& sEnd, size_t topN, size_t matchOptions) const;
 	public:
 		enum
 		{
@@ -75,12 +78,13 @@ namespace kiwi
 		std::vector<KWordDetector::WordInfo> extractWords(const std::function<std::u16string(size_t)>& reader, size_t minCnt = 10, size_t maxWordLen = 10, float minScore = 0.25);
 		std::vector<KWordDetector::WordInfo> filterExtractedWords(std::vector<KWordDetector::WordInfo>&& words, float posThreshold = -3) const;
 		std::vector<KWordDetector::WordInfo> extractAddWords(const std::function<std::u16string(size_t)>& reader, size_t minCnt = 10, size_t maxWordLen = 10, float minScore = 0.25, float posThreshold = -3);
-		KResult analyze(const std::u16string& str) const;
-		KResult analyze(const std::string& str) const;
-		std::vector<KResult> analyze(const std::u16string& str, size_t topN) const;
-		std::vector<KResult> analyze(const std::string& str, size_t topN) const;
-		void analyze(size_t topN, const std::function<std::u16string(size_t)>& reader, const std::function<void(size_t, std::vector<KResult>&&)>& receiver) const;
-		void perform(size_t topN, const std::function<std::u16string(size_t)>& reader, const std::function<void(size_t, std::vector<KResult>&&)>& receiver, size_t minCnt = 10, size_t maxWordLen = 10, float minScore = 0.25, float posThreshold = -3) const;
+		KResult analyze(const std::u16string& str, size_t matchOptions) const;
+		KResult analyze(const std::string& str, size_t matchOptions) const;
+		std::vector<KResult> analyze(const std::u16string& str, size_t topN, size_t matchOptions) const;
+		std::vector<KResult> analyze(const std::string& str, size_t topN, size_t matchOptions) const;
+		std::future<std::vector<KResult>> asyncAnalyze(const std::string& str, size_t topN, size_t matchOptions) const;
+		void analyze(size_t topN, const std::function<std::u16string(size_t)>& reader, const std::function<void(size_t, std::vector<KResult>&&)>& receiver, size_t matchOptions) const;
+		void perform(size_t topN, const std::function<std::u16string(size_t)>& reader, const std::function<void(size_t, std::vector<KResult>&&)>& receiver, size_t matchOptions, size_t minCnt = 10, size_t maxWordLen = 10, float minScore = 0.25, float posThreshold = -3) const;
 		void clearCache();
 		static int getVersion();
 		static std::u16string toU16(const std::string& str);

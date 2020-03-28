@@ -38,6 +38,12 @@
 
 namespace kiwi
 {
+	template<typename T, typename... Args>
+	std::unique_ptr<T> make_unique(Args&&... args)
+	{
+		return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+	}
+
 	typedef char16_t k_char;
 
 	class KiwiException : public std::runtime_error

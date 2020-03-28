@@ -9,7 +9,7 @@
 using namespace std;
 using namespace kiwi;
 
-vector<KGraphNode> KTrie::split(const k_string& str) const
+vector<KGraphNode> KTrie::split(const k_string& str, const PatternMatcher* pm, size_t matchOptions) const
 {
 	vector<KGraphNode> ret;
 	ret.reserve(8);
@@ -18,9 +18,9 @@ vector<KGraphNode> KTrie::split(const k_string& str) const
 	vector<const KForm*, pool_allocator<const KForm*>> candidates;
 	const KTrie* curTrie = this;
 	unordered_map<uint32_t, int> spacePos;
-	size_t lastSpecialEndPos = 0;
+	size_t lastSpecialEndPos = 0, specialStartPos = 0;
 	KPOSTag chrType, lastChrType = KPOSTag::UNKNOWN;
-	auto brachOut = [&](bool makeLongMatch = false)
+	auto branchOut = [&](bool makeLongMatch = false)
 	{
 		if (!candidates.empty())
 		{
@@ -106,9 +106,53 @@ vector<KGraphNode> KTrie::split(const k_string& str) const
 		}
 	};
 
-	for (auto c : str)
+	for (; n < str.size(); ++n)
 	{
+		auto& c = str[n];
+		if (pm)
+		{
+			auto m = pm->match(str.data() + n, str.data() + str.size(), matchOptions);
+			chrType = m.second;
+			if (chrType != KPOSTag::UNKNOWN)
+			{
+				branchOut();
+				auto it = spacePos.find(n - 1);
+				int space = it == spacePos.end() ? 0 : it->second;
+				KGraphNode newNode{ k_string{ &c, m.first }, (uint16_t)(n + m.first) };
+				for (auto& g : ret)
+				{
+					if (g.lastPos != n - space) continue;
+					newNode.addPrev(&ret.back() + 1 - &g);
+				}
+				ret.emplace_back(move(newNode));
+				ret.back().form = this[(size_t)chrType].val;
+
+				n += m.first - 1;
+				goto continueFor;
+			}
+		}
+
 		chrType = identifySpecialChr(c);
+
+		if (lastChrType != chrType)
+		{
+			// sequence of speical characters found
+			if (lastChrType != KPOSTag::MAX && lastChrType != KPOSTag::UNKNOWN /*&& n - specialStartPos > 1*/)
+			{
+				auto it = spacePos.find(specialStartPos - 1);
+				int space = it == spacePos.end() ? 0 : it->second;
+				KGraphNode newNode{ k_string{ &str[specialStartPos], n - specialStartPos }, (uint16_t)n };
+				for (auto& g : ret)
+				{
+					if (g.lastPos != specialStartPos - space) continue;
+					newNode.addPrev(&ret.back() + 1 - &g);
+				}
+				ret.emplace_back(move(newNode));
+				ret.back().form = this[(size_t)lastChrType].val;
+			}
+			specialStartPos = n;
+		}
+
 		while (!curTrie->getNext(c)) // if curTrie has no exact next node, goto fail
 		{
 			if (curTrie->fail)
@@ -126,7 +170,8 @@ vector<KGraphNode> KTrie::split(const k_string& str) const
 			}
 			else
 			{
-				brachOut(chrType != KPOSTag::MAX);
+				branchOut(chrType != KPOSTag::MAX);
+				
 				// the root node has no exact next node, test special chr
 				// space
 				if (chrType == KPOSTag::UNKNOWN)
@@ -146,32 +191,13 @@ vector<KGraphNode> KTrie::split(const k_string& str) const
 				// not space
 				else if(chrType != KPOSTag::MAX)
 				{
-					// insert new node
-					if (chrType != lastChrType)
-					{
-						auto it = spacePos.find(n - 1);
-						int space = it == spacePos.end() ? 0 : it->second;
-						KGraphNode newNode{ k_string{ &c, 1 }, (uint16_t)(n + 1) };
-						for (auto& g : ret)
-						{
-							if (g.lastPos != n - space) continue;
-							newNode.addPrev(&ret.back() + 1 - &g);
-						}
-						ret.emplace_back(move(newNode));
-						ret.back().form = this[(size_t)chrType].val;
-					}
-					// reuse previous node
-					else
-					{
-						ret.back().uform.push_back(c);
-						ret.back().lastPos = n + 1;
-					}
 					lastSpecialEndPos = n + 1;
 				}
+				
 				goto continueFor; 
 			}
 		}
-		brachOut();
+		branchOut();
 		// from this, curTrie has the exact next node
 		curTrie = curTrie->getNext(c);
 		// if it has exit node, a pattern has found
@@ -186,8 +212,23 @@ vector<KGraphNode> KTrie::split(const k_string& str) const
 		}
 	continueFor:
 		lastChrType = chrType;
-		n++;
 	}
+
+	// sequence of speical characters found
+	if (lastChrType != KPOSTag::MAX && lastChrType != KPOSTag::UNKNOWN /*&& n - specialStartPos > 1*/)
+	{
+		auto it = spacePos.find(specialStartPos - 1);
+		int space = it == spacePos.end() ? 0 : it->second;
+		KGraphNode newNode{ k_string{ &str[specialStartPos], n - specialStartPos }, (uint16_t)n };
+		for (auto& g : ret)
+		{
+			if (g.lastPos != specialStartPos - space) continue;
+			newNode.addPrev(&ret.back() + 1 - &g);
+		}
+		ret.emplace_back(move(newNode));
+		ret.back().form = this[(size_t)lastChrType].val;
+	}
+
 	while (curTrie->fail)
 	{
 		curTrie = curTrie->getFail();
@@ -197,35 +238,7 @@ vector<KGraphNode> KTrie::split(const k_string& str) const
 			candidates.emplace_back(curTrie->val);
 		}
 	}
-	brachOut(true);
-
-	// join splitted special chr node
-	for (size_t i = ret.size() ; i-- > 0; )
-	{
-		// if special chr
-		if (!(ret[i].form && ret[i].form->candidate[0] <= this[(size_t)KPOSTag::SN].val->candidate[0]
-			&& ret[i].prevs[0] && !ret[i].prevs[1])) continue;
-
-		auto& joinedNode = ret[i];
-		auto curmorph = ret[i].form->candidate[0];
-		auto j = i;
-		while (ret[j].prevs[0] && !ret[j].prevs[1] && ret[j - ret[j].prevs[0]].form
-			&& curmorph == ret[j - ret[j].prevs[0]].form->candidate[0]
-			&& joinedNode.lastPos - joinedNode.uform.size() == ret[j - ret[j].prevs[0]].lastPos)
-		{
-			j -= ret[j].prevs[0];
-			joinedNode.uform = ret[j].uform + joinedNode.uform;
-			for (size_t k = 0; k < KGraphNode::MAX_PREV; ++k)
-			{
-				if (!ret[j].prevs[k])
-				{
-					joinedNode.prevs[k] = 0;
-					break;
-				}
-				joinedNode.prevs[k] = (&joinedNode - &ret[0]) - (j - ret[j].prevs[k]);
-			}
-		}
-	}
+	branchOut(true);
 
 	ret.emplace_back();
 	ret.back().lastPos = n;
