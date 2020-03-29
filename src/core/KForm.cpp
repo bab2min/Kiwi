@@ -190,11 +190,11 @@ void KMorpheme::writeToBin(ostream& os, const function<size_t(const KMorpheme*)>
 	}
 }
 
-std::ostream & operator<<(std::ostream & os, const KMorpheme & morph)
+std::ostream & kiwi::KMorpheme::print(std::ostream & os) const
 {
-	os << utf16_to_utf8(morph.kform ? u16string{ morph.kform->begin(), morph.kform->end() } : u"_");
+	os << utf16_to_utf8(kform ? u16string{ kform->begin(), kform->end() } : u"_");
 	os << '/';
-	os << tagToString(morph.tag);
-	if (morph.combineSocket) os << '+' << (size_t)morph.combineSocket;
+	os << tagToString(tag);
+	if (combineSocket) os << '+' << (size_t)combineSocket;
 	return os;
 }
