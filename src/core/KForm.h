@@ -2,13 +2,6 @@
 
 namespace kiwi
 {
-	struct KMorpheme;
-}
-
-std::ostream& operator<< (std::ostream& os, const kiwi::KMorpheme& morph);;
-
-namespace kiwi
-{
 	enum class KPOSTag : uint8_t
 	{
 		UNKNOWN,
@@ -96,7 +89,7 @@ namespace kiwi
 		void readFromBin(_Istream& is, const std::function<const KMorpheme*(size_t)>& mapper);
 		void writeToBin(std::ostream& os, const std::function<size_t(const KMorpheme*)>& mapper) const;
 
-		friend std::ostream& (::operator<<) (std::ostream& os, const KMorpheme& morph);
+		std::ostream& print(std::ostream& os) const;
 	};
 
 	struct KForm

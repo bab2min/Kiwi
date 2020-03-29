@@ -4,9 +4,9 @@
 #include "KFeatureTestor.h"
 #include "logPoisson.h"
 
-
 using namespace std;
 using namespace kiwi;
+
 
 //#define LOAD_TXT
 
@@ -318,6 +318,23 @@ struct WordLLP
 
 typedef vector<WordLL, pool_allocator<WordLL>> WordLLs;
 
+template<class _Iter, class _Key>
+auto findNthLargest(_Iter first, _Iter last, size_t nth, _Key&& fn) -> decltype(fn(*first))
+{
+	using KeyType = decltype(fn(*first));
+
+	size_t s = std::distance(first, last);
+
+	std::vector<KeyType> v;
+	for (; first != last; ++first)
+	{
+		v.emplace_back(fn(*first));
+	}
+
+	std::sort(v.rbegin(), v.rend());
+	return v[nth];
+}
+
 template<class _Type>
 void evalTrigram(const KNLangModel::Node* rootNode, const KMorpheme* morphBase, const WordLL** wBegin, const WordLL** wEnd, 
 	array<WID, 4> seq, size_t chSize, const KMorpheme* curMorph, const KGraphNode* node, _Type& maxWidLL)
@@ -540,21 +557,29 @@ vector<pair<Kiwi::path, float>> Kiwi::findBestPath(const vector<KGraphNode>& gra
 		}
 
 		// heuristically removing lower ll to speed up
-		WordLLs reduced;
-		for (auto& c : cache[i])
+		if (cache[i].size() > topN)
 		{
-			if (c.accScore > tMax - cutOffThreshold) reduced.emplace_back(move(c));
+			WordLLs reduced;
+			float cutOffScore = findNthLargest(cache[i].begin(), cache[i].end(), topN, [](const WordLL& c)
+			{
+				return c.accScore;
+			});
+			cutOffScore = min(tMax - cutOffThreshold, cutOffScore);
+			for (auto& c : cache[i])
+			{
+				if (c.accScore >= cutOffScore) reduced.emplace_back(move(c));
+			}
+			cache[i] = move(reduced);
 		}
-		cache[i] = move(reduced);
 
 #ifdef DEBUG_PRINT
-		cout << "== " << i << " ==" << endl;
+		cout << "== " << i << " (tMax: " << tMax << ") ==" << endl;
 		for (auto& tt : cache[i])
 		{
 			cout << tt.accScore << '\t';
 			for (auto& m : tt.morphs)
 			{
-				cout << morphBase[m.wid] << '\t';
+				morphBase[m.wid].print(cout) << '\t';
 			}
 			cout << endl;
 		}
@@ -587,7 +612,7 @@ vector<pair<Kiwi::path, float>> Kiwi::findBestPath(const vector<KGraphNode>& gra
 		cout << tt.accScore << '\t';
 		for (auto& m : tt.morphs)
 		{
-			cout << morphBase[m.wid] << '\t';
+			morphBase[m.wid].print(cout) << '\t';
 		}
 		cout << endl;
 	}

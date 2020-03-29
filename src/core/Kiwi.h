@@ -52,7 +52,7 @@ namespace kiwi
 	class Kiwi
 	{
 	protected:
-		float cutOffThreshold = 7.f;
+		float cutOffThreshold = 8.f;
 		std::unique_ptr<KModelMgr> mdl;
 		std::unique_ptr<ThreadPool> workers;
 		size_t numThread;

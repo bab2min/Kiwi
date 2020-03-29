@@ -146,8 +146,9 @@ int main()
 		}
 		return 0;
 	}
+	kw.addUserWord(u"골리", KPOSTag::NNP, -5);
 	kw.prepare();
-	kw.analyze(u"IPv6 IPv4 ITX-청춘 말레이시아", 10);
+	kw.analyze(u"사람을 골리다", 10, PatternMatcher::all);
 	if (0)
 	{
 		Timer tm;

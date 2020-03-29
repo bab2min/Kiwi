@@ -349,10 +349,11 @@ void KModelMgr::loadMorphBin(_Istream& is)
 		return (const KMorpheme*)p;
 	};
 
+	size_t cnt = 0;
 	for (auto& form : forms)
 	{
 		form.readFromBin(is, mapper);
-		formMap.emplace(form.form, formMap.size());
+		formMap.emplace(form.form, cnt++);
 	}
 	for (auto& morph : morphemes)
 	{
@@ -446,10 +447,21 @@ void KModelMgr::addUserWord(const k_string & form, KPOSTag tag, float userScore)
 {
 	if (!trieRoot.empty()) throw KiwiException{ "Cannot addUserWord() after prepare()" };
 	if (form.empty()) return;
-	if (formMap.find(form) != formMap.end()) return;
-	extraTrieSize += form.size() - 1;
 
 	auto& f = formMapper(form);
+	if (f.candidate.empty())
+	{
+		extraTrieSize += form.size() - 1;
+	}
+	else
+	{
+		for (auto p : f.candidate)
+		{
+			// if `form` already has the same `tag`, skip adding
+			if (morphemes[(size_t)p].tag == tag) return;
+		}
+	}
+
 	f.candidate.emplace_back((const KMorpheme*)morphemes.size());
 	morphemes.emplace_back(form, tag);
 	morphemes.back().kform = (const k_string*)(&f - &forms[0]);
