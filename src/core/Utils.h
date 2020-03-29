@@ -73,32 +73,9 @@ namespace kiwi
 		return up * (sign ? -1 : 1);
 	}
 
-#if _MSC_VER >= 1900
+	std::u16string utf8_to_utf16(const std::string& str);
+	std::string utf16_to_utf8(const std::u16string& str);
 
-	inline std::u16string utf8_to_utf16(const std::string& utf8_string)
-	{
-		static std::wstring_convert<std::codecvt_utf8_utf16<int16_t>, int16_t> convert;
-		auto p = convert.from_bytes(utf8_string);
-		return { p.begin(), p.end() };
-	}
-	inline std::string utf16_to_utf8(const std::u16string& utf16_string)
-	{
-		static std::wstring_convert<std::codecvt_utf8_utf16<int16_t>, int16_t> convert;
-		auto p = reinterpret_cast<const int16_t *>(utf16_string.data());
-		return convert.to_bytes(p, p + utf16_string.size());
-	}
-#else
-	inline std::u16string utf8_to_utf16(const std::string& utf16_string)
-	{
-		static std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
-		return convert.from_bytes(utf16_string);
-	}
-	inline std::string utf16_to_utf8(const std::u16string& utf16_string)
-	{
-		static std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
-		return convert.to_bytes(utf16_string);
-	}
-#endif
 
 	inline std::ostream& operator <<(std::ostream& os, const k_string& str)
 	{

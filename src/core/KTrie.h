@@ -3,6 +3,7 @@
 #include "BakedMap.hpp"
 #include "Trie.hpp"
 #include "KForm.h"
+#include "PatternMatcher.h"
 
 namespace kiwi
 {
@@ -38,7 +39,7 @@ namespace kiwi
 
 	struct KTrie : public Trie<char16_t, const KForm*, OverriddenMap<std::map<char16_t, int32_t>>>
 	{
-		std::vector<KGraphNode> split(const k_string& str) const;
+		std::vector<KGraphNode> split(const k_string& str, const PatternMatcher* pm, size_t matchOptions) const;
 		const KForm* findForm(const k_string& str) const;
 		KTrie* getNext(k_char i) const { return (KTrie*)Trie::getNext(i); }
 		KTrie* getFail() const { return (KTrie*)Trie::getFail(); }

@@ -221,12 +221,12 @@ namespace kiwi
 
 		std::reverse_iterator<const char16_t*> rbegin() const
 		{
-			return std::make_reverse_iterator(end());
+			return std::reverse_iterator<const char16_t*>(end());
 		}
 
 		std::reverse_iterator<const char16_t*> rend() const
 		{
-			return std::make_reverse_iterator(begin());
+			return std::reverse_iterator<const char16_t*>(begin());
 		}
 
 		char16_t& front()
@@ -279,7 +279,7 @@ namespace kiwi
 		template<class LocalData, class FuncReader, class FuncProc>
 		std::vector<LocalData> readProc(const FuncReader& reader, const FuncProc& processor, LocalData&& ld = {}) const
 		{
-			ThreadPool workers(numThread);
+			ThreadPool workers{ numThread, numThread * 2 };
 			std::vector<LocalData> ldByTid(workers.getNumWorkers(), ld);
 			for (size_t id = 0; ; ++id)
 			{

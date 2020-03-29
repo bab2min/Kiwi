@@ -24,7 +24,6 @@
 
 #include <memory>
 #include <locale>
-#include <codecvt>
 
 #include <chrono>
 #include <mutex>
@@ -39,14 +38,24 @@
 
 namespace kiwi
 {
+	template<typename T, typename... Args>
+	std::unique_ptr<T> make_unique(Args&&... args)
+	{
+		return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+	}
+
 	typedef char16_t k_char;
 
-	class KiwiException : public std::exception
+	class KiwiException : public std::runtime_error
 	{
-		std::string msg;
 	public:
-		KiwiException(const std::string& _msg) : msg(_msg) {}
-		const char* what() const noexcept override { return msg.c_str(); }
+		using std::runtime_error::runtime_error;
+	};
+
+	class KiwiUnicodeException : public std::runtime_error
+	{
+	public:
+		using std::runtime_error::runtime_error;
 	};
 
 
