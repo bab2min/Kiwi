@@ -56,7 +56,7 @@ KEval::KEval(const char * testSetFile, Kiwi* kw, size_t topN) : totalCount(0), t
 			TestResult tr;
 			tr.q = fd[0];
 			for (size_t i = 1; i < fd.size(); i++) tr.a.emplace_back(parseWordPOS(fd[i]));
-			auto cands = kw->analyze(tr.q, topN);
+			auto cands = kw->analyze(tr.q, topN, PatternMatcher::all);
 			tr.r = cands[0].first;
 			if (tr.a != tr.r)
 			{

@@ -2,6 +2,7 @@
 #include <psapi.h>
 #include "core/Kiwi.h"
 #include "core/Utils.h"
+#include "core/PatternMatcher.h"
 #include "KEval.h"
 
 class Timer
@@ -103,6 +104,7 @@ int main()
 #endif
 	SetConsoleOutputCP(CP_UTF8);
 	setvbuf(stdout, nullptr, _IOFBF, 1000);
+
 	Timer timer;
 	Kiwi kw{ "ModelGenerator/", (size_t)-1, 0, 3 };
 	//kw.prepare();
@@ -114,7 +116,7 @@ int main()
 		auto flist = { "kowiki.txt" };
 		for (auto list : flist)
 		{
-			ifstream ifs{ string{"D:/"} + list };
+			ifstream ifs{ string{"G:/"} + list };
 			auto res = kw.extractAddWords([&ifs](size_t id) -> u16string
 			{
 				if (id == 0)
@@ -123,6 +125,7 @@ int main()
 					ifs.seekg(0);
 					string line;
 				}
+				if (id >= 10000) return {};
 				string line;
 				while (getline(ifs, line))
 				{
@@ -143,14 +146,14 @@ int main()
 		}
 		return 0;
 	}
+	kw.addUserWord(u"골리", KPOSTag::NNP, -5);
 	kw.prepare();
-	kw.analyze(u"띄어쓰기안한문장은아예분석을안해버릴수도있는데?", 10);
-	kw.analyze(u"풍월량은 유튜브에서 활동한다.", 10);
+	kw.analyze(u"사람을 골리다", 10, PatternMatcher::all);
 	if (0)
 	{
 		Timer tm;
-		ifstream ifs{ "D:/kowiki.txt" };
-		ofstream ofs{ "D:/kowiki_tagged.txt" };
+		ifstream ifs{ "G:/namu_raw.txt" };
+		ofstream ofs{ "G:/namu_tagged.txt" };
 		kw.analyze(1, [&ifs](size_t id) -> u16string
 		{
 			if (id == 0)
@@ -170,10 +173,10 @@ int main()
 		{
 			for (auto& r : res[0].first)
 			{
-				ofs << utf16_to_utf8(r.str()) << '/' << tagToString(r.tag()) << '\t';
+				ofs << utf16_to_utf8(r.str()) << '/' << tagToString(r.tag()) << ' ';
 			}
 			ofs << endl;
-		});
+		}, PatternMatcher::all);
 		return 0;
 	}
 

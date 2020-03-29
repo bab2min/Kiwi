@@ -2,13 +2,6 @@
 
 namespace kiwi
 {
-	struct KMorpheme;
-}
-
-std::ostream& operator<< (std::ostream& os, const kiwi::KMorpheme& morph);;
-
-namespace kiwi
-{
 	enum class KPOSTag : uint8_t
 	{
 		UNKNOWN,
@@ -23,7 +16,9 @@ namespace kiwi
 		VCP, VCN,
 		SF, SP, SS, SE, SO, SW,
 		SL, SH, SN,
-		JKS, JKC, JKG, JKO, JKB, JKV, JKQ, JX, JC,
+		W_URL, W_EMAIL, W_HASHTAG,
+		DEFAULT_TAG_SIZE,
+		JKS = DEFAULT_TAG_SIZE, JKC, JKG, JKO, JKB, JKV, JKQ, JX, JC,
 		EP, EF, EC, ETN, ETM,
 		V,
 		MAX,
@@ -94,7 +89,7 @@ namespace kiwi
 		void readFromBin(_Istream& is, const std::function<const KMorpheme*(size_t)>& mapper);
 		void writeToBin(std::ostream& os, const std::function<size_t(const KMorpheme*)>& mapper) const;
 
-		friend std::ostream& (::operator<<) (std::ostream& os, const KMorpheme& morph);
+		std::ostream& print(std::ostream& os) const;
 	};
 
 	struct KForm
