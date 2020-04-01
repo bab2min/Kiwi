@@ -103,6 +103,7 @@ namespace kiwi
 			}
 			else if(code < 0x10FFFF)
 			{
+				code -= 0x10000;
 				ret.push_back(0xD800 | (code >> 10));
 				ret.push_back(0xDC00 | (code & 0x3FF));
 			}
@@ -126,6 +127,7 @@ namespace kiwi
 				size_t code2 = *it;
 				if ((code2 & 0xFC00) != 0xDC00) throw KiwiUnicodeException{ "unpaired surrogate" };
 				code = ((code & 0x3FF) << 10) | (code2 & 0x3FF);
+				code += 0x10000;
 			}
 
 			if (code <= 0x7F)
