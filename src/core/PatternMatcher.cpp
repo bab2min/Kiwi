@@ -109,6 +109,23 @@ size_t PatternMatcher::testEmail(const char16_t * first, const char16_t * last) 
 	return lastMatched - first;
 }
 
+size_t PatternMatcher::testMention(const char16_t* first, const char16_t* last) const
+{
+	// Pattern: @[A-Za-z0-9._%+-]+
+	const char16_t* b = first;
+
+	// @
+	if (b == last || *b != '@') return 0;
+	++b;
+
+	// [A-Za-z0-9._%+-]+
+	if (b == last || !md->emailAccount.test(*b)) return 0;
+	++b;
+	while (b != last && md->emailAccount.test(*b)) ++b;
+
+	return b - first;
+}
+
 size_t PatternMatcher::testHashtag(const char16_t * first, const char16_t * last) const
 {
 	// Pattern: #[^#\s]+
@@ -141,6 +158,7 @@ pair<size_t, kiwi::KPOSTag> PatternMatcher::match(const char16_t * first, const 
 	size_t size;
 	if ((matchOptions & match_hashtag) && (size = testHashtag(first, last))) return make_pair(size, kiwi::KPOSTag::W_HASHTAG);
 	if ((matchOptions & match_email) && (size = testEmail(first, last))) return make_pair(size, kiwi::KPOSTag::W_EMAIL);
+	if ((matchOptions & match_mention) && (size = testMention(first, last))) return make_pair(size, kiwi::KPOSTag::W_MENTION);
 	if ((matchOptions & match_url) && (size = testUrl(first, last))) return make_pair(size, kiwi::KPOSTag::W_URL);
 	return make_pair(0, kiwi::KPOSTag::UNKNOWN);
 }

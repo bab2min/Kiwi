@@ -1,4 +1,4 @@
-#include <windows.h>
+ï»¿#include <windows.h>
 #include <psapi.h>
 #include "core/Kiwi.h"
 #include "core/Utils.h"
@@ -60,7 +60,7 @@ int main()
 	Kiwi kw{ "../ModelGenerator/" };
 	kw.prepare();
 	Timer timer;
-	auto text = L"¸¶ÃÆ´Ù.";
+	auto text = L"ë§ˆì³¤ë‹¤.";
 	for (int i = 0; i < 1; i++)
 	{
 		kw.clearCache();
@@ -108,7 +108,7 @@ int main()
 	Timer timer;
 	Kiwi kw{ "ModelGenerator/", (size_t)-1, 0, 3 };
 	//kw.prepare();
-	//kw.analyze(u"³²¹ÌÇ³ÀÇ °­·ÄÇÑ ¿ø»ö³¢¸®ÀÇ Á¶È­, ¼öÃ¤È­ °°ÀÌ ¾È¿ÂÇÑ ¹è»ö µî »öÀÇ ºÐÀ§±â¸¦ °­Á¶ÇÏ´Â ±âÇÏÇÐÀû ¹«´Ì, ²É¹«´Ì µðÀÚÀÎÀÌ ÁÖ·ù¸¦ ÀÌ·ç°í ÀÖ´Ù.", 10);
+	//kw.analyze(u"ë‚¨ë¯¸í’ì˜ ê°•ë ¬í•œ ì›ìƒ‰ë¼ë¦¬ì˜ ì¡°í™”, ìˆ˜ì±„í™” ê°™ì´ ì•ˆì˜¨í•œ ë°°ìƒ‰ ë“± ìƒ‰ì˜ ë¶„ìœ„ê¸°ë¥¼ ê°•ì¡°í•˜ëŠ” ê¸°í•˜í•™ì  ë¬´ëŠ¬, ê½ƒë¬´ëŠ¬ ë””ìžì¸ì´ ì£¼ë¥˜ë¥¼ ì´ë£¨ê³  ìžˆë‹¤.", 10);
 	//return 0;
 	//kw.setCutOffThreshold(10);
 	if(0)
@@ -146,9 +146,17 @@ int main()
 		}
 		return 0;
 	}
-	kw.addUserWord(u"°ñ¸®", KPOSTag::NNP, -5);
+	//kw.addUserWord(u"ê³¨ë¦¬", KPOSTag::NNP, -5);
 	kw.prepare();
-	kw.analyze(u"»ç¶÷À» °ñ¸®´Ù", 10, PatternMatcher::all);
+	auto ret = kw.analyze(u8R""(@his email@the.com #ë°”ë‘‘#ìž¥ê¸°#ì˜¤ëª© ê·€ìš”ë¯¸#ë³´ë“œíŒðŸ¥
+		#ì–´ë¦°ì´ìž„ë¸”ë¦¬ì˜ ë†€ì´ì˜€ëŠ”ë°, ì´ì œëŠ” ê°€ë¬¼ê°¸ë¬¼ðŸ™„ëª¨ë¥´ê² 
+		ìž¥ì´ìš”~ë©ì´ìš”~ã…Žã…Žã…Žë‹¤ì‹œ í•œ ë²ˆ ìž¬ë¯¸ë¥¼ ë¶™ì—¬ ë³´ê¹Œã…Ž
+		í•  ì¼ì´ íƒœì‚°ì¸ë°ðŸ˜­, í•˜ê³  ì‹¶ì€ê±´ ë¬´ê¶ë¬´ì§„ðŸ¤¦â€â™€ï¸ í° ì¼ì´ë‹¤)"", 10, PatternMatcher::all)[0];
+	for (auto& p : ret.first)
+	{
+		cout << p << endl;
+	}
+
 	if (0)
 	{
 		Timer tm;

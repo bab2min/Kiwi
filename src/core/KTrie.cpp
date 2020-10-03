@@ -128,6 +128,7 @@ vector<KGraphNode> KTrie::split(const k_string& str, const PatternMatcher* pm, s
 				ret.back().form = this[(size_t)chrType].val;
 
 				n += m.first - 1;
+				curTrie = this;
 				goto continueFor;
 			}
 		}
@@ -137,7 +138,7 @@ vector<KGraphNode> KTrie::split(const k_string& str, const PatternMatcher* pm, s
 		if (lastChrType != chrType)
 		{
 			// sequence of speical characters found
-			if (lastChrType != KPOSTag::MAX && lastChrType != KPOSTag::UNKNOWN /*&& n - specialStartPos > 1*/)
+			if (lastChrType != KPOSTag::MAX && lastChrType != KPOSTag::UNKNOWN && !isWebTag(lastChrType) /*&& n - specialStartPos > 1*/)
 			{
 				auto it = spacePos.find(specialStartPos - 1);
 				int space = it == spacePos.end() ? 0 : it->second;
