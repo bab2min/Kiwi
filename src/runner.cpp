@@ -96,7 +96,7 @@ int main(int argc, const char** argv)
 		if (!userDict.empty()) kiwi->loadUserDictionary(userDict.c_str());
 		kiwi->prepare();
 	}
-	catch (exception e)
+	catch (const exception& e)
 	{
 		printf("#### %s.\n", e.what());
 		return -1;
@@ -130,7 +130,7 @@ int main(int argc, const char** argv)
 			try
 			{
 				auto wstr = Kiwi::toU16(buf);
-				auto cands = kiwi->analyze(wstr, topN);
+				auto cands = kiwi->analyze(wstr, topN, PatternMatcher::all);
 				for (const auto& c : cands)
 				{
 					for (const auto& m : c.first)
@@ -152,7 +152,7 @@ int main(int argc, const char** argv)
 				}
 				if (topN > 1) fputc('\n', of);
 			}
-			catch (exception e)
+			catch (const exception& e)
 			{
 				printf("#### Uncaught exception '%s'.\n", e.what());
 				continue;
