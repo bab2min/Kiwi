@@ -47,7 +47,7 @@ void KModelMgr::loadMMFromTxt(std::istream& is, morphemeMap& morphMap, std::unor
 
 		KCondVowel cvowel = KCondVowel::none;
 		KCondPolarity polar = KCondPolarity::none;
-		if (tag >= KPOSTag::JKS && tag <= KPOSTag::ETM)
+		if (tag >= KPOSTag::JKS && tag <= KPOSTag::JC)
 		{
 			std::array<float, 6> t = { vowel, vocalic, vocalicH, 1 - vowel, 1 - vocalic, 1 - vocalicH };
 			size_t pmIdx = max_element(t.begin(), t.end()) - t.begin();
@@ -59,17 +59,17 @@ void KModelMgr::loadMMFromTxt(std::istream& is, morphemeMap& morphMap, std::unor
 			{
 				cvowel = KCondVowel::any;
 			}
-
-			if (tag < KPOSTag::EP)
-			{
-				float u[] = { positive, 1 - positive };
-				pmIdx = max_element(u, u + 2) - u;
-				if (u[pmIdx] >= 0.825f)
-				{
-					polar = (KCondPolarity)(pmIdx + 1);
-				}
-			}
 		}
+
+		/*if (tag >= KPOSTag::EP && tag <= KPOSTag::ETM)
+		{
+			std::array<float, 2> u = { positive, 1 - positive };
+			size_t pmIdx = max_element(u.begin(), u.end()) - u.begin();
+			if (u[pmIdx] >= 0.825f)
+			{
+				polar = (KCondPolarity)(pmIdx + 1);
+			}
+		}*/
 		auto& fm = formMapper(form);
 		bool unified = false;
 		if (tag >= KPOSTag::EP && tag <= KPOSTag::ETM && form[0] == u'¾Æ')

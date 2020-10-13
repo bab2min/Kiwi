@@ -148,11 +148,8 @@ int main()
 	}
 	//kw.addUserWord(u"골리", KPOSTag::NNP, -5);
 	kw.prepare();
-	auto ret = kw.analyze(u8R""(@his email@the.com #바둑#장기#오목 귀요미#보드판🐥
-		#어린이임블리의 놀이였는데, 이제는 가물갸물🙄모르겠
-		장이요~멍이요~ㅎㅎㅎ다시 한 번 재미를 붙여 보까ㅎ
-		할 일이 태산인데😭, 하고 싶은건 무궁무진🤦‍♀️ 큰 일이다)"", 10, PatternMatcher::all)[0];
-	for (auto& p : ret.first)
+	auto ret = kw.analyze(u8R""('은'은 광물이다.)"", 10, PatternMatcher::all);
+	for (auto& p : ret[0].first)
 	{
 		cout << p << endl;
 	}
