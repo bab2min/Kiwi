@@ -318,8 +318,8 @@ struct WordLLP
 
 typedef vector<WordLL, pool_allocator<WordLL>> WordLLs;
 
-template<class _Iter, class _Key>
-auto findNthLargest(_Iter first, _Iter last, size_t nth, _Key&& fn) -> decltype(fn(*first))
+template<class _Iter, class _Key, class _Filter>
+auto findNthLargest(_Iter first, _Iter last, size_t nth, _Key&& fn, _Filter&& filter) -> decltype(fn(*first))
 {
 	using KeyType = decltype(fn(*first));
 
@@ -328,15 +328,15 @@ auto findNthLargest(_Iter first, _Iter last, size_t nth, _Key&& fn) -> decltype(
 	std::vector<KeyType> v;
 	for (; first != last; ++first)
 	{
-		v.emplace_back(fn(*first));
+		if(filter(*first)) v.emplace_back(fn(*first));
 	}
-
+	if (v.empty()) return {};
 	std::sort(v.rbegin(), v.rend());
-	return v[nth];
+	return v[std::min(nth, v.size() - 1)];
 }
 
 template<class _Type>
-void evalTrigram(const KNLangModel::Node* rootNode, const KMorpheme* morphBase, const WordLL** wBegin, const WordLL** wEnd, 
+void evalTrigram(const KNLangModel::Node* rootNode, const KMorpheme* morphBase, const vector<k_string>& ownForms, const WordLL** wBegin, const WordLL** wEnd, 
 	array<WID, 4> seq, size_t chSize, const KMorpheme* curMorph, const KGraphNode* node, _Type& maxWidLL)
 {
 	for (; wBegin != wEnd; ++wBegin)
@@ -353,10 +353,12 @@ void evalTrigram(const KNLangModel::Node* rootNode, const KMorpheme* morphBase, 
 			seq[0] = morphBase[wids->back().wid].getCombined() - morphBase;
 		}
 
-		/*if (!KFeatureTestor::isMatched(node->uform.empty() ? curMorph->kform : &node->uform, wids->back().condVowel, wids->back().condPolar))
+		auto leftForm = wids->back().ownFormId ? &ownForms[wids->back().ownFormId - 1] : morphBase[wids->back().wid].kform;
+
+		if (!KFeatureTestor::isMatched(leftForm, curMorph->vowel, curMorph->polar))
 		{
 			continue;
-		}*/
+		}
 
 		auto cNode = (*wBegin)->node;
 		WID lSeq = 0;
@@ -447,7 +449,7 @@ vector<pair<Kiwi::path, float>> Kiwi::findBestPath(const vector<KGraphNode>& gra
 				}
 			}
 
-			evalTrigram(knlm->getRoot(), morphBase, &works[0], &works[0] + works.size(), seq, chSize, curMorph, node, maxWidLL);
+			evalTrigram(knlm->getRoot(), morphBase, ownFormList, &works[0], &works[0] + works.size(), seq, chSize, curMorph, node, maxWidLL);
 
 			float estimatedLL = 0;
 			if (isUserWord)
@@ -560,14 +562,37 @@ vector<pair<Kiwi::path, float>> Kiwi::findBestPath(const vector<KGraphNode>& gra
 		if (cache[i].size() > topN)
 		{
 			WordLLs reduced;
-			float cutOffScore = findNthLargest(cache[i].begin(), cache[i].end(), topN, [](const WordLL& c)
-			{
-				return c.accScore;
-			});
-			cutOffScore = min(tMax - cutOffThreshold, cutOffScore);
+			float combinedCutOffScore = findNthLargest(cache[i].begin(), cache[i].end(), topN, 
+				[](const WordLL& c)
+				{
+					return c.accScore;
+				}, 
+				[](const WordLL& c)
+				{
+					if (c.morphs.empty()) return false;
+					return !!c.morphs.back().combineSocket;
+				}
+			);
+
+			float otherCutOffScore = findNthLargest(cache[i].begin(), cache[i].end(), topN,
+				[](const WordLL& c)
+				{
+					return c.accScore;
+				},
+				[](const WordLL& c)
+				{
+					if (c.morphs.empty()) return true;
+					return !c.morphs.back().combineSocket;
+				}
+			);
+
+			combinedCutOffScore = min(tMax - cutOffThreshold, combinedCutOffScore);
+			otherCutOffScore = min(tMax - cutOffThreshold, otherCutOffScore);
 			for (auto& c : cache[i])
 			{
-				if (c.accScore >= cutOffScore) reduced.emplace_back(move(c));
+				float cutoff = combinedCutOffScore;
+				if (c.morphs.empty() || !c.morphs.back().combineSocket) cutoff = otherCutOffScore;
+				if (c.accScore >= cutoff) reduced.emplace_back(move(c));
 			}
 			cache[i] = move(reduced);
 		}

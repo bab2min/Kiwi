@@ -33,7 +33,7 @@ namespace kiwi
 		vocalicH,
 		nonVowel,
 		nonVocalic,
-		nonVocalicH
+		nonVocalicH,
 	};
 
 	enum class KCondPolarity : char
