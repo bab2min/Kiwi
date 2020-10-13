@@ -15,6 +15,7 @@ class PrecombinedModelGenerator:
             if vc in self.vCond: self.vCond[vc][0].add(ch[0][0])
             else: self.vCond[vc] = set([ch[0][0]]), ch[3]
 
+    @staticmethod
     def isPositive(s):
         for c in reversed(s):
             if not ('ㅏ' <= c <= 'ㅣ'): continue
