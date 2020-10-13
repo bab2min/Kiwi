@@ -72,6 +72,14 @@ https://github.com/bab2min/kiwi-gui 에서 다운받을 수 있습니다.
   
   분석 속도 향상
 
+* v0.8 : URL, 이메일, 해시태그, 멘션 검출 추가
+
+  치(하지), 컨대(하건대), 토록(하도록), 케(하게) 축약형이 포함된 동사 활용형 분석 개선
+  
+  사용자 사전에 알파벳이나 숫자, 특수 기호가 포함시 버그 수정
+
+  특정 상황에서 결합조건이 무시되던 문제를 해결
+
 ## 품사 태그
 
 세종 품사 태그를 기초로 하되, 일부 품사 태그를 추가/수정하여 사용하고 있습니다.
@@ -123,7 +131,8 @@ https://github.com/bab2min/kiwi-gui 에서 다운받을 수 있습니다.
 <tr><th rowspan='1'>분석 불능</th><td>UN</td><td>분석 불능<sup>*</sup></td></tr>
 <tr><th rowspan='3'>웹(W)</th><td>W_URL</td><td>URL 주소<sup>*</sup></td></tr>
 <tr><td>W_EMAIL</td><td>이메일 주소<sup>*</sup></td></tr>
-<tr><td>W_HASHTAG</td><td>해시태그<sup>*</sup></td></tr>
+<tr><td>W_HASHTAG</td><td>해시태그(#abcd)<sup>*</sup></td></tr>
+<tr><td>W_MENTION</td><td>멘션(@abcd)<sup>*</sup></td></tr>
 </table>
 
 <sup>*</sup> 세종 품사 태그와 다른 독자적인 태그입니다.
