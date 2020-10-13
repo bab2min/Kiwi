@@ -16,7 +16,7 @@ namespace kiwi
 		VCP, VCN,
 		SF, SP, SS, SE, SO, SW,
 		SL, SH, SN,
-		W_URL, W_EMAIL, W_HASHTAG,
+		W_URL, W_EMAIL, W_MENTION, W_HASHTAG,
 		DEFAULT_TAG_SIZE,
 		JKS = DEFAULT_TAG_SIZE, JKC, JKG, JKO, JKB, JKV, JKQ, JX, JC,
 		EP, EF, EC, ETN, ETM,
@@ -33,7 +33,7 @@ namespace kiwi
 		vocalicH,
 		nonVowel,
 		nonVocalic,
-		nonVocalicH
+		nonVocalicH,
 	};
 
 	enum class KCondPolarity : char
@@ -42,6 +42,11 @@ namespace kiwi
 		positive,
 		negative
 	};
+
+	inline bool isWebTag(KPOSTag t)
+	{
+		return KPOSTag::W_URL <= t && t <= KPOSTag::W_HASHTAG;
+	}
 
 	KPOSTag makePOSTag(const std::u16string& tagStr);
 	const char* tagToString(KPOSTag t);

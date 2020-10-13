@@ -12,10 +12,14 @@ class PatternMatcher
 	size_t testUrl(const char16_t* first, const char16_t* last) const;
 	size_t testEmail(const char16_t* first, const char16_t* last) const;
 	size_t testHashtag(const char16_t* first, const char16_t* last) const;
+	size_t testMention(const char16_t* first, const char16_t* last) const;
 public:
 
-	enum { match_url = 1 << 0, match_email = 1 << 1, match_hashtag = 1 << 2,
-		all = match_url | match_email | match_hashtag };
+	enum { match_url = 1 << 0, 
+		match_email = 1 << 1, 
+		match_hashtag = 1 << 2,
+		match_mention = 1 << 3,
+		all = match_url | match_email | match_hashtag | match_mention };
 
 	PatternMatcher();
 	~PatternMatcher();
