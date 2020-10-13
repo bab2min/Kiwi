@@ -129,7 +129,7 @@ https://github.com/bab2min/kiwi-gui 에서 다운받을 수 있습니다.
 <tr><td>SH</td><td>한자</td></tr>
 <tr><td>SN</td><td>숫자(0-9)</td></tr>
 <tr><th rowspan='1'>분석 불능</th><td>UN</td><td>분석 불능<sup>*</sup></td></tr>
-<tr><th rowspan='3'>웹(W)</th><td>W_URL</td><td>URL 주소<sup>*</sup></td></tr>
+<tr><th rowspan='4'>웹(W)</th><td>W_URL</td><td>URL 주소<sup>*</sup></td></tr>
 <tr><td>W_EMAIL</td><td>이메일 주소<sup>*</sup></td></tr>
 <tr><td>W_HASHTAG</td><td>해시태그(#abcd)<sup>*</sup></td></tr>
 <tr><td>W_MENTION</td><td>멘션(@abcd)<sup>*</sup></td></tr>
