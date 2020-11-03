@@ -22,11 +22,14 @@ https://github.com/bab2min/Kiwi/wiki 를 참고하시길 바랍니다.
 DLL로 컴파일된 바이너리를 이용하여 다른 프로그램에 Kiwi를 적용할 수도 있습니다. 
 최신 버전의 DLL은 https://github.com/bab2min/kiwi-gui/releases 의 zip파일의 bin_x86, bin_x64 폴더에 포함되어 있습니다.
 
-### C# API
+### C# Wrapper
 https://github.com/bab2min/kiwi-gui
 
-### Python3 API
+### Python3 Wrapper
 또한 Python3용 API인 Kiwipiepy가 제공됩니다. 이에 대해서는 https://github.com/bab2min/kiwipiepy 를 참조하시길 바랍니다.
+
+### R Wrapper
+mrchypark님께서 작업해주신 R언어용 wrapper인 Elbird(https://github.com/mrchypark/Elbird)가 있습니다.
 
 ### 응용 프로그램
 Kiwi는 C# 기반의 GUI 형태로도 제공됩니다.
