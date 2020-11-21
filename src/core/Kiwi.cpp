@@ -353,12 +353,12 @@ void evalTrigram(const KNLangModel::Node* rootNode, const KMorpheme* morphBase, 
 			seq[0] = morphBase[wids->back().wid].getCombined() - morphBase;
 		}
 
-		auto leftForm = wids->back().ownFormId ? &ownForms[wids->back().ownFormId - 1] : morphBase[wids->back().wid].kform;
+		/*auto leftForm = wids->back().ownFormId ? &ownForms[wids->back().ownFormId - 1] : morphBase[wids->back().wid].kform;
 
 		if (!KFeatureTestor::isMatched(leftForm, curMorph->vowel, curMorph->polar))
 		{
 			continue;
-		}
+		}*/
 
 		auto cNode = (*wBegin)->node;
 		WID lSeq = 0;
@@ -806,9 +806,9 @@ std::vector<KResult> Kiwi::analyzeSent(const std::u16string::const_iterator & sB
 			rarr.emplace_back(joined, get<0>(s)->tag, 0, 0);
 			size_t nlen = (get<1>(s).empty() ? *get<0>(s)->kform : get<1>(s)).size();
 			size_t nlast = get<2>(s);
-			size_t nllast = nlast >= nlen ? nlast - nlen : 0;
+			size_t nllast = min(max(nlast, nlen) - nlen, posMap.size() - 1);
 			rarr.back().pos() = posMap[nllast];
-			rarr.back().len() = posMap[nlast] - posMap[nllast];
+			rarr.back().len() = posMap[min(nlast, posMap.size() - 1)] - posMap[nllast];
 			prevMorph = get<0>(s)->kform;
 		}
 		ret.emplace_back(rarr, r.second);
@@ -886,7 +886,7 @@ void Kiwi::clearCache()
 
 int Kiwi::getVersion()
 {
-	return 70;
+	return 82;
 }
 
 std::u16string Kiwi::toU16(const std::string & str)

@@ -100,10 +100,30 @@ namespace kiwi
 	struct KForm
 	{
 		k_string form;
+		KCondVowel vowel = KCondVowel::none;
+		KCondPolarity polar = KCondPolarity::none;
+
 		std::vector<const KMorpheme*> candidate;
 		KForm(const k_char* _form = nullptr);
-		KForm(const k_string& _form) : form(_form) {}
-		KForm(const KForm& o) = default;
+		KForm(const k_string& _form, KCondVowel _vowel, KCondPolarity _polar) 
+			: form(_form), vowel(_vowel), polar(_polar)
+		{}
+
+		KForm(const KForm&) = default;
+		KForm(KForm&&) = default;
+
+		bool operator < (const KForm& o) const
+		{
+			if (form < o.form) return true;
+			if (form > o.form) return false;
+			if (vowel < o.vowel) return true;
+			if (vowel > o.vowel) return false;
+			return polar < o.polar;
+
+		}
+
+		KForm& operator=(const KForm&) = default;
+		KForm& operator=(KForm&&) = default;
 
 		template<class _Istream>
 		void readFromBin(_Istream& is, const std::function<const KMorpheme*(size_t)>& mapper);
