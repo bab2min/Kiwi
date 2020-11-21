@@ -173,6 +173,8 @@ namespace kiwi
 		case '\f':
 			return KPOSTag::UNKNOWN;
 		}
+		if (0x2000 <= chr && chr <= 0x200F) return KPOSTag::UNKNOWN;
+
 		if (iswdigit(chr)) return KPOSTag::SN;
 		if (('A' <= chr && chr <= 'Z') ||
 			('a' <= chr && chr <= 'z'))  return KPOSTag::SL;

@@ -148,11 +148,13 @@ int main()
 	}
 	//kw.addUserWord(u"골리", KPOSTag::NNP, -5);
 	kw.prepare();
-	auto ret = kw.analyze(u8R""('은'은 광물이다.)"", 10, PatternMatcher::all);
+	/*auto ret = kw.analyze(u8R""(이조전랑)"", 10, PatternMatcher::all);
 	for (auto& p : ret[0].first)
 	{
 		cout << p << endl;
 	}
+
+	return 0;*/
 
 	if (0)
 	{

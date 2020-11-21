@@ -4,8 +4,6 @@
 #include "serializer.hpp"
 #include "KModelMgr.h"
 
-//#define LOAD_TXT
-
 constexpr uint32_t KIWI_MAGICID = 0x4B495749;
 
 namespace std
@@ -24,7 +22,7 @@ using namespace std;
 using namespace kiwi;
 
 #ifdef LOAD_TXT
-void KModelMgr::loadMMFromTxt(std::istream& is, morphemeMap& morphMap, std::unordered_map<KPOSTag, float>* posWeightSum, const function<bool(float, KPOSTag)>& selector)
+void KModelMgr::loadMMFromTxt(std::istream& is, MorphemeMap& morphMap, std::unordered_map<KPOSTag, float>* posWeightSum, const function<bool(float, KPOSTag)>& selector)
 {
 	string line;
 	while (getline(is, line))
@@ -70,7 +68,7 @@ void KModelMgr::loadMMFromTxt(std::istream& is, morphemeMap& morphMap, std::unor
 				polar = (KCondPolarity)(pmIdx + 1);
 			}
 		}*/
-		auto& fm = formMapper(form);
+		auto& fm = formMapper(form, cvowel, polar);
 		bool unified = false;
 		if (tag >= KPOSTag::EP && tag <= KPOSTag::ETM && form[0] == u'¾Æ')
 		{
@@ -96,7 +94,7 @@ void KModelMgr::loadMMFromTxt(std::istream& is, morphemeMap& morphMap, std::unor
 }
 
 
-void KModelMgr::loadCMFromTxt(std::istream& is, morphemeMap& morphMap)
+void KModelMgr::loadCMFromTxt(std::istream& is, MorphemeMap& morphMap)
 {
 	static std::array<k_char*, 4> conds = { KSTR("+"), KSTR("-Coda"), KSTR("+"), KSTR("+") };
 	static std::array<k_char*, 3> conds2 = { KSTR("+"), KSTR("+Positive"), KSTR("-Positive") };
@@ -128,7 +126,7 @@ void KModelMgr::loadCMFromTxt(std::istream& is, morphemeMap& morphMap)
 			{
 				size_t mid = morphemes.size();
 				morphMap.emplace(make_pair(f, tag), mid);
-				auto& fm = formMapper(f);
+				auto& fm = formMapper(f, KCondVowel::none, KCondPolarity::none);
 				morphemes.emplace_back(f, tag);
 				morphemes.back().kform = (const k_string*)(&fm - &forms[0]);
 				chunkIds->emplace_back((KMorpheme*)mid);
@@ -163,7 +161,7 @@ void KModelMgr::loadCMFromTxt(std::istream& is, morphemeMap& morphMap)
 		}
 
 		size_t mid = morphemes.size();
-		auto& fm = formMapper(form);
+		auto& fm = formMapper(form, vowel, polar);
 		fm.candidate.emplace_back((KMorpheme*)mid);
 		morphemes.emplace_back(form, KPOSTag::UNKNOWN, vowel, polar, combineSocket);
 		morphemes.back().kform = (const k_string*)(&fm - &forms[0]);
@@ -173,7 +171,7 @@ void KModelMgr::loadCMFromTxt(std::istream& is, morphemeMap& morphMap)
 }
 
 
-void KModelMgr::loadPCMFromTxt(std::istream& is, morphemeMap& morphMap)
+void KModelMgr::loadPCMFromTxt(std::istream& is, MorphemeMap& morphMap)
 {
 	string line;
 	while (getline(is, line))
@@ -197,7 +195,7 @@ void KModelMgr::loadPCMFromTxt(std::istream& is, morphemeMap& morphMap)
 		{
 			size_t mid = morphemes.size();
 			//morphMap.emplace(make_pair(form, tag), mid);
-			auto& fm = formMapper(form);
+			auto& fm = formMapper(form, KCondVowel::none, KCondPolarity::none);
 			fm.candidate.emplace_back((KMorpheme*)mid);
 			morphemes.emplace_back(form, tag, KCondVowel::none, KCondPolarity::none, socket);
 			morphemes.back().kform = (const k_string*)(&fm - &forms[0]);
@@ -206,7 +204,7 @@ void KModelMgr::loadPCMFromTxt(std::istream& is, morphemeMap& morphMap)
 	}
 }
 
-KNLangModel::AllomorphSet KModelMgr::loadAllomorphFromTxt(std::istream & is, const morphemeMap& morphMap)
+KNLangModel::AllomorphSet KModelMgr::loadAllomorphFromTxt(std::istream & is, const MorphemeMap& morphMap)
 {
 	KNLangModel::AllomorphSet ams;
 	string line;
@@ -234,7 +232,7 @@ KNLangModel::AllomorphSet KModelMgr::loadAllomorphFromTxt(std::istream & is, con
 	return ams;
 }
 
-void KModelMgr::loadCorpusFromTxt(std::istream & is, morphemeMap& morphMap, const KNLangModel::AllomorphSet& ams)
+void KModelMgr::loadCorpusFromTxt(std::istream & is, MorphemeMap& morphMap, const KNLangModel::AllomorphSet& ams)
 {
 	string line;
 	vector<KNLangModel::WID> wids;
@@ -284,6 +282,30 @@ void KModelMgr::loadCorpusFromTxt(std::istream & is, morphemeMap& morphMap, cons
 				wids.emplace_back(g.empty() ? it->second : g[0]);
 			}
 		}
+	}
+}
+
+void kiwi::KModelMgr::updateForms()
+{
+	vector<pair<KForm, size_t>> formOrder;
+	vector<size_t> newIdcs(forms.size());
+
+	for (size_t i = 0; i < forms.size(); ++i)
+	{
+		formOrder.emplace_back(move(forms[i]), i);
+	}
+	sort(formOrder.begin() + (size_t)KPOSTag::DEFAULT_TAG_SIZE, formOrder.end());
+
+	forms.clear();
+	for (size_t i = 0; i < formOrder.size(); ++i)
+	{
+		forms.emplace_back(move(formOrder[i].first));
+		newIdcs[formOrder[i].second] = i;
+	}
+
+	for (auto& m : morphemes)
+	{
+		m.kform = (k_string*)newIdcs[(size_t)m.kform];
 	}
 }
 
@@ -353,7 +375,7 @@ void KModelMgr::loadMorphBin(_Istream& is)
 	for (auto& form : forms)
 	{
 		form.readFromBin(is, mapper);
-		formMap.emplace(form.form, cnt++);
+		formMap.emplace(FormCond{ form.form, form.vowel, form.polar }, cnt++);
 	}
 	for (auto& morph : morphemes)
 	{
@@ -361,13 +383,14 @@ void KModelMgr::loadMorphBin(_Istream& is)
 	}
 }
 
-KForm & KModelMgr::formMapper(k_string form)
+KForm & KModelMgr::formMapper(k_string form, KCondVowel vowel, KCondPolarity polar)
 {
-	auto it = formMap.find(form);
+	FormCond fc{ form, vowel, polar };
+	auto it = formMap.find(fc);
 	if (it != formMap.end()) return forms[it->second];
 	size_t id = forms.size();
-	formMap.emplace(form, id);
-	forms.emplace_back(form);
+	formMap.emplace(fc, id);
+	forms.emplace_back(form, vowel, polar);
 	return forms[id];
 }
 
@@ -386,7 +409,7 @@ KModelMgr::KModelMgr(const char * modelPath)
 	}
 
 	size_t morphIdToUpdate = morphemes.size();
-	morphemeMap morphMap;
+	MorphemeMap morphMap;
 	loadMMFromTxt(ifstream{ modelPath + string{ "fullmodelV2.txt" } }, morphMap, nullptr, [](float morphWeight, KPOSTag tag) {
 		return morphWeight >= (tag < KPOSTag::JKS ? 10 : 10);
 	});
@@ -408,6 +431,7 @@ KModelMgr::KModelMgr(const char * modelPath)
 
 	loadCMFromTxt(ifstream{ modelPath + string{ "combinedV2.txt" } }, morphMap);
 	loadPCMFromTxt(ifstream{ modelPath + string{ "precombinedV2.txt" } }, morphMap);
+	updateForms();
 	baseTrieSize = estimateTrieSize();
 	saveMorphBin(ofstream{ modelPath + string{ "sj.morph" }, ios_base::binary });
 	
@@ -448,7 +472,7 @@ void KModelMgr::addUserWord(const k_string & form, KPOSTag tag, float userScore)
 	if (!trieRoot.empty()) throw KiwiException{ "Cannot addUserWord() after prepare()" };
 	if (form.empty()) return;
 
-	auto& f = formMapper(form);
+	auto& f = formMapper(form, KCondVowel::none, KCondPolarity::none);
 	if (f.candidate.empty())
 	{
 		extraTrieSize += form.size() - 1;
@@ -484,6 +508,11 @@ void KModelMgr::solidify()
 		auto& f = forms[i];
 		if (f.candidate.empty()) continue;
 		size_t realSize = f.form.size();
+		if (trieRoot.capacity() < trieRoot.size() + realSize)
+		{
+			trieRoot.reserve(max(trieRoot.size() + realSize, trieRoot.capacity() + trieRoot.capacity() / 4));
+		}
+
 		trieRoot[0].build(&f.form[0], realSize, &f, [this]()
 		{
 			trieRoot.emplace_back();

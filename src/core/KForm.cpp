@@ -129,6 +129,8 @@ template<class _Istream>
 void KForm::readFromBin(_Istream& is, const function<const KMorpheme*(size_t)>& mapper)
 {
 	form = serializer::readFromBinStream<k_string>(is);
+	vowel = serializer::readFromBinStream<KCondVowel>(is);
+	polar = serializer::readFromBinStream<KCondPolarity>(is);
 	candidate.resize(serializer::readFromBinStream<uint32_t>(is));
 	for (auto& c : candidate)
 	{
@@ -142,6 +144,8 @@ template void KForm::readFromBin<serializer::imstream>(serializer::imstream& is,
 void KForm::writeToBin(ostream& os, const function<size_t(const KMorpheme*)>& mapper) const
 {
 	serializer::writeToBinStream(os, form);
+	serializer::writeToBinStream(os, vowel);
+	serializer::writeToBinStream(os, polar);
 	serializer::writeToBinStream<uint32_t>(os, candidate.size());
 	for (auto c : candidate)
 	{
