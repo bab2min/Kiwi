@@ -2,7 +2,6 @@
 #include "KTrie.h"
 #include "KFeatureTestor.h"
 #include "KModelMgr.h"
-#include "KMemory.h"
 #include "Utils.h"
 #include "serializer.hpp"
 
@@ -15,7 +14,7 @@ vector<KGraphNode> KTrie::split(const k_string& str, const PatternMatcher* pm, s
 	ret.reserve(8);
 	ret.emplace_back();
 	size_t n = 0;
-	vector<const KForm*, pool_allocator<const KForm*>> candidates;
+	vector<const KForm*> candidates;
 	const KTrie* curTrie = this;
 	unordered_map<uint32_t, int> spacePos;
 	size_t lastSpecialEndPos = 0, specialStartPos = 0;

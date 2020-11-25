@@ -148,7 +148,7 @@ int main()
 	}
 	//kw.addUserWord(u"골리", KPOSTag::NNP, -5);
 	kw.prepare();
-	/*auto ret = kw.analyze(u8R""(이조전랑)"", 10, PatternMatcher::all);
+	/*auto ret = kw.analyze(u8R""(너도 곧 알게될거야. '알게될거야'는 노래 제목이다.)"", 10, PatternMatcher::all);
 	for (auto& p : ret[0].first)
 	{
 		cout << p << endl;
@@ -213,10 +213,10 @@ int main()
 			t.writeResult(out);
 		}
 
-		for (auto& p : KSingleLogger::getInstance().totalAlloc)
+		/*for (auto& p : KSingleLogger::getInstance().totalAlloc)
 		{
 			cout << p.first << "bytes\t" << p.second << endl;
-		}
+		}*/
 	}
 	getchar();
 	return 0;

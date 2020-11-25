@@ -288,10 +288,7 @@ ModelManifest.xml
 /KiwiTester/wrongsV217s.txt
 /ModelGenerator/VAAll.txt
 /KiwiTester/wrongsV218s.txt
-/ModelGenerator/*.lang
-/ModelGenerator/*.morph
 /KiwiTester/test.txt
-/ModelGenerator/extract.mdl
 *.pyd
 /KiwiTester/extracted_xaf.txt
 /KiwiTester/extracted_xae.txt
@@ -348,3 +345,6 @@ __pycache__/
 /Makefile
 /My Advisor Results - evaluator
 /ModelGenerator/compositeHangul.py
+/ModelGenerator/30_sj.morph
+/ModelGenerator/30_sj.lang
+/mimalloc
