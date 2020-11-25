@@ -30,11 +30,7 @@
 #include <thread>
 
 #define TRIE_ALLOC_ARRAY
-#define CUSTOM_ALLOC
-
 #define KSTR(x) u##x
-
-#include "KMemory.h"
 
 namespace kiwi
 {
@@ -59,32 +55,8 @@ namespace kiwi
 	};
 
 
-#ifdef CUSTOM_ALLOC
-	typedef std::basic_string<k_char, std::char_traits<k_char>, spool_allocator<k_char>> k_string;
-	typedef std::basic_stringstream<k_char, std::char_traits<k_char>, spool_allocator<k_char>> k_stringstream;
-	typedef std::vector<k_char, pool_allocator<k_char>> k_vchar;
-	typedef std::vector<std::pair<k_vchar, float>, pool_allocator<std::pair<k_vchar, float>>> k_vpcf;
-#else
-	typedef std::basic_string<k_char> k_string;
-	typedef std::basic_stringstream<k_char> k_stringstream;
-	typedef std::vector<k_char> k_vchar;
-	typedef std::vector<std::pair<k_vchar, float>> k_vpcf;
-#endif
+	using k_string = std::basic_string<k_char>;
+	using k_stringstream = std::basic_stringstream<k_char>;
+	using k_vchar = std::vector<k_char>;
+	using k_vpcf = std::vector<std::pair<k_vchar, float>>;
 }
-
-#ifdef CUSTOM_ALLOC
-#include "KMemoryChar.h"
-
-namespace std
-{
-	template<> struct hash<kiwi::k_string>
-	{
-		size_t operator()(const kiwi::k_string& s) const noexcept
-		{
-			return hash<basic_string <kiwi::k_char, char_traits<kiwi::k_char>>>{}(
-				basic_string <kiwi::k_char, char_traits<kiwi::k_char>>{ s.begin(), s.end() }
-			);
-		}
-	};
-}
-#endif
