@@ -2,7 +2,6 @@
 #include "KTrie.h"
 #include "KFeatureTestor.h"
 #include "KModelMgr.h"
-#include "KMemory.h"
 #include "Utils.h"
 #include "serializer.hpp"
 
@@ -15,7 +14,7 @@ vector<KGraphNode> KTrie::split(const k_string& str, const PatternMatcher* pm, s
 	ret.reserve(8);
 	ret.emplace_back();
 	size_t n = 0;
-	vector<const KForm*, pool_allocator<const KForm*>> candidates;
+	vector<const KForm*> candidates;
 	const KTrie* curTrie = this;
 	unordered_map<uint32_t, int> spacePos;
 	size_t lastSpecialEndPos = 0, specialStartPos = 0;
@@ -165,7 +164,16 @@ vector<KGraphNode> KTrie::split(const k_string& str, const PatternMatcher* pm, s
 					else if (submatcher->val != (void*)-1)
 					{
 						if (find(candidates.begin(), candidates.end(), submatcher->val) != candidates.end()) break;
-						candidates.emplace_back(submatcher->val);
+						const KForm* cand = submatcher->val;
+						while (1)
+						{
+							if (KFeatureTestor::isMatched(&str[0], &str[0] + n + 1 - cand->form.size(), cand->vowel, cand->polar))
+							{
+								candidates.emplace_back(cand);
+							}
+							if (cand[0].form != cand[1].form) break;
+							++cand;
+						}
 					}
 				}
 			}
@@ -208,7 +216,16 @@ vector<KGraphNode> KTrie::split(const k_string& str, const PatternMatcher* pm, s
 			else if (submatcher->val != (void*)-1)
 			{
 				if (find(candidates.begin(), candidates.end(), submatcher->val) != candidates.end()) break;
-				candidates.emplace_back(submatcher->val);
+				const KForm* cand = submatcher->val;
+				while (1)
+				{
+					if (KFeatureTestor::isMatched(&str[0], &str[0] + n + 1 - cand->form.size(), cand->vowel, cand->polar))
+					{
+						candidates.emplace_back(cand);
+					}
+					if (cand[0].form != cand[1].form) break;
+					++cand;
+				}
 			}
 		}
 	continueFor:
@@ -236,7 +253,16 @@ vector<KGraphNode> KTrie::split(const k_string& str, const PatternMatcher* pm, s
 		if (curTrie->val && curTrie->val != (void*)-1)
 		{
 			if (find(candidates.begin(), candidates.end(), curTrie->val) != candidates.end()) break;
-			candidates.emplace_back(curTrie->val);
+			const KForm* cand = curTrie->val;
+			while (1)
+			{
+				if (KFeatureTestor::isMatched(&str[0], &str[0] + n + 1 - cand->form.size(), cand->vowel, cand->polar))
+				{
+					candidates.emplace_back(cand);
+				}
+				if (cand[0].form != cand[1].form) break;
+				++cand;
+			}
 		}
 	}
 	branchOut(true);

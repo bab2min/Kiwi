@@ -52,10 +52,10 @@ namespace kiwi
 	class Kiwi
 	{
 	protected:
-		float cutOffThreshold = 8.f;
+		float cutOffThreshold = 5.f;
 		std::unique_ptr<KModelMgr> mdl;
 		std::unique_ptr<ThreadPool> workers;
-		size_t numThread;
+		size_t numThreads;
 		bool integrateAllomorph;
 		std::unique_ptr<PatternMatcher> pm;
 		KWordDetector detector;
@@ -68,10 +68,11 @@ namespace kiwi
 			LOAD_DEFAULT_DICT = 1,
 			INTEGRATE_ALLOMORPH = 2,
 		};
-		Kiwi(const char* modelPath = "", size_t maxCache = -1, size_t numThread = 0, size_t options = LOAD_DEFAULT_DICT | INTEGRATE_ALLOMORPH);
+		Kiwi(const char* modelPath = "", size_t maxCache = -1, size_t numThreads = 0, size_t options = LOAD_DEFAULT_DICT | INTEGRATE_ALLOMORPH);
 		int addUserWord(const std::u16string& str, KPOSTag tag, float userScore = 20);
 		int loadUserDictionary(const char* userDictPath = "");
 		int prepare();
+		int getNumThreads() const { return numThreads; }
 		void setCutOffThreshold(float _cutOffThreshold);
 		int getOption(size_t option) const;
 		void setOption(size_t option, int value);
@@ -86,7 +87,7 @@ namespace kiwi
 		void analyze(size_t topN, const std::function<std::u16string(size_t)>& reader, const std::function<void(size_t, std::vector<KResult>&&)>& receiver, size_t matchOptions) const;
 		void perform(size_t topN, const std::function<std::u16string(size_t)>& reader, const std::function<void(size_t, std::vector<KResult>&&)>& receiver, size_t matchOptions, size_t minCnt = 10, size_t maxWordLen = 10, float minScore = 0.25, float posThreshold = -3) const;
 		void clearCache();
-		static int getVersion();
+		static const char* getVersion();
 		static std::u16string toU16(const std::string& str);
 		static std::string toU8(const std::u16string& str);
 	};

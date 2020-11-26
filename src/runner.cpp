@@ -39,7 +39,7 @@ unordered_map<string, vector<string>> parseArg(int argc, const char** argv)
 void help()
 {
 	printf("Kiwi : Korean Intelligent Word Identifier\n"
-		"version: 0.%d.%d\n"
+		"version: %s\n"
 		"\n"
 		"= Usage =\n"
 		"kiwi [-m model] [-u user] [-o output] [-c cache] [-n number] input...\n"
@@ -47,7 +47,7 @@ void help()
 		"\tuser: (Optional) path of user dictionary file\n"
 		"\toutput: (Optional) path of result file\n"
 		"\tnumber: (Optional) the number of analyzed result, default = 1\n"
-		"\tinput: path of input file to be analyzed\n", Kiwi::getVersion() / 10, Kiwi::getVersion() % 10);
+		"\tinput: path of input file to be analyzed\n", Kiwi::getVersion());
 }
 
 int main(int argc, const char** argv)
