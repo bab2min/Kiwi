@@ -502,7 +502,6 @@ void KModelMgr::solidify()
 		trieRoot[i].val = &forms[i - 1];
 	}
 
-	bool once = false;
 	for (size_t i = (size_t)KPOSTag::DEFAULT_TAG_SIZE; i < forms.size(); ++i)
 	{
 		auto& f = forms[i];
