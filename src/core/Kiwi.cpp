@@ -327,8 +327,6 @@ auto findNthLargest(_Iter first, _Iter last, size_t nth, _Key&& fn, _Filter&& fi
 {
 	using KeyType = decltype(fn(*first));
 
-	size_t s = std::distance(first, last);
-
 	std::vector<KeyType> v;
 	for (; first != last; ++first)
 	{
@@ -770,7 +768,6 @@ std::vector<KResult> Kiwi::analyzeSent(const std::u16string::const_iterator & sB
 	if (nodes.size() <= 2)
 	{
 		ret.emplace_back();
-		ret.back().first.emplace_back(u16string{sBegin, sEnd}, KPOSTag::UNKNOWN, 0, distance(sBegin, sEnd));
 		return ret;
 	}
 	auto res = findBestPath(nodes, mdl->getLangModel(), mdl->getMorphemes(), topN);
