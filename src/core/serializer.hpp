@@ -83,19 +83,6 @@ namespace kiwi
 			if (!is.read((char*)&v, sizeof(_Ty))) throw std::ios_base::failure(std::string{ "reading type '" } +typeid(_Ty).name() + "' failed");
 		}
 
-		inline void writeToBinStreamImpl(std::ostream& os, const k_string& v)
-		{
-			writeToBinStream<uint32_t>(os, v.size());
-			if (!os.write((const char*)&v[0], v.size() * sizeof(k_string::value_type))) throw std::ios_base::failure(std::string{ "writing type '" } +typeid(k_string).name() + "' failed");
-		}
-
-		template<class _Istream>
-		inline void readFromBinStreamImpl(_Istream& is, k_string& v)
-		{
-			v.resize(readFromBinStream<uint32_t>(is));
-			if (!is.read((char*)&v[0], v.size() * sizeof(k_string::value_type))) throw std::ios_base::failure(std::string{ "reading type '" } +typeid(k_string).name() + "' failed");
-		}
-
 		inline void writeToBinStreamImpl(std::ostream& os, const std::u16string& v)
 		{
 			writeToBinStream<uint32_t>(os, v.size());

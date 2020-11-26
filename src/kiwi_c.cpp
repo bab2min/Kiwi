@@ -9,7 +9,7 @@
 using namespace std;
 using namespace kiwi;
 
-int kiwi_version()
+const char* kiwi_version()
 {
 	return Kiwi::getVersion();
 }

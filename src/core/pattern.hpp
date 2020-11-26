@@ -81,8 +81,12 @@ namespace pattern
 		struct CharTrait<CharOr<_Subset1, _Subset2, _SubsetRest...>>
 		{
 		private:
-			enum { l1 = CharTrait<_Subset1>::lowest, h1 = CharTrait<_Subset1>::highest };
-			enum { l2 = CharTrait<CharOr<_Subset2, _SubsetRest...>>::lowest, h2 = CharTrait<CharOr<_Subset2, _SubsetRest...>>::highest };
+			enum { 
+				l1 = CharTrait<_Subset1>::lowest, 
+				h1 = CharTrait<_Subset1>::highest,
+				l2 = CharTrait<CharOr<_Subset2, _SubsetRest...>>::lowest, 
+				h2 = CharTrait<CharOr<_Subset2, _SubsetRest...>>::highest 
+			};
 		public:
 			enum { lowest = l1 < l2 ? l1 : l2, highest = h1 < h2 ? h2 : h1, span = highest - lowest + 1 };
 		};

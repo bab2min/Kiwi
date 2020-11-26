@@ -272,14 +272,14 @@ namespace kiwi
 	protected:
 		size_t minCnt, maxWordLen;
 		float minScore;
-		size_t numThread;
+		size_t numThreads;
 		std::map<std::pair<KPOSTag, bool>, std::map<char16_t, float>> posScore;
 		std::map<std::u16string, float> nounTailScore;
 
 		template<class LocalData, class FuncReader, class FuncProc>
 		std::vector<LocalData> readProc(const FuncReader& reader, const FuncProc& processor, LocalData&& ld = {}) const
 		{
-			ThreadPool workers{ numThread, numThread * 2 };
+			ThreadPool workers{ numThreads, numThreads * 2 };
 			std::vector<LocalData> ldByTid(workers.getNumWorkers(), ld);
 			for (size_t id = 0; ; ++id)
 			{
@@ -319,7 +319,7 @@ namespace kiwi
 		KWordDetector(size_t _minCnt = 10, size_t _maxWordLen = 10, float _minScore = 0.1f,
 			size_t _numThread = 0)
 			: minCnt(_minCnt), maxWordLen(_maxWordLen), minScore(_minScore),
-			numThread(_numThread ? _numThread : std::thread::hardware_concurrency())
+			numThreads(_numThread ? _numThread : std::thread::hardware_concurrency())
 		{}
 		void setParameters(size_t _minCnt = 10, size_t _maxWordLen = 10, float _minScore = 0.1f)
 		{

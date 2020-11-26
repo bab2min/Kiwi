@@ -33,7 +33,7 @@ enum
 extern "C" {
 #endif 
 
-DECL_DLL int kiwi_version();
+DECL_DLL const char* kiwi_version();
 DECL_DLL const char* kiwi_error();
 
 DECL_DLL PKIWI kiwi_init(const char* modelPath, int numThread, int options);
