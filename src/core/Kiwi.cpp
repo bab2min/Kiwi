@@ -1,8 +1,4 @@
-﻿#ifdef USE_MIMALLOC
-#include <mimalloc-new-delete.h>
-#endif
-
-#include <future>
+﻿#include <future>
 #include "Kiwi.h"
 #include "Utils.h"
 #include "KFeatureTestor.h"
@@ -287,8 +283,8 @@ struct MInfo
 };
 
 struct WordLL;
-using MInfos = vector<MInfo>;
-using WordLLs = vector<WordLL>;
+using MInfos = mvector<MInfo>;
+using WordLLs = mvector<WordLL>;
 
 struct WordLL
 {
@@ -327,7 +323,7 @@ auto findNthLargest(_Iter first, _Iter last, size_t nth, _Key&& fn, _Filter&& fi
 {
 	using KeyType = decltype(fn(*first));
 
-	std::vector<KeyType> v;
+	mvector<KeyType> v;
 	for (; first != last; ++first)
 	{
 		if(filter(*first)) v.emplace_back(fn(*first));
@@ -338,7 +334,7 @@ auto findNthLargest(_Iter first, _Iter last, size_t nth, _Key&& fn, _Filter&& fi
 }
 
 template<class _Type>
-void evalTrigram(const KNLangModel::Node* rootNode, const KMorpheme* morphBase, const vector<k_string>& ownForms, const WordLL** wBegin, const WordLL** wEnd, 
+void evalTrigram(const KNLangModel::Node* rootNode, const KMorpheme* morphBase, const mvector<k_string>& ownForms, const WordLL** wBegin, const WordLL** wEnd, 
 	array<WID, 4> seq, size_t chSize, const KMorpheme* curMorph, const KGraphNode* node, _Type& maxWidLL)
 {
 	for (; wBegin != wEnd; ++wBegin)
@@ -384,12 +380,12 @@ void evalTrigram(const KNLangModel::Node* rootNode, const KMorpheme* morphBase, 
 	}
 }
 
-vector<pair<Kiwi::path, float>> Kiwi::findBestPath(const vector<KGraphNode>& graph, const KNLangModel * knlm, const KMorpheme* morphBase, size_t topN) const
+mvector<pair<Kiwi::path, float>> Kiwi::findBestPath(const mvector<KGraphNode>& graph, const KNLangModel * knlm, const KMorpheme* morphBase, size_t topN) const
 {
-	vector<WordLLs> cache(graph.size());
+	mvector<WordLLs> cache(graph.size());
 	const KGraphNode* startNode = &graph.front();
 	const KGraphNode* endNode = &graph.back();
-	vector<k_string> ownFormList;
+	mvector<k_string> ownFormList;
 
 	vector<const KMorpheme*> unknownNodeCands, unknownNodeLCands;
 	unknownNodeCands.emplace_back(morphBase + (size_t)KPOSTag::NNG + 1);
@@ -435,8 +431,8 @@ vector<pair<Kiwi::path, float>> Kiwi::findBestPath(const vector<KGraphNode>& gra
 			condV = curMorph->vowel;
 			condP = curMorph->polar;
 
-			unordered_map<WID, vector<WordLLP>> maxWidLL;
-			vector<const WordLL*> works;
+			munordered_map<WID, mvector<WordLLP>> maxWidLL;
+			mvector<const WordLL*> works;
 			works.reserve(8);
 			float discountForCombining = 0;
 
@@ -645,7 +641,7 @@ vector<pair<Kiwi::path, float>> Kiwi::findBestPath(const vector<KGraphNode>& gra
 
 #endif
 
-	vector<pair<path, float>> ret;
+	mvector<pair<path, float>> ret;
 	for (size_t i = 0; i < min(topN, cand.size()); ++i)
 	{
 		path mv(cand[i].morphs.size() - 1);
@@ -757,7 +753,7 @@ void Kiwi::perform(size_t topN, const function<u16string(size_t)>& reader, const
 std::vector<KResult> Kiwi::analyzeSent(const std::u16string::const_iterator & sBegin, const std::u16string::const_iterator & sEnd, size_t topN, size_t matchOptions) const
 {
 	auto nstr = normalizeHangul({ sBegin, sEnd });
-	vector<uint32_t> posMap(nstr.size() + 1);
+	mvector<uint32_t> posMap(nstr.size() + 1);
 	for (size_t i = 0; i < nstr.size(); ++i)
 	{
 		posMap[i + 1] = posMap[i] + (isHangulCoda(nstr[i]) ? 0 : 1);
@@ -820,7 +816,7 @@ vector<KResult> Kiwi::analyze(const u16string & str, size_t topN, size_t matchOp
 {
 	if (!mdl->getTrie()) throw KiwiException("Model should be prepared before analyzing.");
 	auto chunk = str.begin();
-	vector<u16string::const_iterator> sents;
+	mvector<u16string::const_iterator> sents;
 	sents.emplace_back(chunk);
 	while (chunk != str.end())
 	{
