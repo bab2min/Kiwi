@@ -23,7 +23,7 @@ namespace kiwi
 
 		KGraphNode* getPrev(size_t idx) const { return prevs[idx] ? (KGraphNode*)this - prevs[idx] : nullptr; }
 
-		static std::vector<KGraphNode> removeUnconnected(const std::vector<KGraphNode>& graph);
+		static mvector<KGraphNode> removeUnconnected(const mvector<KGraphNode>& graph);
 
 		void addPrev(size_t distance)
 		{
@@ -39,7 +39,7 @@ namespace kiwi
 
 	struct KTrie : public Trie<char16_t, const KForm*, OverriddenMap<std::map<char16_t, int32_t>>>
 	{
-		std::vector<KGraphNode> split(const k_string& str, const PatternMatcher* pm, size_t matchOptions) const;
+		mvector<KGraphNode> split(const k_string& str, const PatternMatcher* pm, size_t matchOptions) const;
 		const KForm* findForm(const k_string& str) const;
 		KTrie* getNext(k_char i) const { return (KTrie*)Trie::getNext(i); }
 		KTrie* getFail() const { return (KTrie*)Trie::getFail(); }

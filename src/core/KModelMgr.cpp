@@ -366,7 +366,7 @@ void KModelMgr::loadMorphBin(_Istream& is)
 	forms.resize(formSize);
 	morphemes.resize(morphemeSize);
 
-	auto mapper = [this](size_t p)->const KMorpheme*
+	auto mapper = [this](size_t p)
 	{
 		return (const KMorpheme*)p;
 	};
