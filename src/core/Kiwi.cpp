@@ -885,7 +885,7 @@ void Kiwi::clearCache()
 
 const char* Kiwi::getVersion()
 {
-	return "0.9.0";
+	return "0.9.1";
 }
 
 std::u16string Kiwi::toU16(const std::string & str)
