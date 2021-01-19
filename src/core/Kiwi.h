@@ -45,7 +45,7 @@ namespace kiwi
 		friend std::ostream& (::operator<<) (std::ostream& os, const KWordPair& kp);
 	};
 
-	typedef std::pair<std::vector<KWordPair>, float> KResult;
+	using KResult = std::pair<std::vector<KWordPair>, float>;
 
 	class KModelMgr;
 
@@ -59,8 +59,8 @@ namespace kiwi
 		bool integrateAllomorph;
 		std::unique_ptr<PatternMatcher> pm;
 		KWordDetector detector;
-		typedef std::vector<std::tuple<const KMorpheme*, k_string, uint32_t>> path;
-		std::vector<std::pair<path, float>> findBestPath(const std::vector<KGraphNode>& graph, const KNLangModel * knlm, const KMorpheme* morphBase, size_t topN) const;
+		using path = mvector<std::tuple<const KMorpheme*, k_string, uint32_t>>;
+		mvector<std::pair<path, float>> findBestPath(const mvector<KGraphNode>& graph, const KNLangModel * knlm, const KMorpheme* morphBase, size_t topN) const;
 		std::vector<KResult> analyzeSent(const std::u16string::const_iterator& sBegin, const std::u16string::const_iterator& sEnd, size_t topN, size_t matchOptions) const;
 	public:
 		enum

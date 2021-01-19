@@ -83,17 +83,18 @@ namespace kiwi
 			if (!is.read((char*)&v, sizeof(_Ty))) throw std::ios_base::failure(std::string{ "reading type '" } +typeid(_Ty).name() + "' failed");
 		}
 
-		inline void writeToBinStreamImpl(std::ostream& os, const std::u16string& v)
+		template<class CharTy, class T, class Al>
+		inline void writeToBinStreamImpl(std::ostream& os, const std::basic_string<CharTy, T, Al>& v)
 		{
 			writeToBinStream<uint32_t>(os, v.size());
-			if (!os.write((const char*)&v[0], v.size() * sizeof(char16_t))) throw std::ios_base::failure(std::string{ "writing type '" } +typeid(k_string).name() + "' failed");
+			if (!os.write((const char*)&v[0], v.size() * sizeof(CharTy))) throw std::ios_base::failure("writing type 'string' failed");
 		}
 
-		template<class _Istream>
-		inline void readFromBinStreamImpl(_Istream& is, std::u16string& v)
+		template<class _Istream, class CharTy, class T, class Al>
+		inline void readFromBinStreamImpl(_Istream& is, std::basic_string<CharTy, T, Al>& v)
 		{
 			v.resize(readFromBinStream<uint32_t>(is));
-			if (!is.read((char*)&v[0], v.size() * sizeof(char16_t))) throw std::ios_base::failure(std::string{ "reading type '" } +typeid(k_string).name() + "' failed");
+			if (!is.read((char*)&v[0], v.size() * sizeof(CharTy))) throw std::ios_base::failure("reading type 'string' failed");
 		}
 
 		template<class _Ty1, class _Ty2>

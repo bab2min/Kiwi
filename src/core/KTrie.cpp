@@ -8,15 +8,15 @@
 using namespace std;
 using namespace kiwi;
 
-vector<KGraphNode> KTrie::split(const k_string& str, const PatternMatcher* pm, size_t matchOptions) const
+mvector<KGraphNode> KTrie::split(const k_string& str, const PatternMatcher* pm, size_t matchOptions) const
 {
-	vector<KGraphNode> ret;
+	mvector<KGraphNode> ret;
 	ret.reserve(8);
 	ret.emplace_back();
 	size_t n = 0;
-	vector<const KForm*> candidates;
+	mvector<const KForm*> candidates;
 	const KTrie* curTrie = this;
-	unordered_map<uint32_t, int> spacePos;
+	munordered_map<uint32_t, int> spacePos;
 	size_t lastSpecialEndPos = 0, specialStartPos = 0;
 	KPOSTag chrType, lastChrType = KPOSTag::UNKNOWN;
 	auto branchOut = [&](bool makeLongMatch = false)
@@ -317,9 +317,9 @@ KTrie KTrie::loadFromBin(std::istream & is, const KForm* base)
 	return t;
 }
 
-vector<KGraphNode> KGraphNode::removeUnconnected(const vector<KGraphNode>& graph)
+mvector<KGraphNode> KGraphNode::removeUnconnected(const mvector<KGraphNode>& graph)
 {
-	vector<uint16_t> connectedList(graph.size()), newIndexDiff(graph.size());
+	mvector<uint16_t> connectedList(graph.size()), newIndexDiff(graph.size());
 	connectedList[graph.size() - 1] = true;
 	connectedList[0] = true;
 	// forward searching
@@ -368,7 +368,7 @@ vector<KGraphNode> KGraphNode::removeUnconnected(const vector<KGraphNode>& graph
 		newIndexDiff[i] = i + 1 - newIndexDiff[i];
 	}
 
-	vector<KGraphNode> ret;
+	mvector<KGraphNode> ret;
 	ret.reserve(connectedCnt);
 	for (size_t i = 0; i < graph.size(); ++i)
 	{
