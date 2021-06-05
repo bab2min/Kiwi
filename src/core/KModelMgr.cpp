@@ -70,9 +70,9 @@ void KModelMgr::loadMMFromTxt(std::istream& is, MorphemeMap& morphMap, std::unor
 		}*/
 		auto& fm = formMapper(form, cvowel, polar);
 		bool unified = false;
-		if (tag >= KPOSTag::EP && tag <= KPOSTag::ETM && form[0] == u'¾Æ')
+		if (tag >= KPOSTag::EP && tag <= KPOSTag::ETM && form[0] == u'Â¾Ã†')
 		{
-			form[0] = u'¾î';
+			form[0] = u'Â¾Ã®';
 			unified = true;
 		}
 		auto it = morphMap.find(make_pair(form, tag));
@@ -258,10 +258,10 @@ void KModelMgr::loadCorpusFromTxt(std::istream & is, MorphemeMap& morphMap, cons
 
 			auto t = makePOSTag(fields[i + 1]);
 
-			if ((f[0] == u'¾Æ' || f[0] == u'¾ß') && fields[i + 1][0] == 'E')
+			if ((f[0] == u'Â¾Ã†' || f[0] == u'Â¾ÃŸ') && fields[i + 1][0] == 'E')
 			{
-				if(f[0] == u'¾Æ') f[0] == u'¾î';
-				else f[0] == u'¿©';
+				if(f[0] == u'Â¾Ã†') f[0] == u'Â¾Ã®';
+				else f[0] == u'Â¿Â©';
 			}
 			
 			auto it = morphMap.find(make_pair(f, t));
@@ -502,7 +502,9 @@ void KModelMgr::solidify()
 		trieRoot[i].val = &forms[i - 1];
 	}
 
-	for (size_t i = (size_t)KPOSTag::DEFAULT_TAG_SIZE; i < forms.size(); ++i)
+	forms.emplace_back(); // add sentry for last value
+
+	for (size_t i = (size_t)KPOSTag::DEFAULT_TAG_SIZE; i < forms.size() - 1; ++i)
 	{
 		auto& f = forms[i];
 		if (f.candidate.empty()) continue;
