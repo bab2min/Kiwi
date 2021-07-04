@@ -27,21 +27,30 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\kiwi\FrozenTrie.h" />
+    <ClInclude Include="include\kiwi\Kiwi.h" />
+    <ClInclude Include="include\kiwi\Knlm.h" />
+    <ClInclude Include="include\kiwi\Mmap.h" />
+    <ClInclude Include="include\kiwi\PatternMatcher.h" />
+    <ClInclude Include="include\kiwi\Trainer.h" />
+    <ClInclude Include="include\kiwi\Trie.hpp" />
+    <ClInclude Include="include\kiwi\Types.h" />
+    <ClInclude Include="include\kiwi\Utils.h" />
     <ClInclude Include="src\core\BakedMap.hpp" />
+    <ClInclude Include="src\core\count.hpp" />
+    <ClInclude Include="src\core\FrozenTrie.hpp" />
     <ClInclude Include="src\core\KFeatureTestor.h" />
     <ClInclude Include="src\core\KForm.h" />
     <ClInclude Include="src\core\Kiwi.h" />
-    <ClInclude Include="src\core\KiwiHeader.h" />
     <ClInclude Include="src\core\KModelMgr.h" />
     <ClInclude Include="src\core\KNLangModel.h" />
+    <ClInclude Include="src\core\Knlm.hpp" />
     <ClInclude Include="src\core\KTrie.h" />
     <ClInclude Include="src\core\KWordDetector.h" />
     <ClInclude Include="src\core\logPoisson.h" />
     <ClInclude Include="src\core\pattern.hpp" />
-    <ClInclude Include="src\core\PatternMatcher.h" />
     <ClInclude Include="src\core\serializer.hpp" />
     <ClInclude Include="src\core\ThreadPool.h" />
-    <ClInclude Include="src\core\Trie.hpp" />
     <ClInclude Include="src\core\Utils.h" />
   </ItemGroup>
   <ItemGroup>
@@ -49,6 +58,7 @@
     <ClCompile Include="src\core\KFeatureTestor.cpp" />
     <ClCompile Include="src\core\KForm.cpp" />
     <ClCompile Include="src\core\Kiwi.cpp" />
+    <ClCompile Include="src\core\Kiwi2.cpp" />
     <ClCompile Include="src\core\KModelMgr.cpp" />
     <ClCompile Include="src\core\KNLangModel.cpp" />
     <ClCompile Include="src\core\KTrie.cpp" />
@@ -130,27 +140,27 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)mimalloc/include/;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)include\;$(ProjectDir)mimalloc/include/;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)mimalloc/include/;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)include\;$(ProjectDir)mimalloc/include/;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir)mimalloc/include/;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)include\;$(ProjectDir)mimalloc/include/;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release(LODA_TXT)|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir)mimalloc/include/;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)include\;$(ProjectDir)mimalloc/include/;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir)mimalloc/include/;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)include\;$(ProjectDir)mimalloc/include/;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release(LODA_TXT)|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir)mimalloc/include/;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)include\;$(ProjectDir)mimalloc/include/;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

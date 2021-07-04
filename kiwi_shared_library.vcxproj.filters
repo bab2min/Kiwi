@@ -10,6 +10,9 @@
     <Filter Include="mimalloc">
       <UniqueIdentifier>{088ada21-49be-404b-9c55-a3c9940f65af}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\kiwi">
+      <UniqueIdentifier>{3ed6d7a3-06e8-47ce-8364-951da0b8e030}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\core\BakedMap.hpp">
@@ -22,9 +25,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\core\Kiwi.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\core\KiwiHeader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\core\KModelMgr.h">
@@ -42,9 +42,6 @@
     <ClInclude Include="src\core\logPoisson.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\core\Trie.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\core\ThreadPool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -54,10 +51,43 @@
     <ClInclude Include="src\core\serializer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\core\PatternMatcher.h">
+    <ClInclude Include="src\core\pattern.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\core\pattern.hpp">
+    <ClInclude Include="include\kiwi\Kiwi.h">
+      <Filter>Header Files\kiwi</Filter>
+    </ClInclude>
+    <ClInclude Include="include\kiwi\Types.h">
+      <Filter>Header Files\kiwi</Filter>
+    </ClInclude>
+    <ClInclude Include="include\kiwi\Utils.h">
+      <Filter>Header Files\kiwi</Filter>
+    </ClInclude>
+    <ClInclude Include="include\kiwi\Trainer.h">
+      <Filter>Header Files\kiwi</Filter>
+    </ClInclude>
+    <ClInclude Include="include\kiwi\Mmap.h">
+      <Filter>Header Files\kiwi</Filter>
+    </ClInclude>
+    <ClInclude Include="include\kiwi\Knlm.h">
+      <Filter>Header Files\kiwi</Filter>
+    </ClInclude>
+    <ClInclude Include="include\kiwi\Trie.hpp">
+      <Filter>Header Files\kiwi</Filter>
+    </ClInclude>
+    <ClInclude Include="include\kiwi\PatternMatcher.h">
+      <Filter>Header Files\kiwi</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\FrozenTrie.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\kiwi\FrozenTrie.h">
+      <Filter>Header Files\kiwi</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\count.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\Knlm.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -94,6 +124,9 @@
     </ClCompile>
     <ClCompile Include="mimalloc\src\static.c">
       <Filter>mimalloc</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\Kiwi2.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

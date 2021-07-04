@@ -1,24 +1,26 @@
-#include "KiwiHeader.h"
+#include <numeric>
+#include <kiwi/Types.h>
 #include "KTrie.h"
 #include "KFeatureTestor.h"
 #include "KModelMgr.h"
 #include "Utils.h"
 #include "serializer.hpp"
+#include "FrozenTrie.hpp"
 
 using namespace std;
 using namespace kiwi;
 
-mvector<KGraphNode> KTrie::split(const k_string& str, const PatternMatcher* pm, size_t matchOptions) const
+Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form*>& trie, const KString& str, const PatternMatcher* pm, Match matchOptions)
 {
-	mvector<KGraphNode> ret;
+	Vector<KGraphNode> ret;
 	ret.reserve(8);
 	ret.emplace_back();
 	size_t n = 0;
-	mvector<const KForm*> candidates;
-	const KTrie* curTrie = this;
-	munordered_map<uint32_t, int> spacePos;
+	Vector<const Form*> candidates;
+	auto* curNode = trie.root();
+	UnorderedMap<uint32_t, int> spacePos;
 	size_t lastSpecialEndPos = 0, specialStartPos = 0;
-	KPOSTag chrType, lastChrType = KPOSTag::UNKNOWN;
+	POSTag chrType, lastChrType = POSTag::unknown;
 	auto branchOut = [&](bool makeLongMatch = false)
 	{
 		if (!candidates.empty())
@@ -37,7 +39,7 @@ mvector<KGraphNode> KTrie::split(const k_string& str, const PatternMatcher* pm, 
 				// insert unknown form 
 				if (nBegin > lastSpecialEndPos && !longestMatched 
 					&& !(0x11A8 <= cand->form[0] && cand->form[0] < (0x11A7 + 28)) 
-					&& str[nBegin - space -1] != 0x11BB) // cannot end with ¤¶
+					&& str[nBegin - space - 1] != 0x11BB) // cannot end with ¤¶
 				{
 					auto it2 = spacePos.find(lastSpecialEndPos - 1);
 					int space2 = it2 == spacePos.end() ? 0 : it2->second;
@@ -51,7 +53,7 @@ mvector<KGraphNode> KTrie::split(const k_string& str, const PatternMatcher* pm, 
 				}
 
 				// if special character
-				if (cand->candidate[0] <= this[(size_t)KPOSTag::SN].val->candidate[0])
+				if (cand->candidate[0] <= trie.value((size_t)POSTag::sn)->candidate[0])
 				{
 					// special character should be processed one by one chr.
 					if (!alreadySpecialChrProcessed)
@@ -65,7 +67,7 @@ mvector<KGraphNode> KTrie::split(const k_string& str, const PatternMatcher* pm, 
 							newNode.addPrev(&ret.back() + 1 - &g);
 						}
 						ret.emplace_back(move(newNode));
-						ret.back().form = this[(size_t)cand->candidate[0]->tag].val;
+						ret.back().form = trie.value((size_t)cand->candidate[0]->tag);
 						lastSpecialEndPos = n;
 						alreadySpecialChrProcessed = true;
 					}
@@ -112,22 +114,22 @@ mvector<KGraphNode> KTrie::split(const k_string& str, const PatternMatcher* pm, 
 		{
 			auto m = pm->match(str.data() + n, str.data() + str.size(), matchOptions);
 			chrType = m.second;
-			if (chrType != KPOSTag::UNKNOWN)
+			if (chrType != POSTag::unknown)
 			{
 				branchOut();
 				auto it = spacePos.find(n - 1);
 				int space = it == spacePos.end() ? 0 : it->second;
-				KGraphNode newNode{ k_string{ &c, m.first }, (uint16_t)(n + m.first) };
+				KGraphNode newNode{ KString{ &c, m.first }, (uint16_t)(n + m.first) };
 				for (auto& g : ret)
 				{
 					if (g.lastPos != n - space) continue;
 					newNode.addPrev(&ret.back() + 1 - &g);
 				}
 				ret.emplace_back(move(newNode));
-				ret.back().form = this[(size_t)chrType].val;
+				ret.back().form = trie.value((size_t)chrType);
 
 				n += m.first - 1;
-				curTrie = this;
+				curNode = trie.root();
 				goto continueFor;
 			}
 		}
@@ -137,34 +139,35 @@ mvector<KGraphNode> KTrie::split(const k_string& str, const PatternMatcher* pm, 
 		if (lastChrType != chrType)
 		{
 			// sequence of speical characters found
-			if (lastChrType != KPOSTag::MAX && lastChrType != KPOSTag::UNKNOWN && !isWebTag(lastChrType) /*&& n - specialStartPos > 1*/)
+			if (lastChrType != POSTag::max && lastChrType != POSTag::unknown && !isWebTag(lastChrType) /*&& n - specialStartPos > 1*/)
 			{
 				auto it = spacePos.find(specialStartPos - 1);
 				int space = it == spacePos.end() ? 0 : it->second;
-				KGraphNode newNode{ k_string{ &str[specialStartPos], n - specialStartPos }, (uint16_t)n };
+				KGraphNode newNode{ KString{ &str[specialStartPos], n - specialStartPos }, (uint16_t)n };
 				for (auto& g : ret)
 				{
 					if (g.lastPos != specialStartPos - space) continue;
 					newNode.addPrev(&ret.back() + 1 - &g);
 				}
 				ret.emplace_back(move(newNode));
-				ret.back().form = this[(size_t)lastChrType].val;
+				ret.back().form = trie.value((size_t)lastChrType);
 			}
 			specialStartPos = n;
 		}
 
-		while (!curTrie->getNext(c)) // if curTrie has no exact next node, goto fail
+		auto nextNode = curNode->next(trie, c);
+		while (!nextNode) // if curNode has no exact next node, goto fail
 		{
-			if (curTrie->fail)
+			if (curNode->fail())
 			{
-				curTrie = curTrie->getFail();
-				for (auto submatcher = curTrie; submatcher; submatcher = submatcher->getFail())
+				curNode = curNode->fail();
+				for (auto submatcher = curNode; submatcher; submatcher = submatcher->fail())
 				{
-					if (!submatcher->val) break;
-					else if (submatcher->val != (void*)-1)
+					if (!submatcher->val(trie)) break;
+					else if (submatcher->val(trie) != trie.has_submatch)
 					{
-						if (find(candidates.begin(), candidates.end(), submatcher->val) != candidates.end()) break;
-						const KForm* cand = submatcher->val;
+						if (find(candidates.begin(), candidates.end(), submatcher->val(trie)) != candidates.end()) break;
+						const Form* cand = submatcher->val(trie);
 						while (1)
 						{
 							if (KFeatureTestor::isMatched(&str[0], &str[0] + n + 1 - cand->form.size(), cand->vowel, cand->polar))
@@ -176,14 +179,15 @@ mvector<KGraphNode> KTrie::split(const k_string& str, const PatternMatcher* pm, 
 						}
 					}
 				}
+				nextNode = curNode->next(trie, c);
 			}
 			else
 			{
-				branchOut(chrType != KPOSTag::MAX);
+				branchOut(chrType != POSTag::max);
 				
 				// the root node has no exact next node, test special chr
 				// space
-				if (chrType == KPOSTag::UNKNOWN)
+				if (chrType == POSTag::unknown)
 				{
 					// insert new space
 					if (chrType != lastChrType)
@@ -198,7 +202,7 @@ mvector<KGraphNode> KTrie::split(const k_string& str, const PatternMatcher* pm, 
 					lastSpecialEndPos = n + 1;
 				}
 				// not space
-				else if(chrType != KPOSTag::MAX)
+				else if(chrType != POSTag::max)
 				{
 					lastSpecialEndPos = n + 1;
 				}
@@ -207,16 +211,16 @@ mvector<KGraphNode> KTrie::split(const k_string& str, const PatternMatcher* pm, 
 			}
 		}
 		branchOut();
-		// from this, curTrie has the exact next node
-		curTrie = curTrie->getNext(c);
+		// from this, curNode has the exact next node
+		curNode = nextNode;
 		// if it has exit node, a pattern has found
-		for (auto submatcher = curTrie; submatcher; submatcher = submatcher->getFail())
+		for (auto submatcher = curNode; submatcher; submatcher = submatcher->fail())
 		{
-			if (!submatcher->val) break;
-			else if (submatcher->val != (void*)-1)
+			if (!submatcher->val(trie)) break;
+			else if (submatcher->val(trie) != trie.has_submatch)
 			{
-				if (find(candidates.begin(), candidates.end(), submatcher->val) != candidates.end()) break;
-				const KForm* cand = submatcher->val;
+				if (find(candidates.begin(), candidates.end(), submatcher->val(trie)) != candidates.end()) break;
+				const Form* cand = submatcher->val(trie);
 				while (1)
 				{
 					if (KFeatureTestor::isMatched(&str[0], &str[0] + n + 1 - cand->form.size(), cand->vowel, cand->polar))
@@ -233,27 +237,27 @@ mvector<KGraphNode> KTrie::split(const k_string& str, const PatternMatcher* pm, 
 	}
 
 	// sequence of speical characters found
-	if (lastChrType != KPOSTag::MAX && lastChrType != KPOSTag::UNKNOWN /*&& n - specialStartPos > 1*/)
+	if (lastChrType != POSTag::max && lastChrType != POSTag::unknown /*&& n - specialStartPos > 1*/)
 	{
 		auto it = spacePos.find(specialStartPos - 1);
 		int space = it == spacePos.end() ? 0 : it->second;
-		KGraphNode newNode{ k_string{ &str[specialStartPos], n - specialStartPos }, (uint16_t)n };
+		KGraphNode newNode{ KString{ &str[specialStartPos], n - specialStartPos }, (uint16_t)n };
 		for (auto& g : ret)
 		{
 			if (g.lastPos != specialStartPos - space) continue;
 			newNode.addPrev(&ret.back() + 1 - &g);
 		}
 		ret.emplace_back(move(newNode));
-		ret.back().form = this[(size_t)lastChrType].val;
+		ret.back().form = trie.value((size_t)lastChrType);
 	}
 
-	while (curTrie->fail)
+	curNode = curNode->fail();
+	while (curNode)
 	{
-		curTrie = curTrie->getFail();
-		if (curTrie->val && curTrie->val != (void*)-1)
+		if (curNode->val(trie) && curNode->val(trie) != trie.has_submatch)
 		{
-			if (find(candidates.begin(), candidates.end(), curTrie->val) != candidates.end()) break;
-			const KForm* cand = curTrie->val;
+			if (find(candidates.begin(), candidates.end(), curNode->val(trie)) != candidates.end()) break;
+			const Form* cand = curNode->val(trie);
 			while (1)
 			{
 				if (KFeatureTestor::isMatched(&str[0], &str[0] + n + 1 - cand->form.size(), cand->vowel, cand->polar))
@@ -264,6 +268,7 @@ mvector<KGraphNode> KTrie::split(const k_string& str, const PatternMatcher* pm, 
 				++cand;
 			}
 		}
+		curNode = curNode->fail();
 	}
 	branchOut(true);
 
@@ -279,7 +284,7 @@ mvector<KGraphNode> KTrie::split(const k_string& str, const PatternMatcher* pm, 
 	return KGraphNode::removeUnconnected(ret);
 }
 
-const KForm * KTrie::findForm(const k_string & str) const
+const Form * KTrie::findForm(const KString & str) const
 {
 	const KTrie* curTrie = this;
 	for (auto c : str)
@@ -291,7 +296,7 @@ const KForm * KTrie::findForm(const k_string & str) const
 	return nullptr;
 }
 
-void KTrie::saveToBin(std::ostream & os, const KForm* base) const
+void KTrie::saveToBin(std::ostream & os, const Form* base) const
 {
 	serializer::writeToBinStream<uint16_t>(os, next.size());
 	for (auto& p : next)
@@ -299,11 +304,11 @@ void KTrie::saveToBin(std::ostream & os, const KForm* base) const
 		serializer::writeToBinStream(os, p);
 	}
 	serializer::writeToBinStream(os, fail);
-	uint32_t fVal = (val == nullptr || val == (KForm*)-1) ? (size_t)val - 1 : val - base;
+	uint32_t fVal = (val == nullptr || val == (Form*)-1) ? (size_t)val - 1 : val - base;
 	serializer::writeToBinStream(os, fVal);
 }
 
-KTrie KTrie::loadFromBin(std::istream & is, const KForm* base)
+KTrie KTrie::loadFromBin(std::istream & is, const Form* base)
 {
 	KTrie t;
 	uint16_t len = serializer::readFromBinStream<uint16_t>(is);
@@ -313,20 +318,20 @@ KTrie KTrie::loadFromBin(std::istream & is, const KForm* base)
 	}
 	serializer::readFromBinStream(is, t.fail);
 	uint32_t fVal = serializer::readFromBinStream<uint32_t>(is);
-	t.val = (fVal == (uint32_t)-1 || fVal == (uint32_t)-2) ? (KForm*)((int32_t)fVal + 1) : fVal + base;
+	t.val = (fVal == (uint32_t)-1 || fVal == (uint32_t)-2) ? (Form*)((int32_t)fVal + 1) : fVal + base;
 	return t;
 }
 
-mvector<KGraphNode> KGraphNode::removeUnconnected(const mvector<KGraphNode>& graph)
+Vector<KGraphNode> KGraphNode::removeUnconnected(const Vector<KGraphNode>& graph)
 {
-	mvector<uint16_t> connectedList(graph.size()), newIndexDiff(graph.size());
+	Vector<uint16_t> connectedList(graph.size()), newIndexDiff(graph.size());
 	connectedList[graph.size() - 1] = true;
 	connectedList[0] = true;
 	// forward searching
 	for (size_t i = 1; i < graph.size(); ++i)
 	{
 		bool connected = false;
-		for (size_t j = 0; j < KGraphNode::MAX_PREV; ++j)
+		for (size_t j = 0; j < KGraphNode::max_prev; ++j)
 		{
 			if (!graph[i].prevs[j]) break;
 			if (connectedList[i - graph[i].prevs[j]])
@@ -343,7 +348,7 @@ mvector<KGraphNode> KGraphNode::removeUnconnected(const mvector<KGraphNode>& gra
 		bool connected = false;
 		for (size_t j = i + 1; j < graph.size(); ++j)
 		{
-			for (size_t k = 0; k < KGraphNode::MAX_PREV; ++k)
+			for (size_t k = 0; k < KGraphNode::max_prev; ++k)
 			{
 				if (!graph[j].prevs[k]) break;
 				if (j - graph[j].prevs[k] > i) break;
@@ -368,7 +373,7 @@ mvector<KGraphNode> KGraphNode::removeUnconnected(const mvector<KGraphNode>& gra
 		newIndexDiff[i] = i + 1 - newIndexDiff[i];
 	}
 
-	mvector<KGraphNode> ret;
+	Vector<KGraphNode> ret;
 	ret.reserve(connectedCnt);
 	for (size_t i = 0; i < graph.size(); ++i)
 	{
@@ -376,7 +381,7 @@ mvector<KGraphNode> KGraphNode::removeUnconnected(const mvector<KGraphNode>& gra
 		ret.emplace_back(graph[i]);
 		auto& newNode = ret.back();
 		size_t n = 0;
-		for (size_t j = 0; j < MAX_PREV; ++j)
+		for (size_t j = 0; j < max_prev; ++j)
 		{
 			auto idx = newNode.prevs[j];
 			if (!idx) break;

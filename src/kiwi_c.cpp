@@ -1,10 +1,7 @@
-// KiwiDLL.cpp : Defines the exported functions for the DLL application.
-//
-
 #include <memory>
 #include "core/Kiwi.h"
 
-#include "kiwi_c.h"
+#include <kiwi/capi.h>
 
 using namespace std;
 using namespace kiwi;
@@ -37,11 +34,11 @@ const char* kiwi_error()
 	return nullptr;
 }
 
-PKIWI kiwi_init(const char * modelPath, int numThread, int options)
+kiwi_h kiwi_init(const char * modelPath, int numThread, int options)
 {
 	try
 	{
-		return (PKIWI)new Kiwi{ modelPath, 0, (size_t)numThread, (size_t)options };
+		return (kiwi_h)new Kiwi{ modelPath, 0, (size_t)numThread, (size_t)options };
 	}
 	catch (...)
 	{
@@ -50,13 +47,13 @@ PKIWI kiwi_init(const char * modelPath, int numThread, int options)
 	}
 }
 
-int kiwi_addUserWord(PKIWI handle, const char * word, const char * pos)
+int kiwi_add_user_word(kiwi_h handle, const char * word, const char * pos)
 {
 	if (!handle) return KIWIERR_INVALID_HANDLE;
 	Kiwi* kiwi = (Kiwi*)handle;
 	try
 	{
-		return kiwi->addUserWord(Kiwi::toU16(word), makePOSTag(Kiwi::toU16(pos)));
+		return kiwi->addUserWord(Kiwi::toU16(word), toPOSTag(Kiwi::toU16(pos)));
 	}
 	catch (...)
 	{
@@ -65,7 +62,7 @@ int kiwi_addUserWord(PKIWI handle, const char * word, const char * pos)
 	}
 }
 
-int kiwi_loadUserDict(PKIWI handle, const char * dictPath)
+int kiwi_load_user_dict(kiwi_h handle, const char * dictPath)
 {
 	if (!handle) return KIWIERR_INVALID_HANDLE;
 	Kiwi* kiwi = (Kiwi*)handle;
@@ -81,22 +78,27 @@ int kiwi_loadUserDict(PKIWI handle, const char * dictPath)
 	}
 }
 
-PKIWIWORDS kiwi_extractWords(PKIWI handle, kiwi_reader reader, void * userData, int minCnt, int maxWordLen, float minScore)
+kiwi_ws_h kiwi_extract_words(kiwi_h handle, kiwi_reader_t reader, void * userData, int minCnt, int maxWordLen, float minScore)
 {
 	if (!handle) return nullptr;
 	Kiwi* kiwi = (Kiwi*)handle;
 	try
 	{
-		auto res = kiwi->extractWords([=](size_t id)->u16string
+		auto res = kiwi->extractWords([&]()
 		{
-			string buf;
-			buf.resize((*reader)(id, nullptr, userData));
-			if (buf.empty()) return {};
-			(*reader)(id, &buf[0], userData);
-			return Kiwi::toU16(buf);
+			auto idx = make_shared<int>(0);
+			return [&]() -> u16string
+			{
+				string buf;
+				buf.resize((*reader)(*idx, nullptr, userData));
+				if (buf.empty()) return {};
+				(*reader)(*idx, &buf[0], userData);
+				++*idx;
+				return Kiwi::toU16(buf);
+			};
 		}, minCnt, maxWordLen, minScore);
 
-		return (PKIWIWORDS)new pair<vector<KWordDetector::WordInfo>, ResultBuffer>{ move(res), {} };
+		return (kiwi_ws_h)new pair<vector<KWordDetector::WordInfo>, ResultBuffer>{ move(res), {} };
 	}
 	catch (...)
 	{
@@ -105,93 +107,27 @@ PKIWIWORDS kiwi_extractWords(PKIWI handle, kiwi_reader reader, void * userData, 
 	}
 }
 
-PKIWIWORDS kiwi_extractFilterWords(PKIWI handle, kiwi_reader reader, void * userData, int minCnt, int maxWordLen, float minScore, float posThreshold)
+kiwi_ws_h kiwi_extract_filter_words(kiwi_h handle, kiwi_reader_t reader, void * userData, int minCnt, int maxWordLen, float minScore, float posThreshold)
 {
 	if (!handle) return nullptr;
 	Kiwi* kiwi = (Kiwi*)handle;
 	try
 	{
-		auto res = kiwi->extractWords([=](size_t id)->u16string
+		auto res = kiwi->extractWords([&]()
 		{
-			string buf;
-			buf.resize((*reader)(id, nullptr, userData));
-			if (buf.empty()) return {};
-			(*reader)(id, &buf[0], userData);
-			return Kiwi::toU16(buf);
-		}, minCnt, maxWordLen, minScore);
-		res = kiwi->filterExtractedWords(move(res), posThreshold);
-		return (PKIWIWORDS)new pair<vector<KWordDetector::WordInfo>, ResultBuffer>{ move(res),{} };
-	}
-	catch (...)
-	{
-		currentError = current_exception();
-		return nullptr;
-	}
-}
-
-PKIWIWORDS kiwi_extractAddWords(PKIWI handle, kiwi_reader reader, void * userData, int minCnt, int maxWordLen, float minScore, float posThreshold)
-{
-	if (!handle) return nullptr;
-	Kiwi* kiwi = (Kiwi*)handle;
-	try
-	{
-		auto res = kiwi->extractAddWords([=](size_t id)->u16string
-		{
-			string buf;
-			buf.resize((*reader)(id, nullptr, userData));
-			if (buf.empty()) return {};
-			(*reader)(id, &buf[0], userData);
-			return Kiwi::toU16(buf);
-		}, minCnt, maxWordLen, minScore, posThreshold);
-		return (PKIWIWORDS)new pair<vector<KWordDetector::WordInfo>, ResultBuffer>{ move(res),{} };
-	}
-	catch (...)
-	{
-		currentError = current_exception();
-		return nullptr;
-	}
-}
-
-PKIWIWORDS kiwi_extractWordsW(PKIWI handle, kiwi_readerW reader, void * userData, int minCnt, int maxWordLen, float minScore)
-{
-	if (!handle) return nullptr;
-	Kiwi* kiwi = (Kiwi*)handle;
-	try
-	{
-		auto res = kiwi->extractWords([=](size_t id)->u16string
-		{
-			u16string buf;
-			buf.resize((*reader)(id, nullptr, userData));
-			if (buf.empty()) return {};
-			(*reader)(id, (kchar16_t*)&buf[0], userData);
-			return buf;
-		}, minCnt, maxWordLen, minScore);
-
-		return (PKIWIWORDS)new pair<vector<KWordDetector::WordInfo>, ResultBuffer>{ move(res),{} };
-	}
-	catch (...)
-	{
-		currentError = current_exception();
-		return nullptr;
-	}
-}
-
-PKIWIWORDS kiwi_extractFilterWordsW(PKIWI handle, kiwi_readerW reader, void * userData, int minCnt, int maxWordLen, float minScore, float posThreshold)
-{
-	if (!handle) return nullptr;
-	Kiwi* kiwi = (Kiwi*)handle;
-	try
-	{
-		auto res = kiwi->extractWords([=](size_t id)->u16string
-		{
-			u16string buf;
-			buf.resize((*reader)(id, nullptr, userData));
-			if (buf.empty()) return {};
-			(*reader)(id, (kchar16_t*)&buf[0], userData);
-			return buf;
+			auto idx = make_shared<int>(0);
+			return [&]() -> u16string
+			{
+				string buf;
+				buf.resize((*reader)(*idx, nullptr, userData));
+				if (buf.empty()) return {};
+				(*reader)(*idx, &buf[0], userData);
+				++* idx;
+				return Kiwi::toU16(buf);
+			};
 		}, minCnt, maxWordLen, minScore);
 		res = kiwi->filterExtractedWords(move(res), posThreshold);
-		return (PKIWIWORDS)new pair<vector<KWordDetector::WordInfo>, ResultBuffer>{ move(res),{} };
+		return (kiwi_ws_h)new pair<vector<KWordDetector::WordInfo>, ResultBuffer>{ move(res),{} };
 	}
 	catch (...)
 	{
@@ -200,21 +136,26 @@ PKIWIWORDS kiwi_extractFilterWordsW(PKIWI handle, kiwi_readerW reader, void * us
 	}
 }
 
-PKIWIWORDS kiwi_extractAddWordsW(PKIWI handle, kiwi_readerW reader, void * userData, int minCnt, int maxWordLen, float minScore, float posThreshold)
+kiwi_ws_h kiwi_extract_add_words(kiwi_h handle, kiwi_reader_t reader, void * userData, int minCnt, int maxWordLen, float minScore, float posThreshold)
 {
 	if (!handle) return nullptr;
 	Kiwi* kiwi = (Kiwi*)handle;
 	try
 	{
-		auto res = kiwi->extractAddWords([=](size_t id)->u16string
+		auto res = kiwi->extractAddWords([&]()
 		{
-			u16string buf;
-			buf.resize((*reader)(id, nullptr, userData));
-			if (buf.empty()) return {};
-			(*reader)(id, (kchar16_t*)&buf[0], userData);
-			return buf;
+			auto idx = make_shared<int>(0);
+			return [&]() -> u16string
+			{
+				string buf;
+				buf.resize((*reader)(*idx, nullptr, userData));
+				if (buf.empty()) return {};
+				(*reader)(*idx, &buf[0], userData);
+				++* idx;
+				return Kiwi::toU16(buf);
+			};
 		}, minCnt, maxWordLen, minScore, posThreshold);
-		return (PKIWIWORDS)new pair<vector<KWordDetector::WordInfo>, ResultBuffer>{ move(res),{} };
+		return (kiwi_ws_h)new pair<vector<KWordDetector::WordInfo>, ResultBuffer>{ move(res),{} };
 	}
 	catch (...)
 	{
@@ -223,7 +164,93 @@ PKIWIWORDS kiwi_extractAddWordsW(PKIWI handle, kiwi_readerW reader, void * userD
 	}
 }
 
-int kiwi_prepare(PKIWI handle)
+kiwi_ws_h kiwi_extract_words_w(kiwi_h handle, kiwi_reader_w_t reader, void * userData, int minCnt, int maxWordLen, float minScore)
+{
+	if (!handle) return nullptr;
+	Kiwi* kiwi = (Kiwi*)handle;
+	try
+	{
+		auto res = kiwi->extractWords([&]()
+		{
+			auto idx = make_shared<int>(0);
+			return [&]()->u16string
+			{
+				u16string buf;
+				buf.resize((*reader)(*idx, nullptr, userData));
+				if (buf.empty()) return {};
+				(*reader)(*idx, (kchar16_t*)&buf[0], userData);
+				++* idx;
+				return buf;
+			};
+		}, minCnt, maxWordLen, minScore);
+
+		return (kiwi_ws_h)new pair<vector<KWordDetector::WordInfo>, ResultBuffer>{ move(res),{} };
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return nullptr;
+	}
+}
+
+kiwi_ws_h kiwi_extract_filter_words_w(kiwi_h handle, kiwi_reader_w_t reader, void * userData, int minCnt, int maxWordLen, float minScore, float posThreshold)
+{
+	if (!handle) return nullptr;
+	Kiwi* kiwi = (Kiwi*)handle;
+	try
+	{
+		auto res = kiwi->extractWords([&]()
+		{
+			auto idx = make_shared<int>(0);
+			return [&]()->u16string
+			{
+				u16string buf;
+				buf.resize((*reader)(*idx, nullptr, userData));
+				if (buf.empty()) return {};
+				(*reader)(*idx, (kchar16_t*)&buf[0], userData);
+				++* idx;
+				return buf;
+			};
+		}, minCnt, maxWordLen, minScore);
+		res = kiwi->filterExtractedWords(move(res), posThreshold);
+		return (kiwi_ws_h)new pair<vector<KWordDetector::WordInfo>, ResultBuffer>{ move(res),{} };
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return nullptr;
+	}
+}
+
+kiwi_ws_h kiwi_extract_add_words_w(kiwi_h handle, kiwi_reader_w_t reader, void * userData, int minCnt, int maxWordLen, float minScore, float posThreshold)
+{
+	if (!handle) return nullptr;
+	Kiwi* kiwi = (Kiwi*)handle;
+	try
+	{
+		auto res = kiwi->extractAddWords([&]()
+		{
+			auto idx = make_shared<int>(0);
+			return [&]()->u16string
+			{
+				u16string buf;
+				buf.resize((*reader)(*idx, nullptr, userData));
+				if (buf.empty()) return {};
+				(*reader)(*idx, (kchar16_t*)&buf[0], userData);
+				++* idx;
+				return buf;
+			};
+		}, minCnt, maxWordLen, minScore, posThreshold);
+		return (kiwi_ws_h)new pair<vector<KWordDetector::WordInfo>, ResultBuffer>{ move(res),{} };
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return nullptr;
+	}
+}
+
+int kiwi_prepare(kiwi_h handle)
 {
 	if (!handle) return KIWIERR_INVALID_HANDLE;
 	Kiwi* kiwi = (Kiwi*)handle;
@@ -239,28 +266,28 @@ int kiwi_prepare(PKIWI handle)
 	}
 }
 
-DECL_DLL void kiwi_setOption(PKIWI handle, int option, int value)
+DECL_DLL void kiwi_set_option(kiwi_h handle, int option, int value)
 {
 	if (!handle) return;
 	Kiwi* kiwi = (Kiwi*)handle;
 	kiwi->setOption(option, value);
 }
 
-DECL_DLL int kiwi_getOption(PKIWI handle, int option)
+DECL_DLL int kiwi_get_option(kiwi_h handle, int option)
 {
 	if (!handle) return KIWIERR_INVALID_HANDLE;
 	Kiwi* kiwi = (Kiwi*)handle;
 	return kiwi->getOption(option);
 }
 
-PKIWIRESULT kiwi_analyzeW(PKIWI handle, const kchar16_t * text, int topN)
+kiwi_res_h kiwi_analyze_w(kiwi_h handle, const kchar16_t * text, int topN, int matchOptions)
 {
 	if (!handle) return nullptr;
 	Kiwi* kiwi = (Kiwi*)handle;
 	try
 	{
-		auto result = new pair<vector<KResult>, ResultBuffer>{ kiwi->analyze((const char16_t*)text, topN), {} };
-		return (PKIWIRESULT)result;
+		auto result = new pair<vector<KResult>, ResultBuffer>{ kiwi->analyze((const char16_t*)text, topN, matchOptions), {} };
+		return (kiwi_res_h)result;
 	}
 	catch (...)
 	{
@@ -269,14 +296,14 @@ PKIWIRESULT kiwi_analyzeW(PKIWI handle, const kchar16_t * text, int topN)
 	}
 }
 
-PKIWIRESULT kiwi_analyze(PKIWI handle, const char * text, int topN)
+kiwi_res_h kiwi_analyze(kiwi_h handle, const char * text, int topN, int matchOptions)
 {
 	if (!handle) return nullptr;
 	Kiwi* kiwi = (Kiwi*)handle;
 	try
 	{
-		auto result = new pair<vector<KResult>, ResultBuffer>{ kiwi->analyze(text, topN),{} };
-		return (PKIWIRESULT)result;
+		auto result = new pair<vector<KResult>, ResultBuffer>{ kiwi->analyze(text, topN, matchOptions),{} };
+		return (kiwi_res_h)result;
 	}
 	catch (...)
 	{
@@ -285,24 +312,26 @@ PKIWIRESULT kiwi_analyze(PKIWI handle, const char * text, int topN)
 	}
 }
 
-int kiwi_analyzeMW(PKIWI handle, kiwi_readerW reader, kiwi_receiver receiver, void * userData, int topN)
+int kiwi_analyze_mw(kiwi_h handle, kiwi_reader_w_t reader, kiwi_receiver_t receiver, void * userData, int topN, int matchOptions)
 {
 	if (!handle) return KIWIERR_INVALID_HANDLE;
 	Kiwi* kiwi = (Kiwi*)handle;
 	try
 	{
-		kiwi->analyze(topN, [=](size_t id)->u16string
+		int idx = 0;
+		kiwi->analyze(topN, [&]() -> u16string
 		{
 			u16string buf;
-			buf.resize((*reader)(id, nullptr, userData));
+			buf.resize((*reader)(idx, nullptr, userData));
 			if (buf.empty()) return {};
-			(*reader)(id, (kchar16_t*)&buf[0], userData);
+			(*reader)(idx, (kchar16_t*)&buf[0], userData);
+			++idx;
 			return buf;
-		}, [=](size_t id, vector<KResult>&& res)
+		}, [&](size_t id, vector<KResult>&& res)
 		{
 			auto result = new pair<vector<KResult>, ResultBuffer>{ res, {} };
-			(*receiver)(id, (PKIWIRESULT)result, userData);
-		});
+			(*receiver)(id, (kiwi_res_h)result, userData);
+		}, matchOptions);
 		return 0;
 	}
 	catch (...)
@@ -312,24 +341,26 @@ int kiwi_analyzeMW(PKIWI handle, kiwi_readerW reader, kiwi_receiver receiver, vo
 	}
 }
 
-int kiwi_analyzeM(PKIWI handle, kiwi_reader reader, kiwi_receiver receiver, void * userData, int topN)
+int kiwi_analyze_m(kiwi_h handle, kiwi_reader_t reader, kiwi_receiver_t receiver, void * userData, int topN, int matchOptions)
 {
 	if (!handle) return KIWIERR_INVALID_HANDLE;
 	Kiwi* kiwi = (Kiwi*)handle;
 	try
 	{
-		kiwi->analyze(topN, [=](size_t id)->u16string
+		int idx = 0;
+		kiwi->analyze(topN, [&]() -> u16string
 		{
 			string buf;
-			buf.resize((*reader)(id, nullptr, userData));
+			buf.resize((*reader)(idx, nullptr, userData));
 			if (buf.empty()) return {};
-			(*reader)(id, &buf[0], userData);
+			(*reader)(idx, &buf[0], userData);
+			++idx;
 			return Kiwi::toU16(buf);
-		}, [=](size_t id, vector<KResult>&& res)
+		}, [&](size_t id, vector<KResult>&& res)
 		{
 			auto result = new pair<vector<KResult>, ResultBuffer>{ res,{} };
-			(*receiver)(id, (PKIWIRESULT)result, userData);
-		});
+			(*receiver)(id, (kiwi_res_h)result, userData);
+		}, matchOptions);
 		return 0;
 	}
 	catch (...)
@@ -339,24 +370,29 @@ int kiwi_analyzeM(PKIWI handle, kiwi_reader reader, kiwi_receiver receiver, void
 	}
 }
 
-int kiwi_performW(PKIWI handle, kiwi_readerW reader, kiwi_receiver receiver, void * userData, int topN, int minCnt, int maxWordLen, float minScore, float posThreshold)
+int kiwi_perform_w(kiwi_h handle, kiwi_reader_w_t reader, kiwi_receiver_t receiver, void * userData, int topN, int matchOptions, int minCnt, int maxWordLen, float minScore, float posThreshold)
 {
 	if (!handle) return KIWIERR_INVALID_HANDLE;
 	Kiwi* kiwi = (Kiwi*)handle;
 	try
 	{
-		kiwi->perform(topN, [=](size_t id)->u16string
+		kiwi->perform(topN, [&]()
 		{
-			u16string buf;
-			buf.resize((*reader)(id, nullptr, userData));
-			if (buf.empty()) return {};
-			(*reader)(id, (kchar16_t*)&buf[0], userData);
-			return buf;
-		}, [=](size_t id, vector<KResult>&& res)
+			auto idx = make_shared<int>(0);
+			return [&]() -> u16string
+			{
+				u16string buf;
+				buf.resize((*reader)(*idx, nullptr, userData));
+				if (buf.empty()) return {};
+				(*reader)(*idx, (kchar16_t*)&buf[0], userData);
+				++*idx;
+				return buf;
+			};
+		}, [&](size_t id, vector<KResult>&& res)
 		{
 			auto result = new pair<vector<KResult>, ResultBuffer>{ res,{} };
-			(*receiver)(id, (PKIWIRESULT)result, userData);
-		}, minCnt, maxWordLen, minScore, posThreshold);
+			(*receiver)(id, (kiwi_res_h)result, userData);
+		}, matchOptions, minCnt, maxWordLen, minScore, posThreshold);
 		return 0;
 	}
 	catch (...)
@@ -366,24 +402,29 @@ int kiwi_performW(PKIWI handle, kiwi_readerW reader, kiwi_receiver receiver, voi
 	}
 }
 
-int kiwi_perform(PKIWI handle, kiwi_reader reader, kiwi_receiver receiver, void * userData, int topN, int minCnt, int maxWordLen, float minScore, float posThreshold)
+int kiwi_perform(kiwi_h handle, kiwi_reader_t reader, kiwi_receiver_t receiver, void * userData, int topN, int matchOptions, int minCnt, int maxWordLen, float minScore, float posThreshold)
 {
 	if (!handle) return KIWIERR_INVALID_HANDLE;
 	Kiwi* kiwi = (Kiwi*)handle;
 	try
 	{
-		kiwi->perform(topN, [=](size_t id)->u16string
+		kiwi->perform(topN, [&]()
 		{
-			string buf;
-			buf.resize((*reader)(id, nullptr, userData));
-			if (buf.empty()) return {};
-			(*reader)(id, &buf[0], userData);
-			return Kiwi::toU16(buf);
-		}, [=](size_t id, vector<KResult>&& res)
+			auto idx = make_shared<int>(0);
+			return [&]() -> u16string
+			{
+				string buf;
+				buf.resize((*reader)(*idx, nullptr, userData));
+				if (buf.empty()) return {};
+				(*reader)(*idx, &buf[0], userData);
+				++*idx;
+				return Kiwi::toU16(buf);
+			};
+		}, [&](size_t id, vector<KResult>&& res)
 		{
 			auto result = new pair<vector<KResult>, ResultBuffer>{ res,{} };
-			(*receiver)(id, (PKIWIRESULT)result, userData);
-		}, minCnt, maxWordLen, minScore, posThreshold);
+			(*receiver)(id, (kiwi_res_h)result, userData);
+		}, matchOptions, minCnt, maxWordLen, minScore, posThreshold);
 		return 0;
 	}
 	catch (...)
@@ -393,23 +434,7 @@ int kiwi_perform(PKIWI handle, kiwi_reader reader, kiwi_receiver receiver, void 
 	}
 }
 
-int kiwi_clearCache(PKIWI handle)
-{
-	if (!handle) return KIWIERR_INVALID_HANDLE;
-	Kiwi* kiwi = (Kiwi*)handle;
-	try
-	{
-		kiwi->clearCache();
-		return 0;
-	}
-	catch (...)
-	{
-		currentError = current_exception();
-		return KIWIERR_FAIL;
-	}
-}
-
-int kiwi_close(PKIWI handle)
+int kiwi_close(kiwi_h handle)
 {
 	if (!handle) return KIWIERR_INVALID_HANDLE;
 	Kiwi* kiwi = (Kiwi*)handle;
@@ -425,7 +450,7 @@ int kiwi_close(PKIWI handle)
 	}
 }
 
-int kiwiResult_getSize(PKIWIRESULT result)
+int kiwi_res_size(kiwi_res_h result)
 {
 	if (!result) return KIWIERR_INVALID_HANDLE;
 	try
@@ -440,7 +465,7 @@ int kiwiResult_getSize(PKIWIRESULT result)
 	}
 }
 
-float kiwiResult_getProb(PKIWIRESULT result, int index)
+float kiwi_res_prob(kiwi_res_h result, int index)
 {
 	if (!result) return 0;
 	try
@@ -456,7 +481,7 @@ float kiwiResult_getProb(PKIWIRESULT result, int index)
 	}
 }
 
-int kiwiResult_getWordNum(PKIWIRESULT result, int index)
+int kiwi_res_word_num(kiwi_res_h result, int index)
 {
 	if (!result) return KIWIERR_INVALID_HANDLE;
 	try
@@ -472,14 +497,14 @@ int kiwiResult_getWordNum(PKIWIRESULT result, int index)
 	}
 }
 
-const kchar16_t * kiwiResult_getWordFormW(PKIWIRESULT result, int index, int num)
+const kchar16_t * kiwi_res_form_w(kiwi_res_h result, int index, int num)
 {
 	if (!result) return nullptr;
 	try
 	{
 		auto k = (pair<vector<KResult>, ResultBuffer>*)result;
 		if (index < 0 || index >= k->first.size() || num < 0 || num >= k->first[index].first.size()) return nullptr;
-		return (const kchar16_t*)k->first[index].first[num].str().c_str();
+		return (const kchar16_t*)k->first[index].first[num].str.c_str();
 	}
 	catch (...)
 	{
@@ -488,14 +513,14 @@ const kchar16_t * kiwiResult_getWordFormW(PKIWIRESULT result, int index, int num
 	}
 }
 
-const kchar16_t * kiwiResult_getWordTagW(PKIWIRESULT result, int index, int num)
+const kchar16_t * kiwi_res_tag_w(kiwi_res_h result, int index, int num)
 {
 	if (!result) return nullptr;
 	try
 	{
 		auto k = (pair<vector<KResult>, ResultBuffer>*)result;
 		if (index < 0 || index >= k->first.size() || num < 0 || num >= k->first[index].first.size()) return nullptr;
-		return (const kchar16_t*)tagToStringW(k->first[index].first[num].tag());
+		return (const kchar16_t*)tagToKString(k->first[index].first[num].tag);
 	}
 	catch (...)
 	{
@@ -504,14 +529,14 @@ const kchar16_t * kiwiResult_getWordTagW(PKIWIRESULT result, int index, int num)
 	}
 }
 
-const char * kiwiResult_getWordForm(PKIWIRESULT result, int index, int num)
+const char * kiwi_res_form(kiwi_res_h result, int index, int num)
 {
 	if (!result) return nullptr;
 	try
 	{
 		auto k = (pair<vector<KResult>, ResultBuffer>*)result;
 		if (index < 0 || index >= k->first.size() || num < 0 || num >= k->first[index].first.size()) return nullptr;
-		k->second.stringBuf.emplace_back(Kiwi::toU8(k->first[index].first[num].str()));
+		k->second.stringBuf.emplace_back(Kiwi::toU8(k->first[index].first[num].str));
 		return k->second.stringBuf.back().c_str();
 	}
 	catch (...)
@@ -521,14 +546,14 @@ const char * kiwiResult_getWordForm(PKIWIRESULT result, int index, int num)
 	}
 }
 
-const char * kiwiResult_getWordTag(PKIWIRESULT result, int index, int num)
+const char * kiwi_res_tag(kiwi_res_h result, int index, int num)
 {
 	if (!result) return nullptr;
 	try
 	{
 		auto k = (pair<vector<KResult>, ResultBuffer>*)result;
 		if (index < 0 || index >= k->first.size() || num < 0 || num >= k->first[index].first.size()) return nullptr;
-		return tagToString(k->first[index].first[num].tag());
+		return tagToString(k->first[index].first[num].tag);
 	}
 	catch (...)
 	{
@@ -537,14 +562,14 @@ const char * kiwiResult_getWordTag(PKIWIRESULT result, int index, int num)
 	}
 }
 
-int kiwiResult_getWordPosition(PKIWIRESULT result, int index, int num)
+int kiwi_res_position(kiwi_res_h result, int index, int num)
 {
 	if (!result) return -1;
 	try
 	{
 		auto k = (pair<vector<KResult>, ResultBuffer>*)result;
 		if (index < 0 || index >= k->first.size() || num < 0 || num >= k->first[index].first.size()) return -1;
-		return k->first[index].first[num].pos();
+		return k->first[index].first[num].position;
 	}
 	catch (...)
 	{
@@ -553,14 +578,14 @@ int kiwiResult_getWordPosition(PKIWIRESULT result, int index, int num)
 	}
 }
 
-int kiwiResult_getWordLength(PKIWIRESULT result, int index, int num)
+int kiwi_res_length(kiwi_res_h result, int index, int num)
 {
 	if (!result) return -1;
 	try
 	{
 		auto k = (pair<vector<KResult>, ResultBuffer>*)result;
 		if (index < 0 || index >= k->first.size() || num < 0 || num >= k->first[index].first.size()) return -1;
-		return k->first[index].first[num].len();
+		return k->first[index].first[num].length;
 	}
 	catch (...)
 	{
@@ -569,7 +594,7 @@ int kiwiResult_getWordLength(PKIWIRESULT result, int index, int num)
 	}
 }
 
-int kiwiResult_close(PKIWIRESULT result)
+int kiwi_res_close(kiwi_res_h result)
 {
 	if (!result) return KIWIERR_INVALID_HANDLE;
 	try
@@ -585,7 +610,7 @@ int kiwiResult_close(PKIWIRESULT result)
 	}
 }
 
-int kiwiWords_getSize(PKIWIWORDS result)
+int kiwi_ws_size(kiwi_ws_h result)
 {
 	if (!result) return KIWIERR_INVALID_HANDLE;
 	try
@@ -600,7 +625,7 @@ int kiwiWords_getSize(PKIWIWORDS result)
 	}
 }
 
-const kchar16_t * kiwiWords_getWordFormW(PKIWIWORDS result, int index)
+const kchar16_t * kiwi_ws_form_w(kiwi_ws_h result, int index)
 {
 	if (!result) return nullptr;
 	try
@@ -616,7 +641,7 @@ const kchar16_t * kiwiWords_getWordFormW(PKIWIWORDS result, int index)
 	}
 }
 
-const char * kiwiWords_getWordForm(PKIWIWORDS result, int index)
+const char * kiwi_ws_form(kiwi_ws_h result, int index)
 {
 	if (!result) return nullptr;
 	try
@@ -633,7 +658,7 @@ const char * kiwiWords_getWordForm(PKIWIWORDS result, int index)
 	}
 }
 
-float kiwiWords_getScore(PKIWIWORDS result, int index)
+float kiwi_ws_score(kiwi_ws_h result, int index)
 {
 	if (!result) return NAN;
 	try
@@ -649,7 +674,7 @@ float kiwiWords_getScore(PKIWIWORDS result, int index)
 	}
 }
 
-int kiwiWords_getFreq(PKIWIWORDS result, int index)
+int kiwi_ws_freq(kiwi_ws_h result, int index)
 {
 	if (!result) return KIWIERR_INVALID_HANDLE;
 	try
@@ -665,14 +690,14 @@ int kiwiWords_getFreq(PKIWIWORDS result, int index)
 	}
 }
 
-float kiwiWords_getPosScore(PKIWIWORDS result, int index)
+float kiwi_ws_pos_score(kiwi_ws_h result, int index)
 {
 	if (!result) return NAN;
 	try
 	{
 		auto k = (pair<vector<KWordDetector::WordInfo>, ResultBuffer>*)result;
 		if (index < 0 || index >= k->first.size()) return NAN;
-		return k->first[index].posScore[KPOSTag::NNP];
+		return k->first[index].posScore[POSTag::nnp];
 	}
 	catch (...)
 	{
@@ -681,7 +706,7 @@ float kiwiWords_getPosScore(PKIWIWORDS result, int index)
 	}
 }
 
-int kiwiWords_close(PKIWIWORDS result)
+int kiwi_ws_close(kiwi_ws_h result)
 {
 	if (!result) return KIWIERR_INVALID_HANDLE;
 	try

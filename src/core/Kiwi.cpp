@@ -1,4 +1,7 @@
-﻿#include <future>
+﻿#include <iostream>
+#include <fstream>
+#include <future>
+
 #include "Kiwi.h"
 #include "Utils.h"
 #include "KFeatureTestor.h"
@@ -25,12 +28,12 @@ Kiwi::Kiwi(const char * modelPath, size_t _maxCache, size_t _numThread, size_t o
 #else
 	{
 		ifstream ifs{ modelPath + string{ "extract.mdl" }, ios_base::binary };
-		if (ifs.fail()) throw KiwiException{ std::string{"[Kiwi] Failed to find model file '"} +modelPath + "extract.mdl'." };
+		if (ifs.fail()) throw Exception{ std::string{"[Kiwi] Failed to find model file '"} +modelPath + "extract.mdl'." };
 		detector.loadPOSModel(ifs);
 		detector.loadNounTailModel(ifs);
 	}
 #endif
-	mdl = kiwi::make_unique<KModelMgr>(modelPath);
+	mdl = make_unique<KModelMgr>(modelPath);
 
 	if (options & LOAD_DEFAULT_DICT)
 	{
@@ -39,10 +42,10 @@ Kiwi::Kiwi(const char * modelPath, size_t _maxCache, size_t _numThread, size_t o
 
 	integrateAllomorph = options & INTEGRATE_ALLOMORPH;
 
-	pm = kiwi::make_unique<PatternMatcher>();
+	pm = PatternMatcher::create();
 }
 
-int Kiwi::addUserWord(const u16string & str, KPOSTag tag, float userScore)
+int Kiwi::addUserWord(const u16string & str, POSTag tag, float userScore)
 {
 	mdl->addUserWord(normalizeHangul({ str.begin(), str.end() }), tag, userScore);
 	return 0;
@@ -52,27 +55,27 @@ int Kiwi::addUserWord(const u16string & str, KPOSTag tag, float userScore)
 int Kiwi::loadUserDictionary(const char * userDictPath)
 {
 	ifstream ifs{ userDictPath };
-	if (ifs.fail()) throw KiwiException(std::string{ "[loadUserDictionary] Failed to open '" } +userDictPath + "'");
+	if (ifs.fail()) throw Exception(std::string{ "[loadUserDictionary] Failed to open '" } +userDictPath + "'");
 	ifs.exceptions(std::istream::badbit);
 	string line;
 	while (getline(ifs, line))
 	{
-		auto wstr = utf8_to_utf16(line);
+		auto wstr = utf8To16(line);
 		if (wstr[0] == u'#') continue;
 		auto chunks = split(wstr, u'\t');
 		if (chunks.size() < 2) continue;
 		if (!chunks[1].empty()) 
 		{
-			auto pos = makePOSTag(chunks[1]);
+			auto pos = toPOSTag(chunks[1]);
 			float score = 0.f;
 			if (chunks.size() > 2) score = stof(chunks[2].begin(), chunks[2].end());
-			if (pos != KPOSTag::MAX)
+			if (pos != POSTag::max)
 			{
 				addUserWord(chunks[0], pos, score);
 			}
 			else
 			{
-				throw KiwiException("[loadUserDictionary] Unknown Tag '" + utf16_to_utf8(chunks[1]) + "'");
+				throw Exception("[loadUserDictionary] Unknown Tag '" + utf16To8(chunks[1]) + "'");
 			}
 		}
 	}
@@ -82,7 +85,7 @@ int Kiwi::loadUserDictionary(const char * userDictPath)
 int Kiwi::prepare()
 {
 	mdl->solidify();
-	workers = unique_ptr<ThreadPool>{ new ThreadPool{ numThreads, numThreads * 64 } };
+	workers = make_unique<utils::ThreadPool>(numThreads, numThreads * 64);
 	return 0;
 }
 
@@ -91,7 +94,7 @@ void Kiwi::setCutOffThreshold(float _cutOffThreshold)
 	cutOffThreshold = std::max(_cutOffThreshold, 1.f);
 }
 
-int kiwi::Kiwi::getOption(size_t option) const
+int Kiwi::getOption(size_t option) const
 {
 	if (option == INTEGRATE_ALLOMORPH)
 	{
@@ -100,7 +103,7 @@ int kiwi::Kiwi::getOption(size_t option) const
 	return 0;
 }
 
-void kiwi::Kiwi::setOption(size_t option, int value)
+void Kiwi::setOption(size_t option, int value)
 {
 	if (option == INTEGRATE_ALLOMORPH)
 	{
@@ -108,7 +111,7 @@ void kiwi::Kiwi::setOption(size_t option, int value)
 	}
 }
 
-vector<KWordDetector::WordInfo> Kiwi::extractWords(const function<u16string(size_t)>& reader, size_t minCnt, size_t maxWordLen, float minScore)
+vector<KWordDetector::WordInfo> Kiwi::extractWords(const U16MultipleReader& reader, size_t minCnt, size_t maxWordLen, float minScore)
 {
 	detector.setParameters(minCnt, maxWordLen, minScore);
 	return detector.extractWords(reader);
@@ -116,25 +119,25 @@ vector<KWordDetector::WordInfo> Kiwi::extractWords(const function<u16string(size
 
 vector<KWordDetector::WordInfo> Kiwi::filterExtractedWords(vector<KWordDetector::WordInfo>&& words, float posThreshold) const
 {
-	auto old = kiwi::make_unique<KModelMgr>(*mdl);
+	auto old = make_unique<KModelMgr>(*mdl);
 	swap(old, const_cast<Kiwi*>(this)->mdl);
 	const_cast<Kiwi*>(this)->prepare();
 	
 	const auto& specialChrTest = [](const u16string& form) -> bool
 	{
-		KPOSTag pos;
+		POSTag pos;
 		switch (pos = identifySpecialChr(form.back()))
 		{
-		case KPOSTag::SF:
-		case KPOSTag::SP:
-		case KPOSTag::SS:
-		case KPOSTag::SE:
-		case KPOSTag::SO:
-		case KPOSTag::SW:
+		case POSTag::sf:
+		case POSTag::sp:
+		case POSTag::ss:
+		case POSTag::se:
+		case POSTag::so:
+		case POSTag::sw:
 			return false;
-		case KPOSTag::SL:
-		case KPOSTag::SN:
-		case KPOSTag::SH:
+		case POSTag::sl:
+		case POSTag::sn:
+		case POSTag::sh:
 			if (all_of(form.begin(), form.end(), [pos](char16_t c) {
 				return pos == identifySpecialChr(c);
 			})) return false;
@@ -146,7 +149,7 @@ vector<KWordDetector::WordInfo> Kiwi::filterExtractedWords(vector<KWordDetector:
 	auto allForms = mdl->getAllForms();
 	for (auto& r : words)
 	{
-		if (r.posScore[KPOSTag::NNP] < posThreshold || !r.posScore[KPOSTag::NNP]) continue;
+		if (r.posScore[POSTag::nnp] < posThreshold || !r.posScore[POSTag::nnp]) continue;
 		char16_t bracket = 0;
 		switch (r.form.back())
 		{
@@ -189,10 +192,10 @@ vector<KWordDetector::WordInfo> Kiwi::filterExtractedWords(vector<KWordDetector:
 			auto normForm = normalizeHangul(r.form);
 			if (allForms.count(normForm)) continue;
 
-			KResult kr = analyze(r.form, 0);
-			if (any_of(kr.first.begin(), kr.first.end(), [](const KWordPair& kp)
+			KResult kr = analyze(r.form, Match::none);
+			if (any_of(kr.first.begin(), kr.first.end(), [](const TokenInfo& kp)
 			{
-				return KPOSTag::JKS <= kp.tag() && kp.tag() <= KPOSTag::ETM;
+				return POSTag::jks <= kp.tag && kp.tag <= POSTag::etm;
 			}) && kr.second >= -35)
 			{
 				continue;
@@ -210,10 +213,10 @@ vector<KWordDetector::WordInfo> Kiwi::filterExtractedWords(vector<KWordDetector:
 			auto subNormForm = normalizeHangul(subForm);
 			if (allForms.count(subNormForm)) continue;
 
-			KResult kr = analyze(subForm, 0);
-			if (any_of(kr.first.begin(), kr.first.end(), [](const KWordPair& kp)
+			KResult kr = analyze(subForm, Match::none);
+			if (any_of(kr.first.begin(), kr.first.end(), [](const TokenInfo& kp)
 			{
-				return KPOSTag::JKS <= kp.tag() && kp.tag() <= KPOSTag::ETM;
+				return POSTag::jks <= kp.tag && kp.tag <= POSTag::etm;
 			}) && kr.second >= -35)
 			{
 				continue;
@@ -228,13 +231,13 @@ vector<KWordDetector::WordInfo> Kiwi::filterExtractedWords(vector<KWordDetector:
 	return ret;
 }
 
-vector<KWordDetector::WordInfo> Kiwi::extractAddWords(const function<u16string(size_t)>& reader, size_t minCnt, size_t maxWordLen, float minScore, float posThreshold)
+vector<KWordDetector::WordInfo> Kiwi::extractAddWords(const U16MultipleReader& reader, size_t minCnt, size_t maxWordLen, float minScore, float posThreshold)
 {
 	detector.setParameters(minCnt, maxWordLen, minScore);
 	auto ret = filterExtractedWords(detector.extractWords(reader), posThreshold);
 	for (auto& r : ret)
 	{
-		addUserWord(r.form, KPOSTag::NNP, 10.f);
+		addUserWord(r.form, POSTag::nnp, 10.f);
 	}
 	return ret;
 }
@@ -269,13 +272,13 @@ struct MInfo
 {
 	WID wid;
 	uint8_t combineSocket;
-	KCondVowel condVowel;
-	KCondPolarity condPolar;
+	CondVowel condVowel;
+	CondPolarity condPolar;
 	uint8_t ownFormId;
 	uint32_t lastPos;
 	MInfo(WID _wid = 0, uint8_t _combineSocket = 0,
-		KCondVowel _condVowel = KCondVowel::none,
-		KCondPolarity _condPolar = KCondPolarity::none,
+		CondVowel _condVowel = CondVowel::none,
+		CondPolarity _condPolar = CondPolarity::none,
 		uint8_t _ownFormId = 0, uint32_t _lastPos = 0)
 		: wid(_wid), combineSocket(_combineSocket),
 		condVowel(_condVowel), condPolar(_condPolar), ownFormId(_ownFormId), lastPos(_lastPos)
@@ -283,8 +286,8 @@ struct MInfo
 };
 
 struct WordLL;
-using MInfos = mvector<MInfo>;
-using WordLLs = mvector<WordLL>;
+using MInfos = Vector<MInfo>;
+using WordLLs = Vector<WordLL>;
 
 struct WordLL
 {
@@ -323,7 +326,7 @@ auto findNthLargest(_Iter first, _Iter last, size_t nth, _Key&& fn, _Filter&& fi
 {
 	using KeyType = decltype(fn(*first));
 
-	mvector<KeyType> v;
+	Vector<KeyType> v;
 	for (; first != last; ++first)
 	{
 		if(filter(*first)) v.emplace_back(fn(*first));
@@ -334,8 +337,8 @@ auto findNthLargest(_Iter first, _Iter last, size_t nth, _Key&& fn, _Filter&& fi
 }
 
 template<class _Type>
-void evalTrigram(const KNLangModel::Node* rootNode, const KMorpheme* morphBase, const mvector<k_string>& ownForms, const WordLL** wBegin, const WordLL** wEnd, 
-	array<WID, 4> seq, size_t chSize, const KMorpheme* curMorph, const KGraphNode* node, _Type& maxWidLL)
+void evalTrigram(const KNLangModel::Node* rootNode, const Morpheme* morphBase, const Vector<KString>& ownForms, const WordLL** wBegin, const WordLL** wEnd, 
+	array<WID, 4> seq, size_t chSize, const Morpheme* curMorph, const KGraphNode* node, _Type& maxWidLL)
 {
 	for (; wBegin != wEnd; ++wBegin)
 	{
@@ -343,7 +346,7 @@ void evalTrigram(const KNLangModel::Node* rootNode, const KMorpheme* morphBase, 
 		float candScore = (*wBegin)->accScore;
 		if (wids->back().combineSocket)
 		{
-			// always merge <V> <chunk> with the same socket
+			// always merge <v> <chunk> with the same socket
 			if (wids->back().combineSocket != curMorph->combineSocket || !curMorph->chunks)
 			{
 				continue;
@@ -380,28 +383,28 @@ void evalTrigram(const KNLangModel::Node* rootNode, const KMorpheme* morphBase, 
 	}
 }
 
-mvector<pair<Kiwi::path, float>> Kiwi::findBestPath(const mvector<KGraphNode>& graph, const KNLangModel * knlm, const KMorpheme* morphBase, size_t topN) const
+Vector<pair<Kiwi::Path, float>> Kiwi::findBestPath(const Vector<KGraphNode>& graph, const KNLangModel * knlm, const Morpheme* morphBase, size_t topN) const
 {
-	mvector<WordLLs> cache(graph.size());
+	Vector<WordLLs> cache(graph.size());
 	const KGraphNode* startNode = &graph.front();
 	const KGraphNode* endNode = &graph.back();
-	mvector<k_string> ownFormList;
+	Vector<KString> ownFormList;
 
-	vector<const KMorpheme*> unknownNodeCands, unknownNodeLCands;
-	unknownNodeCands.emplace_back(morphBase + (size_t)KPOSTag::NNG + 1);
-	unknownNodeCands.emplace_back(morphBase + (size_t)KPOSTag::NNP + 1);
+	vector<const Morpheme*> unknownNodeCands, unknownNodeLCands;
+	unknownNodeCands.emplace_back(morphBase + (size_t)POSTag::nng + 1);
+	unknownNodeCands.emplace_back(morphBase + (size_t)POSTag::nnp + 1);
 
-	unknownNodeLCands.emplace_back(morphBase + (size_t)KPOSTag::NNP + 1);
+	unknownNodeLCands.emplace_back(morphBase + (size_t)POSTag::nnp + 1);
 
-	const auto& evalPath = [&, this](const KGraphNode* node, size_t i, size_t ownFormId, const vector<const KMorpheme*>& cands, bool unknownForm)
+	const auto& evalPath = [&, this](const KGraphNode* node, size_t i, size_t ownFormId, const vector<const Morpheme*>& cands, bool unknownForm)
 	{
 		float tMax = -INFINITY;
 		for (auto& curMorph : cands)
 		{
 			array<WID, 4> seq = { 0, };
 			uint8_t combSocket = 0;
-			KCondVowel condV = KCondVowel::none;
-			KCondPolarity condP = KCondPolarity::none;
+			CondVowel condV = CondVowel::none;
+			CondPolarity condP = CondPolarity::none;
 			size_t chSize = 1;
 			bool isUserWord = false;
 			bool leftBoundary = !node->getPrev(0)->lastPos || 
@@ -431,12 +434,12 @@ mvector<pair<Kiwi::path, float>> Kiwi::findBestPath(const mvector<KGraphNode>& g
 			condV = curMorph->vowel;
 			condP = curMorph->polar;
 
-			munordered_map<WID, mvector<WordLLP>> maxWidLL;
-			mvector<const WordLL*> works;
+			UnorderedMap<WID, Vector<WordLLP>> maxWidLL;
+			Vector<const WordLL*> works;
 			works.reserve(8);
 			float discountForCombining = 0;
 
-			for (size_t i = 0; i < KGraphNode::MAX_PREV; ++i)
+			for (size_t i = 0; i < KGraphNode::max_prev; ++i)
 			{
 				auto* prev = node->getPrev(i);
 				if (!prev) break;
@@ -457,9 +460,9 @@ mvector<pair<Kiwi::path, float>> Kiwi::findBestPath(const mvector<KGraphNode>& g
 			else if (unknownForm)
 			{
 				size_t unknownLen = node->uform.empty() ? node->form->form.size() : node->uform.size();
-				if (curMorph->tag == KPOSTag::NNG) estimatedLL = LogPoisson::getLL(4.622955f, unknownLen);
-				else if (curMorph->tag == KPOSTag::NNP) estimatedLL = LogPoisson::getLL(5.177622f, unknownLen);
-				else if (curMorph->tag == KPOSTag::MAG) estimatedLL = LogPoisson::getLL(4.557326f, unknownLen);
+				if (curMorph->tag == POSTag::nng) estimatedLL = LogPoisson::getLL(4.622955f, unknownLen);
+				else if (curMorph->tag == POSTag::nnp) estimatedLL = LogPoisson::getLL(5.177622f, unknownLen);
+				else if (curMorph->tag == POSTag::mag) estimatedLL = LogPoisson::getLL(4.557326f, unknownLen);
 				estimatedLL -= 5 + unknownLen * 3;
 			}
 
@@ -494,7 +497,7 @@ mvector<pair<Kiwi::path, float>> Kiwi::findBestPath(const mvector<KGraphNode>& g
 						if (curMorph->combineSocket)
 						{
 							wids.back() = MInfo{ (WID)(morphBase[wids.back().wid].getCombined() - morphBase),
-								0, KCondVowel::none, KCondPolarity::none, 0, wids.back().lastPos};
+								0, CondVowel::none, CondPolarity::none, 0, wids.back().lastPos};
 							lastPos += morphBase[seq[0]].kform->size() - 1;
 							for (size_t ch = 1; ch < chSize; ++ch)
 							{
@@ -514,7 +517,7 @@ mvector<pair<Kiwi::path, float>> Kiwi::findBestPath(const mvector<KGraphNode>& g
 					else
 					{
 						wids.emplace_back(isUserWord ? curMorph - morphBase : seq[0], 
-							combSocket, KCondVowel::none, KCondPolarity::none, ownFormId, node->lastPos);
+							combSocket, CondVowel::none, CondPolarity::none, ownFormId, node->lastPos);
 					}
 				}
 			}
@@ -540,7 +543,7 @@ mvector<pair<Kiwi::path, float>> Kiwi::findBestPath(const mvector<KGraphNode>& g
 		if (node->form)
 		{
 			tMax = evalPath(node, i, ownFormId, node->form->candidate, false);
-			if (all_of(node->form->candidate.begin(), node->form->candidate.end(), [](const KMorpheme* m)
+			if (all_of(node->form->candidate.begin(), node->form->candidate.end(), [](const Morpheme* m)
 			{
 				return m->combineSocket || m->chunks;
 			}))
@@ -609,7 +612,7 @@ mvector<pair<Kiwi::path, float>> Kiwi::findBestPath(const mvector<KGraphNode>& g
 	}
 
 	// end node
-	for (size_t i = 0; i < KGraphNode::MAX_PREV; ++i)
+	for (size_t i = 0; i < KGraphNode::max_prev; ++i)
 	{
 		auto* prev = endNode->getPrev(i);
 		if (!prev) break;
@@ -641,14 +644,14 @@ mvector<pair<Kiwi::path, float>> Kiwi::findBestPath(const mvector<KGraphNode>& g
 
 #endif
 
-	mvector<pair<path, float>> ret;
+	Vector<pair<Path, float>> ret;
 	for (size_t i = 0; i < min(topN, cand.size()); ++i)
 	{
-		path mv(cand[i].morphs.size() - 1);
+		Path mv(cand[i].morphs.size() - 1);
 		transform(cand[i].morphs.begin() + 1, cand[i].morphs.end(), mv.begin(), [morphBase, &ownFormList](const MInfo& m)
 		{
 			if (m.ownFormId)	return make_tuple(morphBase + m.wid, ownFormList[m.ownFormId - 1], m.lastPos);
-			else return make_tuple(morphBase + m.wid, k_string{}, m.lastPos);
+			else return make_tuple(morphBase + m.wid, KString{}, m.lastPos);
 		});
 		ret.emplace_back(mv, cand[i].accScore);
 	}
@@ -656,22 +659,22 @@ mvector<pair<Kiwi::path, float>> Kiwi::findBestPath(const mvector<KGraphNode>& g
 }
 
 
-KResult Kiwi::analyze(const u16string & str, size_t matchOptions) const
+KResult Kiwi::analyze(const u16string & str, Match matchOptions) const
 {
 	return analyze(str, 1, matchOptions)[0];
 }
 
-KResult Kiwi::analyze(const string & str, size_t matchOptions) const
+KResult Kiwi::analyze(const string & str, Match matchOptions) const
 {
-	return analyze(utf8_to_utf16(str), matchOptions);
+	return analyze(utf8To16(str), matchOptions);
 }
 
-vector<KResult> Kiwi::analyze(const string & str, size_t topN, size_t matchOptions) const
+vector<KResult> Kiwi::analyze(const string & str, size_t topN, Match matchOptions) const
 {
-	return analyze(utf8_to_utf16(str), topN, matchOptions);
+	return analyze(utf8To16(str), topN, matchOptions);
 }
 
-future<vector<KResult>> Kiwi::asyncAnalyze(const string & str, size_t topN, size_t matchOptions) const
+future<vector<KResult>> Kiwi::asyncAnalyze(const string & str, size_t topN, Match matchOptions) const
 {
 	return workers->enqueue([&, str, topN, matchOptions](size_t)
 	{
@@ -679,7 +682,7 @@ future<vector<KResult>> Kiwi::asyncAnalyze(const string & str, size_t topN, size
 	});
 }
 
-void Kiwi::analyze(size_t topN, const function<u16string(size_t)>& reader, const function<void(size_t, vector<KResult>&&)>& receiver, size_t matchOptions) const
+void Kiwi::analyze(size_t topN, const U16Reader& reader, const function<void(size_t, vector<KResult>&&)>& receiver, Match matchOptions) const
 {
 	if (numThreads > 1)
 	{
@@ -711,7 +714,7 @@ void Kiwi::analyze(size_t topN, const function<u16string(size_t)>& reader, const
 		{
 			for (id = 0; ; ++id)
 			{
-				auto ustr = reader(id);
+				auto ustr = reader();
 				if (ustr.empty()) break;
 
 				sharedResult.consumeResult(receiver);
@@ -732,7 +735,7 @@ void Kiwi::analyze(size_t topN, const function<u16string(size_t)>& reader, const
 	{
 		for (size_t id = 0; ; ++id)
 		{
-			auto ustr = reader(id);
+			auto ustr = reader();
 			if (ustr.empty()) break;
 			auto r = analyze(ustr, topN, matchOptions);
 			receiver(id, move(r));
@@ -740,26 +743,26 @@ void Kiwi::analyze(size_t topN, const function<u16string(size_t)>& reader, const
 	}
 }
 
-void Kiwi::perform(size_t topN, const function<u16string(size_t)>& reader, const function<void(size_t, vector<KResult>&&)>& receiver, size_t matchOptions, size_t minCnt, size_t maxWordLen, float minScore, float posThreshold) const
+void Kiwi::perform(size_t topN, const U16MultipleReader& reader, const function<void(size_t, vector<KResult>&&)>& receiver, Match matchOptions, size_t minCnt, size_t maxWordLen, float minScore, float posThreshold) const
 {
-	auto old = kiwi::make_unique<KModelMgr>(*mdl);
+	auto old = make_unique<KModelMgr>(*mdl);
 	swap(old, const_cast<Kiwi*>(this)->mdl);
 	const_cast<Kiwi*>(this)->extractAddWords(reader, minCnt, maxWordLen, minScore, posThreshold);
 	const_cast<Kiwi*>(this)->prepare();
-	analyze(topN, reader, receiver, matchOptions);
+	analyze(topN, reader(), receiver, matchOptions);
 	swap(old, const_cast<Kiwi*>(this)->mdl);
 }
 
-std::vector<KResult> Kiwi::analyzeSent(const std::u16string::const_iterator & sBegin, const std::u16string::const_iterator & sEnd, size_t topN, size_t matchOptions) const
+std::vector<KResult> Kiwi::analyzeSent(const std::u16string::const_iterator & sBegin, const std::u16string::const_iterator & sEnd, size_t topN, Match matchOptions) const
 {
 	auto nstr = normalizeHangul({ sBegin, sEnd });
-	mvector<uint32_t> posMap(nstr.size() + 1);
+	Vector<uint32_t> posMap(nstr.size() + 1);
 	for (size_t i = 0; i < nstr.size(); ++i)
 	{
 		posMap[i + 1] = posMap[i] + (isHangulCoda(nstr[i]) ? 0 : 1);
 	}
 
-	auto nodes = mdl->getTrie()->split(nstr, pm.get(), matchOptions);
+	auto nodes = splitByTrie(mdl->fTrie, nstr, pm.get(), matchOptions);
 	vector<KResult> ret;
 	if (nodes.size() <= 2)
 	{
@@ -769,8 +772,8 @@ std::vector<KResult> Kiwi::analyzeSent(const std::u16string::const_iterator & sB
 	auto res = findBestPath(nodes, mdl->getLangModel(), mdl->getMorphemes(), topN);
 	for (auto&& r : res)
 	{
-		vector<KWordPair> rarr;
-		const k_string* prevMorph = nullptr;
+		vector<TokenInfo> rarr;
+		const KString* prevMorph = nullptr;
 		for (auto&& s : r.first)
 		{
 			if (!get<1>(s).empty() && get<1>(s)[0] == ' ') continue;
@@ -779,7 +782,7 @@ std::vector<KResult> Kiwi::analyzeSent(const std::u16string::const_iterator & sB
 			{
 				if (!integrateAllomorph)
 				{
-					if (KPOSTag::EP <= get<0>(s)->tag && get<0>(s)->tag <= KPOSTag::ETM)
+					if (POSTag::ep <= get<0>(s)->tag && get<0>(s)->tag <= POSTag::etm)
 					{
 						if ((*get<0>(s)->kform)[0] == u'어')
 						{
@@ -788,7 +791,7 @@ std::vector<KResult> Kiwi::analyzeSent(const std::u16string::const_iterator & sB
 								joined = joinHangul(u"여" + get<0>(s)->kform->substr(1));
 								break;
 							}
-							else if (KFeatureTestor::isMatched(prevMorph, KCondPolarity::positive))
+							else if (KFeatureTestor::isMatched(prevMorph, CondPolarity::positive))
 							{
 								joined = joinHangul(u"아" + get<0>(s)->kform->substr(1));
 								break;
@@ -798,12 +801,13 @@ std::vector<KResult> Kiwi::analyzeSent(const std::u16string::const_iterator & sB
 				}
 				joined = joinHangul(get<1>(s).empty() ? *get<0>(s)->kform : get<1>(s));
 			} while (0);
-			rarr.emplace_back(joined, get<0>(s)->tag, 0, 0);
+			rarr.emplace_back(joined, get<0>(s)->tag);
+			rarr.back().morph = get<0>(s);
 			size_t nlen = (get<1>(s).empty() ? *get<0>(s)->kform : get<1>(s)).size();
 			size_t nlast = get<2>(s);
 			size_t nllast = min(max(nlast, nlen) - nlen, posMap.size() - 1);
-			rarr.back().pos() = posMap[nllast];
-			rarr.back().len() = posMap[min(nlast, posMap.size() - 1)] - posMap[nllast];
+			rarr.back().position = posMap[nllast];
+			rarr.back().length = posMap[min(nlast, posMap.size() - 1)] - posMap[nllast];
 			prevMorph = get<0>(s)->kform;
 		}
 		ret.emplace_back(rarr, r.second);
@@ -812,16 +816,16 @@ std::vector<KResult> Kiwi::analyzeSent(const std::u16string::const_iterator & sB
 	return ret;
 }
 
-vector<KResult> Kiwi::analyze(const u16string & str, size_t topN, size_t matchOptions) const
+vector<KResult> Kiwi::analyze(const u16string & str, size_t topN, Match matchOptions) const
 {
-	if (!mdl->getTrie()) throw KiwiException("Model should be prepared before analyzing.");
+	if (!mdl->ready()) throw Exception("Model should be prepared before analyzing.");
 	auto chunk = str.begin();
-	mvector<u16string::const_iterator> sents;
+	Vector<u16string::const_iterator> sents;
 	sents.emplace_back(chunk);
 	while (chunk != str.end())
 	{
-		KPOSTag tag = identifySpecialChr(*chunk);
-		while (chunk != str.end() && !(tag == KPOSTag::SF || tag == KPOSTag::SS || tag == KPOSTag::SE || tag == KPOSTag::SW || *chunk == u':'))
+		POSTag tag = identifySpecialChr(*chunk);
+		while (chunk != str.end() && !(tag == POSTag::sf || tag == POSTag::ss || tag == POSTag::se || tag == POSTag::sw || *chunk == u':'))
 		{
 			++chunk;
 			if (chunk - sents.back() >= 512)
@@ -834,14 +838,14 @@ vector<KResult> Kiwi::analyze(const u16string & str, size_t topN, size_t matchOp
 		}
 		if (chunk == str.end()) break;
 		++chunk;
-		if (tag == KPOSTag::SE)
+		if (tag == POSTag::se)
 		{
 			sents.emplace_back(chunk);
 			continue;
 		}
-		if (chunk != str.end() && (identifySpecialChr(*chunk) == KPOSTag::UNKNOWN || identifySpecialChr(*chunk) == KPOSTag::SF))
+		if (chunk != str.end() && (identifySpecialChr(*chunk) == POSTag::unknown || identifySpecialChr(*chunk) == POSTag::sf))
 		{
-			while (chunk != str.end() && (identifySpecialChr(*chunk) == KPOSTag::UNKNOWN || identifySpecialChr(*chunk) == KPOSTag::SF))
+			while (chunk != str.end() && (identifySpecialChr(*chunk) == POSTag::unknown || identifySpecialChr(*chunk) == POSTag::sf))
 			{
 				++chunk;
 			}
@@ -863,9 +867,9 @@ vector<KResult> Kiwi::analyze(const u16string & str, size_t topN, size_t matchOp
 		for (size_t n = 0; n < topN; ++n)
 		{
 			auto& r = res[min(n, res.size() - 1)];
-			transform(r.first.begin(), r.first.end(), back_inserter(ret[n].first), [&sents, i](KWordPair& p)
+			transform(r.first.begin(), r.first.end(), back_inserter(ret[n].first), [&sents, i](TokenInfo& p)
 			{
-				p.pos() += distance(sents[0], sents[i - 1]);
+				p.position += distance(sents[0], sents[i - 1]);
 				return p;
 			});
 			ret[n].second += r.second;
@@ -879,22 +883,48 @@ void Kiwi::clearCache()
 
 }
 
+const Morpheme* Kiwi::getMorphs() const
+{
+	return mdl->getMorphemes();
+}
+
+size_t Kiwi::getNumMorphs() const
+{
+	return mdl->getNumMorphemes();
+}
+
+std::u16string Kiwi::getFormOfMorph(size_t id) const
+{
+	auto& morph = mdl->getMorphemes()[id];
+	if (!morph.kform) return {};
+	if (mdl->ready())
+	{
+		auto& form = *morph.kform;
+		return { form.begin(), form.end() };
+	}
+	else
+	{
+		auto& form = mdl->getForms()[(size_t)morph.kform].form;
+		return { form.begin(), form.end() };
+	}
+}
+
 const char* Kiwi::getVersion()
 {
-	return "0.9.0";
+	return "0.10.0";
 }
 
 std::u16string Kiwi::toU16(const std::string & str)
 {
-	return utf8_to_utf16(str);
+	return utf8To16(str);
 }
 
 std::string Kiwi::toU8(const std::u16string & str)
 {
-	return utf16_to_utf8(str);
+	return utf16To8(str);
 }
 
-std::ostream & operator<<(std::ostream & os, const KWordPair & kp)
+std::ostream& operator<<(std::ostream& os, const TokenInfo& kp)
 {
-	return os << utf16_to_utf8({ kp.str().begin(), kp.str().end() }) << '/' << tagToString(kp.tag());
+	return os << utf16To8({ kp.str.begin(), kp.str.end() }) << '/' << tagToString(kp.tag);
 }

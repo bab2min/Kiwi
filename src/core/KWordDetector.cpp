@@ -1,15 +1,16 @@
-#include "KiwiHeader.h"
+#include <numeric>
+#include <kiwi/Types.h>
 #include "KWordDetector.h"
 #include "Utils.h"
 #include "serializer.hpp"
-#include "Trie.hpp"
+#include <kiwi/Trie.hpp>
 
 using namespace std;
 using namespace kiwi;
 
-void KWordDetector::countUnigram(Counter& cdata, const function<u16string(size_t)>& reader) const
+void KWordDetector::countUnigram(Counter& cdata, const function<u16string()>& reader) const
 {
-	auto ldUnigram = readProc<vector<uint32_t>>(reader, [this, &cdata](u16string ustr, size_t id, vector<uint32_t>& ld)
+	auto ldUnigram = readProc<vector<uint32_t>>(reader, [this, &cdata](u16string ustr, vector<uint32_t>& ld)
 	{
 		SpaceSplitIterator begin{ ustr.begin(), ustr.end() }, end;
 		vector<uint16_t> ids;
@@ -56,9 +57,9 @@ void KWordDetector::countUnigram(Counter& cdata, const function<u16string(size_t
 	cdata.chrDict = move(chrDictShrink);
 }
 
-void KWordDetector::countBigram(Counter& cdata, const function<u16string(size_t)>& reader) const
+void KWordDetector::countBigram(Counter& cdata, const function<u16string()>& reader) const
 {
-	auto ldBigram = readProc<vector<uint32_t>>(reader, [this, &cdata](u16string ustr, size_t id, vector<uint32_t>& ld)
+	auto ldBigram = readProc<vector<uint32_t>>(reader, [this, &cdata](u16string ustr, vector<uint32_t>& ld)
 	{
 		SpaceSplitIterator begin{ ustr.begin(), ustr.end() }, end;
 		for (; begin != end; ++begin)
@@ -88,14 +89,14 @@ void KWordDetector::countBigram(Counter& cdata, const function<u16string(size_t)
 	}
 }
 
-void KWordDetector::countNgram(Counter& cdata, const function<u16string(size_t)>& reader) const
+void KWordDetector::countNgram(Counter& cdata, const function<u16string()>& reader) const
 {
 	{
-		ThreadPool rtForward{ 1, 2 }, rtBackward{ 1, 2 };
+		utils::ThreadPool rtForward{ 1, 2 }, rtBackward{ 1, 2 };
 		vector<future<void>> futures;
-		for (size_t id = 0; ; ++id)
+		while (1)
 		{
-			auto ustr = reader(id);
+			auto ustr = reader();
 			if (ustr.empty()) break;
 			SpaceSplitIterator begin{ ustr.begin(), ustr.end() }, end;
 			auto idss = make_shared<vector<vector<int16_t>>>();
@@ -219,10 +220,14 @@ float KWordDetector::branchingEntropy(const map<u16light, uint32_t>& cnt, map<u1
 	return entropy;
 }
 
-map<KPOSTag, float> KWordDetector::getPosScore(Counter & cdata, const std::map<u16light, uint32_t>& cnt, std::map<u16light, uint32_t>::iterator it
-	, bool coda, const u16string& realForm) const
+map<POSTag, float> KWordDetector::getPosScore(Counter & cdata, 
+	const std::map<u16light, uint32_t>& cnt, 
+	std::map<u16light, uint32_t>::iterator it, 
+	bool coda, 
+	const u16string& realForm
+) const
 {
-	map<KPOSTag, float> ret;
+	map<POSTag, float> ret;
 	u16light endKey = it->first;
 	float tot = it->second;
 	size_t len = endKey.size();
@@ -253,7 +258,7 @@ map<KPOSTag, float> KWordDetector::getPosScore(Counter & cdata, const std::map<u
 		if (realForm.size() < nount.first.size()) continue;
 		if (equal(realForm.end() - nount.first.size(), realForm.end(), nount.first.begin()))
 		{
-			ret[KPOSTag::NNP] += nount.second * .25f;
+			ret[POSTag::nnp] += nount.second * .25f;
 			break;
 		}
 	}
@@ -265,9 +270,9 @@ void KWordDetector::loadPOSModelFromTxt(std::istream & is)
 	string line;
 	while (getline(is, line))
 	{
-		auto fields = split(utf8_to_utf16(line), u'\t');
+		auto fields = split(utf8To16(line), u'\t');
 		if (fields.size() < 4) continue;
-		KPOSTag pos = makePOSTag(fields[0]);
+		POSTag pos = toPOSTag(fields[0]);
 		bool coda = !!stof(fields[1].begin(), fields[1].end());
 		char16_t chr = fields[2][0];
 		float p = stof(fields[3].begin(), fields[3].end());
@@ -280,7 +285,7 @@ void KWordDetector::loadNounTailModelFromTxt(std::istream & is)
 	string line;
 	while (getline(is, line))
 	{
-		auto fields = split(utf8_to_utf16(line), u'\t');
+		auto fields = split(utf8To16(line), u'\t');
 		if (fields.size() < 4) continue;
 		float p = stof(fields[1].begin(), fields[1].end());
 		nounTailScore[fields[0]] = p;
@@ -307,12 +312,12 @@ void KWordDetector::loadNounTailModel(std::istream & is)
 	serializer::readFromBinStream(is, nounTailScore);
 }
 
-vector<KWordDetector::WordInfo> KWordDetector::extractWords(const function<u16string(size_t)>& reader) const
+vector<KWordDetector::WordInfo> KWordDetector::extractWords(const function<function<u16string()>()>& reader) const
 {
 	Counter cdata;
-	countUnigram(cdata, reader);
-	countBigram(cdata, reader);
-	countNgram(cdata, reader);
+	countUnigram(cdata, reader());
+	countBigram(cdata, reader());
+	countNgram(cdata, reader());
 
 	vector<WordInfo> cands, ret;
 	for (auto it = cdata.forwardCnt.begin(); it != cdata.forwardCnt.end(); ++it)
@@ -378,7 +383,7 @@ vector<KWordDetector::WordInfo> KWordDetector::extractWords(const function<u16st
 		return a.score > b.score;
 	});
 
-	vector<Trie<char16_t, uint32_t, OverriddenMap<map<char16_t, int32_t>>>> trieNodes(1), trieBackNodes(1);
+	vector<utils::TrieNode<char16_t, uint32_t, utils::ConstAccess<map<char16_t, int32_t>>>> trieNodes(1), trieBackNodes(1);
 	const auto& addNode = [&]()
 	{
 		trieNodes.emplace_back();
@@ -406,9 +411,9 @@ vector<KWordDetector::WordInfo> KWordDetector::extractWords(const function<u16st
 		remove ABC_D, ABC_E ... if branching entropy of D, E ... is higher
 		*/
 		auto pm = trieNodes[0].findMaximumMatch(r.form.begin(), r.form.end());
-		if (pm.first && pm.second)
+		if (pm.second)
 		{
-			auto& pr = ret[*pm.first - 1];
+			auto& pr = ret[pm.first->val - 1];
 			if (r.form.size() <= pr.form.size() + 3)
 			{
 				float rEntropy = 1;
@@ -416,7 +421,7 @@ vector<KWordDetector::WordInfo> KWordDetector::extractWords(const function<u16st
 				if (rpit != rPartEntropy.end()) rEntropy = max(rpit->second, rEntropy);
 				if (rEntropy > 2.5f && r.freq < ((rEntropy - 1) / rEntropy) * pr.freq)
 				{
-					//cerr << utf16_to_utf8(r.form) << '\t' << r.freq << '\t' << utf16_to_utf8(pr.form) << '\t' << pr.freq << '\t' << rEntropy << endl;
+					//cerr << utf16To8(r.form) << '\t' << r.freq << '\t' << utf16To8(pr.form) << '\t' << pr.freq << '\t' << rEntropy << endl;
 					continue;
 				}
 			}
@@ -446,7 +451,7 @@ vector<KWordDetector::WordInfo> KWordDetector::extractWords(const function<u16st
 			}
 			if (entropy < 1.5 && (tot + 25) > (r.freq + 25) * 0.9)
 			{
-				//cerr << utf16_to_utf8(r.form) << endl;
+				//cerr << utf16To8(r.form) << endl;
 				continue;
 			}
 		}
@@ -470,7 +475,7 @@ vector<KWordDetector::WordInfo> KWordDetector::extractWords(const function<u16st
 			}
 			if (entropy < 1.5 && (tot + 25) >(r.freq + 25) * 0.9)
 			{
-				//cerr << utf16_to_utf8(r.form) << endl;
+				//cerr << utf16To8(r.form) << endl;
 				continue;
 			}
 		}
@@ -479,14 +484,13 @@ vector<KWordDetector::WordInfo> KWordDetector::extractWords(const function<u16st
 		{
 			trieNodes.reserve(max(trieNodes.capacity() * 2, trieNodes.size() + r.form.size()));
 		}
-		trieNodes[0].build(r.form.data(), r.form.size(), ret.size() + 1, addNode);
+		trieNodes[0].build(r.form.begin(), r.form.end(), ret.size() + 1, addNode);
 
 		if (trieBackNodes.capacity() < trieBackNodes.size() + r.form.size())
 		{
 			trieBackNodes.reserve(max(trieBackNodes.capacity() * 2, trieBackNodes.size() + r.form.size()));
 		}
-		vector<char16_t> revForm{ r.form.rbegin(), r.form.rend() };
-		trieBackNodes[0].build(revForm.data(), r.form.size(), ret.size() + 1, addBackNode);
+		trieBackNodes[0].build(r.form.rbegin(), r.form.rend(), ret.size() + 1, addBackNode);
 		ret.emplace_back(move(r));
 	}
 

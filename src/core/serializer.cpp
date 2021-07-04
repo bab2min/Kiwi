@@ -1,5 +1,5 @@
-#pragma once
-#include "KiwiHeader.h"
+#include <cassert>
+#include <kiwi/Types.h>
 #include "serializer.hpp"
 
 using namespace std;
