@@ -3,13 +3,13 @@
 class KEval
 {
 public:
-	typedef std::vector<kiwi::KWordPair> AnswerType;
+	typedef std::vector<kiwi::TokenInfo> AnswerType;
 	struct TestResult
 	{
 		std::u16string q;
 		AnswerType a;
 		AnswerType r;
-		std::vector<kiwi::KWordPair> dr, da;
+		std::vector<kiwi::TokenInfo> dr, da;
 		std::vector<kiwi::KResult> cands;
 		float score;
 		void writeResult(std::ostream& out) const;

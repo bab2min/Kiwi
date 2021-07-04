@@ -1,8 +1,11 @@
-﻿#include <windows.h>
+﻿#include <iostream>
+#include <fstream>
+
+#include <windows.h>
 #include <psapi.h>
 #include "core/Kiwi.h"
 #include "core/Utils.h"
-#include "core/PatternMatcher.h"
+#include <kiwi/PatternMatcher.h>
 #include "KEval.h"
 
 class Timer
@@ -38,14 +41,14 @@ int main()
 	wstring_convert<codecvt_utf8_utf16<wchar_t>, wchar_t> cvt;
 	while (getline(cin, line))
 	{
-		auto nodes = km.getTrie()->split(normalizeHangul(utf8_to_utf16(line)));
+		auto nodes = km.getTrie()->split(normalizeHangul(utf8To16(line)));
 		auto res = km.findBestPath(nodes, 10);
 		for (auto&& r : res)
 		{
 			cout << r.second << '\t';
 			for (auto&& s : r.first)
 			{
-				if (s->kform) cout << utf16_to_utf8(*s->kform) << '/' << tagToString(s->tag);
+				if (s->kform) cout << utf16To8(*s->kform) << '/' << tagToString(s->tag);
 			}
 		}
 	}
@@ -70,7 +73,7 @@ int main()
 			printf("%.3g\t", r.second);
 			for (auto& p : r.first)
 			{
-				wprintf(L"%s/%s\t", p.str().c_str(), tagToStringW(p.tag()));
+				wprintf(L"%s/%s\t", p.str().c_str(), tagToKString(p.tag()));
 			}
 			printf("\n");
 		}
@@ -86,7 +89,7 @@ int main()
 			printf("%.3g\t", r.second);
 			for (auto& p : r.first)
 			{
-				wprintf(L"%s/%s\t", p.first.c_str(), tagToStringW(p.second));
+				wprintf(L"%s/%s\t", p.first.c_str(), tagToKString(p.second));
 			}
 			printf("\n");
 		}
@@ -116,37 +119,33 @@ int main()
 		auto flist = { "kowiki.txt" };
 		for (auto list : flist)
 		{
-			ifstream ifs{ string{"G:/"} + list };
-			auto res = kw.extractAddWords([&ifs](size_t id) -> u16string
+			
+			auto res = kw.extractAddWords([&]()
 			{
-				if (id == 0)
+				auto ifs = make_shared<ifstream>(string{"G:/"} + list);
+				return [&]() -> u16string
 				{
-					ifs.clear();
-					ifs.seekg(0);
 					string line;
-				}
-				if (id >= 10000) return {};
-				string line;
-				while (getline(ifs, line))
-				{
-					auto sstr = line/*.substr(0, line.find('\t'))*/;
-					if (sstr.size()) return utf8_to_utf16(sstr);
-				}
-				return {};
+					while (getline(*ifs, line))
+					{
+						if (line.size()) return utf8To16(line);
+					}
+					return {};
+				};
 			}, 16, 20, 0.015f, -3.6);
 
 			ofstream ofs{ string{"extracted_"} + list + ".txt" };
 			for (auto& r : res)
 			{
-				ofs << utf16_to_utf8(r.form) << '\t' << r.score << '\t' << r.freq
+				ofs << utf16To8(r.form) << '\t' << r.score << '\t' << r.freq
 					<< '\t' << r.lCohesion << '\t' << r.rCohesion
 					<< '\t' << r.lBranch << '\t' << r.rBranch
-					<< '\t' << r.posScore[KPOSTag::NNP] << endl;
+					<< '\t' << r.posScore[POSTag::nnp] << endl;
 			}
 		}
 		return 0;
 	}
-	//kw.addUserWord(u"골리", KPOSTag::NNP, -5);
+	//kw.addUserWord(u"골리", POSTag::nnp, -5);
 	kw.prepare();
 	/*auto ret = kw.analyze(u8R""(너도 곧 알게될거야. '알게될거야'는 노래 제목이다.)"", 10, PatternMatcher::all);
 	for (auto& p : ret[0].first)
@@ -161,29 +160,23 @@ int main()
 		Timer tm;
 		ifstream ifs{ "G:/namu_raw.txt" };
 		ofstream ofs{ "G:/namu_tagged.txt" };
-		kw.analyze(1, [&ifs](size_t id) -> u16string
+		kw.analyze(1, [&ifs]() -> u16string
 		{
-			if (id == 0)
-			{
-				ifs.clear();
-				ifs.seekg(0);
-				string line;
-			}
 			string line;
 			while (getline(ifs, line))
 			{
 				auto sstr = line;
-				if (sstr.size()) return utf8_to_utf16(sstr);
+				if (sstr.size()) return utf8To16(sstr);
 			}
 			return {};
 		}, [&ofs](size_t id, vector<KResult>&& res)
 		{
 			for (auto& r : res[0].first)
 			{
-				ofs << utf16_to_utf8(r.str()) << '/' << tagToString(r.tag()) << ' ';
+				ofs << utf16To8(r.str) << '/' << tagToString(r.tag) << ' ';
 			}
 			ofs << endl;
-		}, PatternMatcher::all);
+		}, Match::all);
 		return 0;
 	}
 
@@ -194,10 +187,10 @@ int main()
 	cout << "Mem Usage : " << memUsed / 1024.f / 1024.f << " MB" << endl;
 
 	string testFiles[] = { "01s.txt", "02s.txt", "03s.txt", "17s.txt", "18s.txt", "13s.txt", "15s.txt", };
-	for (auto tf : testFiles)
+	for (auto& tf : testFiles)
 	{
 		Timer total;
-		KEval test{ ("test/evaluation/" + tf).c_str(), &kw };
+		KEval test{ ("data/evaluation/" + tf).c_str(), &kw };
 		double tm = total.getElapsed();
 
 		cout << endl << test.getScore() << endl;

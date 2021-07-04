@@ -23,7 +23,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\kiwi_c.h">
+    <ClInclude Include="include\kiwi\capi.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

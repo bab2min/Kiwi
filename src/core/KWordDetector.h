@@ -1,4 +1,10 @@
 #pragma once
+#include <vector>
+#include <array>
+#include <map>
+#include <unordered_map>
+#include <unordered_set>
+
 #include "KForm.h"
 #include "ThreadPool.h"
 
@@ -260,6 +266,9 @@ namespace kiwi
 		}
 	};
 
+	using U16Reader = std::function<std::u16string()>;
+	using U16MultipleReader = std::function<U16Reader()>;
+
 	class KWordDetector
 	{
 		struct Counter
@@ -273,31 +282,31 @@ namespace kiwi
 		size_t minCnt, maxWordLen;
 		float minScore;
 		size_t numThreads;
-		std::map<std::pair<KPOSTag, bool>, std::map<char16_t, float>> posScore;
+		std::map<std::pair<POSTag, bool>, std::map<char16_t, float>> posScore;
 		std::map<std::u16string, float> nounTailScore;
 
 		template<class LocalData, class FuncReader, class FuncProc>
 		std::vector<LocalData> readProc(const FuncReader& reader, const FuncProc& processor, LocalData&& ld = {}) const
 		{
-			ThreadPool workers{ numThreads, numThreads * 2 };
-			std::vector<LocalData> ldByTid(workers.getNumWorkers(), ld);
-			for (size_t id = 0; ; ++id)
+			utils::ThreadPool workers{ numThreads, numThreads * 2 };
+			std::vector<LocalData> ldByTid(workers.size(), ld);
+			while (1)
 			{
-				auto ustr = reader(id);
+				auto ustr = reader();
 				if (ustr.empty()) break;
-				workers.enqueue([this, ustr, id, &ldByTid, &processor](size_t tid)
+				workers.enqueue([this, ustr, &ldByTid, &processor](size_t tid)
 				{
 					auto& ld = ldByTid[tid];
-					processor(ustr, id, ld);
+					processor(ustr, ld);
 				});
 			}
 			return ldByTid;
 		}
-		void countUnigram(Counter&, const std::function<std::u16string(size_t)>& reader) const;
-		void countBigram(Counter&, const std::function<std::u16string(size_t)>& reader) const;
-		void countNgram(Counter&, const std::function<std::u16string(size_t)>& reader) const;
+		void countUnigram(Counter&, const U16Reader& reader) const;
+		void countBigram(Counter&, const U16Reader& reader) const;
+		void countNgram(Counter&, const U16Reader& reader) const;
 		float branchingEntropy(const std::map<u16light, uint32_t>& cnt, std::map<u16light, uint32_t>::iterator it, float defaultPerp = 1.f) const;
-		std::map<KPOSTag, float> getPosScore(Counter&, const std::map<u16light, uint32_t>& cnt, std::map<u16light, uint32_t>::iterator it, bool coda, const std::u16string& realForm) const;
+		std::map<POSTag, float> getPosScore(Counter&, const std::map<u16light, uint32_t>& cnt, std::map<u16light, uint32_t>::iterator it, bool coda, const std::u16string& realForm) const;
 	public:
 
 		struct WordInfo
@@ -305,12 +314,12 @@ namespace kiwi
 			std::u16string form;
 			float score, lBranch, rBranch, lCohesion, rCohesion;
 			uint32_t freq;
-			std::map<KPOSTag, float> posScore;
+			std::map<POSTag, float> posScore;
 
 			WordInfo(std::u16string _form = {},
 				float _score = 0, float _lBranch = 0, float _rBranch = 0,
 				float _lCohesion = 0, float _rCohesion = 0, uint32_t _freq = 0,
-				std::map<KPOSTag, float>&& _posScore = {})
+				std::map<POSTag, float>&& _posScore = {})
 				: form(_form), score(_score), lBranch(_lBranch), rBranch(_rBranch),
 				lCohesion(_lCohesion), rCohesion(_rCohesion), freq(_freq), posScore(_posScore)
 			{}
@@ -333,7 +342,7 @@ namespace kiwi
 		void loadNounTailModel(std::istream& is);
 		void savePOSModel(std::ostream& os);
 		void saveNounTailModel(std::ostream& os);
-		std::vector<WordInfo> extractWords(const std::function<std::u16string(size_t)>& reader) const;
+		std::vector<WordInfo> extractWords(const U16MultipleReader& reader) const;
 	};
 
 }

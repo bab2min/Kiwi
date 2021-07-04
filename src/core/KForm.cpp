@@ -1,4 +1,5 @@
-#include "KiwiHeader.h"
+#include <cassert>
+
 #include "KForm.h"
 #include "Utils.h"
 #include "serializer.hpp"
@@ -7,68 +8,68 @@ using namespace std;
 using namespace kiwi;
 
 #ifdef _DEBUG
-size_t KMorpheme::uid = 0;
+size_t Morpheme::uid = 0;
 #endif
 
-KPOSTag kiwi::makePOSTag(const u16string& tagStr)
+POSTag kiwi::toPOSTag(const u16string& tagStr)
 {
-	if (tagStr == KSTR("NNG")) return KPOSTag::NNG;
-	if (tagStr == KSTR("NNP")) return KPOSTag::NNP;
-	if (tagStr == KSTR("NNB")) return KPOSTag::NNB;
-	if (tagStr == KSTR("NR")) return KPOSTag::NR;
-	if (tagStr == KSTR("NP")) return KPOSTag::NP;
-	if (tagStr == KSTR("VV")) return KPOSTag::VV;
-	if (tagStr == KSTR("VA")) return KPOSTag::VA;
-	if (tagStr == KSTR("VX")) return KPOSTag::VX;
-	if (tagStr == KSTR("VCP")) return KPOSTag::VCP;
-	if (tagStr == KSTR("VCN")) return KPOSTag::VCN;
-	if (tagStr == KSTR("MM")) return KPOSTag::MM;
-	if (tagStr == KSTR("MAG")) return KPOSTag::MAG;
-	if (tagStr == KSTR("MAJ")) return KPOSTag::MAJ;
-	if (tagStr == KSTR("IC")) return KPOSTag::IC;
-	if (tagStr == KSTR("JKS")) return KPOSTag::JKS;
-	if (tagStr == KSTR("JKC")) return KPOSTag::JKC;
-	if (tagStr == KSTR("JKG")) return KPOSTag::JKG;
-	if (tagStr == KSTR("JKO")) return KPOSTag::JKO;
-	if (tagStr == KSTR("JKB")) return KPOSTag::JKB;
-	if (tagStr == KSTR("JKV")) return KPOSTag::JKV;
-	if (tagStr == KSTR("JKQ")) return KPOSTag::JKQ;
-	if (tagStr == KSTR("JX")) return KPOSTag::JX;
-	if (tagStr == KSTR("JC")) return KPOSTag::JC;
-	if (tagStr == KSTR("EP")) return KPOSTag::EP;
-	if (tagStr == KSTR("EF")) return KPOSTag::EF;
-	if (tagStr == KSTR("EC")) return KPOSTag::EC;
-	if (tagStr == KSTR("ETN")) return KPOSTag::ETN;
-	if (tagStr == KSTR("ETM")) return KPOSTag::ETM;
-	if (tagStr == KSTR("XPN")) return KPOSTag::XPN;
-	if (tagStr == KSTR("XSN")) return KPOSTag::XSN;
-	if (tagStr == KSTR("XSV")) return KPOSTag::XSV;
-	if (tagStr == KSTR("XSA")) return KPOSTag::XSA;
-	if (tagStr == KSTR("XR")) return KPOSTag::XR;
-	if (tagStr == KSTR("SF")) return KPOSTag::SF;
-	if (tagStr == KSTR("SP")) return KPOSTag::SP;
-	if (tagStr == KSTR("SS")) return KPOSTag::SS;
-	if (tagStr == KSTR("SE")) return KPOSTag::SE;
-	if (tagStr == KSTR("SO")) return KPOSTag::SO;
-	if (tagStr == KSTR("SW")) return KPOSTag::SW;
-	if (tagStr == KSTR("NF")) return KPOSTag::UNKNOWN;
-	if (tagStr == KSTR("NV")) return KPOSTag::UNKNOWN;
-	if (tagStr == KSTR("NA")) return KPOSTag::UNKNOWN;
-	if (tagStr == KSTR("SL")) return KPOSTag::SL;
-	if (tagStr == KSTR("SH")) return KPOSTag::SH;
-	if (tagStr == KSTR("SN")) return KPOSTag::SN;
-	if (tagStr == KSTR("V")) return KPOSTag::V;
-	if (tagStr == KSTR("A")) return KPOSTag::V;
-	if (tagStr == KSTR("^")) return KPOSTag::UNKNOWN;
-	if (tagStr == KSTR("W_URL")) return KPOSTag::W_URL;
-	if (tagStr == KSTR("W_EMAIL")) return KPOSTag::W_EMAIL;
-	if (tagStr == KSTR("W_HASHTAG")) return KPOSTag::W_HASHTAG;
-	if (tagStr == KSTR("W_MENTION")) return KPOSTag::W_MENTION;
+	if (tagStr == u"NNG") return POSTag::nng;
+	if (tagStr == u"NNP") return POSTag::nnp;
+	if (tagStr == u"NNB") return POSTag::nnb;
+	if (tagStr == u"NR") return POSTag::nr;
+	if (tagStr == u"NP") return POSTag::np;
+	if (tagStr == u"VV") return POSTag::vv;
+	if (tagStr == u"VA") return POSTag::va;
+	if (tagStr == u"VX") return POSTag::vx;
+	if (tagStr == u"VCP") return POSTag::vcp;
+	if (tagStr == u"VCN") return POSTag::vcn;
+	if (tagStr == u"MM") return POSTag::mm;
+	if (tagStr == u"MAG") return POSTag::mag;
+	if (tagStr == u"MAJ") return POSTag::maj;
+	if (tagStr == u"IC") return POSTag::ic;
+	if (tagStr == u"JKS") return POSTag::jks;
+	if (tagStr == u"JKC") return POSTag::jkc;
+	if (tagStr == u"JKG") return POSTag::jkg;
+	if (tagStr == u"JKO") return POSTag::jko;
+	if (tagStr == u"JKB") return POSTag::jkb;
+	if (tagStr == u"JKV") return POSTag::jkv;
+	if (tagStr == u"JKQ") return POSTag::jkq;
+	if (tagStr == u"JX") return POSTag::jx;
+	if (tagStr == u"JC") return POSTag::jc;
+	if (tagStr == u"EP") return POSTag::ep;
+	if (tagStr == u"EF") return POSTag::ef;
+	if (tagStr == u"EC") return POSTag::ec;
+	if (tagStr == u"ETN") return POSTag::etn;
+	if (tagStr == u"ETM") return POSTag::etm;
+	if (tagStr == u"XPN") return POSTag::xpn;
+	if (tagStr == u"XSN") return POSTag::xsn;
+	if (tagStr == u"XSV") return POSTag::xsv;
+	if (tagStr == u"XSA") return POSTag::xsa;
+	if (tagStr == u"XR") return POSTag::xr;
+	if (tagStr == u"SF") return POSTag::sf;
+	if (tagStr == u"SP") return POSTag::sp;
+	if (tagStr == u"SS") return POSTag::ss;
+	if (tagStr == u"SE") return POSTag::se;
+	if (tagStr == u"SO") return POSTag::so;
+	if (tagStr == u"SW") return POSTag::sw;
+	if (tagStr == u"NF") return POSTag::unknown;
+	if (tagStr == u"NV") return POSTag::unknown;
+	if (tagStr == u"NA") return POSTag::unknown;
+	if (tagStr == u"SL") return POSTag::sl;
+	if (tagStr == u"SH") return POSTag::sh;
+	if (tagStr == u"SN") return POSTag::sn;
+	if (tagStr == u"V") return POSTag::v;
+	if (tagStr == u"A") return POSTag::v;
+	if (tagStr == u"^") return POSTag::unknown;
+	if (tagStr == u"W_URL") return POSTag::w_url;
+	if (tagStr == u"W_EMAIL") return POSTag::w_email;
+	if (tagStr == u"W_HASHTAG") return POSTag::w_hashtag;
+	if (tagStr == u"W_MENTION") return POSTag::w_mention;
 	//assert(0);
-	return KPOSTag::MAX;
+	return POSTag::max;
 }
 
-const char * kiwi::tagToString(KPOSTag t)
+const char * kiwi::tagToString(POSTag t)
 {
 	static const char* tags[] = 
 	{
@@ -90,47 +91,47 @@ const char * kiwi::tagToString(KPOSTag t)
 		"V",
 		"@"
 	};
-	assert(t < KPOSTag::MAX);
+	assert(t < POSTag::max);
 	return tags[(size_t)t];
 }
 
-const k_char * kiwi::tagToStringW(KPOSTag t)
+const kchar_t * kiwi::tagToKString(POSTag t)
 {
-	static const k_char* tags[] =
+	static const kchar_t* tags[] =
 	{
-		KSTR("UN"),
-		KSTR("NNG"), KSTR("NNP"), KSTR("NNB"),
-		KSTR("VV"), KSTR("VA"),
-		KSTR("MAG"),
-		KSTR("NR"), KSTR("NP"),
-		KSTR("VX"),
-		KSTR("MM"), KSTR("MAJ"),
-		KSTR("IC"),
-		KSTR("XPN"), KSTR("XSN"), KSTR("XSV"), KSTR("XSA"), KSTR("XR"),
-		KSTR("VCP"), KSTR("VCN"),
-		KSTR("SF"), KSTR("SP"), KSTR("SS"), KSTR("SE"), KSTR("SO"), KSTR("SW"),
-		KSTR("SL"), KSTR("SH"), KSTR("SN"),
-		KSTR("W_URL"), KSTR("W_EMAIL"), KSTR("W_MENTION"), KSTR("W_HASHTAG"),
-		KSTR("JKS"), KSTR("JKC"), KSTR("JKG"), KSTR("JKO"), KSTR("JKB"), KSTR("JKV"), KSTR("JKQ"), KSTR("JX"), KSTR("JC"),
-		KSTR("EP"), KSTR("EF"), KSTR("EC"), KSTR("ETN"), KSTR("ETM"),
-		KSTR("V"),
-		KSTR("@")
+		u"UN",
+		u"NNG", u"NNP", u"NNB",
+		u"VV", u"VA",
+		u"MAG",
+		u"NR", u"NP",
+		u"VX",
+		u"MM", u"MAJ",
+		u"IC",
+		u"XPN", u"XSN", u"XSV", u"XSA", u"XR",
+		u"VCP", u"VCN",
+		u"SF", u"SP", u"SS", u"SE", u"SO", u"SW",
+		u"SL", u"SH", u"SN",
+		u"W_URL", u"W_EMAIL", u"W_MENTION", u"W_HASHTAG",
+		u"JKS", u"JKC", u"JKG", u"JKO", u"JKB", u"JKV", u"JKQ", u"JX", u"JC",
+		u"EP", u"EF", u"EC", u"ETN", u"ETM",
+		u"V",
+		u"@"
 	};
-	assert(t < KPOSTag::MAX);
+	assert(t < POSTag::max);
 	return tags[(size_t)t];
 }
 
-KForm::KForm(const k_char * _form)
+Form::Form(const kchar_t * _form)
 {
 	if (_form) form = _form;
 }
 
 template<class _Istream>
-void KForm::readFromBin(_Istream& is, const function<const KMorpheme*(size_t)>& mapper)
+void Form::readFromBin(_Istream& is, const function<const Morpheme*(size_t)>& mapper)
 {
-	form = serializer::readFromBinStream<k_string>(is);
-	vowel = serializer::readFromBinStream<KCondVowel>(is);
-	polar = serializer::readFromBinStream<KCondPolarity>(is);
+	form = serializer::readFromBinStream<KString>(is);
+	vowel = serializer::readFromBinStream<CondVowel>(is);
+	polar = serializer::readFromBinStream<CondPolarity>(is);
 	candidate.resize(serializer::readFromBinStream<uint32_t>(is));
 	for (auto& c : candidate)
 	{
@@ -138,10 +139,10 @@ void KForm::readFromBin(_Istream& is, const function<const KMorpheme*(size_t)>& 
 	}
 }
 
-template void KForm::readFromBin<istream>(istream& is, const function<const KMorpheme*(size_t)>& mapper);
-template void KForm::readFromBin<serializer::imstream>(serializer::imstream& is, const function<const KMorpheme*(size_t)>& mapper);
+template void Form::readFromBin<istream>(istream& is, const function<const Morpheme*(size_t)>& mapper);
+template void Form::readFromBin<serializer::imstream>(serializer::imstream& is, const function<const Morpheme*(size_t)>& mapper);
 
-void KForm::writeToBin(ostream& os, const function<size_t(const KMorpheme*)>& mapper) const
+void Form::writeToBin(ostream& os, const function<size_t(const Morpheme*)>& mapper) const
 {
 	serializer::writeToBinStream(os, form);
 	serializer::writeToBinStream(os, vowel);
@@ -154,9 +155,9 @@ void KForm::writeToBin(ostream& os, const function<size_t(const KMorpheme*)>& ma
 }
 
 template<class _Istream>
-void KMorpheme::readFromBin(_Istream& is, const function<const KMorpheme*(size_t)>& mapper)
+void Morpheme::readFromBin(_Istream& is, const function<const Morpheme*(size_t)>& mapper)
 {
-	kform = (const k_string*)serializer::readFromBinStream<uint32_t>(is);
+	kform = (const KString*)serializer::readFromBinStream<uint32_t>(is);
 	serializer::readFromBinStream(is, tag);
 	serializer::readFromBinStream(is, vowel);
 	serializer::readFromBinStream(is, polar);
@@ -167,7 +168,7 @@ void KMorpheme::readFromBin(_Istream& is, const function<const KMorpheme*(size_t
 	size_t s = serializer::readFromBinStream<uint32_t>(is);
 	if (s)
 	{
-		chunks.reset(new vector<const KMorpheme*>(s));
+		chunks.reset(new vector<const Morpheme*>(s));
 		for (auto& c : *chunks)
 		{
 			c = mapper(serializer::readFromBinStream<uint32_t>(is));
@@ -175,10 +176,10 @@ void KMorpheme::readFromBin(_Istream& is, const function<const KMorpheme*(size_t
 	}
 }
 
-template void KMorpheme::readFromBin<istream>(istream& is, const function<const KMorpheme*(size_t)>& mapper);
-template void KMorpheme::readFromBin<serializer::imstream>(serializer::imstream& is, const function<const KMorpheme*(size_t)>& mapper);
+template void Morpheme::readFromBin<istream>(istream& is, const function<const Morpheme*(size_t)>& mapper);
+template void Morpheme::readFromBin<serializer::imstream>(serializer::imstream& is, const function<const Morpheme*(size_t)>& mapper);
 
-void KMorpheme::writeToBin(ostream& os, const function<size_t(const KMorpheme*)>& mapper) const
+void Morpheme::writeToBin(ostream& os, const function<size_t(const Morpheme*)>& mapper) const
 {
 	serializer::writeToBinStream<uint32_t>(os, (uint32_t)(size_t)kform);
 	serializer::writeToBinStream(os, tag);
@@ -195,9 +196,9 @@ void KMorpheme::writeToBin(ostream& os, const function<size_t(const KMorpheme*)>
 	}
 }
 
-std::ostream & kiwi::KMorpheme::print(std::ostream & os) const
+std::ostream & kiwi::Morpheme::print(std::ostream & os) const
 {
-	os << utf16_to_utf8(kform ? u16string{ kform->begin(), kform->end() } : u"_");
+	os << utf16To8(kform ? u16string{ kform->begin(), kform->end() } : u"_");
 	os << '/';
 	os << tagToString(tag);
 	if (combineSocket) os << '+' << (size_t)combineSocket;

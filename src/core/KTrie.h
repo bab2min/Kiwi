@@ -1,33 +1,46 @@
 #pragma once
 
+#include <array>
 #include "BakedMap.hpp"
-#include "Trie.hpp"
+#include <kiwi/Trie.hpp>
 #include "KForm.h"
-#include "PatternMatcher.h"
+#include <kiwi/PatternMatcher.h>
+#include <kiwi/FrozenTrie.h>
+
+#ifdef USE_BTREE
+#include <btree/map.h>
+#else
+#endif
 
 namespace kiwi
 {
 	class KModelMgr;
 	class KNLangModel;
 
+#ifdef USE_BTREE
+	template<class K, class V> using map = btree::map<K, V>;
+#else
+	template<class K, class V> using map = std::map<K, V>;
+#endif
+
 	struct KGraphNode
 	{
-		enum { MAX_PREV = 16 };
-		const KForm* form = nullptr;
-		k_string uform;
+		enum { max_prev = 16 };
+		const Form* form = nullptr;
+		KString uform;
 		uint16_t lastPos;
-		std::array<uint16_t, MAX_PREV> prevs = { { 0, } };
+		std::array<uint16_t, max_prev> prevs = { { 0, } };
 
-		KGraphNode(const KForm* _form = nullptr, uint16_t _lastPos = 0) : form(_form), lastPos(_lastPos) {}
-		KGraphNode(const k_string& _uform, uint16_t _lastPos) : uform(_uform), lastPos(_lastPos) {}
+		KGraphNode(const Form* _form = nullptr, uint16_t _lastPos = 0) : form(_form), lastPos(_lastPos) {}
+		KGraphNode(const KString& _uform, uint16_t _lastPos) : uform(_uform), lastPos(_lastPos) {}
 
 		KGraphNode* getPrev(size_t idx) const { return prevs[idx] ? (KGraphNode*)this - prevs[idx] : nullptr; }
 
-		static mvector<KGraphNode> removeUnconnected(const mvector<KGraphNode>& graph);
+		static Vector<KGraphNode> removeUnconnected(const Vector<KGraphNode>& graph);
 
 		void addPrev(size_t distance)
 		{
-			for (size_t i = 0; i < MAX_PREV; ++i)
+			for (size_t i = 0; i < max_prev; ++i)
 			{
 				if (prevs[i]) continue;
 				prevs[i] = distance;
@@ -37,14 +50,14 @@ namespace kiwi
 		}
 	};
 
-	struct KTrie : public Trie<char16_t, const KForm*, OverriddenMap<std::map<char16_t, int32_t>>>
-	{
-		mvector<KGraphNode> split(const k_string& str, const PatternMatcher* pm, size_t matchOptions) const;
-		const KForm* findForm(const k_string& str) const;
-		KTrie* getNext(k_char i) const { return (KTrie*)Trie::getNext(i); }
-		KTrie* getFail() const { return (KTrie*)Trie::getFail(); }
+	Vector<KGraphNode> splitByTrie(const utils::FrozenTrie<kchar_t, const Form*>& trie, const KString& str, const PatternMatcher* pm, Match matchOptions);
 
-		void saveToBin(std::ostream& str, const KForm* base) const;
-		static KTrie loadFromBin(std::istream& str, const KForm* base);
+	struct KTrie : public utils::TrieNode<char16_t, const Form*, utils::ConstAccess<map<char16_t, int32_t>>, KTrie>
+	{
+		Vector<KGraphNode> split(const KString& str, const PatternMatcher* pm, Match matchOptions) const;
+		const Form* findForm(const KString& str) const;
+
+		void saveToBin(std::ostream& str, const Form* base) const;
+		static KTrie loadFromBin(std::istream& str, const Form* base);
 	};
 }

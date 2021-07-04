@@ -1,4 +1,4 @@
-#include "KiwiHeader.h"
+#include <kiwi/Types.h>
 #include "KTrie.h"
 #include "KForm.h"
 #include "Utils.h"
@@ -11,9 +11,9 @@ namespace kiwi
 		return 0x11A8 <= chr && chr < (0x11A7 + 28);
 	}
 
-	k_string normalizeHangul(const std::u16string& hangul)
+	KString normalizeHangul(const std::u16string& hangul)
 	{
-		k_string ret;
+		KString ret;
 		ret.reserve(hangul.size() * 1.5);
 		for (auto c : hangul)
 		{
@@ -32,7 +32,7 @@ namespace kiwi
 		return ret;
 	}
 
-	std::u16string joinHangul(const k_string& hangul)
+	std::u16string joinHangul(const KString& hangul)
 	{
 		std::u16string ret;
 		ret.reserve(hangul.size());
@@ -51,7 +51,7 @@ namespace kiwi
 		return ret;
 	}
 
-	std::u16string utf8_to_utf16(const std::string & str)
+	std::u16string utf8To16(const std::string & str)
 	{
 		std::u16string ret;
 		for (auto it = str.begin(); it != str.end(); ++it)
@@ -61,31 +61,31 @@ namespace kiwi
 			if ((byte & 0xF8) == 0xF0)
 			{
 				code = (byte & 0x07) << 18;
-				if (++it == str.end()) throw KiwiUnicodeException{ "unexpected ending" };
-				if (((byte = *it) & 0xC0) != 0x80) throw KiwiUnicodeException{ "unexpected training byte" };
+				if (++it == str.end()) throw UnicodeException{ "unexpected ending" };
+				if (((byte = *it) & 0xC0) != 0x80) throw UnicodeException{ "unexpected trailing byte" };
 				code |= (byte & 0x3F) << 12;
-				if (++it == str.end()) throw KiwiUnicodeException{ "unexpected ending" };
-				if (((byte = *it) & 0xC0) != 0x80) throw KiwiUnicodeException{ "unexpected training byte" };
+				if (++it == str.end()) throw UnicodeException{ "unexpected ending" };
+				if (((byte = *it) & 0xC0) != 0x80) throw UnicodeException{ "unexpected trailing byte" };
 				code |= (byte & 0x3F) << 6;
-				if (++it == str.end()) throw KiwiUnicodeException{ "unexpected ending" };
-				if (((byte = *it) & 0xC0) != 0x80) throw KiwiUnicodeException{ "unexpected training byte" };
+				if (++it == str.end()) throw UnicodeException{ "unexpected ending" };
+				if (((byte = *it) & 0xC0) != 0x80) throw UnicodeException{ "unexpected trailing byte" };
 				code |= (byte & 0x3F);
 			}
 			else if ((byte & 0xF0) == 0xE0)
 			{
 				code = (byte & 0x0F) << 12;
-				if (++it == str.end()) throw KiwiUnicodeException{ "unexpected ending" };
-				if (((byte = *it) & 0xC0) != 0x80) throw KiwiUnicodeException{ "unexpected training byte" };
+				if (++it == str.end()) throw UnicodeException{ "unexpected ending" };
+				if (((byte = *it) & 0xC0) != 0x80) throw UnicodeException{ "unexpected trailing byte" };
 				code |= (byte & 0x3F) << 6;
-				if (++it == str.end()) throw KiwiUnicodeException{ "unexpected ending" };
-				if (((byte = *it) & 0xC0) != 0x80) throw KiwiUnicodeException{ "unexpected training byte" };
+				if (++it == str.end()) throw UnicodeException{ "unexpected ending" };
+				if (((byte = *it) & 0xC0) != 0x80) throw UnicodeException{ "unexpected trailing byte" };
 				code |= (byte & 0x3F);
 			}
 			else if ((byte & 0xE0) == 0xC0)
 			{
 				code = (byte & 0x1F) << 6;
-				if (++it == str.end()) throw KiwiUnicodeException{ "unexpected ending" };
-				if (((byte = *it) & 0xC0) != 0x80) throw KiwiUnicodeException{ "unexpected training byte" };
+				if (++it == str.end()) throw UnicodeException{ "unexpected ending" };
+				if (((byte = *it) & 0xC0) != 0x80) throw UnicodeException{ "unexpected trailing byte" };
 				code |= (byte & 0x3F);
 			}
 			else if ((byte & 0x80) == 0x00)
@@ -94,7 +94,7 @@ namespace kiwi
 			}
 			else
 			{
-				throw KiwiUnicodeException{ "unicode error" };
+				throw UnicodeException{ "unicode error" };
 			}
 
 			if (code < 0x10000)
@@ -109,13 +109,13 @@ namespace kiwi
 			}
 			else
 			{
-				throw KiwiUnicodeException{ "unicode error" };
+				throw UnicodeException{ "unicode error" };
 			}
 		}
 		return ret;
 	}
 
-	std::string utf16_to_utf8(const std::u16string & str)
+	std::string utf16To8(const std::u16string & str)
 	{
 		std::string ret;
 		for (auto it = str.begin(); it != str.end(); ++it)
@@ -123,9 +123,9 @@ namespace kiwi
 			size_t code = *it;
 			if ((code & 0xFC00) == 0xD800)
 			{
-				if (++it == str.end()) throw KiwiUnicodeException{ "unpaired surrogate" };
+				if (++it == str.end()) throw UnicodeException{ "unpaired surrogate" };
 				size_t code2 = *it;
-				if ((code2 & 0xFC00) != 0xDC00) throw KiwiUnicodeException{ "unpaired surrogate" };
+				if ((code2 & 0xFC00) != 0xDC00) throw UnicodeException{ "unpaired surrogate" };
 				code = ((code & 0x3FF) << 10) | (code2 & 0x3FF);
 				code += 0x10000;
 			}
@@ -154,14 +154,14 @@ namespace kiwi
 			}
 			else
 			{
-				throw KiwiUnicodeException{ "unicode error" };
+				throw UnicodeException{ "unicode error" };
 			}
 		}
 
 		return ret;
 	}
 
-	KPOSTag identifySpecialChr(k_char chr)
+	POSTag identifySpecialChr(kchar_t chr)
 	{
 		switch (chr)
 		{
@@ -171,33 +171,33 @@ namespace kiwi
 		case '\n':
 		case '\v':
 		case '\f':
-			return KPOSTag::UNKNOWN;
+			return POSTag::unknown;
 		}
-		if (0x2000 <= chr && chr <= 0x200F) return KPOSTag::UNKNOWN;
+		if (0x2000 <= chr && chr <= 0x200F) return POSTag::unknown;
 
-		if (iswdigit(chr)) return KPOSTag::SN;
+		if (iswdigit(chr)) return POSTag::sn;
 		if (('A' <= chr && chr <= 'Z') ||
-			('a' <= chr && chr <= 'z'))  return KPOSTag::SL;
-		if (0xAC00 <= chr && chr < 0xD7A4) return KPOSTag::MAX;
-		if (isHangulCoda(chr)) return KPOSTag::MAX;
+			('a' <= chr && chr <= 'z'))  return POSTag::sl;
+		if (0xAC00 <= chr && chr < 0xD7A4) return POSTag::max;
+		if (isHangulCoda(chr)) return POSTag::max;
 		switch (chr)
 		{
 		case '.':
 		case '!':
 		case '?':
-			return KPOSTag::SF;
+			return POSTag::sf;
 		case '-':
 		case '~':
 		case 0x223c:
-			return KPOSTag::SO;
+			return POSTag::so;
 		case 0x2026:
-			return KPOSTag::SE;
+			return POSTag::se;
 		case ',':
 		case ';':
 		case ':':
 		case '/':
 		case 0xb7:
-			return KPOSTag::SP;
+			return POSTag::sp;
 		case '"':
 		case '\'':
 		case '(':
@@ -230,7 +230,7 @@ namespace kiwi
 		case 0x3014:
 		case 0x3015:
 		case 0xff0d:
-			return KPOSTag::SS;
+			return POSTag::ss;
 		}
 		if ((0x2e80 <= chr && chr <= 0x2e99) ||
 			(0x2e9b <= chr && chr <= 0x2ef3) ||
@@ -241,8 +241,8 @@ namespace kiwi
 			(0x3400 <= chr && chr <= 0x4db5) ||
 			(0x4e00 <= chr && chr <= 0x9fcc) ||
 			(0xf900 <= chr && chr <= 0xfa6d) ||
-			(0xfa70 <= chr && chr <= 0xfad9)) return KPOSTag::SH;
-		if (0xd800 <= chr && chr <= 0xdfff) return KPOSTag::SH;
-		return KPOSTag::SW;
+			(0xfa70 <= chr && chr <= 0xfad9)) return POSTag::sh;
+		if (0xd800 <= chr && chr <= 0xdfff) return POSTag::sh;
+		return POSTag::sw;
 	}
 }

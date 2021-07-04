@@ -315,27 +315,6 @@ ModelManifest.xml
 /Binary
 /KiwiCTester/longText.txt
 /eval_result
-/test/sample/longSpok.txt
-/test/sample/spok.txt
-/test/evaluation/t.txt
-/test/evaluation/23s.txt
-/test/evaluation/22s.txt
-/test/evaluation/21s.txt
-/test/evaluation/20s.txt
-/test/evaluation/19s.txt
-/test/evaluation/18s.txt
-/test/evaluation/17s.txt
-/test/evaluation/16s.txt
-/test/evaluation/15s.txt
-/test/evaluation/14s.txt
-/test/evaluation/13s.txt
-/test/evaluation/12s.txt
-/test/evaluation/11s.txt
-/test/evaluation/10s.txt
-/test/evaluation/03s.txt
-/test/evaluation/03.txt
-/test/evaluation/02s.txt
-/test/evaluation/02.txt
 .idea/
 __pycache__/
 
@@ -348,3 +327,5 @@ __pycache__/
 /ModelGenerator/30_sj.morph
 /ModelGenerator/30_sj.lang
 /mimalloc
+/data/
+include/btree/

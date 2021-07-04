@@ -138,14 +138,14 @@ int main(int argc, const char** argv)
 						if (of == stdout)
 						{
 #ifdef _WIN32
-							fputws((const wchar_t*)m.str().c_str(), of);
+							fputws((const wchar_t*)m.str.c_str(), of);
 #else
-							fputs(Kiwi::toU8(m.str()).c_str(), of);
+							fputs(Kiwi::toU8(m.str).c_str(), of);
 #endif
 						}
-						else fputs(Kiwi::toU8(m.str()).c_str(), of);
+						else fputs(Kiwi::toU8(m.str).c_str(), of);
 						fputc('/', of);
-						fputs(tagToString(m.tag()), of);
+						fputs(tagToString(m.tag), of);
 						fputc('\t', of);
 					}
 					fputc('\n', of);

@@ -1,19 +1,29 @@
-#include "PatternMatcher.h"
+#include <kiwi/PatternMatcher.h>
 #include "pattern.hpp"
 
 using namespace std;
+using namespace kiwi;
 
-struct PatternMatcher::MatchData
+class PatternMatcherImpl : public PatternMatcher
 {
-	pattern::CutSZCharSetParser<PP_GET_64("-A-Za-z0-9._%+", 0)>::type emailAccount;
-	pattern::CutSZCharSetParser<PP_GET_64("-A-Za-z0-9.", 0)>::type alphaNumDotDash;
-	pattern::CutSZCharSetParser<PP_GET_64("-a-zA-Z0-9@:%._+~#=", 0)>::type domain;
-	pattern::CutSZCharSetParser<PP_GET_64("-a-zA-Z0-9()@:%_+.~#?&/=", 0)>::type path;
-	pattern::CutSZCharSetParser<PP_GET_64("^# \t\n\r\v\f.,", 0)>::type hashtags;
-	pattern::CutSZCharSetParser<PP_GET_64(" \t\n\r\v\f", 0)>::type space;
+	struct
+	{
+		pattern::CutSZCharSetParser<PP_GET_64("-A-Za-z0-9._%+", 0)>::type emailAccount;
+		pattern::CutSZCharSetParser<PP_GET_64("-A-Za-z0-9.", 0)>::type alphaNumDotDash;
+		pattern::CutSZCharSetParser<PP_GET_64("-a-zA-Z0-9@:%._+~#=", 0)>::type domain;
+		pattern::CutSZCharSetParser<PP_GET_64("-a-zA-Z0-9()@:%_+.~#?&/=", 0)>::type path;
+		pattern::CutSZCharSetParser<PP_GET_64("^# \t\n\r\v\f.,", 0)>::type hashtags;
+		pattern::CutSZCharSetParser<PP_GET_64(" \t\n\r\v\f", 0)>::type space;
+	} md;
+	size_t testUrl(const char16_t* first, const char16_t* last) const;
+	size_t testEmail(const char16_t* first, const char16_t* last) const;
+	size_t testHashtag(const char16_t* first, const char16_t* last) const;
+	size_t testMention(const char16_t* first, const char16_t* last) const;
+public:
+	std::pair<size_t, kiwi::POSTag> match(const char16_t* first, const char16_t* last, Match matchOptions) const override;
 };
 
-size_t PatternMatcher::testUrl(const char16_t * first, const char16_t * last) const
+size_t PatternMatcherImpl::testUrl(const char16_t * first, const char16_t * last) const
 {
 	// Pattern: https?://[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z]{2,6}(:[0-9]+)?\b(/[-a-zA-Z0-9()@:%_+.~#?&/=]*)?
 
@@ -33,9 +43,9 @@ size_t PatternMatcher::testUrl(const char16_t * first, const char16_t * last) co
 	// [-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}
 	int state = 0;
 	const char16_t* lastMatched = first;
-	if (b == last || !md->domain.test(*b)) return 0;
+	if (b == last || !md.domain.test(*b)) return 0;
 	++b;
-	for (; b != last && md->domain.test(*b); ++b)
+	for (; b != last && md.domain.test(*b); ++b)
 	{
 		if (*b == '.') state = 1;
 		else if (isalpha(*b))
@@ -65,26 +75,26 @@ size_t PatternMatcher::testUrl(const char16_t * first, const char16_t * last) co
 	if (b != last && *b == '/')
 	{
 		++b;
-		while (b != last && md->path.test(*b)) ++b;
+		while (b != last && md.path.test(*b)) ++b;
 	}
 	else
 	{
-		if (b != last && !md->space.test(*b)) return 0;
+		if (b != last && !md.space.test(*b)) return 0;
 	}
 	
 	return b - first;
 }
 
-size_t PatternMatcher::testEmail(const char16_t * first, const char16_t * last) const
+size_t PatternMatcherImpl::testEmail(const char16_t * first, const char16_t * last) const
 {
 	// Pattern: [A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}
 	
 	const char16_t* b = first;
 
 	// [A-Za-z0-9._%+-]+
-	if (b == last || !md->emailAccount.test(*b)) return 0;
+	if (b == last || !md.emailAccount.test(*b)) return 0;
 	++b;
-	while (b != last && md->emailAccount.test(*b)) ++b;
+	while (b != last && md.emailAccount.test(*b)) ++b;
 	
 	// @
 	if (b == last || *b != '@') return 0;
@@ -93,9 +103,9 @@ size_t PatternMatcher::testEmail(const char16_t * first, const char16_t * last) 
 	// [A-Za-z0-9.-]+\.[A-Za-z]{2,6}
 	int state = 0;
 	const char16_t* lastMatched = first;
-	if (b == last || !md->alphaNumDotDash.test(*b)) return 0;
+	if (b == last || !md.alphaNumDotDash.test(*b)) return 0;
 	++b;
-	for (; b != last && md->alphaNumDotDash.test(*b); ++b)
+	for (; b != last && md.alphaNumDotDash.test(*b); ++b)
 	{
 		if (*b == '.') state = 1;
 		else if (isalpha(*b))
@@ -109,7 +119,7 @@ size_t PatternMatcher::testEmail(const char16_t * first, const char16_t * last) 
 	return lastMatched - first;
 }
 
-size_t PatternMatcher::testMention(const char16_t* first, const char16_t* last) const
+size_t PatternMatcherImpl::testMention(const char16_t* first, const char16_t* last) const
 {
 	// Pattern: @[A-Za-z0-9._%+-]+
 	const char16_t* b = first;
@@ -119,14 +129,14 @@ size_t PatternMatcher::testMention(const char16_t* first, const char16_t* last) 
 	++b;
 
 	// [A-Za-z0-9._%+-]+
-	if (b == last || !md->emailAccount.test(*b)) return 0;
+	if (b == last || !md.emailAccount.test(*b)) return 0;
 	++b;
-	while (b != last && md->emailAccount.test(*b)) ++b;
+	while (b != last && md.emailAccount.test(*b)) ++b;
 
 	return b - first;
 }
 
-size_t PatternMatcher::testHashtag(const char16_t * first, const char16_t * last) const
+size_t PatternMatcherImpl::testHashtag(const char16_t * first, const char16_t * last) const
 {
 	// Pattern: #[^#\s]+
 	const char16_t* b = first;
@@ -134,31 +144,25 @@ size_t PatternMatcher::testHashtag(const char16_t * first, const char16_t * last
 	if (b == last || *b != '#') return 0;
 	++b;
 
-	if (b == last || !md->hashtags.test(*b)) return 0;
+	if (b == last || !md.hashtags.test(*b)) return 0;
 	++b;
-	while (b != last && md->hashtags.test(*b)) ++b;
+	while (b != last && md.hashtags.test(*b)) ++b;
 
 	return b - first;
 }
 
-PatternMatcher::PatternMatcher()
+pair<size_t, kiwi::POSTag> PatternMatcherImpl::match(const char16_t * first, const char16_t * last, Match matchOptions) const
 {
-	md = new MatchData;
-}
-
-PatternMatcher::~PatternMatcher()
-{
-	delete md;
-	md = nullptr;
-}
-
-pair<size_t, kiwi::KPOSTag> PatternMatcher::match(const char16_t * first, const char16_t * last, size_t matchOptions) const
-{
-	if(!matchOptions) return make_pair(0, kiwi::KPOSTag::UNKNOWN);
+	if (!matchOptions) return make_pair(0, kiwi::POSTag::unknown);
 	size_t size;
-	if ((matchOptions & match_hashtag) && (size = testHashtag(first, last))) return make_pair(size, kiwi::KPOSTag::W_HASHTAG);
-	if ((matchOptions & match_email) && (size = testEmail(first, last))) return make_pair(size, kiwi::KPOSTag::W_EMAIL);
-	if ((matchOptions & match_mention) && (size = testMention(first, last))) return make_pair(size, kiwi::KPOSTag::W_MENTION);
-	if ((matchOptions & match_url) && (size = testUrl(first, last))) return make_pair(size, kiwi::KPOSTag::W_URL);
-	return make_pair(0, kiwi::KPOSTag::UNKNOWN);
+	if (!!(matchOptions & Match::hashtag) && (size = testHashtag(first, last))) return make_pair(size, kiwi::POSTag::w_hashtag);
+	if (!!(matchOptions & Match::email) && (size = testEmail(first, last))) return make_pair(size, kiwi::POSTag::w_email);
+	if (!!(matchOptions & Match::mention) && (size = testMention(first, last))) return make_pair(size, kiwi::POSTag::w_mention);
+	if (!!(matchOptions & Match::url) && (size = testUrl(first, last))) return make_pair(size, kiwi::POSTag::w_url);
+	return make_pair(0, kiwi::POSTag::unknown);
+}
+
+unique_ptr<PatternMatcher> PatternMatcher::create()
+{
+	return make_unique<PatternMatcherImpl>();
 }

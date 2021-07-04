@@ -2,19 +2,22 @@
 
 #include <tuple>
 #include <unordered_map>
+#include <unordered_set>
 
 #include "KNLangModel.h"
 #include "KForm.h"
+#include <kiwi/FrozenTrie.h>
+#include <kiwi/Knlm.h>
 
 namespace kiwi
 {
-	struct FormCond : public std::tuple<k_string, KCondVowel, KCondPolarity>
+	struct FormCond : public std::tuple<KString, CondVowel, CondPolarity>
 	{
-		using std::tuple<k_string, KCondVowel, KCondPolarity>::tuple;
+		using std::tuple<KString, CondVowel, CondPolarity>::tuple;
 		
-		const k_string& form() const { return std::get<0>(*this); }
-		const KCondVowel& vowel() const { return std::get<1>(*this); }
-		const KCondPolarity& polar() const { return std::get<2>(*this); }
+		const KString& form() const { return std::get<0>(*this); }
+		const CondVowel& vowel() const { return std::get<1>(*this); }
+		const CondPolarity& polar() const { return std::get<2>(*this); }
 	};
 }
 
@@ -25,7 +28,7 @@ namespace std
 	{
 		size_t operator()(const kiwi::FormCond& fc) const
 		{
-			return hash<kiwi::k_string>{}(fc.form()) ^ ( (size_t)fc.vowel() | ((size_t)fc.polar() << 8));
+			return hash<kiwi::KString>{}(fc.form()) ^ ( (size_t)fc.vowel() | ((size_t)fc.polar() << 8));
 		}
 	};
 }
@@ -36,38 +39,50 @@ namespace kiwi
 	{
 	protected:
 		const char* modelPath = nullptr;
-		std::vector<KForm> forms;
-		std::vector<KMorpheme> morphemes;
+		std::vector<Form> forms;
+		std::vector<Morpheme> morphemes;
 		std::unordered_map<FormCond, size_t> formMap;
 		size_t baseTrieSize = 0;
 		size_t extraTrieSize = 0;
-		std::vector<KTrie> trieRoot;
+		utils::ContinuousTrie<KTrie> formTrie;
+	public:
+		utils::FrozenTrie<kchar_t, const Form*> fTrie;
+	protected:
 		std::shared_ptr<KNLangModel> langMdl;
+		std::shared_ptr<lm::KNLangModelBase> langMdl2;
 
-		using MorphemeMap = std::unordered_map<std::pair<k_string, KPOSTag>, size_t>;
-		void loadMMFromTxt(std::istream& is, MorphemeMap& morphMap, std::unordered_map<KPOSTag, float>* posWeightSum, const std::function<bool(float, KPOSTag)>& selector);
+		using MorphemeMap = std::unordered_map<std::pair<KString, POSTag>, size_t>;
+		void loadMMFromTxt(std::istream& is, MorphemeMap& morphMap, std::unordered_map<POSTag, float>* posWeightSum, const std::function<bool(float, POSTag)>& selector);
 		void loadCMFromTxt(std::istream& is, MorphemeMap& morphMap);
 		void loadPCMFromTxt(std::istream& is, MorphemeMap& morphMap);
 		KNLangModel::AllomorphSet loadAllomorphFromTxt(std::istream& is, const MorphemeMap& morphMap);
 		void loadCorpusFromTxt(std::istream& is, MorphemeMap& morphMap, const KNLangModel::AllomorphSet& ams);
+		void addCorpusTo(Vector<Vector<uint16_t>>& out, std::istream& is, MorphemeMap& morphMap, const KNLangModel::AllomorphSet& ams);
+
 		void updateForms();
 		void saveMorphBin(std::ostream& os) const;
 		size_t estimateTrieSize() const;
 		template<class _Istream>
 		void loadMorphBin(_Istream& is);
-		KForm& formMapper(k_string form, KCondVowel vowel, KCondPolarity polar);
+		Form& formMapper(KString form, CondVowel vowel, CondPolarity polar);
 	public:
 		KModelMgr(const char* modelPath = "");
 		KModelMgr(const KModelMgr&) = default;
-		void addUserWord(const k_string& form, KPOSTag tag, float userScore = 10);
+		KModelMgr(KModelMgr&&) = default;
+		void addUserWord(const KString& form, POSTag tag, float userScore = 10);
 		void solidify();
-		const KTrie* getTrie() const { if (trieRoot.empty()) return nullptr; return &trieRoot[0]; }
+		bool ready() const { return !fTrie.empty(); }
+		const KTrie* getTrie() const { if (formTrie.empty()) return nullptr; return &formTrie.root(); }
 
 		const KNLangModel* getLangModel() const { return langMdl.get(); }
-		const KMorpheme* getMorphemes() const { return &morphemes[0]; }
+		const lm::KNLangModelBase* getLangModel2() const { return langMdl2.get(); }
+		const Morpheme* getMorphemes() const { return &morphemes[0]; }
+		size_t getNumMorphemes() const { return morphemes.size(); }
 
-		const KMorpheme* getDefaultMorpheme(KPOSTag tag) const { return &morphemes[1] + (size_t)tag; }
-		std::unordered_set<k_string> getAllForms() const;
+		const std::vector<Form>& getForms() const { return forms; }
+
+		const Morpheme* getDefaultMorpheme(POSTag tag) const { return &morphemes[1] + (size_t)tag; }
+		std::unordered_set<KString> getAllForms() const;
 	};
 
 }

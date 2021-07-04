@@ -1,11 +1,13 @@
 #pragma once
+#include <iostream>
+#include <string>
 #include "KForm.h"
 
 namespace kiwi
 {
 	bool isHangulCoda(char16_t chr);
-	k_string normalizeHangul(const std::u16string& hangul);
-	std::u16string joinHangul(const k_string& hangul);
+	KString normalizeHangul(const std::u16string& hangul);
+	std::u16string joinHangul(const KString& hangul);
 
 	template<class BaseChr, class OutIterator>
 	void split(const std::basic_string<BaseChr>& s, BaseChr delim, OutIterator result) 
@@ -73,16 +75,16 @@ namespace kiwi
 		return up * (sign ? -1 : 1);
 	}
 
-	std::u16string utf8_to_utf16(const std::string& str);
-	std::string utf16_to_utf8(const std::u16string& str);
+	std::u16string utf8To16(const std::string& str);
+	std::string utf16To8(const std::u16string& str);
 
 
-	inline std::ostream& operator <<(std::ostream& os, const k_string& str)
+	inline std::ostream& operator <<(std::ostream& os, const KString& str)
 	{
-		return os << utf16_to_utf8({ str.begin(), str.end() });
+		return os << utf16To8({ str.begin(), str.end() });
 	}
 
-	KPOSTag identifySpecialChr(k_char chr);
+	POSTag identifySpecialChr(kchar_t chr);
 
 	class SpaceSplitIterator
 	{

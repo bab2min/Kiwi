@@ -1,4 +1,5 @@
-#include "KiwiHeader.h"
+#include <cassert>
+#include <kiwi/Types.h>
 #include "KNLangModel.h"
 #include "Utils.h"
 #include "serializer.hpp"
