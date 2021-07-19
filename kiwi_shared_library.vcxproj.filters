@@ -15,45 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\core\BakedMap.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\core\KFeatureTestor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\core\KForm.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\core\Kiwi.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\core\KModelMgr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\core\KNLangModel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\core\KTrie.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\core\KWordDetector.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\core\logPoisson.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\core\ThreadPool.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\core\Utils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\core\serializer.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\core\pattern.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\kiwi\Kiwi.h">
       <Filter>Header Files\kiwi</Filter>
     </ClInclude>
@@ -78,54 +39,81 @@
     <ClInclude Include="include\kiwi\PatternMatcher.h">
       <Filter>Header Files\kiwi</Filter>
     </ClInclude>
-    <ClInclude Include="src\core\FrozenTrie.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\kiwi\FrozenTrie.h">
       <Filter>Header Files\kiwi</Filter>
     </ClInclude>
-    <ClInclude Include="src\core\count.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\kiwi\WordDetector.h">
+      <Filter>Header Files\kiwi</Filter>
     </ClInclude>
-    <ClInclude Include="src\core\Knlm.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\kiwi\ThreadPool.h">
+      <Filter>Header Files\kiwi</Filter>
+    </ClInclude>
+    <ClInclude Include="include\kiwi\BitEncoder.hpp">
+      <Filter>Header Files\kiwi</Filter>
+    </ClInclude>
+    <ClInclude Include="include\kiwi\FixedVector.hpp">
+      <Filter>Header Files\kiwi</Filter>
+    </ClInclude>
+    <ClInclude Include="include\kiwi\Form.h">
+      <Filter>Header Files\kiwi</Filter>
+    </ClInclude>
+    <ClInclude Include="src\count.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FrozenTrie.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FeatureTestor.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Knlm.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\KTrie.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\logPoisson.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pattern.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\search.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\serializer.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\kiwi\BitUtils.h">
+      <Filter>Header Files\kiwi</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\core\KFeatureTestor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\core\KForm.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\core\Kiwi.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\core\KModelMgr.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\core\KNLangModel.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\core\KTrie.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\core\KWordDetector.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\core\Utils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\core\serializer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\core\PatternMatcher.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="mimalloc\src\static.c">
       <Filter>mimalloc</Filter>
     </ClCompile>
-    <ClCompile Include="src\core\Kiwi2.cpp">
+    <ClCompile Include="src\Form.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FeatureTestor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Kiwi.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\KiwiBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\KTrie.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PatternMatcher.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WordDetector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -89,6 +89,11 @@ namespace kiwi
 }
 #else
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <sys/mman.h>
+
 namespace kiwi
 {
 	namespace utils
@@ -153,12 +158,23 @@ namespace kiwi
 			MMap(const MMap&) = delete;
 			MMap& operator=(const MMap&) = delete;
 
-			MMap(MMap&&) = default;
-			MMap& operator=(MMap&&) = default;
+			MMap(MMap&& o)
+			{
+				std::swap(view, o.view);
+			}
+
+			MMap& operator=(MMap&& o)
+			{
+				std::swap(view, o.view);
+				return *this;
+			}
 
 			~MMap()
 			{
-				munmap((void*)view, len);
+				if (view)
+				{
+					munmap((void*)view, len);
+				}
 			}
 
 			const char* get() const { return view; }
@@ -241,7 +257,7 @@ namespace kiwi
 
 				if (write)
 				{
-					this->setp(base, base, base + n);
+					this->setp(base, base + n);
 				}
 			}
 
@@ -267,9 +283,9 @@ namespace kiwi
 					if (dir == std::ios_base::cur)
 						pbump(off);
 					else if (dir == std::ios_base::end)
-						setp(pbase(), epptr() + off, epptr());
+						setp(epptr() + off, epptr());
 					else if (dir == std::ios_base::beg)
-						setp(pbase(), pbase() + off, epptr());
+						setp(pbase() + off, epptr());
 				}
 				return gptr() - eback();
 			}

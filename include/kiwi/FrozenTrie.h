@@ -12,15 +12,31 @@ namespace kiwi
 {
 	namespace utils
 	{
+		namespace detail
+		{
+			template<class Value, class = void>
+			struct HasSubmatch {};
+
+			template<class Value>
+			struct HasSubmatch<Value, typename std::enable_if<std::is_integral<Value>::value>::type>
+			{
+				static constexpr Value hasSubmatch = (Value)-1;
+			};
+
+			template<class Value>
+			struct HasSubmatch<Value, typename std::enable_if<std::is_pointer<Value>::value>::type>
+			{
+				static constexpr ptrdiff_t hasSubmatch = -1;
+			};
+		}
+
 		template<class _Key, class _Value, class _Diff = int32_t>
-		class FrozenTrie
+		class FrozenTrie : public detail::HasSubmatch<_Value>
 		{
 		public:
 			using Key = _Key;
 			using Value = _Value;
 			using Diff = _Diff;
-
-			static constexpr Value has_submatch = (Value)-1;
 
 			struct Node
 			{

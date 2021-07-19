@@ -13,14 +13,14 @@
 #include <mimalloc.h>
 #endif
 
-#define DEFINE_ENUM_FLAG_OPERATORS(Type) \
+#define KIWI_DEFINE_ENUM_FLAG_OPERATORS(Type) \
 inline Type operator~(Type a)\
 {\
 	return static_cast<Type>(~static_cast<typename std::underlying_type<Type>::type>(a));\
 }\
 inline bool operator!(Type a)\
 {\
-	return a != static_cast<Type>(0);\
+	return a == static_cast<Type>(0);\
 }\
 inline Type operator|(Type a, Type b)\
 {\
@@ -86,25 +86,7 @@ namespace kiwi
 	using KcVector = Vector<kchar_t>;
 	using KcScores = Vector<std::pair<KcVector, float>>;
 #endif
-}
 
-#ifdef USE_MIMALLOC
-namespace std
-{
-	template<>
-	struct hash<kiwi::KString>
-	{
-		size_t operator()(const kiwi::KString& s) const
-		{
-			return hash<basic_string<kiwi::kchar_t>>{}({ s.begin(), s.end() });
-		}
-	};
-
-}
-#endif
-
-namespace kiwi
-{
 	enum class POSTag : uint8_t
 	{
 		unknown,
@@ -147,6 +129,13 @@ namespace kiwi
 		negative
 	};
 
+	enum class BuildOption
+	{
+		none = 0,
+		integrateAllomorph = 1 << 0,
+		loadDefaultDict = 1 << 1,
+	};
+
 	struct Morpheme;
 
 	struct TokenInfo
@@ -177,8 +166,29 @@ namespace kiwi
 		{
 			return !operator==(o);
 		}
+	};
 
-		//friend std::ostream& (::operator<<) (std::ostream& os, const TokenInfo& tokeninfo);
+	struct FormCond
+	{
+		KString form;
+		CondVowel vowel;
+		CondPolarity polar;
+		
+		FormCond() = default;
+		FormCond(const KString& _form, CondVowel _vowel, CondPolarity _polar)
+			: form{ _form }, vowel{ _vowel }, polar{ _polar }
+		{
+		}
+
+		bool operator==(const FormCond& o) const
+		{
+			return form == o.form && vowel == o.vowel && polar == o.polar;
+		}
+
+		bool operator!=(const FormCond& o) const
+		{
+			return !operator==(o);
+		}
 	};
 
 	using TokenResult = std::pair<std::vector<TokenInfo>, float>;
@@ -186,3 +196,28 @@ namespace kiwi
 	using U16Reader = std::function<std::u16string()>;
 	using U16MultipleReader = std::function<U16Reader()>;
 }
+
+namespace std
+{
+#ifdef USE_MIMALLOC
+	template<>
+	struct hash<kiwi::KString>
+	{
+		size_t operator()(const kiwi::KString& s) const
+		{
+			return hash<basic_string<kiwi::kchar_t>>{}({ s.begin(), s.end() });
+		}
+	};
+#endif
+
+	template<>
+	struct hash<kiwi::FormCond>
+	{
+		size_t operator()(const kiwi::FormCond& fc) const
+		{
+			return hash<kiwi::KString>{}(fc.form) ^ ((size_t)fc.vowel | ((size_t)fc.polar << 8));
+		}
+	};
+}
+
+KIWI_DEFINE_ENUM_FLAG_OPERATORS(kiwi::BuildOption);

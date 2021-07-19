@@ -20,10 +20,10 @@ namespace kiwi
 	class PatternMatcher
 	{
 	public:
-		static std::unique_ptr<PatternMatcher> create();
+		static const PatternMatcher* getInst();
 		virtual ~PatternMatcher() {}
 		virtual std::pair<size_t, kiwi::POSTag> match(const char16_t* first, const char16_t* last, Match matchOptions) const = 0;
 	};
 }
 
-DEFINE_ENUM_FLAG_OPERATORS(kiwi::Match);
+KIWI_DEFINE_ENUM_FLAG_OPERATORS(kiwi::Match);

@@ -13,6 +13,7 @@
 #endif
 
 typedef struct kiwi_s* kiwi_h;
+typedef struct kiwi_builder* kiwi_builder_h;
 typedef struct kiwi_res* kiwi_res_h;
 typedef struct kiwi_ws* kiwi_ws_h;
 typedef unsigned short kchar16_t;
@@ -31,8 +32,18 @@ typedef int(*kiwi_receiver_t)(int, kiwi_res_h, void*);
 
 enum
 {
-	KIWI_LOAD_DEFAULT_DICT = 1,
-	KIWI_INTEGRATE_ALLOMORPH = 2,
+	KIWI_BUILD_LOAD_DEFAULT_DICT = 1,
+	KIWI_BUILD_INTEGRATE_ALLOMORPH = 2,
+	KIWI_BUILD_DEFAULT = 3,
+};
+
+enum
+{
+	KIWI_MATCH_URL = 1,
+	KIWI_MATCH_EMAIL = 2,
+	KIWI_MATCH_HASHTAG = 4,
+	KIWI_MATCH_MENTION = 8,
+	KIWI_MATCH_ALL = 15,
 };
 
 #ifdef __cplusplus  
@@ -42,24 +53,23 @@ extern "C" {
 DECL_DLL const char* kiwi_version();
 DECL_DLL const char* kiwi_error();
 
+DECL_DLL kiwi_builder_h kiwi_builder_init(const char* model_path, int num_threads, int options);
+DECL_DLL int kiwi_builder_close(kiwi_builder_h handle);
+DECL_DLL int kiwi_builder_add_word(kiwi_builder_h handle, const char* word, const char* pos, float score);
+DECL_DLL int kiwi_builder_load_dict(kiwi_builder_h handle, const char* dict_path);
+DECL_DLL kiwi_ws_h kiwi_builder_extract_words(kiwi_builder_h handle, kiwi_reader_t reader, void* user_data, int min_cnt, int max_word_len, float min_score, float pos_threshold);
+DECL_DLL kiwi_ws_h kiwi_builder_extract_add_words(kiwi_builder_h handle, kiwi_reader_t reader, void* user_data, int min_cnt, int max_word_len, float min_score, float pos_threshold);
+DECL_DLL kiwi_ws_h kiwi_builder_extract_words_w(kiwi_builder_h handle, kiwi_reader_w_t reader, void* user_data, int min_cnt, int max_word_len, float min_score, float pos_threshold);
+DECL_DLL kiwi_ws_h kiwi_builder_extract_add_words_w(kiwi_builder_h handle, kiwi_reader_w_t reader, void* user_data, int min_cnt, int max_word_len, float min_score, float pos_threshold);
+DECL_DLL kiwi_h kiwi_builder_build(kiwi_builder_h handle);
+
 DECL_DLL kiwi_h kiwi_init(const char* model_path, int num_threads, int options);
-DECL_DLL int kiwi_add_user_word(kiwi_h handle, const char* word, const char* pos);
-DECL_DLL int kiwi_load_user_dict(kiwi_h handle, const char* dict_path);
-DECL_DLL kiwi_ws_h kiwi_extract_words(kiwi_h handle, kiwi_reader_t reader, void* user_data, int min_cnt, int max_word_len, float min_score);
-DECL_DLL kiwi_ws_h kiwi_extract_filter_words(kiwi_h handle, kiwi_reader_t reader, void* user_data, int min_cnt, int max_word_len, float min_score, float pos_threshold);
-DECL_DLL kiwi_ws_h kiwi_extract_add_words(kiwi_h handle, kiwi_reader_t reader, void* user_data, int min_cnt, int max_word_len, float min_score, float pos_threshold);
-DECL_DLL kiwi_ws_h kiwi_extract_words_w(kiwi_h handle, kiwi_reader_w_t reader, void* user_data, int min_cnt, int max_word_len, float min_score);
-DECL_DLL kiwi_ws_h kiwi_extract_filter_words_w(kiwi_h handle, kiwi_reader_w_t reader, void* user_data, int min_cnt, int max_word_len, float min_score, float pos_threshold);
-DECL_DLL kiwi_ws_h kiwi_extract_add_words_w(kiwi_h handle, kiwi_reader_w_t reader, void* user_data, int min_cnt, int max_word_len, float min_score, float pos_threshold);
-DECL_DLL int kiwi_prepare(kiwi_h handle);
 DECL_DLL void kiwi_set_option(kiwi_h handle, int option, int value);
 DECL_DLL int kiwi_get_option(kiwi_h handle, int option);
 DECL_DLL kiwi_res_h kiwi_analyze_w(kiwi_h handle, const kchar16_t* text, int top_n, int match_options);
 DECL_DLL kiwi_res_h kiwi_analyze(kiwi_h handle, const char* text, int top_n, int match_options);
 DECL_DLL int kiwi_analyze_mw(kiwi_h handle, kiwi_reader_w_t reader, kiwi_receiver_t receiver, void* user_data, int top_n, int match_options);
 DECL_DLL int kiwi_analyze_m(kiwi_h handle, kiwi_reader_t reader, kiwi_receiver_t receiver, void* user_data, int top_n, int match_options);
-DECL_DLL int kiwi_perform_w(kiwi_h handle, kiwi_reader_w_t reader, kiwi_receiver_t receiver, void* user_data, int top_n, int match_options, int min_cnt, int max_word_len, float min_score, float pos_threshold);
-DECL_DLL int kiwi_perform(kiwi_h handle, kiwi_reader_t reader, kiwi_receiver_t receiver, void* user_data, int top_n, int match_options, int min_cnt, int max_word_len, float min_score, float pos_threshold);
 DECL_DLL int kiwi_close(kiwi_h handle);
 
 DECL_DLL int kiwi_res_size(kiwi_res_h result);
