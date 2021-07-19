@@ -27,45 +27,41 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\kiwi\BitEncoder.hpp" />
+    <ClInclude Include="include\kiwi\BitUtils.h" />
+    <ClInclude Include="include\kiwi\FixedVector.hpp" />
+    <ClInclude Include="include\kiwi\Form.h" />
     <ClInclude Include="include\kiwi\FrozenTrie.h" />
     <ClInclude Include="include\kiwi\Kiwi.h" />
     <ClInclude Include="include\kiwi\Knlm.h" />
     <ClInclude Include="include\kiwi\Mmap.h" />
     <ClInclude Include="include\kiwi\PatternMatcher.h" />
+    <ClInclude Include="include\kiwi\ThreadPool.h" />
     <ClInclude Include="include\kiwi\Trainer.h" />
     <ClInclude Include="include\kiwi\Trie.hpp" />
     <ClInclude Include="include\kiwi\Types.h" />
     <ClInclude Include="include\kiwi\Utils.h" />
-    <ClInclude Include="src\core\BakedMap.hpp" />
-    <ClInclude Include="src\core\count.hpp" />
-    <ClInclude Include="src\core\FrozenTrie.hpp" />
-    <ClInclude Include="src\core\KFeatureTestor.h" />
-    <ClInclude Include="src\core\KForm.h" />
-    <ClInclude Include="src\core\Kiwi.h" />
-    <ClInclude Include="src\core\KModelMgr.h" />
-    <ClInclude Include="src\core\KNLangModel.h" />
-    <ClInclude Include="src\core\Knlm.hpp" />
-    <ClInclude Include="src\core\KTrie.h" />
-    <ClInclude Include="src\core\KWordDetector.h" />
-    <ClInclude Include="src\core\logPoisson.h" />
-    <ClInclude Include="src\core\pattern.hpp" />
-    <ClInclude Include="src\core\serializer.hpp" />
-    <ClInclude Include="src\core\ThreadPool.h" />
-    <ClInclude Include="src\core\Utils.h" />
+    <ClInclude Include="include\kiwi\WordDetector.h" />
+    <ClInclude Include="src\count.hpp" />
+    <ClInclude Include="src\FrozenTrie.hpp" />
+    <ClInclude Include="src\FeatureTestor.h" />
+    <ClInclude Include="src\Knlm.hpp" />
+    <ClInclude Include="src\KTrie.h" />
+    <ClInclude Include="src\logPoisson.h" />
+    <ClInclude Include="src\pattern.hpp" />
+    <ClInclude Include="src\search.h" />
+    <ClInclude Include="src\serializer.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mimalloc\src\static.c" />
-    <ClCompile Include="src\core\KFeatureTestor.cpp" />
-    <ClCompile Include="src\core\KForm.cpp" />
-    <ClCompile Include="src\core\Kiwi.cpp" />
-    <ClCompile Include="src\core\Kiwi2.cpp" />
-    <ClCompile Include="src\core\KModelMgr.cpp" />
-    <ClCompile Include="src\core\KNLangModel.cpp" />
-    <ClCompile Include="src\core\KTrie.cpp" />
-    <ClCompile Include="src\core\KWordDetector.cpp" />
-    <ClCompile Include="src\core\PatternMatcher.cpp" />
-    <ClCompile Include="src\core\serializer.cpp" />
-    <ClCompile Include="src\core\Utils.cpp" />
+    <ClCompile Include="src\Form.cpp" />
+    <ClCompile Include="src\FeatureTestor.cpp" />
+    <ClCompile Include="src\Kiwi.cpp" />
+    <ClCompile Include="src\KiwiBuilder.cpp" />
+    <ClCompile Include="src\KTrie.cpp" />
+    <ClCompile Include="src\PatternMatcher.cpp" />
+    <ClCompile Include="src\Utils.cpp" />
+    <ClCompile Include="src\WordDetector.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F790BC37-2732-4ED1-9CA5-7248BED3588E}</ProjectGuid>
@@ -169,6 +165,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>USE_MIMALLOC;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -182,6 +179,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>USE_MIMALLOC;_DEBUG;_CONSOLE;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -233,9 +231,9 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>USE_MIMALLOC;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <AdditionalOptions>/Qvec-report:1 %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -253,9 +251,9 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>USE_MIMALLOC;LOAD_TXT;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <AdditionalOptions>/Qvec-report:1 %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
