@@ -1,222 +1,129 @@
-﻿#include <iostream>
-#include <fstream>
+﻿#include <fstream>
+#include <iostream>
 
-#include <windows.h>
-#include <psapi.h>
 #include <kiwi/Utils.h>
-#include <kiwi/PatternMatcher.h>
-#include "KEval.h"
-#include <kiwi/Kiwi.h>
-
-class Timer
-{
-public:
-	std::chrono::high_resolution_clock::time_point point;
-	Timer()
-	{
-		reset();
-	}
-	void reset()
-	{
-		point = std::chrono::high_resolution_clock::now();
-	}
-
-	double getElapsed() const
-	{
-		return std::chrono::duration <double, std::milli>(std::chrono::high_resolution_clock::now() - point).count();
-	}
-};
+#include "Evaluator.h"
+#include "LCS.hpp"
 
 using namespace std;
 using namespace kiwi;
 
-/*
-int main()
+TokenInfo parseWordPOS(const u16string& str)
 {
-	//SetConsoleOutputCP(CP_UTF8);
-	//setvbuf(stdout, nullptr, _IOFBF, 1000);
-	KModelMgr km{ "../ModelGenerator/" };
-	km.solidify();
+	if (str[0] == '/' && str[1] == '/')
+	{
+		return { u"/", toPOSTag(str.substr(2)), 0, 0 };
+	}
+	auto p = str.find('/');
+	if (p == str.npos) return {};
+	u16string form{ str.begin(), str.begin() + p };
+	if (str[p + 1] == 'E')
+	{
+		if (form[0] == u'아' || form[0] == u'여') form[0] = u'어';
+		if (form[0] == u'았' || form[0] == u'였') form[0] = u'었';
+	}
+	switch (form[0])
+	{
+	case u'\u3134': // ㄴ
+		form[0] = u'\u11AB'; break;
+	case u'\u3139': // ㄹ
+		form[0] = u'\u11AF'; break;
+	case u'\u3141': // ㅁ
+		form[0] = u'\u11B7'; break;
+	case u'\u3142': // ㅂ
+		form[0] = u'\u11B8'; break;
+	}
+	return { form, toPOSTag(str.substr(p + 1)), 0, 0 };
+}
+
+Evaluator::Evaluator(const std::string& testSetFile, Kiwi* kw, size_t topN)
+{
+	ifstream f{ testSetFile };
 	string line;
-	wstring_convert<codecvt_utf8_utf16<wchar_t>, wchar_t> cvt;
-	while (getline(cin, line))
+	while (getline(f, line))
 	{
-		auto nodes = km.getTrie()->split(normalizeHangul(utf8To16(line)));
-		auto res = km.findBestPath(nodes, 10);
-		for (auto&& r : res)
+		auto wstr = utf8To16(line);
+		if (wstr.back() == '\n') wstr.pop_back();
+		auto fd = split(wstr, u'\t');
+		if (fd.size() < 2) continue;
+		vector<u16string> tokens;
+		for (size_t i = 1; i < fd.size(); ++i)
 		{
-			cout << r.second << '\t';
-			for (auto&& s : r.first)
-			{
-				if (s->kform) cout << utf16To8(*s->kform) << '/' << tagToString(s->tag);
-			}
+			split(fd[i], u' ', back_inserter(tokens));
 		}
+		TestResult tr;
+		tr.q = fd[0];
+		for (auto& t : tokens) tr.a.emplace_back(parseWordPOS(t));
+		auto cands = kw->analyze(tr.q, topN, Match::all);
+		tr.r = cands[0].first;
+		if (tr.a != tr.r)
+		{
+			auto diff = lcs::getDiff(tr.r.begin(), tr.r.end(), tr.a.begin(), tr.a.end(), [](const TokenInfo& a, const TokenInfo& b)
+			{
+				if (a.tag != b.tag) return false;
+				if (a.tag == POSTag::jko) return true;
+				if (a.str == u"은" && u"ᆫ" == b.str) return true;
+				if (b.str == u"은" && u"ᆫ" == a.str) return true;
+				if (a.str == u"을" && u"ᆯ" == b.str) return true;
+				if (b.str == u"을" && u"ᆯ" == a.str) return true;
+				if (a.str == u"음" && u"ᆷ" == b.str) return true;
+				if (b.str == u"음" && u"ᆷ" == a.str) return true;
+				if (a.str == u"그것" && u"그거" == b.str) return true;
+				if (b.str == u"그것" && u"그거" == a.str) return true;
+				if (a.str == u"것" && u"거" == b.str) return true;
+				if (b.str == u"것" && u"거" == a.str) return true;
+				return a == b;
+			});
+			size_t common = 0;
+			for (auto&& d : diff)
+			{
+				if (d.first < 0) tr.dr.emplace_back(d.second);
+				else if (d.first > 0) tr.da.emplace_back(d.second);
+				else common++;
+			}
+			tr.score = common / (double)diff.size();
+			totalScore += tr.score;
+			microCorrect += common;
+			microCount += diff.size();
+			errors.emplace_back(tr);
+		}
+		else
+		{
+			totalScore += 1;
+			microCorrect += tr.r.size();
+			microCount += tr.r.size();
+		}
+		totalCount++;
 	}
-	return 0;
 }
-*/
 
-/*int main2()
+double Evaluator::getMacroScore() const
 {
-	system("chcp 65001");
-	_wsetlocale(LC_ALL, L"korean");
-	Kiwi kw{ "../ModelGenerator/" };
-	kw.prepare();
-	Timer timer;
-	auto text = L"마쳤다.";
-	for (int i = 0; i < 1; i++)
-	{
-		kw.clearCache();
-		auto res = kw.analyze(text, 10);
-		if(i == 0) for (auto r : res)
-		{
-			printf("%.3g\t", r.second);
-			for (auto& p : r.first)
-			{
-				wprintf(L"%s/%s\t", p.str().c_str(), tagToKString(p.tag()));
-			}
-			printf("\n");
-		}
-	}
-	printf("\n==== %gms\n", timer.getElapsed());
-	timer.reset();
-	for (int i = 0; i < 500; i++)
-	{
-		kw.clearCache();
-		auto res = kw.analyzeOld(text, 5);
-		if (i == 0) for (auto r : res)
-		{
-			printf("%.3g\t", r.second);
-			for (auto& p : r.first)
-			{
-				wprintf(L"%s/%s\t", p.first.c_str(), tagToKString(p.second));
-			}
-			printf("\n");
-		}
-	}
-	printf("\n==== %gms\n", timer.getElapsed());
-	getchar();
-	return 0;
+	return totalScore / totalCount;
 }
-*/
 
-int main()
+double Evaluator::getMicroScore() const
 {
-/*#ifdef _DEBUG
-	_CrtSetDbgFlag(_CRTDBG_CHECK_ALWAYS_DF);
-#endif*/
-	SetConsoleOutputCP(CP_UTF8);
-	setvbuf(stdout, nullptr, _IOFBF, 1000);
-
-	//KiwiBuilder{ KiwiBuilder::fromRawDataTag, "ModelGenerator", 0 }.saveModel("ModelGenerator");
-
-	Timer timer;
-	Kiwi kw = KiwiBuilder{ "ModelGenerator" }.build();
-	//Kiwi kw{ "ModelGenerator/", (size_t)-1, 0, 3 };
-	//kw.prepare();
-	//kw.analyze(u"남미풍의 강렬한 원색끼리의 조화, 수채화 같이 안온한 배색 등 색의 분위기를 강조하는 기하학적 무늬, 꽃무늬 디자인이 주류를 이루고 있다.", 10);
-	//return 0;
-	//kw.setCutOffThreshold(10);
-	/*if (0)
-	{
-		auto flist = { "kowiki.txt" };
-		for (auto list : flist)
-		{
-			
-			auto res = kw.extractAddWords([&]()
-			{
-				auto ifs = make_shared<ifstream>(string{"G:/"} + list);
-				return [&]() -> u16string
-				{
-					string line;
-					while (getline(*ifs, line))
-					{
-						if (line.size()) return utf8To16(line);
-					}
-					return {};
-				};
-			}, 16, 20, 0.015f, -3.6);
-
-			ofstream ofs{ string{"extracted_"} + list + ".txt" };
-			for (auto& r : res)
-			{
-				ofs << utf16To8(r.form) << '\t' << r.score << '\t' << r.freq
-					<< '\t' << r.lCohesion << '\t' << r.rCohesion
-					<< '\t' << r.lBranch << '\t' << r.rBranch
-					<< '\t' << r.posScore[POSTag::nnp] << endl;
-			}
-		}
-		return 0;
-	}*/
-	//kw.addUserWord(u"골리", POSTag::nnp, -5);
-	//kw.prepare();
-	/*auto ret = kw.analyze(u8R""(너도 곧 알게될거야. '알게될거야'는 노래 제목이다.)"", 10, PatternMatcher::all);
-	for (auto& p : ret[0].first)
-	{
-		cout << p << endl;
-	}
-
-	return 0;*/
-
-	if (0)
-	{
-		Timer tm;
-		ifstream ifs{ "G:/namu_raw.txt" };
-		ofstream ofs{ "G:/namu_tagged.txt" };
-		kw.analyze(1, [&ifs]() -> u16string
-		{
-			string line;
-			while (getline(ifs, line))
-			{
-				auto sstr = line;
-				if (sstr.size()) return utf8To16(sstr);
-			}
-			return {};
-		}, [&ofs](size_t id, vector<TokenResult>&& res)
-		{
-			for (auto& r : res[0].first)
-			{
-				ofs << utf16To8(r.str) << '/' << tagToString(r.tag) << ' ';
-			}
-			ofs << endl;
-		}, Match::all);
-		return 0;
-	}
-
-	cout << "Loading Time : " << timer.getElapsed() << " ms" << endl;
-	PROCESS_MEMORY_COUNTERS pmc;
-	GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc));
-	SIZE_T memUsed = pmc.WorkingSetSize;
-	cout << "Mem Usage : " << memUsed / 1024.f / 1024.f << " MB" << endl;
-
-	string testFiles[] = { "01s.txt", "02s.txt", "03s.txt", "17s.txt", "18s.txt", "13s.txt", 
-		//"15s.txt",
-	};
-	for (auto& tf : testFiles)
-	{
-		Timer total;
-		KEval test{ ("data/evaluation/" + tf).c_str(), &kw };
-		double tm = total.getElapsed();
-
-		cout << endl << test.getScore() << endl;
-		cout << "Total (" << test.getTotalCount() << ") Time : " << tm << " ms" << endl;
-		cout << "Time per Unit : " << tm / test.getTotalCount() << " ms" << endl;
-		
-		ofstream out{ "eval_result/wrongsV2" + tf };
-		out << test.getScore() << endl;
-		out << "Total (" << test.getTotalCount() << ") Time : " << tm << " ms" << endl;
-		out << "Time per Unit : " << tm / test.getTotalCount() << " ms" << endl;
-		for (auto t : test.getWrongList())
-		{
-			t.writeResult(out);
-		}
-
-		/*for (auto& p : KSingleLogger::getInstance().totalAlloc)
-		{
-			cout << p.first << "bytes\t" << p.second << endl;
-		}*/
-	}
-	//getchar();
-	return 0;
+	return microCorrect / (double)microCount;
 }
 
+ostream& operator<<(ostream& o, const kiwi::TokenInfo& t)
+{
+	return o << utf16To8(t.str) << "/" << kiwi::tagToString(t.tag);
+}
+
+void Evaluator::TestResult::writeResult(ostream& out) const
+{
+	out << utf16To8(q) << '\t' << score << endl;
+	for (auto& _r : da)
+	{
+		out << _r << '\t';
+	}
+	out << endl;
+	for (auto& _r : dr)
+	{
+		out << _r << '\t';
+	}
+	out << endl;
+	out << endl;
+}

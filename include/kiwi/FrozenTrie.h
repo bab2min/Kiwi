@@ -40,9 +40,9 @@ namespace kiwi
 
 			struct Node
 			{
-				Key numNexts;
-				Diff lower;
-				uint32_t nextOffset;
+				Key numNexts = 0;
+				Diff lower = 0;
+				uint32_t nextOffset = 0;
 
 				const Node* next(const FrozenTrie& ft, Key c) const;
 				const Node* fail() const;

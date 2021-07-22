@@ -292,21 +292,20 @@ int kiwi_analyze_mw(kiwi_h handle, kiwi_reader_w_t reader, kiwi_receiver_t recei
 	Kiwi* kiwi = (Kiwi*)handle;
 	try
 	{
-		int idx = 0;
+		int reader_idx = 0, receiver_idx = 0;
 		kiwi->analyze(topN, [&]() -> u16string
 		{
 			u16string buf;
-			buf.resize((*reader)(idx, nullptr, userData));
+			buf.resize((*reader)(reader_idx, nullptr, userData));
 			if (buf.empty()) return {};
-			(*reader)(idx, (kchar16_t*)&buf[0], userData);
-			++idx;
+			(*reader)(reader_idx++, (kchar16_t*)&buf[0], userData);
 			return buf;
-		}, [&](size_t id, vector<TokenResult>&& res)
+		}, [&](vector<TokenResult>&& res)
 		{
 			auto result = new TResult{ move(res), {} };
-			(*receiver)(id, (kiwi_res_h)result, userData);
+			(*receiver)(receiver_idx++, (kiwi_res_h)result, userData);
 		}, (Match)matchOptions);
-		return 0;
+		return reader_idx;
 	}
 	catch (...)
 	{
@@ -321,21 +320,20 @@ int kiwi_analyze_m(kiwi_h handle, kiwi_reader_t reader, kiwi_receiver_t receiver
 	Kiwi* kiwi = (Kiwi*)handle;
 	try
 	{
-		int idx = 0;
+		int reader_idx = 0, receiver_idx = 0;
 		kiwi->analyze(topN, [&]() -> u16string
 		{
 			string buf;
-			buf.resize((*reader)(idx, nullptr, userData));
+			buf.resize((*reader)(reader_idx, nullptr, userData));
 			if (buf.empty()) return {};
-			(*reader)(idx, &buf[0], userData);
-			++idx;
+			(*reader)(reader_idx++, &buf[0], userData);
 			return utf8To16(buf);
-		}, [&](size_t id, vector<TokenResult>&& res)
+		}, [&](vector<TokenResult>&& res)
 		{
 			auto result = new TResult{ move(res),{} };
-			(*receiver)(id, (kiwi_res_h)result, userData);
+			(*receiver)(receiver_idx++, (kiwi_res_h)result, userData);
 		}, (Match)matchOptions);
-		return 0;
+		return reader_idx;
 	}
 	catch (...)
 	{

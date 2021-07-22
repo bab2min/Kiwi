@@ -298,8 +298,8 @@ namespace kiwi
 		serializer::writeMany(os, serializer::toKey("KIWI"), forms, morphemes);
 	}
 
-	KiwiBuilder::KiwiBuilder(const string& modelPath, size_t numThreads, BuildOption _options) 
-		: detector{ modelPath, numThreads }, options { _options }
+	KiwiBuilder::KiwiBuilder(const string& modelPath, size_t _numThreads, BuildOption _options) 
+		: detector{ modelPath, _numThreads }, options{ _options }, numThreads{ _numThreads ? _numThreads : thread::hardware_concurrency() }
 	{
 		{
 			utils::MMap mm{ modelPath + "/sj.morph" };
@@ -313,8 +313,8 @@ namespace kiwi
 		}
 	}
 
-	KiwiBuilder::KiwiBuilder(FromRawData, const std::string& rawDataPath, size_t numThreads)
-		: detector{ WordDetector::fromRawDataTag, rawDataPath, numThreads }
+	KiwiBuilder::KiwiBuilder(FromRawData, const std::string& rawDataPath, size_t _numThreads)
+		: detector{ WordDetector::fromRawDataTag, rawDataPath, _numThreads }, numThreads{ _numThreads ? _numThreads : thread::hardware_concurrency() }
 	{
 		forms.resize(defaultTagSize);
 		morphemes.resize(defaultTagSize + 2); // additional places for <s> & </s>
@@ -443,6 +443,10 @@ namespace kiwi
 		ret.morphemes.reserve(morphemes.size());
 		ret.langMdl = langMdl;
 		ret.integrateAllomorph = !!(options & BuildOption::integrateAllomorph);
+		if (numThreads > 1)
+		{
+			ret.pool = make_unique<utils::ThreadPool>(numThreads);
+		}
 
 		for (auto& f : forms)
 		{

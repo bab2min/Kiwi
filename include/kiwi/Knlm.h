@@ -25,9 +25,9 @@ namespace kiwi
 		template<class KeyType, class DiffType = int32_t>
 		struct Node
 		{
-			KeyType num_nexts;
-			DiffType lower;
-			uint32_t next_offset;
+			KeyType num_nexts = 0;
+			DiffType lower = 0;
+			uint32_t next_offset = 0;
 		};
 
 		class KnLangModelBase
