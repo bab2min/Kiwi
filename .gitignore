@@ -329,3 +329,4 @@ __pycache__/
 /mimalloc
 /data/
 include/btree/
+.vscode/
