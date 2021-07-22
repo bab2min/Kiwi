@@ -29,27 +29,35 @@ class MorphemeModel:
             if k[1] not in self.index: self.index[k[1]] = [k]
             else: self.index[k[1]].append(k)
 
+    @staticmethod
     def isVowel(s):
         return '가' <= s[-1] <= '히'
 
+    @staticmethod
     def isVocalic(s):
         return '가' <= s[-1] <= '히' or s[-1] == 'ᆯ'
 
+    @staticmethod
     def isVocalicH(s):
         return '가' <= s[-1] <= '히' or s[-1] == 'ᆯ' or s[-1] == 'ᇂ'
 
+    @staticmethod
     def notVowel(s):
         return not MorphemeModel.isVowel(s)
 
+    @staticmethod
     def notVocalic(s):
         return not MorphemeModel.isVocalic(s)
 
+    @staticmethod
     def notVocalicH(s):
         return not MorphemeModel.isVocalicH(s)
 
+    @staticmethod
     def isSingleVowel(s):
         return 'ㅏ' <= s <= 'ㅣ'
 
+    @staticmethod
     def isPositive(s):
         for c in reversed(s):
             if not ('ㅏ' <= c <= 'ㅣ'): continue
@@ -105,7 +113,7 @@ class RuleModel:
 
         def ruleToPrecond(r):
             t = r[0].replace('^', '')
-            mgroup = re.match('\(\[(.*)\]\)', t)
+            mgroup = re.match(r'\(\[(.*)\]\)', t)
             if mgroup: return [(c, r[4]) for c in mgroup.group(1)]
             else: return [(t, r[4])]
 
