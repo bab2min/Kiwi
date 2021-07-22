@@ -1,26 +1,56 @@
 # Kiwi : 지능형 한국어 형태소 분석기(Korean Intelligent Word Identifier)
 
-## 개요
-Kiwi는 C++기반의 한국어 형태소 분석기 라이브러리입니다. 
-입력한 단어나 문장을 세종 품사 태그에 따라 분석하고 그 태그를 붙여줍니다. 
-분석기는 문어 텍스트의 경우 평균 94%의 정확도로 해당 텍스트를 분석해 낼 수 있습니다.
+![KiwiLogo](https://repository-images.githubusercontent.com/82677855/eb9fa478-175d-47a5-8e07-0e169c030ff5)
 
-Kiwi는 C++기반으로 최적화되었으며 멀티스레딩을 지원하기에,
-대량의 텍스트를 분석해야하는 경우 멀티코어를 활용하여 좀 더 빠르게 분석이 가능합니다.
+Kiwi는 빠른 속도와 범용적인 성능을 지향하는 한국어 형태소 분석기 라이브러리입니다. 한국어 자연어처리에 관심 있는 사람이면 누구나 쉽게 사용할 수 있도록 오픈 소스로 공개 중이며, C++로 구현된 코어 라이브러리를 래핑하여 다양한 프로그래밍 언어에 사용할 수 있도록 준비 중입니다. 
 
-## 사용
+형태소 분석은 세종 품사 태그 체계를 기반으로 하고 있으며 모델 학습에는 세종계획 말뭉치와 모두의 말뭉치를 사용하고 있습니다. 문어 텍스트의 경우 약 94% 정도의 정확도로 한국어 문장의 형태소를 분석해 낼 수 있습니다.
+
+또한 라이브러리 차원에서 멀티스레딩을 지원하기 때문에 대량의 텍스트를 분석해야할 경우 멀티코어를 활용하여 빠른 분석이 가능합니다.
+
+아직 부족한 부분이 많기에 개발자분들의 많은 관심과 기여 부탁드립니다.
+
+## 설치
 
 ### C++
-오픈소스로 제공되는 C++ 라이브러리를 컴파일하여 사용하실 수 있습니다. 
-Visual Studio 2015, 2017 환경에서 개발되었고 gcc 5.0 이상에서 컴파일되는 것을 확인했습니다.
-컴파일에 필요한 별도의 의존 관계는 없으나, 컴파일러가 C++14 이상을 지원해야 합니다.
+
+#### Windows
+Visual Studio 2019 이상을 사용하여 `Kiwi.sln` 파일을 실행하여 컴파일할 수 있습니다.
+
+#### Linux
+이 레포지토리를 clone한 뒤 cmake>=3.9를 사용하여 컴파일합니다. 
+```console
+$ git clone https://github.com/bab2min/Kiwi
+$ cd Kiwi
+$ git submodule sync
+$ git submodule update --init --recursive
+$ mkdir build && cd build
+$ cmake -DCMAKE_BUILD_TYPE=Release ../
+$ make
+```
+설치가 잘 됐는지 확인하기 위해서는 `kiwi-evaluator`를 실행해봅니다.
+```console
+$ ./kiwi-evaluator --model ../ModelGenerator ../eval_data/web.txt ../eva
+l_data/written.txt
+
+Loading Time : 1198.05 ms
+Mem Usage : 158.539 MB
+
+Test file: ../eval_data/web.txt
+0.822854, 0.804857
+Total (96 lines) Time : 105.274 ms
+Time per Line : 1.0966 ms
+================
+Test file: ../eval_data/written.txt
+0.946757, 0.943904
+Total (23 lines) Time : 34.2189 ms
+Time per Line : 1.48778 ms
+================
+```
 
 ### C API
-https://github.com/bab2min/Kiwi/wiki 를 참고하시길 바랍니다.
+include/kiwi/capi.h 를 참조하세요.
 
-### Windows용 DLL
-DLL로 컴파일된 바이너리를 이용하여 다른 프로그램에 Kiwi를 적용할 수도 있습니다. 
-최신 버전의 DLL은 https://github.com/bab2min/kiwi-gui/releases 의 zip파일의 bin_x86, bin_x64 폴더에 포함되어 있습니다.
 
 ### C# Wrapper
 https://github.com/bab2min/kiwi-gui
