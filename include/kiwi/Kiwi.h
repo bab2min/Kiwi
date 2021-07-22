@@ -72,28 +72,53 @@ namespace kiwi
 
 		std::future<std::vector<TokenResult>> asyncAnalyze(const std::string& str, size_t topN, Match matchOptions) const;
 
-		template<class ResultCallback>
-		void analyze(size_t topN, const U16Reader& reader, ResultCallback&& resultCallback, Match matchOptions) const
+		template<class ReaderCallback, class ResultCallback>
+		void analyze(size_t topN, ReaderCallback&& reader, ResultCallback&& resultCallback, Match matchOptions) const
 		{
 			if (pool)
 			{
-				for (size_t id = 0; ; ++id)
+				bool stop = false;
+				std::deque<std::future<std::vector<TokenResult>>> futures;
+				for (size_t i = 0; i < pool->size() * 2; ++i)
 				{
 					auto ustr = reader();
-					if (ustr.empty()) break;
-					pool->enqueue([&, topN, matchOptions, id, ustr](size_t tid)
+					if (ustr.empty())
 					{
-						resultCallback(id, analyze(ustr, topN, matchOptions));
-					});
+						stop = true;
+						break;
+					}
+					futures.emplace_back(pool->enqueue([&, ustr](size_t tid)
+					{
+						return analyze(ustr, topN, matchOptions);
+					}));
+				}
+
+				while (!futures.empty())
+				{
+					resultCallback(futures.front().get());
+					futures.pop_front();
+					if (!stop)
+					{
+						auto ustr = reader();
+						if (ustr.empty())
+						{
+							stop = true;
+							continue;
+						}
+						futures.emplace_back(pool->enqueue([&, ustr](size_t tid)
+						{
+							return analyze(ustr, topN, matchOptions);
+						}));
+					}
 				}
 			}
 			else
 			{
-				for (size_t id = 0; ; ++id)
+				while(1)
 				{
 					auto ustr = reader();
 					if (ustr.empty()) break;
-					resultCallback(id, analyze(ustr, topN, matchOptions));
+					resultCallback(analyze(ustr, topN, matchOptions));
 				}
 			}
 		}
@@ -105,6 +130,7 @@ namespace kiwi
 		std::vector<MorphemeRaw> morphemes;
 		std::unordered_map<FormCond, size_t> formMap;
 		std::shared_ptr<lm::KnLangModelBase> langMdl;
+		size_t numThreads;
 		WordDetector detector;
 		BuildOption options;
 

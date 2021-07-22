@@ -1,160 +1,106 @@
+#include <iostream>
+#include <fstream>
+
 #include <kiwi/Kiwi.h>
+#include <tclap/CmdLine.h>
+#include "toolUtils.h"
 
 using namespace std;
 using namespace kiwi;
-#ifdef _WIN32
-#else
-int fopen_s(FILE** f, const char* a, const char* b)
-{
-	*f = fopen(a, b);
-	return !f;
-}
-#endif
 
-unordered_map<string, vector<string>> parseArg(int argc, const char** argv)
+void printResult(Kiwi& kw, const string& line, int topn, ostream& out)
 {
-	unordered_map<string, vector<string>> ret;
-	string key = "";
-	for (int i = 0; i < argc; i++)
+	for (auto& result : kw.analyze(line, topn, Match::all))
 	{
-		if (argv[i][0] == '-')
+		for (auto& t : result.first)
 		{
-			if (!key.empty()) ret[key].emplace_back("");
-			key = argv[i] + 1;
+			out << utf16To8(t.str) << '/' << tagToString(t.tag) << '\t';
+		}
+		out << endl;
+	}
+	if (topn > 1) out << endl;
+}
+
+int run(const string& modelPath, bool buildFromRaw, const string& output, const string& user, int topn, const vector<string>& input)
+{
+	try
+	{
+		Kiwi kw;
+		if (buildFromRaw)
+		{
+			kw = KiwiBuilder{ KiwiBuilder::fromRawDataTag, modelPath, 1 }.build();
 		}
 		else
 		{
-			ret[key].emplace_back(argv[i]);
-			key = "";
+			kw = KiwiBuilder{ modelPath, 1 }.build();
 		}
-	}
-	if (!key.empty()) ret[key].emplace_back("");
-	return ret;
-}
 
-void help()
-{
-	printf("Kiwi : Korean Intelligent Word Identifier\n"
-		"version: %s\n"
-		"\n"
-		"= Usage =\n"
-		"kiwi [-m model] [-u user] [-o output] [-c cache] [-n number] input...\n"
-		"\tmodel: (Optional) path of model file\n"
-		"\tuser: (Optional) path of user dictionary file\n"
-		"\toutput: (Optional) path of result file\n"
-		"\tnumber: (Optional) the number of analyzed result, default = 1\n"
-		"\tinput: path of input file to be analyzed\n", "0.10.0");
-}
+		ostream* out = &cout;
+		unique_ptr<ofstream> fout;
+		if (!output.empty())
+		{
+			fout = kiwi::make_unique<ofstream>(output);
+			out = fout.get();
+		}
 
-int main(int argc, const char** argv)
-{
-#ifdef _WIN32
-	system("chcp 65001");
-	_wsetlocale(LC_ALL, L"korean");
-#endif
-	auto arg = parseArg(argc - 1, argv + 1);
-	string model = "";
-	string userDict = "";
-	string output = "";
-	size_t maxCache = -1;
-	size_t topN = 1;
-	if (!arg["m"].empty())
-	{
-		model = arg["m"][0];
-	}
-	if (!arg["u"].empty())
-	{
-		userDict = arg["u"][0];
-	}
-	if (!arg["o"].empty())
-	{
-		output = arg["o"][0];
-	}
-	if (!arg["c"].empty())
-	{
-		maxCache = atoi(arg["c"][0].c_str());
-	}
-	if (!arg["n"].empty())
-	{
-		topN = atoi(arg["n"][0].c_str());
-	}
-
-	if (arg[""].empty())
-	{
-		help();
-		return -1;
-	}
-
-	Kiwi kiwi;
-	try
-	{
-		kiwi = KiwiBuilder{ model, 0 }.build();
+		if (input.empty())
+		{
+			for (string line; getline(cin, line);)
+			{
+				printResult(kw, line, topn, *out);
+			}
+		}
+		else
+		{
+			for (auto& f : input)
+			{
+				ifstream in{ f };
+				for (string line; getline(in, line);)
+				{
+					printResult(kw, line, topn, *out);
+				}
+			}
+		}
+		return 0;
 	}
 	catch (const exception& e)
 	{
-		printf("#### %s.\n", e.what());
+		cerr << e.what() << endl;
 		return -1;
 	}
+}
 
-	FILE* of = nullptr;
-	if (output.empty()) 
-	{
-		of = stdout;
-	}
-	else
-	{
-		if (fopen_s(&of, output.c_str(), "w"))
-		{
-			printf("#### Cannot write file '%s'.\n", output.c_str());
-			return -1;
-		}
-	}
+using namespace TCLAP;
 
-	for (const auto& input : arg[""])
+int main(int argc, const char* argv[])
+{
+	tutils::setUTF8Output();
+
+	CmdLine cmd{ "Kiwi CLI", ' ', "0.10.0" };
+
+	ValueArg<string> model{ "m", "model", "Kiwi model path", true, "", "string" };
+	SwitchArg build{ "b", "build", "build model from raw data" };
+	ValueArg<string> output{ "o", "output", "output file path", false, "", "string" };
+	ValueArg<string> user{ "u", "user", "user dictionary path", false, "", "string" };
+	ValueArg<int> topn{ "n", "topn", "top-n of result", false, 1, "int > 0" };
+	UnlabeledMultiArg<string> files{ "inputs", "input files", false, "string" };
+
+	cmd.add(model);
+	cmd.add(build);
+	cmd.add(output);
+	cmd.add(user);
+	cmd.add(topn);
+	cmd.add(files);
+
+	try
 	{
-		FILE* f = nullptr;
-		if (fopen_s(&f, input.c_str(), "r"))
-		{
-			printf("#### Cannot open file '%s'.\n", input.c_str());
-			continue;
-		}
-		char buf[8192];
-		while (fgets(buf, 8192, f))
-		{
-			try
-			{
-				auto wstr = utf8To16(buf);
-				auto cands = kiwi.analyze(wstr, topN, Match::all);
-				for (const auto& c : cands)
-				{
-					for (const auto& m : c.first)
-					{
-						if (of == stdout)
-						{
-#ifdef _WIN32
-							fputws((const wchar_t*)m.str.c_str(), of);
-#else
-							fputs(utf16To8(m.str).c_str(), of);
-#endif
-						}
-						else fputs(utf16To8(m.str).c_str(), of);
-						fputc('/', of);
-						fputs(tagToString(m.tag), of);
-						fputc('\t', of);
-					}
-					fputc('\n', of);
-				}
-				if (topN > 1) fputc('\n', of);
-			}
-			catch (const exception& e)
-			{
-				printf("#### Uncaught exception '%s'.\n", e.what());
-				continue;
-			}
-		}
-		fclose(f);
+		cmd.parse(argc, argv);
 	}
-	if(of != stdout) fclose(of);
-    return 0;
+	catch (const ArgException& e)
+	{
+		cerr << "error: " << e.error() << " for arg " << e.argId() << endl;
+		return -1;
+	}
+	return run(model, build, output, user, topn, files.getValue());
 }
 

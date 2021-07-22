@@ -19,6 +19,7 @@ set ( SRCS
 )
 
 include_directories( include/ )
+include_directories( third_party/tclap/include )
 
 link_libraries ( pthread )
 set ( CMAKE_EXE_LINKER_FLAGS "-static -Wl,--gc-sections" )
@@ -45,7 +46,16 @@ add_executable( "${CMAKE_PROJECT_NAME}-cli-${PROJECT_VERSION}"
 )
 
 target_link_libraries( "${CMAKE_PROJECT_NAME}-cli-${PROJECT_VERSION}"
-"${CMAKE_PROJECT_NAME}_static"
+  "${CMAKE_PROJECT_NAME}_static"
+)
+
+add_executable( "${CMAKE_PROJECT_NAME}-evaluator"
+  tools/Evaluator.cpp
+  tools/evaluator_main.cpp
+)
+
+target_link_libraries( "${CMAKE_PROJECT_NAME}-evaluator"
+  "${CMAKE_PROJECT_NAME}_static"
 )
 
 add_library( "${CMAKE_PROJECT_NAME}" SHARED

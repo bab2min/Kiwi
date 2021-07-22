@@ -5,7 +5,7 @@
 #include <iterator>
 #include <algorithm>
 
-namespace LCS
+namespace lcs
 {
 	template<class Type> class matrix : public std::vector<Type>
 	{
@@ -18,17 +18,17 @@ namespace LCS
 
 		std::pair<size_t, size_t> getDimension() const
 		{
-			return std::make_pair(xDim, size() / xDim);
+			return std::make_pair(xDim, this->size() / xDim);
 		}
 
 		Type& at(size_t i, size_t j)
 		{
-			return operator [](i + j * xDim);
+			return this->operator [](i + j * xDim);
 		}
 
 		const Type& at(size_t i, size_t j) const
 		{
-			return operator [](i + j * xDim);
+			return this->operator [](i + j * xDim);
 		}
 	};
 

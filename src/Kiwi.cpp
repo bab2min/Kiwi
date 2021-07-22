@@ -208,13 +208,22 @@ namespace kiwi
 						auto cn = seq[i];
 						if (cn >= vocabSize)
 						{
-							cn = (size_t)morphBase[cn].tag + 1;
+							if (morphBase[cn].tag == POSTag::v)
+							{
+								// prohibit <v> without <chunk>
+								goto continueFor;
+							}
+							else
+							{
+								cn = (size_t)morphBase[cn].tag + 1;
+							}
 						}
 						float ll = (*knlm).progress(cNode, cn);
 						candScore += ll;
 					}
 				}
 				emplaceMaxCnt(maxWidLL, lSeq, WordLLP{ wids, candScore, cNode }, 3, [](const WordLLP& a, const WordLLP& b) { return a.accScore > b.accScore; });
+			continueFor:;
 			}
 		}
 	}
