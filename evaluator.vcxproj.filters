@@ -18,18 +18,21 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\evaluator.cpp">
+    <ClCompile Include="tools\Evaluator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\KEval.cpp">
+    <ClCompile Include="tools\evaluator_main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\KEval.h">
+    <ClInclude Include="tools\Evaluator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\LCS.hpp">
+    <ClInclude Include="tools\LCS.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tools\toolUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

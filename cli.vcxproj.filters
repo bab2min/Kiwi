@@ -18,7 +18,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\runner.cpp">
+    <ClCompile Include="tools\runner.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
