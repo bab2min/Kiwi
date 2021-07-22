@@ -30,8 +30,7 @@ $ make
 ```
 설치가 잘 됐는지 확인하기 위해서는 `kiwi-evaluator`를 실행해봅니다.
 ```console
-$ ./kiwi-evaluator --model ../ModelGenerator ../eval_data/web.txt ../eva
-l_data/written.txt
+$ ./kiwi-evaluator --model ../ModelGenerator ../eval_data/web.txt ../eval_data/written.txt
 
 Loading Time : 1198.05 ms
 Mem Usage : 158.539 MB
