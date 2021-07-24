@@ -1,3 +1,10 @@
 [submodule "third_party/tclap"]
 	path = third_party/tclap
 	url = https://github.com/mirror/tclap
+[submodule "third_party/mimalloc"]
+	path = third_party/mimalloc
+	url = https://github.com/microsoft/mimalloc
+[submodule "third_party/cpp-btree"]
+	path = third_party/cpp-btree
+	url = https://github.com/bab2min/cpp-btree
+	branch = improve-mscv-compatibility
