@@ -8,7 +8,14 @@
 #include <kiwi/Trie.hpp>
 #include <kiwi/ThreadPool.h>
 
-#ifdef USE_BTREE
+#ifdef KIWI_USE_BTREE
+
+#ifdef _WIN32
+using ssize_t = ptrdiff_t;
+#else
+#include <sys/types.h>
+#endif
+
 #include <btree/map.h>
 #else
 #endif
@@ -17,7 +24,7 @@ namespace kiwi
 {
 	namespace utils
 	{
-#ifdef USE_BTREE
+#ifdef KIWI_USE_BTREE
 		template<typename K, typename V> using map = btree::map<K, V>;
 #else
 		template<typename K, typename V> using map = std::map<K, V>;

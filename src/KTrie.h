@@ -6,7 +6,14 @@
 #include <kiwi/PatternMatcher.h>
 #include <kiwi/FrozenTrie.h>
 
-#ifdef USE_BTREE
+#ifdef KIWI_USE_BTREE
+
+#ifdef _WIN32
+using ssize_t = ptrdiff_t;
+#else
+#include <sys/types.h>
+#endif
+
 #include <btree/map.h>
 #else
 #endif
@@ -16,7 +23,7 @@ namespace kiwi
 	class KModelMgr;
 	class KnLangModel;
 
-#ifdef USE_BTREE
+#ifdef KIWI_USE_BTREE
 	template<class K, class V> using map = btree::map<K, V>;
 #else
 	template<class K, class V> using map = std::map<K, V>;
