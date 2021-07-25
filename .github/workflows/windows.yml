@@ -21,15 +21,18 @@ jobs:
       with:
         submodules: true
     - name: Init
-      run: mkdir build
-    - name: Configure Build
+      run: |
+        mkdir build
+        chcp 65001
+        echo ("KIWI_STATIC_WITHOUT_MT=1") >> $env:GITHUB_ENV
+    - name: Build
       uses: lukka/run-cmake@v3
       with:
         cmakeListsOrSettingsJson: CMakeListsTxtBasic
         cmakeBuildType: Release
         buildWithCMake: true
         cmakeGenerator: VS16Win${{ matrix.arch }}
-        buildWithCMakeArgs: -DKIWI_MT_STATIC=0
+        buildWithCMakeArgs: --config Release
         buildDirectory: build
     - name: Run Unit Test
       run: .\build\test\Release\kiwi-test.exe
