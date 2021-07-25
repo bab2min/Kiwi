@@ -20,11 +20,13 @@ jobs:
     - uses: actions/checkout@v1
       with:
         submodules: true
+    - name: Init
+      run: mkdir build
     - name: Configure Build
-      run: mkdir build && cd build && cmake -DCMAKE_GENERATOR_PLATFORM=${{ matrix.arch }} -DCMAKE_BUILD_TYPE=Release ..
-    - name: Add MSBuild to PATH
-      uses: microsoft/setup-msbuild@v1.0.2
-    - name: Build
-      run: cd build && MSBuild.exe Kiwi.sln /p:Configuration=Release
-    - name: Run Unit Test
-      run: ./build/test/kiwi-test.exe
+      uses: lukka/run-cmake@v3
+      with:
+        cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
+        cmakeListsTxtPath: '${{ github.workspace }}/cmakesettings.json/CMakeLists.txt'
+        useVcpkgToolchainFile: true
+        cmakeAppendedArgs: '-GNinja'
+        buildDirectory: build

@@ -60,3 +60,10 @@ jobs:
       run: |
         mkdir eval_results
         ./build/kiwi-evaluator -m ./ModelGenerator eval_data/*.txt -o eval_results/
+    - name: Archive binaries
+      uses: actions/upload-artifact@v2
+      with:
+        name: Artifacts
+        path: |
+          build/*kiwi*
+          build/test/*kiwi*
