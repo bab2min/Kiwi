@@ -28,7 +28,7 @@ jobs:
         mkdir eval_results
         ./build/kiwi-evaluator -m ./ModelGenerator eval_data/*.txt -o eval_results/
     - name: Archive binaries
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v1
       with:
         name: Artifacts Centos5
         path: |
