@@ -27,7 +27,6 @@ jobs:
         echo ("KIWI_STATIC_WITHOUT_MT=1") >> $env:GITHUB_ENV
         echo $env:KIWI_STATIC_WITHOUT_MT
     - run: echo $env:KIWI_STATIC_WITHOUT_MT
-    - run: echo "${{ env:KIWI_STATIC_WITHOUT_MT }}"
     - name: Build
       uses: lukka/run-cmake@v3
       with:
