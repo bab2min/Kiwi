@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-2019]
-        arch: [32, 64]
+        arch: [Win32, x64]
 
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }} ${{ matrix.arch }}
@@ -23,17 +23,14 @@ jobs:
     - name: Init
       run: |
         mkdir build
-        chcp 65001
-        echo ("KIWI_STATIC_WITHOUT_MT=1") >> $env:GITHUB_ENV
-        echo $env:KIWI_STATIC_WITHOUT_MT
-    - run: echo $env:KIWI_STATIC_WITHOUT_MT
     - name: Build
       uses: lukka/run-cmake@v3
       with:
-        cmakeListsOrSettingsJson: CMakeListsTxtBasic
+        cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
         cmakeBuildType: Release
         buildWithCMake: true
-        cmakeGenerator: VS16Win${{ matrix.arch }}
+        #cmakeGenerator: VS16Win${{ matrix.arch }}
+        cmakeAppendedArgs: -G"Visual Studio 16 2019" -A${{ matrix.arch }} -DKIWI_STATIC_WITHOUT_MT=1
         buildWithCMakeArgs: --config Release
         buildDirectory: build
     - name: Run Unit Test
