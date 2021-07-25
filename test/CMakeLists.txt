@@ -18,7 +18,7 @@ target_link_libraries(kiwi-test gtest_main gtest)
 if(MSVC)
   
 else()
-  target_link_libraries(kiwi-test -Wl,--whole-archive -lpthread -Wl,--no-whole-archive)
+  #target_link_libraries(kiwi-test -Wl,--whole-archive -lpthread -Wl,--no-whole-archive)
 endif()
 target_link_libraries(kiwi-test "${CMAKE_PROJECT_NAME}_static")
 
