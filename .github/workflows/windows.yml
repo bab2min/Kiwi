@@ -32,7 +32,7 @@ jobs:
         buildWithCMakeArgs: --config Release
         buildDirectory: build
     - name: Run Unit Test
-      run: .\build\Release\test\kiwi-test.exe
+      run: .\build\test\Release\kiwi-test.exe
     - name: Run Evaluator
       run: |
         mkdir eval_results
@@ -43,4 +43,4 @@ jobs:
         name: Artifacts ${{ matrix.name }}
         path: |
           build\Release\*kiwi*
-          build\Release\test\*kiwi*
+          build\test\Release\*kiwi*
