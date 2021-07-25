@@ -207,7 +207,7 @@ namespace kiwi
 
 			template<class ...Args>
 			FixedLengthEncoder(Args&&... args)
-				: stream{ std::forward<Args>(args)... }
+				: stream( std::forward<Args>(args)... )
 			{
 			}
 
@@ -245,7 +245,7 @@ namespace kiwi
 			{
 				Encoder& encoder;
 
-				VLTransform(Encoder& _encoder) : encoder{ _encoder }
+				VLTransform(Encoder& _encoder) : encoder( _encoder )
 				{
 				}
 
@@ -267,7 +267,7 @@ namespace kiwi
 			{
 				Encoder& encoder;
 
-				VLTransform(Encoder& _encoder) : encoder{ _encoder }
+				VLTransform(Encoder& _encoder) : encoder( _encoder )
 				{
 				}
 
@@ -444,7 +444,7 @@ namespace kiwi
 
 			template<class ...Args>
 			VariableLengthEncoder(Args&&... args)
-				: stream{ std::forward<Args>(args)... }
+				: stream( std::forward<Args>(args)... )
 			{
 			}
 
@@ -478,7 +478,7 @@ namespace kiwi
 		public:
 			template<class ...Args>
 			VariableLengthDecoder(Args&&... args)
-				: VariableLengthEncoder<Stream, BitSeqs, Packet, bufSize>{ std::forward<Args>(args)... }
+				: VariableLengthEncoder<Stream, BitSeqs, Packet, bufSize>( std::forward<Args>(args)... )
 			{
 				this->fetch();
 			}
