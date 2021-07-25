@@ -45,18 +45,35 @@ include_directories( include/ )
 include_directories( third_party/tclap/include )
 include_directories( third_party/cpp-btree )
 
-link_libraries ( pthread )
+if(MSVC)
+  set ( CMAKE_C_FLAGS_DEBUG "-DDEBUG -DC_FLAGS -Zi -Od ${ADDITIONAL_FLAGS}" )
+  set ( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}" )
+  set ( CMAKE_EXE_LINKER_FLAGS_DEBUG "-DDEBUG -DLINKER_FLAGS" )
 
-set ( CMAKE_EXE_LINKER_FLAGS "-static -Wl,--gc-sections" )
+  set ( CMAKE_C_FLAGS_RELEASE "-DNDEBUG -DRELEASE -DC_FLAGS -O2 -Oi -Gy -DKIWI_USE_BTREE ${ADDITIONAL_FLAGS}" )
+  set ( CMAKE_CXX_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}" )
+  set ( CMAKE_EXE_LINKER_FLAGS_RELEASE "-DRELEASE -DLINKER_FLAGS" )
 
-set ( CMAKE_C_FLAGS_DEBUG "-DDEBUG -DC_FLAGS -g3 -O0 ${ADDITIONAL_FLAGS}" )
-set ( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}" )
-set ( CMAKE_EXE_LINKER_FLAGS_DEBUG "-DDEBUG -DLINKER_FLAGS" )
+  set ( CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELEASE} -Zi")
+  set ( CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO}")
+  set ( CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_EXE_LINKER_FLAGS_RELEASE}" )
+else()
+  link_libraries ( pthread )
+  
+  set ( CMAKE_EXE_LINKER_FLAGS "-static -Wl,--gc-sections" )
 
-set ( CMAKE_C_FLAGS_RELEASE "-DRELEASE -DC_FLAGS -O3 -DKIWI_USE_BTREE ${ADDITIONAL_FLAGS}" )
-set ( CMAKE_CXX_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}" )
-set ( CMAKE_EXE_LINKER_FLAGS_RELEASE "-DRELEASE -DLINKER_FLAGS" )
+  set ( CMAKE_C_FLAGS_DEBUG "-DDEBUG -DC_FLAGS -g3 -O0 ${ADDITIONAL_FLAGS}" )
+  set ( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}" )
+  set ( CMAKE_EXE_LINKER_FLAGS_DEBUG "-DDEBUG -DLINKER_FLAGS" )
 
+  set ( CMAKE_C_FLAGS_RELEASE "-DNDEBUG -DRELEASE -DC_FLAGS -O3 -DKIWI_USE_BTREE ${ADDITIONAL_FLAGS}" )
+  set ( CMAKE_CXX_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}" )
+  set ( CMAKE_EXE_LINKER_FLAGS_RELEASE "-DRELEASE -DLINKER_FLAGS" )
+
+  set ( CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELEASE} -g3")
+  set ( CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO}")
+  set ( CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_EXE_LINKER_FLAGS_RELEASE}" )
+endif()
 
 add_library( "${CMAKE_PROJECT_NAME}_static" STATIC
   ${CORE_SRCS} 
@@ -85,6 +102,21 @@ target_link_libraries( "${CMAKE_PROJECT_NAME}-evaluator"
   "${CMAKE_PROJECT_NAME}_static"
 )
 
+if(MSVC)
+  target_compile_options("${CMAKE_PROJECT_NAME}_static" PUBLIC
+    -MT
+  )
+
+  add_library( "${CMAKE_PROJECT_NAME}_rtd" SHARED
+    ${CORE_SRCS} 
+    src/capi/kiwi_c.cpp
+  )
+
+  target_compile_options("${CMAKE_PROJECT_NAME}_rtd" PUBLIC
+    -MD
+  )
+endif()
+
 #if(KIWI_USE_MIMALLOC)
 #  target_link_libraries( "${CMAKE_PROJECT_NAME}_static" 
 #    mimalloc-static
@@ -106,11 +138,5 @@ set_target_properties("${CMAKE_PROJECT_NAME}" PROPERTIES
     include/kiwi/capi.h
 )
 
-include(ExternalProject)
-ExternalProject_Add(gtest
-  URL https://github.com/google/googletest/archive/release-1.8.1.zip
-  PREFIX ${CMAKE_CURRENT_BINARY_DIR}/gtest
-  INSTALL_COMMAND ""
-)
-ExternalProject_Get_Property(gtest source_dir binary_dir)
-add_subdirectory(test)
+add_subdirectory( third_party/googletest )
+add_subdirectory( test )

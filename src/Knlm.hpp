@@ -353,7 +353,7 @@ namespace kiwi
 						node.num_nexts = node_sizes[i];
 						node.next_offset = next_offset;
 						next_offset += node_sizes[i];
-						key_ranges.emplace_back(std::array<size_t, 3>{ non_leaf_idx, node.next_offset, node.next_offset + node.num_nexts });
+						key_ranges.emplace_back(std::array<size_t, 3>{ non_leaf_idx, (size_t)node.next_offset, (size_t)(node.next_offset + node.num_nexts) });
 						non_leaf_idx++;
 					}
 					else
