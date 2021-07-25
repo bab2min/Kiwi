@@ -6,6 +6,7 @@ set ( CMAKE_CXX_STANDARD 11 )
 set ( CMAKE_VERBOSE_MAKEFILE true )
 
 option(KIWI_USE_MIMALLOC  "Use mimalloc for faster memory allocation" ON)
+option(KIWI_STATIC_MT  "Use /MT Option in building kiwi_static" ON)
 
 if (NOT CMAKE_BUILD_TYPE)
   if ("${CMAKE_BINARY_DIR}" MATCHES ".*(D|d)ebug$")
@@ -97,9 +98,24 @@ target_link_libraries( "${CMAKE_PROJECT_NAME}-evaluator"
 )
 
 if(MSVC)
-  #target_compile_options("${CMAKE_PROJECT_NAME}_static" PUBLIC
-  #  -MT
-  #)
+  if(KIWI_STATIC_MT)
+    target_compile_options("${CMAKE_PROJECT_NAME}_static" PUBLIC
+      -MT
+    )
+  else()
+    add_library( "${CMAKE_PROJECT_NAME}_mt_static" SHARED
+      ${CORE_SRCS} 
+      src/capi/kiwi_c.cpp
+    )
+    
+    target_compile_options("${CMAKE_PROJECT_NAME}_mt_static" PUBLIC
+      -MT
+    )
+  endif()
+
+  target_compile_options("${CMAKE_PROJECT_NAME}" PUBLIC
+    -MT
+  )
 
   add_library( "${CMAKE_PROJECT_NAME}_rtd" SHARED
     ${CORE_SRCS} 
