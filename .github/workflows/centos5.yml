@@ -1,0 +1,35 @@
+name: Centos5
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-centos:
+    name: Centos5
+    runs-on: ubuntu-latest
+    container:
+      image: docker://hoshizora/manylinux1-clang_x86_64
+
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        submodules: true
+    - name: Configure Build
+      run: mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_USE_MIMALLOC=0 ..
+    - name: Build
+      run: cd build && make
+    - name: Run Unit Test
+      run: ./build/test/kiwi-test
+    - name: Run Evaluator
+      run: |
+        mkdir eval_results
+        ./build/kiwi-evaluator -m ./ModelGenerator eval_data/*.txt -o eval_results/
+    - run: tar -zcvf arts.tgz build/*kiwi* build/test/*kiwi* eval_results/*.txt
+    - name: Archive binaries
+      uses: actions/upload-artifact@v1
+      with:
+        name: Artifacts Centos5
+        path: arts.tgz

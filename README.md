@@ -2,6 +2,12 @@
 
 ![KiwiLogo](https://repository-images.githubusercontent.com/82677855/eb9fa478-175d-47a5-8e07-0e169c030ff5)
 
+[![Action Status Centos5](https://github.com/bab2min/Kiwi/workflows/Centos5/badge.svg)](https://github.com/bab2min/Kiwi/actions)
+[![Action Status Windows](https://github.com/bab2min/Kiwi/workflows/Windows/badge.svg)](https://github.com/bab2min/Kiwi/actions)
+[![Action Status Ubuntu](https://github.com/bab2min/Kiwi/workflows/Ubuntu/badge.svg)](https://github.com/bab2min/Kiwi/actions)
+[![Action Status macOS](https://github.com/bab2min/Kiwi/workflows/macOS/badge.svg)](https://github.com/bab2min/Kiwi/actions)
+
+
 Kiwi는 빠른 속도와 범용적인 성능을 지향하는 한국어 형태소 분석기 라이브러리입니다. 한국어 자연어처리에 관심 있는 사람이면 누구나 쉽게 사용할 수 있도록 오픈 소스로 공개 중이며, C++로 구현된 코어 라이브러리를 래핑하여 다양한 프로그래밍 언어에 사용할 수 있도록 준비 중입니다. 
 
 형태소 분석은 세종 품사 태그 체계를 기반으로 하고 있으며 모델 학습에는 세종계획 말뭉치와 모두의 말뭉치를 사용하고 있습니다. 문어 텍스트의 경우 약 94% 정도의 정확도로 한국어 문장의 형태소를 분석해 낼 수 있습니다.
@@ -237,3 +243,5 @@ Kiwi는 LGPL v3 라이센스로 배포됩니다.
 이메일: bab2min@gmail.com
 
 블로그: http://bab2min.tistory.com/560
+
+## 기여하기

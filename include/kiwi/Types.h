@@ -9,7 +9,7 @@
 #include <functional>
 #include <stdexcept>
 
-#ifdef USE_MIMALLOC
+#ifdef KIWI_USE_MIMALLOC
 #include <mimalloc.h>
 #endif
 
@@ -63,7 +63,7 @@ namespace kiwi
 		using Exception::Exception;
 	};
 
-#ifdef USE_MIMALLOC
+#ifdef KIWI_USE_MIMALLOC
 	template<typename _Ty>
 	using Vector = std::vector<_Ty, mi_stl_allocator<_Ty>>;
 
@@ -199,7 +199,7 @@ namespace kiwi
 
 namespace std
 {
-#ifdef USE_MIMALLOC
+#ifdef KIWI_USE_MIMALLOC
 	template<>
 	struct hash<kiwi::KString>
 	{

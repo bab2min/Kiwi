@@ -89,9 +89,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="mimalloc\src\static.c">
-      <Filter>mimalloc</Filter>
-    </ClCompile>
     <ClCompile Include="src\Form.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -116,5 +113,6 @@
     <ClCompile Include="src\WordDetector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="third_party\mimalloc\src\static.c" />
   </ItemGroup>
 </Project>
