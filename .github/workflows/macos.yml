@@ -63,7 +63,7 @@ jobs:
     - name: Archive binaries
       uses: actions/upload-artifact@v2
       with:
-        name: Artifacts
+        name: Artifacts ${{ matrix.name }}
         path: |
           build/*kiwi*
           build/test/*kiwi*

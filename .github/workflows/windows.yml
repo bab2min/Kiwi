@@ -25,6 +25,6 @@ jobs:
     - name: Configure Build
       uses: lukka/run-cmake@v3
       with:
-        cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
+        cmakeListsOrSettingsJson: CMakeSettingsJson
         cmakeAppendedArgs: '-GNinja'
         buildDirectory: build
