@@ -67,3 +67,4 @@ jobs:
         path: |
           build/*kiwi*
           build/test/*kiwi*
+          eval_results/*.txt
