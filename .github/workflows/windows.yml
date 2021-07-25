@@ -29,7 +29,7 @@ jobs:
         cmakeBuildType: Release
         buildWithCMake: true
         cmakeGenerator: VS16Win${{ matrix.arch }}
-        buildWithCMakeArgs: --config Release
+        buildWithCMakeArgs: -DKIWI_MT_STATIC=0
         buildDirectory: build
     - name: Run Unit Test
       run: .\build\test\Release\kiwi-test.exe
