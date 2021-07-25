@@ -56,3 +56,7 @@ jobs:
       run: cd build && make
     - name: Run Unit Test
       run: ./build/test/kiwi-test
+    - name: Run Evaluator
+      run: |
+        mkdir eval_results
+        ./build/kiwi-evaluator -m ./ModelGenerator eval_data/*.txt -o eval_results/

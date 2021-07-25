@@ -311,6 +311,9 @@ namespace kiwi
 			{
 				return utils::countTrailingZeroes(~mask);
 			}
+#ifdef __APPLE__
+			inline size_t getPrefixWidth(size_t mask) { return getPrefixWidth((uint64_t)mask); }
+#endif
 		}
 
 		template<class Stream, class BitSeqs, class Packet = uint8_t, size_t bufSize = 64>

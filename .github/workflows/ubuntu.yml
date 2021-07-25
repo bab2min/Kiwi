@@ -39,8 +39,6 @@ jobs:
     - uses: actions/checkout@v1
       with:
         submodules: true
-    - name: Install packages
-      run: sudo apt-get install -yq python3-setuptools
     - name: Configure Compiler
       run: |
         if [ "${{ matrix.compiler }}" = "gcc" ]; then
@@ -56,3 +54,7 @@ jobs:
       run: cd build && make
     - name: Run Unit Test
       run: ./build/test/kiwi-test
+    - name: Run Evaluator
+      run: |
+        mkdir eval_results
+        ./build/kiwi-evaluator -m ./ModelGenerator eval_data/*.txt -o eval_results/
