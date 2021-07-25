@@ -41,6 +41,7 @@ TokenInfo parseWordPOS(const u16string& str)
 Evaluator::Evaluator(const std::string& testSetFile, Kiwi* kw, size_t topN)
 {
 	ifstream f{ testSetFile };
+	if (!f) throw std::ios_base::failure{ "Cannot open '" + testSetFile + "'" };
 	string line;
 	while (getline(f, line))
 	{
