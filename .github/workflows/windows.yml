@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-2016, windows-2019]
-        arch: [x64]
+        arch: [32, 64]
 
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }} ${{ matrix.arch }}
@@ -25,8 +25,9 @@ jobs:
     - name: Configure Build
       uses: lukka/run-cmake@v3
       with:
-        cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
+        cmakeListsOrSettingsJson: CMakeListsTxtBasic
         cmakeBuildType: Release
         buildWithCMake: true
-        cmakeGenerator: VS16Win64
+        cmakeGenerator: VS16Win${{ matrix.arch }}
+        buildWithCMakeArgs: --config Release
         buildDirectory: build
