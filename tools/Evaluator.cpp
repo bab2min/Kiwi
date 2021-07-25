@@ -33,17 +33,20 @@ TokenInfo parseWordPOS(const u16string& str)
 	case u'\u3142': // ㅂ
 		form[0] = u'\u11B8'; break;
 	}
-	return { form, toPOSTag(str.substr(p + 1)), 0, 0 };
+	POSTag tag = toPOSTag(str.substr(p + 1));
+	if (tag >= POSTag::max) throw runtime_error{ "Wrong Input '" + utf16To8(str.substr(p + 1)) + "'" };
+	return { form, tag, 0, 0 };
 }
 
 Evaluator::Evaluator(const std::string& testSetFile, Kiwi* kw, size_t topN)
 {
 	ifstream f{ testSetFile };
+	if (!f) throw std::ios_base::failure{ "Cannot open '" + testSetFile + "'" };
 	string line;
 	while (getline(f, line))
 	{
+		while (line.back() == '\n' || line.back() == '\r') line.pop_back();
 		auto wstr = utf8To16(line);
-		if (wstr.back() == '\n') wstr.pop_back();
 		auto fd = split(wstr, u'\t');
 		if (fd.size() < 2) continue;
 		vector<u16string> tokens;

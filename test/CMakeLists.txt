@@ -13,10 +13,13 @@ test_cpp.cpp
 # If used often, could be made a macro.
 
 add_dependencies(kiwi-test gtest)
-include_directories(${source_dir}/googletest/include)
-target_link_libraries(kiwi-test ${binary_dir}/googlemock/gtest/libgtest_main.a)
-target_link_libraries(kiwi-test ${binary_dir}/googlemock/gtest/libgtest.a)
-target_link_libraries(kiwi-test -Wl,--whole-archive -lpthread -Wl,--no-whole-archive)
+include_directories(third_party/googletest/include)
+target_link_libraries(kiwi-test gtest_main gtest)
+if(MSVC)
+  
+else()
+  #target_link_libraries(kiwi-test -Wl,--whole-archive -lpthread -Wl,--no-whole-archive)
+endif()
 target_link_libraries(kiwi-test "${CMAKE_PROJECT_NAME}_static")
 
 ##################################
