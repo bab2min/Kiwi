@@ -36,8 +36,6 @@ if(KIWI_USE_MIMALLOC)
   set ( CORE_SRCS "${CORE_SRCS}"
     third_party/mimalloc/src/static.c
   )
-  #SET(MI_OVERRIDE OFF CACHE BOOL "")
-  #add_subdirectory( third_party/mimalloc )
 endif()
 
 
@@ -48,11 +46,9 @@ include_directories( third_party/cpp-btree )
 if(MSVC)
   set ( CMAKE_C_FLAGS_DEBUG "-DDEBUG -DC_FLAGS -Zi -Od ${ADDITIONAL_FLAGS}" )
   set ( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}" )
-  set ( CMAKE_EXE_LINKER_FLAGS_DEBUG "-DDEBUG -DLINKER_FLAGS" )
 
   set ( CMAKE_C_FLAGS_RELEASE "-DNDEBUG -DRELEASE -DC_FLAGS -O2 -Oi -Gy -DKIWI_USE_BTREE ${ADDITIONAL_FLAGS}" )
   set ( CMAKE_CXX_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}" )
-  set ( CMAKE_EXE_LINKER_FLAGS_RELEASE "-DRELEASE -DLINKER_FLAGS" )
 
   set ( CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELEASE} -Zi")
   set ( CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO}")
@@ -60,8 +56,6 @@ if(MSVC)
 else()
   link_libraries ( pthread )
   
-  #set ( CMAKE_EXE_LINKER_FLAGS "-static -Wl,--gc-sections" )
-
   set ( CMAKE_C_FLAGS_DEBUG "-DDEBUG -DC_FLAGS -g3 -O0 ${ADDITIONAL_FLAGS}" )
   set ( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}" )
   set ( CMAKE_EXE_LINKER_FLAGS_DEBUG "-DDEBUG -DLINKER_FLAGS" )
@@ -104,7 +98,7 @@ target_link_libraries( "${CMAKE_PROJECT_NAME}-evaluator"
 
 if(MSVC)
   target_compile_options("${CMAKE_PROJECT_NAME}_static" PUBLIC
-    -MT
+    "/MT"
   )
 
   add_library( "${CMAKE_PROJECT_NAME}_rtd" SHARED
@@ -113,19 +107,9 @@ if(MSVC)
   )
 
   target_compile_options("${CMAKE_PROJECT_NAME}_rtd" PUBLIC
-    -MD
+    "/MD"
   )
 endif()
-
-#if(KIWI_USE_MIMALLOC)
-#  target_link_libraries( "${CMAKE_PROJECT_NAME}_static" 
-#    mimalloc-static
-#  )
-#  
-#  target_link_libraries( "${CMAKE_PROJECT_NAME}" 
-#    mimalloc-static
-#  )
-#endif()
 
 target_compile_definitions("${CMAKE_PROJECT_NAME}"
   PUBLIC DLL_EXPORT=1
