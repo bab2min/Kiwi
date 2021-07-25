@@ -99,5 +99,9 @@ namespace kiwi
 		inline int ceilLog2(uint32_t v) { return 32 - countLeadingZeroes(v - 1); }
 
 		inline int ceilLog2(uint64_t v) { return 64 - countLeadingZeroes(v - 1); }
+
+#ifdef __APPLE__
+		inline int ceilLog2(size_t v) { return ceilLog2((uint64_t)v); }
+#endif
 	}
 }
