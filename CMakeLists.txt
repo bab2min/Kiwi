@@ -97,9 +97,9 @@ target_link_libraries( "${CMAKE_PROJECT_NAME}-evaluator"
 )
 
 if(MSVC)
-  target_compile_options("${CMAKE_PROJECT_NAME}_static" PUBLIC
-    -MT
-  )
+  #target_compile_options("${CMAKE_PROJECT_NAME}_static" PUBLIC
+  #  -MT
+  #)
 
   add_library( "${CMAKE_PROJECT_NAME}_rtd" SHARED
     ${CORE_SRCS} 
