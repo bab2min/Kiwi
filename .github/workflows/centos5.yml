@@ -27,11 +27,9 @@ jobs:
       run: |
         mkdir eval_results
         ./build/kiwi-evaluator -m ./ModelGenerator eval_data/*.txt -o eval_results/
+    - run: tar -zcvf arts.tgz build/*kiwi* build/test/*kiwi* eval_results/*.txt
     - name: Archive binaries
       uses: actions/upload-artifact@v1
       with:
         name: Artifacts Centos5
-        path: |
-          build/*kiwi*
-          build/test/*kiwi*
-          eval_results/*.txt
+        path: arts.tgz
