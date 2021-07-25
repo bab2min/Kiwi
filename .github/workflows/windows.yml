@@ -32,15 +32,15 @@ jobs:
         buildWithCMakeArgs: --config Release
         buildDirectory: build
     - name: Run Unit Test
-      run: .\build\test\kiwi-test.exe
+      run: .\build\Release\test\kiwi-test.exe
     - name: Run Evaluator
       run: |
         mkdir eval_results
-        .\build\kiwi-evaluator.exe -m .\ModelGenerator eval_data\*.txt -o eval_results\
+        .\build\Release\kiwi-evaluator.exe -m .\ModelGenerator eval_data\*.txt -o eval_results\
     - name: Archive binaries
       uses: actions/upload-artifact@v2
       with:
         name: Artifacts ${{ matrix.name }}
         path: |
-          build\*kiwi*
-          build\test\*kiwi*
+          build\Release\*kiwi*
+          build\Release\test\*kiwi*
