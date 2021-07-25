@@ -98,17 +98,17 @@ target_link_libraries( "${CMAKE_PROJECT_NAME}-evaluator"
 )
 
 if(MSVC)
-  if(KIWI_STATIC_MT)
-    target_compile_options("${CMAKE_PROJECT_NAME}_static" PUBLIC
-      -MT
-    )
-  else()
+  if(ENV{KIWI_STATIC_WITHOUT_MT})
     add_library( "${CMAKE_PROJECT_NAME}_mt_static" SHARED
       ${CORE_SRCS} 
       src/capi/kiwi_c.cpp
     )
     
     target_compile_options("${CMAKE_PROJECT_NAME}_mt_static" PUBLIC
+      -MT
+    )
+  else()
+    target_compile_options("${CMAKE_PROJECT_NAME}_static" PUBLIC
       -MT
     )
   endif()
