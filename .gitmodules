@@ -8,3 +8,7 @@
 	path = third_party/cpp-btree
 	url = https://github.com/bab2min/cpp-btree
 	branch = improve-mscv-compatibility
+[submodule "third_party/googletest"]
+	path = third_party/googletest
+	url = https://github.com/google/googletest
+	branch = v1.8.x

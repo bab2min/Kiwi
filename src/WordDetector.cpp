@@ -126,7 +126,7 @@ WordDetector::WordDetector(const std::string& modelPath, size_t _numThreads)
 {
 	{
 		ifstream ifs{ modelPath + "/extract.mdl", ios_base::binary };
-		if (ifs.fail()) throw Exception{ "Failed to open model file '" + modelPath + "extract.mdl'." };
+		if (ifs.fail()) throw Exception{ "Failed to open model file '" + modelPath + "/extract.mdl'." };
 		serializer::readMany(ifs, posScore, nounTailScore);
 	}
 }
