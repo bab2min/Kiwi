@@ -13,11 +13,22 @@ using namespace std;
 namespace std
 {
 	template <>
-	class hash<pair<kiwi::KString, kiwi::POSTag>> {
+	class hash<pair<kiwi::KString, kiwi::POSTag>> 
+	{
 	public:
 		size_t operator() (const pair<kiwi::KString, kiwi::POSTag>& o) const
 		{
 			return hash<kiwi::KString>{}(o.first) ^ (size_t)o.second;
+		};
+	};
+
+	template <>
+	class hash<kiwi::POSTag>
+	{
+	public:
+		size_t operator() (const kiwi::POSTag& o) const
+		{
+			return (size_t)o;
 		};
 	};
 }
