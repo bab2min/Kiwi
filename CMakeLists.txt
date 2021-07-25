@@ -60,7 +60,7 @@ if(MSVC)
 else()
   link_libraries ( pthread )
   
-  set ( CMAKE_EXE_LINKER_FLAGS "-static -Wl,--gc-sections" )
+  #set ( CMAKE_EXE_LINKER_FLAGS "-static -Wl,--gc-sections" )
 
   set ( CMAKE_C_FLAGS_DEBUG "-DDEBUG -DC_FLAGS -g3 -O0 ${ADDITIONAL_FLAGS}" )
   set ( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}" )
