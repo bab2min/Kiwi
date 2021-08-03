@@ -7,6 +7,7 @@ set ( CMAKE_VERBOSE_MAKEFILE true )
 
 option(KIWI_USE_MIMALLOC  "Use mimalloc for faster memory allocation" ON)
 option(KIWI_STATIC_WITHOUT_MT  "Use /MT Option in building kiwi_static" OFF)
+option(KIWI_BUILD_TEST  "Build Test sets" ON)
 
 if (NOT CMAKE_BUILD_TYPE)
   if ("${CMAKE_BINARY_DIR}" MATCHES ".*(D|d)ebug$")
@@ -70,66 +71,68 @@ else()
   set ( CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_EXE_LINKER_FLAGS_RELEASE}" )
 endif()
 
-add_library( "${CMAKE_PROJECT_NAME}_static" STATIC
+add_library( "${PROJECT_NAME}_static" STATIC
   ${CORE_SRCS} 
   src/capi/kiwi_c.cpp
 )
 
-add_library( "${CMAKE_PROJECT_NAME}" SHARED
+add_library( "${PROJECT_NAME}" SHARED
   ${CORE_SRCS} 
   src/capi/kiwi_c.cpp
 )
 
-add_executable( "${CMAKE_PROJECT_NAME}-cli-${PROJECT_VERSION}"
+add_executable( "${PROJECT_NAME}-cli-${PROJECT_VERSION}"
   tools/runner.cpp
 )
 
-target_link_libraries( "${CMAKE_PROJECT_NAME}-cli-${PROJECT_VERSION}"
-  "${CMAKE_PROJECT_NAME}_static"
+target_link_libraries( "${PROJECT_NAME}-cli-${PROJECT_VERSION}"
+  "${PROJECT_NAME}_static"
 )
 
-add_executable( "${CMAKE_PROJECT_NAME}-evaluator"
+add_executable( "${PROJECT_NAME}-evaluator"
   tools/Evaluator.cpp
   tools/evaluator_main.cpp
 )
 
-target_link_libraries( "${CMAKE_PROJECT_NAME}-evaluator"
-  "${CMAKE_PROJECT_NAME}_static"
+target_link_libraries( "${PROJECT_NAME}-evaluator"
+  "${PROJECT_NAME}_static"
 )
 
 if(MSVC)
   if(KIWI_STATIC_WITHOUT_MT)
     message(STATUS "Use /MD at kiwi_static")
-    add_library( "${CMAKE_PROJECT_NAME}_mt_static" STATIC
+    add_library( "${PROJECT_NAME}_mt_static" STATIC
       ${CORE_SRCS} 
       src/capi/kiwi_c.cpp
     )
     
-    target_compile_options("${CMAKE_PROJECT_NAME}_mt_static" PUBLIC
+    target_compile_options("${PROJECT_NAME}_mt_static" PUBLIC
       -MT
     )
   else()
     message(STATUS "Use /MT at kiwi_static")
-    target_compile_options("${CMAKE_PROJECT_NAME}_static" PUBLIC
+    target_compile_options("${PROJECT_NAME}_static" PUBLIC
       -MT
     )
   endif()
 
-  target_compile_options("${CMAKE_PROJECT_NAME}" PUBLIC
+  target_compile_options("${PROJECT_NAME}" PUBLIC
     -MT
   )
 endif()
 
-target_compile_definitions("${CMAKE_PROJECT_NAME}"
+target_compile_definitions("${PROJECT_NAME}"
   PUBLIC DLL_EXPORT=1
 )
 
-set_target_properties("${CMAKE_PROJECT_NAME}" PROPERTIES
+set_target_properties("${PROJECT_NAME}" PROPERTIES
     VERSION ${PROJECT_VERSION}
     SOVERSION 1
     PUBLIC_HEADER 
     include/kiwi/capi.h
 )
 
-add_subdirectory( third_party/googletest )
-add_subdirectory( test )
+if(KIWI_BUILD_TEST)
+  add_subdirectory( third_party/googletest )
+  add_subdirectory( test )
+endif()

@@ -29,6 +29,7 @@ namespace kiwi
 			~ThreadPool();
 			size_t size() const { return workers.size(); }
 			size_t numEnqueued() const { return tasks.size(); }
+			void joinAll();
 		private:
 			std::vector<std::thread> workers;
 			std::queue<std::function<void(size_t)>> tasks;
@@ -87,8 +88,10 @@ namespace kiwi
 			return res;
 		}
 
-		inline ThreadPool::~ThreadPool()
+		inline void ThreadPool::joinAll()
 		{
+			if (stop) return;
+
 			{
 				std::unique_lock<std::mutex> lock(queue_mutex);
 				stop = true;
@@ -96,6 +99,11 @@ namespace kiwi
 			condition.notify_all();
 			for (std::thread& worker : workers)
 				worker.join();
+		}
+
+		inline ThreadPool::~ThreadPool()
+		{
+			joinAll();
 		}
 	}
 }

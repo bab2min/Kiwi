@@ -14,6 +14,21 @@ using namespace std;
 
 namespace kiwi
 {
+	class PathEvaluator
+	{
+	public:
+		using Path = Vector<std::tuple<const Morpheme*, KString, uint32_t>>;
+
+		template<class LmType>
+		static Vector<std::pair<Path, float>> findBestPath(const Kiwi* kw, const Vector<KGraphNode>& graph, size_t topN);
+
+		template<class LmType, class CandTy, class CacheTy>
+		static float evalPath(const Kiwi* kw, const KGraphNode* startNode, const KGraphNode* node,
+			CacheTy& cache, Vector<KString>& ownFormList,
+			size_t i, size_t ownFormId, CandTy&& cands, bool unknownForm
+		);
+	};
+
 	vector<TokenResult> Kiwi::analyze(const u16string& str, size_t topN, Match matchOptions) const
 	{
 		auto chunk = str.begin();
@@ -229,12 +244,12 @@ namespace kiwi
 	}
 
 	template<class LmType, class CandTy, class CacheTy>
-	float Kiwi::evalPath(const KGraphNode* startNode, const KGraphNode* node,
+	float PathEvaluator::evalPath(const Kiwi* kw, const KGraphNode* startNode, const KGraphNode* node,
 		CacheTy& cache, Vector<KString>& ownFormList,
 		size_t i, size_t ownFormId, CandTy&& cands, bool unknownForm
-	) const
+	)
 	{
-		auto lm = static_cast<const lm::KnLangModel<LmType>*>(langMdl.get());
+		auto lm = static_cast<const lm::KnLangModel<LmType>*>(kw->langMdl.get());
 		size_t langVocabSize = lm->getHeader().vocab_size;
 
 		float tMax = -INFINITY;
@@ -254,19 +269,19 @@ namespace kiwi
 				chSize = curMorph->chunks.size();
 				for (size_t i = 0; i < chSize; ++i)
 				{
-					seq[i] = curMorph->chunks[i] - morphemes.data();
+					seq[i] = curMorph->chunks[i] - kw->morphemes.data();
 				}
 			}
 			else
 			{
-				if ((curMorph->getCombined() ? curMorph->getCombined() : curMorph) - morphemes.data() >= langVocabSize)
+				if ((curMorph->getCombined() ? curMorph->getCombined() : curMorph) - kw->morphemes.data() >= langVocabSize)
 				{
 					isUserWord = true;
-					seq[0] = getDefaultMorpheme(curMorph->tag) - morphemes.data();
+					seq[0] = kw->getDefaultMorpheme(curMorph->tag) - kw->morphemes.data();
 				}
 				else
 				{
-					seq[0] = curMorph - morphemes.data();
+					seq[0] = curMorph - kw->morphemes.data();
 				}
 				combSocket = curMorph->combineSocket;
 			}
@@ -274,7 +289,7 @@ namespace kiwi
 			condP = curMorph->polar;
 
 			UnorderedMap<Wid, Vector<WordLLP>> maxWidLL;
-			evalTrigram(lm, morphemes.data(), ownFormList, cache, seq, chSize, curMorph, node, startNode, maxWidLL);
+			evalTrigram(lm, kw->morphemes.data(), ownFormList, cache, seq, chSize, curMorph, node, startNode, maxWidLL);
 
 			float estimatedLL = 0;
 			if (isUserWord)
@@ -312,7 +327,7 @@ namespace kiwi
 			{
 				for (auto& q : p.second)
 				{
-					if (q.accScore <= tMax - cutOffThreshold) continue;
+					if (q.accScore <= tMax - kw->cutOffThreshold) continue;
 					nCache.emplace_back(WordLL{ MInfos{}, q.accScore, q.node });
 					auto& wids = nCache.back().morphs;
 					wids.reserve(q.morphs->size() + chSize);
@@ -322,13 +337,13 @@ namespace kiwi
 						size_t lastPos = node->lastPos;
 						if (curMorph->combineSocket)
 						{
-							wids.back() = MInfo{ (Wid)(morphemes[wids.back().wid].getCombined() - morphemes.data()),
+							wids.back() = MInfo{ (Wid)(kw->morphemes[wids.back().wid].getCombined() - kw->morphemes.data()),
 								0, CondVowel::none, CondPolarity::none, 0, wids.back().lastPos };
-							lastPos += morphemes[seq[0]].kform->size() - 1;
+							lastPos += kw->morphemes[seq[0]].kform->size() - 1;
 							for (size_t ch = 1; ch < chSize; ++ch)
 							{
 								wids.emplace_back(seq[ch], 0, condV, condP, 0, lastPos);
-								lastPos += morphemes[seq[ch]].kform->size() - 1;
+								lastPos += kw->morphemes[seq[ch]].kform->size() - 1;
 							}
 						}
 						else
@@ -336,13 +351,13 @@ namespace kiwi
 							for (size_t ch = 0; ch < chSize; ++ch)
 							{
 								wids.emplace_back(seq[ch], 0, condV, condP, 0, lastPos);
-								lastPos += morphemes[seq[ch]].kform->size() - 1;
+								lastPos += kw->morphemes[seq[ch]].kform->size() - 1;
 							}
 						}
 					}
 					else
 					{
-						wids.emplace_back(isUserWord ? curMorph - morphemes.data() : seq[0],
+						wids.emplace_back(isUserWord ? curMorph - kw->morphemes.data() : seq[0],
 							combSocket, CondVowel::none, CondPolarity::none, ownFormId, node->lastPos);
 					}
 				}
@@ -352,22 +367,22 @@ namespace kiwi
 	}
 
 	template<class LmType>
-	Vector<pair<Kiwi::Path, float>> Kiwi::findBestPath(const Vector<KGraphNode>& graph, size_t topN) const
+	Vector<pair<PathEvaluator::Path, float>> PathEvaluator::findBestPath(const Kiwi* kw, const Vector<KGraphNode>& graph, size_t topN)
 	{
 		Vector<WordLLs> cache(graph.size());
 		Vector<KString> ownFormList;
 		Vector<const Morpheme*> unknownNodeCands, unknownNodeLCands;
 
-		auto lm = static_cast<const lm::KnLangModel<LmType>*>(langMdl.get());
+		auto lm = static_cast<const lm::KnLangModel<LmType>*>(kw->langMdl.get());
 
 		size_t langVocabSize = lm->getHeader().vocab_size;
 
 		const KGraphNode* startNode = &graph.front();
 		const KGraphNode* endNode = &graph.back();
 
-		unknownNodeCands.emplace_back(getDefaultMorpheme(POSTag::nng));
-		unknownNodeCands.emplace_back(getDefaultMorpheme(POSTag::nnp));
-		unknownNodeLCands.emplace_back(getDefaultMorpheme(POSTag::nnp));
+		unknownNodeCands.emplace_back(kw->getDefaultMorpheme(POSTag::nng));
+		unknownNodeCands.emplace_back(kw->getDefaultMorpheme(POSTag::nnp));
+		unknownNodeLCands.emplace_back(kw->getDefaultMorpheme(POSTag::nnp));
 
 		// start node
 		ptrdiff_t bosNode = 0;
@@ -388,7 +403,7 @@ namespace kiwi
 
 			if (node->form)
 			{
-				tMax = evalPath<LmType>(startNode, node, cache, ownFormList, i, ownFormId, node->form->candidate, false);
+				tMax = evalPath<LmType>(kw, startNode, node, cache, ownFormList, i, ownFormId, node->form->candidate, false);
 				if (all_of(node->form->candidate.begin(), node->form->candidate.end(), [](const Morpheme* m)
 				{
 					return m->combineSocket || !m->chunks.empty();
@@ -396,12 +411,12 @@ namespace kiwi
 				{
 					ownFormList.emplace_back(node->form->form);
 					ownFormId = ownFormList.size();
-					tMax = min(tMax, evalPath<LmType>(startNode, node, cache, ownFormList, i, ownFormId, unknownNodeLCands, true));
+					tMax = min(tMax, evalPath<LmType>(kw, startNode, node, cache, ownFormList, i, ownFormId, unknownNodeLCands, true));
 				};
 			}
 			else
 			{
-				tMax = evalPath<LmType>(startNode, node, cache, ownFormList, i, ownFormId, unknownNodeCands, true);
+				tMax = evalPath<LmType>(kw, startNode, node, cache, ownFormList, i, ownFormId, unknownNodeCands, true);
 			}
 
 			// heuristically remove cands with lower ll to speed up
@@ -432,8 +447,8 @@ namespace kiwi
 				}
 				);
 
-				combinedCutOffScore = min(tMax - cutOffThreshold, combinedCutOffScore);
-				otherCutOffScore = min(tMax - cutOffThreshold, otherCutOffScore);
+				combinedCutOffScore = min(tMax - kw->cutOffThreshold, combinedCutOffScore);
+				otherCutOffScore = min(tMax - kw->cutOffThreshold, otherCutOffScore);
 				for (auto& c : cache[i])
 				{
 					float cutoff = (c.morphs.empty() || !c.morphs.back().combineSocket) ? otherCutOffScore : combinedCutOffScore;
@@ -496,8 +511,8 @@ namespace kiwi
 			Path mv(cand[i].morphs.size() - 1);
 			transform(cand[i].morphs.begin() + 1, cand[i].morphs.end(), mv.begin(), [&](const MInfo& m)
 			{
-				if (m.ownFormId) return make_tuple(&morphemes[m.wid], ownFormList[m.ownFormId - 1], m.lastPos);
-				else return make_tuple(&morphemes[m.wid], KString{}, m.lastPos);
+				if (m.ownFormId) return make_tuple(&kw->morphemes[m.wid], ownFormList[m.ownFormId - 1], m.lastPos);
+				else return make_tuple(&kw->morphemes[m.wid], KString{}, m.lastPos);
 			});
 			ret.emplace_back(mv, cand[i].accScore);
 		}
@@ -521,21 +536,21 @@ namespace kiwi
 			return ret;
 		}
 
-		Vector<std::pair<Path, float>> res;
+		Vector<std::pair<PathEvaluator::Path, float>> res;
 		//auto h = langMdl->getHeader();
 		switch (langMdl->getHeader().key_size)
 		{
 		case 1:
-			res = findBestPath<uint8_t>(nodes, topN);
+			res = PathEvaluator::findBestPath<uint8_t>(this, nodes, topN);
 			break;
 		case 2:
-			res = findBestPath<uint16_t>(nodes, topN);
+			res = PathEvaluator::findBestPath<uint16_t>(this, nodes, topN);
 			break;
 		case 4:
-			res = findBestPath<uint32_t>(nodes, topN);
+			res = PathEvaluator::findBestPath<uint32_t>(this, nodes, topN);
 			break;
 		case 8:
-			res = findBestPath<uint64_t>(nodes, topN);
+			res = PathEvaluator::findBestPath<uint64_t>(this, nodes, topN);
 			break;
 		default:
 			throw runtime_error{ "wrong langMdl" };
