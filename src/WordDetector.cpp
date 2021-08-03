@@ -122,7 +122,7 @@ struct WordDetector::Counter
 };
 
 WordDetector::WordDetector(const std::string& modelPath, size_t _numThreads)
-	: numThreads{ _numThreads }
+	: numThreads{ _numThreads ? _numThreads : std::thread::hardware_concurrency() }
 {
 	{
 		ifstream ifs{ modelPath + "/extract.mdl", ios_base::binary };
@@ -132,7 +132,7 @@ WordDetector::WordDetector(const std::string& modelPath, size_t _numThreads)
 }
 
 WordDetector::WordDetector(FromRawData, const std::string& modelPath, size_t _numThreads)
-	: numThreads{ _numThreads }
+	: numThreads{ _numThreads ? _numThreads : std::thread::hardware_concurrency() }
 {
 	{
 		ifstream ifs{ modelPath + "/RPosModel.txt" };
@@ -168,6 +168,7 @@ std::vector<LocalData> readProc(size_t numWorkers, const FuncReader& reader, con
 			processor(ustr, ld);
 		});
 	}
+	workers.joinAll();
 	return ldByTid;
 }
 
@@ -455,6 +456,12 @@ void WordDetector::loadNounTailModelFromTxt(std::istream & is)
 	}
 }
 
+inline bool isalnum16(char16_t c)
+{
+	if (c < 0 || c > 255) return false;
+	return std::isalnum(c);
+}
+
 vector<WordInfo> WordDetector::extractWords(const U16MultipleReader& reader, size_t minCnt, size_t maxWordLen, float minScore) const
 {
 	Counter cdata;
@@ -516,7 +523,7 @@ vector<WordInfo> WordDetector::extractWords(const U16MultipleReader& reader, siz
 			u16string form;
 			form.reserve(p.first.size());
 			transform(p.first.begin(), p.first.end(), back_inserter(form), [this, &cdata](char16_t c) { return cdata.chrDict.getStr(c); });
-			if (any_of(form.begin(), form.end(), [](char16_t c) { return isalnum(c); })) continue;
+			if (any_of(form.begin(), form.end(), isalnum16)) continue;
 			rPartEntropy[form] = r;
 		}
 	}

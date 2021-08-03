@@ -24,7 +24,7 @@ namespace kiwi
 	{
 		struct Counter;
 	protected:
-		size_t numThreads;
+		size_t numThreads = 0;
 		std::map<std::pair<POSTag, bool>, std::map<char16_t, float>> posScore;
 		std::map<std::u16string, float> nounTailScore;
 
@@ -41,8 +41,14 @@ namespace kiwi
 		struct FromRawData {};
 		static constexpr FromRawData fromRawDataTag = {};
 
+		WordDetector() = default;
 		WordDetector(const std::string& modelPath, size_t _numThreads = 0);
 		WordDetector(FromRawData, const std::string& modelPath, size_t _numThreads = 0);
+
+		bool ready() const
+		{
+			return !posScore.empty();
+		}
 
 		void saveModel(const std::string& modelPath) const;
 		std::vector<WordInfo> extractWords(const U16MultipleReader& reader, size_t minCnt = 10, size_t maxWordLen = 10, float minScore = 0.1f) const;
