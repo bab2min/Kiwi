@@ -56,7 +56,7 @@ if(MSVC)
   set ( CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO}")
   set ( CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_EXE_LINKER_FLAGS_RELEASE}" )
 else()
-  link_libraries ( pthread rt )
+  link_libraries ( pthread )
   
   set ( CMAKE_C_FLAGS_DEBUG "-DDEBUG -DC_FLAGS -g3 -O0 ${ADDITIONAL_FLAGS}" )
   set ( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}" )
@@ -118,6 +118,16 @@ if(MSVC)
 
   target_compile_options("${PROJECT_NAME}" PUBLIC
     -MT
+  )
+endif()
+
+if(UNIX AND NOT APPLE)
+  target_link_libraries( "${PROJECT_NAME}-cli-${PROJECT_VERSION}"
+    rt
+  )
+
+  target_link_libraries( "${PROJECT_NAME}-evaluator"
+    rt
   )
 endif()
 
