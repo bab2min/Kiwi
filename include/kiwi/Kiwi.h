@@ -19,11 +19,10 @@ namespace kiwi
 	struct KGraphNode;
 	struct WordInfo;
 
-	class KiwiBuilder;
-
 	class Kiwi
 	{
 		friend class KiwiBuilder;
+		friend class PathEvaluator;
 
 		bool integrateAllomorph = true;
 		float cutOffThreshold = 5;
@@ -34,17 +33,6 @@ namespace kiwi
 		const PatternMatcher* pm = nullptr;
 		std::shared_ptr<lm::KnLangModelBase> langMdl;
 		std::unique_ptr<utils::ThreadPool> pool;
-
-		using Path = Vector<std::tuple<const Morpheme*, KString, uint32_t>>;
-			
-		template<class LmType>
-		Vector<std::pair<Path, float>> findBestPath(const Vector<KGraphNode>& graph, size_t topN) const;
-			
-		template<class LmType, class CandTy, class CacheTy>
-		float evalPath(const KGraphNode* startNode, const KGraphNode* node, 
-			CacheTy& cache, Vector<KString>& ownFormList,
-			size_t i, size_t ownFormId, CandTy&& cands, bool unknownForm
-		) const;
 			
 		std::vector<TokenResult> analyzeSent(const std::u16string::const_iterator& sBegin, const std::u16string::const_iterator& sEnd, size_t topN, Match matchOptions) const;
 
@@ -54,6 +42,8 @@ namespace kiwi
 		Kiwi() = default;
 		Kiwi(Kiwi&&) = default;
 		Kiwi& operator=(Kiwi&&) = default;
+
+		bool ready() const { return !forms.empty(); }
 
 		TokenResult analyze(const std::u16string& str, Match matchOptions) const
 		{
@@ -122,6 +112,43 @@ namespace kiwi
 				}
 			}
 		}
+
+		size_t morphToId(const Morpheme* morph) const
+		{
+			if (!morph || morph < morphemes.data()) return -1;
+			return morph - morphemes.data();
+		}
+
+		const Morpheme* idToMorph(size_t morphId) const
+		{
+			if (morphId >= morphemes.size()) return nullptr;
+			return &morphemes[morphId];
+		}
+
+		size_t getNumThreads() const
+		{
+			return pool ? 1 : pool->size();
+		}
+
+		float getCutOffThreshold() const
+		{
+			return cutOffThreshold;
+		}
+
+		void setCutOffThreshold(float v)
+		{
+			cutOffThreshold = v;
+		}
+
+		bool getIntegrateAllomorph() const
+		{
+			return integrateAllomorph;
+		}
+
+		void setIntegrateAllomorph(bool v)
+		{
+			integrateAllomorph = v;
+		}
 	};
 
 	class KiwiBuilder
@@ -130,9 +157,9 @@ namespace kiwi
 		std::vector<MorphemeRaw> morphemes;
 		std::unordered_map<FormCond, size_t> formMap;
 		std::shared_ptr<lm::KnLangModelBase> langMdl;
-		size_t numThreads;
+		size_t numThreads = 0;
 		WordDetector detector;
-		BuildOption options;
+		BuildOption options = BuildOption::none;
 
 		void loadMorphBin(std::istream& is);
 		void saveMorphBin(std::ostream& os) const;
@@ -147,8 +174,15 @@ namespace kiwi
 	public:
 		struct FromRawData {};
 		static constexpr FromRawData fromRawDataTag = {};
+
+		KiwiBuilder() = default;
 		KiwiBuilder(FromRawData, const std::string& rawDataPath, size_t numThreads = 0);
 		KiwiBuilder(const std::string& modelPath, size_t numThreads = 0, BuildOption options = BuildOption::integrateAllomorph | BuildOption::loadDefaultDict);
+
+		bool ready() const
+		{
+			return !!langMdl;
+		}
 
 		void saveModel(const std::string& modelPath) const;
 
