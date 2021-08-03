@@ -153,7 +153,7 @@ namespace kiwi
 
 		bool operator==(const SpaceSplitIterator& o) const
 		{
-			if (mBegin == mEnd && o.mBegin == o.mEnd) return true;
+			if (o.mBegin == o.mEnd) return mBegin == mEnd;
 			return mBegin == o.mBegin;
 		}
 
