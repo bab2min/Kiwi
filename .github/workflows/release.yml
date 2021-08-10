@@ -1,0 +1,129 @@
+on:
+  release:
+    types: [created]
+
+jobs:
+  build-centos:
+    name: Centos5
+    runs-on: ubuntu-latest
+    container:
+      image: docker://hoshizora/manylinux1-clang_x86_64
+
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        submodules: true
+    - name: Get release
+      id: get_release
+      uses: bruceadams/get-release@v1.2.2
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+    - name: Configure Build
+      run: mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_USE_MIMALLOC=0 ..
+    - name: Build
+      run: cd build && make
+    - name: Run Unit Test
+      run: ./build/test/kiwi-test
+    - name: Run Evaluator
+      run: |
+        mkdir eval_results
+        ./build/kiwi-evaluator -m ./ModelGenerator eval_data/*.txt -o eval_results/
+    - run: tar -zcvf asset.tgz build/*kiwi* build/test/*kiwi* eval_results/*.txt
+    - name: Upload release binary
+      uses: actions/upload-release-asset@v1.0.2
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        upload_url: ${{ steps.get_release.outputs.upload_url }}
+        asset_path: asset.tgz
+        asset_name: kiwi_lnx_${{ steps.get_release.outputs.tag_name }}.zip
+        asset_content_type: application/octet-stream
+
+  build-macos:
+    strategy:
+      matrix:
+        include:
+          # macOS 10.15 + Xcode 11.7
+          - name: "macOS 10.15 + Xcode 11.7"
+            os: macos-10.15
+            compiler: xcode
+            version: "11.7"
+
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.name }}
+
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        submodules: true
+    - name: Get release
+      id: get_release
+      uses: bruceadams/get-release@v1.2.2
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+    - name: Configure Compiler
+      run: |
+        if [ "${{ matrix.compiler }}" = "gcc" ]; then
+          echo "CC=gcc-${{ matrix.version }}" >> $GITHUB_ENV
+          echo "CXX=g++-${{ matrix.version }}" >> $GITHUB_ENV
+        else
+          ls -ls /Applications/
+          sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app
+          echo "CC=clang" >> $GITHUB_ENV
+          echo "CXX=clang++" >> $GITHUB_ENV
+        fi
+    - name: Configure Build
+      run: mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release ..
+    - name: Build
+      run: cd build && make
+    - run: tar -zcvf asset.tgz build/*kiwi* build/test/*kiwi* eval_results/*.txt
+    - name: Upload release binary
+      uses: actions/upload-release-asset@v1.0.2
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        upload_url: ${{ steps.get_release.outputs.upload_url }}
+        asset_path: asset.tgz
+        asset_name: kiwi_mac_${{ steps.get_release.outputs.tag_name }}.zip
+        asset_content_type: application/octet-stream
+
+  build-windows:
+    strategy:
+      matrix:
+        os: [windows-2019]
+        arch: [Win32, x64]
+
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.os }} ${{ matrix.arch }}
+
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        submodules: true
+    - name: Get release
+      id: get_release
+      uses: bruceadams/get-release@v1.2.2
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+    - name: Init
+      run: |
+        mkdir build
+    - name: Build
+      uses: lukka/run-cmake@v3
+      with:
+        cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
+        cmakeBuildType: Release
+        buildWithCMake: true
+        cmakeAppendedArgs: -G"Visual Studio 16 2019" -A${{ matrix.arch }} -DKIWI_STATIC_WITHOUT_MT=1
+        buildWithCMakeArgs: --config Release
+        buildDirectory: build
+    - run: Compress-Archive -Path 'build\Release\*kiwi*', 'build\test\Release\*kiwi*', 'eval_results\*.txt' -DestinationPath asset.zip
+    - name: Upload release binary
+      uses: actions/upload-release-asset@v1.0.2
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        upload_url: ${{ steps.get_release.outputs.upload_url }}
+        asset_path: asset.zip
+        asset_name: kiwi_win_${{ matrix.arch }}_${{ steps.get_release.outputs.tag_name }}.zip
+        asset_content_type: application/octet-stream
