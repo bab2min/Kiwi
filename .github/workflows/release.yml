@@ -33,7 +33,9 @@ jobs:
     - uses: actions/download-artifact@v2
       with:
         name: asset_Centos5
-        path: asset.tgz
+        path: arts
+    - name: Display downloaded files
+        run: ls -lh arts/
     - name: Get release
       id: get_release
       uses: bruceadams/get-release@v1.2.2
@@ -45,8 +47,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       with:
         upload_url: ${{ steps.get_release.outputs.upload_url }}
-        asset_path: asset.tgz
-        asset_name: kiwi_lnx_${{ steps.get_release.outputs.tag_name }}.zip
+        asset_path: arts/asset.tgz
+        asset_name: kiwi_lnx_${{ steps.get_release.outputs.tag_name }}.tgz
         asset_content_type: application/octet-stream
 
   build-macos:
@@ -94,7 +96,7 @@ jobs:
       with:
         upload_url: ${{ steps.get_release.outputs.upload_url }}
         asset_path: asset.tgz
-        asset_name: kiwi_mac_${{ steps.get_release.outputs.tag_name }}.zip
+        asset_name: kiwi_mac_${{ steps.get_release.outputs.tag_name }}.tgz
         asset_content_type: application/octet-stream
 
   build-windows:
