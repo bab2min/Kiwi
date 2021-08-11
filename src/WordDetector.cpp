@@ -126,7 +126,7 @@ WordDetector::WordDetector(const std::string& modelPath, size_t _numThreads)
 {
 	{
 		ifstream ifs{ modelPath + "/extract.mdl", ios_base::binary };
-		if (ifs.fail()) throw Exception{ "Failed to open model file '" + modelPath + "/extract.mdl'." };
+		if (!ifs) throw Exception{ "Failed to open model file '" + modelPath + "/extract.mdl'." };
 		serializer::readMany(ifs, posScore, nounTailScore);
 	}
 }
@@ -136,10 +136,12 @@ WordDetector::WordDetector(FromRawData, const std::string& modelPath, size_t _nu
 {
 	{
 		ifstream ifs{ modelPath + "/RPosModel.txt" };
+		if(!ifs) throw Exception{ "Failed to open file '" + modelPath + "/RPosModel.txt'." };
 		loadPOSModelFromTxt(ifs);
 	}
 	{
 		ifstream ifs{ modelPath + "/NounTailList.txt" };
+		if (!ifs) throw Exception{ "Failed to open file '" + modelPath + "/NounTailList.txt'." };
 		loadNounTailModelFromTxt(ifs);
 	}
 }
@@ -148,7 +150,7 @@ void WordDetector::saveModel(const std::string& modelPath) const
 {
 	{
 		ofstream ofs{ modelPath + "/extract.mdl", ios_base::binary };
-		if (ofs.fail()) throw Exception{ "Failed to open model file '" + modelPath + "extract.mdl'." };
+		if (!ofs) throw Exception{ "Failed to open model file '" + modelPath + "extract.mdl'." };
 		serializer::writeMany(ofs, posScore, nounTailScore);
 	}
 }

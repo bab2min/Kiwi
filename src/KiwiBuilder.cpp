@@ -422,7 +422,7 @@ namespace kiwi
 	{
 		size_t addedCnt = 0;
 		ifstream ifs{ dictPath };
-		if (!ifs) throw Exception(std::string{ "[loadUserDictionary] Failed to open '" } + dictPath + "'");
+		if (!ifs) throw Exception("[loadUserDictionary] Failed to open '" + dictPath + "'");
 		string line;
 		while (getline(ifs, line))
 		{
