@@ -35,7 +35,7 @@ jobs:
         name: asset_Centos5
         path: arts
     - name: Display downloaded files
-        run: ls -lh arts/
+      run: ls -lh arts/
     - name: Get release
       id: get_release
       uses: bruceadams/get-release@v1.2.2
