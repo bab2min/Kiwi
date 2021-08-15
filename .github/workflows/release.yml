@@ -1,3 +1,5 @@
+name: Publish Release assets
+
 on:
   release:
     types: [created]
