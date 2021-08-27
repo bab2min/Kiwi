@@ -30,7 +30,6 @@ namespace kiwi
 		std::vector<Form> forms;
 		std::vector<Morpheme> morphemes;
 		utils::FrozenTrie<kchar_t, const Form*> formTrie;
-		const PatternMatcher* pm = nullptr;
 		std::shared_ptr<lm::KnLangModelBase> langMdl;
 		std::unique_ptr<utils::ThreadPool> pool;
 			
