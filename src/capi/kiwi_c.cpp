@@ -38,6 +38,11 @@ const char* kiwi_error()
 	return nullptr;
 }
 
+void kiwi_clear_error()
+{
+	currentError = {};
+}
+
 kiwi_builder_h kiwi_builder_init(const char* model_path, int num_threads, int options)
 {
 	try
@@ -239,21 +244,36 @@ kiwi_h kiwi_init(const char * modelPath, int num_threads, int options)
 		return nullptr;
 	}
 }
-/*
+
 void kiwi_set_option(kiwi_h handle, int option, int value)
 {
 	if (!handle) return;
 	Kiwi* kiwi = (Kiwi*)handle;
-	kiwi->setOption(option, value);
+	switch (option)
+	{
+	case KIWI_BUILD_INTEGRATE_ALLOMORPH:
+		kiwi->setIntegrateAllomorph(!!value);
+		break;
+	case KIWI_NUM_THREADS:
+		currentError = make_exception_ptr(runtime_error{ "Cannot modify the number of threads." });
+		break;
+	}
 }
 
 int kiwi_get_option(kiwi_h handle, int option)
 {
 	if (!handle) return KIWIERR_INVALID_HANDLE;
 	Kiwi* kiwi = (Kiwi*)handle;
-	return kiwi->getOption(option);
+	switch (option)
+	{
+	case KIWI_BUILD_INTEGRATE_ALLOMORPH:
+		return kiwi->getIntegrateAllomorph() ? 1 : 0;
+	case KIWI_NUM_THREADS:
+		return kiwi->getNumThreads();
+	}
+	return KIWIERR_INVALID_INDEX;
 }
-*/
+
 kiwi_res_h kiwi_analyze_w(kiwi_h handle, const kchar16_t * text, int topN, int matchOptions)
 {
 	if (!handle) return nullptr;
@@ -428,7 +448,7 @@ const kchar16_t * kiwi_res_tag_w(kiwi_res_h result, int index, int num)
 	{
 		auto k = (TResult*)result;
 		if (index < 0 || index >= k->first.size() || num < 0 || num >= k->first[index].first.size()) return nullptr;
-		return (const kchar16_t*)  (k->first[index].first[num].tag);
+		return (const kchar16_t*)tagToKString(k->first[index].first[num].tag);
 	}
 	catch (...)
 	{
