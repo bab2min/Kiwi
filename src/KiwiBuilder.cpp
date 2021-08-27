@@ -449,7 +449,6 @@ namespace kiwi
 	Kiwi KiwiBuilder::build() const
 	{
 		Kiwi ret;
-		ret.pm = PatternMatcher::getInst();
 		ret.forms.reserve(forms.size() + 1);
 		ret.morphemes.reserve(morphemes.size());
 		ret.langMdl = langMdl;

@@ -528,7 +528,7 @@ namespace kiwi
 			posMap[i + 1] = posMap[i] + (isHangulCoda(nstr[i]) ? 0 : 1);
 		}
 
-		auto nodes = splitByTrie(formTrie, nstr, pm, matchOptions);
+		auto nodes = splitByTrie(formTrie, nstr, matchOptions);
 		vector<TokenResult> ret;
 		if (nodes.size() <= 2)
 		{
