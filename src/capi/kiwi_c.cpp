@@ -109,16 +109,17 @@ kiwi_ws_h kiwi_builder_extract_words(kiwi_builder_h handle, kiwi_reader_t reader
 	auto* kb = (KiwiBuilder*)handle;
 	try
 	{
+		int idx = 0;
 		auto res = kb->extractWords([&]()
 		{
-			auto idx = make_shared<int>(0);
+			idx = 0;
 			return [&]() -> u16string
 			{
 				string buf;
-				buf.resize((*reader)(*idx, nullptr, userData));
+				buf.resize((*reader)(idx, nullptr, userData));
 				if (buf.empty()) return {};
-				(*reader)(*idx, &buf[0], userData);
-				++* idx;
+				(*reader)(idx, &buf[0], userData);
+				++idx;
 				return utf8To16(buf);
 			};
 		}, minCnt, maxWordLen, minScore, posThreshold);
@@ -138,16 +139,17 @@ kiwi_ws_h kiwi_builder_extract_add_words(kiwi_builder_h handle, kiwi_reader_t re
 	auto* kb = (KiwiBuilder*)handle;
 	try
 	{
+		int idx = 0;
 		auto res = kb->extractAddWords([&]()
 		{
-			auto idx = make_shared<int>(0);
+			idx = 0;
 			return [&]() -> u16string
 			{
 				string buf;
-				buf.resize((*reader)(*idx, nullptr, userData));
+				buf.resize((*reader)(idx, nullptr, userData));
 				if (buf.empty()) return {};
-				(*reader)(*idx, &buf[0], userData);
-				++* idx;
+				(*reader)(idx, &buf[0], userData);
+				++idx;
 				return utf8To16(buf);
 			};
 		}, minCnt, maxWordLen, minScore, posThreshold);
@@ -166,16 +168,17 @@ kiwi_ws_h kiwi_builder_extract_words_w(kiwi_builder_h handle, kiwi_reader_w_t re
 	auto* kb = (KiwiBuilder*)handle;
 	try
 	{
+		int idx = 0;
 		auto res = kb->extractWords([&]()
 		{
-			auto idx = make_shared<int>(0);
+			idx = 0;
 			return [&]()->u16string
 			{
 				u16string buf;
-				buf.resize((*reader)(*idx, nullptr, userData));
+				buf.resize((*reader)(idx, nullptr, userData));
 				if (buf.empty()) return {};
-				(*reader)(*idx, (kchar16_t*)&buf[0], userData);
-				++* idx;
+				(*reader)(idx, (kchar16_t*)&buf[0], userData);
+				++idx;
 				return buf;
 			};
 		}, minCnt, maxWordLen, minScore, posThreshold);
@@ -195,16 +198,17 @@ kiwi_ws_h kiwi_builder_extract_add_words_w(kiwi_builder_h handle, kiwi_reader_w_
 	auto* kb = (KiwiBuilder*)handle;
 	try
 	{
+		int idx = 0;
 		auto res = kb->extractAddWords([&]()
 		{
-			auto idx = make_shared<int>(0);
+			idx = 0;
 			return [&]()->u16string
 			{
 				u16string buf;
-				buf.resize((*reader)(*idx, nullptr, userData));
+				buf.resize((*reader)(idx, nullptr, userData));
 				if (buf.empty()) return {};
-				(*reader)(*idx, (kchar16_t*)&buf[0], userData);
-				++* idx;
+				(*reader)(idx, (kchar16_t*)&buf[0], userData);
+				++idx;
 				return buf;
 			};
 		}, minCnt, maxWordLen, minScore, posThreshold);
