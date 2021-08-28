@@ -19,6 +19,11 @@ namespace kiwi
 	struct KGraphNode;
 	struct WordInfo;
 
+	/**
+	 * @brief 실제 형태소 분석을 수행하는 클래스.
+	 * 이 클래스의 인스턴스는 KiwiBuilder를 통해 생성될 수 있음.
+	 * 
+	 */
 	class Kiwi
 	{
 		friend class KiwiBuilder;
@@ -150,6 +155,11 @@ namespace kiwi
 		}
 	};
 
+	/**
+	 * @brief 형태소 분석에 사용될 사전을 관리하고, 
+	 * 사전을 바탕으로 실제 형태소 분석을 수행하는 Kiwi의 인스턴스를 생성하는 클래스.
+	 * 
+	 */
 	class KiwiBuilder
 	{
 		std::vector<FormRaw> forms;
