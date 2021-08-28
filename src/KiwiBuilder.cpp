@@ -430,6 +430,11 @@ namespace kiwi
 			if (wstr[0] == u'#') continue;
 			auto fields = split(wstr, u'\t');
 			if (fields.size() < 2) continue;
+
+			while (!fields[1].empty() && 
+				kiwi::identifySpecialChr(fields[1].back()) == POSTag::unknown
+			) fields[1].pop_back();
+
 			if (!fields[1].empty())
 			{
 				auto pos = toPOSTag(fields[1]);
