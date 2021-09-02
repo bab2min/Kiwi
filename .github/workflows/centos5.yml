@@ -15,8 +15,6 @@ jobs:
     - uses: actions/checkout@v1
       with:
         submodules: true
-    - name: Checkout Old Version googletest
-      run: cd third_party/googletest && git checkout v1.8.x && ../..
     - name: Configure Build
       run: mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_USE_MIMALLOC=0 ..
     - name: Build
