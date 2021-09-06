@@ -28,6 +28,8 @@ Visual Studio 2019 이상을 사용하여 `Kiwi.sln` 파일을 실행하여 컴�
 
 #### Linux
 이 레포지토리를 clone한 뒤 cmake>=3.9를 사용하여 컴파일합니다. 
+
+##### gcc >= 5.0 이상 혹은 다른 c++11 호환 컴파일러 사용가능 환경
 ```console
 $ git clone https://github.com/bab2min/Kiwi
 $ cd Kiwi
@@ -37,6 +39,20 @@ $ mkdir build && cd build
 $ cmake -DCMAKE_BUILD_TYPE=Release ../
 $ make
 ```
+
+##### gcc >= 4.8, < 5.0
+Centos5와 같이 gcc 4.8까지만 지원하는 환경에서는 googletest의 버전을 1.8.x로 낮춰야 컴파일 가능합니다.
+```console
+$ git clone https://github.com/bab2min/Kiwi
+$ cd Kiwi
+$ git submodule sync
+$ git submodule update --init --recursive
+$ cd third_party/googletest && git checkout v1.8.x && cd ../../
+$ mkdir build && cd build
+$ cmake -DCMAKE_BUILD_TYPE=Release ../
+$ make
+```
+
 설치가 잘 됐는지 확인하기 위해서는 `kiwi-evaluator`를 실행해봅니다.
 ```console
 $ ./kiwi-evaluator --model ../ModelGenerator ../eval_data/web.txt ../eval_data/written.txt
