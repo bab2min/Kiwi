@@ -56,11 +56,10 @@ namespace kiwi
 		}
 	};
 
-	Vector<KGraphNode> splitByTrie(const utils::FrozenTrie<kchar_t, const Form*>& trie, const KString& str, const PatternMatcher* pm, Match matchOptions);
+	Vector<KGraphNode> splitByTrie(const utils::FrozenTrie<kchar_t, const Form*>& trie, const KString& str, Match matchOptions);
 
 	struct KTrie : public utils::TrieNode<char16_t, const Form*, utils::ConstAccess<map<char16_t, int32_t>>, KTrie>
 	{
-		Vector<KGraphNode> split(const KString& str, const PatternMatcher* pm, Match matchOptions) const;
 		const Form* findForm(const KString& str) const;
 	};
 }

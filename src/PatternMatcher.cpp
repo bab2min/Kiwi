@@ -4,7 +4,7 @@
 using namespace std;
 using namespace kiwi;
 
-class PatternMatcherImpl : public PatternMatcher
+class PatternMatcherImpl
 {
 	struct
 	{
@@ -20,7 +20,7 @@ class PatternMatcherImpl : public PatternMatcher
 	size_t testHashtag(const char16_t* first, const char16_t* last) const;
 	size_t testMention(const char16_t* first, const char16_t* last) const;
 public:
-	std::pair<size_t, kiwi::POSTag> match(const char16_t* first, const char16_t* last, Match matchOptions) const override;
+	std::pair<size_t, kiwi::POSTag> match(const char16_t* first, const char16_t* last, Match matchOptions) const;
 };
 
 size_t PatternMatcherImpl::testUrl(const char16_t * first, const char16_t * last) const
@@ -162,8 +162,8 @@ pair<size_t, kiwi::POSTag> PatternMatcherImpl::match(const char16_t * first, con
 	return make_pair(0, kiwi::POSTag::unknown);
 }
 
-const PatternMatcher* PatternMatcher::getInst()
+pair<size_t, kiwi::POSTag> kiwi::matchPattern(const char16_t* first, const char16_t* last, Match matchOptions)
 {
-	thread_local PatternMatcherImpl inst;
-	return &inst;
+	static PatternMatcherImpl matcher;
+	return matcher.match(first, last, matchOptions);
 }

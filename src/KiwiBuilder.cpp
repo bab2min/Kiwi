@@ -430,6 +430,11 @@ namespace kiwi
 			if (wstr[0] == u'#') continue;
 			auto fields = split(wstr, u'\t');
 			if (fields.size() < 2) continue;
+
+			while (!fields[1].empty() && 
+				kiwi::identifySpecialChr(fields[1].back()) == POSTag::unknown
+			) fields[1].pop_back();
+
 			if (!fields[1].empty())
 			{
 				auto pos = toPOSTag(fields[1]);
@@ -449,7 +454,6 @@ namespace kiwi
 	Kiwi KiwiBuilder::build() const
 	{
 		Kiwi ret;
-		ret.pm = PatternMatcher::getInst();
 		ret.forms.reserve(forms.size() + 1);
 		ret.morphemes.reserve(morphemes.size());
 		ret.langMdl = langMdl;

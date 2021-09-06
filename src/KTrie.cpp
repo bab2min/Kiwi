@@ -8,7 +8,7 @@
 using namespace std;
 using namespace kiwi;
 
-Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form*>& trie, const KString& str, const PatternMatcher* pm, Match matchOptions)
+Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form*>& trie, const KString& str, Match matchOptions)
 {
 	Vector<KGraphNode> ret;
 	ret.reserve(8);
@@ -109,9 +109,9 @@ Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form
 	for (; n < str.size(); ++n)
 	{
 		auto& c = str[n];
-		if (pm)
+		if (!!matchOptions)
 		{
-			auto m = pm->match(str.data() + n, str.data() + str.size(), matchOptions);
+			auto m = matchPattern(str.data() + n, str.data() + str.size(), matchOptions);
 			chrType = m.second;
 			if (chrType != POSTag::unknown)
 			{

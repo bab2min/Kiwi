@@ -17,13 +17,7 @@ namespace kiwi
 		all = url | email | hashtag | mention,
 	};
 
-	class PatternMatcher
-	{
-	public:
-		static const PatternMatcher* getInst();
-		virtual ~PatternMatcher() {}
-		virtual std::pair<size_t, kiwi::POSTag> match(const char16_t* first, const char16_t* last, Match matchOptions) const = 0;
-	};
+	std::pair<size_t, kiwi::POSTag> matchPattern(const char16_t* first, const char16_t* last, Match matchOptions);
 }
 
 KIWI_DEFINE_ENUM_FLAG_OPERATORS(kiwi::Match);
