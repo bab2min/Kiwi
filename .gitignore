@@ -330,3 +330,5 @@ __pycache__/
 /data/
 include/btree/
 .vscode/
+docs/html
+docs/latex
