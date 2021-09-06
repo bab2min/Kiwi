@@ -1,3 +1,14 @@
+/**
+ * @file Types.h
+ * @author bab2min (bab2min@gmail.com)
+ * @brief Kiwi C++ API에 쓰이는 주요 타입들을 모아놓은 헤더 파일
+ * @version 0.10.0
+ * @date 2021-08-31
+ * 
+ * @copyright Copyright (c) 2021
+ * 
+ */
+
 #pragma once
 
 #include <vector>
@@ -129,11 +140,18 @@ namespace kiwi
 		negative
 	};
 
+	/**
+	 * @brief KiwiBuilder 생성시 사용되는 비트 플래그
+	 * 
+	 * @sa `kiwi::KiwiBuilder`
+	 */
 	enum class BuildOption
 	{
 		none = 0,
-		integrateAllomorph = 1 << 0,
-		loadDefaultDict = 1 << 1,
+
+		integrateAllomorph = 1 << 0, /**< 이형태 통합 여부를 설정한다. 이 옵션을 사용시 `아/EC, 어/EC, 여/EC` 와 같은 형태소들이 `어/EC`로 통합되어 출력된다. */
+		
+		loadDefaultDict = 1 << 1, /**< 기본 사전(default.dict)의 로딩 여부를 설정한다. 기본 사전은 위키백과 및 나무위키의 표제어로 구성되어 있다. */
 	};
 
 	struct Morpheme;
