@@ -1,6 +1,9 @@
 #pragma once
 #include <cstdint>
-#include <immintrin.h>
+
+#if defined(__SSE2__) || defined(__AVX2__)
+	#include <immintrin.h>
+#endif
 
 namespace kiwi
 {
