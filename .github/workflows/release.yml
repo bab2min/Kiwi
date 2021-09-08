@@ -50,7 +50,7 @@ jobs:
       with:
         upload_url: ${{ steps.get_release.outputs.upload_url }}
         asset_path: arts/asset.tgz
-        asset_name: kiwi_lnx_${{ steps.get_release.outputs.tag_name }}.tgz
+        asset_name: kiwi_lnx_x86_64_${{ steps.get_release.outputs.tag_name }}.tgz
         asset_content_type: application/octet-stream
 
   build-macos:
@@ -98,7 +98,7 @@ jobs:
       with:
         upload_url: ${{ steps.get_release.outputs.upload_url }}
         asset_path: asset.tgz
-        asset_name: kiwi_mac_${{ steps.get_release.outputs.tag_name }}.tgz
+        asset_name: kiwi_mac_x86_64_${{ steps.get_release.outputs.tag_name }}.tgz
         asset_content_type: application/octet-stream
     - run: tar -zcvf model.tgz ModelGenerator/sj.* ModelGenerator/extract.mdl ModelGenerator/default.dict
     - name: Upload release binary
@@ -150,4 +150,44 @@ jobs:
         upload_url: ${{ steps.get_release.outputs.upload_url }}
         asset_path: asset.zip
         asset_name: kiwi_win_${{ matrix.arch }}_${{ steps.get_release.outputs.tag_name }}.zip
+        asset_content_type: application/octet-stream
+
+  build-other-arch:
+    strategy:
+      matrix:
+        arch: [aarch64, ppc64le]
+    name: Centos7-${{ matrix.arch }}
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        submodules: true
+    - uses: bab2min/run-on-arch-action@use-custom-image
+      id: runcmd
+      with:
+        image: quay.io/pypa/manylinux2014_${{ matrix.arch }}
+        githubToken: ${{ github.token }}
+        setup: |
+          mkdir -p "${PWD}/artifacts"
+        dockerRunArgs: |
+          --volume "${PWD}/artifacts:/artifacts"
+        run: |
+          mkdir build && pushd build && cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_USE_MIMALLOC=0 ..
+          make && popd
+          ./build/test/kiwi-test
+          mkdir eval_results && ./build/kiwi-evaluator -m ./ModelGenerator eval_data/*.txt -o eval_results/
+          tar -zcvf /artifacts/asset.tgz build/*kiwi* build/test/*kiwi*
+    - name: Get release
+      id: get_release
+      uses: bruceadams/get-release@v1.2.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+    - name: Upload release binary
+      uses: actions/upload-release-asset@v1.0.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+      with:
+        upload_url: ${{ steps.get_release.outputs.upload_url }}
+        asset_path: artifacts/asset.tgz
+        asset_name: kiwi_lnx_${{ matrix.arch }}_${{ steps.get_release.outputs.tag_name }}.tgz
         asset_content_type: application/octet-stream
