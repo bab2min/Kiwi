@@ -1,0 +1,39 @@
+name: Arm64-Centos7
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-centos:
+    name: Arm64-Centos7
+    runs-on: ubuntu-18.04
+
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        submodules: true
+    - uses: bab2min/run-on-arch-action@use-custom-image
+      id: runcmd
+      with:
+        image: quay.io/pypa/manylinux2014_aarch64
+        githubToken: ${{ github.token }}
+        setup: |
+          mkdir -p "${PWD}/artifacts"
+        dockerRunArgs: |
+          --volume "${PWD}/artifacts:/artifacts"
+        run: |
+          mkdir build && pushd build && cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_USE_MIMALLOC=0 ..
+          make && popd
+          ./build/test/kiwi-test
+          mkdir eval_results && ./build/kiwi-evaluator -m ./ModelGenerator eval_data/*.txt -o eval_results/
+          cp -r build /artifacts/
+          cp -r eval_results /artifacts/
+    - name: Archive binaries
+      uses: actions/upload-artifact@v2
+      with:
+        name: Artifacts ${{ matrix.name }}
+        path: |
+          artifacts/build/*kiwi*
+          artifacts/build/test/*kiwi*
+          artifacts/eval_results/*.txt
