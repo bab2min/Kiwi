@@ -1,6 +1,10 @@
 #pragma once
 #include <algorithm>
-#include <immintrin.h>
+
+#if defined(__SSE2__) || defined(__AVX2__)
+	#include <immintrin.h>
+#endif
+
 #include <kiwi/BitUtils.h>
 
 namespace kiwi
@@ -39,6 +43,15 @@ namespace kiwi
 			}
 		}
 
+		inline void prefetch(const void* ptr)
+		{
+#if defined(__SSE2__) || defined(__AVX2__)
+			_mm_prefetch((const char*)ptr, _MM_HINT_T0);
+#elif defined(__GNUC__)
+			__builtin_prefetch(ptr);
+#endif
+		}
+
 		template<class IntTy, class ValueIt, class Out>
 		bool bsearch(const IntTy* keys, ValueIt values, size_t size, IntTy target, Out& ret)
 		{
@@ -57,8 +70,8 @@ namespace kiwi
 			{
 				if (dist >= cacheLineSize / sizeof(IntTy))
 				{
-					_mm_prefetch((const char*)&keys[left1 + dist - 1], _MM_HINT_T0);
-					_mm_prefetch((const char*)&keys[left2 + dist - 1], _MM_HINT_T0);
+					prefetch(&keys[left1 + dist - 1]);
+					prefetch(&keys[left2 + dist - 1]);
 				}
 				if (target > keys[mid]) left1 = left2;
 				left2 = left1 + dist;
