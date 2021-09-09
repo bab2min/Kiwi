@@ -2,11 +2,15 @@
 
 ![KiwiLogo](https://repository-images.githubusercontent.com/82677855/eb9fa478-175d-47a5-8e07-0e169c030ff5)
 
+x86_64: 
 [![Action Status Centos5](https://github.com/bab2min/Kiwi/workflows/Centos5/badge.svg)](https://github.com/bab2min/Kiwi/actions)
 [![Action Status Windows](https://github.com/bab2min/Kiwi/workflows/Windows/badge.svg)](https://github.com/bab2min/Kiwi/actions)
 [![Action Status Ubuntu](https://github.com/bab2min/Kiwi/workflows/Ubuntu/badge.svg)](https://github.com/bab2min/Kiwi/actions)
 [![Action Status macOS](https://github.com/bab2min/Kiwi/workflows/macOS/badge.svg)](https://github.com/bab2min/Kiwi/actions)
 
+Other:
+[![Action Status ARM64](https://github.com/bab2min/Kiwi/workflows/Arm64-Centos7/badge.svg)](https://github.com/bab2min/Kiwi/actions)
+[![Action Status PPC64LE](https://github.com/bab2min/Kiwi/workflows/PPC64LE-Centos7/badge.svg)](https://github.com/bab2min/Kiwi/actions)
 
 Kiwi는 빠른 속도와 범용적인 성능을 지향하는 한국어 형태소 분석기 라이브러리입니다. 한국어 자연어처리에 관심 있는 사람이면 누구나 쉽게 사용할 수 있도록 오픈 소스로 공개 중이며, C++로 구현된 코어 라이브러리를 래핑하여 다양한 프로그래밍 언어에 사용할 수 있도록 준비 중입니다. 
 
