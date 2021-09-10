@@ -122,10 +122,11 @@ namespace kiwi
 	/**
 	 * @brief 형태소 품사 태그와 관련된 열거형
 	 * 
+	 * @note 나머지 품사 태그에 대한 정보는 README.md 를 참조할 것.
 	 */
 	enum class POSTag : uint8_t
 	{
-		unknown,
+		unknown, /**< 미설정 */
 		nng, nnp, nnb,
 		vv, va,
 		mag,
@@ -140,7 +141,7 @@ namespace kiwi
 		w_url, w_email, w_mention, w_hashtag,
 		jks, jkc, jkg, jko, jkb, jkv, jkq, jx, jc,
 		ep, ef, ec, etn, etm,
-		v, /**< 미완성 동사/형용사를 나타내는데 사용됨 */
+		v, /**< 분할된 동사/형용사를 나타내는데 사용됨 */
 		max, /**< POSTag의 총 개수를 나타내는 용도 */
 	};
 
