@@ -5,7 +5,6 @@
  * @version 0.10.0
  * @date 2021-08-31
  * 
- * @copyright Copyright (c) 2021
  * 
  */
 
@@ -86,21 +85,48 @@ namespace kiwi
 	using KcVector = Vector<kchar_t>;
 	using KcScores = Vector<std::pair<KcVector, float>>;
 #else
+	/**
+	 * @brief std::vector의 내부용 타입. mimalloc 옵션에 따라 mi_stl_allocator로부터 메모리를 할당받는다.
+	 * 
+	 * @note Vector는 std::vector와 동일한 역할을 수행하지만,
+	 * mimalloc 사용시 Vector가 좀 더 빠른 속도로 메모리를 할당 받을 수 있음.
+	 * Vector와 std::vector는 섞어 쓸 수 없다. 
+	 * Kiwi 내부에서만 사용할 것이라면 Vector를, 외부로 반환해야할 값이라면 std::vector를 사용할 것.
+	 */
 	template<typename _Ty>
 	using Vector = std::vector<_Ty>;
 
+	/**
+	 * @brief std::unordered_map의 내부용 타입. mimalloc 옵션에 따라 mi_stl_allocator로부터 메모리를 할당받는다.
+	 * 
+	 * @note UnorderMap은 std::unordered_map과 동일한 역할을 수행하지만,
+	 * mimalloc 사용시 UnorderMap이 좀 더 빠른 속도로 메모리를 할당 받을 수 있음.
+	 * @sa Vector
+	 */
 	template<typename _K, typename _V>
 	using UnorderedMap = std::unordered_map<_K, _V>;
 
+	/**
+	 * @brief std::u16string의 내부용 타입. mimalloc 옵션에 따라 mi_stl_allocator로부터 메모리를 할당받는다.
+	 * 
+	 * @note KString은 std::u16string과 동일한 역할을 수행하지만,
+	 * mimalloc 사용시 KString이 좀 더 빠른 속도로 메모리를 할당 받을 수 있음.
+	 * @sa Vector
+	 */
 	using KString = std::basic_string<kchar_t>;
 	using KStringStream = std::basic_stringstream<kchar_t>;
 	using KcVector = Vector<kchar_t>;
 	using KcScores = Vector<std::pair<KcVector, float>>;
 #endif
 
+	/**
+	 * @brief 형태소 품사 태그와 관련된 열거형
+	 * 
+	 * @note 나머지 품사 태그에 대한 정보는 README.md 를 참조할 것.
+	 */
 	enum class POSTag : uint8_t
 	{
-		unknown,
+		unknown, /**< 미설정 */
 		nng, nnp, nnb,
 		vv, va,
 		mag,
@@ -115,29 +141,37 @@ namespace kiwi
 		w_url, w_email, w_mention, w_hashtag,
 		jks, jkc, jkg, jko, jkb, jkv, jkq, jx, jc,
 		ep, ef, ec, etn, etm,
-		v,
-		max,
+		v, /**< 분할된 동사/형용사를 나타내는데 사용됨 */
+		max, /**< POSTag의 총 개수를 나타내는 용도 */
 	};
 
 	constexpr size_t defaultTagSize = (size_t)POSTag::jks;
 
+	/**
+	 * @brief 선행 형태소의 종성 여부 조건과 관련된 열거형
+	 * 
+	 */
 	enum class CondVowel : uint8_t
 	{
-		none,
-		any,
-		vowel,
-		vocalic,
-		vocalic_h,
-		non_vowel,
-		non_vocalic,
-		non_vocalic_h,
+		none, /**< 조건이 설정되지 않음 */
+		any, /**< 자음, 모음 여부와 상관 없이 등장 가능 */
+		vowel, /**< 선행 형태소가 받침이 없는 경우만 등장 가능*/
+		vocalic, /**< 선행 형태소가 받침이 없거나 ㄹ받침인 경우만 등장 가능*/
+		vocalic_h, /**< 선행 형태소가 받침이 없거나 ㄹ, ㅎ 받침인 경우만 등장 가능 */
+		non_vowel, /**< `vowel`의 부정 */
+		non_vocalic, /**< `vocalic`의 부정 */
+		non_vocalic_h, /**< `vocalic_h`의 부정 */
 	};
 
+	/**
+	 * @brief 선행 형태소의 양/음성 조건(모음 조화)과 관련된 열거형
+	 * 
+	 */
 	enum class CondPolarity : char
 	{
-		none,
-		positive,
-		negative
+		none, /**< 조건이 설정되지 않음 */
+		positive, /**< 선행 형태소가 양성(ㅏ,ㅑ,ㅗ)인 경우만 등장 가능 */
+		negative, /**< 선행 형태소가 음성(그 외)인 경우만 등장 가능 */
 	};
 
 	/**
@@ -156,13 +190,17 @@ namespace kiwi
 
 	struct Morpheme;
 
+	/**
+	 * @brief 분석 완료된 각 형태소들의 정보를 담는 구조체
+	 * 
+	 */
 	struct TokenInfo
 	{
-		std::u16string str;
-		uint32_t position = 0;
-		uint16_t length = 0;
-		POSTag tag = POSTag::unknown;
-		const Morpheme* morph = nullptr;
+		std::u16string str; /**< 형태 */
+		uint32_t position = 0; /**< 시작 위치(UTF16 문자 기준) */
+		uint16_t length = 0; /**< 길이(UTF16 문자 기준) */
+		POSTag tag = POSTag::unknown; /**< 품사 태그 */
+		const Morpheme* morph = nullptr; /**< 기타 형태소 정보에 대한 포인터 (OOV인 경우 nullptr) */
 
 		TokenInfo() = default;
 
@@ -209,6 +247,10 @@ namespace kiwi
 		}
 	};
 
+	/**
+	 * @brief 분석 완료된 형태소의 목록(`std::vector<TokenInfo>`)과 점수(`float`)의 pair 타입
+	 * 
+	 */
 	using TokenResult = std::pair<std::vector<TokenInfo>, float>;
 
 	using U16Reader = std::function<std::u16string()>;
