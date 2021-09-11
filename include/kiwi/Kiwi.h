@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file Kiwi.h
  * @author bab2min (bab2min@gmail.com)
  * @brief Kiwi C++ API를 담고 있는 헤더 파일
@@ -11,6 +11,7 @@
 
 #include <iostream>
 #include <future>
+#include "Macro.h"
 #include "Types.h"
 #include "Form.h"
 #include "Utils.h"

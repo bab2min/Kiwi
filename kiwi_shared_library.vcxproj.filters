@@ -87,6 +87,9 @@
     <ClInclude Include="include\kiwi\BitUtils.h">
       <Filter>Header Files\kiwi</Filter>
     </ClInclude>
+    <ClInclude Include="include\kiwi\Macro.h">
+      <Filter>Header Files\kiwi</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Form.cpp">

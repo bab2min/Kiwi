@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file capi.h
  * @author bab2min (bab2min@gmail.com)
  * @brief Kiwi C API를 담고 있는 헤더 파일
@@ -9,6 +9,8 @@
  */
 
 #pragma once
+
+#include "Macro.h"
 
 #define KIWIERR_FAIL -1
 #define KIWIERR_INVALID_HANDLE -2
