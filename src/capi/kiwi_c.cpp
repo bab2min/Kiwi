@@ -8,8 +8,7 @@ using namespace kiwi;
 
 const char* kiwi_version()
 {
-	//return Kiwi::getVersion();
-	return nullptr;
+	return KIWI_VERSION_STRING;
 }
 
 struct ResultBuffer

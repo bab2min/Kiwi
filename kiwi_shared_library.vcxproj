@@ -34,6 +34,7 @@
     <ClInclude Include="include\kiwi\FrozenTrie.h" />
     <ClInclude Include="include\kiwi\Kiwi.h" />
     <ClInclude Include="include\kiwi\Knlm.h" />
+    <ClInclude Include="include\kiwi\Macro.h" />
     <ClInclude Include="include\kiwi\Mmap.h" />
     <ClInclude Include="include\kiwi\PatternMatcher.h" />
     <ClInclude Include="include\kiwi\ThreadPool.h" />
