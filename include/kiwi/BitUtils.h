@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <cstdint>
 
 #if defined(__SSE2__) || defined(__AVX2__)
