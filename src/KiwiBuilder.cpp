@@ -324,8 +324,8 @@ namespace kiwi
 		}
 	}
 
-	KiwiBuilder::KiwiBuilder(FromRawData, const std::string& rawDataPath, size_t _numThreads)
-		: detector{ WordDetector::fromRawDataTag, rawDataPath, _numThreads }, numThreads{ _numThreads ? _numThreads : thread::hardware_concurrency() }
+	KiwiBuilder::KiwiBuilder(FromRawData, const std::string& rawDataPath, size_t _numThreads, BuildOption _options)
+		: detector{ WordDetector::fromRawDataTag, rawDataPath, _numThreads }, options{ _options }, numThreads{ _numThreads ? _numThreads : thread::hardware_concurrency() }
 	{
 		forms.resize(defaultTagSize);
 		morphemes.resize(defaultTagSize + 2); // additional places for <s> & </s>
@@ -365,8 +365,14 @@ namespace kiwi
 		addCorpusTo(sents, ifstream{ rawDataPath + "/ML_lit.txt" }, realMorph);
 		addCorpusTo(sents, ifstream{ rawDataPath + "/ML_spo.txt" }, realMorph);
 		vector<pair<uint16_t, uint16_t>> bigramList;
-		auto cntNodes = utils::count(sents.begin(), sents.end(), 1, 1, 3, nullptr, &bigramList);
-		langMdl = lm::KnLangModelBase::create(lm::KnLangModelBase::build(cntNodes, 3, 1, 2, 0, 1, 1e-5, 8, false, &bigramList));
+		constexpr size_t order = 3, minCnt = 1, lastMinCnt = 1;
+		auto cntNodes = utils::count(sents.begin(), sents.end(), minCnt, 1, order, nullptr, &bigramList);
+		langMdl = lm::KnLangModelBase::create(lm::KnLangModelBase::build(cntNodes, order, minCnt, lastMinCnt, 2, 0, 1, 1e-5, 8, false, &bigramList));
+
+		if (!!(options & BuildOption::loadDefaultDict))
+		{
+			loadDictionary(rawDataPath + "/default.dict");
+		}
 	}
 
 	void KiwiBuilder::saveModel(const string& modelPath) const

@@ -773,7 +773,7 @@ namespace kiwi
 
 		template<class KeyType, class TrieNode>
 		utils::MemoryOwner buildCompressedModel(Header header,
-			size_t min_cf,
+			size_t min_cf, size_t last_min_cf,
 			float unigram_alpha,
 			const utils::ContinuousTrie<TrieNode>& compressed_ngrams,
 			const std::vector<double>& unigram_pats,
@@ -827,6 +827,7 @@ namespace kiwi
 				{
 					if (rkeys.empty()) return;
 					ptrdiff_t i = (ptrdiff_t)(node - &compressed_ngrams[0]);
+					size_t min_cnt = rkeys.size() < header.order - 1 ? min_cf : last_min_cf;
 
 					std::array<size_t, 3> pats = { 0, };
 					ptrdiff_t rest = node->val;
@@ -837,14 +838,14 @@ namespace kiwi
 						if (cnt)
 						{
 							rest -= cnt;
-							pats[std::min(cnt / min_cf, (size_t)3) - 1]++;
+							pats[std::min(cnt / min_cnt, (size_t)3) - 1]++;
 						}
 					}
 
 					double g = rest;
 					if (!node->next.empty())
 					{
-						for (size_t j = 0; j < 3; ++j) g += pats[j] * (min_cf * discnts[rkeys.size()][j]);
+						for (size_t j = 0; j < 3; ++j) g += pats[j] * (min_cnt * discnts[rkeys.size()][j]);
 					}
 					g /= node->val;
 					gamma[i] = g;
@@ -856,22 +857,23 @@ namespace kiwi
 				}, rkeys, -1, true);
 
 				// set n-gram ll
-				for (size_t o = 1; o < header.order; ++o)
+				for (size_t o = 2; o <= header.order; ++o)
 				{
 					compressed_ngrams[0].traverseWithKeys([&](const TrieNode* node, const std::vector<uint16_t>& rkeys)
 					{
 						ptrdiff_t i = (ptrdiff_t)(node - &compressed_ngrams[0]);
-						if (rkeys.size() == o + 1)
+						if (rkeys.size() == o)
 						{
 							if (history_transformer && rkeys.back() >= history_transformer->size()) return;
+							size_t min_cnt = o < header.order ? min_cf : last_min_cf;
 							if (node->val)
 							{
-								double l = (node->val - min_cf * discnts[rkeys.size() - 1][std::min(node->val / min_cf, (size_t)3) - 1]) / (double)node->getParent()->val;
+								double l = (node->val - min_cnt * discnts[rkeys.size() - 1][std::min(node->val / min_cnt, (size_t)3) - 1]) / (double)node->getParent()->val;
 								l += gamma[i + node->parent] * ll[i + node->fail];
 								ll[i] = l;
 							}
 						}
-					}, rkeys, o + 1, true);
+					}, rkeys, o, true);
 				}
 			}
 
@@ -1002,7 +1004,8 @@ namespace kiwi
 		}
 
 		template<class TrieNode>
-		utils::MemoryOwner KnLangModelBase::build(const utils::ContinuousTrie<TrieNode>& ngram_cf, size_t order, size_t min_cf,
+		utils::MemoryOwner KnLangModelBase::build(const utils::ContinuousTrie<TrieNode>& ngram_cf, 
+			size_t order, size_t min_cf, size_t last_min_cf,
 			size_t unk_id, size_t bos_id, size_t eos_id, float unigram_alpha, size_t quantize, bool compress,
 			const std::vector<std::pair<Vid, Vid>>* bigram_list, const std::vector<Vid>* history_transformer
 		)
@@ -1014,6 +1017,7 @@ namespace kiwi
 			std::vector<std::array<size_t, 4>> ngram_ncnt(order);
 
 			if (min_cf == 0) min_cf = 1;
+			if (last_min_cf < min_cf) last_min_cf = min_cf;
 
 			if (bigram_list)
 			{
@@ -1042,14 +1046,16 @@ namespace kiwi
 						unigram_pats[rkeys[1]] += 1;
 					}
 
-					if (node->val < min_cf) return;
+					size_t min_cnt = rkeys.size() == order ? last_min_cf : min_cf;
+
+					if (node->val < min_cnt) return;
 
 					if (!rkeys.empty()) max_vid = std::max(max_vid, (size_t)rkeys.back());
 
 					// last-gram discounting
 					if (rkeys.size() == order)
 					{
-						size_t n = node->val / min_cf;
+						size_t n = node->val / last_min_cf;
 						if (n <= 4) ngram_ncnt[order - 1][n - 1]++;
 					}
 
@@ -1089,19 +1095,19 @@ namespace kiwi
 
 			if (max_vid <= 0xFF)
 			{
-				return buildCompressedModel<uint8_t>(header, min_cf, unigram_alpha, compressed_ngrams, unigram_pats, unigram_cnts, ngram_ncnt, history_transformer);
+				return buildCompressedModel<uint8_t>(header, min_cf, last_min_cf, unigram_alpha, compressed_ngrams, unigram_pats, unigram_cnts, ngram_ncnt, history_transformer);
 			}
 			else if (max_vid <= 0xFFFF)
 			{
-				return buildCompressedModel<uint16_t>(header, min_cf, unigram_alpha, compressed_ngrams, unigram_pats, unigram_cnts, ngram_ncnt, history_transformer);
+				return buildCompressedModel<uint16_t>(header, min_cf, last_min_cf, unigram_alpha, compressed_ngrams, unigram_pats, unigram_cnts, ngram_ncnt, history_transformer);
 			}
 			else if (max_vid <= 0xFFFFFFFF)
 			{
-				return buildCompressedModel<uint32_t>(header, min_cf, unigram_alpha, compressed_ngrams, unigram_pats, unigram_cnts, ngram_ncnt, history_transformer);
+				return buildCompressedModel<uint32_t>(header, min_cf, last_min_cf, unigram_alpha, compressed_ngrams, unigram_pats, unigram_cnts, ngram_ncnt, history_transformer);
 			}
 			else
 			{
-				return buildCompressedModel<uint64_t>(header, min_cf, unigram_alpha, compressed_ngrams, unigram_pats, unigram_cnts, ngram_ncnt, history_transformer);
+				return buildCompressedModel<uint64_t>(header, min_cf, last_min_cf, unigram_alpha, compressed_ngrams, unigram_pats, unigram_cnts, ngram_ncnt, history_transformer);
 			}
 		}
 	}
