@@ -332,3 +332,4 @@ include/btree/
 .vscode/
 docs/html
 docs/latex
+docs/_build
