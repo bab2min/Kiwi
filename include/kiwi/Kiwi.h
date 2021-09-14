@@ -226,6 +226,11 @@ namespace kiwi
 		{
 			integrateAllomorph = v;
 		}
+
+		const lm::KnLangModelBase* getLangModel() const
+		{
+			return langMdl.get();
+		}
 	};
 
 	/**
@@ -269,11 +274,12 @@ namespace kiwi
 		 * 
 		 * @param rawDataPath 
 		 * @param numThreads 
+		 * @param options
 		 * 
 		 * @note 이 함수는 현재 내부적으로 모델 구축에 쓰인다. 
 		 * 추후 공개 데이터로도 쉽게 직접 모델을 구축할 수 있도록 개선된 API를 제공할 예정.
 		 */
-		KiwiBuilder(FromRawData, const std::string& rawDataPath, size_t numThreads = 0);
+		KiwiBuilder(FromRawData, const std::string& rawDataPath, size_t numThreads = 0, BuildOption options = BuildOption::integrateAllomorph | BuildOption::loadDefaultDict);
 
 		/**
 		 * @brief KiwiBuilder를 모델 파일로부터 생성한다.
@@ -329,5 +335,10 @@ namespace kiwi
 		 * @return 형태소 분석 준비가 완료된 Kiwi의 객체.
 		 */
 		Kiwi build() const;
+
+		const lm::KnLangModelBase* getLangModel() const
+		{
+			return langMdl.get();
+		}
 	};
 }
