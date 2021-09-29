@@ -230,21 +230,16 @@ namespace kiwi
 		CondVowel vowel;
 		CondPolarity polar;
 		
-		FormCond() = default;
-		FormCond(const KString& _form, CondVowel _vowel, CondPolarity _polar)
-			: form{ _form }, vowel{ _vowel }, polar{ _polar }
-		{
-		}
+		FormCond();
+		~FormCond();
+		FormCond(const FormCond&);
+		FormCond(FormCond&&);
+		FormCond& operator=(const FormCond&);
+		FormCond& operator=(FormCond&&);
 
-		bool operator==(const FormCond& o) const
-		{
-			return form == o.form && vowel == o.vowel && polar == o.polar;
-		}
-
-		bool operator!=(const FormCond& o) const
-		{
-			return !operator==(o);
-		}
+		FormCond(const KString& _form, CondVowel _vowel, CondPolarity _polar);
+		bool operator==(const FormCond& o) const;
+		bool operator!=(const FormCond& o) const;
 	};
 
 	/**

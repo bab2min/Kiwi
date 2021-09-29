@@ -49,7 +49,7 @@ namespace kiwi
 
 		FixedVector& operator=(const FixedVector& o)
 		{
-			~FixedVector();
+			this->~FixedVector();
 			new (this) FixedVector(o);
 			return *this;
 		}
