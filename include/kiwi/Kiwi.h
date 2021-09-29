@@ -58,9 +58,17 @@ namespace kiwi
 		 * @note 이 생성자는 기본 생성자로 이를 통해 생성된 객체는 바로 형태소 분석에 사용할 수 없다.
 		 * kiwi::KiwiBuilder 를 통해 생성된 객체만이 형태소 분석에 사용할 수 있다.
 		 */
-		Kiwi() = default;
-		Kiwi(Kiwi&&) = default;
-		Kiwi& operator=(Kiwi&&) = default;
+		Kiwi();
+
+		~Kiwi();
+
+		Kiwi(const Kiwi&) = delete;
+
+		Kiwi(Kiwi&&);
+
+		Kiwi& operator=(const Kiwi&) = delete;
+
+		Kiwi& operator=(Kiwi&&);
 
 		/**
 		 * @brief 현재 Kiwi 객체가 형태소 분석을 수행할 준비가 되었는지를 알려준다.
@@ -267,7 +275,17 @@ namespace kiwi
 		 * 
 		 * @note 이 생성자로 생성된 경우 `ready() == false`인 상태이므로 유효한 Kiwi 객체를 생성할 수 없다.
 		 */
-		KiwiBuilder() = default;
+		KiwiBuilder();
+
+		~KiwiBuilder();
+
+		KiwiBuilder(const KiwiBuilder&);
+
+		KiwiBuilder(KiwiBuilder&&);
+
+		KiwiBuilder& operator=(const KiwiBuilder&);
+
+		KiwiBuilder& operator=(KiwiBuilder&&);
 
 		/**
 		 * @brief KiwiBuilder를 raw 데이터로부터 생성한다.

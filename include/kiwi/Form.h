@@ -27,17 +27,16 @@ namespace kiwi
 	 * `kiwi::Kiwi` 내 실제 형태소 분석 단계에 쓰인다.
 	 * @tparam baked 
 	 */
-	template<bool baked>
-	struct MorphemeT
+	struct MorphemeRaw
 	{
-		typename std::conditional<baked, const KString*, uint32_t>::type kform = 0; /**< 형태에 대한 포인터 */
+		uint32_t kform = 0; /**< 형태에 대한 포인터 */
 		POSTag tag = POSTag::unknown; /**< 품사 태그 */
 		CondVowel vowel = CondVowel::none; /**< 선행형태소의 자/모음 조건 */
 		CondPolarity polar = CondPolarity::none; /**< 선행형태소의 모음조화 조건 */
 
 		/**
 		 * @brief 형태소가 두 부분으로 분할된 경우 결합 번호를 표기하기 위해 사용된다.
-		 * 
+		 *
 		 * @note `덥/VA`, `춥/VA` 등의 형태소는 `어/EC`와 만나면 `더워`, `추워`와 같이 형태가 변화한다.
 		 * 이 경우를 각각 처리하기 보다는 `더/V + ㅂ/V`, `추/V + ㅂ/V`과 같이 분해하면
 		 * `ㅂ/V` + `어/EC`가 `워`로 변한다는 규칙만으로 처리가 가능해진다. (이 규칙은 `chunks`를 이용해 형태소 정보에 담길 수 있음)
@@ -48,19 +47,19 @@ namespace kiwi
 		 * `더/V`와 `워/UNK`(`ㅂ/V + 어/EC`)는 예를 들어 3과 같이 동일한 combineSocket을 할당해 둘이 서로 결합이 가능한 형태소임을 식별한다.
 		 */
 		uint8_t combineSocket = 0;
-		
+
 		/**
 		 * @brief 여러 형태소가 결합되어 형태가 변경된 경우에 원 형태소 목록을 표기하기 위해 사용된다.
-		 * 
+		 *
 		 * @note `되/VV + 어/EC`의 결합은 `돼`라는 형태로 축약될 수 있다.
 		 * 분석과정에서 `돼`를 만난 경우 역으로 `되/VV + 어/EC`로 분석할 수 있도록 `돼/UNK`를 더미 형태소로 등록하고
 		 * chunks에는 `되/VV`와 `어/EC`에 대한 포인터를 넣어둔다.
 		 */
-		typename std::conditional<baked, FixedVector<const Morpheme*>, std::vector<uint32_t>>::type chunks;
+		Vector<uint32_t> chunks;
 
 		/**
 		 * @brief 분할된 형태소의 원형 형태소를 가리키는 오프셋
-		 * 
+		 *
 		 * @note `덥/VA`이 `더/V` + `ㅂ/V`으로 분할된 경우 `더/V`는 `덥/VA`에 대한 오프셋을 combined에 저장해둔다.
 		 * `kiwi::Morpheme::getCombined()`를 통해 원형 형태소의 포인터를 구할 수 있음
 		 * @sa combineSocket
@@ -68,22 +67,20 @@ namespace kiwi
 		int32_t combined = 0;
 		float userScore = 0;
 
-		MorphemeT(const KString& _form = {},
-			POSTag _tag = POSTag::unknown,
+		MorphemeRaw();
+		~MorphemeRaw();
+		MorphemeRaw(const MorphemeRaw&);
+		MorphemeRaw(MorphemeRaw&&);
+		MorphemeRaw& operator=(const MorphemeRaw&);
+		MorphemeRaw& operator=(MorphemeRaw&&);
+
+		MorphemeRaw(
+			POSTag _tag,
 			CondVowel _vowel = CondVowel::none,
 			CondPolarity _polar = CondPolarity::none,
-			uint8_t _combineSocket = 0)
-			: tag(_tag), vowel(_vowel), polar(_polar), combineSocket(_combineSocket)
-		{
-		}
+			uint8_t _combineSocket = 0
+		);
 
-		std::ostream& print(std::ostream& os) const;
-		
-	};
-
-	struct MorphemeRaw : public MorphemeT<false>
-	{
-		using MorphemeT<false>::MorphemeT;
 		void serializerRead(std::istream& istr);
 		void serializerWrite(std::ostream& ostr) const;
 	};
@@ -92,9 +89,25 @@ namespace kiwi
 	 * @brief 최적화된 형태소 정보를 담는 구조체. 값을 변경하면 안된다.
 	 * 
 	 */
-	struct Morpheme : public MorphemeT<true>
+	struct Morpheme
 	{
-		using MorphemeT<true>::MorphemeT;
+		const KString* kform = nullptr;
+		POSTag tag = POSTag::unknown;
+		CondVowel vowel = CondVowel::none;
+		CondPolarity polar = CondPolarity::none;
+		uint8_t combineSocket = 0;
+		FixedVector<const Morpheme*> chunks;
+		int32_t combined = 0;
+		float userScore = 0;
+
+		Morpheme();
+		~Morpheme();
+		Morpheme(const Morpheme&);
+		Morpheme(Morpheme&&);
+		Morpheme& operator=(const Morpheme&);
+		Morpheme& operator=(Morpheme&&);
+
+		std::ostream& print(std::ostream& os) const;
 
 		/** 형태소의 형태를 반환한다. */
 		const KString& getForm() const { return *kform; }
@@ -113,49 +126,41 @@ namespace kiwi
 	 * `kiwi::Kiwi` 내 실제 형태소 분석 단계에 쓰인다.
 	 * @tparam baked 
 	 */
-	template<bool baked>
-	struct FormT
+	struct FormRaw
 	{
 		KString form; /**< 형태 */
 		CondVowel vowel = CondVowel::none; /**< 선행형태소의 자/모음 조건 */
 		CondPolarity polar = CondPolarity::none; /**< 선행형태소의 모음조화 조건 */
-		typename std::conditional<baked, FixedVector<const Morpheme*>, Vector<uint32_t>>::type candidate;
+		Vector<uint32_t> candidate;
 		/**< 이 형태에 해당하는 형태소들의 목록 */
 
-		FormT(const kchar_t* _form = nullptr)
-		{
-			if (_form) form = _form;
-		}
-		FormT(const KString& _form, CondVowel _vowel, CondPolarity _polar) 
-			: form(_form), vowel(_vowel), polar(_polar)
-		{}
+		FormRaw();
+		~FormRaw();
+		FormRaw(const FormRaw&);
+		FormRaw(FormRaw&&);
+		FormRaw& operator=(const FormRaw&);
+		FormRaw& operator=(FormRaw&&);
+		
+		FormRaw(const KString& _form, CondVowel _vowel, CondPolarity _polar);
+		bool operator<(const FormRaw& o) const;
 
-		FormT(const FormT&) = default;
-		FormT(FormT&&) = default;
-		FormT& operator=(const FormT&) = default;
-		FormT& operator=(FormT&&) = default;
-
-		bool operator < (const FormT& o) const
-		{
-			if (form < o.form) return true;
-			if (form > o.form) return false;
-			if (vowel < o.vowel) return true;
-			if (vowel > o.vowel) return false;
-			return polar < o.polar;
-		}
-
-	};
-
-	struct FormRaw : public FormT<false>
-	{
-		using FormT<false>::FormT;
 		void serializerRead(std::istream& istr);
 		void serializerWrite(std::ostream& ostr) const;
 	};
 
-	struct Form : public FormT<true>
+	struct Form
 	{
-		using FormT<true>::FormT;
+		KString form;
+		CondVowel vowel = CondVowel::none;
+		CondPolarity polar = CondPolarity::none;
+		FixedVector<const Morpheme*> candidate;
+
+		Form();
+		~Form();
+		Form(const Form&);
+		Form(Form&&);
+		Form& operator=(const Form&);
+		Form& operator=(Form&&);
 	};
 
 	/**

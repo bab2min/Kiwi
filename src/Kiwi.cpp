@@ -29,6 +29,14 @@ namespace kiwi
 		);
 	};
 
+	Kiwi::Kiwi() = default;
+
+	Kiwi::~Kiwi() = default;
+
+	Kiwi::Kiwi(Kiwi&&) = default;
+
+	Kiwi& Kiwi::operator=(Kiwi&&) = default;
+
 	vector<TokenResult> Kiwi::analyze(const u16string& str, size_t topN, Match matchOptions) const
 	{
 		auto chunk = str.begin();
