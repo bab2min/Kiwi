@@ -25,8 +25,9 @@ int doEvaluate(const string& modelPath, bool buildFromRaw, const string& output,
 		{
 			kw = KiwiBuilder{ modelPath, 1 }.build();
 		}
+		
 		cout << "Loading Time : " << timer.getElapsed() << " ms" << endl;
-
+		cout << "LM Size : " << (kw.getLangModel()->getMemory().size() / 1024. / 1024.) << " MB" << endl;
 		cout << "Mem Usage : " << (tutils::getCurrentPhysicalMemoryUsage() / 1024.) << " MB\n" << endl;
 
 		for (auto& tf : input)

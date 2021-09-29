@@ -58,9 +58,17 @@ namespace kiwi
 		 * @note 이 생성자는 기본 생성자로 이를 통해 생성된 객체는 바로 형태소 분석에 사용할 수 없다.
 		 * kiwi::KiwiBuilder 를 통해 생성된 객체만이 형태소 분석에 사용할 수 있다.
 		 */
-		Kiwi() = default;
-		Kiwi(Kiwi&&) = default;
-		Kiwi& operator=(Kiwi&&) = default;
+		Kiwi();
+
+		~Kiwi();
+
+		Kiwi(const Kiwi&) = delete;
+
+		Kiwi(Kiwi&&);
+
+		Kiwi& operator=(const Kiwi&) = delete;
+
+		Kiwi& operator=(Kiwi&&);
 
 		/**
 		 * @brief 현재 Kiwi 객체가 형태소 분석을 수행할 준비가 되었는지를 알려준다.
@@ -226,6 +234,11 @@ namespace kiwi
 		{
 			integrateAllomorph = v;
 		}
+
+		const lm::KnLangModelBase* getLangModel() const
+		{
+			return langMdl.get();
+		}
 	};
 
 	/**
@@ -262,18 +275,29 @@ namespace kiwi
 		 * 
 		 * @note 이 생성자로 생성된 경우 `ready() == false`인 상태이므로 유효한 Kiwi 객체를 생성할 수 없다.
 		 */
-		KiwiBuilder() = default;
+		KiwiBuilder();
+
+		~KiwiBuilder();
+
+		KiwiBuilder(const KiwiBuilder&);
+
+		KiwiBuilder(KiwiBuilder&&);
+
+		KiwiBuilder& operator=(const KiwiBuilder&);
+
+		KiwiBuilder& operator=(KiwiBuilder&&);
 
 		/**
 		 * @brief KiwiBuilder를 raw 데이터로부터 생성한다.
 		 * 
 		 * @param rawDataPath 
 		 * @param numThreads 
+		 * @param options
 		 * 
 		 * @note 이 함수는 현재 내부적으로 모델 구축에 쓰인다. 
 		 * 추후 공개 데이터로도 쉽게 직접 모델을 구축할 수 있도록 개선된 API를 제공할 예정.
 		 */
-		KiwiBuilder(FromRawData, const std::string& rawDataPath, size_t numThreads = 0);
+		KiwiBuilder(FromRawData, const std::string& rawDataPath, size_t numThreads = 0, BuildOption options = BuildOption::integrateAllomorph | BuildOption::loadDefaultDict);
 
 		/**
 		 * @brief KiwiBuilder를 모델 파일로부터 생성한다.
@@ -329,5 +353,10 @@ namespace kiwi
 		 * @return 형태소 분석 준비가 완료된 Kiwi의 객체.
 		 */
 		Kiwi build() const;
+
+		const lm::KnLangModelBase* getLangModel() const
+		{
+			return langMdl.get();
+		}
 	};
 }

@@ -35,6 +35,45 @@ namespace std
 
 namespace kiwi
 {
+	FormCond::FormCond() = default;
+
+	FormCond::~FormCond() = default;
+
+	FormCond::FormCond(const FormCond&) = default;
+
+	FormCond::FormCond(FormCond&&) = default;
+
+	FormCond& FormCond::operator=(const FormCond&) = default;
+
+	FormCond& FormCond::operator=(FormCond&&) = default;
+
+	FormCond::FormCond(const KString& _form, CondVowel _vowel, CondPolarity _polar)
+		: form{ _form }, vowel{ _vowel }, polar{ _polar }
+	{
+	}
+
+	bool FormCond::operator==(const FormCond& o) const
+	{
+		return form == o.form && vowel == o.vowel && polar == o.polar;
+	}
+
+	bool FormCond::operator!=(const FormCond& o) const
+	{
+		return !operator==(o);
+	}
+
+	KiwiBuilder::KiwiBuilder() = default;
+
+	KiwiBuilder::~KiwiBuilder() = default;
+
+	KiwiBuilder::KiwiBuilder(const KiwiBuilder&) = default;
+
+	KiwiBuilder::KiwiBuilder(KiwiBuilder&&) = default;
+
+	KiwiBuilder& KiwiBuilder::operator=(const KiwiBuilder&) = default;
+
+	KiwiBuilder& KiwiBuilder::operator=(KiwiBuilder&&) = default;
+
 	void KiwiBuilder::loadMMFromTxt(std::istream&& is, MorphemeMap& morphMap, std::unordered_map<POSTag, float>* posWeightSum, const function<bool(float, POSTag)>& selector)
 	{
 		string line;
@@ -99,7 +138,7 @@ namespace kiwi
 				size_t mid = morphemes.size();
 				morphMap.emplace(make_pair(form, tag), mid);
 				fm.candidate.emplace_back(mid);
-				morphemes.emplace_back(form, tag, cvowel, polar);
+				morphemes.emplace_back(tag, cvowel, polar);
 				morphemes.back().kform = &fm - &forms[0];
 				morphemes.back().userScore = morphWeight;
 			}
@@ -121,7 +160,7 @@ namespace kiwi
 			if (fields.size() < 2) continue;
 			if (fields.size() == 2) fields.emplace_back();
 			auto form = normalizeHangul({ fields[0].begin(), fields[0].end() });
-			vector<uint32_t> chunkIds;
+			Vector<uint32_t> chunkIds;
 			float ps = 0;
 			size_t bTag = 0;
 			for (auto chunk : split(fields[1], u'+'))
@@ -140,7 +179,7 @@ namespace kiwi
 					size_t mid = morphemes.size();
 					morphMap.emplace(make_pair(f, tag), mid);
 					auto& fm = addForm(f, CondVowel::none, CondPolarity::none);
-					morphemes.emplace_back(f, tag);
+					morphemes.emplace_back(tag);
 					morphemes.back().kform = &fm - &forms[0];
 					chunkIds.emplace_back(mid);
 				}
@@ -177,7 +216,7 @@ namespace kiwi
 				size_t mid = morphemes.size();
 				auto& fm = addForm(form, vowel, polar);
 				fm.candidate.emplace_back(mid);
-				morphemes.emplace_back(form, POSTag::unknown, vowel, polar, combineSocket);
+				morphemes.emplace_back(POSTag::unknown, vowel, polar, combineSocket);
 				morphemes.back().kform = (&fm - &forms[0]);
 				morphemes.back().chunks = move(chunkIds);
 			}
@@ -211,7 +250,7 @@ namespace kiwi
 				//morphMap.emplace(make_pair(form, tag), mid);
 				auto& fm = addForm(form, CondVowel::none, CondPolarity::none);
 				fm.candidate.emplace_back(mid);
-				morphemes.emplace_back(form, tag, CondVowel::none, CondPolarity::none, socket);
+				morphemes.emplace_back(tag, CondVowel::none, CondPolarity::none, socket);
 				morphemes.back().kform = &fm - &forms[0];
 				morphemes.back().combined = (int)mit->second - ((int)morphemes.size() - 1);
 			}
@@ -324,8 +363,8 @@ namespace kiwi
 		}
 	}
 
-	KiwiBuilder::KiwiBuilder(FromRawData, const std::string& rawDataPath, size_t _numThreads)
-		: detector{ WordDetector::fromRawDataTag, rawDataPath, _numThreads }, numThreads{ _numThreads ? _numThreads : thread::hardware_concurrency() }
+	KiwiBuilder::KiwiBuilder(FromRawData, const std::string& rawDataPath, size_t _numThreads, BuildOption _options)
+		: detector{ WordDetector::fromRawDataTag, rawDataPath, _numThreads }, options{ _options }, numThreads{ _numThreads ? _numThreads : thread::hardware_concurrency() }
 	{
 		forms.resize(defaultTagSize);
 		morphemes.resize(defaultTagSize + 2); // additional places for <s> & </s>
@@ -365,8 +404,14 @@ namespace kiwi
 		addCorpusTo(sents, ifstream{ rawDataPath + "/ML_lit.txt" }, realMorph);
 		addCorpusTo(sents, ifstream{ rawDataPath + "/ML_spo.txt" }, realMorph);
 		vector<pair<uint16_t, uint16_t>> bigramList;
-		auto cntNodes = utils::count(sents.begin(), sents.end(), 1, 1, 3, nullptr, &bigramList);
-		langMdl = lm::KnLangModelBase::create(lm::KnLangModelBase::build(cntNodes, 3, 1, 2, 0, 1, 1e-5, 8, false, &bigramList));
+		constexpr size_t order = 3, minCnt = 1, lastMinCnt = 1;
+		auto cntNodes = utils::count(sents.begin(), sents.end(), minCnt, 1, order, nullptr, &bigramList);
+		langMdl = lm::KnLangModelBase::create(lm::KnLangModelBase::build(cntNodes, order, minCnt, lastMinCnt, 2, 0, 1, 1e-5, 8, false, &bigramList));
+
+		if (!!(options & BuildOption::loadDefaultDict))
+		{
+			loadDictionary(rawDataPath + "/default.dict");
+		}
 	}
 
 	void KiwiBuilder::saveModel(const string& modelPath) const
@@ -412,7 +457,7 @@ namespace kiwi
 		}
 
 		f.candidate.emplace_back(morphemes.size());
-		morphemes.emplace_back(normalizedForm, tag);
+		morphemes.emplace_back(tag);
 		morphemes.back().kform = &f - &forms[0];
 		morphemes.back().userScore = score;
 		return true;
