@@ -70,3 +70,16 @@ TEST(KiwiCpp, AnalyzeError01)
 	res = kiwi.analyze(u"잤는데", Match::all);
 	EXPECT_EQ(res.first[0].str, std::u16string{ u"자" });
 }
+
+TEST(KiwiCpp, AnalyzeWithWordPosition)
+{
+  std::u16string testSentence = u"나 정말 배불렄ㅋㅋ"; 
+	Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 0, BuildOption::none }.build();
+	TokenResult tokenResult = kiwi.analyze(testSentence, Match::all);
+  std::vector<TokenInfo> tokenInfoList = tokenResult.first;
+
+  EXPECT_EQ(tokenInfoList[0].wordPosition, 0);
+  EXPECT_EQ(tokenInfoList[1].wordPosition, 1);
+  EXPECT_EQ(tokenInfoList[2].wordPosition, 2);
+  EXPECT_EQ(tokenInfoList[3].wordPosition, 2);
+}
