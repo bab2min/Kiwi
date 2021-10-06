@@ -199,6 +199,7 @@ namespace kiwi
 		std::u16string str; /**< 형태 */
 		uint32_t position = 0; /**< 시작 위치(UTF16 문자 기준) */
 		uint16_t length = 0; /**< 길이(UTF16 문자 기준) */
+    uint16_t wordPosition = 0;
 		POSTag tag = POSTag::unknown; /**< 품사 태그 */
 		const Morpheme* morph = nullptr; /**< 기타 형태소 정보에 대한 포인터 (OOV인 경우 nullptr) */
 
@@ -207,9 +208,10 @@ namespace kiwi
 		TokenInfo(const std::u16string& _str,
 			POSTag _tag = POSTag::unknown,
 			uint16_t _length = 0,
-			uint32_t _position = 0
+			uint32_t _position = 0,
+      uint16_t _wordPosition = 0
 		)
-			: str{ _str }, position{ _position }, length{ _length }, tag{ _tag }
+			: str{ _str }, position{ _position }, length{ _length }, wordPosition{ _wordPosition }, tag{ _tag }
 		{
 		}
 
