@@ -527,6 +527,24 @@ namespace kiwi
 		return ret;
 	}
 
+  const std::vector<uint16_t>& getWordPosition(const std::u16string& sentence)
+  {
+    std::vector<uint16_t>* wordPosition = new std::vector<uint16_t>(sentence.size());
+    uint32_t position = 0;
+
+    for (auto i = 0; i < sentence.size(); ++i)
+    {
+      (*wordPosition)[i] = position;
+
+      if (sentence[i] == u' ')
+      {
+        ++position; 
+      }
+    }
+
+    return *wordPosition;
+  }
+
 	std::vector<TokenResult> Kiwi::analyzeSent(const std::u16string::const_iterator& sBegin, const std::u16string::const_iterator& sEnd, size_t topN, Match matchOptions) const
 	{
 		auto nstr = normalizeHangul({ sBegin, sEnd });
@@ -535,6 +553,8 @@ namespace kiwi
 		{
 			posMap[i + 1] = posMap[i] + (isHangulCoda(nstr[i]) ? 0 : 1);
 		}
+
+    std::vector<uint16_t> wordPositions = getWordPosition({ sBegin, sEnd });
 
 		auto nodes = splitByTrie(formTrie, nstr, matchOptions);
 		vector<TokenResult> ret;
@@ -601,6 +621,7 @@ namespace kiwi
 				size_t nllast = min(max(nlast, nlen) - nlen, posMap.size() - 1);
 				rarr.back().position = posMap[nllast];
 				rarr.back().length = posMap[min(nlast, posMap.size() - 1)] - posMap[nllast];
+        rarr.back().wordPosition = wordPositions[rarr.back().position];
 				prevMorph = get<0>(s)->kform;
 			}
 			ret.emplace_back(rarr, r.second);
