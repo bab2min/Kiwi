@@ -11,6 +11,7 @@
 
 #include <iostream>
 #include <future>
+#include <string>
 #include "Macro.h"
 #include "Types.h"
 #include "Form.h"
@@ -47,6 +48,7 @@ namespace kiwi
 		std::shared_ptr<lm::KnLangModelBase> langMdl;
 		std::unique_ptr<utils::ThreadPool> pool;
 			
+    const std::vector<uint16_t> getWordPositions(const std::u16string& sentence) const;
 		std::vector<TokenResult> analyzeSent(const std::u16string::const_iterator& sBegin, const std::u16string::const_iterator& sEnd, size_t topN, Match matchOptions) const;
 
 		const Morpheme* getDefaultMorpheme(POSTag tag) const;
