@@ -609,16 +609,16 @@ namespace kiwi
 					{
 						if (POSTag::ep <= get<0>(s)->tag && get<0>(s)->tag <= POSTag::etm)
 						{
-							if ((*get<0>(s)->kform)[0] == u'어')
+							if ((*get<0>(s)->kform)[0] == u'\uC5B4') // 어
 							{
-								if (prevMorph && prevMorph[0].back() == u'하')
+								if (prevMorph && prevMorph[0].back() == u'\uD558') // 하
 								{
-									joined = joinHangul(u"여" + get<0>(s)->kform->substr(1));
+									joined = joinHangul(u"\uC5EC" + get<0>(s)->kform->substr(1)); // 여
 									break;
 								}
 								else if (FeatureTestor::isMatched(prevMorph, CondPolarity::positive))
 								{
-									joined = joinHangul(u"아" + get<0>(s)->kform->substr(1));
+									joined = joinHangul(u"\uC544" + get<0>(s)->kform->substr(1)); // 아
 									break;
 								}
 							}
