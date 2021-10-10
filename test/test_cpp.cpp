@@ -70,7 +70,8 @@ TEST(KiwiCpp, AnalyzeError01)
 	res = kiwi.analyze(u"잤는데", Match::all);
 	EXPECT_EQ(res.first[0].str, std::u16string{ u"자" });
 }
-TEST(KiwiCpp, AnalyzeError02) { 
+
+TEST(KiwiCpp, NormalizeCoda) { 
  	Kiwi& kiwi = reuseKiwiInstance(); 
  	TokenResult res = kiwi.analyze(u"키윜ㅋㅋ", Match::all); 
  	EXPECT_EQ(res.first[1].str, std::u16string{ u"ㅋㅋㅋ" });  
