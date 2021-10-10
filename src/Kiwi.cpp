@@ -528,28 +528,37 @@ namespace kiwi
 	}
 
 	template<class It> //여러가지 타입에 대응가능함.
-	inline void normalizeCoda(It begin, It end) {
+	inline void normalizeCoda(It begin, It end) 
+	{
 		char16_t before = 0;
-		for (auto it=begin; it != end; ++it) { // 키윜ㅋㅋ -> 키위ㅋㅋㅋ
-			if (before == 4543 && *it == 12619) {
+		for (auto it = begin; it != end; ++it) 
+		{ 
+			if (before == 4543 && *it == 12619) // 키윜ㅋㅋ -> 키위ㅋㅋㅋ
+			{
 				it[-1] = 12619;
 			}
-			if (before == 4546 && *it == 12622) { // 키윟ㅎㅎ->키위ㅎㅎㅎ
+			else if (before == 4546 && *it == 12622) // 키윟ㅎㅎ->키위ㅎㅎㅎ
+			{ 
 				it[-1] = 12622;
 			}
-			if (before == 4525 && *it == 12622) { // 키윊ㅎㅎ->키윈ㅎㅎ
+			else if (before == 4525 && *it == 12622) // 키윊ㅎㅎ->키윈ㅎㅎ
+			{ 
 				it[-1] = 4523;
 			}
-			if (before == 4534 && *it == 12622) { // 키윓ㅎㅎ->키윌ㅎㅎ
+			else if (before == 4534 && *it == 12622) // 키윓ㅎㅎ->키윌ㅎㅎ
+			{ 
 				it[-1] = 4527;
 			}
-			if (before == 4528 && *it == 12593) { // 키윍ㄱㄱ->키윌ㄱㄱ
+			else if (before == 4528 && *it == 12593) // 키윍ㄱㄱ->키윌ㄱㄱ
+			{ 
 				it[-1] = 4527;
 			}
-			if (before == 4520 && *it == 12593) { // 키윅ㄱㄱ->키위ㄱㄱㄱ
+			else if (before == 4520 && *it == 12593) // 키윅ㄱㄱ->키위ㄱㄱㄱ
+			{ 
 				it[-1] = 12593;
 			}
-			if (before == 4523 && *it == 12596) { // 키윈ㄴㄴ->키위ㄴㄴㄴ
+			else if (before == 4523 && *it == 12596) // 키윈ㄴㄴ->키위ㄴㄴㄴ
+			{ 
 				it[-1] = 12596;
 			}
 			before = *it;
