@@ -1,4 +1,4 @@
-﻿#include "gtest/gtest.h"
+#include "gtest/gtest.h"
 #include <kiwi/Kiwi.h>
 #include "common.h"
 
@@ -70,3 +70,18 @@ TEST(KiwiCpp, AnalyzeError01)
 	res = kiwi.analyze(u"잤는데", Match::all);
 	EXPECT_EQ(res.first[0].str, std::u16string{ u"자" });
 }
+TEST(KiwiCpp, AnalyzeError02) { 
+ 	Kiwi& kiwi = reuseKiwiInstance(); 
+ 	TokenResult res = kiwi.analyze(u"키윜ㅋㅋ", Match::all); 
+ 	EXPECT_EQ(res.first[1].str, std::u16string{ u"ㅋㅋㅋ" });  
+ 	res = kiwi.analyze(u"키윟ㅎ", Match::all); 
+ 	EXPECT_EQ(res.first[1].str, std::u16string{ u"ㅎㅎ" });
+ 	res = kiwi.analyze(u"키윅ㄱ", Match::all); 
+ 	EXPECT_EQ(res.first[1].str, std::u16string{ u"ㄱㄱ" });
+	res = kiwi.analyze(u"키윈ㄴㄴ", Match::all); 
+ 	EXPECT_EQ(res.first[1].str, std::u16string{ u"ㄴㄴㄴ" });
+	res = kiwi.analyze(u"키윊ㅎㅎ", Match::all); 
+ 	EXPECT_EQ(res.first[2].str, std::u16string{ u"ㅎㅎ" });
+	res = kiwi.analyze(u"키윍ㄱㄱ", Match::all); 
+ 	EXPECT_EQ(res.first[2].str, std::u16string{ u"ㄱㄱ" });
+} 
