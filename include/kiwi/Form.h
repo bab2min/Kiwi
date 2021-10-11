@@ -20,12 +20,11 @@ namespace kiwi
 	/**
 	 * @brief 형태소에 관한 모든 정보를 담는 구조체의 템플릿
 	 * 
-	 * @note `baked = false`는 변경가능한 상태로 인덱스와 관련된 값이나 std::vector 등의 길이를 변경할 수 있음.
-	 * 이 상태는 `kiwi::MorphemeRaw`라는 타입의 부모클래스로 쓰이며, `kiwi::KiwiBuilder`에서 사용한다.
+	 * @note 변경가능한 상태로 인덱스와 관련된 값이나 std::vector 등의 길이를 변경할 수 있음.
+	 * `kiwi::KiwiBuilder`에서 사용한다.
 	 * `baked = true`는 변경 불가능한 상태로 인덱스는 모두 포인터로, std::vector는 FixedVector로 변경되어 수정이 불가능한 대신
 	 * 각 값에 효율적으로 빠르게 접근 가능하다. 이 상태는 `kiwi::Morpheme`이라는 타입의 부모클래스로 쓰이며, 
 	 * `kiwi::Kiwi` 내 실제 형태소 분석 단계에 쓰인다.
-	 * @tparam baked 
 	 */
 	struct MorphemeRaw
 	{
@@ -86,8 +85,10 @@ namespace kiwi
 	};
 
 	/**
-	 * @brief 최적화된 형태소 정보를 담는 구조체. 값을 변경하면 안된다.
+	 * @brief 형태소에 관한 모든 정보를 담는 구조체의 템플릿
 	 * 
+	 * @note 변경 불가능한 상태로 인덱스는 모두 포인터로, std::vector는 FixedVector로 변경되어 수정이 불가능한 대신
+	 * 각 값에 효율적으로 빠르게 접근 가능하다. `kiwi::Kiwi` 내 실제 형태소 분석 단계에 쓰인다.
 	 */
 	struct Morpheme
 	{
@@ -119,12 +120,10 @@ namespace kiwi
 	/**
 	 * @brief 형태에 관한 모든 정보를 담는 구조체의 템플릿
 	 * 
-	 * @note `baked = false`는 변경가능한 상태로 인덱스와 관련된 값이나 std::vector 등의 길이를 변경할 수 있음.
-	 * 이 상태는 `kiwi::FormRaw`라는 타입의 부모클래스로 쓰이며, `kiwi::KiwiBuilder`에서 사용한다.
+	 * @note 변경가능한 상태로 인덱스와 관련된 값이나 std::vector 등의 길이를 변경할 수 있음. `kiwi::KiwiBuilder`에서 사용한다.
 	 * `baked = true`는 변경 불가능한 상태로 인덱스는 모두 포인터로, std::vector는 FixedVector로 변경되어 수정이 불가능한 대신
 	 * 각 값에 효율적으로 빠르게 접근 가능하다. 이 상태는 `kiwi::Form`이라는 타입의 부모클래스로 쓰이며, 
 	 * `kiwi::Kiwi` 내 실제 형태소 분석 단계에 쓰인다.
-	 * @tparam baked 
 	 */
 	struct FormRaw
 	{
@@ -148,6 +147,12 @@ namespace kiwi
 		void serializerWrite(std::ostream& ostr) const;
 	};
 
+	/**
+	 * @brief 형태에 관한 모든 정보를 담는 구조체의 템플릿
+	 * 
+	 * @note 변경 불가능한 상태로 인덱스는 모두 포인터로, std::vector는 FixedVector로 변경되어 수정이 불가능한 대신
+	 * 각 값에 효율적으로 빠르게 접근 가능하다. `kiwi::Kiwi` 내 실제 형태소 분석 단계에 쓰인다.
+	 */
 	struct Form
 	{
 		KString form;

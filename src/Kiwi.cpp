@@ -587,7 +587,7 @@ namespace kiwi
 
 		for (auto i = 0; i < sentence.size(); ++i)
 		{
-		wordPositions[i] = position;
+			wordPositions[i] = position;
 
 			if (sentence[i] == u' ')
 			{
@@ -608,7 +608,7 @@ namespace kiwi
 		}
 
 		normalizeCoda(nstr.begin(), nstr.end());
-    // 분석할 문장에 포함된 개별 문자에 대해 어절번호를 생성한다
+		// 분석할 문장에 포함된 개별 문자에 대해 어절번호를 생성한다
 		std::vector<uint16_t> wordPositions = getWordPositions({ sBegin, sEnd });
 
 		auto nodes = splitByTrie(formTrie, nstr, matchOptions);
@@ -677,8 +677,8 @@ namespace kiwi
 				rarr.back().position = posMap[nllast];
 				rarr.back().length = posMap[min(nlast, posMap.size() - 1)] - posMap[nllast];
 
-        // Token의 시작위치(position)을 이용해 Token이 포함된 어절번호(wordPosition)를 얻음
-        rarr.back().wordPosition = wordPositions[rarr.back().position];
+				// Token의 시작위치(position)을 이용해 Token이 포함된 어절번호(wordPosition)를 얻음
+        		rarr.back().wordPosition = wordPositions[rarr.back().position];
 				prevMorph = get<0>(s)->kform;
 			}
 			ret.emplace_back(rarr, r.second);
