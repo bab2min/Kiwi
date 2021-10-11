@@ -11,6 +11,7 @@
 
 #include <iostream>
 #include <future>
+#include <string>
 #include "Macro.h"
 #include "Types.h"
 #include "Form.h"
