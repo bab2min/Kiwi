@@ -1,4 +1,4 @@
-﻿#include <fstream>
+#include <fstream>
 
 #include <kiwi/Kiwi.h>
 #include <kiwi/Utils.h>
@@ -527,6 +527,44 @@ namespace kiwi
 		return ret;
 	}
 
+	template<class It> //여러가지 타입에 대응가능함.
+	inline void normalizeCoda(It begin, It end) 
+	{
+		char16_t before = 0;
+		for (auto it = begin; it != end; ++it) 
+		{ 
+			if (before == 4543 && *it == 12619) // 키윜ㅋㅋ -> 키위ㅋㅋㅋ
+			{
+				it[-1] = 12619;
+			}
+			else if (before == 4546 && *it == 12622) // 키윟ㅎㅎ->키위ㅎㅎㅎ
+			{ 
+				it[-1] = 12622;
+			}
+			else if (before == 4525 && *it == 12622) // 키윊ㅎㅎ->키윈ㅎㅎ
+			{ 
+				it[-1] = 4523;
+			}
+			else if (before == 4534 && *it == 12622) // 키윓ㅎㅎ->키윌ㅎㅎ
+			{ 
+				it[-1] = 4527;
+			}
+			else if (before == 4528 && *it == 12593) // 키윍ㄱㄱ->키윌ㄱㄱ
+			{ 
+				it[-1] = 4527;
+			}
+			else if (before == 4520 && *it == 12593) // 키윅ㄱㄱ->키위ㄱㄱㄱ
+			{ 
+				it[-1] = 12593;
+			}
+			else if (before == 4523 && *it == 12596) // 키윈ㄴㄴ->키위ㄴㄴㄴ
+			{ 
+				it[-1] = 12596;
+			}
+			before = *it;
+
+		}
+	}
 
   /**
    * @brief 주어진 문자열에 나타난 개별 문자들에 대해 어절번호(wordPosition) 생성하여 반환한다.
@@ -542,23 +580,23 @@ namespace kiwi
    * @param sentence 어절번호를 생성할 문장.
    * @return sentence 에 대한 어절번호를 담고있는 vector.
    */
-  const std::vector<uint16_t> getWordPositions(const std::u16string& sentence)
-  {
-    std::vector<uint16_t> wordPositions(sentence.size());
-    uint32_t position = 0;
+	const std::vector<uint16_t> getWordPositions(const std::u16string& sentence)
+	{
+		std::vector<uint16_t> wordPositions(sentence.size());
+		uint32_t position = 0;
 
-    for (auto i = 0; i < sentence.size(); ++i)
-    {
-      wordPositions[i] = position;
+		for (auto i = 0; i < sentence.size(); ++i)
+		{
+		wordPositions[i] = position;
 
-      if (sentence[i] == u' ')
-      {
-        ++position; 
-      }
-    }
+			if (sentence[i] == u' ')
+			{
+				++position; 
+			}
+		}
 
-    return wordPositions;
-  }
+		return wordPositions;
+	}
 
 	std::vector<TokenResult> Kiwi::analyzeSent(const std::u16string::const_iterator& sBegin, const std::u16string::const_iterator& sEnd, size_t topN, Match matchOptions) const
 	{
@@ -569,8 +607,9 @@ namespace kiwi
 			posMap[i + 1] = posMap[i] + (isHangulCoda(nstr[i]) ? 0 : 1);
 		}
 
+		normalizeCoda(nstr.begin(), nstr.end());
     // 분석할 문장에 포함된 개별 문자에 대해 어절번호를 생성한다
-    std::vector<uint16_t> wordPositions = getWordPositions({ sBegin, sEnd });
+		std::vector<uint16_t> wordPositions = getWordPositions({ sBegin, sEnd });
 
 		auto nodes = splitByTrie(formTrie, nstr, matchOptions);
 		vector<TokenResult> ret;
@@ -613,16 +652,16 @@ namespace kiwi
 					{
 						if (POSTag::ep <= get<0>(s)->tag && get<0>(s)->tag <= POSTag::etm)
 						{
-							if ((*get<0>(s)->kform)[0] == u'어')
+							if ((*get<0>(s)->kform)[0] == u'\uC5B4') // 어
 							{
-								if (prevMorph && prevMorph[0].back() == u'하')
+								if (prevMorph && prevMorph[0].back() == u'\uD558') // 하
 								{
-									joined = joinHangul(u"여" + get<0>(s)->kform->substr(1));
+									joined = joinHangul(u"\uC5EC" + get<0>(s)->kform->substr(1)); // 여
 									break;
 								}
 								else if (FeatureTestor::isMatched(prevMorph, CondPolarity::positive))
 								{
-									joined = joinHangul(u"아" + get<0>(s)->kform->substr(1));
+									joined = joinHangul(u"\uC544" + get<0>(s)->kform->substr(1)); // 아
 									break;
 								}
 							}
