@@ -46,10 +46,10 @@ include_directories( third_party/tclap/include )
 include_directories( third_party/cpp-btree )
 
 if(MSVC)
-  set ( CMAKE_C_FLAGS_DEBUG "-DDEBUG -DC_FLAGS -Zi -Od /utf-8 ${ADDITIONAL_FLAGS}" )
+  set ( CMAKE_C_FLAGS_DEBUG "-DDEBUG -DC_FLAGS -Zi -Od /utf-8" )
   set ( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}" )
 
-  set ( CMAKE_C_FLAGS_RELEASE "-DNDEBUG -DRELEASE -DC_FLAGS -O2 -Oi -Gy /utf-8 -DKIWI_USE_BTREE ${ADDITIONAL_FLAGS}" )
+  set ( CMAKE_C_FLAGS_RELEASE "-DNDEBUG -DRELEASE -DC_FLAGS -O2 -Oi -Gy /utf-8 -DKIWI_USE_BTREE" )
   set ( CMAKE_CXX_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}" )
 
   set ( CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELEASE} -Zi")
@@ -58,11 +58,11 @@ if(MSVC)
 else()
   link_libraries ( pthread )
   
-  set ( CMAKE_C_FLAGS_DEBUG "-DDEBUG -DC_FLAGS -g3 -O0 ${ADDITIONAL_FLAGS}" )
+  set ( CMAKE_C_FLAGS_DEBUG "-DDEBUG -DC_FLAGS -g3 -O0" )
   set ( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}" )
   set ( CMAKE_EXE_LINKER_FLAGS_DEBUG "-DDEBUG -DLINKER_FLAGS" )
 
-  set ( CMAKE_C_FLAGS_RELEASE "-DNDEBUG -DRELEASE -DC_FLAGS -O3 -DKIWI_USE_BTREE ${ADDITIONAL_FLAGS}" )
+  set ( CMAKE_C_FLAGS_RELEASE "-DNDEBUG -DRELEASE -DC_FLAGS -O3 -DKIWI_USE_BTREE" )
   set ( CMAKE_CXX_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}" )
   set ( CMAKE_EXE_LINKER_FLAGS_RELEASE "-DRELEASE -DLINKER_FLAGS" )
 
@@ -80,6 +80,9 @@ add_library( "${PROJECT_NAME}" SHARED
   ${CORE_SRCS} 
   src/capi/kiwi_c.cpp
 )
+
+target_compile_options("${PROJECT_NAME}_static" PRIVATE "${ADDITIONAL_FLAGS}")
+target_compile_options("${PROJECT_NAME}" PRIVATE "${ADDITIONAL_FLAGS}")
 
 add_executable( "${PROJECT_NAME}-cli-${PROJECT_VERSION}"
   tools/runner.cpp
