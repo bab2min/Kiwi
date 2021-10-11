@@ -71,18 +71,33 @@ TEST(KiwiCpp, AnalyzeError01)
 	EXPECT_EQ(res.first[0].str, std::u16string{ u"자" });
 }
 
-TEST(KiwiCpp, NormalizeCoda) { 
- 	Kiwi& kiwi = reuseKiwiInstance(); 
- 	TokenResult res = kiwi.analyze(u"키윜ㅋㅋ", Match::all); 
- 	EXPECT_EQ(res.first[1].str, std::u16string{ u"ㅋㅋㅋ" });  
- 	res = kiwi.analyze(u"키윟ㅎ", Match::all); 
- 	EXPECT_EQ(res.first[1].str, std::u16string{ u"ㅎㅎ" });
- 	res = kiwi.analyze(u"키윅ㄱ", Match::all); 
- 	EXPECT_EQ(res.first[1].str, std::u16string{ u"ㄱㄱ" });
+TEST(KiwiCpp, NormalizeCoda) 
+{ 
+	Kiwi& kiwi = reuseKiwiInstance(); 
+	TokenResult res = kiwi.analyze(u"키윜ㅋㅋ", Match::all); 
+	EXPECT_EQ(res.first[1].str, std::u16string{ u"ㅋㅋㅋ" });  
+	res = kiwi.analyze(u"키윟ㅎ", Match::all); 
+	EXPECT_EQ(res.first[1].str, std::u16string{ u"ㅎㅎ" });
+	res = kiwi.analyze(u"키윅ㄱ", Match::all); 
+	EXPECT_EQ(res.first[1].str, std::u16string{ u"ㄱㄱ" });
 	res = kiwi.analyze(u"키윈ㄴㄴ", Match::all); 
- 	EXPECT_EQ(res.first[1].str, std::u16string{ u"ㄴㄴㄴ" });
+	EXPECT_EQ(res.first[1].str, std::u16string{ u"ㄴㄴㄴ" });
 	res = kiwi.analyze(u"키윊ㅎㅎ", Match::all); 
- 	EXPECT_EQ(res.first[2].str, std::u16string{ u"ㅎㅎ" });
+	EXPECT_EQ(res.first[2].str, std::u16string{ u"ㅎㅎ" });
 	res = kiwi.analyze(u"키윍ㄱㄱ", Match::all); 
- 	EXPECT_EQ(res.first[2].str, std::u16string{ u"ㄱㄱ" });
+	EXPECT_EQ(res.first[2].str, std::u16string{ u"ㄱㄱ" });
 } 
+
+TEST(KiwiCpp, AnalyzeWithWordPosition)
+{
+	std::u16string testSentence = u"나 정말 배불렄ㅋㅋ"; 
+	Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 0, BuildOption::none }.build();
+	TokenResult tokenResult = kiwi.analyze(testSentence, Match::all);
+	std::vector<TokenInfo> tokenInfoList = tokenResult.first;
+
+	EXPECT_EQ(tokenInfoList[0].wordPosition, 0);
+	EXPECT_EQ(tokenInfoList[1].wordPosition, 1);
+	EXPECT_EQ(tokenInfoList[2].wordPosition, 2);
+	EXPECT_EQ(tokenInfoList[3].wordPosition, 2);
+}
+
