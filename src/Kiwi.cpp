@@ -542,7 +542,7 @@ namespace kiwi
    * @param sentence 어절번호를 생성할 문장.
    * @return sentence 에 대한 어절번호를 담고있는 vector.
    */
-  const std::vector<uint16_t> Kiwi::getWordPositions(const std::u16string& sentence) const
+  const std::vector<uint16_t> getWordPositions(const std::u16string& sentence)
   {
     std::vector<uint16_t> wordPositions(sentence.size());
     uint32_t position = 0;
