@@ -524,7 +524,7 @@ namespace kiwi
 		{
 			formTrie[i].val = &ret.forms[i - 1];
 		}
-		for (size_t i = defaultTagSize; i < forms.size() - 1; ++i)
+		for (size_t i = defaultTagSize; i < ret.forms.size() - 1; ++i)
 		{
 			auto& f = ret.forms[i];
 			if (f.candidate.empty()) continue;
