@@ -607,7 +607,7 @@ namespace kiwi
 			posMap[i + 1] = posMap[i] + (isHangulCoda(nstr[i]) ? 0 : 1);
 		}
 
-		normalizeCoda(nstr.begin(), nstr.end());
+		if (!!(matchOptions & Match::normalizeCoda)) normalizeCoda(nstr.begin(), nstr.end());
 		// 분석할 문장에 포함된 개별 문자에 대해 어절번호를 생성한다
 		std::vector<uint16_t> wordPositions = getWordPositions({ sBegin, sEnd });
 
