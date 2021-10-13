@@ -101,3 +101,23 @@ TEST(KiwiCpp, AnalyzeWithWordPosition)
 	EXPECT_EQ(tokenInfoList[3].wordPosition, 2);
 }
 
+TEST(KiwiCpp, Issue57_BuilderAddWord)
+{
+	{
+		KiwiBuilder builder{ MODEL_PATH };
+		builder.addWord(u"울트라리스크", POSTag::nnp, 3.0);
+		builder.addWord(u"파일즈", POSTag::nnp, 0.0);
+		Kiwi kiwi = builder.build();
+		TokenResult res = kiwi.analyze(u"울트라리스크가 뭐야?", Match::all);
+		EXPECT_EQ(res.first[0].str, std::u16string{ u"울트라리스크" });
+	}
+
+	{
+		KiwiBuilder builder{ MODEL_PATH };
+		builder.addWord(u"파일즈", POSTag::nnp, 0.0);
+		builder.addWord(u"울트라리스크", POSTag::nnp, 3.0);
+		Kiwi kiwi = builder.build();
+		TokenResult res = kiwi.analyze(u"울트라리스크가 뭐야?", Match::all);
+		EXPECT_EQ(res.first[0].str, std::u16string{ u"울트라리스크" });
+	}
+}
