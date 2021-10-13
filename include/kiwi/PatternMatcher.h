@@ -14,7 +14,9 @@ namespace kiwi
 		email = 1 << 1,
 		hashtag = 1 << 2,
 		mention = 1 << 3,
+		normalizeCoda = 1 << 16,
 		all = url | email | hashtag | mention,
+		allWithNormalizing = all | normalizeCoda,
 	};
 
 	std::pair<size_t, kiwi::POSTag> matchPattern(const char16_t* first, const char16_t* last, Match matchOptions);
