@@ -67,9 +67,10 @@ jobs:
     name: ${{ matrix.name }}
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
       with:
         submodules: true
+        lfs: true
     - name: Get release
       id: get_release
       uses: bruceadams/get-release@v1.2.2
@@ -121,9 +122,10 @@ jobs:
     name: ${{ matrix.os }} ${{ matrix.arch }}
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
       with:
         submodules: true
+        lfs: true
     - name: Get release
       id: get_release
       uses: bruceadams/get-release@v1.2.2
@@ -159,9 +161,10 @@ jobs:
     name: Centos7-${{ matrix.arch }}
     runs-on: ubuntu-18.04
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
       with:
         submodules: true
+        lfs: true
     - uses: bab2min/run-on-arch-action@use-custom-image
       id: runcmd
       with:
