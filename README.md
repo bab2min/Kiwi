@@ -32,11 +32,13 @@ Visual Studio 2019 이상을 사용하여 `Kiwi.sln` 파일을 실행하여 컴�
 
 #### Linux
 이 레포지토리를 clone한 뒤 cmake>=3.9를 사용하여 컴파일합니다. 
+모델 파일은 용량이 큰 관계로 [Git LFS](https://git-lfs.github.com/)를 통해 공유됩니다. 따라서 `git clone`에 앞서 Git LFS가 설치되어있는지 확인해주세요.
 
 ##### gcc >= 5.0 이상 혹은 다른 c++11 호환 컴파일러 사용가능 환경
 ```console
 $ git clone https://github.com/bab2min/Kiwi
 $ cd Kiwi
+$ git lfs pull
 $ git submodule sync
 $ git submodule update --init --recursive
 $ mkdir build && cd build
@@ -49,6 +51,7 @@ Centos5와 같이 gcc 4.8까지만 지원하는 환경에서는 googletest의 �
 ```console
 $ git clone https://github.com/bab2min/Kiwi
 $ cd Kiwi
+$ git lfs pull
 $ git submodule sync
 $ git submodule update --init --recursive
 $ cd third_party/googletest && git checkout v1.8.x && cd ../../
