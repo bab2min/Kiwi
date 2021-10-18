@@ -10,9 +10,10 @@ jobs:
     runs-on: ubuntu-18.04
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
       with:
         submodules: true
+        lfs: true
     - uses: bab2min/run-on-arch-action@use-custom-image
       id: runcmd
       with:
