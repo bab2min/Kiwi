@@ -15,6 +15,12 @@ jobs:
     - uses: actions/checkout@v1
       with:
         submodules: true
+    - name: Install Git LFS
+      run: |
+        curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.rpm.sh | bash
+        yum install git-lfs -y
+    - name: Pull LFS files
+      run: git lfs pull
     - name: Checkout Old Version googletest
       run: cd third_party/googletest && git checkout v1.8.x && cd ../..
     - name: Configure Build
