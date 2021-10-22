@@ -91,6 +91,10 @@ html_theme_options = {
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
+# This must be the same as GitHub repo name since the output is hosted at
+# https://bab2min.github.io/Kiwi
+html_baseurl = '/Kiwi'
+
 # -- Breathe configuration -------------------------------------------------
 
 master_doc = 'index'
