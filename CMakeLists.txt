@@ -57,7 +57,7 @@ if(MSVC)
   set ( CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_EXE_LINKER_FLAGS_RELEASE}" )
 else()
   link_libraries ( pthread )
-  
+
   set ( CMAKE_C_FLAGS_DEBUG "-DDEBUG -DC_FLAGS -g3 -O0" )
   set ( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}" )
   set ( CMAKE_EXE_LINKER_FLAGS_DEBUG "-DDEBUG -DLINKER_FLAGS" )
@@ -72,14 +72,22 @@ else()
 endif()
 
 add_library( "${PROJECT_NAME}_static" STATIC
-  ${CORE_SRCS} 
+  ${CORE_SRCS}
   src/capi/kiwi_c.cpp
 )
 
 add_library( "${PROJECT_NAME}" SHARED
-  ${CORE_SRCS} 
+  ${CORE_SRCS}
   src/capi/kiwi_c.cpp
 )
+
+# Install the kiwi library as well as header files to (`include/kiwi` directory)
+# so that a user can use it in their own projects that are not cmake projects.
+file(GLOB KIWI_INCLUDE_FILES include/kiwi/*.h)
+set_target_properties(${PROJECT_NAME}
+    PROPERTIES PUBLIC_HEADER "${KIWI_INCLUDE_FILES}"
+)
+install(TARGETS ${PROJECT_NAME} PUBLIC_HEADER DESTINATION include/kiwi)
 
 target_compile_options("${PROJECT_NAME}_static" PRIVATE "${ADDITIONAL_FLAGS}")
 target_compile_options("${PROJECT_NAME}" PRIVATE "${ADDITIONAL_FLAGS}")
@@ -105,10 +113,10 @@ if(MSVC)
   if(KIWI_STATIC_WITHOUT_MT)
     message(STATUS "Use /MD at kiwi_static")
     add_library( "${PROJECT_NAME}_mt_static" STATIC
-      ${CORE_SRCS} 
+      ${CORE_SRCS}
       src/capi/kiwi_c.cpp
     )
-    
+
     target_compile_options("${PROJECT_NAME}_mt_static" PUBLIC
       -MT
     )
@@ -141,7 +149,7 @@ target_compile_definitions("${PROJECT_NAME}"
 set_target_properties("${PROJECT_NAME}" PROPERTIES
     VERSION ${PROJECT_VERSION}
     SOVERSION 1
-    PUBLIC_HEADER 
+    PUBLIC_HEADER
     include/kiwi/capi.h
 )
 
