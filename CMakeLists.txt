@@ -83,7 +83,7 @@ add_library( "${PROJECT_NAME}" SHARED
 
 # Install the kiwi library as well as header files to (`include/kiwi` directory)
 # so that a user can use it in their own projects that are not cmake projects.
-file(GLOB KIWI_INCLUDE_FILES include/kiwi/*.h)
+file(GLOB KIWI_INCLUDE_FILES include/kiwi/*.h include/kiwi/*.hpp)
 set_target_properties(${PROJECT_NAME}
     PROPERTIES PUBLIC_HEADER "${KIWI_INCLUDE_FILES}"
 )
