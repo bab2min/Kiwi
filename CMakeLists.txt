@@ -87,6 +87,7 @@ file(GLOB KIWI_INCLUDE_FILES include/kiwi/*.h include/kiwi/*.hpp)
 set_target_properties(${PROJECT_NAME}
     PROPERTIES PUBLIC_HEADER "${KIWI_INCLUDE_FILES}"
 )
+install(TARGETS ${PROJECT_NAME}_static PUBLIC_HEADER DESTINATION include/kiwi)
 install(TARGETS ${PROJECT_NAME} PUBLIC_HEADER DESTINATION include/kiwi)
 
 target_compile_options("${PROJECT_NAME}_static" PRIVATE "${ADDITIONAL_FLAGS}")
