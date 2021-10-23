@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: docker://hoshizora/manylinux1-clang_x86_64
-
+    
     steps:
     - uses: actions/checkout@v1
       with:
