@@ -44,6 +44,8 @@ $ git submodule update --init --recursive
 $ mkdir build && cd build
 $ cmake -DCMAKE_BUILD_TYPE=Release ../
 $ make
+$ make install
+$ ldconfig
 ```
 
 ##### gcc >= 4.8, < 5.0
@@ -58,6 +60,8 @@ $ cd third_party/googletest && git checkout v1.8.x && cd ../../
 $ mkdir build && cd build
 $ cmake -DCMAKE_BUILD_TYPE=Release ../
 $ make
+$ make install
+$ ldconfig
 ```
 
 설치가 잘 됐는지 확인하기 위해서는 `kiwi-evaluator`를 실행해봅니다.
