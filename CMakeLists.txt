@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 
-project(kiwi VERSION 0.10.0 DESCRIPTION "Kiwi, Korean Intelligent Word Identifier")
+project(kiwi VERSION 0.10.2 DESCRIPTION "Kiwi, Korean Intelligent Word Identifier")
 
 set ( CMAKE_CXX_STANDARD 11 )
 set ( CMAKE_VERBOSE_MAKEFILE true )
@@ -84,9 +84,13 @@ add_library( "${PROJECT_NAME}" SHARED
 # Install the kiwi library as well as header files to (`include/kiwi` directory)
 # so that a user can use it in their own projects that are not cmake projects.
 file(GLOB KIWI_INCLUDE_FILES include/kiwi/*.h include/kiwi/*.hpp)
-set_target_properties(${PROJECT_NAME}
-    PROPERTIES PUBLIC_HEADER "${KIWI_INCLUDE_FILES}"
+set_target_properties("${PROJECT_NAME}" PROPERTIES
+    VERSION ${PROJECT_VERSION}
+    SOVERSION ${PROJECT_VERSION_MAJOR}
+    PUBLIC_HEADER
+    ${KIWI_INCLUDE_FILES}
 )
+
 install(TARGETS ${PROJECT_NAME}_static PUBLIC_HEADER DESTINATION include/kiwi)
 install(TARGETS ${PROJECT_NAME} PUBLIC_HEADER DESTINATION include/kiwi)
 
@@ -145,13 +149,6 @@ endif()
 
 target_compile_definitions("${PROJECT_NAME}"
   PUBLIC DLL_EXPORT=1
-)
-
-set_target_properties("${PROJECT_NAME}" PROPERTIES
-    VERSION ${PROJECT_VERSION}
-    SOVERSION 1
-    PUBLIC_HEADER
-    include/kiwi/capi.h
 )
 
 if(KIWI_BUILD_TEST)
