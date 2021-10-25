@@ -70,7 +70,9 @@ enum
 	KIWI_MATCH_EMAIL = 2,
 	KIWI_MATCH_HASHTAG = 4,
 	KIWI_MATCH_MENTION = 8,
-	KIWI_MATCH_ALL = 15,
+	KIWI_MATCH_ALL = KIWI_MATCH_URL | KIWI_MATCH_EMAIL | KIWI_MATCH_HASHTAG | KIWI_MATCH_MENTION,
+	KIWI_MATCH_NORMALIZE_CODA = 65536,
+	KIWI_MATCH_ALL_WITH_NORMALIZING = KIWI_MATCH_ALL | KIWI_MATCH_NORMALIZE_CODA,
 };
 
 #ifdef __cplusplus  
@@ -372,6 +374,16 @@ DECL_DLL int kiwi_res_position(kiwi_res_h result, int index, int num);
  * @return  
  */
 DECL_DLL int kiwi_res_length(kiwi_res_h result, int index, int num);
+
+/**
+ * @brief
+ *
+ * @param result
+ * @param index
+ * @param num
+ * @return
+ */
+DECL_DLL int kiwi_res_word_position(kiwi_res_h result, int index, int num);
 
 /**
  * @brief 

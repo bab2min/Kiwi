@@ -17,8 +17,10 @@ jobs:
         submodules: true
     - name: Install Git LFS
       run: |
-        curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.rpm.sh | bash
-        yum install git-lfs -y
+        mkdir gitlfs && pushd gitlfs
+        curl -L https://github.com/git-lfs/git-lfs/releases/download/v2.13.2/git-lfs-linux-amd64-v2.13.2.tar.gz | tar -zxv
+        ./install.sh
+        popd
     - name: Pull LFS files
       run: git lfs pull
     - name: Update CMake
