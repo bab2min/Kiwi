@@ -38,7 +38,7 @@ user_data: user_data from kiwi_extract~, kiwi_perform, kiwi_analyze_m functions.
 */
 
 /**
- * @brief 문자열을 읽어들여 Kiwi에 제공하기 위한 콜백 함수 타입
+ * @brief 문자열을 읽어들여 Kiwi에 제공하기 위한 콜백 함수 타입.
  * 
  * @param int 읽어들일 문자열의 줄 번호입니다. 0부터 시작하여 차례로 1씩 증가합니다. 
  * @param char* 읽어들인 문자열이 저장될 버퍼의 주소입니다. 이 값이 null인 경우 버퍼의 크기를 반환해야 합니다.
@@ -82,14 +82,14 @@ extern "C" {
 /**
  * @brief 설치된 Kiwi의 버전을 반환합니다.
  * 
- * @return "major.minor.patch"로 구성되는 버전 문자열
+ * @return "major.minor.patch"로 구성되는 버전 문자열.
  */
 DECL_DLL const char* kiwi_version();
 
 /**
  * @brief 현재 스레드에서 발생한 에러 메세지를 반환합니다. 발생한 에러가 없을 경우 nullptr를 반환합니다.
  * 
- * @return 에러 메세지 혹은 nullptr
+ * @return 에러 메세지 혹은 nullptr.
  */
 DECL_DLL const char* kiwi_error();
 
@@ -101,9 +101,9 @@ DECL_DLL const char* kiwi_error();
 DECL_DLL void kiwi_clear_error();
 
 /**
- * @brief Kiwi Builder를 생성합니다
+ * @brief Kiwi Builder를 생성합니다.
  * 
- * @param model_path 모델의 경로
+ * @param model_path 모델의 경로.
  * @param num_threads 사용할 스레드의 개수. 0으로 지정시 가용한 스레드 개수를 자동으로 판단합니다.
  * @param options 생성 옵션. KIWI_BUILD_* 열거형을 참조하십시오.
  * @return 성공 시 Kiwi Builder의 핸들을 반환합니다. 
@@ -113,30 +113,30 @@ DECL_DLL void kiwi_clear_error();
 DECL_DLL kiwi_builder_h kiwi_builder_init(const char* model_path, int num_threads, int options);
 
 /**
- * @brief 
+ * @brief 사용된 resource를 반환합니다.
  * 
- * @param handle 
- * @return 
+ * @param handle KiwiBuilder.
+ * @return 성공 시, 0를 반환합니다.
  */
 DECL_DLL int kiwi_builder_close(kiwi_builder_h handle);
 
 /**
- * @brief 
+ * @brief 사용자 단어를 추가합니다.
  * 
- * @param handle 
- * @param word 
- * @param pos 
- * @param score 
- * @return  
+ * @param handle KiwiBuilder.
+ * @param word 추가할 단어.
+ * @param pos 품사 태그 (kiwi#POSTag).
+ * @param score 점수.
+ * @return 성공 시, 0를 반환합니다.
  */
 DECL_DLL int kiwi_builder_add_word(kiwi_builder_h handle, const char* word, const char* pos, float score);
 
 /**
- * @brief 
+ * @brief 사용자 사전으로부터 단어를 읽어들입니다.
  * 
- * @param handle 
- * @param dict_path 
- * @return  
+ * @param handle KiwiBuilder.
+ * @param dict_path 사전 파일 경로.
+ * @return 추가된 단어 수.
  */
 DECL_DLL int kiwi_builder_load_dict(kiwi_builder_h handle, const char* dict_path);
 
@@ -197,39 +197,41 @@ DECL_DLL kiwi_ws_h kiwi_builder_extract_words_w(kiwi_builder_h handle, kiwi_read
 DECL_DLL kiwi_ws_h kiwi_builder_extract_add_words_w(kiwi_builder_h handle, kiwi_reader_w_t reader, void* user_data, int min_cnt, int max_word_len, float min_score, float pos_threshold);
 
 /**
- * @brief 
+ * @brief Kiwi instance를 생성합니다.
  * 
- * @param handle 
- * @return  
+ * @param handle KiwiBuilder.
+ * @return Kiwi instance.
  */
 DECL_DLL kiwi_h kiwi_builder_build(kiwi_builder_h handle);
 
 /**
- * @brief 
+ * @brief 빌더를 사용하지 않고 Kiwi instance를 생성합니다.
  * 
- * @param model_path 
- * @param num_threads 
- * @param options 
- * @return  
+ * @param model_path 모델이 들어있는 디렉토리 경로 (e.g., ./ModelGenerator).
+ * @param num_threads 사용할 쓰레드의 수 (0일 경우, 자동으로 설정).
+ * @param options 생성 옵션. KIWI_BUILD_* 참조.
+ * @return Kiwi instance.
  */
 DECL_DLL kiwi_h kiwi_init(const char* model_path, int num_threads, int options);
 
 /**
- * @brief 
+ * @brief KIWI_BUILD_INTEGRATE_ALLOMORPH 의 값을 변경합니다.
  * 
- * @param handle 
- * @param option 
- * @param value 
- * @return  
+ * @param handle Kiwi.
+ * @param option KIWI_BUILD_INTEGRATE_ALLOMORPH.
+ * @param value 0 or 1 (enabled).
  */
 DECL_DLL void kiwi_set_option(kiwi_h handle, int option, int value);
 
 /**
- * @brief 
+ * @brief 옵션의 값을 반환합니다.
  * 
- * @param handle 
- * @param option 
- * @return  
+ * @param handle  Kiwi.
+ * @param option {KIWI_BUILD_INTEGRATE_ALLOMORPH, KIWI_NUM_THREADS}.
+ * @return 해당 옵션의 값을 반환합니다.
+ *
+ * - KIWI_BUILD_INTEGRATE_ALLOMORPH: 0 or 1
+ * - KIWI_NUM_THREADS: 사용중인 쓰레드 수
  */
 DECL_DLL int kiwi_get_option(kiwi_h handle, int option);
 
@@ -245,13 +247,13 @@ DECL_DLL int kiwi_get_option(kiwi_h handle, int option);
 DECL_DLL kiwi_res_h kiwi_analyze_w(kiwi_h handle, const kchar16_t* text, int top_n, int match_options);
 
 /**
- * @brief 
+ * @brief 텍스트를 분석해 형태소 결과를 반환합니다.
  * 
- * @param handle 
- * @param text 
- * @param top_n 
- * @param match_options 
- * @return  
+ * @param handle Kiwi.
+ * @param text 분석할 텍스트.
+ * @param top_n 반환할 결과물.
+ * @param match_options KIWI_MATCH_ALL 등 KIWI_MATCH_* 열거형 참고.
+ * @return 형태소 분석 결과. kiwi_res_* 함수를 통해 값에 접근가능합니다.
  */
 DECL_DLL kiwi_res_h kiwi_analyze(kiwi_h handle, const char* text, int top_n, int match_options);
 

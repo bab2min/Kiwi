@@ -333,3 +333,4 @@ include/btree/
 docs/html
 docs/latex
 docs/_build
+cmake-build-*/
