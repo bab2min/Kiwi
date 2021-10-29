@@ -14,8 +14,8 @@ jobs:
       - run: pip install -U sphinx sphinx-sitemap breathe sphinx_rtd_theme
       - run: sudo apt update && sudo apt install doxygen
       - uses: actions/checkout@v2
-      - run: cd docs && make singlehtml
+      - run: cd docs && make html
       - uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs/_build/singlehtml
+          publish_dir: ./docs/_build/html
