@@ -2,6 +2,7 @@
 
 #include <kiwi/Kiwi.h>
 #include <kiwi/Utils.h>
+#include <kiwi/TemplateUtils.hpp>
 #include <kiwi/Form.h>
 #include "KTrie.h"
 #include "FeatureTestor.h"
@@ -19,17 +20,51 @@ namespace kiwi
 	public:
 		using Path = Vector<std::tuple<const Morpheme*, KString, uint32_t>>;
 
-		template<class LmType>
+		template<ArchType arch, class LmType>
 		static Vector<std::pair<Path, float>> findBestPath(const Kiwi* kw, const Vector<KGraphNode>& graph, size_t topN);
 
-		template<class LmType, class CandTy, class CacheTy>
+		template<ArchType arch, class LmType, class CandTy, class CacheTy>
 		static float evalPath(const Kiwi* kw, const KGraphNode* startNode, const KGraphNode* node,
 			CacheTy& cache, Vector<KString>& ownFormList,
 			size_t i, size_t ownFormId, CandTy&& cands, bool unknownForm
 		);
 	};
 
-	Kiwi::Kiwi() = default;
+	using FnFindBestPath = decltype(&PathEvaluator::findBestPath<ArchType::default_, uint8_t>);
+
+	template<class IntTy, ptrdiff_t ...indices>
+	inline FnFindBestPath getFindBestPathFn(ArchType arch, tp::seq<indices...>)
+	{
+		static FnFindBestPath table[] = {
+			&PathEvaluator::findBestPath<static_cast<ArchType>(indices + 1), IntTy>...
+		};
+		return table[static_cast<int>(arch) - 1];
+	}
+
+	Kiwi::Kiwi(ArchType arch, size_t lmKeySize)
+	{
+		arch = getSelectedArch(arch);
+		dfSplitByTrie = getSplitByTrieFn(arch);
+		
+		auto indexHolder = tp::GenSeq<static_cast<int>(ArchType::last)>{};
+		switch (lmKeySize)
+		{
+		case 1:
+			dfFindBestPath = getFindBestPathFn<uint8_t>(arch, indexHolder);
+			break;
+		case 2:
+			dfFindBestPath = getFindBestPathFn<uint16_t>(arch, indexHolder);
+			break;
+		case 4:
+			dfFindBestPath = getFindBestPathFn<uint32_t>(arch, indexHolder);
+			break;
+		case 8:
+			dfFindBestPath = getFindBestPathFn<uint64_t>(arch, indexHolder);
+			break;
+		default:
+			throw Exception{ "Wrong `lmKeySize`" };
+		}
+	}
 
 	Kiwi::~Kiwi() = default;
 
@@ -187,7 +222,7 @@ namespace kiwi
 		return v[std::min(nth, v.size() - 1)];
 	}
 
-	template<class LmType, class _Type>
+	template<ArchType arch, class LmType, class _Type>
 	void evalTrigram(const lm::KnLangModel<LmType>* knlm, const Morpheme* morphBase, const Vector<KString>& ownForms, const Vector<WordLLs>& cache,
 		array<Wid, 4> seq, size_t chSize, const Morpheme* curMorph, const KGraphNode* node, const KGraphNode* startNode, _Type& maxWidLL)
 	{
@@ -241,7 +276,7 @@ namespace kiwi
 								cn = (size_t)morphBase[cn].tag + 1;
 							}
 						}
-						float ll = (*knlm).progress(cNode, cn);
+						float ll = knlm->template progressOpt<arch>(cNode, cn);
 						candScore += ll;
 					}
 				}
@@ -251,7 +286,7 @@ namespace kiwi
 		}
 	}
 
-	template<class LmType, class CandTy, class CacheTy>
+	template<ArchType arch, class LmType, class CandTy, class CacheTy>
 	float PathEvaluator::evalPath(const Kiwi* kw, const KGraphNode* startNode, const KGraphNode* node,
 		CacheTy& cache, Vector<KString>& ownFormList,
 		size_t i, size_t ownFormId, CandTy&& cands, bool unknownForm
@@ -297,7 +332,7 @@ namespace kiwi
 			condP = curMorph->polar;
 
 			UnorderedMap<Wid, Vector<WordLLP>> maxWidLL;
-			evalTrigram(lm, kw->morphemes.data(), ownFormList, cache, seq, chSize, curMorph, node, startNode, maxWidLL);
+			evalTrigram<arch>(lm, kw->morphemes.data(), ownFormList, cache, seq, chSize, curMorph, node, startNode, maxWidLL);
 
 			float estimatedLL = 0;
 			if (isUserWord)
@@ -374,7 +409,7 @@ namespace kiwi
 		return tMax;
 	}
 
-	template<class LmType>
+	template<ArchType arch, class LmType>
 	Vector<pair<PathEvaluator::Path, float>> PathEvaluator::findBestPath(const Kiwi* kw, const Vector<KGraphNode>& graph, size_t topN)
 	{
 		Vector<WordLLs> cache(graph.size());
@@ -394,7 +429,7 @@ namespace kiwi
 
 		// start node
 		ptrdiff_t bosNode = 0;
-		lm->progress(bosNode, 0);
+		lm->template progressOpt<arch>(bosNode, 0);
 		cache.front().emplace_back(WordLL{ MInfos{ MInfo(0u) }, 0.f, bosNode });
 
 		// middle nodes
@@ -411,7 +446,7 @@ namespace kiwi
 
 			if (node->form)
 			{
-				tMax = evalPath<LmType>(kw, startNode, node, cache, ownFormList, i, ownFormId, node->form->candidate, false);
+				tMax = evalPath<arch, LmType>(kw, startNode, node, cache, ownFormList, i, ownFormId, node->form->candidate, false);
 				if (all_of(node->form->candidate.begin(), node->form->candidate.end(), [](const Morpheme* m)
 				{
 					return m->combineSocket || !m->chunks.empty();
@@ -419,12 +454,12 @@ namespace kiwi
 				{
 					ownFormList.emplace_back(node->form->form);
 					ownFormId = ownFormList.size();
-					tMax = min(tMax, evalPath<LmType>(kw, startNode, node, cache, ownFormList, i, ownFormId, unknownNodeLCands, true));
+					tMax = min(tMax, evalPath<arch, LmType>(kw, startNode, node, cache, ownFormList, i, ownFormId, unknownNodeLCands, true));
 				};
 			}
 			else
 			{
-				tMax = evalPath<LmType>(kw, startNode, node, cache, ownFormList, i, ownFormId, unknownNodeCands, true);
+				tMax = evalPath<arch, LmType>(kw, startNode, node, cache, ownFormList, i, ownFormId, unknownNodeCands, true);
 			}
 
 			// heuristically remove cands with lower ll to speed up
@@ -490,7 +525,7 @@ namespace kiwi
 				if (p.morphs.back().combineSocket) continue;
 				if (!FeatureTestor::isMatched(nullptr, p.morphs.back().condVowel)) continue;
 
-				float c = p.accScore + lm->progress(p.node, 1);
+				float c = p.accScore + lm->template progressOpt<arch>(p.node, 1);
 				cache.back().emplace_back(WordLL{ p.morphs, c, 0 });
 			}
 		}
@@ -611,7 +646,7 @@ namespace kiwi
 		// 분석할 문장에 포함된 개별 문자에 대해 어절번호를 생성한다
 		std::vector<uint16_t> wordPositions = getWordPositions({ sBegin, sEnd });
 
-		auto nodes = splitByTrie(formTrie, nstr, matchOptions);
+		auto nodes = (*reinterpret_cast<FnSplitByTrie>(dfSplitByTrie))(formTrie, nstr, matchOptions);
 		vector<TokenResult> ret;
 		if (nodes.size() <= 2)
 		{
@@ -619,25 +654,7 @@ namespace kiwi
 			return ret;
 		}
 
-		Vector<std::pair<PathEvaluator::Path, float>> res;
-		//auto h = langMdl->getHeader();
-		switch (langMdl->getHeader().key_size)
-		{
-		case 1:
-			res = PathEvaluator::findBestPath<uint8_t>(this, nodes, topN);
-			break;
-		case 2:
-			res = PathEvaluator::findBestPath<uint16_t>(this, nodes, topN);
-			break;
-		case 4:
-			res = PathEvaluator::findBestPath<uint32_t>(this, nodes, topN);
-			break;
-		case 8:
-			res = PathEvaluator::findBestPath<uint64_t>(this, nodes, topN);
-			break;
-		default:
-			throw runtime_error{ "wrong langMdl" };
-		}
+		Vector<std::pair<PathEvaluator::Path, float>> res = (*static_cast<FnFindBestPath>(dfFindBestPath))(this, nodes, topN);
 		for (auto&& r : res)
 		{
 			vector<TokenInfo> rarr;

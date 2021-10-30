@@ -9,14 +9,21 @@ namespace kiwi
 	namespace utils
 	{
 		template<class _Key, class _Value, class _Diff>
-		auto FrozenTrie<_Key, _Value, _Diff>::Node::next(const FrozenTrie<_Key, _Value, _Diff>& ft, Key c) const -> const Node*
+		template<ArchType arch>
+		auto FrozenTrie<_Key, _Value, _Diff>::Node::nextOpt(const FrozenTrie<_Key, _Value, _Diff>& ft, Key c) const -> const Node*
 		{
 			_Diff v;
-			if (!bsearch(&ft.nextKeys[nextOffset], &ft.nextDiffs[nextOffset], numNexts, c, v))
+			if (!bsearch<arch>(&ft.nextKeys[nextOffset], &ft.nextDiffs[nextOffset], numNexts, c, v))
 			{
 				return nullptr;
 			}
 			return this + v;
+		}
+
+		template<class _Key, class _Value, class _Diff>
+		auto FrozenTrie<_Key, _Value, _Diff>::Node::next(const FrozenTrie<_Key, _Value, _Diff>& ft, Key c) const -> const Node*
+		{
+			return nextOpt<ArchType::balanced>(ft, c);
 		}
 
 		template<class _Key, class _Value, class _Diff>
@@ -27,15 +34,16 @@ namespace kiwi
 		}
 
 		template<class _Key, class _Value, class _Diff>
+		template<ArchType arch>
 		auto FrozenTrie<_Key, _Value, _Diff>::Node::findFail(const FrozenTrie& ft, Key c) const -> const Node*
 		{
 			if (!lower) return this;
 			auto* lowerNode = this + lower;
 			_Diff v;
 
-			if (!bsearch(
-				&ft.nextKeys[lowerNode->nextOffset], 
-				&ft.nextDiffs[lowerNode->nextOffset], 
+			if (!bsearch<arch>(
+				&ft.nextKeys[lowerNode->nextOffset],
+				&ft.nextDiffs[lowerNode->nextOffset],
 				lowerNode->numNexts, c, v
 			))
 			{
@@ -46,6 +54,12 @@ namespace kiwi
 			{
 				return lowerNode + v;
 			}
+		}
+
+		template<class _Key, class _Value, class _Diff>
+		auto FrozenTrie<_Key, _Value, _Diff>::Node::findFail(const FrozenTrie& ft, Key c) const -> const Node*
+		{
+			return findFail<ArchType::balanced>(ft, c);
 		}
 
 		template<class _Key, class _Value, class _Diff>
@@ -68,7 +82,7 @@ namespace kiwi
 			std::copy(o.nextKeys.get(), o.nextKeys.get() + numNexts, nextKeys.get());
 			std::copy(o.nextDiffs.get(), o.nextDiffs.get() + numNexts, nextDiffs.get());
 		}
-		
+
 		template<class _Key, class _Value, class _Diff>
 		auto FrozenTrie<_Key, _Value, _Diff>::operator=(const FrozenTrie& o) -> FrozenTrie&
 		{

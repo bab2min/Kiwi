@@ -6,6 +6,7 @@
 #include <memory>
 #include <algorithm>
 #include <numeric>
+#include <kiwi/ArchUtils.h>
 #include <kiwi/Trie.hpp>
 
 namespace kiwi
@@ -43,6 +44,12 @@ namespace kiwi
 				Key numNexts = 0;
 				Diff lower = 0;
 				uint32_t nextOffset = 0;
+
+				template<ArchType arch>
+				const Node* nextOpt(const FrozenTrie& ft, Key c) const;
+
+				template<ArchType arch>
+				const Node* findFail(const FrozenTrie& ft, Key c) const;
 
 				const Node* next(const FrozenTrie& ft, Key c) const;
 				const Node* fail() const;

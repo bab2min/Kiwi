@@ -1,5 +1,6 @@
 #include <numeric>
 #include <kiwi/Types.h>
+#include <kiwi/TemplateUtils.hpp>
 #include <kiwi/Utils.h>
 #include "KTrie.h"
 #include "FeatureTestor.h"
@@ -8,6 +9,7 @@
 using namespace std;
 using namespace kiwi;
 
+template<ArchType arch>
 Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form*>& trie, const KString& str, Match matchOptions)
 {
 	Vector<KGraphNode> ret;
@@ -154,7 +156,7 @@ Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form
 			specialStartPos = n;
 		}
 
-		nextNode = curNode->next(trie, c);
+		nextNode = curNode->template nextOpt<arch>(trie, c);
 		while (!nextNode) // if curNode has no exact next node, goto fail
 		{
 			if (curNode->fail())
@@ -178,7 +180,7 @@ Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form
 						}
 					}
 				}
-				nextNode = curNode->next(trie, c);
+				nextNode = curNode->template nextOpt<arch>(trie, c);
 			}
 			else
 			{
@@ -281,6 +283,20 @@ Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form
 		ret.back().addPrev(&ret.back() - &r);
 	}
 	return KGraphNode::removeUnconnected(ret);
+}
+
+template<ptrdiff_t ...indices>
+inline FnSplitByTrie getSplitByTrieFnDispatch(ArchType arch, tp::seq<indices...>)
+{
+	static FnSplitByTrie table[] = {
+		&splitByTrie<static_cast<ArchType>(indices + 1)>...
+	};
+	return table[static_cast<int>(arch) - 1];
+}
+
+FnSplitByTrie kiwi::getSplitByTrieFn(ArchType arch)
+{
+	return getSplitByTrieFnDispatch(arch, tp::GenSeq<static_cast<int>(ArchType::last)>{});
 }
 
 const Form * KTrie::findForm(const KString & str) const
