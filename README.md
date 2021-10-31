@@ -98,6 +98,9 @@ https://github.com/bab2min/kiwi-gui
 ### R Wrapper
 mrchypark님께서 작업해주신 R언어용 wrapper인 [Elbird](https://github.com/mrchypark/Elbird)가 있습니다.
 
+### GO Wrapper
+codingpot 커뮤니티가 작업해주신 go언어용 wrapper인 [kiwigo](https://github.com/codingpot/kiwigo)가 있습니다.
+
 ### 응용 프로그램
 Kiwi는 C# 기반의 GUI 형태로도 제공됩니다.
 형태소 분석기는 사용해야하지만 별도의 프로그래밍 지식이 없는 경우 이 프로그램을 사용하시면 됩니다.
