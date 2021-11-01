@@ -20,12 +20,14 @@ if (NOT CMAKE_BUILD_TYPE)
 endif()
 
 set ( CORE_SRCS
+  src/ArchUtils.cpp
   src/Form.cpp
   src/FeatureTestor.cpp
   src/Kiwi.cpp
   src/KiwiBuilder.cpp
   src/KTrie.cpp
   src/PatternMatcher.cpp
+  src/search.cpp
   src/Utils.cpp
   src/WordDetector.cpp
 )
@@ -44,6 +46,14 @@ endif()
 include_directories( include/ )
 include_directories( third_party/tclap/include )
 include_directories( third_party/cpp-btree )
+include_directories( third_party/cpuinfo/include )
+
+set(CPUINFO_LIBRARY_TYPE "shared" CACHE STRING "")
+SET(CPUINFO_BUILD_TOOLS OFF CACHE BOOL "")
+SET(CPUINFO_BUILD_UNIT_TESTS OFF CACHE BOOL "")
+SET(CPUINFO_BUILD_MOCK_TESTS OFF CACHE BOOL "")
+SET(CPUINFO_BUILD_BENCHMARKS OFF CACHE BOOL "")
+add_subdirectory( third_party/cpuinfo )
 
 if(MSVC)
   set ( CMAKE_C_FLAGS_DEBUG "-DDEBUG -DC_FLAGS -Zi -Od /utf-8" )
@@ -74,11 +84,15 @@ endif()
 add_library( "${PROJECT_NAME}_static" STATIC
   ${CORE_SRCS}
   src/capi/kiwi_c.cpp
+  $<TARGET_OBJECTS:clog>
+  $<TARGET_OBJECTS:cpuinfo_internals>
 )
 
 add_library( "${PROJECT_NAME}" SHARED
   ${CORE_SRCS}
   src/capi/kiwi_c.cpp
+  $<TARGET_OBJECTS:clog>
+  $<TARGET_OBJECTS:cpuinfo>
 )
 
 # Install the kiwi library as well as header files to (`include/kiwi` directory)
@@ -96,6 +110,9 @@ install(TARGETS ${PROJECT_NAME} PUBLIC_HEADER DESTINATION include/kiwi)
 
 target_compile_options("${PROJECT_NAME}_static" PRIVATE "${ADDITIONAL_FLAGS}")
 target_compile_options("${PROJECT_NAME}" PRIVATE "${ADDITIONAL_FLAGS}")
+
+#target_link_libraries("${PROJECT_NAME}_static" cpuinfo_internals)
+#target_link_libraries("${PROJECT_NAME}" cpuinfo)
 
 add_executable( "${PROJECT_NAME}-cli-${PROJECT_VERSION}"
   tools/runner.cpp
