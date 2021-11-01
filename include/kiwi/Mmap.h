@@ -158,7 +158,7 @@ namespace kiwi
 			MMap(const MMap&) = delete;
 			MMap& operator=(const MMap&) = delete;
 
-			MMap(MMap&& o)
+			MMap(MMap&& o) : len{ o.len }, fd{ std::move(o.fd) }
 			{
 				std::swap(view, o.view);
 			}
@@ -166,6 +166,8 @@ namespace kiwi
 			MMap& operator=(MMap&& o)
 			{
 				std::swap(view, o.view);
+				std::swap(len, o.len);
+				std::swap(fd, o.fd);
 				return *this;
 			}
 
