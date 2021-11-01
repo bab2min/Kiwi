@@ -16,6 +16,12 @@
 #include <arm_neon.h>
 #endif
 
+#ifdef __GNUC__
+#define ARCH_TARGET(x) __attribute__((target(#x)))
+#else
+#define ARCH_TARGET(x)
+#endif
+
 template<class IntTy>
 static bool bsearchStd(const IntTy* keys, size_t size, IntTy target, size_t& ret)
 {
@@ -35,11 +41,9 @@ static inline void prefetch(const void* ptr)
 #endif
 }
 
-inline constexpr size_t getBitSize(size_t n)
+static constexpr size_t getBitSize(size_t n)
 {
-	size_t ret = 0;
-	for (; n > 1; n >>= 1) ++ret;
-	return ret;
+	return n <= 1 ? 0 : (getBitSize(n >> 1) + 1);
 }
 
 namespace kiwi
@@ -146,6 +150,7 @@ namespace kiwi
 				static constexpr size_t packetBytes = 64;
 
 				template<class IntTy>
+				ARCH_TARGET(avx512bw)
 				bool lookup(const IntTy* keys, size_t size, size_t left, IntTy target, size_t& ret)
 				{
 					uint64_t mask;
@@ -198,6 +203,7 @@ namespace kiwi
 				static constexpr size_t packetBytes = 32;
 
 				template<class IntTy>
+				ARCH_TARGET(avx2)
 				bool lookup(const IntTy* keys, size_t size, size_t left, IntTy target, size_t& ret)
 				{
 					uint32_t mask;
@@ -250,6 +256,7 @@ namespace kiwi
 				static constexpr size_t packetBytes = 16;
 
 				template<class IntTy>
+				ARCH_TARGET(sse4.1)
 				bool lookup(const IntTy* keys, size_t size, size_t left, IntTy target, size_t& ret)
 				{
 					uint32_t mask;
@@ -303,6 +310,7 @@ namespace kiwi
 				static constexpr size_t packetBytes = 16;
 
 				template<class IntTy>
+				ARCH_TARGET(sse2)
 				bool lookup(const IntTy* keys, size_t size, size_t left, IntTy target, size_t& ret)
 				{
 					uint32_t mask;

@@ -44,22 +44,22 @@ namespace kiwi
 	Kiwi::Kiwi(ArchType arch, size_t lmKeySize)
 	{
 		arch = getSelectedArch(arch);
-		dfSplitByTrie = getSplitByTrieFn(arch);
+		dfSplitByTrie = (void*)getSplitByTrieFn(arch);
 		
 		auto indexHolder = tp::GenSeq<static_cast<int>(ArchType::last)>{};
 		switch (lmKeySize)
 		{
 		case 1:
-			dfFindBestPath = getFindBestPathFn<uint8_t>(arch, indexHolder);
+			dfFindBestPath = (void*)getFindBestPathFn<uint8_t>(arch, indexHolder);
 			break;
 		case 2:
-			dfFindBestPath = getFindBestPathFn<uint16_t>(arch, indexHolder);
+			dfFindBestPath = (void*)getFindBestPathFn<uint16_t>(arch, indexHolder);
 			break;
 		case 4:
-			dfFindBestPath = getFindBestPathFn<uint32_t>(arch, indexHolder);
+			dfFindBestPath = (void*)getFindBestPathFn<uint32_t>(arch, indexHolder);
 			break;
 		case 8:
-			dfFindBestPath = getFindBestPathFn<uint64_t>(arch, indexHolder);
+			dfFindBestPath = (void*)getFindBestPathFn<uint64_t>(arch, indexHolder);
 			break;
 		default:
 			throw Exception{ "Wrong `lmKeySize`" };
@@ -654,7 +654,7 @@ namespace kiwi
 			return ret;
 		}
 
-		Vector<std::pair<PathEvaluator::Path, float>> res = (*static_cast<FnFindBestPath>(dfFindBestPath))(this, nodes, topN);
+		Vector<std::pair<PathEvaluator::Path, float>> res = (*reinterpret_cast<FnFindBestPath>(dfFindBestPath))(this, nodes, topN);
 		for (auto&& r : res)
 		{
 			vector<TokenInfo> rarr;
