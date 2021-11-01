@@ -33,13 +33,15 @@ int doEvaluate(const string& modelPath, bool buildFromRaw, const string& output,
 		for (auto& tf : input)
 		{
 			cout << "Test file: " << tf << endl;
-			tutils::Timer total;
 			Evaluator test{ tf, &kw };
+			tutils::Timer total;
+			test.run();
 			double tm = total.getElapsed();
+			auto result = test.evaluate();
 
-			cout << test.getMicroScore() << ", " << test.getMacroScore() << endl;
-			cout << "Total (" << test.getTotalCount() << " lines) Time : " << tm << " ms" << endl;
-			cout << "Time per Line : " << tm / test.getTotalCount() << " ms" << endl;
+			cout << result.micro << ", " << result.macro << endl;
+			cout << "Total (" << result.totalCount << " lines) Time : " << tm << " ms" << endl;
+			cout << "Time per Line : " << tm / result.totalCount << " ms" << endl;
 
 			if (!output.empty())
 			{
@@ -49,9 +51,9 @@ int doEvaluate(const string& modelPath, bool buildFromRaw, const string& output,
 				else name = tf;
 
 				ofstream out{ output + "/" + name };
-				out << test.getMicroScore() << ", " << test.getMacroScore() << endl;
-				out << "Total (" << test.getTotalCount() << ") Time : " << tm << " ms" << endl;
-				out << "Time per Unit : " << tm / test.getTotalCount() << " ms" << endl;
+				out << result.micro << ", " << result.macro << endl;
+				out << "Total (" << result.totalCount << ") Time : " << tm << " ms" << endl;
+				out << "Time per Unit : " << tm / result.totalCount << " ms" << endl;
 				for (auto t : test.getErrors())
 				{
 					t.writeResult(out);
