@@ -28,7 +28,7 @@ jobs:
     - name: Checkout Old Version googletest
       run: cd third_party/googletest && git checkout v1.8.x && cd ../..
     - name: Configure Build
-      run: mkdir build && cd build && /opt/python/cp36-cp36m/bin/cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_USE_MIMALLOC=0 ..
+      run: mkdir build && cd build && /opt/python/cp36-cp36m/bin/cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_USE_MIMALLOC=0 -DKIWI_USE_CPUINFO=0 ..
     - name: Build
       run: cd build && make
     - name: Run Unit Test

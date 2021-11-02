@@ -28,6 +28,7 @@ jobs:
           make && popd
           ./build/test/kiwi-test
           mkdir eval_results && ./build/kiwi-evaluator -m ./ModelGenerator eval_data/*.txt -o eval_results/
+          mkdir eval_results_balanced && KIWI_ARCH_TYPE=balanced ./build/kiwi-evaluator -m ./ModelGenerator eval_data/*.txt -o eval_results_balanced/
           cp -r build /artifacts/
           cp -r eval_results /artifacts/
     - name: Archive binaries
