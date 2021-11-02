@@ -3,13 +3,16 @@
 #include <string>
 #include <algorithm>
 
-#include <cpuinfo.h>
+#ifdef KIWI_USE_CPUINFO
+	#include <cpuinfo.h>
+#endif
 #include <kiwi/ArchUtils.h>
 
 using namespace kiwi;
 
 ArchType kiwi::getBestArch()
 {
+#ifdef KIWI_USE_CPUINFO
 	cpuinfo_initialize();
 #if CPUINFO_ARCH_X86 || CPUINFO_ARCH_X86_64
 	if (cpuinfo_has_x86_avx512bw()) return ArchType::avx512bw;
@@ -18,6 +21,7 @@ ArchType kiwi::getBestArch()
 	if (cpuinfo_has_x86_sse2()) return ArchType::sse2;
 #elif CPUINFO_ARCH_ARM64
 	if (cpuinfo_has_arm_neon()) return ArchType::neon;
+#endif
 #endif
 	return ArchType::balanced;
 }

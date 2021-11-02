@@ -1,5 +1,5 @@
 #pragma once
-#include <array>
+#include <cstddef>
 
 namespace kiwi
 {
@@ -25,11 +25,11 @@ namespace kiwi
 
 		template<class _T> using Invoke = typename _T::type;
 
-		template<ptrdiff_t...> struct seq { using type = seq; };
+		template<std::ptrdiff_t...> struct seq { using type = seq; };
 
 		template<class _S1, class _S2> struct concat;
 
-		template<ptrdiff_t... _i1, ptrdiff_t... _i2>
+		template<std::ptrdiff_t... _i1, std::ptrdiff_t... _i2>
 		struct concat<seq<_i1...>, seq<_i2...>>
 			: seq<_i1..., (sizeof...(_i1) + _i2)...> {};
 
@@ -48,46 +48,46 @@ namespace kiwi
 		template<class Ty>
 		struct SeqSize;
 
-		template<ptrdiff_t ..._i>
+		template<std::ptrdiff_t ..._i>
 		struct SeqSize<seq<_i...>>
 		{
 			static constexpr size_t value = sizeof...(_i);
 		};
 
-		template<size_t n, class Seq, ptrdiff_t ..._j>
+		template<size_t n, class Seq, std::ptrdiff_t ..._j>
 		struct slice;
 
-		template<size_t n, class Seq, ptrdiff_t ..._j>
+		template<size_t n, class Seq, std::ptrdiff_t ..._j>
 		using Slice = Invoke<slice<n, Seq, _j...>>;
 
-		template<size_t n, ptrdiff_t first, ptrdiff_t ..._i, ptrdiff_t ..._j>
+		template<size_t n, std::ptrdiff_t first, std::ptrdiff_t ..._i, std::ptrdiff_t ..._j>
 		struct slice<n, seq<first, _i...>, _j...>
 		{
 			using type = Slice<n - 1, seq<_i...>, _j..., first>;
 		};
 
-		template<ptrdiff_t first, ptrdiff_t ..._i, ptrdiff_t ..._j>
+		template<std::ptrdiff_t first, std::ptrdiff_t ..._i, std::ptrdiff_t ..._j>
 		struct slice<0, seq<first, _i...>, _j...>
 		{
 			using type = seq<_j...>;
 		};
 
-		template<ptrdiff_t ..._j>
+		template<std::ptrdiff_t ..._j>
 		struct slice<0, seq<>, _j...>
 		{
 			using type = seq<_j...>;
 		};
 
-		template<size_t n, class Seq, ptrdiff_t ...j>
+		template<size_t n, class Seq, std::ptrdiff_t ...j>
 		struct get;
 
-		template<size_t n, ptrdiff_t first, ptrdiff_t ..._i>
+		template<size_t n, std::ptrdiff_t first, std::ptrdiff_t ..._i>
 		struct get<n, seq<first, _i...>> : get<n - 1, seq<_i...>>
 		{
 		};
 
-		template<ptrdiff_t first, ptrdiff_t ..._i>
-		struct get<0, seq<first, _i...>> : std::integral_constant<ptrdiff_t, first>
+		template<std::ptrdiff_t first, std::ptrdiff_t ..._i>
+		struct get<0, seq<first, _i...>> : std::integral_constant<std::ptrdiff_t, first>
 		{
 		};
 

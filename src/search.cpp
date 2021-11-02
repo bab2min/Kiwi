@@ -1,5 +1,7 @@
 #include <algorithm>
-#include <cpuinfo.h>
+#ifdef KIWI_USE_CPUINFO
+	#include <cpuinfo.h>
+#endif
 #include <kiwi/BitUtils.h>
 #include "search.h"
 
@@ -41,7 +43,7 @@ static inline void prefetch(const void* ptr)
 #endif
 }
 
-static constexpr size_t getBitSize(size_t n)
+static constexpr int getBitSize(size_t n)
 {
 	return n <= 1 ? 0 : (getBitSize(n >> 1) + 1);
 }
@@ -71,14 +73,15 @@ namespace kiwi
 			{
 				BalancedSearcher<arch> bs;
 				static constexpr size_t cacheLineSize = 64 / sizeof(IntTy);
-				static constexpr size_t minH = getBitSize(bs.packetBytes / sizeof(IntTy));
+				static constexpr int minH = getBitSize(bs.packetBytes / sizeof(IntTy));
+				static constexpr int realMinH = minH > 2 ? minH : 0;
 
-				size_t height = ceilLog2(size + 1);
+				int height = ceilLog2(size + 1);
 				size_t dist = (size_t)1 << (size_t)(height - 1);
 				size_t mid = size - dist;
 				dist >>= 1;
 				size_t left1 = 0, left2 = mid + 1;
-				while (height-- > minH)
+				while (height-- > realMinH)
 				{
 					if (dist >= cacheLineSize / sizeof(IntTy))
 					{
@@ -90,7 +93,6 @@ namespace kiwi
 					mid = left1 + dist - 1;
 					dist >>= 1;
 				}
-
 				return bs.lookup(keys, size, left1, target, ret);
 			}
 
@@ -102,6 +104,7 @@ namespace kiwi
 				case ArchType::none:
 					return bsearchStd(keys, size, target, ret);
 				case ArchType::balanced:
+#ifdef KIWI_USE_CPUINFO
 #if CPUINFO_ARCH_X86_64
 				case ArchType::sse2:
 				case ArchType::sse4_1:
@@ -111,6 +114,7 @@ namespace kiwi
 				case ArchType::sse2:
 #elif CPUINFO_ARCH_ARM || CPUINFO_ARCH_ARM64
 				case ArchType::neon:
+#endif
 #endif
 					return bsearchBalanced<arch>(keys, size, target, ret);
 				}
@@ -134,6 +138,7 @@ namespace kiwi
 	{
 		namespace detail
 		{
+#ifdef KIWI_USE_CPUINFO
 #if CPUINFO_ARCH_X86_64
 			template<>
 			struct BalancedSearcher<ArchType::avx512bw>
@@ -358,57 +363,83 @@ namespace kiwi
 				static constexpr size_t packetBytes = 16;
 
 				template<class IntTy>
-				ARCH_TARGET("armv8-a")
+				ARCH_TARGET("arch=armv8-a")
 				bool lookup(const IntTy* keys, size_t size, size_t left, IntTy target, size_t& ret)
 				{
 					size_t found;
 					if (sizeof(IntTy) == 1)
 					{
-						static const int8_t __attribute__((aligned(16))) idx[16] = { 
-							1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+						static const uint8_t __attribute__((aligned(16))) idx[16][16] = { 
+							{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 },
+							{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0 },
+							{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 0, 0 },
+							{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 0, 0, 0 },
+							{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 0, 0, 0, 0 },
+							{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 0, 0, 0, 0 },
+							{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 0, 0, 0, 0, 0, 0 },
+							{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 0, 0, 0, 0, 0, 0 },
+							{ 1, 2, 3, 4, 5, 6, 7, 8, 0, 0, 0, 0, 0, 0, 0, 0 },
+							{ 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+							{ 1, 2, 3, 4, 5, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+							{ 1, 2, 3, 4, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+							{ 1, 2, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+							{ 1, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+							{ 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+							{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 						};
 						int8x16_t ptarget = vdupq_n_s8((int8_t)target);
-						int8x16_t selected = vandq_s8(vceqq_s8(
-							vld1q_s8(&keys[left]),
+						uint8x16_t selected = vandq_u8(vceqq_s8(
+							vld1q_s8((const int8_t*)&keys[left]),
 							ptarget
-						), vld1q_s8(idx));
-						found = vaddvq_s8(selected);
+						), vld1q_u8(idx[16 - std::min(size - left, (size_t)16)]));
+						found = vaddvq_u8(selected);
 					}
 					else if (sizeof(IntTy) == 2)
 					{
-						static const int16_t __attribute__((aligned(16))) idx[8] = {
-							1, 2, 3, 4, 5, 6, 7, 8
+						static const uint16_t __attribute__((aligned(16))) idx[8][8] = {
+							{ 1, 2, 3, 4, 5, 6, 7, 8 },
+							{ 1, 2, 3, 4, 5, 6, 7, 0 },
+							{ 1, 2, 3, 4, 5, 6, 0, 0 },
+							{ 1, 2, 3, 4, 5, 0, 0, 0 },
+							{ 1, 2, 3, 4, 0, 0, 0, 0 },
+							{ 1, 2, 3, 0, 0, 0, 0, 0 },
+							{ 1, 2, 0, 0, 0, 0, 0, 0 },
+							{ 1, 0, 0, 0, 0, 0, 0, 0 },
 						};
 						int16x8_t ptarget = vdupq_n_s16((int16_t)target);
-						int16x8_t selected = vandq_s16(vceqq_s16(
-							vld1q_s16(&keys[left]),
+						uint16x8_t selected = vandq_u16(vceqq_s16(
+							vld1q_s16((const int16_t*)&keys[left]),
 							ptarget
-						), vld1q_s16(idx));
-						found = vaddvq_s16(selected);
+						), vld1q_u16(idx[8 - std::min(size - left, (size_t)8)]));
+						found = vaddvq_u16(selected);
 					}
 					else if (sizeof(IntTy) == 4)
 					{
-						static const int32_t __attribute__((aligned(16))) idx[4] = {
-							1, 2, 3, 4
+						static const uint32_t __attribute__((aligned(16))) idx[4][4] = {
+							{ 1, 2, 3, 4 },
+							{ 1, 2, 3, 0 },
+							{ 1, 2, 0, 0 },
+							{ 1, 0, 0, 0 },
 						};
 						int32x4_t ptarget = vdupq_n_s32((int32_t)target);
-						int32x4_t selected = vandq_s32(vceqq_s32(
-							vld1q_s32(&keys[left]),
+						uint32x4_t selected = vandq_u32(vceqq_s32(
+							vld1q_s32((const int32_t*)&keys[left]),
 							ptarget
-						), vld1q_s32(idx));
-						found = vaddvq_s32(selected);
+						), vld1q_u32(idx[4 - std::min(size - left, (size_t)4)]));
+						found = vaddvq_u32(selected);
 					}
 					else
 					{
-						static const int64_t __attribute__((aligned(16))) idx[2] = {
-							1, 2,
+						static const uint64_t __attribute__((aligned(16))) idx[2][2] = {
+							{ 1, 2 },
+							{ 1, 0 },
 						};
 						int64x2_t ptarget = vdupq_n_s64((int64_t)target);
-						int64x2_t selected = vandq_s64(vceqq_s32(
-							vld1q_s64(&keys[left]),
+						uint64x2_t selected = vandq_u64(vceqq_s64(
+							vld1q_s64((const int64_t*)&keys[left]),
 							ptarget
-						), vld1q_s64(idx));
-						found = vaddvq_s64(selected);
+						), vld1q_u64(idx[2 - std::min(size - left, (size_t)2)]));
+						found = vaddvq_u64(selected);
 					}
 
 					if (found && left + found - 1 < size)
@@ -420,6 +451,7 @@ namespace kiwi
 				}
 			};
 
+#endif
 #endif
 		}
 	}
