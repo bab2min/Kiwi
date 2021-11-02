@@ -483,8 +483,8 @@ namespace kiwi
 
 			std::vector<float> allNextLL(ptrdiff_t node_idx, std::vector<ptrdiff_t>& next_node_idx) const final
 			{
-				std::vector<float> ret(getHeader().vocab_size, -INFINITY);
-				next_node_idx.resize(getHeader().vocab_size);
+				std::vector<float> ret((size_t)getHeader().vocab_size, -INFINITY);
+				next_node_idx.resize((size_t)getHeader().vocab_size);
 				auto* node = &node_data[node_idx];
 				auto* keys = &key_data[node->next_offset];
 				auto* values = &value_data[node->next_offset];

@@ -44,7 +44,7 @@ namespace kiwi
 
 		static Vector<KGraphNode> removeUnconnected(const Vector<KGraphNode>& graph);
 
-		void addPrev(size_t distance)
+		void addPrev(uint16_t distance)
 		{
 			for (size_t i = 0; i < max_prev; ++i)
 			{
