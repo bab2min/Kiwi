@@ -10,14 +10,14 @@
 	template bool bsearchImpl<arch>(const uint64_t*, size_t, uint64_t, size_t&);\
 	template bool bsearchImpl<arch>(const char16_t*, size_t, char16_t, size_t&)
 
-#if defined(CPUINFO_ARCH_X86) || defined(CPUINFO_ARCH_X86_64)
+#if CPUINFO_ARCH_X86 || CPUINFO_ARCH_X86_64
 #include <immintrin.h>
-#elif defined(CPUINFO_ARCH_ARM64)
+#elif CPUINFO_ARCH_ARM || CPUINFO_ARCH_ARM64
 #include <arm_neon.h>
 #endif
 
 #ifdef __GNUC__
-#define ARCH_TARGET(x) __attribute__((target(#x)))
+#define ARCH_TARGET(x) __attribute__((target(x)))
 #else
 #define ARCH_TARGET(x)
 #endif
@@ -34,7 +34,7 @@ static bool bsearchStd(const IntTy* keys, size_t size, IntTy target, size_t& ret
 
 static inline void prefetch(const void* ptr)
 {
-#if defined(CPUINFO_ARCH_X86) || defined(CPUINFO_ARCH_X86_64)
+#if CPUINFO_ARCH_X86 || CPUINFO_ARCH_X86_64
 	_mm_prefetch((const char*)ptr, _MM_HINT_T0);
 #elif defined(__GNUC__)
 	__builtin_prefetch(ptr);
@@ -102,14 +102,14 @@ namespace kiwi
 				case ArchType::none:
 					return bsearchStd(keys, size, target, ret);
 				case ArchType::balanced:
-#if defined(CPUINFO_ARCH_X86_64)
+#if CPUINFO_ARCH_X86_64
 				case ArchType::sse2:
 				case ArchType::sse4_1:
 				case ArchType::avx2:
 				case ArchType::avx512bw:
-#elif defined(CPUINFO_ARCH_X86)
+#elif CPUINFO_ARCH_X86
 				case ArchType::sse2:
-#elif defined(CPUINFO_ARCH_ARM64)
+#elif CPUINFO_ARCH_ARM || CPUINFO_ARCH_ARM64
 				case ArchType::neon:
 #endif
 					return bsearchBalanced<arch>(keys, size, target, ret);
@@ -119,20 +119,11 @@ namespace kiwi
 
 			INSTANTIATE_IMPL(ArchType::none);
 			INSTANTIATE_IMPL(ArchType::balanced);
-
-#if defined(CPUINFO_ARCH_X86) || defined(CPUINFO_ARCH_X86_64)
 			INSTANTIATE_IMPL(ArchType::sse2);
-#endif
-
-#if defined(CPUINFO_ARCH_X86_64)
 			INSTANTIATE_IMPL(ArchType::sse4_1);
 			INSTANTIATE_IMPL(ArchType::avx2);
 			INSTANTIATE_IMPL(ArchType::avx512bw);
-#endif
-
-#if defined(CPUINFO_ARCH_ARM64)
 			INSTANTIATE_IMPL(ArchType::neon);
-#endif
 		}
 	}
 }
@@ -143,14 +134,14 @@ namespace kiwi
 	{
 		namespace detail
 		{
-#if defined(CPUINFO_ARCH_X86_64)
+#if CPUINFO_ARCH_X86_64
 			template<>
 			struct BalancedSearcher<ArchType::avx512bw>
 			{
 				static constexpr size_t packetBytes = 64;
 
 				template<class IntTy>
-				ARCH_TARGET(avx512bw)
+				ARCH_TARGET("avx512bw")
 				bool lookup(const IntTy* keys, size_t size, size_t left, IntTy target, size_t& ret)
 				{
 					uint64_t mask;
@@ -203,7 +194,7 @@ namespace kiwi
 				static constexpr size_t packetBytes = 32;
 
 				template<class IntTy>
-				ARCH_TARGET(avx2)
+				ARCH_TARGET("avx2")
 				bool lookup(const IntTy* keys, size_t size, size_t left, IntTy target, size_t& ret)
 				{
 					uint32_t mask;
@@ -256,7 +247,7 @@ namespace kiwi
 				static constexpr size_t packetBytes = 16;
 
 				template<class IntTy>
-				ARCH_TARGET(sse4.1)
+				ARCH_TARGET("sse4.1")
 				bool lookup(const IntTy* keys, size_t size, size_t left, IntTy target, size_t& ret)
 				{
 					uint32_t mask;
@@ -303,14 +294,14 @@ namespace kiwi
 				}
 			};
 #endif
-#if defined(CPUINFO_ARCH_X86)
+#if CPUINFO_ARCH_X86
 			template<>
 			struct BalancedSearcher<ArchType::sse2>
 			{
 				static constexpr size_t packetBytes = 16;
 
 				template<class IntTy>
-				ARCH_TARGET(sse2)
+				ARCH_TARGET("sse2")
 				bool lookup(const IntTy* keys, size_t size, size_t left, IntTy target, size_t& ret)
 				{
 					uint32_t mask;
@@ -360,8 +351,74 @@ namespace kiwi
 				}
 			};
 #endif
-#if defined(CPUINFO_ARCH_ARM64)
+#if CPUINFO_ARCH_ARM64
+			template<>
+			struct BalancedSearcher<ArchType::neon>
+			{
+				static constexpr size_t packetBytes = 16;
 
+				template<class IntTy>
+				ARCH_TARGET("armv8-a")
+				bool lookup(const IntTy* keys, size_t size, size_t left, IntTy target, size_t& ret)
+				{
+					size_t found;
+					if (sizeof(IntTy) == 1)
+					{
+						static const int8_t __attribute__((aligned(16))) idx[16] = { 
+							1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+						};
+						int8x16_t ptarget = vdupq_n_s8((int8_t)target);
+						int8x16_t selected = vandq_s8(vceqq_s8(
+							vld1q_s8(&keys[left]),
+							ptarget
+						), vld1q_s8(idx));
+						found = vaddvq_s8(selected);
+					}
+					else if (sizeof(IntTy) == 2)
+					{
+						static const int16_t __attribute__((aligned(16))) idx[8] = {
+							1, 2, 3, 4, 5, 6, 7, 8
+						};
+						int16x8_t ptarget = vdupq_n_s16((int16_t)target);
+						int16x8_t selected = vandq_s16(vceqq_s16(
+							vld1q_s16(&keys[left]),
+							ptarget
+						), vld1q_s16(idx));
+						found = vaddvq_s16(selected);
+					}
+					else if (sizeof(IntTy) == 4)
+					{
+						static const int32_t __attribute__((aligned(16))) idx[4] = {
+							1, 2, 3, 4
+						};
+						int32x4_t ptarget = vdupq_n_s32((int32_t)target);
+						int32x4_t selected = vandq_s32(vceqq_s32(
+							vld1q_s32(&keys[left]),
+							ptarget
+						), vld1q_s32(idx));
+						found = vaddvq_s32(selected);
+					}
+					else
+					{
+						static const int64_t __attribute__((aligned(16))) idx[2] = {
+							1, 2,
+						};
+						int64x2_t ptarget = vdupq_n_s64((int64_t)target);
+						int64x2_t selected = vandq_s64(vceqq_s32(
+							vld1q_s64(&keys[left]),
+							ptarget
+						), vld1q_s64(idx));
+						found = vaddvq_s64(selected);
+					}
+
+					if (found && left + found - 1 < size)
+					{
+						ret = left + found - 1;
+						return true;
+					}
+					return false;
+				}
+			};
 
 #endif
 		}

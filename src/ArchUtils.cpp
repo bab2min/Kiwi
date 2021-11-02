@@ -11,12 +11,12 @@ using namespace kiwi;
 ArchType kiwi::getBestArch()
 {
 	cpuinfo_initialize();
-#if defined(CPUINFO_ARCH_X86) || defined(CPUINFO_ARCH_X86_64)
+#if CPUINFO_ARCH_X86 || CPUINFO_ARCH_X86_64
 	if (cpuinfo_has_x86_avx512bw()) return ArchType::avx512bw;
 	if (cpuinfo_has_x86_avx2()) return ArchType::avx2;
 	if (cpuinfo_has_x86_sse4_1()) return ArchType::sse4_1;
 	if (cpuinfo_has_x86_sse2()) return ArchType::sse2;
-#elif defined(CPUINFO_ARCH_ARM64)
+#elif CPUINFO_ARCH_ARM64
 	if (cpuinfo_has_arm_neon()) return ArchType::neon;
 #endif
 	return ArchType::balanced;
@@ -36,12 +36,12 @@ static const char* archNames[] = {
 static ArchType testArchSet(ArchType arch, ArchType best)
 {
 	if (arch <= ArchType::balanced) return arch;
-#if defined(CPUINFO_ARCH_X86) || defined(CPUINFO_ARCH_X86_64)
+#if CPUINFO_ARCH_X86 || CPUINFO_ARCH_X86_64
 	if (ArchType::sse2 <= arch && arch <= ArchType::avx512bw && arch <= best)
 	{
 		return arch;
 	}
-#elif defined(CPUINFO_ARCH_ARM64)
+#elif CPUINFO_ARCH_ARM || CPUINFO_ARCH_ARM64
 	if (ArchType::neon <= arch && arch <= ArchType::neon && arch <= best)
 	{
 		return arch;
@@ -70,7 +70,7 @@ ArchType parserArchType(const char* env)
 		if (envs == archNames[i]) return static_cast<ArchType>(i);
 	}
 	
-	std::fprintf(stderr, "Wrong value for KIWI_ARCH_TYPE: %s\n ArchType::default will be used instead.\n", env);
+	std::fprintf(stderr, "Wrong value for KIWI_ARCH_TYPE: %s\nArchType::default will be used instead.\n", env);
 	return ArchType::default_;
 }
 
