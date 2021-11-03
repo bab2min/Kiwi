@@ -59,6 +59,19 @@ if(KIWI_USE_CPUINFO)
   add_subdirectory( third_party/cpuinfo )
 
   set ( ADDITIONAL_FLAGS ${ADDITIONAL_FLAGS} "-DKIWI_USE_CPUINFO" )
+
+  if(MSVC)
+    target_compile_options("clog" PUBLIC
+      /MT
+    )
+    target_compile_options("cpuinfo" PUBLIC
+      /MT
+    )
+    target_compile_options("cpuinfo_internals" PUBLIC
+      /MT
+    )
+  endif()
+
   set ( CPUINFO_OBJECTS_STATIC 
     $<TARGET_OBJECTS:clog>
     $<TARGET_OBJECTS:cpuinfo_internals>
@@ -168,6 +181,10 @@ if(MSVC)
 endif()
 
 if(UNIX AND NOT APPLE)
+  target_link_libraries( "${PROJECT_NAME}_static"
+    rt
+  )
+
   target_link_libraries( "${PROJECT_NAME}-cli-${PROJECT_VERSION}"
     rt
   )
@@ -184,4 +201,12 @@ target_compile_definitions("${PROJECT_NAME}"
 if(KIWI_BUILD_TEST)
   add_subdirectory( third_party/googletest )
   add_subdirectory( test )
+  if(MSVC)
+    target_compile_options("gtest_main" PUBLIC
+      /MT
+    )
+    target_compile_options("gtest" PUBLIC
+      /MT
+    )
+  endif()
 endif()
