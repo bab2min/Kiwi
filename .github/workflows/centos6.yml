@@ -1,0 +1,43 @@
+name: Centos6
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-centos6:
+    name: Centos6
+    runs-on: ubuntu-latest
+    container:
+      image: docker://quay.io/pypa/manylinux2010_x86_64
+
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        submodules: true
+    - name: Install Git LFS
+      run: |
+        mkdir gitlfs && pushd gitlfs
+        curl -L https://github.com/git-lfs/git-lfs/releases/download/v2.13.2/git-lfs-linux-amd64-v2.13.2.tar.gz | tar -zxv
+        ./install.sh
+        popd
+    - name: Pull LFS files
+      run: git lfs pull
+    - name: Update CMake
+      run: /opt/python/cp36-cp36m/bin/pip install cmake
+    - name: Configure Build
+      run: mkdir build && cd build && /opt/python/cp36-cp36m/bin/cmake -DCMAKE_BUILD_TYPE=Release ..
+    - name: Build
+      run: cd build && make
+    - name: Run Unit Test
+      run: ./build/test/kiwi-test
+    - name: Run Evaluator
+      run: |
+        mkdir eval_results
+        ./build/kiwi-evaluator -m ./ModelGenerator eval_data/*.txt -o eval_results/
+    - run: tar -zcvf arts.tgz build/*kiwi* build/test/*kiwi* eval_results/*.txt
+    - name: Archive binaries
+      uses: actions/upload-artifact@v1
+      with:
+        name: Artifacts Centos6
+        path: arts.tgz
