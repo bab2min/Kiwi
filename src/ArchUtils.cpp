@@ -14,12 +14,15 @@ ArchType kiwi::getBestArch()
 {
 #ifdef KIWI_USE_CPUINFO
 	cpuinfo_initialize();
-#if CPUINFO_ARCH_X86 || CPUINFO_ARCH_X86_64
+#if CPUINFO_ARCH_X86_64
 	if (cpuinfo_has_x86_avx512bw()) return ArchType::avx512bw;
 	if (cpuinfo_has_x86_avx2()) return ArchType::avx2;
 	if (cpuinfo_has_x86_sse4_1()) return ArchType::sse4_1;
+#endif
+#if CPUINFO_ARCH_X86 || CPUINFO_ARCH_X86_64
 	if (cpuinfo_has_x86_sse2()) return ArchType::sse2;
-#elif CPUINFO_ARCH_ARM64
+#endif
+#if CPUINFO_ARCH_ARM64
 	if (cpuinfo_has_arm_neon()) return ArchType::neon;
 #endif
 #endif
