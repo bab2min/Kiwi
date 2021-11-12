@@ -213,7 +213,7 @@ namespace kiwi
 
 		size_t getNumThreads() const
 		{
-			return pool ? 1 : pool->size();
+			return pool ? pool->size() : 1;
 		}
 
 		float getCutOffThreshold() const
