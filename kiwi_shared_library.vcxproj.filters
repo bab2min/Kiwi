@@ -90,6 +90,12 @@
     <ClInclude Include="include\kiwi\Macro.h">
       <Filter>Header Files\kiwi</Filter>
     </ClInclude>
+    <ClInclude Include="include\kiwi\ArchUtils.h">
+      <Filter>Header Files\kiwi</Filter>
+    </ClInclude>
+    <ClInclude Include="include\kiwi\TemplateUtils.hpp">
+      <Filter>Header Files\kiwi</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Form.cpp">
@@ -116,6 +122,14 @@
     <ClCompile Include="src\WordDetector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="third_party\mimalloc\src\static.c" />
+    <ClCompile Include="src\search.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\mimalloc\src\static.c">
+      <Filter>mimalloc</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ArchUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

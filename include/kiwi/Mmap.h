@@ -52,7 +52,7 @@ namespace kiwi
 		class MMap
 		{
 			const char* view = nullptr;
-			size_t len = 0;
+			uint64_t len = 0;
 			detail::HandleGuard hFile, hFileMap;
 		public:
 			MMap(const std::string& filepath)
@@ -64,7 +64,7 @@ namespace kiwi
 				view = (const char*)MapViewOfFile(hFileMap, FILE_MAP_READ, 0, 0, 0);
 				DWORD high;
 				len = GetFileSize(hFile, &high);
-				len |= (size_t)high << 32;
+				len |= (uint64_t)high << 32;
 			}
 
 			MMap(const MMap&) = delete;
@@ -158,7 +158,7 @@ namespace kiwi
 			MMap(const MMap&) = delete;
 			MMap& operator=(const MMap&) = delete;
 
-			MMap(MMap&& o)
+			MMap(MMap&& o) : len{ o.len }, fd{ std::move(o.fd) }
 			{
 				std::swap(view, o.view);
 			}
@@ -166,6 +166,8 @@ namespace kiwi
 			MMap& operator=(MMap&& o)
 			{
 				std::swap(view, o.view);
+				std::swap(len, o.len);
+				std::swap(fd, o.fd);
 				return *this;
 			}
 

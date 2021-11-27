@@ -12,3 +12,6 @@
 	path = third_party/googletest
 	url = https://github.com/google/googletest
 	branch = master
+[submodule "third_party/cpuinfo"]
+	path = third_party/cpuinfo
+	url = https://github.com/pytorch/cpuinfo

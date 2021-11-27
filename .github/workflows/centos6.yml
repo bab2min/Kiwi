@@ -1,15 +1,15 @@
-name: Centos5
+name: Centos6
 
 on:
   pull_request:
     branches: [ main ]
 
 jobs:
-  build-centos:
-    name: Centos5
+  build-centos6:
+    name: Centos6
     runs-on: ubuntu-latest
     container:
-      image: docker://hoshizora/manylinux1-clang_x86_64
+      image: docker://quay.io/pypa/manylinux2010_x86_64
 
     steps:
     - uses: actions/checkout@v1
@@ -25,10 +25,8 @@ jobs:
       run: git lfs pull
     - name: Update CMake
       run: /opt/python/cp36-cp36m/bin/pip install cmake
-    - name: Checkout Old Version googletest
-      run: cd third_party/googletest && git checkout v1.8.x && cd ../..
     - name: Configure Build
-      run: mkdir build && cd build && /opt/python/cp36-cp36m/bin/cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_USE_MIMALLOC=0 -DKIWI_USE_CPUINFO=0 ..
+      run: mkdir build && cd build && /opt/python/cp36-cp36m/bin/cmake -DCMAKE_BUILD_TYPE=Release ..
     - name: Build
       run: cd build && make
     - name: Run Unit Test
@@ -41,5 +39,5 @@ jobs:
     - name: Archive binaries
       uses: actions/upload-artifact@v1
       with:
-        name: Artifacts Centos5
+        name: Artifacts Centos6
         path: arts.tgz

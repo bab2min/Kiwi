@@ -6,6 +6,7 @@ set ( CMAKE_CXX_STANDARD 11 )
 set ( CMAKE_VERBOSE_MAKEFILE true )
 
 option(KIWI_USE_MIMALLOC  "Use mimalloc for faster memory allocation" ON)
+option(KIWI_USE_CPUINFO  "Use cpuinfo for dynamic CPU dispatching" ON)
 option(KIWI_STATIC_WITHOUT_MT  "Use /MT Option in building kiwi_static" OFF)
 option(KIWI_BUILD_TEST  "Build Test sets" ON)
 
@@ -20,12 +21,14 @@ if (NOT CMAKE_BUILD_TYPE)
 endif()
 
 set ( CORE_SRCS
+  src/ArchUtils.cpp
   src/Form.cpp
   src/FeatureTestor.cpp
   src/Kiwi.cpp
   src/KiwiBuilder.cpp
   src/KTrie.cpp
   src/PatternMatcher.cpp
+  src/search.cpp
   src/Utils.cpp
   src/WordDetector.cpp
 )
@@ -44,6 +47,40 @@ endif()
 include_directories( include/ )
 include_directories( third_party/tclap/include )
 include_directories( third_party/cpp-btree )
+if(KIWI_USE_CPUINFO)
+  message(STATUS "Use cpuinfo")
+  include_directories( third_party/cpuinfo/include )
+
+  set(CPUINFO_LIBRARY_TYPE "shared" CACHE STRING "")
+  set(CPUINFO_BUILD_TOOLS OFF CACHE BOOL "")
+  set(CPUINFO_BUILD_UNIT_TESTS OFF CACHE BOOL "")
+  set(CPUINFO_BUILD_MOCK_TESTS OFF CACHE BOOL "")
+  set(CPUINFO_BUILD_BENCHMARKS OFF CACHE BOOL "")
+  add_subdirectory( third_party/cpuinfo )
+
+  set ( ADDITIONAL_FLAGS ${ADDITIONAL_FLAGS} "-DKIWI_USE_CPUINFO" )
+
+  if(MSVC)
+    target_compile_options("clog" PUBLIC
+      /MT
+    )
+    target_compile_options("cpuinfo" PUBLIC
+      /MT
+    )
+    target_compile_options("cpuinfo_internals" PUBLIC
+      /MT
+    )
+  endif()
+
+  set ( CPUINFO_OBJECTS_STATIC 
+    $<TARGET_OBJECTS:clog>
+    $<TARGET_OBJECTS:cpuinfo_internals>
+  )
+  set ( CPUINFO_OBJECTS_SHARED 
+    $<TARGET_OBJECTS:clog>
+    $<TARGET_OBJECTS:cpuinfo>
+  )
+endif()
 
 if(MSVC)
   set ( CMAKE_C_FLAGS_DEBUG "-DDEBUG -DC_FLAGS -Zi -Od /utf-8" )
@@ -74,11 +111,13 @@ endif()
 add_library( "${PROJECT_NAME}_static" STATIC
   ${CORE_SRCS}
   src/capi/kiwi_c.cpp
+  ${CPUINFO_OBJECTS_STATIC}
 )
 
 add_library( "${PROJECT_NAME}" SHARED
   ${CORE_SRCS}
   src/capi/kiwi_c.cpp
+  ${CPUINFO_OBJECTS_SHARED}
 )
 
 # Install the kiwi library as well as header files to (`include/kiwi` directory)
@@ -96,6 +135,9 @@ install(TARGETS ${PROJECT_NAME} PUBLIC_HEADER DESTINATION include/kiwi)
 
 target_compile_options("${PROJECT_NAME}_static" PRIVATE "${ADDITIONAL_FLAGS}")
 target_compile_options("${PROJECT_NAME}" PRIVATE "${ADDITIONAL_FLAGS}")
+
+#target_link_libraries("${PROJECT_NAME}_static" cpuinfo_internals)
+#target_link_libraries("${PROJECT_NAME}" cpuinfo)
 
 add_executable( "${PROJECT_NAME}-cli-${PROJECT_VERSION}"
   tools/runner.cpp
@@ -120,24 +162,29 @@ if(MSVC)
     add_library( "${PROJECT_NAME}_mt_static" STATIC
       ${CORE_SRCS}
       src/capi/kiwi_c.cpp
+      ${CPUINFO_OBJECTS_STATIC}
     )
 
     target_compile_options("${PROJECT_NAME}_mt_static" PUBLIC
-      -MT
+      /MT
     )
   else()
     message(STATUS "Use /MT at kiwi_static")
     target_compile_options("${PROJECT_NAME}_static" PUBLIC
-      -MT
+      /MT
     )
   endif()
 
   target_compile_options("${PROJECT_NAME}" PUBLIC
-    -MT
+    /MT
   )
 endif()
 
 if(UNIX AND NOT APPLE)
+  target_link_libraries( "${PROJECT_NAME}_static"
+    rt
+  )
+
   target_link_libraries( "${PROJECT_NAME}-cli-${PROJECT_VERSION}"
     rt
   )
@@ -154,4 +201,12 @@ target_compile_definitions("${PROJECT_NAME}"
 if(KIWI_BUILD_TEST)
   add_subdirectory( third_party/googletest )
   add_subdirectory( test )
+  if(MSVC)
+    target_compile_options("gtest_main" PUBLIC
+      /MT
+    )
+    target_compile_options("gtest" PUBLIC
+      /MT
+    )
+  endif()
 endif()

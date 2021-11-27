@@ -496,9 +496,9 @@ namespace kiwi
 		return addedCnt;
 	}
 
-	Kiwi KiwiBuilder::build() const
+	Kiwi KiwiBuilder::build(ArchType arch) const
 	{
-		Kiwi ret;
+		Kiwi ret{ arch, langMdl->getHeader().key_size };
 		ret.forms.reserve(forms.size() + 1);
 		ret.morphemes.reserve(morphemes.size());
 		ret.langMdl = langMdl;

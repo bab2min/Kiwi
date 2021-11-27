@@ -38,7 +38,7 @@ TokenInfo parseWordPOS(const u16string& str)
 	return { form, tag, 0, 0 };
 }
 
-Evaluator::Evaluator(const std::string& testSetFile, Kiwi* kw, size_t topN)
+Evaluator::Evaluator(const std::string& testSetFile, const Kiwi* _kw, size_t _topN) : kw{ _kw }, topN{ _topN }
 {
 	ifstream f{ testSetFile };
 	if (!f) throw std::ios_base::failure{ "Cannot open '" + testSetFile + "'" };
@@ -57,8 +57,28 @@ Evaluator::Evaluator(const std::string& testSetFile, Kiwi* kw, size_t topN)
 		TestResult tr;
 		tr.q = fd[0];
 		for (auto& t : tokens) tr.a.emplace_back(parseWordPOS(t));
+		testsets.emplace_back(std::move(tr));
+	}
+}
+
+void Evaluator::run()
+{
+	for (auto& tr : testsets)
+	{
 		auto cands = kw->analyze(tr.q, topN, Match::all);
 		tr.r = cands[0].first;
+	}
+}
+
+Evaluator::Score Evaluator::evaluate()
+{
+	errors.clear();
+
+	size_t totalCount = 0, microCorrect = 0, microCount = 0;
+	double totalScore = 0;
+
+	for (auto& tr : testsets)
+	{
 		if (tr.a != tr.r)
 		{
 			auto diff = lcs::getDiff(tr.r.begin(), tr.r.end(), tr.a.begin(), tr.a.end(), [](const TokenInfo& a, const TokenInfo& b)
@@ -98,16 +118,11 @@ Evaluator::Evaluator(const std::string& testSetFile, Kiwi* kw, size_t topN)
 		}
 		totalCount++;
 	}
-}
-
-double Evaluator::getMacroScore() const
-{
-	return totalScore / totalCount;
-}
-
-double Evaluator::getMicroScore() const
-{
-	return microCorrect / (double)microCount;
+	Score ret;
+	ret.micro = microCorrect / (double)microCount;
+	ret.macro = totalScore / totalCount;
+	ret.totalCount = totalCount;
+	return ret;
 }
 
 ostream& operator<<(ostream& o, const kiwi::TokenInfo& t)

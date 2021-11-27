@@ -5,6 +5,8 @@
 #include <kiwi/Knlm.h>
 #include <kiwi/Trie.hpp>
 #include <kiwi/Utils.h>
+#include <kiwi/TemplateUtils.hpp>
+#include <kiwi/ArchUtils.h>
 #include "search.h"
 #include <kiwi/BitEncoder.hpp>
 
@@ -30,162 +32,6 @@ namespace kiwi
 			float unk_ll = 0;
 			ptrdiff_t bos_node_idx = 0;
 
-
-			float _getLL(ptrdiff_t node_idx, KeyType next) const
-			{
-				DiffType v;
-				auto* node = &node_data[node_idx];
-				if (node_idx == 0)
-				{
-					v = all_value_data[next];
-					if (v == 0) return unk_ll;
-				}
-				/*else if (node_idx == bos_node_idx)
-				{
-					v = all_value_data[next + getHeader().vocab_size];
-					if (v == 0) return gamma_data[node_idx] + _getLL(0, next);
-				}*/
-				else
-				{
-					if (!utils::bsearch(
-						&key_data[node->next_offset], 
-						&value_data[node->next_offset], 
-						node->num_nexts, next, v
-					))
-					{
-						// cannot find the next node
-						if (node->lower == 0) return unk_ll;
-						return gamma_data[node_idx] + _getLL(node_idx + node->lower, next);
-					}
-				}
-
-				// non-leaf node
-				if (v > 0)
-				{
-					return ll_data[node_idx + v];
-				}
-				// leaf node
-				else
-				{
-					return reinterpret_cast<const float&>(v);
-				}
-			}
-
-			float _progress(ptrdiff_t& node_idx, KeyType next) const
-			{
-				float acc = 0;
-				while (1)
-				{
-					DiffType v;
-					auto* node = &node_data[node_idx];
-					auto* keys = &key_data[node->next_offset];
-					auto* values = &value_data[node->next_offset];
-					if (node_idx == 0)
-					{
-						v = all_value_data[next];
-						if (v == 0) return acc + unk_ll;
-					}
-					/*else if (node_idx == bos_node_idx)
-					{
-						v = all_value_data[next + getHeader().vocab_size];
-						if (v == 0)
-						{
-							acc += gamma_data[node_idx];
-							node_idx += node->lower;
-							continue;
-						}
-					}*/
-					else
-					{
-						if (!utils::bsearch(
-							keys, 
-							values, 
-							node->num_nexts, next, v
-						))
-						{
-							// cannot find the next node
-							if (node->lower == 0)
-							{
-								node_idx = 0;
-								return acc + unk_ll;
-							}
-							acc += gamma_data[node_idx];
-							node_idx += node->lower;
-							continue;
-						}
-					}
-
-					if (!htx_data)
-					{
-						// non-leaf node
-						if (v > 0)
-						{
-							node_idx += v;
-							return acc + ll_data[node_idx];
-						}
-						// leaf node
-						else
-						{
-							while (node->lower)
-							{
-								node += node->lower;
-								DiffType lv;
-								if (utils::bsearch(
-									&key_data[node->next_offset], 
-									&value_data[node->next_offset], 
-									node->num_nexts, next, lv
-								))
-								{
-									if (lv > 0)
-									{
-										node += lv;
-										node_idx = node - &node_data[0];
-										return acc + reinterpret_cast<const float&>(v);
-									}
-								}
-							}
-							node_idx = 0;
-							return acc + reinterpret_cast<const float&>(v);
-						}
-					}
-					else
-					{
-						auto ret = acc + reinterpret_cast<const float&>(v);
-						next = htx_data[next];
-						utils::bsearch(keys, values, node->num_nexts, next, v);
-						// non-leaf node
-						if (v > 0)
-						{
-							node_idx += v;
-							return ret;
-						}
-						// leaf node
-						else
-						{
-							while (node->lower)
-							{
-								node += node->lower;
-								DiffType lv;
-								if (utils::bsearch(
-									&key_data[node->next_offset], 
-									&value_data[node->next_offset], 
-									node->num_nexts, next, lv
-								))
-								{
-									if (lv > 0)
-									{
-										node += lv;
-										node_idx = node - &node_data[0];
-										return ret;
-									}
-								}
-							}
-							node_idx = 0;
-							return ret;
-						}
-					}
-				}
-			}
 
 			MyNode* findLowerNode(MyNode* node, KeyType k)
 			{
@@ -237,8 +83,8 @@ namespace kiwi
 			}
 
 			template<ptrdiff_t ...idx>
-			static void dequantize_dispatch(
-				detail::seq<idx...>,
+			static void dequantizeDispatch(
+				tp::seq<idx...>,
 				size_t bits,
 				std::vector<float>& restored_floats, std::vector<float>& restored_leaf_ll,
 				const char* llq_data, size_t llq_size,
@@ -312,7 +158,7 @@ namespace kiwi
 					const float* ll_table = reinterpret_cast<const float*>(ptr + header.qtable_offset);
 					const float* gamma_table = ll_table + (1 << quantized);
 
-					dequantize_dispatch(detail::gen_seq<16>{}, quantized, restored_floats, restored_leaf_ll,
+					dequantizeDispatch(tp::gen_seq<16>{}, quantized, restored_floats, restored_leaf_ll,
 						ptr + header.ll_offset, header.gamma_offset - header.ll_offset,
 						ptr + header.gamma_offset, header.qtable_offset - header.gamma_offset,
 						ll_table,
@@ -378,9 +224,9 @@ namespace kiwi
 					all_value_data[k] = v;
 				}
 
-				unk_ll = _getLL(0, header.unk_id);
+				unk_ll = getLL(0, header.unk_id);
 				bos_node_idx = 0;
-				_progress(bos_node_idx, header.bos_id);
+				progress(bos_node_idx, header.bos_id);
 
 				for (size_t i = 0; i < node_data[bos_node_idx].num_nexts; ++i)
 				{
@@ -405,14 +251,172 @@ namespace kiwi
 				}
 			}
 
+			template<ArchType arch>
+			float getLLOpt(ptrdiff_t node_idx, KeyType next) const
+			{
+				DiffType v;
+				auto* node = &node_data[node_idx];
+				if (node_idx == 0)
+				{
+					v = all_value_data[next];
+					if (v == 0) return unk_ll;
+				}
+				/*else if (node_idx == bos_node_idx)
+				{
+					v = all_value_data[next + getHeader().vocab_size];
+					if (v == 0) return gamma_data[node_idx] + _getLL(0, next);
+				}*/
+				else
+				{
+					if (!utils::bsearch<arch>(
+						&key_data[node->next_offset],
+						&value_data[node->next_offset],
+						node->num_nexts, next, v
+						))
+					{
+						// cannot find the next node
+						if (node->lower == 0) return unk_ll;
+						return gamma_data[node_idx] + getLLOpt<arch>(node_idx + node->lower, next);
+					}
+				}
+
+				// non-leaf node
+				if (v > 0)
+				{
+					return ll_data[node_idx + v];
+				}
+				// leaf node
+				else
+				{
+					return reinterpret_cast<const float&>(v);
+				}
+			}
+
+			template<ArchType arch>
+			float progressOpt(ptrdiff_t& node_idx, KeyType next) const
+			{
+				float acc = 0;
+				while (1)
+				{
+					DiffType v;
+					auto* node = &node_data[node_idx];
+					auto* keys = &key_data[node->next_offset];
+					auto* values = &value_data[node->next_offset];
+					if (node_idx == 0)
+					{
+						v = all_value_data[next];
+						if (v == 0) return acc + unk_ll;
+					}
+					/*else if (node_idx == bos_node_idx)
+					{
+						v = all_value_data[next + getHeader().vocab_size];
+						if (v == 0)
+						{
+							acc += gamma_data[node_idx];
+							node_idx += node->lower;
+							continue;
+						}
+					}*/
+					else
+					{
+						if (!utils::bsearch<arch>(
+							keys,
+							values,
+							node->num_nexts, next, v
+							))
+						{
+							// cannot find the next node
+							if (node->lower == 0)
+							{
+								node_idx = 0;
+								return acc + unk_ll;
+							}
+							acc += gamma_data[node_idx];
+							node_idx += node->lower;
+							continue;
+						}
+					}
+
+					if (!htx_data)
+					{
+						// non-leaf node
+						if (v > 0)
+						{
+							node_idx += v;
+							return acc + ll_data[node_idx];
+						}
+						// leaf node
+						else
+						{
+							while (node->lower)
+							{
+								node += node->lower;
+								DiffType lv;
+								if (utils::bsearch<arch>(
+									&key_data[node->next_offset],
+									&value_data[node->next_offset],
+									node->num_nexts, next, lv
+									))
+								{
+									if (lv > 0)
+									{
+										node += lv;
+										node_idx = node - &node_data[0];
+										return acc + reinterpret_cast<const float&>(v);
+									}
+								}
+							}
+							node_idx = 0;
+							return acc + reinterpret_cast<const float&>(v);
+						}
+					}
+					else
+					{
+						auto ret = acc + reinterpret_cast<const float&>(v);
+						next = htx_data[next];
+						utils::bsearch<arch>(keys, values, node->num_nexts, next, v);
+						// non-leaf node
+						if (v > 0)
+						{
+							node_idx += v;
+							return ret;
+						}
+						// leaf node
+						else
+						{
+							while (node->lower)
+							{
+								node += node->lower;
+								DiffType lv;
+								if (utils::bsearch<arch>(
+									&key_data[node->next_offset],
+									&value_data[node->next_offset],
+									node->num_nexts, next, lv
+									))
+								{
+									if (lv > 0)
+									{
+										node += lv;
+										node_idx = node - &node_data[0];
+										return ret;
+									}
+								}
+							}
+							node_idx = 0;
+							return ret;
+						}
+					}
+				}
+			}
+
 			float getLL(ptrdiff_t node_idx, size_t next) const final
 			{
-				return _getLL(node_idx, next);
+				return getLLOpt<ArchType::balanced>(node_idx, next);
 			}
 
 			float progress(ptrdiff_t& node_idx, size_t next) const final
 			{
-				return _progress(node_idx, next);
+				return progressOpt<ArchType::balanced>(node_idx, next);
 			}
 
 			const float* getLLBuf() const final
@@ -479,8 +483,8 @@ namespace kiwi
 
 			std::vector<float> allNextLL(ptrdiff_t node_idx, std::vector<ptrdiff_t>& next_node_idx) const final
 			{
-				std::vector<float> ret(getHeader().vocab_size, -INFINITY);
-				next_node_idx.resize(getHeader().vocab_size);
+				std::vector<float> ret((size_t)getHeader().vocab_size, -INFINITY);
+				next_node_idx.resize((size_t)getHeader().vocab_size);
 				auto* node = &node_data[node_idx];
 				auto* keys = &key_data[node->next_offset];
 				auto* values = &value_data[node->next_offset];
@@ -754,7 +758,7 @@ namespace kiwi
 		}
 
 		template<ptrdiff_t ...idx>
-		void quantize_dispatch(detail::seq<idx...>, size_t bits,
+		void quantizeDispatch(tp::seq<idx...>, size_t bits,
 			const std::vector<float>& ll_table, const std::vector<float>& gamma_table,
 			const std::vector<float>& ll, const std::vector<float>& leaf_ll,
 			const std::vector<float>& gamma,
@@ -918,7 +922,7 @@ namespace kiwi
 				std::sort(sorted_gamma.begin(), sorted_gamma.end());
 				detail::nuquant(gamma_table.data(), sorted_gamma, quantize_size);
 
-				quantize_dispatch(detail::gen_seq<16>{}, quantized,
+				quantizeDispatch(tp::gen_seq<16>{}, quantized,
 					ll_table, gamma_table,
 					ll, leaf_ll, gamma, 
 					llq, gammaq

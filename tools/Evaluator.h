@@ -15,17 +15,22 @@ public:
 		float score;
 		void writeResult(std::ostream& out) const;
 	};
-protected:
-	std::vector<TestResult> errors;
-	size_t totalCount = 0;
-	double totalScore = 0;
-	size_t microCount = 0;
-	size_t microCorrect = 0;
+	
+	struct Score
+	{
+		double micro = 0;
+		double macro = 0;
+		size_t totalCount = 0;
+	};
+
+private:
+	const kiwi::Kiwi* kw = nullptr;
+	size_t topN = 3;
+	std::vector<TestResult> testsets, errors;
 public:
-	Evaluator(const std::string& testSetFile, kiwi::Kiwi* kw, size_t topN = 3);
-	double getMacroScore() const;
-	double getMicroScore() const;
+	Evaluator(const std::string& testSetFile, const kiwi::Kiwi* _kw, size_t topN = 3);
+	void run();
+	Score evaluate();
 	const std::vector<TestResult>& getErrors() const { return errors; }
-	size_t getTotalCount() const { return totalCount; }
 };
 

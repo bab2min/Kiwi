@@ -20,7 +20,7 @@ jobs:
     - name: Update CMake
       run: /opt/python/cp36-cp36m/bin/pip install cmake
     - name: Configure Build
-      run: mkdir build && cd build && /opt/python/cp36-cp36m/bin/cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_USE_MIMALLOC=0 ..
+      run: mkdir build && cd build && /opt/python/cp36-cp36m/bin/cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_USE_MIMALLOC=0 -DKIWI_USE_CPUINFO=0 ..
     - name: Build
       run: cd build && make
     - run: tar -zcvf asset.tgz build/*kiwi* build/test/*kiwi*
@@ -39,6 +39,54 @@ jobs:
     - uses: actions/download-artifact@v2
       with:
         name: asset_Centos5
+        path: arts
+    - name: Get release
+      id: get_release
+      uses: bruceadams/get-release@v1.2.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+    - name: Upload release binary
+      uses: actions/upload-release-asset@v1.0.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+      with:
+        upload_url: ${{ steps.get_release.outputs.upload_url }}
+        asset_path: arts/asset.tgz
+        asset_name: kiwi_lnx_centos5_x86_64_${{ steps.get_release.outputs.tag_name }}.tgz
+        asset_content_type: application/octet-stream
+
+  build-centos6:
+    name: Centos6
+    runs-on: ubuntu-latest
+    container:
+      image: docker://hoshizora/manylinux2010_x86_64
+
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        submodules: true
+    - name: Update CMake
+      run: /opt/python/cp36-cp36m/bin/pip install cmake
+    - name: Configure Build
+      run: mkdir build && cd build && /opt/python/cp36-cp36m/bin/cmake -DCMAKE_BUILD_TYPE=Release ..
+    - name: Build
+      run: cd build && make
+    - run: tar -zcvf asset.tgz build/*kiwi* build/test/*kiwi*
+    - name: Archive binaries
+      uses: actions/upload-artifact@v1
+      with:
+        name: asset_Centos6
+        path: asset.tgz
+
+  upload-asset-from-centos:
+    name: Upload asset from Centos6
+    needs: build-centos6
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/download-artifact@v2
+      with:
+        name: asset_Centos6
         path: arts
     - name: Get release
       id: get_release

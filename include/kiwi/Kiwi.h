@@ -52,6 +52,9 @@ namespace kiwi
 
 		const Morpheme* getDefaultMorpheme(POSTag tag) const;
 
+		void* dfSplitByTrie = nullptr;
+		void* dfFindBestPath = nullptr;
+
 	public:
 		/**
 		 * @brief 빈 Kiwi 객체를 생성한다.
@@ -59,7 +62,7 @@ namespace kiwi
 		 * @note 이 생성자는 기본 생성자로 이를 통해 생성된 객체는 바로 형태소 분석에 사용할 수 없다.
 		 * kiwi::KiwiBuilder 를 통해 생성된 객체만이 형태소 분석에 사용할 수 있다.
 		 */
-		Kiwi();
+		Kiwi(ArchType arch = ArchType::default_, size_t lmKeySize = 2);
 
 		~Kiwi();
 
@@ -353,7 +356,7 @@ namespace kiwi
 		 * 
 		 * @return 형태소 분석 준비가 완료된 Kiwi의 객체.
 		 */
-		Kiwi build() const;
+		Kiwi build(ArchType arch = ArchType::default_) const;
 
 		const lm::KnLangModelBase* getLangModel() const
 		{

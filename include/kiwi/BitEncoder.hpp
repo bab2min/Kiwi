@@ -3,110 +3,17 @@
 #include <vector>
 #include <array>
 #include "BitUtils.h"
+#include "TemplateUtils.hpp"
 
 namespace kiwi
 {
 	namespace lm
 	{
-		namespace detail
-		{
-			template<size_t a, size_t b> 
-			struct gcd
-			{
-				static constexpr size_t value = gcd<b, a% b>::value;
-			};
-
-			template<size_t a>
-			struct gcd<a, 0>
-			{
-				static constexpr size_t value = a;
-			};
-
-			template<size_t a, size_t b>
-			struct lcm
-			{
-				static constexpr size_t value = a * b / gcd<a, b>::value;
-			};
-
-			template<class _T> using Invoke = typename _T::type;
-
-			template<ptrdiff_t...> struct seq { using type = seq; };
-
-			template<class _S1, class _S2> struct concat;
-
-			template<ptrdiff_t... _i1, ptrdiff_t... _i2>
-			struct concat<seq<_i1...>, seq<_i2...>>
-				: seq<_i1..., (sizeof...(_i1) + _i2)...> {};
-
-			template<class _S1, class _S2>
-			using Concat = Invoke<concat<_S1, _S2>>;
-
-			template<size_t _n> struct gen_seq;
-			template<size_t _n> using GenSeq = Invoke<gen_seq<_n>>;
-
-			template<size_t _n>
-			struct gen_seq : Concat<GenSeq<_n / 2>, GenSeq<_n - _n / 2>> {};
-
-			template<> struct gen_seq<0> : seq<> {};
-			template<> struct gen_seq<1> : seq<0> {};
-
-			template<class Ty>
-			struct SeqSize;
-
-			template<ptrdiff_t ..._i>
-			struct SeqSize<seq<_i...>>
-			{
-				static constexpr size_t value = sizeof...(_i);
-			};
-
-			template<size_t n, class Seq, ptrdiff_t ..._j>
-			struct slice;
-
-			template<size_t n, class Seq, ptrdiff_t ..._j>
-			using Slice = Invoke<slice<n, Seq, _j...>>;
-
-			template<size_t n, ptrdiff_t first, ptrdiff_t ..._i, ptrdiff_t ..._j>
-			struct slice<n, seq<first, _i...>, _j...>
-			{
-				using type = Slice<n - 1, seq<_i...>, _j..., first>;
-			};
-
-			template<ptrdiff_t first, ptrdiff_t ..._i, ptrdiff_t ..._j>
-			struct slice<0, seq<first, _i...>, _j...>
-			{
-				using type = seq<_j...>;
-			};
-
-			template<ptrdiff_t ..._j>
-			struct slice<0, seq<>, _j...>
-			{
-				using type = seq<_j...>;
-			};
-
-			template<size_t n, class Seq, ptrdiff_t ...j>
-			struct get;
-
-			template<size_t n, ptrdiff_t first, ptrdiff_t ..._i>
-			struct get<n, seq<first, _i...>> : get<n - 1, seq<_i...>>
-			{
-			};
-
-			template<ptrdiff_t first, ptrdiff_t ..._i>
-			struct get<0, seq<first, _i...>> : std::integral_constant<ptrdiff_t, first>
-			{
-			};
-
-			template<>
-			struct get<0, seq<>>
-			{
-			};
-		}
-
 		template<class Stream, size_t bits, class Packet = uint8_t>
 		class FixedLengthEncoder
 		{
 			static constexpr size_t packetBits = sizeof(Packet) * 8;
-			static constexpr size_t bufSize = bits / detail::gcd<bits, packetBits>::value;
+			static constexpr size_t bufSize = bits / tp::gcd<bits, packetBits>::value;
 			static constexpr size_t numPhases = bufSize * packetBits / bits;
 			static constexpr size_t mask = (1 << bits) - 1;
 			std::array<Packet, bufSize> buf = { {0,} };
@@ -146,7 +53,7 @@ namespace kiwi
 			}
 
 			template<ptrdiff_t ...indices>
-			void writeDispatch(size_t i, detail::seq<indices...>)
+			void writeDispatch(size_t i, tp::seq<indices...>)
 			{
 				using WriteFn = void(FixedLengthEncoder::*)(size_t);
 
@@ -193,7 +100,7 @@ namespace kiwi
 			}
 
 			template<ptrdiff_t ...indices>
-			size_t readDispatch(detail::seq<indices...>)
+			size_t readDispatch(tp::seq<indices...>)
 			{
 				using ReadFn = size_t(FixedLengthEncoder::*)();
 
@@ -213,12 +120,12 @@ namespace kiwi
 
 			void write(size_t i)
 			{
-				return writeDispatch(i & mask, detail::gen_seq<numPhases>{});
+				return writeDispatch(i & mask, tp::gen_seq<numPhases>{});
 			}
 
 			size_t read()
 			{
-				return readDispatch(detail::gen_seq<numPhases>{});
+				return readDispatch(tp::gen_seq<numPhases>{});
 			}
 
 			void flush()
@@ -233,7 +140,7 @@ namespace kiwi
 		};
 
 		template<ptrdiff_t ...s>
-		using BitSeq = detail::seq<s...>;
+		using BitSeq = tp::seq<s...>;
 
 		namespace detail
 		{
@@ -422,12 +329,12 @@ namespace kiwi
 			template<ptrdiff_t widthIdx>
 			size_t readV()
 			{
-				size_t i = readBits(detail::get<widthIdx, BitSeqs>::value);
-				return i + decltype(detail::makeVLTransform<VariableLengthEncoder>(*this, detail::Slice<widthIdx, BitSeqs>{}))::bias;
+				size_t i = readBits(tp::get<widthIdx, BitSeqs>::value);
+				return i + decltype(detail::makeVLTransform<VariableLengthEncoder>(*this, tp::Slice<widthIdx, BitSeqs>{}))::bias;
 			}
 
 			template<ptrdiff_t ...indices>
-			size_t readVDispatch(size_t width, detail::seq<indices...>)
+			size_t readVDispatch(size_t width, tp::seq<indices...>)
 			{
 				using ReadFn = size_t(VariableLengthEncoder::*)();
 
@@ -455,11 +362,11 @@ namespace kiwi
 
 			size_t read()
 			{
-				constexpr size_t maxPrefixWidth = detail::SeqSize<BitSeqs>::value - 1;
+				constexpr size_t maxPrefixWidth = tp::SeqSize<BitSeqs>::value - 1;
 				size_t i = readBits(maxPrefixWidth);
 				size_t prefixWidth = detail::getPrefixWidth(i);
 				bitPos -= maxPrefixWidth - std::min(prefixWidth + 1, maxPrefixWidth);
-				return readVDispatch(prefixWidth, detail::gen_seq<detail::SeqSize<BitSeqs>::value>{});
+				return readVDispatch(prefixWidth, tp::gen_seq<tp::SeqSize<BitSeqs>::value>{});
 			}
 
 			void flush(bool full = false)

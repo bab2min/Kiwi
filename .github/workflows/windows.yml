@@ -29,11 +29,9 @@ jobs:
         cmakeBuildType: Release
         buildWithCMake: true
         #cmakeGenerator: VS16Win${{ matrix.arch }}
-        cmakeAppendedArgs: -G"Visual Studio 16 2019" -A${{ matrix.arch }} -DKIWI_STATIC_WITHOUT_MT=1
+        cmakeAppendedArgs: -G"Visual Studio 16 2019" -A${{ matrix.arch }}
         buildWithCMakeArgs: --config Release
         buildDirectory: build
-    - name: Run Unit Test
-      run: .\build\test\Release\kiwi-test.exe
     - name: Run Evaluator
       run: |
         mkdir eval_results
@@ -46,3 +44,5 @@ jobs:
           build\Release\*kiwi*
           build\test\Release\*kiwi*
           eval_results\*.txt
+    - name: Run Unit Test
+      run: .\build\test\Release\kiwi-test.exe
