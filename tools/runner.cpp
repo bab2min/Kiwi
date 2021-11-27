@@ -42,7 +42,7 @@ int run(const string& modelPath, bool buildFromRaw, bool benchmark, const string
 			cout << "Loading Time : " << timer.getElapsed() << " ms" << endl;
 			cout << "ArchType : " << archToStr(kw.archType()) << endl;
 			cout << "LM Size : " << (kw.getLangModel()->getMemory().size() / 1024. / 1024.) << " MB" << endl;
-			cout << "Mem Usage : " << (tutils::getCurrentPhysicalMemoryUsage() / 1024.) << " MB\n" << endl;
+			cout << "Mem Usage : " << (tutils::getCurrentPhysicalMemoryUsage() / 1024.) << " MB" << endl;
 		}
 
 		ostream* out = &cout;
@@ -85,6 +85,7 @@ int run(const string& modelPath, bool buildFromRaw, bool benchmark, const string
 			cout << "Elapsed per line: " << tm / lines << " ms" << endl;
 			cout << "Elapsed per KB: " << tm / (bytes / 1024.) << " ms" << endl;
 			cout << "KB per second: " << (bytes / 1024.) / (tm / 1000) << " KB" << endl;
+			cout << "====================\n" << endl;
 		}
 		return 0;
 	}
