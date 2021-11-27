@@ -21,10 +21,12 @@ void printResult(Kiwi& kw, const string& line, int topn, ostream& out)
 	if (topn > 1) out << endl;
 }
 
-int run(const string& modelPath, bool buildFromRaw, const string& output, const string& user, int topn, const vector<string>& input)
+int run(const string& modelPath, bool buildFromRaw, bool benchmark, const string& output, const string& user, int topn, const vector<string>& input)
 {
 	try
 	{
+		tutils::Timer timer;
+		size_t lines = 0, bytes = 0;
 		Kiwi kw;
 		if (buildFromRaw)
 		{
@@ -33,6 +35,14 @@ int run(const string& modelPath, bool buildFromRaw, const string& output, const 
 		else
 		{
 			kw = KiwiBuilder{ modelPath, 1 }.build();
+		}
+
+		if (benchmark)
+		{
+			cout << "Loading Time : " << timer.getElapsed() << " ms" << endl;
+			cout << "ArchType : " << archToStr(kw.archType()) << endl;
+			cout << "LM Size : " << (kw.getLangModel()->getMemory().size() / 1024. / 1024.) << " MB" << endl;
+			cout << "Mem Usage : " << (tutils::getCurrentPhysicalMemoryUsage() / 1024.) << " MB\n" << endl;
 		}
 
 		ostream* out = &cout;
@@ -45,21 +55,36 @@ int run(const string& modelPath, bool buildFromRaw, const string& output, const 
 
 		if (input.empty())
 		{
+			timer.reset();
 			for (string line; getline(cin, line);)
 			{
 				printResult(kw, line, topn, *out);
+				++lines;
+				bytes += line.size();
 			}
 		}
 		else
 		{
+			timer.reset();
 			for (auto& f : input)
 			{
 				ifstream in{ f };
 				for (string line; getline(in, line);)
 				{
 					printResult(kw, line, topn, *out);
+					++lines;
+					bytes += line.size();
 				}
 			}
+		}
+
+		if (benchmark)
+		{
+			double tm = timer.getElapsed();
+			cout << "Total: " << tm << " ms, " << lines << " lines, " << (bytes / 1024.) << " KB" << endl;
+			cout << "Elapsed per line: " << tm / lines << " ms" << endl;
+			cout << "Elapsed per KB: " << tm / (bytes / 1024.) << " ms" << endl;
+			cout << "KB per second: " << (bytes / 1024.) / (tm / 1000) << " KB" << endl;
 		}
 		return 0;
 	}
@@ -80,6 +105,7 @@ int main(int argc, const char* argv[])
 
 	ValueArg<string> model{ "m", "model", "Kiwi model path", true, "", "string" };
 	SwitchArg build{ "b", "build", "build model from raw data" };
+	SwitchArg benchmark{ "e", "benchmark", "benchmark performance" };
 	ValueArg<string> output{ "o", "output", "output file path", false, "", "string" };
 	ValueArg<string> user{ "u", "user", "user dictionary path", false, "", "string" };
 	ValueArg<int> topn{ "n", "topn", "top-n of result", false, 1, "int > 0" };
@@ -87,6 +113,7 @@ int main(int argc, const char* argv[])
 
 	cmd.add(model);
 	cmd.add(build);
+	cmd.add(benchmark);
 	cmd.add(output);
 	cmd.add(user);
 	cmd.add(topn);
@@ -101,6 +128,6 @@ int main(int argc, const char* argv[])
 		cerr << "error: " << e.error() << " for arg " << e.argId() << endl;
 		return -1;
 	}
-	return run(model, build, output, user, topn, files.getValue());
+	return run(model, build, benchmark, output, user, topn, files.getValue());
 }
 
