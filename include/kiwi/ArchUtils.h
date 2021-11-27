@@ -18,4 +18,6 @@ namespace kiwi
 	ArchType getBestArch();
 
 	ArchType getSelectedArch(ArchType arch);
+
+	const char* archToStr(ArchType arch);
 }
