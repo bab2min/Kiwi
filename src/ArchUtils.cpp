@@ -94,3 +94,11 @@ ArchType kiwi::getSelectedArch(ArchType arch)
 	arch = testArchSet(arch, best);
 	return arch;
 }
+
+const char* kiwi::archToStr(ArchType arch)
+{
+	if (arch <= ArchType::last) 
+		return archNames[static_cast<size_t>(arch)];
+
+	return "unknown";
+}

@@ -52,6 +52,7 @@ namespace kiwi
 
 		const Morpheme* getDefaultMorpheme(POSTag tag) const;
 
+		ArchType selectedArch = ArchType::none;
 		void* dfSplitByTrie = nullptr;
 		void* dfFindBestPath = nullptr;
 
@@ -83,6 +84,8 @@ namespace kiwi
 		 * `kiwi::KiwiBuilder`를 통해 생성된 경우 `ready() == true`이다.
 		 */
 		bool ready() const { return !forms.empty(); }
+
+		ArchType archType() const { return selectedArch; }
 
 		/**
 		 * @brief 

@@ -43,23 +43,23 @@ namespace kiwi
 
 	Kiwi::Kiwi(ArchType arch, size_t lmKeySize)
 	{
-		arch = getSelectedArch(arch);
-		dfSplitByTrie = (void*)getSplitByTrieFn(arch);
+		selectedArch = getSelectedArch(arch);
+		dfSplitByTrie = (void*)getSplitByTrieFn(selectedArch);
 		
 		auto indexHolder = tp::GenSeq<static_cast<int>(ArchType::last)>{};
 		switch (lmKeySize)
 		{
 		case 1:
-			dfFindBestPath = (void*)getFindBestPathFn<uint8_t>(arch, indexHolder);
+			dfFindBestPath = (void*)getFindBestPathFn<uint8_t>(selectedArch, indexHolder);
 			break;
 		case 2:
-			dfFindBestPath = (void*)getFindBestPathFn<uint16_t>(arch, indexHolder);
+			dfFindBestPath = (void*)getFindBestPathFn<uint16_t>(selectedArch, indexHolder);
 			break;
 		case 4:
-			dfFindBestPath = (void*)getFindBestPathFn<uint32_t>(arch, indexHolder);
+			dfFindBestPath = (void*)getFindBestPathFn<uint32_t>(selectedArch, indexHolder);
 			break;
 		case 8:
-			dfFindBestPath = (void*)getFindBestPathFn<uint64_t>(arch, indexHolder);
+			dfFindBestPath = (void*)getFindBestPathFn<uint64_t>(selectedArch, indexHolder);
 			break;
 		default:
 			throw Exception{ "Wrong `lmKeySize`" };
