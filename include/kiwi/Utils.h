@@ -114,6 +114,7 @@ namespace kiwi
 		return os << utf16To8({ str.begin(), str.end() });
 	}
 
+	bool isClosingPair(char16_t c);
 	POSTag identifySpecialChr(kchar_t chr);
 
 	inline bool isspace(char16_t c)

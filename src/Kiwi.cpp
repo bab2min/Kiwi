@@ -132,8 +132,11 @@ namespace kiwi
 				case POSTag::so:
 				case POSTag::sw:
 				case POSTag::sh:
+				case POSTag::sp:
 				case POSTag::sf:
 					break;
+				case POSTag::ss:
+					if (isClosingPair(t.str[0])) break;
 				default:
 					sentPos++;
 					state = State::none;
@@ -146,7 +149,10 @@ namespace kiwi
 				case POSTag::so:
 				case POSTag::sw:
 				case POSTag::sh:
+				case POSTag::sp:
 					break;
+				case POSTag::ss:
+					if (isClosingPair(t.str[0])) break;
 				default:
 					sentPos++;
 					state = State::none;

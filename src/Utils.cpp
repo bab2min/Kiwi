@@ -246,18 +246,34 @@ namespace kiwi
 		case '.':
 		case '!':
 		case '?':
+		case 0x2047:
+		case 0x2048:
+		case 0x2049:
+		case 0x3002:
+		case 0xff01:
+		case 0xff0e:
+		case 0xff1f:
+		case 0xff61:
 			return POSTag::sf;
 		case '-':
 		case '~':
 		case 0x223c:
+		case 0x301c:
+		case 0xff5e:
 			return POSTag::so;
 		case 0x2026:
+		case 0x205d:
 			return POSTag::se;
 		case ',':
 		case ';':
 		case ':':
 		case '/':
 		case 0xb7:
+		case 0x3001:
+		case 0xff0c:
+		case 0xff1a:
+		case 0xff1b:
+		case 0xff64:
 			return POSTag::sp;
 		case '"':
 		case '\'':
@@ -290,7 +306,25 @@ namespace kiwi
 		case 0x3011:
 		case 0x3014:
 		case 0x3015:
+		case 0x3016:
+		case 0x3017:
+		case 0x3018:
+		case 0x3019:
+		case 0x301a:
+		case 0x301b:
+		case 0xff08:
+		case 0xff09:
 		case 0xff0d:
+		case 0xff1c:
+		case 0xff1e:
+		case 0xff3b:
+		case 0xff3d:
+		case 0xff5b:
+		case 0xff5d:
+		case 0xff5f:
+		case 0xff60:
+		case 0xff62:
+		case 0xff63:
 			return POSTag::ss;
 		}
 		if ((0x2e80 <= chr && chr <= 0x2e99) ||
@@ -305,6 +339,35 @@ namespace kiwi
 			(0xfa70 <= chr && chr <= 0xfad9)) return POSTag::sh;
 		if (0xd800 <= chr && chr <= 0xdfff) return POSTag::sh;
 		return POSTag::sw;
+	}
+
+	bool isClosingPair(char16_t c)
+	{
+		switch (c)
+		{
+		case ')':
+		case '>':
+		case ']':
+		case '}':
+		case 0x2019:
+		case 0x201d:
+		case 0x3009:
+		case 0x300b:
+		case 0x300d:
+		case 0x300f:
+		case 0x3011:
+		case 0x3015:
+		case 0x3017:
+		case 0x3019:
+		case 0x301b:
+		case 0xff09:
+		case 0xff1e:
+		case 0xff5d:
+		case 0xff60:
+		case 0xff63:
+			return true;
+		}
+		return false;
 	}
 
 	POSTag toPOSTag(const std::u16string& tagStr)
