@@ -16,8 +16,26 @@ struct ResultBuffer
 	vector<string> stringBuf;
 };
 
-using TResult = pair<vector<TokenResult>, ResultBuffer>;
-using EResult = pair<vector<WordInfo>, ResultBuffer>;
+//using TResult = pair<vector<TokenResult>, ResultBuffer>;
+//using EResult = pair<vector<WordInfo>, ResultBuffer>;
+//using SResult = vector<pair<size_t, size_t>>;
+
+struct kiwi_res : public pair<vector<TokenResult>, ResultBuffer>
+{
+	using pair<vector<TokenResult>, ResultBuffer>::pair;
+};
+
+struct kiwi_ws : public pair<vector<WordInfo>, ResultBuffer>
+{
+	using pair<vector<WordInfo>, ResultBuffer>::pair;
+};
+
+struct kiwi_ss : public vector<pair<size_t, size_t>>
+{
+	kiwi_ss(vector<pair<size_t, size_t>>&& o) : vector{ move(o) }
+	{
+	}
+};
 
 thread_local exception_ptr currentError;
 
@@ -123,7 +141,7 @@ kiwi_ws_h kiwi_builder_extract_words(kiwi_builder_h handle, kiwi_reader_t reader
 			};
 		}, minCnt, maxWordLen, minScore, posThreshold);
 
-		return (kiwi_ws_h)new EResult{ move(res), {} };
+		return new kiwi_ws{ move(res), {} };
 	}
 	catch (...)
 	{
@@ -152,7 +170,7 @@ kiwi_ws_h kiwi_builder_extract_add_words(kiwi_builder_h handle, kiwi_reader_t re
 				return utf8To16(buf);
 			};
 		}, minCnt, maxWordLen, minScore, posThreshold);
-		return (kiwi_ws_h)new EResult{ move(res),{} };
+		return new kiwi_ws{ move(res), {} };
 	}
 	catch (...)
 	{
@@ -182,7 +200,7 @@ kiwi_ws_h kiwi_builder_extract_words_w(kiwi_builder_h handle, kiwi_reader_w_t re
 			};
 		}, minCnt, maxWordLen, minScore, posThreshold);
 
-		return (kiwi_ws_h)new EResult{ move(res),{} };
+		return new kiwi_ws{ move(res), {} };
 	}
 	catch (...)
 	{
@@ -211,7 +229,7 @@ kiwi_ws_h kiwi_builder_extract_add_words_w(kiwi_builder_h handle, kiwi_reader_w_
 				return buf;
 			};
 		}, minCnt, maxWordLen, minScore, posThreshold);
-		return (kiwi_ws_h)new EResult{ move(res),{} };
+		return new kiwi_ws{ move(res), {} };
 	}
 	catch (...)
 	{
@@ -283,8 +301,7 @@ kiwi_res_h kiwi_analyze_w(kiwi_h handle, const kchar16_t * text, int topN, int m
 	Kiwi* kiwi = (Kiwi*)handle;
 	try
 	{
-		auto result = new TResult{ kiwi->analyze((const char16_t*)text, topN, (Match)matchOptions), {} };
-		return (kiwi_res_h)result;
+		return new kiwi_res{ kiwi->analyze((const char16_t*)text, topN, (Match)matchOptions), {} };
 	}
 	catch (...)
 	{
@@ -299,8 +316,7 @@ kiwi_res_h kiwi_analyze(kiwi_h handle, const char * text, int topN, int matchOpt
 	Kiwi* kiwi = (Kiwi*)handle;
 	try
 	{
-		auto result = new TResult{ kiwi->analyze(text, topN, (Match)matchOptions),{} };
-		return (kiwi_res_h)result;
+		return new kiwi_res{ kiwi->analyze(text, topN, (Match)matchOptions),{} };
 	}
 	catch (...)
 	{
@@ -325,8 +341,8 @@ int kiwi_analyze_mw(kiwi_h handle, kiwi_reader_w_t reader, kiwi_receiver_t recei
 			return buf;
 		}, [&](vector<TokenResult>&& res)
 		{
-			auto result = new TResult{ move(res), {} };
-			(*receiver)(receiver_idx++, (kiwi_res_h)result, userData);
+			auto result = new kiwi_res{ move(res), {} };
+			(*receiver)(receiver_idx++, result, userData);
 		}, (Match)matchOptions);
 		return reader_idx;
 	}
@@ -353,8 +369,8 @@ int kiwi_analyze_m(kiwi_h handle, kiwi_reader_t reader, kiwi_receiver_t receiver
 			return utf8To16(buf);
 		}, [&](vector<TokenResult>&& res)
 		{
-			auto result = new TResult{ move(res),{} };
-			(*receiver)(receiver_idx++, (kiwi_res_h)result, userData);
+			auto result = new kiwi_res{ move(res),{} };
+			(*receiver)(receiver_idx++, result, userData);
 		}, (Match)matchOptions);
 		return reader_idx;
 	}
@@ -364,6 +380,45 @@ int kiwi_analyze_m(kiwi_h handle, kiwi_reader_t reader, kiwi_receiver_t receiver
 		return KIWIERR_FAIL;
 	}
 }
+
+kiwi_ss_h kiwi_split_into_sentences_w(kiwi_h handle, const kchar16_t* text, int matchOptions, kiwi_res_h* tokenized_res)
+{
+	if (!handle) return nullptr;
+	Kiwi* kiwi = (Kiwi*)handle;
+	try
+	{
+		vector<TokenResult> tokenized;
+		if (tokenized_res) tokenized.resize(1);
+		auto sent_ranges = kiwi->splitIntoSentences((const char16_t*)text, (Match)matchOptions, &tokenized[0]);
+		if (tokenized_res) *tokenized_res = new kiwi_res{ move(tokenized), {} };
+		return new kiwi_ss{ move(sent_ranges) };
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return nullptr;
+	}
+}
+
+kiwi_ss_h kiwi_split_into_sentences(kiwi_h handle, const char* text, int matchOptions, kiwi_res_h* tokenized_res)
+{
+	if (!handle) return nullptr;
+	Kiwi* kiwi = (Kiwi*)handle;
+	try
+	{
+		vector<TokenResult> tokenized;
+		if (tokenized_res) tokenized.resize(1);
+		auto sent_ranges = kiwi->splitIntoSentences(text, (Match)matchOptions, &tokenized[0]);
+		if (tokenized_res) *tokenized_res = new kiwi_res{ move(tokenized), {} };
+		return new kiwi_ss{ move(sent_ranges) };
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return nullptr;
+	}
+}
+
 
 int kiwi_close(kiwi_h handle)
 {
@@ -386,8 +441,7 @@ int kiwi_res_size(kiwi_res_h result)
 	if (!result) return KIWIERR_INVALID_HANDLE;
 	try
 	{
-		auto k = (TResult*)result;
-		return k->first.size();
+		return result->first.size();
 	}
 	catch (...)
 	{
@@ -401,9 +455,8 @@ float kiwi_res_prob(kiwi_res_h result, int index)
 	if (!result) return 0;
 	try
 	{
-		auto k = (TResult*)result;
-		if (index < 0 || index >= k->first.size()) return 0;
-		return k->first[index].second;
+		if (index < 0 || index >= result->first.size()) return 0;
+		return result->first[index].second;
 	}
 	catch (...)
 	{
@@ -417,9 +470,8 @@ int kiwi_res_word_num(kiwi_res_h result, int index)
 	if (!result) return KIWIERR_INVALID_HANDLE;
 	try
 	{
-		auto k = (TResult*)result;
-		if (index < 0 || index >= k->first.size()) return KIWIERR_INVALID_INDEX;
-		return k->first[index].first.size();
+		if (index < 0 || index >= result->first.size()) return KIWIERR_INVALID_INDEX;
+		return result->first[index].first.size();
 	}
 	catch (...)
 	{
@@ -433,9 +485,8 @@ const kchar16_t * kiwi_res_form_w(kiwi_res_h result, int index, int num)
 	if (!result) return nullptr;
 	try
 	{
-		auto k = (TResult*)result;
-		if (index < 0 || index >= k->first.size() || num < 0 || num >= k->first[index].first.size()) return nullptr;
-		return (const kchar16_t*)k->first[index].first[num].str.c_str();
+		if (index < 0 || index >= result->first.size() || num < 0 || num >= result->first[index].first.size()) return nullptr;
+		return (const kchar16_t*)result->first[index].first[num].str.c_str();
 	}
 	catch (...)
 	{
@@ -449,9 +500,8 @@ const kchar16_t * kiwi_res_tag_w(kiwi_res_h result, int index, int num)
 	if (!result) return nullptr;
 	try
 	{
-		auto k = (TResult*)result;
-		if (index < 0 || index >= k->first.size() || num < 0 || num >= k->first[index].first.size()) return nullptr;
-		return (const kchar16_t*)tagToKString(k->first[index].first[num].tag);
+		if (index < 0 || index >= result->first.size() || num < 0 || num >= result->first[index].first.size()) return nullptr;
+		return (const kchar16_t*)tagToKString(result->first[index].first[num].tag);
 	}
 	catch (...)
 	{
@@ -465,10 +515,9 @@ const char * kiwi_res_form(kiwi_res_h result, int index, int num)
 	if (!result) return nullptr;
 	try
 	{
-		auto k = (TResult*)result;
-		if (index < 0 || index >= k->first.size() || num < 0 || num >= k->first[index].first.size()) return nullptr;
-		k->second.stringBuf.emplace_back(utf16To8(k->first[index].first[num].str));
-		return k->second.stringBuf.back().c_str();
+		if (index < 0 || index >= result->first.size() || num < 0 || num >= result->first[index].first.size()) return nullptr;
+		result->second.stringBuf.emplace_back(utf16To8(result->first[index].first[num].str));
+		return result->second.stringBuf.back().c_str();
 	}
 	catch (...)
 	{
@@ -482,9 +531,8 @@ const char * kiwi_res_tag(kiwi_res_h result, int index, int num)
 	if (!result) return nullptr;
 	try
 	{
-		auto k = (TResult*)result;
-		if (index < 0 || index >= k->first.size() || num < 0 || num >= k->first[index].first.size()) return nullptr;
-		return tagToString(k->first[index].first[num].tag);
+		if (index < 0 || index >= result->first.size() || num < 0 || num >= result->first[index].first.size()) return nullptr;
+		return tagToString(result->first[index].first[num].tag);
 	}
 	catch (...)
 	{
@@ -498,9 +546,8 @@ int kiwi_res_position(kiwi_res_h result, int index, int num)
 	if (!result) return -1;
 	try
 	{
-		auto k = (TResult*)result;
-		if (index < 0 || index >= k->first.size() || num < 0 || num >= k->first[index].first.size()) return -1;
-		return k->first[index].first[num].position;
+		if (index < 0 || index >= result->first.size() || num < 0 || num >= result->first[index].first.size()) return -1;
+		return result->first[index].first[num].position;
 	}
 	catch (...)
 	{
@@ -514,9 +561,8 @@ int kiwi_res_length(kiwi_res_h result, int index, int num)
 	if (!result) return -1;
 	try
 	{
-		auto k = (TResult*)result;
-		if (index < 0 || index >= k->first.size() || num < 0 || num >= k->first[index].first.size()) return -1;
-		return k->first[index].first[num].length;
+		if (index < 0 || index >= result->first.size() || num < 0 || num >= result->first[index].first.size()) return -1;
+		return result->first[index].first[num].length;
 	}
 	catch (...)
 	{
@@ -530,9 +576,8 @@ int kiwi_res_word_position(kiwi_res_h result, int index, int num)
 	if (!result) return -1;
 	try
 	{
-		auto k = (TResult*)result;
-		if (index < 0 || index >= k->first.size() || num < 0 || num >= k->first[index].first.size()) return -1;
-		return k->first[index].first[num].wordPosition;
+		if (index < 0 || index >= result->first.size() || num < 0 || num >= result->first[index].first.size()) return -1;
+		return result->first[index].first[num].wordPosition;
 	}
 	catch (...)
 	{
@@ -546,8 +591,7 @@ int kiwi_res_close(kiwi_res_h result)
 	if (!result) return KIWIERR_INVALID_HANDLE;
 	try
 	{
-		auto k = (TResult*)result;
-		delete k;
+		delete result;
 		return 0;
 	}
 	catch (...)
@@ -562,8 +606,7 @@ int kiwi_ws_size(kiwi_ws_h result)
 	if (!result) return KIWIERR_INVALID_HANDLE;
 	try
 	{
-		auto k = (EResult*)result;
-		return k->first.size();
+		return result->first.size();
 	}
 	catch (...)
 	{
@@ -577,9 +620,8 @@ const kchar16_t * kiwi_ws_form_w(kiwi_ws_h result, int index)
 	if (!result) return nullptr;
 	try
 	{
-		auto k = (EResult*)result;
-		if (index < 0 || index >= k->first.size()) return nullptr;
-		return (const kchar16_t*)k->first[index].form.c_str();
+		if (index < 0 || index >= result->first.size()) return nullptr;
+		return (const kchar16_t*)result->first[index].form.c_str();
 	}
 	catch (...)
 	{
@@ -593,10 +635,9 @@ const char * kiwi_ws_form(kiwi_ws_h result, int index)
 	if (!result) return nullptr;
 	try
 	{
-		auto k = (EResult*)result;
-		if (index < 0 || index >= k->first.size()) return nullptr;
-		k->second.stringBuf.emplace_back(utf16To8(k->first[index].form));
-		return k->second.stringBuf.back().c_str();
+		if (index < 0 || index >= result->first.size()) return nullptr;
+		result->second.stringBuf.emplace_back(utf16To8(result->first[index].form));
+		return result->second.stringBuf.back().c_str();
 	}
 	catch (...)
 	{
@@ -610,9 +651,8 @@ float kiwi_ws_score(kiwi_ws_h result, int index)
 	if (!result) return NAN;
 	try
 	{
-		auto k = (EResult*)result;
-		if (index < 0 || index >= k->first.size()) return NAN;
-		return k->first[index].score;
+		if (index < 0 || index >= result->first.size()) return NAN;
+		return result->first[index].score;
 	}
 	catch (...)
 	{
@@ -626,9 +666,8 @@ int kiwi_ws_freq(kiwi_ws_h result, int index)
 	if (!result) return KIWIERR_INVALID_HANDLE;
 	try
 	{
-		auto k = (EResult*)result;
-		if (index < 0 || index >= k->first.size()) return KIWIERR_INVALID_INDEX;
-		return k->first[index].freq;
+		if (index < 0 || index >= result->first.size()) return KIWIERR_INVALID_INDEX;
+		return result->first[index].freq;
 	}
 	catch (...)
 	{
@@ -642,9 +681,8 @@ float kiwi_ws_pos_score(kiwi_ws_h result, int index)
 	if (!result) return NAN;
 	try
 	{
-		auto k = (EResult*)result;
-		if (index < 0 || index >= k->first.size()) return NAN;
-		return k->first[index].posScore[POSTag::nnp];
+		if (index < 0 || index >= result->first.size()) return NAN;
+		return result->first[index].posScore[POSTag::nnp];
 	}
 	catch (...)
 	{
@@ -658,8 +696,7 @@ int kiwi_ws_close(kiwi_ws_h result)
 	if (!result) return KIWIERR_INVALID_HANDLE;
 	try
 	{
-		auto k = (EResult*)result;
-		delete k;
+		delete result;
 		return 0;
 	}
 	catch (...)
@@ -669,3 +706,61 @@ int kiwi_ws_close(kiwi_ws_h result)
 	}
 }
 
+int kiwi_ss_size(kiwi_ss_h result)
+{
+	if (!result) return KIWIERR_INVALID_HANDLE;
+	try
+	{
+		return result->size();
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return KIWIERR_FAIL;
+	}
+}
+
+int kiwi_ss_begin_position(kiwi_ss_h result, int index)
+{
+	if (!result) return KIWIERR_INVALID_HANDLE;
+	try
+	{
+		if (index < 0 || index >= result->size()) return KIWIERR_INVALID_INDEX;
+		return (*result)[index].first;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return KIWIERR_FAIL;
+	}
+}
+
+int kiwi_ss_end_position(kiwi_ss_h result, int index)
+{
+	if (!result) return KIWIERR_INVALID_HANDLE;
+	try
+	{
+		if (index < 0 || index >= result->size()) return KIWIERR_INVALID_INDEX;
+		return (*result)[index].second;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return KIWIERR_FAIL;
+	}
+}
+
+int kiwi_ss_close(kiwi_ss_h result)
+{
+	if (!result) return KIWIERR_INVALID_HANDLE;
+	try
+	{
+		delete result;
+		return 0;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return KIWIERR_FAIL;
+	}
+}
