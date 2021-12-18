@@ -3,7 +3,7 @@
 #include <kiwi/capi.h>
 #include "common.h"
 
-kiwi_h reuseKiwiInstance()
+kiwi_h reuse_kiwi_instance()
 {
 	static kiwi_h kw = kiwi_init(MODEL_PATH, 0, KIWI_BUILD_DEFAULT);
 	return kw;
@@ -70,7 +70,7 @@ TEST(KiwiC, AnalyzeMultithread)
 
 TEST(KiwiC, Issue71_SentenceSplit_u16)
 {
-	kiwi_h kw = reuseKiwiInstance();
+	kiwi_h kw = reuse_kiwi_instance();
 
 	const char16_t str[] = u"다녀온 후기\n\n강남 토끼정에 다녀왔습니다. 음식도 맛있었어요 다만 역시 토끼정 본점 답죠?ㅎㅅㅎ 그 맛이 크으.. 아주 맛있었음...! ^^";
 	const char16_t* ref[] = {
@@ -98,7 +98,7 @@ TEST(KiwiC, Issue71_SentenceSplit_u16)
 
 TEST(KiwiC, Issue71_SentenceSplit_u8)
 {
-	kiwi_h kw = reuseKiwiInstance();
+	kiwi_h kw = reuse_kiwi_instance();
 
 	const char str[] = u8"다녀온 후기\n\n강남 토끼정에 다녀왔습니다. 음식도 맛있었어요 다만 역시 토끼정 본점 답죠?ㅎㅅㅎ 그 맛이 크으.. 아주 맛있었음...! ^^";
 	const char* ref[] = {
