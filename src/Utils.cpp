@@ -107,6 +107,75 @@ namespace kiwi
 		return ret;
 	}
 
+	std::u16string utf8To16(const std::string& str, std::vector<size_t>& bytePositions)
+	{
+		std::u16string ret;
+		bytePositions.clear();
+		for (auto it = str.begin(); it != str.end(); ++it)
+		{
+			size_t pos = (size_t)(it - str.begin());
+			size_t code = 0;
+			uint8_t byte = *it;
+			if ((byte & 0xF8) == 0xF0)
+			{
+				code = (byte & 0x07) << 18;
+				if (++it == str.end()) throw UnicodeException{ "unexpected ending" };
+				if (((byte = *it) & 0xC0) != 0x80) throw UnicodeException{ "unexpected trailing byte" };
+				code |= (byte & 0x3F) << 12;
+				if (++it == str.end()) throw UnicodeException{ "unexpected ending" };
+				if (((byte = *it) & 0xC0) != 0x80) throw UnicodeException{ "unexpected trailing byte" };
+				code |= (byte & 0x3F) << 6;
+				if (++it == str.end()) throw UnicodeException{ "unexpected ending" };
+				if (((byte = *it) & 0xC0) != 0x80) throw UnicodeException{ "unexpected trailing byte" };
+				code |= (byte & 0x3F);
+			}
+			else if ((byte & 0xF0) == 0xE0)
+			{
+				code = (byte & 0x0F) << 12;
+				if (++it == str.end()) throw UnicodeException{ "unexpected ending" };
+				if (((byte = *it) & 0xC0) != 0x80) throw UnicodeException{ "unexpected trailing byte" };
+				code |= (byte & 0x3F) << 6;
+				if (++it == str.end()) throw UnicodeException{ "unexpected ending" };
+				if (((byte = *it) & 0xC0) != 0x80) throw UnicodeException{ "unexpected trailing byte" };
+				code |= (byte & 0x3F);
+			}
+			else if ((byte & 0xE0) == 0xC0)
+			{
+				code = (byte & 0x1F) << 6;
+				if (++it == str.end()) throw UnicodeException{ "unexpected ending" };
+				if (((byte = *it) & 0xC0) != 0x80) throw UnicodeException{ "unexpected trailing byte" };
+				code |= (byte & 0x3F);
+			}
+			else if ((byte & 0x80) == 0x00)
+			{
+				code = byte;
+			}
+			else
+			{
+				throw UnicodeException{ "unicode error" };
+			}
+
+			if (code < 0x10000)
+			{
+				ret.push_back(code);
+				bytePositions.emplace_back(pos);
+			}
+			else if (code < 0x10FFFF)
+			{
+				code -= 0x10000;
+				ret.push_back(0xD800 | (code >> 10));
+				ret.push_back(0xDC00 | (code & 0x3FF));
+				bytePositions.emplace_back(pos);
+				bytePositions.emplace_back(pos);
+			}
+			else
+			{
+				throw UnicodeException{ "unicode error" };
+			}
+		}
+		return ret;
+	}
+
 	std::string utf16To8(const std::u16string & str)
 	{
 		std::string ret;

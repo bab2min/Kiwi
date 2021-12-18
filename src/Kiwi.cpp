@@ -72,6 +72,114 @@ namespace kiwi
 
 	Kiwi& Kiwi::operator=(Kiwi&&) = default;
 
+	inline vector<size_t> allNewLinePositions(const u16string& str)
+	{
+		vector<size_t> ret;
+		bool isCR = false;
+		for (size_t i = 0; i < str.size(); ++i)
+		{
+			switch (str[i])
+			{
+			case 0x0D:
+				isCR = true;
+				ret.emplace_back(i);
+				break;
+			case 0x0A:
+				if (!isCR) ret.emplace_back(i);
+				isCR = false;
+				break;
+			case 0x0B:
+			case 0x0C:
+			case 0x85:
+			case 0x2028:
+			case 0x2029:
+				isCR = false;
+				ret.emplace_back(i);
+				break;
+			}
+		}
+		return ret;
+	}
+
+	inline void fillSentLineInfo(vector<TokenInfo>& tokens, const vector<size_t>& newlines)
+	{
+		enum class State 
+		{
+			none = 0,
+			ef,
+			sf,
+		} state = State::none;
+
+		uint32_t sentPos = 0, lastSentPos = 0, accumWordPos = 0, lastWordPos = 0;
+		size_t nlPos = 0, lastNlPos = 0;
+		for (auto& t : tokens)
+		{
+			switch (state)
+			{
+			case State::none:
+				if (t.tag == POSTag::ef)
+				{
+					state = State::ef;
+				}
+				else if (t.tag == POSTag::sf)
+				{
+					state = State::sf;
+				}
+				break;
+			case State::ef:
+				switch (t.tag)
+				{
+				case POSTag::so:
+				case POSTag::sw:
+				case POSTag::sh:
+				case POSTag::sf:
+					break;
+				default:
+					sentPos++;
+					state = State::none;
+					break;
+				}
+				break;
+			case State::sf:
+				switch (t.tag)
+				{
+				case POSTag::so:
+				case POSTag::sw:
+				case POSTag::sh:
+					break;
+				default:
+					sentPos++;
+					state = State::none;
+					break;
+				}
+				break;
+			}
+
+			while (nlPos < newlines.size() && newlines[nlPos] < t.position) nlPos++;
+			
+			t.lineNumber = (uint32_t)nlPos;
+			if (nlPos > lastNlPos + 1 && sentPos == lastSentPos)
+			{
+				sentPos++;
+			}
+			t.sentPosition = sentPos;
+			
+			if (sentPos != lastSentPos)
+			{
+				accumWordPos = 0;
+			}
+			else if (t.wordPosition != lastWordPos)
+			{
+				accumWordPos++;
+			}
+			lastWordPos = t.wordPosition;
+			t.wordPosition = accumWordPos;
+
+			lastSentPos = sentPos;
+			lastNlPos = nlPos;
+		}
+	}
+
 	vector<TokenResult> Kiwi::analyze(const u16string& str, size_t topN, Match matchOptions) const
 	{
 		auto chunk = str.begin();
@@ -129,6 +237,44 @@ namespace kiwi
 				});
 				ret[n].second += r.second;
 			}
+		}
+
+		auto newlines = allNewLinePositions(str);
+		for (auto& r : ret) fillSentLineInfo(r.first, newlines);
+		return ret;
+	}
+
+	vector<pair<size_t, size_t>> Kiwi::splitIntoSentences(const u16string& str, Match matchOptions, TokenResult* tokenizedResultOut) const
+	{
+		vector<pair<size_t, size_t>> ret;
+		uint32_t sentPos = -1;
+		auto res = analyze(str, matchOptions);
+		for (auto& t : res.first)
+		{
+			if (t.sentPosition != sentPos)
+			{
+				ret.emplace_back(t.position, (size_t)t.position + t.length);
+				sentPos = t.sentPosition;
+			}
+			else
+			{
+				ret.back().second = (size_t)t.position + t.length;
+			}
+		}
+		if (tokenizedResultOut) *tokenizedResultOut = move(res);
+		return ret;
+	}
+
+	vector<pair<size_t, size_t>> Kiwi::splitIntoSentences(const string& str, Match matchOptions, TokenResult* tokenizedResultOut) const
+	{
+		vector<size_t> bytePositions;
+		u16string u16str = utf8To16(str, bytePositions);
+		bytePositions.emplace_back(str.size());
+		vector<pair<size_t, size_t>> ret = splitIntoSentences(u16str, matchOptions, tokenizedResultOut);
+		for (auto& r : ret)
+		{
+			r.first = bytePositions[r.first];
+			r.second = bytePositions[r.second];
 		}
 		return ret;
 	}
@@ -601,32 +747,38 @@ namespace kiwi
 		}
 	}
 
-  /**
-   * @brief 주어진 문자열에 나타난 개별 문자들에 대해 어절번호(wordPosition) 생성하여 반환한다.
-   * @details 문자열의 길이와 동일한 크기의 std::vector<uint16_t>를 생성한 뒤, 문자열 내 개별 문자가
-   * 나타난 인덱스와 동일한 위치에 각 문자에 대한 어절번호(wordPosition)를 기록한다.
-   * 어절번호는 단순히 각 어절의 등장순서로부터 얻어진다.
-   * 예를 들어, '나는 학교에 간다'라는 문자열의 경우 '나는'이 첫 번째 어절이므로 여기에포함된
-   * 개별 문자인 '나'와 '는'의 어절번호는 0이다. 마찬가지로 '학교에'에 포함된 문자들의 어절번호는 1, 
-   * '간다'에 포함된 문자들의 어절번호는 2이다.
-   * 따라서 최종적으로 문자열 '나는 학교에 간다'로부터 {0, 0, 0, 1, 1, 1, 1, 2, 2}의 어절번호가
-   * 생성된다.
-   *
-   * @param sentence 어절번호를 생성할 문장.
-   * @return sentence 에 대한 어절번호를 담고있는 vector.
-   */
+	/**
+	* @brief 주어진 문자열에 나타난 개별 문자들에 대해 어절번호(wordPosition) 생성하여 반환한다.
+	* @details 문자열의 길이와 동일한 크기의 std::vector<uint16_t>를 생성한 뒤, 문자열 내 개별 문자가
+	* 나타난 인덱스와 동일한 위치에 각 문자에 대한 어절번호(wordPosition)를 기록한다.
+	* 어절번호는 단순히 각 어절의 등장순서로부터 얻어진다.
+	* 예를 들어, '나는 학교에 간다'라는 문자열의 경우 '나는'이 첫 번째 어절이므로 여기에포함된
+	* 개별 문자인 '나'와 '는'의 어절번호는 0이다. 마찬가지로 '학교에'에 포함된 문자들의 어절번호는 1, 
+	* '간다'에 포함된 문자들의 어절번호는 2이다.
+	* 따라서 최종적으로 문자열 '나는 학교에 간다'로부터 {0, 0, 0, 1, 1, 1, 1, 2, 2}의 어절번호가
+	* 생성된다.
+	*
+	* @param sentence 어절번호를 생성할 문장.
+	* @return sentence 에 대한 어절번호를 담고있는 vector.
+	*/
 	const std::vector<uint16_t> getWordPositions(const std::u16string& sentence)
 	{
 		std::vector<uint16_t> wordPositions(sentence.size());
 		uint32_t position = 0;
+		bool continuousSpace = false;
 
 		for (auto i = 0; i < sentence.size(); ++i)
 		{
 			wordPositions[i] = position;
 
-			if (sentence[i] == u' ')
+			if (isspace(sentence[i]))
 			{
-				++position; 
+				if (!continuousSpace) ++position;
+				continuousSpace = true;
+			}
+			else
+			{
+				continuousSpace = false;
 			}
 		}
 

@@ -205,6 +205,34 @@ namespace kiwi
 			}
 		}
 
+		/**
+		 * @brief
+		 *
+		 * @param str
+		 * @param matchOptions
+		 * @param tokenizedResultOut
+		 * @return std::vector<pair<size_t, size_t>>
+		 */
+		std::vector<std::pair<size_t, size_t>> splitIntoSentences(
+			const std::u16string& str, 
+			Match matchOptions = Match::allWithNormalizing, 
+			TokenResult* tokenizedResultOut = nullptr
+		) const;
+
+		/**
+		 * @brief
+		 *
+		 * @param str
+		 * @param matchOptions
+		 * @param tokenizedResultOut
+		 * @return std::vector<pair<size_t, size_t>>
+		 */
+		std::vector<std::pair<size_t, size_t>> splitIntoSentences(
+			const std::string& str,
+			Match matchOptions = Match::allWithNormalizing,
+			TokenResult* tokenizedResultOut = nullptr
+		) const;
+
 		size_t morphToId(const Morpheme* morph) const
 		{
 			if (!morph || morph < morphemes.data()) return -1;
