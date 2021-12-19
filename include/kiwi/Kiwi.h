@@ -213,7 +213,7 @@ namespace kiwi
 		 * @param tokenizedResultOut
 		 * @return std::vector<pair<size_t, size_t>>
 		 */
-		std::vector<std::pair<size_t, size_t>> splitIntoSentences(
+		std::vector<std::pair<size_t, size_t>> splitIntoSents(
 			const std::u16string& str, 
 			Match matchOptions = Match::allWithNormalizing, 
 			TokenResult* tokenizedResultOut = nullptr
@@ -227,7 +227,7 @@ namespace kiwi
 		 * @param tokenizedResultOut
 		 * @return std::vector<pair<size_t, size_t>>
 		 */
-		std::vector<std::pair<size_t, size_t>> splitIntoSentences(
+		std::vector<std::pair<size_t, size_t>> splitIntoSents(
 			const std::string& str,
 			Match matchOptions = Match::allWithNormalizing,
 			TokenResult* tokenizedResultOut = nullptr

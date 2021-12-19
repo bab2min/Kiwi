@@ -252,7 +252,7 @@ namespace kiwi
 		return ret;
 	}
 
-	vector<pair<size_t, size_t>> Kiwi::splitIntoSentences(const u16string& str, Match matchOptions, TokenResult* tokenizedResultOut) const
+	vector<pair<size_t, size_t>> Kiwi::splitIntoSents(const u16string& str, Match matchOptions, TokenResult* tokenizedResultOut) const
 	{
 		vector<pair<size_t, size_t>> ret;
 		uint32_t sentPos = -1;
@@ -273,12 +273,12 @@ namespace kiwi
 		return ret;
 	}
 
-	vector<pair<size_t, size_t>> Kiwi::splitIntoSentences(const string& str, Match matchOptions, TokenResult* tokenizedResultOut) const
+	vector<pair<size_t, size_t>> Kiwi::splitIntoSents(const string& str, Match matchOptions, TokenResult* tokenizedResultOut) const
 	{
 		vector<size_t> bytePositions;
 		u16string u16str = utf8To16(str, bytePositions);
 		bytePositions.emplace_back(str.size());
-		vector<pair<size_t, size_t>> ret = splitIntoSentences(u16str, matchOptions, tokenizedResultOut);
+		vector<pair<size_t, size_t>> ret = splitIntoSents(u16str, matchOptions, tokenizedResultOut);
 		for (auto& r : ret)
 		{
 			r.first = bytePositions[r.first];

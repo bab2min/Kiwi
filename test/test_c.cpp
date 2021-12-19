@@ -83,7 +83,7 @@ TEST(KiwiC, Issue71_SentenceSplit_u16)
 	};
 	const int ref_len = sizeof(ref) / sizeof(ref[0]);
 
-	kiwi_ss_h res = kiwi_split_into_sentences_w(kw, (const kchar16_t*)str, KIWI_MATCH_ALL_WITH_NORMALIZING, nullptr);
+	kiwi_ss_h res = kiwi_split_into_sents_w(kw, (const kchar16_t*)str, KIWI_MATCH_ALL_WITH_NORMALIZING, nullptr);
 	EXPECT_NE(res, nullptr);
 	EXPECT_EQ(kiwi_ss_size(res), ref_len);
 	
@@ -111,7 +111,7 @@ TEST(KiwiC, Issue71_SentenceSplit_u8)
 	};
 	const int ref_len = sizeof(ref) / sizeof(ref[0]);
 
-	kiwi_ss_h res = kiwi_split_into_sentences(kw, str, KIWI_MATCH_ALL_WITH_NORMALIZING, nullptr);
+	kiwi_ss_h res = kiwi_split_into_sents(kw, str, KIWI_MATCH_ALL_WITH_NORMALIZING, nullptr);
 	EXPECT_NE(res, nullptr);
 	EXPECT_EQ(kiwi_ss_size(res), ref_len);
 

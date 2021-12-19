@@ -127,7 +127,7 @@ TEST(KiwiCpp, Issue71_SentenceSplit_u16)
 	Kiwi& kiwi = reuseKiwiInstance();
 	
 	std::u16string str = u"다녀온 후기\n\n<강남 토끼정에 다녀왔습니다.> 음식도 맛있었어요 다만 역시 토끼정 본점 답죠?ㅎㅅㅎ 그 맛이 크으.. 아주 맛있었음...! ^^";
-	std::vector<std::pair<size_t, size_t>> sentRanges = kiwi.splitIntoSentences(str);
+	std::vector<std::pair<size_t, size_t>> sentRanges = kiwi.splitIntoSents(str);
 	std::vector<std::u16string> sents;
 	for (auto& p : sentRanges)
 	{
@@ -147,7 +147,7 @@ TEST(KiwiCpp, Issue71_SentenceSplit_u8)
 	Kiwi& kiwi = reuseKiwiInstance();
 
 	std::string str = u8"다녀온 후기\n\n<강남 토끼정에 다녀왔습니다.> 음식도 맛있었어요 다만 역시 토끼정 본점 답죠?ㅎㅅㅎ 그 맛이 크으.. 아주 맛있었음...! ^^";
-	std::vector<std::pair<size_t, size_t>> sentRanges = kiwi.splitIntoSentences(str);
+	std::vector<std::pair<size_t, size_t>> sentRanges = kiwi.splitIntoSents(str);
 	std::vector<std::string> sents;
 	for (auto& p : sentRanges)
 	{

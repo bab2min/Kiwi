@@ -381,7 +381,7 @@ int kiwi_analyze_m(kiwi_h handle, kiwi_reader_t reader, kiwi_receiver_t receiver
 	}
 }
 
-kiwi_ss_h kiwi_split_into_sentences_w(kiwi_h handle, const kchar16_t* text, int matchOptions, kiwi_res_h* tokenized_res)
+kiwi_ss_h kiwi_split_into_sents_w(kiwi_h handle, const kchar16_t* text, int matchOptions, kiwi_res_h* tokenized_res)
 {
 	if (!handle) return nullptr;
 	Kiwi* kiwi = (Kiwi*)handle;
@@ -389,7 +389,7 @@ kiwi_ss_h kiwi_split_into_sentences_w(kiwi_h handle, const kchar16_t* text, int 
 	{
 		vector<TokenResult> tokenized;
 		if (tokenized_res) tokenized.resize(1);
-		auto sent_ranges = kiwi->splitIntoSentences((const char16_t*)text, (Match)matchOptions, &tokenized[0]);
+		auto sent_ranges = kiwi->splitIntoSents((const char16_t*)text, (Match)matchOptions, &tokenized[0]);
 		if (tokenized_res) *tokenized_res = new kiwi_res{ move(tokenized), {} };
 		return new kiwi_ss{ move(sent_ranges) };
 	}
@@ -400,7 +400,7 @@ kiwi_ss_h kiwi_split_into_sentences_w(kiwi_h handle, const kchar16_t* text, int 
 	}
 }
 
-kiwi_ss_h kiwi_split_into_sentences(kiwi_h handle, const char* text, int matchOptions, kiwi_res_h* tokenized_res)
+kiwi_ss_h kiwi_split_into_sents(kiwi_h handle, const char* text, int matchOptions, kiwi_res_h* tokenized_res)
 {
 	if (!handle) return nullptr;
 	Kiwi* kiwi = (Kiwi*)handle;
@@ -408,7 +408,7 @@ kiwi_ss_h kiwi_split_into_sentences(kiwi_h handle, const char* text, int matchOp
 	{
 		vector<TokenResult> tokenized;
 		if (tokenized_res) tokenized.resize(1);
-		auto sent_ranges = kiwi->splitIntoSentences(text, (Match)matchOptions, &tokenized[0]);
+		auto sent_ranges = kiwi->splitIntoSents(text, (Match)matchOptions, &tokenized[0]);
 		if (tokenized_res) *tokenized_res = new kiwi_res{ move(tokenized), {} };
 		return new kiwi_ss{ move(sent_ranges) };
 	}

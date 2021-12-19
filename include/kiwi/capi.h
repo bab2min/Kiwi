@@ -294,7 +294,7 @@ DECL_DLL int kiwi_analyze_m(kiwi_h handle, kiwi_reader_t reader, kiwi_receiver_t
  *              null을 입력시 형태소 분석 결과는 내부적으로 사용된 뒤 버려집니다.
  * @return
  */
-DECL_DLL kiwi_ss_h kiwi_split_into_sentences_w(kiwi_h handle, const kchar16_t* text, int match_options, kiwi_res_h* tokenized_res);
+DECL_DLL kiwi_ss_h kiwi_split_into_sents_w(kiwi_h handle, const kchar16_t* text, int match_options, kiwi_res_h* tokenized_res);
 
 /**
  * @brief 텍스트를 문장 단위로 분할합니다.
@@ -306,7 +306,7 @@ DECL_DLL kiwi_ss_h kiwi_split_into_sentences_w(kiwi_h handle, const kchar16_t* t
  *              null을 입력시 형태소 분석 결과는 내부적으로 사용된 뒤 버려집니다.
  * @return 문장 분할 결과
  */
-DECL_DLL kiwi_ss_h kiwi_split_into_sentences(kiwi_h handle, const char* text, int match_options, kiwi_res_h* tokenized_res);
+DECL_DLL kiwi_ss_h kiwi_split_into_sents(kiwi_h handle, const char* text, int match_options, kiwi_res_h* tokenized_res);
 
 
 /**
