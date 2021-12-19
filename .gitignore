@@ -334,3 +334,8 @@ docs/html
 docs/latex
 docs/_build
 cmake-build-*/
+libs/
+model_s/
+model_xs/
+ModelGenerator/
+
