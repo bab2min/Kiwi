@@ -133,6 +133,7 @@ namespace kiwi
 				case POSTag::sw:
 				case POSTag::sh:
 				case POSTag::sp:
+				case POSTag::se:
 				case POSTag::sf:
 					break;
 				case POSTag::ss:
@@ -149,6 +150,7 @@ namespace kiwi
 				case POSTag::so:
 				case POSTag::sw:
 				case POSTag::sh:
+				case POSTag::se:
 				case POSTag::sp:
 					break;
 				case POSTag::ss:
