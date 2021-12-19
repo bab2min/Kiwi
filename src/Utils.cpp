@@ -107,6 +107,75 @@ namespace kiwi
 		return ret;
 	}
 
+	std::u16string utf8To16(const std::string& str, std::vector<size_t>& bytePositions)
+	{
+		std::u16string ret;
+		bytePositions.clear();
+		for (auto it = str.begin(); it != str.end(); ++it)
+		{
+			size_t pos = (size_t)(it - str.begin());
+			size_t code = 0;
+			uint8_t byte = *it;
+			if ((byte & 0xF8) == 0xF0)
+			{
+				code = (byte & 0x07) << 18;
+				if (++it == str.end()) throw UnicodeException{ "unexpected ending" };
+				if (((byte = *it) & 0xC0) != 0x80) throw UnicodeException{ "unexpected trailing byte" };
+				code |= (byte & 0x3F) << 12;
+				if (++it == str.end()) throw UnicodeException{ "unexpected ending" };
+				if (((byte = *it) & 0xC0) != 0x80) throw UnicodeException{ "unexpected trailing byte" };
+				code |= (byte & 0x3F) << 6;
+				if (++it == str.end()) throw UnicodeException{ "unexpected ending" };
+				if (((byte = *it) & 0xC0) != 0x80) throw UnicodeException{ "unexpected trailing byte" };
+				code |= (byte & 0x3F);
+			}
+			else if ((byte & 0xF0) == 0xE0)
+			{
+				code = (byte & 0x0F) << 12;
+				if (++it == str.end()) throw UnicodeException{ "unexpected ending" };
+				if (((byte = *it) & 0xC0) != 0x80) throw UnicodeException{ "unexpected trailing byte" };
+				code |= (byte & 0x3F) << 6;
+				if (++it == str.end()) throw UnicodeException{ "unexpected ending" };
+				if (((byte = *it) & 0xC0) != 0x80) throw UnicodeException{ "unexpected trailing byte" };
+				code |= (byte & 0x3F);
+			}
+			else if ((byte & 0xE0) == 0xC0)
+			{
+				code = (byte & 0x1F) << 6;
+				if (++it == str.end()) throw UnicodeException{ "unexpected ending" };
+				if (((byte = *it) & 0xC0) != 0x80) throw UnicodeException{ "unexpected trailing byte" };
+				code |= (byte & 0x3F);
+			}
+			else if ((byte & 0x80) == 0x00)
+			{
+				code = byte;
+			}
+			else
+			{
+				throw UnicodeException{ "unicode error" };
+			}
+
+			if (code < 0x10000)
+			{
+				ret.push_back(code);
+				bytePositions.emplace_back(pos);
+			}
+			else if (code < 0x10FFFF)
+			{
+				code -= 0x10000;
+				ret.push_back(0xD800 | (code >> 10));
+				ret.push_back(0xDC00 | (code & 0x3FF));
+				bytePositions.emplace_back(pos);
+				bytePositions.emplace_back(pos);
+			}
+			else
+			{
+				throw UnicodeException{ "unicode error" };
+			}
+		}
+		return ret;
+	}
+
 	std::string utf16To8(const std::u16string & str)
 	{
 		std::string ret;
@@ -177,18 +246,34 @@ namespace kiwi
 		case '.':
 		case '!':
 		case '?':
+		case 0x2047:
+		case 0x2048:
+		case 0x2049:
+		case 0x3002:
+		case 0xff01:
+		case 0xff0e:
+		case 0xff1f:
+		case 0xff61:
 			return POSTag::sf;
 		case '-':
 		case '~':
 		case 0x223c:
+		case 0x301c:
+		case 0xff5e:
 			return POSTag::so;
 		case 0x2026:
+		case 0x205d:
 			return POSTag::se;
 		case ',':
 		case ';':
 		case ':':
 		case '/':
 		case 0xb7:
+		case 0x3001:
+		case 0xff0c:
+		case 0xff1a:
+		case 0xff1b:
+		case 0xff64:
 			return POSTag::sp;
 		case '"':
 		case '\'':
@@ -221,7 +306,25 @@ namespace kiwi
 		case 0x3011:
 		case 0x3014:
 		case 0x3015:
+		case 0x3016:
+		case 0x3017:
+		case 0x3018:
+		case 0x3019:
+		case 0x301a:
+		case 0x301b:
+		case 0xff08:
+		case 0xff09:
 		case 0xff0d:
+		case 0xff1c:
+		case 0xff1e:
+		case 0xff3b:
+		case 0xff3d:
+		case 0xff5b:
+		case 0xff5d:
+		case 0xff5f:
+		case 0xff60:
+		case 0xff62:
+		case 0xff63:
 			return POSTag::ss;
 		}
 		if ((0x2e80 <= chr && chr <= 0x2e99) ||
@@ -236,6 +339,35 @@ namespace kiwi
 			(0xfa70 <= chr && chr <= 0xfad9)) return POSTag::sh;
 		if (0xd800 <= chr && chr <= 0xdfff) return POSTag::sh;
 		return POSTag::sw;
+	}
+
+	bool isClosingPair(char16_t c)
+	{
+		switch (c)
+		{
+		case ')':
+		case '>':
+		case ']':
+		case '}':
+		case 0x2019:
+		case 0x201d:
+		case 0x3009:
+		case 0x300b:
+		case 0x300d:
+		case 0x300f:
+		case 0x3011:
+		case 0x3015:
+		case 0x3017:
+		case 0x3019:
+		case 0x301b:
+		case 0xff09:
+		case 0xff1e:
+		case 0xff5d:
+		case 0xff60:
+		case 0xff63:
+			return true;
+		}
+		return false;
 	}
 
 	POSTag toPOSTag(const std::u16string& tagStr)

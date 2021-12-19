@@ -23,6 +23,7 @@ namespace kiwi
 	}
 
 	std::u16string utf8To16(const std::string& str);
+	std::u16string utf8To16(const std::string& str, std::vector<size_t>& bytePositions);
 	std::string utf16To8(const std::u16string& str);
 
 	inline bool isWebTag(POSTag t)
@@ -113,25 +114,26 @@ namespace kiwi
 		return os << utf16To8({ str.begin(), str.end() });
 	}
 
+	bool isClosingPair(char16_t c);
 	POSTag identifySpecialChr(kchar_t chr);
+
+	inline bool isspace(char16_t c)
+	{
+		switch (c)
+		{
+		case u' ':
+		case u'\f':
+		case u'\n':
+		case u'\r':
+		case u'\t':
+		case u'\v':
+			return true;
+		}
+		return false;
+	}
 
 	class SpaceSplitIterator
 	{
-		static bool isspace(char16_t c)
-		{
-			switch (c)
-			{
-			case u' ':
-			case u'\f':
-			case u'\n':
-			case u'\r':
-			case u'\t':
-			case u'\v':
-				return true;
-			}
-			return false;
-		}
-
 		std::u16string::const_iterator mBegin, mChunk, mEnd;
 	public:
 		SpaceSplitIterator(const std::u16string::const_iterator& _begin = {}, const std::u16string::const_iterator& _end = {})

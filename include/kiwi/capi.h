@@ -28,6 +28,7 @@ typedef struct kiwi_s* kiwi_h;
 typedef struct kiwi_builder* kiwi_builder_h;
 typedef struct kiwi_res* kiwi_res_h;
 typedef struct kiwi_ws* kiwi_ws_h;
+typedef struct kiwi_ss* kiwi_ss_h;
 typedef unsigned short kchar16_t;
 
 /*
@@ -284,6 +285,31 @@ DECL_DLL int kiwi_analyze_mw(kiwi_h handle, kiwi_reader_w_t reader, kiwi_receive
 DECL_DLL int kiwi_analyze_m(kiwi_h handle, kiwi_reader_t reader, kiwi_receiver_t receiver, void* user_data, int top_n, int match_options);
 
 /**
+ * @brief
+ *
+ * @param handle
+ * @param text
+ * @param match_options
+ * @param tokenized_res (선택사항) 형태소 분석 결과를 받으려는 경우 kiwi_res_h 값을 받을 포인터를 넘겨주세요.
+ *              null을 입력시 형태소 분석 결과는 내부적으로 사용된 뒤 버려집니다.
+ * @return
+ */
+DECL_DLL kiwi_ss_h kiwi_split_into_sentences_w(kiwi_h handle, const kchar16_t* text, int match_options, kiwi_res_h* tokenized_res);
+
+/**
+ * @brief 텍스트를 문장 단위로 분할합니다.
+ *
+ * @param handle Kiwi.
+ * @param text 분할할 텍스트.
+ * @param match_options KIWI_MATCH_ALL 등 KIWI_MATCH_* 열거형 참고.
+ * @param tokenized_res (선택사항) 형태소 분석 결과를 받으려는 경우 kiwi_res_h 값을 받을 포인터를 넘겨주세요. 
+ *              null을 입력시 형태소 분석 결과는 내부적으로 사용된 뒤 버려집니다.
+ * @return 문장 분할 결과
+ */
+DECL_DLL kiwi_ss_h kiwi_split_into_sentences(kiwi_h handle, const char* text, int match_options, kiwi_res_h* tokenized_res);
+
+
+/**
  * @brief 
  * 
  * @param handle 
@@ -456,6 +482,40 @@ DECL_DLL float kiwi_ws_pos_score(kiwi_ws_h result, int index);
  * @return  
  */
 DECL_DLL int kiwi_ws_close(kiwi_ws_h result);
+
+/**
+ * @brief
+ *
+ * @param result
+ * @return
+ */
+DECL_DLL int kiwi_ss_size(kiwi_ss_h result);
+
+/**
+ * @brief
+ *
+ * @param result
+ * @param index
+ * @return
+ */
+DECL_DLL int kiwi_ss_begin_position(kiwi_ss_h result, int index);
+
+/**
+ * @brief
+ *
+ * @param result
+ * @param index
+ * @return
+ */
+DECL_DLL int kiwi_ss_end_position(kiwi_ss_h result, int index);
+
+/**
+ * @brief
+ *
+ * @param result
+ * @return
+ */
+DECL_DLL int kiwi_ss_close(kiwi_ss_h result);
 
 #ifdef __cplusplus  
 }

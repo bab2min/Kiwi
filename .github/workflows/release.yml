@@ -78,7 +78,7 @@ jobs:
         name: asset_Centos6
         path: asset.tgz
 
-  upload-asset-from-centos:
+  upload-asset-from-centos6:
     name: Upload asset from Centos6
     needs: build-centos6
     runs-on: ubuntu-latest
