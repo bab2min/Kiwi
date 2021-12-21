@@ -67,7 +67,7 @@ char asciitolower(char in) {
 	return in;
 }
 
-ArchType parserArchType(const char* env)
+ArchType parseArchType(const char* env)
 {
 	std::string envs = env;
 	std::transform(envs.begin(), envs.end(), envs.begin(), asciitolower);
@@ -88,7 +88,7 @@ ArchType kiwi::getSelectedArch(ArchType arch)
 	{
 		const char* env = std::getenv("KIWI_ARCH_TYPE");
 		if (!env) return best;
-		arch = parserArchType(env);
+		arch = parseArchType(env);
 		if (arch == ArchType::default_) return best;
 	}
 	arch = testArchSet(arch, best);

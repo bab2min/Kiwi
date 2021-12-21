@@ -620,29 +620,23 @@ namespace kiwi
 			if (cache[i].size() > topN)
 			{
 				WordLLs reduced;
-				float combinedCutOffScore = findNthLargest(cache[i].begin(), cache[i].end(), topN,
-					[](const WordLL& c)
+				float combinedCutOffScore = findNthLargest(cache[i].begin(), cache[i].end(), topN, [](const WordLL& c)
 				{
 					return c.accScore;
-				},
-					[](const WordLL& c)
+				}, [](const WordLL& c)
 				{
 					if (c.morphs.empty()) return false;
 					return !!c.morphs.back().combineSocket;
-				}
-				);
+				});
 
-				float otherCutOffScore = findNthLargest(cache[i].begin(), cache[i].end(), topN,
-					[](const WordLL& c)
+				float otherCutOffScore = findNthLargest(cache[i].begin(), cache[i].end(), topN, [](const WordLL& c)
 				{
 					return c.accScore;
-				},
-					[](const WordLL& c)
+				}, [](const WordLL& c)
 				{
 					if (c.morphs.empty()) return true;
 					return !c.morphs.back().combineSocket;
-				}
-				);
+				});
 
 				combinedCutOffScore = min(tMax - kw->cutOffThreshold, combinedCutOffScore);
 				otherCutOffScore = min(tMax - kw->cutOffThreshold, otherCutOffScore);
