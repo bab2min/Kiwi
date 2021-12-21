@@ -183,6 +183,7 @@ namespace kiwi
 				node_data = make_unique<MyNode[]>(num_non_leaf_nodes);
 				all_value_data = make_unique<DiffType[]>(header.num_nodes - 1 + header.vocab_size * 2);
 				value_data = &all_value_data[header.vocab_size * 2];
+				std::fill(&all_value_data[0], value_data, 0);
 
 				size_t non_leaf_idx = 0, leaf_idx = 0, next_offset = 0;
 				std::vector<std::array<size_t, 3>> key_ranges;
