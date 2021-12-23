@@ -59,7 +59,7 @@ jobs:
     name: Centos6
     runs-on: ubuntu-latest
     container:
-      image: docker://hoshizora/manylinux2010_x86_64
+      image: docker://quay.io/pypa/manylinux2010_x86_64
 
     steps:
     - uses: actions/checkout@v1
@@ -190,7 +190,7 @@ jobs:
         cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
         cmakeBuildType: Release
         buildWithCMake: true
-        cmakeAppendedArgs: -G"Visual Studio 16 2019" -A${{ matrix.arch }} -DKIWI_STATIC_WITHOUT_MT=1
+        cmakeAppendedArgs: -G"Visual Studio 16 2019" -A${{ matrix.arch }}
         buildWithCMakeArgs: --config Release
         buildDirectory: build
     - run: Compress-Archive -Path 'build\Release\*kiwi*', 'build\test\Release\*kiwi*' -DestinationPath asset.zip
