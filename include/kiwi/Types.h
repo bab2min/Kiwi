@@ -73,6 +73,12 @@ namespace kiwi
 		using Exception::Exception;
 	};
 
+	class UnknownMorphemeException : public Exception
+	{
+	public:
+		using Exception::Exception;
+	};
+
 #ifdef KIWI_USE_MIMALLOC
 	template<typename _Ty>
 	using Vector = std::vector<_Ty, mi_stl_allocator<_Ty>>;

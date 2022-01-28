@@ -294,7 +294,7 @@ namespace kiwi
 				{
 					if (t <= POSTag::sn && t != POSTag::unknown)
 					{
-						wids.emplace_back((size_t)t + 1);
+						wids.emplace_back(getDefaultMorphemeId(t));
 					}
 					else
 					{
@@ -333,6 +333,21 @@ namespace kiwi
 		}
 	}
 
+	void KiwiBuilder::updateMorphemes()
+	{
+		for (auto& m : morphemes)
+		{
+			if (m.tag == POSTag::v || (&m - morphemes.data() + m.combined) < langMdl->getHeader().vocab_size)
+			{
+				m.lmMorphemeId = &m - morphemes.data();
+			}
+			else
+			{
+				m.lmMorphemeId = getDefaultMorphemeId(m.tag);
+			}
+		}
+	}
+
 	void KiwiBuilder::loadMorphBin(std::istream& is)
 	{
 		serializer::readMany(is, serializer::toKey("KIWI"), forms, morphemes);
@@ -357,6 +372,7 @@ namespace kiwi
 			loadMorphBin(iss);
 		}
 		langMdl = lm::KnLangModelBase::create(utils::MMap(modelPath + string{ "/sj.knlm" }));
+		updateMorphemes();
 		if (!!(options & BuildOption::loadDefaultDict))
 		{
 			loadDictionary(modelPath + "/default.dict");
@@ -407,7 +423,7 @@ namespace kiwi
 		constexpr size_t order = 3, minCnt = 1, lastMinCnt = 1;
 		auto cntNodes = utils::count(sents.begin(), sents.end(), minCnt, 1, order, nullptr, &bigramList);
 		langMdl = lm::KnLangModelBase::create(lm::KnLangModelBase::build(cntNodes, order, minCnt, lastMinCnt, 2, 0, 1, 1e-5, 8, false, &bigramList));
-
+		updateMorphemes();
 		if (!!(options & BuildOption::loadDefaultDict))
 		{
 			loadDictionary(rawDataPath + "/default.dict");
@@ -438,11 +454,11 @@ namespace kiwi
 		return forms[ret.first->second];
 	}
 
-	bool KiwiBuilder::addWord(const std::u16string& form, POSTag tag, float score)
+	bool KiwiBuilder::addWord(const std::u16string& newForm, POSTag tag, float score, size_t origMorphemeId)
 	{
-		if (form.empty()) return false;
-		auto normalizedForm = normalizeHangul({ form.begin(), form.end() });
+		if (newForm.empty()) return false;
 
+		auto normalizedForm = normalizeHangul({ newForm.begin(), newForm.end() });
 		auto& f = addForm(normalizedForm, CondVowel::none, CondPolarity::none);
 		if (f.candidate.empty())
 		{
@@ -460,7 +476,41 @@ namespace kiwi
 		morphemes.emplace_back(tag);
 		morphemes.back().kform = &f - &forms[0];
 		morphemes.back().userScore = score;
+		morphemes.back().lmMorphemeId = origMorphemeId;
 		return true;
+	}
+
+	bool KiwiBuilder::addWord(const std::u16string& form, POSTag tag, float score)
+	{
+		return addWord(form, tag, score, getDefaultMorphemeId(tag));
+	}
+
+	bool KiwiBuilder::addWord(const std::u16string& newForm, POSTag tag, float score, const std::u16string& origForm)
+	{
+		auto normalizedOrigForm = normalizeHangul({ origForm.begin(), origForm.end() });
+
+		FormCond fc{ normalizedOrigForm, CondVowel::none, CondPolarity::none };
+		auto origIt = formMap.find(fc);
+		if (origIt == formMap.end())
+		{
+			throw UnknownMorphemeException{ "cannot find the original morpheme " + utf16To8(origForm) + "/" + tagToString(tag) };
+		}
+
+		size_t origMorphemeId = -1;
+		for (auto p : forms[origIt->second].candidate)
+		{
+			if (morphemes[(size_t)p].tag == tag)
+			{
+				origMorphemeId = p;
+				break;
+			}
+		}
+		if (origMorphemeId == -1)
+		{
+			throw UnknownMorphemeException{ "cannot find the original morpheme " + utf16To8(origForm) + "/" + tagToString(tag) };
+		}
+
+		return addWord(newForm, tag, score, origMorphemeId);
 	}
 
 	size_t KiwiBuilder::loadDictionary(const std::string& dictPath)
@@ -513,6 +563,7 @@ namespace kiwi
 			ret.forms.emplace_back(bake(f, ret.morphemes.data()));
 		}
 		ret.forms.emplace_back();
+
 		for (auto& m : morphemes)
 		{
 			ret.morphemes.emplace_back(bake(m, ret.morphemes.data(), ret.forms.data()));

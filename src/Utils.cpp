@@ -3,46 +3,6 @@
 
 namespace kiwi
 {
-	KString normalizeHangul(const std::u16string& hangul)
-	{
-		KString ret;
-		ret.reserve(hangul.size() * 1.5);
-		for (auto c : hangul)
-		{
-			if (c == 0xB42C) c = 0xB410;
-			if (0xAC00 <= c && c < 0xD7A4)
-			{
-				int coda = (c - 0xAC00) % 28;
-				ret.push_back(c - coda);
-				if (coda) ret.push_back(coda + 0x11A7);
-			}
-			else
-			{
-				ret.push_back(c);
-			}
-		}
-		return ret;
-	}
-
-	std::u16string joinHangul(const KString& hangul)
-	{
-		std::u16string ret;
-		ret.reserve(hangul.size());
-		for (auto c : hangul)
-		{
-			if (isHangulCoda(c) && !ret.empty() && 0xAC00 <= ret.back() && ret.back() < 0xD7A4)
-			{
-				if ((ret.back() - 0xAC00) % 28) ret.push_back(c);
-				else ret.back() += c - 0x11A7;
-			}
-			else
-			{
-				ret.push_back(c);
-			}
-		}
-		return ret;
-	}
-
 	std::u16string utf8To16(const std::string & str)
 	{
 		std::u16string ret;

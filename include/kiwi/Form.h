@@ -66,6 +66,14 @@ namespace kiwi
 		int32_t combined = 0;
 		float userScore = 0;
 
+		/**
+		 * @brief 형태소의 언어모델 상의 인덱스 값을 보관하는 필드.
+		 * 
+		 * @note 대부분의 경우는 형태소 자체의 인덱스 값과 동일하지만, 
+		 * 이형태 형태소의 경우 원형 형태소의 인덱스 값을 가진다.
+		 */
+		uint32_t lmMorphemeId = 0;
+
 		MorphemeRaw();
 		~MorphemeRaw();
 		MorphemeRaw(const MorphemeRaw&);
@@ -100,6 +108,7 @@ namespace kiwi
 		FixedVector<const Morpheme*> chunks;
 		int32_t combined = 0;
 		float userScore = 0;
+		uint32_t lmMorphemeId = 0;
 
 		Morpheme();
 		~Morpheme();

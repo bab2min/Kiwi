@@ -30,6 +30,11 @@ namespace kiwi
 	struct KGraphNode;
 	struct WordInfo;
 
+	inline uint32_t getDefaultMorphemeId(POSTag tag)
+	{
+		return (uint32_t)tag + 1;
+	}
+
 	/**
 	 * @brief 실제 형태소 분석을 수행하는 클래스.
 	 * 
@@ -301,6 +306,10 @@ namespace kiwi
 		void loadPCMFromTxt(std::istream&& is, MorphemeMap& morphMap);
 		void addCorpusTo(Vector<Vector<uint16_t>>& out, std::istream&& is, MorphemeMap& morphMap);
 		void updateForms();
+		void updateMorphemes();
+
+		bool addWord(const std::u16string& newForm, POSTag tag, float score, size_t origMorphemeId);
+
 	public:
 		struct FromRawData {};
 		static constexpr FromRawData fromRawDataTag = {};
@@ -359,12 +368,50 @@ namespace kiwi
 		/**
 		 * @brief 
 		 * 
-		 * @param str 
+		 * @param form 
 		 * @param tag 
 		 * @param score 
 		 * @return
 		 */
-		bool addWord(const std::u16string& str, POSTag tag = POSTag::nnp, float score = 0);
+		bool addWord(const std::u16string& form, POSTag tag = POSTag::nnp, float score = 0);
+
+		/**
+		 * @brief 
+		 *
+		 * @param newForm
+		 * @param tag
+		 * @param score
+		 * @param origForm
+		 * @return
+		 */
+		bool addWord(const std::u16string& newForm, POSTag tag, float score, const std::u16string& origForm);
+
+		/**
+		 * @brief 규칙에 의해 변형된 형태소 목록을 생성하여 자동 추가한다.
+		 * 
+		 * @param tag 
+		 * @param repl 
+		 * @param score 
+		 * @return 새로 추가된 변형된 형태소 목록
+		 */
+		template<class Replacer>
+		std::vector<std::u16string> addRule(POSTag tag, Replacer&& repl, float score = 0)
+		{
+			std::vector<std::u16string> ret;
+			for (auto& m : morphemes)
+			{
+				size_t morphemeId = &m - morphemes.data();
+				if (morphemeId < defaultTagSize || m.tag != tag) continue;
+				std::u16string input = joinHangul(forms[m.kform].form);
+				std::u16string output = repl(input);
+				if (input == output) continue;
+				if (addWord(output, tag, score, morphemeId))
+				{
+					ret.emplace_back(output);
+				}
+			}
+			return ret;
+		}
 
 		/**
 		 * @brief 

@@ -161,3 +161,41 @@ TEST(KiwiCpp, Issue71_SentenceSplit_u8)
 	EXPECT_EQ(sents[4], u8"그 맛이 크으..");
 	EXPECT_EQ(sents[5], u8"아주 맛있었음...! ^^");
 }
+
+TEST(KiwiCpp, AddRule)
+{
+	Kiwi& okiwi = reuseKiwiInstance();
+	auto ores = okiwi.analyze(u"했어요! 하잖아요! 할까요?", Match::allWithNormalizing);
+	
+	{
+		KiwiBuilder builder{ MODEL_PATH };
+		auto inserted = builder.addRule(POSTag::ef, [](std::u16string input)
+		{
+			if (input.back() == u'요')
+			{
+				input.back() = u'용';
+			}
+			return input;
+		}, 0);
+		Kiwi kiwi = builder.build();
+		auto res = kiwi.analyze(u"했어용! 하잖아용! 할까용?", Match::allWithNormalizing);
+
+		EXPECT_EQ(ores.second, res.second);
+	}
+
+	{
+		KiwiBuilder builder{ MODEL_PATH };
+		auto inserted = builder.addRule(POSTag::ef, [](std::u16string input)
+		{
+			if (input.back() == u'요')
+			{
+				input.back() = u'용';
+			}
+			return input;
+		}, -1);
+		Kiwi kiwi = builder.build();
+		auto res = kiwi.analyze(u"했어용! 하잖아용! 할까용?", Match::allWithNormalizing);
+
+		EXPECT_FLOAT_EQ(ores.second -3, res.second);
+	}
+}

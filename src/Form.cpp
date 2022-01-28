@@ -105,6 +105,7 @@ namespace kiwi
 		ret.combineSocket = o.combineSocket;
 		ret.combined = o.combined;
 		ret.userScore = o.userScore;
+		ret.lmMorphemeId = o.lmMorphemeId;
 		ret.chunks = FixedVector<const Morpheme*>{ o.chunks.size() };
 		for (size_t i = 0; i < o.chunks.size(); ++i)
 		{

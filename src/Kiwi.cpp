@@ -391,12 +391,12 @@ namespace kiwi
 				float candScore = p.accScore;
 				if (wids->back().combineSocket)
 				{
-					// always merge <v> <chunk> with the same socket
+					// merge <v> <chunk> with only the same socket
 					if (wids->back().combineSocket != curMorph->combineSocket || curMorph->chunks.empty())
 					{
 						continue;
 					}
-					seq[0] = morphBase[wids->back().wid].getCombined() - morphBase;
+					seq[0] = morphBase[wids->back().wid].getCombined()->lmMorphemeId;
 				}
 
 				/*auto leftForm = wids->back().ownFormId ? &ownForms[wids->back().ownFormId - 1] : morphBase[wids->back().wid].kform;
@@ -417,20 +417,12 @@ namespace kiwi
 					lSeq = seq[chSize - 1];
 					for (size_t i = 0; i < chSize; ++i)
 					{
-						auto cn = seq[i];
-						if (cn >= vocabSize)
+						if (morphBase[seq[i]].tag == POSTag::v)
 						{
-							if (morphBase[cn].tag == POSTag::v)
-							{
-								// prohibit <v> without <chunk>
-								goto continueFor;
-							}
-							else
-							{
-								cn = (size_t)morphBase[cn].tag + 1;
-							}
+							// prohibit <v> without <chunk>
+							goto continueFor;
 						}
-						float ll = knlm->template progressOpt<arch>(cNode, cn);
+						float ll = knlm->template progressOpt<arch>(cNode, seq[i]);
 						candScore += ll;
 					}
 				}
@@ -466,7 +458,7 @@ namespace kiwi
 				chSize = curMorph->chunks.size();
 				for (size_t i = 0; i < chSize; ++i)
 				{
-					seq[i] = curMorph->chunks[i] - kw->morphemes.data();
+					seq[i] = curMorph->chunks[i]->lmMorphemeId;
 				}
 			}
 			else
@@ -474,12 +466,8 @@ namespace kiwi
 				if ((curMorph->getCombined() ? curMorph->getCombined() : curMorph) - kw->morphemes.data() >= langVocabSize)
 				{
 					isUserWord = true;
-					seq[0] = kw->getDefaultMorpheme(curMorph->tag) - kw->morphemes.data();
 				}
-				else
-				{
-					seq[0] = curMorph - kw->morphemes.data();
-				}
+				seq[0] = curMorph->lmMorphemeId;
 				combSocket = curMorph->combineSocket;
 			}
 			condV = curMorph->vowel;
@@ -507,7 +495,10 @@ namespace kiwi
 			if (curMorph->combineSocket) discountForCombining -= 15.f;
 			if (isUserWord && !leftBoundary)
 			{
-				estimatedLL -= 10.f;
+				// TODO: 조사/어미/접미사가 아니고, 
+				// 왼쪽 형태소가 접두사가 아닌데도 붙어쓰여진 경우
+				// 페널티 부여할 것
+				//estimatedLL -= 10.f;
 			}
 
 			for (auto& p : maxWidLL)
@@ -799,6 +790,10 @@ namespace kiwi
 		if (!!(matchOptions & Match::normalizeCoda)) normalizeCoda(nstr.begin(), nstr.end());
 		// 분석할 문장에 포함된 개별 문자에 대해 어절번호를 생성한다
 		std::vector<uint16_t> wordPositions = getWordPositions({ sBegin, sEnd });
+		
+		// 형태소 위치 분석 버그 때문에 길이를 1칸 널널하게 확보해야함 (https://github.com/bab2min/kiwipiepy/issues/15)
+		// 해당 버그가 수정되면 제거할 것 
+		wordPositions.emplace_back();
 
 		auto nodes = (*reinterpret_cast<FnSplitByTrie>(dfSplitByTrie))(formTrie, nstr, matchOptions);
 		vector<TokenResult> ret;
