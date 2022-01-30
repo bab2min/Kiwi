@@ -308,6 +308,7 @@ namespace kiwi
 		void updateForms();
 		void updateMorphemes();
 
+		size_t findMorpheme(const std::u16string& form, POSTag tag) const;
 		bool addWord(const std::u16string& newForm, POSTag tag, float score, size_t origMorphemeId);
 
 	public:
@@ -366,25 +367,45 @@ namespace kiwi
 		void saveModel(const std::string& modelPath) const;
 
 		/**
-		 * @brief 
+		 * @brief 사전에 새로운 형태소를 추가한다. 이미 동일한 형태소가 있는 경우는 무시된다.
 		 * 
-		 * @param form 
-		 * @param tag 
-		 * @param score 
-		 * @return
+		 * @param form 새로운 형태소의 형태
+		 * @param tag 품사 태그
+		 * @param score 페널티 점수. 이에 대한 자세한 설명은 하단의 note 참조.
+		 * @return `form/tag` 형태소를 추가하는데 성공했으면 true, 동일한 형태소가 존재하여 추가에 실패한 경우 false를 반환한다.
+		 * @note 이 방법으로 추가된 형태소는 언어모델 탐색에서 어휘 사전 외 토큰(OOV 토큰)으로 처리된다.
+		 * 이 방법으로 추가된 형태소는 항상 분석 과정에서 최우선으로 탐색되지는 않으므로 최상의 결과를 위해서는 `score` 값을 조절할 필요가 있다.
+		 * `score` 값을 높게 설정할수록 다른 후보들과의 경쟁에서 이 형태소가 더 높은 점수를 받아 최종 분석 결과에 노출될 가능성이 높아진다.
+		 * 만약 이 방법으로 추가된 형태소가 원치 않는 상황에서 과도하게 출력되는 경우라면 `score`를 더 작은 값으로, 
+		 * 반대로 원하는 상황에서도 출력되지 않는 경우라면 `score`를 더 큰 값으로 조절하는 게 좋다.
 		 */
 		bool addWord(const std::u16string& form, POSTag tag = POSTag::nnp, float score = 0);
 
 		/**
-		 * @brief 
+		 * @brief 사전에 기존 형태소의 변이형을 추가한다. 이미 동일한 형태소가 있는 경우는 무시된다.
 		 *
-		 * @param newForm
-		 * @param tag
-		 * @param score
-		 * @param origForm
-		 * @return
+		 * @param newForm 새로운 형태
+		 * @param tag 품사 태그
+		 * @param score 새로운 형태의 페널티 점수. 이에 대한 자세한 설명은 하단의 `addWord`함수의 note 참조.
+		 * @param origForm 기존 형태
+		 * @return `newForm/tag` 형태소를 추가하는데 성공했으면 true, 동일한 형태소가 존재하여 추가에 실패한 경우 false를 반환한다.
+		 * @exception kiwi::UnknownMorphemeException `origForm/tag`에 해당하는 형태소가 없을 경우 예외를 발생시킨다.
+		 * @note 이 방법으로 추가된 형태소는 언어모델 탐색 과정에서 `origForm/tag` 토큰으로 처리된다.
 		 */
 		bool addWord(const std::u16string& newForm, POSTag tag, float score, const std::u16string& origForm);
+
+		/**
+		 * @brief 사전에 기분석 형태소열을 추가한다. 이미 동일한 기분석 형태소열이 있는 경우는 무시된다.
+		 *
+		 * @param form 분석될 문자열 형태
+		 * @param analyzed `form` 문자열이 입력되었을 때, 이의 분석결과로 내놓을 형태소의 배열
+		 * @param score 페널티 점수. 이에 대한 자세한 설명은 하단의 `addWord`함수의 note 참조.
+		 * @exception kiwi::UnknownMorphemeException `analyzed`로 주어진 형태소 중 하나라도 존재하지 않는게 있는 경우 예외를 발생시킨다.
+		 * @return 형태소열을 추가하는데 성공했으면 true, 동일한 형태소열이 존재하여 추가에 실패한 경우 false를 반환한다.
+		 * @note 이 함수는 특정 문자열이 어떻게 분석되어야하는지 직접적으로 지정해줄 수 있다. 
+		 * 따라서 `addWord` 함수를 사용해도 오분석이 발생하는 경우, 이 함수를 통해 해당 사례들에 대해 정확한 분석 결과를 추가하면 원하는 분석 결과를 얻을 수 있다. 
+		 */
+		bool addPreAnalyzedWord(const std::u16string& form, const std::vector<std::pair<std::u16string, POSTag>>& analyzed, float score = 0);
 
 		/**
 		 * @brief 규칙에 의해 변형된 형태소 목록을 생성하여 자동 추가한다.

@@ -454,7 +454,7 @@ namespace kiwi
 		return forms[ret.first->second];
 	}
 
-	bool KiwiBuilder::addWord(const std::u16string& newForm, POSTag tag, float score, size_t origMorphemeId)
+	bool KiwiBuilder::addWord(const u16string& newForm, POSTag tag, float score, size_t origMorphemeId)
 	{
 		if (newForm.empty()) return false;
 
@@ -480,31 +480,32 @@ namespace kiwi
 		return true;
 	}
 
-	bool KiwiBuilder::addWord(const std::u16string& form, POSTag tag, float score)
+	bool KiwiBuilder::addWord(const u16string& form, POSTag tag, float score)
 	{
 		return addWord(form, tag, score, getDefaultMorphemeId(tag));
 	}
-
-	bool KiwiBuilder::addWord(const std::u16string& newForm, POSTag tag, float score, const std::u16string& origForm)
+	
+	size_t KiwiBuilder::findMorpheme(const u16string& form, POSTag tag) const
 	{
-		auto normalizedOrigForm = normalizeHangul({ origForm.begin(), origForm.end() });
+		auto normalized = normalizeHangul({ form.begin(), form.end() });
+		FormCond fc{ normalized, CondVowel::none, CondPolarity::none };
+		auto it = formMap.find(fc);
+		if (it == formMap.end()) return -1;
 
-		FormCond fc{ normalizedOrigForm, CondVowel::none, CondPolarity::none };
-		auto origIt = formMap.find(fc);
-		if (origIt == formMap.end())
-		{
-			throw UnknownMorphemeException{ "cannot find the original morpheme " + utf16To8(origForm) + "/" + tagToString(tag) };
-		}
-
-		size_t origMorphemeId = -1;
-		for (auto p : forms[origIt->second].candidate)
+		for (auto p : forms[it->second].candidate)
 		{
 			if (morphemes[(size_t)p].tag == tag)
 			{
-				origMorphemeId = p;
-				break;
+				return p;
 			}
 		}
+		return -1;
+	}
+
+	bool KiwiBuilder::addWord(const u16string& newForm, POSTag tag, float score, const u16string& origForm)
+	{
+		size_t origMorphemeId = findMorpheme(origForm, tag);
+
 		if (origMorphemeId == -1)
 		{
 			throw UnknownMorphemeException{ "cannot find the original morpheme " + utf16To8(origForm) + "/" + tagToString(tag) };
@@ -513,7 +514,45 @@ namespace kiwi
 		return addWord(newForm, tag, score, origMorphemeId);
 	}
 
-	size_t KiwiBuilder::loadDictionary(const std::string& dictPath)
+	bool KiwiBuilder::addPreAnalyzedWord(const u16string& form, const vector<pair<u16string, POSTag>>& analyzed, float score)
+	{
+		if (form.empty()) return false;
+
+		Vector<uint32_t> analyzedIds;
+		for (auto& p : analyzed)
+		{
+			size_t morphemeId = findMorpheme(p.first, p.second);
+			if (morphemeId == -1)
+			{
+				throw UnknownMorphemeException{ "cannot find the original morpheme " + utf16To8(p.first) + "/" + tagToString(p.second) };
+			}
+			analyzedIds.emplace_back(morphemeId);
+		}
+
+		auto normalizedForm = normalizeHangul({ form.begin(), form.end() });
+		auto& f = addForm(normalizedForm, CondVowel::none, CondPolarity::none);
+		if (f.candidate.empty())
+		{
+		}
+		else
+		{
+			for (auto p : f.candidate)
+			{
+				auto& mchunks = morphemes[(size_t)p].chunks;
+				if (mchunks == analyzedIds) return false;
+			}
+		}
+
+		f.candidate.emplace_back(morphemes.size());
+		morphemes.emplace_back(POSTag::unknown);
+		morphemes.back().kform = &f - &forms[0];
+		morphemes.back().userScore = score;
+		morphemes.back().lmMorphemeId = morphemes.size() - 1;
+		morphemes.back().chunks = analyzedIds;
+		return true;
+	}
+
+	size_t KiwiBuilder::loadDictionary(const string& dictPath)
 	{
 		size_t addedCnt = 0;
 		ifstream ifs{ dictPath };

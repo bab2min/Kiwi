@@ -199,3 +199,32 @@ TEST(KiwiCpp, AddRule)
 		EXPECT_FLOAT_EQ(ores.second -3, res.second);
 	}
 }
+
+TEST(KiwiCpp, AddPreAnalyzedWord)
+{
+	Kiwi& okiwi = reuseKiwiInstance();
+	auto ores = okiwi.analyze("팅겼어...", Match::allWithNormalizing);
+
+	KiwiBuilder builder{ MODEL_PATH };
+	std::vector<std::pair<std::u16string, POSTag>> analyzed;
+	analyzed.emplace_back(u"팅기", POSTag::vv);
+	analyzed.emplace_back(u"었", POSTag::ep);
+	analyzed.emplace_back(u"어", POSTag::ef);
+	
+	EXPECT_THROW(builder.addPreAnalyzedWord(u"팅겼어", analyzed), UnknownMorphemeException);
+
+	builder.addWord(u"팅기", POSTag::vv);
+	builder.addPreAnalyzedWord(u"팅겼어", analyzed);
+	
+	Kiwi kiwi = builder.build();
+	auto res = kiwi.analyze("팅겼어...", Match::allWithNormalizing);
+	
+	EXPECT_EQ(res.first[0].str, u"팅기");
+	EXPECT_EQ(res.first[0].tag, POSTag::vv);
+	EXPECT_EQ(res.first[1].str, u"었");
+	EXPECT_EQ(res.first[1].tag, POSTag::ep);
+	EXPECT_EQ(res.first[2].str, u"어");
+	EXPECT_EQ(res.first[2].tag, POSTag::ef);
+	EXPECT_EQ(res.first[3].str, u"...");
+	EXPECT_EQ(res.first[3].tag, POSTag::sf);
+}

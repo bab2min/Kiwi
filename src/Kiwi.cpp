@@ -445,6 +445,7 @@ namespace kiwi
 		for (auto& curMorph : cands)
 		{
 			array<Wid, 4> seq = { 0, };
+			array<Wid, 4> oseq = { 0, };
 			uint8_t combSocket = 0;
 			CondVowel condV = CondVowel::none;
 			CondPolarity condP = CondPolarity::none;
@@ -459,15 +460,28 @@ namespace kiwi
 				for (size_t i = 0; i < chSize; ++i)
 				{
 					seq[i] = curMorph->chunks[i]->lmMorphemeId;
+					if (curMorph->chunks[i] - kw->morphemes.data() >= langVocabSize)
+					{
+						oseq[i] = curMorph->chunks[i] - kw->morphemes.data();
+					}
+					else
+					{
+						oseq[i] = seq[i];
+					}
 				}
 			}
 			else
 			{
+				seq[0] = curMorph->lmMorphemeId;
 				if ((curMorph->getCombined() ? curMorph->getCombined() : curMorph) - kw->morphemes.data() >= langVocabSize)
 				{
 					isUserWord = true;
+					oseq[0] = curMorph - kw->morphemes.data();
 				}
-				seq[0] = curMorph->lmMorphemeId;
+				else
+				{
+					oseq[0] = seq[0];
+				}
 				combSocket = curMorph->combineSocket;
 			}
 			condV = curMorph->vowel;
@@ -530,23 +544,24 @@ namespace kiwi
 							lastPos += kw->morphemes[seq[0]].kform->size() - 1;
 							for (size_t ch = 1; ch < chSize; ++ch)
 							{
-								wids.emplace_back(seq[ch], 0, condV, condP, 0, lastPos);
-								lastPos += kw->morphemes[seq[ch]].kform->size() - 1;
+								wids.emplace_back(oseq[ch], 0, condV, condP, 0, lastPos);
+								lastPos += kw->morphemes[oseq[ch]].kform->size() - 1;
 							}
 						}
 						else
 						{
 							for (size_t ch = 0; ch < chSize; ++ch)
 							{
-								wids.emplace_back(seq[ch], 0, condV, condP, 0, lastPos);
-								lastPos += kw->morphemes[seq[ch]].kform->size() - 1;
+								wids.emplace_back(oseq[ch], 0, condV, condP, 0, lastPos);
+								lastPos += kw->morphemes[oseq[ch]].kform->size() - 1;
 							}
 						}
 					}
 					else
 					{
-						wids.emplace_back(isUserWord ? curMorph - kw->morphemes.data() : seq[0],
-							combSocket, CondVowel::none, CondPolarity::none, ownFormId, node->lastPos);
+						wids.emplace_back(oseq[0], combSocket, 
+							CondVowel::none, CondPolarity::none, ownFormId, node->lastPos
+						);
 					}
 				}
 			}
