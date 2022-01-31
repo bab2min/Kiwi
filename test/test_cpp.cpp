@@ -228,3 +228,24 @@ TEST(KiwiCpp, AddPreAnalyzedWord)
 	EXPECT_EQ(res.first[3].str, u"...");
 	EXPECT_EQ(res.first[3].tag, POSTag::sf);
 }
+
+TEST(KiwiCpp, JoinAffix)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	auto sample = u"사랑스러운 풋사과들아! 배송됐니";
+	auto ores = kiwi.analyze(sample, Match::none);
+	auto res0 = kiwi.analyze(sample, Match::joinNounPrefix);
+	EXPECT_EQ(res0.first[3].str, u"풋사과");
+	auto res1 = kiwi.analyze(sample, Match::joinNounSuffix);
+	EXPECT_EQ(res1.first[4].str, u"사과들");
+	auto res2 = kiwi.analyze(sample, Match::joinNounPrefix | Match::joinNounSuffix);
+	EXPECT_EQ(res2.first[3].str, u"풋사과들");
+	auto res3 = kiwi.analyze(sample, Match::joinAdjSuffix);
+	EXPECT_EQ(res3.first[0].str, u"사랑스럽");
+	auto res4 = kiwi.analyze(sample, Match::joinVerbSuffix);
+	EXPECT_EQ(res4.first[8].str, u"배송되");
+	auto res5 = kiwi.analyze(sample, Match::joinAffix);
+	EXPECT_EQ(res5.first[0].str, u"사랑스럽");
+	EXPECT_EQ(res5.first[2].str, u"풋사과들");
+	EXPECT_EQ(res5.first[5].str, u"배송되");
+}

@@ -793,6 +793,73 @@ namespace kiwi
 		return wordPositions;
 	}
 
+	void concatTokens(TokenInfo& dest, const TokenInfo& src, POSTag tag)
+	{
+		dest.tag = tag;
+		dest.morph = nullptr;
+		dest.length = (uint16_t)(src.position + src.length - dest.position);
+		dest.str += src.str;
+	}
+
+	template<class TokenInfoIt>
+	TokenInfoIt joinAffixTokens(TokenInfoIt first, TokenInfoIt last, Match matchOptions)
+	{
+		if (!(matchOptions & (Match::joinNounPrefix | Match::joinNounSuffix | Match::joinVerbSuffix | Match::joinAdjSuffix))) return last;
+		if (std::distance(first, last) < 2) return last;
+
+		auto next = first;
+		++next;
+		while(next != last)
+		{
+			TokenInfo& current = *first;
+			TokenInfo& nextToken = *next;
+
+			// XPN + (NN. | SN) => (NN. | SN)
+			if (!!(matchOptions & Match::joinNounPrefix) 
+				&& current.tag == POSTag::xpn 
+				&& ((POSTag::nng <= nextToken.tag && nextToken.tag <= POSTag::nnb) || nextToken.tag == POSTag::sn)
+			)
+			{
+				concatTokens(current, nextToken, nextToken.tag);
+				++next;
+			}
+			// (NN. | SN) + XSN => (NN. | SN)
+			else if (!!(matchOptions & Match::joinNounSuffix)
+				&& nextToken.tag == POSTag::xsn
+				&& ((POSTag::nng <= current.tag && current.tag <= POSTag::nnb) || current.tag == POSTag::sn)
+			)
+			{
+				concatTokens(current, nextToken, current.tag);
+				++next;
+			}
+			// (NN. | XR) + XSV => VV
+			else if (!!(matchOptions & Match::joinVerbSuffix)
+				&& nextToken.tag == POSTag::xsv
+				&& ((POSTag::nng <= current.tag && current.tag <= POSTag::nnb) || current.tag == POSTag::xr)
+			)
+			{
+				concatTokens(current, nextToken, POSTag::vv);
+				++next;
+			}
+			// (NN. | XR) + XSA => VA
+			else if (!!(matchOptions & Match::joinAdjSuffix)
+				&& nextToken.tag == POSTag::xsa
+				&& ((POSTag::nng <= current.tag && current.tag <= POSTag::nnb) || current.tag == POSTag::xr)
+			)
+			{
+				concatTokens(current, nextToken, POSTag::va);
+				++next;
+			}
+			else
+			{
+				++first;
+				if (first != next) *first = *next;
+				++next;
+			}
+		}
+		return ++first;
+	}
+
 	std::vector<TokenResult> Kiwi::analyzeSent(const std::u16string::const_iterator& sBegin, const std::u16string::const_iterator& sEnd, size_t topN, Match matchOptions) const
 	{
 		auto nstr = normalizeHangul({ sBegin, sEnd });
@@ -862,6 +929,7 @@ namespace kiwi
         		rarr.back().wordPosition = wordPositions[rarr.back().position];
 				prevMorph = get<0>(s)->kform;
 			}
+			rarr.erase(joinAffixTokens(rarr.begin(), rarr.end(), matchOptions), rarr.end());
 			ret.emplace_back(rarr, r.second);
 		}
 		if (ret.empty()) ret.emplace_back();
@@ -870,7 +938,7 @@ namespace kiwi
 
 	const Morpheme* Kiwi::getDefaultMorpheme(POSTag tag) const
 	{
-		return &morphemes[(size_t)tag + 1];
+		return &morphemes[getDefaultMorphemeId(tag)];
 	}
 
 	future<vector<TokenResult>> Kiwi::asyncAnalyze(const string& str, size_t topN, Match matchOptions) const
