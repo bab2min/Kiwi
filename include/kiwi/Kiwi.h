@@ -74,11 +74,11 @@ namespace kiwi
 
 		Kiwi(const Kiwi&) = delete;
 
-		Kiwi(Kiwi&&);
+		Kiwi(Kiwi&&) noexcept;
 
 		Kiwi& operator=(const Kiwi&) = delete;
 
-		Kiwi& operator=(Kiwi&&);
+		Kiwi& operator=(Kiwi&&) noexcept;
 
 		/**
 		 * @brief 현재 Kiwi 객체가 형태소 분석을 수행할 준비가 되었는지를 알려준다.
@@ -326,11 +326,11 @@ namespace kiwi
 
 		KiwiBuilder(const KiwiBuilder&);
 
-		KiwiBuilder(KiwiBuilder&&);
+		KiwiBuilder(KiwiBuilder&&) noexcept;
 
 		KiwiBuilder& operator=(const KiwiBuilder&);
 
-		KiwiBuilder& operator=(KiwiBuilder&&);
+		KiwiBuilder& operator=(KiwiBuilder&&) noexcept;
 
 		/**
 		 * @brief KiwiBuilder를 raw 데이터로부터 생성한다.

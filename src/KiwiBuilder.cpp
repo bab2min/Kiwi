@@ -68,11 +68,11 @@ namespace kiwi
 
 	KiwiBuilder::KiwiBuilder(const KiwiBuilder&) = default;
 
-	KiwiBuilder::KiwiBuilder(KiwiBuilder&&) = default;
+	KiwiBuilder::KiwiBuilder(KiwiBuilder&&) noexcept = default;
 
 	KiwiBuilder& KiwiBuilder::operator=(const KiwiBuilder&) = default;
 
-	KiwiBuilder& KiwiBuilder::operator=(KiwiBuilder&&) = default;
+	KiwiBuilder& KiwiBuilder::operator=(KiwiBuilder&&) noexcept = default;
 
 	void KiwiBuilder::loadMMFromTxt(std::istream&& is, MorphemeMap& morphMap, std::unordered_map<POSTag, float>* posWeightSum, const function<bool(float, POSTag)>& selector)
 	{
@@ -84,8 +84,8 @@ namespace kiwi
 			auto fields = split(wstr, u'\t');
 			if (fields.size() < 8) continue;
 
-			auto form = normalizeHangul({ fields[0].begin(), fields[0].end() });
-			auto tag = toPOSTag({ fields[1].begin(), fields[1].end() });
+			auto form = normalizeHangul(fields[0]);
+			auto tag = toPOSTag(fields[1]);
 
 			float morphWeight = stof(fields[2].begin(), fields[2].end());
 			if (!selector(morphWeight, tag)) continue;
@@ -159,7 +159,7 @@ namespace kiwi
 			auto fields = split(wstr, u'\t');
 			if (fields.size() < 2) continue;
 			if (fields.size() == 2) fields.emplace_back();
-			auto form = normalizeHangul({ fields[0].begin(), fields[0].end() });
+			auto form = normalizeHangul(fields[0]);
 			Vector<uint32_t> chunkIds;
 			float ps = 0;
 			size_t bTag = 0;
@@ -167,14 +167,14 @@ namespace kiwi
 			{
 				auto c = split(chunk, u'/');
 				if (c.size() < 2) continue;
-				auto f = normalizeHangul({ c[0].begin(), c[0].end() });
-				auto tag = toPOSTag({ c[1].begin(), c[1].end() });
+				auto f = normalizeHangul(c[0]);
+				auto tag = toPOSTag(c[1]);
 				auto it = morphMap.find(make_pair(f, tag));
 				if (it != morphMap.end())
 				{
 					chunkIds.emplace_back(it->second);
 				}
-				else if (tag == POSTag::v)
+				else if (tag == POSTag::p)
 				{
 					size_t mid = morphemes.size();
 					morphMap.emplace(make_pair(f, tag), mid);
@@ -236,10 +236,10 @@ namespace kiwi
 
 			auto combs = split(fields[0], u'+');
 			auto org = combs[0] + combs[1];
-			auto form = normalizeHangul({ combs[0].begin(), combs[0].end() });
-			auto orgform = normalizeHangul({ org.begin(), org.end() });
-			auto tag = toPOSTag({ fields[1].begin(), fields[1].end() });
-			KString suffixes = normalizeHangul({ fields[2].begin(), fields[2].end() });
+			auto form = normalizeHangul(combs[0]);
+			auto orgform = normalizeHangul(org);
+			auto tag = toPOSTag(fields[1]);
+			KString suffixes = normalizeHangul(fields[2]);
 			uint8_t socket = (size_t)stof(fields[3].begin(), fields[3].end());
 
 			auto mit = morphMap.find(make_pair(orgform, tag));
@@ -337,7 +337,7 @@ namespace kiwi
 	{
 		for (auto& m : morphemes)
 		{
-			if (m.tag == POSTag::v || (&m - morphemes.data() + m.combined) < langMdl->getHeader().vocab_size)
+			if (m.tag == POSTag::p || (&m - morphemes.data() + m.combined) < langMdl->getHeader().vocab_size)
 			{
 				m.lmMorphemeId = &m - morphemes.data();
 			}
@@ -458,7 +458,7 @@ namespace kiwi
 	{
 		if (newForm.empty()) return false;
 
-		auto normalizedForm = normalizeHangul({ newForm.begin(), newForm.end() });
+		auto normalizedForm = normalizeHangul(newForm);
 		auto& f = addForm(normalizedForm, CondVowel::none, CondPolarity::none);
 		if (f.candidate.empty())
 		{
@@ -487,7 +487,7 @@ namespace kiwi
 	
 	size_t KiwiBuilder::findMorpheme(const u16string& form, POSTag tag) const
 	{
-		auto normalized = normalizeHangul({ form.begin(), form.end() });
+		auto normalized = normalizeHangul(form);
 		FormCond fc{ normalized, CondVowel::none, CondPolarity::none };
 		auto it = formMap.find(fc);
 		if (it == formMap.end()) return -1;
@@ -529,7 +529,7 @@ namespace kiwi
 			analyzedIds.emplace_back(morphemeId);
 		}
 
-		auto normalizedForm = normalizeHangul({ form.begin(), form.end() });
+		auto normalizedForm = normalizeHangul(form);
 		auto& f = addForm(normalizedForm, CondVowel::none, CondPolarity::none);
 		if (f.candidate.empty())
 		{

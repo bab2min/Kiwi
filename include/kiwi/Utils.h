@@ -24,6 +24,7 @@ namespace kiwi
 
 	std::u16string utf8To16(const std::string& str);
 	std::u16string utf8To16(const std::string& str, std::vector<size_t>& bytePositions);
+	std::string utf8FromCode(size_t code);
 	std::string utf16To8(const std::u16string& str);
 
 	inline bool isWebTag(POSTag t)
@@ -61,6 +62,11 @@ namespace kiwi
 		return ret;
 	}
 
+	inline KString normalizeHangul(const std::string& hangul)
+	{
+		return normalizeHangul(utf8To16(hangul));
+	}
+
 	inline std::u16string joinHangul(const KString& hangul)
 	{
 		std::u16string ret;
@@ -80,8 +86,8 @@ namespace kiwi
 		return ret;
 	}
 
-	template<class BaseChr, class OutIterator>
-	void split(const std::basic_string<BaseChr>& s, BaseChr delim, OutIterator result)
+	template<class BaseChr, class Trait, class Alloc, class OutIterator>
+	void split(const std::basic_string<BaseChr, Trait, Alloc>& s, BaseChr delim, OutIterator result)
 	{
 		size_t p = 0;
 		while (1)
@@ -100,10 +106,10 @@ namespace kiwi
 		}
 	}
 
-	template<class BaseChr>
-	inline std::vector<std::basic_string<BaseChr>> split(const std::basic_string<BaseChr>& s, BaseChr delim)
+	template<class BaseChr, class Trait, class Alloc>
+	inline std::vector<std::basic_string<BaseChr, Trait, Alloc>> split(const std::basic_string<BaseChr, Trait, Alloc>& s, BaseChr delim)
 	{
-		std::vector<std::basic_string<BaseChr>> elems;
+		std::vector<std::basic_string<BaseChr, Trait, Alloc>> elems;
 		split(s, delim, std::back_inserter(elems));
 		return elems;
 	}

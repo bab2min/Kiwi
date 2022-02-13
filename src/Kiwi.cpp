@@ -68,9 +68,9 @@ namespace kiwi
 
 	Kiwi::~Kiwi() = default;
 
-	Kiwi::Kiwi(Kiwi&&) = default;
+	Kiwi::Kiwi(Kiwi&&) noexcept = default;
 
-	Kiwi& Kiwi::operator=(Kiwi&&) = default;
+	Kiwi& Kiwi::operator=(Kiwi&&) noexcept = default;
 
 	inline vector<size_t> allNewLinePositions(const u16string& str)
 	{
@@ -417,7 +417,7 @@ namespace kiwi
 					lSeq = seq[chSize - 1];
 					for (size_t i = 0; i < chSize; ++i)
 					{
-						if (morphBase[seq[i]].tag == POSTag::v)
+						if (morphBase[seq[i]].tag == POSTag::p)
 						{
 							// prohibit <v> without <chunk>
 							goto continueFor;
@@ -853,7 +853,7 @@ namespace kiwi
 			else
 			{
 				++first;
-				if (first != next) *first = *next;
+				if (first != next) *first = std::move(*next);
 				++next;
 			}
 		}
@@ -862,7 +862,7 @@ namespace kiwi
 
 	std::vector<TokenResult> Kiwi::analyzeSent(const std::u16string::const_iterator& sBegin, const std::u16string::const_iterator& sEnd, size_t topN, Match matchOptions) const
 	{
-		auto nstr = normalizeHangul({ sBegin, sEnd });
+		auto nstr = normalizeHangul(std::u16string{ sBegin, sEnd });
 		Vector<uint32_t> posMap(nstr.size() + 1);
 		for (size_t i = 0; i < nstr.size(); ++i)
 		{

@@ -83,8 +83,8 @@ namespace kiwi
 	template<typename _Ty>
 	using Vector = std::vector<_Ty, mi_stl_allocator<_Ty>>;
 
-	template<typename _K, typename _V>
-	using UnorderedMap = std::unordered_map<_K, _V, std::hash<_K>, std::equal_to<_K>, mi_stl_allocator<std::pair<const _K, _V>>>;
+	template<typename _K, typename _V, typename _Hash=std::hash<_K>>
+	using UnorderedMap = std::unordered_map<_K, _V, _Hash, std::equal_to<_K>, mi_stl_allocator<std::pair<const _K, _V>>>;
 
 	using KString = std::basic_string<kchar_t, std::char_traits<kchar_t>, mi_stl_allocator<kchar_t>>;
 	using KStringStream = std::basic_stringstream<kchar_t, std::char_traits<kchar_t>, mi_stl_allocator<kchar_t>>;
@@ -109,8 +109,8 @@ namespace kiwi
 	 * mimalloc 사용시 UnorderMap이 좀 더 빠른 속도로 메모리를 할당 받을 수 있음.
 	 * @sa Vector
 	 */
-	template<typename _K, typename _V>
-	using UnorderedMap = std::unordered_map<_K, _V>;
+	template<typename _K, typename _V, typename _Hash = std::hash<_K>>
+	using UnorderedMap = std::unordered_map<_K, _V, _Hash>;
 
 	/**
 	 * @brief std::u16string의 내부용 타입. mimalloc 옵션에 따라 mi_stl_allocator로부터 메모리를 할당받는다.
@@ -147,7 +147,7 @@ namespace kiwi
 		w_url, w_email, w_mention, w_hashtag,
 		jks, jkc, jkg, jko, jkb, jkv, jkq, jx, jc,
 		ep, ef, ec, etn, etm,
-		v, /**< 분할된 동사/형용사를 나타내는데 사용됨 */
+		p, /**< 분할된 동사/형용사를 나타내는데 사용됨 */
 		max, /**< POSTag의 총 개수를 나타내는 용도 */
 	};
 

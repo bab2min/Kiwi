@@ -1,8 +1,40 @@
 #include "gtest/gtest.h"
 #include <kiwi/Kiwi.h>
 #include "common.h"
+#include "../src/Combiner.h"
 
 using namespace kiwi;
+
+TEST(KiwiCpp, Combiner)
+{
+	cmb::CompiledRule rule;
+	{
+		cmb::RuleSet crs;
+		std::ifstream ifs{ MODEL_PATH "/combiningRule.txt" };
+		crs.loadRules(ifs);
+		rule = crs.compile();
+	}
+
+	EXPECT_EQ(rule.combine(u"이", POSTag::vcp, u"다", POSTag::ec, CondVowel::vowel)[0], u"다");
+	EXPECT_EQ(rule.combine(u"이", POSTag::vcp, u"었", POSTag::ec, CondVowel::vowel)[0], u"이었");
+	EXPECT_EQ(rule.combine(u"이", POSTag::vcp, u"ᆫ지도", POSTag::ec, CondVowel::vowel)[0], u"ᆫ지도");
+	EXPECT_EQ(rule.combine(u"이", POSTag::vcp, u"ᆫ가", POSTag::ec, CondVowel::vowel)[0], u"ᆫ가");
+	
+
+	EXPECT_EQ(rule.combine(u"이르", POSTag::vv, u"어", POSTag::ec)[0], u"이르러");
+	EXPECT_EQ(rule.combine(u"푸", POSTag::vv, u"어", POSTag::ec)[0], u"퍼");
+	EXPECT_EQ(rule.combine(u"따르", POSTag::vv, u"어", POSTag::ec)[0], u"따라");
+	EXPECT_EQ(rule.combine(u"돕", POSTag::vv, u"어", POSTag::ec)[0], u"도와");
+	EXPECT_EQ(rule.combine(u"하", POSTag::vv, u"도록", POSTag::ec)[0], u"토록");
+	EXPECT_EQ(rule.combine(u"하", POSTag::vv, u"어", POSTag::ec)[0], u"해");
+
+	EXPECT_EQ(rule.combine(u"타이르", POSTag::p, u"어", POSTag::ec)[0], u"타일러");
+	EXPECT_EQ(rule.combine(u"가르", POSTag::p, u"어", POSTag::ec)[0], u"갈라");
+
+	EXPECT_EQ(rule.combine(u"나", POSTag::np, u"가", POSTag::jks)[0], u"내가");
+
+	EXPECT_EQ(rule.combine(u"시", POSTag::ep, u"어용", POSTag::ef)[0], u"세용");
+}
 
 Kiwi& reuseKiwiInstance()
 {
@@ -120,6 +152,22 @@ TEST(KiwiCpp, Issue57_BuilderAddWord)
 		TokenResult res = kiwi.analyze(u"울트라리스크가 뭐야?", Match::all);
 		EXPECT_EQ(res.first[0].str, std::u16string{ u"울트라리스크" });
 	}
+}
+
+TEST(KiwiCpp, IncorrectPosition)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	auto tokens = kiwi.analyze(u"자랑했던", Match::all).first;
+	EXPECT_EQ(tokens[0].position, 0);
+	//EXPECT_EQ(tokens[1].position, 2);
+	EXPECT_EQ(tokens[2].position, 2);
+	EXPECT_EQ(tokens[3].position, 3);
+}
+
+TEST(KiwiCpp, TokenProbs)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	auto tokens = kiwi.analyze(u"넘어갈 뻔 했답니다 강남역 맛집 토끼정", Match::all).first;
 }
 
 TEST(KiwiCpp, Issue71_SentenceSplit_u16)

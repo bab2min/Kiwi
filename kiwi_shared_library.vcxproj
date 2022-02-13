@@ -45,7 +45,9 @@
     <ClInclude Include="include\kiwi\Types.h" />
     <ClInclude Include="include\kiwi\Utils.h" />
     <ClInclude Include="include\kiwi\WordDetector.h" />
+    <ClInclude Include="src\Combiner.h" />
     <ClInclude Include="src\count.hpp" />
+    <ClInclude Include="src\bitset.hpp" />
     <ClInclude Include="src\FrozenTrie.hpp" />
     <ClInclude Include="src\FeatureTestor.h" />
     <ClInclude Include="src\Knlm.hpp" />
@@ -57,6 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ArchUtils.cpp" />
+    <ClCompile Include="src\Combiner.cpp" />
     <ClCompile Include="src\search.cpp" />
     <ClCompile Include="third_party\mimalloc\src\static.c" />
     <ClCompile Include="src\Form.cpp" />
@@ -141,27 +144,27 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)third_party/cpuinfo/src;$(SolutionDir)third_party/cpuinfo/include;$(SolutionDir)third_party/mimalloc/include;$(SolutionDir)third_party/cpp-btree;$(ProjectDir)include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)third_party/variant/include;$(SolutionDir)third_party/cpuinfo/src;$(SolutionDir)third_party/cpuinfo/include;$(SolutionDir)third_party/mimalloc/include;$(SolutionDir)third_party/cpp-btree;$(ProjectDir)include\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)third_party/cpuinfo/src;$(SolutionDir)third_party/cpuinfo/include;$(ProjectDir)third_party/mimalloc/include;$(ProjectDir)third_party/cpp-btree;$(ProjectDir)include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)third_party/variant/include;$(SolutionDir)third_party/cpuinfo/src;$(SolutionDir)third_party/cpuinfo/include;$(ProjectDir)third_party/mimalloc/include;$(ProjectDir)third_party/cpp-btree;$(ProjectDir)include\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)third_party/cpuinfo/src;$(SolutionDir)third_party/cpuinfo/include;$(SolutionDir)third_party/mimalloc/include;$(SolutionDir)third_party/cpp-btree;$(ProjectDir)include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)third_party/variant/include;$(SolutionDir)third_party/cpuinfo/src;$(SolutionDir)third_party/cpuinfo/include;$(SolutionDir)third_party/mimalloc/include;$(SolutionDir)third_party/cpp-btree;$(ProjectDir)include\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release(LODA_TXT)|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)third_party/cpuinfo/src;$(SolutionDir)third_party/cpuinfo/include;$(SolutionDir)third_party/mimalloc/include;$(SolutionDir)third_party/cpp-btree;$(ProjectDir)include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)third_party/variant/include;$(SolutionDir)third_party/cpuinfo/src;$(SolutionDir)third_party/cpuinfo/include;$(SolutionDir)third_party/mimalloc/include;$(SolutionDir)third_party/cpp-btree;$(ProjectDir)include\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)third_party/cpuinfo/src;$(SolutionDir)third_party/cpuinfo/include;$(ProjectDir)third_party/mimalloc/include;$(ProjectDir)third_party/cpp-btree;$(ProjectDir)include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)third_party/variant/include;$(SolutionDir)third_party/cpuinfo/src;$(SolutionDir)third_party/cpuinfo/include;$(ProjectDir)third_party/mimalloc/include;$(ProjectDir)third_party/cpp-btree;$(ProjectDir)include\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release(LODA_TXT)|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)third_party/cpuinfo/src;$(SolutionDir)third_party/cpuinfo/include;$(ProjectDir)third_party/mimalloc/include;$(ProjectDir)third_party/cpp-btree;$(ProjectDir)include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)third_party/variant/include;$(SolutionDir)third_party/cpuinfo/src;$(SolutionDir)third_party/cpuinfo/include;$(ProjectDir)third_party/mimalloc/include;$(ProjectDir)third_party/cpp-btree;$(ProjectDir)include\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

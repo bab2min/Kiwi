@@ -95,5 +95,20 @@ namespace kiwi
 		struct get<0, seq<>>
 		{
 		};
+
+		namespace detail
+		{
+			template<std::ptrdiff_t... Ns, typename... Ts>
+			auto tail(seq<Ns...>, const std::tuple<Ts...>& t) -> decltype(std::make_tuple(std::get<Ns + 1>(t)...))
+			{
+				return std::make_tuple(std::get<Ns + 1>(t)...);
+			}
+		}
+
+		template<typename... Ts>
+		auto tuple_tail(const std::tuple<Ts...>& t) -> decltype(detail::tail(gen_seq<sizeof...(Ts) - 1>{}, t))
+		{
+			return detail::tail(gen_seq<sizeof...(Ts) - 1>{}, t);
+		}
 	}
 }

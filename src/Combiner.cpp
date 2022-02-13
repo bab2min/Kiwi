@@ -1,0 +1,892 @@
+﻿#include <array>
+#include <iostream>
+#include <unordered_set>
+#include <algorithm>
+
+#include <kiwi/Utils.h>
+
+#include "FeatureTestor.h"
+#include "Combiner.h"
+
+using namespace std;
+using namespace kiwi;
+using namespace kiwi::cmb;
+
+ChrSet::ChrSet() = default;
+ChrSet::ChrSet(const ChrSet&) = default;
+ChrSet::ChrSet(ChrSet&&) noexcept = default;
+ChrSet::~ChrSet() = default;
+ChrSet& ChrSet::operator=(const ChrSet&) = default;
+ChrSet& ChrSet::operator=(ChrSet&&) noexcept = default;
+
+Pattern::Pattern() = default;
+Pattern::Pattern(const Pattern&) = default;
+Pattern::Pattern(Pattern&&) noexcept = default;
+Pattern::~Pattern() = default;
+Pattern& Pattern::operator=(const Pattern&) = default;
+Pattern& Pattern::operator=(Pattern&&) noexcept = default;
+
+CompiledRule::CompiledRule() = default;
+CompiledRule::CompiledRule(const CompiledRule&) = default;
+CompiledRule::CompiledRule(CompiledRule&&) noexcept = default;
+CompiledRule::~CompiledRule() = default;
+CompiledRule& CompiledRule::operator=(const CompiledRule&) = default;
+CompiledRule& CompiledRule::operator=(CompiledRule&&) noexcept = default;
+
+RuleSet::RuleSet() = default;
+RuleSet::RuleSet(const RuleSet&) = default;
+RuleSet::RuleSet(RuleSet&&) noexcept = default;
+RuleSet::~RuleSet() = default;
+RuleSet& RuleSet::operator=(const RuleSet&) = default;
+RuleSet& RuleSet::operator=(RuleSet&&) noexcept = default;
+
+inline bool hasRange(const ChrSet& set, char16_t b, char16_t e)
+{
+	for (auto& p : set.ranges)
+	{
+		if (p.first <= b && e <= p.second) return !set.negation;
+	}
+	return set.negation;
+}
+
+ChrSet::ChrSet(char16_t chr)
+{
+	ranges.emplace_back((uint16_t)chr, (uint16_t)chr);
+}
+
+Pattern::Pattern(const KString& expr)
+{
+	static constexpr ptrdiff_t endIdx = numeric_limits<ptrdiff_t>::max();
+	struct Group
+	{
+		ptrdiff_t prev = 0;
+		Vector<ptrdiff_t> last;
+	};
+	Vector<Group> groupStack;
+	ptrdiff_t lastNode = 0, beforeNode = 0;
+	nodes.emplace_back();
+	groupStack.emplace_back();
+	groupStack.back().prev = lastNode;
+	bool inCharClass = false;
+	bool inRange = false;
+	ChrSet charClass;
+
+	for (size_t i = 0; i < expr.size(); ++i)
+	{
+		switch (expr[i])
+		{
+		case u'(':
+			if (inCharClass) goto addIntoClass;
+			groupStack.emplace_back();
+			groupStack.back().prev = lastNode;
+			continue;
+		case u')':
+			if (inCharClass) goto addIntoClass;
+			if (groupStack.size() <= 1) throw runtime_error{ "unpaired closing parenthesis" };
+			beforeNode = groupStack.back().prev;
+			for (auto& node : nodes)
+			{
+				auto& nodeNext = node.next;
+				auto it = nodeNext.find(endIdx);
+				if (it == nodeNext.end()) continue;
+				swap(nodeNext[lastNode - (&node - nodes.data())], it->second);
+				nodeNext.erase(it);
+			}
+			groupStack.pop_back();
+			continue;
+		case u'|':
+			if (inCharClass) goto addIntoClass;
+			{
+				nodes.pop_back();
+				groupStack.back().last.emplace_back(lastNode - 1);
+				for (auto& node : nodes)
+				{
+					auto& nodeNext = node.next;
+					auto it = nodeNext.find(lastNode - (&node - nodes.data()));
+					if (it == nodeNext.end()) continue;
+					swap(nodeNext[endIdx], it->second);
+					nodeNext.erase(it);
+				}
+				lastNode = groupStack.back().prev;
+			}
+			continue;
+		case u'[':
+			if (inCharClass) goto addIntoClass;
+			inCharClass = true;
+			inRange = false;
+			charClass = {};
+			continue;
+		case u']':
+			if (inCharClass)
+			{
+				if (inRange) throw runtime_error{ "unpaired range in character class" };
+				inCharClass = false;
+				goto addSingleNode;
+			}
+			else
+			{
+				throw runtime_error{ "unpaired ]" };
+			}
+			continue;
+		case u'^':
+			if (inCharClass)
+			{
+				if (charClass.ranges.empty())
+				{
+					charClass.negation = true;
+				}
+				else goto addIntoClass;
+			}
+			else
+			{
+				charClass = { bos };
+				goto addSingleNode;
+			}
+			continue;
+		case u'$':
+			if (inCharClass) goto addIntoClass;
+			charClass = { eos };
+			goto addSingleNode;
+		case u'-':
+			if (inCharClass)
+			{
+				if (charClass.ranges.empty())
+				{
+					goto addIntoClass;
+				}
+				else
+				{
+					inRange = true;
+				}
+			}
+			else
+			{
+				charClass = { expr[i] };
+				goto addSingleNode;
+			}
+			continue;
+		case u'+':
+		case u'*':
+		case u'?':
+			if (inCharClass) goto addIntoClass;
+			if (beforeNode == lastNode) throw runtime_error{ "not allowed quantifier position" };
+
+			if (expr[i] == u'*' || expr[i] == u'?')
+			{
+				nodes[beforeNode].next[lastNode - beforeNode].skippable = true;
+			}
+
+			if (expr[i] == u'+' || expr[i] == u'*')
+			{
+				ptrdiff_t c = (ptrdiff_t)nodes.size();
+				nodes[lastNode].next[beforeNode - lastNode].skippable = true;
+				nodes[lastNode].next[c - lastNode].skippable = true;
+				nodes.emplace_back();
+				beforeNode = c;
+				lastNode = c;
+			}
+			continue;
+		case u'.':
+			if (inCharClass) goto addIntoClass;
+			charClass = {};
+			charClass.ranges.emplace_back(bos, 0xFFFF);
+			goto addSingleNode;
+		default:
+			if (inCharClass) goto addIntoClass;
+			charClass = { expr[i] };
+			goto addSingleNode;
+		}
+
+		addIntoClass:
+		{
+			if (inRange)
+			{
+				if (charClass.ranges.back().first != charClass.ranges.back().second)
+				{
+					throw runtime_error{ "unpaired range in character class" };
+				}
+
+				char16_t leftChr = charClass.ranges.back().first;
+				if (leftChr >= expr[i])
+				{
+					throw runtime_error{ "invalid character range: " + utf8FromCode(leftChr) + "-" + utf8FromCode(expr[i])};
+				}
+				charClass.ranges.back().second = expr[i];
+				inRange = false;
+			}
+			else
+			{
+				charClass.ranges.emplace_back(expr[i], expr[i]);
+			}
+			continue;
+		}
+
+		addSingleNode:
+		{
+			ptrdiff_t c = (ptrdiff_t)nodes.size();
+			nodes[lastNode].next[c - lastNode] = move(charClass);
+			nodes.emplace_back();
+			beforeNode = lastNode;
+			lastNode = c;
+			continue;
+		}
+	}
+
+	if (groupStack.size() > 1) throw runtime_error{ "unpaired open parenthesis" };
+
+	for (auto n : groupStack.back().last)
+	{
+		auto& nodeNext = nodes[n].next;
+		auto it = nodeNext.find(endIdx);
+		swap(nodeNext[lastNode - n], it->second);
+		nodeNext.erase(it);
+	}
+
+	for (auto& n : nodes)
+	{
+		for (auto& nn : n.next)
+		{
+			if (nn.second.negation)
+			{
+				nn.second.ranges.emplace_back(ruleSep, ruleSep);
+				sort(nn.second.ranges.begin(), nn.second.ranges.end());
+			}
+		}
+	}
+}
+
+inline Vector<POSTag> getSubTagset(const string& prefix)
+{
+	Vector<POSTag> ret;
+	for (auto i = POSTag::nng; i <= POSTag::p; i = (POSTag)((size_t)i + 1))
+	{
+		if (strncmp(tagToString(i), prefix.c_str(), prefix.size()) == 0)
+		{
+			ret.emplace_back(i);
+		}
+	}
+	return ret;
+}
+
+inline Vector<uint8_t> getSubFeatset(CondPolarity polar)
+{
+	switch (polar)
+	{
+	case CondPolarity::none:
+		return { 0, 1 };
+	case CondPolarity::negative:
+		return { 0 };
+	case CondPolarity::positive:
+	default:
+		return { 1 };
+	}
+}
+
+inline Vector<uint8_t> getSubFeatset(CondVowel vowel)
+{
+	switch (vowel)
+	{
+	case CondVowel::none:
+		return { 0, 2 };
+	case CondVowel::non_vowel:
+		return { 0 };
+	case CondVowel::vowel:
+	default:
+		return { 2 };
+	}
+}
+
+void Pattern::Node::getEpsilonTransition(ptrdiff_t thisOffset, Vector<ptrdiff_t>& ret) const
+{
+	ret.emplace_back(thisOffset);
+	for (auto& p : next)
+	{
+		if (p.second.skippable)
+		{
+			if (find(ret.begin(), ret.end(), p.first + thisOffset) != ret.end()) continue;
+			this[p.first].getEpsilonTransition(p.first + thisOffset, ret);
+		}
+	}
+}
+
+Vector<ptrdiff_t> Pattern::Node::getEpsilonTransition(ptrdiff_t thisOffset) const
+{
+	Vector<ptrdiff_t> ret;
+	getEpsilonTransition(thisOffset, ret);
+	sort(ret.begin(), ret.end());
+	ret.erase(unique(ret.begin(), ret.end()), ret.end());
+	return ret;
+}
+
+RaggedVector<ptrdiff_t> Pattern::Node::getTransitions(const Vector<char16_t>& vocabs, const Vector<Vector<ptrdiff_t>>& epsilonTable, ptrdiff_t thisOffset) const
+{
+	RaggedVector<ptrdiff_t> ret;
+
+	for (size_t i = 0; i < vocabs.size(); ++i)
+	{
+		char16_t b = vocabs[i];
+		char16_t e = (i + 1 < vocabs.size()) ? (vocabs[i + 1] - 1) : numeric_limits<char16_t>::max();
+		ret.emplace_back();
+		for (auto& p : next)
+		{
+			if (hasRange(p.second, b, e))
+			{
+				auto& et = epsilonTable[p.first + thisOffset];
+				ret.insert_data(et.begin(), et.end());
+			}
+		}
+		sort(ret[i].first, ret[i].second);
+	}
+
+	return ret;
+}
+
+Vector<char16_t> RuleSet::getVocabList(const Vector<Pattern::Node>& nodes)
+{
+	using CRange = pair<const char16_t*, const char16_t*>;
+	Vector<char16_t> ret;
+	Vector<CRange> ranges;
+
+	for (auto& n : nodes)
+	{
+		for (auto& p : n.next)
+		{
+			if (p.second.ranges.empty()) continue;
+			ranges.emplace_back(
+				(const char16_t*)p.second.ranges.data(),
+				(const char16_t*)(p.second.ranges.data() + p.second.ranges.size())
+			);
+		}
+	}
+
+	while (!all_of(ranges.begin(), ranges.end(), [](const CRange& x)
+	{
+		return x.first == x.second;
+	}))
+	{
+		auto& minElem = *min_element(ranges.begin(), ranges.end(), [](const CRange& x, const CRange& y)
+		{
+			if (x.first == x.second) return false;
+			if (y.first == y.second) return true;
+			auto xv = *x.first + (x.second - x.first) % 2;
+			auto yv = *y.first + (y.second - y.first) % 2;
+			return xv < yv;
+		});
+		char16_t v = *minElem.first + (minElem.second - minElem.first) % 2;
+		if (ret.empty() || ret.back() < v)
+		{
+			ret.emplace_back(v);
+		}
+		minElem.first++;
+	}
+	return ret;
+}
+
+template<class Ty, class It>
+inline void inplaceUnion(Vector<Ty>& dest, It first, It last)
+{
+	auto mid = dest.size();
+	dest.insert(dest.end(), first, last);
+	inplace_merge(dest.begin(), dest.begin() + mid, dest.end());
+	dest.erase(unique(dest.begin(), dest.end()), dest.end());
+}
+
+template<class GroupSizeTy>
+MultiRuleDFAErased RuleSet::buildRules(const Vector<Rule>& rules)
+{
+	MultiRuleDFA<uint64_t, GroupSizeTy> ret;
+	Vector<Pattern::Node> nodes(1);
+	Vector<size_t> ends, startingGroup;
+
+	for (auto& r : rules)
+	{
+		ptrdiff_t size = nodes.size() - 1;
+		for (auto& p : r.left.nodes[0].next)
+		{
+			nodes[0].next[p.first + size] = p.second;
+		}
+		nodes.insert(nodes.end(), r.left.nodes.begin() + 1, r.left.nodes.end());
+		nodes.back().next[1] = { Pattern::ruleSep };
+		nodes.insert(nodes.end(), r.right.nodes.begin(), r.right.nodes.end());
+		startingGroup.resize(nodes.size(), -1);
+		for (auto& p : r.left.nodes[0].next)
+		{
+			startingGroup[p.first + size] = ret.finish.size();
+		}
+		ends.emplace_back(nodes.size() - 1);
+		ret.finish.emplace_back(r.repl);
+	}
+
+	Vector<Vector<ptrdiff_t>> epsilonTable;
+	for (auto& n : nodes)
+	{
+		epsilonTable.emplace_back(n.getEpsilonTransition(&n - nodes.data()));
+	}
+
+	ret.vocabs = getVocabList(nodes);
+	Vector<RaggedVector<ptrdiff_t>> transitionTable;
+	for (auto& n : nodes)
+	{
+		transitionTable.emplace_back(n.getTransitions(ret.vocabs, epsilonTable, &n - nodes.data()));
+	}
+
+	UnorderedMap<Vector<ptrdiff_t>, size_t, Hash> dfaIdxMapper;
+	Vector<Vector<ptrdiff_t>> dfaInvIdx;
+	size_t visited = 0;
+	dfaInvIdx.emplace_back(dfaIdxMapper.emplace(Vector<ptrdiff_t>{ { 0 } }, 0).first->first);
+	
+	for (size_t visited = 0; visited < dfaInvIdx.size(); ++visited)
+	{
+		auto p = dfaInvIdx[visited];
+		size_t finishGroup = -1;
+		for (auto& e : ends)
+		{
+			if (binary_search(p.begin(), p.end(), e))
+			{
+				finishGroup = (size_t)(&e - ends.data());
+				break;
+			}
+		}
+		ret.finishGroup.emplace_back(finishGroup);
+		ret.groupInfo.emplace_back(rules.size());
+		for (auto i : p)
+		{
+			if (startingGroup[i] == (size_t)-1) continue;
+			ret.groupInfo.back().set(startingGroup[i]);
+		}
+		
+		for (size_t v = 0; v < ret.vocabs.size(); ++v)
+		{
+			Vector<ptrdiff_t> set;
+			if (p[0] == 0 && v != Pattern::ruleSep) // begin node
+			{
+				set.emplace_back(0);
+			}
+			else if (finishGroup != (size_t)-1) // end node
+			{
+				set.emplace_back(ends[finishGroup]);
+			}
+
+			for (auto i : p)
+			{
+				inplaceUnion(set, transitionTable[i][v].first, transitionTable[i][v].second);
+			}
+			
+			if (set.empty())
+			{
+				ret.transition.emplace_back(-1);
+			}
+			else
+			{
+				auto inserted = dfaIdxMapper.emplace(move(set), dfaIdxMapper.size());
+				if (inserted.second)
+				{
+					dfaInvIdx.emplace_back(inserted.first->first);
+				}
+				ret.transition.emplace_back(inserted.first->second);
+			}
+		}
+	}
+	
+	if (dfaInvIdx.size() < 0xFF)
+	{
+		MultiRuleDFA<uint8_t, GroupSizeTy> rret;
+		rret.vocabs = move(ret.vocabs);
+		rret.finish = move(ret.finish);
+		rret.finishGroup = move(ret.finishGroup);
+		rret.groupInfo = move(ret.groupInfo);
+		rret.transition.insert(rret.transition.end(), ret.transition.begin(), ret.transition.end());
+		return rret;
+	}
+	else if (dfaInvIdx.size() < 0xFFFF)
+	{
+		MultiRuleDFA<uint16_t, GroupSizeTy> rret;
+		rret.vocabs = move(ret.vocabs);
+		rret.finish = move(ret.finish);
+		rret.finishGroup = move(ret.finishGroup);
+		rret.groupInfo = move(ret.groupInfo);
+		rret.transition.insert(rret.transition.end(), ret.transition.begin(), ret.transition.end());
+		return rret;
+	}
+	else if (dfaInvIdx.size() < 0xFFFFFFFF)
+	{
+		MultiRuleDFA<uint32_t, GroupSizeTy> rret;
+		rret.vocabs = move(ret.vocabs);
+		rret.finish = move(ret.finish);
+		rret.finishGroup = move(ret.finishGroup);
+		rret.groupInfo = move(ret.groupInfo);
+		rret.transition.insert(rret.transition.end(), ret.transition.begin(), ret.transition.end());
+		return rret;
+	}
+
+	return ret;
+}
+
+MultiRuleDFAErased RuleSet::buildRules(const Vector<Rule>& rules)
+{
+	if (rules.size() <= 0xFF)
+	{
+		return buildRules<uint8_t>(rules);
+	}
+	else if (rules.size() <= 0xFFFF)
+	{
+		return buildRules<uint16_t>(rules);
+	}
+	else if (rules.size() <= 0xFFFFFFFF)
+	{
+		return buildRules<uint32_t>(rules);
+	}
+	else
+	{
+		return buildRules<uint64_t>(rules);
+	}
+}
+
+inline bool isHangulVowel(char16_t c)
+{
+	return u'ㅏ' <= c && c <= u'ㅣ';
+}
+
+inline char16_t joinOnsetVowel(size_t onset, size_t vowel)
+{
+	return u'가' + (onset * 21 + vowel) * 28;
+}
+
+void RuleSet::addRule(const string& lTag, const string& rTag,
+	const KString& lPat, const KString& rPat, const std::vector<KString>& results,
+	CondVowel leftVowel, CondPolarity leftPolar
+)
+{
+	auto lTags = getSubTagset(lTag);
+	auto rTags = getSubTagset(rTag);
+	if (lTags.empty() || rTags.empty()) return;
+
+	bool broadcastableVowel = false;
+	char16_t lPatVowel = 0;
+	Vector<char16_t> resultsVowel;
+	if (isHangulVowel(lPat[0]))
+	{
+		lPatVowel = lPat[0] - u'ㅏ';
+		for (auto& r : results)
+		{
+			if (!isHangulVowel(r[0])) throw runtime_error{ "invalid Hangul composition: left=" + utf16To8(joinHangul(lPat)) + ", result=" + utf16To8(joinHangul(r)) };
+			resultsVowel.emplace_back(r[0] - u'ㅏ');
+		}
+		broadcastableVowel = true;
+	}
+
+	size_t ruleId = rules.size();
+	if (broadcastableVowel)
+	{
+		auto bPat = lPat;
+		Vector<KString> bResults{ results.begin(), results.end() };
+
+		for (size_t onset = 0; onset < 19; ++onset)
+		{
+			bPat[0] = joinOnsetVowel(onset, lPatVowel);
+			for (size_t n = 0; n < results.size(); ++n) bResults[n][0] = joinOnsetVowel(onset, resultsVowel[n]);
+			rules.emplace_back(bPat, rPat, bResults, leftVowel, leftPolar);
+		}
+	}
+	else
+	{
+		rules.emplace_back(lPat, rPat, Vector<KString>{ results.begin(), results.end() }, leftVowel, leftPolar);
+	}
+
+	for (auto l : lTags)
+	{
+		for (auto r : rTags)
+		{
+			for (auto f1 : getSubFeatset(leftVowel)) for (auto f2 : getSubFeatset(leftPolar))
+			{
+				if (broadcastableVowel)
+				{
+					auto& target = ruleset[make_tuple(l, r, f1 | f2)];
+					for (size_t i = 0; i < 19; ++i)
+					{
+						target.emplace_back(ruleId + i);
+					}
+				}
+				else
+				{
+					ruleset[make_tuple(l, r, f1 | f2)].emplace_back(ruleId);
+				}
+			}
+		}
+	}
+}
+
+inline KString encodeSpecialToken(KString&& str)
+{
+	bool escape = false;
+	size_t target = 0;
+	for (size_t i = 0; i < str.size(); ++i)
+	{
+		if (escape)
+		{
+			switch (str[i])
+			{
+			case '1':
+				str[target++] = 1;
+				break;
+			case '2':
+				str[target++] = 2;
+				break;
+			case '\\':
+				str[target++] = '\\';
+				break;
+			default:
+				str[target++] = '\\';
+				str[target++] = str[i];
+			}
+			escape = false;
+		}
+		else
+		{
+			if (str[i] == '\\')
+			{
+				escape = true;
+			}
+			else
+			{
+				str[target++] = str[i];
+			}
+		}
+	}
+	str.erase(str.begin() + target, str.end());
+	return str;
+}
+
+void RuleSet::loadRules(istream& istr)
+{
+	string line;
+	string lTag, rTag;
+	while (getline(istr, line))
+	{
+		if (line[0] == '#') continue;
+		while (!line.empty() && isspace(line.back())) line.pop_back();
+		if (line.empty()) continue;
+
+		auto fields = split(line, '\t');
+		if (fields.size() < 2)
+		{
+			throw runtime_error{ "wrong line: " + line };
+		}
+		else if (fields.size() == 2)
+		{
+			lTag = fields[0];
+			rTag = fields[1];
+		}
+		else
+		{
+			CondVowel cv = CondVowel::none;
+			CondPolarity cp = CondPolarity::none;
+			if (fields.size() >= 4)
+			{
+				static array<const char*, 4> fs = {
+					"+positive",
+					"-positive",
+					"+coda",
+					"-coda",
+				};
+
+				for (auto& f : split(fields[3], ','))
+				{
+					transform(f.begin(), f.end(), f.begin(), tolower);
+					size_t t = find(fs.begin(), fs.end(), f) - fs.begin();
+					if (t >= fs.size())
+					{
+						throw runtime_error{ "invalid feature value: " + f};
+					}
+
+					switch (t)
+					{
+					case 0:
+						cp = CondPolarity::positive;
+						break;
+					case 1:
+						cp = CondPolarity::negative;
+						break;
+					case 2:
+						cv = CondVowel::non_vowel;
+						break;
+					case 3:
+						cv = CondVowel::vowel;
+						break;
+					}
+				}
+			}
+
+			addRule(lTag, rTag, 
+				normalizeHangul(fields[0]), 
+				normalizeHangul(fields[1]), 
+				split(encodeSpecialToken(normalizeHangul(fields[2])), u','),
+				cv, 
+				cp
+			);
+		}
+	}
+}
+
+CompiledRule RuleSet::compile() const
+{
+	CompiledRule ret;
+	UnorderedMap<Vector<size_t>, size_t, Hash> mapper;
+
+	for (auto& p : ruleset)
+	{
+		auto inserted = mapper.emplace(p.second, mapper.size());
+		if (inserted.second)
+		{
+			Vector<Rule> rs;
+			for (auto i : p.second) rs.emplace_back(rules[i]);
+			ret.dfa.emplace_back(buildRules(rs));
+		}
+		ret.map.emplace(p.first, inserted.first->second);
+	}
+	return ret;
+}
+
+template<class NodeSizeTy, class GroupSizeTy>
+vector<KString> MultiRuleDFA<NodeSizeTy, GroupSizeTy>::combine(const KString& left, const KString& right) const
+{
+	static constexpr NodeSizeTy no_node = -1;
+	static constexpr GroupSizeTy no_group = -1;
+	vector<KString> ret;
+	Vector<size_t> capturedLefts(finish.size());
+	size_t nidx = 0, cpos = 0, capturedLeft = 0, capturedRight = 0;
+	const size_t vsize = vocabs.size();
+
+	nidx = transition[nidx * vsize + Pattern::bos];
+	groupInfo[nidx].visit([&](size_t i)
+	{
+		capturedLefts[i] = cpos;
+	});
+
+	for (auto c : left)
+	{
+		if (nidx == no_node) goto not_matched;
+		size_t v = (size_t)(upper_bound(vocabs.begin(), vocabs.end(), c) - vocabs.begin()) - 1;
+		nidx = transition[nidx * vsize + v];
+		
+		if (nidx != no_node) groupInfo[nidx].visit([&](size_t i)
+		{
+			capturedLefts[i] = cpos;
+		});
+		cpos++;
+	}
+
+	if (nidx == no_node) goto not_matched;
+	nidx = transition[nidx * vsize + Pattern::ruleSep];
+	cpos = 0;
+	for (auto c : right)
+	{
+		if (nidx == no_node) goto not_matched;
+		size_t v = (size_t)(upper_bound(vocabs.begin(), vocabs.end(), c) - vocabs.begin()) - 1;
+		nidx = transition[nidx * vsize + v];
+		cpos++;
+		if (nidx != no_node && finishGroup[nidx] != no_group && capturedRight == 0) capturedRight = cpos;
+	}
+	
+	if (nidx == no_node) goto not_matched;
+	nidx = transition[nidx * vsize + Pattern::eos];
+
+	if (nidx == no_node || finishGroup[nidx] == no_group) goto not_matched;
+	if (capturedRight == 0) capturedRight = cpos;
+	capturedLeft = capturedLefts[finishGroup[nidx]];
+
+	for (auto& r : finish[finishGroup[nidx]].repl)
+	{
+		ret.emplace_back(left.begin(), left.begin() + capturedLeft);
+		auto& t = ret.back();
+		for (auto c : r)
+		{
+			switch (c)
+			{
+			case 1:
+				t.insert(t.end(), left.begin() + capturedLeft, left.end());
+				break;
+			case 2:
+				t.insert(t.end(), right.begin(), right.begin() + capturedRight);
+				break;
+			default:
+				t.push_back(c);
+				break;
+			}
+		}
+		t.insert(t.end(), right.begin() + capturedRight, right.end());
+	}
+	return ret;
+
+not_matched:
+	ret.emplace_back(left + right);
+	return ret;
+}
+
+struct CombineVisitor
+{
+	const KString& left, & right;
+
+	CombineVisitor(const KString& _left, const KString& _right)
+		: left{ _left }, right{ _right }
+	{
+	}
+
+	template<class Ty>
+	std::vector<KString> operator()(const Ty& e) const
+	{
+		return e.combine(left, right);
+	}
+};
+
+vector<u16string> CompiledRule::combine(
+	const u16string& leftForm, POSTag leftTag, 
+	const u16string& rightForm, POSTag rightTag,
+	CondVowel cv, CondPolarity cp
+) const
+{
+	vector<u16string> ret;
+	KString l, r;
+	l = normalizeHangul(leftForm);
+	uint8_t feat = 0;
+	
+	switch (cp)
+	{
+	case CondPolarity::none:
+		feat |= FeatureTestor::isMatched(&l, CondPolarity::positive) ? 1 : 0;
+		break;
+	case CondPolarity::positive:
+		feat |= 1;
+		break;
+	case CondPolarity::negative:
+		feat |= 0;
+		break;
+	}
+
+	switch (cv)
+	{
+	case CondVowel::none:
+		feat |= 0;
+		break;
+	case CondVowel::vowel:
+		feat |= 2;
+		break;
+	case CondVowel::non_vowel:
+		feat |= 0;
+		break;
+	}
+
+	auto it = map.find(make_tuple(leftTag, rightTag, feat));
+	if (it == map.end())
+	{
+		ret.emplace_back(leftForm + rightForm);
+		return ret;
+	}
+
+	r = normalizeHangul(rightForm);
+	for (auto& p : mapbox::util::apply_visitor(CombineVisitor{l, r}, dfa[it->second]))
+	{
+		ret.emplace_back(joinHangul(p));
+	}
+	return ret;
+}
