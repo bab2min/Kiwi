@@ -15,3 +15,6 @@
 [submodule "third_party/cpuinfo"]
 	path = third_party/cpuinfo
 	url = https://github.com/pytorch/cpuinfo
+[submodule "third_party/variant"]
+	path = third_party/variant
+	url = https://github.com/mapbox/variant
