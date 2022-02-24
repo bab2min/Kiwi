@@ -2,5 +2,4 @@
 
 *.knlm filter=lfs diff=lfs merge=lfs -text
 *.morph filter=lfs diff=lfs merge=lfs -text
-*.dict filter=lfs diff=lfs merge=lfs -text
 *.mdl filter=lfs diff=lfs merge=lfs -text

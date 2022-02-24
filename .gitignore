@@ -337,5 +337,5 @@ cmake-build-*/
 libs/
 model_s/
 model_xs/
-ModelGenerator/
-
+ModelGenerator/*
+!ModelGenerator/combiningRule.txt
