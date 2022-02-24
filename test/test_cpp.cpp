@@ -16,10 +16,11 @@ TEST(KiwiCpp, Combiner)
 	}
 
 	EXPECT_EQ(rule.combine(u"이", POSTag::vcp, u"다", POSTag::ec, CondVowel::vowel)[0], u"다");
-	EXPECT_EQ(rule.combine(u"이", POSTag::vcp, u"었", POSTag::ec, CondVowel::vowel)[0], u"이었");
+	EXPECT_EQ(rule.combine(u"이", POSTag::vcp, u"었", POSTag::ec, CondVowel::vowel)[0], u"였");
 	EXPECT_EQ(rule.combine(u"이", POSTag::vcp, u"ᆫ지도", POSTag::ec, CondVowel::vowel)[0], u"ᆫ지도");
 	EXPECT_EQ(rule.combine(u"이", POSTag::vcp, u"ᆫ가", POSTag::ec, CondVowel::vowel)[0], u"ᆫ가");
-	
+
+	EXPECT_EQ(rule.combine(u"ᆯ", POSTag::p, u"ᆯ", POSTag::etm, CondVowel::vowel)[0], u"ᆯ");
 
 	EXPECT_EQ(rule.combine(u"이르", POSTag::vv, u"어", POSTag::ec)[0], u"이르러");
 	EXPECT_EQ(rule.combine(u"푸", POSTag::vv, u"어", POSTag::ec)[0], u"퍼");
@@ -154,14 +155,48 @@ TEST(KiwiCpp, Issue57_BuilderAddWord)
 	}
 }
 
-TEST(KiwiCpp, IncorrectPosition)
+TEST(KiwiCpp, PositionAndLength)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
-	auto tokens = kiwi.analyze(u"자랑했던", Match::all).first;
-	EXPECT_EQ(tokens[0].position, 0);
-	//EXPECT_EQ(tokens[1].position, 2);
-	EXPECT_EQ(tokens[2].position, 2);
-	EXPECT_EQ(tokens[3].position, 3);
+
+	{
+		auto tokens = kiwi.analyze(u"자랑했던", Match::all).first;
+		EXPECT_EQ(tokens[0].position, 0);
+		EXPECT_EQ(tokens[0].length, 2);
+		EXPECT_EQ(tokens[1].position, 2);
+		EXPECT_EQ(tokens[1].length, 1);
+		EXPECT_EQ(tokens[2].position, 2);
+		EXPECT_EQ(tokens[2].length, 1);
+		EXPECT_EQ(tokens[3].position, 3);
+		EXPECT_EQ(tokens[3].length, 1);
+	}
+	{
+		auto tokens = kiwi.analyze(u"이르렀다", Match::all).first;
+		EXPECT_EQ(tokens[0].position, 0);
+		EXPECT_EQ(tokens[0].length, 2);
+		EXPECT_EQ(tokens[1].position, 2);
+		EXPECT_EQ(tokens[1].length, 1);
+		EXPECT_EQ(tokens[2].position, 3);
+		EXPECT_EQ(tokens[2].length, 1);
+	}
+	{
+		auto tokens = kiwi.analyze(u"다다랐다", Match::all).first;
+		EXPECT_EQ(tokens[0].position, 0);
+		EXPECT_EQ(tokens[0].length, 3);
+		EXPECT_EQ(tokens[1].position, 2);
+		EXPECT_EQ(tokens[1].length, 1);
+		EXPECT_EQ(tokens[2].position, 3);
+		EXPECT_EQ(tokens[2].length, 1);
+	}
+	{
+		auto tokens = kiwi.analyze(u"바다다!", Match::all).first;
+		EXPECT_EQ(tokens[0].position, 0);
+		EXPECT_EQ(tokens[0].length, 2);
+		EXPECT_EQ(tokens[1].position, 2);
+		EXPECT_EQ(tokens[1].length, 0);
+		EXPECT_EQ(tokens[2].position, 2);
+		EXPECT_EQ(tokens[2].length, 1);
+	}
 }
 
 TEST(KiwiCpp, TokenProbs)
@@ -225,6 +260,7 @@ TEST(KiwiCpp, AddRule)
 			}
 			return input;
 		}, 0);
+
 		Kiwi kiwi = builder.build();
 		auto res = kiwi.analyze(u"했어용! 하잖아용! 할까용?", Match::allWithNormalizing);
 
@@ -241,6 +277,7 @@ TEST(KiwiCpp, AddRule)
 			}
 			return input;
 		}, -1);
+
 		Kiwi kiwi = builder.build();
 		auto res = kiwi.analyze(u"했어용! 하잖아용! 할까용?", Match::allWithNormalizing);
 
