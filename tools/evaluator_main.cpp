@@ -29,7 +29,9 @@ int doEvaluate(const string& modelPath, bool buildFromRaw, const string& output,
 		cout << "Loading Time : " << timer.getElapsed() << " ms" << endl;
 		cout << "LM Size : " << (kw.getLangModel()->getMemory().size() / 1024. / 1024.) << " MB" << endl;
 		cout << "Mem Usage : " << (tutils::getCurrentPhysicalMemoryUsage() / 1024.) << " MB\n" << endl;
-
+		
+		double avgMicro = 0, avgMacro = 0;
+		double cnt = 0;
 		for (auto& tf : input)
 		{
 			cout << "Test file: " << tf << endl;
@@ -42,6 +44,10 @@ int doEvaluate(const string& modelPath, bool buildFromRaw, const string& output,
 			cout << result.micro << ", " << result.macro << endl;
 			cout << "Total (" << result.totalCount << " lines) Time : " << tm << " ms" << endl;
 			cout << "Time per Line : " << tm / result.totalCount << " ms" << endl;
+
+			avgMicro += result.micro;
+			avgMacro += result.macro;
+			cnt++;
 
 			if (!output.empty())
 			{
@@ -61,6 +67,11 @@ int doEvaluate(const string& modelPath, bool buildFromRaw, const string& output,
 			}
 			cout << "================" << endl;
 		}
+
+		cout << endl << "================" << endl;
+		cout << "Avg Score" << endl;
+		cout << avgMicro / cnt << ", " << avgMacro / cnt << endl;
+		cout << "================" << endl;
 		return 0;
 	}
 	catch (const exception& e)
