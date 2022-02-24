@@ -102,6 +102,9 @@
     <ClInclude Include="src\bitset.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\kiwi\TagUtils.h">
+      <Filter>Header Files\kiwi</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Form.cpp">
@@ -138,6 +141,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Combiner.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TagUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -38,6 +38,7 @@
     <ClInclude Include="include\kiwi\Macro.h" />
     <ClInclude Include="include\kiwi\Mmap.h" />
     <ClInclude Include="include\kiwi\PatternMatcher.h" />
+    <ClInclude Include="include\kiwi\TagUtils.h" />
     <ClInclude Include="include\kiwi\TemplateUtils.hpp" />
     <ClInclude Include="include\kiwi\ThreadPool.h" />
     <ClInclude Include="include\kiwi\Trainer.h" />
@@ -61,6 +62,7 @@
     <ClCompile Include="src\ArchUtils.cpp" />
     <ClCompile Include="src\Combiner.cpp" />
     <ClCompile Include="src\search.cpp" />
+    <ClCompile Include="src\TagUtils.cpp" />
     <ClCompile Include="third_party\mimalloc\src\static.c" />
     <ClCompile Include="src\Form.cpp" />
     <ClCompile Include="src\FeatureTestor.cpp" />
