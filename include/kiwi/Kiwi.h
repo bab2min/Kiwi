@@ -23,6 +23,7 @@
 #include "Knlm.h"
 #include "ThreadPool.h"
 #include "WordDetector.h"
+#include "TagUtils.h"
 
 namespace kiwi
 {
@@ -46,6 +47,8 @@ namespace kiwi
 
 		bool integrateAllomorph = true;
 		float cutOffThreshold = 5;
+
+		TagSequenceScorer tagScorer;
 
 		std::vector<Form> forms;
 		std::vector<Morpheme> morphemes;
@@ -281,6 +284,11 @@ namespace kiwi
 		}
 	};
 
+	namespace cmb
+	{
+		class CompiledRule;
+	}
+
 	/**
 	 * @brief 형태소 분석에 사용될 사전을 관리하고, 
 	 * 사전을 바탕으로 실제 형태소 분석을 수행하는 Kiwi의 인스턴스를 생성하는 클래스.
@@ -288,19 +296,23 @@ namespace kiwi
 	 */
 	class KiwiBuilder
 	{
-		std::vector<FormRaw> forms;
-		std::vector<MorphemeRaw> morphemes;
-		std::unordered_map<FormCond, size_t> formMap;
+		Vector<FormRaw> forms;
+		Vector<MorphemeRaw> morphemes;
+		UnorderedMap<KString, size_t> formMap;
 		std::shared_ptr<lm::KnLangModelBase> langMdl;
+		std::shared_ptr<cmb::CompiledRule> combiningRule;
+		Vector<Vector<size_t>> combiningLeftCands, combiningRightCands;
+		UnorderedMap<std::tuple<KString, POSTag, CondPolarity>, size_t> combiningSuffices;
+		size_t combiningUpdateIdx = defaultTagSize + 2;
 		size_t numThreads = 0;
 		WordDetector detector;
 		BuildOption options = BuildOption::none;
 
 		void loadMorphBin(std::istream& is);
 		void saveMorphBin(std::ostream& os) const;
-		FormRaw& addForm(KString form, CondVowel vowel, CondPolarity polar);
+		FormRaw& addForm(KString form, CondVowel vowel = CondVowel::none, CondPolarity polar = CondPolarity::none);
 
-		using MorphemeMap = std::unordered_map<std::pair<KString, POSTag>, size_t>;
+		using MorphemeMap = UnorderedMap<std::pair<KString, POSTag>, size_t>;
 		void loadMMFromTxt(std::istream&& is, MorphemeMap& morphMap, std::unordered_map<POSTag, float>* posWeightSum, const std::function<bool(float, POSTag)>& selector);
 		void loadCMFromTxt(std::istream&& is, MorphemeMap& morphMap);
 		void loadPCMFromTxt(std::istream&& is, MorphemeMap& morphMap);
@@ -310,6 +322,9 @@ namespace kiwi
 
 		size_t findMorpheme(const std::u16string& form, POSTag tag) const;
 		bool addWord(const std::u16string& newForm, POSTag tag, float score, size_t origMorphemeId);
+
+		void addCombinedMorphemes(size_t leftId, size_t rightId, size_t ruleId);
+		void updateCombiningCands();
 
 	public:
 		struct FromRawData {};
@@ -399,13 +414,18 @@ namespace kiwi
 		 *
 		 * @param form 분석될 문자열 형태
 		 * @param analyzed `form` 문자열이 입력되었을 때, 이의 분석결과로 내놓을 형태소의 배열
+		 * @param positions `analyzed`의 각 형태소가 `form`내에서 차지하는 위치(시작/끝 지점, char16_t 단위). 생략 가능
 		 * @param score 페널티 점수. 이에 대한 자세한 설명은 하단의 `addWord`함수의 note 참조.
 		 * @exception kiwi::UnknownMorphemeException `analyzed`로 주어진 형태소 중 하나라도 존재하지 않는게 있는 경우 예외를 발생시킨다.
 		 * @return 형태소열을 추가하는데 성공했으면 true, 동일한 형태소열이 존재하여 추가에 실패한 경우 false를 반환한다.
 		 * @note 이 함수는 특정 문자열이 어떻게 분석되어야하는지 직접적으로 지정해줄 수 있다. 
 		 * 따라서 `addWord` 함수를 사용해도 오분석이 발생하는 경우, 이 함수를 통해 해당 사례들에 대해 정확한 분석 결과를 추가하면 원하는 분석 결과를 얻을 수 있다. 
 		 */
-		bool addPreAnalyzedWord(const std::u16string& form, const std::vector<std::pair<std::u16string, POSTag>>& analyzed, float score = 0);
+		bool addPreAnalyzedWord(const std::u16string& form, 
+			const std::vector<std::pair<std::u16string, POSTag>>& analyzed, 
+			std::vector<std::pair<size_t, size_t>> positions = {},
+			float score = 0
+		);
 
 		/**
 		 * @brief 규칙에 의해 변형된 형태소 목록을 생성하여 자동 추가한다.
@@ -433,6 +453,13 @@ namespace kiwi
 			}
 			return ret;
 		}
+
+		/**
+		 * @brief 새로운 형태소가 추가된 경우, 형태소 결합규칙에 의해 합성된 형태소 목록을 업데이트합니다.
+		 *
+		 * @return
+		 */
+		//size_t updatePrecombinedWord();
 
 		/**
 		 * @brief 

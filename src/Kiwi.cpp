@@ -18,7 +18,17 @@ namespace kiwi
 	class PathEvaluator
 	{
 	public:
-		using Path = Vector<std::tuple<const Morpheme*, KString, uint32_t>>;
+		struct Result
+		{
+			const Morpheme* morph;
+			KString str;
+			uint32_t begin, end;
+			Result(const Morpheme* _morph = nullptr, const KString& _str = {}, uint32_t _begin = 0, uint32_t _end = 0)
+				: morph{ _morph }, str{ _str }, begin{ _begin }, end{ _end }
+			{
+			}
+		};
+		using Path = Vector<Result>;
 
 		template<ArchType arch, class LmType>
 		static Vector<std::pair<Path, float>> findBestPath(const Kiwi* kw, const Vector<KGraphNode>& graph, size_t topN);
@@ -314,17 +324,18 @@ namespace kiwi
 	struct MInfo
 	{
 		Wid wid;
+		uint32_t beginPos;
+		uint32_t endPos;
 		uint8_t combineSocket;
 		CondVowel condVowel;
 		CondPolarity condPolar;
 		uint8_t ownFormId;
-		uint32_t lastPos;
 		MInfo(Wid _wid = 0, uint8_t _combineSocket = 0,
 			CondVowel _condVowel = CondVowel::none,
 			CondPolarity _condPolar = CondPolarity::none,
-			uint8_t _ownFormId = 0, uint32_t _lastPos = 0)
+			uint8_t _ownFormId = 0, uint32_t _beginPos = 0, uint32_t _endPos = 0)
 			: wid(_wid), combineSocket(_combineSocket),
-			condVowel(_condVowel), condPolar(_condPolar), ownFormId(_ownFormId), lastPos(_lastPos)
+			condVowel(_condVowel), condPolar(_condPolar), ownFormId(_ownFormId), beginPos(_beginPos), endPos(_endPos)
 		{}
 	};
 
@@ -377,7 +388,7 @@ namespace kiwi
 	}
 
 	template<ArchType arch, class LmType, class _Type>
-	void evalTrigram(const lm::KnLangModel<LmType>* knlm, const Morpheme* morphBase, const Vector<KString>& ownForms, const Vector<WordLLs>& cache,
+	void evalTrigram(const lm::KnLangModel<LmType>* knlm, const TagSequenceScorer& tagScorer, const Morpheme* morphBase, const Vector<KString>& ownForms, const Vector<WordLLs>& cache,
 		array<Wid, 4> seq, size_t chSize, const Morpheme* curMorph, const KGraphNode* node, const KGraphNode* startNode, _Type& maxWidLL)
 	{
 		size_t vocabSize = knlm->getHeader().vocab_size;
@@ -399,12 +410,12 @@ namespace kiwi
 					seq[0] = morphBase[wids->back().wid].getCombined()->lmMorphemeId;
 				}
 
-				/*auto leftForm = wids->back().ownFormId ? &ownForms[wids->back().ownFormId - 1] : morphBase[wids->back().wid].kform;
+				auto leftForm = wids->back().ownFormId ? &ownForms[wids->back().ownFormId - 1] : morphBase[wids->back().wid].kform;
 
 				if (!FeatureTestor::isMatched(leftForm, curMorph->vowel, curMorph->polar))
 				{
 					continue;
-				}*/
+				}
 
 				auto cNode = p.node;
 				Wid lSeq = 0;
@@ -414,6 +425,7 @@ namespace kiwi
 				}
 				else
 				{
+					candScore += tagScorer.evalSeqs(morphBase[wids->back().wid].tag, morphBase[seq[0]].tag);
 					lSeq = seq[chSize - 1];
 					for (size_t i = 0; i < chSize; ++i)
 					{
@@ -430,6 +442,28 @@ namespace kiwi
 			continueFor:;
 			}
 		}
+	}
+
+	inline bool hasLeftBoundary(const KGraphNode* node)
+	{
+		// 시작 지점은 항상 왼쪽 경계로 처리
+		if (node->getPrev(0)->endPos == 0) return true; 
+
+		// 이전 노드의 끝지점이 현재 노드보다 작은 경우 왼쪽 경계로 처리
+		if (node->getPrev(0)->endPos < node->getStartPos()) return true;
+		
+		// 이전 노드가 구두점이나 특수 문자인 경우
+		if (!node->getPrev(0)->uform.empty())
+		{
+			// 닫는 괄호는 왼쪽 경계로 처리하지 않음
+			auto c = node->getPrev(0)->uform.back();
+			if (isClosingPair(c) || c == u'"' || c == u'\'') return false;
+			
+			// 나머지 특수문자는 왼쪽 경계로 처리
+			auto tag = identifySpecialChr(c);
+			if (POSTag::sf <= tag && tag <= POSTag::sw) return true;
+		}
+		return false;
 	}
 
 	template<ArchType arch, class LmType, class CandTy, class CacheTy>
@@ -451,8 +485,6 @@ namespace kiwi
 			CondPolarity condP = CondPolarity::none;
 			size_t chSize = 1;
 			bool isUserWord = false;
-			bool leftBoundary = !node->getPrev(0)->lastPos ||
-				node->getPrev(0)->lastPos < node->lastPos - (node->form ? node->form->form.size() : node->uform.size());
 			// if the morpheme is chunk set
 			if (!curMorph->chunks.empty())
 			{
@@ -488,7 +520,7 @@ namespace kiwi
 			condP = curMorph->polar;
 
 			UnorderedMap<Wid, Vector<WordLLP>> maxWidLL;
-			evalTrigram<arch>(lm, kw->morphemes.data(), ownFormList, cache, seq, chSize, curMorph, node, startNode, maxWidLL);
+			evalTrigram<arch>(lm, kw->tagScorer, kw->morphemes.data(), ownFormList, cache, seq, chSize, curMorph, node, startNode, maxWidLL);
 
 			float estimatedLL = 0;
 			if (isUserWord)
@@ -507,13 +539,7 @@ namespace kiwi
 
 			float discountForCombining = 0;
 			if (curMorph->combineSocket) discountForCombining -= 15.f;
-			if (isUserWord && !leftBoundary)
-			{
-				// TODO: 조사/어미/접미사가 아니고, 
-				// 왼쪽 형태소가 접두사가 아닌데도 붙어쓰여진 경우
-				// 페널티 부여할 것
-				//estimatedLL -= 10.f;
-			}
+			estimatedLL += kw->tagScorer.evalLeftBoundary(hasLeftBoundary(node), curMorph->tag);
 
 			for (auto& p : maxWidLL)
 			{
@@ -534,33 +560,37 @@ namespace kiwi
 					auto& wids = nCache.back().morphs;
 					wids.reserve(q.morphs->size() + chSize);
 					wids = *q.morphs;
+					size_t beginPos = node->getStartPos();
 					if (!curMorph->chunks.empty())
 					{
-						size_t lastPos = node->lastPos;
 						if (curMorph->combineSocket)
 						{
-							wids.back() = MInfo{ (Wid)(kw->morphemes[wids.back().wid].getCombined() - kw->morphemes.data()),
-								0, CondVowel::none, CondPolarity::none, 0, wids.back().lastPos };
-							lastPos += kw->morphemes[seq[0]].kform->size() - 1;
+							auto& back = wids.back();
+							back.wid = (Wid)(kw->morphemes[wids.back().wid].getCombined() - kw->morphemes.data());
+							back.combineSocket = 0;
+							back.condVowel = CondVowel::none;
+							back.condPolar = CondPolarity::none;
+							back.ownFormId = 0;
+							back.endPos = beginPos + curMorph->chunks.getSecond(0).second;
 							for (size_t ch = 1; ch < chSize; ++ch)
 							{
-								wids.emplace_back(oseq[ch], 0, condV, condP, 0, lastPos);
-								lastPos += kw->morphemes[oseq[ch]].kform->size() - 1;
+								auto& p = curMorph->chunks.getSecond(ch);
+								wids.emplace_back(oseq[ch], 0, condV, condP, 0, beginPos + p.first, beginPos + p.second);
 							}
 						}
 						else
 						{
 							for (size_t ch = 0; ch < chSize; ++ch)
 							{
-								wids.emplace_back(oseq[ch], 0, condV, condP, 0, lastPos);
-								lastPos += kw->morphemes[oseq[ch]].kform->size() - 1;
+								auto& p = curMorph->chunks.getSecond(ch);
+								wids.emplace_back(oseq[ch], 0, condV, condP, 0, beginPos + p.first, beginPos + p.second);
 							}
 						}
 					}
 					else
 					{
 						wids.emplace_back(oseq[0], combSocket, 
-							CondVowel::none, CondPolarity::none, ownFormId, node->lastPos
+							CondVowel::none, CondPolarity::none, ownFormId, beginPos, node->endPos
 						);
 					}
 				}
@@ -708,8 +738,8 @@ namespace kiwi
 			Path mv(cand[i].morphs.size() - 1);
 			transform(cand[i].morphs.begin() + 1, cand[i].morphs.end(), mv.begin(), [&](const MInfo& m)
 			{
-				if (m.ownFormId) return make_tuple(&kw->morphemes[m.wid], ownFormList[m.ownFormId - 1], m.lastPos);
-				else return make_tuple(&kw->morphemes[m.wid], KString{}, m.lastPos);
+				if (m.ownFormId) return Result{ &kw->morphemes[m.wid], ownFormList[m.ownFormId - 1], m.beginPos, m.endPos };
+				else return Result{ &kw->morphemes[m.wid], KString{}, m.beginPos, m.endPos };
 			});
 			ret.emplace_back(mv, cand[i].accScore);
 		}
@@ -769,17 +799,18 @@ namespace kiwi
 	* @param sentence 어절번호를 생성할 문장.
 	* @return sentence 에 대한 어절번호를 담고있는 vector.
 	*/
-	const std::vector<uint16_t> getWordPositions(const std::u16string& sentence)
+	template<class It>
+	const vector<uint16_t> getWordPositions(It first, It last)
 	{
-		std::vector<uint16_t> wordPositions(sentence.size());
+		vector<uint16_t> wordPositions(distance(first, last));
 		uint32_t position = 0;
 		bool continuousSpace = false;
 
-		for (auto i = 0; i < sentence.size(); ++i)
+		for (size_t i = 0; first != last; ++first, ++i)
 		{
 			wordPositions[i] = position;
 
-			if (isspace(sentence[i]))
+			if (isspace(*first))
 			{
 				if (!continuousSpace) ++position;
 				continuousSpace = true;
@@ -793,7 +824,7 @@ namespace kiwi
 		return wordPositions;
 	}
 
-	void concatTokens(TokenInfo& dest, const TokenInfo& src, POSTag tag)
+	inline void concatTokens(TokenInfo& dest, const TokenInfo& src, POSTag tag)
 	{
 		dest.tag = tag;
 		dest.morph = nullptr;
@@ -862,22 +893,15 @@ namespace kiwi
 
 	std::vector<TokenResult> Kiwi::analyzeSent(const std::u16string::const_iterator& sBegin, const std::u16string::const_iterator& sEnd, size_t topN, Match matchOptions) const
 	{
-		auto nstr = normalizeHangul(std::u16string{ sBegin, sEnd });
-		Vector<uint32_t> posMap(nstr.size() + 1);
-		for (size_t i = 0; i < nstr.size(); ++i)
-		{
-			posMap[i + 1] = posMap[i] + (isHangulCoda(nstr[i]) ? 0 : 1);
-		}
+		auto normalized = normalizeHangulWithPosition(sBegin, sEnd);
+		auto& normalizedStr = normalized.first;
+		auto& positionTable = normalized.second;
 
-		if (!!(matchOptions & Match::normalizeCoda)) normalizeCoda(nstr.begin(), nstr.end());
+		if (!!(matchOptions & Match::normalizeCoda)) normalizeCoda(normalizedStr.begin(), normalizedStr.end());
 		// 분석할 문장에 포함된 개별 문자에 대해 어절번호를 생성한다
-		std::vector<uint16_t> wordPositions = getWordPositions({ sBegin, sEnd });
+		std::vector<uint16_t> wordPositions = getWordPositions(sBegin, sEnd);
 		
-		// 형태소 위치 분석 버그 때문에 길이를 1칸 널널하게 확보해야함 (https://github.com/bab2min/kiwipiepy/issues/15)
-		// 해당 버그가 수정되면 제거할 것 
-		wordPositions.emplace_back();
-
-		auto nodes = (*reinterpret_cast<FnSplitByTrie>(dfSplitByTrie))(formTrie, nstr, matchOptions);
+		auto nodes = (*reinterpret_cast<FnSplitByTrie>(dfSplitByTrie))(formTrie, normalizedStr, matchOptions);
 		vector<TokenResult> ret;
 		if (nodes.size() <= 2)
 		{
@@ -890,44 +914,44 @@ namespace kiwi
 		{
 			vector<TokenInfo> rarr;
 			const KString* prevMorph = nullptr;
-			for (auto&& s : r.first)
+			for (auto& s : r.first)
 			{
-				if (!get<1>(s).empty() && get<1>(s)[0] == ' ') continue;
+				if (!s.str.empty() && s.str[0] == ' ') continue;
 				u16string joined;
 				do
 				{
 					if (!integrateAllomorph)
 					{
-						if (POSTag::ep <= get<0>(s)->tag && get<0>(s)->tag <= POSTag::etm)
+						if (POSTag::ep <= s.morph->tag && s.morph->tag <= POSTag::etm)
 						{
-							if ((*get<0>(s)->kform)[0] == u'\uC5B4') // 어
+							if ((*s.morph->kform)[0] == u'\uC5B4') // 어
 							{
 								if (prevMorph && prevMorph[0].back() == u'\uD558') // 하
 								{
-									joined = joinHangul(u"\uC5EC" + get<0>(s)->kform->substr(1)); // 여
+									joined = joinHangul(u"\uC5EC" + s.morph->kform->substr(1)); // 여
 									break;
 								}
 								else if (FeatureTestor::isMatched(prevMorph, CondPolarity::positive))
 								{
-									joined = joinHangul(u"\uC544" + get<0>(s)->kform->substr(1)); // 아
+									joined = joinHangul(u"\uC544" + s.morph->kform->substr(1)); // 아
 									break;
 								}
 							}
 						}
 					}
-					joined = joinHangul(get<1>(s).empty() ? *get<0>(s)->kform : get<1>(s));
+					joined = joinHangul(s.str.empty() ? *s.morph->kform : s.str);
 				} while (0);
-				rarr.emplace_back(joined, get<0>(s)->tag);
-				rarr.back().morph = get<0>(s);
-				size_t nlen = (get<1>(s).empty() ? *get<0>(s)->kform : get<1>(s)).size();
-				size_t nlast = get<2>(s);
-				size_t nllast = min(max(nlast, nlen) - nlen, posMap.size() - 1);
-				rarr.back().position = posMap[nllast];
-				rarr.back().length = posMap[min(nlast, posMap.size() - 1)] - posMap[nllast];
+				rarr.emplace_back(joined, s.morph->tag);
+				auto& token = rarr.back();
+				token.morph = s.morph;
+				size_t beginPos = (upper_bound(positionTable.begin(), positionTable.end(), s.begin) - positionTable.begin()) - 1;
+				size_t endPos = lower_bound(positionTable.begin(), positionTable.end(), s.end) - positionTable.begin();
+				token.position = beginPos;
+				token.length = endPos - beginPos;
 
 				// Token의 시작위치(position)을 이용해 Token이 포함된 어절번호(wordPosition)를 얻음
-        		rarr.back().wordPosition = wordPositions[rarr.back().position];
-				prevMorph = get<0>(s)->kform;
+				token.wordPosition = wordPositions[token.position];
+				prevMorph = s.morph->kform;
 			}
 			rarr.erase(joinAffixTokens(rarr.begin(), rarr.end(), matchOptions), rarr.end());
 			ret.emplace_back(rarr, r.second);

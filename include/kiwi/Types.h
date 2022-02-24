@@ -23,6 +23,8 @@
 #include <mimalloc.h>
 #endif
 
+#include "TemplateUtils.hpp"
+
 #define KIWI_DEFINE_ENUM_FLAG_OPERATORS(Type) \
 inline Type operator~(Type a)\
 {\
@@ -79,11 +81,69 @@ namespace kiwi
 		using Exception::Exception;
 	};
 
+	template<class Ty>
+	struct Hash
+	{
+		template<class V>
+		size_t operator()(V&& v) const
+		{
+			return std::hash<Ty>{}(std::forward<V>(v));
+		}
+	};
+
+	template<class Ty, class Alloc>
+	struct Hash<std::vector<Ty, Alloc>>
+	{
+		size_t operator()(const std::vector<Ty, Alloc>& p) const
+		{
+			size_t hash = p.size();
+			for (auto& v : p)
+			{
+				hash ^= Hash<Ty>{}(v)+(hash << 6) + (hash >> 2);
+			}
+			return hash;
+		}
+
+	};
+
+	template<class Ty1, class Ty2>
+	struct Hash<std::pair<Ty1, Ty2>>
+	{
+		size_t operator()(const std::pair<Ty1, Ty2>& p) const
+		{
+			size_t hash = Hash<Ty2>{}(p.second);
+			hash ^= Hash<Ty1>{}(p.first) + (hash << 6) + (hash >> 2);
+			return hash;
+		}
+	};
+
+	template<class Ty>
+	struct Hash<std::tuple<Ty>>
+	{
+		template<class Ty>
+		size_t operator()(const std::tuple<Ty>& p) const
+		{
+			return Hash<Ty>{}(std::get<0>(p));
+		}
+
+	};
+
+	template<class Ty1, class...Rest>
+	struct Hash<std::tuple<Ty1, Rest...>>
+	{
+		size_t operator()(const std::tuple<Ty1, Rest...>& p) const
+		{
+			size_t hash = Hash<std::tuple<Rest...>>{}(kiwi::tp::tuple_tail(p));
+			hash ^= Hash<Ty1>{}(std::get<0>(p)) + (hash << 6) + (hash >> 2);
+			return hash;
+		}
+	};
+
 #ifdef KIWI_USE_MIMALLOC
 	template<typename _Ty>
 	using Vector = std::vector<_Ty, mi_stl_allocator<_Ty>>;
 
-	template<typename _K, typename _V, typename _Hash=std::hash<_K>>
+	template<typename _K, typename _V, typename _Hash=Hash<_K>>
 	using UnorderedMap = std::unordered_map<_K, _V, _Hash, std::equal_to<_K>, mi_stl_allocator<std::pair<const _K, _V>>>;
 
 	using KString = std::basic_string<kchar_t, std::char_traits<kchar_t>, mi_stl_allocator<kchar_t>>;
@@ -109,7 +169,7 @@ namespace kiwi
 	 * mimalloc 사용시 UnorderMap이 좀 더 빠른 속도로 메모리를 할당 받을 수 있음.
 	 * @sa Vector
 	 */
-	template<typename _K, typename _V, typename _Hash = std::hash<_K>>
+	template<typename _K, typename _V, typename _Hash = Hash<_K>>
 	using UnorderedMap = std::unordered_map<_K, _V, _Hash>;
 
 	/**
@@ -149,6 +209,7 @@ namespace kiwi
 		ep, ef, ec, etn, etm,
 		p, /**< 분할된 동사/형용사를 나타내는데 사용됨 */
 		max, /**< POSTag의 총 개수를 나타내는 용도 */
+		pa = max,
 	};
 
 	constexpr size_t defaultTagSize = (size_t)POSTag::jks;
@@ -234,24 +295,6 @@ namespace kiwi
 		}
 	};
 
-	struct FormCond
-	{
-		KString form;
-		CondVowel vowel;
-		CondPolarity polar;
-		
-		FormCond();
-		~FormCond();
-		FormCond(const FormCond&);
-		FormCond(FormCond&&);
-		FormCond& operator=(const FormCond&);
-		FormCond& operator=(FormCond&&);
-
-		FormCond(const KString& _form, CondVowel _vowel, CondPolarity _polar);
-		bool operator==(const FormCond& o) const;
-		bool operator!=(const FormCond& o) const;
-	};
-
 	/**
 	 * @brief 분석 완료된 형태소의 목록(`std::vector<TokenInfo>`)과 점수(`float`)의 pair 타입
 	 * 
@@ -274,15 +317,6 @@ namespace std
 		}
 	};
 #endif
-
-	template<>
-	struct hash<kiwi::FormCond>
-	{
-		size_t operator()(const kiwi::FormCond& fc) const
-		{
-			return hash<kiwi::KString>{}(fc.form) ^ ((size_t)fc.vowel | ((size_t)fc.polar << 8));
-		}
-	};
 }
 
 KIWI_DEFINE_ENUM_FLAG_OPERATORS(kiwi::BuildOption);

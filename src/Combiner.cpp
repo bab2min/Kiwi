@@ -249,8 +249,8 @@ Pattern::Pattern(const KString& expr)
 			if (nn.second.negation)
 			{
 				nn.second.ranges.emplace_back(ruleSep, ruleSep);
-				sort(nn.second.ranges.begin(), nn.second.ranges.end());
 			}
+			sort(nn.second.ranges.begin(), nn.second.ranges.end());
 		}
 	}
 }
@@ -258,11 +258,30 @@ Pattern::Pattern(const KString& expr)
 inline Vector<POSTag> getSubTagset(const string& prefix)
 {
 	Vector<POSTag> ret;
-	for (auto i = POSTag::nng; i <= POSTag::p; i = (POSTag)((size_t)i + 1))
+	for (auto& pf : split(prefix, ','))
 	{
-		if (strncmp(tagToString(i), prefix.c_str(), prefix.size()) == 0)
+		if (pf == "P")
 		{
-			ret.emplace_back(i);
+			ret.emplace_back(POSTag::p);
+			ret.emplace_back(POSTag::pa);
+		}
+		else if (pf == "PV")
+		{
+			ret.emplace_back(POSTag::p);
+		}
+		else if (pf == "PA")
+		{
+			ret.emplace_back(POSTag::pa);
+		}
+		else
+		{
+			for (auto i = POSTag::nng; i < POSTag::p; i = (POSTag)((size_t)i + 1))
+			{
+				if (strncmp(tagToString(i), pf.c_str(), pf.size()) == 0)
+				{
+					ret.emplace_back(i);
+				}
+			}
 		}
 	}
 	return ret;
@@ -345,6 +364,7 @@ Vector<char16_t> RuleSet::getVocabList(const Vector<Pattern::Node>& nodes)
 {
 	using CRange = pair<const char16_t*, const char16_t*>;
 	Vector<char16_t> ret;
+	ret.emplace_back(0);
 	Vector<CRange> ranges;
 
 	for (auto& n : nodes)
@@ -391,31 +411,33 @@ inline void inplaceUnion(Vector<Ty>& dest, It first, It last)
 	dest.erase(unique(dest.begin(), dest.end()), dest.end());
 }
 
+template<class NodeSizeTy, class GroupSizeTy>
+template<class _NodeSizeTy>
+auto MultiRuleDFA<NodeSizeTy, GroupSizeTy>::fromOther(MultiRuleDFA<_NodeSizeTy, GroupSizeTy>&& o) -> MultiRuleDFA
+{
+	MultiRuleDFA ret;
+	ret.vocabs = move(o.vocabs);
+	ret.finish = move(o.finish);
+	ret.finishGroup = move(o.finishGroup);
+	ret.groupInfo = move(o.groupInfo);
+	ret.sepGroupFlatten = move(o.sepGroupFlatten);
+	ret.sepGroupPtrs.insert(ret.sepGroupPtrs.end(), o.sepGroupPtrs.begin(), o.sepGroupPtrs.end());
+	ret.transition.insert(ret.transition.end(), o.transition.begin(), o.transition.end());
+	return ret;
+}
+
 template<class GroupSizeTy>
-MultiRuleDFAErased RuleSet::buildRules(const Vector<Rule>& rules)
+MultiRuleDFAErased RuleSet::buildRules(
+	size_t ruleSize,
+	const Vector<Pattern::Node>& nodes,
+	const Vector<size_t>& ends,
+	const Vector<size_t>& startingGroup,
+	const Vector<size_t>& sepPositions,
+	Vector<Replacement>&& finish
+)
 {
 	MultiRuleDFA<uint64_t, GroupSizeTy> ret;
-	Vector<Pattern::Node> nodes(1);
-	Vector<size_t> ends, startingGroup;
-
-	for (auto& r : rules)
-	{
-		ptrdiff_t size = nodes.size() - 1;
-		for (auto& p : r.left.nodes[0].next)
-		{
-			nodes[0].next[p.first + size] = p.second;
-		}
-		nodes.insert(nodes.end(), r.left.nodes.begin() + 1, r.left.nodes.end());
-		nodes.back().next[1] = { Pattern::ruleSep };
-		nodes.insert(nodes.end(), r.right.nodes.begin(), r.right.nodes.end());
-		startingGroup.resize(nodes.size(), -1);
-		for (auto& p : r.left.nodes[0].next)
-		{
-			startingGroup[p.first + size] = ret.finish.size();
-		}
-		ends.emplace_back(nodes.size() - 1);
-		ret.finish.emplace_back(r.repl);
-	}
+	ret.finish = move(finish);
 
 	Vector<Vector<ptrdiff_t>> epsilonTable;
 	for (auto& n : nodes)
@@ -430,11 +452,11 @@ MultiRuleDFAErased RuleSet::buildRules(const Vector<Rule>& rules)
 		transitionTable.emplace_back(n.getTransitions(ret.vocabs, epsilonTable, &n - nodes.data()));
 	}
 
-	UnorderedMap<Vector<ptrdiff_t>, size_t, Hash> dfaIdxMapper;
+	UnorderedMap<Vector<ptrdiff_t>, size_t> dfaIdxMapper;
 	Vector<Vector<ptrdiff_t>> dfaInvIdx;
 	size_t visited = 0;
 	dfaInvIdx.emplace_back(dfaIdxMapper.emplace(Vector<ptrdiff_t>{ { 0 } }, 0).first->first);
-	
+
 	for (size_t visited = 0; visited < dfaInvIdx.size(); ++visited)
 	{
 		auto p = dfaInvIdx[visited];
@@ -448,13 +470,22 @@ MultiRuleDFAErased RuleSet::buildRules(const Vector<Rule>& rules)
 			}
 		}
 		ret.finishGroup.emplace_back(finishGroup);
-		ret.groupInfo.emplace_back(rules.size());
+		ret.groupInfo.emplace_back(ruleSize);
 		for (auto i : p)
 		{
 			if (startingGroup[i] == (size_t)-1) continue;
 			ret.groupInfo.back().set(startingGroup[i]);
 		}
-		
+
+		ret.sepGroupPtrs.emplace_back(ret.sepGroupFlatten.size());
+		for (auto& e : sepPositions)
+		{
+			if (binary_search(p.begin(), p.end(), e))
+			{
+				ret.sepGroupFlatten.emplace_back((GroupSizeTy)(&e - sepPositions.data()));
+			}
+		}
+
 		for (size_t v = 0; v < ret.vocabs.size(); ++v)
 		{
 			Vector<ptrdiff_t> set;
@@ -462,7 +493,7 @@ MultiRuleDFAErased RuleSet::buildRules(const Vector<Rule>& rules)
 			{
 				set.emplace_back(0);
 			}
-			else if (finishGroup != (size_t)-1) // end node
+			if (finishGroup != (size_t)-1) // end node
 			{
 				set.emplace_back(ends[finishGroup]);
 			}
@@ -471,7 +502,7 @@ MultiRuleDFAErased RuleSet::buildRules(const Vector<Rule>& rules)
 			{
 				inplaceUnion(set, transitionTable[i][v].first, transitionTable[i][v].second);
 			}
-			
+
 			if (set.empty())
 			{
 				ret.transition.emplace_back(-1);
@@ -487,38 +518,50 @@ MultiRuleDFAErased RuleSet::buildRules(const Vector<Rule>& rules)
 			}
 		}
 	}
-	
+
 	if (dfaInvIdx.size() < 0xFF)
 	{
-		MultiRuleDFA<uint8_t, GroupSizeTy> rret;
-		rret.vocabs = move(ret.vocabs);
-		rret.finish = move(ret.finish);
-		rret.finishGroup = move(ret.finishGroup);
-		rret.groupInfo = move(ret.groupInfo);
-		rret.transition.insert(rret.transition.end(), ret.transition.begin(), ret.transition.end());
-		return rret;
+		return MultiRuleDFA<uint8_t, GroupSizeTy>::fromOther(move(ret));
 	}
 	else if (dfaInvIdx.size() < 0xFFFF)
 	{
-		MultiRuleDFA<uint16_t, GroupSizeTy> rret;
-		rret.vocabs = move(ret.vocabs);
-		rret.finish = move(ret.finish);
-		rret.finishGroup = move(ret.finishGroup);
-		rret.groupInfo = move(ret.groupInfo);
-		rret.transition.insert(rret.transition.end(), ret.transition.begin(), ret.transition.end());
-		return rret;
+		return MultiRuleDFA<uint16_t, GroupSizeTy>::fromOther(move(ret));
 	}
 	else if (dfaInvIdx.size() < 0xFFFFFFFF)
 	{
-		MultiRuleDFA<uint32_t, GroupSizeTy> rret;
-		rret.vocabs = move(ret.vocabs);
-		rret.finish = move(ret.finish);
-		rret.finishGroup = move(ret.finishGroup);
-		rret.groupInfo = move(ret.groupInfo);
-		rret.transition.insert(rret.transition.end(), ret.transition.begin(), ret.transition.end());
-		return rret;
+		return MultiRuleDFA<uint32_t, GroupSizeTy>::fromOther(move(ret));
+	}
+	return ret;
+}
+
+template<class GroupSizeTy>
+MultiRuleDFAErased RuleSet::buildRules(const Vector<Rule>& rules)
+{
+	Vector<Pattern::Node> nodes(1);
+	Vector<size_t> ends, startingGroup, sepPositions;
+	Vector<Replacement> finish;
+
+	for (auto& r : rules)
+	{
+		ptrdiff_t size = nodes.size() - 1;
+		for (auto& p : r.left.nodes[0].next)
+		{
+			nodes[0].next[p.first + size] = p.second;
+		}
+		nodes.insert(nodes.end(), r.left.nodes.begin() + 1, r.left.nodes.end());
+		nodes.back().next[1] = { Pattern::ruleSep };
+		sepPositions.emplace_back(nodes.size());
+		nodes.insert(nodes.end(), r.right.nodes.begin(), r.right.nodes.end());
+		startingGroup.resize(nodes.size(), -1);
+		for (auto& p : r.left.nodes[0].next)
+		{
+			startingGroup[p.first + size] = finish.size();
+		}
+		ends.emplace_back(nodes.size() - 1);
+		finish.emplace_back(r.repl);
 	}
 
+	auto ret = buildRules<GroupSizeTy>(rules.size(), nodes, ends, startingGroup, sepPositions, move(finish));
 	return ret;
 }
 
@@ -542,6 +585,24 @@ MultiRuleDFAErased RuleSet::buildRules(const Vector<Rule>& rules)
 	}
 }
 
+MultiRuleDFAErased RuleSet::buildRightPattern(const Vector<Rule>& rules)
+{
+	Vector<Pattern::Node> nodes(1);
+	Vector<size_t> ends, startingGroup;
+
+	for (auto& r : rules)
+	{
+		ptrdiff_t size = nodes.size();
+		nodes[0].next[size] = { Pattern::bos };
+		nodes.insert(nodes.end(), r.right.nodes.begin(), r.right.nodes.end());
+		startingGroup.resize(nodes.size(), -1);
+		ends.emplace_back(nodes.size() - 1);
+	}
+
+	auto ret = buildRules<uint8_t>(rules.size(), nodes, ends, startingGroup);
+	return ret;
+}
+
 inline bool isHangulVowel(char16_t c)
 {
 	return u'ㅏ' <= c && c <= u'ㅣ';
@@ -553,7 +614,7 @@ inline char16_t joinOnsetVowel(size_t onset, size_t vowel)
 }
 
 void RuleSet::addRule(const string& lTag, const string& rTag,
-	const KString& lPat, const KString& rPat, const std::vector<KString>& results,
+	const KString& lPat, const KString& rPat, const vector<ReplString>& results,
 	CondVowel leftVowel, CondPolarity leftPolar
 )
 {
@@ -569,8 +630,8 @@ void RuleSet::addRule(const string& lTag, const string& rTag,
 		lPatVowel = lPat[0] - u'ㅏ';
 		for (auto& r : results)
 		{
-			if (!isHangulVowel(r[0])) throw runtime_error{ "invalid Hangul composition: left=" + utf16To8(joinHangul(lPat)) + ", result=" + utf16To8(joinHangul(r)) };
-			resultsVowel.emplace_back(r[0] - u'ㅏ');
+			if (!isHangulVowel(r.str[0])) throw runtime_error{ "invalid Hangul composition: left=" + utf16To8(joinHangul(lPat)) + ", result=" + utf16To8(joinHangul(r.str)) };
+			resultsVowel.emplace_back(r.str[0] - u'ㅏ');
 		}
 		broadcastableVowel = true;
 	}
@@ -579,18 +640,18 @@ void RuleSet::addRule(const string& lTag, const string& rTag,
 	if (broadcastableVowel)
 	{
 		auto bPat = lPat;
-		Vector<KString> bResults{ results.begin(), results.end() };
+		Vector<ReplString> bResults{ results.begin(), results.end() };
 
 		for (size_t onset = 0; onset < 19; ++onset)
 		{
 			bPat[0] = joinOnsetVowel(onset, lPatVowel);
-			for (size_t n = 0; n < results.size(); ++n) bResults[n][0] = joinOnsetVowel(onset, resultsVowel[n]);
+			for (size_t n = 0; n < results.size(); ++n) bResults[n].str[0] = joinOnsetVowel(onset, resultsVowel[n]);
 			rules.emplace_back(bPat, rPat, bResults, leftVowel, leftPolar);
 		}
 	}
 	else
 	{
-		rules.emplace_back(lPat, rPat, Vector<KString>{ results.begin(), results.end() }, leftVowel, leftPolar);
+		rules.emplace_back(lPat, rPat, Vector<ReplString>{ results.begin(), results.end() }, leftVowel, leftPolar);
 	}
 
 	for (auto l : lTags)
@@ -616,9 +677,10 @@ void RuleSet::addRule(const string& lTag, const string& rTag,
 	}
 }
 
-inline KString encodeSpecialToken(KString&& str)
+inline ReplString parseReplString(KString&& str)
 {
 	bool escape = false;
+	size_t leftEnd = -1, rightBegin = 0;
 	size_t target = 0;
 	for (size_t i = 0; i < str.size(); ++i)
 	{
@@ -632,8 +694,10 @@ inline KString encodeSpecialToken(KString&& str)
 			case '2':
 				str[target++] = 2;
 				break;
+			case '(':
+			case ')':
 			case '\\':
-				str[target++] = '\\';
+				str[target++] = str[i];
 				break;
 			default:
 				str[target++] = '\\';
@@ -643,18 +707,24 @@ inline KString encodeSpecialToken(KString&& str)
 		}
 		else
 		{
-			if (str[i] == '\\')
+			switch (str[i])
 			{
+			case '\\':
 				escape = true;
-			}
-			else
-			{
+				break;
+			case '(':
+				rightBegin = i;
+				break;
+			case ')':
+				leftEnd = i;
+				break;
+			default:
 				str[target++] = str[i];
 			}
 		}
 	}
 	str.erase(str.begin() + target, str.end());
-	return str;
+	return { move(str), leftEnd, rightBegin };
 }
 
 void RuleSet::loadRules(istream& istr)
@@ -717,10 +787,16 @@ void RuleSet::loadRules(istream& istr)
 				}
 			}
 
+			vector<ReplString> repl;
+			for (auto& r : split(normalizeHangul(fields[2]), u','))
+			{
+				repl.emplace_back(parseReplString(move(r)));
+			}
+
 			addRule(lTag, rTag, 
 				normalizeHangul(fields[0]), 
 				normalizeHangul(fields[1]), 
-				split(encodeSpecialToken(normalizeHangul(fields[2])), u','),
+				repl,
 				cv, 
 				cp
 			);
@@ -731,7 +807,7 @@ void RuleSet::loadRules(istream& istr)
 CompiledRule RuleSet::compile() const
 {
 	CompiledRule ret;
-	UnorderedMap<Vector<size_t>, size_t, Hash> mapper;
+	UnorderedMap<Vector<size_t>, size_t> mapper;
 
 	for (auto& p : ruleset)
 	{
@@ -741,6 +817,7 @@ CompiledRule RuleSet::compile() const
 			Vector<Rule> rs;
 			for (auto i : p.second) rs.emplace_back(rules[i]);
 			ret.dfa.emplace_back(buildRules(rs));
+			ret.dfaRight.emplace_back(buildRightPattern(rs));
 		}
 		ret.map.emplace(p.first, inserted.first->second);
 	}
@@ -748,11 +825,11 @@ CompiledRule RuleSet::compile() const
 }
 
 template<class NodeSizeTy, class GroupSizeTy>
-vector<KString> MultiRuleDFA<NodeSizeTy, GroupSizeTy>::combine(const KString& left, const KString& right) const
+Vector<Result> MultiRuleDFA<NodeSizeTy, GroupSizeTy>::combine(const KString& left, const KString& right) const
 {
 	static constexpr NodeSizeTy no_node = -1;
 	static constexpr GroupSizeTy no_group = -1;
-	vector<KString> ret;
+	Vector<Result> ret;
 	Vector<size_t> capturedLefts(finish.size());
 	size_t nidx = 0, cpos = 0, capturedLeft = 0, capturedRight = 0;
 	const size_t vsize = vocabs.size();
@@ -797,10 +874,13 @@ vector<KString> MultiRuleDFA<NodeSizeTy, GroupSizeTy>::combine(const KString& le
 
 	for (auto& r : finish[finishGroup[nidx]].repl)
 	{
-		ret.emplace_back(left.begin(), left.begin() + capturedLeft);
-		auto& t = ret.back();
-		for (auto c : r)
+		size_t leftEnd, rightBegin;
+		KString t{ left.begin(), left.begin() + capturedLeft };
+		if (r.leftEnd == 0) leftEnd = t.size();
+		if (r.rightBegin == 0) rightBegin = t.size();
+		for (size_t i = 0; i < r.str.size(); ++i)
 		{
+			auto c = r.str[i];
 			switch (c)
 			{
 			case 1:
@@ -813,13 +893,77 @@ vector<KString> MultiRuleDFA<NodeSizeTy, GroupSizeTy>::combine(const KString& le
 				t.push_back(c);
 				break;
 			}
+			if (r.leftEnd == i + 1) leftEnd = t.size();
+			if (r.rightBegin == i + 1) rightBegin = t.size();
 		}
 		t.insert(t.end(), right.begin() + capturedRight, right.end());
+		ret.emplace_back(
+			move(t),
+			leftEnd,
+			rightBegin,
+			finish[finishGroup[nidx]].leftVowel,
+			finish[finishGroup[nidx]].leftPolarity
+		);
 	}
-	return ret;
 
 not_matched:
-	ret.emplace_back(left + right);
+	return ret;
+}
+
+template<class NodeSizeTy, class GroupSizeTy>
+Vector<tuple<size_t, size_t, CondPolarity>> MultiRuleDFA<NodeSizeTy, GroupSizeTy>::searchLeftPat(const KString& left, bool matchRulSep) const
+{
+	static constexpr NodeSizeTy no_node = -1;
+	static constexpr GroupSizeTy no_group = -1;
+
+	Vector<tuple<size_t, size_t, CondPolarity>> ret;
+	Vector<size_t> capturedLefts(finish.size());
+	size_t nidx = 0, cpos = 0;
+	const size_t vsize = vocabs.size();
+
+	nidx = transition[nidx * vsize + Pattern::bos];
+	groupInfo[nidx].visit([&](size_t i)
+	{
+		capturedLefts[i] = cpos;
+	});
+
+	for (auto c : left)
+	{
+		if (nidx == no_node) goto not_matched;
+		size_t v = (size_t)(upper_bound(vocabs.begin(), vocabs.end(), c) - vocabs.begin()) - 1;
+		nidx = transition[nidx * vsize + v];
+
+		if (nidx != no_node) groupInfo[nidx].visit([&](size_t i)
+		{
+			capturedLefts[i] = cpos;
+		});
+		cpos++;
+	}
+
+	if (nidx == no_node) goto not_matched;
+	if (matchRulSep)
+	{
+		nidx = transition[nidx * vsize + Pattern::ruleSep];
+		if (nidx == no_node) goto not_matched;
+
+		size_t e = nidx + 1 < sepGroupPtrs.size() ? sepGroupPtrs[nidx + 1] : sepGroupFlatten.size();
+		for (size_t i = sepGroupPtrs[nidx]; i < e; ++i)
+		{
+			ret.emplace_back(sepGroupFlatten[i], capturedLefts[sepGroupFlatten[i]], finish[sepGroupFlatten[i]].leftPolarity);
+		}
+	}
+	else
+	{
+		nidx = transition[nidx * vsize + Pattern::eos];
+		if (nidx == no_node) goto not_matched;
+
+		if (finishGroup[nidx] != no_group)
+		{
+			ret.emplace_back(finishGroup[nidx], 0, CondPolarity::none);
+		}
+	}
+
+not_matched:
 	return ret;
 }
 
@@ -833,27 +977,36 @@ struct CombineVisitor
 	}
 
 	template<class Ty>
-	std::vector<KString> operator()(const Ty& e) const
+	Vector<Result> operator()(const Ty& e) const
 	{
 		return e.combine(left, right);
 	}
 };
 
-vector<u16string> CompiledRule::combine(
-	const u16string& leftForm, POSTag leftTag, 
-	const u16string& rightForm, POSTag rightTag,
-	CondVowel cv, CondPolarity cp
-) const
+struct SearchLeftVisitor
 {
-	vector<u16string> ret;
-	KString l, r;
-	l = normalizeHangul(leftForm);
+	const KString& left;
+	bool matchRuleSep;
+
+	SearchLeftVisitor(const KString& _left, bool _matchRuleSep) : left{ _left }, matchRuleSep{ _matchRuleSep }
+	{
+	}
+
+	template<class Ty>
+	Vector<tuple<size_t, size_t, CondPolarity>> operator()(const Ty& e) const
+	{
+		return e.searchLeftPat(left, matchRuleSep);
+	}
+};
+
+uint8_t CompiledRule::toFeature(CondVowel cv, CondPolarity cp)
+{
 	uint8_t feat = 0;
-	
+
 	switch (cp)
 	{
 	case CondPolarity::none:
-		feat |= FeatureTestor::isMatched(&l, CondPolarity::positive) ? 1 : 0;
+		//feat |= FeatureTestor::isMatched(&l, CondPolarity::positive) ? 1 : 0;
 		break;
 	case CondPolarity::positive:
 		feat |= 1;
@@ -875,8 +1028,29 @@ vector<u16string> CompiledRule::combine(
 		feat |= 0;
 		break;
 	}
+	return feat;
+}
 
-	auto it = map.find(make_tuple(leftTag, rightTag, feat));
+auto CompiledRule::findRule(POSTag leftTag, POSTag rightTag, CondVowel cv, CondPolarity cp) const -> decltype(map.end())
+{
+	return map.find(make_tuple(leftTag, rightTag, toFeature(cv, cp)));
+}
+
+vector<u16string> CompiledRule::combine(
+	const u16string& leftForm, POSTag leftTag, 
+	const u16string& rightForm, POSTag rightTag,
+	CondVowel cv, CondPolarity cp
+) const
+{
+	vector<u16string> ret;
+	KString l, r;
+	l = normalizeHangul(leftForm);
+	if (cp == CondPolarity::none)
+	{
+		cp = FeatureTestor::isMatched(&l, CondPolarity::positive) ? CondPolarity::positive : CondPolarity::negative;
+	}
+
+	auto it = findRule(leftTag, rightTag, cv, cp);
 	if (it == map.end())
 	{
 		ret.emplace_back(leftForm + rightForm);
@@ -886,7 +1060,73 @@ vector<u16string> CompiledRule::combine(
 	r = normalizeHangul(rightForm);
 	for (auto& p : mapbox::util::apply_visitor(CombineVisitor{l, r}, dfa[it->second]))
 	{
-		ret.emplace_back(joinHangul(p));
+		ret.emplace_back(joinHangul(p.str));
+	}
+	if (ret.empty()) ret.emplace_back(leftForm + rightForm);
+	return ret;
+}
+
+Vector<tuple<size_t, size_t, CondPolarity>> CompiledRule::testLeftPattern(const KString& leftForm, size_t ruleId) const
+{
+	return mapbox::util::apply_visitor(SearchLeftVisitor{ leftForm, true }, dfa[ruleId]);
+}
+
+
+Vector<tuple<size_t, size_t, CondPolarity>> CompiledRule::testRightPattern(const KString& rightForm, size_t ruleId) const
+{
+	return mapbox::util::apply_visitor(SearchLeftVisitor{ rightForm, false }, dfaRight[ruleId]);
+}
+
+vector<tuple<size_t, size_t, CondPolarity>> CompiledRule::testLeftPattern(const u16string& leftForm, POSTag leftTag, POSTag rightTag, CondVowel cv, CondPolarity cp) const
+{
+	vector<tuple<size_t, size_t, CondPolarity>> ret;
+	KString l = normalizeHangul(leftForm);
+	if (cp == CondPolarity::none)
+	{
+		cp = FeatureTestor::isMatched(&l, CondPolarity::positive) ? CondPolarity::positive : CondPolarity::negative;
+	}
+
+	auto it = findRule(leftTag, rightTag, cv, cp);
+	if (it == map.end()) return ret;
+
+	auto p = mapbox::util::apply_visitor(SearchLeftVisitor{ l, true }, dfa[it->second]);
+	ret.insert(ret.end(), p.begin(), p.end());
+	return ret;
+}
+
+UnorderedMap<tuple<POSTag, uint8_t>, Vector<size_t>> CompiledRule::getRuleIdsByLeftTag() const
+{
+	UnorderedMap<tuple<POSTag, uint8_t>, Vector<size_t>> ret;
+	for (auto& p : map)
+	{
+		ret[make_tuple(get<0>(p.first), get<2>(p.first))].emplace_back(p.second);
+	}
+
+	for (auto& r : ret)
+	{
+		sort(r.second.begin(), r.second.end());
+		r.second.erase(unique(r.second.begin(), r.second.end()), r.second.end());
 	}
 	return ret;
+}
+
+UnorderedMap<POSTag, Vector<size_t>> CompiledRule::getRuleIdsByRightTag() const
+{
+	UnorderedMap<POSTag, Vector<size_t>> ret;
+	for (auto& p : map)
+	{
+		ret[get<1>(p.first)].emplace_back(p.second);
+	}
+
+	for (auto& r : ret)
+	{
+		sort(r.second.begin(), r.second.end());
+		r.second.erase(unique(r.second.begin(), r.second.end()), r.second.end());
+	}
+	return ret;
+}
+
+Vector<Result> CompiledRule::combine(const KString& leftForm, const KString& rightForm, size_t ruleId) const
+{
+	return mapbox::util::apply_visitor(CombineVisitor{ leftForm, rightForm }, dfa[ruleId]);
 }

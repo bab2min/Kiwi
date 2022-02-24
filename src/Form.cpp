@@ -54,20 +54,16 @@ namespace kiwi
 
 	FormRaw& FormRaw::operator=(FormRaw&&) = default;
 
-	FormRaw::FormRaw(const KString& _form, CondVowel _vowel, CondPolarity _polar)
-		: form(_form), vowel(_vowel), polar(_polar)
+	FormRaw::FormRaw(const KString& _form)
+		: form(_form)
 	{}
 
 	bool FormRaw::operator<(const FormRaw& o) const
 	{
-		if (form < o.form) return true;
-		if (form > o.form) return false;
-		if (vowel < o.vowel) return true;
-		if (vowel > o.vowel) return false;
-		return polar < o.polar;
+		return form < o.form;
 	}
 
-	DEFINE_SERIALIZER_OUTSIDE(FormRaw, form, vowel, polar, candidate);
+	DEFINE_SERIALIZER_OUTSIDE(FormRaw, form, candidate);
 
 	Form::Form() = default;
 
@@ -85,8 +81,6 @@ namespace kiwi
 	{
 		Form ret;
 		ret.form = o.form;
-		ret.vowel = o.vowel;
-		ret.polar = o.polar;
 		ret.candidate = FixedVector<const Morpheme*>{ o.candidate.size() };
 		for (size_t i = 0; i < o.candidate.size(); ++i)
 		{
@@ -106,10 +100,11 @@ namespace kiwi
 		ret.combined = o.combined;
 		ret.userScore = o.userScore;
 		ret.lmMorphemeId = o.lmMorphemeId;
-		ret.chunks = FixedVector<const Morpheme*>{ o.chunks.size() };
+		ret.chunks = FixedPairVector<const Morpheme*, std::pair<uint8_t, uint8_t>>{ o.chunks.size() };
 		for (size_t i = 0; i < o.chunks.size(); ++i)
 		{
 			ret.chunks[i] = morphBase + o.chunks[i];
+			ret.chunks.getSecond(i) = o.chunkPositions[i];
 		}
 		return ret;
 	}

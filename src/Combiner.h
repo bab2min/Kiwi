@@ -7,44 +7,9 @@
 
 namespace kiwi
 {
+	class KiwiBuilder;
 	namespace cmb
 	{
-		struct Hash
-		{
-			template<class Ty1, class Ty2>
-			size_t operator()(const std::pair<Ty1, Ty2>& p) const
-			{
-				size_t hash = std::hash<Ty2>{}(p.second);
-				hash ^= std::hash<Ty1>{}(p.first) + (hash << 6) + (hash >> 2);
-				return hash;
-			}
-
-			template<class Ty1, class ...Rest>
-			size_t operator()(const std::tuple<Ty1, Rest...>& p) const
-			{
-				size_t hash = operator()(kiwi::tp::tuple_tail(p));
-				hash ^= std::hash<Ty1>{}(std::get<0>(p)) + (hash << 6) + (hash >> 2);
-				return hash;
-			}
-
-			template<class Ty>
-			size_t operator()(const std::tuple<Ty>& p) const
-			{
-				return std::hash<Ty>{}(std::get<0>(p));
-			}
-
-			template<class Ty>
-			size_t operator()(const Vector<Ty>& p) const
-			{
-				size_t hash = p.size();
-				for (auto& v : p)
-				{
-					hash ^= std::hash<Ty>{}(v) + (hash << 6) + (hash >> 2);
-				}
-				return hash;
-			}
-		};
-
 		template<class ValueTy>
 		class RaggedVector
 		{
@@ -85,17 +50,47 @@ namespace kiwi
 			}
 		};
 
+		struct ReplString
+		{
+			KString str;
+			size_t leftEnd;
+			size_t rightBegin;
+
+			ReplString(const KString& _str = {}, size_t _leftEnd = -1, size_t _rightBegin = 0)
+				: str{ _str }, leftEnd{ std::min(_leftEnd, str.size()) }, rightBegin{ _rightBegin }
+			{
+			}
+		};
+
 		struct Replacement
 		{
-			Vector<KString> repl;
+			Vector<ReplString> repl;
 			CondVowel leftVowel;
 			CondPolarity leftPolarity;
 
-			Replacement(Vector<KString> _repl = {},
+			Replacement(Vector<ReplString> _repl = {},
 				CondVowel _leftVowel = CondVowel::none,
 				CondPolarity _leftPolar = CondPolarity::none
 			) : repl{ _repl }, leftVowel{ _leftVowel }, leftPolarity{ _leftPolar }
 			{}
+		};
+
+		struct Result
+		{
+			KString str;
+			size_t leftEnd;
+			size_t rightBegin;
+			CondVowel vowel;
+			CondPolarity polar;
+
+			Result(const KString& _str = {},
+				size_t _leftEnd = 0,
+				size_t _rightBegin = 0,
+				CondVowel _vowel = CondVowel::none,
+				CondPolarity _polar = CondPolarity::none
+			) : str{ _str }, leftEnd{ _leftEnd }, rightBegin{ _rightBegin }, vowel{ _vowel }, polar{ _polar }
+			{
+			}
 		};
 
 		template<class NodeSizeTy, class GroupSizeTy>
@@ -103,13 +98,23 @@ namespace kiwi
 		{
 			friend class RuleSet;
 
+			template<class _NodeSizeTy, class _GroupSizeTy>
+			friend class MultiRuleDFA;
+
 			Vector<char16_t> vocabs;
 			Vector<NodeSizeTy> transition;
 			Vector<GroupSizeTy> finishGroup;
+			Vector<GroupSizeTy> sepGroupFlatten;
+			Vector<NodeSizeTy> sepGroupPtrs;
 			Vector<utils::Bitset> groupInfo;
 			Vector<Replacement> finish;
+
+			template<class _NodeSizeTy>
+			static MultiRuleDFA fromOther(MultiRuleDFA<_NodeSizeTy, GroupSizeTy>&& o);
+
 		public:
-			std::vector<KString> combine(const KString& left, const KString& right) const;
+			Vector<Result> combine(const KString& left, const KString& right) const;
+			Vector<std::tuple<size_t, size_t, CondPolarity>> searchLeftPat(const KString& left, bool matchRuleSep = true) const;
 		};
 
 		namespace detail
@@ -208,8 +213,15 @@ namespace kiwi
 		class CompiledRule
 		{
 			friend class RuleSet;
-			Vector<MultiRuleDFAErased> dfa;
-			UnorderedMap<std::tuple<POSTag, POSTag, uint8_t>, size_t, Hash> map;
+			friend class KiwiBuilder;
+
+			Vector<MultiRuleDFAErased> dfa, dfaRight;
+			UnorderedMap<std::tuple<POSTag, POSTag, uint8_t>, size_t> map;
+
+			auto findRule(POSTag leftTag, POSTag rightTag,
+				CondVowel cv = CondVowel::none, CondPolarity cp = CondPolarity::none
+			) const -> decltype(map.end());
+
 		public:
 			CompiledRule();
 			CompiledRule(const CompiledRule&);
@@ -223,6 +235,35 @@ namespace kiwi
 				const std::u16string& rightForm, POSTag rightTag,
 				CondVowel cv = CondVowel::none, CondPolarity cp = CondPolarity::none
 			) const;
+
+			static uint8_t toFeature(CondVowel cv, CondPolarity cp);
+
+			/**
+			 * @return vector of tuple(replaceGroupId, capturedStartPos, replaceGroupCondition)
+			 */
+			std::vector<std::tuple<size_t, size_t, CondPolarity>> testLeftPattern(
+				const std::u16string& leftForm, POSTag leftTag, POSTag rightTag,
+				CondVowel cv = CondVowel::none, CondPolarity cp = CondPolarity::none
+			) const;
+
+			/**
+			 * @return vector of tuple(replaceGroupId, capturedStartPos, replaceGroupCondition)
+			 */
+			Vector<std::tuple<size_t, size_t, CondPolarity>> testLeftPattern(
+				const KString& leftForm, size_t ruleId
+			) const;
+
+			/**
+			 * @return vector of tuple(replaceGroupId, capturedEndPos, replaceGroupCondition)
+			 */
+			Vector<std::tuple<size_t, size_t, CondPolarity>> testRightPattern(
+				const KString& rightForm, size_t ruleId
+			) const;
+
+			UnorderedMap<std::tuple<POSTag, uint8_t>, Vector<size_t>> getRuleIdsByLeftTag() const;
+			UnorderedMap<POSTag, Vector<size_t>> getRuleIdsByRightTag() const;
+
+			Vector<Result> combine(const KString& leftForm, const KString& rightForm, size_t ruleId) const;
 		};
 
 		class RuleSet
@@ -234,7 +275,7 @@ namespace kiwi
 
 				Rule(const KString& _left = {},
 					const KString& _right = {},
-					const Vector<KString>& _results = {},
+					const Vector<ReplString>& _results = {},
 					CondVowel _leftVowel = CondVowel::none,
 					CondPolarity _leftPolar = CondPolarity::none)
 					: left{ _left }, right { _right }, repl{ _results, _leftVowel, _leftPolar }
@@ -242,15 +283,27 @@ namespace kiwi
 				}
 			};
 
-			UnorderedMap<std::tuple<POSTag, POSTag, uint8_t>, Vector<size_t>, Hash> ruleset;
+			UnorderedMap<std::tuple<POSTag, POSTag, uint8_t>, Vector<size_t>> ruleset;
 			Vector<Rule> rules;
 
 			static Vector<char16_t> getVocabList(const Vector<Pattern::Node>& nodes);
 			
 			template<class GroupSizeTy>
+			static MultiRuleDFAErased buildRules(
+				size_t ruleSize,
+				const Vector<Pattern::Node>& nodes, 
+				const Vector<size_t>& ends, 
+				const Vector<size_t>& startingGroup, 
+				const Vector<size_t>& sepPositions = {},
+				Vector<Replacement>&& finish = {}
+			);
+
+			template<class GroupSizeTy>
 			static MultiRuleDFAErased buildRules(const Vector<Rule>& rules);
 			
 			static MultiRuleDFAErased buildRules(const Vector<Rule>& rules);
+
+			static MultiRuleDFAErased buildRightPattern(const Vector<Rule>& rules);
 		public:
 			RuleSet();
 			RuleSet(const RuleSet&);
@@ -259,8 +312,13 @@ namespace kiwi
 			RuleSet& operator=(const RuleSet&);
 			RuleSet& operator=(RuleSet&&) noexcept;
 
+			explicit RuleSet(std::istream& ruleFile)
+			{
+				loadRules(ruleFile);
+			}
+
 			void addRule(const std::string& lTag, const std::string& rTag,
-				const KString& lPat, const KString& rPat, const std::vector<KString>& results,
+				const KString& lPat, const KString& rPat, const std::vector<ReplString>& results,
 				CondVowel leftVowel, CondPolarity leftPolar
 			);
 			
