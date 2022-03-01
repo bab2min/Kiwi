@@ -250,10 +250,77 @@ namespace kiwi
 				return this + this->next[k];
 			}
 
+			template<typename _FnAlloc, typename _HistoryTx>
+			TrieNodeEx* makeNext(const _Key& k, _FnAlloc&& alloc, _HistoryTx&& htx)
+			{
+				if (!this->next[k])
+				{
+					this->next[k] = alloc() - this;
+					this->getNext(k)->parent = -this->next[k];
+					auto f = this->getFail();
+					if (f)
+					{
+						if (f->fail)
+						{
+							f = f->makeNext(k, std::forward<_FnAlloc>(alloc), std::forward<_HistoryTx>(htx));
+							this->getNext(k)->fail = f - this->getNext(k);
+						}
+						else // the fail node of this is a root node
+						{
+							f = f->makeNext(htx(k), std::forward<_FnAlloc>(alloc));
+							this->getNext(k)->fail = f - this->getNext(k);
+						}
+					}
+					else // this node is a root node
+					{
+						this->getNext(k)->fail = this - this->getNext(k);
+					}
+				}
+				return this + this->next[k];
+			}
+
 			TrieNodeEx* getParent() const
 			{
 				if (!parent) return nullptr;
 				return (TrieNodeEx*)this + parent;
+			}
+
+			using TrieNode<_Key, _Value, _KeyStore, TrieNodeEx<_Key, _Value, _KeyStore>>::fillFail;
+
+			template<class HistoryTx>
+			void fillFail(HistoryTx&& htx, bool ignoreNegative = false)
+			{
+				std::deque<TrieNodeEx*> dq;
+				for (dq.emplace_back(this); !dq.empty(); dq.pop_front())
+				{
+					auto p = dq.front();
+					for (auto&& kv : p->next)
+					{
+						auto i = kv.first;
+						if (ignoreNegative && kv.second < 0) continue;
+						if (!p->getNext(i)) continue;
+						
+						if (p->getParent() == this)
+						{
+							p->getNext(i)->fail = this->getNext(htx(i)) - p->getNext(i);
+						}
+						else
+						{
+							p->getNext(i)->fail = p->findFail(i) - p->getNext(i);
+						}
+						dq.emplace_back(p->getNext(i));
+
+						if (!p->val)
+						{
+							for (auto n = p; n->fail; n = n->getFail())
+							{
+								if (!n->val) continue;
+								p->val = (_Value)-1;
+								break;
+							}
+						}
+					}
+				}
 			}
 		};
 
@@ -321,6 +388,12 @@ namespace kiwi
 			void fillFail(bool ignoreNegative = false)
 			{
 				return nodes[0].fillFail(ignoreNegative);
+			}
+
+			template<class HistoryTx>
+			void fillFail(HistoryTx&& htx, bool ignoreNegative = false)
+			{
+				return nodes[0].fillFail(std::forward<HistoryTx>(htx), ignoreNegative);
 			}
 
 			template<typename _Fn, typename _CKey>

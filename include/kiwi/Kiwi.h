@@ -289,6 +289,9 @@ namespace kiwi
 		class CompiledRule;
 	}
 
+	template<class Ty>
+	class RaggedVector;
+
 	/**
 	 * @brief 형태소 분석에 사용될 사전을 관리하고, 
 	 * 사전을 바탕으로 실제 형태소 분석을 수행하는 Kiwi의 인스턴스를 생성하는 클래스.
@@ -313,10 +316,9 @@ namespace kiwi
 		FormRaw& addForm(KString form, CondVowel vowel = CondVowel::none, CondPolarity polar = CondPolarity::none);
 
 		using MorphemeMap = UnorderedMap<std::pair<KString, POSTag>, size_t>;
-		void loadMMFromTxt(std::istream&& is, MorphemeMap& morphMap, std::unordered_map<POSTag, float>* posWeightSum, const std::function<bool(float, POSTag)>& selector);
-		void loadCMFromTxt(std::istream&& is, MorphemeMap& morphMap);
-		void loadPCMFromTxt(std::istream&& is, MorphemeMap& morphMap);
-		void addCorpusTo(Vector<Vector<uint16_t>>& out, std::istream&& is, MorphemeMap& morphMap);
+		template<class Fn>
+		MorphemeMap loadMorphemesFromTxt(std::istream&& is, Fn&& filter);
+		void addCorpusTo(RaggedVector<uint16_t>& out, std::istream&& is, MorphemeMap& morphMap);
 		void updateForms();
 		void updateMorphemes();
 

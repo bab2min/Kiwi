@@ -212,7 +212,7 @@ namespace kiwi
 		pa = max,
 	};
 
-	constexpr size_t defaultTagSize = (size_t)POSTag::jks;
+	constexpr size_t defaultTagSize = (size_t)POSTag::p;
 
 	/**
 	 * @brief 선행 형태소의 종성 여부 조건과 관련된 열거형

@@ -54,13 +54,13 @@ namespace kiwi
 
 			static std::unique_ptr<KnLangModelBase> create(utils::MemoryObject&& mem);
 
-			template<class TrieNode>
+			template<class TrieNode, class HistoryTx = std::vector<Vid>>
 			static utils::MemoryOwner build(const utils::ContinuousTrie<TrieNode>& ngram_cf,
 				size_t order, size_t min_cf, size_t last_min_cf,
 				size_t unk_id, size_t bos_id, size_t eos_id,
 				float unigram_alpha, size_t quantize, bool compress,
 				const std::vector<std::pair<Vid, Vid>>* bigram_list = nullptr,
-				const std::vector<Vid>* historyTransformer = nullptr
+				const HistoryTx* historyTransformer = nullptr
 			);
 
 			const utils::MemoryObject& getMemory() const { return base; }

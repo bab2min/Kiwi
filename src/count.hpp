@@ -110,52 +110,46 @@ namespace kiwi
 			}
 		}
 
-		template<typename _DocIter, typename _Freqs>
+		template<typename _DocIter, typename _Freqs, typename _HistoryTx = std::vector<Vid>>
 		void countBigrams(map<std::pair<Vid, Vid>, size_t>& bigramCf,
 			map<std::pair<Vid, Vid>, size_t>& bigramDf,
 			_DocIter docBegin, _DocIter docEnd,
 			_Freqs&& vocabFreqs, _Freqs&& vocabDf,
 			size_t candMinCnt, size_t candMinDf,
-			const std::vector<Vid>* historyTransformer = nullptr
+			const _HistoryTx* historyTransformer = nullptr
 		)
 		{
+			std::unordered_set<std::pair<Vid, Vid>, detail::vvhash> uniqBigram;
 			for (auto docIt = docBegin; docIt != docEnd; ++docIt)
 			{
-				std::unordered_set<std::pair<Vid, Vid>, detail::vvhash> uniqBigram;
 				auto doc = *docIt;
 				if (!doc.size()) continue;
 				Vid prevWord = doc[0];
-				if (historyTransformer) prevWord = (*historyTransformer)[prevWord];
 				for (size_t j = 1; j < doc.size(); ++j)
 				{
 					Vid curWord = doc[j];
 					if (curWord != non_vocab_id && vocabFreqs[curWord] >= candMinCnt && vocabDf[curWord] >= candMinDf)
 					{
-						if (historyTransformer || prevWord != non_vocab_id && vocabFreqs[prevWord] >= candMinCnt && vocabDf[prevWord] >= candMinDf)
+						if (prevWord != non_vocab_id && vocabFreqs[prevWord] >= candMinCnt && vocabDf[prevWord] >= candMinDf)
 						{
 							bigramCf[std::make_pair(prevWord, curWord)]++;
 							uniqBigram.emplace(prevWord, curWord);
 						}
-						if (historyTransformer)
-						{
-							bigramCf[std::make_pair(prevWord, (*historyTransformer)[curWord])]++;
-							uniqBigram.emplace(prevWord, (*historyTransformer)[curWord]);
-						}
 					}
-					if (historyTransformer) prevWord = (*historyTransformer)[curWord];
-					else prevWord = curWord;
+					prevWord = curWord;
 				}
 
 				for (auto& p : uniqBigram) bigramDf[p]++;
+				uniqBigram.clear();
 			}
 		}
 
-		template<bool _reverse, typename _DocIter, typename _Freqs, typename _BigramPairs>
+		template<bool _reverse, typename _DocIter, typename _Freqs, typename _BigramPairs, typename _HistoryTx = std::vector<Vid>>
 		void countNgrams(ContinuousTrie<CTrieNode>& dest,
 			_DocIter docBegin, _DocIter docEnd,
 			_Freqs&& vocabFreqs, _Freqs&& vocabDf, _BigramPairs&& validPairs,
 			size_t candMinCnt, size_t candMinDf, size_t maxNgrams,
-			const std::vector<Vid>* historyTransformer = nullptr
+			const _HistoryTx* historyTransformer = nullptr
 		)
 		{
 			if (dest.empty())
@@ -163,6 +157,7 @@ namespace kiwi
 				dest = ContinuousTrie<CTrieNode>{ 1, 1024 };
 			}
 			const auto& allocNode = [&]() { return dest.newNode(); };
+			const auto& historyTx = [&](size_t i) { return (*historyTransformer)[i]; };
 
 			for (auto docIt = docBegin; docIt != docEnd; ++docIt)
 			{
@@ -175,15 +170,7 @@ namespace kiwi
 				auto node = &dest[0];
 				if (prevWord != non_vocab_id && vocabFreqs[prevWord] >= candMinCnt && vocabDf[prevWord] >= candMinDf)
 				{
-					node = dest[0].makeNext(prevWord, allocNode);
-					node->val++;
-					labelLen = 1;
-				}
-
-				if (historyTransformer)
-				{
-					prevWord = (*historyTransformer)[prevWord];
-					node = dest[0].makeNext(prevWord, allocNode);
+					node = dest[0].makeNext(historyTransformer ? historyTx(prevWord) : prevWord, allocNode);
 					node->val++;
 					labelLen = 1;
 				}
@@ -192,8 +179,16 @@ namespace kiwi
 				{
 					if (curWord != non_vocab_id && (vocabFreqs[curWord] < candMinCnt || vocabDf[curWord] < candMinDf))
 					{
-						node = &dest[0];
-						labelLen = 0;
+						if (historyTransformer)
+						{
+							node = dest[0].makeNext(historyTx(0), allocNode);
+							labelLen = 1;
+						}
+						else
+						{
+							node = &dest[0];
+							labelLen = 0;
+						}
 					}
 					else
 					{
@@ -205,38 +200,35 @@ namespace kiwi
 
 						if (validPairs.count(_reverse ? std::make_pair(curWord, prevWord) : std::make_pair(prevWord, curWord)))
 						{
-							auto nnode = node->makeNext(curWord, allocNode);
+							auto nnode = node;
+							if (historyTransformer)
+							{
+								nnode = node->makeNext(curWord, allocNode, historyTx);
+							}
+							else
+							{
+								nnode = node->makeNext(curWord, allocNode);
+							}
 							node = nnode;
 							do
 							{
 								nnode->val++;
 							} while ((nnode = nnode->getFail()));
 							labelLen++;
-
-							if (historyTransformer)
-							{
-								curWord = (*historyTransformer)[curWord];
-								nnode = node->getParent()->makeNext(curWord, allocNode);
-								node = nnode;
-								do
-								{
-									nnode->val++;
-								} while ((nnode = nnode->getFail()));
-							}
+						}
+						else if (historyTransformer)
+						{
+							node = dest[0].makeNext(prevWord, allocNode);
+							node->val++;
+							node = node->makeNext(curWord, allocNode, historyTx);
+							node->val++;
+							labelLen = 2;
 						}
 						else
 						{
 							node = dest[0].makeNext(curWord, allocNode);
 							node->val++;
 							labelLen = 1;
-
-							if (historyTransformer)
-							{
-								curWord = (*historyTransformer)[curWord];
-								node = dest[0].makeNext(curWord, allocNode);
-								node->val++;
-								labelLen = 1;
-							}
 						}
 					}
 					prevWord = curWord;
@@ -308,11 +300,11 @@ namespace kiwi
 			return std::move(data[0]);
 		}
 
-		template<typename _DocIter>
+		template<typename _DocIter, typename _HistoryTx = std::vector<Vid>>
 		ContinuousTrie<CTrieNode> count(_DocIter docBegin, _DocIter docEnd,
 			size_t minCf, size_t minDf, size_t maxNgrams,
 			ThreadPool* pool = nullptr, std::vector<std::pair<Vid, Vid>>* bigramList = nullptr,
-			const std::vector<Vid>* historyTransformer = nullptr
+			const _HistoryTx* historyTransformer = nullptr
 		)
 		{
 			// counting unigrams & bigrams
@@ -411,6 +403,15 @@ namespace kiwi
 			}
 
 			ContinuousTrie<CTrieNode> trieNodes{ 1 };
+			if (historyTransformer)
+			{
+				for (size_t i = 0; i < unigramCf.size(); ++i)
+				{
+					trieNodes.reserveMore(1);
+					trieNodes.root().makeNext((*historyTransformer)[i], [&]() { return trieNodes.newNode(); });
+				}
+			}
+
 			if (maxNgrams <= 2)
 			{
 				trieNodes.reserveMore(unigramCf.size() + bigramCf.size() * (historyTransformer ? 2 : 1) + 1);

@@ -9,6 +9,7 @@
 #include "count.hpp"
 #include "FeatureTestor.h"
 #include "Combiner.h"
+#include "RaggedVector.hpp"
 
 using namespace std;
 using namespace kiwi;
@@ -25,59 +26,23 @@ KiwiBuilder& KiwiBuilder::operator=(const KiwiBuilder&) = default;
 
 KiwiBuilder& KiwiBuilder::operator=(KiwiBuilder&&) noexcept = default;
 
-void KiwiBuilder::loadMMFromTxt(std::istream&& is, MorphemeMap& morphMap, std::unordered_map<POSTag, float>* posWeightSum, const function<bool(float, POSTag)>& selector)
+template<class Fn>
+auto KiwiBuilder::loadMorphemesFromTxt(std::istream&& is, Fn&& filter) -> MorphemeMap
 {
-	string line;
-	while (getline(is, line))
+	Vector<tuple<KString, float, POSTag, CondVowel>> longTails;
+	UnorderedMap<POSTag, float> longTailWeights;
+	MorphemeMap morphMap, ret;
+
+	const auto& insertMorph = [&](KString&& form, float score, POSTag tag, CondVowel cvowel)
 	{
-		auto wstr = utf8To16(line);
-		if (!wstr.empty() && wstr.back() == '\n') wstr.pop_back();
-		auto fields = split(wstr, u'\t');
-		if (fields.size() < 8) continue;
-
-		auto form = normalizeHangul(fields[0]);
-		auto tag = toPOSTag(fields[1]);
-
-		float morphWeight = stof(fields[2].begin(), fields[2].end());
-		if (!selector(morphWeight, tag)) continue;
-		if (posWeightSum) (*posWeightSum)[tag] += morphWeight;
-		float vowel = stof(fields[4].begin(), fields[4].end());
-		float vocalic = stof(fields[5].begin(), fields[5].end());
-		float vocalic_h = stof(fields[6].begin(), fields[6].end());
-		float positive = stof(fields[7].begin(), fields[7].end());
-
-		CondVowel cvowel = CondVowel::none;
-		CondPolarity polar = CondPolarity::none;
-		if (tag >= POSTag::jks && tag <= POSTag::jc)
-		{
-			std::array<float, 6> t = { vowel, vocalic, vocalic_h, 1 - vowel, 1 - vocalic, 1 - vocalic_h };
-			size_t pmIdx = max_element(t.begin(), t.end()) - t.begin();
-			if (t[pmIdx] >= 0.85f)
-			{
-				cvowel = (CondVowel)(pmIdx + 2);
-			}
-			else
-			{
-				cvowel = CondVowel::any;
-			}
-		}
-
-		/*if (tag >= POSTag::ep && tag <= POSTag::etm)
-		{
-			std::array<float, 2> u = { positive, 1 - positive };
-			size_t pmIdx = max_element(u.begin(), u.end()) - u.begin();
-			if (u[pmIdx] >= 0.825f)
-			{
-				polar = (CondPolarity)(pmIdx + 1);
-			}
-		}*/
-		auto& fm = addForm(form, cvowel, polar);
+		auto& fm = addForm(form, cvowel, CondPolarity::none);
 		bool unified = false;
-		if (tag >= POSTag::ep && tag <= POSTag::etm && form[0] == u'아')
+		if (isEClass(tag) && form[0] == u'아')
 		{
 			form[0] = u'어';
 			unified = true;
 		}
+
 		auto it = morphMap.find(make_pair(form, tag));
 		if (it != morphMap.end())
 		{
@@ -89,17 +54,76 @@ void KiwiBuilder::loadMMFromTxt(std::istream&& is, MorphemeMap& morphMap, std::u
 			size_t mid = morphemes.size();
 			morphMap.emplace(make_pair(form, tag), mid);
 			fm.candidate.emplace_back(mid);
-			morphemes.emplace_back(tag, cvowel, polar);
+			morphemes.emplace_back(tag, cvowel, CondPolarity::none);
 			morphemes.back().kform = &fm - &forms[0];
-			morphemes.back().userScore = morphWeight;
+			morphemes.back().userScore = score;
 		}
+	};
+
+	string line;
+	while (getline(is, line))
+	{
+		auto wstr = utf8To16(line);
+		if (!wstr.empty() && wstr.back() == '\n') wstr.pop_back();
+		if (wstr.empty()) continue;
+		auto fields = split(wstr, u'\t');
+		if (fields.size() < 3)
+		{
+			throw Exception{ "wrong line: " + line };
+		}
+
+		auto form = normalizeHangul(fields[0]);
+		auto tag = toPOSTag(fields[1]);
+		if (tag >= POSTag::p || tag == POSTag::unknown)
+		{
+			cerr << "Wrong tag at line: " + line << endl;
+			continue;
+		}
+
+		float morphWeight = stof(fields[2].begin(), fields[2].end());
+
+		CondVowel cvowel = CondVowel::none;
+		if (fields.size() > 3)
+		{
+			if (fields[3] == u"vowel")
+			{
+				cvowel = CondVowel::vowel;
+			}
+			else if (fields[3] == u"non_vowel")
+			{
+				cvowel = CondVowel::non_vowel;
+			}
+			else
+			{
+				throw Exception{ "wrong line: " + line };
+			}
+		}
+
+		if (filter(tag, morphWeight))
+		{
+			insertMorph(move(form), 0.f, tag, cvowel);
+		}
+		else
+		{
+			longTails.emplace_back(form, morphWeight, tag, cvowel);
+			longTailWeights[tag] += morphWeight;
+		}
+		
 	}
+	ret = morphMap;
+	for (auto& p : longTails)
+	{
+		auto morphWeight = get<1>(p);
+		auto tag = get<2>(p);
+		auto cvowel = get<3>(p);
+		insertMorph(move(get<0>(p)), log(morphWeight / longTailWeights[tag]), tag, cvowel);
+	}
+	return ret;
 }
 
-void KiwiBuilder::addCorpusTo(Vector<Vector<uint16_t>>& out, std::istream&& is, MorphemeMap& morphMap)
+void KiwiBuilder::addCorpusTo(RaggedVector<uint16_t>& out, std::istream&& is, KiwiBuilder::MorphemeMap& morphMap)
 {
 	Vector<uint16_t> wids;
-	wids.emplace_back(0);
 	string line;
 	while (getline(is, line))
 	{
@@ -107,9 +131,11 @@ void KiwiBuilder::addCorpusTo(Vector<Vector<uint16_t>>& out, std::istream&& is, 
 		if (!wstr.empty() && wstr.back() == '\n') wstr.pop_back();
 		if (wstr.empty() && wids.size() > 1)
 		{
-			wids.emplace_back(1);
-			out.emplace_back(move(wids));
-			wids.emplace_back(0);
+			out.emplace_back();
+			out.add_data(0);
+			out.insert_data(wids.begin(), wids.end());
+			out.add_data(1);
+			wids.clear();
 			continue;
 		}
 		auto fields = split(wstr, u'\t');
@@ -122,22 +148,22 @@ void KiwiBuilder::addCorpusTo(Vector<Vector<uint16_t>>& out, std::istream&& is, 
 
 			auto t = toPOSTag(fields[i + 1]);
 
-			/*if ((f[0] == u'아' || f[0] == u'야') && fields[i + 1][0] == 'E')
+			if ((f[0] == u'아' || f[0] == u'야') && fields[i + 1][0] == 'E')
 			{
 				if (f[0] == u'아') f[0] = u'어';
 				else f[0] = u'여';
-			}*/
+			}
 
 			auto it = morphMap.find(make_pair(f, t));
 			if (it == morphMap.end() || !morphemes[it->second].chunks.empty() || morphemes[it->second].combineSocket)
 			{
-				if (t <= POSTag::sn && t != POSTag::unknown)
+				if (t < POSTag::p && t != POSTag::unknown)
 				{
 					wids.emplace_back(getDefaultMorphemeId(t));
 				}
 				else
 				{
-					wids.emplace_back((size_t)POSTag::nnp);
+					//wids.emplace_back(getDefaultMorphemeId(POSTag::nnp));
 				}
 			}
 			else
@@ -211,7 +237,7 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, size_t _numThreads, BuildOptio
 		loadMorphBin(iss);
 	}
 	langMdl = lm::KnLangModelBase::create(utils::MMap(modelPath + string{ "/sj.knlm" }));
-	
+
 	if (!!(options & BuildOption::loadDefaultDict))
 	{
 		loadDictionary(modelPath + "/default.dict");
@@ -237,37 +263,34 @@ KiwiBuilder::KiwiBuilder(FromRawData, const std::string& rawDataPath, size_t _nu
 		morphemes[i + 2].tag = (POSTag)(i + 1);
 	}
 
-	size_t morphIdToUpdate = morphemes.size();
-	MorphemeMap morphMap;
-	loadMMFromTxt(ifstream{ rawDataPath + "/fullmodelV2.txt" }, morphMap, nullptr, [](float morphWeight, POSTag tag) {
-		return morphWeight >= (tag < POSTag::jks ? 10 : 10);
-	});
-	for (size_t i = morphIdToUpdate; i < morphemes.size(); ++i)
+	auto realMorph = loadMorphemesFromTxt(ifstream{ rawDataPath + "/morphemes.txt" }, [](POSTag tag, float cnt)
 	{
-		morphemes[i].userScore = 0;
-	}
-
-	morphIdToUpdate = morphemes.size();
-	auto realMorph = morphMap;
-	unordered_map<POSTag, float> unknownWeight;
-	loadMMFromTxt(ifstream{ rawDataPath + "/fullmodelV2.txt" }, morphMap, &unknownWeight, [](float morphWeight, POSTag tag) {
-		return tag < POSTag::jks && morphWeight < 10;
+		return cnt >= 10;
 	});
-	for (size_t i = morphIdToUpdate; i < morphemes.size(); ++i)
-	{
-		morphemes[i].userScore = log(morphemes[i].userScore / unknownWeight[morphemes[i].tag]);
-	}
-
 	updateForms();
 
-	Vector<Vector<uint16_t>> sents;
+	RaggedVector<uint16_t> sents;
 	addCorpusTo(sents, ifstream{ rawDataPath + "/ML_lit.txt" }, realMorph);
 	addCorpusTo(sents, ifstream{ rawDataPath + "/ML_spo.txt" }, realMorph);
+	addCorpusTo(sents, ifstream{ rawDataPath + "/modu_cps.txt" }, realMorph);
+
+	size_t lmVocabSize = 0;
+	for (auto& p : realMorph) lmVocabSize = max(p.second, lmVocabSize);
+	lmVocabSize += 1;
+
+	Vector<utils::Vid> historyTx(lmVocabSize);
+
+	for (size_t i = 0; i < lmVocabSize; ++i)
+	{
+		historyTx[i] = (size_t)morphemes[i].tag + lmVocabSize;
+	}
+
 	vector<pair<uint16_t, uint16_t>> bigramList;
-	constexpr size_t order = 3, minCnt = 1, lastMinCnt = 1;
-	auto cntNodes = utils::count(sents.begin(), sents.end(), minCnt, 1, order, nullptr, &bigramList);
-	langMdl = lm::KnLangModelBase::create(lm::KnLangModelBase::build(cntNodes, order, minCnt, lastMinCnt, 2, 0, 1, 1e-5, 8, false, &bigramList));
-	
+	constexpr size_t order = 4, minCnt = 1, lastMinCnt = 1;
+	auto cntNodes = utils::count(sents.begin(), sents.end(), minCnt, 1, order, nullptr, &bigramList, &historyTx);
+	cntNodes.root().getNext(lmVocabSize)->val /= 2;
+	langMdl = lm::KnLangModelBase::create(lm::KnLangModelBase::build(cntNodes, order, minCnt, lastMinCnt, 2, 0, 1, 1e-5, 8, true, &bigramList, &historyTx));
+
 	if (!!(options & BuildOption::loadDefaultDict))
 	{
 		loadDictionary(rawDataPath + "/default.dict");
@@ -340,12 +363,12 @@ void KiwiBuilder::addCombinedMorphemes(size_t leftId, size_t rightId, size_t rul
 		size_t newId = morphemes.size();
 		morphemes.emplace_back(POSTag::unknown);
 		auto& newMorph = morphemes.back();
-		newMorph.userScore = 0;
 		newMorph.lmMorphemeId = newId;
 		if (morphemes[leftId].chunks.empty())
 		{
 			newMorph.chunks.emplace_back(leftId);
 			newMorph.chunkPositions.emplace_back(0, r.leftEnd);
+			newMorph.userScore = r.score;
 		}
 		else
 		{
@@ -354,6 +377,7 @@ void KiwiBuilder::addCombinedMorphemes(size_t leftId, size_t rightId, size_t rul
 			newMorph.chunkPositions.back().second = r.leftEnd;
 			if (r.vowel == CondVowel::none) r.vowel = morphemes[leftId].vowel;
 			if (r.polar == CondPolarity::none) r.polar = morphemes[leftId].polar;
+			newMorph.userScore = morphemes[leftId].userScore + r.score;
 		}
 		newMorph.chunks.emplace_back(rightId);
 		newMorph.chunkPositions.emplace_back(r.rightBegin, r.str.size());
@@ -362,7 +386,11 @@ void KiwiBuilder::addCombinedMorphemes(size_t leftId, size_t rightId, size_t rul
 			newMorph.combineSocket = morphemes[newMorph.chunks[0]].combineSocket;
 		}
 		newMorph.vowel = r.vowel;
-		newMorph.polar = r.polar;
+		// 양/음성 조건은 부분결합된 형태소에서만 유효
+		if (morphemes[leftId].tag == POSTag::p)
+		{
+			newMorph.polar = r.polar;
+		}
 		auto& f = addForm(r.str);
 		f.candidate.emplace_back(newId);
 		newMorph.kform = &f - &forms[0];
@@ -474,6 +502,7 @@ void KiwiBuilder::updateCombiningCands()
 			if (get<1>(p.first) != POSTag::va) continue;
 			morphemes[p.second].tag = POSTag::p;
 		}
+
 		size_t updated = morphemes.size();
 
 		// 규칙에 의한 결합 연산 수행 후 형태소 목록에 삽입

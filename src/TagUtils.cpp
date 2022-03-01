@@ -64,7 +64,7 @@ TagSequenceScorer::TagSequenceScorer(float _weight) : weight{ _weight }
 	{
 		for (size_t r = 0; r < (size_t)POSTag::max; ++r)
 		{
-			seqScores[l][r] = isAllowedSeq((POSTag)l, (POSTag)r) ? 0 : -1;
+			seqScores[l][r] = isAllowedSeq((POSTag)l, (POSTag)r) ? 0 : -0;
 		}
 	}
 

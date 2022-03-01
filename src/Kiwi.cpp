@@ -388,7 +388,7 @@ namespace kiwi
 	}
 
 	template<ArchType arch, class LmType, class _Type>
-	void evalTrigram(const lm::KnLangModel<LmType>* knlm, const TagSequenceScorer& tagScorer, const Morpheme* morphBase, const Vector<KString>& ownForms, const Vector<WordLLs>& cache,
+	void evalTrigram(const lm::KnLangModel<LmType>* knlm, const Morpheme* morphBase, const Vector<KString>& ownForms, const Vector<WordLLs>& cache,
 		array<Wid, 4> seq, size_t chSize, const Morpheme* curMorph, const KGraphNode* node, const KGraphNode* startNode, _Type& maxWidLL)
 	{
 		size_t vocabSize = knlm->getHeader().vocab_size;
@@ -425,7 +425,6 @@ namespace kiwi
 				}
 				else
 				{
-					candScore += tagScorer.evalSeqs(morphBase[wids->back().wid].tag, morphBase[seq[0]].tag);
 					lSeq = seq[chSize - 1];
 					for (size_t i = 0; i < chSize; ++i)
 					{
@@ -520,15 +519,11 @@ namespace kiwi
 			condP = curMorph->polar;
 
 			UnorderedMap<Wid, Vector<WordLLP>> maxWidLL;
-			evalTrigram<arch>(lm, kw->tagScorer, kw->morphemes.data(), ownFormList, cache, seq, chSize, curMorph, node, startNode, maxWidLL);
+			evalTrigram<arch>(lm, kw->morphemes.data(), ownFormList, cache, seq, chSize, curMorph, node, startNode, maxWidLL);
 
-			float estimatedLL = 0;
-			if (isUserWord)
-			{
-				estimatedLL = curMorph->userScore;
-			}
+			float estimatedLL = curMorph->userScore;
 			// if a form of the node is unknown, calculate log poisson distribution for word-tag
-			else if (unknownForm)
+			if (unknownForm)
 			{
 				size_t unknownLen = node->uform.empty() ? node->form->form.size() : node->uform.size();
 				if (curMorph->tag == POSTag::nng) estimatedLL = LogPoisson::getLL(4.622955f, unknownLen);
@@ -618,8 +613,7 @@ namespace kiwi
 		unknownNodeLCands.emplace_back(kw->getDefaultMorpheme(POSTag::nnp));
 
 		// start node
-		ptrdiff_t bosNode = 0;
-		lm->template progressOpt<arch>(bosNode, 0);
+		ptrdiff_t bosNode = lm->getBosNodeIdx();
 		cache.front().emplace_back(WordLL{ MInfos{ MInfo(0u) }, 0.f, bosNode });
 
 		// middle nodes
