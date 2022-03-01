@@ -339,3 +339,4 @@ model_s/
 model_xs/
 ModelGenerator/*
 !ModelGenerator/combiningRule.txt
+!ModelGenerator/morphemes.txt
