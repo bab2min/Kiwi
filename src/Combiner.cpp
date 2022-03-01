@@ -354,7 +354,7 @@ RaggedVector<ptrdiff_t> Pattern::Node::getTransitions(const Vector<char16_t>& vo
 				ret.insert_data(et.begin(), et.end());
 			}
 		}
-		sort(ret[i].first, ret[i].second);
+		sort(ret[i].begin(), ret[i].end());
 	}
 
 	return ret;
@@ -500,7 +500,7 @@ MultiRuleDFAErased RuleSet::buildRules(
 
 			for (auto i : p)
 			{
-				inplaceUnion(set, transitionTable[i][v].first, transitionTable[i][v].second);
+				inplaceUnion(set, transitionTable[i][v].begin(), transitionTable[i][v].end());
 			}
 
 			if (set.empty())
@@ -682,6 +682,7 @@ inline ReplString parseReplString(KString&& str)
 	bool escape = false;
 	size_t leftEnd = -1, rightBegin = 0;
 	size_t target = 0;
+	float score = 0;
 	for (size_t i = 0; i < str.size(); ++i)
 	{
 		if (escape)
@@ -697,6 +698,7 @@ inline ReplString parseReplString(KString&& str)
 			case '(':
 			case ')':
 			case '\\':
+			case '-':
 				str[target++] = str[i];
 				break;
 			default:
@@ -718,13 +720,17 @@ inline ReplString parseReplString(KString&& str)
 			case ')':
 				leftEnd = i;
 				break;
+			case '-':
+				score = stof(str.begin() + i, str.end());
+				i = str.size();
+				break;
 			default:
 				str[target++] = str[i];
 			}
 		}
 	}
 	str.erase(str.begin() + target, str.end());
-	return { move(str), leftEnd, rightBegin };
+	return { move(str), leftEnd, rightBegin, score };
 }
 
 void RuleSet::loadRules(istream& istr)
@@ -902,7 +908,8 @@ Vector<Result> MultiRuleDFA<NodeSizeTy, GroupSizeTy>::combine(const KString& lef
 			leftEnd,
 			rightBegin,
 			finish[finishGroup[nidx]].leftVowel,
-			finish[finishGroup[nidx]].leftPolarity
+			finish[finishGroup[nidx]].leftPolarity,
+			r.score
 		);
 	}
 

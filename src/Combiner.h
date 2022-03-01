@@ -3,6 +3,7 @@
 #include <mapbox/variant.hpp>
 #include <kiwi/Types.h>
 #include <kiwi/TemplateUtils.hpp>
+#include "RaggedVector.hpp"
 #include "bitset.hpp"
 
 namespace kiwi
@@ -10,54 +11,15 @@ namespace kiwi
 	class KiwiBuilder;
 	namespace cmb
 	{
-		template<class ValueTy>
-		class RaggedVector
-		{
-			Vector<ValueTy> data;
-			Vector<size_t> ptrs;
-		public:
-			size_t size() const { return ptrs.size(); };
-
-			auto operator[](size_t idx) const -> std::pair<decltype(data.begin()), decltype(data.begin())>
-			{
-				size_t b = idx < ptrs.size() ? ptrs[idx] : data.size();
-				size_t e = idx + 1 < ptrs.size() ? ptrs[idx + 1] : data.size();
-				return std::make_pair(data.begin() + b, data.begin() + e);
-			}
-
-			auto operator[](size_t idx) -> std::pair<decltype(data.begin()), decltype(data.begin())>
-			{
-				size_t b = idx < ptrs.size() ? ptrs[idx] : data.size();
-				size_t e = idx + 1 < ptrs.size() ? ptrs[idx + 1] : data.size();
-				return std::make_pair(data.begin() + b, data.begin() + e);
-			}
-
-			void emplace_back()
-			{
-				ptrs.emplace_back(data.size());
-			}
-
-			template<class... Args>
-			void add_data(Args&&... args)
-			{
-				data.emplace_back(std::forward<Args>(args)...);
-			}
-
-			template<class It>
-			void insert_data(It first, It last)
-			{
-				data.insert(data.end(), first, last);
-			}
-		};
-
 		struct ReplString
 		{
 			KString str;
 			size_t leftEnd;
 			size_t rightBegin;
+			float score;
 
-			ReplString(const KString& _str = {}, size_t _leftEnd = -1, size_t _rightBegin = 0)
-				: str{ _str }, leftEnd{ std::min(_leftEnd, str.size()) }, rightBegin{ _rightBegin }
+			ReplString(const KString& _str = {}, size_t _leftEnd = -1, size_t _rightBegin = 0, float _score = 0)
+				: str{ _str }, leftEnd{ std::min(_leftEnd, str.size()) }, rightBegin{ _rightBegin }, score{ _score }
 			{
 			}
 		};
@@ -82,13 +44,15 @@ namespace kiwi
 			size_t rightBegin;
 			CondVowel vowel;
 			CondPolarity polar;
+			float score;
 
 			Result(const KString& _str = {},
 				size_t _leftEnd = 0,
 				size_t _rightBegin = 0,
 				CondVowel _vowel = CondVowel::none,
-				CondPolarity _polar = CondPolarity::none
-			) : str{ _str }, leftEnd{ _leftEnd }, rightBegin{ _rightBegin }, vowel{ _vowel }, polar{ _polar }
+				CondPolarity _polar = CondPolarity::none,
+				float _score = 0
+			) : str{ _str }, leftEnd{ _leftEnd }, rightBegin{ _rightBegin }, vowel{ _vowel }, polar{ _polar }, score{ _score }
 			{
 			}
 		};
