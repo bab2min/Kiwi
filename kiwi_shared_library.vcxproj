@@ -55,6 +55,7 @@
     <ClInclude Include="src\KTrie.h" />
     <ClInclude Include="src\logPoisson.h" />
     <ClInclude Include="src\pattern.hpp" />
+    <ClInclude Include="src\RaggedVector.hpp" />
     <ClInclude Include="src\search.h" />
     <ClInclude Include="src\serializer.hpp" />
   </ItemGroup>
