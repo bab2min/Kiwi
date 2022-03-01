@@ -340,3 +340,5 @@ model_xs/
 ModelGenerator/*
 !ModelGenerator/combiningRule.txt
 !ModelGenerator/morphemes.txt
+!ModelGenerator/extractMorphemeList.py
+!ModelGenerator/convertModuToKiwi.py
