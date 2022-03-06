@@ -77,14 +77,18 @@ namespace kiwi
 
 	Form& Form::operator=(Form&&) = default;
 
-	Form bake(const FormRaw& o, const Morpheme* morphBase)
+	Form bake(const FormRaw& o, const Morpheme* morphBase, const Vector<uint32_t>& additionalCands)
 	{
 		Form ret;
 		ret.form = o.form;
-		ret.candidate = FixedVector<const Morpheme*>{ o.candidate.size() };
+		ret.candidate = FixedVector<const Morpheme*>{ o.candidate.size() + additionalCands.size()};
 		for (size_t i = 0; i < o.candidate.size(); ++i)
 		{
 			ret.candidate[i] = morphBase + o.candidate[i];
+		}
+		for (size_t i = 0; i < additionalCands.size(); ++i)
+		{
+			ret.candidate[i + o.candidate.size()] = morphBase + additionalCands[i];
 		}
 		return ret;
 	}

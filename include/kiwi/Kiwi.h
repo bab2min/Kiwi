@@ -304,16 +304,14 @@ namespace kiwi
 		UnorderedMap<KString, size_t> formMap;
 		std::shared_ptr<lm::KnLangModelBase> langMdl;
 		std::shared_ptr<cmb::CompiledRule> combiningRule;
-		Vector<Vector<size_t>> combiningLeftCands, combiningRightCands;
-		UnorderedMap<std::tuple<KString, POSTag, CondPolarity>, size_t> combiningSuffices;
-		size_t combiningUpdateIdx = defaultTagSize + 2;
 		size_t numThreads = 0;
 		WordDetector detector;
 		BuildOption options = BuildOption::none;
 
 		void loadMorphBin(std::istream& is);
 		void saveMorphBin(std::ostream& os) const;
-		FormRaw& addForm(KString form, CondVowel vowel = CondVowel::none, CondPolarity polar = CondPolarity::none);
+		FormRaw& addForm(KString form);
+		size_t addForm(Vector<FormRaw>& newForms, UnorderedMap<KString, size_t>& newFormMap, KString form) const;
 
 		using MorphemeMap = UnorderedMap<std::pair<KString, POSTag>, size_t>;
 		template<class Fn>
@@ -325,8 +323,21 @@ namespace kiwi
 		size_t findMorpheme(const std::u16string& form, POSTag tag) const;
 		bool addWord(const std::u16string& newForm, POSTag tag, float score, size_t origMorphemeId);
 
-		void addCombinedMorphemes(size_t leftId, size_t rightId, size_t ruleId);
-		void updateCombiningCands();
+		void addCombinedMorphemes(
+			Vector<FormRaw>& newForms, 
+			UnorderedMap<KString, size_t>& newFormMap, 
+			Vector<MorphemeRaw>& newMorphemes, 
+			UnorderedMap<size_t, Vector<uint32_t>>& newFormCands, 
+			size_t leftId, 
+			size_t rightId, 
+			size_t ruleId
+		) const;
+
+		void buildCombinedMorphemes(
+			Vector<FormRaw>& newForms, 
+			Vector<MorphemeRaw>& newMorphemes, 
+			UnorderedMap<size_t, Vector<uint32_t>>& newFormCands
+		) const;
 
 	public:
 		struct FromRawData {};
