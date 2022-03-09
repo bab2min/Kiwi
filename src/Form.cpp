@@ -28,7 +28,7 @@ namespace kiwi
 	{
 	}
 
-	DEFINE_SERIALIZER_OUTSIDE(MorphemeRaw, kform, tag, vowel, polar, combineSocket, combined, userScore, chunks, chunkPositions);
+	DEFINE_SERIALIZER_OUTSIDE(MorphemeRaw, kform, tag, vowel, polar, combineSocket, combined, userScore, chunks, chunkPositions, lmMorphemeId);
 
 	Morpheme::Morpheme() = default;
 

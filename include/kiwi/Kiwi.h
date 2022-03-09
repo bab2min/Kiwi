@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file Kiwi.h
  * @author bab2min (bab2min@gmail.com)
  * @brief Kiwi C++ API를 담고 있는 헤더 파일
@@ -466,13 +466,6 @@ namespace kiwi
 			}
 			return ret;
 		}
-
-		/**
-		 * @brief 새로운 형태소가 추가된 경우, 형태소 결합규칙에 의해 합성된 형태소 목록을 업데이트합니다.
-		 *
-		 * @return
-		 */
-		//size_t updatePrecombinedWord();
 
 		/**
 		 * @brief 

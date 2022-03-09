@@ -1,4 +1,4 @@
-﻿#include <fstream>
+#include <fstream>
 
 #include <kiwi/Kiwi.h>
 #include <kiwi/Utils.h>
@@ -248,7 +248,6 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, size_t _numThreads, BuildOptio
 		if (!ifs) throw Exception("Cannot open '" + modelPath + "/combiningRule.txt'");
 		combiningRule = make_shared<cmb::CompiledRule>(cmb::RuleSet{ ifs }.compile());
 	}
-	updateMorphemes();
 }
 
 KiwiBuilder::KiwiBuilder(FromRawData, const std::string& rawDataPath, size_t _numThreads, BuildOption _options)
@@ -291,6 +290,8 @@ KiwiBuilder::KiwiBuilder(FromRawData, const std::string& rawDataPath, size_t _nu
 	cntNodes.root().getNext(lmVocabSize)->val /= 2;
 	langMdl = lm::KnLangModelBase::create(lm::KnLangModelBase::build(cntNodes, order, minCnt, lastMinCnt, 2, 0, 1, 1e-5, 8, true, &bigramList, &historyTx));
 
+	updateMorphemes();
+
 	if (!!(options & BuildOption::loadDefaultDict))
 	{
 		loadDictionary(rawDataPath + "/default.dict");
@@ -301,7 +302,6 @@ KiwiBuilder::KiwiBuilder(FromRawData, const std::string& rawDataPath, size_t _nu
 		if (!ifs) throw Exception("Cannot open '" + rawDataPath + "/combiningRule.txt'");
 		combiningRule = make_shared<cmb::CompiledRule>(cmb::RuleSet{ ifs }.compile());
 	}
-	updateMorphemes();
 }
 
 void KiwiBuilder::saveModel(const string& modelPath) const
