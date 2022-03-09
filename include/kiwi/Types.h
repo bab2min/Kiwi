@@ -11,6 +11,7 @@
 #pragma once
 
 #include <vector>
+#include <deque>
 #include <map>
 #include <unordered_map>
 #include <string>
@@ -143,6 +144,9 @@ namespace kiwi
 	template<typename _Ty>
 	using Vector = std::vector<_Ty, mi_stl_allocator<_Ty>>;
 
+	template<typename _Ty>
+	using Deque = std::deque<_Ty, mi_stl_allocator<_Ty>>;
+
 	template<typename _K, typename _V, typename _Hash=Hash<_K>>
 	using UnorderedMap = std::unordered_map<_K, _V, _Hash, std::equal_to<_K>, mi_stl_allocator<std::pair<const _K, _V>>>;
 
@@ -161,6 +165,9 @@ namespace kiwi
 	 */
 	template<typename _Ty>
 	using Vector = std::vector<_Ty>;
+
+	template<typename _Ty>
+	using Deque = std::deque<_Ty>;
 
 	/**
 	 * @brief std::unordered_map의 내부용 타입. mimalloc 옵션에 따라 mi_stl_allocator로부터 메모리를 할당받는다.

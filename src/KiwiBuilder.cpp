@@ -1,4 +1,4 @@
-#include <fstream>
+﻿#include <fstream>
 
 #include <kiwi/Kiwi.h>
 #include <kiwi/Utils.h>
@@ -801,12 +801,14 @@ Kiwi KiwiBuilder::build(ArchType arch) const
 	{
 		formTrie[i].val = &ret.forms[i - 1];
 	}
+
+	Vector<const Form*> sortedForms;
 	for (size_t i = defaultTagSize; i < ret.forms.size() - 1; ++i)
 	{
 		auto& f = ret.forms[i];
 		if (f.candidate.empty()) continue;
 
-		if (f.candidate[0]->vowel != CondVowel::none && 
+		if (f.candidate[0]->vowel != CondVowel::none &&
 			all_of(f.candidate.begin(), f.candidate.end(), [&](const Morpheme* m)
 		{
 			return m->vowel == f.candidate[0]->vowel;
@@ -815,7 +817,7 @@ Kiwi KiwiBuilder::build(ArchType arch) const
 			f.vowel = f.candidate[0]->vowel;
 		}
 
-		if (f.candidate[0]->polar != CondPolarity::none && 
+		if (f.candidate[0]->polar != CondPolarity::none &&
 			all_of(f.candidate.begin(), f.candidate.end(), [&](const Morpheme* m)
 		{
 			return m->polar == f.candidate[0]->polar;
@@ -824,7 +826,18 @@ Kiwi KiwiBuilder::build(ArchType arch) const
 			f.polar = f.candidate[0]->polar;
 		}
 
-		formTrie.build(f.form.begin(), f.form.end(), &f);
+		sortedForms.emplace_back(&f);
+	}
+
+	sort(sortedForms.begin(), sortedForms.end(), [](const Form* a, const Form* b)
+	{
+		return a->form < b->form;
+	});
+
+	decltype(formTrie)::CacheStore<const KString> cache;
+	for (auto f : sortedForms)
+	{
+		formTrie.buildWithCaching(f->form, f, cache);
 	}
 	ret.formTrie = utils::FrozenTrie<kchar_t, const Form*>{ formTrie };
 	return ret;

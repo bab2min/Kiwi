@@ -22,42 +22,44 @@ namespace kiwi
 			using MyNode = Node<KeyType, DiffType>;
 
 			std::unique_ptr<MyNode[]> node_data;
-			const KeyType* key_data = nullptr;
+			//const KeyType* key_data = nullptr;
+			std::unique_ptr<KeyType[]> key_data;
 			std::unique_ptr<DiffType[]> all_value_data;
 			DiffType* value_data = nullptr;
 			const float* ll_data = nullptr;
 			const float* gamma_data = nullptr;
 			const KeyType* htx_data = nullptr;
-			std::vector<float> restored_floats;
+			Vector<float> restored_floats;
 			float unk_ll = 0;
 			ptrdiff_t bos_node_idx = 0;
 
 			MyNode* findLowerNode(MyNode* node, KeyType k)
 			{
-				if (!node->lower) return node;
-				auto* lower_node = node + node->lower;
-				if (lower_node == &node_data[0] && htx_data)
+				while (node->lower)
 				{
-					k = htx_data[k];
-				}
-				auto* keys = &key_data[lower_node->next_offset];
-				auto* values = &value_data[lower_node->next_offset];
-				auto* it = std::lower_bound(keys, keys + lower_node->num_nexts, k);
+					auto* lower_node = node + node->lower;
+					if (lower_node == &node_data[0] && htx_data)
+					{
+						k = htx_data[k];
+					}
+					auto* keys = &key_data[lower_node->next_offset];
+					auto* values = &value_data[lower_node->next_offset];
+					auto* it = std::lower_bound(keys, keys + lower_node->num_nexts, k);
 
-				// `k` node doesn't exist
-				if (it == keys + lower_node->num_nexts || *it != k)
-				{
-					return findLowerNode(lower_node, k);
+					// `k` node does exist
+					if (it != keys + lower_node->num_nexts && *it == k)
+					{
+						return lower_node + values[it - keys];
+					}
+					
+					node = lower_node;
 				}
-				else
-				{
-					return lower_node + values[it - keys];
-				}
+				return node;
 			}
 
 			template<size_t bits>
 			static void dequantize(
-				std::vector<float>& restored_floats, std::vector<float>& restored_leaf_ll,
+				Vector<float>& restored_floats, Vector<float>& restored_leaf_ll,
 				const char* llq_data, size_t llq_size,
 				const char* gammaq_data, size_t gammaq_size,
 				const float* ll_table,
@@ -89,7 +91,7 @@ namespace kiwi
 			static void dequantizeDispatch(
 				tp::seq<idx...>,
 				size_t bits,
-				std::vector<float>& restored_floats, std::vector<float>& restored_leaf_ll,
+				Vector<float>& restored_floats, Vector<float>& restored_leaf_ll,
 				const char* llq_data, size_t llq_size,
 				const char* gammaq_data, size_t gammaq_size,
 				const float* ll_table,
@@ -98,7 +100,7 @@ namespace kiwi
 				size_t num_leaf_nodes
 			)
 			{
-				using Fn = void(*)(std::vector<float>&, std::vector<float>&,
+				using Fn = void(*)(Vector<float>&, Vector<float>&,
 					const char*, size_t,
 					const char*, size_t,
 					const float*,
@@ -124,9 +126,10 @@ namespace kiwi
 				size_t quantized = header.quantized & 0x1F;
 				bool compressed = header.quantized & 0x80;
 
-				std::vector<KeyType> d_node_size;
+				Vector<KeyType> d_node_size;
 				auto* node_sizes = reinterpret_cast<const KeyType*>(ptr + header.node_offset);
-				key_data = reinterpret_cast<const KeyType*>(ptr + header.key_offset);
+				key_data = make_unique<KeyType[]>((header.ll_offset - header.key_offset) / sizeof(KeyType));
+				std::memcpy(&key_data[0], ptr + header.key_offset, header.ll_offset - header.key_offset);
 				size_t num_non_leaf_nodes = 0, num_leaf_nodes = 0;
 				if (compressed)
 				{
@@ -143,7 +146,7 @@ namespace kiwi
 				}
 
 				// restore ll & gamma data
-				std::vector<float> restored_leaf_ll;
+				Vector<float> restored_leaf_ll;
 				const float* leaf_ll_data = nullptr;
 				if (quantized)
 				{
@@ -191,7 +194,7 @@ namespace kiwi
 				std::fill(&all_value_data[0], value_data, 0);
 
 				size_t non_leaf_idx = 0, leaf_idx = 0, next_offset = 0;
-				std::vector<std::array<size_t, 3>> key_ranges;
+				Vector<std::array<size_t, 3>> key_ranges;
 				for (size_t i = 0; i < header.num_nodes; ++i)
 				{
 					if (node_sizes[i])
@@ -244,8 +247,8 @@ namespace kiwi
 					bos_node_idx = 0;
 					progress(bos_node_idx, header.bos_id);
 				}
-
-				std::deque<MyNode*> dq;
+				
+				Deque<MyNode*> dq;
 				for (dq.emplace_back(&node_data[0]); !dq.empty(); dq.pop_front())
 				{
 					auto p = dq.front();
@@ -314,7 +317,7 @@ namespace kiwi
 							{
 								ptrdiff_t lv;
 								if (utils::bsearch<arch>(
-									key_data,
+									&key_data[0],
 									value_data,
 									node_data[0].num_nexts, htx_data[next], lv
 								)) node_idx = lv;
@@ -368,7 +371,7 @@ namespace kiwi
 						{
 							ptrdiff_t lv;
 							if (utils::bsearch<arch>(
-								key_data,
+								&key_data[0],
 								value_data,
 								node_data[0].num_nexts, htx_data[next], lv
 							)) node_idx = lv;

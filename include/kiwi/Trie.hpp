@@ -84,22 +84,27 @@ namespace kiwi
 				return { next.end(), (const Node*)this };
 			}
 
+			template<class _FnAlloc>
+			Node* buildNext(const _Key& k, _FnAlloc&& alloc)
+			{
+				auto* n = getNext(k);
+				if (n) return n;
+				n = alloc();
+				next[k] = n - (Node*)this;
+				n->depth = depth + 1;
+				return n;
+			}
+
 			template<typename _TyIter, typename _FnAlloc>
 			Node* build(_TyIter first, _TyIter last, const _Value& _val, _FnAlloc&& alloc)
 			{
-				if (first == last)
+				Node* node = (Node*)this;
+				for (; first != last; ++first)
 				{
-					if (!val) val = _val;
-					return (Node*)this;
+					node = node->buildNext(*first, alloc);
 				}
-
-				auto v = *first;
-				if (!getNext(v))
-				{
-					next[v] = alloc() - (Node*)this;
-					getNext(v)->depth = depth + 1;
-				}
-				return getNext(v)->build(++first, last, _val, alloc);
+				if (!node->val) node->val = _val;
+				return node;
 			}
 
 			template<typename _TyIter>
@@ -211,22 +216,27 @@ namespace kiwi
 		{
 			int32_t parent = 0;
 
+			template<class _FnAlloc>
+			TrieNodeEx* buildNext(const _Key& k, _FnAlloc&& alloc)
+			{
+				auto* n = this->getNext(k);
+				if (n) return n;
+				n = alloc();
+				this->next[k] = n - this;
+				n->parent = this - n;
+				return n;
+			}
+
 			template<typename _TyIter, typename _FnAlloc>
 			TrieNodeEx* build(_TyIter first, _TyIter last, const _Value& _val, _FnAlloc&& alloc)
 			{
-				if (first == last)
+				TrieNodeEx* node = (TrieNodeEx*)this;
+				for (; first != last; ++first)
 				{
-					if (!this->val) this->val = _val;
-					return this;
+					node = node->buildNext(*first, alloc);
 				}
-
-				auto v = *first;
-				if (!this->getNext(v))
-				{
-					this->next[v] = alloc() - this;
-					this->getNext(v)->parent = -this->next[v];
-				}
-				return this->getNext(v)->build(++first, last, _val, alloc);
+				if (!node->val) node->val = _val;
+				return node;
 			}
 
 			template<typename _FnAlloc>
@@ -382,7 +392,41 @@ namespace kiwi
 				size_t insertSize = std::distance(first, last);
 				reserveMore(insertSize);
 
-				return nodes[0].build(first, last, val, [&]() { return newNode(); });
+				return nodes[0].build(first, last, std::forward<Value>(val), [&]() { return newNode(); });
+			}
+
+			template<class Cont>
+			struct CacheStore
+			{
+				Cont* cont = nullptr;
+				std::vector<size_t> ptrs;
+			};
+
+			template<class Cont, class Value>
+			Node* buildWithCaching(Cont& cont, Value&& val, CacheStore<Cont>& cache)
+			{
+				auto allocNode = [&]() { return newNode(); };
+				reserveMore(cont.size());
+				
+				size_t commonPrefix = 0;
+				if (cache.cont)
+				{
+					while (commonPrefix < std::min(cache.cont->size(), cont.size())
+						&& cont[commonPrefix] == (*cache.cont)[commonPrefix]
+					) ++commonPrefix;
+				}
+
+				cache.ptrs.resize(cont.size());
+
+				auto* node = &nodes[commonPrefix ? cache.ptrs[commonPrefix - 1] : 0];
+				for (size_t i = commonPrefix; i < cont.size(); ++i)
+				{
+					node = node->buildNext(cont[i], allocNode);
+					cache.ptrs[i] = node - nodes.data();
+				}
+				if (!node->val) node->val = val;
+				cache.cont = &cont;
+				return node;
 			}
 
 			void fillFail(bool ignoreNegative = false)
