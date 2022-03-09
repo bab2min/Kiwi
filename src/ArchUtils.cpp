@@ -25,7 +25,7 @@ ArchType kiwi::getBestArch()
 #else
 #ifdef KIWI_ARCH_X86_64
 	return ArchType::avx512bw;
-#elif defined(KIWI_ARCH_X86)
+#elif defined(__x86_64__) || defined(KIWI_ARCH_X86)
 	return ArchType::sse2;
 #elif defined(KIWI_ARCH_ARM64)
 	//return ArchType::neon;

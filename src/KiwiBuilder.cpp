@@ -253,9 +253,12 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, size_t _numThreads, BuildOptio
 	}
 }
 
-inline ifstream openFile(const std::string& filePath)
+#if defined(__GNUC__) && __GNUC__ < 5
+#define openFile std::ifstream
+#else
+inline ifstream openFile(const string& filePath)
 {
-	std::ifstream f;
+	ifstream f;
 	auto exc = f.exceptions();
 	f.exceptions(ifstream::failbit | ifstream::badbit);
 	try
@@ -269,6 +272,7 @@ inline ifstream openFile(const std::string& filePath)
 	f.exceptions(exc);
 	return f;
 }
+#endif
 
 KiwiBuilder::KiwiBuilder(const ModelBuildArgs& args)
 {

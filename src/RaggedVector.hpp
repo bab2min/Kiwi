@@ -78,7 +78,7 @@ namespace kiwi
 			size_t i;
 		public:
 			Iterator(RaggedVector& _rv, size_t _i = 0)
-				: rv{ _rv }, i{ _i }
+				: rv(_rv), i{_i} // `rv{ _rv }` generates a compilation error at gcc <= 4.8
 			{
 			}
 

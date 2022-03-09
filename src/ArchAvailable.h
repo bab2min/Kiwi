@@ -28,7 +28,7 @@ namespace kiwi
 		static_cast<std::ptrdiff_t>(ArchType::avx2),
 		static_cast<std::ptrdiff_t>(ArchType::sse4_1),
 #endif
-#if defined(KIWI_ARCH_X86) || defined(KIWI_ARCH_X86_64)
+#if defined(__x86_64__) || defined(KIWI_ARCH_X86) || defined(KIWI_ARCH_X86_64)
 		static_cast<std::ptrdiff_t>(ArchType::sse2),
 #endif
 #ifdef KIWI_ARCH_ARM64

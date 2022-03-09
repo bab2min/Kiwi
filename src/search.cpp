@@ -203,7 +203,7 @@ namespace kiwi
 	}
 }
 
-#if CPUINFO_ARCH_X86 || CPUINFO_ARCH_X86_64 || KIWI_ARCH_X86 || KIWI_ARCH_X86_64
+#if defined(__x86_64__) || CPUINFO_ARCH_X86 || CPUINFO_ARCH_X86_64 || KIWI_ARCH_X86 || KIWI_ARCH_X86_64
 namespace kiwi
 {
 	namespace nst
@@ -229,7 +229,7 @@ namespace kiwi
 
 		template<class IntTy>
 		ARCH_TARGET("sse2")
-		inline bool testEq(__m128i p, size_t offset, size_t size, size_t& ret)
+			inline bool testEq(__m128i p, size_t offset, size_t size, size_t& ret)
 		{
 			uint32_t m = _mm_movemask_epi8(p);
 			uint32_t b = utils::countTrailingZeroes(m);
@@ -241,34 +241,9 @@ namespace kiwi
 			return false;
 		}
 
-		template<class IntTy>
-		ARCH_TARGET("avx2")
-		inline bool testEq(__m256i p, size_t offset, size_t size, size_t& ret)
-		{
-			uint32_t m = _mm256_movemask_epi8(p);
-			uint32_t b = utils::countTrailingZeroes(m);
-			if (m && (offset + b / sizeof(IntTy)) < size)
-			{
-				ret = offset + b / sizeof(IntTy);
-				return true;
-			}
-			return false;
-		}
-
-		inline bool testEqMask(uint64_t m, size_t offset, size_t size, size_t& ret)
-		{
-			uint32_t b = utils::countTrailingZeroes(m);
-			if (m && (offset + b) < size)
-			{
-				ret = offset + b;
-				return true;
-			}
-			return false;
-		}
-
 		template<size_t n, class IntTy>
 		ARCH_TARGET("sse2")
-		bool nstSearchSSE2(const IntTy* keys, size_t size, IntTy target, size_t& ret)
+			bool nstSearchSSE2(const IntTy* keys, size_t size, IntTy target, size_t& ret)
 		{
 			size_t i = 0;
 
@@ -313,6 +288,57 @@ namespace kiwi
 			return false;
 		}
 
+		template<>
+		struct OptimizedImpl<ArchType::sse2>
+		{
+			template<class IntTy>
+			static Vector<size_t> reorder(const IntTy* keys, size_t size)
+			{
+				using SignedIntTy = typename SignedType<IntTy>::type;
+				return getNstOrder<16 / sizeof(IntTy) + 1>((const SignedIntTy*)keys, size, true);
+			}
+
+			template<class IntTy>
+			static bool search(const IntTy* keys, size_t size, IntTy target, size_t& ret)
+			{
+				using SignedIntTy = typename SignedType<IntTy>::type;
+				return nstSearchSSE2<16 / sizeof(IntTy) + 1>((const SignedIntTy*)keys, size, (SignedIntTy)target, ret);
+			}
+		};
+		INSTANTIATE_IMPL(ArchType::sse2);
+	}
+}
+#endif
+
+#if CPUINFO_ARCH_X86 || CPUINFO_ARCH_X86_64 || KIWI_ARCH_X86 || KIWI_ARCH_X86_64
+namespace kiwi
+{
+	namespace nst
+	{
+		template<class IntTy>
+		ARCH_TARGET("avx2")
+		inline bool testEq(__m256i p, size_t offset, size_t size, size_t& ret)
+		{
+			uint32_t m = _mm256_movemask_epi8(p);
+			uint32_t b = utils::countTrailingZeroes(m);
+			if (m && (offset + b / sizeof(IntTy)) < size)
+			{
+				ret = offset + b / sizeof(IntTy);
+				return true;
+			}
+			return false;
+		}
+
+		inline bool testEqMask(uint64_t m, size_t offset, size_t size, size_t& ret)
+		{
+			uint32_t b = utils::countTrailingZeroes(m);
+			if (m && (offset + b) < size)
+			{
+				ret = offset + b;
+				return true;
+			}
+			return false;
+		}
 
 		template<size_t n, class IntTy>
 		ARCH_TARGET("avx2")
@@ -422,26 +448,6 @@ namespace kiwi
 			}
 			return false;
 		}
-
-
-		template<>
-		struct OptimizedImpl<ArchType::sse2>
-		{
-			template<class IntTy>
-			static Vector<size_t> reorder(const IntTy* keys, size_t size)
-			{
-				using SignedIntTy = typename SignedType<IntTy>::type;
-				return getNstOrder<16 / sizeof(IntTy) + 1>((const SignedIntTy*)keys, size, true);
-			}
-
-			template<class IntTy>
-			static bool search(const IntTy* keys, size_t size, IntTy target, size_t& ret)
-			{
-				using SignedIntTy = typename SignedType<IntTy>::type;
-				return nstSearchSSE2<16 / sizeof(IntTy) + 1>((const SignedIntTy*)keys, size, (SignedIntTy)target, ret);
-			}
-		};
-		INSTANTIATE_IMPL(ArchType::sse2);
 
 		template<>
 		struct OptimizedImpl<ArchType::sse4_1>
