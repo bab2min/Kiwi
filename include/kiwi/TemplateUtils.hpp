@@ -54,6 +54,21 @@ namespace kiwi
 			static constexpr size_t value = sizeof...(_i);
 		};
 
+		template<class Ty>
+		struct SeqMax;
+
+		template<std::ptrdiff_t i>
+		struct SeqMax<seq<i>>
+		{
+			static constexpr std::ptrdiff_t value = i;
+		};
+
+		template<std::ptrdiff_t i, std::ptrdiff_t ...j>
+		struct SeqMax<seq<i, j...>>
+		{
+			static constexpr std::ptrdiff_t value = (i > SeqMax<seq<j...>>::value) ? i : SeqMax<seq<j...>>::value;
+		};
+
 		template<size_t n, class Seq, std::ptrdiff_t ..._j>
 		struct slice;
 
@@ -110,5 +125,35 @@ namespace kiwi
 		{
 			return detail::tail(gen_seq<sizeof...(Ts) - 1>{}, t);
 		}
+
+		template<class ValTy, class SeqTy>
+		class Table
+		{
+			ValTy table[SeqMax<SeqTy>::value + 1];
+
+			template<class ValGetter>
+			constexpr void set(seq<>)
+			{
+			}
+
+			template<class ValGetter, std::ptrdiff_t i, std::ptrdiff_t ...j>
+			constexpr void set(seq<i, j...>)
+			{
+				table[i] = ValGetter::Wrapper<i>::value;
+				set<ValGetter>(seq<j...>{});
+			}
+
+		public:
+			template<class ValGetter>
+			constexpr Table(ValGetter)
+			{
+				set<ValGetter>(SeqTy{});
+			}
+
+			constexpr ValTy operator[](std::ptrdiff_t idx) const
+			{
+				return table[idx];
+			}
+		};
 	}
 }

@@ -2,6 +2,7 @@
 #include <kiwi/Types.h>
 #include <kiwi/TemplateUtils.hpp>
 #include <kiwi/Utils.h>
+#include "ArchAvailable.h"
 #include "KTrie.h"
 #include "FeatureTestor.h"
 #include "FrozenTrie.hpp"
@@ -294,9 +295,19 @@ inline FnSplitByTrie getSplitByTrieFnDispatch(ArchType arch, tp::seq<indices...>
 	return table[static_cast<int>(arch) - 1];
 }
 
+struct SplitByTrieGetter
+{
+	template<std::ptrdiff_t i>
+	struct Wrapper
+	{
+		static constexpr FnSplitByTrie value = &splitByTrie<static_cast<ArchType>(i)>;
+	};
+};
+
 FnSplitByTrie kiwi::getSplitByTrieFn(ArchType arch)
 {
-	return getSplitByTrieFnDispatch(arch, tp::GenSeq<static_cast<int>(ArchType::last)>{});
+	static tp::Table<FnSplitByTrie, AvailableArch> table{ SplitByTrieGetter{} };
+	return table[static_cast<std::ptrdiff_t>(arch)];
 }
 
 const Form * KTrie::findForm(const KString & str) const

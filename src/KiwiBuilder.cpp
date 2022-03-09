@@ -2,6 +2,7 @@
 
 #include <kiwi/Kiwi.h>
 #include <kiwi/Utils.h>
+#include "ArchAvailable.h"
 #include "KTrie.h"
 #include "FrozenTrie.hpp"
 #include "Knlm.hpp"
@@ -231,12 +232,14 @@ void KiwiBuilder::saveMorphBin(std::ostream& os) const
 KiwiBuilder::KiwiBuilder(const string& modelPath, size_t _numThreads, BuildOption _options) 
 	: detector{ modelPath, _numThreads }, options{ _options }, numThreads{ _numThreads ? _numThreads : thread::hardware_concurrency() }
 {
+	archType = getSelectedArch(ArchType::default_);
+
 	{
 		utils::MMap mm{ modelPath + "/sj.morph" };
 		utils::imstream iss{ mm };
 		loadMorphBin(iss);
 	}
-	langMdl = lm::KnLangModelBase::create(utils::MMap(modelPath + string{ "/sj.knlm" }));
+	langMdl = lm::KnLangModelBase::create(utils::MMap(modelPath + string{ "/sj.knlm" }), archType);
 
 	if (!!(options & BuildOption::loadDefaultDict))
 	{
@@ -253,6 +256,8 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, size_t _numThreads, BuildOptio
 KiwiBuilder::KiwiBuilder(FromRawData, const std::string& rawDataPath, size_t _numThreads, BuildOption _options)
 	: detector{ WordDetector::fromRawDataTag, rawDataPath, _numThreads }, options{ _options }, numThreads{ _numThreads ? _numThreads : thread::hardware_concurrency() }
 {
+	archType = getSelectedArch(ArchType::default_);
+
 	forms.resize(defaultTagSize);
 	morphemes.resize(defaultTagSize + 2); // additional places for <s> & </s>
 	for (size_t i = 0; i < defaultTagSize; ++i)
@@ -288,7 +293,7 @@ KiwiBuilder::KiwiBuilder(FromRawData, const std::string& rawDataPath, size_t _nu
 	constexpr size_t order = 4, minCnt = 1, lastMinCnt = 2;
 	auto cntNodes = utils::count(sents.begin(), sents.end(), minCnt, 1, order, nullptr, &bigramList, &historyTx);
 	cntNodes.root().getNext(lmVocabSize)->val /= 2;
-	langMdl = lm::KnLangModelBase::create(lm::KnLangModelBase::build(cntNodes, order, minCnt, lastMinCnt, 2, 0, 1, 1e-5, 8, true, &bigramList, &historyTx));
+	langMdl = lm::KnLangModelBase::create(lm::KnLangModelBase::build(cntNodes, order, minCnt, lastMinCnt, 2, 0, 1, 1e-5, 8, true, &bigramList, &historyTx), archType);
 
 	updateMorphemes();
 
@@ -747,9 +752,26 @@ size_t KiwiBuilder::loadDictionary(const string& dictPath)
 	return addedCnt;
 }
 
-Kiwi KiwiBuilder::build(ArchType arch) const
+template<ArchType archType>
+utils::FrozenTrie<kchar_t, const Form*> freezeTrie(utils::ContinuousTrie<KTrie>&& trie)
 {
-	Kiwi ret{ arch, langMdl->getHeader().key_size };
+	return { trie, ArchTypeHolder<archType>{} };
+}
+
+using FnFreezeTrie = decltype(&freezeTrie<ArchType::none>);
+
+struct FreezeTrieGetter
+{
+	template<std::ptrdiff_t i>
+	struct Wrapper
+	{
+		static constexpr FnFreezeTrie value = &freezeTrie<static_cast<ArchType>(i)>;
+	};
+};
+
+Kiwi KiwiBuilder::build() const
+{
+	Kiwi ret{ archType, langMdl->getHeader().key_size };
 
 	Vector<FormRaw> combinedForms;
 	Vector<MorphemeRaw> combinedMorphemes;
@@ -839,7 +861,11 @@ Kiwi KiwiBuilder::build(ArchType arch) const
 	{
 		formTrie.buildWithCaching(f->form, f, cache);
 	}
-	ret.formTrie = utils::FrozenTrie<kchar_t, const Form*>{ formTrie };
+
+	static tp::Table<FnFreezeTrie, AvailableArch> table{ FreezeTrieGetter{} };
+	auto* fn = table[static_cast<std::ptrdiff_t>(archType)];
+	if (!fn) throw std::runtime_error{ std::string{"Unsupported architecture : "} + archToStr(archType)};
+	ret.formTrie = (*fn)(move(formTrie));
 	return ret;
 }
 

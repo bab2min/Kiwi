@@ -4,6 +4,7 @@
 #include <kiwi/Utils.h>
 #include <kiwi/TemplateUtils.hpp>
 #include <kiwi/Form.h>
+#include "ArchAvailable.h"
 #include "KTrie.h"
 #include "FeatureTestor.h"
 #include "logPoisson.h"
@@ -42,34 +43,39 @@ namespace kiwi
 
 	using FnFindBestPath = decltype(&PathEvaluator::findBestPath<ArchType::default_, uint8_t>);
 
-	template<class IntTy, ptrdiff_t ...indices>
-	inline FnFindBestPath getFindBestPathFn(ArchType arch, tp::seq<indices...>)
+	template<class IntTy>
+	struct FindBestPathGetter
 	{
-		static FnFindBestPath table[] = {
-			&PathEvaluator::findBestPath<static_cast<ArchType>(indices + 1), IntTy>...
+		template<std::ptrdiff_t i>
+		struct Wrapper
+		{
+			static constexpr FnFindBestPath value = &PathEvaluator::findBestPath<static_cast<ArchType>(i), IntTy>;
 		};
-		return table[static_cast<int>(arch) - 1];
-	}
+	};
 
 	Kiwi::Kiwi(ArchType arch, size_t lmKeySize)
 	{
-		selectedArch = getSelectedArch(arch);
+		selectedArch = arch;
 		dfSplitByTrie = (void*)getSplitByTrieFn(selectedArch);
+
+		static tp::Table<FnFindBestPath, AvailableArch> tableFindBestPath_8{ FindBestPathGetter<uint8_t>{} };
+		static tp::Table<FnFindBestPath, AvailableArch> tableFindBestPath_16{ FindBestPathGetter<uint16_t>{} };
+		static tp::Table<FnFindBestPath, AvailableArch> tableFindBestPath_32{ FindBestPathGetter<uint32_t>{} };
+		static tp::Table<FnFindBestPath, AvailableArch> tableFindBestPath_64{ FindBestPathGetter<uint64_t>{} };
 		
-		auto indexHolder = tp::GenSeq<static_cast<int>(ArchType::last)>{};
 		switch (lmKeySize)
 		{
 		case 1:
-			dfFindBestPath = (void*)getFindBestPathFn<uint8_t>(selectedArch, indexHolder);
+			dfFindBestPath = (void*)tableFindBestPath_8[static_cast<std::ptrdiff_t>(selectedArch)];
 			break;
 		case 2:
-			dfFindBestPath = (void*)getFindBestPathFn<uint16_t>(selectedArch, indexHolder);
+			dfFindBestPath = (void*)tableFindBestPath_16[static_cast<std::ptrdiff_t>(selectedArch)];
 			break;
 		case 4:
-			dfFindBestPath = (void*)getFindBestPathFn<uint32_t>(selectedArch, indexHolder);
+			dfFindBestPath = (void*)tableFindBestPath_32[static_cast<std::ptrdiff_t>(selectedArch)];
 			break;
 		case 8:
-			dfFindBestPath = (void*)getFindBestPathFn<uint64_t>(selectedArch, indexHolder);
+			dfFindBestPath = (void*)tableFindBestPath_64[static_cast<std::ptrdiff_t>(selectedArch)];
 			break;
 		default:
 			throw Exception{ "Wrong `lmKeySize`" };
@@ -388,7 +394,7 @@ namespace kiwi
 	}
 
 	template<ArchType arch, class LmType, class _Type>
-	void evalTrigram(const lm::KnLangModel<LmType>* knlm, const Morpheme* morphBase, const Vector<KString>& ownForms, const Vector<WordLLs>& cache,
+	void evalTrigram(const lm::KnLangModel<arch, LmType>* knlm, const Morpheme* morphBase, const Vector<KString>& ownForms, const Vector<WordLLs>& cache,
 		array<Wid, 4> seq, size_t chSize, const Morpheme* curMorph, const KGraphNode* node, const KGraphNode* startNode, _Type& maxWidLL)
 	{
 		size_t vocabSize = knlm->getHeader().vocab_size;
@@ -433,7 +439,7 @@ namespace kiwi
 							// prohibit <v> without <chunk>
 							goto continueFor;
 						}
-						float ll = knlm->template progressOpt<arch>(cNode, seq[i]);
+						float ll = knlm->progress(cNode, seq[i]);
 						candScore += ll;
 					}
 				}
@@ -471,7 +477,7 @@ namespace kiwi
 		size_t i, size_t ownFormId, CandTy&& cands, bool unknownForm
 	)
 	{
-		auto lm = static_cast<const lm::KnLangModel<LmType>*>(kw->langMdl.get());
+		auto lm = static_cast<const lm::KnLangModel<arch, LmType>*>(kw->langMdl.get());
 		size_t langVocabSize = lm->getHeader().vocab_size;
 
 		float tMax = -INFINITY;
@@ -519,7 +525,7 @@ namespace kiwi
 			condP = curMorph->polar;
 
 			UnorderedMap<Wid, Vector<WordLLP>> maxWidLL;
-			evalTrigram<arch>(lm, kw->morphemes.data(), ownFormList, cache, seq, chSize, curMorph, node, startNode, maxWidLL);
+			evalTrigram(lm, kw->morphemes.data(), ownFormList, cache, seq, chSize, curMorph, node, startNode, maxWidLL);
 
 			float estimatedLL = curMorph->userScore;
 			// if a form of the node is unknown, calculate log poisson distribution for word-tag
@@ -601,7 +607,7 @@ namespace kiwi
 		Vector<KString> ownFormList;
 		Vector<const Morpheme*> unknownNodeCands, unknownNodeLCands;
 
-		auto lm = static_cast<const lm::KnLangModel<LmType>*>(kw->langMdl.get());
+		auto lm = static_cast<const lm::KnLangModel<arch, LmType>*>(kw->langMdl.get());
 
 		size_t langVocabSize = lm->getHeader().vocab_size;
 
@@ -703,7 +709,7 @@ namespace kiwi
 				if (p.morphs.back().combineSocket) continue;
 				if (!FeatureTestor::isMatched(nullptr, p.morphs.back().condVowel)) continue;
 
-				float c = p.accScore + lm->template progressOpt<arch>(p.node, 1);
+				float c = p.accScore + lm->progress(p.node, 1);
 				cache.back().emplace_back(WordLL{ p.morphs, c, 0 });
 			}
 		}

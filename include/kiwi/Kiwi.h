@@ -304,9 +304,11 @@ namespace kiwi
 		UnorderedMap<KString, size_t> formMap;
 		std::shared_ptr<lm::KnLangModelBase> langMdl;
 		std::shared_ptr<cmb::CompiledRule> combiningRule;
-		size_t numThreads = 0;
 		WordDetector detector;
+		
+		size_t numThreads = 0;
 		BuildOption options = BuildOption::none;
+		ArchType archType = ArchType::none;
 
 		void loadMorphBin(std::istream& is);
 		void saveMorphBin(std::ostream& os) const;
@@ -488,7 +490,7 @@ namespace kiwi
 		 * 
 		 * @return 형태소 분석 준비가 완료된 Kiwi의 객체.
 		 */
-		Kiwi build(ArchType arch = ArchType::default_) const;
+		Kiwi build() const;
 
 		const lm::KnLangModelBase* getLangModel() const
 		{

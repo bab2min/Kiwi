@@ -15,6 +15,9 @@ namespace kiwi
 		last = neon,
 	};
 
+	template<ArchType>
+	struct ArchTypeHolder {};
+
 	ArchType getBestArch();
 
 	ArchType getSelectedArch(ArchType arch);

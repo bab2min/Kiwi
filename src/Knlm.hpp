@@ -7,6 +7,7 @@
 #include <kiwi/Utils.h>
 #include <kiwi/TemplateUtils.hpp>
 #include <kiwi/ArchUtils.h>
+#include "ArchAvailable.h"
 #include "search.h"
 #include <kiwi/BitEncoder.hpp>
 
@@ -16,13 +17,12 @@ namespace kiwi
 	{
 		using VLECode = BitSeq<1, 3, 6, 10, 28>;
 
-		template<class KeyType, class DiffType = int32_t>
+		template<ArchType arch, class KeyType, class DiffType = int32_t>
 		class KnLangModel : public KnLangModelBase
 		{
 			using MyNode = Node<KeyType, DiffType>;
 
 			std::unique_ptr<MyNode[]> node_data;
-			//const KeyType* key_data = nullptr;
 			std::unique_ptr<KeyType[]> key_data;
 			std::unique_ptr<DiffType[]> all_value_data;
 			DiffType* value_data = nullptr;
@@ -44,14 +44,17 @@ namespace kiwi
 					}
 					auto* keys = &key_data[lower_node->next_offset];
 					auto* values = &value_data[lower_node->next_offset];
-					auto* it = std::lower_bound(keys, keys + lower_node->num_nexts, k);
-
-					// `k` node does exist
-					if (it != keys + lower_node->num_nexts && *it == k)
+					DiffType found;
+					if (nst::search<arch>(
+						keys,
+						values,
+						lower_node->num_nexts,
+						k,
+						found
+					))
 					{
-						return lower_node + values[it - keys];
+						return lower_node + found;
 					}
-					
 					node = lower_node;
 				}
 				return node;
@@ -233,6 +236,12 @@ namespace kiwi
 					all_value_data[k] = v;
 				}
 
+				for (size_t i = 0; i < non_leaf_idx; ++i)
+				{
+					auto& node = node_data[i];
+					nst::prepare<arch>(&key_data[node.next_offset], &value_data[node.next_offset], node.num_nexts);
+				}
+
 				if (htx_data)
 				{
 					ptrdiff_t node = 0;
@@ -264,8 +273,7 @@ namespace kiwi
 				}
 			}
 
-			template<ArchType arch>
-			float getLLOpt(ptrdiff_t node_idx, KeyType next) const
+			float getLL(ptrdiff_t node_idx, KeyType next) const
 			{
 				DiffType v;
 				auto* node = &node_data[node_idx];
@@ -276,13 +284,13 @@ namespace kiwi
 				}
 				else
 				{
-					if (!utils::bsearch<arch>(
+					if (!nst::search<arch>(
 						&key_data[node->next_offset],
 						&value_data[node->next_offset],
 						node->num_nexts, next, v
 						))
 					{
-						return gamma_data[node_idx] + getLLOpt<arch>(node_idx + node->lower, next);
+						return gamma_data[node_idx] + getLL(node_idx + node->lower, next);
 					}
 				}
 
@@ -298,8 +306,7 @@ namespace kiwi
 				}
 			}
 
-			template<ArchType arch>
-			float progressOpt(ptrdiff_t& node_idx, KeyType next) const
+			float progress(ptrdiff_t& node_idx, KeyType next) const
 			{
 				float acc = 0;
 				while (1)
@@ -316,7 +323,7 @@ namespace kiwi
 							if (htx_data)
 							{
 								ptrdiff_t lv;
-								if (utils::bsearch<arch>(
+								if (nst::search<arch>(
 									&key_data[0],
 									value_data,
 									node_data[0].num_nexts, htx_data[next], lv
@@ -328,7 +335,7 @@ namespace kiwi
 					}
 					else
 					{
-						if (!utils::bsearch<arch>(
+						if (!nst::search<arch>(
 							keys,
 							values,
 							node->num_nexts, next, v
@@ -353,7 +360,7 @@ namespace kiwi
 						{
 							node += node->lower;
 							DiffType lv;
-							if (utils::bsearch<arch>(
+							if (nst::search<arch>(
 								&key_data[node->next_offset],
 								&value_data[node->next_offset],
 								node->num_nexts, next, lv
@@ -370,7 +377,7 @@ namespace kiwi
 						if (htx_data)
 						{
 							ptrdiff_t lv;
-							if (utils::bsearch<arch>(
+							if (nst::search<arch>(
 								&key_data[0],
 								value_data,
 								node_data[0].num_nexts, htx_data[next], lv
@@ -383,128 +390,9 @@ namespace kiwi
 				}
 			}
 
-			template<ArchType arch>
-			float progressOpt(ptrdiff_t& node_idx, KeyType next, float fallback_ll) const
-			{
-				float acc = 0;
-				bool is_fallback = false;
-				while (1)
-				{
-					DiffType v;
-					auto* node = &node_data[node_idx];
-					auto* keys = &key_data[node->next_offset];
-					auto* values = &value_data[node->next_offset];
-					if (node_idx == 0)
-					{
-						v = all_value_data[next];
-						if (v == 0) return acc + unk_ll;
-						is_fallback = true;
-					}
-					else
-					{
-						if (!utils::bsearch<arch>(
-							keys,
-							values,
-							node->num_nexts, next, v
-							))
-						{
-							// cannot find the next node
-							if (node->lower == 0)
-							{
-								node_idx = 0;
-								return acc + unk_ll;
-							}
-							acc += gamma_data[node_idx];
-							node_idx += node->lower;
-							continue;
-						}
-					}
-
-					if (!htx_data)
-					{
-						// non-leaf node
-						if (v > 0)
-						{
-							node_idx += v;
-							return acc + is_fallback ? fallback_ll : ll_data[node_idx];
-						}
-						// leaf node
-						else
-						{
-							while (node->lower)
-							{
-								node += node->lower;
-								DiffType lv;
-								if (utils::bsearch<arch>(
-									&key_data[node->next_offset],
-									&value_data[node->next_offset],
-									node->num_nexts, next, lv
-									))
-								{
-									if (lv > 0)
-									{
-										node += lv;
-										node_idx = node - &node_data[0];
-										return acc + reinterpret_cast<const float&>(v);
-									}
-								}
-							}
-							node_idx = 0;
-							return acc + is_fallback ? fallback_ll : reinterpret_cast<const float&>(v);
-						}
-					}
-					else
-					{
-						auto ret = acc + is_fallback ? fallback_ll : reinterpret_cast<const float&>(v);
-						next = htx_data[next];
-						utils::bsearch<arch>(keys, values, node->num_nexts, next, v);
-						// non-leaf node
-						if (v > 0)
-						{
-							node_idx += v;
-							return ret;
-						}
-						// leaf node
-						else
-						{
-							while (node->lower)
-							{
-								node += node->lower;
-								DiffType lv;
-								if (utils::bsearch<arch>(
-									&key_data[node->next_offset],
-									&value_data[node->next_offset],
-									node->num_nexts, next, lv
-									))
-								{
-									if (lv > 0)
-									{
-										node += lv;
-										node_idx = node - &node_data[0];
-										return ret;
-									}
-								}
-							}
-							node_idx = 0;
-							return ret;
-						}
-					}
-				}
-			}
-
 			ptrdiff_t getBosNodeIdx() const
 			{
 				return bos_node_idx;
-			}
-
-			float getLL(ptrdiff_t node_idx, size_t next) const final
-			{
-				return getLLOpt<ArchType::balanced>(node_idx, next);
-			}
-
-			float progress(ptrdiff_t& node_idx, size_t next) const final
-			{
-				return progressOpt<ArchType::balanced>(node_idx, next);
 			}
 
 			const float* getLLBuf() const final
@@ -688,23 +576,43 @@ namespace kiwi
 			}
 		};
 
-		inline std::unique_ptr<KnLangModelBase> KnLangModelBase::create(utils::MemoryObject&& mem)
+		template<ArchType archType>
+		std::unique_ptr<KnLangModelBase> createOptimizedModel(utils::MemoryObject&& mem)
 		{
 			auto* ptr = reinterpret_cast<const char*>(mem.get());
 			auto& header = *reinterpret_cast<const Header*>(ptr);
 			switch (header.key_size)
 			{
 			case 1:
-				return make_unique<KnLangModel<uint8_t>>(std::move(mem));
+				return make_unique<KnLangModel<archType, uint8_t>>(std::move(mem));
 			case 2:
-				return make_unique<KnLangModel<uint16_t>>(std::move(mem));
+				return make_unique<KnLangModel<archType, uint16_t>>(std::move(mem));
 			case 4:
-				return make_unique<KnLangModel<uint32_t>>(std::move(mem));
+				return make_unique<KnLangModel<archType, uint32_t>>(std::move(mem));
 			case 8:
-				return make_unique<KnLangModel<uint64_t>>(std::move(mem));
+				return make_unique<KnLangModel<archType, uint64_t>>(std::move(mem));
 			default:
 				throw std::runtime_error{ "Unsupported `key_size` : " + std::to_string((size_t)header.key_size) };
 			}
+		}
+
+		using FnCreateOptimizedModel = decltype(&createOptimizedModel<ArchType::none>);
+
+		struct CreateOptimizedModelGetter
+		{
+			template<std::ptrdiff_t i>
+			struct Wrapper
+			{
+				static constexpr FnCreateOptimizedModel value = &createOptimizedModel<static_cast<ArchType>(i)>;
+			};
+		};
+
+		inline std::unique_ptr<KnLangModelBase> KnLangModelBase::create(utils::MemoryObject&& mem, ArchType archType)
+		{
+			tp::Table<FnCreateOptimizedModel, AvailableArch> table{ CreateOptimizedModelGetter{} };
+			auto fn = table[static_cast<std::ptrdiff_t>(archType)];
+			if (!fn) throw std::runtime_error{ std::string{"Unsupported architecture : "} + archToStr(archType) };
+			return (*fn)(std::move(mem));
 		}
 
 		namespace detail
