@@ -58,6 +58,7 @@ namespace kiwi
 				{
 					_size = size;
 					_data = new size_t[(size + uintSize - 1) / uintSize];
+					std::memset(_data, 0, sizeof(size_t) * (size + uintSize - 1) / uintSize);
 				}
 			}
 
