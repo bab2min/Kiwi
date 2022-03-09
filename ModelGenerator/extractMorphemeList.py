@@ -1,3 +1,4 @@
+import re
 from collections import Counter, defaultdict
 
 def test_coda_vowel(s):
@@ -13,6 +14,9 @@ def test_coda_vowel(s):
     return 0
 
 class MorphemeExtractor:
+
+    stop_pattern = re.compile(r'<.*>|name[0-9]*|[.,?!:;]|.*[()].*')
+
     def __init__(self):
         self._morpheme_cnt = Counter()
         self._josa_cnts = defaultdict(Counter)
@@ -33,7 +37,7 @@ class MorphemeExtractor:
         with open(path, 'w', encoding='utf-8') as fout:
             for (form, tag), cnt in self._morpheme_cnt.most_common():
                 if cnt < min_cnt: break
-                if form[0] == '<' and form[-1] == '>': continue
+                if self.stop_pattern.fullmatch(form): continue
                 if tag.startswith('J'):
                     left_dists = self._josa_cnts[form, tag].copy()
                     for i in range(4):
