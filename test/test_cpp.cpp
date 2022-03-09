@@ -128,6 +128,7 @@ TEST(KiwiCpp, AnalyzeWithWordPosition)
 	TokenResult tokenResult = kiwi.analyze(testSentence, Match::all);
 	std::vector<TokenInfo> tokenInfoList = tokenResult.first;
 
+	ASSERT_GE(tokenInfoList.size(), 4);
 	EXPECT_EQ(tokenInfoList[0].wordPosition, 0);
 	EXPECT_EQ(tokenInfoList[1].wordPosition, 1);
 	EXPECT_EQ(tokenInfoList[2].wordPosition, 2);
@@ -161,6 +162,7 @@ TEST(KiwiCpp, PositionAndLength)
 
 	{
 		auto tokens = kiwi.analyze(u"자랑했던", Match::all).first;
+		ASSERT_GE(tokens.size(), 4);
 		EXPECT_EQ(tokens[0].position, 0);
 		EXPECT_EQ(tokens[0].length, 2);
 		EXPECT_EQ(tokens[1].position, 2);
@@ -172,6 +174,7 @@ TEST(KiwiCpp, PositionAndLength)
 	}
 	{
 		auto tokens = kiwi.analyze(u"이르렀다", Match::all).first;
+		ASSERT_GE(tokens.size(), 3);
 		EXPECT_EQ(tokens[0].position, 0);
 		EXPECT_EQ(tokens[0].length, 2);
 		EXPECT_EQ(tokens[1].position, 2);
@@ -181,6 +184,7 @@ TEST(KiwiCpp, PositionAndLength)
 	}
 	{
 		auto tokens = kiwi.analyze(u"다다랐다", Match::all).first;
+		ASSERT_GE(tokens.size(), 3);
 		EXPECT_EQ(tokens[0].position, 0);
 		EXPECT_EQ(tokens[0].length, 3);
 		EXPECT_EQ(tokens[1].position, 2);
@@ -190,6 +194,7 @@ TEST(KiwiCpp, PositionAndLength)
 	}
 	{
 		auto tokens = kiwi.analyze(u"바다다!", Match::all).first;
+		ASSERT_GE(tokens.size(), 3);
 		EXPECT_EQ(tokens[0].position, 0);
 		EXPECT_EQ(tokens[0].length, 2);
 		EXPECT_EQ(tokens[1].position, 2);
@@ -217,6 +222,7 @@ TEST(KiwiCpp, Issue71_SentenceSplit_u16)
 		sents.emplace_back(str.substr(p.first, p.second - p.first));
 	}
 
+	ASSERT_GE(sents.size(), 6);
 	EXPECT_EQ(sents[0], u"다녀온 후기");
 	EXPECT_EQ(sents[1], u"<강남 토끼정에 다녀왔습니다.>");
 	EXPECT_EQ(sents[2], u"음식도 맛있었어요");
@@ -237,6 +243,7 @@ TEST(KiwiCpp, Issue71_SentenceSplit_u8)
 		sents.emplace_back(str.substr(p.first, p.second - p.first));
 	}
 
+	ASSERT_GE(sents.size(), 6);
 	EXPECT_EQ(sents[0], u8"다녀온 후기");
 	EXPECT_EQ(sents[1], u8"<강남 토끼정에 다녀왔습니다.>");
 	EXPECT_EQ(sents[2], u8"음식도 맛있었어요");
@@ -304,6 +311,7 @@ TEST(KiwiCpp, AddPreAnalyzedWord)
 	Kiwi kiwi = builder.build();
 	auto res = kiwi.analyze("팅겼어...", Match::allWithNormalizing);
 	
+	ASSERT_GE(res.first.size(), 4);
 	EXPECT_EQ(res.first[0].str, u"팅기");
 	EXPECT_EQ(res.first[0].tag, POSTag::vv);
 	EXPECT_EQ(res.first[1].str, u"었");
