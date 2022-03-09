@@ -394,7 +394,7 @@ namespace kiwi
 
 			while (i < size)
 			{
-				pkey = _mm512_loadu_si256(reinterpret_cast<const __m512i*>(&keys[i]));
+				pkey = _mm512_loadu_si512(reinterpret_cast<const __m512i*>(&keys[i]));
 				switch (sizeof(IntTy))
 				{
 				case 1:

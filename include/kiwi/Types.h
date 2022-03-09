@@ -272,6 +272,24 @@ namespace kiwi
 		}
 	};
 
+	template<>
+	struct Hash<CondVowel>
+	{
+		size_t operator()(CondVowel v) const
+		{
+			return std::hash<uint8_t>{}(static_cast<uint8_t>(v));
+		}
+	};
+
+	template<>
+	struct Hash<CondPolarity>
+	{
+		size_t operator()(CondPolarity v) const
+		{
+			return std::hash<uint8_t>{}(static_cast<uint8_t>(v));
+		}
+	};
+
 	template<class Ty, class Alloc>
 	struct Hash<std::vector<Ty, Alloc>>
 	{
