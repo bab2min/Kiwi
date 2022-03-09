@@ -12,7 +12,7 @@ ArchType kiwi::getBestArch()
 #ifdef KIWI_USE_CPUINFO
 	cpuinfo_initialize();
 #if CPUINFO_ARCH_X86_64
-	//if (cpuinfo_has_x86_avx512bw()) return ArchType::avx512bw;
+	if (cpuinfo_has_x86_avx512bw()) return ArchType::avx512bw;
 	if (cpuinfo_has_x86_avx2()) return ArchType::avx2;
 	if (cpuinfo_has_x86_sse4_1()) return ArchType::sse4_1;
 #endif
@@ -24,8 +24,7 @@ ArchType kiwi::getBestArch()
 #endif
 #else
 #ifdef KIWI_ARCH_X86_64
-	//return ArchType::avx512bw;
-	return ArchType::avx2;
+	return ArchType::avx512bw;
 #elif defined(KIWI_ARCH_X86)
 	return ArchType::sse2;
 #elif defined(KIWI_ARCH_ARM64)
