@@ -255,6 +255,17 @@ namespace kiwi
 			return false;
 		}
 
+		inline bool testEqMask(uint64_t m, size_t offset, size_t size, size_t& ret)
+		{
+			uint32_t b = utils::countTrailingZeroes(m);
+			if (m && (offset + b) < size)
+			{
+				ret = offset + b;
+				return true;
+			}
+			return false;
+		}
+
 		template<size_t n, class IntTy>
 		ARCH_TARGET("sse2")
 		bool nstSearchSSE2(const IntTy* keys, size_t size, IntTy target, size_t& ret)
@@ -357,6 +368,61 @@ namespace kiwi
 			return false;
 		}
 
+		template<size_t n, class IntTy>
+		ARCH_TARGET("avx512bw")
+		bool nstSearchAVX512(const IntTy* keys, size_t size, IntTy target, size_t& ret)
+		{
+			size_t i = 0;
+
+			__m512i ptarget, pkey;
+			uint64_t peq, pgt;
+			switch (sizeof(IntTy))
+			{
+			case 1:
+				ptarget = _mm512_set1_epi8(target);
+				break;
+			case 2:
+				ptarget = _mm512_set1_epi16(target);
+				break;
+			case 4:
+				ptarget = _mm512_set1_epi32(target);
+				break;
+			case 8:
+				ptarget = _mm512_set1_epi64(target);
+				break;
+			}
+
+			while (i < size)
+			{
+				pkey = _mm512_loadu_si256(reinterpret_cast<const __m512i*>(&keys[i]));
+				switch (sizeof(IntTy))
+				{
+				case 1:
+					peq = _mm512_cmpeq_epi8_mask(ptarget, pkey);
+					pgt = _mm512_cmpgt_epi8_mask(ptarget, pkey);
+					break;
+				case 2:
+					peq = _mm512_cmpeq_epi16_mask(ptarget, pkey);
+					pgt = _mm512_cmpgt_epi16_mask(ptarget, pkey);
+					break;
+				case 4:
+					peq = _mm512_cmpeq_epi32_mask(ptarget, pkey);
+					pgt = _mm512_cmpgt_epi32_mask(ptarget, pkey);
+					break;
+				case 8:
+					peq = _mm512_cmpeq_epi64_mask(ptarget, pkey);
+					pgt = _mm512_cmpgt_epi64_mask(ptarget, pkey);
+					break;
+				}
+
+				if (testEqMask(peq, i, size, ret)) return true;
+
+				size_t r = utils::popcount(pgt);
+				i = i * n + (n - 1) * (r + 1);
+			}
+			return false;
+		}
+
 
 		template<>
 		struct OptimizedImpl<ArchType::sse2>
@@ -414,6 +480,25 @@ namespace kiwi
 			}
 		};
 		INSTANTIATE_IMPL(ArchType::avx2);
+
+		template<>
+		struct OptimizedImpl<ArchType::avx512bw>
+		{
+			template<class IntTy>
+			static Vector<size_t> reorder(const IntTy* keys, size_t size)
+			{
+				using SignedIntTy = typename SignedType<IntTy>::type;
+				return getNstOrder<64 / sizeof(IntTy) + 1>((const SignedIntTy*)keys, size, true);
+			}
+
+			template<class IntTy>
+			static bool search(const IntTy* keys, size_t size, IntTy target, size_t& ret)
+			{
+				using SignedIntTy = typename SignedType<IntTy>::type;
+				return nstSearchAVX512<64 / sizeof(IntTy) + 1>((const SignedIntTy*)keys, size, (SignedIntTy)target, ret);
+			}
+		};
+		INSTANTIATE_IMPL(ArchType::avx512bw);
 	}
 }
 #endif
