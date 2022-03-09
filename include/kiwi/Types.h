@@ -92,53 +92,6 @@ namespace kiwi
 		}
 	};
 
-	template<class Ty, class Alloc>
-	struct Hash<std::vector<Ty, Alloc>>
-	{
-		size_t operator()(const std::vector<Ty, Alloc>& p) const
-		{
-			size_t hash = p.size();
-			for (auto& v : p)
-			{
-				hash ^= Hash<Ty>{}(v)+(hash << 6) + (hash >> 2);
-			}
-			return hash;
-		}
-
-	};
-
-	template<class Ty1, class Ty2>
-	struct Hash<std::pair<Ty1, Ty2>>
-	{
-		size_t operator()(const std::pair<Ty1, Ty2>& p) const
-		{
-			size_t hash = Hash<Ty2>{}(p.second);
-			hash ^= Hash<Ty1>{}(p.first) + (hash << 6) + (hash >> 2);
-			return hash;
-		}
-	};
-
-	template<class Ty>
-	struct Hash<std::tuple<Ty>>
-	{
-		size_t operator()(const std::tuple<Ty>& p) const
-		{
-			return Hash<Ty>{}(std::get<0>(p));
-		}
-
-	};
-
-	template<class Ty1, class...Rest>
-	struct Hash<std::tuple<Ty1, Rest...>>
-	{
-		size_t operator()(const std::tuple<Ty1, Rest...>& p) const
-		{
-			size_t hash = Hash<std::tuple<Rest...>>{}(kiwi::tp::tuple_tail(p));
-			hash ^= Hash<Ty1>{}(std::get<0>(p)) + (hash << 6) + (hash >> 2);
-			return hash;
-		}
-	};
-
 #ifdef KIWI_USE_MIMALLOC
 	template<typename _Ty>
 	using Vector = std::vector<_Ty, mi_stl_allocator<_Ty>>;
@@ -309,6 +262,63 @@ namespace kiwi
 
 	using U16Reader = std::function<std::u16string()>;
 	using U16MultipleReader = std::function<U16Reader()>;
+
+	template<>
+	struct Hash<POSTag>
+	{
+		size_t operator()(POSTag v) const
+		{
+			return std::hash<uint8_t>{}(static_cast<uint8_t>(v));
+		}
+	};
+
+	template<class Ty, class Alloc>
+	struct Hash<std::vector<Ty, Alloc>>
+	{
+		size_t operator()(const std::vector<Ty, Alloc>& p) const
+		{
+			size_t hash = p.size();
+			for (auto& v : p)
+			{
+				hash ^= Hash<Ty>{}(v)+(hash << 6) + (hash >> 2);
+			}
+			return hash;
+		}
+
+	};
+
+	template<class Ty1, class Ty2>
+	struct Hash<std::pair<Ty1, Ty2>>
+	{
+		size_t operator()(const std::pair<Ty1, Ty2>& p) const
+		{
+			size_t hash = Hash<Ty2>{}(p.second);
+			hash ^= Hash<Ty1>{}(p.first) + (hash << 6) + (hash >> 2);
+			return hash;
+		}
+	};
+
+	template<class Ty>
+	struct Hash<std::tuple<Ty>>
+	{
+		size_t operator()(const std::tuple<Ty>& p) const
+		{
+			return Hash<Ty>{}(std::get<0>(p));
+		}
+
+	};
+
+	template<class Ty1, class...Rest>
+	struct Hash<std::tuple<Ty1, Rest...>>
+	{
+		size_t operator()(const std::tuple<Ty1, Rest...>& p) const
+		{
+			size_t hash = Hash<std::tuple<Rest...>>{}(kiwi::tp::tuple_tail(p));
+			hash ^= Hash<Ty1>{}(std::get<0>(p)) + (hash << 6) + (hash >> 2);
+			return hash;
+		}
+	};
+
 }
 
 namespace std

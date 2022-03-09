@@ -113,6 +113,10 @@ namespace kiwi
 		inline int ceilLog2(uint64_t v) { return 64 - countLeadingZeroes(v - 1); }
 
 #ifdef __APPLE__
+		inline int countTrailingZeroes(size_t v) { return countTrailingZeroes((uint64_t)v); }
+		
+		inline int countLeadingZeroes(size_t v) { return countLeadingZeroes((uint64_t)v); }
+
 		inline int ceilLog2(size_t v) { return ceilLog2((uint64_t)v); }
 #endif
 
