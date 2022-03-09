@@ -16,6 +16,7 @@ int run(const KiwiBuilder::ModelBuildArgs& args, const string& output)
 		KiwiBuilder{ args }.saveModel(output);
 		double tm = timer.getElapsed();
 		cout << "Total: " << tm << " ms " << endl;
+		return 0;
 	}
 	catch (const exception& e)
 	{

@@ -7,17 +7,11 @@ namespace kiwi
 {
 	class TagSequenceScorer
 	{
-		float seqScores[(size_t)POSTag::max][(size_t)POSTag::max] = { 0, };
-		float leftBoundaryScores[2][(size_t)POSTag::max] = { 0, };
+		float leftBoundaryScores[2][(size_t)POSTag::max] = { { 0, }, };
 	public:
 		float weight;
 
 		TagSequenceScorer(float _weight = 5);
-
-		float evalSeqs(POSTag left, POSTag right) const
-		{
-			return seqScores[(size_t)left][(size_t)right] * weight;
-		}
 
 		float evalLeftBoundary(bool hasLeftBoundary, POSTag right) const
 		{

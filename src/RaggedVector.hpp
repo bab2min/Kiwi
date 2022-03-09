@@ -10,6 +10,7 @@ namespace kiwi
 	{
 	public:
 		using std::pair<It, It>::pair;
+		using Reference = decltype(*std::declval<It>());
 
 		It begin() const
 		{
@@ -53,12 +54,12 @@ namespace kiwi
 
 		size_t size() const { return this->second - this->first; }
 
-		auto operator[](size_t idx) const -> const decltype(*this->first)&
+		const Reference operator[](size_t idx) const
 		{
 			return this->first[idx];
 		}
 
-		auto operator[](size_t idx) -> decltype(*this->first)&
+		Reference operator[](size_t idx)
 		{
 			return this->first[idx];
 		}
