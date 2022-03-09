@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30517.126
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cli", "cli.vcxproj", "{1B5AD766-36DC-4207-8B0E-F45CBEF473AB}"
 EndProject
@@ -20,6 +20,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test", "test\test.vcxproj", "{FE648386-241A-4859-A7EC-01EE7FB1893E}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kiwi_c_static", "kiwi_c_static.vcxproj", "{E7AA2D5D-631A-4A0D-BA7C-F5BEA56C54E7}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "build_model", "build_model.vcxproj", "{4764D221-D089-4494-86CB-7F67DE6644CB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -125,6 +127,24 @@ Global
 		{E7AA2D5D-631A-4A0D-BA7C-F5BEA56C54E7}.Release|x64.Build.0 = Release|x64
 		{E7AA2D5D-631A-4A0D-BA7C-F5BEA56C54E7}.Release|x86.ActiveCfg = Release|Win32
 		{E7AA2D5D-631A-4A0D-BA7C-F5BEA56C54E7}.Release|x86.Build.0 = Release|Win32
+		{4764D221-D089-4494-86CB-7F67DE6644CB}.Debug|ARM.ActiveCfg = Debug|x64
+		{4764D221-D089-4494-86CB-7F67DE6644CB}.Debug|ARM.Build.0 = Debug|x64
+		{4764D221-D089-4494-86CB-7F67DE6644CB}.Debug|x64.ActiveCfg = Debug|x64
+		{4764D221-D089-4494-86CB-7F67DE6644CB}.Debug|x64.Build.0 = Debug|x64
+		{4764D221-D089-4494-86CB-7F67DE6644CB}.Debug|x86.ActiveCfg = Debug|Win32
+		{4764D221-D089-4494-86CB-7F67DE6644CB}.Debug|x86.Build.0 = Debug|Win32
+		{4764D221-D089-4494-86CB-7F67DE6644CB}.Release(LODA_TXT)|ARM.ActiveCfg = Release(LODA_TXT)|x64
+		{4764D221-D089-4494-86CB-7F67DE6644CB}.Release(LODA_TXT)|ARM.Build.0 = Release(LODA_TXT)|x64
+		{4764D221-D089-4494-86CB-7F67DE6644CB}.Release(LODA_TXT)|x64.ActiveCfg = Release(LODA_TXT)|x64
+		{4764D221-D089-4494-86CB-7F67DE6644CB}.Release(LODA_TXT)|x64.Build.0 = Release(LODA_TXT)|x64
+		{4764D221-D089-4494-86CB-7F67DE6644CB}.Release(LODA_TXT)|x86.ActiveCfg = Release(LODA_TXT)|Win32
+		{4764D221-D089-4494-86CB-7F67DE6644CB}.Release(LODA_TXT)|x86.Build.0 = Release(LODA_TXT)|Win32
+		{4764D221-D089-4494-86CB-7F67DE6644CB}.Release|ARM.ActiveCfg = Release|x64
+		{4764D221-D089-4494-86CB-7F67DE6644CB}.Release|ARM.Build.0 = Release|x64
+		{4764D221-D089-4494-86CB-7F67DE6644CB}.Release|x64.ActiveCfg = Release|x64
+		{4764D221-D089-4494-86CB-7F67DE6644CB}.Release|x64.Build.0 = Release|x64
+		{4764D221-D089-4494-86CB-7F67DE6644CB}.Release|x86.ActiveCfg = Release|Win32
+		{4764D221-D089-4494-86CB-7F67DE6644CB}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

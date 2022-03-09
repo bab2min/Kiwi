@@ -21,21 +21,13 @@ void printResult(Kiwi& kw, const string& line, int topn, ostream& out)
 	if (topn > 1) out << endl;
 }
 
-int run(const string& modelPath, bool buildFromRaw, bool benchmark, const string& output, const string& user, int topn, const vector<string>& input)
+int run(const string& modelPath, bool benchmark, const string& output, const string& user, int topn, const vector<string>& input)
 {
 	try
 	{
 		tutils::Timer timer;
 		size_t lines = 0, bytes = 0;
-		Kiwi kw;
-		if (buildFromRaw)
-		{
-			kw = KiwiBuilder{ KiwiBuilder::fromRawDataTag, modelPath, 1 }.build();
-		}
-		else
-		{
-			kw = KiwiBuilder{ modelPath, 1 }.build();
-		}
+		Kiwi kw = KiwiBuilder{ modelPath, 1 }.build();
 
 		if (benchmark)
 		{
@@ -105,7 +97,6 @@ int main(int argc, const char* argv[])
 	CmdLine cmd{ "Kiwi CLI", ' ', "0.10.0" };
 
 	ValueArg<string> model{ "m", "model", "Kiwi model path", true, "", "string" };
-	SwitchArg build{ "b", "build", "build model from raw data" };
 	SwitchArg benchmark{ "e", "benchmark", "benchmark performance" };
 	ValueArg<string> output{ "o", "output", "output file path", false, "", "string" };
 	ValueArg<string> user{ "u", "user", "user dictionary path", false, "", "string" };
@@ -113,7 +104,6 @@ int main(int argc, const char* argv[])
 	UnlabeledMultiArg<string> files{ "inputs", "input files", false, "string" };
 
 	cmd.add(model);
-	cmd.add(build);
 	cmd.add(benchmark);
 	cmd.add(output);
 	cmd.add(user);
@@ -129,6 +119,6 @@ int main(int argc, const char* argv[])
 		cerr << "error: " << e.error() << " for arg " << e.argId() << endl;
 		return -1;
 	}
-	return run(model, build, benchmark, output, user, topn, files.getValue());
+	return run(model, benchmark, output, user, topn, files.getValue());
 }
 

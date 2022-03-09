@@ -342,8 +342,18 @@ namespace kiwi
 		) const;
 
 	public:
-		struct FromRawData {};
-		static constexpr FromRawData fromRawDataTag = {};
+		struct ModelBuildArgs 
+		{
+			std::string morphemeDef;
+			std::vector<std::string> corpora;
+			size_t minMorphCnt = 10;
+			size_t lmOrder = 4;
+			size_t lmMinCnt = 1;
+			size_t lmLastOrderMinCnt = 2;
+			bool useLmTagHistory = true;
+			bool quantizeLm = true;
+			bool compressLm = true;
+		};
 
 		/**
 		 * @brief KiwiBuilder의 기본 생성자
@@ -365,14 +375,11 @@ namespace kiwi
 		/**
 		 * @brief KiwiBuilder를 raw 데이터로부터 생성한다.
 		 * 
-		 * @param rawDataPath 
-		 * @param numThreads 
-		 * @param options
 		 * 
 		 * @note 이 함수는 현재 내부적으로 모델 구축에 쓰인다. 
 		 * 추후 공개 데이터로도 쉽게 직접 모델을 구축할 수 있도록 개선된 API를 제공할 예정.
 		 */
-		KiwiBuilder(FromRawData, const std::string& rawDataPath, size_t numThreads = 0, BuildOption options = BuildOption::integrateAllomorph | BuildOption::loadDefaultDict);
+		KiwiBuilder(const ModelBuildArgs& args);
 
 		/**
 		 * @brief KiwiBuilder를 모델 파일로부터 생성한다.

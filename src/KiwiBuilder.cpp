@@ -253,8 +253,24 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, size_t _numThreads, BuildOptio
 	}
 }
 
-KiwiBuilder::KiwiBuilder(FromRawData, const std::string& rawDataPath, size_t _numThreads, BuildOption _options)
-	: detector{ WordDetector::fromRawDataTag, rawDataPath, _numThreads }, options{ _options }, numThreads{ _numThreads ? _numThreads : thread::hardware_concurrency() }
+inline ifstream openFile(const std::string& filePath)
+{
+	std::ifstream f;
+	auto exc = f.exceptions();
+	f.exceptions(ifstream::failbit | ifstream::badbit);
+	try
+	{
+		f.open(filePath);
+	}
+	catch (ios_base::failure& e) 
+	{
+		throw Exception{ "Cannot open file : " + filePath };
+	}
+	f.exceptions(exc);
+	return f;
+}
+
+KiwiBuilder::KiwiBuilder(const ModelBuildArgs& args)
 {
 	archType = getSelectedArch(ArchType::default_);
 
@@ -266,17 +282,17 @@ KiwiBuilder::KiwiBuilder(FromRawData, const std::string& rawDataPath, size_t _nu
 		morphemes[i + 2].tag = (POSTag)(i + 1);
 	}
 
-	auto realMorph = loadMorphemesFromTxt(ifstream{ rawDataPath + "/morphemes.txt" }, [](POSTag tag, float cnt)
+	auto realMorph = loadMorphemesFromTxt(openFile(args.morphemeDef), [&](POSTag tag, float cnt)
 	{
-		return cnt >= 10;
+		return cnt >= args.minMorphCnt;
 	});
 	updateForms();
 
 	RaggedVector<uint16_t> sents;
-	addCorpusTo(sents, ifstream{ rawDataPath + "/ML_lit.txt" }, realMorph);
-	addCorpusTo(sents, ifstream{ rawDataPath + "/ML_spo.txt" }, realMorph);
-	addCorpusTo(sents, ifstream{ rawDataPath + "/modu_cps.txt" }, realMorph);
-	addCorpusTo(sents, ifstream{ rawDataPath + "/modu_cps_aug_ef.txt" }, realMorph);
+	for (auto& f : args.corpora)
+	{
+		addCorpusTo(sents, openFile(f), realMorph);
+	}
 
 	size_t lmVocabSize = 0;
 	for (auto& p : realMorph) lmVocabSize = max(p.second, lmVocabSize);
@@ -284,29 +300,28 @@ KiwiBuilder::KiwiBuilder(FromRawData, const std::string& rawDataPath, size_t _nu
 
 	Vector<utils::Vid> historyTx(lmVocabSize);
 
-	for (size_t i = 0; i < lmVocabSize; ++i)
+	if (args.useLmTagHistory)
 	{
-		historyTx[i] = (size_t)morphemes[i].tag + lmVocabSize;
+		for (size_t i = 0; i < lmVocabSize; ++i)
+		{
+			historyTx[i] = (size_t)morphemes[i].tag + lmVocabSize;
+		}
 	}
 
 	vector<pair<uint16_t, uint16_t>> bigramList;
-	constexpr size_t order = 4, minCnt = 1, lastMinCnt = 2;
-	auto cntNodes = utils::count(sents.begin(), sents.end(), minCnt, 1, order, nullptr, &bigramList, &historyTx);
+	auto cntNodes = utils::count(sents.begin(), sents.end(), args.lmMinCnt, 1, args.lmOrder, nullptr, &bigramList, args.useLmTagHistory ? &historyTx : nullptr);
 	cntNodes.root().getNext(lmVocabSize)->val /= 2;
-	langMdl = lm::KnLangModelBase::create(lm::KnLangModelBase::build(cntNodes, order, minCnt, lastMinCnt, 2, 0, 1, 1e-5, 8, true, &bigramList, &historyTx), archType);
+	langMdl = lm::KnLangModelBase::create(lm::KnLangModelBase::build(
+		cntNodes, 
+		args.lmOrder, args.lmMinCnt, args.lmLastOrderMinCnt, 
+		2, 0, 1, 1e-5, 
+		args.quantizeLm ? 8 : 0,
+		args.compressLm,
+		&bigramList, 
+		args.useLmTagHistory ? &historyTx : nullptr
+	), archType);
 
 	updateMorphemes();
-
-	if (!!(options & BuildOption::loadDefaultDict))
-	{
-		loadDictionary(rawDataPath + "/default.dict");
-	}
-
-	{
-		ifstream ifs{ rawDataPath + string{ "/combiningRule.txt" } };
-		if (!ifs) throw Exception("Cannot open '" + rawDataPath + "/combiningRule.txt'");
-		combiningRule = make_shared<cmb::CompiledRule>(cmb::RuleSet{ ifs }.compile());
-	}
 }
 
 void KiwiBuilder::saveModel(const string& modelPath) const
