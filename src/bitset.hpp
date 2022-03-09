@@ -25,7 +25,7 @@ namespace kiwi
 					size_t _size;
 				};
 
-				size_t _fields[2] = { 0, };
+				size_t _fields[2];
 			};
 		
 			static constexpr size_t uintSize = sizeof(size_t) * 8;
@@ -48,10 +48,12 @@ namespace kiwi
 			{
 				if (size == 0)
 				{
-
+					_fields[0] = 0;
+					_fields[1] = 0;
 				}
 				else if (size < realFieldSize)
 				{
+					_fields[0] = 0;
 					_fields[1] = size << (uintSize - prefixSize);
 				}
 				else
@@ -89,6 +91,8 @@ namespace kiwi
 
 			Bitset(Bitset&& o) noexcept
 			{
+				_fields[0] = 0;
+				_fields[1] = 0;
 				std::swap(_fields, o._fields);
 			}
 
