@@ -1,5 +1,6 @@
 #pragma once
 #include <cstddef>
+#include <tuple>
 
 namespace kiwi
 {
@@ -132,20 +133,20 @@ namespace kiwi
 			ValTy table[SeqMax<SeqTy>::value + 1];
 
 			template<class ValGetter>
-			constexpr void set(seq<>)
+			void set(seq<>)
 			{
 			}
 
 			template<class ValGetter, std::ptrdiff_t i, std::ptrdiff_t ...j>
-			constexpr void set(seq<i, j...>)
+			void set(seq<i, j...>)
 			{
-				table[i] = ValGetter::Wrapper<i>::value;
+				table[i] = ValGetter::template Wrapper<i>::value;
 				set<ValGetter>(seq<j...>{});
 			}
 
 		public:
 			template<class ValGetter>
-			constexpr Table(ValGetter)
+			Table(ValGetter)
 			{
 				set<ValGetter>(SeqTy{});
 			}

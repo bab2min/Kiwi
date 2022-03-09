@@ -121,7 +121,6 @@ namespace kiwi
 	template<class Ty>
 	struct Hash<std::tuple<Ty>>
 	{
-		template<class Ty>
 		size_t operator()(const std::tuple<Ty>& p) const
 		{
 			return Hash<Ty>{}(std::get<0>(p));

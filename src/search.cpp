@@ -150,7 +150,7 @@ namespace kiwi
 		template<ArchType arch, class IntTy>
 		bool detail::searchImpl(const IntTy* keys, size_t size, IntTy target, size_t& ret)
 		{
-			return OptimizedImpl<arch>::search<IntTy>(keys, size, target, ret);
+			return OptimizedImpl<arch>::template search<IntTy>(keys, size, target, ret);
 		}
 
 		template<>
@@ -228,6 +228,7 @@ namespace kiwi
 
 
 		template<class IntTy>
+		ARCH_TARGET("sse2")
 		inline bool testEq(__m128i p, size_t offset, size_t size, size_t& ret)
 		{
 			uint32_t m = _mm_movemask_epi8(p);
@@ -241,6 +242,7 @@ namespace kiwi
 		}
 
 		template<class IntTy>
+		ARCH_TARGET("avx2")
 		inline bool testEq(__m256i p, size_t offset, size_t size, size_t& ret)
 		{
 			uint32_t m = _mm256_movemask_epi8(p);

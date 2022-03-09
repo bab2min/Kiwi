@@ -1,4 +1,5 @@
 #pragma once
+#include <iterator>
 #include <kiwi/Types.h>
 #include <kiwi/Mmap.h>
 
@@ -32,22 +33,22 @@ namespace kiwi
 
 		std::reverse_iterator<It> rbegin() const
 		{
-			return std::make_reverse_iterator(this->second);
+			return std::reverse_iterator<It>{ this->second };
 		}
 
 		std::reverse_iterator<It> rend() const
 		{
-			return std::make_reverse_iterator(this->first);
+			return std::reverse_iterator<It>{ this->first };
 		}
 
 		std::reverse_iterator<It> rbegin()
 		{
-			return std::make_reverse_iterator(this->second);
+			return std::reverse_iterator<It>{ this->second };
 		}
 
 		std::reverse_iterator<It> rend()
 		{
-			return std::make_reverse_iterator(this->first);
+			return std::reverse_iterator<It>{ this->first };
 		}
 
 		size_t size() const { return this->second - this->first; }

@@ -768,7 +768,7 @@ void RuleSet::loadRules(istream& istr)
 
 				for (auto& f : split(fields[3], ','))
 				{
-					transform(f.begin(), f.end(), f.begin(), tolower);
+					transform(f.begin(), f.end(), f.begin(), static_cast<int(*)(int)>(tolower));
 					size_t t = find(fs.begin(), fs.end(), f) - fs.begin();
 					if (t >= fs.size())
 					{
