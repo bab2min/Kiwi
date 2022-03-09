@@ -97,11 +97,13 @@
 받	VV	30101
 와	JKB	29653	vowel	0.9994950587895838
 안	MAG	29172
+ᆸ니다	EF	29093
 아야	EC	29031
 라	EC	27568
 어야	EC	27476
 그것	NP	27367
 그러나	MAJ	27092
+ᆷ	ETN	27024
 그런	MM	26923
 알	VV	26849
 어요	EF	26693
@@ -113,7 +115,6 @@
 보이	VV	24619
 나오	VV	24606
 좋	VA	24532
-ᄆ	ETN	24516
 가	JKC	24388	vowel	0.9996156966565609
 문제	NNG	23820
 보다	JKB	23794
@@ -153,7 +154,6 @@
 집	NNG	18085
 시키	XSV	17966
 야	EF	17920
-ᄇ니다	EF	17723
 오	VX	17717
 좀	MAG	17454
 다른	MM	17432
@@ -235,7 +235,6 @@
 여자	NNG	11520
 기업	NNG	11466
 분	NNB	11394
-ᆸ니다	EF	11370
 근데	MAJ	11354
 모든	MM	11341
 교육	NNG	11321
@@ -756,6 +755,7 @@
 순간	NNG	3799
 바라보	VV	3795
 요즘	NNG	3784
+ᆸ니까	EF	3784
 지키	VV	3780
 세기	NNG	3774
 옷	NNG	3773
@@ -1130,7 +1130,6 @@
 별로	MAG	2517
 인생	NNG	2516
 인상	NNG	2511
-ᆷ	ETN	2508
 쉬	VV	2508
 평균	NNG	2505
 남기	VV	2504
@@ -1239,7 +1238,6 @@
 또는	MAJ	2265
 었었	EP	2263
 안전	NNG	2263
-ᄇ니까	EF	2263
 높이	VV	2260
 지구	NNG	2257
 특징	NNG	2255
@@ -1730,7 +1728,6 @@
 친	XPN	1527
 합리	NNG	1527
 끼리	XSN	1523
-ᆸ니까	EF	1521
 지르	VV	1521
 제	MM	1520
 범죄	NNG	1519
@@ -2415,6 +2412,7 @@
 기타	NNG	1009
 접촉	NNG	1008
 붓	VV	1006
+ᆸ시오	EF	1006
 피해자	NNG	1006
 하락	NNG	1006
 극	NNG	1006
@@ -2501,6 +2499,7 @@
 어야지	EF	963
 덜	MAG	961
 제재	NNG	960
+ᆸ시다	EF	959
 형편	NNG	959
 습관	NNG	958
 책상	NNG	958
@@ -2650,7 +2649,6 @@
 아이	IC	886
 지치	VV	886
 분양	NNG	886
-ᄇ시오	EF	886
 상식	NNG	885
 필수	NNG	883
 부자	NNG	883
@@ -2720,7 +2718,7 @@
 매력	NNG	855
 희생	NNG	855
 태우	VV	855
-ᄇ니다	EC	855
+ᆸ니다	EC	855
 대목	NNG	854
 미루	VV	854
 삼성전자	NNP	854
@@ -2913,7 +2911,6 @@
 빚	VV	788
 촉구	NNG	788
 진정	XR	788
-ᄇ시다	EF	788
 부패	NNG	787
 다시피	EC	787
 가스	NNG	787
@@ -3398,7 +3395,6 @@
 대전	NNP	662
 기념	NNG	662
 지상	NNG	662
-ᄀ	NNG	662
 더라구	EF	661
 경선	NNG	661
 독재	NNG	661
@@ -6190,7 +6186,6 @@ XX	UNC	394
 이별	NNG	280
 루	NNG	280
 과부	NNG	280
-ᄃ	NNG	280
 규혁	NNP	280
 자립	NNG	279
 멸치	NNG	279
@@ -6663,6 +6658,7 @@ XX	UNC	394
 지도원	NNG	251
 재우	NNP	251
 두환	NNP	251
+ᆸ디다	EF	250
 사회단체	NNG	250
 xx	NA	250
 뵙	VV	250
@@ -6815,7 +6811,6 @@ xx	NA	250
 여지	NNG	243
 짖	VV	243
 포스트모더니즘	NNG	243
-ᄇ디다	EF	243
 험하	VA	242
 노화	NNG	242
 실례	NNG	242
@@ -7455,7 +7450,6 @@ xx	NA	250
 문화방송	NNP	212
 은	NNG	212
 큰새	NNP	212
-(하)	VX	212
 나열	NNG	211
 육십	NR	211
 오렌지	NNG	211
@@ -7699,7 +7693,6 @@ xx	NF	205
 똘스또이	NNP	202
 고춧가루	NNG	201
 치안	NNG	201
-name2	NNP	201
 내정	NNG	201
 베스트셀러	NNG	201
 가담	NNG	201
@@ -8139,7 +8132,6 @@ name2	NNP	201
 수	EF	185
 미혜	NNP	185
 세상에	IC	184
-name1	NNP	184
 메이커	NNG	184
 요번	NNG	184
 악순환	NNG	184
@@ -8544,7 +8536,6 @@ name1	NNP	184
 찔리	VV	171
 표상	NNG	171
 자백	NNG	171
-ᆸ시다	EF	171
 쪽지	NNG	171
 초등학생	NNG	171
 국무부	NNG	171
@@ -8814,7 +8805,6 @@ name1	NNP	184
 스태프	NNG	164
 피터	NNP	164
 앞지르	VV	164
-ㅅ	NNG	164
 난감	XR	164
 유태인	NNG	164
 참신	XR	164
@@ -9663,6 +9653,7 @@ name1	NNP	184
 조선족	NNP	143
 가져다주	VV	143
 방사	NNG	143
+ᆸ니까	EC	143
 애착	NNG	143
 전염	NNG	143
 몸담	VV	143
@@ -10258,7 +10249,6 @@ name1	NNP	184
 제인	NNP	131
 제우스	NNP	131
 합당	XR	131
-ᄇ니까	EC	131
 치열	XR	131
 이야	IC	130
 이비에스	NNP	130
@@ -10354,7 +10344,6 @@ name1	NNP	184
 핏줄	NNG	129
 알루미늄	NNG	129
 상복	NNG	129
-ㄱ	NNG	129
 러	NNP	129
 동점	NNG	129
 아프가니스탄	NNP	129
@@ -10615,6 +10604,7 @@ name1	NNP	184
 ᆼ	NNG	124
 이라든지	JC	124	non_vowel	0.9776119402985075
 듬뿍	MAG	123
+ᆸ쇼	EF	123
 뻔히	MAG	123
 마는	JX	123	vowel	0.9323308270676691
 군데군데	MAG	123
@@ -10774,7 +10764,6 @@ name1	NNP	184
 신석주	NNP	121
 식이	NNG	120
 불태우	VV	120
-ᆸ시오	EF	120
 파란색	NNG	120
 해	VV	120
 억울	NNG	120
@@ -11143,6 +11132,8 @@ LG전자	NNP	119
 논법	NNG	114
 중등	NNG	114
 어이	IC	114
+ᆷ	EC	114
+ᆸ니다만	EC	114
 동아	NNP	114
 소위	NNG	114
 이재용	NNP	114
@@ -11423,7 +11414,6 @@ xxx	NA	110
 탕	NNG	110
 찜	NNG	110
 가	NA	110
-ᆷ	EC	110
 탐정	NNG	110
 직구	NNG	110
 면세점	NNG	110
@@ -11498,7 +11488,7 @@ xxx	NA	110
 능	NNG	110
 씁쓸	XR	110
 도적	NNG	110
-ᄇ시다	EC	110
+ᆸ시다	EC	110
 엉성	XR	110
 쾌적	XR	110
 황량	XR	110
@@ -12130,6 +12120,7 @@ XXX	UNC	103
 운율	NNG	102
 신작로	NNG	102
 약사회	NNG	102
+ᆷ	NNG	102
 아니면은	MAJ	102
 총독부	NNG	101
 청취자	NNG	101
@@ -12444,6 +12435,7 @@ XXX	UNC	103
 써내	VV	98
 농법	NNG	98
 경마장	NNG	98
+ᆷ직	EC	98
 미궁	NNG	98
 상념	NNG	98
 계산기	NNG	98
@@ -12531,7 +12523,6 @@ XXX	UNC	103
 장상	NNP	97
 대부자	NNG	97
 납작	XR	97
-ᄆ직	EC	97
 대주주	NNG	97
 건넌방	NNG	97
 건너다보	VV	97
@@ -12837,6 +12828,7 @@ XXX	UNC	103
 밑돌	VV	93
 제방	NNG	93
 자급	NNG	93
+ᆸ시오	EC	93
 유자	NNG	93
 약주	NNG	93
 시누이	NNG	93
@@ -12875,6 +12867,7 @@ XXX	UNC	103
 장명수	NNP	93
 허황	XR	93
 흘기	VV	93
+ᆸ니다요	EF	93
 토익	NNP	93
 낡	VV	92
 비린내	NNG	92
@@ -12962,7 +12955,6 @@ XXX	UNC	103
 한가지	NNG	92
 며	EF	92
 해롭	VA	92
-ᄇ니다요	EF	92
 조상국	NNP	92
 최제우	NNP	92
 은철	NNP	92
@@ -13054,7 +13046,6 @@ XXX	UNC	103
 통째	NNG	91
 장황	XR	91
 착실	XR	91
-ᄒ	NNG	91
 하나님	NNP	91
 불복	NNG	90
 센치	NNB	90
@@ -13222,7 +13213,6 @@ XXX	UNC	103
 재채기	NNG	89
 문학가	NNG	89
 평형	NNG	89
-ᄇ시오	EC	89
 애절	XR	89
 기괴	XR	89
 상업주의	NNG	89
@@ -13258,7 +13248,6 @@ XXX	UNC	103
 리서치	NNG	88
 의식주	NNG	88
 탁하	VA	88
-name4	NNP	88
 유방암	NNG	88
 블라우스	NNG	88
 싱글	NNG	88
@@ -13518,7 +13507,7 @@ name4	NNP	88
 황야	NNG	86
 계시	NNG	86
 심오	XR	86
-ᄇ	NNG	86
+ᆸ	NNG	86
 간호원	NNG	86
 미륵	NNP	86
 돌리	NNP	86
@@ -14286,7 +14275,6 @@ LG화학	NNP	82
 범벅	NNG	78
 소외감	NNG	78
 저널	NNG	78
-name3	NNP	78
 뀌	VV	78
 더냐	EF	78
 성나	VV	78
@@ -15180,7 +15168,6 @@ name3	NNP	78
 왕성	XR	71
 세련	XR	71
 식염	NNG	71
-ᄇ쇼	EF	71
 ᆫ다구요	EF	71
 측간	NNG	71
 석하	NNP	71
@@ -16397,6 +16384,7 @@ xxx	NF	64
 임박	NNG	62
 수개월	NNG	62
 갑상선	NNG	62
+ᆸ시요	EF	62
 선풍	NNG	62
 걸음마	NNG	62
 회원사	NNG	62
@@ -16677,7 +16665,6 @@ xxx	NF	64
 뒤란	NNG	61
 효순	NNP	61
 부당	XR	61
-ᄇ니다만	EC	61
 자색	NNG	61
 내빼	VV	61
 달구지	NNG	61
@@ -17258,7 +17245,6 @@ xxx	NF	64
 병자	NNG	57
 통칭	NNG	57
 반바지	NNG	57
-name6	NNP	57
 남아돌	VV	57
 홍삼	NNG	57
 청소기	NNG	57
@@ -17369,7 +17355,6 @@ name6	NNP	57
 완연	XR	57
 갸름	XR	57
 수효	NNG	57
-ᄎ	NNG	57
 동면	NNG	57
 홀아비	NNG	57
 모란	NNG	57
@@ -17576,6 +17561,7 @@ name6	NNP	57
 맥베드	NNP	56
 따른	MM	55
 중고등학교	NNG	55
+ᆸ니다마는	EC	55
 쑥쑥	MAG	55
 쩜	NNG	55
 섣부르	VA	55
@@ -17795,7 +17781,6 @@ name6	NNP	57
 화풀이	NNG	54
 공포증	NNG	54
 삐삐	NNG	54
-name8	NNP	54
 백내장	NNG	54
 엑스레이	NNG	54
 휴양	NNG	54
@@ -17953,7 +17938,6 @@ name8	NNP	54
 김의관	NNP	54
 죽당	NNP	54
 오드바이	NNP	54
-(하)	VV	54
 십시오	EF	54
 X	UNC	54
 비비	NNB	54
@@ -17965,7 +17949,6 @@ X	UNC	54
 식감	NNG	53
 짤리	VV	53
 하이힐	NNG	53
-ᆸ니다만	EC	53
 킬로	NNB	53
 으면	EF	53
 미명	NNG	53
@@ -18146,7 +18129,6 @@ X	UNC	54
 맛나	NNP	53
 황당하	VA	52
 ᆫ지요	EF	52
-ᆸ쇼	EF	52
 십일	NR	52
 팔팔	MAG	52
 통깨	NNG	52
@@ -19783,7 +19765,7 @@ AP통신	NNP	50
 뜨내기	NNG	46
 백치	NNG	46
 누추	XR	46
-ᄇ지요	EF	46
+ᆸ지요	EF	46
 포트란	NNG	46
 그렇잖	VA	46
 경혜	NNP	46
@@ -19889,7 +19871,6 @@ AP통신	NNP	50
 우물쭈물	MAG	45
 꼭두각시	NNG	45
 수족	NNG	45
-ᆸ시요	EF	45
 거제	NNP	45
 완도	NNP	45
 암반	NNG	45
@@ -20729,7 +20710,6 @@ AP통신	NNP	50
 등짝	NNG	42
 피붙이	NNG	42
 소유물	NNG	42
-name11	NNP	42
 을라고	EC	42
 가지가지	NNG	42
 예정자	NNG	42
@@ -20769,6 +20749,7 @@ name11	NNP	42
 과학원	NNG	42
 본원	NNG	42
 헌팅턴	NNP	42
+ᆸ죠	EF	42
 톱스타	NNG	42
 왼	MM	42
 진단서	NNG	42
@@ -21039,8 +21020,6 @@ name11	NNP	42
 쨍쨍	MAG	41
 아후	IC	41
 화공	NNG	41
-name10	NNP	41
-name12	NNP	41
 ᆫ께	EC	41
 쳐주	VV	41
 어학연수	NNG	41
@@ -21302,7 +21281,6 @@ name12	NNP	41
 까요	EF	40
 흰자	NNG	40
 실록	NNG	40
-ᆸ니다마는	EC	40
 매콤하	VA	40
 배추김치	NNG	40
 심심하	VA	40
@@ -21598,7 +21576,6 @@ name12	NNP	41
 기집애	NNG	40
 금테	NNG	40
 병화	NNP	40
-ᄇ죠	EF	40
 가혹	XR	40
 솔밭	NNG	40
 영계	NNG	40
@@ -22069,7 +22046,6 @@ GS칼텍스	NNP	39
 태평로	NNP	38
 대회장	NNG	38
 쇼트	NNG	38
-ㄴ	NNG	38
 구불구불	MAG	38
 도핑	NNG	38
 잘잘못	NNG	38
@@ -22661,7 +22637,6 @@ XXXX	UNC	38
 강권	NNG	36
 발열	NNG	36
 대천	NNP	36
-name5	NNP	36
 질그릇	NNG	36
 왕십리	NNP	36
 영양사	NNG	36
@@ -22768,7 +22743,6 @@ name5	NNP	36
 전라	NNP	36
 갈고리	NNG	36
 카라	NNP	36
-ㅇ	NNG	36
 보상비	NNG	36
 변화무쌍	NNG	36
 출마자	NNG	36
@@ -23420,7 +23394,6 @@ name5	NNP	36
 망고	NNG	34
 형제간	NNG	34
 백혈구	NNG	34
-name7	NNP	34
 어르	VV	34
 방구	NNG	34
 센스	NNG	34
@@ -24162,7 +24135,6 @@ SK그룹	NNP	33
 되	UNT	33
 스	UNT	33
 유	UNA	33
-?	EF	33
 에이치티엠엘	NNG	33
 파우베	NNP	33
 구수하	VA	32
@@ -24551,7 +24523,7 @@ xxxx	NA	32
 부조리	NNG	32
 김매기	NNG	32
 이담	NNG	32
-ᄇ니더	EF	32
+ᆸ니더	EF	32
 출석부	NNG	32
 바이킹	NNP	32
 경덕왕	NNP	32
@@ -26399,7 +26371,7 @@ CJ그룹	NNP	29
 조선조	NNP	28
 말씀드리	VV	28
 젤소미나	NNP	28
-ᄇ니까요	EF	28
+ᆸ니까요	EF	28
 텔코트	NNG	28
 두환이	NNP	28
 수부	NNG	28
@@ -26513,7 +26485,6 @@ XX이	UNC	28
 센타	NNG	27
 인간학	NNG	27
 을뿐더러	EC	27
-?	NA	27
 창사	NNG	27
 사이언스	NNG	27
 나요	EC	27
@@ -28173,7 +28144,6 @@ XX이	UNC	28
 정	UNT	25
 연	UNT	25
 때	NNB	25
-ㅎ	XSA	25
 영	UNT	25
 기	UNT	25
 에스크	NNG	25
@@ -28381,7 +28351,6 @@ XX이	UNC	28
 신한국당	NNP	24
 보령	NNP	24
 어학원	NNG	24
-ㄷ	NNG	24
 김성식	NNP	24
 재갈	NNG	24
 복날	NNG	24
@@ -28698,7 +28667,7 @@ LG유플러스	NNP	24
 오순도순	MAG	24
 망연	XR	24
 테니슨	NNP	24
-ᄇ네	EC	24
+ᆸ네	EC	24
 신문인	NNG	24
 장물아비	NNG	24
 찬조금	NNG	24
@@ -28944,7 +28913,6 @@ LG유플러스	NNP	24
 매형	NNG	23
 건대	NNP	23
 콩나물국	NNG	23
-name9	NNP	23
 물타기	NNG	23
 울화통	NNG	23
 그지	NNG	23
@@ -30028,7 +29996,6 @@ name9	NNP	23
 수도관	NNG	22
 물개	NNG	22
 정착촌	NNG	22
-ㅎ	NNG	22
 프로펠러	NNG	22
 물욕	NNG	22
 만월대	NNP	22
@@ -31197,7 +31164,6 @@ x	NF	20
 진물	NNG	20
 오수	NNG	20
 부침개	NNG	20
-name20	NNP	20
 부녀회장	NNG	20
 짠하	VA	20
 어엉	IC	20
@@ -32093,7 +32059,6 @@ LG디스플레이	NNP	20
 체지방	NNG	19
 헤에	IC	19
 라며	EF	19
-name21	NNP	19
 가산	NNP	19
 명절날	NNG	19
 일러바치	VV	19
@@ -32754,7 +32719,7 @@ SH공사	NNP	19
 부러	MAG	19
 의롭	VA	19
 마	EC	19
-ᄇ니꺼	EF	19
+ᆸ니꺼	EF	19
 게시리	EC	19
 청색증	NNG	19
 우물물	NNG	19
@@ -33146,7 +33111,6 @@ SH공사	NNP	19
 레인저스	NNP	18
 초구	NNG	18
 콘셉트카	NNG	18
-ㅈ	NNG	18
 홈팀	NNG	18
 모처	NNG	18
 개포	NNP	18
@@ -33959,6 +33923,7 @@ SH공사	NNP	19
 씩씩하	VA	17
 알리바이	NNG	17
 쳐내	VV	17
+ᆷ서	EC	17
 윌	NNP	17
 틈	NNB	17
 팔십칠	NR	17
@@ -34013,7 +33978,6 @@ SH공사	NNP	19
 벙긋	MAG	17
 십시일반	NNG	17
 물리학과	NNG	17
-name17	NNP	17
 치맛바람	NNG	17
 분무기	NNG	17
 중앙공원	NNP	17
@@ -34679,7 +34643,6 @@ name17	NNP	17
 꺼칠	XR	17
 문소리	NNG	17
 민속주	NNG	17
-ᄇ시요	EF	17
 감복	NNG	17
 창달	NNG	17
 연탄가스	NNG	17
@@ -35046,7 +35009,6 @@ name17	NNP	17
 북촌	NNP	16
 땡	NNG	16
 빈방	NNG	16
-name19	NNP	16
 잔심부름	NNG	16
 꽈	NNG	16
 삼양	NNP	16
@@ -35513,7 +35475,6 @@ name19	NNP	16
 총공세	NNG	16
 특별기	NNG	16
 마르코	NNP	16
-ㅌ	NNG	16
 해풍	NNG	16
 구릿빛	NNG	16
 승하	NNG	16
@@ -35882,7 +35843,7 @@ name19	NNP	16
 깊이깊이	MAG	16
 코방귀	NNG	16
 면상	NNG	16
-ᄇ쇼	EC	16
+ᆸ쇼	EC	16
 생짜	NNG	16
 플레인즈사	NNP	16
 문진	NNG	16
@@ -36937,7 +36898,7 @@ LH공사	NNP	15
 럭키증권	NNP	15
 클라우스	NNP	15
 크롱카이트	NNP	15
-ᄇ사	EC	15
+ᆸ사	EC	15
 화계	NNG	15
 마릴린	NNP	15
 돌무덤	NNG	15
@@ -37179,7 +37140,7 @@ LH공사	NNP	15
 골백번	NNG	15
 벽돌담	NNG	15
 잔말	NNG	15
-ᄇ디까	EF	15
+ᆸ디까	EF	15
 에니악	NNG	15
 쟈슬로사	NNP	15
 일본관	NNG	15
@@ -37274,7 +37235,6 @@ LH공사	NNP	15
 촌닭	NNG	15
 물지게	NNG	15
 명길	NNP	15
-ᄇ니다마는	EC	15
 어라우	EC	15
 망종	NNG	15
 경음기	NNG	15
@@ -37550,7 +37510,6 @@ LH공사	NNP	15
 데면데면	MAG	14
 ᆫ다며	EF	14
 우유병	NNG	14
-name16	NNP	14
 잡생각	NNG	14
 앞일	NNG	14
 먹	NA	14
@@ -37617,7 +37576,6 @@ name16	NNP	14
 이순재	NNP	14
 휘핑크림	NNG	14
 잔털	NNG	14
-name	NNP	14
 사견	NNG	14
 광신도	NNG	14
 정견	NNG	14
@@ -38368,7 +38326,6 @@ D사	NNG	14
 이승구	NNP	14
 일주일간	NNG	14
 인의협	NNG	14
-ᄑ	NNG	14
 대문자	NNG	14
 연분	NNG	14
 전세방	NNG	14
@@ -38967,7 +38924,6 @@ XXXXX	UNC	14
 뱀사골	NNP	13
 발발	MAG	13
 현대병	NNG	13
-name13	NNP	13
 매칭	NNG	13
 내후년	NNG	13
 외	NA	13
@@ -39890,7 +39846,7 @@ NH농협은행	NNP	13
 배산임수	NNG	13
 수달	NNG	13
 다더라	EC	13
-ᄇ디다	EC	13
+ᆸ디다	EC	13
 동만	NNP	13
 환락	NNG	13
 진이	NNP	13
@@ -40575,7 +40531,6 @@ NH농협은행	NNP	13
 기준점	NNG	12
 회의감	NNG	12
 화학식	NNG	12
-ᆸ니까	EC	12
 냉정히	MAG	12
 기회균등	NNG	12
 분법	NNG	12
@@ -40925,7 +40880,6 @@ NH농협은행	NNP	13
 개보수	NNG	12
 지난여름	NNG	12
 입말	NNG	12
-ㅁ	NNG	12
 주연상	NNG	12
 결식아동	NNG	12
 요부	NNG	12
@@ -42341,7 +42295,6 @@ xx	NV	11
 퉁	MAG	11
 밉보이	VV	11
 이비에쓰	NNP	11
-ᆷ서	EC	11
 스포일러	NNG	11
 되돌이키	VV	11
 성대모사	NNG	11
@@ -42410,7 +42363,6 @@ xx	NV	11
 울먹거리	VV	11
 대니까	EC	11
 사천만	NR	11
-name28	NNP	11
 지우	NAP	11
 딸랑	MAG	11
 잠깐잠깐	MAG	11
@@ -44586,7 +44538,6 @@ IMF	NNP	11
 돼지띠	NNG	10
 여직	MAG	10
 떨이	NNG	10
-name31	NNP	10
 훨	MAG	10
 열나	VV	10
 댄다	EF	10
@@ -46348,7 +46299,7 @@ JP모건	NNP	10
 태몽	NNG	10
 앞개	NNG	10
 기름	XR	10
-ᄆ세	EF	10
+ᆷ세	EF	10
 소갈머리	NNG	10
 염병	NNG	10
 양귀비	NNP	10
@@ -46826,7 +46777,6 @@ BBC	NNP	10
 에유	IC	9
 하우	IC	9
 고깃집	NNG	9
-ㄴ	NA	9
 자자	IC	9
 차우더	NNG	9
 요거트	NNG	9
@@ -46957,9 +46907,7 @@ BBC	NNP	10
 서울대학병원	NNP	9
 작은애	NNG	9
 데려다주	VV	9
-name15	NNP	9
 그냥저냥	MAG	9
-name18	NNP	9
 아들내미	NNG	9
 그날그날	MAG	9
 뜨개질	NNG	9
@@ -47225,7 +47173,6 @@ K리그	NNP	9
 아까워하	VV	9
 전무송	NNP	9
 인터밀란	NNP	9
-ㅂ	NNG	9
 자투리땅	NNG	9
 투런	NNG	9
 솔로포	NNG	9
@@ -47251,7 +47198,6 @@ K리그	NNP	9
 만석	NNG	9
 휴관	NNG	9
 브레이브스	NNP	9
-ㄹ	NNG	9
 봉사료	NNG	9
 사채업자	NNG	9
 김문호	NNP	9
@@ -48803,7 +48749,6 @@ ABC	NNP	9
 마이카	NNG	9
 산출액	NNG	9
 비씨	NNG	9
-6?25	NNP	9
 백양나무	NNG	9
 비죽거리	VV	9
 송화강	NNP	9
@@ -49849,10 +49794,7 @@ xx이	NA	8
 대나	EF	8
 맨	MAG	8
 소맥	NNG	8
-name22	NNP	8
 떼부자	NNG	8
-name26	NNP	8
-name27	NNP	8
 커피믹스	NNG	8
 딸래미	NNG	8
 다잖아	EF	8
@@ -51421,7 +51363,6 @@ T맵	NNP	8
 이체	NNP	8
 친부모	NNG	8
 프라이	NNP	8
-ᄏ	NNG	8
 황경식	NNP	8
 번식지	NNG	8
 최원석	NNP	8
@@ -52851,7 +52792,6 @@ YMCA	NNP	8
 피	UNT	8
 들	UNT	8
 삔	NNG	8
-ㅎ	XSV	8
 위	UNT	8
 벨소리	NNG	8
 정맥주	NNG	8
@@ -52935,7 +52875,6 @@ XX을	UNC	8
 의정원	NNG	7
 국사학자	NNG	7
 으떤	MM	7
-ᆸ디다	EF	7
 병인양요	NNG	7
 사십육	NR	7
 오륙십	NR	7
@@ -53146,12 +53085,10 @@ XX을	UNC	8
 덜렁덜렁	MAG	7
 몇백	NR	7
 쟤	EF	7
-name14	NNP	7
 적	NA	7
 주꾸미	NNG	7
 몽글몽글	MAG	7
 어머머머	IC	7
-name25	NNP	7
 모지	VA	7
 에이씨	IC	7
 묵은지	NNG	7
@@ -55781,14 +55718,14 @@ OB맥주	NNP	7
 미쯔꼬	NNP	7
 질탕	NNG	7
 미쯔코	NNP	7
-ᄆ더	EF	7
+ᆷ더	EF	7
 육시	NNG	7
 불사신	NNG	7
 규	NNG	7
 간단	NNG	7
 소우주	NNG	7
 집짐승	NNG	7
-ᄇ니다요	EC	7
+ᆸ니다요	EC	7
 요년	NP	7
 허섭쓰레기	NNG	7
 달덩이	NNG	7
@@ -57019,7 +56956,6 @@ OB맥주	NNP	7
 고이	NNP	7
 기생자	NNG	7
 메나르	NNP	7
-유?불?도	NNG	7
 팔정도	NNG	7
 삼세	NNG	7
 도학파	NNG	7
@@ -57437,10 +57373,8 @@ address2	NNP	6
 피	NA	6
 십육만	NR	6
 승질	NNG	6
-name30	NNP	6
 따박따박	MAG	6
 종암	NNP	6
-name32	NNP	6
 어묵탕	NNG	6
 정직원	NNG	6
 득실득실	MAG	6
@@ -59998,7 +59932,7 @@ ISL코리아	NNP	6
 응원복	NNG	6
 아태평화재단	NNP	6
 주경기장	NNG	6
-ᄇ네다	EF	6
+ᆸ네다	EF	6
 양정	NNP	6
 정선경	NNP	6
 조명등	NNG	6
@@ -60594,7 +60528,7 @@ ISL코리아	NNP	6
 외각	NNG	6
 꽃샘	NNG	6
 편집부원	NNG	6
-ᄇ니다만	EF	6
+ᆸ니다만	EF	6
 할로윈	NNG	6
 해뜨기	NNG	6
 대한제국기	NNG	6
@@ -61048,7 +60982,7 @@ ISL코리아	NNP	6
 서북향	NNG	6
 가목	NNP	6
 습넨다	EF	6
-ᄇ넨다	EF	6
+ᆸ넨다	EF	6
 는다지	EC	6
 봉다리	NNG	6
 한뎃잠	NNG	6
@@ -61299,7 +61233,7 @@ ISL코리아	NNP	6
 흑치상지	NNP	6
 저술자	NNG	6
 하룻저녁	NNG	6
-ᄇ소서	EF	6
+ᆸ소서	EF	6
 휑	MAG	6
 황구	NNG	6
 주름투성이	NNG	6
@@ -61332,7 +61266,6 @@ ISL코리아	NNP	6
 암캐	NNG	6
 병훈	NNP	6
 행복동	NNP	6
-ᄆ서	EC	6
 아빠트	NNG	6
 파라티온	NNG	6
 뽕밭	NNG	6
@@ -61662,7 +61595,6 @@ ISL코리아	NNP	6
 부차	NNP	6
 수줄	NNG	6
 투당투당	MAG	6
-권유_)2	NNG	6
 딱딱딱	MAG	6
 기어올라가	VV	6
 봉	NNB	6
@@ -61682,7 +61614,7 @@ ISL코리아	NNP	6
 참외밭	NNG	6
 주철	NNP	6
 십자길	NNG	6
-ᄇ니껴	EF	6
+ᆸ니껴	EF	6
 뀌익	MAG	6
 홀기	NNG	6
 전안청	NNP	6
@@ -62417,7 +62349,6 @@ XX야	UNC	6
 법	NA	5
 소나타	NNP	5
 대원어드바이저리	NNP	5
-ㅂ	NA	5
 이혜원	NNP	5
 인기투표	NNG	5
 사면령	NNG	5
@@ -62666,10 +62597,8 @@ XX야	UNC	6
 모평	NNG	5
 절밥	NNG	5
 구매처	NNG	5
-name23	NNP	5
 address1	NNP	5
 사십이	NR	5
-name24	NNP	5
 벽산	NNP	5
 십칠만	NR	5
 삼십억	NR	5
@@ -62860,6 +62789,7 @@ xx선	NF	5
 파채	NNG	5
 버진	NNG	5
 오므라이스	NNG	5
+ᆷ	ETM	5
 빠삭	MAG	5
 불낙	NNG	5
 스텐	NNG	5
@@ -63560,7 +63490,6 @@ xx선	NF	5
 레제프	NNP	5
 타이이프	NNP	5
 안경률	NNP	5
-ㅋ	NNG	5
 일본항공	NNP	5
 검단	NNP	5
 페라미비르	NNG	5
@@ -68307,7 +68236,6 @@ KBS	NNP	5
 숭엄	XR	5
 근참기	NNG	5
 천불동	NNP	5
-비조)	NNG	5
 금반지	NNP	5
 태서문예신보	NNP	5
 그믐달	NNP	5
