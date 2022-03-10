@@ -31,7 +31,7 @@ https://github.com/bab2min/Kiwi/releases 에서 Windows, Linux, macOS 버전으�
 Visual Studio 2019 이상을 사용하여 `Kiwi.sln` 파일을 실행하여 컴파일할 수 있습니다.
 
 #### Linux
-이 레포지토리를 clone한 뒤 cmake>=3.9를 사용하여 컴파일합니다. 
+이 레포지토리를 clone한 뒤 cmake>=3.12를 사용하여 컴파일합니다. 
 모델 파일은 용량이 큰 관계로 [Git LFS](https://git-lfs.github.com/)를 통해 공유됩니다. 따라서 `git clone`에 앞서 Git LFS가 설치되어있는지 확인해주세요.
 
 ##### gcc >= 5.0 이상 혹은 다른 c++11 호환 컴파일러 사용가능 환경
@@ -68,18 +68,24 @@ $ ldconfig
 ```console
 $ ./kiwi-evaluator --model ../ModelGenerator ../eval_data/web.txt ../eval_data/written.txt
 
-Loading Time : 1198.05 ms
-Mem Usage : 158.539 MB
+Loading Time : 1400.44 ms
+LM Size : 32.452 MB
+Mem Usage : 268.941 MB
 
-Test file: ../eval_data/web.txt
-0.822854, 0.804857
-Total (96 lines) Time : 105.274 ms
-Time per Line : 1.0966 ms
+Test file: eval_data/web.txt
+0.869743, 0.853454
+Total (108 lines) Time : 138.974 ms
+Time per Line : 1.2868 ms
 ================
-Test file: ../eval_data/written.txt
-0.946757, 0.943904
-Total (23 lines) Time : 34.2189 ms
-Time per Line : 1.48778 ms
+Test file: eval_data/written.txt
+0.940606, 0.940701
+Total (33 lines) Time : 57.3238 ms
+Time per Line : 1.73708 ms
+================
+
+================
+Avg Score
+0.905175, 0.897078
 ================
 ```
 
