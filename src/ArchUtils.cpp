@@ -20,7 +20,7 @@ ArchType kiwi::getBestArch()
 	if (cpuinfo_has_x86_sse2()) return ArchType::sse2;
 #endif
 #if CPUINFO_ARCH_ARM64
-	//if (cpuinfo_has_arm_neon()) return ArchType::neon;
+	if (cpuinfo_has_arm_neon()) return ArchType::neon;
 #endif
 #else
 #ifdef KIWI_ARCH_X86_64
@@ -28,7 +28,7 @@ ArchType kiwi::getBestArch()
 #elif defined(__x86_64__) || defined(KIWI_ARCH_X86)
 	return ArchType::sse2;
 #elif defined(KIWI_ARCH_ARM64)
-	//return ArchType::neon;
+	return ArchType::neon;
 #endif
 #endif
 	return ArchType::none;

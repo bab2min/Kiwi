@@ -200,14 +200,7 @@ namespace kiwi
 			}
 		};
 		INSTANTIATE_IMPL(ArchType::balanced);
-	}
-}
 
-#if defined(__x86_64__) || CPUINFO_ARCH_X86 || CPUINFO_ARCH_X86_64 || KIWI_ARCH_X86 || KIWI_ARCH_X86_64
-namespace kiwi
-{
-	namespace nst
-	{
 		template<class IntTy>
 		struct SignedType { using type = IntTy; };
 
@@ -225,8 +218,14 @@ namespace kiwi
 
 		template<>
 		struct SignedType<char16_t> { using type = int16_t; };
+	}
+}
 
-
+#if defined(__x86_64__) || CPUINFO_ARCH_X86 || CPUINFO_ARCH_X86_64 || KIWI_ARCH_X86 || KIWI_ARCH_X86_64
+namespace kiwi
+{
+	namespace nst
+	{
 		template<class IntTy>
 		ARCH_TARGET("sse2")
 			inline bool testEq(__m128i p, size_t offset, size_t size, size_t& ret)
@@ -505,6 +504,156 @@ namespace kiwi
 			}
 		};
 		INSTANTIATE_IMPL(ArchType::avx512bw);
+	}
+}
+#endif
+
+#if CPUINFO_ARCH_ARM || CPUINFO_ARCH_ARM64 || KIWI_ARCH_ARM64
+namespace kiwi
+{
+	namespace nst
+	{
+		template<size_t n>
+		ARCH_TARGET("arch=armv8-a")
+		bool nstSearchNeon(const int8_t* keys, size_t size, int8_t target, size_t& ret)
+		{
+			size_t i = 0;
+
+			int8x16_t ptarget = vdupq_n_s8(target), pkey;
+			uint8x16_t peq, pgt, pmasked;
+			static const uint8x16_t __attribute__((aligned(16))) mask = { 1, 2, 4, 8, 16, 32, 64, 128, 1, 2, 4, 8, 16, 32, 64, 128 };
+
+			while (i < size)
+			{
+				pkey = vld1q_s8(&keys[i]);
+				peq = vceqq_s8(ptarget, pkey);
+				pgt = vcgtq_s8(ptarget, pkey);
+
+				pmasked = vandq_u8(peq, mask);
+				uint8_t mm0 = vaddv_u8(vget_low_u8(pmasked));
+				uint8_t mm1 = vaddv_u8(vget_high_u8(pmasked));
+				uint32_t mm = mm0 | (uint32_t)(mm1 << 8);
+				uint32_t b = utils::countTrailingZeroes(mm);
+				if (mm && (i + b) < size)
+				{
+					ret = i + b;
+					return true;
+				}
+
+				size_t r = vaddvq_u8(vandq_u8(pgt, vdupq_n_u8(1)));
+				i = i * n + (n - 1) * (r + 1);
+			}
+			return false;
+		}
+
+		template<size_t n>
+		ARCH_TARGET("arch=armv8-a")
+		bool nstSearchNeon(const int16_t* keys, size_t size, int16_t target, size_t& ret)
+		{
+			size_t i = 0;
+
+			int16x8_t ptarget = vdupq_n_s16(target), pkey;
+			uint16x8_t peq, pgt;
+			static const uint16x8_t __attribute__((aligned(16))) mask = { 1, 2, 4, 8, 16, 32, 64, 128 };
+
+			while (i < size)
+			{
+				pkey = vld1q_s16(&keys[i]);
+				peq = vceqq_s16(ptarget, pkey);
+				pgt = vcgtq_s16(ptarget, pkey);
+
+				uint32_t mm = vaddvq_u16(vandq_u16(peq, mask));
+				uint32_t b = utils::countTrailingZeroes(mm);
+				if (mm && (i + b) < size)
+				{
+					ret = i + b;
+					return true;
+				}
+
+				size_t r = vaddvq_u16(vandq_u16(pgt, vdupq_n_u16(1)));
+				i = i * n + (n - 1) * (r + 1);
+			}
+			return false;
+		}
+
+		template<size_t n>
+		ARCH_TARGET("arch=armv8-a")
+		bool nstSearchNeon(const int32_t* keys, size_t size, int32_t target, size_t& ret)
+		{
+			size_t i = 0;
+
+			int32x4_t ptarget = vdupq_n_s32(target), pkey;
+			uint32x4_t peq, pgt;
+			static const uint32x4_t __attribute__((aligned(16))) mask = { 1, 2, 4, 8 };
+
+			while (i < size)
+			{
+				pkey = vld1q_s32(&keys[i]);
+				peq = vceqq_s32(ptarget, pkey);
+				pgt = vcgtq_s32(ptarget, pkey);
+
+				uint32_t mm = vaddvq_u32(vandq_u32(peq, mask));
+				uint32_t b = utils::countTrailingZeroes(mm);
+				if (mm && (i + b) < size)
+				{
+					ret = i + b;
+					return true;
+				}
+
+				size_t r = vaddvq_u32(vandq_u32(pgt, vdupq_n_u32(1)));
+				i = i * n + (n - 1) * (r + 1);
+			}
+			return false;
+		}
+
+		template<size_t n>
+		ARCH_TARGET("arch=armv8-a")
+		bool nstSearchNeon(const int64_t* keys, size_t size, int64_t target, size_t& ret)
+		{
+			size_t i = 0;
+
+			int64x2_t ptarget = vdupq_n_s64(target), pkey;
+			uint64x2_t peq, pgt;
+			static const uint64x2_t __attribute__((aligned(16))) mask = { 1, 2 };
+
+			while (i < size)
+			{
+				pkey = vld1q_s64(&keys[i]);
+				peq = vceqq_s64(ptarget, pkey);
+				pgt = vcgtq_s64(ptarget, pkey);
+
+				uint32_t mm = vaddvq_u64(vandq_u64(peq, mask));
+				uint32_t b = utils::countTrailingZeroes(mm);
+				if (mm && (i + b) < size)
+				{
+					ret = i + b;
+					return true;
+				}
+
+				size_t r = vaddvq_u64(vandq_u64(pgt, vdupq_n_u64(1)));
+				i = i * n + (n - 1) * (r + 1);
+			}
+			return false;
+		}
+
+		template<>
+		struct OptimizedImpl<ArchType::neon>
+		{
+			template<class IntTy>
+			static Vector<size_t> reorder(const IntTy* keys, size_t size)
+			{
+				using SignedIntTy = typename SignedType<IntTy>::type;
+				return getNstOrder<16 / sizeof(IntTy) + 1>((const SignedIntTy*)keys, size, true);
+			}
+
+			template<class IntTy>
+			static bool search(const IntTy* keys, size_t size, IntTy target, size_t& ret)
+			{
+				using SignedIntTy = typename SignedType<IntTy>::type;
+				return nstSearchNeon<16 / sizeof(IntTy) + 1>((const SignedIntTy*)keys, size, (SignedIntTy)target, ret);
+			}
+		};
+		INSTANTIATE_IMPL(ArchType::neon);
 	}
 }
 #endif
