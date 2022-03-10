@@ -34,13 +34,14 @@ namespace kiwi
 		enum { max_prev = 16 };
 		const Form* form = nullptr;
 		KString uform;
-		uint16_t lastPos;
+		uint16_t endPos;
 		std::array<uint16_t, max_prev> prevs = { { 0, } };
 
-		KGraphNode(const Form* _form = nullptr, uint16_t _lastPos = 0) : form(_form), lastPos(_lastPos) {}
-		KGraphNode(const KString& _uform, uint16_t _lastPos) : uform(_uform), lastPos(_lastPos) {}
+		KGraphNode(const Form* _form = nullptr, uint16_t _endPos = 0) : form(_form), endPos(_endPos) {}
+		KGraphNode(const KString& _uform, uint16_t _endPos) : uform(_uform), endPos(_endPos) {}
 
 		KGraphNode* getPrev(size_t idx) const { return prevs[idx] ? (KGraphNode*)this - prevs[idx] : nullptr; }
+		size_t getStartPos() const { return endPos - (uform.empty() ? form->form.size() : uform.size()); }
 
 		static Vector<KGraphNode> removeUnconnected(const Vector<KGraphNode>& graph);
 

@@ -3,10 +3,7 @@
 #include <string>
 #include <algorithm>
 
-#ifdef KIWI_USE_CPUINFO
-	#include <cpuinfo.h>
-#endif
-#include <kiwi/ArchUtils.h>
+#include "ArchAvailable.h"
 
 using namespace kiwi;
 
@@ -25,8 +22,16 @@ ArchType kiwi::getBestArch()
 #if CPUINFO_ARCH_ARM64
 	if (cpuinfo_has_arm_neon()) return ArchType::neon;
 #endif
+#else
+#ifdef KIWI_ARCH_X86_64
+	return ArchType::avx512bw;
+#elif defined(__x86_64__) || defined(KIWI_ARCH_X86)
+	return ArchType::sse2;
+#elif defined(KIWI_ARCH_ARM64)
+	return ArchType::neon;
 #endif
-	return ArchType::balanced;
+#endif
+	return ArchType::none;
 }
 
 static const char* archNames[] = {
@@ -43,12 +48,12 @@ static const char* archNames[] = {
 static ArchType testArchSet(ArchType arch, ArchType best)
 {
 	if (arch <= ArchType::balanced) return arch;
-#if CPUINFO_ARCH_X86 || CPUINFO_ARCH_X86_64
+#if CPUINFO_ARCH_X86 || CPUINFO_ARCH_X86_64 || KIWI_ARCH_X86_64 || KIWI_ARCH_X86
 	if (ArchType::sse2 <= arch && arch <= ArchType::avx512bw && arch <= best)
 	{
 		return arch;
 	}
-#elif CPUINFO_ARCH_ARM || CPUINFO_ARCH_ARM64
+#elif CPUINFO_ARCH_ARM || CPUINFO_ARCH_ARM64 || KIWI_ARCH_NEON
 	if (ArchType::neon <= arch && arch <= ArchType::neon && arch <= best)
 	{
 		return arch;

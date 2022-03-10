@@ -24,6 +24,7 @@ namespace kiwi
 
 	std::u16string utf8To16(const std::string& str);
 	std::u16string utf8To16(const std::string& str, std::vector<size_t>& bytePositions);
+	std::string utf8FromCode(size_t code);
 	std::string utf16To8(const std::u16string& str);
 
 	inline bool isWebTag(POSTag t)
@@ -40,11 +41,91 @@ namespace kiwi
 		return 0x11A8 <= chr && chr < (0x11A7 + 28);
 	}
 
-	KString normalizeHangul(const std::u16string& hangul);
-	std::u16string joinHangul(const KString& hangul);
+	template<class It>
+	inline KString normalizeHangul(It first, It last)
+	{
+		KString ret;
+		ret.reserve((size_t)(std::distance(first, last) * 1.5));
+		for (; first != last; ++first)
+		{
+			char16_t c = *first;
+			if (c == 0xB42C) c = 0xB410;
+			if (0xAC00 <= c && c < 0xD7A4)
+			{
+				int coda = (c - 0xAC00) % 28;
+				ret.push_back(c - coda);
+				if (coda) ret.push_back(coda + 0x11A7);
+			}
+			else
+			{
+				ret.push_back(c);
+			}
+		}
+		return ret;
+	}
 
-	template<class BaseChr, class OutIterator>
-	void split(const std::basic_string<BaseChr>& s, BaseChr delim, OutIterator result)
+	inline KString normalizeHangul(const std::u16string& hangul)
+	{
+		return normalizeHangul(hangul.begin(), hangul.end());
+	}
+
+	template<class It>
+	inline std::pair<KString, Vector<size_t>> normalizeHangulWithPosition(It first, It last)
+	{
+		KString ret;
+		Vector<size_t> pos;
+		ret.reserve((size_t)(std::distance(first, last) * 1.5));
+		for (; first != last; ++first)
+		{
+			auto c = *first;
+			pos.emplace_back(ret.size());
+			if (c == 0xB42C) c = 0xB410;
+			if (0xAC00 <= c && c < 0xD7A4)
+			{
+				int coda = (c - 0xAC00) % 28;
+				ret.push_back(c - coda);
+				if (coda) ret.push_back(coda + 0x11A7);
+			}
+			else
+			{
+				ret.push_back(c);
+			}
+		}
+		pos.emplace_back(ret.size());
+		return make_pair(move(ret), move(pos));
+	}
+
+	inline std::pair<KString, Vector<size_t>> normalizeHangulWithPosition(const std::u16string& hangul)
+	{
+		return normalizeHangulWithPosition(hangul.begin(), hangul.end());
+	}
+
+	inline KString normalizeHangul(const std::string& hangul)
+	{
+		return normalizeHangul(utf8To16(hangul));
+	}
+
+	inline std::u16string joinHangul(const KString& hangul)
+	{
+		std::u16string ret;
+		ret.reserve(hangul.size());
+		for (auto c : hangul)
+		{
+			if (isHangulCoda(c) && !ret.empty() && 0xAC00 <= ret.back() && ret.back() < 0xD7A4)
+			{
+				if ((ret.back() - 0xAC00) % 28) ret.push_back(c);
+				else ret.back() += c - 0x11A7;
+			}
+			else
+			{
+				ret.push_back(c);
+			}
+		}
+		return ret;
+	}
+
+	template<class BaseChr, class Trait, class Alloc, class OutIterator>
+	void split(const std::basic_string<BaseChr, Trait, Alloc>& s, BaseChr delim, OutIterator result)
 	{
 		size_t p = 0;
 		while (1)
@@ -63,10 +144,10 @@ namespace kiwi
 		}
 	}
 
-	template<class BaseChr>
-	inline std::vector<std::basic_string<BaseChr>> split(const std::basic_string<BaseChr>& s, BaseChr delim)
+	template<class BaseChr, class Trait, class Alloc>
+	inline std::vector<std::basic_string<BaseChr, Trait, Alloc>> split(const std::basic_string<BaseChr, Trait, Alloc>& s, BaseChr delim)
 	{
-		std::vector<std::basic_string<BaseChr>> elems;
+		std::vector<std::basic_string<BaseChr, Trait, Alloc>> elems;
 		split(s, delim, std::back_inserter(elems));
 		return elems;
 	}

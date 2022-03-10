@@ -28,7 +28,7 @@ namespace kiwi
 	{
 	}
 
-	DEFINE_SERIALIZER_OUTSIDE(MorphemeRaw, kform, tag, vowel, polar, combineSocket, combined, userScore, chunks);
+	DEFINE_SERIALIZER_OUTSIDE(MorphemeRaw, kform, tag, vowel, polar, combineSocket, combined, userScore, chunks, chunkPositions, lmMorphemeId);
 
 	Morpheme::Morpheme() = default;
 
@@ -54,20 +54,16 @@ namespace kiwi
 
 	FormRaw& FormRaw::operator=(FormRaw&&) = default;
 
-	FormRaw::FormRaw(const KString& _form, CondVowel _vowel, CondPolarity _polar)
-		: form(_form), vowel(_vowel), polar(_polar)
+	FormRaw::FormRaw(const KString& _form)
+		: form(_form)
 	{}
 
 	bool FormRaw::operator<(const FormRaw& o) const
 	{
-		if (form < o.form) return true;
-		if (form > o.form) return false;
-		if (vowel < o.vowel) return true;
-		if (vowel > o.vowel) return false;
-		return polar < o.polar;
+		return form < o.form;
 	}
 
-	DEFINE_SERIALIZER_OUTSIDE(FormRaw, form, vowel, polar, candidate);
+	DEFINE_SERIALIZER_OUTSIDE(FormRaw, form, candidate);
 
 	Form::Form() = default;
 
@@ -81,16 +77,18 @@ namespace kiwi
 
 	Form& Form::operator=(Form&&) = default;
 
-	Form bake(const FormRaw& o, const Morpheme* morphBase)
+	Form bake(const FormRaw& o, const Morpheme* morphBase, const Vector<uint32_t>& additionalCands)
 	{
 		Form ret;
 		ret.form = o.form;
-		ret.vowel = o.vowel;
-		ret.polar = o.polar;
-		ret.candidate = FixedVector<const Morpheme*>{ o.candidate.size() };
+		ret.candidate = FixedVector<const Morpheme*>{ o.candidate.size() + additionalCands.size()};
 		for (size_t i = 0; i < o.candidate.size(); ++i)
 		{
 			ret.candidate[i] = morphBase + o.candidate[i];
+		}
+		for (size_t i = 0; i < additionalCands.size(); ++i)
+		{
+			ret.candidate[i + o.candidate.size()] = morphBase + additionalCands[i];
 		}
 		return ret;
 	}
@@ -105,10 +103,12 @@ namespace kiwi
 		ret.combineSocket = o.combineSocket;
 		ret.combined = o.combined;
 		ret.userScore = o.userScore;
-		ret.chunks = FixedVector<const Morpheme*>{ o.chunks.size() };
+		ret.lmMorphemeId = o.lmMorphemeId;
+		ret.chunks = FixedPairVector<const Morpheme*, std::pair<uint8_t, uint8_t>>{ o.chunks.size() };
 		for (size_t i = 0; i < o.chunks.size(); ++i)
 		{
 			ret.chunks[i] = morphBase + o.chunks[i];
+			ret.chunks.getSecond(i) = o.chunkPositions[i];
 		}
 		return ret;
 	}

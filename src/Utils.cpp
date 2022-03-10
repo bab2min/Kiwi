@@ -3,46 +3,6 @@
 
 namespace kiwi
 {
-	KString normalizeHangul(const std::u16string& hangul)
-	{
-		KString ret;
-		ret.reserve(hangul.size() * 1.5);
-		for (auto c : hangul)
-		{
-			if (c == 0xB42C) c = 0xB410;
-			if (0xAC00 <= c && c < 0xD7A4)
-			{
-				int coda = (c - 0xAC00) % 28;
-				ret.push_back(c - coda);
-				if (coda) ret.push_back(coda + 0x11A7);
-			}
-			else
-			{
-				ret.push_back(c);
-			}
-		}
-		return ret;
-	}
-
-	std::u16string joinHangul(const KString& hangul)
-	{
-		std::u16string ret;
-		ret.reserve(hangul.size());
-		for (auto c : hangul)
-		{
-			if (isHangulCoda(c) && !ret.empty() && 0xAC00 <= ret.back() && ret.back() < 0xD7A4)
-			{
-				if ((ret.back() - 0xAC00) % 28) ret.push_back(c);
-				else ret.back() += c - 0x11A7;
-			}
-			else
-			{
-				ret.push_back(c);
-			}
-		}
-		return ret;
-	}
-
 	std::u16string utf8To16(const std::string & str)
 	{
 		std::u16string ret;
@@ -172,6 +132,34 @@ namespace kiwi
 			{
 				throw UnicodeException{ "unicode error" };
 			}
+		}
+		return ret;
+	}
+
+	std::string utf8FromCode(size_t code)
+	{
+		std::string ret;
+		if (code <= 0x7F)
+		{
+			ret.push_back(code);
+		}
+		else if (code <= 0x7FF)
+		{
+			ret.push_back(0xC0 | (code >> 6));
+			ret.push_back(0x80 | (code & 0x3F));
+		}
+		else if (code <= 0xFFFF)
+		{
+			ret.push_back(0xE0 | (code >> 12));
+			ret.push_back(0x80 | ((code >> 6) & 0x3F));
+			ret.push_back(0x80 | (code & 0x3F));
+		}
+		else if (code <= 0x10FFFF)
+		{
+			ret.push_back(0xF0 | (code >> 18));
+			ret.push_back(0x80 | ((code >> 12) & 0x3F));
+			ret.push_back(0x80 | ((code >> 6) & 0x3F));
+			ret.push_back(0x80 | (code & 0x3F));
 		}
 		return ret;
 	}
@@ -417,8 +405,8 @@ namespace kiwi
 		if (tagStr == u"SL") return POSTag::sl;
 		if (tagStr == u"SH") return POSTag::sh;
 		if (tagStr == u"SN") return POSTag::sn;
-		if (tagStr == u"V") return POSTag::v;
-		if (tagStr == u"A") return POSTag::v;
+		if (tagStr == u"V") return POSTag::p;
+		if (tagStr == u"A") return POSTag::p;
 		if (tagStr == u"^") return POSTag::unknown;
 		if (tagStr == u"W_URL") return POSTag::w_url;
 		if (tagStr == u"W_EMAIL") return POSTag::w_email;
@@ -447,7 +435,7 @@ namespace kiwi
 			"W_URL", "W_EMAIL", "W_MENTION", "W_HASHTAG",
 			"JKS", "JKC", "JKG", "JKO", "JKB", "JKV", "JKQ", "JX", "JC",
 			"EP", "EF", "EC", "ETN", "ETM",
-			"V",
+			"P",
 			"@"
 		};
 		assert(t < POSTag::max);
@@ -473,7 +461,7 @@ namespace kiwi
 			u"W_URL", u"W_EMAIL", u"W_MENTION", u"W_HASHTAG",
 			u"JKS", u"JKC", u"JKG", u"JKO", u"JKB", u"JKV", u"JKQ", u"JX", u"JC",
 			u"EP", u"EF", u"EC", u"ETN", u"ETM",
-			u"V",
+			u"P",
 			u"@"
 		};
 		assert(t < POSTag::max);

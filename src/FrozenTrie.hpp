@@ -13,17 +13,11 @@ namespace kiwi
 		auto FrozenTrie<_Key, _Value, _Diff>::Node::nextOpt(const FrozenTrie<_Key, _Value, _Diff>& ft, Key c) const -> const Node*
 		{
 			_Diff v;
-			if (!bsearch<arch>(&ft.nextKeys[nextOffset], &ft.nextDiffs[nextOffset], numNexts, c, v))
+			if (!nst::search<arch>(&ft.nextKeys[nextOffset], &ft.nextDiffs[nextOffset], numNexts, c, v))
 			{
 				return nullptr;
 			}
 			return this + v;
-		}
-
-		template<class _Key, class _Value, class _Diff>
-		auto FrozenTrie<_Key, _Value, _Diff>::Node::next(const FrozenTrie<_Key, _Value, _Diff>& ft, Key c) const -> const Node*
-		{
-			return nextOpt<ArchType::balanced>(ft, c);
 		}
 
 		template<class _Key, class _Value, class _Diff>
@@ -41,25 +35,19 @@ namespace kiwi
 			auto* lowerNode = this + lower;
 			_Diff v;
 
-			if (!bsearch<arch>(
+			if (!nst::search<arch>(
 				&ft.nextKeys[lowerNode->nextOffset],
 				&ft.nextDiffs[lowerNode->nextOffset],
 				lowerNode->numNexts, c, v
 			))
 			{
 				// `c` node doesn't exist
-				return lowerNode->findFail(ft, c);
+				return lowerNode->template findFail<arch>(ft, c);
 			}
 			else
 			{
 				return lowerNode + v;
 			}
-		}
-
-		template<class _Key, class _Value, class _Diff>
-		auto FrozenTrie<_Key, _Value, _Diff>::Node::findFail(const FrozenTrie& ft, Key c) const -> const Node*
-		{
-			return findFail<ArchType::balanced>(ft, c);
 		}
 
 		template<class _Key, class _Value, class _Diff>
@@ -102,8 +90,8 @@ namespace kiwi
 		}
 
 		template<class _Key, class _Value, class _Diff>
-		template<class TrieNode>
-		FrozenTrie<_Key, _Value, _Diff>::FrozenTrie(const ContinuousTrie<TrieNode>& trie)
+		template<class TrieNode, ArchType archType>
+		FrozenTrie<_Key, _Value, _Diff>::FrozenTrie(const ContinuousTrie<TrieNode>& trie, ArchTypeHolder<archType>)
 		{
 			numNodes = trie.size();
 			nodes = make_unique<Node[]>(numNodes);
@@ -133,6 +121,7 @@ namespace kiwi
 					nextDiffs[ptr] = p.second;
 					++ptr;
 				}
+				nst::prepare<archType>(&nextKeys[nodes[i].nextOffset], &nextDiffs[nodes[i].nextOffset], pairs.size());
 			}
 
 			std::deque<Node*> dq;
@@ -145,7 +134,7 @@ namespace kiwi
 					auto v = nextDiffs[p->nextOffset + i];
 					if (v <= 0) continue;
 					auto* child = &p[v];
-					child->lower = p->findFail(*this, k) - child;
+					child->lower = p->template findFail<archType>(*this, k) - child;
 					dq.emplace_back(child);
 				}
 

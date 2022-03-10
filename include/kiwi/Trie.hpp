@@ -84,22 +84,27 @@ namespace kiwi
 				return { next.end(), (const Node*)this };
 			}
 
+			template<class _FnAlloc>
+			Node* buildNext(const _Key& k, _FnAlloc&& alloc)
+			{
+				auto* n = getNext(k);
+				if (n) return n;
+				n = alloc();
+				next[k] = n - (Node*)this;
+				n->depth = depth + 1;
+				return n;
+			}
+
 			template<typename _TyIter, typename _FnAlloc>
 			Node* build(_TyIter first, _TyIter last, const _Value& _val, _FnAlloc&& alloc)
 			{
-				if (first == last)
+				Node* node = (Node*)this;
+				for (; first != last; ++first)
 				{
-					if (!val) val = _val;
-					return (Node*)this;
+					node = node->buildNext(*first, alloc);
 				}
-
-				auto v = *first;
-				if (!getNext(v))
-				{
-					next[v] = alloc() - (Node*)this;
-					getNext(v)->depth = depth + 1;
-				}
-				return getNext(v)->build(++first, last, _val, alloc);
+				if (!node->val) node->val = _val;
+				return node;
 			}
 
 			template<typename _TyIter>
@@ -211,22 +216,27 @@ namespace kiwi
 		{
 			int32_t parent = 0;
 
+			template<class _FnAlloc>
+			TrieNodeEx* buildNext(const _Key& k, _FnAlloc&& alloc)
+			{
+				auto* n = this->getNext(k);
+				if (n) return n;
+				n = alloc();
+				this->next[k] = n - this;
+				n->parent = this - n;
+				return n;
+			}
+
 			template<typename _TyIter, typename _FnAlloc>
 			TrieNodeEx* build(_TyIter first, _TyIter last, const _Value& _val, _FnAlloc&& alloc)
 			{
-				if (first == last)
+				TrieNodeEx* node = (TrieNodeEx*)this;
+				for (; first != last; ++first)
 				{
-					if (!this->val) this->val = _val;
-					return this;
+					node = node->buildNext(*first, alloc);
 				}
-
-				auto v = *first;
-				if (!this->getNext(v))
-				{
-					this->next[v] = alloc() - this;
-					this->getNext(v)->parent = -this->next[v];
-				}
-				return this->getNext(v)->build(++first, last, _val, alloc);
+				if (!node->val) node->val = _val;
+				return node;
 			}
 
 			template<typename _FnAlloc>
@@ -250,10 +260,77 @@ namespace kiwi
 				return this + this->next[k];
 			}
 
+			template<typename _FnAlloc, typename _HistoryTx>
+			TrieNodeEx* makeNext(const _Key& k, _FnAlloc&& alloc, _HistoryTx&& htx)
+			{
+				if (!this->next[k])
+				{
+					this->next[k] = alloc() - this;
+					this->getNext(k)->parent = -this->next[k];
+					auto f = this->getFail();
+					if (f)
+					{
+						if (f->fail)
+						{
+							f = f->makeNext(k, std::forward<_FnAlloc>(alloc), std::forward<_HistoryTx>(htx));
+							this->getNext(k)->fail = f - this->getNext(k);
+						}
+						else // the fail node of this is a root node
+						{
+							f = f->makeNext(htx(k), std::forward<_FnAlloc>(alloc));
+							this->getNext(k)->fail = f - this->getNext(k);
+						}
+					}
+					else // this node is a root node
+					{
+						this->getNext(k)->fail = this - this->getNext(k);
+					}
+				}
+				return this + this->next[k];
+			}
+
 			TrieNodeEx* getParent() const
 			{
 				if (!parent) return nullptr;
 				return (TrieNodeEx*)this + parent;
+			}
+
+			using TrieNode<_Key, _Value, _KeyStore, TrieNodeEx<_Key, _Value, _KeyStore>>::fillFail;
+
+			template<class HistoryTx>
+			void fillFail(HistoryTx&& htx, bool ignoreNegative = false)
+			{
+				std::deque<TrieNodeEx*> dq;
+				for (dq.emplace_back(this); !dq.empty(); dq.pop_front())
+				{
+					auto p = dq.front();
+					for (auto&& kv : p->next)
+					{
+						auto i = kv.first;
+						if (ignoreNegative && kv.second < 0) continue;
+						if (!p->getNext(i)) continue;
+						
+						if (p->getParent() == this)
+						{
+							p->getNext(i)->fail = this->getNext(htx(i)) - p->getNext(i);
+						}
+						else
+						{
+							p->getNext(i)->fail = p->findFail(i) - p->getNext(i);
+						}
+						dq.emplace_back(p->getNext(i));
+
+						if (!p->val)
+						{
+							for (auto n = p; n->fail; n = n->getFail())
+							{
+								if (!n->val) continue;
+								p->val = (_Value)-1;
+								break;
+							}
+						}
+					}
+				}
 			}
 		};
 
@@ -315,12 +392,52 @@ namespace kiwi
 				size_t insertSize = std::distance(first, last);
 				reserveMore(insertSize);
 
-				return nodes[0].build(first, last, val, [&]() { return newNode(); });
+				return nodes[0].build(first, last, std::forward<Value>(val), [&]() { return newNode(); });
+			}
+
+			template<class Cont>
+			struct CacheStore
+			{
+				Cont* cont = nullptr;
+				std::vector<size_t> ptrs;
+			};
+
+			template<class Cont, class Value>
+			Node* buildWithCaching(Cont& cont, Value&& val, CacheStore<Cont>& cache)
+			{
+				auto allocNode = [&]() { return newNode(); };
+				reserveMore(cont.size());
+				
+				size_t commonPrefix = 0;
+				if (cache.cont)
+				{
+					while (commonPrefix < std::min(cache.cont->size(), cont.size())
+						&& cont[commonPrefix] == (*cache.cont)[commonPrefix]
+					) ++commonPrefix;
+				}
+
+				cache.ptrs.resize(cont.size());
+
+				auto* node = &nodes[commonPrefix ? cache.ptrs[commonPrefix - 1] : 0];
+				for (size_t i = commonPrefix; i < cont.size(); ++i)
+				{
+					node = node->buildNext(cont[i], allocNode);
+					cache.ptrs[i] = node - nodes.data();
+				}
+				if (!node->val) node->val = val;
+				cache.cont = &cont;
+				return node;
 			}
 
 			void fillFail(bool ignoreNegative = false)
 			{
 				return nodes[0].fillFail(ignoreNegative);
+			}
+
+			template<class HistoryTx>
+			void fillFail(HistoryTx&& htx, bool ignoreNegative = false)
+			{
+				return nodes[0].fillFail(std::forward<HistoryTx>(htx), ignoreNegative);
 			}
 
 			template<typename _Fn, typename _CKey>

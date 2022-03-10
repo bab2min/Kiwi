@@ -39,7 +39,7 @@ namespace kiwi
 			{
 			}
 
-			virtual float getLL(ptrdiff_t node_idx, size_t next) const = 0;
+			//virtual float getLL(ptrdiff_t node_idx, size_t next) const = 0;
 			virtual std::vector<float> allNextLL(ptrdiff_t node_idx) const = 0;
 			virtual std::vector<float> allNextLL(ptrdiff_t node_idx, std::vector<ptrdiff_t>& next_node_idx) const = 0;
 
@@ -52,20 +52,20 @@ namespace kiwi
 			virtual const float* getLLBuf() const = 0;
 			virtual const float* getGammaBuf() const = 0;
 
-			static std::unique_ptr<KnLangModelBase> create(utils::MemoryObject&& mem);
+			static std::unique_ptr<KnLangModelBase> create(utils::MemoryObject&& mem, ArchType archType = ArchType::none);
 
-			template<class TrieNode>
+			template<class TrieNode, class HistoryTx = std::vector<Vid>>
 			static utils::MemoryOwner build(const utils::ContinuousTrie<TrieNode>& ngram_cf,
 				size_t order, size_t min_cf, size_t last_min_cf,
 				size_t unk_id, size_t bos_id, size_t eos_id,
 				float unigram_alpha, size_t quantize, bool compress,
 				const std::vector<std::pair<Vid, Vid>>* bigram_list = nullptr,
-				const std::vector<Vid>* historyTransformer = nullptr
+				const HistoryTx* historyTransformer = nullptr
 			);
 
 			const utils::MemoryObject& getMemory() const { return base; }
 
-			virtual float progress(ptrdiff_t& node_idx, size_t next) const = 0;
+			//virtual float progress(ptrdiff_t& node_idx, size_t next) const = 0;
 
 			template<class InTy, class OutTy>
 			void evaluate(InTy in_first, InTy in_last, OutTy out_first) const

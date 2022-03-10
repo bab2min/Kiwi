@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="tools\runner.cpp">
+    <ClCompile Include="tools\model_builder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

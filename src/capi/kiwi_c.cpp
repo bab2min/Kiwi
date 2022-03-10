@@ -389,7 +389,7 @@ kiwi_ss_h kiwi_split_into_sents_w(kiwi_h handle, const kchar16_t* text, int matc
 	{
 		vector<TokenResult> tokenized;
 		if (tokenized_res) tokenized.resize(1);
-		auto sent_ranges = kiwi->splitIntoSents((const char16_t*)text, (Match)matchOptions, &tokenized[0]);
+		auto sent_ranges = kiwi->splitIntoSents((const char16_t*)text, (Match)matchOptions, tokenized_res ? tokenized.data() : nullptr);
 		if (tokenized_res) *tokenized_res = new kiwi_res{ move(tokenized), {} };
 		return new kiwi_ss{ move(sent_ranges) };
 	}
@@ -408,7 +408,7 @@ kiwi_ss_h kiwi_split_into_sents(kiwi_h handle, const char* text, int matchOption
 	{
 		vector<TokenResult> tokenized;
 		if (tokenized_res) tokenized.resize(1);
-		auto sent_ranges = kiwi->splitIntoSents(text, (Match)matchOptions, &tokenized[0]);
+		auto sent_ranges = kiwi->splitIntoSents(text, (Match)matchOptions, tokenized_res ? tokenized.data() : nullptr);
 		if (tokenized_res) *tokenized_res = new kiwi_res{ move(tokenized), {} };
 		return new kiwi_ss{ move(sent_ranges) };
 	}

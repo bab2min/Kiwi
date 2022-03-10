@@ -2,6 +2,7 @@
 #include <kiwi/Types.h>
 #include <kiwi/TemplateUtils.hpp>
 #include <kiwi/Utils.h>
+#include "ArchAvailable.h"
 #include "KTrie.h"
 #include "FeatureTestor.h"
 #include "FrozenTrie.hpp"
@@ -34,7 +35,7 @@ Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form
 				int space = it == spacePos.end() ? 0 : it->second;
 				bool longestMatched = any_of(ret.begin() + 1, ret.end(), [lastSpecialEndPos, nBegin](const KGraphNode& g)
 				{
-					return nBegin == g.lastPos && lastSpecialEndPos == g.lastPos - (g.uform.empty() ? g.form->form.size() : g.uform.size());
+					return nBegin == g.endPos && lastSpecialEndPos == g.endPos - (g.uform.empty() ? g.form->form.size() : g.uform.size());
 				});
 
 				// insert unknown form 
@@ -47,7 +48,7 @@ Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form
 					KGraphNode newNode{ str.substr(lastSpecialEndPos, nBegin - space - lastSpecialEndPos), (uint16_t)(nBegin - space) };
 					for (auto& g : ret)
 					{
-						if (g.lastPos != lastSpecialEndPos - space2) continue;
+						if (g.endPos != lastSpecialEndPos - space2) continue;
 						newNode.addPrev(&ret.back() + 1 - &g);
 					}
 					ret.emplace_back(move(newNode));
@@ -64,7 +65,7 @@ Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form
 						KGraphNode newNode{ cand->form.substr(cand->form.size() - 1), (uint16_t)n };
 						for (auto& g : ret)
 						{
-							if (g.lastPos != n - 1 - space) continue;
+							if (g.endPos != n - 1 - space) continue;
 							newNode.addPrev(&ret.back() + 1 - &g);
 						}
 						ret.emplace_back(move(newNode));
@@ -78,7 +79,7 @@ Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form
 					KGraphNode newNode{ cand, (uint16_t)n };
 					for (auto& g : ret)
 					{
-						if (g.lastPos != nBegin - space) continue;
+						if (g.endPos != nBegin - space) continue;
 						newNode.addPrev(&ret.back() + 1 - &g);
 					}
 					if (newNode.prevs[0])
@@ -92,7 +93,7 @@ Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form
 
 		bool duplicated = any_of(ret.begin() + 1, ret.end(), [lastSpecialEndPos, n](const KGraphNode& g)
 		{
-			return n == g.lastPos /*&& lastSpecialEndPos == g.lastPos - (g.uform.empty() ? g.form->form.size() : g.uform.size())*/;
+			return n == g.endPos /*&& lastSpecialEndPos == g.endPos - (g.uform.empty() ? g.form->form.size() : g.uform.size())*/;
 		});
 		if (makeLongMatch && n != lastSpecialEndPos && !duplicated)
 		{
@@ -101,7 +102,7 @@ Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form
 			KGraphNode newNode{ str.substr(lastSpecialEndPos, n - lastSpecialEndPos), (uint16_t)n };
 			for (auto& g : ret)
 			{
-				if (g.lastPos != lastSpecialEndPos - space2) continue;
+				if (g.endPos != lastSpecialEndPos - space2) continue;
 				newNode.addPrev(&ret.back() + 1 - &g);
 			}
 			ret.emplace_back(move(newNode));
@@ -123,7 +124,7 @@ Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form
 				KGraphNode newNode{ KString{ &c, m.first }, (uint16_t)(n + m.first) };
 				for (auto& g : ret)
 				{
-					if (g.lastPos != n - space) continue;
+					if (g.endPos != n - space) continue;
 					newNode.addPrev(&ret.back() + 1 - &g);
 				}
 				ret.emplace_back(move(newNode));
@@ -147,7 +148,7 @@ Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form
 				KGraphNode newNode{ KString{ &str[specialStartPos], n - specialStartPos }, (uint16_t)n };
 				for (auto& g : ret)
 				{
-					if (g.lastPos != specialStartPos - space) continue;
+					if (g.endPos != specialStartPos - space) continue;
 					newNode.addPrev(&ret.back() + 1 - &g);
 				}
 				ret.emplace_back(move(newNode));
@@ -245,7 +246,7 @@ Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form
 		KGraphNode newNode{ KString{ &str[specialStartPos], n - specialStartPos }, (uint16_t)n };
 		for (auto& g : ret)
 		{
-			if (g.lastPos != specialStartPos - space) continue;
+			if (g.endPos != specialStartPos - space) continue;
 			newNode.addPrev(&ret.back() + 1 - &g);
 		}
 		ret.emplace_back(move(newNode));
@@ -274,12 +275,12 @@ Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form
 	branchOut(true);
 
 	ret.emplace_back();
-	ret.back().lastPos = n;
+	ret.back().endPos = n;
 	auto it = spacePos.find(n - 1);
 	int space = it == spacePos.end() ? 0 : it->second;
 	for (auto& r : ret)
 	{
-		if (r.lastPos < n - space) continue;
+		if (r.endPos < n - space) continue;
 		ret.back().addPrev(&ret.back() - &r);
 	}
 	return KGraphNode::removeUnconnected(ret);
@@ -294,9 +295,19 @@ inline FnSplitByTrie getSplitByTrieFnDispatch(ArchType arch, tp::seq<indices...>
 	return table[static_cast<int>(arch) - 1];
 }
 
+struct SplitByTrieGetter
+{
+	template<std::ptrdiff_t i>
+	struct Wrapper
+	{
+		static constexpr FnSplitByTrie value = &splitByTrie<static_cast<ArchType>(i)>;
+	};
+};
+
 FnSplitByTrie kiwi::getSplitByTrieFn(ArchType arch)
 {
-	return getSplitByTrieFnDispatch(arch, tp::GenSeq<static_cast<int>(ArchType::last)>{});
+	static tp::Table<FnSplitByTrie, AvailableArch> table{ SplitByTrieGetter{} };
+	return table[static_cast<std::ptrdiff_t>(arch)];
 }
 
 const Form * KTrie::findForm(const KString & str) const

@@ -51,9 +51,7 @@ namespace kiwi
 				template<ArchType arch>
 				const Node* findFail(const FrozenTrie& ft, Key c) const;
 
-				const Node* next(const FrozenTrie& ft, Key c) const;
 				const Node* fail() const;
-				const Node* findFail(const FrozenTrie& ft, Key c) const;
 				const Value& val(const FrozenTrie& ft) const;
 			};
 		private:
@@ -68,8 +66,8 @@ namespace kiwi
 
 			FrozenTrie() = default;
 
-			template<class TrieNode>
-			FrozenTrie(const ContinuousTrie<TrieNode>& trie);
+			template<class TrieNode, ArchType archType>
+			FrozenTrie(const ContinuousTrie<TrieNode>& trie, ArchTypeHolder<archType>);
 
 			FrozenTrie(const FrozenTrie& o);
 			FrozenTrie(FrozenTrie&&) = default;

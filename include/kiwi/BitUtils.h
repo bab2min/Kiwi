@@ -1,6 +1,15 @@
 ﻿#pragma once
 #include <cstdint>
 
+#ifdef _MSC_VER
+#include <intrin.h>
+#pragma intrinsic(__popcnt)
+#pragma intrinsic(_BitScanForward)
+#pragma intrinsic(_BitScanForward64)
+#pragma intrinsic(_BitScanReverse)
+#pragma intrinsic(_BitScanReverse64)
+#endif
+
 #if defined(__SSE2__) || defined(__AVX2__)
 	#include <immintrin.h>
 #endif
@@ -104,7 +113,23 @@ namespace kiwi
 		inline int ceilLog2(uint64_t v) { return 64 - countLeadingZeroes(v - 1); }
 
 #ifdef __APPLE__
+		inline int countTrailingZeroes(size_t v) { return countTrailingZeroes((uint64_t)v); }
+		
+		inline int countLeadingZeroes(size_t v) { return countLeadingZeroes((uint64_t)v); }
+
 		inline int ceilLog2(size_t v) { return ceilLog2((uint64_t)v); }
 #endif
+
+
+		inline uint32_t popcount(uint32_t v)
+		{
+#if defined(__GNUC__)
+			return __builtin_popcount(v);
+#elif defined(_MSC_VER)
+			return __popcnt(v);
+#else
+			throw "";
+#endif
+		}
 	}
 }

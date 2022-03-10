@@ -3,7 +3,7 @@
 
 using namespace kiwi;
 
-bool kiwi::FeatureTestor::isMatched(const kchar_t* begin, const kchar_t* end, CondVowel vowel)
+bool FeatureTestor::isMatched(const kchar_t* begin, const kchar_t* end, CondVowel vowel)
 {
 	if (vowel == CondVowel::none) return true;
 	if (begin == end) return false;
@@ -29,7 +29,7 @@ bool kiwi::FeatureTestor::isMatched(const kchar_t* begin, const kchar_t* end, Co
 	}
 }
 
-bool kiwi::FeatureTestor::isMatched(const kchar_t* begin, const kchar_t* end, CondPolarity polar)
+bool FeatureTestor::isMatched(const kchar_t* begin, const kchar_t* end, CondPolarity polar)
 {
 	if (polar == CondPolarity::none) return true;
 	if (begin == end) return true;
@@ -44,7 +44,7 @@ bool kiwi::FeatureTestor::isMatched(const kchar_t* begin, const kchar_t* end, Co
 	return polar == CondPolarity::negative;
 }
 
-bool kiwi::FeatureTestor::isMatched(const kchar_t* begin, const kchar_t* end, CondVowel vowel, CondPolarity polar)
+bool FeatureTestor::isMatched(const kchar_t* begin, const kchar_t* end, CondVowel vowel, CondPolarity polar)
 {
 	return isMatched(begin, end, vowel) && isMatched(begin, end, polar);
 }

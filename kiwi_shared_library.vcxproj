@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|ARM64">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release(LODA_TXT)|Win32">
-      <Configuration>Release(LODA_TXT)</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release(LODA_TXT)|x64">
-      <Configuration>Release(LODA_TXT)</Configuration>
-      <Platform>x64</Platform>
+    <ProjectConfiguration Include="Release|ARM64">
+      <Configuration>Release</Configuration>
+      <Platform>ARM64</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
@@ -38,6 +38,7 @@
     <ClInclude Include="include\kiwi\Macro.h" />
     <ClInclude Include="include\kiwi\Mmap.h" />
     <ClInclude Include="include\kiwi\PatternMatcher.h" />
+    <ClInclude Include="include\kiwi\TagUtils.h" />
     <ClInclude Include="include\kiwi\TemplateUtils.hpp" />
     <ClInclude Include="include\kiwi\ThreadPool.h" />
     <ClInclude Include="include\kiwi\Trainer.h" />
@@ -45,19 +46,25 @@
     <ClInclude Include="include\kiwi\Types.h" />
     <ClInclude Include="include\kiwi\Utils.h" />
     <ClInclude Include="include\kiwi\WordDetector.h" />
+    <ClInclude Include="src\ArchAvailable.h" />
+    <ClInclude Include="src\Combiner.h" />
     <ClInclude Include="src\count.hpp" />
+    <ClInclude Include="src\bitset.hpp" />
     <ClInclude Include="src\FrozenTrie.hpp" />
     <ClInclude Include="src\FeatureTestor.h" />
     <ClInclude Include="src\Knlm.hpp" />
     <ClInclude Include="src\KTrie.h" />
     <ClInclude Include="src\logPoisson.h" />
     <ClInclude Include="src\pattern.hpp" />
+    <ClInclude Include="src\RaggedVector.hpp" />
     <ClInclude Include="src\search.h" />
     <ClInclude Include="src\serializer.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ArchUtils.cpp" />
+    <ClCompile Include="src\Combiner.cpp" />
     <ClCompile Include="src\search.cpp" />
+    <ClCompile Include="src\TagUtils.cpp" />
     <ClCompile Include="third_party\mimalloc\src\static.c" />
     <ClCompile Include="src\Form.cpp" />
     <ClCompile Include="src\FeatureTestor.cpp" />
@@ -78,40 +85,39 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release(LODA_TXT)|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release(LODA_TXT)|x64'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -126,49 +132,49 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release(LODA_TXT)|Win32'" Label="PropertySheets">
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release(LODA_TXT)|x64'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)third_party/cpuinfo/src;$(SolutionDir)third_party/cpuinfo/include;$(SolutionDir)third_party/mimalloc/include;$(SolutionDir)third_party/cpp-btree;$(ProjectDir)include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)third_party/variant/include;$(SolutionDir)third_party/cpuinfo/src;$(SolutionDir)third_party/cpuinfo/include;$(SolutionDir)third_party/mimalloc/include;$(SolutionDir)third_party/cpp-btree;$(ProjectDir)include\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)third_party/cpuinfo/src;$(SolutionDir)third_party/cpuinfo/include;$(ProjectDir)third_party/mimalloc/include;$(ProjectDir)third_party/cpp-btree;$(ProjectDir)include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)third_party/variant/include;$(SolutionDir)third_party/cpuinfo/src;$(SolutionDir)third_party/cpuinfo/include;$(ProjectDir)third_party/mimalloc/include;$(ProjectDir)third_party/cpp-btree;$(ProjectDir)include\;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(SolutionDir)third_party/variant/include;$(SolutionDir)third_party/cpuinfo/src;$(SolutionDir)third_party/cpuinfo/include;$(ProjectDir)third_party/mimalloc/include;$(ProjectDir)third_party/cpp-btree;$(ProjectDir)include\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)third_party/cpuinfo/src;$(SolutionDir)third_party/cpuinfo/include;$(SolutionDir)third_party/mimalloc/include;$(SolutionDir)third_party/cpp-btree;$(ProjectDir)include\;$(IncludePath)</IncludePath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release(LODA_TXT)|Win32'">
-    <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)third_party/cpuinfo/src;$(SolutionDir)third_party/cpuinfo/include;$(SolutionDir)third_party/mimalloc/include;$(SolutionDir)third_party/cpp-btree;$(ProjectDir)include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)third_party/variant/include;$(SolutionDir)third_party/cpuinfo/src;$(SolutionDir)third_party/cpuinfo/include;$(SolutionDir)third_party/mimalloc/include;$(SolutionDir)third_party/cpp-btree;$(ProjectDir)include\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)third_party/cpuinfo/src;$(SolutionDir)third_party/cpuinfo/include;$(ProjectDir)third_party/mimalloc/include;$(ProjectDir)third_party/cpp-btree;$(ProjectDir)include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)third_party/variant/include;$(SolutionDir)third_party/cpuinfo/src;$(SolutionDir)third_party/cpuinfo/include;$(ProjectDir)third_party/mimalloc/include;$(ProjectDir)third_party/cpp-btree;$(ProjectDir)include\;$(IncludePath)</IncludePath>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release(LODA_TXT)|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)third_party/cpuinfo/src;$(SolutionDir)third_party/cpuinfo/include;$(ProjectDir)third_party/mimalloc/include;$(ProjectDir)third_party/cpp-btree;$(ProjectDir)include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)third_party/variant/include;$(SolutionDir)third_party/cpuinfo/src;$(SolutionDir)third_party/cpuinfo/include;$(ProjectDir)third_party/mimalloc/include;$(ProjectDir)third_party/cpp-btree;$(ProjectDir)include\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>KIWI_USE_MIMALLOC;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>KIWI_ARCH_X86=1;KIWI_USE_MIMALLOC;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalOptions>/Qvec-report:1 /utf-8 /D _CRT_SECURE_NO_WARNINGS=1 %(AdditionalOptions)</AdditionalOptions>
@@ -183,7 +189,28 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>KIWI_USE_MIMALLOC;_DEBUG;_CONSOLE;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>KIWI_ARCH_X86_64=1;KIWI_USE_MIMALLOC;_DEBUG;_CONSOLE;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <AdditionalOptions>/Qvec-report:1 /utf-8 /D _CRT_SECURE_NO_WARNINGS=1 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>cpuinfo_internals.lib;</AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalLibraryDirectories>$(ProjectDir)libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>KIWI_ARCH_ARM64=1;KIWI_USE_MIMALLOC;_DEBUG;_CONSOLE;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalOptions>/Qvec-report:1 /utf-8 /D _CRT_SECURE_NO_WARNINGS=1 %(AdditionalOptions)</AdditionalOptions>
@@ -206,26 +233,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>KIWI_USE_BTREE;KIWI_USE_MIMALLOC;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>true</SDLCheck>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalOptions>/Qvec-report:1 /utf-8 /D _CRT_SECURE_NO_WARNINGS=1 %(AdditionalOptions)</AdditionalOptions>
-    </ClCompile>
-    <Link>
-      <SubSystem>Console</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release(LODA_TXT)|Win32'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <Optimization>MaxSpeed</Optimization>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>KIWI_USE_MIMALLOC;LOAD_TXT;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>KIWI_ARCH_X86=1;KIWI_USE_BTREE;KIWI_USE_MIMALLOC;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalOptions>/Qvec-report:1 /utf-8 /D _CRT_SECURE_NO_WARNINGS=1 %(AdditionalOptions)</AdditionalOptions>
@@ -244,7 +252,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>KIWI_USE_BTREE;KIWI_USE_MIMALLOC;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>KIWI_ARCH_X86_64=1;KIWI_USE_BTREE;KIWI_USE_MIMALLOC;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <AdditionalOptions>/Qvec-report:1 /utf-8 /D _CRT_SECURE_NO_WARNINGS=1 %(AdditionalOptions)</AdditionalOptions>
@@ -263,16 +271,16 @@
       <AdditionalLibraryDirectories>$(ProjectDir)libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release(LODA_TXT)|x64'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>KIWI_USE_MIMALLOC;LOAD_TXT;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>KIWI_ARCH_ARM64=1;KIWI_USE_BTREE;KIWI_USE_MIMALLOC;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <AdditionalOptions>/Qvec-report:1 /utf-8 /D _CRT_SECURE_NO_WARNINGS=1 %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>

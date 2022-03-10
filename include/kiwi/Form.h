@@ -48,13 +48,20 @@ namespace kiwi
 		uint8_t combineSocket = 0;
 
 		/**
-		 * @brief 여러 형태소가 결합되어 형태가 변경된 경우에 원 형태소 목록을 표기하기 위해 사용된다.
+		 * @brief 여러 형태소가 결합되어 형태가 변경된 경우, 원 형태소 목록을 표기하기 위해 사용된다.
 		 *
 		 * @note `되/VV + 어/EC`의 결합은 `돼`라는 형태로 축약될 수 있다.
 		 * 분석과정에서 `돼`를 만난 경우 역으로 `되/VV + 어/EC`로 분석할 수 있도록 `돼/UNK`를 더미 형태소로 등록하고
 		 * chunks에는 `되/VV`와 `어/EC`에 대한 포인터를 넣어둔다.
 		 */
 		Vector<uint32_t> chunks;
+
+		/**
+		 * @brief 여러 형태소가 결합되어 형태가 변경된 경우, 원 형태소의 위치 정보를 표기하기 위해 사용된다.
+		 *
+		 * @note pair.first는 시작 지점, pair.second는 길이를 나타낸다. chunkPositions.size()는 항상 chunks.size()와 같다.
+		 */
+		Vector<std::pair<uint8_t, uint8_t>> chunkPositions;
 
 		/**
 		 * @brief 분할된 형태소의 원형 형태소를 가리키는 오프셋
@@ -65,6 +72,14 @@ namespace kiwi
 		 */
 		int32_t combined = 0;
 		float userScore = 0;
+
+		/**
+		 * @brief 형태소의 언어모델 상의 인덱스 값을 보관하는 필드.
+		 * 
+		 * @note 대부분의 경우는 형태소 자체의 인덱스 값과 동일하지만, 
+		 * 이형태 형태소의 경우 원형 형태소의 인덱스 값을 가진다.
+		 */
+		uint32_t lmMorphemeId = 0;
 
 		MorphemeRaw();
 		~MorphemeRaw();
@@ -97,9 +112,10 @@ namespace kiwi
 		CondVowel vowel = CondVowel::none;
 		CondPolarity polar = CondPolarity::none;
 		uint8_t combineSocket = 0;
-		FixedVector<const Morpheme*> chunks;
+		FixedPairVector<const Morpheme*, std::pair<uint8_t, uint8_t>> chunks;
 		int32_t combined = 0;
 		float userScore = 0;
+		uint32_t lmMorphemeId = 0;
 
 		Morpheme();
 		~Morpheme();
@@ -128,8 +144,6 @@ namespace kiwi
 	struct FormRaw
 	{
 		KString form; /**< 형태 */
-		CondVowel vowel = CondVowel::none; /**< 선행형태소의 자/모음 조건 */
-		CondPolarity polar = CondPolarity::none; /**< 선행형태소의 모음조화 조건 */
 		Vector<uint32_t> candidate;
 		/**< 이 형태에 해당하는 형태소들의 목록 */
 
@@ -140,7 +154,7 @@ namespace kiwi
 		FormRaw& operator=(const FormRaw&);
 		FormRaw& operator=(FormRaw&&);
 		
-		FormRaw(const KString& _form, CondVowel _vowel, CondPolarity _polar);
+		FormRaw(const KString& _form);
 		bool operator<(const FormRaw& o) const;
 
 		void serializerRead(std::istream& istr);
@@ -175,7 +189,7 @@ namespace kiwi
 	 * @param morphBase 형태소 배열의 시작 위치
 	 * @return 최적화된 형태 정보
 	 */
-	Form bake(const FormRaw& o, const Morpheme* morphBase);
+	Form bake(const FormRaw& o, const Morpheme* morphBase, const Vector<uint32_t>& additionalCands = {});
 
 	/**
 	 * @brief 변경 가능한 형태소 정보를 bake하여 최적화한다.
