@@ -976,17 +976,19 @@ not_matched:
 
 struct CombineVisitor
 {
-	const KString& left, & right;
+	/* use member pointer, not reference, because of the bug at gcc 4.8 */
+	const KString* left;
+	const KString* right;
 
 	CombineVisitor(const KString& _left, const KString& _right)
-		: left{ _left }, right{ _right }
+		: left{ &_left }, right{ &_right }
 	{
 	}
 
 	template<class Ty>
 	Vector<Result> operator()(const Ty& e) const
 	{
-		return e.combine(left, right);
+		return e.combine(*left, *right);
 	}
 };
 
