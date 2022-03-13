@@ -16,10 +16,6 @@ struct ResultBuffer
 	vector<string> stringBuf;
 };
 
-//using TResult = pair<vector<TokenResult>, ResultBuffer>;
-//using EResult = pair<vector<WordInfo>, ResultBuffer>;
-//using SResult = vector<pair<size_t, size_t>>;
-
 struct kiwi_res : public pair<vector<TokenResult>, ResultBuffer>
 {
 	using pair<vector<TokenResult>, ResultBuffer>::pair;
@@ -38,6 +34,15 @@ struct kiwi_ss : public vector<pair<size_t, size_t>>
 };
 
 thread_local exception_ptr currentError;
+
+inline POSTag parse_tag(const char* pos)
+{
+	auto u16 = utf8To16(pos);
+	transform(u16.begin(), u16.end(), u16.begin(), static_cast<int(*)(int)>(toupper));
+	auto ret = toPOSTag(u16);
+	if (ret == POSTag::max) throw invalid_argument{ string{"Unknown POSTag : "} + pos };
+	return ret;
+}
 
 const char* kiwi_error()
 {
@@ -95,8 +100,85 @@ int kiwi_builder_add_word(kiwi_builder_h handle, const char* word, const char* p
 	auto* kb = (KiwiBuilder*)handle;
 	try
 	{
-		if (kb->addWord(utf8To16(word), toPOSTag(utf8To16(pos)), score)) return 0;
+		if (kb->addWord(utf8To16(word), parse_tag(pos), score)) return 0;
 		return KIWIERR_FAIL;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return KIWIERR_FAIL;
+	}
+}
+
+int kiwi_builder_add_alias_word(kiwi_builder_h handle, const char* alias, const char* pos, float score, const char* orig_word)
+{
+	if (!handle) return KIWIERR_INVALID_HANDLE;
+	auto* kb = (KiwiBuilder*)handle;
+	try
+	{
+		if (kb->addWord(utf8To16(alias), parse_tag(pos), score, utf8To16(orig_word))) return 0;
+		return KIWIERR_FAIL;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return KIWIERR_FAIL;
+	}
+}
+
+int kiwi_builder_add_pre_analyzed_word(kiwi_builder_h handle, const char* form, int size, const char** analyzed_morphs, const char** analyzed_pos, float score, const int* positions)
+{
+	if (!handle) return KIWIERR_INVALID_HANDLE;
+	auto* kb = (KiwiBuilder*)handle;
+	try
+	{
+		if (size < 0)
+		{
+			throw invalid_argument{ "`size` must be positive integer." };
+		}
+		vector<pair<u16string, POSTag>> analyzed(size);
+		vector<pair<size_t, size_t>> p_positions;
+
+		for (int i = 0; i < size; ++i)
+		{
+			analyzed[i].first = utf8To16(analyzed_morphs[i]);
+			analyzed[i].second = parse_tag(analyzed_pos[i]);
+		}
+
+		if (positions)
+		{
+			p_positions.resize(size);
+			for (int i = 0; i < size; ++i)
+			{
+				p_positions[i].first = positions[i * 2];
+				p_positions[i].second = positions[i * 2 + 1];
+			}
+		}
+
+		if (kb->addPreAnalyzedWord(utf8To16(form), analyzed, p_positions, score)) return 0;
+		return KIWIERR_FAIL;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return KIWIERR_FAIL;
+	}
+}
+
+int kiwi_builder_add_rule(kiwi_builder_h handle, const char* pos, kiwi_builder_replacer_t replacer, void* user_data, float score)
+{
+	if (!handle) return KIWIERR_INVALID_HANDLE;
+	auto* kb = (KiwiBuilder*)handle;
+	try
+	{
+		return kb->addRule(parse_tag(pos), [&](const u16string& str) 
+		{
+			auto s8 = utf16To8(str);
+			size_t buf_len = replacer(s8.c_str(), s8.size(), nullptr, user_data);
+			vector<char> buf(buf_len);
+			replacer(s8.c_str(), s8.size(), buf.data(), user_data);
+			return utf8To16(buf.data());
+		}, score).size();
 	}
 	catch (...)
 	{

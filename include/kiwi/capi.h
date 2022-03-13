@@ -53,6 +53,18 @@ typedef int(*kiwi_reader_w_t)(int, kchar16_t*, void*);
 
 typedef int(*kiwi_receiver_t)(int, kiwi_res_h, void*);
 
+/**
+ * @brief 문자열의 변형결과를 Kiwi에 제공하기 위한 콜백 함수 타입
+ *
+ * @param const char* 원본 문자열의 값입니다.
+ * @param int 원본 문자열의 바이트 단위 길이입니다.
+ * @param char* 변형된 문자열을 쓸 버퍼입니다. 이 값이 null인 경우 버퍼의 크기를 반환해야 합니다.
+ * @param void* user data를 위한 인자입니다.
+ *
+ * @return int 세번째 인자가 null인 경우 출력할 문자열의 버퍼의 크기를 반환합니다.
+ */
+typedef int(*kiwi_builder_replacer_t)(const char*, int, char*, void*);
+
 enum
 {
 	KIWI_BUILD_LOAD_DEFAULT_DICT = 1,
@@ -72,8 +84,15 @@ enum
 	KIWI_MATCH_HASHTAG = 4,
 	KIWI_MATCH_MENTION = 8,
 	KIWI_MATCH_ALL = KIWI_MATCH_URL | KIWI_MATCH_EMAIL | KIWI_MATCH_HASHTAG | KIWI_MATCH_MENTION,
-	KIWI_MATCH_NORMALIZE_CODA = 65536,
+	KIWI_MATCH_NORMALIZE_CODA = 1 << 16,
 	KIWI_MATCH_ALL_WITH_NORMALIZING = KIWI_MATCH_ALL | KIWI_MATCH_NORMALIZE_CODA,
+
+	KIWI_MATCH_JOIN_NOUN_PREFIX = 1 << 17,
+	KIWI_MATCH_JOIN_NOUN_SUFFIX = 1 << 18,
+	KIWI_MATCH_JOIN_VERB_SUFFIX = 1 << 19,
+	KIWI_MATCH_JOIN_ADJ_SUFFIX = 1 << 20,
+	KIWI_MATCH_JOIN_V_SUFFIX = KIWI_MATCH_JOIN_VERB_SUFFIX | KIWI_MATCH_JOIN_ADJ_SUFFIX,
+	KIWI_MATCH_JOIN_NOUN_AFFIX = KIWI_MATCH_JOIN_NOUN_PREFIX | KIWI_MATCH_JOIN_NOUN_SUFFIX | KIWI_MATCH_JOIN_V_SUFFIX,
 };
 
 #ifdef __cplusplus  
@@ -117,20 +136,71 @@ DECL_DLL kiwi_builder_h kiwi_builder_init(const char* model_path, int num_thread
  * @brief 사용된 resource를 반환합니다.
  * 
  * @param handle KiwiBuilder.
- * @return 성공 시, 0를 반환합니다.
+ * @return 성공 시 0를 반환합니다.
  */
 DECL_DLL int kiwi_builder_close(kiwi_builder_h handle);
 
 /**
- * @brief 사용자 단어를 추가합니다.
+ * @brief 사용자 형태소를 추가합니다.
+ *        이 함수로 등록한 형태소의 경우
+ *        언어 모델 내에서 UNK(사전 미등재 단어)로 처리됩니다.
+ *        특정 형태소의 변이형을 등록하려는 경우 kiwi_builder_add_alias_word 함수를 사용하는 걸 권장합니다.
  * 
  * @param handle KiwiBuilder.
- * @param word 추가할 단어.
+ * @param word 추가할 형태소.
  * @param pos 품사 태그 (kiwi#POSTag).
  * @param score 점수.
- * @return 성공 시, 0를 반환합니다.
+ * @return 성공 시 0를 반환합니다.
  */
 DECL_DLL int kiwi_builder_add_word(kiwi_builder_h handle, const char* word, const char* pos, float score);
+
+
+/**
+ * @brief 원본 형태소를 기반으로하는 새 형태소를 추가합니다.
+ *        kiwi_builder_add_word로 등록한 형태소의 경우 
+ *        언어 모델 내에서 UNK(사전 미등재 단어)로 처리되는 반면, 
+ *        이 함수로 등록한 형태소의 경우 언어모델 내에서 원본 형태소와 동일하게 처리됩니다.
+ *
+ * @param handle KiwiBuilder.
+ * @param alias 새 형태소
+ * @param pos 품사 태그 (kiwi#POSTag).
+ * @param score 점수.
+ * @param orig_word 원 형태소
+ * @return 성공 시 0를 반환합니다.
+ * 만약 orig_word에 pos 태그를 가진 원본 형태소가 존재하지 않는 경우 이 함수는 실패합니다.
+ */
+DECL_DLL int kiwi_builder_add_alias_word(kiwi_builder_h handle, const char* alias, const char* pos, float score, const char* orig_word);
+
+/**
+ * @brief 기분석 형태소열을 추가합니다.
+ *        불규칙적으로 분석되어야하는 패턴을 추가하는 데 용이합니다.
+ *        예) 사겼다 -> 사귀/VV + 었/EP + 다/EF
+ *        
+ * 
+ * @param handle KiwiBuilder.
+ * @param form 등록할 형태
+ * @param size 형태소의 개수
+ * @param analyzed_morphs size 개수의 const char* 배열의 시작 포인터. 분석되어야할 각 형태소의 형태를 나타냅니다.
+ * @param analyzed_pos size 개수의 const char* 배열의 시작 포인터. 분석되어야할 각 형태소의 품사를 나타냅니다.
+ * @param score 점수. 기본적으로는 0을 사용합니다. 0보다 클 경우 이 분석 결과가 더 높은 우선순위를, 작을 경우 더 낮은 우선순위를 갖습니다.
+ * @param positions size * 2 개수의 int 배열의 시작 포인터. 각 형태소가 형태 내에서 차지하는 위치를 지정합니다. null을 입력하여 생략할 수 있습니다.
+ * @return 성공 시 0를 반환합니다.
+ * 만약 analyzed_morphs와 analyzed_pos로 지정된 형태소가 사전 내에 존재하지 않으면 이 함수는 실패합니다.
+ */
+DECL_DLL int kiwi_builder_add_pre_analyzed_word(kiwi_builder_h handle, const char* form, int size, const char** analyzed_morphs, const char** analyzed_pos, float score, const int* positions);
+
+/**
+ * @brief 규칙에 의해 변형된 형태소 목록을 생성하여 자동 추가합니다.
+ *
+ * @param handle KiwiBuilder.
+ * @param pos 변형할 형태소의 품사 태그
+ * @param replacer 변형 결과를 제공하는데에 쓰일 콜백 함수
+ * @param user_data replacer 호출시 사용될 유저 데이터
+ * @param score 점수. 기본적으로는 0을 사용합니다. 0보다 클 경우 이 변형 결과가 더 높은 우선순위를, 작을 경우 더 낮은 우선순위를 갖습니다.
+ * @return 성공 시 새로 추가된 형태소의 개수를 반환합니다. 실패 시 음수를 반환합니다.
+ */
+DECL_DLL int kiwi_builder_add_rule(kiwi_builder_h handle, const char* pos, kiwi_builder_replacer_t replacer, void* user_data, float score);
+
 
 /**
  * @brief 사용자 사전으로부터 단어를 읽어들입니다.
