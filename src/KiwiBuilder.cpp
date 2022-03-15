@@ -802,7 +802,7 @@ Kiwi KiwiBuilder::build() const
 	ret.morphemes.reserve(morphemes.size() + combinedMorphemes.size());
 	ret.langMdl = langMdl;
 	ret.integrateAllomorph = !!(options & BuildOption::integrateAllomorph);
-	if (numThreads > 1)
+	if (numThreads >= 1)
 	{
 		ret.pool = make_unique<utils::ThreadPool>(numThreads);
 	}

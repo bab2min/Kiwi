@@ -967,6 +967,7 @@ namespace kiwi
 
 	future<vector<TokenResult>> Kiwi::asyncAnalyze(const string& str, size_t topN, Match matchOptions) const
 	{
+		if (!pool) throw Exception{ "`asyncAnalyze` doesn't work at single thread mode." };
 		return pool->enqueue([&, str, topN, matchOptions](size_t)
 		{
 			return analyze(str, topN, matchOptions);
