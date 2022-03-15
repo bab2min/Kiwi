@@ -80,13 +80,8 @@ namespace kiwi
 		template<size_t n, class KeyTy>
 		Vector<size_t> getNstOrder(const KeyTy* keys, size_t size, bool sort = false)
 		{
-			Vector<size_t> ret(size), idx(size);
-			std::iota(idx.begin(), idx.end(), 0);
-
-			std::sort(idx.begin(), idx.end(), [&](size_t a, size_t b)
-			{
-				return keys[a] < keys[b];
-			});
+			Vector<size_t> ret(size);
+			size_t neg_pos = sort ? (std::find_if(keys, keys + size, [](KeyTy a) { return a < 0; }) - keys) : size;
 
 			size_t height = 0;
 			for (size_t s = size; s > 0; s /= n) height++;
@@ -107,7 +102,11 @@ namespace kiwi
 					{
 						size_t f = r;
 						if (f > off_start) f -= (f - off_start) - (f - off_start) / n;
-						ret[i++] = idx[f];
+						
+						if (f < size - neg_pos) f += neg_pos;
+						else f -= size - neg_pos;
+
+						ret[i++] = f;
 						if (i >= size) break;
 					}
 					if (i >= size) break;
@@ -228,7 +227,7 @@ namespace kiwi
 	{
 		template<class IntTy>
 		ARCH_TARGET("sse2")
-			inline bool testEq(__m128i p, size_t offset, size_t size, size_t& ret)
+		inline bool testEq(__m128i p, size_t offset, size_t size, size_t& ret)
 		{
 			uint32_t m = _mm_movemask_epi8(p);
 			uint32_t b = utils::countTrailingZeroes(m);
@@ -242,7 +241,7 @@ namespace kiwi
 
 		template<size_t n, class IntTy>
 		ARCH_TARGET("sse2")
-			bool nstSearchSSE2(const IntTy* keys, size_t size, IntTy target, size_t& ret)
+		bool nstSearchSSE2(const IntTy* keys, size_t size, IntTy target, size_t& ret)
 		{
 			size_t i = 0;
 

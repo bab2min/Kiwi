@@ -50,8 +50,8 @@ namespace kiwi
 
 		TagSequenceScorer tagScorer;
 
-		std::vector<Form> forms;
-		std::vector<Morpheme> morphemes;
+		Vector<Form> forms;
+		Vector<Morpheme> morphemes;
 		utils::FrozenTrie<kchar_t, const Form*> formTrie;
 		std::shared_ptr<lm::KnLangModelBase> langMdl;
 		std::unique_ptr<utils::ThreadPool> pool;

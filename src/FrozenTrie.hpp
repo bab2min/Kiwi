@@ -106,6 +106,7 @@ namespace kiwi
 			nextDiffs = make_unique<Diff[]>(numNexts);
 
 			size_t ptr = 0;
+			Vector<uint8_t> tempBuf;
 			for (size_t i = 0; i < trie.size(); ++i)
 			{
 				auto& o = trie[i];
@@ -121,10 +122,10 @@ namespace kiwi
 					nextDiffs[ptr] = p.second;
 					++ptr;
 				}
-				nst::prepare<archType>(&nextKeys[nodes[i].nextOffset], &nextDiffs[nodes[i].nextOffset], pairs.size());
+				nst::prepare<archType>(&nextKeys[nodes[i].nextOffset], &nextDiffs[nodes[i].nextOffset], pairs.size(), tempBuf);
 			}
 
-			std::deque<Node*> dq;
+			Deque<Node*> dq;
 			for (dq.emplace_back(&nodes[0]); !dq.empty(); dq.pop_front())
 			{
 				auto p = dq.front();

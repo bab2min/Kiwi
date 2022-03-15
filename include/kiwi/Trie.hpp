@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <deque>
 #include <iterator>
+#include <kiwi/Types.h>
 
 namespace kiwi
 {
@@ -337,7 +338,7 @@ namespace kiwi
 		template<class _TrieNode>
 		class ContinuousTrie
 		{
-			std::vector<_TrieNode> nodes;
+			Vector<_TrieNode> nodes;
 
 		public:
 			using Node = _TrieNode;
@@ -370,7 +371,7 @@ namespace kiwi
 			{
 				if (nodes.capacity() < nodes.size() + n)
 				{
-					nodes.reserve(std::max(nodes.size() + n, nodes.capacity() + nodes.capacity() / 2));
+					nodes.reserve(std::max(nodes.size() + n, nodes.capacity() * 2));
 				}
 			}
 
