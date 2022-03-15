@@ -9,13 +9,14 @@
 #include <kiwi/ArchUtils.h>
 #include "ArchAvailable.h"
 #include "search.h"
-#include <kiwi/BitEncoder.hpp>
+#include "BitEncoder.hpp"
+#include "QEncoder.hpp"
 
 namespace kiwi
 {
 	namespace lm
 	{
-		using VLECode = BitSeq<1, 3, 6, 10, 28>;
+		using QCode = qe::QCode<0, 2, 8, 16>;
 
 		template<ArchType arch, class KeyType, class DiffType = int32_t>
 		class KnLangModel : public KnLangModelBase
@@ -90,6 +91,36 @@ namespace kiwi
 				}
 			}
 
+			template<>
+			static void dequantize<8>(
+				Vector<float>& restored_floats, Vector<float>& restored_leaf_ll,
+				const char* llq_data, size_t llq_size,
+				const char* gammaq_data, size_t gammaq_size,
+				const float* ll_table,
+				const float* gamma_table,
+				size_t num_non_leaf_nodes,
+				size_t num_leaf_nodes
+			)
+			{
+				const uint8_t* non_leaf_q = reinterpret_cast<const uint8_t*>(llq_data);
+				for (size_t i = 0; i < num_non_leaf_nodes; ++i)
+				{
+					restored_floats[i] = ll_table[non_leaf_q[i]];
+				}
+
+				const uint8_t* leaf_q = reinterpret_cast<const uint8_t*>(llq_data + num_non_leaf_nodes);
+				for (size_t i = 0; i < num_leaf_nodes; ++i)
+				{
+					restored_leaf_ll[i] = ll_table[leaf_q[i]];
+				}
+
+				const uint8_t* gamma_q = reinterpret_cast<const uint8_t*>(gammaq_data);
+				for (size_t i = 0; i < num_non_leaf_nodes; ++i)
+				{
+					restored_floats[i + num_non_leaf_nodes] = gamma_table[gamma_q[i]];
+				}
+			}
+
 			template<ptrdiff_t ...idx>
 			static void dequantizeDispatch(
 				tp::seq<idx...>,
@@ -137,8 +168,9 @@ namespace kiwi
 				if (compressed)
 				{
 					d_node_size.resize(header.num_nodes);
-					VariableLengthDecoder<utils::imstream, VLECode, uint32_t> decoder{ ptr + header.node_offset, (ptrdiff_t)(header.key_offset - header.node_offset) };
-					for (auto& i : d_node_size) i = decoder.read();
+					auto qc_header = reinterpret_cast<const uint8_t*>(ptr + header.node_offset);
+					auto qc_body = reinterpret_cast<const size_t*>(qc_header + (header.num_nodes + 3) / 4);
+					QCode::template decode<8>((uint16_t*)d_node_size.data(), qc_header, qc_body, 0, header.num_nodes);
 					node_sizes = d_node_size.data();
 				}
 				
@@ -236,10 +268,11 @@ namespace kiwi
 					all_value_data[k] = v;
 				}
 
+				Vector<uint8_t> tempBuf;
 				for (size_t i = 0; i < non_leaf_idx; ++i)
 				{
 					auto& node = node_data[i];
-					nst::prepare<arch>(&key_data[node.next_offset], &value_data[node.next_offset], node.num_nexts);
+					nst::prepare<arch>(&key_data[node.next_offset], &value_data[node.next_offset], node.num_nexts, tempBuf);
 				}
 
 				if (htx_data)
@@ -940,9 +973,17 @@ namespace kiwi
 
 			if (compressed)
 			{
-				VariableLengthEncoder<std::ostringstream&, VLECode, uint32_t> encoder{ c_node_size };
-				for (auto i : node_sizes) encoder.write(i);
-				encoder.flush();
+				if (sizeof(KeyType) == 2)
+				{
+					qe::Encoder<QCode> encoder;
+					encoder.template encode<8>(node_sizes.begin(), node_sizes.end());
+					c_node_size.write((const char*)encoder.getHeader().data(), encoder.headerSize());
+					c_node_size.write((const char*)encoder.getBody().data(), encoder.bodySize());
+				}
+				else
+				{
+					throw std::invalid_argument{ "`compress=True` is supported only KeyType=uint16_t." };
+				}
 			}
 
 			size_t final_size = 0;
