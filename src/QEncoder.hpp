@@ -277,5 +277,11 @@ namespace kiwi
 
 			return decodeRest(&ints[size - size % pack], header, body, b, size % pack);
 		}
+
+		template<uint8_t b1, uint8_t b2, uint8_t b3, uint8_t b4>
+		constexpr size_t QCode<b1, b2, b3, b4>::qBits[4];
+
+		template<uint8_t b1, uint8_t b2, uint8_t b3, uint8_t b4>
+		constexpr size_t QCode<b1, b2, b3, b4>::qBias[4];
 	}
 }

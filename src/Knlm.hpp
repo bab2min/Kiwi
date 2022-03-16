@@ -18,6 +18,66 @@ namespace kiwi
 	{
 		using QCode = qe::QCode<0, 2, 8, 16>;
 
+		template<size_t bits>
+		inline void dequantize(
+			Vector<float>& restored_floats, Vector<float>& restored_leaf_ll,
+			const char* llq_data, size_t llq_size,
+			const char* gammaq_data, size_t gammaq_size,
+			const float* ll_table,
+			const float* gamma_table,
+			size_t num_non_leaf_nodes,
+			size_t num_leaf_nodes
+		)
+		{
+			FixedLengthEncoder<utils::imstream, bits, uint32_t> llq{ llq_data, (ptrdiff_t)llq_size };
+			FixedLengthEncoder<utils::imstream, bits, uint32_t> gammaq{ gammaq_data, (ptrdiff_t)gammaq_size };
+
+			for (size_t i = 0; i < num_non_leaf_nodes; ++i)
+			{
+				restored_floats[i] = ll_table[llq.read()];
+			}
+
+			for (size_t i = 0; i < num_leaf_nodes; ++i)
+			{
+				restored_leaf_ll[i] = ll_table[llq.read()];
+			}
+
+			for (size_t i = 0; i < num_non_leaf_nodes; ++i)
+			{
+				restored_floats[i + num_non_leaf_nodes] = gamma_table[gammaq.read()];
+			}
+		}
+
+		template<>
+		inline void dequantize<8>(
+			Vector<float>& restored_floats, Vector<float>& restored_leaf_ll,
+			const char* llq_data, size_t llq_size,
+			const char* gammaq_data, size_t gammaq_size,
+			const float* ll_table,
+			const float* gamma_table,
+			size_t num_non_leaf_nodes,
+			size_t num_leaf_nodes
+		)
+		{
+			const uint8_t* non_leaf_q = reinterpret_cast<const uint8_t*>(llq_data);
+			for (size_t i = 0; i < num_non_leaf_nodes; ++i)
+			{
+				restored_floats[i] = ll_table[non_leaf_q[i]];
+			}
+
+			const uint8_t* leaf_q = reinterpret_cast<const uint8_t*>(llq_data + num_non_leaf_nodes);
+			for (size_t i = 0; i < num_leaf_nodes; ++i)
+			{
+				restored_leaf_ll[i] = ll_table[leaf_q[i]];
+			}
+
+			const uint8_t* gamma_q = reinterpret_cast<const uint8_t*>(gammaq_data);
+			for (size_t i = 0; i < num_non_leaf_nodes; ++i)
+			{
+				restored_floats[i + num_non_leaf_nodes] = gamma_table[gamma_q[i]];
+			}
+		}
+
 		template<ArchType arch, class KeyType, class DiffType = int32_t>
 		class KnLangModel : public KnLangModelBase
 		{
@@ -59,66 +119,6 @@ namespace kiwi
 					node = lower_node;
 				}
 				return node;
-			}
-
-			template<size_t bits>
-			static void dequantize(
-				Vector<float>& restored_floats, Vector<float>& restored_leaf_ll,
-				const char* llq_data, size_t llq_size,
-				const char* gammaq_data, size_t gammaq_size,
-				const float* ll_table,
-				const float* gamma_table,
-				size_t num_non_leaf_nodes,
-				size_t num_leaf_nodes
-			)
-			{
-				FixedLengthEncoder<utils::imstream, bits, uint32_t> llq{ llq_data, (ptrdiff_t)llq_size };
-				FixedLengthEncoder<utils::imstream, bits, uint32_t> gammaq{ gammaq_data, (ptrdiff_t)gammaq_size };
-
-				for (size_t i = 0; i < num_non_leaf_nodes; ++i)
-				{
-					restored_floats[i] = ll_table[llq.read()];
-				}
-
-				for (size_t i = 0; i < num_leaf_nodes; ++i)
-				{
-					restored_leaf_ll[i] = ll_table[llq.read()];
-				}
-
-				for (size_t i = 0; i < num_non_leaf_nodes; ++i)
-				{
-					restored_floats[i + num_non_leaf_nodes] = gamma_table[gammaq.read()];
-				}
-			}
-
-			template<>
-			static void dequantize<8>(
-				Vector<float>& restored_floats, Vector<float>& restored_leaf_ll,
-				const char* llq_data, size_t llq_size,
-				const char* gammaq_data, size_t gammaq_size,
-				const float* ll_table,
-				const float* gamma_table,
-				size_t num_non_leaf_nodes,
-				size_t num_leaf_nodes
-			)
-			{
-				const uint8_t* non_leaf_q = reinterpret_cast<const uint8_t*>(llq_data);
-				for (size_t i = 0; i < num_non_leaf_nodes; ++i)
-				{
-					restored_floats[i] = ll_table[non_leaf_q[i]];
-				}
-
-				const uint8_t* leaf_q = reinterpret_cast<const uint8_t*>(llq_data + num_non_leaf_nodes);
-				for (size_t i = 0; i < num_leaf_nodes; ++i)
-				{
-					restored_leaf_ll[i] = ll_table[leaf_q[i]];
-				}
-
-				const uint8_t* gamma_q = reinterpret_cast<const uint8_t*>(gammaq_data);
-				for (size_t i = 0; i < num_non_leaf_nodes; ++i)
-				{
-					restored_floats[i + num_non_leaf_nodes] = gamma_table[gamma_q[i]];
-				}
 			}
 
 			template<ptrdiff_t ...idx>
