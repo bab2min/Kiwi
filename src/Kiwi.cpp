@@ -10,6 +10,7 @@
 #include "logPoisson.h"
 #include "FrozenTrie.hpp"
 #include "Knlm.hpp"
+#include "StrUtils.h"
 #include "serializer.hpp"
 
 using namespace std;

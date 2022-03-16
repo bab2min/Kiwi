@@ -23,9 +23,7 @@ namespace kiwi
 
 			auto operator[](typename _Map::key_type key) -> typename _Map::mapped_type&
 			{
-				auto it = this->find(key);
-				if (it == this->end()) return this->emplace(key, typename _Map::mapped_type{}).first->second;
-				else return it->second;
+				return this->emplace(key, typename _Map::mapped_type{}).first->second;
 			}
 		};
 
@@ -407,7 +405,7 @@ namespace kiwi
 			Node* buildWithCaching(Cont& cont, Value&& val, CacheStore<Cont>& cache)
 			{
 				auto allocNode = [&]() { return newNode(); };
-				reserveMore(cont.size());
+				//reserveMore(cont.size());
 				
 				size_t commonPrefix = 0;
 				if (cache.cont)

@@ -7,6 +7,7 @@
 
 #include "FeatureTestor.h"
 #include "Combiner.h"
+#include "StrUtils.h"
 
 using namespace std;
 using namespace kiwi;
@@ -258,7 +259,7 @@ Pattern::Pattern(const KString& expr)
 inline Vector<POSTag> getSubTagset(const string& prefix)
 {
 	Vector<POSTag> ret;
-	for (auto& pf : split(prefix, ','))
+	for (auto pf : split(prefix, ','))
 	{
 		if (pf == "P")
 		{
@@ -277,7 +278,7 @@ inline Vector<POSTag> getSubTagset(const string& prefix)
 		{
 			for (auto i = POSTag::nng; i < POSTag::p; i = (POSTag)((size_t)i + 1))
 			{
-				if (strncmp(tagToString(i), pf.c_str(), pf.size()) == 0)
+				if (strncmp(tagToString(i), pf.data(), pf.size()) == 0)
 				{
 					ret.emplace_back(i);
 				}
@@ -750,8 +751,8 @@ void RuleSet::loadRules(istream& istr)
 		}
 		else if (fields.size() == 2)
 		{
-			lTag = fields[0];
-			rTag = fields[1];
+			lTag = fields[0].to_string();
+			rTag = fields[1].to_string();
 		}
 		else
 		{
@@ -766,13 +767,13 @@ void RuleSet::loadRules(istream& istr)
 					"-coda",
 				};
 
-				for (auto& f : split(fields[3], ','))
+				transform(fields[3].begin(), fields[3].end(), const_cast<char*>(fields[3].begin()), static_cast<int(*)(int)>(tolower));
+				for (auto f : split(fields[3], ','))
 				{
-					transform(f.begin(), f.end(), f.begin(), static_cast<int(*)(int)>(tolower));
 					size_t t = find(fs.begin(), fs.end(), f) - fs.begin();
 					if (t >= fs.size())
 					{
-						throw runtime_error{ "invalid feature value: " + f};
+						throw runtime_error{ "invalid feature value: " + f.to_string()};
 					}
 
 					switch (t)
@@ -794,12 +795,13 @@ void RuleSet::loadRules(istream& istr)
 			}
 
 			vector<ReplString> repl;
-			for (auto& r : split(normalizeHangul(fields[2]), u','))
+			auto normalizedResult = normalizeHangul(fields[2]);
+			for (auto r : split(normalizedResult, u','))
 			{
-				repl.emplace_back(parseReplString(move(r)));
+				repl.emplace_back(parseReplString(KString{ r.begin(), r.end() }));
 			}
 
-			addRule(lTag, rTag, 
+			addRule(lTag, rTag,
 				normalizeHangul(fields[0]), 
 				normalizeHangul(fields[1]), 
 				repl,

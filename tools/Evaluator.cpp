@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include <kiwi/Utils.h>
+#include "../src/StrUtils.h"
 #include "Evaluator.h"
 #include "LCS.hpp"
 
@@ -52,10 +53,10 @@ Evaluator::Evaluator(const std::string& testSetFile, const Kiwi* _kw, size_t _to
 		vector<u16string> tokens;
 		for (size_t i = 1; i < fd.size(); ++i)
 		{
-			split(fd[i], u' ', back_inserter(tokens));
+			for (auto s : split(fd[i], u' ')) tokens.emplace_back(s.to_string());
 		}
 		TestResult tr;
-		tr.q = fd[0];
+		tr.q = fd[0].to_string();
 		for (auto& t : tokens) tr.a.emplace_back(parseWordPOS(t));
 		testsets.emplace_back(std::move(tr));
 	}
