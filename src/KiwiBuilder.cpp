@@ -381,7 +381,7 @@ bool KiwiBuilder::addWord(nonstd::u16string_view newForm, POSTag tag, float scor
 		for (auto p : f.candidate)
 		{
 			// if `form` already has the same `tag`, skip adding
-			if (morphemes[(size_t)p].tag == tag) return false;
+			if (morphemes[p].tag == tag && morphemes[p].lmMorphemeId == origMorphemeId) return false;
 		}
 	}
 
@@ -432,7 +432,7 @@ void KiwiBuilder::addCombinedMorphemes(
 		{
 			newMorph.chunks.emplace_back(leftId);
 			newMorph.chunkPositions.emplace_back(0, r.leftEnd);
-			newMorph.userScore = r.score;
+			newMorph.userScore = getMorph(leftId).userScore + r.score;
 		}
 		else
 		{
@@ -450,6 +450,7 @@ void KiwiBuilder::addCombinedMorphemes(
 		{
 			newMorph.combineSocket = getMorph(newMorph.chunks[0]).combineSocket;
 		}
+		newMorph.userScore += getMorph(rightId).userScore;
 		newMorph.vowel = r.vowel;
 		// 양/음성 조건은 부분결합된 형태소에서만 유효
 		if (getMorph(leftId).tag == POSTag::p)
@@ -701,7 +702,7 @@ bool KiwiBuilder::addPreAnalyzedWord(nonstd::u16string_view form, const vector<p
 	{
 		for (auto p : f.candidate)
 		{
-			auto& mchunks = morphemes[(size_t)p].chunks;
+			auto& mchunks = morphemes[p].chunks;
 			if (mchunks == analyzedIds) return false;
 		}
 	}

@@ -11,7 +11,7 @@ class PatternMatcherImpl
 		pattern::CutSZCharSetParser<PP_GET_64("-A-Za-z0-9._%+", 0)>::type emailAccount;
 		pattern::CutSZCharSetParser<PP_GET_64("-A-Za-z0-9.", 0)>::type alphaNumDotDash;
 		pattern::CutSZCharSetParser<PP_GET_64("-a-zA-Z0-9@:%._+~#=", 0)>::type domain;
-		pattern::CutSZCharSetParser<PP_GET_64("-a-zA-Z0-9()@:%_+.~#?&/=", 0)>::type path;
+		pattern::CutSZCharSetParser<PP_GET_64("-a-zA-Z0-9()@:%_+.~#!?&/=", 0)>::type path;
 		pattern::CutSZCharSetParser<PP_GET_64("^# \t\n\r\v\f.,", 0)>::type hashtags;
 		pattern::CutSZCharSetParser<PP_GET_64(" \t\n\r\v\f", 0)>::type space;
 	} md;
@@ -25,7 +25,7 @@ public:
 
 size_t PatternMatcherImpl::testUrl(const char16_t * first, const char16_t * last) const
 {
-	// Pattern: https?://[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z]{2,6}(:[0-9]+)?\b(/[-a-zA-Z0-9()@:%_+.~#?&/=]*)?
+	// Pattern: https?://[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z]{2,6}(:[0-9]+)?\b(/[-a-zA-Z0-9()@:%_+.~#!?&/=]*)?
 
 	const char16_t* b = first;
 
@@ -39,6 +39,8 @@ size_t PatternMatcherImpl::testUrl(const char16_t * first, const char16_t * last
 		m = https.progress(first, last);
 		if (m.second) b = m.first;
 	}
+
+	if (!m.second) return 0;
 
 	// [-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}
 	int state = 0;
@@ -82,6 +84,7 @@ size_t PatternMatcherImpl::testUrl(const char16_t * first, const char16_t * last
 		if (b != last && !md.space.test(*b)) return 0;
 	}
 	
+	if (b[-1] == u'.' || b[-1] == u':') --b;
 	return b - first;
 }
 
@@ -121,18 +124,19 @@ size_t PatternMatcherImpl::testEmail(const char16_t * first, const char16_t * la
 
 size_t PatternMatcherImpl::testMention(const char16_t* first, const char16_t* last) const
 {
-	// Pattern: @[A-Za-z0-9._%+-]+
+	// Pattern: @[A-Za-z][A-Za-z0-9._%+-]+
 	const char16_t* b = first;
 
 	// @
 	if (b == last || *b != '@') return 0;
 	++b;
 
-	// [A-Za-z0-9._%+-]+
-	if (b == last || !md.emailAccount.test(*b)) return 0;
+	// [A-Za-z][A-Za-z0-9._%+-]+
+	if (b == last || !isalpha(*b)) return 0;
 	++b;
 	while (b != last && md.emailAccount.test(*b)) ++b;
-
+	if (b[-1] == u'.' || b[-1] == u'%' || b[-1] == u'+' || b[-1] == u'-') --b;
+	if (b - first <= 3) return 0;
 	return b - first;
 }
 

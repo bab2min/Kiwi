@@ -53150,7 +53150,6 @@ XX을	UNC	8
 목적격	NNG	7
 오촌	NNG	7
 고무래	NNG	7
-어	EP	7
 죄송스럽	VA	7
 김하수	NNP	7
 쇼파	NNG	7
@@ -53364,7 +53363,6 @@ XX을	UNC	8
 메이트	NNG	7
 똥줄	NNG	7
 티머니	NNP	7
-엇	EP	7
 토시	NNG	7
 간소하	VA	7
 아이쇼핑	NNG	7
@@ -62913,7 +62911,6 @@ xx선	NF	5
 최고위직	NNG	5
 방송통신대학	NNP	5
 장목	NNG	5
-겟	EP	5
 올래	NNG	5
 팔조	NR	5
 수수하	VA	5
@@ -62978,7 +62975,6 @@ xx선	NF	5
 아무튼지	MAG	5
 상갓집	NNG	5
 걸신	NNG	5
-앗	EP	5
 래	NA	5
 장위	NNP	5
 와트	NNB	5

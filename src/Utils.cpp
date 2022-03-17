@@ -57,6 +57,7 @@ namespace kiwi
 		case '\n':
 		case '\v':
 		case '\f':
+		case 0x2800:
 			return POSTag::unknown;
 		}
 		if (0x2000 <= chr && chr <= 0x200F) return POSTag::unknown;

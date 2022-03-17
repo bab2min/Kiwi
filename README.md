@@ -68,24 +68,24 @@ $ ldconfig
 ```console
 $ ./kiwi-evaluator --model ../ModelGenerator ../eval_data/web.txt ../eval_data/written.txt
 
-Loading Time : 1400.44 ms
-LM Size : 32.452 MB
-Mem Usage : 268.941 MB
+Loading Time : 841.122 ms
+LM Size : 32.8576 MB
+Mem Usage : 288.27 MB
 
 Test file: eval_data/web.txt
-0.869743, 0.853454
-Total (108 lines) Time : 138.974 ms
-Time per Line : 1.2868 ms
+0.871109, 0.855246
+Total (108 lines) Time : 130 ms
+Time per Line : 1.2037 ms
 ================
 Test file: eval_data/written.txt
-0.940606, 0.940701
-Total (33 lines) Time : 57.3238 ms
-Time per Line : 1.73708 ms
+0.94, 0.940363
+Total (33 lines) Time : 63.5559 ms
+Time per Line : 1.92594 ms
 ================
 
 ================
 Avg Score
-0.905175, 0.897078
+0.905555, 0.897805
 ================
 ```
 
@@ -115,6 +115,9 @@ https://github.com/bab2min/kiwi-gui 에서 다운받을 수 있습니다.
 
 
 ## 업데이트 내역
+* v0.11
+  
+
 * v0.10
   * 소스 코드 리팩토링. 인터페이스를 `kiwi::KiwiBuilder`(분석기 사전을 관리)와 `kiwi::Kiwi`(실제 형태소 분석을 수행)로 분할
   * CMake 적용
