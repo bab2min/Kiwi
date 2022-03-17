@@ -4,6 +4,7 @@
 #include <kiwi/Utils.h>
 #include "ArchAvailable.h"
 #include "KTrie.h"
+#include "StrUtils.h"
 #include "FrozenTrie.hpp"
 #include "Knlm.hpp"
 #include "serializer.hpp"
@@ -341,7 +342,7 @@ void KiwiBuilder::saveModel(const string& modelPath) const
 	}
 }
 
-FormRaw& KiwiBuilder::addForm(KString form)
+FormRaw& KiwiBuilder::addForm(const KString& form)
 {
 	auto ret = formMap.emplace(form, forms.size());
 	if (ret.second)
@@ -366,7 +367,7 @@ size_t KiwiBuilder::addForm(Vector<FormRaw>& newForms, UnorderedMap<KString, siz
 	return ret.first->second;
 }
 
-bool KiwiBuilder::addWord(const u16string& newForm, POSTag tag, float score, size_t origMorphemeId)
+bool KiwiBuilder::addWord(nonstd::u16string_view newForm, POSTag tag, float score, size_t origMorphemeId)
 {
 	if (newForm.empty()) return false;
 
@@ -391,6 +392,11 @@ bool KiwiBuilder::addWord(const u16string& newForm, POSTag tag, float score, siz
 	newMorph.userScore = score;
 	newMorph.lmMorphemeId = origMorphemeId;
 	return true;
+}
+
+bool KiwiBuilder::addWord(const u16string& newForm, POSTag tag, float score, size_t origMorphemeId)
+{
+	return addWord(nonstd::to_string_view(newForm), tag, score, origMorphemeId);
 }
 
 void KiwiBuilder::addCombinedMorphemes(
@@ -616,9 +622,14 @@ void KiwiBuilder::buildCombinedMorphemes(
 	}
 }
 
-bool KiwiBuilder::addWord(const u16string& form, POSTag tag, float score)
+bool KiwiBuilder::addWord(nonstd::u16string_view form, POSTag tag, float score)
 {
 	return addWord(form, tag, score, getDefaultMorphemeId(tag));
+}
+
+bool KiwiBuilder::addWord(const u16string& form, POSTag tag, float score)
+{
+	return addWord(nonstd::to_string_view(form), tag, score);
 }
 	
 size_t KiwiBuilder::findMorpheme(const u16string& form, POSTag tag) const
@@ -637,7 +648,7 @@ size_t KiwiBuilder::findMorpheme(const u16string& form, POSTag tag) const
 	return -1;
 }
 
-bool KiwiBuilder::addWord(const u16string& newForm, POSTag tag, float score, const u16string& origForm)
+bool KiwiBuilder::addWord(nonstd::u16string_view newForm, POSTag tag, float score, const u16string& origForm)
 {
 	size_t origMorphemeId = findMorpheme(origForm, tag);
 
@@ -649,7 +660,12 @@ bool KiwiBuilder::addWord(const u16string& newForm, POSTag tag, float score, con
 	return addWord(newForm, tag, score, origMorphemeId);
 }
 
-bool KiwiBuilder::addPreAnalyzedWord(const u16string& form, const vector<pair<u16string, POSTag>>& analyzed, vector<pair<size_t, size_t>> positions, float score)
+bool KiwiBuilder::addWord(const u16string& newForm, POSTag tag, float score, const u16string& origForm)
+{
+	return addWord(nonstd::to_string_view(newForm), tag, score, origForm);
+}
+
+bool KiwiBuilder::addPreAnalyzedWord(nonstd::u16string_view form, const vector<pair<u16string, POSTag>>& analyzed, vector<pair<size_t, size_t>> positions, float score)
 {
 	if (form.empty()) return false;
 
@@ -701,20 +717,27 @@ bool KiwiBuilder::addPreAnalyzedWord(const u16string& form, const vector<pair<u1
 	return true;
 }
 
+bool KiwiBuilder::addPreAnalyzedWord(const u16string& form, const vector<pair<u16string, POSTag>>& analyzed, vector<pair<size_t, size_t>> positions, float score)
+{
+	return addPreAnalyzedWord(nonstd::to_string_view(form), analyzed, positions, score);
+}
+
 size_t KiwiBuilder::loadDictionary(const string& dictPath)
 {
 	size_t addedCnt = 0;
 	ifstream ifs{ dictPath };
 	if (!ifs) throw Exception("[loadUserDictionary] Failed to open '" + dictPath + "'");
 	string line;
+	array<nonstd::u16string_view, 3> fields;
+	u16string wstr;
 	for (size_t lineNo = 1; getline(ifs, line); ++lineNo)
 	{
-		auto wstr = utf8To16(line);
+		utf8To16(nonstd::to_string_view(line), wstr);
 		while (!wstr.empty() && kiwi::identifySpecialChr(wstr.back()) == POSTag::unknown) wstr.pop_back();
 		if (wstr.empty()) continue;
 		if (wstr[0] == u'#') continue;
-		auto fields = split(wstr, u'\t');
-		if (fields.size() < 2)
+		size_t fieldSize = split(wstr, u'\t', fields.begin(), 2) - fields.begin();
+		if (fieldSize < 2)
 		{
 			throw Exception("[loadUserDictionary] Wrong dictionary format at line " + to_string(lineNo) + " : " + line);
 		}
@@ -725,7 +748,7 @@ size_t KiwiBuilder::loadDictionary(const string& dictPath)
 		}
 
 		float score = 0.f;
-		if (fields.size() > 2) score = stof(fields[2].begin(), fields[2].end());
+		if (fieldSize > 2) score = stof(fields[2].begin(), fields[2].end());
 
 		if (fields[1].find(u'/') != fields[1].npos)
 		{
@@ -733,8 +756,10 @@ size_t KiwiBuilder::loadDictionary(const string& dictPath)
 
 			for (auto& m : split(fields[1], u'+'))
 			{
-				while (!m.empty() && m.back() == ' ') m.pop_back();
-				while (!m.empty() && m.front() == ' ') m.erase(m.begin());
+				size_t b = 0, e = m.size();
+				while (b < e && m[e - 1] == ' ') --e;
+				while (b < e && m[b] == ' ') ++b;
+				m = m.substr(b, e - b);
 
 				size_t p = m.rfind(u'/');
 				if (p == m.npos)
@@ -746,7 +771,7 @@ size_t KiwiBuilder::loadDictionary(const string& dictPath)
 				{
 					throw Exception("[loadUserDictionary] Unknown Tag '" + utf16To8(fields[1]) + "' at line " + to_string(lineNo));
 				}
-				morphemes.emplace_back(m.substr(0, p), pos);
+				morphemes.emplace_back(m.substr(0, p).to_string(), pos);
 			}
 
 			if (morphemes.size() > 1)
@@ -802,7 +827,7 @@ Kiwi KiwiBuilder::build() const
 	ret.morphemes.reserve(morphemes.size() + combinedMorphemes.size());
 	ret.langMdl = langMdl;
 	ret.integrateAllomorph = !!(options & BuildOption::integrateAllomorph);
-	if (numThreads > 1)
+	if (numThreads >= 1)
 	{
 		ret.pool = make_unique<utils::ThreadPool>(numThreads);
 	}
@@ -874,6 +899,24 @@ Kiwi KiwiBuilder::build() const
 	{
 		return a->form < b->form;
 	});
+
+	size_t estimatedNodeSize = 0;
+	const KString* prevForm = nullptr;
+	for (auto f : sortedForms)
+	{
+		if (!prevForm)
+		{
+			estimatedNodeSize += f->form.size();
+			prevForm = &f->form;
+			continue;
+		}
+		size_t commonPrefix = 0;
+		while (commonPrefix < std::min(prevForm->size(), f->form.size())
+			&& (*prevForm)[commonPrefix] == f->form[commonPrefix]) ++commonPrefix;
+		estimatedNodeSize += f->form.size() - commonPrefix;
+		prevForm = &f->form;
+	}
+	formTrie.reserveMore(estimatedNodeSize);
 
 	decltype(formTrie)::CacheStore<const KString> cache;
 	for (auto f : sortedForms)

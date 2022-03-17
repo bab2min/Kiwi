@@ -11,6 +11,7 @@
 #include <kiwi/Trie.hpp>
 #include <kiwi/ThreadPool.h>
 #include <kiwi/Utils.h>
+#include "StrUtils.h"
 #include "serializer.hpp"
 
 using namespace std;
@@ -454,7 +455,7 @@ void WordDetector::loadNounTailModelFromTxt(std::istream & is)
 		auto fields = split(utf8To16(line), u'\t');
 		if (fields.size() < 4) continue;
 		float p = stof(fields[1].begin(), fields[1].end());
-		nounTailScore[fields[0]] = p;
+		nounTailScore[fields[0].to_string()] = p;
 	}
 }
 

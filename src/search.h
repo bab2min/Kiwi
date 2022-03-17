@@ -16,18 +16,28 @@ namespace kiwi
 		}
 
 		template<ArchType arch, class IntTy, class Value>
-		void prepare(IntTy* keys, Value* values, size_t size)
+		void prepare(IntTy* keys, Value* values, size_t size, Vector<uint8_t>& tempBuf)
 		{
+			if (size <= 1) return;
 			auto order = detail::reorderImpl<arch>(keys, size);
 			if (order.empty()) return;
 
-			Vector<IntTy> tempKeys{ std::make_move_iterator(keys), std::make_move_iterator(keys + size) };
-			Vector<Value> tempValues{ std::make_move_iterator(values), std::make_move_iterator(values + size) };
-
+			if (tempBuf.size() < std::max(sizeof(IntTy), sizeof(Value)) * size)
+			{
+				tempBuf.resize(std::max(sizeof(IntTy), sizeof(Value)) * size);
+			}
+			auto tempKeys = (IntTy*)tempBuf.data();
+			auto tempValues = (Value*)tempBuf.data();
+			std::copy(keys, keys + size, tempKeys);
 			for (size_t i = 0; i < size; ++i)
 			{
-				keys[i] = std::move(tempKeys[order[i]]);
-				values[i] = std::move(tempValues[order[i]]);
+				keys[i] = tempKeys[order[i]];
+			}
+
+			std::copy(values, values + size, tempValues);
+			for (size_t i = 0; i < size; ++i)
+			{
+				values[i] = tempValues[order[i]];
 			}
 		}
 

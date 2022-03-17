@@ -28,7 +28,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\kiwi\ArchUtils.h" />
-    <ClInclude Include="include\kiwi\BitEncoder.hpp" />
     <ClInclude Include="include\kiwi\BitUtils.h" />
     <ClInclude Include="include\kiwi\FixedVector.hpp" />
     <ClInclude Include="include\kiwi\Form.h" />
@@ -47,6 +46,7 @@
     <ClInclude Include="include\kiwi\Utils.h" />
     <ClInclude Include="include\kiwi\WordDetector.h" />
     <ClInclude Include="src\ArchAvailable.h" />
+    <ClInclude Include="src\BitEncoder.hpp" />
     <ClInclude Include="src\Combiner.h" />
     <ClInclude Include="src\count.hpp" />
     <ClInclude Include="src\bitset.hpp" />
@@ -59,6 +59,9 @@
     <ClInclude Include="src\RaggedVector.hpp" />
     <ClInclude Include="src\search.h" />
     <ClInclude Include="src\serializer.hpp" />
+    <ClInclude Include="src\QEncoder.hpp" />
+    <ClInclude Include="src\string_view.hpp" />
+    <ClInclude Include="src\StrUtils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ArchUtils.cpp" />
@@ -151,7 +154,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)third_party/variant/include;$(SolutionDir)third_party/cpuinfo/src;$(SolutionDir)third_party/cpuinfo/include;$(ProjectDir)third_party/mimalloc/include;$(ProjectDir)third_party/cpp-btree;$(ProjectDir)include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)third_party/variant/include;$(ProjectDir)third_party/cpuinfo/src;$(ProjectDir)third_party/cpuinfo/include;$(ProjectDir)third_party/mimalloc/include;$(ProjectDir)third_party/cpp-btree;$(ProjectDir)include\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <LinkIncremental>true</LinkIncremental>
@@ -163,7 +166,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)third_party/variant/include;$(SolutionDir)third_party/cpuinfo/src;$(SolutionDir)third_party/cpuinfo/include;$(ProjectDir)third_party/mimalloc/include;$(ProjectDir)third_party/cpp-btree;$(ProjectDir)include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)third_party/variant/include;$(ProjectDir)third_party/cpuinfo/src;$(ProjectDir)third_party/cpuinfo/include;$(ProjectDir)third_party/mimalloc/include;$(ProjectDir)third_party/cpp-btree;$(ProjectDir)include\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <LinkIncremental>false</LinkIncremental>

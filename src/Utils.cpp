@@ -1,139 +1,17 @@
 #include <cassert>
 #include <kiwi/Utils.h>
+#include "StrUtils.h"
 
 namespace kiwi
 {
 	std::u16string utf8To16(const std::string & str)
 	{
-		std::u16string ret;
-		for (auto it = str.begin(); it != str.end(); ++it)
-		{
-			size_t code = 0;
-			uint8_t byte = *it;
-			if ((byte & 0xF8) == 0xF0)
-			{
-				code = (byte & 0x07) << 18;
-				if (++it == str.end()) throw UnicodeException{ "unexpected ending" };
-				if (((byte = *it) & 0xC0) != 0x80) throw UnicodeException{ "unexpected trailing byte" };
-				code |= (byte & 0x3F) << 12;
-				if (++it == str.end()) throw UnicodeException{ "unexpected ending" };
-				if (((byte = *it) & 0xC0) != 0x80) throw UnicodeException{ "unexpected trailing byte" };
-				code |= (byte & 0x3F) << 6;
-				if (++it == str.end()) throw UnicodeException{ "unexpected ending" };
-				if (((byte = *it) & 0xC0) != 0x80) throw UnicodeException{ "unexpected trailing byte" };
-				code |= (byte & 0x3F);
-			}
-			else if ((byte & 0xF0) == 0xE0)
-			{
-				code = (byte & 0x0F) << 12;
-				if (++it == str.end()) throw UnicodeException{ "unexpected ending" };
-				if (((byte = *it) & 0xC0) != 0x80) throw UnicodeException{ "unexpected trailing byte" };
-				code |= (byte & 0x3F) << 6;
-				if (++it == str.end()) throw UnicodeException{ "unexpected ending" };
-				if (((byte = *it) & 0xC0) != 0x80) throw UnicodeException{ "unexpected trailing byte" };
-				code |= (byte & 0x3F);
-			}
-			else if ((byte & 0xE0) == 0xC0)
-			{
-				code = (byte & 0x1F) << 6;
-				if (++it == str.end()) throw UnicodeException{ "unexpected ending" };
-				if (((byte = *it) & 0xC0) != 0x80) throw UnicodeException{ "unexpected trailing byte" };
-				code |= (byte & 0x3F);
-			}
-			else if ((byte & 0x80) == 0x00)
-			{
-				code = byte;
-			}
-			else
-			{
-				throw UnicodeException{ "unicode error" };
-			}
-
-			if (code < 0x10000)
-			{
-				ret.push_back(code);
-			}
-			else if(code < 0x10FFFF)
-			{
-				code -= 0x10000;
-				ret.push_back(0xD800 | (code >> 10));
-				ret.push_back(0xDC00 | (code & 0x3FF));
-			}
-			else
-			{
-				throw UnicodeException{ "unicode error" };
-			}
-		}
-		return ret;
+		return utf8To16(nonstd::to_string_view(str));
 	}
 
 	std::u16string utf8To16(const std::string& str, std::vector<size_t>& bytePositions)
 	{
-		std::u16string ret;
-		bytePositions.clear();
-		for (auto it = str.begin(); it != str.end(); ++it)
-		{
-			size_t pos = (size_t)(it - str.begin());
-			size_t code = 0;
-			uint8_t byte = *it;
-			if ((byte & 0xF8) == 0xF0)
-			{
-				code = (byte & 0x07) << 18;
-				if (++it == str.end()) throw UnicodeException{ "unexpected ending" };
-				if (((byte = *it) & 0xC0) != 0x80) throw UnicodeException{ "unexpected trailing byte" };
-				code |= (byte & 0x3F) << 12;
-				if (++it == str.end()) throw UnicodeException{ "unexpected ending" };
-				if (((byte = *it) & 0xC0) != 0x80) throw UnicodeException{ "unexpected trailing byte" };
-				code |= (byte & 0x3F) << 6;
-				if (++it == str.end()) throw UnicodeException{ "unexpected ending" };
-				if (((byte = *it) & 0xC0) != 0x80) throw UnicodeException{ "unexpected trailing byte" };
-				code |= (byte & 0x3F);
-			}
-			else if ((byte & 0xF0) == 0xE0)
-			{
-				code = (byte & 0x0F) << 12;
-				if (++it == str.end()) throw UnicodeException{ "unexpected ending" };
-				if (((byte = *it) & 0xC0) != 0x80) throw UnicodeException{ "unexpected trailing byte" };
-				code |= (byte & 0x3F) << 6;
-				if (++it == str.end()) throw UnicodeException{ "unexpected ending" };
-				if (((byte = *it) & 0xC0) != 0x80) throw UnicodeException{ "unexpected trailing byte" };
-				code |= (byte & 0x3F);
-			}
-			else if ((byte & 0xE0) == 0xC0)
-			{
-				code = (byte & 0x1F) << 6;
-				if (++it == str.end()) throw UnicodeException{ "unexpected ending" };
-				if (((byte = *it) & 0xC0) != 0x80) throw UnicodeException{ "unexpected trailing byte" };
-				code |= (byte & 0x3F);
-			}
-			else if ((byte & 0x80) == 0x00)
-			{
-				code = byte;
-			}
-			else
-			{
-				throw UnicodeException{ "unicode error" };
-			}
-
-			if (code < 0x10000)
-			{
-				ret.push_back(code);
-				bytePositions.emplace_back(pos);
-			}
-			else if (code < 0x10FFFF)
-			{
-				code -= 0x10000;
-				ret.push_back(0xD800 | (code >> 10));
-				ret.push_back(0xDC00 | (code & 0x3FF));
-				bytePositions.emplace_back(pos);
-				bytePositions.emplace_back(pos);
-			}
-			else
-			{
-				throw UnicodeException{ "unicode error" };
-			}
-		}
-		return ret;
+		return utf8To16(nonstd::to_string_view(str), bytePositions);
 	}
 
 	std::string utf8FromCode(size_t code)
@@ -166,48 +44,7 @@ namespace kiwi
 
 	std::string utf16To8(const std::u16string & str)
 	{
-		std::string ret;
-		for (auto it = str.begin(); it != str.end(); ++it)
-		{
-			size_t code = *it;
-			if ((code & 0xFC00) == 0xD800)
-			{
-				if (++it == str.end()) throw UnicodeException{ "unpaired surrogate" };
-				size_t code2 = *it;
-				if ((code2 & 0xFC00) != 0xDC00) throw UnicodeException{ "unpaired surrogate" };
-				code = ((code & 0x3FF) << 10) | (code2 & 0x3FF);
-				code += 0x10000;
-			}
-
-			if (code <= 0x7F)
-			{
-				ret.push_back(code);
-			}
-			else if (code <= 0x7FF)
-			{
-				ret.push_back(0xC0 | (code >> 6));
-				ret.push_back(0x80 | (code & 0x3F));
-			}
-			else if (code <= 0xFFFF)
-			{
-				ret.push_back(0xE0 | (code >> 12));
-				ret.push_back(0x80 | ((code >> 6) & 0x3F));
-				ret.push_back(0x80 | (code & 0x3F));
-			}
-			else if (code <= 0x10FFFF)
-			{
-				ret.push_back(0xF0 | (code >> 18));
-				ret.push_back(0x80 | ((code >> 12) & 0x3F));
-				ret.push_back(0x80 | ((code >> 6) & 0x3F));
-				ret.push_back(0x80 | (code & 0x3F));
-			}
-			else
-			{
-				throw UnicodeException{ "unicode error" };
-			}
-		}
-
-		return ret;
+		return utf16To8(nonstd::to_string_view(str));
 	}
 
 	POSTag identifySpecialChr(kchar_t chr)
@@ -360,60 +197,7 @@ namespace kiwi
 
 	POSTag toPOSTag(const std::u16string& tagStr)
 	{
-		if (tagStr == u"NNG") return POSTag::nng;
-		if (tagStr == u"NNP") return POSTag::nnp;
-		if (tagStr == u"NNB") return POSTag::nnb;
-		if (tagStr == u"NR") return POSTag::nr;
-		if (tagStr == u"NP") return POSTag::np;
-		if (tagStr == u"VV") return POSTag::vv;
-		if (tagStr == u"VA") return POSTag::va;
-		if (tagStr == u"VX") return POSTag::vx;
-		if (tagStr == u"VCP") return POSTag::vcp;
-		if (tagStr == u"VCN") return POSTag::vcn;
-		if (tagStr == u"MM") return POSTag::mm;
-		if (tagStr == u"MAG") return POSTag::mag;
-		if (tagStr == u"MAJ") return POSTag::maj;
-		if (tagStr == u"IC") return POSTag::ic;
-		if (tagStr == u"JKS") return POSTag::jks;
-		if (tagStr == u"JKC") return POSTag::jkc;
-		if (tagStr == u"JKG") return POSTag::jkg;
-		if (tagStr == u"JKO") return POSTag::jko;
-		if (tagStr == u"JKB") return POSTag::jkb;
-		if (tagStr == u"JKV") return POSTag::jkv;
-		if (tagStr == u"JKQ") return POSTag::jkq;
-		if (tagStr == u"JX") return POSTag::jx;
-		if (tagStr == u"JC") return POSTag::jc;
-		if (tagStr == u"EP") return POSTag::ep;
-		if (tagStr == u"EF") return POSTag::ef;
-		if (tagStr == u"EC") return POSTag::ec;
-		if (tagStr == u"ETN") return POSTag::etn;
-		if (tagStr == u"ETM") return POSTag::etm;
-		if (tagStr == u"XPN") return POSTag::xpn;
-		if (tagStr == u"XSN") return POSTag::xsn;
-		if (tagStr == u"XSV") return POSTag::xsv;
-		if (tagStr == u"XSA") return POSTag::xsa;
-		if (tagStr == u"XR") return POSTag::xr;
-		if (tagStr == u"SF") return POSTag::sf;
-		if (tagStr == u"SP") return POSTag::sp;
-		if (tagStr == u"SS") return POSTag::ss;
-		if (tagStr == u"SE") return POSTag::se;
-		if (tagStr == u"SO") return POSTag::so;
-		if (tagStr == u"SW") return POSTag::sw;
-		if (tagStr == u"NF") return POSTag::unknown;
-		if (tagStr == u"NV") return POSTag::unknown;
-		if (tagStr == u"NA") return POSTag::unknown;
-		if (tagStr == u"SL") return POSTag::sl;
-		if (tagStr == u"SH") return POSTag::sh;
-		if (tagStr == u"SN") return POSTag::sn;
-		if (tagStr == u"V") return POSTag::p;
-		if (tagStr == u"A") return POSTag::p;
-		if (tagStr == u"^") return POSTag::unknown;
-		if (tagStr == u"W_URL") return POSTag::w_url;
-		if (tagStr == u"W_EMAIL") return POSTag::w_email;
-		if (tagStr == u"W_HASHTAG") return POSTag::w_hashtag;
-		if (tagStr == u"W_MENTION") return POSTag::w_mention;
-		//assert(0);
-		return POSTag::max;
+		return toPOSTag(nonstd::to_string_view(tagStr));
 	}
 
 	const char* tagToString(POSTag t)

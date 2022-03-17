@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <deque>
 #include <iterator>
+#include <kiwi/Types.h>
 
 namespace kiwi
 {
@@ -22,9 +23,7 @@ namespace kiwi
 
 			auto operator[](typename _Map::key_type key) -> typename _Map::mapped_type&
 			{
-				auto it = this->find(key);
-				if (it == this->end()) return this->emplace(key, typename _Map::mapped_type{}).first->second;
-				else return it->second;
+				return this->emplace(key, typename _Map::mapped_type{}).first->second;
 			}
 		};
 
@@ -337,7 +336,7 @@ namespace kiwi
 		template<class _TrieNode>
 		class ContinuousTrie
 		{
-			std::vector<_TrieNode> nodes;
+			Vector<_TrieNode> nodes;
 
 		public:
 			using Node = _TrieNode;
@@ -370,7 +369,7 @@ namespace kiwi
 			{
 				if (nodes.capacity() < nodes.size() + n)
 				{
-					nodes.reserve(std::max(nodes.size() + n, nodes.capacity() + nodes.capacity() / 2));
+					nodes.reserve(std::max(nodes.size() + n, nodes.capacity() * 2));
 				}
 			}
 
@@ -406,7 +405,7 @@ namespace kiwi
 			Node* buildWithCaching(Cont& cont, Value&& val, CacheStore<Cont>& cache)
 			{
 				auto allocNode = [&]() { return newNode(); };
-				reserveMore(cont.size());
+				//reserveMore(cont.size());
 				
 				size_t commonPrefix = 0;
 				if (cache.cont)

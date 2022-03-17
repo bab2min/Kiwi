@@ -25,6 +25,17 @@
 #include "WordDetector.h"
 #include "TagUtils.h"
 
+namespace nonstd
+{
+	namespace sv_lite
+	{
+		template<class CharT,class Traits> class basic_string_view;
+	}
+
+	using string_view = sv_lite::basic_string_view<char, std::char_traits<char>>;
+	using u16string_view = sv_lite::basic_string_view<char16_t, std::char_traits<char16_t>>;
+}
+
 namespace kiwi
 {
 	struct KTrie;
@@ -50,8 +61,8 @@ namespace kiwi
 
 		TagSequenceScorer tagScorer;
 
-		std::vector<Form> forms;
-		std::vector<Morpheme> morphemes;
+		Vector<Form> forms;
+		Vector<Morpheme> morphemes;
 		utils::FrozenTrie<kchar_t, const Form*> formTrie;
 		std::shared_ptr<lm::KnLangModelBase> langMdl;
 		std::unique_ptr<utils::ThreadPool> pool;
@@ -312,7 +323,7 @@ namespace kiwi
 
 		void loadMorphBin(std::istream& is);
 		void saveMorphBin(std::ostream& os) const;
-		FormRaw& addForm(KString form);
+		FormRaw& addForm(const KString& form);
 		size_t addForm(Vector<FormRaw>& newForms, UnorderedMap<KString, size_t>& newFormMap, KString form) const;
 
 		using MorphemeMap = UnorderedMap<std::pair<KString, POSTag>, size_t>;
@@ -323,7 +334,16 @@ namespace kiwi
 		void updateMorphemes();
 
 		size_t findMorpheme(const std::u16string& form, POSTag tag) const;
+		
+		bool addWord(nonstd::u16string_view newForm, POSTag tag, float score, size_t origMorphemeId);
 		bool addWord(const std::u16string& newForm, POSTag tag, float score, size_t origMorphemeId);
+		bool addWord(nonstd::u16string_view form, POSTag tag = POSTag::nnp, float score = 0);
+		bool addWord(nonstd::u16string_view newForm, POSTag tag, float score, const std::u16string& origForm);
+		bool addPreAnalyzedWord(nonstd::u16string_view form,
+			const std::vector<std::pair<std::u16string, POSTag>>& analyzed,
+			std::vector<std::pair<size_t, size_t>> positions = {},
+			float score = 0
+		);
 
 		void addCombinedMorphemes(
 			Vector<FormRaw>& newForms, 

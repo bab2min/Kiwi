@@ -41,68 +41,9 @@ namespace kiwi
 		return 0x11A8 <= chr && chr < (0x11A7 + 28);
 	}
 
-	template<class It>
-	inline KString normalizeHangul(It first, It last)
+	inline std::ostream& operator <<(std::ostream& os, const KString& str)
 	{
-		KString ret;
-		ret.reserve((size_t)(std::distance(first, last) * 1.5));
-		for (; first != last; ++first)
-		{
-			char16_t c = *first;
-			if (c == 0xB42C) c = 0xB410;
-			if (0xAC00 <= c && c < 0xD7A4)
-			{
-				int coda = (c - 0xAC00) % 28;
-				ret.push_back(c - coda);
-				if (coda) ret.push_back(coda + 0x11A7);
-			}
-			else
-			{
-				ret.push_back(c);
-			}
-		}
-		return ret;
-	}
-
-	inline KString normalizeHangul(const std::u16string& hangul)
-	{
-		return normalizeHangul(hangul.begin(), hangul.end());
-	}
-
-	template<class It>
-	inline std::pair<KString, Vector<size_t>> normalizeHangulWithPosition(It first, It last)
-	{
-		KString ret;
-		Vector<size_t> pos;
-		ret.reserve((size_t)(std::distance(first, last) * 1.5));
-		for (; first != last; ++first)
-		{
-			auto c = *first;
-			pos.emplace_back(ret.size());
-			if (c == 0xB42C) c = 0xB410;
-			if (0xAC00 <= c && c < 0xD7A4)
-			{
-				int coda = (c - 0xAC00) % 28;
-				ret.push_back(c - coda);
-				if (coda) ret.push_back(coda + 0x11A7);
-			}
-			else
-			{
-				ret.push_back(c);
-			}
-		}
-		pos.emplace_back(ret.size());
-		return make_pair(move(ret), move(pos));
-	}
-
-	inline std::pair<KString, Vector<size_t>> normalizeHangulWithPosition(const std::u16string& hangul)
-	{
-		return normalizeHangulWithPosition(hangul.begin(), hangul.end());
-	}
-
-	inline KString normalizeHangul(const std::string& hangul)
-	{
-		return normalizeHangul(utf8To16(hangul));
+		return os << utf16To8({ str.begin(), str.end() });
 	}
 
 	inline std::u16string joinHangul(const KString& hangul)
@@ -122,77 +63,6 @@ namespace kiwi
 			}
 		}
 		return ret;
-	}
-
-	template<class BaseChr, class Trait, class Alloc, class OutIterator>
-	void split(const std::basic_string<BaseChr, Trait, Alloc>& s, BaseChr delim, OutIterator result)
-	{
-		size_t p = 0;
-		while (1)
-		{
-			size_t t = s.find(delim, p);
-			if (t == s.npos)
-			{
-				*(result++) = s.substr(p);
-				break;
-			}
-			else
-			{
-				*(result++) = s.substr(p, t - p);
-				p = t + 1;
-			}
-		}
-	}
-
-	template<class BaseChr, class Trait, class Alloc>
-	inline std::vector<std::basic_string<BaseChr, Trait, Alloc>> split(const std::basic_string<BaseChr, Trait, Alloc>& s, BaseChr delim)
-	{
-		std::vector<std::basic_string<BaseChr, Trait, Alloc>> elems;
-		split(s, delim, std::back_inserter(elems));
-		return elems;
-	}
-
-
-	template<class ChrIterator>
-	inline float stof(ChrIterator begin, ChrIterator end)
-	{
-		if (begin == end) return 0;
-		bool sign = false;
-		switch (*begin)
-		{
-		case '-':
-			sign = true;
-		case '+':
-			++begin;
-			break;
-		}
-		double up = 0, down = 0;
-		for (; begin != end; ++begin)
-		{
-			if ('0' <= *begin && *begin <= '9') up = up * 10 + (*begin - '0');
-			else break;
-		}
-		if (begin != end && *begin == '.')
-		{
-			++begin;
-			float d = 1;
-			for (; begin != end; ++begin)
-			{
-				if ('0' <= *begin && *begin <= '9')
-				{
-					down = down * 10 + (*begin - '0');
-					d /= 10;
-				}
-				else break;
-			}
-			up += down * d;
-		}
-		return up * (sign ? -1 : 1);
-	}
-
-	inline std::ostream& operator <<(std::ostream& os, const KString& str)
-	{
-		return os << utf16To8({ str.begin(), str.end() });
 	}
 
 	bool isClosingPair(char16_t c);

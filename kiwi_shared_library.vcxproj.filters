@@ -48,9 +48,6 @@
     <ClInclude Include="include\kiwi\ThreadPool.h">
       <Filter>Header Files\kiwi</Filter>
     </ClInclude>
-    <ClInclude Include="include\kiwi\BitEncoder.hpp">
-      <Filter>Header Files\kiwi</Filter>
-    </ClInclude>
     <ClInclude Include="include\kiwi\FixedVector.hpp">
       <Filter>Header Files\kiwi</Filter>
     </ClInclude>
@@ -109,6 +106,18 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="src\ArchAvailable.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\QEncoder.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BitEncoder.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\string_view.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\StrUtils.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
