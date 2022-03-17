@@ -771,7 +771,7 @@ size_t KiwiBuilder::loadDictionary(const string& dictPath)
 				{
 					throw Exception("[loadUserDictionary] Unknown Tag '" + utf16To8(fields[1]) + "' at line " + to_string(lineNo));
 				}
-				morphemes.emplace_back(m.substr(0, p), pos);
+				morphemes.emplace_back(m.substr(0, p).to_string(), pos);
 			}
 
 			if (morphemes.size() > 1)
