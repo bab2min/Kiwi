@@ -118,6 +118,25 @@ Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form
 			chrType = m.second;
 			if (chrType != POSTag::unknown)
 			{
+				if (lastChrType != POSTag::unknown)
+				{
+					// sequence of speical characters found
+					if (lastChrType != POSTag::max && !isWebTag(lastChrType))
+					{
+						auto it = spacePos.find(specialStartPos - 1);
+						int space = it == spacePos.end() ? 0 : it->second;
+						KGraphNode newNode{ KString{ &str[specialStartPos], n - specialStartPos }, (uint16_t)n };
+						for (auto& g : ret)
+						{
+							if (g.endPos != specialStartPos - space) continue;
+							newNode.addPrev(&ret.back() + 1 - &g);
+						}
+						ret.emplace_back(move(newNode));
+						ret.back().form = trie.value((size_t)lastChrType);
+					}
+					specialStartPos = n;
+				}
+
 				branchOut();
 				auto it = spacePos.find(n - 1);
 				int space = it == spacePos.end() ? 0 : it->second;
