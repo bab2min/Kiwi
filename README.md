@@ -14,7 +14,7 @@ Other:
 
 Kiwi는 빠른 속도와 범용적인 성능을 지향하는 한국어 형태소 분석기 라이브러리입니다. 한국어 자연어처리에 관심 있는 사람이면 누구나 쉽게 사용할 수 있도록 오픈 소스로 공개 중이며, C++로 구현된 코어 라이브러리를 래핑하여 다양한 프로그래밍 언어에 사용할 수 있도록 준비 중입니다. 
 
-형태소 분석은 세종 품사 태그 체계를 기반으로 하고 있으며 모델 학습에는 세종계획 말뭉치와 모두의 말뭉치를 사용하고 있습니다. 문어 텍스트의 경우 약 94% 정도의 정확도로 한국어 문장의 형태소를 분석해 낼 수 있습니다.
+형태소 분석은 세종 품사 태그 체계를 기반으로 하고 있으며 모델 학습에는 세종계획 말뭉치와 모두의 말뭉치를 사용하고 있습니다. 웹 텍스트의 경우 약 87%, 문어 텍스트의 경우 약 94% 정도의 정확도로 한국어 문장의 형태소를 분석해 낼 수 있습니다.
 
 또한 라이브러리 차원에서 멀티스레딩을 지원하기 때문에 대량의 텍스트를 분석해야할 경우 멀티코어를 활용하여 빠른 분석이 가능합니다.
 
@@ -68,24 +68,24 @@ $ ldconfig
 ```console
 $ ./kiwi-evaluator --model ../ModelGenerator ../eval_data/web.txt ../eval_data/written.txt
 
-Loading Time : 841.122 ms
-LM Size : 32.8576 MB
-Mem Usage : 288.27 MB
+Loading Time : 838.809 ms
+LM Size : 32.1909 MB
+Mem Usage : 427.664 MB
 
 Test file: eval_data/web.txt
-0.871109, 0.855246
-Total (108 lines) Time : 130 ms
-Time per Line : 1.2037 ms
+0.870123, 0.856707
+Total (108 lines) Time : 143.519 ms
+Time per Line : 1.32888 ms
 ================
 Test file: eval_data/written.txt
-0.94, 0.940363
-Total (33 lines) Time : 63.5559 ms
-Time per Line : 1.92594 ms
+0.941176, 0.941059
+Total (33 lines) Time : 56.5635 ms
+Time per Line : 1.71404 ms
 ================
 
 ================
 Avg Score
-0.905555, 0.897805
+0.90565, 0.898883
 ================
 ```
 
@@ -116,7 +116,13 @@ https://github.com/bab2min/kiwi-gui 에서 다운받을 수 있습니다.
 
 ## 업데이트 내역
 * v0.11
-  
+  * 이용자 사전을 관리하는 메소드 `kiwi::Kiwi::addPreAnalyzedWord`, `kiwi::Kiwi::addRule`가 추가되었습니다.
+  * 분석 시 접두사/접미사 및 동/형용사 전성어미의 분리여부를 선택할 수 있는 옵션 `kiwi::Match::joinNounPrefix`, `kiwi::Match::joinNounSuffix`, `kiwi::Match::joinVerbSuffix`, `kiwi::Match::joinAdjSuffix`가 추가되었습니다.
+  * 결합된 형태소 `kiwi::TokenInfo`의 `position`, `length`가 부정확한 버그를 수정했습니다.
+  * 이제 형태소 결합 규칙이 Kiwi 모델 내로 통합되어 `kiwi::Kiwi::addWord`로 추가된 동/형용사의 활용형도 정상적으로 분석이 됩니다.
+  * 언어 모델의 압축 알고리즘을 개선하여 초기 로딩 속도를 높였습니다.
+  * SIMD 최적화가 개선되었습니다.
+  * 언어 모델 및 기본 사전을 업데이트하여 전반적인 정확도를 높였습니다.
 
 * v0.10
   * 소스 코드 리팩토링. 인터페이스를 `kiwi::KiwiBuilder`(분석기 사전을 관리)와 `kiwi::Kiwi`(실제 형태소 분석을 수행)로 분할
