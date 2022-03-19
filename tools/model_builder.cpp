@@ -37,6 +37,7 @@ int main(int argc, const char* argv[])
 	SwitchArg compress{ "", "compress", "compress LM" };
 	SwitchArg quantize{ "", "quantize", "quantize LM" };
 	SwitchArg tagHistory{ "", "history", "use tag history of LM" };
+	ValueArg<size_t> workers{ "w", "workers", "number of workers", false, 1, "int" };
 	ValueArg<size_t> morMinCnt{ "", "morpheme_min_cnt", "min count of morpheme", false, 10, "int" };
 	ValueArg<size_t> lmOrder{ "", "order", "order of LM", false, 4, "int" };
 	ValueArg<size_t> lmMinCnt{ "", "min_cnt", "min count of LM", false, 1, "int" };
@@ -54,6 +55,7 @@ int main(int argc, const char* argv[])
 	cmd.add(lmOrder);
 	cmd.add(lmMinCnt);
 	cmd.add(lmLastOrderMinCnt);
+	cmd.add(workers);
 
 	try
 	{
@@ -74,6 +76,7 @@ int main(int argc, const char* argv[])
 	args.lmOrder = lmOrder;
 	args.lmMinCnt = lmMinCnt;
 	args.lmLastOrderMinCnt = lmLastOrderMinCnt;
+	args.numWorkers = workers;
 	return run(args, output);
 }
 

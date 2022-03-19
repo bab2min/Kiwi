@@ -61,8 +61,8 @@
   <ItemGroup>
     <ClCompile Include="test_QEncoder.cpp" />
     <ClCompile Include="bit_encode.cpp" />
-    <ClCompile Include="test_c.cpp" />
     <ClCompile Include="test_cpp.cpp" />
+    <ClCompile Include="test_c.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common.h" />

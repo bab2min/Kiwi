@@ -27,37 +27,44 @@ int doEvaluate(const string& modelPath, const string& output, const vector<strin
 		for (auto& tf : input)
 		{
 			cout << "Test file: " << tf << endl;
-			Evaluator test{ tf, &kw };
-			tutils::Timer total;
-			test.run();
-			double tm = total.getElapsed();
-			auto result = test.evaluate();
-
-			cout << result.micro << ", " << result.macro << endl;
-			cout << "Total (" << result.totalCount << " lines) Time : " << tm << " ms" << endl;
-			cout << "Time per Line : " << tm / result.totalCount << " ms" << endl;
-
-			avgMicro += result.micro;
-			avgMacro += result.macro;
-			cnt++;
-
-			if (!output.empty())
+			try
 			{
-				const size_t last_slash_idx = tf.find_last_of("\\/");
-				string name;
-				if (last_slash_idx != tf.npos) name = tf.substr(last_slash_idx + 1);
-				else name = tf;
+				Evaluator test{ tf, &kw };
+				tutils::Timer total;
+				test.run();
+				double tm = total.getElapsed();
+				auto result = test.evaluate();
 
-				ofstream out{ output + "/" + name };
-				out << result.micro << ", " << result.macro << endl;
-				out << "Total (" << result.totalCount << ") Time : " << tm << " ms" << endl;
-				out << "Time per Unit : " << tm / result.totalCount << " ms" << endl;
-				for (auto t : test.getErrors())
+				cout << result.micro << ", " << result.macro << endl;
+				cout << "Total (" << result.totalCount << " lines) Time : " << tm << " ms" << endl;
+				cout << "Time per Line : " << tm / result.totalCount << " ms" << endl;
+
+				avgMicro += result.micro;
+				avgMacro += result.macro;
+				cnt++;
+
+				if (!output.empty())
 				{
-					t.writeResult(out);
+					const size_t last_slash_idx = tf.find_last_of("\\/");
+					string name;
+					if (last_slash_idx != tf.npos) name = tf.substr(last_slash_idx + 1);
+					else name = tf;
+
+					ofstream out{ output + "/" + name };
+					out << result.micro << ", " << result.macro << endl;
+					out << "Total (" << result.totalCount << ") Time : " << tm << " ms" << endl;
+					out << "Time per Unit : " << tm / result.totalCount << " ms" << endl;
+					for (auto t : test.getErrors())
+					{
+						t.writeResult(out);
+					}
 				}
+				cout << "================" << endl;
 			}
-			cout << "================" << endl;
+			catch (const std::exception& e)
+			{
+				cerr << e.what() << endl;
+			}
 		}
 
 		cout << endl << "================" << endl;
