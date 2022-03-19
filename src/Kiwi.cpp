@@ -7,7 +7,6 @@
 #include "ArchAvailable.h"
 #include "KTrie.h"
 #include "FeatureTestor.h"
-#include "logPoisson.h"
 #include "FrozenTrie.hpp"
 #include "Knlm.hpp"
 #include "StrUtils.h"
@@ -533,10 +532,7 @@ namespace kiwi
 			if (unknownForm)
 			{
 				size_t unknownLen = node->uform.empty() ? node->form->form.size() : node->uform.size();
-				if (curMorph->tag == POSTag::nng) estimatedLL = LogPoisson::getLL(4.622955f, unknownLen);
-				else if (curMorph->tag == POSTag::nnp) estimatedLL = LogPoisson::getLL(5.177622f, unknownLen);
-				else if (curMorph->tag == POSTag::mag) estimatedLL = LogPoisson::getLL(4.557326f, unknownLen);
-				estimatedLL -= 5 + unknownLen * 3;
+				estimatedLL -= unknownLen * kw->unkFormScoreScale + kw->unkFormScoreBias;
 			}
 
 			float discountForCombining = 0;
@@ -902,7 +898,7 @@ namespace kiwi
 		// 분석할 문장에 포함된 개별 문자에 대해 어절번호를 생성한다
 		std::vector<uint16_t> wordPositions = getWordPositions(sBegin, sEnd);
 		
-		auto nodes = (*reinterpret_cast<FnSplitByTrie>(dfSplitByTrie))(formTrie, normalizedStr, matchOptions);
+		auto nodes = (*reinterpret_cast<FnSplitByTrie>(dfSplitByTrie))(formTrie, normalizedStr, matchOptions, maxUnkFormSize);
 		vector<TokenResult> ret;
 		if (nodes.size() <= 2)
 		{

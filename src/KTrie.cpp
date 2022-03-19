@@ -11,7 +11,7 @@ using namespace std;
 using namespace kiwi;
 
 template<ArchType arch>
-Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form*>& trie, const KString& str, Match matchOptions)
+Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form*>& trie, const KString& str, Match matchOptions, size_t maxUnkFormSize)
 {
 	Vector<KGraphNode> ret;
 	ret.reserve(8);
@@ -39,19 +39,24 @@ Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form
 				});
 
 				// insert unknown form 
-				if (nBegin > lastSpecialEndPos && !longestMatched 
-					&& !(0x11A8 <= cand->form[0] && cand->form[0] < (0x11A7 + 28)) 
+				if (maxUnkFormSize
+					&& nBegin > lastSpecialEndPos && !longestMatched
+					&& !isHangulCoda(cand->form[0])
 					&& str[nBegin - space - 1] != 0x11BB) // cannot end with ¤¶
 				{
 					auto it2 = spacePos.find(lastSpecialEndPos - 1);
 					int space2 = it2 == spacePos.end() ? 0 : it2->second;
-					KGraphNode newNode{ str.substr(lastSpecialEndPos, nBegin - space - lastSpecialEndPos), (uint16_t)(nBegin - space) };
-					for (auto& g : ret)
+					size_t newNodeLength = nBegin - space - lastSpecialEndPos;
+					if (newNodeLength <= maxUnkFormSize)
 					{
-						if (g.endPos != lastSpecialEndPos - space2) continue;
-						newNode.addPrev(&ret.back() + 1 - &g);
+						KGraphNode newNode{ str.substr(lastSpecialEndPos, newNodeLength), (uint16_t)(nBegin - space) };
+						for (auto& g : ret)
+						{
+							if (g.endPos != lastSpecialEndPos - space2) continue;
+							newNode.addPrev(&ret.back() + 1 - &g);
+						}
+						ret.emplace_back(move(newNode));
 					}
-					ret.emplace_back(move(newNode));
 				}
 
 				// if special character

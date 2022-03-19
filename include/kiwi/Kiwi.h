@@ -58,6 +58,9 @@ namespace kiwi
 
 		bool integrateAllomorph = true;
 		float cutOffThreshold = 5;
+		float unkFormScoreScale = 3;
+		float unkFormScoreBias = 5;
+		size_t maxUnkFormSize = 6;
 
 		TagSequenceScorer tagScorer;
 
@@ -279,6 +282,36 @@ namespace kiwi
 			cutOffThreshold = v;
 		}
 
+		float getUnkScoreBias() const
+		{
+			return unkFormScoreBias;
+		}
+
+		void setUnkScoreBias(float v)
+		{
+			unkFormScoreBias = v;
+		}
+
+		float getUnkScoreScale() const
+		{
+			return unkFormScoreScale;
+		}
+
+		void setUnkScoreScale(float v)
+		{
+			unkFormScoreScale = v;
+		}
+
+		size_t getMaxUnkFormSize() const
+		{
+			return maxUnkFormSize;
+		}
+
+		void setMaxUnkFormSize(size_t v)
+		{
+			maxUnkFormSize = v;
+		}
+
 		bool getIntegrateAllomorph() const
 		{
 			return integrateAllomorph;
@@ -370,6 +403,7 @@ namespace kiwi
 			size_t lmOrder = 4;
 			size_t lmMinCnt = 1;
 			size_t lmLastOrderMinCnt = 2;
+			size_t numWorkers = 1;
 			bool useLmTagHistory = true;
 			bool quantizeLm = true;
 			bool compressLm = true;
