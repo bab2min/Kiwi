@@ -125,3 +125,4 @@ namespace kiwi
 		size_t strSize() const { return distance(mBegin, mChunk); }
 	};
 }
+

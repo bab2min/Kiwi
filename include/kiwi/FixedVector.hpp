@@ -165,3 +165,4 @@ namespace kiwi
 		const Ty2& getSecond(size_t i) const { return dataSecond()[i]; }
 	};
 }
+
