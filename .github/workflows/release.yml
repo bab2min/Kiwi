@@ -159,7 +159,7 @@ jobs:
       with:
         upload_url: ${{ steps.get_release.outputs.upload_url }}
         asset_path: model.tgz
-        asset_name: kiwi_model_${{ steps.get_release.outputs.tag_name }}.tgz
+        asset_name: kiwi_model_${{ steps.get_release.outputs.tag_name }}_base.tgz
         asset_content_type: application/octet-stream
 
   build-windows:
