@@ -123,6 +123,7 @@ namespace kiwi
 		{
 			none = 0,
 			ef,
+			efjx,
 			sf,
 		} state = State::none;
 
@@ -143,8 +144,20 @@ namespace kiwi
 				}
 				break;
 			case State::ef:
+			case State::efjx:
 				switch (t.tag)
 				{
+				case POSTag::jx:
+					if (state == State::ef)
+					{
+						state = State::efjx;
+					}
+					else
+					{
+						sentPos++;
+						state = State::none;
+					}
+					break;
 				case POSTag::so:
 				case POSTag::sw:
 				case POSTag::sh:
