@@ -257,8 +257,12 @@ https://github.com/bab2min/kiwipiepy/blob/master/evaluate.py 를 통해 직접 �
 
 ## 성능
 
-* 비문학(신문기사): 0.928
-* 문학작품: 0.960
+<table>
+<tr><th>모델(파일 크기)</th> <th>웹</th> <th>정제된 웹</th> <th>신문기사</th> <th>문학작품</th> </tr>
+<tr><th>소형(15.5MB)</th> <td>87.35</td> <td>93.23</td> <td>89.95</td> <td>95.42</td></tr>
+<tr><th>중형(38.5MB)</th> <td>87.01</td> <td>94.12</td> <td>91.57</td> <td>96.92</td></tr>
+<tr><th>대형(MB)</th> <td></td> <td></td> <td></td> <td></td></tr>
+</table>
 
 결과 예시
 
