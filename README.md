@@ -117,7 +117,7 @@ https://github.com/bab2min/kiwi-gui 에서 다운받을 수 있습니다.
 ## 업데이트 내역
 * v0.11
   * 이용자 사전을 관리하는 메소드 `kiwi::Kiwi::addPreAnalyzedWord`, `kiwi::Kiwi::addRule`가 추가되었습니다.
-  * 분석 시 접두사/접미사 및 동/형용사 전성어미의 분리여부를 선택할 수 있는 옵션 `kiwi::Match::joinNounPrefix`, `kiwi::Match::joinNounSuffix`, `kiwi::Match::joinVerbSuffix`, `kiwi::Match::joinAdjSuffix`가 추가되었습니다.
+  * 분석 시 접두사/접미사 및 동/형용사 파생접미사의 분리여부를 선택할 수 있는 옵션 `kiwi::Match::joinNounPrefix`, `kiwi::Match::joinNounSuffix`, `kiwi::Match::joinVerbSuffix`, `kiwi::Match::joinAdjSuffix`가 추가되었습니다.
   * 결합된 형태소 `kiwi::TokenInfo`의 `position`, `length`가 부정확한 버그를 수정했습니다.
   * 이제 형태소 결합 규칙이 Kiwi 모델 내로 통합되어 `kiwi::Kiwi::addWord`로 추가된 동/형용사의 활용형도 정상적으로 분석이 됩니다.
   * 언어 모델의 압축 알고리즘을 개선하여 초기 로딩 속도를 높였습니다.
