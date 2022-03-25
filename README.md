@@ -12,11 +12,9 @@ Other:
 [![Action Status ARM64](https://github.com/bab2min/Kiwi/workflows/Arm64-Centos7/badge.svg)](https://github.com/bab2min/Kiwi/actions)
 [![Action Status PPC64LE](https://github.com/bab2min/Kiwi/workflows/PPC64LE-Centos7/badge.svg)](https://github.com/bab2min/Kiwi/actions)
 
-Kiwi는 빠른 속도와 범용적인 성능을 지향하는 한국어 형태소 분석기 라이브러리입니다. 한국어 자연어처리에 관심 있는 사람이면 누구나 쉽게 사용할 수 있도록 오픈 소스로 공개 중이며, C++로 구현된 코어 라이브러리를 래핑하여 다양한 프로그래밍 언어에 사용할 수 있도록 준비 중입니다. 
+Kiwi는 빠른 속도와 범용적인 성능을 지향하는 한국어 형태소 분석기 라이브러리입니다. 한국어 처리에 관심 있는 사람이면 누구나 쉽게 사용할 수 있도록 오픈 소스로 공개 중이며, C++로 구현된 코어 라이브러리를 래핑하여 다양한 프로그래밍 언어에 사용할 수 있도록 준비 중입니다. 
 
 형태소 분석은 세종 품사 태그 체계를 기반으로 하고 있으며 모델 학습에는 세종계획 말뭉치와 모두의 말뭉치를 사용하고 있습니다. 웹 텍스트의 경우 약 87%, 문어 텍스트의 경우 약 94% 정도의 정확도로 한국어 문장의 형태소를 분석해 낼 수 있습니다.
-
-또한 라이브러리 차원에서 멀티스레딩을 지원하기 때문에 대량의 텍스트를 분석해야할 경우 멀티코어를 활용하여 빠른 분석이 가능합니다.
 
 아직 부족한 부분이 많기에 개발자분들의 많은 관심과 기여 부탁드립니다.
 
@@ -24,17 +22,17 @@ Kiwi는 빠른 속도와 범용적인 성능을 지향하는 한국어 형태소
 
 ![속도](https://bab2min.github.io/kiwipiepy/images/TokenizeSpeed.PNG)
 
-텍스트 분석 속도가 다른 한국어 형태소분석기들과 비교하여 꽤 빠른 편입니다.
+텍스트 분석 속도가 다른 한국어 형태소분석기들과 비교하여 꽤 빠른 편입니다. (속도 측정은 [이 코드](https://github.com/bab2min/kiwipiepy/blob/main/evaluate.py)를 통해 수행 가능합니다. )
 
 ![모호성 해소 성능](https://bab2min.github.io/kiwipiepy/images/DisambAcc.PNG)
 
-또한 자체적으로 경량 언어모델을 탑재하여 모호성이 있는 경우에도 제법 정확하게 형태소를 분석해냅니다.
+또한 자체적으로 경량 언어모델을 탑재하여 모호성이 있는 경우에도 제법 정확하게 형태소를 분석해냅니다. (모호성 해소 성능 평가는 [이 페이지](https://github.com/bab2min/kiwipiepy/tree/main/benchmark/disambiguate)에서 수행가능합니다. )
 
 ![문장 분리 성능](https://bab2min.github.io/kiwipiepy/images/SentSplit_EM.PNG)
 
-문장 분리 기능을 비롯한 다양한 편의기능을 제공합니다.
+문장 분리 기능을 비롯한 다양한 편의기능을 제공합니다.  (문장 분리 성능 평가는 [이 페이지](https://github.com/bab2min/kiwipiepy/tree/main/benchmark/sentence_split)에서 수행가능합니다. )
 
-또한 다양한 시스템에서 상황에 맞춰 선택할 수 있도록 소형/중형/대형 모델을 제공합니다.
+라이브러리 차원에서 멀티스레딩을 지원하기 때문에 대량의 텍스트를 분석해야할 경우 멀티코어를 활용하여 빠른 분석이 가능합니다. 또한 다양한 시스템에서 상황에 맞춰 선택할 수 있도록 소형/중형/대형 모델을 제공합니다.
 
 ## 설치
 
