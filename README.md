@@ -12,13 +12,27 @@ Other:
 [![Action Status ARM64](https://github.com/bab2min/Kiwi/workflows/Arm64-Centos7/badge.svg)](https://github.com/bab2min/Kiwi/actions)
 [![Action Status PPC64LE](https://github.com/bab2min/Kiwi/workflows/PPC64LE-Centos7/badge.svg)](https://github.com/bab2min/Kiwi/actions)
 
-Kiwi는 빠른 속도와 범용적인 성능을 지향하는 한국어 형태소 분석기 라이브러리입니다. 한국어 자연어처리에 관심 있는 사람이면 누구나 쉽게 사용할 수 있도록 오픈 소스로 공개 중이며, C++로 구현된 코어 라이브러리를 래핑하여 다양한 프로그래밍 언어에 사용할 수 있도록 준비 중입니다. 
+Kiwi는 빠른 속도와 범용적인 성능을 지향하는 한국어 형태소 분석기 라이브러리입니다. 한국어 처리에 관심 있는 사람이면 누구나 쉽게 사용할 수 있도록 오픈 소스로 공개 중이며, C++로 구현된 코어 라이브러리를 래핑하여 다양한 프로그래밍 언어에 사용할 수 있도록 준비 중입니다. 
 
-형태소 분석은 세종 품사 태그 체계를 기반으로 하고 있으며 모델 학습에는 세종계획 말뭉치와 모두의 말뭉치를 사용하고 있습니다. 문어 텍스트의 경우 약 94% 정도의 정확도로 한국어 문장의 형태소를 분석해 낼 수 있습니다.
-
-또한 라이브러리 차원에서 멀티스레딩을 지원하기 때문에 대량의 텍스트를 분석해야할 경우 멀티코어를 활용하여 빠른 분석이 가능합니다.
+형태소 분석은 세종 품사 태그 체계를 기반으로 하고 있으며 모델 학습에는 세종계획 말뭉치와 모두의 말뭉치를 사용하고 있습니다. 웹 텍스트의 경우 약 87%, 문어 텍스트의 경우 약 94% 정도의 정확도로 한국어 문장의 형태소를 분석해 낼 수 있습니다.
 
 아직 부족한 부분이 많기에 개발자분들의 많은 관심과 기여 부탁드립니다.
+
+## 특징
+
+![속도](https://bab2min.github.io/kiwipiepy/images/TokenizeSpeed.PNG)
+
+텍스트 분석 속도가 다른 한국어 형태소분석기들과 비교하여 꽤 빠른 편입니다. (속도 측정은 [이 코드](https://github.com/bab2min/kiwipiepy/blob/main/evaluate.py)를 통해 수행 가능합니다. )
+
+![모호성 해소 성능](https://bab2min.github.io/kiwipiepy/images/DisambAcc.PNG)
+
+또한 자체적으로 경량 언어모델을 탑재하여 모호성이 있는 경우에도 제법 정확하게 형태소를 분석해냅니다. (모호성 해소 성능 평가는 [이 페이지](https://github.com/bab2min/kiwipiepy/tree/main/benchmark/disambiguate)에서 수행가능합니다. )
+
+![문장 분리 성능](https://bab2min.github.io/kiwipiepy/images/SentSplit_EM.PNG)
+
+문장 분리 기능을 비롯한 다양한 편의기능을 제공합니다.  (문장 분리 성능 평가는 [이 페이지](https://github.com/bab2min/kiwipiepy/tree/main/benchmark/sentence_split)에서 수행가능합니다. )
+
+라이브러리 차원에서 멀티스레딩을 지원하기 때문에 대량의 텍스트를 분석해야할 경우 멀티코어를 활용하여 빠른 분석이 가능합니다. 또한 다양한 시스템에서 상황에 맞춰 선택할 수 있도록 소형/중형/대형 모델을 제공합니다.
 
 ## 설치
 
@@ -68,24 +82,24 @@ $ ldconfig
 ```console
 $ ./kiwi-evaluator --model ../ModelGenerator ../eval_data/web.txt ../eval_data/written.txt
 
-Loading Time : 841.122 ms
-LM Size : 32.8576 MB
-Mem Usage : 288.27 MB
+Loading Time : 838.809 ms
+LM Size : 32.1909 MB
+Mem Usage : 427.664 MB
 
 Test file: eval_data/web.txt
-0.871109, 0.855246
-Total (108 lines) Time : 130 ms
-Time per Line : 1.2037 ms
+0.870123, 0.856707
+Total (108 lines) Time : 143.519 ms
+Time per Line : 1.32888 ms
 ================
 Test file: eval_data/written.txt
-0.94, 0.940363
-Total (33 lines) Time : 63.5559 ms
-Time per Line : 1.92594 ms
+0.941176, 0.941059
+Total (33 lines) Time : 56.5635 ms
+Time per Line : 1.71404 ms
 ================
 
 ================
 Avg Score
-0.905555, 0.897805
+0.90565, 0.898883
 ================
 ```
 
@@ -116,7 +130,13 @@ https://github.com/bab2min/kiwi-gui 에서 다운받을 수 있습니다.
 
 ## 업데이트 내역
 * v0.11
-  
+  * 이용자 사전을 관리하는 메소드 `kiwi::Kiwi::addPreAnalyzedWord`, `kiwi::Kiwi::addRule`가 추가되었습니다.
+  * 분석 시 접두사/접미사 및 동/형용사 파생접미사의 분리여부를 선택할 수 있는 옵션 `kiwi::Match::joinNounPrefix`, `kiwi::Match::joinNounSuffix`, `kiwi::Match::joinVerbSuffix`, `kiwi::Match::joinAdjSuffix`가 추가되었습니다.
+  * 결합된 형태소 `kiwi::TokenInfo`의 `position`, `length`가 부정확한 버그를 수정했습니다.
+  * 이제 형태소 결합 규칙이 Kiwi 모델 내로 통합되어 `kiwi::Kiwi::addWord`로 추가된 동/형용사의 활용형도 정상적으로 분석이 됩니다.
+  * 언어 모델의 압축 알고리즘을 개선하여 초기 로딩 속도를 높였습니다.
+  * SIMD 최적화가 개선되었습니다.
+  * 언어 모델 및 기본 사전을 업데이트하여 전반적인 정확도를 높였습니다.
 
 * v0.10
   * 소스 코드 리팩토링. 인터페이스를 `kiwi::KiwiBuilder`(분석기 사전을 관리)와 `kiwi::Kiwi`(실제 형태소 분석을 수행)로 분할
@@ -227,51 +247,33 @@ https://github.com/bab2min/kiwi-gui 에서 다운받을 수 있습니다.
 
 <sup>*</sup> 세종 품사 태그와 다른 독자적인 태그입니다.
 
-
-
-## 다른 형태소 분석기와의 비교
-다음의 성능 평가는 konlpy-0.5.1에 포함된 Hannanum, Kkma, Komoran, Okt를 Kiwi와 비교한 것입니다.
-
-평가는 AMD Ryzen 7 3700X @3.6GHz, RAM 32GB, Windows 10(64bit) 환경에서 진행되었습니다.
-
-![형태소 분석기 실행 속도 비교](/KiwiChart.PNG)
-
-| | Loading | 1 | 10 | 100 | 1000 | 10000 | 100000 |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-**Hannanum** | 0.434 | 0.003 | 0.005 | 0.015 | 0.055 | 0.424 | 5.360
-**Kkma** | 2.481 | 0.004 | 0.062 | 0.087 | 0.348 | 2.058 | 21.054
-**Komoran** | 1.068 | 0.005 | 0.003 | 0.009 | 0.045 | 0.469 | 17.974
-**Okt** | 1.787 | 0.005 | 0.023 | 0.040 | 0.094 | 0.376 | 2.527
-**Kiwi** | **1.009** | **0.002** | **0.002** | **0.004** | **0.029** | **0.137** | **1.361**
-
-Kiwi의 로딩 시간 및 처리 속도는 기존의 분석기들과 비교할 때 매우 빠른 편임을 확인할 수 있습니다.
-
-위의 성능 평가는
-https://github.com/bab2min/kiwipiepy/blob/master/evaluate.py 를 통해 직접 실시해볼 수 있습니다.
-
 ## 성능
 
-* 비문학(신문기사): 0.928
-* 문학작품: 0.960
+<table>
+<tr><th>모델(파일 크기)</th> <th>웹</th> <th>정제된 웹</th> <th>신문기사</th> <th>문학작품</th> </tr>
+<tr><th>소형(15.5MB)</th> <td>87.35</td> <td>93.23</td> <td>89.95</td> <td>95.42</td></tr>
+<tr><th>중형(38.5MB)</th> <td>87.01</td> <td>94.12</td> <td>91.57</td> <td>96.92</td></tr>
+<tr><th>대형(87.3MB)</th> <td>87.08</td> <td>93.70</td> <td>92.54</td> <td>97.96</td></tr>
+</table>
 
-결과 예시
+**결과 예시**
+```text
+프랑스의 세계적인 의상 디자이너 엠마누엘 웅가로가 실내 장식용 직물 디자이너로 나섰다.
+(정답) 프랑스/NNP	의/JKG	세계/NNG	적/XSN	이/VCP	ㄴ/ETM	의상/NNG	디자이너/NNG	엠마누엘/NNP	웅가로/NNP	가/JKS	실내/NNG	장식/NNG	용/XSN	직물/NNG	디자이너/NNG	로/JKB	나서/VV	었/EP	다/EF	./SF
+(Kiwi) 프랑스/NNP	의/JKG	세계/NNG	적/XSN	이/VCP	ᆫ/ETM	의상/NNG	디자이너/NNG	엠마누/NNP	에/JKB	ᆯ/JKO	웅가로/NNP	가/JKS	실내/NNG	장식/NNG	용/XSN	직물/NNG	디자이너/NNG	로/JKB	나서/VV	었/EP	다/EF	./SF
 
-    프랑스의 세계적인 의상 디자이너 엠마누엘 웅가로가 실내 장식용 직물 디자이너로 나섰다.
-    (정답) 프랑스/NNP	의/JKG	세계/NNG	적/XSN	이/VCP	ㄴ/ETM	의상/NNG	디자이너/NNG	엠마누엘/NNP	웅가로/NNP	가/JKS	실내/NNG	장식/NNG	용/XSN	직물/NNG	디자이너/NNG	로/JKB	나서/VV	었/EP	다/EF	./SF
-    (Kiwi) 프랑스/NNP	의/JKG	세계/NNG	적/XSN	이/VCP	ᆫ/ETM	의상/NNG	디자이너/NNG	엠마누/NNP	에/JKB	ᆯ/JKO	웅가로/NNP	가/JKS	실내/NNG	장식/NNG	용/XSN	직물/NNG	디자이너/NNG	로/JKB	나서/VV	었/EP	다/EF	./SF
-    
-    둥글둥글한 돌은 아무리 굴러도 흔적이 남지 않습니다.
-    (정답) 둥글둥글/MAG	하/XSA	ㄴ/ETM	돌/NNG	은/JX	아무리/MAG	구르/VV	어도/EC	흔적/NNG	이/JKS	남/VV	지/EC	않/VX	습니다/EF	./SF
-    (Kiwi) 둥글둥글/MAG	하/XSA	ᆫ/ETM	돌/NNG	은/JX	아무리/MAG	구르/VV	어도/EC	흔적/NNG	이/JKS	남/VV	지/EC	않/VX	습니다/EF	./SF
+둥글둥글한 돌은 아무리 굴러도 흔적이 남지 않습니다.
+(정답) 둥글둥글/MAG	하/XSA	ㄴ/ETM	돌/NNG	은/JX	아무리/MAG	구르/VV	어도/EC	흔적/NNG	이/JKS	남/VV	지/EC	않/VX	습니다/EF	./SF
+(Kiwi) 둥글둥글/MAG	하/XSA	ᆫ/ETM	돌/NNG	은/JX	아무리/MAG	구르/VV	어도/EC	흔적/NNG	이/JKS	남/VV	지/EC	않/VX	습니다/EF	./SF
 
-	하늘을 훨훨 나는 새처럼
-	(정답) 하늘/NNG	을/JKO	훨훨/MAG	날/VV	는/ETM	새/NNG	처럼/JKB
-	(Kiwi) 하늘/NNG	을/JKO	훨훨/MAG	날/VV	는/ETM	새/NNG	처럼/JKB
+하늘을 훨훨 나는 새처럼
+(정답) 하늘/NNG	을/JKO	훨훨/MAG	날/VV	는/ETM	새/NNG	처럼/JKB
+(Kiwi) 하늘/NNG	을/JKO	훨훨/MAG	날/VV	는/ETM	새/NNG	처럼/JKB
 
-	아버지가방에들어가신다
-	(정답) 아버지/NNG	가/JKS	방/NNG	에/JKB	들어가/VV	시/EP	ㄴ다/EF
-	(Kiwi) 아버지/NNG	가/JKS	방/NNG	에/JKB	들어가/VV	시/EP	ᆫ다/EC
-
+아버지가방에들어가신다
+(정답) 아버지/NNG	가/JKS	방/NNG	에/JKB	들어가/VV	시/EP	ㄴ다/EF
+(Kiwi) 아버지/NNG	가/JKS	방/NNG	에/JKB	들어가/VV	시/EP	ᆫ다/EC
+```
 ## 데모
 
 https://lab.bab2min.pe.kr/kiwi 에서 데모를 실행해 볼 수 있습니다.

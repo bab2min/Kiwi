@@ -2,8 +2,8 @@
  * @file capi.h
  * @author bab2min (bab2min@gmail.com)
  * @brief Kiwi C API를 담고 있는 헤더 파일
- * @version 0.10.0
- * @date 2021-08-31
+ * @version 0.11.0
+ * @date 2022-03-19
  * 
  * 
  */
@@ -67,8 +67,8 @@ typedef int(*kiwi_builder_replacer_t)(const char*, int, char*, void*);
 
 enum
 {
-	KIWI_BUILD_LOAD_DEFAULT_DICT = 1,
-	KIWI_BUILD_INTEGRATE_ALLOMORPH = 2,
+	KIWI_BUILD_INTEGRATE_ALLOMORPH = 1,
+	KIWI_BUILD_LOAD_DEFAULT_DICT = 2,
 	KIWI_BUILD_DEFAULT = 3,
 };
 
@@ -482,6 +482,16 @@ DECL_DLL int kiwi_res_length(kiwi_res_h result, int index, int num);
  * @return
  */
 DECL_DLL int kiwi_res_word_position(kiwi_res_h result, int index, int num);
+
+/**
+ * @brief
+ *
+ * @param result
+ * @param index
+ * @param num
+ * @return
+ */
+DECL_DLL int kiwi_res_sent_position(kiwi_res_h result, int index, int num);
 
 /**
  * @brief 

@@ -69,9 +69,6 @@
     <ClInclude Include="src\KTrie.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\logPoisson.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\pattern.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>

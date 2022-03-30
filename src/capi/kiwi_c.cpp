@@ -668,6 +668,21 @@ int kiwi_res_word_position(kiwi_res_h result, int index, int num)
 	}
 }
 
+int kiwi_res_sent_position(kiwi_res_h result, int index, int num)
+{
+	if (!result) return -1;
+	try
+	{
+		if (index < 0 || index >= result->first.size() || num < 0 || num >= result->first[index].first.size()) return -1;
+		return result->first[index].first[num].sentPosition;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return KIWIERR_FAIL;
+	}
+}
+
 int kiwi_res_close(kiwi_res_h result)
 {
 	if (!result) return KIWIERR_INVALID_HANDLE;

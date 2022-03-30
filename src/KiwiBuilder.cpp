@@ -31,11 +31,11 @@ KiwiBuilder& KiwiBuilder::operator=(KiwiBuilder&&) noexcept = default;
 template<class Fn>
 auto KiwiBuilder::loadMorphemesFromTxt(std::istream&& is, Fn&& filter) -> MorphemeMap
 {
-	Vector<tuple<KString, float, POSTag, CondVowel>> longTails;
+	Vector<tuple<KString, float, POSTag, CondVowel, KString, int>> longTails;
 	UnorderedMap<POSTag, float> longTailWeights;
-	MorphemeMap morphMap, ret;
+	MorphemeMap morphMap;
 
-	const auto& insertMorph = [&](KString&& form, float score, POSTag tag, CondVowel cvowel)
+	const auto& insertMorph = [&](KString&& form, float score, POSTag tag, CondVowel cvowel, size_t origMorphemeId = 0)
 	{
 		auto& fm = addForm(form);
 		bool unified = false;
@@ -54,11 +54,12 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream&& is, Fn&& filter) -> Morphe
 		else
 		{
 			size_t mid = morphemes.size();
-			morphMap.emplace(make_pair(form, tag), mid);
+			morphMap.emplace(make_pair(form, tag), origMorphemeId ? origMorphemeId : mid);
 			fm.candidate.emplace_back(mid);
 			morphemes.emplace_back(tag, cvowel, CondPolarity::none);
 			morphemes.back().kform = &fm - &forms[0];
 			morphemes.back().userScore = score;
+			morphemes.back().lmMorphemeId = origMorphemeId;
 		}
 	};
 
@@ -85,42 +86,130 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream&& is, Fn&& filter) -> Morphe
 		float morphWeight = stof(fields[2].begin(), fields[2].end());
 
 		CondVowel cvowel = CondVowel::none;
+		KString origMorphemeOfAlias;
+		int addAlias = 0;
 		if (fields.size() > 3)
 		{
-			if (fields[3] == u"vowel")
+			for (size_t i = 3; i < fields.size(); ++i)
 			{
-				cvowel = CondVowel::vowel;
-			}
-			else if (fields[3] == u"non_vowel")
-			{
-				cvowel = CondVowel::non_vowel;
-			}
-			else
-			{
-				throw Exception{ "wrong line: " + line };
+				auto& f = fields[i];
+				if (f == u"vowel")
+				{
+					if (cvowel != CondVowel::none) throw Exception{ "wrong line: " + line };
+					cvowel = CondVowel::vowel;
+					if (i + 1 < fields.size())
+					{
+						if (stof(fields[i + 1].begin(), fields[i + 1].end())) ++i;
+					}
+				}
+				else if (f == u"non_vowel")
+				{
+					if (cvowel != CondVowel::none) throw Exception{ "wrong line: " + line };
+					cvowel = CondVowel::non_vowel;
+					if (i + 1 < fields.size())
+					{
+						if (stof(fields[i + 1].begin(), fields[i + 1].end())) ++i;
+					}
+				}
+				else if (f == u"vocalic")
+				{
+					if (cvowel != CondVowel::none) throw Exception{ "wrong line: " + line };
+					cvowel = CondVowel::vocalic;
+					if (i + 1 < fields.size())
+					{
+						if (stof(fields[i + 1].begin(), fields[i + 1].end())) ++i;
+					}
+				}
+				else if (f[0] == u'=')
+				{
+					if (!origMorphemeOfAlias.empty()) throw Exception{ "wrong line: " + line };
+					if (f[1] == u'=')
+					{
+						origMorphemeOfAlias = normalizeHangul(f.substr(2));
+						addAlias = 2;
+					}
+					else
+					{
+						origMorphemeOfAlias = normalizeHangul(f.substr(1));
+						addAlias = 1;
+					}
+					
+				}
+				else if (f[0] == u'~')
+				{
+					if (!origMorphemeOfAlias.empty()) throw Exception{ "wrong line: " + line };
+					origMorphemeOfAlias = normalizeHangul(f.substr(1));
+					addAlias = 0;
+				}
+				else
+				{
+					throw Exception{ "wrong line: " + line };
+				}
 			}
 		}
 
-		if (filter(tag, morphWeight))
+		if (filter(tag, morphWeight) && origMorphemeOfAlias.empty())
 		{
-			insertMorph(move(form), 0.f, tag, cvowel);
+			insertMorph(move(form), morphWeight, tag, cvowel);
 		}
 		else
 		{
-			longTails.emplace_back(form, morphWeight, tag, cvowel);
+			longTails.emplace_back(form, morphWeight, tag, cvowel, origMorphemeOfAlias, addAlias);
 			longTailWeights[tag] += morphWeight;
 		}
 		
 	}
-	ret = morphMap;
+
 	for (auto& p : longTails)
 	{
 		auto morphWeight = get<1>(p);
 		auto tag = get<2>(p);
 		auto cvowel = get<3>(p);
-		insertMorph(move(get<0>(p)), log(morphWeight / longTailWeights[tag]), tag, cvowel);
+		auto& origMorphemeOfAlias = get<4>(p);
+		auto addAlias = get<5>(p);
+		if (origMorphemeOfAlias.empty()) continue;
+		auto it = morphMap.find(make_pair(origMorphemeOfAlias, tag));
+		if (it == morphMap.end())
+		{
+			throw Exception{ "cannot find base morpheme: " + utf16To8(origMorphemeOfAlias) + "/" + tagToString(tag) };
+		}
+		if (!addAlias) continue;
+		morphemes[it->second].userScore += morphWeight;
 	}
-	return ret;
+
+	for (auto& p : longTails)
+	{
+		auto morphWeight = get<1>(p);
+		auto tag = get<2>(p);
+		auto cvowel = get<3>(p);
+		auto& origMorphemeOfAlias = get<4>(p);
+		auto addAlias = get<5>(p);
+		if (origMorphemeOfAlias.empty())
+		{
+			insertMorph(move(get<0>(p)), log(morphWeight / longTailWeights[tag]), tag, cvowel, getDefaultMorphemeId(tag));
+		}
+		else
+		{
+			auto it = morphMap.find(make_pair(origMorphemeOfAlias, tag));
+			if (addAlias)
+			{
+				float normalized = morphWeight / morphemes[it->second].userScore;
+				float score = log(normalized);
+				if (addAlias > 1) score = 0;
+				insertMorph(move(get<0>(p)), score, tag, cvowel, it->second);
+			}
+			else
+			{
+				morphMap.emplace(make_pair(move(get<0>(p)), tag), it->second);
+			}
+		}
+	}
+	for (auto& m : morphemes)
+	{
+		if (m.userScore <= 0) continue;
+		m.userScore = 0;
+	}
+	return morphMap;
 }
 
 void KiwiBuilder::addCorpusTo(RaggedVector<uint16_t>& out, std::istream&& is, KiwiBuilder::MorphemeMap& morphMap)
@@ -150,10 +239,9 @@ void KiwiBuilder::addCorpusTo(RaggedVector<uint16_t>& out, std::istream&& is, Ki
 
 			auto t = toPOSTag(fields[i + 1]);
 
-			if ((f[0] == u'아' || f[0] == u'야') && fields[i + 1][0] == 'E')
+			if (f[0] == u'아' && fields[i + 1][0] == 'E')
 			{
-				if (f[0] == u'아') f[0] = u'어';
-				else f[0] = u'여';
+				f[0] = u'어';
 			}
 
 			auto it = morphMap.find(make_pair(f, t));
@@ -204,6 +292,7 @@ void KiwiBuilder::updateMorphemes()
 {
 	for (auto& m : morphemes)
 	{
+		if (m.lmMorphemeId > 0) continue;
 		if (m.tag == POSTag::p || (&m - morphemes.data() + m.combined) < langMdl->getHeader().vocab_size)
 		{
 			m.lmMorphemeId = &m - morphemes.data();
@@ -314,7 +403,13 @@ KiwiBuilder::KiwiBuilder(const ModelBuildArgs& args)
 	}
 
 	vector<pair<uint16_t, uint16_t>> bigramList;
-	auto cntNodes = utils::count(sents.begin(), sents.end(), args.lmMinCnt, 1, args.lmOrder, nullptr, &bigramList, args.useLmTagHistory ? &historyTx : nullptr);
+	utils::ThreadPool pool;
+	if (args.numWorkers > 1)
+	{
+		pool.~ThreadPool();
+		new (&pool) utils::ThreadPool{ args.numWorkers };
+	}
+	auto cntNodes = utils::count(sents.begin(), sents.end(), args.lmMinCnt, 1, args.lmOrder, (args.numWorkers > 1 ? &pool : nullptr), &bigramList, args.useLmTagHistory ? &historyTx : nullptr);
 	cntNodes.root().getNext(lmVocabSize)->val /= 2;
 	langMdl = lm::KnLangModelBase::create(lm::KnLangModelBase::build(
 		cntNodes, 

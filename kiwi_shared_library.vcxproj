@@ -54,7 +54,6 @@
     <ClInclude Include="src\FeatureTestor.h" />
     <ClInclude Include="src\Knlm.hpp" />
     <ClInclude Include="src\KTrie.h" />
-    <ClInclude Include="src\logPoisson.h" />
     <ClInclude Include="src\pattern.hpp" />
     <ClInclude Include="src\RaggedVector.hpp" />
     <ClInclude Include="src\search.h" />

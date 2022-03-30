@@ -94,7 +94,7 @@ int main(int argc, const char* argv[])
 {
 	tutils::setUTF8Output();
 
-	CmdLine cmd{ "Kiwi CLI", ' ', "0.10.0" };
+	CmdLine cmd{ "Kiwi CLI", ' ', "0.11.0" };
 
 	ValueArg<string> model{ "m", "model", "Kiwi model path", true, "", "string" };
 	SwitchArg benchmark{ "e", "benchmark", "benchmark performance" };
