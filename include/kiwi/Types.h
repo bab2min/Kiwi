@@ -239,7 +239,7 @@ namespace kiwi
 			uint32_t _position = 0,
 			uint32_t _wordPosition = 0
 		)
-			: str{ _str }, position{ _position }, length{ _length }, wordPosition{ _wordPosition }, tag{ _tag }
+			: str{ _str }, position{ _position }, wordPosition{ _wordPosition }, length{ _length }, tag{ _tag }
 		{
 		}
 
