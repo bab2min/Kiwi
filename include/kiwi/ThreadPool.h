@@ -36,8 +36,8 @@ namespace kiwi
 
 			std::mutex queue_mutex;
 			std::condition_variable condition, inputCnd;
-			size_t maxQueued;
 			bool stop;
+			size_t maxQueued;
 		};
 
 		inline ThreadPool::ThreadPool(size_t threads, size_t _maxQueued)
