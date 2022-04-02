@@ -50,6 +50,7 @@
     <ClInclude Include="src\Combiner.h" />
     <ClInclude Include="src\count.hpp" />
     <ClInclude Include="src\bitset.hpp" />
+    <ClInclude Include="src\FileUtils.h" />
     <ClInclude Include="src\FrozenTrie.hpp" />
     <ClInclude Include="src\FeatureTestor.h" />
     <ClInclude Include="src\Knlm.hpp" />

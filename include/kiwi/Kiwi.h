@@ -361,8 +361,8 @@ namespace kiwi
 
 		using MorphemeMap = UnorderedMap<std::pair<KString, POSTag>, size_t>;
 		template<class Fn>
-		MorphemeMap loadMorphemesFromTxt(std::istream&& is, Fn&& filter);
-		void addCorpusTo(RaggedVector<uint16_t>& out, std::istream&& is, MorphemeMap& morphMap);
+		MorphemeMap loadMorphemesFromTxt(std::istream& is, Fn&& filter);
+		void addCorpusTo(RaggedVector<uint16_t>& out, std::istream& is, MorphemeMap& morphMap);
 		void updateForms();
 		void updateMorphemes();
 
