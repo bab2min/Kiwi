@@ -12,6 +12,7 @@
 #include <kiwi/ThreadPool.h>
 #include <kiwi/Utils.h>
 #include "StrUtils.h"
+#include "FileUtils.h"
 #include "serializer.hpp"
 
 using namespace std;
@@ -126,8 +127,7 @@ WordDetector::WordDetector(const std::string& modelPath, size_t _numThreads)
 	: numThreads{ _numThreads ? _numThreads : std::thread::hardware_concurrency() }
 {
 	{
-		ifstream ifs{ modelPath + "/extract.mdl", ios_base::binary };
-		if (!ifs) throw Exception{ "Failed to open model file '" + modelPath + "/extract.mdl'." };
+		ifstream ifs = openFile(modelPath + "/extract.mdl", ios_base::binary);
 		serializer::readMany(ifs, posScore, nounTailScore);
 	}
 }
@@ -136,13 +136,11 @@ WordDetector::WordDetector(FromRawData, const std::string& modelPath, size_t _nu
 	: numThreads{ _numThreads ? _numThreads : std::thread::hardware_concurrency() }
 {
 	{
-		ifstream ifs{ modelPath + "/RPosModel.txt" };
-		if(!ifs) throw Exception{ "Failed to open file '" + modelPath + "/RPosModel.txt'." };
+		ifstream ifs = openFile(modelPath + "/RPosModel.txt");
 		loadPOSModelFromTxt(ifs);
 	}
 	{
-		ifstream ifs{ modelPath + "/NounTailList.txt" };
-		if (!ifs) throw Exception{ "Failed to open file '" + modelPath + "/NounTailList.txt'." };
+		ifstream ifs = openFile(modelPath + "/NounTailList.txt");
 		loadNounTailModelFromTxt(ifs);
 	}
 }

@@ -5,6 +5,7 @@
 #include "ArchAvailable.h"
 #include "KTrie.h"
 #include "StrUtils.h"
+#include "FileUtils.h"
 #include "FrozenTrie.hpp"
 #include "Knlm.hpp"
 #include "serializer.hpp"
@@ -337,32 +338,9 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, size_t _numThreads, BuildOptio
 	}
 
 	{
-		ifstream ifs{ modelPath + string{ "/combiningRule.txt" } };
-		if (!ifs) throw Exception("Cannot open '" + modelPath + "/combiningRule.txt'");
-		combiningRule = make_shared<cmb::CompiledRule>(cmb::RuleSet{ ifs }.compile());
+		combiningRule = make_shared<cmb::CompiledRule>(cmb::RuleSet{ openFile(modelPath + string{ "/combiningRule.txt" }) }.compile());
 	}
 }
-
-#if defined(__GNUC__) && __GNUC__ < 5
-#define openFile std::ifstream
-#else
-inline ifstream openFile(const string& filePath)
-{
-	ifstream f;
-	auto exc = f.exceptions();
-	f.exceptions(ifstream::failbit | ifstream::badbit);
-	try
-	{
-		f.open(filePath);
-	}
-	catch (ios_base::failure& e) 
-	{
-		throw Exception{ "Cannot open file : " + filePath };
-	}
-	f.exceptions(exc);
-	return f;
-}
-#endif
 
 KiwiBuilder::KiwiBuilder(const ModelBuildArgs& args)
 {
@@ -821,8 +799,7 @@ bool KiwiBuilder::addPreAnalyzedWord(const u16string& form, const vector<pair<u1
 size_t KiwiBuilder::loadDictionary(const string& dictPath)
 {
 	size_t addedCnt = 0;
-	ifstream ifs{ dictPath };
-	if (!ifs) throw Exception("[loadUserDictionary] Failed to open '" + dictPath + "'");
+	ifstream ifs = openFile(dictPath);
 	string line;
 	array<nonstd::u16string_view, 3> fields;
 	u16string wstr;
