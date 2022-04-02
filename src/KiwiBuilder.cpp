@@ -5,6 +5,7 @@
 #include "ArchAvailable.h"
 #include "KTrie.h"
 #include "StrUtils.h"
+#include "FileUtils.h"
 #include "FrozenTrie.hpp"
 #include "Knlm.hpp"
 #include "serializer.hpp"
@@ -29,7 +30,7 @@ KiwiBuilder& KiwiBuilder::operator=(const KiwiBuilder&) = default;
 KiwiBuilder& KiwiBuilder::operator=(KiwiBuilder&&) noexcept = default;
 
 template<class Fn>
-auto KiwiBuilder::loadMorphemesFromTxt(std::istream&& is, Fn&& filter) -> MorphemeMap
+auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> MorphemeMap
 {
 	Vector<tuple<KString, float, POSTag, CondVowel, KString, int>> longTails;
 	UnorderedMap<POSTag, float> longTailWeights;
@@ -212,7 +213,7 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream&& is, Fn&& filter) -> Morphe
 	return morphMap;
 }
 
-void KiwiBuilder::addCorpusTo(RaggedVector<uint16_t>& out, std::istream&& is, KiwiBuilder::MorphemeMap& morphMap)
+void KiwiBuilder::addCorpusTo(RaggedVector<uint16_t>& out, std::istream& is, KiwiBuilder::MorphemeMap& morphMap)
 {
 	Vector<uint16_t> wids;
 	string line;
@@ -337,32 +338,10 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, size_t _numThreads, BuildOptio
 	}
 
 	{
-		ifstream ifs{ modelPath + string{ "/combiningRule.txt" } };
-		if (!ifs) throw Exception("Cannot open '" + modelPath + "/combiningRule.txt'");
-		combiningRule = make_shared<cmb::CompiledRule>(cmb::RuleSet{ ifs }.compile());
+		ifstream ifs;
+		combiningRule = make_shared<cmb::CompiledRule>(cmb::RuleSet{ openFile(ifs, modelPath + string{ "/combiningRule.txt" }) }.compile());
 	}
 }
-
-#if defined(__GNUC__) && __GNUC__ < 5
-#define openFile std::ifstream
-#else
-inline ifstream openFile(const string& filePath)
-{
-	ifstream f;
-	auto exc = f.exceptions();
-	f.exceptions(ifstream::failbit | ifstream::badbit);
-	try
-	{
-		f.open(filePath);
-	}
-	catch (ios_base::failure& e) 
-	{
-		throw Exception{ "Cannot open file : " + filePath };
-	}
-	f.exceptions(exc);
-	return f;
-}
-#endif
 
 KiwiBuilder::KiwiBuilder(const ModelBuildArgs& args)
 {
@@ -376,16 +355,18 @@ KiwiBuilder::KiwiBuilder(const ModelBuildArgs& args)
 		morphemes[i + 2].tag = (POSTag)(i + 1);
 	}
 
-	auto realMorph = loadMorphemesFromTxt(openFile(args.morphemeDef), [&](POSTag tag, float cnt)
+	ifstream ifs;
+	auto realMorph = loadMorphemesFromTxt(openFile(ifs, args.morphemeDef), [&](POSTag tag, float cnt)
 	{
 		return cnt >= args.minMorphCnt;
 	});
 	updateForms();
 
 	RaggedVector<uint16_t> sents;
-	for (auto& f : args.corpora)
+	for (auto& path : args.corpora)
 	{
-		addCorpusTo(sents, openFile(f), realMorph);
+		ifstream ifs;
+		addCorpusTo(sents, openFile(ifs, path), realMorph);
 	}
 
 	size_t lmVocabSize = 0;
@@ -821,8 +802,8 @@ bool KiwiBuilder::addPreAnalyzedWord(const u16string& form, const vector<pair<u1
 size_t KiwiBuilder::loadDictionary(const string& dictPath)
 {
 	size_t addedCnt = 0;
-	ifstream ifs{ dictPath };
-	if (!ifs) throw Exception("[loadUserDictionary] Failed to open '" + dictPath + "'");
+	ifstream ifs;
+	openFile(ifs, dictPath);
 	string line;
 	array<nonstd::u16string_view, 3> fields;
 	u16string wstr;
