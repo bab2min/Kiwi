@@ -7,7 +7,7 @@
 
 namespace kiwi
 {
-	inline std::ifstream& openFile(std::ifstream& f, const std::string& filePath, std::ios_base::open_mode mode = std::ios_base::in)
+	inline std::ifstream& openFile(std::ifstream& f, const std::string& filePath, std::ios_base::openmode mode = std::ios_base::in)
 	{
 		auto exc = f.exceptions();
 		f.exceptions(std::ifstream::failbit | std::ifstream::badbit);
