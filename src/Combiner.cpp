@@ -1038,6 +1038,8 @@ uint8_t CompiledRule::toFeature(CondVowel cv, CondPolarity cp)
 	case CondVowel::non_vowel:
 		feat |= 0;
 		break;
+	default: 
+		break;
 	}
 	return feat;
 }
