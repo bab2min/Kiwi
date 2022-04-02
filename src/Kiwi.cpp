@@ -468,7 +468,7 @@ namespace kiwi
 		if (node->getPrev(0)->endPos == 0) return true; 
 
 		// 이전 노드의 끝지점이 현재 노드보다 작은 경우 왼쪽 경계로 처리
-		if (node->getPrev(0)->endPos < node->getStartPos()) return true;
+		if (node->getPrev(0)->endPos < node->startPos) return true;
 		
 		// 이전 노드가 구두점이나 특수 문자인 경우
 		if (!node->getPrev(0)->uform.empty())
@@ -571,7 +571,7 @@ namespace kiwi
 					auto& wids = nCache.back().morphs;
 					wids.reserve(q.morphs->size() + chSize);
 					wids = *q.morphs;
-					size_t beginPos = node->getStartPos();
+					size_t beginPos = node->startPos;
 					if (!curMorph->chunks.empty())
 					{
 						if (curMorph->combineSocket)
