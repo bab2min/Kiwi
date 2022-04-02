@@ -127,8 +127,8 @@ WordDetector::WordDetector(const std::string& modelPath, size_t _numThreads)
 	: numThreads{ _numThreads ? _numThreads : std::thread::hardware_concurrency() }
 {
 	{
-		ifstream ifs = openFile(modelPath + "/extract.mdl", ios_base::binary);
-		serializer::readMany(ifs, posScore, nounTailScore);
+		ifstream ifs;
+		serializer::readMany(openFile(ifs, modelPath + "/extract.mdl", ios_base::binary), posScore, nounTailScore);
 	}
 }
 
@@ -136,12 +136,12 @@ WordDetector::WordDetector(FromRawData, const std::string& modelPath, size_t _nu
 	: numThreads{ _numThreads ? _numThreads : std::thread::hardware_concurrency() }
 {
 	{
-		ifstream ifs = openFile(modelPath + "/RPosModel.txt");
-		loadPOSModelFromTxt(ifs);
+		ifstream ifs;
+		loadPOSModelFromTxt(openFile(ifs, modelPath + "/RPosModel.txt"));
 	}
 	{
-		ifstream ifs = openFile(modelPath + "/NounTailList.txt");
-		loadNounTailModelFromTxt(ifs);
+		ifstream ifs;
+		loadNounTailModelFromTxt(openFile(ifs, modelPath + "/NounTailList.txt"));
 	}
 }
 

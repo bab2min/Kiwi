@@ -7,12 +7,8 @@
 
 namespace kiwi
 {
-#if defined(__GNUC__) && __GNUC__ < 5
-#define openFile(...) std::ifstream(__VA_ARGS__)
-#else
-	inline std::ifstream openFile(const std::string& filePath, std::ios_base::open_mode mode = std::ios_base::in)
+	inline std::ifstream& openFile(std::ifstream& f, const std::string& filePath, std::ios_base::open_mode mode = std::ios_base::in)
 	{
-		std::ifstream f;
 		auto exc = f.exceptions();
 		f.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 		try
@@ -30,5 +26,4 @@ namespace kiwi
 		f.exceptions(exc);
 		return f;
 	}
-#endif
 }
