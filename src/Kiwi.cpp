@@ -820,7 +820,7 @@ namespace kiwi
 		{
 			wordPositions[i] = position;
 
-			if (isspace(*first))
+			if (isSpace(*first))
 			{
 				if (!continuousSpace) ++position;
 				continuousSpace = true;
