@@ -96,7 +96,7 @@ Evaluator::Score Evaluator::evaluate()
 				if (b.str == u"그것" && u"그거" == a.str) return true;
 				if (a.str == u"것" && u"거" == b.str) return true;
 				if (b.str == u"것" && u"거" == a.str) return true;
-				return a == b;
+				return a.str == b.str;
 			});
 			size_t common = 0;
 			for (auto&& d : diff)

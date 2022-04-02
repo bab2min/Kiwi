@@ -48,6 +48,45 @@ TEST(KiwiCpp, InitClose)
 	Kiwi& kiwi = reuseKiwiInstance();
 }
 
+TEST(KiwiCpp, Pattern)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	auto tokens = kiwi.analyze(u"123.4567", Match::none).first;
+	EXPECT_EQ(tokens.size(), 1);
+	EXPECT_EQ(tokens[0].tag, POSTag::sn);
+
+	tokens = kiwi.analyze(u"123.4567.", Match::none).first;
+	EXPECT_EQ(tokens.size(), 4);
+	EXPECT_EQ(tokens[0].tag, POSTag::sn);
+	EXPECT_EQ(tokens[1].tag, POSTag::sf);
+
+	tokens = kiwi.analyze(u"123.", Match::none).first;
+	EXPECT_EQ(tokens.size(), 2);
+	EXPECT_EQ(tokens[0].tag, POSTag::sn);
+	EXPECT_EQ(tokens[1].tag, POSTag::sf);
+
+	tokens = kiwi.analyze(u"1,234,567", Match::none).first;
+	EXPECT_EQ(tokens.size(), 1);
+	EXPECT_EQ(tokens[0].tag, POSTag::sn);
+
+	tokens = kiwi.analyze(u"123,", Match::none).first;
+	EXPECT_EQ(tokens.size(), 2);
+	EXPECT_EQ(tokens[0].tag, POSTag::sn);
+	EXPECT_EQ(tokens[1].tag, POSTag::sp);
+
+	tokens = kiwi.analyze(u"123,456.789", Match::none).first;
+	EXPECT_EQ(tokens.size(), 1);
+	EXPECT_EQ(tokens[0].tag, POSTag::sn);
+
+	tokens = kiwi.analyze(u"123,456.789a", Match::none).first;
+	EXPECT_EQ(tokens.size(), 6);
+	EXPECT_EQ(tokens[0].tag, POSTag::sn);
+
+	tokens = kiwi.analyze(u"123,456.789이다", Match::none).first;
+	EXPECT_EQ(tokens.size(), 3);
+	EXPECT_EQ(tokens[0].tag, POSTag::sn);
+}
+
 TEST(KiwiCpp, BuilderAddWords)
 {
 	KiwiBuilder builder{ MODEL_PATH };

@@ -22,7 +22,7 @@ Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form
 	auto* nextNode = trie.root();
 	UnorderedMap<uint32_t, int> spacePos;
 	size_t lastSpecialEndPos = 0, specialStartPos = 0;
-	POSTag chrType, lastChrType = POSTag::unknown;
+	POSTag chrType, lastChrType = POSTag::unknown, lastMatchedPattern = POSTag::unknown;
 	auto branchOut = [&](bool makeLongMatch = false)
 	{
 		if (!candidates.empty())
@@ -117,7 +117,7 @@ Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form
 	for (; n < str.size(); ++n)
 	{
 		auto& c = str[n];
-		if (!!matchOptions)
+
 		{
 			auto m = matchPattern(str.data() + n, str.data() + str.size(), matchOptions);
 			chrType = m.second;
@@ -156,6 +156,7 @@ Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form
 
 				n += m.first - 1;
 				curNode = trie.root();
+				lastMatchedPattern = m.second;
 				goto continueFor;
 			}
 		}
@@ -165,7 +166,7 @@ Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form
 		if (lastChrType != chrType)
 		{
 			// sequence of speical characters found
-			if (lastChrType != POSTag::max && lastChrType != POSTag::unknown && !isWebTag(lastChrType) /*&& n - specialStartPos > 1*/)
+			if (lastChrType != POSTag::max && lastChrType != POSTag::unknown && lastChrType != lastMatchedPattern /*&& n - specialStartPos > 1*/)
 			{
 				auto it = spacePos.find(specialStartPos - 1);
 				int space = it == spacePos.end() ? 0 : it->second;
@@ -180,6 +181,7 @@ Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form
 			}
 			specialStartPos = n;
 		}
+		lastMatchedPattern = POSTag::unknown;
 
 		nextNode = curNode->template nextOpt<arch>(trie, c);
 		while (!nextNode) // if curNode has no exact next node, goto fail

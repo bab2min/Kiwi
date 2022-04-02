@@ -49,17 +49,7 @@ namespace kiwi
 
 	POSTag identifySpecialChr(kchar_t chr)
 	{
-		switch (chr)
-		{
-		case ' ':
-		case '\t':
-		case '\r':
-		case '\n':
-		case '\v':
-		case '\f':
-		case 0x2800:
-			return POSTag::unknown;
-		}
+		if (isSpace(chr)) return POSTag::unknown;
 		if (0x2000 <= chr && chr <= 0x200F) return POSTag::unknown;
 
 		if (iswdigit(chr)) return POSTag::sn;
