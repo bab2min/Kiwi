@@ -26,7 +26,7 @@ inline void appendNewNode(Vector<KGraphNode>& nodes, Vector<Vector<uint32_t>>& e
 }
 
 template<ArchType arch>
-Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form*>& trie, const KString& str, Match matchOptions, size_t maxUnkFormSize)
+Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form*>& trie, const KString& str, Match matchOptions, size_t maxUnkFormSize, size_t spaceTolerance)
 {
 	Vector<KGraphNode> ret;
 	Vector<Vector<uint32_t>> endPosMap(str.size() + 1);
@@ -81,8 +81,12 @@ Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form
 				}
 				else
 				{
-					appendNewNode(ret, endPosMap, nBegin, cand, (uint16_t)nonSpaces.size());
-					if (!ret.back().prevs[0]) ret.pop_back();
+					size_t lengthWithSpaces = nonSpaces.back() + 1 - nonSpaces[nBegin];
+					if (lengthWithSpaces <= cand->form.size() + spaceTolerance)
+					{
+						appendNewNode(ret, endPosMap, nBegin, cand, (uint16_t)nonSpaces.size());
+						if (!ret.back().prevs[0]) ret.pop_back();
+					}
 				}
 			}
 			candidates.clear();
@@ -148,6 +152,14 @@ Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form
 		}
 		lastMatchedPattern = POSTag::unknown;
 
+		// spaceTolerance > 0이면 공백문자를 무시하고 분할 진행
+		if (spaceTolerance > 0 && chrType == POSTag::unknown)
+		{
+			branchOut(true);
+			lastSpecialEndPos = nonSpaces.size();
+			goto continueFor;
+		}
+
 		nextNode = curNode->template nextOpt<arch>(trie, c);
 		while (!nextNode) // if curNode has no exact next node, goto fail
 		{
@@ -178,13 +190,12 @@ Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form
 			{
 				branchOut(chrType != POSTag::max);
 				
-				// the root node has no exact next node, test special chr
-				// space
+				// spaceTolerance == 0이고 공백 문자인 경우
 				if (chrType == POSTag::unknown)
 				{
 					lastSpecialEndPos = nonSpaces.size();
 				}
-				// not space
+				// 그 외의 경우
 				else
 				{
 					nonSpaces.emplace_back(n);
@@ -199,10 +210,7 @@ Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form
 		}
 		branchOut();
 		
-		if (chrType != POSTag::unknown)
-		{
-			nonSpaces.emplace_back(n);
-		}
+		nonSpaces.emplace_back(n);
 
 		// from this, curNode has the exact next node
 		curNode = nextNode;

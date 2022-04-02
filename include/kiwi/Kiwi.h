@@ -60,7 +60,9 @@ namespace kiwi
 		float cutOffThreshold = 5;
 		float unkFormScoreScale = 3;
 		float unkFormScoreBias = 5;
+		float spacePenalty = 10;
 		size_t maxUnkFormSize = 6;
+		size_t spaceTolerance = 0;
 
 		TagSequenceScorer tagScorer;
 
@@ -310,6 +312,26 @@ namespace kiwi
 		void setMaxUnkFormSize(size_t v)
 		{
 			maxUnkFormSize = v;
+		}
+
+		size_t getSpaceTolerance() const
+		{
+			return spaceTolerance;
+		}
+
+		void setSpaceTolerance(size_t v)
+		{
+			spaceTolerance = v;
+		}
+
+		float getSpacePenalty() const
+		{
+			return spacePenalty;
+		}
+
+		void setSpacePenalty(float v)
+		{
+			spacePenalty = v;
 		}
 
 		bool getIntegrateAllomorph() const

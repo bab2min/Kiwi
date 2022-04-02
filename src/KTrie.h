@@ -58,7 +58,7 @@ namespace kiwi
 	};
 
 	template<ArchType arch>
-	Vector<KGraphNode> splitByTrie(const utils::FrozenTrie<kchar_t, const Form*>& trie, const KString& str, Match matchOptions, size_t maxUnkFormSize);
+	Vector<KGraphNode> splitByTrie(const utils::FrozenTrie<kchar_t, const Form*>& trie, const KString& str, Match matchOptions, size_t maxUnkFormSize, size_t spaceTolerance);
 	
 	using FnSplitByTrie = decltype(&splitByTrie<ArchType::default_>);
 	FnSplitByTrie getSplitByTrieFn(ArchType arch);

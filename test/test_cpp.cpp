@@ -48,6 +48,28 @@ TEST(KiwiCpp, InitClose)
 	Kiwi& kiwi = reuseKiwiInstance();
 }
 
+TEST(KiwiCpp, SpaceTolerant)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	auto str = u"띄 어 쓰 기 문 제 가 있 습 니 다";
+	auto tokens = kiwi.analyze(str, Match::all).first;
+	EXPECT_GE(tokens.size(), 11);
+
+	kiwi.setSpaceTolerance(1);
+	tokens = kiwi.analyze(str, Match::all).first;
+	EXPECT_EQ(tokens.size(), 9);
+
+	kiwi.setSpaceTolerance(2);
+	tokens = kiwi.analyze(str, Match::all).first;
+	EXPECT_EQ(tokens.size(), 7);
+
+	kiwi.setSpaceTolerance(3);
+	tokens = kiwi.analyze(str, Match::all).first;
+	EXPECT_EQ(tokens.size(), 5);
+
+	kiwi.setSpaceTolerance(0);
+}
+
 TEST(KiwiCpp, Pattern)
 {
 	Kiwi& kiwi = reuseKiwiInstance();

@@ -493,6 +493,12 @@ namespace kiwi
 		auto lm = static_cast<const lm::KnLangModel<arch, LmType>*>(kw->langMdl.get());
 		size_t langVocabSize = lm->getHeader().vocab_size;
 
+		float whitespaceDiscount = 0;
+		if (node->uform.empty() && node->endPos - node->startPos > node->form->form.size())
+		{
+			whitespaceDiscount = -kw->spacePenalty * (node->endPos - node->startPos - node->form->form.size());
+		}
+
 		float tMax = -INFINITY;
 		for (auto& curMorph : cands)
 		{
@@ -540,7 +546,7 @@ namespace kiwi
 			UnorderedMap<Wid, Vector<WordLLP>> maxWidLL;
 			evalTrigram(lm, kw->morphemes.data(), ownFormList, cache, seq, chSize, curMorph, node, startNode, maxWidLL);
 
-			float estimatedLL = curMorph->userScore;
+			float estimatedLL = curMorph->userScore + whitespaceDiscount;
 			// if a form of the node is unknown, calculate log poisson distribution for word-tag
 			if (unknownForm)
 			{
@@ -911,7 +917,7 @@ namespace kiwi
 		// 분석할 문장에 포함된 개별 문자에 대해 어절번호를 생성한다
 		std::vector<uint16_t> wordPositions = getWordPositions(sBegin, sEnd);
 		
-		auto nodes = (*reinterpret_cast<FnSplitByTrie>(dfSplitByTrie))(formTrie, normalizedStr, matchOptions, maxUnkFormSize);
+		auto nodes = (*reinterpret_cast<FnSplitByTrie>(dfSplitByTrie))(formTrie, normalizedStr, matchOptions, maxUnkFormSize, spaceTolerance);
 		vector<TokenResult> ret;
 		if (nodes.size() <= 2)
 		{
