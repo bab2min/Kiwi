@@ -134,10 +134,18 @@ Enumerations</h2></td></tr>
 <b>KIWI_BUILD_DEFAULT</b> = 3
  }</td></tr>
 <tr class="separator:a06fc87d81c62e9abb8790b6e5713c55b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adf764cbdea00d65edcd07bb9953ad2b7"><td class="memItemLeft" align="right" valign="top"><a id="adf764cbdea00d65edcd07bb9953ad2b7"></a>enum &#160;</td><td class="memItemRight" valign="bottom">{ <b>KIWI_NUM_THREADS</b> = 0x8001
+<tr class="memitem:adf764cbdea00d65edcd07bb9953ad2b7"><td class="memItemLeft" align="right" valign="top"><a id="adf764cbdea00d65edcd07bb9953ad2b7"></a>enum &#160;</td><td class="memItemRight" valign="bottom">{ <b>KIWI_NUM_THREADS</b> = 0x8001, 
+<b>KIWI_MAX_UNK_FORM_SIZE</b> = 0x8002, 
+<b>KIWI_SPACE_TOLERANCE</b> = 0x8003
  }</td></tr>
 <tr class="separator:adf764cbdea00d65edcd07bb9953ad2b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a99fb83031ce9923c84392b4e92f956b5"><td class="memItemLeft" align="right" valign="top"><a id="a99fb83031ce9923c84392b4e92f956b5"></a>enum &#160;</td><td class="memItemRight" valign="bottom">{ <br />
+<tr class="memitem:a99fb83031ce9923c84392b4e92f956b5"><td class="memItemLeft" align="right" valign="top"><a id="a99fb83031ce9923c84392b4e92f956b5"></a>enum &#160;</td><td class="memItemRight" valign="bottom">{ <b>KIWI_CUT_OFF_THRESHOLD</b> = 0x9001, 
+<b>KIWI_UNK_FORM_SCORE_SCALE</b> = 0x9002, 
+<b>KIWI_UNK_FORM_SCORE_BIAS</b> = 0x9003, 
+<b>KIWI_SPACE_PENALTY</b> = 0x9004
+ }</td></tr>
+<tr class="separator:a99fb83031ce9923c84392b4e92f956b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abc6126af1d45847bc59afa0aa3216b04"><td class="memItemLeft" align="right" valign="top"><a id="abc6126af1d45847bc59afa0aa3216b04"></a>enum &#160;</td><td class="memItemRight" valign="bottom">{ <br />
 &#160;&#160;<b>KIWI_MATCH_URL</b> = 1, 
 <b>KIWI_MATCH_EMAIL</b> = 2, 
 <b>KIWI_MATCH_HASHTAG</b> = 4, 
@@ -156,7 +164,7 @@ Enumerations</h2></td></tr>
 &#160;&#160;<b>KIWI_MATCH_JOIN_NOUN_AFFIX</b> = KIWI_MATCH_JOIN_NOUN_PREFIX | KIWI_MATCH_JOIN_NOUN_SUFFIX | KIWI_MATCH_JOIN_V_SUFFIX
 <br />
  }</td></tr>
-<tr class="separator:a99fb83031ce9923c84392b4e92f956b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:abc6126af1d45847bc59afa0aa3216b04"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -173,7 +181,7 @@ Functions</h2></td></tr>
 <tr class="memdesc:afab914642519cf01fb15017989045cbf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Kiwi Builder를 생성합니다.  <a href="capi_8h.html#afab914642519cf01fb15017989045cbf">More...</a><br /></td></tr>
 <tr class="separator:afab914642519cf01fb15017989045cbf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8ee24152f80c94f558f3ca9f5760d54d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a8ee24152f80c94f558f3ca9f5760d54d">kiwi_builder_close</a> (kiwi_builder_h handle)</td></tr>
-<tr class="memdesc:a8ee24152f80c94f558f3ca9f5760d54d"><td class="mdescLeft">&#160;</td><td class="mdescRight">사용된 resource를 반환합니다.  <a href="capi_8h.html#a8ee24152f80c94f558f3ca9f5760d54d">More...</a><br /></td></tr>
+<tr class="memdesc:a8ee24152f80c94f558f3ca9f5760d54d"><td class="mdescLeft">&#160;</td><td class="mdescRight">사용이 끝난 KiwiBuilder를 삭제합니다.  <a href="capi_8h.html#a8ee24152f80c94f558f3ca9f5760d54d">More...</a><br /></td></tr>
 <tr class="separator:a8ee24152f80c94f558f3ca9f5760d54d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad43fce424031604034a6350146edc366"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#ad43fce424031604034a6350146edc366">kiwi_builder_add_word</a> (kiwi_builder_h handle, const char *word, const char *pos, float score)</td></tr>
 <tr class="memdesc:ad43fce424031604034a6350146edc366"><td class="mdescLeft">&#160;</td><td class="mdescRight">사용자 형태소를 추가합니다. 이 함수로 등록한 형태소의 경우 언어 모델 내에서 UNK(사전 미등재 단어)로 처리됩니다. 특정 형태소의 변이형을 등록하려는 경우 kiwi_builder_add_alias_word 함수를 사용하는 걸 권장합니다.  <a href="capi_8h.html#ad43fce424031604034a6350146edc366">More...</a><br /></td></tr>
@@ -199,18 +207,25 @@ Functions</h2></td></tr>
 <tr class="memitem:ad985587162086e74c184d609d640d1ae"><td class="memItemLeft" align="right" valign="top">kiwi_ws_h&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#ad985587162086e74c184d609d640d1ae">kiwi_builder_extract_add_words_w</a> (kiwi_builder_h handle, kiwi_reader_w_t reader, void *user_data, int min_cnt, int max_word_len, float min_score, float pos_threshold)</td></tr>
 <tr class="separator:ad985587162086e74c184d609d640d1ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5696d58d01a91d319345626c6b2087b0"><td class="memItemLeft" align="right" valign="top">kiwi_h&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a5696d58d01a91d319345626c6b2087b0">kiwi_builder_build</a> (kiwi_builder_h handle)</td></tr>
-<tr class="memdesc:a5696d58d01a91d319345626c6b2087b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Kiwi instance를 생성합니다.  <a href="capi_8h.html#a5696d58d01a91d319345626c6b2087b0">More...</a><br /></td></tr>
+<tr class="memdesc:a5696d58d01a91d319345626c6b2087b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">KiwiBuilder로부터 Kiwi instance를 생성합니다.  <a href="capi_8h.html#a5696d58d01a91d319345626c6b2087b0">More...</a><br /></td></tr>
 <tr class="separator:a5696d58d01a91d319345626c6b2087b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae460a36b48337e45ce07cd4143d1e3d6"><td class="memItemLeft" align="right" valign="top">kiwi_h&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#ae460a36b48337e45ce07cd4143d1e3d6">kiwi_init</a> (const char *model_path, int num_threads, int options)</td></tr>
-<tr class="memdesc:ae460a36b48337e45ce07cd4143d1e3d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">빌더를 사용하지 않고 Kiwi instance를 생성합니다.  <a href="capi_8h.html#ae460a36b48337e45ce07cd4143d1e3d6">More...</a><br /></td></tr>
+<tr class="memdesc:ae460a36b48337e45ce07cd4143d1e3d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">KiwiBuilder를 거치지 않고 바로 Kiwi instance를 생성합니다.  <a href="capi_8h.html#ae460a36b48337e45ce07cd4143d1e3d6">More...</a><br /></td></tr>
 <tr class="separator:ae460a36b48337e45ce07cd4143d1e3d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7e836be806c4f2cdf7698849b72dd247"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a7e836be806c4f2cdf7698849b72dd247">kiwi_set_option</a> (kiwi_h handle, int option, int value)</td></tr>
-<tr class="memdesc:a7e836be806c4f2cdf7698849b72dd247"><td class="mdescLeft">&#160;</td><td class="mdescRight">KIWI_BUILD_INTEGRATE_ALLOMORPH 의 값을 변경합니다.  <a href="capi_8h.html#a7e836be806c4f2cdf7698849b72dd247">More...</a><br /></td></tr>
+<tr class="memdesc:a7e836be806c4f2cdf7698849b72dd247"><td class="mdescLeft">&#160;</td><td class="mdescRight">int 타입 옵션의 값을 변경합니다.  <a href="capi_8h.html#a7e836be806c4f2cdf7698849b72dd247">More...</a><br /></td></tr>
 <tr class="separator:a7e836be806c4f2cdf7698849b72dd247"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab35bce02d300b0e753d3f9cb81ca879f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#ab35bce02d300b0e753d3f9cb81ca879f">kiwi_get_option</a> (kiwi_h handle, int option)</td></tr>
-<tr class="memdesc:ab35bce02d300b0e753d3f9cb81ca879f"><td class="mdescLeft">&#160;</td><td class="mdescRight">옵션의 값을 반환합니다.  <a href="capi_8h.html#ab35bce02d300b0e753d3f9cb81ca879f">More...</a><br /></td></tr>
+<tr class="memdesc:ab35bce02d300b0e753d3f9cb81ca879f"><td class="mdescLeft">&#160;</td><td class="mdescRight">int 타입 옵션의 값을 반환합니다.  <a href="capi_8h.html#ab35bce02d300b0e753d3f9cb81ca879f">More...</a><br /></td></tr>
 <tr class="separator:ab35bce02d300b0e753d3f9cb81ca879f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7b29ac8dbc6bff5622258ab0e0ab48cf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a7b29ac8dbc6bff5622258ab0e0ab48cf">kiwi_set_option_f</a> (kiwi_h handle, int option, float value)</td></tr>
+<tr class="memdesc:a7b29ac8dbc6bff5622258ab0e0ab48cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">float 타입 옵션의 값을 변경합니다.  <a href="capi_8h.html#a7b29ac8dbc6bff5622258ab0e0ab48cf">More...</a><br /></td></tr>
+<tr class="separator:a7b29ac8dbc6bff5622258ab0e0ab48cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1c8691bf364a136ea171e807fa3300b5"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a1c8691bf364a136ea171e807fa3300b5">kiwi_get_option_f</a> (kiwi_h handle, int option)</td></tr>
+<tr class="memdesc:a1c8691bf364a136ea171e807fa3300b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">float 타입 옵션의 값을 반환합니다.  <a href="capi_8h.html#a1c8691bf364a136ea171e807fa3300b5">More...</a><br /></td></tr>
+<tr class="separator:a1c8691bf364a136ea171e807fa3300b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab3d1784020b6f2a1b77e84463c4a5eb8"><td class="memItemLeft" align="right" valign="top">kiwi_res_h&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#ab3d1784020b6f2a1b77e84463c4a5eb8">kiwi_analyze_w</a> (kiwi_h handle, const kchar16_t *text, int top_n, int match_options)</td></tr>
+<tr class="memdesc:ab3d1784020b6f2a1b77e84463c4a5eb8"><td class="mdescLeft">&#160;</td><td class="mdescRight">텍스트를 분석해 형태소 결과를 반환합니다.  <a href="capi_8h.html#ab3d1784020b6f2a1b77e84463c4a5eb8">More...</a><br /></td></tr>
 <tr class="separator:ab3d1784020b6f2a1b77e84463c4a5eb8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab6ec0d26dbd4f25b85a0edf9784425d1"><td class="memItemLeft" align="right" valign="top">kiwi_res_h&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#ab6ec0d26dbd4f25b85a0edf9784425d1">kiwi_analyze</a> (kiwi_h handle, const char *text, int top_n, int match_options)</td></tr>
 <tr class="memdesc:ab6ec0d26dbd4f25b85a0edf9784425d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">텍스트를 분석해 형태소 결과를 반환합니다.  <a href="capi_8h.html#ab6ec0d26dbd4f25b85a0edf9784425d1">More...</a><br /></td></tr>
@@ -220,11 +235,13 @@ Functions</h2></td></tr>
 <tr class="memitem:a264f6b307c5b2397e13f8d1db23694ce"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a264f6b307c5b2397e13f8d1db23694ce">kiwi_analyze_m</a> (kiwi_h handle, <a class="el" href="capi_8h.html#a1b38cdecc30ec0b3f84086a18ca06512">kiwi_reader_t</a> reader, kiwi_receiver_t receiver, void *user_data, int top_n, int match_options)</td></tr>
 <tr class="separator:a264f6b307c5b2397e13f8d1db23694ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac9abe9c18c92b2a1c19d831c4e0a01f3"><td class="memItemLeft" align="right" valign="top">kiwi_ss_h&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#ac9abe9c18c92b2a1c19d831c4e0a01f3">kiwi_split_into_sents_w</a> (kiwi_h handle, const kchar16_t *text, int match_options, kiwi_res_h *tokenized_res)</td></tr>
+<tr class="memdesc:ac9abe9c18c92b2a1c19d831c4e0a01f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">텍스트를 문장 단위로 분할합니다.  <a href="capi_8h.html#ac9abe9c18c92b2a1c19d831c4e0a01f3">More...</a><br /></td></tr>
 <tr class="separator:ac9abe9c18c92b2a1c19d831c4e0a01f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae4a9c8e2ac8ab6d928c12d6a79090edb"><td class="memItemLeft" align="right" valign="top">kiwi_ss_h&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#ae4a9c8e2ac8ab6d928c12d6a79090edb">kiwi_split_into_sents</a> (kiwi_h handle, const char *text, int match_options, kiwi_res_h *tokenized_res)</td></tr>
 <tr class="memdesc:ae4a9c8e2ac8ab6d928c12d6a79090edb"><td class="mdescLeft">&#160;</td><td class="mdescRight">텍스트를 문장 단위로 분할합니다.  <a href="capi_8h.html#ae4a9c8e2ac8ab6d928c12d6a79090edb">More...</a><br /></td></tr>
 <tr class="separator:ae4a9c8e2ac8ab6d928c12d6a79090edb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7b9edfa303fddc98d9d505ee58d3211b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a7b9edfa303fddc98d9d505ee58d3211b">kiwi_close</a> (kiwi_h handle)</td></tr>
+<tr class="memdesc:a7b9edfa303fddc98d9d505ee58d3211b"><td class="mdescLeft">&#160;</td><td class="mdescRight">사용이 완료된 Kiwi객체를 삭제합니다.  <a href="capi_8h.html#a7b9edfa303fddc98d9d505ee58d3211b">More...</a><br /></td></tr>
 <tr class="separator:a7b9edfa303fddc98d9d505ee58d3211b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3e1b43fb351b73e0835aae7bf56fdc9c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a3e1b43fb351b73e0835aae7bf56fdc9c">kiwi_res_size</a> (kiwi_res_h result)</td></tr>
 <tr class="separator:a3e1b43fb351b73e0835aae7bf56fdc9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -249,6 +266,7 @@ Functions</h2></td></tr>
 <tr class="memitem:aeeb9f4ae5b3ba1c873cd53e32186bec3"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#aeeb9f4ae5b3ba1c873cd53e32186bec3">kiwi_res_sent_position</a> (kiwi_res_h result, int index, int num)</td></tr>
 <tr class="separator:aeeb9f4ae5b3ba1c873cd53e32186bec3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab793f64bc59b828f44135f1092a16d97"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#ab793f64bc59b828f44135f1092a16d97">kiwi_res_close</a> (kiwi_res_h result)</td></tr>
+<tr class="memdesc:ab793f64bc59b828f44135f1092a16d97"><td class="mdescLeft">&#160;</td><td class="mdescRight">사용이 완료된 형태소 분석 결과를 삭제합니다.  <a href="capi_8h.html#ab793f64bc59b828f44135f1092a16d97">More...</a><br /></td></tr>
 <tr class="separator:ab793f64bc59b828f44135f1092a16d97"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3421fe0f93fc5991dee5fbef4205a226"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a3421fe0f93fc5991dee5fbef4205a226">kiwi_ws_size</a> (kiwi_ws_h result)</td></tr>
 <tr class="separator:a3421fe0f93fc5991dee5fbef4205a226"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -271,6 +289,7 @@ Functions</h2></td></tr>
 <tr class="memitem:ad4ce67949349f809b16aee8d6059b38b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#ad4ce67949349f809b16aee8d6059b38b">kiwi_ss_end_position</a> (kiwi_ss_h result, int index)</td></tr>
 <tr class="separator:ad4ce67949349f809b16aee8d6059b38b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5de6d686c50da0bece243ec049f82fc0"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a5de6d686c50da0bece243ec049f82fc0">kiwi_ss_close</a> (kiwi_ss_h result)</td></tr>
+<tr class="memdesc:a5de6d686c50da0bece243ec049f82fc0"><td class="mdescLeft">&#160;</td><td class="mdescRight">사용이 완료된 문장 분리 객체를 삭제합니다.  <a href="capi_8h.html#a5de6d686c50da0bece243ec049f82fc0">More...</a><br /></td></tr>
 <tr class="separator:a5de6d686c50da0bece243ec049f82fc0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -373,13 +392,14 @@ Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">handle</td><td>Kiwi. </td></tr>
-    <tr><td class="paramname">text</td><td>분석할 텍스트. </td></tr>
+    <tr><td class="paramname">text</td><td>분석할 텍스트 (utf-8). </td></tr>
     <tr><td class="paramname">top_n</td><td>반환할 결과물. </td></tr>
     <tr><td class="paramname">match_options</td><td>KIWI_MATCH_ALL 등 KIWI_MATCH_* 열거형 참고. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>형태소 분석 결과. kiwi_res_* 함수를 통해 값에 접근가능합니다. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>형태소 분석 결과의 핸들. kiwi_res_* 함수를 통해 값에 접근가능합니다. 이 핸들은 사용 후 kiwi_res_close를 사용해 반드시 해제되어야 합니다.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="capi_8h.html#ab3d1784020b6f2a1b77e84463c4a5eb8" title="텍스트를 분석해 형태소 결과를 반환합니다.">kiwi_analyze_w</a> </dd></dl>
 
 </div>
 </div>
@@ -550,16 +570,19 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>텍스트를 분석해 형태소 결과를 반환합니다. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">handle</td><td></td></tr>
-    <tr><td class="paramname">text</td><td></td></tr>
-    <tr><td class="paramname">top_n</td><td></td></tr>
-    <tr><td class="paramname">match_options</td><td></td></tr>
+    <tr><td class="paramname">handle</td><td>Kiwi. </td></tr>
+    <tr><td class="paramname">text</td><td>분석할 텍스트 (utf-16). </td></tr>
+    <tr><td class="paramname">top_n</td><td>반환할 결과물. </td></tr>
+    <tr><td class="paramname">match_options</td><td>KIWI_MATCH_ALL 등 KIWI_MATCH_* 열거형 참고. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd></dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>형태소 분석 결과의 핸들. kiwi_res_* 함수를 통해 값에 접근가능합니다. 이 핸들은 사용 후 kiwi_res_close를 사용해 반드시 해제되어야 합니다.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="capi_8h.html#ab6ec0d26dbd4f25b85a0edf9784425d1" title="텍스트를 분석해 형태소 결과를 반환합니다.">kiwi_analyze</a> </dd></dl>
 
 </div>
 </div>
@@ -610,11 +633,11 @@ Functions</h2></td></tr>
 <p>원본 형태소를 기반으로하는 새 형태소를 추가합니다. kiwi_builder_add_word로 등록한 형태소의 경우 언어 모델 내에서 UNK(사전 미등재 단어)로 처리되는 반면, 이 함수로 등록한 형태소의 경우 언어모델 내에서 원본 형태소와 동일하게 처리됩니다. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">handle</td><td>KiwiBuilder. </td></tr>
-    <tr><td class="paramname">alias</td><td>새 형태소 </td></tr>
+    <tr><td class="paramname">handle</td><td>KiwiBuilder의 핸들. </td></tr>
+    <tr><td class="paramname">alias</td><td>새 형태소 (utf-8) </td></tr>
     <tr><td class="paramname">pos</td><td>품사 태그 (kiwi::POSTag). </td></tr>
     <tr><td class="paramname">score</td><td>점수. </td></tr>
-    <tr><td class="paramname">orig_word</td><td>원 형태소 </td></tr>
+    <tr><td class="paramname">orig_word</td><td>원 형태소 (utf-8) </td></tr>
   </table>
   </dd>
 </dl>
@@ -681,8 +704,8 @@ Functions</h2></td></tr>
 <p>기분석 형태소열을 추가합니다. 불규칙적으로 분석되어야하는 패턴을 추가하는 데 용이합니다. 예) 사겼다 -&gt; 사귀/VV + 었/EP + 다/EF </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">handle</td><td>KiwiBuilder. </td></tr>
-    <tr><td class="paramname">form</td><td>등록할 형태 </td></tr>
+    <tr><td class="paramname">handle</td><td>KiwiBuilder의 핸들. </td></tr>
+    <tr><td class="paramname">form</td><td>등록할 형태 (utf-8) </td></tr>
     <tr><td class="paramname">size</td><td>형태소의 개수 </td></tr>
     <tr><td class="paramname">analyzed_morphs</td><td>size 개수의 const char* 배열의 시작 포인터. 분석되어야할 각 형태소의 형태를 나타냅니다. </td></tr>
     <tr><td class="paramname">analyzed_pos</td><td>size 개수의 const char* 배열의 시작 포인터. 분석되어야할 각 형태소의 품사를 나타냅니다. </td></tr>
@@ -742,7 +765,7 @@ Functions</h2></td></tr>
 <p>규칙에 의해 변형된 형태소 목록을 생성하여 자동 추가합니다. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">handle</td><td>KiwiBuilder. </td></tr>
+    <tr><td class="paramname">handle</td><td>KiwiBuilder의 핸들. </td></tr>
     <tr><td class="paramname">pos</td><td>변형할 형태소의 품사 태그 </td></tr>
     <tr><td class="paramname">replacer</td><td>변형 결과를 제공하는데에 쓰일 콜백 함수 </td></tr>
     <tr><td class="paramname">user_data</td><td>replacer 호출시 사용될 유저 데이터 </td></tr>
@@ -795,8 +818,8 @@ Functions</h2></td></tr>
 <p>사용자 형태소를 추가합니다. 이 함수로 등록한 형태소의 경우 언어 모델 내에서 UNK(사전 미등재 단어)로 처리됩니다. 특정 형태소의 변이형을 등록하려는 경우 kiwi_builder_add_alias_word 함수를 사용하는 걸 권장합니다. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">handle</td><td>KiwiBuilder. </td></tr>
-    <tr><td class="paramname">word</td><td>추가할 형태소. </td></tr>
+    <tr><td class="paramname">handle</td><td>KiwiBuilder의 핸들. </td></tr>
+    <tr><td class="paramname">word</td><td>추가할 형태소 (utf-8). </td></tr>
     <tr><td class="paramname">pos</td><td>품사 태그 (kiwi::POSTag). </td></tr>
     <tr><td class="paramname">score</td><td>점수. </td></tr>
   </table>
@@ -822,14 +845,15 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Kiwi instance를 생성합니다. </p>
+<p>KiwiBuilder로부터 Kiwi instance를 생성합니다. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">handle</td><td>KiwiBuilder. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Kiwi instance. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Kiwi의 핸들.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>kiwi_close, kiwi_init </dd></dl>
 
 </div>
 </div>
@@ -849,14 +873,15 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>사용된 resource를 반환합니다. </p>
+<p>사용이 끝난 KiwiBuilder를 삭제합니다. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">handle</td><td>KiwiBuilder. </td></tr>
+    <tr><td class="paramname">handle</td><td>KiwiBuilder의 핸들. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>성공 시 0를 반환합니다. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>성공 시 0를 반환합니다.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>kiwi_builder_init로 생성된 kiwi_builder_h는 반드시 이 함수로 해제되어야 합니다. </dd></dl>
 
 </div>
 </div>
@@ -917,7 +942,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">handle</td><td></td></tr>
+    <tr><td class="paramname">handle</td><td>KiwiBuilder의 핸들. </td></tr>
     <tr><td class="paramname">reader</td><td></td></tr>
     <tr><td class="paramname">user_data</td><td></td></tr>
     <tr><td class="paramname">min_cnt</td><td></td></tr>
@@ -989,7 +1014,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">handle</td><td></td></tr>
+    <tr><td class="paramname">handle</td><td>KiwiBuilder의 핸들. </td></tr>
     <tr><td class="paramname">reader</td><td></td></tr>
     <tr><td class="paramname">user_data</td><td></td></tr>
     <tr><td class="paramname">min_cnt</td><td></td></tr>
@@ -1061,7 +1086,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">handle</td><td></td></tr>
+    <tr><td class="paramname">handle</td><td>KiwiBuilder의 핸들. </td></tr>
     <tr><td class="paramname">reader</td><td></td></tr>
     <tr><td class="paramname">user_data</td><td></td></tr>
     <tr><td class="paramname">min_cnt</td><td></td></tr>
@@ -1133,7 +1158,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">handle</td><td></td></tr>
+    <tr><td class="paramname">handle</td><td>KiwiBuilder의 핸들. </td></tr>
     <tr><td class="paramname">reader</td><td></td></tr>
     <tr><td class="paramname">user_data</td><td></td></tr>
     <tr><td class="paramname">min_cnt</td><td></td></tr>
@@ -1189,7 +1214,8 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>성공 시 Kiwi Builder의 핸들을 반환합니다. 실패시 nullptr를 반환하고 에러 메세지를 설정합니다. 에러 메세지는 <a class="el" href="capi_8h.html#afeefb305c962012957279d889e6dac3e" title="현재 스레드에서 발생한 에러 메세지를 반환합니다. 발생한 에러가 없을 경우 nullptr를 반환합니다.">kiwi_error()</a>를 통해 확인할 수 있습니다. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>성공 시 Kiwi Builder의 핸들을 반환합니다. 실패시 nullptr를 반환하고 에러 메세지를 설정합니다. 에러 메세지는 <a class="el" href="capi_8h.html#afeefb305c962012957279d889e6dac3e" title="현재 스레드에서 발생한 에러 메세지를 반환합니다. 발생한 에러가 없을 경우 nullptr를 반환합니다.">kiwi_error()</a>를 통해 확인할 수 있습니다.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="capi_8h.html#a8ee24152f80c94f558f3ca9f5760d54d" title="사용이 끝난 KiwiBuilder를 삭제합니다.">kiwi_builder_close</a> </dd></dl>
 
 </div>
 </div>
@@ -1222,7 +1248,7 @@ Functions</h2></td></tr>
 <p>사용자 사전으로부터 단어를 읽어들입니다. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">handle</td><td>KiwiBuilder. </td></tr>
+    <tr><td class="paramname">handle</td><td>KiwiBuilder의 핸들. </td></tr>
     <tr><td class="paramname">dict_path</td><td>사전 파일 경로. </td></tr>
   </table>
   </dd>
@@ -1247,7 +1273,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>현재 스레드의 에러 메세지를 초기화합니다. </p>
-<dl class="section return"><dt>Returns</dt><dd></dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>void </dd></dl>
 
 </div>
 </div>
@@ -1266,14 +1292,16 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>사용이 완료된 Kiwi객체를 삭제합니다. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">handle</td><td></td></tr>
+    <tr><td class="paramname">handle</td><td>Kiwi 핸들 </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><br  />
- </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>성공시 0을 반환합니다. 실패시 0이 아닌 값을 반환합니다.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>kiwi_builder_build 및 kiwi_init으로 생성된 kiwi_h는 반드시 이 함수로 해제되어야 합니다. </dd></dl>
 
 </div>
 </div>
@@ -1323,18 +1351,64 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>옵션의 값을 반환합니다. </p>
+<p>int 타입 옵션의 값을 반환합니다. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">handle</td><td>Kiwi. </td></tr>
-    <tr><td class="paramname">option</td><td>{KIWI_BUILD_INTEGRATE_ALLOMORPH, KIWI_NUM_THREADS}. </td></tr>
+    <tr><td class="paramname">option</td><td>{KIWI_BUILD_INTEGRATE_ALLOMORPH, KIWI_NUM_THREADS, KIWI_MAX_UNK_FORM_SIZE, KIWI_SPACE_TOLERANCE}. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>해당 옵션의 값을 반환합니다.</dd></dl>
 <ul>
-<li>KIWI_BUILD_INTEGRATE_ALLOMORPH: 0 or 1</li>
-<li>KIWI_NUM_THREADS: 사용중인 쓰레드 수 </li>
+<li>KIWI_BUILD_INTEGRATE_ALLOMORPH: 이형태 통합 기능 사용 유무 (0 혹은 1)</li>
+<li>KIWI_NUM_THREADS: 사용중인 쓰레드 수 (1 이상의 정수)</li>
+<li>KIWI_MAX_UNK_FORM_SIZE: 추출 가능한 사전 미등재 형태의 최대 길이 (0 이상의 정수)</li>
+<li>KIWI_SPACE_TOLERANCE: 무시할 수 있는 공백의 최대 개수 (0 이상의 정수) </li>
+</ul>
+
+</div>
+</div>
+<a id="a1c8691bf364a136ea171e807fa3300b5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1c8691bf364a136ea171e807fa3300b5">&#9670;&nbsp;</a></span>kiwi_get_option_f()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float kiwi_get_option_f </td>
+          <td>(</td>
+          <td class="paramtype">kiwi_h&#160;</td>
+          <td class="paramname"><em>handle</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>option</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>float 타입 옵션의 값을 반환합니다. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">handle</td><td>Kiwi. </td></tr>
+    <tr><td class="paramname">option</td><td>{KIWI_CUT_OFF_THRESHOLD, KIWI_UNK_FORM_SCORE_SCALE, KIWI_UNK_FORM_SCORE_BIAS, KIWI_SPACE_PENALTY}. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>해당 옵션의 값을 반환합니다.</dd></dl>
+<ul>
+<li>KIWI_CUT_OFF_THRESHOLD: 분석 과정에서 이 값보다 더 크게 차이가 나는 후보들은 제거합니다.</li>
+<li>KIWI_UNK_FORM_SCORE_SCALE: 미등재 형태 추출 시 사용하는 기울기 값</li>
+<li>KIWI_UNK_FORM_SCORE_BIAS: 미등재 형태 추출 시 사용하는 편차 값</li>
+<li>KIWI_SPACE_PENALTY: 무시하는 공백 1개당 발생하는 언어 점수 페널티 값 </li>
 </ul>
 
 </div>
@@ -1371,7 +1445,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>빌더를 사용하지 않고 Kiwi instance를 생성합니다. </p>
+<p>KiwiBuilder를 거치지 않고 바로 Kiwi instance를 생성합니다. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">model_path</td><td>모델이 들어있는 디렉토리 경로 (e.g., ./ModelGenerator). </td></tr>
@@ -1380,7 +1454,7 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Kiwi instance. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Kiwi의 핸들. </dd></dl>
 
 </div>
 </div>
@@ -1399,14 +1473,16 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>사용이 완료된 형태소 분석 결과를 삭제합니다. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">result</td><td></td></tr>
+    <tr><td class="paramname">handle</td><td>형태소 분석 결과 핸들 </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><br  />
- </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>성공시 0을 반환합니다. 실패시 0이 아닌 값을 반환합니다.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>kiwi_analyze 계열의 함수들에서 반환된 kiwi_res_h 값들은 반드시 이 함수를 통해 해제되어야 합니다. </dd></dl>
 
 </div>
 </div>
@@ -1888,15 +1964,61 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>KIWI_BUILD_INTEGRATE_ALLOMORPH 의 값을 변경합니다. </p>
+<p>int 타입 옵션의 값을 변경합니다. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">handle</td><td>Kiwi. </td></tr>
-    <tr><td class="paramname">option</td><td>KIWI_BUILD_INTEGRATE_ALLOMORPH. </td></tr>
-    <tr><td class="paramname">value</td><td>0 or 1 (enabled). </td></tr>
+    <tr><td class="paramname">option</td><td>{KIWI_BUILD_INTEGRATE_ALLOMORPH, KIWI_MAX_UNK_FORM_SIZE, KIWI_SPACE_TOLERANCE}. </td></tr>
+    <tr><td class="paramname">value</td><td>옵션의 설정값</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="capi_8h.html#ab35bce02d300b0e753d3f9cb81ca879f" title="int 타입 옵션의 값을 반환합니다.">kiwi_get_option</a>, <a class="el" href="capi_8h.html#a7b29ac8dbc6bff5622258ab0e0ab48cf" title="float 타입 옵션의 값을 변경합니다.">kiwi_set_option_f</a> </dd></dl>
+
+</div>
+</div>
+<a id="a7b29ac8dbc6bff5622258ab0e0ab48cf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7b29ac8dbc6bff5622258ab0e0ab48cf">&#9670;&nbsp;</a></span>kiwi_set_option_f()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void kiwi_set_option_f </td>
+          <td>(</td>
+          <td class="paramtype">kiwi_h&#160;</td>
+          <td class="paramname"><em>handle</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>option</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>value</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>float 타입 옵션의 값을 변경합니다. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">handle</td><td>Kiwi. </td></tr>
+    <tr><td class="paramname">option</td><td>{KIWI_CUT_OFF_THRESHOLD, KIWI_UNK_FORM_SCORE_SCALE, KIWI_UNK_FORM_SCORE_BIAS, KIWI_SPACE_PENALTY}. </td></tr>
+    <tr><td class="paramname">value</td><td>옵션의 설정값</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="capi_8h.html#a1c8691bf364a136ea171e807fa3300b5" title="float 타입 옵션의 값을 반환합니다.">kiwi_get_option_f</a>, <a class="el" href="capi_8h.html#a7e836be806c4f2cdf7698849b72dd247" title="int 타입 옵션의 값을 변경합니다.">kiwi_set_option</a> </dd></dl>
 
 </div>
 </div>
@@ -1942,13 +2064,14 @@ Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">handle</td><td>Kiwi. </td></tr>
-    <tr><td class="paramname">text</td><td>분할할 텍스트. </td></tr>
+    <tr><td class="paramname">text</td><td>분할할 텍스트 (utf-8). </td></tr>
     <tr><td class="paramname">match_options</td><td>KIWI_MATCH_ALL 등 KIWI_MATCH_* 열거형 참고. </td></tr>
     <tr><td class="paramname">tokenized_res</td><td>(선택사항) 형태소 분석 결과를 받으려는 경우 kiwi_res_h 값을 받을 포인터를 넘겨주세요. null을 입력시 형태소 분석 결과는 내부적으로 사용된 뒤 버려집니다. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>문장 분할 결과 </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>문장 분할 결과의 핸들. kiwi_ss_* 함수를 통해 값에 접근가능합니다. 이 핸들은 사용 후 kiwi_ss_close를 사용해 반드시 해제되어야 합니다.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="capi_8h.html#ac9abe9c18c92b2a1c19d831c4e0a01f3" title="텍스트를 문장 단위로 분할합니다.">kiwi_split_into_sents_w</a> </dd></dl>
 
 </div>
 </div>
@@ -1989,16 +2112,19 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>텍스트를 문장 단위로 분할합니다. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">handle</td><td></td></tr>
-    <tr><td class="paramname">text</td><td></td></tr>
-    <tr><td class="paramname">match_options</td><td></td></tr>
+    <tr><td class="paramname">handle</td><td>Kiwi. </td></tr>
+    <tr><td class="paramname">text</td><td>분할할 텍스트 (utf-16). </td></tr>
+    <tr><td class="paramname">match_options</td><td>KIWI_MATCH_ALL 등 KIWI_MATCH_* 열거형 참고. </td></tr>
     <tr><td class="paramname">tokenized_res</td><td>(선택사항) 형태소 분석 결과를 받으려는 경우 kiwi_res_h 값을 받을 포인터를 넘겨주세요. null을 입력시 형태소 분석 결과는 내부적으로 사용된 뒤 버려집니다. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd></dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>문장 분할 결과의 핸들. kiwi_ss_* 함수를 통해 값에 접근가능합니다. 이 핸들은 사용 후 kiwi_ss_close를 사용해 반드시 해제되어야 합니다.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="capi_8h.html#ae4a9c8e2ac8ab6d928c12d6a79090edb" title="텍스트를 문장 단위로 분할합니다.">kiwi_split_into_sents</a> </dd></dl>
 
 </div>
 </div>
@@ -2053,13 +2179,16 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>사용이 완료된 문장 분리 객체를 삭제합니다. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">result</td><td></td></tr>
+    <tr><td class="paramname">handle</td><td>문장 분리 결과 핸들 </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd></dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>성공시 0을 반환합니다. 실패시 0이 아닌 값을 반환합니다.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>kiwi_split_into_sents 계열 함수에서 반환된 kiwi_ss_h는 반드시 이 함수로 해제되어야 합니다. </dd></dl>
 
 </div>
 </div>
