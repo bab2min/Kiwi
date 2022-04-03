@@ -8,7 +8,7 @@
 using namespace std;
 using namespace kiwi;
 
-void printResult(Kiwi& kw, const string& line, int topn, ostream& out)
+void printResult(Kiwi& kw, const string& line, int topn, bool score, ostream& out)
 {
 	for (auto& result : kw.analyze(line, topn, Match::all))
 	{
@@ -16,18 +16,26 @@ void printResult(Kiwi& kw, const string& line, int topn, ostream& out)
 		{
 			out << utf16To8(t.str) << '/' << tagToString(t.tag) << '\t';
 		}
+		if (score) out << setprecision(5) << result.second;
 		out << endl;
 	}
 	if (topn > 1) out << endl;
 }
 
-int run(const string& modelPath, bool benchmark, const string& output, const string& user, int topn, const vector<string>& input)
+int run(const string& modelPath, bool benchmark, const string& output, const string& user, int topn, int tolerance, bool score, const vector<string>& input)
 {
 	try
 	{
 		tutils::Timer timer;
 		size_t lines = 0, bytes = 0;
 		Kiwi kw = KiwiBuilder{ modelPath, 1 }.build();
+
+		cout << "Kiwi v" << KIWI_VERSION_STRING << endl;
+		if (tolerance)
+		{
+			kw.setSpaceTolerance(tolerance);
+			cout << "SpaceTolerance: " << tolerance << endl;
+		}
 
 		if (benchmark)
 		{
@@ -48,12 +56,21 @@ int run(const string& modelPath, bool benchmark, const string& output, const str
 		if (input.empty())
 		{
 			timer.reset();
-			for (string line; getline(cin, line);)
+#ifdef _WIN32
+			for (wstring line; (cout << ">> ").flush(), getline(wcin, line);)
 			{
-				printResult(kw, line, topn, *out);
+				printResult(kw, utf16To8((const char16_t*)line.c_str()), topn, score, *out);
 				++lines;
 				bytes += line.size();
 			}
+#else
+			for (string line; (cout << ">> ").flush(), getline(cin, line);)
+			{
+				printResult(kw, line, topn, score, *out);
+				++lines;
+				bytes += line.size();
+			}
+#endif
 		}
 		else
 		{
@@ -63,7 +80,7 @@ int run(const string& modelPath, bool benchmark, const string& output, const str
 				ifstream in{ f };
 				for (string line; getline(in, line);)
 				{
-					printResult(kw, line, topn, *out);
+					printResult(kw, line, topn, score, *out);
 					++lines;
 					bytes += line.size();
 				}
@@ -101,6 +118,8 @@ int main(int argc, const char* argv[])
 	ValueArg<string> output{ "o", "output", "output file path", false, "", "string" };
 	ValueArg<string> user{ "u", "user", "user dictionary path", false, "", "string" };
 	ValueArg<int> topn{ "n", "topn", "top-n of result", false, 1, "int > 0" };
+	ValueArg<int> tolerance{ "t", "tolerance", "space tolerance of Kiwi", false, 0, "int >= 0" };
+	SwitchArg score{ "s", "score", "print score together" };
 	UnlabeledMultiArg<string> files{ "inputs", "input files", false, "string" };
 
 	cmd.add(model);
@@ -108,6 +127,8 @@ int main(int argc, const char* argv[])
 	cmd.add(output);
 	cmd.add(user);
 	cmd.add(topn);
+	cmd.add(tolerance);
+	cmd.add(score);
 	cmd.add(files);
 
 	try
@@ -119,6 +140,6 @@ int main(int argc, const char* argv[])
 		cerr << "error: " << e.error() << " for arg " << e.argId() << endl;
 		return -1;
 	}
-	return run(model, benchmark, output, user, topn, files.getValue());
+	return run(model, benchmark, output, user, topn, tolerance, score, files.getValue());
 }
 

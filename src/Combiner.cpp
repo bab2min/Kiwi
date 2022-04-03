@@ -741,7 +741,7 @@ void RuleSet::loadRules(istream& istr)
 	while (getline(istr, line))
 	{
 		if (line[0] == '#') continue;
-		while (!line.empty() && isspace(line.back())) line.pop_back();
+		while (!line.empty() && isSpace(line.back())) line.pop_back();
 		if (line.empty()) continue;
 
 		auto fields = split(line, '\t');

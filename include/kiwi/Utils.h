@@ -36,7 +36,12 @@ namespace kiwi
 	const char* tagToString(POSTag t);
 	const kchar_t* tagToKString(POSTag t);
 
-	inline bool isHangulCoda(int chr)
+	inline bool isHangulSyllable(char16_t chr)
+	{
+		return 0xAC00 <= chr && chr < 0xD7A4;
+	}
+
+	inline bool isHangulCoda(char16_t chr)
 	{
 		return 0x11A8 <= chr && chr < (0x11A7 + 28);
 	}
@@ -52,7 +57,7 @@ namespace kiwi
 		ret.reserve(hangul.size());
 		for (auto c : hangul)
 		{
-			if (isHangulCoda(c) && !ret.empty() && 0xAC00 <= ret.back() && ret.back() < 0xD7A4)
+			if (isHangulCoda(c) && !ret.empty() && isHangulSyllable(ret.back()))
 			{
 				if ((ret.back() - 0xAC00) % 28) ret.push_back(c);
 				else ret.back() += c - 0x11A7;
@@ -68,7 +73,7 @@ namespace kiwi
 	bool isClosingPair(char16_t c);
 	POSTag identifySpecialChr(kchar_t chr);
 
-	inline bool isspace(char16_t c)
+	inline bool isSpace(char16_t c)
 	{
 		switch (c)
 		{
@@ -78,6 +83,7 @@ namespace kiwi
 		case u'\r':
 		case u'\t':
 		case u'\v':
+		case u'\u2800':
 			return true;
 		}
 		return false;
@@ -90,17 +96,17 @@ namespace kiwi
 		SpaceSplitIterator(const std::u16string::const_iterator& _begin = {}, const std::u16string::const_iterator& _end = {})
 			: mBegin(_begin), mEnd(_end)
 		{
-			while (mBegin != mEnd && isspace(*mBegin)) ++mBegin;
+			while (mBegin != mEnd && isSpace(*mBegin)) ++mBegin;
 			mChunk = mBegin;
-			while (mChunk != mEnd && !isspace(*mChunk)) ++mChunk;
+			while (mChunk != mEnd && !isSpace(*mChunk)) ++mChunk;
 		}
 
 		SpaceSplitIterator& operator++()
 		{
 			mBegin = mChunk;
-			while (mBegin != mEnd && isspace(*mBegin)) ++mBegin;
+			while (mBegin != mEnd && isSpace(*mBegin)) ++mBegin;
 			mChunk = mBegin;
-			while (mChunk != mEnd && !isspace(*mChunk)) ++mChunk;
+			while (mChunk != mEnd && !isSpace(*mChunk)) ++mChunk;
 			return *this;
 		}
 

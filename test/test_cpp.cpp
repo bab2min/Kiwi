@@ -48,6 +48,69 @@ TEST(KiwiCpp, InitClose)
 	Kiwi& kiwi = reuseKiwiInstance();
 }
 
+TEST(KiwiCpp, SpaceTolerant)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	auto str = u"띄 어 쓰 기 문 제 가 있 습 니 다";
+	auto tokens = kiwi.analyze(str, Match::all).first;
+	EXPECT_GE(tokens.size(), 11);
+
+	kiwi.setSpaceTolerance(1);
+	kiwi.setSpacePenalty(3);
+	tokens = kiwi.analyze(str, Match::all).first;
+	EXPECT_EQ(tokens.size(), 10);
+
+	kiwi.setSpaceTolerance(2);
+	tokens = kiwi.analyze(str, Match::all).first;
+	EXPECT_EQ(tokens.size(), 8);
+
+	kiwi.setSpaceTolerance(3);
+	tokens = kiwi.analyze(str, Match::all).first;
+	EXPECT_EQ(tokens.size(), 5);
+
+	kiwi.setSpaceTolerance(0);
+	kiwi.setSpacePenalty(8);
+}
+
+TEST(KiwiCpp, Pattern)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	auto tokens = kiwi.analyze(u"123.4567", Match::none).first;
+	EXPECT_EQ(tokens.size(), 1);
+	EXPECT_EQ(tokens[0].tag, POSTag::sn);
+
+	tokens = kiwi.analyze(u"123.4567.", Match::none).first;
+	EXPECT_EQ(tokens.size(), 4);
+	EXPECT_EQ(tokens[0].tag, POSTag::sn);
+	EXPECT_EQ(tokens[1].tag, POSTag::sf);
+
+	tokens = kiwi.analyze(u"123.", Match::none).first;
+	EXPECT_EQ(tokens.size(), 2);
+	EXPECT_EQ(tokens[0].tag, POSTag::sn);
+	EXPECT_EQ(tokens[1].tag, POSTag::sf);
+
+	tokens = kiwi.analyze(u"1,234,567", Match::none).first;
+	EXPECT_EQ(tokens.size(), 1);
+	EXPECT_EQ(tokens[0].tag, POSTag::sn);
+
+	tokens = kiwi.analyze(u"123,", Match::none).first;
+	EXPECT_EQ(tokens.size(), 2);
+	EXPECT_EQ(tokens[0].tag, POSTag::sn);
+	EXPECT_EQ(tokens[1].tag, POSTag::sp);
+
+	tokens = kiwi.analyze(u"123,456.789", Match::none).first;
+	EXPECT_EQ(tokens.size(), 1);
+	EXPECT_EQ(tokens[0].tag, POSTag::sn);
+
+	tokens = kiwi.analyze(u"123,456.789a", Match::none).first;
+	EXPECT_EQ(tokens.size(), 6);
+	EXPECT_EQ(tokens[0].tag, POSTag::sn);
+
+	tokens = kiwi.analyze(u"123,456.789이다", Match::none).first;
+	EXPECT_EQ(tokens.size(), 3);
+	EXPECT_EQ(tokens[0].tag, POSTag::sn);
+}
+
 TEST(KiwiCpp, BuilderAddWords)
 {
 	KiwiBuilder builder{ MODEL_PATH };

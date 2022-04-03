@@ -468,7 +468,7 @@ namespace kiwi
 		if (node->getPrev(0)->endPos == 0) return true; 
 
 		// 이전 노드의 끝지점이 현재 노드보다 작은 경우 왼쪽 경계로 처리
-		if (node->getPrev(0)->endPos < node->getStartPos()) return true;
+		if (node->getPrev(0)->endPos < node->startPos) return true;
 		
 		// 이전 노드가 구두점이나 특수 문자인 경우
 		if (!node->getPrev(0)->uform.empty())
@@ -492,6 +492,12 @@ namespace kiwi
 	{
 		auto lm = static_cast<const lm::KnLangModel<arch, LmType>*>(kw->langMdl.get());
 		size_t langVocabSize = lm->getHeader().vocab_size;
+
+		float whitespaceDiscount = 0;
+		if (node->uform.empty() && node->endPos - node->startPos > node->form->form.size())
+		{
+			whitespaceDiscount = -kw->spacePenalty * (node->endPos - node->startPos - node->form->form.size());
+		}
 
 		float tMax = -INFINITY;
 		for (auto& curMorph : cands)
@@ -540,7 +546,7 @@ namespace kiwi
 			UnorderedMap<Wid, Vector<WordLLP>> maxWidLL;
 			evalTrigram(lm, kw->morphemes.data(), ownFormList, cache, seq, chSize, curMorph, node, startNode, maxWidLL);
 
-			float estimatedLL = curMorph->userScore;
+			float estimatedLL = curMorph->userScore + whitespaceDiscount;
 			// if a form of the node is unknown, calculate log poisson distribution for word-tag
 			if (unknownForm)
 			{
@@ -571,7 +577,7 @@ namespace kiwi
 					auto& wids = nCache.back().morphs;
 					wids.reserve(q.morphs->size() + chSize);
 					wids = *q.morphs;
-					size_t beginPos = node->getStartPos();
+					size_t beginPos = node->startPos;
 					if (!curMorph->chunks.empty())
 					{
 						if (curMorph->combineSocket)
@@ -820,7 +826,7 @@ namespace kiwi
 		{
 			wordPositions[i] = position;
 
-			if (isspace(*first))
+			if (isSpace(*first))
 			{
 				if (!continuousSpace) ++position;
 				continuousSpace = true;
@@ -911,7 +917,7 @@ namespace kiwi
 		// 분석할 문장에 포함된 개별 문자에 대해 어절번호를 생성한다
 		std::vector<uint16_t> wordPositions = getWordPositions(sBegin, sEnd);
 		
-		auto nodes = (*reinterpret_cast<FnSplitByTrie>(dfSplitByTrie))(formTrie, normalizedStr, matchOptions, maxUnkFormSize);
+		auto nodes = (*reinterpret_cast<FnSplitByTrie>(dfSplitByTrie))(formTrie, normalizedStr, matchOptions, maxUnkFormSize, spaceTolerance);
 		vector<TokenResult> ret;
 		if (nodes.size() <= 2)
 		{
