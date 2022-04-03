@@ -1,0 +1,8 @@
+digraph "Graphical Class Hierarchy"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node0 [label="kiwi::KiwiBuilder",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classkiwi_1_1KiwiBuilder.html",tooltip="형태소 분석에 사용될 사전을 관리하고, 사전을 바탕으로 실제 형태소 분석을 수행하는 Kiwi의 인스턴스를 생성하는 클래스."];
+}
