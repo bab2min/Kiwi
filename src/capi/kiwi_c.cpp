@@ -360,6 +360,15 @@ void kiwi_set_option(kiwi_h handle, int option, int value)
 	case KIWI_NUM_THREADS:
 		currentError = make_exception_ptr(runtime_error{ "Cannot modify the number of threads." });
 		break;
+	case KIWI_MAX_UNK_FORM_SIZE:
+		kiwi->setMaxUnkFormSize(value);
+		break;
+	case KIWI_SPACE_TOLERANCE:
+		kiwi->setSpaceTolerance(value);
+		break;
+	default:
+		currentError = make_exception_ptr(invalid_argument{ "Invalid option value: " + to_string(option)});
+		break;
 	}
 }
 
@@ -373,6 +382,58 @@ int kiwi_get_option(kiwi_h handle, int option)
 		return kiwi->getIntegrateAllomorph() ? 1 : 0;
 	case KIWI_NUM_THREADS:
 		return kiwi->getNumThreads();
+	case KIWI_MAX_UNK_FORM_SIZE:
+		return kiwi->getMaxUnkFormSize();
+	case KIWI_SPACE_TOLERANCE:
+		return kiwi->getSpaceTolerance();
+	default:
+		currentError = make_exception_ptr(invalid_argument{ "Invalid option value: " + to_string(option) });
+		break;
+	}
+	return KIWIERR_INVALID_INDEX;
+}
+
+void kiwi_set_option_f(kiwi_h handle, int option, float value)
+{
+	if (!handle) return;
+	Kiwi* kiwi = (Kiwi*)handle;
+	switch (option)
+	{
+	case KIWI_CUT_OFF_THRESHOLD:
+		kiwi->setCutOffThreshold(value);
+		break;
+	case KIWI_UNK_FORM_SCORE_SCALE:
+		kiwi->setUnkScoreScale(value);
+		break;
+	case KIWI_UNK_FORM_SCORE_BIAS:
+		kiwi->setUnkScoreBias(value);
+		break;
+	case KIWI_SPACE_PENALTY:
+		kiwi->setSpacePenalty(value);
+		break;
+	default:
+		currentError = make_exception_ptr(invalid_argument{ "Invalid option value: " + to_string(option) });
+		break;
+	}
+}
+
+float kiwi_get_option_f(kiwi_h handle, int option)
+{
+	if (!handle) return KIWIERR_INVALID_HANDLE;
+	Kiwi* kiwi = (Kiwi*)handle;
+	switch (option)
+	{
+	case KIWI_CUT_OFF_THRESHOLD:
+		return kiwi->getCutOffThreshold();
+	case KIWI_UNK_FORM_SCORE_SCALE:
+		return kiwi->getUnkScoreScale();
+	case KIWI_UNK_FORM_SCORE_BIAS:
+		return kiwi->getUnkScoreBias();
+	case KIWI_SPACE_PENALTY:
+		return kiwi->getSpacePenalty();
+	default:
+		currentError = make_exception_ptr(invalid_argument{ "Invalid option value: " + to_string(option) });
+		break;
 	}
 	return KIWIERR_INVALID_INDEX;
 }
