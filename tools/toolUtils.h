@@ -6,6 +6,9 @@
 #include <windows.h>
 #include <psapi.h>
 #include <stdio.h>
+#include <tchar.h>
+#include <fcntl.h>
+#include <io.h>
 #elif defined(__APPLE__)
 #include <mach/mach.h>
 #else
@@ -47,6 +50,7 @@ namespace tutils
 	{
 		SetConsoleOutputCP(CP_UTF8);
 		setvbuf(stdout, nullptr, _IOFBF, 1000);
+		_setmode(_fileno(stdin), _O_U16TEXT);
 	}
 #elif defined(__APPLE__)
 	inline size_t getCurrentPhysicalMemoryUsage()
