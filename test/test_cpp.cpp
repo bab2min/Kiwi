@@ -56,18 +56,20 @@ TEST(KiwiCpp, SpaceTolerant)
 	EXPECT_GE(tokens.size(), 11);
 
 	kiwi.setSpaceTolerance(1);
+	kiwi.setSpacePenalty(3);
 	tokens = kiwi.analyze(str, Match::all).first;
-	EXPECT_EQ(tokens.size(), 9);
+	EXPECT_EQ(tokens.size(), 10);
 
 	kiwi.setSpaceTolerance(2);
 	tokens = kiwi.analyze(str, Match::all).first;
-	EXPECT_EQ(tokens.size(), 7);
+	EXPECT_EQ(tokens.size(), 8);
 
 	kiwi.setSpaceTolerance(3);
 	tokens = kiwi.analyze(str, Match::all).first;
 	EXPECT_EQ(tokens.size(), 5);
 
 	kiwi.setSpaceTolerance(0);
+	kiwi.setSpacePenalty(8);
 }
 
 TEST(KiwiCpp, Pattern)

@@ -60,7 +60,7 @@ namespace kiwi
 		float cutOffThreshold = 5;
 		float unkFormScoreScale = 3;
 		float unkFormScoreBias = 5;
-		float spacePenalty = 10;
+		float spacePenalty = 7;
 		size_t maxUnkFormSize = 6;
 		size_t spaceTolerance = 0;
 
