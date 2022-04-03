@@ -161,7 +161,7 @@ size_t PatternMatcherImpl::testHashtag(const char16_t * first, const char16_t * 
 
 inline bool isDigit(char16_t c)
 {
-	return ('0' <= c && c <= '9') || ('\uff10' <= c && c <= '\uff19');
+	return ('0' <= c && c <= '9') || (u'\uff10' <= c && c <= u'\uff19');
 }
 
 size_t PatternMatcherImpl::testNumeric(const char16_t* first, const char16_t* last) const
