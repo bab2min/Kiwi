@@ -1,0 +1,23 @@
+name: Doxygen publish
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request: {}
+
+jobs:
+  build-doxygen-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v2
+      - run: pip install -U sphinx sphinx-sitemap breathe sphinx_rtd_theme
+      - run: sudo apt update && sudo apt install doxygen
+      - uses: actions/checkout@v2
+      - run: cd docs && make html
+      - uses: peaceiris/actions-gh-pages@v3
+        if: github.ref == 'refs/heads/main'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/_build/html
