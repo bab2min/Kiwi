@@ -75,6 +75,16 @@ enum
 enum
 {
 	KIWI_NUM_THREADS = 0x8001,
+	KIWI_MAX_UNK_FORM_SIZE = 0x8002,
+	KIWI_SPACE_TOLERANCE = 0x8003,
+};
+
+enum
+{
+	KIWI_CUT_OFF_THRESHOLD = 0x9001,
+	KIWI_UNK_FORM_SCORE_SCALE = 0x9002,
+	KIWI_UNK_FORM_SCORE_BIAS = 0x9003,
+	KIWI_SPACE_PENALTY = 0x9004,
 };
 
 enum
@@ -116,7 +126,7 @@ DECL_DLL const char* kiwi_error();
 /**
  * @brief 현재 스레드의 에러 메세지를 초기화합니다.
  * 
- * @return 
+ * @return void
  */
 DECL_DLL void kiwi_clear_error();
 
@@ -129,14 +139,18 @@ DECL_DLL void kiwi_clear_error();
  * @return 성공 시 Kiwi Builder의 핸들을 반환합니다. 
  * 실패시 nullptr를 반환하고 에러 메세지를 설정합니다. 
  * 에러 메세지는 kiwi_error()를 통해 확인할 수 있습니다.
+ * 
+ * @see kiwi_builder_close
  */
 DECL_DLL kiwi_builder_h kiwi_builder_init(const char* model_path, int num_threads, int options);
 
 /**
- * @brief 사용된 resource를 반환합니다.
+ * @brief 사용이 끝난 KiwiBuilder를 삭제합니다.
  * 
- * @param handle KiwiBuilder.
+ * @param handle KiwiBuilder의 핸들.
  * @return 성공 시 0를 반환합니다.
+ * 
+ * @note kiwi_builder_init로 생성된 kiwi_builder_h는 반드시 이 함수로 해제되어야 합니다.
  */
 DECL_DLL int kiwi_builder_close(kiwi_builder_h handle);
 
@@ -146,8 +160,8 @@ DECL_DLL int kiwi_builder_close(kiwi_builder_h handle);
  *        언어 모델 내에서 UNK(사전 미등재 단어)로 처리됩니다.
  *        특정 형태소의 변이형을 등록하려는 경우 kiwi_builder_add_alias_word 함수를 사용하는 걸 권장합니다.
  * 
- * @param handle KiwiBuilder.
- * @param word 추가할 형태소.
+ * @param handle KiwiBuilder의 핸들.
+ * @param word 추가할 형태소 (utf-8).
  * @param pos 품사 태그 (kiwi#POSTag).
  * @param score 점수.
  * @return 성공 시 0를 반환합니다.
@@ -161,11 +175,11 @@ DECL_DLL int kiwi_builder_add_word(kiwi_builder_h handle, const char* word, cons
  *        언어 모델 내에서 UNK(사전 미등재 단어)로 처리되는 반면, 
  *        이 함수로 등록한 형태소의 경우 언어모델 내에서 원본 형태소와 동일하게 처리됩니다.
  *
- * @param handle KiwiBuilder.
- * @param alias 새 형태소
+ * @param handle KiwiBuilder의 핸들.
+ * @param alias 새 형태소 (utf-8)
  * @param pos 품사 태그 (kiwi#POSTag).
  * @param score 점수.
- * @param orig_word 원 형태소
+ * @param orig_word 원 형태소 (utf-8)
  * @return 성공 시 0를 반환합니다.
  * 만약 orig_word에 pos 태그를 가진 원본 형태소가 존재하지 않는 경우 이 함수는 실패합니다.
  */
@@ -177,8 +191,8 @@ DECL_DLL int kiwi_builder_add_alias_word(kiwi_builder_h handle, const char* alia
  *        예) 사겼다 -> 사귀/VV + 었/EP + 다/EF
  *        
  * 
- * @param handle KiwiBuilder.
- * @param form 등록할 형태
+ * @param handle KiwiBuilder의 핸들.
+ * @param form 등록할 형태 (utf-8)
  * @param size 형태소의 개수
  * @param analyzed_morphs size 개수의 const char* 배열의 시작 포인터. 분석되어야할 각 형태소의 형태를 나타냅니다.
  * @param analyzed_pos size 개수의 const char* 배열의 시작 포인터. 분석되어야할 각 형태소의 품사를 나타냅니다.
@@ -192,7 +206,7 @@ DECL_DLL int kiwi_builder_add_pre_analyzed_word(kiwi_builder_h handle, const cha
 /**
  * @brief 규칙에 의해 변형된 형태소 목록을 생성하여 자동 추가합니다.
  *
- * @param handle KiwiBuilder.
+ * @param handle KiwiBuilder의 핸들.
  * @param pos 변형할 형태소의 품사 태그
  * @param replacer 변형 결과를 제공하는데에 쓰일 콜백 함수
  * @param user_data replacer 호출시 사용될 유저 데이터
@@ -205,7 +219,7 @@ DECL_DLL int kiwi_builder_add_rule(kiwi_builder_h handle, const char* pos, kiwi_
 /**
  * @brief 사용자 사전으로부터 단어를 읽어들입니다.
  * 
- * @param handle KiwiBuilder.
+ * @param handle KiwiBuilder의 핸들.
  * @param dict_path 사전 파일 경로.
  * @return 추가된 단어 수.
  */
@@ -214,7 +228,7 @@ DECL_DLL int kiwi_builder_load_dict(kiwi_builder_h handle, const char* dict_path
 /**
  * @brief 
  * 
- * @param handle 
+ * @param handle KiwiBuilder의 핸들.
  * @param reader 
  * @param user_data 
  * @param min_cnt 
@@ -228,7 +242,7 @@ DECL_DLL kiwi_ws_h kiwi_builder_extract_words(kiwi_builder_h handle, kiwi_reader
 /**
  * @brief 
  * 
- * @param handle 
+ * @param handle KiwiBuilder의 핸들.
  * @param reader 
  * @param user_data 
  * @param min_cnt 
@@ -242,7 +256,7 @@ DECL_DLL kiwi_ws_h kiwi_builder_extract_add_words(kiwi_builder_h handle, kiwi_re
 /**
  * @brief 
  * 
- * @param handle 
+ * @param handle KiwiBuilder의 핸들.
  * @param reader 
  * @param user_data 
  * @param min_cnt 
@@ -256,7 +270,7 @@ DECL_DLL kiwi_ws_h kiwi_builder_extract_words_w(kiwi_builder_h handle, kiwi_read
 /**
  * @brief 
  * 
- * @param handle 
+ * @param handle KiwiBuilder의 핸들.
  * @param reader 
  * @param user_data 
  * @param min_cnt 
@@ -268,52 +282,85 @@ DECL_DLL kiwi_ws_h kiwi_builder_extract_words_w(kiwi_builder_h handle, kiwi_read
 DECL_DLL kiwi_ws_h kiwi_builder_extract_add_words_w(kiwi_builder_h handle, kiwi_reader_w_t reader, void* user_data, int min_cnt, int max_word_len, float min_score, float pos_threshold);
 
 /**
- * @brief Kiwi instance를 생성합니다.
+ * @brief KiwiBuilder로부터 Kiwi instance를 생성합니다.
  * 
  * @param handle KiwiBuilder.
- * @return Kiwi instance.
+ * @return Kiwi의 핸들.
+ * 
+ * @note kiwi_close, kiwi_init
  */
 DECL_DLL kiwi_h kiwi_builder_build(kiwi_builder_h handle);
 
 /**
- * @brief 빌더를 사용하지 않고 Kiwi instance를 생성합니다.
+ * @brief KiwiBuilder를 거치지 않고 바로 Kiwi instance를 생성합니다.
  * 
  * @param model_path 모델이 들어있는 디렉토리 경로 (e.g., ./ModelGenerator).
  * @param num_threads 사용할 쓰레드의 수 (0일 경우, 자동으로 설정).
  * @param options 생성 옵션. KIWI_BUILD_* 참조.
- * @return Kiwi instance.
+ * @return Kiwi의 핸들.
  */
 DECL_DLL kiwi_h kiwi_init(const char* model_path, int num_threads, int options);
 
 /**
- * @brief KIWI_BUILD_INTEGRATE_ALLOMORPH 의 값을 변경합니다.
+ * @brief int 타입 옵션의 값을 변경합니다.
  * 
  * @param handle Kiwi.
- * @param option KIWI_BUILD_INTEGRATE_ALLOMORPH.
- * @param value 0 or 1 (enabled).
+ * @param option {KIWI_BUILD_INTEGRATE_ALLOMORPH, KIWI_MAX_UNK_FORM_SIZE, KIWI_SPACE_TOLERANCE}.
+ * @param value 옵션의 설정값
+ * 
+ * @see kiwi_get_option, kiwi_set_option_f
  */
 DECL_DLL void kiwi_set_option(kiwi_h handle, int option, int value);
 
 /**
- * @brief 옵션의 값을 반환합니다.
+ * @brief int 타입 옵션의 값을 반환합니다.
  * 
  * @param handle  Kiwi.
- * @param option {KIWI_BUILD_INTEGRATE_ALLOMORPH, KIWI_NUM_THREADS}.
+ * @param option {KIWI_BUILD_INTEGRATE_ALLOMORPH, KIWI_NUM_THREADS, KIWI_MAX_UNK_FORM_SIZE, KIWI_SPACE_TOLERANCE}.
  * @return 해당 옵션의 값을 반환합니다.
  *
- * - KIWI_BUILD_INTEGRATE_ALLOMORPH: 0 or 1
- * - KIWI_NUM_THREADS: 사용중인 쓰레드 수
+ * - KIWI_BUILD_INTEGRATE_ALLOMORPH: 이형태 통합 기능 사용 유무 (0 혹은 1)
+ * - KIWI_NUM_THREADS: 사용중인 쓰레드 수 (1 이상의 정수)
+ * - KIWI_MAX_UNK_FORM_SIZE: 추출 가능한 사전 미등재 형태의 최대 길이 (0 이상의 정수)
+ * - KIWI_SPACE_TOLERANCE: 무시할 수 있는 공백의 최대 개수 (0 이상의 정수)
  */
 DECL_DLL int kiwi_get_option(kiwi_h handle, int option);
 
 /**
- * @brief 
+ * @brief float 타입 옵션의 값을 변경합니다.
+ *
+ * @param handle Kiwi.
+ * @param option {KIWI_CUT_OFF_THRESHOLD, KIWI_UNK_FORM_SCORE_SCALE, KIWI_UNK_FORM_SCORE_BIAS, KIWI_SPACE_PENALTY}.
+ * @param value 옵션의 설정값
  * 
- * @param handle 
- * @param text 
- * @param top_n 
- * @param match_options 
- * @return 
+ * @see kiwi_get_option_f, kiwi_set_option
+ */
+DECL_DLL void kiwi_set_option_f(kiwi_h handle, int option, float value);
+
+/**
+ * @brief float 타입 옵션의 값을 반환합니다.
+ *
+ * @param handle  Kiwi.
+ * @param option {KIWI_CUT_OFF_THRESHOLD, KIWI_UNK_FORM_SCORE_SCALE, KIWI_UNK_FORM_SCORE_BIAS, KIWI_SPACE_PENALTY}.
+ * @return 해당 옵션의 값을 반환합니다.
+ *
+ * - KIWI_CUT_OFF_THRESHOLD: 분석 과정에서 이 값보다 더 크게 차이가 나는 후보들은 제거합니다.
+ * - KIWI_UNK_FORM_SCORE_SCALE: 미등재 형태 추출 시 사용하는 기울기 값
+ * - KIWI_UNK_FORM_SCORE_BIAS: 미등재 형태 추출 시 사용하는 편차 값
+ * - KIWI_SPACE_PENALTY: 무시하는 공백 1개당 발생하는 언어 점수 페널티 값
+ */
+DECL_DLL float kiwi_get_option_f(kiwi_h handle, int option);
+
+/**
+ * @brief 텍스트를 분석해 형태소 결과를 반환합니다.
+ *
+ * @param handle Kiwi.
+ * @param text 분석할 텍스트 (utf-16).
+ * @param top_n 반환할 결과물.
+ * @param match_options KIWI_MATCH_ALL 등 KIWI_MATCH_* 열거형 참고.
+ * @return 형태소 분석 결과의 핸들. kiwi_res_* 함수를 통해 값에 접근가능합니다. 이 핸들은 사용 후 kiwi_res_close를 사용해 반드시 해제되어야 합니다.
+ * 
+ * @see kiwi_analyze
  */
 DECL_DLL kiwi_res_h kiwi_analyze_w(kiwi_h handle, const kchar16_t* text, int top_n, int match_options);
 
@@ -321,10 +368,12 @@ DECL_DLL kiwi_res_h kiwi_analyze_w(kiwi_h handle, const kchar16_t* text, int top
  * @brief 텍스트를 분석해 형태소 결과를 반환합니다.
  * 
  * @param handle Kiwi.
- * @param text 분석할 텍스트.
+ * @param text 분석할 텍스트 (utf-8).
  * @param top_n 반환할 결과물.
  * @param match_options KIWI_MATCH_ALL 등 KIWI_MATCH_* 열거형 참고.
- * @return 형태소 분석 결과. kiwi_res_* 함수를 통해 값에 접근가능합니다.
+ * @return 형태소 분석 결과의 핸들. kiwi_res_* 함수를 통해 값에 접근가능합니다. 이 핸들은 사용 후 kiwi_res_close를 사용해 반드시 해제되어야 합니다.
+ * 
+ * @see kiwi_analyze_w
  */
 DECL_DLL kiwi_res_h kiwi_analyze(kiwi_h handle, const char* text, int top_n, int match_options);
 
@@ -355,14 +404,16 @@ DECL_DLL int kiwi_analyze_mw(kiwi_h handle, kiwi_reader_w_t reader, kiwi_receive
 DECL_DLL int kiwi_analyze_m(kiwi_h handle, kiwi_reader_t reader, kiwi_receiver_t receiver, void* user_data, int top_n, int match_options);
 
 /**
- * @brief
+ * @brief 텍스트를 문장 단위로 분할합니다.
  *
- * @param handle
- * @param text
- * @param match_options
+ * @param handle Kiwi.
+ * @param text 분할할 텍스트 (utf-16).
+ * @param match_options KIWI_MATCH_ALL 등 KIWI_MATCH_* 열거형 참고.
  * @param tokenized_res (선택사항) 형태소 분석 결과를 받으려는 경우 kiwi_res_h 값을 받을 포인터를 넘겨주세요.
  *              null을 입력시 형태소 분석 결과는 내부적으로 사용된 뒤 버려집니다.
- * @return
+ * @return 문장 분할 결과의 핸들. kiwi_ss_* 함수를 통해 값에 접근가능합니다.  이 핸들은 사용 후 kiwi_ss_close를 사용해 반드시 해제되어야 합니다.
+ * 
+ * @see kiwi_split_into_sents
  */
 DECL_DLL kiwi_ss_h kiwi_split_into_sents_w(kiwi_h handle, const kchar16_t* text, int match_options, kiwi_res_h* tokenized_res);
 
@@ -370,20 +421,24 @@ DECL_DLL kiwi_ss_h kiwi_split_into_sents_w(kiwi_h handle, const kchar16_t* text,
  * @brief 텍스트를 문장 단위로 분할합니다.
  *
  * @param handle Kiwi.
- * @param text 분할할 텍스트.
+ * @param text 분할할 텍스트 (utf-8).
  * @param match_options KIWI_MATCH_ALL 등 KIWI_MATCH_* 열거형 참고.
  * @param tokenized_res (선택사항) 형태소 분석 결과를 받으려는 경우 kiwi_res_h 값을 받을 포인터를 넘겨주세요. 
  *              null을 입력시 형태소 분석 결과는 내부적으로 사용된 뒤 버려집니다.
- * @return 문장 분할 결과
+ * @return 문장 분할 결과의 핸들. kiwi_ss_* 함수를 통해 값에 접근가능합니다.  이 핸들은 사용 후 kiwi_ss_close를 사용해 반드시 해제되어야 합니다.
+ * 
+ * @see kiwi_split_into_sents_w
  */
 DECL_DLL kiwi_ss_h kiwi_split_into_sents(kiwi_h handle, const char* text, int match_options, kiwi_res_h* tokenized_res);
 
 
 /**
- * @brief 
+ * @brief 사용이 완료된 Kiwi객체를 삭제합니다.
  * 
- * @param handle 
- * @return  
+ * @param handle Kiwi 핸들
+ * @return 성공시 0을 반환합니다. 실패시 0이 아닌 값을 반환합니다.
+ * 
+ * @note kiwi_builder_build 및 kiwi_init으로 생성된 kiwi_h는 반드시 이 함수로 해제되어야 합니다.
  */
 DECL_DLL int kiwi_close(kiwi_h handle);
 
@@ -494,10 +549,12 @@ DECL_DLL int kiwi_res_word_position(kiwi_res_h result, int index, int num);
 DECL_DLL int kiwi_res_sent_position(kiwi_res_h result, int index, int num);
 
 /**
- * @brief 
+ * @brief 사용이 완료된 형태소 분석 결과를 삭제합니다.
+ *
+ * @param handle 형태소 분석 결과 핸들
+ * @return 성공시 0을 반환합니다. 실패시 0이 아닌 값을 반환합니다.
  * 
- * @param result 
- * @return  
+ * @note kiwi_analyze 계열의 함수들에서 반환된 kiwi_res_h 값들은 반드시 이 함수를 통해 해제되어야 합니다.
  */
 DECL_DLL int kiwi_res_close(kiwi_res_h result);
 
@@ -590,10 +647,12 @@ DECL_DLL int kiwi_ss_begin_position(kiwi_ss_h result, int index);
 DECL_DLL int kiwi_ss_end_position(kiwi_ss_h result, int index);
 
 /**
- * @brief
+ * @brief 사용이 완료된 문장 분리 객체를 삭제합니다.
  *
- * @param result
- * @return
+ * @param handle 문장 분리 결과 핸들
+ * @return 성공시 0을 반환합니다. 실패시 0이 아닌 값을 반환합니다.
+ * 
+ * @note kiwi_split_into_sents 계열 함수에서 반환된 kiwi_ss_h는 반드시 이 함수로 해제되어야 합니다.
  */
 DECL_DLL int kiwi_ss_close(kiwi_ss_h result);
 

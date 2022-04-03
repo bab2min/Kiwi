@@ -2,8 +2,8 @@
  * @file Kiwi.h
  * @author bab2min (bab2min@gmail.com)
  * @brief Kiwi C++ API를 담고 있는 헤더 파일
- * @version 0.11.0
- * @date 2022-03-19
+ * @version 0.11.1
+ * @date 2022-04-03
  * 
  * 
  */
