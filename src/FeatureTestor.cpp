@@ -8,6 +8,9 @@ bool FeatureTestor::isMatched(const kchar_t* begin, const kchar_t* end, CondVowe
 	if (vowel == CondVowel::none) return true;
 	if (begin == end) return false;
 	if (vowel == CondVowel::any) return true;
+	if (!(u'\uAC00' <= end[-1] && end[-1] <= u'\uD7A4') &&
+		!(u'\u11A8' <= end[-1] && end[-1] <= u'\u11C2')) return true;
+
 	switch (vowel)
 	{
 	case CondVowel::vocalic_h:

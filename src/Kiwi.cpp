@@ -225,7 +225,7 @@ namespace kiwi
 		while (chunk != str.end())
 		{
 			POSTag tag = identifySpecialChr(*chunk);
-			while (chunk != str.end() && !(tag == POSTag::sf || tag == POSTag::ss || tag == POSTag::se || *chunk == u':'))
+			while (chunk != str.end() && !(tag == POSTag::sf || tag == POSTag::se || *chunk == u':'))
 			{
 				++chunk;
 				if (chunk - sents.back() >= 512)
