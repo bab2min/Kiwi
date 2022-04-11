@@ -48,6 +48,46 @@ TEST(KiwiCpp, InitClose)
 	Kiwi& kiwi = reuseKiwiInstance();
 }
 
+inline testing::AssertionResult testTokenization(Kiwi& kiwi, const std::u16string& s)
+{
+	auto tokens = kiwi.analyze(s, Match::all).first;
+	if (tokens.empty()) return testing::AssertionFailure() << "kiwi.analyze(" << testing::PrintToString(s) << ") yields an empty result.";
+	if (tokens.back().position + tokens.back().length == s.size())
+	{
+		return testing::AssertionSuccess();
+	}
+	else
+	{
+		return testing::AssertionFailure() << "the result of kiwi.analyze(" << testing::PrintToString(s) << ") ends at " << (tokens.back().position + tokens.back().length);
+	}
+}
+
+TEST(KiwiCpp, EmptyResult)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	auto testCases = {
+		u"제이플래닛2005년생위주6인조걸그룹",
+		u"당장 유튜브에서 '페ㅌ",
+		u"스쿠비쿨로",
+		u"키블러",
+		u"포뮬러",
+		u"오리쿨로",
+		u"만들어졌다\" 며 여전히 냉정하게 반응한다.",
+		u"통과했며",
+		u"우걱우걱\"",
+		u"네오 플래닛S",
+		u"YJ 뭐위 웨이촹GTS",
+		u"쮸쮸\"",
+		u"스틸블루",
+		u"15살이었므로",
+		u"타란튤라",
+	};
+	for (auto s : testCases)
+	{
+		EXPECT_TRUE(testTokenization(kiwi, s));
+	}
+}
+
 TEST(KiwiCpp, SpaceTolerant)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
