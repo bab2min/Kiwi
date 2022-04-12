@@ -211,17 +211,17 @@ TEST(KiwiCpp, NormalizeCoda)
 { 
 	Kiwi& kiwi = reuseKiwiInstance(); 
 	TokenResult res = kiwi.analyze(u"키윜ㅋㅋ", Match::allWithNormalizing); 
-	EXPECT_EQ(res.first[1].str, std::u16string{ u"ㅋㅋㅋ" });  
+	EXPECT_EQ(res.first.back().str, std::u16string{ u"ㅋㅋㅋ" });
 	res = kiwi.analyze(u"키윟ㅎ", Match::allWithNormalizing);
-	EXPECT_EQ(res.first[1].str, std::u16string{ u"ㅎㅎ" });
+	EXPECT_EQ(res.first.back().str, std::u16string{ u"ㅎㅎ" });
 	res = kiwi.analyze(u"키윅ㄱ", Match::allWithNormalizing);
-	EXPECT_EQ(res.first[1].str, std::u16string{ u"ㄱㄱ" });
+	EXPECT_EQ(res.first.back().str, std::u16string{ u"ㄱㄱ" });
 	res = kiwi.analyze(u"키윈ㄴㄴ", Match::allWithNormalizing);
-	EXPECT_EQ(res.first[1].str, std::u16string{ u"ㄴㄴㄴ" });
+	EXPECT_EQ(res.first.back().str, std::u16string{ u"ㄴㄴㄴ" });
 	res = kiwi.analyze(u"키윊ㅎㅎ", Match::allWithNormalizing);
-	EXPECT_EQ(res.first[2].str, std::u16string{ u"ㅎㅎ" });
+	EXPECT_EQ(res.first.back().str, std::u16string{ u"ㅎㅎ" });
 	res = kiwi.analyze(u"키윍ㄱㄱ", Match::allWithNormalizing);
-	EXPECT_EQ(res.first[2].str, std::u16string{ u"ㄱㄱ" });
+	EXPECT_EQ(res.first.back().str, std::u16string{u"ㄱㄱ"});
 } 
 
 TEST(KiwiCpp, AnalyzeWithWordPosition)

@@ -762,45 +762,6 @@ namespace kiwi
 		return ret;
 	}
 
-	template<class It> //여러가지 타입에 대응가능함.
-	inline void normalizeCoda(It begin, It end) 
-	{
-		char16_t before = 0;
-		for (auto it = begin; it != end; ++it) 
-		{ 
-			if (before == 4543 && *it == 12619) // 키윜ㅋㅋ -> 키위ㅋㅋㅋ
-			{
-				it[-1] = 12619;
-			}
-			else if (before == 4546 && *it == 12622) // 키윟ㅎㅎ->키위ㅎㅎㅎ
-			{ 
-				it[-1] = 12622;
-			}
-			else if (before == 4525 && *it == 12622) // 키윊ㅎㅎ->키윈ㅎㅎ
-			{ 
-				it[-1] = 4523;
-			}
-			else if (before == 4534 && *it == 12622) // 키윓ㅎㅎ->키윌ㅎㅎ
-			{ 
-				it[-1] = 4527;
-			}
-			else if (before == 4528 && *it == 12593) // 키윍ㄱㄱ->키윌ㄱㄱ
-			{ 
-				it[-1] = 4527;
-			}
-			else if (before == 4520 && *it == 12593) // 키윅ㄱㄱ->키위ㄱㄱㄱ
-			{ 
-				it[-1] = 12593;
-			}
-			else if (before == 4523 && *it == 12596) // 키윈ㄴㄴ->키위ㄴㄴㄴ
-			{ 
-				it[-1] = 12596;
-			}
-			before = *it;
-
-		}
-	}
-
 	/**
 	* @brief 주어진 문자열에 나타난 개별 문자들에 대해 어절번호(wordPosition) 생성하여 반환한다.
 	* @details 문자열의 길이와 동일한 크기의 std::vector<uint16_t>를 생성한 뒤, 문자열 내 개별 문자가
