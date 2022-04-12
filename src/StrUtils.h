@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <string>
 #include <vector>
 #include <utility>
@@ -402,5 +402,82 @@ namespace kiwi
 		if (tagStr == u"W_MENTION") return POSTag::w_mention;
 		//assert(0);
 		return POSTag::max;
+	}
+
+	template<class It>
+	inline void normalizeCoda(It begin, It end)
+	{
+		static char16_t codaToOnsetTable[] = {
+			0x3131, // ㄱ
+			0x3131, // ㄲ
+			0x3145, // ㄳ
+			0x3134, // ㄴ
+			0x3148, // ㄵ
+			0x314E, // ㄶ
+			0x3137, // ㄷ
+			0x3139, // ㄹ
+			0x3131, // ㄺ
+			0x3141, // ㄻ
+			0x3142, // ㄼ
+			0x3145, // ㄽ
+			0x314C, // ㄾ
+			0x314D, // ㄿ
+			0x314E, // ㅀ
+			0x3141, // ㅁ
+			0x3142, // ㅂ
+			0x3145, // ㅄ
+			0x3145, // ㅅ
+			0x3145, // ㅆ
+			0x3147, // ㅇ
+			0x3148, // ㅈ
+			0x314A, // ㅊ
+			0x314B, // ㅋ
+			0x314C, // ㅌ
+			0x314D, // ㅍ
+			0x314E, // ㅎ
+		};
+		static char16_t codaConversionTable[] = {
+			0, // ㄱ
+			0x11A8, // ㄲ
+			0x11A8, // ㄳ
+			0, // ㄴ
+			0x11AB, // ㄵ
+			0x11AB, // ㄶ
+			0, // ㄷ
+			0, // ㄹ
+			0x11AF, // ㄺ
+			0x11AF, // ㄻ
+			0x11AF, // ㄼ
+			0x11AF, // ㄽ
+			0x11AF, // ㄾ
+			0x11AF, // ㄿ
+			0x11AF, // ㅀ
+			0, // ㅁ
+			0, // ㅂ
+			0x11B8, // ㅄ
+			0, // ㅅ
+			0x11BA, // ㅆ
+			0, // ㅇ
+			0, // ㅈ
+			0, // ㅊ
+			0, // ㅋ
+			0, // ㅌ
+			0, // ㅍ
+			0, // ㅎ
+		};
+		char16_t before = 0;
+		for (auto it = begin; it != end; ++it)
+		{
+			if (0x11A8 <= before && before <= 0x11C2)
+			{
+				auto offset = before - 0x11A8;
+				if (*it == codaToOnsetTable[offset])
+				{
+					if (codaConversionTable[offset]) it[-1] = codaConversionTable[offset];
+					else it[-1] = *it;
+				}
+			}
+			before = *it;
+		}
 	}
 }

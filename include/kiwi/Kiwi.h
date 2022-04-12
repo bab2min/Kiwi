@@ -58,7 +58,7 @@ namespace kiwi
 
 		bool integrateAllomorph = true;
 		float cutOffThreshold = 5;
-		float unkFormScoreScale = 3;
+		float unkFormScoreScale = 5;
 		float unkFormScoreBias = 5;
 		float spacePenalty = 7;
 		size_t maxUnkFormSize = 6;

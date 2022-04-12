@@ -890,6 +890,34 @@ struct FreezeTrieGetter
 	};
 };
 
+inline CondVowel reduceVowel(CondVowel v, const Morpheme* m)
+{
+	if (v == m->vowel) return v;
+	if (CondVowel::vowel <= v && v <= CondVowel::vocalic_h)
+	{
+		if (CondVowel::vowel <= m->vowel && m->vowel <= CondVowel::vocalic_h)
+		{
+			return max(v, m->vowel);
+		}
+		return CondVowel::none;
+	}
+	else if (CondVowel::non_vowel <= v && v <= CondVowel::non_vocalic_h)
+	{
+		if (CondVowel::non_vowel <= m->vowel && m->vowel <= CondVowel::non_vocalic_h)
+		{
+			return min(v, m->vowel);
+		}
+		return CondVowel::none;
+	}
+	return CondVowel::none;
+}
+
+inline CondPolarity reducePolar(CondPolarity p, const Morpheme* m)
+{
+	if (p == m->polar) return p;
+	return CondPolarity::none;
+}
+
 Kiwi KiwiBuilder::build() const
 {
 	Kiwi ret{ archType, langMdl->getHeader().key_size };
@@ -951,24 +979,15 @@ Kiwi KiwiBuilder::build() const
 		auto& f = ret.forms[i];
 		if (f.candidate.empty()) continue;
 
-		if (f.candidate[0]->vowel != CondVowel::none &&
-			all_of(f.candidate.begin(), f.candidate.end(), [&](const Morpheme* m)
+		if (f.candidate[0]->vowel != CondVowel::none)
 		{
-			return m->vowel == f.candidate[0]->vowel;
-		}))
-		{
-			f.vowel = f.candidate[0]->vowel;
+			f.vowel = accumulate(f.candidate.begin(), f.candidate.end(), f.candidate[0]->vowel, reduceVowel);
 		}
 
-		if (f.candidate[0]->polar != CondPolarity::none &&
-			all_of(f.candidate.begin(), f.candidate.end(), [&](const Morpheme* m)
+		if (f.candidate[0]->polar != CondPolarity::none)
 		{
-			return m->polar == f.candidate[0]->polar;
-		}))
-		{
-			f.polar = f.candidate[0]->polar;
+			f.polar = accumulate(f.candidate.begin(), f.candidate.end(), f.candidate[0]->polar, reducePolar);
 		}
-
 		sortedForms.emplace_back(&f);
 	}
 
