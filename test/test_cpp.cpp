@@ -66,6 +66,11 @@ TEST(KiwiCpp, EmptyResult)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
 	auto testCases = {
+		u"보일덱BD2",
+		u"5스트릿/7스트릿",
+		u"며",
+		u"\"오쿠\"(",
+		u"키미토나라바킷토ah",
 		u"제이플래닛2005년생위주6인조걸그룹",
 		u"당장 유튜브에서 '페ㅌ",
 		u"스쿠비쿨로",
