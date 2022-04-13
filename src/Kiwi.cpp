@@ -408,7 +408,7 @@ namespace kiwi
 
 	template<ArchType arch, class LmType, class _Type>
 	void evalTrigram(const lm::KnLangModel<arch, LmType>* knlm, const Morpheme* morphBase, const Vector<KString>& ownForms, const Vector<WordLLs>& cache,
-		array<Wid, 4> seq, size_t chSize, const Morpheme* curMorph, const KGraphNode* node, const KGraphNode* startNode, _Type& maxWidLL)
+		array<Wid, 4> seq, size_t chSize, const Morpheme* curMorph, const KGraphNode* node, const KGraphNode* startNode, _Type& maxWidLL, float ignoreCondScore)
 	{
 		size_t vocabSize = knlm->getHeader().vocab_size;
 		for (size_t i = 0; i < KGraphNode::max_prev; ++i)
@@ -431,9 +431,13 @@ namespace kiwi
 
 				auto leftForm = wids->back().ownFormId ? &ownForms[wids->back().ownFormId - 1] : morphBase[wids->back().wid].kform;
 
-				if (!FeatureTestor::isMatched(leftForm, curMorph->vowel, curMorph->polar))
+				if (ignoreCondScore)
 				{
-					continue;
+					candScore += FeatureTestor::isMatched(leftForm, curMorph->vowel, curMorph->polar) ? 0 : ignoreCondScore;
+				}
+				else
+				{
+					if (!FeatureTestor::isMatched(leftForm, curMorph->vowel, curMorph->polar)) continue;
 				}
 
 				auto cNode = p.node;
@@ -491,7 +495,8 @@ namespace kiwi
 	)
 	{
 		auto lm = static_cast<const lm::KnLangModel<arch, LmType>*>(kw->langMdl.get());
-		size_t langVocabSize = lm->getHeader().vocab_size;
+		const size_t langVocabSize = lm->getHeader().vocab_size;
+		auto& nCache = cache[i];
 
 		float whitespaceDiscount = 0;
 		if (node->uform.empty() && node->endPos - node->startPos > node->form->form.size())
@@ -500,118 +505,121 @@ namespace kiwi
 		}
 
 		float tMax = -INFINITY;
-		for (auto& curMorph : cands)
+		for (bool ignoreCond : {false, true})
 		{
-			array<Wid, 4> seq = { 0, };
-			array<Wid, 4> oseq = { 0, };
-			uint8_t combSocket = 0;
-			CondVowel condV = CondVowel::none;
-			CondPolarity condP = CondPolarity::none;
-			size_t chSize = 1;
-			bool isUserWord = false;
-			// if the morpheme is chunk set
-			if (!curMorph->chunks.empty())
+			for (auto& curMorph : cands)
 			{
-				chSize = curMorph->chunks.size();
-				for (size_t i = 0; i < chSize; ++i)
+				array<Wid, 4> seq = { 0, };
+				array<Wid, 4> oseq = { 0, };
+				uint8_t combSocket = 0;
+				CondVowel condV = CondVowel::none;
+				CondPolarity condP = CondPolarity::none;
+				size_t chSize = 1;
+				bool isUserWord = false;
+				// if the morpheme is chunk set
+				if (!curMorph->chunks.empty())
 				{
-					seq[i] = curMorph->chunks[i]->lmMorphemeId;
-					if (curMorph->chunks[i] - kw->morphemes.data() >= langVocabSize)
+					chSize = curMorph->chunks.size();
+					for (size_t i = 0; i < chSize; ++i)
 					{
-						oseq[i] = curMorph->chunks[i] - kw->morphemes.data();
+						seq[i] = curMorph->chunks[i]->lmMorphemeId;
+						if (curMorph->chunks[i] - kw->morphemes.data() >= langVocabSize)
+						{
+							oseq[i] = curMorph->chunks[i] - kw->morphemes.data();
+						}
+						else
+						{
+							oseq[i] = seq[i];
+						}
 					}
-					else
-					{
-						oseq[i] = seq[i];
-					}
-				}
-			}
-			else
-			{
-				seq[0] = curMorph->lmMorphemeId;
-				if ((curMorph->getCombined() ? curMorph->getCombined() : curMorph) - kw->morphemes.data() >= langVocabSize)
-				{
-					isUserWord = true;
-					oseq[0] = curMorph - kw->morphemes.data();
 				}
 				else
 				{
-					oseq[0] = seq[0];
-				}
-				combSocket = curMorph->combineSocket;
-			}
-			condV = curMorph->vowel;
-			condP = curMorph->polar;
-
-			UnorderedMap<Wid, Vector<WordLLP>> maxWidLL;
-			evalTrigram(lm, kw->morphemes.data(), ownFormList, cache, seq, chSize, curMorph, node, startNode, maxWidLL);
-
-			float estimatedLL = curMorph->userScore + whitespaceDiscount;
-			// if a form of the node is unknown, calculate log poisson distribution for word-tag
-			if (unknownForm)
-			{
-				size_t unknownLen = node->uform.empty() ? node->form->form.size() : node->uform.size();
-				estimatedLL -= unknownLen * kw->unkFormScoreScale + kw->unkFormScoreBias;
-			}
-
-			float discountForCombining = 0;
-			if (curMorph->combineSocket) discountForCombining -= 15.f;
-			estimatedLL += kw->tagScorer.evalLeftBoundary(hasLeftBoundary(node), curMorph->tag);
-
-			for (auto& p : maxWidLL)
-			{
-				for (auto& q : p.second)
-				{
-					q.accScore += estimatedLL;
-					tMax = max(tMax, q.accScore + discountForCombining);
-				}
-			}
-
-			auto& nCache = cache[i];
-			for (auto& p : maxWidLL)
-			{
-				for (auto& q : p.second)
-				{
-					if (q.accScore <= tMax - kw->cutOffThreshold) continue;
-					nCache.emplace_back(WordLL{ MInfos{}, q.accScore, q.node });
-					auto& wids = nCache.back().morphs;
-					wids.reserve(q.morphs->size() + chSize);
-					wids = *q.morphs;
-					size_t beginPos = node->startPos;
-					if (!curMorph->chunks.empty())
+					seq[0] = curMorph->lmMorphemeId;
+					if ((curMorph->getCombined() ? curMorph->getCombined() : curMorph) - kw->morphemes.data() >= langVocabSize)
 					{
-						if (curMorph->combineSocket)
+						isUserWord = true;
+						oseq[0] = curMorph - kw->morphemes.data();
+					}
+					else
+					{
+						oseq[0] = seq[0];
+					}
+					combSocket = curMorph->combineSocket;
+				}
+				condV = curMorph->vowel;
+				condP = curMorph->polar;
+
+				UnorderedMap<Wid, Vector<WordLLP>> maxWidLL;
+				evalTrigram(lm, kw->morphemes.data(), ownFormList, cache, seq, chSize, curMorph, node, startNode, maxWidLL, ignoreCond ? -10 : 0);
+				if (maxWidLL.empty()) continue;
+
+				float estimatedLL = curMorph->userScore + whitespaceDiscount;
+				// if a form of the node is unknown, calculate log poisson distribution for word-tag
+				if (unknownForm)
+				{
+					size_t unknownLen = node->uform.empty() ? node->form->form.size() : node->uform.size();
+					estimatedLL -= unknownLen * kw->unkFormScoreScale + kw->unkFormScoreBias;
+				}
+
+				float discountForCombining = curMorph->combineSocket ? -15 : 0;
+				estimatedLL += kw->tagScorer.evalLeftBoundary(hasLeftBoundary(node), curMorph->tag);
+
+				for (auto& p : maxWidLL)
+				{
+					for (auto& q : p.second)
+					{
+						q.accScore += estimatedLL;
+						tMax = max(tMax, q.accScore + discountForCombining);
+					}
+				}
+
+				for (auto& p : maxWidLL)
+				{
+					for (auto& q : p.second)
+					{
+						if (q.accScore <= tMax - kw->cutOffThreshold) continue;
+						nCache.emplace_back(WordLL{ MInfos{}, q.accScore, q.node });
+						auto& wids = nCache.back().morphs;
+						wids.reserve(q.morphs->size() + chSize);
+						wids = *q.morphs;
+						size_t beginPos = node->startPos;
+						if (!curMorph->chunks.empty())
 						{
-							auto& back = wids.back();
-							back.wid = (Wid)(kw->morphemes[wids.back().wid].getCombined() - kw->morphemes.data());
-							back.combineSocket = 0;
-							back.condVowel = CondVowel::none;
-							back.condPolar = CondPolarity::none;
-							back.ownFormId = 0;
-							back.endPos = beginPos + curMorph->chunks.getSecond(0).second;
-							for (size_t ch = 1; ch < chSize; ++ch)
+							if (curMorph->combineSocket)
 							{
-								auto& p = curMorph->chunks.getSecond(ch);
-								wids.emplace_back(oseq[ch], 0, condV, condP, 0, beginPos + p.first, beginPos + p.second);
+								auto& back = wids.back();
+								back.wid = (Wid)(kw->morphemes[wids.back().wid].getCombined() - kw->morphemes.data());
+								back.combineSocket = 0;
+								back.condVowel = CondVowel::none;
+								back.condPolar = CondPolarity::none;
+								back.ownFormId = 0;
+								back.endPos = beginPos + curMorph->chunks.getSecond(0).second;
+								for (size_t ch = 1; ch < chSize; ++ch)
+								{
+									auto& p = curMorph->chunks.getSecond(ch);
+									wids.emplace_back(oseq[ch], 0, condV, condP, 0, beginPos + p.first, beginPos + p.second);
+								}
+							}
+							else
+							{
+								for (size_t ch = 0; ch < chSize; ++ch)
+								{
+									auto& p = curMorph->chunks.getSecond(ch);
+									wids.emplace_back(oseq[ch], 0, condV, condP, 0, beginPos + p.first, beginPos + p.second);
+								}
 							}
 						}
 						else
 						{
-							for (size_t ch = 0; ch < chSize; ++ch)
-							{
-								auto& p = curMorph->chunks.getSecond(ch);
-								wids.emplace_back(oseq[ch], 0, condV, condP, 0, beginPos + p.first, beginPos + p.second);
-							}
+							wids.emplace_back(oseq[0], combSocket,
+								CondVowel::none, CondPolarity::none, ownFormId, beginPos, node->endPos
+							);
 						}
-					}
-					else
-					{
-						wids.emplace_back(oseq[0], combSocket, 
-							CondVowel::none, CondPolarity::none, ownFormId, beginPos, node->endPos
-						);
 					}
 				}
 			}
+			if (!nCache.empty()) break;
 		}
 		return tMax;
 	}
