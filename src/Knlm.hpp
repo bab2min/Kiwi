@@ -423,6 +423,12 @@ namespace kiwi
 				}
 			}
 
+
+			float _progress(ptrdiff_t& node_idx, size_t next) const override
+			{
+				return progress(node_idx, (KeyType)next);
+			}
+
 			ptrdiff_t getBosNodeIdx() const
 			{
 				return bos_node_idx;

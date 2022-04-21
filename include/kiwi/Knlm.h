@@ -40,6 +40,7 @@ namespace kiwi
 			}
 
 			//virtual float getLL(ptrdiff_t node_idx, size_t next) const = 0;
+			virtual float _progress(ptrdiff_t& node_idx, size_t next) const = 0;
 			virtual std::vector<float> allNextLL(ptrdiff_t node_idx) const = 0;
 			virtual std::vector<float> allNextLL(ptrdiff_t node_idx, std::vector<ptrdiff_t>& next_node_idx) const = 0;
 
@@ -73,7 +74,7 @@ namespace kiwi
 				ptrdiff_t node_idx = 0;
 				for (; in_first != in_last; ++in_first)
 				{
-					*out_first = progress(node_idx, *in_first);
+					*out_first = _progress(node_idx, *in_first);
 					++out_first;
 				}
 			}
@@ -85,7 +86,7 @@ namespace kiwi
 				ptrdiff_t node_idx = 0;
 				for (; in_first != in_last; ++in_first)
 				{
-					ret += std::max(progress(node_idx, *in_first), min_score);
+					ret += std::max(_progress(node_idx, *in_first), min_score);
 				}
 				return ret;
 			}
@@ -96,7 +97,7 @@ namespace kiwi
 				ptrdiff_t node_idx = 0;
 				for (; in_first != in_last; ++in_first)
 				{
-					progress(node_idx, *in_first);
+					_progress(node_idx, *in_first);
 				}
 				return allNextLL(node_idx);
 			}
@@ -107,7 +108,7 @@ namespace kiwi
 				ptrdiff_t node_idx = 0;
 				for (; in_first != in_last; ++in_first)
 				{
-					progress(node_idx, *in_first);
+					_progress(node_idx, *in_first);
 					*out_first = allNextLL(node_idx);
 					++out_first;
 				}
@@ -119,7 +120,7 @@ namespace kiwi
 				ptrdiff_t node_idx = 0;
 				for (; prefix_first != prefix_last; ++prefix_first)
 				{
-					progress(node_idx, *prefix_first);
+					_progress(node_idx, *prefix_first);
 				}
 
 				std::vector<ptrdiff_t> next_node_idcs;

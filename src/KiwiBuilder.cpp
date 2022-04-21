@@ -1,4 +1,5 @@
 ﻿#include <fstream>
+#include <random>
 
 #include <kiwi/Kiwi.h>
 #include <kiwi/Utils.h>
@@ -13,6 +14,8 @@
 #include "FeatureTestor.h"
 #include "Combiner.h"
 #include "RaggedVector.hpp"
+#include "SkipBigramTrainer.hpp"
+#include "SkipBigramModel.hpp"
 
 using namespace std;
 using namespace kiwi;
@@ -87,6 +90,7 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 		float morphWeight = stof(fields[2].begin(), fields[2].end());
 
 		CondVowel cvowel = CondVowel::none;
+		bool irregular = false;
 		KString origMorphemeOfAlias;
 		int addAlias = 0;
 		if (fields.size() > 3)
@@ -121,6 +125,14 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 						if (stof(fields[i + 1].begin(), fields[i + 1].end())) ++i;
 					}
 				}
+				else if (f == u"irreg")
+				{
+					irregular = true;
+				}
+				else if (f == u"reg")
+				{
+					irregular = false;
+				}
 				else if (f[0] == u'=')
 				{
 					if (!origMorphemeOfAlias.empty()) throw Exception{ "wrong line: " + line };
@@ -151,11 +163,11 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 
 		if (filter(tag, morphWeight) && origMorphemeOfAlias.empty())
 		{
-			insertMorph(move(form), morphWeight, tag, cvowel);
+			insertMorph(move(form), morphWeight, irregular ? setIrregular(tag) : tag, cvowel);
 		}
 		else
 		{
-			longTails.emplace_back(form, morphWeight, tag, cvowel, origMorphemeOfAlias, addAlias);
+			longTails.emplace_back(form, morphWeight, irregular ? setIrregular(tag) : tag, cvowel, origMorphemeOfAlias, addAlias);
 			longTailWeights[tag] += morphWeight;
 		}
 		
@@ -169,7 +181,7 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 		auto& origMorphemeOfAlias = get<4>(p);
 		auto addAlias = get<5>(p);
 		if (origMorphemeOfAlias.empty()) continue;
-		auto it = morphMap.find(make_pair(origMorphemeOfAlias, tag));
+		auto it = morphMap.find(make_pair(origMorphemeOfAlias, clearIrregular(tag)));
 		if (it == morphMap.end())
 		{
 			throw Exception{ "cannot find base morpheme: " + utf16To8(origMorphemeOfAlias) + "/" + tagToString(tag) };
@@ -211,6 +223,18 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 		m.userScore = 0;
 	}
 	return morphMap;
+}
+
+auto KiwiBuilder::restoreMorphemeMap() const -> MorphemeMap
+{
+	MorphemeMap ret;
+	for (size_t i = defaultTagSize + 1; i < morphemes.size(); ++i)
+	{
+		size_t id = morphemes[i].lmMorphemeId;
+		if (!id) id = i;
+		ret.emplace(make_pair(forms[morphemes[i].kform].form, morphemes[i].tag), id);
+	}
+	return ret;
 }
 
 void KiwiBuilder::addCorpusTo(RaggedVector<uint16_t>& out, std::istream& is, KiwiBuilder::MorphemeMap& morphMap)
@@ -274,7 +298,7 @@ void KiwiBuilder::updateForms()
 	{
 		formOrder.emplace_back(move(forms[i]), i);
 	}
-	sort(formOrder.begin() + defaultTagSize, formOrder.end());
+	sort(formOrder.begin() + defaultTagSize - 1, formOrder.end());
 
 	forms.clear();
 	for (size_t i = 0; i < formOrder.size(); ++i)
@@ -320,7 +344,7 @@ void KiwiBuilder::saveMorphBin(std::ostream& os) const
 	serializer::writeMany(os, serializer::toKey("KIWI"), forms, morphemes);
 }
 
-KiwiBuilder::KiwiBuilder(const string& modelPath, size_t _numThreads, BuildOption _options) 
+KiwiBuilder::KiwiBuilder(const string& modelPath, size_t _numThreads, BuildOption _options, bool useSBG) 
 	: detector{ modelPath, _numThreads }, options{ _options }, numThreads{ _numThreads ? _numThreads : thread::hardware_concurrency() }
 {
 	archType = getSelectedArch(ArchType::default_);
@@ -331,6 +355,10 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, size_t _numThreads, BuildOptio
 		loadMorphBin(iss);
 	}
 	langMdl = lm::KnLangModelBase::create(utils::MMap(modelPath + string{ "/sj.knlm" }), archType);
+	if (useSBG)
+	{
+		sbgMdl = sb::SkipBigramModelBase::create(utils::MMap(modelPath + string{ "/skipbigram.mdl" }), archType);
+	}
 
 	if (!!(options & BuildOption::loadDefaultDict))
 	{
@@ -347,12 +375,12 @@ KiwiBuilder::KiwiBuilder(const ModelBuildArgs& args)
 {
 	archType = getSelectedArch(ArchType::default_);
 
-	forms.resize(defaultTagSize);
-	morphemes.resize(defaultTagSize + 2); // additional places for <s> & </s>
-	for (size_t i = 0; i < defaultTagSize; ++i)
+	forms.resize(defaultTagSize - 1);
+	morphemes.resize(defaultTagSize + 1); // additional places for <s> & </s>
+	for (size_t i = 1; i < defaultTagSize; ++i)
 	{
-		forms[i].candidate.emplace_back(i + 2);
-		morphemes[i + 2].tag = (POSTag)(i + 1);
+		forms[i - 1].candidate.emplace_back(i + 1);
+		morphemes[i + 1].tag = (POSTag)i;
 	}
 
 	ifstream ifs;
@@ -362,13 +390,35 @@ KiwiBuilder::KiwiBuilder(const ModelBuildArgs& args)
 	});
 	updateForms();
 
-	RaggedVector<uint16_t> sents;
+	RaggedVector<utils::Vid> sents;
 	for (auto& path : args.corpora)
 	{
 		ifstream ifs;
 		addCorpusTo(sents, openFile(ifs, path), realMorph);
 	}
 
+	if (args.dropoutProb > 0 && args.dropoutSampling > 0)
+	{
+		mt19937_64 rng{ 42 };
+		bernoulli_distribution sampler{ args.dropoutSampling }, drop{ args.dropoutProb };
+
+		size_t origSize = sents.size();
+		for (size_t i = 0; i < origSize; ++i)
+		{
+			if (!sampler(rng)) continue;
+			sents.emplace_back();
+			for (size_t j = 0; j < sents[i].size(); ++j)
+			{
+				auto v = sents[i][j];
+				if (drop(rng))
+				{
+					v = getDefaultMorphemeId(morphemes[v].tag);
+				}
+				sents.add_data(v);
+			}
+		}
+	}
+	
 	size_t lmVocabSize = 0;
 	for (auto& p : realMorph) lmVocabSize = max(p.second, lmVocabSize);
 	lmVocabSize += 1;
@@ -403,6 +453,231 @@ KiwiBuilder::KiwiBuilder(const ModelBuildArgs& args)
 	), archType);
 
 	updateMorphemes();
+}
+
+class SBDataFeeder
+{
+	const RaggedVector<utils::Vid>& sents;
+	const lm::KnLangModelBase* lm = nullptr;
+	Vector<Vector<float>> lmBuf;
+
+public:
+	SBDataFeeder(const RaggedVector<utils::Vid>& _sents, const lm::KnLangModelBase* _lm, size_t numThreads = 1)
+		: sents{ _sents }, lm{ _lm }, lmBuf(numThreads)
+	{
+	}
+
+	sb::FeedingData<utils::Vid> operator()(size_t i, size_t threadId = 0)
+	{
+		sb::FeedingData<utils::Vid> ret;
+		ret.len = sents[i].size();
+		if (lmBuf[threadId].size() < ret.len)
+		{
+			lmBuf[threadId].resize(ret.len);
+		}
+		ret.x = &sents[i][0];
+		lm->evaluate(sents[i].begin(), sents[i].end(), lmBuf[threadId].data());
+		ret.lmLogProbs = lmBuf[threadId].data();
+		return ret;
+	}
+};
+
+KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
+	: KiwiBuilder{ modelPath }
+{
+	auto realMorph = restoreMorphemeMap();
+	RaggedVector<utils::Vid> sents;
+	if (0)
+	{
+		for (auto& path : args.corpora)
+		{
+			ifstream ifs;
+			addCorpusTo(sents, openFile(ifs, path), realMorph);
+		}
+
+		if (false && args.dropoutProb > 0 && args.dropoutSampling > 0)
+		{
+			mt19937_64 rng{ 42 };
+			bernoulli_distribution sampler{ args.dropoutSampling }, drop{ args.dropoutProb };
+
+			size_t origSize = sents.size();
+			for (size_t i = 0; i < origSize; ++i)
+			{
+				if (!sampler(rng)) continue;
+				sents.emplace_back();
+				for (size_t j = 0; j < sents[i].size(); ++j)
+				{
+					auto v = sents[i][j];
+					if (drop(rng))
+					{
+						v = getDefaultMorphemeId(morphemes[v].tag);
+					}
+					sents.add_data(v);
+				}
+			}
+		}
+		//ofstream ofs{ "sent.bin", ios_base::binary };
+		//auto mem = sents.toMemory();
+		//ofs.write((const char*)mem.get(), mem.size());
+	}
+	else
+	{
+		ifstream ifs{ "sent.bin", ios_base::binary };
+		utils::MMap mm{ "sent.bin" };
+		utils::imstream im(mm.get(), mm.size());
+		sents = RaggedVector<utils::Vid>::fromMemory(im);
+	}
+
+	size_t lmVocabSize = 0;
+	for (auto& p : realMorph) lmVocabSize = max(p.second, lmVocabSize);
+	lmVocabSize += 1;
+
+	auto sbgFilter = [&](size_t a, size_t b)
+	{
+		if (a < 21 || (34 < a && a < defaultTagSize + 1)) return false;
+		if (isEClass(morphemes[a].tag) || isJClass(morphemes[a].tag)) return false;
+		if (isEClass(morphemes[b].tag) || isJClass(morphemes[b].tag)) return false;
+		if (morphemes[a].tag == POSTag::vcp || morphemes[a].tag == POSTag::vcn) return false;
+		if (morphemes[b].tag == POSTag::vcp || morphemes[b].tag == POSTag::vcn) return false;
+		return true;
+	};
+
+	/*Vector<std::pair<size_t, float>> cases = {
+		{ 5, 0.10f },
+		{ 10, 0.10f },
+		{ 5, 0.08f },
+		{ 10, 0.08f },
+		{ 5, 0.06f },
+		{ 10, 0.06f },
+		{ 5, 0.04f },
+		{ 10, 0.04f },
+	};
+	for (size_t n = 0; n < cases.size(); ++n)
+	{
+		ofstream ofs{"logs/" + to_string(n) + ".log"};
+		SkipBigramTrainer<utils::Vid, 8> sbg{ sents, sbgFilter, 0, 320, cases[n].first, cases[n].second};
+		ofs << "minCnt: " << cases[n].first << ", minNPMI: " << cases[n].second << ", vocabs: " << sbg.vocabDataSize() << "\n" << endl;
+		for (size_t i = 0; i < lmVocabSize; ++i)
+		{
+			auto vs = sbg.getVocabByCond(i);
+			if (vs.empty()) continue;
+			ofs << utf16To8(joinHangul(forms[morphemes[i].kform].form)) << '/' << tagToString(morphemes[i].tag) << endl;
+			for (auto v : vs)
+			{
+				ofs << "    " << utf16To8(joinHangul(forms[morphemes[v].kform].form)) << '/' << tagToString(morphemes[v].tag) << endl;
+			}
+			ofs << endl;
+		}
+	}*/
+	
+	sb::SkipBigramTrainer<utils::Vid, 8> sbg;
+	if (1)
+	{
+		sbg = sb::SkipBigramTrainer<utils::Vid, 8>{ sents, sbgFilter, 0, 150, 10, 1, 1000000 };
+		ofstream ofs{ "sbg.bin", ios_base::binary };
+		sbg.save(ofs);
+	}
+	else
+	{
+		ifstream ifs{ "sbg.bin", ios_base::binary };
+		sbg.load(ifs);
+	}
+
+	Vector<float> lmLogProbs;
+	auto tc = sbg.newContext();
+	float llMean = 0;
+	size_t llCnt = 0;
+	Vector<size_t> sampleIdcs;
+	for (size_t i = 0; i < sents.size(); ++i)
+	{
+		if (i % 20 == 0) continue;
+		sampleIdcs.emplace_back(i);
+	}
+
+	for (size_t i = 0; i < sents.size(); i += 20)
+	{
+		auto sent = sents[i];
+		if (lmLogProbs.size() < sent.size())
+		{
+			lmLogProbs.resize(sent.size());
+		}
+		langMdl->evaluate(sent.begin(), sent.end(), lmLogProbs.begin());
+		//float sum = sbg.evaluate(&sent[0], lmLogProbs.data(), sent.size());
+		float sum = accumulate(lmLogProbs.begin() + 1, lmLogProbs.begin() + sent.size(), 0.);
+		size_t cnt = sent.size() - 1;
+		llCnt += cnt;
+		llMean += (sum - llMean * cnt) / llCnt;
+	}
+	cout << "Init Dev AvgLL: " << llMean << endl;
+
+	llCnt = 0;
+	llMean = 0;
+	float lrStart = 1e-1;
+	size_t numEpochs = 10;
+	size_t totalSteps = sampleIdcs.size() * numEpochs;
+
+	if (0)
+	{
+		sbg.train(SBDataFeeder{ sents, langMdl.get() }, [&](const sb::ObservingData& od)
+			{
+				llCnt += od.cntRecent;
+				llMean += (od.llRecent - llMean * od.cntRecent) / llCnt;
+				if (od.globalStep % 10000 == 0)
+				{
+					cout << od.globalStep / 10000 << " (" << std::round(od.globalStep * 1000. / totalSteps) / 10 << "%): AvgLL: " << od.llMeanTotal << ", RecentLL: " << llMean << endl;
+					llCnt = 0;
+					llMean = 0;
+				}
+			}, sampleIdcs, totalSteps, lrStart);
+	}
+	else
+	{
+		sbg.trainMulti(8, SBDataFeeder{ sents, langMdl.get(), 8 }, [&](const sb::ObservingData& od)
+			{
+				llCnt += od.cntRecent;
+				llMean += (od.llRecent - llMean * od.cntRecent) / llCnt;
+				if (od.prevGlobalStep / 10000 < od.globalStep / 10000)
+				{
+					cout << od.globalStep / 10000 << " (" << std::round(od.globalStep * 1000. / totalSteps) / 10 << "%): AvgLL: " << od.llMeanTotal << ", RecentLL: " << llMean << endl;
+					llCnt = 0;
+					llMean = 0;
+				}
+			}, sampleIdcs, totalSteps, lrStart);
+	}
+
+	{
+		ofstream ofs{ "sbg.fin.bin", ios_base::binary };
+		sbg.save(ofs);
+	}
+
+	llCnt = 0;
+	llMean = 0;
+	for (size_t i = 0; i < sents.size(); i += 20)
+	{
+		auto sent = sents[i];
+		if (lmLogProbs.size() < sent.size())
+		{
+			lmLogProbs.resize(sent.size());
+		}
+		langMdl->evaluate(sent.begin(), sent.end(), lmLogProbs.begin());
+		float sum = sbg.evaluate(&sent[0], lmLogProbs.data(), sent.size());
+		size_t cnt = sent.size() - 1;
+		llCnt += cnt;
+		llMean += (sum - llMean * cnt) / llCnt;
+	}
+	cout << "After Dev AvgLL: " << llMean << endl;
+	
+	ofstream ofs{ "logs/result.log" };
+	sbg.printParameters(ofs << "AvgLL: " << llMean << "\n", [&](size_t v)
+	{
+		return utf16To8(joinHangul(forms[morphemes[v].kform].form)) + "/" + tagToString(morphemes[v].tag);
+	});
+
+	{
+		auto mem = sbg.convertToModel();
+		ofstream ofs{ modelPath + "/skipbigram.mdl", ios_base::binary };
+		ofs.write((const char*)mem.get(), mem.size());
+	}
 }
 
 void KiwiBuilder::saveModel(const string& modelPath) const
@@ -931,6 +1206,7 @@ Kiwi KiwiBuilder::build() const
 	ret.forms.reserve(forms.size() + combinedForms.size() + 1);
 	ret.morphemes.reserve(morphemes.size() + combinedMorphemes.size());
 	ret.langMdl = langMdl;
+	ret.sbgMdl = sbgMdl;
 	ret.integrateAllomorph = !!(options & BuildOption::integrateAllomorph);
 	if (numThreads >= 1)
 	{

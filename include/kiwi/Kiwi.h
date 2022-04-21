@@ -21,6 +21,7 @@
 #include "PatternMatcher.h"
 #include "FrozenTrie.h"
 #include "Knlm.h"
+#include "SkipBigramModel.h"
 #include "ThreadPool.h"
 #include "WordDetector.h"
 #include "TagUtils.h"
@@ -70,6 +71,7 @@ namespace kiwi
 		Vector<Morpheme> morphemes;
 		utils::FrozenTrie<kchar_t, const Form*> formTrie;
 		std::shared_ptr<lm::KnLangModelBase> langMdl;
+		std::shared_ptr<sb::SkipBigramModelBase> sbgMdl;
 		std::unique_ptr<utils::ThreadPool> pool;
 			
 		std::vector<TokenResult> analyzeSent(const std::u16string::const_iterator& sBegin, const std::u16string::const_iterator& sEnd, size_t topN, Match matchOptions) const;
@@ -369,6 +371,7 @@ namespace kiwi
 		Vector<MorphemeRaw> morphemes;
 		UnorderedMap<KString, size_t> formMap;
 		std::shared_ptr<lm::KnLangModelBase> langMdl;
+		std::shared_ptr<sb::SkipBigramModelBase> sbgMdl;
 		std::shared_ptr<cmb::CompiledRule> combiningRule;
 		WordDetector detector;
 		
@@ -382,8 +385,12 @@ namespace kiwi
 		size_t addForm(Vector<FormRaw>& newForms, UnorderedMap<KString, size_t>& newFormMap, KString form) const;
 
 		using MorphemeMap = UnorderedMap<std::pair<KString, POSTag>, size_t>;
+		
 		template<class Fn>
 		MorphemeMap loadMorphemesFromTxt(std::istream& is, Fn&& filter);
+
+		MorphemeMap restoreMorphemeMap() const;
+
 		void addCorpusTo(RaggedVector<uint16_t>& out, std::istream& is, MorphemeMap& morphMap);
 		void updateForms();
 		void updateMorphemes();
@@ -429,6 +436,8 @@ namespace kiwi
 			bool useLmTagHistory = true;
 			bool quantizeLm = true;
 			bool compressLm = true;
+			float dropoutSampling = 0.05f;
+			float dropoutProb = 0.05f;
 		};
 
 		/**
@@ -452,10 +461,15 @@ namespace kiwi
 		 * @brief KiwiBuilder를 raw 데이터로부터 생성한다.
 		 * 
 		 * 
-		 * @note 이 함수는 현재 내부적으로 모델 구축에 쓰인다. 
+		 * @note 이 함수는 현재 내부적으로 기본 모델 구축에 쓰인다. 
 		 * 추후 공개 데이터로도 쉽게 직접 모델을 구축할 수 있도록 개선된 API를 제공할 예정.
 		 */
 		KiwiBuilder(const ModelBuildArgs& args);
+
+		/**
+		 * @brief 기본 모델로부터 확장 모델을 학습하여 생성한다.
+		 */
+		KiwiBuilder(const std::string& modelPath, const ModelBuildArgs& args);
 
 		/**
 		 * @brief KiwiBuilder를 모델 파일로부터 생성한다.
@@ -464,7 +478,7 @@ namespace kiwi
 		 * @param numThreads 모델 및 형태소 분석에 사용할 스레드 개수
 		 * @param options 생성 옵션. `kiwi::BuildOption`을 참조
 		 */
-		KiwiBuilder(const std::string& modelPath, size_t numThreads = 0, BuildOption options = BuildOption::integrateAllomorph | BuildOption::loadDefaultDict);
+		KiwiBuilder(const std::string& modelPath, size_t numThreads = 0, BuildOption options = BuildOption::integrateAllomorph | BuildOption::loadDefaultDict, bool useSBG = false);
 
 		/**
 		 * @brief 현재 KiwiBuilder 객체가 유효한 분석 모델을 로딩한 상태인지 알려준다.

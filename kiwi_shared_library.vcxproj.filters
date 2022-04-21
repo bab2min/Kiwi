@@ -120,6 +120,18 @@
     <ClInclude Include="src\FileUtils.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\SkipBigramTrainer.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\serializerEigen.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SkipBigramModel.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\kiwi\SkipBigramModel.h">
+      <Filter>Header Files\kiwi</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Form.cpp">

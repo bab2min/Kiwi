@@ -9,6 +9,7 @@
 #include "FeatureTestor.h"
 #include "FrozenTrie.hpp"
 #include "Knlm.hpp"
+#include "SkipBigramModel.hpp"
 #include "StrUtils.h"
 #include "serializer.hpp"
 
@@ -407,9 +408,10 @@ namespace kiwi
 	}
 
 	template<ArchType arch, class LmType, class _Type>
-	void evalTrigram(const lm::KnLangModel<arch, LmType>* knlm, const Morpheme* morphBase, const Vector<KString>& ownForms, const Vector<WordLLs>& cache,
+	void evalTrigram(const lm::KnLangModel<arch, LmType>* knlm, const sb::SkipBigramModel<arch, LmType>* sbg, const Morpheme* morphBase, const Vector<KString>& ownForms, const Vector<WordLLs>& cache,
 		array<Wid, 4> seq, size_t chSize, const Morpheme* curMorph, const KGraphNode* node, const KGraphNode* startNode, _Type& maxWidLL, float ignoreCondScore)
 	{
+		array<LmType, 12> history;
 		size_t vocabSize = knlm->getHeader().vocab_size;
 		for (size_t i = 0; i < KGraphNode::max_prev; ++i)
 		{
@@ -448,16 +450,47 @@ namespace kiwi
 				}
 				else
 				{
-					lSeq = seq[chSize - 1];
-					for (size_t i = 0; i < chSize; ++i)
+					if (sbg)
 					{
-						if (morphBase[seq[i]].tag == POSTag::p)
+						size_t historySize = std::min(wids->size() - 1, (size_t)sbg->getHeader().windowSize);
+						size_t h = 0;
+						for (size_t i = wids->size() - historySize; i < wids->size(); ++i, ++h)
 						{
-							// prohibit <v> without <chunk>
-							goto continueFor;
+							history[h] = morphBase[(*wids)[i].wid].getCombined()->lmMorphemeId;
 						}
-						float ll = knlm->progress(cNode, seq[i]);
-						candScore += ll;
+						for (size_t i = (wids->back().combineSocket ? 1 : 0); i < seq.size(); ++i, ++h)
+						{
+							history[h] = seq[i];
+						}
+
+						lSeq = seq[chSize - 1];
+						for (size_t i = 0; i < chSize; ++i)
+						{
+							if (morphBase[seq[i]].tag == POSTag::p)
+							{
+								// prohibit <v> without <chunk>
+								goto continueFor;
+							}
+							float ll = knlm->progress(cNode, seq[i]);
+							size_t e = (historySize + i == 0) ? 0 : (historySize + i - 1);
+							size_t s = std::max(e, (size_t)sbg->getHeader().windowSize) - sbg->getHeader().windowSize;
+							ll = sbg->evaluate(&history[s], e - s, seq[i], ll);
+							candScore += ll;
+						}
+					}
+					else
+					{
+						lSeq = seq[chSize - 1];
+						for (size_t i = 0; i < chSize; ++i)
+						{
+							if (morphBase[seq[i]].tag == POSTag::p)
+							{
+								// prohibit <v> without <chunk>
+								goto continueFor;
+							}
+							float ll = knlm->progress(cNode, seq[i]);
+							candScore += ll;
+						}
 					}
 				}
 				emplaceMaxCnt(maxWidLL, lSeq, WordLLP{ wids, candScore, cNode }, 3, [](const WordLLP& a, const WordLLP& b) { return a.accScore > b.accScore; });
@@ -495,6 +528,7 @@ namespace kiwi
 	)
 	{
 		auto lm = static_cast<const lm::KnLangModel<arch, LmType>*>(kw->langMdl.get());
+		auto sbg = static_cast<const sb::SkipBigramModel<arch, LmType>*>(kw->sbgMdl.get());
 		const size_t langVocabSize = lm->getHeader().vocab_size;
 		auto& nCache = cache[i];
 
@@ -551,7 +585,7 @@ namespace kiwi
 				condP = curMorph->polar;
 
 				UnorderedMap<Wid, Vector<WordLLP>> maxWidLL;
-				evalTrigram(lm, kw->morphemes.data(), ownFormList, cache, seq, chSize, curMorph, node, startNode, maxWidLL, ignoreCond ? -10 : 0);
+				evalTrigram(lm, sbg, kw->morphemes.data(), ownFormList, cache, seq, chSize, curMorph, node, startNode, maxWidLL, ignoreCond ? -10 : 0);
 				if (maxWidLL.empty()) continue;
 
 				float estimatedLL = curMorph->userScore + whitespaceDiscount;

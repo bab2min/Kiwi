@@ -11,12 +11,12 @@
 using namespace std;
 using namespace kiwi;
 
-int doEvaluate(const string& modelPath, const string& output, const vector<string>& input)
+int doEvaluate(const string& modelPath, const string& output, const vector<string>& input, bool useSBG)
 {
 	try
 	{
 		tutils::Timer timer;
-		Kiwi kw = KiwiBuilder{ modelPath, 1 }.build();
+		Kiwi kw = KiwiBuilder{ modelPath, 1, BuildOption::integrateAllomorph | BuildOption::loadDefaultDict, useSBG }.build();
 		
 		cout << "Loading Time : " << timer.getElapsed() << " ms" << endl;
 		cout << "LM Size : " << (kw.getLangModel()->getMemory().size() / 1024. / 1024.) << " MB" << endl;
@@ -88,11 +88,13 @@ int main(int argc, const char* argv[])
 
 	ValueArg<string> model{ "m", "model", "Kiwi model path", false, "ModelGenerator", "string" };
 	ValueArg<string> output{ "o", "output", "output dir for evaluation errors", false, "", "string" };
+	SwitchArg useSBG{ "", "sbg", "use SkipBigram", false };
 	UnlabeledMultiArg<string> files{ "files", "evaluation set files", true, "string" };
 
 	cmd.add(model);
 	cmd.add(output);
 	cmd.add(files);
+	cmd.add(useSBG);
 
 	try
 	{
@@ -103,6 +105,6 @@ int main(int argc, const char* argv[])
 		cerr << "error: " << e.error() << " for arg " << e.argId() << endl;
 		return -1;
 	}
-	return doEvaluate(model, output, files.getValue());
+	return doEvaluate(model, output, files.getValue(), useSBG);
 }
 
