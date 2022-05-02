@@ -534,11 +534,9 @@
 이날	NNG	5253
 역시	MAG	5246
 또한	MAG	5246
-…	UNC	5239
 얼마나	MAG	5231
 으로서	JKB	5227	non_vowel	0.9989888776541962
 알리	VV	5226
-잖	UNA	5215
 롭	XSA	5210
 나가	VX	5193
 지난해	NNG	5189
@@ -3923,7 +3921,6 @@
 화장	NNG	540
 녹색	NNG	540
 그놈	NP	540
-이	NA	539
 큰일	NNG	539
 자칫	MAG	539
 짚	VV	539
@@ -4905,7 +4902,6 @@
 수천	NR	394
 얼핏	MAG	394
 매출액	NNG	394
-XX	UNC	394
 라도	JX	393	vowel	0.9777227722772277	=이라도
 부재	NNG	393
 권위주의	NNG	393
@@ -6659,7 +6655,6 @@ XX	UNC	394
 두환	NNP	251
 ᆸ디다	EF	250
 사회단체	NNG	250
-xx	NA	250
 뵙	VV	250
 체크	NNG	250
 조개	NNG	250
@@ -7593,7 +7588,6 @@ xx	NA	250
 돌멩이	NNG	206
 유치	XR	206
 박	NNG	205
-xx	NF	205
 탈당	NNG	205
 본선	NNG	205
 뺏	VV	205
@@ -9234,7 +9228,6 @@ xx	NF	205
 서사시	NNG	153
 지배자	NNG	153
 현순	NNP	153
-이	UNT	153
 깨끗하	VA	152
 제왕	NNG	152
 단맛	NNG	152
@@ -9315,7 +9308,6 @@ xx	NF	205
 드라구요	EF	151
 당숙	NNG	151
 레지투이	NNP	151
-그	UNT	151
 풍미	NNG	150
 친분	NNG	150
 성형	NNG	150
@@ -9592,7 +9584,6 @@ xx	NF	205
 졸이	VV	144
 소풍	NNG	144
 샘	NNG	144
-하	NA	144
 유승민	NNP	144
 다람쥐	NNG	144
 보자기	NNG	144
@@ -9784,7 +9775,6 @@ xx	NF	205
 할멈	NNG	141
 대의원	NNG	140
 문화유산	NNG	140
-그	NA	140
 대권	NNG	140
 부추	NNG	140
 본연	NNG	140
@@ -10307,7 +10297,6 @@ xx	NF	205
 니	MM	130
 랄까	EF	129
 건	NNG	129
-지	NA	129
 어허	IC	129
 날	XPN	129
 휴게소	NNG	129
@@ -11125,7 +11114,6 @@ LG전자	NNP	119
 첨예	XR	115
 상품권	NNG	115
 시저	NNP	115
-하	UNT	115
 포부	NNG	114
 논법	NNG	114
 중등	NNG	114
@@ -11254,10 +11242,8 @@ LG전자	NNP	119
 로라	NNP	113
 정우	NNP	113
 김부식	NNP	113
-대	NA	112
 하	XSN	112
 잖습니까	EF	112
-분	NA	112
 최소한	MAG	112
 결선	NNG	112
 숙성	NNG	112
@@ -11407,11 +11393,9 @@ LG전자	NNP	119
 신경원	NNG	111
 병모	NNP	111
 그니	NP	111
-xxx	NA	110
 골절	NNG	110
 탕	NNG	110
 찜	NNG	110
-가	NA	110
 탐정	NNG	110
 직구	NNG	110
 면세점	NNG	110
@@ -12023,7 +12007,6 @@ SK텔레콤	NNP	103
 신라인	NNG	103
 시생	NP	103
 길소개	NNP	103
-XXX	UNC	103
 안녕히	MAG	102
 트집	NNG	102
 산적	NNG	102
@@ -12703,7 +12686,6 @@ XXX	UNC	103
 재영이	NNP	95
 애도	NNG	94
 이관	NNG	94
-까	NA	94
 송편	NNG	94
 공신	NNG	94
 솔	NNG	94
@@ -13131,7 +13113,6 @@ XXX	UNC	103
 문태	NNP	90
 간대	NNG	90
 야무지	VA	89
-어	NA	89
 이변	NNG	89
 조직력	NNG	89
 ᆯ라면	EC	89	vocalic	=려면
@@ -13316,7 +13297,6 @@ XXX	UNC	103
 여선생	NNG	88
 일본어	NNG	88
 강판	NNG	87
-한	NA	87
 는지요	EF	87
 옛말	NNG	87
 경합	NNG	87
@@ -13787,7 +13767,6 @@ XXX	UNC	103
 선명	XR	83
 네흘류도프	NNP	83
 출목	NNG	83
-사	UNT	83
 신기하	VA	82
 카	VV	82
 음	EC	82
@@ -14929,12 +14908,10 @@ LG화학	NNP	82
 민겸호	NNP	73
 맥루한	NNP	73
 부루도꾸	NNP	73
-가	UNT	73
 게요	EF	72
 예에	IC	72
 훅	MAG	72
 어묵	NNG	72
-사	NA	72
 공장장	NNG	72
 말려들	VV	72
 김어준	NNP	72
@@ -15052,7 +15029,6 @@ LG화학	NNP	82
 브뤼헤	NNP	72
 수증기	NNG	71
 궤적	NNG	71
-저	NA	71
 어유	IC	71
 든든하	VA	71
 습지	NNG	71
@@ -15289,7 +15265,6 @@ LG화학	NNP	82
 곰이	NNP	70
 야아	IC	69	=야
 가주	VX	69
-전	NA	69
 해전	NNG	69
 싸인	NNG	69
 이재오	NNP	69
@@ -15548,7 +15523,6 @@ LG화학	NNP	82
 차미언	NNP	68
 윤수	NNP	68
 순덕	NNP	68
-있	UNT	68
 조마조마	MAG	67
 도라지	NNG	67
 핏물	NNG	67
@@ -15559,7 +15533,6 @@ LG화학	NNP	82
 진짜로	MAG	67
 산꼭대기	NNG	67
 한중	NNP	67
-시	NA	67
 이런	IC	67
 제일모직	NNP	67
 피클	NNG	67
@@ -15712,7 +15685,6 @@ LG화학	NNP	82
 윤세주	NNP	67
 하여튼	MAJ	67
 한말	NNG	66
-x	NA	66
 지지도	NNG	66
 턱	MAG	66
 전골	NNG	66
@@ -16013,7 +15985,6 @@ x	NA	66
 그든	EF	64
 뚝딱	MAG	64
 고대로	MAG	64
-xxx	NF	64
 단백	NNG	64
 전주	NNG	64
 비호	NNG	64
@@ -16506,7 +16477,6 @@ xxx	NF	64
 과천현	NNP	62
 의열단	NNP	62
 재지	NNG	62
-여	UNT	62
 쓰리	NR	62
 서모나	NNP	62
 석학	NNG	61
@@ -17016,12 +16986,10 @@ xxx	NF	64
 그담	NNG	58
 자세하	VA	58
 본래	MAG	58
-데	NA	58
 딱딱하	VA	58
 미리	NNB	58	=밀리
 잡채	NNG	58
 동떨어지	VA	58
-식	NA	58
 비선	NNG	58
 과하	VA	58
 사계절	NNG	58
@@ -17199,7 +17167,6 @@ xxx	NF	64
 순아	NNP	58
 인자	NNP	58
 장마	NNP	58
-어	UNT	58
 대한제국	NNP	57
 동적	NNG	57
 삼만	NR	57
@@ -17567,7 +17534,6 @@ xxx	NF	64
 팁	NNG	55
 정숙	NNG	55
 이십오	NR	55
-아	NA	55
 십팔	NR	55
 국부	NNG	55
 냐며	EC	55
@@ -17741,7 +17707,6 @@ xxx	NF	64
 달달	MAG	54
 깊어지	VV	54
 승부수	NNG	54
-걸	NA	54
 고요	EC	54
 파렴치	NNG	54
 제각각	NNG	54
@@ -17937,7 +17902,6 @@ xxx	NF	64
 죽당	NNP	54
 오드바이	NNP	54
 십시오	EF	54
-X	UNC	54
 비비	NNB	54
 신선하	VA	53
 것	NP	53
@@ -18339,7 +18303,6 @@ X	UNC	54
 메콩	NNP	52
 위엥찬	NNP	52
 뇌교	NNG	52
-나	UNT	52
 열림터	NNP	52
 담백하	VA	51
 겉돌	VV	51
@@ -18347,7 +18310,6 @@ X	UNC	54
 포개	VV	51
 넉넉하	VA	51
 개그	NNG	51
-여	NA	51
 야전	NNG	51
 정치사	NNG	51
 귀농	NNG	51
@@ -18361,7 +18323,6 @@ X	UNC	54
 섬유질	NNG	51
 식중독	NNG	51
 깨알	NNG	51
-스	NA	51
 게스트	NNG	51
 자크	NNP	51
 꾸준하	VA	51
@@ -18580,7 +18541,6 @@ X	UNC	54
 트임	NNG	51
 티티엘	NNP	51
 왔다갔다	MAG	51
-시	UNT	51
 부펠	NNP	51
 조심조심	MAG	50
 바지락	NNG	50
@@ -18802,7 +18762,6 @@ AP통신	NNP	50
 흉추	NNG	50
 익공	NNG	50
 대모벌	NNP	50
-일	UNT	50
 효진	NNP	50
 안치	VV	49
 래서	EC	49
@@ -19027,7 +18986,6 @@ AP통신	NNP	50
 삼천만	NR	48
 소사	NNG	48
 정의감	NNG	48
-보	NA	48
 서운하	VA	48
 반달	NNG	48
 둘둘	MAG	48
@@ -19043,7 +19001,6 @@ AP통신	NNP	50
 나이프	NNG	48
 팍팍	MAG	48
 건강식	NNG	48
-주	NA	48
 행주	NNG	48
 동석	NNG	48
 산술	NNG	48
@@ -19278,12 +19235,10 @@ AP통신	NNP	50
 곡주	NNG	48
 버가모	NNP	48
 색색	NNG	47
-제	NA	47
 추동	NNG	47
 관망	NNG	47
 맹물	NNG	47
 무전기	NNG	47
-서	NA	47
 고위직	NNG	47
 당적	NNG	47
 나이키	NNP	47
@@ -19512,7 +19467,6 @@ AP통신	NNP	50
 거둥길	NNG	47
 전배	NNG	47
 아기장수	NNG	47
-마	UNT	47
 토플	NNP	47
 존나	MAG	47
 자력	NNG	46
@@ -19785,7 +19739,6 @@ AP통신	NNP	50
 칸딘스키	NNP	46
 박상필	NNP	46
 타우너	NNP	46
-보	UNT	46
 하아	IC	45
 껑충	MAG	45
 소쿠리	NNG	45
@@ -19820,7 +19773,6 @@ AP통신	NNP	50
 권위자	NNG	45
 그닥	MAG	45
 낙점	NNG	45
-고	NA	45
 에에	IC	45
 불감증	NNG	45
 급격하	VA	45
@@ -20082,9 +20034,6 @@ AP통신	NNP	50
 홑처마	NNG	45
 블라디보스똑	NNP	45
 공론장	NNG	45
-아	UNT	45
-학	UNT	45
-한	UNT	45
 절파	NNP	45
 재범	NNG	44
 요롷	VA	44
@@ -20334,7 +20283,6 @@ AP통신	NNP	50
 관목	NNG	44
 큰방	NNG	44
 일부일처	NNG	44
-한민국	NA	44
 움트	VV	44
 파르르	MAG	44
 영악	XR	44
@@ -20372,7 +20320,6 @@ AP통신	NNP	50
 고기	NP	43
 토스트	NNG	43
 케첩	NNG	43
-나	NA	43
 상큼하	VA	43
 보좌진	NNG	43
 아아아	IC	43
@@ -20637,11 +20584,9 @@ AP통신	NNP	50
 장기범	NNP	43
 다포식	NNG	43
 덩달이	NNP	43
-지	UNT	43
 손맛	NNG	42
 국호	NNG	42
 로스	NNP	42
-요	NA	42
 알록달록	MAG	42
 ᆫ다던가	EC	42
 진짜루	MAG	42
@@ -20652,7 +20597,6 @@ AP통신	NNP	50
 라마	NNP	42
 내분	NNG	42
 네거티브	NNG	42
-수	NA	42
 주근깨	NNG	42
 삼사	NR	42
 구요	EC	42
@@ -20669,7 +20613,6 @@ AP통신	NNP	50
 든	ETM	42
 엉뚱하	VA	42
 충청북도	NNP	42
-있	NA	42
 힘내	VV	42
 목련	NNG	42
 등수	NNG	42
@@ -20960,7 +20903,6 @@ AP통신	NNP	50
 요쪽	NP	41
 초대석	NNG	41
 순기능	NNG	41
-다	NA	41
 밑반찬	NNG	41
 아삭	MAG	41
 싸드	NNG	41
@@ -21286,7 +21228,6 @@ AP통신	NNP	50
 김영재	NNP	40
 은총	NNG	40
 예단	NNG	40
-오	NA	40
 믹스	NNG	40
 딜	NNG	40
 참나물	NNG	40
@@ -21613,7 +21554,6 @@ AP통신	NNP	50
 오피스	NNG	39
 ᆫ다면서	EF	39
 반포	NNP	39
-거	NA	39
 금주	NNG	39
 퓨레	NNG	39
 쌩	XPN	39
@@ -21903,16 +21843,13 @@ GS칼텍스	NNP	39
 정혁	NNP	39
 민도리집	NNG	39
 진노래기벌	NNG	39
-그러	UNT	39
 컴퓨타	NNG	39
 그른	MM	38
-정	NA	38
 굉장하	VA	38
 규장각	NNP	38
 필체	NNG	38
 풀풀	MAG	38
 청양고추	NNG	38
-일	NA	38
 고	IC	38
 관광버스	NNG	38
 이천십오	NR	38
@@ -21922,7 +21859,6 @@ GS칼텍스	NNP	39
 억측	NNG	38
 급상승	NNG	38
 기	ETM	38
-안	NA	38
 레몬즙	NNG	38
 는다고	EF	38
 문고리	NNG	38
@@ -22255,11 +22191,7 @@ GS칼텍스	NNP	39
 밑술	NNG	38
 선후행문	NNG	38
 춘길이	NNP	38
-오	UNT	38
-내	UNT	38
-해	UNT	38
 리	EP	38	vocalic
-XXXX	UNC	38
 패짱	NNG	38
 애호박	NNG	37
 검인정	NNG	37
@@ -22565,12 +22497,9 @@ XXXX	UNC	38
 나나니	NNG	37
 뻔하	VX	37
 대메	EF	37
-자	UNT	37
 량	XSN	37
-내	NA	36
 박연차	NNP	36
 다자	NNG	36
-자	NA	36
 따루	MAG	36
 덮밥	NNG	36
 칼칼하	VA	36
@@ -22936,7 +22865,6 @@ XXXX	UNC	38
 임펄스	NNG	36
 렌바흐	NNP	36
 첫	XPN	36
-다	UNT	36
 바루	MAG	35
 잘	ETM	35
 방문자	NNG	35
@@ -23329,7 +23257,6 @@ XXXX	UNC	38
 진혜	NNP	35
 빠스타	NNG	35
 퇴각	NNG	34
-는	NA	34
 제삼	NNG	34
 부	VX	34
 촉촉하	VA	34
@@ -23706,7 +23633,6 @@ MBC애드컴	NNP	34
 보충식	NNG	34
 필요없	VA	34
 근까는	MAJ	34
-없	UNT	34
 라면은	EC	34
 싸운드	NNG	34
 익스플로어	NNP	34
@@ -24130,14 +24056,10 @@ SK그룹	NNP	33
 엠티	NNG	33
 아무거	NP	33
 공일육	NNP	33
-되	UNT	33
-스	UNT	33
-유	UNA	33
 에이치티엠엘	NNG	33
 파우베	NNP	33
 구수하	VA	32
 아랫부분	NNG	32
-xxxx	NA	32
 숭숭	MAG	32
 오목	MAG	32
 랄까요	EF	32
@@ -24154,7 +24076,6 @@ xxxx	NA	32
 터지	VX	32
 고창	NNP	32
 필	NNG	32
-학	NA	32
 초년	NNG	32
 봉제	NNG	32
 리프트	NNG	32
@@ -24556,7 +24477,6 @@ xxxx	NA	32
 상경성	NNP	32
 3대혁명	NNG	32
 영만이	NNP	32
-랬	UNA	32
 공일일	NNP	32
 재학	NNP	32
 그들	NP	32
@@ -24619,7 +24539,6 @@ xxxx	NA	32
 딱정벌레	NNG	31
 류	NNG	31
 검정고시	NNG	31
-만	NA	31
 이쑤시개	NNG	31
 밀봉	NNG	31
 우엉	NNG	31
@@ -24983,15 +24902,10 @@ xxxx	NA	32
 네모기둥	NNG	31
 왕노래기벌	NNG	31
 김승일	NNP	31
-저	UNT	31
-수	UNT	31
 고렇게	MAG	31
 골키파	NNG	31
 팽이버섯	NNG	30
-부	NA	30
-국	NA	30
 레포트	NNG	30
-그러	NA	30
 고렇	VA	30
 중불	NNG	30
 말랑말랑	MAG	30
@@ -25449,7 +25363,6 @@ xxxx	NA	32
 윤서석	NNP	30
 추체로	NNG	30
 정신병학	NNG	30
-주	UNT	30
 조음	NNG	30
 엑스바	NNG	30
 정규분포	NNG	30
@@ -25457,7 +25370,6 @@ xxxx	NA	32
 조선왕조실록	NNP	29
 제독	NNG	29
 총합	NNG	29
-선	NA	29
 쭐이	VV	29
 내공	NNG	29
 올봄	NNG	29
@@ -25470,7 +25382,6 @@ xxxx	NA	32
 는다든가	EC	29
 칠순	NNG	29
 냅두	VV	29
-마	NA	29
 바삭바삭	MAG	29
 매실청	NNG	29
 찜통	NNG	29
@@ -25947,7 +25858,6 @@ CJ그룹	NNP	29
 천태종	NNG	29
 언레	NNP	29
 붉은병정개미	NNG	29
-전	UNT	29
 항등원	NNG	29
 등어선	NNG	29
 이천십사	NR	28
@@ -25956,7 +25866,6 @@ CJ그룹	NNP	29
 인문대	NNG	28
 그라탕	NNG	28
 맛술	NNG	28
-되	NA	28
 그치만	MAJ	28
 예예예	IC	28
 걸쭉하	VA	28
@@ -25964,7 +25873,6 @@ CJ그룹	NNP	29
 기왕이면	MAG	28
 케이	NNP	28
 스크립트	NNG	28
-으	NA	28
 팜플렛	NNG	28
 삼자	NNG	28
 여하간	MAG	28
@@ -25988,7 +25896,6 @@ CJ그룹	NNP	29
 개그우먼	NNG	28
 개선안	NNG	28
 악랄	NNG	28
-기	NA	28
 중환자	NNG	28
 다산	NNG	28
 징집	NNG	28
@@ -26419,7 +26326,6 @@ CJ그룹	NNP	29
 지연	NNP	28
 노드스트롬	NNP	28
 딥스	NNP	28
-XX이	UNC	28
 총	XPN	28
 본란덴	NNP	28
 유토	NNG	28
@@ -26980,7 +26886,6 @@ XX이	UNC	28
 선순환	NNG	26
 두루두루	MAG	26
 얌체	NNG	26
-도	NA	26
 파릇파릇	MAG	26
 수정과	NNG	26
 재첩	NNG	26
@@ -27542,8 +27447,6 @@ XX이	UNC	28
 봉애	NNP	26
 감시견	NNG	26
 루쩨른	NNP	26
-안	UNT	26
-같	UNT	26
 척하	VX	26
 엑티벡스	NNG	26
 새송이	NNG	25
@@ -27561,7 +27464,6 @@ XX이	UNC	28
 뻥	NNG	25
 광섬유	NNG	25
 빔	NNG	25
-유	NA	25
 무난하	VA	25
 대교	NNG	25
 무도	NNG	25
@@ -28137,16 +28039,10 @@ XX이	UNC	28
 야도충	NNG	25
 청벌	NNG	25
 밥곽	NNG	25
-그렇	UNT	25
 첨	MAG	25
-정	UNT	25
-연	UNT	25
 때	NNB	25
-영	UNT	25
-기	UNT	25
 에스크	NNG	25
 삭	MAG	24
-해	NA	24
 의정부	NNG	24
 피플	NNG	24
 어망	NNG	24
@@ -28810,7 +28706,6 @@ LG유플러스	NNP	24
 언론업	NNG	24
 콜롯세움	NNP	24
 그니까는	MAJ	24
-대	UNT	24
 형준	NNP	24
 어쨌든	MAJ	24
 쎄이	NNG	24
@@ -28834,10 +28729,8 @@ LG유플러스	NNP	24
 입체감	NNG	23
 홍합	NNG	23
 면보	NNG	23
-바	NA	23
 으라고	EF	23	non_vowel	==라고
 접착	NNG	23
-없	NA	23
 파이팅	IC	23
 거창하	VA	23
 오천만	NR	23
@@ -28880,7 +28773,6 @@ LG유플러스	NNP	24
 수필가	NNG	23
 하여간에	MAG	23
 예대	NNG	23
-누	NA	23
 로테이션	NNG	23
 축의금	NNG	23
 님비	NNG	23
@@ -29522,9 +29414,7 @@ LG유플러스	NNP	24
 룡성	NNP	23
 범수	NNP	23
 아님	MAJ	23
-인	UNT	23
 우준	NNP	23
-서	UNT	23
 그러니까는	MAJ	23
 자발	XR	23
 포	NR	23
@@ -29551,7 +29441,6 @@ LG유플러스	NNP	24
 맥이	VV	22
 향긋하	VA	22
 자꾸만	MAG	22
-조	NA	22
 은은하	VA	22
 김용태	NNP	22
 늦춰지	VV	22
@@ -29565,7 +29454,6 @@ LG유플러스	NNP	24
 성차별	NNG	22
 비제이	NNG	22
 동일본	NNP	22
-소	NA	22
 역차별	NNG	22
 로망	NNG	22
 얼마큼	MAG	22
@@ -29604,7 +29492,6 @@ LG유플러스	NNP	24
 기달리	VV	22
 인구수	NNG	22
 라이프스타일	NNG	22
-얼	NA	22
 금융인	NNG	22
 으라구	EC	22	non_vowel	=라고
 차지	VA	22
@@ -30283,7 +30170,6 @@ LG유플러스	NNP	24
 니까요	EC	21	vocalic
 부꾸미	NNG	21
 살얼음	NNG	21
-xxxx	NF	21
 고무장갑	NNG	21
 육만	NR	21
 손석희	NNP	21
@@ -30305,7 +30191,6 @@ xxxx	NF	21
 가위바위보	NNG	21
 죄질	NNG	21
 경중	NNG	21
-공	NA	21
 버럭버럭	MAG	21
 치한	NNG	21
 브레인	NNG	21
@@ -30362,7 +30247,6 @@ xxxx	NF	21
 네다섯	NR	21
 어머머	IC	21
 살집	NNG	21
-승환이	NAP	21
 다낭	NNP	21
 차압	NNG	21
 아랫집	NNG	21
@@ -30375,7 +30259,6 @@ xxxx	NF	21
 보이스	NNP	21
 건덕지	NNG	21
 중식	NNG	21
-후	NA	21
 발품	NNG	21
 릭	NNP	21
 형	NNB	21
@@ -31043,8 +30926,6 @@ xxxx	NF	21
 미장이꽃벌	NNG	21
 선추	NNG	21
 에서	JKS	21
-거	UNT	21
-알	UNT	21
 민준	NNP	21
 영하	NNP	21
 어띃게	MAG	21
@@ -31055,14 +30936,11 @@ xxxx	NF	21
 구명완	NNP	21
 태극전사	NNG	21
 슴슴하	VA	20
-x	NF	20
-진	NA	20
 여쭙	VV	20
 던지	JX	20
 동경대학	NNP	20
 이천칠	NR	20
 법통	NNG	20
-인	NA	20
 이십삼	NR	20
 요	NP	20
 예열	NNG	20
@@ -31081,7 +30959,6 @@ x	NF	20
 사방팔방	NNG	20
 카라멜	NNG	20
 산도	NNG	20
-노	NA	20
 메추리	NNG	20
 바베큐	NNG	20
 부터	JKB	20
@@ -31089,7 +30966,6 @@ x	NF	20
 발그레	MAG	20
 치대	VV	20
 라면서	EF	20
-연	NA	20
 야인	NNG	20
 뒤쳐지	VV	20
 봉선사	NNP	20
@@ -31197,7 +31073,6 @@ x	NF	20
 뒷이야기	NNG	20
 방갈로	NNG	20
 눈속임	NNG	20
-호	NA	20
 가려지	VV	20
 이민법	NNG	20
 별스럽	VA	20
@@ -31943,15 +31818,8 @@ LG디스플레이	NNP	20
 포월	NNG	20
 경결	NNG	20
 나찌	NNG	20
-생	UNT	20
-언	UNT	20
-진	UNT	20
-먹	UNT	20
-신	UNT	20
-했	UNT	20
 써버	NNG	20
 따라하	VV	20
-문	UNT	20
 디빅	NNG	20
 디비디	NNG	20
 정교	NNG	19
@@ -31976,11 +31844,9 @@ LG디스플레이	NNP	20
 완성품	NNG	19
 큼직하	VA	19
 놔주	VV	19
-세	NA	19
 조물조물	MAG	19
 메밀묵	NNG	19
 골뱅이	NNG	19
-그렇	NA	19
 장시호	NNP	19
 토픽	NNG	19
 시소	NNG	19
@@ -32020,7 +31886,6 @@ LG디스플레이	NNP	20
 주립대	NNG	19
 핵보유국	NNG	19
 풍기	NNG	19
-습	NA	19
 약대	NNG	19
 푸켓	NNP	19
 프로토콜	NNG	19
@@ -32854,11 +32719,8 @@ SH공사	NNP	19
 당황	XR	19
 한란	NNG	19
 동북리	NNP	19
-조	UNT	19
-제	UNT	19
 말하자면	MAJ	19
 등간척도	NNG	19
-선	UNT	19
 썬그라스	NNG	19
 필선	NNG	19
 써플라이	NNG	19
@@ -32880,7 +32742,6 @@ SH공사	NNP	19
 팟빵	NNP	18
 만덕산	NNP	18
 야대	NNG	18
-무	NA	18
 검역	NNG	18
 썰	NNG	18
 으으음	IC	18
@@ -32892,7 +32753,6 @@ SH공사	NNP	19
 열네	MM	18
 쇄신안	NNG	18
 핫소스	NNG	18
-비	NA	18
 초간장	NNG	18
 숙주나물	NNG	18
 ᆯ려니까	EC	18	vocalic	=려니까
@@ -32923,7 +32783,6 @@ SH공사	NNP	19
 을려면	EC	18	non_vowel	=려면
 단물	NNG	18
 바끼	VV	18
-두	NA	18
 서해안고속도로	NNP	18
 블루	NNP	18
 마사회	NNP	18
@@ -32969,7 +32828,6 @@ SH공사	NNP	19
 더구만	EF	18
 알	NNB	18
 오메	IC	18
-찬이	NAP	18
 견적	NNG	18
 보육료	NNG	18
 컴파운드	NNG	18
@@ -33838,16 +33696,11 @@ SH공사	NNP	19
 7개년계획	NNG	18
 행사부	NNG	18
 특무장	NNG	18
-유	UNT	18
 양미라	NNP	18
 여깄	VA	18
-남	UNT	18
 ᆫ데두	EC	18	=ᆫ데도
-이러	UNT	18
 한누리	NNP	18
 문배주	NNP	18
-부	UNT	18
-공	UNT	18
 이경윤	NNP	18
 민용	NNP	18
 어널라이징	NNG	18
@@ -33859,7 +33712,6 @@ SH공사	NNP	19
 팅	NNG	18
 북북	MAG	17
 찜기	NNG	17
-중	NA	17
 육이오	NNG	17
 이천오	NR	17
 그르면	MAJ	17
@@ -33888,8 +33740,6 @@ SH공사	NNP	19
 디	VV	17
 도토리묵	NNG	17
 겉절이	NNG	17
-그런	NA	17
-개	NA	17
 미진하	VA	17
 발군	NNG	17
 짱	MAG	17
@@ -33913,7 +33763,6 @@ SH공사	NNP	19
 무고하	VA	17
 두서	NNG	17
 기동대	NNG	17
-생	NA	17
 민낯	NNG	17
 농기	NNG	17
 간결하	VA	17
@@ -33931,8 +33780,6 @@ SH공사	NNP	19
 바이런	NNP	17
 그대루	MAG	17
 경성제대	NNP	17
-문	NA	17
-기형도	NAP	17
 휘청휘청	MAG	17
 중개사	NNG	17
 조울증	NNG	17
@@ -34870,14 +34717,8 @@ SH공사	NNP	19
 배내똥	NNG	17
 우투리	NNP	17
 현희	NNP	17
-고	UNT	17
-교	UNT	17
-소	UNT	17
-무	UNT	17
 지	XSV	17
 ᆯ라면은	EC	17	vocalic	=려면은
-만	UNT	17
-모	UNT	17
 독일어	NNG	17
 종혁	NNP	17
 국토지기	NNP	17
@@ -34885,8 +34726,6 @@ SH공사	NNP	19
 놀보	NNP	17
 비피에스	NNB	17
 엑스엘	NNP	17
-캔	UNA	17
-어	UNA	17
 안디바	NNP	17
 윤형빈	NNP	16
 집밥	NNG	16
@@ -34906,7 +34745,6 @@ SH공사	NNP	19
 냉채	NNG	16
 청소원	NNG	16
 어정쩡	MAG	16
-말	NA	16
 그래	MAG	16
 식약처	NNG	16
 조원동	NNP	16
@@ -34918,20 +34756,17 @@ SH공사	NNP	19
 쫑긋	MAG	16
 인명진	NNP	16
 의	JKB	16
-올	NA	16
 바게뜨	NNG	16
 입천장	NNG	16
 채반	NNG	16
 말르	VV	16
 해장	NNG	16
 한	IC	16
-드	NA	16
 곰탕	NNG	16
 크으	IC	16
 쳐지	VV	16
 재첩국	NNG	16
 변죽	NNG	16
-직	NA	16
 능숙하	VA	16
 월운	NNP	16
 예성강	NNP	16
@@ -34950,7 +34785,6 @@ SH공사	NNP	19
 빡	MAG	16
 등원	NNG	16
 서울청	NNP	16
-의	NA	16
 조의	NNG	16
 코뼈	NNG	16
 한신대	NNP	16
@@ -34960,7 +34794,6 @@ SH공사	NNP	19
 씨나리오	NNG	16
 서른여섯	NR	16
 일희일비	NNG	16
-구	NA	16
 받아쓰	VV	16
 종암동	NNP	16
 박한철	NNP	16
@@ -35002,7 +34835,6 @@ SH공사	NNP	19
 앞가림	NNG	16
 필라테스	NNG	16
 수묵화	NNG	16
-대룡	NAP	16
 ᆫ다매	EF	16
 어영부영	MAG	16
 북촌	NNP	16
@@ -36041,7 +35873,6 @@ SH공사	NNP	19
 히드로우	NNP	16
 지오콘다	NNP	16
 당연	MAG	16
-요	UNT	16
 공일구	NNP	16
 하튼	MAJ	16
 문화관광부	NNP	16
@@ -36049,10 +35880,7 @@ SH공사	NNP	19
 엠에스엔	NNP	16
 형태론	NNG	16
 진실게임	NNG	16
-XX가	UNC	16
 홀맨	NNP	16
-두	UNA	16
-미	UNA	16
 포먼트	NNG	16
 모평균	NNG	16
 물총	NNG	15
@@ -36065,19 +35893,14 @@ XX가	UNC	16
 상암	NNP	15
 뻣뻣하	VA	15
 물러지	VV	15
-차	NA	15
 번개탄	NNG	15
-본	NA	15
-너	NA	15
 엊그저께	NNG	15
 유에이이	NNP	15
 땅	MAG	15
 도와드리	VV	15
 꽃가마	NNG	15
-라	NA	15
 내드리	VV	15
 뽑기	NNG	15
-게	NA	15
 목이버섯	NNG	15
 엘에이	NNP	15
 찹쌀떡	NNG	15
@@ -36092,7 +35915,6 @@ XX가	UNC	16
 한역	NNG	15
 근현대	NNG	15
 북간도	NNP	15
-동	NA	15
 실크로드	NNP	15
 모음집	NNG	15
 히로부미	NNP	15
@@ -36107,7 +35929,6 @@ XX가	UNC	16
 자국어	NNG	15
 추모식	NNG	15
 황대훈	NNP	15
-많	NA	15
 개점휴업	NNG	15
 이동현	NNP	15
 빙상장	NNG	15
@@ -36141,7 +35962,6 @@ XX가	UNC	16
 독어	NNP	15
 유재경	NNP	15
 일설	NNG	15
-실	NA	15
 얼렁	MAG	15
 오바이트	NNG	15
 더라구	EC	15
@@ -36168,7 +35988,6 @@ XX가	UNC	16
 샵	NNG	15
 노래지	VV	15
 아스파라거스	NNG	15
-역	NA	15
 내려보내	VV	15
 명쾌하	VA	15
 방방	MAG	15
@@ -36186,7 +36005,6 @@ XX가	UNC	16
 차렵이불	NNG	15
 공원묘지	NNG	15
 라섹	NNG	15
-원	NA	15
 하	MAG	15
 스톤	NNG	15
 브러시	NNG	15
@@ -37357,16 +37175,11 @@ LH공사	NNP	15
 오링	NNG	15
 창현	NNP	15
 금성정치군사대학	NNP	15
-바	UNT	15
 ᆫ대니까	EF	15
-할	UNT	15
 래메	EF	15
 란	XSN	15
 구현정	NNP	15
 쇼프로그램	NNG	15
-오	UNA	15
-구	UNT	15
-중	UNT	15
 더덕술	NNG	15
 팅	NNP	15
 하여간	MAJ	15
@@ -37391,7 +37204,6 @@ LH공사	NNP	15
 형빈	NNP	14
 토란	NNG	14
 한가득	MAG	14
-통	NA	14
 배상훈	NNP	14
 쓰	IC	14
 이제훈	NNP	14
@@ -37402,14 +37214,11 @@ LH공사	NNP	15
 백의종군	NNG	14
 미르재단	NNP	14
 뻔뻔하	VA	14
-살	NA	14
-야	NA	14
 찾아뵈	VV	14
 영양식	NNG	14
 고때	NNG	14
 봄맞이	NNG	14
 최신애	NNP	14
-에	NA	14
 일식집	NNG	14
 새콤달콤	MAG	14
 빠	NNG	14
@@ -37422,7 +37231,6 @@ LH공사	NNP	15
 파급력	NNG	14
 티에프	NNG	14
 헤지	VV	14
-영	NA	14
 초중고	NNG	14
 산	NNP	14
 유아인	NNP	14
@@ -37457,7 +37265,6 @@ LH공사	NNP	15
 불문과	NNG	14
 대계	NNG	14
 판형	NNG	14
-우	NA	14
 가작	NNG	14
 책벌레	NNG	14
 학생회장	NNG	14
@@ -37510,7 +37317,6 @@ LH공사	NNP	15
 우유병	NNG	14
 잡생각	NNG	14
 앞일	NNG	14
-먹	NA	14
 내근	NNG	14
 쭈뼛쭈뼛	MAG	14
 실밥	NNG	14
@@ -38766,25 +38572,16 @@ X선	NNG	14
 김옥화	NNP	14
 근데	MAG	14
 무속지	NNG	14
-얼	UNT	14
-많	UNT	14
 널널	XR	14
 당	NNB	14
 빳데리	NNG	14
-상	UNT	14
 왜냐하면은	MAJ	14
-받	UNT	14
-반	UNT	14
-도	UNT	14
 명현	NNP	14
-우	UNT	14
-말	UNT	14
 목표어	NNG	14
 왕주	NNP	14
 그면은	MAJ	14
 씨뿔	NNG	14
 브루스윌리스	NNP	14
-XXXXX	UNC	14
 이징	NNP	14
 이흥효	NNP	14
 바이링구얼	NNG	14
@@ -38793,7 +38590,6 @@ XXXXX	UNC	14
 듀레이션	NNG	14
 에라	NNG	14
 라조비치	NNP	14
-프롬	UNA	14
 페이버	NNG	14
 뺀네	NNG	14
 뇌진탕	NNG	13
@@ -38802,12 +38598,10 @@ XXXXX	UNC	14
 몰지각	NNG	13
 을사조약	NNG	13
 이천육	NR	13
-성	NA	13
 이십팔	NR	13
 달달하	VA	13
 알뜰살뜰	MAG	13
 쫄이	VV	13
-양	NA	13
 반듯하	VA	13
 김은희	NNP	13
 유병언	NNP	13
@@ -38852,9 +38646,7 @@ XXXXX	UNC	14
 등한시	NNG	13
 여실	NNG	13
 영주권자	NNG	13
-언	NA	13
 내시	NNG	13
-장	NA	13
 동의대	NNP	13
 버쓰	NNG	13
 지금	IC	13
@@ -38897,7 +38689,6 @@ XXXXX	UNC	14
 노발대발	NNG	13
 드라두	EC	13	=드라도
 그만하	VA	13
-치	NA	13
 그러	VA	13
 국고채	NNG	13
 감독자	NNG	13
@@ -38924,7 +38715,6 @@ XXXXX	UNC	14
 현대병	NNG	13
 매칭	NNG	13
 내후년	NNG	13
-외	NA	13
 ᆯ라나	EF	13	vocalic	=려나
 글	VA	13
 레귤러	NNG	13
@@ -38959,7 +38749,6 @@ XXXXX	UNC	14
 영문학자	NNG	13
 이왕에	MAG	13
 풀어쓰	VV	13
-갓	NA	13
 김석기	NNP	13
 무과	NNG	13
 총장실	NNG	13
@@ -40401,14 +40190,9 @@ NH농협은행	NNP	13
 볼떼르	NNP	13
 단식단	NNG	13
 한국병	NNG	13
-성	UNT	13
 터프	XR	13
-누	UNT	13
-않	UNT	13
 불어	NNG	13
-맞	UNT	13
 윈도우즈	NNP	13
-장	UNT	13
 이천이	NNP	13
 원	XPN	13
 비기	NNP	13
@@ -40426,7 +40210,6 @@ NH농협은행	NNP	13
 쪼꼼	MAG	12
 은행잎	NNG	12
 끓어올르	VV	12
-을	NA	12
 명료하	VA	12
 비릿하	VA	12
 김은경	NNP	12
@@ -40441,7 +40224,6 @@ NH농협은행	NNP	13
 야들야들	MAG	12
 통밀	NNG	12
 씨씨	NNG	12
-얘	NA	12
 진부	NNG	12
 ᆫ다든가	EF	12
 이천삼	NR	12
@@ -40452,28 +40234,22 @@ NH농협은행	NNP	13
 꿉	VV	12
 동량	NNG	12
 삼투압	NNG	12
-파	NA	12
 걸르	VV	12
-쓰	NA	12
-그래	NA	12
 딲	VV	12
 흑임자	NNG	12
 코코아	NNG	12
 콕콕	MAG	12
 포도즙	NNG	12
-좋	NA	12
 찰수수	NNG	12
 오돌오돌	MAG	12
 어슷	XR	12
 연겨자	NNG	12
 안이하	VA	12
-않	NA	12
 버티기	NNG	12
 일언지하	NNG	12
 홀가분하	VA	12
 미력	NNG	12
 머릿수	NNG	12
-이런	NA	12
 골든타임	NNG	12
 오억	NR	12
 곡성	NNP	12
@@ -40497,7 +40273,6 @@ NH농협은행	NNP	13
 크리에이터	NNG	12
 협소하	VA	12
 비상근무	NNG	12
-경	NA	12
 일부로	MAG	12
 직업군	NNG	12
 흩트리	VV	12
@@ -40512,12 +40287,9 @@ NH농협은행	NNP	13
 독문과	NNG	12
 이상섭	NNP	12
 인편	NNG	12
-미	NA	12
-애	NA	12
 으	EF	12	non_vowel	==
 타임지	NNP	12
 냥반	NNG	12
-성석제	NAP	12
 래도	JX	12
 메뉴얼	NNG	12
 생활관	NNG	12
@@ -42168,21 +41940,13 @@ NG	NNP	12
 비평자	NNG	12
 대놓	VV	12
 그까는	MAJ	12
-갖	UNT	12
 ᆫ대메	EF	12
 얼마	MAG	12
-세	UNT	12
 블	VX	12
 집어늫	VV	12
 으리	EP	12	non_vowel	==리
-방	UNT	12
-발	UNT	12
 아무데	NP	12
-비	UNT	12
 겠	EC	12
-적	UNT	12
-실	UNT	12
-에	UNT	12
 순	XSN	12
 센치미터	NNB	12	=센티미터
 팝폴더	NNG	12
@@ -42194,37 +41958,27 @@ NG	NNP	12
 김시	NNP	12
 열림터	NNG	12
 강효진	NNP	12
-빗	UNA	12
-씨어리	UNA	12
 로칼	NNG	12
 컴마	NNG	12
 아우트	NNG	12
-아이	UNA	12
 신형섭	NNP	12
 발람	NNP	12
 요대로	MAG	11
 향채	NNG	11
-버	NA	11
 계란찜	NNG	11
 장차관	NNG	11
 알현	NNG	11
-형	NA	11
-알	NA	11
-마이	NA	11
 동태전	NNG	11
 끝부분	NNG	11
 둘르	VV	11
 요릏	VA	11
-수록	NA	11
 기대작	NNG	11
 청국장찌개	NNG	11
-xx	NV	11
 선선하	VA	11
 아삭거리	VV	11
 우아	IC	11
 바질	NNG	11
 모듬	NNG	11
-작	NA	11
 스탠스	NNG	11
 워크샵	NNG	11
 예리하	VA	11
@@ -42242,7 +41996,6 @@ xx	NV	11
 노릇하	VA	11
 텀	NNG	11
 특별나	VA	11
-상	NA	11
 어이고	IC	11
 맛탕	NNG	11
 배즙	NNG	11
@@ -42258,7 +42011,6 @@ xx	NV	11
 나꼼수	NNG	11
 유창하	VA	11
 점점점	MAG	11
-단	NA	11
 연세대학	NNP	11
 번역판	NNG	11
 개원석교록	NNG	11
@@ -42282,13 +42034,9 @@ xx	NV	11
 생리통	NNG	11
 떳떳하	VA	11
 팍팍하	VA	11
-박	NA	11
-과	NA	11
-신	NA	11
 면식범	NNG	11
 날라오	VV	11
 쫀득쫀득	MAG	11
-아이	NA	11
 유승희	NNP	11
 퉁	MAG	11
 밉보이	VV	11
@@ -42301,8 +42049,6 @@ xx	NV	11
 바꿔치기	NNG	11
 ᆫ답니까	EF	11
 초반부	NNG	11
-난	NA	11
-근	NA	11
 애끼	VV	11
 소년범	NNG	11
 타겟	NNG	11
@@ -42315,7 +42061,6 @@ xx	NV	11
 지디피	NNG	11
 공로자	NNG	11
 여행비	NNG	11
-재	NA	11
 트레이드마크	NNG	11
 낙망	NNG	11
 구성력	NNG	11
@@ -42323,7 +42068,6 @@ xx	NV	11
 부성애	NNG	11
 슐리만	NNP	11
 떡잎	NNG	11
-건	NA	11
 초딩	NNG	11
 권모술수	NNG	11
 첨언	NNG	11
@@ -42342,7 +42086,6 @@ xx	NV	11
 희소식	NNG	11
 화사하	VA	11
 채	XSN	11
-참	NA	11
 비등	NNG	11
 떨어트리	VV	11
 김종대	NNP	11
@@ -42352,7 +42095,6 @@ xx	NV	11
 기방	NNG	11
 선도부	NNG	11
 쩔	VV	11
-혜진	NAP	11
 콜록	MAG	11
 윗층	NNG	11
 이뻐하	VV	11
@@ -42361,7 +42103,6 @@ xx	NV	11
 울먹거리	VV	11
 대니까	EC	11
 사천만	NR	11
-지우	NAP	11
 딸랑	MAG	11
 잠깐잠깐	MAG	11
 샷시	NNG	11
@@ -42389,7 +42130,6 @@ xx	NV	11
 공교육비	NNG	11
 오물오물	MAG	11
 홍정선	NNP	11
-처	NA	11
 넌	JX	11
 상성	NNG	11
 양성소	NNG	11
@@ -42407,7 +42147,6 @@ xx	NV	11
 자기애	NNG	11
 성징	NNG	11
 피임법	NNG	11
-조물	NA	11
 와이티엔	NNP	11
 흔들	XR	11
 딴지	NNG	11
@@ -44319,24 +44058,13 @@ IMF	NNP	11
 박창해	NNP	11
 알카트래즈	NNP	11
 걔	MM	11
-친	UNT	11
 라볶이	NNG	11
 이라구	JKQ	11	non_vowel	0.8695652173913043	=이라고
-강	UNT	11
-대	UNA	11
 이러면	MAJ	11
 아름	XR	11
-그래	UNT	11
-쓰	UNT	11
-원	UNT	11
-그리	UNT	11
 방법론	NNG	11
-간	UNT	11
 명명척도	NNG	11
 서열척도	NNG	11
-미	UNT	11
-동	UNT	11
-분	UNT	11
 컴플레이션	NNG	11
 반지의제왕	NNP	11
 엽기적인그녀	NNP	11
@@ -44347,7 +44075,6 @@ IMF	NNP	11
 라틴걸	NNG	11
 세크	NNB	11
 트랜지언트	NNG	11
-일렉트론	UNA	11
 지오메트리	NNG	11
 싸이드필	NNG	11
 호삼갈리	NNP	11
@@ -44357,7 +44084,6 @@ IMF	NNP	11
 뻑뻑하	VA	10
 따듯하	VA	10	=따뜻하
 통감부	NNG	10
-들	NA	10
 이천사	NR	10
 호응도	NNG	10
 리서치앤리서치	NNP	10
@@ -44376,24 +44102,19 @@ IMF	NNP	11
 워딩	NNG	10
 운동체	NNG	10
 양지열	NNP	10
-받	NA	10
 상간	NNG	10
 양방향	NNG	10
 동작대교	NNP	10
 조작국	NNG	10
 뭐야	IC	10
 무슨	IC	10
-그니	NA	10
 민폐	NNG	10
 인공호흡	NNG	10
 역방향	NNG	10
 텁텁하	VA	10
 아무거	NNG	10
-갈	NA	10
-예	NA	10
 빈	NNG	10
 쨈	NNG	10
-남	NA	10
 박경신	NNP	10
 도마도	NNG	10
 최고봉	NNG	10
@@ -44427,7 +44148,6 @@ IMF	NNP	11
 키로미터	NNB	10	=킬로미터
 수리점	NNG	10
 소확행	NNG	10
-엄	NA	10
 라니깐	EF	10
 호오	IC	10
 호놀룰루	NNP	10
@@ -44457,7 +44177,6 @@ IMF	NNP	11
 미드	NNG	10
 합체	NNG	10
 골간	NNG	10
-계	NA	10
 이동관	NNP	10
 노승일	NNP	10
 말조심	NNG	10
@@ -44467,12 +44186,8 @@ IMF	NNP	11
 감상실	NNG	10
 흐	IC	10
 다이제스트	NNG	10
-아니	NA	10
-정과리	NAP	10
-모	NA	10
 돈독하	VA	10
 가	NP	10
-은	NA	10
 허허허허	IC	10
 허고	JC	10	=하고
 이수정	NNP	10
@@ -44518,7 +44233,6 @@ IMF	NNP	11
 크랜베리	NNG	10
 블루베리	NNG	10
 물때	NNG	10
-날	NA	10
 핵미사일	NNG	10
 쿠테타	NNG	10
 방첩	NNG	10
@@ -44639,8 +44353,6 @@ IMF	NNP	11
 약고추장	NNG	10
 무릎팍	NNG	10
 까슬까슬	MAG	10
-찌	NA	10
-온	NA	10
 육이구	NNG	10
 대는데	EC	10
 미스테리	NNG	10
@@ -46710,31 +46422,22 @@ BBC	NNP	10
 티지아이	NNP	10
 정시운	NNP	10
 상젤리제	NNP	10
-새	UNT	10
 그런데도	MAJ	10
-매	UNT	10
 진휘	NNP	10
 올해	MAG	10
 홍경	NNP	10
 근데도	MAJ	10
-과	UNT	10
-너	UNT	10
-두	UNT	10
-십	UNT	10
 카이	NNG	10
 때문	NNG	10
 강장백세주	NNP	10
 이씨	IC	10
-아니	UNT	10
 안정수	NNP	10
-좋	UNT	10
 학년	NNB	10
 이끌어내	VV	10
 드니만	EC	10
 소모임	NNG	10
 대희	NNP	10
 중요시	NNG	10
-군	UNT	10
 주성치	NNP	10
 프리퀀시	NNG	10
 어널라이즈	NNG	10
@@ -46742,7 +46445,6 @@ BBC	NNP	10
 아구	IC	9
 라던가	JC	9	vowel	=이라든가
 러일	NNP	9
-명	NA	9
 수결	NNG	9
 시도당	NNG	9
 건데	EC	9
@@ -46751,7 +46453,6 @@ BBC	NNP	10
 꽂이	NNG	9
 쫀득하	VA	9
 쌀쌀하	VA	9
-집	NA	9
 이등분	NNG	9
 슥슥	MAG	9
 타우린	NNG	9
@@ -46759,7 +46460,6 @@ BBC	NNP	10
 쌀뜬물	NNG	9
 손님상	NNG	9
 제이티비씨	NNP	9
-발	NA	9
 경무관	NNG	9
 이경백	NNP	9
 애절하	VA	9
@@ -46783,17 +46483,13 @@ BBC	NNP	10
 빠나나	NNG	9
 굴파전	NNG	9
 설맞이	NNG	9
-써	NA	9
 삼색나물	NNG	9
 느	VV	9
 루틴	NNG	9
-김	NA	9
 패브릭	NNG	9
 애도	EC	9
 는	EC	9
-검	NA	9
 신랄하	VA	9
-느	NA	9
 얼쩡거리	VV	9
 언해본	NNG	9
 싸그리	MAG	9
@@ -46846,15 +46542,8 @@ BBC	NNP	10
 연신원	NNP	9
 지끔	NNG	9
 바하	NNP	9
-겨	NA	9
 동문회장	NNG	9
-강	NA	9
-추	NA	9
-유성호	NAP	9
-김철	NAP	9
 가스실	NNG	9
-죽	NA	9
-이영준	NAP	9
 한계점	NNG	9
 성수동	NNP	9
 퍼	NNB	9
@@ -46863,7 +46552,6 @@ BBC	NNP	10
 이천이	NR	9
 돌궐	NNP	9
 옆자리	NNG	9
-점	NA	9
 오블리주	NNG	9
 에이에스	NNG	9
 예과	NNG	9
@@ -46871,7 +46559,6 @@ BBC	NNP	10
 중농	NNG	9
 범생이	NNG	9
 난해하	VA	9
-화	NA	9
 군주론	NNP	9
 변변하	VA	9
 오십억	NR	9
@@ -46896,7 +46583,6 @@ BBC	NNP	10
 찝	VV	9
 웅천	NNP	9
 스물하나	NR	9
-하진	NAP	9
 아랫층	NNG	9
 ᆫ대잖아	EF	9
 마	MAG	9
@@ -46914,7 +46600,6 @@ BBC	NNP	10
 쇳덩어리	NNG	9
 보루	NNB	9
 ᆯ려다가	EC	9	vocalic	=려다가
-민규	NAP	9
 프라자	NNG	9
 공강	NNG	9
 스케일링	NNG	9
@@ -46931,10 +46616,7 @@ BBC	NNP	10
 시숙	NNG	9
 노니	NNG	9
 셋째	NNG	9
-관	NA	9
-같	NA	9
 김순덕	NNP	9
-토	NA	9
 적절성	NNG	9
 기술처	NNG	9
 한림과학원	NNP	9
@@ -46954,7 +46636,6 @@ BBC	NNP	10
 현대어	NNG	9
 기웃기웃	MAG	9
 학명	NNG	9
-들여다	NA	9
 임상학	NNG	9
 호랭이	NNG	9
 개장국	NNG	9
@@ -46984,7 +46665,6 @@ BBC	NNP	10
 천칠백	NR	9
 메타	NNB	9
 걍	MAG	9
-끼	NA	9
 철공소	NNG	9
 가벼워지	VV	9
 오만	MM	9
@@ -47010,7 +46690,6 @@ BBC	NNP	10
 머스터드	NNG	9
 김치냉장고	NNG	9
 다홍	NNG	9
-익	NA	9
 이라던가	JC	9	non_vowel	=이라든가
 뽀송뽀송	MAG	9
 채리	VV	9
@@ -49537,29 +49216,13 @@ ABC	NNP	9
 아니믄	MAJ	9
 이러	VA	9
 근데두	MAJ	9	=근데도
-게	UNT	9
-이렇	UNT	9
-그랬	UNT	9
 승욱	NNP	9
 손지영	NNP	9
 코리아헤럴드	NNP	9
-국	UNT	9
-듣	UNT	9
-육	UNT	9
-감	UNT	9
-계	UNT	9
 절	NNB	9
-얘	UNT	9
-표	UNT	9
 마지막	MAG	9
-처	UNT	9
-의	UNT	9
 만이	JX	9
-목	UNT	9
 교재론	NNG	9
-따	UNT	9
-그런	UNT	9
-살	UNT	9
 요러	XR	9
 었었었	EP	9
 스페인어	NNG	9
@@ -49572,7 +49235,6 @@ ABC	NNP	9
 부벽준	NNG	9
 었	EC	9
 유경	NNP	9
-경	UNT	9
 성은	NNP	9
 언어치료사	NNG	9
 우반구	NNG	9
@@ -49581,7 +49243,6 @@ ABC	NNP	9
 케이	NNB	9
 케이비피에스	NNB	9
 신갈호수	NNP	9
-밸런스	UNA	9
 아이이	NNP	9
 퀄러티	NNG	9
 픽	IC	9
@@ -49595,10 +49256,8 @@ ABC	NNP	9
 삼일	NNG	8
 지원군	NNG	8
 보호국	NNG	8
-매	NA	8
 선전대	NNG	8
 자근자근	MAG	8
-잘	NA	8
 청홍	NNG	8
 갈르	VV	8
 들	JX	8
@@ -49610,9 +49269,7 @@ ABC	NNP	9
 납작하	VA	8
 미끌거리	VV	8
 왜냐믄	MAG	8
-그리	NA	8
 이현주	NNP	8
-xx이	NA	8
 저러하	VA	8
 잠원	NNP	8
 올림픽	NNP	8
@@ -49628,7 +49285,6 @@ xx이	NA	8
 군데	NNG	8
 싸악	MAG	8
 기름종이	NNG	8
-맛	NA	8
 토핑	NNG	8
 감자튀김	NNG	8
 요론	MM	8
@@ -49638,12 +49294,10 @@ xx이	NA	8
 참치김치찌개	NNG	8
 전자렌지	NNG	8
 통구이	NNG	8
-더	NA	8
 최순득	NNP	8
 디제이	NNP	8
 겁박	NNG	8
 소울	NNG	8
-쓰리	NA	8
 대니까요	EF	8
 한어	NNP	8
 팔촌	NNG	8
@@ -49680,10 +49334,8 @@ xx이	NA	8
 부수입	NNG	8
 교살	NNG	8
 독물	NNG	8
-범	NA	8
 오에스티	NNG	8
 킹스맨	NNP	8
-당	NA	8
 욕보	VV	8
 보시	VV	8
 놀래키	VV	8
@@ -49700,17 +49352,12 @@ xx이	NA	8
 신월	NNP	8
 거	MM	8
 요금소	NNG	8
-특	NA	8
 김인식	NNP	8
 리드미컬	NNG	8
-있었	NA	8
 돌아댕기	VV	8
-이규호	NAP	8
 튀빙겐	NNP	8
 편저	NNG	8
-뭐	NA	8
 느냐구	EC	8
-십	NA	8
 클라스	NNG	8
 엔피티	NNG	8
 무수단	NNP	8
@@ -49747,7 +49394,6 @@ xx이	NA	8
 에이구	IC	8
 백오십만	NR	8
 이효성	NNP	8
-교	NA	8
 단정하	VA	8
 피알	NNG	8
 건고추	NNG	8
@@ -49773,14 +49419,12 @@ xx이	NA	8
 에드윈	NNP	8
 중앙정보부장	NNG	8
 자가발전	NNG	8
-삼	NA	8
 육영재단	NNP	8
 박철원	NNP	8
 발의안	NNG	8
 검토본	NNG	8
 자당	NNG	8
 정당인	NNG	8
-등	NA	8
 교연	NNP	8
 댓바람	NNG	8
 수색동	NNP	8
@@ -49800,15 +49444,11 @@ xx이	NA	8
 가시나	NNG	8
 제주공항	NNP	8
 타이루	NNG	8
-한선이	NAP	8
 ᆯ려나	EF	8	vocalic	=려나
 기고가	NNG	8
-지호	NAP	8
 금수저	NNG	8
 아웅	IC	8
-었	NA	8
 자소서	NNG	8
-산	NA	8
 백구십	NR	8
 짠돌이	NNG	8
 공감	NNP	8
@@ -49851,7 +49491,6 @@ xx이	NA	8
 병권	NNG	8
 시들하	VA	8
 영합주의	NNG	8
-심	NA	8
 시수	NNG	8
 입학처	NNG	8
 훈련사	NNG	8
@@ -52139,7 +51778,6 @@ YMCA	NNP	8
 ᆫ다넌겨	EF	8
 왜늠	NNG	8
 보꾹	NNG	8
-긔	NA	8
 오여손잽이	NNG	8
 너냔	ETM	8
 철천지	NNG	8
@@ -52439,7 +52077,6 @@ YMCA	NNP	8
 딩동댕	MAG	8
 내롱내롱	IC	8
 간빵	NNG	8
-근다	NA	8
 즉자	NNG	8
 추출법	NNG	8
 복합오염	NNG	8
@@ -52787,57 +52424,34 @@ YMCA	NNP	8
 방출량	NNG	8
 적어두	MAG	8	=적어도
 뺀드	NNG	8
-피	UNT	8
-들	UNT	8
 삔	NNG	8
-위	UNT	8
 벨소리	NNG	8
 정맥주	NNG	8
 임종률	NNP	8
-없으	UNT	8
-열	UNT	8
-별	UNT	8
 급	XPN	8
-예	UNT	8
-개	UNT	8
 큐티	NNG	8
 이릏게	MAG	8
-현	UNT	8
-드	UNT	8
-번	UNT	8
 대	XSV	8
 국어국문학과	NNG	8
 국어국문학	NNG	8
-엄	UNT	8
 비율척도	NNG	8
 에스디	NNG	8
-됐	UNT	8
 비독	NNP	8
-잘	UNT	8
 코너장	NNG	8
-당	UNT	8
-걸	UNT	8
 페넬로페크루즈	NNP	8
 파란대문	NNP	8
 보러	JKB	8
-들어	UNT	8
 미안	IC	8
 에이뿔	NNG	8
 최상은	NNP	8
-갔	UNT	8
 씨디피	NNG	8
-삼	UNT	8
 콘칩	NNP	8
 승규	NNP	8
 그린티	NNG	8
-놀	UNT	8
 조춘도	NNP	8
 미법산수	NNG	8
 예신	NNG	8
 따운로드	NNG	8
-설	UNT	8
-XX에	UNC	8
-XX을	UNC	8
 지구를지켜라	NNP	8
 컴활	NNG	8
 쏘니	NNP	8
@@ -52848,8 +52462,6 @@ XX을	UNC	8
 믹싱	NNG	8
 점점점점	MAG	8
 지	XSN	8
-페어	UNA	8
-본드	UNA	8
 콘설	NNG	8
 써비스팩	NNG	8
 입력판	NNG	8
@@ -52857,7 +52469,6 @@ XX을	UNC	8
 파라메트릭	NNG	8
 반덴베르크	NNP	8
 일날	NNB	8
-페이벌	UNA	8
 페이벌	NNG	8
 어바웃	NNG	8
 박한별	NNP	8
@@ -52880,7 +52491,6 @@ XX을	UNC	8
 뽕뽕	MAG	7
 으까요	EF	7	non_vowel	=ᆯ까요
 쪽파	NNG	7
-채	NA	7
 아작아작	MAG	7
 냄기	VV	7
 퍽퍽하	VA	7
@@ -52899,19 +52509,15 @@ XX을	UNC	8
 수사국장	NNG	7
 초두	NNG	7
 반어법	NNG	7
-디	NA	7
 안티에이징	NNG	7
 오퍼	NNG	7
 뾰쪽	MAG	7
 금방금방	MAG	7
-군	NA	7
 취사병	NNG	7
 짤	VV	7
 메추리알	NNG	7
-볼	NA	7
 직화	NNG	7
 져	EF	7
-달라	NA	7
 황설탕	NNG	7
 만두피	NNG	7
 버섯잡채	NNG	7
@@ -52921,12 +52527,10 @@ XX을	UNC	8
 김치말이국수	NNG	7
 메밀묵무침	NNG	7
 떼굴떼굴	MAG	7
-리	NA	7
 잠룡	NNG	7
 닥터헬기	NNG	7
 지지난	MM	7
 주련	NNG	7
-합	NA	7
 목록집	NNG	7
 대각국사	NNP	7
 인쇄비	NNG	7
@@ -52950,17 +52554,14 @@ XX을	UNC	8
 무거워지	VV	7
 확	NNG	7
 쉬쉬하	VV	7
-감	NA	7
 전기과	NNG	7
 수술복	NNG	7
 생존법	NNG	7
 본진	NNG	7
-왜	NA	7
 쏘주	NNG	7
 간질거리	VV	7
 웰	NNG	7
 고독사	NNG	7
-니	NA	7
 삼종지도	NNG	7
 잠구	VV	7
 발란스	NNG	7
@@ -52968,7 +52569,6 @@ XX을	UNC	8
 퍼센테이지	NNG	7
 이백사십	NR	7
 꽃보직	NNG	7
-약	NA	7
 오창익	NNP	7
 이거	IC	7
 나무위키	NNP	7
@@ -52985,16 +52585,11 @@ XX을	UNC	8
 승마협회	NNP	7
 대체물	NNG	7
 여야	EC	7
-정석현	NAP	7
 최익현	NNP	7
 문화부장	NNG	7
 교류회	NNG	7
-석제	NAP	7
-강계숙	NAP	7
-반	NA	7
 으흐	IC	7
 고갱이	NNG	7
-았	NA	7
 두룩	EC	7
 페데리코	NNP	7
 자기도취	NNG	7
@@ -53039,7 +52634,6 @@ XX을	UNC	8
 디포리	NNG	7
 고다음	NNG	7
 래요	EC	7
-넣	NA	7
 미지근하	VA	7
 땡글땡글	MAG	7
 발그스름	XR	7
@@ -53070,7 +52664,6 @@ XX을	UNC	8
 소근소근	MAG	7
 고지식하	VA	7
 사천	NNG	7
-소연이	NAP	7
 길빵	NNG	7
 아아아아	IC	7
 마왕	NNG	7
@@ -53083,7 +52676,6 @@ XX을	UNC	8
 덜렁덜렁	MAG	7
 몇백	NR	7
 쟤	EF	7
-적	NA	7
 주꾸미	NNG	7	=쭈꾸미
 몽글몽글	MAG	7
 어머머머	IC	7
@@ -53095,10 +52687,7 @@ XX을	UNC	8
 누누히	MAG	7
 드라니까	EF	7
 휴학계	NNG	7
-정은이	NAP	7
 종갓집	NNP	7
-워	NA	7
-함	NA	7
 추리닝	NNG	7
 ᆯ래나	EF	7	vocalic	=려나
 안압	NNG	7
@@ -53128,7 +52717,6 @@ XX을	UNC	8
 다란	ETM	7
 획일화	NNG	7
 한림대학	NNP	7
-투	NA	7
 홍종호	NNP	7
 죽전	NNP	7
 루저	NNG	7
@@ -53193,7 +52781,6 @@ XX을	UNC	8
 우문	NNG	7
 우직하	VA	7
 이그	IC	7
-새	NA	7
 예	JX	7
 조직도	NNG	7
 생물학과	NNG	7
@@ -56099,7 +55686,6 @@ OB맥주	NNP	7
 자벌레	NNG	7
 포옥	MAG	7
 만침	JKB	7
-위헤서	NA	7
 옘병	NNG	7
 전디	VV	7
 애븨	NNG	7
@@ -56807,8 +56393,6 @@ OB맥주	NNP	7
 구조어	NNG	7
 트랜스내셔널	NNG	7
 도리언	NNP	7
-드라	NA	7
-큘라	NA	7
 챈스	NNP	7
 뒤팽	NNP	7
 탐정소설	NNP	7
@@ -57027,29 +56611,17 @@ OB맥주	NNP	7
 결합각	NNG	7
 한무	NNP	7
 아무튼	MAJ	7
-치	UNT	7
-알아	UNT	7
 핏쳐	NNG	7
 아니	VCP	7
-머	UNT	7
 안현진	NNP	7
-종	UNT	7
-화	UNT	7
 여	XPN	7
 그래도	MAG	7
-직	UNT	7
-선생	UNT	7
 든	JC	7
 거만	XR	7
 피피섬	NNP	7
-백	UNT	7
 순간	MAG	7
-관	UNT	7
-넘	UNT	7
 쇼프로	NNG	7
 과사	NNG	7
-단	UNT	7
-는	UNT	7
 교육대학원	NNG	7
 숙달도	NNG	7
 그리고는	MAJ	7
@@ -57057,7 +56629,6 @@ OB맥주	NNP	7
 플레시켓	NNP	7
 마디	NNB	7
 산사춘	NNP	7
-봤	UNT	7
 간만에	MAG	7
 카메론디아즈	NNP	7
 강원도의힘	NNP	7
@@ -57065,14 +56636,11 @@ OB맥주	NNP	7
 의미론	NNG	7
 쎄컨드	NNG	7
 밤새	MAG	7
-혼	UNT	7
 순대볶음	NNG	7
 원조교제	NNG	7
 음음음음	IC	7
 감명깊	VA	7
 넣	VX	7
-XX로	UNC	7
-XX한	UNC	7
 장로	NNP	7
 최립	NNP	7
 암울	XR	7
@@ -57086,24 +56654,14 @@ XX한	UNC	7
 맷데이먼	NNP	7
 셜위댄스	NNP	7
 쎄부야	NNG	7
-히얼	UNA	7
 다현	NNP	7
 인턴쉽	NNG	7
-이	UNA	7
-XX는	UNC	7
 유희열	NNP	7
 좇되	VV	7
 땐쓰	NNG	7
 비오티	NNG	7
 끄	NNG	7
 컴버전	NNG	7
-투	UNA	7
-하	UNA	7
-운	UNT	7
-오비탈	UNA	7
-카이네틱	UNA	7
-포텐셜	UNA	7
-써말	UNA	7
 에스피투	NNG	7
 컨텐트	NNG	7
 반데르샤프	NNP	7
@@ -57114,7 +56672,6 @@ XX는	UNC	7
 학술제	NNG	7
 부장단	NNG	7
 유주식	NNG	7
-미쓰	UNA	7
 쎄븐	NNP	7
 뻔데기	NNG	7
 비디오빵	NNG	7
@@ -57128,11 +56685,9 @@ XX는	UNC	7
 팔십팔	NR	6
 이천일	NR	6
 티케이	NNP	6
-그서	NA	6
 뚜들기	VV	6
 촥	MAG	6
 길쭉길쭉	MAG	6
-설	NA	6
 고론	MM	6
 푸근하	VA	6
 쌀국수	NNG	6
@@ -57141,7 +56696,6 @@ XX는	UNC	7
 칼리	NNG	6
 시그널	NNP	6
 조희팔	NNP	6
-친	NA	6
 전원생활	NNG	6
 백련사	NNP	6
 시끌시끌	MAG	6
@@ -57154,7 +56708,6 @@ XX는	UNC	7
 긍적	NNG	6
 위원직	NNG	6
 임파서블	NNG	6
-면	NA	6
 대선판	NNG	6
 방울토마토	NNG	6
 루꼴라	NNG	6
@@ -57172,7 +56725,6 @@ XX는	UNC	7
 잦	VV	6
 팥소	NNG	6
 오징어채	NNG	6
-짜	NA	6
 라든지	JKB	6
 선연히	MAG	6
 반공주의자	NNG	6
@@ -57197,11 +56749,9 @@ XX는	UNC	7
 몰각	NNG	6
 한서희	NNP	6
 이콜	NNG	6
-했	NA	6
 단어장	NNG	6
 깜	VV	6
 외식업체	NNG	6
-위	NA	6
 혜공왕	NNP	6
 으쌰	IC	6
 염색약	NNG	6
@@ -57209,7 +56759,6 @@ XX는	UNC	7
 엠버	NNP	6
 설리	NNP	6
 아이구야	IC	6	=아이고
-로	NA	6
 이영학	NNP	6
 철구	NNG	6
 돌직구	NNG	6
@@ -57228,17 +56777,13 @@ XX는	UNC	7
 핫하	VA	6
 범죄도시	NNP	6
 시라노	NNP	6
-철	NA	6
 명대사	NNG	6
 클러치	NNG	6
-몰	NA	6
 명명백백하	VA	6
 마이너리티	NNG	6
 일목요연하	VA	6
 유지태	NNP	6
 미국판	NNG	6
-속	NA	6
-청	NA	6
 프리드라이프	NNP	6
 지지세	NNG	6
 압	NNG	6
@@ -57253,15 +56798,11 @@ XX는	UNC	7
 오디에이	NNG	6
 아하하	IC	6
 순계	NNG	6
-이신행	NAP	6
 청설모	NNG	6
 사일구	NNG	6
-최석규	NAP	6
 세계	NNP	6
 겉	VA	6
-최인호	NAP	6
 군계일학	NNG	6
-장철환	NAP	6
 울먹울먹	MAG	6
 로르카	NNP	6
 김광민	NNP	6
@@ -57277,44 +56818,34 @@ XX는	UNC	7
 번아웃	NNG	6
 일방향	NNG	6
 헤어드라이어	NNG	6
-습니	NA	6
 부검실	NNG	6
 혁혁하	VA	6
 화학물	NNG	6
-맞	NV	6
 공란	NNG	6
 동명성왕	NNP	6
 입도	NNG	6
 지증왕	NNP	6
 오십육	NR	6
 티베트족	NNP	6
-석	NA	6
 임산	NNG	6
 천구백육십	NR	6
 기본료	NNG	6
 무역량	NNG	6
 아톰	NNP	6
-달	NA	6
 이응	NNG	6
 삭막하	VA	6
 조곤조곤	MAG	6
 그로벌	NNG	6
 로마사	NNG	6
 중차대하	VA	6
-라고	NA	6
 일방통행식	NNG	6
 그르고	MAJ	6
 오시	VV	6
 더블딥	NNG	6
 선납	NNG	6
 보고자	NNG	6
-가지	NA	6
 마르쿠스	NNP	6
-방	NA	6
 조렇	VA	6
-맛있	NA	6
-담	NA	6
-탄	NA	6
 눌	VV	6
 써	VV	6
 닭봉	NNG	6
@@ -57338,7 +56869,6 @@ XX는	UNC	7
 보조인	NNG	6
 미운털	NNG	6
 연신내	NNP	6
-대룡이	NAP	6
 묵언	NNG	6
 쪼꼴렛	NNG	6
 지엑스	NNG	6
@@ -57367,7 +56897,6 @@ XX는	UNC	7
 유두리	NNG	6
 갈치조림	NNG	6
 address2	NNP	6
-피	NA	6
 십육만	NR	6
 승질	NNG	6
 따박따박	MAG	6
@@ -57379,15 +56908,12 @@ address2	NNP	6
 칙칙	MAG	6
 대리	VV	6
 거치대	NNG	6
-서남숙	NAP	6
-주연이	NAP	6
 난처하	VA	6
 가디건	NNG	6
 저기요	IC	6
 현미차	NNG	6
 당일치기	NNG	6
 몇만	NR	6
-물	NA	6
 레진	NNG	6
 늦바람	NNG	6
 벌렁벌렁	MAG	6
@@ -57412,7 +56938,6 @@ address2	NNP	6
 교육국장	NNG	6
 고견	NNG	6
 칼론	NNP	6
-결	NA	6
 적장자	NNG	6
 여요	EF	6
 논공행상	NNG	6
@@ -57422,7 +56947,6 @@ address2	NNP	6
 제	IC	6
 논물	NNG	6
 권영민	NNP	6
-족	NA	6
 불침번	NNG	6
 고고하	VA	6
 베스트팔렌	NNP	6
@@ -57430,7 +56954,6 @@ address2	NNP	6
 일력	NNG	6
 사피어	NNP	6
 박정현	NNP	6
-혀	NA	6
 패시브	NNG	6
 조은희	NNP	6
 파라다임	NNG	6
@@ -57477,7 +57000,6 @@ address2	NNP	6
 강대	NNG	6
 이심	NNG	6
 이급	NNG	6
-최	NA	6
 셧다운	NNG	6
 란도	NNP	6
 김난도	NNP	6
@@ -57513,7 +57035,6 @@ address2	NNP	6
 누범	NNG	6
 태안선	NNP	6
 김순영	NNP	6
-어렵	NA	6
 사슴뿔	NNG	6
 민첩하	VA	6
 고군산군도	NNP	6
@@ -61389,7 +60910,6 @@ ISL코리아	NNP	6
 굵다랗	VA	6
 이창식	NNP	6
 ᆫ데쇼	EF	6
-그류	NA	6
 벌룽거리	VV	6
 까악까악	MAG	6
 골짜구니	NNG	6
@@ -62175,15 +61695,11 @@ NBC	NNP	6
 서일성	NNP	6
 이따만	XR	6
 도	JKS	6
-으	UNT	6
-체	UNT	6
 최향용	NNP	6
 유양수	NNP	6
-버	UNT	6
 박매형	NNP	6
 ᆯ래다가	EC	6	vocalic	=려다가
 생맥주	NNG	6
-항	UNT	6
 통통	XR	6
 종률	NNP	6
 키즈헤럴드	NNP	6
@@ -62192,52 +61708,35 @@ NBC	NNP	6
 씨씨	NNB	6
 ᆫ대니까	EC	6
 제이에스에이	NNP	6
-갈	UNT	6
-다르	UNT	6
-노	UNT	6
 물항아리	NNG	6
 캡	XPN	6
-애	UNT	6
-어떠	UNT	6
-함	UNT	6
-차	UNT	6
 끝처리	NNG	6
 그런까	MAJ	6
-형	UNT	6
 후치	XR	6
 쎄션	NNG	6
 한국어세계화추진위원회	NNP	6
 김제열	NNP	6
 청해	NNG	6
-돼	UNT	6
 리니얼	NNG	6
 그런	IC	6
-팔	UNT	6
 진	XPN	6
 등간성	NNG	6
 칼제임스	NNP	6
 응용언어학	NNG	6
-엇	UNT	6
-생각	UNT	6
-나오	UNT	6
 규범문법	NNG	6
-맨	UNT	6
 스파이께임	NNP	6
 와레즈	NNP	6
 껏	XSN	6
 명	XSN	6
-쪼	UNT	6
 옛날	MAG	6
 긍까는	MAJ	6
 서브	NNP	6
 파쉬툰어	NNP	6
 잘랄라바드	NNP	6
-커미티	UNA	6
 신라의달밤	NNP	6
 라이온킹	NNP	6
 줄리엣의남자	NNP	6
 뷰티풀마인드	NNP	6
-달	UNT	6
 생각샘	NNP	6
 파	XSN	6
 파적	NNP	6
@@ -62247,22 +61746,14 @@ NBC	NNP	6
 매혹선	NNG	6
 오에이치피	NNG	6
 엔쵸	NNP	6
-역	UNT	6
 쵸코렛	NNG	6
 호렴	NNP	6
 사회복지학과	NNG	6
-어떻	UNT	6
-막	UNT	6
 마니또	NNG	6
 하이튼	MAJ	6
-죽	UNT	6
 검심	NNG	6
-똑	UNT	6
-절	UNT	6
-민	UNT	6
 거등요	EF	6
 왜냐믄	MAJ	6
-XX야	UNC	6
 전칭작	NNG	6
 오위	NNP	6
 미금산수	NNP	6
@@ -62272,7 +61763,6 @@ XX야	UNC	6
 유토	NNP	6
 씸플	NNG	6
 통일부	NNP	6
-이	UNC	6
 한동안	MAG	6
 대드라	EF	6
 글로시	NNG	6
@@ -62297,15 +61787,12 @@ XX야	UNC	6
 개게	NNG	6
 연대회의	NNP	6
 연봉급	NNG	6
-몰래큘러	UNA	6
 열화학	NNG	6
 에이디	NNG	6
 보스팅	NNG	6
 파라메타	NNG	6
-콘	UNT	6
 바테루스	NNP	6
 루시우스	NNP	6
-페이버	UNA	6
 푸름	NNP	6
 엠티비	NNP	6
 스타워즈	NNG	6
@@ -62325,12 +61812,10 @@ XX야	UNC	6
 ᆫ다라고	EC	5
 피피티	NNG	5
 늘푸른한국당	NNP	5
-잖	NA	5
 바른당	NNP	5
 유무선	NNG	5
 이펙트	NNG	5
 피케이	NNP	5
-완	NA	5
 쎈치	NNB	5	=센티
 아삭아삭거리	VV	5
 정미경	NNP	5
@@ -62343,7 +61828,6 @@ XX야	UNC	6
 왜냐하믄	MAG	5
 북창동	NNP	5
 주저리주저리	MAG	5
-법	NA	5
 소나타	NNP	5
 대원어드바이저리	NNP	5
 이혜원	NNP	5
@@ -62354,12 +61838,10 @@ XX야	UNC	6
 긍께	MAJ	5
 계파주의	NNG	5
 항정산	NNG	5
-사람	NA	5
 짱아찌	NNG	5
 신콩	NNG	5
 뿔리	VV	5
 프랑스식	NNG	5
-때	NA	5
 시리	NNG	5
 고기집	NNG	5
 레서피	NNG	5	=레시피
@@ -62367,21 +61849,14 @@ XX야	UNC	6
 파마산	NNG	5
 데코	NNG	5
 감장	NNG	5
-끼리	NA	5
 와르르르	MAG	5
 주종목	NNG	5
-잡	NA	5
 욕심나	VV	5
-만들	NA	5
 냉국	NNG	5
-쪼	NA	5
 려	EF	5	vocalic
 으네요	EF	5	non_vowel	=네요
 삼인방	NNG	5
-트	NA	5
-증	NA	5
 극명히	MAG	5
-총	NA	5
 담화범	NNG	5
 마흔두	MM	5
 훼절	NNG	5
@@ -62413,21 +61888,14 @@ XX야	UNC	6
 팔로우	NNG	5
 유연제	NNG	5
 잔향	NNG	5
-커	NA	5
 커피값	NNG	5
-머	NA	5
 도도하	VA	5
 아이고야	IC	5	=아이고
 재범자	NNG	5
 우범자	NNG	5
 왜케	MAG	5
 글면	MAJ	5
-급	NA	5
-니까	NA	5
-땡큐	NA	5
 튼실하	VA	5
-열	NA	5
-간	NA	5
 질르	VV	5
 니까	MAJ	5
 십상시	NNG	5
@@ -62457,7 +61925,6 @@ XX야	UNC	6
 성산대교	NNP	5
 구룡	NNP	5
 인사차	NNG	5
-어려	NA	5
 연대설	NNG	5
 더머	NNP	5
 황성수	NNP	5
@@ -62467,13 +61934,10 @@ XX야	UNC	6
 밈	NNG	5
 돌집	NNG	5
 외솔관	NNP	5
-이양하	NAP	5
 대광	NNP	5
 와세다	NNP	5
-최익환	NAP	5
 백양로	NNP	5
 새벽	NNP	5
-그게	NA	5
 종합지	NNG	5
 댄디	NNG	5
 자믄	EC	5
@@ -62481,17 +61945,12 @@ XX야	UNC	6
 멫	NR	5
 대니	VV	5
 복지다방	NNP	5
-순	NA	5
 으어	IC	5
-래서	NA	5
-김성윤	NAP	5
-옛	NA	5
 교수실	NNG	5
 경희대학	NNP	5
 티에스	NNP	5
 일리엇	NNP	5
 예언가	NNG	5
-즐	NA	5
 패키징	NNG	5
 막된장	NNG	5
 천오백만	NR	5
@@ -62506,7 +61965,6 @@ XX야	UNC	6
 야지	EC	5
 인터폴	NNG	5
 각방	NNG	5
-라든	NA	5
 오미	NNG	5
 디스트리뷰터	NNG	5
 팔칠	NR	5
@@ -62542,7 +62000,6 @@ XX야	UNC	6
 표면적	NNG	5
 포도씨유	NNG	5
 반건조	NNG	5
-이이	NA	5
 우스터	NNP	5
 깨스	NNG	5
 념	NNG	5
@@ -62563,8 +62020,6 @@ XX야	UNC	6
 신사협정	NNG	5
 오공	NNG	5
 풀르	VV	5
-모르	NA	5
-이십	NA	5
 결판나	VV	5
 닭털기	NNG	5
 삼지대론	NNG	5
@@ -62601,7 +62056,6 @@ address1	NNP	5
 칠십오	NR	5
 떠	VV	5
 테팔	NNP	5
-일한이	NAP	5
 참내	IC	5
 겸사	NNG	5
 아싸리	MAG	5
@@ -62610,21 +62064,16 @@ address1	NNP	5
 티켓팅	NNG	5
 삼양동	NNP	5
 딜리버리	NNG	5
-혜림	NAP	5
-컴	NA	5
 헤비	NNG	5
 어눌하	VA	5
 얼얼하	VA	5
 알피	NNG	5
 허니	NNG	5
-주영이	NAP	5
 빠이	IC	5
 끄치	IC	5
-활	NA	5
 변뇨한	NNP	5
 기프티콘	NNP	5
 몽키	NNG	5
-잠	NA	5
 김종민	NNP	5
 차은우	NNP	5
 덕질	NNG	5
@@ -62675,7 +62124,6 @@ address1	NNP	5
 링귀스틱	NNG	5
 나이다	NNP	5
 풀브라이트	NNP	5
-에디퀴쉬	NA	5
 머쉰	NNG	5
 다이어그램	NNG	5
 촘스키식	NNG	5
@@ -62684,7 +62132,6 @@ address1	NNP	5
 다다닥	MAG	5
 학기말	NNG	5
 서강대학	NNP	5
-엉	NA	5
 유호	NNP	5
 소강춘	NNP	5
 겨레말	NNG	5
@@ -62701,7 +62148,6 @@ address1	NNP	5
 박동인	NNP	5
 김충희	NNP	5
 단국	NNP	5
-코	NA	5
 유니코드	NNG	5
 멜라티	NNP	5
 엠블럼	NNG	5
@@ -62716,7 +62162,6 @@ address1	NNP	5
 벙벙하	VA	5
 컷트	NNG	5
 보관료	NNG	5
-불	NA	5
 귀갓길	NNG	5
 김희숙	NNP	5
 징짜	MAG	5
@@ -62757,7 +62202,6 @@ address1	NNP	5
 날개짓	NNG	5
 청포	NNG	5
 서시	NNG	5
-뛰	NA	5
 포식자	NNG	5
 우포늪	NNP	5
 필경	NNG	5
@@ -62767,19 +62211,15 @@ address1	NNP	5
 여자관계	NNG	5
 갓건배	NNP	5
 국립해양문화재연구소	NNP	5
-xx선	NF	5
-죽x	NF	5
 천관산	NNP	5
 송원	NNP	5
 진혼제	NNG	5
-사x선	NF	5
 민첩성	NNG	5
 강하제	NNG	5
 솔깃하	VA	5
 봄동	NNG	5
 임방울	NNP	5
 컴컴하	VA	5
-낙지자	NA	5
 라죠	EF	5
 안성	NNG	5
 파채	NNG	5
@@ -62814,7 +62254,6 @@ xx선	NF	5
 피엔	NNP	5
 등록비	NNG	5
 대박	IC	5
-내비	NA	5
 오씨엔	NNP	5
 소머즈	NNP	5
 계족산	NNP	5
@@ -62824,7 +62263,6 @@ xx선	NF	5
 하휴	IC	5
 주절주절	MAG	5
 케	EC	5
-케	NA	5
 악력	NNG	5
 불닭볶음면	NNP	5
 뮤비	NNG	5
@@ -62840,7 +62278,6 @@ xx선	NF	5
 계양구	NNP	5
 택배비	NNG	5
 쇼미더머니	NNP	5
-용	NA	5
 핫초코	NNG	5
 김재용	NNP	5
 전선부	NNG	5
@@ -62901,7 +62338,6 @@ xx선	NF	5
 야바우	NNG	5
 존함	NNG	5
 오세철	NNP	5
-오혜령	NAP	5
 공여국	NNG	5
 달라	NNB	5
 한국제	NNG	5
@@ -62974,7 +62410,6 @@ xx선	NF	5
 아무튼지	MAG	5
 상갓집	NNG	5
 걸신	NNG	5
-래	NA	5
 장위	NNP	5
 와트	NNB	5
 재털이	NNG	5
@@ -64913,7 +64348,6 @@ LG하우시스	NNP	5
 그레고리오	NNP	5
 동맥혈	NNG	5
 박은정	NNP	5
-핏	NA	5
 윤영석	NNP	5
 모리토모학원	NNP	5
 광시	NNP	5
@@ -64943,7 +64377,6 @@ LG하우시스	NNP	5
 아프타	NNG	5
 카디자	NNP	5
 나우콤	NNP	5
-잡이	NA	5
 하트비트	NNP	5
 롄유	NNP	5
 헛개나무	NNG	5
@@ -66993,7 +66426,6 @@ KBS	NNP	5
 덜리	VV	5
 실바람	NNG	5
 자우	EF	5
-얻다가	NA	5
 내뻗치	VV	5
 방축골	NNP	5
 꿈칠	MAG	5
@@ -67021,7 +66453,6 @@ KBS	NNP	5
 푸푸	MAG	5
 김생	NNP	5
 물독	NNG	5
-길래	NA	5
 더라니요	EF	5
 눈방울	NNG	5
 비틀걸음	NNG	5
@@ -68869,29 +68300,21 @@ CNN	NNP	5
 내셔날리즘	NNG	5
 발토판	NNG	5
 전파과학사	NNP	5
-잡	UNT	5
 스럽	VA	5
 재요	EF	5
 그면서	MAJ	5
-마이	UNT	5
 저기	MAG	5
 글루	MAG	5
-힘들	UNT	5
 케이에프씨	NNP	5
 작은아빠	NNG	5
 어디	MAG	5
 선능	NNP	5
-댔	UNA	5
 슈퍼킹	NNG	5
 하다못해	MAJ	5
 이	VCN	5
-묻	UNT	5
 걸어다니	VV	5
-어려	UNT	5
 어떻	VV	5
-괜	UNT	5
 돌솥밥	NNG	5
-가지	UNT	5
 버티칼	NNG	5
 심	XSN	5
 호경	NNP	5
@@ -68902,34 +68325,21 @@ CNN	NNP	5
 니깐요	EF	5	vocalic	=니까요
 으니깐요	EF	5	non_vowel	=니까요
 측	XSN	5
-식	UNT	5
 모니타	NNG	5
 초상권	NNG	5
-김	UNT	5
 뷰티살롱	NNG	5
 프랑스어	NNG	5
-마이	UNA	5
-갓	UNA	5
 더군다나	MAJ	5
-며	UNT	5
 아이러브코메디	NNP	5
 에스에스제이	NNG	5
-궁	UNT	5
 오알즈	NNG	5
 피디에프	NNG	5
 페이지	NNB	5
 실제루	MAG	5
-와	UNT	5
 익스페리멘트	NNG	5
 통계치	NNG	5
-약	UNT	5
-불	UNT	5
 체하	VX	5
-배	UNT	5
-포	UNT	5
 산딸기술	NNG	5
-끝	UNT	5
-허	UNT	5
 오픈유얼아이즈	NNP	5
 찝쩍	XR	5
 오션스일레븐	NNP	5
@@ -68941,10 +68351,6 @@ CNN	NNP	5
 쪼그만	XR	5
 아나토미	NNP	5
 블레이드러너	NNP	5
-재	UNT	5
-스피킹	UNA	5
-울	UNT	5
-까	UNT	5
 아니다	IC	5
 갈키	VV	5
 모든	MAG	5
@@ -68953,51 +68359,37 @@ CNN	NNP	5
 집부	NNG	5
 학점	NNB	5
 앰블란스	NNG	5
-작	UNT	5
-박	UNT	5
 소홍주	NNG	5
 리처드바크	NNP	5
 래드라	EF	5
 선식	NNG	5
 숨쉬	VV	5
-물	UNT	5
 켄신	NNP	5
 오브이에이	NNG	5
 닐다이아몬드	NNP	5
-광	UNT	5
 구십칠	NNP	5
 완성형	NNG	5
-XX라고	UNC	5
 백분토론	NNP	5
 독서당	NNG	5
 세부도	NNG	5
 은일지사	NNG	5
 자애롭	VA	5
-산	UNT	5
 유씨	NNP	5
 김신각	NNP	5
 배수	NNB	5
 글쎄	MAG	5
-한	UNA	5
-추	UNT	5
 뻘줌	XR	5
 케릭	NNG	5
-새꺄	UNA	5
 슈덴	NNP	5
 우마써먼	NNP	5
-겨	UNT	5
 쏘리	NNG	5
 플래시겟	NNP	5
 쎄이고스돕	NNP	5
 런딤	NNP	5
 피디수첩	NNP	5
-편	UNT	5
 엔피티	NNP	5
 엘고어	NNP	5
-돌	UNT	5
-내	UNA	5
 보건복지부	NNG	5
-에떼	UNA	5
 아쎔	NNP	5
 여인의향기	NNP	5
 티지	NNP	5
@@ -69035,10 +68427,8 @@ XX라고	UNC	5
 루데바익	NNP	5
 년생	NNB	5
 디즈니	NNG	5
-케이	UNA	5
 위시스	NNG	5
 히쓰	NNG	5
-펜팔	UNA	5
 껌	VA	5
 뽀순	NNP	5
 짝	XPN	5
