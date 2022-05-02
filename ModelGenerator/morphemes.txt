@@ -3033,7 +3033,7 @@
 호랑이	NNG	756
 부진	NNG	756
 살짝	MAG	755
-허	VV	755
+허	VV	755	=하
 양쪽	NNG	755
 금	NNG	755
 무게	NNG	755
@@ -4923,8 +4923,7 @@ XX	UNC	394
 성당	NNG	392
 사로잡히	VV	392
 원숭이	NNG	392
-요기	NP	391
-잏	VA	391
+요기	NP	391	=여기
 도서	NNG	391
 이탈	NNG	391
 국면	NNG	391
@@ -6946,7 +6945,7 @@ xx	NA	250
 티셔츠	NNG	234
 복종	NNG	234
 면모	NNG	234
-누렇	VA	234
+누렇	VA	234	=노랗
 패스	NNG	234
 검은색	NNG	234
 태극기	NNG	234
@@ -7769,7 +7768,7 @@ xx	NF	205
 땅바닥	NNG	198
 발령	NNG	197
 어야지요	EF	197
-허옇	VA	197
+허옇	VA	197	=하얗
 서럽	VA	197
 설명회	NNG	197
 손잡이	NNG	197
@@ -11598,7 +11597,7 @@ xxx	NA	110
 인공위성	NNG	108
 복부	NNG	108
 터치	NNG	108
-시퍼렇	VA	108
+시퍼렇	VA	108	=새파랗
 매이	VV	108
 해부	NNG	108
 유기체	NNG	108
@@ -13049,7 +13048,7 @@ XXX	UNC	103
 불복	NNG	90
 센치	NNB	90	=센티
 케이크	NNG	90
-둥그렇	VA	90
+둥그렇	VA	90	=동그랗
 과감하	VA	90
 구미	NNG	90
 이월	NNG	90
@@ -13720,7 +13719,7 @@ XXX	UNC	103
 흠집	NNG	83
 독촉	NNG	83
 일흔	NR	83
-허	VX	83
+허	VX	83	=하
 마	EF	83	vocalic
 국제기구	NNG	83
 엔터테인먼트	NNG	83
@@ -14482,7 +14481,7 @@ LG화학	NNP	82
 외도	NNG	76
 운전석	NNG	76
 억눌리	VV	76
-시뻘겋	VA	76
+시뻘겋	VA	76	=새빨갛
 아이콘	NNG	76
 나약	NNG	76
 장미꽃	NNG	76
@@ -16289,7 +16288,7 @@ xxx	NF	64
 도로변	NNG	63
 친목	NNG	63
 정주	NNP	63
-퍼렇	VA	63
+퍼렇	VA	63	=파랗
 참모습	NNG	63
 김유신	NNP	63
 병적	NNG	63
@@ -16680,7 +16679,7 @@ xxx	NF	64
 푸르르	VA	60
 만발	NNG	60
 육류	NNG	60
-짜장면	NNG	60
+짜장면	NNG	60	=자장면
 포상	NNG	60
 하차	NNG	60
 감점	NNG	60
@@ -17240,7 +17239,7 @@ xxx	NF	64
 판잣집	NNG	57
 으란	ETM	57	non_vowel	==란
 마지않	VX	57
-뻘겋	VA	57
+뻘겋	VA	57	=빨갛
 병자	NNG	57
 통칭	NNG	57
 반바지	NNG	57
@@ -17622,7 +17621,7 @@ xxx	NF	64
 대중음악	NNG	55
 프라이버시	NNG	55
 의문사	NNG	55
-하두	MAG	55
+하두	MAG	55	=하도
 프랭크	NNP	55
 연회	NNG	55
 안면도	NNP	55
@@ -18291,7 +18290,7 @@ X	UNC	54
 방아쇠	NNG	52
 바닷바람	NNG	52
 빅딜	NNG	52
-혀	VV	52
+혀	VV	52	=하
 젤	NNG	52
 기생충	NNG	52
 세입	NNG	52
@@ -18649,7 +18648,7 @@ X	UNC	54
 염상섭	NNP	50
 종언	NNG	50
 교육열	NNG	50
-시꺼멓	VA	50
+시꺼멓	VA	50	=새까맣
 인습	NNG	50
 허탈감	NNG	50
 저마다	NNG	50
@@ -20355,7 +20354,7 @@ AP통신	NNP	50
 종합병원	NNP	44
 시현	NNG	44
 망둥이	NNG	44
-어떡허	VV	44
+어떡허	VV	44	=어떡하
 아뭏든	MAG	44
 타작	NNG	44
 통밥	NNG	44
@@ -24650,7 +24649,7 @@ xxxx	NA	32
 발붙이	VV	31
 벽보	NNG	31
 댓	NR	31
-증말	NNG	31
+증말	NNG	31	=정말
 정릉	NNP	31
 정현	NNP	31
 간음	NNG	31
@@ -25079,7 +25078,7 @@ xxxx	NA	32
 통탄	NNG	30
 지표면	NNG	30
 포유동물	NNG	30
-꺼멓	VA	30
+꺼멓	VA	30	=까맣
 제과점	NNG	30
 냬	EF	30
 무리수	NNG	30
@@ -25562,7 +25561,7 @@ xxxx	NA	32
 유채	NNG	29
 슈즈	NNG	29
 위반자	NNG	29
-부페	NNG	29
+부페	NNG	29	=뷔페
 핸드	NNG	29
 영양학	NNG	29
 난장	NNG	29
@@ -25584,7 +25583,7 @@ xxxx	NA	32
 장흥	NNP	29
 대동소이	NNG	29
 템플스테이	NNG	29
-깍	VV	29
+깍	VV	29	==깎
 소화제	NNG	29
 당규	NNG	29
 교학사	NNP	29
@@ -30451,7 +30450,8 @@ xxxx	NF	21
 교양인	NNG	21
 이희승	NNP	21
 깨트리	VV	21
-동그래지	VV	21
+둥그레지	VV	21
+동그래지	VV	21	=둥그레지
 샤브샤브	NNG	21
 바르르	MAG	21
 영락	NNG	21
@@ -33161,7 +33161,7 @@ SH공사	NNP	19
 전원회의	NNG	18
 갓끈	NNG	18
 간지	NNG	18
-휘둥그레지	VV	18
+휘둥그레지	VV	18	=휘둥그래지
 가토	NNP	18
 김성동	NNP	18
 열창	NNG	18
@@ -36248,7 +36248,7 @@ XX가	UNC	16
 사정사정	NNG	15
 엄수	NNG	15
 날라리	NNG	15
-돈가스	NNG	15
+돈가스	NNG	15	=돈까스
 위장약	NNG	15
 다아	MAG	15
 핵산	NNG	15
@@ -39054,7 +39054,7 @@ XXXXX	UNC	14
 예방책	NNG	13
 프린스	NNG	13
 두피	NNG	13
-정말루	MAG	13
+정말루	MAG	13	=정말로
 쏠디	NNP	13
 닷	NNG	13
 건너방	NNG	13
@@ -42365,7 +42365,7 @@ xx	NV	11
 딸랑	MAG	11
 잠깐잠깐	MAG	11
 샷시	NNG	11
-어짜피	MAG	11
+어짜피	MAG	11	=어차피
 동상이몽	NNG	11
 건조증	NNG	11
 방탄	NNP	11
@@ -43348,7 +43348,7 @@ SK이노베이션	NNP	11
 출판업	NNG	11
 신곡	NNP	11
 횟감	NNG	11
-포르셰	NNP	11
+포르셰	NNP	11	=포르쉐
 볼보트럭	NNP	11
 성글	VA	11
 독신주의자	NNG	11
@@ -44027,7 +44027,7 @@ IMF	NNP	11
 동극	NNG	11
 수지맞	VV	11
 나잇살	NNG	11
-따듯	XR	11
+따듯	XR	11	=따뜻
 오강원	NNP	11
 대광	NNG	11
 막이	NNG	11
@@ -44355,7 +44355,7 @@ IMF	NNP	11
 원총	NNG	11
 아이엘츠	NNP	11
 뻑뻑하	VA	10
-따듯하	VA	10
+따듯하	VA	10	=따뜻하
 통감부	NNG	10
 들	NA	10
 이천사	NR	10
@@ -44502,7 +44502,7 @@ IMF	NNP	11
 설왕설래	NNG	10
 냉혹하	VA	10
 국제금융센터	NNP	10
-대게	MAG	10
+대게	MAG	10	=대개
 입바르	VA	10
 이솝우화	NNP	10
 명심보감	NNP	10
@@ -46025,7 +46025,7 @@ JP모건	NNP	10
 여탕	NNG	10
 육관	NNP	10
 길상	NNG	10
-동그스름	XR	10
+동그스름	XR	10	=둥그스름
 홍리나	NNP	10
 여음	NNG	10
 카수	NNG	10
@@ -49536,7 +49536,7 @@ ABC	NNP	9
 런닝머신	NNG	9
 아니믄	MAJ	9
 이러	VA	9
-근데두	MAJ	9
+근데두	MAJ	9	=근데도
 게	UNT	9
 이렇	UNT	9
 그랬	UNT	9
@@ -52302,7 +52302,7 @@ YMCA	NNP	8
 홍은준	NNP	8
 발기회	NNG	8
 윤지섭	NNP	8
-둥그래지	VV	8
+둥그래지	VV	8	=둥그레지
 수놈	NNG	8
 로맨티스트	NNG	8
 버그	NNG	8
@@ -53084,7 +53084,7 @@ XX을	UNC	8
 몇백	NR	7
 쟤	EF	7
 적	NA	7
-주꾸미	NNG	7
+주꾸미	NNG	7	=쭈꾸미
 몽글몽글	MAG	7
 어머머머	IC	7
 모지	VA	7
@@ -56375,7 +56375,7 @@ OB맥주	NNP	7
 조카애	NNG	7
 개발도상국가	NNG	7
 때까우	NNG	7
-당허	VV	7
+당허	VV	7	=당하
 풍향목재소	NNP	7
 자주빛	NNG	7
 엄폐호	NNG	7
@@ -60932,7 +60932,7 @@ ISL코리아	NNP	6
 도탑	VA	6
 병대	NNG	6
 원쑤	NNG	6
-뭇허	VX	6
+뭇허	VX	6	=못하
 굴신	NNG	6
 짝짝짝	MAG	6
 영뵉	NNP	6
@@ -64855,7 +64855,7 @@ LG하우시스	NNP	5
 화이부동	NNG	5
 유천	NNP	5
 오나가	NNP	5
-포르쉐사	NNP	5
+포르쉐사	NNP	5	=포르쉐
 커머스	NNG	5
 소련제	NNG	5
 왕산	NNP	5
@@ -66315,7 +66315,7 @@ SK바이오팜	NNP	5
 스턴트맨	NNG	5
 정이품	NNG	5
 사하촌	NNP	5
-싯누렇	VA	5
+싯누렇	VA	5	=샛노랗
 서걱거리	VV	5
 게슴치레	MAG	5
 흐물거리	VV	5
@@ -67114,7 +67114,7 @@ KBS	NNP	5
 박색	NNG	5
 볼때기	NNG	5
 노인장	NNG	5
-혀	VX	5
+혀	VX	5	=하
 목댕기	NNG	5
 디	VX	5
 여적	MAG	5
@@ -67135,7 +67135,7 @@ KBS	NNP	5
 으먼서	EC	5	non_vowel	=면서
 으이구	IC	5
 지달리	VV	5
-독허	VA	5
+독허	VA	5	=독하
 수연	NNG	5
 쬐금	NNG	5
 멧비둘기	NNG	5
@@ -67166,7 +67166,7 @@ KBS	NNP	5
 방고래	NNG	5
 알어듣	VV	5
 백날	NNG	5
-좋아허	VV	5
+좋아허	VV	5	=좋아하
 기백만	NR	5
 영생불멸	NNG	5
 북망산	NNG	5
@@ -67847,7 +67847,7 @@ KBS	NNP	5
 말눈치	NNG	5
 형	NNP	5
 내지인	NNG	5
-볼셰비끼	NNP	5
+볼셰비끼	NNP	5	=볼셰비키
 식산은행	NNP	5
 담바구	NNG	5
 담바고타령	NNP	5
@@ -69053,3 +69053,25 @@ XX라고	UNC	5
 프레쉬	NNG	5
 모짜렐라	NNG	5
 말아톤	NNP	5
+짜장	NNG	5
+파에야	NNG	5
+빠에야	NNG	5
+웨이팅	NNG	5
+플레이팅	NNG	5
+컷팅	NNG	5	=커팅
+수플레	NNG	5
+수풀레	NNG	5
+봉골레	NNG	5
+감사히	MAG	5
+건강히	MAG	5
+경건히	MAG	5
+경솔히	MAG	5
+귀중히	MAG	5
+극렬히	MAG	5
+능숙히	MAG	5
+뚜렷히	MAG	5
+어정쩡히	MAG	5
+자상히	MAG	5
+요괴	NNG	5
+쉐프	NNG	5	=셰프
+쉐익스피어	NNP	5	=셰익스피어
