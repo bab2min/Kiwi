@@ -119,8 +119,17 @@ namespace kiwi
 		return ret;
 	}
 
+	/**
+	* @brief tokens에 문장 번호 및 줄 번호를 채워넣는다.
+	*/
 	inline void fillSentLineInfo(vector<TokenInfo>& tokens, const vector<size_t>& newlines)
 	{
+		/*
+		* 문장 분리 기준
+		* 1) 종결어미(ef) (요/jx)? (so|sw|sh|sp|se|sf|(닫는 괄호))*
+		* 2) 종결구두점(sf) (so|sw|sh|sp|se|(닫는 괄호))*
+		* 3) 단 종결어미(ef) 바로 다음에 요가 아닌 조사(j)가 뒤따르는 경우는 제외
+		*/
 		enum class State 
 		{
 			none = 0,
@@ -149,7 +158,17 @@ namespace kiwi
 			case State::efjx:
 				switch (t.tag)
 				{
+				case POSTag::jc:
+				case POSTag::jkb:
+				case POSTag::jkc:
+				case POSTag::jkg:
+				case POSTag::jko:
+				case POSTag::jkq:
+				case POSTag::jks:
+				case POSTag::jkv:
 				case POSTag::jx:
+					if (t.tag == POSTag::jx && *t.morph->kform == u"요")
+					{
 						if (state == State::ef)
 						{
 							state = State::efjx;
@@ -158,6 +177,11 @@ namespace kiwi
 						{
 							sentPos++;
 							state = State::none;
+						}
+					}
+					else
+					{
+						state = State::none;
 					}
 					break;
 				case POSTag::so:
