@@ -30,8 +30,8 @@ namespace kiwi
 	{
 		uint32_t kform = 0; /**< 형태에 대한 포인터 */
 		POSTag tag = POSTag::unknown; /**< 품사 태그 */
-		CondVowel vowel = CondVowel::none; /**< 선행형태소의 자/모음 조건 */
-		CondPolarity polar = CondPolarity::none; /**< 선행형태소의 모음조화 조건 */
+		uint8_t vpPack = 0; /**< CondVowel과 CondPolarity를 4비트 단위로 묶어서 합친 값 */
+		uint8_t senseId = 0; /**< 의미 번호 */
 
 		/**
 		 * @brief 형태소가 두 부분으로 분할된 경우 결합 번호를 표기하기 위해 사용된다.
@@ -95,6 +95,22 @@ namespace kiwi
 			uint8_t _combineSocket = 0
 		);
 
+		/**< 선행형태소의 자/모음 조건 */
+		constexpr CondVowel vowel() const { return static_cast<CondVowel>(vpPack & 0xF); }
+		
+		/**< 선행형태소의 모음조화 조건 */
+		constexpr CondPolarity polar() const { return static_cast<CondPolarity>(vpPack >> 4); }
+
+		void setVowel(CondVowel v)
+		{
+			vpPack = (vpPack & 0xF0) | static_cast<uint8_t>(v);
+		}
+
+		void setPolar(CondPolarity v)
+		{
+			vpPack = (vpPack & 0x0F) | (static_cast<uint8_t>(v) << 4);
+		}
+
 		void serializerRead(std::istream& istr);
 		void serializerWrite(std::ostream& ostr) const;
 	};
@@ -109,11 +125,12 @@ namespace kiwi
 	{
 		const KString* kform = nullptr;
 		POSTag tag = POSTag::unknown;
-		CondVowel vowel = CondVowel::none;
-		CondPolarity polar = CondPolarity::none;
+		CondVowel vowel : 4;
+		CondPolarity polar : 4;
+		uint8_t senseId = 0;
 		uint8_t combineSocket = 0;
-		FixedPairVector<const Morpheme*, std::pair<uint8_t, uint8_t>> chunks;
 		int32_t combined = 0;
+		FixedPairVector<const Morpheme*, std::pair<uint8_t, uint8_t>> chunks;
 		float userScore = 0;
 		uint32_t lmMorphemeId = 0;
 

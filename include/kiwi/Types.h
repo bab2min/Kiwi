@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file Types.h
  * @author bab2min (bab2min@gmail.com)
  * @brief Kiwi C++ API에 쓰이는 주요 타입들을 모아놓은 헤더 파일
@@ -168,8 +168,32 @@ namespace kiwi
 		ep, ef, ec, etn, etm,
 		p, /**< 분할된 동사/형용사를 나타내는데 사용됨 */
 		max, /**< POSTag의 총 개수를 나타내는 용도 */
-		pa = max,
+		pv = p,
+		pa = p + 1,
+		irregular = 0x80, /**< 불규칙 활용을 하는 동/형용사를 나타내는데 사용됨 */
+
+		vvi = vv | irregular,
+		vai = va | irregular,
+		vxi = vx | irregular,
+		xsai = xsa | irregular,
+		pvi = pv | irregular,
+		pai = pa | irregular,
 	};
+
+	inline constexpr bool isIrregular(POSTag tag)
+	{
+		return !!(static_cast<uint8_t>(tag) & static_cast<uint8_t>(POSTag::irregular));
+	}
+
+	inline constexpr POSTag setIrregular(POSTag tag)
+	{
+		return static_cast<POSTag>(static_cast<uint8_t>(tag) | static_cast<uint8_t>(POSTag::irregular));
+	}
+
+	inline constexpr POSTag clearIrregular(POSTag tag)
+	{
+		return static_cast<POSTag>(static_cast<uint8_t>(tag) & ~static_cast<uint8_t>(POSTag::irregular));
+	}
 
 	constexpr size_t defaultTagSize = (size_t)POSTag::p;
 
@@ -212,6 +236,8 @@ namespace kiwi
 		integrateAllomorph = 1 << 0, /**< 이형태 통합 여부를 설정한다. 이 옵션을 사용시 `아/EC, 어/EC, 여/EC` 와 같은 형태소들이 `어/EC`로 통합되어 출력된다. */
 		
 		loadDefaultDict = 1 << 1, /**< 기본 사전(default.dict)의 로딩 여부를 설정한다. 기본 사전은 위키백과 및 나무위키의 표제어로 구성되어 있다. */
+
+		default_ = integrateAllomorph | loadDefaultDict,
 	};
 
 	struct Morpheme;
@@ -229,6 +255,7 @@ namespace kiwi
 		uint32_t lineNumber = 0; /**< 줄 번호*/
 		uint16_t length = 0; /**< 길이(UTF16 문자 기준) */
 		POSTag tag = POSTag::unknown; /**< 품사 태그 */
+		uint8_t senseId = 0; /**< 의미 번호 */
 		const Morpheme* morph = nullptr; /**< 기타 형태소 정보에 대한 포인터 (OOV인 경우 nullptr) */
 
 		TokenInfo() = default;

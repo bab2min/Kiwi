@@ -437,7 +437,7 @@ namespace kiwi
 			bool quantizeLm = true;
 			bool compressLm = true;
 			float dropoutSampling = 0.05f;
-			float dropoutProb = 0.05f;
+			float dropoutProb = 0.15f;
 		};
 
 		/**

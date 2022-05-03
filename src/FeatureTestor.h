@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <kiwi/Types.h>
 
@@ -16,4 +16,8 @@ namespace kiwi
 		static bool isMatched(const KString* form, CondVowel vowel, CondPolarity polar);
 	};
 
+	inline bool hasNoOnset(const KString& form)
+	{
+		return u'아' <= form[0] && form[0] <= u'이';
+	}
 }

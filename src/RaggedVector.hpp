@@ -159,6 +159,12 @@ namespace kiwi
 			ptrs.emplace_back(data.size());
 		}
 
+		void pop_back()
+		{
+			data.resize(ptrs.back());
+			ptrs.pop_back();
+		}
+
 		template<class... Args>
 		void add_data(Args&&... args)
 		{

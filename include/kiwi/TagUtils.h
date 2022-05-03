@@ -15,7 +15,7 @@ namespace kiwi
 
 		float evalLeftBoundary(bool hasLeftBoundary, POSTag right) const
 		{
-			return leftBoundaryScores[hasLeftBoundary ? 1 : 0][(size_t)right] * weight;
+			return leftBoundaryScores[hasLeftBoundary ? 1 : 0][(size_t)clearIrregular(right)] * weight;
 		}
 	};
 

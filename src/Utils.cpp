@@ -213,8 +213,22 @@ namespace kiwi
 			"P",
 			"@"
 		};
-		assert(t < POSTag::max);
-		return tags[(size_t)t];
+		if (isIrregular(t))
+		{
+			switch (clearIrregular(t))
+			{
+			case POSTag::vv: return "VV-I";
+			case POSTag::va: return "VA-I";
+			case POSTag::vx: return "VX-I";
+			case POSTag::xsa: return "XSA-I";
+			default: return "@";
+			}
+		}
+		else
+		{
+			assert(t < POSTag::max);
+			return tags[(size_t)t];
+		}
 	}
 
 	const kchar_t* tagToKString(POSTag t)
@@ -239,7 +253,21 @@ namespace kiwi
 			u"P",
 			u"@"
 		};
-		assert(t < POSTag::max);
-		return tags[(size_t)t];
+		if (isIrregular(t))
+		{
+			switch (clearIrregular(t))
+			{
+			case POSTag::vv: return u"VV-I";
+			case POSTag::va: return u"VA-I";
+			case POSTag::vx: return u"VX-I";
+			case POSTag::xsa: return u"XSA-I";
+			default: return u"@";
+			}
+		}
+		else
+		{
+			assert(t < POSTag::max);
+			return tags[(size_t)t];
+		}
 	}
 }

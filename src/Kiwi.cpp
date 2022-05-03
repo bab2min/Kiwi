@@ -599,11 +599,18 @@ namespace kiwi
 				float discountForCombining = curMorph->combineSocket ? -15 : 0;
 				estimatedLL += kw->tagScorer.evalLeftBoundary(hasLeftBoundary(node), curMorph->tag);
 
+				bool isVowelE = isEClass(curMorph->tag) && curMorph->kform && hasNoOnset(*curMorph->kform);
+
 				for (auto& p : maxWidLL)
 				{
 					for (auto& q : p.second)
 					{
 						q.accScore += estimatedLL;
+						// 불규칙 활용 형태소 뒤에 모음 어미가 붙는 경우 벌점 부여
+						if (isVowelE && isIrregular(kw->morphemes[q.morphs->back().wid].tag))
+						{
+							q.accScore -= 10;
+						}
 						tMax = max(tMax, q.accScore + discountForCombining);
 					}
 				}
@@ -749,7 +756,7 @@ namespace kiwi
 				cout << tt.accScore << '\t';
 				for (auto& m : tt.morphs)
 				{
-					morphBase[m.wid].print(cout) << '\t';
+					kw->morphemes[m.wid].print(cout) << '\t';
 				}
 				cout << endl;
 			}
@@ -782,7 +789,7 @@ namespace kiwi
 			cout << tt.accScore << '\t';
 			for (auto& m : tt.morphs)
 			{
-				morphBase[m.wid].print(cout) << '\t';
+				kw->morphemes[m.wid].print(cout) << '\t';
 			}
 			cout << endl;
 		}

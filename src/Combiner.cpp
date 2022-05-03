@@ -263,20 +263,44 @@ inline Vector<POSTag> getSubTagset(const string& prefix)
 	{
 		if (pf == "P")
 		{
-			ret.emplace_back(POSTag::p);
+			ret.emplace_back(POSTag::pv);
 			ret.emplace_back(POSTag::pa);
+			ret.emplace_back(POSTag::pvi);
+			ret.emplace_back(POSTag::pai);
 		}
 		else if (pf == "PV")
 		{
-			ret.emplace_back(POSTag::p);
+			ret.emplace_back(POSTag::pv);
+			ret.emplace_back(POSTag::pvi);
 		}
 		else if (pf == "PA")
 		{
 			ret.emplace_back(POSTag::pa);
+			ret.emplace_back(POSTag::pai);
+		}
+		else if (pf == "PV-I")
+		{
+			ret.emplace_back(POSTag::pvi);
+		}
+		else if (pf == "PA-I")
+		{
+			ret.emplace_back(POSTag::pai);
+		}
+		else if (pf == "PI")
+		{
+			ret.emplace_back(POSTag::pvi);
+			ret.emplace_back(POSTag::pai);
 		}
 		else
 		{
 			for (auto i = POSTag::nng; i < POSTag::p; i = (POSTag)((size_t)i + 1))
+			{
+				if (strncmp(tagToString(i), pf.data(), pf.size()) == 0)
+				{
+					ret.emplace_back(i);
+				}
+			}
+			for (auto i : { POSTag::vvi, POSTag::vai, POSTag::vxi, POSTag::xsai })
 			{
 				if (strncmp(tagToString(i), pf.data(), pf.size()) == 0)
 				{
