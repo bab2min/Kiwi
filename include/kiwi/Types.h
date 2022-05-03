@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file Types.h
  * @author bab2min (bab2min@gmail.com)
  * @brief Kiwi C++ API에 쓰이는 주요 타입들을 모아놓은 헤더 파일
@@ -256,6 +256,7 @@ namespace kiwi
 		uint16_t length = 0; /**< 길이(UTF16 문자 기준) */
 		POSTag tag = POSTag::unknown; /**< 품사 태그 */
 		uint8_t senseId = 0; /**< 의미 번호 */
+		float score = 0; /**< 해당 형태소의 언어모델 점수 */
 		const Morpheme* morph = nullptr; /**< 기타 형태소 정보에 대한 포인터 (OOV인 경우 nullptr) */
 
 		TokenInfo() = default;
@@ -264,9 +265,10 @@ namespace kiwi
 			POSTag _tag = POSTag::unknown,
 			uint16_t _length = 0,
 			uint32_t _position = 0,
-			uint32_t _wordPosition = 0
+			uint32_t _wordPosition = 0,
+			float _score = 0
 		)
-			: str{ _str }, position{ _position }, wordPosition{ _wordPosition }, length{ _length }, tag{ _tag }
+			: str{ _str }, position{ _position }, wordPosition{ _wordPosition }, length{ _length }, tag{ _tag }, score{ _score }
 		{
 		}
 

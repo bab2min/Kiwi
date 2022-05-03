@@ -22,11 +22,12 @@ namespace kiwi
 	public:
 		struct Result
 		{
-			const Morpheme* morph;
+			const Morpheme* morph = nullptr;
 			KString str;
-			uint32_t begin, end;
-			Result(const Morpheme* _morph = nullptr, const KString& _str = {}, uint32_t _begin = 0, uint32_t _end = 0)
-				: morph{ _morph }, str{ _str }, begin{ _begin }, end{ _end }
+			uint32_t begin = 0, end = 0;
+			float wordScore = 0;
+			Result(const Morpheme* _morph = nullptr, const KString& _str = {}, uint32_t _begin = 0, uint32_t _end = 0, float _wordScore = 0)
+				: morph{ _morph }, str{ _str }, begin{ _begin }, end{ _end }, wordScore{ _wordScore }
 			{
 			}
 		};
@@ -149,14 +150,14 @@ namespace kiwi
 				switch (t.tag)
 				{
 				case POSTag::jx:
-					if (state == State::ef)
-					{
-						state = State::efjx;
-					}
-					else
-					{
-						sentPos++;
-						state = State::none;
+						if (state == State::ef)
+						{
+							state = State::efjx;
+						}
+						else
+						{
+							sentPos++;
+							state = State::none;
 					}
 					break;
 				case POSTag::so:
@@ -368,11 +369,12 @@ namespace kiwi
 		MInfos morphs;
 		float accScore = 0;
 		ptrdiff_t node = 0;
+		const WordLL* parent = nullptr;
 
 		WordLL() = default;
 
-		WordLL(const MInfos& _morphs, float _accScore, ptrdiff_t _node)
-			: morphs{ _morphs }, accScore{ _accScore }, node{ _node }
+		WordLL(const MInfos& _morphs, float _accScore, ptrdiff_t _node, const WordLL* _parent)
+			: morphs{ _morphs }, accScore{ _accScore }, node{ _node }, parent{ _parent }
 		{
 		}
 	};
@@ -382,11 +384,12 @@ namespace kiwi
 		const MInfos* morphs = nullptr;
 		float accScore = 0;
 		ptrdiff_t node = 0;
+		const WordLL* parent = nullptr;
 
 		WordLLP() = default;
 
-		WordLLP(const MInfos* _morphs, float _accScore, ptrdiff_t _node)
-			: morphs{ _morphs }, accScore{ _accScore }, node{ _node }
+		WordLLP(const MInfos* _morphs, float _accScore, ptrdiff_t _node, const WordLL* _parent)
+			: morphs{ _morphs }, accScore{ _accScore }, node{ _node }, parent{ _parent }
 		{
 		}
 	};
@@ -452,30 +455,77 @@ namespace kiwi
 				{
 					if (sbg)
 					{
-						size_t historySize = std::min(wids->size() - 1, (size_t)sbg->getHeader().windowSize);
-						size_t h = 0;
-						for (size_t i = wids->size() - historySize; i < wids->size(); ++i, ++h)
+						if (1) // skip empty words
 						{
-							history[h] = morphBase[(*wids)[i].wid].getCombined()->lmMorphemeId;
-						}
-						for (size_t i = (wids->back().combineSocket ? 1 : 0); i < seq.size(); ++i, ++h)
-						{
-							history[h] = seq[i];
-						}
-
-						lSeq = seq[chSize - 1];
-						for (size_t i = 0; i < chSize; ++i)
-						{
-							if (morphBase[seq[i]].tag == POSTag::p)
+							size_t h = 0;
+							array<size_t, 4> seqSPos = { 0, };
+							for (size_t i = chSize - 1; i > (wids->back().combineSocket ? 1 : 0); --i)
 							{
-								// prohibit <v> without <chunk>
-								goto continueFor;
+								if(sbg->isValidVocab(seq[i - 1])) history[h++] = seq[i - 1];
+								seqSPos[i - 1] = h;
 							}
-							float ll = knlm->progress(cNode, seq[i]);
-							size_t e = (historySize + i == 0) ? 0 : (historySize + i - 1);
-							size_t s = std::max(e, (size_t)sbg->getHeader().windowSize) - sbg->getHeader().windowSize;
-							ll = sbg->evaluate(&history[s], e - s, seq[i], ll);
-							candScore += ll;
+							if (wids->back().combineSocket)
+							{
+								seqSPos[0] = sbg->isValidVocab(seq[0]) ? 1 : 0;
+							}
+
+							for (size_t i = wids->size(); i > 0 && h < history.size(); --i)
+							{
+								size_t mid = morphBase[(*wids)[i - 1].wid].getCombined()->lmMorphemeId;
+								if (sbg->isValidVocab(mid)) history[h++] = mid;
+							}
+							lSeq = seq[chSize - 1];
+							for (size_t i = 0; i < chSize; ++i)
+							{
+								if (morphBase[seq[i]].tag == POSTag::p)
+								{
+									// prohibit <v> without <chunk>
+									goto continueFor;
+								}
+								float ll = knlm->progress(cNode, seq[i]);
+								if (ll > -13)
+								{
+									size_t s = seqSPos[i];
+									size_t e = std::min(s + sbg->getHeader().windowSize, h);
+									ll = sbg->evaluate(&history[s], e - s, seq[i], ll);
+								}
+								/*else
+								{
+									size_t bf = i ? seq[i - 1] : wids->back().wid;
+									cout << utf16To8(joinHangul(*morphBase[bf].kform)) << '/' << tagToString(morphBase[bf].tag)
+										<< ' ' << utf16To8(joinHangul(*morphBase[seq[i]].kform)) << '/' << tagToString(morphBase[seq[i]].tag) << endl;
+								}*/
+								candScore += ll;
+							}
+						}
+						else
+						{
+							size_t historySize = std::min(wids->size() - 1, (size_t)sbg->getHeader().windowSize);
+							size_t h = 0;
+
+							for (size_t i = wids->size() - historySize; i < wids->size(); ++i, ++h)
+							{
+								history[h] = morphBase[(*wids)[i].wid].getCombined()->lmMorphemeId;
+							}
+							for (size_t i = (wids->back().combineSocket ? 1 : 0); i < seq.size(); ++i, ++h)
+							{
+								history[h] = seq[i];
+							}
+
+							lSeq = seq[chSize - 1];
+							for (size_t i = 0; i < chSize; ++i)
+							{
+								if (morphBase[seq[i]].tag == POSTag::p)
+								{
+									// prohibit <v> without <chunk>
+									goto continueFor;
+								}
+								float ll = knlm->progress(cNode, seq[i]);
+								size_t e = (historySize + i == 0) ? 0 : (historySize + i - 1);
+								size_t s = std::max(e, (size_t)sbg->getHeader().windowSize) - sbg->getHeader().windowSize;
+								ll = sbg->evaluate(&history[s], e - s, seq[i], ll);
+								candScore += ll;
+							}
 						}
 					}
 					else
@@ -493,7 +543,7 @@ namespace kiwi
 						}
 					}
 				}
-				emplaceMaxCnt(maxWidLL, lSeq, WordLLP{ wids, candScore, cNode }, 3, [](const WordLLP& a, const WordLLP& b) { return a.accScore > b.accScore; });
+				emplaceMaxCnt(maxWidLL, lSeq, WordLLP{ wids, candScore, cNode, &p }, 3, [](const WordLLP& a, const WordLLP& b) { return a.accScore > b.accScore; });
 			continueFor:;
 			}
 		}
@@ -598,7 +648,7 @@ namespace kiwi
 
 				float discountForCombining = curMorph->combineSocket ? -15 : 0;
 				estimatedLL += kw->tagScorer.evalLeftBoundary(hasLeftBoundary(node), curMorph->tag);
-
+				
 				bool isVowelE = isEClass(curMorph->tag) && curMorph->kform && hasNoOnset(*curMorph->kform);
 
 				for (auto& p : maxWidLL)
@@ -620,7 +670,7 @@ namespace kiwi
 					for (auto& q : p.second)
 					{
 						if (q.accScore <= tMax - kw->cutOffThreshold) continue;
-						nCache.emplace_back(WordLL{ MInfos{}, q.accScore, q.node });
+						nCache.emplace_back(WordLL{ MInfos{}, q.accScore, q.node, q.parent });
 						auto& wids = nCache.back().morphs;
 						wids.reserve(q.morphs->size() + chSize);
 						wids = *q.morphs;
@@ -665,6 +715,24 @@ namespace kiwi
 		return tMax;
 	}
 
+	inline void fillWordScores(const WordLL* result, PathEvaluator::Result* out)
+	{
+		for (;result->parent; result = result->parent)
+		{
+			float scoreDiff = result->accScore - result->parent->accScore;
+			size_t b = result->parent->morphs.size() - 1;
+			size_t e = result->morphs.size() - 1;
+			if (result->parent->morphs.back().combineSocket) --b;
+			if (result->morphs.back().combineSocket) --e;
+			if (b == e) continue;
+			scoreDiff /= e - b;
+			for (size_t i = b; i < e; ++i)
+			{
+				out[i].wordScore = scoreDiff;
+			}
+		}
+	}
+
 	template<ArchType arch, class LmType>
 	Vector<pair<PathEvaluator::Path, float>> PathEvaluator::findBestPath(const Kiwi* kw, const Vector<KGraphNode>& graph, size_t topN)
 	{
@@ -685,7 +753,7 @@ namespace kiwi
 
 		// start node
 		ptrdiff_t bosNode = lm->getBosNodeIdx();
-		cache.front().emplace_back(WordLL{ MInfos{ MInfo(0u) }, 0.f, bosNode });
+		cache.front().emplace_back(WordLL{ MInfos{ MInfo(0u) }, 0.f, bosNode, nullptr });
 
 		// middle nodes
 		for (size_t i = 1; i < graph.size() - 1; ++i)
@@ -775,7 +843,7 @@ namespace kiwi
 				if (!FeatureTestor::isMatched(nullptr, p.morphs.back().condVowel)) continue;
 
 				float c = p.accScore + lm->progress(p.node, 1);
-				cache.back().emplace_back(WordLL{ p.morphs, c, 0 });
+				cache.back().emplace_back(WordLL{ p.morphs, c, 0, &p });
 			}
 		}
 
@@ -806,6 +874,7 @@ namespace kiwi
 				if (m.ownFormId) return Result{ &kw->morphemes[m.wid], ownFormList[m.ownFormId - 1], m.beginPos, m.endPos };
 				else return Result{ &kw->morphemes[m.wid], KString{}, m.beginPos, m.endPos };
 			});
+			fillWordScores(&cand[i], mv.data());
 			ret.emplace_back(mv, cand[i].accScore);
 		}
 		return ret;
@@ -974,6 +1043,7 @@ namespace kiwi
 				size_t endPos = lower_bound(positionTable.begin(), positionTable.end(), s.end) - positionTable.begin();
 				token.position = beginPos;
 				token.length = endPos - beginPos;
+				token.score = s.wordScore;
 
 				// Token의 시작위치(position)을 이용해 Token이 포함된 어절번호(wordPosition)를 얻음
 				token.wordPosition = wordPositions[token.position];
