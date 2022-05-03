@@ -96,6 +96,17 @@ TEST(KiwiCpp, EmptyResult)
 	}
 }
 
+TEST(KiwiCpp, SplitByPolarity)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	auto ret = kiwi.analyze(u"흘렀다", Match::all);
+	EXPECT_EQ(ret.first.size(), 3);
+	ret = kiwi.analyze(u"전류가 흘렀다", Match::all);
+	EXPECT_EQ(ret.first.size(), 5);
+	ret = kiwi.analyze(u"전류가흘렀다", Match::all);
+	EXPECT_EQ(ret.first.size(), 5);
+}
+
 TEST(KiwiCpp, SpaceTolerant)
 {
 	Kiwi& kiwi = reuseKiwiInstance();

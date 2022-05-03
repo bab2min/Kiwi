@@ -38,10 +38,27 @@ bool FeatureTestor::isMatched(const kchar_t* begin, const kchar_t* end, CondPola
 	if (begin == end) return true;
 	for (auto it = end - 1; it >= begin; --it)
 	{
-		if (!(u'\uAC00' <= *it && *it <= u'\uD7A4')) continue;
+		if (u'\u11A8' <= *it && *it <= u'\u11C2') continue;
+		if (!(u'\uAC00' <= *it && *it <= u'\uD7A4')) break;
 		int v = ((*it - u'\uAC00') / 28) % 21;
 		if (v == 0 || v == 2 || v == 8) return polar == CondPolarity::positive;
 		if (v == 18) continue;
+		return polar == CondPolarity::negative;
+	}
+	return polar == CondPolarity::negative;
+}
+
+bool FeatureTestor::isMatchedApprox(const kchar_t* begin, const kchar_t* end, CondPolarity polar)
+{
+	if (polar == CondPolarity::none) return true;
+	if (begin == end) return true;
+	for (auto it = end - 1; it >= begin; --it)
+	{
+		if (u'\u11A8' <= *it && *it <= u'\u11C2') continue;
+		if (!(u'\uAC00' <= *it && *it <= u'\uD7A4')) break;
+		int v = ((*it - u'\uAC00') / 28) % 21;
+		if (v == 0 || v == 2 || v == 8) return polar == CondPolarity::positive;
+		if (v == 18) return true;
 		return polar == CondPolarity::negative;
 	}
 	return polar == CondPolarity::negative;
@@ -67,3 +84,7 @@ bool FeatureTestor::isMatched(const KString * form, CondVowel vowel, CondPolarit
 	return isMatched(form ? &(*form)[0] : nullptr, form ? &(*form)[0] + form->size() : nullptr, vowel, polar);
 }
 
+bool FeatureTestor::isMatchedApprox(const kchar_t* begin, const kchar_t* end, CondVowel vowel, CondPolarity polar)
+{
+	return isMatched(begin, end, vowel) && isMatchedApprox(begin, end, polar);
+}
