@@ -340,6 +340,9 @@ TEST(KiwiCpp, Issue71_SentenceSplit_u16)
 	EXPECT_EQ(sents[3], u"다만 역시 토끼정 본점 답죠?ㅎㅅㅎ");
 	EXPECT_EQ(sents[4], u"그 맛이 크으..");
 	EXPECT_EQ(sents[5], u"아주 맛있었음...! ^^");
+
+	sentRanges = kiwi.splitIntoSents(u"지도부가 어떻게 구성되느냐에 따라");
+	EXPECT_EQ(sentRanges.size(), 1);
 }
 
 TEST(KiwiCpp, Issue71_SentenceSplit_u8)
