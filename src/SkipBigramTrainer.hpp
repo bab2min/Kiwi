@@ -7,6 +7,7 @@
 #include <kiwi/SkipBigramModel.h>
 #include "RaggedVector.hpp"
 #include "serializerEigen.hpp"
+#include "BitEncoder.hpp"
 
 namespace kiwi
 {
@@ -71,10 +72,12 @@ namespace kiwi
 			Vector<size_t> ptrs;
 			Vector<VocabTy> vocabs;
 			Eigen::ArrayXf logits;
+			Vector<uint8_t> vocabValidness;
+			bool skipEmptyWords = false;
 
 			static constexpr size_t gradientBlockSize = 128;
 			static constexpr float lmInitialBias = 10;
-			static constexpr float lmRegularizingLimit = 0.333;
+			float lmRegularizingLimit = 0.333;
 
 		private:
 
@@ -87,19 +90,53 @@ namespace kiwi
 			*
 			* assert x[0] == bosToken and x[len - 1] == eosToken
 			*/
+			float accumulateGradientExceptEmptyWords(const VocabTy* x, const float* lmLogProbs, size_t len, Eigen::ArrayXf& grad, Vector<uint8_t>& updatedMask) const
+			{
+				float ret = 0;
+				Vector<VocabTy> validX;
+				Vector<float> validLProbs;
+				validX.emplace_back(x[0]);
+				validLProbs.emplace_back(lmLogProbs[0]);
+				for (size_t i = 1; i < len - 1; ++i)
+				{
+					if (vocabValidness[x[i]])
+					{
+						validX.emplace_back(x[i]);
+						validLProbs.emplace_back(lmLogProbs[i]);
+					}
+					else
+					{
+						ret += lmLogProbs[i];
+					}
+				}
+				validX.emplace_back(x[len - 1]);
+				validLProbs.emplace_back(lmLogProbs[len - 1]);
+
+				if (validX.size() <= 2)
+				{
+					return ret + std::accumulate(validLProbs.begin() + 1, validLProbs.end(), 0.f);
+				}
+				else
+				{
+					return ret + accumulateGradient(validX.data(), validLProbs.data(), validX.size(), grad, updatedMask);
+				}
+			}
+
 			float accumulateGradient(const VocabTy* x, const float* lmLogProbs, size_t len, Eigen::ArrayXf& grad, Vector<uint8_t>& updatedMask) const
 			{
-				Vector<size_t> bufPtrs(len - 2);
-				Vector<VocabTy> bufIdcs(windowSize * (len - 3));
+				const size_t wOffset = skipEmptyWords ? 0 : 1;
+
+				Vector<size_t> bufPtrs(len - 1 - wOffset);
+				Vector<VocabTy> bufIdcs(windowSize * (len - 2 - wOffset));
 				size_t maxNnz = 0;
-				for (size_t i = 1; i < len - 2; ++i)
+				for (size_t i = 1; i < len - 1 - wOffset; ++i)
 				{
 					size_t nnz = ptrs[x[i] + 1] - ptrs[x[i]];
 					maxNnz = std::max(nnz, maxNnz);
 					bufPtrs[i] = bufPtrs[i - 1] + (nnz > 1 ? nnz : 0);
 				}
 				Eigen::ArrayXf lsBuf{ bufPtrs.back() }, onehotBuf = Eigen::ArrayXf::Zero(maxNnz);
-				Eigen::ArrayXXf llBuf{ windowSize * 2, (len - 1) };
+				Eigen::ArrayXXf llBuf{ windowSize * 2, (len - wOffset) };
 				llBuf.fill(-INFINITY);
 				auto llModel = llBuf.template topRows<windowSize>();
 				auto llBase = llBuf.template bottomRows<windowSize>();
@@ -114,7 +151,7 @@ namespace kiwi
 				}
 
 				size_t s = 0;
-				for (size_t i = 1; i < len - 2; ++i)
+				for (size_t i = 1; i < len - 1 - wOffset; ++i)
 				{
 					auto cond = x[i];
 					size_t b = ptrs[cond], e = ptrs[cond + 1];
@@ -126,9 +163,9 @@ namespace kiwi
 						float logsumSegment = std::log((segment - segment.maxCoeff()).exp().sum());
 						buf = segment - segment.maxCoeff() - logsumSegment;
 
-						for (size_t j = 1; j <= std::min(windowSize, len - i - 2); ++j)
+						for (size_t j = 1; j <= std::min(windowSize, len - i - 1 - wOffset); ++j)
 						{
-							auto target = x[i + j + 1];
+							auto target = x[i + j + wOffset];
 							auto it = std::lower_bound(vocabs.data() + b, vocabs.data() + e - 1, target);
 							if (it != vocabs.data() + e - 1 && *it == target)
 							{
@@ -140,15 +177,15 @@ namespace kiwi
 							{
 								bufIdcs[s++] = segSize - 1;
 							}
-							llBase(windowSize - j, i + j) = buf[segSize - 1] + lmLogProbs[i + j + 1];
+							llBase(windowSize - j, i + j) = buf[segSize - 1] + lmLogProbs[i + j + wOffset];
 						}
 					}
 					else
 					{
-						for (size_t j = 1; j <= std::min(windowSize, len - i - 2); ++j)
+						for (size_t j = 1; j <= std::min(windowSize, len - i - 1 - wOffset); ++j)
 						{
-							auto target = x[i + j + 1];
-							llBase(windowSize - j, i + j) = lmLogProbs[i + j + 1];
+							auto target = x[i + j + wOffset];
+							llBase(windowSize - j, i + j) = lmLogProbs[i + j + wOffset];
 						}
 					}
 				}
@@ -158,7 +195,7 @@ namespace kiwi
 				auto denom = logProbSum.exp().eval();
 
 				s = 0;
-				for (size_t i = 1; i < len - 2; ++i)
+				for (size_t i = 1; i < len - 1 - wOffset; ++i)
 				{
 					auto cond = x[i];
 					size_t b = ptrs[cond], e = ptrs[cond + 1];
@@ -172,9 +209,9 @@ namespace kiwi
 					size_t gb = b / gradientBlockSize;
 					size_t ge = (e + gradientBlockSize - 1) / gradientBlockSize;
 					std::fill(updatedMask.begin() + gb, updatedMask.begin() + ge, 0xFF);
-					for (size_t j = 1; j <= std::min(windowSize, len - i - 2); ++j)
+					for (size_t j = 1; j <= std::min(windowSize, len - i - 1 - wOffset); ++j)
 					{
-						auto target = x[i + j + 1];
+						auto target = x[i + j + wOffset];
 						size_t idx = bufIdcs[s++];
 						if (idx < segSize - 1)
 						{
@@ -183,7 +220,7 @@ namespace kiwi
 							onehot[idx] = 0;
 						}
 						onehot[segSize - 1] = 1;
-						gradSegment += (buf[segSize - 1] / denom[i + j] * std::exp(lmLogProbs[i + j + 1])) * (onehot - buf);
+						gradSegment += (buf[segSize - 1] / denom[i + j] * std::exp(lmLogProbs[i + j + wOffset])) * (onehot - buf);
 						onehot[segSize - 1] = 0;
 					}
 
@@ -198,30 +235,164 @@ namespace kiwi
 				return (logProbSum - std::log((float)windowSize)).sum();
 			}
 
+			float evaluateExceptEmptyWords(const VocabTy* x, const float* lmLogProbs, size_t len) const
+			{
+				float ret = 0;
+				Vector<VocabTy> validX;
+				Vector<float> validLProbs;
+				validX.emplace_back(x[0]);
+				validLProbs.emplace_back(lmLogProbs[0]);
+				for (size_t i = 1; i < len - 1; ++i)
+				{
+					if (vocabValidness[x[i]])
+					{
+						validX.emplace_back(x[i]);
+						validLProbs.emplace_back(lmLogProbs[i]);
+					}
+					else
+					{
+						ret += lmLogProbs[i];
+					}
+				}
+				validX.emplace_back(x[len - 1]);
+				validLProbs.emplace_back(lmLogProbs[len - 1]);
+
+				if (validX.size() <= 2)
+				{
+					return ret + std::accumulate(validLProbs.begin() + 1, validLProbs.end(), 0.f);
+				}
+				else
+				{
+					return ret + evaluateAll(validX.data(), validLProbs.data(), validX.size());
+				}
+			}
+
+			/**
+			* assert x[0] == bosToken and x[len - 1] == eosToken
+			*/
+			float evaluateAll(const VocabTy* x, const float* lmLogProbs, size_t len) const
+			{
+				const size_t wOffset = skipEmptyWords ? 0 : 1;
+
+				Eigen::ArrayXXf llBuf{ windowSize * 2, (len - wOffset) };
+				llBuf.fill(-INFINITY);
+				auto llModel = llBuf.template topRows<windowSize>();
+				auto llBase = llBuf.template bottomRows<windowSize>();
+
+				{
+					size_t b = ptrs[bosToken], e = ptrs[bosToken + 1];
+					for (size_t j = 0; j <= std::min(windowSize, len - 2); ++j)
+					{
+						auto target = x[j + 1];
+						llModel.block(0, j, windowSize + 1 - (j ? j : 1), 1).fill(lmLogProbs[j + 1]);
+					}
+				}
+
+				size_t s = 0;
+				for (size_t i = 1; i < len - 1 - wOffset; ++i)
+				{
+					auto cond = x[i];
+					size_t b = ptrs[cond], e = ptrs[cond + 1];
+					size_t segSize = e - b;
+					if (segSize > 1)
+					{
+						auto segment = logits.segment(b, segSize);
+						float logsumSegment = std::log((segment - segment.maxCoeff()).exp().sum());
+						auto buf = (segment - segment.maxCoeff() - logsumSegment).eval();
+
+						for (size_t j = 1; j <= std::min(windowSize, len - i - 1 - wOffset); ++j)
+						{
+							auto target = x[i + j + wOffset];
+							auto it = std::lower_bound(vocabs.data() + b, vocabs.data() + e - 1, target);
+							if (it != vocabs.data() + e - 1 && *it == target)
+							{
+								size_t idx = it - (vocabs.data() + b);
+								llModel(windowSize - j, i + j) = buf[idx];
+							}
+							else
+							{
+							}
+							llBase(windowSize - j, i + j) = buf[segSize - 1] + lmLogProbs[i + j + wOffset];
+						}
+					}
+					else
+					{
+						for (size_t j = 1; j <= std::min(windowSize, len - i - 1 - wOffset); ++j)
+						{
+							auto target = x[i + j + wOffset];
+							llBase(windowSize - j, i + j) = lmLogProbs[i + j + wOffset];
+						}
+					}
+				}
+				return (logSumExp(llBuf) - std::log((float)windowSize)).sum();
+			}
+
+
 		public:
 			SkipBigramTrainer()
 			{
 			}
 
-			template<class Filter>
-			SkipBigramTrainer(const RaggedVector<VocabTy>& sents, Filter&& filter, VocabTy _bosToken, size_t minCnt, size_t minCoCnt, float pmiThreshold = 1, size_t maxDataSize = -1)
-				: bosToken{ _bosToken }
+			template<class TokenFilter, class PairFilter>
+			SkipBigramTrainer(const RaggedVector<VocabTy>& sents,
+				TokenFilter&& tokenFilter,
+				PairFilter&& pairFilter,
+				VocabTy _bosToken,
+				size_t minCnt,
+				size_t minCoCnt,
+				bool _skipEmptyWords,
+				float _lmRegularizingLimit,
+				float pmiThreshold = 1,
+				size_t maxDataSize = -1)
+				: bosToken{ _bosToken }, skipEmptyWords{ _skipEmptyWords }, lmRegularizingLimit{ _lmRegularizingLimit }
 			{
 				size_t vocabSize = 0;
 				UnorderedMap<std::pair<VocabTy, VocabTy>, size_t> pairCounter;
 
-				for (auto r : sents)
+				if (skipEmptyWords)
 				{
-					for (size_t i = 1; i < r.size(); ++i)
+					Vector<VocabTy> validTokens;
+					for (auto r : sents)
 					{
-						vocabSize = vocabSize > r[i] ? vocabSize : r[i];
-						for (size_t j = 2; j < windowSize + 2; ++j)
+						validTokens.clear();
+						for (size_t i = 1; i < r.size(); ++i)
 						{
-							pairCounter[std::make_pair(j <= i ? r[i - j] : bosToken, r[i])]++;
+							if (tokenFilter(r[i])) validTokens.emplace_back(r[i]);
+							vocabSize = vocabSize > r[i] ? vocabSize : r[i];
+						}
+
+						for (size_t i = 0; i < validTokens.size(); ++i)
+						{
+							for (size_t j = 1; j <= windowSize; ++j)
+							{
+								pairCounter[std::make_pair(j <= i ? validTokens[i - j] : bosToken, validTokens[i])]++;
+							}
+						}
+					}
+				}
+				else
+				{
+					for (auto r : sents)
+					{
+						for (size_t i = 1; i < r.size(); ++i)
+						{
+							vocabSize = vocabSize > r[i] ? vocabSize : r[i];
+							if (!tokenFilter(r[i])) continue;
+							for (size_t j = 2; j < windowSize + 2; ++j)
+							{
+								if (j <= i && !tokenFilter(r[i - j])) continue;
+								pairCounter[std::make_pair(j <= i ? r[i - j] : bosToken, r[i])]++;
+							}
 						}
 					}
 				}
 				vocabSize++;
+
+				vocabValidness.resize(vocabSize);
+				for (size_t i = 0; i < vocabSize; ++i)
+				{
+					vocabValidness[i] = tokenFilter(i) ? 1 : 0;
+				}
 
 				size_t dataSize = 0, totCnt = 0;
 				Vector<size_t> aCnts(vocabSize), bCnts(vocabSize);
@@ -247,7 +418,7 @@ namespace kiwi
 						if (aCnts[p.first.first] < minCnt * windowSize) continue;
 						if (bCnts[p.first.second] < minCnt * windowSize) continue;
 						if (p.second < minCoCnt) continue;
-						if (!filter(p.first.first, p.first.second)) continue;
+						if (!pairFilter(p.first.first, p.first.second)) continue;
 						float pmi = std::log(p.second / unigramProbs[p.first.second] / aCnts[p.first.first]);
 						pmi /= -std::log(p.second / (float)totCnt);
 						if (pmi < 0) continue;
@@ -264,7 +435,7 @@ namespace kiwi
 					if (aCnts[p.first.first] < minCnt * windowSize) continue;
 					if (bCnts[p.first.second] < minCnt * windowSize) continue;
 					if (p.second < minCoCnt) continue;
-					if (!filter(p.first.first, p.first.second)) continue;
+					if (!pairFilter(p.first.first, p.first.second)) continue;
 					float pmi = std::log(p.second / unigramProbs[p.first.second] / aCnts[p.first.first]);
 					pmi /= -std::log(p.second / (float)totCnt);
 					if (pmi < pmiThreshold) continue;
@@ -293,57 +464,8 @@ namespace kiwi
 			*/
 			float evaluate(const VocabTy* x, const float* lmLogProbs, size_t len) const
 			{
-				Eigen::ArrayXXf llBuf{ windowSize * 2, (len - 1) };
-				llBuf.fill(-INFINITY);
-				auto llModel = llBuf.template topRows<windowSize>();
-				auto llBase = llBuf.template bottomRows<windowSize>();
-
-				{
-					size_t b = ptrs[bosToken], e = ptrs[bosToken + 1];
-					for (size_t j = 0; j <= std::min(windowSize, len - 2); ++j)
-					{
-						auto target = x[j + 1];
-						llModel.block(0, j, windowSize + 1 - (j ? j : 1), 1).fill(lmLogProbs[j + 1]);
-					}
-				}
-
-				size_t s = 0;
-				for (size_t i = 1; i < len - 2; ++i)
-				{
-					auto cond = x[i];
-					size_t b = ptrs[cond], e = ptrs[cond + 1];
-					size_t segSize = e - b;
-					if (segSize > 1)
-					{
-						auto segment = logits.segment(b, segSize);
-						float logsumSegment = std::log((segment - segment.maxCoeff()).exp().sum());
-						auto buf = (segment - segment.maxCoeff() - logsumSegment).eval();
-
-						for (size_t j = 1; j <= std::min(windowSize, len - i - 2); ++j)
-						{
-							auto target = x[i + j + 1];
-							auto it = std::lower_bound(vocabs.data() + b, vocabs.data() + e - 1, target);
-							if (it != vocabs.data() + e - 1 && *it == target)
-							{
-								size_t idx = it - (vocabs.data() + b);
-								llModel(windowSize - j, i + j) = buf[idx];
-							}
-							else
-							{
-							}
-							llBase(windowSize - j, i + j) = buf[segSize - 1] + lmLogProbs[i + j + 1];
-						}
-					}
-					else
-					{
-						for (size_t j = 1; j <= std::min(windowSize, len - i - 2); ++j)
-						{
-							auto target = x[i + j + 1];
-							llBase(windowSize - j, i + j) = lmLogProbs[i + j + 1];
-						}
-					}
-				}
-				return (logSumExp(llBuf) - std::log((float)windowSize)).sum();
+				if (skipEmptyWords) return evaluateExceptEmptyWords(x, lmLogProbs, len);
+				else return evaluateAll(x, lmLogProbs, len);
 			}
 
 			TrainContext newContext() const
@@ -356,7 +478,9 @@ namespace kiwi
 
 			float update(const VocabTy* x, const float* lmLogProbs, size_t len, float lr, TrainContext& tc)
 			{
-				float ll = accumulateGradient(x, lmLogProbs, len, tc.grad, tc.updatedMask);
+				float ll;
+				if (skipEmptyWords) ll = accumulateGradientExceptEmptyWords(x, lmLogProbs, len, tc.grad, tc.updatedMask);
+				else ll = accumulateGradient(x, lmLogProbs, len, tc.grad, tc.updatedMask);
 				size_t b = 0;
 				for (size_t i = 0; i < tc.updatedMask.size() - 1; ++i, b += gradientBlockSize)
 				{
@@ -403,12 +527,12 @@ namespace kiwi
 		public:
 			void save(std::ostream& ostr) const
 			{
-				serializer::writeMany(ostr, bosToken, ptrs, vocabs, logits);
+				serializer::writeMany(ostr, bosToken, ptrs, vocabs, logits, skipEmptyWords, vocabValidness);
 			}
 
 			void load(std::istream& istr)
 			{
-				serializer::readMany(istr, bosToken, ptrs, vocabs, logits);
+				serializer::readMany(istr, bosToken, ptrs, vocabs, logits, skipEmptyWords, vocabValidness);
 			}
 
 			template<class DataFeeder, class Observer>
@@ -481,7 +605,9 @@ namespace kiwi
 							{
 								FeedingData<VocabTy> d = dataFeeder(sampleIdcs[i], threadId);
 								if (!d.len) break;
-								float sum = accumulateGradient(d.x, d.lmLogProbs, d.len, tc[threadId].grad, tc[threadId].updatedMask);
+								float sum;
+								if (skipEmptyWords) sum = accumulateGradientExceptEmptyWords(d.x, d.lmLogProbs, d.len, tc[threadId].grad, tc[threadId].updatedMask);
+								else sum = accumulateGradient(d.x, d.lmLogProbs, d.len, tc[threadId].grad, tc[threadId].updatedMask);
 								size_t cnt = d.len - 1;
 								localLlCnt += cnt;
 								localLlMean += (sum - localLlMean * cnt) / localLlCnt;
@@ -594,6 +720,7 @@ namespace kiwi
 				totalModelSize += finalVocabSize * sizeof(VocabTy);
 				totalModelSize += header.vocabSize * sizeof(float);
 				totalModelSize += finalVocabSize * sizeof(float);
+				totalModelSize += header.vocabSize;
 
 				utils::MemoryOwner ret{ totalModelSize };
 				auto* ptr = reinterpret_cast<char*>(ret.get());
@@ -615,6 +742,10 @@ namespace kiwi
 				{
 					fs = std::copy(v.second.begin(), v.second.end(), fs);
 				}
+				
+				auto us = reinterpret_cast<uint8_t*>(fs);
+				us = std::copy(vocabValidness.begin(), vocabValidness.end(), us);
+
 				return ret;
 			}
 		};

@@ -1,4 +1,4 @@
-#include <fstream>
+﻿#include <fstream>
 #include <random>
 
 #include <kiwi/Kiwi.h>
@@ -519,32 +519,61 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 {
 	auto realMorph = restoreMorphemeMap();
 	RaggedVector<utils::Vid> sents;
-	if (0)
+	if (1)
 	{
 		for (auto& path : args.corpora)
 		{
 			ifstream ifs;
 			addCorpusTo(sents, openFile(ifs, path), realMorph);
 		}
+		//std::cout << sents.size() << std::endl;
 
-		if (false && args.dropoutProb > 0 && args.dropoutSampling > 0)
+		if (args.dropoutProb > 0 && args.dropoutSampling > 0)
 		{
 			mt19937_64 rng{ 42 };
-			bernoulli_distribution sampler{ args.dropoutSampling }, drop{ args.dropoutProb };
+			bernoulli_distribution sampler{ args.dropoutSampling };
+			discrete_distribution<> drop{ { 1 - args.dropoutProb, args.dropoutProb / 3, args.dropoutProb / 3, args.dropoutProb / 3} };
 
 			size_t origSize = sents.size();
-			for (size_t i = 0; i < origSize; ++i)
+			for (size_t n = 0; n < 2; ++n)
 			{
-				if (!sampler(rng)) continue;
-				sents.emplace_back();
-				for (size_t j = 0; j < sents[i].size(); ++j)
+				for (size_t i = 0; i < origSize; ++i)
 				{
-					auto v = sents[i][j];
-					if (drop(rng))
+					//if (!sampler(rng)) continue;
+					sents.emplace_back();
+					sents.add_data(sents[i][0]);
+					bool emptyDoc = true;
+					for (size_t j = 1; j < sents[i].size() - 1; ++j)
 					{
-						v = getDefaultMorphemeId(morphemes[v].tag);
+						auto v = sents[i][j];
+						switch (drop(rng))
+						{
+						case 0: // no dropout
+							emptyDoc = false;
+							sents.add_data(v);
+							break;
+						case 1: // replacement
+							emptyDoc = false;
+							sents.add_data(getDefaultMorphemeId(morphemes[v].tag));
+							break;
+						case 2: // deletion
+							break;
+						case 3: // insertion
+							emptyDoc = false;
+							sents.add_data(getDefaultMorphemeId(morphemes[v].tag));
+							sents.add_data(v);
+							break;
+						}
 					}
-					sents.add_data(v);
+
+					if (emptyDoc)
+					{
+						sents.pop_back();
+					}
+					else
+					{
+						sents.add_data(sents[i][sents[i].size() - 1]);
+					}
 				}
 			}
 		}
@@ -564,13 +593,19 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 	for (auto& p : realMorph) lmVocabSize = max(p.second, lmVocabSize);
 	lmVocabSize += 1;
 
-	auto sbgFilter = [&](size_t a, size_t b)
+	auto sbgTokenFilter = [&](size_t a)
+	{
+		auto tag = morphemes[a].tag;
+		if (isEClass(tag) || isJClass(tag)) return false;
+		if (tag == POSTag::vcp || tag == POSTag::vcn) return false;
+		if (isVerbClass(tag) && forms[morphemes[a].kform].form == u"하") return false;
+		return true;
+	};
+
+	auto sbgPairFilter = [&](size_t a, size_t b)
 	{
 		if (a < 21 || (34 < a && a < defaultTagSize + 1)) return false;
-		if (isEClass(morphemes[a].tag) || isJClass(morphemes[a].tag)) return false;
-		if (isEClass(morphemes[b].tag) || isJClass(morphemes[b].tag)) return false;
-		if (morphemes[a].tag == POSTag::vcp || morphemes[a].tag == POSTag::vcn) return false;
-		if (morphemes[b].tag == POSTag::vcp || morphemes[b].tag == POSTag::vcn) return false;
+		if ((1 < b && b < 21) || (34 < b && b < defaultTagSize + 1)) return false;
 		return true;
 	};
 
@@ -605,7 +640,7 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 	sb::SkipBigramTrainer<utils::Vid, 8> sbg;
 	if (1)
 	{
-		sbg = sb::SkipBigramTrainer<utils::Vid, 8>{ sents, sbgFilter, 0, 150, 10, 1, 1000000 };
+		sbg = sb::SkipBigramTrainer<utils::Vid, 8>{ sents, sbgTokenFilter, sbgPairFilter, 0, 150, 20, true, 0.333f, 1, 1000000 };
 		ofstream ofs{ "sbg.bin", ios_base::binary };
 		sbg.save(ofs);
 	}
@@ -648,7 +683,7 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 	size_t numEpochs = 10;
 	size_t totalSteps = sampleIdcs.size() * numEpochs;
 
-	if (0)
+	if (args.numWorkers <= 1)
 	{
 		sbg.train(SBDataFeeder{ sents, langMdl.get() }, [&](const sb::ObservingData& od)
 			{
@@ -664,7 +699,7 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 	}
 	else
 	{
-		sbg.trainMulti(8, SBDataFeeder{ sents, langMdl.get(), 8 }, [&](const sb::ObservingData& od)
+		sbg.trainMulti(args.numWorkers, SBDataFeeder{ sents, langMdl.get(), 8 }, [&](const sb::ObservingData& od)
 			{
 				llCnt += od.cntRecent;
 				llMean += (od.llRecent - llMean * od.cntRecent) / llCnt;

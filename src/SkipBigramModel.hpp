@@ -19,6 +19,7 @@ namespace kiwi
 			std::unique_ptr<size_t[]> ptrs;
 			std::unique_ptr<float[]> restoredFloats;
 			std::unique_ptr<KeyType[]> keyData;
+			std::unique_ptr<uint8_t[]> vocabValidness;
 			const float* discnts = nullptr;
 			const float* compensations = nullptr;
 			float logWindowSize;
@@ -39,6 +40,8 @@ namespace kiwi
 				size_t totalVocabs = ptrs[header.vocabSize];
 				keyData = make_unique<KeyType[]>(totalVocabs);
 				restoredFloats = make_unique<float[]>(totalVocabs);
+				vocabValidness = make_unique<uint8_t[]>(header.vocabSize);
+				std::fill(vocabValidness.get(), vocabValidness.get() + header.vocabSize, 0);
 
 				auto kdSrc = reinterpret_cast<const KeyType*>(ptr += header.vocabSize * sizeof(KeyType));
 				std::copy(kdSrc, kdSrc + totalVocabs, keyData.get());
@@ -48,6 +51,9 @@ namespace kiwi
 				std::copy(cmpSrc, cmpSrc + totalVocabs, restoredFloats.get());
 				compensations = restoredFloats.get();
 				auto mutableCompensations = restoredFloats.get();
+
+				auto vvSrc = reinterpret_cast<const uint8_t*>(ptr += totalVocabs * sizeof(float));
+				std::copy(vvSrc, vvSrc + header.vocabSize, vocabValidness.get());
 
 				Vector<uint8_t> tempBuf;
 				for (size_t i = 0; i < header.vocabSize; ++i)
@@ -60,13 +66,20 @@ namespace kiwi
 				logWindowSize = std::log(header.windowSize);
 			}
 
+			bool isValidVocab(KeyType k) const
+			{
+				if (k >= getHeader().vocabSize) return false;
+				return !!vocabValidness[k];
+			}
+
 			float evaluate(const KeyType* history, size_t cnt, KeyType next, float base) const
 			{
 				if (!cnt) return base;
+				if (!vocabValidness[next]) return base;
 
 				Eigen::Array<float, 16, 1> arr;
-				arr.template head<8>().fill(base);
-				arr.template tail<8>().fill(-INFINITY);
+				arr.fill(-INFINITY);
+				arr.head(getHeader().windowSize).fill(base);
 
 				size_t b = ptrs[next], e = ptrs[next + 1];
 				size_t size = e - b;
