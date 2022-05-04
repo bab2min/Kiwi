@@ -161,12 +161,16 @@ TEST(KiwiCpp, Pattern)
 	EXPECT_EQ(tokens.size(), 1);
 	EXPECT_EQ(tokens[0].tag, POSTag::sn);
 
-	tokens = kiwi.analyze(u"123,456.789a", Match::none).first;
-	EXPECT_EQ(tokens.size(), 6);
+	tokens = kiwi.analyze(u"123,456.789hz", Match::none).first;
+	EXPECT_EQ(tokens.size(), 2);
 	EXPECT_EQ(tokens[0].tag, POSTag::sn);
 
 	tokens = kiwi.analyze(u"123,456.789이다", Match::none).first;
 	EXPECT_EQ(tokens.size(), 3);
+	EXPECT_EQ(tokens[0].tag, POSTag::sn);
+
+	tokens = kiwi.analyze(u"1.2%", Match::none).first;
+	EXPECT_EQ(tokens.size(), 2);
 	EXPECT_EQ(tokens[0].tag, POSTag::sn);
 }
 
