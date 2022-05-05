@@ -25,6 +25,7 @@ set ( CORE_SRCS
   src/Combiner.cpp
   src/Form.cpp
   src/FeatureTestor.cpp
+  src/Joiner.cpp
   src/Kiwi.cpp
   src/KiwiBuilder.cpp
   src/KTrie.cpp
