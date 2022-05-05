@@ -60,6 +60,17 @@ inline Type operator^=(Type& a, Type b)\
 	return reinterpret_cast<Type&>(reinterpret_cast<typename std::underlying_type<Type>::type&>(a) ^= static_cast<typename std::underlying_type<Type>::type>(b));\
 }
 
+namespace nonstd
+{
+	namespace sv_lite
+	{
+		template<class CharT, class Traits> class basic_string_view;
+	}
+
+	using string_view = sv_lite::basic_string_view<char, std::char_traits<char>>;
+	using u16string_view = sv_lite::basic_string_view<char16_t, std::char_traits<char16_t>>;
+}
+
 namespace kiwi
 {
 	typedef char16_t kchar_t;
@@ -144,6 +155,8 @@ namespace kiwi
 	using KcScores = Vector<std::pair<KcVector, float>>;
 #endif
 
+	using U16StringView = nonstd::u16string_view;
+
 	/**
 	 * @brief 형태소 품사 태그와 관련된 열거형
 	 * 
@@ -193,6 +206,12 @@ namespace kiwi
 	inline constexpr POSTag clearIrregular(POSTag tag)
 	{
 		return static_cast<POSTag>(static_cast<uint8_t>(tag) & ~static_cast<uint8_t>(POSTag::irregular));
+	}
+
+	inline constexpr POSTag setIrregular(POSTag tag, bool irregular)
+	{
+		if (irregular) return setIrregular(tag);
+		else return clearIrregular(tag);
 	}
 
 	constexpr size_t defaultTagSize = (size_t)POSTag::p;

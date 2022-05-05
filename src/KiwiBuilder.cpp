@@ -1,4 +1,4 @@
-﻿#include <fstream>
+#include <fstream>
 #include <random>
 
 #include <kiwi/Kiwi.h>
@@ -785,7 +785,7 @@ size_t KiwiBuilder::addForm(Vector<FormRaw>& newForms, UnorderedMap<KString, siz
 	return ret.first->second;
 }
 
-bool KiwiBuilder::addWord(nonstd::u16string_view newForm, POSTag tag, float score, size_t origMorphemeId)
+bool KiwiBuilder::addWord(U16StringView newForm, POSTag tag, float score, size_t origMorphemeId)
 {
 	if (newForm.empty()) return false;
 
@@ -812,7 +812,7 @@ bool KiwiBuilder::addWord(nonstd::u16string_view newForm, POSTag tag, float scor
 	return true;
 }
 
-bool KiwiBuilder::addWord(const u16string& newForm, POSTag tag, float score, size_t origMorphemeId)
+bool KiwiBuilder::addWord(const std::u16string& newForm, POSTag tag, float score, size_t origMorphemeId)
 {
 	return addWord(nonstd::to_string_view(newForm), tag, score, origMorphemeId);
 }
@@ -1056,7 +1056,7 @@ void KiwiBuilder::buildCombinedMorphemes(
 	}
 }
 
-bool KiwiBuilder::addWord(nonstd::u16string_view form, POSTag tag, float score)
+bool KiwiBuilder::addWord(U16StringView form, POSTag tag, float score)
 {
 	return addWord(form, tag, score, getDefaultMorphemeId(tag));
 }
@@ -1066,7 +1066,12 @@ bool KiwiBuilder::addWord(const u16string& form, POSTag tag, float score)
 	return addWord(nonstd::to_string_view(form), tag, score);
 }
 	
-size_t KiwiBuilder::findMorpheme(const u16string& form, POSTag tag) const
+bool KiwiBuilder::addWord(const char16_t* form, POSTag tag, float score)
+{
+	return addWord(U16StringView{ form }, tag, score);
+}
+
+size_t KiwiBuilder::findMorpheme(U16StringView form, POSTag tag) const
 {
 	auto normalized = normalizeHangul(form);
 	auto it = formMap.find(normalized);
@@ -1082,7 +1087,7 @@ size_t KiwiBuilder::findMorpheme(const u16string& form, POSTag tag) const
 	return -1;
 }
 
-bool KiwiBuilder::addWord(nonstd::u16string_view newForm, POSTag tag, float score, const u16string& origForm)
+bool KiwiBuilder::addWord(U16StringView newForm, POSTag tag, float score, U16StringView origForm)
 {
 	size_t origMorphemeId = findMorpheme(origForm, tag);
 
@@ -1099,7 +1104,13 @@ bool KiwiBuilder::addWord(const u16string& newForm, POSTag tag, float score, con
 	return addWord(nonstd::to_string_view(newForm), tag, score, origForm);
 }
 
-bool KiwiBuilder::addPreAnalyzedWord(nonstd::u16string_view form, const vector<pair<u16string, POSTag>>& analyzed, vector<pair<size_t, size_t>> positions, float score)
+bool KiwiBuilder::addWord(const char16_t* newForm, POSTag tag, float score, const char16_t* origForm)
+{
+	return addWord(U16StringView(newForm), tag, score, U16StringView(origForm));
+}
+
+template<class U16>
+bool KiwiBuilder::addPreAnalyzedWord(U16StringView form, const vector<pair<U16, POSTag>>& analyzed, vector<pair<size_t, size_t>> positions, float score)
 {
 	if (form.empty()) return false;
 
@@ -1156,13 +1167,18 @@ bool KiwiBuilder::addPreAnalyzedWord(const u16string& form, const vector<pair<u1
 	return addPreAnalyzedWord(nonstd::to_string_view(form), analyzed, positions, score);
 }
 
+bool KiwiBuilder::addPreAnalyzedWord(const char16_t* form, const vector<pair<const char16_t*, POSTag>>& analyzed, vector<pair<size_t, size_t>> positions, float score)
+{
+	return addPreAnalyzedWord(U16StringView{ form }, analyzed, positions, score);
+}
+
 size_t KiwiBuilder::loadDictionary(const string& dictPath)
 {
 	size_t addedCnt = 0;
 	ifstream ifs;
 	openFile(ifs, dictPath);
 	string line;
-	array<nonstd::u16string_view, 3> fields;
+	array<U16StringView, 3> fields;
 	u16string wstr;
 	for (size_t lineNo = 1; getline(ifs, line); ++lineNo)
 	{
@@ -1186,7 +1202,7 @@ size_t KiwiBuilder::loadDictionary(const string& dictPath)
 
 		if (fields[1].find(u'/') != fields[1].npos)
 		{
-			vector<pair<u16string, POSTag>> morphemes;
+			vector<pair<U16StringView, POSTag>> morphemes;
 
 			for (auto& m : split(fields[1], u'+'))
 			{
@@ -1205,7 +1221,7 @@ size_t KiwiBuilder::loadDictionary(const string& dictPath)
 				{
 					throw Exception("[loadUserDictionary] Unknown Tag '" + utf16To8(fields[1]) + "' at line " + to_string(lineNo));
 				}
-				morphemes.emplace_back(m.substr(0, p).to_string(), pos);
+				morphemes.emplace_back(m.substr(0, p), pos);
 			}
 
 			if (morphemes.size() > 1)

@@ -267,6 +267,11 @@ namespace kiwi
 		return ret;
 	}
 
+	inline std::string utf16To8(const char16_t* str)
+	{
+		return utf16To8(U16StringView{ str });
+	}
+
 	template<class It>
 	inline KString normalizeHangul(It first, It last)
 	{

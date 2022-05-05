@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file Kiwi.h
  * @author bab2min (bab2min@gmail.com)
  * @brief Kiwi C++ API를 담고 있는 헤더 파일
@@ -39,9 +39,15 @@ namespace nonstd
 
 namespace kiwi
 {
+	//// 헤더 파일 분리를 위한 전방 선언
 	struct KTrie;
 	struct KGraphNode;
 	struct WordInfo;
+
+	namespace cmb{ class CompiledRule; }
+
+	template<class Ty> class RaggedVector;
+	////
 
 	inline uint32_t getDefaultMorphemeId(POSTag tag)
 	{
@@ -352,14 +358,6 @@ namespace kiwi
 		}
 	};
 
-	namespace cmb
-	{
-		class CompiledRule;
-	}
-
-	template<class Ty>
-	class RaggedVector;
-
 	/**
 	 * @brief 형태소 분석에 사용될 사전을 관리하고, 
 	 * 사전을 바탕으로 실제 형태소 분석을 수행하는 Kiwi의 인스턴스를 생성하는 클래스.
@@ -395,14 +393,16 @@ namespace kiwi
 		void updateForms();
 		void updateMorphemes();
 
-		size_t findMorpheme(const std::u16string& form, POSTag tag) const;
+		size_t findMorpheme(U16StringView form, POSTag tag) const;
 		
-		bool addWord(nonstd::u16string_view newForm, POSTag tag, float score, size_t origMorphemeId);
+		bool addWord(U16StringView newForm, POSTag tag, float score, size_t origMorphemeId);
 		bool addWord(const std::u16string& newForm, POSTag tag, float score, size_t origMorphemeId);
-		bool addWord(nonstd::u16string_view form, POSTag tag = POSTag::nnp, float score = 0);
-		bool addWord(nonstd::u16string_view newForm, POSTag tag, float score, const std::u16string& origForm);
-		bool addPreAnalyzedWord(nonstd::u16string_view form,
-			const std::vector<std::pair<std::u16string, POSTag>>& analyzed,
+		bool addWord(U16StringView form, POSTag tag = POSTag::nnp, float score = 0);
+		bool addWord(U16StringView newForm, POSTag tag, float score, U16StringView origForm);
+
+		template<class U16>
+		bool addPreAnalyzedWord(U16StringView form,
+			const std::vector<std::pair<U16, POSTag>>& analyzed,
 			std::vector<std::pair<size_t, size_t>> positions = {},
 			float score = 0
 		);
@@ -422,6 +422,8 @@ namespace kiwi
 			Vector<MorphemeRaw>& newMorphemes, 
 			UnorderedMap<size_t, Vector<uint32_t>>& newFormCands
 		) const;
+
+		void addAllomorphsToRule();
 
 	public:
 		struct ModelBuildArgs 
@@ -507,6 +509,7 @@ namespace kiwi
 		 * 반대로 원하는 상황에서도 출력되지 않는 경우라면 `score`를 더 큰 값으로 조절하는 게 좋다.
 		 */
 		bool addWord(const std::u16string& form, POSTag tag = POSTag::nnp, float score = 0);
+		bool addWord(const char16_t* form, POSTag tag = POSTag::nnp, float score = 0);
 
 		/**
 		 * @brief 사전에 기존 형태소의 변이형을 추가한다. 이미 동일한 형태소가 있는 경우는 무시된다.
@@ -520,6 +523,7 @@ namespace kiwi
 		 * @note 이 방법으로 추가된 형태소는 언어모델 탐색 과정에서 `origForm/tag` 토큰으로 처리된다.
 		 */
 		bool addWord(const std::u16string& newForm, POSTag tag, float score, const std::u16string& origForm);
+		bool addWord(const char16_t* newForm, POSTag tag, float score, const char16_t* origForm);
 
 		/**
 		 * @brief 사전에 기분석 형태소열을 추가한다. 이미 동일한 기분석 형태소열이 있는 경우는 무시된다.
@@ -535,6 +539,11 @@ namespace kiwi
 		 */
 		bool addPreAnalyzedWord(const std::u16string& form, 
 			const std::vector<std::pair<std::u16string, POSTag>>& analyzed, 
+			std::vector<std::pair<size_t, size_t>> positions = {},
+			float score = 0
+		);
+		bool addPreAnalyzedWord(const char16_t* form, 
+			const std::vector<std::pair<const char16_t*, POSTag>>& analyzed, 
 			std::vector<std::pair<size_t, size_t>> positions = {},
 			float score = 0
 		);
