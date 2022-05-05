@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file Kiwi.h
  * @author bab2min (bab2min@gmail.com)
  * @brief Kiwi C++ API를 담고 있는 헤더 파일
@@ -25,17 +25,7 @@
 #include "ThreadPool.h"
 #include "WordDetector.h"
 #include "TagUtils.h"
-
-namespace nonstd
-{
-	namespace sv_lite
-	{
-		template<class CharT,class Traits> class basic_string_view;
-	}
-
-	using string_view = sv_lite::basic_string_view<char, std::char_traits<char>>;
-	using u16string_view = sv_lite::basic_string_view<char16_t, std::char_traits<char16_t>>;
-}
+#include "Joiner.h"
 
 namespace kiwi
 {
@@ -62,6 +52,7 @@ namespace kiwi
 	{
 		friend class KiwiBuilder;
 		friend class PathEvaluator;
+		friend class cmb::AutoJoiner;
 
 		bool integrateAllomorph = true;
 		float cutOffThreshold = 5;
@@ -78,6 +69,7 @@ namespace kiwi
 		utils::FrozenTrie<kchar_t, const Form*> formTrie;
 		std::shared_ptr<lm::KnLangModelBase> langMdl;
 		std::shared_ptr<sb::SkipBigramModelBase> sbgMdl;
+		std::shared_ptr<cmb::CompiledRule> combiningRule;
 		std::unique_ptr<utils::ThreadPool> pool;
 			
 		std::vector<TokenResult> analyzeSent(const std::u16string::const_iterator& sBegin, const std::u16string::const_iterator& sEnd, size_t topN, Match matchOptions) const;
@@ -89,6 +81,7 @@ namespace kiwi
 		void* dfFindBestPath = nullptr;
 
 	public:
+
 		/**
 		 * @brief 빈 Kiwi 객체를 생성한다.
 		 * 
@@ -264,6 +257,18 @@ namespace kiwi
 			Match matchOptions = Match::allWithNormalizing,
 			TokenResult* tokenizedResultOut = nullptr
 		) const;
+
+		/**
+		 * @brief 형태소들을 결합하여 텍스트로 복원해주는 작업을 수행하는 AutoJoiner를 반환한다.
+		 * 
+		 * @return 새 AutoJoiner 인스턴스
+		 * 
+		 * @sa kiwi::cmb::AutoJoiner
+		 */
+		cmb::AutoJoiner newJoiner() const
+		{
+			return cmb::AutoJoiner{ *this };
+		}
 
 		size_t morphToId(const Morpheme* morph) const
 		{

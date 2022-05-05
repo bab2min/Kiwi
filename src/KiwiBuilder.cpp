@@ -1,4 +1,4 @@
-#include <fstream>
+﻿#include <fstream>
 #include <random>
 
 #include <kiwi/Kiwi.h>
@@ -401,6 +401,7 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, size_t _numThreads, BuildOptio
 	{
 		ifstream ifs;
 		combiningRule = make_shared<cmb::CompiledRule>(cmb::RuleSet{ openFile(ifs, modelPath + string{ "/combiningRule.txt" }) }.compile());
+		addAllomorphsToRule();
 	}
 }
 
@@ -760,6 +761,29 @@ void KiwiBuilder::saveModel(const string& modelPath) const
 	}
 }
 
+void KiwiBuilder::addAllomorphsToRule()
+{
+	UnorderedMap<size_t, Vector<const MorphemeRaw*>> allomorphs;
+	for (auto& m : morphemes)
+	{
+		if (!isJClass(m.tag) && !isEClass(m.tag)) continue;
+		if (m.vowel() == CondVowel::none) continue;
+		if (m.lmMorphemeId == getDefaultMorphemeId(m.tag)) continue;
+		allomorphs[m.lmMorphemeId].emplace_back(&m);
+	}
+
+	for (auto& p : allomorphs)
+	{
+		if (p.second.size() <= 1) continue;
+		vector<pair<U16StringView, CondVowel>> d;
+		for (auto m : p.second)
+		{
+			d.emplace_back(forms[m->kform].form, m->vowel());
+		}
+		combiningRule->addAllomorph(d, p.second[0]->tag);
+	}
+}
+
 FormRaw& KiwiBuilder::addForm(const KString& form)
 {
 	auto ret = formMap.emplace(form, forms.size());
@@ -1065,7 +1089,7 @@ bool KiwiBuilder::addWord(const u16string& form, POSTag tag, float score)
 {
 	return addWord(nonstd::to_string_view(form), tag, score);
 }
-	
+
 bool KiwiBuilder::addWord(const char16_t* form, POSTag tag, float score)
 {
 	return addWord(U16StringView{ form }, tag, score);
@@ -1305,6 +1329,7 @@ Kiwi KiwiBuilder::build() const
 	ret.morphemes.reserve(morphemes.size() + combinedMorphemes.size());
 	ret.langMdl = langMdl;
 	ret.sbgMdl = sbgMdl;
+	ret.combiningRule = combiningRule;
 	ret.integrateAllomorph = !!(options & BuildOption::integrateAllomorph);
 	if (numThreads >= 1)
 	{
