@@ -93,9 +93,6 @@
     <ClInclude Include="src\Combiner.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\bitset.hpp">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\kiwi\TagUtils.h">
       <Filter>Header Files\kiwi</Filter>
     </ClInclude>
@@ -130,6 +127,12 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="include\kiwi\SkipBigramModel.h">
+      <Filter>Header Files\kiwi</Filter>
+    </ClInclude>
+    <ClInclude Include="src\bitset.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\kiwi\Joiner.h">
       <Filter>Header Files\kiwi</Filter>
     </ClInclude>
   </ItemGroup>
