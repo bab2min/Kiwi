@@ -984,20 +984,20 @@ namespace kiwi
 			}
 			// (NN. | XR) + XSV => VV
 			else if (!!(matchOptions & Match::joinVerbSuffix)
-				&& nextToken.tag == POSTag::xsv
+				&& clearIrregular(nextToken.tag) == POSTag::xsv
 				&& ((POSTag::nng <= current.tag && current.tag <= POSTag::nnb) || current.tag == POSTag::xr)
 			)
 			{
-				concatTokens(current, nextToken, POSTag::vv);
+				concatTokens(current, nextToken, setIrregular(POSTag::vv, isIrregular(nextToken.tag)));
 				++next;
 			}
 			// (NN. | XR) + XSA => VA
 			else if (!!(matchOptions & Match::joinAdjSuffix)
-				&& nextToken.tag == POSTag::xsa
+				&& clearIrregular(nextToken.tag) == POSTag::xsa
 				&& ((POSTag::nng <= current.tag && current.tag <= POSTag::nnb) || current.tag == POSTag::xr)
 			)
 			{
-				concatTokens(current, nextToken, POSTag::va);
+				concatTokens(current, nextToken, setIrregular(POSTag::va, isIrregular(nextToken.tag)));
 				++next;
 			}
 			else
