@@ -1,22 +1,29 @@
 #pragma once
 #include "Types.h"
+#include <kiwi/ArchUtils.h>
 
 namespace kiwi
 {
 	class Kiwi;
+	template<ArchType arch>
+	class VoidState;
 
 	namespace cmb
 	{
+		class CompiledRule;
+		class AutoJoiner;
+
 		class Joiner
 		{
 			friend class CompiledRule;
+			friend class AutoJoiner;
+			template<class LmState> friend struct Candidate;
 			const CompiledRule* cr = nullptr;
 			KString stack;
 			size_t activeStart = 0;
 			POSTag lastTag = POSTag::unknown;
-		protected:
-			explicit Joiner(const CompiledRule& _cr);
-			
+
+			explicit Joiner(const CompiledRule& _cr);			
 			void add(U16StringView form, POSTag tag);
 
 		public:
@@ -34,14 +41,49 @@ namespace kiwi
 			std::string getU8() const;
 		};
 
-		class AutoJoiner : public Joiner
+		template<class LmState>
+		struct Candidate
+		{
+			Joiner joiner;
+			LmState lmState;
+			float score = 0;
+
+			Candidate(const CompiledRule& _cr)
+				: joiner{ _cr }
+			{
+			}
+		};
+
+		template<ArchType arch>
+		struct Candidate<VoidState<arch>>
+		{
+			Joiner joiner;
+
+			Candidate(const CompiledRule& _cr)
+				: joiner{ _cr }
+			{
+			}
+		};
+
+		class AutoJoiner
 		{
 			friend class kiwi::Kiwi;
+
+			struct AddVisitor;
 			const Kiwi* kiwi = nullptr;
+			union
+			{
+				typename std::aligned_storage<sizeof(Vector<char>) + sizeof(int), alignof(Vector<char>)>::type candBuf;
+			};
 
-			explicit AutoJoiner(const Kiwi& kiwi);
+			template<class LmState>
+			explicit AutoJoiner(const Kiwi& kiwi, Candidate<LmState>&& state);
 
-			void add(U16StringView form, POSTag tag, bool inferRegularity);
+			template<class LmState>
+			void add(U16StringView form, POSTag tag, bool inferRegularity, Vector<Candidate<LmState>>& candidates);
+
+			template<ArchType arch>
+			void addWithoutSearch(U16StringView form, POSTag tag, bool inferRegularity, Vector<Candidate<VoidState<arch>>>& candidates);
 		public:
 			~AutoJoiner();
 			AutoJoiner(const AutoJoiner&);
@@ -51,6 +93,9 @@ namespace kiwi
 
 			void add(const std::u16string& form, POSTag tag, bool inferRegularity = true);
 			void add(const char16_t* form, POSTag tag, bool inferRegularity = true);
+
+			std::u16string getU16() const;
+			std::string getU8() const;
 		};
 	}
 }

@@ -6,7 +6,7 @@ using namespace kiwi;
 
 Kiwi& reuseKiwiInstance()
 {
-	static Kiwi kiwi = KiwiBuilder{ MODEL_PATH }.build();
+	static Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 0, BuildOption::default_, }.build();
 	return kiwi;
 }
 
@@ -485,4 +485,32 @@ TEST(KiwiCpp, AutoJoiner)
 	joiner.add(u"날", POSTag::vv);
 	joiner.add(u"어", POSTag::ef);
 	EXPECT_EQ(joiner.getU16(), u"날아");
+
+	joiner = kiwi.newJoiner();
+	joiner.add(u"고기", POSTag::nng);
+	joiner.add(u"을", POSTag::jko);
+	joiner.add(u"굽", POSTag::vv);
+	joiner.add(u"어", POSTag::ef);
+	EXPECT_EQ(joiner.getU16(), u"고기를 구워");
+
+	joiner = kiwi.newJoiner();
+	joiner.add(u"길", POSTag::nng);
+	joiner.add(u"을", POSTag::jko);
+	joiner.add(u"걷", POSTag::vv);
+	joiner.add(u"어요", POSTag::ef);
+	EXPECT_EQ(joiner.getU16(), u"길을 걸어요");
+
+	joiner = kiwi.newJoiner(false);
+	joiner.add(u"길", POSTag::nng);
+	joiner.add(u"을", POSTag::jko);
+	joiner.add(u"걷", POSTag::vv);
+	joiner.add(u"어요", POSTag::ef);
+	EXPECT_EQ(joiner.getU16(), u"길을 걷어요");
+
+	joiner = kiwi.newJoiner();
+	joiner.add(u"땅", POSTag::nng);
+	joiner.add(u"에", POSTag::jkb);
+	joiner.add(u"묻", POSTag::vv);
+	joiner.add(u"어요", POSTag::ef);
+	EXPECT_EQ(joiner.getU16(), u"땅에 묻어요");
 }

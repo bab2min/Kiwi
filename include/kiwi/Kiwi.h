@@ -39,6 +39,12 @@ namespace kiwi
 	template<class Ty> class RaggedVector;
 	////
 
+	struct LangModel
+	{
+		std::shared_ptr<lm::KnLangModelBase> knlm;
+		std::shared_ptr<sb::SkipBigramModelBase> sbg;
+	};
+
 	inline uint32_t getDefaultMorphemeId(POSTag tag)
 	{
 		return (uint32_t)tag + 1;
@@ -53,6 +59,7 @@ namespace kiwi
 		friend class KiwiBuilder;
 		friend class PathEvaluator;
 		friend class cmb::AutoJoiner;
+		template<template<ArchType> class LmState> friend struct NewAutoJoinerGetter;
 
 		bool integrateAllomorph = true;
 		float cutOffThreshold = 5;
@@ -67,14 +74,19 @@ namespace kiwi
 		Vector<Form> forms;
 		Vector<Morpheme> morphemes;
 		utils::FrozenTrie<kchar_t, const Form*> formTrie;
-		std::shared_ptr<lm::KnLangModelBase> langMdl;
-		std::shared_ptr<sb::SkipBigramModelBase> sbgMdl;
+		LangModel langMdl;
 		std::shared_ptr<cmb::CompiledRule> combiningRule;
 		std::unique_ptr<utils::ThreadPool> pool;
-			
+		
 		std::vector<TokenResult> analyzeSent(const std::u16string::const_iterator& sBegin, const std::u16string::const_iterator& sEnd, size_t topN, Match matchOptions) const;
 
 		const Morpheme* getDefaultMorpheme(POSTag tag) const;
+
+		template<class LmState>
+		cmb::AutoJoiner newJoinerImpl() const
+		{
+			return cmb::AutoJoiner{ *this, cmb::Candidate<LmState>{ *combiningRule } };
+		}
 
 		ArchType selectedArch = ArchType::none;
 		void* dfSplitByTrie = nullptr;
@@ -261,14 +273,12 @@ namespace kiwi
 		/**
 		 * @brief 형태소들을 결합하여 텍스트로 복원해주는 작업을 수행하는 AutoJoiner를 반환한다.
 		 * 
+		 * @param lmSearch 결합 전에 언어 모델을 이용하여 최적의 형태소를 탐색하여 사용합니다.
 		 * @return 새 AutoJoiner 인스턴스
 		 * 
 		 * @sa kiwi::cmb::AutoJoiner
 		 */
-		cmb::AutoJoiner newJoiner() const
-		{
-			return cmb::AutoJoiner{ *this };
-		}
+		cmb::AutoJoiner newJoiner(bool lmSearch = true) const;
 
 		size_t morphToId(const Morpheme* morph) const
 		{
@@ -357,9 +367,9 @@ namespace kiwi
 			integrateAllomorph = v;
 		}
 
-		const lm::KnLangModelBase* getLangModel() const
+		const lm::KnLangModelBase* getKnLM() const
 		{
-			return langMdl.get();
+			return langMdl.knlm.get();
 		}
 	};
 
@@ -373,8 +383,7 @@ namespace kiwi
 		Vector<FormRaw> forms;
 		Vector<MorphemeRaw> morphemes;
 		UnorderedMap<KString, size_t> formMap;
-		std::shared_ptr<lm::KnLangModelBase> langMdl;
-		std::shared_ptr<sb::SkipBigramModelBase> sbgMdl;
+		LangModel langMdl;
 		std::shared_ptr<cmb::CompiledRule> combiningRule;
 		WordDetector detector;
 		
@@ -495,7 +504,7 @@ namespace kiwi
 		 */
 		bool ready() const
 		{
-			return !!langMdl;
+			return !!langMdl.knlm;
 		}
 
 		void saveModel(const std::string& modelPath) const;
@@ -603,9 +612,9 @@ namespace kiwi
 		 */
 		Kiwi build() const;
 
-		const lm::KnLangModelBase* getLangModel() const
+		/*const lm::KnLangModelBase* getLangModel() const
 		{
 			return langMdl.get();
-		}
+		}*/
 	};
 }

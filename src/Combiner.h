@@ -181,7 +181,7 @@ namespace kiwi
 		class CompiledRule
 		{
 			friend class RuleSet;
-			friend class KiwiBuilder;
+			friend class kiwi::KiwiBuilder;
 			friend class Joiner;
 
 			Vector<MultiRuleDFAErased> dfa, dfaRight;

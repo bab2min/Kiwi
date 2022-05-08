@@ -19,7 +19,7 @@ int doEvaluate(const string& modelPath, const string& output, const vector<strin
 		Kiwi kw = KiwiBuilder{ modelPath, 1, BuildOption::integrateAllomorph | BuildOption::loadDefaultDict, useSBG }.build();
 		
 		cout << "Loading Time : " << timer.getElapsed() << " ms" << endl;
-		cout << "LM Size : " << (kw.getLangModel()->getMemory().size() / 1024. / 1024.) << " MB" << endl;
+		cout << "LM Size : " << (kw.getKnLM()->getMemory().size() / 1024. / 1024.) << " MB" << endl;
 		cout << "Mem Usage : " << (tutils::getCurrentPhysicalMemoryUsage() / 1024.) << " MB\n" << endl;
 		
 		double avgMicro = 0, avgMacro = 0;

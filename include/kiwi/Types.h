@@ -210,8 +210,7 @@ namespace kiwi
 
 	inline constexpr POSTag setIrregular(POSTag tag, bool irregular)
 	{
-		if (irregular) return setIrregular(tag);
-		else return clearIrregular(tag);
+		return irregular ? setIrregular(tag) : clearIrregular(tag);
 	}
 
 	constexpr size_t defaultTagSize = (size_t)POSTag::p;

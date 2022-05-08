@@ -2,6 +2,7 @@
 
 #include <utility>
 #include <memory>
+#include <cstring>
 
 #include <kiwi/BitUtils.h>
 

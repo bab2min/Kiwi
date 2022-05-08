@@ -135,6 +135,12 @@
     <ClInclude Include="include\kiwi\Joiner.h">
       <Filter>Header Files\kiwi</Filter>
     </ClInclude>
+    <ClInclude Include="src\LmState.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Joiner.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Form.cpp">

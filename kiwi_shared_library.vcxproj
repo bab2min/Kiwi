@@ -55,8 +55,10 @@
     <ClInclude Include="src\FileUtils.h" />
     <ClInclude Include="src\FrozenTrie.hpp" />
     <ClInclude Include="src\FeatureTestor.h" />
+    <ClInclude Include="src\Joiner.hpp" />
     <ClInclude Include="src\Knlm.hpp" />
     <ClInclude Include="src\KTrie.h" />
+    <ClInclude Include="src\LmState.hpp" />
     <ClInclude Include="src\pattern.hpp" />
     <ClInclude Include="src\RaggedVector.hpp" />
     <ClInclude Include="src\search.h" />

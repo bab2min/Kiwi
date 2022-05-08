@@ -351,7 +351,7 @@ void KiwiBuilder::updateMorphemes()
 	for (auto& m : morphemes)
 	{
 		if (m.lmMorphemeId > 0) continue;
-		if (m.tag == POSTag::p || (&m - morphemes.data() + m.combined) < langMdl->getHeader().vocab_size)
+		if (m.tag == POSTag::p || (&m - morphemes.data() + m.combined) < langMdl.knlm->getHeader().vocab_size)
 		{
 			m.lmMorphemeId = &m - morphemes.data();
 		}
@@ -387,10 +387,10 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, size_t _numThreads, BuildOptio
 		utils::imstream iss{ mm };
 		loadMorphBin(iss);
 	}
-	langMdl = lm::KnLangModelBase::create(utils::MMap(modelPath + string{ "/sj.knlm" }), archType);
+	langMdl.knlm = lm::KnLangModelBase::create(utils::MMap(modelPath + string{ "/sj.knlm" }), archType);
 	if (useSBG)
 	{
-		sbgMdl = sb::SkipBigramModelBase::create(utils::MMap(modelPath + string{ "/skipbigram.mdl" }), archType);
+		langMdl.sbg = sb::SkipBigramModelBase::create(utils::MMap(modelPath + string{ "/skipbigram.mdl" }), archType);
 	}
 
 	if (!!(options & BuildOption::loadDefaultDict))
@@ -475,7 +475,7 @@ KiwiBuilder::KiwiBuilder(const ModelBuildArgs& args)
 	}
 	auto cntNodes = utils::count(sents.begin(), sents.end(), args.lmMinCnt, 1, args.lmOrder, (args.numWorkers > 1 ? &pool : nullptr), &bigramList, args.useLmTagHistory ? &historyTx : nullptr);
 	cntNodes.root().getNext(lmVocabSize)->val /= 2;
-	langMdl = lm::KnLangModelBase::create(lm::KnLangModelBase::build(
+	langMdl.knlm = lm::KnLangModelBase::create(lm::KnLangModelBase::build(
 		cntNodes, 
 		args.lmOrder, args.lmMinCnt, args.lmLastOrderMinCnt, 
 		2, 0, 1, 1e-5, 
@@ -669,7 +669,7 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 		{
 			lmLogProbs.resize(sent.size());
 		}
-		langMdl->evaluate(sent.begin(), sent.end(), lmLogProbs.begin());
+		langMdl.knlm->evaluate(sent.begin(), sent.end(), lmLogProbs.begin());
 		//float sum = sbg.evaluate(&sent[0], lmLogProbs.data(), sent.size());
 		float sum = accumulate(lmLogProbs.begin() + 1, lmLogProbs.begin() + sent.size(), 0.);
 		size_t cnt = sent.size() - 1;
@@ -686,7 +686,7 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 
 	if (args.numWorkers <= 1)
 	{
-		sbg.train(SBDataFeeder{ sents, langMdl.get() }, [&](const sb::ObservingData& od)
+		sbg.train(SBDataFeeder{ sents, langMdl.knlm.get() }, [&](const sb::ObservingData& od)
 			{
 				llCnt += od.cntRecent;
 				llMean += (od.llRecent - llMean * od.cntRecent) / llCnt;
@@ -700,7 +700,7 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 	}
 	else
 	{
-		sbg.trainMulti(args.numWorkers, SBDataFeeder{ sents, langMdl.get(), 8 }, [&](const sb::ObservingData& od)
+		sbg.trainMulti(args.numWorkers, SBDataFeeder{ sents, langMdl.knlm.get(), 8 }, [&](const sb::ObservingData& od)
 			{
 				llCnt += od.cntRecent;
 				llMean += (od.llRecent - llMean * od.cntRecent) / llCnt;
@@ -727,7 +727,7 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 		{
 			lmLogProbs.resize(sent.size());
 		}
-		langMdl->evaluate(sent.begin(), sent.end(), lmLogProbs.begin());
+		langMdl.knlm->evaluate(sent.begin(), sent.end(), lmLogProbs.begin());
 		float sum = sbg.evaluate(&sent[0], lmLogProbs.data(), sent.size());
 		size_t cnt = sent.size() - 1;
 		llCnt += cnt;
@@ -755,7 +755,7 @@ void KiwiBuilder::saveModel(const string& modelPath) const
 		saveMorphBin(ofs);
 	}
 	{
-		auto mem = langMdl->getMemory();
+		auto mem = langMdl.knlm->getMemory();
 		ofstream ofs{ modelPath + "/sj.knlm", ios_base::binary };
 		ofs.write((const char*)mem.get(), mem.size());
 	}
@@ -1317,7 +1317,7 @@ inline CondPolarity reducePolar(CondPolarity p, const Morpheme* m)
 
 Kiwi KiwiBuilder::build() const
 {
-	Kiwi ret{ archType, langMdl->getHeader().key_size };
+	Kiwi ret{ archType, langMdl.knlm->getHeader().key_size };
 
 	Vector<FormRaw> combinedForms;
 	Vector<MorphemeRaw> combinedMorphemes;
@@ -1328,7 +1328,6 @@ Kiwi KiwiBuilder::build() const
 	ret.forms.reserve(forms.size() + combinedForms.size() + 1);
 	ret.morphemes.reserve(morphemes.size() + combinedMorphemes.size());
 	ret.langMdl = langMdl;
-	ret.sbgMdl = sbgMdl;
 	ret.combiningRule = combiningRule;
 	ret.integrateAllomorph = !!(options & BuildOption::integrateAllomorph);
 	if (numThreads >= 1)

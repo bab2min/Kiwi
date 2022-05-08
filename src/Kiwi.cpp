@@ -8,10 +8,10 @@
 #include "KTrie.h"
 #include "FeatureTestor.h"
 #include "FrozenTrie.hpp"
-#include "Knlm.hpp"
-#include "SkipBigramModel.hpp"
+#include "LmState.hpp"
 #include "StrUtils.h"
 #include "serializer.hpp"
+#include "Joiner.hpp"
 
 using namespace std;
 
@@ -64,7 +64,7 @@ namespace kiwi
 		static tp::Table<FnFindBestPath, AvailableArch> tableFindBestPath_16{ FindBestPathGetter<uint16_t>{} };
 		static tp::Table<FnFindBestPath, AvailableArch> tableFindBestPath_32{ FindBestPathGetter<uint32_t>{} };
 		static tp::Table<FnFindBestPath, AvailableArch> tableFindBestPath_64{ FindBestPathGetter<uint64_t>{} };
-		
+
 		switch (lmKeySize)
 		{
 		case 1:
@@ -601,8 +601,8 @@ namespace kiwi
 		size_t i, size_t ownFormId, CandTy&& cands, bool unknownForm
 	)
 	{
-		auto lm = static_cast<const lm::KnLangModel<arch, LmType>*>(kw->langMdl.get());
-		auto sbg = static_cast<const sb::SkipBigramModel<arch, LmType>*>(kw->sbgMdl.get());
+		auto lm = static_cast<const lm::KnLangModel<arch, LmType>*>(kw->langMdl.knlm.get());
+		auto sbg = static_cast<const sb::SkipBigramModel<arch, LmType>*>(kw->langMdl.sbg.get());
 		const size_t langVocabSize = lm->getHeader().vocab_size;
 		auto& nCache = cache[i];
 
@@ -764,7 +764,7 @@ namespace kiwi
 		Vector<KString> ownFormList;
 		Vector<const Morpheme*> unknownNodeCands, unknownNodeLCands;
 
-		auto lm = static_cast<const lm::KnLangModel<arch, LmType>*>(kw->langMdl.get());
+		auto lm = static_cast<const lm::KnLangModel<arch, LmType>*>(kw->langMdl.knlm.get());
 
 		size_t langVocabSize = lm->getHeader().vocab_size;
 
@@ -1092,5 +1092,73 @@ namespace kiwi
 		{
 			return analyze(str, topN, matchOptions);
 		});
+	}
+
+	using FnNewAutoJoiner = cmb::AutoJoiner(Kiwi::*)() const;
+
+	template<template<ArchType> class LmState>
+	struct NewAutoJoinerGetter
+	{
+		template<std::ptrdiff_t i>
+		struct Wrapper
+		{
+			static constexpr FnNewAutoJoiner value = &Kiwi::newJoinerImpl<LmState<static_cast<ArchType>(i)>>;
+		};
+	};
+
+	cmb::AutoJoiner Kiwi::newJoiner(bool lmSearch) const
+	{
+		static tp::Table<FnNewAutoJoiner, AvailableArch> lmVoid{ NewAutoJoinerGetter<VoidState>{} };
+		static tp::Table<FnNewAutoJoiner, AvailableArch> lmKnLM_8{ NewAutoJoinerGetter<cmb::WrappedKnLM<uint8_t>::type>{} };
+		static tp::Table<FnNewAutoJoiner, AvailableArch> lmKnLM_16{ NewAutoJoinerGetter<cmb::WrappedKnLM<uint16_t>::type>{} };
+		static tp::Table<FnNewAutoJoiner, AvailableArch> lmKnLM_32{ NewAutoJoinerGetter<cmb::WrappedKnLM<uint32_t>::type>{} };
+		static tp::Table<FnNewAutoJoiner, AvailableArch> lmKnLM_64{ NewAutoJoinerGetter<cmb::WrappedKnLM<uint64_t>::type>{} };
+		static tp::Table<FnNewAutoJoiner, AvailableArch> lmSbg_8{ NewAutoJoinerGetter<cmb::WrappedSbg<8, uint8_t>::type>{} };
+		static tp::Table<FnNewAutoJoiner, AvailableArch> lmSbg_16{ NewAutoJoinerGetter<cmb::WrappedSbg<8, uint16_t>::type>{} };
+		static tp::Table<FnNewAutoJoiner, AvailableArch> lmSbg_32{ NewAutoJoinerGetter<cmb::WrappedSbg<8, uint32_t>::type>{} };
+		static tp::Table<FnNewAutoJoiner, AvailableArch> lmSbg_64{ NewAutoJoinerGetter<cmb::WrappedSbg<8, uint64_t>::type>{} };
+		
+		const auto archIdx = static_cast<std::ptrdiff_t>(selectedArch);
+
+		if (lmSearch)
+		{
+			size_t vocabTySize = langMdl.knlm->getHeader().key_size;
+			if (langMdl.sbg)
+			{
+				switch (vocabTySize)
+				{
+				case 1:
+					return (this->*lmSbg_8[archIdx])();
+				case 2:
+					return (this->*lmSbg_16[archIdx])();
+				case 4:
+					return (this->*lmSbg_32[archIdx])();
+				case 8:
+					return (this->*lmSbg_64[archIdx])();
+				default:
+					throw Exception{ "invalid `key_size`=" + to_string(vocabTySize)};
+				}
+			}
+			else
+			{
+				switch (vocabTySize)
+				{
+				case 1:
+					return (this->*lmKnLM_8[archIdx])();
+				case 2:
+					return (this->*lmKnLM_16[archIdx])();
+				case 4:
+					return (this->*lmKnLM_32[archIdx])();
+				case 8:
+					return (this->*lmKnLM_64[archIdx])();
+				default:
+					throw Exception{ "invalid `key_size`=" + to_string(vocabTySize) };
+				}
+			}
+		}
+		else
+		{
+			return (this->*lmVoid[archIdx])();
+		}
 	}
 }
