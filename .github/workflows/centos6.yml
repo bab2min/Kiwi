@@ -22,7 +22,7 @@ jobs:
       with:
         submodules: true
     - name: Pull LFS files
-      run: git lfs install && git lfs pull
+      run: git config --global --add safe.directory /__w/Kiwi/Kiwi && git lfs pull
     - name: Update CMake
       run: /opt/python/cp36-cp36m/bin/pip install cmake
     - name: Configure Build
