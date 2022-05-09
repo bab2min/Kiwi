@@ -157,6 +157,22 @@ namespace kiwi
 		}
 
 		template<class LmState>
+		void AutoJoiner::add(size_t morphemeId, Vector<Candidate<LmState>>& candidates)
+		{
+			auto& morph = kiwi->morphemes[morphemeId];
+			for (auto& cand : candidates)
+			{
+				cand.score += cand.lmState.next(kiwi->langMdl, morph.lmMorphemeId);
+				cand.joiner.add(morph.getForm(), morph.tag);
+			}
+			
+			sort(candidates.begin(), candidates.end(), [](const cmb::Candidate<LmState>& a, const cmb::Candidate<LmState>& b)
+			{
+				return a.score > b.score;
+			});
+		}
+
+		template<class LmState>
 		void AutoJoiner::add(U16StringView form, POSTag tag, bool inferRegularity, Vector<Candidate<LmState>>& candidates)
 		{
 			const Form* formHead;
@@ -271,6 +287,16 @@ namespace kiwi
 			candidates[0].joiner.add(form, tag);
 		}
 
+		template<ArchType arch>
+		void AutoJoiner::addWithoutSearch(size_t morphemeId, Vector<Candidate<VoidState<arch>>>& candidates)
+		{
+			auto& morph = kiwi->morphemes[morphemeId];
+			for (auto& cand : candidates)
+			{
+				cand.joiner.add(morph.getForm(), morph.tag);
+			}
+		}
+
 		struct AutoJoiner::AddVisitor
 		{
 			AutoJoiner* joiner;
@@ -296,6 +322,29 @@ namespace kiwi
 			}
 		};
 
+		struct AutoJoiner::AddVisitor2
+		{
+			AutoJoiner* joiner;
+			size_t morphemeId;
+
+			AddVisitor2(AutoJoiner* _joiner, size_t _morphemeId)
+				: joiner{ _joiner }, morphemeId{ _morphemeId }
+			{
+			}
+
+			template<ArchType arch>
+			void operator()(Vector<Candidate<VoidState<arch>>>& o) const
+			{
+				return joiner->addWithoutSearch(morphemeId, o);
+			}
+
+			template<class LmState>
+			void operator()(Vector<Candidate<LmState>>& o) const
+			{
+				return joiner->add(morphemeId, o);
+			}
+		};
+
 		struct GetU16Visitor
 		{
 			template<class LmState>
@@ -313,6 +362,11 @@ namespace kiwi
 				return o[0].joiner.getU8();
 			}
 		};
+
+		void AutoJoiner::add(size_t morphemeId)
+		{
+			return mapbox::util::apply_visitor(AddVisitor2{ this, morphemeId }, reinterpret_cast<CandVector&>(candBuf));
+		}
 
 		void AutoJoiner::add(const u16string& form, POSTag tag, bool inferRegularity)
 		{

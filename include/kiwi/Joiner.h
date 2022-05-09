@@ -71,6 +71,7 @@ namespace kiwi
 			friend class kiwi::Kiwi;
 
 			struct AddVisitor;
+			struct AddVisitor2;
 			const Kiwi* kiwi = nullptr;
 			union
 			{
@@ -81,7 +82,13 @@ namespace kiwi
 			explicit AutoJoiner(const Kiwi& kiwi, Candidate<LmState>&& state);
 
 			template<class LmState>
+			void add(size_t morphemeId, Vector<Candidate<LmState>>& candidates);
+
+			template<class LmState>
 			void add(U16StringView form, POSTag tag, bool inferRegularity, Vector<Candidate<LmState>>& candidates);
+
+			template<ArchType arch>
+			void addWithoutSearch(size_t morphemeId, Vector<Candidate<VoidState<arch>>>& candidates);
 
 			template<ArchType arch>
 			void addWithoutSearch(U16StringView form, POSTag tag, bool inferRegularity, Vector<Candidate<VoidState<arch>>>& candidates);
@@ -92,6 +99,7 @@ namespace kiwi
 			AutoJoiner& operator=(const AutoJoiner&);
 			AutoJoiner& operator=(AutoJoiner&&);
 
+			void add(size_t morphemeId);
 			void add(const std::u16string& form, POSTag tag, bool inferRegularity = true);
 			void add(const char16_t* form, POSTag tag, bool inferRegularity = true);
 

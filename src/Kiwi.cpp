@@ -43,7 +43,7 @@ namespace kiwi
 		);
 	};
 
-	using FnFindBestPath = decltype(&PathEvaluator::findBestPath<void>);
+	using FnFindBestPath = decltype(&PathEvaluator::findBestPath<KnLMState<ArchType::none, uint16_t>>);
 
 	template<template<ArchType> class LmState>
 	struct FindBestPathGetter
