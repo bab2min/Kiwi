@@ -37,7 +37,7 @@ namespace kiwi
 	class SbgState : KnLMState<_arch, VocabTy>
 	{
 		size_t historyPos = 0;
-		std::array<VocabTy, windowSize> history = { 0, };
+		std::array<VocabTy, windowSize> history = { {0,} };
 	public:
 		static constexpr ArchType arch = _arch;
 
