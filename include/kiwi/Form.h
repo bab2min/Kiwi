@@ -96,10 +96,10 @@ namespace kiwi
 		);
 
 		/**< 선행형태소의 자/모음 조건 */
-		constexpr CondVowel vowel() const { return static_cast<CondVowel>(vpPack & 0xF); }
+		CondVowel vowel() const { return static_cast<CondVowel>(vpPack & 0xF); }
 		
 		/**< 선행형태소의 모음조화 조건 */
-		constexpr CondPolarity polar() const { return static_cast<CondPolarity>(vpPack >> 4); }
+		CondPolarity polar() const { return static_cast<CondPolarity>(vpPack >> 4); }
 
 		void setVowel(CondVowel v)
 		{
