@@ -202,3 +202,37 @@ TEST(KiwiC, AddPreAnalyzedWord)
 	kiwi_close(kw);
 	kiwi_builder_close(kb);
 }
+
+TEST(KiwiC, Joiner)
+{
+	kiwi_h okw = reuse_kiwi_instance();
+	kiwi_joiner_h joiner;
+
+	joiner = kiwi_new_joiner(okw, 1);
+	EXPECT_EQ(kiwi_joiner_add(joiner, "시동", "NNG", 1), 0);
+	EXPECT_EQ(kiwi_joiner_add(joiner, "를", "JKO", 1), 0);
+	EXPECT_EQ(kiwi_joiner_get(joiner), std::string{ u8"시동을" });
+	EXPECT_EQ(kiwi_joiner_close(joiner), 0);
+
+	joiner = kiwi_new_joiner(okw, 1);
+	EXPECT_EQ(kiwi_joiner_add(joiner, "시도", "NNG", 1), 0);
+	EXPECT_EQ(kiwi_joiner_add(joiner, "를", "JKO", 1), 0);
+	EXPECT_EQ(kiwi_joiner_get(joiner), std::string{ u8"시도를" });
+	EXPECT_EQ(kiwi_joiner_close(joiner), 0);
+
+	joiner = kiwi_new_joiner(okw, 1);
+	EXPECT_EQ(kiwi_joiner_add(joiner, "길", "NNG", 1), 0);
+	EXPECT_EQ(kiwi_joiner_add(joiner, "을", "JKO", 1), 0);
+	EXPECT_EQ(kiwi_joiner_add(joiner, "걷", "VV", 1), 0);
+	EXPECT_EQ(kiwi_joiner_add(joiner, "어요", "EF", 1), 0);
+	EXPECT_EQ(kiwi_joiner_get(joiner), std::string{ u8"길을 걸어요" });
+	EXPECT_EQ(kiwi_joiner_close(joiner), 0);
+
+	joiner = kiwi_new_joiner(okw, 0);
+	EXPECT_EQ(kiwi_joiner_add(joiner, "길", "NNG", 1), 0);
+	EXPECT_EQ(kiwi_joiner_add(joiner, "을", "JKO", 1), 0);
+	EXPECT_EQ(kiwi_joiner_add(joiner, "걷", "VV", 1), 0);
+	EXPECT_EQ(kiwi_joiner_add(joiner, "어요", "EF", 1), 0);
+	EXPECT_EQ(kiwi_joiner_get(joiner), std::string{ u8"길을 걷어요" });
+	EXPECT_EQ(kiwi_joiner_close(joiner), 0);
+}
