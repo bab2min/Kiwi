@@ -2,8 +2,8 @@
  * @file capi.h
  * @author bab2min (bab2min@gmail.com)
  * @brief Kiwi C API를 담고 있는 헤더 파일
- * @version 0.11.2
- * @date 2022-04-13
+ * @version 0.12.0
+ * @date 2022-05-10
  * 
  * 
  */
