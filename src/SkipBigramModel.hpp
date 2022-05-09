@@ -103,13 +103,13 @@ namespace kiwi
 			switch (header.keySize)
 			{
 			case 1:
-				return make_unique<SkipBigramModel<ArchType::avx2, uint8_t>>(std::move(mem));
+				return make_unique<SkipBigramModel<ArchType::none, uint8_t>>(std::move(mem));
 			case 2:
-				return make_unique<SkipBigramModel<ArchType::avx2, uint16_t>>(std::move(mem));
+				return make_unique<SkipBigramModel<ArchType::none, uint16_t>>(std::move(mem));
 			case 4:
-				return make_unique<SkipBigramModel<ArchType::avx2, uint32_t>>(std::move(mem));
+				return make_unique<SkipBigramModel<ArchType::none, uint32_t>>(std::move(mem));
 			case 8:
-				return make_unique<SkipBigramModel<ArchType::avx2, uint64_t>>(std::move(mem));
+				return make_unique<SkipBigramModel<ArchType::none, uint64_t>>(std::move(mem));
 			default:
 				throw std::runtime_error{ "Unsupported `key_size` : " + std::to_string((size_t)header.keySize) };
 			}
