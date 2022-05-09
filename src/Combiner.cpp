@@ -741,10 +741,10 @@ inline ReplString parseReplString(KString&& str)
 				escape = true;
 				break;
 			case '(':
-				rightBegin = i;
+				rightBegin = target;
 				break;
 			case ')':
-				leftEnd = i;
+				leftEnd = target;
 				break;
 			case '-':
 				score = stof(str.begin() + i, str.end());
