@@ -15,7 +15,7 @@ jobs:
     - name: Install Git LFS
       run: |
         mkdir ../gitlfs && pushd ../gitlfs
-        curl -L https://github.com/git-lfs/git-lfs/releases/download/v2.13.2/git-lfs-linux-amd64-v2.13.2.tar.gz | tar -zxv
+        curl -L https://github.com/git-lfs/git-lfs/releases/download/v3.1.4/git-lfs-linux-amd64-v3.1.4.tar.gz | tar -zxv
         ./install.sh
         popd
     - uses: actions/checkout@v1
