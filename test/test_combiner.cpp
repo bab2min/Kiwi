@@ -60,14 +60,6 @@ TEST(KiwiCppCombiner, Joiner)
 	EXPECT_EQ(joiner.getU16(), u"했다");
 
 	joiner = rule.newJoiner();
-	joiner.add(u"나", POSTag::np);
-	joiner.add(u"가", POSTag::jks);
-	joiner.add(u"묻", POSTag::vvi);
-	joiner.add(u"었", POSTag::ep);
-	joiner.add(u"다", POSTag::ef);
-	EXPECT_EQ(joiner.getU16(), u"내가 물었다");
-
-	joiner = rule.newJoiner();
 	joiner.add(u"하", POSTag::vv);
 	joiner.add(u"시", POSTag::ep);
 	joiner.add(u"었", POSTag::ep);
@@ -180,4 +172,19 @@ TEST(KiwiCppCombiner, Allomorph)
 	joiner.add(u"날", POSTag::vv);
 	joiner.add(u"어", POSTag::ef);
 	EXPECT_EQ(joiner.getU16(), u"날아");
+
+	joiner = rule.newJoiner();
+	joiner.add(u"나", POSTag::np);
+	joiner.add(u"가", POSTag::jks);
+	joiner.add(u"묻", POSTag::vvi);
+	joiner.add(u"었", POSTag::ep);
+	joiner.add(u"다", POSTag::ef);
+	EXPECT_EQ(joiner.getU16(), u"내가 물었다");
+
+	joiner = rule.newJoiner();
+	joiner.add(u"되", POSTag::vv);
+	joiner.add(u"어", POSTag::ec);
+	joiner.add(u"지", POSTag::vx);
+	joiner.add(u"다", POSTag::ef);
+	EXPECT_EQ(joiner.getU16(), u"돼지다");
 }

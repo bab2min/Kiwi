@@ -14,13 +14,16 @@ namespace kiwi
 		Joiner& Joiner::operator=(const Joiner&) = default;
 		Joiner& Joiner::operator=(Joiner&&) = default;
 
-		inline bool isSpaceInsertable(POSTag l, POSTag r)
+		inline bool isSpaceInsertable(POSTag l, POSTag r, U16StringView rform)
 		{
 			if (r == POSTag::vcp || r == POSTag::xsa || r == POSTag::xsai || r == POSTag::xsv || r == POSTag::xsn) return false;
 			if (l == POSTag::xpn || l == POSTag::so || l == POSTag::ss || l == POSTag::sw) return false;
 			if (l == POSTag::sn && r == POSTag::nnb) return false;
 			if (!(l == POSTag::sn || l == POSTag::sp || l == POSTag::sf || l == POSTag::sl)
 				&& (r == POSTag::sl || r == POSTag::sn)) return true;
+
+			if (r == POSTag::vx && rform.size() == 1 && (rform[0] == u'하' || rform[0] == u'지')) return false;
+
 			switch (r)
 			{
 			case POSTag::nng:
@@ -58,7 +61,7 @@ namespace kiwi
 				return;
 			}
 
-			if (isSpaceInsertable(clearIrregular(lastTag), clearIrregular(tag)))
+			if (isSpaceInsertable(clearIrregular(lastTag), clearIrregular(tag), form))
 			{
 				stack.push_back(u' ');
 				activeStart = stack.size();
