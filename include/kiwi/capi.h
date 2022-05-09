@@ -29,6 +29,7 @@ typedef struct kiwi_builder* kiwi_builder_h;
 typedef struct kiwi_res* kiwi_res_h;
 typedef struct kiwi_ws* kiwi_ws_h;
 typedef struct kiwi_ss* kiwi_ss_h;
+typedef struct kiwi_joiner* kiwi_joiner_h;
 typedef unsigned short kchar16_t;
 
 /*
@@ -425,12 +426,20 @@ DECL_DLL kiwi_ss_h kiwi_split_into_sents_w(kiwi_h handle, const kchar16_t* text,
  * @param match_options KIWI_MATCH_ALL 등 KIWI_MATCH_* 열거형 참고.
  * @param tokenized_res (선택사항) 형태소 분석 결과를 받으려는 경우 kiwi_res_h 값을 받을 포인터를 넘겨주세요. 
  *              null을 입력시 형태소 분석 결과는 내부적으로 사용된 뒤 버려집니다.
- * @return 문장 분할 결과의 핸들. kiwi_ss_* 함수를 통해 값에 접근가능합니다.  이 핸들은 사용 후 kiwi_ss_close를 사용해 반드시 해제되어야 합니다.
+ * @return 문장 분할 결과의 핸들. kiwi_ss_* 함수를 통해 값에 접근가능합니다.  이 핸들은 사용 후 kiwi_ss_close를 통해 반드시 해제되어야 합니다.
  * 
  * @see kiwi_split_into_sents_w
  */
 DECL_DLL kiwi_ss_h kiwi_split_into_sents(kiwi_h handle, const char* text, int match_options, kiwi_res_h* tokenized_res);
 
+/**
+ * @brief 형태소를 결합하여 텍스트로 만들어주는 Joiner를 새로 생성합니다.
+ *
+ * @param handle Kiwi.
+ * @param lm_search True일 경우 언어 모델 탐색을 사용하여 최적의 품사를 선택합니다.
+ * @return 새 Joiner의 핸들. kiwi_joiner_* 함수에 사용가능합니다. 이 핸들은 사용 후 kiwi_joiner_close를 통해 반드시 해제되어야 합니다.
+ */
+DECL_DLL kiwi_joiner_h kiwi_new_joiner(kiwi_h handle, int lm_search);
 
 /**
  * @brief 사용이 완료된 Kiwi객체를 삭제합니다.
@@ -655,6 +664,43 @@ DECL_DLL int kiwi_ss_end_position(kiwi_ss_h result, int index);
  * @note kiwi_split_into_sents 계열 함수에서 반환된 kiwi_ss_h는 반드시 이 함수로 해제되어야 합니다.
  */
 DECL_DLL int kiwi_ss_close(kiwi_ss_h result);
+
+/**
+ * @brief Joiner에 새 형태소를 삽입합니다.
+ *
+ * @param handle Joiner 객체의 핸들
+ * @param form 삽입할 형태소의 형태
+ * @param tag 삽입할 형태소의 품사 태그
+ * @param option 1이면 불규칙 활용여부를 자동으로 탐색합니다. 0인 경우 tag로 입력한 불규칙 활용여부를 그대로 사용합니다.
+ * @return 성공시 0을 반환합니다. 실패시 0이 아닌 값을 반환합니다.
+ */
+DECL_DLL int kiwi_joiner_add(kiwi_joiner_h handle, const char* form, const char* tag, int option);
+
+/**
+ * @brief Joiner에 삽입된 형태소들을 텍스트로 결합하여 반환합니다.
+ *
+ * @param handle Joiner 객체의 핸들
+ * @return 성공시 UTF-8로 인코딩된 텍스트의 포인터를 반환합니다. 실패시 null을 반환합니다.
+ */
+DECL_DLL const char* kiwi_joiner_get(kiwi_joiner_h handle);
+
+/**
+ * @brief Joiner에 삽입된 형태소들을 텍스트로 결합하여 반환합니다.
+ *
+ * @param handle Joiner 객체의 핸들
+ * @return 성공시 UTF-16로 인코딩된 텍스트의 포인터를 반환합니다. 실패시 null을 반환합니다.
+ */
+DECL_DLL const kchar16_t* kiwi_joiner_get_w(kiwi_joiner_h handle);
+
+/**
+ * @brief 사용이 완료된 Joiner 객체를 삭제합니다.
+ *
+ * @param handle 삭제할 Joiner 객체의 핸들
+ * @return 성공시 0을 반환합니다. 실패시 0이 아닌 값을 반환합니다.
+ * 
+ * @note kiwi_new_joiner 함수에서 반환된 kiwi_joiner_h는 반드시 이 함수로 해제되어야 합니다.
+ */
+DECL_DLL int kiwi_joiner_close(kiwi_joiner_h handle);
 
 #ifdef __cplusplus  
 }
