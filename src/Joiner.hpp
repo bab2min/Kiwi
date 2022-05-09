@@ -33,18 +33,6 @@ namespace kiwi
 			};
 		}
 
-		template<class VocabTy>
-		struct WrappedKnLM
-		{
-			template<ArchType arch> using type = KnLMState<arch, VocabTy>;
-		};
-
-		template<size_t windowSize, class VocabTy>
-		struct WrappedSbg
-		{
-			template<ArchType arch> using type = SbgState<windowSize, arch, VocabTy>;
-		};
-
 		using CandTypeTuple = typename detail::VCUnpack<AvailableArch,
 			VoidState, 
 			WrappedKnLM<uint8_t>::type, WrappedKnLM<uint16_t>::type, WrappedKnLM<uint32_t>::type, WrappedKnLM<uint64_t>::type,

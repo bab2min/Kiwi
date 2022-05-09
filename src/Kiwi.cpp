@@ -33,25 +33,25 @@ namespace kiwi
 		};
 		using Path = Vector<Result>;
 
-		template<ArchType arch, class LmType>
+		template<class LmState>
 		static Vector<std::pair<Path, float>> findBestPath(const Kiwi* kw, const Vector<KGraphNode>& graph, size_t topN);
 
-		template<ArchType arch, class LmType, class CandTy, class CacheTy>
+		template<class LmState, class CandTy, class CacheTy>
 		static float evalPath(const Kiwi* kw, const KGraphNode* startNode, const KGraphNode* node,
 			CacheTy& cache, Vector<KString>& ownFormList,
 			size_t i, size_t ownFormId, CandTy&& cands, bool unknownForm
 		);
 	};
 
-	using FnFindBestPath = decltype(&PathEvaluator::findBestPath<ArchType::default_, uint8_t>);
+	using FnFindBestPath = decltype(&PathEvaluator::findBestPath<void>);
 
-	template<class IntTy>
+	template<template<ArchType> class LmState>
 	struct FindBestPathGetter
 	{
 		template<std::ptrdiff_t i>
 		struct Wrapper
 		{
-			static constexpr FnFindBestPath value = &PathEvaluator::findBestPath<static_cast<ArchType>(i), IntTy>;
+			static constexpr FnFindBestPath value = &PathEvaluator::findBestPath<LmState<static_cast<ArchType>(i)>>;
 		};
 	};
 
@@ -60,27 +60,54 @@ namespace kiwi
 		selectedArch = arch;
 		dfSplitByTrie = (void*)getSplitByTrieFn(selectedArch);
 
-		static tp::Table<FnFindBestPath, AvailableArch> tableFindBestPath_8{ FindBestPathGetter<uint8_t>{} };
-		static tp::Table<FnFindBestPath, AvailableArch> tableFindBestPath_16{ FindBestPathGetter<uint16_t>{} };
-		static tp::Table<FnFindBestPath, AvailableArch> tableFindBestPath_32{ FindBestPathGetter<uint32_t>{} };
-		static tp::Table<FnFindBestPath, AvailableArch> tableFindBestPath_64{ FindBestPathGetter<uint64_t>{} };
+		static tp::Table<FnFindBestPath, AvailableArch> lmKnLM_8{ FindBestPathGetter<WrappedKnLM<uint8_t>::type>{} };
+		static tp::Table<FnFindBestPath, AvailableArch> lmKnLM_16{ FindBestPathGetter<WrappedKnLM<uint16_t>::type>{} };
+		static tp::Table<FnFindBestPath, AvailableArch> lmKnLM_32{ FindBestPathGetter<WrappedKnLM<uint32_t>::type>{} };
+		static tp::Table<FnFindBestPath, AvailableArch> lmKnLM_64{ FindBestPathGetter<WrappedKnLM<uint64_t>::type>{} };
+		static tp::Table<FnFindBestPath, AvailableArch> lmSbg_8{ FindBestPathGetter<WrappedSbg<8, uint8_t>::type>{} };
+		static tp::Table<FnFindBestPath, AvailableArch> lmSbg_16{ FindBestPathGetter<WrappedSbg<8, uint16_t>::type>{} };
+		static tp::Table<FnFindBestPath, AvailableArch> lmSbg_32{ FindBestPathGetter<WrappedSbg<8, uint32_t>::type>{} };
+		static tp::Table<FnFindBestPath, AvailableArch> lmSbg_64{ FindBestPathGetter<WrappedSbg<8, uint64_t>::type>{} };
 
-		switch (lmKeySize)
+		if (langMdl.sbg)
 		{
-		case 1:
-			dfFindBestPath = (void*)tableFindBestPath_8[static_cast<std::ptrdiff_t>(selectedArch)];
-			break;
-		case 2:
-			dfFindBestPath = (void*)tableFindBestPath_16[static_cast<std::ptrdiff_t>(selectedArch)];
-			break;
-		case 4:
-			dfFindBestPath = (void*)tableFindBestPath_32[static_cast<std::ptrdiff_t>(selectedArch)];
-			break;
-		case 8:
-			dfFindBestPath = (void*)tableFindBestPath_64[static_cast<std::ptrdiff_t>(selectedArch)];
-			break;
-		default:
-			throw Exception{ "Wrong `lmKeySize`" };
+			switch (lmKeySize)
+			{
+			case 1:
+				dfFindBestPath = (void*)lmSbg_8[static_cast<std::ptrdiff_t>(selectedArch)];
+				break;
+			case 2:
+				dfFindBestPath = (void*)lmSbg_16[static_cast<std::ptrdiff_t>(selectedArch)];
+				break;
+			case 4:
+				dfFindBestPath = (void*)lmSbg_32[static_cast<std::ptrdiff_t>(selectedArch)];
+				break;
+			case 8:
+				dfFindBestPath = (void*)lmSbg_64[static_cast<std::ptrdiff_t>(selectedArch)];
+				break;
+			default:
+				throw Exception{ "Wrong `lmKeySize`" };
+			}
+		}
+		else
+		{
+			switch (lmKeySize)
+			{
+			case 1:
+				dfFindBestPath = (void*)lmKnLM_8[static_cast<std::ptrdiff_t>(selectedArch)];
+				break;
+			case 2:
+				dfFindBestPath = (void*)lmKnLM_16[static_cast<std::ptrdiff_t>(selectedArch)];
+				break;
+			case 4:
+				dfFindBestPath = (void*)lmKnLM_32[static_cast<std::ptrdiff_t>(selectedArch)];
+				break;
+			case 8:
+				dfFindBestPath = (void*)lmKnLM_64[static_cast<std::ptrdiff_t>(selectedArch)];
+				break;
+			default:
+				throw Exception{ "Wrong `lmKeySize`" };
+			}
 		}
 	}
 
@@ -384,36 +411,36 @@ namespace kiwi
 		{}
 	};
 
-	struct WordLL;
 	using MInfos = Vector<MInfo>;
-	using WordLLs = Vector<WordLL>;
 
+	template<class LmState>
 	struct WordLL
 	{
 		MInfos morphs;
 		float accScore = 0;
-		ptrdiff_t node = 0;
 		const WordLL* parent = nullptr;
+		LmState lmState;
 
 		WordLL() = default;
 
-		WordLL(const MInfos& _morphs, float _accScore, ptrdiff_t _node, const WordLL* _parent)
-			: morphs{ _morphs }, accScore{ _accScore }, node{ _node }, parent{ _parent }
+		WordLL(const MInfos& _morphs, float _accScore, const WordLL* _parent, LmState _lmState)
+			: morphs{ _morphs }, accScore{ _accScore }, parent{ _parent }, lmState{ _lmState }
 		{
 		}
 	};
 
+	template<class LmState>
 	struct WordLLP
 	{
 		const MInfos* morphs = nullptr;
 		float accScore = 0;
-		ptrdiff_t node = 0;
-		const WordLL* parent = nullptr;
+		const WordLL<LmState>* parent = nullptr;
+		LmState lmState;
 
 		WordLLP() = default;
 
-		WordLLP(const MInfos* _morphs, float _accScore, ptrdiff_t _node, const WordLL* _parent)
-			: morphs{ _morphs }, accScore{ _accScore }, node{ _node }, parent{ _parent }
+		WordLLP(const MInfos* _morphs, float _accScore, const WordLL<LmState>* _parent, LmState _lmState)
+			: morphs{ _morphs }, accScore{ _accScore }, parent{ _parent }, lmState{ _lmState }
 		{
 		}
 	};
@@ -434,12 +461,21 @@ namespace kiwi
 		return v[std::min(nth, v.size() - 1)];
 	}
 
-	template<ArchType arch, class LmType, class _Type>
-	void evalTrigram(const lm::KnLangModel<arch, LmType>* knlm, const sb::SkipBigramModel<arch, LmType>* sbg, const Morpheme* morphBase, const Vector<KString>& ownForms, const Vector<WordLLs>& cache,
-		array<Wid, 4> seq, size_t chSize, const Morpheme* curMorph, const KGraphNode* node, const KGraphNode* startNode, _Type& maxWidLL, float ignoreCondScore)
+	template<class LmState, class _Type>
+	void evalTrigram(const LangModel& langMdl, 
+		const Morpheme* morphBase, 
+		const Vector<KString>& ownForms, 
+		const Vector<Vector<WordLL<LmState>>>& cache,
+		array<Wid, 4> seq, 
+		size_t chSize, 
+		const Morpheme* curMorph, 
+		const KGraphNode* node, 
+		const KGraphNode* startNode, 
+		_Type& maxWidLL, 
+		float ignoreCondScore
+	)
 	{
-		array<LmType, 12> history;
-		size_t vocabSize = knlm->getHeader().vocab_size;
+		size_t vocabSize = langMdl.knlm->getHeader().vocab_size;
 		for (size_t i = 0; i < KGraphNode::max_prev; ++i)
 		{
 			auto* prev = node->getPrev(i);
@@ -469,7 +505,7 @@ namespace kiwi
 					if (!FeatureTestor::isMatched(leftForm, curMorph->vowel, curMorph->polar)) continue;
 				}
 
-				auto cNode = p.node;
+				auto cLmState = p.lmState;
 				Wid lSeq = 0;
 				if (curMorph->combineSocket && curMorph->chunks.empty())
 				{
@@ -477,97 +513,24 @@ namespace kiwi
 				}
 				else
 				{
-					if (sbg)
+					lSeq = seq[chSize - 1];
+					for (size_t i = 0; i < chSize; ++i)
 					{
-						if (1) // skip empty words
+						if (morphBase[seq[i]].tag == POSTag::p)
 						{
-							size_t h = 0;
-							array<size_t, 4> seqSPos = { 0, };
-							for (size_t i = chSize - 1; i > (wids->back().combineSocket ? 1 : 0); --i)
-							{
-								if(sbg->isValidVocab(seq[i - 1])) history[h++] = seq[i - 1];
-								seqSPos[i - 1] = h;
-							}
-							if (wids->back().combineSocket)
-							{
-								seqSPos[0] = sbg->isValidVocab(seq[0]) ? 1 : 0;
-							}
-
-							for (size_t i = wids->size(); i > 0 && h < history.size(); --i)
-							{
-								size_t mid = morphBase[(*wids)[i - 1].wid].getCombined()->lmMorphemeId;
-								if (sbg->isValidVocab(mid)) history[h++] = mid;
-							}
-							lSeq = seq[chSize - 1];
-							for (size_t i = 0; i < chSize; ++i)
-							{
-								if (morphBase[seq[i]].tag == POSTag::p)
-								{
-									// prohibit <v> without <chunk>
-									goto continueFor;
-								}
-								float ll = knlm->progress(cNode, seq[i]);
-								if (ll > -13)
-								{
-									size_t s = seqSPos[i];
-									size_t e = std::min(s + sbg->getHeader().windowSize, h);
-									ll = sbg->evaluate(&history[s], e - s, seq[i], ll);
-								}
-								/*else
-								{
-									size_t bf = i ? seq[i - 1] : wids->back().wid;
-									cout << utf16To8(joinHangul(*morphBase[bf].kform)) << '/' << tagToString(morphBase[bf].tag)
-										<< ' ' << utf16To8(joinHangul(*morphBase[seq[i]].kform)) << '/' << tagToString(morphBase[seq[i]].tag) << endl;
-								}*/
-								candScore += ll;
-							}
+							// prohibit <v> without <chunk>
+							goto continueFor;
 						}
-						else
-						{
-							size_t historySize = std::min(wids->size() - 1, (size_t)sbg->getHeader().windowSize);
-							size_t h = 0;
-
-							for (size_t i = wids->size() - historySize; i < wids->size(); ++i, ++h)
-							{
-								history[h] = morphBase[(*wids)[i].wid].getCombined()->lmMorphemeId;
-							}
-							for (size_t i = (wids->back().combineSocket ? 1 : 0); i < seq.size(); ++i, ++h)
-							{
-								history[h] = seq[i];
-							}
-
-							lSeq = seq[chSize - 1];
-							for (size_t i = 0; i < chSize; ++i)
-							{
-								if (morphBase[seq[i]].tag == POSTag::p)
-								{
-									// prohibit <v> without <chunk>
-									goto continueFor;
-								}
-								float ll = knlm->progress(cNode, seq[i]);
-								size_t e = (historySize + i == 0) ? 0 : (historySize + i - 1);
-								size_t s = std::max(e, (size_t)sbg->getHeader().windowSize) - sbg->getHeader().windowSize;
-								ll = sbg->evaluate(&history[s], e - s, seq[i], ll);
-								candScore += ll;
-							}
-						}
-					}
-					else
-					{
-						lSeq = seq[chSize - 1];
-						for (size_t i = 0; i < chSize; ++i)
-						{
-							if (morphBase[seq[i]].tag == POSTag::p)
-							{
-								// prohibit <v> without <chunk>
-								goto continueFor;
-							}
-							float ll = knlm->progress(cNode, seq[i]);
-							candScore += ll;
-						}
+						float ll = cLmState.next(langMdl, seq[i]);
+						candScore += ll;
 					}
 				}
-				emplaceMaxCnt(maxWidLL, lSeq, WordLLP{ wids, candScore, cNode, &p }, 3, [](const WordLLP& a, const WordLLP& b) { return a.accScore > b.accScore; });
+				emplaceMaxCnt(maxWidLL, lSeq, WordLLP<LmState>{ wids, candScore, &p, move(cLmState) }, 3, 
+					[](const WordLLP<LmState>& a, const WordLLP<LmState>& b) 
+					{ 
+						return a.accScore > b.accScore; 
+					}
+				);
 			continueFor:;
 			}
 		}
@@ -595,15 +558,19 @@ namespace kiwi
 		return false;
 	}
 
-	template<ArchType arch, class LmType, class CandTy, class CacheTy>
-	float PathEvaluator::evalPath(const Kiwi* kw, const KGraphNode* startNode, const KGraphNode* node,
-		CacheTy& cache, Vector<KString>& ownFormList,
-		size_t i, size_t ownFormId, CandTy&& cands, bool unknownForm
+	template<class LmState, class CandTy, class CacheTy>
+	float PathEvaluator::evalPath(const Kiwi* kw, 
+		const KGraphNode* startNode, 
+		const KGraphNode* node,
+		CacheTy& cache, 
+		Vector<KString>& ownFormList,
+		size_t i, 
+		size_t ownFormId, 
+		CandTy&& cands, 
+		bool unknownForm
 	)
 	{
-		auto lm = static_cast<const lm::KnLangModel<arch, LmType>*>(kw->langMdl.knlm.get());
-		auto sbg = static_cast<const sb::SkipBigramModel<arch, LmType>*>(kw->langMdl.sbg.get());
-		const size_t langVocabSize = lm->getHeader().vocab_size;
+		const size_t langVocabSize = kw->langMdl.knlm->getHeader().vocab_size;;
 		auto& nCache = cache[i];
 
 		float whitespaceDiscount = 0;
@@ -658,8 +625,8 @@ namespace kiwi
 				condV = curMorph->vowel;
 				condP = curMorph->polar;
 
-				UnorderedMap<Wid, Vector<WordLLP>> maxWidLL;
-				evalTrigram(lm, sbg, kw->morphemes.data(), ownFormList, cache, seq, chSize, curMorph, node, startNode, maxWidLL, ignoreCond ? -10 : 0);
+				UnorderedMap<Wid, Vector<WordLLP<LmState>>> maxWidLL;
+				evalTrigram(kw->langMdl, kw->morphemes.data(), ownFormList, cache, seq, chSize, curMorph, node, startNode, maxWidLL, ignoreCond ? -10 : 0);
 				if (maxWidLL.empty()) continue;
 
 				float estimatedLL = curMorph->userScore + whitespaceDiscount;
@@ -694,7 +661,7 @@ namespace kiwi
 					for (auto& q : p.second)
 					{
 						if (q.accScore <= tMax - kw->cutOffThreshold) continue;
-						nCache.emplace_back(WordLL{ MInfos{}, q.accScore, q.node, q.parent });
+						nCache.emplace_back(MInfos{}, q.accScore, q.parent, q.lmState);
 						auto& wids = nCache.back().morphs;
 						wids.reserve(q.morphs->size() + chSize);
 						wids = *q.morphs;
@@ -739,7 +706,8 @@ namespace kiwi
 		return tMax;
 	}
 
-	inline void fillWordScores(const WordLL* result, PathEvaluator::Result* out)
+	template<class LmState>
+	inline void fillWordScores(const WordLL<LmState>* result, PathEvaluator::Result* out)
 	{
 		for (;result->parent; result = result->parent)
 		{
@@ -757,16 +725,16 @@ namespace kiwi
 		}
 	}
 
-	template<ArchType arch, class LmType>
+	template<class LmState>
 	Vector<pair<PathEvaluator::Path, float>> PathEvaluator::findBestPath(const Kiwi* kw, const Vector<KGraphNode>& graph, size_t topN)
 	{
-		Vector<WordLLs> cache(graph.size());
+		static constexpr size_t eosId = 1;
+
+		Vector<Vector<WordLL<LmState>>> cache(graph.size());
 		Vector<KString> ownFormList;
 		Vector<const Morpheme*> unknownNodeCands, unknownNodeLCands;
 
-		auto lm = static_cast<const lm::KnLangModel<arch, LmType>*>(kw->langMdl.knlm.get());
-
-		size_t langVocabSize = lm->getHeader().vocab_size;
+		const size_t langVocabSize = kw->langMdl.knlm->getHeader().vocab_size;
 
 		const KGraphNode* startNode = &graph.front();
 		const KGraphNode* endNode = &graph.back();
@@ -776,8 +744,7 @@ namespace kiwi
 		unknownNodeLCands.emplace_back(kw->getDefaultMorpheme(POSTag::nnp));
 
 		// start node
-		ptrdiff_t bosNode = lm->getBosNodeIdx();
-		cache.front().emplace_back(WordLL{ MInfos{ MInfo(0u) }, 0.f, bosNode, nullptr });
+		cache.front().emplace_back(MInfos{ MInfo(0u) }, 0.f, nullptr, LmState{ kw->langMdl });
 
 		// middle nodes
 		for (size_t i = 1; i < graph.size() - 1; ++i)
@@ -793,7 +760,7 @@ namespace kiwi
 
 			if (node->form)
 			{
-				tMax = evalPath<arch, LmType>(kw, startNode, node, cache, ownFormList, i, ownFormId, node->form->candidate, false);
+				tMax = evalPath<LmState>(kw, startNode, node, cache, ownFormList, i, ownFormId, node->form->candidate, false);
 				if (all_of(node->form->candidate.begin(), node->form->candidate.end(), [](const Morpheme* m)
 				{
 					return m->combineSocket || !m->chunks.empty();
@@ -801,31 +768,31 @@ namespace kiwi
 				{
 					ownFormList.emplace_back(node->form->form);
 					ownFormId = ownFormList.size();
-					tMax = min(tMax, evalPath<arch, LmType>(kw, startNode, node, cache, ownFormList, i, ownFormId, unknownNodeLCands, true));
+					tMax = min(tMax, evalPath<LmState>(kw, startNode, node, cache, ownFormList, i, ownFormId, unknownNodeLCands, true));
 				};
 			}
 			else
 			{
-				tMax = evalPath<arch, LmType>(kw, startNode, node, cache, ownFormList, i, ownFormId, unknownNodeCands, true);
+				tMax = evalPath<LmState>(kw, startNode, node, cache, ownFormList, i, ownFormId, unknownNodeCands, true);
 			}
 
-			// heuristically remove cands with lower ll to speed up
+			// heuristically remove cands having lower ll to speed up
 			if (cache[i].size() > topN)
 			{
-				WordLLs reduced;
-				float combinedCutOffScore = findNthLargest(cache[i].begin(), cache[i].end(), topN, [](const WordLL& c)
+				Vector<WordLL<LmState>> reduced;
+				float combinedCutOffScore = findNthLargest(cache[i].begin(), cache[i].end(), topN, [](const WordLL<LmState>& c)
 				{
 					return c.accScore;
-				}, [](const WordLL& c)
+				}, [](const WordLL<LmState>& c)
 				{
 					if (c.morphs.empty()) return false;
 					return !!c.morphs.back().combineSocket;
 				});
 
-				float otherCutOffScore = findNthLargest(cache[i].begin(), cache[i].end(), topN, [](const WordLL& c)
+				float otherCutOffScore = findNthLargest(cache[i].begin(), cache[i].end(), topN, [](const WordLL<LmState>& c)
 				{
 					return c.accScore;
-				}, [](const WordLL& c)
+				}, [](const WordLL<LmState>& c)
 				{
 					if (c.morphs.empty()) return true;
 					return !c.morphs.back().combineSocket;
@@ -866,13 +833,18 @@ namespace kiwi
 				if (p.morphs.back().combineSocket) continue;
 				if (!FeatureTestor::isMatched(nullptr, p.morphs.back().condVowel)) continue;
 
-				float c = p.accScore + lm->progress(p.node, 1);
-				cache.back().emplace_back(WordLL{ p.morphs, c, 0, &p });
+				float c = p.accScore + p.lmState.next(kw->langMdl, eosId);
+				cache.back().emplace_back(p.morphs, c, &p, p.lmState);
 			}
 		}
 
 		auto& cand = cache.back();
-		sort(cand.begin(), cand.end(), [](const WordLL& a, const WordLL& b) { return a.accScore > b.accScore; });
+		sort(cand.begin(), cand.end(), 
+			[](const WordLL<LmState>& a, const WordLL<LmState>& b) 
+			{ 
+				return a.accScore > b.accScore; 
+			}
+		);
 
 #ifdef DEBUG_PRINT
 		cout << "== LAST ==" << endl;
@@ -1109,14 +1081,14 @@ namespace kiwi
 	cmb::AutoJoiner Kiwi::newJoiner(bool lmSearch) const
 	{
 		static tp::Table<FnNewAutoJoiner, AvailableArch> lmVoid{ NewAutoJoinerGetter<VoidState>{} };
-		static tp::Table<FnNewAutoJoiner, AvailableArch> lmKnLM_8{ NewAutoJoinerGetter<cmb::WrappedKnLM<uint8_t>::type>{} };
-		static tp::Table<FnNewAutoJoiner, AvailableArch> lmKnLM_16{ NewAutoJoinerGetter<cmb::WrappedKnLM<uint16_t>::type>{} };
-		static tp::Table<FnNewAutoJoiner, AvailableArch> lmKnLM_32{ NewAutoJoinerGetter<cmb::WrappedKnLM<uint32_t>::type>{} };
-		static tp::Table<FnNewAutoJoiner, AvailableArch> lmKnLM_64{ NewAutoJoinerGetter<cmb::WrappedKnLM<uint64_t>::type>{} };
-		static tp::Table<FnNewAutoJoiner, AvailableArch> lmSbg_8{ NewAutoJoinerGetter<cmb::WrappedSbg<8, uint8_t>::type>{} };
-		static tp::Table<FnNewAutoJoiner, AvailableArch> lmSbg_16{ NewAutoJoinerGetter<cmb::WrappedSbg<8, uint16_t>::type>{} };
-		static tp::Table<FnNewAutoJoiner, AvailableArch> lmSbg_32{ NewAutoJoinerGetter<cmb::WrappedSbg<8, uint32_t>::type>{} };
-		static tp::Table<FnNewAutoJoiner, AvailableArch> lmSbg_64{ NewAutoJoinerGetter<cmb::WrappedSbg<8, uint64_t>::type>{} };
+		static tp::Table<FnNewAutoJoiner, AvailableArch> lmKnLM_8{ NewAutoJoinerGetter<WrappedKnLM<uint8_t>::type>{} };
+		static tp::Table<FnNewAutoJoiner, AvailableArch> lmKnLM_16{ NewAutoJoinerGetter<WrappedKnLM<uint16_t>::type>{} };
+		static tp::Table<FnNewAutoJoiner, AvailableArch> lmKnLM_32{ NewAutoJoinerGetter<WrappedKnLM<uint32_t>::type>{} };
+		static tp::Table<FnNewAutoJoiner, AvailableArch> lmKnLM_64{ NewAutoJoinerGetter<WrappedKnLM<uint64_t>::type>{} };
+		static tp::Table<FnNewAutoJoiner, AvailableArch> lmSbg_8{ NewAutoJoinerGetter<WrappedSbg<8, uint8_t>::type>{} };
+		static tp::Table<FnNewAutoJoiner, AvailableArch> lmSbg_16{ NewAutoJoinerGetter<WrappedSbg<8, uint16_t>::type>{} };
+		static tp::Table<FnNewAutoJoiner, AvailableArch> lmSbg_32{ NewAutoJoinerGetter<WrappedSbg<8, uint32_t>::type>{} };
+		static tp::Table<FnNewAutoJoiner, AvailableArch> lmSbg_64{ NewAutoJoinerGetter<WrappedSbg<8, uint64_t>::type>{} };
 		
 		const auto archIdx = static_cast<std::ptrdiff_t>(selectedArch);
 

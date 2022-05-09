@@ -12,6 +12,9 @@ namespace kiwi
 	{
 	public:
 		static constexpr ArchType arch = _arch;
+
+		VoidState() = default;
+		VoidState(const LangModel& lm) {}
 	};
 
 	template<ArchType _arch, class VocabTy>
@@ -20,6 +23,10 @@ namespace kiwi
 		ptrdiff_t node = 0;
 	public:
 		static constexpr ArchType arch = _arch;
+
+		KnLMState() = default;
+		KnLMState(const LangModel& lm) : node{ static_cast<const lm::KnLangModel<arch, VocabTy>&>(*lm.knlm).getBosNodeIdx() } {}
+
 		float next(const LangModel& lm, VocabTy next)
 		{
 			return static_cast<const lm::KnLangModel<arch, VocabTy>&>(*lm.knlm).progress(node, next);
@@ -33,6 +40,10 @@ namespace kiwi
 		std::array<VocabTy, windowSize> history = { 0, };
 	public:
 		static constexpr ArchType arch = _arch;
+
+		SbgState() = default;
+		SbgState(const LangModel& lm) : KnLMState<_arch, VocabTy>{ lm } {}
+
 		float next(const LangModel& lm, VocabTy next)
 		{
 			auto& sbg = static_cast<const sb::SkipBigramModel<arch, VocabTy>&>(*lm.sbg);
@@ -49,4 +60,18 @@ namespace kiwi
 			return ll;
 		}
 	};
+
+
+	template<class VocabTy>
+	struct WrappedKnLM
+	{
+		template<ArchType arch> using type = KnLMState<arch, VocabTy>;
+	};
+
+	template<size_t windowSize, class VocabTy>
+	struct WrappedSbg
+	{
+		template<ArchType arch> using type = SbgState<windowSize, arch, VocabTy>;
+	};
+
 }

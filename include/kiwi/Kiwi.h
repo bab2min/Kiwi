@@ -25,6 +25,7 @@
 #include "ThreadPool.h"
 #include "WordDetector.h"
 #include "TagUtils.h"
+#include "LmState.h"
 #include "Joiner.h"
 
 namespace kiwi
@@ -38,12 +39,6 @@ namespace kiwi
 
 	template<class Ty> class RaggedVector;
 	////
-
-	struct LangModel
-	{
-		std::shared_ptr<lm::KnLangModelBase> knlm;
-		std::shared_ptr<sb::SkipBigramModelBase> sbg;
-	};
 
 	inline uint32_t getDefaultMorphemeId(POSTag tag)
 	{
@@ -85,7 +80,7 @@ namespace kiwi
 		template<class LmState>
 		cmb::AutoJoiner newJoinerImpl() const
 		{
-			return cmb::AutoJoiner{ *this, cmb::Candidate<LmState>{ *combiningRule } };
+			return cmb::AutoJoiner{ *this, cmb::Candidate<LmState>{ *combiningRule, langMdl } };
 		}
 
 		ArchType selectedArch = ArchType::none;

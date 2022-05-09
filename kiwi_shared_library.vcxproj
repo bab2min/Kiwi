@@ -35,6 +35,7 @@
     <ClInclude Include="include\kiwi\Joiner.h" />
     <ClInclude Include="include\kiwi\Kiwi.h" />
     <ClInclude Include="include\kiwi\Knlm.h" />
+    <ClInclude Include="include\kiwi\LmState.h" />
     <ClInclude Include="include\kiwi\Macro.h" />
     <ClInclude Include="include\kiwi\Mmap.h" />
     <ClInclude Include="include\kiwi\PatternMatcher.h" />

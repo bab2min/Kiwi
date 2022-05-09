@@ -1,6 +1,7 @@
 #pragma once
 #include "Types.h"
-#include <kiwi/ArchUtils.h>
+#include "ArchUtils.h"
+#include "LmState.h"
 
 namespace kiwi
 {
@@ -48,8 +49,8 @@ namespace kiwi
 			LmState lmState;
 			float score = 0;
 
-			Candidate(const CompiledRule& _cr)
-				: joiner{ _cr }
+			Candidate(const CompiledRule& _cr, const LangModel& lm)
+				: joiner{ _cr }, lmState{ lm }
 			{
 			}
 		};
@@ -59,7 +60,7 @@ namespace kiwi
 		{
 			Joiner joiner;
 
-			Candidate(const CompiledRule& _cr)
+			Candidate(const CompiledRule& _cr, const LangModel& lm)
 				: joiner{ _cr }
 			{
 			}
