@@ -1,4 +1,5 @@
 ﻿#include <fstream>
+#include <random>
 
 #include <kiwi/Kiwi.h>
 #include <kiwi/Utils.h>
@@ -13,6 +14,8 @@
 #include "FeatureTestor.h"
 #include "Combiner.h"
 #include "RaggedVector.hpp"
+#include "SkipBigramTrainer.hpp"
+#include "SkipBigramModel.hpp"
 
 using namespace std;
 using namespace kiwi;
@@ -32,7 +35,31 @@ KiwiBuilder& KiwiBuilder::operator=(KiwiBuilder&&) noexcept = default;
 template<class Fn>
 auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> MorphemeMap
 {
-	Vector<tuple<KString, float, POSTag, CondVowel, KString, int>> longTails;
+	struct LongTail
+	{
+		KString form;
+		float weight = 0;
+		POSTag tag = POSTag::unknown;
+		CondVowel cvowel = CondVowel::none;
+		KString origForm;
+		int addAlias = 0;
+		size_t origMorphId = 0;
+
+		LongTail(KString _form = {},
+			float _weight = 0,
+			POSTag _tag = POSTag::unknown,
+			CondVowel _cvowel = CondVowel::none,
+			KString _origForm = {},
+			int _addAlias = 0,
+			size_t _origMorphId = 0
+		) :
+			form{ _form }, weight{ _weight }, tag{ _tag }, cvowel{ _cvowel }, 
+			origForm{ _origForm }, addAlias{ _addAlias }, origMorphId{ _origMorphId }
+		{
+		}
+	};
+
+	Vector<LongTail> longTails;
 	UnorderedMap<POSTag, float> longTailWeights;
 	MorphemeMap morphMap;
 
@@ -78,7 +105,7 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 
 		auto form = normalizeHangul(fields[0]);
 		auto tag = toPOSTag(fields[1]);
-		if (tag >= POSTag::p || tag == POSTag::unknown)
+		if (clearIrregular(tag) >= POSTag::p || clearIrregular(tag) == POSTag::unknown)
 		{
 			cerr << "Wrong tag at line: " + line << endl;
 			continue;
@@ -127,12 +154,12 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 					if (f[1] == u'=')
 					{
 						origMorphemeOfAlias = normalizeHangul(f.substr(2));
-						addAlias = 2;
+						addAlias = 2; // ==의 경우 alias에 추가하고, score까지 동일하게 통일
 					}
 					else
 					{
 						origMorphemeOfAlias = normalizeHangul(f.substr(1));
-						addAlias = 1;
+						addAlias = 1; // =의 경우 alias에 추가하고, score는 discount
 					}
 					
 				}
@@ -140,7 +167,7 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 				{
 					if (!origMorphemeOfAlias.empty()) throw Exception{ "wrong line: " + line };
 					origMorphemeOfAlias = normalizeHangul(f.substr(1));
-					addAlias = 0;
+					addAlias = 0; // ~의 경우 말뭉치 로딩시에만 alias 처리하고, 실제 모델 데이터에는 삽입 안 함
 				}
 				else
 				{
@@ -155,53 +182,50 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 		}
 		else
 		{
-			longTails.emplace_back(form, morphWeight, tag, cvowel, origMorphemeOfAlias, addAlias);
+			longTails.emplace_back(LongTail{ form, morphWeight, tag, cvowel, origMorphemeOfAlias, addAlias });
 			longTailWeights[tag] += morphWeight;
 		}
 		
 	}
 
-	for (auto& p : longTails)
+	for (LongTail& p : longTails)
 	{
-		auto morphWeight = get<1>(p);
-		auto tag = get<2>(p);
-		auto cvowel = get<3>(p);
-		auto& origMorphemeOfAlias = get<4>(p);
-		auto addAlias = get<5>(p);
-		if (origMorphemeOfAlias.empty()) continue;
-		auto it = morphMap.find(make_pair(origMorphemeOfAlias, tag));
+		if (p.origForm.empty()) continue;
+		auto it = morphMap.find(make_pair(p.origForm, clearIrregular(p.tag)));
+		auto it2 = morphMap.find(make_pair(p.origForm, setIrregular(p.tag)));
+		
+		if (it != morphMap.end() && it2 != morphMap.end())
+		{
+			throw Exception{ "ambiguous base morpheme: " + utf16To8(p.origForm) + "/" + tagToString(clearIrregular(p.tag)) };
+		}
+		it = (it == morphMap.end()) ? it2 : it;
 		if (it == morphMap.end())
 		{
-			throw Exception{ "cannot find base morpheme: " + utf16To8(origMorphemeOfAlias) + "/" + tagToString(tag) };
+			throw Exception{ "cannot find base morpheme: " + utf16To8(p.origForm) + "/" + tagToString(p.tag) };
 		}
-		if (!addAlias) continue;
-		morphemes[it->second].userScore += morphWeight;
+		p.origMorphId = it->second;
+		if (!p.addAlias) continue;
+		morphemes[it->second].userScore += p.weight;
 	}
 
-	for (auto& p : longTails)
+	for (LongTail& p : longTails)
 	{
-		auto morphWeight = get<1>(p);
-		auto tag = get<2>(p);
-		auto cvowel = get<3>(p);
-		auto& origMorphemeOfAlias = get<4>(p);
-		auto addAlias = get<5>(p);
-		if (origMorphemeOfAlias.empty())
+		if (p.origForm.empty())
 		{
-			insertMorph(move(get<0>(p)), log(morphWeight / longTailWeights[tag]), tag, cvowel, getDefaultMorphemeId(tag));
+			insertMorph(move(p.form), log(p.weight / longTailWeights[p.tag]), p.tag, p.cvowel, getDefaultMorphemeId(p.tag));
 		}
 		else
 		{
-			auto it = morphMap.find(make_pair(origMorphemeOfAlias, tag));
-			if (addAlias)
+			if (p.addAlias)
 			{
-				float normalized = morphWeight / morphemes[it->second].userScore;
+				float normalized = p.weight / morphemes[p.origMorphId].userScore;
 				float score = log(normalized);
-				if (addAlias > 1) score = 0;
-				insertMorph(move(get<0>(p)), score, tag, cvowel, it->second);
+				if (p.addAlias > 1) score = 0;
+				insertMorph(move(p.form), score, p.tag, p.cvowel, p.origMorphId);
 			}
 			else
 			{
-				morphMap.emplace(make_pair(move(get<0>(p)), tag), it->second);
+				morphMap.emplace(make_pair(move(p.form), p.tag), p.origMorphId);
 			}
 		}
 	}
@@ -210,7 +234,40 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 		if (m.userScore <= 0) continue;
 		m.userScore = 0;
 	}
+
+	for (auto& m : morphemes)
+	{
+		if (!isIrregular(m.tag)) continue;
+		auto it = morphMap.find(make_pair(forms[m.kform].form, clearIrregular(m.tag)));
+		if (it != morphMap.end()) continue;
+		morphMap.emplace(
+			make_pair(forms[m.kform].form, clearIrregular(m.tag)), 
+			morphMap.find(make_pair(forms[m.kform].form, m.tag))->second
+		);
+	}
 	return morphMap;
+}
+
+auto KiwiBuilder::restoreMorphemeMap() const -> MorphemeMap
+{
+	MorphemeMap ret;
+	for (size_t i = defaultTagSize + 1; i < morphemes.size(); ++i)
+	{
+		size_t id = morphemes[i].lmMorphemeId;
+		if (!id) id = i;
+		ret.emplace(make_pair(forms[morphemes[i].kform].form, morphemes[i].tag), id);
+	}
+	for (auto& m : morphemes)
+	{
+		if (!isIrregular(m.tag)) continue;
+		auto it = ret.find(make_pair(forms[m.kform].form, clearIrregular(m.tag)));
+		if (it != ret.end()) continue;
+		ret.emplace(
+			make_pair(forms[m.kform].form, clearIrregular(m.tag)),
+			ret.find(make_pair(forms[m.kform].form, m.tag))->second
+		);
+	}
+	return ret;
 }
 
 void KiwiBuilder::addCorpusTo(RaggedVector<uint16_t>& out, std::istream& is, KiwiBuilder::MorphemeMap& morphMap)
@@ -274,7 +331,7 @@ void KiwiBuilder::updateForms()
 	{
 		formOrder.emplace_back(move(forms[i]), i);
 	}
-	sort(formOrder.begin() + defaultTagSize, formOrder.end());
+	sort(formOrder.begin() + defaultTagSize - 1, formOrder.end());
 
 	forms.clear();
 	for (size_t i = 0; i < formOrder.size(); ++i)
@@ -294,7 +351,7 @@ void KiwiBuilder::updateMorphemes()
 	for (auto& m : morphemes)
 	{
 		if (m.lmMorphemeId > 0) continue;
-		if (m.tag == POSTag::p || (&m - morphemes.data() + m.combined) < langMdl->getHeader().vocab_size)
+		if (m.tag == POSTag::p || (&m - morphemes.data() + m.combined) < langMdl.knlm->getHeader().vocab_size)
 		{
 			m.lmMorphemeId = &m - morphemes.data();
 		}
@@ -320,7 +377,7 @@ void KiwiBuilder::saveMorphBin(std::ostream& os) const
 	serializer::writeMany(os, serializer::toKey("KIWI"), forms, morphemes);
 }
 
-KiwiBuilder::KiwiBuilder(const string& modelPath, size_t _numThreads, BuildOption _options) 
+KiwiBuilder::KiwiBuilder(const string& modelPath, size_t _numThreads, BuildOption _options, bool useSBG) 
 	: detector{ modelPath, _numThreads }, options{ _options }, numThreads{ _numThreads ? _numThreads : thread::hardware_concurrency() }
 {
 	archType = getSelectedArch(ArchType::default_);
@@ -330,7 +387,11 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, size_t _numThreads, BuildOptio
 		utils::imstream iss{ mm };
 		loadMorphBin(iss);
 	}
-	langMdl = lm::KnLangModelBase::create(utils::MMap(modelPath + string{ "/sj.knlm" }), archType);
+	langMdl.knlm = lm::KnLangModelBase::create(utils::MMap(modelPath + string{ "/sj.knlm" }), archType);
+	if (useSBG)
+	{
+		langMdl.sbg = sb::SkipBigramModelBase::create(utils::MMap(modelPath + string{ "/skipbigram.mdl" }), archType);
+	}
 
 	if (!!(options & BuildOption::loadDefaultDict))
 	{
@@ -340,6 +401,7 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, size_t _numThreads, BuildOptio
 	{
 		ifstream ifs;
 		combiningRule = make_shared<cmb::CompiledRule>(cmb::RuleSet{ openFile(ifs, modelPath + string{ "/combiningRule.txt" }) }.compile());
+		addAllomorphsToRule();
 	}
 }
 
@@ -347,12 +409,12 @@ KiwiBuilder::KiwiBuilder(const ModelBuildArgs& args)
 {
 	archType = getSelectedArch(ArchType::default_);
 
-	forms.resize(defaultTagSize);
-	morphemes.resize(defaultTagSize + 2); // additional places for <s> & </s>
-	for (size_t i = 0; i < defaultTagSize; ++i)
+	forms.resize(defaultTagSize - 1);
+	morphemes.resize(defaultTagSize + 1); // additional places for <s> & </s>
+	for (size_t i = 1; i < defaultTagSize; ++i)
 	{
-		forms[i].candidate.emplace_back(i + 2);
-		morphemes[i + 2].tag = (POSTag)(i + 1);
+		forms[i - 1].candidate.emplace_back(i + 1);
+		morphemes[i + 1].tag = (POSTag)i;
 	}
 
 	ifstream ifs;
@@ -362,24 +424,45 @@ KiwiBuilder::KiwiBuilder(const ModelBuildArgs& args)
 	});
 	updateForms();
 
-	RaggedVector<uint16_t> sents;
+	RaggedVector<utils::Vid> sents;
 	for (auto& path : args.corpora)
 	{
 		ifstream ifs;
 		addCorpusTo(sents, openFile(ifs, path), realMorph);
 	}
 
+	if (args.dropoutProb > 0 && args.dropoutSampling > 0)
+	{
+		mt19937_64 rng{ 42 };
+		bernoulli_distribution sampler{ args.dropoutSampling }, drop{ args.dropoutProb };
+
+		size_t origSize = sents.size();
+		for (size_t i = 0; i < origSize; ++i)
+		{
+			if (!sampler(rng)) continue;
+			sents.emplace_back();
+			for (size_t j = 0; j < sents[i].size(); ++j)
+			{
+				auto v = sents[i][j];
+				if (drop(rng))
+				{
+					v = getDefaultMorphemeId(clearIrregular(morphemes[v].tag));
+				}
+				sents.add_data(v);
+			}
+		}
+	}
+	
 	size_t lmVocabSize = 0;
 	for (auto& p : realMorph) lmVocabSize = max(p.second, lmVocabSize);
 	lmVocabSize += 1;
 
 	Vector<utils::Vid> historyTx(lmVocabSize);
-
 	if (args.useLmTagHistory)
 	{
 		for (size_t i = 0; i < lmVocabSize; ++i)
 		{
-			historyTx[i] = (size_t)morphemes[i].tag + lmVocabSize;
+			historyTx[i] = (size_t)clearIrregular(morphemes[i].tag) + lmVocabSize;
 		}
 	}
 
@@ -392,7 +475,7 @@ KiwiBuilder::KiwiBuilder(const ModelBuildArgs& args)
 	}
 	auto cntNodes = utils::count(sents.begin(), sents.end(), args.lmMinCnt, 1, args.lmOrder, (args.numWorkers > 1 ? &pool : nullptr), &bigramList, args.useLmTagHistory ? &historyTx : nullptr);
 	cntNodes.root().getNext(lmVocabSize)->val /= 2;
-	langMdl = lm::KnLangModelBase::create(lm::KnLangModelBase::build(
+	langMdl.knlm = lm::KnLangModelBase::create(lm::KnLangModelBase::build(
 		cntNodes, 
 		args.lmOrder, args.lmMinCnt, args.lmLastOrderMinCnt, 
 		2, 0, 1, 1e-5, 
@@ -405,6 +488,266 @@ KiwiBuilder::KiwiBuilder(const ModelBuildArgs& args)
 	updateMorphemes();
 }
 
+class SBDataFeeder
+{
+	const RaggedVector<utils::Vid>& sents;
+	const lm::KnLangModelBase* lm = nullptr;
+	Vector<Vector<float>> lmBuf;
+
+public:
+	SBDataFeeder(const RaggedVector<utils::Vid>& _sents, const lm::KnLangModelBase* _lm, size_t numThreads = 1)
+		: sents{ _sents }, lm{ _lm }, lmBuf(numThreads)
+	{
+	}
+
+	sb::FeedingData<utils::Vid> operator()(size_t i, size_t threadId = 0)
+	{
+		sb::FeedingData<utils::Vid> ret;
+		ret.len = sents[i].size();
+		if (lmBuf[threadId].size() < ret.len)
+		{
+			lmBuf[threadId].resize(ret.len);
+		}
+		ret.x = &sents[i][0];
+		lm->evaluate(sents[i].begin(), sents[i].end(), lmBuf[threadId].data());
+		ret.lmLogProbs = lmBuf[threadId].data();
+		return ret;
+	}
+};
+
+KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
+	: KiwiBuilder{ modelPath }
+{
+	auto realMorph = restoreMorphemeMap();
+	RaggedVector<utils::Vid> sents;
+	if (1)
+	{
+		for (auto& path : args.corpora)
+		{
+			ifstream ifs;
+			addCorpusTo(sents, openFile(ifs, path), realMorph);
+		}
+		//std::cout << sents.size() << std::endl;
+
+		if (args.dropoutProb > 0 && args.dropoutSampling > 0)
+		{
+			mt19937_64 rng{ 42 };
+			bernoulli_distribution sampler{ args.dropoutSampling };
+			discrete_distribution<> drop{ { 1 - args.dropoutProb, args.dropoutProb / 3, args.dropoutProb / 3, args.dropoutProb / 3} };
+
+			size_t origSize = sents.size();
+			for (size_t n = 0; n < 2; ++n)
+			{
+				for (size_t i = 0; i < origSize; ++i)
+				{
+					//if (!sampler(rng)) continue;
+					sents.emplace_back();
+					sents.add_data(sents[i][0]);
+					bool emptyDoc = true;
+					for (size_t j = 1; j < sents[i].size() - 1; ++j)
+					{
+						auto v = sents[i][j];
+						switch (drop(rng))
+						{
+						case 0: // no dropout
+							emptyDoc = false;
+							sents.add_data(v);
+							break;
+						case 1: // replacement
+							emptyDoc = false;
+							sents.add_data(getDefaultMorphemeId(morphemes[v].tag));
+							break;
+						case 2: // deletion
+							break;
+						case 3: // insertion
+							emptyDoc = false;
+							sents.add_data(getDefaultMorphemeId(morphemes[v].tag));
+							sents.add_data(v);
+							break;
+						}
+					}
+
+					if (emptyDoc)
+					{
+						sents.pop_back();
+					}
+					else
+					{
+						sents.add_data(sents[i][sents[i].size() - 1]);
+					}
+				}
+			}
+		}
+		//ofstream ofs{ "sent.bin", ios_base::binary };
+		//auto mem = sents.toMemory();
+		//ofs.write((const char*)mem.get(), mem.size());
+	}
+	else
+	{
+		ifstream ifs{ "sent.bin", ios_base::binary };
+		utils::MMap mm{ "sent.bin" };
+		utils::imstream im(mm.get(), mm.size());
+		sents = RaggedVector<utils::Vid>::fromMemory(im);
+	}
+
+	size_t lmVocabSize = 0;
+	for (auto& p : realMorph) lmVocabSize = max(p.second, lmVocabSize);
+	lmVocabSize += 1;
+
+	auto sbgTokenFilter = [&](size_t a)
+	{
+		auto tag = morphemes[a].tag;
+		if (isEClass(tag) || isJClass(tag)) return false;
+		if (tag == POSTag::vcp || tag == POSTag::vcn) return false;
+		if (isVerbClass(tag) && forms[morphemes[a].kform].form == u"하") return false;
+		return true;
+	};
+
+	auto sbgPairFilter = [&](size_t a, size_t b)
+	{
+		if (a < 21 || (34 < a && a < defaultTagSize + 1)) return false;
+		if ((1 < b && b < 21) || (34 < b && b < defaultTagSize + 1)) return false;
+		return true;
+	};
+
+	/*Vector<std::pair<size_t, float>> cases = {
+		{ 5, 0.10f },
+		{ 10, 0.10f },
+		{ 5, 0.08f },
+		{ 10, 0.08f },
+		{ 5, 0.06f },
+		{ 10, 0.06f },
+		{ 5, 0.04f },
+		{ 10, 0.04f },
+	};
+	for (size_t n = 0; n < cases.size(); ++n)
+	{
+		ofstream ofs{"logs/" + to_string(n) + ".log"};
+		SkipBigramTrainer<utils::Vid, 8> sbg{ sents, sbgFilter, 0, 320, cases[n].first, cases[n].second};
+		ofs << "minCnt: " << cases[n].first << ", minNPMI: " << cases[n].second << ", vocabs: " << sbg.vocabDataSize() << "\n" << endl;
+		for (size_t i = 0; i < lmVocabSize; ++i)
+		{
+			auto vs = sbg.getVocabByCond(i);
+			if (vs.empty()) continue;
+			ofs << utf16To8(joinHangul(forms[morphemes[i].kform].form)) << '/' << tagToString(morphemes[i].tag) << endl;
+			for (auto v : vs)
+			{
+				ofs << "    " << utf16To8(joinHangul(forms[morphemes[v].kform].form)) << '/' << tagToString(morphemes[v].tag) << endl;
+			}
+			ofs << endl;
+		}
+	}*/
+	
+	sb::SkipBigramTrainer<utils::Vid, 8> sbg;
+	if (1)
+	{
+		sbg = sb::SkipBigramTrainer<utils::Vid, 8>{ sents, sbgTokenFilter, sbgPairFilter, 0, 150, 20, true, 0.333f, 1, 1000000 };
+		ofstream ofs{ "sbg.bin", ios_base::binary };
+		sbg.save(ofs);
+	}
+	else
+	{
+		ifstream ifs{ "sbg.bin", ios_base::binary };
+		sbg.load(ifs);
+	}
+
+	Vector<float> lmLogProbs;
+	auto tc = sbg.newContext();
+	float llMean = 0;
+	size_t llCnt = 0;
+	Vector<size_t> sampleIdcs;
+	for (size_t i = 0; i < sents.size(); ++i)
+	{
+		if (i % 20 == 0) continue;
+		sampleIdcs.emplace_back(i);
+	}
+
+	for (size_t i = 0; i < sents.size(); i += 20)
+	{
+		auto sent = sents[i];
+		if (lmLogProbs.size() < sent.size())
+		{
+			lmLogProbs.resize(sent.size());
+		}
+		langMdl.knlm->evaluate(sent.begin(), sent.end(), lmLogProbs.begin());
+		//float sum = sbg.evaluate(&sent[0], lmLogProbs.data(), sent.size());
+		float sum = accumulate(lmLogProbs.begin() + 1, lmLogProbs.begin() + sent.size(), 0.);
+		size_t cnt = sent.size() - 1;
+		llCnt += cnt;
+		llMean += (sum - llMean * cnt) / llCnt;
+	}
+	cout << "Init Dev AvgLL: " << llMean << endl;
+
+	llCnt = 0;
+	llMean = 0;
+	float lrStart = 1e-1;
+	size_t numEpochs = 10;
+	size_t totalSteps = sampleIdcs.size() * numEpochs;
+
+	if (args.numWorkers <= 1)
+	{
+		sbg.train(SBDataFeeder{ sents, langMdl.knlm.get() }, [&](const sb::ObservingData& od)
+			{
+				llCnt += od.cntRecent;
+				llMean += (od.llRecent - llMean * od.cntRecent) / llCnt;
+				if (od.globalStep % 10000 == 0)
+				{
+					cout << od.globalStep / 10000 << " (" << std::round(od.globalStep * 1000. / totalSteps) / 10 << "%): AvgLL: " << od.llMeanTotal << ", RecentLL: " << llMean << endl;
+					llCnt = 0;
+					llMean = 0;
+				}
+			}, sampleIdcs, totalSteps, lrStart);
+	}
+	else
+	{
+		sbg.trainMulti(args.numWorkers, SBDataFeeder{ sents, langMdl.knlm.get(), 8 }, [&](const sb::ObservingData& od)
+			{
+				llCnt += od.cntRecent;
+				llMean += (od.llRecent - llMean * od.cntRecent) / llCnt;
+				if (od.prevGlobalStep / 10000 < od.globalStep / 10000)
+				{
+					cout << od.globalStep / 10000 << " (" << std::round(od.globalStep * 1000. / totalSteps) / 10 << "%): AvgLL: " << od.llMeanTotal << ", RecentLL: " << llMean << endl;
+					llCnt = 0;
+					llMean = 0;
+				}
+			}, sampleIdcs, totalSteps, lrStart);
+	}
+
+	{
+		ofstream ofs{ "sbg.fin.bin", ios_base::binary };
+		sbg.save(ofs);
+	}
+
+	llCnt = 0;
+	llMean = 0;
+	for (size_t i = 0; i < sents.size(); i += 20)
+	{
+		auto sent = sents[i];
+		if (lmLogProbs.size() < sent.size())
+		{
+			lmLogProbs.resize(sent.size());
+		}
+		langMdl.knlm->evaluate(sent.begin(), sent.end(), lmLogProbs.begin());
+		float sum = sbg.evaluate(&sent[0], lmLogProbs.data(), sent.size());
+		size_t cnt = sent.size() - 1;
+		llCnt += cnt;
+		llMean += (sum - llMean * cnt) / llCnt;
+	}
+	cout << "After Dev AvgLL: " << llMean << endl;
+	
+	ofstream ofs{ "logs/result.log" };
+	sbg.printParameters(ofs << "AvgLL: " << llMean << "\n", [&](size_t v)
+	{
+		return utf16To8(joinHangul(forms[morphemes[v].kform].form)) + "/" + tagToString(morphemes[v].tag);
+	});
+
+	{
+		auto mem = sbg.convertToModel();
+		ofstream ofs{ modelPath + "/skipbigram.mdl", ios_base::binary };
+		ofs.write((const char*)mem.get(), mem.size());
+	}
+}
+
 void KiwiBuilder::saveModel(const string& modelPath) const
 {
 	{
@@ -412,9 +755,32 @@ void KiwiBuilder::saveModel(const string& modelPath) const
 		saveMorphBin(ofs);
 	}
 	{
-		auto mem = langMdl->getMemory();
+		auto mem = langMdl.knlm->getMemory();
 		ofstream ofs{ modelPath + "/sj.knlm", ios_base::binary };
 		ofs.write((const char*)mem.get(), mem.size());
+	}
+}
+
+void KiwiBuilder::addAllomorphsToRule()
+{
+	UnorderedMap<size_t, Vector<const MorphemeRaw*>> allomorphs;
+	for (auto& m : morphemes)
+	{
+		if (!isJClass(m.tag) && !isEClass(m.tag)) continue;
+		if (m.vowel() == CondVowel::none) continue;
+		if (m.lmMorphemeId == getDefaultMorphemeId(m.tag)) continue;
+		allomorphs[m.lmMorphemeId].emplace_back(&m);
+	}
+
+	for (auto& p : allomorphs)
+	{
+		if (p.second.size() <= 1) continue;
+		vector<pair<U16StringView, CondVowel>> d;
+		for (auto m : p.second)
+		{
+			d.emplace_back(forms[m->kform].form, m->vowel());
+		}
+		combiningRule->addAllomorph(d, p.second[0]->tag);
 	}
 }
 
@@ -443,7 +809,7 @@ size_t KiwiBuilder::addForm(Vector<FormRaw>& newForms, UnorderedMap<KString, siz
 	return ret.first->second;
 }
 
-bool KiwiBuilder::addWord(nonstd::u16string_view newForm, POSTag tag, float score, size_t origMorphemeId)
+bool KiwiBuilder::addWord(U16StringView newForm, POSTag tag, float score, size_t origMorphemeId)
 {
 	if (newForm.empty()) return false;
 
@@ -470,7 +836,7 @@ bool KiwiBuilder::addWord(nonstd::u16string_view newForm, POSTag tag, float scor
 	return true;
 }
 
-bool KiwiBuilder::addWord(const u16string& newForm, POSTag tag, float score, size_t origMorphemeId)
+bool KiwiBuilder::addWord(const std::u16string& newForm, POSTag tag, float score, size_t origMorphemeId)
 {
 	return addWord(nonstd::to_string_view(newForm), tag, score, origMorphemeId);
 }
@@ -516,8 +882,8 @@ void KiwiBuilder::addCombinedMorphemes(
 			newMorph.chunks = leftMorph.chunks;
 			newMorph.chunkPositions = leftMorph.chunkPositions;
 			newMorph.chunkPositions.back().second = r.leftEnd;
-			if (r.vowel == CondVowel::none) r.vowel = leftMorph.vowel;
-			if (r.polar == CondPolarity::none) r.polar = leftMorph.polar;
+			if (r.vowel == CondVowel::none) r.vowel = leftMorph.vowel();
+			if (r.polar == CondPolarity::none) r.polar = leftMorph.polar();
 			newMorph.userScore = leftMorph.userScore + r.score;
 		}
 		newMorph.chunks.emplace_back(rightId);
@@ -527,11 +893,11 @@ void KiwiBuilder::addCombinedMorphemes(
 			newMorph.combineSocket = getMorph(newMorph.chunks[0]).combineSocket;
 		}
 		newMorph.userScore += getMorph(rightId).userScore;
-		newMorph.vowel = r.vowel;
+		newMorph.setVowel(r.vowel);
 		// 양/음성 조건은 부분결합된 형태소에서만 유효
 		if (getMorph(leftId).tag == POSTag::p)
 		{
-			newMorph.polar = r.polar;
+			newMorph.setPolar(r.polar);
 		}
 		size_t fid = addForm(newForms, newFormMap, r.str);
 		newFormCands[fid].emplace_back(newId);
@@ -573,7 +939,7 @@ void KiwiBuilder::buildCombinedMorphemes(
 			auto tag = morph.tag;
 			auto& form = getForm(morph.kform).form;
 
-			if (tag > POSTag::pa) continue;
+			if (clearIrregular(tag) > POSTag::pa) continue;
 			if (morph.combined) continue;
 
 			if (tag == POSTag::unknown)
@@ -604,15 +970,31 @@ void KiwiBuilder::buildCombinedMorphemes(
 				combiningRightCands[id].emplace_back(i);
 			}
 
-			if (tag == POSTag::vv || tag == POSTag::va)
+			if (tag == POSTag::vv || tag == POSTag::va || tag == POSTag::vvi || tag == POSTag::vai)
 			{
 				CondVowel vowel = CondVowel::none;
 				CondPolarity polar = FeatureTestor::isMatched(&form, CondPolarity::positive) ? CondPolarity::positive : CondPolarity::negative;
 
-				auto& ids = ruleLeftIds[make_tuple(
-					tag == POSTag::vv ? POSTag::p : POSTag::pa,
-					cmb::CompiledRule::toFeature(vowel, polar)
-				)];
+				POSTag partialTag;
+				switch (tag)
+				{
+				case POSTag::vv:
+					partialTag = POSTag::pv;
+					break;
+				case POSTag::va:
+					partialTag = POSTag::pa;
+					break;
+				case POSTag::vvi:
+					partialTag = POSTag::pvi;
+					break;
+				case POSTag::vai:
+					partialTag = POSTag::pai;
+					break;
+				default:
+					break;
+				}
+
+				auto& ids = ruleLeftIds[make_tuple(partialTag, cmb::CompiledRule::toFeature(vowel, polar))];
 				Vector<uint8_t> partialFormInserted(form.size());
 				auto cform = form;
 
@@ -640,7 +1022,7 @@ void KiwiBuilder::buildCombinedMorphemes(
 							size_t fid = addForm(newForms, newFormMap, get<0>(inserted.first->first));
 							size_t newId = morphemes.size() + newMorphemes.size();
 							inserted.first->second = newId;
-							newMorphemes.emplace_back(tag == POSTag::vv ? POSTag::p : POSTag::pa);
+							newMorphemes.emplace_back(partialTag);
 							auto& newMorph = newMorphemes.back();
 							newMorph.kform = fid;
 							newMorph.lmMorphemeId = newId;
@@ -666,7 +1048,6 @@ void KiwiBuilder::buildCombinedMorphemes(
 		}
 		for (auto& p : combiningSuffices)
 		{
-			if (get<1>(p.first) != POSTag::va) continue;
 			newMorphemes[p.second - morphemes.size()].tag = POSTag::p;
 		}
 
@@ -699,7 +1080,7 @@ void KiwiBuilder::buildCombinedMorphemes(
 	}
 }
 
-bool KiwiBuilder::addWord(nonstd::u16string_view form, POSTag tag, float score)
+bool KiwiBuilder::addWord(U16StringView form, POSTag tag, float score)
 {
 	return addWord(form, tag, score, getDefaultMorphemeId(tag));
 }
@@ -708,8 +1089,13 @@ bool KiwiBuilder::addWord(const u16string& form, POSTag tag, float score)
 {
 	return addWord(nonstd::to_string_view(form), tag, score);
 }
-	
-size_t KiwiBuilder::findMorpheme(const u16string& form, POSTag tag) const
+
+bool KiwiBuilder::addWord(const char16_t* form, POSTag tag, float score)
+{
+	return addWord(U16StringView{ form }, tag, score);
+}
+
+size_t KiwiBuilder::findMorpheme(U16StringView form, POSTag tag) const
 {
 	auto normalized = normalizeHangul(form);
 	auto it = formMap.find(normalized);
@@ -725,7 +1111,7 @@ size_t KiwiBuilder::findMorpheme(const u16string& form, POSTag tag) const
 	return -1;
 }
 
-bool KiwiBuilder::addWord(nonstd::u16string_view newForm, POSTag tag, float score, const u16string& origForm)
+bool KiwiBuilder::addWord(U16StringView newForm, POSTag tag, float score, U16StringView origForm)
 {
 	size_t origMorphemeId = findMorpheme(origForm, tag);
 
@@ -742,7 +1128,13 @@ bool KiwiBuilder::addWord(const u16string& newForm, POSTag tag, float score, con
 	return addWord(nonstd::to_string_view(newForm), tag, score, origForm);
 }
 
-bool KiwiBuilder::addPreAnalyzedWord(nonstd::u16string_view form, const vector<pair<u16string, POSTag>>& analyzed, vector<pair<size_t, size_t>> positions, float score)
+bool KiwiBuilder::addWord(const char16_t* newForm, POSTag tag, float score, const char16_t* origForm)
+{
+	return addWord(U16StringView(newForm), tag, score, U16StringView(origForm));
+}
+
+template<class U16>
+bool KiwiBuilder::addPreAnalyzedWord(U16StringView form, const vector<pair<U16, POSTag>>& analyzed, vector<pair<size_t, size_t>> positions, float score)
 {
 	if (form.empty()) return false;
 
@@ -799,13 +1191,18 @@ bool KiwiBuilder::addPreAnalyzedWord(const u16string& form, const vector<pair<u1
 	return addPreAnalyzedWord(nonstd::to_string_view(form), analyzed, positions, score);
 }
 
+bool KiwiBuilder::addPreAnalyzedWord(const char16_t* form, const vector<pair<const char16_t*, POSTag>>& analyzed, vector<pair<size_t, size_t>> positions, float score)
+{
+	return addPreAnalyzedWord(U16StringView{ form }, analyzed, positions, score);
+}
+
 size_t KiwiBuilder::loadDictionary(const string& dictPath)
 {
 	size_t addedCnt = 0;
 	ifstream ifs;
 	openFile(ifs, dictPath);
 	string line;
-	array<nonstd::u16string_view, 3> fields;
+	array<U16StringView, 3> fields;
 	u16string wstr;
 	for (size_t lineNo = 1; getline(ifs, line); ++lineNo)
 	{
@@ -829,7 +1226,7 @@ size_t KiwiBuilder::loadDictionary(const string& dictPath)
 
 		if (fields[1].find(u'/') != fields[1].npos)
 		{
-			vector<pair<u16string, POSTag>> morphemes;
+			vector<pair<U16StringView, POSTag>> morphemes;
 
 			for (auto& m : split(fields[1], u'+'))
 			{
@@ -848,7 +1245,7 @@ size_t KiwiBuilder::loadDictionary(const string& dictPath)
 				{
 					throw Exception("[loadUserDictionary] Unknown Tag '" + utf16To8(fields[1]) + "' at line " + to_string(lineNo));
 				}
-				morphemes.emplace_back(m.substr(0, p).to_string(), pos);
+				morphemes.emplace_back(m.substr(0, p), pos);
 			}
 
 			if (morphemes.size() > 1)
@@ -920,7 +1317,7 @@ inline CondPolarity reducePolar(CondPolarity p, const Morpheme* m)
 
 Kiwi KiwiBuilder::build() const
 {
-	Kiwi ret{ archType, langMdl->getHeader().key_size };
+	Kiwi ret{ archType, langMdl.knlm->getHeader().key_size };
 
 	Vector<FormRaw> combinedForms;
 	Vector<MorphemeRaw> combinedMorphemes;
@@ -931,6 +1328,7 @@ Kiwi KiwiBuilder::build() const
 	ret.forms.reserve(forms.size() + combinedForms.size() + 1);
 	ret.morphemes.reserve(morphemes.size() + combinedMorphemes.size());
 	ret.langMdl = langMdl;
+	ret.combiningRule = combiningRule;
 	ret.integrateAllomorph = !!(options & BuildOption::integrateAllomorph);
 	if (numThreads >= 1)
 	{

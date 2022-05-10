@@ -8,9 +8,10 @@
 #include "KTrie.h"
 #include "FeatureTestor.h"
 #include "FrozenTrie.hpp"
-#include "Knlm.hpp"
+#include "LmState.hpp"
 #include "StrUtils.h"
 #include "serializer.hpp"
+#include "Joiner.hpp"
 
 using namespace std;
 
@@ -21,35 +22,36 @@ namespace kiwi
 	public:
 		struct Result
 		{
-			const Morpheme* morph;
+			const Morpheme* morph = nullptr;
 			KString str;
-			uint32_t begin, end;
-			Result(const Morpheme* _morph = nullptr, const KString& _str = {}, uint32_t _begin = 0, uint32_t _end = 0)
-				: morph{ _morph }, str{ _str }, begin{ _begin }, end{ _end }
+			uint32_t begin = 0, end = 0;
+			float wordScore = 0;
+			Result(const Morpheme* _morph = nullptr, const KString& _str = {}, uint32_t _begin = 0, uint32_t _end = 0, float _wordScore = 0)
+				: morph{ _morph }, str{ _str }, begin{ _begin }, end{ _end }, wordScore{ _wordScore }
 			{
 			}
 		};
 		using Path = Vector<Result>;
 
-		template<ArchType arch, class LmType>
+		template<class LmState>
 		static Vector<std::pair<Path, float>> findBestPath(const Kiwi* kw, const Vector<KGraphNode>& graph, size_t topN);
 
-		template<ArchType arch, class LmType, class CandTy, class CacheTy>
+		template<class LmState, class CandTy, class CacheTy>
 		static float evalPath(const Kiwi* kw, const KGraphNode* startNode, const KGraphNode* node,
 			CacheTy& cache, Vector<KString>& ownFormList,
 			size_t i, size_t ownFormId, CandTy&& cands, bool unknownForm
 		);
 	};
 
-	using FnFindBestPath = decltype(&PathEvaluator::findBestPath<ArchType::default_, uint8_t>);
+	using FnFindBestPath = decltype(&PathEvaluator::findBestPath<KnLMState<ArchType::none, uint16_t>>);
 
-	template<class IntTy>
+	template<template<ArchType> class LmState>
 	struct FindBestPathGetter
 	{
 		template<std::ptrdiff_t i>
 		struct Wrapper
 		{
-			static constexpr FnFindBestPath value = &PathEvaluator::findBestPath<static_cast<ArchType>(i), IntTy>;
+			static constexpr FnFindBestPath value = &PathEvaluator::findBestPath<LmState<static_cast<ArchType>(i)>>;
 		};
 	};
 
@@ -58,27 +60,54 @@ namespace kiwi
 		selectedArch = arch;
 		dfSplitByTrie = (void*)getSplitByTrieFn(selectedArch);
 
-		static tp::Table<FnFindBestPath, AvailableArch> tableFindBestPath_8{ FindBestPathGetter<uint8_t>{} };
-		static tp::Table<FnFindBestPath, AvailableArch> tableFindBestPath_16{ FindBestPathGetter<uint16_t>{} };
-		static tp::Table<FnFindBestPath, AvailableArch> tableFindBestPath_32{ FindBestPathGetter<uint32_t>{} };
-		static tp::Table<FnFindBestPath, AvailableArch> tableFindBestPath_64{ FindBestPathGetter<uint64_t>{} };
-		
-		switch (lmKeySize)
+		static tp::Table<FnFindBestPath, AvailableArch> lmKnLM_8{ FindBestPathGetter<WrappedKnLM<uint8_t>::type>{} };
+		static tp::Table<FnFindBestPath, AvailableArch> lmKnLM_16{ FindBestPathGetter<WrappedKnLM<uint16_t>::type>{} };
+		static tp::Table<FnFindBestPath, AvailableArch> lmKnLM_32{ FindBestPathGetter<WrappedKnLM<uint32_t>::type>{} };
+		static tp::Table<FnFindBestPath, AvailableArch> lmKnLM_64{ FindBestPathGetter<WrappedKnLM<uint64_t>::type>{} };
+		static tp::Table<FnFindBestPath, AvailableArch> lmSbg_8{ FindBestPathGetter<WrappedSbg<8, uint8_t>::type>{} };
+		static tp::Table<FnFindBestPath, AvailableArch> lmSbg_16{ FindBestPathGetter<WrappedSbg<8, uint16_t>::type>{} };
+		static tp::Table<FnFindBestPath, AvailableArch> lmSbg_32{ FindBestPathGetter<WrappedSbg<8, uint32_t>::type>{} };
+		static tp::Table<FnFindBestPath, AvailableArch> lmSbg_64{ FindBestPathGetter<WrappedSbg<8, uint64_t>::type>{} };
+
+		if (langMdl.sbg)
 		{
-		case 1:
-			dfFindBestPath = (void*)tableFindBestPath_8[static_cast<std::ptrdiff_t>(selectedArch)];
-			break;
-		case 2:
-			dfFindBestPath = (void*)tableFindBestPath_16[static_cast<std::ptrdiff_t>(selectedArch)];
-			break;
-		case 4:
-			dfFindBestPath = (void*)tableFindBestPath_32[static_cast<std::ptrdiff_t>(selectedArch)];
-			break;
-		case 8:
-			dfFindBestPath = (void*)tableFindBestPath_64[static_cast<std::ptrdiff_t>(selectedArch)];
-			break;
-		default:
-			throw Exception{ "Wrong `lmKeySize`" };
+			switch (lmKeySize)
+			{
+			case 1:
+				dfFindBestPath = (void*)lmSbg_8[static_cast<std::ptrdiff_t>(selectedArch)];
+				break;
+			case 2:
+				dfFindBestPath = (void*)lmSbg_16[static_cast<std::ptrdiff_t>(selectedArch)];
+				break;
+			case 4:
+				dfFindBestPath = (void*)lmSbg_32[static_cast<std::ptrdiff_t>(selectedArch)];
+				break;
+			case 8:
+				dfFindBestPath = (void*)lmSbg_64[static_cast<std::ptrdiff_t>(selectedArch)];
+				break;
+			default:
+				throw Exception{ "Wrong `lmKeySize`" };
+			}
+		}
+		else
+		{
+			switch (lmKeySize)
+			{
+			case 1:
+				dfFindBestPath = (void*)lmKnLM_8[static_cast<std::ptrdiff_t>(selectedArch)];
+				break;
+			case 2:
+				dfFindBestPath = (void*)lmKnLM_16[static_cast<std::ptrdiff_t>(selectedArch)];
+				break;
+			case 4:
+				dfFindBestPath = (void*)lmKnLM_32[static_cast<std::ptrdiff_t>(selectedArch)];
+				break;
+			case 8:
+				dfFindBestPath = (void*)lmKnLM_64[static_cast<std::ptrdiff_t>(selectedArch)];
+				break;
+			default:
+				throw Exception{ "Wrong `lmKeySize`" };
+			}
 		}
 	}
 
@@ -117,8 +146,17 @@ namespace kiwi
 		return ret;
 	}
 
+	/**
+	* @brief tokens에 문장 번호 및 줄 번호를 채워넣는다.
+	*/
 	inline void fillSentLineInfo(vector<TokenInfo>& tokens, const vector<size_t>& newlines)
 	{
+		/*
+		* 문장 분리 기준
+		* 1) 종결어미(ef) (요/jx)? (so|sw|sh|sp|se|sf|(닫는 괄호))*
+		* 2) 종결구두점(sf) (so|sw|sh|sp|se|(닫는 괄호))*
+		* 3) 단 종결어미(ef) 바로 다음에 요가 아닌 조사(j)가 뒤따르는 경우는 제외
+		*/
 		enum class State 
 		{
 			none = 0,
@@ -147,14 +185,29 @@ namespace kiwi
 			case State::efjx:
 				switch (t.tag)
 				{
+				case POSTag::jc:
+				case POSTag::jkb:
+				case POSTag::jkc:
+				case POSTag::jkg:
+				case POSTag::jko:
+				case POSTag::jkq:
+				case POSTag::jks:
+				case POSTag::jkv:
 				case POSTag::jx:
-					if (state == State::ef)
+					if (t.tag == POSTag::jx && *t.morph->kform == u"요")
 					{
-						state = State::efjx;
+						if (state == State::ef)
+						{
+							state = State::efjx;
+						}
+						else
+						{
+							sentPos++;
+							state = State::none;
+						}
 					}
 					else
 					{
-						sentPos++;
 						state = State::none;
 					}
 					break;
@@ -358,34 +411,36 @@ namespace kiwi
 		{}
 	};
 
-	struct WordLL;
 	using MInfos = Vector<MInfo>;
-	using WordLLs = Vector<WordLL>;
 
+	template<class LmState>
 	struct WordLL
 	{
 		MInfos morphs;
 		float accScore = 0;
-		ptrdiff_t node = 0;
+		const WordLL* parent = nullptr;
+		LmState lmState;
 
 		WordLL() = default;
 
-		WordLL(const MInfos& _morphs, float _accScore, ptrdiff_t _node)
-			: morphs{ _morphs }, accScore{ _accScore }, node{ _node }
+		WordLL(const MInfos& _morphs, float _accScore, const WordLL* _parent, LmState _lmState)
+			: morphs{ _morphs }, accScore{ _accScore }, parent{ _parent }, lmState{ _lmState }
 		{
 		}
 	};
 
+	template<class LmState>
 	struct WordLLP
 	{
 		const MInfos* morphs = nullptr;
 		float accScore = 0;
-		ptrdiff_t node = 0;
+		const WordLL<LmState>* parent = nullptr;
+		LmState lmState;
 
 		WordLLP() = default;
 
-		WordLLP(const MInfos* _morphs, float _accScore, ptrdiff_t _node)
-			: morphs{ _morphs }, accScore{ _accScore }, node{ _node }
+		WordLLP(const MInfos* _morphs, float _accScore, const WordLL<LmState>* _parent, LmState _lmState)
+			: morphs{ _morphs }, accScore{ _accScore }, parent{ _parent }, lmState{ _lmState }
 		{
 		}
 	};
@@ -406,11 +461,21 @@ namespace kiwi
 		return v[std::min(nth, v.size() - 1)];
 	}
 
-	template<ArchType arch, class LmType, class _Type>
-	void evalTrigram(const lm::KnLangModel<arch, LmType>* knlm, const Morpheme* morphBase, const Vector<KString>& ownForms, const Vector<WordLLs>& cache,
-		array<Wid, 4> seq, size_t chSize, const Morpheme* curMorph, const KGraphNode* node, const KGraphNode* startNode, _Type& maxWidLL, float ignoreCondScore)
+	template<class LmState, class _Type>
+	void evalTrigram(const LangModel& langMdl, 
+		const Morpheme* morphBase, 
+		const Vector<KString>& ownForms, 
+		const Vector<Vector<WordLL<LmState>>>& cache,
+		array<Wid, 4> seq, 
+		size_t chSize, 
+		const Morpheme* curMorph, 
+		const KGraphNode* node, 
+		const KGraphNode* startNode, 
+		_Type& maxWidLL, 
+		float ignoreCondScore
+	)
 	{
-		size_t vocabSize = knlm->getHeader().vocab_size;
+		size_t vocabSize = langMdl.knlm->getHeader().vocab_size;
 		for (size_t i = 0; i < KGraphNode::max_prev; ++i)
 		{
 			auto* prev = node->getPrev(i);
@@ -440,7 +505,7 @@ namespace kiwi
 					if (!FeatureTestor::isMatched(leftForm, curMorph->vowel, curMorph->polar)) continue;
 				}
 
-				auto cNode = p.node;
+				auto cLmState = p.lmState;
 				Wid lSeq = 0;
 				if (curMorph->combineSocket && curMorph->chunks.empty())
 				{
@@ -456,11 +521,16 @@ namespace kiwi
 							// prohibit <v> without <chunk>
 							goto continueFor;
 						}
-						float ll = knlm->progress(cNode, seq[i]);
+						float ll = cLmState.next(langMdl, seq[i]);
 						candScore += ll;
 					}
 				}
-				emplaceMaxCnt(maxWidLL, lSeq, WordLLP{ wids, candScore, cNode }, 3, [](const WordLLP& a, const WordLLP& b) { return a.accScore > b.accScore; });
+				emplaceMaxCnt(maxWidLL, lSeq, WordLLP<LmState>{ wids, candScore, &p, move(cLmState) }, 3, 
+					[](const WordLLP<LmState>& a, const WordLLP<LmState>& b) 
+					{ 
+						return a.accScore > b.accScore; 
+					}
+				);
 			continueFor:;
 			}
 		}
@@ -488,14 +558,19 @@ namespace kiwi
 		return false;
 	}
 
-	template<ArchType arch, class LmType, class CandTy, class CacheTy>
-	float PathEvaluator::evalPath(const Kiwi* kw, const KGraphNode* startNode, const KGraphNode* node,
-		CacheTy& cache, Vector<KString>& ownFormList,
-		size_t i, size_t ownFormId, CandTy&& cands, bool unknownForm
+	template<class LmState, class CandTy, class CacheTy>
+	float PathEvaluator::evalPath(const Kiwi* kw, 
+		const KGraphNode* startNode, 
+		const KGraphNode* node,
+		CacheTy& cache, 
+		Vector<KString>& ownFormList,
+		size_t i, 
+		size_t ownFormId, 
+		CandTy&& cands, 
+		bool unknownForm
 	)
 	{
-		auto lm = static_cast<const lm::KnLangModel<arch, LmType>*>(kw->langMdl.get());
-		const size_t langVocabSize = lm->getHeader().vocab_size;
+		const size_t langVocabSize = kw->langMdl.knlm->getHeader().vocab_size;;
 		auto& nCache = cache[i];
 
 		float whitespaceDiscount = 0;
@@ -550,8 +625,8 @@ namespace kiwi
 				condV = curMorph->vowel;
 				condP = curMorph->polar;
 
-				UnorderedMap<Wid, Vector<WordLLP>> maxWidLL;
-				evalTrigram(lm, kw->morphemes.data(), ownFormList, cache, seq, chSize, curMorph, node, startNode, maxWidLL, ignoreCond ? -10 : 0);
+				UnorderedMap<Wid, Vector<WordLLP<LmState>>> maxWidLL;
+				evalTrigram(kw->langMdl, kw->morphemes.data(), ownFormList, cache, seq, chSize, curMorph, node, startNode, maxWidLL, ignoreCond ? -10 : 0);
 				if (maxWidLL.empty()) continue;
 
 				float estimatedLL = curMorph->userScore + whitespaceDiscount;
@@ -564,12 +639,19 @@ namespace kiwi
 
 				float discountForCombining = curMorph->combineSocket ? -15 : 0;
 				estimatedLL += kw->tagScorer.evalLeftBoundary(hasLeftBoundary(node), curMorph->tag);
+				
+				bool isVowelE = isEClass(curMorph->tag) && curMorph->kform && hasNoOnset(*curMorph->kform);
 
 				for (auto& p : maxWidLL)
 				{
 					for (auto& q : p.second)
 					{
 						q.accScore += estimatedLL;
+						// 불규칙 활용 형태소 뒤에 모음 어미가 붙는 경우 벌점 부여
+						if (isVowelE && isIrregular(kw->morphemes[q.morphs->back().wid].tag))
+						{
+							q.accScore -= 10;
+						}
 						tMax = max(tMax, q.accScore + discountForCombining);
 					}
 				}
@@ -579,7 +661,7 @@ namespace kiwi
 					for (auto& q : p.second)
 					{
 						if (q.accScore <= tMax - kw->cutOffThreshold) continue;
-						nCache.emplace_back(WordLL{ MInfos{}, q.accScore, q.node });
+						nCache.emplace_back(MInfos{}, q.accScore, q.parent, q.lmState);
 						auto& wids = nCache.back().morphs;
 						wids.reserve(q.morphs->size() + chSize);
 						wids = *q.morphs;
@@ -624,16 +706,35 @@ namespace kiwi
 		return tMax;
 	}
 
-	template<ArchType arch, class LmType>
+	template<class LmState>
+	inline void fillWordScores(const WordLL<LmState>* result, PathEvaluator::Result* out)
+	{
+		for (;result->parent; result = result->parent)
+		{
+			float scoreDiff = result->accScore - result->parent->accScore;
+			size_t b = result->parent->morphs.size() - 1;
+			size_t e = result->morphs.size() - 1;
+			if (result->parent->morphs.back().combineSocket) --b;
+			if (result->morphs.back().combineSocket) --e;
+			if (b == e) continue;
+			scoreDiff /= e - b;
+			for (size_t i = b; i < e; ++i)
+			{
+				out[i].wordScore = scoreDiff;
+			}
+		}
+	}
+
+	template<class LmState>
 	Vector<pair<PathEvaluator::Path, float>> PathEvaluator::findBestPath(const Kiwi* kw, const Vector<KGraphNode>& graph, size_t topN)
 	{
-		Vector<WordLLs> cache(graph.size());
+		static constexpr size_t eosId = 1;
+
+		Vector<Vector<WordLL<LmState>>> cache(graph.size());
 		Vector<KString> ownFormList;
 		Vector<const Morpheme*> unknownNodeCands, unknownNodeLCands;
 
-		auto lm = static_cast<const lm::KnLangModel<arch, LmType>*>(kw->langMdl.get());
-
-		size_t langVocabSize = lm->getHeader().vocab_size;
+		const size_t langVocabSize = kw->langMdl.knlm->getHeader().vocab_size;
 
 		const KGraphNode* startNode = &graph.front();
 		const KGraphNode* endNode = &graph.back();
@@ -643,8 +744,7 @@ namespace kiwi
 		unknownNodeLCands.emplace_back(kw->getDefaultMorpheme(POSTag::nnp));
 
 		// start node
-		ptrdiff_t bosNode = lm->getBosNodeIdx();
-		cache.front().emplace_back(WordLL{ MInfos{ MInfo(0u) }, 0.f, bosNode });
+		cache.front().emplace_back(MInfos{ MInfo(0u) }, 0.f, nullptr, LmState{ kw->langMdl });
 
 		// middle nodes
 		for (size_t i = 1; i < graph.size() - 1; ++i)
@@ -660,7 +760,7 @@ namespace kiwi
 
 			if (node->form)
 			{
-				tMax = evalPath<arch, LmType>(kw, startNode, node, cache, ownFormList, i, ownFormId, node->form->candidate, false);
+				tMax = evalPath<LmState>(kw, startNode, node, cache, ownFormList, i, ownFormId, node->form->candidate, false);
 				if (all_of(node->form->candidate.begin(), node->form->candidate.end(), [](const Morpheme* m)
 				{
 					return m->combineSocket || !m->chunks.empty();
@@ -668,31 +768,31 @@ namespace kiwi
 				{
 					ownFormList.emplace_back(node->form->form);
 					ownFormId = ownFormList.size();
-					tMax = min(tMax, evalPath<arch, LmType>(kw, startNode, node, cache, ownFormList, i, ownFormId, unknownNodeLCands, true));
+					tMax = min(tMax, evalPath<LmState>(kw, startNode, node, cache, ownFormList, i, ownFormId, unknownNodeLCands, true));
 				};
 			}
 			else
 			{
-				tMax = evalPath<arch, LmType>(kw, startNode, node, cache, ownFormList, i, ownFormId, unknownNodeCands, true);
+				tMax = evalPath<LmState>(kw, startNode, node, cache, ownFormList, i, ownFormId, unknownNodeCands, true);
 			}
 
-			// heuristically remove cands with lower ll to speed up
+			// heuristically remove cands having lower ll to speed up
 			if (cache[i].size() > topN)
 			{
-				WordLLs reduced;
-				float combinedCutOffScore = findNthLargest(cache[i].begin(), cache[i].end(), topN, [](const WordLL& c)
+				Vector<WordLL<LmState>> reduced;
+				float combinedCutOffScore = findNthLargest(cache[i].begin(), cache[i].end(), topN, [](const WordLL<LmState>& c)
 				{
 					return c.accScore;
-				}, [](const WordLL& c)
+				}, [](const WordLL<LmState>& c)
 				{
 					if (c.morphs.empty()) return false;
 					return !!c.morphs.back().combineSocket;
 				});
 
-				float otherCutOffScore = findNthLargest(cache[i].begin(), cache[i].end(), topN, [](const WordLL& c)
+				float otherCutOffScore = findNthLargest(cache[i].begin(), cache[i].end(), topN, [](const WordLL<LmState>& c)
 				{
 					return c.accScore;
-				}, [](const WordLL& c)
+				}, [](const WordLL<LmState>& c)
 				{
 					if (c.morphs.empty()) return true;
 					return !c.morphs.back().combineSocket;
@@ -715,7 +815,7 @@ namespace kiwi
 				cout << tt.accScore << '\t';
 				for (auto& m : tt.morphs)
 				{
-					morphBase[m.wid].print(cout) << '\t';
+					kw->morphemes[m.wid].print(cout) << '\t';
 				}
 				cout << endl;
 			}
@@ -733,13 +833,18 @@ namespace kiwi
 				if (p.morphs.back().combineSocket) continue;
 				if (!FeatureTestor::isMatched(nullptr, p.morphs.back().condVowel)) continue;
 
-				float c = p.accScore + lm->progress(p.node, 1);
-				cache.back().emplace_back(WordLL{ p.morphs, c, 0 });
+				float c = p.accScore + p.lmState.next(kw->langMdl, eosId);
+				cache.back().emplace_back(p.morphs, c, &p, p.lmState);
 			}
 		}
 
 		auto& cand = cache.back();
-		sort(cand.begin(), cand.end(), [](const WordLL& a, const WordLL& b) { return a.accScore > b.accScore; });
+		sort(cand.begin(), cand.end(), 
+			[](const WordLL<LmState>& a, const WordLL<LmState>& b) 
+			{ 
+				return a.accScore > b.accScore; 
+			}
+		);
 
 #ifdef DEBUG_PRINT
 		cout << "== LAST ==" << endl;
@@ -748,7 +853,7 @@ namespace kiwi
 			cout << tt.accScore << '\t';
 			for (auto& m : tt.morphs)
 			{
-				morphBase[m.wid].print(cout) << '\t';
+				kw->morphemes[m.wid].print(cout) << '\t';
 			}
 			cout << endl;
 		}
@@ -765,6 +870,7 @@ namespace kiwi
 				if (m.ownFormId) return Result{ &kw->morphemes[m.wid], ownFormList[m.ownFormId - 1], m.beginPos, m.endPos };
 				else return Result{ &kw->morphemes[m.wid], KString{}, m.beginPos, m.endPos };
 			});
+			fillWordScores(&cand[i], mv.data());
 			ret.emplace_back(mv, cand[i].accScore);
 		}
 		return ret;
@@ -850,20 +956,20 @@ namespace kiwi
 			}
 			// (NN. | XR) + XSV => VV
 			else if (!!(matchOptions & Match::joinVerbSuffix)
-				&& nextToken.tag == POSTag::xsv
+				&& clearIrregular(nextToken.tag) == POSTag::xsv
 				&& ((POSTag::nng <= current.tag && current.tag <= POSTag::nnb) || current.tag == POSTag::xr)
 			)
 			{
-				concatTokens(current, nextToken, POSTag::vv);
+				concatTokens(current, nextToken, setIrregular(POSTag::vv, isIrregular(nextToken.tag)));
 				++next;
 			}
 			// (NN. | XR) + XSA => VA
 			else if (!!(matchOptions & Match::joinAdjSuffix)
-				&& nextToken.tag == POSTag::xsa
+				&& clearIrregular(nextToken.tag) == POSTag::xsa
 				&& ((POSTag::nng <= current.tag && current.tag <= POSTag::nnb) || current.tag == POSTag::xr)
 			)
 			{
-				concatTokens(current, nextToken, POSTag::va);
+				concatTokens(current, nextToken, setIrregular(POSTag::va, isIrregular(nextToken.tag)));
 				++next;
 			}
 			else
@@ -933,6 +1039,7 @@ namespace kiwi
 				size_t endPos = lower_bound(positionTable.begin(), positionTable.end(), s.end) - positionTable.begin();
 				token.position = beginPos;
 				token.length = endPos - beginPos;
+				token.score = s.wordScore;
 
 				// Token의 시작위치(position)을 이용해 Token이 포함된 어절번호(wordPosition)를 얻음
 				token.wordPosition = wordPositions[token.position];
@@ -957,5 +1064,73 @@ namespace kiwi
 		{
 			return analyze(str, topN, matchOptions);
 		});
+	}
+
+	using FnNewAutoJoiner = cmb::AutoJoiner(Kiwi::*)() const;
+
+	template<template<ArchType> class LmState>
+	struct NewAutoJoinerGetter
+	{
+		template<std::ptrdiff_t i>
+		struct Wrapper
+		{
+			static constexpr FnNewAutoJoiner value = &Kiwi::newJoinerImpl<LmState<static_cast<ArchType>(i)>>;
+		};
+	};
+
+	cmb::AutoJoiner Kiwi::newJoiner(bool lmSearch) const
+	{
+		static tp::Table<FnNewAutoJoiner, AvailableArch> lmVoid{ NewAutoJoinerGetter<VoidState>{} };
+		static tp::Table<FnNewAutoJoiner, AvailableArch> lmKnLM_8{ NewAutoJoinerGetter<WrappedKnLM<uint8_t>::type>{} };
+		static tp::Table<FnNewAutoJoiner, AvailableArch> lmKnLM_16{ NewAutoJoinerGetter<WrappedKnLM<uint16_t>::type>{} };
+		static tp::Table<FnNewAutoJoiner, AvailableArch> lmKnLM_32{ NewAutoJoinerGetter<WrappedKnLM<uint32_t>::type>{} };
+		static tp::Table<FnNewAutoJoiner, AvailableArch> lmKnLM_64{ NewAutoJoinerGetter<WrappedKnLM<uint64_t>::type>{} };
+		static tp::Table<FnNewAutoJoiner, AvailableArch> lmSbg_8{ NewAutoJoinerGetter<WrappedSbg<8, uint8_t>::type>{} };
+		static tp::Table<FnNewAutoJoiner, AvailableArch> lmSbg_16{ NewAutoJoinerGetter<WrappedSbg<8, uint16_t>::type>{} };
+		static tp::Table<FnNewAutoJoiner, AvailableArch> lmSbg_32{ NewAutoJoinerGetter<WrappedSbg<8, uint32_t>::type>{} };
+		static tp::Table<FnNewAutoJoiner, AvailableArch> lmSbg_64{ NewAutoJoinerGetter<WrappedSbg<8, uint64_t>::type>{} };
+		
+		const auto archIdx = static_cast<std::ptrdiff_t>(selectedArch);
+
+		if (lmSearch)
+		{
+			size_t vocabTySize = langMdl.knlm->getHeader().key_size;
+			if (langMdl.sbg)
+			{
+				switch (vocabTySize)
+				{
+				case 1:
+					return (this->*lmSbg_8[archIdx])();
+				case 2:
+					return (this->*lmSbg_16[archIdx])();
+				case 4:
+					return (this->*lmSbg_32[archIdx])();
+				case 8:
+					return (this->*lmSbg_64[archIdx])();
+				default:
+					throw Exception{ "invalid `key_size`=" + to_string(vocabTySize)};
+				}
+			}
+			else
+			{
+				switch (vocabTySize)
+				{
+				case 1:
+					return (this->*lmKnLM_8[archIdx])();
+				case 2:
+					return (this->*lmKnLM_16[archIdx])();
+				case 4:
+					return (this->*lmKnLM_32[archIdx])();
+				case 8:
+					return (this->*lmKnLM_64[archIdx])();
+				default:
+					throw Exception{ "invalid `key_size`=" + to_string(vocabTySize) };
+				}
+			}
+		}
+		else
+		{
+			return (this->*lmVoid[archIdx])();
+		}
 	}
 }

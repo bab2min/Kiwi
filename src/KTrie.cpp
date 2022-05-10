@@ -208,7 +208,7 @@ Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form
 						if (find(candidates.begin(), candidates.end(), cand) != candidates.end()) break;
 						while (1)
 						{
-							if (FeatureTestor::isMatched(&str[0], &str[nonSpaces[nonSpaces.size() - cand->form.size()]], cand->vowel, cand->polar))
+							if (FeatureTestor::isMatchedApprox(&str[0], &str[nonSpaces[nonSpaces.size() - cand->form.size()]], cand->vowel, cand->polar))
 							{
 								candidates.emplace_back(cand);
 							}
@@ -271,7 +271,7 @@ Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form
 				if (find(candidates.begin(), candidates.end(), cand) != candidates.end()) break;
 				while (1)
 				{
-					if (FeatureTestor::isMatched(&str[0], &str[nonSpaces[nonSpaces.size() - cand->form.size()]], cand->vowel, cand->polar))
+					if (FeatureTestor::isMatchedApprox(&str[0], &str[nonSpaces[nonSpaces.size() - cand->form.size()]], cand->vowel, cand->polar))
 					{
 						candidates.emplace_back(cand);
 					}

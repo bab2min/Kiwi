@@ -34,12 +34,18 @@ TokenInfo parseWordPOS(const u16string& str)
 	case u'\u3142': // ㅂ
 		form[0] = u'\u11B8'; break;
 	}
-	POSTag tag = toPOSTag(str.substr(p + 1));
+	u16string tagStr = str.substr(p + 1);
+	if (tagStr.find('-') != tagStr.npos)
+	{
+		tagStr.erase(tagStr.begin() + tagStr.find('-'), tagStr.end());
+	}
+	POSTag tag = toPOSTag(tagStr);
 	if (tag >= POSTag::max) throw runtime_error{ "Wrong Input '" + utf16To8(str.substr(p + 1)) + "'" };
 	return { form, tag, 0, 0 };
 }
 
-Evaluator::Evaluator(const std::string& testSetFile, const Kiwi* _kw, size_t _topN) : kw{ _kw }, topN{ _topN }
+Evaluator::Evaluator(const std::string& testSetFile, const Kiwi* _kw, Match _matchOption, size_t _topN)
+	: kw{ _kw }, matchOption{ _matchOption }, topN{ _topN }
 {
 	ifstream f{ testSetFile };
 	if (!f) throw std::ios_base::failure{ "Cannot open '" + testSetFile + "'" };
@@ -66,7 +72,7 @@ void Evaluator::run()
 {
 	for (auto& tr : testsets)
 	{
-		auto cands = kw->analyze(tr.q, topN, Match::all);
+		auto cands = kw->analyze(tr.q, topN, matchOption);
 		tr.r = cands[0].first;
 	}
 }
@@ -84,7 +90,7 @@ Evaluator::Score Evaluator::evaluate()
 		{
 			auto diff = lcs::getDiff(tr.r.begin(), tr.r.end(), tr.a.begin(), tr.a.end(), [](const TokenInfo& a, const TokenInfo& b)
 			{
-				if (a.tag != b.tag) return false;
+				if (clearIrregular(a.tag) != clearIrregular(b.tag)) return false;
 				if (a.tag == POSTag::jko) return true;
 				if (a.str == u"은" && u"ᆫ" == b.str) return true;
 				if (b.str == u"은" && u"ᆫ" == a.str) return true;

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 
-project(kiwi VERSION 0.11.2 DESCRIPTION "Kiwi, Korean Intelligent Word Identifier")
+project(kiwi VERSION 0.12.0 DESCRIPTION "Kiwi, Korean Intelligent Word Identifier")
 
 set ( CMAKE_CXX_STANDARD 11 )
 set ( CMAKE_VERBOSE_MAKEFILE true )
@@ -25,6 +25,7 @@ set ( CORE_SRCS
   src/Combiner.cpp
   src/Form.cpp
   src/FeatureTestor.cpp
+  src/Joiner.cpp
   src/Kiwi.cpp
   src/KiwiBuilder.cpp
   src/KTrie.cpp
@@ -50,6 +51,7 @@ include_directories( include/ )
 include_directories( third_party/tclap/include )
 include_directories( third_party/cpp-btree )
 include_directories( third_party/variant/include )
+include_directories( third_party/eigen )
 if(KIWI_USE_CPUINFO)
   message(STATUS "Use cpuinfo")
   include_directories( third_party/cpuinfo/include )

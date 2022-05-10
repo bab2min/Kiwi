@@ -267,6 +267,11 @@ namespace kiwi
 		return ret;
 	}
 
+	inline std::string utf16To8(const char16_t* str)
+	{
+		return utf16To8(U16StringView{ str });
+	}
+
 	template<class It>
 	inline KString normalizeHangul(It first, It last)
 	{
@@ -400,6 +405,16 @@ namespace kiwi
 		if (tagStr == u"W_EMAIL") return POSTag::w_email;
 		if (tagStr == u"W_HASHTAG") return POSTag::w_hashtag;
 		if (tagStr == u"W_MENTION") return POSTag::w_mention;
+		
+		if (tagStr == u"VV-I") return setIrregular(POSTag::vv);
+		if (tagStr == u"VA-I") return setIrregular(POSTag::va);
+		if (tagStr == u"VX-I") return setIrregular(POSTag::vx);
+		if (tagStr == u"XSA-I") return setIrregular(POSTag::xsa);
+
+		if (tagStr == u"VV-R") return POSTag::vv;
+		if (tagStr == u"VA-R") return POSTag::va;
+		if (tagStr == u"VX-R") return POSTag::vx;
+		if (tagStr == u"XSA-R") return POSTag::xsa;
 		//assert(0);
 		return POSTag::max;
 	}

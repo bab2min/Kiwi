@@ -19,7 +19,7 @@ bool kiwi::isNounClass(POSTag tag)
 bool kiwi::isVerbClass(POSTag tag)
 {
 	static auto verbs = { POSTag::vv, POSTag::va, POSTag::vx, POSTag::xsv, POSTag::xsa, POSTag::vcp, POSTag::vcn, };
-	return find(verbs.begin(), verbs.end(), tag) != verbs.end();
+	return find(verbs.begin(), verbs.end(), clearIrregular(tag)) != verbs.end();
 }
 
 bool kiwi::isEClass(POSTag tag)
@@ -34,6 +34,7 @@ bool kiwi::isJClass(POSTag tag)
 
 bool kiwi::isSuffix(POSTag tag)
 {
+	tag = clearIrregular(tag);
 	return POSTag::xsn <= tag && tag <= POSTag::xsa;
 }
 

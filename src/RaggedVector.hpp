@@ -104,6 +104,38 @@ namespace kiwi
 			}
 		};
 
+		class ConstIterator
+		{
+			const RaggedVector& rv;
+			size_t i;
+		public:
+			ConstIterator(const RaggedVector& _rv, size_t _i = 0)
+				: rv(_rv), i{ _i } // `rv{ _rv }` generates a compilation error at gcc <= 4.8
+			{
+			}
+
+			bool operator==(const ConstIterator& o) const
+			{
+				return i == o.i;
+			}
+
+			bool operator!=(const ConstIterator& o) const
+			{
+				return i != o.i;
+			}
+
+			ConstIterator& operator++()
+			{
+				++i;
+				return *this;
+			}
+
+			auto operator*() const -> decltype(rv[i])
+			{
+				return rv[i];
+			}
+		};
+
 		size_t size() const { return ptrs.size(); };
 
 		void resize(size_t i) { data.resize(ptrs[i]); ptrs.resize(i); }
@@ -127,6 +159,12 @@ namespace kiwi
 			ptrs.emplace_back(data.size());
 		}
 
+		void pop_back()
+		{
+			data.resize(ptrs.back());
+			ptrs.pop_back();
+		}
+
 		template<class... Args>
 		void add_data(Args&&... args)
 		{
@@ -145,6 +183,16 @@ namespace kiwi
 		}
 
 		Iterator end()
+		{
+			return { *this, size() };
+		}
+
+		ConstIterator begin() const
+		{
+			return { *this, 0 };
+		}
+
+		ConstIterator end() const
 		{
 			return { *this, size() };
 		}

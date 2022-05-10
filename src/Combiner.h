@@ -3,12 +3,16 @@
 #include <mapbox/variant.hpp>
 #include <kiwi/Types.h>
 #include <kiwi/TemplateUtils.hpp>
-#include "RaggedVector.hpp"
+#include <kiwi/Joiner.h>
+#include "string_view.hpp"
 #include "bitset.hpp"
 
 namespace kiwi
 {
 	class KiwiBuilder;
+
+	template<class Ty> class RaggedVector;
+
 	namespace cmb
 	{
 		struct ReplString
@@ -77,8 +81,8 @@ namespace kiwi
 			static MultiRuleDFA fromOther(MultiRuleDFA<_NodeSizeTy, GroupSizeTy>&& o);
 
 		public:
-			Vector<Result> combine(const KString& left, const KString& right) const;
-			Vector<std::tuple<size_t, size_t, CondPolarity>> searchLeftPat(const KString& left, bool matchRuleSep = true) const;
+			Vector<Result> combine(U16StringView left, U16StringView right) const;
+			Vector<std::tuple<size_t, size_t, CondPolarity>> searchLeftPat(U16StringView left, bool matchRuleSep = true) const;
 		};
 
 		namespace detail
@@ -177,36 +181,27 @@ namespace kiwi
 		class CompiledRule
 		{
 			friend class RuleSet;
-			friend class KiwiBuilder;
+			friend class kiwi::KiwiBuilder;
+			friend class Joiner;
 
 			Vector<MultiRuleDFAErased> dfa, dfaRight;
 			UnorderedMap<std::tuple<POSTag, POSTag, uint8_t>, size_t> map;
+			Vector<std::pair<KString, CondVowel>> allomorphData;
+			UnorderedMap<std::pair<KString, POSTag>, std::pair<size_t, size_t>> allomorphPtrMap;
 
 			auto findRule(POSTag leftTag, POSTag rightTag,
 				CondVowel cv = CondVowel::none, CondPolarity cp = CondPolarity::none
 			) const -> decltype(map.end());
 
-		public:
-			CompiledRule();
-			CompiledRule(const CompiledRule&);
-			CompiledRule(CompiledRule&&) noexcept;
-			~CompiledRule();
-			CompiledRule& operator=(const CompiledRule&);
-			CompiledRule& operator=(CompiledRule&&) noexcept;
-
-			std::vector<std::u16string> combine(
-				const std::u16string& leftForm, POSTag leftTag, 
-				const std::u16string& rightForm, POSTag rightTag,
+			Vector<KString> combineImpl(
+				U16StringView leftForm, POSTag leftTag,
+				U16StringView rightForm, POSTag rightTag,
 				CondVowel cv = CondVowel::none, CondPolarity cp = CondPolarity::none
 			) const;
 
-			static uint8_t toFeature(CondVowel cv, CondPolarity cp);
-
-			/**
-			 * @return vector of tuple(replaceGroupId, capturedStartPos, replaceGroupCondition)
-			 */
-			std::vector<std::tuple<size_t, size_t, CondPolarity>> testLeftPattern(
-				const std::u16string& leftForm, POSTag leftTag, POSTag rightTag,
+			std::pair<KString, size_t> combineOneImpl(
+				U16StringView leftForm, POSTag leftTag,
+				U16StringView rightForm, POSTag rightTag,
 				CondVowel cv = CondVowel::none, CondPolarity cp = CondPolarity::none
 			) const;
 
@@ -214,20 +209,63 @@ namespace kiwi
 			 * @return vector of tuple(replaceGroupId, capturedStartPos, replaceGroupCondition)
 			 */
 			Vector<std::tuple<size_t, size_t, CondPolarity>> testLeftPattern(
-				const KString& leftForm, size_t ruleId
+				U16StringView leftForm, size_t ruleId
 			) const;
 
 			/**
 			 * @return vector of tuple(replaceGroupId, capturedEndPos, replaceGroupCondition)
 			 */
 			Vector<std::tuple<size_t, size_t, CondPolarity>> testRightPattern(
-				const KString& rightForm, size_t ruleId
+				U16StringView rightForm, size_t ruleId
 			) const;
 
 			UnorderedMap<std::tuple<POSTag, uint8_t>, Vector<size_t>> getRuleIdsByLeftTag() const;
 			UnorderedMap<POSTag, Vector<size_t>> getRuleIdsByRightTag() const;
 
-			Vector<Result> combine(const KString& leftForm, const KString& rightForm, size_t ruleId) const;
+			Vector<Result> combine(U16StringView leftForm, U16StringView rightForm, size_t ruleId) const;
+
+			template<class FormsTy>
+			void addAllomorphImpl(const FormsTy& forms, POSTag tag);
+
+			static uint8_t toFeature(CondVowel cv, CondPolarity cp);
+
+		public:
+
+			CompiledRule();
+			CompiledRule(const CompiledRule&);
+			CompiledRule(CompiledRule&&) noexcept;
+			~CompiledRule();
+			CompiledRule& operator=(const CompiledRule&);
+			CompiledRule& operator=(CompiledRule&&) noexcept;
+
+			bool isReady() const { return !dfa.empty(); }
+
+			std::vector<std::u16string> combine(
+				U16StringView leftForm, POSTag leftTag,
+				U16StringView rightForm, POSTag rightTag,
+				CondVowel cv = CondVowel::none, CondPolarity cp = CondPolarity::none
+			) const;
+
+			std::vector<std::u16string> combine(
+				const char16_t* leftForm, POSTag leftTag,
+				const char16_t* rightForm, POSTag rightTag,
+				CondVowel cv = CondVowel::none, CondPolarity cp = CondPolarity::none
+			) const;
+
+			Joiner newJoiner() const
+			{
+				return Joiner{ *this };
+			}
+
+			void addAllomorph(const std::vector<std::pair<U16StringView, CondVowel>>& forms, POSTag tag);
+
+			/**
+			 * @return vector of tuple(replaceGroupId, capturedStartPos, replaceGroupCondition)
+			 */
+			std::vector<std::tuple<size_t, size_t, CondPolarity>> testLeftPattern(
+				U16StringView leftForm, POSTag leftTag, POSTag rightTag,
+				CondVowel cv = CondVowel::none, CondPolarity cp = CondPolarity::none
+			) const;
 		};
 
 		class RuleSet

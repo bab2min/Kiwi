@@ -189,7 +189,7 @@ size_t PatternMatcherImpl::testNumeric(const char16_t* first, const char16_t* la
 		while (b != last && isDigit(*b)) ++b;
 	}
 	
-	if(b == last || isSpace(*b) || isHangulSyllable(*b))
+	if(b == last || (*b != '.'))
 	{
 		return b - first;
 	}

@@ -8,12 +8,20 @@
 using namespace std;
 using namespace kiwi;
 
-int run(const KiwiBuilder::ModelBuildArgs& args, const string& output)
+int run(const KiwiBuilder::ModelBuildArgs& args, const string& output, bool skipBigram)
 {
 	try
 	{
 		tutils::Timer timer;
-		KiwiBuilder{ args }.saveModel(output);
+		if (skipBigram)
+		{
+			cout << "Build SkipBigram model based on KnLM: " << output << endl;
+			KiwiBuilder kb{ output, args };
+		}
+		else
+		{
+			KiwiBuilder{ args }.saveModel(output);
+		}
 		double tm = timer.getElapsed();
 		cout << "Total: " << tm << " ms " << endl;
 		return 0;
@@ -37,6 +45,7 @@ int main(int argc, const char* argv[])
 	SwitchArg compress{ "", "compress", "compress LM" };
 	SwitchArg quantize{ "", "quantize", "quantize LM" };
 	SwitchArg tagHistory{ "", "history", "use tag history of LM" };
+	SwitchArg skipBigram{ "", "skipbigram", "build skipbigram model" };
 	ValueArg<size_t> workers{ "w", "workers", "number of workers", false, 1, "int" };
 	ValueArg<size_t> morMinCnt{ "", "morpheme_min_cnt", "min count of morpheme", false, 10, "int" };
 	ValueArg<size_t> lmOrder{ "", "order", "order of LM", false, 4, "int" };
@@ -51,6 +60,7 @@ int main(int argc, const char* argv[])
 	cmd.add(compress);
 	cmd.add(quantize);
 	cmd.add(tagHistory);
+	cmd.add(skipBigram);
 	cmd.add(morMinCnt);
 	cmd.add(lmOrder);
 	cmd.add(lmMinCnt);
@@ -77,6 +87,6 @@ int main(int argc, const char* argv[])
 	args.lmMinCnt = lmMinCnt;
 	args.lmLastOrderMinCnt = lmLastOrderMinCnt;
 	args.numWorkers = workers;
-	return run(args, output);
+	return run(args, output, skipBigram);
 }
 

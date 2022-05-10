@@ -24,11 +24,13 @@ namespace kiwi
 		CondVowel _vowel,
 		CondPolarity _polar,
 		uint8_t _combineSocket)
-		: tag(_tag), vowel(_vowel), polar(_polar), combineSocket(_combineSocket)
+		: tag(_tag), combineSocket(_combineSocket)
 	{
+		setVowel(_vowel);
+		setPolar(_polar);
 	}
 
-	DEFINE_SERIALIZER_OUTSIDE(MorphemeRaw, kform, tag, vowel, polar, combineSocket, combined, userScore, chunks, chunkPositions, lmMorphemeId);
+	DEFINE_SERIALIZER_OUTSIDE(MorphemeRaw, kform, tag, vpPack, combineSocket, combined, userScore, chunks, chunkPositions, lmMorphemeId);
 
 	Morpheme::Morpheme() = default;
 
@@ -98,8 +100,8 @@ namespace kiwi
 		Morpheme ret;
 		ret.kform = &formBase[o.kform].form;
 		ret.tag = o.tag;
-		ret.vowel = o.vowel;
-		ret.polar = o.polar;
+		ret.vowel = o.vowel();
+		ret.polar = o.polar();
 		ret.combineSocket = o.combineSocket;
 		ret.combined = o.combined;
 		ret.userScore = o.userScore;
@@ -115,7 +117,7 @@ namespace kiwi
 
 	std::ostream& Morpheme::print(std::ostream& os) const
 	{
-		os << utf16To8(kform ? u16string{ kform->begin(), kform->end() } : u"_");
+		os << utf16To8(kform ? joinHangul(*kform) : u"_");
 		os << '/';
 		os << tagToString(tag);
 		if (combineSocket) os << '+' << (size_t)combineSocket;

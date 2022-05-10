@@ -4,10 +4,11 @@
 #include <algorithm>
 
 #include <kiwi/Utils.h>
-
-#include "FeatureTestor.h"
+#include <kiwi/TagUtils.h>
 #include "Combiner.h"
+#include "FeatureTestor.h"
 #include "StrUtils.h"
+#include "RaggedVector.hpp"
 
 using namespace std;
 using namespace kiwi;
@@ -263,20 +264,44 @@ inline Vector<POSTag> getSubTagset(const string& prefix)
 	{
 		if (pf == "P")
 		{
-			ret.emplace_back(POSTag::p);
+			ret.emplace_back(POSTag::pv);
 			ret.emplace_back(POSTag::pa);
+			ret.emplace_back(POSTag::pvi);
+			ret.emplace_back(POSTag::pai);
 		}
 		else if (pf == "PV")
 		{
-			ret.emplace_back(POSTag::p);
+			ret.emplace_back(POSTag::pv);
+			ret.emplace_back(POSTag::pvi);
 		}
 		else if (pf == "PA")
 		{
 			ret.emplace_back(POSTag::pa);
+			ret.emplace_back(POSTag::pai);
+		}
+		else if (pf == "PV-I")
+		{
+			ret.emplace_back(POSTag::pvi);
+		}
+		else if (pf == "PA-I")
+		{
+			ret.emplace_back(POSTag::pai);
+		}
+		else if (pf == "PI")
+		{
+			ret.emplace_back(POSTag::pvi);
+			ret.emplace_back(POSTag::pai);
 		}
 		else
 		{
 			for (auto i = POSTag::nng; i < POSTag::p; i = (POSTag)((size_t)i + 1))
+			{
+				if (strncmp(tagToString(i), pf.data(), pf.size()) == 0)
+				{
+					ret.emplace_back(i);
+				}
+			}
+			for (auto i : { POSTag::vvi, POSTag::vai, POSTag::vxi, POSTag::xsai })
 			{
 				if (strncmp(tagToString(i), pf.data(), pf.size()) == 0)
 				{
@@ -716,10 +741,10 @@ inline ReplString parseReplString(KString&& str)
 				escape = true;
 				break;
 			case '(':
-				rightBegin = i;
+				rightBegin = target;
 				break;
 			case ')':
-				leftEnd = i;
+				leftEnd = target;
 				break;
 			case '-':
 				score = stof(str.begin() + i, str.end());
@@ -833,13 +858,13 @@ CompiledRule RuleSet::compile() const
 }
 
 template<class NodeSizeTy, class GroupSizeTy>
-Vector<Result> MultiRuleDFA<NodeSizeTy, GroupSizeTy>::combine(const KString& left, const KString& right) const
+Vector<Result> MultiRuleDFA<NodeSizeTy, GroupSizeTy>::combine(U16StringView left, U16StringView right) const
 {
 	static constexpr NodeSizeTy no_node = -1;
 	static constexpr GroupSizeTy no_group = -1;
 	Vector<Result> ret;
 	Vector<size_t> capturedLefts(finish.size());
-	size_t nidx = 0, cpos = 0, capturedLeft = 0, capturedRight = 0;
+	size_t nidx = 0, cpos = 0, capturedLeft = 0, capturedRight = 0, groupCapturedR = no_group;
 	const size_t vsize = vocabs.size();
 
 	nidx = transition[nidx * vsize + Pattern::bos];
@@ -870,7 +895,11 @@ Vector<Result> MultiRuleDFA<NodeSizeTy, GroupSizeTy>::combine(const KString& lef
 		size_t v = (size_t)(upper_bound(vocabs.begin(), vocabs.end(), c) - vocabs.begin()) - 1;
 		nidx = transition[nidx * vsize + v];
 		cpos++;
-		if (nidx != no_node && finishGroup[nidx] != no_group && capturedRight == 0) capturedRight = cpos;
+		if (nidx != no_node && finishGroup[nidx] != no_group)
+		{
+			if(groupCapturedR != finishGroup[nidx]) capturedRight = cpos;
+			groupCapturedR = finishGroup[nidx];
+		}
 	}
 	
 	if (nidx == no_node) goto not_matched;
@@ -920,7 +949,7 @@ not_matched:
 }
 
 template<class NodeSizeTy, class GroupSizeTy>
-Vector<tuple<size_t, size_t, CondPolarity>> MultiRuleDFA<NodeSizeTy, GroupSizeTy>::searchLeftPat(const KString& left, bool matchRulSep) const
+Vector<tuple<size_t, size_t, CondPolarity>> MultiRuleDFA<NodeSizeTy, GroupSizeTy>::searchLeftPat(U16StringView left, bool matchRulSep) const
 {
 	static constexpr NodeSizeTy no_node = -1;
 	static constexpr GroupSizeTy no_group = -1;
@@ -978,28 +1007,27 @@ not_matched:
 
 struct CombineVisitor
 {
-	/* use member pointer, not reference, because of the bug at gcc 4.8 */
-	const KString* left;
-	const KString* right;
+	U16StringView left;
+	U16StringView right;
 
-	CombineVisitor(const KString& _left, const KString& _right)
-		: left{ &_left }, right{ &_right }
+	CombineVisitor(U16StringView _left, U16StringView _right)
+		: left{ _left }, right{ _right }
 	{
 	}
 
 	template<class Ty>
 	Vector<Result> operator()(const Ty& e) const
 	{
-		return e.combine(*left, *right);
+		return e.combine(left, right);
 	}
 };
 
 struct SearchLeftVisitor
 {
-	const KString& left;
+	U16StringView left;
 	bool matchRuleSep;
 
-	SearchLeftVisitor(const KString& _left, bool _matchRuleSep) : left{ _left }, matchRuleSep{ _matchRuleSep }
+	SearchLeftVisitor(U16StringView _left, bool _matchRuleSep) : left{ _left }, matchRuleSep{ _matchRuleSep }
 	{
 	}
 
@@ -1049,48 +1077,118 @@ auto CompiledRule::findRule(POSTag leftTag, POSTag rightTag, CondVowel cv, CondP
 	return map.find(make_tuple(leftTag, rightTag, toFeature(cv, cp)));
 }
 
-vector<u16string> CompiledRule::combine(
-	const u16string& leftForm, POSTag leftTag, 
-	const u16string& rightForm, POSTag rightTag,
+Vector<KString> CompiledRule::combineImpl(
+	U16StringView leftForm, POSTag leftTag,
+	U16StringView rightForm, POSTag rightTag,
 	CondVowel cv, CondPolarity cp
 ) const
 {
-	vector<u16string> ret;
-	KString l, r;
-	l = normalizeHangul(leftForm);
+	Vector<KString> ret;
 	if (cp == CondPolarity::none)
 	{
-		cp = FeatureTestor::isMatched(&l, CondPolarity::positive) ? CondPolarity::positive : CondPolarity::negative;
+		cp = FeatureTestor::isMatched(leftForm.data(), leftForm.data() + leftForm.size(), CondPolarity::positive) ? CondPolarity::positive : CondPolarity::negative;
 	}
 
 	auto it = findRule(leftTag, rightTag, cv, cp);
-	if (it == map.end())
+	if (it != map.end())
 	{
-		ret.emplace_back(leftForm + rightForm);
-		return ret;
+		for (auto& p : mapbox::util::apply_visitor(CombineVisitor{ leftForm, rightForm }, dfa[it->second]))
+		{
+			ret.emplace_back(move(p.str));
+		}
+		if (!ret.empty()) return ret;
 	}
 
-	r = normalizeHangul(rightForm);
-	for (auto& p : mapbox::util::apply_visitor(CombineVisitor{l, r}, dfa[it->second]))
+	// leftTag가 vv, va인데 일치하는 규칙이 없는 경우, pv, pa로 변경하여 재탐색
+	bool irregular = isIrregular(leftTag);
+	auto regLeftTag = clearIrregular(leftTag);
+	if (regLeftTag == POSTag::vv || regLeftTag == POSTag::va)
 	{
-		ret.emplace_back(joinHangul(p.str));
+		leftTag = setIrregular(regLeftTag == POSTag::vv ? POSTag::pv : POSTag::pa, irregular);
+		it = findRule(leftTag, rightTag, cv, cp);
+		if (it != map.end())
+		{
+			for (auto& p : mapbox::util::apply_visitor(CombineVisitor{ leftForm, rightForm }, dfa[it->second]))
+			{
+				ret.emplace_back(move(p.str));
+			}
+			if (!ret.empty()) return ret;
+		}
 	}
-	if (ret.empty()) ret.emplace_back(leftForm + rightForm);
+
+	KString r;
+	r.reserve(leftForm.size() + rightForm.size());
+	r.insert(r.end(), leftForm.begin(), leftForm.end());
+	r.insert(r.end(), rightForm.begin(), rightForm.end());
+	ret.emplace_back(r);
 	return ret;
 }
 
-Vector<tuple<size_t, size_t, CondPolarity>> CompiledRule::testLeftPattern(const KString& leftForm, size_t ruleId) const
+pair<KString, size_t> CompiledRule::combineOneImpl(
+	U16StringView leftForm, POSTag leftTag,
+	U16StringView rightForm, POSTag rightTag,
+	CondVowel cv, CondPolarity cp
+) const
+{
+	if (cp == CondPolarity::none)
+	{
+		cp = FeatureTestor::isMatched(leftForm.data(), leftForm.data() + leftForm.size(), CondPolarity::positive) ? CondPolarity::positive : CondPolarity::negative;
+	}
+
+	auto it = findRule(leftTag, rightTag, cv, cp);
+	if (it != map.end())
+	{
+		for (auto& p : mapbox::util::apply_visitor(CombineVisitor{ leftForm, rightForm }, dfa[it->second]))
+		{
+			return make_pair(p.str, p.rightBegin);
+		}
+	}
+
+	// leftTag가 vv, va인데 일치하는 규칙이 없는 경우, pv, pa로 변경하여 재탐색
+	bool irregular = isIrregular(leftTag);
+	auto regLeftTag = clearIrregular(leftTag);
+	if (regLeftTag == POSTag::vv || regLeftTag == POSTag::va)
+	{
+		leftTag = setIrregular(regLeftTag == POSTag::vv ? POSTag::pv : POSTag::pa, irregular);
+		it = findRule(leftTag, rightTag, cv, cp);
+		if (it != map.end())
+		{
+			for (auto& p : mapbox::util::apply_visitor(CombineVisitor{ leftForm, rightForm }, dfa[it->second]))
+			{
+				return make_pair(p.str, p.rightBegin);
+			}
+		}
+
+		// rightTag가 어미이며 일치하는 규칙이 없고 `어`로 시작하는 형태일 경우
+		if (isEClass(rightTag) && rightForm[0] == u'어' && cp == CondPolarity::positive)
+		{
+			KString ret;
+			ret.reserve(leftForm.size() + rightForm.size());
+			ret.insert(ret.end(), leftForm.begin(), leftForm.end());
+			ret.push_back(u'아'); // `어`를 `아`로 교체하여 삽입
+			ret.insert(ret.end(), rightForm.begin() + 1, rightForm.end());
+			return make_pair(ret, leftForm.size());
+		}
+	}
+	KString ret;
+	ret.reserve(leftForm.size() + rightForm.size());
+	ret.insert(ret.end(), leftForm.begin(), leftForm.end());
+	ret.insert(ret.end(), rightForm.begin(), rightForm.end());
+	return make_pair(ret, leftForm.size());
+}
+
+Vector<tuple<size_t, size_t, CondPolarity>> CompiledRule::testLeftPattern(U16StringView leftForm, size_t ruleId) const
 {
 	return mapbox::util::apply_visitor(SearchLeftVisitor{ leftForm, true }, dfa[ruleId]);
 }
 
 
-Vector<tuple<size_t, size_t, CondPolarity>> CompiledRule::testRightPattern(const KString& rightForm, size_t ruleId) const
+Vector<tuple<size_t, size_t, CondPolarity>> CompiledRule::testRightPattern(U16StringView rightForm, size_t ruleId) const
 {
 	return mapbox::util::apply_visitor(SearchLeftVisitor{ rightForm, false }, dfaRight[ruleId]);
 }
 
-vector<tuple<size_t, size_t, CondPolarity>> CompiledRule::testLeftPattern(const u16string& leftForm, POSTag leftTag, POSTag rightTag, CondVowel cv, CondPolarity cp) const
+vector<tuple<size_t, size_t, CondPolarity>> CompiledRule::testLeftPattern(U16StringView leftForm, POSTag leftTag, POSTag rightTag, CondVowel cv, CondPolarity cp) const
 {
 	vector<tuple<size_t, size_t, CondPolarity>> ret;
 	KString l = normalizeHangul(leftForm);
@@ -1139,7 +1237,50 @@ UnorderedMap<POSTag, Vector<size_t>> CompiledRule::getRuleIdsByRightTag() const
 	return ret;
 }
 
-Vector<Result> CompiledRule::combine(const KString& leftForm, const KString& rightForm, size_t ruleId) const
+Vector<Result> CompiledRule::combine(U16StringView leftForm, U16StringView rightForm, size_t ruleId) const
 {
 	return mapbox::util::apply_visitor(CombineVisitor{ leftForm, rightForm }, dfa[ruleId]);
+}
+
+vector<u16string> CompiledRule::combine(U16StringView leftForm, POSTag leftTag, U16StringView rightForm, POSTag rightTag, CondVowel cv, CondPolarity cp) const
+{
+	vector<u16string> ret;
+	for (auto& r : combineImpl(normalizeHangul(leftForm), leftTag, normalizeHangul(rightForm), rightTag, cv, cp))
+	{
+		ret.emplace_back(joinHangul(r));
+	}
+	return ret;
+}
+
+vector<u16string> CompiledRule::combine(const char16_t* leftForm, POSTag leftTag, const char16_t* rightForm, POSTag rightTag, CondVowel cv, CondPolarity cp) const
+{
+	return combine(U16StringView{ leftForm }, leftTag, U16StringView{ rightForm }, rightTag, cv, cp);
+}
+
+template<class FormsTy>
+void CompiledRule::addAllomorphImpl(const FormsTy& forms, POSTag tag)
+{
+	size_t ptrBegin = allomorphData.size();
+	size_t ptrEnd = allomorphData.size() + forms.size();
+
+	// vocalic 먼저 삽입 후 나머지 삽입
+	for (auto& p : forms)
+	{
+		if (p.second != CondVowel::vocalic) continue;
+		auto normForm = normalizeHangul(U16StringView{ p.first });
+		allomorphPtrMap[make_pair(normForm, tag)] = make_pair(ptrBegin, ptrEnd);
+		allomorphData.emplace_back(normForm, p.second);
+	}
+	for (auto& p : forms)
+	{
+		if (p.second == CondVowel::vocalic) continue;
+		auto normForm = normalizeHangul(U16StringView{ p.first });
+		allomorphPtrMap[make_pair(normForm, tag)] = make_pair(ptrBegin, ptrEnd);
+		allomorphData.emplace_back(normForm, p.second);
+	}
+}
+
+void CompiledRule::addAllomorph(const vector<pair<U16StringView, CondVowel>>& forms, POSTag tag)
+{
+	return addAllomorphImpl(forms, tag);
 }

@@ -33,6 +33,11 @@ struct kiwi_ss : public vector<pair<size_t, size_t>>
 	}
 };
 
+struct kiwi_joiner : public tuple<cmb::AutoJoiner, string, u16string>
+{
+	using tuple<cmb::AutoJoiner, string, u16string>::tuple;
+};
+
 thread_local exception_ptr currentError;
 
 inline POSTag parse_tag(const char* pos)
@@ -562,6 +567,20 @@ kiwi_ss_h kiwi_split_into_sents(kiwi_h handle, const char* text, int matchOption
 	}
 }
 
+DECL_DLL kiwi_joiner_h kiwi_new_joiner(kiwi_h handle, int lm_search)
+{
+	if (!handle) return nullptr;
+	Kiwi* kiwi = (Kiwi*)handle;
+	try
+	{
+		return new kiwi_joiner{ kiwi->newJoiner(!!lm_search), string{}, u16string{} };
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return nullptr;
+	}
+}
 
 int kiwi_close(kiwi_h handle)
 {
@@ -914,6 +933,66 @@ int kiwi_ss_close(kiwi_ss_h result)
 	try
 	{
 		delete result;
+		return 0;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return KIWIERR_FAIL;
+	}
+}
+
+int kiwi_joiner_add(kiwi_joiner_h handle, const char* form, const char* tag, int option)
+{
+	if (!handle) return KIWIERR_INVALID_HANDLE;
+	try
+	{
+		get<0>(*handle).add(utf8To16(form), parse_tag(tag), !!option);
+		return 0;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return KIWIERR_FAIL;
+	}
+}
+
+const char* kiwi_joiner_get(kiwi_joiner_h handle)
+{
+	if (!handle) return nullptr;
+	try
+	{
+		get<1>(*handle) = get<0>(*handle).getU8();
+		return get<1>(*handle).c_str();
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return nullptr;
+	}
+}
+
+const kchar16_t* kiwi_joiner_get_w(kiwi_joiner_h handle)
+{
+	if (!handle) return nullptr;
+	try
+	{
+		get<2>(*handle) = get<0>(*handle).getU16();
+		return (const kchar16_t*)get<2>(*handle).c_str();
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return nullptr;
+	}
+}
+
+int kiwi_joiner_close(kiwi_joiner_h handle)
+{
+	if (!handle) return KIWIERR_INVALID_HANDLE;
+	try
+	{
+		delete handle;
 		return 0;
 	}
 	catch (...)

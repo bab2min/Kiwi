@@ -2,8 +2,8 @@
  * @file Kiwi.h
  * @author bab2min (bab2min@gmail.com)
  * @brief Kiwi C++ API를 담고 있는 헤더 파일
- * @version 0.11.2
- * @date 2022-04-13
+ * @version 0.12.0
+ * @date 2022-05-10
  * 
  * 
  */
@@ -21,26 +21,24 @@
 #include "PatternMatcher.h"
 #include "FrozenTrie.h"
 #include "Knlm.h"
+#include "SkipBigramModel.h"
 #include "ThreadPool.h"
 #include "WordDetector.h"
 #include "TagUtils.h"
-
-namespace nonstd
-{
-	namespace sv_lite
-	{
-		template<class CharT,class Traits> class basic_string_view;
-	}
-
-	using string_view = sv_lite::basic_string_view<char, std::char_traits<char>>;
-	using u16string_view = sv_lite::basic_string_view<char16_t, std::char_traits<char16_t>>;
-}
+#include "LmState.h"
+#include "Joiner.h"
 
 namespace kiwi
 {
+	//// 헤더 파일 분리를 위한 전방 선언
 	struct KTrie;
 	struct KGraphNode;
 	struct WordInfo;
+
+	namespace cmb{ class CompiledRule; }
+
+	template<class Ty> class RaggedVector;
+	////
 
 	inline uint32_t getDefaultMorphemeId(POSTag tag)
 	{
@@ -55,6 +53,8 @@ namespace kiwi
 	{
 		friend class KiwiBuilder;
 		friend class PathEvaluator;
+		friend class cmb::AutoJoiner;
+		template<template<ArchType> class LmState> friend struct NewAutoJoinerGetter;
 
 		bool integrateAllomorph = true;
 		float cutOffThreshold = 5;
@@ -69,18 +69,26 @@ namespace kiwi
 		Vector<Form> forms;
 		Vector<Morpheme> morphemes;
 		utils::FrozenTrie<kchar_t, const Form*> formTrie;
-		std::shared_ptr<lm::KnLangModelBase> langMdl;
+		LangModel langMdl;
+		std::shared_ptr<cmb::CompiledRule> combiningRule;
 		std::unique_ptr<utils::ThreadPool> pool;
-			
+		
 		std::vector<TokenResult> analyzeSent(const std::u16string::const_iterator& sBegin, const std::u16string::const_iterator& sEnd, size_t topN, Match matchOptions) const;
 
 		const Morpheme* getDefaultMorpheme(POSTag tag) const;
+
+		template<class LmState>
+		cmb::AutoJoiner newJoinerImpl() const
+		{
+			return cmb::AutoJoiner{ *this, cmb::Candidate<LmState>{ *combiningRule, langMdl } };
+		}
 
 		ArchType selectedArch = ArchType::none;
 		void* dfSplitByTrie = nullptr;
 		void* dfFindBestPath = nullptr;
 
 	public:
+
 		/**
 		 * @brief 빈 Kiwi 객체를 생성한다.
 		 * 
@@ -257,6 +265,16 @@ namespace kiwi
 			TokenResult* tokenizedResultOut = nullptr
 		) const;
 
+		/**
+		 * @brief 형태소들을 결합하여 텍스트로 복원해주는 작업을 수행하는 AutoJoiner를 반환한다.
+		 * 
+		 * @param lmSearch 결합 전에 언어 모델을 이용하여 최적의 형태소를 탐색하여 사용합니다.
+		 * @return 새 AutoJoiner 인스턴스
+		 * 
+		 * @sa kiwi::cmb::AutoJoiner
+		 */
+		cmb::AutoJoiner newJoiner(bool lmSearch = true) const;
+
 		size_t morphToId(const Morpheme* morph) const
 		{
 			if (!morph || morph < morphemes.data()) return -1;
@@ -344,19 +362,11 @@ namespace kiwi
 			integrateAllomorph = v;
 		}
 
-		const lm::KnLangModelBase* getLangModel() const
+		const lm::KnLangModelBase* getKnLM() const
 		{
-			return langMdl.get();
+			return langMdl.knlm.get();
 		}
 	};
-
-	namespace cmb
-	{
-		class CompiledRule;
-	}
-
-	template<class Ty>
-	class RaggedVector;
 
 	/**
 	 * @brief 형태소 분석에 사용될 사전을 관리하고, 
@@ -368,7 +378,7 @@ namespace kiwi
 		Vector<FormRaw> forms;
 		Vector<MorphemeRaw> morphemes;
 		UnorderedMap<KString, size_t> formMap;
-		std::shared_ptr<lm::KnLangModelBase> langMdl;
+		LangModel langMdl;
 		std::shared_ptr<cmb::CompiledRule> combiningRule;
 		WordDetector detector;
 		
@@ -382,20 +392,26 @@ namespace kiwi
 		size_t addForm(Vector<FormRaw>& newForms, UnorderedMap<KString, size_t>& newFormMap, KString form) const;
 
 		using MorphemeMap = UnorderedMap<std::pair<KString, POSTag>, size_t>;
+		
 		template<class Fn>
 		MorphemeMap loadMorphemesFromTxt(std::istream& is, Fn&& filter);
+
+		MorphemeMap restoreMorphemeMap() const;
+
 		void addCorpusTo(RaggedVector<uint16_t>& out, std::istream& is, MorphemeMap& morphMap);
 		void updateForms();
 		void updateMorphemes();
 
-		size_t findMorpheme(const std::u16string& form, POSTag tag) const;
+		size_t findMorpheme(U16StringView form, POSTag tag) const;
 		
-		bool addWord(nonstd::u16string_view newForm, POSTag tag, float score, size_t origMorphemeId);
+		bool addWord(U16StringView newForm, POSTag tag, float score, size_t origMorphemeId);
 		bool addWord(const std::u16string& newForm, POSTag tag, float score, size_t origMorphemeId);
-		bool addWord(nonstd::u16string_view form, POSTag tag = POSTag::nnp, float score = 0);
-		bool addWord(nonstd::u16string_view newForm, POSTag tag, float score, const std::u16string& origForm);
-		bool addPreAnalyzedWord(nonstd::u16string_view form,
-			const std::vector<std::pair<std::u16string, POSTag>>& analyzed,
+		bool addWord(U16StringView form, POSTag tag = POSTag::nnp, float score = 0);
+		bool addWord(U16StringView newForm, POSTag tag, float score, U16StringView origForm);
+
+		template<class U16>
+		bool addPreAnalyzedWord(U16StringView form,
+			const std::vector<std::pair<U16, POSTag>>& analyzed,
 			std::vector<std::pair<size_t, size_t>> positions = {},
 			float score = 0
 		);
@@ -416,6 +432,8 @@ namespace kiwi
 			UnorderedMap<size_t, Vector<uint32_t>>& newFormCands
 		) const;
 
+		void addAllomorphsToRule();
+
 	public:
 		struct ModelBuildArgs 
 		{
@@ -429,6 +447,8 @@ namespace kiwi
 			bool useLmTagHistory = true;
 			bool quantizeLm = true;
 			bool compressLm = true;
+			float dropoutSampling = 0.05f;
+			float dropoutProb = 0.15f;
 		};
 
 		/**
@@ -452,10 +472,15 @@ namespace kiwi
 		 * @brief KiwiBuilder를 raw 데이터로부터 생성한다.
 		 * 
 		 * 
-		 * @note 이 함수는 현재 내부적으로 모델 구축에 쓰인다. 
+		 * @note 이 함수는 현재 내부적으로 기본 모델 구축에 쓰인다. 
 		 * 추후 공개 데이터로도 쉽게 직접 모델을 구축할 수 있도록 개선된 API를 제공할 예정.
 		 */
 		KiwiBuilder(const ModelBuildArgs& args);
+
+		/**
+		 * @brief 기본 모델로부터 확장 모델을 학습하여 생성한다.
+		 */
+		KiwiBuilder(const std::string& modelPath, const ModelBuildArgs& args);
 
 		/**
 		 * @brief KiwiBuilder를 모델 파일로부터 생성한다.
@@ -464,7 +489,7 @@ namespace kiwi
 		 * @param numThreads 모델 및 형태소 분석에 사용할 스레드 개수
 		 * @param options 생성 옵션. `kiwi::BuildOption`을 참조
 		 */
-		KiwiBuilder(const std::string& modelPath, size_t numThreads = 0, BuildOption options = BuildOption::integrateAllomorph | BuildOption::loadDefaultDict);
+		KiwiBuilder(const std::string& modelPath, size_t numThreads = 0, BuildOption options = BuildOption::integrateAllomorph | BuildOption::loadDefaultDict, bool useSBG = false);
 
 		/**
 		 * @brief 현재 KiwiBuilder 객체가 유효한 분석 모델을 로딩한 상태인지 알려준다.
@@ -474,7 +499,7 @@ namespace kiwi
 		 */
 		bool ready() const
 		{
-			return !!langMdl;
+			return !!langMdl.knlm;
 		}
 
 		void saveModel(const std::string& modelPath) const;
@@ -493,6 +518,7 @@ namespace kiwi
 		 * 반대로 원하는 상황에서도 출력되지 않는 경우라면 `score`를 더 큰 값으로 조절하는 게 좋다.
 		 */
 		bool addWord(const std::u16string& form, POSTag tag = POSTag::nnp, float score = 0);
+		bool addWord(const char16_t* form, POSTag tag = POSTag::nnp, float score = 0);
 
 		/**
 		 * @brief 사전에 기존 형태소의 변이형을 추가한다. 이미 동일한 형태소가 있는 경우는 무시된다.
@@ -506,6 +532,7 @@ namespace kiwi
 		 * @note 이 방법으로 추가된 형태소는 언어모델 탐색 과정에서 `origForm/tag` 토큰으로 처리된다.
 		 */
 		bool addWord(const std::u16string& newForm, POSTag tag, float score, const std::u16string& origForm);
+		bool addWord(const char16_t* newForm, POSTag tag, float score, const char16_t* origForm);
 
 		/**
 		 * @brief 사전에 기분석 형태소열을 추가한다. 이미 동일한 기분석 형태소열이 있는 경우는 무시된다.
@@ -521,6 +548,11 @@ namespace kiwi
 		 */
 		bool addPreAnalyzedWord(const std::u16string& form, 
 			const std::vector<std::pair<std::u16string, POSTag>>& analyzed, 
+			std::vector<std::pair<size_t, size_t>> positions = {},
+			float score = 0
+		);
+		bool addPreAnalyzedWord(const char16_t* form, 
+			const std::vector<std::pair<const char16_t*, POSTag>>& analyzed, 
 			std::vector<std::pair<size_t, size_t>> positions = {},
 			float score = 0
 		);
@@ -575,9 +607,9 @@ namespace kiwi
 		 */
 		Kiwi build() const;
 
-		const lm::KnLangModelBase* getLangModel() const
+		/*const lm::KnLangModelBase* getLangModel() const
 		{
 			return langMdl.get();
-		}
+		}*/
 	};
 }

@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <fstream>
 
 #include <kiwi/Utils.h>
@@ -11,15 +11,15 @@
 using namespace std;
 using namespace kiwi;
 
-int doEvaluate(const string& modelPath, const string& output, const vector<string>& input)
+int doEvaluate(const string& modelPath, const string& output, const vector<string>& input, bool normCoda, bool useSBG)
 {
 	try
 	{
 		tutils::Timer timer;
-		Kiwi kw = KiwiBuilder{ modelPath, 1 }.build();
+		Kiwi kw = KiwiBuilder{ modelPath, 1, BuildOption::integrateAllomorph | BuildOption::loadDefaultDict, useSBG }.build();
 		
 		cout << "Loading Time : " << timer.getElapsed() << " ms" << endl;
-		cout << "LM Size : " << (kw.getLangModel()->getMemory().size() / 1024. / 1024.) << " MB" << endl;
+		cout << "LM Size : " << (kw.getKnLM()->getMemory().size() / 1024. / 1024.) << " MB" << endl;
 		cout << "Mem Usage : " << (tutils::getCurrentPhysicalMemoryUsage() / 1024.) << " MB\n" << endl;
 		
 		double avgMicro = 0, avgMacro = 0;
@@ -29,7 +29,7 @@ int doEvaluate(const string& modelPath, const string& output, const vector<strin
 			cout << "Test file: " << tf << endl;
 			try
 			{
-				Evaluator test{ tf, &kw };
+				Evaluator test{ tf, &kw, normCoda ? Match::allWithNormalizing : Match::all};
 				tutils::Timer total;
 				test.run();
 				double tm = total.getElapsed();
@@ -88,11 +88,15 @@ int main(int argc, const char* argv[])
 
 	ValueArg<string> model{ "m", "model", "Kiwi model path", false, "ModelGenerator", "string" };
 	ValueArg<string> output{ "o", "output", "output dir for evaluation errors", false, "", "string" };
+	SwitchArg withoutNormCoda{ "", "wcoda", "without normalizing coda", false };
+	SwitchArg useSBG{ "", "sbg", "use SkipBigram", false };
 	UnlabeledMultiArg<string> files{ "files", "evaluation set files", true, "string" };
 
 	cmd.add(model);
 	cmd.add(output);
 	cmd.add(files);
+	cmd.add(withoutNormCoda);
+	cmd.add(useSBG);
 
 	try
 	{
@@ -103,6 +107,6 @@ int main(int argc, const char* argv[])
 		cerr << "error: " << e.error() << " for arg " << e.argId() << endl;
 		return -1;
 	}
-	return doEvaluate(model, output, files.getValue());
+	return doEvaluate(model, output, files.getValue(), !withoutNormCoda, useSBG);
 }
 

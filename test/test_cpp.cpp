@@ -1,45 +1,12 @@
 #include "gtest/gtest.h"
 #include <kiwi/Kiwi.h>
 #include "common.h"
-#include "../src/Combiner.h"
 
 using namespace kiwi;
 
-TEST(KiwiCpp, Combiner)
-{
-	cmb::CompiledRule rule;
-	{
-		cmb::RuleSet crs;
-		std::ifstream ifs{ MODEL_PATH "/combiningRule.txt" };
-		crs.loadRules(ifs);
-		rule = crs.compile();
-	}
-
-	EXPECT_EQ(rule.combine(u"이", POSTag::vcp, u"다", POSTag::ec, CondVowel::vowel)[0], u"다");
-	EXPECT_EQ(rule.combine(u"이", POSTag::vcp, u"었", POSTag::ec, CondVowel::vowel)[0], u"였");
-	EXPECT_EQ(rule.combine(u"이", POSTag::vcp, u"ᆫ지도", POSTag::ec, CondVowel::vowel)[0], u"ᆫ지도");
-	EXPECT_EQ(rule.combine(u"이", POSTag::vcp, u"ᆫ가", POSTag::ec, CondVowel::vowel)[0], u"ᆫ가");
-
-	EXPECT_EQ(rule.combine(u"ᆯ", POSTag::p, u"ᆯ", POSTag::etm, CondVowel::vowel)[0], u"ᆯ");
-
-	EXPECT_EQ(rule.combine(u"이르", POSTag::vv, u"어", POSTag::ec)[0], u"이르러");
-	EXPECT_EQ(rule.combine(u"푸", POSTag::vv, u"어", POSTag::ec)[0], u"퍼");
-	EXPECT_EQ(rule.combine(u"따르", POSTag::vv, u"어", POSTag::ec)[0], u"따라");
-	EXPECT_EQ(rule.combine(u"돕", POSTag::vv, u"어", POSTag::ec)[0], u"도와");
-	EXPECT_EQ(rule.combine(u"하", POSTag::vv, u"도록", POSTag::ec)[0], u"토록");
-	EXPECT_EQ(rule.combine(u"하", POSTag::vv, u"어", POSTag::ec)[0], u"해");
-
-	EXPECT_EQ(rule.combine(u"타이르", POSTag::p, u"어", POSTag::ec)[0], u"타일러");
-	EXPECT_EQ(rule.combine(u"가르", POSTag::p, u"어", POSTag::ec)[0], u"갈라");
-
-	EXPECT_EQ(rule.combine(u"나", POSTag::np, u"가", POSTag::jks)[0], u"내가");
-
-	EXPECT_EQ(rule.combine(u"시", POSTag::ep, u"어용", POSTag::ef)[0], u"세용");
-}
-
 Kiwi& reuseKiwiInstance()
 {
-	static Kiwi kiwi = KiwiBuilder{ MODEL_PATH }.build();
+	static Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 0, BuildOption::default_, }.build();
 	return kiwi;
 }
 
@@ -91,6 +58,17 @@ TEST(KiwiCpp, EmptyResult)
 	{
 		EXPECT_TRUE(testTokenization(kiwi, s));
 	}
+}
+
+TEST(KiwiCpp, SplitByPolarity)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	auto ret = kiwi.analyze(u"흘렀다", Match::all);
+	EXPECT_EQ(ret.first.size(), 3);
+	ret = kiwi.analyze(u"전류가 흘렀다", Match::all);
+	EXPECT_EQ(ret.first.size(), 5);
+	ret = kiwi.analyze(u"전류가흘렀다", Match::all);
+	EXPECT_EQ(ret.first.size(), 5);
 }
 
 TEST(KiwiCpp, SpaceTolerant)
@@ -147,12 +125,16 @@ TEST(KiwiCpp, Pattern)
 	EXPECT_EQ(tokens.size(), 1);
 	EXPECT_EQ(tokens[0].tag, POSTag::sn);
 
-	tokens = kiwi.analyze(u"123,456.789a", Match::none).first;
-	EXPECT_EQ(tokens.size(), 6);
+	tokens = kiwi.analyze(u"123,456.789hz", Match::none).first;
+	EXPECT_EQ(tokens.size(), 2);
 	EXPECT_EQ(tokens[0].tag, POSTag::sn);
 
 	tokens = kiwi.analyze(u"123,456.789이다", Match::none).first;
 	EXPECT_EQ(tokens.size(), 3);
+	EXPECT_EQ(tokens[0].tag, POSTag::sn);
+
+	tokens = kiwi.analyze(u"1.2%", Match::none).first;
+	EXPECT_EQ(tokens.size(), 2);
 	EXPECT_EQ(tokens[0].tag, POSTag::sn);
 }
 
@@ -312,12 +294,6 @@ TEST(KiwiCpp, PositionAndLength)
 	}
 }
 
-TEST(KiwiCpp, TokenProbs)
-{
-	Kiwi& kiwi = reuseKiwiInstance();
-	auto tokens = kiwi.analyze(u"넘어갈 뻔 했답니다 강남역 맛집 토끼정", Match::all).first;
-}
-
 TEST(KiwiCpp, Issue71_SentenceSplit_u16)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
@@ -337,6 +313,9 @@ TEST(KiwiCpp, Issue71_SentenceSplit_u16)
 	EXPECT_EQ(sents[3], u"다만 역시 토끼정 본점 답죠?ㅎㅅㅎ");
 	EXPECT_EQ(sents[4], u"그 맛이 크으..");
 	EXPECT_EQ(sents[5], u"아주 맛있었음...! ^^");
+
+	sentRanges = kiwi.splitIntoSents(u"지도부가 어떻게 구성되느냐에 따라");
+	EXPECT_EQ(sentRanges.size(), 1);
 }
 
 TEST(KiwiCpp, Issue71_SentenceSplit_u8)
@@ -406,7 +385,7 @@ TEST(KiwiCpp, AddPreAnalyzedWord)
 	auto ores = okiwi.analyze("팅겼어...", Match::allWithNormalizing);
 
 	KiwiBuilder builder{ MODEL_PATH };
-	std::vector<std::pair<std::u16string, POSTag>> analyzed;
+	std::vector<std::pair<const char16_t*, POSTag>> analyzed;
 	analyzed.emplace_back(u"팅기", POSTag::vv);
 	analyzed.emplace_back(u"었", POSTag::ep);
 	analyzed.emplace_back(u"어", POSTag::ef);
@@ -449,4 +428,89 @@ TEST(KiwiCpp, JoinAffix)
 	EXPECT_EQ(res5.first[0].str, u"사랑스럽");
 	EXPECT_EQ(res5.first[2].str, u"풋사과들");
 	EXPECT_EQ(res5.first[5].str, u"배송되");
+}
+
+TEST(KiwiCpp, AutoJoiner)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	auto joiner = kiwi.newJoiner();
+	joiner.add(u"시동", POSTag::nng);
+	joiner.add(u"를", POSTag::jko);
+	EXPECT_EQ(joiner.getU16(), u"시동을");
+
+	joiner = kiwi.newJoiner();
+	joiner.add(u"시도", POSTag::nng);
+	joiner.add(u"를", POSTag::jko);
+	EXPECT_EQ(joiner.getU16(), u"시도를");
+
+	joiner = kiwi.newJoiner();
+	joiner.add(u"바다", POSTag::nng);
+	joiner.add(u"가", POSTag::jks);
+	EXPECT_EQ(joiner.getU16(), u"바다가");
+
+	joiner = kiwi.newJoiner();
+	joiner.add(u"바닥", POSTag::nng);
+	joiner.add(u"가", POSTag::jks);
+	EXPECT_EQ(joiner.getU16(), u"바닥이");
+
+	joiner = kiwi.newJoiner();
+	joiner.add(u"불", POSTag::nng);
+	joiner.add(u"으로", POSTag::jkb);
+	EXPECT_EQ(joiner.getU16(), u"불로");
+
+	joiner = kiwi.newJoiner();
+	joiner.add(u"북", POSTag::nng);
+	joiner.add(u"으로", POSTag::jkb);
+	EXPECT_EQ(joiner.getU16(), u"북으로");
+
+	joiner = kiwi.newJoiner();
+	joiner.add(u"갈", POSTag::vv);
+	joiner.add(u"면", POSTag::ec);
+	EXPECT_EQ(joiner.getU16(), u"갈면");
+
+	joiner = kiwi.newJoiner();
+	joiner.add(u"갈", POSTag::vv);
+	joiner.add(u"시", POSTag::ep);
+	joiner.add(u"았", POSTag::ep);
+	joiner.add(u"면", POSTag::ec);
+	EXPECT_EQ(joiner.getU16(), u"가셨으면");
+
+	joiner = kiwi.newJoiner();
+	joiner.add(u"하", POSTag::vv);
+	joiner.add(u"았", POSTag::ep);
+	joiner.add(u"다", POSTag::ef);
+	EXPECT_EQ(joiner.getU16(), u"했다");
+
+	joiner = kiwi.newJoiner();
+	joiner.add(u"날", POSTag::vv);
+	joiner.add(u"어", POSTag::ef);
+	EXPECT_EQ(joiner.getU16(), u"날아");
+
+	joiner = kiwi.newJoiner();
+	joiner.add(u"고기", POSTag::nng);
+	joiner.add(u"을", POSTag::jko);
+	joiner.add(u"굽", POSTag::vv);
+	joiner.add(u"어", POSTag::ef);
+	EXPECT_EQ(joiner.getU16(), u"고기를 구워");
+
+	joiner = kiwi.newJoiner();
+	joiner.add(u"길", POSTag::nng);
+	joiner.add(u"을", POSTag::jko);
+	joiner.add(u"걷", POSTag::vv);
+	joiner.add(u"어요", POSTag::ef);
+	EXPECT_EQ(joiner.getU16(), u"길을 걸어요");
+
+	joiner = kiwi.newJoiner(false);
+	joiner.add(u"길", POSTag::nng);
+	joiner.add(u"을", POSTag::jko);
+	joiner.add(u"걷", POSTag::vv);
+	joiner.add(u"어요", POSTag::ef);
+	EXPECT_EQ(joiner.getU16(), u"길을 걷어요");
+
+	joiner = kiwi.newJoiner();
+	joiner.add(u"땅", POSTag::nng);
+	joiner.add(u"에", POSTag::jkb);
+	joiner.add(u"묻", POSTag::vv);
+	joiner.add(u"어요", POSTag::ef);
+	EXPECT_EQ(joiner.getU16(), u"땅에 묻어요");
 }

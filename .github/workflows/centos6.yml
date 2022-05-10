@@ -15,14 +15,14 @@ jobs:
     - name: Install Git LFS
       run: |
         mkdir ../gitlfs && pushd ../gitlfs
-        curl -L https://github.com/git-lfs/git-lfs/releases/download/v2.13.2/git-lfs-linux-amd64-v2.13.2.tar.gz | tar -zxv
+        curl -L https://github.com/git-lfs/git-lfs/releases/download/v2.10.0/git-lfs-linux-amd64-v2.10.0.tar.gz | tar -zxv
         ./install.sh
         popd
     - uses: actions/checkout@v1
       with:
         submodules: true
     - name: Pull LFS files
-      run: git lfs pull
+      run: git config --global --add safe.directory /__w/Kiwi/Kiwi && git lfs pull
     - name: Update CMake
       run: /opt/python/cp36-cp36m/bin/pip install cmake
     - name: Configure Build

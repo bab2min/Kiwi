@@ -93,9 +93,6 @@
     <ClInclude Include="src\Combiner.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\bitset.hpp">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\kiwi\TagUtils.h">
       <Filter>Header Files\kiwi</Filter>
     </ClInclude>
@@ -119,6 +116,33 @@
     </ClInclude>
     <ClInclude Include="src\FileUtils.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SkipBigramTrainer.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\serializerEigen.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SkipBigramModel.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\kiwi\SkipBigramModel.h">
+      <Filter>Header Files\kiwi</Filter>
+    </ClInclude>
+    <ClInclude Include="src\bitset.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\kiwi\Joiner.h">
+      <Filter>Header Files\kiwi</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LmState.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Joiner.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\kiwi\LmState.h">
+      <Filter>Header Files\kiwi</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -159,6 +183,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\TagUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Joiner.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
