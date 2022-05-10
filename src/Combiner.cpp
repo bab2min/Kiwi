@@ -391,6 +391,9 @@ Vector<char16_t> RuleSet::getVocabList(const Vector<Pattern::Node>& nodes)
 	using CRange = pair<const char16_t*, const char16_t*>;
 	Vector<char16_t> ret;
 	ret.emplace_back(0);
+	ret.emplace_back(1);
+	ret.emplace_back(2);
+	ret.emplace_back(3);
 	Vector<CRange> ranges;
 
 	for (auto& n : nodes)
@@ -1140,7 +1143,12 @@ pair<KString, size_t> CompiledRule::combineOneImpl(
 	{
 		for (auto& p : mapbox::util::apply_visitor(CombineVisitor{ leftForm, rightForm }, dfa[it->second]))
 		{
-			return make_pair(p.str, p.rightBegin);
+			if(p.score >= 0) return make_pair(p.str, p.rightBegin);
+			KString ret;
+			ret.reserve(leftForm.size() + rightForm.size());
+			ret.insert(ret.end(), leftForm.begin(), leftForm.end());
+			ret.insert(ret.end(), rightForm.begin(), rightForm.end());
+			return make_pair(ret, leftForm.size());
 		}
 	}
 
