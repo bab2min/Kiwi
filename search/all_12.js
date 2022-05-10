@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['vector_166',['Vector',['../Types_8h.html#a48d29484f2a48f6a4de60bbfd7746232',1,'kiwi']]],
-  ['vowel_167',['vowel',['../structkiwi_1_1MorphemeRaw.html#a3c56eb441f5e826270fc4bdceab1dffb',1,'kiwi::MorphemeRaw']]]
+  ['unicodeexception_175',['UnicodeException',['../classkiwi_1_1UnicodeException.html',1,'kiwi']]],
+  ['unknownmorphemeexception_176',['UnknownMorphemeException',['../classkiwi_1_1UnknownMorphemeException.html',1,'kiwi']]],
+  ['unorderedmap_177',['UnorderedMap',['../Types_8h.html#a22049affb93ad297719245d28ffc10ff',1,'kiwi']]]
 ];

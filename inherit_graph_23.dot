@@ -4,5 +4,5 @@ digraph "Graphical Class Hierarchy"
   edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
   node [fontname="Helvetica",fontsize="10",shape=record];
   rankdir="LR";
-  Node0 [label="kiwi::tp::concat\< \l_S1, _S2 \>",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structkiwi_1_1tp_1_1concat.html",tooltip=" "];
+  Node0 [label="kiwi::MorphemeRaw",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structkiwi_1_1MorphemeRaw.html",tooltip="형태소에 관한 모든 정보를 담는 구조체의 템플릿"];
 }

@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['archtypeholder_171',['ArchTypeHolder',['../structkiwi_1_1ArchTypeHolder.html',1,'kiwi']]]
+  ['archtypeholder_184',['ArchTypeHolder',['../structkiwi_1_1ArchTypeHolder.html',1,'kiwi']]],
+  ['autojoiner_185',['AutoJoiner',['../classkiwi_1_1cmb_1_1AutoJoiner.html',1,'kiwi::cmb']]]
 ];

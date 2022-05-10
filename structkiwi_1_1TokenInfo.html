@@ -86,9 +86,9 @@ Collaboration diagram for kiwi::TokenInfo:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a40d53f7f095dc155c6b947713687b415"><td class="memItemLeft" align="right" valign="top"><a id="a40d53f7f095dc155c6b947713687b415"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>TokenInfo</b> (const std::u16string &amp;_str, <a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebb">POSTag</a> _tag=POSTag::unknown, uint16_t _length=0, uint32_t _position=0, uint32_t _wordPosition=0)</td></tr>
-<tr class="separator:a40d53f7f095dc155c6b947713687b415"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaf231d5f14283ea4f8afa4352bf60b94"><td class="memItemLeft" align="right" valign="top"><a id="aaf231d5f14283ea4f8afa4352bf60b94"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>TokenInfo</b> (const std::u16string &amp;_str, <a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebb">POSTag</a> _tag=POSTag::unknown, uint16_t _length=0, uint32_t _position=0, uint32_t _wordPosition=0, float _score=0)</td></tr>
+<tr class="separator:aaf231d5f14283ea4f8afa4352bf60b94"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6d44917903378253e200706d876c1b3b"><td class="memItemLeft" align="right" valign="top"><a id="a6d44917903378253e200706d876c1b3b"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator==</b> (const <a class="el" href="structkiwi_1_1TokenInfo.html">TokenInfo</a> &amp;o) const</td></tr>
 <tr class="separator:a6d44917903378253e200706d876c1b3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -112,6 +112,10 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a66fb9fa90738360f753f93a568b254b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a45967e9870d0b947d30e7ad8fece4898"><td class="memItemLeft" align="right" valign="top"><a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebb">POSTag</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi_1_1TokenInfo.html#a45967e9870d0b947d30e7ad8fece4898">tag</a> = POSTag::unknown</td></tr>
 <tr class="separator:a45967e9870d0b947d30e7ad8fece4898"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab7e062c457af1a22400689cdcfb66f72"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi_1_1TokenInfo.html#ab7e062c457af1a22400689cdcfb66f72">senseId</a> = 0</td></tr>
+<tr class="separator:ab7e062c457af1a22400689cdcfb66f72"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9b27979bcbb4a0ddcca86fdb8ac0087c"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi_1_1TokenInfo.html#a9b27979bcbb4a0ddcca86fdb8ac0087c">score</a> = 0</td></tr>
+<tr class="separator:a9b27979bcbb4a0ddcca86fdb8ac0087c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8036684b6884ddf24d5f013d36cb6b0a"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi_1_1TokenInfo.html#a8036684b6884ddf24d5f013d36cb6b0a">morph</a> = nullptr</td></tr>
 <tr class="separator:a8036684b6884ddf24d5f013d36cb6b0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -175,6 +179,36 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>시작 위치(UTF16 문자 기준) </p>
+
+</div>
+</div>
+<a id="a9b27979bcbb4a0ddcca86fdb8ac0087c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9b27979bcbb4a0ddcca86fdb8ac0087c">&#9670;&nbsp;</a></span>score</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float kiwi::TokenInfo::score = 0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>해당 형태소의 언어모델 점수 </p>
+
+</div>
+</div>
+<a id="ab7e062c457af1a22400689cdcfb66f72"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab7e062c457af1a22400689cdcfb66f72">&#9670;&nbsp;</a></span>senseId</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t kiwi::TokenInfo::senseId = 0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>의미 번호 </p>
 
 </div>
 </div>

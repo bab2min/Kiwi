@@ -67,7 +67,6 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#typedef-members">Typedefs</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">Kiwi.h File Reference</div>  </div>
@@ -88,9 +87,12 @@ $(function() {
 <code>#include &quot;PatternMatcher.h&quot;</code><br />
 <code>#include &quot;FrozenTrie.h&quot;</code><br />
 <code>#include &quot;Knlm.h&quot;</code><br />
+<code>#include &quot;SkipBigramModel.h&quot;</code><br />
 <code>#include &quot;ThreadPool.h&quot;</code><br />
 <code>#include &quot;WordDetector.h&quot;</code><br />
 <code>#include &quot;TagUtils.h&quot;</code><br />
+<code>#include &quot;LmState.h&quot;</code><br />
+<code>#include &quot;Joiner.h&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for Kiwi.h:</div>
 <div class="dyncontent">
@@ -99,27 +101,16 @@ Include dependency graph for Kiwi.h:</div>
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnonstd_1_1sv__lite_1_1basic__string__view.html">nonstd::sv_lite::basic_string_view&lt; CharT, Traits &gt;</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1RaggedVector.html">kiwi::RaggedVector&lt; Ty &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1Kiwi.html">kiwi::Kiwi</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">실제 형태소 분석을 수행하는 클래스.  <a href="classkiwi_1_1Kiwi.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1RaggedVector.html">kiwi::RaggedVector&lt; Ty &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1KiwiBuilder.html">kiwi::KiwiBuilder</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">형태소 분석에 사용될 사전을 관리하고, 사전을 바탕으로 실제 형태소 분석을 수행하는 Kiwi의 인스턴스를 생성하는 클래스.  <a href="classkiwi_1_1KiwiBuilder.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi_1_1KiwiBuilder_1_1ModelBuildArgs.html">kiwi::KiwiBuilder::ModelBuildArgs</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
-Typedefs</h2></td></tr>
-<tr class="memitem:af2347aab8733ce0ba133f9831896cdb3"><td class="memItemLeft" align="right" valign="top"><a id="af2347aab8733ce0ba133f9831896cdb3"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>nonstd::string_view</b> = sv_lite::basic_string_view&lt; char, std::char_traits&lt; char &gt; &gt;</td></tr>
-<tr class="separator:af2347aab8733ce0ba133f9831896cdb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7106abe60276f87a4e0c66e20b358a25"><td class="memItemLeft" align="right" valign="top"><a id="a7106abe60276f87a4e0c66e20b358a25"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>nonstd::u16string_view</b> = sv_lite::basic_string_view&lt; char16_t, std::char_traits&lt; char16_t &gt; &gt;</td></tr>
-<tr class="separator:a7106abe60276f87a4e0c66e20b358a25"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -130,8 +121,8 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>kiwi::getDefaultM
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Kiwi C++ API를 담고 있는 헤더 파일 </p>
 <dl class="section author"><dt>Author</dt><dd>bab2min (<a href="#" onclick="location.href='mai'+'lto:'+'bab'+'2m'+'in@'+'gm'+'ail'+'.c'+'om'; return false;">bab2m<span style="display: none;">.nosp@m.</span>in@g<span style="display: none;">.nosp@m.</span>mail.<span style="display: none;">.nosp@m.</span>com</a>) </dd></dl>
-<dl class="section version"><dt>Version</dt><dd>0.11.2 </dd></dl>
-<dl class="section date"><dt>Date</dt><dd>2022-04-13 </dd></dl>
+<dl class="section version"><dt>Version</dt><dd>0.12.0 </dd></dl>
+<dl class="section date"><dt>Date</dt><dd>2022-05-10 </dd></dl>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

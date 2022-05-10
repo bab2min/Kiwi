@@ -111,6 +111,9 @@ typedef struct kiwi_ws *&#160;</td><td class="memItemRight" valign="bottom"><b>k
 <tr class="memitem:a2c404eb5749b8ecbe23003a8722adf21"><td class="memItemLeft" align="right" valign="top"><a id="a2c404eb5749b8ecbe23003a8722adf21"></a>
 typedef struct kiwi_ss *&#160;</td><td class="memItemRight" valign="bottom"><b>kiwi_ss_h</b></td></tr>
 <tr class="separator:a2c404eb5749b8ecbe23003a8722adf21"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6b1b76aeba3acf5201565afe880fa3c6"><td class="memItemLeft" align="right" valign="top"><a id="a6b1b76aeba3acf5201565afe880fa3c6"></a>
+typedef struct kiwi_joiner *&#160;</td><td class="memItemRight" valign="bottom"><b>kiwi_joiner_h</b></td></tr>
+<tr class="separator:a6b1b76aeba3acf5201565afe880fa3c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aec0475678556a23255faafdb6104971c"><td class="memItemLeft" align="right" valign="top"><a id="aec0475678556a23255faafdb6104971c"></a>
 typedef unsigned short&#160;</td><td class="memItemRight" valign="bottom"><b>kchar16_t</b></td></tr>
 <tr class="separator:aec0475678556a23255faafdb6104971c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -240,6 +243,9 @@ Functions</h2></td></tr>
 <tr class="memitem:ae4a9c8e2ac8ab6d928c12d6a79090edb"><td class="memItemLeft" align="right" valign="top">kiwi_ss_h&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#ae4a9c8e2ac8ab6d928c12d6a79090edb">kiwi_split_into_sents</a> (kiwi_h handle, const char *text, int match_options, kiwi_res_h *tokenized_res)</td></tr>
 <tr class="memdesc:ae4a9c8e2ac8ab6d928c12d6a79090edb"><td class="mdescLeft">&#160;</td><td class="mdescRight">텍스트를 문장 단위로 분할합니다.  <a href="capi_8h.html#ae4a9c8e2ac8ab6d928c12d6a79090edb">More...</a><br /></td></tr>
 <tr class="separator:ae4a9c8e2ac8ab6d928c12d6a79090edb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7d9f0bc86e63d79491d73eb61117ba07"><td class="memItemLeft" align="right" valign="top">kiwi_joiner_h&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a7d9f0bc86e63d79491d73eb61117ba07">kiwi_new_joiner</a> (kiwi_h handle, int lm_search)</td></tr>
+<tr class="memdesc:a7d9f0bc86e63d79491d73eb61117ba07"><td class="mdescLeft">&#160;</td><td class="mdescRight">형태소를 결합하여 텍스트로 만들어주는 Joiner를 새로 생성합니다.  <a href="capi_8h.html#a7d9f0bc86e63d79491d73eb61117ba07">More...</a><br /></td></tr>
+<tr class="separator:a7d9f0bc86e63d79491d73eb61117ba07"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7b9edfa303fddc98d9d505ee58d3211b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a7b9edfa303fddc98d9d505ee58d3211b">kiwi_close</a> (kiwi_h handle)</td></tr>
 <tr class="memdesc:a7b9edfa303fddc98d9d505ee58d3211b"><td class="mdescLeft">&#160;</td><td class="mdescRight">사용이 완료된 Kiwi객체를 삭제합니다.  <a href="capi_8h.html#a7b9edfa303fddc98d9d505ee58d3211b">More...</a><br /></td></tr>
 <tr class="separator:a7b9edfa303fddc98d9d505ee58d3211b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -291,12 +297,24 @@ Functions</h2></td></tr>
 <tr class="memitem:a5de6d686c50da0bece243ec049f82fc0"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a5de6d686c50da0bece243ec049f82fc0">kiwi_ss_close</a> (kiwi_ss_h result)</td></tr>
 <tr class="memdesc:a5de6d686c50da0bece243ec049f82fc0"><td class="mdescLeft">&#160;</td><td class="mdescRight">사용이 완료된 문장 분리 객체를 삭제합니다.  <a href="capi_8h.html#a5de6d686c50da0bece243ec049f82fc0">More...</a><br /></td></tr>
 <tr class="separator:a5de6d686c50da0bece243ec049f82fc0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3564e88965726f312880ace77fe86282"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a3564e88965726f312880ace77fe86282">kiwi_joiner_add</a> (kiwi_joiner_h handle, const char *form, const char *tag, int option)</td></tr>
+<tr class="memdesc:a3564e88965726f312880ace77fe86282"><td class="mdescLeft">&#160;</td><td class="mdescRight">Joiner에 새 형태소를 삽입합니다.  <a href="capi_8h.html#a3564e88965726f312880ace77fe86282">More...</a><br /></td></tr>
+<tr class="separator:a3564e88965726f312880ace77fe86282"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d00c91c8a897ea2fe10c7bdd85da916"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a2d00c91c8a897ea2fe10c7bdd85da916">kiwi_joiner_get</a> (kiwi_joiner_h handle)</td></tr>
+<tr class="memdesc:a2d00c91c8a897ea2fe10c7bdd85da916"><td class="mdescLeft">&#160;</td><td class="mdescRight">Joiner에 삽입된 형태소들을 텍스트로 결합하여 반환합니다.  <a href="capi_8h.html#a2d00c91c8a897ea2fe10c7bdd85da916">More...</a><br /></td></tr>
+<tr class="separator:a2d00c91c8a897ea2fe10c7bdd85da916"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a71f96f85afa099ebd504bee335820b81"><td class="memItemLeft" align="right" valign="top">const kchar16_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a71f96f85afa099ebd504bee335820b81">kiwi_joiner_get_w</a> (kiwi_joiner_h handle)</td></tr>
+<tr class="memdesc:a71f96f85afa099ebd504bee335820b81"><td class="mdescLeft">&#160;</td><td class="mdescRight">Joiner에 삽입된 형태소들을 텍스트로 결합하여 반환합니다.  <a href="capi_8h.html#a71f96f85afa099ebd504bee335820b81">More...</a><br /></td></tr>
+<tr class="separator:a71f96f85afa099ebd504bee335820b81"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeea8d4f01d5152f1e14f3f65fc6189e4"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#aeea8d4f01d5152f1e14f3f65fc6189e4">kiwi_joiner_close</a> (kiwi_joiner_h handle)</td></tr>
+<tr class="memdesc:aeea8d4f01d5152f1e14f3f65fc6189e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">사용이 완료된 Joiner 객체를 삭제합니다.  <a href="capi_8h.html#aeea8d4f01d5152f1e14f3f65fc6189e4">More...</a><br /></td></tr>
+<tr class="separator:aeea8d4f01d5152f1e14f3f65fc6189e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Kiwi C API를 담고 있는 헤더 파일 </p>
 <dl class="section author"><dt>Author</dt><dd>bab2min (<a href="#" onclick="location.href='mai'+'lto:'+'bab'+'2m'+'in@'+'gm'+'ail'+'.c'+'om'; return false;">bab2m<span style="display: none;">.nosp@m.</span>in@g<span style="display: none;">.nosp@m.</span>mail.<span style="display: none;">.nosp@m.</span>com</a>) </dd></dl>
-<dl class="section version"><dt>Version</dt><dd>0.11.2 </dd></dl>
-<dl class="section date"><dt>Date</dt><dd>2022-04-13 </dd></dl>
+<dl class="section version"><dt>Version</dt><dd>0.12.0 </dd></dl>
+<dl class="section date"><dt>Date</dt><dd>2022-05-10 </dd></dl>
 </div><h2 class="groupheader">Typedef Documentation</h2>
 <a id="aaca30b98ab19263d7f0494b80ff5d095"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aaca30b98ab19263d7f0494b80ff5d095">&#9670;&nbsp;</a></span>kiwi_builder_replacer_t</h2>
@@ -1458,6 +1476,178 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a3564e88965726f312880ace77fe86282"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3564e88965726f312880ace77fe86282">&#9670;&nbsp;</a></span>kiwi_joiner_add()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int kiwi_joiner_add </td>
+          <td>(</td>
+          <td class="paramtype">kiwi_joiner_h&#160;</td>
+          <td class="paramname"><em>handle</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>form</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>tag</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>option</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Joiner에 새 형태소를 삽입합니다. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">handle</td><td>Joiner 객체의 핸들 </td></tr>
+    <tr><td class="paramname">form</td><td>삽입할 형태소의 형태 </td></tr>
+    <tr><td class="paramname">tag</td><td>삽입할 형태소의 품사 태그 </td></tr>
+    <tr><td class="paramname">option</td><td>1이면 불규칙 활용여부를 자동으로 탐색합니다. 0인 경우 tag로 입력한 불규칙 활용여부를 그대로 사용합니다. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>성공시 0을 반환합니다. 실패시 0이 아닌 값을 반환합니다. </dd></dl>
+
+</div>
+</div>
+<a id="aeea8d4f01d5152f1e14f3f65fc6189e4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeea8d4f01d5152f1e14f3f65fc6189e4">&#9670;&nbsp;</a></span>kiwi_joiner_close()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int kiwi_joiner_close </td>
+          <td>(</td>
+          <td class="paramtype">kiwi_joiner_h&#160;</td>
+          <td class="paramname"><em>handle</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>사용이 완료된 Joiner 객체를 삭제합니다. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">handle</td><td>삭제할 Joiner 객체의 핸들 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>성공시 0을 반환합니다. 실패시 0이 아닌 값을 반환합니다.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>kiwi_new_joiner 함수에서 반환된 kiwi_joiner_h는 반드시 이 함수로 해제되어야 합니다. </dd></dl>
+
+</div>
+</div>
+<a id="a2d00c91c8a897ea2fe10c7bdd85da916"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2d00c91c8a897ea2fe10c7bdd85da916">&#9670;&nbsp;</a></span>kiwi_joiner_get()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const char* kiwi_joiner_get </td>
+          <td>(</td>
+          <td class="paramtype">kiwi_joiner_h&#160;</td>
+          <td class="paramname"><em>handle</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Joiner에 삽입된 형태소들을 텍스트로 결합하여 반환합니다. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">handle</td><td>Joiner 객체의 핸들 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>성공시 UTF-8로 인코딩된 텍스트의 포인터를 반환합니다. 실패시 null을 반환합니다. </dd></dl>
+
+</div>
+</div>
+<a id="a71f96f85afa099ebd504bee335820b81"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a71f96f85afa099ebd504bee335820b81">&#9670;&nbsp;</a></span>kiwi_joiner_get_w()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const kchar16_t* kiwi_joiner_get_w </td>
+          <td>(</td>
+          <td class="paramtype">kiwi_joiner_h&#160;</td>
+          <td class="paramname"><em>handle</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Joiner에 삽입된 형태소들을 텍스트로 결합하여 반환합니다. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">handle</td><td>Joiner 객체의 핸들 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>성공시 UTF-16로 인코딩된 텍스트의 포인터를 반환합니다. 실패시 null을 반환합니다. </dd></dl>
+
+</div>
+</div>
+<a id="a7d9f0bc86e63d79491d73eb61117ba07"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7d9f0bc86e63d79491d73eb61117ba07">&#9670;&nbsp;</a></span>kiwi_new_joiner()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">kiwi_joiner_h kiwi_new_joiner </td>
+          <td>(</td>
+          <td class="paramtype">kiwi_h&#160;</td>
+          <td class="paramname"><em>handle</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>lm_search</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>형태소를 결합하여 텍스트로 만들어주는 Joiner를 새로 생성합니다. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">handle</td><td>Kiwi. </td></tr>
+    <tr><td class="paramname">lm_search</td><td>True일 경우 언어 모델 탐색을 사용하여 최적의 품사를 선택합니다. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>새 Joiner의 핸들. kiwi_joiner_* 함수에 사용가능합니다. 이 핸들은 사용 후 kiwi_joiner_close를 통해 반드시 해제되어야 합니다. </dd></dl>
+
+</div>
+</div>
 <a id="ab793f64bc59b828f44135f1092a16d97"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab793f64bc59b828f44135f1092a16d97">&#9670;&nbsp;</a></span>kiwi_res_close()</h2>
 
@@ -2070,7 +2260,7 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>문장 분할 결과의 핸들. kiwi_ss_* 함수를 통해 값에 접근가능합니다. 이 핸들은 사용 후 kiwi_ss_close를 사용해 반드시 해제되어야 합니다.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>문장 분할 결과의 핸들. kiwi_ss_* 함수를 통해 값에 접근가능합니다. 이 핸들은 사용 후 kiwi_ss_close를 통해 반드시 해제되어야 합니다.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="capi_8h.html#ac9abe9c18c92b2a1c19d831c4e0a01f3" title="텍스트를 문장 단위로 분할합니다.">kiwi_split_into_sents_w</a> </dd></dl>
 
 </div>

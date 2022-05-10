@@ -4,5 +4,5 @@ digraph "Graphical Class Hierarchy"
   edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
   node [fontname="Helvetica",fontsize="10",shape=record];
   rankdir="LR";
-  Node0 [label="kiwi::utils::detail\l::HasSubmatch\< Value,\l class \>",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structkiwi_1_1utils_1_1detail_1_1HasSubmatch.html",tooltip=" "];
+  Node0 [label="kiwi::tp::Table\< ValTy,\l SeqTy \>",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classkiwi_1_1tp_1_1Table.html",tooltip=" "];
 }

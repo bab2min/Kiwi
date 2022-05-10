@@ -4,7 +4,5 @@ digraph "Graphical Class Hierarchy"
   edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
   node [fontname="Helvetica",fontsize="10",shape=record];
   rankdir="LR";
-  Node52 [label="integral_constant",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",tooltip=" "];
-  Node52 -> Node0 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node0 [label="kiwi::tp::get\< 0, seq\l\< first, _i... \> \>",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structkiwi_1_1tp_1_1get_3_010_00_01seq_3_01first_00_01__i_8_8_8_01_4_01_4.html",tooltip=" "];
+  Node0 [label="kiwi::SpaceSplitIterator",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classkiwi_1_1SpaceSplitIterator.html",tooltip=" "];
 }

@@ -1,10 +1,18 @@
 var searchData=
 [
-  ['table_238',['Table',['../classkiwi_1_1tp_1_1Table.html',1,'kiwi::tp']]],
-  ['tagsequencescorer_239',['TagSequenceScorer',['../classkiwi_1_1TagSequenceScorer.html',1,'kiwi']]],
-  ['threadpool_240',['ThreadPool',['../classkiwi_1_1utils_1_1ThreadPool.html',1,'kiwi::utils']]],
-  ['tokeninfo_241',['TokenInfo',['../structkiwi_1_1TokenInfo.html',1,'kiwi']]],
-  ['trieiterator_242',['TrieIterator',['../classkiwi_1_1utils_1_1TrieIterator.html',1,'kiwi::utils']]],
-  ['trienode_243',['TrieNode',['../structkiwi_1_1utils_1_1TrieNode.html',1,'kiwi::utils']]],
-  ['trienodeex_244',['TrieNodeEx',['../structkiwi_1_1utils_1_1TrieNodeEx.html',1,'kiwi::utils']]]
+  ['seq_242',['seq',['../structkiwi_1_1tp_1_1seq.html',1,'kiwi::tp']]],
+  ['seq_3c_200_20_3e_243',['seq&lt; 0 &gt;',['../structkiwi_1_1tp_1_1seq.html',1,'kiwi::tp']]],
+  ['seq_3c_20_5fi1_2e_2e_2e_2c_28sizeof_2e_2e_2e_28_5fi1_29_2b_5fi2_29_2e_2e_2e_20_3e_244',['seq&lt; _i1...,(sizeof...(_i1)+_i2)... &gt;',['../structkiwi_1_1tp_1_1seq.html',1,'kiwi::tp']]],
+  ['seq_3c_3e_245',['seq&lt;&gt;',['../structkiwi_1_1tp_1_1seq.html',1,'kiwi::tp']]],
+  ['seqmax_246',['SeqMax',['../structkiwi_1_1tp_1_1SeqMax.html',1,'kiwi::tp']]],
+  ['seqmax_3c_20seq_3c_20i_20_3e_20_3e_247',['SeqMax&lt; seq&lt; i &gt; &gt;',['../structkiwi_1_1tp_1_1SeqMax_3_01seq_3_01i_01_4_01_4.html',1,'kiwi::tp']]],
+  ['seqmax_3c_20seq_3c_20i_2c_20j_2e_2e_2e_20_3e_20_3e_248',['SeqMax&lt; seq&lt; i, j... &gt; &gt;',['../structkiwi_1_1tp_1_1SeqMax_3_01seq_3_01i_00_01j_8_8_8_01_4_01_4.html',1,'kiwi::tp']]],
+  ['seqsize_249',['SeqSize',['../structkiwi_1_1tp_1_1SeqSize.html',1,'kiwi::tp']]],
+  ['seqsize_3c_20seq_3c_20_5fi_2e_2e_2e_20_3e_20_3e_250',['SeqSize&lt; seq&lt; _i... &gt; &gt;',['../structkiwi_1_1tp_1_1SeqSize_3_01seq_3_01__i_8_8_8_01_4_01_4.html',1,'kiwi::tp']]],
+  ['skipbigrammodelbase_251',['SkipBigramModelBase',['../classkiwi_1_1sb_1_1SkipBigramModelBase.html',1,'kiwi::sb']]],
+  ['slice_252',['slice',['../structkiwi_1_1tp_1_1slice.html',1,'kiwi::tp']]],
+  ['slice_3c_200_2c_20seq_3c_20first_2c_20_5fi_2e_2e_2e_20_3e_2c_20_5fj_2e_2e_2e_20_3e_253',['slice&lt; 0, seq&lt; first, _i... &gt;, _j... &gt;',['../structkiwi_1_1tp_1_1slice_3_010_00_01seq_3_01first_00_01__i_8_8_8_01_4_00_01__j_8_8_8_01_4.html',1,'kiwi::tp']]],
+  ['slice_3c_200_2c_20seq_3c_3e_2c_20_5fj_2e_2e_2e_20_3e_254',['slice&lt; 0, seq&lt;&gt;, _j... &gt;',['../structkiwi_1_1tp_1_1slice_3_010_00_01seq_3_4_00_01__j_8_8_8_01_4.html',1,'kiwi::tp']]],
+  ['slice_3c_20n_2c_20seq_3c_20first_2c_20_5fi_2e_2e_2e_20_3e_2c_20_5fj_2e_2e_2e_20_3e_255',['slice&lt; n, seq&lt; first, _i... &gt;, _j... &gt;',['../structkiwi_1_1tp_1_1slice_3_01n_00_01seq_3_01first_00_01__i_8_8_8_01_4_00_01__j_8_8_8_01_4.html',1,'kiwi::tp']]],
+  ['spacesplititerator_256',['SpaceSplitIterator',['../classkiwi_1_1SpaceSplitIterator.html',1,'kiwi']]]
 ];

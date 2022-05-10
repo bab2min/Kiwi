@@ -79,9 +79,9 @@
 <p><dl class="simple">
 <dt><strong>Author</strong></dt><dd><p>bab2min (<a class="reference external" href="mailto:bab2min&#37;&#52;&#48;gmail&#46;com">bab2min<span>&#64;</span>gmail<span>&#46;</span>com</a>) </p>
 </dd>
-<dt><strong>Version</strong></dt><dd><p>0.11.2 </p>
+<dt><strong>Version</strong></dt><dd><p>0.12.0 </p>
 </dd>
-<dt><strong>Date</strong></dt><dd><p>2022-04-13 </p>
+<dt><strong>Date</strong></dt><dd><p>2022-05-10 </p>
 </dd>
 </dl>
 </p>
@@ -133,6 +133,11 @@
 <dl class="cpp type">
 <dt class="sig sig-object cpp" id="_CPPv49kiwi_ss_h">
 <span id="_CPPv39kiwi_ss_h"></span><span id="_CPPv29kiwi_ss_h"></span><span id="kiwi_ss_h"></span><span class="target" id="capi_8h_1a2c404eb5749b8ecbe23003a8722adf21"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">kiwi_ss</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_ss_h</span></span></span><a class="headerlink" href="#_CPPv49kiwi_ss_h" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv413kiwi_joiner_h">
+<span id="_CPPv313kiwi_joiner_h"></span><span id="_CPPv213kiwi_joiner_h"></span><span id="kiwi_joiner_h"></span><span class="target" id="capi_8h_1a6b1b76aeba3acf5201565afe880fa3c6"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">kiwi_joiner</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_joiner_h</span></span></span><a class="headerlink" href="#_CPPv413kiwi_joiner_h" title="Permalink to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp type">
@@ -849,7 +854,24 @@
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>문장 분할 결과의 핸들. kiwi_ss_* 함수를 통해 값에 접근가능합니다. 이 핸들은 사용 후 kiwi_ss_close를 사용해 반드시 해제되어야 합니다.</p>
+<dd class="field-even"><p>문장 분할 결과의 핸들. kiwi_ss_* 함수를 통해 값에 접근가능합니다. 이 핸들은 사용 후 kiwi_ss_close를 통해 반드시 해제되어야 합니다.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv415kiwi_new_joiner6kiwi_hi">
+<span id="_CPPv315kiwi_new_joiner6kiwi_hi"></span><span id="_CPPv215kiwi_new_joiner6kiwi_hi"></span><span id="kiwi_new_joiner__kiwi_h.i"></span><span class="target" id="capi_8h_1a7d9f0bc86e63d79491d73eb61117ba07"></span><a class="reference internal" href="#_CPPv413kiwi_joiner_h" title="kiwi_joiner_h"><span class="n"><span class="pre">kiwi_joiner_h</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_new_joiner</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv46kiwi_h" title="kiwi_h"><span class="n"><span class="pre">kiwi_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">lm_search</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415kiwi_new_joiner6kiwi_hi" title="Permalink to this definition"></a><br /></dt>
+<dd><p>형태소를 결합하여 텍스트로 만들어주는 Joiner를 새로 생성합니다. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>handle</strong> – Kiwi. </p></li>
+<li><p><strong>lm_search</strong> – True일 경우 언어 모델 탐색을 사용하여 최적의 품사를 선택합니다. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>새 Joiner의 핸들. kiwi_joiner_* 함수에 사용가능합니다. 이 핸들은 사용 후 kiwi_joiner_close를 통해 반드시 해제되어야 합니다. </p>
 </dd>
 </dl>
 </dd></dl>
@@ -1233,6 +1255,71 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>handle</strong> – 문장 분리 결과 핸들 </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>성공시 0을 반환합니다. 실패시 0이 아닌 값을 반환합니다.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv415kiwi_joiner_add13kiwi_joiner_hPKcPKci">
+<span id="_CPPv315kiwi_joiner_add13kiwi_joiner_hPKcPKci"></span><span id="_CPPv215kiwi_joiner_add13kiwi_joiner_hPKcPKci"></span><span id="kiwi_joiner_add__kiwi_joiner_h.cCP.cCP.i"></span><span class="target" id="capi_8h_1a3564e88965726f312880ace77fe86282"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_joiner_add</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv413kiwi_joiner_h" title="kiwi_joiner_h"><span class="n"><span class="pre">kiwi_joiner_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">form</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">tag</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">option</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415kiwi_joiner_add13kiwi_joiner_hPKcPKci" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Joiner에 새 형태소를 삽입합니다. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>handle</strong> – Joiner 객체의 핸들 </p></li>
+<li><p><strong>form</strong> – 삽입할 형태소의 형태 </p></li>
+<li><p><strong>tag</strong> – 삽입할 형태소의 품사 태그 </p></li>
+<li><p><strong>option</strong> – 1이면 불규칙 활용여부를 자동으로 탐색합니다. 0인 경우 tag로 입력한 불규칙 활용여부를 그대로 사용합니다. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>성공시 0을 반환합니다. 실패시 0이 아닌 값을 반환합니다. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv415kiwi_joiner_get13kiwi_joiner_h">
+<span id="_CPPv315kiwi_joiner_get13kiwi_joiner_h"></span><span id="_CPPv215kiwi_joiner_get13kiwi_joiner_h"></span><span id="kiwi_joiner_get__kiwi_joiner_h"></span><span class="target" id="capi_8h_1a2d00c91c8a897ea2fe10c7bdd85da916"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_joiner_get</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv413kiwi_joiner_h" title="kiwi_joiner_h"><span class="n"><span class="pre">kiwi_joiner_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415kiwi_joiner_get13kiwi_joiner_h" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Joiner에 삽입된 형태소들을 텍스트로 결합하여 반환합니다. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>handle</strong> – Joiner 객체의 핸들 </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>성공시 UTF-8로 인코딩된 텍스트의 포인터를 반환합니다. 실패시 null을 반환합니다. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv417kiwi_joiner_get_w13kiwi_joiner_h">
+<span id="_CPPv317kiwi_joiner_get_w13kiwi_joiner_h"></span><span id="_CPPv217kiwi_joiner_get_w13kiwi_joiner_h"></span><span id="kiwi_joiner_get_w__kiwi_joiner_h"></span><span class="target" id="capi_8h_1a71f96f85afa099ebd504bee335820b81"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49kchar16_t" title="kchar16_t"><span class="n"><span class="pre">kchar16_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_joiner_get_w</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv413kiwi_joiner_h" title="kiwi_joiner_h"><span class="n"><span class="pre">kiwi_joiner_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417kiwi_joiner_get_w13kiwi_joiner_h" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Joiner에 삽입된 형태소들을 텍스트로 결합하여 반환합니다. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>handle</strong> – Joiner 객체의 핸들 </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>성공시 UTF-16로 인코딩된 텍스트의 포인터를 반환합니다. 실패시 null을 반환합니다. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv417kiwi_joiner_close13kiwi_joiner_h">
+<span id="_CPPv317kiwi_joiner_close13kiwi_joiner_h"></span><span id="_CPPv217kiwi_joiner_close13kiwi_joiner_h"></span><span id="kiwi_joiner_close__kiwi_joiner_h"></span><span class="target" id="capi_8h_1aeea8d4f01d5152f1e14f3f65fc6189e4"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_joiner_close</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv413kiwi_joiner_h" title="kiwi_joiner_h"><span class="n"><span class="pre">kiwi_joiner_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417kiwi_joiner_close13kiwi_joiner_h" title="Permalink to this definition"></a><br /></dt>
+<dd><p>사용이 완료된 Joiner 객체를 삭제합니다. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>kiwi_new_joiner 함수에서 반환된 kiwi_joiner_h는 반드시 이 함수로 해제되어야 합니다. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>handle</strong> – 삭제할 Joiner 객체의 핸들 </p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>성공시 0을 반환합니다. 실패시 0이 아닌 값을 반환합니다.</p>

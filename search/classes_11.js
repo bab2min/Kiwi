@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['worddetector_247',['WordDetector',['../classkiwi_1_1WordDetector.html',1,'kiwi']]],
-  ['wordinfo_248',['WordInfo',['../structkiwi_1_1WordInfo.html',1,'kiwi']]]
+  ['unicodeexception_264',['UnicodeException',['../classkiwi_1_1UnicodeException.html',1,'kiwi']]],
+  ['unknownmorphemeexception_265',['UnknownMorphemeException',['../classkiwi_1_1UnknownMorphemeException.html',1,'kiwi']]]
 ];

@@ -4,11 +4,5 @@ digraph "Graphical Class Hierarchy"
   edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
   node [fontname="Helvetica",fontsize="10",shape=record];
   rankdir="LR";
-  Node31 [label="runtime_error",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",tooltip=" "];
-  Node31 -> Node0 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node0 [label="kiwi::Exception",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classkiwi_1_1Exception.html",tooltip=" "];
-  Node0 -> Node1 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node1 [label="kiwi::UnicodeException",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classkiwi_1_1UnicodeException.html",tooltip=" "];
-  Node0 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node2 [label="kiwi::UnknownMorphemeException",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classkiwi_1_1UnknownMorphemeException.html",tooltip=" "];
+  Node0 [label="kiwi::cmb::AutoJoiner",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classkiwi_1_1cmb_1_1AutoJoiner.html",tooltip=" "];
 }

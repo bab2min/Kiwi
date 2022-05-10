@@ -104,9 +104,13 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a6338925fdfa3ac713fbd6a860866e7f7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1KiwiBuilder.html#a6338925fdfa3ac713fbd6a860866e7f7">KiwiBuilder</a> (const <a class="el" href="structkiwi_1_1KiwiBuilder_1_1ModelBuildArgs.html">ModelBuildArgs</a> &amp;args)</td></tr>
 <tr class="memdesc:a6338925fdfa3ac713fbd6a860866e7f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">KiwiBuilder를 raw 데이터로부터 생성한다.  <a href="classkiwi_1_1KiwiBuilder.html#a6338925fdfa3ac713fbd6a860866e7f7">More...</a><br /></td></tr>
 <tr class="separator:a6338925fdfa3ac713fbd6a860866e7f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae1aeaa0c9eac185f5ba3b19b6d58e85d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1KiwiBuilder.html#ae1aeaa0c9eac185f5ba3b19b6d58e85d">KiwiBuilder</a> (const std::string &amp;modelPath, size_t numThreads=0, <a class="el" href="Types_8h.html#a7b5ed1c7b90b79877f32c8a011c06ff3">BuildOption</a> options=BuildOption::integrateAllomorph|BuildOption::loadDefaultDict)</td></tr>
-<tr class="memdesc:ae1aeaa0c9eac185f5ba3b19b6d58e85d"><td class="mdescLeft">&#160;</td><td class="mdescRight">KiwiBuilder를 모델 파일로부터 생성한다.  <a href="classkiwi_1_1KiwiBuilder.html#ae1aeaa0c9eac185f5ba3b19b6d58e85d">More...</a><br /></td></tr>
-<tr class="separator:ae1aeaa0c9eac185f5ba3b19b6d58e85d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaf6cf74f8ba2b589a939932a6851e8d0"><td class="memItemLeft" align="right" valign="top"><a id="aaf6cf74f8ba2b589a939932a6851e8d0"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1KiwiBuilder.html#aaf6cf74f8ba2b589a939932a6851e8d0">KiwiBuilder</a> (const std::string &amp;modelPath, const <a class="el" href="structkiwi_1_1KiwiBuilder_1_1ModelBuildArgs.html">ModelBuildArgs</a> &amp;args)</td></tr>
+<tr class="memdesc:aaf6cf74f8ba2b589a939932a6851e8d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">기본 모델로부터 확장 모델을 학습하여 생성한다. <br /></td></tr>
+<tr class="separator:aaf6cf74f8ba2b589a939932a6851e8d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a22d8ffb811ea9ceb0e146c0a736c7d3d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1KiwiBuilder.html#a22d8ffb811ea9ceb0e146c0a736c7d3d">KiwiBuilder</a> (const std::string &amp;modelPath, size_t numThreads=0, <a class="el" href="Types_8h.html#a7b5ed1c7b90b79877f32c8a011c06ff3">BuildOption</a> options=BuildOption::integrateAllomorph|BuildOption::loadDefaultDict, bool useSBG=false)</td></tr>
+<tr class="memdesc:a22d8ffb811ea9ceb0e146c0a736c7d3d"><td class="mdescLeft">&#160;</td><td class="mdescRight">KiwiBuilder를 모델 파일로부터 생성한다.  <a href="classkiwi_1_1KiwiBuilder.html#a22d8ffb811ea9ceb0e146c0a736c7d3d">More...</a><br /></td></tr>
+<tr class="separator:a22d8ffb811ea9ceb0e146c0a736c7d3d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1f90bdbca2a4d4a7d5a9b8b2fb052cfd"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1KiwiBuilder.html#a1f90bdbca2a4d4a7d5a9b8b2fb052cfd">ready</a> () const</td></tr>
 <tr class="memdesc:a1f90bdbca2a4d4a7d5a9b8b2fb052cfd"><td class="mdescLeft">&#160;</td><td class="mdescRight">현재 <a class="el" href="classkiwi_1_1KiwiBuilder.html" title="형태소 분석에 사용될 사전을 관리하고, 사전을 바탕으로 실제 형태소 분석을 수행하는 Kiwi의 인스턴스를 생성하는 클래스.">KiwiBuilder</a> 객체가 유효한 분석 모델을 로딩한 상태인지 알려준다.  <a href="classkiwi_1_1KiwiBuilder.html#a1f90bdbca2a4d4a7d5a9b8b2fb052cfd">More...</a><br /></td></tr>
 <tr class="separator:a1f90bdbca2a4d4a7d5a9b8b2fb052cfd"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -116,12 +120,21 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>saveModel</b> (const 
 <tr class="memitem:a36bfec30ad9e9c51a9a0719bf421c250"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1KiwiBuilder.html#a36bfec30ad9e9c51a9a0719bf421c250">addWord</a> (const std::u16string &amp;form, <a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebb">POSTag</a> tag=POSTag::nnp, float score=0)</td></tr>
 <tr class="memdesc:a36bfec30ad9e9c51a9a0719bf421c250"><td class="mdescLeft">&#160;</td><td class="mdescRight">사전에 새로운 형태소를 추가한다. 이미 동일한 형태소가 있는 경우는 무시된다.  <a href="classkiwi_1_1KiwiBuilder.html#a36bfec30ad9e9c51a9a0719bf421c250">More...</a><br /></td></tr>
 <tr class="separator:a36bfec30ad9e9c51a9a0719bf421c250"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb4da611d32864e667ca2784e6f89187"><td class="memItemLeft" align="right" valign="top"><a id="adb4da611d32864e667ca2784e6f89187"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>addWord</b> (const char16_t *form, <a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebb">POSTag</a> tag=POSTag::nnp, float score=0)</td></tr>
+<tr class="separator:adb4da611d32864e667ca2784e6f89187"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a40e6412e9e8955db984197bd0dcfbf21"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1KiwiBuilder.html#a40e6412e9e8955db984197bd0dcfbf21">addWord</a> (const std::u16string &amp;newForm, <a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebb">POSTag</a> tag, float score, const std::u16string &amp;origForm)</td></tr>
 <tr class="memdesc:a40e6412e9e8955db984197bd0dcfbf21"><td class="mdescLeft">&#160;</td><td class="mdescRight">사전에 기존 형태소의 변이형을 추가한다. 이미 동일한 형태소가 있는 경우는 무시된다.  <a href="classkiwi_1_1KiwiBuilder.html#a40e6412e9e8955db984197bd0dcfbf21">More...</a><br /></td></tr>
 <tr class="separator:a40e6412e9e8955db984197bd0dcfbf21"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aed1569590be6bd92d7598015e9f9011c"><td class="memItemLeft" align="right" valign="top"><a id="aed1569590be6bd92d7598015e9f9011c"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>addWord</b> (const char16_t *newForm, <a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebb">POSTag</a> tag, float score, const char16_t *origForm)</td></tr>
+<tr class="separator:aed1569590be6bd92d7598015e9f9011c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa7ca37c66851bb345568a76899fdcba4"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1KiwiBuilder.html#aa7ca37c66851bb345568a76899fdcba4">addPreAnalyzedWord</a> (const std::u16string &amp;form, const std::vector&lt; std::pair&lt; std::u16string, <a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebb">POSTag</a> &gt;&gt; &amp;analyzed, std::vector&lt; std::pair&lt; size_t, size_t &gt;&gt; positions={}, float score=0)</td></tr>
 <tr class="memdesc:aa7ca37c66851bb345568a76899fdcba4"><td class="mdescLeft">&#160;</td><td class="mdescRight">사전에 기분석 형태소열을 추가한다. 이미 동일한 기분석 형태소열이 있는 경우는 무시된다.  <a href="classkiwi_1_1KiwiBuilder.html#aa7ca37c66851bb345568a76899fdcba4">More...</a><br /></td></tr>
 <tr class="separator:aa7ca37c66851bb345568a76899fdcba4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac8722d7e786d841fd92b8c0ed275c809"><td class="memItemLeft" align="right" valign="top"><a id="ac8722d7e786d841fd92b8c0ed275c809"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>addPreAnalyzedWord</b> (const char16_t *form, const std::vector&lt; std::pair&lt; const char16_t *, <a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebb">POSTag</a> &gt;&gt; &amp;analyzed, std::vector&lt; std::pair&lt; size_t, size_t &gt;&gt; positions={}, float score=0)</td></tr>
+<tr class="separator:ac8722d7e786d841fd92b8c0ed275c809"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a730f5bf0d5e2180bc81ccc28deb4e792"><td class="memTemplParams" colspan="2">template&lt;class Replacer &gt; </td></tr>
 <tr class="memitem:a730f5bf0d5e2180bc81ccc28deb4e792"><td class="memTemplItemLeft" align="right" valign="top">std::vector&lt; std::u16string &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classkiwi_1_1KiwiBuilder.html#a730f5bf0d5e2180bc81ccc28deb4e792">addRule</a> (<a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebb">POSTag</a> tag, Replacer &amp;&amp;repl, float score=0)</td></tr>
 <tr class="memdesc:a730f5bf0d5e2180bc81ccc28deb4e792"><td class="mdescLeft">&#160;</td><td class="mdescRight">규칙에 의해 변형된 형태소 목록을 생성하여 자동 추가한다.  <a href="classkiwi_1_1KiwiBuilder.html#a730f5bf0d5e2180bc81ccc28deb4e792">More...</a><br /></td></tr>
@@ -137,9 +150,6 @@ std::vector&lt; <a class="el" href="structkiwi_1_1WordInfo.html">WordInfo</a> &g
 <tr class="memitem:af559f6584302e821efb73365634cf4c6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classkiwi_1_1Kiwi.html">Kiwi</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1KiwiBuilder.html#af559f6584302e821efb73365634cf4c6">build</a> () const</td></tr>
 <tr class="memdesc:af559f6584302e821efb73365634cf4c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">현재 단어 및 사전 설정을 기반으로 <a class="el" href="classkiwi_1_1Kiwi.html" title="실제 형태소 분석을 수행하는 클래스.">Kiwi</a> 객체를 생성한다.  <a href="classkiwi_1_1KiwiBuilder.html#af559f6584302e821efb73365634cf4c6">More...</a><br /></td></tr>
 <tr class="separator:af559f6584302e821efb73365634cf4c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5bc0055fe429575922e15c8c25e6c2f4"><td class="memItemLeft" align="right" valign="top"><a id="a5bc0055fe429575922e15c8c25e6c2f4"></a>
-const <a class="el" href="classkiwi_1_1lm_1_1KnLangModelBase.html">lm::KnLangModelBase</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>getLangModel</b> () const</td></tr>
-<tr class="separator:a5bc0055fe429575922e15c8c25e6c2f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>형태소 분석에 사용될 사전을 관리하고, 사전을 바탕으로 실제 형태소 분석을 수행하는 Kiwi의 인스턴스를 생성하는 클래스. </p>
@@ -181,12 +191,12 @@ const <a class="el" href="classkiwi_1_1lm_1_1KnLangModelBase.html">lm::KnLangMod
 </div><div class="memdoc">
 
 <p>KiwiBuilder를 raw 데이터로부터 생성한다. </p>
-<dl class="section note"><dt>Note</dt><dd>이 함수는 현재 내부적으로 모델 구축에 쓰인다. 추후 공개 데이터로도 쉽게 직접 모델을 구축할 수 있도록 개선된 API를 제공할 예정. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>이 함수는 현재 내부적으로 기본 모델 구축에 쓰인다. 추후 공개 데이터로도 쉽게 직접 모델을 구축할 수 있도록 개선된 API를 제공할 예정. </dd></dl>
 
 </div>
 </div>
-<a id="ae1aeaa0c9eac185f5ba3b19b6d58e85d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae1aeaa0c9eac185f5ba3b19b6d58e85d">&#9670;&nbsp;</a></span>KiwiBuilder() <span class="overload">[3/3]</span></h2>
+<a id="a22d8ffb811ea9ceb0e146c0a736c7d3d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a22d8ffb811ea9ceb0e146c0a736c7d3d">&#9670;&nbsp;</a></span>KiwiBuilder() <span class="overload">[3/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -207,7 +217,13 @@ const <a class="el" href="classkiwi_1_1lm_1_1KnLangModelBase.html">lm::KnLangMod
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="Types_8h.html#a7b5ed1c7b90b79877f32c8a011c06ff3">BuildOption</a>&#160;</td>
-          <td class="paramname"><em>options</em> = <code>BuildOption::integrateAllomorph|BuildOption::loadDefaultDict</code>&#160;</td>
+          <td class="paramname"><em>options</em> = <code>BuildOption::integrateAllomorph|BuildOption::loadDefaultDict</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>useSBG</em> = <code>false</code>&#160;</td>
         </tr>
         <tr>
           <td></td>

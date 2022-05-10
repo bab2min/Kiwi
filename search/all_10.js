@@ -1,13 +1,23 @@
 var searchData=
 [
-  ['table_153',['Table',['../classkiwi_1_1tp_1_1Table.html',1,'kiwi::tp']]],
-  ['tag_154',['tag',['../structkiwi_1_1MorphemeRaw.html#a5234f7084311dc2f6e1951bb141be9f7',1,'kiwi::MorphemeRaw::tag()'],['../structkiwi_1_1TokenInfo.html#a45967e9870d0b947d30e7ad8fece4898',1,'kiwi::TokenInfo::tag()']]],
-  ['tagsequencescorer_155',['TagSequenceScorer',['../classkiwi_1_1TagSequenceScorer.html',1,'kiwi']]],
-  ['threadpool_156',['ThreadPool',['../classkiwi_1_1utils_1_1ThreadPool.html',1,'kiwi::utils']]],
-  ['tokeninfo_157',['TokenInfo',['../structkiwi_1_1TokenInfo.html',1,'kiwi']]],
-  ['tokenresult_158',['TokenResult',['../Types_8h.html#aa3333c7237f7db8aa0121560dbaa3ecb',1,'kiwi']]],
-  ['trieiterator_159',['TrieIterator',['../classkiwi_1_1utils_1_1TrieIterator.html',1,'kiwi::utils']]],
-  ['trienode_160',['TrieNode',['../structkiwi_1_1utils_1_1TrieNode.html',1,'kiwi::utils']]],
-  ['trienodeex_161',['TrieNodeEx',['../structkiwi_1_1utils_1_1TrieNodeEx.html',1,'kiwi::utils']]],
-  ['types_2eh_162',['Types.h',['../Types_8h.html',1,'']]]
+  ['score_145',['score',['../structkiwi_1_1TokenInfo.html#a9b27979bcbb4a0ddcca86fdb8ac0087c',1,'kiwi::TokenInfo']]],
+  ['senseid_146',['senseId',['../structkiwi_1_1MorphemeRaw.html#a9b66ca802e93668d9c46da65a5012fa8',1,'kiwi::MorphemeRaw::senseId()'],['../structkiwi_1_1TokenInfo.html#ab7e062c457af1a22400689cdcfb66f72',1,'kiwi::TokenInfo::senseId()']]],
+  ['sentposition_147',['sentPosition',['../structkiwi_1_1TokenInfo.html#a891dbb0c4774cb1eff196e6e53815a7d',1,'kiwi::TokenInfo']]],
+  ['seq_148',['seq',['../structkiwi_1_1tp_1_1seq.html',1,'kiwi::tp']]],
+  ['seq_3c_200_20_3e_149',['seq&lt; 0 &gt;',['../structkiwi_1_1tp_1_1seq.html',1,'kiwi::tp']]],
+  ['seq_3c_20_5fi1_2e_2e_2e_2c_28sizeof_2e_2e_2e_28_5fi1_29_2b_5fi2_29_2e_2e_2e_20_3e_150',['seq&lt; _i1...,(sizeof...(_i1)+_i2)... &gt;',['../structkiwi_1_1tp_1_1seq.html',1,'kiwi::tp']]],
+  ['seq_3c_3e_151',['seq&lt;&gt;',['../structkiwi_1_1tp_1_1seq.html',1,'kiwi::tp']]],
+  ['seqmax_152',['SeqMax',['../structkiwi_1_1tp_1_1SeqMax.html',1,'kiwi::tp']]],
+  ['seqmax_3c_20seq_3c_20i_20_3e_20_3e_153',['SeqMax&lt; seq&lt; i &gt; &gt;',['../structkiwi_1_1tp_1_1SeqMax_3_01seq_3_01i_01_4_01_4.html',1,'kiwi::tp']]],
+  ['seqmax_3c_20seq_3c_20i_2c_20j_2e_2e_2e_20_3e_20_3e_154',['SeqMax&lt; seq&lt; i, j... &gt; &gt;',['../structkiwi_1_1tp_1_1SeqMax_3_01seq_3_01i_00_01j_8_8_8_01_4_01_4.html',1,'kiwi::tp']]],
+  ['seqsize_155',['SeqSize',['../structkiwi_1_1tp_1_1SeqSize.html',1,'kiwi::tp']]],
+  ['seqsize_3c_20seq_3c_20_5fi_2e_2e_2e_20_3e_20_3e_156',['SeqSize&lt; seq&lt; _i... &gt; &gt;',['../structkiwi_1_1tp_1_1SeqSize_3_01seq_3_01__i_8_8_8_01_4_01_4.html',1,'kiwi::tp']]],
+  ['skipbigrammodelbase_157',['SkipBigramModelBase',['../classkiwi_1_1sb_1_1SkipBigramModelBase.html',1,'kiwi::sb']]],
+  ['slice_158',['slice',['../structkiwi_1_1tp_1_1slice.html',1,'kiwi::tp']]],
+  ['slice_3c_200_2c_20seq_3c_20first_2c_20_5fi_2e_2e_2e_20_3e_2c_20_5fj_2e_2e_2e_20_3e_159',['slice&lt; 0, seq&lt; first, _i... &gt;, _j... &gt;',['../structkiwi_1_1tp_1_1slice_3_010_00_01seq_3_01first_00_01__i_8_8_8_01_4_00_01__j_8_8_8_01_4.html',1,'kiwi::tp']]],
+  ['slice_3c_200_2c_20seq_3c_3e_2c_20_5fj_2e_2e_2e_20_3e_160',['slice&lt; 0, seq&lt;&gt;, _j... &gt;',['../structkiwi_1_1tp_1_1slice_3_010_00_01seq_3_4_00_01__j_8_8_8_01_4.html',1,'kiwi::tp']]],
+  ['slice_3c_20n_2c_20seq_3c_20first_2c_20_5fi_2e_2e_2e_20_3e_2c_20_5fj_2e_2e_2e_20_3e_161',['slice&lt; n, seq&lt; first, _i... &gt;, _j... &gt;',['../structkiwi_1_1tp_1_1slice_3_01n_00_01seq_3_01first_00_01__i_8_8_8_01_4_00_01__j_8_8_8_01_4.html',1,'kiwi::tp']]],
+  ['spacesplititerator_162',['SpaceSplitIterator',['../classkiwi_1_1SpaceSplitIterator.html',1,'kiwi']]],
+  ['splitintosents_163',['splitIntoSents',['../classkiwi_1_1Kiwi.html#a52218c510d6c8ee53fea28402a177902',1,'kiwi::Kiwi::splitIntoSents(const std::u16string &amp;str, Match matchOptions=Match::allWithNormalizing, TokenResult *tokenizedResultOut=nullptr) const'],['../classkiwi_1_1Kiwi.html#a1a8f39476bb72b3c75b83dc6f7a43992',1,'kiwi::Kiwi::splitIntoSents(const std::string &amp;str, Match matchOptions=Match::allWithNormalizing, TokenResult *tokenizedResultOut=nullptr) const']]],
+  ['str_164',['str',['../structkiwi_1_1TokenInfo.html#ae10c0de28c7d59c5dbb5d6e85e07b5c4',1,'kiwi::TokenInfo']]]
 ];

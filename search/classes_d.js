@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['raggedvector_223',['RaggedVector',['../classkiwi_1_1RaggedVector.html',1,'kiwi']]]
+  ['omstream_240',['omstream',['../classkiwi_1_1utils_1_1omstream.html',1,'kiwi::utils']]]
 ];
