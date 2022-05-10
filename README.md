@@ -129,6 +129,12 @@ https://github.com/bab2min/kiwi-gui 에서 다운받을 수 있습니다.
 
 
 ## 업데이트 내역
+* v0.12
+  * 동/형용사 형태소의 불규칙 활용 여부를 표시하는 태그 추가
+  * 규칙/불규칙 활용 둘 다 가능한 `걷다/묻다` 동사에 대한 모호성 해소 기능 추가
+  * 형태소를 결합하여 원본 텍스트를 복원하는 클래스인 `kiwi::cmb::AutoJoiner` 추가
+  * 각종 버그 수정 & 언어 모델 정확도 개선
+
 * v0.11
   * 이용자 사전을 관리하는 메소드 `kiwi::Kiwi::addPreAnalyzedWord`, `kiwi::Kiwi::addRule`가 추가되었습니다.
   * 분석 시 접두사/접미사 및 동/형용사 파생접미사의 분리여부를 선택할 수 있는 옵션 `kiwi::Match::joinNounPrefix`, `kiwi::Match::joinNounSuffix`, `kiwi::Match::joinVerbSuffix`, `kiwi::Match::joinAdjSuffix`가 추가되었습니다.
