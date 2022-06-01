@@ -30,5 +30,25 @@ TEST(KiwiTypo, Builder)
 	tt.addTypo(u"ㅐㅔ", u"ㅐㅔ");
 	Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 0, BuildOption::default_, }.build(tt);
 
-	kiwi.analyze(u"문화제 보호", Match::allWithNormalizing);
+	TokenResult ret;
+	kiwi.setTypoCostWeight(0);
+	ret = kiwi.analyze(u"문화제 보호", Match::allWithNormalizing);
+	kiwi.setTypoCostWeight(2);
+	ret = kiwi.analyze(u"문화제 보호", Match::allWithNormalizing);
+	kiwi.setTypoCostWeight(4);
+	ret = kiwi.analyze(u"문화제 보호", Match::allWithNormalizing);
+	kiwi.setTypoCostWeight(6);
+	ret = kiwi.analyze(u"문화제 보호", Match::allWithNormalizing);
+}
+
+TEST(KiwiTypo, BasicTypoSet)
+{
+	KiwiBuilder builder{ MODEL_PATH, 0, BuildOption::default_, };
+	Kiwi kiwi = builder.build();
+
+	Kiwi typoKiwi = builder.build(basicTypoSet);
+
+	TokenResult o = kiwi.analyze(u"외안됀데?", Match::allWithNormalizing);
+	TokenResult c = typoKiwi.analyze(u"외안됀데?", Match::allWithNormalizing);
+	EXPECT_TRUE(o.second < c.second);
 }

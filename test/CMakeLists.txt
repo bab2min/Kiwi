@@ -4,6 +4,7 @@ add_executable(kiwi-test
 
 bit_encode.cpp
 test_QEncoder.cpp
+test_typo.cpp
 test_combiner.cpp
 test_c.cpp
 test_cpp.cpp
