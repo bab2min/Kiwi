@@ -46,6 +46,7 @@
     <ClInclude Include="include\kiwi\Trainer.h" />
     <ClInclude Include="include\kiwi\Trie.hpp" />
     <ClInclude Include="include\kiwi\Types.h" />
+    <ClInclude Include="include\kiwi\TypoTransformer.h" />
     <ClInclude Include="include\kiwi\Utils.h" />
     <ClInclude Include="include\kiwi\WordDetector.h" />
     <ClInclude Include="src\ArchAvailable.h" />
@@ -68,6 +69,7 @@
     <ClInclude Include="src\serializerEigen.hpp" />
     <ClInclude Include="src\SkipBigramTrainer.hpp" />
     <ClInclude Include="src\SkipBigramModel.hpp" />
+    <ClInclude Include="src\SortUtils.hpp" />
     <ClInclude Include="src\string_view.hpp" />
     <ClInclude Include="src\StrUtils.h" />
   </ItemGroup>
@@ -77,6 +79,7 @@
     <ClCompile Include="src\Joiner.cpp" />
     <ClCompile Include="src\search.cpp" />
     <ClCompile Include="src\TagUtils.cpp" />
+    <ClCompile Include="src\TypoTransformer.cpp" />
     <ClCompile Include="third_party\mimalloc\src\static.c" />
     <ClCompile Include="src\Form.cpp" />
     <ClCompile Include="src\FeatureTestor.cpp" />

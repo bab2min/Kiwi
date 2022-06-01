@@ -632,16 +632,6 @@ MultiRuleDFAErased RuleSet::buildRightPattern(const Vector<Rule>& rules)
 	return ret;
 }
 
-inline bool isHangulVowel(char16_t c)
-{
-	return u'ㅏ' <= c && c <= u'ㅣ';
-}
-
-inline char16_t joinOnsetVowel(size_t onset, size_t vowel)
-{
-	return u'가' + (onset * 21 + vowel) * 28;
-}
-
 void RuleSet::addRule(const string& lTag, const string& rTag,
 	const KString& lPat, const KString& rPat, const vector<ReplString>& results,
 	CondVowel leftVowel, CondPolarity leftPolar

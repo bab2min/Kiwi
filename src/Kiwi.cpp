@@ -55,10 +55,10 @@ namespace kiwi
 		};
 	};
 
-	Kiwi::Kiwi(ArchType arch, size_t lmKeySize)
+	Kiwi::Kiwi(ArchType arch, size_t lmKeySize, bool typoTolerant)
 	{
 		selectedArch = arch;
-		dfSplitByTrie = (void*)getSplitByTrieFn(selectedArch);
+		dfSplitByTrie = (void*)getSplitByTrieFn(selectedArch, typoTolerant);
 
 		static tp::Table<FnFindBestPath, AvailableArch> lmKnLM_8{ FindBestPathGetter<WrappedKnLM<uint8_t>::type>{} };
 		static tp::Table<FnFindBestPath, AvailableArch> lmKnLM_16{ FindBestPathGetter<WrappedKnLM<uint16_t>::type>{} };
@@ -992,7 +992,7 @@ namespace kiwi
 		// 분석할 문장에 포함된 개별 문자에 대해 어절번호를 생성한다
 		std::vector<uint16_t> wordPositions = getWordPositions(sBegin, sEnd);
 		
-		auto nodes = (*reinterpret_cast<FnSplitByTrie>(dfSplitByTrie))(formTrie, normalizedStr, matchOptions, maxUnkFormSize, spaceTolerance);
+		auto nodes = (*reinterpret_cast<FnSplitByTrie>(dfSplitByTrie))(forms.data(), formTrie, normalizedStr, matchOptions, maxUnkFormSize, spaceTolerance, 1.f);
 		vector<TokenResult> ret;
 		if (nodes.size() <= 2)
 		{

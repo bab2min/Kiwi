@@ -34,8 +34,53 @@ inline bool appendNewNode(Vector<KGraphNode>& nodes, Vector<Vector<uint32_t>>& e
 	}
 }
 
-template<ArchType arch>
-Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form*>& trie, const KString& str, Match matchOptions, size_t maxUnkFormSize, size_t spaceTolerance)
+template<bool typoTolerant>
+bool insertCandidates(Vector<const Form*>& candidates, const Form* foundCand, const Form* formBase, const KString& str, const Vector<uint32_t>& nonSpaces)
+{
+	if (typoTolerant)
+	{
+		auto tCand = reinterpret_cast<const TypoForm*>(foundCand);
+
+		if (find(candidates.begin(), candidates.end(), &tCand->form(formBase)) != candidates.end()) return false;
+
+		while (1)
+		{
+			auto cand = &tCand->form(formBase);
+			if (FeatureTestor::isMatchedApprox(&str[0], &str[nonSpaces[nonSpaces.size() - cand->form.size()]], cand->vowel, cand->polar))
+			{
+				candidates.emplace_back(cand);
+			}
+			if (tCand[0].hash() != tCand[1].hash()) break;
+			++tCand;
+		}
+	}
+	else
+	{
+		if (find(candidates.begin(), candidates.end(), foundCand) != candidates.end()) return false;
+
+		while (1)
+		{
+			if (FeatureTestor::isMatchedApprox(&str[0], &str[nonSpaces[nonSpaces.size() - foundCand->form.size()]], foundCand->vowel, foundCand->polar))
+			{
+				candidates.emplace_back(foundCand);
+			}
+			if (foundCand[0].formHash != foundCand[1].formHash) break;
+			++foundCand;
+		}
+	}
+	return true;
+}
+
+template<ArchType arch, bool typoTolerant>
+Vector<KGraphNode> kiwi::splitByTrie(
+	const Form* formBase,
+	const utils::FrozenTrie<kchar_t, const Form*>& trie, 
+	const KString& str, 
+	Match matchOptions, 
+	size_t maxUnkFormSize, 
+	size_t spaceTolerance,
+	float typoCostWeight
+)
 {
 	Vector<KGraphNode> ret;
 	Vector<Vector<uint32_t>> endPosMap(str.size() + 1);
@@ -205,16 +250,7 @@ Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form
 					if (!cand) break;
 					else if (cand != (const Form*)trie.hasSubmatch)
 					{
-						if (find(candidates.begin(), candidates.end(), cand) != candidates.end()) break;
-						while (1)
-						{
-							if (FeatureTestor::isMatchedApprox(&str[0], &str[nonSpaces[nonSpaces.size() - cand->form.size()]], cand->vowel, cand->polar))
-							{
-								candidates.emplace_back(cand);
-							}
-							if (cand[0].form != cand[1].form) break;
-							++cand;
-						}
+						if (!insertCandidates<typoTolerant>(candidates, cand, formBase, str, nonSpaces)) break;
 					}
 				}
 				nextNode = curNode->template nextOpt<arch>(trie, c);
@@ -268,16 +304,7 @@ Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form
 			if (!cand) break;
 			else if (cand != (const Form*)trie.hasSubmatch)
 			{
-				if (find(candidates.begin(), candidates.end(), cand) != candidates.end()) break;
-				while (1)
-				{
-					if (FeatureTestor::isMatchedApprox(&str[0], &str[nonSpaces[nonSpaces.size() - cand->form.size()]], cand->vowel, cand->polar))
-					{
-						candidates.emplace_back(cand);
-					}
-					if (cand[0].form != cand[1].form) break;
-					++cand;
-				}
+				if (!insertCandidates<typoTolerant>(candidates, cand, formBase, str, nonSpaces)) break;
 			}
 		}
 	continueFor:
@@ -308,16 +335,7 @@ Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form
 		if (curNode->val(trie) && curNode->val(trie) != (const Form*)trie.hasSubmatch)
 		{
 			const Form* cand = curNode->val(trie);
-			if (find(candidates.begin(), candidates.end(), cand) != candidates.end()) break;
-			while (1)
-			{
-				if (FeatureTestor::isMatched(&str[0], &str[nonSpaces[nonSpaces.size() - cand->form.size()]], cand->vowel, cand->polar))
-				{
-					candidates.emplace_back(cand);
-				}
-				if (cand[0].form != cand[1].form) break;
-				++cand;
-			}
+			if (!insertCandidates<typoTolerant>(candidates, cand, formBase, str, nonSpaces)) break;
 		}
 		curNode = curNode->fail();
 	}
@@ -348,19 +366,29 @@ inline FnSplitByTrie getSplitByTrieFnDispatch(ArchType arch, tp::seq<indices...>
 	return table[static_cast<int>(arch) - 1];
 }
 
+template<bool typoTolerant>
 struct SplitByTrieGetter
 {
 	template<std::ptrdiff_t i>
 	struct Wrapper
 	{
-		static constexpr FnSplitByTrie value = &splitByTrie<static_cast<ArchType>(i)>;
+		static constexpr FnSplitByTrie value = &splitByTrie<static_cast<ArchType>(i), typoTolerant>;
 	};
 };
 
-FnSplitByTrie kiwi::getSplitByTrieFn(ArchType arch)
+FnSplitByTrie kiwi::getSplitByTrieFn(ArchType arch, bool typoTolerant)
 {
-	static tp::Table<FnSplitByTrie, AvailableArch> table{ SplitByTrieGetter{} };
-	return table[static_cast<std::ptrdiff_t>(arch)];
+	static tp::Table<FnSplitByTrie, AvailableArch> table{ SplitByTrieGetter<false>{} };
+	static tp::Table<FnSplitByTrie, AvailableArch> tableTT{ SplitByTrieGetter<true>{} };
+	
+	if (typoTolerant)
+	{
+		return tableTT[static_cast<std::ptrdiff_t>(arch)];
+	}
+	else
+	{
+		return table[static_cast<std::ptrdiff_t>(arch)];
+	}
 }
 
 const Form * KTrie::findForm(const KString & str) const

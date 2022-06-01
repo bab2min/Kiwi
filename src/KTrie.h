@@ -57,11 +57,19 @@ namespace kiwi
 		}
 	};
 
-	template<ArchType arch>
-	Vector<KGraphNode> splitByTrie(const utils::FrozenTrie<kchar_t, const Form*>& trie, const KString& str, Match matchOptions, size_t maxUnkFormSize, size_t spaceTolerance);
+	template<ArchType arch, bool typoTolerant = false>
+	Vector<KGraphNode> splitByTrie(
+		const Form* formBase,
+		const utils::FrozenTrie<kchar_t, const Form*>& trie, 
+		const KString& str, 
+		Match matchOptions, 
+		size_t maxUnkFormSize, 
+		size_t spaceTolerance,
+		float typoCostWeight
+	);
 	
 	using FnSplitByTrie = decltype(&splitByTrie<ArchType::default_>);
-	FnSplitByTrie getSplitByTrieFn(ArchType arch);
+	FnSplitByTrie getSplitByTrieFn(ArchType arch, bool typoTolerant);
 
 	struct KTrie : public utils::TrieNode<char16_t, const Form*, utils::ConstAccess<map<char16_t, int32_t>>, KTrie>
 	{

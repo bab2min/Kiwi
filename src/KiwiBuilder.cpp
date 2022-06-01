@@ -16,6 +16,7 @@
 #include "RaggedVector.hpp"
 #include "SkipBigramTrainer.hpp"
 #include "SkipBigramModel.hpp"
+#include "SortUtils.hpp"
 
 using namespace std;
 using namespace kiwi;
@@ -1315,9 +1316,9 @@ inline CondPolarity reducePolar(CondPolarity p, const Morpheme* m)
 	return CondPolarity::none;
 }
 
-Kiwi KiwiBuilder::build() const
+Kiwi KiwiBuilder::build(TypoTransformer typos) const
 {
-	Kiwi ret{ archType, langMdl.knlm->getHeader().key_size };
+	Kiwi ret{ archType, langMdl.knlm->getHeader().key_size, !typos.empty()};
 
 	Vector<FormRaw> combinedForms;
 	Vector<MorphemeRaw> combinedMorphemes;
@@ -1353,15 +1354,25 @@ Kiwi KiwiBuilder::build() const
 		ret.forms.emplace_back(bake(f, ret.morphemes.data(), newFormCands[ret.forms.size()]));
 	}
 
+	Vector<size_t> newFormIdMapper(ret.forms.size());
+	iota(newFormIdMapper.begin(), newFormIdMapper.begin() + defaultTagSize - 1, 0);
+	utils::sortWriteInvIdx(ret.forms.begin() + defaultTagSize - 1, ret.forms.end(), newFormIdMapper.begin() + defaultTagSize - 1, (size_t)(defaultTagSize - 1));
 	ret.forms.emplace_back();
+
+	uint8_t formHash = 0;
+	for (size_t i = 1; i < ret.forms.size(); ++i)
+	{
+		if (ret.forms[i].form != ret.forms[i - 1].form) ++formHash;
+		ret.forms[i].formHash = formHash;
+	}
 
 	for (auto& m : morphemes)
 	{
-		ret.morphemes.emplace_back(bake(m, ret.morphemes.data(), ret.forms.data()));
+		ret.morphemes.emplace_back(bake(m, ret.morphemes.data(), ret.forms.data(), newFormIdMapper));
 	}
 	for (auto& m : combinedMorphemes)
 	{
-		ret.morphemes.emplace_back(bake(m, ret.morphemes.data(), ret.forms.data()));
+		ret.morphemes.emplace_back(bake(m, ret.morphemes.data(), ret.forms.data(), newFormIdMapper));
 	}
 
 	utils::ContinuousTrie<KTrie> formTrie{ defaultTagSize + 1 };
@@ -1389,33 +1400,108 @@ Kiwi KiwiBuilder::build() const
 		sortedForms.emplace_back(&f);
 	}
 
-	sort(sortedForms.begin(), sortedForms.end(), [](const Form* a, const Form* b)
+	// 오타 교정이 없는 경우 일반 Trie 생성
+	if (typos.empty())
 	{
-		return a->form < b->form;
-	});
-
-	size_t estimatedNodeSize = 0;
-	const KString* prevForm = nullptr;
-	for (auto f : sortedForms)
-	{
-		if (!prevForm)
+		sort(sortedForms.begin(), sortedForms.end(), [](const Form* a, const Form* b)
 		{
-			estimatedNodeSize += f->form.size();
-			prevForm = &f->form;
-			continue;
-		}
-		size_t commonPrefix = 0;
-		while (commonPrefix < std::min(prevForm->size(), f->form.size())
-			&& (*prevForm)[commonPrefix] == f->form[commonPrefix]) ++commonPrefix;
-		estimatedNodeSize += f->form.size() - commonPrefix;
-		prevForm = &f->form;
-	}
-	formTrie.reserveMore(estimatedNodeSize);
+			return a->form < b->form;
+		});
 
-	decltype(formTrie)::CacheStore<const KString> cache;
-	for (auto f : sortedForms)
+		size_t estimatedNodeSize = 0;
+		const KString* prevForm = nullptr;
+		for (auto f : sortedForms)
+		{
+			if (!prevForm)
+			{
+				estimatedNodeSize += f->form.size();
+				prevForm = &f->form;
+				continue;
+			}
+			size_t commonPrefix = 0;
+			while (commonPrefix < std::min(prevForm->size(), f->form.size())
+				&& (*prevForm)[commonPrefix] == f->form[commonPrefix]) ++commonPrefix;
+			estimatedNodeSize += f->form.size() - commonPrefix;
+			prevForm = &f->form;
+		}
+		formTrie.reserveMore(estimatedNodeSize);
+
+		decltype(formTrie)::CacheStore<const KString> cache;
+		for (auto f : sortedForms)
+		{
+			formTrie.buildWithCaching(f->form, f, cache);
+		}
+	}
+	// 오타 교정이 있는 경우 가능한 모든 오타에 대해 Trie 생성
+	else
 	{
-		formTrie.buildWithCaching(f->form, f, cache);
+		UnorderedMap<KString, Vector<pair<uint32_t, float>>> typoGroup;
+		for (auto f : sortedForms)
+		{
+			for (auto t : typos._generate(f->form))
+			{
+				typoGroup[t.first].emplace_back(f - ret.forms.data(), t.second);
+			}
+		}
+
+		Vector<decltype(typoGroup)::pointer> typoGroupSorted;
+		size_t totTfSize = 0;
+		for (auto& v : typoGroup)
+		{
+			typoGroupSorted.emplace_back(&v);
+			sort(v.second.begin(), v.second.end(), [](const pair<uint32_t, float>& a, const pair<uint32_t, float>& b)
+				{
+					if (a.second < b.second) return true;
+					if (a.second > b.second) return false;
+					return a.first < b.first;
+				});
+			totTfSize += v.second.size();
+		}
+
+		sort(typoGroupSorted.begin(), typoGroupSorted.end(), [](decltype(typoGroup)::pointer a, decltype(typoGroup)::pointer b)
+			{
+				return a->first < b->first;
+			});
+
+		ret.typoForms.reserve(totTfSize + 1);
+		
+		size_t estimatedNodeSize = 0;
+		const KString* prevForm = nullptr;
+		bool hash = false;
+		for (auto f : typoGroupSorted)
+		{
+			ret.typoForms.insert(ret.typoForms.end(), f->second.begin(), f->second.end());
+			if (hash)
+			{
+				for (size_t i = 0; i < f->second.size(); ++i)
+				{
+					ret.typoForms.rbegin()[i].scoreHash = -ret.typoForms.rbegin()[i].scoreHash;
+				}
+			}
+
+			if (!prevForm)
+			{
+				estimatedNodeSize += f->first.size();
+				prevForm = &f->first;
+				continue;
+			}
+			size_t commonPrefix = 0;
+			while (commonPrefix < std::min(prevForm->size(), f->first.size())
+				&& (*prevForm)[commonPrefix] == f->first[commonPrefix]) ++commonPrefix;
+			estimatedNodeSize += f->first.size() - commonPrefix;
+			prevForm = &f->first;
+			hash = !hash;
+		}
+		ret.typoForms.emplace_back(0, 0, hash);
+		formTrie.reserveMore(estimatedNodeSize);
+
+		decltype(formTrie)::CacheStore<const KString> cache;
+		size_t cumulated = 0;
+		for (auto f : typoGroupSorted)
+		{
+			formTrie.buildWithCaching(f->first, reinterpret_cast<const Form*>(&ret.typoForms[cumulated]), cache);
+			cumulated += f->second.size();
+		}
 	}
 
 	static tp::Table<FnFreezeTrie, AvailableArch> table{ FreezeTrieGetter{} };

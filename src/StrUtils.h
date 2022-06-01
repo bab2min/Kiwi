@@ -272,6 +272,11 @@ namespace kiwi
 		return utf16To8(U16StringView{ str });
 	}
 
+	inline std::string utf16To8(char16_t str)
+	{
+		return utf16To8(U16StringView{ &str, 1 });
+	}
+
 	template<class It>
 	inline KString normalizeHangul(It first, It last)
 	{
@@ -495,4 +500,16 @@ namespace kiwi
 			before = *it;
 		}
 	}
+
+
+	inline bool isHangulVowel(char16_t c)
+	{
+		return u'ㅏ' <= c && c <= u'ㅣ';
+	}
+
+	inline char16_t joinOnsetVowel(size_t onset, size_t vowel)
+	{
+		return u'가' + (onset * 21 + vowel) * 28;
+	}
+
 }

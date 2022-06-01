@@ -95,10 +95,10 @@ namespace kiwi
 		return ret;
 	}
 
-	Morpheme bake(const MorphemeRaw& o, const Morpheme* morphBase, const Form* formBase)
+	Morpheme bake(const MorphemeRaw& o, const Morpheme* morphBase, const Form* formBase, const Vector<size_t>& formMap)
 	{
 		Morpheme ret;
-		ret.kform = &formBase[o.kform].form;
+		ret.kform = &formBase[formMap[o.kform]].form;
 		ret.tag = o.tag;
 		ret.vowel = o.vowel();
 		ret.polar = o.polar();
