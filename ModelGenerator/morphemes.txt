@@ -68448,7 +68448,6 @@ CNN	NNP	5
 건강히	MAG	5
 경건히	MAG	5
 경솔히	MAG	5
-귀중히	MAG	5
 극렬히	MAG	5
 능숙히	MAG	5
 뚜렷히	MAG	5
