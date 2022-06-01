@@ -12,26 +12,33 @@ using namespace std;
 using namespace kiwi;
 
 template<class... Args>
-inline bool appendNewNode(Vector<KGraphNode>& nodes, Vector<Vector<uint32_t>>& endPosMap, size_t startPos, Args&&... args)
+inline bool appendNewNode(Vector<KGraphNode>& nodes, Vector<pair<uint32_t, uint32_t>>& endPosMap, size_t startPos, Args&&... args)
 {
+	static constexpr uint32_t npos = -1;
+
+	if (endPosMap[startPos].first == npos)
+	{
+		return false;
+	}
+
 	size_t newId = nodes.size();
 	nodes.emplace_back(forward<Args>(args)...);
 	auto& nnode = nodes.back();
 
-	for (auto i : endPosMap[startPos])
+	nnode.prev = newId - endPosMap[startPos].first;
+	if (nnode.endPos >= endPosMap.size()) return true;
+
+	if (endPosMap[nnode.endPos].first == npos)
 	{
-		nnode.addPrev(newId - i);
-	}
-	if (!nnode.prevs[0])
-	{
-		nodes.pop_back();
-		return false;
+		endPosMap[nnode.endPos].first = newId;
+		endPosMap[nnode.endPos].second = newId;
 	}
 	else
 	{
-		endPosMap[nnode.endPos].emplace_back(newId);
-		return true;
+		nodes[endPosMap[nnode.endPos].second].sibling = newId - endPosMap[nnode.endPos].second;
+		endPosMap[nnode.endPos].second = newId;
 	}
+	return true;
 }
 
 template<bool typoTolerant>
@@ -83,10 +90,10 @@ Vector<KGraphNode> kiwi::splitByTrie(
 )
 {
 	Vector<KGraphNode> ret;
-	Vector<Vector<uint32_t>> endPosMap(str.size() + 1);
+	Vector<pair<uint32_t, uint32_t>> endPosMap(str.size() + 1, make_pair<uint32_t, uint32_t>(-1, -1));
+	endPosMap[0] = make_pair(0, 0);
 	ret.reserve(8);
 	ret.emplace_back();
-	endPosMap[0].emplace_back(0);
 	size_t n = 0;
 	Vector<const Form*> candidates;
 	auto* curNode = trie.root();
@@ -341,7 +348,8 @@ Vector<KGraphNode> kiwi::splitByTrie(
 	}
 	branchOut(nonSpaces.size(), n);
 
-	appendNewNode(ret, endPosMap, nonSpaces.size(), nullptr, nonSpaces.size());
+	appendNewNode(ret, endPosMap, nonSpaces.size(), nullptr, nonSpaces.size() + 1);
+	ret.back().endPos = nonSpaces.size();
 
 	nonSpaces.emplace_back(n);
 
@@ -405,23 +413,23 @@ const Form * KTrie::findForm(const KString & str) const
 
 Vector<KGraphNode> KGraphNode::removeUnconnected(const Vector<KGraphNode>& graph)
 {
-	Vector<uint16_t> connectedList(graph.size()), newIndexDiff(graph.size());
+	Vector<uint8_t> connectedList(graph.size());
+	Vector<uint16_t> newIndexDiff(graph.size());
 	connectedList[graph.size() - 1] = true;
 	connectedList[0] = true;
 	// forward searching
 	for (size_t i = 1; i < graph.size(); ++i)
 	{
 		bool connected = false;
-		for (size_t j = 0; j < KGraphNode::max_prev; ++j)
+		for (auto prev = graph[i].getPrev(); prev; prev = prev->getSibling())
 		{
-			if (!graph[i].prevs[j]) break;
-			if (connectedList[i - graph[i].prevs[j]])
+			if (connectedList[prev - graph.data()])
 			{
 				connected = true;
 				break;
 			}
 		}
-		connectedList[i] = connected;
+		connectedList[i] = connected ? 1 : 0;
 	}
 	// backward searching
 	for (size_t i = graph.size() - 1; i-- > 1; )
@@ -429,11 +437,10 @@ Vector<KGraphNode> KGraphNode::removeUnconnected(const Vector<KGraphNode>& graph
 		bool connected = false;
 		for (size_t j = i + 1; j < graph.size(); ++j)
 		{
-			for (size_t k = 0; k < KGraphNode::max_prev; ++k)
+			for (auto prev = graph[j].getPrev(); prev; prev = prev->getSibling())
 			{
-				if (!graph[j].prevs[k]) break;
-				if (j - graph[j].prevs[k] > i) break;
-				if (j - graph[j].prevs[k] < i) continue;
+				if (prev > &graph[i]) break;
+				if (prev < &graph[i]) continue;
 				if (connectedList[j])
 				{
 					connected = true;
@@ -441,7 +448,7 @@ Vector<KGraphNode> KGraphNode::removeUnconnected(const Vector<KGraphNode>& graph
 				}
 			}
 		}
-		connectedList[i] = connectedList[i] && connected;
+		connectedList[i] = (connectedList[i] && connected) ? 1 : 0;
 	}
 	size_t connectedCnt = accumulate(connectedList.begin(), connectedList.end(), 0);
 	newIndexDiff[0] = connectedList[0];
@@ -461,14 +468,8 @@ Vector<KGraphNode> KGraphNode::removeUnconnected(const Vector<KGraphNode>& graph
 		if (!connectedList[i]) continue;
 		ret.emplace_back(graph[i]);
 		auto& newNode = ret.back();
-		size_t n = 0;
-		for (size_t j = 0; j < max_prev; ++j)
-		{
-			auto idx = newNode.prevs[j];
-			if (!idx) break;
-			if(connectedList[i - idx]) newNode.prevs[n++] = newNode.prevs[j] - (newIndexDiff[i] - newIndexDiff[i - idx]);
-		}
-		newNode.prevs[n] = 0;
+		if (newNode.prev) newNode.prev -= newIndexDiff[i] - newIndexDiff[i - newNode.prev];
+		if (newNode.sibling) newNode.sibling -= newIndexDiff[i + newNode.sibling] - newIndexDiff[i];
 	}
 	return ret;
 }

@@ -476,10 +476,8 @@ namespace kiwi
 	)
 	{
 		size_t vocabSize = langMdl.knlm->getHeader().vocab_size;
-		for (size_t i = 0; i < KGraphNode::max_prev; ++i)
+		for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
 		{
-			auto* prev = node->getPrev(i);
-			if (!prev) break;
 			for (auto& p : cache[prev - startNode])
 			{
 				const auto* wids = &p.morphs;
@@ -539,16 +537,16 @@ namespace kiwi
 	inline bool hasLeftBoundary(const KGraphNode* node)
 	{
 		// 시작 지점은 항상 왼쪽 경계로 처리
-		if (node->getPrev(0)->endPos == 0) return true; 
+		if (node->getPrev()->endPos == 0) return true; 
 
 		// 이전 노드의 끝지점이 현재 노드보다 작은 경우 왼쪽 경계로 처리
-		if (node->getPrev(0)->endPos < node->startPos) return true;
+		if (node->getPrev()->endPos < node->startPos) return true;
 		
 		// 이전 노드가 구두점이나 특수 문자인 경우
-		if (!node->getPrev(0)->uform.empty())
+		if (!node->getPrev()->uform.empty())
 		{
 			// 닫는 괄호는 왼쪽 경계로 처리하지 않음
-			auto c = node->getPrev(0)->uform.back();
+			auto c = node->getPrev()->uform.back();
 			if (isClosingPair(c) || c == u'"' || c == u'\'') return false;
 			
 			// 나머지 특수문자는 왼쪽 경계로 처리
@@ -823,11 +821,9 @@ namespace kiwi
 #endif
 		}
 
-		// end node
-		for (size_t i = 0; i < KGraphNode::max_prev; ++i)
+		// end node		
+		for (auto prev = endNode->getPrev(); prev; prev = prev->getSibling())
 		{
-			auto* prev = endNode->getPrev(i);
-			if (!prev) break;
 			for (auto&& p : cache[prev - startNode])
 			{
 				if (p.morphs.back().combineSocket) continue;
