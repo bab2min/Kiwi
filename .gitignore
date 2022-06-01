@@ -342,3 +342,4 @@ ModelGenerator/*
 !ModelGenerator/morphemes.txt
 !ModelGenerator/extractMorphemeList.py
 !ModelGenerator/convertModuToKiwi.py
+models/
