@@ -8,20 +8,30 @@ using namespace kiwi;
 TEST(KiwiTypo, Generate)
 {
 	TypoTransformer tt;
-	tt.addTypo(u"ㅐㅔ", u"ㅐㅔ");
-
 	UnorderedMap<std::u16string, float> typos;
+	tt.addTypo(u"ㅐㅔ", u"ㅐㅔ");
 	
+	tt.setCostThreshold(2);
 	for (auto e : tt.generate(u"개가납네"))
 	{
 		typos.emplace(e);
 	}
-
 	EXPECT_EQ(typos.size(), 4);
 	EXPECT_EQ(typos.find(u"개가납네")->second, 0);
 	EXPECT_EQ(typos.find(u"게가납네")->second, 1);
 	EXPECT_EQ(typos.find(u"개가납내")->second, 1);
 	EXPECT_EQ(typos.find(u"게가납내")->second, 2);
+
+	typos.clear();
+	tt.setCostThreshold(1);
+	for (auto e : tt.generate(u"개가납네"))
+	{
+		typos.emplace(e);
+	}
+	EXPECT_EQ(typos.size(), 3);
+	EXPECT_EQ(typos.find(u"개가납네")->second, 0);
+	EXPECT_EQ(typos.find(u"게가납네")->second, 1);
+	EXPECT_EQ(typos.find(u"개가납내")->second, 1);
 }
 
 TEST(KiwiTypo, Builder)
@@ -48,7 +58,15 @@ TEST(KiwiTypo, BasicTypoSet)
 
 	Kiwi typoKiwi = builder.build(basicTypoSet);
 
-	TokenResult o = kiwi.analyze(u"외안됀데?", Match::allWithNormalizing);
-	TokenResult c = typoKiwi.analyze(u"외안됀데?", Match::allWithNormalizing);
+	TokenResult o = kiwi.analyze(u"외 않됀데?", Match::allWithNormalizing);
+	TokenResult c = typoKiwi.analyze(u"외 않됀데?", Match::allWithNormalizing);
+	EXPECT_TRUE(o.second < c.second);
+
+	o = kiwi.analyze(u"나 죰 도와죠.", Match::allWithNormalizing);
+	c = typoKiwi.analyze(u"나 죰 도와죠.", Match::allWithNormalizing);
+	EXPECT_TRUE(o.second < c.second);
+
+	o = kiwi.analyze(u"맗은 믈을 마셧다!", Match::allWithNormalizing);
+	c = typoKiwi.analyze(u"맗은 믈을 마셧다!", Match::allWithNormalizing);
 	EXPECT_TRUE(o.second < c.second);
 }

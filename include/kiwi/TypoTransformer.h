@@ -13,9 +13,11 @@ namespace kiwi
 	{
 		friend class TypoTransformer;
 		template<bool u> friend class TypoIterator;
+
 		KString data;
 		Vector<size_t> ptrs, pptrs;
 		Vector<float> cost;
+		float costThreshold = 0;
 
 		template<class It>
 		void insertSinglePath(It first, It last);
@@ -52,6 +54,9 @@ namespace kiwi
 	{
 		const TypoCandidates<u16wrap>* cands = nullptr;
 		Vector<size_t> digit;
+
+		bool increase();
+		bool valid() const;
 
 	public:
 
@@ -93,6 +98,7 @@ namespace kiwi
 		friend class KiwiBuilder;
 
 		UnorderedMap<char16_t, Vector<std::pair<char16_t, float>>> xformMap;
+		float costThreshold = 2.5f;
 
 		void _addTypo(char16_t orig, char16_t error, float cost);
 
@@ -121,7 +127,10 @@ namespace kiwi
 		}
 
 		TypoCandidates<true> generate(const std::u16string& orig) const;
+
+		float getCostThreshold() const { return costThreshold; }
+		void setCostThreshold(float _costThreshold) { costThreshold = _costThreshold; }
 	};
 
-	extern TypoTransformer withoutTypo, basicTypoSet;
+	extern const TypoTransformer withoutTypo, basicTypoSet;
 }
