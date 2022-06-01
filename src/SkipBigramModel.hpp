@@ -63,7 +63,7 @@ namespace kiwi
 					nst::prepare<arch>(keyData.get() + ptrs[i], mutableCompensations + ptrs[i], size, tempBuf);
 				}
 
-				logWindowSize = std::log(header.windowSize);
+				logWindowSize = std::log((float)header.windowSize);
 			}
 
 			bool isValidVocab(KeyType k) const

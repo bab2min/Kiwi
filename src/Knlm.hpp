@@ -197,7 +197,7 @@ namespace kiwi
 					gamma_data = &restored_floats[num_non_leaf_nodes];
 
 					const float* ll_table = reinterpret_cast<const float*>(ptr + header.qtable_offset);
-					const float* gamma_table = ll_table + (1 << quantized);
+					const float* gamma_table = ll_table + ((size_t)1 << quantized);
 
 					dequantizeDispatch(tp::gen_seq<16>{}, quantized, restored_floats, restored_leaf_ll,
 						ptr + header.ll_offset, header.gamma_offset - header.ll_offset,
@@ -278,16 +278,16 @@ namespace kiwi
 				if (htx_data)
 				{
 					ptrdiff_t node = 0;
-					progress(node, header.bos_id);
-					unk_ll = getLL(node, header.unk_id);
+					progress(node, (KeyType)header.bos_id);
+					unk_ll = getLL(node, (KeyType)header.unk_id);
 					bos_node_idx = 0;
-					progress(bos_node_idx, header.bos_id);
+					progress(bos_node_idx, (KeyType)header.bos_id);
 				}
 				else
 				{
-					unk_ll = getLL(0, header.unk_id);
+					unk_ll = getLL(0, (KeyType)header.unk_id);
 					bos_node_idx = 0;
-					progress(bos_node_idx, header.bos_id);
+					progress(bos_node_idx, (KeyType)header.bos_id);
 				}
 				
 				Deque<MyNode*> dq;

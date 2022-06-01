@@ -328,7 +328,7 @@ namespace kiwi
 				auto& r = res[min(n, res.size() - 1)];
 				transform(r.first.begin(), r.first.end(), back_inserter(ret[n].first), [&sents, i](TokenInfo& p)
 				{
-					p.position += distance(sents[0], sents[i - 1]);
+					p.position += (uint32_t)distance(sents[0], sents[i - 1]);
 					return p;
 				});
 				ret[n].second += r.second;
@@ -1043,8 +1043,8 @@ namespace kiwi
 				token.morph = s.morph;
 				size_t beginPos = (upper_bound(positionTable.begin(), positionTable.end(), s.begin) - positionTable.begin()) - 1;
 				size_t endPos = lower_bound(positionTable.begin(), positionTable.end(), s.end) - positionTable.begin();
-				token.position = beginPos;
-				token.length = endPos - beginPos;
+				token.position = (uint32_t)beginPos;
+				token.length = (uint16_t)(endPos - beginPos);
 				token.score = s.wordScore;
 				token.typoCost = s.typoCost;
 

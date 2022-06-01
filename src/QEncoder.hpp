@@ -163,14 +163,14 @@ namespace kiwi
 						e = body[u] >> (IntTy)b;
 						e |= (body[u + 1] & ((one << (IntTy)(qBits[q[i]] + b - bitSize)) - 1)) << (IntTy)(bitSize - b);
 					}
-					b += qBits[q[i]];
+					b += (uint8_t)qBits[q[i]];
 					if (b >= bitSize)
 					{
 						b -= bitSize;
 						u++;
 					}
 				}
-				ints[i] = e + qBias[q[i]];
+				ints[i] = e + (IntTy)qBias[q[i]];
 			}
 			return std::make_pair(body + u, b);
 		}
@@ -236,14 +236,14 @@ namespace kiwi
 						e = body[u] >> (IntTy)b;
 						e |= (body[u + 1] & ((one << (IntTy)(qBits[q] + b - bitSize)) - 1)) << (IntTy)(bitSize - b);
 					}
-					b += qBits[q];
+					b += (uint8_t)qBits[q];
 					if (b >= bitSize)
 					{
 						b -= bitSize;
 						u++;
 					}
 				}
-				ints[i] = e + qBias[q];
+				ints[i] = e + (IntTy)qBias[q];
 			}
 			return std::make_pair(body + u, b);
 		}
