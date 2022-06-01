@@ -42,12 +42,11 @@ inline bool appendNewNode(Vector<KGraphNode>& nodes, Vector<pair<uint32_t, uint3
 }
 
 template<bool typoTolerant>
-bool insertCandidates(Vector<const Form*>& candidates, const Form* foundCand, const Form* formBase, const KString& str, const Vector<uint32_t>& nonSpaces)
+bool insertCandidates(Vector<const Form*>& candidates, Vector<float>& candTypoCosts, const Form* foundCand, const Form* formBase, const KString& str, const Vector<uint32_t>& nonSpaces)
 {
 	if (typoTolerant)
 	{
 		auto tCand = reinterpret_cast<const TypoForm*>(foundCand);
-
 		if (find(candidates.begin(), candidates.end(), &tCand->form(formBase)) != candidates.end()) return false;
 
 		while (1)
@@ -56,6 +55,7 @@ bool insertCandidates(Vector<const Form*>& candidates, const Form* foundCand, co
 			if (FeatureTestor::isMatchedApprox(&str[0], &str[nonSpaces[nonSpaces.size() - cand->form.size()]], cand->vowel, cand->polar))
 			{
 				candidates.emplace_back(cand);
+				candTypoCosts.emplace_back(tCand->score());
 			}
 			if (tCand[0].hash() != tCand[1].hash()) break;
 			++tCand;
@@ -96,6 +96,7 @@ Vector<KGraphNode> kiwi::splitByTrie(
 	ret.emplace_back();
 	size_t n = 0;
 	Vector<const Form*> candidates;
+	Vector<float> candTypoCosts;
 	auto* curNode = trie.root();
 	auto* nextNode = trie.root();
 	Vector<uint32_t> nonSpaces;
@@ -147,11 +148,13 @@ Vector<KGraphNode> kiwi::splitByTrie(
 					size_t lengthWithSpaces = nonSpaces.back() + 1 - nonSpaces[nBegin];
 					if (lengthWithSpaces <= cand->form.size() + spaceTolerance)
 					{
-						appendNewNode(ret, endPosMap, nBegin, cand, (uint16_t)nonSpaces.size());
+						float typoCost = typoTolerant ? candTypoCosts[&cand - candidates.data()] : 0.f;
+						appendNewNode(ret, endPosMap, nBegin, cand, (uint16_t)nonSpaces.size(), typoCost);
 					}
 				}
 			}
 			candidates.clear();
+			if (typoTolerant) candTypoCosts.clear();
 		}
 
 		bool duplicated = any_of(ret.begin() + 1, ret.end(), [&](const KGraphNode& g)
@@ -257,7 +260,7 @@ Vector<KGraphNode> kiwi::splitByTrie(
 					if (!cand) break;
 					else if (cand != (const Form*)trie.hasSubmatch)
 					{
-						if (!insertCandidates<typoTolerant>(candidates, cand, formBase, str, nonSpaces)) break;
+						if (!insertCandidates<typoTolerant>(candidates, candTypoCosts, cand, formBase, str, nonSpaces)) break;
 					}
 				}
 				nextNode = curNode->template nextOpt<arch>(trie, c);
@@ -311,7 +314,7 @@ Vector<KGraphNode> kiwi::splitByTrie(
 			if (!cand) break;
 			else if (cand != (const Form*)trie.hasSubmatch)
 			{
-				if (!insertCandidates<typoTolerant>(candidates, cand, formBase, str, nonSpaces)) break;
+				if (!insertCandidates<typoTolerant>(candidates, candTypoCosts, cand, formBase, str, nonSpaces)) break;
 			}
 		}
 	continueFor:
@@ -342,7 +345,7 @@ Vector<KGraphNode> kiwi::splitByTrie(
 		if (curNode->val(trie) && curNode->val(trie) != (const Form*)trie.hasSubmatch)
 		{
 			const Form* cand = curNode->val(trie);
-			if (!insertCandidates<typoTolerant>(candidates, cand, formBase, str, nonSpaces)) break;
+			if (!insertCandidates<typoTolerant>(candidates, candTypoCosts, cand, formBase, str, nonSpaces)) break;
 		}
 		curNode = curNode->fail();
 	}
@@ -363,15 +366,6 @@ Vector<KGraphNode> kiwi::splitByTrie(
 	}
 	ret.back().startPos = ret.back().endPos = nonSpaces[ret.back().endPos];
 	return ret;
-}
-
-template<ptrdiff_t ...indices>
-inline FnSplitByTrie getSplitByTrieFnDispatch(ArchType arch, tp::seq<indices...>)
-{
-	static FnSplitByTrie table[] = {
-		&splitByTrie<static_cast<ArchType>(indices + 1)>...
-	};
-	return table[static_cast<int>(arch) - 1];
 }
 
 template<bool typoTolerant>

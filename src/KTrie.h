@@ -37,8 +37,8 @@ namespace kiwi
 		uint16_t startPos = 0, endPos = 0;
 		float typoCost = 0;
 
-		KGraphNode(const Form* _form = nullptr, uint16_t _endPos = 0) : form(_form), endPos(_endPos) {}
-		KGraphNode(const KString& _uform, uint16_t _endPos) : uform(_uform), endPos(_endPos) {}
+		KGraphNode(const Form* _form = nullptr, uint16_t _endPos = 0, float _typoCost = 0) : form(_form), endPos(_endPos), typoCost(_typoCost) {}
+		KGraphNode(const KString& _uform, uint16_t _endPos, float _typoCost = 0) : uform(_uform), endPos(_endPos), typoCost(_typoCost) {}
 
 		KGraphNode* getPrev() { return prev ? this - prev : nullptr; }
 		const KGraphNode* getPrev() const { return prev ? this - prev : nullptr; }

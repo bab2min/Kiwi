@@ -275,6 +275,7 @@ namespace kiwi
 		POSTag tag = POSTag::unknown; /**< 품사 태그 */
 		uint8_t senseId = 0; /**< 의미 번호 */
 		float score = 0; /**< 해당 형태소의 언어모델 점수 */
+		float typoCost = 0; /**< 오타가 교정된 경우 오타 비용. 그렇지 않은 경우 0 */
 		const Morpheme* morph = nullptr; /**< 기타 형태소 정보에 대한 포인터 (OOV인 경우 nullptr) */
 
 		TokenInfo() = default;
@@ -288,6 +289,7 @@ namespace kiwi
 		)
 			: str{ _str }, position{ _position }, wordPosition{ _wordPosition }, length{ _length }, tag{ _tag }, score{ _score }
 		{
+			sizeof(TokenInfo);
 		}
 
 		bool operator==(const TokenInfo& o) const

@@ -101,6 +101,7 @@ namespace kiwi
 
 	public:
 		TypoTransformer();
+		TypoTransformer(std::initializer_list<std::tuple<const char16_t*, const char16_t*, float>> l);
 		~TypoTransformer();
 		TypoTransformer(const TypoTransformer&);
 		TypoTransformer(TypoTransformer&&) noexcept;
@@ -121,4 +122,6 @@ namespace kiwi
 
 		TypoCandidates<true> generate(const std::u16string& orig) const;
 	};
+
+	extern TypoTransformer withoutTypo, basicTypoSet;
 }

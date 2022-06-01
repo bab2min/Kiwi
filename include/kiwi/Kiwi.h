@@ -62,6 +62,7 @@ namespace kiwi
 		float unkFormScoreScale = 5;
 		float unkFormScoreBias = 5;
 		float spacePenalty = 7;
+		float typoCostWeight = 4;
 		size_t maxUnkFormSize = 6;
 		size_t spaceTolerance = 0;
 
@@ -301,6 +302,7 @@ namespace kiwi
 
 		void setCutOffThreshold(float v)
 		{
+			if (v < 0) throw std::invalid_argument{ "`v` must >= 0" };
 			cutOffThreshold = v;
 		}
 
@@ -311,6 +313,7 @@ namespace kiwi
 
 		void setUnkScoreBias(float v)
 		{
+			if (v < 0) throw std::invalid_argument{ "`v` must >= 0" };
 			unkFormScoreBias = v;
 		}
 
@@ -321,6 +324,7 @@ namespace kiwi
 
 		void setUnkScoreScale(float v)
 		{
+			if (v < 0) throw std::invalid_argument{ "`v` must >= 0" };
 			unkFormScoreScale = v;
 		}
 
@@ -351,7 +355,19 @@ namespace kiwi
 
 		void setSpacePenalty(float v)
 		{
+			if (v < 0) throw std::invalid_argument{ "`v` must >= 0" };
 			spacePenalty = v;
+		}
+
+		float getTypoCostWeight() const
+		{
+			return typoCostWeight;
+		}
+
+		void setTypoCostWeight(float v)
+		{
+			if (v < 0) throw std::invalid_argument{ "`v` must >= 0" };
+			typoCostWeight = v;
 		}
 
 		bool getIntegrateAllomorph() const

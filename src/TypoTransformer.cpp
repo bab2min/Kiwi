@@ -151,6 +151,14 @@ TypoTransformer::TypoTransformer(TypoTransformer&&) noexcept = default;
 TypoTransformer& TypoTransformer::operator=(const TypoTransformer&) = default;
 TypoTransformer& TypoTransformer::operator=(TypoTransformer&&) noexcept = default;
 
+TypoTransformer::TypoTransformer(initializer_list<tuple<const char16_t*, const char16_t*, float>> lst)
+{
+	for (auto& l : lst)
+	{
+		addTypo(get<0>(l), get<1>(l), get<2>(l));
+	}
+}
+
 void TypoTransformer::_addTypo(char16_t orig, char16_t error, float cost)
 {
 	if (orig == error) cost = 0;
@@ -230,3 +238,20 @@ template class TypoIterator<false>;
 
 template TypoCandidates<true> TypoTransformer::_generate<true>(const KString&) const;
 template TypoCandidates<false> TypoTransformer::_generate<false>(const KString&) const;
+
+TypoTransformer kiwi::withoutTypo;
+
+TypoTransformer kiwi::basicTypoSet = {
+	{ u"ㅐㅔ", u"ㅐㅔ", 1.f },
+	{ u"ㅐㅔ", u"ㅒㅖ", 1.5f },
+	{ u"ㅒㅖ", u"ㅐㅔ", 1.5f },
+	{ u"ㅒㅖ", u"ㅒㅖ", 1.f },
+	{ u"ㅚㅙㅞ", u"ㅚㅙㅞ", 1.f },
+	{ u"ㅝ", u"ㅝㅗ", 1.f },
+	{ u"자쟈", u"자쟈", 1.f },
+	{ u"재쟤", u"재쟤", 1.f },
+	{ u"저져", u"저져", 1.f },
+	{ u"제졔", u"제졔", 1.f },
+	{ u"조죠줘", u"조죠줘", 1.f },
+	{ u"주쥬", u"주쥬", 1.f },
+};
