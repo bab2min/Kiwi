@@ -11,12 +11,15 @@
 using namespace std;
 using namespace kiwi;
 
-int doEvaluate(const string& modelPath, const string& output, const vector<string>& input, bool normCoda, bool useSBG)
+int doEvaluate(const string& modelPath, const string& output, const vector<string>& input, bool normCoda, bool useSBG, float typoCostWeight)
 {
 	try
 	{
 		tutils::Timer timer;
-		Kiwi kw = KiwiBuilder{ modelPath, 1, BuildOption::integrateAllomorph | BuildOption::loadDefaultDict, useSBG }.build();
+		Kiwi kw = KiwiBuilder{ modelPath, 1, BuildOption::integrateAllomorph | BuildOption::loadDefaultDict, useSBG }.build(
+			typoCostWeight > 0 ? basicTypoSet : withoutTypo
+		);
+		kw.setTypoCostWeight(typoCostWeight);
 		
 		cout << "Loading Time : " << timer.getElapsed() << " ms" << endl;
 		cout << "LM Size : " << (kw.getKnLM()->getMemory().size() / 1024. / 1024.) << " MB" << endl;
@@ -90,6 +93,7 @@ int main(int argc, const char* argv[])
 	ValueArg<string> output{ "o", "output", "output dir for evaluation errors", false, "", "string" };
 	SwitchArg withoutNormCoda{ "", "wcoda", "without normalizing coda", false };
 	SwitchArg useSBG{ "", "sbg", "use SkipBigram", false };
+	ValueArg<float> typoTolerant{ "", "typo", "make typo-tolerant model", false, 0.f, "float"};
 	UnlabeledMultiArg<string> files{ "files", "evaluation set files", true, "string" };
 
 	cmd.add(model);
@@ -97,6 +101,7 @@ int main(int argc, const char* argv[])
 	cmd.add(files);
 	cmd.add(withoutNormCoda);
 	cmd.add(useSBG);
+	cmd.add(typoTolerant);
 
 	try
 	{
@@ -107,6 +112,6 @@ int main(int argc, const char* argv[])
 		cerr << "error: " << e.error() << " for arg " << e.argId() << endl;
 		return -1;
 	}
-	return doEvaluate(model, output, files.getValue(), !withoutNormCoda, useSBG);
+	return doEvaluate(model, output, files.getValue(), !withoutNormCoda, useSBG, typoTolerant);
 }
 
