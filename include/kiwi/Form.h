@@ -209,16 +209,19 @@ namespace kiwi
 	{
 		uint32_t formId = 0;
 		float scoreHash = 0;
+		uint32_t origLength;
 
 		TypoForm() = default;
 
-		TypoForm(const std::pair<uint32_t, float>& p)
-			: formId{ p.first }, scoreHash{ p.second }
-		{}
+		TypoForm(const std::tuple<uint32_t, float, size_t>& p)
+			: formId{ std::get<0>(p) }, scoreHash{ std::get<1>(p) }, origLength{ (uint32_t)std::get<2>(p) }
+		{
+		}
 
-		TypoForm(uint32_t _formId, float _score = 0, bool _hash = 0)
-			: formId{ _formId }, scoreHash{ _hash ? -_score : _score }
-		{}
+		TypoForm(uint32_t _formId, float _score = 0, bool _hash = 0, size_t _origLength = 0)
+			: formId{ _formId }, scoreHash{ _hash ? -_score : _score }, origLength{ (uint32_t)_origLength }
+		{
+		}
 
 		const Form& form(const Form* data) const { return data[formId]; }
 		float score() const { return std::abs(scoreHash); }

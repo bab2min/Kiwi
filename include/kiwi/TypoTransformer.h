@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Types.h"
+#include "Trie.hpp"
+#include "FrozenTrie.h"
 #include "Utils.h"
 
 namespace kiwi
@@ -12,10 +14,11 @@ namespace kiwi
 	class TypoCandidates
 	{
 		friend class TypoTransformer;
+		friend class PreparedTypoTransformer;
 		template<bool u> friend class TypoIterator;
 
-		KString data;
-		Vector<size_t> ptrs, pptrs;
+		KString strPool;
+		Vector<size_t> strPtrs, branchPtrs;
 		Vector<float> cost;
 		float costThreshold = 0;
 
@@ -24,6 +27,9 @@ namespace kiwi
 
 		template<class It>
 		void addBranch(It first, It last, float _cost);
+
+		template<class It1, class It2, class It3>
+		void addBranch(It1 first1, It1 last1, It2 first2, It2 last2, It3 first3, It3 last3, float _cost);
 
 		void finishBranch();
 	public:
@@ -36,11 +42,11 @@ namespace kiwi
 
 		size_t size() const
 		{
-			if (pptrs.empty()) return 0;
+			if (branchPtrs.empty()) return 0;
 			size_t ret = 1;
-			for (size_t i = 1; i < pptrs.size(); ++i)
+			for (size_t i = 1; i < branchPtrs.size(); ++i)
 			{
-				ret *= pptrs[i] - pptrs[i - 1];
+				ret *= branchPtrs[i] - branchPtrs[i - 1] - 1;
 			}
 			return ret;
 		}
@@ -92,22 +98,103 @@ namespace kiwi
 	};
 
 	class KiwiBuilder;
+	class TypoTransformer;
+
+	class PreparedTypoTransformer
+	{
+		friend class KiwiBuilder;
+
+		struct ReplInfo
+		{
+			const char16_t* str;
+			uint32_t length;
+			float cost;
+
+			ReplInfo(const char16_t* _str = nullptr, uint32_t _length = 0, float _cost = 0)
+				: str{ _str }, length{ _length }, cost{ _cost }
+			{}
+		};
+
+		struct PatInfo
+		{
+			const ReplInfo* repl;
+			uint32_t size;
+			uint32_t patLength;
+
+			constexpr PatInfo(const ReplInfo* _repl = nullptr, uint32_t _size = 0, uint32_t _patLength = 0)
+				: repl{ _repl }, size{ _size }, patLength{ _patLength }
+			{}
+		};
+
+		struct PatInfoHasSubmatch
+		{
+			static constexpr bool isNull(const PatInfo& v)
+			{
+				return !v.repl && v.size != (uint32_t)-1 && v.patLength != (uint32_t)-1;
+			}
+
+			static void setHasSubmatch(PatInfo& v)
+			{
+				v.repl = nullptr;
+				v.size = (uint32_t)-1;
+				v.patLength = (uint32_t)-1;
+			}
+
+			static constexpr bool hasSubmatch(const PatInfo& v)
+			{
+				return !v.repl && v.size == (uint32_t)-1 && v.patLength == (uint32_t)-1;
+			}
+		};
+
+		utils::FrozenTrie<char16_t, PatInfo, int32_t, PatInfoHasSubmatch> patTrie;
+		KString strPool;
+		Vector<ReplInfo> replacements;
+
+		template<bool u16wrap = false>
+		TypoCandidates<u16wrap> _generate(const KString& orig, float costThreshold = 2.5f) const;
+
+	public:
+		PreparedTypoTransformer(const TypoTransformer& tt);
+		~PreparedTypoTransformer();
+		PreparedTypoTransformer(const PreparedTypoTransformer&) = delete;
+		PreparedTypoTransformer(PreparedTypoTransformer&&) noexcept;
+		PreparedTypoTransformer& operator=(const PreparedTypoTransformer&) = delete;
+		PreparedTypoTransformer& operator=(PreparedTypoTransformer&&) noexcept;
+
+		TypoCandidates<true> generate(const std::u16string& orig, float costThreshold = 2.5f) const;
+	};
 
 	class TypoTransformer
 	{
 		friend class KiwiBuilder;
+		friend class PreparedTypoTransformer;
 
-		UnorderedMap<char16_t, Vector<std::pair<char16_t, float>>> xformMap;
-		float costThreshold = 2.5f;
+		using TrieNode = utils::TrieNode<char16_t, size_t, utils::ConstAccess<UnorderedMap<char16_t, int32_t>>>;
 
-		void _addTypo(char16_t orig, char16_t error, float cost);
+		utils::ContinuousTrie<TrieNode> patTrie;
+		KString strPool;
+		Vector<Vector<std::pair<std::pair<uint32_t, uint32_t>, float>>> replacements;
 
-		template<bool u16wrap = false>
-		TypoCandidates<u16wrap> _generate(const KString& orig) const;
+		void addTypoImpl(const KString& orig, const KString& error, float cost, CondVowel leftCond = CondVowel::none);
+		void addTypoNormalized(const KString& orig, const KString& error, float cost = 1, CondVowel leftCond = CondVowel::none);
 
 	public:
 		TypoTransformer();
-		TypoTransformer(std::initializer_list<std::tuple<const char16_t*, const char16_t*, float>> l);
+		TypoTransformer(std::initializer_list<std::tuple<std::initializer_list<const char16_t*>, std::initializer_list<const char16_t*>, float, CondVowel>> lst)
+			: TypoTransformer()
+		{
+			for (auto& l : lst)
+			{
+				for (auto i : std::get<0>(l))
+				{
+					for (auto o : std::get<1>(l))
+					{
+						addTypo(i, o, std::get<2>(l), std::get<3>(l));
+					}
+				}
+			}
+		}
+
 		~TypoTransformer();
 		TypoTransformer(const TypoTransformer&);
 		TypoTransformer(TypoTransformer&&) noexcept;
@@ -116,20 +203,15 @@ namespace kiwi
 
 		bool empty() const
 		{
-			return xformMap.empty();
+			return replacements.empty();
 		}
 
-		void addTypo(char16_t orig, char16_t error, float cost = 1);
+		void addTypo(const std::u16string& orig, const std::u16string& error, float cost = 1, CondVowel leftCond = CondVowel::none);
 
-		void addTypo(const KString& orig, const KString& error, float cost = 1)
+		PreparedTypoTransformer prepare() const
 		{
-			for(auto o : orig) for (auto e : error) addTypo(o, e, cost);
+			return { *this };
 		}
-
-		TypoCandidates<true> generate(const std::u16string& orig) const;
-
-		float getCostThreshold() const { return costThreshold; }
-		void setCostThreshold(float _costThreshold) { costThreshold = _costThreshold; }
 	};
 
 	extern const TypoTransformer withoutTypo, basicTypoSet;

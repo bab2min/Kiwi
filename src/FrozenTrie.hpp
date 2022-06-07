@@ -8,9 +8,9 @@ namespace kiwi
 {
 	namespace utils
 	{
-		template<class _Key, class _Value, class _Diff>
+		template<class _Key, class _Value, class _Diff, class _HasSubmatch>
 		template<ArchType arch>
-		auto FrozenTrie<_Key, _Value, _Diff>::Node::nextOpt(const FrozenTrie<_Key, _Value, _Diff>& ft, Key c) const -> const Node*
+		auto FrozenTrie<_Key, _Value, _Diff, _HasSubmatch>::Node::nextOpt(const FrozenTrie& ft, Key c) const -> const Node*
 		{
 			_Diff v;
 			if (!nst::search<arch>(&ft.nextKeys[nextOffset], &ft.nextDiffs[nextOffset], numNexts, c, v))
@@ -20,16 +20,16 @@ namespace kiwi
 			return this + v;
 		}
 
-		template<class _Key, class _Value, class _Diff>
-		auto FrozenTrie<_Key, _Value, _Diff>::Node::fail() const -> const Node*
+		template<class _Key, class _Value, class _Diff, class _HasSubmatch>
+		auto FrozenTrie<_Key, _Value, _Diff, _HasSubmatch>::Node::fail() const -> const Node*
 		{
 			if (!lower) return nullptr;
 			return this + lower;
 		}
 
-		template<class _Key, class _Value, class _Diff>
+		template<class _Key, class _Value, class _Diff, class _HasSubmatch>
 		template<ArchType arch>
-		auto FrozenTrie<_Key, _Value, _Diff>::Node::findFail(const FrozenTrie& ft, Key c) const -> const Node*
+		auto FrozenTrie<_Key, _Value, _Diff, _HasSubmatch>::Node::findFail(const FrozenTrie& ft, Key c) const -> const Node*
 		{
 			if (!lower) return this;
 			auto* lowerNode = this + lower;
@@ -50,14 +50,14 @@ namespace kiwi
 			}
 		}
 
-		template<class _Key, class _Value, class _Diff>
-		auto FrozenTrie<_Key, _Value, _Diff>::Node::val(const FrozenTrie<_Key, _Value, _Diff>& ft) const -> const Value&
+		template<class _Key, class _Value, class _Diff, class _HasSubmatch>
+		auto FrozenTrie<_Key, _Value, _Diff, _HasSubmatch>::Node::val(const FrozenTrie& ft) const -> const Value&
 		{
 			return ft.values[this - ft.nodes.get()];
 		}
 
-		template<class _Key, class _Value, class _Diff>
-		FrozenTrie<_Key, _Value, _Diff>::FrozenTrie(const FrozenTrie& o)
+		template<class _Key, class _Value, class _Diff, class _HasSubmatch>
+		FrozenTrie<_Key, _Value, _Diff, _HasSubmatch>::FrozenTrie(const FrozenTrie& o)
 			: numNodes{ o.numNodes }, numNexts{ o.numNexts }
 		{
 			nodes = make_unique<Node[]>(numNodes);
@@ -71,8 +71,8 @@ namespace kiwi
 			std::copy(o.nextDiffs.get(), o.nextDiffs.get() + numNexts, nextDiffs.get());
 		}
 
-		template<class _Key, class _Value, class _Diff>
-		auto FrozenTrie<_Key, _Value, _Diff>::operator=(const FrozenTrie& o) -> FrozenTrie&
+		template<class _Key, class _Value, class _Diff, class _HasSubmatch>
+		auto FrozenTrie<_Key, _Value, _Diff, _HasSubmatch>::operator=(const FrozenTrie& o) -> FrozenTrie&
 		{
 			numNodes = o.numNodes;
 			numNexts = o.numNexts;
@@ -89,9 +89,9 @@ namespace kiwi
 			return *this;
 		}
 
-		template<class _Key, class _Value, class _Diff>
-		template<class TrieNode, ArchType archType>
-		FrozenTrie<_Key, _Value, _Diff>::FrozenTrie(const ContinuousTrie<TrieNode>& trie, ArchTypeHolder<archType>)
+		template<class _Key, class _Value, class _Diff, class _HasSubmatch>
+		template<class TrieNode, ArchType archType, class Xform>
+		FrozenTrie<_Key, _Value, _Diff, _HasSubmatch>::FrozenTrie(const ContinuousTrie<TrieNode>& trie, ArchTypeHolder<archType>, Xform xform)
 		{
 			numNodes = trie.size();
 			nodes = make_unique<Node[]>(numNodes);
@@ -111,7 +111,7 @@ namespace kiwi
 			{
 				auto& o = trie[i];
 				nodes[i].numNexts = o.next.size();
-				values[i] = o.val;
+				values[i] = xform(o);
 				nodes[i].nextOffset = ptr;
 
 				std::vector<std::pair<Key, Diff>> pairs{ o.next.begin(), o.next.end() };
@@ -139,12 +139,12 @@ namespace kiwi
 					dq.emplace_back(child);
 				}
 
-				if (!p->val(*this))
+				if (this->isNull(p->val(*this)))
 				{
 					for (auto n = p; n->lower; n = const_cast<Node*>(n->fail()))
 					{
-						if (!n->val(*this)) continue;
-						values[p - nodes.get()] = (_Value)this->hasSubmatch;
+						if (this->isNull(n->val(*this))) continue;
+						this->setHasSubmatch(values[p - nodes.get()]);
 						break;
 					}
 				}

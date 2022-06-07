@@ -622,9 +622,10 @@ namespace kiwi
 		 * @brief 현재 단어 및 사전 설정을 기반으로 Kiwi 객체를 생성한다.
 		 * 
 		 * @param typos
+		 * @param typoCostThreshold
 		 * @return 형태소 분석 준비가 완료된 Kiwi의 객체.
 		 */
-		Kiwi build(TypoTransformer typos = {}) const;
+		Kiwi build(const TypoTransformer& typos = {}, float typoCostThreshold = 2.5f) const;
 
 		/*const lm::KnLangModelBase* getLangModel() const
 		{

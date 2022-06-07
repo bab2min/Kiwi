@@ -1316,7 +1316,7 @@ inline CondPolarity reducePolar(CondPolarity p, const Morpheme* m)
 	return CondPolarity::none;
 }
 
-Kiwi KiwiBuilder::build(TypoTransformer typos) const
+Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) const
 {
 	Kiwi ret{ archType, langMdl.knlm->getHeader().key_size, !typos.empty()};
 
@@ -1435,12 +1435,13 @@ Kiwi KiwiBuilder::build(TypoTransformer typos) const
 	// 오타 교정이 있는 경우 가능한 모든 오타에 대해 Trie 생성
 	else
 	{
-		UnorderedMap<KString, Vector<pair<uint32_t, float>>> typoGroup;
+		UnorderedMap<KString, Vector<tuple<uint32_t, float, size_t>>> typoGroup;
+		auto ptypos = typos.prepare();
 		for (auto f : sortedForms)
 		{
-			for (auto t : typos._generate(f->form))
+			for (auto t : ptypos._generate(f->form, typoCostThreshold))
 			{
-				typoGroup[t.first].emplace_back(f - ret.forms.data(), t.second);
+				typoGroup[t.first].emplace_back(f - ret.forms.data(), t.second, t.first.size());
 			}
 		}
 
@@ -1449,11 +1450,11 @@ Kiwi KiwiBuilder::build(TypoTransformer typos) const
 		for (auto& v : typoGroup)
 		{
 			typoGroupSorted.emplace_back(&v);
-			sort(v.second.begin(), v.second.end(), [](const pair<uint32_t, float>& a, const pair<uint32_t, float>& b)
+			sort(v.second.begin(), v.second.end(), [](const tuple<uint32_t, float, size_t>& a, const tuple<uint32_t, float, size_t>& b)
 				{
-					if (a.second < b.second) return true;
-					if (a.second > b.second) return false;
-					return a.first < b.first;
+					if (get<1>(a) < get<1>(b)) return true;
+					if (get<1>(a) > get<1>(b)) return false;
+					return get<0>(a) < get<0>(b);
 				});
 			totTfSize += v.second.size();
 		}

@@ -148,7 +148,7 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="include\kiwi\TypoTransformer.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\kiwi</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
