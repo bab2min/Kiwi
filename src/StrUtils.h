@@ -501,6 +501,10 @@ namespace kiwi
 		}
 	}
 
+	inline bool isHangulOnset(char16_t c)
+	{
+		return u'ᄀ' <= c && c <= u'ᄒ';
+	}
 
 	inline bool isHangulVowel(char16_t c)
 	{

@@ -53,7 +53,8 @@ bool insertCandidates(Vector<const Form*>& candidates, Vector<pair<float, uint32
 		while (1)
 		{
 			auto cand = &tCand->form(formBase);
-			if (FeatureTestor::isMatchedApprox(&str[0], &str[nonSpaces[nonSpaces.size() - tCand->origLength]], cand->vowel, cand->polar))
+			if (FeatureTestor::isMatched(&str[0], &str[nonSpaces[nonSpaces.size() - tCand->origLength]], tCand->leftCond)
+				&& FeatureTestor::isMatchedApprox(&str[0], &str[nonSpaces[nonSpaces.size() - tCand->origLength]], cand->vowel, cand->polar))
 			{
 				candidates.emplace_back(cand);
 				candTypoCostStarts.emplace_back(tCand->score(), nonSpaces.size() - tCand->origLength);

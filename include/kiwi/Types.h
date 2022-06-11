@@ -229,6 +229,7 @@ namespace kiwi
 		non_vowel, /**< `vowel`의 부정 */
 		non_vocalic, /**< `vocalic`의 부정 */
 		non_vocalic_h, /**< `vocalic_h`의 부정 */
+		applosive, /**< 불파음 받침(ㄴㄹㅁㅇ을 제외한 모든 받침)*/
 	};
 
 	/**

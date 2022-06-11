@@ -1435,13 +1435,15 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 	// 오타 교정이 있는 경우 가능한 모든 오타에 대해 Trie 생성
 	else
 	{
-		UnorderedMap<KString, Vector<tuple<uint32_t, float, size_t>>> typoGroup;
+		using TypoInfo = tuple<uint32_t, float, uint32_t, CondVowel>;
+		UnorderedMap<KString, Vector<TypoInfo>> typoGroup;
 		auto ptypos = typos.prepare();
 		for (auto f : sortedForms)
 		{
 			for (auto t : ptypos._generate(f->form, typoCostThreshold))
 			{
-				typoGroup[t.first].emplace_back(f - ret.forms.data(), t.second, t.first.size());
+				if (t.leftCond != CondVowel::none && f->vowel != CondVowel::none && t.leftCond != f->vowel) continue;
+				typoGroup[t.str].emplace_back(f - ret.forms.data(), t.cost, (uint32_t)t.str.size(), t.leftCond);
 			}
 		}
 
@@ -1450,7 +1452,7 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 		for (auto& v : typoGroup)
 		{
 			typoGroupSorted.emplace_back(&v);
-			sort(v.second.begin(), v.second.end(), [](const tuple<uint32_t, float, size_t>& a, const tuple<uint32_t, float, size_t>& b)
+			sort(v.second.begin(), v.second.end(), [](const TypoInfo& a, const TypoInfo& b)
 				{
 					if (get<1>(a) < get<1>(b)) return true;
 					if (get<1>(a) > get<1>(b)) return false;

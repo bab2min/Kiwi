@@ -20,16 +20,17 @@ namespace kiwi
 		KString strPool;
 		Vector<size_t> strPtrs, branchPtrs;
 		Vector<float> cost;
+		Vector<CondVowel> leftCond;
 		float costThreshold = 0;
 
 		template<class It>
 		void insertSinglePath(It first, It last);
 
 		template<class It>
-		void addBranch(It first, It last, float _cost);
+		void addBranch(It first, It last, float _cost, CondVowel _leftCond);
 
 		template<class It1, class It2, class It3>
-		void addBranch(It1 first1, It1 last1, It2 first2, It2 last2, It3 first3, It3 last3, float _cost);
+		void addBranch(It1 first1, It1 last1, It2 first2, It2 last2, It3 first3, It3 last3, float _cost, CondVowel _leftCond);
 
 		void finishBranch();
 	public:
@@ -66,7 +67,20 @@ namespace kiwi
 
 	public:
 
-		using value_type = std::pair<typename std::conditional<u16wrap, std::u16string, KString>::type, float>;
+		using StrType = typename std::conditional<u16wrap, std::u16string, KString>::type;
+
+		struct RetType
+		{
+			StrType str;
+			float cost;
+			CondVowel leftCond;
+
+			RetType(const StrType& _str = {}, float _cost = 0, CondVowel _leftCond = CondVowel::none)
+				: str{ _str }, cost{ _cost }, leftCond{ _leftCond }
+			{}
+		};
+
+		using value_type = RetType;
 		using reference = value_type;
 		using iterator_category = std::forward_iterator_tag;
 
@@ -109,9 +123,10 @@ namespace kiwi
 			const char16_t* str;
 			uint32_t length;
 			float cost;
+			CondVowel leftCond;
 
-			ReplInfo(const char16_t* _str = nullptr, uint32_t _length = 0, float _cost = 0)
-				: str{ _str }, length{ _length }, cost{ _cost }
+			ReplInfo(const char16_t* _str = nullptr, uint32_t _length = 0, float _cost = 0, CondVowel _leftCond = CondVowel::none)
+				: str{ _str }, length{ _length }, cost{ _cost }, leftCond{ _leftCond }
 			{}
 		};
 
@@ -171,11 +186,23 @@ namespace kiwi
 
 		using TrieNode = utils::TrieNode<char16_t, size_t, utils::ConstAccess<UnorderedMap<char16_t, int32_t>>>;
 
+		struct ReplInfo
+		{
+			uint32_t begin, end;
+			float cost;
+			CondVowel leftCond;
+
+			ReplInfo(uint32_t _begin = 0, uint32_t _end = 0, float _cost = 0, CondVowel _leftCond = CondVowel::none)
+				: begin{ _begin }, end{ _end }, cost{ _cost }, leftCond{ _leftCond }
+			{}
+		};
+
 		utils::ContinuousTrie<TrieNode> patTrie;
 		KString strPool;
-		Vector<Vector<std::pair<std::pair<uint32_t, uint32_t>, float>>> replacements;
+		Vector<Vector<ReplInfo>> replacements;
 
 		void addTypoImpl(const KString& orig, const KString& error, float cost, CondVowel leftCond = CondVowel::none);
+		void addTypoWithCond(const KString& orig, const KString& error, float cost, CondVowel leftCond = CondVowel::none);
 		void addTypoNormalized(const KString& orig, const KString& error, float cost = 1, CondVowel leftCond = CondVowel::none);
 
 	public:

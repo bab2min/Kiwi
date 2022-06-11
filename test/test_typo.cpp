@@ -17,14 +17,14 @@ TEST(KiwiTypo, Generate)
 	typos.clear();
 	for (auto e : ptt.generate(u"%없어"))
 	{
-		typos.emplace(e);
+		typos.emplace(e.str, e.cost);
 	}
 	EXPECT_EQ(typos.size(), 1);
 	
 	typos.clear();
 	for (auto e : ptt.generate(u"개가납네", 2))
 	{
-		typos.emplace(e);
+		typos.emplace(e.str, e.cost);
 	}
 	EXPECT_EQ(typos.size(), 4);
 	EXPECT_EQ(typos.find(u"개가납네")->second, 0);
@@ -35,7 +35,7 @@ TEST(KiwiTypo, Generate)
 	typos.clear();
 	for (auto e : ptt.generate(u"개가납네", 1))
 	{
-		typos.emplace(e);
+		typos.emplace(e.str, e.cost);
 	}
 	EXPECT_EQ(typos.size(), 3);
 	EXPECT_EQ(typos.find(u"개가납네")->second, 0);
@@ -45,7 +45,7 @@ TEST(KiwiTypo, Generate)
 	typos.clear();
 	for (auto e : ptt.generate(u"사에", 2))
 	{
-		typos.emplace(e);
+		typos.emplace(e.str, e.cost);
 	}
 	EXPECT_EQ(typos.size(), 3);
 	EXPECT_EQ(typos.find(u"사에")->second, 0);
@@ -84,6 +84,14 @@ TEST(KiwiTypo, BasicTypoSet)
 
 	o = kiwi.analyze(u"나 죰 도와죠.", Match::allWithNormalizing);
 	c = typoKiwi.analyze(u"나 죰 도와죠.", Match::allWithNormalizing);
+	EXPECT_TRUE(o.second < c.second);
+
+	o = kiwi.analyze(u"잘했따", Match::allWithNormalizing);
+	c = typoKiwi.analyze(u"잘했따", Match::allWithNormalizing);
+	EXPECT_TRUE(o.second < c.second);
+
+	o = kiwi.analyze(u"외구거 공부", Match::allWithNormalizing);
+	c = typoKiwi.analyze(u"외구거 공부", Match::allWithNormalizing);
 	EXPECT_TRUE(o.second < c.second);
 
 	o = kiwi.analyze(u"맗은 믈을 마셧다!", Match::allWithNormalizing);
