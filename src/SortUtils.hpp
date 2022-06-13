@@ -231,5 +231,30 @@ namespace kiwi
 				dest[sorter[i].second - startIdx] = i + startIdx;
 			}
 		}
+
+
+		template<class Ty>
+		class ContainerSearcher
+		{
+			std::vector<const Ty*> data;
+			std::vector<size_t> idx;
+		public:
+			template<class AllocA, class AllocB>
+			ContainerSearcher(const std::vector<std::vector<Ty, AllocB>, AllocA>& v)
+				: data(v.size()), idx(v.size())
+			{
+				for (size_t i = 0; i < v.size(); ++i)
+				{
+					data[i] = v[i].data();
+				}
+
+				sortWriteIdx(data.begin(), data.end(), idx.begin());
+			}
+
+			size_t operator()(const Ty* v) const
+			{
+				return idx[(std::upper_bound(data.begin(), data.end(), v) - data.begin()) - 1];
+			}
+		};
 	}
 }

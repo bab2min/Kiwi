@@ -10,6 +10,7 @@
 #include "FrozenTrie.hpp"
 #include "LmState.hpp"
 #include "StrUtils.h"
+#include "SortUtils.hpp"
 #include "serializer.hpp"
 #include "Joiner.hpp"
 
@@ -26,6 +27,7 @@ namespace kiwi
 			KString str;
 			uint32_t begin = 0, end = 0;
 			float wordScore = 0, typoCost = 0;
+			uint32_t typoFormId = 0;
 			Result(const Morpheme* _morph = nullptr, 
 				const KString& _str = {}, 
 				uint32_t _begin = 0, 
@@ -61,7 +63,8 @@ namespace kiwi
 		};
 	};
 
-	Kiwi::Kiwi(ArchType arch, size_t lmKeySize, bool typoTolerant)
+	Kiwi::Kiwi(ArchType arch, LangModel _langMdl, bool typoTolerant)
+		: langMdl{ _langMdl }
 	{
 		selectedArch = arch;
 		dfSplitByTrie = (void*)getSplitByTrieFn(selectedArch, typoTolerant);
@@ -77,7 +80,7 @@ namespace kiwi
 
 		if (langMdl.sbg)
 		{
-			switch (lmKeySize)
+			switch (langMdl.sbg->getHeader().keySize)
 			{
 			case 1:
 				dfFindBestPath = (void*)lmSbg_8[static_cast<std::ptrdiff_t>(selectedArch)];
@@ -95,9 +98,9 @@ namespace kiwi
 				throw Exception{ "Wrong `lmKeySize`" };
 			}
 		}
-		else
+		else if(langMdl.knlm)
 		{
-			switch (lmKeySize)
+			switch (langMdl.knlm->getHeader().key_size)
 			{
 			case 1:
 				dfFindBestPath = (void*)lmKnLM_8[static_cast<std::ptrdiff_t>(selectedArch)];
@@ -711,7 +714,7 @@ namespace kiwi
 	}
 
 	template<class LmState>
-	inline void fillWordScores(const WordLL<LmState>* result, PathEvaluator::Result* out, float typoCostWeight)
+	inline void fillWordScores(const WordLL<LmState>* result, const utils::ContainerSearcher<WordLL<LmState>>& csearcher, const KGraphNode* graph, PathEvaluator::Result* out, float typoCostWeight)
 	{
 		for (;result->parent; result = result->parent)
 		{
@@ -722,6 +725,7 @@ namespace kiwi
 			if (result->parent->morphs.back().combineSocket) --b;
 			if (result->morphs.back().combineSocket) --e;
 			if (b == e) continue;
+			auto& gNode = graph[csearcher(result)];
 			scoreDiff += typoCostDiff * typoCostWeight;
 			scoreDiff /= e - b;
 			typoCostDiff /= e - b;
@@ -729,6 +733,7 @@ namespace kiwi
 			{
 				out[i].wordScore = scoreDiff;
 				out[i].typoCost = typoCostDiff;
+				out[i].typoFormId = gNode.typoFormId;
 			}
 		}
 	}
@@ -867,6 +872,7 @@ namespace kiwi
 
 #endif
 
+		utils::ContainerSearcher<WordLL<LmState>> csearcher{ cache };
 		Vector<pair<Path, float>> ret;
 		for (size_t i = 0; i < min(topN, cand.size()); ++i)
 		{
@@ -876,7 +882,7 @@ namespace kiwi
 				if (m.ownFormId) return Result{ &kw->morphemes[m.wid], ownFormList[m.ownFormId - 1], m.beginPos, m.endPos };
 				else return Result{ &kw->morphemes[m.wid], KString{}, m.beginPos, m.endPos };
 			});
-			fillWordScores(&cand[i], mv.data(), kw->typoCostWeight);
+			fillWordScores(&cand[i], csearcher, graph.data(), mv.data(), kw->typoCostWeight);
 			ret.emplace_back(mv, cand[i].accScore);
 		}
 		return ret;
@@ -998,7 +1004,7 @@ namespace kiwi
 		// 분석할 문장에 포함된 개별 문자에 대해 어절번호를 생성한다
 		std::vector<uint16_t> wordPositions = getWordPositions(sBegin, sEnd);
 		
-		auto nodes = (*reinterpret_cast<FnSplitByTrie>(dfSplitByTrie))(forms.data(), formTrie, normalizedStr, matchOptions, maxUnkFormSize, spaceTolerance, 1.f);
+		auto nodes = (*reinterpret_cast<FnSplitByTrie>(dfSplitByTrie))(forms.data(), typoPtrs.data(), formTrie, normalizedStr, matchOptions, maxUnkFormSize, spaceTolerance, typoCostWeight);
 		vector<TokenResult> ret;
 		if (nodes.size() <= 2)
 		{
@@ -1047,6 +1053,7 @@ namespace kiwi
 				token.length = (uint16_t)(endPos - beginPos);
 				token.score = s.wordScore;
 				token.typoCost = s.typoCost;
+				token.typoFormId = s.typoFormId;
 
 				// Token의 시작위치(position)을 이용해 Token이 포함된 어절번호(wordPosition)를 얻음
 				token.wordPosition = wordPositions[token.position];
@@ -1139,5 +1146,11 @@ namespace kiwi
 		{
 			return (this->*lmVoid[archIdx])();
 		}
+	}
+
+	u16string Kiwi::getTypoForm(size_t typoFormId) const
+	{
+		const size_t* p = &typoPtrs[typoFormId];
+		return joinHangul(typoPool.begin() + p[0], typoPool.begin() + p[1]);
 	}
 }

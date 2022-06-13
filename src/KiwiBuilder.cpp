@@ -1,4 +1,4 @@
-﻿#include <fstream>
+#include <fstream>
 #include <random>
 
 #include <kiwi/Kiwi.h>
@@ -1318,7 +1318,7 @@ inline CondPolarity reducePolar(CondPolarity p, const Morpheme* m)
 
 Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) const
 {
-	Kiwi ret{ archType, langMdl.knlm->getHeader().key_size, !typos.empty()};
+	Kiwi ret{ archType, langMdl, !typos.empty()};
 
 	Vector<FormRaw> combinedForms;
 	Vector<MorphemeRaw> combinedMorphemes;
@@ -1328,7 +1328,6 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 
 	ret.forms.reserve(forms.size() + combinedForms.size() + 1);
 	ret.morphemes.reserve(morphemes.size() + combinedMorphemes.size());
-	ret.langMdl = langMdl;
 	ret.combiningRule = combiningRule;
 	ret.integrateAllomorph = !!(options & BuildOption::integrateAllomorph);
 	if (numThreads >= 1)
@@ -1435,7 +1434,7 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 	// 오타 교정이 있는 경우 가능한 모든 오타에 대해 Trie 생성
 	else
 	{
-		using TypoInfo = tuple<uint32_t, float, uint32_t, CondVowel>;
+		using TypoInfo = tuple<uint32_t, float, CondVowel>;
 		UnorderedMap<KString, Vector<TypoInfo>> typoGroup;
 		auto ptypos = typos.prepare();
 		for (auto f : sortedForms)
@@ -1443,7 +1442,7 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 			for (auto t : ptypos._generate(f->form, typoCostThreshold))
 			{
 				if (t.leftCond != CondVowel::none && f->vowel != CondVowel::none && t.leftCond != f->vowel) continue;
-				typoGroup[t.str].emplace_back(f - ret.forms.data(), t.cost, (uint32_t)t.str.size(), t.leftCond);
+				typoGroup[t.str].emplace_back(f - ret.forms.data(), t.cost, t.leftCond);
 			}
 		}
 
@@ -1474,6 +1473,13 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 		for (auto f : typoGroupSorted)
 		{
 			ret.typoForms.insert(ret.typoForms.end(), f->second.begin(), f->second.end());
+			for (auto it = ret.typoForms.end() - f->second.size(); it != ret.typoForms.end(); ++it)
+			{
+				it->typoId = ret.typoPtrs.size();
+			}
+			ret.typoPtrs.emplace_back(ret.typoPool.size());
+			ret.typoPool += f->first;
+
 			if (hash)
 			{
 				for (size_t i = 0; i < f->second.size(); ++i)
@@ -1496,6 +1502,7 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 			hash = !hash;
 		}
 		ret.typoForms.emplace_back(0, 0, hash);
+		ret.typoPtrs.emplace_back(ret.typoPool.size());
 		formTrie.reserveMore(estimatedNodeSize);
 
 		decltype(formTrie)::CacheStore<const KString> cache;

@@ -36,6 +36,7 @@ namespace kiwi
 		uint32_t prev = 0, sibling = 0;
 		uint16_t startPos = 0, endPos = 0;
 		float typoCost = 0;
+		uint32_t typoFormId = 0;
 
 		KGraphNode(const Form* _form = nullptr, uint16_t _endPos = 0, float _typoCost = 0) : form(_form), endPos(_endPos), typoCost(_typoCost) {}
 		KGraphNode(const KString& _uform, uint16_t _endPos, float _typoCost = 0) : uform(_uform), endPos(_endPos), typoCost(_typoCost) {}
@@ -52,6 +53,7 @@ namespace kiwi
 	template<ArchType arch, bool typoTolerant = false>
 	Vector<KGraphNode> splitByTrie(
 		const Form* formBase,
+		const size_t* typoPtrs,
 		const utils::FrozenTrie<kchar_t, const Form*>& trie, 
 		const KString& str, 
 		Match matchOptions, 

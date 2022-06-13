@@ -70,6 +70,8 @@ namespace kiwi
 
 		Vector<Form> forms;
 		Vector<Morpheme> morphemes;
+		KString typoPool;
+		Vector<size_t> typoPtrs;
 		Vector<TypoForm> typoForms;
 		utils::FrozenTrie<kchar_t, const Form*> formTrie;
 		LangModel langMdl;
@@ -98,7 +100,7 @@ namespace kiwi
 		 * @note 이 생성자는 기본 생성자로 이를 통해 생성된 객체는 바로 형태소 분석에 사용할 수 없다.
 		 * kiwi::KiwiBuilder 를 통해 생성된 객체만이 형태소 분석에 사용할 수 있다.
 		 */
-		Kiwi(ArchType arch = ArchType::default_, size_t lmKeySize = 2, bool typoTolerant = false);
+		Kiwi(ArchType arch = ArchType::default_, LangModel _langMdl = {}, bool typoTolerant = false);
 
 		~Kiwi();
 
@@ -271,12 +273,20 @@ namespace kiwi
 		/**
 		 * @brief 형태소들을 결합하여 텍스트로 복원해주는 작업을 수행하는 AutoJoiner를 반환한다.
 		 * 
-		 * @param lmSearch 결합 전에 언어 모델을 이용하여 최적의 형태소를 탐색하여 사용합니다.
+		 * @param lmSearch 결합 전에 언어 모델을 이용하여 최적의 형태소를 탐색하여 사용한다.
 		 * @return 새 AutoJoiner 인스턴스
 		 * 
 		 * @sa kiwi::cmb::AutoJoiner
 		 */
 		cmb::AutoJoiner newJoiner(bool lmSearch = true) const;
+
+		/**
+		 * @brief `TokenInfo::typoFormId`로부터 실제 오타 형태를 복원한다.
+		 * 
+		 * @param typoFormId analyze함수의 리턴으로 반환된 TokenInfo 내의 typoFormId 값
+		 * @return 복원된 오타의 형태
+		 */
+		std::u16string getTypoForm(size_t typoFormId) const;
 
 		size_t morphToId(const Morpheme* morph) const
 		{

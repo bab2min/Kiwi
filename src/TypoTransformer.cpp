@@ -393,13 +393,14 @@ TypoCandidates<u16wrap> PreparedTypoTransformer::_generate(const KString& orig, 
 			else
 			{
 				node = patTrie.root();
-				goto nextchar;
+				break;
 			}
 		}
+		if (!nnode) continue;
 		node = nnode;
 
 		auto& v = node->val(patTrie);
-		if (patTrie.isNull(v)) goto nextchar;
+		if (patTrie.isNull(v)) continue;
 
 		size_t endPos = i + 1;
 		size_t startPos = endPos - v.patLength;
@@ -414,7 +415,6 @@ TypoCandidates<u16wrap> PreparedTypoTransformer::_generate(const KString& orig, 
 			if (patTrie.hasSubmatch(sv)) continue;
 			matches.emplace_back(endPos, sv);
 		}
-	nextchar:;
 	}
 	if (!matches.empty())
 	{

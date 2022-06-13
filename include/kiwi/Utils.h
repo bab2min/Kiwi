@@ -51,12 +51,14 @@ namespace kiwi
 		return os << utf16To8({ str.begin(), str.end() });
 	}
 
-	inline std::u16string joinHangul(const KString& hangul)
+	template<class It>
+	inline std::u16string joinHangul(It first, It last)
 	{
 		std::u16string ret;
-		ret.reserve(hangul.size());
-		for (auto c : hangul)
+		ret.reserve(std::distance(first, last));
+		for (; first != last; ++first)
 		{
+			auto c = *first;
 			if (isHangulCoda(c) && !ret.empty() && isHangulSyllable(ret.back()))
 			{
 				if ((ret.back() - 0xAC00) % 28) ret.push_back(c);
@@ -68,6 +70,11 @@ namespace kiwi
 			}
 		}
 		return ret;
+	}
+
+	inline std::u16string joinHangul(const KString& hangul)
+	{
+		return joinHangul(hangul.begin(), hangul.end());
 	}
 
 	bool isClosingPair(char16_t c);
