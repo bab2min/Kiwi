@@ -11,6 +11,7 @@
 #include "search.h"
 #include "BitEncoder.hpp"
 #include "QEncoder.hpp"
+#include "nuquant.hpp"
 
 namespace kiwi
 {
@@ -423,7 +424,6 @@ namespace kiwi
 				}
 			}
 
-
 			float _progress(ptrdiff_t& node_idx, size_t next) const override
 			{
 				return progress(node_idx, (KeyType)next);
@@ -648,109 +648,10 @@ namespace kiwi
 
 		inline std::unique_ptr<KnLangModelBase> KnLangModelBase::create(utils::MemoryObject&& mem, ArchType archType)
 		{
-			tp::Table<FnCreateOptimizedModel, AvailableArch> table{ CreateOptimizedModelGetter{} };
+			static tp::Table<FnCreateOptimizedModel, AvailableArch> table{ CreateOptimizedModelGetter{} };
 			auto fn = table[static_cast<std::ptrdiff_t>(archType)];
 			if (!fn) throw std::runtime_error{ std::string{"Unsupported architecture : "} + archToStr(archType) };
 			return (*fn)(std::move(mem));
-		}
-
-		namespace detail
-		{
-			template<class Ty>
-			inline Ty average(const Ty* f, size_t n)
-			{
-				Ty sum = 0;
-				for (size_t i = 0; i < n; ++i) sum += f[i];
-				return sum / n;
-			}
-
-			template<class Ty>
-			inline Ty sumSquaredErrors(const Ty* f, size_t n, Ty mean)
-			{
-				Ty sum = 0;
-				for (size_t i = 0; i < n; ++i) sum += (f[i] - mean) * (f[i] - mean);
-				return sum;
-			}
-
-			template<class Ty>
-			inline Ty nuquant(Ty* cs, const std::vector<Ty>& vs, size_t cats)
-			{
-				const size_t cols = vs.size();
-				if (cols <= cats)
-				{
-					for (size_t i = 0; i < cols; ++i) cs[i] = vs[i];
-					for (size_t i = cols; i < cats; ++i) cs[i] = cs[cols - 1];
-					return 0.f;
-				}
-
-				if (cats == 1)
-				{
-					float c = average(vs.data(), cols);
-					cs[0] = c;
-					return sumSquaredErrors(vs.data(), cols, c) / cols;
-				}
-
-				std::vector<size_t> boundary(cats + 1), best_boundary;
-				for (int i = 1; i <= cats; ++i)
-				{
-					boundary[i] = i * cols / cats;
-					cs[i - 1] = average(&vs[boundary[i - 1]], boundary[i] - boundary[i - 1]);
-				}
-
-				Ty best_mse = INFINITY;
-				size_t deadline = 10;
-				for (size_t epoch = 0; epoch < deadline && epoch < 1000; ++epoch)
-				{
-					// update boundaries
-					for (size_t i = 1; i < cats; ++i)
-					{
-						float mid = (cs[i - 1] + cs[i]) / 2;
-						boundary[i] = std::find_if(vs.begin() + boundary[i - 1], vs.end(), [&](Ty x)
-						{
-							return x > mid;
-						}) - vs.begin();
-					}
-
-					boundary.erase(std::unique(boundary.begin(), boundary.end()), boundary.end());
-					while (boundary.size() <= cats)
-					{
-						Ty max_diff = 0;
-						size_t max_i = 0;
-						for (size_t i = 1; i < boundary.size(); ++i)
-						{
-							if (boundary[i] - boundary[i - 1] <= 1) continue;
-							Ty diff = vs[boundary[i] - 1] - vs[boundary[i - 1]];
-							if (diff > max_diff)
-							{
-								max_diff = diff;
-								max_i = i;
-							}
-						}
-						boundary.insert(boundary.begin() + max_i, (boundary[max_i - 1] + boundary[max_i]) / 2);
-					}
-
-					Ty mse = 0;
-					// update centroids
-					for (size_t i = 0; i < cats; ++i)
-					{
-						cs[i] = average(&vs[boundary[i]], boundary[i + 1] - boundary[i]);
-						mse += sumSquaredErrors(&vs[boundary[i]], boundary[i + 1] - boundary[i], cs[i]);
-					}
-
-					if (mse < best_mse)
-					{
-						best_mse = mse;
-						best_boundary = boundary;
-						deadline = epoch + 10;
-					}
-				}
-
-				for (size_t i = 0; i < cats; ++i)
-				{
-					cs[i] = average(&vs[best_boundary[i]], best_boundary[i + 1] - best_boundary[i]);
-				}
-				return best_mse / cols;
-			}
 		}
 
 		template<size_t bits>
@@ -964,11 +865,11 @@ namespace kiwi
 				std::copy_if(ll.begin(), ll.end(), std::back_inserter(sorted_ll), isfinitef);
 				std::copy_if(leaf_ll.begin(), leaf_ll.end(), std::back_inserter(sorted_ll), isfinitef);
 				std::sort(sorted_ll.begin(), sorted_ll.end());
-				detail::nuquant(ll_table.data(), sorted_ll, quantize_size);
+				nuq::nuquant(ll_table.data(), sorted_ll, quantize_size);
 
 				std::copy_if(gamma.begin(), gamma.end(), std::back_inserter(sorted_gamma), isfinitef);
 				std::sort(sorted_gamma.begin(), sorted_gamma.end());
-				detail::nuquant(gamma_table.data(), sorted_gamma, quantize_size);
+				nuq::nuquant(gamma_table.data(), sorted_gamma, quantize_size);
 
 				quantizeDispatch(tp::gen_seq<16>{}, quantized,
 					ll_table, gamma_table,

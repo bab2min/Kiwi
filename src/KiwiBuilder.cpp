@@ -1,4 +1,4 @@
-#include <fstream>
+﻿#include <fstream>
 #include <random>
 
 #include <kiwi/Kiwi.h>
@@ -520,15 +520,15 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 	: KiwiBuilder{ modelPath }
 {
 	auto realMorph = restoreMorphemeMap();
-	RaggedVector<utils::Vid> sents;
-	if (1)
+	sb::SkipBigramTrainer<utils::Vid, 8> sbg;
+	if (0)
 	{
+		RaggedVector<utils::Vid> sents;
 		for (auto& path : args.corpora)
 		{
 			ifstream ifs;
 			addCorpusTo(sents, openFile(ifs, path), realMorph);
 		}
-		//std::cout << sents.size() << std::endl;
 
 		if (args.dropoutProb > 0 && args.dropoutSampling > 0)
 		{
@@ -579,169 +579,124 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 				}
 			}
 		}
-		//ofstream ofs{ "sent.bin", ios_base::binary };
-		//auto mem = sents.toMemory();
-		//ofs.write((const char*)mem.get(), mem.size());
-	}
-	else
-	{
-		ifstream ifs{ "sent.bin", ios_base::binary };
-		utils::MMap mm{ "sent.bin" };
-		utils::imstream im(mm.get(), mm.size());
-		sents = RaggedVector<utils::Vid>::fromMemory(im);
-	}
 
-	size_t lmVocabSize = 0;
-	for (auto& p : realMorph) lmVocabSize = max(p.second, lmVocabSize);
-	lmVocabSize += 1;
+		size_t lmVocabSize = 0;
+		for (auto& p : realMorph) lmVocabSize = max(p.second, lmVocabSize);
+		lmVocabSize += 1;
 
-	auto sbgTokenFilter = [&](size_t a)
-	{
-		auto tag = morphemes[a].tag;
-		if (isEClass(tag) || isJClass(tag)) return false;
-		if (tag == POSTag::vcp || tag == POSTag::vcn) return false;
-		if (isVerbClass(tag) && forms[morphemes[a].kform].form == u"하") return false;
-		return true;
-	};
-
-	auto sbgPairFilter = [&](size_t a, size_t b)
-	{
-		if (a < 21 || (34 < a && a < defaultTagSize + 1)) return false;
-		if ((1 < b && b < 21) || (34 < b && b < defaultTagSize + 1)) return false;
-		return true;
-	};
-
-	/*Vector<std::pair<size_t, float>> cases = {
-		{ 5, 0.10f },
-		{ 10, 0.10f },
-		{ 5, 0.08f },
-		{ 10, 0.08f },
-		{ 5, 0.06f },
-		{ 10, 0.06f },
-		{ 5, 0.04f },
-		{ 10, 0.04f },
-	};
-	for (size_t n = 0; n < cases.size(); ++n)
-	{
-		ofstream ofs{"logs/" + to_string(n) + ".log"};
-		SkipBigramTrainer<utils::Vid, 8> sbg{ sents, sbgFilter, 0, 320, cases[n].first, cases[n].second};
-		ofs << "minCnt: " << cases[n].first << ", minNPMI: " << cases[n].second << ", vocabs: " << sbg.vocabDataSize() << "\n" << endl;
-		for (size_t i = 0; i < lmVocabSize; ++i)
+		auto sbgTokenFilter = [&](size_t a)
 		{
-			auto vs = sbg.getVocabByCond(i);
-			if (vs.empty()) continue;
-			ofs << utf16To8(joinHangul(forms[morphemes[i].kform].form)) << '/' << tagToString(morphemes[i].tag) << endl;
-			for (auto v : vs)
-			{
-				ofs << "    " << utf16To8(joinHangul(forms[morphemes[v].kform].form)) << '/' << tagToString(morphemes[v].tag) << endl;
-			}
-			ofs << endl;
-		}
-	}*/
-	
-	sb::SkipBigramTrainer<utils::Vid, 8> sbg;
-	if (1)
-	{
+			auto tag = morphemes[a].tag;
+			if (isEClass(tag) || isJClass(tag)) return false;
+			if (tag == POSTag::vcp || tag == POSTag::vcn) return false;
+			if (isVerbClass(tag) && forms[morphemes[a].kform].form == u"하") return false;
+			return true;
+		};
+
+		auto sbgPairFilter = [&](size_t a, size_t b)
+		{
+			if (a < 21 || (34 < a && a < defaultTagSize + 1)) return false;
+			if ((1 < b && b < 21) || (34 < b && b < defaultTagSize + 1)) return false;
+			return true;
+		};
+
 		sbg = sb::SkipBigramTrainer<utils::Vid, 8>{ sents, sbgTokenFilter, sbgPairFilter, 0, 150, 20, true, 0.333f, 1, 1000000 };
-		ofstream ofs{ "sbg.bin", ios_base::binary };
-		sbg.save(ofs);
+		Vector<float> lmLogProbs;
+		auto tc = sbg.newContext();
+		float llMean = 0;
+		size_t llCnt = 0;
+		Vector<size_t> sampleIdcs;
+		for (size_t i = 0; i < sents.size(); ++i)
+		{
+			if (i % 20 == 0) continue;
+			sampleIdcs.emplace_back(i);
+		}
+
+		for (size_t i = 0; i < sents.size(); i += 20)
+		{
+			auto sent = sents[i];
+			if (lmLogProbs.size() < sent.size())
+			{
+				lmLogProbs.resize(sent.size());
+			}
+			langMdl.knlm->evaluate(sent.begin(), sent.end(), lmLogProbs.begin());
+			//float sum = sbg.evaluate(&sent[0], lmLogProbs.data(), sent.size());
+			float sum = accumulate(lmLogProbs.begin() + 1, lmLogProbs.begin() + sent.size(), 0.);
+			size_t cnt = sent.size() - 1;
+			llCnt += cnt;
+			llMean += (sum - llMean * cnt) / llCnt;
+		}
+		cout << "Init Dev AvgLL: " << llMean << endl;
+
+		llCnt = 0;
+		llMean = 0;
+		float lrStart = 1e-1;
+		size_t numEpochs = 10;
+		size_t totalSteps = sampleIdcs.size() * numEpochs;
+
+		if (args.numWorkers <= 1)
+		{
+			sbg.train(SBDataFeeder{ sents, langMdl.knlm.get() }, [&](const sb::ObservingData& od)
+				{
+					llCnt += od.cntRecent;
+					llMean += (od.llRecent - llMean * od.cntRecent) / llCnt;
+					if (od.globalStep % 10000 == 0)
+					{
+						cout << od.globalStep / 10000 << " (" << std::round(od.globalStep * 1000. / totalSteps) / 10 << "%): AvgLL: " << od.llMeanTotal << ", RecentLL: " << llMean << endl;
+						llCnt = 0;
+						llMean = 0;
+					}
+				}, sampleIdcs, totalSteps, lrStart);
+		}
+		else
+		{
+			sbg.trainMulti(args.numWorkers, SBDataFeeder{ sents, langMdl.knlm.get(), 8 }, [&](const sb::ObservingData& od)
+				{
+					llCnt += od.cntRecent;
+					llMean += (od.llRecent - llMean * od.cntRecent) / llCnt;
+					if (od.prevGlobalStep / 10000 < od.globalStep / 10000)
+					{
+						cout << od.globalStep / 10000 << " (" << std::round(od.globalStep * 1000. / totalSteps) / 10 << "%): AvgLL: " << od.llMeanTotal << ", RecentLL: " << llMean << endl;
+						llCnt = 0;
+						llMean = 0;
+					}
+				}, sampleIdcs, totalSteps, lrStart);
+		}
+
+		{
+			ofstream ofs{ "sbg.fin.bin", ios_base::binary };
+			sbg.save(ofs);
+		}
+
+		llCnt = 0;
+		llMean = 0;
+		for (size_t i = 0; i < sents.size(); i += 20)
+		{
+			auto sent = sents[i];
+			if (lmLogProbs.size() < sent.size())
+			{
+				lmLogProbs.resize(sent.size());
+			}
+			langMdl.knlm->evaluate(sent.begin(), sent.end(), lmLogProbs.begin());
+			float sum = sbg.evaluate(&sent[0], lmLogProbs.data(), sent.size());
+			size_t cnt = sent.size() - 1;
+			llCnt += cnt;
+			llMean += (sum - llMean * cnt) / llCnt;
+		}
+		cout << "After Dev AvgLL: " << llMean << endl;
+
+		ofstream ofs{ modelPath + "/sbg.result.log" };
+		sbg.printParameters(ofs << "AvgLL: " << llMean << "\n", [&](size_t v)
+		{
+			return utf16To8(joinHangul(forms[morphemes[v].kform].form)) + "/" + tagToString(morphemes[v].tag);
+		});
 	}
 	else
 	{
-		ifstream ifs{ "sbg.bin", ios_base::binary };
+		ifstream ifs{ "sbg.fin.bin", ios_base::binary };
 		sbg.load(ifs);
 	}
-
-	Vector<float> lmLogProbs;
-	auto tc = sbg.newContext();
-	float llMean = 0;
-	size_t llCnt = 0;
-	Vector<size_t> sampleIdcs;
-	for (size_t i = 0; i < sents.size(); ++i)
-	{
-		if (i % 20 == 0) continue;
-		sampleIdcs.emplace_back(i);
-	}
-
-	for (size_t i = 0; i < sents.size(); i += 20)
-	{
-		auto sent = sents[i];
-		if (lmLogProbs.size() < sent.size())
-		{
-			lmLogProbs.resize(sent.size());
-		}
-		langMdl.knlm->evaluate(sent.begin(), sent.end(), lmLogProbs.begin());
-		//float sum = sbg.evaluate(&sent[0], lmLogProbs.data(), sent.size());
-		float sum = accumulate(lmLogProbs.begin() + 1, lmLogProbs.begin() + sent.size(), 0.);
-		size_t cnt = sent.size() - 1;
-		llCnt += cnt;
-		llMean += (sum - llMean * cnt) / llCnt;
-	}
-	cout << "Init Dev AvgLL: " << llMean << endl;
-
-	llCnt = 0;
-	llMean = 0;
-	float lrStart = 1e-1;
-	size_t numEpochs = 10;
-	size_t totalSteps = sampleIdcs.size() * numEpochs;
-
-	if (args.numWorkers <= 1)
-	{
-		sbg.train(SBDataFeeder{ sents, langMdl.knlm.get() }, [&](const sb::ObservingData& od)
-			{
-				llCnt += od.cntRecent;
-				llMean += (od.llRecent - llMean * od.cntRecent) / llCnt;
-				if (od.globalStep % 10000 == 0)
-				{
-					cout << od.globalStep / 10000 << " (" << std::round(od.globalStep * 1000. / totalSteps) / 10 << "%): AvgLL: " << od.llMeanTotal << ", RecentLL: " << llMean << endl;
-					llCnt = 0;
-					llMean = 0;
-				}
-			}, sampleIdcs, totalSteps, lrStart);
-	}
-	else
-	{
-		sbg.trainMulti(args.numWorkers, SBDataFeeder{ sents, langMdl.knlm.get(), 8 }, [&](const sb::ObservingData& od)
-			{
-				llCnt += od.cntRecent;
-				llMean += (od.llRecent - llMean * od.cntRecent) / llCnt;
-				if (od.prevGlobalStep / 10000 < od.globalStep / 10000)
-				{
-					cout << od.globalStep / 10000 << " (" << std::round(od.globalStep * 1000. / totalSteps) / 10 << "%): AvgLL: " << od.llMeanTotal << ", RecentLL: " << llMean << endl;
-					llCnt = 0;
-					llMean = 0;
-				}
-			}, sampleIdcs, totalSteps, lrStart);
-	}
-
-	{
-		ofstream ofs{ "sbg.fin.bin", ios_base::binary };
-		sbg.save(ofs);
-	}
-
-	llCnt = 0;
-	llMean = 0;
-	for (size_t i = 0; i < sents.size(); i += 20)
-	{
-		auto sent = sents[i];
-		if (lmLogProbs.size() < sent.size())
-		{
-			lmLogProbs.resize(sent.size());
-		}
-		langMdl.knlm->evaluate(sent.begin(), sent.end(), lmLogProbs.begin());
-		float sum = sbg.evaluate(&sent[0], lmLogProbs.data(), sent.size());
-		size_t cnt = sent.size() - 1;
-		llCnt += cnt;
-		llMean += (sum - llMean * cnt) / llCnt;
-	}
-	cout << "After Dev AvgLL: " << llMean << endl;
 	
-	ofstream ofs{ "logs/result.log" };
-	sbg.printParameters(ofs << "AvgLL: " << llMean << "\n", [&](size_t v)
-	{
-		return utf16To8(joinHangul(forms[morphemes[v].kform].form)) + "/" + tagToString(morphemes[v].tag);
-	});
-
 	{
 		auto mem = sbg.convertToModel();
 		ofstream ofs{ modelPath + "/skipbigram.mdl", ios_base::binary };

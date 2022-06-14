@@ -13,6 +13,9 @@
     <Filter Include="Header Files\kiwi">
       <UniqueIdentifier>{3ed6d7a3-06e8-47ce-8364-951da0b8e030}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\ArchImpl">
+      <UniqueIdentifier>{c677baec-b75c-46a8-a488-6944ae199577}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\kiwi\Kiwi.h">
@@ -150,6 +153,15 @@
     <ClInclude Include="include\kiwi\TypoTransformer.h">
       <Filter>Header Files\kiwi</Filter>
     </ClInclude>
+    <ClInclude Include="src\nuquant.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SkipBigramModelImpl.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SIMD.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Form.cpp">
@@ -196,6 +208,24 @@
     </ClCompile>
     <ClCompile Include="src\TypoTransformer.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\archImpl\none.cpp">
+      <Filter>Source Files\ArchImpl</Filter>
+    </ClCompile>
+    <ClCompile Include="src\archImpl\neon.cpp">
+      <Filter>Source Files\ArchImpl</Filter>
+    </ClCompile>
+    <ClCompile Include="src\archImpl\sse2.cpp">
+      <Filter>Source Files\ArchImpl</Filter>
+    </ClCompile>
+    <ClCompile Include="src\archImpl\avx2.cpp">
+      <Filter>Source Files\ArchImpl</Filter>
+    </ClCompile>
+    <ClCompile Include="src\archImpl\avx512bw.cpp">
+      <Filter>Source Files\ArchImpl</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ArchImpl\sse4_1.cpp">
+      <Filter>Source Files\ArchImpl</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

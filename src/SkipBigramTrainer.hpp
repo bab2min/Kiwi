@@ -8,6 +8,7 @@
 #include "RaggedVector.hpp"
 #include "serializerEigen.hpp"
 #include "BitEncoder.hpp"
+#include "nuquant.hpp"
 
 namespace kiwi
 {
@@ -676,16 +677,17 @@ namespace kiwi
 				return out;
 			}
 
-			utils::MemoryOwner convertToModel(float trimThreshold = -15) const
+			utils::MemoryOwner convertToModel(float trimThreshold = -15, bool quantize = true) const
 			{
 				Header header = { 0, };
 				header.vocabSize = ptrs.size() - 1;
 				header.keySize = sizeof(VocabTy);
 				header.windowSize = windowSize;
 				header.compressed = 0;
+				header.quantize = quantize ? 8 : 0;
 
 				size_t finalVocabSize = 0;
-				Vector<float> discnts(header.vocabSize);
+				Vector<float> discnts(header.vocabSize), allCompensations;
 				Vector<std::pair<Vector<VocabTy>, Vector<float>>> compensations(header.vocabSize);
 
 				for (size_t i = 1; i < ptrs.size(); ++i)
@@ -712,41 +714,106 @@ namespace kiwi
 							compensations[vocabs[b + j]].second.emplace_back(ls[j]);
 							++finalVocabSize;
 						}
+						if (quantize) allCompensations.insert(allCompensations.end(), ls.data(), ls.data() + segSize - 1);
 					}
 				}
 
-				size_t totalModelSize = sizeof(Header);
-				totalModelSize += header.vocabSize * sizeof(VocabTy);
-				totalModelSize += finalVocabSize * sizeof(VocabTy);
-				totalModelSize += header.vocabSize * sizeof(float);
-				totalModelSize += finalVocabSize * sizeof(float);
-				totalModelSize += header.vocabSize;
+				if (quantize)
+				{
+					Vector<float> discntTable(256), compensationTable(256);
+					auto sortedDiscnts = discnts;
+					std::transform(sortedDiscnts.begin(), sortedDiscnts.end(), sortedDiscnts.begin(), [](float f) { return -std::sqrt(-f); });
+					std::sort(sortedDiscnts.begin(), sortedDiscnts.end());
+					float mse = nuq::nuquant(discntTable.data(), sortedDiscnts, 256);
+					std::transform(discntTable.begin(), discntTable.end(), discntTable.begin(), [](float f) { return -f*f; });
 
-				utils::MemoryOwner ret{ totalModelSize };
-				auto* ptr = reinterpret_cast<char*>(ret.get());
-				*reinterpret_cast<Header*>(ptr) = header;
-				auto* ks = reinterpret_cast<VocabTy*>(ptr += sizeof(Header));
-				for (auto& v : compensations)
-				{
-					*ks++ = v.first.size();
-				}
-				ks = reinterpret_cast<VocabTy*>(ptr += header.vocabSize * sizeof(VocabTy));
-				for (auto& v : compensations)
-				{
-					ks = std::copy(v.first.begin(), v.first.end(), ks);
-				}
-				auto* fs = reinterpret_cast<float*>(ptr += finalVocabSize * sizeof(VocabTy));
-				std::copy(discnts.begin(), discnts.end(), fs);
-				fs = reinterpret_cast<float*>(ptr += header.vocabSize * sizeof(float));
-				for (auto& v : compensations)
-				{
-					fs = std::copy(v.second.begin(), v.second.end(), fs);
-				}
-				
-				auto us = reinterpret_cast<uint8_t*>(fs);
-				us = std::copy(vocabValidness.begin(), vocabValidness.end(), us);
+					std::transform(allCompensations.begin(), allCompensations.end(), allCompensations.begin(), [](float f) { return -std::pow(-f, 1 / 16.f); });
+					std::sort(allCompensations.begin(), allCompensations.end());
+					mse = nuq::nuquant(compensationTable.data(), allCompensations, 256);
+					std::transform(compensationTable.begin(), compensationTable.end(), compensationTable.begin(), [](float f) { return -std::pow(f, 16.f); });
 
-				return ret;
+					size_t totalModelSize = sizeof(Header);
+					totalModelSize += header.vocabSize * sizeof(VocabTy);
+					totalModelSize += finalVocabSize * sizeof(VocabTy);
+					totalModelSize += header.vocabSize * sizeof(uint8_t);
+					totalModelSize += finalVocabSize * sizeof(uint8_t);
+					totalModelSize += header.vocabSize;
+					totalModelSize += 256 * sizeof(float);
+					totalModelSize += 256 * sizeof(float);
+
+					utils::MemoryOwner ret{ totalModelSize };
+					auto* ptr = reinterpret_cast<char*>(ret.get());
+					*reinterpret_cast<Header*>(ptr) = header;
+					auto* ks = reinterpret_cast<VocabTy*>(ptr += sizeof(Header));
+					for (auto& v : compensations)
+					{
+						*ks++ = v.first.size();
+					}
+					ks = reinterpret_cast<VocabTy*>(ptr += header.vocabSize * sizeof(VocabTy));
+					for (auto& v : compensations)
+					{
+						ks = std::copy(v.first.begin(), v.first.end(), ks);
+					}
+					auto* us = reinterpret_cast<uint8_t*>(ptr += finalVocabSize * sizeof(VocabTy));
+					{
+						nuq::NUQuantizer<float> quantizer{ discntTable.begin(), discntTable.end() };
+						for (auto v : discnts)
+						{
+							*us++ = (uint8_t)quantizer(v);
+						}
+					}
+					{
+						nuq::NUQuantizer<float> quantizer{ compensationTable.begin(), compensationTable.end() };
+						for (auto& vs : compensations)
+						{
+							for (auto v : vs.second)
+							{
+								*us++ = (uint8_t)quantizer(v);
+							}
+						}
+					}
+
+					us = std::copy(vocabValidness.begin(), vocabValidness.end(), us);
+					auto* fs = reinterpret_cast<float*>(us);
+					fs = std::copy(discntTable.begin(), discntTable.end(), fs);
+					fs = std::copy(compensationTable.begin(), compensationTable.end(), fs);
+					return ret;
+				}
+				else
+				{
+					size_t totalModelSize = sizeof(Header);
+					totalModelSize += header.vocabSize * sizeof(VocabTy);
+					totalModelSize += finalVocabSize * sizeof(VocabTy);
+					totalModelSize += header.vocabSize * sizeof(float);
+					totalModelSize += finalVocabSize * sizeof(float);
+					totalModelSize += header.vocabSize;
+
+					utils::MemoryOwner ret{ totalModelSize };
+					auto* ptr = reinterpret_cast<char*>(ret.get());
+					*reinterpret_cast<Header*>(ptr) = header;
+					auto* ks = reinterpret_cast<VocabTy*>(ptr += sizeof(Header));
+					for (auto& v : compensations)
+					{
+						*ks++ = v.first.size();
+					}
+					ks = reinterpret_cast<VocabTy*>(ptr += header.vocabSize * sizeof(VocabTy));
+					for (auto& v : compensations)
+					{
+						ks = std::copy(v.first.begin(), v.first.end(), ks);
+					}
+					auto* fs = reinterpret_cast<float*>(ptr += finalVocabSize * sizeof(VocabTy));
+					std::copy(discnts.begin(), discnts.end(), fs);
+					fs = reinterpret_cast<float*>(ptr += header.vocabSize * sizeof(float));
+					for (auto& vs : compensations)
+					{
+						fs = std::copy(vs.second.begin(), vs.second.end(), fs);
+					}
+
+					auto us = reinterpret_cast<uint8_t*>(fs);
+					us = std::copy(vocabValidness.begin(), vocabValidness.end(), us);
+
+					return ret;
+				}
 			}
 		};
 	}
