@@ -228,9 +228,9 @@ void TypoTransformer::addTypoImpl(const KString& orig, const KString& error, flo
 	bool updated = false;
 	for (auto& p : replacements[replIdx])
 	{
-		if (p.leftCond == leftCond && strPool.substr(p.begin, p.end) == error)
+		if (p.leftCond == leftCond && strPool.substr(p.begin, p.end - p.begin) == error)
 		{
-			p.cost = min(p.cost, cost);
+			p.cost = isfinite(cost) ? min(p.cost, cost) : cost;
 			updated = true;
 			break;
 		}
@@ -449,6 +449,7 @@ const TypoTransformer kiwi::basicTypoSet = {
 	{ {u"ㅝ"}, {u"ㅗ", u"ㅓ"}, 1.f, CondVowel::none },
 	{ {u"ㅟ"}, {u"ㅣ"}, 1.f, CondVowel::none },
 	{ {u"ㅢ"}, {u"ㅣ"}, 1.f, CondVowel::none },
+	{ {u"위", u"의"}, {u"이"}, INFINITY, CondVowel::none}, // 이->위, 이->의 과도교정 배제
 	{ {u"자", u"쟈"}, {u"자", u"쟈"}, 1.f, CondVowel::none },
 	{ {u"재", u"쟤"}, {u"재", u"쟤"}, 1.f, CondVowel::none },
 	{ {u"저", u"져"}, {u"저", u"져"}, 1.f, CondVowel::none },
@@ -484,12 +485,13 @@ const TypoTransformer kiwi::basicTypoSet = {
 	{ {u"ᇀ이", u"치"}, {u"ᇀ이", u"치"}, 1.f, CondVowel::none },
 	{ {u"ᇀ여", u"쳐"}, {u"ᇀ여", u"쳐"}, 1.f, CondVowel::none },
 	
-
 	{ {u"ᄀ", u"ᄁ"}, {u"ᄀ", u"ᄁ"}, 1.f, CondVowel::applosive },
 	{ {u"ᄃ", u"ᄄ"}, {u"ᄃ", u"ᄄ"}, 1.f, CondVowel::applosive },
 	{ {u"ᄇ", u"ᄈ"}, {u"ᄇ", u"ᄈ"}, 1.f, CondVowel::applosive },
 	{ {u"ᄉ", u"ᄊ"}, {u"ᄉ", u"ᄊ"}, 1.f, CondVowel::applosive },
 	{ {u"ᄌ", u"ᄍ"}, {u"ᄌ", u"ᄍ"}, 1.f, CondVowel::applosive },
+
+	{ {u"ᇂᄒ", u"ᆨᄒ", u"ᇂᄀ"}, {u"ᇂᄒ", u"ᆨᄒ", u"ᇂᄀ"}, 1.f, CondVowel::none},
 
 	{ {u"ᆨᄂ", u"ᆩᄂ", u"ᆪᄂ", u"ᆿᄂ", u"ᆼᄂ"}, {u"ᆨᄂ", u"ᆩᄂ", u"ᆪᄂ", u"ᆿᄂ", u"ᆼᄂ"}, 1.f, CondVowel::none },
 	{ {u"ᆨᄆ", u"ᆩᄆ", u"ᆪᄆ", u"ᆿᄆ", u"ᆼᄆ"}, {u"ᆨᄆ", u"ᆩᄆ", u"ᆪᄆ", u"ᆿᄆ", u"ᆼᄆ"}, 1.f, CondVowel::none },
@@ -503,11 +505,18 @@ const TypoTransformer kiwi::basicTypoSet = {
 	{ {u"ᆫᄅ", u"ᆫᄂ", u"ᆯᄅ", u"ᆯᄂ"}, {u"ᆫᄅ", u"ᆫᄂ", u"ᆯᄅ", u"ᆯᄂ"}, 1.f, CondVowel::none },
 	
 	{ {u"ᆨᄋ", u"ᄀ"}, {u"ᆨᄋ", u"ᄀ"}, 1.f, CondVowel::vowel },
-	{ {u"ᆫᄋ", u"ᄂ"}, {u"ᆫᄋ", u"ᄂ"}, 1.f, CondVowel::vowel },
+	{ {u"ᆩᄋ", u"ᄁ"}, {u"ᆩᄋ", u"ᄁ"}, 1.f, CondVowel::vowel },
+	{ {u"ᆫᄋ", u"ᆫᄒ", u"ᄂ"}, {u"ᆫᄋ", u"ᆫᄒ", u"ᄂ"}, 1.f, CondVowel::vowel },
+	{ {u"ᆬᄋ", u"ᆫᄌ"}, {u"ᆬᄋ", u"ᆫᄌ"}, 1.f, CondVowel::vowel },
+	{ {u"ᆭᄋ", u"ᄂ"}, {u"ᆭᄋ", u"ᄂ"}, 1.f, CondVowel::vowel },
 	{ {u"ᆮᄋ", u"ᄃ"}, {u"ᆮᄋ", u"ᄃ"}, 1.f, CondVowel::vowel },
-	{ {u"ᆯᄋ", u"ᄅ"}, {u"ᆯᄋ", u"ᄅ"}, 1.f, CondVowel::vowel },
+	{ {u"ᆯᄋ", u"ᆯᄒ", u"ᄅ"}, {u"ᆯᄋ", u"ᆯᄒ", u"ᄅ"}, 1.f, CondVowel::vowel },
 	{ {u"ᆷᄋ", u"ᄆ"}, {u"ᆷᄋ", u"ᄆ"}, 1.f, CondVowel::vowel },
 	{ {u"ᆸᄋ", u"ᄇ"}, {u"ᆸᄋ", u"ᄇ"}, 1.f, CondVowel::vowel },
 	{ {u"ᆺᄋ", u"ᄉ"}, {u"ᆺᄋ", u"ᄉ"}, 1.f, CondVowel::vowel },
+	{ {u"ᆻᄋ", u"ᄊ"}, {u"ᆻᄋ", u"ᄊ"}, 1.f, CondVowel::vowel },
 	{ {u"ᆽᄋ", u"ᄌ"}, {u"ᆽᄋ", u"ᄌ"}, 1.f, CondVowel::vowel },
+
+	{ {u"은", u"는"}, {u"은", u"는"}, 2.f, CondVowel::none },
+	{ {u"을", u"를"}, {u"을", u"를"}, 2.f, CondVowel::none },
 };
