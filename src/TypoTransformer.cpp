@@ -306,6 +306,8 @@ void TypoTransformer::addTypo(const u16string& orig, const u16string& error, flo
 	return addTypoNormalized(normalizeHangul(orig), normalizeHangul(error), cost, leftCond);
 }
 
+PreparedTypoTransformer::PreparedTypoTransformer() = default;
+
 PreparedTypoTransformer::PreparedTypoTransformer(const TypoTransformer& tt)
 	: strPool{ tt.strPool }
 {
@@ -476,6 +478,8 @@ const TypoTransformer kiwi::basicTypoSet = {
 	{ {u"안"}, {u"않"}, 1.5f, CondVowel::none },
 	{ {u"맞추", u"맞히"}, {u"맞추", u"맞히"}, 1.5f, CondVowel::none },
 	{ {u"맞춰", u"맞혀"}, {u"맞춰", u"맞혀"}, 1.5f, CondVowel::none },
+	{ {u"받치", u"바치", u"받히"}, {u"받치", u"바치", u"받히"}, 1.5f, CondVowel::none },
+	{ {u"받쳐", u"바쳐", u"받혀"}, {u"받쳐", u"바쳐", u"받혀"}, 1.5f, CondVowel::none },
 	{ {u"던", u"든"}, {u"던", u"든"}, 1.f, CondVowel::none },
 	{ {u"때", u"데"}, {u"때", u"데"}, 1.5f, CondVowel::none },
 	{ {u"빛", u"빚"}, {u"빛", u"빚"}, 1.f, CondVowel::none },
@@ -514,9 +518,11 @@ const TypoTransformer kiwi::basicTypoSet = {
 	{ {u"ᆷᄋ", u"ᄆ"}, {u"ᆷᄋ", u"ᄆ"}, 1.f, CondVowel::vowel },
 	{ {u"ᆸᄋ", u"ᄇ"}, {u"ᆸᄋ", u"ᄇ"}, 1.f, CondVowel::vowel },
 	{ {u"ᆺᄋ", u"ᄉ"}, {u"ᆺᄋ", u"ᄉ"}, 1.f, CondVowel::vowel },
-	{ {u"ᆻᄋ", u"ᄊ"}, {u"ᆻᄋ", u"ᄊ"}, 1.f, CondVowel::vowel },
+	{ {u"ᆻᄋ", u"ᆺᄉ", u"ᄊ"}, {u"ᆻᄋ", u"ᆺᄉ", u"ᄊ"}, 1.f, CondVowel::vowel },
 	{ {u"ᆽᄋ", u"ᄌ"}, {u"ᆽᄋ", u"ᄌ"}, 1.f, CondVowel::vowel },
 
 	{ {u"은", u"는"}, {u"은", u"는"}, 2.f, CondVowel::none },
 	{ {u"을", u"를"}, {u"을", u"를"}, 2.f, CondVowel::none },
+
+	{ {u"ㅣ워", u"ㅣ어", u"ㅕ"}, {u"ㅣ워", u"ㅣ어", u"ㅕ"}, 1.5f, CondVowel::none},
 };

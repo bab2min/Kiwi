@@ -169,12 +169,15 @@ namespace kiwi
 		TypoCandidates<u16wrap> _generate(const KString& orig, float costThreshold = 2.5f) const;
 
 	public:
+		PreparedTypoTransformer();
 		PreparedTypoTransformer(const TypoTransformer& tt);
 		~PreparedTypoTransformer();
 		PreparedTypoTransformer(const PreparedTypoTransformer&) = delete;
 		PreparedTypoTransformer(PreparedTypoTransformer&&) noexcept;
 		PreparedTypoTransformer& operator=(const PreparedTypoTransformer&) = delete;
 		PreparedTypoTransformer& operator=(PreparedTypoTransformer&&) noexcept;
+
+		bool ready() const { return !replacements.empty(); }
 
 		TypoCandidates<true> generate(const std::u16string& orig, float costThreshold = 2.5f) const;
 	};
