@@ -62,7 +62,7 @@ namespace kiwi
 		float unkFormScoreScale = 5;
 		float unkFormScoreBias = 5;
 		float spacePenalty = 7;
-		float typoCostWeight = 4;
+		float typoCostWeight = 6;
 		size_t maxUnkFormSize = 6;
 		size_t spaceTolerance = 0;
 

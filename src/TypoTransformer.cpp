@@ -1,4 +1,5 @@
-﻿#include <kiwi/TypoTransformer.h>
+﻿#include <cmath>
+#include <kiwi/TypoTransformer.h>
 #include <kiwi/Utils.h>
 #include "StrUtils.h"
 #include "FrozenTrie.hpp"
@@ -515,11 +516,17 @@ const TypoTransformer kiwi::basicTypoSet = {
 	{ {u"ᆭᄋ", u"ᄂ"}, {u"ᆭᄋ", u"ᄂ"}, 1.f, CondVowel::vowel },
 	{ {u"ᆮᄋ", u"ᄃ"}, {u"ᆮᄋ", u"ᄃ"}, 1.f, CondVowel::vowel },
 	{ {u"ᆯᄋ", u"ᆯᄒ", u"ᄅ"}, {u"ᆯᄋ", u"ᆯᄒ", u"ᄅ"}, 1.f, CondVowel::vowel },
+	{ {u"ᆰᄋ", u"ᆯᄀ"}, {u"ᆰᄋ", u"ᆯᄀ"}, 1.f, CondVowel::vowel },
+	{ {u"ᆰᄒ", u"ᆯᄏ"}, {u"ᆰᄒ", u"ᆯᄏ"}, 1.f, CondVowel::vowel },
 	{ {u"ᆷᄋ", u"ᄆ"}, {u"ᆷᄋ", u"ᄆ"}, 1.f, CondVowel::vowel },
 	{ {u"ᆸᄋ", u"ᄇ"}, {u"ᆸᄋ", u"ᄇ"}, 1.f, CondVowel::vowel },
 	{ {u"ᆺᄋ", u"ᄉ"}, {u"ᆺᄋ", u"ᄉ"}, 1.f, CondVowel::vowel },
 	{ {u"ᆻᄋ", u"ᆺᄉ", u"ᄊ"}, {u"ᆻᄋ", u"ᆺᄉ", u"ᄊ"}, 1.f, CondVowel::vowel },
 	{ {u"ᆽᄋ", u"ᄌ"}, {u"ᆽᄋ", u"ᄌ"}, 1.f, CondVowel::vowel },
+	{ {u"ᆾᄋ", u"ᆾᄒ", u"ᆽᄒ", u"ᄎ"}, {u"ᆾᄋ", u"ᆾᄒ", u"ᆽᄒ", u"ᄎ"}, 1.f, CondVowel::vowel },
+	{ {u"ᆿᄋ", u"ᆿᄒ", u"ᆨᄒ", u"ᄏ"}, {u"ᆿᄋ", u"ᆿᄒ", u"ᆨᄒ", u"ᄏ"}, 1.f, CondVowel::vowel },
+	{ {u"ᇀᄋ", u"ᇀᄒ", u"ᆮᄒ", u"ᄐ"}, {u"ᇀᄋ", u"ᇀᄒ", u"ᆮᄒ", u"ᄐ"}, 1.f, CondVowel::vowel },
+	{ {u"ᇁᄋ", u"ᇁᄒ", u"ᆸᄒ", u"ᄑ"}, {u"ᇁᄋ", u"ᇁᄒ", u"ᆸᄒ", u"ᄑ"}, 1.f, CondVowel::vowel },
 
 	{ {u"은", u"는"}, {u"은", u"는"}, 2.f, CondVowel::none },
 	{ {u"을", u"를"}, {u"을", u"를"}, 2.f, CondVowel::none },
