@@ -39788,7 +39788,7 @@ NH농협은행	NNP	13
 진기	NNG	13
 생활력	NNG	13
 옳다	IC	13
-덮히	VV	13
+덮히	VV	13	=덮이
 스크루	NNG	13
 거무튀튀	XR	13
 그믐날	NNG	13
@@ -66853,7 +66853,7 @@ KBS	NNP	5
 큰일나	VV	5
 사발통문	NNG	5
 혼숙	NNG	5
-부딛히	VV	5
+부딛히	VV	5	=부딪히
 독사진	NNG	5
 땀나	VV	5
 백면서생	NNG	5
@@ -67083,7 +67083,7 @@ KBS	NNP	5
 팽팽	MAG	5
 침노	NNG	5
 은혼식	NNG	5
-짚히	VV	5
+짚히	VV	5	=짚이
 바타이유	NNP	5
 남한군	NNG	5
 투시력	NNG	5
