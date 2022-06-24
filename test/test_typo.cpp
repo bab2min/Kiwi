@@ -53,6 +53,15 @@ TEST(KiwiTypo, Generate)
 	EXPECT_EQ(typos.find(u"사애")->second, 1);
 }
 
+TEST(KiwiTypo, BasicTypoSet)
+{
+	auto ptt = basicTypoSet.prepare();
+
+	for (auto t : ptt.generate(u"얽히고설키"))
+	{
+	}
+}
+
 TEST(KiwiTypo, Builder)
 {
 	TypoTransformer tt;
@@ -71,7 +80,7 @@ TEST(KiwiTypo, Builder)
 	ret = kiwi.analyze(u"문화제 보호", Match::allWithNormalizing);
 }
 
-TEST(KiwiTypo, BasicTypoSet)
+TEST(KiwiTypo, AnalyzeBasicTypoSet)
 {
 	KiwiBuilder builder{ MODEL_PATH, 0, BuildOption::default_, };
 	Kiwi kiwi = builder.build();
