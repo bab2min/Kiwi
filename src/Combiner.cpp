@@ -19,28 +19,28 @@ ChrSet::ChrSet(const ChrSet&) = default;
 ChrSet::ChrSet(ChrSet&&) noexcept = default;
 ChrSet::~ChrSet() = default;
 ChrSet& ChrSet::operator=(const ChrSet&) = default;
-ChrSet& ChrSet::operator=(ChrSet&&) noexcept = default;
+ChrSet& ChrSet::operator=(ChrSet&&) = default;
 
 Pattern::Pattern() = default;
 Pattern::Pattern(const Pattern&) = default;
 Pattern::Pattern(Pattern&&) noexcept = default;
 Pattern::~Pattern() = default;
 Pattern& Pattern::operator=(const Pattern&) = default;
-Pattern& Pattern::operator=(Pattern&&) noexcept = default;
+Pattern& Pattern::operator=(Pattern&&) = default;
 
 CompiledRule::CompiledRule() = default;
 CompiledRule::CompiledRule(const CompiledRule&) = default;
 CompiledRule::CompiledRule(CompiledRule&&) noexcept = default;
 CompiledRule::~CompiledRule() = default;
 CompiledRule& CompiledRule::operator=(const CompiledRule&) = default;
-CompiledRule& CompiledRule::operator=(CompiledRule&&) noexcept = default;
+CompiledRule& CompiledRule::operator=(CompiledRule&&) = default;
 
 RuleSet::RuleSet() = default;
 RuleSet::RuleSet(const RuleSet&) = default;
 RuleSet::RuleSet(RuleSet&&) noexcept = default;
 RuleSet::~RuleSet() = default;
 RuleSet& RuleSet::operator=(const RuleSet&) = default;
-RuleSet& RuleSet::operator=(RuleSet&&) noexcept = default;
+RuleSet& RuleSet::operator=(RuleSet&&) = default;
 
 inline bool hasRange(const ChrSet& set, char16_t b, char16_t e)
 {

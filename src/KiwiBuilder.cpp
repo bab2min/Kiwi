@@ -31,7 +31,7 @@ KiwiBuilder::KiwiBuilder(KiwiBuilder&&) noexcept = default;
 
 KiwiBuilder& KiwiBuilder::operator=(const KiwiBuilder&) = default;
 
-KiwiBuilder& KiwiBuilder::operator=(KiwiBuilder&&) noexcept = default;
+KiwiBuilder& KiwiBuilder::operator=(KiwiBuilder&&) = default;
 
 template<class Fn>
 auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> MorphemeMap

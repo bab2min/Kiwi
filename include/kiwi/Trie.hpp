@@ -355,7 +355,7 @@ namespace kiwi
 			ContinuousTrie(ContinuousTrie&&) noexcept = default;
 
 			ContinuousTrie& operator=(const ContinuousTrie&) = default;
-			ContinuousTrie& operator=(ContinuousTrie&&) noexcept = default;
+			ContinuousTrie& operator=(ContinuousTrie&&) = default;
 
 			bool empty() const { return nodes.empty(); }
 			size_t size() const { return nodes.size(); }

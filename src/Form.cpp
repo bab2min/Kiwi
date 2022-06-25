@@ -17,7 +17,7 @@ namespace kiwi
 
 	MorphemeRaw& MorphemeRaw::operator=(const MorphemeRaw&) = default;
 
-	MorphemeRaw& MorphemeRaw::operator=(MorphemeRaw&&) noexcept = default;
+	MorphemeRaw& MorphemeRaw::operator=(MorphemeRaw&&) = default;
 
 	MorphemeRaw::MorphemeRaw(
 		POSTag _tag,
@@ -42,7 +42,7 @@ namespace kiwi
 
 	Morpheme& Morpheme::operator=(const Morpheme&) = default;
 
-	Morpheme& Morpheme::operator=(Morpheme&&) noexcept = default;
+	Morpheme& Morpheme::operator=(Morpheme&&) = default;
 
 	FormRaw::FormRaw() = default;
 
@@ -54,7 +54,7 @@ namespace kiwi
 
 	FormRaw& FormRaw::operator=(const FormRaw&) = default;
 
-	FormRaw& FormRaw::operator=(FormRaw&&) noexcept = default;
+	FormRaw& FormRaw::operator=(FormRaw&&) = default;
 
 	FormRaw::FormRaw(const KString& _form)
 		: form(_form)
@@ -77,7 +77,7 @@ namespace kiwi
 
 	Form& Form::operator=(const Form&) = default;
 
-	Form& Form::operator=(Form&&) noexcept = default;
+	Form& Form::operator=(Form&&) = default;
 
 	Form bake(const FormRaw& o, const Morpheme* morphBase, const Vector<uint32_t>& additionalCands)
 	{

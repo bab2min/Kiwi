@@ -39,7 +39,7 @@ namespace kiwi
 		TypoCandidates(const TypoCandidates&);
 		TypoCandidates(TypoCandidates&&) noexcept;
 		TypoCandidates& operator=(const TypoCandidates&);
-		TypoCandidates& operator=(TypoCandidates&&) noexcept;
+		TypoCandidates& operator=(TypoCandidates&&);
 
 		size_t size() const
 		{
@@ -94,7 +94,7 @@ namespace kiwi
 		TypoIterator(const TypoIterator&);
 		TypoIterator(TypoIterator&&) noexcept;
 		TypoIterator& operator=(const TypoIterator&);
-		TypoIterator& operator=(TypoIterator&&) noexcept;
+		TypoIterator& operator=(TypoIterator&&);
 
 		value_type operator*() const;
 
@@ -175,7 +175,7 @@ namespace kiwi
 		PreparedTypoTransformer(const PreparedTypoTransformer&) = delete;
 		PreparedTypoTransformer(PreparedTypoTransformer&&) noexcept;
 		PreparedTypoTransformer& operator=(const PreparedTypoTransformer&) = delete;
-		PreparedTypoTransformer& operator=(PreparedTypoTransformer&&) noexcept;
+		PreparedTypoTransformer& operator=(PreparedTypoTransformer&&);
 
 		bool ready() const { return !replacements.empty(); }
 
@@ -229,7 +229,7 @@ namespace kiwi
 		TypoTransformer(const TypoTransformer&);
 		TypoTransformer(TypoTransformer&&) noexcept;
 		TypoTransformer& operator=(const TypoTransformer&);
-		TypoTransformer& operator=(TypoTransformer&&) noexcept;
+		TypoTransformer& operator=(TypoTransformer&&);
 
 		bool empty() const
 		{

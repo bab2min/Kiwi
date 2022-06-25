@@ -33,7 +33,7 @@ namespace kiwi
 			Joiner(const Joiner&);
 			Joiner(Joiner&&) noexcept;
 			Joiner& operator=(const Joiner&);
-			Joiner& operator=(Joiner&&) noexcept;
+			Joiner& operator=(Joiner&&);
 
 			void add(const std::u16string& form, POSTag tag);
 			void add(const char16_t* form, POSTag tag);

@@ -136,7 +136,7 @@ namespace kiwi
 			ChrSet(ChrSet&&) noexcept;
 			~ChrSet();
 			ChrSet& operator=(const ChrSet&);
-			ChrSet& operator=(ChrSet&&) noexcept;
+			ChrSet& operator=(ChrSet&&);
 
 			ChrSet(char16_t chr);
 		};
@@ -173,7 +173,7 @@ namespace kiwi
 			Pattern(Pattern&&) noexcept;
 			~Pattern();
 			Pattern& operator=(const Pattern&);
-			Pattern& operator=(Pattern&&) noexcept;
+			Pattern& operator=(Pattern&&);
 
 			Pattern(const KString& expr);
 		};
@@ -236,7 +236,7 @@ namespace kiwi
 			CompiledRule(CompiledRule&&) noexcept;
 			~CompiledRule();
 			CompiledRule& operator=(const CompiledRule&);
-			CompiledRule& operator=(CompiledRule&&) noexcept;
+			CompiledRule& operator=(CompiledRule&&);
 
 			bool isReady() const { return !dfa.empty(); }
 
@@ -312,7 +312,7 @@ namespace kiwi
 			RuleSet(RuleSet&&) noexcept;
 			~RuleSet();
 			RuleSet& operator=(const RuleSet&);
-			RuleSet& operator=(RuleSet&&) noexcept;
+			RuleSet& operator=(RuleSet&&);
 
 			explicit RuleSet(std::istream& ruleFile)
 			{

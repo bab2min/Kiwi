@@ -124,7 +124,7 @@ namespace kiwi
 
 	Kiwi::Kiwi(Kiwi&&) noexcept = default;
 
-	Kiwi& Kiwi::operator=(Kiwi&&) noexcept = default;
+	Kiwi& Kiwi::operator=(Kiwi&&) = default;
 
 	inline vector<size_t> allNewLinePositions(const u16string& str)
 	{

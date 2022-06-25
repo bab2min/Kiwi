@@ -110,7 +110,7 @@ namespace kiwi
 
 		Kiwi& operator=(const Kiwi&) = delete;
 
-		Kiwi& operator=(Kiwi&&) noexcept;
+		Kiwi& operator=(Kiwi&&);
 
 		/**
 		 * @brief 현재 Kiwi 객체가 형태소 분석을 수행할 준비가 되었는지를 알려준다.
@@ -494,7 +494,7 @@ namespace kiwi
 
 		KiwiBuilder& operator=(const KiwiBuilder&);
 
-		KiwiBuilder& operator=(KiwiBuilder&&) noexcept;
+		KiwiBuilder& operator=(KiwiBuilder&&);
 
 		/**
 		 * @brief KiwiBuilder를 raw 데이터로부터 생성한다.

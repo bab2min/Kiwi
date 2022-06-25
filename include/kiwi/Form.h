@@ -87,7 +87,7 @@ namespace kiwi
 		MorphemeRaw(const MorphemeRaw&);
 		MorphemeRaw(MorphemeRaw&&) noexcept;
 		MorphemeRaw& operator=(const MorphemeRaw&);
-		MorphemeRaw& operator=(MorphemeRaw&&) noexcept;
+		MorphemeRaw& operator=(MorphemeRaw&&);
 
 		MorphemeRaw(
 			POSTag _tag,
@@ -140,7 +140,7 @@ namespace kiwi
 		Morpheme(const Morpheme&);
 		Morpheme(Morpheme&&) noexcept;
 		Morpheme& operator=(const Morpheme&);
-		Morpheme& operator=(Morpheme&&) noexcept;
+		Morpheme& operator=(Morpheme&&);
 
 		std::ostream& print(std::ostream& os) const;
 
@@ -170,7 +170,7 @@ namespace kiwi
 		FormRaw(const FormRaw&);
 		FormRaw(FormRaw&&) noexcept;
 		FormRaw& operator=(const FormRaw&);
-		FormRaw& operator=(FormRaw&&) noexcept;
+		FormRaw& operator=(FormRaw&&);
 		
 		FormRaw(const KString& _form);
 		bool operator<(const FormRaw& o) const;
@@ -198,7 +198,7 @@ namespace kiwi
 		Form(const Form&);
 		Form(Form&&) noexcept;
 		Form& operator=(const Form&);
-		Form& operator=(Form&&) noexcept;
+		Form& operator=(Form&&);
 
 		bool operator<(const Form& o) const
 		{

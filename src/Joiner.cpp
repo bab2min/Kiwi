@@ -12,7 +12,7 @@ namespace kiwi
 		Joiner::Joiner(const Joiner&) = default;
 		Joiner::Joiner(Joiner&&) noexcept = default;
 		Joiner& Joiner::operator=(const Joiner&) = default;
-		Joiner& Joiner::operator=(Joiner&&) noexcept = default;
+		Joiner& Joiner::operator=(Joiner&&) = default;
 
 		inline bool isSpaceInsertable(POSTag l, POSTag r, U16StringView rform)
 		{

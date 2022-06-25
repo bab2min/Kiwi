@@ -25,7 +25,7 @@ template<bool u16wrap>
 TypoCandidates<u16wrap>& TypoCandidates<u16wrap>::operator=(const TypoCandidates&) = default;
 
 template<bool u16wrap>
-TypoCandidates<u16wrap>& TypoCandidates<u16wrap>::operator=(TypoCandidates&&) noexcept = default;
+TypoCandidates<u16wrap>& TypoCandidates<u16wrap>::operator=(TypoCandidates&&) = default;
 
 template<bool u16wrap>
 TypoIterator<u16wrap> TypoCandidates<u16wrap>::begin() const
@@ -112,7 +112,7 @@ template<bool u16wrap>
 TypoIterator<u16wrap>& TypoIterator<u16wrap>::operator=(const TypoIterator&) = default;
 
 template<bool u16wrap>
-TypoIterator<u16wrap>& TypoIterator<u16wrap>::operator=(TypoIterator&&) noexcept = default;
+TypoIterator<u16wrap>& TypoIterator<u16wrap>::operator=(TypoIterator&&) = default;
 
 namespace detail
 {
@@ -215,7 +215,7 @@ TypoTransformer::~TypoTransformer() = default;
 TypoTransformer::TypoTransformer(const TypoTransformer&) = default;
 TypoTransformer::TypoTransformer(TypoTransformer&&) noexcept = default;
 TypoTransformer& TypoTransformer::operator=(const TypoTransformer&) = default;
-TypoTransformer& TypoTransformer::operator=(TypoTransformer&&) noexcept = default;
+TypoTransformer& TypoTransformer::operator=(TypoTransformer&&) = default;
 
 void TypoTransformer::addTypoImpl(const KString& orig, const KString& error, float cost, CondVowel leftCond)
 {
@@ -342,7 +342,7 @@ PreparedTypoTransformer::PreparedTypoTransformer(const TypoTransformer& tt)
 
 PreparedTypoTransformer::~PreparedTypoTransformer() = default;
 PreparedTypoTransformer::PreparedTypoTransformer(PreparedTypoTransformer&&) noexcept = default;
-PreparedTypoTransformer& PreparedTypoTransformer::operator=(PreparedTypoTransformer&&) noexcept = default;
+PreparedTypoTransformer& PreparedTypoTransformer::operator=(PreparedTypoTransformer&&) = default;
 
 template<bool u16wrap>
 TypoCandidates<u16wrap> PreparedTypoTransformer::_generate(const KString& orig, float costThreshold) const
