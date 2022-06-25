@@ -270,4 +270,38 @@ namespace kiwi
 			return tags[(size_t)t];
 		}
 	}
+
+	const char* tagRToString(char16_t form, POSTag t)
+	{
+		if (isIrregular(t)) return tagToString(t);
+		if (isHangulSyllable(form) && ((form - 0xAC00) % 28 == 7 || (form - 0xAC00) % 28 == 17 || (form - 0xAC00) % 28 == 19))
+		{
+			switch (t)
+			{
+			case POSTag::vv: return "VV-R";
+			case POSTag::va: return "VA-R";
+			case POSTag::vx: return "VX-R";
+			case POSTag::xsa: return "XSA-R";
+			default: break;
+			}
+		}
+		return tagToString(t);
+	}
+
+	const kchar_t* tagRToKString(char16_t form, POSTag t)
+	{
+		if (isIrregular(t)) return tagToKString(t);
+		if (isHangulSyllable(form) && ((form - 0xAC00) % 28 == 7 || (form - 0xAC00) % 28 == 17 || (form - 0xAC00) % 28 == 19))
+		{
+			switch (t)
+			{
+			case POSTag::vv: return u"VV-R";
+			case POSTag::va: return u"VA-R";
+			case POSTag::vx: return u"VX-R";
+			case POSTag::xsa: return u"XSA-R";
+			default: break;
+			}
+		}
+		return tagToKString(t);
+	}
 }

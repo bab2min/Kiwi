@@ -20,7 +20,7 @@ TEST(KiwiC, BuilderInitClose)
 {
 	kiwi_builder_h kb = kiwi_builder_init(MODEL_PATH, 0, KIWI_BUILD_DEFAULT);
 	EXPECT_NE(kb, nullptr);
-	kiwi_h kw = kiwi_builder_build(kb);
+	kiwi_h kw = kiwi_builder_build(kb, nullptr, 0);
 	EXPECT_NE(kw, nullptr);
 	EXPECT_EQ(kiwi_builder_close(kb), 0);
 	EXPECT_EQ(kiwi_close(kw), 0);
@@ -31,7 +31,7 @@ TEST(KiwiC, BuilderAddWords)
 	kiwi_builder_h kb = kiwi_builder_init(MODEL_PATH, 0, KIWI_BUILD_DEFAULT);
 	EXPECT_NE(kb, nullptr);
 	EXPECT_EQ(kiwi_builder_add_word(kb, KWORD8, "NNP", 0.0), 0);
-	kiwi_h kw = kiwi_builder_build(kb);
+	kiwi_h kw = kiwi_builder_build(kb, nullptr, 0);
 	EXPECT_NE(kw, nullptr);
 	EXPECT_EQ(kiwi_builder_close(kb), 0);
 	
@@ -146,7 +146,7 @@ TEST(KiwiC, AddRule)
 
 		EXPECT_GT(kiwi_builder_add_rule(kb, "ef", kb_replacer, nullptr, 0), 0);
 		
-		kiwi_h kw = kiwi_builder_build(kb);
+		kiwi_h kw = kiwi_builder_build(kb, nullptr, 0);
 		kiwi_res_h res = kiwi_analyze(kw, u8"했어용! 하잖아용! 할까용?", 1, KIWI_MATCH_ALL_WITH_NORMALIZING);
 		EXPECT_EQ(kiwi_res_prob(ores, 0), kiwi_res_prob(res, 0));
 		kiwi_res_close(res);
@@ -159,7 +159,7 @@ TEST(KiwiC, AddRule)
 
 		EXPECT_GT(kiwi_builder_add_rule(kb, "ef", kb_replacer, nullptr, -1), 0);
 
-		kiwi_h kw = kiwi_builder_build(kb);
+		kiwi_h kw = kiwi_builder_build(kb, nullptr, 0);
 		kiwi_res_h res = kiwi_analyze(kw, u8"했어용! 하잖아용! 할까용?", 1, KIWI_MATCH_ALL_WITH_NORMALIZING);
 		EXPECT_FLOAT_EQ(kiwi_res_prob(ores, 0) - 3, kiwi_res_prob(res, 0));
 		kiwi_res_close(res);
@@ -185,7 +185,7 @@ TEST(KiwiC, AddPreAnalyzedWord)
 	kiwi_builder_add_alias_word(kb, u8"팅기", "vv", -1, u8"튕기");
 	EXPECT_EQ(kiwi_builder_add_pre_analyzed_word(kb, u8"팅겼어", 3, morphs, pos, 0, nullptr), 0);
 
-	kiwi_h kw = kiwi_builder_build(kb);
+	kiwi_h kw = kiwi_builder_build(kb, nullptr, 0);
 	kiwi_res_h res = kiwi_analyze(kw, u8"팅겼어...", 1, KIWI_MATCH_ALL_WITH_NORMALIZING);
 	
 	ASSERT_GE(kiwi_res_word_num(res, 0), 4);
@@ -235,4 +235,34 @@ TEST(KiwiC, Joiner)
 	EXPECT_EQ(kiwi_joiner_add(joiner, "어요", "EF", 1), 0);
 	EXPECT_EQ(kiwi_joiner_get(joiner), std::string{ u8"길을 걷어요" });
 	EXPECT_EQ(kiwi_joiner_close(joiner), 0);
+}
+
+TEST(KiwiC, Regularity)
+{
+	kiwi_h okw = reuse_kiwi_instance();
+	kiwi_res_h r = kiwi_analyze(okw, "걷었다", 1, KIWI_MATCH_ALL_WITH_NORMALIZING);
+
+	EXPECT_STREQ(kiwi_res_tag(r, 0, 0), "VV-R");
+
+	EXPECT_EQ(kiwi_res_close(r), 0);
+}
+
+TEST(KiwiC, AnalyzeBasicTypoSet)
+{
+	kiwi_h okw = reuse_kiwi_instance(), typo_kw;
+	kiwi_builder_h builder = kiwi_builder_init(MODEL_PATH, 0, KIWI_BUILD_DEFAULT);
+	typo_kw = kiwi_builder_build(builder, kiwi_basic_typo, 2.5f);
+
+	kiwi_res_h o, c;
+	for (const char* s : { u8"외않됀데?", u8"나 죰 도와죠.", u8"잘했따", u8"외구거 공부", u8"맗은 믈을 마셧다!" })
+	{
+		o = kiwi_analyze(okw, s, 1, KIWI_MATCH_ALL_WITH_NORMALIZING);
+		c = kiwi_analyze(typo_kw, s, 1, KIWI_MATCH_ALL_WITH_NORMALIZING);
+		EXPECT_TRUE(kiwi_res_prob(o, 0) < kiwi_res_prob(c, 0));
+		EXPECT_EQ(kiwi_res_close(o), 0);
+		EXPECT_EQ(kiwi_res_close(c), 0);
+	}
+
+	EXPECT_EQ(kiwi_builder_close(builder), 0);
+	EXPECT_EQ(kiwi_close(typo_kw), 0);
 }

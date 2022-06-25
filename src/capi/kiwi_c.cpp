@@ -38,6 +38,10 @@ struct kiwi_joiner : public tuple<cmb::AutoJoiner, string, u16string>
 	using tuple<cmb::AutoJoiner, string, u16string>::tuple;
 };
 
+struct kiwi_typo : public TypoTransformer
+{
+};
+
 thread_local exception_ptr currentError;
 
 inline POSTag parse_tag(const char* pos)
@@ -74,7 +78,9 @@ kiwi_builder_h kiwi_builder_init(const char* model_path, int num_threads, int op
 {
 	try
 	{
-		return (kiwi_builder_h)new KiwiBuilder{ model_path, (size_t)num_threads, (BuildOption)options};
+		BuildOption buildOption = (BuildOption)(options & 0xFF);
+		bool useSBG = !!(options & KIWI_BUILD_MODEL_TYPE_SBG);
+		return (kiwi_builder_h)new KiwiBuilder{ model_path, (size_t)num_threads, buildOption, useSBG};
 	}
 	catch (...)
 	{
@@ -325,18 +331,83 @@ kiwi_ws_h kiwi_builder_extract_add_words_w(kiwi_builder_h handle, kiwi_reader_w_
 	}
 }
 
-kiwi_h kiwi_builder_build(kiwi_builder_h handle)
+kiwi_h kiwi_builder_build(kiwi_builder_h handle, kiwi_typo_h typos, float typo_cost_threshold)
 {
 	if (!handle) return nullptr;
 	auto* kb = (KiwiBuilder*)handle;
 	try
 	{
-		return (kiwi_h)new Kiwi{ kb->build() };
+		const TypoTransformer* tt = &withoutTypo;
+		if (typos)
+		{
+			tt = typos;
+		}
+		return (kiwi_h)new Kiwi{ kb->build(*tt, typo_cost_threshold) };
 	}
 	catch (...)
 	{
 		currentError = current_exception();
 		return nullptr;
+	}
+}
+
+const kiwi_typo_h kiwi_basic_typo = (kiwi_typo_h)&basicTypoSet;
+
+kiwi_typo_h kiwi_typo_init()
+{
+	try
+	{
+		return new kiwi_typo;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return nullptr;
+	}
+}
+
+int kiwi_typo_add(kiwi_typo_h handle, const char** orig, int orig_size, const char** error, int error_size, float cost, int condition)
+{
+	if (!handle) return KIWIERR_INVALID_HANDLE;
+	try
+	{
+		vector<u16string> origs, errors;
+		for (int i = 0; i < orig_size; ++i)
+		{
+			origs.emplace_back(utf8To16(orig[i]));
+		}
+		for (int i = 0; i < error_size; ++i)
+		{
+			errors.emplace_back(utf8To16(error[i]));
+		}
+		for (auto& o : origs)
+		{
+			for (auto& e : errors)
+			{
+				handle->addTypo(o, e, cost, (CondVowel)condition);
+			}
+		}
+		return 0;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return -1;
+	}
+}
+
+int kiwi_typo_close(kiwi_typo_h handle)
+{
+	if (!handle) return KIWIERR_INVALID_HANDLE;
+	try
+	{
+		delete handle;
+		return 0;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return -1;
 	}
 }
 
@@ -416,6 +487,9 @@ void kiwi_set_option_f(kiwi_h handle, int option, float value)
 	case KIWI_SPACE_PENALTY:
 		kiwi->setSpacePenalty(value);
 		break;
+	case KIWI_TYPO_COST_WEIGHT:
+		kiwi->setTypoCostWeight(value);
+		break;
 	default:
 		currentError = make_exception_ptr(invalid_argument{ "Invalid option value: " + to_string(option) });
 		break;
@@ -436,6 +510,8 @@ float kiwi_get_option_f(kiwi_h handle, int option)
 		return kiwi->getUnkScoreBias();
 	case KIWI_SPACE_PENALTY:
 		return kiwi->getSpacePenalty();
+	case KIWI_TYPO_COST_WEIGHT:
+		return kiwi->getTypoCostWeight();
 	default:
 		currentError = make_exception_ptr(invalid_argument{ "Invalid option value: " + to_string(option) });
 		break;
@@ -663,7 +739,7 @@ const kchar16_t * kiwi_res_tag_w(kiwi_res_h result, int index, int num)
 	try
 	{
 		if (index < 0 || index >= result->first.size() || num < 0 || num >= result->first[index].first.size()) return nullptr;
-		return (const kchar16_t*)tagToKString(result->first[index].first[num].tag);
+		return (const kchar16_t*)tagRToKString(result->first[index].first[num].str.back(), result->first[index].first[num].tag);
 	}
 	catch (...)
 	{
@@ -694,7 +770,7 @@ const char * kiwi_res_tag(kiwi_res_h result, int index, int num)
 	try
 	{
 		if (index < 0 || index >= result->first.size() || num < 0 || num >= result->first[index].first.size()) return nullptr;
-		return tagToString(result->first[index].first[num].tag);
+		return tagRToString(result->first[index].first[num].str.back(), result->first[index].first[num].tag);
 	}
 	catch (...)
 	{
@@ -755,6 +831,36 @@ int kiwi_res_sent_position(kiwi_res_h result, int index, int num)
 	{
 		if (index < 0 || index >= result->first.size() || num < 0 || num >= result->first[index].first.size()) return -1;
 		return result->first[index].first[num].sentPosition;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return KIWIERR_FAIL;
+	}
+}
+
+float kiwi_res_score(kiwi_res_h result, int index, int num)
+{
+	if (!result) return 0;
+	try
+	{
+		if (index < 0 || index >= result->first.size() || num < 0 || num >= result->first[index].first.size()) return -1;
+		return result->first[index].first[num].score;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return KIWIERR_FAIL;
+	}
+}
+
+float kiwi_res_typo_cost(kiwi_res_h result, int index, int num)
+{
+	if (!result) return -1;
+	try
+	{
+		if (index < 0 || index >= result->first.size() || num < 0 || num >= result->first[index].first.size()) return -1;
+		return result->first[index].first[num].typoCost;
 	}
 	catch (...)
 	{

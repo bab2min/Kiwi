@@ -35,6 +35,9 @@ namespace kiwi
 	POSTag toPOSTag(const std::u16string& tagStr);
 	const char* tagToString(POSTag t);
 	const kchar_t* tagToKString(POSTag t);
+	
+	const char* tagRToString(char16_t form, POSTag t);
+	const kchar_t* tagRToKString(char16_t form, POSTag t);
 
 	inline bool isHangulSyllable(char16_t chr)
 	{
