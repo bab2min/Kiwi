@@ -68,6 +68,8 @@ jobs:
         KIWI_ARCH_TYPE=sse4_1 ./build/kiwi-cli-* -m ./ModelGenerator -e -o test.out kowiki1000.txt
         KIWI_ARCH_TYPE=avx2 ./build/kiwi-cli-* -m ./ModelGenerator -e -o test.out kowiki1000.txt
         KIWI_ARCH_TYPE=avx512bw ./build/kiwi-cli-* -m ./ModelGenerator -e -o test.out kowiki1000.txt
+        KIWI_ARCH_TYPE=avx512bw ./build/kiwi-cli-* -m ./ModelGenerator -e -o test.out --sbg kowiki1000.txt
+        KIWI_ARCH_TYPE=avx512bw ./build/kiwi-cli-* -m ./ModelGenerator -e -o test.out --typos 6 kowiki1000.txt
     - name: Archive binaries
       uses: actions/upload-artifact@v2
       with:
