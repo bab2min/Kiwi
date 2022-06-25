@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <cmath>
 #include <kiwi/Types.h>
 #include <kiwi/FixedVector.hpp>
 

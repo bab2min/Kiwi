@@ -206,14 +206,29 @@ namespace kiwi
 		template<class InIt, class OutIt, class IdxTy = size_t, class Cmp = detail::Less>
 		void sortWriteIdx(InIt first, InIt last, OutIt dest, IdxTy startIdx = 0, Cmp cmp = {})
 		{
-			std::vector<detail::MovingPair<typename InIt::reference, typename OutIt::reference>> sorter;
+			/*std::vector<detail::MovingPair<typename InIt::reference, typename OutIt::reference>> sorter;
 			for (IdxTy i = startIdx; first != last; ++first, ++dest, ++i)
 			{
 				*dest = i;
 				sorter.emplace_back(*first, *dest);
 			}
 
-			std::sort(detail::makeRefIdxIterator(sorter.begin()), detail::makeRefIdxIterator(sorter.end()), cmp);
+			std::sort(detail::makeRefIdxIterator(sorter.begin()), detail::makeRefIdxIterator(sorter.end()), cmp);*/
+
+			std::vector<std::pair<typename InIt::value_type, typename OutIt::value_type>> sorter;
+			auto ofirst = first;
+			auto odest = dest;
+			for (IdxTy i = startIdx; first != last; ++first, ++dest, ++i)
+			{
+				*dest = i;
+				sorter.emplace_back(std::move(*first), std::move(*dest));
+			}
+			std::sort(sorter.begin(), sorter.end());
+			for (auto& p : sorter)
+			{
+				*ofirst++ = std::move(p.first);
+				*odest++ = std::move(p.second);
+			}
 		}
 
 		template<class InIt, class OutIt, class IdxTy = size_t, class Cmp = detail::Less>
@@ -231,7 +246,6 @@ namespace kiwi
 				dest[sorter[i].second - startIdx] = i + startIdx;
 			}
 		}
-
 
 		template<class Ty>
 		class ContainerSearcher

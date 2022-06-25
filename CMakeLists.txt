@@ -135,7 +135,7 @@ if (CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)|(amd64)|(AMD64)")
     set_source_files_properties(src/archImpl/avx2.cpp PROPERTIES COMPILE_FLAGS "-mavx2 -mfma")
     set_source_files_properties(src/archImpl/avx512bw.cpp PROPERTIES COMPILE_FLAGS "-mavx512f -mavx512bw")
   endif()
-elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "(arm)|(ARM)|(AARCH)")
+elseif (HOST_ARCHITECTURE MATCHES "^arm64" OR CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm|aarch64)")
   set( CORE_SRCS 
     ${CORE_SRCS}
     src/archImpl/neon.cpp

@@ -105,10 +105,10 @@ namespace kiwi
 			FrozenTrie(const ContinuousTrie<TrieNode>& trie, ArchTypeHolder<archType>, Xform xform = {});
 
 			FrozenTrie(const FrozenTrie& o);
-			FrozenTrie(FrozenTrie&&) = default;
+			FrozenTrie(FrozenTrie&&) noexcept = default;
 
 			FrozenTrie& operator=(const FrozenTrie& o);
-			FrozenTrie& operator=(FrozenTrie&& o) = default;
+			FrozenTrie& operator=(FrozenTrie&& o) noexcept = default;
 
 			bool empty() const { return !numNodes; }
 			size_t size() const { return numNodes; }

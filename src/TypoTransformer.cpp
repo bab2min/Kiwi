@@ -433,103 +433,106 @@ TypoCandidates<true> PreparedTypoTransformer::generate(const u16string& orig, fl
 }
 
 
-template class TypoCandidates<true>;
-template class TypoCandidates<false>;
-template class TypoIterator<true>;
-template class TypoIterator<false>;
+namespace kiwi
+{
+	template class TypoCandidates<true>;
+	template class TypoCandidates<false>;
+	template class TypoIterator<true>;
+	template class TypoIterator<false>;
 
-template TypoCandidates<true> PreparedTypoTransformer::_generate<true>(const KString&, float) const;
-template TypoCandidates<false> PreparedTypoTransformer::_generate<false>(const KString&, float) const;
+	template TypoCandidates<true> PreparedTypoTransformer::_generate<true>(const KString&, float) const;
+	template TypoCandidates<false> PreparedTypoTransformer::_generate<false>(const KString&, float) const;
 
-const TypoTransformer kiwi::withoutTypo;
+	const TypoTransformer withoutTypo;
 
-const TypoTransformer kiwi::basicTypoSet = {
-	{ {u"ㅐ", u"ㅔ"}, {u"ㅐ", u"ㅔ"}, 1.f, CondVowel::none },
-	{ {u"ㅐ", u"ㅔ"}, {u"ㅒ", u"ㅖ"}, 1.5f, CondVowel::none },
-	{ {u"ㅒ", u"ㅖ"}, {u"ㅐ", u"ㅔ"}, 1.5f, CondVowel::none },
-	{ {u"ㅒ", u"ㅖ"}, {u"ㅒ", u"ㅖ"}, 1.f, CondVowel::none },
-	{ {u"ㅚ", u"ㅙ", u"ㅞ"}, {u"ㅚ", u"ㅙ", u"ㅞ", u"ㅐ", u"ㅔ"}, 1.f, CondVowel::none },
-	{ {u"ㅝ"}, {u"ㅗ", u"ㅓ"}, 1.f, CondVowel::none },
-	{ {u"ㅟ"}, {u"ㅣ"}, 1.f, CondVowel::none },
-	{ {u"ㅢ"}, {u"ㅣ"}, 1.f, CondVowel::none },
-	{ {u"위", u"의"}, {u"이"}, INFINITY, CondVowel::none}, // 이->위, 이->의 과도교정 배제
-	{ {u"자", u"쟈"}, {u"자", u"쟈"}, 1.f, CondVowel::none },
-	{ {u"재", u"쟤"}, {u"재", u"쟤"}, 1.f, CondVowel::none },
-	{ {u"저", u"져"}, {u"저", u"져"}, 1.f, CondVowel::none },
-	{ {u"제", u"졔"}, {u"제", u"졔"}, 1.f, CondVowel::none },
-	{ {u"조", u"죠", u"줘"}, {u"조", u"죠", u"줘"}, 1.f, CondVowel::none },
-	{ {u"주", u"쥬"}, {u"주", u"쥬"}, 1.f, CondVowel::none },
-	{ {u"차", u"챠"}, {u"차", u"챠"}, 1.f, CondVowel::none },
-	{ {u"채", u"챼"}, {u"채", u"챼"}, 1.f, CondVowel::none },
-	{ {u"처", u"쳐"}, {u"처", u"쳐"}, 1.f, CondVowel::none },
-	{ {u"체", u"쳬"}, {u"체", u"쳬"}, 1.f, CondVowel::none },
-	{ {u"초", u"쵸", u"춰"}, {u"초", u"쵸", u"춰"}, 1.f, CondVowel::none },
-	{ {u"추", u"츄"}, {u"추", u"츄"}, 1.f, CondVowel::none },
-	{ {u"유", u"류"}, {u"유", u"류"}, 1.f, CondVowel::none },
-	{ {u"므", u"무"}, {u"므", u"무"}, 1.f, CondVowel::none },
-	{ {u"브", u"부"}, {u"브", u"부"}, 1.f, CondVowel::none },
-	{ {u"프", u"푸"}, {u"프", u"푸"}, 1.f, CondVowel::none },
-	{ {u"르", u"루"}, {u"르", u"루"}, 1.f, CondVowel::none },
-	{ {u"러", u"뤄"}, {u"러", u"뤄"}, 1.f, CondVowel::none },
-	{ {u"ᆩ", u"ᆪ"}, {u"ᆨ", u"ᆩ", u"ᆪ"}, 1.5f, CondVowel::none },
-	{ {u"ᆬ", u"ᆭ"}, {u"ᆫ", u"ᆬ", u"ᆭ"}, 1.5f, CondVowel::none },
-	{ {u"ᆰ", u"ᆱ", u"ᆲ", u"ᆳ", u"ᆴ", u"ᆵ", u"ᆶ"}, {u"ᆯ", u"ᆰ", u"ᆱ", u"ᆲ", u"ᆳ", u"ᆴ", u"ᆵ", u"ᆶ"}, 1.5f, CondVowel::none },
-	{ {u"ᆺ", u"ᆻ"}, {u"ᆺ", u"ᆻ"}, 1.f, CondVowel::none },
+	const TypoTransformer basicTypoSet = {
+		{ {u"ㅐ", u"ㅔ"}, {u"ㅐ", u"ㅔ"}, 1.f, CondVowel::none },
+		{ {u"ㅐ", u"ㅔ"}, {u"ㅒ", u"ㅖ"}, 1.5f, CondVowel::none },
+		{ {u"ㅒ", u"ㅖ"}, {u"ㅐ", u"ㅔ"}, 1.5f, CondVowel::none },
+		{ {u"ㅒ", u"ㅖ"}, {u"ㅒ", u"ㅖ"}, 1.f, CondVowel::none },
+		{ {u"ㅚ", u"ㅙ", u"ㅞ"}, {u"ㅚ", u"ㅙ", u"ㅞ", u"ㅐ", u"ㅔ"}, 1.f, CondVowel::none },
+		{ {u"ㅝ"}, {u"ㅗ", u"ㅓ"}, 1.f, CondVowel::none },
+		{ {u"ㅟ"}, {u"ㅣ"}, 1.f, CondVowel::none },
+		{ {u"ㅢ"}, {u"ㅣ"}, 1.f, CondVowel::none },
+		{ {u"위", u"의"}, {u"이"}, INFINITY, CondVowel::none}, // 이->위, 이->의 과도교정 배제
+		{ {u"자", u"쟈"}, {u"자", u"쟈"}, 1.f, CondVowel::none },
+		{ {u"재", u"쟤"}, {u"재", u"쟤"}, 1.f, CondVowel::none },
+		{ {u"저", u"져"}, {u"저", u"져"}, 1.f, CondVowel::none },
+		{ {u"제", u"졔"}, {u"제", u"졔"}, 1.f, CondVowel::none },
+		{ {u"조", u"죠", u"줘"}, {u"조", u"죠", u"줘"}, 1.f, CondVowel::none },
+		{ {u"주", u"쥬"}, {u"주", u"쥬"}, 1.f, CondVowel::none },
+		{ {u"차", u"챠"}, {u"차", u"챠"}, 1.f, CondVowel::none },
+		{ {u"채", u"챼"}, {u"채", u"챼"}, 1.f, CondVowel::none },
+		{ {u"처", u"쳐"}, {u"처", u"쳐"}, 1.f, CondVowel::none },
+		{ {u"체", u"쳬"}, {u"체", u"쳬"}, 1.f, CondVowel::none },
+		{ {u"초", u"쵸", u"춰"}, {u"초", u"쵸", u"춰"}, 1.f, CondVowel::none },
+		{ {u"추", u"츄"}, {u"추", u"츄"}, 1.f, CondVowel::none },
+		{ {u"유", u"류"}, {u"유", u"류"}, 1.f, CondVowel::none },
+		{ {u"므", u"무"}, {u"므", u"무"}, 1.f, CondVowel::none },
+		{ {u"브", u"부"}, {u"브", u"부"}, 1.f, CondVowel::none },
+		{ {u"프", u"푸"}, {u"프", u"푸"}, 1.f, CondVowel::none },
+		{ {u"르", u"루"}, {u"르", u"루"}, 1.f, CondVowel::none },
+		{ {u"러", u"뤄"}, {u"러", u"뤄"}, 1.f, CondVowel::none },
+		{ {u"ᆩ", u"ᆪ"}, {u"ᆨ", u"ᆩ", u"ᆪ"}, 1.5f, CondVowel::none },
+		{ {u"ᆬ", u"ᆭ"}, {u"ᆫ", u"ᆬ", u"ᆭ"}, 1.5f, CondVowel::none },
+		{ {u"ᆰ", u"ᆱ", u"ᆲ", u"ᆳ", u"ᆴ", u"ᆵ", u"ᆶ"}, {u"ᆯ", u"ᆰ", u"ᆱ", u"ᆲ", u"ᆳ", u"ᆴ", u"ᆵ", u"ᆶ"}, 1.5f, CondVowel::none },
+		{ {u"ᆺ", u"ᆻ"}, {u"ᆺ", u"ᆻ"}, 1.f, CondVowel::none },
 
-	{ {u"안"}, {u"않"}, 1.5f, CondVowel::none },
-	{ {u"맞추", u"맞히"}, {u"맞추", u"맞히"}, 1.5f, CondVowel::none },
-	{ {u"맞춰", u"맞혀"}, {u"맞춰", u"맞혀"}, 1.5f, CondVowel::none },
-	{ {u"받치", u"바치", u"받히"}, {u"받치", u"바치", u"받히"}, 1.5f, CondVowel::none },
-	{ {u"받쳐", u"바쳐", u"받혀"}, {u"받쳐", u"바쳐", u"받혀"}, 1.5f, CondVowel::none },
-	{ {u"던", u"든"}, {u"던", u"든"}, 1.f, CondVowel::none },
-	{ {u"때", u"데"}, {u"때", u"데"}, 1.5f, CondVowel::none },
-	{ {u"빛", u"빚"}, {u"빛", u"빚"}, 1.f, CondVowel::none },
+		{ {u"안"}, {u"않"}, 1.5f, CondVowel::none },
+		{ {u"맞추", u"맞히"}, {u"맞추", u"맞히"}, 1.5f, CondVowel::none },
+		{ {u"맞춰", u"맞혀"}, {u"맞춰", u"맞혀"}, 1.5f, CondVowel::none },
+		{ {u"받치", u"바치", u"받히"}, {u"받치", u"바치", u"받히"}, 1.5f, CondVowel::none },
+		{ {u"받쳐", u"바쳐", u"받혀"}, {u"받쳐", u"바쳐", u"받혀"}, 1.5f, CondVowel::none },
+		{ {u"던", u"든"}, {u"던", u"든"}, 1.f, CondVowel::none },
+		{ {u"때", u"데"}, {u"때", u"데"}, 1.5f, CondVowel::none },
+		{ {u"빛", u"빚"}, {u"빛", u"빚"}, 1.f, CondVowel::none },
 
-	{ {u"ᆮ이", u"지"}, {u"ᆮ이", u"지"}, 1.f, CondVowel::none },
-	{ {u"ᆮ여", u"져"}, {u"ᆮ여", u"져"}, 1.f, CondVowel::none },
-	{ {u"ᇀ이", u"치"}, {u"ᇀ이", u"치"}, 1.f, CondVowel::none },
-	{ {u"ᇀ여", u"쳐"}, {u"ᇀ여", u"쳐"}, 1.f, CondVowel::none },
-	
-	{ {u"ᄀ", u"ᄁ"}, {u"ᄀ", u"ᄁ"}, 1.f, CondVowel::applosive },
-	{ {u"ᄃ", u"ᄄ"}, {u"ᄃ", u"ᄄ"}, 1.f, CondVowel::applosive },
-	{ {u"ᄇ", u"ᄈ"}, {u"ᄇ", u"ᄈ"}, 1.f, CondVowel::applosive },
-	{ {u"ᄉ", u"ᄊ"}, {u"ᄉ", u"ᄊ"}, 1.f, CondVowel::applosive },
-	{ {u"ᄌ", u"ᄍ"}, {u"ᄌ", u"ᄍ"}, 1.f, CondVowel::applosive },
+		{ {u"ᆮ이", u"지"}, {u"ᆮ이", u"지"}, 1.f, CondVowel::none },
+		{ {u"ᆮ여", u"져"}, {u"ᆮ여", u"져"}, 1.f, CondVowel::none },
+		{ {u"ᇀ이", u"치"}, {u"ᇀ이", u"치"}, 1.f, CondVowel::none },
+		{ {u"ᇀ여", u"쳐"}, {u"ᇀ여", u"쳐"}, 1.f, CondVowel::none },
+		
+		{ {u"ᄀ", u"ᄁ"}, {u"ᄀ", u"ᄁ"}, 1.f, CondVowel::applosive },
+		{ {u"ᄃ", u"ᄄ"}, {u"ᄃ", u"ᄄ"}, 1.f, CondVowel::applosive },
+		{ {u"ᄇ", u"ᄈ"}, {u"ᄇ", u"ᄈ"}, 1.f, CondVowel::applosive },
+		{ {u"ᄉ", u"ᄊ"}, {u"ᄉ", u"ᄊ"}, 1.f, CondVowel::applosive },
+		{ {u"ᄌ", u"ᄍ"}, {u"ᄌ", u"ᄍ"}, 1.f, CondVowel::applosive },
 
-	{ {u"ᇂᄒ", u"ᆨᄒ", u"ᇂᄀ"}, {u"ᇂᄒ", u"ᆨᄒ", u"ᇂᄀ"}, 1.f, CondVowel::none},
+		{ {u"ᇂᄒ", u"ᆨᄒ", u"ᇂᄀ"}, {u"ᇂᄒ", u"ᆨᄒ", u"ᇂᄀ"}, 1.f, CondVowel::none},
 
-	{ {u"ᆨᄂ", u"ᆩᄂ", u"ᆪᄂ", u"ᆿᄂ", u"ᆼᄂ"}, {u"ᆨᄂ", u"ᆩᄂ", u"ᆪᄂ", u"ᆿᄂ", u"ᆼᄂ"}, 1.f, CondVowel::none },
-	{ {u"ᆨᄆ", u"ᆩᄆ", u"ᆪᄆ", u"ᆿᄆ", u"ᆼᄆ"}, {u"ᆨᄆ", u"ᆩᄆ", u"ᆪᄆ", u"ᆿᄆ", u"ᆼᄆ"}, 1.f, CondVowel::none },
-	{ {u"ᆨᄅ", u"ᆩᄅ", u"ᆪᄅ", u"ᆿᄅ", u"ᆼᄅ", u"ᆼᄂ",}, {u"ᆨᄅ", u"ᆩᄅ", u"ᆪᄅ", u"ᆿᄅ", u"ᆼᄅ", u"ᆼᄂ",}, 1.f, CondVowel::none },
-	{ {u"ᆮᄂ", u"ᆺᄂ", u"ᆻᄂ", u"ᆽᄂ", u"ᆾᄂ", u"ᇀᄂ", u"ᆫᄂ"}, {u"ᆮᄂ", u"ᆺᄂ", u"ᆻᄂ", u"ᆽᄂ", u"ᆾᄂ", u"ᇀᄂ", u"ᆫᄂ"}, 1.f, CondVowel::none },
-	{ {u"ᆮᄆ", u"ᆺᄆ", u"ᆻᄆ", u"ᆽᄆ", u"ᆾᄆ", u"ᇀᄆ", u"ᆫᄆ"}, {u"ᆮᄆ", u"ᆺᄆ", u"ᆻᄆ", u"ᆽᄆ", u"ᆾᄆ", u"ᇀᄆ", u"ᆫᄆ"}, 1.f, CondVowel::none },
-	{ {u"ᆮᄅ", u"ᆺᄅ", u"ᆻᄅ", u"ᆽᄅ", u"ᆾᄅ", u"ᇀᄅ", u"ᆫᄅ", u"ᆫᄂ",}, {u"ᆮᄅ", u"ᆺᄅ", u"ᆻᄅ", u"ᆽᄅ", u"ᆾᄅ", u"ᇀᄅ", u"ᆫᄅ", u"ᆫᄂ",}, 1.f, CondVowel::none },
-	{ {u"ᆸᄂ", u"ᆹᄂ", u"ᇁᄂ", u"ᆷᄂ"}, {u"ᆸᄂ", u"ᆹᄂ", u"ᇁᄂ", u"ᆷᄂ"}, 1.f, CondVowel::none },
-	{ {u"ᆸᄆ", u"ᆹᄆ", u"ᇁᄆ", u"ᆷᄆ"}, {u"ᆸᄆ", u"ᆹᄆ", u"ᇁᄆ", u"ᆷᄆ"}, 1.f, CondVowel::none },
-	{ {u"ᆸᄅ", u"ᆹᄅ", u"ᇁᄅ", u"ᆷᄅ", u"ᆷᄂ",}, {u"ᆸᄅ", u"ᆹᄅ", u"ᇁᄅ", u"ᆷᄅ", u"ᆷᄂ",}, 1.f, CondVowel::none },
-	{ {u"ᆫᄅ", u"ᆫᄂ", u"ᆯᄅ", u"ᆯᄂ"}, {u"ᆫᄅ", u"ᆫᄂ", u"ᆯᄅ", u"ᆯᄂ"}, 1.f, CondVowel::none },
-	
-	{ {u"ᆨᄋ", u"ᄀ"}, {u"ᆨᄋ", u"ᄀ"}, 1.f, CondVowel::vowel },
-	{ {u"ᆩᄋ", u"ᄁ"}, {u"ᆩᄋ", u"ᄁ"}, 1.f, CondVowel::vowel },
-	{ {u"ᆫᄋ", u"ᆫᄒ", u"ᄂ"}, {u"ᆫᄋ", u"ᆫᄒ", u"ᄂ"}, 1.f, CondVowel::vowel },
-	{ {u"ᆬᄋ", u"ᆫᄌ"}, {u"ᆬᄋ", u"ᆫᄌ"}, 1.f, CondVowel::vowel },
-	{ {u"ᆭᄋ", u"ᄂ"}, {u"ᆭᄋ", u"ᄂ"}, 1.f, CondVowel::vowel },
-	{ {u"ᆮᄋ", u"ᄃ"}, {u"ᆮᄋ", u"ᄃ"}, 1.f, CondVowel::vowel },
-	{ {u"ᆯᄋ", u"ᆯᄒ", u"ᄅ"}, {u"ᆯᄋ", u"ᆯᄒ", u"ᄅ"}, 1.f, CondVowel::vowel },
-	{ {u"ᆰᄋ", u"ᆯᄀ"}, {u"ᆰᄋ", u"ᆯᄀ"}, 1.f, CondVowel::vowel },
-	{ {u"ᆰᄒ", u"ᆯᄏ"}, {u"ᆰᄒ", u"ᆯᄏ"}, 1.f, CondVowel::vowel },
-	{ {u"ᆷᄋ", u"ᄆ"}, {u"ᆷᄋ", u"ᄆ"}, 1.f, CondVowel::vowel },
-	{ {u"ᆸᄋ", u"ᄇ"}, {u"ᆸᄋ", u"ᄇ"}, 1.f, CondVowel::vowel },
-	{ {u"ᆺᄋ", u"ᄉ"}, {u"ᆺᄋ", u"ᄉ"}, 1.f, CondVowel::vowel },
-	{ {u"ᆻᄋ", u"ᆺᄉ", u"ᄊ"}, {u"ᆻᄋ", u"ᆺᄉ", u"ᄊ"}, 1.f, CondVowel::vowel },
-	{ {u"ᆽᄋ", u"ᄌ"}, {u"ᆽᄋ", u"ᄌ"}, 1.f, CondVowel::vowel },
-	{ {u"ᆾᄋ", u"ᆾᄒ", u"ᆽᄒ", u"ᄎ"}, {u"ᆾᄋ", u"ᆾᄒ", u"ᆽᄒ", u"ᄎ"}, 1.f, CondVowel::vowel },
-	{ {u"ᆿᄋ", u"ᆿᄒ", u"ᆨᄒ", u"ᄏ"}, {u"ᆿᄋ", u"ᆿᄒ", u"ᆨᄒ", u"ᄏ"}, 1.f, CondVowel::vowel },
-	{ {u"ᇀᄋ", u"ᇀᄒ", u"ᆮᄒ", u"ᄐ"}, {u"ᇀᄋ", u"ᇀᄒ", u"ᆮᄒ", u"ᄐ"}, 1.f, CondVowel::vowel },
-	{ {u"ᇁᄋ", u"ᇁᄒ", u"ᆸᄒ", u"ᄑ"}, {u"ᇁᄋ", u"ᇁᄒ", u"ᆸᄒ", u"ᄑ"}, 1.f, CondVowel::vowel },
+		{ {u"ᆨᄂ", u"ᆩᄂ", u"ᆪᄂ", u"ᆿᄂ", u"ᆼᄂ"}, {u"ᆨᄂ", u"ᆩᄂ", u"ᆪᄂ", u"ᆿᄂ", u"ᆼᄂ"}, 1.f, CondVowel::none },
+		{ {u"ᆨᄆ", u"ᆩᄆ", u"ᆪᄆ", u"ᆿᄆ", u"ᆼᄆ"}, {u"ᆨᄆ", u"ᆩᄆ", u"ᆪᄆ", u"ᆿᄆ", u"ᆼᄆ"}, 1.f, CondVowel::none },
+		{ {u"ᆨᄅ", u"ᆩᄅ", u"ᆪᄅ", u"ᆿᄅ", u"ᆼᄅ", u"ᆼᄂ",}, {u"ᆨᄅ", u"ᆩᄅ", u"ᆪᄅ", u"ᆿᄅ", u"ᆼᄅ", u"ᆼᄂ",}, 1.f, CondVowel::none },
+		{ {u"ᆮᄂ", u"ᆺᄂ", u"ᆻᄂ", u"ᆽᄂ", u"ᆾᄂ", u"ᇀᄂ", u"ᆫᄂ"}, {u"ᆮᄂ", u"ᆺᄂ", u"ᆻᄂ", u"ᆽᄂ", u"ᆾᄂ", u"ᇀᄂ", u"ᆫᄂ"}, 1.f, CondVowel::none },
+		{ {u"ᆮᄆ", u"ᆺᄆ", u"ᆻᄆ", u"ᆽᄆ", u"ᆾᄆ", u"ᇀᄆ", u"ᆫᄆ"}, {u"ᆮᄆ", u"ᆺᄆ", u"ᆻᄆ", u"ᆽᄆ", u"ᆾᄆ", u"ᇀᄆ", u"ᆫᄆ"}, 1.f, CondVowel::none },
+		{ {u"ᆮᄅ", u"ᆺᄅ", u"ᆻᄅ", u"ᆽᄅ", u"ᆾᄅ", u"ᇀᄅ", u"ᆫᄅ", u"ᆫᄂ",}, {u"ᆮᄅ", u"ᆺᄅ", u"ᆻᄅ", u"ᆽᄅ", u"ᆾᄅ", u"ᇀᄅ", u"ᆫᄅ", u"ᆫᄂ",}, 1.f, CondVowel::none },
+		{ {u"ᆸᄂ", u"ᆹᄂ", u"ᇁᄂ", u"ᆷᄂ"}, {u"ᆸᄂ", u"ᆹᄂ", u"ᇁᄂ", u"ᆷᄂ"}, 1.f, CondVowel::none },
+		{ {u"ᆸᄆ", u"ᆹᄆ", u"ᇁᄆ", u"ᆷᄆ"}, {u"ᆸᄆ", u"ᆹᄆ", u"ᇁᄆ", u"ᆷᄆ"}, 1.f, CondVowel::none },
+		{ {u"ᆸᄅ", u"ᆹᄅ", u"ᇁᄅ", u"ᆷᄅ", u"ᆷᄂ",}, {u"ᆸᄅ", u"ᆹᄅ", u"ᇁᄅ", u"ᆷᄅ", u"ᆷᄂ",}, 1.f, CondVowel::none },
+		{ {u"ᆫᄅ", u"ᆫᄂ", u"ᆯᄅ", u"ᆯᄂ"}, {u"ᆫᄅ", u"ᆫᄂ", u"ᆯᄅ", u"ᆯᄂ"}, 1.f, CondVowel::none },
+		
+		{ {u"ᆨᄋ", u"ᄀ"}, {u"ᆨᄋ", u"ᄀ"}, 1.f, CondVowel::vowel },
+		{ {u"ᆩᄋ", u"ᄁ"}, {u"ᆩᄋ", u"ᄁ"}, 1.f, CondVowel::vowel },
+		{ {u"ᆫᄋ", u"ᆫᄒ", u"ᄂ"}, {u"ᆫᄋ", u"ᆫᄒ", u"ᄂ"}, 1.f, CondVowel::vowel },
+		{ {u"ᆬᄋ", u"ᆫᄌ"}, {u"ᆬᄋ", u"ᆫᄌ"}, 1.f, CondVowel::vowel },
+		{ {u"ᆭᄋ", u"ᄂ"}, {u"ᆭᄋ", u"ᄂ"}, 1.f, CondVowel::vowel },
+		{ {u"ᆮᄋ", u"ᄃ"}, {u"ᆮᄋ", u"ᄃ"}, 1.f, CondVowel::vowel },
+		{ {u"ᆯᄋ", u"ᆯᄒ", u"ᄅ"}, {u"ᆯᄋ", u"ᆯᄒ", u"ᄅ"}, 1.f, CondVowel::vowel },
+		{ {u"ᆰᄋ", u"ᆯᄀ"}, {u"ᆰᄋ", u"ᆯᄀ"}, 1.f, CondVowel::vowel },
+		{ {u"ᆰᄒ", u"ᆯᄏ"}, {u"ᆰᄒ", u"ᆯᄏ"}, 1.f, CondVowel::vowel },
+		{ {u"ᆷᄋ", u"ᄆ"}, {u"ᆷᄋ", u"ᄆ"}, 1.f, CondVowel::vowel },
+		{ {u"ᆸᄋ", u"ᄇ"}, {u"ᆸᄋ", u"ᄇ"}, 1.f, CondVowel::vowel },
+		{ {u"ᆺᄋ", u"ᄉ"}, {u"ᆺᄋ", u"ᄉ"}, 1.f, CondVowel::vowel },
+		{ {u"ᆻᄋ", u"ᆺᄉ", u"ᄊ"}, {u"ᆻᄋ", u"ᆺᄉ", u"ᄊ"}, 1.f, CondVowel::vowel },
+		{ {u"ᆽᄋ", u"ᄌ"}, {u"ᆽᄋ", u"ᄌ"}, 1.f, CondVowel::vowel },
+		{ {u"ᆾᄋ", u"ᆾᄒ", u"ᆽᄒ", u"ᄎ"}, {u"ᆾᄋ", u"ᆾᄒ", u"ᆽᄒ", u"ᄎ"}, 1.f, CondVowel::vowel },
+		{ {u"ᆿᄋ", u"ᆿᄒ", u"ᆨᄒ", u"ᄏ"}, {u"ᆿᄋ", u"ᆿᄒ", u"ᆨᄒ", u"ᄏ"}, 1.f, CondVowel::vowel },
+		{ {u"ᇀᄋ", u"ᇀᄒ", u"ᆮᄒ", u"ᄐ"}, {u"ᇀᄋ", u"ᇀᄒ", u"ᆮᄒ", u"ᄐ"}, 1.f, CondVowel::vowel },
+		{ {u"ᇁᄋ", u"ᇁᄒ", u"ᆸᄒ", u"ᄑ"}, {u"ᇁᄋ", u"ᇁᄒ", u"ᆸᄒ", u"ᄑ"}, 1.f, CondVowel::vowel },
 
-	{ {u"은", u"는"}, {u"은", u"는"}, 2.f, CondVowel::none },
-	{ {u"을", u"를"}, {u"을", u"를"}, 2.f, CondVowel::none },
+		{ {u"은", u"는"}, {u"은", u"는"}, 2.f, CondVowel::none },
+		{ {u"을", u"를"}, {u"을", u"를"}, 2.f, CondVowel::none },
 
-	{ {u"ㅣ워", u"ㅣ어", u"ㅕ"}, {u"ㅣ워", u"ㅣ어", u"ㅕ"}, 1.5f, CondVowel::none},
-};
+		{ {u"ㅣ워", u"ㅣ어", u"ㅕ"}, {u"ㅣ워", u"ㅣ어", u"ㅕ"}, 1.5f, CondVowel::none},
+	};
+}
