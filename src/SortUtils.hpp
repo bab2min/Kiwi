@@ -234,7 +234,7 @@ namespace kiwi
 		template<class InIt, class OutIt, class IdxTy = size_t, class Cmp = detail::Less>
 		void sortWriteInvIdx(InIt first, InIt last, OutIt dest, IdxTy startIdx = 0, Cmp cmp = {})
 		{
-			std::vector<detail::MovingPair<typename InIt::reference, IdxTy>> sorter;
+			/*std::vector<detail::MovingPair<typename InIt::reference, IdxTy>> sorter;
 			for (IdxTy i = startIdx; first != last; ++first, ++i)
 			{
 				sorter.emplace_back(*first, i);
@@ -243,6 +243,19 @@ namespace kiwi
 			std::sort(detail::makeRefIdxIterator(sorter.begin()), detail::makeRefIdxIterator(sorter.end()), cmp);
 			for (size_t i = 0; i < sorter.size(); ++i)
 			{
+				dest[sorter[i].second - startIdx] = i + startIdx;
+			}*/
+
+			std::vector<std::pair<typename InIt::value_type, IdxTy>> sorter;
+			auto ofirst = first;
+			for (IdxTy i = startIdx; first != last; ++first, ++i)
+			{
+				sorter.emplace_back(std::move(*first), i);
+			}
+			std::sort(sorter.begin(), sorter.end());
+			for (size_t i = 0; i < sorter.size(); ++i)
+			{
+				*ofirst++ = std::move(sorter[i].first);
 				dest[sorter[i].second - startIdx] = i + startIdx;
 			}
 		}

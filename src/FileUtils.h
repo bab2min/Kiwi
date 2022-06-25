@@ -19,7 +19,7 @@ namespace kiwi
 			f.open(filePath, mode);
 #endif
 		}
-		catch (std::ios_base::failure& e)
+		catch (const std::ios_base::failure&)
 		{
 			throw Exception{ "Cannot open file : " + filePath };
 		}

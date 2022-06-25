@@ -70,8 +70,8 @@ namespace kiwi
 			MMap(const MMap&) = delete;
 			MMap& operator=(const MMap&) = delete;
 
-			MMap(MMap&&) = default;
-			MMap& operator=(MMap&&) = default;
+			MMap(MMap&&) noexcept = default;
+			MMap& operator=(MMap&&) noexcept = default;
 
 			~MMap()
 			{
@@ -241,7 +241,7 @@ namespace kiwi
 			MemoryObject(Ty&& _obj) : obj{ std::make_shared<Model<typename std::remove_reference<Ty>::type>>(std::forward<Ty>(_obj)) } {}
 
 			MemoryObject(const MemoryObject&) = default;
-			MemoryObject(MemoryObject&&) = default;
+			MemoryObject(MemoryObject&&) noexcept = default;
 
 			const void* get() const { return obj->get(); }
 			size_t size() const { return obj->size(); }
