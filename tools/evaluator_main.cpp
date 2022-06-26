@@ -22,6 +22,7 @@ int doEvaluate(const string& modelPath, const string& output, const vector<strin
 		kw.setTypoCostWeight(typoCostWeight);
 		
 		cout << "Loading Time : " << timer.getElapsed() << " ms" << endl;
+		cout << "ArchType : " << archToStr(kw.archType()) << endl;
 		cout << "LM Size : " << (kw.getKnLM()->getMemory().size() / 1024. / 1024.) << " MB" << endl;
 		cout << "Mem Usage : " << (tutils::getCurrentPhysicalMemoryUsage() / 1024.) << " MB\n" << endl;
 		
