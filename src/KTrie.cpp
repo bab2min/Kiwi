@@ -463,10 +463,11 @@ Vector<KGraphNode> KGraphNode::removeUnconnected(const Vector<KGraphNode>& graph
 				if (connectedList[j])
 				{
 					connected = true;
-					break;
+					goto break_2;
 				}
 			}
 		}
+		break_2:
 		connectedList[i] = (connectedList[i] && connected) ? 1 : 0;
 	}
 	size_t connectedCnt = accumulate(connectedList.begin(), connectedList.end(), 0);
@@ -488,7 +489,11 @@ Vector<KGraphNode> KGraphNode::removeUnconnected(const Vector<KGraphNode>& graph
 		ret.emplace_back(graph[i]);
 		auto& newNode = ret.back();
 		if (newNode.prev) newNode.prev -= newIndexDiff[i] - newIndexDiff[i - newNode.prev];
-		if (newNode.sibling) newNode.sibling -= newIndexDiff[i + newNode.sibling] - newIndexDiff[i];
+		if (newNode.sibling)
+		{
+			if (connectedList[i + newNode.sibling]) newNode.sibling -= newIndexDiff[i + newNode.sibling] - newIndexDiff[i];
+			else newNode.sibling = 0;
+		}
 	}
 	return ret;
 }

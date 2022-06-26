@@ -106,4 +106,9 @@ TEST(KiwiTypo, AnalyzeBasicTypoSet)
 	o = kiwi.analyze(u"맗은 믈을 마셧다!", Match::allWithNormalizing);
 	c = typoKiwi.analyze(u"맗은 믈을 마셧다!", Match::allWithNormalizing);
 	EXPECT_TRUE(o.second < c.second);
+
+	o = kiwi.analyze(u"Wertheimer)가 자신의 논문 <운동지각에 관한 실험연구>(Experimental studies on the perception of movement)을 통해 일상적인 지각 현상에 대한 새로운 시각을 제시한 시기이다.",
+		Match::allWithNormalizing);
+	c = typoKiwi.analyze(u"Wertheimer)가 자신의 논문 <운동지각에 관한 실험연구>(Experimental studies on the perception of movement)을 통해 일상적인 지각 현상에 대한 새로운 시각을 제시한 시기이다.",
+		Match::allWithNormalizing);
 }

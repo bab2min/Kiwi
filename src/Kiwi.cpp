@@ -487,6 +487,7 @@ namespace kiwi
 		size_t vocabSize = langMdl.knlm->getHeader().vocab_size;
 		for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
 		{
+			assert(prev != node);
 			for (auto& p : cache[prev - startNode])
 			{
 				const auto* wids = &p.morphs;
@@ -577,7 +578,7 @@ namespace kiwi
 		bool unknownForm
 	)
 	{
-		const size_t langVocabSize = kw->langMdl.knlm->getHeader().vocab_size;;
+		const size_t langVocabSize = kw->langMdl.knlm->getHeader().vocab_size;
 		auto& nCache = cache[i];
 
 		float whitespaceDiscount = 0;
