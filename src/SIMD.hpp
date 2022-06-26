@@ -124,7 +124,7 @@ namespace kiwi
     }
 }
 
-#if CPUINFO_ARCH_X86 || CPUINFO_ARCH_X86_64 || KIWI_ARCH_X86 || KIWI_ARCH_X86_64
+#if defined(__x86_64__) || defined(KIWI_ARCH_X86) || defined(KIWI_ARCH_X86_64)
 #include <immintrin.h>
 namespace kiwi
 {
@@ -157,7 +157,7 @@ namespace kiwi
             static STRONG_INLINE void storef(float* a, __m128 b) { return _mm_store_ps(a, b); }
             static STRONG_INLINE __m128 maxf(__m128 a, __m128 b) { return _mm_max_ps(a, b); }
             static STRONG_INLINE __m128 minf(__m128 a, __m128 b) { return _mm_min_ps(a, b); }
-            
+
             static STRONG_INLINE __m128 absf(__m128 a)
             {
                 const __m128 mask = _mm_castsi128_ps(_mm_setr_epi32(0x7FFFFFFF, 0x7FFFFFFF, 0x7FFFFFFF, 0x7FFFFFFF));
@@ -184,7 +184,7 @@ namespace kiwi
                 return r;
             }
 
-            static STRONG_INLINE __m128 floorf(__m128 a) 
+            static STRONG_INLINE __m128 floorf(__m128 a)
             {
                 const __m128 cst_1 = set1f(1.0f);
                 __m128 tmp = rint(a);
@@ -199,7 +199,7 @@ namespace kiwi
             static STRONG_INLINE __m128 reinterpret_as_float(__m128i a) { return _mm_castsi128_ps(a); }
             template<int bit> static STRONG_INLINE __m128i sll(__m128i a) { return _mm_slli_epi32(a, bit); }
             static STRONG_INLINE float firstf(__m128 a) { return _mm_cvtss_f32(a); }
-            
+
             static STRONG_INLINE float redsumf(__m128 a)
             {
                 __m128 tmp = _mm_add_ps(a, _mm_movehl_ps(a, a));
@@ -214,8 +214,8 @@ namespace kiwi
 
             static STRONG_INLINE __m128 redmaxbf(__m128 a)
             {
-                __m128 tmp = _mm_max_ps(a, _mm_movehl_ps(a, a));
-                return _mm_max_ps(tmp, _mm_shuffle_ps(tmp, tmp, 1));
+                __m128 tmp = _mm_max_ps(a, _mm_shuffle_ps(a, a, _MM_SHUFFLE(1, 0, 3, 2)));
+                return _mm_max_ps(tmp, _mm_shuffle_ps(tmp, tmp, _MM_SHUFFLE(2, 3, 0, 1)));
             }
         };
 
@@ -256,8 +256,8 @@ namespace kiwi
 
             static STRONG_INLINE __m128 redmaxbf(__m128 a)
             {
-                __m128 tmp = _mm_max_ps(a, _mm_movehl_ps(a, a));
-                return _mm_max_ps(tmp, _mm_shuffle_ps(tmp, tmp, 1));
+                __m128 tmp = _mm_max_ps(a, _mm_shuffle_ps(a, a, _MM_SHUFFLE(1, 0, 3, 2)));
+                return _mm_max_ps(tmp, _mm_shuffle_ps(tmp, tmp, _MM_SHUFFLE(2, 3, 0, 1)));
             }
         };
 
@@ -308,10 +308,19 @@ namespace kiwi
             {
                 __m256 tmp = _mm256_max_ps(a, _mm256_permute2f128_ps(a, a, 1));
                 tmp = _mm256_max_ps(tmp, _mm256_shuffle_ps(tmp, tmp, _MM_SHUFFLE(1, 0, 3, 2)));
-                return _mm256_max_ps(tmp, _mm256_shuffle_ps(tmp, tmp, 1));
+                return _mm256_max_ps(tmp, _mm256_shuffle_ps(tmp, tmp, _MM_SHUFFLE(2, 3, 0, 1)));
             }
         };
 
+    }
+}
+#endif
+
+#if CPUINFO_ARCH_X86 || CPUINFO_ARCH_X86_64 || defined(KIWI_ARCH_X86_64)
+namespace kiwi
+{
+    namespace simd
+    {
         template<>
         struct PacketTrait<ArchType::avx512bw>
         {
@@ -425,9 +434,7 @@ namespace kiwi
 
             static STRONG_INLINE float32x4_t redmaxbf(float32x4_t a)
             {
-                float32x2_t max = vmax_f32(vget_low_f32(a), vget_high_f32(a));
-                max = vpmax_f32(max, max);
-                return vdupq_n_f32(vget_lane_f32(max, 0));
+                return set1f(redmaxf(a));
             }
         };
     }
