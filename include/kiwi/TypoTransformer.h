@@ -209,8 +209,10 @@ namespace kiwi
 		void addTypoNormalized(const KString& orig, const KString& error, float cost = 1, CondVowel leftCond = CondVowel::none);
 
 	public:
+		using TypoDef = std::tuple<std::initializer_list<const char16_t*>, std::initializer_list<const char16_t*>, float, CondVowel>;
+
 		TypoTransformer();
-		TypoTransformer(std::initializer_list<std::tuple<std::initializer_list<const char16_t*>, std::initializer_list<const char16_t*>, float, CondVowel>> lst)
+		TypoTransformer(std::initializer_list<TypoDef> lst)
 			: TypoTransformer()
 		{
 			for (auto& l : lst)

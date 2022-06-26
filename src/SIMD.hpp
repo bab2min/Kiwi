@@ -124,7 +124,7 @@ namespace kiwi
     }
 }
 
-#if defined(__x86_64__) || defined(KIWI_ARCH_X86) || defined(KIWI_ARCH_X86_64)
+#if defined(__x86_64__) || CPUINFO_ARCH_X86 || CPUINFO_ARCH_X86_64 || defined(KIWI_ARCH_X86) || defined(KIWI_ARCH_X86_64)
 #include <immintrin.h>
 namespace kiwi
 {
@@ -142,6 +142,7 @@ namespace kiwi
         struct PacketTrait<ArchType::sse4_1> : public PacketTrait<ArchType::sse2>
         {};
 
+#if defined(_MSC_VER) || defined(__SSE2__) || defined(__AVX2__)
         template<>
         class Operator<ArchType::sse2> : public OperatorBase<ArchType::sse2, Operator<ArchType::sse2>>
         {
@@ -218,7 +219,9 @@ namespace kiwi
                 return _mm_max_ps(tmp, _mm_shuffle_ps(tmp, tmp, _MM_SHUFFLE(2, 3, 0, 1)));
             }
         };
+#endif
 
+#if defined(_MSC_VER) || defined(__SSE4_1__) || defined(__AVX2__)
         template<>
         class Operator<ArchType::sse4_1> : public OperatorBase<ArchType::sse4_1, Operator<ArchType::sse4_1>>
         {
@@ -260,7 +263,9 @@ namespace kiwi
                 return _mm_max_ps(tmp, _mm_shuffle_ps(tmp, tmp, _MM_SHUFFLE(2, 3, 0, 1)));
             }
         };
+#endif
 
+#if defined(_MSC_VER) || defined(__AVX2__)
         template<>
         struct PacketTrait<ArchType::avx2>
         {
@@ -311,16 +316,9 @@ namespace kiwi
                 return _mm256_max_ps(tmp, _mm256_shuffle_ps(tmp, tmp, _MM_SHUFFLE(2, 3, 0, 1)));
             }
         };
-
-    }
-}
 #endif
 
-#if CPUINFO_ARCH_X86 || CPUINFO_ARCH_X86_64 || defined(KIWI_ARCH_X86_64)
-namespace kiwi
-{
-    namespace simd
-    {
+#if defined(_MSC_VER) || defined(__AVX512F__) || defined(__AVX512BW__)
         template<>
         struct PacketTrait<ArchType::avx512bw>
         {
@@ -380,6 +378,7 @@ namespace kiwi
                 return set1f(redmaxf(a));
             }
         };
+#endif
     }
 }
 

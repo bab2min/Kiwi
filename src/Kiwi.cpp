@@ -64,7 +64,7 @@ namespace kiwi
 	};
 
 	Kiwi::Kiwi(ArchType arch, LangModel _langMdl, bool typoTolerant)
-		: langMdl{ _langMdl }
+		: langMdl(_langMdl)
 	{
 		selectedArch = arch;
 		dfSplitByTrie = (void*)getSplitByTrieFn(selectedArch, typoTolerant);

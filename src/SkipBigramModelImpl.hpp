@@ -50,7 +50,11 @@ namespace kiwi
 			if (!cnt) return base;
 			if (!vocabValidness[next]) return base;
 
+#if defined(__GNUC__) && __GNUC__ < 5
+			alignas(256) float arr[windowSize * 2];
+#else
 			alignas(ArchInfo<arch>::alignment) float arr[windowSize * 2];
+#endif
 			std::fill(arr, arr + windowSize, base);
 			std::fill(arr + windowSize, arr + windowSize * 2, -INFINITY);
 
