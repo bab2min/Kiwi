@@ -8,6 +8,30 @@ bool FeatureTestor::isMatched(const kchar_t* begin, const kchar_t* end, CondVowe
 	if (vowel == CondVowel::none) return true;
 	if (begin == end) return false;
 	if (vowel == CondVowel::any) return true;
+
+	if (vowel == CondVowel::applosive)
+	{
+		switch (end[-1])
+		{
+		case u'\u11A8':
+		case u'\u11A9':
+		case u'\u11AA':
+		case u'\u11AE':
+		case u'\u11B8':
+		case u'\u11B9':
+		case u'\u11BA':
+		case u'\u11BB':
+		case u'\u11BD':
+		case u'\u11BE':
+		case u'\u11BF':
+		case u'\u11C0':
+		case u'\u11C1':
+			return true;
+		default:
+			return false;
+		}
+	}
+
 	if (!(u'\uAC00' <= end[-1] && end[-1] <= u'\uD7A4') &&
 		!(u'\u11A8' <= end[-1] && end[-1] <= u'\u11C2')) return true;
 

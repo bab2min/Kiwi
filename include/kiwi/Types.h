@@ -2,8 +2,8 @@
  * @file Types.h
  * @author bab2min (bab2min@gmail.com)
  * @brief Kiwi C++ API에 쓰이는 주요 타입들을 모아놓은 헤더 파일
- * @version 0.12.0
- * @date 2022-05-10
+ * @version 0.13.0
+ * @date 2022-06-24
  * 
  * 
  */
@@ -229,6 +229,7 @@ namespace kiwi
 		non_vowel, /**< `vowel`의 부정 */
 		non_vocalic, /**< `vocalic`의 부정 */
 		non_vocalic_h, /**< `vocalic_h`의 부정 */
+		applosive, /**< 불파음 받침(ㄴㄹㅁㅇ을 제외한 모든 받침)*/
 	};
 
 	/**
@@ -275,6 +276,8 @@ namespace kiwi
 		POSTag tag = POSTag::unknown; /**< 품사 태그 */
 		uint8_t senseId = 0; /**< 의미 번호 */
 		float score = 0; /**< 해당 형태소의 언어모델 점수 */
+		float typoCost = 0; /**< 오타가 교정된 경우 오타 비용. 그렇지 않은 경우 0 */
+		uint32_t typoFormId = 0; /**< 교정 전 오타의 형태에 대한 정보 (typoCost가 0인 경우 의미 없음) */
 		const Morpheme* morph = nullptr; /**< 기타 형태소 정보에 대한 포인터 (OOV인 경우 nullptr) */
 
 		TokenInfo() = default;

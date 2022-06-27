@@ -2,14 +2,15 @@
  * @file Form.h
  * @author bab2min (bab2min@gmail.com)
  * @brief 형태 및 형태소에 관한 정보를 담는 구조체들이 선언된 헤더
- * @version 0.12.0
- * @date 2022-05-10
+ * @version 0.13.0
+ * @date 2022-06-24
  * 
  * 
  */
 
 #pragma once
 
+#include <cmath>
 #include <kiwi/Types.h>
 #include <kiwi/FixedVector.hpp>
 
@@ -84,7 +85,7 @@ namespace kiwi
 		MorphemeRaw();
 		~MorphemeRaw();
 		MorphemeRaw(const MorphemeRaw&);
-		MorphemeRaw(MorphemeRaw&&);
+		MorphemeRaw(MorphemeRaw&&) noexcept;
 		MorphemeRaw& operator=(const MorphemeRaw&);
 		MorphemeRaw& operator=(MorphemeRaw&&);
 
@@ -137,7 +138,7 @@ namespace kiwi
 		Morpheme();
 		~Morpheme();
 		Morpheme(const Morpheme&);
-		Morpheme(Morpheme&&);
+		Morpheme(Morpheme&&) noexcept;
 		Morpheme& operator=(const Morpheme&);
 		Morpheme& operator=(Morpheme&&);
 
@@ -167,7 +168,7 @@ namespace kiwi
 		FormRaw();
 		~FormRaw();
 		FormRaw(const FormRaw&);
-		FormRaw(FormRaw&&);
+		FormRaw(FormRaw&&) noexcept;
 		FormRaw& operator=(const FormRaw&);
 		FormRaw& operator=(FormRaw&&);
 		
@@ -187,16 +188,46 @@ namespace kiwi
 	struct Form
 	{
 		KString form;
+		FixedVector<const Morpheme*> candidate;
 		CondVowel vowel = CondVowel::none;
 		CondPolarity polar = CondPolarity::none;
-		FixedVector<const Morpheme*> candidate;
+		uint8_t formHash = 0;
 
 		Form();
 		~Form();
 		Form(const Form&);
-		Form(Form&&);
+		Form(Form&&) noexcept;
 		Form& operator=(const Form&);
 		Form& operator=(Form&&);
+
+		bool operator<(const Form& o) const
+		{
+			return form < o.form;
+		}
+	};
+
+	struct TypoForm
+	{
+		uint32_t formId = 0;
+		float scoreHash = 0;
+		uint32_t typoId = 0;
+		CondVowel leftCond = CondVowel::none;
+
+		TypoForm() = default;
+
+		TypoForm(const std::tuple<uint32_t, float, CondVowel>& p)
+			: formId{ std::get<0>(p) }, scoreHash{ std::get<1>(p) }, leftCond{ std::get<2>(p) }
+		{
+		}
+
+		TypoForm(uint32_t _formId, float _score = 0, bool _hash = 0, uint32_t _typoId = 0, CondVowel _leftCond = CondVowel::none)
+			: formId{ _formId }, scoreHash{ _hash ? -_score : _score }, typoId{ _typoId }, leftCond{ _leftCond }
+		{
+		}
+
+		const Form& form(const Form* data) const { return data[formId]; }
+		float score() const { return std::abs(scoreHash); }
+		bool hash() const { return reinterpret_cast<const int32_t&>(scoreHash) < 0; }
 	};
 
 	/**
@@ -214,7 +245,8 @@ namespace kiwi
 	 * @param o 변경 가능한 형태소 정보
 	 * @param morphBase 형태소 배열의 시작 위치
 	 * @param formBase 형태 배열의 시작 위치
+	 * @param formMap
 	 * @return 최적화된 형태소 정보
 	 */
-	Morpheme bake(const MorphemeRaw& o, const Morpheme* morphBase, const Form* formBase);
+	Morpheme bake(const MorphemeRaw& o, const Morpheme* morphBase, const Form* formBase, const Vector<size_t>& formMap);
 }

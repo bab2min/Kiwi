@@ -12,38 +12,114 @@ using namespace std;
 using namespace kiwi;
 
 template<class... Args>
-inline bool appendNewNode(Vector<KGraphNode>& nodes, Vector<Vector<uint32_t>>& endPosMap, size_t startPos, Args&&... args)
+inline bool appendNewNode(Vector<KGraphNode>& nodes, Vector<pair<uint32_t, uint32_t>>& endPosMap, size_t startPos, Args&&... args)
 {
+	static constexpr uint32_t npos = -1;
+
+	if (endPosMap[startPos].first == npos)
+	{
+		return false;
+	}
+
 	size_t newId = nodes.size();
 	nodes.emplace_back(forward<Args>(args)...);
 	auto& nnode = nodes.back();
+	nnode.startPos = startPos;
 
-	for (auto i : endPosMap[startPos])
+	nnode.prev = newId - endPosMap[startPos].first;
+	if (nnode.endPos >= endPosMap.size()) return true;
+
+	if (endPosMap[nnode.endPos].first == npos)
 	{
-		nnode.addPrev(newId - i);
-	}
-	if (!nnode.prevs[0])
-	{
-		nodes.pop_back();
-		return false;
+		endPosMap[nnode.endPos].first = newId;
+		endPosMap[nnode.endPos].second = newId;
 	}
 	else
 	{
-		endPosMap[nnode.endPos].emplace_back(newId);
-		return true;
+		nodes[endPosMap[nnode.endPos].second].sibling = newId - endPosMap[nnode.endPos].second;
+		endPosMap[nnode.endPos].second = newId;
 	}
+	return true;
 }
 
-template<ArchType arch>
-Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form*>& trie, const KString& str, Match matchOptions, size_t maxUnkFormSize, size_t spaceTolerance)
+struct TypoCostInfo
+{
+	float cost;
+	uint32_t start;
+	uint32_t typoId;
+
+	TypoCostInfo(float _cost = 0, uint32_t _start = 0, uint32_t _typoId = 0)
+		: cost{ _cost }, start{ _start }, typoId{ _typoId }
+	{}
+};
+
+template<bool typoTolerant>
+bool insertCandidates(
+	Vector<const Form*>& candidates, 
+	Vector<TypoCostInfo>& candTypoCostStarts,
+	const Form* foundCand, 
+	const Form* formBase, 
+	const size_t* typoPtrs,
+	const KString& str, 
+	const Vector<uint32_t>& nonSpaces
+)
+{
+	if (typoTolerant)
+	{
+		auto tCand = reinterpret_cast<const TypoForm*>(foundCand);
+		if (find(candidates.begin(), candidates.end(), &tCand->form(formBase)) != candidates.end()) return false;
+		
+		while (1)
+		{
+			auto typoFormSize = typoPtrs[tCand->typoId + 1] - typoPtrs[tCand->typoId];
+			auto cand = &tCand->form(formBase);
+			if (FeatureTestor::isMatched(&str[0], &str[nonSpaces[nonSpaces.size() - typoFormSize]], tCand->leftCond)
+				&& FeatureTestor::isMatchedApprox(&str[0], &str[nonSpaces[nonSpaces.size() - typoFormSize]], cand->vowel, cand->polar))
+			{
+				candidates.emplace_back(cand);
+				candTypoCostStarts.emplace_back(tCand->score(), nonSpaces.size() - typoFormSize, tCand->typoId);
+			}
+			if (tCand[0].hash() != tCand[1].hash()) break;
+			++tCand;
+		}
+	}
+	else
+	{
+		if (find(candidates.begin(), candidates.end(), foundCand) != candidates.end()) return false;
+
+		while (1)
+		{
+			if (FeatureTestor::isMatchedApprox(&str[0], &str[nonSpaces[nonSpaces.size() - foundCand->form.size()]], foundCand->vowel, foundCand->polar))
+			{
+				candidates.emplace_back(foundCand);
+			}
+			if (foundCand[0].formHash != foundCand[1].formHash) break;
+			++foundCand;
+		}
+	}
+	return true;
+}
+
+template<ArchType arch, bool typoTolerant>
+Vector<KGraphNode> kiwi::splitByTrie(
+	const Form* formBase,
+	const size_t* typoPtrs,
+	const utils::FrozenTrie<kchar_t, const Form*>& trie, 
+	const KString& str, 
+	Match matchOptions, 
+	size_t maxUnkFormSize, 
+	size_t spaceTolerance,
+	float typoCostWeight
+)
 {
 	Vector<KGraphNode> ret;
-	Vector<Vector<uint32_t>> endPosMap(str.size() + 1);
+	Vector<pair<uint32_t, uint32_t>> endPosMap(str.size() + 1, make_pair<uint32_t, uint32_t>(-1, -1));
+	endPosMap[0] = make_pair(0, 0);
 	ret.reserve(8);
 	ret.emplace_back();
-	endPosMap[0].emplace_back(0);
 	size_t n = 0;
 	Vector<const Form*> candidates;
+	Vector<TypoCostInfo> candTypoCostStarts;
 	auto* curNode = trie.root();
 	auto* nextNode = trie.root();
 	Vector<uint32_t> nonSpaces;
@@ -57,7 +133,7 @@ Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form
 			bool alreadySpecialChrProcessed = false;
 			for (auto& cand : candidates)
 			{
-				size_t nBegin = nonSpaces.size() - cand->form.size();
+				size_t nBegin = typoTolerant ? candTypoCostStarts[&cand - candidates.data()].start : (nonSpaces.size() - cand->form.size());
 				bool longestMatched = any_of(ret.begin() + 1, ret.end(), [&](const KGraphNode& g)
 				{
 					return nBegin == g.endPos && lastSpecialEndPos == g.endPos - (g.uform.empty() ? g.form->form.size() : g.uform.size());
@@ -95,11 +171,16 @@ Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form
 					size_t lengthWithSpaces = nonSpaces.back() + 1 - nonSpaces[nBegin];
 					if (lengthWithSpaces <= cand->form.size() + spaceTolerance)
 					{
-						appendNewNode(ret, endPosMap, nBegin, cand, (uint16_t)nonSpaces.size());
+						float typoCost = typoTolerant ? candTypoCostStarts[&cand - candidates.data()].cost : 0.f;
+						if (appendNewNode(ret, endPosMap, nBegin, cand, (uint16_t)nonSpaces.size(), typoCost) && typoTolerant)
+						{
+							ret.back().typoFormId = candTypoCostStarts[&cand - candidates.data()].typoId;
+						}
 					}
 				}
 			}
 			candidates.clear();
+			if (typoTolerant) candTypoCostStarts.clear();
 		}
 
 		bool duplicated = any_of(ret.begin() + 1, ret.end(), [&](const KGraphNode& g)
@@ -203,18 +284,9 @@ Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form
 				{
 					const Form* cand = submatcher->val(trie);
 					if (!cand) break;
-					else if (cand != (const Form*)trie.hasSubmatch)
+					else if (!trie.hasSubmatch(cand))
 					{
-						if (find(candidates.begin(), candidates.end(), cand) != candidates.end()) break;
-						while (1)
-						{
-							if (FeatureTestor::isMatchedApprox(&str[0], &str[nonSpaces[nonSpaces.size() - cand->form.size()]], cand->vowel, cand->polar))
-							{
-								candidates.emplace_back(cand);
-							}
-							if (cand[0].form != cand[1].form) break;
-							++cand;
-						}
+						if (!insertCandidates<typoTolerant>(candidates, candTypoCostStarts, cand, formBase, typoPtrs, str, nonSpaces)) break;
 					}
 				}
 				nextNode = curNode->template nextOpt<arch>(trie, c);
@@ -266,18 +338,9 @@ Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form
 		{
 			const Form* cand = submatcher->val(trie);
 			if (!cand) break;
-			else if (cand != (const Form*)trie.hasSubmatch)
+			else if (!trie.hasSubmatch(cand))
 			{
-				if (find(candidates.begin(), candidates.end(), cand) != candidates.end()) break;
-				while (1)
-				{
-					if (FeatureTestor::isMatchedApprox(&str[0], &str[nonSpaces[nonSpaces.size() - cand->form.size()]], cand->vowel, cand->polar))
-					{
-						candidates.emplace_back(cand);
-					}
-					if (cand[0].form != cand[1].form) break;
-					++cand;
-				}
+				if (!insertCandidates<typoTolerant>(candidates, candTypoCostStarts, cand, formBase, typoPtrs, str, nonSpaces)) break;
 			}
 		}
 	continueFor:
@@ -305,25 +368,17 @@ Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form
 	curNode = curNode->fail();
 	while (curNode)
 	{
-		if (curNode->val(trie) && curNode->val(trie) != (const Form*)trie.hasSubmatch)
+		if (curNode->val(trie) && !trie.hasSubmatch(curNode->val(trie)))
 		{
 			const Form* cand = curNode->val(trie);
-			if (find(candidates.begin(), candidates.end(), cand) != candidates.end()) break;
-			while (1)
-			{
-				if (FeatureTestor::isMatched(&str[0], &str[nonSpaces[nonSpaces.size() - cand->form.size()]], cand->vowel, cand->polar))
-				{
-					candidates.emplace_back(cand);
-				}
-				if (cand[0].form != cand[1].form) break;
-				++cand;
-			}
+			if (!insertCandidates<typoTolerant>(candidates, candTypoCostStarts, cand, formBase, typoPtrs, str, nonSpaces)) break;
 		}
 		curNode = curNode->fail();
 	}
 	branchOut(nonSpaces.size(), n);
 
-	appendNewNode(ret, endPosMap, nonSpaces.size(), nullptr, nonSpaces.size());
+	appendNewNode(ret, endPosMap, nonSpaces.size(), nullptr, nonSpaces.size() + 1);
+	ret.back().endPos = nonSpaces.size();
 
 	nonSpaces.emplace_back(n);
 
@@ -331,7 +386,6 @@ Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form
 	for (size_t i = 1; i < ret.size() - 1; ++i)
 	{
 		auto& r = ret[i];
-		r.startPos = r.endPos - (r.uform.empty() ? r.form->form.size() : r.uform.size());
 		r.startPos = nonSpaces[r.startPos];
 		r.endPos = nonSpaces[r.endPos - 1] + 1;
 	}
@@ -339,28 +393,29 @@ Vector<KGraphNode> kiwi::splitByTrie(const utils::FrozenTrie<kchar_t, const Form
 	return ret;
 }
 
-template<ptrdiff_t ...indices>
-inline FnSplitByTrie getSplitByTrieFnDispatch(ArchType arch, tp::seq<indices...>)
-{
-	static FnSplitByTrie table[] = {
-		&splitByTrie<static_cast<ArchType>(indices + 1)>...
-	};
-	return table[static_cast<int>(arch) - 1];
-}
-
+template<bool typoTolerant>
 struct SplitByTrieGetter
 {
 	template<std::ptrdiff_t i>
 	struct Wrapper
 	{
-		static constexpr FnSplitByTrie value = &splitByTrie<static_cast<ArchType>(i)>;
+		static constexpr FnSplitByTrie value = &splitByTrie<static_cast<ArchType>(i), typoTolerant>;
 	};
 };
 
-FnSplitByTrie kiwi::getSplitByTrieFn(ArchType arch)
+FnSplitByTrie kiwi::getSplitByTrieFn(ArchType arch, bool typoTolerant)
 {
-	static tp::Table<FnSplitByTrie, AvailableArch> table{ SplitByTrieGetter{} };
-	return table[static_cast<std::ptrdiff_t>(arch)];
+	static tp::Table<FnSplitByTrie, AvailableArch> table{ SplitByTrieGetter<false>{} };
+	static tp::Table<FnSplitByTrie, AvailableArch> tableTT{ SplitByTrieGetter<true>{} };
+	
+	if (typoTolerant)
+	{
+		return tableTT[static_cast<std::ptrdiff_t>(arch)];
+	}
+	else
+	{
+		return table[static_cast<std::ptrdiff_t>(arch)];
+	}
 }
 
 const Form * KTrie::findForm(const KString & str) const
@@ -377,23 +432,23 @@ const Form * KTrie::findForm(const KString & str) const
 
 Vector<KGraphNode> KGraphNode::removeUnconnected(const Vector<KGraphNode>& graph)
 {
-	Vector<uint16_t> connectedList(graph.size()), newIndexDiff(graph.size());
+	Vector<uint8_t> connectedList(graph.size());
+	Vector<uint16_t> newIndexDiff(graph.size());
 	connectedList[graph.size() - 1] = true;
 	connectedList[0] = true;
 	// forward searching
 	for (size_t i = 1; i < graph.size(); ++i)
 	{
 		bool connected = false;
-		for (size_t j = 0; j < KGraphNode::max_prev; ++j)
+		for (auto prev = graph[i].getPrev(); prev; prev = prev->getSibling())
 		{
-			if (!graph[i].prevs[j]) break;
-			if (connectedList[i - graph[i].prevs[j]])
+			if (connectedList[prev - graph.data()])
 			{
 				connected = true;
 				break;
 			}
 		}
-		connectedList[i] = connected;
+		connectedList[i] = connected ? 1 : 0;
 	}
 	// backward searching
 	for (size_t i = graph.size() - 1; i-- > 1; )
@@ -401,19 +456,19 @@ Vector<KGraphNode> KGraphNode::removeUnconnected(const Vector<KGraphNode>& graph
 		bool connected = false;
 		for (size_t j = i + 1; j < graph.size(); ++j)
 		{
-			for (size_t k = 0; k < KGraphNode::max_prev; ++k)
+			for (auto prev = graph[j].getPrev(); prev; prev = prev->getSibling())
 			{
-				if (!graph[j].prevs[k]) break;
-				if (j - graph[j].prevs[k] > i) break;
-				if (j - graph[j].prevs[k] < i) continue;
+				if (prev > &graph[i]) break;
+				if (prev < &graph[i]) continue;
 				if (connectedList[j])
 				{
 					connected = true;
-					break;
+					goto break_2;
 				}
 			}
 		}
-		connectedList[i] = connectedList[i] && connected;
+		break_2:
+		connectedList[i] = (connectedList[i] && connected) ? 1 : 0;
 	}
 	size_t connectedCnt = accumulate(connectedList.begin(), connectedList.end(), 0);
 	newIndexDiff[0] = connectedList[0];
@@ -433,14 +488,12 @@ Vector<KGraphNode> KGraphNode::removeUnconnected(const Vector<KGraphNode>& graph
 		if (!connectedList[i]) continue;
 		ret.emplace_back(graph[i]);
 		auto& newNode = ret.back();
-		size_t n = 0;
-		for (size_t j = 0; j < max_prev; ++j)
+		if (newNode.prev) newNode.prev -= newIndexDiff[i] - newIndexDiff[i - newNode.prev];
+		if (newNode.sibling)
 		{
-			auto idx = newNode.prevs[j];
-			if (!idx) break;
-			if(connectedList[i - idx]) newNode.prevs[n++] = newNode.prevs[j] - (newIndexDiff[i] - newIndexDiff[i - idx]);
+			if (connectedList[i + newNode.sibling]) newNode.sibling -= newIndexDiff[i + newNode.sibling] - newIndexDiff[i];
+			else newNode.sibling = 0;
 		}
-		newNode.prevs[n] = 0;
 	}
 	return ret;
 }

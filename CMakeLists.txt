@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 
-project(kiwi VERSION 0.12.0 DESCRIPTION "Kiwi, Korean Intelligent Word Identifier")
+project(kiwi VERSION 0.13.0 DESCRIPTION "Kiwi, Korean Intelligent Word Identifier")
 
 set ( CMAKE_CXX_STANDARD 11 )
 set ( CMAKE_VERBOSE_MAKEFILE true )
@@ -32,8 +32,10 @@ set ( CORE_SRCS
   src/PatternMatcher.cpp
   src/search.cpp
   src/TagUtils.cpp
+  src/TypoTransformer.cpp
   src/Utils.cpp
   src/WordDetector.cpp
+  src/archImpl/none.cpp
 )
 
 
@@ -111,6 +113,43 @@ else()
   set ( CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELEASE} -g3")
   set ( CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO}")
   set ( CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_EXE_LINKER_FLAGS_RELEASE}" )
+endif()
+
+
+if (CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)|(amd64)|(AMD64)")
+  set( CORE_SRCS 
+    ${CORE_SRCS}
+    src/archImpl/sse2.cpp
+    src/archImpl/sse4_1.cpp
+  )
+  if (KIWI_USE_CPUINFO)
+    set( CORE_SRCS 
+      ${CORE_SRCS}
+      src/archImpl/avx2.cpp
+      src/archImpl/avx512bw.cpp
+    )
+  endif()
+  if(MSVC)
+    set_source_files_properties(src/archImpl/sse2.cpp PROPERTIES COMPILE_FLAGS "/arch:SSE2")
+    set_source_files_properties(src/archImpl/sse4_1.cpp PROPERTIES COMPILE_FLAGS "/arch:SSE2")
+    if (KIWI_USE_CPUINFO)
+      set_source_files_properties(src/archImpl/avx2.cpp PROPERTIES COMPILE_FLAGS "/arch:AVX2")
+      set_source_files_properties(src/archImpl/avx512bw.cpp PROPERTIES COMPILE_FLAGS "/arch:AVX512")
+    endif()
+  else()
+    set_source_files_properties(src/archImpl/sse2.cpp PROPERTIES COMPILE_FLAGS "-msse2")
+    set_source_files_properties(src/archImpl/sse4_1.cpp PROPERTIES COMPILE_FLAGS "-msse2 -msse4.1")
+    if (KIWI_USE_CPUINFO)
+      set_source_files_properties(src/archImpl/avx2.cpp PROPERTIES COMPILE_FLAGS "-mavx -mavx2 -mfma")
+      set_source_files_properties(src/archImpl/avx512bw.cpp PROPERTIES COMPILE_FLAGS "-mavx512f -mavx512bw")
+    endif()
+  endif()
+elseif (HOST_ARCHITECTURE MATCHES "^arm64" OR CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm|aarch64)")
+  set( CORE_SRCS 
+    ${CORE_SRCS}
+    src/archImpl/neon.cpp
+  )
+  set_source_files_properties(src/archImpl/neon.cpp PROPERTIES COMPILE_FLAGS "-march=armv8-a")
 endif()
 
 add_library( "${PROJECT_NAME}_static" STATIC

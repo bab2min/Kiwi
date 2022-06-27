@@ -62,7 +62,7 @@ namespace tutils
 			&t_info_count)
 		) return 0;
 
-		return (size_t)t_info.resident_size;
+		return (size_t)t_info.resident_size / 1024;
 	}
 
 	inline void setUTF8Output()

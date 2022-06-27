@@ -13,7 +13,7 @@ namespace kiwi
 
 	MorphemeRaw::MorphemeRaw(const MorphemeRaw&) = default;
 
-	MorphemeRaw::MorphemeRaw(MorphemeRaw&&) = default;
+	MorphemeRaw::MorphemeRaw(MorphemeRaw&&) noexcept = default;
 
 	MorphemeRaw& MorphemeRaw::operator=(const MorphemeRaw&) = default;
 
@@ -38,7 +38,7 @@ namespace kiwi
 
 	Morpheme::Morpheme(const Morpheme&) = default;
 
-	Morpheme::Morpheme(Morpheme&&) = default;
+	Morpheme::Morpheme(Morpheme&&) noexcept = default;
 
 	Morpheme& Morpheme::operator=(const Morpheme&) = default;
 
@@ -50,7 +50,7 @@ namespace kiwi
 
 	FormRaw::FormRaw(const FormRaw&) = default;
 
-	FormRaw::FormRaw(FormRaw&&) = default;
+	FormRaw::FormRaw(FormRaw&&) noexcept = default;
 
 	FormRaw& FormRaw::operator=(const FormRaw&) = default;
 
@@ -73,7 +73,7 @@ namespace kiwi
 
 	Form::Form(const Form&) = default;
 
-	Form::Form(Form&&) = default;
+	Form::Form(Form&&) noexcept = default;
 
 	Form& Form::operator=(const Form&) = default;
 
@@ -95,10 +95,10 @@ namespace kiwi
 		return ret;
 	}
 
-	Morpheme bake(const MorphemeRaw& o, const Morpheme* morphBase, const Form* formBase)
+	Morpheme bake(const MorphemeRaw& o, const Morpheme* morphBase, const Form* formBase, const Vector<size_t>& formMap)
 	{
 		Morpheme ret;
-		ret.kform = &formBase[o.kform].form;
+		ret.kform = &formBase[formMap[o.kform]].form;
 		ret.tag = o.tag;
 		ret.vowel = o.vowel();
 		ret.polar = o.polar();

@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <numeric>
 
+#include "ArchUtils.h"
 #include "Mmap.h"
 
 namespace kiwi
@@ -16,7 +17,7 @@ namespace kiwi
 		struct Header
 		{
 			uint64_t vocabSize;
-			uint8_t keySize, windowSize, compressed, _rsv[5];
+			uint8_t keySize, windowSize, compressed, quantize, _rsv[4];
 		};
 
 		class SkipBigramModelBase
@@ -32,8 +33,6 @@ namespace kiwi
 			const Header& getHeader() const { return *reinterpret_cast<const Header*>(base.get()); }
 
 			static std::unique_ptr<SkipBigramModelBase> create(utils::MemoryObject&& mem, ArchType archType = ArchType::none);
-
-
 		};
 	}
 }

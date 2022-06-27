@@ -30,13 +30,14 @@ jobs:
     - name: Configure Build
       run: mkdir build && cd build && /opt/python/cp36-cp36m/bin/cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_USE_MIMALLOC=0 -DKIWI_USE_CPUINFO=0 ..
     - name: Build
-      run: cd build && make
+      run: cd build && make -j2
     - name: Run Unit Test
       run: ./build/test/kiwi-test
     - name: Run Evaluator
       run: |
         mkdir eval_results
         ./build/kiwi-evaluator -m ./ModelGenerator eval_data/*.txt -o eval_results/
+        ./build/kiwi-evaluator -m ./ModelGenerator eval_data/*.txt --sbg -o eval_results/
     - run: tar -zcvf arts.tgz build/*kiwi* build/test/*kiwi* eval_results/*.txt
     - name: Archive binaries
       uses: actions/upload-artifact@v1

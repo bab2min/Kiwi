@@ -46,7 +46,7 @@ namespace kiwi
 
 		float next(const LangModel& lm, VocabTy next)
 		{
-			auto& sbg = static_cast<const sb::SkipBigramModel<arch, VocabTy>&>(*lm.sbg);
+			auto& sbg = static_cast<const sb::SkipBigramModel<arch, VocabTy, 8>&>(*lm.sbg);
 			float ll = KnLMState<arch, VocabTy>::next(lm, next);
 			if (sbg.isValidVocab(next))
 			{

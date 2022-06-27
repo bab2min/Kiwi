@@ -168,6 +168,12 @@ TEST(KiwiCpp, AnalyzeWithLoadDefaultDict)
 	kiwi.analyze(TEST_SENT, Match::all);
 }
 
+TEST(KiwiCpp, AnalyzeSBG)
+{
+	Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 0, BuildOption::none, true }.build();
+	kiwi.analyze(TEST_SENT, Match::all);
+}
+
 TEST(KiwiCpp, AnalyzeMultithread)
 {
 	auto data = loadTestCorpus();

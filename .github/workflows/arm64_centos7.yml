@@ -25,9 +25,9 @@ jobs:
           --volume "${PWD}/artifacts:/artifacts"
         run: |
           mkdir build && pushd build && cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_USE_MIMALLOC=0 ..
-          make && popd
+          make -j2 && popd
           ./build/test/kiwi-test
-          mkdir eval_results && ./build/kiwi-evaluator -m ./ModelGenerator eval_data/*.txt -o eval_results/
+          mkdir eval_results && ./build/kiwi-evaluator -m ./ModelGenerator eval_data/*.txt -o eval_results/ && ./build/kiwi-evaluator -m ./ModelGenerator eval_data/*.txt --sbg -o eval_results/
           mkdir eval_results_balanced && KIWI_ARCH_TYPE=balanced ./build/kiwi-evaluator -m ./ModelGenerator eval_data/*.txt -o eval_results_balanced/
           cp -r build /artifacts/
           cp -r eval_results /artifacts/
@@ -36,6 +36,8 @@ jobs:
           KIWI_ARCH_TYPE=none ./build/kiwi-cli-* -m ./ModelGenerator -e -o test.out kowiki1000.txt
           KIWI_ARCH_TYPE=balanced ./build/kiwi-cli-* -m ./ModelGenerator -e -o test.out kowiki1000.txt
           KIWI_ARCH_TYPE=neon ./build/kiwi-cli-* -m ./ModelGenerator -e -o test.out kowiki1000.txt
+          KIWI_ARCH_TYPE=neon ./build/kiwi-cli-* -m ./ModelGenerator -e -o test.out --sbg kowiki1000.txt
+          KIWI_ARCH_TYPE=neon ./build/kiwi-cli-* -m ./ModelGenerator -e -o test.out --typos 6 kowiki1000.txt
     - name: Archive binaries
       uses: actions/upload-artifact@v2
       with:

@@ -2,8 +2,8 @@
  * @file capi.h
  * @author bab2min (bab2min@gmail.com)
  * @brief Kiwi C API를 담고 있는 헤더 파일
- * @version 0.12.0
- * @date 2022-05-10
+ * @version 0.13.0
+ * @date 2022-06-24
  * 
  * 
  */
@@ -30,6 +30,7 @@ typedef struct kiwi_res* kiwi_res_h;
 typedef struct kiwi_ws* kiwi_ws_h;
 typedef struct kiwi_ss* kiwi_ss_h;
 typedef struct kiwi_joiner* kiwi_joiner_h;
+typedef struct kiwi_typo* kiwi_typo_h;
 typedef unsigned short kchar16_t;
 
 /*
@@ -71,6 +72,8 @@ enum
 	KIWI_BUILD_INTEGRATE_ALLOMORPH = 1,
 	KIWI_BUILD_LOAD_DEFAULT_DICT = 2,
 	KIWI_BUILD_DEFAULT = 3,
+	KIWI_BUILD_MODEL_TYPE_KNLM = 0x0000,
+	KIWI_BUILD_MODEL_TYPE_SBG = 0x0100,
 };
 
 enum
@@ -86,6 +89,7 @@ enum
 	KIWI_UNK_FORM_SCORE_SCALE = 0x9002,
 	KIWI_UNK_FORM_SCORE_BIAS = 0x9003,
 	KIWI_SPACE_PENALTY = 0x9004,
+	KIWI_TYPO_COST_WEIGHT = 0x9005,
 };
 
 enum
@@ -286,11 +290,48 @@ DECL_DLL kiwi_ws_h kiwi_builder_extract_add_words_w(kiwi_builder_h handle, kiwi_
  * @brief KiwiBuilder로부터 Kiwi instance를 생성합니다.
  * 
  * @param handle KiwiBuilder.
+ * @param typos 오타 교정기의 핸들. 오타 교정을 사용하지 않을 경우 null을 입력합니다.
+ * @param typo_cost_threshold 오타 교정기에서 생성하는 오타 중 비용이 이 값 이하인 오타만 사용합니다.
+ * 
  * @return Kiwi의 핸들.
  * 
  * @note kiwi_close, kiwi_init
  */
-DECL_DLL kiwi_h kiwi_builder_build(kiwi_builder_h handle);
+DECL_DLL kiwi_h kiwi_builder_build(kiwi_builder_h handle, kiwi_typo_h typos, float typo_cost_threshold);
+
+/**
+ * @brief Kiwi 기본 내장 오타 교정기의 핸들
+ * 
+ * @note 이 핸들은 kiwi_typo_close에 사용할 수 없음.
+ */
+extern DECL_DLL const kiwi_typo_h kiwi_basic_typo;
+
+/**
+ * @brief 
+ * 
+ * @return
+ * 
+ * @note
+ */
+DECL_DLL kiwi_typo_h kiwi_typo_init();
+
+/**
+ * @brief
+ *
+ * @return
+ *
+ * @note
+ */
+DECL_DLL int kiwi_typo_add(kiwi_typo_h handle, const char** orig, int orig_size, const char** error, int error_size, float cost, int condition);
+
+/**
+ * @brief
+ *
+ * @return
+ *
+ * @note
+ */
+DECL_DLL int kiwi_typo_close(kiwi_typo_h handle);
 
 /**
  * @brief KiwiBuilder를 거치지 않고 바로 Kiwi instance를 생성합니다.
@@ -452,110 +493,130 @@ DECL_DLL kiwi_joiner_h kiwi_new_joiner(kiwi_h handle, int lm_search);
 DECL_DLL int kiwi_close(kiwi_h handle);
 
 /**
- * @brief 
+ * @brief 분석 결과 내에 포함된 리스트의 개수를 반환합니다.
  * 
- * @param result 
- * @return  
+ * @param result 분석 결과의 핸들
+ * @return 성공시 0이상의 값, 실패 시 음수를 반환합니다.
  */
 DECL_DLL int kiwi_res_size(kiwi_res_h result);
 
 /**
- * @brief 
+ * @brief index번째 분석 결과의 확률 점수를 반환합니다.
  * 
- * @param result 
- * @param index 
- * @return  
+ * @param result 분석 결과의 핸들
+ * @param index `0` 이상 `kiwi_res_size(result)` 미만의 정수
+ * @return 성공 시 0이 아닌 값, 실패 시 0을 반환합니다.
  */
 DECL_DLL float kiwi_res_prob(kiwi_res_h result, int index);
 
 /**
- * @brief 
+ * @brief index번째 분석 결과 내에 포함된 형태소의 개수를 반환합니다.
  * 
- * @param result 
- * @param index 
- * @return  
+ * @param result 분석 결과의 핸들
+ * @param index `0` 이상 `kiwi_res_size(result)` 미만의 정수
+ * @return 성공시 0이상의 값, 실패 시 음수를 반환합니다.
  */
 DECL_DLL int kiwi_res_word_num(kiwi_res_h result, int index);
 
 /**
- * @brief 
+ * @brief index번째 분석 결과의 num번째 형태소의 형태를 반환합니다.
  * 
- * @param result 
- * @param index 
- * @param num 
- * @return 
+ * @param result 분석 결과의 핸들
+ * @param index `0` 이상 `kiwi_res_size(result)` 미만의 정수
+ * @param num `0` 이상 `kiwi_res_word_num(result, index)` 미만의 정수
+ * @return UTF-16으로 인코딩된 문자열. 실패 시 null을 반환합니다. 이 값은 Kiwi API가 관리하므로 별도로 해제할 필요가 없습니다.
  */
 DECL_DLL const kchar16_t* kiwi_res_form_w(kiwi_res_h result, int index, int num);
 
 /**
- * @brief 
- * 
- * @param result 
- * @param index 
- * @param num 
- * @return 
+ * @brief index번째 분석 결과의 num번째 형태소의 품사 태그를 반환합니다.
+ *
+ * @param result 분석 결과의 핸들
+ * @param index `0` 이상 `kiwi_res_size(result)` 미만의 정수
+ * @param num `0` 이상 `kiwi_res_word_num(result, index)` 미만의 정수
+ * @return UTF-16으로 인코딩된 문자열. 실패 시 null을 반환합니다. 이 값은 Kiwi API가 관리하므로 별도로 해제할 필요가 없습니다.
  */
 DECL_DLL const kchar16_t* kiwi_res_tag_w(kiwi_res_h result, int index, int num);
 
 /**
- * @brief 
- * 
- * @param result 
- * @param index 
- * @param num 
- * @return 
+ * @brief index번째 분석 결과의 num번째 형태소의 형태를 반환합니다.
+ *
+ * @param result 분석 결과의 핸들
+ * @param index `0` 이상 `kiwi_res_size(result)` 미만의 정수
+ * @param num `0` 이상 `kiwi_res_word_num(result, index)` 미만의 정수
+ * @return UTF-8으로 인코딩된 문자열. 실패 시 null을 반환합니다. 이 값은 Kiwi API가 관리하므로 별도로 해제할 필요가 없습니다.
  */
 DECL_DLL const char* kiwi_res_form(kiwi_res_h result, int index, int num);
 
 /**
- * @brief 
- * 
- * @param result 
- * @param index 
- * @param num 
- * @return 
+ * @brief index번째 분석 결과의 num번째 형태소의 품사 태그를 반환합니다.
+ *
+ * @param result 분석 결과의 핸들
+ * @param index `0` 이상 `kiwi_res_size(result)` 미만의 정수
+ * @param num `0` 이상 `kiwi_res_word_num(result, index)` 미만의 정수
+ * @return UTF-8으로 인코딩된 문자열. 실패 시 null을 반환합니다. 이 값은 Kiwi API가 관리하므로 별도로 해제할 필요가 없습니다.
  */
 DECL_DLL const char* kiwi_res_tag(kiwi_res_h result, int index, int num);
 
 /**
- * @brief 
- * 
- * @param result 
- * @param index 
- * @param num 
- * @return  
+ * @brief index번째 분석 결과의 num번째 형태소의 시작 위치(UTF-16 문자열 기준)를 반환합니다.
+ *
+ * @param result 분석 결과의 핸들
+ * @param index `0` 이상 `kiwi_res_size(result)` 미만의 정수
+ * @param num `0` 이상 `kiwi_res_word_num(result, index)` 미만의 정수
+ * @return 성공 시 0 이상의 값, 실패 시 음수를 반환합니다.
  */
 DECL_DLL int kiwi_res_position(kiwi_res_h result, int index, int num);
 
 /**
- * @brief 
- * 
- * @param result 
- * @param index 
- * @param num 
- * @return  
+ * @brief index번째 분석 결과의 num번째 형태소의 길이(UTF-16 문자열 기준)를 반환합니다.
+ *
+ * @param result 분석 결과의 핸들
+ * @param index `0` 이상 `kiwi_res_size(result)` 미만의 정수
+ * @param num `0` 이상 `kiwi_res_word_num(result, index)` 미만의 정수
+ * @return 성공 시 0 이상의 값, 실패 시 음수를 반환합니다.
  */
 DECL_DLL int kiwi_res_length(kiwi_res_h result, int index, int num);
 
 /**
- * @brief
+ * @brief index번째 분석 결과의 num번째 형태소의 문장 내 어절 번호를 반환합니다.
  *
- * @param result
- * @param index
- * @param num
- * @return
+ * @param result 분석 결과의 핸들
+ * @param index `0` 이상 `kiwi_res_size(result)` 미만의 정수
+ * @param num `0` 이상 `kiwi_res_word_num(result, index)` 미만의 정수
+ * @return 성공 시 0 이상의 값, 실패 시 음수를 반환합니다.
  */
 DECL_DLL int kiwi_res_word_position(kiwi_res_h result, int index, int num);
 
 /**
- * @brief
+ * @brief index번째 분석 결과의 num번째 형태소의 문장 번호를 반환합니다.
  *
- * @param result
- * @param index
- * @param num
- * @return
+ * @param result 분석 결과의 핸들
+ * @param index `0` 이상 `kiwi_res_size(result)` 미만의 정수
+ * @param num `0` 이상 `kiwi_res_word_num(result, index)` 미만의 정수
+ * @return 성공 시 0 이상의 값, 실패 시 음수를 반환합니다.
  */
 DECL_DLL int kiwi_res_sent_position(kiwi_res_h result, int index, int num);
+
+/**
+ * @brief index번째 분석 결과의 num번째 형태소의 언어 모델 점수를 반환합니다.
+ *
+ * @param result 분석 결과의 핸들
+ * @param index `0` 이상 `kiwi_res_size(result)` 미만의 정수
+ * @param num `0` 이상 `kiwi_res_word_num(result, index)` 미만의 정수
+ * @return 성공 시 0이 아닌 값, 실패 시 0을 반환합니다.
+ */
+DECL_DLL float kiwi_res_score(kiwi_res_h result, int index, int num);
+
+/**
+ * @brief index번째 분석 결과의 num번째 형태소의 오타 교정 비용을 반환합니다.
+ *
+ * @param result 분석 결과의 핸들
+ * @param index `0` 이상 `kiwi_res_size(result)` 미만의 정수
+ * @param num `0` 이상 `kiwi_res_word_num(result, index)` 미만의 정수
+ * @return 성공 시 0 이상의 값, 실패 시 음수를 반환합니다. 0은 오타 교정이 발생하지 않았음을 뜻합니다.
+ */
+DECL_DLL float kiwi_res_typo_cost(kiwi_res_h result, int index, int num);
 
 /**
  * @brief 사용이 완료된 형태소 분석 결과를 삭제합니다.

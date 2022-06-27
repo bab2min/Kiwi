@@ -46,7 +46,7 @@ namespace kiwi
 			}
 
 			StrideIter(const StrideIter&) = default;
-			StrideIter(StrideIter&&) = default;
+			StrideIter(StrideIter&&) noexcept = default;
 
 			StrideIter& operator++()
 			{

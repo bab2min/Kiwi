@@ -85,7 +85,7 @@ namespace kiwi
 
 				for (size_t p = packetBegin; p < packetEnd; ++p)
 				{
-					i |= buf[p] << (shiftBias + (p - packetBegin) * packetBits);
+					i |= (size_t)buf[p] << (shiftBias + (p - packetBegin) * packetBits);
 				}
 
 				if (phase == numPhases - 1)

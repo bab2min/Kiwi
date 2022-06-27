@@ -16,6 +16,7 @@
 #include "RaggedVector.hpp"
 #include "SkipBigramTrainer.hpp"
 #include "SkipBigramModel.hpp"
+#include "SortUtils.hpp"
 
 using namespace std;
 using namespace kiwi;
@@ -30,7 +31,7 @@ KiwiBuilder::KiwiBuilder(KiwiBuilder&&) noexcept = default;
 
 KiwiBuilder& KiwiBuilder::operator=(const KiwiBuilder&) = default;
 
-KiwiBuilder& KiwiBuilder::operator=(KiwiBuilder&&) noexcept = default;
+KiwiBuilder& KiwiBuilder::operator=(KiwiBuilder&&) = default;
 
 template<class Fn>
 auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> MorphemeMap
@@ -519,75 +520,62 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 	: KiwiBuilder{ modelPath }
 {
 	auto realMorph = restoreMorphemeMap();
+	sb::SkipBigramTrainer<utils::Vid, 8> sbg;
 	RaggedVector<utils::Vid> sents;
-	if (1)
+	for (auto& path : args.corpora)
 	{
-		for (auto& path : args.corpora)
-		{
-			ifstream ifs;
-			addCorpusTo(sents, openFile(ifs, path), realMorph);
-		}
-		//std::cout << sents.size() << std::endl;
+		ifstream ifs;
+		addCorpusTo(sents, openFile(ifs, path), realMorph);
+	}
 
-		if (args.dropoutProb > 0 && args.dropoutSampling > 0)
-		{
-			mt19937_64 rng{ 42 };
-			bernoulli_distribution sampler{ args.dropoutSampling };
-			discrete_distribution<> drop{ { 1 - args.dropoutProb, args.dropoutProb / 3, args.dropoutProb / 3, args.dropoutProb / 3} };
+	if (args.dropoutProb > 0 && args.dropoutSampling > 0)
+	{
+		mt19937_64 rng{ 42 };
+		bernoulli_distribution sampler{ args.dropoutSampling };
+		discrete_distribution<> drop{ { 1 - args.dropoutProb, args.dropoutProb / 3, args.dropoutProb / 3, args.dropoutProb / 3} };
 
-			size_t origSize = sents.size();
-			for (size_t n = 0; n < 2; ++n)
+		size_t origSize = sents.size();
+		for (size_t n = 0; n < 2; ++n)
+		{
+			for (size_t i = 0; i < origSize; ++i)
 			{
-				for (size_t i = 0; i < origSize; ++i)
+				//if (!sampler(rng)) continue;
+				sents.emplace_back();
+				sents.add_data(sents[i][0]);
+				bool emptyDoc = true;
+				for (size_t j = 1; j < sents[i].size() - 1; ++j)
 				{
-					//if (!sampler(rng)) continue;
-					sents.emplace_back();
-					sents.add_data(sents[i][0]);
-					bool emptyDoc = true;
-					for (size_t j = 1; j < sents[i].size() - 1; ++j)
+					auto v = sents[i][j];
+					switch (drop(rng))
 					{
-						auto v = sents[i][j];
-						switch (drop(rng))
-						{
-						case 0: // no dropout
-							emptyDoc = false;
-							sents.add_data(v);
-							break;
-						case 1: // replacement
-							emptyDoc = false;
-							sents.add_data(getDefaultMorphemeId(morphemes[v].tag));
-							break;
-						case 2: // deletion
-							break;
-						case 3: // insertion
-							emptyDoc = false;
-							sents.add_data(getDefaultMorphemeId(morphemes[v].tag));
-							sents.add_data(v);
-							break;
-						}
+					case 0: // no dropout
+						emptyDoc = false;
+						sents.add_data(v);
+						break;
+					case 1: // replacement
+						emptyDoc = false;
+						sents.add_data(getDefaultMorphemeId(morphemes[v].tag));
+						break;
+					case 2: // deletion
+						break;
+					case 3: // insertion
+						emptyDoc = false;
+						sents.add_data(getDefaultMorphemeId(morphemes[v].tag));
+						sents.add_data(v);
+						break;
 					}
+				}
 
-					if (emptyDoc)
-					{
-						sents.pop_back();
-					}
-					else
-					{
-						sents.add_data(sents[i][sents[i].size() - 1]);
-					}
+				if (emptyDoc)
+				{
+					sents.pop_back();
+				}
+				else
+				{
+					sents.add_data(sents[i][sents[i].size() - 1]);
 				}
 			}
 		}
-		//ofstream ofs{ "sent.bin", ios_base::binary };
-		//auto mem = sents.toMemory();
-		//ofs.write((const char*)mem.get(), mem.size());
-	}
-	else
-	{
-		ifstream ifs{ "sent.bin", ios_base::binary };
-		utils::MMap mm{ "sent.bin" };
-		utils::imstream im(mm.get(), mm.size());
-		sents = RaggedVector<utils::Vid>::fromMemory(im);
 	}
 
 	size_t lmVocabSize = 0;
@@ -610,47 +598,7 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 		return true;
 	};
 
-	/*Vector<std::pair<size_t, float>> cases = {
-		{ 5, 0.10f },
-		{ 10, 0.10f },
-		{ 5, 0.08f },
-		{ 10, 0.08f },
-		{ 5, 0.06f },
-		{ 10, 0.06f },
-		{ 5, 0.04f },
-		{ 10, 0.04f },
-	};
-	for (size_t n = 0; n < cases.size(); ++n)
-	{
-		ofstream ofs{"logs/" + to_string(n) + ".log"};
-		SkipBigramTrainer<utils::Vid, 8> sbg{ sents, sbgFilter, 0, 320, cases[n].first, cases[n].second};
-		ofs << "minCnt: " << cases[n].first << ", minNPMI: " << cases[n].second << ", vocabs: " << sbg.vocabDataSize() << "\n" << endl;
-		for (size_t i = 0; i < lmVocabSize; ++i)
-		{
-			auto vs = sbg.getVocabByCond(i);
-			if (vs.empty()) continue;
-			ofs << utf16To8(joinHangul(forms[morphemes[i].kform].form)) << '/' << tagToString(morphemes[i].tag) << endl;
-			for (auto v : vs)
-			{
-				ofs << "    " << utf16To8(joinHangul(forms[morphemes[v].kform].form)) << '/' << tagToString(morphemes[v].tag) << endl;
-			}
-			ofs << endl;
-		}
-	}*/
-	
-	sb::SkipBigramTrainer<utils::Vid, 8> sbg;
-	if (1)
-	{
-		sbg = sb::SkipBigramTrainer<utils::Vid, 8>{ sents, sbgTokenFilter, sbgPairFilter, 0, 150, 20, true, 0.333f, 1, 1000000 };
-		ofstream ofs{ "sbg.bin", ios_base::binary };
-		sbg.save(ofs);
-	}
-	else
-	{
-		ifstream ifs{ "sbg.bin", ios_base::binary };
-		sbg.load(ifs);
-	}
-
+	sbg = sb::SkipBigramTrainer<utils::Vid, 8>{ sents, sbgTokenFilter, sbgPairFilter, 0, 150, 20, true, 0.333f, 1, 1000000 };
 	Vector<float> lmLogProbs;
 	auto tc = sbg.newContext();
 	float llMean = 0;
@@ -734,13 +682,13 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 		llMean += (sum - llMean * cnt) / llCnt;
 	}
 	cout << "After Dev AvgLL: " << llMean << endl;
-	
-	ofstream ofs{ "logs/result.log" };
+
+	ofstream ofs{ modelPath + "/sbg.result.log" };
 	sbg.printParameters(ofs << "AvgLL: " << llMean << "\n", [&](size_t v)
 	{
 		return utf16To8(joinHangul(forms[morphemes[v].kform].form)) + "/" + tagToString(morphemes[v].tag);
 	});
-
+	
 	{
 		auto mem = sbg.convertToModel();
 		ofstream ofs{ modelPath + "/skipbigram.mdl", ios_base::binary };
@@ -1315,9 +1263,9 @@ inline CondPolarity reducePolar(CondPolarity p, const Morpheme* m)
 	return CondPolarity::none;
 }
 
-Kiwi KiwiBuilder::build() const
+Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) const
 {
-	Kiwi ret{ archType, langMdl.knlm->getHeader().key_size };
+	Kiwi ret{ archType, langMdl, !typos.empty()};
 
 	Vector<FormRaw> combinedForms;
 	Vector<MorphemeRaw> combinedMorphemes;
@@ -1327,7 +1275,6 @@ Kiwi KiwiBuilder::build() const
 
 	ret.forms.reserve(forms.size() + combinedForms.size() + 1);
 	ret.morphemes.reserve(morphemes.size() + combinedMorphemes.size());
-	ret.langMdl = langMdl;
 	ret.combiningRule = combiningRule;
 	ret.integrateAllomorph = !!(options & BuildOption::integrateAllomorph);
 	if (numThreads >= 1)
@@ -1353,15 +1300,25 @@ Kiwi KiwiBuilder::build() const
 		ret.forms.emplace_back(bake(f, ret.morphemes.data(), newFormCands[ret.forms.size()]));
 	}
 
+	Vector<size_t> newFormIdMapper(ret.forms.size());
+	iota(newFormIdMapper.begin(), newFormIdMapper.begin() + defaultTagSize - 1, 0);
+	utils::sortWriteInvIdx(ret.forms.begin() + defaultTagSize - 1, ret.forms.end(), newFormIdMapper.begin() + defaultTagSize - 1, (size_t)(defaultTagSize - 1));
 	ret.forms.emplace_back();
+
+	uint8_t formHash = 0;
+	for (size_t i = 1; i < ret.forms.size(); ++i)
+	{
+		if (ret.forms[i].form != ret.forms[i - 1].form) ++formHash;
+		ret.forms[i].formHash = formHash;
+	}
 
 	for (auto& m : morphemes)
 	{
-		ret.morphemes.emplace_back(bake(m, ret.morphemes.data(), ret.forms.data()));
+		ret.morphemes.emplace_back(bake(m, ret.morphemes.data(), ret.forms.data(), newFormIdMapper));
 	}
 	for (auto& m : combinedMorphemes)
 	{
-		ret.morphemes.emplace_back(bake(m, ret.morphemes.data(), ret.forms.data()));
+		ret.morphemes.emplace_back(bake(m, ret.morphemes.data(), ret.forms.data(), newFormIdMapper));
 	}
 
 	utils::ContinuousTrie<KTrie> formTrie{ defaultTagSize + 1 };
@@ -1389,33 +1346,119 @@ Kiwi KiwiBuilder::build() const
 		sortedForms.emplace_back(&f);
 	}
 
-	sort(sortedForms.begin(), sortedForms.end(), [](const Form* a, const Form* b)
+	// 오타 교정이 없는 경우 일반 Trie 생성
+	if (typos.empty())
 	{
-		return a->form < b->form;
-	});
-
-	size_t estimatedNodeSize = 0;
-	const KString* prevForm = nullptr;
-	for (auto f : sortedForms)
-	{
-		if (!prevForm)
+		sort(sortedForms.begin(), sortedForms.end(), [](const Form* a, const Form* b)
 		{
-			estimatedNodeSize += f->form.size();
-			prevForm = &f->form;
-			continue;
-		}
-		size_t commonPrefix = 0;
-		while (commonPrefix < std::min(prevForm->size(), f->form.size())
-			&& (*prevForm)[commonPrefix] == f->form[commonPrefix]) ++commonPrefix;
-		estimatedNodeSize += f->form.size() - commonPrefix;
-		prevForm = &f->form;
-	}
-	formTrie.reserveMore(estimatedNodeSize);
+			return a->form < b->form;
+		});
 
-	decltype(formTrie)::CacheStore<const KString> cache;
-	for (auto f : sortedForms)
+		size_t estimatedNodeSize = 0;
+		const KString* prevForm = nullptr;
+		for (auto f : sortedForms)
+		{
+			if (!prevForm)
+			{
+				estimatedNodeSize += f->form.size();
+				prevForm = &f->form;
+				continue;
+			}
+			size_t commonPrefix = 0;
+			while (commonPrefix < std::min(prevForm->size(), f->form.size())
+				&& (*prevForm)[commonPrefix] == f->form[commonPrefix]) ++commonPrefix;
+			estimatedNodeSize += f->form.size() - commonPrefix;
+			prevForm = &f->form;
+		}
+		formTrie.reserveMore(estimatedNodeSize);
+
+		decltype(formTrie)::CacheStore<const KString> cache;
+		for (auto f : sortedForms)
+		{
+			formTrie.buildWithCaching(f->form, f, cache);
+		}
+	}
+	// 오타 교정이 있는 경우 가능한 모든 오타에 대해 Trie 생성
+	else
 	{
-		formTrie.buildWithCaching(f->form, f, cache);
+		using TypoInfo = tuple<uint32_t, float, CondVowel>;
+		UnorderedMap<KString, Vector<TypoInfo>> typoGroup;
+		auto ptypos = typos.prepare();
+		for (auto f : sortedForms)
+		{
+			for (auto t : ptypos._generate(f->form, typoCostThreshold))
+			{
+				if (t.leftCond != CondVowel::none && f->vowel != CondVowel::none && t.leftCond != f->vowel) continue;
+				typoGroup[t.str].emplace_back(f - ret.forms.data(), t.cost, t.leftCond);
+			}
+		}
+
+		Vector<decltype(typoGroup)::pointer> typoGroupSorted;
+		size_t totTfSize = 0;
+		for (auto& v : typoGroup)
+		{
+			typoGroupSorted.emplace_back(&v);
+			sort(v.second.begin(), v.second.end(), [](const TypoInfo& a, const TypoInfo& b)
+				{
+					if (get<1>(a) < get<1>(b)) return true;
+					if (get<1>(a) > get<1>(b)) return false;
+					return get<0>(a) < get<0>(b);
+				});
+			totTfSize += v.second.size();
+		}
+
+		sort(typoGroupSorted.begin(), typoGroupSorted.end(), [](decltype(typoGroup)::pointer a, decltype(typoGroup)::pointer b)
+			{
+				return a->first < b->first;
+			});
+
+		ret.typoForms.reserve(totTfSize + 1);
+		
+		size_t estimatedNodeSize = 0;
+		const KString* prevForm = nullptr;
+		bool hash = false;
+		for (auto f : typoGroupSorted)
+		{
+			ret.typoForms.insert(ret.typoForms.end(), f->second.begin(), f->second.end());
+			for (auto it = ret.typoForms.end() - f->second.size(); it != ret.typoForms.end(); ++it)
+			{
+				it->typoId = ret.typoPtrs.size();
+			}
+			ret.typoPtrs.emplace_back(ret.typoPool.size());
+			ret.typoPool += f->first;
+
+			if (hash)
+			{
+				for (size_t i = 0; i < f->second.size(); ++i)
+				{
+					ret.typoForms.rbegin()[i].scoreHash = -ret.typoForms.rbegin()[i].scoreHash;
+				}
+			}
+
+			if (!prevForm)
+			{
+				estimatedNodeSize += f->first.size();
+				prevForm = &f->first;
+				continue;
+			}
+			size_t commonPrefix = 0;
+			while (commonPrefix < std::min(prevForm->size(), f->first.size())
+				&& (*prevForm)[commonPrefix] == f->first[commonPrefix]) ++commonPrefix;
+			estimatedNodeSize += f->first.size() - commonPrefix;
+			prevForm = &f->first;
+			hash = !hash;
+		}
+		ret.typoForms.emplace_back(0, 0, hash);
+		ret.typoPtrs.emplace_back(ret.typoPool.size());
+		formTrie.reserveMore(estimatedNodeSize);
+
+		decltype(formTrie)::CacheStore<const KString> cache;
+		size_t cumulated = 0;
+		for (auto f : typoGroupSorted)
+		{
+			formTrie.buildWithCaching(f->first, reinterpret_cast<const Form*>(&ret.typoForms[cumulated]), cache);
+			cumulated += f->second.size();
+		}
 	}
 
 	static tp::Table<FnFreezeTrie, AvailableArch> table{ FreezeTrieGetter{} };

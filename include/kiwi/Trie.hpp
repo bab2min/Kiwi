@@ -352,7 +352,7 @@ namespace kiwi
 			}
 
 			ContinuousTrie(const ContinuousTrie&) = default;
-			ContinuousTrie(ContinuousTrie&&) = default;
+			ContinuousTrie(ContinuousTrie&&) noexcept = default;
 
 			ContinuousTrie& operator=(const ContinuousTrie&) = default;
 			ContinuousTrie& operator=(ContinuousTrie&&) = default;

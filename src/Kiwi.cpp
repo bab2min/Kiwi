@@ -10,6 +10,7 @@
 #include "FrozenTrie.hpp"
 #include "LmState.hpp"
 #include "StrUtils.h"
+#include "SortUtils.hpp"
 #include "serializer.hpp"
 #include "Joiner.hpp"
 
@@ -25,9 +26,16 @@ namespace kiwi
 			const Morpheme* morph = nullptr;
 			KString str;
 			uint32_t begin = 0, end = 0;
-			float wordScore = 0;
-			Result(const Morpheme* _morph = nullptr, const KString& _str = {}, uint32_t _begin = 0, uint32_t _end = 0, float _wordScore = 0)
-				: morph{ _morph }, str{ _str }, begin{ _begin }, end{ _end }, wordScore{ _wordScore }
+			float wordScore = 0, typoCost = 0;
+			uint32_t typoFormId = 0;
+			Result(const Morpheme* _morph = nullptr, 
+				const KString& _str = {}, 
+				uint32_t _begin = 0, 
+				uint32_t _end = 0, 
+				float _wordScore = 0,
+				float _typoCost = 0
+			)
+				: morph{ _morph }, str{ _str }, begin{ _begin }, end{ _end }, wordScore{ _wordScore }, typoCost{_typoCost}
 			{
 			}
 		};
@@ -55,10 +63,11 @@ namespace kiwi
 		};
 	};
 
-	Kiwi::Kiwi(ArchType arch, size_t lmKeySize)
+	Kiwi::Kiwi(ArchType arch, LangModel _langMdl, bool typoTolerant)
+		: langMdl(_langMdl)
 	{
 		selectedArch = arch;
-		dfSplitByTrie = (void*)getSplitByTrieFn(selectedArch);
+		dfSplitByTrie = (void*)getSplitByTrieFn(selectedArch, typoTolerant);
 
 		static tp::Table<FnFindBestPath, AvailableArch> lmKnLM_8{ FindBestPathGetter<WrappedKnLM<uint8_t>::type>{} };
 		static tp::Table<FnFindBestPath, AvailableArch> lmKnLM_16{ FindBestPathGetter<WrappedKnLM<uint16_t>::type>{} };
@@ -71,7 +80,7 @@ namespace kiwi
 
 		if (langMdl.sbg)
 		{
-			switch (lmKeySize)
+			switch (langMdl.sbg->getHeader().keySize)
 			{
 			case 1:
 				dfFindBestPath = (void*)lmSbg_8[static_cast<std::ptrdiff_t>(selectedArch)];
@@ -89,9 +98,9 @@ namespace kiwi
 				throw Exception{ "Wrong `lmKeySize`" };
 			}
 		}
-		else
+		else if(langMdl.knlm)
 		{
-			switch (lmKeySize)
+			switch (langMdl.knlm->getHeader().key_size)
 			{
 			case 1:
 				dfFindBestPath = (void*)lmKnLM_8[static_cast<std::ptrdiff_t>(selectedArch)];
@@ -115,7 +124,7 @@ namespace kiwi
 
 	Kiwi::Kiwi(Kiwi&&) noexcept = default;
 
-	Kiwi& Kiwi::operator=(Kiwi&&) noexcept = default;
+	Kiwi& Kiwi::operator=(Kiwi&&) = default;
 
 	inline vector<size_t> allNewLinePositions(const u16string& str)
 	{
@@ -322,7 +331,7 @@ namespace kiwi
 				auto& r = res[min(n, res.size() - 1)];
 				transform(r.first.begin(), r.first.end(), back_inserter(ret[n].first), [&sents, i](TokenInfo& p)
 				{
-					p.position += distance(sents[0], sents[i - 1]);
+					p.position += (uint32_t)distance(sents[0], sents[i - 1]);
 					return p;
 				});
 				ret[n].second += r.second;
@@ -417,14 +426,14 @@ namespace kiwi
 	struct WordLL
 	{
 		MInfos morphs;
-		float accScore = 0;
+		float accScore = 0, accTypoCost = 0;
 		const WordLL* parent = nullptr;
 		LmState lmState;
 
 		WordLL() = default;
 
-		WordLL(const MInfos& _morphs, float _accScore, const WordLL* _parent, LmState _lmState)
-			: morphs{ _morphs }, accScore{ _accScore }, parent{ _parent }, lmState{ _lmState }
+		WordLL(const MInfos& _morphs, float _accScore, float _accTypoCost, const WordLL* _parent, LmState _lmState)
+			: morphs{ _morphs }, accScore{ _accScore }, accTypoCost{ _accTypoCost }, parent{ _parent }, lmState{ _lmState }
 		{
 		}
 	};
@@ -433,14 +442,14 @@ namespace kiwi
 	struct WordLLP
 	{
 		const MInfos* morphs = nullptr;
-		float accScore = 0;
+		float accScore = 0, accTypoCost = 0;
 		const WordLL<LmState>* parent = nullptr;
 		LmState lmState;
 
 		WordLLP() = default;
 
-		WordLLP(const MInfos* _morphs, float _accScore, const WordLL<LmState>* _parent, LmState _lmState)
-			: morphs{ _morphs }, accScore{ _accScore }, parent{ _parent }, lmState{ _lmState }
+		WordLLP(const MInfos* _morphs, float _accScore, float _accTypoCost, const WordLL<LmState>* _parent, LmState _lmState)
+			: morphs{ _morphs }, accScore{ _accScore }, accTypoCost{ _accTypoCost }, parent{ _parent }, lmState{ _lmState }
 		{
 		}
 	};
@@ -476,10 +485,9 @@ namespace kiwi
 	)
 	{
 		size_t vocabSize = langMdl.knlm->getHeader().vocab_size;
-		for (size_t i = 0; i < KGraphNode::max_prev; ++i)
+		for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
 		{
-			auto* prev = node->getPrev(i);
-			if (!prev) break;
+			assert(prev != node);
 			for (auto& p : cache[prev - startNode])
 			{
 				const auto* wids = &p.morphs;
@@ -525,7 +533,7 @@ namespace kiwi
 						candScore += ll;
 					}
 				}
-				emplaceMaxCnt(maxWidLL, lSeq, WordLLP<LmState>{ wids, candScore, &p, move(cLmState) }, 3, 
+				emplaceMaxCnt(maxWidLL, lSeq, WordLLP<LmState>{ wids, candScore, p.accTypoCost + node->typoCost, &p, move(cLmState) }, 3, 
 					[](const WordLLP<LmState>& a, const WordLLP<LmState>& b) 
 					{ 
 						return a.accScore > b.accScore; 
@@ -539,16 +547,16 @@ namespace kiwi
 	inline bool hasLeftBoundary(const KGraphNode* node)
 	{
 		// 시작 지점은 항상 왼쪽 경계로 처리
-		if (node->getPrev(0)->endPos == 0) return true; 
+		if (node->getPrev()->endPos == 0) return true; 
 
 		// 이전 노드의 끝지점이 현재 노드보다 작은 경우 왼쪽 경계로 처리
-		if (node->getPrev(0)->endPos < node->startPos) return true;
+		if (node->getPrev()->endPos < node->startPos) return true;
 		
 		// 이전 노드가 구두점이나 특수 문자인 경우
-		if (!node->getPrev(0)->uform.empty())
+		if (!node->getPrev()->uform.empty())
 		{
 			// 닫는 괄호는 왼쪽 경계로 처리하지 않음
-			auto c = node->getPrev(0)->uform.back();
+			auto c = node->getPrev()->uform.back();
 			if (isClosingPair(c) || c == u'"' || c == u'\'') return false;
 			
 			// 나머지 특수문자는 왼쪽 경계로 처리
@@ -570,7 +578,7 @@ namespace kiwi
 		bool unknownForm
 	)
 	{
-		const size_t langVocabSize = kw->langMdl.knlm->getHeader().vocab_size;;
+		const size_t langVocabSize = kw->langMdl.knlm->getHeader().vocab_size;
 		auto& nCache = cache[i];
 
 		float whitespaceDiscount = 0;
@@ -629,7 +637,7 @@ namespace kiwi
 				evalTrigram(kw->langMdl, kw->morphemes.data(), ownFormList, cache, seq, chSize, curMorph, node, startNode, maxWidLL, ignoreCond ? -10 : 0);
 				if (maxWidLL.empty()) continue;
 
-				float estimatedLL = curMorph->userScore + whitespaceDiscount;
+				float estimatedLL = curMorph->userScore + whitespaceDiscount - node->typoCost * kw->typoCostWeight;
 				// if a form of the node is unknown, calculate log poisson distribution for word-tag
 				if (unknownForm)
 				{
@@ -661,7 +669,7 @@ namespace kiwi
 					for (auto& q : p.second)
 					{
 						if (q.accScore <= tMax - kw->cutOffThreshold) continue;
-						nCache.emplace_back(MInfos{}, q.accScore, q.parent, q.lmState);
+						nCache.emplace_back(MInfos{}, q.accScore, q.accTypoCost, q.parent, q.lmState);
 						auto& wids = nCache.back().morphs;
 						wids.reserve(q.morphs->size() + chSize);
 						wids = *q.morphs;
@@ -707,20 +715,26 @@ namespace kiwi
 	}
 
 	template<class LmState>
-	inline void fillWordScores(const WordLL<LmState>* result, PathEvaluator::Result* out)
+	inline void fillWordScores(const WordLL<LmState>* result, const utils::ContainerSearcher<WordLL<LmState>>& csearcher, const KGraphNode* graph, PathEvaluator::Result* out, float typoCostWeight)
 	{
 		for (;result->parent; result = result->parent)
 		{
 			float scoreDiff = result->accScore - result->parent->accScore;
+			float typoCostDiff = result->accTypoCost - result->parent->accTypoCost;
 			size_t b = result->parent->morphs.size() - 1;
 			size_t e = result->morphs.size() - 1;
 			if (result->parent->morphs.back().combineSocket) --b;
 			if (result->morphs.back().combineSocket) --e;
 			if (b == e) continue;
+			auto& gNode = graph[csearcher(result)];
+			scoreDiff += typoCostDiff * typoCostWeight;
 			scoreDiff /= e - b;
+			typoCostDiff /= e - b;
 			for (size_t i = b; i < e; ++i)
 			{
 				out[i].wordScore = scoreDiff;
+				out[i].typoCost = typoCostDiff;
+				out[i].typoFormId = gNode.typoFormId;
 			}
 		}
 	}
@@ -744,7 +758,7 @@ namespace kiwi
 		unknownNodeLCands.emplace_back(kw->getDefaultMorpheme(POSTag::nnp));
 
 		// start node
-		cache.front().emplace_back(MInfos{ MInfo(0u) }, 0.f, nullptr, LmState{ kw->langMdl });
+		cache.front().emplace_back(MInfos{ MInfo(0u) }, 0.f, 0.f, nullptr, LmState{ kw->langMdl });
 
 		// middle nodes
 		for (size_t i = 1; i < graph.size() - 1; ++i)
@@ -823,18 +837,16 @@ namespace kiwi
 #endif
 		}
 
-		// end node
-		for (size_t i = 0; i < KGraphNode::max_prev; ++i)
+		// end node		
+		for (auto prev = endNode->getPrev(); prev; prev = prev->getSibling())
 		{
-			auto* prev = endNode->getPrev(i);
-			if (!prev) break;
 			for (auto&& p : cache[prev - startNode])
 			{
 				if (p.morphs.back().combineSocket) continue;
 				if (!FeatureTestor::isMatched(nullptr, p.morphs.back().condVowel)) continue;
 
 				float c = p.accScore + p.lmState.next(kw->langMdl, eosId);
-				cache.back().emplace_back(p.morphs, c, &p, p.lmState);
+				cache.back().emplace_back(p.morphs, c, p.accTypoCost, &p, p.lmState);
 			}
 		}
 
@@ -861,6 +873,7 @@ namespace kiwi
 
 #endif
 
+		utils::ContainerSearcher<WordLL<LmState>> csearcher{ cache };
 		Vector<pair<Path, float>> ret;
 		for (size_t i = 0; i < min(topN, cand.size()); ++i)
 		{
@@ -870,7 +883,7 @@ namespace kiwi
 				if (m.ownFormId) return Result{ &kw->morphemes[m.wid], ownFormList[m.ownFormId - 1], m.beginPos, m.endPos };
 				else return Result{ &kw->morphemes[m.wid], KString{}, m.beginPos, m.endPos };
 			});
-			fillWordScores(&cand[i], mv.data());
+			fillWordScores(&cand[i], csearcher, graph.data(), mv.data(), kw->typoCostWeight);
 			ret.emplace_back(mv, cand[i].accScore);
 		}
 		return ret;
@@ -992,7 +1005,7 @@ namespace kiwi
 		// 분석할 문장에 포함된 개별 문자에 대해 어절번호를 생성한다
 		std::vector<uint16_t> wordPositions = getWordPositions(sBegin, sEnd);
 		
-		auto nodes = (*reinterpret_cast<FnSplitByTrie>(dfSplitByTrie))(formTrie, normalizedStr, matchOptions, maxUnkFormSize, spaceTolerance);
+		auto nodes = (*reinterpret_cast<FnSplitByTrie>(dfSplitByTrie))(forms.data(), typoPtrs.data(), formTrie, normalizedStr, matchOptions, maxUnkFormSize, spaceTolerance, typoCostWeight);
 		vector<TokenResult> ret;
 		if (nodes.size() <= 2)
 		{
@@ -1037,9 +1050,11 @@ namespace kiwi
 				token.morph = s.morph;
 				size_t beginPos = (upper_bound(positionTable.begin(), positionTable.end(), s.begin) - positionTable.begin()) - 1;
 				size_t endPos = lower_bound(positionTable.begin(), positionTable.end(), s.end) - positionTable.begin();
-				token.position = beginPos;
-				token.length = endPos - beginPos;
+				token.position = (uint32_t)beginPos;
+				token.length = (uint16_t)(endPos - beginPos);
 				token.score = s.wordScore;
+				token.typoCost = s.typoCost;
+				token.typoFormId = s.typoFormId;
 
 				// Token의 시작위치(position)을 이용해 Token이 포함된 어절번호(wordPosition)를 얻음
 				token.wordPosition = wordPositions[token.position];
@@ -1132,5 +1147,11 @@ namespace kiwi
 		{
 			return (this->*lmVoid[archIdx])();
 		}
+	}
+
+	u16string Kiwi::getTypoForm(size_t typoFormId) const
+	{
+		const size_t* p = &typoPtrs[typoFormId];
+		return joinHangul(typoPool.begin() + p[0], typoPool.begin() + p[1]);
 	}
 }

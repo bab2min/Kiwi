@@ -2,8 +2,8 @@
  * @file Kiwi.h
  * @author bab2min (bab2min@gmail.com)
  * @brief Kiwi C++ API를 담고 있는 헤더 파일
- * @version 0.12.0
- * @date 2022-05-10
+ * @version 0.13.0
+ * @date 2022-06-24
  * 
  * 
  */
@@ -27,6 +27,7 @@
 #include "TagUtils.h"
 #include "LmState.h"
 #include "Joiner.h"
+#include "TypoTransformer.h"
 
 namespace kiwi
 {
@@ -61,6 +62,7 @@ namespace kiwi
 		float unkFormScoreScale = 5;
 		float unkFormScoreBias = 5;
 		float spacePenalty = 7;
+		float typoCostWeight = 6;
 		size_t maxUnkFormSize = 6;
 		size_t spaceTolerance = 0;
 
@@ -68,6 +70,9 @@ namespace kiwi
 
 		Vector<Form> forms;
 		Vector<Morpheme> morphemes;
+		KString typoPool;
+		Vector<size_t> typoPtrs;
+		Vector<TypoForm> typoForms;
 		utils::FrozenTrie<kchar_t, const Form*> formTrie;
 		LangModel langMdl;
 		std::shared_ptr<cmb::CompiledRule> combiningRule;
@@ -95,7 +100,7 @@ namespace kiwi
 		 * @note 이 생성자는 기본 생성자로 이를 통해 생성된 객체는 바로 형태소 분석에 사용할 수 없다.
 		 * kiwi::KiwiBuilder 를 통해 생성된 객체만이 형태소 분석에 사용할 수 있다.
 		 */
-		Kiwi(ArchType arch = ArchType::default_, size_t lmKeySize = 2);
+		Kiwi(ArchType arch = ArchType::default_, LangModel _langMdl = {}, bool typoTolerant = false);
 
 		~Kiwi();
 
@@ -105,7 +110,7 @@ namespace kiwi
 
 		Kiwi& operator=(const Kiwi&) = delete;
 
-		Kiwi& operator=(Kiwi&&) noexcept;
+		Kiwi& operator=(Kiwi&&);
 
 		/**
 		 * @brief 현재 Kiwi 객체가 형태소 분석을 수행할 준비가 되었는지를 알려준다.
@@ -268,12 +273,20 @@ namespace kiwi
 		/**
 		 * @brief 형태소들을 결합하여 텍스트로 복원해주는 작업을 수행하는 AutoJoiner를 반환한다.
 		 * 
-		 * @param lmSearch 결합 전에 언어 모델을 이용하여 최적의 형태소를 탐색하여 사용합니다.
+		 * @param lmSearch 결합 전에 언어 모델을 이용하여 최적의 형태소를 탐색하여 사용한다.
 		 * @return 새 AutoJoiner 인스턴스
 		 * 
 		 * @sa kiwi::cmb::AutoJoiner
 		 */
 		cmb::AutoJoiner newJoiner(bool lmSearch = true) const;
+
+		/**
+		 * @brief `TokenInfo::typoFormId`로부터 실제 오타 형태를 복원한다.
+		 * 
+		 * @param typoFormId analyze함수의 리턴으로 반환된 TokenInfo 내의 typoFormId 값
+		 * @return 복원된 오타의 형태
+		 */
+		std::u16string getTypoForm(size_t typoFormId) const;
 
 		size_t morphToId(const Morpheme* morph) const
 		{
@@ -299,6 +312,7 @@ namespace kiwi
 
 		void setCutOffThreshold(float v)
 		{
+			if (v < 0) throw std::invalid_argument{ "`v` must >= 0" };
 			cutOffThreshold = v;
 		}
 
@@ -309,6 +323,7 @@ namespace kiwi
 
 		void setUnkScoreBias(float v)
 		{
+			if (v < 0) throw std::invalid_argument{ "`v` must >= 0" };
 			unkFormScoreBias = v;
 		}
 
@@ -319,6 +334,7 @@ namespace kiwi
 
 		void setUnkScoreScale(float v)
 		{
+			if (v < 0) throw std::invalid_argument{ "`v` must >= 0" };
 			unkFormScoreScale = v;
 		}
 
@@ -349,7 +365,19 @@ namespace kiwi
 
 		void setSpacePenalty(float v)
 		{
+			if (v < 0) throw std::invalid_argument{ "`v` must >= 0" };
 			spacePenalty = v;
+		}
+
+		float getTypoCostWeight() const
+		{
+			return typoCostWeight;
+		}
+
+		void setTypoCostWeight(float v)
+		{
+			if (v < 0) throw std::invalid_argument{ "`v` must >= 0" };
+			typoCostWeight = v;
 		}
 
 		bool getIntegrateAllomorph() const
@@ -466,7 +494,7 @@ namespace kiwi
 
 		KiwiBuilder& operator=(const KiwiBuilder&);
 
-		KiwiBuilder& operator=(KiwiBuilder&&) noexcept;
+		KiwiBuilder& operator=(KiwiBuilder&&);
 
 		/**
 		 * @brief KiwiBuilder를 raw 데이터로부터 생성한다.
@@ -603,9 +631,11 @@ namespace kiwi
 		/**
 		 * @brief 현재 단어 및 사전 설정을 기반으로 Kiwi 객체를 생성한다.
 		 * 
+		 * @param typos
+		 * @param typoCostThreshold
 		 * @return 형태소 분석 준비가 완료된 Kiwi의 객체.
 		 */
-		Kiwi build() const;
+		Kiwi build(const TypoTransformer& typos = {}, float typoCostThreshold = 2.5f) const;
 
 		/*const lm::KnLangModelBase* getLangModel() const
 		{

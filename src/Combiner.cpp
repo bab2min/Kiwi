@@ -19,28 +19,28 @@ ChrSet::ChrSet(const ChrSet&) = default;
 ChrSet::ChrSet(ChrSet&&) noexcept = default;
 ChrSet::~ChrSet() = default;
 ChrSet& ChrSet::operator=(const ChrSet&) = default;
-ChrSet& ChrSet::operator=(ChrSet&&) noexcept = default;
+ChrSet& ChrSet::operator=(ChrSet&&) = default;
 
 Pattern::Pattern() = default;
 Pattern::Pattern(const Pattern&) = default;
 Pattern::Pattern(Pattern&&) noexcept = default;
 Pattern::~Pattern() = default;
 Pattern& Pattern::operator=(const Pattern&) = default;
-Pattern& Pattern::operator=(Pattern&&) noexcept = default;
+Pattern& Pattern::operator=(Pattern&&) = default;
 
 CompiledRule::CompiledRule() = default;
 CompiledRule::CompiledRule(const CompiledRule&) = default;
 CompiledRule::CompiledRule(CompiledRule&&) noexcept = default;
 CompiledRule::~CompiledRule() = default;
 CompiledRule& CompiledRule::operator=(const CompiledRule&) = default;
-CompiledRule& CompiledRule::operator=(CompiledRule&&) noexcept = default;
+CompiledRule& CompiledRule::operator=(CompiledRule&&) = default;
 
 RuleSet::RuleSet() = default;
 RuleSet::RuleSet(const RuleSet&) = default;
 RuleSet::RuleSet(RuleSet&&) noexcept = default;
 RuleSet::~RuleSet() = default;
 RuleSet& RuleSet::operator=(const RuleSet&) = default;
-RuleSet& RuleSet::operator=(RuleSet&&) noexcept = default;
+RuleSet& RuleSet::operator=(RuleSet&&) = default;
 
 inline bool hasRange(const ChrSet& set, char16_t b, char16_t e)
 {
@@ -630,16 +630,6 @@ MultiRuleDFAErased RuleSet::buildRightPattern(const Vector<Rule>& rules)
 
 	auto ret = buildRules<uint8_t>(rules.size(), nodes, ends, startingGroup);
 	return ret;
-}
-
-inline bool isHangulVowel(char16_t c)
-{
-	return u'ㅏ' <= c && c <= u'ㅣ';
-}
-
-inline char16_t joinOnsetVowel(size_t onset, size_t vowel)
-{
-	return u'가' + (onset * 21 + vowel) * 28;
 }
 
 void RuleSet::addRule(const string& lTag, const string& rTag,

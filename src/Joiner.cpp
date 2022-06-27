@@ -10,7 +10,7 @@ namespace kiwi
 		Joiner::Joiner(const CompiledRule& _cr) : cr{ &_cr } {}
 		Joiner::~Joiner() = default;
 		Joiner::Joiner(const Joiner&) = default;
-		Joiner::Joiner(Joiner&&) = default;
+		Joiner::Joiner(Joiner&&) noexcept = default;
 		Joiner& Joiner::operator=(const Joiner&) = default;
 		Joiner& Joiner::operator=(Joiner&&) = default;
 
@@ -81,8 +81,8 @@ namespace kiwi
 				{
 					if (isEClass(tag) && normForm[0] == u'아') normForm[0] = u'어';
 
-					CondVowel lastCv = lastCv = isHangulCoda(stack.back()) ? CondVowel::non_vowel : CondVowel::vowel;
-					bool lastCvocalic = lastCvocalic = (lastCv == CondVowel::vowel || stack.back() == u'\u11AF');
+					CondVowel lastCv = isHangulCoda(stack.back()) ? CondVowel::non_vowel : CondVowel::vowel;
+					bool lastCvocalic = (lastCv == CondVowel::vowel || stack.back() == u'\u11AF');
 					auto it = cr->allomorphPtrMap.find(make_pair(normForm, tag));
 					if (it != cr->allomorphPtrMap.end())
 					{
@@ -91,7 +91,7 @@ namespace kiwi
 						for (size_t i = ptrBegin; i < ptrEnd; ++i)
 						{
 							auto& m = cr->allomorphData[i];
-							if (m.second == CondVowel::vocalic && lastCvocalic || m.second == lastCv)
+							if ((m.second == CondVowel::vocalic && lastCvocalic) || m.second == lastCv)
 							{
 								normForm = m.first;
 								break;
