@@ -247,7 +247,7 @@ void TypoTransformer::addTypoWithCond(const KString& orig, const KString& error,
 {
 	if (orig == error) return;
 
-	if (leftCond == CondVowel::none || leftCond == CondVowel::vowel)
+	if (leftCond == CondVowel::none || leftCond == CondVowel::vowel || leftCond == CondVowel::any)
 	{
 		addTypoImpl(orig, error, cost, leftCond);
 	}
@@ -364,16 +364,23 @@ TypoCandidates<u16wrap> PreparedTypoTransformer::_generate(const KString& orig, 
 			for (size_t j = 0; j < m.second.size; ++j)
 			{
 				auto& repl = m.second.repl[j];
-				if (repl.leftCond == CondVowel::vowel)
+				if (repl.cost > costThreshold) continue;
+				CondVowel laxedCond = repl.leftCond;
+				if (laxedCond == CondVowel::vowel)
 				{
 					if (s == 0 || !isHangulSyllable(orig[s - 1])) continue;
+					laxedCond = CondVowel::none;
 				}
-
+				else if (laxedCond == CondVowel::any)
+				{
+					if (s == 0) continue;
+					laxedCond = CondVowel::none;
+				}
 				ret.addBranch(orig.begin() + totStartPos, orig.begin() + s,
 					repl.str, repl.str + repl.length,
 					orig.begin() + e, orig.begin() + totEndPos,
 					repl.cost,
-					repl.leftCond
+					laxedCond
 				);
 			}
 		}
@@ -454,9 +461,9 @@ namespace kiwi
 		TypoDef{ {u"ㅒ", u"ㅖ"}, {u"ㅒ", u"ㅖ"}, 1.f, CondVowel::none },
 		TypoDef{ {u"ㅚ", u"ㅙ", u"ㅞ"}, {u"ㅚ", u"ㅙ", u"ㅞ", u"ㅐ", u"ㅔ"}, 1.f, CondVowel::none },
 		TypoDef{ {u"ㅝ"}, {u"ㅗ", u"ㅓ"}, 1.f, CondVowel::none },
-		TypoDef{ {u"ㅟ"}, {u"ㅣ"}, 1.f, CondVowel::none },
-		TypoDef{ {u"ㅢ"}, {u"ㅣ"}, 1.f, CondVowel::none },
+		TypoDef{ {u"ㅟ", u"ㅢ"}, {u"ㅣ"}, 1.f, CondVowel::none},
 		TypoDef{ {u"위", u"의"}, {u"이"}, INFINITY, CondVowel::none}, // 이->위, 이->의 과도교정 배제
+		TypoDef{ {u"위", u"의"}, {u"이"}, 1.f, CondVowel::any}, // 이->위, 이->의 과도교정 배제
 		TypoDef{ {u"자", u"쟈"}, {u"자", u"쟈"}, 1.f, CondVowel::none },
 		TypoDef{ {u"재", u"쟤"}, {u"재", u"쟤"}, 1.f, CondVowel::none },
 		TypoDef{ {u"저", u"져"}, {u"저", u"져"}, 1.f, CondVowel::none },
@@ -536,5 +543,9 @@ namespace kiwi
 		TypoDef{ {u"을", u"를"}, {u"을", u"를"}, 2.f, CondVowel::none },
 
 		TypoDef{ {u"ㅣ워", u"ㅣ어", u"ㅕ"}, {u"ㅣ워", u"ㅣ어", u"ㅕ"}, 1.5f, CondVowel::none},
+		//TypoDef{ {u"ㅡ아", u"ㅏ"}, {u"ㅡ아", u"ㅏ"}, 1.5f, CondVowel::none},
+		//TypoDef{ {u"ㅡ어", u"ㅓ"}, {u"ㅡ어", u"ㅓ"}, 1.5f, CondVowel::none},
+		//TypoDef{ {u"ㅡ오", u"ㅗ"}, {u"ㅡ오", u"ㅗ"}, 1.5f, CondVowel::none},
+		//TypoDef{ {u"ㅡ우", u"ㅜ"}, {u"ㅡ우", u"ㅜ"}, 1.5f, CondVowel::none},
 	};
 }

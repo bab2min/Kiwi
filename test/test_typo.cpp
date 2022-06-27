@@ -56,6 +56,14 @@ TEST(KiwiTypo, Generate)
 TEST(KiwiTypo, BasicTypoSet)
 {
 	auto ptt = basicTypoSet.prepare();
+	
+	for (auto t : ptt.generate(u"의"))
+	{
+	}
+
+	for (auto t : ptt.generate(u"거의"))
+	{
+	}
 
 	for (auto t : ptt.generate(u"얽히고설키"))
 	{
