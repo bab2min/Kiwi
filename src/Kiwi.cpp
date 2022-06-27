@@ -481,7 +481,9 @@ namespace kiwi
 		const KGraphNode* node, 
 		const KGraphNode* startNode, 
 		_Type& maxWidLL, 
-		float ignoreCondScore
+		float ignoreCondScore,
+		float spacePenalty,
+		bool allowedSpaceBetweenChunk
 	)
 	{
 		size_t vocabSize = langMdl.knlm->getHeader().vocab_size;
@@ -498,6 +500,11 @@ namespace kiwi
 					if (wids->back().combineSocket != curMorph->combineSocket || curMorph->chunks.empty())
 					{
 						continue;
+					}
+					if (prev->endPos < node->startPos)
+					{
+						if (allowedSpaceBetweenChunk) candScore -= spacePenalty;
+						else continue;
 					}
 					seq[0] = morphBase[wids->back().wid].getCombined()->lmMorphemeId;
 				}
@@ -634,7 +641,7 @@ namespace kiwi
 				condP = curMorph->polar;
 
 				UnorderedMap<Wid, Vector<WordLLP<LmState>>> maxWidLL;
-				evalTrigram(kw->langMdl, kw->morphemes.data(), ownFormList, cache, seq, chSize, curMorph, node, startNode, maxWidLL, ignoreCond ? -10 : 0);
+				evalTrigram(kw->langMdl, kw->morphemes.data(), ownFormList, cache, seq, chSize, curMorph, node, startNode, maxWidLL, ignoreCond ? -10 : 0, kw->spacePenalty, kw->spaceTolerance > 0);
 				if (maxWidLL.empty()) continue;
 
 				float estimatedLL = curMorph->userScore + whitespaceDiscount - node->typoCost * kw->typoCostWeight;

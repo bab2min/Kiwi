@@ -71,6 +71,13 @@ TEST(KiwiCpp, SplitByPolarity)
 	EXPECT_EQ(ret.first.size(), 5);
 }
 
+TEST(KiwiCpp, SpaceBetweenChunk)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	auto ret = kiwi.analyze(u"다 갔다.", Match::allWithNormalizing);
+	EXPECT_EQ(ret.first[0].str, u"다");
+}
+
 TEST(KiwiCpp, SpaceTolerant)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
