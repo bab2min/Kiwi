@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['raggedvector_241',['RaggedVector',['../classkiwi_1_1RaggedVector.html',1,'kiwi']]]
+  ['preparedtypotransformer_278',['PreparedTypoTransformer',['../classkiwi_1_1PreparedTypoTransformer.html',1,'kiwi']]]
 ];

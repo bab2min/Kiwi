@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['worddetector_267',['WordDetector',['../classkiwi_1_1WordDetector.html',1,'kiwi']]],
-  ['wordinfo_268',['WordInfo',['../structkiwi_1_1WordInfo.html',1,'kiwi']]]
+  ['voidstate_309',['VoidState',['../classkiwi_1_1VoidState.html',1,'kiwi']]]
 ];

@@ -116,6 +116,10 @@ Public Attributes</h2></td></tr>
 <tr class="separator:ab7e062c457af1a22400689cdcfb66f72"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9b27979bcbb4a0ddcca86fdb8ac0087c"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi_1_1TokenInfo.html#a9b27979bcbb4a0ddcca86fdb8ac0087c">score</a> = 0</td></tr>
 <tr class="separator:a9b27979bcbb4a0ddcca86fdb8ac0087c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a665bcabafa2c41815d0a5ad51a27e833"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi_1_1TokenInfo.html#a665bcabafa2c41815d0a5ad51a27e833">typoCost</a> = 0</td></tr>
+<tr class="separator:a665bcabafa2c41815d0a5ad51a27e833"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa77262e269fb9873c00c6fc9ad410fbb"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi_1_1TokenInfo.html#aa77262e269fb9873c00c6fc9ad410fbb">typoFormId</a> = 0</td></tr>
+<tr class="separator:aa77262e269fb9873c00c6fc9ad410fbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8036684b6884ddf24d5f013d36cb6b0a"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi_1_1TokenInfo.html#a8036684b6884ddf24d5f013d36cb6b0a">morph</a> = nullptr</td></tr>
 <tr class="separator:a8036684b6884ddf24d5f013d36cb6b0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -254,6 +258,36 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>품사 태그 </p>
+
+</div>
+</div>
+<a id="a665bcabafa2c41815d0a5ad51a27e833"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a665bcabafa2c41815d0a5ad51a27e833">&#9670;&nbsp;</a></span>typoCost</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float kiwi::TokenInfo::typoCost = 0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>오타가 교정된 경우 오타 비용. 그렇지 않은 경우 0 </p>
+
+</div>
+</div>
+<a id="aa77262e269fb9873c00c6fc9ad410fbb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa77262e269fb9873c00c6fc9ad410fbb">&#9670;&nbsp;</a></span>typoFormId</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t kiwi::TokenInfo::typoFormId = 0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>교정 전 오타의 형태에 대한 정보 (typoCost가 0인 경우 의미 없음) </p>
 
 </div>
 </div>

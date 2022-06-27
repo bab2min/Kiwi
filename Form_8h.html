@@ -75,7 +75,8 @@ $(function() {
 
 <p>형태 및 형태소에 관한 정보를 담는 구조체들이 선언된 헤더  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &lt;<a class="el" href="Types_8h.html">kiwi/Types.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &lt;cmath&gt;</code><br />
+<code>#include &lt;<a class="el" href="Types_8h.html">kiwi/Types.h</a>&gt;</code><br />
 <code>#include &lt;kiwi/FixedVector.hpp&gt;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for Form.h:</div>
@@ -102,21 +103,23 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi_1_1Form.html">kiwi::Form</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">형태에 관한 모든 정보를 담는 구조체의 템플릿  <a href="structkiwi_1_1Form.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi_1_1TypoForm.html">kiwi::TypoForm</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:accaeb4bd4436e272076c608e00e20427"><td class="memItemLeft" align="right" valign="top">Form&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Form_8h.html#accaeb4bd4436e272076c608e00e20427">kiwi::bake</a> (const FormRaw &amp;o, const Morpheme *morphBase, const Vector&lt; uint32_t &gt; &amp;additionalCands={})</td></tr>
 <tr class="memdesc:accaeb4bd4436e272076c608e00e20427"><td class="mdescLeft">&#160;</td><td class="mdescRight">변경가능한 형태 정보를 bake하여 최적화한다.  <a href="Form_8h.html#accaeb4bd4436e272076c608e00e20427">More...</a><br /></td></tr>
 <tr class="separator:accaeb4bd4436e272076c608e00e20427"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad87b6a5e831ed4ca57972cf839b8bdbd"><td class="memItemLeft" align="right" valign="top">Morpheme&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Form_8h.html#ad87b6a5e831ed4ca57972cf839b8bdbd">kiwi::bake</a> (const MorphemeRaw &amp;o, const Morpheme *morphBase, const Form *formBase)</td></tr>
-<tr class="memdesc:ad87b6a5e831ed4ca57972cf839b8bdbd"><td class="mdescLeft">&#160;</td><td class="mdescRight">변경 가능한 형태소 정보를 bake하여 최적화한다.  <a href="Form_8h.html#ad87b6a5e831ed4ca57972cf839b8bdbd">More...</a><br /></td></tr>
-<tr class="separator:ad87b6a5e831ed4ca57972cf839b8bdbd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9a5e003889c5c747a5650ae0a7d58f9d"><td class="memItemLeft" align="right" valign="top">Morpheme&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Form_8h.html#a9a5e003889c5c747a5650ae0a7d58f9d">kiwi::bake</a> (const MorphemeRaw &amp;o, const Morpheme *morphBase, const Form *formBase, const Vector&lt; size_t &gt; &amp;formMap)</td></tr>
+<tr class="memdesc:a9a5e003889c5c747a5650ae0a7d58f9d"><td class="mdescLeft">&#160;</td><td class="mdescRight">변경 가능한 형태소 정보를 bake하여 최적화한다.  <a href="Form_8h.html#a9a5e003889c5c747a5650ae0a7d58f9d">More...</a><br /></td></tr>
+<tr class="separator:a9a5e003889c5c747a5650ae0a7d58f9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>형태 및 형태소에 관한 정보를 담는 구조체들이 선언된 헤더 </p>
 <dl class="section author"><dt>Author</dt><dd>bab2min (<a href="#" onclick="location.href='mai'+'lto:'+'bab'+'2m'+'in@'+'gm'+'ail'+'.c'+'om'; return false;">bab2m<span style="display: none;">.nosp@m.</span>in@g<span style="display: none;">.nosp@m.</span>mail.<span style="display: none;">.nosp@m.</span>com</a>) </dd></dl>
-<dl class="section version"><dt>Version</dt><dd>0.12.0 </dd></dl>
-<dl class="section date"><dt>Date</dt><dd>2022-05-10 </dd></dl>
+<dl class="section version"><dt>Version</dt><dd>0.13.0 </dd></dl>
+<dl class="section date"><dt>Date</dt><dd>2022-06-24 </dd></dl>
 </div><h2 class="groupheader">Function Documentation</h2>
 <a id="accaeb4bd4436e272076c608e00e20427"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#accaeb4bd4436e272076c608e00e20427">&#9670;&nbsp;</a></span>bake() <span class="overload">[1/2]</span></h2>
@@ -162,8 +165,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="ad87b6a5e831ed4ca57972cf839b8bdbd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad87b6a5e831ed4ca57972cf839b8bdbd">&#9670;&nbsp;</a></span>bake() <span class="overload">[2/2]</span></h2>
+<a id="a9a5e003889c5c747a5650ae0a7d58f9d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9a5e003889c5c747a5650ae0a7d58f9d">&#9670;&nbsp;</a></span>bake() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -184,7 +187,13 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const <a class="el" href="structkiwi_1_1Form.html">Form</a> *&#160;</td>
-          <td class="paramname"><em>formBase</em>&#160;</td>
+          <td class="paramname"><em>formBase</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="Types_8h.html#a48d29484f2a48f6a4de60bbfd7746232">Vector</a>&lt; size_t &gt; &amp;&#160;</td>
+          <td class="paramname"><em>formMap</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -200,6 +209,7 @@ Functions</h2></td></tr>
     <tr><td class="paramname">o</td><td>변경 가능한 형태소 정보 </td></tr>
     <tr><td class="paramname">morphBase</td><td>형태소 배열의 시작 위치 </td></tr>
     <tr><td class="paramname">formBase</td><td>형태 배열의 시작 위치 </td></tr>
+    <tr><td class="paramname">formMap</td><td></td></tr>
   </table>
   </dd>
 </dl>

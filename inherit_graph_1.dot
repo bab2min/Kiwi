@@ -4,5 +4,5 @@ digraph "Graphical Class Hierarchy"
   edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
   node [fontname="Helvetica",fontsize="10",shape=record];
   rankdir="LR";
-  Node0 [label="kiwi::cmb::AutoJoiner",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classkiwi_1_1cmb_1_1AutoJoiner.html",tooltip=" "];
+  Node0 [label="kiwi::ArchInfo\< ArchType\l::avx2 \>",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structkiwi_1_1ArchInfo_3_01ArchType_1_1avx2_01_4.html",tooltip=" "];
 }

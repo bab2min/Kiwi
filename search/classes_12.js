@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['voidstate_266',['VoidState',['../classkiwi_1_1VoidState.html',1,'kiwi']]]
+  ['unicodeexception_307',['UnicodeException',['../classkiwi_1_1UnicodeException.html',1,'kiwi']]],
+  ['unknownmorphemeexception_308',['UnknownMorphemeException',['../classkiwi_1_1UnknownMorphemeException.html',1,'kiwi']]]
 ];

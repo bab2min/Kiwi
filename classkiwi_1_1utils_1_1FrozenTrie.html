@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.17"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Kiwi: kiwi::utils::FrozenTrie&lt; _Key, _Value, _Diff &gt; Class Template Reference</title>
+<title>Kiwi: kiwi::utils::FrozenTrie&lt; _Key, _Value, _Diff, _HasSubmatch &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -71,18 +71,18 @@ $(function() {
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="classkiwi_1_1utils_1_1FrozenTrie-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">kiwi::utils::FrozenTrie&lt; _Key, _Value, _Diff &gt; Class Template Reference</div>  </div>
+<div class="title">kiwi::utils::FrozenTrie&lt; _Key, _Value, _Diff, _HasSubmatch &gt; Class Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="dynheader">
-Inheritance diagram for kiwi::utils::FrozenTrie&lt; _Key, _Value, _Diff &gt;:</div>
+Inheritance diagram for kiwi::utils::FrozenTrie&lt; _Key, _Value, _Diff, _HasSubmatch &gt;:</div>
 <div class="dyncontent">
-<div class="center"><img src="classkiwi_1_1utils_1_1FrozenTrie__inherit__graph.png" border="0" usemap="#kiwi_1_1utils_1_1FrozenTrie_3_01__Key_00_01__Value_00_01__Diff_01_4_inherit__map" alt="Inheritance graph"/></div>
+<div class="center"><img src="classkiwi_1_1utils_1_1FrozenTrie__inherit__graph.png" border="0" usemap="#kiwi_1_1utils_1_1FrozenTrie_3_01__Key_00_01__Value_00_01__Diff_00_01__HasSubmatch_01_4_inherit__map" alt="Inheritance graph"/></div>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <div class="dynheader">
-Collaboration diagram for kiwi::utils::FrozenTrie&lt; _Key, _Value, _Diff &gt;:</div>
+Collaboration diagram for kiwi::utils::FrozenTrie&lt; _Key, _Value, _Diff, _HasSubmatch &gt;:</div>
 <div class="dyncontent">
-<div class="center"><img src="classkiwi_1_1utils_1_1FrozenTrie__coll__graph.png" border="0" usemap="#kiwi_1_1utils_1_1FrozenTrie_3_01__Key_00_01__Value_00_01__Diff_01_4_coll__map" alt="Collaboration graph"/></div>
+<div class="center"><img src="classkiwi_1_1utils_1_1FrozenTrie__coll__graph.png" border="0" usemap="#kiwi_1_1utils_1_1FrozenTrie_3_01__Key_00_01__Value_00_01__Diff_00_01__HasSubmatch_01_4_coll__map" alt="Collaboration graph"/></div>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
@@ -92,46 +92,46 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:a5dc016f54212cfb2e6415d9f3d2567f5"><td class="memItemLeft" align="right" valign="top"><a id="a5dc016f54212cfb2e6415d9f3d2567f5"></a>
+<tr class="memitem:aa035bf14f543eae496eb8a9b8e1d82cf"><td class="memItemLeft" align="right" valign="top"><a id="aa035bf14f543eae496eb8a9b8e1d82cf"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>Key</b> = _Key</td></tr>
-<tr class="separator:a5dc016f54212cfb2e6415d9f3d2567f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aec4326ee8bf69f6e93add66a6c39824e"><td class="memItemLeft" align="right" valign="top"><a id="aec4326ee8bf69f6e93add66a6c39824e"></a>
+<tr class="separator:aa035bf14f543eae496eb8a9b8e1d82cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9518e0fa4a987822af96b5bd26ad6dd3"><td class="memItemLeft" align="right" valign="top"><a id="a9518e0fa4a987822af96b5bd26ad6dd3"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>Value</b> = _Value</td></tr>
-<tr class="separator:aec4326ee8bf69f6e93add66a6c39824e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acd38ba328cee05c931ae007f32045bdd"><td class="memItemLeft" align="right" valign="top"><a id="acd38ba328cee05c931ae007f32045bdd"></a>
+<tr class="separator:a9518e0fa4a987822af96b5bd26ad6dd3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac633c1ff19a3e1466674e6432d11a244"><td class="memItemLeft" align="right" valign="top"><a id="ac633c1ff19a3e1466674e6432d11a244"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>Diff</b> = _Diff</td></tr>
-<tr class="separator:acd38ba328cee05c931ae007f32045bdd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:ac633c1ff19a3e1466674e6432d11a244"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ad0b472e21aba1655a70a9b3eeae0249e"><td class="memTemplParams" colspan="2"><a id="ad0b472e21aba1655a70a9b3eeae0249e"></a>
-template&lt;class TrieNode , ArchType archType&gt; </td></tr>
-<tr class="memitem:ad0b472e21aba1655a70a9b3eeae0249e"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><b>FrozenTrie</b> (const <a class="el" href="classkiwi_1_1utils_1_1ContinuousTrie.html">ContinuousTrie</a>&lt; <a class="el" href="structkiwi_1_1utils_1_1TrieNode.html">TrieNode</a> &gt; &amp;trie, <a class="el" href="structkiwi_1_1ArchTypeHolder.html">ArchTypeHolder</a>&lt; archType &gt;)</td></tr>
-<tr class="separator:ad0b472e21aba1655a70a9b3eeae0249e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3f48b98ae9d8da8b8b5ff6a6b7ebcb07"><td class="memItemLeft" align="right" valign="top"><a id="a3f48b98ae9d8da8b8b5ff6a6b7ebcb07"></a>
+<tr class="memitem:a87c4c76394c51f32607b736fe6066fd5"><td class="memTemplParams" colspan="2"><a id="a87c4c76394c51f32607b736fe6066fd5"></a>
+template&lt;class TrieNode , ArchType archType, class Xform  = detail::NodeToVal&gt; </td></tr>
+<tr class="memitem:a87c4c76394c51f32607b736fe6066fd5"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><b>FrozenTrie</b> (const <a class="el" href="classkiwi_1_1utils_1_1ContinuousTrie.html">ContinuousTrie</a>&lt; <a class="el" href="structkiwi_1_1utils_1_1TrieNode.html">TrieNode</a> &gt; &amp;trie, <a class="el" href="structkiwi_1_1ArchTypeHolder.html">ArchTypeHolder</a>&lt; archType &gt;, Xform xform={})</td></tr>
+<tr class="separator:a87c4c76394c51f32607b736fe6066fd5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4baf9766252a1269cc9a350ab428a5dd"><td class="memItemLeft" align="right" valign="top"><a id="a4baf9766252a1269cc9a350ab428a5dd"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>FrozenTrie</b> (const <a class="el" href="classkiwi_1_1utils_1_1FrozenTrie.html">FrozenTrie</a> &amp;o)</td></tr>
-<tr class="separator:a3f48b98ae9d8da8b8b5ff6a6b7ebcb07"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5dc190b6cbd982f2ec21246e31e217ca"><td class="memItemLeft" align="right" valign="top"><a id="a5dc190b6cbd982f2ec21246e31e217ca"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>FrozenTrie</b> (<a class="el" href="classkiwi_1_1utils_1_1FrozenTrie.html">FrozenTrie</a> &amp;&amp;)=default</td></tr>
-<tr class="separator:a5dc190b6cbd982f2ec21246e31e217ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4c049783f24be287404044e154e3f551"><td class="memItemLeft" align="right" valign="top"><a id="a4c049783f24be287404044e154e3f551"></a>
+<tr class="separator:a4baf9766252a1269cc9a350ab428a5dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abcb5f2f1529688749757154819a84af5"><td class="memItemLeft" align="right" valign="top"><a id="abcb5f2f1529688749757154819a84af5"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>FrozenTrie</b> (<a class="el" href="classkiwi_1_1utils_1_1FrozenTrie.html">FrozenTrie</a> &amp;&amp;) noexcept=default</td></tr>
+<tr class="separator:abcb5f2f1529688749757154819a84af5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a77b9cec51d852d4f1a785383e4585814"><td class="memItemLeft" align="right" valign="top"><a id="a77b9cec51d852d4f1a785383e4585814"></a>
 <a class="el" href="classkiwi_1_1utils_1_1FrozenTrie.html">FrozenTrie</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const <a class="el" href="classkiwi_1_1utils_1_1FrozenTrie.html">FrozenTrie</a> &amp;o)</td></tr>
-<tr class="separator:a4c049783f24be287404044e154e3f551"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa3676760915450d75c479dd5b49ab05c"><td class="memItemLeft" align="right" valign="top"><a id="aa3676760915450d75c479dd5b49ab05c"></a>
-<a class="el" href="classkiwi_1_1utils_1_1FrozenTrie.html">FrozenTrie</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (<a class="el" href="classkiwi_1_1utils_1_1FrozenTrie.html">FrozenTrie</a> &amp;&amp;o)=default</td></tr>
-<tr class="separator:aa3676760915450d75c479dd5b49ab05c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a39e549c3e26eb4fdc5d13fb3ff017d15"><td class="memItemLeft" align="right" valign="top"><a id="a39e549c3e26eb4fdc5d13fb3ff017d15"></a>
+<tr class="separator:a77b9cec51d852d4f1a785383e4585814"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab9a05583036d0198e24971c469bd8578"><td class="memItemLeft" align="right" valign="top"><a id="ab9a05583036d0198e24971c469bd8578"></a>
+<a class="el" href="classkiwi_1_1utils_1_1FrozenTrie.html">FrozenTrie</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (<a class="el" href="classkiwi_1_1utils_1_1FrozenTrie.html">FrozenTrie</a> &amp;&amp;o) noexcept=default</td></tr>
+<tr class="separator:ab9a05583036d0198e24971c469bd8578"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7ffe11d28c0c87381077137ed112f39a"><td class="memItemLeft" align="right" valign="top"><a id="a7ffe11d28c0c87381077137ed112f39a"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>empty</b> () const</td></tr>
-<tr class="separator:a39e549c3e26eb4fdc5d13fb3ff017d15"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac22b55d315348a95e671788cb712fcb5"><td class="memItemLeft" align="right" valign="top"><a id="ac22b55d315348a95e671788cb712fcb5"></a>
+<tr class="separator:a7ffe11d28c0c87381077137ed112f39a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a378c7b178d013688d4871a53b85a5ac6"><td class="memItemLeft" align="right" valign="top"><a id="a378c7b178d013688d4871a53b85a5ac6"></a>
 size_t&#160;</td><td class="memItemRight" valign="bottom"><b>size</b> () const</td></tr>
-<tr class="separator:ac22b55d315348a95e671788cb712fcb5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aef9c8f81b1952cdedaf5b3bf72936ed0"><td class="memItemLeft" align="right" valign="top"><a id="aef9c8f81b1952cdedaf5b3bf72936ed0"></a>
+<tr class="separator:a378c7b178d013688d4871a53b85a5ac6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae369d3cc21bfcaee514d7ad44d88eb94"><td class="memItemLeft" align="right" valign="top"><a id="ae369d3cc21bfcaee514d7ad44d88eb94"></a>
 const <a class="el" href="structkiwi_1_1utils_1_1FrozenTrie_1_1Node.html">Node</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>root</b> () const</td></tr>
-<tr class="separator:aef9c8f81b1952cdedaf5b3bf72936ed0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af84a1f354450c9de1de8046ab065ef2a"><td class="memItemLeft" align="right" valign="top"><a id="af84a1f354450c9de1de8046ab065ef2a"></a>
+<tr class="separator:ae369d3cc21bfcaee514d7ad44d88eb94"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a764bef0923a3528f0a2c9e843ed62d47"><td class="memItemLeft" align="right" valign="top"><a id="a764bef0923a3528f0a2c9e843ed62d47"></a>
 const Value &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>value</b> (size_t idx) const</td></tr>
-<tr class="separator:af84a1f354450c9de1de8046ab065ef2a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:a764bef0923a3528f0a2c9e843ed62d47"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <hr/>The documentation for this class was generated from the following file:<ul>
 <li>include/kiwi/FrozenTrie.h</li>

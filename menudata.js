@@ -52,4 +52,5 @@ var menudata={children:[
 {text:"k",url:"globals.html#index_k"}]},
 {text:"Functions",url:"globals_func.html",children:[
 {text:"k",url:"globals_func.html#index_k"}]},
+{text:"Variables",url:"globals_vars.html"},
 {text:"Typedefs",url:"globals_type.html"}]}]}]}

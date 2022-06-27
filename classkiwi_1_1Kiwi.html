@@ -81,9 +81,9 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a1ddbdd082be1079cb306538bc05719af"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1Kiwi.html#a1ddbdd082be1079cb306538bc05719af">Kiwi</a> (ArchType arch=ArchType::default_, size_t lmKeySize=2)</td></tr>
-<tr class="memdesc:a1ddbdd082be1079cb306538bc05719af"><td class="mdescLeft">&#160;</td><td class="mdescRight">빈 <a class="el" href="classkiwi_1_1Kiwi.html" title="실제 형태소 분석을 수행하는 클래스.">Kiwi</a> 객체를 생성한다.  <a href="classkiwi_1_1Kiwi.html#a1ddbdd082be1079cb306538bc05719af">More...</a><br /></td></tr>
-<tr class="separator:a1ddbdd082be1079cb306538bc05719af"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a447ca75684e8a73ce682022268be1e4c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1Kiwi.html#a447ca75684e8a73ce682022268be1e4c">Kiwi</a> (ArchType arch=ArchType::default_, <a class="el" href="structkiwi_1_1LangModel.html">LangModel</a> _langMdl={}, bool typoTolerant=false)</td></tr>
+<tr class="memdesc:a447ca75684e8a73ce682022268be1e4c"><td class="mdescLeft">&#160;</td><td class="mdescRight">빈 <a class="el" href="classkiwi_1_1Kiwi.html" title="실제 형태소 분석을 수행하는 클래스.">Kiwi</a> 객체를 생성한다.  <a href="classkiwi_1_1Kiwi.html#a447ca75684e8a73ce682022268be1e4c">More...</a><br /></td></tr>
+<tr class="separator:a447ca75684e8a73ce682022268be1e4c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a823fae39cb92135cf1507ddcea7d3004"><td class="memItemLeft" align="right" valign="top"><a id="a823fae39cb92135cf1507ddcea7d3004"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>Kiwi</b> (const <a class="el" href="classkiwi_1_1Kiwi.html">Kiwi</a> &amp;)=delete</td></tr>
 <tr class="separator:a823fae39cb92135cf1507ddcea7d3004"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -93,9 +93,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a2fbde2743dcdfa23e4a97ce83fb42e3a"><td class="memItemLeft" align="right" valign="top"><a id="a2fbde2743dcdfa23e4a97ce83fb42e3a"></a>
 <a class="el" href="classkiwi_1_1Kiwi.html">Kiwi</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const <a class="el" href="classkiwi_1_1Kiwi.html">Kiwi</a> &amp;)=delete</td></tr>
 <tr class="separator:a2fbde2743dcdfa23e4a97ce83fb42e3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3d69432341622848efaa9358e120447e"><td class="memItemLeft" align="right" valign="top"><a id="a3d69432341622848efaa9358e120447e"></a>
-<a class="el" href="classkiwi_1_1Kiwi.html">Kiwi</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (<a class="el" href="classkiwi_1_1Kiwi.html">Kiwi</a> &amp;&amp;) noexcept</td></tr>
-<tr class="separator:a3d69432341622848efaa9358e120447e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af9212c53378c80198cd124736d44fe70"><td class="memItemLeft" align="right" valign="top"><a id="af9212c53378c80198cd124736d44fe70"></a>
+<a class="el" href="classkiwi_1_1Kiwi.html">Kiwi</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (<a class="el" href="classkiwi_1_1Kiwi.html">Kiwi</a> &amp;&amp;)</td></tr>
+<tr class="separator:af9212c53378c80198cd124736d44fe70"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a278af7fd34a725f39b2fcfd528d34b6e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1Kiwi.html#a278af7fd34a725f39b2fcfd528d34b6e">ready</a> () const</td></tr>
 <tr class="memdesc:a278af7fd34a725f39b2fcfd528d34b6e"><td class="mdescLeft">&#160;</td><td class="mdescRight">현재 <a class="el" href="classkiwi_1_1Kiwi.html" title="실제 형태소 분석을 수행하는 클래스.">Kiwi</a> 객체가 형태소 분석을 수행할 준비가 되었는지를 알려준다.  <a href="classkiwi_1_1Kiwi.html#a278af7fd34a725f39b2fcfd528d34b6e">More...</a><br /></td></tr>
 <tr class="separator:a278af7fd34a725f39b2fcfd528d34b6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -122,6 +122,9 @@ ArchType&#160;</td><td class="memItemRight" valign="bottom"><b>archType</b> () c
 <tr class="memitem:a38266e3408b09fe2e924f5f04fd8f19d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classkiwi_1_1cmb_1_1AutoJoiner.html">cmb::AutoJoiner</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1Kiwi.html#a38266e3408b09fe2e924f5f04fd8f19d">newJoiner</a> (bool lmSearch=true) const</td></tr>
 <tr class="memdesc:a38266e3408b09fe2e924f5f04fd8f19d"><td class="mdescLeft">&#160;</td><td class="mdescRight">형태소들을 결합하여 텍스트로 복원해주는 작업을 수행하는 AutoJoiner를 반환한다.  <a href="classkiwi_1_1Kiwi.html#a38266e3408b09fe2e924f5f04fd8f19d">More...</a><br /></td></tr>
 <tr class="separator:a38266e3408b09fe2e924f5f04fd8f19d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aec622c9828a27aad2c12a021e1c8a577"><td class="memItemLeft" align="right" valign="top">std::u16string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1Kiwi.html#aec622c9828a27aad2c12a021e1c8a577">getTypoForm</a> (size_t typoFormId) const</td></tr>
+<tr class="memdesc:aec622c9828a27aad2c12a021e1c8a577"><td class="mdescLeft">&#160;</td><td class="mdescRight"><code><a class="el" href="structkiwi_1_1TokenInfo.html#aa77262e269fb9873c00c6fc9ad410fbb">TokenInfo::typoFormId</a></code>로부터 실제 오타 형태를 복원한다.  <a href="classkiwi_1_1Kiwi.html#aec622c9828a27aad2c12a021e1c8a577">More...</a><br /></td></tr>
+<tr class="separator:aec622c9828a27aad2c12a021e1c8a577"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a259ea999c3b30610c92d01adb9e69df0"><td class="memItemLeft" align="right" valign="top"><a id="a259ea999c3b30610c92d01adb9e69df0"></a>
 size_t&#160;</td><td class="memItemRight" valign="bottom"><b>morphToId</b> (const <a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a> *morph) const</td></tr>
 <tr class="separator:a259ea999c3b30610c92d01adb9e69df0"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -167,6 +170,12 @@ float&#160;</td><td class="memItemRight" valign="bottom"><b>getSpacePenalty</b> 
 <tr class="memitem:ad8e14dbe35e32682ae9eb9c713d4b30e"><td class="memItemLeft" align="right" valign="top"><a id="ad8e14dbe35e32682ae9eb9c713d4b30e"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>setSpacePenalty</b> (float v)</td></tr>
 <tr class="separator:ad8e14dbe35e32682ae9eb9c713d4b30e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a24a74632fc1dff4a720cbc79b7d0b230"><td class="memItemLeft" align="right" valign="top"><a id="a24a74632fc1dff4a720cbc79b7d0b230"></a>
+float&#160;</td><td class="memItemRight" valign="bottom"><b>getTypoCostWeight</b> () const</td></tr>
+<tr class="separator:a24a74632fc1dff4a720cbc79b7d0b230"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aca5362444e20f2587ad7a6b178c7e02a"><td class="memItemLeft" align="right" valign="top"><a id="aca5362444e20f2587ad7a6b178c7e02a"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setTypoCostWeight</b> (float v)</td></tr>
+<tr class="separator:aca5362444e20f2587ad7a6b178c7e02a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4ed866e8bd2f37aca4d76ba6e606fb05"><td class="memItemLeft" align="right" valign="top"><a id="a4ed866e8bd2f37aca4d76ba6e606fb05"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>getIntegrateAllomorph</b> () const</td></tr>
 <tr class="separator:a4ed866e8bd2f37aca4d76ba6e606fb05"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -196,8 +205,8 @@ template&lt;template&lt; ArchType &gt; class LmState&gt; </td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>실제 형태소 분석을 수행하는 클래스. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a1ddbdd082be1079cb306538bc05719af"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1ddbdd082be1079cb306538bc05719af">&#9670;&nbsp;</a></span>Kiwi()</h2>
+<a id="a447ca75684e8a73ce682022268be1e4c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a447ca75684e8a73ce682022268be1e4c">&#9670;&nbsp;</a></span>Kiwi()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -211,8 +220,14 @@ template&lt;template&lt; ArchType &gt; class LmState&gt; </td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>lmKeySize</em> = <code>2</code>&#160;</td>
+          <td class="paramtype"><a class="el" href="structkiwi_1_1LangModel.html">LangModel</a>&#160;</td>
+          <td class="paramname"><em>_langMdl</em> = <code>{}</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>typoTolerant</em> = <code>false</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -519,6 +534,33 @@ template&lt;class ReaderCallback , class ResultCallback &gt; </div>
 
 </div>
 </div>
+<a id="aec622c9828a27aad2c12a021e1c8a577"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aec622c9828a27aad2c12a021e1c8a577">&#9670;&nbsp;</a></span>getTypoForm()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::u16string kiwi::Kiwi::getTypoForm </td>
+          <td>(</td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>typoFormId</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><code><a class="el" href="structkiwi_1_1TokenInfo.html#aa77262e269fb9873c00c6fc9ad410fbb">TokenInfo::typoFormId</a></code>로부터 실제 오타 형태를 복원한다. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">typoFormId</td><td>analyze함수의 리턴으로 반환된 <a class="el" href="structkiwi_1_1TokenInfo.html" title="분석 완료된 각 형태소들의 정보를 담는 구조체">TokenInfo</a> 내의 typoFormId 값 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>복원된 오타의 형태 </dd></dl>
+
+</div>
+</div>
 <a id="a38266e3408b09fe2e924f5f04fd8f19d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a38266e3408b09fe2e924f5f04fd8f19d">&#9670;&nbsp;</a></span>newJoiner()</h2>
 
@@ -538,7 +580,7 @@ template&lt;class ReaderCallback , class ResultCallback &gt; </div>
 <p>형태소들을 결합하여 텍스트로 복원해주는 작업을 수행하는 AutoJoiner를 반환한다. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">lmSearch</td><td>결합 전에 언어 모델을 이용하여 최적의 형태소를 탐색하여 사용합니다. </td></tr>
+    <tr><td class="paramname">lmSearch</td><td>결합 전에 언어 모델을 이용하여 최적의 형태소를 탐색하여 사용한다. </td></tr>
   </table>
   </dd>
 </dl>
