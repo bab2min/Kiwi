@@ -14,7 +14,7 @@ Other:
 
 Kiwi는 빠른 속도와 범용적인 성능을 지향하는 한국어 형태소 분석기 라이브러리입니다. 한국어 처리에 관심 있는 사람이면 누구나 쉽게 사용할 수 있도록 오픈 소스로 공개 중이며, C++로 구현된 코어 라이브러리를 래핑하여 다양한 프로그래밍 언어에 사용할 수 있도록 준비 중입니다. 
 
-형태소 분석은 세종 품사 태그 체계를 기반으로 하고 있으며 모델 학습에는 세종계획 말뭉치와 모두의 말뭉치를 사용하고 있습니다. 웹 텍스트의 경우 약 87%, 문어 텍스트의 경우 약 94% 정도의 정확도로 한국어 문장의 형태소를 분석해 낼 수 있습니다.
+형태소 분석은 세종 품사 태그 체계를 기반으로 하고 있으며 모델 학습에는 세종계획 말뭉치와 모두의 말뭉치를 사용하고 있습니다. 웹 텍스트의 경우 약 87%, 문어 텍스트의 경우 약 94% 정도의 정확도로 한국어 문장의 형태소를 분석해 낼 수 있습니다. 또한 간단한 오타의 경우 모델 스스로 교정하는 기능을 지원합니다(0.13.0버전 이후). 
 
 아직 부족한 부분이 많기에 개발자분들의 많은 관심과 기여 부탁드립니다.
 
@@ -80,26 +80,62 @@ $ ldconfig
 
 설치가 잘 됐는지 확인하기 위해서는 `kiwi-evaluator`를 실행해봅니다.
 ```console
-$ ./kiwi-evaluator --model ../ModelGenerator ../eval_data/web.txt ../eval_data/written.txt
+$ ./kiwi-evaluator --model ../ModelGenerator ../eval_data/* --sbg
 
-Loading Time : 838.809 ms
-LM Size : 32.1909 MB
-Mem Usage : 427.664 MB
+Loading Time : 846.046 ms
+ArchType : avx2
+LM Size : 33.6552 MB
+Mem Usage : 276.844 MB
 
 Test file: eval_data/web.txt
-0.870123, 0.856707
-Total (108 lines) Time : 143.519 ms
-Time per Line : 1.32888 ms
+0.864955, 0.855184
+Total (158 lines) Time : 305.428 ms
+Time per Line : 1.93309 ms
+================
+Test file: eval_data/web_with_typos.txt
+0.780165, 0.741127
+Total (97 lines) Time : 96.5016 ms
+Time per Line : 0.994862 ms
 ================
 Test file: eval_data/written.txt
-0.941176, 0.941059
-Total (33 lines) Time : 56.5635 ms
-Time per Line : 1.71404 ms
+0.941712, 0.943084
+Total (33 lines) Time : 59.7139 ms
+Time per Line : 1.80951 ms
 ================
 
 ================
 Avg Score
-0.90565, 0.898883
+0.862277, 0.846465
+================
+```
+
+0.13.0 버전부터 추가된 오타 교정 기능이 잘 작동하는지 확인하기 위해서는 다음과 같이 실행합니다.
+```console
+$ ./kiwi-evaluator --model ../ModelGenerator ../eval_data/* --sbg --typo 6
+Loading Time : 8726.69 ms
+ArchType : avx2
+LM Size : 33.6552 MB
+Mem Usage : 943.961 MB
+
+Test file: eval_data/web.txt
+0.866503, 0.856685
+Total (158 lines) Time : 440.98 ms
+Time per Line : 2.79101 ms
+================
+Test file: eval_data/web_with_typos.txt
+0.906406, 0.897511
+Total (97 lines) Time : 167.255 ms
+Time per Line : 1.72428 ms
+================
+Test file: eval_data/written.txt
+0.940534, 0.941794
+Total (33 lines) Time : 95.3002 ms
+Time per Line : 2.88788 ms
+================
+
+================
+Avg Score
+0.904481, 0.898663
 ================
 ```
 
