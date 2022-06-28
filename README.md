@@ -26,7 +26,7 @@ Kiwi는 빠른 속도와 범용적인 성능을 지향하는 한국어 형태소
 
 ![모호성 해소 성능](https://bab2min.github.io/kiwipiepy/images/DisambAcc.PNG)
 
-또한 자체적으로 경량 언어모델을 탑재하여 모호성이 있는 경우에도 제법 정확하게 형태소를 분석해냅니다. (모호성 해소 성능 평가는 [이 페이지](https://github.com/bab2min/kiwipiepy/tree/main/benchmark/disambiguate)에서 수행가능합니다. )
+또한 자체적으로 경량 언어모델을 탑재하여 모호성이 있는 경우에도 제법 정확하게 형태소를 분석해냅니다. 특히 SBG모델을 사용 시 모호성 해소 성능이 크게 향상됩니다. (모호성 해소 성능 평가는 [이 페이지](https://github.com/bab2min/kiwipiepy/tree/main/benchmark/disambiguate)에서 수행가능합니다. )
 
 ![문장 분리 성능](https://bab2min.github.io/kiwipiepy/images/SentSplit_EM.PNG)
 
