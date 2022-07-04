@@ -115,6 +115,8 @@ namespace kiwi
 			const Node* root() const { return nodes.get(); }
 
 			const Value& value(size_t idx) const { return values[idx]; };
+
+			bool hasMatch(_Value v) const { return !this->isNull(v) && !this->hasSubmatch(v); }
 		};
 	}
 }

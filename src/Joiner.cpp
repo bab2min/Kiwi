@@ -186,7 +186,7 @@ namespace kiwi
 				if (!node) break;
 			}
 
-			if (node && (formHead = node->val(kiwi->formTrie)) != nullptr)
+			if (node && kiwi->formTrie.hasMatch(formHead = node->val(kiwi->formTrie)))
 			{
 				Vector<const Morpheme*> cands;
 				do
