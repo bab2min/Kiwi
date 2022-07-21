@@ -287,10 +287,27 @@ inline Vector<POSTag> getSubTagset(const string& prefix)
 		{
 			ret.emplace_back(POSTag::pai);
 		}
+		else if (pf == "PR")
+		{
+			ret.emplace_back(POSTag::pv);
+			ret.emplace_back(POSTag::pa);
+		}
 		else if (pf == "PI")
 		{
 			ret.emplace_back(POSTag::pvi);
 			ret.emplace_back(POSTag::pai);
+		}
+		else if (pf == "VV-R")
+		{
+			ret.emplace_back(POSTag::vv);
+		}
+		else if (pf == "VA-R")
+		{
+			ret.emplace_back(POSTag::va);
+		}
+		else if (pf == "VX-R")
+		{
+			ret.emplace_back(POSTag::vx);
 		}
 		else
 		{

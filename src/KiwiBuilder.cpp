@@ -41,6 +41,7 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 		KString form;
 		float weight = 0;
 		POSTag tag = POSTag::unknown;
+		POSTag origTag = POSTag::unknown;
 		CondVowel cvowel = CondVowel::none;
 		KString origForm;
 		int addAlias = 0;
@@ -49,12 +50,13 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 		LongTail(KString _form = {},
 			float _weight = 0,
 			POSTag _tag = POSTag::unknown,
+			POSTag _origTag = POSTag::unknown,
 			CondVowel _cvowel = CondVowel::none,
 			KString _origForm = {},
 			int _addAlias = 0,
 			size_t _origMorphId = 0
 		) :
-			form{ _form }, weight{ _weight }, tag{ _tag }, cvowel{ _cvowel }, 
+			form{ _form }, weight{ _weight }, tag{ _tag }, origTag{ _origTag }, cvowel{ _cvowel },
 			origForm{ _origForm }, addAlias{ _addAlias }, origMorphId{ _origMorphId }
 		{
 		}
@@ -116,6 +118,7 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 
 		CondVowel cvowel = CondVowel::none;
 		KString origMorphemeOfAlias;
+		POSTag origTag = tag;
 		int addAlias = 0;
 		if (fields.size() > 3)
 		{
@@ -167,7 +170,15 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 				else if (f[0] == u'~')
 				{
 					if (!origMorphemeOfAlias.empty()) throw Exception{ "wrong line: " + line };
-					origMorphemeOfAlias = normalizeHangul(f.substr(1));
+					if (f.find('/') == f.npos)
+					{
+						origMorphemeOfAlias = normalizeHangul(f.substr(1));
+					}
+					else
+					{
+						origMorphemeOfAlias = normalizeHangul(f.substr(1, f.find('/') - 1));
+						origTag = toPOSTag(f.substr(f.find('/') + 1));
+					}
 					addAlias = 0; // ~의 경우 말뭉치 로딩시에만 alias 처리하고, 실제 모델 데이터에는 삽입 안 함
 				}
 				else
@@ -183,7 +194,7 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 		}
 		else
 		{
-			longTails.emplace_back(LongTail{ form, morphWeight, tag, cvowel, origMorphemeOfAlias, addAlias });
+			longTails.emplace_back(LongTail{ form, morphWeight, tag, origTag, cvowel, origMorphemeOfAlias, addAlias });
 			longTailWeights[tag] += morphWeight;
 		}
 		
@@ -192,17 +203,17 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 	for (LongTail& p : longTails)
 	{
 		if (p.origForm.empty()) continue;
-		auto it = morphMap.find(make_pair(p.origForm, clearIrregular(p.tag)));
-		auto it2 = morphMap.find(make_pair(p.origForm, setIrregular(p.tag)));
+		auto it = morphMap.find(make_pair(p.origForm, clearIrregular(p.origTag)));
+		auto it2 = morphMap.find(make_pair(p.origForm, setIrregular(p.origTag)));
 		
 		if (it != morphMap.end() && it2 != morphMap.end())
 		{
-			throw Exception{ "ambiguous base morpheme: " + utf16To8(p.origForm) + "/" + tagToString(clearIrregular(p.tag)) };
+			throw Exception{ "ambiguous base morpheme: " + utf16To8(p.origForm) + "/" + tagToString(clearIrregular(p.origTag)) };
 		}
 		it = (it == morphMap.end()) ? it2 : it;
 		if (it == morphMap.end())
 		{
-			throw Exception{ "cannot find base morpheme: " + utf16To8(p.origForm) + "/" + tagToString(p.tag) };
+			throw Exception{ "cannot find base morpheme: " + utf16To8(p.origForm) + "/" + tagToString(p.origTag) };
 		}
 		p.origMorphId = it->second;
 		if (!p.addAlias) continue;

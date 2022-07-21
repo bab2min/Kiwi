@@ -286,6 +286,16 @@ TEST(KiwiCpp, PositionAndLength)
 		EXPECT_EQ(tokens[2].length, 1);
 	}
 	{
+		auto tokens = kiwi.analyze(u"일렀다", Match::all).first;
+		ASSERT_GE(tokens.size(), 3);
+		EXPECT_EQ(tokens[0].position, 0);
+		EXPECT_EQ(tokens[0].length, 1);
+		EXPECT_EQ(tokens[1].position, 1);
+		EXPECT_EQ(tokens[1].length, 1);
+		EXPECT_EQ(tokens[2].position, 2);
+		EXPECT_EQ(tokens[2].length, 1);
+	}
+	{
 		auto tokens = kiwi.analyze(u"다다랐다", Match::all).first;
 		ASSERT_GE(tokens.size(), 3);
 		EXPECT_EQ(tokens[0].position, 0);
