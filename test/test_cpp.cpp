@@ -526,4 +526,16 @@ TEST(KiwiCpp, AutoJoiner)
 	joiner.add(u"묻", POSTag::vv);
 	joiner.add(u"어요", POSTag::ef);
 	EXPECT_EQ(joiner.getU16(), u"땅에 묻어요");
+
+	joiner = kiwi.newJoiner();
+	joiner.add(u"땅", POSTag::nng);
+	joiner.add(u"이", POSTag::vcp);
+	joiner.add(u"에요", POSTag::ef);
+	EXPECT_EQ(joiner.getU16(), u"땅이에요");
+
+	joiner = kiwi.newJoiner();
+	joiner.add(u"바다", POSTag::nng);
+	joiner.add(u"이", POSTag::vcp);
+	joiner.add(u"에요", POSTag::ef);
+	EXPECT_EQ(joiner.getU16(), u"바다에요");
 }
