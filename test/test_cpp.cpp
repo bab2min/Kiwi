@@ -549,3 +549,25 @@ TEST(KiwiCpp, AutoJoiner)
 	joiner.add(u"에요", POSTag::ef);
 	EXPECT_EQ(joiner.getU16(), u"바다에요");
 }
+
+TEST(KiwiCpp, UserWordWithNumeric)
+{
+	KiwiBuilder builder{ MODEL_PATH };
+	EXPECT_TRUE(builder.addWord(u"코로나19", POSTag::nnp, 0.0));
+	EXPECT_TRUE(builder.addWord(u"2차전지", POSTag::nnp, 0.0));
+	Kiwi kiwi = builder.build();
+
+	auto tokens = kiwi.analyze(u"코로나19이다.", Match::all).first;
+
+	ASSERT_GE(tokens.size(), 3);
+	EXPECT_EQ(tokens[0].str, u"코로나19");
+	EXPECT_EQ(tokens[1].str, u"이");
+	EXPECT_EQ(tokens[2].str, u"다");
+
+	tokens = kiwi.analyze(u"2차전지이다.", Match::all).first;
+
+	ASSERT_GE(tokens.size(), 3);
+	EXPECT_EQ(tokens[0].str, u"2차전지");
+	EXPECT_EQ(tokens[1].str, u"이");
+	EXPECT_EQ(tokens[2].str, u"다");
+}

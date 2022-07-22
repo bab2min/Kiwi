@@ -217,19 +217,56 @@ Vector<KGraphNode> kiwi::splitByTrie(
 					specialStartPos = nonSpaces.size();
 				}
 
-				branchOut(nonSpaces.size(), n);
-				if (appendNewNode(ret, endPosMap, nonSpaces.size(), KString{ &c, m.first }, (uint16_t)(nonSpaces.size() + m.first)))
+				size_t patStart = nonSpaces.size();
+				for (size_t i = 0; i < m.first; ++i)
+				{
+					branchOut(nonSpaces.size(), n + i);
+					nextNode = curNode->template nextOpt<arch>(trie, str[n + i]);
+					while (!nextNode) // if curNode has no exact next node, goto fail
+					{
+						if (curNode->fail())
+						{
+							curNode = curNode->fail();
+							for (auto submatcher = curNode; submatcher; submatcher = submatcher->fail())
+							{
+								const Form* cand = submatcher->val(trie);
+								if (!cand) break;
+								else if (!trie.hasSubmatch(cand))
+								{
+									if (!insertCandidates<typoTolerant>(candidates, candTypoCostStarts, cand, formBase, typoPtrs, str, nonSpaces)) break;
+								}
+							}
+							nextNode = curNode->template nextOpt<arch>(trie, str[n + i]);
+						}
+						else
+						{
+							nonSpaces.emplace_back(n + i);
+							goto continuePatternFor;
+						}
+					}
+					nonSpaces.emplace_back(n + i);
+					// from this, curNode has the exact next node
+					curNode = nextNode;
+					// if it has exit node, a pattern has found
+					for (auto submatcher = curNode; submatcher; submatcher = submatcher->fail())
+					{
+						const Form* cand = submatcher->val(trie);
+						if (!cand) break;
+						else if (!trie.hasSubmatch(cand))
+						{
+							if (!insertCandidates<typoTolerant>(candidates, candTypoCostStarts, cand, formBase, typoPtrs, str, nonSpaces)) break;
+						}
+					}
+				continuePatternFor:;
+				}
+				branchOut(nonSpaces.size(), n + m.first);
+
+				if (appendNewNode(ret, endPosMap, patStart, KString{ &c, m.first }, (uint16_t)(patStart + m.first)))
 				{
 					ret.back().form = trie.value((size_t)chrType);
 				}
 
-				for (size_t i = 0; i < m.first; ++i)
-				{
-					nonSpaces.emplace_back(n + i);
-				}
-
 				n += m.first - 1;
-				curNode = trie.root();
 				lastMatchedPattern = m.second;
 				// SN태그 패턴 매칭의 경우 Web태그로 치환하여 Web와 동일하게 처리되도록 한다
 				if (chrType == POSTag::sn)
