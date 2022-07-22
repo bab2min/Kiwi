@@ -22,6 +22,7 @@ class PatternMatcherImpl
 	size_t testHashtag(const char16_t* first, const char16_t* last) const;
 	size_t testMention(const char16_t* first, const char16_t* last) const;
 	size_t testNumeric(const char16_t* first, const char16_t* last) const;
+	size_t testSerial(const char16_t* first, const char16_t* last) const;
 
 public:
 	std::pair<size_t, POSTag> match(const char16_t* first, const char16_t* last, Match matchOptions) const;
@@ -196,10 +197,42 @@ size_t PatternMatcherImpl::testNumeric(const char16_t* first, const char16_t* la
 	return 0;
 }
 
+size_t PatternMatcherImpl::testSerial(const char16_t* first, const char16_t* last) const
+{
+	// Pattern: [0-9]+([:.-/])[0-9]+(\1[0-9]+)*
+	const char16_t* b = first;
+
+	if (b == last || !isDigit(*b)) return 0;
+
+	while (b != last && isDigit(*b)) ++b;
+
+	if (b == last) return 0;
+
+	char16_t sep = 0;
+	if (*b == ':' || *b == '.' || *b == '-' || *b == '/') sep = *b;
+	else return 0;
+	++b;
+	if (b == last || !isDigit(*b)) return 0;
+	++b;
+	while (b != last && isDigit(*b)) ++b;
+
+	if (sep == '.' && (b == last || *b != sep)) return 0; // reject [0-9]+\.[0-9]+ pattern
+
+	while (b != last && *b == sep)
+	{
+		++b;
+		if (b == last || !isDigit(*b)) return b - first - 1;
+		++b;
+		while (b != last && isDigit(*b)) ++b;
+	}
+	return b - first;
+}
+
 
 pair<size_t, POSTag> PatternMatcherImpl::match(const char16_t * first, const char16_t * last, Match matchOptions) const
 {
 	size_t size;
+	if (!!(matchOptions & Match::serial) && (size = testSerial(first, last))) return make_pair(size, POSTag::w_serial);
 	if ((size = testNumeric(first, last))) return make_pair(size, POSTag::sn);
 	if (!!(matchOptions & Match::hashtag) && (size = testHashtag(first, last))) return make_pair(size, POSTag::w_hashtag);
 	if (!!(matchOptions & Match::email) && (size = testEmail(first, last))) return make_pair(size, POSTag::w_email);

@@ -143,6 +143,30 @@ TEST(KiwiCpp, Pattern)
 	tokens = kiwi.analyze(u"1.2%", Match::none).first;
 	EXPECT_EQ(tokens.size(), 2);
 	EXPECT_EQ(tokens[0].tag, POSTag::sn);
+
+	tokens = kiwi.analyze(u"12:34에", Match::all).first;
+	EXPECT_EQ(tokens.size(), 2);
+	EXPECT_EQ(tokens[0].tag, POSTag::w_serial);
+
+	tokens = kiwi.analyze(u"12:3:456:7890에", Match::all).first;
+	EXPECT_EQ(tokens.size(), 2);
+	EXPECT_EQ(tokens[0].tag, POSTag::w_serial);
+
+	tokens = kiwi.analyze(u"12.34에", Match::all).first;
+	EXPECT_EQ(tokens.size(), 2);
+	EXPECT_EQ(tokens[0].tag, POSTag::sn);
+
+	tokens = kiwi.analyze(u"12.34.0.1에", Match::all).first;
+	EXPECT_EQ(tokens.size(), 2);
+	EXPECT_EQ(tokens[0].tag, POSTag::w_serial);
+
+	tokens = kiwi.analyze(u"2001/01/02에", Match::all).first;
+	EXPECT_EQ(tokens.size(), 2);
+	EXPECT_EQ(tokens[0].tag, POSTag::w_serial);
+
+	tokens = kiwi.analyze(u"010-1234-5678에", Match::all).first;
+	EXPECT_EQ(tokens.size(), 2);
+	EXPECT_EQ(tokens[0].tag, POSTag::w_serial);
 }
 
 TEST(KiwiCpp, BuilderAddWords)

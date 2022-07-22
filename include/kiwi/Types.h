@@ -176,7 +176,7 @@ namespace kiwi
 		vcp, vcn,
 		sf, sp, ss, se, so, sw,
 		sl, sh, sn,
-		w_url, w_email, w_mention, w_hashtag,
+		w_url, w_email, w_mention, w_hashtag, w_serial,
 		jks, jkc, jkg, jko, jkb, jkv, jkq, jx, jc,
 		ep, ef, ec, etn, etm,
 		p, /**< 분할된 동사/형용사를 나타내는데 사용됨 */

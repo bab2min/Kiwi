@@ -410,6 +410,7 @@ namespace kiwi
 		if (tagStr == u"W_EMAIL") return POSTag::w_email;
 		if (tagStr == u"W_HASHTAG") return POSTag::w_hashtag;
 		if (tagStr == u"W_MENTION") return POSTag::w_mention;
+		if (tagStr == u"W_SERIAL") return POSTag::w_serial;
 		
 		if (tagStr == u"VV-I") return setIrregular(POSTag::vv);
 		if (tagStr == u"VA-I") return setIrregular(POSTag::va);
