@@ -11,11 +11,7 @@ using namespace kiwi;
 
 TokenInfo parseWordPOS(const u16string& str)
 {
-	if (str[0] == '/' && str[1] == '/')
-	{
-		return { u"/", toPOSTag(str.substr(2)), 0, 0 };
-	}
-	auto p = str.find('/');
+	auto p = str.rfind('/');
 	if (p == str.npos) return {};
 	u16string form{ str.begin(), str.begin() + p };
 	if (str[p + 1] == 'E')
