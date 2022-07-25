@@ -1461,6 +1461,7 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 				}
 			}
 
+			hash = !hash;
 			if (!prevForm)
 			{
 				estimatedNodeSize += f->first.size();
@@ -1472,7 +1473,6 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 				&& (*prevForm)[commonPrefix] == f->first[commonPrefix]) ++commonPrefix;
 			estimatedNodeSize += f->first.size() - commonPrefix;
 			prevForm = &f->first;
-			hash = !hash;
 		}
 		ret.typoForms.emplace_back(0, 0, hash);
 		ret.typoPtrs.emplace_back(ret.typoPool.size());
