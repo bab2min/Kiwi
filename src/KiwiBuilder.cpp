@@ -285,9 +285,12 @@ auto KiwiBuilder::restoreMorphemeMap() const -> MorphemeMap
 void KiwiBuilder::addCorpusTo(RaggedVector<uint16_t>& out, std::istream& is, KiwiBuilder::MorphemeMap& morphMap)
 {
 	Vector<uint16_t> wids;
+	size_t numLine = 0;
 	string line;
 	while (getline(is, line))
 	{
+		bool alreadyPrintError = false;
+		++numLine;
 		auto wstr = utf8To16(line);
 		if (!wstr.empty() && wstr.back() == '\n') wstr.pop_back();
 		if (wstr.empty() && wids.size() > 1)
@@ -308,6 +311,11 @@ void KiwiBuilder::addCorpusTo(RaggedVector<uint16_t>& out, std::istream& is, Kiw
 			if (f.empty()) continue;
 
 			auto t = toPOSTag(fields[i + 1]);
+			if (t == POSTag::max && !alreadyPrintError)
+			{
+				cerr << "Unknown tags at line " << numLine << " :\t" << line << endl;
+				alreadyPrintError = true;
+			}
 
 			if (f[0] == u'아' && fields[i + 1][0] == 'E')
 			{
@@ -315,20 +323,26 @@ void KiwiBuilder::addCorpusTo(RaggedVector<uint16_t>& out, std::istream& is, Kiw
 			}
 
 			auto it = morphMap.find(make_pair(f, t));
-			if (it == morphMap.end() || !morphemes[it->second].chunks.empty() || morphemes[it->second].combineSocket)
-			{
-				if (t < POSTag::p && t != POSTag::unknown)
-				{
-					wids.emplace_back(getDefaultMorphemeId(t));
-				}
-				else
-				{
-					//wids.emplace_back(getDefaultMorphemeId(POSTag::nnp));
-				}
-			}
-			else
+			if (it != morphMap.end() && morphemes[it->second].chunks.empty() && !morphemes[it->second].combineSocket)
 			{
 				wids.emplace_back(it->second);
+				continue;
+			}
+
+			if (t == POSTag::ss && f.size() == 1)
+			{
+				auto nt = identifySpecialChr(f[0]);
+				if (nt == POSTag::sso || nt == POSTag::ssc)
+				{
+					wids.emplace_back(getDefaultMorphemeId(nt));
+					continue;
+				}
+			}
+
+			if (t < POSTag::p && t != POSTag::unknown)
+			{
+				wids.emplace_back(getDefaultMorphemeId(t));
+				continue;
 			}
 		}
 	}
@@ -440,6 +454,7 @@ KiwiBuilder::KiwiBuilder(const ModelBuildArgs& args)
 	for (auto& path : args.corpora)
 	{
 		ifstream ifs;
+		cerr << "Loading corpus: " << path << endl;
 		addCorpusTo(sents, openFile(ifs, path), realMorph);
 	}
 
@@ -1340,7 +1355,7 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 	}
 
 	Vector<const Form*> sortedForms;
-	for (size_t i = defaultTagSize; i < ret.forms.size() - 1; ++i)
+	for (size_t i = defaultTagSize - 1; i < ret.forms.size() - 1; ++i)
 	{
 		auto& f = ret.forms[i];
 		if (f.candidate.empty()) continue;

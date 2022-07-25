@@ -226,9 +226,8 @@ namespace kiwi
 				case POSTag::sp:
 				case POSTag::se:
 				case POSTag::sf:
+				case POSTag::ssc:
 					break;
-				case POSTag::ss:
-					if (isClosingPair(t.str[0])) break;
 				default:
 					sentPos++;
 					state = State::none;
@@ -243,9 +242,8 @@ namespace kiwi
 				case POSTag::sh:
 				case POSTag::se:
 				case POSTag::sp:
+				case POSTag::ssc:
 					break;
-				case POSTag::ss:
-					if (isClosingPair(t.str[0])) break;
 				default:
 					sentPos++;
 					state = State::none;
@@ -564,10 +562,10 @@ namespace kiwi
 		{
 			// 닫는 괄호는 왼쪽 경계로 처리하지 않음
 			auto c = node->getPrev()->uform.back();
-			if (isClosingPair(c) || c == u'"' || c == u'\'') return false;
+			auto tag = identifySpecialChr(c);
+			if (tag == POSTag::ssc || c == u'"' || c == u'\'') return false;
 			
 			// 나머지 특수문자는 왼쪽 경계로 처리
-			auto tag = identifySpecialChr(c);
 			if (POSTag::sf <= tag && tag <= POSTag::sw) return true;
 		}
 		return false;

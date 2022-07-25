@@ -595,3 +595,45 @@ TEST(KiwiCpp, UserWordWithNumeric)
 	EXPECT_EQ(tokens[1].str, u"이");
 	EXPECT_EQ(tokens[2].str, u"다");
 }
+
+TEST(KiwiCpp, Quotation)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	std::vector<TokenInfo> quotTokens;
+	auto tokens = kiwi.analyze(u"그는 \"여러분 이거 다 거짓말인거 아시죠?\"라고 물으며 \"아무것도 모른다\"고 말했다.", Match::allWithNormalizing).first;
+	EXPECT_GE(tokens.size(), 26);
+	std::copy_if(tokens.begin(), tokens.end(), std::back_inserter(quotTokens), [](const TokenInfo& token)
+		{
+			return token.str == u"\"";
+		});
+	EXPECT_EQ(quotTokens.size(), 4);
+	EXPECT_EQ(quotTokens[0].tag, POSTag::sso);
+	EXPECT_EQ(quotTokens[1].tag, POSTag::ssc);
+	EXPECT_EQ(quotTokens[2].tag, POSTag::sso);
+	EXPECT_EQ(quotTokens[3].tag, POSTag::ssc);
+
+	tokens = kiwi.analyze(u"\"중첩된 인용부호, 그것은 '중복', '반복', '계속되는 되풀이'인 것이다.\"", Match::allWithNormalizing).first;
+	quotTokens.clear();
+	std::copy_if(tokens.begin(), tokens.end(), std::back_inserter(quotTokens), [](const TokenInfo& token)
+		{
+			return token.str == u"\"";
+		});
+	EXPECT_EQ(quotTokens.size(), 2);
+	EXPECT_EQ(quotTokens[0].tag, POSTag::sso);
+	EXPECT_EQ(quotTokens[1].tag, POSTag::ssc);
+	quotTokens.clear();
+	std::copy_if(tokens.begin(), tokens.end(), std::back_inserter(quotTokens), [](const TokenInfo& token)
+		{
+			return token.str == u"'";
+		});
+	EXPECT_EQ(quotTokens.size(), 6);
+	EXPECT_EQ(quotTokens[0].tag, POSTag::sso);
+	EXPECT_EQ(quotTokens[1].tag, POSTag::ssc);
+	EXPECT_EQ(quotTokens[2].tag, POSTag::sso);
+	EXPECT_EQ(quotTokens[3].tag, POSTag::ssc);
+	EXPECT_EQ(quotTokens[4].tag, POSTag::sso);
+	EXPECT_EQ(quotTokens[5].tag, POSTag::ssc);
+
+	tokens = kiwi.analyze(u"I'd like to be a tree.", Match::allWithNormalizing).first;
+	EXPECT_EQ(tokens[1].tag, POSTag::ss);
+}

@@ -293,9 +293,13 @@ Vector<KGraphNode> kiwi::splitByTrie(
 				{
 					appendNewNode(ret, endPosMap, lastSpecialEndPos, str.substr(nonSpaces[lastSpecialEndPos], nonSpaces[specialStartPos] - nonSpaces[lastSpecialEndPos]), (uint16_t)specialStartPos);
 				}
-				if (appendNewNode(ret, endPosMap, specialStartPos, KString{ &str[nonSpaces[specialStartPos]], n - nonSpaces[specialStartPos] }, (uint16_t)nonSpaces.size()))
+
+				if (lastChrType != POSTag::ss) // ss 태그는 morpheme 내에 등록된 후보에서 직접 탐색하도록 한다
 				{
-					ret.back().form = trie.value((size_t)lastChrType);
+					if (appendNewNode(ret, endPosMap, specialStartPos, KString{ &str[nonSpaces[specialStartPos]], n - nonSpaces[specialStartPos] }, (uint16_t)nonSpaces.size()))
+					{
+						ret.back().form = trie.value((size_t)lastChrType);
+					}
 				}
 			}
 			lastSpecialEndPos = specialStartPos;
