@@ -48,6 +48,8 @@ namespace kiwi
 			case POSTag::w_url:
 			case POSTag::w_mention:
 				return true;
+			default:
+				return false;
 			}
 			return false;
 		}
