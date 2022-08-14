@@ -290,6 +290,7 @@ namespace kiwi
 				++chunk;
 				if (chunk - sents.back() >= 512)
 				{
+					if (0xDC00 <= *chunk && *chunk <= 0xDFFF) --chunk;
 					sents.emplace_back(chunk);
 					break;
 				}
