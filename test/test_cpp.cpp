@@ -2,18 +2,20 @@
 #include <kiwi/Kiwi.h>
 #include "common.h"
 
+class TestInitializer
+{
+public:
+	TestInitializer()
+	{
+#ifdef _MSC_VER
+		SetConsoleOutputCP(CP_UTF8);
+#endif
+	}
+};
+
+TestInitializer _global_initializer;
+
 using namespace kiwi;
-
-Kiwi& reuseKiwiInstance()
-{
-	static Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 0, BuildOption::default_, }.build();
-	return kiwi;
-}
-
-TEST(KiwiCpp, InitClose)
-{
-	Kiwi& kiwi = reuseKiwiInstance();
-}
 
 inline testing::AssertionResult testTokenization(Kiwi& kiwi, const std::u16string& s)
 {
@@ -27,6 +29,17 @@ inline testing::AssertionResult testTokenization(Kiwi& kiwi, const std::u16strin
 	{
 		return testing::AssertionFailure() << "the result of kiwi.analyze(" << testing::PrintToString(s) << ") ends at " << (tokens.back().position + tokens.back().length);
 	}
+}
+
+Kiwi& reuseKiwiInstance()
+{
+	static Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 0, BuildOption::default_, }.build();
+	return kiwi;
+}
+
+TEST(KiwiCpp, InitClose)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
 }
 
 TEST(KiwiCpp, EmptyResult)
@@ -486,6 +499,16 @@ TEST(KiwiCpp, AutoJoiner)
 	EXPECT_EQ(joiner.getU16(), u"시동을");
 
 	joiner = kiwi.newJoiner();
+	joiner.add(u"시동", POSTag::nng);
+	joiner.add(u"ᆯ", POSTag::jko);
+	EXPECT_EQ(joiner.getU16(), u"시동을");
+
+	joiner = kiwi.newJoiner();
+	joiner.add(u"나", POSTag::np);
+	joiner.add(u"ᆯ", POSTag::jko);
+	EXPECT_EQ(joiner.getU16(), u"날");
+
+	joiner = kiwi.newJoiner();
 	joiner.add(u"시도", POSTag::nng);
 	joiner.add(u"를", POSTag::jko);
 	EXPECT_EQ(joiner.getU16(), u"시도를");
@@ -572,6 +595,16 @@ TEST(KiwiCpp, AutoJoiner)
 	joiner.add(u"이", POSTag::vcp);
 	joiner.add(u"에요", POSTag::ef);
 	EXPECT_EQ(joiner.getU16(), u"바다에요");
+
+	joiner = kiwi.newJoiner();
+	joiner.add(u"좋", POSTag::va);
+	joiner.add(u"은데", POSTag::ec);
+	EXPECT_EQ(joiner.getU16(), u"좋은데");
+
+	joiner = kiwi.newJoiner();
+	joiner.add(u"크", POSTag::va);
+	joiner.add(u"은데", POSTag::ec);
+	EXPECT_EQ(joiner.getU16(), u"큰데");
 }
 
 TEST(KiwiCpp, UserWordWithNumeric)
@@ -636,4 +669,39 @@ TEST(KiwiCpp, Quotation)
 
 	tokens = kiwi.analyze(u"I'd like to be a tree.", Match::allWithNormalizing).first;
 	EXPECT_EQ(tokens[1].tag, POSTag::ss);
+}
+
+TEST(KiwiCpp, JoinRestore)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	for (auto c : { 
+		u8"좋아요도 눌렀다.",
+		u8"좋은데", 
+		u8"않았다", 
+		u8"인정받았다", 
+		u8"하지 말아야", 
+		u8"말았다", 
+		//u8"비어 있다", 
+		//u8"기어 가다", 
+		u8"좋은 태도입니다", 
+		u8"바로 '내일'입니다",
+		u8"in the", 
+		u8"할 것이었다", 
+		u8"몇 번의 신호 음이 이어지고",
+		u8"오래 나가 있는 바람에",
+		u8"간이 학교로서 인가를 받은",
+		u8"있을 터였다",
+		u8"극도의 인륜 상실",
+		u8"'내일'을 말하다",
+		u8"실톱으로 다듬어 놓은 것들",
+	})
+	{
+		auto tokens = kiwi.analyze(c, Match::allWithNormalizing).first;
+		auto joiner = kiwi.newJoiner();
+		for (auto& t : tokens)
+		{
+			joiner.add(t.str, t.tag, false);
+		}
+		EXPECT_EQ(joiner.getU8(), c);
+	}
 }

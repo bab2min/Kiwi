@@ -68,6 +68,6 @@ TagSequenceScorer::TagSequenceScorer(float _weight) : weight{ _weight }
 
 	for (size_t r = 0; r < (size_t)POSTag::max; ++r)
 	{
-		leftBoundaryScores[1][r] = (isEClass((POSTag)r) || isJClass((POSTag)r) || isSuffix((POSTag)r)) ? -1 : 0;
+		leftBoundaryScores[1][r] = (isEClass((POSTag)r) || isJClass((POSTag)r) || isSuffix((POSTag)r) || (POSTag)r == POSTag::vcp) ? -1 : 0;
 	}
 }

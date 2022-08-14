@@ -33,11 +33,13 @@ namespace kiwi
 			Vector<ReplString> repl;
 			CondVowel leftVowel;
 			CondPolarity leftPolarity;
+			bool ignoreRCond;
 
 			Replacement(Vector<ReplString> _repl = {},
 				CondVowel _leftVowel = CondVowel::none,
-				CondPolarity _leftPolar = CondPolarity::none
-			) : repl{ _repl }, leftVowel{ _leftVowel }, leftPolarity{ _leftPolar }
+				CondPolarity _leftPolar = CondPolarity::none,
+				bool _ignoreRCond = false
+			) : repl{ _repl }, leftVowel{ _leftVowel }, leftPolarity{ _leftPolar }, ignoreRCond{ _ignoreRCond }
 			{}
 		};
 
@@ -48,6 +50,7 @@ namespace kiwi
 			size_t rightBegin;
 			CondVowel vowel;
 			CondPolarity polar;
+			bool ignoreRCond;
 			float score;
 
 			Result(const KString& _str = {},
@@ -55,8 +58,9 @@ namespace kiwi
 				size_t _rightBegin = 0,
 				CondVowel _vowel = CondVowel::none,
 				CondPolarity _polar = CondPolarity::none,
+				bool _ignoreRCond = false,
 				float _score = 0
-			) : str{ _str }, leftEnd{ _leftEnd }, rightBegin{ _rightBegin }, vowel{ _vowel }, polar{ _polar }, score{ _score }
+			) : str{ _str }, leftEnd{ _leftEnd }, rightBegin{ _rightBegin }, vowel{ _vowel }, polar{ _polar }, ignoreRCond{ _ignoreRCond }, score{_score}
 			{
 			}
 		};
@@ -184,9 +188,21 @@ namespace kiwi
 			friend class kiwi::KiwiBuilder;
 			friend class Joiner;
 
+			struct Allomorph
+			{
+				KString form;
+				CondVowel cvowel;
+				uint8_t priority;
+
+				Allomorph(const KString& _form = {}, CondVowel _cvowel = CondVowel::none, uint8_t _priority = 0)
+					: form{ _form }, cvowel{ _cvowel }, priority{ _priority }
+				{
+				}
+			};
+
 			Vector<MultiRuleDFAErased> dfa, dfaRight;
 			UnorderedMap<std::tuple<POSTag, POSTag, uint8_t>, size_t> map;
-			Vector<std::pair<KString, CondVowel>> allomorphData;
+			Vector<Allomorph> allomorphData;
 			UnorderedMap<std::pair<KString, POSTag>, std::pair<size_t, size_t>> allomorphPtrMap;
 
 			auto findRule(POSTag leftTag, POSTag rightTag,
@@ -257,7 +273,7 @@ namespace kiwi
 				return Joiner{ *this };
 			}
 
-			void addAllomorph(const std::vector<std::pair<U16StringView, CondVowel>>& forms, POSTag tag);
+			void addAllomorph(const std::vector<std::tuple<U16StringView, CondVowel, uint8_t>>& forms, POSTag tag);
 
 			/**
 			 * @return vector of tuple(replaceGroupId, capturedStartPos, replaceGroupCondition)
@@ -279,8 +295,10 @@ namespace kiwi
 					const KString& _right = {},
 					const Vector<ReplString>& _results = {},
 					CondVowel _leftVowel = CondVowel::none,
-					CondPolarity _leftPolar = CondPolarity::none)
-					: left{ _left }, right { _right }, repl{ _results, _leftVowel, _leftPolar }
+					CondPolarity _leftPolar = CondPolarity::none,
+					bool _ignoreRCond = false
+				)
+					: left{ _left }, right { _right }, repl{ _results, _leftVowel, _leftPolar, _ignoreRCond }
 				{
 				}
 			};
@@ -321,7 +339,7 @@ namespace kiwi
 
 			void addRule(const std::string& lTag, const std::string& rTag,
 				const KString& lPat, const KString& rPat, const std::vector<ReplString>& results,
-				CondVowel leftVowel, CondPolarity leftPolar
+				CondVowel leftVowel, CondPolarity leftPolar, bool ignoreRCond
 			);
 			
 			void loadRules(std::istream& istr);

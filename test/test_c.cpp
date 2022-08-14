@@ -252,6 +252,7 @@ TEST(KiwiC, AnalyzeBasicTypoSet)
 	kiwi_h okw = reuse_kiwi_instance(), typo_kw;
 	kiwi_builder_h builder = kiwi_builder_init(MODEL_PATH, 0, KIWI_BUILD_DEFAULT);
 	typo_kw = kiwi_builder_build(builder, kiwi_basic_typo, 2.5f);
+	kiwi_set_option_f(typo_kw, KIWI_TYPO_COST_WEIGHT, 5);
 
 	kiwi_res_h o, c;
 	for (const char* s : { u8"외않됀데?", u8"나 죰 도와죠.", u8"잘했따", u8"외구거 공부", u8"맗은 믈을 마셧다!" })

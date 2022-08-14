@@ -241,6 +241,7 @@ namespace kiwi
 		none, /**< 조건이 설정되지 않음 */
 		positive, /**< 선행 형태소가 양성(ㅏ,ㅑ,ㅗ)인 경우만 등장 가능 */
 		negative, /**< 선행 형태소가 음성(그 외)인 경우만 등장 가능 */
+		non_adj, /**< 선행 형태소가 형용사가 아닌 경우만 등장 가능 (모음조화와 관련없지만 효율성을 위해 여기에 삽입)*/
 	};
 
 	/**
@@ -278,6 +279,8 @@ namespace kiwi
 		float score = 0; /**< 해당 형태소의 언어모델 점수 */
 		float typoCost = 0; /**< 오타가 교정된 경우 오타 비용. 그렇지 않은 경우 0 */
 		uint32_t typoFormId = 0; /**< 교정 전 오타의 형태에 대한 정보 (typoCost가 0인 경우 의미 없음) */
+		uint32_t pairedToken = -1;
+		uint32_t subSentPosition = 0;
 		const Morpheme* morph = nullptr; /**< 기타 형태소 정보에 대한 포인터 (OOV인 경우 nullptr) */
 
 		TokenInfo() = default;

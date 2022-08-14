@@ -294,6 +294,8 @@ namespace kiwi
 			return morph - morphemes.data();
 		}
 
+		size_t getMorphemeSize() const { return morphemes.size(); }
+
 		const Morpheme* idToMorph(size_t morphId) const
 		{
 			if (morphId >= morphemes.size()) return nullptr;

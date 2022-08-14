@@ -119,6 +119,16 @@ TEST(KiwiCppCombiner, Joiner)
 	joiner.add(u"지", POSTag::vx);
 	joiner.add(u"다", POSTag::ef);
 	EXPECT_EQ(joiner.getU16(), u"돼지다");
+
+	joiner = rule.newJoiner();
+	joiner.add(u"하얗", POSTag::vai);
+	joiner.add(u"으니", POSTag::ec);
+	EXPECT_EQ(joiner.getU16(), u"하야니");
+
+	joiner = rule.newJoiner();
+	joiner.add(u"좋", POSTag::va);
+	joiner.add(u"으니", POSTag::ec);
+	EXPECT_EQ(joiner.getU16(), u"좋으니");
 }
 
 TEST(KiwiCppCombiner, Allomorph)
@@ -126,15 +136,15 @@ TEST(KiwiCppCombiner, Allomorph)
 	auto& rule = getCompiledRule();
 
 	rule.addAllomorph({
-		{ u"를", CondVowel::vowel}, { u"을", CondVowel::non_vowel}
+		{ u"를", CondVowel::vowel, 0}, { u"을", CondVowel::non_vowel, 0}
 	}, POSTag::jko);
 
 	rule.addAllomorph({
-		{ u"가", CondVowel::vowel}, { u"이", CondVowel::non_vowel}
+		{ u"가", CondVowel::vowel, 0}, { u"이", CondVowel::non_vowel, 0}
 	}, POSTag::jks);
 
 	rule.addAllomorph({
-		{ u"로", CondVowel::vocalic}, { u"으로", CondVowel::non_vowel}
+		{ u"로", CondVowel::vocalic, 0}, { u"으로", CondVowel::non_vowel, 0}
 	}, POSTag::jkb);
 
 	auto joiner = rule.newJoiner();
@@ -168,7 +178,7 @@ TEST(KiwiCppCombiner, Allomorph)
 	EXPECT_EQ(joiner.getU16(), u"북으로");
 
 	rule.addAllomorph({
-		{ u"면", CondVowel::vocalic}, { u"으면", CondVowel::non_vowel}
+		{ u"면", CondVowel::vocalic, 0}, { u"으면", CondVowel::non_vowel, 0}
 	}, POSTag::ec);
 
 	joiner = rule.newJoiner();

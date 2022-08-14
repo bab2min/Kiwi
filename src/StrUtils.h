@@ -7,6 +7,28 @@
 namespace kiwi
 {
 	template<class ChrIterator>
+	inline long stol(ChrIterator begin, ChrIterator end)
+	{
+		if (begin == end) return 0;
+		bool sign = false;
+		switch (*begin)
+		{
+		case '-':
+			sign = true;
+		case '+':
+			++begin;
+			break;
+		}
+		long up = 0;
+		for (; begin != end; ++begin)
+		{
+			if ('0' <= *begin && *begin <= '9') up = up * 10 + (*begin - '0');
+			else break;
+		}
+		return up * (sign ? -1 : 1);
+	}
+
+	template<class ChrIterator>
 	inline float stof(ChrIterator begin, ChrIterator end)
 	{
 		if (begin == end) return 0;

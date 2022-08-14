@@ -30,7 +30,7 @@ namespace kiwi
 		setPolar(_polar);
 	}
 
-	DEFINE_SERIALIZER_OUTSIDE(MorphemeRaw, kform, tag, vpPack, combineSocket, combined, userScore, chunks, chunkPositions, lmMorphemeId);
+	DEFINE_SERIALIZER_OUTSIDE(MorphemeRaw, kform, tag, vpPack, combineSocket, combined, userScore, chunks, chunkPositions, lmMorphemeId, groupId);
 
 	Morpheme::Morpheme() = default;
 

@@ -82,6 +82,14 @@ namespace kiwi
 		 */
 		uint32_t lmMorphemeId = 0;
 
+		/**
+		 * @brief 형태소의 그룹 인덱스.
+		 * 
+		 * @note 형태소 결합 시 음운 조건에 따라 이형태를 선택해야 하는 경우
+		   그룹 인덱스가 동일한 형태소만 선택된다.
+		 */
+		uint32_t groupId = 0;
+
 		MorphemeRaw();
 		~MorphemeRaw();
 		MorphemeRaw(const MorphemeRaw&);

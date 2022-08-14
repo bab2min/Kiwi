@@ -571,6 +571,17 @@ namespace kiwi
 		return false;
 	}
 
+	inline bool isInflectendaNP(const Morpheme* morph)
+	{
+		return morph->tag == POSTag::np && morph->kform->size() == 1 && (
+			(*morph->kform)[0] == u'나' || (*morph->kform)[0] == u'너' || (*morph->kform)[0] == u'저');
+	}
+
+	inline bool isInflectendaJ(const Morpheme* morph)
+	{
+		return (morph->tag == POSTag::jks || morph->tag == POSTag::jkc) && morph->kform->size() == 1 && (*morph->kform)[0] == u'가';
+	}
+
 	template<class LmState, class CandTy, class CacheTy>
 	float PathEvaluator::evalPath(const Kiwi* kw, 
 		const KGraphNode* startNode, 
@@ -654,6 +665,7 @@ namespace kiwi
 				estimatedLL += kw->tagScorer.evalLeftBoundary(hasLeftBoundary(node), curMorph->tag);
 				
 				bool isVowelE = isEClass(curMorph->tag) && curMorph->kform && hasNoOnset(*curMorph->kform);
+				bool isInfJ = isInflectendaJ(curMorph);
 
 				for (auto& p : maxWidLL)
 				{
@@ -664,6 +676,11 @@ namespace kiwi
 						if (isVowelE && isIrregular(kw->morphemes[q.morphs->back().wid].tag))
 						{
 							q.accScore -= 10;
+						}
+						// 나/너/저 뒤에 주격 조사 '가'가 붙는 경우 벌점 부여
+						if (isInfJ && isInflectendaNP(&kw->morphemes[q.morphs->back().wid]))
+						{
+							q.accScore -= 5;
 						}
 						tMax = max(tMax, q.accScore + discountForCombining);
 					}
