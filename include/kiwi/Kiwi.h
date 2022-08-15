@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file Kiwi.h
  * @author bab2min (bab2min@gmail.com)
  * @brief Kiwi C++ API를 담고 있는 헤더 파일
@@ -601,12 +601,12 @@ namespace kiwi
 			std::vector<std::u16string> ret;
 			for (auto& m : morphemes)
 			{
-				size_t morphemeId = &m - morphemes.data();
+				size_t morphemeId = m.lmMorphemeId ? m.lmMorphemeId : (&m - morphemes.data());
 				if (morphemeId < defaultTagSize || m.tag != tag) continue;
 				std::u16string input = joinHangul(forms[m.kform].form);
 				std::u16string output = repl(input);
 				if (input == output) continue;
-				if (addWord(output, tag, score, morphemeId))
+				if (addWord(output, tag, score + (m.lmMorphemeId ? m.userScore : 0), morphemeId))
 				{
 					ret.emplace_back(output);
 				}
