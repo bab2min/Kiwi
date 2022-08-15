@@ -1619,7 +1619,7 @@
 인구	NNG	1674
 설립	NNG	1674
 쌀	NNG	1674
-소	EF	1674
+소	EF	1674	vocalic
 상상	NNG	1672
 초기	NNG	1672
 센터	NNG	1668
@@ -2197,7 +2197,7 @@
 코	NNG	1158
 무너지	VV	1155
 원래	MAG	1155
-푸르	VA	1153
+푸르	VA-I	1153
 소	XPN	1152
 는다고	EC	1151	non_vowel	non_adj	==ᆫ다고
 낮	NNG	1151
@@ -5303,7 +5303,6 @@
 알아내	VV	352
 학점	NNG	352
 가장	NNG	352
-ᆫ	NNG	352
 을수록	EC	351	non_vowel	==ᆯ수록
 경제학	NNG	351
 조세	NNG	351
@@ -5852,7 +5851,7 @@
 신명	NNG	303
 여느	MM	303
 그물	NNG	303
-누	NP	303
+누	NP	303	~누구
 수시로	MAG	302
 선뜻	MAG	302
 연어	NNG	302
@@ -7436,7 +7435,7 @@
 뻗치	VV	213
 유지	NNP	213
 신전	NNG	213
-슈	EF	213	vowel
+슈	EF	213
 다산	NNP	212
 재정부	NNG	212
 포드	NNP	212
@@ -8134,7 +8133,8 @@
 웃음소리	NNG	185
 겹	NNG	185
 서운	XR	185
-수	EF	185
+수	EF	185	vocalic
+으수	EF	185	non_vowel	==수
 미혜	NNP	185
 세상에	IC	184
 메이커	NNG	184
@@ -9449,7 +9449,7 @@
 신청서	NNG	148
 숨결	NNG	148
 국책	NNG	148
-소서	EF	148	vowel
+소서	EF	148	vocalic
 상이	XR	148
 상쾌	XR	148
 장해	NNG	148
@@ -10756,7 +10756,6 @@
 중엽	NNG	121
 정연	NNP	121
 망막	NNG	121
-ᆯ	NNG	121
 길일	NNG	121
 나으리	NNG	121
 신석주	NNP	121
@@ -12112,7 +12111,6 @@ SK텔레콤	NNP	103
 운율	NNG	102
 신작로	NNG	102
 약사회	NNG	102
-ᆷ	NNG	102
 아니면은	MAJ	102
 총독부	NNG	101
 청취자	NNG	101
@@ -12690,7 +12688,7 @@ SK텔레콤	NNP	103
 집시	NNG	95
 금당	NNG	95
 송종국	NNP	95
-소이다	EF	95
+소이다	EF	95	non_vowel
 한유지	NNP	95
 이애	IC	95
 꾹	NNP	95
@@ -13151,7 +13149,7 @@ SK텔레콤	NNP	103
 조수	NNG	89
 중화	NNG	89
 쳐들어오	VV	89
-세	EF	89
+세	EF	89	vocalic
 불리우	VV	89
 호기	NNG	89
 죄의식	NNG	89
@@ -14775,7 +14773,6 @@ LG화학	NNP	82
 기실	MAG	74
 숭늉	NNG	74
 무뚝뚝	XR	74
-ᆽ	NNG	74
 올시다	EF	74
 경추	NNG	74
 진수	NNP	74
@@ -15979,7 +15976,7 @@ LG화학	NNP	82
 남천	NNP	65
 깜박이	VV	65
 묘적	NNP	65
-외다	EF	65
+외다	EF	65	vocalic	==소이다
 가잘	NNP	65
 덮개돌	NNG	65
 때로는	MAG	65
@@ -16654,7 +16651,7 @@ LG화학	NNP	82
 보리밥	NNG	60
 거국	NNG	60
 수순	NNG	60
-푸르르	VA	60
+푸르르	VA	60	=푸르
 만발	NNG	60
 육류	NNG	60
 짜장면	NNG	60	=자장면
@@ -16965,7 +16962,7 @@ LG화학	NNP	82
 돌아앉	VV	59
 척박	XR	59
 미진	XR	59
-소서	EC	59	vowel
+소서	EC	59	vocalic
 푸근	XR	59
 무기물	NNG	59
 늠름	XR	59
@@ -17909,7 +17906,8 @@ LG화학	NNP	82
 김의관	NNP	54
 죽당	NNP	54
 오드바이	NNP	54
-십시오	EF	54
+십시오	EF	54	vocalic
+으십시오	EF	54	non_vowel	==십시오
 비비	NNB	54
 신선하	VA	53
 것	NP	53
@@ -20028,7 +20026,8 @@ AP통신	NNP	50
 혜숙	NNP	45
 헉	MAG	45
 흘금	MAG	45
-쇼	EF	45
+쇼	EF	45	vocalic
+으쇼	EF	45	non_vowel	==쇼
 맑스주의	NNG	45
 경제주의	NNG	45
 서하총	NNP	45
@@ -21837,7 +21836,7 @@ GS칼텍스	NNP	39
 커맨드	NNG	39
 은옥이	NNP	39
 술래	NNG	39
-뉘	NP	39
+뉘	NP	39	=누구
 초식	NNG	39
 살구나무	NNG	39
 판	XSN	39
@@ -22154,7 +22153,6 @@ GS칼텍스	NNP	39
 이태현	NNP	38
 냉랭	XR	38
 빤하	VA	38
-/	NNG	38
 백설공주	NNP	38
 유구	XR	38
 분모	NNG	38
@@ -22640,7 +22638,8 @@ GS칼텍스	NNP	39
 화기	NNG	36
 울화	NNG	36
 겉옷	NNG	36
-세	EC	36
+세	EC	36	vocalic
+으세	EC	36	non_vowel	==세
 며	JC	36	vowel	==이며
 역전패	NNG	36
 전시물	NNG	36
@@ -22809,7 +22808,7 @@ GS칼텍스	NNP	39
 이랑	NNG	36
 각고	NNG	36
 주책	NNG	36
-검푸르	VA	36
+검푸르	VA-I	36
 적혈구	NNG	36
 한빛은행	NNP	36
 울적	XR	36
@@ -24038,7 +24037,7 @@ SK그룹	NNP	33
 안집	NNG	33
 승범	NNP	33
 협실	NNG	33
-소이까	EF	33
+소이까	EF	33	non_vowel
 버텀	JX	33
 뭇	MAG	33
 프롤레타리아트	NNG	33
@@ -26364,7 +26363,7 @@ CJ그룹	NNP	29
 꼬챙이	NNG	27
 여	JX	27
 은지	EF	27	non_vowel	==ᆫ지
-달르	VA	27
+달르	VA	27	=다르
 평북	NNP	27
 한글학회	NNP	27
 율	NNG	27
@@ -26746,7 +26745,7 @@ CJ그룹	NNP	29
 꾸벅꾸벅	MAG	27
 스티로폴	NNG	27
 균질	NNG	27
-짙푸르	VA	27
+짙푸르	VA-I	27
 도톰	XR	27
 서울랜드	NNP	27
 우묵	MAG	27
@@ -29324,7 +29323,7 @@ LG유플러스	NNP	24
 스잔	NNP	23
 희끄무레	XR	23
 노	EC	23
-옵니다	EF	23
+옵니다	EF	23	vocalic
 저년	NP	23
 진종일	NNG	23
 코볼	NNG	23
@@ -30635,7 +30634,7 @@ LG유플러스	NNP	24
 서고	NNG	21
 송사	NNG	21
 변상	NNG	21
-오니	EC	21
+오니	EC	21	vocalic
 유득공	NNP	21
 이아현	NNP	21
 양탄자	NNG	21
@@ -31751,7 +31750,7 @@ LG디스플레이	NNP	20
 을꼬	EF	20	non_vowel	==ᆯ꼬
 노신	NNP	20
 까무라치	VV	20
-슈	EC	20	vowel
+슈	EC	20
 슬기	NNP	20
 전찻길	NNG	20
 빽	MAG	20
@@ -35754,7 +35753,7 @@ SH공사	NNP	19
 들입다	MAG	16
 부둣가	NNG	16
 는고	EF	16	non_adj	=는가
-오이다	EF	16
+오이다	EF	16	vocalic	==소이다
 첩첩	MAG	16
 외팔이	NNG	16
 기골	NNG	16
@@ -48749,7 +48748,8 @@ ABC	NNP	9
 간호실	NNG	9
 헤이	IC	9
 진압봉	NNG	9
-세나	EF	9
+세나	EF	10	vocalic
+으세나	EF	9	non_vowel	==세나
 ᆯ걸세	EF	9	vocalic
 은숙	NNP	9
 으소	EF	9	non_vowel	==소
@@ -49007,7 +49007,8 @@ ABC	NNP	9
 점득이	NNP	9
 달숙이	NNP	9
 우량아	NNG	9
-누르	VA	9
+누르	VA-I	10
+노르	VA-I	9	=누르
 덥석부리	NNG	9
 경식	NNP	9
 통일체	NNG	9
@@ -51459,7 +51460,7 @@ T맵	NNP	8
 품관	NNG	8
 기어들어가	VV	8
 곤룡포	NNG	8
-사오니	EC	8
+사오니	EC	8	non_vowel	==오니
 부윤	NNG	8
 때까치	NNG	8
 입춘서	NNG	8
@@ -51796,7 +51797,7 @@ YMCA	NNP	8
 물경	MAG	8
 차근차근히	MAG	8
 염화시중	NNG	8
-오이까	EF	8
+오이까	EF	8	vocalic	==소이까
 무위이화	NNG	8
 싸우디	NNP	8
 허벌나	VA	8
@@ -53808,7 +53809,7 @@ KB금융그룹	NNP	7
 급진파	NNG	7
 마석	NNP	7
 정준양	NNP	7
-사옵니다	EF	7
+사옵니다	EF	7	non_vowel	==옵니다
 우수영	NNP	7
 로레나	NNP	7
 명연주	NNG	7
@@ -59354,7 +59355,6 @@ ISL코리아	NNP	6
 이재근	NNP	6
 하푼	NNG	6
 김종완	NNP	6
-ㅗ	NNG	6
 레프	NNP	6
 스피리도노프	NNP	6
 아주	NNP	6
@@ -61436,7 +61436,6 @@ NBC	NNP	6
 의부	NNG	6
 영등할머니	NNP	6
 이선본	NNP	6
-ᅫ	NNG	6
 수근	NNG	6
 시편	NNP	6
 낭송가	NNG	6
@@ -67127,7 +67126,7 @@ KBS	NNP	5
 뺀뺀이	NNP	5
 악살	NNG	5
 출세욕	NNG	5
-쇠다	EF	5
+쇠다	EF	5	non_vowel	==소이다
 피봉	NNG	5
 독또오루	NNP	5
 낙토	NNG	5
@@ -67164,7 +67163,6 @@ KBS	NNP	5
 발증	NNG	5
 모춤	NNG	5
 행랑살이	NNG	5
-세유	EF	5
 구뎅이	NNG	5
 샘말	NNP	5
 경찰부	NNG	5
@@ -67949,7 +67947,6 @@ CNN	NNP	5
 을지어다	EF	5	non_vowel	==ᆯ지어다
 피사리	NNG	5
 이성지합	NNG	5
-ㅖ	NNG	5
 단군조선	NNP	5
 고골리	NNP	5
 올리가	NNP	5
