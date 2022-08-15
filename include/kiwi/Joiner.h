@@ -22,7 +22,7 @@ namespace kiwi
 			const CompiledRule* cr = nullptr;
 			KString stack;
 			size_t activeStart = 0;
-			POSTag lastTag = POSTag::unknown;
+			POSTag lastTag = POSTag::unknown, anteLastTag = POSTag::unknown;
 
 			explicit Joiner(const CompiledRule& _cr);			
 			void add(U16StringView form, POSTag tag);

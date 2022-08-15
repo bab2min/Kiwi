@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file Kiwi.h
  * @author bab2min (bab2min@gmail.com)
  * @brief Kiwi C++ API를 담고 있는 헤더 파일
@@ -58,7 +58,7 @@ namespace kiwi
 		template<template<ArchType> class LmState> friend struct NewAutoJoinerGetter;
 
 		bool integrateAllomorph = true;
-		float cutOffThreshold = 5;
+		float cutOffThreshold = 8;
 		float unkFormScoreScale = 5;
 		float unkFormScoreBias = 5;
 		float spacePenalty = 7;

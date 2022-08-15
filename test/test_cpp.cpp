@@ -37,6 +37,48 @@ Kiwi& reuseKiwiInstance()
 	return kiwi;
 }
 
+TEST(KiwiCpp, JoinRestore)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	for (auto c : {
+		u8"이야기가 얼마나 지겨운지 잘 알고 있다. \"'아!' 하고 힐데가르드는 한숨을 푹 쉬며 말했다.",
+		u8"승진해서 어쨌는 줄 아슈?",
+		u8"2002년 아서 안데르센의 몰락",
+		u8"호텔의 음침함이 좀 나아 보일 정도였다",
+		u8"황자의 일을 물을려고 부른 것이 아니냐고",
+		u8"생겼는 지 제법 알을 품는 것 같다.",
+		u8"음악용 CD를 들을 수 있다",
+		u8"좋아요도 눌렀다.",
+		u8"좋은데",
+		u8"않았다",
+		u8"인정받았다",
+		u8"하지 말아야",
+		u8"말았다",
+		//u8"비어 있다", 
+		//u8"기어 가다", 
+		u8"좋은 태도입니다",
+		u8"바로 '내일'입니다",
+		u8"in the",
+		u8"할 것이었다",
+		u8"몇 번의 신호 음이 이어지고",
+		u8"오래 나가 있는 바람에",
+		u8"간이 학교로서 인가를 받은",
+		u8"있을 터였다",
+		u8"극도의 인륜 상실",
+		u8"'내일'을 말하다",
+		u8"실톱으로 다듬어 놓은 것들",
+		})
+	{
+		auto tokens = kiwi.analyze(c, Match::allWithNormalizing).first;
+		auto joiner = kiwi.newJoiner();
+		for (auto& t : tokens)
+		{
+			joiner.add(t.str, t.tag, false);
+		}
+		EXPECT_EQ(joiner.getU8(), c);
+	}
+}
+
 TEST(KiwiCpp, InitClose)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
@@ -669,39 +711,4 @@ TEST(KiwiCpp, Quotation)
 
 	tokens = kiwi.analyze(u"I'd like to be a tree.", Match::allWithNormalizing).first;
 	EXPECT_EQ(tokens[1].tag, POSTag::ss);
-}
-
-TEST(KiwiCpp, JoinRestore)
-{
-	Kiwi& kiwi = reuseKiwiInstance();
-	for (auto c : { 
-		u8"좋아요도 눌렀다.",
-		u8"좋은데", 
-		u8"않았다", 
-		u8"인정받았다", 
-		u8"하지 말아야", 
-		u8"말았다", 
-		//u8"비어 있다", 
-		//u8"기어 가다", 
-		u8"좋은 태도입니다", 
-		u8"바로 '내일'입니다",
-		u8"in the", 
-		u8"할 것이었다", 
-		u8"몇 번의 신호 음이 이어지고",
-		u8"오래 나가 있는 바람에",
-		u8"간이 학교로서 인가를 받은",
-		u8"있을 터였다",
-		u8"극도의 인륜 상실",
-		u8"'내일'을 말하다",
-		u8"실톱으로 다듬어 놓은 것들",
-	})
-	{
-		auto tokens = kiwi.analyze(c, Match::allWithNormalizing).first;
-		auto joiner = kiwi.newJoiner();
-		for (auto& t : tokens)
-		{
-			joiner.add(t.str, t.tag, false);
-		}
-		EXPECT_EQ(joiner.getU8(), c);
-	}
 }

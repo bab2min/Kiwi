@@ -422,6 +422,8 @@ void KiwiBuilder::addCorpusTo(RaggedVector<uint16_t>& out, std::istream& is, Kiw
 				wids.emplace_back(getDefaultMorphemeId(t));
 				continue;
 			}
+
+			wids.emplace_back(getDefaultMorphemeId(POSTag::nng));
 		}
 	}
 }

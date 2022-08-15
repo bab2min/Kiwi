@@ -351,11 +351,24 @@ namespace kiwi
 			size_t hash = p.size();
 			for (auto& v : p)
 			{
-				hash ^= Hash<Ty>{}(v)+(hash << 6) + (hash >> 2);
+				hash ^= Hash<Ty>{}(v) + (hash << 6) + (hash >> 2);
 			}
 			return hash;
 		}
+	};
 
+	template<class Ty, size_t n>
+	struct Hash<std::array<Ty, n>>
+	{
+		size_t operator()(const std::array<Ty, n>& p) const
+		{
+			size_t hash = p.size();
+			for (auto& v : p)
+			{
+				hash ^= Hash<Ty>{}(v) + (hash << 6) + (hash >> 2);
+			}
+			return hash;
+		}
 	};
 
 	template<class Ty1, class Ty2>

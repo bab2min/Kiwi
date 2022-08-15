@@ -47,7 +47,7 @@ TEST(KiwiCppCombiner, Combine)
 
 	EXPECT_EQ(rule.combine(u"나", POSTag::np, u"가", POSTag::jks)[0], u"내가");
 
-	EXPECT_EQ(rule.combine(u"시", POSTag::ep, u"어용", POSTag::ef)[0], u"세용");
+	EXPECT_EQ(rule.combine(u"시", POSTag::ep, u"어용", POSTag::ef)[0], u"셔용");
 }
 
 TEST(KiwiCppCombiner, Joiner)

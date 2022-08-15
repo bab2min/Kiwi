@@ -583,6 +583,32 @@ namespace kiwi
 		return (morph->tag == POSTag::jks || morph->tag == POSTag::jkc) && morph->kform->size() == 1 && (*morph->kform)[0] == u'가';
 	}
 
+	inline bool isVerbL(const Morpheme* morph)
+	{
+		return isVerbClass(morph->tag) && morph->kform && !morph->kform->empty() && morph->kform->back() == u'ᆯ';
+	}
+
+	inline bool isBadPairOfVerbL(const Morpheme* morph)
+	{
+		auto onset = (morph->kform && !morph->kform->empty()) ? morph->kform->front() : 0;
+		return onset == u'으' || onset == u'느' || (u'사' <= onset && onset <= u'시');
+	}
+
+	inline bool isPositiveVerb(const Morpheme* morph)
+	{
+		return isVerbClass(morph->tag) && FeatureTestor::isMatched(morph->kform, CondPolarity::positive);
+	}
+
+	inline bool isNegativeVerb(const Morpheme* morph)
+	{
+		return isVerbClass(morph->tag) && FeatureTestor::isMatched(morph->kform, CondPolarity::negative);
+	}
+
+	inline bool isVerbVowel(const Morpheme* morph)
+	{
+		return isVerbClass(morph->tag) && morph->kform && !morph->kform->empty() && !isHangulCoda(morph->kform->back());
+	}
+
 	template<class LmState, class CandTy, class CacheTy>
 	float PathEvaluator::evalPath(const Kiwi* kw, 
 		const KGraphNode* startNode, 
@@ -665,23 +691,41 @@ namespace kiwi
 				float discountForCombining = curMorph->combineSocket ? -15 : 0;
 				estimatedLL += kw->tagScorer.evalLeftBoundary(hasLeftBoundary(node), curMorph->tag);
 				
-				bool isVowelE = isEClass(curMorph->tag) && curMorph->kform && hasNoOnset(*curMorph->kform);
-				bool isInfJ = isInflectendaJ(curMorph);
-
+				bool vowelE = isEClass(curMorph->tag) && curMorph->kform && hasNoOnset(*curMorph->kform);
+				bool infJ = isInflectendaJ(curMorph);
+				bool badPairOfL = isBadPairOfVerbL(curMorph);
+				bool positiveE = isEClass(curMorph->tag) && node->form && node->form->form[0] == u'아';
+				bool contractableE = isEClass(curMorph->tag) && curMorph->kform && !curMorph->kform->empty() && (*curMorph->kform)[0] == u'어';
+				
 				for (auto& p : maxWidLL)
 				{
 					for (auto& q : p.second)
 					{
 						q.accScore += estimatedLL;
 						// 불규칙 활용 형태소 뒤에 모음 어미가 붙는 경우 벌점 부여
-						if (isVowelE && isIrregular(kw->morphemes[q.morphs->back().wid].tag))
+						if (vowelE && isIrregular(kw->morphemes[q.morphs->back().wid].tag))
 						{
 							q.accScore -= 10;
 						}
 						// 나/너/저 뒤에 주격 조사 '가'가 붙는 경우 벌점 부여
-						if (isInfJ && isInflectendaNP(&kw->morphemes[q.morphs->back().wid]))
+						if (infJ && isInflectendaNP(&kw->morphemes[q.morphs->back().wid]))
 						{
 							q.accScore -= 5;
+						}
+						// ㄹ 받침 용언 뒤에 으/느/ㅅ으로 시작하는 형태소가 올 경우 벌점 부여
+						if (badPairOfL && isVerbL(&kw->morphemes[q.morphs->back().wid]))
+						{
+							q.accScore -= 7;
+						}
+						// 동사 뒤가 아니거나, 앞의 동사가 양성이 아닌데, 양성모음용 어미가 등장한 경우 벌점 부여
+						if (positiveE && !isPositiveVerb(&kw->morphemes[q.morphs->back().wid]))
+						{
+							q.accScore -= 100;
+						}
+						// 아/어로 시작하는 어미가 받침 없는 동사 뒤에서 축약되지 않은 경우 벌점 부여
+						if (contractableE && isVerbVowel(&kw->morphemes[q.morphs->back().wid]))
+						{
+							q.accScore -= 3;
 						}
 						tMax = max(tMax, q.accScore + discountForCombining);
 					}
@@ -816,30 +860,41 @@ namespace kiwi
 			// heuristically remove cands having lower ll to speed up
 			if (cache[i].size() > topN)
 			{
-				Vector<WordLL<LmState>> reduced;
-				float combinedCutOffScore = findNthLargest(cache[i].begin(), cache[i].end(), topN, [](const WordLL<LmState>& c)
-				{
-					return c.accScore;
-				}, [](const WordLL<LmState>& c)
-				{
-					if (c.morphs.empty()) return false;
-					return !!c.morphs.back().combineSocket;
-				});
-
-				float otherCutOffScore = findNthLargest(cache[i].begin(), cache[i].end(), topN, [](const WordLL<LmState>& c)
-				{
-					return c.accScore;
-				}, [](const WordLL<LmState>& c)
-				{
-					if (c.morphs.empty()) return true;
-					return !c.morphs.back().combineSocket;
-				});
-
-				combinedCutOffScore = min(tMax - kw->cutOffThreshold, combinedCutOffScore);
-				otherCutOffScore = min(tMax - kw->cutOffThreshold, otherCutOffScore);
+				UnorderedMap<array<Wid, 4>, pair<WordLL<LmState>*, float>> bestPathes;
+				float cutoffScore = -INFINITY, cutoffScoreWithCombined = -INFINITY;
 				for (auto& c : cache[i])
 				{
-					float cutoff = (c.morphs.empty() || !c.morphs.back().combineSocket) ? otherCutOffScore : combinedCutOffScore;
+					array<Wid, 4> lastNgram = { 0, };
+					size_t j = 0;
+					for (auto it = c.morphs.end() - min((size_t)4, c.morphs.size()); it != c.morphs.end(); ++it)
+					{
+						lastNgram[j++] = it->wid;
+					}
+					auto insertResult = bestPathes.emplace(lastNgram, make_pair(&c, c.accScore));
+					if (!insertResult.second)
+					{
+						if (c.accScore > insertResult.first->second.second)
+						{
+							insertResult.first->second = make_pair(&c, c.accScore);
+						}
+					}
+					if (!c.morphs.empty() && c.morphs.back().combineSocket)
+					{
+						cutoffScoreWithCombined = max(cutoffScoreWithCombined, c.accScore);
+					}
+					else
+					{
+						cutoffScore = max(cutoffScore, c.accScore);
+					}
+				}
+				cutoffScore -= kw->cutOffThreshold;
+				cutoffScoreWithCombined -= kw->cutOffThreshold;
+
+				Vector<WordLL<LmState>> reduced;
+				for (auto& p : bestPathes)
+				{
+					auto& c = *p.second.first;
+					float cutoff = (!c.morphs.empty() && c.morphs.back().combineSocket) ? cutoffScoreWithCombined : cutoffScore;
 					if (reduced.size() < topN || c.accScore >= cutoff) reduced.emplace_back(move(c));
 				}
 				cache[i] = move(reduced);

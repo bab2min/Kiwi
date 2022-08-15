@@ -20,8 +20,9 @@ namespace kiwi
 			if (r == POSTag::vcp || r == POSTag::xsa || r == POSTag::xsai || r == POSTag::xsv || r == POSTag::xsn) return false;
 			if (l == POSTag::xpn || l == POSTag::so || l == POSTag::ss || l == POSTag::sw) return false;
 			if (l == POSTag::sn && r == POSTag::nnb) return false;
-			if (!(l == POSTag::sn || l == POSTag::sp || l == POSTag::sf || l == POSTag::sl)
+			if (!(l == POSTag::sn || l == POSTag::sl)
 				&& (r == POSTag::sl || r == POSTag::sn)) return true;
+			if (l == POSTag::sn && r == POSTag::nr) return false;
 			if (l == POSTag::sso || l == POSTag::ssc) return false;
 			if (r == POSTag::sso) return true;
 
@@ -135,21 +136,17 @@ namespace kiwi
 					}
 				}
 
-				if (lastTag == POSTag::vcp && isHangulCoda(normForm[0]))
+				// 대명사가 아닌 다른 품사 뒤에 서술격 조사가 오는 경우 생략 금지
+				if (anteLastTag != POSTag::np && lastTag == POSTag::vcp && isHangulCoda(normForm[0]))
 				{
-					auto r = cr->combineOneImpl({ stack.data() + activeStart, stack.size() - activeStart }, lastTag, normForm, tag, CondVowel::none);
-					stack.erase(stack.begin() + activeStart, stack.end());
-					stack += r.first;
-					activeStart += r.second;
+					cv = CondVowel::none;
 				}
-				else
-				{
-					auto r = cr->combineOneImpl({ stack.data() + activeStart, stack.size() - activeStart }, lastTag, normForm, tag, cv);
-					stack.erase(stack.begin() + activeStart, stack.end());
-					stack += r.first;
-					activeStart += r.second;
-				}
+				auto r = cr->combineOneImpl({ stack.data() + activeStart, stack.size() - activeStart }, lastTag, normForm, tag, cv);
+				stack.erase(stack.begin() + activeStart, stack.end());
+				stack += r.first;
+				activeStart += r.second;
 			}
+			anteLastTag = lastTag;
 			lastTag = tag;
 		}
 
