@@ -699,8 +699,8 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 
 	auto sbgPairFilter = [&](size_t a, size_t b)
 	{
-		if (a < 21 || (34 < a && a < defaultTagSize + 1)) return false;
-		if ((1 < b && b < 21) || (34 < b && b < defaultTagSize + 1)) return false;
+		if (a <= (int)POSTag::vcn + 1 || ((int)POSTag::w_serial + 1 < a && a < defaultTagSize + 1)) return false;
+		if ((1 < b && b < (int)POSTag::vcn + 1) || ((int)POSTag::w_serial + 1 < b && b < defaultTagSize + 1)) return false;
 		return true;
 	};
 
