@@ -41,7 +41,7 @@ TEST(KiwiCpp, JoinRestore)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
 	for (auto c : {
-		u8"이야기가 얼마나 지겨운지 잘 알고 있다. \"'아!' 하고 힐데가르드는 한숨을 푹 쉬며 말했다.",
+		u8"이야기가 얼마나 지겨운지 잘 알고 있다. \" '아!'하고 힐데가르드는 한숨을 푹 쉬며 말했다.",
 		u8"승진해서 어쨌는 줄 아슈?",
 		u8"2002년 아서 안데르센의 몰락",
 		u8"호텔의 음침함이 좀 나아 보일 정도였다",
@@ -76,6 +76,25 @@ TEST(KiwiCpp, JoinRestore)
 			joiner.add(t.str, t.tag, false);
 		}
 		EXPECT_EQ(joiner.getU8(), c);
+	}
+}
+
+TEST(KiwiCpp, NestedSentenceSplit)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+
+	for (auto c : {
+		u8"“절망한 자는 대담해지는 법이다”라는 니체의 경구가 부제로 붙은 시이다.",
+		u8"우리는 저녁을 먹은 다음 식탁을 치우기 전에 할머니가 떠먹는 요구르트를 다 먹고 조그만 숟가락을 싹싹 핥는 일을 끝마치기를(할머니가 그 숟가락을 브래지어에 쑤셔넣을지도 몰랐다. 요컨대 흔한 일이다) 기다리고 있었다.",
+		u8"조현준 효성그룹 회장도 신년사를 통해 “속도와 효율성에 기반한 민첩한 조직으로 탈바꿈해야 한다”며 “이를 위해 무엇보다 데이터베이스 경영이 뒷받침돼야 한다”고 말했다.",
+		u8"1699년에 한 학자는 \"어떤 것은 뿔을 앞으로 내밀고 있고, 다른 것은 뾰족한 꼬리를 만들기도 한다.새부리 모양을 하고 있는 것도 있고, 털로 온 몸을 덮고 있다가 전체가 거칠어지기도 하고 비늘로 뒤덮여 뱀처럼 되기도 한다\"라고 기록했다.",
+		u8"회사의 정보 서비스를 책임지고 있는 로웬버그John Loewenberg는 <서비스 산업에 있어 종이는 혈관내의 콜레스트롤과 같다. 나쁜 종이는 동맥을 막는 내부의 물질이다.>라고 말한다.",
+		u8"그것은 바로 ‘내 임기 중에는 대운하 완공할 시간이 없으니 임기 내에 강별로 소운하부터 개통하겠다’는 것이나 다름없다. ",
+		u8"그러나 '문학이란 무엇인가'를 묻느니보다는 '무엇이 하나의 텍스트를 문학으로 만드는가'를 묻자고 제의했던 야콥슨 이래로, 문학의 본질을 정의하기보다는 문학의 존재론을 추적하는 것이 훨씬 생산적인 일이라는 것은 널리 알려진 바가 있다.",
+		})
+	{
+		auto ranges = kiwi.splitIntoSents(c);
+		EXPECT_EQ(ranges.size(), 1);
 	}
 }
 
@@ -143,7 +162,7 @@ TEST(KiwiCpp, SpaceTolerant)
 	kiwi.setSpaceTolerance(1);
 	kiwi.setSpacePenalty(3);
 	tokens = kiwi.analyze(str, Match::all).first;
-	EXPECT_EQ(tokens.size(), 10);
+	EXPECT_EQ(tokens.size(), 9);
 
 	kiwi.setSpaceTolerance(2);
 	tokens = kiwi.analyze(str, Match::all).first;

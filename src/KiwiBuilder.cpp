@@ -1,4 +1,4 @@
-﻿#include <fstream>
+#include <fstream>
 #include <random>
 
 #include <kiwi/Kiwi.h>
@@ -1579,6 +1579,22 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 	auto* fn = table[static_cast<std::ptrdiff_t>(archType)];
 	if (!fn) throw std::runtime_error{ std::string{"Unsupported architecture : "} + archToStr(archType)};
 	ret.formTrie = (*fn)(move(formTrie));
+
+	for (auto& m : ret.morphemes)
+	{
+		if (m.kform && *m.kform == u"'")
+		{
+			if (m.tag == POSTag::sso) ret.specialMorphIds[static_cast<size_t>(Kiwi::SpecialMorph::singleQuoteOpen)] = &m - ret.morphemes.data();
+			else if (m.tag == POSTag::ssc) ret.specialMorphIds[static_cast<size_t>(Kiwi::SpecialMorph::singleQuoteClose)] = &m - ret.morphemes.data();
+			else if (m.tag == POSTag::ss) ret.specialMorphIds[static_cast<size_t>(Kiwi::SpecialMorph::singleQuoteNA)] = &m - ret.morphemes.data();
+		}
+		else if (m.kform && *m.kform == u"\"")
+		{
+			if (m.tag == POSTag::sso) ret.specialMorphIds[static_cast<size_t>(Kiwi::SpecialMorph::doubleQuoteOpen)] = &m - ret.morphemes.data();
+			else if (m.tag == POSTag::ssc) ret.specialMorphIds[static_cast<size_t>(Kiwi::SpecialMorph::doubleQuoteClose)] = &m - ret.morphemes.data();
+			else if (m.tag == POSTag::ss) ret.specialMorphIds[static_cast<size_t>(Kiwi::SpecialMorph::doubleQuoteNA)] = &m - ret.morphemes.data();
+		}
+	}
 	return ret;
 }
 

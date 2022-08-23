@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <iostream>
 #include <string>
 #include <memory>
@@ -81,6 +81,7 @@ namespace kiwi
 	}
 
 	POSTag identifySpecialChr(kchar_t chr);
+	size_t getSSType(char16_t c);
 
 	inline bool isSpace(char16_t c)
 	{

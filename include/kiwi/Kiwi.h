@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file Kiwi.h
  * @author bab2min (bab2min@gmail.com)
  * @brief Kiwi C++ API를 담고 있는 헤더 파일
@@ -91,6 +91,20 @@ namespace kiwi
 		ArchType selectedArch = ArchType::none;
 		void* dfSplitByTrie = nullptr;
 		void* dfFindBestPath = nullptr;
+	
+	public:
+		enum class SpecialMorph {
+			singleQuoteOpen = 0,
+			singleQuoteClose,
+			singleQuoteNA,
+			doubleQuoteOpen,
+			doubleQuoteClose,
+			doubleQuoteNA,
+			max,
+		};
+
+	private:
+		std::array<size_t, static_cast<size_t>(SpecialMorph::max)> specialMorphIds = { 0, };
 
 	public:
 
@@ -292,6 +306,20 @@ namespace kiwi
 		{
 			if (!morph || morph < morphemes.data()) return -1;
 			return morph - morphemes.data();
+		}
+
+		size_t getSpecialMorphId(SpecialMorph type) const
+		{
+			return specialMorphIds[static_cast<size_t>(type)];
+		}
+
+		SpecialMorph determineSpecialMorphType(size_t morphId) const
+		{
+			for (size_t i = 0; i < specialMorphIds.size(); ++i)
+			{
+				if (morphId == specialMorphIds[i]) return static_cast<SpecialMorph>(i);
+			}
+			return SpecialMorph::max;
 		}
 
 		size_t getMorphemeSize() const { return morphemes.size(); }
