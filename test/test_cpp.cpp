@@ -37,67 +37,6 @@ Kiwi& reuseKiwiInstance()
 	return kiwi;
 }
 
-TEST(KiwiCpp, JoinRestore)
-{
-	Kiwi& kiwi = reuseKiwiInstance();
-	for (auto c : {
-		u8"이야기가 얼마나 지겨운지 잘 알고 있다. \" '아!'하고 힐데가르드는 한숨을 푹 쉬며 말했다.",
-		u8"승진해서 어쨌는 줄 아슈?",
-		u8"2002년 아서 안데르센의 몰락",
-		u8"호텔의 음침함이 좀 나아 보일 정도였다",
-		u8"황자의 일을 물을려고 부른 것이 아니냐고",
-		u8"생겼는 지 제법 알을 품는 것 같다.",
-		u8"음악용 CD를 들을 수 있다",
-		u8"좋아요도 눌렀다.",
-		u8"좋은데",
-		u8"않았다",
-		u8"인정받았다",
-		u8"하지 말아야",
-		u8"말았다",
-		//u8"비어 있다", 
-		//u8"기어 가다", 
-		u8"좋은 태도입니다",
-		u8"바로 '내일'입니다",
-		u8"in the",
-		u8"할 것이었다",
-		u8"몇 번의 신호 음이 이어지고",
-		u8"오래 나가 있는 바람에",
-		u8"간이 학교로서 인가를 받은",
-		u8"있을 터였다",
-		u8"극도의 인륜 상실",
-		u8"'내일'을 말하다",
-		u8"실톱으로 다듬어 놓은 것들",
-		})
-	{
-		auto tokens = kiwi.analyze(c, Match::allWithNormalizing).first;
-		auto joiner = kiwi.newJoiner();
-		for (auto& t : tokens)
-		{
-			joiner.add(t.str, t.tag, false);
-		}
-		EXPECT_EQ(joiner.getU8(), c);
-	}
-}
-
-TEST(KiwiCpp, NestedSentenceSplit)
-{
-	Kiwi& kiwi = reuseKiwiInstance();
-
-	for (auto c : {
-		u8"“절망한 자는 대담해지는 법이다”라는 니체의 경구가 부제로 붙은 시이다.",
-		u8"우리는 저녁을 먹은 다음 식탁을 치우기 전에 할머니가 떠먹는 요구르트를 다 먹고 조그만 숟가락을 싹싹 핥는 일을 끝마치기를(할머니가 그 숟가락을 브래지어에 쑤셔넣을지도 몰랐다. 요컨대 흔한 일이다) 기다리고 있었다.",
-		u8"조현준 효성그룹 회장도 신년사를 통해 “속도와 효율성에 기반한 민첩한 조직으로 탈바꿈해야 한다”며 “이를 위해 무엇보다 데이터베이스 경영이 뒷받침돼야 한다”고 말했다.",
-		u8"1699년에 한 학자는 \"어떤 것은 뿔을 앞으로 내밀고 있고, 다른 것은 뾰족한 꼬리를 만들기도 한다.새부리 모양을 하고 있는 것도 있고, 털로 온 몸을 덮고 있다가 전체가 거칠어지기도 하고 비늘로 뒤덮여 뱀처럼 되기도 한다\"라고 기록했다.",
-		u8"회사의 정보 서비스를 책임지고 있는 로웬버그John Loewenberg는 <서비스 산업에 있어 종이는 혈관내의 콜레스트롤과 같다. 나쁜 종이는 동맥을 막는 내부의 물질이다.>라고 말한다.",
-		u8"그것은 바로 ‘내 임기 중에는 대운하 완공할 시간이 없으니 임기 내에 강별로 소운하부터 개통하겠다’는 것이나 다름없다. ",
-		u8"그러나 '문학이란 무엇인가'를 묻느니보다는 '무엇이 하나의 텍스트를 문학으로 만드는가'를 묻자고 제의했던 야콥슨 이래로, 문학의 본질을 정의하기보다는 문학의 존재론을 추적하는 것이 훨씬 생산적인 일이라는 것은 널리 알려진 바가 있다.",
-		})
-	{
-		auto ranges = kiwi.splitIntoSents(c);
-		EXPECT_EQ(ranges.size(), 1);
-	}
-}
-
 TEST(KiwiCpp, InitClose)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
@@ -673,6 +612,8 @@ TEST(KiwiCpp, UserWordWithNumeric)
 	KiwiBuilder builder{ MODEL_PATH };
 	EXPECT_TRUE(builder.addWord(u"코로나19", POSTag::nnp, 0.0));
 	EXPECT_TRUE(builder.addWord(u"2차전지", POSTag::nnp, 0.0));
+	builder.addWord(u"K9", POSTag::nnp, 3.0);
+	builder.addWord(u"K55", POSTag::nnp, 3.0);
 	Kiwi kiwi = builder.build();
 
 	auto tokens = kiwi.analyze(u"코로나19이다.", Match::all).first;
@@ -688,6 +629,11 @@ TEST(KiwiCpp, UserWordWithNumeric)
 	EXPECT_EQ(tokens[0].str, u"2차전지");
 	EXPECT_EQ(tokens[1].str, u"이");
 	EXPECT_EQ(tokens[2].str, u"다");
+
+	tokens = kiwi.analyze(u"K9 K55", Match::all).first;
+	ASSERT_GE(tokens.size(), 2);
+	EXPECT_EQ(tokens[0].str, u"K9");
+	EXPECT_EQ(tokens[1].str, u"K55");
 }
 
 TEST(KiwiCpp, Quotation)
@@ -730,4 +676,65 @@ TEST(KiwiCpp, Quotation)
 
 	tokens = kiwi.analyze(u"I'd like to be a tree.", Match::allWithNormalizing).first;
 	EXPECT_EQ(tokens[1].tag, POSTag::ss);
+}
+
+TEST(KiwiCpp, JoinRestore)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	for (auto c : {
+		u8"이야기가 얼마나 지겨운지 잘 알고 있다. \" '아!'하고 힐데가르드는 한숨을 푹 쉬며 말했다.",
+		u8"승진해서 어쨌는 줄 아슈?",
+		u8"2002년 아서 안데르센의 몰락",
+		u8"호텔의 음침함이 좀 나아 보일 정도였다",
+		u8"황자의 일을 물을려고 부른 것이 아니냐고",
+		u8"생겼는 지 제법 알을 품는 것 같다.",
+		u8"음악용 CD를 들을 수 있다",
+		u8"좋아요도 눌렀다.",
+		u8"좋은데",
+		u8"않았다",
+		u8"인정받았다",
+		u8"하지 말아야",
+		u8"말았다",
+		//u8"비어 있다", 
+		//u8"기어 가다", 
+		u8"좋은 태도입니다",
+		u8"바로 '내일'입니다",
+		u8"in the",
+		u8"할 것이었다",
+		u8"몇 번의 신호 음이 이어지고",
+		u8"오래 나가 있는 바람에",
+		u8"간이 학교로서 인가를 받은",
+		u8"있을 터였다",
+		u8"극도의 인륜 상실",
+		u8"'내일'을 말하다",
+		u8"실톱으로 다듬어 놓은 것들",
+		})
+	{
+		auto tokens = kiwi.analyze(c, Match::allWithNormalizing).first;
+		auto joiner = kiwi.newJoiner();
+		for (auto& t : tokens)
+		{
+			joiner.add(t.str, t.tag, false);
+		}
+		EXPECT_EQ(joiner.getU8(), c);
+	}
+}
+
+TEST(KiwiCpp, NestedSentenceSplit)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+
+	for (auto c : {
+		u8"“절망한 자는 대담해지는 법이다”라는 니체의 경구가 부제로 붙은 시이다.",
+		u8"우리는 저녁을 먹은 다음 식탁을 치우기 전에 할머니가 떠먹는 요구르트를 다 먹고 조그만 숟가락을 싹싹 핥는 일을 끝마치기를(할머니가 그 숟가락을 브래지어에 쑤셔넣을지도 몰랐다. 요컨대 흔한 일이다) 기다리고 있었다.",
+		u8"조현준 효성그룹 회장도 신년사를 통해 “속도와 효율성에 기반한 민첩한 조직으로 탈바꿈해야 한다”며 “이를 위해 무엇보다 데이터베이스 경영이 뒷받침돼야 한다”고 말했다.",
+		u8"1699년에 한 학자는 \"어떤 것은 뿔을 앞으로 내밀고 있고, 다른 것은 뾰족한 꼬리를 만들기도 한다.새부리 모양을 하고 있는 것도 있고, 털로 온 몸을 덮고 있다가 전체가 거칠어지기도 하고 비늘로 뒤덮여 뱀처럼 되기도 한다\"라고 기록했다.",
+		u8"회사의 정보 서비스를 책임지고 있는 로웬버그John Loewenberg는 <서비스 산업에 있어 종이는 혈관내의 콜레스트롤과 같다. 나쁜 종이는 동맥을 막는 내부의 물질이다.>라고 말한다.",
+		u8"그것은 바로 ‘내 임기 중에는 대운하 완공할 시간이 없으니 임기 내에 강별로 소운하부터 개통하겠다’는 것이나 다름없다. ",
+		u8"그러나 '문학이란 무엇인가'를 묻느니보다는 '무엇이 하나의 텍스트를 문학으로 만드는가'를 묻자고 제의했던 야콥슨 이래로, 문학의 본질을 정의하기보다는 문학의 존재론을 추적하는 것이 훨씬 생산적인 일이라는 것은 널리 알려진 바가 있다.",
+		})
+	{
+		auto ranges = kiwi.splitIntoSents(c);
+		EXPECT_EQ(ranges.size(), 1);
+	}
 }
