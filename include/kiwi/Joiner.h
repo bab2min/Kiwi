@@ -8,6 +8,7 @@ namespace kiwi
 	class Kiwi;
 	template<ArchType arch>
 	class VoidState;
+	struct Form;
 
 	namespace cmb
 	{
@@ -80,6 +81,9 @@ namespace kiwi
 
 			template<class LmState>
 			explicit AutoJoiner(const Kiwi& kiwi, Candidate<LmState>&& state);
+
+			template<class Func>
+			void foreachMorpheme(const Form* formHead, Func&& func) const;
 
 			template<class LmState>
 			void add(size_t morphemeId, Vector<Candidate<LmState>>& candidates);

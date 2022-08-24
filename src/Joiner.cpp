@@ -217,6 +217,37 @@ namespace kiwi
 			});
 		}
 
+		template<class Func>
+		void AutoJoiner::foreachMorpheme(const Form* formHead, Func&& func) const
+		{
+			if (kiwi->isTypoTolerant())
+			{
+				auto tformHead = reinterpret_cast<const TypoForm*>(formHead);
+				do
+				{
+					if (tformHead->score() == 0)
+					{
+						for (auto m : tformHead->form(kiwi->forms.data()).candidate)
+						{
+							func(m);
+						}
+					}
+					++tformHead;
+				} while (tformHead[-1].hash() == tformHead[0].hash());
+			}
+			else
+			{
+				do
+				{
+					for (auto m : formHead->candidate)
+					{
+						func(m);
+					}
+					++formHead;
+				} while (formHead[-1].form == formHead[0].form);
+			}
+		}
+
 		template<class LmState>
 		void AutoJoiner::add(U16StringView form, POSTag tag, bool inferRegularity, Vector<Candidate<LmState>>& candidates)
 		{
@@ -231,22 +262,18 @@ namespace kiwi
 			if (node && kiwi->formTrie.hasMatch(formHead = node->val(kiwi->formTrie)))
 			{
 				Vector<const Morpheme*> cands;
-				do
+				foreachMorpheme(formHead, [&](const Morpheme* m)
 				{
-					for (auto m : formHead->candidate)
+					if (inferRegularity && clearIrregular(m->tag) == clearIrregular(tag))
 					{
-						if (inferRegularity && clearIrregular(m->tag) == clearIrregular(tag))
-						{
-							cands.emplace_back(m);
-						}
-						else if (!inferRegularity && m->tag == tag)
-						{
-							cands.emplace_back(m);
-						}
+						cands.emplace_back(m);
 					}
-					++formHead;
-				} while (formHead[-1].form == formHead[0].form);
-
+					else if (!inferRegularity && m->tag == tag)
+					{
+						cands.emplace_back(m);
+					}
+				});
+				
 				if (cands.size() <= 1)
 				{
 					auto lmId = cands.empty() ? getDefaultMorphemeId(clearIrregular(tag)) : cands[0]->lmMorphemeId;
@@ -310,17 +337,13 @@ namespace kiwi
 					if (const Form* formHead = node->val(kiwi->formTrie))
 					{
 						Vector<const Morpheme*> cands;
-						do
+						foreachMorpheme(formHead, [&](const Morpheme* m)
 						{
-							for (auto m : formHead->candidate)
+							if (clearIrregular(m->tag) == clearIrregular(tag))
 							{
-								if (clearIrregular(m->tag) == clearIrregular(tag))
-								{
-									cands.emplace_back(m);
-								}
+								cands.emplace_back(m);
 							}
-							++formHead;
-						} while (formHead[-1].form == formHead[0].form);
+						});
 
 						if (!cands.empty())
 						{

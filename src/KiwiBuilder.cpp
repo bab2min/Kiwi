@@ -1,4 +1,4 @@
-#include <fstream>
+﻿#include <fstream>
 #include <random>
 
 #include <kiwi/Kiwi.h>
@@ -880,7 +880,11 @@ bool KiwiBuilder::addWord(U16StringView newForm, POSTag tag, float score, size_t
 		for (auto p : f.candidate)
 		{
 			// if `form` already has the same `tag`, skip adding
-			if (morphemes[p].tag == tag && morphemes[p].lmMorphemeId == origMorphemeId) return false;
+			if (morphemes[p].tag == tag && morphemes[p].lmMorphemeId == origMorphemeId)
+			{
+				morphemes[p].userScore = score;
+				return false;
+			}
 		}
 	}
 

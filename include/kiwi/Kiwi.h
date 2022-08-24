@@ -139,6 +139,13 @@ namespace kiwi
 		ArchType archType() const { return selectedArch; }
 
 		/**
+		 * @brief 현재 Kiwi 객체가 오타 교정 기능이 켜진 상태로 생성되었는지 알려준다.
+		 * 
+		 * @return 오타 교정 기능이 켜진 경우 true를 반환한다.
+		 */
+		bool isTypoTolerant() const { return !typoForms.empty(); }
+
+		/**
 		 * @brief 
 		 * 
 		 * @param str 
