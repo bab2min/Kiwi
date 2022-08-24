@@ -280,7 +280,7 @@ Vector<KGraphNode> kiwi::splitByTrie(
 
 		chrType = identifySpecialChr(c);
 
-		if (lastChrType != chrType)
+		if (lastChrType != chrType || lastChrType == POSTag::sso || lastChrType == POSTag::ssc)
 		{
 			// sequence of speical characters found
 			if (lastChrType != POSTag::max && lastChrType != POSTag::unknown && lastChrType != lastMatchedPattern)
