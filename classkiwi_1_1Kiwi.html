@@ -66,6 +66,7 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#friends">Friends</a> &#124;
 <a href="classkiwi_1_1Kiwi-members.html">List of all members</a>  </div>
@@ -79,6 +80,21 @@ $(function() {
 
 <p><code>#include &lt;Kiwi.h&gt;</code></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:ae0120f259ed65a1337afd6d5035a92e5"><td class="memItemLeft" align="right" valign="top"><a id="ae0120f259ed65a1337afd6d5035a92e5"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><b>SpecialMorph</b> { <br />
+&#160;&#160;<b>singleQuoteOpen</b> = 0, 
+<b>singleQuoteClose</b>, 
+<b>singleQuoteNA</b>, 
+<b>doubleQuoteOpen</b>, 
+<br />
+&#160;&#160;<b>doubleQuoteClose</b>, 
+<b>doubleQuoteNA</b>, 
+<b>max</b>
+<br />
+ }</td></tr>
+<tr class="separator:ae0120f259ed65a1337afd6d5035a92e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a447ca75684e8a73ce682022268be1e4c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1Kiwi.html#a447ca75684e8a73ce682022268be1e4c">Kiwi</a> (ArchType arch=ArchType::default_, <a class="el" href="structkiwi_1_1LangModel.html">LangModel</a> _langMdl={}, bool typoTolerant=false)</td></tr>
@@ -102,6 +118,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a9ef69ed82844eace895f941409f7d647"><td class="memItemLeft" align="right" valign="top"><a id="a9ef69ed82844eace895f941409f7d647"></a>
 ArchType&#160;</td><td class="memItemRight" valign="bottom"><b>archType</b> () const</td></tr>
 <tr class="separator:a9ef69ed82844eace895f941409f7d647"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a56ef14c138b0a3aba65f14aa58153622"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1Kiwi.html#a56ef14c138b0a3aba65f14aa58153622">isTypoTolerant</a> () const</td></tr>
+<tr class="memdesc:a56ef14c138b0a3aba65f14aa58153622"><td class="mdescLeft">&#160;</td><td class="mdescRight">현재 <a class="el" href="classkiwi_1_1Kiwi.html" title="실제 형태소 분석을 수행하는 클래스.">Kiwi</a> 객체가 오타 교정 기능이 켜진 상태로 생성되었는지 알려준다.  <a href="classkiwi_1_1Kiwi.html#a56ef14c138b0a3aba65f14aa58153622">More...</a><br /></td></tr>
+<tr class="separator:a56ef14c138b0a3aba65f14aa58153622"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a25c0c472ed3ce16790b32349d8ea73ab"><td class="memItemLeft" align="right" valign="top"><a class="el" href="Types_8h.html#aa3333c7237f7db8aa0121560dbaa3ecb">TokenResult</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1Kiwi.html#a25c0c472ed3ce16790b32349d8ea73ab">analyze</a> (const std::u16string &amp;str, Match matchOptions) const</td></tr>
 <tr class="separator:a25c0c472ed3ce16790b32349d8ea73ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae52dd58f775ec0cd59631a9cc2f00991"><td class="memItemLeft" align="right" valign="top"><a class="el" href="Types_8h.html#aa3333c7237f7db8aa0121560dbaa3ecb">TokenResult</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1Kiwi.html#ae52dd58f775ec0cd59631a9cc2f00991">analyze</a> (const std::string &amp;str, Match matchOptions) const</td></tr>
@@ -128,6 +147,15 @@ ArchType&#160;</td><td class="memItemRight" valign="bottom"><b>archType</b> () c
 <tr class="memitem:a259ea999c3b30610c92d01adb9e69df0"><td class="memItemLeft" align="right" valign="top"><a id="a259ea999c3b30610c92d01adb9e69df0"></a>
 size_t&#160;</td><td class="memItemRight" valign="bottom"><b>morphToId</b> (const <a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a> *morph) const</td></tr>
 <tr class="separator:a259ea999c3b30610c92d01adb9e69df0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3fd2329f19f103417c61f0913fb87188"><td class="memItemLeft" align="right" valign="top"><a id="a3fd2329f19f103417c61f0913fb87188"></a>
+size_t&#160;</td><td class="memItemRight" valign="bottom"><b>getSpecialMorphId</b> (SpecialMorph type) const</td></tr>
+<tr class="separator:a3fd2329f19f103417c61f0913fb87188"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab7b3f650b237af8fe030a6eb18fb835c"><td class="memItemLeft" align="right" valign="top"><a id="ab7b3f650b237af8fe030a6eb18fb835c"></a>
+SpecialMorph&#160;</td><td class="memItemRight" valign="bottom"><b>determineSpecialMorphType</b> (size_t morphId) const</td></tr>
+<tr class="separator:ab7b3f650b237af8fe030a6eb18fb835c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5b088c9836275c96a63559e3e7fd5cbb"><td class="memItemLeft" align="right" valign="top"><a id="a5b088c9836275c96a63559e3e7fd5cbb"></a>
+size_t&#160;</td><td class="memItemRight" valign="bottom"><b>getMorphemeSize</b> () const</td></tr>
+<tr class="separator:a5b088c9836275c96a63559e3e7fd5cbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8c76d6a8c69d2c3b00e268d906457fe3"><td class="memItemLeft" align="right" valign="top"><a id="a8c76d6a8c69d2c3b00e268d906457fe3"></a>
 const <a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>idToMorph</b> (size_t morphId) const</td></tr>
 <tr class="separator:a8c76d6a8c69d2c3b00e268d906457fe3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -558,6 +586,34 @@ template&lt;class ReaderCallback , class ResultCallback &gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>복원된 오타의 형태 </dd></dl>
+
+</div>
+</div>
+<a id="a56ef14c138b0a3aba65f14aa58153622"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a56ef14c138b0a3aba65f14aa58153622">&#9670;&nbsp;</a></span>isTypoTolerant()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool kiwi::Kiwi::isTypoTolerant </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>현재 <a class="el" href="classkiwi_1_1Kiwi.html" title="실제 형태소 분석을 수행하는 클래스.">Kiwi</a> 객체가 오타 교정 기능이 켜진 상태로 생성되었는지 알려준다. </p>
+<dl class="section return"><dt>Returns</dt><dd>오타 교정 기능이 켜진 경우 true를 반환한다. </dd></dl>
 
 </div>
 </div>

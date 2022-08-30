@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['wordposition_414',['wordPosition',['../structkiwi_1_1TokenInfo.html#a9729fcc663ca3040215d945a120478ed',1,'kiwi::TokenInfo']]]
+  ['vppack_442',['vpPack',['../structkiwi_1_1MorphemeRaw.html#adf7d523968d409122cc3c0e3578d831a',1,'kiwi::MorphemeRaw']]]
 ];

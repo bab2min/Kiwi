@@ -1010,6 +1010,24 @@
 </dd></dl>
 
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv419kiwi_res_token_info10kiwi_res_hii">
+<span id="_CPPv319kiwi_res_token_info10kiwi_res_hii"></span><span id="_CPPv219kiwi_res_token_info10kiwi_res_hii"></span><span id="kiwi_res_token_info__kiwi_res_h.i.i"></span><span class="target" id="capi_8h_1a37ff344465481dd08f45bc4797e58f7c"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv417kiwi_token_info_t" title="kiwi_token_info_t"><span class="n"><span class="pre">kiwi_token_info_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_res_token_info</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv410kiwi_res_h" title="kiwi_res_h"><span class="n"><span class="pre">kiwi_res_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">result</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419kiwi_res_token_info10kiwi_res_hii" title="Permalink to this definition"></a><br /></dt>
+<dd><p>index번째 분석 결과의 num번째 형태소의 정보를 반환합니다. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>result</strong> – 분석 결과의 핸들 </p></li>
+<li><p><strong>index</strong> – <code class="docutils literal notranslate"><span class="pre">0</span></code> 이상 <code class="docutils literal notranslate"><span class="pre">kiwi_res_size(result)</span></code> 미만의 정수 </p></li>
+<li><p><strong>num</strong> – <code class="docutils literal notranslate"><span class="pre">0</span></code> 이상 <code class="docutils literal notranslate"><span class="pre">kiwi_res_word_num(result,</span> <span class="pre">index)</span></code> 미만의 정수 </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>형태소 정보가 담긴 <code class="docutils literal notranslate"><a class="reference internal" href="#structkiwi__token__info__t"><span class="std std-ref"><span class="pre">kiwi_token_info_t</span></span></a></code>에 대한 포인터를 반환합니다. 실패 시 null을 반환합니다. 이 포인터는 Kiwi API가 관리하므로 별도로 해제할 필요가 없습니다. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv415kiwi_res_form_w10kiwi_res_hii">
 <span id="_CPPv315kiwi_res_form_w10kiwi_res_hii"></span><span id="_CPPv215kiwi_res_form_w10kiwi_res_hii"></span><span id="kiwi_res_form_w__kiwi_res_h.i.i"></span><span class="target" id="capi_8h_1a608d1ae9196ab0f680508f5da301743a"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49kchar16_t" title="kchar16_t"><span class="n"><span class="pre">kchar16_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_res_form_w</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv410kiwi_res_h" title="kiwi_res_h"><span class="n"><span class="pre">kiwi_res_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">result</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415kiwi_res_form_w10kiwi_res_hii" title="Permalink to this definition"></a><br /></dt>
 <dd><p>index번째 분석 결과의 num번째 형태소의 형태를 반환합니다. </p>
@@ -1022,7 +1040,7 @@
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>UTF-16으로 인코딩된 문자열. 실패 시 null을 반환합니다. 이 값은 Kiwi API가 관리하므로 별도로 해제할 필요가 없습니다. </p>
+<dd class="field-even"><p>UTF-16으로 인코딩된 문자열. 실패 시 null을 반환합니다. 이 포인터는 Kiwi API가 관리하므로 별도로 해제할 필요가 없습니다. </p>
 </dd>
 </dl>
 </dd></dl>
@@ -1455,6 +1473,86 @@
 </dd></dl>
 
 </div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv417kiwi_token_info_t">
+<span id="_CPPv317kiwi_token_info_t"></span><span id="_CPPv217kiwi_token_info_t"></span><span id="kiwi_token_info_t"></span><span class="target" id="structkiwi__token__info__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_token_info_t</span></span></span><a class="headerlink" href="#_CPPv417kiwi_token_info_t" title="Permalink to this definition"></a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17kiwi_token_info_t12chr_positionE">
+<span id="_CPPv3N17kiwi_token_info_t12chr_positionE"></span><span id="_CPPv2N17kiwi_token_info_t12chr_positionE"></span><span id="kiwi_token_info_t::chr_position__uint_fast32_t"></span><span class="target" id="structkiwi__token__info__t_1a8c2ed0afb7f93f055b750f7fdde93217"></span><span class="n"><span class="pre">uint_fast32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">chr_position</span></span></span><a class="headerlink" href="#_CPPv4N17kiwi_token_info_t12chr_positionE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>시작 위치(UTF16 문자 기준) </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17kiwi_token_info_t13word_positionE">
+<span id="_CPPv3N17kiwi_token_info_t13word_positionE"></span><span id="_CPPv2N17kiwi_token_info_t13word_positionE"></span><span id="kiwi_token_info_t::word_position__uint_fast32_t"></span><span class="target" id="structkiwi__token__info__t_1ab3b9e684f690cf257d726b31a5f3c159"></span><span class="n"><span class="pre">uint_fast32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">word_position</span></span></span><a class="headerlink" href="#_CPPv4N17kiwi_token_info_t13word_positionE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>어절 번호(공백 기준) </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17kiwi_token_info_t13sent_positionE">
+<span id="_CPPv3N17kiwi_token_info_t13sent_positionE"></span><span id="_CPPv2N17kiwi_token_info_t13sent_positionE"></span><span id="kiwi_token_info_t::sent_position__uint_fast32_t"></span><span class="target" id="structkiwi__token__info__t_1a2b11a00822e73ac06ea6c4f24a9db099"></span><span class="n"><span class="pre">uint_fast32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sent_position</span></span></span><a class="headerlink" href="#_CPPv4N17kiwi_token_info_t13sent_positionE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>문장 번호 </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17kiwi_token_info_t11line_numberE">
+<span id="_CPPv3N17kiwi_token_info_t11line_numberE"></span><span id="_CPPv2N17kiwi_token_info_t11line_numberE"></span><span id="kiwi_token_info_t::line_number__uint_fast32_t"></span><span class="target" id="structkiwi__token__info__t_1aef3c13fb97d37be9cf66cd96ef116636"></span><span class="n"><span class="pre">uint_fast32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">line_number</span></span></span><a class="headerlink" href="#_CPPv4N17kiwi_token_info_t11line_numberE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>줄 번호 </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17kiwi_token_info_t6lengthE">
+<span id="_CPPv3N17kiwi_token_info_t6lengthE"></span><span id="_CPPv2N17kiwi_token_info_t6lengthE"></span><span id="kiwi_token_info_t::length__uint_fast16_t"></span><span class="target" id="structkiwi__token__info__t_1aa58f7371dcc20a58969b69ac0aeda481"></span><span class="n"><span class="pre">uint_fast16_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">length</span></span></span><a class="headerlink" href="#_CPPv4N17kiwi_token_info_t6lengthE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>길이(UTF16 문자 기준) </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17kiwi_token_info_t3tagE">
+<span id="_CPPv3N17kiwi_token_info_t3tagE"></span><span id="_CPPv2N17kiwi_token_info_t3tagE"></span><span id="kiwi_token_info_t::tag__uint_fast8_t"></span><span class="target" id="structkiwi__token__info__t_1a5c8321c009ebcbc2e79a2e461c752571"></span><span class="n"><span class="pre">uint_fast8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">tag</span></span></span><a class="headerlink" href="#_CPPv4N17kiwi_token_info_t3tagE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>품사 태그 </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17kiwi_token_info_t8sense_idE">
+<span id="_CPPv3N17kiwi_token_info_t8sense_idE"></span><span id="_CPPv2N17kiwi_token_info_t8sense_idE"></span><span id="kiwi_token_info_t::sense_id__uint_fast8_t"></span><span class="target" id="structkiwi__token__info__t_1a88381b21fdcc88f02e06d11bddfa48f2"></span><span class="n"><span class="pre">uint_fast8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sense_id</span></span></span><a class="headerlink" href="#_CPPv4N17kiwi_token_info_t8sense_idE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>의미 번호 </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17kiwi_token_info_t5scoreE">
+<span id="_CPPv3N17kiwi_token_info_t5scoreE"></span><span id="_CPPv2N17kiwi_token_info_t5scoreE"></span><span id="kiwi_token_info_t::score__float"></span><span class="target" id="structkiwi__token__info__t_1a27403cec79ba0637f33534ee1ee624d7"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">score</span></span></span><a class="headerlink" href="#_CPPv4N17kiwi_token_info_t5scoreE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>해당 형태소의 언어모델 점수 </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17kiwi_token_info_t9typo_costE">
+<span id="_CPPv3N17kiwi_token_info_t9typo_costE"></span><span id="_CPPv2N17kiwi_token_info_t9typo_costE"></span><span id="kiwi_token_info_t::typo_cost__float"></span><span class="target" id="structkiwi__token__info__t_1ae4a0a293df8c1fabb3cc131a21590e73"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">typo_cost</span></span></span><a class="headerlink" href="#_CPPv4N17kiwi_token_info_t9typo_costE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>오타가 교정된 경우 오타 비용. 그렇지 않은 경우 0 </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17kiwi_token_info_t12typo_form_idE">
+<span id="_CPPv3N17kiwi_token_info_t12typo_form_idE"></span><span id="_CPPv2N17kiwi_token_info_t12typo_form_idE"></span><span id="kiwi_token_info_t::typo_form_id__uint_fast32_t"></span><span class="target" id="structkiwi__token__info__t_1a05f73924d87c86ad22e837e98f7c4e7d"></span><span class="n"><span class="pre">uint_fast32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">typo_form_id</span></span></span><a class="headerlink" href="#_CPPv4N17kiwi_token_info_t12typo_form_idE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>교정 전 오타의 형태에 대한 정보 (typoCost가 0인 경우 의미 없음) </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17kiwi_token_info_t12paired_tokenE">
+<span id="_CPPv3N17kiwi_token_info_t12paired_tokenE"></span><span id="_CPPv2N17kiwi_token_info_t12paired_tokenE"></span><span id="kiwi_token_info_t::paired_token__uint_fast32_t"></span><span class="target" id="structkiwi__token__info__t_1aaa638b5454e57531bba051eede546804"></span><span class="n"><span class="pre">uint_fast32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">paired_token</span></span></span><a class="headerlink" href="#_CPPv4N17kiwi_token_info_t12paired_tokenE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>SSO, SSC 태그에 속하는 형태소의 경우 쌍을 이루는 반대쪽 형태소의 위치(-1인 경우 해당하는 형태소가 없는 것을 뜻함) </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17kiwi_token_info_t17sub_sent_positionE">
+<span id="_CPPv3N17kiwi_token_info_t17sub_sent_positionE"></span><span id="_CPPv2N17kiwi_token_info_t17sub_sent_positionE"></span><span id="kiwi_token_info_t::sub_sent_position__uint_fast32_t"></span><span class="target" id="structkiwi__token__info__t_1a6af137a85aa6e59330b1f9a08d87ff5e"></span><span class="n"><span class="pre">uint_fast32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sub_sent_position</span></span></span><a class="headerlink" href="#_CPPv4N17kiwi_token_info_t17sub_sent_positionE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>인용부호나 괄호로 둘러싸인 하위 문장의 번호. 1부터 시작. 0인 경우 하위 문장이 아님을 뜻함 </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
 </section>
 
 

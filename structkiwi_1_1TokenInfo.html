@@ -120,6 +120,10 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a665bcabafa2c41815d0a5ad51a27e833"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa77262e269fb9873c00c6fc9ad410fbb"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi_1_1TokenInfo.html#aa77262e269fb9873c00c6fc9ad410fbb">typoFormId</a> = 0</td></tr>
 <tr class="separator:aa77262e269fb9873c00c6fc9ad410fbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a85cdd9227a90c95fb2bd301dff853c42"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi_1_1TokenInfo.html#a85cdd9227a90c95fb2bd301dff853c42">pairedToken</a> = -1</td></tr>
+<tr class="separator:a85cdd9227a90c95fb2bd301dff853c42"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3854dee1149cee2d42e421e4bedc6a2c"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi_1_1TokenInfo.html#a3854dee1149cee2d42e421e4bedc6a2c">subSentPosition</a> = 0</td></tr>
+<tr class="separator:a3854dee1149cee2d42e421e4bedc6a2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8036684b6884ddf24d5f013d36cb6b0a"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi_1_1TokenInfo.html#a8036684b6884ddf24d5f013d36cb6b0a">morph</a> = nullptr</td></tr>
 <tr class="separator:a8036684b6884ddf24d5f013d36cb6b0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -168,6 +172,21 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>기타 형태소 정보에 대한 포인터 (OOV인 경우 nullptr) </p>
+
+</div>
+</div>
+<a id="a85cdd9227a90c95fb2bd301dff853c42"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a85cdd9227a90c95fb2bd301dff853c42">&#9670;&nbsp;</a></span>pairedToken</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t kiwi::TokenInfo::pairedToken = -1</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>SSO, SSC 태그에 속하는 형태소의 경우 쌍을 이루는 반대쪽 형태소의 위치(-1인 경우 해당하는 형태소가 없는 것을 뜻함) </p>
 
 </div>
 </div>
@@ -243,6 +262,21 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>형태 </p>
+
+</div>
+</div>
+<a id="a3854dee1149cee2d42e421e4bedc6a2c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3854dee1149cee2d42e421e4bedc6a2c">&#9670;&nbsp;</a></span>subSentPosition</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t kiwi::TokenInfo::subSentPosition = 0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>인용부호나 괄호로 둘러싸인 하위 문장의 번호. 1부터 시작. 0인 경우 하위 문장이 아님을 뜻함 </p>
 
 </div>
 </div>

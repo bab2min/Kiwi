@@ -139,6 +139,9 @@ float&#160;</td><td class="memItemRight" valign="bottom"><b>userScore</b> = 0</t
 <tr class="memitem:a41db424d4bb673194931d6d3f96b8482"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi_1_1MorphemeRaw.html#a41db424d4bb673194931d6d3f96b8482">lmMorphemeId</a> = 0</td></tr>
 <tr class="memdesc:a41db424d4bb673194931d6d3f96b8482"><td class="mdescLeft">&#160;</td><td class="mdescRight">형태소의 언어모델 상의 인덱스 값을 보관하는 필드.  <a href="structkiwi_1_1MorphemeRaw.html#a41db424d4bb673194931d6d3f96b8482">More...</a><br /></td></tr>
 <tr class="separator:a41db424d4bb673194931d6d3f96b8482"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a79a39a11768abac9b1dcf72ebb06b5d2"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi_1_1MorphemeRaw.html#a79a39a11768abac9b1dcf72ebb06b5d2">groupId</a> = 0</td></tr>
+<tr class="memdesc:a79a39a11768abac9b1dcf72ebb06b5d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">형태소의 그룹 인덱스.  <a href="structkiwi_1_1MorphemeRaw.html#a79a39a11768abac9b1dcf72ebb06b5d2">More...</a><br /></td></tr>
+<tr class="separator:a79a39a11768abac9b1dcf72ebb06b5d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>형태소에 관한 모든 정보를 담는 구조체의 템플릿 </p>
@@ -252,6 +255,23 @@ float&#160;</td><td class="memItemRight" valign="bottom"><b>userScore</b> = 0</t
 
 <p>형태소가 두 부분으로 분할된 경우 결합 번호를 표기하기 위해 사용된다. </p>
 <dl class="section note"><dt>Note</dt><dd><code>덥/VA</code>, <code>춥/VA</code> 등의 형태소는 <code>어/EC</code>와 만나면 <code>더워</code>, <code>추워</code>와 같이 형태가 변화한다. 이 경우를 각각 처리하기 보다는 <code>더/V + ㅂ/V</code>, <code>추/V + ㅂ/V</code>과 같이 분해하면 <code>ㅂ/V</code> + <code>어/EC</code>가 <code>워</code>로 변한다는 규칙만으로 처리가 가능해진다. (이 규칙은 <code>chunks</code>를 이용해 형태소 정보에 담길 수 있음) 그러나 모든 ㅂ으로 끝나는 형태소가 위와 같은 규칙에 결합되면 안된다. 예를 들어 <code>굽/VA</code>의 경우 <code>어/EC</code>와 만나도 <code>굽어</code>라고 형태가 유지되기 때문. 따라서 <code>ㅂ/V</code>이 결합할 수 있는 조건을 명시해서 이 조건과 맞는 경우에만 <code>더/V + ㅂ/V</code> -&gt; <code>덥/VA</code>과 같이 복원해야 한다. <code>combineSocket</code>이 0이면 이런 결합 조건이 없는 일반 형태소임을 뜻하며, 0이 아닌 경우 결합 조건을 가지고 분해된 형태소임을 뜻한다. <code>더/V</code>와 <code>워/UNK</code>(<code>ㅂ/V + 어/EC</code>)는 예를 들어 3과 같이 동일한 combineSocket을 할당해 둘이 서로 결합이 가능한 형태소임을 식별한다. </dd></dl>
+
+</div>
+</div>
+<a id="a79a39a11768abac9b1dcf72ebb06b5d2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a79a39a11768abac9b1dcf72ebb06b5d2">&#9670;&nbsp;</a></span>groupId</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t kiwi::MorphemeRaw::groupId = 0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>형태소의 그룹 인덱스. </p>
+<dl class="section note"><dt>Note</dt><dd>형태소 결합 시 음운 조건에 따라 이형태를 선택해야 하는 경우 그룹 인덱스가 동일한 형태소만 선택된다. </dd></dl>
 
 </div>
 </div>

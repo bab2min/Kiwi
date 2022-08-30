@@ -66,6 +66,7 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#nested-classes">Classes</a> &#124;
 <a href="#define-members">Macros</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
 <a href="#enum-members">Enumerations</a> &#124;
@@ -78,8 +79,19 @@ $(function() {
 
 <p>Kiwi C API를 담고 있는 헤더 파일  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &quot;Macro.h&quot;</code><br />
+<div class="textblock"><code>#include &lt;stdint.h&gt;</code><br />
+<code>#include &quot;Macro.h&quot;</code><br />
+</div><div class="textblock"><div class="dynheader">
+Include dependency graph for capi.h:</div>
+<div class="dyncontent">
+<div class="center"><img src="capi_8h__incl.png" border="0" usemap="#include_2kiwi_2capi_8h" alt=""/></div>
+</div>
 </div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi__token__info__t.html">kiwi_token_info_t</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:a45e6d1d49a205a344fea551ad976d463"><td class="memItemLeft" align="right" valign="top"><a id="a45e6d1d49a205a344fea551ad976d463"></a>
@@ -277,6 +289,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a00804b079c392e08d97ddb59b5be38d6"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a00804b079c392e08d97ddb59b5be38d6">kiwi_res_word_num</a> (kiwi_res_h result, int index)</td></tr>
 <tr class="memdesc:a00804b079c392e08d97ddb59b5be38d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">index번째 분석 결과 내에 포함된 형태소의 개수를 반환합니다.  <a href="capi_8h.html#a00804b079c392e08d97ddb59b5be38d6">More...</a><br /></td></tr>
 <tr class="separator:a00804b079c392e08d97ddb59b5be38d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a37ff344465481dd08f45bc4797e58f7c"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structkiwi__token__info__t.html">kiwi_token_info_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a37ff344465481dd08f45bc4797e58f7c">kiwi_res_token_info</a> (kiwi_res_h result, int index, int num)</td></tr>
+<tr class="memdesc:a37ff344465481dd08f45bc4797e58f7c"><td class="mdescLeft">&#160;</td><td class="mdescRight">index번째 분석 결과의 num번째 형태소의 정보를 반환합니다.  <a href="capi_8h.html#a37ff344465481dd08f45bc4797e58f7c">More...</a><br /></td></tr>
+<tr class="separator:a37ff344465481dd08f45bc4797e58f7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a608d1ae9196ab0f680508f5da301743a"><td class="memItemLeft" align="right" valign="top">const kchar16_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a608d1ae9196ab0f680508f5da301743a">kiwi_res_form_w</a> (kiwi_res_h result, int index, int num)</td></tr>
 <tr class="memdesc:a608d1ae9196ab0f680508f5da301743a"><td class="mdescLeft">&#160;</td><td class="mdescRight">index번째 분석 결과의 num번째 형태소의 형태를 반환합니다.  <a href="capi_8h.html#a608d1ae9196ab0f680508f5da301743a">More...</a><br /></td></tr>
 <tr class="separator:a608d1ae9196ab0f680508f5da301743a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1822,7 +1837,7 @@ Variables</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>UTF-16으로 인코딩된 문자열. 실패 시 null을 반환합니다. 이 값은 Kiwi API가 관리하므로 별도로 해제할 필요가 없습니다. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>UTF-16으로 인코딩된 문자열. 실패 시 null을 반환합니다. 이 포인터는 Kiwi API가 관리하므로 별도로 해제할 필요가 없습니다. </dd></dl>
 
 </div>
 </div>
@@ -2158,6 +2173,51 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>UTF-16으로 인코딩된 문자열. 실패 시 null을 반환합니다. 이 값은 Kiwi API가 관리하므로 별도로 해제할 필요가 없습니다. </dd></dl>
+
+</div>
+</div>
+<a id="a37ff344465481dd08f45bc4797e58f7c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a37ff344465481dd08f45bc4797e58f7c">&#9670;&nbsp;</a></span>kiwi_res_token_info()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="structkiwi__token__info__t.html">kiwi_token_info_t</a>* kiwi_res_token_info </td>
+          <td>(</td>
+          <td class="paramtype">kiwi_res_h&#160;</td>
+          <td class="paramname"><em>result</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>num</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>index번째 분석 결과의 num번째 형태소의 정보를 반환합니다. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">result</td><td>분석 결과의 핸들 </td></tr>
+    <tr><td class="paramname">index</td><td><code>0</code> 이상 <code>kiwi_res_size(result)</code> 미만의 정수 </td></tr>
+    <tr><td class="paramname">num</td><td><code>0</code> 이상 <code>kiwi_res_word_num(result, index)</code> 미만의 정수 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>형태소 정보가 담긴 <code><a class="el" href="structkiwi__token__info__t.html">kiwi_token_info_t</a></code>에 대한 포인터를 반환합니다. 실패 시 null을 반환합니다. 이 포인터는 Kiwi API가 관리하므로 별도로 해제할 필요가 없습니다. </dd></dl>
 
 </div>
 </div>

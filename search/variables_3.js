@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['length_401',['length',['../structkiwi_1_1TokenInfo.html#a66fb9fa90738360f753f93a568b254b8',1,'kiwi::TokenInfo']]],
-  ['linenumber_402',['lineNumber',['../structkiwi_1_1TokenInfo.html#ad4b895d72300bd9682e82db3400e19f3',1,'kiwi::TokenInfo']]],
-  ['lmmorphemeid_403',['lmMorphemeId',['../structkiwi_1_1MorphemeRaw.html#a41db424d4bb673194931d6d3f96b8482',1,'kiwi::MorphemeRaw']]]
+  ['kform_419',['kform',['../structkiwi_1_1MorphemeRaw.html#a10ff5e61d22c88c01d594b9cf60532ad',1,'kiwi::MorphemeRaw']]],
+  ['kiwi_5fbasic_5ftypo_420',['kiwi_basic_typo',['../capi_8h.html#ae4952a2cdec37114719c25eee5fe4c8a',1,'capi.h']]]
 ];
