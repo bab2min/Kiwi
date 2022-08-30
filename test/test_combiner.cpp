@@ -182,7 +182,8 @@ TEST(KiwiCppCombiner, Allomorph)
 	EXPECT_EQ(joiner.getU16(), u"북으로");
 
 	rule.addAllomorph({
-		{ u"면", CondVowel::vocalic, 0}, { u"으면", CondVowel::non_vowel, 0}
+		Tuple{ nonstd::u16string_view{u"면"}, CondVowel::vocalic, (uint8_t)0}, 
+		Tuple{ nonstd::u16string_view{u"으면"}, CondVowel::non_vowel, (uint8_t)0}
 	}, POSTag::ec);
 
 	joiner = rule.newJoiner();
