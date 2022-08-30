@@ -7,6 +7,28 @@
 namespace kiwi
 {
 	template<class ChrIterator>
+	inline long stol(ChrIterator begin, ChrIterator end)
+	{
+		if (begin == end) return 0;
+		bool sign = false;
+		switch (*begin)
+		{
+		case '-':
+			sign = true;
+		case '+':
+			++begin;
+			break;
+		}
+		long up = 0;
+		for (; begin != end; ++begin)
+		{
+			if ('0' <= *begin && *begin <= '9') up = up * 10 + (*begin - '0');
+			else break;
+		}
+		return up * (sign ? -1 : 1);
+	}
+
+	template<class ChrIterator>
 	inline float stof(ChrIterator begin, ChrIterator end)
 	{
 		if (begin == end) return 0;
@@ -394,6 +416,8 @@ namespace kiwi
 		if (tagStr == u"SF") return POSTag::sf;
 		if (tagStr == u"SP") return POSTag::sp;
 		if (tagStr == u"SS") return POSTag::ss;
+		if (tagStr == u"SSO") return POSTag::sso;
+		if (tagStr == u"SSC") return POSTag::ssc;
 		if (tagStr == u"SE") return POSTag::se;
 		if (tagStr == u"SO") return POSTag::so;
 		if (tagStr == u"SW") return POSTag::sw;
@@ -410,6 +434,7 @@ namespace kiwi
 		if (tagStr == u"W_EMAIL") return POSTag::w_email;
 		if (tagStr == u"W_HASHTAG") return POSTag::w_hashtag;
 		if (tagStr == u"W_MENTION") return POSTag::w_mention;
+		if (tagStr == u"W_SERIAL") return POSTag::w_serial;
 		
 		if (tagStr == u"VV-I") return setIrregular(POSTag::vv);
 		if (tagStr == u"VA-I") return setIrregular(POSTag::va);

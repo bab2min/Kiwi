@@ -16,11 +16,15 @@ namespace kiwi
 
 		inline bool isSpaceInsertable(POSTag l, POSTag r, U16StringView rform)
 		{
+			if (l == r && (POSTag::sf <= l && l <= POSTag::sn)) return true;
 			if (r == POSTag::vcp || r == POSTag::xsa || r == POSTag::xsai || r == POSTag::xsv || r == POSTag::xsn) return false;
 			if (l == POSTag::xpn || l == POSTag::so || l == POSTag::ss || l == POSTag::sw) return false;
 			if (l == POSTag::sn && r == POSTag::nnb) return false;
-			if (!(l == POSTag::sn || l == POSTag::sp || l == POSTag::sf || l == POSTag::sl)
+			if (!(l == POSTag::sn || l == POSTag::sl)
 				&& (r == POSTag::sl || r == POSTag::sn)) return true;
+			if (l == POSTag::sn && r == POSTag::nr) return false;
+			if (l == POSTag::sso || l == POSTag::ssc) return false;
+			if (r == POSTag::sso) return true;
 
 			if (r == POSTag::vx && rform.size() == 1 && (rform[0] == u'하' || rform[0] == u'지')) return false;
 
@@ -54,6 +58,24 @@ namespace kiwi
 			return false;
 		}
 
+		inline char16_t getLastValidChr(const KString& str)
+		{
+			for (auto it = str.rbegin(); it != str.rend(); ++it)
+			{
+				switch (identifySpecialChr(*it))
+				{
+				case POSTag::sl:
+				case POSTag::sn:
+				case POSTag::sh:
+				case POSTag::max:
+					return *it;
+				default:
+					break;
+				}
+			}
+			return 0;
+		}
+
 		void Joiner::add(U16StringView form, POSTag tag)
 		{
 			if (stack.size() == activeStart)
@@ -71,42 +93,62 @@ namespace kiwi
 			}
 			else
 			{
-				CondVowel cv = CondVowel::none;
+				CondVowel cv = CondVowel::non_vowel;
 				if (activeStart > 0)
 				{
-					cv = isHangulCoda(stack[activeStart - 1]) ? CondVowel::non_vowel : CondVowel::vowel;
+					cv = isHangulSyllable(stack[activeStart - 1]) ? CondVowel::vowel : CondVowel::non_vowel;
 				}
 
-				auto normForm = normalizeHangul(form);
+				KString normForm = normalizeHangul(form);
 
 				if (!stack.empty() && (isJClass(tag) || isEClass(tag)))
 				{
 					if (isEClass(tag) && normForm[0] == u'아') normForm[0] = u'어';
-
-					CondVowel lastCv = isHangulCoda(stack.back()) ? CondVowel::non_vowel : CondVowel::vowel;
-					bool lastCvocalic = (lastCv == CondVowel::vowel || stack.back() == u'\u11AF');
+					char16_t c = getLastValidChr(stack);
+					CondVowel lastCv = isHangulCoda(c) ? CondVowel::non_vowel : CondVowel::vowel;
+					bool lastCvocalic = (lastCv == CondVowel::vowel || c == u'\u11AF');
 					auto it = cr->allomorphPtrMap.find(make_pair(normForm, tag));
 					if (it != cr->allomorphPtrMap.end())
 					{
 						size_t ptrBegin = it->second.first;
 						size_t ptrEnd = it->second.second;
+						CondVowel matchedCond = CondVowel::none;
+						KString bestNormForm;
 						for (size_t i = ptrBegin; i < ptrEnd; ++i)
 						{
 							auto& m = cr->allomorphData[i];
-							if ((m.second == CondVowel::vocalic && lastCvocalic) || m.second == lastCv)
+							if (matchedCond == CondVowel::none && ((m.cvowel == CondVowel::vocalic && lastCvocalic) || m.cvowel == lastCv))
 							{
-								normForm = m.first;
-								break;
+								bestNormForm = m.form;
+								matchedCond = m.cvowel;
+							}
+							else if (matchedCond != CondVowel::none)
+							{
+								if (matchedCond == m.cvowel)
+								{
+									if (normForm == m.form) bestNormForm = m.form;
+								}
+								else
+								{
+									break;
+								}
 							}
 						}
+						normForm = bestNormForm;
 					}
 				}
 
+				// 대명사가 아닌 다른 품사 뒤에 서술격 조사가 오는 경우 생략 금지
+				if (anteLastTag != POSTag::np && lastTag == POSTag::vcp && isHangulCoda(normForm[0]))
+				{
+					cv = CondVowel::none;
+				}
 				auto r = cr->combineOneImpl({ stack.data() + activeStart, stack.size() - activeStart }, lastTag, normForm, tag, cv);
 				stack.erase(stack.begin() + activeStart, stack.end());
 				stack += r.first;
 				activeStart += r.second;
 			}
+			anteLastTag = lastTag;
 			lastTag = tag;
 		}
 
@@ -177,6 +219,37 @@ namespace kiwi
 			});
 		}
 
+		template<class Func>
+		void AutoJoiner::foreachMorpheme(const Form* formHead, Func&& func) const
+		{
+			if (kiwi->isTypoTolerant())
+			{
+				auto tformHead = reinterpret_cast<const TypoForm*>(formHead);
+				do
+				{
+					if (tformHead->score() == 0)
+					{
+						for (auto m : tformHead->form(kiwi->forms.data()).candidate)
+						{
+							func(m);
+						}
+					}
+					++tformHead;
+				} while (tformHead[-1].hash() == tformHead[0].hash());
+			}
+			else
+			{
+				do
+				{
+					for (auto m : formHead->candidate)
+					{
+						func(m);
+					}
+					++formHead;
+				} while (formHead[-1].form == formHead[0].form);
+			}
+		}
+
 		template<class LmState>
 		void AutoJoiner::add(U16StringView form, POSTag tag, bool inferRegularity, Vector<Candidate<LmState>>& candidates)
 		{
@@ -191,22 +264,18 @@ namespace kiwi
 			if (node && kiwi->formTrie.hasMatch(formHead = node->val(kiwi->formTrie)))
 			{
 				Vector<const Morpheme*> cands;
-				do
+				foreachMorpheme(formHead, [&](const Morpheme* m)
 				{
-					for (auto m : formHead->candidate)
+					if (inferRegularity && clearIrregular(m->tag) == clearIrregular(tag))
 					{
-						if (inferRegularity && clearIrregular(m->tag) == clearIrregular(tag))
-						{
-							cands.emplace_back(m);
-						}
-						else if (!inferRegularity && m->tag == tag)
-						{
-							cands.emplace_back(m);
-						}
+						cands.emplace_back(m);
 					}
-					++formHead;
-				} while (formHead[-1].form == formHead[0].form);
-
+					else if (!inferRegularity && m->tag == tag)
+					{
+						cands.emplace_back(m);
+					}
+				});
+				
 				if (cands.size() <= 1)
 				{
 					auto lmId = cands.empty() ? getDefaultMorphemeId(clearIrregular(tag)) : cands[0]->lmMorphemeId;
@@ -270,17 +339,13 @@ namespace kiwi
 					if (const Form* formHead = node->val(kiwi->formTrie))
 					{
 						Vector<const Morpheme*> cands;
-						do
+						foreachMorpheme(formHead, [&](const Morpheme* m)
 						{
-							for (auto m : formHead->candidate)
+							if (clearIrregular(m->tag) == clearIrregular(tag))
 							{
-								if (clearIrregular(m->tag) == clearIrregular(tag))
-								{
-									cands.emplace_back(m);
-								}
+								cands.emplace_back(m);
 							}
-							++formHead;
-						} while (formHead[-1].form == formHead[0].form);
+						});
 
 						if (!cands.empty())
 						{

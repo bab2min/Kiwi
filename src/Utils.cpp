@@ -91,56 +91,58 @@ namespace kiwi
 		case 0xff1b:
 		case 0xff64:
 			return POSTag::sp;
+		case '(':
+		case '<':
+		case '[':
+		case '{':
+		case 0x2018:
+		case 0x201c:
+		case 0x226a:
+		case 0x3008:
+		case 0x300a:
+		case 0x300c:
+		case 0x300e:
+		case 0x3010:
+		case 0x3014:
+		case 0x3016:
+		case 0x3018:
+		case 0x301a:
+		case 0xff08:
+		case 0xff1c:
+		case 0xff3b:
+		case 0xff5b:
+		case 0xff5f:
+		case 0xff62:
+			return POSTag::sso;
+		case ')':
+		case '>':
+		case ']':
+		case '}':
+		case 0x2019:
+		case 0x201d:
+		case 0x226b:
+		case 0x3009:
+		case 0x300b:
+		case 0x300d:
+		case 0x300f:
+		case 0x3011:
+		case 0x3015:
+		case 0x3017:
+		case 0x3019:
+		case 0x301b:
+		case 0xff09:
+		case 0xff1e:
+		case 0xff3d:
+		case 0xff5d:
+		case 0xff60:
+		case 0xff63:
+			return POSTag::ssc;
 		case '"':
 		case '\'':
-		case '(':
-		case ')':
-		case '<':
-		case '>':
-		case '[':
-		case ']':
-		case '{':
-		case '}':
 		case 0xad:
 		case 0x2015:
-		case 0x2018:
-		case 0x2019:
-		case 0x201c:
-		case 0x201d:
-		case 0x226a:
-		case 0x226b:
 		case 0x2500:
-		case 0x3008:
-		case 0x3009:
-		case 0x300a:
-		case 0x300b:
-		case 0x300c:
-		case 0x300d:
-		case 0x300e:
-		case 0x300f:
-		case 0x3010:
-		case 0x3011:
-		case 0x3014:
-		case 0x3015:
-		case 0x3016:
-		case 0x3017:
-		case 0x3018:
-		case 0x3019:
-		case 0x301a:
-		case 0x301b:
-		case 0xff08:
-		case 0xff09:
 		case 0xff0d:
-		case 0xff1c:
-		case 0xff1e:
-		case 0xff3b:
-		case 0xff3d:
-		case 0xff5b:
-		case 0xff5d:
-		case 0xff5f:
-		case 0xff60:
-		case 0xff62:
-		case 0xff63:
 			return POSTag::ss;
 		}
 		if ((0x2e80 <= chr && chr <= 0x2e99) ||
@@ -157,33 +159,84 @@ namespace kiwi
 		return POSTag::sw;
 	}
 
-	bool isClosingPair(char16_t c)
+	size_t getSSType(char16_t c)
 	{
 		switch (c)
 		{
+		case '\'':
+			return 1;
+		case '"':
+			return 2;
+		case '(':
 		case ')':
+			return 3;
+		case '<':
 		case '>':
+			return 4;
+		case '[':
 		case ']':
+			return 5;
+		case '{':
 		case '}':
+			return 6;
+		case 0x2018:
 		case 0x2019:
+			return 7;
+		case 0x201c:
 		case 0x201d:
+			return 8;
+		case 0x226a:
+		case 0x226b:
+			return 9;
+		case 0x3008:
 		case 0x3009:
+			return 10;
+		case 0x300a:
 		case 0x300b:
+			return 11;
+		case 0x300c:
 		case 0x300d:
+			return 12;
+		case 0x300e:
 		case 0x300f:
+			return 13;
+		case 0x3010:
 		case 0x3011:
+			return 14;
+		case 0x3014:
 		case 0x3015:
+			return 15;
+		case 0x3016:
 		case 0x3017:
+			return 16;
+		case 0x3018:
 		case 0x3019:
+			return 17;
+		case 0x301a:
 		case 0x301b:
+			return 18;
+		case 0xff08:
 		case 0xff09:
+			return 19;
+		case 0xff1c:
 		case 0xff1e:
+			return 20;
+		case 0xff3b:
+		case 0xff3d:
+			return 21;
+		case 0xff5b:
 		case 0xff5d:
+			return 22;
+		case 0xff5f:
 		case 0xff60:
+			return 23;
+		case 0xff62:
 		case 0xff63:
-			return true;
+			return 24;
+		default:
+			return 0;
 		}
-		return false;
+		return 0;
 	}
 
 	POSTag toPOSTag(const std::u16string& tagStr)
@@ -205,9 +258,9 @@ namespace kiwi
 			"IC",
 			"XPN", "XSN", "XSV", "XSA", "XR",
 			"VCP", "VCN",
-			"SF", "SP", "SS", "SE", "SO", "SW",
+			"SF", "SP", "SS", "SSO", "SSC", "SE", "SO", "SW",
 			"SL", "SH", "SN",
-			"W_URL", "W_EMAIL", "W_MENTION", "W_HASHTAG",
+			"W_URL", "W_EMAIL", "W_MENTION", "W_HASHTAG", "W_SERIAL",
 			"JKS", "JKC", "JKG", "JKO", "JKB", "JKV", "JKQ", "JX", "JC",
 			"EP", "EF", "EC", "ETN", "ETM",
 			"P",
@@ -245,9 +298,9 @@ namespace kiwi
 			u"IC",
 			u"XPN", u"XSN", u"XSV", u"XSA", u"XR",
 			u"VCP", u"VCN",
-			u"SF", u"SP", u"SS", u"SE", u"SO", u"SW",
+			u"SF", u"SP", u"SS", u"SSO", u"SSC", u"SE", u"SO", u"SW",
 			u"SL", u"SH", u"SN",
-			u"W_URL", u"W_EMAIL", u"W_MENTION", u"W_HASHTAG",
+			u"W_URL", u"W_EMAIL", u"W_MENTION", u"W_HASHTAG", u"W_SERIAL",
 			u"JKS", u"JKC", u"JKG", u"JKO", u"JKB", u"JKV", u"JKQ", u"JX", u"JC",
 			u"EP", u"EF", u"EC", u"ETN", u"ETM",
 			u"P",

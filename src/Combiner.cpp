@@ -287,10 +287,27 @@ inline Vector<POSTag> getSubTagset(const string& prefix)
 		{
 			ret.emplace_back(POSTag::pai);
 		}
+		else if (pf == "PR")
+		{
+			ret.emplace_back(POSTag::pv);
+			ret.emplace_back(POSTag::pa);
+		}
 		else if (pf == "PI")
 		{
 			ret.emplace_back(POSTag::pvi);
 			ret.emplace_back(POSTag::pai);
+		}
+		else if (pf == "VV-R")
+		{
+			ret.emplace_back(POSTag::vv);
+		}
+		else if (pf == "VA-R")
+		{
+			ret.emplace_back(POSTag::va);
+		}
+		else if (pf == "VX-R")
+		{
+			ret.emplace_back(POSTag::vx);
 		}
 		else
 		{
@@ -634,7 +651,7 @@ MultiRuleDFAErased RuleSet::buildRightPattern(const Vector<Rule>& rules)
 
 void RuleSet::addRule(const string& lTag, const string& rTag,
 	const KString& lPat, const KString& rPat, const vector<ReplString>& results,
-	CondVowel leftVowel, CondPolarity leftPolar
+	CondVowel leftVowel, CondPolarity leftPolar, bool ignoreRCond
 )
 {
 	auto lTags = getSubTagset(lTag);
@@ -665,12 +682,12 @@ void RuleSet::addRule(const string& lTag, const string& rTag,
 		{
 			bPat[0] = joinOnsetVowel(onset, lPatVowel);
 			for (size_t n = 0; n < results.size(); ++n) bResults[n].str[0] = joinOnsetVowel(onset, resultsVowel[n]);
-			rules.emplace_back(bPat, rPat, bResults, leftVowel, leftPolar);
+			rules.emplace_back(bPat, rPat, bResults, leftVowel, leftPolar, ignoreRCond);
 		}
 	}
 	else
 	{
-		rules.emplace_back(lPat, rPat, Vector<ReplString>{ results.begin(), results.end() }, leftVowel, leftPolar);
+		rules.emplace_back(lPat, rPat, Vector<ReplString>{ results.begin(), results.end() }, leftVowel, leftPolar, ignoreRCond);
 	}
 
 	for (auto l : lTags)
@@ -776,13 +793,15 @@ void RuleSet::loadRules(istream& istr)
 		{
 			CondVowel cv = CondVowel::none;
 			CondPolarity cp = CondPolarity::none;
+			bool ignoreRCond = false;
 			if (fields.size() >= 4)
 			{
-				static array<const char*, 4> fs = {
+				static array<const char*, 5> fs = {
 					"+positive",
 					"-positive",
 					"+coda",
 					"-coda",
+					"+ignorercond",
 				};
 
 				transform(fields[3].begin(), fields[3].end(), const_cast<char*>(fields[3].begin()), static_cast<int(*)(int)>(tolower));
@@ -808,6 +827,9 @@ void RuleSet::loadRules(istream& istr)
 					case 3:
 						cv = CondVowel::vowel;
 						break;
+					case 4:
+						ignoreRCond = true;
+						break;
 					}
 				}
 			}
@@ -824,7 +846,8 @@ void RuleSet::loadRules(istream& istr)
 				normalizeHangul(fields[1]), 
 				repl,
 				cv, 
-				cp
+				cp,
+				ignoreRCond
 			);
 		}
 	}
@@ -933,6 +956,7 @@ Vector<Result> MultiRuleDFA<NodeSizeTy, GroupSizeTy>::combine(U16StringView left
 			rightBegin,
 			finish[finishGroup[nidx]].leftVowel,
 			finish[finishGroup[nidx]].leftPolarity,
+			finish[finishGroup[nidx]].ignoreRCond,
 			r.score
 		);
 	}
@@ -1142,7 +1166,7 @@ pair<KString, size_t> CompiledRule::combineOneImpl(
 		}
 	}
 
-	// leftTag가 vv, va인데 일치하는 규칙이 없는 경우, pv, pa로 변경하여 재탐색
+	// leftTag가 용언 계열인데 일치하는 규칙이 없는 경우, pv, pa로 변경하여 재탐색
 	bool irregular = isIrregular(leftTag);
 	auto regLeftTag = clearIrregular(leftTag);
 	if (regLeftTag == POSTag::vv || regLeftTag == POSTag::va)
@@ -1156,7 +1180,10 @@ pair<KString, size_t> CompiledRule::combineOneImpl(
 				return make_pair(p.str, p.rightBegin);
 			}
 		}
+	}
 
+	if(isVerbClass(regLeftTag))
+	{
 		// rightTag가 어미이며 일치하는 규칙이 없고 `어`로 시작하는 형태일 경우
 		if (isEClass(rightTag) && rightForm[0] == u'어' && cp == CondPolarity::positive)
 		{
@@ -1261,24 +1288,29 @@ void CompiledRule::addAllomorphImpl(const FormsTy& forms, POSTag tag)
 	size_t ptrBegin = allomorphData.size();
 	size_t ptrEnd = allomorphData.size() + forms.size();
 
-	// vocalic 먼저 삽입 후 나머지 삽입
-	for (auto& p : forms)
+	using FormTy = typename FormsTy::value_type;
+	vector<const FormTy*> sortedForms;
+	for (auto& p : forms) sortedForms.emplace_back(&p);
+
+	// vocalic, priority 순으로 정렬
+	sort(sortedForms.begin(), sortedForms.end(), [](const FormTy* a, const FormTy* b)
 	{
-		if (p.second != CondVowel::vocalic) continue;
-		auto normForm = normalizeHangul(U16StringView{ p.first });
-		allomorphPtrMap[make_pair(normForm, tag)] = make_pair(ptrBegin, ptrEnd);
-		allomorphData.emplace_back(normForm, p.second);
-	}
-	for (auto& p : forms)
+		if (get<1>(*a) == CondVowel::vocalic && get<1>(*b) != CondVowel::vocalic) return true;
+		if (get<1>(*a) != CondVowel::vocalic && get<1>(*b) == CondVowel::vocalic) return false;
+		if (get<1>(*a) < get<1>(*b)) return true;
+		if (get<1>(*a) > get<1>(*b)) return false;
+		return get<2>(*a) > get<2>(*b);
+	});
+
+	for (auto p : sortedForms)
 	{
-		if (p.second == CondVowel::vocalic) continue;
-		auto normForm = normalizeHangul(U16StringView{ p.first });
+		auto normForm = normalizeHangul(U16StringView{ get<0>(*p) });
 		allomorphPtrMap[make_pair(normForm, tag)] = make_pair(ptrBegin, ptrEnd);
-		allomorphData.emplace_back(normForm, p.second);
+		allomorphData.emplace_back(normForm, get<1>(*p), get<2>(*p));
 	}
 }
 
-void CompiledRule::addAllomorph(const vector<pair<U16StringView, CondVowel>>& forms, POSTag tag)
+void CompiledRule::addAllomorph(const vector<tuple<U16StringView, CondVowel, uint8_t>>& forms, POSTag tag)
 {
 	return addAllomorphImpl(forms, tag);
 }

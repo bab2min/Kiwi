@@ -37,7 +37,7 @@
 좀 꾸미면 왜 애꺼 뻇어 입었냐 소리 나옴. 지금쯤 머하고 있을까	좀/MAG 꾸미/VV 면/EC 왜/MAG 애/NNG 꺼/NNB 뺏/VV-R 어/EC 입/VV-R 었/EP 냐/EC 소리/NNG 나오/VV ᆷ/ETN ./SF 지금/NNG 쯤/XSN 뭐/NP 하/VV 고/EC 있/VX 을까/EF
 마이클 젝슨 소환영 촉메제로 봉인지정?	마이클/NNP 잭슨/NNP 소환/NNG 용/XSN 촉매제/NNG 로/JKB 봉인/NNG 지정/NNG ?/SF
 정말 자기관리를 잘해서 피부도 몸매도 좋으면.... 저기에 글쓸떄까지 감안히 놔둘리 없다....	정말/MAG 자기/NNG 관리/NNG 를/JKO 잘/MAG 하/XSV 어서/EC 피부/NNG 도/JX 몸매/NNG 도/JX 좋/VA 으면/EC ..../SF 저기/NP 에/JKB 글/NNG 쓰/VV ᆯ/ETM 때/NNG 까지/JX 가만히/MAG 놔두/VV ᆯ/ETM 리/NNB 없/VA 다/EF ..../SF
-20대까진 내구도가 달아도 수리하면 다 수리되눈 느낌임 30/100까지 달아도 휴식하면 100/100이 되는데 30대부턴 휴식을 해도 최대 내구도가 닳는 느낌이야 운동은 그 차감치를 줄여주는거고 때에 따라선 회복되기도 하는거 같아	20/SN 대/NNB 까지/JX ᆫ/JX 내구도/NNG 가/JKS 닳/VV 어도/EC 수리/NNG 하/XSV 면/EC 다/MAG 수리/NNG 되/XSV 는/ETM 느낌/NNG 이/VCP ᆷ/ETN 30/SN //SP 100/SN 까지/JX 닳/VV 어도/EC 휴식/NNG 하/XSV 면/EC 100/SN //SP 100/SN 이/JKC 되/VV 는데/EC 30/SN 대/NNB 부터/JX ᆫ/JX 휴식/NNG 을/JKO 하/VV 어도/EC 최대/NNG 내구도/NNG 가/JKS 닳/VV 는/ETM 느낌/NNG 이/VCP 야/EC 운동/NNG 은/JX 그/MM 차감/NNG 치/XSN 를/JKO 줄이/VV 어/EC 주/VX 는/ETM 거/NNB 이/VCP 고/EC 때/NNG 에/JKB 따르/VV 어서/EC ᆫ/JX 회복/NNG 되/XSV 기/ETN 도/JX 하/VX 는/ETM 거/NNB 같/VA 어/EF
+20대까진 내구도가 달아도 수리하면 다 수리되눈 느낌임 30/100까지 달아도 휴식하면 100/100이 되는데 30대부턴 휴식을 해도 최대 내구도가 닳는 느낌이야 운동은 그 차감치를 줄여주는거고 때에 따라선 회복되기도 하는거 같아	20/SN 대/NNB 까지/JX ᆫ/JX 내구도/NNG 가/JKS 닳/VV 어도/EC 수리/NNG 하/XSV 면/EC 다/MAG 수리/NNG 되/XSV 는/ETM 느낌/NNG 이/VCP ᆷ/ETN 30/100/W_SERIAL 까지/JX 닳/VV 어도/EC 휴식/NNG 하/XSV 면/EC 100/100/W_SERIAL 이/JKC 되/VV 는데/EC 30/SN 대/NNB 부터/JX ᆫ/JX 휴식/NNG 을/JKO 하/VV 어도/EC 최대/NNG 내구도/NNG 가/JKS 닳/VV 는/ETM 느낌/NNG 이/VCP 야/EC 운동/NNG 은/JX 그/MM 차감/NNG 치/XSN 를/JKO 줄이/VV 어/EC 주/VX 는/ETM 거/NNB 이/VCP 고/EC 때/NNG 에/JKB 따르/VV 어서/EC ᆫ/JX 회복/NNG 되/XSV 기/ETN 도/JX 하/VX 는/ETM 거/NNB 같/VA 어/EF
 참고로 박준형 학력 캘리포니아 주립대 그래픽디자인 학사	참고/NNG 로/JKB 박준형/NNP 학력/NNG 캘리포니아/NNP 주립대/NNG 그래픽/NNG 디자인/NNG 학사/NNG
 인구수 많으면 뭐하는데 도시는 빛더미지, 코로나때도 제대로된 지원도 거의 없었지	인구/NNG 수/NNG 많/VA 으면/EC 뭐/NP 하/VV 는데/EF 도시/NNG 는/JX 빚더미/NNG 이/VCP 지/EC ,/SP 코로나/NNP 때/NNG 도/JX 제대로/MAG 되/VV ᆫ/ETM 지원/NNG 도/JX 거의/MAG 없/VA 었/EP 지/EF
 부평공장 빠지면 역근처 재에하고는 부평 한동안 진짜 휑하겠내요  서구가는 길목은 진짜 건물들 다오래됬던데	부평/NNP 공장/NNG 빠지/VV 면/EC 역/NNG 근처/NNG 제외/NNG 하고/JKB 는/JX 부평/NNP 한/MM 동안/NNG 진짜/MAG 휑하/VA 겠/EP 네요/EF 서구/NNP 가/VV 는/ETM 길목/NNG 은/JX 진짜/MAG 건물/NNG 들/XSN 다/MAG 오래되/VA 었/EP 던/ETM 데/NNB
@@ -90,7 +90,7 @@
 그는 이내 짚히는 것이 있는 듯 눈빛을 반짝였다	그/NP 는/JX 이내/MAG 짚이/VV 는/ETM 것/NNB 이/JKS 있/VV 는/ETM 듯/NNB 눈/NNG 빛/NNG 을/JKO 반짝이/VV 었/EP 다/EF
 그의 방문이 굳게 닫쳤다.	그/NP 의/JKG 방문/NNG 이/JKS 굳/VA-R 게/EC 닫히/VV 었/EP 다/EF ./SF
 둘째, 눈꺼풀이 닽혔다 열렸다 하면서 눈동자의 윤활을 돕기위한 작은량의 눈물이 있으며	둘째/NR ,/SP 눈꺼풀/NNG 이/JKS 닫히/VV 었/EP 다/EC 열리/VV 었/EP 다/EC 하/VV 면서/EC 눈동자/NNG 의/JKG 윤활/NNG 을/JKO 돕/VV-I 기/ETN 위하/VV ᆫ/ETM 작/VA 은/ETM 량/NNG 의/JKG 눈물/NNG 이/JKS 있/VV 으며/EC
-섬의 노래에서는 그를 「달빛과 조석의 잋힌 아이」, 또는 「달빛에 잋힌 아이」라 부르고 있다.	섬/NNG 의/JKG 노래/NNG 에서/JKB 는/JX 그/NP 를/JKO 「/SS 달빛/NNG 과/JC 조석/NNG 의/JKG 잊히/VV ᆫ/ETM 아이/NNG 」/SS ,/SP 또는/MAJ 「/SS 달빛/NNG 에/JKB 잊히/VV ᆫ/ETM 아이/NNG 」/SS 이/VCP 라/EC 부르/VV 고/EC 있/VX 다/EF ./SF
+섬의 노래에서는 그를 「달빛과 조석의 잋힌 아이」, 또는 「달빛에 잋힌 아이」라 부르고 있다.	섬/NNG 의/JKG 노래/NNG 에서/JKB 는/JX 그/NP 를/JKO 「/SSO 달빛/NNG 과/JC 조석/NNG 의/JKG 잊히/VV ᆫ/ETM 아이/NNG 」/SSC ,/SP 또는/MAJ 「/SSO 달빛/NNG 에/JKB 잊히/VV ᆫ/ETM 아이/NNG 」/SSC 이/VCP 라/EC 부르/VV 고/EC 있/VX 다/EF ./SF
 새로 방영되는 일일드라마는 얼키고설킨 가족의 사랑 이야기에 관한 것이다.	새로/MAG 방영/NNG 되/XSV 는/ETM 일일/NNG 드라마/NNG 는/JX 얽히고설키/VV ᆫ/ETM 가족/NNG 의/JKG 사랑/NNG 이야기/NNG 에/JKB 관하/VV ᆫ/ETM 것/NNB 이/VCP 다/EF ./SF
 문에 부딛혀서 코피가 났다.	문/NNG 에/JKB 부딪히/VV 어서/EC 코피/NNG 가/JKS 나/VV 었/EP 다/EF ./SF
 넘어지며 엉덩이를 바닥에 부디쳐 다쳤어.	넘어지/VV 며/EC 엉덩이/NNG 를/JKO 바닥/NNG 에/JKB 부딪히/VV 어/EC 다치/VV 었/EP 어/EF ./SF

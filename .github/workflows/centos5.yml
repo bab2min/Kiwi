@@ -24,7 +24,7 @@ jobs:
     - name: Pull LFS files
       run: git lfs pull
     - name: Update CMake
-      run: /opt/python/cp36-cp36m/bin/pip install cmake
+      run: /opt/python/cp36-cp36m/bin/pip install "cmake<3.20"
     - name: Checkout Old Version googletest
       run: cd third_party/googletest && git checkout v1.8.x && cd ../..
     - name: Configure Build

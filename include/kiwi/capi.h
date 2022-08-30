@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <stdint.h>
 #include "Macro.h"
 
 #define KIWIERR_FAIL -1
@@ -32,6 +33,21 @@ typedef struct kiwi_ss* kiwi_ss_h;
 typedef struct kiwi_joiner* kiwi_joiner_h;
 typedef struct kiwi_typo* kiwi_typo_h;
 typedef unsigned short kchar16_t;
+
+typedef struct {
+	uint_fast32_t chr_position; /**< 시작 위치(UTF16 문자 기준) */
+	uint_fast32_t word_position; /**< 어절 번호(공백 기준)*/
+	uint_fast32_t sent_position; /**< 문장 번호*/
+	uint_fast32_t line_number; /**< 줄 번호*/
+	uint_fast16_t length; /**< 길이(UTF16 문자 기준) */
+	uint_fast8_t tag; /**< 품사 태그 */
+	uint_fast8_t sense_id; /**< 의미 번호 */
+	float score; /**< 해당 형태소의 언어모델 점수 */
+	float typo_cost; /**< 오타가 교정된 경우 오타 비용. 그렇지 않은 경우 0 */
+	uint_fast32_t typo_form_id; /**< 교정 전 오타의 형태에 대한 정보 (typoCost가 0인 경우 의미 없음) */
+	uint_fast32_t paired_token; /**< SSO, SSC 태그에 속하는 형태소의 경우 쌍을 이루는 반대쪽 형태소의 위치(-1인 경우 해당하는 형태소가 없는 것을 뜻함) */
+	uint_fast32_t sub_sent_position; /**< 인용부호나 괄호로 둘러싸인 하위 문장의 번호. 1부터 시작. 0인 경우 하위 문장이 아님을 뜻함 */
+} kiwi_token_info_t;
 
 /*
 int (*kiwi_reader_t)(int id, char* buffer, void* user_data)
@@ -519,12 +535,22 @@ DECL_DLL float kiwi_res_prob(kiwi_res_h result, int index);
 DECL_DLL int kiwi_res_word_num(kiwi_res_h result, int index);
 
 /**
+ * @brief index번째 분석 결과의 num번째 형태소의 정보를 반환합니다.
+ *
+ * @param result 분석 결과의 핸들
+ * @param index `0` 이상 `kiwi_res_size(result)` 미만의 정수
+ * @param num `0` 이상 `kiwi_res_word_num(result, index)` 미만의 정수
+ * @return 형태소 정보가 담긴 `kiwi_token_info_t`에 대한 포인터를 반환합니다. 실패 시 null을 반환합니다. 이 포인터는 Kiwi API가 관리하므로 별도로 해제할 필요가 없습니다.
+ */
+DECL_DLL const kiwi_token_info_t* kiwi_res_token_info(kiwi_res_h result, int index, int num);
+
+/**
  * @brief index번째 분석 결과의 num번째 형태소의 형태를 반환합니다.
  * 
  * @param result 분석 결과의 핸들
  * @param index `0` 이상 `kiwi_res_size(result)` 미만의 정수
  * @param num `0` 이상 `kiwi_res_word_num(result, index)` 미만의 정수
- * @return UTF-16으로 인코딩된 문자열. 실패 시 null을 반환합니다. 이 값은 Kiwi API가 관리하므로 별도로 해제할 필요가 없습니다.
+ * @return UTF-16으로 인코딩된 문자열. 실패 시 null을 반환합니다. 이 포인터는 Kiwi API가 관리하므로 별도로 해제할 필요가 없습니다.
  */
 DECL_DLL const kchar16_t* kiwi_res_form_w(kiwi_res_h result, int index, int num);
 

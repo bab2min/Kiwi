@@ -18,12 +18,19 @@ jobs:
     - name: Checkout Old Version googletest
       run: cd third_party/googletest && git checkout v1.8.x && cd ../..
     - name: Update CMake
-      run: /opt/python/cp36-cp36m/bin/pip install cmake
+      run: /opt/python/cp36-cp36m/bin/pip install "cmake<3.20"
     - name: Configure Build
       run: mkdir build && cd build && /opt/python/cp36-cp36m/bin/cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_USE_MIMALLOC=0 -DKIWI_USE_CPUINFO=0 ..
     - name: Build
       run: cd build && make -j2
-    - run: tar -zcvf asset.tgz build/*kiwi* build/test/*kiwi*
+    - run: |
+        cd build
+        mkdir include && mkdir lib && mkdir bin
+        mv libkiwi* lib/
+        mv kiwi-* bin/
+        mv test/kiwi-* bin/
+        cp -r ../include/kiwi include/
+        tar -zcvf ../asset.tgz include/ lib/ bin/
     - name: Archive binaries
       uses: actions/upload-artifact@v1
       with:
@@ -71,7 +78,14 @@ jobs:
       run: mkdir build && cd build && /opt/python/cp36-cp36m/bin/cmake -DCMAKE_BUILD_TYPE=Release ..
     - name: Build
       run: cd build && make -j2
-    - run: tar -zcvf asset.tgz build/*kiwi* build/test/*kiwi*
+    - run: |
+        cd build
+        mkdir include && mkdir lib && mkdir bin
+        mv libkiwi* lib/
+        mv kiwi-* bin/
+        mv test/kiwi-* bin/
+        cp -r ../include/kiwi include/
+        tar -zcvf ../asset.tgz include/ lib/ bin/
     - name: Archive binaries
       uses: actions/upload-artifact@v1
       with:
@@ -141,7 +155,14 @@ jobs:
       run: mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release ..
     - name: Build
       run: cd build && make -j2
-    - run: tar -zcvf asset.tgz build/*kiwi* build/test/*kiwi*
+    - run: |
+        cd build
+        mkdir include && mkdir lib && mkdir bin
+        mv libkiwi* lib/
+        mv kiwi-* bin/
+        mv test/kiwi-* bin/
+        cp -r ../include/kiwi include/
+        tar -zcvf ../asset.tgz include/ lib/ bin/
     - name: Upload release binary
       uses: actions/upload-release-asset@v1.0.2
       env:
@@ -193,7 +214,16 @@ jobs:
         cmakeAppendedArgs: -G"Visual Studio 16 2019" -A${{ matrix.arch }}
         buildWithCMakeArgs: --config Release
         buildDirectory: build
-    - run: Compress-Archive -Path 'build\Release\*kiwi*', 'build\test\Release\*kiwi*' -DestinationPath asset.zip
+    - run: |
+        cd build
+        mkdir include; mkdir lib; mkdir bin
+        mv build\Release\*.dll lib\
+        mv build\Release\*.exp lib\
+        mv build\Release\*.lib lib\
+        mv build\Release\*.exe bin\
+        mv build\test\Release\*.exe bin\
+        cp -r ..\include\kiwi include\
+        Compress-Archive -Path 'include', 'lib', 'bin' -DestinationPath ..\asset.zip
     - name: Upload release binary
       uses: actions/upload-release-asset@v1.0.2
       env:
@@ -229,7 +259,13 @@ jobs:
           make -j2 && popd
           ./build/test/kiwi-test
           mkdir eval_results && ./build/kiwi-evaluator -m ./ModelGenerator eval_data/*.txt -o eval_results/
-          tar -zcvf /artifacts/asset.tgz build/*kiwi* build/test/*kiwi*
+          cd build
+          mkdir include && mkdir lib && mkdir bin
+          mv libkiwi* lib/
+          mv kiwi-* bin/
+          mv test/kiwi-* bin/
+          cp -r ../include/kiwi include/
+          tar -zcvf /artifacts/asset.tgz include/ lib/ bin/
     - name: Get release
       id: get_release
       uses: bruceadams/get-release@v1.2.2

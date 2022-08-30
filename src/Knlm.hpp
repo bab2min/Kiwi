@@ -282,7 +282,7 @@ namespace kiwi
 					progress(node, (KeyType)header.bos_id);
 					unk_ll = getLL(node, (KeyType)header.unk_id);
 					bos_node_idx = 0;
-					progress(bos_node_idx, (KeyType)header.bos_id);
+					progress(bos_node_idx, htx_data[(KeyType)header.bos_id]);
 				}
 				else
 				{

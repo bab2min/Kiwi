@@ -31,7 +31,8 @@ TEST(KiwiCppCombiner, Combine)
 	EXPECT_EQ(rule.combine(u"하", POSTag::vv, u"었", POSTag::ep)[0], u"했");
 	EXPECT_EQ(rule.combine(u"시", POSTag::ep, u"었", POSTag::ep)[0], u"셨");
 
-	EXPECT_EQ(rule.combine(u"이르", POSTag::vv, u"어", POSTag::ec)[0], u"이르러");
+	EXPECT_EQ(rule.combine(u"이르", POSTag::vv, u"어", POSTag::ec)[0], u"일러");
+	EXPECT_EQ(rule.combine(u"이르", POSTag::vvi, u"어", POSTag::ec)[0], u"이르러");
 	EXPECT_EQ(rule.combine(u"푸", POSTag::vv, u"어", POSTag::ec)[0], u"퍼");
 	EXPECT_EQ(rule.combine(u"따르", POSTag::vv, u"어", POSTag::ec)[0], u"따라");
 	EXPECT_EQ(rule.combine(u"돕", POSTag::vv, u"어", POSTag::ec)[0], u"도와");
@@ -46,7 +47,7 @@ TEST(KiwiCppCombiner, Combine)
 
 	EXPECT_EQ(rule.combine(u"나", POSTag::np, u"가", POSTag::jks)[0], u"내가");
 
-	EXPECT_EQ(rule.combine(u"시", POSTag::ep, u"어용", POSTag::ef)[0], u"세용");
+	EXPECT_EQ(rule.combine(u"시", POSTag::ep, u"어용", POSTag::ef)[0], u"셔용");
 }
 
 TEST(KiwiCppCombiner, Joiner)
@@ -118,22 +119,36 @@ TEST(KiwiCppCombiner, Joiner)
 	joiner.add(u"지", POSTag::vx);
 	joiner.add(u"다", POSTag::ef);
 	EXPECT_EQ(joiner.getU16(), u"돼지다");
+
+	joiner = rule.newJoiner();
+	joiner.add(u"하얗", POSTag::vai);
+	joiner.add(u"으니", POSTag::ec);
+	EXPECT_EQ(joiner.getU16(), u"하야니");
+
+	joiner = rule.newJoiner();
+	joiner.add(u"좋", POSTag::va);
+	joiner.add(u"으니", POSTag::ec);
+	EXPECT_EQ(joiner.getU16(), u"좋으니");
 }
 
 TEST(KiwiCppCombiner, Allomorph)
 {
+	using Tuple = std::tuple<nonstd::u16string_view, CondVowel, uint8_t>;
 	auto& rule = getCompiledRule();
 
 	rule.addAllomorph({
-		{ u"를", CondVowel::vowel}, { u"을", CondVowel::non_vowel}
+		Tuple{ nonstd::u16string_view{u"를"}, CondVowel::vowel, (uint8_t)0}, 
+		Tuple{ nonstd::u16string_view{u"을"}, CondVowel::non_vowel, (uint8_t)0}
 	}, POSTag::jko);
 
 	rule.addAllomorph({
-		{ u"가", CondVowel::vowel}, { u"이", CondVowel::non_vowel}
+		Tuple{ nonstd::u16string_view{u"가"}, CondVowel::vowel, (uint8_t)0}, 
+		Tuple{ nonstd::u16string_view{u"이"}, CondVowel::non_vowel, (uint8_t)0}
 	}, POSTag::jks);
 
 	rule.addAllomorph({
-		{ u"로", CondVowel::vocalic}, { u"으로", CondVowel::non_vowel}
+		Tuple{ nonstd::u16string_view{u"로"}, CondVowel::vocalic, (uint8_t)0}, 
+		Tuple{ nonstd::u16string_view{u"으로"}, CondVowel::non_vowel, (uint8_t)0}
 	}, POSTag::jkb);
 
 	auto joiner = rule.newJoiner();
@@ -167,7 +182,8 @@ TEST(KiwiCppCombiner, Allomorph)
 	EXPECT_EQ(joiner.getU16(), u"북으로");
 
 	rule.addAllomorph({
-		{ u"면", CondVowel::vocalic}, { u"으면", CondVowel::non_vowel}
+		Tuple{ nonstd::u16string_view{u"면"}, CondVowel::vocalic, (uint8_t)0}, 
+		Tuple{ nonstd::u16string_view{u"으면"}, CondVowel::non_vowel, (uint8_t)0}
 	}, POSTag::ec);
 
 	joiner = rule.newJoiner();

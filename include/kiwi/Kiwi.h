@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file Kiwi.h
  * @author bab2min (bab2min@gmail.com)
  * @brief Kiwi C++ API를 담고 있는 헤더 파일
@@ -58,7 +58,7 @@ namespace kiwi
 		template<template<ArchType> class LmState> friend struct NewAutoJoinerGetter;
 
 		bool integrateAllomorph = true;
-		float cutOffThreshold = 5;
+		float cutOffThreshold = 8;
 		float unkFormScoreScale = 5;
 		float unkFormScoreBias = 5;
 		float spacePenalty = 7;
@@ -91,6 +91,20 @@ namespace kiwi
 		ArchType selectedArch = ArchType::none;
 		void* dfSplitByTrie = nullptr;
 		void* dfFindBestPath = nullptr;
+	
+	public:
+		enum class SpecialMorph {
+			singleQuoteOpen = 0,
+			singleQuoteClose,
+			singleQuoteNA,
+			doubleQuoteOpen,
+			doubleQuoteClose,
+			doubleQuoteNA,
+			max,
+		};
+
+	private:
+		std::array<size_t, static_cast<size_t>(SpecialMorph::max)> specialMorphIds = { { 0, } };
 
 	public:
 
@@ -123,6 +137,13 @@ namespace kiwi
 		bool ready() const { return !forms.empty(); }
 
 		ArchType archType() const { return selectedArch; }
+
+		/**
+		 * @brief 현재 Kiwi 객체가 오타 교정 기능이 켜진 상태로 생성되었는지 알려준다.
+		 * 
+		 * @return 오타 교정 기능이 켜진 경우 true를 반환한다.
+		 */
+		bool isTypoTolerant() const { return !typoForms.empty(); }
 
 		/**
 		 * @brief 
@@ -293,6 +314,22 @@ namespace kiwi
 			if (!morph || morph < morphemes.data()) return -1;
 			return morph - morphemes.data();
 		}
+
+		size_t getSpecialMorphId(SpecialMorph type) const
+		{
+			return specialMorphIds[static_cast<size_t>(type)];
+		}
+
+		SpecialMorph determineSpecialMorphType(size_t morphId) const
+		{
+			for (size_t i = 0; i < specialMorphIds.size(); ++i)
+			{
+				if (morphId == specialMorphIds[i]) return static_cast<SpecialMorph>(i);
+			}
+			return SpecialMorph::max;
+		}
+
+		size_t getMorphemeSize() const { return morphemes.size(); }
 
 		const Morpheme* idToMorph(size_t morphId) const
 		{
@@ -599,12 +636,12 @@ namespace kiwi
 			std::vector<std::u16string> ret;
 			for (auto& m : morphemes)
 			{
-				size_t morphemeId = &m - morphemes.data();
+				size_t morphemeId = m.lmMorphemeId ? m.lmMorphemeId : (&m - morphemes.data());
 				if (morphemeId < defaultTagSize || m.tag != tag) continue;
 				std::u16string input = joinHangul(forms[m.kform].form);
 				std::u16string output = repl(input);
 				if (input == output) continue;
-				if (addWord(output, tag, score, morphemeId))
+				if (addWord(output, tag, score + (m.lmMorphemeId ? m.userScore : 0), morphemeId))
 				{
 					ret.emplace_back(output);
 				}

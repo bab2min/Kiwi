@@ -94,6 +94,7 @@ TEST(KiwiTypo, AnalyzeBasicTypoSet)
 	Kiwi kiwi = builder.build();
 
 	Kiwi typoKiwi = builder.build(basicTypoSet);
+	typoKiwi.setTypoCostWeight(5);
 
 	TokenResult o = kiwi.analyze(u"외않됀데?", Match::allWithNormalizing);
 	TokenResult c = typoKiwi.analyze(u"외않됀데?", Match::allWithNormalizing);

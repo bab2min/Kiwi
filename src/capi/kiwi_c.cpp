@@ -718,6 +718,21 @@ int kiwi_res_word_num(kiwi_res_h result, int index)
 	}
 }
 
+const kiwi_token_info_t* kiwi_res_token_info(kiwi_res_h result, int index, int num)
+{
+	if (!result) return nullptr;
+	try
+	{
+		if (index < 0 || index >= result->first.size() || num < 0 || num >= result->first[index].first.size()) return nullptr;
+		return (const kiwi_token_info_t*)&result->first[index].first[num].position;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return nullptr;
+	}
+}
+
 const kchar16_t * kiwi_res_form_w(kiwi_res_h result, int index, int num)
 {
 	if (!result) return nullptr;

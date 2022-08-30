@@ -66,7 +66,7 @@ bool FeatureTestor::isMatched(const kchar_t* begin, const kchar_t* end, CondPola
 		if (!(u'\uAC00' <= *it && *it <= u'\uD7A4')) break;
 		int v = ((*it - u'\uAC00') / 28) % 21;
 		if (v == 0 || v == 2 || v == 8) return polar == CondPolarity::positive;
-		if (v == 18) continue;
+		if (v == 18 && it == end - 1) continue;
 		return polar == CondPolarity::negative;
 	}
 	return polar == CondPolarity::negative;

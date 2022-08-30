@@ -155,29 +155,55 @@ namespace kiwi
 		return ret;
 	}
 
-	/**
-	* @brief tokens에 문장 번호 및 줄 번호를 채워넣는다.
-	*/
-	inline void fillSentLineInfo(vector<TokenInfo>& tokens, const vector<size_t>& newlines)
+	inline void fillPairedTokenInfo(vector<TokenInfo>& tokens)
 	{
-		/*
-		* 문장 분리 기준
-		* 1) 종결어미(ef) (요/jx)? (so|sw|sh|sp|se|sf|(닫는 괄호))*
-		* 2) 종결구두점(sf) (so|sw|sh|sp|se|(닫는 괄호))*
-		* 3) 단 종결어미(ef) 바로 다음에 요가 아닌 조사(j)가 뒤따르는 경우는 제외
-		*/
-		enum class State 
+		Vector<pair<uint32_t, uint32_t>> pStack;
+		for (auto& t : tokens)
+		{
+			if (t.tag != POSTag::sso && t.tag != POSTag::ssc) continue;
+			uint32_t i = &t - tokens.data();
+			uint32_t type = getSSType(t.str[0]);
+			if (!type) continue;
+			if (t.tag == POSTag::sso)
+			{
+				pStack.emplace_back(i, type);
+			}
+			else if (t.tag == POSTag::ssc)
+			{
+				for (size_t j = 0; j < pStack.size(); ++j)
+				{
+					if (pStack.rbegin()[j].second == type)
+					{
+						t.pairedToken = pStack.rbegin()[j].first;
+						tokens[pStack.rbegin()[j].first].pairedToken = i;
+						pStack.erase(pStack.end() - j - 1, pStack.end());
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	class SentenceParser
+	{
+		enum class State
 		{
 			none = 0,
 			ef,
 			efjx,
 			sf,
 		} state = State::none;
+	public:
 
-		uint32_t sentPos = 0, lastSentPos = 0, accumWordPos = 0, lastWordPos = 0;
-		size_t nlPos = 0, lastNlPos = 0;
-		for (auto& t : tokens)
+		bool next(const TokenInfo& t, bool forceNewSent = false)
 		{
+			bool ret = false;
+			if (forceNewSent)
+			{
+				state = State::none;
+				return true;
+			}
+
 			switch (state)
 			{
 			case State::none:
@@ -211,7 +237,7 @@ namespace kiwi
 						}
 						else
 						{
-							sentPos++;
+							ret = true;
 							state = State::none;
 						}
 					}
@@ -226,11 +252,10 @@ namespace kiwi
 				case POSTag::sp:
 				case POSTag::se:
 				case POSTag::sf:
+				case POSTag::ssc:
 					break;
-				case POSTag::ss:
-					if (isClosingPair(t.str[0])) break;
 				default:
-					sentPos++;
+					ret = true;
 					state = State::none;
 					break;
 				}
@@ -243,29 +268,100 @@ namespace kiwi
 				case POSTag::sh:
 				case POSTag::se:
 				case POSTag::sp:
+				case POSTag::ssc:
 					break;
-				case POSTag::ss:
-					if (isClosingPair(t.str[0])) break;
 				default:
-					sentPos++;
+					ret = true;
 					state = State::none;
 					break;
 				}
 				break;
 			}
+			return ret;
+		}
+	};
+
+	inline bool hasSentences(const TokenInfo* first, const TokenInfo* last)
+	{
+		SentenceParser sp;
+		for (; first != last; ++first)
+		{
+			if (sp.next(*first)) return true;
+		}
+		return sp.next({});
+	}
+
+	inline bool isNestedLeft(const TokenInfo& t)
+	{
+		return isJClass(t.tag) || (isEClass(t.tag) && t.tag != POSTag::ef) || t.tag == POSTag::sp;
+	}
+
+	inline bool isNestedRight(const TokenInfo& t)
+	{
+		return isJClass(t.tag) || isEClass(t.tag) || (isVerbClass(t.tag) && t.str == u"하") || t.tag == POSTag::vcp || t.tag == POSTag::sp;
+	}
+
+	/**
+	* @brief tokens에 문장 번호 및 줄 번호를 채워넣는다.
+	*/
+	inline void fillSentLineInfo(vector<TokenInfo>& tokens, const vector<size_t>& newlines)
+	{
+		/*
+		* 문장 분리 기준
+		* 1) 종결어미(ef) (요/jx)? (so|sw|sh|sp|se|sf|(닫는 괄호))*
+		* 2) 종결구두점(sf) (so|sw|sh|sp|se|(닫는 괄호))*
+		* 3) 단 종결어미(ef) 바로 다음에 요가 아닌 조사(j)가 뒤따르는 경우는 제외
+		*/
+
+		SentenceParser sp;
+		uint32_t sentPos = 0, lastSentPos = 0, subSentPos = 0, accumSubSent = 1, accumWordPos = 0, lastWordPos = 0;
+		size_t nlPos = 0, lastNlPos = 0, nestedEnd = 0;
+		for (size_t i = 0; i < tokens.size(); ++i)
+		{
+			auto& t = tokens[i];
+			if (sp.next(t, nestedEnd && i == nestedEnd))
+			{
+				if (nestedEnd)
+				{
+					subSentPos++;
+					accumSubSent++;
+				}
+				else
+				{
+					sentPos++;
+					accumSubSent = 1;
+				}
+			}
+
+			if (!nestedEnd && t.tag == POSTag::sso && t.pairedToken != (uint32_t)-1
+				&& hasSentences(&tokens[i], &tokens[t.pairedToken])
+				&& ((t.pairedToken + 1 < tokens.size() && isNestedRight(tokens[t.pairedToken + 1]))
+					|| (i > 0 && isNestedLeft(tokens[i - 1])))
+				)
+			{
+				nestedEnd = t.pairedToken;
+				subSentPos = accumSubSent;
+			}
+			else if (nestedEnd && i > nestedEnd)
+			{
+				nestedEnd = 0;
+				subSentPos = 0;
+			}
 
 			while (nlPos < newlines.size() && newlines[nlPos] < t.position) nlPos++;
 			
 			t.lineNumber = (uint32_t)nlPos;
-			if (nlPos > lastNlPos + 1 && sentPos == lastSentPos)
+			if (nlPos > lastNlPos + 1 && sentPos == lastSentPos && !nestedEnd)
 			{
 				sentPos++;
 			}
 			t.sentPosition = sentPos;
+			t.subSentPosition = (i == nestedEnd || i == tokens[nestedEnd].pairedToken) ? 0 : subSentPos;
 			
 			if (sentPos != lastSentPos)
 			{
 				accumWordPos = 0;
+				accumSubSent = 1;
 			}
 			else if (t.wordPosition != lastWordPos)
 			{
@@ -292,6 +388,7 @@ namespace kiwi
 				++chunk;
 				if (chunk - sents.back() >= 512)
 				{
+					if (0xDC00 <= *chunk && *chunk <= 0xDFFF) --chunk;
 					sents.emplace_back(chunk);
 					break;
 				}
@@ -339,7 +436,11 @@ namespace kiwi
 		}
 
 		auto newlines = allNewLinePositions(str);
-		for (auto& r : ret) fillSentLineInfo(r.first, newlines);
+		for (auto& r : ret)
+		{
+			fillPairedTokenInfo(r.first);
+			fillSentLineInfo(r.first, newlines);
+		}
 		return ret;
 	}
 
@@ -421,6 +522,7 @@ namespace kiwi
 	};
 
 	using MInfos = Vector<MInfo>;
+	using SpecialState = array<uint8_t, 2>;
 
 	template<class LmState>
 	struct WordLL
@@ -429,11 +531,12 @@ namespace kiwi
 		float accScore = 0, accTypoCost = 0;
 		const WordLL* parent = nullptr;
 		LmState lmState;
+		SpecialState spState = { { 0, } };
 
 		WordLL() = default;
 
-		WordLL(const MInfos& _morphs, float _accScore, float _accTypoCost, const WordLL* _parent, LmState _lmState)
-			: morphs{ _morphs }, accScore{ _accScore }, accTypoCost{ _accTypoCost }, parent{ _parent }, lmState{ _lmState }
+		WordLL(const MInfos& _morphs, float _accScore, float _accTypoCost, const WordLL* _parent, LmState _lmState, SpecialState _spState)
+			: morphs{ _morphs }, accScore{ _accScore }, accTypoCost{ _accTypoCost }, parent{ _parent }, lmState{ _lmState }, spState(_spState)
 		{
 		}
 	};
@@ -445,30 +548,15 @@ namespace kiwi
 		float accScore = 0, accTypoCost = 0;
 		const WordLL<LmState>* parent = nullptr;
 		LmState lmState;
+		SpecialState spState = { { 0, } };
 
 		WordLLP() = default;
 
-		WordLLP(const MInfos* _morphs, float _accScore, float _accTypoCost, const WordLL<LmState>* _parent, LmState _lmState)
-			: morphs{ _morphs }, accScore{ _accScore }, accTypoCost{ _accTypoCost }, parent{ _parent }, lmState{ _lmState }
+		WordLLP(const MInfos* _morphs, float _accScore, float _accTypoCost, const WordLL<LmState>* _parent, LmState _lmState, SpecialState _spState)
+			: morphs{ _morphs }, accScore{ _accScore }, accTypoCost{ _accTypoCost }, parent{ _parent }, lmState{ _lmState }, spState(_spState)
 		{
 		}
 	};
-
-	template<class _Iter, class _Key, class _Filter>
-	auto findNthLargest(_Iter first, _Iter last, size_t nth, _Key&& fn, _Filter&& filter) -> decltype(fn(*first))
-	{
-		using KeyType = decltype(fn(*first));
-
-		Vector<KeyType> v;
-		for (; first != last; ++first)
-		{
-			if (filter(*first)) v.emplace_back(fn(*first));
-		}
-		if (v.empty()) return {};
-		std::partial_sort(v.begin(), v.begin() + std::min(nth + 1, v.size()), v.end(), std::greater<KeyType>{});
-		//std::sort(v.rbegin(), v.rend());
-		return v[std::min(nth, v.size() - 1)];
-	}
 
 	template<class LmState, class _Type>
 	void evalTrigram(const LangModel& langMdl, 
@@ -540,7 +628,7 @@ namespace kiwi
 						candScore += ll;
 					}
 				}
-				emplaceMaxCnt(maxWidLL, lSeq, WordLLP<LmState>{ wids, candScore, p.accTypoCost + node->typoCost, &p, move(cLmState) }, 3, 
+				emplaceMaxCnt(maxWidLL, lSeq, WordLLP<LmState>{ wids, candScore, p.accTypoCost + node->typoCost, &p, move(cLmState), p.spState }, 3, 
 					[](const WordLLP<LmState>& a, const WordLLP<LmState>& b) 
 					{ 
 						return a.accScore > b.accScore; 
@@ -564,13 +652,50 @@ namespace kiwi
 		{
 			// 닫는 괄호는 왼쪽 경계로 처리하지 않음
 			auto c = node->getPrev()->uform.back();
-			if (isClosingPair(c) || c == u'"' || c == u'\'') return false;
+			auto tag = identifySpecialChr(c);
+			if (tag == POSTag::ssc || c == u'"' || c == u'\'') return false;
 			
 			// 나머지 특수문자는 왼쪽 경계로 처리
-			auto tag = identifySpecialChr(c);
 			if (POSTag::sf <= tag && tag <= POSTag::sw) return true;
 		}
 		return false;
+	}
+
+	inline bool isInflectendaNP(const Morpheme* morph)
+	{
+		return morph->tag == POSTag::np && morph->kform->size() == 1 && (
+			(*morph->kform)[0] == u'나' || (*morph->kform)[0] == u'너' || (*morph->kform)[0] == u'저');
+	}
+
+	inline bool isInflectendaJ(const Morpheme* morph)
+	{
+		return (morph->tag == POSTag::jks || morph->tag == POSTag::jkc) && morph->kform->size() == 1 && (*morph->kform)[0] == u'가';
+	}
+
+	inline bool isVerbL(const Morpheme* morph)
+	{
+		return isVerbClass(morph->tag) && morph->kform && !morph->kform->empty() && morph->kform->back() == u'ᆯ';
+	}
+
+	inline bool isBadPairOfVerbL(const Morpheme* morph)
+	{
+		auto onset = (morph->kform && !morph->kform->empty()) ? morph->kform->front() : 0;
+		return onset == u'으' || onset == u'느' || (u'사' <= onset && onset <= u'시');
+	}
+
+	inline bool isPositiveVerb(const Morpheme* morph)
+	{
+		return isVerbClass(morph->tag) && FeatureTestor::isMatched(morph->kform, CondPolarity::positive);
+	}
+
+	inline bool isNegativeVerb(const Morpheme* morph)
+	{
+		return isVerbClass(morph->tag) && FeatureTestor::isMatched(morph->kform, CondPolarity::negative);
+	}
+
+	inline bool isVerbVowel(const Morpheme* morph)
+	{
+		return isVerbClass(morph->tag) && morph->kform && !morph->kform->empty() && !isHangulCoda(morph->kform->back());
 	}
 
 	template<class LmState, class CandTy, class CacheTy>
@@ -654,19 +779,60 @@ namespace kiwi
 
 				float discountForCombining = curMorph->combineSocket ? -15 : 0;
 				estimatedLL += kw->tagScorer.evalLeftBoundary(hasLeftBoundary(node), curMorph->tag);
-				
-				bool isVowelE = isEClass(curMorph->tag) && curMorph->kform && hasNoOnset(*curMorph->kform);
 
+				auto curMorphSpecialType = kw->determineSpecialMorphType(kw->morphToId(curMorph));
+				
+				bool vowelE = isEClass(curMorph->tag) && curMorph->kform && hasNoOnset(*curMorph->kform);
+				bool infJ = isInflectendaJ(curMorph);
+				bool badPairOfL = isBadPairOfVerbL(curMorph);
+				bool positiveE = isEClass(curMorph->tag) && node->form && node->form->form[0] == u'아';
+				bool contractableE = isEClass(curMorph->tag) && curMorph->kform && !curMorph->kform->empty() && (*curMorph->kform)[0] == u'어';
+				
 				for (auto& p : maxWidLL)
 				{
 					for (auto& q : p.second)
 					{
 						q.accScore += estimatedLL;
 						// 불규칙 활용 형태소 뒤에 모음 어미가 붙는 경우 벌점 부여
-						if (isVowelE && isIrregular(kw->morphemes[q.morphs->back().wid].tag))
+						if (vowelE && isIrregular(kw->morphemes[q.morphs->back().wid].tag))
 						{
 							q.accScore -= 10;
 						}
+						// 나/너/저 뒤에 주격 조사 '가'가 붙는 경우 벌점 부여
+						if (infJ && isInflectendaNP(&kw->morphemes[q.morphs->back().wid]))
+						{
+							q.accScore -= 5;
+						}
+						// ㄹ 받침 용언 뒤에 으/느/ㅅ으로 시작하는 형태소가 올 경우 벌점 부여
+						if (badPairOfL && isVerbL(&kw->morphemes[q.morphs->back().wid]))
+						{
+							q.accScore -= 7;
+						}
+						// 동사 뒤가 아니거나, 앞의 동사가 양성이 아닌데, 양성모음용 어미가 등장한 경우 벌점 부여
+						if (positiveE && !isPositiveVerb(&kw->morphemes[q.morphs->back().wid]))
+						{
+							q.accScore -= 100;
+						}
+						// 아/어로 시작하는 어미가 받침 없는 동사 뒤에서 축약되지 않은 경우 벌점 부여
+						if (contractableE && isVerbVowel(&kw->morphemes[q.morphs->back().wid]))
+						{
+							q.accScore -= 3;
+						}
+						if (curMorphSpecialType <= Kiwi::SpecialMorph::singleQuoteNA)
+						{
+							if (static_cast<uint8_t>(curMorphSpecialType) != q.spState[0])
+							{
+								q.accScore -= 2;
+							}
+						}
+						else if (curMorphSpecialType <= Kiwi::SpecialMorph::doubleQuoteNA)
+						{
+							if ((static_cast<uint8_t>(curMorphSpecialType) - 3) != q.spState[1])
+							{
+								q.accScore -= 2;
+							}
+						}
+
 						tMax = max(tMax, q.accScore + discountForCombining);
 					}
 				}
@@ -676,7 +842,13 @@ namespace kiwi
 					for (auto& q : p.second)
 					{
 						if (q.accScore <= tMax - kw->cutOffThreshold) continue;
-						nCache.emplace_back(MInfos{}, q.accScore, q.accTypoCost, q.parent, q.lmState);
+						nCache.emplace_back(MInfos{}, q.accScore, q.accTypoCost, q.parent, q.lmState, q.spState);
+						
+						if (curMorphSpecialType == Kiwi::SpecialMorph::singleQuoteOpen) nCache.back().spState[0] = 1;
+						else if (curMorphSpecialType == Kiwi::SpecialMorph::singleQuoteClose) nCache.back().spState[0] = 0;
+						else if (curMorphSpecialType == Kiwi::SpecialMorph::doubleQuoteOpen) nCache.back().spState[1] = 1;
+						else if (curMorphSpecialType == Kiwi::SpecialMorph::doubleQuoteClose) nCache.back().spState[1] = 0;
+
 						auto& wids = nCache.back().morphs;
 						wids.reserve(q.morphs->size() + chSize);
 						wids = *q.morphs;
@@ -765,7 +937,7 @@ namespace kiwi
 		unknownNodeLCands.emplace_back(kw->getDefaultMorpheme(POSTag::nnp));
 
 		// start node
-		cache.front().emplace_back(MInfos{ MInfo(0u) }, 0.f, 0.f, nullptr, LmState{ kw->langMdl });
+		cache.front().emplace_back(MInfos{ MInfo(0u) }, 0.f, 0.f, nullptr, LmState{ kw->langMdl }, SpecialState{ 0, });
 
 		// middle nodes
 		for (size_t i = 1; i < graph.size() - 1; ++i)
@@ -800,30 +972,42 @@ namespace kiwi
 			// heuristically remove cands having lower ll to speed up
 			if (cache[i].size() > topN)
 			{
-				Vector<WordLL<LmState>> reduced;
-				float combinedCutOffScore = findNthLargest(cache[i].begin(), cache[i].end(), topN, [](const WordLL<LmState>& c)
-				{
-					return c.accScore;
-				}, [](const WordLL<LmState>& c)
-				{
-					if (c.morphs.empty()) return false;
-					return !!c.morphs.back().combineSocket;
-				});
-
-				float otherCutOffScore = findNthLargest(cache[i].begin(), cache[i].end(), topN, [](const WordLL<LmState>& c)
-				{
-					return c.accScore;
-				}, [](const WordLL<LmState>& c)
-				{
-					if (c.morphs.empty()) return true;
-					return !c.morphs.back().combineSocket;
-				});
-
-				combinedCutOffScore = min(tMax - kw->cutOffThreshold, combinedCutOffScore);
-				otherCutOffScore = min(tMax - kw->cutOffThreshold, otherCutOffScore);
+				UnorderedMap<array<uint16_t, 4>, pair<WordLL<LmState>*, float>> bestPathes;
+				float cutoffScore = -INFINITY, cutoffScoreWithCombined = -INFINITY;
 				for (auto& c : cache[i])
 				{
-					float cutoff = (c.morphs.empty() || !c.morphs.back().combineSocket) ? otherCutOffScore : combinedCutOffScore;
+					array<uint16_t, 4> lastNgram = { 0, };
+					size_t j = 0;
+					for (auto it = c.morphs.end() - min((size_t)4, c.morphs.size()); it != c.morphs.end(); ++it)
+					{
+						lastNgram[j++] = it->wid;
+					}
+					lastNgram[3] |= (c.spState[0] << 14) | (c.spState[1] << 15);
+					auto insertResult = bestPathes.emplace(lastNgram, make_pair(&c, c.accScore));
+					if (!insertResult.second)
+					{
+						if (c.accScore > insertResult.first->second.second)
+						{
+							insertResult.first->second = make_pair(&c, c.accScore);
+						}
+					}
+					if (!c.morphs.empty() && c.morphs.back().combineSocket)
+					{
+						cutoffScoreWithCombined = max(cutoffScoreWithCombined, c.accScore);
+					}
+					else
+					{
+						cutoffScore = max(cutoffScore, c.accScore);
+					}
+				}
+				cutoffScore -= kw->cutOffThreshold;
+				cutoffScoreWithCombined -= kw->cutOffThreshold;
+
+				Vector<WordLL<LmState>> reduced;
+				for (auto& p : bestPathes)
+				{
+					auto& c = *p.second.first;
+					float cutoff = (!c.morphs.empty() && c.morphs.back().combineSocket) ? cutoffScoreWithCombined : cutoffScore;
 					if (reduced.size() < topN || c.accScore >= cutoff) reduced.emplace_back(move(c));
 				}
 				cache[i] = move(reduced);
@@ -847,13 +1031,15 @@ namespace kiwi
 		// end node		
 		for (auto prev = endNode->getPrev(); prev; prev = prev->getSibling())
 		{
-			for (auto&& p : cache[prev - startNode])
+			for (auto& p : cache[prev - startNode])
 			{
 				if (p.morphs.back().combineSocket) continue;
 				if (!FeatureTestor::isMatched(nullptr, p.morphs.back().condVowel)) continue;
 
 				float c = p.accScore + p.lmState.next(kw->langMdl, eosId);
-				cache.back().emplace_back(p.morphs, c, p.accTypoCost, &p, p.lmState);
+				if (p.spState[0]) c -= 2;
+				if (p.spState[1]) c -= 2;
+				cache.back().emplace_back(p.morphs, c, p.accTypoCost, &p, p.lmState, p.spState);
 			}
 		}
 
