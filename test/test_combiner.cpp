@@ -136,15 +136,15 @@ TEST(KiwiCppCombiner, Allomorph)
 	auto& rule = getCompiledRule();
 
 	rule.addAllomorph({
-		{ u"를", CondVowel::vowel, 0}, { u"을", CondVowel::non_vowel, 0}
+		{ u"를", CondVowel::vowel, (uint8_t)0}, { u"을", CondVowel::non_vowel, (uint8_t)0}
 	}, POSTag::jko);
 
 	rule.addAllomorph({
-		{ u"가", CondVowel::vowel, 0}, { u"이", CondVowel::non_vowel, 0}
+		{ u"가", CondVowel::vowel, (uint8_t)0}, { u"이", CondVowel::non_vowel, (uint8_t)0}
 	}, POSTag::jks);
 
 	rule.addAllomorph({
-		{ u"로", CondVowel::vocalic, 0}, { u"으로", CondVowel::non_vowel, 0}
+		{ u"로", CondVowel::vocalic, (uint8_t)0}, { u"으로", CondVowel::non_vowel, (uint8_t)0}
 	}, POSTag::jkb);
 
 	auto joiner = rule.newJoiner();
