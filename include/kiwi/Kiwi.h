@@ -104,7 +104,7 @@ namespace kiwi
 		};
 
 	private:
-		std::array<size_t, static_cast<size_t>(SpecialMorph::max)> specialMorphIds = { 0, };
+		std::array<size_t, static_cast<size_t>(SpecialMorph::max)> specialMorphIds = { { 0, } };
 
 	public:
 
