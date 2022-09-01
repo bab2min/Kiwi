@@ -402,10 +402,10 @@ TEST(KiwiCpp, Issue71_SentenceSplit_u8)
 TEST(KiwiCpp, AddRule)
 {
 	Kiwi& okiwi = reuseKiwiInstance();
-	auto ores = okiwi.analyze(u"했어요! 하잖아요! 할까요?", Match::allWithNormalizing);
+	auto ores = okiwi.analyze(u"했어요! 하잖아요! 할까요? 좋아요!", Match::allWithNormalizing);
 	
 	{
-		KiwiBuilder builder{ MODEL_PATH };
+		KiwiBuilder builder{ MODEL_PATH, 0, BuildOption::default_ & ~BuildOption::loadTypoDict };
 		auto inserted = builder.addRule(POSTag::ef, [](std::u16string input)
 		{
 			if (input.back() == u'요')
@@ -416,13 +416,13 @@ TEST(KiwiCpp, AddRule)
 		}, 0);
 
 		Kiwi kiwi = builder.build();
-		auto res = kiwi.analyze(u"했어용! 하잖아용! 할까용?", Match::allWithNormalizing);
+		auto res = kiwi.analyze(u"했어용! 하잖아용! 할까용? 좋아용!", Match::allWithNormalizing);
 
 		EXPECT_EQ(ores.second, res.second);
 	}
 
 	{
-		KiwiBuilder builder{ MODEL_PATH };
+		KiwiBuilder builder{ MODEL_PATH, 0, BuildOption::default_ & ~BuildOption::loadTypoDict };
 		auto inserted = builder.addRule(POSTag::ef, [](std::u16string input)
 		{
 			if (input.back() == u'요')
@@ -433,9 +433,9 @@ TEST(KiwiCpp, AddRule)
 		}, -1);
 
 		Kiwi kiwi = builder.build();
-		auto res = kiwi.analyze(u"했어용! 하잖아용! 할까용?", Match::allWithNormalizing);
+		auto res = kiwi.analyze(u"했어용! 하잖아용! 할까용? 좋아용!", Match::allWithNormalizing);
 
-		EXPECT_FLOAT_EQ(ores.second -3, res.second);
+		EXPECT_FLOAT_EQ(ores.second -4, res.second);
 	}
 }
 

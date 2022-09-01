@@ -366,6 +366,11 @@ kiwi_typo_h kiwi_typo_init()
 	}
 }
 
+kiwi_typo_h kiwi_typo_get_basic()
+{
+	return (kiwi_typo_h)&basicTypoSet;
+}
+
 int kiwi_typo_add(kiwi_typo_h handle, const char** orig, int orig_size, const char** error, int error_size, float cost, int condition)
 {
 	if (!handle) return KIWIERR_INVALID_HANDLE;

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file capi.h
  * @author bab2min (bab2min@gmail.com)
  * @brief Kiwi C API를 담고 있는 헤더 파일
@@ -87,7 +87,8 @@ enum
 {
 	KIWI_BUILD_INTEGRATE_ALLOMORPH = 1,
 	KIWI_BUILD_LOAD_DEFAULT_DICT = 2,
-	KIWI_BUILD_DEFAULT = 3,
+	KIWI_BUILD_LOAD_TYPO_DICT = 4,
+	KIWI_BUILD_DEFAULT = 7,
 	KIWI_BUILD_MODEL_TYPE_KNLM = 0x0000,
 	KIWI_BUILD_MODEL_TYPE_SBG = 0x0100,
 };
@@ -330,6 +331,15 @@ extern DECL_DLL const kiwi_typo_h kiwi_basic_typo;
  * @note
  */
 DECL_DLL kiwi_typo_h kiwi_typo_init();
+
+/**
+ * @brief Kiwi 기본 내장 오타 교정기의 핸들을 반환합니다.
+ *
+ * @return
+ *
+ * @note 이 핸들은 kiwi_typo_close에 사용할 수 없음.
+ */
+DECL_DLL kiwi_typo_h kiwi_typo_get_basic();
 
 /**
  * @brief
