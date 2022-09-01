@@ -165,6 +165,14 @@ https://github.com/bab2min/kiwi-gui 에서 다운받을 수 있습니다.
 
 
 ## 업데이트 내역
+* v0.14
+  * `SS` 태그를 여는 태그(SSO)와 닫는 태그(SSC)로 세분화
+  * `SSO` 태그로 시작하여 SSC 태그로 끝나는 범위 내에 포함된 문장을 '안긴문장'으로 처리하여 문장 분리 성능을 개선
+  * 의미에 따라 두 가지로 활용하는 `이르다` 동사도 `VV-R(일렀다)`과 `VV-I(이르렀다)` 태그로 나눠 모호성 해소 기능 추가
+  * 전화번호, 통장번호, IP주소 등의 일련번호를 추출하는 `W_SERIAL` 태그 추가
+  * `랬/댔/잖`의 분석 정확도 개선
+  * 각정 버그 수정 & 언어 모델 정확도 개선
+
 * v0.13
   * 형태소 분석 과정에서 간단한 오타를 교정하는 기능 추가
   * 장거리 형태소 간의 관계를 고려할 수 있는 SkipBigram 언어 모델 추가
@@ -276,9 +284,11 @@ https://github.com/bab2min/kiwi-gui 에서 다운받을 수 있습니다.
 <tr><td>XSV</td><td>동사 파생 접미사</td></tr>
 <tr><td>XSA</td><td>형용사 파생 접미사</td></tr>
 <tr><th rowspan='1'>어근</th><td>XR</td><td>어근</td></tr>
-<tr><th rowspan='9'>부호, 외국어, 특수문자(S)</th><td>SF</td><td>종결 부호(. ! ?)</td></tr>
+<tr><th rowspan='11'>부호, 외국어, 특수문자(S)</th><td>SF</td><td>종결 부호(. ! ?)</td></tr>
 <tr><td>SP</td><td>구분 부호(, / : ;)</td></tr>
 <tr><td>SS</td><td>인용 부호 및 괄호(' " ( ) [ ] < > { } ― ‘ ’ “ ” ≪ ≫ 등)</td></tr>
+<tr><td>SSO</td><td>SS 중 여는 부호</td></tr>
+<tr><td>SSC</td><td>SS 중 닫는 부호</td></tr>
 <tr><td>SE</td><td>줄임표(…)</td></tr>
 <tr><td>SO</td><td>붙임표(- ~)</td></tr>
 <tr><td>SW</td><td>기타 특수 문자</td></tr>
@@ -286,10 +296,11 @@ https://github.com/bab2min/kiwi-gui 에서 다운받을 수 있습니다.
 <tr><td>SH</td><td>한자</td></tr>
 <tr><td>SN</td><td>숫자(0-9)</td></tr>
 <tr><th rowspan='1'>분석 불능</th><td>UN</td><td>분석 불능<sup>*</sup></td></tr>
-<tr><th rowspan='4'>웹(W)</th><td>W_URL</td><td>URL 주소<sup>*</sup></td></tr>
+<tr><th rowspan='5'>웹(W)</th><td>W_URL</td><td>URL 주소<sup>*</sup></td></tr>
 <tr><td>W_EMAIL</td><td>이메일 주소<sup>*</sup></td></tr>
 <tr><td>W_HASHTAG</td><td>해시태그(#abcd)<sup>*</sup></td></tr>
 <tr><td>W_MENTION</td><td>멘션(@abcd)<sup>*</sup></td></tr>
+<tr><td>W_SERIAL</td><td>일련번호(전화번호, 통장번호, IP주소 등)<sup>*</sup></td></tr>
 </table>
 
 <sup>*</sup> 세종 품사 태그와 다른 독자적인 태그입니다.
