@@ -139,15 +139,15 @@ int kb_replacer(const char* input, int size, char* output, void* user_data)
 TEST(KiwiC, AddRule)
 {
 	kiwi_h okw = reuse_kiwi_instance();
-	kiwi_res_h ores = kiwi_analyze(okw, u8"했어요! 하잖아요! 할까요?", 1, KIWI_MATCH_ALL_WITH_NORMALIZING);
+	kiwi_res_h ores = kiwi_analyze(okw, u8"했어요! 하잖아요! 할까요? 좋아요!", 1, KIWI_MATCH_ALL_WITH_NORMALIZING);
 
 	{
-		kiwi_builder_h kb = kiwi_builder_init(MODEL_PATH, 0, KIWI_BUILD_DEFAULT);
+		kiwi_builder_h kb = kiwi_builder_init(MODEL_PATH, 0, KIWI_BUILD_DEFAULT & ~KIWI_BUILD_LOAD_TYPO_DICT);
 
 		EXPECT_GT(kiwi_builder_add_rule(kb, "ef", kb_replacer, nullptr, 0), 0);
 		
 		kiwi_h kw = kiwi_builder_build(kb, nullptr, 0);
-		kiwi_res_h res = kiwi_analyze(kw, u8"했어용! 하잖아용! 할까용?", 1, KIWI_MATCH_ALL_WITH_NORMALIZING);
+		kiwi_res_h res = kiwi_analyze(kw, u8"했어용! 하잖아용! 할까용? 좋아용!", 1, KIWI_MATCH_ALL_WITH_NORMALIZING);
 		EXPECT_EQ(kiwi_res_prob(ores, 0), kiwi_res_prob(res, 0));
 		kiwi_res_close(res);
 		kiwi_close(kw);
@@ -155,13 +155,13 @@ TEST(KiwiC, AddRule)
 	}
 
 	{
-		kiwi_builder_h kb = kiwi_builder_init(MODEL_PATH, 0, KIWI_BUILD_DEFAULT);
+		kiwi_builder_h kb = kiwi_builder_init(MODEL_PATH, 0, KIWI_BUILD_DEFAULT & ~KIWI_BUILD_LOAD_TYPO_DICT);
 
 		EXPECT_GT(kiwi_builder_add_rule(kb, "ef", kb_replacer, nullptr, -1), 0);
 
 		kiwi_h kw = kiwi_builder_build(kb, nullptr, 0);
-		kiwi_res_h res = kiwi_analyze(kw, u8"했어용! 하잖아용! 할까용?", 1, KIWI_MATCH_ALL_WITH_NORMALIZING);
-		EXPECT_FLOAT_EQ(kiwi_res_prob(ores, 0) - 3, kiwi_res_prob(res, 0));
+		kiwi_res_h res = kiwi_analyze(kw, u8"했어용! 하잖아용! 할까용? 좋아용!", 1, KIWI_MATCH_ALL_WITH_NORMALIZING);
+		EXPECT_FLOAT_EQ(kiwi_res_prob(ores, 0) - 4, kiwi_res_prob(res, 0));
 		kiwi_res_close(res);
 		kiwi_close(kw);
 		kiwi_builder_close(kb);
