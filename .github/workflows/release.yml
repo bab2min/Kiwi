@@ -24,11 +24,12 @@ jobs:
     - name: Build
       run: cd build && make -j2
     - run: |
-        cd build
+        mkdir result
+        cd result
         mkdir include && mkdir lib && mkdir bin
-        mv libkiwi* lib/
-        mv kiwi-* bin/
-        mv test/kiwi-* bin/
+        mv ../build/libkiwi* lib/
+        mv ../build/kiwi-* bin/
+        mv ../build/test/kiwi-* bin/
         cp -r ../include/kiwi include/
         tar -zcvf ../asset.tgz include/ lib/ bin/
     - name: Archive binaries
@@ -79,11 +80,12 @@ jobs:
     - name: Build
       run: cd build && make -j2
     - run: |
-        cd build
+        mkdir result
+        cd result
         mkdir include && mkdir lib && mkdir bin
-        mv libkiwi* lib/
-        mv kiwi-* bin/
-        mv test/kiwi-* bin/
+        mv ../build/libkiwi* lib/
+        mv ../build/kiwi-* bin/
+        mv ../build/test/kiwi-* bin/
         cp -r ../include/kiwi include/
         tar -zcvf ../asset.tgz include/ lib/ bin/
     - name: Archive binaries
@@ -156,11 +158,12 @@ jobs:
     - name: Build
       run: cd build && make -j2
     - run: |
-        cd build
+        mkdir result
+        cd result
         mkdir include && mkdir lib && mkdir bin
-        mv libkiwi* lib/
-        mv kiwi-* bin/
-        mv test/kiwi-* bin/
+        mv ../build/libkiwi* lib/
+        mv ../build/kiwi-* bin/
+        mv ../build/test/kiwi-* bin/
         cp -r ../include/kiwi include/
         tar -zcvf ../asset.tgz include/ lib/ bin/
     - name: Upload release binary
@@ -215,13 +218,14 @@ jobs:
         buildWithCMakeArgs: --config Release
         buildDirectory: build
     - run: |
-        cd build
+        mkdir result
+        cd result
         mkdir include; mkdir lib; mkdir bin
-        mv build\Release\*.dll lib\
-        mv build\Release\*.exp lib\
-        mv build\Release\*.lib lib\
-        mv build\Release\*.exe bin\
-        mv build\test\Release\*.exe bin\
+        mv ..\build\Release\*.dll lib\
+        mv ..\build\Release\*.exp lib\
+        mv ..\build\Release\*.lib lib\
+        mv ..\build\Release\*.exe bin\
+        mv ..\build\test\Release\*.exe bin\
         cp -r ..\include\kiwi include\
         Compress-Archive -Path 'include', 'lib', 'bin' -DestinationPath ..\asset.zip
     - name: Upload release binary
