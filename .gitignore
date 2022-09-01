@@ -343,4 +343,5 @@ ModelGenerator/*
 !ModelGenerator/extractMorphemeList.py
 !ModelGenerator/convertModuToKiwi.py
 !ModelGenerator/skipbigram.mdl
+!ModelGenerator/*.dict
 models/
