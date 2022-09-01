@@ -2,8 +2,8 @@
  * @file Types.h
  * @author bab2min (bab2min@gmail.com)
  * @brief Kiwi C++ API에 쓰이는 주요 타입들을 모아놓은 헤더 파일
- * @version 0.13.0
- * @date 2022-06-24
+ * @version 0.14.0
+ * @date 2022-09-01
  * 
  * 
  */
@@ -257,7 +257,9 @@ namespace kiwi
 		
 		loadDefaultDict = 1 << 1, /**< 기본 사전(default.dict)의 로딩 여부를 설정한다. 기본 사전은 위키백과 및 나무위키의 표제어로 구성되어 있다. */
 
-		default_ = integrateAllomorph | loadDefaultDict,
+		loadTypoDict = 1 << 2, /**< 오타 사전(typo.dict)의 로딩 여부를 설정한다.*/
+
+		default_ = integrateAllomorph | loadDefaultDict | loadTypoDict,
 	};
 
 	struct Morpheme;

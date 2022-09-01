@@ -172,7 +172,7 @@ jobs:
         asset_path: asset.tgz
         asset_name: kiwi_mac_x86_64_${{ steps.get_release.outputs.tag_name }}.tgz
         asset_content_type: application/octet-stream
-    - run: tar -zcvf model.tgz ModelGenerator/sj.* ModelGenerator/extract.mdl ModelGenerator/default.dict ModelGenerator/combiningRule.txt ModelGenerator/skipbigram.mdl
+    - run: tar -zcvf model.tgz ModelGenerator/sj.* ModelGenerator/extract.mdl ModelGenerator/*.dict ModelGenerator/combiningRule.txt ModelGenerator/skipbigram.mdl
     - name: Upload release binary
       uses: actions/upload-release-asset@v1.0.2
       env:

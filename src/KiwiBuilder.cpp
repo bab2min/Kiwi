@@ -504,6 +504,11 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, size_t _numThreads, BuildOptio
 		loadDictionary(modelPath + "/default.dict");
 	}
 
+	if (!!(options & BuildOption::loadTypoDict))
+	{
+		loadDictionary(modelPath + "/typo.dict");
+	}
+
 	{
 		ifstream ifs;
 		combiningRule = make_shared<cmb::CompiledRule>(cmb::RuleSet{ openFile(ifs, modelPath + string{ "/combiningRule.txt" }) }.compile());
@@ -1314,13 +1319,36 @@ size_t KiwiBuilder::loadDictionary(const string& dictPath)
 				morphemes.emplace_back(m.substr(0, p), pos);
 			}
 
-			if (morphemes.size() > 1)
+			if (fields[0].empty())
 			{
-				addedCnt += addPreAnalyzedWord(fields[0], morphemes, {}, score) ? 1 : 0;
+				throw Exception("[loadUserDictionary] Wrong dictionary format at line " + to_string(lineNo) + " : " + line);
+			}
+
+			if (fields[0].back() == '$')
+			{
+				if (morphemes.size() > 1)
+				{
+					throw Exception("[loadUserDictionary] Replace rule cannot have 2 or more forms '" + utf16To8(fields[1]) + "' at line " + to_string(lineNo));
+				}
+
+				auto suffix = fields[0].substr(0, fields[0].size() - 1);
+				addedCnt += addRule(morphemes[0].second, [&](const u16string& str)
+				{
+					auto strv = nonstd::to_string_view(str);
+					if (!strv.ends_with(suffix)) return str;
+					return strv.substr(0, strv.size() - suffix.size()).to_string() + morphemes[0].first.to_string();
+				}, score).size();
 			}
 			else
 			{
-				addedCnt += addWord(fields[0], morphemes[0].second, score, morphemes[0].first);
+				if (morphemes.size() > 1)
+				{
+					addedCnt += addPreAnalyzedWord(fields[0], morphemes, {}, score) ? 1 : 0;
+				}
+				else
+				{
+					addedCnt += addWord(fields[0], morphemes[0].second, score, morphemes[0].first);
+				}
 			}
 		}
 		else

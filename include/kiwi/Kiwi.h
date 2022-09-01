@@ -2,8 +2,8 @@
  * @file Kiwi.h
  * @author bab2min (bab2min@gmail.com)
  * @brief Kiwi C++ API를 담고 있는 헤더 파일
- * @version 0.13.0
- * @date 2022-06-24
+ * @version 0.14.0
+ * @date 2022-09-01
  * 
  * 
  */
@@ -634,14 +634,25 @@ namespace kiwi
 		std::vector<std::u16string> addRule(POSTag tag, Replacer&& repl, float score = 0)
 		{
 			std::vector<std::u16string> ret;
-			for (auto& m : morphemes)
+			size_t formSize = forms.size();
+			for (size_t i = 0; i < formSize; ++i)
 			{
-				size_t morphemeId = m.lmMorphemeId ? m.lmMorphemeId : (&m - morphemes.data());
-				if (morphemeId < defaultTagSize || m.tag != tag) continue;
-				std::u16string input = joinHangul(forms[m.kform].form);
+				auto& f = forms[i];
+				const MorphemeRaw* m = nullptr;
+				for (auto j : f.candidate)
+				{
+					if (morphemes[j].tag == tag)
+					{
+						m = &morphemes[j];
+						break;
+					}
+				}
+				if (!m) continue;
+				std::u16string input = joinHangul(f.form);
 				std::u16string output = repl(input);
 				if (input == output) continue;
-				if (addWord(output, tag, score + (m.lmMorphemeId ? m.userScore : 0), morphemeId))
+				size_t morphemeId = m->lmMorphemeId ? m->lmMorphemeId : (size_t)(m - morphemes.data());
+				if (addWord(output, tag, score + (m->lmMorphemeId ? m->userScore : 0), morphemeId))
 				{
 					ret.emplace_back(output);
 				}
