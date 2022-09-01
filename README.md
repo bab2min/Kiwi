@@ -352,16 +352,17 @@ Kiwi는 LGPL v3 라이센스로 배포됩니다.
 
 ## 인용하기
 DOI 혹은 아래의 BibTex를 이용해 인용해주세요.
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6761939.svg)](https://doi.org/10.5281/zenodo.6761939)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7041425.svg)](https://doi.org/10.5281/zenodo.7041425)
 
 ```text
-@software{minchul_lee_2022_kiwi,
+@software{minchul_lee_2022_7041425,
   author       = {Minchul Lee},
   title        = {Kiwi, Korean Intelligent Word Identifier},
-  month        = june,
+  month        = sep,
   year         = 2022,
-  version      = {v0.13.0},
-  doi          = {10.5281/zenodo.6761939},
+  publisher    = {Zenodo},
+  version      = {v0.14.0},
+  doi          = {10.5281/zenodo.7041425},
   publisher = {GitHub},
   journal = {GitHub repository},
   howpublished = {\url{https://github.com/bab2min/Kiwi}}
