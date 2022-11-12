@@ -71,6 +71,23 @@ Kiwi& reuseKiwiInstance()
 	return kiwi;
 }
 
+TEST(KiwiCpp, SentenceBoundaryErrors)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+
+	for (auto str : { 
+		u8"실패할까봐",
+		u8"집에 갈까 봐요",
+		u8"너무 낮지 싶어요",
+		u8"계속 할까 싶다",
+		})
+	{
+		TokenResult res;
+		std::vector<std::pair<size_t, size_t>> sentRanges = kiwi.splitIntoSents(str, Match::allWithNormalizing, &res);
+		EXPECT_EQ(sentRanges.size(), 1);
+	}
+}
+
 TEST(KiwiCpp, InitClose)
 {
 	Kiwi& kiwi = reuseKiwiInstance();

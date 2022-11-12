@@ -217,6 +217,11 @@ namespace kiwi
 				}
 				break;
 			case State::ef:
+				if (t.tag == POSTag::vx)
+				{
+					state = State::none;
+					break;
+				}
 			case State::efjx:
 				switch (t.tag)
 				{
@@ -310,7 +315,7 @@ namespace kiwi
 		* 문장 분리 기준
 		* 1) 종결어미(ef) (요/jx)? (so|sw|sh|sp|se|sf|(닫는 괄호))*
 		* 2) 종결구두점(sf) (so|sw|sh|sp|se|(닫는 괄호))*
-		* 3) 단 종결어미(ef) 바로 다음에 요가 아닌 조사(j)가 뒤따르는 경우는 제외
+		* 3) 단 종결어미(ef) 바로 다음에 '요'가 아닌 조사(j)나 보조용언(vx)이 뒤따르는 경우는 제외
 		*/
 
 		SentenceParser sp;
