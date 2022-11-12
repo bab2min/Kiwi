@@ -52,5 +52,17 @@ namespace kiwi
 			}
 			else return false;
 		}
+
+		template<ArchType arch, class IntTy, class Out>
+		bool search(const IntTy* keys, size_t size, IntTy target, Out& ret)
+		{
+			size_t idx;
+			if (detail::searchImpl<arch>(keys, size, target, idx))
+			{
+				ret = idx;
+				return true;
+			}
+			else return false;
+		}
 	}
 }

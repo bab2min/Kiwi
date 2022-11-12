@@ -136,7 +136,11 @@ namespace kiwi
 			}
 		};
 
-		size_t size() const { return ptrs.size(); };
+		size_t size() const { return ptrs.size(); }
+
+		size_t dataSize() const { return data.size(); }
+
+		const Vector<ValueTy>& raw() const { return data; }
 
 		void resize(size_t i) { data.resize(ptrs[i]); ptrs.resize(i); }
 

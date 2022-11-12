@@ -42,7 +42,7 @@ namespace kiwi
 		using Path = Vector<Result>;
 
 		template<class LmState>
-		static Vector<std::pair<Path, float>> findBestPath(const Kiwi* kw, const Vector<KGraphNode>& graph, size_t topN);
+		static Vector<std::pair<Path, float>> findBestPath(const Kiwi* kw, const Vector<KGraphNode>& graph, size_t topN, bool openEnd);
 
 		template<class LmState, class CandTy, class CacheTy>
 		static float evalPath(const Kiwi* kw, const KGraphNode* startNode, const KGraphNode* node,
@@ -919,7 +919,7 @@ namespace kiwi
 	}
 
 	template<class LmState>
-	Vector<pair<PathEvaluator::Path, float>> PathEvaluator::findBestPath(const Kiwi* kw, const Vector<KGraphNode>& graph, size_t topN)
+	Vector<pair<PathEvaluator::Path, float>> PathEvaluator::findBestPath(const Kiwi* kw, const Vector<KGraphNode>& graph, size_t topN, bool openEnd)
 	{
 		static constexpr size_t eosId = 1;
 
@@ -1036,7 +1036,7 @@ namespace kiwi
 				if (p.morphs.back().combineSocket) continue;
 				if (!FeatureTestor::isMatched(nullptr, p.morphs.back().condVowel)) continue;
 
-				float c = p.accScore + p.lmState.next(kw->langMdl, eosId);
+				float c = p.accScore + (openEnd ? 0 : p.lmState.next(kw->langMdl, eosId));
 				if (p.spState[0]) c -= 2;
 				if (p.spState[1]) c -= 2;
 				cache.back().emplace_back(p.morphs, c, p.accTypoCost, &p, p.lmState, p.spState);
@@ -1188,7 +1188,7 @@ namespace kiwi
 		return ++first;
 	}
 
-	std::vector<TokenResult> Kiwi::analyzeSent(const std::u16string::const_iterator& sBegin, const std::u16string::const_iterator& sEnd, size_t topN, Match matchOptions) const
+	std::vector<TokenResult> Kiwi::analyzeSent(const std::u16string::const_iterator& sBegin, const std::u16string::const_iterator& sEnd, size_t topN, Match matchOptions, bool openEnd) const
 	{
 		auto normalized = normalizeHangulWithPosition(sBegin, sEnd);
 		auto& normalizedStr = normalized.first;
@@ -1206,7 +1206,7 @@ namespace kiwi
 			return ret;
 		}
 
-		Vector<std::pair<PathEvaluator::Path, float>> res = (*reinterpret_cast<FnFindBestPath>(dfFindBestPath))(this, nodes, topN);
+		Vector<std::pair<PathEvaluator::Path, float>> res = (*reinterpret_cast<FnFindBestPath>(dfFindBestPath))(this, nodes, topN, openEnd);
 		for (auto&& r : res)
 		{
 			vector<TokenInfo> rarr;
@@ -1339,6 +1339,72 @@ namespace kiwi
 		else
 		{
 			return (this->*lmVoid[archIdx])();
+		}
+	}
+
+	using FnNewLmObject = std::unique_ptr<LmObjectBase>(*)(const LangModel&);
+
+	template<class Ty>
+	std::unique_ptr<LmObjectBase> makeNewLmObject(const LangModel& lm)
+	{
+		return make_unique<LmObject<Ty>>(lm);
+	}
+
+	template<template<ArchType> class LmState>
+	struct NewLmObjectGetter
+	{
+		template<std::ptrdiff_t i>
+		struct Wrapper
+		{
+			static constexpr FnNewLmObject value = makeNewLmObject<LmState<static_cast<ArchType>(i)>>;
+		};
+	};
+
+	std::unique_ptr<LmObjectBase> Kiwi::newLmObject() const
+	{
+		static tp::Table<FnNewLmObject, AvailableArch> lmKnLM_8{ NewLmObjectGetter<WrappedKnLM<uint8_t>::type>{} };
+		static tp::Table<FnNewLmObject, AvailableArch> lmKnLM_16{ NewLmObjectGetter<WrappedKnLM<uint16_t>::type>{} };
+		static tp::Table<FnNewLmObject, AvailableArch> lmKnLM_32{ NewLmObjectGetter<WrappedKnLM<uint32_t>::type>{} };
+		static tp::Table<FnNewLmObject, AvailableArch> lmKnLM_64{ NewLmObjectGetter<WrappedKnLM<uint64_t>::type>{} };
+		static tp::Table<FnNewLmObject, AvailableArch> lmSbg_8{ NewLmObjectGetter<WrappedSbg<8, uint8_t>::type>{} };
+		static tp::Table<FnNewLmObject, AvailableArch> lmSbg_16{ NewLmObjectGetter<WrappedSbg<8, uint16_t>::type>{} };
+		static tp::Table<FnNewLmObject, AvailableArch> lmSbg_32{ NewLmObjectGetter<WrappedSbg<8, uint32_t>::type>{} };
+		static tp::Table<FnNewLmObject, AvailableArch> lmSbg_64{ NewLmObjectGetter<WrappedSbg<8, uint64_t>::type>{} };
+
+		const auto archIdx = static_cast<std::ptrdiff_t>(selectedArch);
+
+		size_t vocabTySize = langMdl.knlm->getHeader().key_size;
+		if (langMdl.sbg)
+		{
+			switch (vocabTySize)
+			{
+			case 1:
+				return (lmSbg_8[archIdx])(langMdl);
+			case 2:
+				return (lmSbg_16[archIdx])(langMdl);
+			case 4:
+				return (lmSbg_32[archIdx])(langMdl);
+			case 8:
+				return (lmSbg_64[archIdx])(langMdl);
+			default:
+				throw Exception{ "invalid `key_size`=" + to_string(vocabTySize) };
+			}
+		}
+		else
+		{
+			switch (vocabTySize)
+			{
+			case 1:
+				return (lmKnLM_8[archIdx])(langMdl);
+			case 2:
+				return (lmKnLM_16[archIdx])(langMdl);
+			case 4:
+				return (lmKnLM_32[archIdx])(langMdl);
+			case 8:
+				return (lmKnLM_64[archIdx])(langMdl);
+			default:
+				throw Exception{ "invalid `key_size`=" + to_string(vocabTySize) };
+			}
 		}
 	}
 

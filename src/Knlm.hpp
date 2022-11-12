@@ -87,6 +87,7 @@ namespace kiwi
 			std::unique_ptr<MyNode[]> node_data;
 			std::unique_ptr<KeyType[]> key_data;
 			std::unique_ptr<DiffType[]> all_value_data;
+			size_t num_non_leaf_nodes = 0;
 			DiffType* value_data = nullptr;
 			const float* ll_data = nullptr;
 			const float* gamma_data = nullptr;
@@ -165,7 +166,7 @@ namespace kiwi
 				auto* node_sizes = reinterpret_cast<const KeyType*>(ptr + header.node_offset);
 				key_data = make_unique<KeyType[]>((header.ll_offset - header.key_offset) / sizeof(KeyType));
 				std::memcpy(&key_data[0], ptr + header.key_offset, header.ll_offset - header.key_offset);
-				size_t num_non_leaf_nodes = 0, num_leaf_nodes = 0;
+				size_t num_leaf_nodes = 0;
 				if (compressed)
 				{
 					d_node_size.resize(header.num_nodes);
@@ -442,6 +443,16 @@ namespace kiwi
 			const float* getGammaBuf() const final
 			{
 				return gamma_data;
+			}
+
+			ptrdiff_t getLowerNode(ptrdiff_t node_idx) const final
+			{
+				return node_idx + node_data[node_idx].lower;
+			}
+
+			size_t nonLeafNodeSize() const final
+			{
+				return num_non_leaf_nodes;
 			}
 
 			size_t llSize() const final

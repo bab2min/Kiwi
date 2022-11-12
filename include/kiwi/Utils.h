@@ -140,5 +140,47 @@ namespace kiwi
 		std::u16string::const_iterator strEnd() const { return mChunk; }
 		size_t strSize() const { return distance(mBegin, mChunk); }
 	};
+
+	template<class Ty, size_t size>
+	class HiddenMember
+	{
+		union { std::array<uint8_t, size> dummy; };
+	public:
+		template<class ...Args>
+		HiddenMember(Args&&... args)
+		{
+			new (&get()) Ty{ std::forward<Args>(args)... };
+		}
+
+		HiddenMember(const HiddenMember& o)
+		{
+			new (&get()) Ty{ o.get() };
+		}
+
+		HiddenMember(HiddenMember&& o) noexcept
+		{
+			new (&get()) Ty{ std::move(o.get()) };
+		}
+
+		HiddenMember& operator=(const HiddenMember& o)
+		{
+			get() = o.get();
+			return *this;
+		}
+
+		HiddenMember& operator=(HiddenMember&& o) noexcept
+		{
+			get() = std::move(o.get());
+			return *this;
+		}
+
+		~HiddenMember()
+		{
+			get().~Ty();
+		}
+
+		Ty& get() { return *reinterpret_cast<Ty*>(dummy.data()); }
+		const Ty& get() const { return *reinterpret_cast<const Ty*>(dummy.data()); }
+	};
 }
 

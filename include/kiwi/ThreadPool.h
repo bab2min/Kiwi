@@ -23,10 +23,12 @@ namespace kiwi
 		{
 		public:
 			ThreadPool(size_t threads = 0, size_t maxQueued = 0);
+			~ThreadPool();
+
 			template<class F, class... Args>
 			auto enqueue(F&& f, Args&&... args)
 				->std::future<typename std::result_of<F(size_t, Args...)>::type>;
-			~ThreadPool();
+
 			size_t size() const { return workers.size(); }
 			size_t numEnqueued() const { return tasks.size(); }
 			void joinAll();

@@ -15,6 +15,11 @@ namespace kiwi
 
 		VoidState() = default;
 		VoidState(const LangModel& lm) {}
+
+		float next(const LangModel& lm, size_t next)
+		{
+			return 0;
+		}
 	};
 
 	template<ArchType _arch, class VocabTy>
@@ -30,6 +35,11 @@ namespace kiwi
 		float next(const LangModel& lm, VocabTy next)
 		{
 			return static_cast<const lm::KnLangModel<arch, VocabTy>&>(*lm.knlm).progress(node, next);
+		}
+
+		void predict(const LangModel& lm, float* out) const
+		{
+			
 		}
 	};
 
@@ -59,6 +69,11 @@ namespace kiwi
 			}
 			return ll;
 		}
+
+		void predict(const LangModel& lm, float* out) const
+		{
+
+		}
 	};
 
 
@@ -74,4 +89,86 @@ namespace kiwi
 		template<ArchType arch> using type = SbgState<windowSize, arch, VocabTy>;
 	};
 
+	template<class LmStateTy>
+	class LmObject : public LmObjectBase
+	{
+		LangModel mdl;
+	public:
+		LmObject(const LangModel& _mdl) : mdl{ _mdl }
+		{
+		}
+
+		size_t vocabSize() const override
+		{
+			return mdl.knlm->getHeader().vocab_size;
+		}
+
+		template<class It>
+		float evalSequence(It first, It last) const
+		{
+			float ret = 0;
+			LmStateTy state{ mdl };
+			for (; first != last; ++first)
+			{
+				ret += state.next(mdl, *first);
+			}
+			return ret;
+		}
+
+		float evalSequence(const uint32_t* seq, size_t length, size_t stride) const override
+		{
+			float ret = 0;
+			LmStateTy state{ mdl };
+			for (size_t i = 0; i < length; ++i)
+			{
+				ret += state.next(mdl, *seq);
+				seq = reinterpret_cast<const uint32_t*>(reinterpret_cast<const uint8_t*>(seq) + stride);
+			}
+			return ret;
+		}
+
+		void predictNext(const uint32_t* seq, size_t length, size_t stride, float* outScores) const override
+		{
+			LmStateTy state{ mdl };
+			for (size_t i = 0; i < length; ++i)
+			{
+				state.next(mdl, *seq);
+				seq = reinterpret_cast<const uint32_t*>(reinterpret_cast<const uint8_t*>(seq) + stride);
+			}
+			state.predict(mdl, outScores);
+		}
+
+		void evalSequences(
+			const uint32_t* prefix, size_t prefixLength, size_t prefixStride,
+			const uint32_t* suffix, size_t suffixLength, size_t suffixStride,
+			size_t seqSize, const uint32_t** seq, const size_t* seqLength, const size_t* seqStride, float* outScores
+		) const override
+		{
+			float ret = 0;
+			LmStateTy state{ mdl };
+			for (size_t i = 0; i < prefixLength; ++i)
+			{
+				ret += state.next(mdl, *prefix);
+				prefix = reinterpret_cast<const uint32_t*>(reinterpret_cast<const uint8_t*>(prefix) + prefixStride);
+			}
+
+			Vector<LmStateTy> states(seqSize, state);
+			std::fill(outScores, outScores + seqSize, ret);
+			for (size_t s = 0; s < seqSize; ++s)
+			{
+				auto p = seq[s];
+				for (size_t i = 0; i < seqLength[s]; ++i)
+				{
+					outScores[s] += states[s].next(mdl, *p);
+					p = reinterpret_cast<const uint32_t*>(reinterpret_cast<const uint8_t*>(p) + seqStride[s]);
+				}
+
+				for (size_t i = 0; i < suffixLength; ++i)
+				{
+					outScores[s] += states[s].next(mdl, *suffix);
+					suffix = reinterpret_cast<const uint32_t*>(reinterpret_cast<const uint8_t*>(suffix) + suffixStride);
+				}
+			}
+		}
+	};
 }

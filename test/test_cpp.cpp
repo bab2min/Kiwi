@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include <kiwi/Kiwi.h>
+#include <kiwi/HSDataset.h>
 #include "common.h"
 
 class TestInitializer
@@ -28,6 +29,39 @@ inline testing::AssertionResult testTokenization(Kiwi& kiwi, const std::u16strin
 	else
 	{
 		return testing::AssertionFailure() << "the result of kiwi.analyze(" << testing::PrintToString(s) << ") ends at " << (tokens.back().position + tokens.back().length);
+	}
+}
+
+TEST(KiwiCpp, HSDataset)
+{
+	KiwiBuilder kw{ MODEL_PATH, 0, BuildOption::default_, };
+	std::vector<std::string> data;
+	data.emplace_back(MODEL_PATH "/w_email.txt");
+
+	static constexpr size_t batchSize = 32, windowSize = 8;
+
+	std::array<int32_t, batchSize * windowSize> in;
+	std::array<int32_t, batchSize> out;
+	std::array<float, batchSize> lmLProbs;
+	std::array<uint32_t, batchSize> outNgramBase;
+	
+	for (size_t w : {1, 2, 4})
+	{
+		std::cout << w << std::endl;
+		auto dataset = kw.makeHSDataset(data, batchSize, windowSize, w, 0.);
+		for (size_t i = 0; i < 2; ++i)
+		{
+			size_t totalBatchCnt = 0, totalTokenCnt = 0, s;
+			dataset.reset();
+			while (s = dataset.next(in.data(), out.data(), lmLProbs.data(), outNgramBase.data()))
+			{
+				EXPECT_LE(s, batchSize);
+				totalTokenCnt += s;
+				totalBatchCnt++;
+			}
+			EXPECT_TRUE(std::max(dataset.numEstimBatches(), (size_t)w) - w <= totalBatchCnt && totalBatchCnt <= dataset.numEstimBatches() + w);
+			EXPECT_EQ(dataset.numTokens(), totalTokenCnt);
+		}
 	}
 }
 

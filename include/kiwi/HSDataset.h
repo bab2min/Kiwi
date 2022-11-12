@@ -1,0 +1,91 @@
+#pragma once
+#include <random>
+#include "Kiwi.h"
+
+namespace kiwi
+{
+	template<class Ty>
+	class OptionalFuture
+	{
+		std::future<Ty> future;
+		Ty val;
+	public:
+		OptionalFuture(Ty _val = {}) : val{ _val } {}
+		OptionalFuture(std::future<Ty>&& _future) : future{ std::move(_future) } {}
+
+		OptionalFuture(OptionalFuture&&) = default;
+		OptionalFuture& operator=(OptionalFuture&&) = default;
+
+		Ty get()
+		{
+			if (future.valid()) return future.get();
+			return val;
+		}
+	};
+
+	class HSDataset
+	{
+		friend class KiwiBuilder;
+
+		struct ThreadLocal
+		{
+			std::mt19937_64 rng;
+			Vector<uint32_t> tokenBuf;
+			Vector<float> lmLProbsBuf;
+			Vector<uint32_t> outNgramNodeBuf;
+			Deque<int32_t> historyBuf;
+			Deque<int32_t> inData;
+			Deque<int32_t> outData;
+			Deque<float> lmLProbsData;
+			Deque<uint32_t> outNgramNodeData;
+		};
+
+		static constexpr int32_t nonVocab = -1;
+
+		HiddenMember<RaggedVector<uint16_t>, sizeof(Vector<size_t>) * 2> sents;
+		std::shared_ptr<lm::KnLangModelBase> knlm;
+		std::unique_ptr<utils::ThreadPool> workers;
+		std::discrete_distribution<> dropout;
+		std::mt19937_64 rng;
+		Vector<ThreadLocal> locals;
+		Vector<size_t> shuffledIdx;
+		Vector<int32_t> tokenToVocab, vocabToToken;
+		Deque<OptionalFuture<size_t>> futures;
+		const Vector<MorphemeRaw>* morphemes = nullptr;
+		const Vector<FormRaw>* forms = nullptr;
+		size_t batchSize = 0;
+		size_t windowSize = 0;
+		size_t totalTokens = 0;
+		size_t passedSents = 0;
+		size_t passedWorkItems = 0;
+
+		size_t numValidTokensInSent(size_t sentId) const;
+
+		template<class InTy, class OutTy, class LmTy, class NgramTy>
+		size_t _next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode);
+
+	public:
+		HSDataset(size_t _batchSize = 0, size_t _windowSize = 0, size_t _workers = 0, double _dropoutProb = 0);
+		~HSDataset();
+		HSDataset(const HSDataset&) = delete;
+		HSDataset(HSDataset&&) /*noexcept*/;
+		HSDataset& operator=(const HSDataset&) = delete;
+		HSDataset& operator=(HSDataset&&) /*noexcept*/;
+
+		size_t numEstimBatches() const;
+		size_t numSents() const;
+		size_t numTokens() const;
+
+		size_t getBatchSize() const { return batchSize; }
+		size_t getWindowSize() const { return windowSize; }
+
+		void reset();
+		size_t next(int32_t* in, int32_t* out, float* lmLProbs, uint32_t* outNgramNode);
+		size_t next(int64_t* in, int64_t* out, float* lmLProbs, int64_t* outNgramNode);
+
+		size_t vocabSize() const { return vocabToToken.size(); }
+		size_t ngramNodeSize() const;
+		const MorphemeRaw& vocabInfo(uint32_t vocab) const;
+		std::u16string vocabForm(uint32_t vocab) const;
+	};
+}
