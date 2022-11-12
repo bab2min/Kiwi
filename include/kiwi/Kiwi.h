@@ -653,7 +653,7 @@ namespace kiwi
 						break;
 					}
 				}
-				if (!m) continue;
+				if (!m || f.form.empty()) continue;
 				std::u16string input = joinHangul(f.form);
 				std::u16string output = repl(input);
 				if (input == output) continue;

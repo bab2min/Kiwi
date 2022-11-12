@@ -32,61 +32,12 @@ inline testing::AssertionResult testTokenization(Kiwi& kiwi, const std::u16strin
 	}
 }
 
-TEST(KiwiCpp, HSDataset)
-{
-	KiwiBuilder kw{ MODEL_PATH, 0, BuildOption::default_, };
-	std::vector<std::string> data;
-	data.emplace_back(MODEL_PATH "/w_email.txt");
-
-	static constexpr size_t batchSize = 32, windowSize = 8;
-
-	std::array<int32_t, batchSize * windowSize> in;
-	std::array<int32_t, batchSize> out;
-	std::array<float, batchSize> lmLProbs;
-	std::array<uint32_t, batchSize> outNgramBase;
-	
-	for (size_t w : {1, 2, 4})
-	{
-		std::cout << w << std::endl;
-		auto dataset = kw.makeHSDataset(data, batchSize, windowSize, w, 0.);
-		for (size_t i = 0; i < 2; ++i)
-		{
-			size_t totalBatchCnt = 0, totalTokenCnt = 0, s;
-			dataset.reset();
-			while (s = dataset.next(in.data(), out.data(), lmLProbs.data(), outNgramBase.data()))
-			{
-				EXPECT_LE(s, batchSize);
-				totalTokenCnt += s;
-				totalBatchCnt++;
-			}
-			EXPECT_TRUE(std::max(dataset.numEstimBatches(), (size_t)w) - w <= totalBatchCnt && totalBatchCnt <= dataset.numEstimBatches() + w);
-			EXPECT_EQ(dataset.numTokens(), totalTokenCnt);
-		}
-	}
-}
-
 Kiwi& reuseKiwiInstance()
 {
 	static Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 0, BuildOption::default_, }.build();
 	return kiwi;
 }
 
-TEST(KiwiCpp, SentenceBoundaryErrors)
-{
-	Kiwi& kiwi = reuseKiwiInstance();
-
-	for (auto str : { 
-		u8"실패할까봐",
-		u8"집에 갈까 봐요",
-		u8"너무 낮지 싶어요",
-		u8"계속 할까 싶다",
-		})
-	{
-		TokenResult res;
-		std::vector<std::pair<size_t, size_t>> sentRanges = kiwi.splitIntoSents(str, Match::allWithNormalizing, &res);
-		EXPECT_EQ(sentRanges.size(), 1);
-	}
-}
 
 TEST(KiwiCpp, InitClose)
 {
@@ -134,6 +85,56 @@ TEST(KiwiCpp, SingleResult)
 	{
 		auto res = kiwi.analyze(s, Match::allWithNormalizing);
 		EXPECT_GT(res.first.size(), 1);
+	}
+}
+
+TEST(KiwiCpp, HSDataset)
+{
+	KiwiBuilder kw{ MODEL_PATH, 0, BuildOption::default_, };
+	std::vector<std::string> data;
+	data.emplace_back(MODEL_PATH "/w_email.txt");
+
+	static constexpr size_t batchSize = 32, windowSize = 8;
+
+	std::array<int32_t, batchSize* windowSize> in;
+	std::array<int32_t, batchSize> out;
+	std::array<float, batchSize> lmLProbs;
+	std::array<uint32_t, batchSize> outNgramBase;
+
+	for (size_t w : {1, 2, 4})
+	{
+		//std::cout << w << std::endl;
+		auto dataset = kw.makeHSDataset(data, batchSize, windowSize, w, 0.);
+		for (size_t i = 0; i < 2; ++i)
+		{
+			size_t totalBatchCnt = 0, totalTokenCnt = 0, s;
+			dataset.reset();
+			while (s = dataset.next(in.data(), out.data(), lmLProbs.data(), outNgramBase.data()))
+			{
+				EXPECT_LE(s, batchSize);
+				totalTokenCnt += s;
+				totalBatchCnt++;
+			}
+			EXPECT_TRUE(std::max(dataset.numEstimBatches(), (size_t)w) - w <= totalBatchCnt && totalBatchCnt <= dataset.numEstimBatches() + w);
+			EXPECT_EQ(dataset.numTokens(), totalTokenCnt);
+		}
+	}
+}
+
+TEST(KiwiCpp, SentenceBoundaryErrors)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+
+	for (auto str : {
+		u8"실패할까봐",
+		u8"집에 갈까 봐요",
+		u8"너무 낮지 싶어요",
+		u8"계속 할까 싶다",
+		})
+	{
+		TokenResult res;
+		std::vector<std::pair<size_t, size_t>> sentRanges = kiwi.splitIntoSents(str, Match::allWithNormalizing, &res);
+		EXPECT_EQ(sentRanges.size(), 1);
 	}
 }
 
