@@ -32,6 +32,7 @@
     <ClInclude Include="include\kiwi\FixedVector.hpp" />
     <ClInclude Include="include\kiwi\Form.h" />
     <ClInclude Include="include\kiwi\FrozenTrie.h" />
+    <ClInclude Include="include\kiwi\HSDataset.h" />
     <ClInclude Include="include\kiwi\Joiner.h" />
     <ClInclude Include="include\kiwi\Kiwi.h" />
     <ClInclude Include="include\kiwi\Knlm.h" />
@@ -105,6 +106,7 @@
     </ClCompile>
     <ClCompile Include="src\ArchUtils.cpp" />
     <ClCompile Include="src\Combiner.cpp" />
+    <ClCompile Include="src\HSDataset.cpp" />
     <ClCompile Include="src\Joiner.cpp" />
     <ClCompile Include="src\search.cpp" />
     <ClCompile Include="src\TagUtils.cpp" />
