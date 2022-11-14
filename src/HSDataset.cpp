@@ -73,7 +73,7 @@ size_t HSDataset::numValidTokensInSent(size_t sentId) const
 }
 
 template<class InTy, class OutTy, class LmTy, class NgramTy>
-size_t HSDataset::_next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode)
+size_t HSDataset::_next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode, float& restLmOut, uint32_t& restLmCntOut)
 {
 	while (passedSents < numSents() && futures.size() < workers->size())
 	{
@@ -127,7 +127,18 @@ size_t HSDataset::_next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode)
 					for (size_t i = 1; i < tokens.size(); ++i)
 					{
 						int32_t v = tokenToVocab[tokens[i]];
-						if (v == nonVocab) continue;
+						if (v == nonVocab)
+						{
+							size_t r = local.outData.size() / batchSize;
+							if (local.restLmLProbsData.size() <= r)
+							{
+								local.restLmLProbsData.resize(r + 1);
+								local.restLmLProbsCntData.resize(r + 1);
+							}
+							local.restLmLProbsData[r] += local.lmLProbsBuf[i];
+							local.restLmLProbsCntData[r] += 1;
+							continue;
+						}
 						std::copy(history.begin(), history.end(), std::back_inserter(local.inData));
 						local.outData.emplace_back(v);
 						local.lmLProbsData.emplace_back(local.lmLProbsBuf[i]);
@@ -135,6 +146,13 @@ size_t HSDataset::_next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode)
 
 						history.pop_front();
 						history.push_back(v);
+					}
+
+					size_t r = local.outData.size() / batchSize;
+					if (local.restLmLProbsData.size() <= r)
+					{
+						local.restLmLProbsData.resize(r + 1);
+						local.restLmLProbsCntData.resize(r + 1);
 					}
 				}
 				return localId;
@@ -173,22 +191,26 @@ size_t HSDataset::_next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode)
 	std::copy(l.outData.begin(), l.outData.begin() + rest, out);
 	std::copy(l.lmLProbsData.begin(), l.lmLProbsData.begin() + rest, lmLProbs);
 	std::copy(l.outNgramNodeData.begin(), l.outNgramNodeData.begin() + rest, outNgramNode);
+	restLmOut = l.restLmLProbsData.front();
+	restLmCntOut = l.restLmLProbsCntData.front();
 
 	l.inData.erase(l.inData.begin(), l.inData.begin() + rest * windowSize);
 	l.outData.erase(l.outData.begin(), l.outData.begin() + rest);
 	l.lmLProbsData.erase(l.lmLProbsData.begin(), l.lmLProbsData.begin() + rest);
 	l.outNgramNodeData.erase(l.outNgramNodeData.begin(), l.outNgramNodeData.begin() + rest);
+	l.restLmLProbsData.pop_front();
+	l.restLmLProbsCntData.pop_front();
 	return rest;
 }
 
-size_t HSDataset::next(int32_t* in, int32_t* out, float* lmLProbs, uint32_t* outNgramNode)
+size_t HSDataset::next(int32_t* in, int32_t* out, float* lmLProbs, uint32_t* outNgramNode, float& restLmOut, uint32_t& restLmCntOut)
 {
-	return _next(in, out, lmLProbs, outNgramNode);
+	return _next(in, out, lmLProbs, outNgramNode, restLmOut, restLmCntOut);
 }
 
-size_t HSDataset::next(int64_t* in, int64_t* out, float* lmLProbs, int64_t* outNgramNode)
+size_t HSDataset::next(int64_t* in, int64_t* out, float* lmLProbs, int64_t* outNgramNode, float& restLmOut, uint32_t& restLmCntOut)
 {
-	return _next(in, out, lmLProbs, outNgramNode);
+	return _next(in, out, lmLProbs, outNgramNode, restLmOut, restLmCntOut);
 }
 
 size_t HSDataset::ngramNodeSize() const

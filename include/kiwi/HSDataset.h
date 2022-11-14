@@ -38,6 +38,8 @@ namespace kiwi
 			Deque<int32_t> outData;
 			Deque<float> lmLProbsData;
 			Deque<uint32_t> outNgramNodeData;
+			Deque<float> restLmLProbsData;
+			Deque<uint32_t> restLmLProbsCntData;
 		};
 
 		static constexpr int32_t nonVocab = -1;
@@ -62,7 +64,7 @@ namespace kiwi
 		size_t numValidTokensInSent(size_t sentId) const;
 
 		template<class InTy, class OutTy, class LmTy, class NgramTy>
-		size_t _next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode);
+		size_t _next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode, float& restLmOut, uint32_t& restLmCntOut);
 
 	public:
 		HSDataset(size_t _batchSize = 0, size_t _windowSize = 0, size_t _workers = 0, double _dropoutProb = 0);
@@ -80,8 +82,8 @@ namespace kiwi
 		size_t getWindowSize() const { return windowSize; }
 
 		void reset();
-		size_t next(int32_t* in, int32_t* out, float* lmLProbs, uint32_t* outNgramNode);
-		size_t next(int64_t* in, int64_t* out, float* lmLProbs, int64_t* outNgramNode);
+		size_t next(int32_t* in, int32_t* out, float* lmLProbs, uint32_t* outNgramNode, float& restLmOut, uint32_t& restLmCntOut);
+		size_t next(int64_t* in, int64_t* out, float* lmLProbs, int64_t* outNgramNode, float& restLmOut, uint32_t& restLmCntOut);
 
 		size_t vocabSize() const { return vocabToToken.size(); }
 		size_t ngramNodeSize() const;
