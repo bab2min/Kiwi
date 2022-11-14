@@ -4,9 +4,9 @@
 using namespace kiwi;
 
 HSDataset::HSDataset(size_t _batchSize, size_t _windowSize, size_t _workers, double _dropoutProb)
-	: workers{ make_unique<utils::ThreadPool>(_workers) },
+	: workers{ _workers ? make_unique<utils::ThreadPool>(_workers) : nullptr },
 	dropout{ {1 - _dropoutProb * 3, _dropoutProb, _dropoutProb, _dropoutProb} }, 
-	locals(workers->size()),
+	locals( _workers ? workers->size() : 1),
 	batchSize{ _batchSize },
 	windowSize{ _windowSize }
 {
@@ -58,6 +58,8 @@ void HSDataset::reset()
 		l.outData.clear();
 		l.lmLProbsData.clear();
 		l.outNgramNodeData.clear();
+		l.restLmLProbsData.clear();
+		l.restLmLProbsCntData.clear();
 	}
 }
 
@@ -75,113 +77,138 @@ size_t HSDataset::numValidTokensInSent(size_t sentId) const
 template<class InTy, class OutTy, class LmTy, class NgramTy>
 size_t HSDataset::_next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode, float& restLmOut, uint32_t& restLmCntOut)
 {
-	while (passedSents < numSents() && futures.size() < workers->size())
+	const auto& prepareNext = [&](size_t, size_t localId, size_t sentFirst, size_t sentLast)
 	{
-		size_t sentCount = 0, tokenCount = locals[passedWorkItems % workers->size()].outData.size();
-		while (tokenCount < batchSize && passedSents + sentCount < numSents())
+		auto& local = locals[localId];
+		auto& tokens = local.tokenBuf;
+		tokens.reserve(sents.get()[shuffledIdx[sentFirst]].size());
+		for (size_t s = sentFirst; s < sentLast; ++s)
 		{
-			tokenCount += numValidTokensInSent(shuffledIdx[passedSents + sentCount++]) - 1;
-		}
-		
-		if (sentCount > 0)
-		{
-			futures.emplace_back(workers->enqueue([&](size_t, size_t localId, size_t sentFirst, size_t sentLast)
+			auto sent = sents.get()[shuffledIdx[s]];
+			tokens.clear();
+			tokens.emplace_back(sent[0]);
+			for (auto p = sent.begin() + 1; p != sent.end() - 1; ++p)
 			{
-				auto& local = locals[localId];
-				auto& tokens = local.tokenBuf;
-				tokens.reserve(sents.get()[shuffledIdx[sentFirst]].size());
-				for (size_t s = sentFirst; s < sentLast; ++s)
+				auto t = *p;
+				switch (dropout(local.rng))
 				{
-					auto sent = sents.get()[shuffledIdx[s]];
-					tokens.clear();
-					tokens.emplace_back(sent[0]);
-					for (auto p = sent.begin() + 1; p != sent.end() - 1; ++p)
-					{
-						auto t = *p;
-						switch (dropout(local.rng))
-						{
-						case 0: // no dropout
-							tokens.emplace_back(t);
-							break;
-						case 1: // replacement
-							tokens.emplace_back(getDefaultMorphemeId((*morphemes)[t].tag));
-							break;
-						case 2: // deletion
-							break;
-						case 3: // insertion
-							tokens.emplace_back(getDefaultMorphemeId((*morphemes)[t].tag));
-							tokens.emplace_back(t);
-							break;
-						}
-					}
-					tokens.emplace_back(sent[sent.size() - 1]);
+				case 0: // no dropout
+					tokens.emplace_back(t);
+					break;
+				case 1: // replacement
+					tokens.emplace_back(getDefaultMorphemeId((*morphemes)[t].tag));
+					break;
+				case 2: // deletion
+					break;
+				case 3: // insertion
+					tokens.emplace_back(getDefaultMorphemeId((*morphemes)[t].tag));
+					tokens.emplace_back(t);
+					break;
+				}
+			}
+			tokens.emplace_back(sent[sent.size() - 1]);
 
-					local.lmLProbsBuf.resize(tokens.size());
-					local.outNgramNodeBuf.resize(tokens.size());
-					knlm->evaluate(tokens.begin(), tokens.end(), local.lmLProbsBuf.begin(), local.outNgramNodeBuf.begin());
+			local.lmLProbsBuf.resize(tokens.size());
+			local.outNgramNodeBuf.resize(tokens.size());
+			knlm->evaluate(tokens.begin(), tokens.end(), local.lmLProbsBuf.begin(), local.outNgramNodeBuf.begin());
 
-					auto& history = local.historyBuf;
-					history.clear();
-					history.resize(windowSize, -1);
-					history.back() = tokenToVocab[tokens[0]];
-					for (size_t i = 1; i < tokens.size(); ++i)
-					{
-						int32_t v = tokenToVocab[tokens[i]];
-						if (v == nonVocab)
-						{
-							size_t r = local.outData.size() / batchSize;
-							if (local.restLmLProbsData.size() <= r)
-							{
-								local.restLmLProbsData.resize(r + 1);
-								local.restLmLProbsCntData.resize(r + 1);
-							}
-							local.restLmLProbsData[r] += local.lmLProbsBuf[i];
-							local.restLmLProbsCntData[r] += 1;
-							continue;
-						}
-						std::copy(history.begin(), history.end(), std::back_inserter(local.inData));
-						local.outData.emplace_back(v);
-						local.lmLProbsData.emplace_back(local.lmLProbsBuf[i]);
-						local.outNgramNodeData.emplace_back(local.outNgramNodeBuf[i]);
-
-						history.pop_front();
-						history.push_back(v);
-					}
-
+			auto& history = local.historyBuf;
+			history.clear();
+			history.resize(windowSize, -1);
+			history.back() = tokenToVocab[tokens[0]];
+			for (size_t i = 1; i < tokens.size(); ++i)
+			{
+				int32_t v = tokenToVocab[tokens[i]];
+				if (v == nonVocab)
+				{
 					size_t r = local.outData.size() / batchSize;
 					if (local.restLmLProbsData.size() <= r)
 					{
 						local.restLmLProbsData.resize(r + 1);
 						local.restLmLProbsCntData.resize(r + 1);
 					}
+					local.restLmLProbsData[r] += local.lmLProbsBuf[i];
+					local.restLmLProbsCntData[r] += 1;
+					continue;
 				}
-				return localId;
-			}, passedWorkItems++ % workers->size(), passedSents, passedSents + sentCount));
-			passedSents += sentCount;
+				std::copy(history.begin(), history.end(), std::back_inserter(local.inData));
+				local.outData.emplace_back(v);
+				local.lmLProbsData.emplace_back(local.lmLProbsBuf[i]);
+				local.outNgramNodeData.emplace_back(local.outNgramNodeBuf[i]);
+
+				history.pop_front();
+				history.push_back(v);
+			}
+
+			size_t r = local.outData.size() / batchSize;
+			if (local.restLmLProbsData.size() <= r)
+			{
+				local.restLmLProbsData.resize(r + 1);
+				local.restLmLProbsCntData.resize(r + 1);
+			}
+		}
+		return localId;
+	};
+
+	size_t localId;
+	if (workers)
+	{
+		while (passedSents < numSents() && futures.size() < workers->size())
+		{
+			size_t sentCount = 0, tokenCount = locals[passedWorkItems % workers->size()].outData.size();
+			while (tokenCount < batchSize && passedSents + sentCount < numSents())
+			{
+				tokenCount += numValidTokensInSent(shuffledIdx[passedSents + sentCount++]) - 1;
+			}
+
+			if (sentCount > 0)
+			{
+				futures.emplace_back(workers->enqueue(prepareNext, passedWorkItems++ % workers->size(), passedSents, passedSents + sentCount));
+				passedSents += sentCount;
+			}
+			else
+			{
+				futures.emplace_back(passedWorkItems++ % workers->size());
+			}
+		}
+
+		if (futures.empty())
+		{
+			for (localId = 0; localId < locals.size(); ++localId)
+			{
+				if (!locals[localId].outData.empty()) break;
+			}
+
+			if (localId >= locals.size())
+			{
+				return 0;
+			}
 		}
 		else
 		{
-			futures.emplace_back(passedWorkItems++ % workers->size());
-		}
-	}
-	
-	size_t localId;
-	if (futures.empty())
-	{
-		for (localId = 0; localId < locals.size(); ++localId)
-		{
-			if (!locals[localId].outData.empty()) break;
-		}
-
-		if (localId >= locals.size())
-		{
-			return 0;
+			localId = futures.front().get();
+			futures.pop_front();
 		}
 	}
 	else
 	{
-		localId = futures.front().get();
-		futures.pop_front();
+		if (passedSents < numSents())
+		{
+			size_t sentCount = 0, tokenCount = locals[0].outData.size();
+			while (tokenCount < batchSize && passedSents + sentCount < numSents())
+			{
+				tokenCount += numValidTokensInSent(shuffledIdx[passedSents + sentCount++]) - 1;
+			}
+
+			if (sentCount > 0)
+			{
+				prepareNext(0, 0, passedSents, passedSents + sentCount);
+				passedSents += sentCount;
+			}
+		}
+		localId = 0;
+
+		if (locals[0].outData.empty()) return 0;
 	}
 
 	auto& l = locals[localId];
