@@ -119,6 +119,36 @@ TEST(KiwiCpp, HSDataset)
 			EXPECT_EQ(dataset.numTokens(), totalTokenCnt);
 		}
 	}
+
+	HSDataset trainset, devset;
+	trainset = kw.makeHSDataset(data, batchSize, windowSize, 1, 0., {}, 0.1, &devset);
+	for (size_t i = 0; i < 2; ++i)
+	{
+		{
+			size_t totalBatchCnt = 0, totalTokenCnt = 0, s;
+			trainset.reset();
+			while (s = trainset.next(in.data(), out.data(), lmLProbs.data(), outNgramBase.data()))
+			{
+				EXPECT_LE(s, batchSize);
+				totalTokenCnt += s;
+				totalBatchCnt++;
+			}
+			EXPECT_TRUE(std::max(trainset.numEstimBatches(), (size_t)1) - 1 <= totalBatchCnt && totalBatchCnt <= trainset.numEstimBatches() + 1);
+			EXPECT_EQ(trainset.numTokens(), totalTokenCnt);
+		}
+		{
+			size_t totalBatchCnt = 0, totalTokenCnt = 0, s;
+			devset.reset();
+			while (s = devset.next(in.data(), out.data(), lmLProbs.data(), outNgramBase.data()))
+			{
+				EXPECT_LE(s, batchSize);
+				totalTokenCnt += s;
+				totalBatchCnt++;
+			}
+			EXPECT_TRUE(std::max(devset.numEstimBatches(), (size_t)1) - 1 <= totalBatchCnt && totalBatchCnt <= devset.numEstimBatches() + 1);
+			EXPECT_EQ(devset.numTokens(), totalTokenCnt);
+		}
+	}
 }
 
 TEST(KiwiCpp, SentenceBoundaryErrors)

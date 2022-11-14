@@ -469,7 +469,7 @@ namespace kiwi
 
 		MorphemeMap restoreMorphemeMap() const;
 
-		void addCorpusTo(RaggedVector<uint16_t>& out, std::istream& is, MorphemeMap& morphMap) const;
+		void addCorpusTo(RaggedVector<uint16_t>& out, std::istream& is, MorphemeMap& morphMap, double splitRatio = 0, RaggedVector<uint16_t>* splitOut = nullptr) const;
 		void updateForms();
 		void updateMorphemes();
 
@@ -701,7 +701,9 @@ namespace kiwi
 		HSDataset makeHSDataset(const std::vector<std::string>& inputPathes, 
 			size_t batchSize, size_t windowSize, size_t numWorkers, 
 			double dropoutProb = 0,
-			const TokenFilter& tokenFilter = {}
+			const TokenFilter& tokenFilter = {},
+			double splitRatio = 0,
+			HSDataset* splitDataset = nullptr
 		) const;
 	};
 }

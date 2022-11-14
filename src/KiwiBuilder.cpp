@@ -361,9 +361,13 @@ auto KiwiBuilder::restoreMorphemeMap() const -> MorphemeMap
 	return ret;
 }
 
-void KiwiBuilder::addCorpusTo(RaggedVector<uint16_t>& out, std::istream& is, KiwiBuilder::MorphemeMap& morphMap) const
+void KiwiBuilder::addCorpusTo(RaggedVector<uint16_t>& out, std::istream& is, KiwiBuilder::MorphemeMap& morphMap,
+	double splitRatio,
+	RaggedVector<uint16_t>* splitOut
+) const
 {
 	Vector<uint16_t> wids;
+	double splitCnt = 0;
 	size_t numLine = 0;
 	string line;
 	while (getline(is, line))
@@ -374,11 +378,14 @@ void KiwiBuilder::addCorpusTo(RaggedVector<uint16_t>& out, std::istream& is, Kiw
 		if (!wstr.empty() && wstr.back() == '\n') wstr.pop_back();
 		if (wstr.empty() && wids.size() > 1)
 		{
-			out.emplace_back();
-			out.add_data(0);
-			out.insert_data(wids.begin(), wids.end());
-			out.add_data(1);
+			splitCnt += splitRatio;
+			auto& o = splitOut && splitCnt >= 1 ? *splitOut : out;
+			o.emplace_back();
+			o.add_data(0);
+			o.insert_data(wids.begin(), wids.end());
+			o.add_data(1);
 			wids.clear();
+			splitCnt = std::fmod(splitCnt, 1.);
 			continue;
 		}
 		auto fields = split(wstr, u'\t');
@@ -1775,7 +1782,9 @@ vector<WordInfo> KiwiBuilder::extractAddWords(const U16MultipleReader& reader, s
 HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes, 
 	size_t batchSize, size_t windowSize, size_t numWorkers, 
 	double dropoutProb,
-	const TokenFilter& tokenFilter
+	const TokenFilter& tokenFilter,
+	double splitRatio,
+	HSDataset* splitDataset
 ) const
 {
 	auto realMorph = restoreMorphemeMap();
@@ -1784,12 +1793,28 @@ HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes,
 	dataset.knlm = langMdl.knlm;
 	dataset.morphemes = &morphemes;
 	dataset.forms = &forms;
+
+	if (splitDataset)
+	{
+		*splitDataset = HSDataset{ batchSize, windowSize, numWorkers, dropoutProb };
+		splitDataset->knlm = langMdl.knlm;
+		splitDataset->morphemes = &morphemes;
+		splitDataset->forms = &forms;
+	}
+
 	for (auto& path : inputPathes)
 	{
 		ifstream ifs;
-		addCorpusTo(sents, openFile(ifs, path), realMorph);
+		addCorpusTo(sents, openFile(ifs, path), realMorph, splitRatio, splitDataset ? &splitDataset->sents.get() : nullptr);
 	}
 	size_t tokenSize = sents.raw().empty() ? 0 : *std::max_element(sents.raw().begin(), sents.raw().end()) + 1;
+
+	if (splitDataset)
+	{
+		auto& sents = splitDataset->sents.get();
+		tokenSize = std::max(tokenSize, sents.raw().empty() ? (size_t)0 : *std::max_element(sents.raw().begin(), sents.raw().end()) + 1);
+	}
+
 	for (size_t i = 0; i < tokenSize; ++i)
 	{
 		if (tokenFilter && !tokenFilter(joinHangul(forms[morphemes[i].kform].form), morphemes[i].tag))
@@ -1804,6 +1829,16 @@ HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes,
 	for (size_t i = 0; i < sents.size(); ++i)
 	{
 		dataset.totalTokens += dataset.numValidTokensInSent(i) - 1;
+	}
+	
+	if (splitDataset)
+	{
+		splitDataset->tokenToVocab = dataset.tokenToVocab;
+		splitDataset->vocabToToken = dataset.vocabToToken;
+		for (size_t i = 0; i < splitDataset->sents.get().size(); ++i)
+		{
+			splitDataset->totalTokens += splitDataset->numValidTokensInSent(i) - 1;
+		}
 	}
 	return dataset;
 }
