@@ -92,7 +92,7 @@ TEST(KiwiCpp, HSDataset)
 {
 	KiwiBuilder kw{ MODEL_PATH, 0, BuildOption::default_, };
 	std::vector<std::string> data;
-	data.emplace_back(MODEL_PATH "/w_email.txt");
+	data.emplace_back(MODEL_PATH "/testHSDataset.txt");
 
 	static constexpr size_t batchSize = 32, windowSize = 8;
 
@@ -122,7 +122,7 @@ TEST(KiwiCpp, HSDataset)
 		}
 	}
 
-	auto& tokenFilter = [](const std::u16string& form, POSTag tag)
+	auto tokenFilter = [](const std::u16string& form, POSTag tag)
 	{
 		if (isJClass(tag) || isEClass(tag)) return false;
 		return true;
