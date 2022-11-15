@@ -100,8 +100,10 @@ TEST(KiwiCpp, HSDataset)
 	std::array<int32_t, batchSize> out;
 	std::array<float, batchSize> lmLProbs;
 	std::array<uint32_t, batchSize> outNgramBase;
+	float restLm;
+	uint32_t restLmCnt;
 
-	for (size_t w : {1, 2, 4})
+	for (size_t w : {0, 1, 2, 4})
 	{
 		//std::cout << w << std::endl;
 		auto dataset = kw.makeHSDataset(data, batchSize, windowSize, w, 0.);
@@ -109,7 +111,7 @@ TEST(KiwiCpp, HSDataset)
 		{
 			size_t totalBatchCnt = 0, totalTokenCnt = 0, s;
 			dataset.reset();
-			while (s = dataset.next(in.data(), out.data(), lmLProbs.data(), outNgramBase.data()))
+			while (s = dataset.next(in.data(), out.data(), lmLProbs.data(), outNgramBase.data(), restLm, restLmCnt))
 			{
 				EXPECT_LE(s, batchSize);
 				totalTokenCnt += s;
@@ -120,14 +122,20 @@ TEST(KiwiCpp, HSDataset)
 		}
 	}
 
+	auto& tokenFilter = [](const std::u16string& form, POSTag tag)
+	{
+		if (isJClass(tag) || isEClass(tag)) return false;
+		return true;
+	};
+
 	HSDataset trainset, devset;
-	trainset = kw.makeHSDataset(data, batchSize, windowSize, 1, 0., {}, 0.1, &devset);
+	trainset = kw.makeHSDataset(data, batchSize, windowSize, 1, 0., tokenFilter, 0.1, &devset);
 	for (size_t i = 0; i < 2; ++i)
 	{
 		{
 			size_t totalBatchCnt = 0, totalTokenCnt = 0, s;
 			trainset.reset();
-			while (s = trainset.next(in.data(), out.data(), lmLProbs.data(), outNgramBase.data()))
+			while (s = trainset.next(in.data(), out.data(), lmLProbs.data(), outNgramBase.data(), restLm, restLmCnt))
 			{
 				EXPECT_LE(s, batchSize);
 				totalTokenCnt += s;
@@ -139,7 +147,7 @@ TEST(KiwiCpp, HSDataset)
 		{
 			size_t totalBatchCnt = 0, totalTokenCnt = 0, s;
 			devset.reset();
-			while (s = devset.next(in.data(), out.data(), lmLProbs.data(), outNgramBase.data()))
+			while (s = devset.next(in.data(), out.data(), lmLProbs.data(), outNgramBase.data(), restLm, restLmCnt))
 			{
 				EXPECT_LE(s, batchSize);
 				totalTokenCnt += s;
