@@ -24,6 +24,7 @@ namespace kiwi
 		struct FeedingData
 		{
 			const VocabTy* x = nullptr;
+			const uint32_t* base = nullptr;
 			const float* lmLogProbs = nullptr;
 			size_t len = 0;
 		};
@@ -46,6 +47,11 @@ namespace kiwi
 			-> decltype(((a.min(b) - a.max(b)).exp() + 1).log() + a.max(b))
 		{
 			return ((a.min(b) - a.max(b)).exp() + 1).log() + a.max(b);
+		}
+
+		inline float logAddExp(float a, float b)
+		{
+			return std::log(std::exp(std::min(a, b) - std::max(a, b)) + 1) + std::max(a, b);
 		}
 
 		/**
@@ -74,14 +80,27 @@ namespace kiwi
 			Vector<VocabTy> vocabs;
 			Eigen::ArrayXf logits;
 			Vector<uint8_t> vocabValidness;
+			size_t baseSize;
 			bool skipEmptyWords = false;
 
 			static constexpr size_t gradientBlockSize = 128;
 			static constexpr float lmInitialBias = 10;
+			static constexpr size_t updateInterval = 32;
+			float baseConfidL2Reg = 5e-4;
 			float lmRegularizingLimit = 0.333;
 
-		private:
+		public:
+			Eigen::VectorBlock<Eigen::ArrayXf> getBaseConfidences()
+			{
+				return logits.tail(baseSize);
+			}
 
+			Eigen::VectorBlock<const Eigen::ArrayXf> getBaseConfidences() const
+			{
+				return logits.tail(baseSize);
+			}
+
+		private:
 			/**
 			* log P(W|X) = log(mean_i (softmax_W(Theta_X_i) + softmax_O(Theta_X_i) * LM(W|X)) )
 			*
@@ -91,18 +110,21 @@ namespace kiwi
 			*
 			* assert x[0] == bosToken and x[len - 1] == eosToken
 			*/
-			float accumulateGradientExceptEmptyWords(const VocabTy* x, const float* lmLogProbs, size_t len, Eigen::ArrayXf& grad, Vector<uint8_t>& updatedMask) const
+			float accumulateGradientExceptEmptyWords(const VocabTy* x, const uint32_t* base, const float* lmLogProbs, size_t len, Eigen::ArrayXf& grad, Vector<uint8_t>& updatedMask) const
 			{
 				float ret = 0;
 				Vector<VocabTy> validX;
+				Vector<uint32_t> validBase;
 				Vector<float> validLProbs;
 				validX.emplace_back(x[0]);
+				validBase.emplace_back(base[0]);
 				validLProbs.emplace_back(lmLogProbs[0]);
 				for (size_t i = 1; i < len - 1; ++i)
 				{
 					if (vocabValidness[x[i]])
 					{
 						validX.emplace_back(x[i]);
+						validBase.emplace_back(base[i]);
 						validLProbs.emplace_back(lmLogProbs[i]);
 					}
 					else
@@ -111,6 +133,7 @@ namespace kiwi
 					}
 				}
 				validX.emplace_back(x[len - 1]);
+				validBase.emplace_back(base[len - 1]);
 				validLProbs.emplace_back(lmLogProbs[len - 1]);
 
 				if (validX.size() <= 2)
@@ -119,11 +142,11 @@ namespace kiwi
 				}
 				else
 				{
-					return ret + accumulateGradient(validX.data(), validLProbs.data(), validX.size(), grad, updatedMask);
+					return ret + accumulateGradient(validX.data(), validBase.data(), validLProbs.data(), validX.size(), grad, updatedMask);
 				}
 			}
 
-			float accumulateGradient(const VocabTy* x, const float* lmLogProbs, size_t len, Eigen::ArrayXf& grad, Vector<uint8_t>& updatedMask) const
+			float accumulateGradient(const VocabTy* x, const uint32_t* base, const float* lmLogProbs, size_t len, Eigen::ArrayXf& grad, Vector<uint8_t>& updatedMask) const
 			{
 				const size_t wOffset = skipEmptyWords ? 0 : 1;
 
@@ -141,6 +164,7 @@ namespace kiwi
 				llBuf.fill(-INFINITY);
 				auto llModel = llBuf.template topRows<windowSize>();
 				auto llBase = llBuf.template bottomRows<windowSize>();
+				auto baseConfidences = getBaseConfidences();
 
 				{
 					size_t b = ptrs[bosToken], e = ptrs[bosToken + 1];
@@ -159,26 +183,30 @@ namespace kiwi
 					size_t segSize = e - b;
 					if (segSize > 1)
 					{
-						auto segment = logits.segment(b, segSize);
 						auto buf = lsBuf.segment(bufPtrs[i - 1], bufPtrs[i] - bufPtrs[i - 1]);
-						float logsumSegment = std::log((segment - segment.maxCoeff()).exp().sum());
-						buf = segment - segment.maxCoeff() - logsumSegment;
-
+						buf = logits.segment(b, segSize);
+						auto bufWords = buf.head(buf.size() - 1);
+						//float logsumSegment = std::log((buf - buf.maxCoeff()).exp().sum());
+						//buf -= buf.maxCoeff() + logsumSegment;
+						float logsumWords = std::log((bufWords - bufWords.maxCoeff()).exp().sum()) + bufWords.maxCoeff();
+						buf -= logsumWords;
 						for (size_t j = 1; j <= std::min(windowSize, len - i - 1 - wOffset); ++j)
 						{
 							auto target = x[i + j + wOffset];
+							auto baseConf = (baseSize ? baseConfidences[base[i + j + wOffset]] : 0) + buf[segSize - 1];
+							auto correction = std::log(std::exp(baseConf) + 1);
 							auto it = std::lower_bound(vocabs.data() + b, vocabs.data() + e - 1, target);
 							if (it != vocabs.data() + e - 1 && *it == target)
 							{
 								size_t idx = it - (vocabs.data() + b);
 								bufIdcs[s++] = idx;
-								llModel(windowSize - j, i + j) = buf[idx];
+								llModel(windowSize - j, i + j) = buf[idx] - correction;
 							}
 							else
 							{
 								bufIdcs[s++] = segSize - 1;
 							}
-							llBase(windowSize - j, i + j) = buf[segSize - 1] + lmLogProbs[i + j + wOffset];
+							llBase(windowSize - j, i + j) = baseConf - correction + lmLogProbs[i + j + wOffset];
 						}
 					}
 					else
@@ -194,7 +222,7 @@ namespace kiwi
 				auto sBuf = lsBuf.exp().eval();
 				auto logProbSum = logSumExp(llBuf).eval();
 				auto denom = logProbSum.exp().eval();
-
+				size_t baseGradOffset = grad.size() - baseSize;
 				s = 0;
 				for (size_t i = 1; i < len - 1 - wOffset; ++i)
 				{
@@ -210,44 +238,53 @@ namespace kiwi
 					size_t gb = b / gradientBlockSize;
 					size_t ge = (e + gradientBlockSize - 1) / gradientBlockSize;
 					std::fill(updatedMask.begin() + gb, updatedMask.begin() + ge, 0xFF);
-					for (size_t j = 1; j <= std::min(windowSize, len - i - 1 - wOffset); ++j)
+					size_t j_end = std::min(windowSize, len - i - 1 - wOffset);
+					for (size_t j = 1; j <= j_end; ++j)
 					{
 						auto target = x[i + j + wOffset];
+						auto correctedBuf = buf.eval();
+						if (baseSize) correctedBuf[segSize - 1] *= std::exp(baseConfidences[base[i + j + wOffset]]);
+						correctedBuf /= correctedBuf[segSize - 1] + 1;
 						size_t idx = bufIdcs[s++];
+						auto bf = gradSegment[segSize - 1];
+						gradSegment[segSize - 1] = 0;
 						if (idx < segSize - 1)
 						{
 							onehot[idx] = 1;
-							gradSegment += (buf[idx] / denom[i + j]) * (onehot - buf);
+							gradSegment += (correctedBuf[idx] / denom[i + j]) * (onehot - correctedBuf);
 							onehot[idx] = 0;
 						}
 						onehot[segSize - 1] = 1;
-						gradSegment += (buf[segSize - 1] / denom[i + j] * std::exp(lmLogProbs[i + j + wOffset])) * (onehot - buf);
+						gradSegment += (correctedBuf[segSize - 1] / denom[i + j] * std::exp(lmLogProbs[i + j + wOffset])) * (onehot - correctedBuf);
 						onehot[segSize - 1] = 0;
-					}
 
-					if (buf[segSize - 1] < lmRegularizingLimit)
-					{
-						onehot[segSize - 1] = 1;
-						gradSegment += (onehot - buf) * (lmRegularizingLimit - buf[segSize - 1]) / lmRegularizingLimit;
-						onehot[segSize - 1] = 0;
+						if (baseSize)
+						{
+							grad[baseGradOffset + base[i + j + wOffset]] += gradSegment[segSize - 1];
+							updatedMask[(baseGradOffset + base[i + j + wOffset]) / gradientBlockSize] = 0xFF;
+						}
+						gradSegment[segSize - 1] += bf;
 					}
 				}
 
 				return (logProbSum - std::log((float)windowSize)).sum();
 			}
 
-			float evaluateExceptEmptyWords(const VocabTy* x, const float* lmLogProbs, size_t len) const
+			float evaluateExceptEmptyWords(const VocabTy* x, const uint32_t* base, const float* lmLogProbs, size_t len) const
 			{
 				float ret = 0;
 				Vector<VocabTy> validX;
+				Vector<uint32_t> validBase;
 				Vector<float> validLProbs;
 				validX.emplace_back(x[0]);
+				validBase.emplace_back(base[0]);
 				validLProbs.emplace_back(lmLogProbs[0]);
 				for (size_t i = 1; i < len - 1; ++i)
 				{
 					if (vocabValidness[x[i]])
 					{
 						validX.emplace_back(x[i]);
+						validBase.emplace_back(base[i]);
 						validLProbs.emplace_back(lmLogProbs[i]);
 					}
 					else
@@ -256,6 +293,7 @@ namespace kiwi
 					}
 				}
 				validX.emplace_back(x[len - 1]);
+				validBase.emplace_back(base[len - 1]);
 				validLProbs.emplace_back(lmLogProbs[len - 1]);
 
 				if (validX.size() <= 2)
@@ -264,14 +302,14 @@ namespace kiwi
 				}
 				else
 				{
-					return ret + evaluateAll(validX.data(), validLProbs.data(), validX.size());
+					return ret + evaluateAll(validX.data(), validBase.data(), validLProbs.data(), validX.size());
 				}
 			}
 
 			/**
 			* assert x[0] == bosToken and x[len - 1] == eosToken
 			*/
-			float evaluateAll(const VocabTy* x, const float* lmLogProbs, size_t len) const
+			float evaluateAll(const VocabTy* x, const uint32_t* base, const float* lmLogProbs, size_t len) const
 			{
 				const size_t wOffset = skipEmptyWords ? 0 : 1;
 
@@ -279,6 +317,7 @@ namespace kiwi
 				llBuf.fill(-INFINITY);
 				auto llModel = llBuf.template topRows<windowSize>();
 				auto llBase = llBuf.template bottomRows<windowSize>();
+				auto baseConfidences = getBaseConfidences();
 
 				{
 					size_t b = ptrs[bosToken], e = ptrs[bosToken + 1];
@@ -297,23 +336,25 @@ namespace kiwi
 					size_t segSize = e - b;
 					if (segSize > 1)
 					{
-						auto segment = logits.segment(b, segSize);
-						float logsumSegment = std::log((segment - segment.maxCoeff()).exp().sum());
-						auto buf = (segment - segment.maxCoeff() - logsumSegment).eval();
-
+						auto buf = logits.segment(b, segSize).eval();
+						auto bufWords = buf.head(buf.size() - 1);
+						float logsumWords = std::log((bufWords - bufWords.maxCoeff()).exp().sum()) + bufWords.maxCoeff();
+						buf -= logsumWords;
 						for (size_t j = 1; j <= std::min(windowSize, len - i - 1 - wOffset); ++j)
 						{
 							auto target = x[i + j + wOffset];
+							auto baseConf = (baseSize ? baseConfidences[base[i + j + wOffset]] : 0) + buf[segSize - 1];
+							auto correction = std::log(std::exp(baseConf) + 1);
 							auto it = std::lower_bound(vocabs.data() + b, vocabs.data() + e - 1, target);
 							if (it != vocabs.data() + e - 1 && *it == target)
 							{
 								size_t idx = it - (vocabs.data() + b);
-								llModel(windowSize - j, i + j) = buf[idx];
+								llModel(windowSize - j, i + j) = buf[idx] - correction;
 							}
 							else
 							{
 							}
-							llBase(windowSize - j, i + j) = buf[segSize - 1] + lmLogProbs[i + j + wOffset];
+							llBase(windowSize - j, i + j) = baseConf - correction + lmLogProbs[i + j + wOffset];
 						}
 					}
 					else
@@ -330,9 +371,7 @@ namespace kiwi
 
 
 		public:
-			SkipBigramTrainer()
-			{
-			}
+			SkipBigramTrainer() = default;
 
 			template<class TokenFilter, class PairFilter>
 			SkipBigramTrainer(const RaggedVector<VocabTy>& sents,
@@ -344,8 +383,9 @@ namespace kiwi
 				bool _skipEmptyWords,
 				float _lmRegularizingLimit,
 				float pmiThreshold = 1,
-				size_t maxDataSize = -1)
-				: bosToken{ _bosToken }, skipEmptyWords{ _skipEmptyWords }, lmRegularizingLimit{ _lmRegularizingLimit }
+				size_t maxDataSize = -1,
+				size_t _baseSize = 0)
+				: bosToken{ _bosToken }, skipEmptyWords{ _skipEmptyWords }, lmRegularizingLimit{ _lmRegularizingLimit }, baseSize{ _baseSize }
 			{
 				size_t vocabSize = 0;
 				UnorderedMap<std::pair<VocabTy, VocabTy>, size_t> pairCounter;
@@ -446,7 +486,7 @@ namespace kiwi
 
 				ptrs.reserve(vocabSize + 1);
 				vocabs.reserve(dataSize + vocabSize);
-				logits.resize(dataSize + vocabSize);
+				logits.resize(dataSize + vocabSize + baseSize);
 				logits.setZero();
 				ptrs.emplace_back(0);
 				for (size_t i = 0; i < vocabSize; ++i)
@@ -463,10 +503,10 @@ namespace kiwi
 			/**
 			* assert x[0] == bosToken and x[len - 1] == eosToken
 			*/
-			float evaluate(const VocabTy* x, const float* lmLogProbs, size_t len) const
+			float evaluate(const VocabTy* x, const uint32_t* base, const float* lmLogProbs, size_t len) const
 			{
-				if (skipEmptyWords) return evaluateExceptEmptyWords(x, lmLogProbs, len);
-				else return evaluateAll(x, lmLogProbs, len);
+				if (skipEmptyWords) return evaluateExceptEmptyWords(x, base, lmLogProbs, len);
+				else return evaluateAll(x, base, lmLogProbs, len);
 			}
 
 			TrainContext newContext() const
@@ -477,33 +517,38 @@ namespace kiwi
 				return tc;
 			}
 
-			float update(const VocabTy* x, const float* lmLogProbs, size_t len, float lr, TrainContext& tc)
+			float update(const VocabTy* x, const uint32_t* base, const float* lmLogProbs, size_t len, float lr, TrainContext& tc)
 			{
 				float ll;
-				if (skipEmptyWords) ll = accumulateGradientExceptEmptyWords(x, lmLogProbs, len, tc.grad, tc.updatedMask);
-				else ll = accumulateGradient(x, lmLogProbs, len, tc.grad, tc.updatedMask);
-				size_t b = 0;
-				for (size_t i = 0; i < tc.updatedMask.size() - 1; ++i, b += gradientBlockSize)
+				if (skipEmptyWords) ll = accumulateGradientExceptEmptyWords(x, base, lmLogProbs, len, tc.grad, tc.updatedMask);
+				else ll = accumulateGradient(x, base, lmLogProbs, len, tc.grad, tc.updatedMask);
+				size_t lmSize = (size_t)logits.size() - baseSize;
+				size_t i, b;
+				for (i = 0, b = 0; b < (lmSize & ~(gradientBlockSize - 1)); ++i, b += gradientBlockSize)
 				{
 					if (!tc.updatedMask[i]) continue;
 					logits.template segment<gradientBlockSize>(b) += tc.grad.template segment<gradientBlockSize>(b) * lr;
 					tc.grad.template segment<gradientBlockSize>(b).setZero();
 					tc.updatedMask[i] = 0;
 				}
-				if (tc.updatedMask.back())
+				
+				if (b < lmSize && tc.updatedMask[i])
 				{
-					logits.segment(b, logits.size() - b) += tc.grad.segment(b, logits.size() - b) * lr;
-					tc.grad.segment(b, logits.size() - b);
-					tc.updatedMask.back() = 0;
+					logits.segment(b, lmSize - b) += tc.grad.segment(b, lmSize - b) * lr;
 				}
+
+				logits.segment(lmSize, baseSize) += (logits.segment(lmSize, baseSize) * (-2 * baseConfidL2Reg) + tc.grad.segment(lmSize, baseSize)) * lr;
+				tc.grad.segment(b, (size_t)logits.size() - b).setZero();
+				std::fill(tc.updatedMask.begin() + i, tc.updatedMask.end(), 0);
 				return ll;
 			}
 		
 		private:
 			void update(float lr, TrainContext& tc, std::mutex* mutex)
 			{
-				size_t b = 0;
-				for (size_t i = 0; i < tc.updatedMask.size() - 1; ++i, b += gradientBlockSize)
+				size_t lmSize = (size_t)logits.size() - baseSize;
+				size_t i, b;
+				for (i = 0, b = 0; b < (lmSize & ~(gradientBlockSize - 1)); ++i, b += gradientBlockSize)
 				{
 					if (!tc.updatedMask[i]) continue;
 					
@@ -514,14 +559,45 @@ namespace kiwi
 					tc.grad.template segment<gradientBlockSize>(b).setZero();
 					tc.updatedMask[i] = 0;
 				}
-				if (tc.updatedMask.back())
+				
+				if (b < (size_t)logits.size())
 				{
+					size_t i2 = i, b2 = b;
 					{
-						std::lock_guard<std::mutex> lg{ mutex[tc.updatedMask.size() - 1]};
-						logits.segment(b, logits.size() - b) += tc.grad.segment(b, logits.size() - b) * lr;
+						std::lock_guard<std::mutex> lg{ mutex[i2] };
+						logits.segment(b2, lmSize - b2) += tc.grad.segment(b2, lmSize - b2) * lr;
+						b2 += gradientBlockSize;
+						logits.segment(lmSize, b2 - lmSize) += 
+							(logits.segment(lmSize, b2 - lmSize) * (-2 * baseConfidL2Reg) + tc.grad.segment(lmSize, b2 - lmSize)) * lr;
+						++i2;
 					}
-					tc.grad.segment(b, logits.size() - b).setZero();
-					tc.updatedMask.back() = 0;
+					for (; i2 < tc.updatedMask.size() - 1; ++i2, b2 += gradientBlockSize)
+					{
+						std::lock_guard<std::mutex> lg{ mutex[i2] };
+						if (tc.updatedMask[i2])
+						{
+							logits.template segment<gradientBlockSize>(b2) +=
+								(logits.template segment<gradientBlockSize>(b2) * (-2 * baseConfidL2Reg) + tc.grad.template segment<gradientBlockSize>(b2)) * lr;
+						}
+						else
+						{
+							logits.template segment<gradientBlockSize>(b2) *= 1 - 2 * baseConfidL2Reg * lr;
+						}
+					}
+					{
+						std::lock_guard<std::mutex> lg{ mutex[i2] };
+						if (tc.updatedMask[i2])
+						{
+							logits.segment(b2, (size_t)logits.size() - b2) +=
+								(logits.segment(b2, (size_t)logits.size() - b2) * (-2 * baseConfidL2Reg) + tc.grad.segment(b2, (size_t)logits.size() - b2)) * lr;
+						}
+						else
+						{
+							logits.segment(b2, (size_t)logits.size() - b2) *= 1 - 2 * baseConfidL2Reg * lr;
+						}
+					}
+					tc.grad.segment(b, (size_t)logits.size() - b).setZero();
+					std::fill(tc.updatedMask.begin() + i, tc.updatedMask.end(), 0);
 				}
 			}
 		
@@ -555,7 +631,7 @@ namespace kiwi
 						FeedingData<VocabTy> d = dataFeeder(idx);
 						if (!d.len) return steps;
 						float lr = lrStart * std::max((totalSteps - steps) / (double)totalSteps, 1e-5);
-						float sum = update(d.x, d.lmLogProbs, d.len, lr, tc);
+						float sum = update(d.x, d.base, d.lmLogProbs, d.len, lr, tc);
 						size_t cnt = d.len - 1;
 						llCnt += cnt;
 						llMean += (sum - llMean * cnt) / llCnt;
@@ -577,16 +653,17 @@ namespace kiwi
 			size_t trainMulti(const size_t workers, DataFeeder&& dataFeeder, Observer&& observer, Vector<size_t> sampleIdcs, const size_t totalSteps, const float lrStart)
 			{
 				const size_t items = workers * 1;
-				const size_t updateInterval = 16;
 				float llMean = 0;
 				size_t llCnt = 0;
 				utils::ThreadPool pool{ workers };
 				Vector<std::future<std::tuple<float, size_t, size_t>>> futures;
 				Vector<TrainContext> tc;
 				for (size_t i = 0; i < workers; ++i) tc.emplace_back(newContext());
-				std::unique_ptr<std::mutex[]> mutex = make_unique<std::mutex[]>(tc.back().updatedMask.size());
+				std::unique_ptr<std::mutex[]> mutex = make_unique<std::mutex[]>(tc.back().updatedMask.size() + 1);
+				auto& mutexForGlobal = mutex[tc.back().updatedMask.size()];
 				std::mt19937_64 rng{ 42 };
 
+				size_t prevSteps = 0;
 				for (size_t steps = 0; steps < totalSteps;)
 				{
 					std::shuffle(sampleIdcs.begin(), sampleIdcs.end(), rng);
@@ -597,7 +674,7 @@ namespace kiwi
 
 					for (size_t t = 0; t < items; ++t)
 					{
-						futures.emplace_back(pool.enqueue([&, steps](size_t threadId, size_t itemId)
+						futures.emplace_back(pool.enqueue([&](size_t threadId, size_t itemId)
 						{
 							float localLlMean = 0;
 							size_t localLlCnt = 0;
@@ -607,27 +684,39 @@ namespace kiwi
 								FeedingData<VocabTy> d = dataFeeder(sampleIdcs[i], threadId);
 								if (!d.len) break;
 								float sum;
-								if (skipEmptyWords) sum = accumulateGradientExceptEmptyWords(d.x, d.lmLogProbs, d.len, tc[threadId].grad, tc[threadId].updatedMask);
-								else sum = accumulateGradient(d.x, d.lmLogProbs, d.len, tc[threadId].grad, tc[threadId].updatedMask);
+								if (skipEmptyWords) sum = accumulateGradientExceptEmptyWords(d.x, d.base, d.lmLogProbs, d.len, tc[threadId].grad, tc[threadId].updatedMask);
+								else sum = accumulateGradient(d.x, d.base, d.lmLogProbs, d.len, tc[threadId].grad, tc[threadId].updatedMask);
 								size_t cnt = d.len - 1;
 								localLlCnt += cnt;
 								localLlMean += (sum - localLlMean * cnt) / localLlCnt;
 								if ((localSteps + 1) % updateInterval == 0)
 								{
-									float lr = lrStart * std::max((totalSteps - (steps + localSteps * items)) / (double)totalSteps, 1e-5);
+									float lr = lrStart * std::max((totalSteps - steps) / (double)totalSteps, 1e-5);
 									update(lr, tc[threadId], mutex.get());
 								}
 
 								if (threadId == 0)
 								{
 									ObservingData od;
-									od.prevGlobalStep = steps + localSteps * items;
-									od.globalStep = steps + (localSteps + 1) * items;
+									od.prevGlobalStep = prevSteps;
+									od.globalStep = steps;
+									prevSteps = steps;
 									od.llMeanTotal = llMean;
 									od.cntTotal = llCnt;
 									od.llRecent = sum;
 									od.cntRecent = cnt;
 									observer(od);
+								}
+
+								if ((localSteps + 1) % updateInterval == 0)
+								{
+									std::lock_guard<std::mutex> lg{ mutexForGlobal };
+									llCnt += localLlCnt;
+									llMean += (localLlMean - llMean) * localLlCnt / llCnt;
+									steps += localSteps;
+									localLlMean = 0;
+									localLlCnt = 0;
+									localSteps = 0;
 								}
 							}
 							return std::make_tuple(localLlMean, localLlCnt, localSteps);
