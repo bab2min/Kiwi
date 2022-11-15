@@ -1287,6 +1287,8 @@ size_t KiwiBuilder::loadDictionary(const string& dictPath)
 			throw Exception("[loadUserDictionary] Wrong dictionary format at line " + to_string(lineNo) + " : " + line);
 		}
 
+		while (!fields[0].empty() && fields[0][0] == ' ') fields[0] = fields[0].substr(1);
+
 		if (fields[0].find(' ') != fields[0].npos)
 		{
 			throw Exception("[loadUserDictionary] Form should not contain space. at line " + to_string(lineNo) + " : " + line);
