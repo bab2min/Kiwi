@@ -94,7 +94,7 @@ namespace kiwi
 	{
 		LangModel mdl;
 	public:
-		LmObject(const LangModel& _mdl) : mdl{ _mdl }
+		LmObject(const LangModel& _mdl) : mdl(_mdl)
 		{
 		}
 
