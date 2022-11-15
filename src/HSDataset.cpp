@@ -20,6 +20,8 @@ HSDataset::HSDataset(HSDataset&& o) /*noexcept*/ = default;
 
 HSDataset& HSDataset::operator=(HSDataset&& o) /*noexcept*/ = default;
 
+constexpr int32_t HSDataset::nonVocab;
+
 size_t HSDataset::numSents() const
 {
 	return sents.get().size();
