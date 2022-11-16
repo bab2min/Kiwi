@@ -86,6 +86,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a61f33d684ebe4749c90bc1f4cbcc0b0f"><td class="memItemLeft" align="right" valign="top"><a id="a61f33d684ebe4749c90bc1f4cbcc0b0f"></a>
 const <a class="el" href="structkiwi_1_1lm_1_1Header.html">Header</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>getHeader</b> () const</td></tr>
 <tr class="separator:a61f33d684ebe4749c90bc1f4cbcc0b0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af23c709e681dce6cf743235eac16f6d9"><td class="memItemLeft" align="right" valign="top"><a id="af23c709e681dce6cf743235eac16f6d9"></a>
+virtual ptrdiff_t&#160;</td><td class="memItemRight" valign="bottom"><b>getLowerNode</b> (ptrdiff_t node_idx) const =0</td></tr>
+<tr class="separator:af23c709e681dce6cf743235eac16f6d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a43474faf610866711979a266c5b4e73c"><td class="memItemLeft" align="right" valign="top"><a id="a43474faf610866711979a266c5b4e73c"></a>
+virtual size_t&#160;</td><td class="memItemRight" valign="bottom"><b>nonLeafNodeSize</b> () const =0</td></tr>
+<tr class="separator:a43474faf610866711979a266c5b4e73c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abfd1dace998a8ea5ac2d5ea27b2445aa"><td class="memItemLeft" align="right" valign="top"><a id="abfd1dace998a8ea5ac2d5ea27b2445aa"></a>
 virtual size_t&#160;</td><td class="memItemRight" valign="bottom"><b>llSize</b> () const =0</td></tr>
 <tr class="separator:abfd1dace998a8ea5ac2d5ea27b2445aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -102,6 +108,10 @@ const <a class="el" href="classkiwi_1_1utils_1_1MemoryObject.html">utils::Memory
 template&lt;class InTy , class OutTy &gt; </td></tr>
 <tr class="memitem:aaecb93d9cd0eed052505e6c8a1a36128"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>evaluate</b> (InTy in_first, InTy in_last, OutTy out_first) const</td></tr>
 <tr class="separator:aaecb93d9cd0eed052505e6c8a1a36128"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6edf6dd2b0c6c3197fdc653d8b1b2cdf"><td class="memTemplParams" colspan="2"><a id="a6edf6dd2b0c6c3197fdc653d8b1b2cdf"></a>
+template&lt;class InTy , class OutProbTy , class OutNodeTy &gt; </td></tr>
+<tr class="memitem:a6edf6dd2b0c6c3197fdc653d8b1b2cdf"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>evaluate</b> (InTy in_first, InTy in_last, OutProbTy prob_first, OutNodeTy node_first) const</td></tr>
+<tr class="separator:a6edf6dd2b0c6c3197fdc653d8b1b2cdf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ada7f302f44e4dcc5e105e82df867eb85"><td class="memTemplParams" colspan="2"><a id="ada7f302f44e4dcc5e105e82df867eb85"></a>
 template&lt;class InTy &gt; </td></tr>
 <tr class="memitem:ada7f302f44e4dcc5e105e82df867eb85"><td class="memTemplItemLeft" align="right" valign="top">float&#160;</td><td class="memTemplItemRight" valign="bottom"><b>sum</b> (InTy in_first, InTy in_last, float min_score=-100) const</td></tr>

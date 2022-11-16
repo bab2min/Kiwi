@@ -4,7 +4,5 @@ digraph "Graphical Class Hierarchy"
   edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
   node [fontname="Helvetica",fontsize="10",shape=record];
   rankdir="LR";
-  Node112 [label="_Map",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",tooltip=" "];
-  Node112 -> Node0 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node0 [label="kiwi::utils::ConstAccess\l\< _Map \>",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classkiwi_1_1utils_1_1ConstAccess.html",tooltip=" "];
+  Node0 [label="kiwi::TypoCandidates\l\< u16wrap \>",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classkiwi_1_1TypoCandidates.html",tooltip=" "];
 }

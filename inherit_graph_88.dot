@@ -4,5 +4,7 @@ digraph "Graphical Class Hierarchy"
   edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
   node [fontname="Helvetica",fontsize="10",shape=record];
   rankdir="LR";
-  Node0 [label="kiwi::VoidState\< arch \>",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classkiwi_1_1VoidState.html",tooltip=" "];
+  Node46 [label="ostream",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",tooltip=" "];
+  Node46 -> Node0 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node0 [label="kiwi::utils::omstream",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classkiwi_1_1utils_1_1omstream.html",tooltip=" "];
 }

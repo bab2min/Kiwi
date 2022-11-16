@@ -7,5 +7,8 @@ var searchData=
   ['hassubmatch_66',['HasSubmatch',['../structkiwi_1_1utils_1_1detail_1_1HasSubmatch.html',1,'kiwi::utils::detail']]],
   ['hassubmatch_3c_20_5fvalue_20_3e_67',['HasSubmatch&lt; _Value &gt;',['../structkiwi_1_1utils_1_1detail_1_1HasSubmatch.html',1,'kiwi::utils::detail']]],
   ['hassubmatch_3c_20const_20kiwi_3a_3aform_20_2a_20_3e_68',['HasSubmatch&lt; const kiwi::Form * &gt;',['../structkiwi_1_1utils_1_1detail_1_1HasSubmatch.html',1,'kiwi::utils::detail']]],
-  ['header_69',['Header',['../structkiwi_1_1lm_1_1Header.html',1,'kiwi::lm::Header'],['../structkiwi_1_1sb_1_1Header.html',1,'kiwi::sb::Header']]]
+  ['header_69',['Header',['../structkiwi_1_1lm_1_1Header.html',1,'kiwi::lm::Header'],['../structkiwi_1_1sb_1_1Header.html',1,'kiwi::sb::Header']]],
+  ['hiddenmember_70',['HiddenMember',['../classkiwi_1_1HiddenMember.html',1,'kiwi']]],
+  ['hiddenmember_3c_20kiwi_3a_3araggedvector_3c_20uint16_5ft_20_3e_2c_20sizeof_28vector_3c_20size_5ft_20_3e_29_20_2a2_20_3e_71',['HiddenMember&lt; kiwi::RaggedVector&lt; uint16_t &gt;, sizeof(Vector&lt; size_t &gt;) *2 &gt;',['../classkiwi_1_1HiddenMember.html',1,'kiwi']]],
+  ['hsdataset_72',['HSDataset',['../classkiwi_1_1HSDataset.html',1,'kiwi']]]
 ];
