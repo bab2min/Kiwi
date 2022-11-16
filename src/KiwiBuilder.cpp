@@ -3,6 +3,7 @@
 
 #include <kiwi/Kiwi.h>
 #include <kiwi/Utils.h>
+#include <kiwi/HSDataset.h>
 #include "ArchAvailable.h"
 #include "KTrie.h"
 #include "StrUtils.h"
@@ -360,9 +361,13 @@ auto KiwiBuilder::restoreMorphemeMap() const -> MorphemeMap
 	return ret;
 }
 
-void KiwiBuilder::addCorpusTo(RaggedVector<uint16_t>& out, std::istream& is, KiwiBuilder::MorphemeMap& morphMap)
+void KiwiBuilder::addCorpusTo(RaggedVector<uint16_t>& out, std::istream& is, KiwiBuilder::MorphemeMap& morphMap,
+	double splitRatio,
+	RaggedVector<uint16_t>* splitOut
+) const
 {
 	Vector<uint16_t> wids;
+	double splitCnt = 0;
 	size_t numLine = 0;
 	string line;
 	while (getline(is, line))
@@ -373,11 +378,14 @@ void KiwiBuilder::addCorpusTo(RaggedVector<uint16_t>& out, std::istream& is, Kiw
 		if (!wstr.empty() && wstr.back() == '\n') wstr.pop_back();
 		if (wstr.empty() && wids.size() > 1)
 		{
-			out.emplace_back();
-			out.add_data(0);
-			out.insert_data(wids.begin(), wids.end());
-			out.add_data(1);
+			splitCnt += splitRatio;
+			auto& o = splitOut && splitCnt >= 1 ? *splitOut : out;
+			o.emplace_back();
+			o.add_data(0);
+			o.insert_data(wids.begin(), wids.end());
+			o.add_data(1);
 			wids.clear();
+			splitCnt = std::fmod(splitCnt, 1.);
 			continue;
 		}
 		auto fields = split(wstr, u'\t');
@@ -605,10 +613,11 @@ class SBDataFeeder
 	const RaggedVector<utils::Vid>& sents;
 	const lm::KnLangModelBase* lm = nullptr;
 	Vector<Vector<float>> lmBuf;
+	Vector<Vector<uint32_t>> nodeBuf;
 
 public:
 	SBDataFeeder(const RaggedVector<utils::Vid>& _sents, const lm::KnLangModelBase* _lm, size_t numThreads = 1)
-		: sents{ _sents }, lm{ _lm }, lmBuf(numThreads)
+		: sents{ _sents }, lm{ _lm }, lmBuf(numThreads), nodeBuf(numThreads)
 	{
 	}
 
@@ -619,10 +628,12 @@ public:
 		if (lmBuf[threadId].size() < ret.len)
 		{
 			lmBuf[threadId].resize(ret.len);
+			nodeBuf[threadId].resize(ret.len);
 		}
 		ret.x = &sents[i][0];
-		lm->evaluate(sents[i].begin(), sents[i].end(), lmBuf[threadId].data());
+		lm->evaluate(sents[i].begin(), sents[i].end(), lmBuf[threadId].data(), nodeBuf[threadId].data());
 		ret.lmLogProbs = lmBuf[threadId].data();
+		ret.base = nodeBuf[threadId].data();
 		return ret;
 	}
 };
@@ -709,8 +720,9 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 		return true;
 	};
 
-	sbg = sb::SkipBigramTrainer<utils::Vid, 8>{ sents, sbgTokenFilter, sbgPairFilter, 0, 150, 20, true, 0.333f, 1, 1000000 };
+	sbg = sb::SkipBigramTrainer<utils::Vid, 8>{ sents, sbgTokenFilter, sbgPairFilter, 0, 150, 20, true, 0.333f, 1, 1000000, langMdl.knlm->nonLeafNodeSize() };
 	Vector<float> lmLogProbs;
+	Vector<uint32_t> baseNodes;
 	auto tc = sbg.newContext();
 	float llMean = 0;
 	size_t llCnt = 0;
@@ -727,6 +739,7 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 		if (lmLogProbs.size() < sent.size())
 		{
 			lmLogProbs.resize(sent.size());
+			baseNodes.resize(sent.size());
 		}
 		langMdl.knlm->evaluate(sent.begin(), sent.end(), lmLogProbs.begin());
 		//float sum = sbg.evaluate(&sent[0], lmLogProbs.data(), sent.size());
@@ -746,30 +759,31 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 	if (args.numWorkers <= 1)
 	{
 		sbg.train(SBDataFeeder{ sents, langMdl.knlm.get() }, [&](const sb::ObservingData& od)
+		{
+			llCnt += od.cntRecent;
+			llMean += (od.llRecent - llMean * od.cntRecent) / llCnt;
+			if (od.globalStep % 10000 == 0)
 			{
-				llCnt += od.cntRecent;
-				llMean += (od.llRecent - llMean * od.cntRecent) / llCnt;
-				if (od.globalStep % 10000 == 0)
-				{
-					cout << od.globalStep / 10000 << " (" << std::round(od.globalStep * 1000. / totalSteps) / 10 << "%): AvgLL: " << od.llMeanTotal << ", RecentLL: " << llMean << endl;
-					llCnt = 0;
-					llMean = 0;
-				}
-			}, sampleIdcs, totalSteps, lrStart);
+				cout << od.globalStep / 10000 << " (" << std::round(od.globalStep * 1000. / totalSteps) / 10 << "%): AvgLL: " << od.llMeanTotal << ", RecentLL: " << llMean << endl;
+				llCnt = 0;
+				llMean = 0;
+			}
+		}, sampleIdcs, totalSteps, lrStart);
 	}
 	else
 	{
 		sbg.trainMulti(args.numWorkers, SBDataFeeder{ sents, langMdl.knlm.get(), 8 }, [&](const sb::ObservingData& od)
+		{
+			llCnt += od.cntRecent;
+			llMean += (od.llRecent - llMean * od.cntRecent) / llCnt;
+			if (od.prevGlobalStep / 10000 < od.globalStep / 10000)
 			{
-				llCnt += od.cntRecent;
-				llMean += (od.llRecent - llMean * od.cntRecent) / llCnt;
-				if (od.prevGlobalStep / 10000 < od.globalStep / 10000)
-				{
-					cout << od.globalStep / 10000 << " (" << std::round(od.globalStep * 1000. / totalSteps) / 10 << "%): AvgLL: " << od.llMeanTotal << ", RecentLL: " << llMean << endl;
-					llCnt = 0;
-					llMean = 0;
-				}
-			}, sampleIdcs, totalSteps, lrStart);
+				cout << od.globalStep / 10000 << " (" << std::round(od.globalStep * 1000. / totalSteps) / 10 << "%): AvgLL: " << od.llMeanTotal << ", RecentLL: " << llMean
+					<< ", BaseConfid: " << sbg.getBaseConfidences().minCoeff() << "~" << sbg.getBaseConfidences().maxCoeff() << endl;
+				llCnt = 0;
+				llMean = 0;
+			}
+		}, sampleIdcs, totalSteps, lrStart);
 	}
 
 	{
@@ -785,9 +799,10 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 		if (lmLogProbs.size() < sent.size())
 		{
 			lmLogProbs.resize(sent.size());
+			baseNodes.resize(sent.size());
 		}
-		langMdl.knlm->evaluate(sent.begin(), sent.end(), lmLogProbs.begin());
-		float sum = sbg.evaluate(&sent[0], lmLogProbs.data(), sent.size());
+		langMdl.knlm->evaluate(sent.begin(), sent.end(), lmLogProbs.begin(), baseNodes.begin());
+		float sum = sbg.evaluate(&sent[0], baseNodes.data(), lmLogProbs.data(), sent.size());
 		size_t cnt = sent.size() - 1;
 		llCnt += cnt;
 		llMean += (sum - llMean * cnt) / llCnt;
@@ -1764,4 +1779,68 @@ vector<WordInfo> KiwiBuilder::extractAddWords(const U16MultipleReader& reader, s
 		addWord(w.form);
 	}
 	return words;
+}
+
+HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes, 
+	size_t batchSize, size_t windowSize, size_t numWorkers, 
+	double dropoutProb,
+	const TokenFilter& tokenFilter,
+	double splitRatio,
+	HSDataset* splitDataset
+) const
+{
+	auto realMorph = restoreMorphemeMap();
+	HSDataset dataset{ batchSize, windowSize, numWorkers, dropoutProb };
+	auto& sents = dataset.sents.get();
+	dataset.knlm = langMdl.knlm;
+	dataset.morphemes = &morphemes;
+	dataset.forms = &forms;
+
+	if (splitDataset)
+	{
+		*splitDataset = HSDataset{ batchSize, windowSize, numWorkers, dropoutProb };
+		splitDataset->knlm = langMdl.knlm;
+		splitDataset->morphemes = &morphemes;
+		splitDataset->forms = &forms;
+	}
+
+	for (auto& path : inputPathes)
+	{
+		ifstream ifs;
+		addCorpusTo(sents, openFile(ifs, path), realMorph, splitRatio, splitDataset ? &splitDataset->sents.get() : nullptr);
+	}
+	size_t tokenSize = sents.raw().empty() ? 0 : *std::max_element(sents.raw().begin(), sents.raw().end()) + 1;
+
+	if (splitDataset)
+	{
+		auto& sents = splitDataset->sents.get();
+		tokenSize = std::max(tokenSize, sents.raw().empty() ? (size_t)0 : *std::max_element(sents.raw().begin(), sents.raw().end()) + 1);
+	}
+
+	for (size_t i = 0; i < tokenSize; ++i)
+	{
+		if (tokenFilter && !tokenFilter(joinHangul(forms[morphemes[i].kform].form), morphemes[i].tag))
+		{
+			dataset.tokenToVocab.emplace_back(HSDataset::nonVocab);
+			continue;
+		}
+		dataset.tokenToVocab.emplace_back(dataset.vocabToToken.size());
+		dataset.vocabToToken.emplace_back(i);
+	}
+
+	for (size_t i = 0; i < sents.size(); ++i)
+	{
+		dataset.totalTokens += dataset.numValidTokensInSent(i) - 1;
+	}
+	
+	if (splitDataset)
+	{
+		splitDataset->tokenToVocab = dataset.tokenToVocab;
+		splitDataset->vocabToToken = dataset.vocabToToken;
+		for (size_t i = 0; i < splitDataset->sents.get().size(); ++i)
+		{
+			splitDataset->totalTokens += splitDataset->numValidTokensInSent(i) - 1;
+		}
+	}
+	return dataset;
 }

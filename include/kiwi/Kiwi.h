@@ -35,6 +35,7 @@ namespace kiwi
 	struct KTrie;
 	struct KGraphNode;
 	struct WordInfo;
+	class HSDataset;
 
 	namespace cmb{ class CompiledRule; }
 
@@ -78,7 +79,7 @@ namespace kiwi
 		std::shared_ptr<cmb::CompiledRule> combiningRule;
 		std::unique_ptr<utils::ThreadPool> pool;
 		
-		std::vector<TokenResult> analyzeSent(const std::u16string::const_iterator& sBegin, const std::u16string::const_iterator& sEnd, size_t topN, Match matchOptions) const;
+		std::vector<TokenResult> analyzeSent(const std::u16string::const_iterator& sBegin, const std::u16string::const_iterator& sEnd, size_t topN, Match matchOptions, bool openEnd = false) const;
 
 		const Morpheme* getDefaultMorpheme(POSTag tag) const;
 
@@ -302,6 +303,11 @@ namespace kiwi
 		cmb::AutoJoiner newJoiner(bool lmSearch = true) const;
 
 		/**
+		 * @brief Kiwi에 내장된 언어 모델에 접근할 수 있는 LmObject 객체를 생성한다.
+		 */
+		std::unique_ptr<LmObjectBase> newLmObject() const;
+
+		/**
 		 * @brief `TokenInfo::typoFormId`로부터 실제 오타 형태를 복원한다.
 		 * 
 		 * @param typoFormId analyze함수의 리턴으로 반환된 TokenInfo 내의 typoFormId 값
@@ -463,7 +469,7 @@ namespace kiwi
 
 		MorphemeMap restoreMorphemeMap() const;
 
-		void addCorpusTo(RaggedVector<uint16_t>& out, std::istream& is, MorphemeMap& morphMap);
+		void addCorpusTo(RaggedVector<uint16_t>& out, std::istream& is, MorphemeMap& morphMap, double splitRatio = 0, RaggedVector<uint16_t>* splitOut = nullptr) const;
 		void updateForms();
 		void updateMorphemes();
 
@@ -647,7 +653,7 @@ namespace kiwi
 						break;
 					}
 				}
-				if (!m) continue;
+				if (!m || f.form.empty()) continue;
 				std::u16string input = joinHangul(f.form);
 				std::u16string output = repl(input);
 				if (input == output) continue;
@@ -689,5 +695,15 @@ namespace kiwi
 		{
 			return langMdl.get();
 		}*/
+
+		using TokenFilter = std::function<bool(const std::u16string&, POSTag)>;
+
+		HSDataset makeHSDataset(const std::vector<std::string>& inputPathes, 
+			size_t batchSize, size_t windowSize, size_t numWorkers, 
+			double dropoutProb = 0,
+			const TokenFilter& tokenFilter = {},
+			double splitRatio = 0,
+			HSDataset* splitDataset = nullptr
+		) const;
 	};
 }

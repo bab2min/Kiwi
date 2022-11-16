@@ -162,6 +162,9 @@
     <ClInclude Include="src\SIMD.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\kiwi\HSDataset.h">
+      <Filter>Header Files\kiwi</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Form.cpp">
@@ -226,6 +229,9 @@
     </ClCompile>
     <ClCompile Include="src\ArchImpl\sse4_1.cpp">
       <Filter>Source Files\ArchImpl</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HSDataset.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

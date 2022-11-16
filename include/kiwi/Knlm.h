@@ -49,6 +49,9 @@ namespace kiwi
 			virtual ~KnLangModelBase() {}
 			const Header& getHeader() const { return *reinterpret_cast<const Header*>(base.get()); }
 
+			virtual ptrdiff_t getLowerNode(ptrdiff_t node_idx) const = 0;
+
+			virtual size_t nonLeafNodeSize() const = 0;
 			virtual size_t llSize() const = 0;
 			virtual const float* getLLBuf() const = 0;
 			virtual const float* getGammaBuf() const = 0;
@@ -76,6 +79,19 @@ namespace kiwi
 				{
 					*out_first = _progress(node_idx, *in_first);
 					++out_first;
+				}
+			}
+
+			template<class InTy, class OutProbTy, class OutNodeTy>
+			void evaluate(InTy in_first, InTy in_last, OutProbTy prob_first, OutNodeTy node_first) const
+			{
+				ptrdiff_t node_idx = 0;
+				for (; in_first != in_last; ++in_first)
+				{
+					*node_first = node_idx;
+					*prob_first = _progress(node_idx, *in_first);
+					++prob_first;
+					++node_first;
 				}
 			}
 
