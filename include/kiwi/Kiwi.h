@@ -44,7 +44,7 @@ namespace kiwi
 
 	inline uint32_t getDefaultMorphemeId(POSTag tag)
 	{
-		return (uint32_t)tag + 1;
+		return (uint32_t)clearIrregular(tag) + 1;
 	}
 
 	/**
