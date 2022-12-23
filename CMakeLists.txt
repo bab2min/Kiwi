@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 
-project(kiwi VERSION 0.14.0 DESCRIPTION "Kiwi, Korean Intelligent Word Identifier")
+project(kiwi VERSION 0.14.1 DESCRIPTION "Kiwi, Korean Intelligent Word Identifier")
 
 set ( CMAKE_CXX_STANDARD 11 )
 set ( CMAKE_VERBOSE_MAKEFILE true )
@@ -9,6 +9,7 @@ option(KIWI_USE_MIMALLOC  "Use mimalloc for faster memory allocation" ON)
 option(KIWI_USE_CPUINFO  "Use cpuinfo for dynamic CPU dispatching" ON)
 option(KIWI_STATIC_WITHOUT_MT  "Use /MT Option in building kiwi_static" OFF)
 option(KIWI_BUILD_TEST  "Build Test sets" ON)
+set(KIWI_CPU_ARCH "" CACHE STRING "Set architecture type for macOS")
 
 if (NOT CMAKE_BUILD_TYPE)
   if ("${CMAKE_BINARY_DIR}" MATCHES ".*(D|d)ebug$")
@@ -18,6 +19,20 @@ if (NOT CMAKE_BUILD_TYPE)
     message(STATUS "No build type selected, default to: Release")
     set(CMAKE_BUILD_TYPE "Release")
   endif()
+endif()
+
+if(NOT KIWI_CPU_ARCH)
+  if (CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)|(amd64)|(AMD64)")
+    set(KIWI_CPU_ARCH "x86_64" PARENT_SCOPE)
+  elseif (HOST_ARCHITECTURE MATCHES "^arm64" OR CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm|aarch64)")
+    set(KIWI_CPU_ARCH "arm64" PARENT_SCOPE)
+  else()
+    set(KIWI_CPU_ARCH "other" PARENT_SCOPE)
+  endif()
+endif()
+
+if(APPLE)
+  set(CMAKE_OSX_ARCHITECTURES "${KIWI_CPU_ARCH}")
 endif()
 
 set ( CORE_SRCS
@@ -116,8 +131,8 @@ else()
   set ( CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_EXE_LINKER_FLAGS_RELEASE}" )
 endif()
 
-
-if (CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)|(amd64)|(AMD64)")
+if (KIWI_CPU_ARCH MATCHES "x86_64")
+  message("Compiling for x86_64")
   set( CORE_SRCS 
     ${CORE_SRCS}
     src/archImpl/sse2.cpp
@@ -145,12 +160,15 @@ if (CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)|(amd64)|(AMD64)")
       set_source_files_properties(src/archImpl/avx512bw.cpp PROPERTIES COMPILE_FLAGS "-mavx512f -mavx512bw")
     endif()
   endif()
-elseif (HOST_ARCHITECTURE MATCHES "^arm64" OR CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm|aarch64)")
+elseif (KIWI_CPU_ARCH MATCHES "arm64")
+  message("Compiling for arm64")
   set( CORE_SRCS 
     ${CORE_SRCS}
     src/archImpl/neon.cpp
   )
   set_source_files_properties(src/archImpl/neon.cpp PROPERTIES COMPILE_FLAGS "-march=armv8-a")
+else()
+  message("Compiling for other")
 endif()
 
 add_library( "${PROJECT_NAME}_static" STATIC
