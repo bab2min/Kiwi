@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['loaddictionary_419',['loadDictionary',['../classkiwi_1_1KiwiBuilder.html#a1c34aeb8fac1f3b324e0de63d45f4eea',1,'kiwi::KiwiBuilder']]]
+  ['loaddictionary_442',['loadDictionary',['../classkiwi_1_1KiwiBuilder.html#a1c34aeb8fac1f3b324e0de63d45f4eea',1,'kiwi::KiwiBuilder']]]
 ];

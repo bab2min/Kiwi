@@ -4,5 +4,11 @@ digraph "Graphical Class Hierarchy"
   edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
   node [fontname="Helvetica",fontsize="10",shape=record];
   rankdir="LR";
-  Node0 [label="kiwi::utils::MemoryObject",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classkiwi_1_1utils_1_1MemoryObject.html",tooltip=" "];
+  Node104 [label="std::streambuf",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",tooltip=" "];
+  Node104 -> Node0 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node0 [label="kiwi::utils::membuf\l\< false, true \>",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structkiwi_1_1utils_1_1membuf.html",tooltip=" "];
+  Node104 -> Node106 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node106 [label="kiwi::utils::membuf\l\< true, false \>",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structkiwi_1_1utils_1_1membuf.html",tooltip=" "];
+  Node104 -> Node107 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node107 [label="kiwi::utils::membuf\l\< read, write \>",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structkiwi_1_1utils_1_1membuf.html",tooltip=" "];
 }

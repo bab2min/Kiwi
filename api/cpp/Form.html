@@ -83,7 +83,7 @@
 <p><dl class="simple">
 <dt><strong>Author</strong></dt><dd><p>bab2min (<a class="reference external" href="mailto:bab2min&#37;&#52;&#48;gmail&#46;com">bab2min<span>&#64;</span>gmail<span>&#46;</span>com</a>) </p>
 </dd>
-<dt><strong>Version</strong></dt><dd><p>0.14.0 </p>
+<dt><strong>Version</strong></dt><dd><p>0.14.1 </p>
 </dd>
 <dt><strong>Date</strong></dt><dd><p>2022-09-01 </p>
 </dd>
@@ -132,279 +132,6 @@
 
 </div>
 <dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi4FormE">
-<span id="_CPPv3N4kiwi4FormE"></span><span id="_CPPv2N4kiwi4FormE"></span><span id="kiwi::Form"></span><span class="target" id="structkiwi_1_1Form"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Form</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi4FormE" title="Permalink to this definition"></a><br /></dt>
-<dd><div class="docutils container">
-<em>#include &lt;Form.h&gt;</em></div>
-<p>형태에 관한 모든 정보를 담는 구조체의 템플릿 </p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>변경 불가능한 상태로 인덱스는 모두 포인터로, std::vector는 FixedVector로 변경되어 수정이 불가능한 대신 각 값에 효율적으로 빠르게 접근 가능하다. <code class="docutils literal notranslate"><a class="reference internal" href="Kiwi.html#classkiwi_1_1Kiwi"><span class="std std-ref"><span class="pre">kiwi::Kiwi</span></span></a></code> 내 실제 형태소 분석 단계에 쓰인다. </p>
-</div>
-<div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi4Form4FormEv">
-<span id="_CPPv3N4kiwi4Form4FormEv"></span><span id="_CPPv2N4kiwi4Form4FormEv"></span><span id="kiwi::Form::Form"></span><span class="target" id="structkiwi_1_1Form_1a959622ceaa869642344aca864bf9debe"></span><span class="sig-name descname"><span class="n"><span class="pre">Form</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4kiwi4Form4FormEv" title="Permalink to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi4FormD0Ev">
-<span id="_CPPv3N4kiwi4FormD0Ev"></span><span id="_CPPv2N4kiwi4FormD0Ev"></span><span id="kiwi::Form::~Form"></span><span class="target" id="structkiwi_1_1Form_1adb5e34781a80a7dec43da28e5d73fdc6"></span><span class="sig-name descname"><span class="n"><span class="pre">~Form</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4kiwi4FormD0Ev" title="Permalink to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi4Form4FormERK4Form">
-<span id="_CPPv3N4kiwi4Form4FormERK4Form"></span><span id="_CPPv2N4kiwi4Form4FormERK4Form"></span><span id="kiwi::Form::Form__FormCR"></span><span class="target" id="structkiwi_1_1Form_1a0c5842c792ed732798ade19b00d5466a"></span><span class="sig-name descname"><span class="n"><span class="pre">Form</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N4kiwi4Form4FormERK4Form" title="kiwi::Form::Form"><span class="n"><span class="pre">Form</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4kiwi4Form4FormERK4Form" title="Permalink to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi4Form4FormERR4Form">
-<span id="_CPPv3N4kiwi4Form4FormERR4Form"></span><span id="_CPPv2N4kiwi4Form4FormERR4Form"></span><span id="kiwi::Form::Form__FormRR"></span><span class="target" id="structkiwi_1_1Form_1abee52fee9a2cbda7edc1e90f489493a3"></span><span class="sig-name descname"><span class="n"><span class="pre">Form</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N4kiwi4Form4FormERR4Form" title="kiwi::Form::Form"><span class="n"><span class="pre">Form</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N4kiwi4Form4FormERR4Form" title="Permalink to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi4FormaSERK4Form">
-<span id="_CPPv3N4kiwi4FormaSERK4Form"></span><span id="_CPPv2N4kiwi4FormaSERK4Form"></span><span id="kiwi::Form::assign-operator__FormCR"></span><span class="target" id="structkiwi_1_1Form_1a7f5be3195ee8cda8a3b72c9e201eb51f"></span><a class="reference internal" href="#_CPPv4N4kiwi4FormE" title="kiwi::Form"><span class="n"><span class="pre">Form</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N4kiwi4FormE" title="kiwi::Form"><span class="n"><span class="pre">Form</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4kiwi4FormaSERK4Form" title="Permalink to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi4FormaSERR4Form">
-<span id="_CPPv3N4kiwi4FormaSERR4Form"></span><span id="_CPPv2N4kiwi4FormaSERR4Form"></span><span id="kiwi::Form::assign-operator__FormRR"></span><span class="target" id="structkiwi_1_1Form_1ac43ec9d9c07216c89f4fb9f78960f175"></span><a class="reference internal" href="#_CPPv4N4kiwi4FormE" title="kiwi::Form"><span class="n"><span class="pre">Form</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N4kiwi4FormE" title="kiwi::Form"><span class="n"><span class="pre">Form</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4kiwi4FormaSERR4Form" title="Permalink to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK4kiwi4FormltERK4Form">
-<span id="_CPPv3NK4kiwi4FormltERK4Form"></span><span id="_CPPv2NK4kiwi4FormltERK4Form"></span><span id="kiwi::Form::lt-operator__FormCRC"></span><span class="target" id="structkiwi_1_1Form_1a29fdf43dbd702c51a0bc3f9b65a911f5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&lt;</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N4kiwi4FormE" title="kiwi::Form"><span class="n"><span class="pre">Form</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">o</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4kiwi4FormltERK4Form" title="Permalink to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-</div>
-<div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi4Form4formE">
-<span id="_CPPv3N4kiwi4Form4formE"></span><span id="_CPPv2N4kiwi4Form4formE"></span><span id="kiwi::Form::form__KString"></span><span class="target" id="structkiwi_1_1Form_1a642ff790c81f689848a8b73e4cade54d"></span><a class="reference internal" href="Types.html#_CPPv4N4kiwi7KStringE" title="kiwi::KString"><span class="n"><span class="pre">KString</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">form</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi4Form4formE" title="Permalink to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi4Form9candidateE">
-<span id="_CPPv3N4kiwi4Form9candidateE"></span><span id="_CPPv2N4kiwi4Form9candidateE"></span><span id="kiwi::Form::candidate__FixedVector:MorphemeCP:"></span><span class="target" id="structkiwi_1_1Form_1a05479b57fda21f7951dc64b7198c2bb0"></span><span class="n"><span class="pre">FixedVector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N4kiwi8MorphemeE" title="kiwi::Morpheme"><span class="n"><span class="pre">Morpheme</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">candidate</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi4Form9candidateE" title="Permalink to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi4Form5vowelE">
-<span id="_CPPv3N4kiwi4Form5vowelE"></span><span id="_CPPv2N4kiwi4Form5vowelE"></span><span id="kiwi::Form::vowel__CondVowel"></span><span class="target" id="structkiwi_1_1Form_1a12cce1bf068ef6d5faf2b81527d36a1f"></span><a class="reference internal" href="Types.html#_CPPv4N4kiwi9CondVowelE" title="kiwi::CondVowel"><span class="n"><span class="pre">CondVowel</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">vowel</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="Types.html#_CPPv4N4kiwi9CondVowelE" title="kiwi::CondVowel"><span class="n"><span class="pre">CondVowel</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="Types.html#_CPPv4N4kiwi9CondVowel4noneE" title="kiwi::CondVowel::none"><span class="n"><span class="pre">none</span></span></a><a class="headerlink" href="#_CPPv4N4kiwi4Form5vowelE" title="Permalink to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi4Form5polarE">
-<span id="_CPPv3N4kiwi4Form5polarE"></span><span id="_CPPv2N4kiwi4Form5polarE"></span><span id="kiwi::Form::polar__CondPolarity"></span><span class="target" id="structkiwi_1_1Form_1a4dace42069405d03d59ab6ad0ef383a9"></span><a class="reference internal" href="Types.html#_CPPv4N4kiwi12CondPolarityE" title="kiwi::CondPolarity"><span class="n"><span class="pre">CondPolarity</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">polar</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="Types.html#_CPPv4N4kiwi12CondPolarityE" title="kiwi::CondPolarity"><span class="n"><span class="pre">CondPolarity</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="Types.html#_CPPv4N4kiwi12CondPolarity4noneE" title="kiwi::CondPolarity::none"><span class="n"><span class="pre">none</span></span></a><a class="headerlink" href="#_CPPv4N4kiwi4Form5polarE" title="Permalink to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi4Form8formHashE">
-<span id="_CPPv3N4kiwi4Form8formHashE"></span><span id="_CPPv2N4kiwi4Form8formHashE"></span><span id="kiwi::Form::formHash__uint8_t"></span><span class="target" id="structkiwi_1_1Form_1a41d0945b7a92e49d6bfacca96b16b917"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">formHash</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N4kiwi4Form8formHashE" title="Permalink to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-</div>
-</dd></dl>
-
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi7FormRawE">
-<span id="_CPPv3N4kiwi7FormRawE"></span><span id="_CPPv2N4kiwi7FormRawE"></span><span id="kiwi::FormRaw"></span><span class="target" id="structkiwi_1_1FormRaw"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FormRaw</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi7FormRawE" title="Permalink to this definition"></a><br /></dt>
-<dd><div class="docutils container">
-<em>#include &lt;Form.h&gt;</em></div>
-<p>형태에 관한 모든 정보를 담는 구조체의 템플릿 </p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>변경가능한 상태로 인덱스와 관련된 값이나 std::vector 등의 길이를 변경할 수 있음. <code class="docutils literal notranslate"><a class="reference internal" href="Kiwi.html#classkiwi_1_1KiwiBuilder"><span class="std std-ref"><span class="pre">kiwi::KiwiBuilder</span></span></a></code>에서 사용한다. </p>
-</div>
-<div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi7FormRaw7FormRawEv">
-<span id="_CPPv3N4kiwi7FormRaw7FormRawEv"></span><span id="_CPPv2N4kiwi7FormRaw7FormRawEv"></span><span id="kiwi::FormRaw::FormRaw"></span><span class="target" id="structkiwi_1_1FormRaw_1a502f568516ee1651dc4f02e814dc7991"></span><span class="sig-name descname"><span class="n"><span class="pre">FormRaw</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4kiwi7FormRaw7FormRawEv" title="Permalink to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi7FormRawD0Ev">
-<span id="_CPPv3N4kiwi7FormRawD0Ev"></span><span id="_CPPv2N4kiwi7FormRawD0Ev"></span><span id="kiwi::FormRaw::~FormRaw"></span><span class="target" id="structkiwi_1_1FormRaw_1acfd4e9df9377fd69f37cbca07b3755dc"></span><span class="sig-name descname"><span class="n"><span class="pre">~FormRaw</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4kiwi7FormRawD0Ev" title="Permalink to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi7FormRaw7FormRawERK7FormRaw">
-<span id="_CPPv3N4kiwi7FormRaw7FormRawERK7FormRaw"></span><span id="_CPPv2N4kiwi7FormRaw7FormRawERK7FormRaw"></span><span id="kiwi::FormRaw::FormRaw__FormRawCR"></span><span class="target" id="structkiwi_1_1FormRaw_1a63a10c37b125ce41b1cf59bd07faa4ab"></span><span class="sig-name descname"><span class="n"><span class="pre">FormRaw</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N4kiwi7FormRaw7FormRawERK7FormRaw" title="kiwi::FormRaw::FormRaw"><span class="n"><span class="pre">FormRaw</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4kiwi7FormRaw7FormRawERK7FormRaw" title="Permalink to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi7FormRaw7FormRawERR7FormRaw">
-<span id="_CPPv3N4kiwi7FormRaw7FormRawERR7FormRaw"></span><span id="_CPPv2N4kiwi7FormRaw7FormRawERR7FormRaw"></span><span id="kiwi::FormRaw::FormRaw__FormRawRR"></span><span class="target" id="structkiwi_1_1FormRaw_1a2f4034c31d9758540b2e4a7e2177b8ee"></span><span class="sig-name descname"><span class="n"><span class="pre">FormRaw</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N4kiwi7FormRaw7FormRawERR7FormRaw" title="kiwi::FormRaw::FormRaw"><span class="n"><span class="pre">FormRaw</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N4kiwi7FormRaw7FormRawERR7FormRaw" title="Permalink to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi7FormRawaSERK7FormRaw">
-<span id="_CPPv3N4kiwi7FormRawaSERK7FormRaw"></span><span id="_CPPv2N4kiwi7FormRawaSERK7FormRaw"></span><span id="kiwi::FormRaw::assign-operator__FormRawCR"></span><span class="target" id="structkiwi_1_1FormRaw_1a06cf2424397f481fe4836ce244999139"></span><a class="reference internal" href="#_CPPv4N4kiwi7FormRawE" title="kiwi::FormRaw"><span class="n"><span class="pre">FormRaw</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N4kiwi7FormRawE" title="kiwi::FormRaw"><span class="n"><span class="pre">FormRaw</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4kiwi7FormRawaSERK7FormRaw" title="Permalink to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi7FormRawaSERR7FormRaw">
-<span id="_CPPv3N4kiwi7FormRawaSERR7FormRaw"></span><span id="_CPPv2N4kiwi7FormRawaSERR7FormRaw"></span><span id="kiwi::FormRaw::assign-operator__FormRawRR"></span><span class="target" id="structkiwi_1_1FormRaw_1a1be0c155621ba3c6c101129280571287"></span><a class="reference internal" href="#_CPPv4N4kiwi7FormRawE" title="kiwi::FormRaw"><span class="n"><span class="pre">FormRaw</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N4kiwi7FormRawE" title="kiwi::FormRaw"><span class="n"><span class="pre">FormRaw</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4kiwi7FormRawaSERR7FormRaw" title="Permalink to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi7FormRaw7FormRawERK7KString">
-<span id="_CPPv3N4kiwi7FormRaw7FormRawERK7KString"></span><span id="_CPPv2N4kiwi7FormRaw7FormRawERK7KString"></span><span id="kiwi::FormRaw::FormRaw__KStringCR"></span><span class="target" id="structkiwi_1_1FormRaw_1a918b6b5fd462c490dac34e78c19cfbe2"></span><span class="sig-name descname"><span class="n"><span class="pre">FormRaw</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="Types.html#_CPPv4N4kiwi7KStringE" title="kiwi::KString"><span class="n"><span class="pre">KString</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_form</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4kiwi7FormRaw7FormRawERK7KString" title="Permalink to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK4kiwi7FormRawltERK7FormRaw">
-<span id="_CPPv3NK4kiwi7FormRawltERK7FormRaw"></span><span id="_CPPv2NK4kiwi7FormRawltERK7FormRaw"></span><span id="kiwi::FormRaw::lt-operator__FormRawCRC"></span><span class="target" id="structkiwi_1_1FormRaw_1ab8d18489c41d2171c5524c62c13bc305"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&lt;</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N4kiwi7FormRawE" title="kiwi::FormRaw"><span class="n"><span class="pre">FormRaw</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">o</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4kiwi7FormRawltERK7FormRaw" title="Permalink to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi7FormRaw14serializerReadERNSt7istreamE">
-<span id="_CPPv3N4kiwi7FormRaw14serializerReadERNSt7istreamE"></span><span id="_CPPv2N4kiwi7FormRaw14serializerReadERNSt7istreamE"></span><span id="kiwi::FormRaw::serializerRead__isR"></span><span class="target" id="structkiwi_1_1FormRaw_1a72c7601a92aef5459f63ceed40f638c5"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">serializerRead</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">istream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">istr</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4kiwi7FormRaw14serializerReadERNSt7istreamE" title="Permalink to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK4kiwi7FormRaw15serializerWriteERNSt7ostreamE">
-<span id="_CPPv3NK4kiwi7FormRaw15serializerWriteERNSt7ostreamE"></span><span id="_CPPv2NK4kiwi7FormRaw15serializerWriteERNSt7ostreamE"></span><span id="kiwi::FormRaw::serializerWrite__osRC"></span><span class="target" id="structkiwi_1_1FormRaw_1ad410351dd8b922009ea18e4d3bebcf36"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">serializerWrite</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">ostr</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4kiwi7FormRaw15serializerWriteERNSt7ostreamE" title="Permalink to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-</div>
-<div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi7FormRaw4formE">
-<span id="_CPPv3N4kiwi7FormRaw4formE"></span><span id="_CPPv2N4kiwi7FormRaw4formE"></span><span id="kiwi::FormRaw::form__KString"></span><span class="target" id="structkiwi_1_1FormRaw_1aa541ea8bad70b8fb69223d34f9ae3e24"></span><a class="reference internal" href="Types.html#_CPPv4N4kiwi7KStringE" title="kiwi::KString"><span class="n"><span class="pre">KString</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">form</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi7FormRaw4formE" title="Permalink to this definition"></a><br /></dt>
-<dd><p>형태 </p>
-</dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi7FormRaw9candidateE">
-<span id="_CPPv3N4kiwi7FormRaw9candidateE"></span><span id="_CPPv2N4kiwi7FormRaw9candidateE"></span><span id="kiwi::FormRaw::candidate__Vector:uint32_t:"></span><span class="target" id="structkiwi_1_1FormRaw_1aaeb9a4a50365e34fd542d2ea07ded938"></span><a class="reference internal" href="Types.html#_CPPv4I0EN4kiwi6VectorE" title="kiwi::Vector"><span class="n"><span class="pre">Vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">uint32_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">candidate</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi7FormRaw9candidateE" title="Permalink to this definition"></a><br /></dt>
-<dd><p>이 형태에 해당하는 형태소들의 목록 </p>
-</dd></dl>
-
-</div>
-</dd></dl>
-
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi8MorphemeE">
-<span id="_CPPv3N4kiwi8MorphemeE"></span><span id="_CPPv2N4kiwi8MorphemeE"></span><span id="kiwi::Morpheme"></span><span class="target" id="structkiwi_1_1Morpheme"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Morpheme</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi8MorphemeE" title="Permalink to this definition"></a><br /></dt>
-<dd><div class="docutils container">
-<em>#include &lt;Form.h&gt;</em></div>
-<p>형태소에 관한 모든 정보를 담는 구조체의 템플릿 </p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>변경 불가능한 상태로 인덱스는 모두 포인터로, std::vector는 FixedVector로 변경되어 수정이 불가능한 대신 각 값에 효율적으로 빠르게 접근 가능하다. <code class="docutils literal notranslate"><a class="reference internal" href="Kiwi.html#classkiwi_1_1Kiwi"><span class="std std-ref"><span class="pre">kiwi::Kiwi</span></span></a></code> 내 실제 형태소 분석 단계에 쓰인다. </p>
-</div>
-<div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi8Morpheme8MorphemeEv">
-<span id="_CPPv3N4kiwi8Morpheme8MorphemeEv"></span><span id="_CPPv2N4kiwi8Morpheme8MorphemeEv"></span><span id="kiwi::Morpheme::Morpheme"></span><span class="target" id="structkiwi_1_1Morpheme_1a60cac38d3677048abaaf664d23a82b11"></span><span class="sig-name descname"><span class="n"><span class="pre">Morpheme</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4kiwi8Morpheme8MorphemeEv" title="Permalink to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi8MorphemeD0Ev">
-<span id="_CPPv3N4kiwi8MorphemeD0Ev"></span><span id="_CPPv2N4kiwi8MorphemeD0Ev"></span><span id="kiwi::Morpheme::~Morpheme"></span><span class="target" id="structkiwi_1_1Morpheme_1a7ad3a63eccf1af355f9eb0a3cd2bdd26"></span><span class="sig-name descname"><span class="n"><span class="pre">~Morpheme</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4kiwi8MorphemeD0Ev" title="Permalink to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi8Morpheme8MorphemeERK8Morpheme">
-<span id="_CPPv3N4kiwi8Morpheme8MorphemeERK8Morpheme"></span><span id="_CPPv2N4kiwi8Morpheme8MorphemeERK8Morpheme"></span><span id="kiwi::Morpheme::Morpheme__MorphemeCR"></span><span class="target" id="structkiwi_1_1Morpheme_1a810567cf1448ecf64d3689a3ff924256"></span><span class="sig-name descname"><span class="n"><span class="pre">Morpheme</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N4kiwi8Morpheme8MorphemeERK8Morpheme" title="kiwi::Morpheme::Morpheme"><span class="n"><span class="pre">Morpheme</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4kiwi8Morpheme8MorphemeERK8Morpheme" title="Permalink to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi8Morpheme8MorphemeERR8Morpheme">
-<span id="_CPPv3N4kiwi8Morpheme8MorphemeERR8Morpheme"></span><span id="_CPPv2N4kiwi8Morpheme8MorphemeERR8Morpheme"></span><span id="kiwi::Morpheme::Morpheme__MorphemeRR"></span><span class="target" id="structkiwi_1_1Morpheme_1ada691fb9caa54c7a7d71ceafa5539cb8"></span><span class="sig-name descname"><span class="n"><span class="pre">Morpheme</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N4kiwi8Morpheme8MorphemeERR8Morpheme" title="kiwi::Morpheme::Morpheme"><span class="n"><span class="pre">Morpheme</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N4kiwi8Morpheme8MorphemeERR8Morpheme" title="Permalink to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi8MorphemeaSERK8Morpheme">
-<span id="_CPPv3N4kiwi8MorphemeaSERK8Morpheme"></span><span id="_CPPv2N4kiwi8MorphemeaSERK8Morpheme"></span><span id="kiwi::Morpheme::assign-operator__MorphemeCR"></span><span class="target" id="structkiwi_1_1Morpheme_1a71e539cd38f472c22c56e65d3a93ac75"></span><a class="reference internal" href="#_CPPv4N4kiwi8MorphemeE" title="kiwi::Morpheme"><span class="n"><span class="pre">Morpheme</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N4kiwi8MorphemeE" title="kiwi::Morpheme"><span class="n"><span class="pre">Morpheme</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4kiwi8MorphemeaSERK8Morpheme" title="Permalink to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi8MorphemeaSERR8Morpheme">
-<span id="_CPPv3N4kiwi8MorphemeaSERR8Morpheme"></span><span id="_CPPv2N4kiwi8MorphemeaSERR8Morpheme"></span><span id="kiwi::Morpheme::assign-operator__MorphemeRR"></span><span class="target" id="structkiwi_1_1Morpheme_1ab7471058af63ee829a6bc641d14b347f"></span><a class="reference internal" href="#_CPPv4N4kiwi8MorphemeE" title="kiwi::Morpheme"><span class="n"><span class="pre">Morpheme</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N4kiwi8MorphemeE" title="kiwi::Morpheme"><span class="n"><span class="pre">Morpheme</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4kiwi8MorphemeaSERR8Morpheme" title="Permalink to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK4kiwi8Morpheme5printERNSt7ostreamE">
-<span id="_CPPv3NK4kiwi8Morpheme5printERNSt7ostreamE"></span><span id="_CPPv2NK4kiwi8Morpheme5printERNSt7ostreamE"></span><span id="kiwi::Morpheme::print__osRC"></span><span class="target" id="structkiwi_1_1Morpheme_1ab33de4aabd68a2d3e9127d47ed26dbd0"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">print</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">os</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4kiwi8Morpheme5printERNSt7ostreamE" title="Permalink to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK4kiwi8Morpheme7getFormEv">
-<span id="_CPPv3NK4kiwi8Morpheme7getFormEv"></span><span id="_CPPv2NK4kiwi8Morpheme7getFormEv"></span><span id="kiwi::Morpheme::getFormC"></span><span class="target" id="structkiwi_1_1Morpheme_1a9cbef2b60afeb297583aa18614acdbea"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="Types.html#_CPPv4N4kiwi7KStringE" title="kiwi::KString"><span class="n"><span class="pre">KString</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getForm</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4kiwi8Morpheme7getFormEv" title="Permalink to this definition"></a><br /></dt>
-<dd><p>형태소의 형태를 반환한다. </p>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK4kiwi8Morpheme11getCombinedEv">
-<span id="_CPPv3NK4kiwi8Morpheme11getCombinedEv"></span><span id="_CPPv2NK4kiwi8Morpheme11getCombinedEv"></span><span id="kiwi::Morpheme::getCombinedC"></span><span class="target" id="structkiwi_1_1Morpheme_1a39cc9841ade9b202bc59cfaf093dc8f5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N4kiwi8MorphemeE" title="kiwi::Morpheme"><span class="n"><span class="pre">Morpheme</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">getCombined</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4kiwi8Morpheme11getCombinedEv" title="Permalink to this definition"></a><br /></dt>
-<dd><p>분할된 형태소의 경우 원형 형태소를 반환한다. 그 외에는 자기 자신을 반환한다. </p>
-</dd></dl>
-
-</div>
-<div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi8Morpheme5kformE">
-<span id="_CPPv3N4kiwi8Morpheme5kformE"></span><span id="_CPPv2N4kiwi8Morpheme5kformE"></span><span id="kiwi::Morpheme::kform__KStringCP"></span><span class="target" id="structkiwi_1_1Morpheme_1a60e86f63f1063d3d4c05ae8c9f878a46"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="Types.html#_CPPv4N4kiwi7KStringE" title="kiwi::KString"><span class="n"><span class="pre">KString</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">kform</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><a class="headerlink" href="#_CPPv4N4kiwi8Morpheme5kformE" title="Permalink to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi8Morpheme3tagE">
-<span id="_CPPv3N4kiwi8Morpheme3tagE"></span><span id="_CPPv2N4kiwi8Morpheme3tagE"></span><span id="kiwi::Morpheme::tag__POSTag"></span><span class="target" id="structkiwi_1_1Morpheme_1ad94d847bf8179e1fed2313573f89addc"></span><a class="reference internal" href="Types.html#_CPPv4N4kiwi6POSTagE" title="kiwi::POSTag"><span class="n"><span class="pre">POSTag</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">tag</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="Types.html#_CPPv4N4kiwi6POSTagE" title="kiwi::POSTag"><span class="n"><span class="pre">POSTag</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="Types.html#_CPPv4N4kiwi6POSTag7unknownE" title="kiwi::POSTag::unknown"><span class="n"><span class="pre">unknown</span></span></a><a class="headerlink" href="#_CPPv4N4kiwi8Morpheme3tagE" title="Permalink to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi8Morpheme5vowelE">
-<span id="_CPPv3N4kiwi8Morpheme5vowelE"></span><span id="_CPPv2N4kiwi8Morpheme5vowelE"></span><span id="kiwi::Morpheme::vowel__CondVowel"></span><span class="target" id="structkiwi_1_1Morpheme_1adac63ad020b65323aedcfff6ec6ad620"></span><a class="reference internal" href="Types.html#_CPPv4N4kiwi9CondVowelE" title="kiwi::CondVowel"><span class="n"><span class="pre">CondVowel</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">vowel</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi8Morpheme5vowelE" title="Permalink to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi8Morpheme5polarE">
-<span id="_CPPv3N4kiwi8Morpheme5polarE"></span><span id="_CPPv2N4kiwi8Morpheme5polarE"></span><span id="kiwi::Morpheme::polar__CondPolarity"></span><span class="target" id="structkiwi_1_1Morpheme_1a353e39e805bf5f879100a8b68e77abb4"></span><a class="reference internal" href="Types.html#_CPPv4N4kiwi12CondPolarityE" title="kiwi::CondPolarity"><span class="n"><span class="pre">CondPolarity</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">polar</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi8Morpheme5polarE" title="Permalink to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi8Morpheme7senseIdE">
-<span id="_CPPv3N4kiwi8Morpheme7senseIdE"></span><span id="_CPPv2N4kiwi8Morpheme7senseIdE"></span><span id="kiwi::Morpheme::senseId__uint8_t"></span><span class="target" id="structkiwi_1_1Morpheme_1a4421cbfd16b88d9d47daa159674eaf18"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">senseId</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N4kiwi8Morpheme7senseIdE" title="Permalink to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi8Morpheme13combineSocketE">
-<span id="_CPPv3N4kiwi8Morpheme13combineSocketE"></span><span id="_CPPv2N4kiwi8Morpheme13combineSocketE"></span><span id="kiwi::Morpheme::combineSocket__uint8_t"></span><span class="target" id="structkiwi_1_1Morpheme_1a6aa664ae5bac1c9aaa1db3f145a067a6"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">combineSocket</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N4kiwi8Morpheme13combineSocketE" title="Permalink to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi8Morpheme8combinedE">
-<span id="_CPPv3N4kiwi8Morpheme8combinedE"></span><span id="_CPPv2N4kiwi8Morpheme8combinedE"></span><span id="kiwi::Morpheme::combined__int32_t"></span><span class="target" id="structkiwi_1_1Morpheme_1a940fd73ffe29bed18697939bc9235afd"></span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">combined</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N4kiwi8Morpheme8combinedE" title="Permalink to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi8Morpheme6chunksE">
-<span id="_CPPv3N4kiwi8Morpheme6chunksE"></span><span id="_CPPv2N4kiwi8Morpheme6chunksE"></span><span id="kiwi::Morpheme::chunks__FixedPairVector:MorphemeCP.std::pair:uint8_t.uint8_t::"></span><span class="target" id="structkiwi_1_1Morpheme_1abe1e9ebc3b4a6492408f965138719bcf"></span><span class="n"><span class="pre">FixedPairVector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N4kiwi8MorphemeE" title="kiwi::Morpheme"><span class="n"><span class="pre">Morpheme</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">pair</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">uint8_t</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">uint8_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">chunks</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi8Morpheme6chunksE" title="Permalink to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi8Morpheme9userScoreE">
-<span id="_CPPv3N4kiwi8Morpheme9userScoreE"></span><span id="_CPPv2N4kiwi8Morpheme9userScoreE"></span><span id="kiwi::Morpheme::userScore__float"></span><span class="target" id="structkiwi_1_1Morpheme_1aeef565f756b8f7cb51a93629f0e74abe"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">userScore</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N4kiwi8Morpheme9userScoreE" title="Permalink to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi8Morpheme12lmMorphemeIdE">
-<span id="_CPPv3N4kiwi8Morpheme12lmMorphemeIdE"></span><span id="_CPPv2N4kiwi8Morpheme12lmMorphemeIdE"></span><span id="kiwi::Morpheme::lmMorphemeId__uint32_t"></span><span class="target" id="structkiwi_1_1Morpheme_1a40f29de05ae347749ad1357c1c7656ab"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">lmMorphemeId</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N4kiwi8Morpheme12lmMorphemeIdE" title="Permalink to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-</div>
-</dd></dl>
-
-<dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv4N4kiwi11MorphemeRawE">
 <span id="_CPPv3N4kiwi11MorphemeRawE"></span><span id="_CPPv2N4kiwi11MorphemeRawE"></span><span id="kiwi::MorphemeRaw"></span><span class="target" id="structkiwi_1_1MorphemeRaw"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MorphemeRaw</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi11MorphemeRawE" title="Permalink to this definition"></a><br /></dt>
 <dd><div class="docutils container">
@@ -450,6 +177,12 @@
 <dt class="sig sig-object cpp" id="_CPPv4N4kiwi11MorphemeRaw11MorphemeRawE6POSTag9CondVowel12CondPolarity7uint8_t">
 <span id="_CPPv3N4kiwi11MorphemeRaw11MorphemeRawE6POSTag9CondVowel12CondPolarity7uint8_t"></span><span id="_CPPv2N4kiwi11MorphemeRaw11MorphemeRawE6POSTag9CondVowel12CondPolarity7uint8_t"></span><span id="kiwi::MorphemeRaw::MorphemeRaw__POSTag.CondVowel.CondPolarity.uint8_t"></span><span class="target" id="structkiwi_1_1MorphemeRaw_1a3a2e5bbed542ace389cfb6fb333361ca"></span><span class="sig-name descname"><span class="n"><span class="pre">MorphemeRaw</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Types.html#_CPPv4N4kiwi6POSTagE" title="kiwi::POSTag"><span class="n"><span class="pre">POSTag</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">_tag</span></span>, <a class="reference internal" href="Types.html#_CPPv4N4kiwi9CondVowelE" title="kiwi::CondVowel"><span class="n"><span class="pre">CondVowel</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">_vowel</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="Types.html#_CPPv4N4kiwi9CondVowelE" title="kiwi::CondVowel"><span class="n"><span class="pre">CondVowel</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="Types.html#_CPPv4N4kiwi9CondVowel4noneE" title="kiwi::CondVowel::none"><span class="n"><span class="pre">none</span></span></a>, <a class="reference internal" href="Types.html#_CPPv4N4kiwi12CondPolarityE" title="kiwi::CondPolarity"><span class="n"><span class="pre">CondPolarity</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">_polar</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="Types.html#_CPPv4N4kiwi12CondPolarityE" title="kiwi::CondPolarity"><span class="n"><span class="pre">CondPolarity</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="Types.html#_CPPv4N4kiwi12CondPolarity4noneE" title="kiwi::CondPolarity::none"><span class="n"><span class="pre">none</span></span></a>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_combineSocket</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4kiwi11MorphemeRaw11MorphemeRawE6POSTag9CondVowel12CondPolarity7uint8_t" title="Permalink to this definition"></a><br /></dt>
 <dd><p>선행형태소의 자/모음 조건 </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4kiwi11MorphemeRaw5vowelEv">
+<span id="_CPPv3NK4kiwi11MorphemeRaw5vowelEv"></span><span id="_CPPv2NK4kiwi11MorphemeRaw5vowelEv"></span><span id="kiwi::MorphemeRaw::vowelC"></span><span class="target" id="structkiwi_1_1MorphemeRaw_1ace3917dd7cfdf3035a2aa108a0296005"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="Types.html#_CPPv4N4kiwi9CondVowelE" title="kiwi::CondVowel"><span class="n"><span class="pre">CondVowel</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">vowel</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4kiwi11MorphemeRaw5vowelEv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>선행형태소의 모음조화 조건 </p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -573,6 +306,279 @@
 <p>형태소 결합 시 음운 조건에 따라 이형태를 선택해야 하는 경우 그룹 인덱스가 동일한 형태소만 선택된다. </p>
 </div>
 </dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi8MorphemeE">
+<span id="_CPPv3N4kiwi8MorphemeE"></span><span id="_CPPv2N4kiwi8MorphemeE"></span><span id="kiwi::Morpheme"></span><span class="target" id="structkiwi_1_1Morpheme"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Morpheme</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi8MorphemeE" title="Permalink to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Form.h&gt;</em></div>
+<p>형태소에 관한 모든 정보를 담는 구조체의 템플릿 </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>변경 불가능한 상태로 인덱스는 모두 포인터로, std::vector는 FixedVector로 변경되어 수정이 불가능한 대신 각 값에 효율적으로 빠르게 접근 가능하다. <code class="docutils literal notranslate"><a class="reference internal" href="Kiwi.html#classkiwi_1_1Kiwi"><span class="std std-ref"><span class="pre">kiwi::Kiwi</span></span></a></code> 내 실제 형태소 분석 단계에 쓰인다. </p>
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi8Morpheme8MorphemeEv">
+<span id="_CPPv3N4kiwi8Morpheme8MorphemeEv"></span><span id="_CPPv2N4kiwi8Morpheme8MorphemeEv"></span><span id="kiwi::Morpheme::Morpheme"></span><span class="target" id="structkiwi_1_1Morpheme_1a60cac38d3677048abaaf664d23a82b11"></span><span class="sig-name descname"><span class="n"><span class="pre">Morpheme</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4kiwi8Morpheme8MorphemeEv" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi8MorphemeD0Ev">
+<span id="_CPPv3N4kiwi8MorphemeD0Ev"></span><span id="_CPPv2N4kiwi8MorphemeD0Ev"></span><span id="kiwi::Morpheme::~Morpheme"></span><span class="target" id="structkiwi_1_1Morpheme_1a7ad3a63eccf1af355f9eb0a3cd2bdd26"></span><span class="sig-name descname"><span class="n"><span class="pre">~Morpheme</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4kiwi8MorphemeD0Ev" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi8Morpheme8MorphemeERK8Morpheme">
+<span id="_CPPv3N4kiwi8Morpheme8MorphemeERK8Morpheme"></span><span id="_CPPv2N4kiwi8Morpheme8MorphemeERK8Morpheme"></span><span id="kiwi::Morpheme::Morpheme__MorphemeCR"></span><span class="target" id="structkiwi_1_1Morpheme_1a810567cf1448ecf64d3689a3ff924256"></span><span class="sig-name descname"><span class="n"><span class="pre">Morpheme</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N4kiwi8Morpheme8MorphemeERK8Morpheme" title="kiwi::Morpheme::Morpheme"><span class="n"><span class="pre">Morpheme</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4kiwi8Morpheme8MorphemeERK8Morpheme" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi8Morpheme8MorphemeERR8Morpheme">
+<span id="_CPPv3N4kiwi8Morpheme8MorphemeERR8Morpheme"></span><span id="_CPPv2N4kiwi8Morpheme8MorphemeERR8Morpheme"></span><span id="kiwi::Morpheme::Morpheme__MorphemeRR"></span><span class="target" id="structkiwi_1_1Morpheme_1ada691fb9caa54c7a7d71ceafa5539cb8"></span><span class="sig-name descname"><span class="n"><span class="pre">Morpheme</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N4kiwi8Morpheme8MorphemeERR8Morpheme" title="kiwi::Morpheme::Morpheme"><span class="n"><span class="pre">Morpheme</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N4kiwi8Morpheme8MorphemeERR8Morpheme" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi8MorphemeaSERK8Morpheme">
+<span id="_CPPv3N4kiwi8MorphemeaSERK8Morpheme"></span><span id="_CPPv2N4kiwi8MorphemeaSERK8Morpheme"></span><span id="kiwi::Morpheme::assign-operator__MorphemeCR"></span><span class="target" id="structkiwi_1_1Morpheme_1a71e539cd38f472c22c56e65d3a93ac75"></span><a class="reference internal" href="#_CPPv4N4kiwi8MorphemeE" title="kiwi::Morpheme"><span class="n"><span class="pre">Morpheme</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N4kiwi8MorphemeE" title="kiwi::Morpheme"><span class="n"><span class="pre">Morpheme</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4kiwi8MorphemeaSERK8Morpheme" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi8MorphemeaSERR8Morpheme">
+<span id="_CPPv3N4kiwi8MorphemeaSERR8Morpheme"></span><span id="_CPPv2N4kiwi8MorphemeaSERR8Morpheme"></span><span id="kiwi::Morpheme::assign-operator__MorphemeRR"></span><span class="target" id="structkiwi_1_1Morpheme_1ab7471058af63ee829a6bc641d14b347f"></span><a class="reference internal" href="#_CPPv4N4kiwi8MorphemeE" title="kiwi::Morpheme"><span class="n"><span class="pre">Morpheme</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N4kiwi8MorphemeE" title="kiwi::Morpheme"><span class="n"><span class="pre">Morpheme</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4kiwi8MorphemeaSERR8Morpheme" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4kiwi8Morpheme5printERNSt7ostreamE">
+<span id="_CPPv3NK4kiwi8Morpheme5printERNSt7ostreamE"></span><span id="_CPPv2NK4kiwi8Morpheme5printERNSt7ostreamE"></span><span id="kiwi::Morpheme::print__osRC"></span><span class="target" id="structkiwi_1_1Morpheme_1ab33de4aabd68a2d3e9127d47ed26dbd0"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">print</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">os</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4kiwi8Morpheme5printERNSt7ostreamE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4kiwi8Morpheme7getFormEv">
+<span id="_CPPv3NK4kiwi8Morpheme7getFormEv"></span><span id="_CPPv2NK4kiwi8Morpheme7getFormEv"></span><span id="kiwi::Morpheme::getFormC"></span><span class="target" id="structkiwi_1_1Morpheme_1a9cbef2b60afeb297583aa18614acdbea"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="Types.html#_CPPv4N4kiwi7KStringE" title="kiwi::KString"><span class="n"><span class="pre">KString</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getForm</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4kiwi8Morpheme7getFormEv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>형태소의 형태를 반환한다. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4kiwi8Morpheme11getCombinedEv">
+<span id="_CPPv3NK4kiwi8Morpheme11getCombinedEv"></span><span id="_CPPv2NK4kiwi8Morpheme11getCombinedEv"></span><span id="kiwi::Morpheme::getCombinedC"></span><span class="target" id="structkiwi_1_1Morpheme_1a39cc9841ade9b202bc59cfaf093dc8f5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N4kiwi8MorphemeE" title="kiwi::Morpheme"><span class="n"><span class="pre">Morpheme</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">getCombined</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4kiwi8Morpheme11getCombinedEv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>분할된 형태소의 경우 원형 형태소를 반환한다. 그 외에는 자기 자신을 반환한다. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi8Morpheme5kformE">
+<span id="_CPPv3N4kiwi8Morpheme5kformE"></span><span id="_CPPv2N4kiwi8Morpheme5kformE"></span><span id="kiwi::Morpheme::kform__KStringCP"></span><span class="target" id="structkiwi_1_1Morpheme_1a60e86f63f1063d3d4c05ae8c9f878a46"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="Types.html#_CPPv4N4kiwi7KStringE" title="kiwi::KString"><span class="n"><span class="pre">KString</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">kform</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><a class="headerlink" href="#_CPPv4N4kiwi8Morpheme5kformE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi8Morpheme3tagE">
+<span id="_CPPv3N4kiwi8Morpheme3tagE"></span><span id="_CPPv2N4kiwi8Morpheme3tagE"></span><span id="kiwi::Morpheme::tag__POSTag"></span><span class="target" id="structkiwi_1_1Morpheme_1ad94d847bf8179e1fed2313573f89addc"></span><a class="reference internal" href="Types.html#_CPPv4N4kiwi6POSTagE" title="kiwi::POSTag"><span class="n"><span class="pre">POSTag</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">tag</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="Types.html#_CPPv4N4kiwi6POSTagE" title="kiwi::POSTag"><span class="n"><span class="pre">POSTag</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="Types.html#_CPPv4N4kiwi6POSTag7unknownE" title="kiwi::POSTag::unknown"><span class="n"><span class="pre">unknown</span></span></a><a class="headerlink" href="#_CPPv4N4kiwi8Morpheme3tagE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi8Morpheme5vowelE">
+<span id="_CPPv3N4kiwi8Morpheme5vowelE"></span><span id="_CPPv2N4kiwi8Morpheme5vowelE"></span><span id="kiwi::Morpheme::vowel__CondVowel"></span><span class="target" id="structkiwi_1_1Morpheme_1adac63ad020b65323aedcfff6ec6ad620"></span><a class="reference internal" href="Types.html#_CPPv4N4kiwi9CondVowelE" title="kiwi::CondVowel"><span class="n"><span class="pre">CondVowel</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">vowel</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi8Morpheme5vowelE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi8Morpheme5polarE">
+<span id="_CPPv3N4kiwi8Morpheme5polarE"></span><span id="_CPPv2N4kiwi8Morpheme5polarE"></span><span id="kiwi::Morpheme::polar__CondPolarity"></span><span class="target" id="structkiwi_1_1Morpheme_1a353e39e805bf5f879100a8b68e77abb4"></span><a class="reference internal" href="Types.html#_CPPv4N4kiwi12CondPolarityE" title="kiwi::CondPolarity"><span class="n"><span class="pre">CondPolarity</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">polar</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi8Morpheme5polarE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi8Morpheme7senseIdE">
+<span id="_CPPv3N4kiwi8Morpheme7senseIdE"></span><span id="_CPPv2N4kiwi8Morpheme7senseIdE"></span><span id="kiwi::Morpheme::senseId__uint8_t"></span><span class="target" id="structkiwi_1_1Morpheme_1a4421cbfd16b88d9d47daa159674eaf18"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">senseId</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N4kiwi8Morpheme7senseIdE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi8Morpheme13combineSocketE">
+<span id="_CPPv3N4kiwi8Morpheme13combineSocketE"></span><span id="_CPPv2N4kiwi8Morpheme13combineSocketE"></span><span id="kiwi::Morpheme::combineSocket__uint8_t"></span><span class="target" id="structkiwi_1_1Morpheme_1a6aa664ae5bac1c9aaa1db3f145a067a6"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">combineSocket</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N4kiwi8Morpheme13combineSocketE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi8Morpheme8combinedE">
+<span id="_CPPv3N4kiwi8Morpheme8combinedE"></span><span id="_CPPv2N4kiwi8Morpheme8combinedE"></span><span id="kiwi::Morpheme::combined__int32_t"></span><span class="target" id="structkiwi_1_1Morpheme_1a940fd73ffe29bed18697939bc9235afd"></span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">combined</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N4kiwi8Morpheme8combinedE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi8Morpheme6chunksE">
+<span id="_CPPv3N4kiwi8Morpheme6chunksE"></span><span id="_CPPv2N4kiwi8Morpheme6chunksE"></span><span id="kiwi::Morpheme::chunks__FixedPairVector:MorphemeCP.std::pair:uint8_t.uint8_t::"></span><span class="target" id="structkiwi_1_1Morpheme_1abe1e9ebc3b4a6492408f965138719bcf"></span><span class="n"><span class="pre">FixedPairVector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N4kiwi8MorphemeE" title="kiwi::Morpheme"><span class="n"><span class="pre">Morpheme</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">pair</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">uint8_t</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">uint8_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">chunks</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi8Morpheme6chunksE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi8Morpheme9userScoreE">
+<span id="_CPPv3N4kiwi8Morpheme9userScoreE"></span><span id="_CPPv2N4kiwi8Morpheme9userScoreE"></span><span id="kiwi::Morpheme::userScore__float"></span><span class="target" id="structkiwi_1_1Morpheme_1aeef565f756b8f7cb51a93629f0e74abe"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">userScore</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N4kiwi8Morpheme9userScoreE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi8Morpheme12lmMorphemeIdE">
+<span id="_CPPv3N4kiwi8Morpheme12lmMorphemeIdE"></span><span id="_CPPv2N4kiwi8Morpheme12lmMorphemeIdE"></span><span id="kiwi::Morpheme::lmMorphemeId__uint32_t"></span><span class="target" id="structkiwi_1_1Morpheme_1a40f29de05ae347749ad1357c1c7656ab"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">lmMorphemeId</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N4kiwi8Morpheme12lmMorphemeIdE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi7FormRawE">
+<span id="_CPPv3N4kiwi7FormRawE"></span><span id="_CPPv2N4kiwi7FormRawE"></span><span id="kiwi::FormRaw"></span><span class="target" id="structkiwi_1_1FormRaw"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FormRaw</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi7FormRawE" title="Permalink to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Form.h&gt;</em></div>
+<p>형태에 관한 모든 정보를 담는 구조체의 템플릿 </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>변경가능한 상태로 인덱스와 관련된 값이나 std::vector 등의 길이를 변경할 수 있음. <code class="docutils literal notranslate"><a class="reference internal" href="Kiwi.html#classkiwi_1_1KiwiBuilder"><span class="std std-ref"><span class="pre">kiwi::KiwiBuilder</span></span></a></code>에서 사용한다. </p>
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi7FormRaw7FormRawEv">
+<span id="_CPPv3N4kiwi7FormRaw7FormRawEv"></span><span id="_CPPv2N4kiwi7FormRaw7FormRawEv"></span><span id="kiwi::FormRaw::FormRaw"></span><span class="target" id="structkiwi_1_1FormRaw_1a502f568516ee1651dc4f02e814dc7991"></span><span class="sig-name descname"><span class="n"><span class="pre">FormRaw</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4kiwi7FormRaw7FormRawEv" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi7FormRawD0Ev">
+<span id="_CPPv3N4kiwi7FormRawD0Ev"></span><span id="_CPPv2N4kiwi7FormRawD0Ev"></span><span id="kiwi::FormRaw::~FormRaw"></span><span class="target" id="structkiwi_1_1FormRaw_1acfd4e9df9377fd69f37cbca07b3755dc"></span><span class="sig-name descname"><span class="n"><span class="pre">~FormRaw</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4kiwi7FormRawD0Ev" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi7FormRaw7FormRawERK7FormRaw">
+<span id="_CPPv3N4kiwi7FormRaw7FormRawERK7FormRaw"></span><span id="_CPPv2N4kiwi7FormRaw7FormRawERK7FormRaw"></span><span id="kiwi::FormRaw::FormRaw__FormRawCR"></span><span class="target" id="structkiwi_1_1FormRaw_1a63a10c37b125ce41b1cf59bd07faa4ab"></span><span class="sig-name descname"><span class="n"><span class="pre">FormRaw</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N4kiwi7FormRaw7FormRawERK7FormRaw" title="kiwi::FormRaw::FormRaw"><span class="n"><span class="pre">FormRaw</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4kiwi7FormRaw7FormRawERK7FormRaw" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi7FormRaw7FormRawERR7FormRaw">
+<span id="_CPPv3N4kiwi7FormRaw7FormRawERR7FormRaw"></span><span id="_CPPv2N4kiwi7FormRaw7FormRawERR7FormRaw"></span><span id="kiwi::FormRaw::FormRaw__FormRawRR"></span><span class="target" id="structkiwi_1_1FormRaw_1a2f4034c31d9758540b2e4a7e2177b8ee"></span><span class="sig-name descname"><span class="n"><span class="pre">FormRaw</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N4kiwi7FormRaw7FormRawERR7FormRaw" title="kiwi::FormRaw::FormRaw"><span class="n"><span class="pre">FormRaw</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N4kiwi7FormRaw7FormRawERR7FormRaw" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi7FormRawaSERK7FormRaw">
+<span id="_CPPv3N4kiwi7FormRawaSERK7FormRaw"></span><span id="_CPPv2N4kiwi7FormRawaSERK7FormRaw"></span><span id="kiwi::FormRaw::assign-operator__FormRawCR"></span><span class="target" id="structkiwi_1_1FormRaw_1a06cf2424397f481fe4836ce244999139"></span><a class="reference internal" href="#_CPPv4N4kiwi7FormRawE" title="kiwi::FormRaw"><span class="n"><span class="pre">FormRaw</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N4kiwi7FormRawE" title="kiwi::FormRaw"><span class="n"><span class="pre">FormRaw</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4kiwi7FormRawaSERK7FormRaw" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi7FormRawaSERR7FormRaw">
+<span id="_CPPv3N4kiwi7FormRawaSERR7FormRaw"></span><span id="_CPPv2N4kiwi7FormRawaSERR7FormRaw"></span><span id="kiwi::FormRaw::assign-operator__FormRawRR"></span><span class="target" id="structkiwi_1_1FormRaw_1a1be0c155621ba3c6c101129280571287"></span><a class="reference internal" href="#_CPPv4N4kiwi7FormRawE" title="kiwi::FormRaw"><span class="n"><span class="pre">FormRaw</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N4kiwi7FormRawE" title="kiwi::FormRaw"><span class="n"><span class="pre">FormRaw</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4kiwi7FormRawaSERR7FormRaw" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi7FormRaw7FormRawERK7KString">
+<span id="_CPPv3N4kiwi7FormRaw7FormRawERK7KString"></span><span id="_CPPv2N4kiwi7FormRaw7FormRawERK7KString"></span><span id="kiwi::FormRaw::FormRaw__KStringCR"></span><span class="target" id="structkiwi_1_1FormRaw_1a918b6b5fd462c490dac34e78c19cfbe2"></span><span class="sig-name descname"><span class="n"><span class="pre">FormRaw</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="Types.html#_CPPv4N4kiwi7KStringE" title="kiwi::KString"><span class="n"><span class="pre">KString</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_form</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4kiwi7FormRaw7FormRawERK7KString" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4kiwi7FormRawltERK7FormRaw">
+<span id="_CPPv3NK4kiwi7FormRawltERK7FormRaw"></span><span id="_CPPv2NK4kiwi7FormRawltERK7FormRaw"></span><span id="kiwi::FormRaw::lt-operator__FormRawCRC"></span><span class="target" id="structkiwi_1_1FormRaw_1ab8d18489c41d2171c5524c62c13bc305"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&lt;</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N4kiwi7FormRawE" title="kiwi::FormRaw"><span class="n"><span class="pre">FormRaw</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">o</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4kiwi7FormRawltERK7FormRaw" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi7FormRaw14serializerReadERNSt7istreamE">
+<span id="_CPPv3N4kiwi7FormRaw14serializerReadERNSt7istreamE"></span><span id="_CPPv2N4kiwi7FormRaw14serializerReadERNSt7istreamE"></span><span id="kiwi::FormRaw::serializerRead__isR"></span><span class="target" id="structkiwi_1_1FormRaw_1a72c7601a92aef5459f63ceed40f638c5"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">serializerRead</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">istream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">istr</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4kiwi7FormRaw14serializerReadERNSt7istreamE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4kiwi7FormRaw15serializerWriteERNSt7ostreamE">
+<span id="_CPPv3NK4kiwi7FormRaw15serializerWriteERNSt7ostreamE"></span><span id="_CPPv2NK4kiwi7FormRaw15serializerWriteERNSt7ostreamE"></span><span id="kiwi::FormRaw::serializerWrite__osRC"></span><span class="target" id="structkiwi_1_1FormRaw_1ad410351dd8b922009ea18e4d3bebcf36"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">serializerWrite</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">ostr</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4kiwi7FormRaw15serializerWriteERNSt7ostreamE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi7FormRaw4formE">
+<span id="_CPPv3N4kiwi7FormRaw4formE"></span><span id="_CPPv2N4kiwi7FormRaw4formE"></span><span id="kiwi::FormRaw::form__KString"></span><span class="target" id="structkiwi_1_1FormRaw_1aa541ea8bad70b8fb69223d34f9ae3e24"></span><a class="reference internal" href="Types.html#_CPPv4N4kiwi7KStringE" title="kiwi::KString"><span class="n"><span class="pre">KString</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">form</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi7FormRaw4formE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>형태 </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi7FormRaw9candidateE">
+<span id="_CPPv3N4kiwi7FormRaw9candidateE"></span><span id="_CPPv2N4kiwi7FormRaw9candidateE"></span><span id="kiwi::FormRaw::candidate__Vector:uint32_t:"></span><span class="target" id="structkiwi_1_1FormRaw_1aaeb9a4a50365e34fd542d2ea07ded938"></span><a class="reference internal" href="Types.html#_CPPv4I0EN4kiwi6VectorE" title="kiwi::Vector"><span class="n"><span class="pre">Vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">uint32_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">candidate</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi7FormRaw9candidateE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>이 형태에 해당하는 형태소들의 목록 </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi4FormE">
+<span id="_CPPv3N4kiwi4FormE"></span><span id="_CPPv2N4kiwi4FormE"></span><span id="kiwi::Form"></span><span class="target" id="structkiwi_1_1Form"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Form</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi4FormE" title="Permalink to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Form.h&gt;</em></div>
+<p>형태에 관한 모든 정보를 담는 구조체의 템플릿 </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>변경 불가능한 상태로 인덱스는 모두 포인터로, std::vector는 FixedVector로 변경되어 수정이 불가능한 대신 각 값에 효율적으로 빠르게 접근 가능하다. <code class="docutils literal notranslate"><a class="reference internal" href="Kiwi.html#classkiwi_1_1Kiwi"><span class="std std-ref"><span class="pre">kiwi::Kiwi</span></span></a></code> 내 실제 형태소 분석 단계에 쓰인다. </p>
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi4Form4FormEv">
+<span id="_CPPv3N4kiwi4Form4FormEv"></span><span id="_CPPv2N4kiwi4Form4FormEv"></span><span id="kiwi::Form::Form"></span><span class="target" id="structkiwi_1_1Form_1a959622ceaa869642344aca864bf9debe"></span><span class="sig-name descname"><span class="n"><span class="pre">Form</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4kiwi4Form4FormEv" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi4FormD0Ev">
+<span id="_CPPv3N4kiwi4FormD0Ev"></span><span id="_CPPv2N4kiwi4FormD0Ev"></span><span id="kiwi::Form::~Form"></span><span class="target" id="structkiwi_1_1Form_1adb5e34781a80a7dec43da28e5d73fdc6"></span><span class="sig-name descname"><span class="n"><span class="pre">~Form</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4kiwi4FormD0Ev" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi4Form4FormERK4Form">
+<span id="_CPPv3N4kiwi4Form4FormERK4Form"></span><span id="_CPPv2N4kiwi4Form4FormERK4Form"></span><span id="kiwi::Form::Form__FormCR"></span><span class="target" id="structkiwi_1_1Form_1a0c5842c792ed732798ade19b00d5466a"></span><span class="sig-name descname"><span class="n"><span class="pre">Form</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N4kiwi4Form4FormERK4Form" title="kiwi::Form::Form"><span class="n"><span class="pre">Form</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4kiwi4Form4FormERK4Form" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi4Form4FormERR4Form">
+<span id="_CPPv3N4kiwi4Form4FormERR4Form"></span><span id="_CPPv2N4kiwi4Form4FormERR4Form"></span><span id="kiwi::Form::Form__FormRR"></span><span class="target" id="structkiwi_1_1Form_1abee52fee9a2cbda7edc1e90f489493a3"></span><span class="sig-name descname"><span class="n"><span class="pre">Form</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N4kiwi4Form4FormERR4Form" title="kiwi::Form::Form"><span class="n"><span class="pre">Form</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N4kiwi4Form4FormERR4Form" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi4FormaSERK4Form">
+<span id="_CPPv3N4kiwi4FormaSERK4Form"></span><span id="_CPPv2N4kiwi4FormaSERK4Form"></span><span id="kiwi::Form::assign-operator__FormCR"></span><span class="target" id="structkiwi_1_1Form_1a7f5be3195ee8cda8a3b72c9e201eb51f"></span><a class="reference internal" href="#_CPPv4N4kiwi4FormE" title="kiwi::Form"><span class="n"><span class="pre">Form</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N4kiwi4FormE" title="kiwi::Form"><span class="n"><span class="pre">Form</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4kiwi4FormaSERK4Form" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi4FormaSERR4Form">
+<span id="_CPPv3N4kiwi4FormaSERR4Form"></span><span id="_CPPv2N4kiwi4FormaSERR4Form"></span><span id="kiwi::Form::assign-operator__FormRR"></span><span class="target" id="structkiwi_1_1Form_1ac43ec9d9c07216c89f4fb9f78960f175"></span><a class="reference internal" href="#_CPPv4N4kiwi4FormE" title="kiwi::Form"><span class="n"><span class="pre">Form</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N4kiwi4FormE" title="kiwi::Form"><span class="n"><span class="pre">Form</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4kiwi4FormaSERR4Form" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4kiwi4FormltERK4Form">
+<span id="_CPPv3NK4kiwi4FormltERK4Form"></span><span id="_CPPv2NK4kiwi4FormltERK4Form"></span><span id="kiwi::Form::lt-operator__FormCRC"></span><span class="target" id="structkiwi_1_1Form_1a29fdf43dbd702c51a0bc3f9b65a911f5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&lt;</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N4kiwi4FormE" title="kiwi::Form"><span class="n"><span class="pre">Form</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">o</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4kiwi4FormltERK4Form" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi4Form4formE">
+<span id="_CPPv3N4kiwi4Form4formE"></span><span id="_CPPv2N4kiwi4Form4formE"></span><span id="kiwi::Form::form__KString"></span><span class="target" id="structkiwi_1_1Form_1a642ff790c81f689848a8b73e4cade54d"></span><a class="reference internal" href="Types.html#_CPPv4N4kiwi7KStringE" title="kiwi::KString"><span class="n"><span class="pre">KString</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">form</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi4Form4formE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi4Form9candidateE">
+<span id="_CPPv3N4kiwi4Form9candidateE"></span><span id="_CPPv2N4kiwi4Form9candidateE"></span><span id="kiwi::Form::candidate__FixedVector:MorphemeCP:"></span><span class="target" id="structkiwi_1_1Form_1a05479b57fda21f7951dc64b7198c2bb0"></span><span class="n"><span class="pre">FixedVector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N4kiwi8MorphemeE" title="kiwi::Morpheme"><span class="n"><span class="pre">Morpheme</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">candidate</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi4Form9candidateE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi4Form5vowelE">
+<span id="_CPPv3N4kiwi4Form5vowelE"></span><span id="_CPPv2N4kiwi4Form5vowelE"></span><span id="kiwi::Form::vowel__CondVowel"></span><span class="target" id="structkiwi_1_1Form_1a12cce1bf068ef6d5faf2b81527d36a1f"></span><a class="reference internal" href="Types.html#_CPPv4N4kiwi9CondVowelE" title="kiwi::CondVowel"><span class="n"><span class="pre">CondVowel</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">vowel</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="Types.html#_CPPv4N4kiwi9CondVowelE" title="kiwi::CondVowel"><span class="n"><span class="pre">CondVowel</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="Types.html#_CPPv4N4kiwi9CondVowel4noneE" title="kiwi::CondVowel::none"><span class="n"><span class="pre">none</span></span></a><a class="headerlink" href="#_CPPv4N4kiwi4Form5vowelE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi4Form5polarE">
+<span id="_CPPv3N4kiwi4Form5polarE"></span><span id="_CPPv2N4kiwi4Form5polarE"></span><span id="kiwi::Form::polar__CondPolarity"></span><span class="target" id="structkiwi_1_1Form_1a4dace42069405d03d59ab6ad0ef383a9"></span><a class="reference internal" href="Types.html#_CPPv4N4kiwi12CondPolarityE" title="kiwi::CondPolarity"><span class="n"><span class="pre">CondPolarity</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">polar</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="Types.html#_CPPv4N4kiwi12CondPolarityE" title="kiwi::CondPolarity"><span class="n"><span class="pre">CondPolarity</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="Types.html#_CPPv4N4kiwi12CondPolarity4noneE" title="kiwi::CondPolarity::none"><span class="n"><span class="pre">none</span></span></a><a class="headerlink" href="#_CPPv4N4kiwi4Form5polarE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi4Form8formHashE">
+<span id="_CPPv3N4kiwi4Form8formHashE"></span><span id="_CPPv2N4kiwi4Form8formHashE"></span><span id="kiwi::Form::formHash__uint8_t"></span><span class="target" id="structkiwi_1_1Form_1a41d0945b7a92e49d6bfacca96b16b917"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">formHash</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N4kiwi4Form8formHashE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
 
 </div>
 </dd></dl>

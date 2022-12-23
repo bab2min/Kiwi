@@ -4,5 +4,5 @@ digraph "Graphical Class Hierarchy"
   edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
   node [fontname="Helvetica",fontsize="10",shape=record];
   rankdir="LR";
-  Node0 [label="kiwi::WordInfo",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structkiwi_1_1WordInfo.html",tooltip=" "];
+  Node0 [label="kiwi::WordDetector\l::FromRawData",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structkiwi_1_1WordDetector_1_1FromRawData.html",tooltip=" "];
 }
