@@ -2,7 +2,7 @@
  * @file Types.h
  * @author bab2min (bab2min@gmail.com)
  * @brief Kiwi C++ API에 쓰이는 주요 타입들을 모아놓은 헤더 파일
- * @version 0.14.0
+ * @version 0.14.1
  * @date 2022-09-01
  * 
  * 
