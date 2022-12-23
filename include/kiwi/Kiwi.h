@@ -2,7 +2,7 @@
  * @file Kiwi.h
  * @author bab2min (bab2min@gmail.com)
  * @brief Kiwi C++ API를 담고 있는 헤더 파일
- * @version 0.14.0
+ * @version 0.14.1
  * @date 2022-09-01
  * 
  * 
@@ -44,7 +44,7 @@ namespace kiwi
 
 	inline uint32_t getDefaultMorphemeId(POSTag tag)
 	{
-		return (uint32_t)tag + 1;
+		return (uint32_t)clearIrregular(tag) + 1;
 	}
 
 	/**

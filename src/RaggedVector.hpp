@@ -2,69 +2,10 @@
 #include <iterator>
 #include <kiwi/Types.h>
 #include <kiwi/Mmap.h>
+#include <kiwi/Utils.h>
 
 namespace kiwi
 {
-	template<class It>
-	class Range : std::pair<It, It>
-	{
-	public:
-		using std::pair<It, It>::pair;
-		using Reference = decltype(*std::declval<It>());
-
-		It begin() const
-		{
-			return this->first;
-		}
-
-		It end() const
-		{
-			return this->second;
-		}
-
-		It begin()
-		{
-			return this->first;
-		}
-
-		It end()
-		{
-			return this->second;
-		}
-
-		std::reverse_iterator<It> rbegin() const
-		{
-			return std::reverse_iterator<It>{ this->second };
-		}
-
-		std::reverse_iterator<It> rend() const
-		{
-			return std::reverse_iterator<It>{ this->first };
-		}
-
-		std::reverse_iterator<It> rbegin()
-		{
-			return std::reverse_iterator<It>{ this->second };
-		}
-
-		std::reverse_iterator<It> rend()
-		{
-			return std::reverse_iterator<It>{ this->first };
-		}
-
-		size_t size() const { return this->second - this->first; }
-
-		const Reference operator[](size_t idx) const
-		{
-			return this->first[idx];
-		}
-
-		Reference operator[](size_t idx)
-		{
-			return this->first[idx];
-		}
-	};
-
 	template<class ValueTy>
 	class RaggedVector
 	{

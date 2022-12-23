@@ -81,6 +81,7 @@ namespace kiwi
 		size_t getBatchSize() const { return batchSize; }
 		size_t getWindowSize() const { return windowSize; }
 
+		void seed(size_t newSeed);
 		void reset();
 		size_t next(int32_t* in, int32_t* out, float* lmLProbs, uint32_t* outNgramNode, float& restLmOut, uint32_t& restLmCntOut);
 		size_t next(int64_t* in, int64_t* out, float* lmLProbs, int64_t* outNgramNode, float& restLmOut, uint32_t& restLmCntOut);
@@ -89,5 +90,9 @@ namespace kiwi
 		size_t ngramNodeSize() const;
 		const MorphemeRaw& vocabInfo(uint32_t vocab) const;
 		std::u16string vocabForm(uint32_t vocab) const;
+		std::vector<size_t> estimVocabFrequency() const;
+
+		Range<Vector<uint16_t>::const_iterator> getSent(size_t idx) const;
+		std::vector<uint16_t> getAugmentedSent(size_t idx);
 	};
 }

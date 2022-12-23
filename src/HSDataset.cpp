@@ -62,6 +62,7 @@ void HSDataset::reset()
 		l.outNgramNodeData.clear();
 		l.restLmLProbsData.clear();
 		l.restLmLProbsCntData.clear();
+		l.rng.seed(rng());
 	}
 }
 
@@ -255,4 +256,60 @@ const MorphemeRaw& HSDataset::vocabInfo(uint32_t vocab) const
 std::u16string HSDataset::vocabForm(uint32_t vocab) const
 {
 	return joinHangul((*forms)[(*morphemes)[vocabToToken[vocab]].kform].form);
+}
+
+std::vector<size_t> kiwi::HSDataset::estimVocabFrequency() const
+{
+	std::vector<size_t> ret(vocabSize()), augs(getDefaultMorphemeId(POSTag::max));
+	for (auto t : sents.get().raw())
+	{
+		auto v = tokenToVocab[t];
+		auto fv = tokenToVocab[getDefaultMorphemeId((*morphemes)[t].tag)];
+		if (v == nonVocab) v = fv;
+		if (fv == nonVocab) continue;
+		ret[v]++;
+		augs[fv]++;
+	}
+
+	double augProbs = dropout.param().probabilities().back();
+	for (size_t i = 0; i < augs.size(); ++i)
+	{
+		ret[i] += (size_t)(augs[i] * augProbs);
+	}
+	return ret;
+}
+
+Range<Vector<uint16_t>::const_iterator> HSDataset::getSent(size_t idx) const
+{
+	return sents.get()[idx];
+}
+
+void HSDataset::seed(size_t newSeed)
+{
+	rng.seed(newSeed);
+}
+
+std::vector<uint16_t> HSDataset::getAugmentedSent(size_t idx)
+{
+	std::vector<uint16_t> ret;
+	auto sent = sents.get()[idx];
+	ret.emplace_back(*sent.begin());
+	for (auto p = sent.begin() + 1; p != sent.end() - 1; ++p)
+	{
+		auto t = *p;
+		switch (dropout(rng))
+		{
+		case 0:
+		case 1:
+		case 2:
+			ret.emplace_back(t);
+			break;
+		case 3: // insertion
+			ret.emplace_back(getDefaultMorphemeId((*morphemes)[t].tag));
+			ret.emplace_back(t);
+			break;
+		}
+	}
+	ret.emplace_back(*sent.rbegin());
+	return ret;
 }
