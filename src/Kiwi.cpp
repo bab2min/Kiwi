@@ -872,7 +872,7 @@ namespace kiwi
 								for (size_t ch = 1; ch < chSize; ++ch)
 								{
 									auto& p = curMorph->chunks.getSecond(ch);
-									wids.emplace_back(oseq[ch], 0, condV, condP, 0, beginPos + p.first, beginPos + p.second);
+									wids.emplace_back(oseq[ch], 0, ch > 1 ? CondVowel::none : condV, condP, 0, beginPos + p.first, beginPos + p.second);
 								}
 							}
 							else
