@@ -23,11 +23,13 @@ namespace kiwi
 		POSTag _tag,
 		CondVowel _vowel,
 		CondPolarity _polar,
+		bool _complex,
 		uint8_t _combineSocket)
 		: tag(_tag), combineSocket(_combineSocket)
 	{
 		setVowel(_vowel);
 		setPolar(_polar);
+		setComplex(_complex);
 	}
 
 	DEFINE_SERIALIZER_OUTSIDE(MorphemeRaw, kform, tag, vpPack, combineSocket, combined, userScore, chunks, chunkPositions, lmMorphemeId, groupId);
@@ -102,6 +104,7 @@ namespace kiwi
 		ret.tag = o.tag;
 		ret.vowel = o.vowel();
 		ret.polar = o.polar();
+		ret.complex = o.complex();
 		ret.combineSocket = o.combineSocket;
 		ret.combined = o.combined;
 		ret.userScore = o.userScore;

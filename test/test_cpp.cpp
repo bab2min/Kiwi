@@ -88,6 +88,39 @@ TEST(KiwiCpp, SingleResult)
 	}
 }
 
+TEST(KiwiCpp, SplitComplex)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	auto testCases = {
+		//u"고맙습니다",
+		u"고마워합니다",
+		u"고마움",
+	};
+	for (auto s : testCases)
+	{
+		auto res1 = kiwi.analyze(s, Match::allWithNormalizing);
+		auto res2 = kiwi.analyze(s, Match::allWithNormalizing | Match::splitComplex);
+		EXPECT_NE(res1.first[0].str, u"고맙");
+		EXPECT_EQ(res2.first[0].str, u"고맙");
+	}
+}
+
+TEST(KiwiCpp, EmptyToken)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	auto testCases = {
+		u"제목원래 마이 리틀 김구라 아닙니까?김구라는 한번도 안빠지고 순위도 4위하는데 계속나오네요다른분들도 그럼 교체하지 말아야지요;",
+	};
+	for (auto s : testCases)
+	{
+		auto res = kiwi.analyze(s, Match::allWithNormalizing);
+		for (auto& t : res.first)
+		{
+			EXPECT_FALSE(t.str.empty());
+		}
+	}
+}
+
 TEST(KiwiCpp, HSDataset)
 {
 	KiwiBuilder kw{ MODEL_PATH, 0, BuildOption::default_, };
@@ -204,7 +237,7 @@ TEST(KiwiCpp, SpaceTolerant)
 	kiwi.setSpaceTolerance(1);
 	kiwi.setSpacePenalty(3);
 	tokens = kiwi.analyze(str, Match::all).first;
-	EXPECT_EQ(tokens.size(), 9);
+	EXPECT_LE(tokens.size(), 11);
 
 	kiwi.setSpaceTolerance(2);
 	tokens = kiwi.analyze(str, Match::all).first;

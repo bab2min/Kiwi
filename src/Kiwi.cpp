@@ -42,12 +42,20 @@ namespace kiwi
 		using Path = Vector<Result>;
 
 		template<class LmState>
-		static Vector<std::pair<Path, float>> findBestPath(const Kiwi* kw, const Vector<KGraphNode>& graph, size_t topN, bool openEnd);
+		static Vector<std::pair<Path, float>> findBestPath(const Kiwi* kw, 
+			const Vector<KGraphNode>& graph, 
+			size_t topN, 
+			bool openEnd,
+			bool splitComplex = false,
+			const std::unordered_set<const Morpheme*>* blocklist = nullptr
+		);
 
 		template<class LmState, class CandTy, class CacheTy>
 		static float evalPath(const Kiwi* kw, const KGraphNode* startNode, const KGraphNode* node,
 			CacheTy& cache, Vector<KString>& ownFormList,
-			size_t i, size_t ownFormId, CandTy&& cands, bool unknownForm
+			size_t i, size_t ownFormId, CandTy&& cands, bool unknownForm,
+			bool splitComplex = false,
+			const std::unordered_set<const Morpheme*>* blocklist = nullptr
 		);
 	};
 
@@ -68,6 +76,7 @@ namespace kiwi
 	{
 		selectedArch = arch;
 		dfSplitByTrie = (void*)getSplitByTrieFn(selectedArch, typoTolerant);
+		dfFindForm = (void*)getFindFormFn(selectedArch);
 
 		static tp::Table<FnFindBestPath, AvailableArch> lmKnLM_8{ FindBestPathGetter<WrappedKnLM<uint8_t>::type>{} };
 		static tp::Table<FnFindBestPath, AvailableArch> lmKnLM_16{ FindBestPathGetter<WrappedKnLM<uint16_t>::type>{} };
@@ -380,7 +389,7 @@ namespace kiwi
 		}
 	}
 
-	vector<TokenResult> Kiwi::analyze(const u16string& str, size_t topN, Match matchOptions) const
+	vector<TokenResult> Kiwi::analyze(const u16string& str, size_t topN, Match matchOptions, const std::unordered_set<const Morpheme*>* blocklist) const
 	{
 		auto chunk = str.begin();
 		Vector<u16string::const_iterator> sents;
@@ -418,7 +427,7 @@ namespace kiwi
 		}
 		if (sents.back() != str.end()) sents.emplace_back(str.end());
 		if (sents.size() <= 1) return vector<TokenResult>(1);
-		vector<TokenResult> ret = analyzeSent(sents[0], sents[1], topN, matchOptions);
+		vector<TokenResult> ret = analyzeSent(sents[0], sents[1], topN, matchOptions, blocklist);
 		if (ret.empty())
 		{
 			return vector<TokenResult>(1);
@@ -426,7 +435,7 @@ namespace kiwi
 		while (ret.size() < topN) ret.emplace_back(ret.back());
 		for (size_t i = 2; i < sents.size(); ++i)
 		{
-			auto res = analyzeSent(sents[i - 1], sents[i], topN, matchOptions);
+			auto res = analyzeSent(sents[i - 1], sents[i], topN, matchOptions, blocklist);
 			if (res.empty()) continue;
 			for (size_t n = 0; n < topN; ++n)
 			{
@@ -712,7 +721,9 @@ namespace kiwi
 		size_t i, 
 		size_t ownFormId, 
 		CandTy&& cands, 
-		bool unknownForm
+		bool unknownForm,
+		bool splitComplex,
+		const std::unordered_set<const Morpheme*>* blocklist
 	)
 	{
 		const size_t langVocabSize = kw->langMdl.knlm->getHeader().vocab_size;
@@ -729,6 +740,8 @@ namespace kiwi
 		{
 			for (auto& curMorph : cands)
 			{
+				if (splitComplex && curMorph->getCombined()->complex) continue;
+				if (blocklist && blocklist->count(curMorph->getCombined())) continue;
 				array<Wid, 4> seq = { 0, };
 				array<Wid, 4> oseq = { 0, };
 				uint8_t combSocket = 0;
@@ -737,7 +750,7 @@ namespace kiwi
 				size_t chSize = 1;
 				bool isUserWord = false;
 				// if the morpheme is chunk set
-				if (!curMorph->chunks.empty())
+				if (!curMorph->chunks.empty() && !curMorph->complex)
 				{
 					chSize = curMorph->chunks.size();
 					for (size_t i = 0; i < chSize; ++i)
@@ -924,7 +937,13 @@ namespace kiwi
 	}
 
 	template<class LmState>
-	Vector<pair<PathEvaluator::Path, float>> PathEvaluator::findBestPath(const Kiwi* kw, const Vector<KGraphNode>& graph, size_t topN, bool openEnd)
+	Vector<pair<PathEvaluator::Path, float>> PathEvaluator::findBestPath(const Kiwi* kw, 
+		const Vector<KGraphNode>& graph, 
+		size_t topN, 
+		bool openEnd,
+		bool splitComplex,
+		const std::unordered_set<const Morpheme*>* blocklist
+	)
 	{
 		static constexpr size_t eosId = 1;
 
@@ -958,7 +977,7 @@ namespace kiwi
 
 			if (node->form)
 			{
-				tMax = evalPath<LmState>(kw, startNode, node, cache, ownFormList, i, ownFormId, node->form->candidate, false);
+				tMax = evalPath<LmState>(kw, startNode, node, cache, ownFormList, i, ownFormId, node->form->candidate, false, splitComplex, blocklist);
 				if (all_of(node->form->candidate.begin(), node->form->candidate.end(), [](const Morpheme* m)
 				{
 					return m->combineSocket || !m->chunks.empty();
@@ -966,12 +985,12 @@ namespace kiwi
 				{
 					ownFormList.emplace_back(node->form->form);
 					ownFormId = ownFormList.size();
-					tMax = min(tMax, evalPath<LmState>(kw, startNode, node, cache, ownFormList, i, ownFormId, unknownNodeLCands, true));
+					tMax = min(tMax, evalPath<LmState>(kw, startNode, node, cache, ownFormList, i, ownFormId, unknownNodeLCands, true, splitComplex, blocklist));
 				};
 			}
 			else
 			{
-				tMax = evalPath<LmState>(kw, startNode, node, cache, ownFormList, i, ownFormId, unknownNodeCands, true);
+				tMax = evalPath<LmState>(kw, startNode, node, cache, ownFormList, i, ownFormId, unknownNodeCands, true, splitComplex, blocklist);
 			}
 
 			// heuristically remove cands having lower ll to speed up
@@ -1193,7 +1212,12 @@ namespace kiwi
 		return ++first;
 	}
 
-	std::vector<TokenResult> Kiwi::analyzeSent(const std::u16string::const_iterator& sBegin, const std::u16string::const_iterator& sEnd, size_t topN, Match matchOptions, bool openEnd) const
+	std::vector<TokenResult> Kiwi::analyzeSent(const std::u16string::const_iterator& sBegin, const std::u16string::const_iterator& sEnd, 
+		size_t topN, 
+		Match matchOptions, 
+		bool openEnd, 
+		const std::unordered_set<const Morpheme*>* blocklist
+	) const
 	{
 		auto normalized = normalizeHangulWithPosition(sBegin, sEnd);
 		auto& normalizedStr = normalized.first;
@@ -1203,7 +1227,16 @@ namespace kiwi
 		// 분석할 문장에 포함된 개별 문자에 대해 어절번호를 생성한다
 		std::vector<uint16_t> wordPositions = getWordPositions(sBegin, sEnd);
 		
-		auto nodes = (*reinterpret_cast<FnSplitByTrie>(dfSplitByTrie))(forms.data(), typoPtrs.data(), formTrie, normalizedStr, matchOptions, maxUnkFormSize, spaceTolerance, typoCostWeight);
+		auto nodes = (*reinterpret_cast<FnSplitByTrie>(dfSplitByTrie))(
+			forms.data(), 
+			typoPtrs.data(), 
+			formTrie, 
+			normalizedStr, 
+			matchOptions, 
+			maxUnkFormSize, 
+			spaceTolerance, 
+			typoCostWeight
+		);
 		vector<TokenResult> ret;
 		if (nodes.size() <= 2)
 		{
@@ -1211,8 +1244,15 @@ namespace kiwi
 			return ret;
 		}
 
-		Vector<std::pair<PathEvaluator::Path, float>> res = (*reinterpret_cast<FnFindBestPath>(dfFindBestPath))(this, nodes, topN, openEnd);
-		for (auto&& r : res)
+		Vector<std::pair<PathEvaluator::Path, float>> res = (*reinterpret_cast<FnFindBestPath>(dfFindBestPath))(
+			this, 
+			nodes, 
+			topN, 
+			openEnd, 
+			!!(matchOptions & Match::splitComplex), 
+			blocklist
+		);
+		for (auto& r : res)
 		{
 			vector<TokenInfo> rarr;
 			const KString* prevMorph = nullptr;
@@ -1270,13 +1310,75 @@ namespace kiwi
 		return &morphemes[getDefaultMorphemeId(tag)];
 	}
 
-	future<vector<TokenResult>> Kiwi::asyncAnalyze(const string& str, size_t topN, Match matchOptions) const
+	template<class Str, class ...Rest>
+	auto Kiwi::_asyncAnalyze(Str&& str, Rest&&... args) const
 	{
 		if (!pool) throw Exception{ "`asyncAnalyze` doesn't work at single thread mode." };
-		return pool->enqueue([&, str, topN, matchOptions](size_t)
+		return pool->enqueue([=, str = std::forward<Str>(str)](size_t)
 		{
-			return analyze(str, topN, matchOptions);
+			return analyze(str, args...);
 		});
+	}
+
+	template<class Str, class ...Rest>
+	auto Kiwi::_asyncAnalyzeEcho(Str&& str, Rest&&... args) const
+	{
+		if (!pool) throw Exception{ "`asyncAnalyze` doesn't work at single thread mode." };
+		return pool->enqueue([=, str = std::forward<Str>(str)](size_t) mutable
+		{
+			auto ret = analyze(str, args...);
+			return make_pair(move(ret), move(str));
+		});
+	}
+
+	future<vector<TokenResult>> Kiwi::asyncAnalyze(const string& str, size_t topN, Match matchOptions, const std::unordered_set<const Morpheme*>* blocklist) const
+	{
+		return _asyncAnalyze(str, topN, matchOptions, blocklist);
+	}
+
+	future<vector<TokenResult>> Kiwi::asyncAnalyze(string&& str, size_t topN, Match matchOptions, const std::unordered_set<const Morpheme*>* blocklist) const
+	{
+		return _asyncAnalyze(std::move(str), topN, matchOptions, blocklist);
+	}
+
+	future<TokenResult> Kiwi::asyncAnalyze(const string& str, Match matchOptions, const std::unordered_set<const Morpheme*>* blocklist) const
+	{
+		return _asyncAnalyze(str, matchOptions, blocklist);
+	}
+
+	future<TokenResult> Kiwi::asyncAnalyze(string&& str, Match matchOptions, const std::unordered_set<const Morpheme*>* blocklist) const
+	{
+		return _asyncAnalyze(std::move(str), matchOptions, blocklist);
+	}
+
+	future<pair<TokenResult, string>> Kiwi::asyncAnalyzeEcho(string&& str, Match matchOptions, const std::unordered_set<const Morpheme*>* blocklist) const
+	{
+		return _asyncAnalyzeEcho(std::move(str), matchOptions, blocklist);
+	}
+
+	future<vector<TokenResult>> Kiwi::asyncAnalyze(const u16string& str, size_t topN, Match matchOptions, const std::unordered_set<const Morpheme*>* blocklist) const
+	{
+		return _asyncAnalyze(str, topN, matchOptions, blocklist);
+	}
+
+	future<vector<TokenResult>> Kiwi::asyncAnalyze(u16string&& str, size_t topN, Match matchOptions, const std::unordered_set<const Morpheme*>* blocklist) const
+	{
+		return _asyncAnalyze(std::move(str), topN, matchOptions, blocklist);
+	}
+
+	future<TokenResult> Kiwi::asyncAnalyze(const u16string& str, Match matchOptions, const std::unordered_set<const Morpheme*>* blocklist) const
+	{
+		return _asyncAnalyze(str, matchOptions, blocklist);
+	}
+
+	future<TokenResult> Kiwi::asyncAnalyze(u16string&& str, Match matchOptions, const std::unordered_set<const Morpheme*>* blocklist) const
+	{
+		return _asyncAnalyze(std::move(str), matchOptions, blocklist);
+	}
+
+	future<pair<TokenResult, u16string>> Kiwi::asyncAnalyzeEcho(u16string&& str, Match matchOptions, const std::unordered_set<const Morpheme*>* blocklist) const
+	{
+		return _asyncAnalyzeEcho(std::move(str), matchOptions, blocklist);
 	}
 
 	using FnNewAutoJoiner = cmb::AutoJoiner(Kiwi::*)() const;
@@ -1417,5 +1519,22 @@ namespace kiwi
 	{
 		const size_t* p = &typoPtrs[typoFormId];
 		return joinHangul(typoPool.begin() + p[0], typoPool.begin() + p[1]);
+	}
+
+	vector<const Morpheme*> Kiwi::findMorpheme(const u16string& s, POSTag tag) const
+	{
+		vector<const Morpheme*> ret;
+		auto normalized = normalizeHangul(s);
+		auto form = (*reinterpret_cast<FnFindForm>(dfFindForm))(formTrie, normalized);
+		if (!form) return ret;
+		for (auto c : form->candidate)
+		{
+			if (c->combineSocket
+				|| (tag != POSTag::unknown 
+				&& clearIrregular(c->tag) != tag))
+				continue;
+			ret.emplace_back(c);
+		}
+		return ret;
 	}
 }

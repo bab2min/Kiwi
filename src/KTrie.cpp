@@ -455,6 +455,22 @@ Vector<KGraphNode> kiwi::splitByTrie(
 	return ret;
 }
 
+template<ArchType arch>
+const Form* kiwi::findForm(
+	const utils::FrozenTrie<kchar_t, const Form*>& trie,
+	const KString& str
+)
+{
+	auto* node = trie.root();
+	for (auto c : str)
+	{
+		node = node->template nextOpt<arch>(trie, c);
+		if (!node) return nullptr;
+	}
+	if (trie.hasSubmatch(node->val(trie))) return nullptr;
+	return node->val(trie);
+}
+
 template<bool typoTolerant>
 struct SplitByTrieGetter
 {
@@ -480,16 +496,20 @@ FnSplitByTrie kiwi::getSplitByTrieFn(ArchType arch, bool typoTolerant)
 	}
 }
 
-const Form * KTrie::findForm(const KString & str) const
+struct FindFormGetter
 {
-	const KTrie* curTrie = this;
-	for (auto c : str)
+	template<std::ptrdiff_t i>
+	struct Wrapper
 	{
-		if (!curTrie->getNext(c)) return nullptr;
-		curTrie = curTrie->getNext(c);
-	}
-	if (curTrie->val != (void*)-1) return curTrie->val;
-	return nullptr;
+		static constexpr FnFindForm value = &findForm<static_cast<ArchType>(i)>;
+	};
+};
+
+FnFindForm kiwi::getFindFormFn(ArchType arch)
+{
+	static tp::Table<FnFindForm, AvailableArch> table{ FindFormGetter{} };
+
+	return table[static_cast<std::ptrdiff_t>(arch)];
 }
 
 Vector<KGraphNode> KGraphNode::removeUnconnected(const Vector<KGraphNode>& graph)

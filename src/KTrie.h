@@ -61,12 +61,20 @@ namespace kiwi
 		size_t spaceTolerance,
 		float typoCostWeight
 	);
+
+	template<ArchType arch>
+	const Form* findForm(
+		const utils::FrozenTrie<kchar_t, const Form*>& trie,
+		const KString& str
+	);
 	
 	using FnSplitByTrie = decltype(&splitByTrie<ArchType::default_>);
 	FnSplitByTrie getSplitByTrieFn(ArchType arch, bool typoTolerant);
 
+	using FnFindForm = decltype(&findForm<ArchType::default_>);
+	FnFindForm getFindFormFn(ArchType arch);
+
 	struct KTrie : public utils::TrieNode<char16_t, const Form*, utils::ConstAccess<map<char16_t, int32_t>>, KTrie>
 	{
-		const Form* findForm(const KString& str) const;
 	};
 }
