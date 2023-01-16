@@ -102,12 +102,14 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 					}
 				}
 				fm.candidate.emplace_back(unifiedId);
+				return unifiedId;
 			}
 			else
 			{
 				fm.candidate.emplace_back(it->second);
 			}
 			if (!unified) morphemes[it->second].kform = &fm - &forms[0];
+			return it->second;
 		}
 		else
 		{
@@ -119,6 +121,7 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 			morphemes.back().userScore = score;
 			morphemes.back().lmMorphemeId = origMorphemeId;
 			morphemes.back().groupId = groupId;
+			return mid;
 		}
 	};
 
@@ -301,6 +304,8 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 		if (!p.addAlias) continue;
 		if (p.weight > 0) morphemes[it->second].userScore += p.weight;
 	}
+	
+	UnorderedMap<pair<KString, POSTag>, size_t> longTailMap;
 
 	for (LongTail& p : longTails)
 	{
@@ -328,7 +333,16 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 			// groupId 삽입용이 아닌 long tail에 대해서
 			if (p.origTag != POSTag::unknown)
 			{
-				insertMorph(move(p.form), p.weight < 0 ? p.weight : log(p.weight / longTailWeights[p.tag]), p.tag, p.cvowel, p.cpolar, p.complex, getDefaultMorphemeId(p.tag), groupId);
+				size_t mid = insertMorph(move(p.form), 
+					p.weight < 0 ? p.weight : log(p.weight / longTailWeights[p.tag]), 
+					p.tag, 
+					p.cvowel, 
+					p.cpolar, 
+					p.complex, 
+					getDefaultMorphemeId(p.tag), 
+					groupId
+				);
+				longTailMap.emplace(make_pair(forms[morphemes[mid].kform].form, p.tag), mid);
 			}
 		}
 		else
@@ -349,21 +363,17 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 	}
 
 	// fill chunks of complex morphemes
-	for (auto& p : complexChunks)
+	for (auto& morph : morphemes)
 	{
-		auto it = morphMap.find(p.first);
-		if (it == morphMap.end())
-		{
-			throw Exception{ "cannot find complex morpheme : " + utf16To8(joinHangul(p.first.first)) + "/" + tagToString(p.first.second) };
-		}
-		auto& morph = morphemes[it->second];
-		if (!morph.kform) continue;
-		auto fd = split(p.second, u' ');
+		auto it = complexChunks.find(make_pair(forms[morph.kform].form, morph.tag));
+		if (it == complexChunks.end()) continue;
+		auto fd = split(it->second, u' ');
+
 		if (fd.back().size() != (fd.size() - 1) * 2)
 		{
 			throw Exception{ "wrong position information : " + utf16To8(fd.back()) };
 		}
-		auto posMap = normalizeHangulWithPosition(joinHangul(p.first.first)).second;
+		auto posMap = normalizeHangulWithPosition(joinHangul(it->first.first)).second;
 		for (size_t i = 0; i < fd.size() - 1; ++i)
 		{
 			auto f = split(fd[i], u'/');
@@ -375,6 +385,15 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 			{
 				throw Exception{ "cannot find morpheme : " + utf16To8(fd[i]) };
 			}
+			if (!morphemes[it->second].kform)
+			{
+				it = longTailMap.find(make_pair(norm, tag));
+				if (it == longTailMap.end())
+				{
+					throw Exception{ "cannot find morpheme : " + utf16To8(fd[i]) };
+				}
+			}
+
 			morph.chunks.emplace_back(it->second);
 			size_t start = fd.back()[i * 2] - u'0';
 			size_t end = fd.back()[i * 2 + 1] - u'0';
