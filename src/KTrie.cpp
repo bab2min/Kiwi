@@ -323,7 +323,7 @@ Vector<KGraphNode> kiwi::splitByTrie(
 					}
 				}
 			}
-			lastSpecialEndPos = specialStartPos;
+			lastSpecialEndPos = (lastChrType == POSTag::sso || lastChrType == POSTag::ssc) ? nonSpaces.size() : specialStartPos;
 			specialStartPos = nonSpaces.size();
 		}
 		lastMatchedPattern = POSTag::unknown;
