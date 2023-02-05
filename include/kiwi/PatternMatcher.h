@@ -20,9 +20,10 @@ namespace kiwi
 		joinNounSuffix = 1 << 18, /**< 명사파생접미사(XSN)를 분리하지 않고 합쳐서 매칭한다 */
 		joinVerbSuffix = 1 << 19, /**< 동사파생접미사(XSV)를 분리하지 않고 합쳐서 매칭한다 */
 		joinAdjSuffix = 1 << 20, /**< 형용사파생접미사(XSA)를 분리하지 않고 합쳐서 매칭한다 */
-		splitComplex = 1 << 21, /**< 더 작은 단위로 분할될 수 있는 형태소는 더 분할하여 매칭한다 */
+		joinAdvSuffix = 1 << 21, /**< 부사파생접미사(XSM)를 분리하지 않고 합쳐서 매칭한다 */
+		splitComplex = 1 << 22, /**< 더 작은 단위로 분할될 수 있는 형태소는 더 분할하여 매칭한다 */
 		joinVSuffix = joinVerbSuffix | joinAdjSuffix,
-		joinAffix = joinNounPrefix | joinNounSuffix | joinVerbSuffix | joinAdjSuffix,
+		joinAffix = joinNounPrefix | joinNounSuffix | joinVerbSuffix | joinAdjSuffix | joinAdvSuffix,
 		all = url | email | hashtag | mention | serial,
 		allWithNormalizing = all | normalizeCoda,
 	};

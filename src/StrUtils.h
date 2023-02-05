@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <string>
 #include <vector>
 #include <utility>
@@ -412,6 +412,7 @@ namespace kiwi
 		if (tagStr == u"XSN") return POSTag::xsn;
 		if (tagStr == u"XSV") return POSTag::xsv;
 		if (tagStr == u"XSA") return POSTag::xsa;
+		if (tagStr == u"XSM") return POSTag::xsm;
 		if (tagStr == u"XR") return POSTag::xr;
 		if (tagStr == u"SF") return POSTag::sf;
 		if (tagStr == u"SP") return POSTag::sp;

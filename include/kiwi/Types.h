@@ -173,7 +173,7 @@ namespace kiwi
 		vx,
 		mm, maj,
 		ic,
-		xpn, xsn, xsv, xsa, xr,
+		xpn, xsn, xsv, xsa, xsm, xr,
 		vcp, vcn,
 		sf, sp, ss, sso, ssc, se, so, sw,
 		sl, sh, sn,

@@ -1156,7 +1156,7 @@ namespace kiwi
 	template<class TokenInfoIt>
 	TokenInfoIt joinAffixTokens(TokenInfoIt first, TokenInfoIt last, Match matchOptions)
 	{
-		if (!(matchOptions & (Match::joinNounPrefix | Match::joinNounSuffix | Match::joinVerbSuffix | Match::joinAdjSuffix))) return last;
+		if (!(matchOptions & (Match::joinNounPrefix | Match::joinNounSuffix | Match::joinVerbSuffix | Match::joinAdjSuffix | Match::joinAdvSuffix))) return last;
 		if (std::distance(first, last) < 2) return last;
 
 		auto next = first;
@@ -1200,6 +1200,15 @@ namespace kiwi
 			)
 			{
 				concatTokens(current, nextToken, setIrregular(POSTag::va, isIrregular(nextToken.tag)));
+				++next;
+			}
+			// (NN. | XR) + XSM => MAG
+			else if (!!(matchOptions & Match::joinAdvSuffix)
+				&& nextToken.tag == POSTag::xsm
+				&& ((POSTag::nng <= current.tag && current.tag <= POSTag::nnb) || current.tag == POSTag::xr)
+				)
+			{
+				concatTokens(current, nextToken, POSTag::mag);
 				++next;
 			}
 			else

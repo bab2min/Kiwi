@@ -91,17 +91,32 @@ TEST(KiwiCpp, SingleResult)
 TEST(KiwiCpp, SplitComplex)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
-	auto testCases = {
-		//u"고맙습니다",
-		u"고마워합니다",
-		u"고마움",
-	};
-	for (auto s : testCases)
 	{
-		auto res1 = kiwi.analyze(s, Match::allWithNormalizing);
-		auto res2 = kiwi.analyze(s, Match::allWithNormalizing | Match::splitComplex);
-		EXPECT_NE(res1.first[0].str, u"고맙");
-		EXPECT_EQ(res2.first[0].str, u"고맙");
+		auto testCases = {
+			//u"고맙습니다",
+			u"고마워합니다",
+			u"고마움",
+		};
+		for (auto s : testCases)
+		{
+			auto res1 = kiwi.analyze(s, Match::allWithNormalizing);
+			auto res2 = kiwi.analyze(s, Match::allWithNormalizing | Match::splitComplex);
+			EXPECT_NE(res1.first[0].str, u"고맙");
+			EXPECT_EQ(res2.first[0].str, u"고맙");
+		}
+	}
+
+	{
+		auto testCases = {
+			u"감사히",
+		};
+		for (auto s : testCases)
+		{
+			auto res1 = kiwi.analyze(s, Match::allWithNormalizing);
+			auto res2 = kiwi.analyze(s, Match::allWithNormalizing | Match::splitComplex);
+			EXPECT_NE(res1.first[0].str, u"감사");
+			EXPECT_EQ(res2.first[0].str, u"감사");
+		}
 	}
 }
 
