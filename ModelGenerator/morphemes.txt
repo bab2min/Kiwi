@@ -209,7 +209,8 @@
 아이	NNG	14376
 뒤	NNG	14247
 전	NNG	14033
-많이	MAG	14025
+이	XSM	14025
+많이	MAG	14025	complex 많/VA 이/XSM 0112
 도록	EC	13937
 저	NP	13862
 다음	NNG	13816
@@ -266,7 +267,7 @@
 내	VV	10723
 정치	NNG	10720
 이거	NP	10715	=이것
-없이	MAG	10538
+없이	MAG	10538	complex 없/VA 이/XSM 0112
 의미	NNG	10536
 왜	MAG	10519
 국가	NNG	10502
@@ -314,7 +315,7 @@
 으나	EC	9441	non_vowel	=나
 너	NP	9417
 아요	EF	9407
-같이	MAG	9402
+같이	MAG	9402	complex 같/VA 이/XSM 0112
 이번	NNG	9388
 에요	EF	9372
 여러	MM	9342
@@ -330,6 +331,7 @@
 전	MM	8999
 과정	NNG	8998
 역사	NNG	8987
+히	XSM	8976
 특히	MAG	8976
 방법	NNG	8956
 느끼	VV	8937
@@ -568,6 +570,7 @@
 넘	VV	5054
 땅	NNG	5051
 나	VX	5034
+나	XSA	5034
 말씀	NNG	5002
 형	NNG	4998
 로부터	JKB	4998	vocalic	==으로부터
@@ -938,7 +941,7 @@
 가깝	VA-I	3048
 현재	NNG	3046
 이제	IC	3046
-굉장히	MAG	3044
+굉장히	MAG	3044	complex 굉장/XR 히/XSM 0223
 층	NNG	3044
 걱정	NNG	3032
 강화	NNG	3027
@@ -1047,7 +1050,8 @@
 시설	NNG	2770
 나타내	VV	2763
 정하	VV	2757
-심하	VA	2756
+심	XR	2756
+심하	VA	2756	complex 심/XR 하/XSA 0112
 도움	NNG	2752
 붙	VV	2749
 기에	EC	2749
@@ -1113,7 +1117,7 @@
 같이	JKB	2591
 행복	NNG	2589
 아기	NNG	2587
-여전히	MAG	2581
+여전히	MAG	2581	complex 여전/XR 히/XSM 0223
 항상	MAG	2577
 정리	NNG	2574
 남성	NNG	2572
@@ -1182,7 +1186,7 @@
 민주	NNG	2418
 전달	NNG	2417
 반응	NNG	2416
-완전히	MAG	2416
+완전히	MAG	2416	complex 완전/NNG 히/XSM 0223
 네	MM	2412
 일정	NNG	2411
 수업	NNG	2410
@@ -1224,7 +1228,8 @@
 주택	NNG	2318
 살펴보	VV	2316	complex 살피/VV 어/EC 보/VX 021223
 께서	JKS	2315
-흔히	MAG	2315
+흔	XR	2315
+흔히	MAG	2315	complex 흔/XR 히/XSM 0223
 인터넷	NNG	2312
 농민	NNG	2308
 돌	VV	2302
@@ -1307,7 +1312,7 @@
 오	NR	2163
 늘	VV	2161
 감사	NNG	2158
-열심히	MAG	2158
+열심히	MAG	2158	complex 열심/NNG 히/XSM 0223
 야	IC	2153
 기	NNG	2153
 보험	NNG	2148
@@ -1520,7 +1525,7 @@
 회복	NNG	1786
 관점	NNG	1784
 시행	NNG	1783
-엄청나	VA	1783
+엄청나	VA	1783	complex 엄청/MAG 나/XSA 0223
 주목	NNG	1782
 어떻게	MAG	1781
 찾아오	VV	1778	complex 찾/VV 어/EC 오/VX 011223
@@ -1583,7 +1588,7 @@
 최초	NNG	1714
 지나치	VA	1713
 직업	NNG	1713
-분명히	MAG	1712
+분명히	MAG	1712	complex 분명/XR 히/XSM 0223
 즉	MAJ	1706
 대출	NNG	1704
 체험	NNG	1702
@@ -1611,7 +1616,7 @@
 가끔	MAG	1680
 구요	EF	1677
 랑	JKB	1676	vowel	0.9939722724532851	==이랑
-충분히	MAG	1676
+충분히	MAG	1676	complex 충분/XR 히/XSM 0223
 건축	NNG	1676
 시즌	NNG	1675
 상호	NNG	1675
@@ -1717,7 +1722,7 @@
 보통	NNG	1552
 비록	MAG	1552
 자랑	NNG	1550
-상당히	MAG	1550
+상당히	MAG	1550	complex 상당/NNG 히/XSM 0223
 참가	NNG	1550
 소속	NNG	1548
 을지	EC	1546	non_vowel	==ᆯ지
@@ -1885,7 +1890,8 @@
 약하	VA	1385
 중단	NNG	1385
 질	NNG	1383
-편하	VA	1382
+편	XR	1382
+편하	VA	1382	complex 편/XR 하/XSA 0112
 전반	NNG	1382
 기울이	VV	1381
 여인	NNG	1381
@@ -2029,7 +2035,7 @@
 보편	NNG	1270
 결합	NNG	1268
 다소	MAG	1268
-가까이	MAG	1262
+가까이	MAG	1262	complex 가깝/VA-I 이/XSM 0223
 용어	NNG	1259
 손가락	NNG	1259
 지	NNG	1259
@@ -2074,7 +2080,7 @@
 수학	NNG	1237
 야당	NNG	1237
 군요	EF	1235
-당연히	MAG	1235
+당연히	MAG	1235	complex 당연/XR 히/XSM 0223
 위협	NNG	1235
 식당	NNG	1235
 토지	NNG	1235
@@ -2157,7 +2163,7 @@
 랑	JC	1182	vowel	0.9914893617021276	==이랑
 바람직	XR	1182
 맑	VA	1181
-단순히	MAG	1181
+단순히	MAG	1181	complex 단순/XR 히/XSM 0223
 아무래도	MAG	1181
 씻	VV-R	1181
 조각	NNG	1181
@@ -2187,7 +2193,7 @@
 기여	NNG	1165
 자마자	EC	1163
 비리	NNG	1163
-가만히	MAG	1163
+가만히	MAG	1163	complex 가만/MAG 히/XSM 0223
 개입	NNG	1162
 줄	VV	1162
 오염	NNG	1162
@@ -2254,7 +2260,7 @@
 근처	NNG	1118
 분단	NNG	1114
 재판	NNG	1114
-깊이	MAG	1113
+깊이	MAG	1113	complex 깊/VA 이/XSM 0112
 식물	NNG	1112
 계층	NNG	1111
 학원	NNG	1111
@@ -2274,10 +2280,10 @@
 극장	NNG	1105
 탄생	NNG	1103
 미안	NNG	1102
-뛰어나	VA	1101	complex 뛰/VV 어/EC 나/VX 011223
+뛰어나	VA	1101	complex 뛰/VV 어/EC 나/XSA 011223
 피부	NNG	1101
 여섯	NR	1099
-솔직히	MAG	1098
+솔직히	MAG	1098	complex 솔직/XR 히/XSM 0223
 눈길	NNG	1098
 발휘	NNG	1097
 거대	NNG	1097
@@ -2701,7 +2707,7 @@
 택하	VV	867
 권위	NNG	867
 풀	NNG	866
-대단히	MAG	865
+대단히	MAG	865	complex 대단/XR 히/XSM 0223
 진화	NNG	865
 분노	NNG	864
 저기	NP	864
@@ -2873,7 +2879,7 @@
 곳곳	NNG	811
 일방	NNG	810
 신앙	NNG	810
-흔하	VA	809
+흔하	VA	809	complex 흔/XR 하/XSA 0112
 만화	NNG	809
 협회	NNG	808
 입구	NNG	807
@@ -2890,7 +2896,7 @@
 제약	NNG	801
 정치인	NNG	801
 영향력	NNG	801
-확실히	MAG	800
+확실히	MAG	800	complex 확실/XR 히/XSM 0223
 악화	NNG	799
 ᆯ로	JKB	798	vowel	0.9691358024691358	=으로
 저기	IC	798
@@ -2930,6 +2936,9 @@
 올바르	VA	787
 콩	NNG	786
 바치	VV	786
+뜨리	XSV	786
+트리	XSV	786	=뜨리
+이	XSV	786
 터뜨리	VV	786
 지경	NNB	784
 연상	NNG	784
@@ -3037,7 +3046,7 @@
 눈앞	NNG	757
 내다보	VV	757	complex 내/VV 다/EC 보/VX 011223
 출마	NNG	756
-정확히	MAG	756
+정확히	MAG	756	complex 정확/XR 히/XSM 0223
 그야말로	MAG	756
 도달	NNG	756
 가	NNG	756
@@ -3103,7 +3112,7 @@
 지붕	NNG	740
 빛나	VV	740
 귀족	NNG	740
-똑같이	MAG	739
+똑같이	MAG	739	complex 똑같/VA 이/XSM 0223
 털	VV	739
 여당	NNG	738
 상담	NNG	738
@@ -3149,13 +3158,13 @@
 국민학교	NNG	727
 근육	NNG	727
 꼽	VV-R	726
-자세히	MAG	726
+자세히	MAG	726	complex 자세/XR 히/XSM 0223
 석유	NNG	726
 이자	NNG	726
 보존	NNG	726
 단독	NNG	725
 게	EF	725
-도저히	MAG	725
+도저히	MAG	725	complex 도저/XR 히/XSM 0223
 방해	NNG	725
 비롯하	VV	725	complex 비롯/XR 하/XSV 0223
 대전	NNG	725
@@ -3165,7 +3174,8 @@
 최소	NNG	723
 대량	NNG	723
 들르	VV	723
-급하	VA	722
+급	XR	722
+급하	VA	722	complex 급/XR 하/XSA 0112
 꺾	VV	722
 부실	NNG	722
 파	VV	722
@@ -3200,7 +3210,7 @@
 떠들	VV	715
 선진	NNG	715
 품	VV	715
-조용히	MAG	714
+조용히	MAG	714	complex 조용/XR 히/XSM 0223
 이사장	NNG	714
 붙잡	VV-R	714
 출판	NNG	714
@@ -3212,7 +3222,8 @@
 오바마	NNP	712
 들려오	VV	712	complex 들리/VV 어/EC 오/VX 021223
 훔치	VV	712
-중얼거리	VV	712
+중얼	XR	712
+중얼거리	VV	712	complex 중얼/XR 거리/XSV 0224
 보완	NNG	711
 쯤	NNG	711
 인공	NNG	710
@@ -3273,7 +3284,7 @@
 가사	NNG	697
 홀	NNG	697
 쫌	MAG	696
-특별히	MAG	696
+특별히	MAG	696	complex 특별/XR 히/XSM 0223
 정원	NNG	696
 저장	NNG	696
 볶	VV	695
@@ -3318,7 +3329,7 @@
 추상	NNG	687
 귀국	NNG	686
 김대중	NNP	686
-철저히	MAG	686
+철저히	MAG	686	complex 철저/XR 히/XSM 0223
 판사	NNG	686
 분열	NNG	685
 도리	NNG	685
@@ -3388,7 +3399,7 @@
 온도	NNG	668
 형상	NNG	668
 대문	NNG	668
-높이	MAG	667
+높이	MAG	667	complex 높/VA 이/XSM 0112
 달아나	VV	667	complex 닫/VV-I 어/EC 나/VX 011223
 다니	EC	666
 영장	NNG	666
@@ -3443,7 +3454,7 @@
 심화	NNG	656
 먹이	NNG	656
 찌	VV	655
-나란히	MAG	655
+나란히	MAG	655	complex 나란/XR 히/XSM 0223
 잠기	VV	655
 사기	NNG	655
 이중	NNG	655
@@ -3452,7 +3463,7 @@
 백제	NNP	655
 향기	NNG	654
 저거	NP	654	=저것
-꾸준히	MAG	654
+꾸준히	MAG	654	complex 꾸준/XR 히/XSM 0223
 합병	NNG	654
 초등학교	NNG	654
 억제	NNG	654
@@ -3618,13 +3629,14 @@
 임원	NNG	611
 풍부	XR	611
 대로	JKB	611
-떨어뜨리	VV	610
+떨어뜨리	VV	610	complex 떨/VV 어/EC 뜨리/XSV 011224
 정성	NNG	610
 보증	NNG	610
 독서	NNG	608
 으려는	ETM	608	non_vowel	==려는
 팀장	NNG	607
-괜히	MAG	607
+괜	XR	607
+괜히	MAG	607	complex 괜/XR 히/XSM 0112
 사법	NNG	607
 이마	NNG	607
 캠페인	NNG	607
@@ -3641,7 +3653,7 @@
 자신감	NNG	605
 생성	NNG	605
 초대	NNG	604
-극히	MAG	604
+극히	MAG	604	complex 극/NNG 히/XSM 0112
 감수	NNG	604
 이사회	NNG	604
 더군요	EF	604
@@ -3694,7 +3706,7 @@
 짜증	NNG	595
 굳	VA-R	595
 박히	VV	595
-끄덕이	VV	595
+끄덕이	VV	595	complex 끄덕/MAG 이/XSV 0223
 고사	NNG	594
 흩어지	VV	594	complex 흩/VV 어/EC 지/VX 011223
 도중	NNG	594
@@ -3704,7 +3716,7 @@
 두드리	VV	592
 나	NNG	592
 정자	NNG	592
-우연히	MAG	591
+우연히	MAG	591	complex 우연/NNG 히/XSM 0223
 제주도	NNP	591
 실망	NNG	591
 넓히	VV	590
@@ -3810,7 +3822,7 @@
 여사	NNG	568
 손바닥	NNG	568
 자아	NNG	568
-영원히	MAG	568
+영원히	MAG	568	complex 영원/NNG 히/XSM 0223
 상반기	NNG	568
 장수	NNG	568
 호기심	NNG	568
@@ -3866,7 +3878,7 @@
 증세	NNG	556
 도둑	NNG	556
 조처	NNG	556
-다행히	MAG	555
+다행히	MAG	555	complex 다행/NNG 히/XSM 0223
 유교	NNG	555
 그중	NNG	555
 유권자	NNG	555
@@ -4109,7 +4121,8 @@
 계승	NNG	507
 지	NP	507
 쇼	NNG	507
-귀하	VA	506
+귀	XR	506
+귀하	VA	506	complex 귀/XR 하/XSA 0112
 재배	NNG	506
 삼키	VV	506
 박수	NNG	506
@@ -4149,7 +4162,7 @@
 장악	NNG	502
 중년	NNG	502
 모방	NNG	502
-깨끗이	MAG	501
+깨끗이	MAG	501	complex 깨끗/XR 이/XSM 0223
 안심	NNG	501
 속이	VV	501
 번째	NNB	501
@@ -4268,7 +4281,7 @@
 소설가	NNG	481
 처방	NNG	481
 조국	NNP	481
-간단히	MAG	480
+간단히	MAG	480	complex 간단/XR 히/XSM 0223
 가라앉	VV	480
 소스	NNG	480
 꺼지	VV	480
@@ -4297,7 +4310,8 @@
 외우	VV	477
 명단	NNG	477
 내	NNG	477
-환하	VA	477
+환	XR	477
+환하	VA	477	complex 환/XR 하/XSA 0112
 아비	NNG	477
 분배	NNG	476
 오픈	NNG	476
@@ -4583,7 +4597,7 @@
 나비	NNG	436
 아베	NNP	436
 목욕	NNG	435
-유난히	MAG	435
+유난히	MAG	435	complex 유난/NNG 히/XSM 0223
 범	XPN	435
 흘러가	VV	435	complex 흐르/VV 어/EC 가/VX 011223
 대상자	NNG	435
@@ -4742,7 +4756,7 @@
 모	MM	415
 주석	NNG	415
 니까요	EF	415	vocalic
-지극히	MAG	415
+지극히	MAG	415	complex 지극/XR 히/XSM 0223
 파랗	VA-I	414
 권	NNG	414
 넋	NNG	414
@@ -4862,11 +4876,11 @@
 어디	IC	401
 확률	NNG	401
 데이터	NNG	401
-일찍이	MAG	401
+일찍이	MAG	401	complex 일찍/MAG 이/XSM 0223
 전역	NNG	401
 하도	MAG	400
 동행	NNG	400
-일제히	MAG	400
+일제히	MAG	400	complex 일제/NNG 히/XSM 0223
 포항	NNP	400
 중독	NNG	400
 자유주의	NNG	400
@@ -5069,7 +5083,7 @@
 회수	NNG	377
 경주	NNP	377
 관람	NNG	377
-은근히	MAG	377
+은근히	MAG	377	complex 은근/XR 히/XSM 0223
 가	XPN	377
 명	NNG	377
 정확	XR	377
@@ -5087,7 +5101,8 @@
 강렬	XR	376
 중립	NNG	375
 간격	NNG	375
-고스란히	MAG	375
+고스란	XR	375
+고스란히	MAG	375	complex 고스란/XR 히/XSM 0334
 꺼리	VV	375
 서점	NNG	375
 가입자	NNG	375
@@ -5114,7 +5129,7 @@
 수없이	MAG	372
 리라	EC	372	vocalic
 끌어올리	VV	371	complex 끌/VV 어/EC 올리/VV 011224
-적당히	MAG	371
+적당히	MAG	371	complex 적당/XR 히/XSM 0223
 중점	NNG	371
 옹호	NNG	371
 충고	NNG	371
@@ -5466,7 +5481,7 @@
 모니터	NNG	334
 유효	NNG	334
 세미나	NNG	334
-급히	MAG	334
+급히	MAG	334	complex 급/XR 히/XSM 0112
 주방	NNG	334
 하천	NNG	334
 장윤	NNP	334
@@ -5501,7 +5516,7 @@
 감지	NNG	331
 창립	NNG	331
 울타리	NNG	331
-부지런히	MAG	331
+부지런히	MAG	331	complex 부지런/XR 히/XSM 0334
 장편	NNG	331
 의례	NNG	331
 강남구	NNP	331
@@ -5629,10 +5644,10 @@
 보름	NNG	321
 분해	NNG	321
 부추기	VV	321
-급격히	MAG	321
+급격히	MAG	321	complex 급격/XR 히/XSM 0223
 초라	XR	321
 손님	NNG	321
-깨뜨리	VV	320
+깨뜨리	VV	320	complex 깨/VV 어/EC 뜨리/XSV 010113
 틀리	VA	320
 표출	NNG	320
 강경	NNG	320
@@ -5647,7 +5662,7 @@
 회피	NNG	319
 포	NNG	319
 응응	IC	319
-단단히	MAG	319
+단단히	MAG	319	complex 단단/XR 히/XSM 0223
 용납	NNG	319
 호응	NNG	319
 홍수	NNG	319
@@ -5679,7 +5694,7 @@
 의외로	MAG	316
 수직	NNG	316
 당일	NNG	316
-자연히	MAG	316
+자연히	MAG	316	complex 자연/NNG 히/XSM 0223
 동영상	NNG	316
 불평	NNG	316
 정말	NNG	316
@@ -5893,7 +5908,7 @@
 허	NNP	300
 조지	NNP	300
 수험	NNG	300
-잘나	VA	300
+잘나	VA	300	complex 잘/MAG 나/XSA 0112
 지난주	NNG	299
 감사원	NNG	299
 월요일	NNG	299
@@ -5953,7 +5968,7 @@
 탈	NNG	295
 행운	NNG	295
 뜻밖	NNG	295
-강력히	MAG	295
+강력히	MAG	295	complex 강력/XR 히/XSM 0223
 이주	NNG	295
 물리치	VV	295
 주름	NNG	295
@@ -5971,7 +5986,7 @@
 성리학	NNG	294
 땜	NNB	293
 산책	NNG	293
-적절히	MAG	293
+적절히	MAG	293	complex 적절/XR 히/XSM 0223
 기득	NNG	293
 둥	NNB	293
 도망	NNG	293
@@ -6203,7 +6218,7 @@
 캠퍼스	NNG	279
 불량	NNG	279
 세요	EF	279	vocalic
-마땅히	MAG	279
+마땅히	MAG	279	complex 마땅/XR 히/XSM 0223
 고비	NNG	279
 얘	IC	279
 자비	NNG	279
@@ -6270,7 +6285,7 @@
 차전	NNB	275
 무산	NNG	275
 전두환	NNP	275
-급속히	MAG	275
+급속히	MAG	275	complex 급속/NNG 히/XSM 0223
 두드러지	VA	275
 내던지	VV	275	complex 내/VV 어/EC 던지/VV 010113
 강	NNB	275
@@ -6355,7 +6370,7 @@
 은혜	NNG	270
 공평	NNG	270
 횟수	NNG	270
-반짝이	VV	270
+반짝이	VV	270	complex 반짝/MAG 이/XSV 0223
 서랍	NNG	270
 허무	NNG	270
 참모	NNG	270
@@ -6470,7 +6485,7 @@
 콘크리트	NNG	262
 창피	NNG	262
 애플	NNP	262
-묵묵히	MAG	262
+묵묵히	MAG	262	complex 묵묵/XR 히/XSM 0223
 제대	NNG	262
 수당	NNG	262
 내재	NNG	262
@@ -6573,7 +6588,7 @@
 넥타이	NNG	256
 진압	NNG	256
 대치	NNG	256
-순전히	MAG	256
+순전히	MAG	256	complex 순전/XR 히/XSM 0223
 새댁	NNG	256
 참석자	NNG	256
 불황	NNG	256
@@ -6617,7 +6632,7 @@
 집약	NNG	253
 수용자	NNG	253
 장난감	NNG	253
-깊숙이	MAG	253
+깊숙이	MAG	253	complex 깊숙/XR 이/XSM 0223
 생산량	NNG	253
 좌석	NNG	253
 가전	NNG	253
@@ -6780,7 +6795,7 @@
 한창	NNG	244
 일상생활	NNG	244
 귀가	NNG	244
-다분히	MAG	244
+다분히	MAG	244	complex 다분/XR 히/XSM 0223
 메일	NNG	244
 시위대	NNG	244
 사납	VA-I	244
@@ -6861,7 +6876,7 @@
 신도	NNG	239
 돋	VV-R	239
 추궁	NNG	239
-무사히	MAG	239
+무사히	MAG	239	complex 무사/NNG 히/XSM 0223
 안면	NNG	239
 다시금	MAG	239
 민영	NNG	239
@@ -6900,7 +6915,7 @@
 의대	NNG	237
 부수	NNG	237
 항구	NNG	237
-공연히	MAG	237
+공연히	MAG	237	complex 공연/XR 히/XSM 0223
 의아	NNG	236
 퇴출	NNG	236
 전철	NNG	236
@@ -6981,7 +6996,7 @@
 박지성	NNP	233
 예민	XR	233
 요새	MAG	233
-소홀히	MAG	232
+소홀히	MAG	232	complex 소홀/XR 히/XSM 0223
 테마	NNG	232
 졸	VV	232
 액체	NNG	232
@@ -7338,7 +7353,7 @@
 농경	NNG	217
 불상	NNG	217
 세균	NNG	217
-새로이	MAG	217
+새로이	MAG	217	complex 새롭/VA-I 이/XSM 0223
 서정	NNG	217
 최다	NNG	217
 내비치	VV	217
@@ -7428,7 +7443,7 @@
 기대감	NNG	213
 디스크	NNG	213
 상하	NNG	213
-엄격히	MAG	213
+엄격히	MAG	213	complex 엄격/XR 히/XSM 0223
 철폐	NNG	213
 석탑	NNG	213
 방출	NNG	213
@@ -7520,7 +7535,7 @@
 재야	NNG	209
 획일	XR	209
 현저	XR	209
-못나	VA	209
+못나	VA	209	complex 못/MAG 나/XSA 0112
 더하	VV	209
 하	NNP	208
 내일	MAG	208
@@ -7677,7 +7692,7 @@
 계약서	NNG	202
 구청	NNG	202
 부응	NNG	202
-뚜렷이	MAG	202
+뚜렷이	MAG	202	complex 뚜렷/XR 이/XSM 0223
 경쟁자	NNG	202
 흑백	NNG	202
 뾰족	MAG	202
@@ -7767,7 +7782,7 @@
 촉각	NNG	198
 솟구치	VV	198
 모질	VA	198
-기웃거리	VV	198
+기웃거리	VV	198	complex 기웃/MAG 거리/XSV 0224
 미생물	NNG	198
 탄식	NNG	198
 땅바닥	NNG	198
@@ -7897,7 +7912,7 @@
 팔십	NR	192
 훑	VV	192
 착취	NNG	192
-명확히	MAG	192
+명확히	MAG	192	complex 명확/XR 히/XSM 0223
 유인	NNG	192
 매번	MAG	192
 김구	NNP	192
@@ -8183,7 +8198,8 @@
 마산	NNP	183
 동독	NNP	183
 단락	NNG	183
-머뭇거리	VV	183
+머뭇	XR	183
+머뭇거리	VV	183	complex 머뭇/XR 거리/XSV 0224
 리	NNP	183
 꿰뚫	VV	183
 낭만주의	NNG	183
@@ -8359,7 +8375,8 @@
 엉터리	NNG	177
 위임	NNG	177
 내력	NNG	177
-엄하	VA	177
+엄	XR	177
+엄하	VA	177	complex 엄/XR 하/XSA 0112
 어설프	VA	177
 일손	NNG	177
 벼랑	NNG	177
@@ -8479,7 +8496,7 @@
 박원순	NNP	173
 ᆫ다는데	EC	173	vocalic
 후진	NNG	173
-활발히	MAG	173
+활발히	MAG	173	complex 활발/XR 히/XSM 0223
 피자	NNG	173
 고루	MAG	173
 솟아오르	VV	173	complex 솟/VV-R 어/EC 오르/VV 011224
@@ -8594,7 +8611,7 @@
 수련	NNG	170
 폴	NNP	170
 외침	NNG	170
-무수히	MAG	170
+무수히	MAG	170	complex 무수/XR 히/XSM 0223
 불러내	VV	170	complex 부르/VV 어/EC 내/VX 011223
 손수건	NNG	170
 액자	NNG	170
@@ -8904,7 +8921,7 @@
 출가	NNG	161
 무명	NNG	161
 하물며	MAJ	161
-편히	MAG	161
+편히	MAG	161	complex 편/XR 히/XSM 0112
 불어오	VV	161	complex 불/VV 어/EC 오/VX 011223
 예속	NNG	161
 전학	NNG	161
@@ -8943,7 +8960,7 @@
 민망	XR	161
 유	EF	161
 순미	NNP	161
-충실히	MAG	160
+충실히	MAG	160	complex 충실/NNG 히/XSM 0223
 점치	VV	160
 벗겨지	VV	160	complex 벗기/VV 어/EC 지/VX 021223
 구애	NNG	160
@@ -9005,7 +9022,7 @@
 이색	NNG	159
 선조	NNG	159
 베토벤	NNP	159
-과감히	MAG	159
+과감히	MAG	159	complex 과감/XR 히/XSM 0223
 숨소리	NNG	159
 종소리	NNG	159
 기껏해야	MAG	159
@@ -9091,7 +9108,7 @@
 용감	XR	157
 강압	NNG	156
 불의	NNG	156
-말끔히	MAG	156
+말끔히	MAG	156	complex 말끔/XR 히/XSM 0223
 미역	NNG	156
 직관	NNG	156
 캘리포니아	NNP	156
@@ -9118,7 +9135,7 @@
 마지못하	VA	156
 데이비드	NNP	156
 소유주	NNG	156
-꼼꼼히	MAG	156
+꼼꼼히	MAG	156	complex 꼼꼼/XR 히/XSM 0223
 귀퉁이	NNG	156
 경비정	NNG	156
 회비	NNG	156
@@ -9445,7 +9462,7 @@
 항해	NNG	148
 교통부	NNG	148
 침실	NNG	148
-소중히	MAG	148
+소중히	MAG	148	complex 소중/XR 히/XSM 0223
 신청서	NNG	148
 숨결	NNG	148
 국책	NNG	148
@@ -9507,7 +9524,7 @@
 투여	NNG	146
 하루아침	NNG	146
 어쩌다가	MAG	146
-당당히	MAG	146
+당당히	MAG	146	complex 당당/XR 히/XSM 0223
 형부	NNG	146
 정정	NNG	146
 화초	NNG	146
@@ -9571,7 +9588,7 @@
 제작진	NNG	145
 용인	NNP	145
 능가	NNG	145
-황급히	MAG	145
+황급히	MAG	145	complex 황급/XR 히/XSM 0223
 도자기	NNG	145
 서비스업	NNG	145
 흠	NNG	145
@@ -9580,7 +9597,8 @@
 고위급	NNG	145
 준공	NNG	145
 먹고살	VV	145	complex 먹/VV 고/EC 살/VV 011223
-투덜거리	VV	145
+투덜	MAG	145
+투덜거리	VV	145	complex 투덜/MAG 거리/XSV 0224
 걸작	NNG	145
 남북	NNG	145
 엘리어트	NNP	145
@@ -9753,7 +9771,7 @@
 일부분	NNG	141
 기껏	MAG	141
 점진	NNG	141
-비스듬히	MAG	141
+비스듬히	MAG	141	complex 비스듬/XR 히/XSM 0334
 구태여	MAG	141
 인슐린	NNG	141
 조롱	NNG	141
@@ -9806,7 +9824,7 @@
 선원	NNG	140
 현수	NNP	140
 챔피언십	NNG	140
-비틀거리	VV	140	complex 비틀/MAG 거리/VV 0224
+비틀거리	VV	140	complex 비틀/MAG 거리/XSV 0224
 빌	NNP	140
 금연	NNG	140
 유적지	NNG	140
@@ -9874,7 +9892,7 @@
 장모	NNG	138
 원단	NNG	138
 내실	NNG	138
-명백히	MAG	138
+명백히	MAG	138	complex 명백/XR 히/XSM 0223
 블랙	NNG	138
 다던	ETM	138
 청계천	NNP	138
@@ -9890,7 +9908,8 @@
 온난	NNG	138
 토착	NNG	138
 등교	NNG	138
-두근거리	VV	138
+두근	XR	138
+두근거리	VV	138	complex 두근/XR 거리/XSV 0224
 가면	NNG	138
 불사	NNG	138
 겨드랑이	NNG	138
@@ -9946,7 +9965,7 @@
 예년	NNG	137
 유선	NNG	137
 삼진	NNG	137
-빼어나	VA	137	complex 빼/VV 어/EC 나/VX 011223
+빼어나	VA	137	complex 빼/VV 어/EC 나/XSA 011223
 인민군	NNG	137
 판문점	NNP	137
 성자	NNG	137
@@ -10014,7 +10033,7 @@
 활	NNG	135
 이왕	MAG	135
 외래어	NNG	135
-절실히	MAG	135
+절실히	MAG	135	complex 절실/XR 히/XSM 0223
 명작	NNG	135
 변환	NNG	135
 쿠바	NNP	135
@@ -10194,7 +10213,8 @@
 좆	NNG	132
 분권	NNG	131
 휘젓	VV-I	131
-멍하	VA	131
+멍	XR	131
+멍하	VA	131	complex 멍/NNG 하/XSA 0112
 산재	NNG	131
 권력자	NNG	131
 허브	NNG	131
@@ -10411,7 +10431,7 @@
 걷어차	VV	127	complex 걷/VV-R 어/EC 차/VV 011223
 쌤	NNG	127
 귀납	NNG	127
-온전히	MAG	127
+온전히	MAG	127	complex 온전/XR 히/XSM 0223
 가전제품	NNG	127
 만끽	NNG	127
 소개팅	NNG	127
@@ -10426,7 +10446,7 @@
 증발	NNG	127
 관문	NNG	127
 허겁지겁	MAG	127
-똑똑히	MAG	127
+똑똑히	MAG	127	complex 똑똑/XR 히/XSM 0223
 적금	NNG	127
 김연아	NNP	127
 쫓아내	VV	127	complex 쫓/VV 어/EC 내/VX 011223
@@ -10439,7 +10459,8 @@
 외할머니	NNG	127
 인치	NNB	127
 응원단	NNG	127
-훤히	MAG	127
+훤	XR	127
+훤히	MAG	127	complex 훤/XR 히/XSM 0112
 커브	NNG	127
 내한	NNG	127
 갤러리	NNG	127
@@ -10448,7 +10469,7 @@
 하사	NNG	127
 국영	NNG	127
 나치	NNP	127
-끄덕거리	VV	127
+끄덕거리	VV	127	complex 끄덕/MAG 거리/XSV 0224
 등불	NNG	127
 비겁	XR	127
 되	NNB	127
@@ -10484,7 +10505,7 @@
 기강	NNG	126
 허탈	NNG	126
 남조선	NNP	126
-상세히	MAG	126
+상세히	MAG	126	complex 상세/XR 히/XSM 0223
 장롱	NNG	126
 슈팅	NNG	126
 구미	NNP	126
@@ -10502,7 +10523,7 @@
 생동	NNG	126
 도사리	VV	126
 의자왕	NNP	126
-무심히	MAG	126
+무심히	MAG	126	complex 무심/NNG 히/XSM 0223
 여공	NNG	126
 기발	XR	126
 천정	NNG	126
@@ -10603,7 +10624,7 @@
 이라든지	JC	124	non_vowel	0.9776119402985075
 듬뿍	MAG	123
 ᆸ쇼	EF	123	vocalic
-뻔히	MAG	123
+뻔히	MAG	123	complex 뻔/XR 히/XSM 0112
 마는	JX	123	vowel	0.9323308270676691
 군데군데	MAG	123
 카레	NNG	123
@@ -10617,7 +10638,7 @@
 잔재	NNG	123
 바야흐로	MAG	123
 선	NNB	123
-간절히	MAG	123
+간절히	MAG	123	complex 간절/XR 히/XSM 0223
 빈부	NNG	123
 업그레이드	NNG	123
 모의	NNG	123
@@ -10641,11 +10662,12 @@
 구금	NNG	123
 자원부	NNG	123
 운전기사	NNG	123
-갸웃거리	VV	123
+갸웃거리	VV	123	complex 갸웃/MAG 거리/XSV 0224
 이름나	VV	123	complex 이름/NNG 나/VV 0223
 명소	NNG	123
 저만치	MAG	123
-들먹이	VV	123
+들먹	XR	123
+들먹이	VV	123	complex 들먹/XR 이/XSV 0223
 대동	NNG	123
 윤건	NNP	123
 실리콘	NNG	123
@@ -10668,7 +10690,7 @@
 발발	NNG	122
 산화	NNG	122
 당혹	NNG	122
-어지간히	MAG	122
+어지간히	MAG	122	complex 어지간/XR 히/XSM 0334
 피상	NNG	122
 희랍	NNP	122
 주어	NNG	122
@@ -10681,7 +10703,7 @@
 에이스	NNG	122
 파행	NNG	122
 황해도	NNP	122
-은밀히	MAG	122
+은밀히	MAG	122	complex 은밀/XR 히/XSM 0223
 긴축	NNG	122
 장작	NNG	122
 기호	NNP	122
@@ -10786,7 +10808,7 @@
 내과	NNG	120
 매	NNB	120
 교도관	NNG	120
-현저히	MAG	120
+현저히	MAG	120	complex 현저/XR 히/XSM 0223
 한옥	NNG	120
 빠지	VX	120
 경색	NNG	120
@@ -10854,7 +10876,7 @@
 효소	NNG	119
 마틴	NNP	119
 때마침	MAG	119
-신속히	MAG	119
+신속히	MAG	119	complex 신속/XR 히/XSM 0223
 타도	NNG	119
 경연	NNG	119
 근교	NNG	119
@@ -10942,7 +10964,7 @@ LG전자	NNP	119
 답답하	VA	117	complex 답답/XR 하/XSA 0223
 한자어	NNG	117
 반납	NNG	117
-막연히	MAG	117
+막연히	MAG	117	complex 막연/XR 히/XSM 0223
 영동	NNP	117
 증식	NNG	117
 하숙집	NNG	117
@@ -11104,7 +11126,7 @@ LG전자	NNP	119
 헤엄치	VV	115
 무형	NNG	115
 개탄	NNG	115
-유별나	VA	115	complex 유별/NNG 나/VX 0223
+유별나	VA	115	complex 유별/NNG 나/XSA 0223
 볼넷	NNG	115
 굴레	NNG	115
 사업부	NNG	115
@@ -11137,7 +11159,7 @@ LG전자	NNP	119
 디	NNG	114
 봄철	NNG	114
 파주	NNP	114
-톡톡히	MAG	114
+톡톡히	MAG	114	complex 톡톡/XR 히/XSM 0223
 점심시간	NNG	114
 불	NNB	114
 점퍼	NNG	114
@@ -11145,7 +11167,7 @@ LG전자	NNP	119
 여지껏	MAG	114
 주름살	NNG	114
 무서워하	VV	114	complex 무섭/VA-I 어/EC 하/VX 032334
-엄연히	MAG	114
+엄연히	MAG	114	complex 엄연/XR 히/XSM 0223
 혈당	NNG	114
 사교	NNG	114
 벨	NNG	114
@@ -11266,7 +11288,7 @@ LG전자	NNP	119
 커버	NNG	112
 비핵	NNG	112
 연명	NNG	112
-꿈틀거리	VV	112
+꿈틀거리	VV	112	complex 꿈틀/MAG 거리/XSV 0224
 특강	NNG	112
 중앙당	NNG	112
 열세	NNG	112
@@ -11508,18 +11530,18 @@ LG전자	NNP	119
 프랑스어	NNP	109
 익살	NNG	109
 도표	NNG	109
-불행히	MAG	109
+불행히	MAG	109	complex 불행/NNG 히/XSM 0223
 둔하	VA	109
 지랄	NNG	109
 샌프란시스코	NNP	109
 뒤바뀌	VV	109
 풀뿌리	NNG	109
-면밀히	MAG	109
-가득히	MAG	109
+면밀히	MAG	109	complex 면밀/XR 히/XSM 0223
+가득히	MAG	109	complex 가득/MAG 히/XSM 0223
 틈틈이	MAG	109
 독단	NNG	109
 뒷바라지	NNG	109
-가지런히	MAG	109
+가지런히	MAG	109	complex 가지런/XR 히/XSM 0334
 부르주아	NNG	109
 야산	NNG	109
 모양	NNB	109
@@ -11680,7 +11702,7 @@ LG전자	NNP	119
 만수	NNP	107
 파면	NNG	107
 염	NNG	107
-환히	MAG	107
+환히	MAG	107	complex 환/XR 히/XSM 0112
 찻집	NNG	107
 밤나무	NNG	107
 핥	VV	107
@@ -11884,7 +11906,7 @@ LG전자	NNP	119
 영재	NNP	104
 하이닉스	NNP	104
 교육학	NNG	104
-족하	VA	104
+족하	VA	104	complex 족/XR 하/XSA 0112
 예찬	NNG	104
 형태소	NNG	104
 괴리	NNG	104
@@ -11922,7 +11944,8 @@ LG전자	NNP	119
 한화갑	NNP	104
 헛간	NNG	104
 동물원	NNG	104
-서성거리	VV	104
+서성	XR	104
+서성거리	VV	104	complex 서성/XR 거리/XSV 0224
 문안	NNG	104
 도령	NNG	104
 단념	NNG	104
@@ -12017,7 +12040,7 @@ SK텔레콤	NNP	103
 신라인	NNG	103
 시생	NP	103
 길소개	NNP	103
-안녕히	MAG	102
+안녕히	MAG	102	complex 안녕/NNG 히/XSM 0223
 트집	NNG	102
 산적	NNG	102
 그르니까	MAJ	102
@@ -12100,7 +12123,7 @@ SK텔레콤	NNP	103
 허리띠	NNG	102
 인간관	NNG	102
 하품	NNG	102
-번쩍이	VV	102
+번쩍이	VV	102	complex 번쩍/MAG 이/XSV 0223
 방광	NNG	102
 문화원	NNG	102
 구렁이	NNG	102
@@ -12120,7 +12143,7 @@ SK텔레콤	NNP	103
 자칭	NNG	101
 남대문	NNP	101
 찬스	NNG	101
-딱히	MAG	101
+딱히	MAG	101	complex 딱/XR 히/XSM 0112
 허약	NNG	101
 쇼크	NNG	101
 사이사이	NNG	101
@@ -12146,7 +12169,7 @@ SK텔레콤	NNP	103
 이남	NNG	101
 장본인	NNG	101
 재떨이	NNG	101
-신중히	MAG	101
+신중히	MAG	101	complex 신중/NNG 히/XSM 0223
 쓰리	VA	101
 수요자	NNG	101
 퇴폐	NNG	101
@@ -12309,7 +12332,8 @@ SK텔레콤	NNP	103
 해발	NNG	99
 암석	NNG	99
 자의식	NNG	99
-뒤적이	VV	99
+뒤적	XR	99
+뒤적이	VV	99	complex 뒤적/XR 이/XSV 0223
 미행	NNG	99
 불가사의	NNG	99
 방랑	NNG	99
@@ -12332,7 +12356,7 @@ SK텔레콤	NNP	103
 꽃다발	NNG	99
 계약금	NNG	99
 간염	NNG	99
-조속히	MAG	99
+조속히	MAG	99	complex 조속/XR 히/XSM 0223
 개막식	NNG	99
 교육장	NNG	99
 구릉	NNG	99
@@ -12345,7 +12369,7 @@ SK텔레콤	NNP	103
 버림받	VV-R	99
 슬며시	MAG	99
 종가	NNG	99
-편안히	MAG	99
+편안히	MAG	99	complex 편안/NNG 히/XSM 0223
 희박	XR	99
 우리	NNG	99
 이삭	NNG	99
@@ -12368,7 +12392,7 @@ SK텔레콤	NNP	103
 공용	NNG	98
 정파	NNG	98
 무슬림	NNG	98
-여실히	MAG	98
+여실히	MAG	98	complex 여실/NNG 히/XSM 0223
 밟히	VV	98
 빛내	VV	98
 인제	NNG	98
@@ -12413,7 +12437,7 @@ SK텔레콤	NNP	103
 눈물겹	VA-I	98
 안성	NNP	98
 책가방	NNG	98
-부단히	MAG	98
+부단히	MAG	98	complex 부단/XR 히/XSM 0223
 하나은행	NNP	98
 서울중앙지법	NNP	98
 한길	NNG	98
@@ -12447,7 +12471,7 @@ SK텔레콤	NNP	103
 수운	NNP	98
 그려	JX	98	vowel	0.9150943396226415
 역사학자	NNG	97
-넉넉히	MAG	97
+넉넉히	MAG	97	complex 넉넉/XR 히/XSM 0223
 어야만	EC	97
 작고	NNG	97
 맞이하	VV	97	complex 맞이/NNG 하/XSV 0223
@@ -12499,7 +12523,8 @@ SK텔레콤	NNP	103
 백과사전	NNG	97
 장로	NNG	97
 탁구	NNG	97
-순순히	MAG	97
+순순	XR	97
+순순히	MAG	97	complex 순순/XR 히/XSM 0223
 평원	NNG	97
 눈발	NNG	97
 첫눈	NNG	97
@@ -12539,7 +12564,7 @@ SK텔레콤	NNP	103
 나이트클럽	NNG	96
 모티브	NNG	96
 수량	NNG	96
-찬찬히	MAG	96
+찬찬히	MAG	96	complex 찬찬/XR 히/XSM 0223
 부적절하	VA	96	complex 부적절/XR 하/XSA 0334
 수십억	NR	96
 헬스	NNG	96
@@ -12779,7 +12804,7 @@ SK텔레콤	NNP	103
 부스	NNG	93
 오천	NR	93
 응급실	NNG	93
-반짝거리	VV	93
+반짝거리	VV	93	complex 반짝/MAG 거리/XSV 0224
 문집	NNG	93
 리포터	NNG	93
 아다가	EC	93
@@ -12880,7 +12905,7 @@ SK텔레콤	NNP	103
 판명	NNG	92
 영문학	NNG	92
 전문대	NNG	92
-괜하	VA	92
+괜하	VA	92	complex 괜/XR 하/XSA 0112
 교량	NNG	92
 배수	NNG	92
 남해	NNP	92
@@ -12981,7 +13006,7 @@ SK텔레콤	NNP	103
 싸이	NNP	91
 큰아들	NNG	91
 급수	NNG	91
-엄밀히	MAG	91
+엄밀히	MAG	91	complex 엄밀/XR 히/XSM 0223
 암울	NNG	91
 녹음기	NNG	91
 담합	NNG	91
@@ -13093,7 +13118,7 @@ SK텔레콤	NNP	103
 업주	NNG	90
 국감	NNG	90
 내리치	VV	90	complex 내리/MAG 치/VV 0223
-확연히	MAG	90
+확연히	MAG	90	complex 확연/XR 히/XSM 0223
 시골집	NNG	90
 뜯어보	VV	90	complex 뜯/VV-R 어/EC 보/VX 011223
 임	NNG	90
@@ -13331,7 +13356,7 @@ SK텔레콤	NNP	103
 벙커	NNG	87
 신진	NNG	87
 지리학	NNG	87
-차분히	MAG	87
+차분히	MAG	87	complex 차분/XR 히/XSM 0223
 트로이	NNP	87
 엽기	NNG	87
 중장기	NNG	87
@@ -13724,7 +13749,7 @@ SK텔레콤	NNP	103
 병폐	NNG	83
 다원주의	NNG	83
 잡혀가	VV	83	complex 잡히/VV 어/EC 가/VX 021223
-시급히	MAG	83
+시급히	MAG	83	complex 시급/XR 히/XSM 0223
 석권	NNG	83
 인천공항	NNP	83
 글귀	NNG	83
@@ -13925,7 +13950,7 @@ LG화학	NNP	82
 실책	NNG	81
 리포트	NNG	81
 만화책	NNG	81
-확고히	MAG	81
+확고히	MAG	81	complex 확고/XR 히/XSM 0223
 격정	NNG	81
 집권당	NNG	81
 에드워드	NNP	81
@@ -13961,6 +13986,7 @@ LG화학	NNP	82
 통합진보당	NNP	81
 물갈이	NNG	81
 허둥지둥	MAG	81
+허둥	MAG	81
 하수	NNG	81
 각급	NNG	81
 북구	NNP	81
@@ -14062,7 +14088,8 @@ LG화학	NNP	82
 오래가	VV	80	complex 오래/MAG 가/VV 0223
 건너뛰	VV	80
 감퇴	NNG	80
-만지작거리	VV	80
+만지작	XR	80
+만지작거리	VV	80	complex 만지작/XR 거리/XSV 0335
 녹	NNG	80
 고양	NNP	80
 공적	NNG	80
@@ -14317,7 +14344,7 @@ LG화학	NNP	82
 소행	NNG	78
 시종	MAG	78
 백발	NNG	78
-펄럭이	VV	78
+펄럭이	VV	78	complex 펄럭/MAG 이/XSV 0223
 벌컥	MAG	78
 이영표	NNP	78
 희망자	NNG	78
@@ -14332,7 +14359,8 @@ LG화학	NNP	82
 후련	XR	78
 가람	NNG	78
 면장	NNG	78
-으르렁거리	VV	78
+으르렁	XR	78
+으르렁거리	VV	78	complex 으르렁/XR 거리/XSV 0335
 육중	XR	78
 암담	XR	78
 이처럼	MAG	78
@@ -14396,7 +14424,7 @@ LG화학	NNP	82
 어장	NNG	77
 면사무소	NNG	77
 대대로	MAG	77
-흔쾌히	MAG	77
+흔쾌히	MAG	77	complex 흔쾌/XR 히/XSM 0223
 속히	MAG	77
 쩔쩔매	VV	77	complex 쩔쩔/MAG 매/VV 0223
 횃불	NNG	77
@@ -14418,7 +14446,7 @@ LG화학	NNP	82
 속수무책	NNG	77
 물통	NNG	77
 왕도	NNG	77
-휘청거리	VV	77
+휘청거리	VV	77	complex 휘청/MAG 거리/XSV 0224
 갑판	NNG	77
 원산지	NNG	77
 유배	NNG	77
@@ -14458,7 +14486,7 @@ LG화학	NNP	82
 이천	NNP	76
 김종인	NNP	76
 미끄럽	VA-I	76
-얌전히	MAG	76
+얌전히	MAG	76	complex 얌전/NNG 히/XSM 0223
 식성	NNG	76
 그저께	NNG	76
 연출자	NNG	76
@@ -14603,7 +14631,7 @@ LG화학	NNP	82
 흙탕물	NNG	75
 모시	NNG	75
 보리차	NNG	75
-각별히	MAG	75
+각별히	MAG	75	complex 각별/XR 히/XSM 0223
 냉담	NNG	75
 남중국해	NNP	75
 문체부	NNG	75
@@ -14624,7 +14652,7 @@ LG화학	NNP	82
 수로	NNG	75
 수식어	NNG	75
 미켈란젤로	NNP	75
-투덜대	VV	75
+투덜대	VV	75	complex 투덜/MAG 대/XSV 0223
 창호	NNG	75
 올라앉	VV	75	complex 오르/VV 어/EC 앉/VX 011223
 병무청	NNG	75
@@ -14810,7 +14838,7 @@ LG화학	NNP	82
 떠받치	VV	73
 가변	NNG	73
 유로	NNG	73
-네모나	VA	73
+네모나	VA	73	complex 네모/NNG 나/XSA 0223
 첩보	NNG	73
 갈릴레이	NNP	73
 언덕길	NNG	73
@@ -15025,7 +15053,7 @@ LG화학	NNP	82
 병정	NNG	72
 민첩	XR	72
 성가시	VA	72
-무한히	MAG	72
+무한히	MAG	72	complex 무한/NNG 히/XSM 0223
 쏘다니	VV	72
 세째	NR	72
 나직이	MAG	72
@@ -15038,7 +15066,7 @@ LG화학	NNP	82
 어유	IC	71
 든든하	VA	71	complex 든든/XR 하/XSA 0223
 습지	NNG	71
-훤하	VA	71
+훤하	VA	71	complex 훤/XR 하/XSA 0112
 선례	NNG	71
 채비	NNG	71
 결사체	NNG	71
@@ -15059,7 +15087,7 @@ LG화학	NNP	82
 패자	NNG	71
 평상	NNG	71
 방관	NNG	71
-공공연히	MAG	71
+공공연히	MAG	71	complex 공공연/XR 히/XSM 0334
 각하	NNG	71
 나이트	NNG	71
 별세	NNG	71
@@ -15084,7 +15112,7 @@ LG화학	NNP	82
 군부대	NNG	71
 개학	NNG	71
 식견	NNG	71
-심히	MAG	71
+심히	MAG	71	complex 심/XR 히/XSM 0112
 사회주의자	NNG	71
 아랫사람	NNG	71
 우월감	NNG	71
@@ -15115,7 +15143,8 @@ LG화학	NNP	82
 발원	NNG	71
 헐값	NNG	71
 수입액	NNG	71
-족히	MAG	71
+족	XR	71
+족히	MAG	71	complex 족/XR 히/XSM 0112
 성미	NNG	71
 사별	NNG	71
 우주관	NNG	71
@@ -15216,7 +15245,7 @@ LG화학	NNP	82
 캐내	VV	70
 밤샘	NNG	70
 나부끼	VV	70
-단호히	MAG	70
+단호히	MAG	70	complex 단호/XR 히/XSM 0223
 방	NNP	70
 한국당	NNP	70
 부리나케	MAG	70
@@ -15246,7 +15275,8 @@ LG화학	NNP	82
 성큼성큼	MAG	70
 뒤척이	VV	70
 장안	NNP	70
-더듬거리	VV	70
+더듬	XR	70
+더듬거리	VV	70	complex 더듬/XR 거리/XSV 0224
 국민학생	NNG	70
 ᆫ데도	EC	70	vocalic
 페놀	NNG	70
@@ -15484,7 +15514,8 @@ LG화학	NNP	82
 진보신당	NNP	68
 넘보	VV	68
 롯데마트	NNP	68
-허우적거리	VV	68
+허우적	XR	68
+허우적거리	VV	68	complex 허우적/XR 거리/XSV 0335
 안테나	NNG	68
 강경파	NNG	68
 비행장	NNG	68
@@ -15621,7 +15652,7 @@ LG화학	NNP	82
 입점	NNG	67
 소치	NNP	67
 취득세	NNG	67
-서성이	VV	67
+서성이	VV	67	complex 서성/XR 이/XSV 0223
 곡조	NNG	67
 배출량	NNG	67
 전야제	NNG	67
@@ -15647,14 +15678,14 @@ LG화학	NNP	82
 게릴라	NNG	67
 스러지	VV	67
 비트겐슈타인	NNP	67
-고요히	MAG	67
+고요히	MAG	67	complex 고요/XR 히/XSM 0223
 양로원	NNG	67
 한기	NNG	67
 구매력	NNG	67
 새삼스레	MAG	67
 효모	NNG	67
 누드	NNG	67
-허둥대	VV	67
+허둥대	VV	67	complex 허둥/MAG 대/VX 0223
 기념품	NNG	67
 평안	NNG	67
 반가워하	VV	67	complex 반갑/VA-I 어/EC 하/VX 032334
@@ -15947,7 +15978,7 @@ LG화학	NNP	82
 폭력배	NNG	65
 외계인	NNG	65
 방책	NNG	65
-홀연히	MAG	65
+홀연히	MAG	65	complex 홀연/MAG 히/XSM 0223
 허파	NNG	65
 덩굴	NNG	65
 문전	NNG	65
@@ -16045,7 +16076,7 @@ LG화학	NNP	82
 콱	MAG	64
 버겁	VA-I	64
 후계	NNG	64
-팽팽히	MAG	64
+팽팽히	MAG	64	complex 팽팽/XR 히/XSM 0223
 은빛	NNG	64
 차례차례	MAG	64
 호가	NNG	64
@@ -16415,7 +16446,8 @@ LG화학	NNP	82
 응수	NNG	62
 눈망울	NNG	62
 퍼뜩	MAG	62
-번들거리	VV	62
+번들	XR	62
+번들거리	VV	62	complex 번들/XR 거리/XSV 0224
 괘	NNG	62
 테크노	NNG	62
 오도	NNG	62
@@ -16426,7 +16458,7 @@ LG화학	NNP	82
 부둥켜안	VV	62	complex 부둥키/VV 어/EC 안/VV 032334
 최희섭	NNP	62
 표창	NNG	62
-출렁이	VV	62
+출렁이	VV	62	complex 출렁/MAG 이/XSV 0223
 화끈거리	VV	62	complex 화끈/MAG 거리/XSV 0224
 공급량	NNG	62
 실력자	NNG	62
@@ -16574,7 +16606,7 @@ LG화학	NNP	82
 다승	NNG	61
 계획안	NNG	61
 체인지업	NNG	61
-원활히	MAG	61
+원활히	MAG	61	complex 원활/NNG 히/XSM 0223
 당혹감	NNG	61
 신경통	NNG	61
 알칼리	NNG	61
@@ -16604,7 +16636,8 @@ LG화학	NNP	82
 끝마치	VV	61
 고초	NNG	61
 지척	NNG	61
-웅성거리	VV	61
+웅성	XR	61
+웅성거리	VV	61	complex 웅성/XR 거리/XSV 0224
 과대	NNG	61
 자초지종	NNG	61
 안치	NNG	61
@@ -16617,6 +16650,7 @@ LG화학	NNP	82
 박지은	NNP	61
 암탉	NNG	61
 나자빠지	VV	61
+쩍	XSA	61
 멋쩍	VA	61
 찬미	NNG	61
 과천동	NNP	61
@@ -16644,7 +16678,7 @@ LG화학	NNP	82
 달구지	NNG	61
 허구	XR	61
 안개섬	NNP	61
-웂	VA	61
+웂	VA	61	=없
 영순	NNP	61
 여기	MAG	61
 동의문	NNG	61
@@ -16732,7 +16766,7 @@ LG화학	NNP	82
 요셉	NNP	60
 지역주의	NNG	60
 피트	NNB	60
-분주히	MAG	60
+분주히	MAG	60	complex 분주/XR 히/XSM 0223
 성황	NNG	60
 현대식	NNG	60
 시공사	NNG	60
@@ -16769,7 +16803,8 @@ LG화학	NNP	82
 머나멀	VA	60
 횡행	NNG	60
 들치	VV	60
-웅얼거리	VV	60
+웅얼	XR	60
+웅얼거리	VV	60	complex 웅얼/XR 거리/XSV 0224
 약수	NNG	60
 신은경	NNP	60
 와락	MAG	60
@@ -16880,7 +16915,7 @@ LG화학	NNP	82
 빈틈	NNG	59
 각양각색	NNG	59
 수인	NNG	59
-월등히	MAG	59
+월등히	MAG	59	complex 월등/MAG 히/XSM 0223
 노량진	NNP	59
 해약	NNG	59
 홀어머니	NNG	59
@@ -16998,7 +17033,7 @@ LG화학	NNP	82
 비선	NNG	58
 과하	VA	58
 사계절	NNG	58
-뒤적거리	VV	58
+뒤적거리	VV	58	complex 뒤적/XR 거리/XSV 0224
 위급	NNG	58
 게이	NNG	58
 여든	NR	58
@@ -17105,7 +17140,8 @@ LG화학	NNP	82
 병리학	NNG	58
 줄리엣	NNP	58
 악장	NNG	58
-빈정거리	VV	58
+빈정	XR	58
+빈정거리	VV	58	complex 빈정/XR 거리/XSV 0224
 번화가	NNG	58
 배드민턴	NNG	58
 삭이	VV	58
@@ -17372,7 +17408,7 @@ LG화학	NNP	82
 여전하	VA	56	complex 여전/XR 하/XSA 0223
 리뷰	NNG	56
 계약직	NNG	56
-유유히	MAG	56
+유유히	MAG	56	complex 유유/XR 히/XSM 0223
 유망주	NNG	56
 이사국	NNG	56
 종이컵	NNG	56
@@ -17475,7 +17511,7 @@ LG화학	NNP	82
 사절단	NNG	56
 신영	NNP	56
 인터페이스	NNG	56
-어슬렁거리	VV	56	complex 어슬렁/MAG 거리/VV 0335
+어슬렁거리	VV	56	complex 어슬렁/MAG 거리/XSV 0335
 이지	NNG	56
 수두룩	XR	56
 회갑	NNG	56
@@ -17497,8 +17533,8 @@ LG화학	NNP	82
 밤낮	MAG	56
 한번쯤	NNG	56
 수려	XR	56
-과히	MAG	56
-아득히	MAG	56
+과히	MAG	56	complex 과/XR 히/XSM 0112
+아득히	MAG	56	complex 아득/XR 히/XSM 0223
 냉철	XR	56
 수사학	NNG	56
 순탄	XR	56
@@ -17559,7 +17595,8 @@ LG화학	NNP	82
 탁탁	MAG	55
 유괴	NNG	55
 능사	NNG	55
-울렁거리	VV	55
+울렁	XR	55
+울렁거리	VV	55	complex 울렁/XR 거리/XSV 0224
 모피	NNG	55
 꼬시	VV	55
 핵가족	NNG	55
@@ -17768,7 +17805,7 @@ LG화학	NNP	82
 포탈	NNG	54
 위자료	NNG	54
 고성	NNP	54
-착실히	MAG	54
+착실히	MAG	54	complex 착실/XR 히/XSM 0223
 간헐	NNG	54
 형언	NNG	54
 주섬주섬	MAG	54
@@ -17802,7 +17839,7 @@ LG화학	NNP	82
 워싱턴포스트	NNP	54
 북동쪽	NNG	54
 변함없	VA	54	complex 변하/VV ᆷ/ETN 없/VA 021223
-태연히	MAG	54
+태연히	MAG	54	complex 태연/NNG 히/XSM 0223
 산발	NNG	54
 포스트시즌	NNG	54
 딘	NNP	54
@@ -17901,7 +17938,7 @@ LG화학	NNP	82
 꼬부라지	VV	54
 미라	NNP	54
 종수	NNP	54
-멍청히	MAG	54
+멍청히	MAG	54	complex 멍청/XR 히/XSM 0223
 도이미나	NNP	54
 김의관	NNP	54
 죽당	NNP	54
@@ -18011,7 +18048,8 @@ LG화학	NNP	82
 원리금	NNG	53
 블레어	NNP	53
 솜털	NNG	53
-헐떡거리	VV	53
+헐떡	XR	53
+헐떡거리	VV	53	complex 헐떡/XR 거리/XSV 0224
 안내문	NNG	53
 선제골	NNG	53
 국민운동	NNG	53
@@ -18129,7 +18167,7 @@ LG화학	NNP	82
 연원	NNG	52
 정평	NNG	52
 메모지	NNG	52
-공고히	MAG	52
+공고히	MAG	52	complex 공고/XR 히/XSM 0223
 중량	NNG	52
 얼씬	MAG	52
 증거물	NNG	52
@@ -18244,7 +18282,8 @@ LG화학	NNP	82
 구로구	NNP	52
 담배꽁초	NNG	52
 부양책	NNG	52
-흥얼거리	VV	52
+흥얼	XR	52
+흥얼거리	VV	52	complex 흥얼/XR 거리/XSV 0224
 임대차	NNG	52
 다이얼	NNG	52
 고고학자	NNG	52
@@ -18378,7 +18417,7 @@ LG화학	NNP	82
 카운트	NNG	51
 행정학	NNG	51
 감투	NNG	51
-공손히	MAG	51
+공손히	MAG	51	complex 공손/XR 히/XSM 0223
 혼령	NNG	51
 원상	NNG	51
 이세돌	NNP	51
@@ -18423,7 +18462,7 @@ LG화학	NNP	82
 스트라이커	NNG	51
 에릭	NNP	51
 하프	NNG	51
-무난히	MAG	51
+무난히	MAG	51	complex 무난/XR 히/XSM 0223
 덮개	NNG	51
 경작지	NNG	51
 소방차	NNG	51
@@ -18490,7 +18529,7 @@ LG화학	NNP	82
 처세	NNG	51
 대영박물관	NNP	51
 허울	NNG	51
-정중히	MAG	51
+정중히	MAG	51	complex 정중/XR 히/XSM 0223
 뭍	NNG	51
 화평	NNG	51
 도안	NNG	51
@@ -18627,6 +18666,7 @@ LG화학	NNP	82
 감원	NNG	50
 지성인	NNG	50
 지엽	NNG	50
+비아냥	XR	50
 비아냥거리	VV	50	complex 비아냥/XR 거리/XSV 0335
 구세주	NNG	50
 판세	NNG	50
@@ -18689,7 +18729,7 @@ AP통신	NNP	50
 콧구멍	NNG	50
 건네받	VV-R	50
 귀순	NNG	50
-글썽이	VV	50
+글썽이	VV	50	complex 글썽/MAG 이/XSV 0223
 용수	NNG	50
 상대국	NNG	50
 품속	NNG	50
@@ -18756,7 +18796,7 @@ AP통신	NNP	50
 주제문	NNG	50
 위나라	NNP	50
 옥타비아누스	NNP	50
-헐떡이	VV	50
+헐떡이	VV	50	complex 헐떡/XR 이/XSV 0223
 장우근	NNP	50
 뒤꼍	NNG	50
 하일	NNP	50
@@ -18779,7 +18819,7 @@ AP통신	NNP	50
 응고	NNG	49
 달콤하	VA	49	complex 달콤/XR 하/XSA 0223
 어머나	IC	49
-출렁거리	VV	49
+출렁거리	VV	49	complex 출렁/MAG 거리/XSV 0224
 잃	VA	49
 로맨틱	NNG	49
 으스스	MAG	49
@@ -18811,7 +18851,7 @@ AP통신	NNP	50
 알파고	NNP	49
 페이퍼	NNG	49
 경상남도	NNP	49
-긴밀히	MAG	49
+긴밀히	MAG	49	complex 긴밀/XR 히/XSM 0223
 철학과	NNG	49
 파스칼	NNP	49
 영미	NNP	49
@@ -19108,7 +19148,7 @@ AP통신	NNP	50
 비거리	NNG	48
 대한축구협회	NNP	48
 병충해	NNG	48
-생생히	MAG	48
+생생히	MAG	48	complex 생생/XR 히/XSM 0223
 행여나	MAG	48
 서울대공원	NNP	48
 인턴십	NNG	48
@@ -19182,7 +19222,7 @@ AP통신	NNP	50
 그리스인	NNG	48
 향방	NNG	48
 작대기	NNG	48
-무참히	MAG	48
+무참히	MAG	48	complex 무참/XR 히/XSM 0223
 실정법	NNG	48
 수지	NNP	48
 와르르	MAG	48
@@ -19192,9 +19232,9 @@ AP통신	NNP	50
 의인	NNG	48
 오웬	NNP	48
 서술어	NNG	48
-맹렬히	MAG	48
+맹렬히	MAG	48	complex 맹렬/XR 히/XSM 0223
 잠결	NNG	48
-빈번히	MAG	48
+빈번히	MAG	48	complex 빈번/XR 히/XSM 0223
 정명원	NNP	48
 면세	NNG	48
 최승희	NNP	48
@@ -19231,7 +19271,8 @@ AP통신	NNP	50
 움	NNG	48
 하기야	MAG	48
 김동인	NNP	48
-버둥거리	VV	48
+버둥	XR	48
+버둥거리	VV	48	complex 버둥/XR 거리/XSV 0224
 전등불	NNG	48
 어질머리	NNG	48
 정방	NNG	48
@@ -19253,7 +19294,7 @@ AP통신	NNP	50
 육질	NNG	47
 쑥갓	NNG	47
 덕담	NNG	47
-성실히	MAG	47
+성실히	MAG	47	complex 성실/NNG 히/XSM 0223
 들이받	VV-R	47
 자꾸자꾸	MAG	47
 장자	NNG	47
@@ -19285,7 +19326,8 @@ AP통신	NNP	50
 명암	NNG	47
 칠팔	NR	47
 존경심	NNG	47
-다독거리	VV	47
+다독	XR	47
+다독거리	VV	47	complex 다독/XR 거리/XSV 0224
 시기상조	NNG	47
 희끗희끗	MAG	47
 일식	NNG	47
@@ -19310,7 +19352,7 @@ AP통신	NNP	50
 일체감	NNG	47
 진열대	NNG	47
 미개	NNG	47
-교묘히	MAG	47
+교묘히	MAG	47	complex 교묘/XR 히/XSM 0223
 들녘	NNG	47
 영해	NNG	47
 조정자	NNG	47
@@ -19398,7 +19440,7 @@ AP통신	NNP	50
 부도나	VV	47	complex 부도/NNG 나/VV 0223
 유부남	NNG	47
 연구서	NNG	47
-골똘히	MAG	47
+골똘히	MAG	47	complex 골똘/XR 히/XSM 0223
 드로잉	NNG	47
 추앙	NNG	47
 시편	NNG	47
@@ -19443,13 +19485,14 @@ AP통신	NNP	50
 따귀	NNG	47
 아따	IC	47
 어지간	XR	47
-번듯	XR	47
+번듯	XR	47	=반듯
 꿋꿋	XR	47
 핏기	NNG	47
 자유혼	NNG	47
 잡종	NNG	47
 허혈	NNG	47
-일렁이	VV	47
+일렁	XR	47
+일렁이	VV	47	complex 일렁/XR 이/XSV 0223
 루수	NNG	47
 객점	NNG	47
 등줄기	NNG	47
@@ -19508,7 +19551,7 @@ AP통신	NNP	50
 대내	NNG	46
 카다피	NNP	46
 대비책	NNG	46
-소상히	MAG	46
+소상히	MAG	46	complex 소상/XR 히/XSM 0223
 케이팝	NNG	46
 솔선수범	NNG	46
 여치	NNG	46
@@ -19616,7 +19659,8 @@ AP통신	NNP	50
 폭음	NNG	46
 북녘	NNG	46
 전동	NNG	46
-수군거리	VV	46
+수군	XR	46
+수군거리	VV	46	complex 수군/XR 거리/XSV 0224
 첼리스트	NNG	46
 설파	NNG	46
 광대뼈	NNG	46
@@ -19650,7 +19694,7 @@ AP통신	NNP	50
 해충	NNG	46
 달나라	NNG	46
 연하	NNG	46
-모나	VA	46
+모나	VA	46	complex 모/NNG 나/XSA 0112
 휴무	NNG	46
 흠모	NNG	46
 수조	NNG	46
@@ -19784,7 +19828,7 @@ AP통신	NNP	50
 불감증	NNG	45
 급격하	VA	45	complex 급격/XR 하/XSA 0223
 불면	NNG	45
-간략히	MAG	45
+간략히	MAG	45	complex 간략/XR 히/XSM 0223
 천착	NNG	45
 아이티	NNG	45
 용암	NNG	45
@@ -19814,7 +19858,7 @@ AP통신	NNP	50
 상대주의	NNG	45
 기층	NNG	45
 허술하	VA	45	complex 허술/XR 하/XSA 0223
-선명히	MAG	45
+선명히	MAG	45	complex 선명/XR 히/XSM 0223
 주안점	NNG	45
 이율	NNG	45
 수업료	NNG	45
@@ -19910,7 +19954,7 @@ AP통신	NNP	50
 연	NNP	45
 닛산	NNP	45
 졸	NNG	45
-적잖이	MAG	45
+적잖이	MAG	45	complex 적잖/VA 이/XSM 0223
 하남시	NNP	45
 표현주의	NNG	45
 역삼동	NNP	45
@@ -20010,10 +20054,12 @@ AP통신	NNP	50
 시어즈	NNP	45
 험상궂	VA	45
 므로	EF	45	vocalic
-소곤거리	VV	45
+소곤	XR	45	=수군
+소곤거리	VV	45	complex 소곤/XR 거리/XSV 0224
 빛살	NNG	45
 동철	NNP	45
-재잘거리	VV	45
+재잘	XR	45
+재잘거리	VV	45	complex 재잘/XR 거리/XSV 0224
 중년기	NNG	45
 아전	NNG	45
 부끄럼	NNG	45
@@ -20061,7 +20107,7 @@ AP통신	NNP	50
 대통령직	NNG	44
 보수주의자	NNG	44
 복습	NNG	44
-깊숙히	MAG	44
+깊숙히	MAG	44	=깊숙이	complex 깊숙/XR 히/XSM 0223
 얼음물	NNG	44
 달인	NNG	44
 주걱	NNG	44
@@ -20124,7 +20170,8 @@ AP통신	NNP	50
 퍼레이드	NNG	44
 야생화	NNG	44
 수자원	NNG	44
-중하	VA	44
+중	XR	44
+중하	VA	44	complex 중/XR 하/XSA 0112
 출항	NNG	44
 식습관	NNG	44
 심근	NNG	44
@@ -20248,7 +20295,8 @@ AP통신	NNP	50
 터미네이터	NNP	44
 천혜	NNG	44
 피어스	NNP	44
-빈둥거리	VV	44
+빈둥	XR	44
+빈둥거리	VV	44	complex 빈둥/XR 거리/XSV 0224
 박진감	NNG	44
 어촌	NNG	44
 가슴팍	NNG	44
@@ -20306,7 +20354,7 @@ AP통신	NNP	50
 씨름단	NNG	44
 궤짝	NNG	44
 등나무	NNG	44
-훌쩍거리	VV	44
+훌쩍거리	VV	44	complex 훌쩍/MAG 거리/XSV 0224
 종합병원	NNP	44
 시현	NNG	44
 망둥이	NNG	44
@@ -20321,7 +20369,7 @@ AP통신	NNP	50
 최재걸	NNP	44
 아프로디테	NNP	44
 헤르쯔	NNB	44
-튼튼히	MAG	43
+튼튼히	MAG	43	complex 튼튼/XR 히/XSM 0223
 십칠	NR	43
 푸짐하	VA	43	complex 푸짐/XR 하/XSA 0223
 배어나	VV	43	complex 배/VV 어/EC 나/VX 011223
@@ -20507,7 +20555,7 @@ AP통신	NNP	50
 법문	NNG	43
 미담	NNG	43
 귀걸이	NNG	43
-거뜬히	MAG	43
+거뜬히	MAG	43	complex 거뜬/XR 히/XSM 0223
 노라니	EC	43
 동호인	NNG	43
 신록	NNG	43
@@ -20561,7 +20609,7 @@ AP통신	NNP	50
 국가주의	NNG	43
 끝맺	VV	43
 걸상	NNG	43
-수상쩍	VA	43
+수상쩍	VA	43	complex 수상/XR 쩍/XSA 0223
 대밭	NNG	43
 맡아보	VV	43	complex 맡/VV 어/EC 보/VX 011223
 는데도	EC	43	non_adj
@@ -20885,7 +20933,7 @@ AP통신	NNP	50
 온순	XR	42
 윤미	NNP	42
 개울가	NNG	42
-번쩍거리	VV	42
+번쩍거리	VV	42	complex 번쩍/MAG 거리/XSV 0224
 머지	NNG	42
 에로스	NNG	42
 상실증	NNG	42
@@ -20989,7 +21037,7 @@ AP통신	NNP	50
 핸드볼	NNG	41
 직역	NNG	41
 서체	NNG	41
-훌륭히	MAG	41
+훌륭히	MAG	41	complex 훌륭/XR 히/XSM 0223
 초임	NNG	41
 회기	NNG	41
 방조제	NNG	41
@@ -21045,11 +21093,12 @@ AP통신	NNP	50
 재정난	NNG	41
 도시가스	NNG	41
 오른	MM	41
-촘촘히	MAG	41
+촘촘히	MAG	41	complex 촘촘/XR 히/XSM 0223
 색동	NNG	41
 다듬이	NNG	41
 복개	NNG	41
-술렁이	VV	41
+술렁	XR	41
+술렁이	VV	41	complex 술렁/XR 이/XSV 0223
 반대파	NNG	41
 행정가	NNG	41
 황태자	NNG	41
@@ -21095,7 +21144,7 @@ AP통신	NNP	50
 임창용	NNP	41
 사멸	NNG	41
 블록버스터	NNG	41
-열렬히	MAG	41
+열렬히	MAG	41	complex 열렬/XR 히/XSM 0223
 인천항	NNP	41
 외인	NNG	41
 떼이	VV	41
@@ -21278,7 +21327,7 @@ AP통신	NNP	50
 결정문	NNG	40
 추태	NNG	40
 네트워킹	NNG	40
-맛나	VA	40
+맛나	VA	40	complex 맛/NNG 나/XSA 0112
 거죽	NNG	40
 직격탄	NNG	40
 아가리	NNG	40
@@ -21381,7 +21430,7 @@ AP통신	NNP	50
 집단행동	NNG	40
 포커	NNG	40
 동여매	VV	40	complex 동이/VV 어/EC 매/VV 021223
-총총히	MAG	40
+총총히	MAG	40	complex 총총/XR 히/XSM 0223
 골대	NNG	40
 가평군	NNP	40
 조총련	NNP	40
@@ -21411,7 +21460,7 @@ AP통신	NNP	50
 누수	NNG	40
 일순	NNG	40
 해설자	NNG	40
-완강히	MAG	40
+완강히	MAG	40	complex 완강/XR 히/XSM 0223
 구축함	NNG	40
 싸움터	NNG	40
 연평	NNP	40
@@ -21628,7 +21677,7 @@ AP통신	NNP	50
 디트로이트	NNP	39
 왕가	NNG	39
 패티	NNP	39
-굳건히	MAG	39
+굳건히	MAG	39	complex 굳건/XR 히/XSM 0223
 중절	NNG	39
 생활인	NNG	39
 계산대	NNG	39
@@ -21648,7 +21697,7 @@ AP통신	NNP	50
 사진관	NNG	39
 한림대	NNP	39
 중압감	NNG	39
-삐걱거리	VV	39	complex 삐걱/MAG 거리/VV 0224
+삐걱거리	VV	39	complex 삐걱/MAG 거리/XSV 0224
 보스	NNG	39
 종군	NNG	39
 뉴욕시	NNP	39
@@ -21693,7 +21742,7 @@ AP통신	NNP	50
 남동쪽	NNG	39
 남한강	NNP	39
 도살	NNG	39
-낄낄거리	VV	39
+낄낄거리	VV	39	complex 낄낄/MAG 거리/XSV 0224
 아랫입술	NNG	39
 분투	NNG	39
 포	NNP	39
@@ -21719,7 +21768,7 @@ GS칼텍스	NNP	39
 올빼미	NNG	39
 여수시	NNP	39
 기근	NNG	39
-쓸쓸히	MAG	39
+쓸쓸히	MAG	39	complex 쓸쓸/XR 히/XSM 0223
 주간사	NNG	39
 오두막	NNG	39
 편집인	NNG	39
@@ -21939,7 +21988,7 @@ GS칼텍스	NNP	39
 영종도	NNP	38
 땔감	NNG	38
 오리나무	NNG	38
-간곡히	MAG	38
+간곡히	MAG	38	complex 간곡/XR 히/XSM 0223
 웹툰	NNG	38
 퓨전	NNG	38
 윗면	NNG	38
@@ -21952,7 +22001,7 @@ GS칼텍스	NNP	39
 돛	NNG	38
 병렬	NNG	38
 맷집	NNG	38
-다독이	VV	38
+다독이	VV	38	complex 다독/XR 이/XSV 0223
 덧칠	NNG	38
 국가관	NNG	38
 특공대	NNG	38
@@ -22091,7 +22140,7 @@ GS칼텍스	NNP	39
 법질서	NNG	38
 분홍빛	NNG	38
 김정호	NNP	38
-쉬이	MAG	38
+쉬이	MAG	38	complex 쉽/VA-I 이/XSM 0112
 소반	NNG	38
 샤갈	NNP	38
 십중팔구	NNG	38
@@ -22124,7 +22173,8 @@ GS칼텍스	NNP	39
 택일	NNG	38
 유지현	NNP	38
 씨익	MAG	38
-우글거리	VV	38
+우글	XR	38
+우글거리	VV	38	complex 우글/XR 거리/XSV 0224
 낚시터	NNG	38
 대한해협	NNP	38
 충절	NNG	38
@@ -22368,7 +22418,7 @@ GS칼텍스	NNP	39
 교도통신	NNP	37
 기자실	NNG	37
 원생	NNG	37
-북적거리	VV	37
+북적거리	VV	37	complex 북적/MAG 거리/XSV 0224
 졸라매	VV	37	complex 졸라/MAG 매/VV 0223
 회신	NNG	37
 살찌우	VV	37
@@ -22442,7 +22492,7 @@ GS칼텍스	NNP	39
 연하장	NNG	37
 여성상	NNG	37
 원류	NNG	37
-밀접히	MAG	37
+밀접히	MAG	37	complex 밀접/NNG 히/XSM 0223
 혼사	NNG	37
 반역	NNG	37
 시의	NNG	37
@@ -22768,7 +22818,7 @@ GS칼텍스	NNP	39
 편집국	NNG	36
 간증	NNG	36
 마닐라	NNP	36
-또렷이	MAG	36
+또렷이	MAG	36	complex 또렷/XR 이/XSM 0223
 호숫가	NNG	36
 소렌스탐	NNP	36
 흘러오	VV	36	complex 흐르/VV 어/EC 오/VX 011223
@@ -22817,7 +22867,7 @@ GS칼텍스	NNP	39
 이학	NNG	36
 애잔	XR	36
 맏딸	NNG	36
-뿌리박	VV	36
+뿌리박	VV	36	complex 뿌리/NNG 박/VV 0223
 봉당	NNG	36
 야만인	NNG	36
 소주잔	NNG	36
@@ -22842,7 +22892,7 @@ GS칼텍스	NNP	39
 ᆯ락	EC	36	vocalic
 빳빳	XR	36
 자줏빛	NNG	36
-까마득히	MAG	36
+까마득히	MAG	36	complex 까마득/XR 히/XSM 0334
 태수	NNP	36
 지세	NNG	36
 쥐새끼	NNG	36
@@ -22933,7 +22983,7 @@ GS칼텍스	NNP	39
 스타덤	NNG	35
 경수	NNP	35
 이창동	NNP	35
-극진히	MAG	35
+극진히	MAG	35	complex 극진/XR 히/XSM 0223
 김윤식	NNP	35
 니은	NNG	35
 빅데이터	NNG	35
@@ -23133,7 +23183,7 @@ GS칼텍스	NNP	39
 방일	NNG	35
 자작나무	NNG	35
 발명품	NNG	35
-술렁거리	VV	35
+술렁거리	VV	35	complex 술렁/XR 거리/XSV 0224
 태	NNP	35
 노니	EC	35
 최수철	NNP	35
@@ -23404,7 +23454,7 @@ GS칼텍스	NNP	39
 무기질	NNG	34
 주사위	NNG	34
 들러붙	VV	34
-깍듯이	MAG	34
+깍듯이	MAG	34	complex 깍듯/XR 이/XSM 0223
 한진그룹	NNP	34
 경부	NNP	34
 띡	MAG	34
@@ -23423,7 +23473,7 @@ GS칼텍스	NNP	39
 저리	NNG	34
 중경	NNP	34
 돈	NNP	34
-꿈틀대	VV	34	complex 꿈틀/MAG 대/VV 0223
+꿈틀대	VV	34	complex 꿈틀/MAG 대/XSV 0223
 이종	NNG	34
 급조	NNG	34
 명세	NNG	34
@@ -23442,7 +23492,7 @@ GS칼텍스	NNP	39
 마빈스	NNP	34
 정훈	NNP	34
 프랑수아	NNP	34
-흔들거리	VV	34	complex 흔들/MAG 거리/VV 0224
+흔들거리	VV	34	complex 흔들/MAG 거리/XSV 0224
 자동차업	NNG	34
 연두	NNG	34
 레슨	NNG	34
@@ -23538,7 +23588,7 @@ GS칼텍스	NNP	39
 인공기	NNG	34
 총통	NNG	34
 팔당호	NNP	34
-친절히	MAG	34
+친절히	MAG	34	complex 친절/NNG 히/XSM 0223
 브루나이	NNP	34
 직통	NNG	34
 능산리	NNP	34
@@ -23775,7 +23825,7 @@ MBC애드컴	NNP	34
 서무	NNG	33
 죄명	NNG	33
 당락	NNG	33
-영구히	MAG	33
+영구히	MAG	33	complex 영구/NNG 히/XSM 0223
 점호	NNG	33
 모럴	NNG	33
 피부색	NNG	33
@@ -23845,7 +23895,7 @@ MBC애드컴	NNP	34
 전통주	NNG	33
 민방	NNG	33
 통신업체	NNG	33
-빼곡히	MAG	33
+빼곡히	MAG	33	complex 빼곡/MAG 히/XSM 0223
 기하급수	NNG	33
 옥천	NNP	33
 진품	NNG	33
@@ -23855,7 +23905,7 @@ MBC애드컴	NNP	34
 제전	NNG	33
 기무	NNG	33
 결전	NNG	33
-깔깔대	VV	33	complex 깔깔/MAG 대/VV 0223
+깔깔대	VV	33	complex 깔깔/MAG 대/XSV 0223
 위계질서	NNG	33
 만신창이	NNG	33
 사이언스	NNP	33
@@ -23918,7 +23968,7 @@ SK그룹	NNP	33
 냅킨	NNG	33
 헤엄	NNG	33
 피비린내	NNG	33
-반듯이	MAG	33
+반듯이	MAG	33	complex 반듯/XR 이/XSM 0223
 아틀라스	NNP	33
 피파	NNP	33
 과분	XR	33
@@ -23979,7 +24029,7 @@ SK그룹	NNP	33
 앵커맨	NNG	33
 송사리	NNG	33
 선선	XR	33
-면면히	MAG	33
+면면히	MAG	33	complex 면면/NNG 히/XSM 0223
 덕망	NNG	33
 아집	NNG	33
 상방	NNG	33
@@ -23997,7 +24047,7 @@ SK그룹	NNP	33
 편액	NNG	33
 악극	NNG	33
 기구	XR	33
-주춤거리	VV	33
+주춤거리	VV	33	complex 주춤/MAG 거리/XSV 0224
 페르시아인	NNG	33
 자니까	EC	33
 백일몽	NNG	33
@@ -24024,7 +24074,7 @@ SK그룹	NNP	33
 괴상	XR	33
 과객	NNG	33
 말버릇	NNG	33
-중히	MAG	33
+중히	MAG	33	complex 중/XR 히/XSM 0112
 관동별곡	NNP	33
 한민당	NNP	33
 점령군	NNG	33
@@ -24102,7 +24152,7 @@ SK그룹	NNP	33
 외대	NNP	32
 탐독	NNG	32
 더	NNG	32
-들먹거리	VV	32
+들먹거리	VV	32	complex 들먹/XR 거리/XSV 0224
 어문학	NNG	32
 식도	NNG	32
 기마	NNG	32
@@ -24411,7 +24461,7 @@ SK그룹	NNP	33
 지당	XR	32
 강전	NNG	32
 달관	NNG	32
-헛되이	MAG	32
+헛되이	MAG	32	complex 헛되/VA 이/XSM 0223
 뻔	XR	32
 백일홍	NNG	32
 역자	NNG	32
@@ -24425,7 +24475,7 @@ SK그룹	NNP	33
 소낙비	NNG	32
 지지리	MAG	32
 오윤	NNP	32
-얼씬거리	VV	32
+얼씬거리	VV	32	complex 얼씬/MAG 거리/XSV 0224
 오뚝이	NNG	32
 남근	NNG	32
 덕배	NNP	32
@@ -24439,7 +24489,7 @@ SK그룹	NNP	33
 대조영	NNP	32
 휘돌	VV	32
 하릴없이	MAG	32
-망연히	MAG	32
+망연히	MAG	32	complex 망연/XR 히/XSM 0223
 장가가	VV	32	complex 장가/NNG 가/VV 0223
 말숙	NNP	32
 가무	NNG	32
@@ -24460,7 +24510,7 @@ SK그룹	NNP	33
 등속	NNG	32
 주심포	NNG	32
 견	NNG	32
-일렁거리	VV	32
+일렁거리	VV	32	complex 일렁/XR 거리/XSV 0224
 금줄	NNG	32
 불알	NNG	32
 바람벽	NNG	32
@@ -24710,12 +24760,12 @@ SK그룹	NNP	33
 싯다르타	NNP	31
 시단	NNG	31
 허재	NNP	31
-고함치	VV	31
+고함치	VV	31	complex 고함/NNG 치/VV 0223
 외견	NNG	31
 에두르	VV	31
 만전	NNG	31
 숙고	NNG	31
-꿋꿋이	MAG	31
+꿋꿋이	MAG	31	complex 꿋꿋/XR 이/XSM 0223
 조선대	NNP	31
 기본급	NNG	31
 참교육	NNG	31
@@ -24739,7 +24789,7 @@ SK그룹	NNP	33
 가속기	NNG	31
 안식일	NNG	31
 짐짝	NNG	31
-원만히	MAG	31
+원만히	MAG	31	complex 원만/XR 히/XSM 0223
 사정거리	NNG	31
 매트릭스	NNP	31
 오노	NNP	31
@@ -24751,7 +24801,8 @@ SK그룹	NNP	33
 문익환	NNP	31
 진원지	NNG	31
 스칸디나비아	NNP	31
-아른거리	VV	31
+아른	XR	31
+아른거리	VV	31	complex 아른/XR 거리/XSV 0224
 독일군	NNG	31
 사례비	NNG	31
 꼽추	NNG	31
@@ -24762,7 +24813,7 @@ SK그룹	NNP	33
 수뢰	NNG	31
 블루스	NNG	31
 감전	NNG	31
-갸우뚱거리	VV	31	complex 갸우뚱/MAG 거리/VV 0335
+갸우뚱거리	VV	31	complex 갸우뚱/MAG 거리/XSV 0335
 낙담	NNG	31
 얼음장	NNG	31
 금욕	NNG	31
@@ -24806,7 +24857,7 @@ SK그룹	NNP	33
 폴란드전	NNG	31
 정소	NNG	31
 부활절	NNG	31
-단정히	MAG	31
+단정히	MAG	31	complex 단정/XR 히/XSM 0223
 오리엔탈리즘	NNG	31
 관	NNB	31
 공기총	NNG	31
@@ -24844,7 +24895,7 @@ SK그룹	NNP	33
 풍만	XR	31
 골품	NNG	31
 핏빛	NNG	31
-글썽거리	VV	31
+글썽거리	VV	31	complex 글썽/MAG 거리/XSV 0224
 주억거리	VV	31
 카에다	NNP	31
 우스개	NNG	31
@@ -24969,7 +25020,7 @@ SK그룹	NNP	33
 불찰	NNG	30
 볼품없	VA	30
 몰매	NNG	30
-허둥거리	VV	30
+허둥거리	VV	30	complex 허둥/MAG 거리/XSV 0224
 쇠락	NNG	30
 조문단	NNG	30
 우아하	VA	30	complex 우아/XR 하/XSA 0223
@@ -25107,7 +25158,8 @@ SK그룹	NNP	33
 보도국	NNG	30
 김민정	NNP	30
 회사명	NNG	30
-후들거리	VV	30
+후들	XR	30
+후들거리	VV	30	complex 후들/XR 거리/XSV 0224
 유권	NNG	30
 참정	NNG	30
 금속노조	NNP	30
@@ -25227,7 +25279,7 @@ SK그룹	NNP	33
 박선숙	NNP	30
 의보	NNG	30
 깜둥이	NNG	30
-빈정대	VV	30
+빈정대	VV	30	complex 빈정/XR 대/XSV 0223
 과신	NNG	30
 은박지	NNG	30
 투탕카멘	NNP	30
@@ -25256,7 +25308,7 @@ SK그룹	NNP	33
 질경이	NNG	30
 머루	NNG	30
 눈두덩	NNG	30
-수북히	MAG	30
+수북히	MAG	30	complex 수북/XR 히/XSM 0223
 현장감	NNG	30
 무성	NNG	30
 순전	XR	30
@@ -25907,7 +25959,7 @@ CJ그룹	NNP	29
 중환자	NNG	28
 다산	NNG	28
 징집	NNG	28
-시원히	MAG	28
+시원히	MAG	28	complex 시원/XR 히/XSM 0223
 분향	NNG	28
 풀문	NNG	28
 급작스럽	VA-I	28
@@ -25960,7 +26012,7 @@ CJ그룹	NNP	29
 물산	NNG	28
 적령기	NNG	28
 해상도	NNG	28
-세밀히	MAG	28
+세밀히	MAG	28	complex 세밀/XR 히/XSM 0223
 일갈	NNG	28
 당진	NNP	28
 더더구나	MAG	28
@@ -26060,13 +26112,13 @@ CJ그룹	NNP	29
 프랭클린	NNP	28
 김원홍	NNP	28
 조각상	NNG	28
-수군대	VV	28
+수군대	VV	28	complex 수군/XR 대/XSV 0223
 시흥시	NNP	28
 중노동	NNG	28
 다달이	MAG	28
 알래스카	NNP	28
 황우여	NNP	28
-북적대	VV	28	complex 북적/MAG 대/VV 0223
+북적대	VV	28	complex 북적/MAG 대/XSV 0223
 압송	NNG	28
 미정	NNG	28
 뉴	NNP	28
@@ -26085,7 +26137,8 @@ CJ그룹	NNP	29
 풍토병	NNG	28
 너털웃음	NNG	28
 카리브해	NNP	28
-가물거리	VV	28
+가물	XR	28
+가물거리	VV	28	complex 가물/XR 거리/XSV 0224
 미상	NNG	28
 함석헌	NNP	28
 수훈	NNG	28
@@ -26617,7 +26670,7 @@ CJ그룹	NNP	29
 묵상	NNG	27
 설악	NNP	27
 의장단	NNG	27
-엄중히	MAG	27
+엄중히	MAG	27	complex 엄중/XR 히/XSM 0223
 물장수	NNG	27
 자인	NNG	27
 흑색선전	NNG	27
@@ -26643,7 +26696,8 @@ CJ그룹	NNP	29
 중기중앙회	NNP	27
 비키니	NNG	27
 매거진	NNG	27
-칭얼대	VV	27
+칭얼	XR	27
+칭얼대	VV	27	complex 칭얼/XR 대/XSV 0223
 오염도	NNG	27
 과속	NNG	27
 엘스	NNP	27
@@ -26774,7 +26828,7 @@ CJ그룹	NNP	29
 비천	XR	27
 모어	NNG	27
 오랫만	NNG	27
-선선히	MAG	27
+선선히	MAG	27	complex 선선/XR 히/XSM 0223
 노오랗	VA-I	27
 스핑크스	NNP	27
 몽테뉴	NNP	27
@@ -26803,7 +26857,7 @@ CJ그룹	NNP	29
 ᆫ걸요	EF	27	vocalic
 엉큼	XR	27
 체외	NNG	27
-칭얼거리	VV	27
+칭얼거리	VV	27	complex 칭얼/XR 거리/XSV 0224
 신수	NNG	27
 과대	XR	27
 각별	XR	27
@@ -26950,8 +27004,9 @@ CJ그룹	NNP	29
 대종	NNG	26
 여한	NNG	26
 월남쌈	NNG	26
-뒤뚱거리	VV	26
-완연히	MAG	26
+뒤뚱	XR	26
+뒤뚱거리	VV	26	complex 뒤뚱/XR 거리/XSV 0224
+완연히	MAG	26	complex 완연/XR 히/XSM 0223
 중간중간	NNG	26
 아이쿠	IC	26	=아이고
 떠먹	VV	26
@@ -27242,7 +27297,7 @@ CJ그룹	NNP	29
 접두사	NNG	26
 연화	NNG	26
 마구간	NNG	26
-끙끙거리	VV	26
+끙끙거리	VV	26	complex 끙끙/MAG 거리/XSV 0224
 혈색	NNG	26
 동업자	NNG	26
 격문	NNG	26
@@ -27376,7 +27431,7 @@ CJ그룹	NNP	29
 너저분	XR	26
 듬직	XR	26
 황하	NNP	26
-변변히	MAG	26
+변변히	MAG	26	complex 변변/XR 히/XSM 0223
 패전국	NNG	26
 병환	NNG	26
 우째	MAG	26
@@ -27410,12 +27465,13 @@ CJ그룹	NNP	29
 앞가슴	NNG	26
 주워듣	VV-I	26
 술청	NNG	26
-펄럭거리	VV	26
+펄럭거리	VV	26	complex 펄럭/MAG 거리/XSV 0224
 문무	NNG	26
 ᆯ란다	EF	26	vocalic
 옹암	NNP	26
 박정재	NNP	26
-종알거리	VV	26
+종알	XR	26	=중얼
+종알거리	VV	26	complex 종알/XR 거리/XSV 0224
 거시기	IC	26
 도리천	NNP	26
 소인	NP	26
@@ -27468,7 +27524,7 @@ CJ그룹	NNP	29
 공중파	NNG	25
 이래든가	JX	25	non_vowel	0.9189189189189189	=이라든가
 본청	NNG	25
-길이	MAG	25
+길이	MAG	25	complex 길/VA 이/XSM 0112
 뻥	NNG	25
 광섬유	NNG	25
 빔	NNG	25
@@ -27508,7 +27564,7 @@ CJ그룹	NNP	29
 파이브	NNG	25
 모션	NNG	25
 날	NNB	25
-기우뚱	MAG	25
+기우뚱	MAG	25	=갸우뚱
 붙박이	NNG	25	complex 붙박/VV 이/ETN 0223
 아이오와	NNP	25
 국립과학수사연구원	NNP	25
@@ -27561,7 +27617,7 @@ CJ그룹	NNP	29
 굴종	NNG	25
 떄	NNG	25
 씁쓸하	VA	25	complex 씁쓸/XR 하/XSA 0223
-지독히	MAG	25
+지독히	MAG	25	complex 지독/XR 히/XSM 0223
 순찰차	NNG	25
 로비스트	NNG	25
 오발	NNG	25
@@ -27634,7 +27690,7 @@ CJ그룹	NNP	29
 푸조	NNP	25
 선영	NNP	25
 구본무	NNP	25
-가벼이	MAG	25
+가벼이	MAG	25	complex 가볍/VA-I 이/XSM 0223
 랜드마크	NNG	25
 지주사	NNG	25
 피셔	NNP	25
@@ -27655,7 +27711,7 @@ CJ그룹	NNP	29
 창법	NNG	25
 김병연	NNP	25
 축구부	NNG	25
-북적이	VV	25
+북적이	VV	25	complex 북적/MAG 이/XSV 0223
 세컨드	NNG	25
 부산저축은행	NNP	25
 평균값	NNG	25
@@ -27786,7 +27842,7 @@ CJ그룹	NNP	29
 곱슬머리	NNG	25
 위키리크스	NNP	25
 경부고속철도	NNP	25
-사뿐히	MAG	25
+사뿐히	MAG	25	complex 사뿐/MAG 히/XSM 0223
 운구	NNG	25
 카탈로그	NNG	25
 남대문시장	NNP	25
@@ -27981,11 +28037,13 @@ CJ그룹	NNP	29
 등속	NNB	25
 승냥이	NNG	25
 꺼정	JX	25	=까지	>꺼정
-꾸물거리	VV	25
+꾸물	XR	25
+꾸물거리	VV	25	complex 꾸물/XR 거리/XSV 0224
 남궁억	NNP	25
 부정문	NNG	25
 장혼	NNP	25
-긁적거리	VV	25
+긁적	XR	25
+긁적거리	VV	25	complex 긁적/XR 거리/XSV 0224
 조선공산당	NNP	25
 멀리멀리	MAG	25
 터덜터덜	MAG	25
@@ -28125,7 +28183,7 @@ CJ그룹	NNP	29
 세네	MM	24
 북괴	NNG	24
 지동설	NNG	24
-완벽히	MAG	24
+완벽히	MAG	24	complex 완벽/NNG 히/XSM 0223
 초읽기	NNG	24
 교총	NNP	24
 탄산음료	NNG	24
@@ -28204,7 +28262,7 @@ CJ그룹	NNP	29
 훈련원	NNG	24
 볼리비아	NNP	24
 빈민촌	NNG	24
-곰곰히	MAG	24
+곰곰히	MAG	24	complex 곰곰/MAG 히/XSM 0223
 걸머지	VV	24
 진천	NNP	24
 순간순간	NNG	24
@@ -28243,7 +28301,7 @@ CJ그룹	NNP	29
 가업	NNG	24
 내셔널리그	NNG	24
 어뢰	NNG	24
-으르렁대	VV	24
+으르렁대	VV	24	complex 으르렁/XR 대/XSV 0334
 우완	NNG	24
 배신자	NNG	24
 세리머니	NNG	24
@@ -28381,7 +28439,8 @@ CJ그룹	NNP	29
 사르	VV	24
 살인마	NNG	24
 마에하라	NNP	24
-절룩거리	VV	24
+절룩	XR	24
+절룩거리	VV	24	complex 절룩/XR 거리/XSV 0224
 오슬로	NNP	24
 음해	NNG	24
 이규혁	NNP	24
@@ -28414,7 +28473,8 @@ CJ그룹	NNP	29
 한국갤럽	NNP	24
 노제	NNG	24
 최민식	NNP	24
-꼼지락거리	VV	24
+꼼지락	XR	24
+꼼지락거리	VV	24	complex 꼼지락/XR 거리/XSV 0335
 생산액	NNG	24
 일본도	NNG	24
 자이언츠	NNP	24
@@ -28484,7 +28544,8 @@ LG유플러스	NNP	24
 입추	NNG	24
 항원	NNG	24
 탐험가	NNG	24
-흥청거리	VV	24
+흥청	XR	24
+흥청거리	VV	24	complex 흥청/XR 거리/XSV 0224
 분회	NNG	24
 화주	NNG	24
 백작	NNG	24
@@ -28527,7 +28588,7 @@ LG유플러스	NNP	24
 민국	NNP	24
 이붕	NNP	24
 쉬쉬	XR	24
-빠끔히	MAG	24
+빠끔히	MAG	24	complex 빠끔/MAG 히/XSM 0223
 구랍	NNG	24
 낙오자	NNG	24
 잡치	VV	24
@@ -28993,7 +29054,8 @@ LG유플러스	NNP	24
 한국도로공사	NNP	23
 차감	NNG	23
 예일대	NNP	23
-너끈히	MAG	23
+너끈	XR	23
+너끈히	MAG	23	complex 너끈/XR 히/XSM 0223
 다이애나	NNP	23
 경보음	NNG	23
 본회의장	NNG	23
@@ -29173,7 +29235,7 @@ LG유플러스	NNP	24
 카인	NNP	23
 지참	NNG	23
 폐경기	NNG	23
-성급히	MAG	23
+성급히	MAG	23	complex 성급/XR 히/XSM 0223
 기도회	NNG	23
 멜라토닌	NNG	23
 수재민	NNG	23
@@ -29187,7 +29249,7 @@ LG유플러스	NNP	24
 예조	NNG	23
 파혼	NNG	23
 한도액	NNG	23
-낄낄대	VV	23	complex 낄낄/MAG 대/VV 0223
+낄낄대	VV	23	complex 낄낄/MAG 대/XSV 0223
 정규군	NNG	23
 중앙박물관	NNP	23
 프란체스카	NNP	23
@@ -29267,7 +29329,7 @@ LG유플러스	NNP	24
 율기	NNG	23
 충렬왕	NNP	23
 상민	NNP	23
-의연히	MAG	23
+의연히	MAG	23	complex 의연/XR 히/XSM 0223
 야훼	NNP	23
 물레	NNG	23
 우러러보	VV	23	complex 우러르/VV 어/EC 보/VX 032334
@@ -29290,9 +29352,10 @@ LG유플러스	NNP	24
 이태백	NNP	23
 답니다	EC	23
 왜정	NNG	23
-토닥거리	VV	23
+토닥	XR	23
+토닥거리	VV	23	complex 토닥/XR 거리/XSV 0224
 서용빈	NNP	23
-멈칫거리	VV	23
+멈칫거리	VV	23	complex 멈칫/MAG 거리/XSV 0224
 성불	NNG	23
 애욕	NNG	23
 작두	NNG	23
@@ -29355,7 +29418,8 @@ LG유플러스	NNP	24
 노름판	NNG	23
 찡긋	MAG	23
 은께	EC	23	non_vowel	==ᆫ께
-득실거리	VV	23
+득실	XR	23
+득실거리	VV	23	complex 득실/XR 거리/XSV 0224
 가편	NNG	23
 달음박질	NNG	23
 배알	NNG	23
@@ -29551,10 +29615,10 @@ LG유플러스	NNP	24
 골조	NNG	22
 개털	NNG	22
 스토킹	NNG	22
-긴급히	MAG	22
+긴급히	MAG	22	complex 긴급/NNG 히/XSM 0223
 살인죄	NNG	22
 최태민	NNP	22
-깜빡거리	VV	22	complex 깜빡/MAG 거리/VV 0224
+깜빡거리	VV	22	complex 깜빡/MAG 거리/XSV 0224
 뜬금없	VA	22
 촉수	NNG	22
 내비게이션	NNG	22
@@ -29655,7 +29719,7 @@ LG유플러스	NNP	24
 토플	NNG	22
 책상다리	NNG	22
 기부자	NNG	22
-훌쩍이	VV	22
+훌쩍이	VV	22	complex 훌쩍/MAG 이/XSV 0223
 주제곡	NNG	22
 제니퍼	NNP	22
 방명록	NNG	22
@@ -29765,7 +29829,7 @@ LG유플러스	NNP	24
 조합비	NNG	22
 두루마리	NNG	22
 몬드라곤	NNP	22
-멀쩡히	MAG	22
+멀쩡히	MAG	22	complex 멀쩡/XR 히/XSM 0223
 화적	NNG	22
 관찰력	NNG	22
 술래잡기	NNG	22
@@ -29827,14 +29891,14 @@ LG유플러스	NNP	24
 춘향가	NNP	22
 최민수	NNP	22
 건설업자	NNG	22
-요행히	MAG	22
+요행히	MAG	22	complex 요행/NNG 히/XSM 0223
 딴소리	NNG	22
 연우	NNP	22
 김병철	NNP	22
 아성	NNG	22
 집어삼키	VV	22	complex 집/VV-R 어/EC 삼키/VV 011224
 애물단지	NNG	22
-엄히	MAG	22
+엄히	MAG	22	complex 엄/XR 히/XSM 0112
 보잘것	NNG	22
 포워드	NNG	22
 자격지심	NNG	22
@@ -29973,7 +30037,7 @@ LG유플러스	NNP	24
 특허법	NNG	22
 종성	NNG	22
 행락객	NNG	22
-흥건히	MAG	22
+흥건히	MAG	22	complex 흥건/XR 히/XSM 0223
 야유회	NNG	22
 김원준	NNP	22
 시아누크	NNP	22
@@ -30033,7 +30097,7 @@ LG유플러스	NNP	24
 말머리	NNG	22
 맥주홀	NNG	22
 띠우	VV	22
-덜컹거리	VV	22
+덜컹거리	VV	22	complex 덜컹/MAG 거리/XSV 0224
 알량	XR	22
 현석	NNP	22
 성냥갑	NNG	22
@@ -30153,7 +30217,7 @@ LG유플러스	NNP	24
 스몰라렉	NNP	22
 형형색색	NNG	21
 수도승	NNG	21
-은은히	MAG	21
+은은히	MAG	21	complex 은은/XR 히/XSM 0223
 스토리텔링	NNG	21
 좍	MAG	21
 좌편향	NNG	21
@@ -30288,12 +30352,12 @@ LG유플러스	NNP	24
 완구	NNG	21
 협잡	NNG	21
 반신	NNG	21
-따뜻이	MAG	21
+따뜻이	MAG	21	complex 따뜻/XR 이/XSM 0223
 무심결	NNG	21
 마도	NNP	21
 벌채	NNG	21
 석쇠	NNG	21
-촉촉히	MAG	21
+촉촉히	MAG	21	complex 촉촉/XR 히/XSM 0223
 기념탑	NNG	21
 포크레인	NNG	21
 비아그라	NNP	21
@@ -30339,7 +30403,7 @@ LG유플러스	NNP	24
 김홍도	NNP	21
 교양인	NNG	21
 이희승	NNP	21
-깨트리	VV	21
+깨트리	VV	21	complex 깨/VV 어/EC 트리/XSV 010113
 둥그레지	VV	21
 동그래지	VV	21	=둥그레지	complex 동그랗/VA-I 어/EC 지/VX 032334
 샤브샤브	NNG	21
@@ -30494,7 +30558,8 @@ LG유플러스	NNP	24
 예결위	NNG	21
 쾌재	NNG	21
 이첩	NNG	21
-욱신거리	VV	21
+욱신	XR	21
+욱신거리	VV	21	complex 욱신/XR 거리/XSV 0224
 강남경찰서	NNP	21
 윤호영	NNP	21
 들이붓	VV-I	21
@@ -30592,7 +30657,7 @@ LG유플러스	NNP	24
 자금법	NNG	21
 해머	NNG	21
 라덴	NNP	21
-무던히	MAG	21
+무던히	MAG	21	complex 무던/XR 히/XSM 0223
 갤럭시S8	NNP	21
 수선화	NNG	21
 제이크	NNP	21
@@ -30712,9 +30777,9 @@ LG유플러스	NNP	24
 흉보	VV	21
 협궤	NNG	21
 강토	NNG	21
-우쭐대	VV	21	complex 우쭐/MAG 대/VV 0223
+우쭐대	VV	21	complex 우쭐/MAG 대/XSV 0223
 아메바	NNG	21
-허물어뜨리	VV	21
+허물어뜨리	VV	21	complex 허물/VV 어/EC 뜨리/XSV 022335
 적적	XR	21
 다소간	NNG	21
 흉흉	XR	21
@@ -30759,7 +30824,8 @@ LG유플러스	NNP	24
 겉치레	NNG	21
 머튼	NNP	21
 삼천리	NNG	21
-번연히	MAG	21
+번연	XR	21
+번연히	MAG	21	complex 번연/XR 히/XSM 0223
 아둔	XR	21
 시달림	NNG	21	complex 시달리/VV ᆷ/ETN 0323
 조목	NNG	21
@@ -30796,7 +30862,7 @@ LG유플러스	NNP	24
 크루소	NNP	21
 논변	NNG	21
 빚쟁이	NNG	21
-조급히	MAG	21
+조급히	MAG	21	complex 조급/XR 히/XSM 0223
 삥	MAG	21
 김선창	NNP	21
 스트롱	NNP	21
@@ -30848,7 +30914,7 @@ LG유플러스	NNP	24
 하고많	VA	21
 덕재	NNP	21
 버들피리	NNG	21
-기우뚱거리	VV	21
+기우뚱거리	VV	21	complex 기우뚱/MAG 거리/XSV 0335
 소중이	NNP	21
 간경변증	NNG	21
 원자량	NNG	21
@@ -31089,7 +31155,7 @@ LG유플러스	NNP	24
 평결	NNG	20
 경찰대	NNP	20
 총경	NNG	20
-역력히	MAG	20
+역력히	MAG	20	complex 역력/XR 히/XSM 0223
 우짜	VV	20
 이착륙	NNG	20
 참꽃	NNG	20
@@ -31230,7 +31296,8 @@ LG유플러스	NNP	24
 연말연시	NNG	20
 절편	NNG	20
 최혜진	NNP	20
-겸허히	MAG	20
+겸허	XR	20
+겸허히	MAG	20	complex 겸허/XR 히/XSM 0223
 오클라호마	NNP	20
 약혼녀	NNG	20
 회항	NNG	20
@@ -31280,7 +31347,8 @@ LG유플러스	NNP	24
 양준혁	NNP	20
 복지학과	NNG	20
 스팸	NNG	20
-떵떵거리	VV	20
+떵떵	XR	20
+떵떵거리	VV	20	complex 떵떵/XR 거리/XSV 0224
 주먹구구식	NNG	20
 결승선	NNG	20
 면바지	NNG	20
@@ -31288,7 +31356,7 @@ LG유플러스	NNP	24
 민주노조	NNP	20
 순천향대	NNP	20
 지략	NNG	20
-홀짝거리	VV	20	complex 홀짝/MAG 거리/VV 0224
+홀짝거리	VV	20	complex 홀짝/MAG 거리/XSV 0224
 척	NNP	20
 조사실	NNG	20
 충적	NNG	20
@@ -31397,7 +31465,8 @@ LG디스플레이	NNP	20
 매화나무	NNG	20
 좌정	NNG	20
 갤럭시S	NNP	20
-집적거리	VV	20
+집적	XR	20
+집적거리	VV	20	complex 집적/XR 거리/XSV 0224
 다수당	NNG	20
 유정	NNG	20
 완창	NNG	20
@@ -31460,7 +31529,7 @@ LG디스플레이	NNP	20
 분석력	NNG	20
 연근해	NNG	20
 연리	NNG	20
-귀담아듣	VV-I	20
+귀담아듣	VV-I	20	complex 귀담/VV 어/EC 듣/VV-I 022334
 장돌뱅이	NNG	20
 아이비엠	NNP	20
 동격	NNG	20
@@ -31546,7 +31615,7 @@ LG디스플레이	NNP	20
 중소기업은행	NNP	20
 눈금	NNG	20
 화공품	NNG	20
-서성대	VV	20
+서성대	VV	20	complex 서성/XR 대/XSV 0223
 표주박	NNG	20
 청조	NNG	20
 민국	NNG	20
@@ -31644,7 +31713,7 @@ LG디스플레이	NNP	20
 수돗가	NNG	20
 기든스	NNP	20
 계면쩍	VA	20
-알뜰히	MAG	20
+알뜰히	MAG	20	complex 알뜰/XR 히/XSM 0223
 쪽빛	NNG	20
 드르륵	MAG	20
 외람	XR	20
@@ -31698,13 +31767,13 @@ LG디스플레이	NNP	20
 짚단	NNG	20
 초조	XR	20
 파르스름	XR	20
-반가이	MAG	20
+반가이	MAG	20	complex 반갑/VA-I 이/XSM 0223
 고깃배	NNG	20
 ᆫ다기에	EC	20	vocalic
 루즈	NNG	20
 목책	NNG	20
 광포	NNG	20
-아련히	MAG	20
+아련히	MAG	20	complex 아련/XR 히/XSM 0223
 항고인	NNG	20
 농요	NNG	20
 블라지미르	NNP	20
@@ -31736,12 +31805,13 @@ LG디스플레이	NNP	20
 풍헌	NNG	20
 촉	NNB	20
 일포	NNP	20
-껌벅이	VV	20
+껌벅	MAG	20	=깜빡
+껌벅이	VV	20	complex 껌벅/MAG 이/XSV 0223
 외눈까풀이	NNG	20
 용녀	NNP	20
 목침	NNG	20
 땔나무	NNG	20
-삐죽거리	VV	20
+삐죽거리	VV	20	complex 삐죽/MAG 거리/XSV 0224
 만태	NNG	20
 저승길	NNG	20
 사바	NNG	20
@@ -31944,7 +32014,7 @@ LG디스플레이	NNP	20
 정범모	NNP	19
 거번	NNG	19
 으먼	EC	19	non_vowel	==먼
-심각히	MAG	19
+심각히	MAG	19	complex 심각/XR 히/XSM 0223
 쎄미나	NNG	19
 호사가	NNG	19
 싸락눈	NNG	19
@@ -31959,7 +32029,7 @@ LG디스플레이	NNP	20
 해코지	NNG	19
 가구주	NNG	19
 허드렛일	NNG	19
-깜빡이	VV	19
+깜빡이	VV	19	complex 깜빡/MAG 이/XSV 0223
 친형	NNG	19
 쨍	MAG	19
 타이거	NNG	19
@@ -32050,7 +32120,7 @@ LG디스플레이	NNP	20
 이종욱	NNP	19
 참극	NNG	19
 골든	NNG	19
-허우적대	VV	19
+허우적대	VV	19	complex 허우적/XR 대/XSV 0334
 규슈	NNP	19
 프로젝터	NNG	19
 신세계그룹	NNP	19
@@ -32507,7 +32577,8 @@ SH공사	NNP	19
 도다	EC	19
 신하균	NNP	19
 죽지랑	NNP	19
-넘실거리	VV	19
+넘실	XR	19
+넘실거리	VV	19	complex 넘실/XR 거리/XSV 0224
 휴머니스트	NNG	19
 나신	NNG	19
 속요	NNG	19
@@ -32563,7 +32634,7 @@ SH공사	NNP	19
 아가페	NNG	19
 윤정	NNP	19
 련	EF	19
-찔끔거리	VV	19	complex 찔끔/MAG 거리/VV 0224
+찔끔거리	VV	19	complex 찔끔/MAG 거리/XSV 0224
 애달프	VA	19
 미연	NNP	19
 지나	EC	19
@@ -32582,10 +32653,11 @@ SH공사	NNP	19
 옮겨가	VV	19	complex 옮기/VV 어/EC 가/VX 021223
 호머	NNP	19
 사회과학	NNG	19
-너울거리	VV	19
+너울	XR	19
+너울거리	VV	19	complex 너울/XR 거리/XSV 0224
 흡사	NNG	19
 철없이	MAG	19
-지긋이	MAG	19
+지긋이	MAG	19	complex 지긋/XR 이/XSM 0223
 어줍잖	VA	19
 부러	MAG	19
 의롭	VA-I	19
@@ -32601,7 +32673,7 @@ SH공사	NNP	19
 풍뎅이	NNG	19
 사림	NNG	19
 둑길	NNG	19
-싱글거리	VV	19
+싱글거리	VV	19	complex 싱글/MAG 거리/XSV 0224
 제대루	MAG	19
 흥부전	NNP	19
 다더군	EF	19
@@ -32876,7 +32948,7 @@ SH공사	NNP	19
 올림픽대로	NNP	18
 행주대교	NNP	18
 강간죄	NNG	18
-흩뜨리	VV	18
+흩뜨리	VV	18	complex 흩/VV 뜨리/XSV 0113
 오드리	NNP	18
 머스크	NNP	18
 미결수	NNG	18
@@ -33092,7 +33164,8 @@ SH공사	NNP	19
 가로세로	NNG	18
 정성훈	NNP	18
 암중모색	NNG	18
-웅웅거리	VV	18
+웅웅	XR	18
+웅웅거리	VV	18	complex 웅웅/XR 거리/XSV 0224
 대문짝	NNG	18
 최재원	NNP	18
 성찬	NNG	18
@@ -33125,7 +33198,7 @@ SH공사	NNP	19
 여독	NNG	18
 김종서	NNP	18
 그린란드	NNP	18
-다급히	MAG	18
+다급히	MAG	18	complex 다급/XR 히/XSM 0223
 금호그룹	NNP	18
 키다리	NNG	18
 남영동	NNP	18
@@ -33209,7 +33282,7 @@ SH공사	NNP	19
 용수	NNP	18
 코엑스몰	NNP	18
 평단	NNG	18
-움찔거리	VV	18
+움찔거리	VV	18	complex 움찔/MAG 거리/XSV 0224
 특근	NNG	18
 보건의	NNG	18
 현해탄	NNP	18
@@ -33276,7 +33349,7 @@ SH공사	NNP	19
 생	NNP	18
 아카데미상	NNG	18
 애니	NNP	18
-넘실대	VV	18
+넘실대	VV	18	complex 넘실/XR 대/XSV 0223
 등위	NNG	18
 동병상련	NNG	18
 정회	NNG	18
@@ -33408,7 +33481,7 @@ SH공사	NNP	19
 발신인	NNG	18
 미혹	NNG	18
 지급기	NNG	18
-잔잔히	MAG	18
+잔잔히	MAG	18	complex 잔잔/XR 히/XSM 0223
 진중	XR	18
 스테이지	NNG	18
 참정권	NNG	18
@@ -33509,7 +33582,8 @@ SH공사	NNP	19
 동민	NNG	18
 솔기	NNG	18
 휘둘러보	VV	18	complex 휘두르/VV 어/EC 보/VX 022334
-씰룩거리	VV	18
+씰룩	XR	18
+씰룩거리	VV	18	complex 씰룩/XR 거리/XSV 0224
 은즉	EC	18	non_vowel	==ᆫ즉
 엄지발가락	NNG	18
 주간부	NNG	18
@@ -33518,7 +33592,7 @@ SH공사	NNP	19
 묘자리	NNG	18
 폐부	NNG	18
 뻑뻑	XR	18
-킬킬거리	VV	18
+킬킬거리	VV	18	complex 킬킬/MAG 거리/XSV 0224
 윗입술	NNG	18
 관자놀이	NNG	18
 구본승	NNP	18
@@ -33554,7 +33628,7 @@ SH공사	NNP	19
 닭똥	NNG	18
 가끔가다	MAG	18
 향원정	NNP	18
-헉헉거리	VV	18	complex 헉헉/MAG 거리/VV 0224
+헉헉거리	VV	18	complex 헉헉/MAG 거리/XSV 0224
 버쩍	MAG	18
 헤매이	VV	18
 내리꽂히	VV	18
@@ -33841,7 +33915,7 @@ SH공사	NNP	19
 동백꽃	NNG	17
 컵라면	NNG	17
 오리지날	NNG	17
-곤히	MAG	17
+곤히	MAG	17	complex 곤/XR 히/XSM 0112
 페트병	NNG	17
 목매	VV	17
 평택항	NNP	17
@@ -33874,7 +33948,7 @@ SH공사	NNP	19
 친고죄	NNG	17
 보청기	NNG	17
 가족계획	NNG	17
-토닥이	VV	17
+토닥이	VV	17	complex 토닥/XR 이/XSV 0223
 뿌리채소	NNG	17
 꿀꺽꿀꺽	MAG	17
 퍽퍽	MAG	17
@@ -34176,7 +34250,7 @@ SH공사	NNP	19
 대한상의	NNP	17
 국제부	NNG	17
 강론	NNG	17
-담담히	MAG	17
+담담히	MAG	17	complex 담담/XR 히/XSM 0223
 옆면	NNG	17
 빗길	NNG	17
 상륜부	NNG	17
@@ -34412,7 +34486,7 @@ SH공사	NNP	19
 해태음료	NNP	17
 짚풀	NNG	17
 멸치젓	NNG	17
-황망히	MAG	17
+황망히	MAG	17	complex 황망/NNG 히/XSM 0223
 부목	NNG	17
 전자기력	NNG	17
 중성미자	NNG	17
@@ -34511,7 +34585,7 @@ SH공사	NNP	19
 흙빛	NNG	17
 추리력	NNG	17
 천하제일	NNG	17
-껌벅거리	VV	17
+껌벅거리	VV	17	complex 껌벅/MAG 거리/XSV 0224
 왜	NNG	17
 홍시	NNG	17
 기브	NNG	17
@@ -34561,7 +34635,8 @@ SH공사	NNP	19
 그제사	MAG	17
 박이	XSN	17
 거뭇거뭇	MAG	17
-실룩거리	VV	17
+실룩	XR	17	=씰룩
+실룩거리	VV	17	complex 실룩/XR 거리/XSV 0224
 득남	NNG	17
 예쁘장	XR	17
 창조물	NNG	17
@@ -34883,7 +34958,8 @@ SH공사	NNP	19
 더부살이	NNG	16
 이상호	NNP	16
 남재준	NNP	16
-절뚝거리	VV	16
+절뚝	XR	16
+절뚝거리	VV	16	complex 절뚝/XR 거리/XSV 0224
 법학과	NNG	16
 페스티발	NNG	16
 아시아지역	NNP	16
@@ -34927,7 +35003,7 @@ SH공사	NNP	19
 론	NNP	16
 모델하우스	NNG	16
 체험장	NNG	16
-간간히	MAG	16
+간간히	MAG	16	=간간이
 눈물샘	NNG	16
 서빙	NNG	16
 블루투스	NNG	16
@@ -34948,7 +35024,7 @@ SH공사	NNP	19
 한국외대	NNP	16
 불티나	VV	16	complex 불티/NNG 나/VV 0223
 보건법	NNG	16
-번번히	MAG	16
+번번히	MAG	16	=번번이
 허안나	NNP	16
 억	IC	16
 행정실	NNG	16
@@ -35098,7 +35174,7 @@ SH공사	NNP	19
 전농	NNP	16
 보훈처장	NNG	16
 캐피탈	NNG	16
-돈독히	MAG	16
+돈독히	MAG	16	complex 돈독/XR 히/XSM 0223
 민통선	NNG	16
 먹자골목	NNG	16
 제자리걸음	NNG	16
@@ -35397,7 +35473,7 @@ SH공사	NNP	19
 부르키니	NNG	16
 경주장	NNG	16
 바닥재	NNG	16
-덜커덩거리	VV	16
+덜커덩거리	VV	16	complex 덜커덩/MAG 거리/XSV 0335
 전경환	NNP	16
 증산	NNP	16
 메이슨	NNP	16
@@ -35521,7 +35597,7 @@ SH공사	NNP	19
 고목나무	NNG	16
 아무짝	NNG	16
 틱낫한	NNP	16
-비아냥	NNG	16
+비아냥	NNG	16	=비아냥/XR
 각필	NNG	16
 ᆫ대서	EC	16	vocalic
 독점주의	NNG	16
@@ -35571,7 +35647,8 @@ SH공사	NNP	19
 과	XR	16
 청과물	NNG	16
 머드	NNG	16
-수근거리	VV	16
+수근	XR	16 =수군
+수근거리	VV	16	complex 수근/XR 거리/XSV 0224
 곤	XR	16
 녹색평화당	NNP	16
 조사자	NNG	16
@@ -35634,7 +35711,8 @@ SH공사	NNP	19
 께름칙	XR	16
 털털거리	VV	16	complex 털털/XR 거리/XSV 0224
 식인종	NNG	16
-쿵쾅거리	VV	16
+쿵쾅	XR	16
+쿵쾅거리	VV	16	complex 쿵쾅/XR 거리/XSV 0224
 실오라기	NNG	16
 씀바귀	NNG	16
 이리노	NNP	16
@@ -35648,7 +35726,7 @@ SH공사	NNP	19
 배필	NNG	16
 통째	MAG	16
 익반죽	NNG	16
-빽빽히	MAG	16
+빽빽히	MAG	16	complex 빽빽/XR 히/XSM 0223
 포목	NNG	16
 회벽	NNG	16
 속치마	NNG	16
@@ -35686,7 +35764,7 @@ SH공사	NNP	19
 오하라	NNP	16
 문화주의	NNG	16
 뫼르소	NNP	16
-불쌍히	MAG	16
+불쌍히	MAG	16	complex 불쌍/XR 히/XSM 0223
 그러잖	VV	16	complex 그러/VV 지/EC 않/VX 022323
 직원회의	NNG	16
 특용	NNG	16
@@ -35729,7 +35807,7 @@ SH공사	NNP	19
 핏덩이	NNG	16
 싸리문	NNG	16
 이딸리아	NNP	16
-어련히	MAG	16
+어련히	MAG	16	complex 어련/XR 히/XSM 0223
 비비	MAG	16
 사진틀	NNG	16
 뒷모양	NNG	16
@@ -36041,7 +36119,7 @@ SH공사	NNP	19
 활인	NNG	15
 종교관	NNG	15
 천지인	NNG	15
-세세히	MAG	15
+세세히	MAG	15	complex 세세/XR 히/XSM 0223
 디귿	NNG	15
 예탁	NNG	15
 낭송회	NNG	15
@@ -36066,7 +36144,8 @@ SH공사	NNP	19
 더디	MAG	15
 맘먹	VV	15
 문명사회	NNG	15
-툴툴거리	VV	15
+툴툴	XR	15
+툴툴거리	VV	15	complex 툴툴/XR 거리/XSV 0224
 운반선	NNG	15
 난파선	NNG	15
 사정사정	NNG	15
@@ -36128,7 +36207,7 @@ SH공사	NNP	19
 군데군데	NNG	15
 연례행사	NNG	15
 깍쟁이	NNG	15
-격렬히	MAG	15
+격렬히	MAG	15	complex 격렬/XR 히/XSM 0223
 최후통첩	NNG	15
 용두사미	NNG	15
 코코	NNP	15
@@ -36392,7 +36471,8 @@ ING생명	NNP	15
 우선주의	NNG	15
 고립주의	NNG	15
 피혁	NNG	15
-흐느적거리	VV	15
+흐느적	MAG	15
+흐느적거리	VV	15	complex 흐느적/MAG 거리/XSV 0335
 불어닥치	VV	15
 요시다	NNP	15
 현대오트론	NNP	15
@@ -36738,7 +36818,7 @@ LH공사	NNP	15
 허리선	NNG	15
 단색	NNG	15
 소도	NNG	15
-끙끙대	VV	15	complex 끙끙/MAG 대/VV 0223
+끙끙대	VV	15	complex 끙끙/MAG 대/XSV 0223
 느낌표	NNG	15
 역관	NNG	15
 심의관	NNG	15
@@ -36791,7 +36871,7 @@ LH공사	NNP	15
 조락	NNG	15
 수매량	NNG	15
 기상대	NNG	15
-등한히	MAG	15
+등한히	MAG	15	complex 등한/XR 히/XSM 0223
 텁수룩	XR	15
 으례	MAG	15
 철석	NNG	15
@@ -36941,12 +37021,13 @@ LH공사	NNP	15
 성심	NNG	15
 말하자면	MAG	15
 기껍	VA-I	15
-키득거리	VV	15
+키득	MAG	15
+키득거리	VV	15	complex 키득/MAG 거리/XSV 0224
 비각	NNG	15
 용담	NNP	15
 안개비	NNG	15
 저물녘	NNG	15
-윙윙거리	VV	15
+윙윙거리	VV	15	complex 윙윙/MAG 거리/XSV 0224
 혹심	XR	15
 나목	NNG	15
 낱낱	NNG	15
@@ -37011,7 +37092,7 @@ LH공사	NNP	15
 더냐고	EC	15
 저리로	MAG	15
 홈통	NNG	15
-빳빳이	MAG	15
+빳빳이	MAG	15	complex 빳빳/XR 이/XSM 0223
 매표구	NNG	15
 명호	NNP	15
 웬디스	NNP	15
@@ -37068,7 +37149,7 @@ LH공사	NNP	15
 윽	IC	15
 모리배	NNG	15
 짬밥	NNG	15
-히죽거리	VV	15
+히죽거리	VV	15	complex 히죽/MAG 거리/XSV 0224
 프림	NNG	15
 맑시즘	NNG	15
 에구	IC	15
@@ -37088,7 +37169,7 @@ LH공사	NNP	15
 우옌	NNP	15
 이꼴	NNG	15
 한창연	NNP	15
-포근히	MAG	15
+포근히	MAG	15	complex 포근/XR 히/XSM 0223
 펨푸	NNG	15
 하이방	NNG	15
 레슝	NNG	15
@@ -37339,7 +37420,7 @@ LH공사	NNP	15
 진선미	NNG	14
 라트비아	NNP	14
 이태수	NNP	14
-탄탄히	MAG	14
+탄탄히	MAG	14	complex 탄탄/XR 히/XSM 0223
 영문학과	NNG	14
 플로어	NNG	14
 비평사	NNG	14
@@ -37484,7 +37565,7 @@ LH공사	NNP	15
 국민일보	NNP	14
 기획위	NNG	14
 단칼	NNG	14
-든든히	MAG	14
+든든히	MAG	14	complex 든든/XR 히/XSM 0223
 이맹희	NNP	14
 절친하	VA	14	complex 절친/XR 하/XSA 0223
 빠트리	VV	14
@@ -37492,7 +37573,7 @@ LH공사	NNP	15
 글로브	NNG	14
 메이	NNP	14
 외동아들	NNG	14
-엄숙히	MAG	14
+엄숙히	MAG	14	complex 엄숙/XR 히/XSM 0223
 모리뉴	NNP	14
 경원선	NNP	14
 카드뮴	NNG	14
@@ -37602,7 +37683,7 @@ LH공사	NNP	15
 편서풍	NNG	14
 일성	NNG	14
 약발	NNG	14
-흥청대	VV	14
+흥청대	VV	14	complex 흥청/XR 대/XSV 0223
 안방보험	NNP	14
 동양생명	NNP	14
 청계광장	NNP	14
@@ -37935,7 +38016,8 @@ D사	NNG	14
 골밀도	NNG	14
 변란	NNG	14
 동진	NNG	14
-주물럭거리	VV	14
+주물럭	MAG	14
+주물럭거리	VV	14	complex 주물럭/MAG 거리/XSV 0335
 자파	NNG	14
 모리슨	NNP	14
 참다랑어	NNG	14
@@ -38255,7 +38337,7 @@ D사	NNG	14
 그만그만	XR	14
 왕조사	NNG	14
 로되	EC	14
-달랑거리	VV	14	complex 달랑/MAG 거리/VV 0224
+달랑거리	VV	14	complex 달랑/MAG 거리/XSV 0224
 근기	NNG	14
 사주팔자	NNG	14
 덥썩	MAG	14
@@ -38313,7 +38395,7 @@ D사	NNG	14
 싸리나무	NNG	14
 깨이	VV	14
 돌아들	VV	14	complex 돌/VV 어/EC 들/VX 011223
-질척거리	VV	14
+질척거리	VV	14	complex 질척/XR 거리/XSV 0224
 휘익	MAG	14
 장탄식	NNG	14
 한약사	NNG	14
@@ -38407,7 +38489,7 @@ D사	NNG	14
 빠구리	NNG	14
 창석이	NNP	14
 ᆯ라구요	EF	14	vocalic	=려구요
-중얼대	VV	14
+중얼대	VV	14	complex 중얼/XR 대/XSV 0223
 무도	XR	14
 철딱서니	NNG	14
 윤자	NNP	14
@@ -38905,7 +38987,7 @@ FC서울	NNP	13
 아비규환	NNG	13
 현대제철	NNP	13
 정통파	NNG	13
-내려뜨리	VV	13
+내려뜨리	VV	13	complex 내리/VV 어/EC 뜨리/XSV 021224
 고미술품	NNG	13
 팬클럽	NNG	13
 영철	NNP	13
@@ -39131,7 +39213,7 @@ LG아트센터	NNP	13
 복지학	NNG	13
 워크맨	NNG	13
 충전소	NNG	13
-엄정히	MAG	13
+엄정히	MAG	13	complex 엄정/XR 히/XSM 0223
 오스만	NNP	13
 출세주의	NNG	13
 김대성	NNP	13
@@ -39295,7 +39377,7 @@ LG아트센터	NNP	13
 공덕원	NNP	13
 모나드	NNG	13
 아이비리그	NNG	13
-느긋이	MAG	13
+느긋이	MAG	13	complex 느긋/XR 이/XSM 0223
 모조	NNG	13
 쾌척	NNG	13
 루퍼트	NNP	13
@@ -39377,7 +39459,7 @@ LG아트센터	NNP	13
 쇳물	NNG	13
 데릭	NNP	13
 예명	NNG	13
-킁킁거리	VV	13	complex 킁킁/MAG 거리/VV 0224
+킁킁거리	VV	13	complex 킁킁/MAG 거리/XSV 0224
 라울	NNP	13
 카자흐	NNP	13
 대책반	NNG	13
@@ -39410,7 +39492,7 @@ LG아트센터	NNP	13
 오죽헌	NNP	13
 총동창회	NNG	13
 독실	NNG	13
-힐끔거리	VV	13	complex 힐끔/MAG 거리/VV 0224
+힐끔거리	VV	13	complex 힐끔/MAG 거리/XSV 0224
 맨션	NNG	13
 악서	NNG	13
 음악사	NNG	13
@@ -39669,7 +39751,8 @@ NH농협은행	NNP	13
 총무단	NNG	13
 이설	NNG	13
 승철이	NNP	13
-와글거리	VV	13
+와글	XR	13
+와글거리	VV	13	complex 와글/XR 거리/XSV 0224
 연역법	NNG	13
 본대	NNG	13
 삼양사	NNP	13
@@ -39766,7 +39849,7 @@ NH농협은행	NNP	13
 행형법	NNG	13
 관리소장	NNG	13
 꽥꽥	MAG	13
-용감히	MAG	13
+용감히	MAG	13	complex 용감/XR 히/XSM 0223
 대구역	NNP	13
 편광	NNG	13
 쌍쌍	NNG	13
@@ -39837,8 +39920,9 @@ NH농협은행	NNP	13
 옆눈	NNG	13
 춘방	NNG	13
 송기	NNG	13
-실하	VA	13
-으레히	MAG	13
+실	XR	13
+실하	VA	13	complex 실/XR 하/XSA 0112
+으레히	MAG	13	complex 으레/MAG 히/XSM 0223
 도야	NNG	13
 번	NNG	13
 단조	XR	13
@@ -39851,7 +39935,7 @@ NH농협은행	NNP	13
 행주치마	NNG	13
 땅딸막	XR	13
 원동	NNP	13
-낑낑대	VV	13	complex 낑낑/MAG 대/VV 0223
+낑낑대	VV	13	complex 낑낑/MAG 대/XSV 0223
 대궁	NNG	13
 웰란사	NNP	13
 판례법	NNG	13
@@ -39879,11 +39963,11 @@ NH농협은행	NNP	13
 개흙	NNG	13
 통론	NNG	13
 종원이	NNP	13
-뻣뻣이	MAG	13
+뻣뻣이	MAG	13	complex 뻣뻣/XR 이/XSM 0223
 조야	XR	13
 순배	NNG	13
 강박감	NNG	13
-잠잠히	MAG	13
+잠잠히	MAG	13	complex 잠잠/XR 히/XSM 0223
 지내보	VV	13	complex 지내/VV 어/EC 보/VX 021223
 인사불성	NNG	13
 윙윙	MAG	13
@@ -39963,7 +40047,8 @@ NH농협은행	NNP	13
 화증	NNG	13
 봉욕	NNG	13
 서답	NNG	13
-굽신거리	VV	13
+굽신	XR	13
+굽신거리	VV	13	complex 굽신/XR 거리/XSV 0224
 거머잡	VV-R	13
 얼릉	MAG	13
 그레서	MAJ	13
@@ -40280,7 +40365,7 @@ NH농협은행	NNP	13
 비상근무	NNG	12
 일부로	MAG	12
 직업군	NNG	12
-흩트리	VV	12
+흩트리	VV	12	complex 흩/VV 트리/XSV 0113
 키메라	NNG	12
 김윤석	NNP	12
 태그	NNG	12
@@ -40306,7 +40391,7 @@ NH농협은행	NNP	13
 기준점	NNG	12
 회의감	NNG	12
 화학식	NNG	12
-냉정히	MAG	12
+냉정히	MAG	12	complex 냉정/XR 히/XSM 0223
 기회균등	NNG	12
 분법	NNG	12
 이	JKG	12
@@ -40433,7 +40518,7 @@ NH농협은행	NNP	13
 면류	NNG	12
 단말마	NNG	12
 케이지	NNP	12
-끈적이	VV	12
+끈적이	VV	12	complex 끈적/XR 이/XSV 0223
 워터파크	NNG	12
 담쟁이	NNG	12
 근친상간	NNG	12
@@ -40807,7 +40892,7 @@ NH농협은행	NNP	13
 헌사	NNG	12
 차단기	NNG	12
 저세상	NNG	12
-만만히	MAG	12
+만만히	MAG	12	complex 만만/XR 히/XSM 0223
 출연작	NNG	12
 이석수	NNP	12
 LIG손해보험	NNP	12
@@ -40939,7 +41024,7 @@ SC제일은행	NNP	12
 만국기	NNG	12
 급작스레	MAG	12
 서시	NNP	12
-촉촉이	MAG	12
+촉촉이	MAG	12	complex 촉촉/XR 이/XSM 0223
 소화력	NNG	12
 차례상	NNG	12
 개머리판	NNG	12
@@ -41322,7 +41407,7 @@ KB국민카드	NNP	12
 청상과부	NNG	12
 와장창	MAG	12
 머릿기사	NNG	12
-헉헉대	VV	12	complex 헉헉/MAG 대/VV 0223
+헉헉대	VV	12	complex 헉헉/MAG 대/XSV 0223
 상기도	NNG	12
 볏	NNG	12
 살구꽃	NNG	12
@@ -41355,7 +41440,7 @@ KB국민카드	NNP	12
 소탈	XR	12
 횡혈식	NNG	12
 축상	NNG	12
-재잘대	VV	12
+재잘대	VV	12	complex 재잘/XR 대/XSV 0223
 김진관	NNP	12
 소영	NNP	12
 남원군	NNP	12
@@ -41446,7 +41531,7 @@ KB국민카드	NNP	12
 우격다짐	NNG	12
 하복부	NNG	12
 생식선	NNG	12
-이상히	MAG	12
+이상히	MAG	12	complex 이상/XR 히/XSM 0223
 할아버님	NNG	12
 항심	NNG	12
 녹즙	NNG	12
@@ -41522,7 +41607,7 @@ KB국민카드	NNP	12
 석화	NNG	12
 마름모	NNG	12
 따끈	XR	12
-끈적거리	VV	12
+끈적거리	VV	12	complex 끈적/XR 거리/XSV 0224
 반찬거리	NNG	12
 멸균	NNG	12
 불자동차	NNG	12
@@ -41542,7 +41627,7 @@ KB국민카드	NNP	12
 북곽	NNP	12
 어느날	NNG	12
 이제사	MAG	12
-흘끔거리	VV	12	complex 흘끔/MAG 거리/VV 0224
+흘끔거리	VV	12	complex 흘끔/MAG 거리/XSV 0224
 구렁	NNG	12
 시체실	NNG	12
 게걸	XR	12
@@ -41655,10 +41740,10 @@ KB국민카드	NNP	12
 술추렴	NNG	12
 눈등	NNG	12
 휘끈	MAG	12
-돌연히	MAG	12
+돌연히	MAG	12	complex 돌연/MAG 히/XSM 0223
 소태나무	NNG	12
 지우	EF	12
-귀히	MAG	12
+귀히	MAG	12	complex 귀/XR 히/XSM 0112
 곡가	NNG	12
 그짓말	NNG	12
 잠방이	NNG	12
@@ -41679,7 +41764,8 @@ KB국민카드	NNP	12
 잡상인	NNG	12
 불그스레	XR	12
 흑산도	NNP	12
-쫑알거리	VV	12
+쫑알	XR	12	=중얼
+쫑알거리	VV	12	complex 쫑알/XR 거리/XSV 0224
 바벨탑	NNP	12
 올려붙이	VV	12	complex 올리/VV 어/EC 붙이/VV 021224
 향불	NNG	12
@@ -42000,7 +42086,7 @@ NG	NNP	12
 분분하	VA	11	complex 분분/XR 하/XSA 0223
 노릇하	VA	11	complex 노릇/XR 하/XSA 0223
 텀	NNG	11
-특별나	VA	11
+특별나	VA	11	complex 특별/NNG 나/XSA 0223
 어이고	IC	11
 맛탕	NNG	11
 배즙	NNG	11
@@ -42092,7 +42178,7 @@ NG	NNP	12
 화사하	VA	11	complex 화사/XR 하/XSA 0223
 채	XSN	11
 비등	NNG	11
-떨어트리	VV	11
+떨어트리	VV	11	complex 떨/VV 어/EC 트리/XSV 011224
 김종대	NNP	11
 김관영	NNP	11
 문세광	NNP	11
@@ -42338,7 +42424,7 @@ NG	NNP	12
 헥터	NNP	11
 레이디스	NNG	11
 박찬욱	NNP	11
-현격히	MAG	11
+현격히	MAG	11	complex 현격/XR 히/XSM 0223
 다이노스	NNP	11
 커미셔너	NNG	11
 복서	NNG	11
@@ -42400,7 +42486,7 @@ FC바르셀로나	NNP	11
 수료증	NNG	11
 환경운동연합	NNP	11
 박영석	NNP	11
-찰랑거리	VV	11	complex 찰랑/MAG 거리/VV 0224
+찰랑거리	VV	11	complex 찰랑/MAG 거리/XSV 0224
 설리번	NNP	11
 투타	NNG	11
 수비크	NNP	11
@@ -42510,7 +42596,7 @@ GS그룹	NNP	11
 미디어데이	NNG	11
 법학자	NNG	11
 강의록	NNG	11
-삐죽이	MAG	11
+삐죽이	MAG	11	complex 삐죽/MAG 이/XSM 0223
 장관상	NNG	11
 간이식당	NNG	11
 험로	NNG	11
@@ -42754,7 +42840,8 @@ KB국민은행	NNP	11
 학병	NNG	11
 첩첩산중	NNG	11
 안내선	NNG	11
-끄적거리	VV	11
+끄적	XR	11
+끄적거리	VV	11	complex 끄적/XR 거리/XSV 0224
 유어	NNG	11
 홍성군	NNP	11
 대호	NNG	11
@@ -43273,7 +43360,7 @@ SK이노베이션	NNP	11
 토혈	NNG	11
 로코코	NNG	11
 성식	NNP	11
-긁적이	VV	11
+긁적이	VV	11	complex 긁적/XR 이/XSV 0223
 간악	NNG	11
 채호기	NNP	11
 밀어	NNG	11
@@ -43316,7 +43403,7 @@ SK이노베이션	NNP	11
 피난지	NNG	11
 급선회	NNG	11
 겐이치	NNP	11
-솔직이	MAG	11
+솔직이	MAG	11	=솔직히	complex 솔직/XR 이/XSM 0223
 몽테스키외	NNP	11
 언필칭	MAG	11
 날품팔이	NNG	11
@@ -43332,7 +43419,7 @@ SK이노베이션	NNP	11
 합반	NNG	11
 봉함	NNG	11
 심급	NNG	11
-그득히	MAG	11
+그득히	MAG	11	complex 그득/MAG 히/XSM 0223
 뜯어말리	VV	11	complex 뜯/VV-R 어/EC 말리/VV 011224
 호남인	NNG	11
 정영진	NNP	11
@@ -43410,7 +43497,7 @@ SK이노베이션	NNP	11
 쇠막대기	NNG	11
 크리스테바	NNP	11
 황급	XR	11
-외로이	MAG	11
+외로이	MAG	11	complex 외롭/VA-I 이/XSM 0223
 마치	NNG	11
 위만조선	NNP	11
 스탠바이	NNG	11
@@ -43483,7 +43570,7 @@ SK이노베이션	NNP	11
 기섭	NNP	11
 기수	NNP	11
 로스엔젤레스	NNP	11	=로스앤젤레스
-그윽히	MAG	11
+그윽히	MAG	11	complex 그윽/XR 히/XSM 0223
 친동생	NNG	11
 관제소	NNG	11
 김철기	NNP	11
@@ -43670,7 +43757,7 @@ IMF	NNP	11
 장선	NNG	11
 퉁겨지	VV	11	complex 퉁기/VV 어/EC 지/VX 021223
 슬몃	MAG	11
-근근히	MAG	11
+근근히	MAG	11	=근근이
 휘적휘적	MAG	11
 방물장수	NNG	11
 산모롱이	NNG	11
@@ -43684,12 +43771,12 @@ IMF	NNP	11
 밀리미터	NNB	11
 잔재주	NNG	11
 개골창	NNG	11
-두둑이	MAG	11
-킬킬대	VV	11	complex 킬킬/MAG 대/VV 0223
+두둑이	MAG	11	complex 두둑/XR 이/XSM 0223
+킬킬대	VV	11	complex 킬킬/MAG 대/XSV 0223
 자식새끼	NNG	11
 태기	NNG	11
 푸대	NNG	11
-후끈거리	VV	11	complex 후끈/MAG 거리/VV 0224
+후끈거리	VV	11	complex 후끈/MAG 거리/XSV 0224
 미주알고주알	MAG	11
 영웅주의	NNG	11
 섬찟	MAG	11
@@ -43721,7 +43808,7 @@ IMF	NNP	11
 발장	NNG	11
 벗어젖히	VV	11	complex 벗/VV-R 어/EC 젖히/VV 011224
 발기	VV	11
-굽실거리	VV	11	complex 굽실/MAG 거리/VV 0224
+굽실거리	VV	11	complex 굽실/MAG 거리/XSV 0224
 공양간	NNG	11
 장구벌레	NNG	11
 삼차원	NNG	11
@@ -43784,7 +43871,7 @@ IMF	NNP	11
 푸줏간	NNG	11
 유난스레	MAG	11
 상	NNB	11
-축축히	MAG	11
+축축히	MAG	11	complex 축축/XR 히/XSM 0223
 그렌저	NNP	11
 데이빗드	NNP	11
 와일러	NNP	11
@@ -43812,7 +43899,7 @@ IMF	NNP	11
 영선	NNG	11
 망부석	NNG	11
 평어	NNG	11
-부스럭거리	VV	11	complex 부스럭/MAG 거리/VV 0335
+부스럭거리	VV	11	complex 부스럭/MAG 거리/XSV 0335
 잔악	NNG	11
 누만	EF	11
 예끼	IC	11
@@ -44099,7 +44186,7 @@ IMF	NNP	11
 씨감자	NNG	10
 케잌	NNG	10
 길쭉하	VA	10	complex 길쭉/XR 하/XSA 0223
-깨끗히	MAG	10	=깨끗이
+깨끗히	MAG	10	=깨끗이	complex 깨끗/XR 이/XSM 0223
 액젓	NNG	10
 박해영	NNP	10
 프로파일링	NNG	10
@@ -44166,7 +44253,8 @@ IMF	NNP	11
 광분	NNG	10
 전후사	NNG	10
 바운드	NNG	10
-바둥거리	VV	10
+바둥	XR	10
+바둥거리	VV	10	complex 바둥/XR 거리/XSV 0224
 짜	NNG	10
 박인수	NNP	10
 스피크	NNP	10
@@ -44452,7 +44540,7 @@ IMF	NNP	11
 억지루	MAG	10
 뺑	MAG	10
 띵동	MAG	10
-곧이	MAG	10
+곧이	MAG	10	complex 곧/VA 이/XSM 0112
 출가외인	NNG	10
 정화	NNP	10
 작은엄마	NNG	10
@@ -44601,6 +44689,7 @@ IMF	NNP	11
 월요	NNG	10
 진영읍	NNP	10
 북적	MAG	10
+복작	MAG	10	=북적
 복간	NNG	10
 삼성역	NNP	10
 강의료	NNG	10
@@ -44851,7 +44940,7 @@ G마켓	NNP	10
 감하	VV	10
 커피집	NNG	10
 에쿠스	NNP	10
-까딱거리	VV	10	complex 까딱/MAG 거리/VV 0224
+까딱거리	VV	10	complex 까딱/MAG 거리/XSV 0224
 척사	NNG	10
 예수회	NNP	10
 증명력	NNG	10
@@ -44996,9 +45085,9 @@ JP모건	NNP	10
 동아닷컴	NNP	10
 고리대금업자	NNG	10
 크루스	NNP	10
-도도히	MAG	10
+도도히	MAG	10	complex 도도/XR 히/XSM 0223
 정조준	NNG	10
-측은히	MAG	10
+측은히	MAG	10	complex 측은/XR 히/XSM 0223
 뉴욕행	NNG	10
 최수진	NNP	10
 망명자	NNG	10
@@ -45264,7 +45353,7 @@ JP모건	NNP	10
 배구공	NNG	10
 천고마비	NNG	10
 강화읍	NNP	10
-풍부히	MAG	10
+풍부히	MAG	10	complex 풍부/XR 히/XSM 0223
 맞붙이	VV	10
 오락기	NNG	10
 부총무	NNG	10
@@ -45345,7 +45434,7 @@ JP모건	NNP	10
 원효로	NNP	10
 터프가이	NNG	10
 오마원전	NNP	10
-웅성대	VV	10
+웅성대	VV	10	complex 웅성/XR 대/XSV 0223
 당첨금	NNG	10
 금융채	NNG	10
 담수호	NNG	10
@@ -45608,7 +45697,8 @@ JP모건	NNP	10
 똥개	NNP	10
 오즈	NNP	10
 길드	NNG	10
-추근대	VV	10
+추근	XR	10
+추근대	VV	10	complex 추근/XR 대/XSV 0223
 피그말리온	NNP	10
 키득키득	MAG	10
 알튀세르	NNP	10
@@ -45687,7 +45777,7 @@ JP모건	NNP	10
 전승남	NNP	10
 정삼흠	NNP	10
 횡사	NNG	10
-멀뚱히	MAG	10
+멀뚱히	MAG	10	complex 멀뚱/XR 히/XSM 0223
 양의	NNG	10
 예술미	NNG	10
 김인완	NNP	10
@@ -45708,7 +45798,7 @@ JP모건	NNP	10
 이인모	NNP	10
 날밤	NNG	10
 바른쪽	NNG	10
-무단히	MAG	10
+무단히	MAG	10	complex 무단/NNG 히/XSM 0223
 필라멘트	NNG	10
 노부나가	NNP	10
 도야지	NNG	10
@@ -45716,7 +45806,7 @@ JP모건	NNP	10
 군평협	NNG	10
 옥토	NNG	10
 재조	NNG	10
-두둑히	MAG	10
+두둑히	MAG	10	=두둑이	complex 두둑/XR 히/XSM 0223
 매사	MAG	10
 관상학	NNG	10
 선입감	NNG	10
@@ -45787,7 +45877,7 @@ JP모건	NNP	10
 폐물	NNG	10
 호질	NNP	10
 천만	MAG	10
-소복히	MAG	10
+소복히	MAG	10	complex 소복/XR 히/XSM 0223
 모롱이	NNG	10
 뻗대	VV	10
 우의정	NNG	10
@@ -45935,7 +46025,7 @@ JP모건	NNP	10
 조사당	NNG	10
 황홀감	NNG	10
 내달	VV	10
-끔찍히	MAG	10
+끔찍히	MAG	10	complex 끔찍/XR 히/XSM 0223
 어릿어릿	MAG	10
 땀내	NNG	10
 달음박질치	VV	10
@@ -45982,7 +46072,7 @@ JP모건	NNP	10
 공일	NNG	10
 세루	NNG	10
 싸고돌	VV	10	complex 싸/VV 고/EC 돌/VV 011223
-벌렁거리	VV	10	complex 벌렁/MAG 거리/VV 0224
+벌렁거리	VV	10	complex 벌렁/MAG 거리/XSV 0224
 총총	MAG	10
 게다	NNG	10
 껑충껑충	MAG	10
@@ -46021,7 +46111,7 @@ JP모건	NNP	10
 밭이랑	NNG	10
 양전자	NNG	10
 싹뚝	MAG	10
-달그락거리	VV	10	complex 달그락/MAG 거리/VV 0335
+달그락거리	VV	10	complex 달그락/MAG 거리/XSV 0335
 중놈	NNG	10
 다관	NNG	10
 리까	EF	10	vocalic
@@ -46085,7 +46175,8 @@ JP모건	NNP	10
 얼매나	MAG	10
 윤식이	NNP	10
 고패	NNG	10
-분연히	MAG	10
+분연	XR	10
+분연히	MAG	10	complex 분연/XR 히/XSM 0223
 윤호길	NNP	10
 궁구	NNG	10
 아제	NNG	10
@@ -46106,7 +46197,7 @@ JP모건	NNP	10
 는가고	EC	10	non_adj
 고얀	MM	10
 꼬느	VV	10
-호젓이	MAG	10
+호젓이	MAG	10	complex 호젓/XR 이/XSM 0223
 뭐하	VV	10
 광적	NNG	10
 사갱	NNG	10
@@ -46114,7 +46205,7 @@ JP모건	NNP	10
 히쭉	MAG	10
 그라	EF	10
 김인한	NNP	10
-다정히	MAG	10
+다정히	MAG	10	complex 다정/XR 히/XSM 0223
 윤상진	NNP	10
 헤벌쭉	MAG	10
 제꺽	MAG	10
@@ -46995,7 +47086,8 @@ IBK투자증권	NNP	9
 차폐	NNG	9
 해원	NNG	9
 디에고	NNP	9
-차근히	MAG	9
+차근	XR	10
+차근히	MAG	9	complex 차근/XR 히/XSM 0223
 마사오	NNP	9
 실사단	NNG	9
 당·청	NNG	9
@@ -47972,7 +48064,8 @@ SK케미칼	NNP	9
 소소	XR	9
 여승무원	NNG	9
 켜켜로	MAG	9
-팔랑거리	VV	9
+팔랑	XR	10
+팔랑거리	VV	9	complex 팔랑/XR 거리/XSV 0224
 패러글라이딩	NNG	9
 바기	XSN	9
 컨트리클럽	NNG	9
@@ -48208,7 +48301,7 @@ SK케미칼	NNP	9
 관계있	VA	9	complex 관계/NNG 있/VX 0223
 베텔스만	NNP	9
 사과드리	VV	9	complex 사과/NNG 드리/VV 0224
-헝클어뜨리	VV	9
+헝클어뜨리	VV	9	complex 헝클/VV 어/EC 뜨리/XSV 022335
 라든	EC	9
 북제주	NNP	9
 갯바위	NNG	9
@@ -48224,7 +48317,7 @@ SK케미칼	NNP	9
 악대	NNG	9
 상혼	NNG	9
 빼곡이	MAG	9
-술렁대	VV	9
+술렁대	VV	9	complex 술렁/XR 대/XSV 0223
 합수부	NNG	9
 신세타령	NNG	9
 일장일단	NNG	9
@@ -48264,7 +48357,7 @@ SK케미칼	NNP	9
 벗하	VV	9
 똘마니	NNG	9
 경철	NNP	9
-버둥대	VV	9
+버둥대	VV	9	complex 버둥/XR 대/XSV 0223
 공민증	NNG	9
 학무	NNG	9
 독촉장	NNG	9
@@ -48488,7 +48581,7 @@ ABC	NNP	9
 암술	NNG	9
 육갑	NNG	9
 상량문	NNG	9
-지끈거리	VV	9	complex 지끈/MAG 거리/VV 0224
+지끈거리	VV	9	complex 지끈/MAG 거리/XSV 0224
 쉬쉬	MAG	9
 흔글	NNG	9
 나꿔채	VV	9
@@ -48659,7 +48752,7 @@ ABC	NNP	9
 야물	VA	9
 껌껌	XR	9
 노동판	NNG	9
-조용조용히	MAG	9
+조용조용히	MAG	9	complex 조용조용/MAG 히/XSM 0445
 장작더미	NNG	9
 신파극	NNG	9
 눈두덩이	NNG	9
@@ -48688,7 +48781,7 @@ ABC	NNP	9
 팔목시계	NNG	9
 삼간	NNG	9
 허공중	NNG	9
-웂이	MAG	9
+웂이	MAG	9	complex 웂/VA 이/XSM 0112
 입춘대길	NNG	9
 버덤	JKB	9
 그러니께	MAJ	9
@@ -48816,8 +48909,9 @@ ABC	NNP	9
 다단	XR	9
 놀러가	VV	9	complex 놀/VV 러/EC 가/VV 011223
 멋대가리	NNG	9
-대수롭	VA-I	9
-껌뻑이	VV	9
+대수롭	VA-I	9	complex 대수/NNG 롭/XSA-I 0223
+껌뻑	MAG	10	=깜빡
+껌뻑이	VV	9	complex 껌뻑/MAG 이/XSV 0223
 뺨따귀	NNG	9
 까악	MAG	9
 마웅사우	NNP	9
@@ -48841,7 +48935,7 @@ ABC	NNP	9
 싸진	NNG	9
 피엑스	NNG	9
 게걸	NNG	9
-생글거리	VV	9	complex 생글/MAG 거리/VV 0224
+생글거리	VV	9	complex 생글/MAG 거리/XSV 0224
 영물	NNG	9
 성충	NNP	9
 전승연	NNG	9
@@ -49368,7 +49462,7 @@ ABC	NNP	9
 태국인	NNG	8
 풍계리	NNP	8
 공실	NNG	8
-조심히	MAG	8
+조심히	MAG	8	complex 조심/NNG 히/XSM 0223
 단벌	NNG	8
 말레이지아	NNP	8	=말레이시아
 으라는데	EC	8	non_vowel	==라는데
@@ -49567,7 +49661,8 @@ ABC	NNP	9
 시아버님	NNG	8
 혜화	NNP	8
 일	MM	8
-걸리적거리	VV	8
+걸리적	XR	8
+걸리적거리	VV	8	complex 걸리적/XR 거리/XSV 0335
 이영선	NNP	8
 ᆫ다마는	EC	8	vocalic
 임홍빈	NNP	8
@@ -49820,7 +49915,7 @@ ABC	NNP	9
 카디프시티	NNP	8
 공관위원	NNG	8
 밀수출	NNG	8
-휘청이	VV	8
+휘청이	VV	8	complex 휘청/MAG 이/XSV 0223
 경남지역	NNP	8
 판촉비	NNG	8
 에마뉘엘	NNP	8
@@ -49979,7 +50074,7 @@ ABC	NNP	9
 롯데하이마트	NNP	8
 병탄	NNG	8
 종탑	NNG	8
-살뜰히	MAG	8
+살뜰히	MAG	8	complex 살뜰/XR 히/XSM 0223
 부산고검장	NNG	8
 보안업체	NNG	8
 탈보트	NNP	8
@@ -50758,7 +50853,7 @@ T맵	NNP	8
 말콤	NNP	8
 프라임	NNP	8
 혼슈	NNP	8
-굽신대	VV	8
+굽신대	VV	8	complex 굽신/XR 대/XSV 0223
 페이스트	NNG	8
 최지우	NNP	8
 교체론자	NNG	8
@@ -50878,7 +50973,7 @@ T맵	NNP	8
 흐루시초프	NNP	8
 가열	XR	8
 피용자	NNG	8
-여하히	MAG	8
+여하히	MAG	8	complex 여하/NNG 히/XSM 0223
 등차	NNG	8
 편물	NNG	8
 닳아빠지	VA	8	complex 닳/VV 어/EC 빠지/VX 011224
@@ -51063,7 +51158,7 @@ T맵	NNP	8
 김용대	NNP	8
 안데를레흐트	NNP	8
 셔우드	NNP	8
-냉철히	MAG	8
+냉철히	MAG	8	complex 냉철/XR 히/XSM 0223
 쇳조각	NNG	8
 림팩	NNP	8
 고창	NNG	8
@@ -51121,7 +51216,7 @@ T맵	NNP	8
 비표	NNG	8
 화인	NNG	8
 여승	NNG	8
-징징거리	VV	8	complex 징징/MAG 거리/VV 0224
+징징거리	VV	8	complex 징징/MAG 거리/XSV 0224
 박영규	NNP	8
 이사금	NNG	8
 정신분석학	NNG	8
@@ -51220,7 +51315,7 @@ T맵	NNP	8
 억겁	NNG	8
 무남독녀	NNG	8
 되	NNG	8
-절룩이	VV	8
+절룩이	VV	8	complex 절룩/XR 이/XSV 0223
 김길부	NNP	8
 가극단	NNG	8
 역산	NNG	8
@@ -51465,7 +51560,8 @@ T맵	NNP	8
 부윤	NNG	8
 때까치	NNG	8
 입춘서	NNG	8
-소근대	VV	8
+소근	XR	8	=수군
+소근대	VV	8	complex 소근/XR 대/XSV 0223
 떠받	VV-R	8
 마스타	NNG	8
 일고여덟	NR	8
@@ -51475,7 +51571,7 @@ T맵	NNP	8
 때묻	VV-R	8
 배추벌레	NNG	8
 싸리비	NNG	8
-후줄근히	MAG	8
+후줄근히	MAG	8	complex 후줄근/XR 히/XSM 0334
 떠듬거리	VV	8
 렴	EC	8	vocalic
 햇솜	NNG	8
@@ -51488,7 +51584,7 @@ YMCA	NNP	8
 물고	NNG	8
 깜작	MAG	8
 딩굴	VV	8
-소근거리	VV	8
+소근거리	VV	8	complex 소근/XR 거리/XSV 0224
 몹씨	MAG	8
 삐쭉	MAG	8
 귀기	NNG	8
@@ -51699,7 +51795,8 @@ YMCA	NNP	8
 목메이	VV	8
 군청색	NNG	8
 창끝	NNG	8
-황황히	MAG	8
+황황	XR	10
+황황히	MAG	8	complex 황황/XR 히/XSM 0223
 나이롱	NNG	8
 푸들푸들	MAG	8
 나무짐	NNG	8
@@ -51722,7 +51819,7 @@ YMCA	NNP	8
 랴고	EC	8
 미루꾸	NNG	8
 외딸	NNG	8
-빠끔	MAG	8
+빠끔	MAG	10
 쿨룩쿨룩	MAG	8
 호호호호	IC	8
 그날그날	NNG	8
@@ -51760,7 +51857,7 @@ YMCA	NNP	8
 떼거지	NNG	8
 따스함	NNG	8	complex 따스하/VA ᆷ/ETN 0323
 안달복달	NNG	8
-초연히	MAG	8
+초연히	MAG	8	complex 초연/XR 히/XSM 0223
 개자식	NNG	8
 돌대가리	NNG	8
 쓰잘데	NNG	8
@@ -51796,7 +51893,7 @@ YMCA	NNP	8
 말법	NNG	8
 읍하	VV	8
 물경	MAG	8
-차근차근히	MAG	8
+차근차근히	MAG	8	complex 차근차근/MAG 히/XSM 0445
 염화시중	NNG	8
 오이까	EF	8	vocalic	==소이까
 무위이화	NNG	8
@@ -51817,7 +51914,7 @@ YMCA	NNP	8
 누렁이	NNG	8
 바윗덩이	NNG	8
 탄하	VV	8
-번듯이	MAG	8
+번듯이	MAG	8	complex 번듯/XR 이/XSM 0223
 주둥아리	NNG	8
 대도	EC	8
 태중	NNG	8
@@ -52159,7 +52256,8 @@ YMCA	NNP	8
 양재도	NNP	8
 작헌례	NNG	8
 봉심	NNG	8
-가상히	MAG	8
+가상	XR	10
+가상히	MAG	8	complex 가상/XR 히/XSM 0223
 한전	NNG	8
 역역	NNG	8
 호서	NNP	8
@@ -52689,7 +52787,7 @@ YMCA	NNP	8
 묵은지	NNG	7
 장미희	NNP	7
 대는데	EF	7
-누누히	MAG	7
+누누히	MAG	7	=누누이
 드라니까	EF	7
 휴학계	NNG	7
 종갓집	NNP	7
@@ -52775,7 +52873,7 @@ YMCA	NNP	8
 포레스트	NNG	7
 임계점	NNG	7
 리퍼블릭	NNG	7
-절절히	MAG	7
+절절히	MAG	7	complex 절절/XR 히/XSM 0223
 트레이더	NNG	7
 나리타	NNP	7
 유비쿼터스	NNG	7
@@ -52794,7 +52892,7 @@ YMCA	NNP	8
 하회	NNP	7
 활엽수림	NNG	7
 천년	NNG	7
-강렬히	MAG	7
+강렬히	MAG	7	complex 강렬/XR 히/XSM 0223
 광활하	VA	7	complex 광활/XR 하/XSA 0223
 센트럴	NNP	7
 독수독과	NNG	7
@@ -52944,7 +53042,7 @@ YMCA	NNP	8
 박두	NNG	7
 수정본	NNG	7
 청산유수	NNG	7
-꺼트리	VV	7
+꺼트리	VV	7	complex 끄/VV 어/EC 트리/XSV 010113
 라라	NNP	7
 울보	NNG	7
 재검	NNG	7
@@ -53359,7 +53457,7 @@ SK에너지	NNP	7
 슈퍼주니어	NNP	7
 박형규	NNP	7
 의료기	NNG	7
-웅성이	VV	7
+웅성이	VV	7	complex 웅성/XR 이/XSV 0223
 의뢰자	NNG	7
 창생	NNG	7
 반집	NNG	7
@@ -53433,7 +53531,7 @@ SK에너지	NNP	7
 근무일	NNG	7
 타이피스트	NNG	7
 렉스	NNP	7
-결연히	MAG	7
+결연히	MAG	7	complex 결연/XR 히/XSM 0223
 이글스	NNP	7
 프로듀싱	NNG	7
 덕양구	NNP	7
@@ -53508,7 +53606,8 @@ SK에너지	NNP	7
 나나	NNP	7
 교육과정평가원	NNP	7
 분석실장	NNG	7
-미적거리	VV	7
+미적	XR	7
+미적거리	VV	7	complex 미적/XR 거리/XSV 0224
 대사회	NNG	7
 김성희	NNP	7
 인공물	NNG	7
@@ -53844,7 +53943,7 @@ KB금융그룹	NNP	7
 피델	NNP	7
 의장대	NNG	7
 빚내	VV	7
-절뚝이	VV	7
+절뚝이	VV	7	complex 절뚝/XR 이/XSV 0223
 근로복지공단	NNP	7
 절식	NNG	7
 해맞이	NNG	7
@@ -54532,7 +54631,7 @@ OB맥주	NNP	7
 칼라	NNP	7
 경승용차	NNG	7
 수캐	NNG	7
-득실대	VV	7	complex 득실/NNG 대/XSV 0223
+득실대	VV	7	complex 득실/XR 대/XSV 0223
 합중국	NNG	7
 결하	VV	7
 미작	NNG	7
@@ -54552,7 +54651,7 @@ OB맥주	NNP	7
 호열자	NNG	7
 나웅배	NNP	7
 월산	NNP	7
-새삼스러이	MAG	7
+새삼스러이	MAG	7	complex 새삼스럽/VA-I 이/XSM 0445
 증좌	NNG	7
 한발	NNG	7
 시교위	NNG	7
@@ -54598,7 +54697,7 @@ OB맥주	NNP	7
 내레이터	NNG	7
 바른생활	NNG	7
 무의촌	NNG	7
-청결히	MAG	7
+청결히	MAG	7	complex 청결/NNG 히/XSM 0223
 셀로판지	NNG	7
 광견병	NNG	7
 파이어	NNG	7
@@ -54908,7 +55007,7 @@ OB맥주	NNP	7
 에커슈타인	NNP	7
 배트맨	NNP	7
 흥부가	NNP	7
-평안히	MAG	7
+평안히	MAG	7	complex 평안/NNG 히/XSM 0223
 김열규	NNP	7
 한국민족문화대백과사전	NNP	7
 박하사탕	NNP	7
@@ -54992,7 +55091,7 @@ OB맥주	NNP	7
 널평상	NNG	7
 세사	NNG	7
 꿀통	NNG	7
-특출나	VA	7
+특출나	VA	7	complex 특출/XR 나/XSA 0223
 반월성	NNP	7
 북행	NNG	7
 동사섭	NNG	7
@@ -55177,7 +55276,7 @@ OB맥주	NNP	7
 해괴망측	NNG	7
 비명횡사	NNG	7
 대길	NNG	7
-덜렁대	VV	7	complex 덜렁/MAG 대/VV 0223
+덜렁대	VV	7	complex 덜렁/MAG 대/XSV 0223
 윤승원	NNP	7
 뽀미	NNP	7
 사랑놀음	NNG	7
@@ -55292,7 +55391,7 @@ OB맥주	NNP	7
 말라죽	VV	7	complex 마르/VV 어/EC 죽/VV 011223
 는다기	ETN	7	non_vowel	non_adj	==ᆫ다기
 골패짝	NNG	7
-끄적이	VV	7
+끄적이	VV	7	complex 끄적/XR 이/XSV 0223
 펄벅	NNP	7
 올무	NNG	7
 선금	NNG	7
@@ -55582,7 +55681,7 @@ OB맥주	NNP	7
 대성리	NNP	7
 킥	MAG	7
 훌떡	MAG	7
-흡사히	MAG	7
+흡사히	MAG	7	complex 흡사/XR 히/XSM 0223
 비렁뱅이	NNG	7
 짜르르	MAG	7
 나무가리	NNG	7
@@ -55604,7 +55703,7 @@ OB맥주	NNP	7
 누나	EC	7
 비눗갑	NNG	7
 하늘가	NNG	7
-좋이	MAG	7
+좋이	MAG	7	complex 좋/VA 이/XSM 0112
 입모습	NNG	7
 정월달	NNG	7
 어룬	NNG	7
@@ -55670,7 +55769,7 @@ OB맥주	NNP	7
 구례구	NNP	7
 미륵당	NNP	7
 단음	NNG	7
-빙글거리	VV	7	complex 빙글/MAG 거리/VV 0224
+빙글거리	VV	7	complex 빙글/MAG 거리/XSV 0224
 옹송그리	VV	7
 진세	NNG	7
 어육	NNG	7
@@ -55725,7 +55824,7 @@ OB맥주	NNP	7
 여적지	MAG	7
 민가협	NNG	7
 야멸차	VA	7
-번들대	VV	7
+번들대	VV	7	complex 번들/XR 대/XSV 0223
 더라니	EF	7
 무화	NNG	7
 행동반경	NNG	7
@@ -55766,7 +55865,7 @@ OB맥주	NNP	7
 꼬나물	VV	7	complex 꼬느/VV 어/EC 물/VV 021223
 눅이	VV	7
 일등병	NNG	7
-무성히	MAG	7
+무성히	MAG	7	complex 무성/XR 히/XSM 0223
 불가불	MAG	7
 저그	NP	7
 대나	EC	7
@@ -55828,7 +55927,7 @@ OB맥주	NNP	7
 부복	NNG	7
 오일장	NNG	7
 대성이	NNP	7
-꾸물대	VV	7
+꾸물대	VV	7	complex 꾸물/XR 대/XSV 0223
 천불	NNG	7
 유환욱	NNP	7
 회환	NNG	7
@@ -55910,7 +56009,7 @@ OB맥주	NNP	7
 쇼윈도우	NNG	7
 내깔기	VV	7	complex 내/VV 어/EC 깔기/VV 010113
 러뷰	NNG	7
-두근대	VV	7
+두근대	VV	7	complex 두근/XR 대/XSV 0223
 씽긋	MAG	7
 나무둥치	NNG	7
 철나	VV	7
@@ -56730,7 +56829,7 @@ OB맥주	NNP	7
 팥소	NNG	6
 오징어채	NNG	6
 라든지	JKB	6
-선연히	MAG	6
+선연히	MAG	6	complex 선연/XR 히/XSM 0223
 반공주의자	NNG	6
 끌려다니	VV	6	complex 끌리/VV 어/EC 다니/VV 021224
 홈그라운드	NNG	6
@@ -56771,8 +56870,8 @@ OB맥주	NNP	7
 변사자	NNG	6
 나이대	NNG	6
 부검의	NNG	6
-바둥대	VV	6
-추근거리	VV	6
+바둥대	VV	6	complex 바둥/XR 대/XSV 0223
+추근거리	VV	6	complex 추근/XR 거리/XSV 0224
 혐의점	NNG	6
 콜록콜록	MAG	6
 주문진	NNP	6
@@ -57175,7 +57274,7 @@ address2	NNP	6
 숭덩숭덩	MAG	6
 수육	NNG	6
 탈당파	NNG	6
-유독히	MAG	6
+유독히	MAG	6	complex 유독/MAG 히/XSM 0223
 세상천지	NNG	6
 강고하	VA	6	complex 강고/XR 하/XSA 0223
 모모	NNP	6
@@ -57338,7 +57437,7 @@ address2	NNP	6
 김명인	NNP	6
 선문대	NNP	6
 툴로위츠키	NNP	6
-견고히	MAG	6
+견고히	MAG	6	complex 견고/XR 히/XSM 0223
 태평양그룹	NNP	6
 임실군	NNP	6
 잠금장치	NNG	6
@@ -57464,7 +57563,7 @@ address2	NNP	6
 중·후반	NNG	6
 아마디네자드	NNP	6
 비밀경찰	NNG	6
-통렬히	MAG	6
+통렬히	MAG	6	complex 통렬/XR 히/XSM 0223
 브라자	NNG	6
 경험칙	NNG	6
 네오	NNP	6
@@ -57482,7 +57581,7 @@ address2	NNP	6
 한국철도공사	NNP	6
 도공	NNP	6
 귀경길	NNG	6
-세심히	MAG	6
+세심히	MAG	6	complex 세심/XR 히/XSM 0223
 명월이	NNP	6
 조선닷컴	NNP	6
 리놀레산	NNG	6
@@ -57677,7 +57776,7 @@ NH농협	NNP	6
 호주전	NNG	6
 컨페드컵	NNG	6
 곤파스	NNG	6
-신랄히	MAG	6
+신랄히	MAG	6	complex 신랄/XR 히/XSM 0223
 근조	NNG	6
 박정진	NNP	6
 각운	NNG	6
@@ -57927,7 +58026,7 @@ T모바일	NNP	6
 신한지주	NNP	6
 삼성테크윈	NNP	6
 습식	NNG	6
-비아냥대	VV	6
+비아냥대	VV	6	complex 비아냥/XR 대/XSV 0223
 투표수	NNG	6
 피고석	NNG	6
 심적	MM	6
@@ -58851,7 +58950,7 @@ LS산전	NNP	6
 앵기	VV	6
 에스엠7	NNP	6
 개원의	NNG	6
-찬란히	MAG	6
+찬란히	MAG	6	complex 찬란/XR 히/XSM 0223
 캠프마켓	NNP	6
 코	NNP	6
 로그	NNP	6
@@ -59039,11 +59138,11 @@ ISL코리아	NNP	6
 조지타운	NNP	6
 공탁금	NNG	6
 새벽밥	NNG	6
-의심쩍	VA	6
+의심쩍	VA	6	complex 의심/NNG 쩍/XSA 0223
 브란덴부르크	NNP	6
 폭탄선언	NNG	6
 음행	NNG	6
-투철히	MAG	6
+투철히	MAG	6	complex 투철/XR 히/XSM 0223
 석명	NNG	6
 이산화질소	NNG	6
 고무인	NNG	6
@@ -59140,10 +59239,10 @@ ISL코리아	NNP	6
 특허청장	NNG	6
 당귀	NNG	6
 귀대	NNG	6
-수상히	MAG	6
+수상히	MAG	6	complex 수상/XR 히/XSM 0223
 퀘리	NNG	6
 덧니	NNG	6
-꺼뜨리	VV	6
+꺼뜨리	VV	6	complex 끄/VV 어/EC 뜨리/XSV 010113
 사산	NNG	6
 길동	NNP	6
 평택군	NNP	6
@@ -59161,7 +59260,7 @@ ISL코리아	NNP	6
 거진	NNP	6
 데스크탑	NNG	6
 뷔페식	NNG	6
-산산히	MAG	6
+산산히	MAG	6	=산산이
 바레즈	NNP	6
 끝마디	NNG	6
 이식술	NNG	6
@@ -59434,7 +59533,7 @@ ISL코리아	NNP	6
 흥밋거리	NNG	6
 백가쟁명	NNG	6
 목화씨	NNG	6
-공평히	MAG	6
+공평히	MAG	6	complex 공평/NNG 히/XSM 0223
 윗세대	NNG	6
 해독제	NNG	6
 스쿠비	NNP	6
@@ -59759,7 +59858,7 @@ ISL코리아	NNP	6
 증감원	NNP	6
 요구불	NNG	6
 인사장	NNG	6
-면면이	MAG	6
+면면이	MAG	6	=면면히	complex 면면/NNG 이/XSM 0223
 경월소주	NNP	6
 윤번	NNG	6
 데킬라	NNG	6
@@ -59796,7 +59895,7 @@ ISL코리아	NNP	6
 야타족	NNG	6
 아나	NNG	6
 이래뵈	VV	6	complex 이래/MAG 뵈/VV 0223
-우글대	VV	6
+우글대	VV	6	complex 우글/XR 대/XSV 0223
 들볶이	VV	6
 궁시렁거리	VV	6
 열락	NNG	6
@@ -59907,7 +60006,7 @@ ISL코리아	NNP	6
 가득	NNG	6
 선전비	NNG	6
 물방아	NNG	6
-실히	MAG	6
+실히	MAG	6	complex 실/XR 히/XSM 0112
 인도자	NNG	6
 졸지에	MAG	6
 휴대품	NNG	6
@@ -59935,7 +60034,7 @@ ISL코리아	NNP	6
 진종일	MAG	6
 궁금	NNG	6
 부치미	NNG	6
-아스라히	MAG	6
+아스라히	MAG	6	=아스라이	complex 아스라/XR 히/XSM 0334
 감수성	NNG	6
 영민	XR	6
 몽글	VA	6
@@ -59967,7 +60066,7 @@ ISL코리아	NNP	6
 바깥양반	NNG	6
 자동인형	NNG	6
 셋트	NNG	6
-나직히	MAG	6
+나직히	MAG	6	complex 나직/XR 히/XSM 0223
 습니꺼	EF	6	non_vowel	==ᆸ니꺼
 뒷담	NNG	6
 송전	NNP	6
@@ -60176,7 +60275,7 @@ ISL코리아	NNP	6
 대묘	NNG	6
 홍옥	NNG	6
 육사	NNG	6
-한가히	MAG	6
+한가히	MAG	6	complex 한가/XR 히/XSM 0223
 강호가도	NNG	6
 선죽교	NNP	6
 침대차	NNG	6
@@ -60336,7 +60435,7 @@ ISL코리아	NNP	6
 문초	NNG	6
 격하	VV	6
 묘석	NNG	6
-울렁이	VV	6
+울렁이	VV	6	complex 울렁/XR 이/XSV 0223
 희끗	XR	6
 살기등등	XR	6
 체머리	NNG	6
@@ -60381,7 +60480,7 @@ ISL코리아	NNP	6
 아조	MAG	6
 더라야	EF	6
 느글느글	MAG	6
-얼근히	MAG	6
+얼근히	MAG	6	complex 얼근/XR 히/XSM 0223
 도리우찌	NNG	6
 부디치	VV	6	=부딪히
 괄하	VA	6
@@ -60430,7 +60529,8 @@ ISL코리아	NNP	6
 해연이	NNP	6
 문투	NNG	6
 철학관	NNG	6
-촐랑거리	VV	6
+촐랑	XR	6
+촐랑거리	VV	6	complex 촐랑/XR 거리/XSV 0224
 비끌	VV	6
 기왕지사	NNG	6
 고함지르	VV	6	complex 고함/NNG 지르/VV 0224
@@ -60545,7 +60645,7 @@ ISL코리아	NNP	6
 교수대	NNG	6
 오매	IC	6
 휘몰리	VV	6
-씩씩대	VV	6
+씩씩대	VV	6	complex 씩씩/MAG 대/XSV 0223
 편지투	NNG	6
 암청색	NNG	6
 넓디넓	VA	6	complex 넓/VA 디/EC 넓/VA 011223
@@ -60558,9 +60658,9 @@ ISL코리아	NNP	6
 째째하	VA	6
 동그마니	MAG	6
 짝눈	NNG	6
-으르릉거리	VV	6	complex 으르릉/MAG 거리/VV 0335
+으르릉거리	VV	6	complex 으르릉/MAG 거리/XSV 0335
 회나무	NNG	6
-빠꼼	MAG	6
+빠꼼	MAG	10
 회칠	NNG	6
 허수룩	XR	6
 돼지우리	NNG	6
@@ -60611,7 +60711,7 @@ ISL코리아	NNP	6
 고수레	NNG	6
 갈잎	NNG	6
 집어치	VV	6	complex 집/VV-R 어/EC 치/VV 011223
-요란히	MAG	6
+요란히	MAG	6	complex 요란/XR 히/XSM 0223
 을란다	EF	6	non_vowel	=련다
 불감청	NNG	6
 강포시	NNP	6
@@ -60702,11 +60802,12 @@ ISL코리아	NNP	6
 촌가	NNG	6
 석경	NNP	6
 민성숙	NNP	6
-엔간히	MAG	6
-껌뻑거리	VV	6
+엔간	XR	10
+엔간히	MAG	6	complex 엔간/XR 히/XSM 0223
+껌뻑거리	VV	6	complex 껌뻑/MAG 거리/XSV 0224
 종업식	NNG	6
 마음잡	VV-R	6
-너울대	VV	6
+너울대	VV	6	complex 너울/XR 대/XSV 0223
 교련	NNP	6
 체력장	NNG	6
 과일나무	NNG	6
@@ -60830,7 +60931,7 @@ ISL코리아	NNP	6
 별루	NNG	6
 파적	NNG	6
 줄줄줄	MAG	6
-벙벙히	MAG	6
+벙벙히	MAG	6	complex 벙벙/XR 히/XSM 0223
 저자	NP	6
 로셀리	NNP	6
 서른둘	NR	6
@@ -60879,7 +60980,7 @@ ISL코리아	NNP	6
 터주	NNG	6
 재건대	NNG	6
 데빵	NNG	6
-후히	MAG	6
+후히	MAG	6	complex 후/XR 히/XSM 0112
 뚜룩잽이	NNG	6
 이동철	NNP	6
 꼽사리	NNG	6
@@ -60889,7 +60990,7 @@ ISL코리아	NNP	6
 홀짝	MAG	6
 이새끼	NNG	6
 삼봉이	NNP	6
-복작대	VV	6
+복작대	VV	6	complex 복작/MAG 대/XSV 0223
 야이쪼	NNG	6
 약바우	NNG	6
 야리끼리	NNG	6
@@ -60976,8 +61077,8 @@ ISL코리아	NNP	6
 서선달	NNP	6
 부담농	NNG	6
 가끔가끔	MAG	6
-부산히	MAG	6
-짓궂이	MAG	6
+부산히	MAG	6	complex 부산/NNG 히/XSM 0223
+짓궂이	MAG	6	complex 짓궂/VA 이/XSM 0223
 시골자	NNG	6
 영치기	IC	6
 분상	NNG	6
@@ -61015,7 +61116,7 @@ ISL코리아	NNP	6
 안즉	MAG	6
 석유풍로	NNG	6
 삐딱삐딱	MAG	6
-촐랑대	VV	6
+촐랑대	VV	6	complex 촐랑/XR 대/XSV 0223
 요다음	NNG	6
 우찌	MAG	6
 까마구	NNG	6
@@ -61229,7 +61330,7 @@ ISL코리아	NNP	6
 천계	NNG	6
 숭고	NNG	6
 불사약	NNG	6
-못마땅히	MAG	6
+못마땅히	MAG	6	complex 못마땅/XR 히/XSM 0334
 학세	NNP	6
 광천이	NNP	6
 하크	NNP	6
@@ -61857,7 +61958,7 @@ NBC	NNP	6
 려	EF	5	vocalic
 으네요	EF	5	non_vowel	=네요
 삼인방	NNG	5
-극명히	MAG	5
+극명히	MAG	5	complex 극명/XR 히/XSM 0223
 담화범	NNG	5
 마흔두	MM	5
 훼절	NNG	5
@@ -62207,7 +62308,6 @@ address1	NNP	5
 필경	NNG	5
 영동대교	NNP	5
 힘아리	NNG	5
-비아냥	XR	5
 여자관계	NNG	5
 갓건배	NNP	5
 국립해양문화재연구소	NNP	5
@@ -62399,13 +62499,13 @@ address1	NNP	5
 더라만	EC	5
 한신포차	NNP	5
 백주부	NNP	5
-느지막이	MAG	5
+느지막이	MAG	10	complex 느지막/XR 이/XSM 0334
 염창	NNP	5
 불길하	VA	5	complex 불길/XR 하/XSA 0223
 군만두	NNG	5
 예가체프	NNG	5
 몰입도	NNG	5
-느즈막히	MAG	5
+느즈막히	MAG	5	=느지막이
 데릴사위	NNG	5
 아무튼지	MAG	5
 상갓집	NNG	5
@@ -62617,7 +62717,7 @@ address1	NNP	5
 무기력증	NNG	5
 걸프협력회의	NNP	5
 노노	NNG	5
-미적대	VV	5
+미적대	VV	5	complex 미적/XR 대/XSV 0223
 박상미	NNP	5
 출장길	NNG	5
 필독	NNG	5
@@ -62920,7 +63020,7 @@ address1	NNP	5
 검단	NNP	5
 페라미비르	NNG	5
 만료일	NNG	5
-씰룩이	VV	5
+씰룩이	VV	5	complex 씰룩/XR 이/XSV 0223
 만수위	NNG	5
 기획통	NNG	5
 오세인	NNP	5
@@ -63003,7 +63103,7 @@ address1	NNP	5
 네이선	NNP	5
 주기율표	NNG	5
 분관	NNG	5
-휘청대	VV	5	complex 휘청/MAG 대/VV 0223
+휘청대	VV	5	complex 휘청/MAG 대/XSV 0223
 되밟	VV	5
 화춘잉	NNP	5
 총무과장	NNG	5
@@ -63187,7 +63287,7 @@ KCC전	NNG	5
 디젤	NNP	5
 폴리오네	NNP	5
 조반니	NNP	5
-정밀히	MAG	5
+정밀히	MAG	5	complex 정밀/XR 히/XSM 0223
 포르토프랭스	NNP	5
 이정	NNP	5
 공명심	NNG	5
@@ -63767,7 +63867,7 @@ SK해운	NNP	5
 에디션	NNP	5
 란쓰과기	NNP	5
 가고시마	NNP	5
-깔끔히	MAG	5
+깔끔히	MAG	5	complex 깔끔/XR 히/XSM 0223
 김현욱	NNP	5
 스퍼트	NNG	5
 부영양	NNG	5
@@ -64161,7 +64261,7 @@ CJ제일제당	NNP	5
 이용득	NNP	5
 최교일	NNP	5
 버킹엄궁	NNP	5
-태만히	MAG	5
+태만히	MAG	5	complex 태만/NNG 히/XSM 0223
 윤재만	NNP	5
 카페테리아	NNG	5
 국민의례	NNG	5
@@ -64355,7 +64455,7 @@ LG하우시스	NNP	5
 미디어오늘	NNP	5
 시정촌	NNG	5
 보호책	NNG	5
-성대히	MAG	5
+성대히	MAG	5	complex 성대/XR 히/XSM 0223
 행주산성	NNP	5
 물싸움	NNG	5
 이진규	NNP	5
@@ -64591,7 +64691,7 @@ ICT노믹스	NNG	5
 영종하늘도시	NNP	5
 콜트	NNP	5
 SK바이오팜	NNP	5
-덤덤히	MAG	5
+덤덤히	MAG	5	complex 덤덤/XR 히/XSM 0223
 이순신기념관	NNP	5
 하야설	NNG	5
 성산동	NNP	5
@@ -65444,7 +65544,7 @@ SK바이오팜	NNP	5
 장재언	NNP	5
 만경봉호	NNP	5
 입금표	NNG	5
-즐거이	MAG	5
+즐거이	MAG	5	complex 즐겁/VA-I 이/XSM 0223
 마이더스	NNP	5
 구파	NNG	5
 조폐창	NNP	5
@@ -65544,7 +65644,7 @@ SK바이오팜	NNP	5
 경태	NNP	5
 기원	NNP	5
 의림지	NNP	5
-시시콜콜히	MAG	5
+시시콜콜히	MAG	5	complex 시시콜콜/MAG 히/XSM 0445
 에페드린	NNG	5
 다우코닝사	NNP	5
 임시변통	NNG	5
@@ -65734,7 +65834,7 @@ SK바이오팜	NNP	5
 달구경	NNG	5
 일월산	NNP	5
 부디스트	NNG	5
-얼큰히	MAG	5
+얼큰히	MAG	5	complex 얼큰/XR 히/XSM 0223
 숭하	VA	5
 아구통	NNG	5
 의무대	NNG	5
@@ -65747,7 +65847,8 @@ SK바이오팜	NNP	5
 싯누렇	VA-I	5	=샛노랗
 서걱거리	VV	5
 게슴치레	MAG	5
-흐물거리	VV	5
+흐물	XR	5
+흐물거리	VV	5	complex 흐물/XR 거리/XSV 0224
 흑단	NNG	5
 가기코	NNP	5
 김나운	NNP	5
@@ -65912,7 +66013,8 @@ SK바이오팜	NNP	5
 냇둑	NNG	5
 전원교향곡	NNP	5
 눈가루	NNG	5
-빼꼼히	MAG	5
+빼꼼	MAG	10	=빠꼼
+빼꼼히	MAG	5	complex 빼꼼/MAG 히/XSM 0223
 도동	NNG	5
 울적	NNG	5
 벼이삭	NNG	5
@@ -65976,7 +66078,7 @@ KBS	NNP	5
 바우	NNP	5
 파시	NNG	5
 모조지	NNG	5
-다행이	MAG	5
+다행이	MAG	5	=다행히	complex 다행/NNG 이/XSM 0223
 노심	NNG	5
 벗기우	VV	5
 본새	NNG	5
@@ -66093,7 +66195,8 @@ KBS	NNP	5
 조각달	NNG	5
 가위표	NNG	5
 갑골	NNG	5
-깝죽대	VV	5
+깝죽	XR	5
+깝죽대	VV	5	complex 깝죽/XR 대/XSV 0223
 교육구청	NNG	5
 신길우	NNP	5
 새마을과	NNG	5
@@ -66132,8 +66235,8 @@ KBS	NNP	5
 깃살	NNG	5
 방구멍	NNG	5
 우람이	NNP	5
-삐쭉거리	VV	5	complex 삐쭉/MAG 거리/VV 0224
-비틀대	VV	5	complex 비틀/MAG 대/VV 0223
+삐쭉거리	VV	5	complex 삐쭉/MAG 거리/XSV 0224
+비틀대	VV	5	complex 비틀/MAG 대/XSV 0223
 알림장	NNG	5
 아른아른	MAG	5
 느껍	VA-I	5
@@ -66411,7 +66514,8 @@ KBS	NNP	5
 쭈빗쭈빗	MAG	5
 쌍	IC	5
 씨발놈	NNG	5
-펄렁거리	VV	5
+펄렁	XR	5	=팔랑
+펄렁거리	VV	5	complex 펄렁/XR 거리/XSV 0224
 뒷베란다	NNG	5
 몸차림	NNG	5
 희떱	VA-I	5
@@ -66466,7 +66570,7 @@ KBS	NNP	5
 백사	NNG	5
 말목	NNG	5
 무르춤	XR	5
-멍히	MAG	5
+멍히	MAG	5	complex 멍/XR 히/XSM 0112
 바스락거리	VV	5	complex 바스락/MAG 거리/XSV 0335
 내동댕이	NNG	5
 러요	EF	5
@@ -66474,15 +66578,16 @@ KBS	NNP	5
 피고름	NNG	5
 군교	NNG	5
 밤중쯤	NNG	5
-까불거리	VV	5
+까불	XR	5
+까불거리	VV	5	complex 까불/XR 거리/XSV 0224
 둘러붙이	VV	5	complex 두르/VV 어/EC 붙이/VV 011224
 쉬임	NNG	5
 들썽거리	VV	5
 으쓱으쓱	MAG	5
-질펀히	MAG	5
+질펀히	MAG	5	complex 질펀/XR 히/XSM 0223
 헌걸차	VA	5
 내둥	MAG	5
-허술히	MAG	5
+허술히	MAG	5	complex 허술/XR 히/XSM 0223
 앙바틈	XR	5
 갯지렁이	NNG	5
 활등	NNG	5
@@ -66516,7 +66621,7 @@ KBS	NNP	5
 남금동	NNP	5
 말똥거리	VV	5	complex 말똥/XR 거리/XSV 0224
 빨래감	NNG	5
-갑작스러이	MAG	5
+갑작스러이	MAG	5	complex 갑작스럽/VA-I 이/XSM 0445
 으려는지	EC	5	non_vowel	==려는지
 서석희	NNP	5
 보통내기	NNG	5
@@ -66631,7 +66736,7 @@ KBS	NNP	5
 크리넥스	NNG	5
 들고나	VV	5	complex 들/VV 고/EC 나/VX 011223
 얼레발	NNG	5
-집적대	VV	5
+집적대	VV	5	complex 집적/XR 대/XSV 0223
 망부	NNG	5
 타라	NNP	5
 파리버섯	NNG	5
@@ -66653,7 +66758,7 @@ KBS	NNP	5
 덜컹덜컹	MAG	5
 암록색	NNG	5
 물무늬	NNG	5
-씁쓸히	MAG	5
+씁쓸히	MAG	5	complex 씁쓸/XR 히/XSM 0223
 퐁퐁	MAG	5
 성혈	NNG	5
 양화진	NNP	5
@@ -66667,7 +66772,7 @@ KBS	NNP	5
 방한모	NNG	5
 두서넛	NR	5
 크린트	NNP	5
-빠꼼히	MAG	5
+빠꼼히	MAG	5	complex 빠꼼/MAG 히/XSM 0223
 얼핏얼핏	MAG	5
 댓병	NNG	5
 는다더니	EC	5	non_vowel	non_adj	==ᆫ다더니
@@ -66828,7 +66933,7 @@ KBS	NNP	5
 깜쪽같이	MAG	5
 으라니까	EF	5	non_vowel	==라니까
 보슬비	NNG	5
-빠안히	MAG	5
+빠안히	MAG	5	=빤히
 사기꾼	NNG	5
 이러다가	MAG	5
 탄맥	NNG	5
@@ -66848,9 +66953,9 @@ KBS	NNP	5
 두만	EF	5
 급작	XR	5
 다연발	NNG	5
-머뭇대	VV	5
+머뭇대	VV	5	complex 머뭇/XR 대/XSV 0223
 수사계장	NNG	5
-싱글대	VV	5
+싱글대	VV	5	complex 싱글/MAG 대/XSV 0223
 큰일나	VV	5	complex 큰일/NNG 나/VV 0223
 사발통문	NNG	5
 혼숙	NNG	5
@@ -66932,7 +67037,7 @@ KBS	NNP	5
 물굽이	NNG	5
 ᆫ구	EF	5	vocalic
 허랑방탕	XR	5
-쫑알대	VV	5
+쫑알대	VV	5	complex 쫑알/XR 대/XSV 0223
 블루진	NNG	5
 파들파들	MAG	5
 백합꽃	NNG	5
@@ -66983,7 +67088,8 @@ KBS	NNP	5
 기봉이	NNP	5
 씨요	EF	5
 누에섶	NNG	5
-새치름히	MAG	5
+새치름	XR	10
+새치름히	MAG	5	complex 새치름/XR 히/XSM 0334
 정금이	NNP	5
 책보자기	NNG	5
 대명천지	NNG	5
@@ -67029,7 +67135,7 @@ KBS	NNP	5
 눅	VV	5
 블라인더	NNG	5
 린덴	NNG	5
-소곤대	VV	5	=소곤거리
+소곤대	VV	5	=소곤거리	complex 소곤/XR 대/XSV 0223
 킬링턴	NNP	5
 오미자차	NNG	5
 도심부	NNG	5
@@ -67136,7 +67242,7 @@ KBS	NNP	5
 감꽃	NNG	5
 플륫	NNG	5
 아이참	IC	5
-낼름거리	VV	5	complex 낼름/MAG 거리/VV 0224
+낼름거리	VV	5	complex 낼름/MAG 거리/XSV 0224
 암네리스	NNP	5
 반하	VA	5
 헬밋	NNG	5
@@ -67153,7 +67259,7 @@ KBS	NNP	5
 따루따루	MAG	5
 차자	NNG	5
 손거부	NNP	5
-사뿐	MAG	5
+사뿐	MAG	10
 조가리	NNG	5
 고옥	NNG	5
 사글셋방	NNG	5
@@ -67337,7 +67443,7 @@ KBS	NNP	5
 본도	NNG	5
 티라노사우르스	NNG	5
 네꼬	NNP	5
-왕성히	MAG	5
+왕성히	MAG	5	complex 왕성/XR 히/XSM 0223
 조차지	NNG	5
 아이스께끼	NNG	5
 캐빈	NNG	5
@@ -67683,7 +67789,7 @@ KBS	NNP	5
 만엽집	NNP	5
 아후라	NNP	5
 이교	NNG	5
-귀중히	MAG	5
+귀중히	MAG	5	complex 귀중/XR 히/XSM 0223
 안심입명	NNG	5
 사대주의자	NNG	5
 훈구	NNG	5
@@ -67794,7 +67900,7 @@ CNN	NNP	5
 류만	NNP	5
 헤겔주의	NNG	5
 원기억	NNG	5
-민감히	MAG	5
+민감히	MAG	5	complex 민감/XR 히/XSM 0223
 민생고	NNG	5
 인간서설	NNP	5
 주박	NNG	5
@@ -68361,7 +68467,7 @@ CNN	NNP	5
 독서당	NNG	5
 세부도	NNG	5
 은일지사	NNG	5
-자애롭	VA-I	5
+자애롭	VA-I	5	complex 자애/NNG 롭/XSA-I 0223
 유씨	NNP	5
 김신각	NNP	5
 배수	NNB	5
@@ -68440,15 +68546,15 @@ CNN	NNP	5
 수플레	NNG	5
 수풀레	NNG	5
 봉골레	NNG	5
-감사히	MAG	5
-건강히	MAG	5
-경건히	MAG	5
-경솔히	MAG	5
-극렬히	MAG	5
-능숙히	MAG	5
-뚜렷히	MAG	5
-어정쩡히	MAG	5
-자상히	MAG	5
+감사히	MAG	5	complex 감사/NNG 히/XSM 0223
+건강히	MAG	5	complex 건강/NNG 히/XSM 0223
+경건히	MAG	5	complex 경건/XR 히/XSM 0223
+경솔히	MAG	5	complex 경솔/NNG 히/XSM 0223
+극렬히	MAG	5	complex 극렬/NNG 히/XSM 0223
+능숙히	MAG	5	complex 능숙/XR 히/XSM 0223
+뚜렷히	MAG	5	complex 뚜렷/XR 히/XSM 0223
+어정쩡히	MAG	5	complex 어정쩡/XR 히/XSM 0334
+자상히	MAG	5	complex 자상/XR 히/XSM 0223
 틈틈히	MAG	5	=틈틈이
 요괴	NNG	5
 쉐프	NNG	5	=셰프
