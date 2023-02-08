@@ -47,7 +47,7 @@ namespace kiwi
 		return utf16To8(nonstd::to_string_view(str));
 	}
 
-	POSTag identifySpecialChr(kchar_t chr)
+	POSTag identifySpecialChr(char32_t chr)
 	{
 		if (isSpace(chr)) return POSTag::unknown;
 		if (0x2000 <= chr && chr <= 0x200F) return POSTag::unknown;
@@ -145,17 +145,9 @@ namespace kiwi
 		case 0xff0d:
 			return POSTag::ss;
 		}
-		if ((0x2e80 <= chr && chr <= 0x2e99) ||
-			(0x2e9b <= chr && chr <= 0x2ef3) ||
-			(0x2f00 <= chr && chr <= 0x2fd5) ||
-			(0x3005 <= chr && chr <= 0x3007) ||
-			(0x3021 <= chr && chr <= 0x3029) ||
-			(0x3038 <= chr && chr <= 0x303b) ||
-			(0x3400 <= chr && chr <= 0x4db5) ||
-			(0x4e00 <= chr && chr <= 0x9fcc) ||
-			(0xf900 <= chr && chr <= 0xfa6d) ||
-			(0xfa70 <= chr && chr <= 0xfad9)) return POSTag::sh;
+		if (isChineseChr(chr)) return POSTag::sh;
 		if (0xd800 <= chr && chr <= 0xdfff) return POSTag::sh;
+		
 		return POSTag::sw;
 	}
 

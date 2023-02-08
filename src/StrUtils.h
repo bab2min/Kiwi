@@ -1,7 +1,9 @@
-#pragma once
+﻿#pragma once
 #include <string>
 #include <vector>
 #include <utility>
+#include <array>
+#include <kiwi/Types.h>
 #include "string_view.hpp"
 
 namespace kiwi
@@ -243,19 +245,50 @@ namespace kiwi
 		return ret;
 	}
 
+	inline bool isHighSurrogate(char16_t c)
+	{
+		return (c & 0xFC00) == 0xD800;
+	}
+
+	inline bool isLowSurrogate(char16_t c)
+	{
+		return (c & 0xFC00) == 0xDC00;
+	}
+
+	inline char32_t mergeSurrogate(char16_t h, char16_t l)
+	{
+		return (((h & 0x3FF) << 10) | (l & 0x3FF)) + 0x10000;
+	}
+
+	inline std::array<char16_t, 2> decomposeSurrogate(char32_t c)
+	{
+		std::array<char16_t, 2> ret;
+		if (c < 0x10000)
+		{
+			ret[0] = c;
+			ret[1] = 0;
+		}
+		else
+		{
+			c -= 0x10000;
+			ret[0] = ((c >> 10) & 0x3FF) | 0xD800;
+			ret[1] = (c & 0x3FF) | 0xDC00;
+		}
+		return ret;
+	}
+
 	inline std::string utf16To8(nonstd::u16string_view str)
 	{
 		std::string ret;
 		for (auto it = str.begin(); it != str.end(); ++it)
 		{
 			size_t code = *it;
-			if ((code & 0xFC00) == 0xD800)
+			if (isHighSurrogate(code))
 			{
 				if (++it == str.end()) throw UnicodeException{ "unpaired surrogate" };
 				size_t code2 = *it;
-				if ((code2 & 0xFC00) != 0xDC00) throw UnicodeException{ "unpaired surrogate" };
-				code = ((code & 0x3FF) << 10) | (code2 & 0x3FF);
-				code += 0x10000;
+				if (!isLowSurrogate(code2)) throw UnicodeException{ "unpaired surrogate" };
+				code = mergeSurrogate(code, code2);
 			}
 
 			if (code <= 0x7F)
@@ -542,4 +575,20 @@ namespace kiwi
 		return u'가' + (char16_t)((onset * 21 + vowel) * 28);
 	}
 
+	inline bool isChineseChr(char32_t c)
+	{
+		return (0x4E00 <= c && c <= 0x9FFF)
+			|| (0x3400 <= c && c <= 0x4DBF)
+			|| (0x20000 <= c && c <= 0x2A6DF)
+			|| (0x2A700 <= c && c <= 0x2B73F)
+			|| (0x2B820 <= c && c <= 0x2CEAF)
+			|| (0x2CEB0 <= c && c <= 0x2EBEF)
+			|| (0x30000 <= c && c <= 0x3134F)
+			|| (0x31350 <= c && c <= 0x323AF)
+			|| (0xF900 <= c && c <= 0xFAFF)
+			|| (0x2F800 <= c && c <= 0x2FA1F)
+			|| (0x2F00 <= c && c <= 0x2FDF)
+			|| (0x2E80 <= c && c <= 0x2EFF)
+		;
+	}
 }
