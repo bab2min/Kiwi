@@ -80,6 +80,7 @@ TEST(KiwiCpp, SingleResult)
 	Kiwi& kiwi = reuseKiwiInstance();
 	auto testCases = {
 		u"발신광고갑자기연락드려죄송합니다국내규모가장큰세력이며만구독자를보유하고있고주식유튜버입니다무조건큰돈버는세력",
+		u"재미있게밨어요",
 	};
 	for (auto s : testCases)
 	{

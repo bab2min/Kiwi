@@ -141,26 +141,27 @@ Vector<KGraphNode> kiwi::splitByTrie(
 
 				// insert unknown form 
 				if (nBegin > lastSpecialEndPos && !longestMatched
-					&& !isHangulCoda(cand->form[0])
-					&& str[nonSpaces[nBegin - 1]] != 0x11BB) // cannot end with ㅆ
+					&& !isHangulCoda(cand->form[0]))
 				{
+					{
+						size_t lastPos = ret.back().endPos;
+
+						if (lastPos < nBegin)
+						{
+							if (lastPos && isHangulCoda(str[nonSpaces[lastPos]])) lastPos--; // prevent coda to be matched alone.
+							if (lastPos != lastSpecialEndPos)
+							{
+								appendNewNode(ret, endPosMap, lastPos, str.substr(nonSpaces[lastPos], nonSpaces[nBegin] - nonSpaces[lastPos]), (uint16_t)nBegin);
+							}
+						}
+					}
+
 					size_t newNodeLength = nBegin - lastSpecialEndPos;
 					if (maxUnkFormSize && newNodeLength <= maxUnkFormSize)
 					{
 						appendNewNode(ret, endPosMap, lastSpecialEndPos, str.substr(nonSpaces[lastSpecialEndPos], nonSpaces[nBegin] - nonSpaces[lastSpecialEndPos]), (uint16_t)nBegin);
 					}
-					else
-					{
-						size_t lastPos = max_element(ret.begin() + 1, ret.end(), [](const KGraphNode& a, const KGraphNode& b)
-						{
-							return a.endPos < b.endPos;
-						})->endPos;
-						if (lastPos < nBegin && !isHangulCoda(str[nonSpaces[lastPos]]))
-						{
-							appendNewNode(ret, endPosMap, lastPos, str.substr(nonSpaces[lastPos], nonSpaces[nBegin] - nonSpaces[lastPos]), (uint16_t)nBegin);
-						}
-					}
-				}
+				}				
 
 				// if special character
 				if (cand->candidate[0] <= trie.value((size_t)POSTag::sn)->candidate[0])
@@ -194,10 +195,7 @@ Vector<KGraphNode> kiwi::splitByTrie(
 		}
 		else if (ret.size() > 1 && !specialMatched)
 		{
-			size_t lastPos = max_element(ret.begin() + 1, ret.end(), [](const KGraphNode& a, const KGraphNode& b)
-			{
-				return a.endPos < b.endPos;
-			})->endPos;
+			size_t lastPos = ret.back().endPos;
 			if (lastPos < unkFormEndPos && !isHangulCoda(str[nonSpaces[lastPos]]))
 			{
 				appendNewNode(ret, endPosMap, lastPos, str.substr(nonSpaces[lastPos], unkFormEndPosWithSpace - nonSpaces[lastPos]), (uint16_t)unkFormEndPos);
