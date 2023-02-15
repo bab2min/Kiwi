@@ -180,6 +180,7 @@ namespace kiwi
 		w_url, w_email, w_mention, w_hashtag, w_serial,
 		jks, jkc, jkg, jko, jkb, jkv, jkq, jx, jc,
 		ep, ef, ec, etn, etm,
+		z_coda,
 		p, /**< 분할된 동사/형용사를 나타내는데 사용됨 */
 		max, /**< POSTag의 총 개수를 나타내는 용도 */
 		pv = p,

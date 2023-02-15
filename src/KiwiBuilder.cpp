@@ -34,6 +34,8 @@ KiwiBuilder& KiwiBuilder::operator=(const KiwiBuilder&) = default;
 
 KiwiBuilder& KiwiBuilder::operator=(KiwiBuilder&&) = default;
 
+static constexpr size_t defaultFormSize = defaultTagSize + 26;
+
 template<class Fn>
 auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> MorphemeMap
 {
@@ -371,7 +373,7 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 
 		if (fd.back().size() != (fd.size() - 1) * 2)
 		{
-			throw Exception{ "wrong position information : " + utf16To8(fd.back()) };
+			throw Exception{ "wrong position information : " + utf16To8(fd[0]) + " " + utf16To8(fd.back())};
 		}
 		auto posMap = normalizeHangulWithPosition(joinHangul(it->first.first)).second;
 		for (size_t i = 0; i < fd.size() - 1; ++i)
@@ -526,7 +528,7 @@ void KiwiBuilder::updateForms()
 	{
 		formOrder.emplace_back(move(forms[i]), i);
 	}
-	sort(formOrder.begin() + defaultTagSize - 1, formOrder.end());
+	sort(formOrder.begin() + defaultFormSize, formOrder.end());
 
 	forms.clear();
 	for (size_t i = 0; i < formOrder.size(); ++i)
@@ -609,12 +611,21 @@ KiwiBuilder::KiwiBuilder(const ModelBuildArgs& args)
 {
 	archType = getSelectedArch(ArchType::default_);
 
-	forms.resize(defaultTagSize - 1);
-	morphemes.resize(defaultTagSize + 1); // additional places for <s> & </s>
+	forms.resize(defaultFormSize);
+	morphemes.resize(defaultFormSize + 2); // additional places for <s>, </s>
 	for (size_t i = 1; i < defaultTagSize; ++i)
 	{
 		forms[i - 1].candidate.emplace_back(i + 1);
 		morphemes[i + 1].tag = (POSTag)i;
+	}
+
+	for (size_t i = 0; i < 27; ++i)
+	{
+		forms[i + defaultTagSize - 1].candidate.emplace_back(i + defaultTagSize + 1);
+		forms[i + defaultTagSize - 1].form = { (char16_t)(u'\u11A8' + i) };
+		morphemes[i + defaultTagSize + 1].tag = POSTag::z_coda;
+		morphemes[i + defaultTagSize + 1].kform = i + defaultTagSize - 1;
+		morphemes[i + defaultTagSize + 1].userScore = -1;
 	}
 
 	ifstream ifs;
@@ -796,8 +807,8 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 
 	auto sbgPairFilter = [&](size_t a, size_t b)
 	{
-		if (a <= (int)POSTag::vcn + 1 || ((int)POSTag::w_serial + 1 < a && a < defaultTagSize + 1)) return false;
-		if ((1 < b && b < (int)POSTag::vcn + 1) || ((int)POSTag::w_serial + 1 < b && b < defaultTagSize + 1)) return false;
+		if (a <= (int)POSTag::vcn + 1 || ((int)POSTag::w_serial + 1 < a && a < defaultFormSize + 2)) return false;
+		if ((1 < b && b < (int)POSTag::vcn + 1) || ((int)POSTag::w_serial + 1 < b && b < defaultFormSize + 2)) return false;
 		return true;
 	};
 
@@ -1003,6 +1014,84 @@ bool KiwiBuilder::addWord(const std::u16string& newForm, POSTag tag, float score
 	return addWord(nonstd::to_string_view(newForm), tag, score, origMorphemeId);
 }
 
+void KiwiBuilder::addCombinedMorpheme(
+	Vector<FormRaw>& newForms, 
+	UnorderedMap<KString, size_t>& newFormMap, 
+	Vector<MorphemeRaw>& newMorphemes, 
+	UnorderedMap<size_t, Vector<uint32_t>>& newFormCands,
+	size_t leftId, 
+	size_t rightId, 
+	const cmb::Result& r
+) const
+{
+	const auto& getMorph = [&](size_t id) -> const MorphemeRaw&
+	{
+		if (id < morphemes.size()) return morphemes[id];
+		else return newMorphemes[id - morphemes.size()];
+	};
+
+	const auto& getForm = [&](size_t id) -> const FormRaw&
+	{
+		if (id < forms.size()) return forms[id];
+		else return newForms[id - forms.size()];
+	};
+
+	auto vowel = r.vowel;
+	auto polar = r.polar;
+
+		size_t newId = morphemes.size() + newMorphemes.size();
+		newMorphemes.emplace_back(POSTag::unknown);
+		auto& newMorph = newMorphemes.back();
+		newMorph.lmMorphemeId = newId;
+		if (getMorph(leftId).chunks.empty())
+		{
+			newMorph.chunks.emplace_back(leftId);
+			newMorph.chunkPositions.emplace_back(0, r.leftEnd);
+			newMorph.userScore = getMorph(leftId).userScore + r.score;
+		}
+		else
+		{
+			auto& leftMorph = getMorph(leftId);
+			newMorph.chunks = leftMorph.chunks;
+			newMorph.chunkPositions = leftMorph.chunkPositions;
+			newMorph.chunkPositions.back().second = r.leftEnd;
+		if (vowel == CondVowel::none) vowel = leftMorph.vowel();
+		if (polar == CondPolarity::none) polar = leftMorph.polar();
+			newMorph.userScore = leftMorph.userScore + r.score;
+		}
+
+	if (getMorph(rightId).chunks.empty())
+	{
+		newMorph.chunks.emplace_back(rightId);
+		newMorph.chunkPositions.emplace_back(r.rightBegin, r.str.size());
+	}
+	else
+	{
+		auto& rightMorph = getMorph(rightId);
+		assert(getMorph(rightMorph.chunks.back()).tag == POSTag::z_coda);
+		newMorph.chunks.insert(newMorph.chunks.end(), rightMorph.chunks.begin(), rightMorph.chunks.end());
+		for (auto& p : rightMorph.chunkPositions)
+		{
+			newMorph.chunkPositions.emplace_back(r.rightBegin + p.first, r.rightBegin + p.second);
+		}
+	}
+	
+		if (getMorph(newMorph.chunks[0]).combineSocket)
+		{
+			newMorph.combineSocket = getMorph(newMorph.chunks[0]).combineSocket;
+		}
+		newMorph.userScore += getMorph(rightId).userScore;
+	newMorph.setVowel(vowel);
+		// 양/음성 조건은 부분결합된 형태소에서만 유효
+		if (getMorph(leftId).tag == POSTag::p)
+		{
+		newMorph.setPolar(polar);
+		}
+		size_t fid = addForm(newForms, newFormMap, r.str);
+		newFormCands[fid].emplace_back(newId);
+		newMorph.kform = fid;
+	}
+
 void KiwiBuilder::addCombinedMorphemes(
 	Vector<FormRaw>& newForms, 
 	UnorderedMap<KString, size_t>& newFormMap, 
@@ -1031,49 +1120,14 @@ void KiwiBuilder::addCombinedMorphemes(
 		if (!r.ignoreRCond && !FeatureTestor::isMatched(&getForm(getMorph(leftId).kform).form, getMorph(rightId).vowel()))
 		{
 			continue;
-		}
-
-		size_t newId = morphemes.size() + newMorphemes.size();
-		newMorphemes.emplace_back(POSTag::unknown);
-		auto& newMorph = newMorphemes.back();
-		newMorph.lmMorphemeId = newId;
-		if (getMorph(leftId).chunks.empty())
-		{
-			newMorph.chunks.emplace_back(leftId);
-			newMorph.chunkPositions.emplace_back(0, r.leftEnd);
-			newMorph.userScore = getMorph(leftId).userScore + r.score;
-		}
-		else
-		{
-			auto& leftMorph = getMorph(leftId);
-			newMorph.chunks = leftMorph.chunks;
-			newMorph.chunkPositions = leftMorph.chunkPositions;
-			newMorph.chunkPositions.back().second = r.leftEnd;
-			if (r.vowel == CondVowel::none) r.vowel = leftMorph.vowel();
-			if (r.polar == CondPolarity::none) r.polar = leftMorph.polar();
-			newMorph.userScore = leftMorph.userScore + r.score;
-		}
-		newMorph.chunks.emplace_back(rightId);
-		newMorph.chunkPositions.emplace_back(r.rightBegin, r.str.size());
-		if (getMorph(newMorph.chunks[0]).combineSocket)
-		{
-			newMorph.combineSocket = getMorph(newMorph.chunks[0]).combineSocket;
-		}
-		newMorph.userScore += getMorph(rightId).userScore;
-		newMorph.setVowel(r.vowel);
-		// 양/음성 조건은 부분결합된 형태소에서만 유효
-		if (getMorph(leftId).tag == POSTag::p)
-		{
-			newMorph.setPolar(r.polar);
-		}
-		size_t fid = addForm(newForms, newFormMap, r.str);
-		newFormCands[fid].emplace_back(newId);
-		newMorph.kform = fid;
+}
+		addCombinedMorpheme(newForms, newFormMap, newMorphemes, newFormCands, leftId, rightId, r);
 	}
 }
 
 void KiwiBuilder::buildCombinedMorphemes(
 	Vector<FormRaw>& newForms, 
+	UnorderedMap<KString, size_t>& newFormMap,
 	Vector<MorphemeRaw>& newMorphemes, 
 	UnorderedMap<size_t, Vector<uint32_t>>& newFormCands
 ) const
@@ -1093,7 +1147,7 @@ void KiwiBuilder::buildCombinedMorphemes(
 	UnorderedMap<KString, size_t> newFormMap;
 	Vector<Vector<size_t>> combiningLeftCands, combiningRightCands;
 	UnorderedMap<std::tuple<KString, POSTag, CondPolarity>, size_t> combiningSuffices;
-	size_t combiningUpdateIdx = defaultTagSize + 2;
+	size_t combiningUpdateIdx = defaultFormSize + 2;
 
 	auto ruleLeftIds = combiningRule->getRuleIdsByLeftTag();
 	auto ruleRightIds = combiningRule->getRuleIdsByRightTag();
@@ -1109,6 +1163,7 @@ void KiwiBuilder::buildCombinedMorphemes(
 			if (clearIrregular(tag) > POSTag::pa) continue;
 			if (morph.combined) continue;
 
+			// tag == POSTag::unknown는 이미 결합된 형태소라는 뜻
 			if (tag == POSTag::unknown)
 			{
 				if (morph.chunks.empty()) continue;
@@ -1507,15 +1562,47 @@ inline CondPolarity reducePolar(CondPolarity p, const Morpheme* m)
 	return CondPolarity::none;
 }
 
+inline bool isZCodaAppendable(
+	const KString& form,
+	const Vector<uint32_t>& candidate, 
+	const Vector<MorphemeRaw>& morphemes, 
+	const Vector<MorphemeRaw>& combinedMorphemes)
+{
+	const auto getMorph = [&](size_t i) -> const MorphemeRaw& 
+	{ 
+		return i < morphemes.size() ? morphemes[i] : combinedMorphemes[i - morphemes.size()]; 
+	};
+
+	if (form.empty() || !isHangulSyllable(form.back())) return false;
+
+	for (auto i : candidate)
+	{
+		auto& m = getMorph(i);
+		auto tag = m.tag;
+
+		if (tag == POSTag::unknown && !m.chunks.empty())
+		{
+			tag = getMorph(m.chunks.back()).tag;
+		}
+
+		if (isJClass(tag) || isEClass(tag))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) const
 {
 	Kiwi ret{ archType, langMdl, !typos.empty()};
 
 	Vector<FormRaw> combinedForms;
 	Vector<MorphemeRaw> combinedMorphemes;
+	UnorderedMap<KString, size_t> newFormMap;
 	UnorderedMap<size_t, Vector<uint32_t>> newFormCands;
 
-	buildCombinedMorphemes(combinedForms, combinedMorphemes, newFormCands);
+	buildCombinedMorphemes(combinedForms, newFormMap, combinedMorphemes, newFormCands);
 
 	ret.forms.reserve(forms.size() + combinedForms.size() + 1);
 	ret.morphemes.reserve(morphemes.size() + combinedMorphemes.size());
@@ -1529,24 +1616,28 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 	for (auto& f : forms)
 	{
 		auto it = newFormCands.find(ret.forms.size());
+		bool zCodaAppendable = isZCodaAppendable(f.form, f.candidate, morphemes, combinedMorphemes);
 		if (it == newFormCands.end())
 		{
-			ret.forms.emplace_back(bake(f, ret.morphemes.data()));
+			ret.forms.emplace_back(bake(f, ret.morphemes.data(), zCodaAppendable));
 		}
 		else
 		{
-			ret.forms.emplace_back(bake(f, ret.morphemes.data(), it->second));
+			zCodaAppendable = zCodaAppendable || isZCodaAppendable(f.form, it->second, morphemes, combinedMorphemes);
+			ret.forms.emplace_back(bake(f, ret.morphemes.data(), zCodaAppendable, it->second));
 		}
 		
 	}
 	for (auto& f : combinedForms)
 	{
-		ret.forms.emplace_back(bake(f, ret.morphemes.data(), newFormCands[ret.forms.size()]));
+		bool zCodaAppendable = isZCodaAppendable(f.form, f.candidate, morphemes, combinedMorphemes)
+			|| isZCodaAppendable(f.form, newFormCands[ret.forms.size()], morphemes, combinedMorphemes);
+		ret.forms.emplace_back(bake(f, ret.morphemes.data(), zCodaAppendable, newFormCands[ret.forms.size()]));
 	}
 
 	Vector<size_t> newFormIdMapper(ret.forms.size());
-	iota(newFormIdMapper.begin(), newFormIdMapper.begin() + defaultTagSize - 1, 0);
-	utils::sortWriteInvIdx(ret.forms.begin() + defaultTagSize - 1, ret.forms.end(), newFormIdMapper.begin() + defaultTagSize - 1, (size_t)(defaultTagSize - 1));
+	iota(newFormIdMapper.begin(), newFormIdMapper.begin() + defaultFormSize, 0);
+	utils::sortWriteInvIdx(ret.forms.begin() + defaultFormSize, ret.forms.end(), newFormIdMapper.begin() + defaultFormSize, defaultFormSize);
 	ret.forms.emplace_back();
 
 	uint8_t formHash = 0;
@@ -1565,15 +1656,15 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 		ret.morphemes.emplace_back(bake(m, ret.morphemes.data(), ret.forms.data(), newFormIdMapper));
 	}
 
-	utils::ContinuousTrie<KTrie> formTrie{ defaultTagSize + 1 };
+	utils::ContinuousTrie<KTrie> formTrie{ defaultFormSize + 1 };
 	// reserve places for root node + default tag morphemes
-	for (size_t i = 1; i <= defaultTagSize; ++i)
+	for (size_t i = 0; i < defaultFormSize; ++i)
 	{
-		formTrie[i].val = &ret.forms[i - 1];
+		formTrie[i + 1].val = &ret.forms[i];
 	}
 
 	Vector<const Form*> sortedForms;
-	for (size_t i = defaultTagSize - 1; i < ret.forms.size() - 1; ++i)
+	for (size_t i = defaultFormSize; i < ret.forms.size() - 1; ++i)
 	{
 		auto& f = ret.forms[i];
 		if (f.candidate.empty()) continue;

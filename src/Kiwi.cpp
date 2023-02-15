@@ -742,6 +742,28 @@ namespace kiwi
 			{
 				if (splitComplex && curMorph->getCombined()->complex) continue;
 				if (blocklist && blocklist->count(curMorph->getCombined())) continue;
+
+				// 덧붙은 받침(zCoda)을 위한 지름길
+				if (curMorph->tag == POSTag::z_coda)
+				{
+					for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
+					{
+						for (auto& p : cache[prev - startNode])
+						{
+							auto lastTag = kw->morphemes[p.morphs.back().wid].tag;
+							if (!isJClass(lastTag) && !isEClass(lastTag)) continue;
+							nCache.emplace_back(p);
+							nCache.back().morphs.emplace_back(curMorph->lmMorphemeId);
+							nCache.back().morphs.back().beginPos = node->startPos;
+							nCache.back().morphs.back().endPos = node->endPos;
+							nCache.back().accScore += curMorph->userScore * kw->typoCostWeight;
+							nCache.back().accTypoCost -= curMorph->userScore;
+							nCache.back().parent = &p;
+						}
+					}
+					continue;
+				}
+
 				array<Wid, 4> seq = { 0, };
 				array<Wid, 4> oseq = { 0, };
 				uint8_t combSocket = 0;
@@ -749,7 +771,7 @@ namespace kiwi
 				CondPolarity condP = CondPolarity::none;
 				size_t chSize = 1;
 				bool isUserWord = false;
-				// if the morpheme is chunk set
+				// if the morpheme has chunk set
 				if (!curMorph->chunks.empty() && !curMorph->complex)
 				{
 					chSize = curMorph->chunks.size();

@@ -81,7 +81,7 @@ namespace kiwi
 
 	Form& Form::operator=(Form&&) = default;
 
-	Form bake(const FormRaw& o, const Morpheme* morphBase, const Vector<uint32_t>& additionalCands)
+	Form bake(const FormRaw& o, const Morpheme* morphBase, bool zCodaAppendable, const Vector<uint32_t>& additionalCands)
 	{
 		Form ret;
 		ret.form = o.form;
@@ -94,6 +94,7 @@ namespace kiwi
 		{
 			ret.candidate[i + o.candidate.size()] = morphBase + additionalCands[i];
 		}
+		ret.zCodaAppendable = zCodaAppendable ? 1 : 0;
 		return ret;
 	}
 

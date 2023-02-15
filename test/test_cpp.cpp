@@ -413,6 +413,29 @@ TEST(KiwiCpp, NormalizeCoda)
 	EXPECT_EQ(res.first.back().str, std::u16string{u"ㄱㄱ"});
 } 
 
+TEST(KiwiCpp, ZCoda)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	{
+		std::initializer_list<std::pair<const char16_t*, const char16_t*>> testCases = {
+			{ u"그랬어!", u"그랬엏!",},
+			{ u"아니야!", u"아니얍!",},
+			{ u"나도!", u"나돜!",},
+			{ u"너무해!", u"너무행!",},
+			{ u"그래요!", u"그래용!",},
+		};
+		for (auto s : testCases)
+		{
+			auto res1 = kiwi.analyze(s.first, Match::allWithNormalizing);
+			auto res2 = kiwi.analyze(s.second, Match::allWithNormalizing);
+			auto res3 = kiwi.analyze(s.second, Match::allWithNormalizing & ~Match::zCoda);
+			EXPECT_GE(res1.second - kiwi.getTypoCostWeight(), res2.second);
+			EXPECT_GT(res2.second, res3.second);
+			EXPECT_EQ(res2.first[res2.first.size() - 2].tag, POSTag::z_coda);
+		}
+	}
+}
+
 TEST(KiwiCpp, AnalyzeWithWordPosition)
 {
 	std::u16string testSentence = u"나 정말 배불렄ㅋㅋ"; 
@@ -601,7 +624,7 @@ TEST(KiwiCpp, AddRule)
 		Kiwi kiwi = builder.build();
 		auto res = kiwi.analyze(u"했어용! 하잖아용! 할까용? 좋아용!", Match::allWithNormalizing);
 
-		EXPECT_FLOAT_EQ(ores.second -4, res.second);
+		EXPECT_FLOAT_EQ(ores.second - 4, res.second);
 	}
 }
 

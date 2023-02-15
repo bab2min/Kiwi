@@ -37,7 +37,11 @@ namespace kiwi
 	struct WordInfo;
 	class HSDataset;
 
-	namespace cmb{ class CompiledRule; }
+	namespace cmb
+	{ 
+		class CompiledRule; 
+		struct Result;
+	}
 
 	template<class Ty> class RaggedVector;
 	////
@@ -513,6 +517,16 @@ namespace kiwi
 			float score = 0
 		);
 
+		void addCombinedMorpheme(
+			Vector<FormRaw>& newForms,
+			UnorderedMap<KString, size_t>& newFormMap,
+			Vector<MorphemeRaw>& newMorphemes,
+			UnorderedMap<size_t, Vector<uint32_t>>& newFormCands,
+			size_t leftId,
+			size_t rightId,
+			const cmb::Result& r
+		) const;
+
 		void addCombinedMorphemes(
 			Vector<FormRaw>& newForms, 
 			UnorderedMap<KString, size_t>& newFormMap, 
@@ -525,6 +539,7 @@ namespace kiwi
 
 		void buildCombinedMorphemes(
 			Vector<FormRaw>& newForms, 
+			UnorderedMap<KString, size_t>& newFormMap,
 			Vector<MorphemeRaw>& newMorphemes, 
 			UnorderedMap<size_t, Vector<uint32_t>>& newFormCands
 		) const;

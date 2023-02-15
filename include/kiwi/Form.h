@@ -203,6 +203,7 @@ namespace kiwi
 		CondVowel vowel = CondVowel::none;
 		CondPolarity polar = CondPolarity::none;
 		uint8_t formHash = 0;
+		uint8_t zCodaAppendable = 0;
 
 		Form();
 		~Form();
@@ -248,7 +249,7 @@ namespace kiwi
 	 * @param morphBase 형태소 배열의 시작 위치
 	 * @return 최적화된 형태 정보
 	 */
-	Form bake(const FormRaw& o, const Morpheme* morphBase, const Vector<uint32_t>& additionalCands = {});
+	Form bake(const FormRaw& o, const Morpheme* morphBase, bool zCodaAppendable, const Vector<uint32_t>& additionalCands = {});
 
 	/**
 	 * @brief 변경 가능한 형태소 정보를 bake하여 최적화한다.

@@ -54,6 +54,23 @@ struct TypoCostInfo
 };
 
 template<bool typoTolerant>
+bool getZCodaAppendable(
+	const Form* foundCand,
+	const Form* formBase
+)
+{
+	if (typoTolerant)
+	{
+		auto tCand = reinterpret_cast<const TypoForm*>(foundCand);
+		return tCand->form(formBase).zCodaAppendable;
+	}
+	else
+	{
+		return foundCand->zCodaAppendable;
+	}
+}
+
+template<bool typoTolerant>
 bool insertCandidates(
 	Vector<const Form*>& candidates, 
 	Vector<TypoCostInfo>& candTypoCostStarts,
@@ -213,6 +230,7 @@ Vector<KGraphNode> kiwi::splitByTrie(
 		}
 	};
 
+	bool zCodaFollowable = false;
 	for (; n < str.size(); ++n)
 	{
 		auto& c = str[n];
@@ -346,6 +364,7 @@ Vector<KGraphNode> kiwi::splitByTrie(
 					if (!cand) break;
 					else if (!trie.hasSubmatch(cand))
 					{
+						zCodaFollowable = zCodaFollowable || getZCodaAppendable<typoTolerant>(cand, formBase);
 						if (!insertCandidates<typoTolerant>(candidates, candTypoCostStarts, cand, formBase, typoPtrs, str, nonSpaces)) break;
 					}
 				}
@@ -377,9 +396,20 @@ Vector<KGraphNode> kiwi::splitByTrie(
 					}
 				}
 				
+				if (!!(matchOptions & Match::zCoda) && zCodaFollowable && isHangulCoda(c))
+				{
+					candidates.emplace_back(formBase + defaultTagSize + (c - 0x11A8) - 1);
+					if (typoTolerant)
+					{
+						candTypoCostStarts.emplace_back(0, nonSpaces.size() - 1);
+					}
+				}
+				zCodaFollowable = false;
+
 				goto continueFor; 
 			}
 		}
+
 		if (chrType != POSTag::max)
 		{
 			branchOut(specialStartPos, specialStartPos < nonSpaces.size() ? nonSpaces[specialStartPos] : n);
@@ -391,15 +421,26 @@ Vector<KGraphNode> kiwi::splitByTrie(
 		
 		nonSpaces.emplace_back(n);
 
+		if (!!(matchOptions & Match::zCoda) && zCodaFollowable && isHangulCoda(c))
+		{
+			candidates.emplace_back(formBase + defaultTagSize + (c - 0x11A8) - 1);
+			if (typoTolerant)
+			{
+				candTypoCostStarts.emplace_back(0, nonSpaces.size() - 1);
+			}
+		}
+		zCodaFollowable = false;
+
 		// from this, curNode has the exact next node
 		curNode = nextNode;
-		// if it has exit node, a pattern has found
+		// if it has exit node, patterns have been found
 		for (auto submatcher = curNode; submatcher; submatcher = submatcher->fail())
 		{
 			const Form* cand = submatcher->val(trie);
 			if (!cand) break;
 			else if (!trie.hasSubmatch(cand))
 			{
+				zCodaFollowable = zCodaFollowable || getZCodaAppendable<typoTolerant>(cand, formBase);
 				if (!insertCandidates<typoTolerant>(candidates, candTypoCostStarts, cand, formBase, typoPtrs, str, nonSpaces)) break;
 			}
 		}
