@@ -533,22 +533,13 @@ namespace kiwi
 	struct MInfo
 	{
 		Wid wid;
-		uint32_t beginPos;
-		uint32_t endPos;
 		uint8_t combineSocket;
-		CondVowel condVowel;
-		CondPolarity condPolar;
 		uint8_t ownFormId;
-		MInfo(Wid _wid = 0, uint8_t _combineSocket = 0,
-			CondVowel _condVowel = CondVowel::none,
-			CondPolarity _condPolar = CondPolarity::none,
-			uint8_t _ownFormId = 0, uint32_t _beginPos = 0, uint32_t _endPos = 0)
-			: wid(_wid), combineSocket(_combineSocket),
-			condVowel(_condVowel), condPolar(_condPolar), ownFormId(_ownFormId), beginPos(_beginPos), endPos(_endPos)
+		MInfo(Wid _wid = 0, uint8_t _combineSocket = 0, uint8_t _ownFormId = 0)
+			: wid(_wid), combineSocket(_combineSocket), ownFormId(_ownFormId)
 		{}
 	};
 
-	using MInfos = Vector<MInfo>;
 	using SpecialState = array<uint8_t, 2>;
 
 	template<class LmState>
@@ -556,7 +547,6 @@ namespace kiwi
 	{
 		const Morpheme* morpheme = nullptr;
 		MInfo back;
-		uint32_t beginPos = 0;
 		float accScore = 0, accTypoCost = 0;
 		const WordLL* parent = nullptr;
 		LmState lmState;
@@ -573,7 +563,7 @@ namespace kiwi
 	template<class LmState>
 	struct WordLLP
 	{
-		const Morpheme* morpheme = nullptr;
+		const Morpheme* lastMorpheme = nullptr;
 		float accScore = 0, accTypoCost = 0;
 		const WordLL<LmState>* parent = nullptr;
 		LmState lmState;
@@ -581,8 +571,9 @@ namespace kiwi
 
 		WordLLP() = default;
 
-		WordLLP(const Morpheme* _morph, float _accScore, float _accTypoCost, const WordLL<LmState>* _parent, LmState _lmState, SpecialState _spState)
-			: morpheme{ _morph }, accScore{ _accScore }, accTypoCost{ _accTypoCost }, parent{ _parent }, lmState{ _lmState }, spState(_spState)
+		WordLLP(const Morpheme* _lastMorph, float _accScore, float _accTypoCost, const WordLL<LmState>* _parent, LmState _lmState, SpecialState _spState)
+			: lastMorpheme{ _lastMorph }, accScore{ _accScore }, accTypoCost{ _accTypoCost }, 
+			parent{ _parent }, lmState{ _lmState }, spState(_spState)
 		{
 		}
 	};
@@ -656,7 +647,7 @@ namespace kiwi
 						candScore += ll;
 					}
 				}
-				emplaceMaxCnt(maxWidLL, lSeq, WordLLP<LmState>{ p.morpheme, candScore, p.accTypoCost + node->typoCost, &p, move(cLmState), p.spState }, 3, 
+				emplaceMaxCnt(maxWidLL, lSeq, WordLLP<LmState>{ &morphBase[p.back.wid], candScore, p.accTypoCost + node->typoCost, &p, move(cLmState), p.spState }, 3, 
 					[](const WordLLP<LmState>& a, const WordLLP<LmState>& b) 
 					{ 
 						return a.accScore > b.accScore; 
@@ -771,9 +762,7 @@ namespace kiwi
 							nCache.back().accTypoCost -= curMorph->userScore;
 							nCache.back().parent = &p;
 							nCache.back().morpheme = &kw->morphemes[curMorph->lmMorphemeId];
-							nCache.back().beginPos = node->startPos;
-							nCache.back().back.beginPos = node->startPos;
-							nCache.back().back.endPos = node->endPos;
+							nCache.back().back.wid = curMorph->lmMorphemeId;
 						}
 					}
 					continue;
@@ -849,29 +838,34 @@ namespace kiwi
 					{
 						q.accScore += estimatedLL;
 						// 불규칙 활용 형태소 뒤에 모음 어미가 붙는 경우 벌점 부여
-						if (vowelE && isIrregular(q.morpheme->tag))
+						if (vowelE && isIrregular(q.lastMorpheme->tag))
 						{
 							q.accScore -= 10;
 						}
 						// 나/너/저 뒤에 주격 조사 '가'가 붙는 경우 벌점 부여
-						if (infJ && isInflectendaNP(q.morpheme))
+						if (infJ && isInflectendaNP(q.lastMorpheme))
 						{
 							q.accScore -= 5;
 						}
 						// ㄹ 받침 용언 뒤에 으/느/ㅅ으로 시작하는 형태소가 올 경우 벌점 부여
-						if (badPairOfL && isVerbL(q.morpheme))
+						if (badPairOfL && isVerbL(q.lastMorpheme))
 						{
 							q.accScore -= 7;
 						}
 						// 동사 뒤가 아니거나, 앞의 동사가 양성이 아닌데, 양성모음용 어미가 등장한 경우 벌점 부여
-						if (positiveE && !isPositiveVerb(q.morpheme))
+						if (positiveE && !isPositiveVerb(q.lastMorpheme))
 						{
 							q.accScore -= 100;
 						}
 						// 아/어로 시작하는 어미가 받침 없는 동사 뒤에서 축약되지 않은 경우 벌점 부여
-						if (contractableE && isVerbVowel(q.morpheme))
+						if (contractableE && isVerbVowel(q.lastMorpheme))
 						{
 							q.accScore -= 3;
+						}
+						// 형용사 사용 불가 어미인데 형용사 뒤에 등장
+						if (condP == CondPolarity::non_adj && (q.lastMorpheme->tag == POSTag::va || q.lastMorpheme->tag == POSTag::xsa))
+						{
+							q.accScore -= 10;
 						}
 						if (curMorphSpecialType <= Kiwi::SpecialMorph::singleQuoteNA)
 						{
@@ -905,25 +899,17 @@ namespace kiwi
 						else if (curMorphSpecialType == Kiwi::SpecialMorph::doubleQuoteClose) nCache.back().spState[1] = 0;
 
 						auto& back = nCache.back().back;
-						if (curMorph->chunks.empty())
+						if (curMorph->chunks.empty() || curMorph->complex)
 						{
 							back.wid = oseq[0];
 							back.combineSocket = combSocket;
 							back.ownFormId = ownFormId;
-							back.beginPos = node->startPos;
-							back.endPos = node->endPos;
 						}
 						else
 						{
 							auto& p = curMorph->chunks.getSecond(chSize - 1);
 							back.wid = oseq[chSize - 1];
-							back.condVowel = chSize - 1 > (curMorph->combineSocket ? 1 : 0) ? CondVowel::none : condV;
-							back.condPolar = condP;
-							back.beginPos = node->startPos + p.first;
-							back.endPos = node->startPos + p.second;
 						}
-
-						nCache.back().beginPos = node->startPos;
 					}
 				}
 			}
@@ -973,8 +959,8 @@ namespace kiwi
 				ret.emplace_back(
 					unifyMorpheme(morpheme),
 					cur->back.ownFormId ? ownFormList[cur->back.ownFormId - 1] : KString{},
-					cur->back.beginPos,
-					cur->back.endPos,
+					gNode.startPos,
+					gNode.endPos,
 					scoreDiff,
 					typoCostDiff,
 					gNode.typoFormId
@@ -983,7 +969,7 @@ namespace kiwi
 			else if (morpheme->combineSocket)
 			{
 				ret.back().morph = ret.back().morph->getCombined();
-				ret.back().end = cur->beginPos + morpheme->chunks.getSecond(0).second;
+				ret.back().end = gNode.startPos + morpheme->chunks.getSecond(0).second;
 				ret.back().wordScore = scoreDiff;
 				ret.back().typoCost = typoCostDiff;
 				ret.back().typoFormId = gNode.typoFormId;
@@ -993,8 +979,8 @@ namespace kiwi
 					ret.emplace_back(
 						unifyMorpheme(morpheme->chunks[ch]),
 						KString{},
-						cur->beginPos + p.first,
-						cur->beginPos + p.second,
+						gNode.startPos + p.first,
+						gNode.startPos + p.second,
 						scoreDiff,
 						typoCostDiff,
 						gNode.typoFormId
@@ -1009,8 +995,8 @@ namespace kiwi
 					ret.emplace_back(
 						unifyMorpheme(morpheme->chunks[ch]),
 						KString{},
-						cur->beginPos + p.first,
-						cur->beginPos + p.second,
+						gNode.startPos + p.first,
+						gNode.startPos + p.second,
 						scoreDiff,
 						typoCostDiff,
 						gNode.typoFormId
@@ -1144,7 +1130,13 @@ namespace kiwi
 			for (auto& p : cache[prev - startNode])
 			{
 				if (p.back.combineSocket) continue;
-				if (!FeatureTestor::isMatched(nullptr, p.back.condVowel)) continue;
+				if (!p.morpheme->chunks.empty() && !p.morpheme->complex)
+				{
+					if (p.morpheme->chunks.size() <= (p.morpheme->combineSocket ? 2 : 1))
+					{
+						if (!FeatureTestor::isMatched(nullptr, p.morpheme->vowel)) continue;
+					}
+				}
 
 				float c = p.accScore + (openEnd ? 0 : p.lmState.next(kw->langMdl, eosId));
 				if (p.spState[0]) c -= 2;
