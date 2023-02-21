@@ -80,7 +80,7 @@ namespace kiwi
 		return joinHangul(hangul.begin(), hangul.end());
 	}
 
-	POSTag identifySpecialChr(kchar_t chr);
+	POSTag identifySpecialChr(char32_t chr);
 	size_t getSSType(char16_t c);
 
 	inline bool isSpace(char16_t c)
