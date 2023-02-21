@@ -217,6 +217,11 @@ TEST(KiwiCpp, SentenceBoundaryErrors)
 		u8"집에 갈까 봐요",
 		u8"너무 낮지 싶어요",
 		u8"계속 할까 싶다",
+		u8"집에 가용",
+		u8"집에 갔어용",
+		u8"집에 가용..",
+		u8"집에 갔어용..",
+		u8"bab2min.github.io/kiwipiepy",
 		})
 	{
 		TokenResult res;
