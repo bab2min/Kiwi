@@ -396,7 +396,7 @@ Vector<KGraphNode> kiwi::splitByTrie(
 					}
 				}
 				
-				if (!!(matchOptions & Match::zCoda) && zCodaFollowable && isHangulCoda(c))
+				if (!!(matchOptions & Match::zCoda) && zCodaFollowable && isHangulCoda(c) && (n + 1 >= str.size() || !isHangulSyllable(str[n + 1])))
 				{
 					candidates.emplace_back(formBase + defaultTagSize + (c - 0x11A8) - 1);
 					if (typoTolerant)
@@ -421,7 +421,7 @@ Vector<KGraphNode> kiwi::splitByTrie(
 		
 		nonSpaces.emplace_back(n);
 
-		if (!!(matchOptions & Match::zCoda) && zCodaFollowable && isHangulCoda(c))
+		if (!!(matchOptions & Match::zCoda) && zCodaFollowable && isHangulCoda(c) && (n + 1 >= str.size() || !isHangulSyllable(str[n + 1])))
 		{
 			candidates.emplace_back(formBase + defaultTagSize + (c - 0x11A8) - 1);
 			if (typoTolerant)
