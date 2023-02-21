@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.12)
 
-project(kiwi VERSION 0.14.0 DESCRIPTION "Kiwi, Korean Intelligent Word Identifier")
+project(kiwi VERSION 0.14.1 DESCRIPTION "Kiwi, Korean Intelligent Word Identifier")
 
-set ( CMAKE_CXX_STANDARD 11 )
+set ( CMAKE_CXX_STANDARD 14 )
 set ( CMAKE_VERBOSE_MAKEFILE true )
 
 option(KIWI_USE_MIMALLOC  "Use mimalloc for faster memory allocation" ON)
