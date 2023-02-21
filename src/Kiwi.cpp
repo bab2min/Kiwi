@@ -509,13 +509,13 @@ namespace kiwi
 	template<class _map, class _key, class _value, class _comp>
 	void emplaceMaxCnt(_map& dest, _key&& key, _value&& value, size_t maxCnt, _comp comparator)
 	{
-		auto itp = dest.find(key);
-		if (itp == dest.end())
+		auto p = dest.emplace(std::piecewise_construct, std::forward_as_tuple(key), std::forward_as_tuple());
+		auto itp = p.first;
+		if (p.second)
 		{
-			typename _map::mapped_type emp;
-			emp.reserve(maxCnt);
-			itp = dest.emplace(key, move(emp)).first;
+			itp->second.reserve(maxCnt);
 		}
+
 		if (itp->second.size() < maxCnt)
 		{
 			itp->second.emplace_back(value);
