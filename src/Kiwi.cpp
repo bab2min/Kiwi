@@ -213,8 +213,10 @@ namespace kiwi
 			none = 0,
 			ef,
 			efjx,
+			z_coda,
 			sf,
 		} state = State::none;
+		size_t lastPosition = 0;
 	public:
 
 		bool next(const TokenInfo& t, bool forceNewSent = false)
@@ -223,6 +225,7 @@ namespace kiwi
 			if (forceNewSent)
 			{
 				state = State::none;
+				lastPosition = t.position + t.length;
 				return true;
 			}
 
@@ -247,6 +250,9 @@ namespace kiwi
 			case State::efjx:
 				switch (t.tag)
 				{
+				case POSTag::z_coda:
+					state = State::z_coda;
+					break;
 				case POSTag::jc:
 				case POSTag::jkb:
 				case POSTag::jkc:
@@ -287,6 +293,23 @@ namespace kiwi
 					break;
 				}
 				break;
+			case State::z_coda:
+				switch (t.tag)
+				{
+				case POSTag::so:
+				case POSTag::sw:
+				case POSTag::sh:
+				case POSTag::sp:
+				case POSTag::se:
+				case POSTag::sf:
+				case POSTag::ssc:
+					break;
+				default:
+					ret = true;
+					state = State::none;
+					break;
+				}
+				break;
 			case State::sf:
 				switch (t.tag)
 				{
@@ -297,6 +320,13 @@ namespace kiwi
 				case POSTag::sp:
 				case POSTag::ssc:
 					break;
+				case POSTag::sl:
+				case POSTag::sn:
+					if (lastPosition == t.position)
+					{
+						state = State::none;
+						break;
+					}
 				default:
 					ret = true;
 					state = State::none;
@@ -304,6 +334,7 @@ namespace kiwi
 				}
 				break;
 			}
+			lastPosition = t.position + t.length;
 			return ret;
 		}
 	};
@@ -335,7 +366,7 @@ namespace kiwi
 	{
 		/*
 		* 문장 분리 기준
-		* 1) 종결어미(ef) (요/jx)? (so|sw|sh|sp|se|sf|(닫는 괄호))*
+		* 1) 종결어미(ef) (요/jx)? (z_coda)? (so|sw|sh|sp|se|sf|(닫는 괄호))*
 		* 2) 종결구두점(sf) (so|sw|sh|sp|se|(닫는 괄호))*
 		* 3) 단 종결어미(ef) 바로 다음에 '요'가 아닌 조사(j)나 보조용언(vx)이 뒤따르는 경우는 제외
 		*/
