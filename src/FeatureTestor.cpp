@@ -58,7 +58,7 @@ bool FeatureTestor::isMatched(const kchar_t* begin, const kchar_t* end, CondVowe
 
 bool FeatureTestor::isMatched(const kchar_t* begin, const kchar_t* end, CondPolarity polar)
 {
-	if (polar == CondPolarity::none) return true;
+	if (polar == CondPolarity::none || polar == CondPolarity::non_adj) return true;
 	if (begin == end) return true;
 	for (auto it = end - 1; it >= begin; --it)
 	{
