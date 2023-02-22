@@ -376,6 +376,11 @@ namespace kiwi
 			return pool ? pool->size() : 1;
 		}
 
+		utils::ThreadPool* getThreadPool() const
+		{
+			return pool.get();
+		}
+
 		float getCutOffThreshold() const
 		{
 			return cutOffThreshold;
@@ -731,11 +736,6 @@ namespace kiwi
 		 * @return 형태소 분석 준비가 완료된 Kiwi의 객체.
 		 */
 		Kiwi build(const TypoTransformer& typos = {}, float typoCostThreshold = 2.5f) const;
-
-		/*const lm::KnLangModelBase* getLangModel() const
-		{
-			return langMdl.get();
-		}*/
 
 		using TokenFilter = std::function<bool(const std::u16string&, POSTag)>;
 
