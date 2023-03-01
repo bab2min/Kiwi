@@ -454,7 +454,11 @@ SwTokenizer SwTokenizerBuilder::build() const
 			{
 				u16form.insert(u16form.begin(), u' ');
 			}
-			trie.build(u16form.begin(), u16form.end(), tokenId + 1);
+
+			if (trie.build(u16form.begin(), u16form.end(), tokenId + 1)->val != tokenId + 1)
+			{
+				throw Exception{ "duplicated token: " + t.form };
+		}
 		}
 		else
 		{
@@ -462,17 +466,25 @@ SwTokenizer SwTokenizerBuilder::build() const
 			kiwi->findMorpheme(matchedMorphs, u16form, config.simpleTag ? POSTag::unknown : t.pos);
 			if (matchedMorphs.empty()) continue;
 			auto rtag = toReprTag(t.pos);
+			const Morpheme* firstMorph = nullptr;
 			for (auto m : matchedMorphs)
 			{
 				if (config.simpleTag && toReprTag(m->tag) != rtag) continue;
+				if (joinHangul(m->getForm()) != u16form) continue;
 				auto morphId = kiwi->morphToId(m);
+				if (!firstMorph) firstMorph = m;
 				if (ret.morphToSw.size() <= morphId)
 				{
 					ret.morphToSw.resize(morphId + 1, -1);
 				}
+
+				if (ret.morphToSw[morphId] != -1)
+				{
+					throw Exception{ "duplicated token: " + t.form + "/" + tagToString(t.pos) };
+				}
 				ret.morphToSw[morphId] = tokenId;
 			}
-			ret.swToMorph[tokenId] = kiwi->morphToId(matchedMorphs[0]);
+			if (firstMorph) ret.swToMorph[tokenId] = kiwi->morphToId(firstMorph);
 		}
 	}
 
