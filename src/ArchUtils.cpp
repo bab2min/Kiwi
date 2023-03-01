@@ -34,56 +34,59 @@ ArchType kiwi::getBestArch()
 	return ArchType::none;
 }
 
-static const char* archNames[] = {
-	"default",
-	"none",
-	"balanced",
-	"sse2",
-	"sse4_1",
-	"avx2",
-	"avx512bw",
-	"neon",
-};
-
-static ArchType testArchSet(ArchType arch, ArchType best)
+namespace kiwi
 {
-	if (arch <= ArchType::balanced) return arch;
+	static const char* archNames[] = {
+		"default",
+		"none",
+		"balanced",
+		"sse2",
+		"sse4_1",
+		"avx2",
+		"avx512bw",
+		"neon",
+	};
+
+	static ArchType testArchSet(ArchType arch, ArchType best)
+	{
+		if (arch <= ArchType::balanced) return arch;
 #if CPUINFO_ARCH_X86 || CPUINFO_ARCH_X86_64 || KIWI_ARCH_X86_64 || KIWI_ARCH_X86
-	if (ArchType::sse2 <= arch && arch <= ArchType::avx512bw && arch <= best)
-	{
-		return arch;
-	}
+		if (ArchType::sse2 <= arch && arch <= ArchType::avx512bw && arch <= best)
+		{
+			return arch;
+		}
 #elif CPUINFO_ARCH_ARM || CPUINFO_ARCH_ARM64 || KIWI_ARCH_NEON
-	if (ArchType::neon <= arch && arch <= ArchType::neon && arch <= best)
-	{
-		return arch;
-	}
+		if (ArchType::neon <= arch && arch <= ArchType::neon && arch <= best)
+		{
+			return arch;
+		}
 #endif
-	std::fprintf(stderr, "ArchType::%s is not supported in this environment. ArchType::%s will be used instead.\n",
-		archNames[static_cast<int>(arch)],
-		archNames[static_cast<int>(best)]
-	);
-	return best;
-}
-
-char asciitolower(char in) {
-	if (in <= 'Z' && in >= 'A')
-		return in - ('Z' - 'z');
-	return in;
-}
-
-ArchType parseArchType(const char* env)
-{
-	std::string envs = env;
-	std::transform(envs.begin(), envs.end(), envs.begin(), asciitolower);
-
-	for (size_t i = 0; i <= static_cast<size_t>(ArchType::last); ++i)
-	{
-		if (envs == archNames[i]) return static_cast<ArchType>(i);
+		std::fprintf(stderr, "ArchType::%s is not supported in this environment. ArchType::%s will be used instead.\n",
+			archNames[static_cast<int>(arch)],
+			archNames[static_cast<int>(best)]
+		);
+		return best;
 	}
-	
-	std::fprintf(stderr, "Wrong value for KIWI_ARCH_TYPE: %s\nArchType::default will be used instead.\n", env);
-	return ArchType::default_;
+
+	inline char asciitolower(char in) {
+		if (in <= 'Z' && in >= 'A')
+			return in - ('Z' - 'z');
+		return in;
+	}
+
+	inline ArchType parseArchType(const char* env)
+	{
+		std::string envs = env;
+		std::transform(envs.begin(), envs.end(), envs.begin(), asciitolower);
+
+		for (size_t i = 0; i <= static_cast<size_t>(ArchType::last); ++i)
+		{
+			if (envs == archNames[i]) return static_cast<ArchType>(i);
+		}
+
+		std::fprintf(stderr, "Wrong value for KIWI_ARCH_TYPE: %s\nArchType::default will be used instead.\n", env);
+		return ArchType::default_;
+	}
 }
 
 ArchType kiwi::getSelectedArch(ArchType arch)

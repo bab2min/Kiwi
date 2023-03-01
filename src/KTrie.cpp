@@ -11,110 +11,113 @@
 using namespace std;
 using namespace kiwi;
 
-template<class... Args>
-inline bool appendNewNode(Vector<KGraphNode>& nodes, Vector<pair<uint32_t, uint32_t>>& endPosMap, size_t startPos, Args&&... args)
+namespace kiwi
 {
-	static constexpr uint32_t npos = -1;
-
-	if (endPosMap[startPos].first == npos)
+	template<class... Args>
+	inline bool appendNewNode(Vector<KGraphNode>& nodes, Vector<pair<uint32_t, uint32_t>>& endPosMap, size_t startPos, Args&&... args)
 	{
-		return false;
-	}
+		static constexpr uint32_t npos = -1;
 
-	size_t newId = nodes.size();
-	nodes.emplace_back(forward<Args>(args)...);
-	auto& nnode = nodes.back();
-	nnode.startPos = startPos;
-
-	nnode.prev = newId - endPosMap[startPos].first;
-	if (nnode.endPos >= endPosMap.size()) return true;
-
-	if (endPosMap[nnode.endPos].first == npos)
-	{
-		endPosMap[nnode.endPos].first = newId;
-		endPosMap[nnode.endPos].second = newId;
-	}
-	else
-	{
-		nodes[endPosMap[nnode.endPos].second].sibling = newId - endPosMap[nnode.endPos].second;
-		endPosMap[nnode.endPos].second = newId;
-	}
-	return true;
-}
-
-struct TypoCostInfo
-{
-	float cost;
-	uint32_t start;
-	uint32_t typoId;
-
-	TypoCostInfo(float _cost = 0, uint32_t _start = 0, uint32_t _typoId = 0)
-		: cost{ _cost }, start{ _start }, typoId{ _typoId }
-	{}
-};
-
-template<bool typoTolerant>
-bool getZCodaAppendable(
-	const Form* foundCand,
-	const Form* formBase
-)
-{
-	if (typoTolerant)
-	{
-		auto tCand = reinterpret_cast<const TypoForm*>(foundCand);
-		return tCand->form(formBase).zCodaAppendable;
-	}
-	else
-	{
-		return foundCand->zCodaAppendable;
-	}
-}
-
-template<bool typoTolerant>
-bool insertCandidates(
-	Vector<const Form*>& candidates, 
-	Vector<TypoCostInfo>& candTypoCostStarts,
-	const Form* foundCand, 
-	const Form* formBase, 
-	const size_t* typoPtrs,
-	const KString& str, 
-	const Vector<uint32_t>& nonSpaces
-)
-{
-	if (typoTolerant)
-	{
-		auto tCand = reinterpret_cast<const TypoForm*>(foundCand);
-		if (find(candidates.begin(), candidates.end(), &tCand->form(formBase)) != candidates.end()) return false;
-		
-		while (1)
+		if (endPosMap[startPos].first == npos)
 		{
-			auto typoFormSize = typoPtrs[tCand->typoId + 1] - typoPtrs[tCand->typoId];
-			auto cand = &tCand->form(formBase);
-			if (FeatureTestor::isMatched(&str[0], &str[nonSpaces[nonSpaces.size() - typoFormSize]], tCand->leftCond)
-				&& FeatureTestor::isMatchedApprox(&str[0], &str[nonSpaces[nonSpaces.size() - typoFormSize]], cand->vowel, cand->polar))
-			{
-				candidates.emplace_back(cand);
-				candTypoCostStarts.emplace_back(tCand->score(), nonSpaces.size() - typoFormSize, tCand->typoId);
-			}
-			if (tCand[0].hash() != tCand[1].hash()) break;
-			++tCand;
+			return false;
+		}
+
+		size_t newId = nodes.size();
+		nodes.emplace_back(forward<Args>(args)...);
+		auto& nnode = nodes.back();
+		nnode.startPos = startPos;
+
+		nnode.prev = newId - endPosMap[startPos].first;
+		if (nnode.endPos >= endPosMap.size()) return true;
+
+		if (endPosMap[nnode.endPos].first == npos)
+		{
+			endPosMap[nnode.endPos].first = newId;
+			endPosMap[nnode.endPos].second = newId;
+		}
+		else
+		{
+			nodes[endPosMap[nnode.endPos].second].sibling = newId - endPosMap[nnode.endPos].second;
+			endPosMap[nnode.endPos].second = newId;
+		}
+		return true;
+	}
+
+	struct TypoCostInfo
+	{
+		float cost;
+		uint32_t start;
+		uint32_t typoId;
+
+		TypoCostInfo(float _cost = 0, uint32_t _start = 0, uint32_t _typoId = 0)
+			: cost{ _cost }, start{ _start }, typoId{ _typoId }
+		{}
+	};
+
+	template<bool typoTolerant>
+	bool getZCodaAppendable(
+		const Form* foundCand,
+		const Form* formBase
+	)
+	{
+		if (typoTolerant)
+		{
+			auto tCand = reinterpret_cast<const TypoForm*>(foundCand);
+			return tCand->form(formBase).zCodaAppendable;
+		}
+		else
+		{
+			return foundCand->zCodaAppendable;
 		}
 	}
-	else
-	{
-		if (find(candidates.begin(), candidates.end(), foundCand) != candidates.end()) return false;
 
-		while (1)
+	template<bool typoTolerant>
+	bool insertCandidates(
+		Vector<const Form*>& candidates,
+		Vector<TypoCostInfo>& candTypoCostStarts,
+		const Form* foundCand,
+		const Form* formBase,
+		const size_t* typoPtrs,
+		const KString& str,
+		const Vector<uint32_t>& nonSpaces
+	)
+	{
+		if (typoTolerant)
 		{
-			if (FeatureTestor::isMatchedApprox(&str[0], &str[nonSpaces[nonSpaces.size() - foundCand->form.size()]], foundCand->vowel, foundCand->polar))
+			auto tCand = reinterpret_cast<const TypoForm*>(foundCand);
+			if (find(candidates.begin(), candidates.end(), &tCand->form(formBase)) != candidates.end()) return false;
+
+			while (1)
 			{
-				candidates.emplace_back(foundCand);
+				auto typoFormSize = typoPtrs[tCand->typoId + 1] - typoPtrs[tCand->typoId];
+				auto cand = &tCand->form(formBase);
+				if (FeatureTestor::isMatched(&str[0], &str[nonSpaces[nonSpaces.size() - typoFormSize]], tCand->leftCond)
+					&& FeatureTestor::isMatchedApprox(&str[0], &str[nonSpaces[nonSpaces.size() - typoFormSize]], cand->vowel, cand->polar))
+				{
+					candidates.emplace_back(cand);
+					candTypoCostStarts.emplace_back(tCand->score(), nonSpaces.size() - typoFormSize, tCand->typoId);
+				}
+				if (tCand[0].hash() != tCand[1].hash()) break;
+				++tCand;
 			}
-			if (foundCand[0].formHash != foundCand[1].formHash) break;
-			++foundCand;
 		}
+		else
+		{
+			if (find(candidates.begin(), candidates.end(), foundCand) != candidates.end()) return false;
+
+			while (1)
+			{
+				if (FeatureTestor::isMatchedApprox(&str[0], &str[nonSpaces[nonSpaces.size() - foundCand->form.size()]], foundCand->vowel, foundCand->polar))
+				{
+					candidates.emplace_back(foundCand);
+				}
+				if (foundCand[0].formHash != foundCand[1].formHash) break;
+				++foundCand;
+			}
+		}
+		return true;
 	}
-	return true;
 }
 
 template<ArchType arch, bool typoTolerant>
@@ -510,15 +513,18 @@ const Form* kiwi::findForm(
 	return node->val(trie);
 }
 
-template<bool typoTolerant>
-struct SplitByTrieGetter
+namespace kiwi
 {
-	template<std::ptrdiff_t i>
-	struct Wrapper
+	template<bool typoTolerant>
+	struct SplitByTrieGetter
 	{
-		static constexpr FnSplitByTrie value = &splitByTrie<static_cast<ArchType>(i), typoTolerant>;
+		template<std::ptrdiff_t i>
+		struct Wrapper
+		{
+			static constexpr FnSplitByTrie value = &splitByTrie<static_cast<ArchType>(i), typoTolerant>;
+		};
 	};
-};
+}
 
 FnSplitByTrie kiwi::getSplitByTrieFn(ArchType arch, bool typoTolerant)
 {
@@ -535,14 +541,17 @@ FnSplitByTrie kiwi::getSplitByTrieFn(ArchType arch, bool typoTolerant)
 	}
 }
 
-struct FindFormGetter
+namespace kiwi
 {
-	template<std::ptrdiff_t i>
-	struct Wrapper
+	struct FindFormGetter
 	{
-		static constexpr FnFindForm value = &findForm<static_cast<ArchType>(i)>;
+		template<std::ptrdiff_t i>
+		struct Wrapper
+		{
+			static constexpr FnFindForm value = &findForm<static_cast<ArchType>(i)>;
+		};
 	};
-};
+}
 
 FnFindForm kiwi::getFindFormFn(ArchType arch)
 {

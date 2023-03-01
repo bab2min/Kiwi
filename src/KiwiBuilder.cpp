@@ -721,35 +721,38 @@ KiwiBuilder::KiwiBuilder(const ModelBuildArgs& args)
 	updateMorphemes();
 }
 
-class SBDataFeeder
+namespace kiwi
 {
-	const RaggedVector<utils::Vid>& sents;
-	const lm::KnLangModelBase* lm = nullptr;
-	Vector<Vector<float>> lmBuf;
-	Vector<Vector<uint32_t>> nodeBuf;
-
-public:
-	SBDataFeeder(const RaggedVector<utils::Vid>& _sents, const lm::KnLangModelBase* _lm, size_t numThreads = 1)
-		: sents{ _sents }, lm{ _lm }, lmBuf(numThreads), nodeBuf(numThreads)
+	class SBDataFeeder
 	{
-	}
+		const RaggedVector<utils::Vid>& sents;
+		const lm::KnLangModelBase* lm = nullptr;
+		Vector<Vector<float>> lmBuf;
+		Vector<Vector<uint32_t>> nodeBuf;
 
-	sb::FeedingData<utils::Vid> operator()(size_t i, size_t threadId = 0)
-	{
-		sb::FeedingData<utils::Vid> ret;
-		ret.len = sents[i].size();
-		if (lmBuf[threadId].size() < ret.len)
+	public:
+		SBDataFeeder(const RaggedVector<utils::Vid>& _sents, const lm::KnLangModelBase* _lm, size_t numThreads = 1)
+			: sents{ _sents }, lm{ _lm }, lmBuf(numThreads), nodeBuf(numThreads)
 		{
-			lmBuf[threadId].resize(ret.len);
-			nodeBuf[threadId].resize(ret.len);
 		}
-		ret.x = &sents[i][0];
-		lm->evaluate(sents[i].begin(), sents[i].end(), lmBuf[threadId].data(), nodeBuf[threadId].data());
-		ret.lmLogProbs = lmBuf[threadId].data();
-		ret.base = nodeBuf[threadId].data();
-		return ret;
-	}
-};
+
+		sb::FeedingData<utils::Vid> operator()(size_t i, size_t threadId = 0)
+		{
+			sb::FeedingData<utils::Vid> ret;
+			ret.len = sents[i].size();
+			if (lmBuf[threadId].size() < ret.len)
+			{
+				lmBuf[threadId].resize(ret.len);
+				nodeBuf[threadId].resize(ret.len);
+			}
+			ret.x = &sents[i][0];
+			lm->evaluate(sents[i].begin(), sents[i].end(), lmBuf[threadId].data(), nodeBuf[threadId].data());
+			ret.lmLogProbs = lmBuf[threadId].data();
+			ret.base = nodeBuf[threadId].data();
+			return ret;
+		}
+	};
+}
 
 KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 	: KiwiBuilder{ modelPath }
@@ -1542,63 +1545,93 @@ size_t KiwiBuilder::loadDictionary(const string& dictPath)
 	return addedCnt;
 }
 
-inline CondVowel reduceVowel(CondVowel v, const Morpheme* m)
+namespace kiwi
 {
-	if (v == m->vowel) return v;
-	if (CondVowel::vowel <= v && v <= CondVowel::vocalic_h)
+	inline CondVowel reduceVowel(CondVowel v, const Morpheme* m)
 	{
-		if (CondVowel::vowel <= m->vowel && m->vowel <= CondVowel::vocalic_h)
+		if (v == m->vowel) return v;
+		if (CondVowel::vowel <= v && v <= CondVowel::vocalic_h)
 		{
-			return max(v, m->vowel);
+			if (CondVowel::vowel <= m->vowel && m->vowel <= CondVowel::vocalic_h)
+			{
+				return max(v, m->vowel);
+			}
+			return CondVowel::none;
+		}
+		else if (CondVowel::non_vowel <= v && v <= CondVowel::non_vocalic_h)
+		{
+			if (CondVowel::non_vowel <= m->vowel && m->vowel <= CondVowel::non_vocalic_h)
+			{
+				return min(v, m->vowel);
+			}
+			return CondVowel::none;
 		}
 		return CondVowel::none;
 	}
-	else if (CondVowel::non_vowel <= v && v <= CondVowel::non_vocalic_h)
+
+	inline CondPolarity reducePolar(CondPolarity p, const Morpheme* m)
 	{
-		if (CondVowel::non_vowel <= m->vowel && m->vowel <= CondVowel::non_vocalic_h)
-		{
-			return min(v, m->vowel);
-		}
-		return CondVowel::none;
+		if (p == m->polar) return p;
+		return CondPolarity::none;
 	}
-	return CondVowel::none;
-}
 
-inline CondPolarity reducePolar(CondPolarity p, const Morpheme* m)
-{
-	if (p == m->polar) return p;
-	return CondPolarity::none;
-}
-
-inline bool isZCodaAppendable(
-	const KString& form,
-	const Vector<uint32_t>& candidate, 
-	const Vector<MorphemeRaw>& morphemes, 
-	const Vector<MorphemeRaw>& combinedMorphemes)
-{
-	const auto getMorph = [&](size_t i) -> const MorphemeRaw& 
-	{ 
-		return i < morphemes.size() ? morphemes[i] : combinedMorphemes[i - morphemes.size()]; 
-	};
-
-	if (form.empty() || !isHangulSyllable(form.back())) return false;
-
-	for (auto i : candidate)
+	inline bool isZCodaAppendable(
+		const KString& form,
+		const Vector<uint32_t>& candidate,
+		const Vector<MorphemeRaw>& morphemes,
+		const Vector<MorphemeRaw>& combinedMorphemes)
 	{
-		auto& m = getMorph(i);
-		auto tag = m.tag;
-
-		if (tag == POSTag::unknown && !m.chunks.empty())
+		const auto getMorph = [&](size_t i) -> const MorphemeRaw&
 		{
-			tag = getMorph(m.chunks.back()).tag;
+			return i < morphemes.size() ? morphemes[i] : combinedMorphemes[i - morphemes.size()];
+		};
+
+		if (form.empty() || !isHangulSyllable(form.back())) return false;
+
+		for (auto i : candidate)
+		{
+			auto& m = getMorph(i);
+			auto tag = m.tag;
+
+			if (tag == POSTag::unknown && !m.chunks.empty())
+			{
+				tag = getMorph(m.chunks.back()).tag;
+			}
+
+			if (isJClass(tag) || isEClass(tag))
+			{
+				return true;
+			}
 		}
+		return false;
+	}
 
-		if (isJClass(tag) || isEClass(tag))
+	inline bool testSpeicalChr(const u16string& form)
+	{
+		POSTag pos;
+		switch (pos = identifySpecialChr(form.back()))
 		{
+		case POSTag::sf:
+		case POSTag::sp:
+		case POSTag::ss:
+		case POSTag::se:
+		case POSTag::so:
+		case POSTag::sw:
+			return false;
+		case POSTag::sl:
+		case POSTag::sn:
+		case POSTag::sh:
+			if (all_of(form.begin(), form.end(), [&](char16_t c)
+			{
+				return pos == identifySpecialChr(c);
+			}))
+			{
+				return false;
+			}
+		default:
 			return true;
 		}
 	}
-	return false;
 }
 
 Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) const
@@ -1822,33 +1855,6 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 		}
 	}
 	return ret;
-}
-
-inline bool testSpeicalChr(const u16string& form)
-{
-	POSTag pos;
-	switch (pos = identifySpecialChr(form.back()))
-	{
-	case POSTag::sf:
-	case POSTag::sp:
-	case POSTag::ss:
-	case POSTag::se:
-	case POSTag::so:
-	case POSTag::sw:
-		return false;
-	case POSTag::sl:
-	case POSTag::sn:
-	case POSTag::sh:
-		if (all_of(form.begin(), form.end(), [&](char16_t c)
-		{
-			return pos == identifySpecialChr(c);
-		}))
-		{
-			return false;
-		}
-	default:
-		return true;
-	}
 }
 
 vector<WordInfo> KiwiBuilder::extractWords(const U16MultipleReader& reader, size_t minCnt, size_t maxWordLen, float minScore, float posThreshold, bool lmFilter) const

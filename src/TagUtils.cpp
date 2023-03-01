@@ -38,25 +38,28 @@ bool kiwi::isSuffix(POSTag tag)
 	return POSTag::xsn <= tag && tag <= POSTag::xsa;
 }
 
-inline bool isAllowedSeq(POSTag left, POSTag right)
+namespace kiwi
 {
-	if (isNounClass(left) && isEClass(right))
+	inline bool isAllowedSeq(POSTag left, POSTag right)
 	{
-		return false;
+		if (isNounClass(left) && isEClass(right))
+		{
+			return false;
+		}
+		if ((isVerbClass(left) || isEClass(left)) && right == POSTag::vcp)
+		{
+			return false;
+		}
+		if (isVerbClass(left) && !isEClass(right))
+		{
+			return false;
+		}
+		if ((!isVerbClass(left) && !isEClass(left)) && isEClass(right))
+		{
+			return false;
+		}
+		return true;
 	}
-	if ((isVerbClass(left) || isEClass(left)) && right == POSTag::vcp)
-	{
-		return false;
-	}
-	if (isVerbClass(left) && !isEClass(right))
-	{
-		return false;
-	}
-	if ((!isVerbClass(left) && !isEClass(left)) && isEClass(right))
-	{
-		return false;
-	}
-	return true;
 }
 
 TagSequenceScorer::TagSequenceScorer(float _weight) : weight{ _weight }
