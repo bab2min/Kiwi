@@ -471,6 +471,7 @@ namespace kiwi
 			return langMdl.knlm.get();
 		}
 
+		void findMorpheme(std::vector<const Morpheme*>& out, const std::u16string& s, POSTag tag = POSTag::unknown) const;
 		std::vector<const Morpheme*> findMorpheme(const std::u16string& s, POSTag tag = POSTag::unknown) const;
 	};
 
@@ -497,7 +498,7 @@ namespace kiwi
 		FormRaw& addForm(const KString& form);
 		size_t addForm(Vector<FormRaw>& newForms, UnorderedMap<KString, size_t>& newFormMap, KString form) const;
 
-		using MorphemeMap = UnorderedMap<std::pair<KString, POSTag>, size_t>;
+		using MorphemeMap = UnorderedMap<std::pair<KString, POSTag>, std::pair<size_t, size_t>>;
 		
 		template<class Fn>
 		MorphemeMap loadMorphemesFromTxt(std::istream& is, Fn&& filter);

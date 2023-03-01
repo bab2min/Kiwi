@@ -20,27 +20,39 @@ namespace kiwi
 	class Kiwi;
 	template<class Ty> class RaggedVector;
 
+	enum class SwTokenFlag : uint8_t
+	{
+		none = 0,
+		special = 1,
+		glue = 2,
+		subword = 3,
+		punct,
+		chinese,
+	};
+
 	struct SwToken
 	{
-		std::string form;
+		const char16_t* form = nullptr;
+		uint32_t length = 0;
 		POSTag pos = POSTag::unknown;
-		uint8_t special = 0;
+		SwTokenFlag flags = SwTokenFlag::none;
 
-		SwToken(const std::string& _form = {}, POSTag _pos = POSTag::unknown, uint8_t _special = 0)
-			: form{ _form }, pos{ _pos }, special{ _special }
+		SwToken(const char16_t* _form = nullptr, size_t _length = 0, 
+			POSTag _pos = POSTag::unknown, SwTokenFlag _flags = SwTokenFlag::none)
+			: form{ _form }, length{ (uint32_t)_length }, pos{ _pos }, flags{ _flags }
 		{
 		}
 	};
 
 	struct SwTokenizerConfig
 	{
-		std::string unkToken = "[UNK]";
-		std::string clsToken;
-		std::string sepToken;
-		std::string padToken;
-		std::string maskToken;
-		std::string bosToken;
-		std::string eosToken;
+		enum SpecialToken
+		{
+			unk, cls, sep, pad, mask, bos, eos, glue
+		};
+
+
+		std::array<std::string, eos + 1> specialTokens;
 		size_t multipleUnkTokens = 0;
 		size_t vocabSize = 0;
 		bool doLowercase = false;
@@ -53,12 +65,17 @@ namespace kiwi
 		bool splitEomi = true;
 		bool useGlueToken = true;
 
+		SwTokenizerConfig()
+		{
+			specialTokens[unk] = "[UNK]";
+		}
+
 		size_t numSpecialTokens() const
 		{
 			size_t ret = 0;
-			for (auto p : { &unkToken, &clsToken, &sepToken, &padToken, &maskToken, &bosToken, &eosToken })
+			for (auto& p : specialTokens)
 			{
-				ret += p->empty() ? 0 : 1;
+				ret += p.empty() ? 0 : 1;
 			}
 			return ret;
 		}
@@ -71,30 +88,77 @@ namespace kiwi
 		bool removeRepetitive = true;
 	};
 
+	class SwTokenizer;
+
+	class SwTokenizerBuilder
+	{
+		struct Token
+		{
+			std::string form;
+			float lprob;
+			POSTag pos = POSTag::unknown;
+			SwTokenFlag flags = SwTokenFlag::none;
+
+			Token(const std::string& _form = {}, 
+				POSTag _pos = POSTag::unknown, SwTokenFlag _flag = SwTokenFlag::none,
+				float _lprob = 0
+			)
+				: form{ _form }, lprob{ _lprob }, pos{ _pos }, flags{ _flag }
+			{
+			}
+		};
+
+		const Kiwi* kiwi = nullptr;
+		SwTokenizerConfig config;
+		Vector<Token> tokens;
+	public:
+		SwTokenizerBuilder(const Kiwi& kiwi, const SwTokenizerConfig& config);
+		SwTokenizerBuilder(const SwTokenizerBuilder&);
+		SwTokenizerBuilder(SwTokenizerBuilder&&);
+		~SwTokenizerBuilder();
+		SwTokenizerBuilder& operator=(const SwTokenizerBuilder&);
+		SwTokenizerBuilder& operator=(SwTokenizerBuilder&&);
+
+		void addToken(const char* form, POSTag tag, SwTokenFlag flags, float lprob);
+		void addToken(const std::string& form, POSTag tag, SwTokenFlag flags, float lprob);
+
+		size_t size() const { return tokens.size(); }
+
+		SwTokenizer build() const;
+	};
+
 	class SwTokenizer
 	{
+		friend class SwTokenizerBuilder;
+		void* dfTokenizeSubword = nullptr;
 		const Kiwi* kiwi = nullptr;
-		Vector<SwToken> vocab;
-		utils::FrozenTrie<kchar_t, uint32_t> trie;
 		SwTokenizerConfig config;
+		Vector<SwToken> vocabs;
+		std::u16string vocabStrPool;
+		utils::FrozenTrie<kchar_t, uint32_t> trie;
+		Vector<uint32_t> tokenFallbacks;
+		Vector<float> tokenLProbs;
 		Vector<uint32_t> morphToSw;
 		Vector<uint32_t> swToMorph;
-
-		bool tokenizeSubword(const KString& str, std::vector<uint32_t>& out) const;
+		std::array<size_t, SwTokenizerConfig::glue + 1> specialTokenIds = { { 0, } };
 
 	public:
-		SwTokenizer(const Kiwi& kiwi, const SwTokenizerConfig& config, const std::vector<SwToken>& tokens);
-		SwTokenizer(const Kiwi& kiwi, const SwTokenizerConfig& config, size_t numMorphemes, const std::vector<std::string>& subwordTokens);
+		SwTokenizer(ArchType arch = ArchType::default_);
 		SwTokenizer(const SwTokenizer&);
 		SwTokenizer(SwTokenizer&&);
 		~SwTokenizer();
 		SwTokenizer& operator=(const SwTokenizer&);
 		SwTokenizer& operator=(SwTokenizer&&);
 
-		size_t vocabSize() const { return vocab.size(); }
+		size_t size() const { return vocabs.size(); }
+		const SwToken& getVocab(size_t id) const { return vocabs[id]; }
 
+		void encode(std::vector<uint32_t>& out, const std::string& str, std::vector<std::pair<uint32_t, uint32_t>>* offset = nullptr) const;
 		std::vector<uint32_t> encode(const std::string& str, std::vector<std::pair<uint32_t, uint32_t>>* offset = nullptr) const;
 		std::string decode(const std::vector<uint32_t>& ids) const;
+
+		std::ostream& save(std::ostream& ostr) const;
+		static SwTokenizer load(std::istream& istr);
 	};
 
 	class UnigramSwTrainer
@@ -172,5 +236,7 @@ namespace kiwi
 		size_t getCurrentVocabSize() const { return currentVocabSize + config.numSpecialTokens(); }
 
 		std::ostream& writeVocabs(std::ostream& os) const;
+
+		SwTokenizer build() const;
 	};
 }

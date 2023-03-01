@@ -34,7 +34,10 @@ KiwiBuilder& KiwiBuilder::operator=(const KiwiBuilder&) = default;
 
 KiwiBuilder& KiwiBuilder::operator=(KiwiBuilder&&) = default;
 
-static constexpr size_t defaultFormSize = defaultTagSize + 26;
+namespace kiwi
+{
+	static constexpr size_t defaultFormSize = defaultTagSize + 26;
+}
 
 template<class Fn>
 auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> MorphemeMap
@@ -75,7 +78,8 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 	Vector<LongTail> longTails;
 	UnorderedMap<POSTag, float> longTailWeights;
 	UnorderedMap<pair<KString, POSTag>, u16string> complexChunks;
-	MorphemeMap morphMap, groupMap;
+	MorphemeMap morphMap;
+	UnorderedMap<pair<KString, POSTag>, size_t> groupMap;
 
 	const auto& insertMorph = [&](KString&& form, float score, POSTag tag, CondVowel cvowel, CondPolarity cpolar, bool complex, size_t origMorphemeId = 0, size_t groupId = 0)
 	{
@@ -91,10 +95,10 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 		if (it != morphMap.end())
 		{
 			// 어/아 통합 대상이면서 어xx 형태소와 아xx 형태소 모두 OOV로 취급받는 경우
-			if (it->second == origMorphemeId && unified)
+			if (it->second.first == origMorphemeId && unified)
 			{
 				auto& unifiedForm = forms[formMap.find(form)->second];
-				size_t unifiedId = it->second;
+				size_t unifiedId = it->second.first;
 				for (auto i : unifiedForm.candidate)
 				{
 					if (morphemes[i].tag == tag)
@@ -108,15 +112,15 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 			}
 			else
 			{
-				fm.candidate.emplace_back(it->second);
+				fm.candidate.emplace_back(it->second.first);
 			}
-			if (!unified) morphemes[it->second].kform = &fm - &forms[0];
-			return it->second;
+			if (!unified) morphemes[it->second.first].kform = &fm - &forms[0];
+			return it->second.first;
 		}
 		else
 		{
 			size_t mid = morphemes.size();
-			morphMap.emplace(make_pair(form, tag), origMorphemeId ? origMorphemeId : mid);
+			morphMap.emplace(make_pair(form, tag), make_pair(origMorphemeId ? origMorphemeId : mid, mid));
 			fm.candidate.emplace_back(mid);
 			morphemes.emplace_back(tag, cvowel, cpolar, complex);
 			morphemes.back().kform = &fm - &forms[0];
@@ -302,9 +306,9 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 		{
 			throw Exception{ "cannot find base morpheme: " + utf16To8(p.origForm) + "/" + tagToString(p.origTag) };
 		}
-		p.origMorphId = it->second;
+		p.origMorphId = it->second.first;
 		if (!p.addAlias) continue;
-		if (p.weight > 0) morphemes[it->second].userScore += p.weight;
+		if (p.weight > 0) morphemes[it->second.first].userScore += p.weight;
 	}
 	
 	UnorderedMap<pair<KString, POSTag>, size_t> longTailMap;
@@ -324,7 +328,7 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 				auto it = morphMap.find(make_pair(p.form, p.tag));
 				if (it != morphMap.end())
 				{
-					morphemes[it->second].groupId = groupId;
+					morphemes[it->second.first].groupId = groupId;
 				}
 			}
 			groupId |= (p.groupPriority << 24);
@@ -359,7 +363,7 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 			}
 			else
 			{
-				morphMap.emplace(make_pair(move(p.form), p.tag), p.origMorphId);
+				morphMap.emplace(make_pair(move(p.form), p.tag), make_pair(p.origMorphId, p.origMorphId));
 			}
 		}
 	}
@@ -387,16 +391,18 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 			{
 				throw Exception{ "cannot find morpheme : " + utf16To8(fd[i]) };
 			}
-			if (!morphemes[it->second].kform)
+			size_t lmId = it->second.first;
+			if (!morphemes[lmId].kform)
 			{
-				it = longTailMap.find(make_pair(norm, tag));
+				auto it = longTailMap.find(make_pair(norm, tag));
 				if (it == longTailMap.end())
 				{
 					throw Exception{ "cannot find morpheme : " + utf16To8(fd[i]) };
 				}
+				lmId = it->second;
 			}
 
-			morph.chunks.emplace_back(it->second);
+			morph.chunks.emplace_back(lmId);
 			size_t start = fd.back()[i * 2] - u'0';
 			size_t end = fd.back()[i * 2 + 1] - u'0';
 			morph.chunkPositions.emplace_back(posMap[start], posMap[end] - posMap[start]);
@@ -416,7 +422,7 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 		if (it != morphMap.end()) continue;
 		morphMap.emplace(
 			make_pair(forms[m.kform].form, clearIrregular(m.tag)), 
-			morphMap.find(make_pair(forms[m.kform].form, m.tag))->second
+			make_pair(morphMap.find(make_pair(forms[m.kform].form, m.tag))->second.first, (size_t)(&m - morphemes.data()))
 		);
 	}
 	return morphMap;
@@ -429,7 +435,7 @@ auto KiwiBuilder::restoreMorphemeMap() const -> MorphemeMap
 	{
 		size_t id = morphemes[i].lmMorphemeId;
 		if (!id) id = i;
-		ret.emplace(make_pair(forms[morphemes[i].kform].form, morphemes[i].tag), id);
+		ret.emplace(make_pair(forms[morphemes[i].kform].form, morphemes[i].tag), make_pair(id, id));
 	}
 	for (auto& m : morphemes)
 	{
@@ -438,13 +444,13 @@ auto KiwiBuilder::restoreMorphemeMap() const -> MorphemeMap
 		if (it != ret.end()) continue;
 		ret.emplace(
 			make_pair(forms[m.kform].form, clearIrregular(m.tag)),
-			ret.find(make_pair(forms[m.kform].form, m.tag))->second
+			make_pair(ret.find(make_pair(forms[m.kform].form, m.tag))->second.first, (size_t)(&m - morphemes.data()))
 		);
 	}
 	return ret;
 }
 
-void KiwiBuilder::addCorpusTo(RaggedVector<uint16_t>& out, std::istream& is, KiwiBuilder::MorphemeMap& morphMap,
+void KiwiBuilder::addCorpusTo(RaggedVector<uint16_t>& out, std::istream& is, MorphemeMap& morphMap,
 	double splitRatio,
 	RaggedVector<uint16_t>* splitOut
 ) const
@@ -492,9 +498,24 @@ void KiwiBuilder::addCorpusTo(RaggedVector<uint16_t>& out, std::istream& is, Kiw
 			}
 
 			auto it = morphMap.find(make_pair(f, t));
-			if (it != morphMap.end() && morphemes[it->second].chunks.empty() && !morphemes[it->second].combineSocket)
+			auto& morph = morphemes[it->second.first];
+			if (it != morphMap.end() && (morph.chunks.empty() || morph.complex()) && !morph.combineSocket)
 			{
-				wids.emplace_back(it->second);
+				if (it->second.first != it->second.second 
+					&& it->second.first < defaultFormSize + 2 
+					&& morphemes[it->second.second].complex()
+				)
+				{
+					auto& decomposed = morphemes[it->second.second].chunks;
+					for (auto wid : decomposed)
+					{
+						wids.emplace_back(morphemes[wid].lmMorphemeId ? morphemes[wid].lmMorphemeId : wid);
+					}
+				}
+				else
+				{
+					wids.emplace_back(it->second.first);
+				}
 				continue;
 			}
 
@@ -666,7 +687,7 @@ KiwiBuilder::KiwiBuilder(const ModelBuildArgs& args)
 	}
 	
 	size_t lmVocabSize = 0;
-	for (auto& p : realMorph) lmVocabSize = max(p.second, lmVocabSize);
+	for (auto& p : realMorph) lmVocabSize = max(p.second.first, lmVocabSize);
 	lmVocabSize += 1;
 
 	Vector<utils::Vid> historyTx(lmVocabSize);
@@ -793,7 +814,7 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 	}
 
 	size_t lmVocabSize = 0;
-	for (auto& p : realMorph) lmVocabSize = max(p.second, lmVocabSize);
+	for (auto& p : realMorph) lmVocabSize = max(p.second.first, lmVocabSize);
 	lmVocabSize += 1;
 
 	auto sbgTokenFilter = [&](size_t a)
@@ -1521,23 +1542,6 @@ size_t KiwiBuilder::loadDictionary(const string& dictPath)
 	return addedCnt;
 }
 
-template<ArchType archType>
-utils::FrozenTrie<kchar_t, const Form*> freezeTrie(utils::ContinuousTrie<KTrie>&& trie)
-{
-	return { trie, ArchTypeHolder<archType>{} };
-}
-
-using FnFreezeTrie = decltype(&freezeTrie<ArchType::none>);
-
-struct FreezeTrieGetter
-{
-	template<std::ptrdiff_t i>
-	struct Wrapper
-	{
-		static constexpr FnFreezeTrie value = &freezeTrie<static_cast<ArchType>(i)>;
-	};
-};
-
 inline CondVowel reduceVowel(CondVowel v, const Morpheme* m)
 {
 	if (v == m->vowel) return v;
@@ -1800,10 +1804,7 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 		}
 	}
 
-	static tp::Table<FnFreezeTrie, AvailableArch> table{ FreezeTrieGetter{} };
-	auto* fn = table[static_cast<std::ptrdiff_t>(archType)];
-	if (!fn) throw std::runtime_error{ std::string{"Unsupported architecture : "} + archToStr(archType)};
-	ret.formTrie = (*fn)(move(formTrie));
+	ret.formTrie = freezeTrie(move(formTrie), archType);
 
 	for (auto& m : ret.morphemes)
 	{

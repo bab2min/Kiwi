@@ -16,6 +16,7 @@ namespace kiwi
 
 		inline bool isSpaceInsertable(POSTag l, POSTag r, U16StringView rform)
 		{
+			if (r == POSTag::p) return true; // forced space insertion
 			if (l == r && (POSTag::sf <= l && l <= POSTag::sn)) return true;
 			if (r == POSTag::vcp || r == POSTag::xsa || r == POSTag::xsai || r == POSTag::xsv || r == POSTag::xsn) return false;
 			if (l == POSTag::xpn || l == POSTag::so || l == POSTag::ss || l == POSTag::sw) return false;
@@ -446,6 +447,11 @@ namespace kiwi
 		void AutoJoiner::add(const char16_t* form, POSTag tag, bool inferRegularity)
 		{
 			return mapbox::util::apply_visitor(AddVisitor{ this, U16StringView{ form }, tag, inferRegularity }, reinterpret_cast<CandVector&>(candBuf));
+		}
+
+		void AutoJoiner::add(U16StringView form, POSTag tag)
+		{
+			return mapbox::util::apply_visitor(AddVisitor{ this, form, tag, false }, reinterpret_cast<CandVector&>(candBuf));
 		}
 
 		u16string AutoJoiner::getU16() const

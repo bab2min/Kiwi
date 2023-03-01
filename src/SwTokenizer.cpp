@@ -14,146 +14,597 @@
 using namespace std;
 using namespace kiwi;
 
-SwTokenizer::SwTokenizer(const SwTokenizer&) = default;
-SwTokenizer::SwTokenizer(SwTokenizer&&) = default;
-SwTokenizer& SwTokenizer::operator=(const SwTokenizer&) = default;
-SwTokenizer& SwTokenizer::operator=(SwTokenizer&&) = default;
-SwTokenizer::~SwTokenizer() = default;
-
-SwTokenizer::SwTokenizer(const Kiwi & _kiwi, const SwTokenizerConfig & _config, const vector<SwToken>&tokens)
-	: kiwi{ &_kiwi }, config{ _config }
+namespace kiwi
 {
-	
-}
-
-SwTokenizer::SwTokenizer(const Kiwi & _kiwi, const SwTokenizerConfig & _config, size_t numMorphemes, const vector<string>& subwordTokens)
-	: kiwi{ &_kiwi }, config{ _config }
-{
-	Vector<pair<KString, uint32_t>> subwordList;
-
-	for (auto& t : subwordTokens)
+	inline bool testRepetition(const char16_t* s, size_t l)
 	{
-		vocab.emplace_back(t);
-		swToMorph.emplace_back(0);
-		// subword token
-		if (t.size() > 2 && t[0] == '#' && t[1] == '#')
+		if (l < 5) return false;
+		for (size_t i = 1; i <= l / 3; ++i)
 		{
-			subwordList.emplace_back(normalizeHangul(t.begin() + 2, t.end()), vocab.size() - 1);
-		}
-		else
-		{
-			subwordList.emplace_back(u" " + normalizeHangul(t), vocab.size() - 1);
-		}
-	}
-
-	if (config.integrateAllomoprh)
-	{
-		unordered_set<uint32_t> uniq;
-		for (size_t i = 0; i < kiwi->getMorphemeSize(); ++i)
-		{
-			if (uniq.size() >= numMorphemes) break;
-
-			auto* morph = kiwi->idToMorph(i);
-			if (!morph) break;
-			if (!morph->kform || morph->kform->empty()) continue;
-			if (morph->combined) continue;
-			if (uniq.count(morph->lmMorphemeId)) continue;
-
-			uniq.emplace(morph->lmMorphemeId);
-			if (morphToSw.size() <= morph->lmMorphemeId)
+			bool all = true;
+			for (size_t j = 1; j < l / i; ++j)
 			{
-				morphToSw.resize(morph->lmMorphemeId + 1);
+				if (!equal(s, s + i, s + i * j))
+				{
+					all = false;
+					break;
+				}
 			}
-			morphToSw[morph->lmMorphemeId] = vocab.size();
-			swToMorph.emplace_back((uint32_t)i);
-			vocab.emplace_back(utf16To8(joinHangul(*morph->kform)), morph->tag);
-			if (morph->tag == POSTag::nng || morph->tag == POSTag::nnp)
-			{
-				subwordList.emplace_back(u" " + *morph->kform, vocab.size() - 1);
-			}
+			if (all) return true;
+		}
+		return false;
+	}
+
+	inline bool isTagForPrefix(POSTag tag)
+	{
+		switch (tag)
+		{
+		case POSTag::nng:
+		case POSTag::nnp:
+		case POSTag::nnb:
+		case POSTag::np:
+		case POSTag::nr:
+		case POSTag::mag:
+		case POSTag::maj:
+		case POSTag::mm:
+		case POSTag::xr:
+		case POSTag::xpn:
+		case POSTag::ic:
+			//case POSTag::z_coda:
+			return true;
+		default:
+			return false;
 		}
 	}
-	else
-	{
 
-	}
-
-	sort(subwordList.begin(), subwordList.end());
-	utils::ContinuousTrie<utils::TrieNode<char16_t, uint32_t, utils::ConstAccess<map<char16_t, int32_t>>>> formTrie{ 1 };
-	size_t estimatedNodeSize = 0;
-	const KString* prevForm = nullptr;
-	for (auto& f : subwordList)
+	inline bool isTagForPunct(POSTag tag)
 	{
-		if (!prevForm)
+		switch (tag)
 		{
-			estimatedNodeSize += f.first.size();
-			prevForm = &f.first;
-			continue;
+		case POSTag::sf:
+		case POSTag::sp:
+		case POSTag::ss:
+		case POSTag::sso:
+		case POSTag::ssc:
+		case POSTag::se:
+		case POSTag::so:
+		case POSTag::sw:
+			return true;
+		default:
+			return false;
 		}
-		size_t commonPrefix = 0;
-		while (commonPrefix < std::min(prevForm->size(), f.first.size())
-			&& (*prevForm)[commonPrefix] == f.first[commonPrefix]) ++commonPrefix;
-		estimatedNodeSize += f.first.size() - commonPrefix;
-		prevForm = &f.first;
 	}
-	formTrie.reserveMore(estimatedNodeSize);
 
-	decltype(formTrie)::CacheStore<KString> cache;
-	for (auto& f : subwordList)
+	inline POSTag toReprTag(POSTag tag)
 	{
-		formTrie.buildWithCaching(f.first, f.second, cache);
-	}
-	trie = utils::FrozenTrie<char16_t, uint32_t>{ formTrie, ArchTypeHolder<ArchType::none>{} };
-}
-
-bool SwTokenizer::tokenizeSubword(const KString& str, std::vector<uint32_t>& out) const
-{
-	if (config.wholeTokenUnk)
-	{
-
-	}
-	else
-	{
-		auto* node = trie.root()->template nextOpt<ArchType::none>(trie, ' ');
-		for (auto c : str)
+		switch (tag)
 		{
-			auto* nnode = node->template nextOpt<ArchType::none>(trie, c);
-			if (nnode)
+		case POSTag::nng:
+		case POSTag::nnp:
+		case POSTag::nnb:
+		case POSTag::np:
+		case POSTag::nr:
+		case POSTag::xr:
+			return POSTag::nng;
+		case POSTag::vv:
+		case POSTag::va:
+		case POSTag::vx:
+		case POSTag::vcp:
+		case POSTag::vcn:
+		case POSTag::xsv:
+		case POSTag::xsa:
+			return POSTag::vv;
+		case POSTag::vvi:
+		case POSTag::vai:
+		case POSTag::vxi:
+		case POSTag::xsai:
+			return POSTag::vvi;
+		case POSTag::mm:
+		case POSTag::maj:
+		case POSTag::mag:
+			return POSTag::mag;
+		case POSTag::sf:
+		case POSTag::sp:
+		case POSTag::ss:
+		case POSTag::sso:
+		case POSTag::ssc:
+		case POSTag::se:
+		case POSTag::so:
+		case POSTag::sw:
+			return POSTag::sf;
+		case POSTag::jks:
+		case POSTag::jkc:
+		case POSTag::jkg:
+		case POSTag::jko:
+		case POSTag::jkb:
+		case POSTag::jkv:
+		case POSTag::jkq:
+		case POSTag::jx:
+		case POSTag::jc:
+			return POSTag::jks;
+		case POSTag::ep:
+		case POSTag::ef:
+		case POSTag::ec:
+		case POSTag::etn:
+		case POSTag::etm:
+			return POSTag::ep;
+		}
+		return tag;
+	}
+
+	inline const char* tagToReprStr(POSTag tag)
+	{
+		tag = toReprTag(tag);
+		switch (tag)
+		{
+		case POSTag::nng:
+			return "N";
+		case POSTag::mag:
+			return "M";
+		case POSTag::vv:
+			return "V";
+		case POSTag::vvi:
+			return "V-I";
+		case POSTag::jks:
+			return "J";
+		case POSTag::ep:
+			return "E";
+		case POSTag::xsn:
+			return "XSN";
+		case POSTag::xsm:
+			return "XSM";
+		case POSTag::sf:
+			return "S";
+		case POSTag::z_coda:
+			return "Z";
+		}
+		return nullptr;
+	}
+
+	inline u16string toUTF16(u16string&& str)
+	{
+		return move(str);
+	}
+
+	inline u16string toUTF16(string&& str)
+	{
+		return utf8To16(str);
+	}
+
+	template<class Fn>
+	void foreachU32Chr(const u16string& s, Fn&& fn)
+	{
+		for (size_t i = 0; i < s.size(); ++i)
+		{
+			if (isHighSurrogate(s[i]))
 			{
-				//nnode->val(trie);
-				node = nnode;
+				fn(mergeSurrogate(s[i], s[i + 1]));
+				++i;
 			}
 			else
 			{
-				node = trie.root()->template nextOpt<ArchType::none>(trie, c);
+				fn(s[i]);
 			}
 		}
 	}
-	return false;
+
+	inline set<char32_t> getChrsPreserved(const map<char32_t, uint32_t>& chrCnts, double chrCoverage)
+	{
+		size_t totChrCnt = 0;
+		for (auto& p : chrCnts)
+		{
+			totChrCnt += p.second;
+		}
+		totChrCnt *= chrCoverage;
+
+		Vector<pair<char32_t, uint32_t>> sortedChr{ chrCnts.begin(), chrCnts.end() };
+		sort(sortedChr.begin(), sortedChr.end(), [](const pair<char32_t, uint32_t>& a, const pair<char32_t, uint32_t>& b)
+		{
+			return a.second > b.second;
+		});
+
+		set<char32_t> ret;
+		size_t accum = 0;
+		for (auto& p : sortedChr)
+		{
+			ret.emplace(p.first);
+			accum += p.second;
+			if (accum >= totChrCnt) break;
+		}
+		return ret;
+	}
+
+	inline const Morpheme* findVerbalSuffix(const Morpheme* morph, const Vector<const Morpheme*>& suffices)
+	{
+		auto tag = clearIrregular(morph->tag);
+		auto irreg = isIrregular(morph->tag);
+		if (!(tag == POSTag::vv || tag == POSTag::va)) return nullptr;
+		for (auto s : suffices)
+		{
+			auto stag = clearIrregular(s->tag);
+			if (stag != (tag == POSTag::vv ? POSTag::xsv : POSTag::xsa) || irreg != isIrregular(s->tag)) continue;
+			if (morph->kform->size() <= s->kform->size()) continue;
+			if (equal(morph->kform->end() - s->kform->size(), morph->kform->end(), s->kform->begin()))
+			{
+				return s;
+			}
+		}
+		return nullptr;
+	}
+
+	inline pair<const Morpheme*, const Morpheme*> findEomiSuffix(const Kiwi* kiwi, const Morpheme* morph, const Vector<const Morpheme*>& suffices)
+	{
+		auto tag = morph->tag;
+		if (!(tag == POSTag::ef || tag == POSTag::ec)) return make_pair(nullptr, nullptr);
+		for (auto s : suffices)
+		{
+			if (morph->kform->size() <= s->kform->size()) continue;
+			if (equal(morph->kform->end() - s->kform->size(), morph->kform->end(), s->kform->begin()))
+			{
+				auto base = kiwi->findMorpheme(u16string{ morph->kform->begin(), morph->kform->end() - s->kform->size() }, tag);
+				if (base.empty()) return make_pair(nullptr, nullptr);
+				return make_pair(base[0], s);
+			}
+		}
+		return make_pair(nullptr, nullptr);
+	}
+
+	template<ArchType arch>
+	bool tokenizeSubword(
+		const SwTokenizerConfig& config,
+		const utils::FrozenTrie<kchar_t, uint32_t>& trie,
+		const Vector<SwToken>& vocabs,
+		const Vector<uint32_t>& tokenFallbacks,
+		const Vector<float>& tokenLProbs,
+		size_t unkTokenId,
+		size_t glueTokenId,
+		nonstd::u16string_view str,
+		std::vector<uint32_t>& out
+	)
+	{
+		Vector<pair<Vector<uint32_t>, float>> pathes, cands;
+		auto node = trie.root();
+		node = node->template nextOpt<arch>(trie, u' ');
+		for (size_t i = 0; i < str.size(); ++i)
+		{
+			auto nnode = node->template nextOpt<arch>(trie, str[i]);
+			while (!nnode)
+			{
+				node = node->fail();
+				if (!node) break;
+				nnode = node->template nextOpt<arch>(trie, str[i]);
+			}
+			
+			if (!nnode) 
+			{
+				pathes.emplace_back();
+				node = trie.root();
+				continue;
+			}
+			size_t v = nnode->val(trie);
+
+			cands.clear();
+			if (trie.hasMatch(v))
+			{
+				auto tokenId = v - 1;
+				auto& p = vocabs[tokenId];
+				if (p.length == i + 1)
+				{
+					if (p.flags == SwTokenFlag::none || p.flags == SwTokenFlag::special || p.flags == SwTokenFlag::punct || p.flags == SwTokenFlag::chinese)
+					{
+						cands.emplace_back(Vector<uint32_t>((size_t)1, (uint32_t)tokenId), tokenLProbs[tokenId]);
+					}
+				}
+				else
+				{
+					auto& l = pathes[i - p.length];
+					if (!l.first.empty() && (
+						!(p.flags == SwTokenFlag::none && !config.useGlueToken)
+						|| p.flags == SwTokenFlag::glue
+						|| p.flags == SwTokenFlag::chinese
+					))
+					{
+						cands.emplace_back(l);
+						if (p.flags == SwTokenFlag::none)
+						{
+							cands.back().first.emplace_back(glueTokenId);
+							cands.back().second += tokenLProbs[glueTokenId];
+						}
+						cands.back().first.emplace_back(tokenId);
+						cands.back().second += tokenLProbs[tokenId];
+					}
+				}
+			}
+
+			if (trie.hasMatch(v) || trie.hasSubmatch(v))
+			{
+				for (auto submatcher = nnode->fail(); submatcher; submatcher = submatcher->fail())
+				{
+					v = submatcher->val(trie);
+					if (trie.hasMatch(v))
+					{
+						auto tokenId = v - 1;
+						auto& p = vocabs[tokenId];
+						if (p.length > i) continue;
+						auto& l = pathes[i - p.length];
+						if (!l.first.empty() && (
+							!(p.flags == SwTokenFlag::none && !config.useGlueToken)
+							|| p.flags == SwTokenFlag::glue
+							|| p.flags == SwTokenFlag::chinese
+						))
+						{
+							cands.emplace_back(l);
+							if (p.flags == SwTokenFlag::none)
+							{
+								cands.back().first.emplace_back(glueTokenId);
+								cands.back().second += tokenLProbs[glueTokenId];
+							}
+							cands.back().first.emplace_back(tokenId);
+							cands.back().second += tokenLProbs[tokenId];
+						}
+					}
+				}
+			}
+
+			if (cands.empty())
+			{
+				pathes.emplace_back();
+			}
+			else
+			{
+				size_t bestPath = 0;
+				for (size_t i = 1; i < cands.size(); ++i)
+				{
+					if (cands[i].second > cands[bestPath].second)
+					{
+						bestPath = i;
+					}
+				}
+				pathes.emplace_back(move(cands[bestPath]));
+			}
+			node = nnode;
+		}
+
+		if (pathes.back().first.empty())
+		{
+			out.emplace_back(unkTokenId);
+			return false;
+		}
+		else
+		{
+			out.insert(out.end(), pathes.back().first.begin(), pathes.back().first.end());
+			return true;
+		}
+	}
+
+	using FnTokenizeSubword = decltype(&tokenizeSubword<ArchType::none>);
+
+	struct TokenizeSubwordGetter
+	{
+		template<ptrdiff_t i>
+		struct Wrapper
+		{
+			static constexpr FnTokenizeSubword value = &tokenizeSubword<static_cast<ArchType>(i)>;
+		};
+	};
 }
+
+SwTokenizerBuilder::SwTokenizerBuilder(const Kiwi& _kiwi, const SwTokenizerConfig& _config)
+	: kiwi{ &_kiwi }, config{ _config }
+{
+
+}
+SwTokenizerBuilder::SwTokenizerBuilder(const SwTokenizerBuilder&) = default;
+SwTokenizerBuilder::SwTokenizerBuilder(SwTokenizerBuilder&&) = default;
+SwTokenizerBuilder::~SwTokenizerBuilder() = default;
+SwTokenizerBuilder& SwTokenizerBuilder::operator=(const SwTokenizerBuilder&) = default;
+SwTokenizerBuilder& SwTokenizerBuilder::operator=(SwTokenizerBuilder&&) = default;
+
+void SwTokenizerBuilder::addToken(const char* form, POSTag tag, SwTokenFlag flags, float lprob)
+{
+	tokens.emplace_back(form, tag, flags, lprob);
+}
+
+void SwTokenizerBuilder::addToken(const std::string& form, POSTag tag, SwTokenFlag flags, float lprob)
+{
+	tokens.emplace_back(form, tag, flags, lprob);
+}
+
+SwTokenizer SwTokenizerBuilder::build() const
+{
+	auto bestArch = getSelectedArch(ArchType::default_);
+	SwTokenizer ret{ bestArch };
+	ret.kiwi = kiwi;
+	ret.config = config;
+	vector<const Morpheme*> matchedMorphs;
+
+	utils::ContinuousTrie<utils::TrieNode<kchar_t, uint32_t>> trie{ 1 };
+	size_t offset = 0;
+	ret.swToMorph.resize(tokens.size(), -1);
+	for (auto& t : tokens)
+	{
+		size_t tokenId = &t - tokens.data();
+		auto u16form = utf8To16(t.form);
+		ret.vocabStrPool += u16form;
+		ret.vocabStrPool.push_back('\0');
+		ret.vocabs.emplace_back((const char16_t*)offset, u16form.size(), t.pos, t.flags);
+		ret.tokenLProbs.emplace_back(t.lprob);
+		offset += u16form.size() + 1;
+
+		if (t.pos == POSTag::unknown)
+		{
+			if (t.flags == SwTokenFlag::none)
+			{
+				bool isPunct = config.splitPunct, isChinese = config.splitChinese;
+				foreachU32Chr(u16form, [&](char32_t c)
+				{
+					if (!isTagForPunct(identifySpecialChr(c))) isPunct = false;
+					if (!isChineseChr(c)) isChinese = false;
+				});
+				if (isPunct) ret.vocabs.back().flags = SwTokenFlag::punct;
+				if (isChinese) ret.vocabs.back().flags = SwTokenFlag::chinese;
+			}
+
+			if (t.flags == SwTokenFlag::glue)
+			{
+				ret.specialTokenIds[SwTokenizerConfig::glue] = tokenId;
+				continue;
+			}
+			else if (t.flags == SwTokenFlag::none)
+			{
+				u16form.insert(u16form.begin(), u' ');
+			}
+			trie.build(u16form.begin(), u16form.end(), tokenId + 1);
+		}
+		else
+		{
+			matchedMorphs.clear();
+			kiwi->findMorpheme(matchedMorphs, u16form, config.simpleTag ? POSTag::unknown : t.pos);
+			if (matchedMorphs.empty()) continue;
+			auto rtag = toReprTag(t.pos);
+			for (auto m : matchedMorphs)
+			{
+				if (config.simpleTag && toReprTag(m->tag) != rtag) continue;
+				auto morphId = kiwi->morphToId(m);
+				if (ret.morphToSw.size() <= morphId)
+				{
+					ret.morphToSw.resize(morphId + 1, -1);
+				}
+				ret.morphToSw[morphId] = tokenId;
+			}
+			ret.swToMorph[tokenId] = kiwi->morphToId(matchedMorphs[0]);
+		}
+	}
+
+	for (auto& t : ret.vocabs)
+	{
+		t.form = ret.vocabStrPool.data() + (size_t)t.form;
+	}
+	
+	ret.tokenFallbacks.resize(tokens.size(), -1);
+
+	for (size_t i = 0; i <= SwTokenizerConfig::eos; ++i)
+	{
+		if (config.specialTokens[i].empty())
+		{
+			ret.specialTokenIds[i] = -1;
+		}
+		else
+		{
+			if (any_of(config.specialTokens[i].begin(), config.specialTokens[i].end(), isSpace))
+			{
+				throw Exception{ "Special token shouldn't contain any whitespace characters, but: " + config.specialTokens[i]};
+			}
+			auto u16str = utf8To16(config.specialTokens[i]);
+			auto node = trie.build(u16str.begin(), u16str.end(), 0);
+			if (!node->val) throw Exception{ "Token " + config.specialTokens[i] + " is not found in the vocabulary."};
+			ret.specialTokenIds[i] = node->val - 1;
+		}
+	}
+	
+	for (auto& t : tokens)
+	{
+		size_t tokenId = &t - tokens.data();
+		if (t.pos != POSTag::unknown) continue;
+		if (t.flags != SwTokenFlag::none) continue;
+		auto& v = ret.vocabs[tokenId];
+		auto node = trie.build(v.form, v.form + v.length, tokenId + 1);
+		if (node->val != tokenId + 1)
+		{
+			ret.tokenFallbacks[node->val - 1] = tokenId;
+		}
+	}
+	ret.trie = utils::freezeTrie(move(trie), bestArch);
+	return ret;
+}
+
+SwTokenizer::SwTokenizer(ArchType archType)
+{
+	static tp::Table<FnTokenizeSubword, AvailableArch> table{ TokenizeSubwordGetter{} };
+	dfTokenizeSubword = table[static_cast<ptrdiff_t>(archType)];
+	if (!dfTokenizeSubword) throw Exception{ string{ "Unsupported archType: " } + archToStr(archType) };
+}
+
+SwTokenizer::SwTokenizer(const SwTokenizer&) = default;
+SwTokenizer::SwTokenizer(SwTokenizer&&) = default;
+SwTokenizer::~SwTokenizer() = default;
+SwTokenizer& SwTokenizer::operator=(const SwTokenizer&) = default;
+SwTokenizer& SwTokenizer::operator=(SwTokenizer&&) = default;
 
 vector<uint32_t> SwTokenizer::encode(const string& str, vector<pair<uint32_t, uint32_t>>* offset) const
 {
 	vector<uint32_t> ret;
-	auto tokens = kiwi->analyze(str, Match::allWithNormalizing).first;
+	encode(ret, str, offset);
+	return ret;
+}
+
+void SwTokenizer::encode(std::vector<uint32_t>& ret, const std::string& str, std::vector<std::pair<uint32_t, uint32_t>>* offset) const
+{
+	auto tokens = kiwi->analyze(str, Match::normalizeCoda | Match::zCoda).first;
 	auto* baseMorph = kiwi->idToMorph(0);
+	size_t startPosition = -1, lastPosition = -1;
+	u16string tokenBuf;
+	const auto pushSubwords = [&]()
+	{
+		if (startPosition == -1) return;
+		auto success = reinterpret_cast<FnTokenizeSubword>(dfTokenizeSubword)(
+			config, trie, 
+			vocabs, tokenFallbacks, tokenLProbs,
+			specialTokenIds[SwTokenizerConfig::unk], specialTokenIds[SwTokenizerConfig::glue],
+			tokenBuf,
+			ret
+		);
+		tokenBuf.clear();
+	};
+
 	for (auto& t : tokens)
 	{
 		size_t id = t.morph - baseMorph;
 		// Morpheme
-		if (id < morphToSw.size() && morphToSw[id])
+		if (id < morphToSw.size() && morphToSw[id] != -1)
 		{
+			pushSubwords();
 			ret.emplace_back(morphToSw[id]);
+			startPosition = lastPosition = -1;
 			continue;
 		}
 
-		if (!tokenizeSubword(normalizeHangul(t.str), ret))
+		if (config.splitVerb && isVerbClass(t.morph->tag) && t.morph->complex)
 		{
-			// add Unk
+			for (auto m : t.morph->chunks)
+			{
+
+			}
+			startPosition = lastPosition = -1;
 			continue;
 		}
+
+		if (config.splitEomi && isEClass(t.morph->tag) && t.morph->complex)
+		{
+			for (auto m : t.morph->chunks)
+			{
+
+			}
+			startPosition = lastPosition = -1;
+			continue;
+		}
+
+		if (lastPosition == t.position)
+		{
+			lastPosition = t.position + t.length;
+			if (config.doLowercase) toLower16(t.str.begin(), t.str.end(), back_inserter(tokenBuf));
+			else tokenBuf += t.str;
+		}
+		else
+		{
+			pushSubwords();
+			startPosition = t.position;
+			if (config.doLowercase) toLower16(t.str.begin(), t.str.end(), back_inserter(tokenBuf));
+			else tokenBuf += t.str;
+			lastPosition = t.position + t.length;
+		}
 	}
-	return ret;
+	pushSubwords();
 }
 
 string SwTokenizer::decode(const vector<uint32_t>& ids) const
@@ -162,183 +613,18 @@ string SwTokenizer::decode(const vector<uint32_t>& ids) const
 	for (auto id : ids)
 	{
 		// morpheme
-		if (id < swToMorph.size() && swToMorph[id])
+		if (id < swToMorph.size() && swToMorph[id] != -1)
 		{
 			joiner.add(swToMorph[id]);
 			continue;
 		}
+		
+		// subword
+		auto& v = vocabs[id];
+		bool insertSpace = v.flags == SwTokenFlag::none || v.flags == SwTokenFlag::special;
+		joiner.add(U16StringView{ v.form, v.length }, insertSpace ? POSTag::p : POSTag::unknown);
 	}
 	return joiner.getU8();
-}
-
-inline bool testRepetition(const char16_t* s, size_t l)
-{
-	if (l < 5) return false;
-	for (size_t i = 1; i <= l / 3; ++i)
-	{
-		bool all = true;
-		for (size_t j = 1; j < l / i; ++j)
-		{
-			if (!equal(s, s + i, s + i * j))
-			{
-				all = false;
-				break;
-			}
-		}
-		if (all) return true;
-	}
-	return false;
-}
-
-inline bool isTagForPrefix(POSTag tag)
-{
-	switch (tag)
-	{
-	case POSTag::nng:
-	case POSTag::nnp:
-	case POSTag::nnb:
-	case POSTag::np:
-	case POSTag::nr:
-	case POSTag::mag:
-	case POSTag::maj:
-	case POSTag::mm:
-	case POSTag::xr:
-	case POSTag::xpn:
-	case POSTag::ic:
-	//case POSTag::z_coda:
-		return true;
-	default:
-		return false;
-	}
-}
-
-inline bool isTagForPunct(POSTag tag)
-{
-	switch (tag)
-	{
-	case POSTag::sf:
-	case POSTag::sp:
-	case POSTag::ss:
-	case POSTag::sso:
-	case POSTag::ssc:
-	case POSTag::se:
-	case POSTag::so:
-	case POSTag::sw:
-		return true;
-	default:
-		return false;
-	}
-}
-
-inline POSTag toReprTag(POSTag tag)
-{
-	switch (tag)
-	{
-	case POSTag::nng:
-	case POSTag::nnp:
-	case POSTag::nnb:
-	case POSTag::np:
-	case POSTag::nr:
-	case POSTag::xr:
-		return POSTag::nng;
-	case POSTag::vv:
-	case POSTag::va:
-	case POSTag::vx:
-	case POSTag::vcp:
-	case POSTag::vcn:
-	case POSTag::xsv:
-	case POSTag::xsa:
-		return POSTag::vv;
-	case POSTag::vvi:
-	case POSTag::vai:
-	case POSTag::vxi:
-	case POSTag::xsai:
-		return POSTag::vvi;
-	case POSTag::mm:
-	case POSTag::maj:
-	case POSTag::mag:
-		return POSTag::mag;
-	case POSTag::sf:
-	case POSTag::sp:
-	case POSTag::ss:
-	case POSTag::sso:
-	case POSTag::ssc:
-	case POSTag::se:
-	case POSTag::so:
-	case POSTag::sw:
-		return POSTag::sf;
-	case POSTag::jks:
-	case POSTag::jkc:
-	case POSTag::jkg:
-	case POSTag::jko:
-	case POSTag::jkb:
-	case POSTag::jkv:
-	case POSTag::jkq:
-	case POSTag::jx:
-	case POSTag::jc:
-		return POSTag::jks;
-	case POSTag::ep:
-	case POSTag::ef:
-	case POSTag::ec:
-	case POSTag::etn:
-	case POSTag::etm:
-		return POSTag::ep;
-	}
-	return tag;
-}
-
-inline const char* tagToReprStr(POSTag tag)
-{
-	tag = toReprTag(tag);
-	switch (tag)
-	{
-	case POSTag::nng:
-		return "N";
-	case POSTag::mag:
-		return "M";
-	case POSTag::vv:
-		return "V";
-	case POSTag::vvi:
-		return "V-I";
-	case POSTag::jks:
-		return "J";
-	case POSTag::ep:
-		return "E";
-	case POSTag::xsn:
-		return "XSN";
-	case POSTag::xsm:
-		return "XSM";
-	case POSTag::sf:
-		return "S";
-	case POSTag::z_coda:
-		return "Z";
-	}
-	return nullptr;
-}
-
-inline u16string toUTF16(u16string&& str)
-{
-	return move(str);
-}
-
-inline u16string toUTF16(string&& str)
-{
-	return utf8To16(str);
-}
-
-template<class Fn>
-void foreachWord(const u16string& str, Fn&& fn)
-{
-	for (size_t i = 0; i < str.size(); ++i)
-	{
-		while (i < str.size() && isSpace(str[i])) ++i;
-		size_t s = i;
-		while (i < str.size() && !isSpace(str[i])) ++i;
-		if (s < i)
-		{
-			fn(nonstd::u16string_view{ &str[s], i - s });
-		}
-	}
 }
 
 enum class UnigramSwTrainer::PrefixAvailability : uint8_t
@@ -347,49 +633,6 @@ enum class UnigramSwTrainer::PrefixAvailability : uint8_t
 	available = 1,
 	preserved = 2,
 };
-
-template<class Fn>
-void foreachU32Chr(const u16string& s, Fn&& fn)
-{
-	for (size_t i = 0; i < s.size(); ++i)
-	{
-		if (isHighSurrogate(s[i]))
-		{
-			fn(mergeSurrogate(s[i], s[i + 1]));
-			++i;
-		}
-		else
-		{
-			fn(s[i]);
-		}
-	}
-}
-
-inline set<char32_t> getChrsPreserved(const map<char32_t, uint32_t>& chrCnts, double chrCoverage)
-{
-	size_t totChrCnt = 0;
-	for (auto& p : chrCnts)
-	{
-		totChrCnt += p.second;
-	}
-	totChrCnt *= chrCoverage;
-
-	Vector<pair<char32_t, uint32_t>> sortedChr{ chrCnts.begin(), chrCnts.end() };
-	sort(sortedChr.begin(), sortedChr.end(), [](const pair<char32_t, uint32_t>& a, const pair<char32_t, uint32_t>& b)
-	{
-		return a.second > b.second;
-	});
-
-	set<char32_t> ret;
-	size_t accum = 0;
-	for (auto& p : sortedChr)
-	{
-		ret.emplace(p.first);
-		accum += p.second;
-		if (accum >= totChrCnt) break;
-	}
-	return ret;
-}
 
 UnigramSwTrainer::UnigramSwTrainer(const Kiwi& _kiwi, const SwTokenizerConfig& _config, const UnigramSwTrainerConfig& _trainConfig)
 	: kiwi{ &_kiwi }, config{ _config }, trainConfig{ _trainConfig }
@@ -400,41 +643,6 @@ UnigramSwTrainer::UnigramSwTrainer(UnigramSwTrainer&&) = default;
 UnigramSwTrainer::~UnigramSwTrainer() = default;
 UnigramSwTrainer& UnigramSwTrainer::operator=(const UnigramSwTrainer&) = default;
 UnigramSwTrainer& UnigramSwTrainer::operator=(UnigramSwTrainer&&) = default;
-
-inline const Morpheme* findVerbalSuffix(const Morpheme* morph, const Vector<const Morpheme*>& suffices)
-{
-	auto tag = clearIrregular(morph->tag);
-	auto irreg = isIrregular(morph->tag);
-	if (!(tag == POSTag::vv || tag == POSTag::va)) return nullptr;
-	for (auto s : suffices)
-	{
-		auto stag = clearIrregular(s->tag);
-		if (stag != (tag == POSTag::vv ? POSTag::xsv : POSTag::xsa) || irreg != isIrregular(s->tag)) continue;
-		if (morph->kform->size() <= s->kform->size()) continue;
-		if (equal(morph->kform->end() - s->kform->size(), morph->kform->end(), s->kform->begin()))
-		{
-			return s;
-		}
-	}
-	return nullptr;
-}
-
-inline pair<const Morpheme*, const Morpheme*> findEomiSuffix(const Kiwi* kiwi, const Morpheme* morph, const Vector<const Morpheme*>& suffices)
-{
-	auto tag = morph->tag;
-	if (!(tag == POSTag::ef || tag == POSTag::ec)) return make_pair(nullptr, nullptr);
-	for (auto s : suffices)
-	{
-		if (morph->kform->size() <= s->kform->size()) continue;
-		if (equal(morph->kform->end() - s->kform->size(), morph->kform->end(), s->kform->begin()))
-		{
-			auto base = kiwi->findMorpheme(u16string{ morph->kform->begin(), morph->kform->end() - s->kform->size() }, tag);
-			if (base.empty()) return make_pair(nullptr, nullptr);
-			return make_pair(base[0], s);
-		}
-	}
-	return make_pair(nullptr, nullptr);
-}
 
 void UnigramSwTrainer::addWord(const u16string& str, const Vector<const Morpheme*>& morphs, const Vector<size_t>& boundaries)
 {
@@ -495,24 +703,14 @@ void UnigramSwTrainer::addWord(const u16string& str, const Vector<const Morpheme
 		size_t start = 0;
 		for (size_t i = 0; i < str.size(); ++i)
 		{
+			bool surrogate = isHighSurrogate(str[i]);
 			if (config.splitChinese
-				&& isHighSurrogate(str[i])
-				&& isChineseChr(mergeSurrogate(str[i], str[i + 1])))
+				&& isChineseChr(surrogate ? mergeSurrogate(str[i], str[i + 1]) : str[i]))
 			{
 				if (start < i) emplace(start, i);
-				emplace(i, i + 2);
-				start = i + 2;
+				emplace(i, i + (surrogate ? 2 : 1));
+				start = i + (surrogate ? 2 : 1);
 				++i;
-				continue;
-			}
-
-			if (config.splitChinese
-				&& !isHighSurrogate(str[i])
-				&& isChineseChr(str[i]))
-			{
-				if (start < i) emplace(start, i);
-				emplace(i, i + 1);
-				start = i + 1;
 				continue;
 			}
 
@@ -1327,12 +1525,9 @@ ostream& UnigramSwTrainer::writeVocabs(ostream& os) const
 
 	sort(sortedVocabs.rbegin(), sortedVocabs.rend());
 
-	for (auto p : { 
-		&config.unkToken, &config.clsToken, &config.sepToken, &config.padToken, 
-		&config.maskToken, &config.bosToken, &config.eosToken
-	})
+	for (auto& p : config.specialTokens)
 	{
-		if (!p->empty()) os << *p << '\t' << 0.f << endl;
+		if (!p.empty()) os << p << '\t' << 0.f << endl;
 	}
 
 	for (auto& p : sortedVocabs)
@@ -1354,6 +1549,46 @@ ostream& UnigramSwTrainer::writeVocabs(ostream& os) const
 		}
 	}
 	return os;
+}
+
+SwTokenizer UnigramSwTrainer::build() const
+{
+	SwTokenizerBuilder builder{ *kiwi, config };
+	Vector<pair<float, size_t>> sortedVocabs;
+	for (size_t i = 0; i < prefixLProbs.size(); ++i)
+	{
+		if (!prefixFreqs[i]) continue;
+		sortedVocabs.emplace_back(prefixLProbs[i], i);
+	}
+
+	sort(sortedVocabs.rbegin(), sortedVocabs.rend());
+
+	for (auto& p : config.specialTokens)
+	{
+		if (!p.empty()) builder.addToken(p, POSTag::unknown, SwTokenFlag::special, 0);
+	}
+
+	for (auto& p : sortedVocabs)
+	{
+		if (p.second < knownPrefixSize)
+		{
+			auto m = kiwi->idToMorph(p.second);
+			builder.addToken(utf16To8(joinHangul(m->getForm())), m->tag, SwTokenFlag::none, p.first);
+		}
+		else if (config.useGlueToken && p.second == knownPrefixSize)
+		{
+			builder.addToken({}, POSTag::unknown, SwTokenFlag::glue, p.first);
+		}
+		else if (chrPrefix[p.second][0] == u' ')
+		{
+			builder.addToken(utf16To8(chrPrefix[p.second].substr(1)), POSTag::unknown, SwTokenFlag::none, p.first);
+		}
+		else
+		{
+			builder.addToken(utf16To8(chrPrefix[p.second]), POSTag::unknown, SwTokenFlag::subword, p.first);
+		}
+	}
+	return builder.build();
 }
 
 UnigramSwTrainer::WordCand::WordCand(const Morpheme* _morph, const Morpheme* _suffix)

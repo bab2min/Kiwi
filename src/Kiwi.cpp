@@ -635,7 +635,7 @@ namespace kiwi
 				if (p.back.combineSocket)
 				{
 					// merge <v> <chunk> with only the same socket
-					if (p.back.combineSocket != curMorph->combineSocket || curMorph->chunks.empty())
+					if (p.back.combineSocket != curMorph->combineSocket || (curMorph->chunks.empty() || curMorph->complex))
 					{
 						continue;
 					}
@@ -660,7 +660,7 @@ namespace kiwi
 
 				auto cLmState = p.lmState;
 				Wid lSeq = 0;
-				if (curMorph->combineSocket && curMorph->chunks.empty())
+				if (curMorph->combineSocket && (curMorph->chunks.empty() || curMorph->complex))
 				{
 					lSeq = p.back.wid;
 				}
@@ -1083,7 +1083,7 @@ namespace kiwi
 				tMax = evalPath<LmState>(kw, startNode, node, cache, ownFormList, i, ownFormId, node->form->candidate, false, splitComplex, blocklist);
 				if (all_of(node->form->candidate.begin(), node->form->candidate.end(), [](const Morpheme* m)
 				{
-					return m->combineSocket || !m->chunks.empty();
+					return m->combineSocket || (!m->chunks.empty() && !m->complex);
 				}))
 				{
 					ownFormList.emplace_back(node->form->form);
@@ -1632,20 +1632,25 @@ namespace kiwi
 		return joinHangul(typoPool.begin() + p[0], typoPool.begin() + p[1]);
 	}
 
-	vector<const Morpheme*> Kiwi::findMorpheme(const u16string& s, POSTag tag) const
+	void Kiwi::findMorpheme(vector<const Morpheme*>& ret, const u16string& s, POSTag tag) const
 	{
-		vector<const Morpheme*> ret;
 		auto normalized = normalizeHangul(s);
 		auto form = (*reinterpret_cast<FnFindForm>(dfFindForm))(formTrie, normalized);
-		if (!form) return ret;
+		if (!form) return;
 		for (auto c : form->candidate)
 		{
 			if (c->combineSocket
-				|| (tag != POSTag::unknown 
-				&& clearIrregular(c->tag) != tag))
+				|| (tag != POSTag::unknown
+					&& clearIrregular(c->tag) != tag))
 				continue;
 			ret.emplace_back(c);
 		}
+	}
+
+	vector<const Morpheme*> Kiwi::findMorpheme(const u16string& s, POSTag tag) const
+	{
+		vector<const Morpheme*> ret;
+		findMorpheme(ret, s, tag);
 		return ret;
 	}
 }

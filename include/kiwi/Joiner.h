@@ -104,6 +104,7 @@ namespace kiwi
 			AutoJoiner& operator=(AutoJoiner&&);
 
 			void add(size_t morphemeId);
+			void add(U16StringView form, POSTag tag);
 			void add(const std::u16string& form, POSTag tag, bool inferRegularity = true);
 			void add(const char16_t* form, POSTag tag, bool inferRegularity = true);
 
