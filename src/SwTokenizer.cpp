@@ -741,7 +741,7 @@ void UnigramSwTrainer::addWord(const u16string& str, const Vector<const Morpheme
 
 const Morpheme* UnigramSwTrainer::toReprMorph(const Morpheme* morph)
 {
-	if (!config.simpleTag) return morph;
+	if (!config.simpleTag || !morph) return morph;
 	auto key = make_pair(*morph->kform, toReprTag(morph->tag));
 	return reprMorphMap.emplace(key, morph).first->second;
 }
@@ -764,7 +764,7 @@ size_t UnigramSwTrainer::_addSentences(Feeder&& feeder)
 			if (morphBase[i].complex)
 			{
 				complexMorphemes.emplace(
-					Vector<const Morpheme*>{ morphBase[i].chunks.data(), morphBase[i].chunks.data() + morphBase[i].chunks.size() }, 
+					Vector<const Morpheme*>{ morphBase[i].chunks.begin(), morphBase[i].chunks.end() }, 
 					&morphBase[i]
 				);
 			}
@@ -850,8 +850,8 @@ size_t UnigramSwTrainer::_addSentences(Feeder&& feeder)
 					if (!wordSuffix.count(wid))
 					{
 						Vector<const Morpheme*> submorphs{
-							token.morph->chunks.data(),
-							token.morph->chunks.data() + token.morph->chunks.size()
+							token.morph->chunks.begin(),
+							token.morph->chunks.end()
 						};
 						Vector<int32_t> subids;
 						for (auto m : submorphs)
@@ -868,7 +868,7 @@ size_t UnigramSwTrainer::_addSentences(Feeder&& feeder)
 							}
 						}
 
-						WordCand wc{ token.morph };
+						WordCand wc{ toReprMorph(token.morph) };
 						auto& tokenizations = wc.tokenizations.get();
 						tokenizations.emplace_back();
 						tokenizations.insert_data(subids.begin(), subids.end());
@@ -890,7 +890,7 @@ size_t UnigramSwTrainer::_addSentences(Feeder&& feeder)
 					auto wid = wordMap.emplace(token.str, wordMap.size()).first->second;
 					wordCnts.resize(max(wordCnts.size(), wid + 1));
 					wordCnts[wid]++;
-					WordCand wc{ token.morph, verbSuffix };
+					WordCand wc{ toReprMorph(token.morph), toReprMorph(verbSuffix) };
 					wordSuffix.emplace(wid, move(wc));
 					rsents.add_data(-(int32_t)wid - 1);
 				}
@@ -900,8 +900,8 @@ size_t UnigramSwTrainer::_addSentences(Feeder&& feeder)
 					auto wid = wordMap.emplace(token.str, wordMap.size()).first->second;
 					wordCnts.resize(max(wordCnts.size(), wid + 1));
 					wordCnts[wid]++;
-					WordCand wc{ token.morph, eomiSuffix.second };
-					wc.baseEomi = eomiSuffix.first;
+					WordCand wc{ toReprMorph(token.morph), toReprMorph(eomiSuffix.second) };
+					wc.baseEomi = toReprMorph(eomiSuffix.first);
 					wordSuffix.emplace(wid, move(wc));
 					rsents.add_data(-(int32_t)wid - 1);
 				}
