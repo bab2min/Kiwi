@@ -13,11 +13,22 @@
 #include "SortUtils.hpp"
 #include "serializer.hpp"
 #include "Joiner.hpp"
+#include "LimitedVector.hpp"
 
 using namespace std;
 
 namespace kiwi
 {
+#ifdef KIWI_USE_BTREE
+#ifdef KIWI_USE_MIMALLOC
+	template<typename K, typename V> using BMap = btree::map<K, V, less<K>, mi_stl_allocator<pair<const K, V>>>;
+#else
+	template<typename K, typename V> using BMap = btree::map<K, V, less<K>>;
+#endif
+#else
+	template<typename K, typename V> using BMap = Map<K, V>;
+#endif
+
 	class PathEvaluator
 	{
 	public:
@@ -537,8 +548,8 @@ namespace kiwi
 		return ret;
 	}
 
-	template<class _map, class _key, class _value, class _comp>
-	void emplaceMaxCnt(_map& dest, _key&& key, _value&& value, size_t maxCnt, _comp comparator)
+	template<class Map, class Vector, class Key, class CompareKey, class Value, class Comp>
+	void emplaceMaxCnt(Map& dest, Vector& vector, Key&& key, CompareKey ckey, Value&& value, size_t maxCnt, Comp comparator)
 	{
 		auto p = dest.emplace(std::piecewise_construct, std::forward_as_tuple(key), std::forward_as_tuple());
 		auto itp = p.first;
@@ -549,14 +560,19 @@ namespace kiwi
 
 		if (itp->second.size() < maxCnt)
 		{
-			itp->second.emplace_back(value);
+			itp->second.emplace_back(ckey, vector.size());
+			vector.emplace_back(std::forward<Value>(value));
 			push_heap(itp->second.begin(), itp->second.end(), comparator);
 		}
 		else
 		{
-			pop_heap(itp->second.begin(), itp->second.end(), comparator);
-			if (comparator(value, itp->second.back())) itp->second.back() = value;
-			push_heap(itp->second.begin(), itp->second.end(), comparator);
+			if (comparator(ckey, itp->second.front().first))
+			{
+				pop_heap(itp->second.begin(), itp->second.end(), comparator);
+				itp->second.back().first = ckey;
+				vector[itp->second.back().second] = value;
+				push_heap(itp->second.begin(), itp->second.end(), comparator);
+			}
 		}
 	}
 
@@ -609,7 +625,7 @@ namespace kiwi
 		}
 	};
 
-	template<class LmState, class _Type>
+	template<class LmState, class _Map>
 	void evalTrigram(const LangModel& langMdl, 
 		const Morpheme* morphBase, 
 		const Vector<KString>& ownForms, 
@@ -619,7 +635,8 @@ namespace kiwi
 		const Morpheme* curMorph, 
 		const KGraphNode* node, 
 		const KGraphNode* startNode, 
-		_Type& maxWidLL, 
+		_Map& maxWidLL,
+		Vector<WordLLP<LmState>>& nextPredCands,
 		float ignoreCondScore,
 		float spacePenalty,
 		bool allowedSpaceBetweenChunk
@@ -678,11 +695,14 @@ namespace kiwi
 						candScore += ll;
 					}
 				}
-				emplaceMaxCnt(maxWidLL, lSeq, WordLLP<LmState>{ &morphBase[p.back.wid], candScore, p.accTypoCost + node->typoCost, &p, move(cLmState), p.spState }, 3, 
-					[](const WordLLP<LmState>& a, const WordLLP<LmState>& b) 
-					{ 
-						return a.accScore > b.accScore; 
-					}
+				emplaceMaxCnt(
+					maxWidLL, 
+					nextPredCands,
+					lSeq, 
+					candScore,
+					WordLLP<LmState>{ &morphBase[p.back.wid], candScore, p.accTypoCost + node->typoCost, &p, move(cLmState), p.spState }, 
+					3, 
+					greater<>{}
 				);
 			continueFor:;
 			}
@@ -840,8 +860,11 @@ namespace kiwi
 				condV = curMorph->vowel;
 				condP = curMorph->polar;
 
-				UnorderedMap<Wid, Vector<WordLLP<LmState>>> maxWidLL;
-				evalTrigram(kw->langMdl, kw->morphemes.data(), ownFormList, cache, seq, chSize, curMorph, node, startNode, maxWidLL, ignoreCond ? -10 : 0, kw->spacePenalty, kw->spaceTolerance > 0);
+				thread_local BMap<Wid, utils::LimitedVector<pair<float, uint32_t>, 3>> maxWidLL;
+				thread_local Vector<WordLLP<LmState>> nextPredCands;
+				maxWidLL.clear();
+				nextPredCands.clear();
+				evalTrigram(kw->langMdl, kw->morphemes.data(), ownFormList, cache, seq, chSize, curMorph, node, startNode, maxWidLL, nextPredCands, ignoreCond ? -10 : 0, kw->spacePenalty, kw->spaceTolerance > 0);
 				if (maxWidLL.empty()) continue;
 
 				float estimatedLL = curMorph->userScore + whitespaceDiscount - node->typoCost * kw->typoCostWeight;
@@ -865,8 +888,9 @@ namespace kiwi
 				
 				for (auto& p : maxWidLL)
 				{
-					for (auto& q : p.second)
+					for (auto& qp : p.second)
 					{
+						auto& q = nextPredCands[qp.second];
 						q.accScore += estimatedLL;
 						// 불규칙 활용 형태소 뒤에 모음 어미가 붙는 경우 벌점 부여
 						if (vowelE && isIrregular(q.lastMorpheme->tag))
@@ -919,8 +943,9 @@ namespace kiwi
 
 				for (auto& p : maxWidLL)
 				{
-					for (auto& q : p.second)
+					for (auto& qp : p.second)
 					{
+						auto& q = nextPredCands[qp.second];
 						if (q.accScore <= tMax - kw->cutOffThreshold) continue;
 						nCache.emplace_back(curMorph, q.accScore, q.accTypoCost, q.parent, q.lmState, q.spState);
 						
