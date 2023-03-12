@@ -236,7 +236,12 @@ Vector<KGraphNode> kiwi::splitByTrie(
 	bool zCodaFollowable = false;
 	for (; n < str.size(); ++n)
 	{
-		auto& c = str[n];
+		char16_t c = str[n];
+		char32_t c32 = c;
+		if (isHighSurrogate(c32) && n + 1 < str.size())
+		{
+			c32 = mergeSurrogate(c32, str[n + 1]);
+		}
 
 		{
 			auto m = matchPattern(str.data() + n, str.data() + str.size(), matchOptions);
@@ -301,7 +306,7 @@ Vector<KGraphNode> kiwi::splitByTrie(
 				}
 				branchOut(nonSpaces.size(), n + m.first, true);
 
-				if (appendNewNode(ret, endPosMap, patStart, KString{ &c, m.first }, (uint16_t)(patStart + m.first)))
+				if (appendNewNode(ret, endPosMap, patStart, KString{ &str[n], m.first}, (uint16_t)(patStart + m.first)))
 				{
 					ret.back().form = trie.value((size_t)chrType);
 				}
@@ -318,7 +323,7 @@ Vector<KGraphNode> kiwi::splitByTrie(
 			}
 		}
 
-		chrType = identifySpecialChr(c);
+		chrType = identifySpecialChr(c32);
 
 		if (lastChrType != chrType || lastChrType == POSTag::sso || lastChrType == POSTag::ssc)
 		{
@@ -352,6 +357,12 @@ Vector<KGraphNode> kiwi::splitByTrie(
 		{
 			branchOut(nonSpaces.size(), n);
 			lastSpecialEndPos = nonSpaces.size();
+			goto continueFor;
+		}
+
+		if (isOldHangulToneMark(c))
+		{
+			branchOut(nonSpaces.size(), n);
 			goto continueFor;
 		}
 
@@ -393,6 +404,7 @@ Vector<KGraphNode> kiwi::splitByTrie(
 				else
 				{
 					nonSpaces.emplace_back(n);
+					if (c32 >= 0x10000) nonSpaces.emplace_back(++n);
 					if (chrType != POSTag::max)
 					{
 						lastSpecialEndPos = nonSpaces.size();

@@ -47,6 +47,15 @@ namespace kiwi
 		return utf16To8(nonstd::to_string_view(str));
 	}
 
+	/**
+	* 문자의 타입을 변별한다. 타입에 따라 다음 값을 반환한다.
+	* 
+	* - 공백: POSTag::unknown
+	* - 한글: POSTag::max
+	* - 숫자: POSTag::sn
+	* - 로마자 알파벳: POSTag::sl
+	* 
+	*/
 	POSTag identifySpecialChr(char32_t chr)
 	{
 		if (isSpace(chr)) return POSTag::unknown;
@@ -56,7 +65,11 @@ namespace kiwi
 		if (('A' <= chr && chr <= 'Z') ||
 			('a' <= chr && chr <= 'z'))  return POSTag::sl;
 		if (0xAC00 <= chr && chr < 0xD7A4) return POSTag::max;
-		if (isHangulCoda(chr)) return POSTag::max;
+		if (isOldHangulOnset(chr) 
+			|| isOldHangulVowel(chr) 
+			|| isOldHangulCoda(chr) 
+			|| isOldHangulToneMark(chr)
+		) return POSTag::max;
 		switch (chr)
 		{
 		case '.':

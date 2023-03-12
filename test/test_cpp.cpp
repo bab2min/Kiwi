@@ -121,6 +121,39 @@ TEST(KiwiCpp, SplitComplex)
 	}
 }
 
+TEST(KiwiCpp, OldHangul)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	for (auto& str : {
+		std::u16string{ u"나랏〮말〯ᄊᆞ미〮 듀ᇰ귁에〮 달아〮 문ᄍᆞᆼ와〮로 서르 ᄉᆞᄆᆞᆺ디〮 아니〮ᄒᆞᆯᄊᆡ〮" } ,
+		std::u16string{ u"옛날에 갑ᄅᆈᆼ(甲龍)이라는 사람이 살었어. 이갑ᄅᆈᆼ이라고? 살었는디." },
+	})
+	{
+		auto res = kiwi.analyze(str, Match::allWithNormalizing).first;
+		for (auto& t : res)
+		{
+			if (std::any_of(t.str.begin(), t.str.end(), [](char16_t c)
+			{
+				return isOldHangulOnset(c) || isOldHangulVowel(c) || isOldHangulCoda(c) || isOldHangulToneMark(c);
+			})) EXPECT_TRUE(!isSpecialClass(t.tag));
+			if (isNounClass(t.tag))
+			{
+				auto s = str.substr(t.position, t.length);
+				EXPECT_EQ(t.str, s);
+			}
+		}
+	}
+}
+
+TEST(KiwiCpp, ChineseVsEmoji)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	auto res = kiwi.analyze(u"韓𠀀𠀁𠀂𠀃🔥🤔🙃🐶", Match::allWithNormalizing).first;
+	EXPECT_EQ(res.size(), 2);
+	EXPECT_EQ(res[0].tag, POSTag::sh);
+	EXPECT_EQ(res[1].tag, POSTag::sw);
+}
+
 TEST(KiwiCpp, EmptyToken)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
