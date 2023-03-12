@@ -580,10 +580,10 @@ namespace kiwi
 	struct MInfo
 	{
 		Wid wid;
+		uint16_t ownFormId;
 		uint8_t combineSocket;
-		uint8_t ownFormId;
-		MInfo(Wid _wid = 0, uint8_t _combineSocket = 0, uint8_t _ownFormId = 0)
-			: wid(_wid), combineSocket(_combineSocket), ownFormId(_ownFormId)
+		MInfo(Wid _wid = 0, uint8_t _combineSocket = 0, uint16_t _ownFormId = 0)
+			: wid(_wid), ownFormId(_ownFormId), combineSocket(_combineSocket)
 		{}
 	};
 
