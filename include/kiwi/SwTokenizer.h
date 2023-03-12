@@ -50,8 +50,6 @@ namespace kiwi
 		{
 			unk, cls, sep, pad, mask, bos, eos, glue
 		};
-
-
 		std::array<std::string, eos + 1> specialTokens;
 		size_t multipleUnkTokens = 0;
 		size_t vocabSize = 0;
@@ -203,14 +201,14 @@ namespace kiwi
 		Vector<double> prefixLProbs;
 		Vector<PrefixAvailability> prefixAvailable;
 
-		void addWord(const std::u16string& s, const Vector<const Morpheme*>& morphs, const Vector<size_t>& boundaries);
+		void addWord(const std::u16string& s, const Vector<const Morpheme*>& morphs, const Vector<size_t>& boundaries, bool spacePrefix);
 
 		template<class Feeder>
 		size_t _addSentences(Feeder&& feeder);
 
-		Vector<uint32_t> tokenizeShort(nonstd::u16string_view s) const;
-		Vector<uint32_t> tokenizeShort(nonstd::u16string_view s, const Vector<int32_t>& boundaries) const;
-		std::pair<Vector<uint32_t>, float> tokenizeBest(nonstd::u16string_view s, const Vector<int32_t>* boundaries = nullptr) const;
+		Vector<uint32_t> tokenizeShort(U16StringView s, bool spacePrefix = false) const;
+		Vector<uint32_t> tokenizeShort(U16StringView s, const Vector<int32_t>& boundaries) const;
+		std::pair<Vector<uint32_t>, float> tokenizeBest(U16StringView s, bool spacePrefix = false, const Vector<int32_t>* boundaries = nullptr) const;
 		std::pair<Vector<uint32_t>, float> tokenizeBest(const WordCand& m) const;
 
 		const Morpheme* toReprMorph(const Morpheme* m);

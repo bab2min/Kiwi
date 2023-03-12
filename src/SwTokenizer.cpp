@@ -50,7 +50,8 @@ namespace kiwi
 		case POSTag::xr:
 		case POSTag::xpn:
 		case POSTag::ic:
-			//case POSTag::z_coda:
+		case POSTag::xsm:
+		case POSTag::z_coda:
 			return true;
 		default:
 			return false;
@@ -151,14 +152,23 @@ namespace kiwi
 			return "E";
 		case POSTag::xsn:
 			return "XSN";
-		case POSTag::xsm:
-			return "XSM";
 		case POSTag::sf:
 			return "S";
-		case POSTag::z_coda:
-			return "Z";
 		}
 		return nullptr;
+	}
+
+	inline POSTag reprStrToTag(const string& str)
+	{
+		if (str == "N") return POSTag::nng;
+		if (str == "M") return POSTag::mag;
+		if (str == "V") return POSTag::vv;
+		if (str == "V-I") return POSTag::vvi;
+		if (str == "J") return POSTag::jks;
+		if (str == "E") return POSTag::ep;
+		if (str == "XSN") return POSTag::xsn;
+		if (str == "S") return POSTag::sf;
+		return toPOSTag(utf8To16(str));
 	}
 
 	inline u16string toUTF16(u16string&& str)
@@ -172,7 +182,7 @@ namespace kiwi
 	}
 
 	template<class Fn>
-	void foreachU32Chr(const u16string& s, Fn&& fn)
+	void foreachU32Chr(U16StringView s, Fn&& fn)
 	{
 		for (size_t i = 0; i < s.size(); ++i)
 		{
@@ -258,7 +268,7 @@ namespace kiwi
 		const Vector<float>& tokenLProbs,
 		size_t unkTokenId,
 		size_t glueTokenId,
-		nonstd::u16string_view str,
+		U16StringView str,
 		std::vector<uint32_t>& out
 	)
 	{
@@ -533,8 +543,11 @@ SwTokenizer SwTokenizerBuilder::build() const
 SwTokenizer::SwTokenizer(ArchType archType)
 {
 	static tp::Table<FnTokenizeSubword, AvailableArch> table{ TokenizeSubwordGetter{} };
+	if (archType != ArchType::default_)
+	{
 	dfTokenizeSubword = table[static_cast<ptrdiff_t>(archType)];
 	if (!dfTokenizeSubword) throw Exception{ string{ "Unsupported archType: " } + archToStr(archType) };
+}
 }
 
 SwTokenizer::SwTokenizer(const SwTokenizer&) = default;
@@ -583,9 +596,18 @@ void SwTokenizer::encode(std::vector<uint32_t>& ret, const std::string& str, std
 
 		if (config.splitVerb && isVerbClass(t.morph->tag) && t.morph->complex)
 		{
+			pushSubwords();
 			for (auto m : t.morph->chunks)
 			{
-
+				id = m - baseMorph;
+				if (id < morphToSw.size() && morphToSw[id] != -1)
+				{
+					ret.emplace_back(morphToSw[id]);
+			}
+				else
+				{
+					// to do
+				}
 			}
 			startPosition = lastPosition = -1;
 			continue;
@@ -593,9 +615,18 @@ void SwTokenizer::encode(std::vector<uint32_t>& ret, const std::string& str, std
 
 		if (config.splitEomi && isEClass(t.morph->tag) && t.morph->complex)
 		{
+			pushSubwords();
 			for (auto m : t.morph->chunks)
 			{
-
+				id = m - baseMorph;
+				if (id < morphToSw.size() && morphToSw[id] != -1)
+				{
+					ret.emplace_back(morphToSw[id]);
+			}
+				else
+				{
+					// to do
+				}
 			}
 			startPosition = lastPosition = -1;
 			continue;
@@ -656,13 +687,17 @@ UnigramSwTrainer::~UnigramSwTrainer() = default;
 UnigramSwTrainer& UnigramSwTrainer::operator=(const UnigramSwTrainer&) = default;
 UnigramSwTrainer& UnigramSwTrainer::operator=(UnigramSwTrainer&&) = default;
 
-void UnigramSwTrainer::addWord(const u16string& str, const Vector<const Morpheme*>& morphs, const Vector<size_t>& boundaries)
+void UnigramSwTrainer::addWord(const u16string& str, const Vector<const Morpheme*>& morphs, const Vector<size_t>& boundaries, bool spacePrefix)
 {
 	auto& rsents = sents.get();
 	
-	const auto emplace = [&](size_t s, size_t e, const Morpheme* morph = nullptr, const Vector<size_t>* bounds = nullptr)
+	const auto emplace = [&](size_t s, size_t e, bool spacePrefix, const Morpheme* morph = nullptr, const Vector<size_t>* bounds = nullptr)
 	{
-		auto wid = wordMap.emplace(str.substr(s, e - s), wordMap.size()).first->second;
+		u16string sstr;
+		sstr.reserve((spacePrefix ? 1 : 0) + e - s);
+		if (spacePrefix) sstr.push_back(u' ');
+		sstr.insert(sstr.end(), str.begin() + s, str.begin() + e);
+		auto wid = wordMap.emplace(sstr, wordMap.size()).first->second;
 		wordCnts.resize(max(wordCnts.size(), wid + 1));
 		wordCnts[wid]++;
 		rsents.add_data(-(int32_t)wid - 1);
@@ -673,11 +708,14 @@ void UnigramSwTrainer::addWord(const u16string& str, const Vector<const Morpheme
 			tokenizations.emplace_back();
 			tokenizations.add_data(-(int32_t)wid - 1);
 			tokenizations.emplace_back();
+			bool first = false;
 			for (auto m : morph->chunks)
 			{
 				if (isTagForPrefix(m->tag))
 				{
-					auto wid = wordMap.emplace(joinHangul(*m->kform), wordMap.size()).first->second;
+					auto s = joinHangul(*m->kform);
+					if (first) s.insert(s.begin(), u' ');
+					auto wid = wordMap.emplace(move(s), wordMap.size()).first->second;
 					wordCnts.resize(max(wordCnts.size(), wid + 1));
 					tokenizations.add_data(-(int32_t)wid - 1);
 				}
@@ -685,6 +723,7 @@ void UnigramSwTrainer::addWord(const u16string& str, const Vector<const Morpheme
 				{
 					tokenizations.add_data(kiwi->morphToId(toReprMorph(m)));
 				}
+				first = false;
 			}
 			wordSuffix.emplace(wid, move(wc));
 		}
@@ -704,11 +743,11 @@ void UnigramSwTrainer::addWord(const u16string& str, const Vector<const Morpheme
 
 	if (morphs.size() == 1 && morphs[0]->complex)
 	{
-		emplace(0, str.size(), morphs[0]);
+		emplace(0, str.size(), spacePrefix, morphs[0]);
 	}
 	else if (config.useGlueToken && boundaries.size() > 1 && all_of(str.begin(), str.end(), isHangulSyllable))
 	{
-		emplace(0, str.size(), nullptr, &boundaries);
+		emplace(0, str.size(), spacePrefix, nullptr, &boundaries);
 	}
 	else
 	{
@@ -719,30 +758,29 @@ void UnigramSwTrainer::addWord(const u16string& str, const Vector<const Morpheme
 			if (config.splitChinese
 				&& isChineseChr(surrogate ? mergeSurrogate(str[i], str[i + 1]) : str[i]))
 			{
-				if (start < i) emplace(start, i);
-				emplace(i, i + (surrogate ? 2 : 1));
+				if (start < i) emplace(start, i, start == 0 ? spacePrefix : false);
+				emplace(i, i + (surrogate ? 2 : 1), true);
 				start = i + (surrogate ? 2 : 1);
-				++i;
+				i += (surrogate ? 1 : 0);
 				continue;
 			}
 
 			if (config.splitPunct
 				&& isTagForPunct(identifySpecialChr(str[i])))
 			{
-				if (start < i) emplace(start, i);
-				emplace(i, i + 1);
+				if (start < i) emplace(start, i, start == 0 ? spacePrefix : false);
+				emplace(i, i + 1, true);
 				start = i + 1;
 				continue;
 			}
 		}
-		if (start < str.size()) emplace(start, str.size());
+		if (start < str.size()) emplace(start, str.size(), start == 0 ? spacePrefix : false);
 	}
 }
 
 const Morpheme* UnigramSwTrainer::toReprMorph(const Morpheme* morph)
 {
-	if (!config.simpleTag || !morph) return morph;
-	auto key = make_pair(*morph->kform, toReprTag(morph->tag));
+	auto key = make_pair(*morph->kform, config.simpleTag ? toReprTag(morph->tag) : morph->tag);
 	return reprMorphMap.emplace(key, morph).first->second;
 }
 
@@ -806,12 +844,19 @@ size_t UnigramSwTrainer::_addSentences(Feeder&& feeder)
 		u16string contToken;
 		Vector<const Morpheme*> contMorphs;
 		Vector<size_t> contBoundaries;
+		bool spacePrefix = false;
 		rsents.emplace_back();
 		for (auto& token : res.first.first)
 		{
 			if ((isTagForPrefix(token.tag) || !token.morph->kform || token.morph->kform->empty()) 
 				&& lastTokenEnd == token.position)
 			{
+				if (contToken.empty())
+				{
+					spacePrefix = false;
+					if (config.splitPunct && isTagForPunct(token.tag)) spacePrefix = true;
+					if (config.splitChinese && token.tag == POSTag::sh) spacePrefix = true;
+				}
 				if (config.doLowercase) toLower16(token.str.begin(), token.str.end(), back_inserter(contToken));
 				else contToken += token.str;
 				contMorphs.emplace_back(token.morph);
@@ -822,7 +867,7 @@ size_t UnigramSwTrainer::_addSentences(Feeder&& feeder)
 
 			if (!contToken.empty())
 			{
-				addWord(contToken, contMorphs, contBoundaries);
+				addWord(contToken, contMorphs, contBoundaries, spacePrefix);
 				contToken.clear();
 				contMorphs.clear();
 				contBoundaries.clear();
@@ -831,6 +876,9 @@ size_t UnigramSwTrainer::_addSentences(Feeder&& feeder)
 
 			if (isTagForPrefix(token.tag) || !token.morph->kform || token.morph->kform->empty())
 			{
+				spacePrefix = lastTokenEnd != token.position && !isOldHangulCoda(token.str[0]) && !isOldHangulVowel(token.str[0]);
+				if (config.splitPunct && isTagForPunct(token.tag)) spacePrefix = true;
+				if (config.splitChinese && token.tag == POSTag::sh) spacePrefix = true;
 				if (config.doLowercase) toLower16(token.str.begin(), token.str.end(), back_inserter(contToken));
 				else contToken += token.str;
 				contMorphs.emplace_back(token.morph);
@@ -843,6 +891,7 @@ size_t UnigramSwTrainer::_addSentences(Feeder&& feeder)
 				auto eomiSuffix = findEomiSuffix(kiwi, token.morph, eomiSuffices);
 				if (config.splitVerb && token.morph->complex)
 				{
+					token.str.insert(token.str.begin(), u' ');
 					token.str.push_back(u'\x00'); // add suffix for distinguishing from normal words
 					auto wid = wordMap.emplace(token.str, wordMap.size()).first->second;
 					wordCnts.resize(max(wordCnts.size(), wid + 1));
@@ -854,11 +903,14 @@ size_t UnigramSwTrainer::_addSentences(Feeder&& feeder)
 							token.morph->chunks.end()
 						};
 						Vector<int32_t> subids;
+						bool first = true;
 						for (auto m : submorphs)
 						{
 							if (isTagForPrefix(m->tag))
 							{
-								auto wid = wordMap.emplace(joinHangul(*m->kform), wordMap.size()).first->second;
+								auto s = joinHangul(*m->kform);
+								if (first) s.insert(s.begin(), u' ');
+								auto wid = wordMap.emplace(move(s), wordMap.size()).first->second;
 								wordCnts.resize(max(wordCnts.size(), wid + 1));
 								subids.emplace_back(-(int32_t)wid - 1);
 							}
@@ -866,6 +918,7 @@ size_t UnigramSwTrainer::_addSentences(Feeder&& feeder)
 							{
 								subids.emplace_back(kiwi->morphToId(toReprMorph(m)));
 							}
+							first = false;
 						}
 
 						WordCand wc{ toReprMorph(token.morph) };
@@ -886,6 +939,7 @@ size_t UnigramSwTrainer::_addSentences(Feeder&& feeder)
 				}
 				else if (config.splitVerb && (verbSuffix = findVerbalSuffix(token.morph, verbalSuffices)))
 				{
+					token.str.insert(token.str.begin(), u' ');
 					token.str.push_back(u'\x00'); // add suffix for distinguishing from normal words
 					auto wid = wordMap.emplace(token.str, wordMap.size()).first->second;
 					wordCnts.resize(max(wordCnts.size(), wid + 1));
@@ -909,12 +963,13 @@ size_t UnigramSwTrainer::_addSentences(Feeder&& feeder)
 				{
 					rsents.add_data(kiwi->morphToId(toReprMorph(token.morph)));
 				}
+				lastTokenEnd = token.position + token.length;
 			}
 		}
 		
 		if (!contToken.empty())
 		{
-			addWord(contToken, contMorphs, contBoundaries);
+			addWord(contToken, contMorphs, contBoundaries, spacePrefix);
 		}
 		addedSentences++;
 	};
@@ -967,7 +1022,9 @@ float UnigramSwTrainer::buildSubwordVocabs(const size_t minCnt, const size_t max
 		size_t chrLength = 0;
 		for (auto& p : wordMap)
 		{
-			foreachU32Chr(p.first, [&, i = 0](char32_t c) mutable
+			U16StringView s{ p.first };
+			if (!s.empty() && s[0] == u' ') s = s.substr(1);
+			foreachU32Chr(s, [&, i = 0](char32_t c) mutable
 			{
 				chrCnts[c]++;
 				if (i++ == 0) prefixChrCnts[c]++;
@@ -980,10 +1037,12 @@ float UnigramSwTrainer::buildSubwordVocabs(const size_t minCnt, const size_t max
 
 		for (auto& p : wordMap)
 		{
-			if (p.first.size() <= 1) continue;
+			U16StringView s{ p.first };
+			if (!s.empty() && s[0] == u' ') s = s.substr(1);
+			if (s.size() <= 1) continue;
 			for (size_t i = 0; i < wordCnts[p.second]; ++i)
 			{
-				allTexts.insert(allTexts.end(), p.first.rbegin(), p.first.rend());
+				allTexts.insert(allTexts.end(), s.rbegin(), s.rend());
 				allTexts.push_back(' ');
 			}
 		}
@@ -1147,12 +1206,18 @@ float UnigramSwTrainer::buildSubwordVocabs(const size_t minCnt, const size_t max
 	return updateProb(true);
 }
 
-Vector<uint32_t> UnigramSwTrainer::tokenizeShort(nonstd::u16string_view s) const
+Vector<uint32_t> UnigramSwTrainer::tokenizeShort(U16StringView s, bool spacePrefix) const
 {
 	RaggedVector<uint32_t> pathes;
 	Vector<Vector<uint32_t>> cands;
 	auto node = chrTrie.root();
-	node = node->template nextOpt<ArchType::none>(chrTrie, u' ');
+	if (s[0] == u' ')
+	{
+		spacePrefix = true;
+		s = s.substr(1);
+	}
+
+	if (spacePrefix) node = node->template nextOpt<ArchType::none>(chrTrie, u' ');
 	for (size_t i = 0; i < s.size(); ++i)
 	{
 		pathes.emplace_back();
@@ -1168,7 +1233,7 @@ Vector<uint32_t> UnigramSwTrainer::tokenizeShort(nonstd::u16string_view s) const
 		if (chrTrie.hasMatch(prefixId))
 		{
 			auto& p = chrPrefix[prefixId];
-			if (p[0] == u' ' && p.size() == i + 2)
+			if (spacePrefix ? (p[0] == u' ' && p.size() == i + 2) : p.size() == i + 1)
 			{
 				pathes.add_data(prefixId);
 				node = nnode;
@@ -1214,10 +1279,17 @@ Vector<uint32_t> UnigramSwTrainer::tokenizeShort(nonstd::u16string_view s) const
 	return ret;
 }
 
-Vector<uint32_t> UnigramSwTrainer::tokenizeShort(nonstd::u16string_view s, const Vector<int32_t>& boundaries) const
+Vector<uint32_t> UnigramSwTrainer::tokenizeShort(U16StringView s, const Vector<int32_t>& boundaries) const
 {
 	Vector<uint32_t> ret;
 	size_t last = 0;
+	bool spacePrefix = false;
+	if (s[0] == u' ')
+	{
+		spacePrefix = true;
+		s = s.substr(1);
+	}
+
 	for (auto b : boundaries)
 	{
 		if (!ret.empty())
@@ -1225,18 +1297,24 @@ Vector<uint32_t> UnigramSwTrainer::tokenizeShort(nonstd::u16string_view s, const
 			ret.emplace_back(knownPrefixSize);
 		}
 
-		auto sub = tokenizeShort(s.substr(last, b - last));
+		auto sub = tokenizeShort(s.substr(last, b - last), last == 0 ? spacePrefix : false);
 		ret.insert(ret.end(), sub.begin(), sub.end());
 		last = b;
 	}
 	return ret;
 }
 
-pair<Vector<uint32_t>, float> UnigramSwTrainer::tokenizeBest(nonstd::u16string_view s, const Vector<int32_t>* boundaries) const
+pair<Vector<uint32_t>, float> UnigramSwTrainer::tokenizeBest(U16StringView s, bool spacePrefix, const Vector<int32_t>* boundaries) const
 {
 	Vector<pair<Vector<uint32_t>, float>> pathes, cands;
 	auto node = chrTrie.root();
-	node = node->template nextOpt<ArchType::none>(chrTrie, u' ');
+	if (s[0] == u' ')
+	{
+		spacePrefix = true;
+		s = s.substr(1);
+	}
+
+	if (spacePrefix) node = node->template nextOpt<ArchType::none>(chrTrie, u' ');
 	for (size_t i = 0; i < s.size(); ++i)
 	{
 		auto nnode = node->template nextOpt<ArchType::none>(chrTrie, s[i]);
@@ -1252,7 +1330,7 @@ pair<Vector<uint32_t>, float> UnigramSwTrainer::tokenizeBest(nonstd::u16string_v
 		{
 			auto& p = chrPrefix[prefixId];
 			const auto available = prefixId < knownPrefixSize || prefixAvailable[prefixId - knownPrefixSize] != PrefixAvailability::deleted;
-			if (p[0] == u' ' && p.size() == i + 2)
+			if (spacePrefix ? (p[0] == u' ' && p.size() == i + 2) : p.size() == i + 1)
 			{
 				if (available)
 				{
@@ -1404,7 +1482,7 @@ pair<Vector<uint32_t>, float> UnigramSwTrainer::tokenizeBest(const WordCand& m) 
 	else
 	{
 		auto prefix = joinHangul(m.morph->kform->begin(), m.morph->kform->end() - m.suffix->kform->size());
-		split = tokenizeBest(prefix);
+		split = tokenizeBest(prefix, true);
 		if (!split.first.empty())
 		{
 			auto id = kiwi->morphToId(m.suffix);
@@ -1506,7 +1584,7 @@ void UnigramSwTrainer::updateTokenization()
 		}
 		else if (wordSuffixIt->second.hasBoundaries)
 		{
-			wordBestTokenizations[p.second] = tokenizeBest(p.first, &wordSuffixIt->second.tokenizations.get().raw()).first;
+			wordBestTokenizations[p.second] = tokenizeBest(p.first, false, &wordSuffixIt->second.tokenizations.get().raw()).first;
 		}
 		else
 		{
@@ -1521,7 +1599,9 @@ vector<u16string> UnigramSwTrainer::getUnkExamples() const
 	for (auto& p : wordMap)
 	{
 		if (!wordBestTokenizations[p.second].empty()) continue;
-		ret.emplace_back(p.first);
+		U16StringView s{ p.first };
+		if (!s.empty() && s[0] == u' ') s = s.substr(1);
+		ret.emplace_back(s);
 	}
 	return ret;
 }
@@ -1589,7 +1669,7 @@ SwTokenizer UnigramSwTrainer::build() const
 		}
 		else if (config.useGlueToken && p.second == knownPrefixSize)
 		{
-			builder.addToken({}, POSTag::unknown, SwTokenFlag::glue, p.first);
+			builder.addToken("", POSTag::unknown, SwTokenFlag::glue, p.first);
 		}
 		else if (chrPrefix[p.second][0] == u' ')
 		{

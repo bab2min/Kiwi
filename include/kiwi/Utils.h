@@ -49,6 +49,26 @@ namespace kiwi
 		return 0x11A8 <= chr && chr < (0x11A7 + 28);
 	}
 
+	inline bool isOldHangulOnset(char16_t chr)
+	{
+		return (0x1100 <= chr && chr < 0x1160) || (0xA960 <= chr && chr < 0xA980);
+	}
+
+	inline bool isOldHangulVowel(char16_t chr)
+	{
+		return (0x1160 <= chr && chr < 0x11A8) || (0xD7B0 <= chr && chr < 0xD7CB);
+	}
+
+	inline bool isOldHangulCoda(char16_t chr)
+	{
+		return (0x11A8 <= chr && chr < 0x1200) || (0xD7CB <= chr && chr < 0xD800);
+	}
+
+	inline bool isOldHangulToneMark(char16_t chr)
+	{
+		return 0x302E <= chr && chr < 0x3030;
+	}
+
 	inline std::ostream& operator <<(std::ostream& os, const KString& str)
 	{
 		return os << utf16To8({ str.begin(), str.end() });

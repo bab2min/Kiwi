@@ -22,22 +22,6 @@ bool kiwi::isVerbClass(POSTag tag)
 	return find(verbs.begin(), verbs.end(), clearIrregular(tag)) != verbs.end();
 }
 
-bool kiwi::isEClass(POSTag tag)
-{
-	return POSTag::ep <= tag && tag <= POSTag::etm;
-}
-
-bool kiwi::isJClass(POSTag tag)
-{
-	return POSTag::jks <= tag && tag <= POSTag::jc;
-}
-
-bool kiwi::isSuffix(POSTag tag)
-{
-	tag = clearIrregular(tag);
-	return POSTag::xsn <= tag && tag <= POSTag::xsa;
-}
-
 namespace kiwi
 {
 	inline bool isAllowedSeq(POSTag left, POSTag right)
