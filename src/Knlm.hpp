@@ -350,6 +350,7 @@ namespace kiwi
 					auto* node = &node_data[node_idx];
 					auto* keys = &key_data[node->next_offset];
 					auto* values = &value_data[node->next_offset];
+					PREFETCH_T0(node + node->lower);
 					if (node_idx == 0)
 					{
 						v = all_value_data[next];
@@ -378,6 +379,7 @@ namespace kiwi
 						{
 							acc += gamma_data[node_idx];
 							node_idx += node->lower;
+							PREFETCH_T0(&key_data[node_data[node_idx].next_offset]);
 							continue;
 						}
 					}
