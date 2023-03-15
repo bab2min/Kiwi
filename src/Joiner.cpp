@@ -18,7 +18,7 @@ namespace kiwi
 		{
 			if (r == POSTag::p) return true; // forced space insertion
 			if (l == r && (POSTag::sf <= l && l <= POSTag::sn)) return true;
-			if (r == POSTag::vcp || r == POSTag::xsa || r == POSTag::xsai || r == POSTag::xsv || r == POSTag::xsn) return false;
+			if (r == POSTag::vcp || r == POSTag::xsa || r == POSTag::xsai || r == POSTag::xsv || r == POSTag::xsn) return isJClass(l);
 			if (l == POSTag::xpn || l == POSTag::so || l == POSTag::ss || l == POSTag::sw) return false;
 			if (l == POSTag::sn && r == POSTag::nnb) return false;
 			if (!(l == POSTag::sn || l == POSTag::sl)
@@ -137,6 +137,8 @@ namespace kiwi
 						}
 						normForm = bestNormForm;
 					}
+					// 어미 뒤에 보조사 '요'가 오는 경우, '요'->'이요'로 치환금지
+					if (isEClass(lastTag) && tag == POSTag::jx && normForm[0] == u'이') normForm.erase(normForm.begin());
 				}
 
 				// 대명사가 아닌 다른 품사 뒤에 서술격 조사가 오는 경우 생략 금지

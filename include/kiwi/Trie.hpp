@@ -394,6 +394,12 @@ namespace kiwi
 				return nodes[0].build(first, last, std::forward<Value>(val), [&]() { return newNode(); });
 			}
 
+			template<class Iter>
+			Node* find(Iter first, Iter last)
+			{
+				return nodes[0].findNode(first, last);
+			}
+
 			template<class Cont>
 			struct CacheStore
 			{
