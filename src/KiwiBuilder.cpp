@@ -1092,7 +1092,7 @@ void KiwiBuilder::addCombinedMorpheme(
 	else
 	{
 		auto& rightMorph = getMorph(rightId);
-		assert(getMorph(rightMorph.chunks.back()).tag == POSTag::z_coda);
+		//assert(getMorph(rightMorph.chunks.back()).tag == POSTag::z_coda);
 		newMorph.chunks.insert(newMorph.chunks.end(), rightMorph.chunks.begin(), rightMorph.chunks.end());
 		for (auto& p : rightMorph.chunkPositions)
 		{

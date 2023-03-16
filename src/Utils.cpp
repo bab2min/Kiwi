@@ -48,12 +48,12 @@ namespace kiwi
 	}
 
 	/**
-	* ë¬¸ìì˜ íƒ€ì…ì„ ë³€ë³„í•œë‹¤. íƒ€ì…ì— ë”°ë¼ ë‹¤ìŒ ê°’ì„ ë°˜í™˜í•œë‹¤.
+	* ¹®ÀÚÀÇ Å¸ÀÔÀ» º¯º°ÇÑ´Ù. Å¸ÀÔ¿¡ µû¶ó ´ÙÀ½ °ªÀ» ¹İÈ¯ÇÑ´Ù.
 	* 
-	* - ê³µë°±: POSTag::unknown
-	* - í•œê¸€: POSTag::max
-	* - ìˆ«ì: POSTag::sn
-	* - ë¡œë§ˆì ì•ŒíŒŒë²³: POSTag::sl
+	* - °ø¹é: POSTag::unknown
+	* - ÇÑ±Û: POSTag::max
+	* - ¼ıÀÚ: POSTag::sn
+	* - ·Î¸¶ÀÚ ¾ËÆÄºª: POSTag::sl
 	* 
 	*/
 	POSTag identifySpecialChr(char32_t chr)
