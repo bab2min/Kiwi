@@ -116,7 +116,7 @@
 ᆷ	ETN	27024	vocalic
 그런	MM	26923
 알	VV	26849
-어요	EF	26693
+어요	EF	26693	complex 어/EF 요/JX 0112
 또	MAG	26669
 더	MAG	26454
 오	VV	25242
@@ -315,7 +315,7 @@
 음	IC	9462
 으나	EC	9441	non_vowel	=나
 너	NP	9417
-아요	EF	9407
+아요	EF	9407	complex 아/EF 요/JX 0112
 같이	MAG	9402	complex 같/VA 이/XSM 0112
 이번	NNG	9388
 에요	EF	9372
@@ -518,7 +518,7 @@
 중심	NNG	5597
 존재	NNG	5575
 째	XSN	5572
-지요	EF	5555
+지요	EF	5555	complex 지/EF 요/JX 0112
 관심	NNG	5552
 방	NNG	5541
 론	XSN	5525
@@ -1166,7 +1166,7 @@
 도입	NNG	2456
 지속	NNG	2456
 늘	MAG	2455
-잖아요	EF	2452
+잖아요	EF	2452	complex 잖아/EF 요/JX 0223
 셈	NNB	2452
 눈물	NNG	2451
 합의	NNG	2449
@@ -1353,7 +1353,7 @@
 구하	VV	2080
 나아가	VV	2079
 상	NNG	2079
-거든요	EF	2075
+거든요	EF	2075	complex 거든/EF 요/JX 0223
 첫째	NR	2070
 키우	VV	2063
 불안	NNG	2062
@@ -1542,11 +1542,11 @@
 마리	NNB	1760
 최	NNP	1760
 맛있	VA	1759	complex 맛/NNG 있/VA 0112
-ᆯ까요	EF	1756	vocalic
+ᆯ까요	EF	1756	vocalic	complex ᆯ까/EF 요/JX 0223
 방침	NNG	1756
 근본	NNG	1754
 장기	NNG	1754
-애	EF	1754
+애	EF	1754	=어
 고	XPN	1753
 가득	MAG	1753
 주도	NNG	1752
@@ -1603,7 +1603,7 @@
 특수	NNG	1691
 여론	NNG	1690
 요인	NNG	1688
-네요	EF	1687
+네요	EF	1687	complex 네/EF 요/JX 0112
 특정	NNG	1687
 들	VX	1687
 사전	NNG	1687
@@ -1615,7 +1615,7 @@
 커다랗	VA-I	1682
 가져오	VV	1681	complex 가지/VV 어/EC 오/VX 021223
 가끔	MAG	1680
-구요	EF	1677
+구요	EF	1677	complex 구/EF 요/JX 0112
 랑	JKB	1676	vowel	0.9939722724532851	==이랑
 충분히	MAG	1676	complex 충분/XR 히/XSM 0223
 건축	NNG	1676
@@ -2066,7 +2066,7 @@
 자르	VV	1248
 광주	NNP	1248
 박근혜	NNP	1246
-나요	EF	1245
+나요	EF	1245	complex 나/EF 요/JX 0112
 혼란	NNG	1245
 무겁	VA-I	1245
 주가	NNG	1244
@@ -2080,7 +2080,7 @@
 구입	NNG	1238
 수학	NNG	1237
 야당	NNG	1237
-군요	EF	1235
+군요	EF	1235	complex 군/EF 요/JX 0112
 당연히	MAG	1235	complex 당연/XR 히/XSM 0223
 위협	NNG	1235
 식당	NNG	1235
@@ -2292,7 +2292,7 @@
 감추	VV	1097
 경계	NNG	1096
 관찰	NNG	1095
-어요	EC	1095
+어요	EC	1095	complex 어/EC 요/JX 0112
 요	MM	1094
 퍼지	VV	1094
 끝내	VV	1094
@@ -2382,7 +2382,7 @@
 안보	NNG	1044
 아아	IC	1042
 노	NNP	1041
-애요	EF	1038
+애요	EF	1038	=어요	complex 애/EF 요/JX 0112
 팬	NNG	1037
 온갖	MM	1037
 거듭	MAG	1037
@@ -3145,7 +3145,7 @@
 따라가	VV	730	complex 따르/VV 어/EC 가/VX 021223
 잔뜩	MAG	730
 남한	NNP	730
-는데요	EF	730	non_adj
+는데요	EF	730	non_adj	complex 는데/EF 요/JX 0223
 먹	VX	729
 치열	NNG	728
 투자자	NNG	728
@@ -3567,8 +3567,8 @@
 승용차	NNG	627
 정말로	MAG	626	complex 정말/NNG 로/XSM 0223
 향후	NNG	626
-을까요	EF	625	non_vowel	==ᆯ까요
-ᆯ게요	EF	625	vocalic
+을까요	EF	625	non_vowel	==ᆯ까요	complex 을까/EF 요/JX 0223
+ᆯ게요	EF	625	vocalic	complex ᆯ게/EF 요/JX 0223
 계열	NNG	625
 당황	NNG	625
 병석이	NNP	625
@@ -3657,7 +3657,7 @@
 극히	MAG	604	complex 극/NNG 히/XSM 0112
 감수	NNG	604
 이사회	NNG	604
-더군요	EF	604
+더군요	EF	604	complex 더군/EF 요/JX 0223
 세	VA	603
 제법	MAG	603
 발효	NNG	602
@@ -4042,7 +4042,7 @@
 우울	NNG	521
 피로	NNG	521
 예고	NNG	521
-ᆫ데요	EF	520	vocalic
+ᆫ데요	EF	520	vocalic	complex ᆫ데/EF 요/JX 0223
 역설	NNG	520
 지각	NNG	520
 가능	XR	520
@@ -4262,7 +4262,7 @@
 칸	NNG	484
 그늘	NNG	484
 둥글	VA	484
-ᆫ가요	EF	484	vocalic
+ᆫ가요	EF	484	vocalic	complex ᆫ가/EF 요/JX 0223
 건석	NNP	484
 얇	VA	483
 스마트폰	NNG	483
@@ -4299,14 +4299,14 @@
 황	NNP	479
 생리	NNG	479
 분업	NNG	479
-대요	EF	478
+대요	EF	478	complex 대/EF 요/JX 0112
 취직	NNG	478
 발상	NNG	478
 무상	NNG	478
 턱	NNG	478
 친척	NNG	478
 미술관	NNG	478
-아요	EC	478
+아요	EC	478	complex 아/EC 요/JX 0112
 원천	NNG	477
 외우	VV	477
 명단	NNG	477
@@ -4756,7 +4756,7 @@
 점포	NNG	415
 모	MM	415
 주석	NNG	415
-니까요	EF	415	vocalic
+니까요	EF	415	vocalic	complex 니까/EF 요/JX 0223
 지극히	MAG	415	complex 지극/XR 히/XSM 0223
 파랗	VA-I	414
 권	NNG	414
@@ -5090,7 +5090,7 @@
 정확	XR	377
 동경	NNP	376
 최순실	NNP	376
-으니까요	EF	376	non_vowel	==니까요
+으니까요	EF	376	non_vowel	==니까요	complex 으니까/EF 요/JX 0334
 힘쓰	VV	376
 총괄	NNG	376
 반전	NNG	376
@@ -5147,7 +5147,7 @@
 신인	NNG	370
 재원	NNG	370
 바이러스	NNG	370
-더라구요	EF	370
+더라구요	EF	370	complex 더라구/EF 요/JX 0334
 비결	NNG	369
 다구	EF	369	=다고
 대왕	NNG	369
@@ -6211,7 +6211,7 @@
 규혁	NNP	280
 자립	NNG	279
 멸치	NNG	279
-는군요	EF	279	non_adj
+는군요	EF	279	non_adj	complex 는군/EF 요/JX 0223
 만주	NNP	279
 되돌아가	VV	279	complex 되돌/VV 어/EC 가/VX 022334
 지구촌	NNG	279
@@ -6494,7 +6494,7 @@
 맏	XPN	262
 본	MM	262
 깔끔	XR	262
-고요	EF	262
+고요	EF	262	complex 고/EF 요/JX 0112
 국무총리	NNG	261
 창구	NNG	261
 기미	NNG	261
@@ -6860,7 +6860,7 @@
 쌍둥이	NNG	241
 자락	NNG	241
 사로잡	VV-R	240
-예요	EF	240
+예요	EF	240	=에요
 기각	NNG	240
 술잔	NNG	240
 타이틀	NNG	240
@@ -6871,7 +6871,7 @@
 ᆯ세	EF	240	vocalic
 두레	NNG	240
 지게	NNG	240
-지요	EC	240
+지요	EC	240	complex 지/EC 요/JX 0112
 김밥	NNG	239
 전라도	NNP	239
 신도	NNG	239
@@ -7209,7 +7209,7 @@
 큰소리	NNG	223
 치밀	VV	223
 동일	XR	223
-ᆫ대요	EF	222	vocalic
+ᆫ대요	EF	222	vocalic	complex ᆫ대/EF 요/JX 0223
 ᆯ라	EC	222	vocalic
 대본	NNG	222
 만일	MAG	222
@@ -7280,7 +7280,7 @@
 가락	NNG	220
 겸하	VV	220
 간절	XR	220
-아니요	IC	219
+아니요	IC	219	complex 아니/IC 요/JX 0223
 소신	NNG	219
 충분하	VA	219	complex 충분/XR 하/XSA 0223
 단골	NNG	219
@@ -7431,7 +7431,7 @@
 단숨에	MAG	214
 연꽃	NNG	214
 그렇지	IC	213
-글쎄요	IC	213
+글쎄요	IC	213	complex 글쎄/IC 요/JX 0223
 처	NNG	213
 가만	MAG	213
 치닫	VV-I	213
@@ -7788,7 +7788,7 @@
 탄식	NNG	198
 땅바닥	NNG	198
 발령	NNG	197
-어야지요	EF	197
+어야지요	EF	197	complex 어야지/EF 요/JX 0334
 허옇	VA-I	197	=하얗
 서럽	VA-I	197
 설명회	NNG	197
@@ -8320,7 +8320,7 @@
 더군	EF	179
 철저	XR	179
 어이	NNG	178
-아야지요	EF	178
+아야지요	EF	178	complex 아야지/EF 요/JX 0334
 속속	MAG	178
 뿔	NNG	178
 원고지	NNG	178
@@ -8487,7 +8487,7 @@
 위조	NNG	173
 꼭꼭	MAG	173
 쓰	VA	173
-래요	EF	173
+래요	EF	173	complex 래/EF 요/JX 0112
 브로커	NNG	173
 대여섯	NR	173
 걸림돌	NNG	173
@@ -8831,7 +8831,7 @@
 난감	XR	164
 유태인	NNG	164
 참신	XR	164
-다구요	EF	164
+다구요	EF	164	complex 다구/EF 요/JX 0223
 여하튼	MAG	163	=하여튼
 올라타	VV	163	complex 오르/VV 어/EC 타/VV 011223
 기관지	NNG	163
@@ -8868,7 +8868,7 @@
 신통	NNG	163
 잔잔	XR	163
 거룩	XR	163
-라구요	EF	163
+라구요	EF	163	complex 라구/EF 요/JX 0223
 하여간	MAG	162
 짜	VA	162
 갈리	VV	162
@@ -9335,7 +9335,7 @@
 빨리	VV	151
 안채	NNG	151
 강신애	NNP	151
-드라구요	EF	151
+드라구요	EF	151	complex 드라구/EF 요/JX 0334
 당숙	NNG	151
 레지투이	NNP	151
 풍미	NNG	150
@@ -11508,7 +11508,7 @@ LG전자	NNP	119
 엉성	XR	110
 쾌적	XR	110
 황량	XR	110
-은데요	EF	110	non_vowel	==ᆫ데요
+은데요	EF	110	non_vowel	==ᆫ데요	complex 은데/EF 요/JX 0223
 모가지	NNG	110
 자리잡	VV-R	110
 뇌간	NNG	110
@@ -11782,7 +11782,7 @@ LG전자	NNP	119
 어	NNG	106
 반듯	XR	106
 몰골	NNG	106
-던가요	EF	106
+던가요	EF	106	complex 던가/EF 요/JX 0223
 인	NNB	106
 숫제	MAG	106
 군	EC	106
@@ -12883,7 +12883,7 @@ SK텔레콤	NNP	103
 장명수	NNP	93
 허황	XR	93
 흘기	VV	93
-ᆸ니다요	EF	93	vocalic
+ᆸ니다요	EF	93	vocalic	complex ᆸ니다/EF 요/JX 0334
 토익	NNP	93
 낡	VV	92
 비린내	NNG	92
@@ -13333,7 +13333,7 @@ SK텔레콤	NNP	103
 눈짓	NNG	88
 여선생	NNG	88
 강판	NNG	87
-는지요	EF	87	non_adj
+는지요	EF	87	non_adj	complex 는지/EF 요/JX 0223
 옛말	NNG	87
 경합	NNG	87
 적격	NNG	87
@@ -13525,7 +13525,7 @@ SK텔레콤	NNP	103
 미륵	NNP	86
 돌리	NNP	86
 ᆫ디	EC	86	vocalic
-던데요	EF	86
+던데요	EF	86	complex 던데/EF 요/JX 0223
 베쓰	NNP	86
 도이칠란트	NNP	86
 이라든가	JX	85	non_vowel
@@ -13721,7 +13721,7 @@ SK텔레콤	NNP	103
 을지로	NNP	83
 그르	VV	83
 길어지	VV	83	complex 길/VA 어/EC 지/VX 011223
-을게요	EF	83	non_vowel	==ᆯ게요
+을게요	EF	83	non_vowel	==ᆯ게요	complex 을게/EF 요/JX 0223
 에스비에스	NNP	83
 하야	NNG	83
 비닐봉지	NNG	83
@@ -14000,7 +14000,7 @@ LG화학	NNP	82
 역전승	NNG	81
 이산	NNG	81
 기지개	NNG	81
-ᆯ래요	EF	81	vocalic
+ᆯ래요	EF	81	vocalic	complex ᆯ래/EF 요/JX 0223
 총소리	NNG	81
 진도	NNP	81
 이브	NNP	81
@@ -14022,7 +14022,7 @@ LG화학	NNP	82
 온화	XR	81
 애틋	XR	81
 뻣뻣	XR	81
-라고요	EF	81
+라고요	EF	81complex 라고/EF 요/JX 0223
 유창	XR	81
 생활양식	NNG	81
 당당	XR	81
@@ -14255,7 +14255,7 @@ LG화학	NNP	82
 중대	XR	79
 면서도	EC	79	vocalic
 깨소금	NNG	78
-다니까요	EF	78
+다니까요	EF	78	complex 다니까/EF 요/JX 0334
 물밑	NNG	78
 새누리	NNP	78
 불사르	VV	78
@@ -14828,7 +14828,7 @@ LG화학	NNP	82
 박동	NNG	73
 무릇	MAG	73
 괄호	NNG	73
-라니까요	EF	73
+라니까요	EF	73	complex 라니까/EF 요/JX 0334
 빼먹	VV	73
 연습장	NNG	73
 대졸	NNG	73
@@ -14934,7 +14934,7 @@ LG화학	NNP	82
 지네	NNG	73
 추장	NNG	73
 핑	MAG	73
-어서요	EF	73
+어서요	EF	73	complex 어서/EF 요/JX 0223
 금붕어	NNG	73
 상무이사	NNG	73
 신희	NNP	73
@@ -14945,7 +14945,7 @@ LG화학	NNP	82
 민겸호	NNP	73
 맥루한	NNP	73
 부루도꾸	NNP	73
-게요	EF	72
+게요	EF	72	complex 게/EF 요/JX 0112
 예에	IC	72
 훅	MAG	72
 어묵	NNG	72
@@ -15075,8 +15075,8 @@ LG화학	NNP	82
 결사체	NNG	71
 스텝	NNG	71
 이정현	NNP	71
-는데요	EC	71	non_adj
-ᆫ데요	EC	71	vocalic
+는데요	EC	71	non_adj	complex 는데/EC 요/JX 0223
+ᆫ데요	EC	71	vocalic	complex ᆫ데/EC 요/JX 0223
 평탄	NNG	71
 수제비	NNG	71
 예우	NNG	71
@@ -15180,7 +15180,7 @@ LG화학	NNP	82
 왕성	XR	71
 세련	XR	71
 식염	NNG	71
-ᆫ다구요	EF	71	vocalic
+ᆫ다구요	EF	71	vocalic	complex ᆫ다구/EF 요/JX 0334
 측간	NNG	71
 석하	NNP	71
 더이상	MAG	71
@@ -15424,7 +15424,7 @@ LG화학	NNP	82
 검사법	NNG	69
 신랄	XR	69
 여보게	IC	69
-더라고요	EF	69
+더라고요	EF	69	complex 더라고/EF 요/JX 0334
 나스닥	NNG	69
 계율	NNG	69
 결구	NNG	69
@@ -15852,7 +15852,7 @@ LG화학	NNP	82
 김대업	NNP	66
 깊숙	XR	66
 조잡	XR	66
-ᆯ께요	EF	66	vocalic	=ᆯ게요
+ᆯ께요	EF	66	vocalic	=ᆯ게요	complex ᆯ께/EF 요/JX 0223
 유목	NNG	66
 우수	XR	66
 버선	NNG	66
@@ -15999,7 +15999,7 @@ LG화학	NNP	82
 공손	XR	65
 번거	XR	65
 유민	NNG	65
-아서요	EF	65
+아서요	EF	65	complex 아서/EF 요/JX 0223
 대담	XR	65
 담벽	NNG	65
 행랑채	NNG	65
@@ -16509,7 +16509,7 @@ LG화학	NNP	82
 마귀	NNG	62
 우	EC	62
 참봉	NNG	62
-습니다요	EF	62	non_vowel	==ᆸ니다요
+습니다요	EF	62	non_vowel	==ᆸ니다요	complex 습니다/EF 요/JX 0334
 로군	EF	62
 무신	MM	62
 두리기둥	NNG	62
@@ -17168,7 +17168,7 @@ LG화학	NNP	82
 활개	NNG	58
 연설회	NNG	58
 참가비	NNG	58
-라니요	EF	58
+라니요	EF	58	complex 라니/EF 요/JX 0223
 가로젓	VV-I	58
 하직	NNG	58
 돌사자	NNG	58
@@ -17193,7 +17193,7 @@ LG화학	NNP	82
 공연	XR	58
 도가	NNG	58
 모뎀	NNG	58
-다니요	EF	58
+다니요	EF	58	complex 다니/EF 요/JX 0223
 풍족	XR	58
 고지식	XR	58
 라깡	NNP	58
@@ -17343,7 +17343,7 @@ LG화학	NNP	82
 본위	NNG	57
 박제	NNG	57
 종국	NNG	57
-다고요	EF	57
+다고요	EF	57	complex 다고/EF 요/JX 0223
 윤회	NNG	57
 천안문	NNP	57
 용마루	NNG	57
@@ -17753,7 +17753,7 @@ LG화학	NNP	82
 달달	MAG	54
 깊어지	VV	54	complex 깊/VA 어/EC 지/VX 011223
 승부수	NNG	54
-고요	EC	54
+고요	EC	54	complex 고/EC 요/JX 0112
 파렴치	NNG	54
 제각각	NNG	54
 참선	NNG	54
@@ -18120,7 +18120,7 @@ LG화학	NNP	82
 호젓	XR	53
 씨팔	IC	53
 벙벙	XR	53
-냐구요	EF	53
+냐구요	EF	53	complex 냐구/EF 요/JX 0223
 백설기	NNG	53
 살그머니	MAG	53
 항우	NNP	53
@@ -18138,7 +18138,7 @@ LG화학	NNP	82
 석기인	NNG	53
 맛나	NNP	53
 황당하	VA	52	complex 황당/XR 하/XSA 0223
-ᆫ지요	EF	52	vocalic
+ᆫ지요	EF	52	vocalic	complex ᆫ지/EF 요/JX 0223
 십일	NR	52
 팔팔	MAG	52
 통깨	NNG	52
@@ -18367,7 +18367,7 @@ LG화학	NNP	82
 거침없	VA	51	complex 거치/VV ᆷ/ETN 없/VA 021223
 소추	NNG	51
 에휴	IC	51
-ᆯ까요	EC	51	vocalic
+ᆯ까요	EC	51	vocalic	complex ᆯ까/EC 요/JX 0223
 위트	NNG	51
 섬유질	NNG	51
 식중독	NNG	51
@@ -18986,7 +18986,7 @@ AP통신	NNP	50
 혜정	NNP	49
 매수세	NNG	49
 색출	NNG	49
-지만요	EF	49
+지만요	EF	49	complex 지만/EF 요/JX 0223
 스테로이드	NNG	49
 정민	NNP	49
 쥐어박	VV	49
@@ -19807,7 +19807,7 @@ AP통신	NNP	50
 밀어주	VV	45	complex 밀/VV 어/EC 주/VX 011223
 타깃	NNG	45
 냉대	NNG	45
-애	EC	45
+애	EC	45	=어
 온상	NNG	45
 호강	NNG	45
 수홍	NNP	45
@@ -20052,7 +20052,7 @@ AP통신	NNP	50
 뜸	XR	45
 일제하	NNG	45
 공비	NNG	45
-다면서요	EF	45
+다면서요	EF	45	complex 다면서/EF 요/JX 0334
 석실	NNG	45
 이활	NNP	45
 시어즈	NNP	45
@@ -20659,7 +20659,7 @@ AP통신	NNP	50
 네거티브	NNG	42
 주근깨	NNG	42
 삼사	NR	42
-구요	EC	42
+구요	EC	42	complex 구/EC 요/JX 0112
 참모진	NNG	42
 주필	NNG	42
 동냥	NNG	42
@@ -20955,7 +20955,7 @@ AP통신	NNP	50
 불암사	NNP	42
 다이언	NNP	42
 재욱이	NNP	42
-께요	EF	42
+께요	EF	42	complex 께/EF 요/JX 0112
 행중	NNG	42
 형태	NNP	42
 듯하	VX	42	complex 듯/NNB 하/XSV 0112
@@ -21231,7 +21231,7 @@ AP통신	NNP	50
 덧술	NNG	41
 영롱	XR	41
 소조	NNG	41
-는걸요	EF	41	non_adj
+는걸요	EF	41	non_adj	complex 는걸/EF 요/JX 0223
 길길이	MAG	41
 광인	NNG	41
 까짓	MM	41
@@ -21279,7 +21279,7 @@ AP통신	NNP	50
 포카리스웨트	NNP	41
 근깐	MAJ	41
 십육	NR	40
-까요	EF	40	vocalic	=ᆯ까요
+까요	EF	40	vocalic	=ᆯ까요	complex 까/EF 요/JX 0112
 흰자	NNG	40
 실록	NNG	40
 매콤하	VA	40	complex 매콤/XR 하/XSA 0223
@@ -21309,7 +21309,7 @@ AP통신	NNP	50
 주례사	NNG	40
 홈쇼핑	NNG	40
 구입비	NNG	40
-ᆫ다니까요	EF	40	vocalic
+ᆫ다니까요	EF	40	vocalic	complex ᆫ다니까/EF 요/JX 0445
 단과	NNG	40
 쓱쓱	MAG	40
 필드	NNG	40
@@ -22214,7 +22214,7 @@ GS칼텍스	NNP	39
 분모	NNG	38
 자장가	NNG	38
 문희	NNP	38
-군요	EC	38
+군요	EC	38	complex 군/EC 요/JX 0112
 가상현실	NNG	38
 뱃사람	NNG	38
 완력	NNG	38
@@ -23733,7 +23733,7 @@ MBC애드컴	NNP	34
 합헌	NNG	33
 켜켜이	MAG	33
 베이비부머	NNG	33
-더라니까요	EF	33
+더라니까요	EF	33	complex 더라니까/EF 요/JX 0445
 일로	NNG	33
 끈끈하	VA	33	complex 끈끈/XR 하/XSA 0223
 유언장	NNG	33
@@ -24060,7 +24060,7 @@ SK그룹	NNP	33
 인권위	NNG	33
 타임스	NNG	33
 평자	NNG	33
-라요	EF	33
+라요	EF	33	complex 라/EF 요/JX 0112
 산신	NNG	33
 가정환경	NNG	33
 인자	XR	33
@@ -24087,7 +24087,7 @@ SK그룹	NNP	33
 사림파	NNG	33
 디오니소스	NNP	33
 비릿	XR	33
-구만요	EF	33
+구만요	EF	33	complex 구만/EF 요/JX 0223
 섬돌	NNG	33
 지유	EF	33
 아양	NNG	33
@@ -24100,7 +24100,7 @@ SK그룹	NNP	33
 프롤레타리아트	NNG	33
 요순	NNP	33
 진호	NNP	33
-이봐요	IC	33
+이봐요	IC	33	complex 이봐/IC 요/JX 0223
 윤호	NNP	33
 악하	VA	33
 주막거리	NNG	33
@@ -24126,14 +24126,14 @@ SK그룹	NNP	33
 아랫부분	NNG	32
 숭숭	MAG	32
 오목	MAG	32
-랄까요	EF	32
+랄까요	EF	32	complex 랄까/EF 요/JX 0223
 간절하	VA	32	complex 간절/XR 하/XSA 0223
 에이아이	NNG	32
 오이씨디	NNP	32
 종착역	NNG	32
 드라이	NNG	32
 돌돌	MAG	32
-그럼요	IC	32
+그럼요	IC	32	complex 그럼/IC 요/JX 0223
 잉	IC	32
 씁	IC	32
 전반부	NNG	32
@@ -24144,7 +24144,7 @@ SK그룹	NNP	33
 봉제	NNG	32
 리프트	NNG	32
 유명인	NNG	32
-야요	EF	32
+야요	EF	32	=에요
 상급자	NNG	32
 성비	NNG	32
 열병식	NNG	32
@@ -24458,11 +24458,11 @@ SK그룹	NNP	33
 도중하차	NNG	32
 삐	VV	32
 고유어	NNG	32
-데요	EF	32
+데요	EF	32	complex 데/EF 요/JX 0112
 위독	XR	32
 배속	NNG	32
 라면	EF	32	vocalic
-네요	EC	32
+네요	EC	32	complex 네/EC 요/JX 0112
 기성회비	NNG	32
 지당	XR	32
 강전	NNG	32
@@ -24511,7 +24511,7 @@ SK그룹	NNP	33
 바이킹	NNP	32
 경덕왕	NNP	32
 얼마쯤	NNG	32
-려구요	EF	32	vocalic
+려구요	EF	32	vocalic	complex 려구/EF 요/JX 0223
 관세음	NNP	32
 등속	NNG	32
 주심포	NNG	32
@@ -24935,7 +24935,7 @@ SK그룹	NNP	33
 르네상스	NNP	31
 후려갈기	VV	31
 심란	XR	31
-로군요	EF	31
+로군요	EF	31	complex 로군/EF 요/JX 0223
 인마	NNG	31
 이재필이	NNP	31
 모과나무	NNG	31
@@ -25070,7 +25070,7 @@ SK그룹	NNP	33
 볼멘소리	NNG	30
 가랑비	NNG	30
 이감	NNG	30
-더래요	EF	30
+더래요	EF	30	complex 더래/EF 요/JX 0223
 기름때	NNG	30
 뇌경색	NNG	30
 불후	NNG	30
@@ -25396,7 +25396,7 @@ SK그룹	NNP	33
 해안통	NNG	30
 늠	NNB	30
 자긔	NP	30
-습니까요	EF	30	non_vowel	==ᆸ니까요
+습니까요	EF	30	non_vowel	==ᆸ니까요	complex 습니까/EF 요/JX 0334
 불도	NNG	30
 승신목	NNP	30
 창환이	NNP	30
@@ -25820,7 +25820,7 @@ CJ그룹	NNP	29
 정태	NNG	29
 직립	NNG	29
 물빛	NNG	29
-ᆯ걸요	EF	29	vocalic
+ᆯ걸요	EF	29	vocalic	complex ᆯ걸/EF 요/JX 0223
 자자	XR	29
 민족지	NNG	29
 둔탁	XR	29
@@ -25857,7 +25857,7 @@ CJ그룹	NNP	29
 교협	NNG	29
 화엄경	NNP	29
 화창	XR	29
-을걸요	EF	29	non_vowel	==ᆯ걸요
+을걸요	EF	29	non_vowel	==ᆯ걸요	complex 을걸/EF 요/JX 0223
 현경자	NNP	29
 가무잡잡	XR	29
 이시여	JKV	29
@@ -26343,7 +26343,7 @@ CJ그룹	NNP	29
 조선조	NNP	28
 말씀드리	VV	28	complex 말씀/NNG 드리/VV 0224
 젤소미나	NNP	28
-ᆸ니까요	EF	28	vocalic
+ᆸ니까요	EF	28	vocalic	complex ᆸ니까/EF 요/JX 0334
 텔코트	NNG	28
 두환이	NNP	28
 수부	NNG	28
@@ -26421,7 +26421,7 @@ CJ그룹	NNP	29
 그릴	NNG	27
 조각조각	MAG	27
 꼬챙이	NNG	27
-여	JX	27
+여	JX	27	=이요
 은지	EF	27	non_vowel	==ᆫ지
 달르	VA	27	=다르
 평북	NNP	27
@@ -26458,7 +26458,7 @@ CJ그룹	NNP	29
 을뿐더러	EC	27	non_vowel	==ᆯ뿐더러
 창사	NNG	27
 사이언스	NNG	27
-나요	EC	27
+나요	EC	27	complex 나/EC 요/JX 0112
 유에스	NNP	27
 음양오행	NNG	27
 양기	NNG	27
@@ -26860,7 +26860,7 @@ CJ그룹	NNP	29
 채시라	NNP	27
 떡	MAG	27
 길하	VA	27
-ᆫ걸요	EF	27	vocalic
+ᆫ걸요	EF	27	vocalic	complex ᆫ걸/EF 요/JX 0223
 엉큼	XR	27
 체외	NNG	27
 칭얼거리	VV	27	complex 칭얼/XR 거리/XSV 0224
@@ -27449,7 +27449,7 @@ CJ그룹	NNP	29
 시골뜨기	NNG	26
 분주	XR	26
 간하	VV	26
-려고요	EF	26
+려고요	EF	26	complex 려고/EF 요/JX 0223
 정크본드	NNG	26
 가지런	XR	26
 호박꽃	NNG	26
@@ -28038,7 +28038,7 @@ CJ그룹	NNP	29
 우짖	VV	25
 옳지	IC	25
 구토증	NNG	25
-그래요	IC	25
+그래요	IC	25	complex 그래/IC 요/JX 0223
 날짐승	NNG	25
 등속	NNB	25
 승냥이	NNG	25
@@ -28067,7 +28067,7 @@ CJ그룹	NNP	29
 구럭	NNG	25
 들창	NNG	25
 즈이	NP	25
-ᆯ려구요	EF	25	vocalic	=려구요
+ᆯ려구요	EF	25	vocalic	=려구요	complex ᆯ려구/EF 요/JX 0334
 콩밭	NNG	25
 씨팔놈	NNG	25
 마루방	NNG	25
@@ -28623,7 +28623,7 @@ LG유플러스	NNP	24
 남대천	NNP	24
 눈물짓	VV-I	24
 하늘거리	VV	24
-느냐구요	EF	24
+느냐구요	EF	24	complex 느냐구/EF 요/JX 0334
 타나토스	NNP	24
 무던	XR	24
 만면	NNG	24
@@ -28653,7 +28653,7 @@ LG유플러스	NNP	24
 적자생존	NNG	24
 노사모	NNP	24
 사탕수수	NNG	24
-다는군요	EF	24
+다는군요	EF	24	complex 다는군/EF 요/JX 0334
 원근	NNG	24
 옥탑	NNG	24
 첨탑	NNG	24
@@ -28731,7 +28731,7 @@ LG유플러스	NNP	24
 말똥말똥	MAG	24
 다우	EF	24
 의모	NNG	24
-구먼요	EF	24
+구먼요	EF	24	complex 구먼/EF 요/JX 0223
 정하	VA	24
 곯리	VV	24
 도로꼬	NNG	24
@@ -30164,7 +30164,7 @@ LG유플러스	NNP	24
 행길	NNG	22
 꼭두새벽	NNG	22
 홰	NNG	22
-ᆫ다고요	EF	22	vocalic
+ᆫ다고요	EF	22	vocalic	complex ᆫ다고/EF 요/JX 0334
 율리시즈	NNP	22
 시네라마	NNG	22
 섬망	NNG	22
@@ -30217,7 +30217,7 @@ LG유플러스	NNP	24
 면서두	EC	22
 뭐뭐	NP	22
 씨그마	NNG	22
-그든요	EF	22
+그든요	EF	22	complex 그든/EF 요/JX 0223
 탐크루즈	NNP	22
 언어병리학	NNG	22
 이퀄라이저	NNG	22
@@ -30245,7 +30245,7 @@ LG유플러스	NNP	24
 프라이	NNG	21
 받히	VV	21
 갈비찜	NNG	21
-니까요	EC	21	vocalic
+니까요	EC	21	vocalic	complex 니까/EC 요/JX 0223
 부꾸미	NNG	21
 살얼음	NNG	21
 고무장갑	NNG	21
@@ -30815,7 +30815,7 @@ LG유플러스	NNP	24
 세헤라자드	NNP	21
 고만고만	XR	21
 서커스단	NNG	21
-ᆯ는지요	EF	21	non_vowel
+ᆯ는지요	EF	21	non_vowel	complex ᆯ는지/EF 요/JX 0334
 니다	EF	21
 주객	NNG	21
 자귀	NNG	21
@@ -30939,7 +30939,7 @@ LG유플러스	NNP	24
 장시	NNG	21
 싸돌아다니	VV	21
 애새끼	NNG	21
-는대요	EF	21	non_vowel	non_adj	==ᆫ대요
+는대요	EF	21	non_vowel	non_adj	==ᆫ대요	complex 는대/EF 요/JX 0223
 거꾸러지	VV	21
 개똥	NNP	21
 목화송이	NNG	21
@@ -32469,7 +32469,7 @@ SH공사	NNP	19
 천연자원	NNG	19
 청일	NNP	19
 용인경전철	NNP	19
-다요	EF	19
+다요	EF	19	complex 다/EF 요/JX 0112
 병창	NNG	19
 건초	NNG	19
 강금실	NNP	19
@@ -33500,7 +33500,7 @@ SH공사	NNP	19
 업보	NNG	18
 우레	NNG	18
 골게터	NNG	18
-냐고요	EF	18
+냐고요	EF	18	complex 냐고/EF 요/JX 0223
 내원	NNG	18
 중앙청	NNG	18
 표찰	NNG	18
@@ -33568,7 +33568,7 @@ SH공사	NNP	19
 구름다리	NNG	18
 염탐	NNG	18
 민정이	NNP	18
-라면서요	EF	18
+라면서요	EF	18	complex 라면서/EF 요/JX 0334
 내연산	NNP	18
 보경사	NNP	18
 재실	NNG	18
@@ -34510,7 +34510,7 @@ SH공사	NNP	19
 인사치레	NNG	17
 지소	NNG	17
 엊저녁	NNG	17
-ᆫ가요	EC	17	vocalic
+ᆫ가요	EC	17	vocalic	complex ᆫ가/EC 요/JX 0223
 단란주점	NNG	17
 서해대교	NNP	17
 워즈워스	NNP	17
@@ -34564,7 +34564,7 @@ SH공사	NNP	19
 수미산	NNP	17
 그람시	NNP	17
 갈기	NNG	17
-거든요	EC	17
+거든요	EC	17	complex 거든/EC 요/JX 0223
 터번	NNG	17
 농경문화	NNG	17
 종내	MAG	17
@@ -35726,7 +35726,7 @@ SH공사	NNP	19
 오욱철	NNP	16
 가물	VV	16
 이영자	NNP	16
-ᆯ게요	EC	16	vocalic
+ᆯ게요	EC	16	vocalic	complex ᆯ게/EC 요/JX 0223
 양공주	NNG	16
 진섭이	NNP	16
 둥그스름	XR	16
@@ -35786,7 +35786,7 @@ SH공사	NNP	19
 토담	NNG	16
 시대사	NNG	16
 양변	NNG	16
-는가요	EF	16	non_adj
+는가요	EF	16	non_adj	complex 는가/EF 요/JX 0223
 갈밭	NNG	16
 밭머리	NNG	16
 고호	NNP	16
@@ -36049,7 +36049,7 @@ SH공사	NNP	19
 주승용	NNP	15
 책사	NNG	15
 김영자	NNP	15
-다지요	EF	15
+다지요	EF	15	complex 다지/EF 요/JX 0223
 피씨	NNG	15
 독어	NNP	15
 유재경	NNP	15
@@ -36967,7 +36967,7 @@ LH공사	NNP	15
 고경철	NNP	15
 풍생	NNP	15
 실낱	NNG	15
-으니까요	EC	15	non_vowel	==니까요
+으니까요	EC	15	non_vowel	==니까요	complex 으니까/EC 요/JX 0334
 서울대법	NNP	15
 농학	NNG	15
 최준	NNP	15
@@ -36996,7 +36996,7 @@ LH공사	NNP	15
 까레이스키	NNP	15
 ᆫ다나	EF	15	vocalic
 매무새	NNG	15
-던걸요	EF	15
+던걸요	EF	15	complex 던걸/EF 요/JX 0223
 뱃심	NNG	15
 조갯살	NNG	15
 노릇	XR	15
@@ -37135,7 +37135,7 @@ LH공사	NNP	15
 고서	EF	15
 얼크러지	VV	15
 돼먹	VV	15
-느냐고요	EF	15
+느냐고요	EF	15	complex 느냐고/EF 요/JX 0334
 도랑물	NNG	15
 겨울새	NNG	15
 달	ETM	15
@@ -38499,7 +38499,7 @@ D사	NNG	14
 철갑	NNG	14
 빠구리	NNG	14
 창석이	NNP	14
-ᆯ라구요	EF	14	vocalic	=려구요
+ᆯ라구요	EF	14	vocalic	=려구요	complex ᆯ라구/EF 요/JX 0334
 중얼대	VV	14	complex 중얼/XR 대/XSV 0223
 무도	XR	14
 철딱서니	NNG	14
@@ -39556,7 +39556,7 @@ LG아트센터	NNP	13
 근저당	NNG	13
 딸깍발이	NNG	13
 각개	NNG	13
-라지요	EF	13
+라지요	EF	13	complex 라지/EF 요/JX 0223
 디스카운트	NNG	13
 김희정	NNP	13
 길조	NNG	13
@@ -39881,7 +39881,6 @@ NH농협은행	NNP	13
 수은등	NNG	13
 울구	VV	13
 군재	NNG	13
-더군요	EC	13
 율곡사업	NNP	13
 경고장	NNG	13
 중반기	NNG	13
@@ -40131,7 +40130,7 @@ NH농협은행	NNP	13
 고란사	NNP	13
 멍	MAG	13
 왈	NNG	13
-을래요	EF	13	non_vowel	==ᆯ래요
+을래요	EF	13	non_vowel	==ᆯ래요	complex 을래/EF 요/JX 0223
 어둑신	XR	13
 벼라별	MM	13
 기사도	NNG	13
@@ -41603,7 +41602,7 @@ KB국민카드	NNP	12
 호박잎	NNG	12
 허무주의자	NNG	12
 황신혜	NNP	12
-지만요	EC	12
+지만요	EC	12	complex 지만/EC 요/JX 0223
 도지원	NNP	12
 정은숙	NNP	12
 남탕	NNG	12
@@ -41762,7 +41761,7 @@ KB국민카드	NNP	12
 대동방적공장	NNP	12
 오슬오슬	MAG	12
 해매도	NNP	12
-ᆫ다요	EF	12	vocalic
+ᆫ다요	EF	12	vocalic	complex ᆫ다/EF 요/JX 0223
 경철이	NNP	12
 화톳불	NNG	12
 흉허물	NNG	12
@@ -43723,7 +43722,7 @@ IMF	NNP	11
 시말서	NNG	11
 바리케이트	NNG	11
 피난길	NNG	11
-면서요	EF	11
+면서요	EF	11	complex 면서/EF 요/JX 0223
 색긔	NNG	11
 여러해살이	NNG	11
 준열	XR	11
@@ -43734,7 +43733,7 @@ IMF	NNP	11
 쇠파리	NNG	11
 남폿불	NNG	11
 라던	EC	11
-다마다요	EF	11
+다마다요	EF	11	complex 다마다/EF 요/JX 0334
 송명애	NNP	11
 화급	NNG	11
 김포군	NNP	11
@@ -43816,7 +43815,7 @@ IMF	NNP	11
 다냐	EF	11
 창턱	NNG	11
 입바람	NNG	11
-ᆫ다면서요	EF	11	vocalic
+ᆫ다면서요	EF	11	vocalic	complex ᆫ다면서/EF 요/JX 0445
 발장	NNG	11
 벗어젖히	VV	11	complex 벗/VV-R 어/EC 젖히/VV 011224
 발기	VV	11
@@ -43853,7 +43852,7 @@ IMF	NNP	11
 히포크라테스	NNP	11
 햐	IC	11
 좆나	VA	11
-읍니다요	EF	11	non_vowel	==ᆸ니다요
+읍니다요	EF	11	non_vowel	==ᆸ니다요	complex 읍니다/EF 요/JX 0334
 찐따	NNG	11
 애꾸	NNG	11
 솥단지	NNG	11
@@ -45134,7 +45133,7 @@ JP모건	NNP	10
 헬로	NNG	10
 빼기	NNG	10
 윤공주	NNP	10
-ᆯ라요	EF	10	vocalic
+ᆯ라요	EF	10	vocalic	complex ᆯ라/EF 요/JX 0223
 능욕	NNG	10
 사농공상	NNG	10
 공공복리	NNG	10
@@ -45517,7 +45516,7 @@ JP모건	NNP	10
 교위	NNG	10
 혼약	NNG	10
 투구풍뎅이	NNG	10
-천만에요	IC	10
+천만에요	IC	10	complex 천만에/IC 요/JX 0334
 워터게이트	NNP	10
 김명국	NNP	10
 조감독	NNG	10
@@ -45596,7 +45595,7 @@ JP모건	NNP	10
 낯간지럽	VA-I	10
 세진이	NNP	10
 한국디지탈라인	NNP	10
-을까요	EC	10	non_vowel	==ᆯ까요
+을까요	EC	10	non_vowel	==ᆯ까요	complex 을까/EC 요/JX 0223
 조운	NNP	10
 제시간	NNG	10
 안치환	NNP	10
@@ -45679,13 +45678,13 @@ JP모건	NNP	10
 과거지사	NNG	10
 오락물	NNG	10
 고려장	NNG	10
-ᆫ다지요	EF	10	vocalic
+ᆫ다지요	EF	10	vocalic	complex ᆫ다지/EF 요/JX 0334
 일지사	NNP	10
 선덕왕	NNP	10
 야자열매	NNG	10
 꺽	MAG	10
 죽마고우	NNG	10
-라서요	EF	10
+라서요	EF	10	complex 라서/EF 요/JX 0223
 격자	NNG	10
 싼타페	NNG	10
 터키전	NNG	10
@@ -45778,7 +45777,7 @@ JP모건	NNP	10
 칸델라	NNG	10
 하프플라자	NNP	10
 망울	NNG	10
-는군요	EC	10	non_adj
+는군요	EC	10	non_adj	complex 는군/EC 요/JX 0223
 화이팅	NNG	10	=파이팅
 성천	NNP	10
 염류	NNG	10
@@ -45835,7 +45834,7 @@ JP모건	NNP	10
 자연주의자	NNG	10
 큰마음	NNG	10
 찻값	NNG	10
-아서요	EC	10
+아서요	EC	10	complex 아서/EC 요/JX 0223
 제끼	VX	10
 정유진	NNP	10
 박주미	NNP	10
@@ -45872,7 +45871,7 @@ JP모건	NNP	10
 류	NNB	10
 산국	NNG	10
 양수기	NNG	10
-자구요	EF	10
+자구요	EF	10	complex 자구/EF 요/JX 0223
 삼양제지공업주식회사	NNP	10
 자서	NNG	10
 저당권자	NNG	10
@@ -46290,7 +46289,7 @@ JP모건	NNP	10
 이민자	NNP	10
 도범	NNG	10
 공구장	NNG	10
-디요	EF	10
+디요	EF	10	complex 디/EF 요/JX 0112
 사우정	NNP	10
 일평생	NNG	10
 투기	VV	10
@@ -48174,7 +48173,8 @@ SK케미칼	NNP	9
 롤러스케이트	NNG	9
 해중	NNG	9
 사근사근	XR	9
-라더군요	EF	9
+라더군	EF	10
+라더군요	EF	9	complex 라더군/EF 요/JX 0334
 박정구	NNP	9
 제도하	NNG	9
 요리코	NNP	9
@@ -48404,7 +48404,7 @@ SK케미칼	NNP	9
 석정	NNP	9
 국철	NNG	9
 이영민	NNP	9
-다나요	EF	9
+다나요	EF	9	complex 다나/EF 요/JX 0223
 더없	VA	9
 굴러들	VV	9	complex 구르/VV 어/EC 들/VV 011223
 성남실내체육관	NNP	9
@@ -48568,7 +48568,7 @@ ABC	NNP	9
 딸랑딸랑	MAG	9
 증조모	NNG	9
 창씨개명	NNG	9
-라나요	EF	9
+라나요	EF	9	complex 라나/EF 요/JX 0223
 노예근성	NNG	9
 스트롤사	NNP	9
 덴트콤	NNG	9
@@ -48606,7 +48606,7 @@ ABC	NNP	9
 임해전	NNP	9
 신용하	NNP	9
 흑판	NNG	9
-ᆫ대요	EC	9	vocalic
+ᆫ대요	EC	9	vocalic	complex ᆫ대/EC 요/JX 0223
 탄산칼슘	NNG	9
 코케인	NNG	9
 혼처	NNG	9
@@ -48716,7 +48716,7 @@ ABC	NNP	9
 알거지	NNG	9
 드렁칡	NNG	9
 낙락장송	NNG	9
-은가요	EF	9	non_vowel	==ᆫ가요
+은가요	EF	9	non_vowel	==ᆫ가요	complex 은가/EF 요/JX 0223
 위문편지	NNG	9
 영검	NNG	9
 양장점	NNG	9
@@ -48770,7 +48770,7 @@ ABC	NNP	9
 신파극	NNG	9
 눈두덩이	NNG	9
 더랬다	EF	9
-을라구요	EF	9	non_vowel	=려구요
+을라구요	EF	9	non_vowel	=려구요	complex 을라구/EF 요/JX 0334
 한길이	NNP	9
 쌍소리	NNG	9
 내쏟	VV-R	9
@@ -48884,7 +48884,7 @@ ABC	NNP	9
 경오	NNG	9
 촛농	NNG	9
 야죠	EF	9
-다는데요	EF	9
+다는데요	EF	9	complex 다는데/EF 요/JX 0334
 중앙지	NNG	9
 니미	IC	9
 애굽	NNP	9
@@ -49010,7 +49010,7 @@ ABC	NNP	9
 슈킹	NNG	9
 꽈자	NNG	9
 바이뚜룩	NNG	9
-당게요	EF	9
+당게요	EF	9	complex 당게/EF 요/JX 0223
 춘양	NNP	9
 원혁이	NNP	9
 방치기	NNG	9
@@ -49409,7 +49409,7 @@ ABC	NNP	9
 디제이	NNP	8
 겁박	NNG	8
 소울	NNG	8
-대니까요	EF	8
+대니까요	EF	8	complex 대니까/EF 요/JX 0334
 한어	NNP	8
 팔촌	NNG	8
 천구백삼십	NR	8
@@ -49621,7 +49621,7 @@ ABC	NNP	9
 삼춘	NNG	8
 는답니다	EF	8	non_vowel	non_adj	==ᆫ답니다
 영남대학교	NNP	8
-던지요	EF	8
+던지요	EF	8	complex 던지/EF 요/JX 0223
 세부	NNP	8
 시쳇말	NNG	8
 분류학	NNG	8
@@ -51116,7 +51116,7 @@ T맵	NNP	8
 황경식	NNP	8
 번식지	NNG	8
 최원석	NNP	8
-ᆯ래요	EC	8	vocalic
+ᆯ래요	EC	8	vocalic	complex ᆯ래/EC 요/JX 0223
 손용문	NNP	8
 처바르	VV	8
 신보	NNG	8
@@ -51683,7 +51683,7 @@ YMCA	NNP	8
 버릇없이	MAG	8	complex 버릇없/VA 이/XSM 0334
 묘비명	NNG	8
 새사람	NNG	8
-다니깐요	EF	8
+다니깐요	EF	8	complex 다니깐/EF 요/JX 0334
 애마	NNG	8
 개다리소반	NNG	8
 둘러매	VV	8	complex 두르/VV 어/EC 매/VV 011223
@@ -51865,7 +51865,7 @@ YMCA	NNP	8
 아물거리	VV	8
 바깥바람	NNG	8
 차부	NNG	8
-다더군요	EF	8
+다더군요	EF	8	complex 다더군/EF 요/JX 0334
 대성탕	NNP	8
 조주	NNP	8
 떼거지	NNG	8
@@ -51938,7 +51938,7 @@ YMCA	NNP	8
 독균	NNG	8
 흉곽	NNG	8
 칼렌베르크	NNP	8
-다는군	EF	8
+다는군	EF	10
 배면	NNG	8
 헤벌리	VV	8	complex 헤/MAG 벌리/VV 0113
 씹	NNG	8
@@ -51989,7 +51989,7 @@ YMCA	NNP	8
 붙어먹	VV	8	complex 붙/VV 어/EC 먹/VV 011223
 내림	NNG	8
 허기사	MAJ	8
-암요	IC	8
+암요	IC	8	complex 암/IC 요/JX 0112
 어야제	EF	8
 조객	NNG	8
 매타작	NNG	8
@@ -52548,7 +52548,7 @@ YMCA	NNP	8
 급	XPN	8
 큐티	NNG	8
 이릏게	MAG	8
-대	XSV	8
+대	XSV	10
 국어국문학과	NNG	8
 국어국문학	NNG	8
 비율척도	NNG	8
@@ -52606,7 +52606,7 @@ YMCA	NNP	8
 오륙십	NR	7
 배종찬	NNP	7
 뽕뽕	MAG	7
-으까요	EF	7	non_vowel	=ᆯ까요
+으까요	EF	7	non_vowel	=ᆯ까요	complex 으까/EF 요/JX 0223
 쪽파	NNG	7
 아작아작	MAG	7
 냄기	VV	7
@@ -52750,7 +52750,7 @@ YMCA	NNP	8
 알싸하	VA	7	complex 알싸/XR 하/XSA 0223
 디포리	NNG	7
 고다음	NNG	7
-래요	EC	7
+래요	EC	7	complex 래/EC 요/JX 0112
 미지근하	VA	7	complex 미지근/XR 하/XSA 0334
 땡글땡글	MAG	7
 발그스름	XR	7
@@ -53560,7 +53560,8 @@ SK에너지	NNP	7
 회장실	NNG	7
 멘델레예프	NNP	7
 평화나눔회	NNP	7
-ᆫ다는군요	EF	7	vocalic
+ᆫ다는군	EF	10
+ᆫ다는군요	EF	7	vocalic	complex ᆫ다는군/EF 요/JX 0445
 어깃장	NNG	7
 삼성건설	NNP	7
 포레	NNP	7
@@ -55230,7 +55231,7 @@ OB맥주	NNP	7
 씁쓰레	MAG	7
 글로브	NNP	7
 비상수단	NNG	7
-은데요	EC	7	non_vowel	==ᆫ데요
+은데요	EC	7	non_vowel	==ᆫ데요	complex 은데/EC 요/JX 0223
 강변도로	NNG	7
 혼곤	XR	7
 목포공항	NNP	7
@@ -55294,7 +55295,7 @@ OB맥주	NNP	7
 윤승원	NNP	7
 뽀미	NNP	7
 사랑놀음	NNG	7
-던데요	EC	7
+던데요	EC	7	complex 던데/EC 요/JX 0223
 홈드라마	NNG	7
 디히	NNG	7
 장유유서	NNG	7
@@ -55426,7 +55427,7 @@ OB맥주	NNP	7
 간단	NNG	7
 소우주	NNG	7
 집짐승	NNG	7
-ᆸ니다요	EC	7	vocalic
+ᆸ니다요	EC	7	vocalic	complex ᆸ니다/EC 요/JX 0334
 요년	NP	7
 허섭쓰레기	NNG	7
 달덩이	NNG	7
@@ -55491,7 +55492,7 @@ OB맥주	NNP	7
 노산	NNP	7
 ᆯ지라도	EF	7	vocalic
 첫돌	NNG	7
-예요	EC	7
+예요	EC	7	=에요
 바늘귀	NNG	7
 광개토왕	NNP	7
 순서쌍	NNG	7
@@ -56008,7 +56009,7 @@ OB맥주	NNP	7
 안성마춤	NNG	7
 서울청량음료사	NNP	7
 허인석	NNP	7
-느라구요	EF	7
+느라구요	EF	7	complex 느라구/EF 요/JX 0334
 얻어걸리	VV	7	complex 얻/VV-R 어/EC 걸리/VV 011224
 시부	NNG	7
 똥갈보	NNG	7
@@ -56357,7 +56358,7 @@ OB맥주	NNP	7
 삼불	NNG	7
 논매	VV	7
 모심	VV	7
-드라고요	EF	7
+드라고요	EF	7	complex 드라고/EF 요/JX 0334
 열소리	NNG	7
 원찰	NNG	7
 민치록	NNP	7
@@ -56834,7 +56835,7 @@ OB맥주	NNP	7
 높아지	VA	6	complex 높/VA 어/EC 지/VX 011223
 을래면	EC	6	non_vowel	=려면
 양겨자	NNG	6
-에여	EF	6
+에여	EF	6	=에요
 닭튀김	NNG	6
 뎁히	VV	6
 느타리	NNG	6
@@ -57029,7 +57030,7 @@ address2	NNP	6
 거치대	NNG	6
 난처하	VA	6	complex 난처/XR 하/XSA 0223
 가디건	NNG	6
-저기요	IC	6
+저기요	IC	6	complex 저기/IC 요/JX 0223
 현미차	NNG	6
 당일치기	NNG	6
 몇만	NR	6
@@ -57058,7 +57059,7 @@ address2	NNP	6
 고견	NNG	6
 칼론	NNP	6
 적장자	NNG	6
-여요	EF	6
+여요	EF	6	=에요
 논공행상	NNG	6
 용비어천가	NNP	6
 심오하	VA	6	complex 심오/XR 하/XSA 0223
@@ -59656,7 +59657,7 @@ ISL코리아	NNP	6
 모터보트	NNG	6
 타임스사	NNP	6
 패커드	NNP	6
-라니요	EC	6
+라니요	EC	6	complex 라니/EC 요/JX 0223
 빠삐용	NNP	6
 보체	NNG	6
 캐논	NNG	6
@@ -59925,7 +59926,7 @@ ISL코리아	NNP	6
 작파	NNG	6
 배낭족	NNG	6
 친언니	NNG	6
-면요	EF	6
+면요	EF	6	complex 면/EF 요/JX 0112
 전미례	NNP	6
 재복	NNG	6
 귓밥	NNG	6
@@ -60411,7 +60412,7 @@ ISL코리아	NNP	6
 패대기	NNG	6
 으마	EF	6	non_vowel	==마
 기현	NNP	6
-든지요	EF	6
+든지요	EF	6	complex 든지/EF 요/JX 0223
 피튀스	NNP	6
 발광체	NNG	6
 보호색	NNG	6
@@ -60476,7 +60477,7 @@ ISL코리아	NNP	6
 비슬비슬	MAG	6
 버들가지	NNG	6
 바작바작	MAG	6
-으리요	EC	6	non_vowel
+으리요	EC	6	non_vowel	=리오/EF
 치맛귀	NNG	6
 낟가리	NNG	6
 가로질리	VV	6	complex 가로/MAG 질리/VV 0224
@@ -60514,7 +60515,7 @@ ISL코리아	NNP	6
 뭉그적거리	VV	6
 우당탕	MAG	6
 양춤	NNG	6
-을께요	EF	6	non_vowel	==ᆯ게요
+을께요	EF	6	non_vowel	==ᆯ게요	complex 을께/EF 요/JX 0223
 그리마	NNG	6
 각다귀	NNG	6
 곽리자고	NNP	6
@@ -60551,7 +60552,8 @@ ISL코리아	NNP	6
 기왕지사	NNG	6
 고함지르	VV	6	complex 고함/NNG 지르/VV 0224
 진성여왕	NNP	6
-ᆫ다더군요	EF	6	vocalic
+ᆫ다더군	EF	10
+ᆫ다더군요	EF	6	vocalic	complex ᆫ다더군/EF 요/JX 0445
 광증	NNG	6
 팔소매	NNG	6
 상허	NNP	6
@@ -60731,7 +60733,7 @@ ISL코리아	NNP	6
 을란다	EF	6	non_vowel	=련다
 불감청	NNG	6
 강포시	NNP	6
-ᆫ다구요	EC	6	vocalic
+ᆫ다구요	EC	6	vocalic	complex ᆫ다구/EC 요/JX 0334
 늦더위	NNG	6
 격물	NNG	6
 큰사람	NNG	6
@@ -61870,7 +61872,7 @@ NBC	NNP	6
 마니또	NNG	6
 하이튼	MAJ	6
 검심	NNG	6
-거등요	EF	6
+거등요	EF	6	complex 거등/EF 요/JX 0223
 왜냐믄	MAJ	6
 전칭작	NNG	6
 오위	NNP	6
@@ -61972,7 +61974,7 @@ NBC	NNP	6
 욕심나	VV	5	complex 욕심/NNG 나/VV 0223
 냉국	NNG	5
 려	EF	5	vocalic
-으네요	EF	5	non_vowel	=네요
+으네요	EF	5	non_vowel	=네요	complex 네/EF 요/JX 0223
 삼인방	NNG	5
 극명히	MAG	5	complex 극명/XR 히/XSM 0223
 담화범	NNG	5
@@ -62352,7 +62354,7 @@ address1	NNP	5
 까들까들	MAG	5
 나른나른	MAG	5
 조	MM	5
-라네요	EF	5
+라네요	EF	5	complex 라네/EF 요/JX 0223
 잽	NNG	5
 아사리	NNG	5
 사일삼	NR	5
@@ -62924,7 +62926,7 @@ address1	NNP	5
 털장갑	NNG	5
 고약하	VA	5	complex 고약/XR 하/XSA 0223
 동원령	NNG	5
-다네요	EF	5
+다네요	EF	5	complex 다네/EF 요/JX 0223
 참여국	NNG	5
 농축산	NNG	5
 개미마을	NNP	5
@@ -65385,7 +65387,7 @@ SK바이오팜	NNP	5
 달성도	NNG	5
 포텐샤	NNG	5
 한국산업은행	NNP	5
-ᆫ다면요	EF	5	vocalic
+ᆫ다면요	EF	5	vocalic	complex ᆫ다면/EF 요/JX 0334
 미래도시환경	NNP	5
 김준배	NNP	5
 너울	NNG	5
@@ -65926,7 +65928,7 @@ SK바이오팜	NNP	5
 지퍼백	NNG	5
 분비샘	NNG	5
 세안제	NNG	5
-더라구요	EC	5
+더라구요	EC	5	complex 더라구/EC 요/JX 0334
 바득바득	MAG	5
 유희선	NNP	5
 연락병	NNG	5
@@ -65940,7 +65942,7 @@ SK바이오팜	NNP	5
 유당불내증	NNG	5
 탈지유	NNG	5
 탈지분유	NNG	5
-대요	EC	5
+대요	EC	5	complex 대/EC 요/JX 0112
 방역차	NNG	5
 찌르릉	MAG	5
 집달관	NNG	5
@@ -66080,9 +66082,9 @@ KBS	NNP	5
 애경이	NNP	5
 박명	NNG	5
 비안개	NNG	5
-어서요	EC	5
+어서요	EC	5	complex 어서/EC 요/JX 0223
 구옥	NNG	5
-어야지요	EC	5
+어야지요	EC	5	complex 어야지/EC 요/JX 0334
 고개짓	NNG	5
 스쳐보	VV	5	complex 스치/VV 어/EC 보/VX 021223
 삼이웃	NNG	5
@@ -66217,7 +66219,7 @@ KBS	NNP	5
 교육구청	NNG	5
 신길우	NNP	5
 새마을과	NNG	5
-다던데요	EF	5
+다던데요	EF	5	complex 다던데/EF 요/JX 0334
 더구먼	EC	5
 김문식	NNP	5
 도설	NNG	5
@@ -66546,7 +66548,7 @@ KBS	NNP	5
 내뻗치	VV	5	complex 내/VV 어/EC 뻗치/VV 010113
 방축골	NNP	5
 꿈칠	MAG	5
-서요	EF	5
+서요	EF	5	complex 서/EF 요/JX 0112
 두나	EF	5
 계집년	NNG	5
 아궁	NNG	5
@@ -66559,7 +66561,7 @@ KBS	NNP	5
 갈피갈피	NNG	5
 떨어치	VV	5	complex 떨/VV 어/EC 치/VV 011223
 더웁	VA	5	=덥
-아야지요	EC	5
+아야지요	EC	5	complex 아야지/EC 요/JX 0334
 모밀	NNG	5
 입때	MAG	5
 휘돌아보	VV	5	complex 휘돌/VV 어/EC 보/VX 022334
@@ -66570,7 +66572,7 @@ KBS	NNP	5
 푸푸	MAG	5
 김생	NNP	5
 물독	NNG	5
-더라니요	EF	5
+더라니요	EF	5	complex 더라니/EF 요/JX 0334
 눈방울	NNG	5
 비틀걸음	NNG	5
 섬피	NNG	5
@@ -66591,7 +66593,7 @@ KBS	NNP	5
 멍히	MAG	5	complex 멍/XR 히/XSM 0112
 바스락거리	VV	5	complex 바스락/MAG 거리/XSV 0335
 내동댕이	NNG	5
-러요	EF	5
+러요	EF	5	complex 러/EF 요/JX 0112
 와다나베	NNP	5
 피고름	NNG	5
 군교	NNG	5
@@ -66635,7 +66637,7 @@ KBS	NNP	5
 용바우	NNP	5
 북술이	NNP	5
 다더냐	EF	5
-는다구요	EF	5	non_vowel	non_adj	==ᆫ다구요
+는다구요	EF	5	non_vowel	non_adj	==ᆫ다구요	complex 는다구/EF 요/JX 0334
 남금동	NNP	5
 말똥거리	VV	5	complex 말똥/XR 거리/XSV 0224
 빨래감	NNG	5
@@ -66737,7 +66739,7 @@ KBS	NNP	5
 혼인날	NNG	5
 부주	NNG	5
 붙어살	VV	5	complex 붙/VV 어/EC 살/VV 011223
-웬걸요	IC	5
+웬걸요	IC	5	complex 웬걸/IC 요/JX 0223
 삼지창	NNG	5
 검부락지	NNG	5
 바라뵈	VV	5	complex 바라/VV 어/EC 뵈/VV 021223
@@ -66933,7 +66935,7 @@ KBS	NNP	5
 또록또록	MAG	5
 바각바각	MAG	5
 겨울나무	NNG	5
-든가요	EF	5
+든가요	EF	5	complex 든가/EF 요/JX 0223
 귓볼	NNG	5
 종무소식	NNG	5
 달음산	NNP	5
@@ -66958,11 +66960,11 @@ KBS	NNP	5
 석탄가루	NNG	5
 무기력	NNG	5
 조직부장	NNG	5
-라요	EC	5
+라요	EC	5	complex 라/EC 요/JX 0112
 멀건히	MAG	5
 맑스	NNG	5
 박진섭이	NNP	5
-으려구요	EF	5	non_vowel	==려구요
+으려구요	EF	5	non_vowel	==려구요	complex 으려구/EC 요/JX 0334
 여차하면	MAG	5
 구마	EF	5
 꿰메	VV	5	=꿰매
@@ -67016,7 +67018,7 @@ KBS	NNP	5
 합문	NNG	5
 놋대접	NNG	5
 치자나무	NNG	5
-라구요	EC	5
+라구요	EC	5	complex 라구/EC 요/JX 0223
 애저녁	NNG	5
 들어붓	VV-I	5
 축하객	NNG	5
@@ -67104,7 +67106,7 @@ KBS	NNP	5
 찰랑	MAG	5
 등만	EF	5
 기봉이	NNP	5
-씨요	EF	5
+씨요	EF	5	=세요
 누에섶	NNG	5
 새치름	XR	10
 새치름히	MAG	5	complex 새치름/XR 히/XSM 0334
@@ -67268,7 +67270,7 @@ KBS	NNP	5
 입쌀	NNG	5
 배기미	NNP	5
 닥뜨리	VV	5
-으리요	EF	5	non_vowel
+으리요	EF	5	non_vowel	=리오
 퇴마루	NNG	5
 사쿠라나무	NNG	5
 날래	MAG	5
@@ -68435,8 +68437,8 @@ CNN	NNP	5
 차	IC	5
 오늘날	MAG	5
 믄은	EC	5
-니깐요	EF	5	vocalic	=니까요	>니깐요
-으니깐요	EF	5	non_vowel	=니까요	>니깐요
+니깐요	EF	5	vocalic	=니까요	>니깐요	complex 니깐/EF 요/JX 0223
+으니깐요	EF	5	non_vowel	=니까요	>니깐요	complex 으니깐/EF 요/JX 0334
 측	XSN	5
 모니타	NNG	5
 초상권	NNG	5
