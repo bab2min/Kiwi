@@ -21,3 +21,6 @@
 [submodule "third_party/eigen"]
 	path = third_party/eigen
 	url = https://gitlab.com/libeigen/eigen
+[submodule "third_party/json"]
+	path = third_party/json
+	url = https://github.com/nlohmann/json
