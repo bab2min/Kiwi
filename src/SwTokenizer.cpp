@@ -1688,7 +1688,7 @@ pair<Vector<uint32_t>, float> UnigramSwTrainer::tokenizeBest(U16StringView s, bo
 			}
 			if (pathes[b - 1].first.empty()) continue;
 			
-			auto subs = tokenizeBest(s.substr(b), &subBoundaries);
+			auto subs = tokenizeBest(s.substr(b), true, &subBoundaries);
 			if (subs.first.empty()) continue;
 			float score = pathes[b - 1].second + glueScore + subs.second;
 			if (score >= pathes.back().second)

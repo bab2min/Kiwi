@@ -4,6 +4,7 @@
 #ifdef _MSC_VER
 #include <intrin.h>
 #pragma intrinsic(__popcnt)
+#pragma intrinsic(__popcnt64)
 #pragma intrinsic(_BitScanForward)
 #pragma intrinsic(_BitScanForward64)
 #pragma intrinsic(_BitScanReverse)
@@ -112,14 +113,6 @@ namespace kiwi
 
 		inline int ceilLog2(uint64_t v) { return 64 - countLeadingZeroes(v - 1); }
 
-#ifdef __APPLE__
-		inline int countTrailingZeroes(size_t v) { return countTrailingZeroes((uint64_t)v); }
-		
-		inline int countLeadingZeroes(size_t v) { return countLeadingZeroes((uint64_t)v); }
-
-		inline int ceilLog2(size_t v) { return ceilLog2((uint64_t)v); }
-#endif
-
 
 		inline uint32_t popcount(uint32_t v)
 		{
@@ -130,7 +123,28 @@ namespace kiwi
 #else
 			throw "";
 #endif
+	}
+
+		inline uint64_t popcount(uint64_t v)
+		{
+#if defined(__GNUC__)
+			return __builtin_popcountll(v);
+#elif defined(_MSC_VER)
+			return __popcnt64(v);
+#else
+			throw "";
+#endif
 		}
+
+#ifdef __APPLE__
+		inline int countTrailingZeroes(size_t v) { return countTrailingZeroes((uint64_t)v); }
+		
+		inline int countLeadingZeroes(size_t v) { return countLeadingZeroes((uint64_t)v); }
+
+		inline int ceilLog2(size_t v) { return ceilLog2((uint64_t)v); }
+
+		inline size_t popcount(size_t v) { return popcount((uint64_t)v); }
+#endif
 	}
 }
 

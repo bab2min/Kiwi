@@ -3,28 +3,14 @@
 #include <vector>
 #include <memory>
 
+#include <kiwi/BitUtils.h>
+
 namespace sais
 {
-	inline size_t popcnt(uint64_t x)
-	{
-#ifdef __GNUC__
-		return __builtin_popcountll(x);
-#else
-		return __popcnt64(x);
-#endif
-	}
-
-	inline size_t popcnt(uint32_t x)
-	{
-#ifdef __GNUC__
-		return __builtin_popcount(x);
-#else
-		return __popcnt(x);
-#endif
-	}
-
 	inline size_t popcntBits(const uint8_t* bits, size_t bitSize)
 	{
+		using namespace kiwi::utils;
+
 		static constexpr size_t rSize = sizeof(size_t) * 8;
 		if (bitSize == 0) return 0;
 		const size_t blocks = bitSize / rSize;
@@ -32,14 +18,16 @@ namespace sais
 		size_t ret = 0;
 		for (size_t i = 0; i < blocks; ++i)
 		{
-			ret += popcnt(((const size_t*)bits)[i]);
+			ret += popcount(((const size_t*)bits)[i]);
 		}
-		if (tailSize) ret += popcnt(((const size_t*)bits)[blocks] << (rSize - tailSize));
+		if (tailSize) ret += popcount(((const size_t*)bits)[blocks] << (rSize - tailSize));
 		return ret;
 	}
 
 	inline size_t writeLSBs(uint8_t* out, size_t bitOffset, const char16_t* data, size_t size)
 	{
+		using namespace kiwi::utils;
+
 		static constexpr size_t rSize = sizeof(size_t) * 8;
 		size_t headSize = std::min(bitOffset ? (rSize - bitOffset) : 0, size);
 		size_t bodySize = (std::max(size, headSize) - headSize) & ~(rSize - 1);
@@ -63,7 +51,7 @@ namespace sais
 				g |= v << j;
 			}
 			((size_t*)out)[i + (headSize ? 1 : 0)] = g;
-			oneCnt += popcnt(g);
+			oneCnt += popcount(g);
 		}
 
 		if (tailSize)
@@ -99,6 +87,8 @@ namespace sais
 
 	inline size_t writeMSBs(uint8_t* out, size_t bitOffset, const char16_t* data, size_t size)
 	{
+		using namespace kiwi::utils;
+
 		static constexpr size_t rSize = sizeof(size_t) * 8;
 		size_t headSize = std::min(bitOffset ? (rSize - bitOffset) : 0, size);
 		size_t bodySize = (std::max(size, headSize) - headSize) & ~(rSize - 1);
@@ -122,7 +112,7 @@ namespace sais
 				g |= v << j;
 			}
 			((size_t*)out)[i + (headSize ? 1 : 0)] = g;
-			oneCnt += popcnt(g);
+			oneCnt += popcount(g);
 		}
 
 		if (tailSize)
