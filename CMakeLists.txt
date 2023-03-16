@@ -32,8 +32,10 @@ set ( CORE_SRCS
   src/KTrie.cpp
   src/PatternMatcher.cpp
   src/search.cpp
+  src/SwTokenizer.cpp
   src/TagUtils.cpp
   src/TypoTransformer.cpp
+  src/UnicodeCase.cpp
   src/Utils.cpp
   src/WordDetector.cpp
   src/archImpl/none.cpp
@@ -55,6 +57,7 @@ include_directories( third_party/tclap/include )
 include_directories( third_party/cpp-btree )
 include_directories( third_party/variant/include )
 include_directories( third_party/eigen )
+include_directories( third_party/json/include )
 if(KIWI_USE_CPUINFO)
   message(STATUS "Use cpuinfo")
   include_directories( third_party/cpuinfo/include )

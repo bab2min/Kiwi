@@ -8,6 +8,7 @@ test_typo.cpp
 test_combiner.cpp
 test_c.cpp
 test_cpp.cpp
+test_sw_tokenizer.cpp
 )
 
 ######################################
