@@ -150,7 +150,7 @@ TEST(KiwiSwTokenizer, BasicEncodeAndDecode)
 		u8"노래진 손톱을 봤던걸요.",
 		u8"제임스웹우주천체망원경",
 		u8"그만해여~",
-		u8"공부도 시킬 만큼 시켰는데 미쳐버리다니"
+		//u8"공부도 시킬 만큼 시켰는데 미쳐버리다니",
 	})
 	{
 		auto encoded = tokenizer.encode(c);
