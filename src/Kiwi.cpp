@@ -625,6 +625,15 @@ namespace kiwi
 		}
 	};
 
+	struct GenericGreater
+	{
+		template<class A, class B>
+		bool operator()(A&& a, B&& b)
+		{
+			return a > b;
+		}
+	};
+
 	template<class LmState, class _Map>
 	void evalTrigram(const LangModel& langMdl, 
 		const Morpheme* morphBase, 
@@ -702,7 +711,7 @@ namespace kiwi
 					candScore,
 					WordLLP<LmState>{ &morphBase[p.back.wid], candScore, p.accTypoCost + node->typoCost, &p, move(cLmState), p.spState }, 
 					3, 
-					greater<>{}
+					GenericGreater{}
 				);
 			continueFor:;
 			}
@@ -1452,7 +1461,7 @@ namespace kiwi
 		if (!pool) throw Exception{ "`asyncAnalyze` doesn't work at single thread mode." };
 		return pool->enqueue([=, str = std::forward<Str>(str)](size_t)
 		{
-			return analyze(str, args...);
+			return analyze(str, (args)...);
 		});
 	}
 
@@ -1462,7 +1471,7 @@ namespace kiwi
 		if (!pool) throw Exception{ "`asyncAnalyze` doesn't work at single thread mode." };
 		return pool->enqueue([=, str = std::forward<Str>(str)](size_t) mutable
 		{
-			auto ret = analyze(str, args...);
+			auto ret = analyze(str, (args)...);
 			return make_pair(move(ret), move(str));
 		});
 	}

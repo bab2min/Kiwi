@@ -497,26 +497,29 @@ void KiwiBuilder::addCorpusTo(RaggedVector<uint16_t>& out, std::istream& is, Mor
 				f[0] = u'어';
 			}
 
-			auto it = morphMap.find(make_pair(f, t));
-			auto& morph = morphemes[it->second.first];
-			if (it != morphMap.end() && (morph.chunks.empty() || morph.complex()) && !morph.combineSocket)
+			auto it = morphMap.find(make_pair(f, t));			
+			if (it != morphMap.end())
 			{
-				if (it->second.first != it->second.second 
-					&& it->second.first < defaultFormSize + 2 
-					&& morphemes[it->second.second].complex()
-				)
+				auto& morph = morphemes[it->second.first];
+				if ((morph.chunks.empty() || morph.complex()) && !morph.combineSocket)
 				{
-					auto& decomposed = morphemes[it->second.second].chunks;
-					for (auto wid : decomposed)
+					if (it->second.first != it->second.second
+						&& it->second.first < defaultFormSize + 2
+						&& morphemes[it->second.second].complex()
+						)
 					{
-						wids.emplace_back(morphemes[wid].lmMorphemeId ? morphemes[wid].lmMorphemeId : wid);
+						auto& decomposed = morphemes[it->second.second].chunks;
+						for (auto wid : decomposed)
+						{
+							wids.emplace_back(morphemes[wid].lmMorphemeId ? morphemes[wid].lmMorphemeId : wid);
+						}
 					}
+					else
+					{
+						wids.emplace_back(it->second.first);
+					}
+					continue;
 				}
-				else
-				{
-					wids.emplace_back(it->second.first);
-				}
-				continue;
 			}
 
 			if (t == POSTag::ss && f.size() == 1)

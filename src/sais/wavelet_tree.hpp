@@ -7,12 +7,20 @@ namespace sais
 {
 	inline size_t popcnt(uint64_t x)
 	{
+#ifdef __GNUC__
+		return __builtin_popcountll(x);
+#else
 		return __popcnt64(x);
+#endif
 	}
 
 	inline size_t popcnt(uint32_t x)
 	{
+#ifdef __GNUC__
+		return __builtin_popcount(x);
+#else
 		return __popcnt(x);
+#endif
 	}
 
 	inline size_t popcntBits(const uint8_t* bits, size_t bitSize)

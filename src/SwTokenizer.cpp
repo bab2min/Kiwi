@@ -665,7 +665,7 @@ SwTokenizer::SwTokenizer(ArchType archType)
 	static tp::Table<FnTokenizeSubword, AvailableArch> table{ TokenizeSubwordGetter{} };
 	if (archType != ArchType::default_)
 	{
-		dfTokenizeSubword = table[static_cast<ptrdiff_t>(archType)];
+		dfTokenizeSubword = reinterpret_cast<void*>(table[static_cast<ptrdiff_t>(archType)]);
 		if (!dfTokenizeSubword) throw Exception{ string{ "Unsupported archType: " } + archToStr(archType) };
 	}
 }
