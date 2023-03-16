@@ -18,7 +18,7 @@
 #elif defined(_MSC_VER) || defined(__INTEL_COMPILER)
 #define RESTRICT __restrict
 #else
-#error Your compiler, configuration or platform is not supported.
+#define RESTRICT
 #endif
 
 #if defined(__has_builtin)
@@ -45,7 +45,8 @@
 #define prefetchr(address) __prefetch2((const void *)(address), 0)
 #define prefetchw(address) __prefetch2((const void *)(address), 16)
 #else
-#error Your compiler, configuration or platform is not supported.
+#define prefetchr(x)
+#define prefetchw(x)
 #endif
 
 namespace sais

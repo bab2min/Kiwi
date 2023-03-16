@@ -129,10 +129,10 @@ namespace kiwi
 		{
 #if defined(__GNUC__)
 			return __builtin_popcountll(v);
-#elif defined(_MSC_VER)
+#elif defined(_MSC_VER) && defined(_M_X64)
 			return __popcnt64(v);
 #else
-			throw "";
+			return popcount((uint32_t)(v & 0xFFFFFFFF)) + popcount((uint32_t)(v >> 32));
 #endif
 		}
 
