@@ -1459,21 +1459,21 @@ namespace kiwi
 	auto Kiwi::_asyncAnalyze(Str&& str, Rest&&... args) const
 	{
 		if (!pool) throw Exception{ "`asyncAnalyze` doesn't work at single thread mode." };
-		return pool->enqueue([=, str = std::forward<Str>(str)](size_t)
+		return pool->enqueue([=, str = std::forward<Str>(str)](size_t, Rest... largs)
 		{
-			return analyze(str, (args)...);
-		});
+			return analyze(str, largs...);
+		}, forward<Rest>(args)...);
 	}
 
 	template<class Str, class ...Rest>
 	auto Kiwi::_asyncAnalyzeEcho(Str&& str, Rest&&... args) const
 	{
 		if (!pool) throw Exception{ "`asyncAnalyze` doesn't work at single thread mode." };
-		return pool->enqueue([=, str = std::forward<Str>(str)](size_t) mutable
+		return pool->enqueue([=, str = std::forward<Str>(str)](size_t, Rest... largs) mutable
 		{
-			auto ret = analyze(str, (args)...);
+			auto ret = analyze(str, largs...);
 			return make_pair(move(ret), move(str));
-		});
+		}, forward<Rest>(args)...);
 	}
 
 	future<vector<TokenResult>> Kiwi::asyncAnalyze(const string& str, size_t topN, Match matchOptions, const std::unordered_set<const Morpheme*>* blocklist) const
