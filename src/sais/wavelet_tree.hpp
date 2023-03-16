@@ -148,6 +148,8 @@ namespace sais
 	template<size_t superBlockSize>
 	inline void fillSuperBlocks(size_t* superBlocks, const uint8_t* bits, size_t size)
 	{
+		using namespace kiwi::utils;
+
 		size_t acc = 0;
 		size &= ~(superBlockSize - 1);
 		for (size_t i = 0; i < size; i += superBlockSize)
@@ -155,7 +157,7 @@ namespace sais
 			auto curBits = (const size_t*)(bits + i);
 			for (size_t j = 0; j < superBlockSize / sizeof(size_t); ++j)
 			{
-				acc += popcnt(curBits[j]);
+				acc += popcount(curBits[j]);
 			}
 			*superBlocks++ = acc;
 		}
