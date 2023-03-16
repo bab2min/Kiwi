@@ -218,6 +218,7 @@ namespace mp
 		struct FindType<T, std::tuple<>>
 		{
 			using type = void;
+			static constexpr int value = -1;
 		};
 
 		template<class T, class U, class ...Ts>
@@ -228,6 +229,7 @@ namespace mp
 				U,
 				typename FindType<T, std::tuple<Ts...>>::type
 			>::type;
+			static constexpr int value = std::is_same<T, typename std::remove_reference<U>::type>::value ? 0 : (1 + FindType<T, std::tuple<Ts...>>::value);
 		};
 
 		template<template<class> class T, class Tuple>
@@ -272,7 +274,7 @@ namespace mp
 		>
 		Ty extractValueFrom(Ty2&& def, const std::tuple<Args...>& args)
 		{
-			return std::get<typename FindType<Ty, std::tuple<Args...>>::type>(args);
+			return std::get<FindType<Ty, std::tuple<Args...>>::value>(args);
 		}
 
 		template<class Ty, class Ty2, class ...Args,

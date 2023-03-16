@@ -280,7 +280,7 @@ namespace kiwi
 
 				if (testEq<IntTy>(peq, i, size, ret)) return true;
 
-				r = utils::popcount(_mm_movemask_epi8(pgt)) / sizeof(IntTy);
+				r = utils::popcount((uint32_t)_mm_movemask_epi8(pgt)) / sizeof(IntTy);
 				i = i * n + (n - 1) * (r + 1);
 
 				pkey = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&keys[i]));
@@ -302,7 +302,7 @@ namespace kiwi
 
 				if (testEq<IntTy>(peq, i, size, ret)) return true;
 
-				r = utils::popcount(_mm_movemask_epi8(pgt)) / sizeof(IntTy);
+				r = utils::popcount((uint32_t)_mm_movemask_epi8(pgt)) / sizeof(IntTy);
 				i = i * n + (n - 1) * (r + 1);
 
 				pkey = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&keys[i]));
@@ -324,7 +324,7 @@ namespace kiwi
 
 				if (testEq<IntTy>(peq, i, size, ret)) return true;
 
-				r = utils::popcount(_mm_movemask_epi8(pgt)) / sizeof(IntTy);
+				r = utils::popcount((uint32_t)_mm_movemask_epi8(pgt)) / sizeof(IntTy);
 				i = i * n + (n - 1) * (r + 1);
 			}
 			else if (size >= n * n - 1)
@@ -348,7 +348,7 @@ namespace kiwi
 
 				if (testEq<IntTy>(peq, i, size, ret)) return true;
 
-				r = utils::popcount(_mm_movemask_epi8(pgt)) / sizeof(IntTy);
+				r = utils::popcount((uint32_t)_mm_movemask_epi8(pgt)) / sizeof(IntTy);
 				i = i * n + (n - 1) * (r + 1);
 
 				pkey = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&keys[i]));
@@ -370,7 +370,7 @@ namespace kiwi
 
 				if (testEq<IntTy>(peq, i, size, ret)) return true;
 
-				r = utils::popcount(_mm_movemask_epi8(pgt)) / sizeof(IntTy);
+				r = utils::popcount((uint32_t)_mm_movemask_epi8(pgt)) / sizeof(IntTy);
 				i = i * n + (n - 1) * (r + 1);
 			}
 
@@ -395,7 +395,7 @@ namespace kiwi
 
 				if (testEq<IntTy>(peq, i, size, ret)) return true;
 
-				r = utils::popcount(_mm_movemask_epi8(pgt)) / sizeof(IntTy);
+				r = utils::popcount((uint32_t)_mm_movemask_epi8(pgt)) / sizeof(IntTy);
 				i = i * n + (n - 1) * (r + 1);
 			}
 			return false;
@@ -501,7 +501,7 @@ namespace kiwi
 
 				if (testEq<IntTy>(peq, i, size, ret)) return true;
 
-				r = utils::popcount(_mm256_movemask_epi8(pgt)) / sizeof(IntTy);
+				r = utils::popcount((uint32_t)_mm256_movemask_epi8(pgt)) / sizeof(IntTy);
 				i = i * n + (n - 1) * (r + 1);
 
 				pkey = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&keys[i]));
@@ -527,7 +527,7 @@ namespace kiwi
 
 				if (testEq<IntTy>(peq, i, size, ret)) return true;
 
-				r = utils::popcount(_mm256_movemask_epi8(pgt)) / sizeof(IntTy);
+				r = utils::popcount((uint32_t)_mm256_movemask_epi8(pgt)) / sizeof(IntTy);
 				i = i * n + (n - 1) * (r + 1);
 
 				pkey = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&keys[i]));
@@ -553,7 +553,7 @@ namespace kiwi
 
 				if (testEq<IntTy>(peq, i, size, ret)) return true;
 
-				r = utils::popcount(_mm256_movemask_epi8(pgt)) / sizeof(IntTy);
+				r = utils::popcount((uint32_t)_mm256_movemask_epi8(pgt)) / sizeof(IntTy);
 				i = i * n + (n - 1) * (r + 1);
 			}
 			else if (size >= n * n - 1)
@@ -581,7 +581,7 @@ namespace kiwi
 
 				if (testEq<IntTy>(peq, i, size, ret)) return true;
 
-				r = utils::popcount(_mm256_movemask_epi8(pgt)) / sizeof(IntTy);
+				r = utils::popcount((uint32_t)_mm256_movemask_epi8(pgt)) / sizeof(IntTy);
 				i = i * n + (n - 1) * (r + 1);
 
 				pkey = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&keys[i]));
@@ -607,7 +607,7 @@ namespace kiwi
 
 				if (testEq<IntTy>(peq, i, size, ret)) return true;
 
-				r = utils::popcount(_mm256_movemask_epi8(pgt)) / sizeof(IntTy);
+				r = utils::popcount((uint32_t)_mm256_movemask_epi8(pgt)) / sizeof(IntTy);
 				i = i * n + (n - 1) * (r + 1);
 			}
 
@@ -636,7 +636,7 @@ namespace kiwi
 
 				if (testEq<IntTy>(peq, i, size, ret)) return true;
 
-				r = utils::popcount(_mm256_movemask_epi8(pgt)) / sizeof(IntTy);
+				r = utils::popcount((uint32_t)_mm256_movemask_epi8(pgt)) / sizeof(IntTy);
 				i = i * n + (n - 1) * (r + 1);
 			}
 			return false;

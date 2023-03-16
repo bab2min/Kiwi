@@ -123,7 +123,7 @@ namespace kiwi
 #else
 			throw "";
 #endif
-	}
+		}
 
 		inline uint64_t popcount(uint64_t v)
 		{
