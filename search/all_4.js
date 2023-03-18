@@ -12,5 +12,7 @@ var searchData=
   ['fromrawdata_48',['FromRawData',['../structkiwi_1_1WordDetector_1_1FromRawData.html',1,'kiwi::WordDetector']]],
   ['frozentrie_49',['FrozenTrie',['../classkiwi_1_1utils_1_1FrozenTrie.html',1,'kiwi::utils']]],
   ['frozentrie_3c_20char16_5ft_2c_20patinfo_2c_20int32_5ft_2c_20patinfohassubmatch_20_3e_50',['FrozenTrie&lt; char16_t, PatInfo, int32_t, PatInfoHasSubmatch &gt;',['../classkiwi_1_1utils_1_1FrozenTrie.html',1,'kiwi::utils']]],
-  ['frozentrie_3c_20kchar_5ft_2c_20const_20kiwi_3a_3aform_20_2a_20_3e_51',['FrozenTrie&lt; kchar_t, const kiwi::Form * &gt;',['../classkiwi_1_1utils_1_1FrozenTrie.html',1,'kiwi::utils']]]
+  ['frozentrie_3c_20char16_5ft_2c_20size_5ft_20_3e_51',['FrozenTrie&lt; char16_t, size_t &gt;',['../classkiwi_1_1utils_1_1FrozenTrie.html',1,'kiwi::utils']]],
+  ['frozentrie_3c_20kchar_5ft_2c_20const_20kiwi_3a_3aform_20_2a_20_3e_52',['FrozenTrie&lt; kchar_t, const kiwi::Form * &gt;',['../classkiwi_1_1utils_1_1FrozenTrie.html',1,'kiwi::utils']]],
+  ['frozentrie_3c_20kchar_5ft_2c_20uint32_5ft_20_3e_53',['FrozenTrie&lt; kchar_t, uint32_t &gt;',['../classkiwi_1_1utils_1_1FrozenTrie.html',1,'kiwi::utils']]]
 ];

@@ -9,4 +9,6 @@ digraph "include/kiwi/Types.h"
   Node2 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
   Node3 [label="include/kiwi/Kiwi.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$Kiwi_8h.html",tooltip="Kiwi C++ API를 담고 있는 헤더 파일"];
   Node1 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node1 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="include/kiwi/SwTokenizer.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$SwTokenizer_8h.html",tooltip="Subword Tokenizer."];
 }

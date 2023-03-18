@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>capi.h &mdash; Kiwi  documentation</title>
@@ -14,9 +14,6 @@
   <![endif]-->
   
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/sphinx_highlight.js"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -31,11 +28,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../index.html" class="icon icon-home"> Kiwi
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Kiwi
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -63,7 +64,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a></li>
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="index.html">C API</a></li>
       <li class="breadcrumb-item active">capi.h</li>
       <li class="wy-breadcrumbs-aside">
@@ -157,16 +158,16 @@
 <span id="_CPPv313kiwi_reader_t"></span><span id="_CPPv213kiwi_reader_t"></span><span id="kiwi_reader_t"></span><span class="target" id="capi_8h_1a1b38cdecc30ec0b3f84086a18ca06512"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_reader_t</span></span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv413kiwi_reader_t" title="Permalink to this definition"></a><br /></dt>
 <dd><p>문자열을 읽어들여 Kiwi에 제공하기 위한 콜백 함수 타입. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Param int</dt>
+<dt class="field-odd">Param int<span class="colon">:</span></dt>
 <dd class="field-odd"><p>읽어들일 문자열의 줄 번호입니다. 0부터 시작하여 차례로 1씩 증가합니다. </p>
 </dd>
-<dt class="field-even">Param char*</dt>
+<dt class="field-even">Param char*<span class="colon">:</span></dt>
 <dd class="field-even"><p>읽어들인 문자열이 저장될 버퍼의 주소입니다. 이 값이 null인 경우 버퍼의 크기를 반환해야 합니다. </p>
 </dd>
-<dt class="field-odd">Param void*</dt>
+<dt class="field-odd">Param void*<span class="colon">:</span></dt>
 <dd class="field-odd"><p>user data를 위한 인자입니다.</p>
 </dd>
-<dt class="field-even">Return</dt>
+<dt class="field-even">Return<span class="colon">:</span></dt>
 <dd class="field-even"><p>int 두번째 인자가 null인 경우 읽어들일 버퍼의 크기를 반환합니다. </p>
 </dd>
 </dl>
@@ -187,19 +188,19 @@
 <span id="_CPPv323kiwi_builder_replacer_t"></span><span id="_CPPv223kiwi_builder_replacer_t"></span><span id="kiwi_builder_replacer_t"></span><span class="target" id="capi_8h_1aaca30b98ab19263d7f0494b80ff5d095"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_builder_replacer_t</span></span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv423kiwi_builder_replacer_t" title="Permalink to this definition"></a><br /></dt>
 <dd><p>문자열의 변형결과를 Kiwi에 제공하기 위한 콜백 함수 타입 </p>
 <dl class="field-list simple">
-<dt class="field-odd">Param const</dt>
+<dt class="field-odd">Param const<span class="colon">:</span></dt>
 <dd class="field-odd"><p>char* 원본 문자열의 값입니다. </p>
 </dd>
-<dt class="field-even">Param int</dt>
+<dt class="field-even">Param int<span class="colon">:</span></dt>
 <dd class="field-even"><p>원본 문자열의 바이트 단위 길이입니다. </p>
 </dd>
-<dt class="field-odd">Param char*</dt>
+<dt class="field-odd">Param char*<span class="colon">:</span></dt>
 <dd class="field-odd"><p>변형된 문자열을 쓸 버퍼입니다. 이 값이 null인 경우 버퍼의 크기를 반환해야 합니다. </p>
 </dd>
-<dt class="field-even">Param void*</dt>
+<dt class="field-even">Param void*<span class="colon">:</span></dt>
 <dd class="field-even"><p>user data를 위한 인자입니다.</p>
 </dd>
-<dt class="field-odd">Return</dt>
+<dt class="field-odd">Return<span class="colon">:</span></dt>
 <dd class="field-odd"><p>int 세번째 인자가 null인 경우 출력할 문자열의 버퍼의 크기를 반환합니다. </p>
 </dd>
 </dl>
@@ -375,7 +376,7 @@
 <span id="_CPPv312kiwi_versionv"></span><span id="_CPPv212kiwi_versionv"></span><span id="kiwi_version"></span><span class="target" id="capi_8h_1a0dc43be38208babb62874dd24bf29093"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_version</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412kiwi_versionv" title="Permalink to this definition"></a><br /></dt>
 <dd><p>설치된 Kiwi의 버전을 반환합니다. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>“major.minor.patch”로 구성되는 버전 문자열. </p>
 </dd>
 </dl>
@@ -386,7 +387,7 @@
 <span id="_CPPv310kiwi_errorv"></span><span id="_CPPv210kiwi_errorv"></span><span id="kiwi_error"></span><span class="target" id="capi_8h_1afeefb305c962012957279d889e6dac3e"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_error</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410kiwi_errorv" title="Permalink to this definition"></a><br /></dt>
 <dd><p>현재 스레드에서 발생한 에러 메세지를 반환합니다. 발생한 에러가 없을 경우 nullptr를 반환합니다. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>에러 메세지 혹은 nullptr. </p>
 </dd>
 </dl>
@@ -397,7 +398,7 @@
 <span id="_CPPv316kiwi_clear_errorv"></span><span id="_CPPv216kiwi_clear_errorv"></span><span id="kiwi_clear_error"></span><span class="target" id="capi_8h_1aa3f32e4c147a58e5952676f03712e39c"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_clear_error</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416kiwi_clear_errorv" title="Permalink to this definition"></a><br /></dt>
 <dd><p>현재 스레드의 에러 메세지를 초기화합니다. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>void </p>
 </dd>
 </dl>
@@ -409,18 +410,18 @@
 <dd><p>Kiwi Builder를 생성합니다. </p>
 <p><div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference internal" href="#capi_8h_1a8ee24152f80c94f558f3ca9f5760d54d"><span class="std std-ref">kiwi_builder_close</span></a> </p>
+<p><a class="reference internal" href="#capi_8h_1a8ee24152f80c94f558f3ca9f5760d54d"><span class="std std-ref">kiwi_builder_close</span></a></p>
 </div>
 </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>model_path</strong> – 모델의 경로. </p></li>
 <li><p><strong>num_threads</strong> – 사용할 스레드의 개수. 0으로 지정시 가용한 스레드 개수를 자동으로 판단합니다. </p></li>
 <li><p><strong>options</strong> – 생성 옵션. KIWI_BUILD_* 열거형을 참조하십시오. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>성공 시 Kiwi Builder의 핸들을 반환합니다. 실패시 nullptr를 반환하고 에러 메세지를 설정합니다. 에러 메세지는 <a class="reference internal" href="#capi_8h_1afeefb305c962012957279d889e6dac3e"><span class="std std-ref">kiwi_error()</span></a>를 통해 확인할 수 있습니다.</p>
 </dd>
 </dl>
@@ -435,10 +436,10 @@
 <p>kiwi_builder_init로 생성된 kiwi_builder_h는 반드시 이 함수로 해제되어야 합니다. </p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>handle</strong> – KiwiBuilder의 핸들. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>성공 시 0를 반환합니다.</p>
 </dd>
 </dl>
@@ -449,7 +450,7 @@
 <span id="_CPPv321kiwi_builder_add_word14kiwi_builder_hPKcPKcf"></span><span id="_CPPv221kiwi_builder_add_word14kiwi_builder_hPKcPKcf"></span><span id="kiwi_builder_add_word__kiwi_builder_h.cCP.cCP.float"></span><span class="target" id="capi_8h_1ad43fce424031604034a6350146edc366"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_builder_add_word</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv414kiwi_builder_h" title="kiwi_builder_h"><span class="n"><span class="pre">kiwi_builder_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">word</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">pos</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">score</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421kiwi_builder_add_word14kiwi_builder_hPKcPKcf" title="Permalink to this definition"></a><br /></dt>
 <dd><p>사용자 형태소를 추가합니다. 이 함수로 등록한 형태소의 경우 언어 모델 내에서 UNK(사전 미등재 단어)로 처리됩니다. 특정 형태소의 변이형을 등록하려는 경우 kiwi_builder_add_alias_word 함수를 사용하는 걸 권장합니다. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>handle</strong> – KiwiBuilder의 핸들. </p></li>
 <li><p><strong>word</strong> – 추가할 형태소 (utf-8). </p></li>
@@ -457,7 +458,7 @@
 <li><p><strong>score</strong> – 점수. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>성공 시 0를 반환합니다. </p>
 </dd>
 </dl>
@@ -468,7 +469,7 @@
 <span id="_CPPv327kiwi_builder_add_alias_word14kiwi_builder_hPKcPKcfPKc"></span><span id="_CPPv227kiwi_builder_add_alias_word14kiwi_builder_hPKcPKcfPKc"></span><span id="kiwi_builder_add_alias_word__kiwi_builder_h.cCP.cCP.float.cCP"></span><span class="target" id="capi_8h_1aa3fe9ac609d76d3d4e369b1e50311396"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_builder_add_alias_word</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv414kiwi_builder_h" title="kiwi_builder_h"><span class="n"><span class="pre">kiwi_builder_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">alias</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">pos</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">score</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">orig_word</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv427kiwi_builder_add_alias_word14kiwi_builder_hPKcPKcfPKc" title="Permalink to this definition"></a><br /></dt>
 <dd><p>원본 형태소를 기반으로하는 새 형태소를 추가합니다. kiwi_builder_add_word로 등록한 형태소의 경우 언어 모델 내에서 UNK(사전 미등재 단어)로 처리되는 반면, 이 함수로 등록한 형태소의 경우 언어모델 내에서 원본 형태소와 동일하게 처리됩니다. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>handle</strong> – KiwiBuilder의 핸들. </p></li>
 <li><p><strong>alias</strong> – 새 형태소 (utf-8) </p></li>
@@ -477,7 +478,7 @@
 <li><p><strong>orig_word</strong> – 원 형태소 (utf-8) </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>성공 시 0를 반환합니다. 만약 orig_word에 pos 태그를 가진 원본 형태소가 존재하지 않는 경우 이 함수는 실패합니다. </p>
 </dd>
 </dl>
@@ -488,7 +489,7 @@
 <span id="_CPPv334kiwi_builder_add_pre_analyzed_word14kiwi_builder_hPKciPPKcPPKcfPKi"></span><span id="_CPPv234kiwi_builder_add_pre_analyzed_word14kiwi_builder_hPKciPPKcPPKcfPKi"></span><span id="kiwi_builder_add_pre_analyzed_word__kiwi_builder_h.cCP.i.cCPP.cCPP.float.iCP"></span><span class="target" id="capi_8h_1a2fb7c8fcbf07533015c45dd6b6a92cdf"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_builder_add_pre_analyzed_word</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv414kiwi_builder_h" title="kiwi_builder_h"><span class="n"><span class="pre">kiwi_builder_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">form</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">analyzed_morphs</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">analyzed_pos</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">score</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">positions</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv434kiwi_builder_add_pre_analyzed_word14kiwi_builder_hPKciPPKcPPKcfPKi" title="Permalink to this definition"></a><br /></dt>
 <dd><p>기분석 형태소열을 추가합니다. 불규칙적으로 분석되어야하는 패턴을 추가하는 데 용이합니다. 예) 사겼다 -&gt; 사귀/VV + 었/EP + 다/EF </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>handle</strong> – KiwiBuilder의 핸들. </p></li>
 <li><p><strong>form</strong> – 등록할 형태 (utf-8) </p></li>
@@ -499,7 +500,7 @@
 <li><p><strong>positions</strong> – size * 2 개수의 int 배열의 시작 포인터. 각 형태소가 형태 내에서 차지하는 위치를 지정합니다. null을 입력하여 생략할 수 있습니다. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>성공 시 0를 반환합니다. 만약 analyzed_morphs와 analyzed_pos로 지정된 형태소가 사전 내에 존재하지 않으면 이 함수는 실패합니다. </p>
 </dd>
 </dl>
@@ -510,7 +511,7 @@
 <span id="_CPPv321kiwi_builder_add_rule14kiwi_builder_hPKc23kiwi_builder_replacer_tPvf"></span><span id="_CPPv221kiwi_builder_add_rule14kiwi_builder_hPKc23kiwi_builder_replacer_tPvf"></span><span id="kiwi_builder_add_rule__kiwi_builder_h.cCP.kiwi_builder_replacer_t.voidP.float"></span><span class="target" id="capi_8h_1a124c3141ba46c5ada0ddfed16b75b1a6"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_builder_add_rule</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv414kiwi_builder_h" title="kiwi_builder_h"><span class="n"><span class="pre">kiwi_builder_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">pos</span></span>, <a class="reference internal" href="#_CPPv423kiwi_builder_replacer_t" title="kiwi_builder_replacer_t"><span class="n"><span class="pre">kiwi_builder_replacer_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">replacer</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">user_data</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">score</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421kiwi_builder_add_rule14kiwi_builder_hPKc23kiwi_builder_replacer_tPvf" title="Permalink to this definition"></a><br /></dt>
 <dd><p>규칙에 의해 변형된 형태소 목록을 생성하여 자동 추가합니다. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>handle</strong> – KiwiBuilder의 핸들. </p></li>
 <li><p><strong>pos</strong> – 변형할 형태소의 품사 태그 </p></li>
@@ -519,7 +520,7 @@
 <li><p><strong>score</strong> – 점수. 기본적으로는 0을 사용합니다. 0보다 클 경우 이 변형 결과가 더 높은 우선순위를, 작을 경우 더 낮은 우선순위를 갖습니다. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>성공 시 새로 추가된 형태소의 개수를 반환합니다. 실패 시 음수를 반환합니다. </p>
 </dd>
 </dl>
@@ -530,13 +531,13 @@
 <span id="_CPPv322kiwi_builder_load_dict14kiwi_builder_hPKc"></span><span id="_CPPv222kiwi_builder_load_dict14kiwi_builder_hPKc"></span><span id="kiwi_builder_load_dict__kiwi_builder_h.cCP"></span><span class="target" id="capi_8h_1a9314385ff63c45307f89c8b5f61315d1"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_builder_load_dict</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv414kiwi_builder_h" title="kiwi_builder_h"><span class="n"><span class="pre">kiwi_builder_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">dict_path</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422kiwi_builder_load_dict14kiwi_builder_hPKc" title="Permalink to this definition"></a><br /></dt>
 <dd><p>사용자 사전으로부터 단어를 읽어들입니다. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>handle</strong> – KiwiBuilder의 핸들. </p></li>
 <li><p><strong>dict_path</strong> – 사전 파일 경로. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>추가된 단어 수. </p>
 </dd>
 </dl>
@@ -546,7 +547,7 @@
 <dt class="sig sig-object cpp" id="_CPPv426kiwi_builder_extract_words14kiwi_builder_h13kiwi_reader_tPviiff">
 <span id="_CPPv326kiwi_builder_extract_words14kiwi_builder_h13kiwi_reader_tPviiff"></span><span id="_CPPv226kiwi_builder_extract_words14kiwi_builder_h13kiwi_reader_tPviiff"></span><span id="kiwi_builder_extract_words__kiwi_builder_h.kiwi_reader_t.voidP.i.i.float.float"></span><span class="target" id="capi_8h_1ac7f4a7b66be68929bd332f26f0c57f3b"></span><a class="reference internal" href="#_CPPv49kiwi_ws_h" title="kiwi_ws_h"><span class="n"><span class="pre">kiwi_ws_h</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_builder_extract_words</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv414kiwi_builder_h" title="kiwi_builder_h"><span class="n"><span class="pre">kiwi_builder_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span>, <a class="reference internal" href="#_CPPv413kiwi_reader_t" title="kiwi_reader_t"><span class="n"><span class="pre">kiwi_reader_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">reader</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">user_data</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">min_cnt</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">max_word_len</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">min_score</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pos_threshold</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv426kiwi_builder_extract_words14kiwi_builder_h13kiwi_reader_tPviiff" title="Permalink to this definition"></a><br /></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>handle</strong> – KiwiBuilder의 핸들. </p></li>
 <li><p><strong>reader</strong> – </p></li>
@@ -557,7 +558,7 @@
 <li><p><strong>pos_threshold</strong> – </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p></p>
 </dd>
 </dl>
@@ -567,7 +568,7 @@
 <dt class="sig sig-object cpp" id="_CPPv430kiwi_builder_extract_add_words14kiwi_builder_h13kiwi_reader_tPviiff">
 <span id="_CPPv330kiwi_builder_extract_add_words14kiwi_builder_h13kiwi_reader_tPviiff"></span><span id="_CPPv230kiwi_builder_extract_add_words14kiwi_builder_h13kiwi_reader_tPviiff"></span><span id="kiwi_builder_extract_add_words__kiwi_builder_h.kiwi_reader_t.voidP.i.i.float.float"></span><span class="target" id="capi_8h_1a032232de9f5e4350e142178b4582bd96"></span><a class="reference internal" href="#_CPPv49kiwi_ws_h" title="kiwi_ws_h"><span class="n"><span class="pre">kiwi_ws_h</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_builder_extract_add_words</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv414kiwi_builder_h" title="kiwi_builder_h"><span class="n"><span class="pre">kiwi_builder_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span>, <a class="reference internal" href="#_CPPv413kiwi_reader_t" title="kiwi_reader_t"><span class="n"><span class="pre">kiwi_reader_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">reader</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">user_data</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">min_cnt</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">max_word_len</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">min_score</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pos_threshold</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv430kiwi_builder_extract_add_words14kiwi_builder_h13kiwi_reader_tPviiff" title="Permalink to this definition"></a><br /></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>handle</strong> – KiwiBuilder의 핸들. </p></li>
 <li><p><strong>reader</strong> – </p></li>
@@ -578,7 +579,7 @@
 <li><p><strong>pos_threshold</strong> – </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p></p>
 </dd>
 </dl>
@@ -588,7 +589,7 @@
 <dt class="sig sig-object cpp" id="_CPPv428kiwi_builder_extract_words_w14kiwi_builder_h15kiwi_reader_w_tPviiff">
 <span id="_CPPv328kiwi_builder_extract_words_w14kiwi_builder_h15kiwi_reader_w_tPviiff"></span><span id="_CPPv228kiwi_builder_extract_words_w14kiwi_builder_h15kiwi_reader_w_tPviiff"></span><span id="kiwi_builder_extract_words_w__kiwi_builder_h.kiwi_reader_w_t.voidP.i.i.float.float"></span><span class="target" id="capi_8h_1aea1a5379c79074a4d8c18b2b148874b1"></span><a class="reference internal" href="#_CPPv49kiwi_ws_h" title="kiwi_ws_h"><span class="n"><span class="pre">kiwi_ws_h</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_builder_extract_words_w</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv414kiwi_builder_h" title="kiwi_builder_h"><span class="n"><span class="pre">kiwi_builder_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span>, <a class="reference internal" href="#_CPPv415kiwi_reader_w_t" title="kiwi_reader_w_t"><span class="n"><span class="pre">kiwi_reader_w_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">reader</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">user_data</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">min_cnt</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">max_word_len</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">min_score</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pos_threshold</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv428kiwi_builder_extract_words_w14kiwi_builder_h15kiwi_reader_w_tPviiff" title="Permalink to this definition"></a><br /></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>handle</strong> – KiwiBuilder의 핸들. </p></li>
 <li><p><strong>reader</strong> – </p></li>
@@ -599,7 +600,7 @@
 <li><p><strong>pos_threshold</strong> – </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p></p>
 </dd>
 </dl>
@@ -609,7 +610,7 @@
 <dt class="sig sig-object cpp" id="_CPPv432kiwi_builder_extract_add_words_w14kiwi_builder_h15kiwi_reader_w_tPviiff">
 <span id="_CPPv332kiwi_builder_extract_add_words_w14kiwi_builder_h15kiwi_reader_w_tPviiff"></span><span id="_CPPv232kiwi_builder_extract_add_words_w14kiwi_builder_h15kiwi_reader_w_tPviiff"></span><span id="kiwi_builder_extract_add_words_w__kiwi_builder_h.kiwi_reader_w_t.voidP.i.i.float.float"></span><span class="target" id="capi_8h_1ad985587162086e74c184d609d640d1ae"></span><a class="reference internal" href="#_CPPv49kiwi_ws_h" title="kiwi_ws_h"><span class="n"><span class="pre">kiwi_ws_h</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_builder_extract_add_words_w</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv414kiwi_builder_h" title="kiwi_builder_h"><span class="n"><span class="pre">kiwi_builder_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span>, <a class="reference internal" href="#_CPPv415kiwi_reader_w_t" title="kiwi_reader_w_t"><span class="n"><span class="pre">kiwi_reader_w_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">reader</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">user_data</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">min_cnt</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">max_word_len</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">min_score</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pos_threshold</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv432kiwi_builder_extract_add_words_w14kiwi_builder_h15kiwi_reader_w_tPviiff" title="Permalink to this definition"></a><br /></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>handle</strong> – KiwiBuilder의 핸들. </p></li>
 <li><p><strong>reader</strong> – </p></li>
@@ -620,7 +621,7 @@
 <li><p><strong>pos_threshold</strong> – </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p></p>
 </dd>
 </dl>
@@ -635,14 +636,14 @@
 <p>kiwi_close, kiwi_init </p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>handle</strong> – KiwiBuilder. </p></li>
 <li><p><strong>typos</strong> – 오타 교정기의 핸들. 오타 교정을 사용하지 않을 경우 null을 입력합니다. </p></li>
 <li><p><strong>typo_cost_threshold</strong> – 오타 교정기에서 생성하는 오타 중 비용이 이 값 이하인 오타만 사용합니다.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Kiwi의 핸들.</p>
 </dd>
 </dl>
@@ -656,7 +657,7 @@
 <p></p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p></p>
 </dd>
 </dl>
@@ -671,7 +672,7 @@
 <p>이 핸들은 kiwi_typo_close에 사용할 수 없음. </p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p></p>
 </dd>
 </dl>
@@ -685,7 +686,7 @@
 <p></p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p></p>
 </dd>
 </dl>
@@ -699,7 +700,7 @@
 <p></p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p></p>
 </dd>
 </dl>
@@ -710,14 +711,14 @@
 <span id="_CPPv39kiwi_initPKcii"></span><span id="_CPPv29kiwi_initPKcii"></span><span id="kiwi_init__cCP.i.i"></span><span class="target" id="capi_8h_1ae460a36b48337e45ce07cd4143d1e3d6"></span><a class="reference internal" href="#_CPPv46kiwi_h" title="kiwi_h"><span class="n"><span class="pre">kiwi_h</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_init</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">model_path</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_threads</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">options</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49kiwi_initPKcii" title="Permalink to this definition"></a><br /></dt>
 <dd><p>KiwiBuilder를 거치지 않고 바로 Kiwi instance를 생성합니다. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>model_path</strong> – 모델이 들어있는 디렉토리 경로 (e.g., ./ModelGenerator). </p></li>
 <li><p><strong>num_threads</strong> – 사용할 쓰레드의 수 (0일 경우, 자동으로 설정). </p></li>
 <li><p><strong>options</strong> – 생성 옵션. KIWI_BUILD_* 참조. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Kiwi의 핸들. </p>
 </dd>
 </dl>
@@ -729,11 +730,11 @@
 <dd><p>int 타입 옵션의 값을 변경합니다. </p>
 <p><div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference internal" href="#capi_8h_1ab35bce02d300b0e753d3f9cb81ca879f"><span class="std std-ref">kiwi_get_option</span></a>, <a class="reference internal" href="#capi_8h_1a7b29ac8dbc6bff5622258ab0e0ab48cf"><span class="std std-ref">kiwi_set_option_f</span></a> </p>
+<p><a class="reference internal" href="#capi_8h_1ab35bce02d300b0e753d3f9cb81ca879f"><span class="std std-ref">kiwi_get_option</span></a>, <a class="reference internal" href="#capi_8h_1a7b29ac8dbc6bff5622258ab0e0ab48cf"><span class="std std-ref">kiwi_set_option_f</span></a></p>
 </div>
 </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>handle</strong> – Kiwi. </p></li>
 <li><p><strong>option</strong> – {KIWI_BUILD_INTEGRATE_ALLOMORPH, KIWI_MAX_UNK_FORM_SIZE, KIWI_SPACE_TOLERANCE}. </p></li>
@@ -755,13 +756,13 @@
 </ul>
 </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>handle</strong> – Kiwi. </p></li>
 <li><p><strong>option</strong> – {KIWI_BUILD_INTEGRATE_ALLOMORPH, KIWI_NUM_THREADS, KIWI_MAX_UNK_FORM_SIZE, KIWI_SPACE_TOLERANCE}. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>해당 옵션의 값을 반환합니다.</p>
 </dd>
 </dl>
@@ -773,11 +774,11 @@
 <dd><p>float 타입 옵션의 값을 변경합니다. </p>
 <p><div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference internal" href="#capi_8h_1a1c8691bf364a136ea171e807fa3300b5"><span class="std std-ref">kiwi_get_option_f</span></a>, <a class="reference internal" href="#capi_8h_1a7e836be806c4f2cdf7698849b72dd247"><span class="std std-ref">kiwi_set_option</span></a> </p>
+<p><a class="reference internal" href="#capi_8h_1a1c8691bf364a136ea171e807fa3300b5"><span class="std std-ref">kiwi_get_option_f</span></a>, <a class="reference internal" href="#capi_8h_1a7e836be806c4f2cdf7698849b72dd247"><span class="std std-ref">kiwi_set_option</span></a></p>
 </div>
 </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>handle</strong> – Kiwi. </p></li>
 <li><p><strong>option</strong> – {KIWI_CUT_OFF_THRESHOLD, KIWI_UNK_FORM_SCORE_SCALE, KIWI_UNK_FORM_SCORE_BIAS, KIWI_SPACE_PENALTY}. </p></li>
@@ -799,13 +800,13 @@
 </ul>
 </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>handle</strong> – Kiwi. </p></li>
 <li><p><strong>option</strong> – {KIWI_CUT_OFF_THRESHOLD, KIWI_UNK_FORM_SCORE_SCALE, KIWI_UNK_FORM_SCORE_BIAS, KIWI_SPACE_PENALTY}. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>해당 옵션의 값을 반환합니다.</p>
 </dd>
 </dl>
@@ -817,11 +818,11 @@
 <dd><p>텍스트를 분석해 형태소 결과를 반환합니다. </p>
 <p><div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference internal" href="#capi_8h_1ab6ec0d26dbd4f25b85a0edf9784425d1"><span class="std std-ref">kiwi_analyze</span></a> </p>
+<p><a class="reference internal" href="#capi_8h_1ab6ec0d26dbd4f25b85a0edf9784425d1"><span class="std std-ref">kiwi_analyze</span></a></p>
 </div>
 </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>handle</strong> – Kiwi. </p></li>
 <li><p><strong>text</strong> – 분석할 텍스트 (utf-16). </p></li>
@@ -829,7 +830,7 @@
 <li><p><strong>match_options</strong> – KIWI_MATCH_ALL 등 KIWI_MATCH_* 열거형 참고. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>형태소 분석 결과의 핸들. kiwi_res_* 함수를 통해 값에 접근가능합니다. 이 핸들은 사용 후 kiwi_res_close를 사용해 반드시 해제되어야 합니다.</p>
 </dd>
 </dl>
@@ -841,11 +842,11 @@
 <dd><p>텍스트를 분석해 형태소 결과를 반환합니다. </p>
 <p><div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference internal" href="#capi_8h_1ab3d1784020b6f2a1b77e84463c4a5eb8"><span class="std std-ref">kiwi_analyze_w</span></a> </p>
+<p><a class="reference internal" href="#capi_8h_1ab3d1784020b6f2a1b77e84463c4a5eb8"><span class="std std-ref">kiwi_analyze_w</span></a></p>
 </div>
 </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>handle</strong> – Kiwi. </p></li>
 <li><p><strong>text</strong> – 분석할 텍스트 (utf-8). </p></li>
@@ -853,7 +854,7 @@
 <li><p><strong>match_options</strong> – KIWI_MATCH_ALL 등 KIWI_MATCH_* 열거형 참고. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>형태소 분석 결과의 핸들. kiwi_res_* 함수를 통해 값에 접근가능합니다. 이 핸들은 사용 후 kiwi_res_close를 사용해 반드시 해제되어야 합니다.</p>
 </dd>
 </dl>
@@ -863,7 +864,7 @@
 <dt class="sig sig-object cpp" id="_CPPv415kiwi_analyze_mw6kiwi_h15kiwi_reader_w_t15kiwi_receiver_tPvii">
 <span id="_CPPv315kiwi_analyze_mw6kiwi_h15kiwi_reader_w_t15kiwi_receiver_tPvii"></span><span id="_CPPv215kiwi_analyze_mw6kiwi_h15kiwi_reader_w_t15kiwi_receiver_tPvii"></span><span id="kiwi_analyze_mw__kiwi_h.kiwi_reader_w_t.kiwi_receiver_t.voidP.i.i"></span><span class="target" id="capi_8h_1abcc2c8b8a735f00cbcb67619a0a19a13"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_analyze_mw</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv46kiwi_h" title="kiwi_h"><span class="n"><span class="pre">kiwi_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span>, <a class="reference internal" href="#_CPPv415kiwi_reader_w_t" title="kiwi_reader_w_t"><span class="n"><span class="pre">kiwi_reader_w_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">reader</span></span>, <a class="reference internal" href="#_CPPv415kiwi_receiver_t" title="kiwi_receiver_t"><span class="n"><span class="pre">kiwi_receiver_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">receiver</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">user_data</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">top_n</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">match_options</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415kiwi_analyze_mw6kiwi_h15kiwi_reader_w_t15kiwi_receiver_tPvii" title="Permalink to this definition"></a><br /></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>handle</strong> – </p></li>
 <li><p><strong>reader</strong> – </p></li>
@@ -873,7 +874,7 @@
 <li><p><strong>match_options</strong> – </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p></p>
 </dd>
 </dl>
@@ -883,7 +884,7 @@
 <dt class="sig sig-object cpp" id="_CPPv414kiwi_analyze_m6kiwi_h13kiwi_reader_t15kiwi_receiver_tPvii">
 <span id="_CPPv314kiwi_analyze_m6kiwi_h13kiwi_reader_t15kiwi_receiver_tPvii"></span><span id="_CPPv214kiwi_analyze_m6kiwi_h13kiwi_reader_t15kiwi_receiver_tPvii"></span><span id="kiwi_analyze_m__kiwi_h.kiwi_reader_t.kiwi_receiver_t.voidP.i.i"></span><span class="target" id="capi_8h_1a264f6b307c5b2397e13f8d1db23694ce"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_analyze_m</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv46kiwi_h" title="kiwi_h"><span class="n"><span class="pre">kiwi_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span>, <a class="reference internal" href="#_CPPv413kiwi_reader_t" title="kiwi_reader_t"><span class="n"><span class="pre">kiwi_reader_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">reader</span></span>, <a class="reference internal" href="#_CPPv415kiwi_receiver_t" title="kiwi_receiver_t"><span class="n"><span class="pre">kiwi_receiver_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">receiver</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">user_data</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">top_n</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">match_options</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414kiwi_analyze_m6kiwi_h13kiwi_reader_t15kiwi_receiver_tPvii" title="Permalink to this definition"></a><br /></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>handle</strong> – </p></li>
 <li><p><strong>reader</strong> – </p></li>
@@ -893,7 +894,7 @@
 <li><p><strong>match_options</strong> – </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p></p>
 </dd>
 </dl>
@@ -905,11 +906,11 @@
 <dd><p>텍스트를 문장 단위로 분할합니다. </p>
 <p><div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference internal" href="#capi_8h_1ae4a9c8e2ac8ab6d928c12d6a79090edb"><span class="std std-ref">kiwi_split_into_sents</span></a> </p>
+<p><a class="reference internal" href="#capi_8h_1ae4a9c8e2ac8ab6d928c12d6a79090edb"><span class="std std-ref">kiwi_split_into_sents</span></a></p>
 </div>
 </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>handle</strong> – Kiwi. </p></li>
 <li><p><strong>text</strong> – 분할할 텍스트 (utf-16). </p></li>
@@ -917,7 +918,7 @@
 <li><p><strong>tokenized_res</strong> – (선택사항) 형태소 분석 결과를 받으려는 경우 kiwi_res_h 값을 받을 포인터를 넘겨주세요. null을 입력시 형태소 분석 결과는 내부적으로 사용된 뒤 버려집니다. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>문장 분할 결과의 핸들. kiwi_ss_* 함수를 통해 값에 접근가능합니다. 이 핸들은 사용 후 kiwi_ss_close를 사용해 반드시 해제되어야 합니다.</p>
 </dd>
 </dl>
@@ -929,11 +930,11 @@
 <dd><p>텍스트를 문장 단위로 분할합니다. </p>
 <p><div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference internal" href="#capi_8h_1ac9abe9c18c92b2a1c19d831c4e0a01f3"><span class="std std-ref">kiwi_split_into_sents_w</span></a> </p>
+<p><a class="reference internal" href="#capi_8h_1ac9abe9c18c92b2a1c19d831c4e0a01f3"><span class="std std-ref">kiwi_split_into_sents_w</span></a></p>
 </div>
 </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>handle</strong> – Kiwi. </p></li>
 <li><p><strong>text</strong> – 분할할 텍스트 (utf-8). </p></li>
@@ -941,7 +942,7 @@
 <li><p><strong>tokenized_res</strong> – (선택사항) 형태소 분석 결과를 받으려는 경우 kiwi_res_h 값을 받을 포인터를 넘겨주세요. null을 입력시 형태소 분석 결과는 내부적으로 사용된 뒤 버려집니다. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>문장 분할 결과의 핸들. kiwi_ss_* 함수를 통해 값에 접근가능합니다. 이 핸들은 사용 후 kiwi_ss_close를 통해 반드시 해제되어야 합니다.</p>
 </dd>
 </dl>
@@ -952,13 +953,13 @@
 <span id="_CPPv315kiwi_new_joiner6kiwi_hi"></span><span id="_CPPv215kiwi_new_joiner6kiwi_hi"></span><span id="kiwi_new_joiner__kiwi_h.i"></span><span class="target" id="capi_8h_1a7d9f0bc86e63d79491d73eb61117ba07"></span><a class="reference internal" href="#_CPPv413kiwi_joiner_h" title="kiwi_joiner_h"><span class="n"><span class="pre">kiwi_joiner_h</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_new_joiner</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv46kiwi_h" title="kiwi_h"><span class="n"><span class="pre">kiwi_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">lm_search</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415kiwi_new_joiner6kiwi_hi" title="Permalink to this definition"></a><br /></dt>
 <dd><p>형태소를 결합하여 텍스트로 만들어주는 Joiner를 새로 생성합니다. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>handle</strong> – Kiwi. </p></li>
 <li><p><strong>lm_search</strong> – True일 경우 언어 모델 탐색을 사용하여 최적의 품사를 선택합니다. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>새 Joiner의 핸들. kiwi_joiner_* 함수에 사용가능합니다. 이 핸들은 사용 후 kiwi_joiner_close를 통해 반드시 해제되어야 합니다. </p>
 </dd>
 </dl>
@@ -973,10 +974,10 @@
 <p>kiwi_builder_build 및 kiwi_init으로 생성된 kiwi_h는 반드시 이 함수로 해제되어야 합니다. </p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>handle</strong> – Kiwi 핸들 </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>성공시 0을 반환합니다. 실패시 0이 아닌 값을 반환합니다.</p>
 </dd>
 </dl>
@@ -987,10 +988,10 @@
 <span id="_CPPv313kiwi_res_size10kiwi_res_h"></span><span id="_CPPv213kiwi_res_size10kiwi_res_h"></span><span id="kiwi_res_size__kiwi_res_h"></span><span class="target" id="capi_8h_1a3e1b43fb351b73e0835aae7bf56fdc9c"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_res_size</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv410kiwi_res_h" title="kiwi_res_h"><span class="n"><span class="pre">kiwi_res_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">result</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413kiwi_res_size10kiwi_res_h" title="Permalink to this definition"></a><br /></dt>
 <dd><p>분석 결과 내에 포함된 리스트의 개수를 반환합니다. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>result</strong> – 분석 결과의 핸들 </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>성공시 0이상의 값, 실패 시 음수를 반환합니다. </p>
 </dd>
 </dl>
@@ -1001,13 +1002,13 @@
 <span id="_CPPv313kiwi_res_prob10kiwi_res_hi"></span><span id="_CPPv213kiwi_res_prob10kiwi_res_hi"></span><span id="kiwi_res_prob__kiwi_res_h.i"></span><span class="target" id="capi_8h_1aee566dd84f2edfb272f7b28afd8e47fd"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_res_prob</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv410kiwi_res_h" title="kiwi_res_h"><span class="n"><span class="pre">kiwi_res_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">result</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413kiwi_res_prob10kiwi_res_hi" title="Permalink to this definition"></a><br /></dt>
 <dd><p>index번째 분석 결과의 확률 점수를 반환합니다. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>result</strong> – 분석 결과의 핸들 </p></li>
 <li><p><strong>index</strong> – <code class="docutils literal notranslate"><span class="pre">0</span></code> 이상 <code class="docutils literal notranslate"><span class="pre">kiwi_res_size(result)</span></code> 미만의 정수 </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>성공 시 0이 아닌 값, 실패 시 0을 반환합니다. </p>
 </dd>
 </dl>
@@ -1018,13 +1019,13 @@
 <span id="_CPPv317kiwi_res_word_num10kiwi_res_hi"></span><span id="_CPPv217kiwi_res_word_num10kiwi_res_hi"></span><span id="kiwi_res_word_num__kiwi_res_h.i"></span><span class="target" id="capi_8h_1a00804b079c392e08d97ddb59b5be38d6"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_res_word_num</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv410kiwi_res_h" title="kiwi_res_h"><span class="n"><span class="pre">kiwi_res_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">result</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417kiwi_res_word_num10kiwi_res_hi" title="Permalink to this definition"></a><br /></dt>
 <dd><p>index번째 분석 결과 내에 포함된 형태소의 개수를 반환합니다. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>result</strong> – 분석 결과의 핸들 </p></li>
 <li><p><strong>index</strong> – <code class="docutils literal notranslate"><span class="pre">0</span></code> 이상 <code class="docutils literal notranslate"><span class="pre">kiwi_res_size(result)</span></code> 미만의 정수 </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>성공시 0이상의 값, 실패 시 음수를 반환합니다. </p>
 </dd>
 </dl>
@@ -1035,14 +1036,14 @@
 <span id="_CPPv319kiwi_res_token_info10kiwi_res_hii"></span><span id="_CPPv219kiwi_res_token_info10kiwi_res_hii"></span><span id="kiwi_res_token_info__kiwi_res_h.i.i"></span><span class="target" id="capi_8h_1a37ff344465481dd08f45bc4797e58f7c"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv417kiwi_token_info_t" title="kiwi_token_info_t"><span class="n"><span class="pre">kiwi_token_info_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_res_token_info</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv410kiwi_res_h" title="kiwi_res_h"><span class="n"><span class="pre">kiwi_res_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">result</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419kiwi_res_token_info10kiwi_res_hii" title="Permalink to this definition"></a><br /></dt>
 <dd><p>index번째 분석 결과의 num번째 형태소의 정보를 반환합니다. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>result</strong> – 분석 결과의 핸들 </p></li>
 <li><p><strong>index</strong> – <code class="docutils literal notranslate"><span class="pre">0</span></code> 이상 <code class="docutils literal notranslate"><span class="pre">kiwi_res_size(result)</span></code> 미만의 정수 </p></li>
 <li><p><strong>num</strong> – <code class="docutils literal notranslate"><span class="pre">0</span></code> 이상 <code class="docutils literal notranslate"><span class="pre">kiwi_res_word_num(result,</span> <span class="pre">index)</span></code> 미만의 정수 </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>형태소 정보가 담긴 <code class="docutils literal notranslate"><a class="reference internal" href="#structkiwi__token__info__t"><span class="std std-ref"><span class="pre">kiwi_token_info_t</span></span></a></code>에 대한 포인터를 반환합니다. 실패 시 null을 반환합니다. 이 포인터는 Kiwi API가 관리하므로 별도로 해제할 필요가 없습니다. </p>
 </dd>
 </dl>
@@ -1053,14 +1054,14 @@
 <span id="_CPPv315kiwi_res_form_w10kiwi_res_hii"></span><span id="_CPPv215kiwi_res_form_w10kiwi_res_hii"></span><span id="kiwi_res_form_w__kiwi_res_h.i.i"></span><span class="target" id="capi_8h_1a608d1ae9196ab0f680508f5da301743a"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49kchar16_t" title="kchar16_t"><span class="n"><span class="pre">kchar16_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_res_form_w</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv410kiwi_res_h" title="kiwi_res_h"><span class="n"><span class="pre">kiwi_res_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">result</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415kiwi_res_form_w10kiwi_res_hii" title="Permalink to this definition"></a><br /></dt>
 <dd><p>index번째 분석 결과의 num번째 형태소의 형태를 반환합니다. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>result</strong> – 분석 결과의 핸들 </p></li>
 <li><p><strong>index</strong> – <code class="docutils literal notranslate"><span class="pre">0</span></code> 이상 <code class="docutils literal notranslate"><span class="pre">kiwi_res_size(result)</span></code> 미만의 정수 </p></li>
 <li><p><strong>num</strong> – <code class="docutils literal notranslate"><span class="pre">0</span></code> 이상 <code class="docutils literal notranslate"><span class="pre">kiwi_res_word_num(result,</span> <span class="pre">index)</span></code> 미만의 정수 </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>UTF-16으로 인코딩된 문자열. 실패 시 null을 반환합니다. 이 포인터는 Kiwi API가 관리하므로 별도로 해제할 필요가 없습니다. </p>
 </dd>
 </dl>
@@ -1071,14 +1072,14 @@
 <span id="_CPPv314kiwi_res_tag_w10kiwi_res_hii"></span><span id="_CPPv214kiwi_res_tag_w10kiwi_res_hii"></span><span id="kiwi_res_tag_w__kiwi_res_h.i.i"></span><span class="target" id="capi_8h_1a4053d30c153df66d6003bbb964fbc628"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49kchar16_t" title="kchar16_t"><span class="n"><span class="pre">kchar16_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_res_tag_w</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv410kiwi_res_h" title="kiwi_res_h"><span class="n"><span class="pre">kiwi_res_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">result</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414kiwi_res_tag_w10kiwi_res_hii" title="Permalink to this definition"></a><br /></dt>
 <dd><p>index번째 분석 결과의 num번째 형태소의 품사 태그를 반환합니다. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>result</strong> – 분석 결과의 핸들 </p></li>
 <li><p><strong>index</strong> – <code class="docutils literal notranslate"><span class="pre">0</span></code> 이상 <code class="docutils literal notranslate"><span class="pre">kiwi_res_size(result)</span></code> 미만의 정수 </p></li>
 <li><p><strong>num</strong> – <code class="docutils literal notranslate"><span class="pre">0</span></code> 이상 <code class="docutils literal notranslate"><span class="pre">kiwi_res_word_num(result,</span> <span class="pre">index)</span></code> 미만의 정수 </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>UTF-16으로 인코딩된 문자열. 실패 시 null을 반환합니다. 이 값은 Kiwi API가 관리하므로 별도로 해제할 필요가 없습니다. </p>
 </dd>
 </dl>
@@ -1089,14 +1090,14 @@
 <span id="_CPPv313kiwi_res_form10kiwi_res_hii"></span><span id="_CPPv213kiwi_res_form10kiwi_res_hii"></span><span id="kiwi_res_form__kiwi_res_h.i.i"></span><span class="target" id="capi_8h_1ad4606a81c134f297e961a64f7fe2766e"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_res_form</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv410kiwi_res_h" title="kiwi_res_h"><span class="n"><span class="pre">kiwi_res_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">result</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413kiwi_res_form10kiwi_res_hii" title="Permalink to this definition"></a><br /></dt>
 <dd><p>index번째 분석 결과의 num번째 형태소의 형태를 반환합니다. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>result</strong> – 분석 결과의 핸들 </p></li>
 <li><p><strong>index</strong> – <code class="docutils literal notranslate"><span class="pre">0</span></code> 이상 <code class="docutils literal notranslate"><span class="pre">kiwi_res_size(result)</span></code> 미만의 정수 </p></li>
 <li><p><strong>num</strong> – <code class="docutils literal notranslate"><span class="pre">0</span></code> 이상 <code class="docutils literal notranslate"><span class="pre">kiwi_res_word_num(result,</span> <span class="pre">index)</span></code> 미만의 정수 </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>UTF-8으로 인코딩된 문자열. 실패 시 null을 반환합니다. 이 값은 Kiwi API가 관리하므로 별도로 해제할 필요가 없습니다. </p>
 </dd>
 </dl>
@@ -1107,14 +1108,14 @@
 <span id="_CPPv312kiwi_res_tag10kiwi_res_hii"></span><span id="_CPPv212kiwi_res_tag10kiwi_res_hii"></span><span id="kiwi_res_tag__kiwi_res_h.i.i"></span><span class="target" id="capi_8h_1ad59344ebfa97ba24c479f2c8b68056b3"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_res_tag</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv410kiwi_res_h" title="kiwi_res_h"><span class="n"><span class="pre">kiwi_res_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">result</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412kiwi_res_tag10kiwi_res_hii" title="Permalink to this definition"></a><br /></dt>
 <dd><p>index번째 분석 결과의 num번째 형태소의 품사 태그를 반환합니다. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>result</strong> – 분석 결과의 핸들 </p></li>
 <li><p><strong>index</strong> – <code class="docutils literal notranslate"><span class="pre">0</span></code> 이상 <code class="docutils literal notranslate"><span class="pre">kiwi_res_size(result)</span></code> 미만의 정수 </p></li>
 <li><p><strong>num</strong> – <code class="docutils literal notranslate"><span class="pre">0</span></code> 이상 <code class="docutils literal notranslate"><span class="pre">kiwi_res_word_num(result,</span> <span class="pre">index)</span></code> 미만의 정수 </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>UTF-8으로 인코딩된 문자열. 실패 시 null을 반환합니다. 이 값은 Kiwi API가 관리하므로 별도로 해제할 필요가 없습니다. </p>
 </dd>
 </dl>
@@ -1125,14 +1126,14 @@
 <span id="_CPPv317kiwi_res_position10kiwi_res_hii"></span><span id="_CPPv217kiwi_res_position10kiwi_res_hii"></span><span id="kiwi_res_position__kiwi_res_h.i.i"></span><span class="target" id="capi_8h_1a09ec07d20e833e0ad8113e53ca99541b"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_res_position</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv410kiwi_res_h" title="kiwi_res_h"><span class="n"><span class="pre">kiwi_res_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">result</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417kiwi_res_position10kiwi_res_hii" title="Permalink to this definition"></a><br /></dt>
 <dd><p>index번째 분석 결과의 num번째 형태소의 시작 위치(UTF-16 문자열 기준)를 반환합니다. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>result</strong> – 분석 결과의 핸들 </p></li>
 <li><p><strong>index</strong> – <code class="docutils literal notranslate"><span class="pre">0</span></code> 이상 <code class="docutils literal notranslate"><span class="pre">kiwi_res_size(result)</span></code> 미만의 정수 </p></li>
 <li><p><strong>num</strong> – <code class="docutils literal notranslate"><span class="pre">0</span></code> 이상 <code class="docutils literal notranslate"><span class="pre">kiwi_res_word_num(result,</span> <span class="pre">index)</span></code> 미만의 정수 </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>성공 시 0 이상의 값, 실패 시 음수를 반환합니다. </p>
 </dd>
 </dl>
@@ -1143,14 +1144,14 @@
 <span id="_CPPv315kiwi_res_length10kiwi_res_hii"></span><span id="_CPPv215kiwi_res_length10kiwi_res_hii"></span><span id="kiwi_res_length__kiwi_res_h.i.i"></span><span class="target" id="capi_8h_1a8da6c559c4c3eb3c178a9cce06a5b626"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_res_length</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv410kiwi_res_h" title="kiwi_res_h"><span class="n"><span class="pre">kiwi_res_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">result</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415kiwi_res_length10kiwi_res_hii" title="Permalink to this definition"></a><br /></dt>
 <dd><p>index번째 분석 결과의 num번째 형태소의 길이(UTF-16 문자열 기준)를 반환합니다. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>result</strong> – 분석 결과의 핸들 </p></li>
 <li><p><strong>index</strong> – <code class="docutils literal notranslate"><span class="pre">0</span></code> 이상 <code class="docutils literal notranslate"><span class="pre">kiwi_res_size(result)</span></code> 미만의 정수 </p></li>
 <li><p><strong>num</strong> – <code class="docutils literal notranslate"><span class="pre">0</span></code> 이상 <code class="docutils literal notranslate"><span class="pre">kiwi_res_word_num(result,</span> <span class="pre">index)</span></code> 미만의 정수 </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>성공 시 0 이상의 값, 실패 시 음수를 반환합니다. </p>
 </dd>
 </dl>
@@ -1161,14 +1162,14 @@
 <span id="_CPPv322kiwi_res_word_position10kiwi_res_hii"></span><span id="_CPPv222kiwi_res_word_position10kiwi_res_hii"></span><span id="kiwi_res_word_position__kiwi_res_h.i.i"></span><span class="target" id="capi_8h_1abf3822b553fb497fefd518128602cc47"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_res_word_position</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv410kiwi_res_h" title="kiwi_res_h"><span class="n"><span class="pre">kiwi_res_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">result</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422kiwi_res_word_position10kiwi_res_hii" title="Permalink to this definition"></a><br /></dt>
 <dd><p>index번째 분석 결과의 num번째 형태소의 문장 내 어절 번호를 반환합니다. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>result</strong> – 분석 결과의 핸들 </p></li>
 <li><p><strong>index</strong> – <code class="docutils literal notranslate"><span class="pre">0</span></code> 이상 <code class="docutils literal notranslate"><span class="pre">kiwi_res_size(result)</span></code> 미만의 정수 </p></li>
 <li><p><strong>num</strong> – <code class="docutils literal notranslate"><span class="pre">0</span></code> 이상 <code class="docutils literal notranslate"><span class="pre">kiwi_res_word_num(result,</span> <span class="pre">index)</span></code> 미만의 정수 </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>성공 시 0 이상의 값, 실패 시 음수를 반환합니다. </p>
 </dd>
 </dl>
@@ -1179,14 +1180,14 @@
 <span id="_CPPv322kiwi_res_sent_position10kiwi_res_hii"></span><span id="_CPPv222kiwi_res_sent_position10kiwi_res_hii"></span><span id="kiwi_res_sent_position__kiwi_res_h.i.i"></span><span class="target" id="capi_8h_1aeeb9f4ae5b3ba1c873cd53e32186bec3"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_res_sent_position</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv410kiwi_res_h" title="kiwi_res_h"><span class="n"><span class="pre">kiwi_res_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">result</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422kiwi_res_sent_position10kiwi_res_hii" title="Permalink to this definition"></a><br /></dt>
 <dd><p>index번째 분석 결과의 num번째 형태소의 문장 번호를 반환합니다. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>result</strong> – 분석 결과의 핸들 </p></li>
 <li><p><strong>index</strong> – <code class="docutils literal notranslate"><span class="pre">0</span></code> 이상 <code class="docutils literal notranslate"><span class="pre">kiwi_res_size(result)</span></code> 미만의 정수 </p></li>
 <li><p><strong>num</strong> – <code class="docutils literal notranslate"><span class="pre">0</span></code> 이상 <code class="docutils literal notranslate"><span class="pre">kiwi_res_word_num(result,</span> <span class="pre">index)</span></code> 미만의 정수 </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>성공 시 0 이상의 값, 실패 시 음수를 반환합니다. </p>
 </dd>
 </dl>
@@ -1197,14 +1198,14 @@
 <span id="_CPPv314kiwi_res_score10kiwi_res_hii"></span><span id="_CPPv214kiwi_res_score10kiwi_res_hii"></span><span id="kiwi_res_score__kiwi_res_h.i.i"></span><span class="target" id="capi_8h_1a6d495fb77706c1a584e8263cb113d9ff"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_res_score</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv410kiwi_res_h" title="kiwi_res_h"><span class="n"><span class="pre">kiwi_res_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">result</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414kiwi_res_score10kiwi_res_hii" title="Permalink to this definition"></a><br /></dt>
 <dd><p>index번째 분석 결과의 num번째 형태소의 언어 모델 점수를 반환합니다. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>result</strong> – 분석 결과의 핸들 </p></li>
 <li><p><strong>index</strong> – <code class="docutils literal notranslate"><span class="pre">0</span></code> 이상 <code class="docutils literal notranslate"><span class="pre">kiwi_res_size(result)</span></code> 미만의 정수 </p></li>
 <li><p><strong>num</strong> – <code class="docutils literal notranslate"><span class="pre">0</span></code> 이상 <code class="docutils literal notranslate"><span class="pre">kiwi_res_word_num(result,</span> <span class="pre">index)</span></code> 미만의 정수 </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>성공 시 0이 아닌 값, 실패 시 0을 반환합니다. </p>
 </dd>
 </dl>
@@ -1215,14 +1216,14 @@
 <span id="_CPPv318kiwi_res_typo_cost10kiwi_res_hii"></span><span id="_CPPv218kiwi_res_typo_cost10kiwi_res_hii"></span><span id="kiwi_res_typo_cost__kiwi_res_h.i.i"></span><span class="target" id="capi_8h_1a6ba1b7783b17bbe107d2d6502c5d496b"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_res_typo_cost</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv410kiwi_res_h" title="kiwi_res_h"><span class="n"><span class="pre">kiwi_res_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">result</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418kiwi_res_typo_cost10kiwi_res_hii" title="Permalink to this definition"></a><br /></dt>
 <dd><p>index번째 분석 결과의 num번째 형태소의 오타 교정 비용을 반환합니다. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>result</strong> – 분석 결과의 핸들 </p></li>
 <li><p><strong>index</strong> – <code class="docutils literal notranslate"><span class="pre">0</span></code> 이상 <code class="docutils literal notranslate"><span class="pre">kiwi_res_size(result)</span></code> 미만의 정수 </p></li>
 <li><p><strong>num</strong> – <code class="docutils literal notranslate"><span class="pre">0</span></code> 이상 <code class="docutils literal notranslate"><span class="pre">kiwi_res_word_num(result,</span> <span class="pre">index)</span></code> 미만의 정수 </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>성공 시 0 이상의 값, 실패 시 음수를 반환합니다. 0은 오타 교정이 발생하지 않았음을 뜻합니다. </p>
 </dd>
 </dl>
@@ -1237,10 +1238,10 @@
 <p>kiwi_analyze 계열의 함수들에서 반환된 kiwi_res_h 값들은 반드시 이 함수를 통해 해제되어야 합니다. </p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>handle</strong> – 형태소 분석 결과 핸들 </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>성공시 0을 반환합니다. 실패시 0이 아닌 값을 반환합니다.</p>
 </dd>
 </dl>
@@ -1250,10 +1251,10 @@
 <dt class="sig sig-object cpp" id="_CPPv412kiwi_ws_size9kiwi_ws_h">
 <span id="_CPPv312kiwi_ws_size9kiwi_ws_h"></span><span id="_CPPv212kiwi_ws_size9kiwi_ws_h"></span><span id="kiwi_ws_size__kiwi_ws_h"></span><span class="target" id="capi_8h_1a3421fe0f93fc5991dee5fbef4205a226"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_ws_size</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv49kiwi_ws_h" title="kiwi_ws_h"><span class="n"><span class="pre">kiwi_ws_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">result</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412kiwi_ws_size9kiwi_ws_h" title="Permalink to this definition"></a><br /></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>result</strong> – </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p></p>
 </dd>
 </dl>
@@ -1263,13 +1264,13 @@
 <dt class="sig sig-object cpp" id="_CPPv414kiwi_ws_form_w9kiwi_ws_hi">
 <span id="_CPPv314kiwi_ws_form_w9kiwi_ws_hi"></span><span id="_CPPv214kiwi_ws_form_w9kiwi_ws_hi"></span><span id="kiwi_ws_form_w__kiwi_ws_h.i"></span><span class="target" id="capi_8h_1acbffb7ad81bc4d925b6ad7a0a20cafe6"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49kchar16_t" title="kchar16_t"><span class="n"><span class="pre">kchar16_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_ws_form_w</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv49kiwi_ws_h" title="kiwi_ws_h"><span class="n"><span class="pre">kiwi_ws_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">result</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414kiwi_ws_form_w9kiwi_ws_hi" title="Permalink to this definition"></a><br /></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>result</strong> – </p></li>
 <li><p><strong>index</strong> – </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p></p>
 </dd>
 </dl>
@@ -1279,13 +1280,13 @@
 <dt class="sig sig-object cpp" id="_CPPv412kiwi_ws_form9kiwi_ws_hi">
 <span id="_CPPv312kiwi_ws_form9kiwi_ws_hi"></span><span id="_CPPv212kiwi_ws_form9kiwi_ws_hi"></span><span id="kiwi_ws_form__kiwi_ws_h.i"></span><span class="target" id="capi_8h_1a520bb4eb24c6f0073945cb4e8c6743a5"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_ws_form</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv49kiwi_ws_h" title="kiwi_ws_h"><span class="n"><span class="pre">kiwi_ws_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">result</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412kiwi_ws_form9kiwi_ws_hi" title="Permalink to this definition"></a><br /></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>result</strong> – </p></li>
 <li><p><strong>index</strong> – </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p></p>
 </dd>
 </dl>
@@ -1295,13 +1296,13 @@
 <dt class="sig sig-object cpp" id="_CPPv413kiwi_ws_score9kiwi_ws_hi">
 <span id="_CPPv313kiwi_ws_score9kiwi_ws_hi"></span><span id="_CPPv213kiwi_ws_score9kiwi_ws_hi"></span><span id="kiwi_ws_score__kiwi_ws_h.i"></span><span class="target" id="capi_8h_1a1a8749430c7b7ef9b196cb75c0ce355c"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_ws_score</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv49kiwi_ws_h" title="kiwi_ws_h"><span class="n"><span class="pre">kiwi_ws_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">result</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413kiwi_ws_score9kiwi_ws_hi" title="Permalink to this definition"></a><br /></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>result</strong> – </p></li>
 <li><p><strong>index</strong> – </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p></p>
 </dd>
 </dl>
@@ -1311,13 +1312,13 @@
 <dt class="sig sig-object cpp" id="_CPPv412kiwi_ws_freq9kiwi_ws_hi">
 <span id="_CPPv312kiwi_ws_freq9kiwi_ws_hi"></span><span id="_CPPv212kiwi_ws_freq9kiwi_ws_hi"></span><span id="kiwi_ws_freq__kiwi_ws_h.i"></span><span class="target" id="capi_8h_1adb9c4765cd3a676c4d54fbd7c6391d51"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_ws_freq</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv49kiwi_ws_h" title="kiwi_ws_h"><span class="n"><span class="pre">kiwi_ws_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">result</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412kiwi_ws_freq9kiwi_ws_hi" title="Permalink to this definition"></a><br /></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>result</strong> – </p></li>
 <li><p><strong>index</strong> – </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p></p>
 </dd>
 </dl>
@@ -1327,13 +1328,13 @@
 <dt class="sig sig-object cpp" id="_CPPv417kiwi_ws_pos_score9kiwi_ws_hi">
 <span id="_CPPv317kiwi_ws_pos_score9kiwi_ws_hi"></span><span id="_CPPv217kiwi_ws_pos_score9kiwi_ws_hi"></span><span id="kiwi_ws_pos_score__kiwi_ws_h.i"></span><span class="target" id="capi_8h_1a25feabab022bf3be5fba1013bdbf851a"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_ws_pos_score</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv49kiwi_ws_h" title="kiwi_ws_h"><span class="n"><span class="pre">kiwi_ws_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">result</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417kiwi_ws_pos_score9kiwi_ws_hi" title="Permalink to this definition"></a><br /></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>result</strong> – </p></li>
 <li><p><strong>index</strong> – </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p></p>
 </dd>
 </dl>
@@ -1343,10 +1344,10 @@
 <dt class="sig sig-object cpp" id="_CPPv413kiwi_ws_close9kiwi_ws_h">
 <span id="_CPPv313kiwi_ws_close9kiwi_ws_h"></span><span id="_CPPv213kiwi_ws_close9kiwi_ws_h"></span><span id="kiwi_ws_close__kiwi_ws_h"></span><span class="target" id="capi_8h_1a35059ffa56ef5418e84666d1e2f7f857"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_ws_close</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv49kiwi_ws_h" title="kiwi_ws_h"><span class="n"><span class="pre">kiwi_ws_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">result</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413kiwi_ws_close9kiwi_ws_h" title="Permalink to this definition"></a><br /></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>result</strong> – </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p></p>
 </dd>
 </dl>
@@ -1356,10 +1357,10 @@
 <dt class="sig sig-object cpp" id="_CPPv412kiwi_ss_size9kiwi_ss_h">
 <span id="_CPPv312kiwi_ss_size9kiwi_ss_h"></span><span id="_CPPv212kiwi_ss_size9kiwi_ss_h"></span><span id="kiwi_ss_size__kiwi_ss_h"></span><span class="target" id="capi_8h_1a74deb9acc110ae7b9981e65988fc1526"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_ss_size</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv49kiwi_ss_h" title="kiwi_ss_h"><span class="n"><span class="pre">kiwi_ss_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">result</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412kiwi_ss_size9kiwi_ss_h" title="Permalink to this definition"></a><br /></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>result</strong> – </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p></p>
 </dd>
 </dl>
@@ -1369,13 +1370,13 @@
 <dt class="sig sig-object cpp" id="_CPPv422kiwi_ss_begin_position9kiwi_ss_hi">
 <span id="_CPPv322kiwi_ss_begin_position9kiwi_ss_hi"></span><span id="_CPPv222kiwi_ss_begin_position9kiwi_ss_hi"></span><span id="kiwi_ss_begin_position__kiwi_ss_h.i"></span><span class="target" id="capi_8h_1ac6cdb0ef2832a57beee688efafc0a8bb"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_ss_begin_position</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv49kiwi_ss_h" title="kiwi_ss_h"><span class="n"><span class="pre">kiwi_ss_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">result</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422kiwi_ss_begin_position9kiwi_ss_hi" title="Permalink to this definition"></a><br /></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>result</strong> – </p></li>
 <li><p><strong>index</strong> – </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p></p>
 </dd>
 </dl>
@@ -1385,13 +1386,13 @@
 <dt class="sig sig-object cpp" id="_CPPv420kiwi_ss_end_position9kiwi_ss_hi">
 <span id="_CPPv320kiwi_ss_end_position9kiwi_ss_hi"></span><span id="_CPPv220kiwi_ss_end_position9kiwi_ss_hi"></span><span id="kiwi_ss_end_position__kiwi_ss_h.i"></span><span class="target" id="capi_8h_1ad4ce67949349f809b16aee8d6059b38b"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_ss_end_position</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv49kiwi_ss_h" title="kiwi_ss_h"><span class="n"><span class="pre">kiwi_ss_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">result</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420kiwi_ss_end_position9kiwi_ss_hi" title="Permalink to this definition"></a><br /></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>result</strong> – </p></li>
 <li><p><strong>index</strong> – </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p></p>
 </dd>
 </dl>
@@ -1406,10 +1407,10 @@
 <p>kiwi_split_into_sents 계열 함수에서 반환된 kiwi_ss_h는 반드시 이 함수로 해제되어야 합니다. </p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>handle</strong> – 문장 분리 결과 핸들 </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>성공시 0을 반환합니다. 실패시 0이 아닌 값을 반환합니다.</p>
 </dd>
 </dl>
@@ -1420,7 +1421,7 @@
 <span id="_CPPv315kiwi_joiner_add13kiwi_joiner_hPKcPKci"></span><span id="_CPPv215kiwi_joiner_add13kiwi_joiner_hPKcPKci"></span><span id="kiwi_joiner_add__kiwi_joiner_h.cCP.cCP.i"></span><span class="target" id="capi_8h_1a3564e88965726f312880ace77fe86282"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_joiner_add</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv413kiwi_joiner_h" title="kiwi_joiner_h"><span class="n"><span class="pre">kiwi_joiner_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">form</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">tag</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">option</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415kiwi_joiner_add13kiwi_joiner_hPKcPKci" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Joiner에 새 형태소를 삽입합니다. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>handle</strong> – Joiner 객체의 핸들 </p></li>
 <li><p><strong>form</strong> – 삽입할 형태소의 형태 </p></li>
@@ -1428,7 +1429,7 @@
 <li><p><strong>option</strong> – 1이면 불규칙 활용여부를 자동으로 탐색합니다. 0인 경우 tag로 입력한 불규칙 활용여부를 그대로 사용합니다. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>성공시 0을 반환합니다. 실패시 0이 아닌 값을 반환합니다. </p>
 </dd>
 </dl>
@@ -1439,10 +1440,10 @@
 <span id="_CPPv315kiwi_joiner_get13kiwi_joiner_h"></span><span id="_CPPv215kiwi_joiner_get13kiwi_joiner_h"></span><span id="kiwi_joiner_get__kiwi_joiner_h"></span><span class="target" id="capi_8h_1a2d00c91c8a897ea2fe10c7bdd85da916"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_joiner_get</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv413kiwi_joiner_h" title="kiwi_joiner_h"><span class="n"><span class="pre">kiwi_joiner_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415kiwi_joiner_get13kiwi_joiner_h" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Joiner에 삽입된 형태소들을 텍스트로 결합하여 반환합니다. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>handle</strong> – Joiner 객체의 핸들 </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>성공시 UTF-8로 인코딩된 텍스트의 포인터를 반환합니다. 실패시 null을 반환합니다. </p>
 </dd>
 </dl>
@@ -1453,10 +1454,10 @@
 <span id="_CPPv317kiwi_joiner_get_w13kiwi_joiner_h"></span><span id="_CPPv217kiwi_joiner_get_w13kiwi_joiner_h"></span><span id="kiwi_joiner_get_w__kiwi_joiner_h"></span><span class="target" id="capi_8h_1a71f96f85afa099ebd504bee335820b81"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49kchar16_t" title="kchar16_t"><span class="n"><span class="pre">kchar16_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_joiner_get_w</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv413kiwi_joiner_h" title="kiwi_joiner_h"><span class="n"><span class="pre">kiwi_joiner_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417kiwi_joiner_get_w13kiwi_joiner_h" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Joiner에 삽입된 형태소들을 텍스트로 결합하여 반환합니다. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>handle</strong> – Joiner 객체의 핸들 </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>성공시 UTF-16로 인코딩된 텍스트의 포인터를 반환합니다. 실패시 null을 반환합니다. </p>
 </dd>
 </dl>
@@ -1471,10 +1472,10 @@
 <p>kiwi_new_joiner 함수에서 반환된 kiwi_joiner_h는 반드시 이 함수로 해제되어야 합니다. </p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>handle</strong> – 삭제할 Joiner 객체의 핸들 </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>성공시 0을 반환합니다. 실패시 0이 아닌 값을 반환합니다.</p>
 </dd>
 </dl>

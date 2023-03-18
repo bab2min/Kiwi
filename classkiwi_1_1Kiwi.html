@@ -121,19 +121,46 @@ ArchType&#160;</td><td class="memItemRight" valign="bottom"><b>archType</b> () c
 <tr class="memitem:a56ef14c138b0a3aba65f14aa58153622"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1Kiwi.html#a56ef14c138b0a3aba65f14aa58153622">isTypoTolerant</a> () const</td></tr>
 <tr class="memdesc:a56ef14c138b0a3aba65f14aa58153622"><td class="mdescLeft">&#160;</td><td class="mdescRight">현재 <a class="el" href="classkiwi_1_1Kiwi.html" title="실제 형태소 분석을 수행하는 클래스.">Kiwi</a> 객체가 오타 교정 기능이 켜진 상태로 생성되었는지 알려준다.  <a href="classkiwi_1_1Kiwi.html#a56ef14c138b0a3aba65f14aa58153622">More...</a><br /></td></tr>
 <tr class="separator:a56ef14c138b0a3aba65f14aa58153622"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a25c0c472ed3ce16790b32349d8ea73ab"><td class="memItemLeft" align="right" valign="top"><a class="el" href="Types_8h.html#aa3333c7237f7db8aa0121560dbaa3ecb">TokenResult</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1Kiwi.html#a25c0c472ed3ce16790b32349d8ea73ab">analyze</a> (const std::u16string &amp;str, Match matchOptions) const</td></tr>
-<tr class="separator:a25c0c472ed3ce16790b32349d8ea73ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae52dd58f775ec0cd59631a9cc2f00991"><td class="memItemLeft" align="right" valign="top"><a class="el" href="Types_8h.html#aa3333c7237f7db8aa0121560dbaa3ecb">TokenResult</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1Kiwi.html#ae52dd58f775ec0cd59631a9cc2f00991">analyze</a> (const std::string &amp;str, Match matchOptions) const</td></tr>
-<tr class="separator:ae52dd58f775ec0cd59631a9cc2f00991"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afd0819a9ac470b4483aad92cb1f1e561"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="Types_8h.html#aa3333c7237f7db8aa0121560dbaa3ecb">TokenResult</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1Kiwi.html#afd0819a9ac470b4483aad92cb1f1e561">analyze</a> (const std::u16string &amp;str, size_t topN, Match matchOptions) const</td></tr>
-<tr class="separator:afd0819a9ac470b4483aad92cb1f1e561"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4835741cd80b06c2291371677f786643"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="Types_8h.html#aa3333c7237f7db8aa0121560dbaa3ecb">TokenResult</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1Kiwi.html#a4835741cd80b06c2291371677f786643">analyze</a> (const std::string &amp;str, size_t topN, Match matchOptions) const</td></tr>
-<tr class="separator:a4835741cd80b06c2291371677f786643"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a093702fe40a2e7269c1a035f360c2fbf"><td class="memItemLeft" align="right" valign="top">std::future&lt; std::vector&lt; <a class="el" href="Types_8h.html#aa3333c7237f7db8aa0121560dbaa3ecb">TokenResult</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1Kiwi.html#a093702fe40a2e7269c1a035f360c2fbf">asyncAnalyze</a> (const std::string &amp;str, size_t topN, Match matchOptions) const</td></tr>
-<tr class="separator:a093702fe40a2e7269c1a035f360c2fbf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acb82c70f24a225c6aebadd392b0cd1e6"><td class="memTemplParams" colspan="2">template&lt;class ReaderCallback , class ResultCallback &gt; </td></tr>
-<tr class="memitem:acb82c70f24a225c6aebadd392b0cd1e6"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classkiwi_1_1Kiwi.html#acb82c70f24a225c6aebadd392b0cd1e6">analyze</a> (size_t topN, ReaderCallback &amp;&amp;reader, ResultCallback &amp;&amp;resultCallback, Match matchOptions) const</td></tr>
-<tr class="separator:acb82c70f24a225c6aebadd392b0cd1e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a220a1f8d00f92b3030abaa139ecc88f6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="Types_8h.html#aa3333c7237f7db8aa0121560dbaa3ecb">TokenResult</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1Kiwi.html#a220a1f8d00f92b3030abaa139ecc88f6">analyze</a> (const std::u16string &amp;str, Match matchOptions, const std::unordered_set&lt; const <a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a> * &gt; *blocklist=nullptr) const</td></tr>
+<tr class="separator:a220a1f8d00f92b3030abaa139ecc88f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afee8c67cce5f2f884678d763fb40677e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="Types_8h.html#aa3333c7237f7db8aa0121560dbaa3ecb">TokenResult</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1Kiwi.html#afee8c67cce5f2f884678d763fb40677e">analyze</a> (const std::string &amp;str, Match matchOptions, const std::unordered_set&lt; const <a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a> * &gt; *blocklist=nullptr) const</td></tr>
+<tr class="separator:afee8c67cce5f2f884678d763fb40677e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3b28f8fb3d3a05dc20c6e843d9346009"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="Types_8h.html#aa3333c7237f7db8aa0121560dbaa3ecb">TokenResult</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1Kiwi.html#a3b28f8fb3d3a05dc20c6e843d9346009">analyze</a> (const std::u16string &amp;str, size_t topN, Match matchOptions, const std::unordered_set&lt; const <a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a> * &gt; *blocklist=nullptr) const</td></tr>
+<tr class="separator:a3b28f8fb3d3a05dc20c6e843d9346009"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1efe62d5cb125834a52ed749d5cf2120"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="Types_8h.html#aa3333c7237f7db8aa0121560dbaa3ecb">TokenResult</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1Kiwi.html#a1efe62d5cb125834a52ed749d5cf2120">analyze</a> (const std::string &amp;str, size_t topN, Match matchOptions, const std::unordered_set&lt; const <a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a> * &gt; *blocklist=nullptr) const</td></tr>
+<tr class="separator:a1efe62d5cb125834a52ed749d5cf2120"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae9b5f8a0edf368d46986457f4d49d840"><td class="memItemLeft" align="right" valign="top">std::future&lt; std::vector&lt; <a class="el" href="Types_8h.html#aa3333c7237f7db8aa0121560dbaa3ecb">TokenResult</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1Kiwi.html#ae9b5f8a0edf368d46986457f4d49d840">asyncAnalyze</a> (const std::string &amp;str, size_t topN, Match matchOptions, const std::unordered_set&lt; const <a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a> * &gt; *blocklist=nullptr) const</td></tr>
+<tr class="separator:ae9b5f8a0edf368d46986457f4d49d840"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a85804e16c07c1641770e6bc14c1bb636"><td class="memItemLeft" align="right" valign="top"><a id="a85804e16c07c1641770e6bc14c1bb636"></a>
+std::future&lt; std::vector&lt; <a class="el" href="Types_8h.html#aa3333c7237f7db8aa0121560dbaa3ecb">TokenResult</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>asyncAnalyze</b> (std::string &amp;&amp;str, size_t topN, Match matchOptions, const std::unordered_set&lt; const <a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a> * &gt; *blocklist=nullptr) const</td></tr>
+<tr class="separator:a85804e16c07c1641770e6bc14c1bb636"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad6de2307be7cf44c3dccd6e118c55675"><td class="memItemLeft" align="right" valign="top"><a id="ad6de2307be7cf44c3dccd6e118c55675"></a>
+std::future&lt; <a class="el" href="Types_8h.html#aa3333c7237f7db8aa0121560dbaa3ecb">TokenResult</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>asyncAnalyze</b> (const std::string &amp;str, Match matchOptions, const std::unordered_set&lt; const <a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a> * &gt; *blocklist=nullptr) const</td></tr>
+<tr class="separator:ad6de2307be7cf44c3dccd6e118c55675"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a01ff9bb1418daf169d6816d848185bbf"><td class="memItemLeft" align="right" valign="top"><a id="a01ff9bb1418daf169d6816d848185bbf"></a>
+std::future&lt; <a class="el" href="Types_8h.html#aa3333c7237f7db8aa0121560dbaa3ecb">TokenResult</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>asyncAnalyze</b> (std::string &amp;&amp;str, Match matchOptions, const std::unordered_set&lt; const <a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a> * &gt; *blocklist=nullptr) const</td></tr>
+<tr class="separator:a01ff9bb1418daf169d6816d848185bbf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a35b69f98d475b8788dc66553943a9ea1"><td class="memItemLeft" align="right" valign="top"><a id="a35b69f98d475b8788dc66553943a9ea1"></a>
+std::future&lt; std::pair&lt; <a class="el" href="Types_8h.html#aa3333c7237f7db8aa0121560dbaa3ecb">TokenResult</a>, std::string &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>asyncAnalyzeEcho</b> (std::string &amp;&amp;str, Match matchOptions, const std::unordered_set&lt; const <a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a> * &gt; *blocklist=nullptr) const</td></tr>
+<tr class="separator:a35b69f98d475b8788dc66553943a9ea1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af844960a45c43715f50b9cbb2ba8b469"><td class="memItemLeft" align="right" valign="top"><a id="af844960a45c43715f50b9cbb2ba8b469"></a>
+std::future&lt; std::vector&lt; <a class="el" href="Types_8h.html#aa3333c7237f7db8aa0121560dbaa3ecb">TokenResult</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>asyncAnalyze</b> (const std::u16string &amp;str, size_t topN, Match matchOptions, const std::unordered_set&lt; const <a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a> * &gt; *blocklist=nullptr) const</td></tr>
+<tr class="separator:af844960a45c43715f50b9cbb2ba8b469"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a46ffb8fa670efc47dd37f96e4feaa029"><td class="memItemLeft" align="right" valign="top"><a id="a46ffb8fa670efc47dd37f96e4feaa029"></a>
+std::future&lt; std::vector&lt; <a class="el" href="Types_8h.html#aa3333c7237f7db8aa0121560dbaa3ecb">TokenResult</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>asyncAnalyze</b> (std::u16string &amp;&amp;str, size_t topN, Match matchOptions, const std::unordered_set&lt; const <a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a> * &gt; *blocklist=nullptr) const</td></tr>
+<tr class="separator:a46ffb8fa670efc47dd37f96e4feaa029"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2e0c52064a759aa671bfc9fc002efd04"><td class="memItemLeft" align="right" valign="top"><a id="a2e0c52064a759aa671bfc9fc002efd04"></a>
+std::future&lt; <a class="el" href="Types_8h.html#aa3333c7237f7db8aa0121560dbaa3ecb">TokenResult</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>asyncAnalyze</b> (const std::u16string &amp;str, Match matchOptions, const std::unordered_set&lt; const <a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a> * &gt; *blocklist=nullptr) const</td></tr>
+<tr class="separator:a2e0c52064a759aa671bfc9fc002efd04"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7be10c2647f6146151a7af3b28f17b2f"><td class="memItemLeft" align="right" valign="top"><a id="a7be10c2647f6146151a7af3b28f17b2f"></a>
+std::future&lt; <a class="el" href="Types_8h.html#aa3333c7237f7db8aa0121560dbaa3ecb">TokenResult</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>asyncAnalyze</b> (std::u16string &amp;&amp;str, Match matchOptions, const std::unordered_set&lt; const <a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a> * &gt; *blocklist=nullptr) const</td></tr>
+<tr class="separator:a7be10c2647f6146151a7af3b28f17b2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2c8728ec61416b24585eef0f66dea24e"><td class="memItemLeft" align="right" valign="top"><a id="a2c8728ec61416b24585eef0f66dea24e"></a>
+std::future&lt; std::pair&lt; <a class="el" href="Types_8h.html#aa3333c7237f7db8aa0121560dbaa3ecb">TokenResult</a>, std::u16string &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>asyncAnalyzeEcho</b> (std::u16string &amp;&amp;str, Match matchOptions, const std::unordered_set&lt; const <a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a> * &gt; *blocklist=nullptr) const</td></tr>
+<tr class="separator:a2c8728ec61416b24585eef0f66dea24e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abdc32f4f80e3d3e2cc9622d31db23832"><td class="memTemplParams" colspan="2">template&lt;class ReaderCallback , class ResultCallback &gt; </td></tr>
+<tr class="memitem:abdc32f4f80e3d3e2cc9622d31db23832"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classkiwi_1_1Kiwi.html#abdc32f4f80e3d3e2cc9622d31db23832">analyze</a> (size_t topN, ReaderCallback &amp;&amp;reader, ResultCallback &amp;&amp;resultCallback, Match matchOptions, const std::unordered_set&lt; const <a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a> * &gt; *blocklist=nullptr) const</td></tr>
+<tr class="separator:abdc32f4f80e3d3e2cc9622d31db23832"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a52218c510d6c8ee53fea28402a177902"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::pair&lt; size_t, size_t &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1Kiwi.html#a52218c510d6c8ee53fea28402a177902">splitIntoSents</a> (const std::u16string &amp;str, Match matchOptions=Match::allWithNormalizing, <a class="el" href="Types_8h.html#aa3333c7237f7db8aa0121560dbaa3ecb">TokenResult</a> *tokenizedResultOut=nullptr) const</td></tr>
 <tr class="separator:a52218c510d6c8ee53fea28402a177902"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1a8f39476bb72b3c75b83dc6f7a43992"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::pair&lt; size_t, size_t &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1Kiwi.html#a1a8f39476bb72b3c75b83dc6f7a43992">splitIntoSents</a> (const std::string &amp;str, Match matchOptions=Match::allWithNormalizing, <a class="el" href="Types_8h.html#aa3333c7237f7db8aa0121560dbaa3ecb">TokenResult</a> *tokenizedResultOut=nullptr) const</td></tr>
@@ -166,6 +193,9 @@ const <a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a> *&#160;</td>
 <tr class="memitem:a2e35d05193d6fa42ad56b30dc3e21dbc"><td class="memItemLeft" align="right" valign="top"><a id="a2e35d05193d6fa42ad56b30dc3e21dbc"></a>
 size_t&#160;</td><td class="memItemRight" valign="bottom"><b>getNumThreads</b> () const</td></tr>
 <tr class="separator:a2e35d05193d6fa42ad56b30dc3e21dbc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3d84cd0edf26957032c05095c3914ea7"><td class="memItemLeft" align="right" valign="top"><a id="a3d84cd0edf26957032c05095c3914ea7"></a>
+<a class="el" href="classkiwi_1_1utils_1_1ThreadPool.html">utils::ThreadPool</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>getThreadPool</b> () const</td></tr>
+<tr class="separator:a3d84cd0edf26957032c05095c3914ea7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2fac5aeb250d1c61966ef9abdefa9f8b"><td class="memItemLeft" align="right" valign="top"><a id="a2fac5aeb250d1c61966ef9abdefa9f8b"></a>
 float&#160;</td><td class="memItemRight" valign="bottom"><b>getCutOffThreshold</b> () const</td></tr>
 <tr class="separator:a2fac5aeb250d1c61966ef9abdefa9f8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -217,6 +247,12 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>setIntegrateAllomorph
 <tr class="memitem:ac52dadb518fe722720b7467c652ce6a8"><td class="memItemLeft" align="right" valign="top"><a id="ac52dadb518fe722720b7467c652ce6a8"></a>
 const <a class="el" href="classkiwi_1_1lm_1_1KnLangModelBase.html">lm::KnLangModelBase</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>getKnLM</b> () const</td></tr>
 <tr class="separator:ac52dadb518fe722720b7467c652ce6a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afa75421b03853bed13d3d58dc58ee710"><td class="memItemLeft" align="right" valign="top"><a id="afa75421b03853bed13d3d58dc58ee710"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>findMorpheme</b> (std::vector&lt; const <a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a> * &gt; &amp;out, const std::u16string &amp;s, <a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebb">POSTag</a> tag=<a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebbaad921d60486366258809553a3db49a4a">POSTag::unknown</a>) const</td></tr>
+<tr class="separator:afa75421b03853bed13d3d58dc58ee710"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a612f27124327fa497fde0d56b703fea2"><td class="memItemLeft" align="right" valign="top"><a id="a612f27124327fa497fde0d56b703fea2"></a>
+std::vector&lt; const <a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>findMorpheme</b> (const std::u16string &amp;s, <a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebb">POSTag</a> tag=<a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebbaad921d60486366258809553a3db49a4a">POSTag::unknown</a>) const</td></tr>
+<tr class="separator:a612f27124327fa497fde0d56b703fea2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>
@@ -275,8 +311,8 @@ template&lt;template&lt; ArchType &gt; class LmState&gt; </td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="ae52dd58f775ec0cd59631a9cc2f00991"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae52dd58f775ec0cd59631a9cc2f00991">&#9670;&nbsp;</a></span>analyze() <span class="overload">[1/5]</span></h2>
+<a id="afee8c67cce5f2f884678d763fb40677e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afee8c67cce5f2f884678d763fb40677e">&#9670;&nbsp;</a></span>analyze() <span class="overload">[1/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -294,7 +330,13 @@ template&lt;template&lt; ArchType &gt; class LmState&gt; </td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">Match&#160;</td>
-          <td class="paramname"><em>matchOptions</em>&#160;</td>
+          <td class="paramname"><em>matchOptions</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::unordered_set&lt; const <a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a> * &gt; *&#160;</td>
+          <td class="paramname"><em>blocklist</em> = <code>nullptr</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -319,8 +361,8 @@ template&lt;template&lt; ArchType &gt; class LmState&gt; </td></tr>
 
 </div>
 </div>
-<a id="a4835741cd80b06c2291371677f786643"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4835741cd80b06c2291371677f786643">&#9670;&nbsp;</a></span>analyze() <span class="overload">[2/5]</span></h2>
+<a id="a1efe62d5cb125834a52ed749d5cf2120"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1efe62d5cb125834a52ed749d5cf2120">&#9670;&nbsp;</a></span>analyze() <span class="overload">[2/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -344,7 +386,13 @@ template&lt;template&lt; ArchType &gt; class LmState&gt; </td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">Match&#160;</td>
-          <td class="paramname"><em>matchOptions</em>&#160;</td>
+          <td class="paramname"><em>matchOptions</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::unordered_set&lt; const <a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a> * &gt; *&#160;</td>
+          <td class="paramname"><em>blocklist</em> = <code>nullptr</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -370,8 +418,8 @@ template&lt;template&lt; ArchType &gt; class LmState&gt; </td></tr>
 
 </div>
 </div>
-<a id="a25c0c472ed3ce16790b32349d8ea73ab"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a25c0c472ed3ce16790b32349d8ea73ab">&#9670;&nbsp;</a></span>analyze() <span class="overload">[3/5]</span></h2>
+<a id="a220a1f8d00f92b3030abaa139ecc88f6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a220a1f8d00f92b3030abaa139ecc88f6">&#9670;&nbsp;</a></span>analyze() <span class="overload">[3/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -389,7 +437,13 @@ template&lt;template&lt; ArchType &gt; class LmState&gt; </td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">Match&#160;</td>
-          <td class="paramname"><em>matchOptions</em>&#160;</td>
+          <td class="paramname"><em>matchOptions</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::unordered_set&lt; const <a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a> * &gt; *&#160;</td>
+          <td class="paramname"><em>blocklist</em> = <code>nullptr</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -414,8 +468,8 @@ template&lt;template&lt; ArchType &gt; class LmState&gt; </td></tr>
 
 </div>
 </div>
-<a id="afd0819a9ac470b4483aad92cb1f1e561"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afd0819a9ac470b4483aad92cb1f1e561">&#9670;&nbsp;</a></span>analyze() <span class="overload">[4/5]</span></h2>
+<a id="a3b28f8fb3d3a05dc20c6e843d9346009"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3b28f8fb3d3a05dc20c6e843d9346009">&#9670;&nbsp;</a></span>analyze() <span class="overload">[4/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -436,7 +490,13 @@ template&lt;template&lt; ArchType &gt; class LmState&gt; </td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">Match&#160;</td>
-          <td class="paramname"><em>matchOptions</em>&#160;</td>
+          <td class="paramname"><em>matchOptions</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::unordered_set&lt; const <a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a> * &gt; *&#160;</td>
+          <td class="paramname"><em>blocklist</em> = <code>nullptr</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -457,8 +517,8 @@ template&lt;template&lt; ArchType &gt; class LmState&gt; </td></tr>
 
 </div>
 </div>
-<a id="acb82c70f24a225c6aebadd392b0cd1e6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acb82c70f24a225c6aebadd392b0cd1e6">&#9670;&nbsp;</a></span>analyze() <span class="overload">[5/5]</span></h2>
+<a id="abdc32f4f80e3d3e2cc9622d31db23832"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abdc32f4f80e3d3e2cc9622d31db23832">&#9670;&nbsp;</a></span>analyze() <span class="overload">[5/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -490,7 +550,13 @@ template&lt;class ReaderCallback , class ResultCallback &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">Match&#160;</td>
-          <td class="paramname"><em>matchOptions</em>&#160;</td>
+          <td class="paramname"><em>matchOptions</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::unordered_set&lt; const <a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a> * &gt; *&#160;</td>
+          <td class="paramname"><em>blocklist</em> = <code>nullptr</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -523,8 +589,8 @@ template&lt;class ReaderCallback , class ResultCallback &gt; </div>
 
 </div>
 </div>
-<a id="a093702fe40a2e7269c1a035f360c2fbf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a093702fe40a2e7269c1a035f360c2fbf">&#9670;&nbsp;</a></span>asyncAnalyze()</h2>
+<a id="ae9b5f8a0edf368d46986457f4d49d840"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae9b5f8a0edf368d46986457f4d49d840">&#9670;&nbsp;</a></span>asyncAnalyze()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -545,7 +611,13 @@ template&lt;class ReaderCallback , class ResultCallback &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">Match&#160;</td>
-          <td class="paramname"><em>matchOptions</em>&#160;</td>
+          <td class="paramname"><em>matchOptions</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::unordered_set&lt; const <a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a> * &gt; *&#160;</td>
+          <td class="paramname"><em>blocklist</em> = <code>nullptr</code>&#160;</td>
         </tr>
         <tr>
           <td></td>

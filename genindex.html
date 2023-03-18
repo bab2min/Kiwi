@@ -13,9 +13,6 @@
   <![endif]-->
   
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
@@ -28,11 +25,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> Kiwi
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Kiwi
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -57,7 +58,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
       <li class="breadcrumb-item active">Index</li>
       <li class="wy-breadcrumbs-aside">
       </li>
@@ -156,7 +157,7 @@
 </li>
       <li><a href="api/cpp/Form.html#_CPPv44kiwi">kiwi (C++ type)</a>, <a href="api/cpp/Kiwi.html#_CPPv44kiwi">[1]</a>, <a href="api/cpp/Types.html#_CPPv44kiwi">[2]</a>
 </li>
-      <li><a href="api/cpp/Form.html#_CPPv4N4kiwi4bakeERK11MorphemeRawPK8MorphemePK4FormRK6VectorI6size_tE">kiwi::bake (C++ function)</a>, <a href="api/cpp/Form.html#_CPPv4N4kiwi4bakeERK7FormRawPK8MorphemeRK6VectorI8uint32_tE">[1]</a>
+      <li><a href="api/cpp/Form.html#_CPPv4N4kiwi4bakeERK11MorphemeRawPK8MorphemePK4FormRK6VectorI6size_tE">kiwi::bake (C++ function)</a>, <a href="api/cpp/Form.html#_CPPv4N4kiwi4bakeERK7FormRawPK8MorphemebRK6VectorI8uint32_tE">[1]</a>
 </li>
       <li><a href="api/cpp/Types.html#_CPPv4N4kiwi11BuildOptionE">kiwi::BuildOption (C++ enum)</a>
 </li>
@@ -228,6 +229,8 @@
 </li>
       <li><a href="api/cpp/Form.html#_CPPv4N4kiwi4Form5vowelE">kiwi::Form::vowel (C++ member)</a>
 </li>
+      <li><a href="api/cpp/Form.html#_CPPv4N4kiwi4Form15zCodaAppendableE">kiwi::Form::zCodaAppendable (C++ member)</a>
+</li>
       <li><a href="api/cpp/Form.html#_CPPv4N4kiwi4FormD0Ev">kiwi::Form::~Form (C++ function)</a>
 </li>
       <li><a href="api/cpp/Form.html#_CPPv4N4kiwi7FormRawE">kiwi::FormRaw (C++ struct)</a>
@@ -276,13 +279,19 @@
 </li>
       <li><a href="api/cpp/Kiwi.html#_CPPv4N4kiwi4KiwiE">kiwi::Kiwi (C++ class)</a>
 </li>
-      <li><a href="api/cpp/Kiwi.html#_CPPv4I00ENK4kiwi4Kiwi7analyzeEv6size_tRR14ReaderCallbackRR14ResultCallback5Match">kiwi::Kiwi::analyze (C++ function)</a>, <a href="api/cpp/Kiwi.html#_CPPv4NK4kiwi4Kiwi7analyzeERKNSt6stringE5Match">[1]</a>, <a href="api/cpp/Kiwi.html#_CPPv4NK4kiwi4Kiwi7analyzeERKNSt6stringE6size_t5Match">[2]</a>, <a href="api/cpp/Kiwi.html#_CPPv4NK4kiwi4Kiwi7analyzeERKNSt9u16stringE5Match">[3]</a>, <a href="api/cpp/Kiwi.html#_CPPv4NK4kiwi4Kiwi7analyzeERKNSt9u16stringE6size_t5Match">[4]</a>
+      <li><a href="api/cpp/Kiwi.html#_CPPv4I0DpENK4kiwi4Kiwi13_asyncAnalyzeEDaRR3StrDpRR4Rest">kiwi::Kiwi::_asyncAnalyze (C++ function)</a>
 </li>
-      <li><a href="api/cpp/Kiwi.html#_CPPv4NK4kiwi4Kiwi11analyzeSentERKNSt9u16string14const_iteratorERKNSt9u16string14const_iteratorE6size_t5Matchb">kiwi::Kiwi::analyzeSent (C++ function)</a>
+      <li><a href="api/cpp/Kiwi.html#_CPPv4I0DpENK4kiwi4Kiwi17_asyncAnalyzeEchoEDaRR3StrDpRR4Rest">kiwi::Kiwi::_asyncAnalyzeEcho (C++ function)</a>
+</li>
+      <li><a href="api/cpp/Kiwi.html#_CPPv4I00ENK4kiwi4Kiwi7analyzeEv6size_tRR14ReaderCallbackRR14ResultCallback5MatchPKNSt13unordered_setIPK8MorphemeEE">kiwi::Kiwi::analyze (C++ function)</a>, <a href="api/cpp/Kiwi.html#_CPPv4NK4kiwi4Kiwi7analyzeERKNSt6stringE5MatchPKNSt13unordered_setIPK8MorphemeEE">[1]</a>, <a href="api/cpp/Kiwi.html#_CPPv4NK4kiwi4Kiwi7analyzeERKNSt6stringE6size_t5MatchPKNSt13unordered_setIPK8MorphemeEE">[2]</a>, <a href="api/cpp/Kiwi.html#_CPPv4NK4kiwi4Kiwi7analyzeERKNSt9u16stringE5MatchPKNSt13unordered_setIPK8MorphemeEE">[3]</a>, <a href="api/cpp/Kiwi.html#_CPPv4NK4kiwi4Kiwi7analyzeERKNSt9u16stringE6size_t5MatchPKNSt13unordered_setIPK8MorphemeEE">[4]</a>
+</li>
+      <li><a href="api/cpp/Kiwi.html#_CPPv4NK4kiwi4Kiwi11analyzeSentERKNSt9u16string14const_iteratorERKNSt9u16string14const_iteratorE6size_t5MatchbPKNSt13unordered_setIPK8MorphemeEE">kiwi::Kiwi::analyzeSent (C++ function)</a>
 </li>
       <li><a href="api/cpp/Kiwi.html#_CPPv4NK4kiwi4Kiwi8archTypeEv">kiwi::Kiwi::archType (C++ function)</a>
 </li>
-      <li><a href="api/cpp/Kiwi.html#_CPPv4NK4kiwi4Kiwi12asyncAnalyzeERKNSt6stringE6size_t5Match">kiwi::Kiwi::asyncAnalyze (C++ function)</a>
+      <li><a href="api/cpp/Kiwi.html#_CPPv4NK4kiwi4Kiwi12asyncAnalyzeERKNSt6stringE5MatchPKNSt13unordered_setIPK8MorphemeEE">kiwi::Kiwi::asyncAnalyze (C++ function)</a>, <a href="api/cpp/Kiwi.html#_CPPv4NK4kiwi4Kiwi12asyncAnalyzeERKNSt6stringE6size_t5MatchPKNSt13unordered_setIPK8MorphemeEE">[1]</a>, <a href="api/cpp/Kiwi.html#_CPPv4NK4kiwi4Kiwi12asyncAnalyzeERKNSt9u16stringE5MatchPKNSt13unordered_setIPK8MorphemeEE">[2]</a>, <a href="api/cpp/Kiwi.html#_CPPv4NK4kiwi4Kiwi12asyncAnalyzeERKNSt9u16stringE6size_t5MatchPKNSt13unordered_setIPK8MorphemeEE">[3]</a>, <a href="api/cpp/Kiwi.html#_CPPv4NK4kiwi4Kiwi12asyncAnalyzeERRNSt6stringE5MatchPKNSt13unordered_setIPK8MorphemeEE">[4]</a>, <a href="api/cpp/Kiwi.html#_CPPv4NK4kiwi4Kiwi12asyncAnalyzeERRNSt6stringE6size_t5MatchPKNSt13unordered_setIPK8MorphemeEE">[5]</a>, <a href="api/cpp/Kiwi.html#_CPPv4NK4kiwi4Kiwi12asyncAnalyzeERRNSt9u16stringE5MatchPKNSt13unordered_setIPK8MorphemeEE">[6]</a>, <a href="api/cpp/Kiwi.html#_CPPv4NK4kiwi4Kiwi12asyncAnalyzeERRNSt9u16stringE6size_t5MatchPKNSt13unordered_setIPK8MorphemeEE">[7]</a>
+</li>
+      <li><a href="api/cpp/Kiwi.html#_CPPv4NK4kiwi4Kiwi16asyncAnalyzeEchoERRNSt6stringE5MatchPKNSt13unordered_setIPK8MorphemeEE">kiwi::Kiwi::asyncAnalyzeEcho (C++ function)</a>, <a href="api/cpp/Kiwi.html#_CPPv4NK4kiwi4Kiwi16asyncAnalyzeEchoERRNSt9u16stringE5MatchPKNSt13unordered_setIPK8MorphemeEE">[1]</a>
 </li>
       <li><a href="api/cpp/Kiwi.html#_CPPv4N4kiwi4Kiwi13combiningRuleE">kiwi::Kiwi::combiningRule (C++ member)</a>
 </li>
@@ -292,7 +301,11 @@
 </li>
       <li><a href="api/cpp/Kiwi.html#_CPPv4N4kiwi4Kiwi14dfFindBestPathE">kiwi::Kiwi::dfFindBestPath (C++ member)</a>
 </li>
+      <li><a href="api/cpp/Kiwi.html#_CPPv4N4kiwi4Kiwi10dfFindFormE">kiwi::Kiwi::dfFindForm (C++ member)</a>
+</li>
       <li><a href="api/cpp/Kiwi.html#_CPPv4N4kiwi4Kiwi13dfSplitByTrieE">kiwi::Kiwi::dfSplitByTrie (C++ member)</a>
+</li>
+      <li><a href="api/cpp/Kiwi.html#_CPPv4NK4kiwi4Kiwi12findMorphemeERKNSt9u16stringE6POSTag">kiwi::Kiwi::findMorpheme (C++ function)</a>, <a href="api/cpp/Kiwi.html#_CPPv4NK4kiwi4Kiwi12findMorphemeERNSt6vectorIPK8MorphemeEERKNSt9u16stringE6POSTag">[1]</a>
 </li>
       <li><a href="api/cpp/Kiwi.html#_CPPv4N4kiwi4Kiwi5formsE">kiwi::Kiwi::forms (C++ member)</a>
 </li>
@@ -317,6 +330,8 @@
       <li><a href="api/cpp/Kiwi.html#_CPPv4NK4kiwi4Kiwi17getSpaceToleranceEv">kiwi::Kiwi::getSpaceTolerance (C++ function)</a>
 </li>
       <li><a href="api/cpp/Kiwi.html#_CPPv4NK4kiwi4Kiwi17getSpecialMorphIdE12SpecialMorph">kiwi::Kiwi::getSpecialMorphId (C++ function)</a>
+</li>
+      <li><a href="api/cpp/Kiwi.html#_CPPv4NK4kiwi4Kiwi13getThreadPoolEv">kiwi::Kiwi::getThreadPool (C++ function)</a>
 </li>
       <li><a href="api/cpp/Kiwi.html#_CPPv4NK4kiwi4Kiwi17getTypoCostWeightEv">kiwi::Kiwi::getTypoCostWeight (C++ function)</a>
 </li>
@@ -414,6 +429,8 @@
 </li>
       <li><a href="api/cpp/Kiwi.html#_CPPv4N4kiwi11KiwiBuilder19addAllomorphsToRuleEv">kiwi::KiwiBuilder::addAllomorphsToRule (C++ function)</a>
 </li>
+      <li><a href="api/cpp/Kiwi.html#_CPPv4NK4kiwi11KiwiBuilder19addCombinedMorphemeER6VectorI7FormRawER12UnorderedMapI7KString6size_tER6VectorI11MorphemeRawER12UnorderedMapI6size_t6VectorI8uint32_tEE6size_t6size_tRKN3cmb6ResultE">kiwi::KiwiBuilder::addCombinedMorpheme (C++ function)</a>
+</li>
       <li><a href="api/cpp/Kiwi.html#_CPPv4NK4kiwi11KiwiBuilder20addCombinedMorphemesER6VectorI7FormRawER12UnorderedMapI7KString6size_tER6VectorI11MorphemeRawER12UnorderedMapI6size_t6VectorI8uint32_tEE6size_t6size_t6size_t">kiwi::KiwiBuilder::addCombinedMorphemes (C++ function)</a>
 </li>
       <li><a href="api/cpp/Kiwi.html#_CPPv4NK4kiwi11KiwiBuilder11addCorpusToER12RaggedVectorI8uint16_tERNSt7istreamER11MorphemeMapdP12RaggedVectorI8uint16_tE">kiwi::KiwiBuilder::addCorpusTo (C++ function)</a>
@@ -430,7 +447,7 @@
 </li>
       <li><a href="api/cpp/Kiwi.html#_CPPv4NK4kiwi11KiwiBuilder5buildERK15TypoTransformerf">kiwi::KiwiBuilder::build (C++ function)</a>
 </li>
-      <li><a href="api/cpp/Kiwi.html#_CPPv4NK4kiwi11KiwiBuilder22buildCombinedMorphemesER6VectorI7FormRawER6VectorI11MorphemeRawER12UnorderedMapI6size_t6VectorI8uint32_tEE">kiwi::KiwiBuilder::buildCombinedMorphemes (C++ function)</a>
+      <li><a href="api/cpp/Kiwi.html#_CPPv4NK4kiwi11KiwiBuilder22buildCombinedMorphemesER6VectorI7FormRawER12UnorderedMapI7KString6size_tER6VectorI11MorphemeRawER12UnorderedMapI6size_t6VectorI8uint32_tEE">kiwi::KiwiBuilder::buildCombinedMorphemes (C++ function)</a>
 </li>
       <li><a href="api/cpp/Kiwi.html#_CPPv4N4kiwi11KiwiBuilder13combiningRuleE">kiwi::KiwiBuilder::combiningRule (C++ member)</a>
 </li>
@@ -514,6 +531,8 @@
 </li>
       <li><a href="api/cpp/Types.html#_CPPv4N4kiwi13KStringStreamE">kiwi::KStringStream (C++ type)</a>
 </li>
+      <li><a href="api/cpp/Types.html#_CPPv4I00EN4kiwi3MapE">kiwi::Map (C++ type)</a>
+</li>
       <li><a href="api/cpp/Form.html#_CPPv4N4kiwi8MorphemeE">kiwi::Morpheme (C++ struct)</a>
 </li>
       <li><a href="api/cpp/Form.html#_CPPv4N4kiwi8Morpheme6chunksE">kiwi::Morpheme::chunks (C++ member)</a>
@@ -521,6 +540,8 @@
       <li><a href="api/cpp/Form.html#_CPPv4N4kiwi8Morpheme8combinedE">kiwi::Morpheme::combined (C++ member)</a>
 </li>
       <li><a href="api/cpp/Form.html#_CPPv4N4kiwi8Morpheme13combineSocketE">kiwi::Morpheme::combineSocket (C++ member)</a>
+</li>
+      <li><a href="api/cpp/Form.html#_CPPv4N4kiwi8Morpheme7complexE">kiwi::Morpheme::complex (C++ member)</a>
 </li>
       <li><a href="api/cpp/Form.html#_CPPv4NK4kiwi8Morpheme11getCombinedEv">kiwi::Morpheme::getCombined (C++ function)</a>
 </li>
@@ -554,19 +575,21 @@
 </li>
       <li><a href="api/cpp/Form.html#_CPPv4N4kiwi11MorphemeRaw6chunksE">kiwi::MorphemeRaw::chunks (C++ member)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/cpp/Form.html#_CPPv4N4kiwi11MorphemeRaw8combinedE">kiwi::MorphemeRaw::combined (C++ member)</a>
 </li>
       <li><a href="api/cpp/Form.html#_CPPv4N4kiwi11MorphemeRaw13combineSocketE">kiwi::MorphemeRaw::combineSocket (C++ member)</a>
 </li>
+      <li><a href="api/cpp/Form.html#_CPPv4NK4kiwi11MorphemeRaw7complexEv">kiwi::MorphemeRaw::complex (C++ function)</a>
+</li>
       <li><a href="api/cpp/Form.html#_CPPv4N4kiwi11MorphemeRaw7groupIdE">kiwi::MorphemeRaw::groupId (C++ member)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/cpp/Form.html#_CPPv4N4kiwi11MorphemeRaw5kformE">kiwi::MorphemeRaw::kform (C++ member)</a>
 </li>
       <li><a href="api/cpp/Form.html#_CPPv4N4kiwi11MorphemeRaw12lmMorphemeIdE">kiwi::MorphemeRaw::lmMorphemeId (C++ member)</a>
 </li>
-      <li><a href="api/cpp/Form.html#_CPPv4N4kiwi11MorphemeRaw11MorphemeRawE6POSTag9CondVowel12CondPolarity7uint8_t">kiwi::MorphemeRaw::MorphemeRaw (C++ function)</a>, <a href="api/cpp/Form.html#_CPPv4N4kiwi11MorphemeRaw11MorphemeRawERK11MorphemeRaw">[1]</a>, <a href="api/cpp/Form.html#_CPPv4N4kiwi11MorphemeRaw11MorphemeRawERR11MorphemeRaw">[2]</a>, <a href="api/cpp/Form.html#_CPPv4N4kiwi11MorphemeRaw11MorphemeRawEv">[3]</a>
+      <li><a href="api/cpp/Form.html#_CPPv4N4kiwi11MorphemeRaw11MorphemeRawE6POSTag9CondVowel12CondPolarityb7uint8_t">kiwi::MorphemeRaw::MorphemeRaw (C++ function)</a>, <a href="api/cpp/Form.html#_CPPv4N4kiwi11MorphemeRaw11MorphemeRawERK11MorphemeRaw">[1]</a>, <a href="api/cpp/Form.html#_CPPv4N4kiwi11MorphemeRaw11MorphemeRawERR11MorphemeRaw">[2]</a>, <a href="api/cpp/Form.html#_CPPv4N4kiwi11MorphemeRaw11MorphemeRawEv">[3]</a>
 </li>
       <li><a href="api/cpp/Form.html#_CPPv4N4kiwi11MorphemeRawaSERK11MorphemeRaw">kiwi::MorphemeRaw::operator= (C++ function)</a>, <a href="api/cpp/Form.html#_CPPv4N4kiwi11MorphemeRawaSERR11MorphemeRaw">[1]</a>
 </li>
@@ -577,6 +600,8 @@
       <li><a href="api/cpp/Form.html#_CPPv4N4kiwi11MorphemeRaw14serializerReadERNSt7istreamE">kiwi::MorphemeRaw::serializerRead (C++ function)</a>
 </li>
       <li><a href="api/cpp/Form.html#_CPPv4NK4kiwi11MorphemeRaw15serializerWriteERNSt7ostreamE">kiwi::MorphemeRaw::serializerWrite (C++ function)</a>
+</li>
+      <li><a href="api/cpp/Form.html#_CPPv4N4kiwi11MorphemeRaw10setComplexEb">kiwi::MorphemeRaw::setComplex (C++ function)</a>
 </li>
       <li><a href="api/cpp/Form.html#_CPPv4N4kiwi11MorphemeRaw8setPolarE12CondPolarity">kiwi::MorphemeRaw::setPolar (C++ function)</a>
 </li>
@@ -712,9 +737,13 @@
 </li>
       <li><a href="api/cpp/Types.html#_CPPv4N4kiwi6POSTag4xsaiE">kiwi::POSTag::xsai (C++ enumerator)</a>
 </li>
+      <li><a href="api/cpp/Types.html#_CPPv4N4kiwi6POSTag3xsmE">kiwi::POSTag::xsm (C++ enumerator)</a>
+</li>
       <li><a href="api/cpp/Types.html#_CPPv4N4kiwi6POSTag3xsnE">kiwi::POSTag::xsn (C++ enumerator)</a>
 </li>
       <li><a href="api/cpp/Types.html#_CPPv4N4kiwi6POSTag3xsvE">kiwi::POSTag::xsv (C++ enumerator)</a>
+</li>
+      <li><a href="api/cpp/Types.html#_CPPv4N4kiwi6POSTag6z_codaE">kiwi::POSTag::z_coda (C++ enumerator)</a>
 </li>
       <li><a href="api/cpp/Types.html#_CPPv4N4kiwi12setIrregularE6POSTag">kiwi::setIrregular (C++ function)</a>, <a href="api/cpp/Types.html#_CPPv4N4kiwi12setIrregularE6POSTagb">[1]</a>
 </li>
