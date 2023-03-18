@@ -5,28 +5,41 @@
 using namespace std;
 using namespace kiwi;
 
-class PatternMatcherImpl
+namespace kiwi
 {
-	struct
+	class PatternMatcherImpl
 	{
-		pattern::CutSZCharSetParser<PP_GET_64("-A-Za-z0-9._%+", 0)>::type emailAccount;
-		pattern::CutSZCharSetParser<PP_GET_64("-A-Za-z0-9.", 0)>::type alphaNumDotDash;
-		pattern::CutSZCharSetParser<PP_GET_64("-a-zA-Z0-9@:%._+~#=", 0)>::type domain;
-		pattern::CutSZCharSetParser<PP_GET_64("-a-zA-Z0-9()@:%_+.~#!?&/=", 0)>::type path;
-		pattern::CutSZCharSetParser<PP_GET_64("^# \t\n\r\v\f.,", 0)>::type hashtags;
-		pattern::CutSZCharSetParser<PP_GET_64(" \t\n\r\v\f", 0)>::type space;
-	} md;
+		struct
+		{
+			pattern::CutSZCharSetParser<PP_GET_64("-A-Za-z0-9._%+", 0)>::type emailAccount;
+			pattern::CutSZCharSetParser<PP_GET_64("-A-Za-z0-9.", 0)>::type alphaNumDotDash;
+			pattern::CutSZCharSetParser<PP_GET_64("-a-zA-Z0-9@:%._+~#=", 0)>::type domain;
+			pattern::CutSZCharSetParser<PP_GET_64("-a-zA-Z0-9()@:%_+.~#!?&/=", 0)>::type path;
+			pattern::CutSZCharSetParser<PP_GET_64("^# \t\n\r\v\f.,", 0)>::type hashtags;
+			pattern::CutSZCharSetParser<PP_GET_64(" \t\n\r\v\f", 0)>::type space;
+		} md;
 
-	size_t testUrl(const char16_t* first, const char16_t* last) const;
-	size_t testEmail(const char16_t* first, const char16_t* last) const;
-	size_t testHashtag(const char16_t* first, const char16_t* last) const;
-	size_t testMention(const char16_t* first, const char16_t* last) const;
-	size_t testNumeric(const char16_t* first, const char16_t* last) const;
-	size_t testSerial(const char16_t* first, const char16_t* last) const;
+		size_t testUrl(const char16_t* first, const char16_t* last) const;
+		size_t testEmail(const char16_t* first, const char16_t* last) const;
+		size_t testHashtag(const char16_t* first, const char16_t* last) const;
+		size_t testMention(const char16_t* first, const char16_t* last) const;
+		size_t testNumeric(const char16_t* first, const char16_t* last) const;
+		size_t testSerial(const char16_t* first, const char16_t* last) const;
 
-public:
-	std::pair<size_t, POSTag> match(const char16_t* first, const char16_t* last, Match matchOptions) const;
-};
+	public:
+		std::pair<size_t, POSTag> match(const char16_t* first, const char16_t* last, Match matchOptions) const;
+	};
+
+	inline bool isAlpha(char16_t c)
+	{
+		return ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z');
+	}
+
+	inline bool isDigit(char16_t c)
+	{
+		return ('0' <= c && c <= '9') || (u'\uff10' <= c && c <= u'\uff19');
+	}
+}
 
 size_t PatternMatcherImpl::testUrl(const char16_t * first, const char16_t * last) const
 {
@@ -55,7 +68,7 @@ size_t PatternMatcherImpl::testUrl(const char16_t * first, const char16_t * last
 	for (; b != last && md.domain.test(*b); ++b)
 	{
 		if (*b == '.') state = 1;
-		else if (isalpha(*b))
+		else if (isAlpha(*b))
 		{
 			if (state > 0) ++state;
 			if (state >= 3)
@@ -73,9 +86,9 @@ size_t PatternMatcherImpl::testUrl(const char16_t * first, const char16_t * last
 	if (b != last && *b == ':')
 	{
 		++b;
-		if (b == last || !isdigit(*b)) return 0;
+		if (b == last || !isDigit(*b)) return 0;
 		++b;
-		while (b != last && isdigit(*b)) ++b;
+		while (b != last && isDigit(*b)) ++b;
 	}
 
 	// \b(/[-a-zA-Z0-9()@:%_+.~#?&/=]*)?
@@ -116,7 +129,7 @@ size_t PatternMatcherImpl::testEmail(const char16_t * first, const char16_t * la
 	for (; b != last && md.alphaNumDotDash.test(*b); ++b)
 	{
 		if (*b == '.') state = 1;
-		else if (isalpha(*b))
+		else if (isAlpha(*b))
 		{
 			if (state > 0) ++state;
 			if (state >= 3) lastMatched = b + 1;
@@ -137,7 +150,7 @@ size_t PatternMatcherImpl::testMention(const char16_t* first, const char16_t* la
 	++b;
 
 	// [A-Za-z][A-Za-z0-9._%+-]+
-	if (b == last || !isalpha(*b)) return 0;
+	if (b == last || !isAlpha(*b)) return 0;
 	++b;
 	while (b != last && md.emailAccount.test(*b)) ++b;
 	if (b[-1] == u'.' || b[-1] == u'%' || b[-1] == u'+' || b[-1] == u'-') --b;
@@ -158,11 +171,6 @@ size_t PatternMatcherImpl::testHashtag(const char16_t * first, const char16_t * 
 	while (b != last && md.hashtags.test(*b)) ++b;
 
 	return b - first;
-}
-
-inline bool isDigit(char16_t c)
-{
-	return ('0' <= c && c <= '9') || (u'\uff10' <= c && c <= u'\uff19');
 }
 
 size_t PatternMatcherImpl::testNumeric(const char16_t* first, const char16_t* last) const

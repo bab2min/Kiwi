@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.12)
 
 project(kiwi VERSION 0.14.1 DESCRIPTION "Kiwi, Korean Intelligent Word Identifier")
 
-set ( CMAKE_CXX_STANDARD 11 )
+set ( CMAKE_CXX_STANDARD 14 )
 set ( CMAKE_VERBOSE_MAKEFILE true )
 
 option(KIWI_USE_MIMALLOC  "Use mimalloc for faster memory allocation" ON)
@@ -48,8 +48,10 @@ set ( CORE_SRCS
   src/KTrie.cpp
   src/PatternMatcher.cpp
   src/search.cpp
+  src/SwTokenizer.cpp
   src/TagUtils.cpp
   src/TypoTransformer.cpp
+  src/UnicodeCase.cpp
   src/Utils.cpp
   src/WordDetector.cpp
   src/archImpl/none.cpp
@@ -71,6 +73,7 @@ include_directories( third_party/tclap/include )
 include_directories( third_party/cpp-btree )
 include_directories( third_party/variant/include )
 include_directories( third_party/eigen )
+include_directories( third_party/json/include )
 if(KIWI_USE_CPUINFO)
   message(STATUS "Use cpuinfo")
   include_directories( third_party/cpuinfo/include )

@@ -18,102 +18,130 @@
 using namespace std;
 using namespace kiwi;
 
-struct puhash
+namespace kiwi
 {
-	size_t operator()(const pair<uint16_t, uint16_t>& o) const
+	struct puhash
 	{
-		return hash<uint16_t>{}(o.first) | (hash<uint16_t>{}(o.second) << 16);
-	}
-};
-
-template<class ChrTy>
-bool startsWith(const std::basic_string<ChrTy>& s, const std::basic_string<ChrTy>& pf)
-{
-	if (s.size() < pf.size()) return false;
-	return std::equal(pf.begin(), pf.end(), s.begin());
-}
-
-template<class KeyType = char16_t, class ValueType = uint32_t>
-class WordDictionary
-{
-protected:
-	std::map<KeyType, ValueType> word2id;
-	std::vector<KeyType> id2word;
-	std::mutex mtx;
-public:
-
-	WordDictionary() {}
-	WordDictionary(const WordDictionary& o) : word2id(o.word2id), id2word(o.id2word) {}
-	WordDictionary(WordDictionary&& o)
-	{
-		std::swap(word2id, o.word2id);
-		std::swap(id2word, o.id2word);
-	}
-
-	WordDictionary& operator=(WordDictionary&& o)
-	{
-		std::swap(word2id, o.word2id);
-		std::swap(id2word, o.id2word);
-		return *this;
-	}
-
-	enum { npos = (ValueType)-1 };
-
-	ValueType add(const KeyType& str)
-	{
-		if (word2id.emplace(str, word2id.size()).second) id2word.emplace_back(str);
-		return word2id.size() - 1;
-	}
-
-	ValueType getOrAdd(const KeyType& str)
-	{
-		std::lock_guard<std::mutex> lg(mtx);
-		auto it = word2id.find(str);
-		if (it != word2id.end()) return it->second;
-		return add(str);
-	}
-
-	template<class Iter>
-	std::vector<ValueType> getOrAdds(Iter begin, Iter end)
-	{
-		std::lock_guard<std::mutex> lg(mtx);
-		return getOrAddsWithoutLock(begin, end);
-	}
-
-	template<class Iter>
-	std::vector<ValueType> getOrAddsWithoutLock(Iter begin, Iter end)
-	{
-		std::vector<ValueType> ret;
-		for (; begin != end; ++begin)
+		size_t operator()(const pair<uint16_t, uint16_t>& o) const
 		{
-			auto it = word2id.find(*begin);
-			if (it != word2id.end()) ret.emplace_back(it->second);
-			else ret.emplace_back(add(*begin));
+			return hash<uint16_t>{}(o.first) | (hash<uint16_t>{}(o.second) << 16);
 		}
-		return ret;
-	}
+	};
 
-	template<class Func>
-	void withLock(const Func& f)
+	template<class ChrTy>
+	bool startsWith(const std::basic_string<ChrTy>& s, const std::basic_string<ChrTy>& pf)
 	{
-		std::lock_guard<std::mutex> lg(mtx);
-		f();
+		if (s.size() < pf.size()) return false;
+		return std::equal(pf.begin(), pf.end(), s.begin());
 	}
 
-	ValueType get(const KeyType& str) const
+	template<class KeyType = char16_t, class ValueType = uint32_t>
+	class WordDictionary
 	{
-		auto it = word2id.find(str);
-		if (it != word2id.end()) return it->second;
-		return npos;
-	}
+	protected:
+		std::map<KeyType, ValueType> word2id;
+		std::vector<KeyType> id2word;
+		std::mutex mtx;
+	public:
 
-	const KeyType& getStr(ValueType id) const
+		WordDictionary() {}
+		WordDictionary(const WordDictionary& o) : word2id(o.word2id), id2word(o.id2word) {}
+		WordDictionary(WordDictionary&& o)
+		{
+			std::swap(word2id, o.word2id);
+			std::swap(id2word, o.id2word);
+		}
+
+		WordDictionary& operator=(WordDictionary&& o)
+		{
+			std::swap(word2id, o.word2id);
+			std::swap(id2word, o.id2word);
+			return *this;
+		}
+
+		enum { npos = (ValueType)-1 };
+
+		ValueType add(const KeyType& str)
+		{
+			if (word2id.emplace(str, word2id.size()).second) id2word.emplace_back(str);
+			return word2id.size() - 1;
+		}
+
+		ValueType getOrAdd(const KeyType& str)
+		{
+			std::lock_guard<std::mutex> lg(mtx);
+			auto it = word2id.find(str);
+			if (it != word2id.end()) return it->second;
+			return add(str);
+		}
+
+		template<class Iter>
+		std::vector<ValueType> getOrAdds(Iter begin, Iter end)
+		{
+			std::lock_guard<std::mutex> lg(mtx);
+			return getOrAddsWithoutLock(begin, end);
+		}
+
+		template<class Iter>
+		std::vector<ValueType> getOrAddsWithoutLock(Iter begin, Iter end)
+		{
+			std::vector<ValueType> ret;
+			for (; begin != end; ++begin)
+			{
+				auto it = word2id.find(*begin);
+				if (it != word2id.end()) ret.emplace_back(it->second);
+				else ret.emplace_back(add(*begin));
+			}
+			return ret;
+		}
+
+		template<class Func>
+		void withLock(const Func& f)
+		{
+			std::lock_guard<std::mutex> lg(mtx);
+			f();
+		}
+
+		ValueType get(const KeyType& str) const
+		{
+			auto it = word2id.find(str);
+			if (it != word2id.end()) return it->second;
+			return npos;
+		}
+
+		const KeyType& getStr(ValueType id) const
+		{
+			return id2word[id];
+		}
+
+		size_t size() const { return id2word.size(); }
+	};
+
+	inline bool isalnum16(char16_t c)
 	{
-		return id2word[id];
+		if (c < 0 || c > 255) return false;
+		return std::isalnum(c);
 	}
 
-	size_t size() const { return id2word.size(); }
-};
+	template<class LocalData, class FuncReader, class FuncProc>
+	std::vector<LocalData> readProc(size_t numWorkers, const FuncReader& reader, const FuncProc& processor, LocalData&& ld = {})
+	{
+		utils::ThreadPool workers{ numWorkers, numWorkers * 2 };
+		std::vector<LocalData> ldByTid(workers.size(), ld);
+		while (1)
+		{
+			auto ustr = reader();
+			if (ustr.empty()) break;
+			workers.enqueue([&, ustr](size_t tid)
+			{
+				auto& ld = ldByTid[tid];
+			processor(ustr, ld);
+			});
+		}
+		workers.joinAll();
+		return ldByTid;
+	}
+}
 
 struct WordDetector::Counter
 {
@@ -152,25 +180,6 @@ void WordDetector::saveModel(const std::string& modelPath) const
 		if (!ofs) throw Exception{ "Failed to open model file '" + modelPath + "extract.mdl'." };
 		serializer::writeMany(ofs, posScore, nounTailScore);
 	}
-}
-
-template<class LocalData, class FuncReader, class FuncProc>
-std::vector<LocalData> readProc(size_t numWorkers, const FuncReader& reader, const FuncProc& processor, LocalData&& ld = {})
-{
-	utils::ThreadPool workers{ numWorkers, numWorkers * 2 };
-	std::vector<LocalData> ldByTid(workers.size(), ld);
-	while (1)
-	{
-		auto ustr = reader();
-		if (ustr.empty()) break;
-		workers.enqueue([&, ustr](size_t tid)
-		{
-			auto& ld = ldByTid[tid];
-			processor(ustr, ld);
-		});
-	}
-	workers.joinAll();
-	return ldByTid;
 }
 
 void WordDetector::countUnigram(Counter& cdata, const U16Reader& reader, size_t minCnt) const
@@ -455,12 +464,6 @@ void WordDetector::loadNounTailModelFromTxt(std::istream & is)
 		float p = stof(fields[1].begin(), fields[1].end());
 		nounTailScore[fields[0].to_string()] = p;
 	}
-}
-
-inline bool isalnum16(char16_t c)
-{
-	if (c < 0 || c > 255) return false;
-	return std::isalnum(c);
 }
 
 vector<WordInfo> WordDetector::extractWords(const U16MultipleReader& reader, size_t minCnt, size_t maxWordLen, float minScore) const

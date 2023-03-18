@@ -23,11 +23,13 @@ namespace kiwi
 		POSTag _tag,
 		CondVowel _vowel,
 		CondPolarity _polar,
+		bool _complex,
 		uint8_t _combineSocket)
 		: tag(_tag), combineSocket(_combineSocket)
 	{
 		setVowel(_vowel);
 		setPolar(_polar);
+		setComplex(_complex);
 	}
 
 	DEFINE_SERIALIZER_OUTSIDE(MorphemeRaw, kform, tag, vpPack, combineSocket, combined, userScore, chunks, chunkPositions, lmMorphemeId, groupId);
@@ -79,7 +81,7 @@ namespace kiwi
 
 	Form& Form::operator=(Form&&) = default;
 
-	Form bake(const FormRaw& o, const Morpheme* morphBase, const Vector<uint32_t>& additionalCands)
+	Form bake(const FormRaw& o, const Morpheme* morphBase, bool zCodaAppendable, const Vector<uint32_t>& additionalCands)
 	{
 		Form ret;
 		ret.form = o.form;
@@ -92,6 +94,7 @@ namespace kiwi
 		{
 			ret.candidate[i + o.candidate.size()] = morphBase + additionalCands[i];
 		}
+		ret.zCodaAppendable = zCodaAppendable ? 1 : 0;
 		return ret;
 	}
 
@@ -102,6 +105,7 @@ namespace kiwi
 		ret.tag = o.tag;
 		ret.vowel = o.vowel();
 		ret.polar = o.polar();
+		ret.complex = o.complex();
 		ret.combineSocket = o.combineSocket;
 		ret.combined = o.combined;
 		ret.userScore = o.userScore;

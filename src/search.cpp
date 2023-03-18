@@ -243,7 +243,7 @@ namespace kiwi
 		ARCH_TARGET("sse2")
 		bool nstSearchSSE2(const IntTy* keys, size_t size, IntTy target, size_t& ret)
 		{
-			size_t i = 0;
+			size_t i = 0, r;
 
 			__m128i ptarget, pkey, peq, pgt;
 			switch (sizeof(IntTy))
@@ -257,6 +257,121 @@ namespace kiwi
 			case 4:
 				ptarget = _mm_set1_epi32(target);
 				break;
+			}
+
+			if (size >= n * n * n - 1)
+			{
+				pkey = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&keys[i]));
+				switch (sizeof(IntTy))
+				{
+				case 1:
+					peq = _mm_cmpeq_epi8(ptarget, pkey);
+					pgt = _mm_cmpgt_epi8(ptarget, pkey);
+					break;
+				case 2:
+					peq = _mm_cmpeq_epi16(ptarget, pkey);
+					pgt = _mm_cmpgt_epi16(ptarget, pkey);
+					break;
+				case 4:
+					peq = _mm_cmpeq_epi32(ptarget, pkey);
+					pgt = _mm_cmpgt_epi32(ptarget, pkey);
+					break;
+				}
+
+				if (testEq<IntTy>(peq, i, size, ret)) return true;
+
+				r = utils::popcount((uint32_t)_mm_movemask_epi8(pgt)) / sizeof(IntTy);
+				i = i * n + (n - 1) * (r + 1);
+
+				pkey = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&keys[i]));
+				switch (sizeof(IntTy))
+				{
+				case 1:
+					peq = _mm_cmpeq_epi8(ptarget, pkey);
+					pgt = _mm_cmpgt_epi8(ptarget, pkey);
+					break;
+				case 2:
+					peq = _mm_cmpeq_epi16(ptarget, pkey);
+					pgt = _mm_cmpgt_epi16(ptarget, pkey);
+					break;
+				case 4:
+					peq = _mm_cmpeq_epi32(ptarget, pkey);
+					pgt = _mm_cmpgt_epi32(ptarget, pkey);
+					break;
+				}
+
+				if (testEq<IntTy>(peq, i, size, ret)) return true;
+
+				r = utils::popcount((uint32_t)_mm_movemask_epi8(pgt)) / sizeof(IntTy);
+				i = i * n + (n - 1) * (r + 1);
+
+				pkey = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&keys[i]));
+				switch (sizeof(IntTy))
+				{
+				case 1:
+					peq = _mm_cmpeq_epi8(ptarget, pkey);
+					pgt = _mm_cmpgt_epi8(ptarget, pkey);
+					break;
+				case 2:
+					peq = _mm_cmpeq_epi16(ptarget, pkey);
+					pgt = _mm_cmpgt_epi16(ptarget, pkey);
+					break;
+				case 4:
+					peq = _mm_cmpeq_epi32(ptarget, pkey);
+					pgt = _mm_cmpgt_epi32(ptarget, pkey);
+					break;
+				}
+
+				if (testEq<IntTy>(peq, i, size, ret)) return true;
+
+				r = utils::popcount((uint32_t)_mm_movemask_epi8(pgt)) / sizeof(IntTy);
+				i = i * n + (n - 1) * (r + 1);
+			}
+			else if (size >= n * n - 1)
+			{
+				pkey = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&keys[i]));
+				switch (sizeof(IntTy))
+				{
+				case 1:
+					peq = _mm_cmpeq_epi8(ptarget, pkey);
+					pgt = _mm_cmpgt_epi8(ptarget, pkey);
+					break;
+				case 2:
+					peq = _mm_cmpeq_epi16(ptarget, pkey);
+					pgt = _mm_cmpgt_epi16(ptarget, pkey);
+					break;
+				case 4:
+					peq = _mm_cmpeq_epi32(ptarget, pkey);
+					pgt = _mm_cmpgt_epi32(ptarget, pkey);
+					break;
+				}
+
+				if (testEq<IntTy>(peq, i, size, ret)) return true;
+
+				r = utils::popcount((uint32_t)_mm_movemask_epi8(pgt)) / sizeof(IntTy);
+				i = i * n + (n - 1) * (r + 1);
+
+				pkey = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&keys[i]));
+				switch (sizeof(IntTy))
+				{
+				case 1:
+					peq = _mm_cmpeq_epi8(ptarget, pkey);
+					pgt = _mm_cmpgt_epi8(ptarget, pkey);
+					break;
+				case 2:
+					peq = _mm_cmpeq_epi16(ptarget, pkey);
+					pgt = _mm_cmpgt_epi16(ptarget, pkey);
+					break;
+				case 4:
+					peq = _mm_cmpeq_epi32(ptarget, pkey);
+					pgt = _mm_cmpgt_epi32(ptarget, pkey);
+					break;
+				}
+
+				if (testEq<IntTy>(peq, i, size, ret)) return true;
+
+				r = utils::popcount((uint32_t)_mm_movemask_epi8(pgt)) / sizeof(IntTy);
+				i = i * n + (n - 1) * (r + 1);
 			}
 
 			while (i < size)
@@ -280,7 +395,7 @@ namespace kiwi
 
 				if (testEq<IntTy>(peq, i, size, ret)) return true;
 
-				size_t r = utils::popcount(_mm_movemask_epi8(pgt)) / sizeof(IntTy);
+				r = utils::popcount((uint32_t)_mm_movemask_epi8(pgt)) / sizeof(IntTy);
 				i = i * n + (n - 1) * (r + 1);
 			}
 			return false;
@@ -342,7 +457,7 @@ namespace kiwi
 		ARCH_TARGET("avx2")
 		bool nstSearchAVX2(const IntTy* keys, size_t size, IntTy target, size_t& ret)
 		{
-			size_t i = 0;
+			size_t i = 0, r;
 
 			__m256i ptarget, pkey, peq, pgt;
 			switch (sizeof(IntTy))
@@ -359,6 +474,141 @@ namespace kiwi
 			case 8:
 				ptarget = _mm256_set1_epi64x(target);
 				break;
+			}
+
+			if (size >= n * n * n - 1)
+			{
+				pkey = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&keys[i]));
+				switch (sizeof(IntTy))
+				{
+				case 1:
+					peq = _mm256_cmpeq_epi8(ptarget, pkey);
+					pgt = _mm256_cmpgt_epi8(ptarget, pkey);
+					break;
+				case 2:
+					peq = _mm256_cmpeq_epi16(ptarget, pkey);
+					pgt = _mm256_cmpgt_epi16(ptarget, pkey);
+					break;
+				case 4:
+					peq = _mm256_cmpeq_epi32(ptarget, pkey);
+					pgt = _mm256_cmpgt_epi32(ptarget, pkey);
+					break;
+				case 8:
+					peq = _mm256_cmpeq_epi64(ptarget, pkey);
+					pgt = _mm256_cmpgt_epi64(ptarget, pkey);
+					break;
+				}
+
+				if (testEq<IntTy>(peq, i, size, ret)) return true;
+
+				r = utils::popcount((uint32_t)_mm256_movemask_epi8(pgt)) / sizeof(IntTy);
+				i = i * n + (n - 1) * (r + 1);
+
+				pkey = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&keys[i]));
+				switch (sizeof(IntTy))
+				{
+				case 1:
+					peq = _mm256_cmpeq_epi8(ptarget, pkey);
+					pgt = _mm256_cmpgt_epi8(ptarget, pkey);
+					break;
+				case 2:
+					peq = _mm256_cmpeq_epi16(ptarget, pkey);
+					pgt = _mm256_cmpgt_epi16(ptarget, pkey);
+					break;
+				case 4:
+					peq = _mm256_cmpeq_epi32(ptarget, pkey);
+					pgt = _mm256_cmpgt_epi32(ptarget, pkey);
+					break;
+				case 8:
+					peq = _mm256_cmpeq_epi64(ptarget, pkey);
+					pgt = _mm256_cmpgt_epi64(ptarget, pkey);
+					break;
+				}
+
+				if (testEq<IntTy>(peq, i, size, ret)) return true;
+
+				r = utils::popcount((uint32_t)_mm256_movemask_epi8(pgt)) / sizeof(IntTy);
+				i = i * n + (n - 1) * (r + 1);
+
+				pkey = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&keys[i]));
+				switch (sizeof(IntTy))
+				{
+				case 1:
+					peq = _mm256_cmpeq_epi8(ptarget, pkey);
+					pgt = _mm256_cmpgt_epi8(ptarget, pkey);
+					break;
+				case 2:
+					peq = _mm256_cmpeq_epi16(ptarget, pkey);
+					pgt = _mm256_cmpgt_epi16(ptarget, pkey);
+					break;
+				case 4:
+					peq = _mm256_cmpeq_epi32(ptarget, pkey);
+					pgt = _mm256_cmpgt_epi32(ptarget, pkey);
+					break;
+				case 8:
+					peq = _mm256_cmpeq_epi64(ptarget, pkey);
+					pgt = _mm256_cmpgt_epi64(ptarget, pkey);
+					break;
+				}
+
+				if (testEq<IntTy>(peq, i, size, ret)) return true;
+
+				r = utils::popcount((uint32_t)_mm256_movemask_epi8(pgt)) / sizeof(IntTy);
+				i = i * n + (n - 1) * (r + 1);
+			}
+			else if (size >= n * n - 1)
+			{
+				pkey = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&keys[i]));
+				switch (sizeof(IntTy))
+				{
+				case 1:
+					peq = _mm256_cmpeq_epi8(ptarget, pkey);
+					pgt = _mm256_cmpgt_epi8(ptarget, pkey);
+					break;
+				case 2:
+					peq = _mm256_cmpeq_epi16(ptarget, pkey);
+					pgt = _mm256_cmpgt_epi16(ptarget, pkey);
+					break;
+				case 4:
+					peq = _mm256_cmpeq_epi32(ptarget, pkey);
+					pgt = _mm256_cmpgt_epi32(ptarget, pkey);
+					break;
+				case 8:
+					peq = _mm256_cmpeq_epi64(ptarget, pkey);
+					pgt = _mm256_cmpgt_epi64(ptarget, pkey);
+					break;
+				}
+
+				if (testEq<IntTy>(peq, i, size, ret)) return true;
+
+				r = utils::popcount((uint32_t)_mm256_movemask_epi8(pgt)) / sizeof(IntTy);
+				i = i * n + (n - 1) * (r + 1);
+
+				pkey = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&keys[i]));
+				switch (sizeof(IntTy))
+				{
+				case 1:
+					peq = _mm256_cmpeq_epi8(ptarget, pkey);
+					pgt = _mm256_cmpgt_epi8(ptarget, pkey);
+					break;
+				case 2:
+					peq = _mm256_cmpeq_epi16(ptarget, pkey);
+					pgt = _mm256_cmpgt_epi16(ptarget, pkey);
+					break;
+				case 4:
+					peq = _mm256_cmpeq_epi32(ptarget, pkey);
+					pgt = _mm256_cmpgt_epi32(ptarget, pkey);
+					break;
+				case 8:
+					peq = _mm256_cmpeq_epi64(ptarget, pkey);
+					pgt = _mm256_cmpgt_epi64(ptarget, pkey);
+					break;
+				}
+
+				if (testEq<IntTy>(peq, i, size, ret)) return true;
+
+				r = utils::popcount((uint32_t)_mm256_movemask_epi8(pgt)) / sizeof(IntTy);
+				i = i * n + (n - 1) * (r + 1);
 			}
 
 			while (i < size)
@@ -386,7 +636,7 @@ namespace kiwi
 
 				if (testEq<IntTy>(peq, i, size, ret)) return true;
 
-				size_t r = utils::popcount(_mm256_movemask_epi8(pgt)) / sizeof(IntTy);
+				r = utils::popcount((uint32_t)_mm256_movemask_epi8(pgt)) / sizeof(IntTy);
 				i = i * n + (n - 1) * (r + 1);
 			}
 			return false;
@@ -396,7 +646,7 @@ namespace kiwi
 		ARCH_TARGET("avx512bw")
 		bool nstSearchAVX512(const IntTy* keys, size_t size, IntTy target, size_t& ret)
 		{
-			size_t i = 0;
+			size_t i = 0, r;
 
 			__m512i ptarget, pkey;
 			uint64_t peq, pgt;
@@ -414,6 +664,141 @@ namespace kiwi
 			case 8:
 				ptarget = _mm512_set1_epi64(target);
 				break;
+			}
+
+			if (size >= n * n * n - 1)
+			{
+				pkey = _mm512_loadu_si512(reinterpret_cast<const __m512i*>(&keys[i]));
+				switch (sizeof(IntTy))
+				{
+				case 1:
+					peq = _mm512_cmpeq_epi8_mask(ptarget, pkey);
+					pgt = _mm512_cmpgt_epi8_mask(ptarget, pkey);
+					break;
+				case 2:
+					peq = _mm512_cmpeq_epi16_mask(ptarget, pkey);
+					pgt = _mm512_cmpgt_epi16_mask(ptarget, pkey);
+					break;
+				case 4:
+					peq = _mm512_cmpeq_epi32_mask(ptarget, pkey);
+					pgt = _mm512_cmpgt_epi32_mask(ptarget, pkey);
+					break;
+				case 8:
+					peq = _mm512_cmpeq_epi64_mask(ptarget, pkey);
+					pgt = _mm512_cmpgt_epi64_mask(ptarget, pkey);
+					break;
+				}
+
+				if (testEqMask(peq, i, size, ret)) return true;
+
+				r = utils::popcount(pgt);
+				i = i * n + (n - 1) * (r + 1);
+
+				pkey = _mm512_loadu_si512(reinterpret_cast<const __m512i*>(&keys[i]));
+				switch (sizeof(IntTy))
+				{
+				case 1:
+					peq = _mm512_cmpeq_epi8_mask(ptarget, pkey);
+					pgt = _mm512_cmpgt_epi8_mask(ptarget, pkey);
+					break;
+				case 2:
+					peq = _mm512_cmpeq_epi16_mask(ptarget, pkey);
+					pgt = _mm512_cmpgt_epi16_mask(ptarget, pkey);
+					break;
+				case 4:
+					peq = _mm512_cmpeq_epi32_mask(ptarget, pkey);
+					pgt = _mm512_cmpgt_epi32_mask(ptarget, pkey);
+					break;
+				case 8:
+					peq = _mm512_cmpeq_epi64_mask(ptarget, pkey);
+					pgt = _mm512_cmpgt_epi64_mask(ptarget, pkey);
+					break;
+				}
+
+				if (testEqMask(peq, i, size, ret)) return true;
+
+				r = utils::popcount(pgt);
+				i = i * n + (n - 1) * (r + 1);
+
+				pkey = _mm512_loadu_si512(reinterpret_cast<const __m512i*>(&keys[i]));
+				switch (sizeof(IntTy))
+				{
+				case 1:
+					peq = _mm512_cmpeq_epi8_mask(ptarget, pkey);
+					pgt = _mm512_cmpgt_epi8_mask(ptarget, pkey);
+					break;
+				case 2:
+					peq = _mm512_cmpeq_epi16_mask(ptarget, pkey);
+					pgt = _mm512_cmpgt_epi16_mask(ptarget, pkey);
+					break;
+				case 4:
+					peq = _mm512_cmpeq_epi32_mask(ptarget, pkey);
+					pgt = _mm512_cmpgt_epi32_mask(ptarget, pkey);
+					break;
+				case 8:
+					peq = _mm512_cmpeq_epi64_mask(ptarget, pkey);
+					pgt = _mm512_cmpgt_epi64_mask(ptarget, pkey);
+					break;
+				}
+
+				if (testEqMask(peq, i, size, ret)) return true;
+
+				r = utils::popcount(pgt);
+				i = i * n + (n - 1) * (r + 1);
+			}
+			else if (size >= n * n - 1)
+			{
+				pkey = _mm512_loadu_si512(reinterpret_cast<const __m512i*>(&keys[i]));
+				switch (sizeof(IntTy))
+				{
+				case 1:
+					peq = _mm512_cmpeq_epi8_mask(ptarget, pkey);
+					pgt = _mm512_cmpgt_epi8_mask(ptarget, pkey);
+					break;
+				case 2:
+					peq = _mm512_cmpeq_epi16_mask(ptarget, pkey);
+					pgt = _mm512_cmpgt_epi16_mask(ptarget, pkey);
+					break;
+				case 4:
+					peq = _mm512_cmpeq_epi32_mask(ptarget, pkey);
+					pgt = _mm512_cmpgt_epi32_mask(ptarget, pkey);
+					break;
+				case 8:
+					peq = _mm512_cmpeq_epi64_mask(ptarget, pkey);
+					pgt = _mm512_cmpgt_epi64_mask(ptarget, pkey);
+					break;
+				}
+
+				if (testEqMask(peq, i, size, ret)) return true;
+
+				r = utils::popcount(pgt);
+				i = i * n + (n - 1) * (r + 1);
+
+				pkey = _mm512_loadu_si512(reinterpret_cast<const __m512i*>(&keys[i]));
+				switch (sizeof(IntTy))
+				{
+				case 1:
+					peq = _mm512_cmpeq_epi8_mask(ptarget, pkey);
+					pgt = _mm512_cmpgt_epi8_mask(ptarget, pkey);
+					break;
+				case 2:
+					peq = _mm512_cmpeq_epi16_mask(ptarget, pkey);
+					pgt = _mm512_cmpgt_epi16_mask(ptarget, pkey);
+					break;
+				case 4:
+					peq = _mm512_cmpeq_epi32_mask(ptarget, pkey);
+					pgt = _mm512_cmpgt_epi32_mask(ptarget, pkey);
+					break;
+				case 8:
+					peq = _mm512_cmpeq_epi64_mask(ptarget, pkey);
+					pgt = _mm512_cmpgt_epi64_mask(ptarget, pkey);
+					break;
+				}
+
+				if (testEqMask(peq, i, size, ret)) return true;
+
+				r = utils::popcount(pgt);
+				i = i * n + (n - 1) * (r + 1);
 			}
 
 			while (i < size)
@@ -441,7 +826,7 @@ namespace kiwi
 
 				if (testEqMask(peq, i, size, ret)) return true;
 
-				size_t r = utils::popcount(pgt);
+				r = utils::popcount(pgt);
 				i = i * n + (n - 1) * (r + 1);
 			}
 			return false;

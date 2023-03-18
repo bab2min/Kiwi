@@ -11,93 +11,113 @@
 using namespace std;
 using namespace kiwi;
 
-template<class... Args>
-inline bool appendNewNode(Vector<KGraphNode>& nodes, Vector<pair<uint32_t, uint32_t>>& endPosMap, size_t startPos, Args&&... args)
+namespace kiwi
 {
-	static constexpr uint32_t npos = -1;
-
-	if (endPosMap[startPos].first == npos)
+	template<class... Args>
+	inline bool appendNewNode(Vector<KGraphNode>& nodes, Vector<pair<uint32_t, uint32_t>>& endPosMap, size_t startPos, Args&&... args)
 	{
-		return false;
-	}
+		static constexpr uint32_t npos = -1;
 
-	size_t newId = nodes.size();
-	nodes.emplace_back(forward<Args>(args)...);
-	auto& nnode = nodes.back();
-	nnode.startPos = startPos;
-
-	nnode.prev = newId - endPosMap[startPos].first;
-	if (nnode.endPos >= endPosMap.size()) return true;
-
-	if (endPosMap[nnode.endPos].first == npos)
-	{
-		endPosMap[nnode.endPos].first = newId;
-		endPosMap[nnode.endPos].second = newId;
-	}
-	else
-	{
-		nodes[endPosMap[nnode.endPos].second].sibling = newId - endPosMap[nnode.endPos].second;
-		endPosMap[nnode.endPos].second = newId;
-	}
-	return true;
-}
-
-struct TypoCostInfo
-{
-	float cost;
-	uint32_t start;
-	uint32_t typoId;
-
-	TypoCostInfo(float _cost = 0, uint32_t _start = 0, uint32_t _typoId = 0)
-		: cost{ _cost }, start{ _start }, typoId{ _typoId }
-	{}
-};
-
-template<bool typoTolerant>
-bool insertCandidates(
-	Vector<const Form*>& candidates, 
-	Vector<TypoCostInfo>& candTypoCostStarts,
-	const Form* foundCand, 
-	const Form* formBase, 
-	const size_t* typoPtrs,
-	const KString& str, 
-	const Vector<uint32_t>& nonSpaces
-)
-{
-	if (typoTolerant)
-	{
-		auto tCand = reinterpret_cast<const TypoForm*>(foundCand);
-		if (find(candidates.begin(), candidates.end(), &tCand->form(formBase)) != candidates.end()) return false;
-		
-		while (1)
+		if (endPosMap[startPos].first == npos)
 		{
-			auto typoFormSize = typoPtrs[tCand->typoId + 1] - typoPtrs[tCand->typoId];
-			auto cand = &tCand->form(formBase);
-			if (FeatureTestor::isMatched(&str[0], &str[nonSpaces[nonSpaces.size() - typoFormSize]], tCand->leftCond)
-				&& FeatureTestor::isMatchedApprox(&str[0], &str[nonSpaces[nonSpaces.size() - typoFormSize]], cand->vowel, cand->polar))
-			{
-				candidates.emplace_back(cand);
-				candTypoCostStarts.emplace_back(tCand->score(), nonSpaces.size() - typoFormSize, tCand->typoId);
-			}
-			if (tCand[0].hash() != tCand[1].hash()) break;
-			++tCand;
+			return false;
+		}
+
+		size_t newId = nodes.size();
+		nodes.emplace_back(forward<Args>(args)...);
+		auto& nnode = nodes.back();
+		nnode.startPos = startPos;
+
+		nnode.prev = newId - endPosMap[startPos].first;
+		if (nnode.endPos >= endPosMap.size()) return true;
+
+		if (endPosMap[nnode.endPos].first == npos)
+		{
+			endPosMap[nnode.endPos].first = newId;
+			endPosMap[nnode.endPos].second = newId;
+		}
+		else
+		{
+			nodes[endPosMap[nnode.endPos].second].sibling = newId - endPosMap[nnode.endPos].second;
+			endPosMap[nnode.endPos].second = newId;
+		}
+		return true;
+	}
+
+	struct TypoCostInfo
+	{
+		float cost;
+		uint32_t start;
+		uint32_t typoId;
+
+		TypoCostInfo(float _cost = 0, uint32_t _start = 0, uint32_t _typoId = 0)
+			: cost{ _cost }, start{ _start }, typoId{ _typoId }
+		{}
+	};
+
+	template<bool typoTolerant>
+	bool getZCodaAppendable(
+		const Form* foundCand,
+		const Form* formBase
+	)
+	{
+		if (typoTolerant)
+		{
+			auto tCand = reinterpret_cast<const TypoForm*>(foundCand);
+			return tCand->form(formBase).zCodaAppendable;
+		}
+		else
+		{
+			return foundCand->zCodaAppendable;
 		}
 	}
-	else
-	{
-		if (find(candidates.begin(), candidates.end(), foundCand) != candidates.end()) return false;
 
-		while (1)
+	template<bool typoTolerant>
+	bool insertCandidates(
+		Vector<const Form*>& candidates,
+		Vector<TypoCostInfo>& candTypoCostStarts,
+		const Form* foundCand,
+		const Form* formBase,
+		const size_t* typoPtrs,
+		const KString& str,
+		const Vector<uint32_t>& nonSpaces
+	)
+	{
+		if (typoTolerant)
 		{
-			if (FeatureTestor::isMatchedApprox(&str[0], &str[nonSpaces[nonSpaces.size() - foundCand->form.size()]], foundCand->vowel, foundCand->polar))
+			auto tCand = reinterpret_cast<const TypoForm*>(foundCand);
+			if (find(candidates.begin(), candidates.end(), &tCand->form(formBase)) != candidates.end()) return false;
+
+			while (1)
 			{
-				candidates.emplace_back(foundCand);
+				auto typoFormSize = typoPtrs[tCand->typoId + 1] - typoPtrs[tCand->typoId];
+				auto cand = &tCand->form(formBase);
+				if (FeatureTestor::isMatched(&str[0], &str[nonSpaces[nonSpaces.size() - typoFormSize]], tCand->leftCond)
+					&& FeatureTestor::isMatchedApprox(&str[0], &str[nonSpaces[nonSpaces.size() - typoFormSize]], cand->vowel, cand->polar))
+				{
+					candidates.emplace_back(cand);
+					candTypoCostStarts.emplace_back(tCand->score(), nonSpaces.size() - typoFormSize, tCand->typoId);
+				}
+				if (tCand[0].hash() != tCand[1].hash()) break;
+				++tCand;
 			}
-			if (foundCand[0].formHash != foundCand[1].formHash) break;
-			++foundCand;
 		}
+		else
+		{
+			if (find(candidates.begin(), candidates.end(), foundCand) != candidates.end()) return false;
+
+			while (1)
+			{
+				if (FeatureTestor::isMatchedApprox(&str[0], &str[nonSpaces[nonSpaces.size() - foundCand->form.size()]], foundCand->vowel, foundCand->polar))
+				{
+					candidates.emplace_back(foundCand);
+				}
+				if (foundCand[0].formHash != foundCand[1].formHash) break;
+				++foundCand;
+			}
+		}
+		return true;
 	}
-	return true;
 }
 
 template<ArchType arch, bool typoTolerant>
@@ -141,26 +161,27 @@ Vector<KGraphNode> kiwi::splitByTrie(
 
 				// insert unknown form 
 				if (nBegin > lastSpecialEndPos && !longestMatched
-					&& !isHangulCoda(cand->form[0])
-					&& str[nonSpaces[nBegin - 1]] != 0x11BB) // cannot end with ㅆ
+					&& !isHangulCoda(cand->form[0]))
 				{
+					{
+						size_t lastPos = ret.back().endPos;
+
+						if (lastPos < nBegin)
+						{
+							if (lastPos && isHangulCoda(str[nonSpaces[lastPos]])) lastPos--; // prevent coda to be matched alone.
+							if (lastPos != lastSpecialEndPos)
+							{
+								appendNewNode(ret, endPosMap, lastPos, str.substr(nonSpaces[lastPos], nonSpaces[nBegin] - nonSpaces[lastPos]), (uint16_t)nBegin);
+							}
+						}
+					}
+
 					size_t newNodeLength = nBegin - lastSpecialEndPos;
 					if (maxUnkFormSize && newNodeLength <= maxUnkFormSize)
 					{
 						appendNewNode(ret, endPosMap, lastSpecialEndPos, str.substr(nonSpaces[lastSpecialEndPos], nonSpaces[nBegin] - nonSpaces[lastSpecialEndPos]), (uint16_t)nBegin);
 					}
-					else
-					{
-						size_t lastPos = max_element(ret.begin() + 1, ret.end(), [](const KGraphNode& a, const KGraphNode& b)
-						{
-							return a.endPos < b.endPos;
-						})->endPos;
-						if (lastPos < nBegin && !isHangulCoda(str[nonSpaces[lastPos]]))
-						{
-							appendNewNode(ret, endPosMap, lastPos, str.substr(nonSpaces[lastPos], nonSpaces[nBegin] - nonSpaces[lastPos]), (uint16_t)nBegin);
-						}
-					}
-				}
+				}				
 
 				// if special character
 				if (cand->candidate[0] <= trie.value((size_t)POSTag::sn)->candidate[0])
@@ -194,10 +215,7 @@ Vector<KGraphNode> kiwi::splitByTrie(
 		}
 		else if (ret.size() > 1 && !specialMatched)
 		{
-			size_t lastPos = max_element(ret.begin() + 1, ret.end(), [](const KGraphNode& a, const KGraphNode& b)
-			{
-				return a.endPos < b.endPos;
-			})->endPos;
+			size_t lastPos = ret.back().endPos;
 			if (lastPos < unkFormEndPos && !isHangulCoda(str[nonSpaces[lastPos]]))
 			{
 				appendNewNode(ret, endPosMap, lastPos, str.substr(nonSpaces[lastPos], unkFormEndPosWithSpace - nonSpaces[lastPos]), (uint16_t)unkFormEndPos);
@@ -215,9 +233,15 @@ Vector<KGraphNode> kiwi::splitByTrie(
 		}
 	};
 
+	bool zCodaFollowable = false;
 	for (; n < str.size(); ++n)
 	{
-		auto& c = str[n];
+		char16_t c = str[n];
+		char32_t c32 = c;
+		if (isHighSurrogate(c32) && n + 1 < str.size())
+		{
+			c32 = mergeSurrogate(c32, str[n + 1]);
+		}
 
 		{
 			auto m = matchPattern(str.data() + n, str.data() + str.size(), matchOptions);
@@ -282,7 +306,7 @@ Vector<KGraphNode> kiwi::splitByTrie(
 				}
 				branchOut(nonSpaces.size(), n + m.first, true);
 
-				if (appendNewNode(ret, endPosMap, patStart, KString{ &c, m.first }, (uint16_t)(patStart + m.first)))
+				if (appendNewNode(ret, endPosMap, patStart, KString{ &str[n], m.first}, (uint16_t)(patStart + m.first)))
 				{
 					ret.back().form = trie.value((size_t)chrType);
 				}
@@ -299,7 +323,7 @@ Vector<KGraphNode> kiwi::splitByTrie(
 			}
 		}
 
-		chrType = identifySpecialChr(c);
+		chrType = identifySpecialChr(c32);
 
 		if (lastChrType != chrType || lastChrType == POSTag::sso || lastChrType == POSTag::ssc)
 		{
@@ -323,7 +347,7 @@ Vector<KGraphNode> kiwi::splitByTrie(
 					}
 				}
 			}
-			lastSpecialEndPos = specialStartPos;
+			lastSpecialEndPos = (lastChrType == POSTag::sso || lastChrType == POSTag::ssc) ? nonSpaces.size() : specialStartPos;
 			specialStartPos = nonSpaces.size();
 		}
 		lastMatchedPattern = POSTag::unknown;
@@ -333,6 +357,12 @@ Vector<KGraphNode> kiwi::splitByTrie(
 		{
 			branchOut(nonSpaces.size(), n);
 			lastSpecialEndPos = nonSpaces.size();
+			goto continueFor;
+		}
+
+		if (isOldHangulToneMark(c))
+		{
+			branchOut(nonSpaces.size(), n);
 			goto continueFor;
 		}
 
@@ -348,6 +378,7 @@ Vector<KGraphNode> kiwi::splitByTrie(
 					if (!cand) break;
 					else if (!trie.hasSubmatch(cand))
 					{
+						zCodaFollowable = zCodaFollowable || getZCodaAppendable<typoTolerant>(cand, formBase);
 						if (!insertCandidates<typoTolerant>(candidates, candTypoCostStarts, cand, formBase, typoPtrs, str, nonSpaces)) break;
 					}
 				}
@@ -373,15 +404,27 @@ Vector<KGraphNode> kiwi::splitByTrie(
 				else
 				{
 					nonSpaces.emplace_back(n);
+					if (c32 >= 0x10000) nonSpaces.emplace_back(++n);
 					if (chrType != POSTag::max)
 					{
 						lastSpecialEndPos = nonSpaces.size();
 					}
 				}
 				
+				if (!!(matchOptions & Match::zCoda) && zCodaFollowable && isHangulCoda(c) && (n + 1 >= str.size() || !isHangulSyllable(str[n + 1])))
+				{
+					candidates.emplace_back(formBase + defaultTagSize + (c - 0x11A8) - 1);
+					if (typoTolerant)
+					{
+						candTypoCostStarts.emplace_back(0, nonSpaces.size() - 1);
+					}
+				}
+				zCodaFollowable = false;
+
 				goto continueFor; 
 			}
 		}
+
 		if (chrType != POSTag::max)
 		{
 			branchOut(specialStartPos, specialStartPos < nonSpaces.size() ? nonSpaces[specialStartPos] : n);
@@ -393,15 +436,26 @@ Vector<KGraphNode> kiwi::splitByTrie(
 		
 		nonSpaces.emplace_back(n);
 
+		if (!!(matchOptions & Match::zCoda) && zCodaFollowable && isHangulCoda(c) && (n + 1 >= str.size() || !isHangulSyllable(str[n + 1])))
+		{
+			candidates.emplace_back(formBase + defaultTagSize + (c - 0x11A8) - 1);
+			if (typoTolerant)
+			{
+				candTypoCostStarts.emplace_back(0, nonSpaces.size() - 1);
+			}
+		}
+		zCodaFollowable = false;
+
 		// from this, curNode has the exact next node
 		curNode = nextNode;
-		// if it has exit node, a pattern has found
+		// if it has exit node, patterns have been found
 		for (auto submatcher = curNode; submatcher; submatcher = submatcher->fail())
 		{
 			const Form* cand = submatcher->val(trie);
 			if (!cand) break;
 			else if (!trie.hasSubmatch(cand))
 			{
+				zCodaFollowable = zCodaFollowable || getZCodaAppendable<typoTolerant>(cand, formBase);
 				if (!insertCandidates<typoTolerant>(candidates, candTypoCostStarts, cand, formBase, typoPtrs, str, nonSpaces)) break;
 			}
 		}
@@ -455,15 +509,34 @@ Vector<KGraphNode> kiwi::splitByTrie(
 	return ret;
 }
 
-template<bool typoTolerant>
-struct SplitByTrieGetter
+template<ArchType arch>
+const Form* kiwi::findForm(
+	const utils::FrozenTrie<kchar_t, const Form*>& trie,
+	const KString& str
+)
 {
-	template<std::ptrdiff_t i>
-	struct Wrapper
+	auto* node = trie.root();
+	for (auto c : str)
 	{
-		static constexpr FnSplitByTrie value = &splitByTrie<static_cast<ArchType>(i), typoTolerant>;
+		node = node->template nextOpt<arch>(trie, c);
+		if (!node) return nullptr;
+	}
+	if (trie.hasSubmatch(node->val(trie))) return nullptr;
+	return node->val(trie);
+}
+
+namespace kiwi
+{
+	template<bool typoTolerant>
+	struct SplitByTrieGetter
+	{
+		template<std::ptrdiff_t i>
+		struct Wrapper
+		{
+			static constexpr FnSplitByTrie value = &splitByTrie<static_cast<ArchType>(i), typoTolerant>;
+		};
 	};
-};
+}
 
 FnSplitByTrie kiwi::getSplitByTrieFn(ArchType arch, bool typoTolerant)
 {
@@ -480,16 +553,23 @@ FnSplitByTrie kiwi::getSplitByTrieFn(ArchType arch, bool typoTolerant)
 	}
 }
 
-const Form * KTrie::findForm(const KString & str) const
+namespace kiwi
 {
-	const KTrie* curTrie = this;
-	for (auto c : str)
+	struct FindFormGetter
 	{
-		if (!curTrie->getNext(c)) return nullptr;
-		curTrie = curTrie->getNext(c);
-	}
-	if (curTrie->val != (void*)-1) return curTrie->val;
-	return nullptr;
+		template<std::ptrdiff_t i>
+		struct Wrapper
+		{
+			static constexpr FnFindForm value = &findForm<static_cast<ArchType>(i)>;
+		};
+	};
+}
+
+FnFindForm kiwi::getFindFormFn(ArchType arch)
+{
+	static tp::Table<FnFindForm, AvailableArch> table{ FindFormGetter{} };
+
+	return table[static_cast<std::ptrdiff_t>(arch)];
 }
 
 Vector<KGraphNode> KGraphNode::removeUnconnected(const Vector<KGraphNode>& graph)

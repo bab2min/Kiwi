@@ -14,6 +14,7 @@
 #include <deque>
 #include <map>
 #include <unordered_map>
+#include <unordered_set>
 #include <string>
 #include <memory>
 #include <type_traits>
@@ -110,6 +111,9 @@ namespace kiwi
 	template<typename _Ty>
 	using Deque = std::deque<_Ty, mi_stl_allocator<_Ty>>;
 
+	template<typename _K, typename _V>
+	using Map = std::map<_K, _V, std::less<_K>, mi_stl_allocator<std::pair<const _K, _V>>>;
+
 	template<typename _K, typename _V, typename _Hash=Hash<_K>>
 	using UnorderedMap = std::unordered_map<_K, _V, _Hash, std::equal_to<_K>, mi_stl_allocator<std::pair<const _K, _V>>>;
 
@@ -131,6 +135,9 @@ namespace kiwi
 
 	template<typename _Ty>
 	using Deque = std::deque<_Ty>;
+
+	template<typename _K, typename _V>
+	using Map = std::map<_K, _V>;
 
 	/**
 	 * @brief std::unordered_map의 내부용 타입. mimalloc 옵션에 따라 mi_stl_allocator로부터 메모리를 할당받는다.
@@ -172,13 +179,14 @@ namespace kiwi
 		vx,
 		mm, maj,
 		ic,
-		xpn, xsn, xsv, xsa, xr,
+		xpn, xsn, xsv, xsa, xsm, xr,
 		vcp, vcn,
 		sf, sp, ss, sso, ssc, se, so, sw,
 		sl, sh, sn,
 		w_url, w_email, w_mention, w_hashtag, w_serial,
 		jks, jkc, jkg, jko, jkb, jkv, jkq, jx, jc,
 		ep, ef, ec, etn, etm,
+		z_coda,
 		p, /**< 분할된 동사/형용사를 나타내는데 사용됨 */
 		max, /**< POSTag의 총 개수를 나타내는 용도 */
 		pv = p,

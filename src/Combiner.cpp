@@ -42,13 +42,182 @@ RuleSet::~RuleSet() = default;
 RuleSet& RuleSet::operator=(const RuleSet&) = default;
 RuleSet& RuleSet::operator=(RuleSet&&) = default;
 
-inline bool hasRange(const ChrSet& set, char16_t b, char16_t e)
+namespace kiwi
 {
-	for (auto& p : set.ranges)
+	inline bool hasRange(const ChrSet& set, char16_t b, char16_t e)
 	{
-		if (p.first <= b && e <= p.second) return !set.negation;
+		for (auto& p : set.ranges)
+		{
+			if (p.first <= b && e <= p.second) return !set.negation;
+		}
+		return set.negation;
 	}
-	return set.negation;
+
+	inline Vector<POSTag> getSubTagset(const string& prefix)
+	{
+		Vector<POSTag> ret;
+		for (auto pf : split(prefix, ','))
+		{
+			if (pf == "P")
+			{
+				ret.emplace_back(POSTag::pv);
+				ret.emplace_back(POSTag::pa);
+				ret.emplace_back(POSTag::pvi);
+				ret.emplace_back(POSTag::pai);
+			}
+			else if (pf == "PV")
+			{
+				ret.emplace_back(POSTag::pv);
+				ret.emplace_back(POSTag::pvi);
+			}
+			else if (pf == "PA")
+			{
+				ret.emplace_back(POSTag::pa);
+				ret.emplace_back(POSTag::pai);
+			}
+			else if (pf == "PV-I")
+			{
+				ret.emplace_back(POSTag::pvi);
+			}
+			else if (pf == "PA-I")
+			{
+				ret.emplace_back(POSTag::pai);
+			}
+			else if (pf == "PR")
+			{
+				ret.emplace_back(POSTag::pv);
+				ret.emplace_back(POSTag::pa);
+			}
+			else if (pf == "PI")
+			{
+				ret.emplace_back(POSTag::pvi);
+				ret.emplace_back(POSTag::pai);
+			}
+			else if (pf == "VV-R")
+			{
+				ret.emplace_back(POSTag::vv);
+			}
+			else if (pf == "VA-R")
+			{
+				ret.emplace_back(POSTag::va);
+			}
+			else if (pf == "VX-R")
+			{
+				ret.emplace_back(POSTag::vx);
+			}
+			else
+			{
+				for (auto i = POSTag::nng; i < POSTag::p; i = (POSTag)((size_t)i + 1))
+				{
+					if (strncmp(tagToString(i), pf.data(), pf.size()) == 0)
+					{
+						ret.emplace_back(i);
+					}
+				}
+				for (auto i : { POSTag::vvi, POSTag::vai, POSTag::vxi, POSTag::xsai })
+				{
+					if (strncmp(tagToString(i), pf.data(), pf.size()) == 0)
+					{
+						ret.emplace_back(i);
+					}
+				}
+			}
+		}
+		return ret;
+	}
+
+	inline Vector<uint8_t> getSubFeatset(CondPolarity polar)
+	{
+		switch (polar)
+		{
+		case CondPolarity::none:
+			return { 0, 1 };
+		case CondPolarity::negative:
+			return { 0 };
+		case CondPolarity::positive:
+		default:
+			return { 1 };
+		}
+	}
+
+	inline Vector<uint8_t> getSubFeatset(CondVowel vowel)
+	{
+		switch (vowel)
+		{
+		case CondVowel::none:
+			return { 0, 2 };
+		case CondVowel::non_vowel:
+			return { 0 };
+		case CondVowel::vowel:
+		default:
+			return { 2 };
+		}
+	}
+
+	template<class Ty, class It>
+	inline void inplaceUnion(Vector<Ty>& dest, It first, It last)
+	{
+		auto mid = dest.size();
+		dest.insert(dest.end(), first, last);
+		inplace_merge(dest.begin(), dest.begin() + mid, dest.end());
+		dest.erase(unique(dest.begin(), dest.end()), dest.end());
+	}
+
+	inline ReplString parseReplString(KString&& str)
+	{
+		bool escape = false;
+		size_t leftEnd = -1, rightBegin = 0;
+		size_t target = 0;
+		float score = 0;
+		for (size_t i = 0; i < str.size(); ++i)
+		{
+			if (escape)
+			{
+				switch (str[i])
+				{
+				case '1':
+					str[target++] = 1;
+					break;
+				case '2':
+					str[target++] = 2;
+					break;
+				case '(':
+				case ')':
+				case '\\':
+				case '-':
+					str[target++] = str[i];
+					break;
+				default:
+					str[target++] = '\\';
+					str[target++] = str[i];
+				}
+				escape = false;
+			}
+			else
+			{
+				switch (str[i])
+				{
+				case '\\':
+					escape = true;
+					break;
+				case '(':
+					rightBegin = target;
+					break;
+				case ')':
+					leftEnd = target;
+					break;
+				case '-':
+					score = stof(str.begin() + i, str.end());
+					i = str.size();
+					break;
+				default:
+					str[target++] = str[i];
+				}
+			}
+		}
+		str.erase(str.begin() + target, str.end());
+		return { move(str), leftEnd, rightBegin, score };
+	}
 }
 
 ChrSet::ChrSet(char16_t chr)
@@ -257,107 +426,6 @@ Pattern::Pattern(const KString& expr)
 	}
 }
 
-inline Vector<POSTag> getSubTagset(const string& prefix)
-{
-	Vector<POSTag> ret;
-	for (auto pf : split(prefix, ','))
-	{
-		if (pf == "P")
-		{
-			ret.emplace_back(POSTag::pv);
-			ret.emplace_back(POSTag::pa);
-			ret.emplace_back(POSTag::pvi);
-			ret.emplace_back(POSTag::pai);
-		}
-		else if (pf == "PV")
-		{
-			ret.emplace_back(POSTag::pv);
-			ret.emplace_back(POSTag::pvi);
-		}
-		else if (pf == "PA")
-		{
-			ret.emplace_back(POSTag::pa);
-			ret.emplace_back(POSTag::pai);
-		}
-		else if (pf == "PV-I")
-		{
-			ret.emplace_back(POSTag::pvi);
-		}
-		else if (pf == "PA-I")
-		{
-			ret.emplace_back(POSTag::pai);
-		}
-		else if (pf == "PR")
-		{
-			ret.emplace_back(POSTag::pv);
-			ret.emplace_back(POSTag::pa);
-		}
-		else if (pf == "PI")
-		{
-			ret.emplace_back(POSTag::pvi);
-			ret.emplace_back(POSTag::pai);
-		}
-		else if (pf == "VV-R")
-		{
-			ret.emplace_back(POSTag::vv);
-		}
-		else if (pf == "VA-R")
-		{
-			ret.emplace_back(POSTag::va);
-		}
-		else if (pf == "VX-R")
-		{
-			ret.emplace_back(POSTag::vx);
-		}
-		else
-		{
-			for (auto i = POSTag::nng; i < POSTag::p; i = (POSTag)((size_t)i + 1))
-			{
-				if (strncmp(tagToString(i), pf.data(), pf.size()) == 0)
-				{
-					ret.emplace_back(i);
-				}
-			}
-			for (auto i : { POSTag::vvi, POSTag::vai, POSTag::vxi, POSTag::xsai })
-			{
-				if (strncmp(tagToString(i), pf.data(), pf.size()) == 0)
-				{
-					ret.emplace_back(i);
-				}
-			}
-		}
-	}
-	return ret;
-}
-
-inline Vector<uint8_t> getSubFeatset(CondPolarity polar)
-{
-	switch (polar)
-	{
-	case CondPolarity::none:
-		return { 0, 1 };
-	case CondPolarity::negative:
-		return { 0 };
-	case CondPolarity::positive:
-	default:
-		return { 1 };
-	}
-}
-
-inline Vector<uint8_t> getSubFeatset(CondVowel vowel)
-{
-	switch (vowel)
-	{
-	case CondVowel::none:
-		return { 0, 2 };
-	case CondVowel::non_vowel:
-		return { 0 };
-	case CondVowel::vowel:
-	default:
-		return { 2 };
-	}
-}
-
 void Pattern::Node::getEpsilonTransition(ptrdiff_t thisOffset, Vector<ptrdiff_t>& ret) const
 {
 	ret.emplace_back(thisOffset);
@@ -446,15 +514,6 @@ Vector<char16_t> RuleSet::getVocabList(const Vector<Pattern::Node>& nodes)
 		minElem.first++;
 	}
 	return ret;
-}
-
-template<class Ty, class It>
-inline void inplaceUnion(Vector<Ty>& dest, It first, It last)
-{
-	auto mid = dest.size();
-	dest.insert(dest.end(), first, last);
-	inplace_merge(dest.begin(), dest.begin() + mid, dest.end());
-	dest.erase(unique(dest.begin(), dest.end()), dest.end());
 }
 
 template<class NodeSizeTy, class GroupSizeTy>
@@ -713,62 +772,6 @@ void RuleSet::addRule(const string& lTag, const string& rTag,
 	}
 }
 
-inline ReplString parseReplString(KString&& str)
-{
-	bool escape = false;
-	size_t leftEnd = -1, rightBegin = 0;
-	size_t target = 0;
-	float score = 0;
-	for (size_t i = 0; i < str.size(); ++i)
-	{
-		if (escape)
-		{
-			switch (str[i])
-			{
-			case '1':
-				str[target++] = 1;
-				break;
-			case '2':
-				str[target++] = 2;
-				break;
-			case '(':
-			case ')':
-			case '\\':
-			case '-':
-				str[target++] = str[i];
-				break;
-			default:
-				str[target++] = '\\';
-				str[target++] = str[i];
-			}
-			escape = false;
-		}
-		else
-		{
-			switch (str[i])
-			{
-			case '\\':
-				escape = true;
-				break;
-			case '(':
-				rightBegin = target;
-				break;
-			case ')':
-				leftEnd = target;
-				break;
-			case '-':
-				score = stof(str.begin() + i, str.end());
-				i = str.size();
-				break;
-			default:
-				str[target++] = str[i];
-			}
-		}
-	}
-	str.erase(str.begin() + target, str.end());
-	return { move(str), leftEnd, rightBegin, score };
-}
-
 void RuleSet::loadRules(istream& istr)
 {
 	string line;
@@ -1022,38 +1025,41 @@ not_matched:
 	return ret;
 }
 
-struct CombineVisitor
+namespace kiwi
 {
-	U16StringView left;
-	U16StringView right;
-
-	CombineVisitor(U16StringView _left, U16StringView _right)
-		: left{ _left }, right{ _right }
+	struct CombineVisitor
 	{
-	}
+		U16StringView left;
+		U16StringView right;
 
-	template<class Ty>
-	Vector<Result> operator()(const Ty& e) const
+		CombineVisitor(U16StringView _left, U16StringView _right)
+			: left{ _left }, right{ _right }
+		{
+		}
+
+		template<class Ty>
+		Vector<Result> operator()(const Ty& e) const
+		{
+			return e.combine(left, right);
+		}
+	};
+
+	struct SearchLeftVisitor
 	{
-		return e.combine(left, right);
-	}
-};
+		U16StringView left;
+		bool matchRuleSep;
 
-struct SearchLeftVisitor
-{
-	U16StringView left;
-	bool matchRuleSep;
+		SearchLeftVisitor(U16StringView _left, bool _matchRuleSep) : left{ _left }, matchRuleSep{ _matchRuleSep }
+		{
+		}
 
-	SearchLeftVisitor(U16StringView _left, bool _matchRuleSep) : left{ _left }, matchRuleSep{ _matchRuleSep }
-	{
-	}
-
-	template<class Ty>
-	Vector<tuple<size_t, size_t, CondPolarity>> operator()(const Ty& e) const
-	{
-		return e.searchLeftPat(left, matchRuleSep);
-	}
-};
+		template<class Ty>
+		Vector<tuple<size_t, size_t, CondPolarity>> operator()(const Ty& e) const
+		{
+			return e.searchLeftPat(left, matchRuleSep);
+		}
+	};
+}
 
 uint8_t CompiledRule::toFeature(CondVowel cv, CondPolarity cp)
 {

@@ -107,5 +107,49 @@ namespace kiwi
 		{
 			joinAll();
 		}
+
+		template<class InputIt, class Fn>
+		void forEach(ThreadPool* pool, InputIt first, InputIt last, Fn fn)
+		{
+			if (!pool)
+			{
+				for (; first != last; ++first)
+				{
+					fn(0, *first);
+				}
+			}
+			else
+			{
+				const size_t numItems = std::distance(first, last);
+				const size_t numWorkers = std::min(pool->size(), numItems);
+				std::vector<std::future<void>> futures;
+				futures.reserve(numWorkers);
+
+				for (size_t i = 0; i < numWorkers; ++i)
+				{
+					InputIt mid = first;
+					std::advance(mid, (numItems * (i + 1) / numWorkers) - (numItems * i / numWorkers));
+					futures.emplace_back(pool->enqueue([&](size_t tid, InputIt tFirst, InputIt tLast)
+					{
+						for (; tFirst != tLast; ++tFirst)
+						{
+							fn(tid, *tFirst);
+						}
+					}, first, mid));
+					first = mid;
+				}
+				
+				for (auto& f : futures)
+				{
+					f.get();
+				}
+			}
+		}
+
+		template<class Container, class Fn>
+		void forEach(ThreadPool* pool, Container& cont, Fn fn)
+		{
+			forEach(pool, std::begin(cont), std::end(cont), fn);
+		}
 	}
 }

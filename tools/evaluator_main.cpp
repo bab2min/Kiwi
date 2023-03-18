@@ -11,15 +11,16 @@
 using namespace std;
 using namespace kiwi;
 
-int doEvaluate(const string& modelPath, const string& output, const vector<string>& input, bool normCoda, bool useSBG, float typoCostWeight)
+int doEvaluate(const string& modelPath, const string& output, const vector<string>& input, 
+	bool normCoda, bool zCoda, bool useSBG, float typoCostWeight)
 {
 	try
 	{
 		tutils::Timer timer;
-		Kiwi kw = KiwiBuilder{ modelPath, 1, BuildOption::integrateAllomorph | BuildOption::loadDefaultDict, useSBG }.build(
+		Kiwi kw = KiwiBuilder{ modelPath, 1, BuildOption::default_, useSBG }.build(
 			typoCostWeight > 0 ? basicTypoSet : withoutTypo
 		);
-		kw.setTypoCostWeight(typoCostWeight);
+		if (typoCostWeight > 0) kw.setTypoCostWeight(typoCostWeight);
 		
 		cout << "Loading Time : " << timer.getElapsed() << " ms" << endl;
 		cout << "ArchType : " << archToStr(kw.archType()) << endl;
@@ -33,7 +34,7 @@ int doEvaluate(const string& modelPath, const string& output, const vector<strin
 			cout << "Test file: " << tf << endl;
 			try
 			{
-				Evaluator test{ tf, &kw, normCoda ? Match::allWithNormalizing : Match::all};
+				Evaluator test{ tf, &kw, (normCoda ? Match::allWithNormalizing : Match::all) & ~(zCoda ? Match::none : Match::zCoda)};
 				tutils::Timer total;
 				test.run();
 				double tm = total.getElapsed();
@@ -93,6 +94,7 @@ int main(int argc, const char* argv[])
 	ValueArg<string> model{ "m", "model", "Kiwi model path", false, "ModelGenerator", "string" };
 	ValueArg<string> output{ "o", "output", "output dir for evaluation errors", false, "", "string" };
 	SwitchArg withoutNormCoda{ "", "wcoda", "without normalizing coda", false };
+	SwitchArg withoutZCoda{ "", "wzcoda", "without z-coda", false };
 	SwitchArg useSBG{ "", "sbg", "use SkipBigram", false };
 	ValueArg<float> typoTolerant{ "", "typo", "make typo-tolerant model", false, 0.f, "float"};
 	UnlabeledMultiArg<string> files{ "files", "evaluation set files", true, "string" };
@@ -101,6 +103,7 @@ int main(int argc, const char* argv[])
 	cmd.add(output);
 	cmd.add(files);
 	cmd.add(withoutNormCoda);
+	cmd.add(withoutZCoda);
 	cmd.add(useSBG);
 	cmd.add(typoTolerant);
 
@@ -113,6 +116,6 @@ int main(int argc, const char* argv[])
 		cerr << "error: " << e.error() << " for arg " << e.argId() << endl;
 		return -1;
 	}
-	return doEvaluate(model, output, files.getValue(), !withoutNormCoda, useSBG, typoTolerant);
+	return doEvaluate(model, output, files.getValue(), !withoutNormCoda, !withoutZCoda, useSBG, typoTolerant);
 }
 

@@ -44,6 +44,7 @@
     <ClInclude Include="include\kiwi\TagUtils.h" />
     <ClInclude Include="include\kiwi\TemplateUtils.hpp" />
     <ClInclude Include="include\kiwi\ThreadPool.h" />
+    <ClInclude Include="include\kiwi\SwTokenizer.h" />
     <ClInclude Include="include\kiwi\Trainer.h" />
     <ClInclude Include="include\kiwi\Trie.hpp" />
     <ClInclude Include="include\kiwi\Types.h" />
@@ -61,10 +62,15 @@
     <ClInclude Include="src\Joiner.hpp" />
     <ClInclude Include="src\Knlm.hpp" />
     <ClInclude Include="src\KTrie.h" />
+    <ClInclude Include="src\LimitedVector.hpp" />
     <ClInclude Include="src\LmState.hpp" />
     <ClInclude Include="src\nuquant.hpp" />
     <ClInclude Include="src\pattern.hpp" />
     <ClInclude Include="src\RaggedVector.hpp" />
+    <ClInclude Include="src\sais\fm_index.hpp" />
+    <ClInclude Include="src\sais\mp_utils.hpp" />
+    <ClInclude Include="src\sais\sais.hpp" />
+    <ClInclude Include="src\sais\wavelet_tree.hpp" />
     <ClInclude Include="src\search.h" />
     <ClInclude Include="src\serializer.hpp" />
     <ClInclude Include="src\QEncoder.hpp" />
@@ -76,6 +82,7 @@
     <ClInclude Include="src\SortUtils.hpp" />
     <ClInclude Include="src\string_view.hpp" />
     <ClInclude Include="src\StrUtils.h" />
+    <ClInclude Include="src\UnicodeCase.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\archImpl\avx2.cpp">
@@ -110,7 +117,10 @@
     <ClCompile Include="src\Joiner.cpp" />
     <ClCompile Include="src\search.cpp" />
     <ClCompile Include="src\TagUtils.cpp" />
+    <ClCompile Include="src\SwTokenizer.cpp">
+    </ClCompile>
     <ClCompile Include="src\TypoTransformer.cpp" />
+    <ClCompile Include="src\UnicodeCase.cpp" />
     <ClCompile Include="third_party\mimalloc\src\static.c" />
     <ClCompile Include="src\Form.cpp" />
     <ClCompile Include="src\FeatureTestor.cpp" />
@@ -193,27 +203,27 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)third_party/eigen;$(ProjectDir)third_party/variant/include;$(ProjectDir)third_party/cpuinfo/src;$(ProjectDir)third_party/cpuinfo/include;$(ProjectDir)third_party/mimalloc/include;$(ProjectDir)third_party/cpp-btree;$(ProjectDir)include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)third_party/json/include;$(ProjectDir)third_party/eigen;$(ProjectDir)third_party/variant/include;$(ProjectDir)third_party/cpuinfo/src;$(ProjectDir)third_party/cpuinfo/include;$(ProjectDir)third_party/mimalloc/include;$(ProjectDir)third_party/cpp-btree;$(ProjectDir)include\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)third_party/eigen;$(ProjectDir)third_party/variant/include;$(ProjectDir)third_party/cpuinfo/src;$(ProjectDir)third_party/cpuinfo/include;$(ProjectDir)third_party/mimalloc/include;$(ProjectDir)third_party/cpp-btree;$(ProjectDir)include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)third_party/json/include;$(ProjectDir)third_party/eigen;$(ProjectDir)third_party/variant/include;$(ProjectDir)third_party/cpuinfo/src;$(ProjectDir)third_party/cpuinfo/include;$(ProjectDir)third_party/mimalloc/include;$(ProjectDir)third_party/cpp-btree;$(ProjectDir)include\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)third_party/eigen;$(ProjectDir)third_party/variant/include;$(ProjectDir)third_party/cpuinfo/src;$(ProjectDir)third_party/cpuinfo/include;$(ProjectDir)third_party/mimalloc/include;$(ProjectDir)third_party/cpp-btree;$(ProjectDir)include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)third_party/json/include;$(ProjectDir)third_party/eigen;$(ProjectDir)third_party/variant/include;$(ProjectDir)third_party/cpuinfo/src;$(ProjectDir)third_party/cpuinfo/include;$(ProjectDir)third_party/mimalloc/include;$(ProjectDir)third_party/cpp-btree;$(ProjectDir)include\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir)third_party/eigen;$(ProjectDir)third_party/variant/include;$(ProjectDir)third_party/cpuinfo/src;$(ProjectDir)third_party/cpuinfo/include;$(ProjectDir)third_party/mimalloc/include;$(ProjectDir)third_party/cpp-btree;$(ProjectDir)include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)third_party/json/include;$(ProjectDir)third_party/eigen;$(ProjectDir)third_party/variant/include;$(ProjectDir)third_party/cpuinfo/src;$(ProjectDir)third_party/cpuinfo/include;$(ProjectDir)third_party/mimalloc/include;$(ProjectDir)third_party/cpp-btree;$(ProjectDir)include\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir)third_party/eigen;$(ProjectDir)third_party/variant/include;$(ProjectDir)third_party/cpuinfo/src;$(ProjectDir)third_party/cpuinfo/include;$(ProjectDir)third_party/mimalloc/include;$(ProjectDir)third_party/cpp-btree;$(ProjectDir)include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)third_party/json/include;$(ProjectDir)third_party/eigen;$(ProjectDir)third_party/variant/include;$(ProjectDir)third_party/cpuinfo/src;$(ProjectDir)third_party/cpuinfo/include;$(ProjectDir)third_party/mimalloc/include;$(ProjectDir)third_party/cpp-btree;$(ProjectDir)include\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir)third_party/eigen;$(ProjectDir)third_party/variant/include;$(ProjectDir)third_party/cpuinfo/src;$(ProjectDir)third_party/cpuinfo/include;$(ProjectDir)third_party/mimalloc/include;$(ProjectDir)third_party/cpp-btree;$(ProjectDir)include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)third_party/json/include;$(ProjectDir)third_party/eigen;$(ProjectDir)third_party/variant/include;$(ProjectDir)third_party/cpuinfo/src;$(ProjectDir)third_party/cpuinfo/include;$(ProjectDir)third_party/mimalloc/include;$(ProjectDir)third_party/cpp-btree;$(ProjectDir)include\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

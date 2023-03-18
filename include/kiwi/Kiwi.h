@@ -37,7 +37,11 @@ namespace kiwi
 	struct WordInfo;
 	class HSDataset;
 
-	namespace cmb{ class CompiledRule; }
+	namespace cmb
+	{ 
+		class CompiledRule; 
+		struct Result;
+	}
 
 	template<class Ty> class RaggedVector;
 	////
@@ -79,7 +83,12 @@ namespace kiwi
 		std::shared_ptr<cmb::CompiledRule> combiningRule;
 		std::unique_ptr<utils::ThreadPool> pool;
 		
-		std::vector<TokenResult> analyzeSent(const std::u16string::const_iterator& sBegin, const std::u16string::const_iterator& sEnd, size_t topN, Match matchOptions, bool openEnd = false) const;
+		std::vector<TokenResult> analyzeSent(const std::u16string::const_iterator& sBegin, const std::u16string::const_iterator& sEnd, 
+			size_t topN, 
+			Match matchOptions, 
+			bool openEnd = false, 
+			const std::unordered_set<const Morpheme*>* blocklist = nullptr
+		) const;
 
 		const Morpheme* getDefaultMorpheme(POSTag tag) const;
 
@@ -91,6 +100,7 @@ namespace kiwi
 
 		ArchType selectedArch = ArchType::none;
 		void* dfSplitByTrie = nullptr;
+		void* dfFindForm = nullptr;
 		void* dfFindBestPath = nullptr;
 	
 	public:
@@ -106,6 +116,12 @@ namespace kiwi
 
 	private:
 		std::array<size_t, static_cast<size_t>(SpecialMorph::max)> specialMorphIds = { { 0, } };
+
+		template<class Str, class ...Rest>
+		auto _asyncAnalyze(Str&& str, Rest&&... args) const;
+
+		template<class Str, class ...Rest>
+		auto _asyncAnalyzeEcho(Str&& str, Rest&&... args) const;
 
 	public:
 
@@ -153,9 +169,9 @@ namespace kiwi
 		 * @param matchOptions 
 		 * @return TokenResult 
 		 */
-		TokenResult analyze(const std::u16string& str, Match matchOptions) const
+		TokenResult analyze(const std::u16string& str, Match matchOptions, const std::unordered_set<const Morpheme*>* blocklist = nullptr) const
 		{
-			return analyze(str, 1, matchOptions)[0];
+			return analyze(str, 1, matchOptions, blocklist)[0];
 		}
 
 		/**
@@ -165,9 +181,9 @@ namespace kiwi
 		 * @param matchOptions 
 		 * @return TokenResult 
 		 */
-		TokenResult analyze(const std::string& str, Match matchOptions) const
+		TokenResult analyze(const std::string& str, Match matchOptions, const std::unordered_set<const Morpheme*>* blocklist = nullptr) const
 		{
-			return analyze(utf8To16(str), matchOptions);
+			return analyze(utf8To16(str), matchOptions, blocklist);
 		}
 
 		/**
@@ -178,7 +194,7 @@ namespace kiwi
 		 * @param matchOptions 
 		 * @return std::vector<TokenResult> 
 		 */
-		std::vector<TokenResult> analyze(const std::u16string& str, size_t topN, Match matchOptions) const;
+		std::vector<TokenResult> analyze(const std::u16string& str, size_t topN, Match matchOptions, const std::unordered_set<const Morpheme*>* blocklist = nullptr) const;
 
 		/**
 		 * @brief 
@@ -188,9 +204,9 @@ namespace kiwi
 		 * @param matchOptions 
 		 * @return std::vector<TokenResult> 
 		 */
-		std::vector<TokenResult> analyze(const std::string& str, size_t topN, Match matchOptions) const
+		std::vector<TokenResult> analyze(const std::string& str, size_t topN, Match matchOptions, const std::unordered_set<const Morpheme*>* blocklist = nullptr) const
 		{
-			return analyze(utf8To16(str), topN, matchOptions);
+			return analyze(utf8To16(str), topN, matchOptions, blocklist);
 		}
 
 		/**
@@ -201,7 +217,19 @@ namespace kiwi
 		 * @param matchOptions 
 		 * @return std::future<std::vector<TokenResult>> 
 		 */
-		std::future<std::vector<TokenResult>> asyncAnalyze(const std::string& str, size_t topN, Match matchOptions) const;
+		std::future<std::vector<TokenResult>> asyncAnalyze(const std::string& str, size_t topN, Match matchOptions, const std::unordered_set<const Morpheme*>* blocklist = nullptr) const;
+		std::future<std::vector<TokenResult>> asyncAnalyze(std::string&& str, size_t topN, Match matchOptions, const std::unordered_set<const Morpheme*>* blocklist = nullptr) const;
+
+		std::future<TokenResult> asyncAnalyze(const std::string& str, Match matchOptions, const std::unordered_set<const Morpheme*>* blocklist = nullptr) const;
+		std::future<TokenResult> asyncAnalyze(std::string&& str, Match matchOptions, const std::unordered_set<const Morpheme*>* blocklist = nullptr) const;
+		std::future<std::pair<TokenResult, std::string>> asyncAnalyzeEcho(std::string&& str, Match matchOptions, const std::unordered_set<const Morpheme*>* blocklist = nullptr) const;
+
+		std::future<std::vector<TokenResult>> asyncAnalyze(const std::u16string& str, size_t topN, Match matchOptions, const std::unordered_set<const Morpheme*>* blocklist = nullptr) const;
+		std::future<std::vector<TokenResult>> asyncAnalyze(std::u16string&& str, size_t topN, Match matchOptions, const std::unordered_set<const Morpheme*>* blocklist = nullptr) const;
+
+		std::future<TokenResult> asyncAnalyze(const std::u16string& str, Match matchOptions, const std::unordered_set<const Morpheme*>* blocklist = nullptr) const;
+		std::future<TokenResult> asyncAnalyze(std::u16string&& str, Match matchOptions, const std::unordered_set<const Morpheme*>* blocklist = nullptr) const;
+		std::future<std::pair<TokenResult, std::u16string>> asyncAnalyzeEcho(std::u16string&& str, Match matchOptions, const std::unordered_set<const Morpheme*>* blocklist = nullptr) const;
 
 		/**
 		 * @brief 
@@ -214,7 +242,7 @@ namespace kiwi
 		 * @param matchOptions 
 		 */
 		template<class ReaderCallback, class ResultCallback>
-		void analyze(size_t topN, ReaderCallback&& reader, ResultCallback&& resultCallback, Match matchOptions) const
+		void analyze(size_t topN, ReaderCallback&& reader, ResultCallback&& resultCallback, Match matchOptions, const std::unordered_set<const Morpheme*>* blocklist = nullptr) const
 		{
 			if (pool)
 			{
@@ -228,9 +256,9 @@ namespace kiwi
 						stop = true;
 						break;
 					}
-					futures.emplace_back(pool->enqueue([&, ustr](size_t tid)
+					futures.emplace_back(pool->enqueue([=, ustr = std::move(ustr)](size_t tid)
 					{
-						return analyze(ustr, topN, matchOptions);
+						return analyze(ustr, topN, matchOptions, blocklist);
 					}));
 				}
 
@@ -246,9 +274,9 @@ namespace kiwi
 							stop = true;
 							continue;
 						}
-						futures.emplace_back(pool->enqueue([&, ustr](size_t tid)
+						futures.emplace_back(pool->enqueue([=, ustr = std::move(ustr)](size_t tid)
 						{
-							return analyze(ustr, topN, matchOptions);
+							return analyze(ustr, topN, matchOptions, blocklist);
 						}));
 					}
 				}
@@ -259,7 +287,7 @@ namespace kiwi
 				{
 					auto ustr = reader();
 					if (ustr.empty()) break;
-					resultCallback(analyze(ustr, topN, matchOptions));
+					resultCallback(analyze(ustr, topN, matchOptions, blocklist));
 				}
 			}
 		}
@@ -346,6 +374,11 @@ namespace kiwi
 		size_t getNumThreads() const
 		{
 			return pool ? pool->size() : 1;
+		}
+
+		utils::ThreadPool* getThreadPool() const
+		{
+			return pool.get();
 		}
 
 		float getCutOffThreshold() const
@@ -437,6 +470,9 @@ namespace kiwi
 		{
 			return langMdl.knlm.get();
 		}
+
+		void findMorpheme(std::vector<const Morpheme*>& out, const std::u16string& s, POSTag tag = POSTag::unknown) const;
+		std::vector<const Morpheme*> findMorpheme(const std::u16string& s, POSTag tag = POSTag::unknown) const;
 	};
 
 	/**
@@ -462,7 +498,7 @@ namespace kiwi
 		FormRaw& addForm(const KString& form);
 		size_t addForm(Vector<FormRaw>& newForms, UnorderedMap<KString, size_t>& newFormMap, KString form) const;
 
-		using MorphemeMap = UnorderedMap<std::pair<KString, POSTag>, size_t>;
+		using MorphemeMap = UnorderedMap<std::pair<KString, POSTag>, std::pair<size_t, size_t>>;
 		
 		template<class Fn>
 		MorphemeMap loadMorphemesFromTxt(std::istream& is, Fn&& filter);
@@ -487,6 +523,16 @@ namespace kiwi
 			float score = 0
 		);
 
+		void addCombinedMorpheme(
+			Vector<FormRaw>& newForms,
+			UnorderedMap<KString, size_t>& newFormMap,
+			Vector<MorphemeRaw>& newMorphemes,
+			UnorderedMap<size_t, Vector<uint32_t>>& newFormCands,
+			size_t leftId,
+			size_t rightId,
+			const cmb::Result& r
+		) const;
+
 		void addCombinedMorphemes(
 			Vector<FormRaw>& newForms, 
 			UnorderedMap<KString, size_t>& newFormMap, 
@@ -499,6 +545,7 @@ namespace kiwi
 
 		void buildCombinedMorphemes(
 			Vector<FormRaw>& newForms, 
+			UnorderedMap<KString, size_t>& newFormMap,
 			Vector<MorphemeRaw>& newMorphemes, 
 			UnorderedMap<size_t, Vector<uint32_t>>& newFormCands
 		) const;
@@ -690,11 +737,6 @@ namespace kiwi
 		 * @return 형태소 분석 준비가 완료된 Kiwi의 객체.
 		 */
 		Kiwi build(const TypoTransformer& typos = {}, float typoCostThreshold = 2.5f) const;
-
-		/*const lm::KnLangModelBase* getLangModel() const
-		{
-			return langMdl.get();
-		}*/
 
 		using TokenFilter = std::function<bool(const std::u16string&, POSTag)>;
 

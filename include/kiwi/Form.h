@@ -28,7 +28,7 @@ namespace kiwi
 	{
 		uint32_t kform = 0; /**< 형태에 대한 포인터 */
 		POSTag tag = POSTag::unknown; /**< 품사 태그 */
-		uint8_t vpPack = 0; /**< CondVowel과 CondPolarity를 4비트 단위로 묶어서 합친 값 */
+		uint8_t vpPack = 0; /**< CondVowel, CondPolarity, complex를 각각 4, 3, 1비트로 묶어서 합친 값 */
 		uint8_t senseId = 0; /**< 의미 번호 */
 
 		/**
@@ -98,6 +98,7 @@ namespace kiwi
 			POSTag _tag,
 			CondVowel _vowel = CondVowel::none,
 			CondPolarity _polar = CondPolarity::none,
+			bool _complex = false,
 			uint8_t _combineSocket = 0
 		);
 
@@ -105,7 +106,9 @@ namespace kiwi
 		CondVowel vowel() const { return static_cast<CondVowel>(vpPack & 0xF); }
 		
 		/**< 선행형태소의 모음조화 조건 */
-		CondPolarity polar() const { return static_cast<CondPolarity>(vpPack >> 4); }
+		CondPolarity polar() const { return static_cast<CondPolarity>((vpPack >> 4) & 0x7); }
+
+		bool complex() const { return !!(vpPack & 0x80); }
 
 		void setVowel(CondVowel v)
 		{
@@ -114,7 +117,12 @@ namespace kiwi
 
 		void setPolar(CondPolarity v)
 		{
-			vpPack = (vpPack & 0x0F) | (static_cast<uint8_t>(v) << 4);
+			vpPack = (vpPack & 0x8F) | (static_cast<uint8_t>(v) << 4);
+		}
+
+		void setComplex(bool v)
+		{
+			vpPack = (vpPack & 0x7F) | (v ? 0x80 : 0x00);
 		}
 
 		void serializerRead(std::istream& istr);
@@ -132,7 +140,8 @@ namespace kiwi
 		const KString* kform = nullptr;
 		POSTag tag = POSTag::unknown;
 		CondVowel vowel : 4;
-		CondPolarity polar : 4;
+		CondPolarity polar : 3;
+		bool complex : 1;
 		uint8_t senseId = 0;
 		uint8_t combineSocket = 0;
 		int32_t combined = 0;
@@ -194,6 +203,7 @@ namespace kiwi
 		CondVowel vowel = CondVowel::none;
 		CondPolarity polar = CondPolarity::none;
 		uint8_t formHash = 0;
+		uint8_t zCodaAppendable = 0;
 
 		Form();
 		~Form();
@@ -239,7 +249,7 @@ namespace kiwi
 	 * @param morphBase 형태소 배열의 시작 위치
 	 * @return 최적화된 형태 정보
 	 */
-	Form bake(const FormRaw& o, const Morpheme* morphBase, const Vector<uint32_t>& additionalCands = {});
+	Form bake(const FormRaw& o, const Morpheme* morphBase, bool zCodaAppendable, const Vector<uint32_t>& additionalCands = {});
 
 	/**
 	 * @brief 변경 가능한 형태소 정보를 bake하여 최적화한다.

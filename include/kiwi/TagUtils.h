@@ -21,7 +21,25 @@ namespace kiwi
 
 	bool isNounClass(POSTag tag);
 	bool isVerbClass(POSTag tag);
-	bool isEClass(POSTag tag);
-	bool isJClass(POSTag tag);
-	bool isSuffix(POSTag tag);
+	
+	inline bool isEClass(POSTag tag)
+	{
+		return POSTag::ep <= tag && tag <= POSTag::etm;
+	}
+	
+	inline bool isJClass(POSTag tag)
+	{
+		return POSTag::jks <= tag && tag <= POSTag::jc;
+	}
+	
+	inline bool isSuffix(POSTag tag)
+	{
+		tag = clearIrregular(tag);
+		return POSTag::xsn <= tag && tag <= POSTag::xsa;
+	}
+	
+	inline bool isSpecialClass(POSTag tag)
+	{
+		return POSTag::sf <= tag && tag <= POSTag::sn;
+	}
 }

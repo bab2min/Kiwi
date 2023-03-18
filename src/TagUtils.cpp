@@ -22,41 +22,28 @@ bool kiwi::isVerbClass(POSTag tag)
 	return find(verbs.begin(), verbs.end(), clearIrregular(tag)) != verbs.end();
 }
 
-bool kiwi::isEClass(POSTag tag)
+namespace kiwi
 {
-	return POSTag::ep <= tag && tag <= POSTag::etm;
-}
-
-bool kiwi::isJClass(POSTag tag)
-{
-	return POSTag::jks <= tag && tag <= POSTag::jc;
-}
-
-bool kiwi::isSuffix(POSTag tag)
-{
-	tag = clearIrregular(tag);
-	return POSTag::xsn <= tag && tag <= POSTag::xsa;
-}
-
-inline bool isAllowedSeq(POSTag left, POSTag right)
-{
-	if (isNounClass(left) && isEClass(right))
+	inline bool isAllowedSeq(POSTag left, POSTag right)
 	{
-		return false;
+		if (isNounClass(left) && isEClass(right))
+		{
+			return false;
+		}
+		if ((isVerbClass(left) || isEClass(left)) && right == POSTag::vcp)
+		{
+			return false;
+		}
+		if (isVerbClass(left) && !isEClass(right))
+		{
+			return false;
+		}
+		if ((!isVerbClass(left) && !isEClass(left)) && isEClass(right))
+		{
+			return false;
+		}
+		return true;
 	}
-	if ((isVerbClass(left) || isEClass(left)) && right == POSTag::vcp)
-	{
-		return false;
-	}
-	if (isVerbClass(left) && !isEClass(right))
-	{
-		return false;
-	}
-	if ((!isVerbClass(left) && !isEClass(left)) && isEClass(right))
-	{
-		return false;
-	}
-	return true;
 }
 
 TagSequenceScorer::TagSequenceScorer(float _weight) : weight{ _weight }

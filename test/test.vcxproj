@@ -59,12 +59,13 @@
     <IncludePath>$(SolutionDir)third_party/variant/include;$(SolutionDir)include\;$(SolutionDir)third_party/mimalloc/include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemGroup>
+    <ClCompile Include="test_sw_tokenizer.cpp" />
+    <ClCompile Include="test_cpp.cpp" />
+    <ClCompile Include="test_c.cpp" />
     <ClCompile Include="test_typo.cpp" />
     <ClCompile Include="test_combiner.cpp" />
     <ClCompile Include="test_QEncoder.cpp" />
     <ClCompile Include="bit_encode.cpp" />
-    <ClCompile Include="test_cpp.cpp" />
-    <ClCompile Include="test_c.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common.h" />

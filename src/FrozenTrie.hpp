@@ -3,6 +3,7 @@
 #include <kiwi/FrozenTrie.h>
 #include <kiwi/Utils.h>
 #include "search.h"
+#include "ArchAvailable.h"
 
 namespace kiwi
 {
@@ -151,5 +152,33 @@ namespace kiwi
 			}
 		}
 
+		namespace detail
+		{
+			template<ArchType archType, class Ty>
+			FrozenTrie<typename Ty::Key, typename Ty::Value> freezeTrie(ContinuousTrie<Ty>&& trie)
+			{
+				return { trie, ArchTypeHolder<archType>{} };
+			}
+
+			template<class Fn, class Ty>
+			struct FreezeTrieGetter
+			{
+				template<std::ptrdiff_t i>
+				struct Wrapper
+				{
+					static constexpr Fn value = &freezeTrie<static_cast<ArchType>(i), Ty>;
+				};
+			};
+		}
+
+		template<class Ty>
+		inline FrozenTrie<typename Ty::Key, typename Ty::Value> freezeTrie(ContinuousTrie<Ty>&& trie, ArchType archType)
+		{
+			using FnFreezeTrie = decltype(&detail::freezeTrie<ArchType::none, Ty>);
+			static tp::Table<FnFreezeTrie, AvailableArch> table{ detail::FreezeTrieGetter<FnFreezeTrie, Ty>{} };
+			auto* fn = table[static_cast<std::ptrdiff_t>(archType)];
+			if (!fn) throw std::runtime_error{ std::string{"Unsupported architecture : "} + archToStr(archType) };
+			return (*fn)(std::move(trie));
+		}
 	}
 }

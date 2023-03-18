@@ -47,7 +47,16 @@ namespace kiwi
 		return utf16To8(nonstd::to_string_view(str));
 	}
 
-	POSTag identifySpecialChr(kchar_t chr)
+	/**
+	* 문자의 타입을 변별한다. 타입에 따라 다음 값을 반환한다.
+	* 
+	* - 공백: POSTag::unknown
+	* - 한글: POSTag::max
+	* - 숫자: POSTag::sn
+	* - 로마자 알파벳: POSTag::sl
+	* 
+	*/
+	POSTag identifySpecialChr(char32_t chr)
 	{
 		if (isSpace(chr)) return POSTag::unknown;
 		if (0x2000 <= chr && chr <= 0x200F) return POSTag::unknown;
@@ -56,7 +65,11 @@ namespace kiwi
 		if (('A' <= chr && chr <= 'Z') ||
 			('a' <= chr && chr <= 'z'))  return POSTag::sl;
 		if (0xAC00 <= chr && chr < 0xD7A4) return POSTag::max;
-		if (isHangulCoda(chr)) return POSTag::max;
+		if (isOldHangulOnset(chr) 
+			|| isOldHangulVowel(chr) 
+			|| isOldHangulCoda(chr) 
+			|| isOldHangulToneMark(chr)
+		) return POSTag::max;
 		switch (chr)
 		{
 		case '.':
@@ -145,17 +158,9 @@ namespace kiwi
 		case 0xff0d:
 			return POSTag::ss;
 		}
-		if ((0x2e80 <= chr && chr <= 0x2e99) ||
-			(0x2e9b <= chr && chr <= 0x2ef3) ||
-			(0x2f00 <= chr && chr <= 0x2fd5) ||
-			(0x3005 <= chr && chr <= 0x3007) ||
-			(0x3021 <= chr && chr <= 0x3029) ||
-			(0x3038 <= chr && chr <= 0x303b) ||
-			(0x3400 <= chr && chr <= 0x4db5) ||
-			(0x4e00 <= chr && chr <= 0x9fcc) ||
-			(0xf900 <= chr && chr <= 0xfa6d) ||
-			(0xfa70 <= chr && chr <= 0xfad9)) return POSTag::sh;
+		if (isChineseChr(chr)) return POSTag::sh;
 		if (0xd800 <= chr && chr <= 0xdfff) return POSTag::sh;
+		
 		return POSTag::sw;
 	}
 
@@ -256,13 +261,14 @@ namespace kiwi
 			"VX",
 			"MM", "MAJ",
 			"IC",
-			"XPN", "XSN", "XSV", "XSA", "XR",
+			"XPN", "XSN", "XSV", "XSA", "XSM", "XR",
 			"VCP", "VCN",
 			"SF", "SP", "SS", "SSO", "SSC", "SE", "SO", "SW",
 			"SL", "SH", "SN",
 			"W_URL", "W_EMAIL", "W_MENTION", "W_HASHTAG", "W_SERIAL",
 			"JKS", "JKC", "JKG", "JKO", "JKB", "JKV", "JKQ", "JX", "JC",
 			"EP", "EF", "EC", "ETN", "ETM",
+			"Z_CODA",
 			"P",
 			"@"
 		};
@@ -296,13 +302,14 @@ namespace kiwi
 			u"VX",
 			u"MM", u"MAJ",
 			u"IC",
-			u"XPN", u"XSN", u"XSV", u"XSA", u"XR",
+			u"XPN", u"XSN", u"XSV", u"XSA", u"XSM", u"XR",
 			u"VCP", u"VCN",
 			u"SF", u"SP", u"SS", u"SSO", u"SSC", u"SE", u"SO", u"SW",
 			u"SL", u"SH", u"SN",
 			u"W_URL", u"W_EMAIL", u"W_MENTION", u"W_HASHTAG", u"W_SERIAL",
 			u"JKS", u"JKC", u"JKG", u"JKO", u"JKB", u"JKV", u"JKQ", u"JX", u"JC",
 			u"EP", u"EF", u"EC", u"ETN", u"ETM",
+			u"Z_CODA",
 			u"P",
 			u"@"
 		};
