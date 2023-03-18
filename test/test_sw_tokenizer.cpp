@@ -21,26 +21,28 @@ inline std::string to_string_with_fill(Ty value, char chr, size_t width = 0)
 
 TEST(KiwiSwTokenizer, Builder)
 {
+	using VocabTy = std::tuple<std::string, POSTag, SwTokenFlag, float>;
+
 	SwTokenizerConfig config;
 	config.specialTokens[config.unk] = u8"[UNK]";
 	config.specialTokens[config.cls] = u8"[CLS]";
 	SwTokenizerBuilder builder{ reuseKiwiInstance(), config };
 
-	std::initializer_list<std::tuple<std::string, POSTag, SwTokenFlag, float>> vocabs = {
-		{ config.specialTokens[config.unk], POSTag::unknown, SwTokenFlag::special, 0}, // 0
-		{ u8"하", POSTag::vv, SwTokenFlag::none, -3.33 }, // 1
-		{ u8".", POSTag::unknown, SwTokenFlag::none, -3.34 }, // 2
-		{ u8"어", POSTag::ep, SwTokenFlag::none, -3.89 }, // 3
-		{ u8"이", POSTag::vv, SwTokenFlag::none, -4.06 }, // 4
-		{ u8"ᆫ", POSTag::ep, SwTokenFlag::none, -4.09 }, // 5
-		{ u8"었", POSTag::ep, SwTokenFlag::none, -4.15 }, // 6
-		{ u8"을", POSTag::jks, SwTokenFlag::none, -4.79 }, // 7
-		{ u8"사람", POSTag::unknown, SwTokenFlag::subword, -5.00 }, // 8
-		{ u8"말", POSTag::unknown, SwTokenFlag::none, -5.10 }, // 9
-		{ u8"생각", POSTag::unknown, SwTokenFlag::none, -5.20 }, // 10
-		{ u8"옛", POSTag::unknown, SwTokenFlag::none, -5.30 }, // 11
-		{ u8"", POSTag::unknown, SwTokenFlag::glue, -6.0 }, // 12
-		{ config.specialTokens[config.cls], POSTag::unknown, SwTokenFlag::special, 0}, // 13
+	std::initializer_list<VocabTy> vocabs = {
+		VocabTy{ config.specialTokens[config.unk], POSTag::unknown, SwTokenFlag::special, 0}, // 0
+		VocabTy{ u8"하", POSTag::vv, SwTokenFlag::none, -3.33 }, // 1
+		VocabTy{ u8".", POSTag::unknown, SwTokenFlag::none, -3.34 }, // 2
+		VocabTy{ u8"어", POSTag::ep, SwTokenFlag::none, -3.89 }, // 3
+		VocabTy{ u8"이", POSTag::vv, SwTokenFlag::none, -4.06 }, // 4
+		VocabTy{ u8"ᆫ", POSTag::ep, SwTokenFlag::none, -4.09 }, // 5
+		VocabTy{ u8"었", POSTag::ep, SwTokenFlag::none, -4.15 }, // 6
+		VocabTy{ u8"을", POSTag::jks, SwTokenFlag::none, -4.79 }, // 7
+		VocabTy{ u8"사람", POSTag::unknown, SwTokenFlag::subword, -5.00 }, // 8
+		VocabTy{ u8"말", POSTag::unknown, SwTokenFlag::none, -5.10 }, // 9
+		VocabTy{ u8"생각", POSTag::unknown, SwTokenFlag::none, -5.20 }, // 10
+		VocabTy{ u8"옛", POSTag::unknown, SwTokenFlag::none, -5.30 }, // 11
+		VocabTy{ u8"", POSTag::unknown, SwTokenFlag::glue, -6.0 }, // 12
+		VocabTy{ config.specialTokens[config.cls], POSTag::unknown, SwTokenFlag::special, 0}, // 13
 	};
 	for (auto& t : vocabs)
 	{
