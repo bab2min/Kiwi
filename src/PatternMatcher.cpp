@@ -23,16 +23,22 @@ namespace kiwi
 		size_t testEmail(const char16_t* first, const char16_t* last) const;
 		size_t testHashtag(const char16_t* first, const char16_t* last) const;
 		size_t testMention(const char16_t* first, const char16_t* last) const;
-		size_t testNumeric(const char16_t* first, const char16_t* last) const;
+		size_t testNumeric(const char16_t left, const char16_t* first, const char16_t* last) const;
 		size_t testSerial(const char16_t* first, const char16_t* last) const;
+		size_t testAbbr(const char16_t* first, const char16_t* last) const;
 
 	public:
-		std::pair<size_t, POSTag> match(const char16_t* first, const char16_t* last, Match matchOptions) const;
+		std::pair<size_t, POSTag> match(char16_t left, const char16_t* first, const char16_t* last, Match matchOptions) const;
 	};
 
 	inline bool isAlpha(char16_t c)
 	{
 		return ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z');
+	}
+
+	inline bool isUpperAlpha(char16_t c)
+	{
+		return ('A' <= c && c <= 'Z');
 	}
 
 	inline bool isDigit(char16_t c)
@@ -173,10 +179,11 @@ size_t PatternMatcherImpl::testHashtag(const char16_t * first, const char16_t * 
 	return b - first;
 }
 
-size_t PatternMatcherImpl::testNumeric(const char16_t* first, const char16_t* last) const
+size_t PatternMatcherImpl::testNumeric(char16_t left, const char16_t* first, const char16_t* last) const
 {
 	// Pattern: [0-9]+(,[0-9]{3})*(\.[0-9]+)?
 	const char16_t* b = first;
+	bool hasComma = false;
 
 	if (b == last || !isDigit(*b)) return 0;
 	
@@ -187,6 +194,7 @@ size_t PatternMatcherImpl::testNumeric(const char16_t* first, const char16_t* la
 		++b;
 		if (b + 2 >= last || !isDigit(b[0]) || !isDigit(b[1]) || !isDigit(b[2])) return b - 1 - first;
 		b += 3;
+		hasComma = true;
 	}
 	
 	if (b == last || isSpace(*b) || isHangulSyllable(*b)) return b - first;
@@ -194,6 +202,7 @@ size_t PatternMatcherImpl::testNumeric(const char16_t* first, const char16_t* la
 	if (*b == '.')
 	{
 		++b;
+		if (!hasComma && !md.alphaNumDotDash.test(left) && (b == last || !md.alphaNumDotDash.test(*b))) return b - first;
 		if (b == last || !isDigit(*b)) return b - 1 - first;
 		while (b != last && isDigit(*b)) ++b;
 	}
@@ -207,7 +216,7 @@ size_t PatternMatcherImpl::testNumeric(const char16_t* first, const char16_t* la
 
 size_t PatternMatcherImpl::testSerial(const char16_t* first, const char16_t* last) const
 {
-	// Pattern: [0-9]+([:.-/])[0-9]+(\1[0-9]+)*
+	// Pattern: [0-9]+([:.-/] ?)[0-9]+(\1[0-9]+)*\1?
 	const char16_t* b = first;
 
 	if (b == last || !isDigit(*b)) return 0;
@@ -220,6 +229,7 @@ size_t PatternMatcherImpl::testSerial(const char16_t* first, const char16_t* las
 	if (*b == ':' || *b == '.' || *b == '-' || *b == '/') sep = *b;
 	else return 0;
 	++b;
+	if (b != last && *b == ' ') ++b;
 	if (b == last || !isDigit(*b)) return 0;
 	++b;
 	while (b != last && isDigit(*b)) ++b;
@@ -229,28 +239,67 @@ size_t PatternMatcherImpl::testSerial(const char16_t* first, const char16_t* las
 	while (b != last && *b == sep)
 	{
 		++b;
-		if (b == last || !isDigit(*b)) return b - first - 1;
+		if (b != last && *b == ' ') ++b;
+		if (b == last || !isDigit(*b)) return b - first;
 		++b;
 		while (b != last && isDigit(*b)) ++b;
 	}
 	return b - first;
 }
 
+size_t PatternMatcherImpl::testAbbr(const char16_t* first, const char16_t* last) const
+{
+	const char16_t* b = first;
 
-pair<size_t, POSTag> PatternMatcherImpl::match(const char16_t * first, const char16_t * last, Match matchOptions) const
+	if (b == last || !isAlpha(*b)) return 0;
+
+	size_t l = 0;
+	while (b != last && isAlpha(*b)) ++b, ++l;
+
+	if (b == last) return 0;
+
+	if (*b == '.') ++b;
+	else return 0;
+	
+	if (b != last && *b == ' ')
+	{
+		if (l > (isUpperAlpha(*first) ? 5 : 3)) return 0; // reject too long patterns for abbreviation
+		++b;
+	}
+	else
+	{
+		if (l > 5) return 0; // reject too long patterns for abbreviation
+	}
+	
+	while (b != last && isAlpha(*b))
+	{
+		l = 0;
+		while (b != last && isAlpha(*b)) ++b, ++l;
+		if (l > 5) return 0;
+		
+		if (b != last && *b == '.') ++b;
+		else return b - first;
+		if (b != last && *b == ' ') ++b;
+	}
+	if (b[-1] == ' ') --b;
+	return b - first;
+}
+
+pair<size_t, POSTag> PatternMatcherImpl::match(char16_t left, const char16_t * first, const char16_t * last, Match matchOptions) const
 {
 	size_t size;
 	if (!!(matchOptions & Match::serial) && (size = testSerial(first, last))) return make_pair(size, POSTag::w_serial);
-	if ((size = testNumeric(first, last))) return make_pair(size, POSTag::sn);
+	if ((size = testNumeric(left, first, last))) return make_pair(size, POSTag::sn);
 	if (!!(matchOptions & Match::hashtag) && (size = testHashtag(first, last))) return make_pair(size, POSTag::w_hashtag);
 	if (!!(matchOptions & Match::email) && (size = testEmail(first, last))) return make_pair(size, POSTag::w_email);
 	if (!!(matchOptions & Match::mention) && (size = testMention(first, last))) return make_pair(size, POSTag::w_mention);
 	if (!!(matchOptions & Match::url) && (size = testUrl(first, last))) return make_pair(size, POSTag::w_url);
+	if ((size = testAbbr(first, last))) return make_pair(size, POSTag::sl);
 	return make_pair(0, POSTag::unknown);
 }
 
-pair<size_t, POSTag> kiwi::matchPattern(const char16_t* first, const char16_t* last, Match matchOptions)
+pair<size_t, POSTag> kiwi::matchPattern(char16_t left, const char16_t* first, const char16_t* last, Match matchOptions)
 {
 	static PatternMatcherImpl matcher;
-	return matcher.match(first, last, matchOptions);
+	return matcher.match(left, first, last, matchOptions);
 }

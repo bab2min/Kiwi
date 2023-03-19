@@ -83,13 +83,6 @@ namespace kiwi
 		std::shared_ptr<cmb::CompiledRule> combiningRule;
 		std::unique_ptr<utils::ThreadPool> pool;
 		
-		std::vector<TokenResult> analyzeSent(const std::u16string::const_iterator& sBegin, const std::u16string::const_iterator& sEnd, 
-			size_t topN, 
-			Match matchOptions, 
-			bool openEnd = false, 
-			const std::unordered_set<const Morpheme*>* blocklist = nullptr
-		) const;
-
 		const Morpheme* getDefaultMorpheme(POSTag tag) const;
 
 		template<class LmState>
