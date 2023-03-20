@@ -345,3 +345,5 @@ ModelGenerator/*
 !ModelGenerator/skipbigram.mdl
 !ModelGenerator/*.dict
 models/
+*.vcxproj.filters
+*.vsps
