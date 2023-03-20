@@ -622,13 +622,15 @@ namespace kiwi
 					leftFormLast = nullptr;
 				}
 
+				CondVowel cvowel = curMorph->vowel;
+				CondPolarity cpolar = curMorph->polar;
 				if (ignoreCondScore)
 				{
-					candScore += FeatureTestor::isMatched(leftFormFirst, leftFormLast, curMorph->vowel, curMorph->polar) ? 0 : ignoreCondScore;
+					candScore += FeatureTestor::isMatched(leftFormFirst, leftFormLast, cvowel, cpolar) ? 0 : ignoreCondScore;
 				}
 				else
 				{
-					if (!FeatureTestor::isMatched(leftFormFirst, leftFormLast, curMorph->vowel, curMorph->polar)) continue;
+					if (!FeatureTestor::isMatched(leftFormFirst, leftFormLast, cvowel, cpolar)) continue;
 				}
 
 				auto cLmState = p.lmState;
