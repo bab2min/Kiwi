@@ -10,7 +10,7 @@ using namespace kiwi;
 
 void printResult(Kiwi& kw, const string& line, int topn, bool score, ostream& out)
 {
-	for (auto& result : kw.analyze(line, topn, Match::all))
+	for (auto& result : kw.analyze(line, topn, Match::allWithNormalizing))
 	{
 		for (auto& t : result.first)
 		{
@@ -84,6 +84,11 @@ int run(const string& modelPath, bool benchmark, const string& output, const str
 			for (auto& f : input)
 			{
 				ifstream in{ f };
+				if (!in)
+				{
+					throw runtime_error{ "cannot open file: " + f };
+				}
+
 				for (string line; getline(in, line);)
 				{
 					printResult(kw, line, topn, score, *out);
@@ -117,7 +122,7 @@ int main(int argc, const char* argv[])
 {
 	tutils::setUTF8Output();
 
-	CmdLine cmd{ "Kiwi CLI", ' ', "0.11.0" };
+	CmdLine cmd{ "Kiwi CLI", ' ', KIWI_VERSION_STRING};
 
 	ValueArg<string> model{ "m", "model", "Kiwi model path", true, "", "string" };
 	SwitchArg benchmark{ "e", "benchmark", "benchmark performance" };

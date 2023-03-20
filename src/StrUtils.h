@@ -365,29 +365,42 @@ namespace kiwi
 		return normalizeHangul(hangul.begin(), hangul.end());
 	}
 
+	template<class It, class StrOut, class PosOut>
+	inline void normalizeHangulWithPosition(It first, It last, StrOut strOut, PosOut posOut)
+	{
+		size_t s = 0;
+		for (; first != last; ++first)
+		{
+			auto c = *first;
+			*posOut++ = s;
+			if (c == 0xB42C) c = 0xB410;
+			if (0xAC00 <= c && c < 0xD7A4)
+			{
+				int coda = (c - 0xAC00) % 28;
+				*strOut++ = (c - coda);
+				s++;
+				if (coda)
+				{
+					*strOut++ = (coda + 0x11A7);
+					s++;
+				}
+			}
+			else
+			{
+				*strOut++ = c;
+				s++;
+			}
+		}
+		*posOut++ = s;
+	}
+
 	template<class It>
 	inline std::pair<KString, Vector<size_t>> normalizeHangulWithPosition(It first, It last)
 	{
 		KString ret;
 		Vector<size_t> pos;
 		ret.reserve((size_t)(std::distance(first, last) * 1.5));
-		for (; first != last; ++first)
-		{
-			auto c = *first;
-			pos.emplace_back(ret.size());
-			if (c == 0xB42C) c = 0xB410;
-			if (0xAC00 <= c && c < 0xD7A4)
-			{
-				int coda = (c - 0xAC00) % 28;
-				ret.push_back(c - coda);
-				if (coda) ret.push_back(coda + 0x11A7);
-			}
-			else
-			{
-				ret.push_back(c);
-			}
-		}
-		pos.emplace_back(ret.size());
+		normalizeHangulWithPosition(first, last, std::back_inserter(ret), std::back_inserter(pos));
 		return make_pair(move(ret), move(pos));
 	}
 

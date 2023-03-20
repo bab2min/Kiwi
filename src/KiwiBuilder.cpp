@@ -1070,7 +1070,7 @@ void KiwiBuilder::addCombinedMorpheme(
 	newMorphemes.emplace_back(POSTag::unknown);
 	auto& newMorph = newMorphemes.back();
 	newMorph.lmMorphemeId = newId;
-	if (getMorph(leftId).chunks.empty())
+	if (getMorph(leftId).chunks.empty() || getMorph(leftId).complex())
 	{
 		newMorph.chunks.emplace_back(leftId);
 		newMorph.chunkPositions.emplace_back(0, r.leftEnd);
@@ -1087,7 +1087,7 @@ void KiwiBuilder::addCombinedMorpheme(
 		newMorph.userScore = leftMorph.userScore + r.score;
 	}
 
-	if (getMorph(rightId).chunks.empty())
+	if (getMorph(rightId).chunks.empty() || getMorph(rightId).complex())
 	{
 		newMorph.chunks.emplace_back(rightId);
 		newMorph.chunkPositions.emplace_back(r.rightBegin, r.str.size());

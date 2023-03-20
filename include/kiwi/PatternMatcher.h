@@ -29,7 +29,7 @@ namespace kiwi
 		allWithNormalizing = all | normalizeCoda,
 	};
 
-	std::pair<size_t, kiwi::POSTag> matchPattern(const char16_t* first, const char16_t* last, Match matchOptions);
+	std::pair<size_t, kiwi::POSTag> matchPattern(char16_t left, const char16_t* first, const char16_t* last, Match matchOptions);
 }
 
 KIWI_DEFINE_ENUM_FLAG_OPERATORS(kiwi::Match);

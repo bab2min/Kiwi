@@ -67,7 +67,8 @@ namespace kiwi
 
 		template<class LmState>
 		static Vector<std::pair<Path, float>> findBestPath(const Kiwi* kw, 
-			const Vector<KGraphNode>& graph, 
+			const KGraphNode* graph, 
+			const size_t graphSize,
 			size_t topN, 
 			bool openEnd,
 			bool splitComplex = false,
@@ -76,7 +77,7 @@ namespace kiwi
 
 		template<class LmState, class CandTy, class CacheTy>
 		static float evalPath(const Kiwi* kw, const KGraphNode* startNode, const KGraphNode* node,
-			CacheTy& cache, Vector<KString>& ownFormList,
+			CacheTy& cache, const Vector<U16StringView>& ownFormList,
 			size_t i, size_t ownFormId, CandTy&& cands, bool unknownForm,
 			bool splitComplex = false,
 			const std::unordered_set<const Morpheme*>* blocklist = nullptr
@@ -444,75 +445,6 @@ namespace kiwi
 		}
 	}
 
-	vector<TokenResult> Kiwi::analyze(const u16string& str, size_t topN, Match matchOptions, const std::unordered_set<const Morpheme*>* blocklist) const
-	{
-		auto chunk = str.begin();
-		Vector<u16string::const_iterator> sents;
-		sents.emplace_back(chunk);
-		while (chunk != str.end())
-		{
-			POSTag tag = identifySpecialChr(*chunk);
-			while (chunk != str.end() && !(tag == POSTag::sf || tag == POSTag::se || *chunk == u':'))
-			{
-				++chunk;
-				if (chunk - sents.back() >= 512)
-				{
-					if (0xDC00 <= *chunk && *chunk <= 0xDFFF) --chunk;
-					sents.emplace_back(chunk);
-					break;
-				}
-				if (chunk == str.end()) break;
-				tag = identifySpecialChr(*chunk);
-			}
-			if (chunk == str.end()) break;
-			++chunk;
-			if (tag == POSTag::se)
-			{
-				sents.emplace_back(chunk);
-				continue;
-			}
-			if (chunk != str.end() && (identifySpecialChr(*chunk) == POSTag::unknown || identifySpecialChr(*chunk) == POSTag::sf))
-			{
-				while (chunk != str.end() && (identifySpecialChr(*chunk) == POSTag::unknown || identifySpecialChr(*chunk) == POSTag::sf))
-				{
-					++chunk;
-				}
-				sents.emplace_back(chunk);
-			}
-		}
-		if (sents.back() != str.end()) sents.emplace_back(str.end());
-		if (sents.size() <= 1) return vector<TokenResult>(1);
-		vector<TokenResult> ret = analyzeSent(sents[0], sents[1], topN, matchOptions, blocklist);
-		if (ret.empty())
-		{
-			return vector<TokenResult>(1);
-		}
-		while (ret.size() < topN) ret.emplace_back(ret.back());
-		for (size_t i = 2; i < sents.size(); ++i)
-		{
-			auto res = analyzeSent(sents[i - 1], sents[i], topN, matchOptions, blocklist);
-			if (res.empty()) continue;
-			for (size_t n = 0; n < topN; ++n)
-			{
-				auto& r = res[min(n, res.size() - 1)];
-				transform(r.first.begin(), r.first.end(), back_inserter(ret[n].first), [&sents, i](TokenInfo& p)
-				{
-					p.position += (uint32_t)distance(sents[0], sents[i - 1]);
-					return p;
-				});
-				ret[n].second += r.second;
-			}
-		}
-
-		auto newlines = allNewLinePositions(str);
-		for (auto& r : ret)
-		{
-			fillPairedTokenInfo(r.first);
-			fillSentLineInfo(r.first, newlines);
-		}
-		return ret;
-	}
-
 	vector<pair<size_t, size_t>> Kiwi::splitIntoSents(const u16string& str, Match matchOptions, TokenResult* tokenizedResultOut) const
 	{
 		vector<pair<size_t, size_t>> ret;
@@ -637,7 +569,7 @@ namespace kiwi
 	template<class LmState, class _Map>
 	void evalTrigram(const LangModel& langMdl, 
 		const Morpheme* morphBase, 
-		const Vector<KString>& ownForms, 
+		const Vector<U16StringView>& ownForms, 
 		const Vector<Vector<WordLL<LmState>>>& cache,
 		array<Wid, 4> seq, 
 		size_t chSize, 
@@ -673,15 +605,32 @@ namespace kiwi
 					seq[0] = morphBase[p.back.wid].getCombined()->lmMorphemeId;
 				}
 
-				auto leftForm = p.back.ownFormId ? &ownForms[p.back.ownFormId - 1] : morphBase[p.back.wid].kform;
-
-				if (ignoreCondScore)
+				const kchar_t* leftFormFirst, * leftFormLast;
+				if (p.back.ownFormId)
 				{
-					candScore += FeatureTestor::isMatched(leftForm, curMorph->vowel, curMorph->polar) ? 0 : ignoreCondScore;
+					leftFormFirst = ownForms[p.back.ownFormId - 1].data();
+					leftFormLast = ownForms[p.back.ownFormId - 1].data() + ownForms[0].size();
+				}
+				else if (morphBase[p.back.wid].kform)
+				{
+					leftFormFirst = morphBase[p.back.wid].kform->data();
+					leftFormLast = morphBase[p.back.wid].kform->data() + morphBase[p.back.wid].kform->size();
 				}
 				else
 				{
-					if (!FeatureTestor::isMatched(leftForm, curMorph->vowel, curMorph->polar)) continue;
+					leftFormFirst = nullptr;
+					leftFormLast = nullptr;
+				}
+
+				CondVowel cvowel = curMorph->vowel;
+				CondPolarity cpolar = curMorph->polar;
+				if (ignoreCondScore)
+				{
+					candScore += FeatureTestor::isMatched(leftFormFirst, leftFormLast, cvowel, cpolar) ? 0 : ignoreCondScore;
+				}
+				else
+				{
+					if (!FeatureTestor::isMatched(leftFormFirst, leftFormLast, cvowel, cpolar)) continue;
 				}
 
 				auto cLmState = p.lmState;
@@ -782,7 +731,7 @@ namespace kiwi
 		const KGraphNode* startNode, 
 		const KGraphNode* node,
 		CacheTy& cache, 
-		Vector<KString>& ownFormList,
+		const Vector<U16StringView>& ownFormList,
 		size_t i, 
 		size_t ownFormId, 
 		CandTy&& cands, 
@@ -988,7 +937,7 @@ namespace kiwi
 	inline PathEvaluator::Path generateTokenList(const WordLL<LmState>* result, 
 		const utils::ContainerSearcher<WordLL<LmState>>& csearcher, 
 		const KGraphNode* graph, 
-		const Vector<KString>& ownFormList,
+		const Vector<U16StringView>& ownFormList,
 		float typoCostWeight,
 		const Morpheme* morphBase,
 		size_t langVocabSize)
@@ -1023,7 +972,7 @@ namespace kiwi
 			{
 				ret.emplace_back(
 					unifyMorpheme(morpheme),
-					cur->back.ownFormId ? ownFormList[cur->back.ownFormId - 1] : KString{},
+					cur->back.ownFormId ? KString{ ownFormList[cur->back.ownFormId - 1].data(), ownFormList[cur->back.ownFormId - 1].size()} : KString{},
 					gNode.startPos,
 					gNode.endPos,
 					scoreDiff,
@@ -1075,7 +1024,8 @@ namespace kiwi
 
 	template<class LmState>
 	Vector<pair<PathEvaluator::Path, float>> PathEvaluator::findBestPath(const Kiwi* kw, 
-		const Vector<KGraphNode>& graph, 
+		const KGraphNode* graph, 
+		const size_t graphSize,
 		size_t topN, 
 		bool openEnd,
 		bool splitComplex,
@@ -1084,14 +1034,14 @@ namespace kiwi
 	{
 		static constexpr size_t eosId = 1;
 
-		Vector<Vector<WordLL<LmState>>> cache(graph.size());
-		Vector<KString> ownFormList;
+		Vector<Vector<WordLL<LmState>>> cache(graphSize);
+		Vector<U16StringView> ownFormList;
 		Vector<const Morpheme*> unknownNodeCands, unknownNodeLCands;
 
 		const size_t langVocabSize = kw->langMdl.knlm->getHeader().vocab_size;
 
-		const KGraphNode* startNode = &graph.front();
-		const KGraphNode* endNode = &graph.back();
+		const KGraphNode* startNode = graph;
+		const KGraphNode* endNode = graph + graphSize - 1;
 
 		unknownNodeCands.emplace_back(kw->getDefaultMorpheme(POSTag::nng));
 		unknownNodeCands.emplace_back(kw->getDefaultMorpheme(POSTag::nnp));
@@ -1101,7 +1051,7 @@ namespace kiwi
 		cache.front().emplace_back(&kw->morphemes[0], 0.f, 0.f, nullptr, LmState{kw->langMdl}, SpecialState{0,});
 
 		// middle nodes
-		for (size_t i = 1; i < graph.size() - 1; ++i)
+		for (size_t i = 1; i < graphSize - 1; ++i)
 		{
 			auto* node = &graph[i];
 			size_t ownFormId = 0;
@@ -1237,7 +1187,7 @@ namespace kiwi
 		Vector<pair<Path, float>> ret;
 		for (size_t i = 0; i < min(topN, cand.size()); ++i)
 		{
-			ret.emplace_back(generateTokenList(&cand[i], csearcher, graph.data(), ownFormList, kw->typoCostWeight, kw->morphemes.data(), langVocabSize), cand[i].accScore);
+			ret.emplace_back(generateTokenList(&cand[i], csearcher, graph, ownFormList, kw->typoCostWeight, kw->morphemes.data(), langVocabSize), cand[i].accScore);
 		}
 		return ret;
 	}
@@ -1253,19 +1203,17 @@ namespace kiwi
 	* 따라서 최종적으로 문자열 '나는 학교에 간다'로부터 {0, 0, 0, 1, 1, 1, 1, 2, 2}의 어절번호가
 	* 생성된다.
 	*
-	* @param sentence 어절번호를 생성할 문장.
-	* @return sentence 에 대한 어절번호를 담고있는 vector.
 	*/
 	template<class It>
-	const vector<uint16_t> getWordPositions(It first, It last)
+	void getWordPositions(Vector<uint16_t>& out, It first, It last)
 	{
-		vector<uint16_t> wordPositions(distance(first, last));
+		out.resize(distance(first, last));
 		uint32_t position = 0;
 		bool continuousSpace = false;
 
 		for (size_t i = 0; first != last; ++first, ++i)
 		{
-			wordPositions[i] = position;
+			out[i] = position;
 
 			if (isSpace(*first))
 			{
@@ -1277,8 +1225,6 @@ namespace kiwi
 				continuousSpace = false;
 			}
 		}
-
-		return wordPositions;
 	}
 
 	inline void concatTokens(TokenInfo& dest, const TokenInfo& src, POSTag tag)
@@ -1357,49 +1303,33 @@ namespace kiwi
 		return ++first;
 	}
 
-	std::vector<TokenResult> Kiwi::analyzeSent(const std::u16string::const_iterator& sBegin, const std::u16string::const_iterator& sEnd, 
+	inline void insertPathIntoResults(
+		vector<TokenResult>& ret, 
+		const Vector<std::pair<PathEvaluator::Path, float>>& pathes, 
 		size_t topN, 
-		Match matchOptions, 
-		bool openEnd, 
-		const std::unordered_set<const Morpheme*>* blocklist
-	) const
+		Match matchOptions,
+		bool integrateAllomorph,
+		const Vector<uint32_t>& positionTable,
+		const Vector<uint16_t>& wordPositions
+	)
 	{
-		auto normalized = normalizeHangulWithPosition(sBegin, sEnd);
-		auto& normalizedStr = normalized.first;
-		auto& positionTable = normalized.second;
-
-		if (!!(matchOptions & Match::normalizeCoda)) normalizeCoda(normalizedStr.begin(), normalizedStr.end());
-		// 분석할 문장에 포함된 개별 문자에 대해 어절번호를 생성한다
-		std::vector<uint16_t> wordPositions = getWordPositions(sBegin, sEnd);
-		
-		auto nodes = (*reinterpret_cast<FnSplitByTrie>(dfSplitByTrie))(
-			forms.data(), 
-			typoPtrs.data(), 
-			formTrie, 
-			normalizedStr, 
-			matchOptions, 
-			maxUnkFormSize, 
-			spaceTolerance, 
-			typoCostWeight
-		);
-		vector<TokenResult> ret;
-		if (nodes.size() <= 2)
+		if (ret.empty())
 		{
-			ret.emplace_back();
-			return ret;
+			ret.resize(pathes.size());
+		}
+		else if (ret.size() < pathes.size())
+		{
+			while (ret.size() < pathes.size())
+			{
+				auto b = ret.back();
+				ret.emplace_back(move(b));
+			}
 		}
 
-		Vector<std::pair<PathEvaluator::Path, float>> res = (*reinterpret_cast<FnFindBestPath>(dfFindBestPath))(
-			this, 
-			nodes, 
-			topN, 
-			openEnd, 
-			!!(matchOptions & Match::splitComplex), 
-			blocklist
-		);
-		for (auto& r : res)
+		for (size_t i = 0; i < pathes.size(); ++i)
 		{
-			vector<TokenInfo> rarr;
+			auto& r = pathes[i];
+			auto& rarr = ret[i].first;
 			const KString* prevMorph = nullptr;
 			for (auto& s : r.first)
 			{
@@ -1444,8 +1374,65 @@ namespace kiwi
 				prevMorph = s.morph->kform;
 			}
 			rarr.erase(joinAffixTokens(rarr.begin(), rarr.end(), matchOptions), rarr.end());
-			ret.emplace_back(rarr, r.second);
+			ret[i].second += r.second;
 		}
+	}
+
+	vector<TokenResult> Kiwi::analyze(const u16string& str, size_t topN, Match matchOptions, const std::unordered_set<const Morpheme*>* blocklist) const
+	{
+		thread_local KString normalizedStr;
+		thread_local Vector<uint32_t> positionTable;
+		normalizedStr.clear();
+		positionTable.clear();
+		normalizeHangulWithPosition(str.begin(), str.end(), back_inserter(normalizedStr), back_inserter(positionTable));
+
+		if (!!(matchOptions & Match::normalizeCoda)) normalizeCoda(normalizedStr.begin(), normalizedStr.end());
+		// 분석할 문장에 포함된 개별 문자에 대해 어절번호를 생성한다
+		thread_local Vector<uint16_t> wordPositions;
+		wordPositions.clear();
+		getWordPositions(wordPositions, str.begin(), str.end());
+		
+		vector<TokenResult> ret;
+		thread_local Vector<KGraphNode> nodes;
+		size_t splitEnd = 0;
+		while (splitEnd < normalizedStr.size())
+		{
+			nodes.clear();
+			splitEnd = (*reinterpret_cast<FnSplitByTrie>(dfSplitByTrie))(
+				nodes,
+				forms.data(),
+				typoPtrs.data(),
+				formTrie,
+				U16StringView{ normalizedStr.data() + splitEnd, normalizedStr.size() - splitEnd },
+				splitEnd,
+				matchOptions,
+				maxUnkFormSize,
+				spaceTolerance,
+				typoCostWeight
+			);
+
+			if (nodes.size() <= 2) continue;
+
+			Vector<std::pair<PathEvaluator::Path, float>> res = (*reinterpret_cast<FnFindBestPath>(dfFindBestPath))(
+				this,
+				nodes.data(),
+				nodes.size(),
+				topN,
+				false,
+				!!(matchOptions & Match::splitComplex),
+				blocklist
+			);
+
+			insertPathIntoResults(ret, res, topN, matchOptions, integrateAllomorph, positionTable, wordPositions);
+		}
+		
+		auto newlines = allNewLinePositions(str);
+		for (auto& r : ret)
+		{
+			fillPairedTokenInfo(r.first);
+			fillSentLineInfo(r.first, newlines);
+		}
+
 		if (ret.empty()) ret.emplace_back();
 		return ret;
 	}

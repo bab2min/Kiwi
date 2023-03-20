@@ -6,6 +6,8 @@
 #include <kiwi/PatternMatcher.h>
 #include <kiwi/FrozenTrie.h>
 
+#include "StrUtils.h"
+
 #ifdef KIWI_USE_BTREE
 
 #ifdef _WIN32
@@ -31,7 +33,8 @@ namespace kiwi
 
 	struct KGraphNode
 	{
-		KString uform;
+		//KString uform;
+		U16StringView uform;
 		const Form* form = nullptr;
 		uint32_t prev = 0, sibling = 0;
 		uint16_t startPos = 0, endPos = 0;
@@ -39,23 +42,23 @@ namespace kiwi
 		uint32_t typoFormId = 0;
 
 		KGraphNode(const Form* _form = nullptr, uint16_t _endPos = 0, float _typoCost = 0) : form(_form), endPos(_endPos), typoCost(_typoCost) {}
-		KGraphNode(const KString& _uform, uint16_t _endPos, float _typoCost = 0) : uform(_uform), endPos(_endPos), typoCost(_typoCost) {}
+		KGraphNode(U16StringView _uform, uint16_t _endPos, float _typoCost = 0) : uform(_uform), endPos(_endPos), typoCost(_typoCost) {}
 
 		KGraphNode* getPrev() { return prev ? this - prev : nullptr; }
 		const KGraphNode* getPrev() const { return prev ? this - prev : nullptr; }
 
 		KGraphNode* getSibling() { return sibling ? this + sibling : nullptr; }
 		const KGraphNode* getSibling() const { return sibling ? this + sibling : nullptr; }
-
-		static Vector<KGraphNode> removeUnconnected(const Vector<KGraphNode>& graph);
 	};
 
 	template<ArchType arch, bool typoTolerant = false>
-	Vector<KGraphNode> splitByTrie(
+	size_t splitByTrie(
+		Vector<KGraphNode>& out,
 		const Form* formBase,
 		const size_t* typoPtrs,
 		const utils::FrozenTrie<kchar_t, const Form*>& trie, 
-		const KString& str, 
+		U16StringView str, 
+		size_t startOffset,
 		Match matchOptions, 
 		size_t maxUnkFormSize, 
 		size_t spaceTolerance,

@@ -255,11 +255,26 @@ TEST(KiwiCpp, SentenceBoundaryErrors)
 		u8"집에 가용..",
 		u8"집에 갔어용..",
 		u8"bab2min.github.io/kiwipiepy",
+		u8"결국 슈퍼맨 역에 D.J. 코트로나, 배트맨 역에 아미 해머가 캐스팅 되었죠.",
+		u8"네이크업페이스 07. Kiss the orange 제품이예요.",
+		u8"1. 1리터 초대형 캔들 2명",
+		u8"2017. 12. 11. 공백 1차 심의결과가 종합적 검토를 위해 보류로 의결됨",
+		u8"2017.12.11. 1차 심의결과가 종합적 검토를 위해 보류로 의결됨",
+		u8"짤막 T.M.I : 이 그릴이 4천만원......",
+		u8"Dr. Octo가 진행한다.",
 		})
 	{
 		TokenResult res;
 		std::vector<std::pair<size_t, size_t>> sentRanges = kiwi.splitIntoSents(str, Match::allWithNormalizing, &res);
 		EXPECT_EQ(sentRanges.size(), 1);
+		if (sentRanges.size() > 1)
+		{
+			for (auto& r : sentRanges)
+			{
+				std::cerr << std::string{ &str[r.first], r.second - r.first } << std::endl;
+			}
+			std::cerr << std::endl;
+		}
 	}
 }
 
@@ -317,10 +332,14 @@ TEST(KiwiCpp, Pattern)
 	EXPECT_EQ(tokens[0].tag, POSTag::sn);
 	EXPECT_EQ(tokens[1].tag, POSTag::sf);
 
-	tokens = kiwi.analyze(u"123.", Match::none).first;
+	tokens = kiwi.analyze(u"123,456.", Match::none).first;
 	EXPECT_EQ(tokens.size(), 2);
 	EXPECT_EQ(tokens[0].tag, POSTag::sn);
 	EXPECT_EQ(tokens[1].tag, POSTag::sf);
+
+	tokens = kiwi.analyze(u"123.", Match::none).first;
+	EXPECT_EQ(tokens.size(), 1);
+	EXPECT_EQ(tokens[0].tag, POSTag::sn);
 
 	tokens = kiwi.analyze(u"1,234,567", Match::none).first;
 	EXPECT_EQ(tokens.size(), 1);
@@ -364,6 +383,14 @@ TEST(KiwiCpp, Pattern)
 	EXPECT_EQ(tokens[0].tag, POSTag::w_serial);
 
 	tokens = kiwi.analyze(u"2001/01/02에", Match::all).first;
+	EXPECT_EQ(tokens.size(), 2);
+	EXPECT_EQ(tokens[0].tag, POSTag::w_serial);
+
+	tokens = kiwi.analyze(u"2001. 01. 02에", Match::all).first;
+	EXPECT_EQ(tokens.size(), 2);
+	EXPECT_EQ(tokens[0].tag, POSTag::w_serial);
+
+	tokens = kiwi.analyze(u"2001. 01. 02. 에", Match::all).first;
 	EXPECT_EQ(tokens.size(), 2);
 	EXPECT_EQ(tokens[0].tag, POSTag::w_serial);
 
