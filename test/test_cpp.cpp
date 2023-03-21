@@ -96,7 +96,7 @@ TEST(KiwiCpp, SplitComplex)
 		auto testCases = {
 			//u"고맙습니다",
 			u"고마워합니다",
-			u"고마움",
+			u"고마움을",
 		};
 		for (auto s : testCases)
 		{
@@ -262,6 +262,12 @@ TEST(KiwiCpp, SentenceBoundaryErrors)
 		u8"2017.12.11. 1차 심의결과가 종합적 검토를 위해 보류로 의결됨",
 		u8"짤막 T.M.I : 이 그릴이 4천만원......",
 		u8"Dr. Octo가 진행한다.",
+		u8"좋겠다하는데",
+		u8"최다 우승팀이 되었다(3번 우승).",
+		u8"최고 기록이었다.[4][5]",
+		u8"이렇게 불편함 없이 드실 수 있어요.",
+		u8"이건 소설인가 실제인가라는 문구를 보고",
+		u8"이거 불편함.",
 		})
 	{
 		TokenResult res;
@@ -897,9 +903,9 @@ TEST(KiwiCpp, Quotation)
 	auto tokens = kiwi.analyze(u"그는 \"여러분 이거 다 거짓말인거 아시죠?\"라고 물으며 \"아무것도 모른다\"고 말했다.", Match::allWithNormalizing).first;
 	EXPECT_GE(tokens.size(), 26);
 	std::copy_if(tokens.begin(), tokens.end(), std::back_inserter(quotTokens), [](const TokenInfo& token)
-		{
-			return token.str == u"\"";
-		});
+	{
+		return token.str == u"\"";
+	});
 	EXPECT_EQ(quotTokens.size(), 4);
 	EXPECT_EQ(quotTokens[0].tag, POSTag::sso);
 	EXPECT_EQ(quotTokens[1].tag, POSTag::ssc);
@@ -909,17 +915,17 @@ TEST(KiwiCpp, Quotation)
 	tokens = kiwi.analyze(u"\"중첩된 인용부호, 그것은 '중복', '반복', '계속되는 되풀이'인 것이다.\"", Match::allWithNormalizing).first;
 	quotTokens.clear();
 	std::copy_if(tokens.begin(), tokens.end(), std::back_inserter(quotTokens), [](const TokenInfo& token)
-		{
-			return token.str == u"\"";
-		});
+	{
+		return token.str == u"\"";
+	});
 	EXPECT_EQ(quotTokens.size(), 2);
 	EXPECT_EQ(quotTokens[0].tag, POSTag::sso);
 	EXPECT_EQ(quotTokens[1].tag, POSTag::ssc);
 	quotTokens.clear();
 	std::copy_if(tokens.begin(), tokens.end(), std::back_inserter(quotTokens), [](const TokenInfo& token)
-		{
-			return token.str == u"'";
-		});
+	{
+		return token.str == u"'";
+	});
 	EXPECT_EQ(quotTokens.size(), 6);
 	EXPECT_EQ(quotTokens[0].tag, POSTag::sso);
 	EXPECT_EQ(quotTokens[1].tag, POSTag::ssc);
