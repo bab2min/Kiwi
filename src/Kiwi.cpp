@@ -1674,6 +1674,7 @@ namespace kiwi
 
 	u16string Kiwi::getTypoForm(size_t typoFormId) const
 	{
+		if (typoFormId >= typoPtrs.size()) return {};
 		const size_t* p = &typoPtrs[typoFormId];
 		return joinHangul(typoPool.begin() + p[0], typoPool.begin() + p[1]);
 	}
