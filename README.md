@@ -81,61 +81,60 @@ $ ldconfig
 설치가 잘 됐는지 확인하기 위해서는 `kiwi-evaluator`를 실행해봅니다.
 ```console
 $ ./kiwi-evaluator --model ../ModelGenerator ../eval_data/* --sbg
-
-Loading Time : 846.046 ms
+Loading Time : 981.745 ms
 ArchType : avx2
-LM Size : 33.6552 MB
-Mem Usage : 276.844 MB
+LM Size : 34.1853 MB
+Mem Usage : 278.129 MB
 
 Test file: eval_data/web.txt
-0.864955, 0.855184
-Total (158 lines) Time : 305.428 ms
-Time per Line : 1.93309 ms
-================
-Test file: eval_data/web_with_typos.txt
-0.780165, 0.741127
-Total (97 lines) Time : 96.5016 ms
-Time per Line : 0.994862 ms
+0.862114, 0.852863
+Total (158 lines) Time : 301.702 ms
+Time per Line : 1.9095 ms
 ================
 Test file: eval_data/written.txt
-0.941712, 0.943084
-Total (33 lines) Time : 59.7139 ms
-Time per Line : 1.80951 ms
+0.942892, 0.943506
+Total (33 lines) Time : 62.3999 ms
+Time per Line : 1.89091 ms
+================
+Test file: eval_data/web_with_typos.txt
+0.754417, 0.720886
+Total (97 lines) Time : 99.7661 ms
+Time per Line : 1.02852 ms
 ================
 
 ================
 Avg Score
-0.862277, 0.846465
+0.853141, 0.839085
 ================
 ```
 
 0.13.0 버전부터 추가된 오타 교정 기능이 잘 작동하는지 확인하기 위해서는 다음과 같이 실행합니다.
 ```console
 $ ./kiwi-evaluator --model ../ModelGenerator ../eval_data/* --sbg --typo 6
-Loading Time : 8726.69 ms
+Loading Time : 9414.45 ms
 ArchType : avx2
-LM Size : 33.6552 MB
-Mem Usage : 943.961 MB
+LM Size : 34.1853 MB
+Mem Usage : 693.945 MB
 
 Test file: eval_data/web.txt
-0.866503, 0.856685
-Total (158 lines) Time : 440.98 ms
-Time per Line : 2.79101 ms
-================
-Test file: eval_data/web_with_typos.txt
-0.906406, 0.897511
-Total (97 lines) Time : 167.255 ms
-Time per Line : 1.72428 ms
+0.86321, 0.85566
+Total (158 lines) Time : 432.236 ms
+Time per Line : 2.73567 ms
 ================
 Test file: eval_data/written.txt
-0.940534, 0.941794
-Total (33 lines) Time : 95.3002 ms
-Time per Line : 2.88788 ms
+0.941712, 0.942217
+Total (33 lines) Time : 95.3079 ms
+Time per Line : 2.88812 ms
+================
+Test file: eval_data/web_with_typos.txt
+0.869582, 0.865393
+Total (97 lines) Time : 169.416 ms
+Time per Line : 1.74656 ms
 ================
 
 ================
 Avg Score
-0.904481, 0.898663
+0.891501, 0.887757
 ================
 ```
 
@@ -165,6 +164,15 @@ https://github.com/bab2min/kiwi-gui 에서 다운받을 수 있습니다.
 
 
 ## 업데이트 내역
+* v0.15
+  * 둘 이상의 형태소로 더 잘게 분리될 수 있는 형태소를 추가 분리하는 옵션인 `splitComplex` 도입
+  * 부사파생접사를 위한 `XSM` 태그 추가 및 이에 해당하는 형태소 `-이`, `-히`, `-로`, `-스레` 추가
+  * 조사/어미에 덧붙는 받침을 위한 `Z_CODA` 태그 추가 및 조사/어미에서 자동으로 Z_CODA를 분절해내는 기능 추가
+  * 형태 분석 및 언어 모델 탐색 속도 최적화
+  * 옛한글 문자를 특수 기호로 분리하지 않고 일반 한글과 동일하게 처리하도록 개선
+  * 형태소 분석 기반의 Subword Tokenizer 구현 (현재 실험적으로 지원 중)
+  * 문장 분리 성능 개선
+
 * v0.14
   * `SS` 태그를 여는 태그(SSO)와 닫는 태그(SSC)로 세분화
   * `SSO` 태그로 시작하여 SSC 태그로 끝나는 범위 내에 포함된 문장을 '안긴문장'으로 처리하여 문장 분리 성능을 개선
@@ -280,15 +288,16 @@ https://github.com/bab2min/kiwi-gui 에서 다운받을 수 있습니다.
 <tr><td>ETN</td><td>명사형 전성 어미</td></tr>
 <tr><td>ETM</td><td>관형형 전성 어미</td></tr>
 <tr><th rowspan='1'>접두사</th><td>XPN</td><td>체언 접두사</td></tr>
-<tr><th rowspan='3'>접미사(XS)</th><td>XSN</td><td>명사 파생 접미사</td></tr>
+<tr><th rowspan='4'>접미사(XS)</th><td>XSN</td><td>명사 파생 접미사</td></tr>
 <tr><td>XSV</td><td>동사 파생 접미사</td></tr>
 <tr><td>XSA</td><td>형용사 파생 접미사</td></tr>
+<tr><td>XSM</td><td>부사 파생 접미사<sup>*</sup></td></tr>
 <tr><th rowspan='1'>어근</th><td>XR</td><td>어근</td></tr>
 <tr><th rowspan='11'>부호, 외국어, 특수문자(S)</th><td>SF</td><td>종결 부호(. ! ?)</td></tr>
 <tr><td>SP</td><td>구분 부호(, / : ;)</td></tr>
 <tr><td>SS</td><td>인용 부호 및 괄호(' " ( ) [ ] < > { } ― ‘ ’ “ ” ≪ ≫ 등)</td></tr>
-<tr><td>SSO</td><td>SS 중 여는 부호</td></tr>
-<tr><td>SSC</td><td>SS 중 닫는 부호</td></tr>
+<tr><td>SSO</td><td>SS 중 여는 부호<sup>*</sup></td></tr>
+<tr><td>SSC</td><td>SS 중 닫는 부호<sup>*</sup></td></tr>
 <tr><td>SE</td><td>줄임표(…)</td></tr>
 <tr><td>SO</td><td>붙임표(- ~)</td></tr>
 <tr><td>SW</td><td>기타 특수 문자</td></tr>
@@ -301,6 +310,7 @@ https://github.com/bab2min/kiwi-gui 에서 다운받을 수 있습니다.
 <tr><td>W_HASHTAG</td><td>해시태그(#abcd)<sup>*</sup></td></tr>
 <tr><td>W_MENTION</td><td>멘션(@abcd)<sup>*</sup></td></tr>
 <tr><td>W_SERIAL</td><td>일련번호(전화번호, 통장번호, IP주소 등)<sup>*</sup></td></tr>
+<tr><th rowspan='1'>기타</th><td>Z_CODA</td><td>덧붙은 받침<sup>*</sup></td></tr>
 </table>
 
 <sup>*</sup> 세종 품사 태그와 다른 독자적인 태그입니다.
