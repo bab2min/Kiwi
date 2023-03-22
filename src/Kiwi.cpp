@@ -229,9 +229,10 @@ namespace kiwi
 			sf,
 		} state = State::none;
 		size_t lastPosition = 0;
+		size_t lastLineNumber = 0;
 	public:
 
-		bool next(const TokenInfo& t, bool forceNewSent = false)
+		bool next(const TokenInfo& t, size_t lineNumber, bool forceNewSent = false)
 		{
 			bool ret = false;
 			if (forceNewSent)
@@ -274,6 +275,8 @@ namespace kiwi
 				case POSTag::jks:
 				case POSTag::jkv:
 				case POSTag::jx:
+				case POSTag::vcp:
+				case POSTag::etm:
 					if (t.tag == POSTag::jx && *t.morph->kform == u"요")
 					{
 						if (state == State::ef)
@@ -299,6 +302,8 @@ namespace kiwi
 				case POSTag::sf:
 				case POSTag::ssc:
 					break;
+				case POSTag::sso:
+					if (lineNumber == lastLineNumber) break;
 				default:
 					ret = true;
 					state = State::none;
@@ -316,6 +321,8 @@ namespace kiwi
 				case POSTag::sf:
 				case POSTag::ssc:
 					break;
+				case POSTag::sso:
+					if (lineNumber == lastLineNumber) break;
 				default:
 					ret = true;
 					state = State::none;
@@ -332,6 +339,13 @@ namespace kiwi
 				case POSTag::sp:
 				case POSTag::ssc:
 					break;
+				case POSTag::sso:
+					if (lineNumber != lastLineNumber)
+					{
+						ret = true;
+						state = State::none;
+					}
+					break;
 				case POSTag::sl:
 				case POSTag::sn:
 					if (lastPosition == t.position)
@@ -347,6 +361,7 @@ namespace kiwi
 				break;
 			}
 			lastPosition = t.position + t.length;
+			lastLineNumber = lineNumber;
 			return ret;
 		}
 	};
@@ -356,9 +371,9 @@ namespace kiwi
 		SentenceParser sp;
 		for (; first != last; ++first)
 		{
-			if (sp.next(*first)) return true;
+			if (sp.next(*first, 0)) return true;
 		}
-		return sp.next({});
+		return sp.next({}, 0);
 	}
 
 	inline bool isNestedLeft(const TokenInfo& t)
@@ -380,18 +395,18 @@ namespace kiwi
 		* 문장 분리 기준
 		* 1) 종결어미(ef) (요/jx)? (z_coda)? (so|sw|sh|sp|se|sf|(닫는 괄호))*
 		* 2) 종결구두점(sf) (so|sw|sh|sp|se|(닫는 괄호))*
-		* 3) 단 종결어미(ef) 바로 다음에 '요'가 아닌 조사(j)나 보조용언(vx)이 뒤따르는 경우는 제외
+		* 3) 단 종결어미(ef) 바로 다음에 '요'가 아닌 조사(j)나 보조용언(vx), vcp, etm이 뒤따르는 경우는 제외
 		*/
 
 		SentenceParser sp;
 		uint32_t sentPos = 0, lastSentPos = 0, subSentPos = 0, accumSubSent = 1, accumWordPos = 0, lastWordPos = 0;
-		size_t nlPos = 0, lastNlPos = 0, nestedEnd = 0;
+		size_t nlPos = 0, lastNlPos = 0, nestedSentEnd = 0, nestedEnd = 0;
 		for (size_t i = 0; i < tokens.size(); ++i)
 		{
 			auto& t = tokens[i];
-			if (sp.next(t, nestedEnd && i == nestedEnd))
+			if ((i >= nestedEnd) && sp.next(t, nlPos, nestedSentEnd && i == nestedSentEnd))
 			{
-				if (nestedEnd)
+				if (nestedSentEnd)
 				{
 					subSentPos++;
 					accumSubSent++;
@@ -403,16 +418,26 @@ namespace kiwi
 				}
 			}
 
-			if (!nestedEnd && t.tag == POSTag::sso && t.pairedToken != (uint32_t)-1
-				&& hasSentences(&tokens[i], &tokens[t.pairedToken])
-				&& ((t.pairedToken + 1 < tokens.size() && isNestedRight(tokens[t.pairedToken + 1]))
-					|| (i > 0 && isNestedLeft(tokens[i - 1])))
-				)
+			if (!nestedSentEnd && !nestedEnd && t.tag == POSTag::sso && t.pairedToken != (uint32_t)-1)
 			{
-				nestedEnd = t.pairedToken;
-				subSentPos = accumSubSent;
+				if (!hasSentences(&tokens[i], &tokens[t.pairedToken]))
+				{
+					nestedEnd = t.pairedToken;
+					subSentPos = 0;
+				}
+				else if ((t.pairedToken + 1 < tokens.size() && isNestedRight(tokens[t.pairedToken + 1]))
+						|| (i > 0 && isNestedLeft(tokens[i - 1])))
+				{
+					nestedSentEnd = t.pairedToken;
+					subSentPos = accumSubSent;
+				}
 			}
-			else if (nestedEnd && i > nestedEnd)
+			else if (nestedSentEnd && i > nestedSentEnd)
+			{
+				nestedSentEnd = 0;
+				subSentPos = 0;
+			}
+			else if (nestedEnd && i >= nestedEnd)
 			{
 				nestedEnd = 0;
 				subSentPos = 0;
@@ -421,12 +446,12 @@ namespace kiwi
 			while (nlPos < newlines.size() && newlines[nlPos] < t.position) nlPos++;
 			
 			t.lineNumber = (uint32_t)nlPos;
-			if (nlPos > lastNlPos + 1 && sentPos == lastSentPos && !nestedEnd)
+			if (nlPos > lastNlPos + 1 && sentPos == lastSentPos && !nestedSentEnd)
 			{
 				sentPos++;
 			}
 			t.sentPosition = sentPos;
-			t.subSentPosition = (i == nestedEnd || i == tokens[nestedEnd].pairedToken) ? 0 : subSentPos;
+			t.subSentPosition = (i == nestedSentEnd || i == tokens[nestedSentEnd].pairedToken) ? 0 : subSentPos;
 			
 			if (sentPos != lastSentPos)
 			{
@@ -1649,6 +1674,7 @@ namespace kiwi
 
 	u16string Kiwi::getTypoForm(size_t typoFormId) const
 	{
+		if (typoFormId >= typoPtrs.size()) return {};
 		const size_t* p = &typoPtrs[typoFormId];
 		return joinHangul(typoPool.begin() + p[0], typoPool.begin() + p[1]);
 	}

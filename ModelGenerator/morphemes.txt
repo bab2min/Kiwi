@@ -11153,6 +11153,7 @@ LG전자	NNP	119
 중등	NNG	114
 어이	IC	114
 ᆷ	EC	114	vocalic
+ᆷ	EF	114	vocalic
 ᆸ니다만	EC	114	vocalic
 동아	NNP	114
 소위	NNG	114
@@ -13804,7 +13805,8 @@ SK텔레콤	NNP	103
 출목	NNG	83
 신기하	VA	82	complex 신기/XR 하/XSA 0223
 카	VV	82
-음	EC	82
+음	EC	82	non_vowel	==ᆷ
+음	EF	82	non_vowel	==ᆷ
 우러나오	VV	82
 반대쪽	NNG	82
 집게	NNG	82
