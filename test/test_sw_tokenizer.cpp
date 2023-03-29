@@ -53,11 +53,14 @@ TEST(KiwiSwTokenizer, Builder)
 
 	std::string inp, reconstructed;
 	std::vector<uint32_t> res;
+	std::vector<std::pair<uint32_t, uint32_t>> offsets;
 	
 	{
 		inp = u8"말한 옛사람을 생각했어..";
-		res = tokenizer.encode(inp);
+		offsets.clear();
+		res = tokenizer.encode(inp, &offsets);
 		EXPECT_EQ(res, std::vector<uint32_t>({ 9, 1, 5, 11, 8, 7, 10, 1, 6, 3, 2, 2 }));
+		EXPECT_EQ(res.size(), offsets.size());
 
 		reconstructed = tokenizer.decode(res);
 		EXPECT_EQ(reconstructed, inp);
@@ -65,8 +68,10 @@ TEST(KiwiSwTokenizer, Builder)
 
 	{
 		inp = u8"옛 생각";
-		res = tokenizer.encode(inp);
+		offsets.clear();
+		res = tokenizer.encode(inp, &offsets);
 		EXPECT_EQ(res, std::vector<uint32_t>({ 11, 10 }));
+		EXPECT_EQ(res.size(), offsets.size());
 
 		reconstructed = tokenizer.decode(res);
 		EXPECT_EQ(reconstructed, inp);
@@ -74,8 +79,10 @@ TEST(KiwiSwTokenizer, Builder)
 
 	{
 		inp = u8"옛생각";
-		res = tokenizer.encode(inp);
+		offsets.clear();
+		res = tokenizer.encode(inp, &offsets);
 		EXPECT_EQ(res, std::vector<uint32_t>({ 11, 12, 10 }));
+		EXPECT_EQ(res.size(), offsets.size());
 
 		reconstructed = tokenizer.decode(res);
 		EXPECT_EQ(reconstructed, inp);
@@ -83,8 +90,10 @@ TEST(KiwiSwTokenizer, Builder)
 
 	{
 		inp = u8"[CLS] 잘 모르는 단어";
-		res = tokenizer.encode(inp);
+		offsets.clear();
+		res = tokenizer.encode(inp, &offsets);
 		EXPECT_EQ(res, std::vector<uint32_t>({ 13, 0, 0, 0 }));
+		EXPECT_EQ(res.size(), offsets.size());
 
 		reconstructed = tokenizer.decode(res);
 		EXPECT_EQ(reconstructed, u8"[CLS] [UNK] [UNK] [UNK]");
