@@ -263,5 +263,6 @@ namespace kiwi
 		}
 	};
 
+	std::ifstream& openFile(std::ifstream& f, const std::string& filePath, std::ios_base::openmode mode = std::ios_base::in);
 }
 

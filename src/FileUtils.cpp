@@ -3,14 +3,17 @@
 #include <fstream>
 #include <string>
 #include <kiwi/Types.h>
+#include <kiwi/Utils.h>
 #include "StrUtils.h"
+
+using namespace std;
 
 namespace kiwi
 {
-	inline std::ifstream& openFile(std::ifstream& f, const std::string& filePath, std::ios_base::openmode mode = std::ios_base::in)
+	ifstream& openFile(ifstream& f, const string& filePath, ios_base::openmode mode)
 	{
 		auto exc = f.exceptions();
-		f.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+		f.exceptions(ifstream::failbit | ifstream::badbit);
 		try
 		{
 #if defined(_WIN32) || defined(_WIN64)
@@ -19,7 +22,7 @@ namespace kiwi
 			f.open(filePath, mode);
 #endif
 		}
-		catch (const std::ios_base::failure&)
+		catch (const ios_base::failure&)
 		{
 			throw Exception{ "Cannot open file : " + filePath };
 		}
