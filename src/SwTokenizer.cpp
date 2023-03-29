@@ -262,7 +262,7 @@ namespace kiwi
 		return make_pair(nullptr, nullptr);
 	}
 
-	template<ArchType arch>
+	template<ArchType arch, bool generateOffset>
 	bool tokenizeSubword(
 		const SwTokenizerConfig& config,
 		const utils::FrozenTrie<kchar_t, uint32_t>& trie,
@@ -273,10 +273,13 @@ namespace kiwi
 		size_t glueTokenId,
 		U16StringView str,
 		bool spacePrefix,
-		std::vector<uint32_t>& out
+		vector<uint32_t>& out,
+		vector<pair<uint32_t, uint32_t>>* offset,
+		uint32_t offsetBias
 	)
 	{
 		Vector<pair<Vector<uint32_t>, float>> pathes, cands;
+		Vector<Vector<uint32_t>> pathesEndPtr, candsEndPtr;
 		auto node = trie.root();
 		if (spacePrefix) node = node->template nextOpt<arch>(trie, u' ');
 		for (size_t i = 0; i < str.size(); ++i)
@@ -294,21 +297,29 @@ namespace kiwi
 				if (config.wholeTokenUnk)
 				{
 					pathes.emplace_back();
+					if (generateOffset) pathesEndPtr.emplace_back();
 				}
 				else
 				{
 					if (pathes.empty())
 					{
-						pathes.emplace_back(Vector<uint32_t>(1, unkTokenId), -100);
+						pathes.emplace_back(Vector<uint32_t>{ (uint32_t)unkTokenId }, -100);
+						if (generateOffset) pathesEndPtr.emplace_back(Vector<uint32_t>{ (uint32_t)(i + 1) });
 					}
 					else
 					{
 						auto v = pathes.back().first;
 						auto s = pathes.back().second;
+						if (generateOffset) pathesEndPtr.push_back(pathesEndPtr.back());
 						if (v.back() != unkTokenId)
 						{
 							v.emplace_back(unkTokenId);
 							s -= 100;
+							if (generateOffset) pathesEndPtr.back().emplace_back(i + 1);
+						}
+						else
+						{
+							if (generateOffset) pathesEndPtr.back().back() = i + 1;
 						}
 						pathes.emplace_back(move(v), s);
 					}
@@ -319,6 +330,7 @@ namespace kiwi
 			size_t v = nnode->val(trie);
 
 			cands.clear();
+			if (generateOffset) candsEndPtr.clear();
 			if (trie.hasMatch(v))
 			{
 				auto tokenId = v - 1;
@@ -327,7 +339,8 @@ namespace kiwi
 				{
 					if (p.flags != SwTokenFlag::glue)
 					{
-						cands.emplace_back(Vector<uint32_t>((size_t)1, (uint32_t)tokenId), tokenLProbs[tokenId]);
+						cands.emplace_back(Vector<uint32_t>{ (uint32_t)tokenId }, tokenLProbs[tokenId]);
+						if (generateOffset) candsEndPtr.emplace_back(Vector<uint32_t>{ (uint32_t)(i + 1) });
 					}
 				}
 				else
@@ -340,13 +353,17 @@ namespace kiwi
 					))
 					{
 						cands.emplace_back(l);
+						if (generateOffset) candsEndPtr.emplace_back(pathesEndPtr[i - p.length]);
+
 						if (p.flags == SwTokenFlag::none)
 						{
 							cands.back().first.emplace_back(glueTokenId);
 							cands.back().second += tokenLProbs[glueTokenId];
+							if (generateOffset) candsEndPtr.back().emplace_back(i - p.length + 1);
 						}
 						cands.back().first.emplace_back(tokenId);
 						cands.back().second += tokenLProbs[tokenId];
+						if (generateOffset) candsEndPtr.back().emplace_back(i + 1);
 					}
 				}
 			}
@@ -369,13 +386,16 @@ namespace kiwi
 						))
 						{
 							cands.emplace_back(l);
+							if (generateOffset) candsEndPtr.emplace_back(pathesEndPtr[i - p.length]);
 							if (p.flags == SwTokenFlag::none)
 							{
 								cands.back().first.emplace_back(glueTokenId);
 								cands.back().second += tokenLProbs[glueTokenId];
+								if (generateOffset) candsEndPtr.back().emplace_back(i - p.length + 1);
 							}
 							cands.back().first.emplace_back(tokenId);
 							cands.back().second += tokenLProbs[tokenId];
+							if (generateOffset) candsEndPtr.back().emplace_back(i + 1);
 						}
 					}
 				}
@@ -386,21 +406,29 @@ namespace kiwi
 				if (config.wholeTokenUnk)
 				{
 					pathes.emplace_back();
+					if (generateOffset) pathesEndPtr.emplace_back();
 				}
 				else
 				{
 					if (pathes.empty())
 					{
-						pathes.emplace_back(Vector<uint32_t>(1, unkTokenId), -100);
+						pathes.emplace_back(Vector<uint32_t>{ (uint32_t)unkTokenId }, -100);
+						if (generateOffset) pathesEndPtr.emplace_back(Vector<uint32_t>{ (uint32_t)(i + 1) });
 					}
 					else
 					{
 						auto v = pathes.back().first;
 						auto s = pathes.back().second;
+						if (generateOffset) pathesEndPtr.push_back(pathesEndPtr.back());
 						if (v.back() != unkTokenId)
 						{
 							v.emplace_back(unkTokenId);
 							s -= 100;
+							if (generateOffset) pathesEndPtr.back().emplace_back(i + 1);
+						}
+						else
+						{
+							if (generateOffset) pathesEndPtr.back().back() = i + 1;
 						}
 						pathes.emplace_back(move(v), s);
 					}
@@ -417,6 +445,7 @@ namespace kiwi
 					}
 				}
 				pathes.emplace_back(move(cands[bestPath]));
+				if (generateOffset) pathesEndPtr.emplace_back(move(candsEndPtr[bestPath]));
 			}
 			node = nnode;
 		}
@@ -424,23 +453,33 @@ namespace kiwi
 		if (pathes.back().first.empty())
 		{
 			out.emplace_back(unkTokenId);
+			if (generateOffset) offset->emplace_back(offsetBias, offsetBias + str.size());
 			return false;
 		}
 		else
 		{
 			out.insert(out.end(), pathes.back().first.begin(), pathes.back().first.end());
+			if (generateOffset)
+			{
+				auto& p = pathesEndPtr.back();
+				for (size_t i = 0; i < p.size(); ++i)
+				{
+					offset->emplace_back(offsetBias + (i ? p[i - 1] : 0), offsetBias + p[i]);
+				}
+			}
 			return true;
 		}
 	}
 
-	using FnTokenizeSubword = decltype(&tokenizeSubword<ArchType::none>);
+	using FnTokenizeSubword = decltype(&tokenizeSubword<ArchType::none, false>);
 
+	template<bool generateOffset>
 	struct TokenizeSubwordGetter
 	{
 		template<ptrdiff_t i>
 		struct Wrapper
 		{
-			static constexpr FnTokenizeSubword value = &tokenizeSubword<static_cast<ArchType>(i)>;
+			static constexpr FnTokenizeSubword value = &tokenizeSubword<static_cast<ArchType>(i), generateOffset>;
 		};
 	};
 }
@@ -461,7 +500,7 @@ void SwTokenizerBuilder::addToken(const char* form, POSTag tag, SwTokenFlag flag
 	tokens.emplace_back(form, tag, flags, lprob);
 }
 
-void SwTokenizerBuilder::addToken(const std::string& form, POSTag tag, SwTokenFlag flags, float lprob)
+void SwTokenizerBuilder::addToken(const string& form, POSTag tag, SwTokenFlag flags, float lprob)
 {
 	tokens.emplace_back(form, tag, flags, lprob);
 }
@@ -586,7 +625,7 @@ SwTokenizer SwTokenizerBuilder::build() const
 
 	ret.trie = utils::freezeTrie(move(trie), bestArch);
 
-	Vector<std::pair<KString, uint32_t>> eomiSuffices;
+	Vector<pair<KString, uint32_t>> eomiSuffices;
 	Vector<const Morpheme*> verbalSuffices;
 	for (size_t i = 0; i < kiwi->getMorphemeSize(); ++i)
 	{
@@ -610,8 +649,8 @@ SwTokenizer SwTokenizerBuilder::build() const
 		return a->kform->size() > b->kform->size();
 	});
 
-	std::vector<const Morpheme*> foundMorphs;
-	std::vector<uint32_t> buf;
+	vector<const Morpheme*> foundMorphs;
+	vector<uint32_t> buf;
 	for (size_t i = 0; i < kiwi->getMorphemeSize(); ++i)
 	{
 		auto morph = kiwi->idToMorph(i);
@@ -662,11 +701,14 @@ SwTokenizer SwTokenizerBuilder::build() const
 
 SwTokenizer::SwTokenizer(ArchType archType)
 {
-	static tp::Table<FnTokenizeSubword, AvailableArch> table{ TokenizeSubwordGetter{} };
+	static tp::Table<FnTokenizeSubword, AvailableArch> table{ TokenizeSubwordGetter<false>{} };
+	static tp::Table<FnTokenizeSubword, AvailableArch> tableWithOffset{ TokenizeSubwordGetter<true>{} };
 	if (archType != ArchType::default_)
 	{
 		dfTokenizeSubword = reinterpret_cast<void*>(table[static_cast<ptrdiff_t>(archType)]);
-		if (!dfTokenizeSubword) throw Exception{ string{ "Unsupported archType: " } + archToStr(archType) };
+		dfTokenizeSubwordWithOffset = reinterpret_cast<void*>(tableWithOffset[static_cast<ptrdiff_t>(archType)]);
+
+		if (!dfTokenizeSubword || !dfTokenizeSubwordWithOffset) throw Exception{ string{ "Unsupported archType: " } + archToStr(archType) };
 	}
 }
 
@@ -714,29 +756,54 @@ vector<uint32_t> SwTokenizer::encode(const string& str, vector<pair<uint32_t, ui
 
 bool SwTokenizer::tokenizeSubword(U16StringView str,
 	bool spacePrefix,
-	std::vector<uint32_t>& out) const
+	vector<uint32_t>& out,
+	vector<pair<uint32_t, uint32_t>>* offset,
+	uint32_t offsetBias
+) const
 {
-	return reinterpret_cast<FnTokenizeSubword>(dfTokenizeSubword)(
-		config, trie,
-		vocab.vocabs, tokenFallbacks, tokenLProbs,
-		specialTokenIds[SwTokenizerConfig::unk], specialTokenIds[SwTokenizerConfig::glue],
-		str,
-		spacePrefix,
-		out
-	);
+	if (offset)
+	{
+		return reinterpret_cast<FnTokenizeSubword>(dfTokenizeSubwordWithOffset)(
+			config, trie,
+			vocab.vocabs, tokenFallbacks, tokenLProbs,
+			specialTokenIds[SwTokenizerConfig::unk], specialTokenIds[SwTokenizerConfig::glue],
+			str,
+			spacePrefix,
+			out,
+			offset,
+			offsetBias
+		);
+	}
+	else
+	{
+		return reinterpret_cast<FnTokenizeSubword>(dfTokenizeSubword)(
+			config, trie,
+			vocab.vocabs, tokenFallbacks, tokenLProbs,
+			specialTokenIds[SwTokenizerConfig::unk], specialTokenIds[SwTokenizerConfig::glue],
+			str,
+			spacePrefix,
+			out,
+			offset,
+			offsetBias
+		);
+	}
+	
 }
 
-void SwTokenizer::encode(std::vector<uint32_t>& ret, const std::string& str, std::vector<std::pair<uint32_t, uint32_t>>* offset) const
+void SwTokenizer::encode(vector<uint32_t>& ret, const string& str, vector<pair<uint32_t, uint32_t>>* offset) const
 {
-	auto tokens = kiwi->analyze(str, Match::normalizeCoda | Match::zCoda).first;
+	Vector<size_t> bytePositions;
+	auto tokens = kiwi->analyze(utf8To16(str, bytePositions), Match::normalizeCoda | Match::zCoda).first;
+	bytePositions.emplace_back(str.size());
 	auto* baseMorph = kiwi->idToMorph(0);
 	size_t startPosition = -1, lastPosition = -1;
+	size_t offsetStart = offset ? offset->size() : 0;
 	u16string tokenBuf;
 	bool spacePrefix = true;
 	const auto pushSubwords = [&]()
 	{
 		if (startPosition == -1) return;
-		auto success = tokenizeSubword(tokenBuf, spacePrefix, ret);
+		auto success = tokenizeSubword(tokenBuf, spacePrefix, ret, offset, startPosition);
 		tokenBuf.clear();
 	};
 
@@ -748,6 +815,7 @@ void SwTokenizer::encode(std::vector<uint32_t>& ret, const std::string& str, std
 		{
 			pushSubwords();
 			ret.emplace_back(morphToSw[id]);
+			if (offset) offset->emplace_back(t.position, t.position + t.length);
 			startPosition = -1;
 			lastPosition = t.position + t.length;
 			continue;
@@ -759,6 +827,13 @@ void SwTokenizer::encode(std::vector<uint32_t>& ret, const std::string& str, std
 		{
 			pushSubwords();
 			ret.insert(ret.end(), it->second.begin(), it->second.end());
+			if (offset)
+			{
+				for (size_t i = 0; i < it->second.size(); ++i)
+				{
+					offset->emplace_back(t.position, t.position + t.length);
+				}
+			}
 			startPosition = -1;
 			lastPosition = t.position + t.length;
 			continue;
@@ -769,12 +844,18 @@ void SwTokenizer::encode(std::vector<uint32_t>& ret, const std::string& str, std
 			if (t.morph->complex)
 			{
 				pushSubwords();
+				size_t i = 0;
 				for (auto m : t.morph->chunks)
 				{
 					id = m - baseMorph;
 					if (id < morphToSw.size() && morphToSw[id] != -1)
 					{
 						ret.emplace_back(morphToSw[id]);
+						if (offset)
+						{
+							auto p = t.morph->chunks.getSecond(i);
+							offset->emplace_back(t.position + p.first, t.position + p.first + p.second);
+						}
 					}
 					else
 					{
@@ -783,6 +864,7 @@ void SwTokenizer::encode(std::vector<uint32_t>& ret, const std::string& str, std
 						spacePrefix = true;
 						pushSubwords();
 					}
+					++i;
 				}
 				startPosition = -1;
 				lastPosition = t.position + t.length;
@@ -799,17 +881,24 @@ void SwTokenizer::encode(std::vector<uint32_t>& ret, const std::string& str, std
 			if (t.morph->complex)
 			{
 				pushSubwords();
+				size_t i = 0;
 				for (auto m : t.morph->chunks)
 				{
 					id = m - baseMorph;
 					if (id < morphToSw.size() && morphToSw[id] != -1)
 					{
 						ret.emplace_back(morphToSw[id]);
+						if (offset)
+						{
+							auto p = t.morph->chunks.getSecond(i);
+							offset->emplace_back(t.position + p.first, t.position + p.first + p.second);
+						}
 					}
 					else
 					{
 						// to do
 					}
+					++i;
 				}
 				startPosition = -1;
 				lastPosition = t.position + t.length;
@@ -834,6 +923,15 @@ void SwTokenizer::encode(std::vector<uint32_t>& ret, const std::string& str, std
 		}
 	}
 	pushSubwords();
+	
+	if (offset)
+	{
+		for (size_t i = offsetStart; i < offset->size(); ++i)
+		{
+			(*offset)[i].first = bytePositions[(*offset)[i].first];
+			(*offset)[i].second = bytePositions[(*offset)[i].second];
+		}
+	}
 }
 
 string SwTokenizer::decode(const vector<uint32_t>& ids) const
@@ -841,7 +939,7 @@ string SwTokenizer::decode(const vector<uint32_t>& ids) const
 	auto joiner = kiwi->newJoiner(false);
 	for (auto id : ids)
 	{
-		// to do: detect best ambiguous tags in simpleTag mode
+		// to do: detect the best tag from ambiguous tags in simpleTag mode
 		// morpheme
 		if (id < swToMorph.size() && swToMorph[id] != -1)
 		{
@@ -855,9 +953,28 @@ string SwTokenizer::decode(const vector<uint32_t>& ids) const
 		joiner.add(U16StringView{ v.form, v.length }, insertSpace ? POSTag::p : POSTag::unknown);
 	}
 	return joiner.getU8();
+	
 }
 
-std::ostream& SwTokenizer::save(std::ostream& ostr) const
+future<vector<uint32_t>> SwTokenizer::asyncEncode(const string& str) const
+{
+	return kiwi->getThreadPool()->enqueue([&](size_t)
+	{
+		return encode(str);
+	});
+}
+
+future<pair<vector<uint32_t>, vector<pair<uint32_t, uint32_t>>>> SwTokenizer::asyncEncodeOffset(const string& str) const
+{
+	return kiwi->getThreadPool()->enqueue([&](size_t)
+	{
+		vector<pair<uint32_t, uint32_t>> offset;
+		auto ids = encode(str, &offset);
+		return make_pair(move(ids), move(offset));
+	});
+}
+
+ostream& SwTokenizer::save(ostream& ostr) const
 {
 	nlohmann::json j;
 	j["version"] = "1.0";
@@ -908,7 +1025,7 @@ std::ostream& SwTokenizer::save(std::ostream& ostr) const
 	return ostr;
 }
 
-SwTokenizer SwTokenizer::load(const Kiwi& kiwi, std::istream& istr)
+SwTokenizer SwTokenizer::load(const Kiwi& kiwi, istream& istr)
 {
 	auto j = nlohmann::json::parse(istr);
 	if (!j["decoder"].is_object()) throw Exception{ "Missing key 'decoder'" };
@@ -1255,8 +1372,8 @@ size_t UnigramSwTrainer::_addSentences(Feeder&& feeder)
 	{
 		auto s = feeder();
 		if (s.empty()) break;
-		auto s16 = toUTF16(std::move(s));
-		futures.emplace_back(kiwi->asyncAnalyzeEcho(std::move(s16), Match::normalizeCoda | Match::zCoda));
+		auto s16 = toUTF16(move(s));
+		futures.emplace_back(kiwi->asyncAnalyzeEcho(move(s16), Match::normalizeCoda | Match::zCoda));
 		if (futures.size() > kiwi->getNumThreads() * 4 && !futures.empty())
 		{
 			receiveResult();
@@ -1677,12 +1794,12 @@ pair<Vector<uint32_t>, float> UnigramSwTrainer::tokenizeBest(U16StringView s, bo
 		static constexpr size_t maxBoundaries = 5;
 		Vector<int32_t> subBoundaries;
 		float glueScore = prefixLProbs[knownPrefixSize];
-		for (size_t j = 0; j < std::min(boundaries->size(), maxBoundaries); ++j)
+		for (size_t j = 0; j < min(boundaries->size(), maxBoundaries); ++j)
 		{
 			auto b = (*boundaries)[j];
 			if (b >= s.size() || b == 0) continue;
 			subBoundaries.clear();
-			for (size_t k = j + 1; k < std::min(boundaries->size(), maxBoundaries); ++k)
+			for (size_t k = j + 1; k < min(boundaries->size(), maxBoundaries); ++k)
 			{
 				subBoundaries.emplace_back((*boundaries)[k] - b);
 			}
@@ -1805,7 +1922,7 @@ float UnigramSwTrainer::updateProb(bool init)
 	double totCntF = totCnt;
 	for (size_t i = 0; i < prefixFreqs.size(); ++i)
 	{
-		prefixLProbs[i] = std::log(prefixFreqs[i] / totCntF * discnt + smoothing);
+		prefixLProbs[i] = log(prefixFreqs[i] / totCntF * discnt + smoothing);
 	}
 
 	if (config.useGlueToken && init)
@@ -1831,7 +1948,7 @@ size_t UnigramSwTrainer::reduceVocab(float ratio, size_t minVocabSize)
 	if (minVocabSize == 0) minVocabSize = config.vocabSize;
 	if (minVocabSize < config.numSpecialTokens())
 	{
-		throw std::invalid_argument{ "`minVocabSize` must be greater than `numSpecialTokens()`" };
+		throw invalid_argument{ "`minVocabSize` must be greater than `numSpecialTokens()`" };
 	}
 	minVocabSize -= config.numSpecialTokens();
 
@@ -1966,7 +2083,7 @@ SwTokenizer UnigramSwTrainer::build() const
 	return builder.build();
 }
 
-std::ostream& UnigramSwTrainer::writeTokenizer(std::ostream& os) const
+ostream& UnigramSwTrainer::writeTokenizer(ostream& os) const
 {
 	return build().save(os);
 }

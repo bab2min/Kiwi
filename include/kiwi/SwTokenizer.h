@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include <future>
+
 #include "Types.h"
 #include "FrozenTrie.h"
 #include "Utils.h"
@@ -147,6 +149,7 @@ namespace kiwi
 
 		friend class SwTokenizerBuilder;
 		void* dfTokenizeSubword = nullptr;
+		void* dfTokenizeSubwordWithOffset = nullptr;
 		const Kiwi* kiwi = nullptr;
 		SwTokenizerConfig config;
 		Vocab vocab;
@@ -161,7 +164,9 @@ namespace kiwi
 		bool tokenizeSubword(
 			U16StringView str,
 			bool spacePrefix, 
-			std::vector<uint32_t>& out
+			std::vector<uint32_t>& out,
+			std::vector<std::pair<uint32_t, uint32_t>>* offset = nullptr,
+			uint32_t offsetBias = 0
 		) const;
 
 	public:
@@ -183,6 +188,10 @@ namespace kiwi
 		void encode(std::vector<uint32_t>& out, const std::string& str, std::vector<std::pair<uint32_t, uint32_t>>* offset = nullptr) const;
 		std::vector<uint32_t> encode(const std::string& str, std::vector<std::pair<uint32_t, uint32_t>>* offset = nullptr) const;
 		std::string decode(const std::vector<uint32_t>& ids) const;
+
+		std::future<std::vector<uint32_t>> asyncEncode(const std::string& str) const;
+		std::future<std::pair<std::vector<uint32_t>, std::vector<std::pair<uint32_t, uint32_t>>>> asyncEncodeOffset(const std::string& str) const;
+
 		const SwTokenizerConfig& getConfig() const { return config; }
 		const std::string& getSpecialToken(SwTokenizerConfig::SpecialToken token) const { return config.specialTokens[token]; }
 		size_t getSpecialTokenId(SwTokenizerConfig::SpecialToken token) const { return specialTokenIds[token]; }

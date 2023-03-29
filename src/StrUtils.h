@@ -176,7 +176,8 @@ namespace kiwi
 		return ret;
 	}
 
-	inline std::u16string utf8To16(nonstd::string_view str, std::vector<size_t>& bytePositions)
+	template<class Ty, class Alloc>
+	inline std::u16string utf8To16(nonstd::string_view str, std::vector<Ty, Alloc>& bytePositions)
 	{
 		std::u16string ret;
 		bytePositions.clear();
