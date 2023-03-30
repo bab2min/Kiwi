@@ -674,7 +674,10 @@ SwTokenizer SwTokenizerBuilder::build() const
 						auto j = kiwi->morphToId(m);
 						if (j < ret.morphToSw.size() && ret.morphToSw[j] != -1)
 						{
-							ret.splitCands.emplace(i, Vector<uint32_t>{ ret.morphToSw[j], p.second });
+							ret.splitCands.emplace(i, SwTokenizer::SplittedWord{ 
+								Vector<uint32_t>{ ret.morphToSw[j], p.second },
+								Vector<uint32_t>{ (uint32_t)(f.size() - p.first.size()), (uint32_t)f.size() }
+							});
 							goto endSplitEomi;
 						}
 					}
@@ -688,11 +691,18 @@ SwTokenizer SwTokenizerBuilder::build() const
 			if (!suffix) continue;
 			auto prefix = morph->kform->substr(0, morph->kform->size() - suffix->kform->size());
 			buf.clear();
-			ret.tokenizeSubword(joinHangul(prefix), true, buf);
+			vector<pair<uint32_t, uint32_t>> offsets;
+			ret.tokenizeSubword(joinHangul(prefix), true, buf, &offsets);
 			Vector<uint32_t> tokenized;
+			Vector<uint32_t> boundaries;
 			tokenized.insert(tokenized.end(), buf.begin(), buf.end());
 			tokenized.emplace_back(ret.morphToSw[kiwi->morphToId(suffix)]);
-			ret.splitCands.emplace(i, move(tokenized));
+			for (auto& p : offsets) boundaries.emplace_back(p.second);
+			boundaries.emplace_back(morph->kform->size());
+			ret.splitCands.emplace(i, SwTokenizer::SplittedWord{
+				move(tokenized),
+				move(boundaries)
+			});
 		}
 	}
 
@@ -793,6 +803,7 @@ bool SwTokenizer::tokenizeSubword(U16StringView str,
 void SwTokenizer::encode(vector<uint32_t>& ret, const string& str, vector<pair<uint32_t, uint32_t>>* offset) const
 {
 	Vector<size_t> bytePositions;
+	Vector<uint8_t> codaBias;
 	auto tokens = kiwi->analyze(utf8To16(str, bytePositions), Match::normalizeCoda | Match::zCoda).first;
 	bytePositions.emplace_back(str.size());
 	auto* baseMorph = kiwi->idToMorph(0);
@@ -826,12 +837,12 @@ void SwTokenizer::encode(vector<uint32_t>& ret, const string& str, vector<pair<u
 		if (it != splitCands.end())
 		{
 			pushSubwords();
-			ret.insert(ret.end(), it->second.begin(), it->second.end());
+			ret.insert(ret.end(), it->second.tokenIds.begin(), it->second.tokenIds.end());
 			if (offset)
 			{
-				for (size_t i = 0; i < it->second.size(); ++i)
+				for (size_t i = 0; i < it->second.boundaries.size(); ++i)
 				{
-					offset->emplace_back(t.position, t.position + t.length);
+					offset->emplace_back(t.position + (i ? it->second.boundaries[i - 1] : 0), t.position + it->second.boundaries[i]);
 				}
 			}
 			startPosition = -1;
@@ -844,6 +855,18 @@ void SwTokenizer::encode(vector<uint32_t>& ret, const string& str, vector<pair<u
 			if (t.morph->complex)
 			{
 				pushSubwords();
+				if (offset)
+				{
+					codaBias.clear();
+					uint8_t a = 0;
+					for (size_t i = 0; i < t.morph->kform->size(); ++i)
+					{
+						codaBias.emplace_back(a);
+						a += isHangulCoda((*t.morph->kform)[i]) ? 1 : 0;
+					}
+					codaBias.emplace_back(a);
+				}
+
 				size_t i = 0;
 				for (auto m : t.morph->chunks)
 				{
@@ -854,7 +877,9 @@ void SwTokenizer::encode(vector<uint32_t>& ret, const string& str, vector<pair<u
 						if (offset)
 						{
 							auto p = t.morph->chunks.getSecond(i);
-							offset->emplace_back(t.position + p.first, t.position + p.first + p.second);
+							uint32_t start = p.first - codaBias[p.first];
+							uint32_t end = p.first + p.second - codaBias[p.first + p.second];
+							offset->emplace_back(t.position + start, t.position + end);
 						}
 					}
 					else

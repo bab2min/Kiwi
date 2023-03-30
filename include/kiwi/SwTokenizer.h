@@ -147,6 +147,12 @@ namespace kiwi
 			Vocab& operator=(Vocab&&);
 		};
 
+		struct SplittedWord
+		{
+			Vector<uint32_t> tokenIds;
+			Vector<uint32_t> boundaries;
+		};
+
 		friend class SwTokenizerBuilder;
 		void* dfTokenizeSubword = nullptr;
 		void* dfTokenizeSubwordWithOffset = nullptr;
@@ -159,7 +165,7 @@ namespace kiwi
 		Vector<uint32_t> morphToSw;
 		Vector<uint32_t> swToMorph;
 		std::array<size_t, SwTokenizerConfig::glue + 1> specialTokenIds = { { 0, } };
-		UnorderedMap<uint32_t, Vector<uint32_t>> splitCands;
+		UnorderedMap<uint32_t, SplittedWord> splitCands;
 
 		bool tokenizeSubword(
 			U16StringView str,

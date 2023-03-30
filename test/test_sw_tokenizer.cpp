@@ -19,6 +19,13 @@ inline std::string to_string_with_fill(Ty value, char chr, size_t width = 0)
 	return ret;
 }
 
+template<class Ty, size_t n>
+constexpr std::vector<std::pair<Ty, Ty>> toPair(const Ty(&init)[n])
+{
+	static_assert(n % 2 == 0, "initializer_list must have an even number of elements.");
+	return std::vector<std::pair<Ty, Ty>>{ (const std::pair<Ty, Ty>*)init, (const std::pair<Ty, Ty>*)init + n / 2 };
+}
+
 TEST(KiwiSwTokenizer, Builder)
 {
 	using VocabTy = std::tuple<std::string, POSTag, SwTokenFlag, float>;
@@ -61,6 +68,7 @@ TEST(KiwiSwTokenizer, Builder)
 		res = tokenizer.encode(inp, &offsets);
 		EXPECT_EQ(res, std::vector<uint32_t>({ 9, 1, 5, 11, 8, 7, 10, 1, 6, 3, 2, 2 }));
 		EXPECT_EQ(res.size(), offsets.size());
+		EXPECT_EQ(offsets, toPair<uint32_t>({ 0, 3, 3, 6, 3, 6, 7, 10, 10, 16, 16, 19, 20, 26, 26, 29, 26, 29, 29, 32, 32, 33, 33, 34 }));
 
 		reconstructed = tokenizer.decode(res);
 		EXPECT_EQ(reconstructed, inp);
@@ -72,6 +80,7 @@ TEST(KiwiSwTokenizer, Builder)
 		res = tokenizer.encode(inp, &offsets);
 		EXPECT_EQ(res, std::vector<uint32_t>({ 11, 10 }));
 		EXPECT_EQ(res.size(), offsets.size());
+		EXPECT_EQ(offsets, toPair<uint32_t>({ 0, 3, 4, 10 }));
 
 		reconstructed = tokenizer.decode(res);
 		EXPECT_EQ(reconstructed, inp);
@@ -83,6 +92,7 @@ TEST(KiwiSwTokenizer, Builder)
 		res = tokenizer.encode(inp, &offsets);
 		EXPECT_EQ(res, std::vector<uint32_t>({ 11, 12, 10 }));
 		EXPECT_EQ(res.size(), offsets.size());
+		EXPECT_EQ(offsets, toPair<uint32_t>({ 0, 3, 3, 3, 3, 9 }));
 
 		reconstructed = tokenizer.decode(res);
 		EXPECT_EQ(reconstructed, inp);
@@ -94,6 +104,7 @@ TEST(KiwiSwTokenizer, Builder)
 		res = tokenizer.encode(inp, &offsets);
 		EXPECT_EQ(res, std::vector<uint32_t>({ 13, 0, 0, 0 }));
 		EXPECT_EQ(res.size(), offsets.size());
+		EXPECT_EQ(offsets, toPair<uint32_t>({ 0, 5, 6, 9, 10, 19, 20, 26 }));
 
 		reconstructed = tokenizer.decode(res);
 		EXPECT_EQ(reconstructed, u8"[CLS] [UNK] [UNK] [UNK]");
@@ -164,7 +175,8 @@ TEST(KiwiSwTokenizer, BasicEncodeAndDecode)
 		//u8"공부도 시킬 만큼 시켰는데 미쳐버리다니",
 	})
 	{
-		auto encoded = tokenizer.encode(c);
+		std::vector<std::pair<uint32_t, uint32_t>> offsets;
+		auto encoded = tokenizer.encode(c, &offsets);
 		auto decoded = tokenizer.decode(encoded);
 		EXPECT_EQ(decoded, c);
 	}
