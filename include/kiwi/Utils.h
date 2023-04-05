@@ -24,7 +24,8 @@ namespace kiwi
 
 	std::u16string utf8To16(const std::string& str);
 	std::u16string utf8To16(const std::string& str, std::vector<size_t>& bytePositions);
-	std::string utf8FromCode(size_t code);
+	std::string utf8FromCode(char32_t code);
+	size_t utf8FromCode(std::string& ret, char32_t code);
 	std::string utf16To8(const std::u16string& str);
 
 	inline bool isWebTag(POSTag t)

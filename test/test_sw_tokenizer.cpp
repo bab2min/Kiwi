@@ -1,4 +1,4 @@
-﻿#include "gtest/gtest.h"
+#include "gtest/gtest.h"
 #include <fstream>
 #include <kiwi/Kiwi.h>
 #include <kiwi/SwTokenizer.h>
@@ -61,7 +61,7 @@ TEST(KiwiSwTokenizer, Builder)
 	std::string inp, reconstructed;
 	std::vector<uint32_t> res;
 	std::vector<std::pair<uint32_t, uint32_t>> offsets;
-	
+
 	{
 		inp = u8"말한 옛사람을 생각했어..";
 		offsets.clear();
@@ -182,6 +182,58 @@ TEST(KiwiSwTokenizer, BasicEncodeAndDecode)
 	}
 }
 
+TEST(KiwiSwTokenizer, EncodeFromAlreadyTokenized)
+{
+	SwTokenizer tokenizer;
+	{
+		std::ifstream ifs{ "test/written.tokenizer.json" };
+		tokenizer = SwTokenizer::load(reuseKiwiInstance(), ifs);
+	}
+
+	for (auto c : {
+		u8"",
+		u8"한국어에 특화된 토크나이저입니다.",
+		u8"감사히 먹겠습니당!",
+		u8"노래진 손톱을 봤던걸요.",
+		u8"제임스웹우주천체망원경",
+		u8"그만해여~",
+	})
+	{
+		auto result = tokenizer.getKiwi()->analyze(c, Match::allWithNormalizing | Match::zCoda).first;
+		std::vector<std::pair<std::u16string, POSTag>> tokens;
+		std::vector<std::tuple<std::u16string, POSTag, bool>> tokensWithSpaceness;
+		for (auto& t : result)
+		{
+			tokens.emplace_back(t.str, t.tag);
+			bool hasSpacePrefix = &t == result.data() || ((&t)[-1].position + (&t)[-1].length < t.position);
+			tokensWithSpaceness.emplace_back(t.str, t.tag, hasSpacePrefix);
+		}
+		auto encoded = tokenizer.encode(tokens);
+		auto decoded = tokenizer.decode(encoded);
+		EXPECT_EQ(decoded, c);
+		
+		auto encodedUsingSpaceness = tokenizer.encode(tokensWithSpaceness);
+		auto decodedUsingSpaceness = tokenizer.decode(encodedUsingSpaceness);
+		EXPECT_EQ(decodedUsingSpaceness, c);
+	}
+
+	for (auto c : {
+		u8"제임스웹 우주천체망원경",
+	})
+	{
+		auto result = tokenizer.getKiwi()->analyze(c, Match::allWithNormalizing | Match::zCoda).first;
+		std::vector<std::tuple<std::u16string, POSTag, bool>> tokensWithSpaceness;
+		for (auto& t : result)
+		{
+			bool hasSpacePrefix = &t == result.data() || ((&t)[-1].position + (&t)[-1].length < t.position);
+			tokensWithSpaceness.emplace_back(t.str, t.tag, hasSpacePrefix);
+		}
+		auto encodedUsingSpaceness = tokenizer.encode(tokensWithSpaceness);
+		auto decodedUsingSpaceness = tokenizer.decode(encodedUsingSpaceness);
+		EXPECT_EQ(decodedUsingSpaceness, c);
+	}
+}
+
 TEST(KiwiSwTokenizer, WholeWordUnk)
 {
 	SwTokenizer tokenizer;
@@ -205,3 +257,46 @@ TEST(KiwiSwTokenizer, WholeWordUnk)
 		EXPECT_EQ(decoded, u8"화폐의 주인공은 110여 년 전의 여류 직업 소설가'히구치 [UNK]'이다.");
 	}
 }
+
+TEST(KiwiSwTokenizer, FallbackHangul)
+{
+	auto c = u8"분석이 어려운 한글에는 뚮뷇괗 등이 있다.";
+	SwTokenizer tokenizer;
+	{
+		std::ifstream ifs{ "test/written.tokenizer.json" };
+		tokenizer = SwTokenizer::load(reuseKiwiInstance(), ifs);
+		auto encoded = tokenizer.encode(c);
+		auto decoded = tokenizer.decode(encoded);
+		EXPECT_EQ(decoded, u8"분석이 어려운 한글에는 [UNK] 등이 있다.");
+	}
+
+	{
+		std::ifstream ifs{ "test/written.fallback_hangul.tokenizer.json" };
+		tokenizer = SwTokenizer::load(reuseKiwiInstance(), ifs);
+		auto encoded = tokenizer.encode(c);
+		auto decoded = tokenizer.decode(encoded);
+		EXPECT_EQ(decoded, u8"분석이 어려운 한글에는 뚮뷇괗 등이 있다.");
+	}
+}
+
+TEST(KiwiSwTokenizer, FallbackByte)
+{
+	auto c = u8"분석이 어려운 유니코드에는 💯η💢💥 등이 있다.";
+	SwTokenizer tokenizer;
+	{
+		std::ifstream ifs{ "test/written.tokenizer.json" };
+		tokenizer = SwTokenizer::load(reuseKiwiInstance(), ifs);
+		auto encoded = tokenizer.encode(c);
+		auto decoded = tokenizer.decode(encoded);
+		EXPECT_EQ(decoded, u8"분석이 어려운 유니코드에는 [UNK] 등이 있다.");
+	}
+
+	{
+		std::ifstream ifs{ "test/written.fallback_byte.tokenizer.json" };
+		tokenizer = SwTokenizer::load(reuseKiwiInstance(), ifs);
+		auto encoded = tokenizer.encode(c);
+		auto decoded = tokenizer.decode(encoded);
+		EXPECT_EQ(decoded, u8"분석이 어려운 유니코드에는 💯η💢💥 등이 있다.");
+	}
+}
+

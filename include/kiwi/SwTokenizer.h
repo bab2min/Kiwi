@@ -28,6 +28,7 @@ namespace kiwi
 		special = 1,
 		glue = 2,
 		subword = 3,
+		byte = 4,
 		punct,
 		chinese,
 	};
@@ -38,10 +39,11 @@ namespace kiwi
 		uint32_t length = 0;
 		POSTag pos = POSTag::unknown;
 		SwTokenFlag flags = SwTokenFlag::none;
+		uint8_t byte = 0;
 
-		SwToken(const char16_t* _form = nullptr, size_t _length = 0, 
-			POSTag _pos = POSTag::unknown, SwTokenFlag _flags = SwTokenFlag::none)
-			: form{ _form }, length{ (uint32_t)_length }, pos{ _pos }, flags{ _flags }
+		SwToken(const char16_t* _form = nullptr, size_t _length = 0,
+			POSTag _pos = POSTag::unknown, SwTokenFlag _flags = SwTokenFlag::none, uint8_t _byte = 0)
+			: form{ _form }, length{ (uint32_t)_length }, pos{ _pos }, flags{ _flags }, byte{ _byte }
 		{
 		}
 	};
@@ -66,8 +68,8 @@ namespace kiwi
 		bool useGlueToken = true;
 		bool newlineToken = false; // not implemented yet
 		bool strict = false; // not implemented yet
-		bool fallbackHangul = true; // not implemented yet
-		bool fallbackBPE = false; // not implemented yet
+		bool fallbackHangul = true;
+		bool fallbackByte = false;
 
 
 		SwTokenizerConfig()
@@ -104,7 +106,7 @@ namespace kiwi
 			POSTag pos = POSTag::unknown;
 			SwTokenFlag flags = SwTokenFlag::none;
 
-			Token(const std::string& _form = {}, 
+			Token(const std::string& _form = {},
 				POSTag _pos = POSTag::unknown, SwTokenFlag _flag = SwTokenFlag::none,
 				float _lprob = 0
 			)
@@ -164,6 +166,8 @@ namespace kiwi
 		Vector<float> tokenLProbs;
 		Vector<uint32_t> morphToSw;
 		Vector<uint32_t> swToMorph;
+		Vector<uint32_t> hangulFallbackChrs;
+		Vector<uint32_t> byteFallbackChrs;
 		std::array<size_t, SwTokenizerConfig::glue + 1> specialTokenIds = { { 0, } };
 		UnorderedMap<uint32_t, SplittedWord> splitCands;
 
@@ -174,6 +178,9 @@ namespace kiwi
 			std::vector<std::pair<uint32_t, uint32_t>>* offset = nullptr,
 			uint32_t offsetBias = 0
 		) const;
+
+		template<class TokenIt>
+		void encode(std::vector<uint32_t>& out, TokenIt first, TokenIt last, std::vector<std::pair<uint32_t, uint32_t>>* offset = nullptr) const;
 
 	public:
 		SwTokenizer(ArchType arch = ArchType::default_);
@@ -187,12 +194,21 @@ namespace kiwi
 		const SwToken& getVocab(size_t id) const { return vocab.vocabs[id]; }
 
 		bool ready() const { return dfTokenizeSubword; }
+		const Kiwi* getKiwi() const { return kiwi; }
 		
 		bool getWholeWordUnk() const { return config.wholeTokenUnk; }
 		void setWholeWordUnk(bool v) { config.wholeTokenUnk = v; }
 
 		void encode(std::vector<uint32_t>& out, const std::string& str, std::vector<std::pair<uint32_t, uint32_t>>* offset = nullptr) const;
 		std::vector<uint32_t> encode(const std::string& str, std::vector<std::pair<uint32_t, uint32_t>>* offset = nullptr) const;
+		
+		void encode(std::vector<uint32_t>& out, const std::vector<std::pair<std::string, POSTag>>& morphs) const;
+		std::vector<uint32_t> encode(const std::vector<std::pair<std::string, POSTag>>& morphs) const;
+		void encode(std::vector<uint32_t>& out, const std::vector<std::pair<std::u16string, POSTag>>& morphs) const;
+		std::vector<uint32_t> encode(const std::vector<std::pair<std::u16string, POSTag>>& morphs) const;
+		void encode(std::vector<uint32_t>& out, const std::vector<std::tuple<std::u16string, POSTag, bool>>& morphs) const;
+		std::vector<uint32_t> encode(const std::vector<std::tuple<std::u16string, POSTag, bool>>& morphs) const;
+
 		std::string decode(const std::vector<uint32_t>& ids) const;
 
 		std::future<std::vector<uint32_t>> asyncEncode(const std::string& str) const;

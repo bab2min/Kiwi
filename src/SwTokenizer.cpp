@@ -184,6 +184,16 @@ namespace kiwi
 		return utf8To16(str);
 	}
 
+	inline u16string toUTF16(const u16string& str)
+	{
+		return str;
+	}
+
+	inline u16string toUTF16(const string& str)
+	{
+		return utf8To16(str);
+	}
+
 	template<class Fn>
 	void foreachU32Chr(U16StringView s, Fn&& fn)
 	{
@@ -262,6 +272,8 @@ namespace kiwi
 		return make_pair(nullptr, nullptr);
 	}
 
+	static constexpr size_t numHangulOpenSyllable = 19 * 21;
+
 	template<ArchType arch, bool generateOffset>
 	bool tokenizeSubword(
 		const SwTokenizerConfig& config,
@@ -269,6 +281,8 @@ namespace kiwi
 		const Vector<SwToken>& vocabs,
 		const Vector<uint32_t>& tokenFallbacks,
 		const Vector<float>& tokenLProbs,
+		const Vector<uint32_t>& hangulFallbackChrs,
+		const Vector<uint32_t>& byteFallbackChrs,
 		size_t unkTokenId,
 		size_t glueTokenId,
 		U16StringView str,
@@ -280,6 +294,7 @@ namespace kiwi
 	{
 		Vector<pair<Vector<uint32_t>, float>> pathes, cands;
 		Vector<Vector<uint32_t>> pathesEndPtr, candsEndPtr;
+		std::string u8bytes;
 		auto node = trie.root();
 		if (spacePrefix) node = node->template nextOpt<arch>(trie, u' ');
 		for (size_t i = 0; i < str.size(); ++i)
@@ -294,6 +309,90 @@ namespace kiwi
 			
 			if (!nnode) 
 			{
+				if (config.fallbackHangul && isHangulSyllable(str[i]) && (str[i] - 0xAC00) % 28 > 0)
+				{
+					size_t openSyllable = (str[i] - 0xAC00) / 28;
+					size_t coda = (str[i] - 0xAC00) % 28 - 1;
+					coda += numHangulOpenSyllable * 2;
+					if ((hangulFallbackChrs[openSyllable] != -1 || hangulFallbackChrs[openSyllable + numHangulOpenSyllable] != -1)
+						&& hangulFallbackChrs[coda] != -1)
+					{
+						bool sp = (i == 0 && spacePrefix);
+						auto v = pathes.empty() ? Vector<uint32_t>{} : pathes.back().first;
+						auto s = pathes.empty() ? 0 : pathes.back().second;
+						size_t inserted = 2;
+						if (sp && hangulFallbackChrs[openSyllable] != -1)
+						{
+							v.emplace_back(hangulFallbackChrs[openSyllable]);
+						}
+						else if (!sp && hangulFallbackChrs[openSyllable + numHangulOpenSyllable] != -1)
+						{
+							v.emplace_back(hangulFallbackChrs[openSyllable + numHangulOpenSyllable]);
+						}
+						else if (config.useGlueToken && !sp && hangulFallbackChrs[openSyllable] != -1)
+						{
+							v.emplace_back(glueTokenId);
+							v.emplace_back(hangulFallbackChrs[openSyllable]);
+							inserted++;
+						}
+						else
+						{
+							inserted = 0;
+						}
+
+						if (inserted)
+						{
+							v.emplace_back(hangulFallbackChrs[coda]);
+							s -= 100;
+							pathes.emplace_back(move(v), s);
+							if (generateOffset)
+							{
+								if (pathes.empty()) pathesEndPtr.emplace_back();
+								else pathesEndPtr.push_back(pathesEndPtr.back());
+								pathesEndPtr.back().resize(pathesEndPtr.size() + inserted, i + 1);
+							}
+							node = trie.root();
+							continue;
+						}
+					}
+				}
+
+				if (config.fallbackByte)
+				{
+					bool sp = (i == 0 && spacePrefix);
+					char32_t c;
+					if (isHighSurrogate(str[i]) && i + 1 < str.size())
+					{
+						c = mergeSurrogate(str[i], str[i + 1]);
+						i++;
+					}
+					else
+					{
+						c = str[i];
+					}
+					
+					auto v = pathes.empty() ? Vector<uint32_t>{} : pathes.back().first;
+					auto s = pathes.empty() ? 0 : pathes.back().second;
+
+					u8bytes.clear();
+					if (sp) u8bytes.push_back(' ');
+					utf8FromCode(u8bytes, c);
+					for (uint8_t b : u8bytes)
+					{
+						v.emplace_back(byteFallbackChrs[b]);
+					}
+					s -= 100;
+					pathes.emplace_back(move(v), s);
+					if (generateOffset)
+					{
+						if (pathes.empty()) pathesEndPtr.emplace_back();
+						else pathesEndPtr.push_back(pathesEndPtr.back());
+						pathesEndPtr.back().resize(pathesEndPtr.size() + u8bytes.size(), i + 1);
+					}
+					node = trie.root();
+					continue;
+				}
+
 				if (config.wholeTokenUnk)
 				{
 					pathes.emplace_back();
@@ -517,6 +616,15 @@ SwTokenizer SwTokenizerBuilder::build() const
 	utils::ContinuousTrie<utils::TrieNode<kchar_t, uint32_t>> trie{ 1 };
 	size_t offset = 0;
 	ret.swToMorph.resize(tokens.size(), -1);
+	if (config.fallbackHangul)
+	{
+		ret.hangulFallbackChrs.resize(numHangulOpenSyllable * 2 + 27, -1);
+	}
+	if (config.fallbackByte)
+	{
+		ret.byteFallbackChrs.resize(256);
+	}
+
 	for (auto& t : tokens)
 	{
 		size_t tokenId = &t - tokens.data();
@@ -539,6 +647,37 @@ SwTokenizer SwTokenizerBuilder::build() const
 				});
 				if (isPunct) vocab.vocabs.back().flags = SwTokenFlag::punct;
 				if (isChinese) vocab.vocabs.back().flags = SwTokenFlag::chinese;
+			}
+
+			if (config.fallbackHangul && u16form.size() == 1)
+			{
+				size_t id = -1;
+				if (isHangulSyllable(u16form[0]) && (u16form[0] - 0xAC00) % 28 == 0)
+				{
+					id = (u16form[0] - 0xAC00) / 28;
+					if (t.flags == SwTokenFlag::subword) id += numHangulOpenSyllable;
+				}
+				else if (isHangulCoda(u16form[0]))
+				{
+					id = numHangulOpenSyllable * 2 + (u16form[0] - 0x11A8);
+				}
+
+				if (id != -1)
+				{
+					ret.hangulFallbackChrs[id] = tokenId;
+				}
+			}
+
+			if (t.flags == SwTokenFlag::byte)
+			{
+				if (config.fallbackByte)
+				{
+					int id = stoi(t.form);
+					if (id < 0 || id >= 256) throw Exception{ "wrong byte token: " + t.form };
+					ret.byteFallbackChrs[id] = tokenId;
+					vocab.vocabs.back().byte = id;
+				}
+				continue;
 			}
 
 			if (t.flags == SwTokenFlag::glue)
@@ -764,6 +903,27 @@ vector<uint32_t> SwTokenizer::encode(const string& str, vector<pair<uint32_t, ui
 	return ret;
 }
 
+vector<uint32_t> SwTokenizer::encode(const vector<pair<string, POSTag>>& morphs) const
+{
+	vector<uint32_t> ret;
+	encode(ret, morphs);
+	return ret;
+}
+
+vector<uint32_t> SwTokenizer::encode(const vector<pair<u16string, POSTag>>& morphs) const
+{
+	vector<uint32_t> ret;
+	encode(ret, morphs);
+	return ret;
+}
+
+vector<uint32_t> SwTokenizer::encode(const vector<tuple<u16string, POSTag, bool>>& morphs) const
+{
+	vector<uint32_t> ret;
+	encode(ret, morphs);
+	return ret;
+}
+
 bool SwTokenizer::tokenizeSubword(U16StringView str,
 	bool spacePrefix,
 	vector<uint32_t>& out,
@@ -771,41 +931,22 @@ bool SwTokenizer::tokenizeSubword(U16StringView str,
 	uint32_t offsetBias
 ) const
 {
-	if (offset)
-	{
-		return reinterpret_cast<FnTokenizeSubword>(dfTokenizeSubwordWithOffset)(
-			config, trie,
-			vocab.vocabs, tokenFallbacks, tokenLProbs,
-			specialTokenIds[SwTokenizerConfig::unk], specialTokenIds[SwTokenizerConfig::glue],
-			str,
-			spacePrefix,
-			out,
-			offset,
-			offsetBias
-		);
-	}
-	else
-	{
-		return reinterpret_cast<FnTokenizeSubword>(dfTokenizeSubword)(
-			config, trie,
-			vocab.vocabs, tokenFallbacks, tokenLProbs,
-			specialTokenIds[SwTokenizerConfig::unk], specialTokenIds[SwTokenizerConfig::glue],
-			str,
-			spacePrefix,
-			out,
-			offset,
-			offsetBias
-		);
-	}
-	
+	return reinterpret_cast<FnTokenizeSubword>(offset ? dfTokenizeSubwordWithOffset : dfTokenizeSubword)(
+		config, trie,
+		vocab.vocabs, tokenFallbacks, tokenLProbs, hangulFallbackChrs, byteFallbackChrs,
+		specialTokenIds[SwTokenizerConfig::unk], specialTokenIds[SwTokenizerConfig::glue],
+		str,
+		spacePrefix,
+		out,
+		offset,
+		offsetBias
+	);
 }
 
-void SwTokenizer::encode(vector<uint32_t>& ret, const string& str, vector<pair<uint32_t, uint32_t>>* offset) const
+template<class TokenIt>
+void SwTokenizer::encode(vector<uint32_t>& ret, TokenIt first, TokenIt last, vector<pair<uint32_t, uint32_t>>* offset) const
 {
-	Vector<size_t> bytePositions;
 	Vector<uint8_t> codaBias;
-	auto tokens = kiwi->analyze(utf8To16(str, bytePositions), Match::normalizeCoda | Match::zCoda).first;
-	bytePositions.emplace_back(str.size());
 	auto* baseMorph = kiwi->idToMorph(0);
 	size_t startPosition = -1, lastPosition = -1;
 	size_t offsetStart = offset ? offset->size() : 0;
@@ -818,8 +959,9 @@ void SwTokenizer::encode(vector<uint32_t>& ret, const string& str, vector<pair<u
 		tokenBuf.clear();
 	};
 
-	for (auto& t : tokens)
+	for (; first != last; ++first)
 	{
+		decltype(auto) t = *first;
 		size_t id = t.morph - baseMorph;
 		// Morpheme
 		if (id < morphToSw.size() && morphToSw[id] != -1)
@@ -850,7 +992,7 @@ void SwTokenizer::encode(vector<uint32_t>& ret, const string& str, vector<pair<u
 			continue;
 		}
 
-		if (config.splitVerb && isVerbClass(t.morph->tag))
+		if (config.splitVerb && isVerbClass(t.tag))
 		{
 			if (t.morph->complex)
 			{
@@ -901,7 +1043,7 @@ void SwTokenizer::encode(vector<uint32_t>& ret, const string& str, vector<pair<u
 			}
 		}
 
-		if (config.splitEomi && isEClass(t.morph->tag))
+		if (config.splitEomi && isEClass(t.tag))
 		{
 			if (t.morph->complex)
 			{
@@ -948,7 +1090,17 @@ void SwTokenizer::encode(vector<uint32_t>& ret, const string& str, vector<pair<u
 		}
 	}
 	pushSubwords();
+}
+
+void SwTokenizer::encode(vector<uint32_t>& ret, const string& str, vector<pair<uint32_t, uint32_t>>* offset) const
+{
+	Vector<size_t> bytePositions;
+	size_t offsetStart = offset ? offset->size() : 0;
+	auto tokens = kiwi->analyze(utf8To16(str, bytePositions), Match::normalizeCoda | Match::zCoda).first;
+	bytePositions.emplace_back(str.size());
 	
+	encode(ret, tokens.begin(), tokens.end(), offset);
+
 	if (offset)
 	{
 		for (size_t i = offsetStart; i < offset->size(); ++i)
@@ -959,11 +1111,136 @@ void SwTokenizer::encode(vector<uint32_t>& ret, const string& str, vector<pair<u
 	}
 }
 
+namespace kiwi
+{
+	template<class Ty>
+	class TokenInfoConvertingIterator
+	{
+		const Kiwi* kw = nullptr;
+		const Ty* ptr = nullptr;
+		size_t accumPosition = 0;
+
+		template<class Str>
+		TokenInfo convert(const pair<Str, POSTag>& p) const
+		{
+			TokenInfo ret;
+			ret.str = toUTF16(p.first);
+			ret.tag = p.second;
+			ret.position = accumPosition;
+			ret.length = ret.str.size();
+			auto morphs = kw->findMorpheme(ret.str, ret.tag);
+			if (!morphs.empty()) ret.morph = morphs[0];
+			return ret;
+		}
+
+		template<class Str>
+		TokenInfo convert(const tuple<Str, POSTag, bool>& p) const
+		{
+			TokenInfo ret;
+			ret.str = toUTF16(get<0>(p));
+			ret.tag = get<1>(p);
+			ret.position = accumPosition + (get<2>(p) ? 1 : 0);
+			ret.length = ret.str.size();
+			auto morphs = kw->findMorpheme(ret.str, ret.tag);
+			if (!morphs.empty()) ret.morph = morphs[0];
+			return ret;
+		}
+
+		template<class Str>
+		size_t offset(const pair<Str, POSTag>& p) const
+		{
+			return toUTF16(p.first).size();
+		}
+
+		template<class Str>
+		size_t offset(const tuple<Str, POSTag, bool>& p) const
+		{
+			return toUTF16(get<0>(p)).size() + (get<2>(p) ? 1 : 0);
+		}
+
+	public:
+
+		TokenInfoConvertingIterator(const Kiwi* _kw, const Ty* _ptr = nullptr)
+			: kw{ _kw }, ptr{ _ptr }
+		{
+		}
+
+		TokenInfo operator*() const
+		{
+			return convert(*ptr);
+		}
+
+		TokenInfoConvertingIterator& operator++()
+		{
+			accumPosition += offset(*ptr);
+			++ptr;
+			return *this;
+		}
+
+		bool operator==(const TokenInfoConvertingIterator& o) const
+		{
+			return ptr == o.ptr;
+		}
+
+		bool operator!=(const TokenInfoConvertingIterator& o) const
+		{
+			return !operator==(o);
+		}
+	};
+
+	template<class Ty>
+	TokenInfoConvertingIterator<Ty> makeTokenInfoConvertingIterator(const Kiwi* kw, const Ty* ptr)
+	{
+		return TokenInfoConvertingIterator<Ty>{ kw, ptr };
+	}
+}
+
+void SwTokenizer::encode(vector<uint32_t>& out, const vector<pair<string, POSTag>>& morphs) const
+{
+	encode(out, 
+		makeTokenInfoConvertingIterator(kiwi, morphs.data()), 
+		makeTokenInfoConvertingIterator(kiwi, morphs.data() + morphs.size())
+	);
+}
+
+void SwTokenizer::encode(vector<uint32_t>& out, const vector<pair<u16string, POSTag>>& morphs) const
+{
+	encode(out,
+		makeTokenInfoConvertingIterator(kiwi, morphs.data()),
+		makeTokenInfoConvertingIterator(kiwi, morphs.data() + morphs.size())
+	);
+}
+
+void SwTokenizer::encode(vector<uint32_t>& out, const vector<tuple<u16string, POSTag, bool>>& morphs) const
+{
+	encode(out,
+		makeTokenInfoConvertingIterator(kiwi, morphs.data()),
+		makeTokenInfoConvertingIterator(kiwi, morphs.data() + morphs.size())
+	);
+}
+
 string SwTokenizer::decode(const vector<uint32_t>& ids) const
 {
 	auto joiner = kiwi->newJoiner(false);
+	string u8bytes;
 	for (auto id : ids)
 	{
+		auto& v = vocab.vocabs[id];
+		// byte
+		if (v.flags == SwTokenFlag::byte)
+		{
+			u8bytes.push_back(v.byte);
+			continue;
+		}
+		else
+		{
+			if (!u8bytes.empty())
+			{
+				joiner.add(utf8To16(u8bytes), POSTag::unknown);
+				u8bytes.clear();
+			}
+		}
+
 		// to do: detect the best tag from ambiguous tags in simpleTag mode
 		// morpheme
 		if (id < swToMorph.size() && swToMorph[id] != -1)
@@ -973,9 +1250,14 @@ string SwTokenizer::decode(const vector<uint32_t>& ids) const
 		}
 		
 		// subword
-		auto& v = vocab.vocabs[id];
 		bool insertSpace = v.flags == SwTokenFlag::none || v.flags == SwTokenFlag::special;
 		joiner.add(U16StringView{ v.form, v.length }, insertSpace ? POSTag::p : POSTag::unknown);
+	}
+
+	if (!u8bytes.empty())
+	{
+		joiner.add(utf8To16(u8bytes), POSTag::unknown);
+		u8bytes.clear();
 	}
 	return joiner.getU8();
 	
@@ -1015,6 +1297,8 @@ ostream& SwTokenizer::save(ostream& ostr) const
 		{ "split_eomi", config.splitEomi },
 		{ "simple_tag", config.simpleTag },
 		{ "glue_token", nullptr },
+		{ "fallback_hangul", config.fallbackHangul },
+		{ "fallback_byte", config.fallbackByte },
 	};
 	if (specialTokenIds[SwTokenizerConfig::glue] != -1) j["model"]["glue_token"] = specialTokenIds[SwTokenizerConfig::glue];
 	nlohmann::json jvocab = { size() };
@@ -1066,6 +1350,8 @@ SwTokenizer SwTokenizer::load(const Kiwi& kiwi, istream& istr)
 	config.splitEomi = m["split_eomi"].get<bool>();
 	config.simpleTag = m["simple_tag"].get<bool>();
 	config.useGlueToken = m["glue_token"].is_number();
+	config.fallbackHangul = m["fallback_hangul"].get<bool>();
+	config.fallbackByte = m["fallback_byte"].get<bool>();
 	SwTokenizerBuilder builder{ kiwi, config };
 	for (auto& v : m["vocab"])
 	{
@@ -1083,6 +1369,7 @@ SwTokenizer SwTokenizer::load(const Kiwi& kiwi, istream& istr)
 		else if (v[2].get<string>() == "subword") flag = SwTokenFlag::subword;
 		else if (v[2].get<string>() == "special") flag = SwTokenFlag::special;
 		else if (v[2].get<string>() == "glue") flag = SwTokenFlag::glue;
+		else if (v[2].get<string>() == "byte") flag = SwTokenFlag::byte;
 		float lprob = v[3].get<float>();
 		builder.addToken(form, tag, flag, lprob);
 	}
