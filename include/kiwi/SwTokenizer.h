@@ -56,7 +56,6 @@ namespace kiwi
 		};
 		std::array<std::string, eos + 1> specialTokens;
 		size_t multipleUnkTokens = 0; // not implemented yet
-		size_t vocabSize = 0;
 		bool doLowercase = false;
 		bool splitChinese = true;
 		bool wholeTokenUnk = false;
@@ -84,12 +83,14 @@ namespace kiwi
 			{
 				ret += p.empty() ? 0 : 1;
 			}
+			if (fallbackByte) ret += 256;
 			return ret;
 		}
 	};
 
 	struct UnigramSwTrainerConfig
 	{
+		size_t vocabSize = 0;
 		double chrCoverage = 0.9995;
 		bool reduceStrict = false;
 		bool removeRepetitive = true;

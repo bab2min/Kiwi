@@ -347,7 +347,7 @@ namespace kiwi
 							pathes.emplace_back(move(v), s);
 							if (generateOffset)
 							{
-								if (pathes.empty()) pathesEndPtr.emplace_back();
+								if (pathesEndPtr.empty()) pathesEndPtr.emplace_back();
 								else pathesEndPtr.push_back(pathesEndPtr.back());
 								pathesEndPtr.back().resize(pathesEndPtr.size() + inserted, i + 1);
 							}
@@ -385,7 +385,7 @@ namespace kiwi
 					pathes.emplace_back(move(v), s);
 					if (generateOffset)
 					{
-						if (pathes.empty()) pathesEndPtr.emplace_back();
+						if (pathesEndPtr.empty()) pathesEndPtr.emplace_back();
 						else pathesEndPtr.push_back(pathesEndPtr.back());
 						pathesEndPtr.back().resize(pathesEndPtr.size() + u8bytes.size(), i + 1);
 					}
@@ -1788,6 +1788,37 @@ float UnigramSwTrainer::buildSubwordVocabs(const size_t minCnt, const size_t max
 		prefixAvailable.emplace_back(PrefixAvailability::preserved);
 	}
 
+	if (config.fallbackHangul)
+	{
+		for (char16_t c = 0xAC00; c < 0xD7A4; c += 28)
+		{
+			chrPrefix.emplace_back(u16string{ u' ', c });
+			trie.build(chrPrefix.back().begin(), chrPrefix.back().end(), chrPrefix.size() - 1);
+			prefixAvailable.emplace_back(PrefixAvailability::preserved);
+			prefixChrCnts.erase(c);
+		}
+
+		for (char16_t c = 0x11A8; c < 0x11A7 + 28; ++c)
+		{
+			chrPrefix.emplace_back(&c, &c + 1);
+			trie.build(chrPrefix.back().begin(), chrPrefix.back().end(), chrPrefix.size() - 1);
+			prefixAvailable.emplace_back(PrefixAvailability::preserved);
+			chrCnts.erase(c);
+		}
+
+		for (auto it = chrsPreserved.begin(); it != chrsPreserved.end(); )
+		{
+			if (isHangulSyllable(*it))
+			{
+				it = chrsPreserved.erase(it);
+			}
+			else
+			{
+				++it;
+			}
+		}
+	}
+
 	for (auto p : chrCnts)
 	{
 		auto c = p.first;
@@ -2257,7 +2288,7 @@ float UnigramSwTrainer::updateProb(bool init)
 
 size_t UnigramSwTrainer::reduceVocab(float ratio, size_t minVocabSize)
 {
-	if (minVocabSize == 0) minVocabSize = config.vocabSize;
+	if (minVocabSize == 0) minVocabSize = trainConfig.vocabSize;
 	if (minVocabSize < config.numSpecialTokens())
 	{
 		throw invalid_argument{ "`minVocabSize` must be greater than `numSpecialTokens()`" };
@@ -2323,7 +2354,10 @@ ostream& UnigramSwTrainer::writeVocabs(ostream& os) const
 	Vector<pair<float, size_t>> sortedVocabs;
 	for (size_t i = 0; i < prefixLProbs.size(); ++i)
 	{
-		if (!prefixFreqs[i]) continue;
+		if (!prefixFreqs[i] && (
+			i < knownPrefixSize ||
+			prefixAvailable[i - knownPrefixSize] != PrefixAvailability::preserved
+		)) continue;
 		sortedVocabs.emplace_back(prefixLProbs[i], i);
 	}
 
@@ -2361,7 +2395,10 @@ SwTokenizer UnigramSwTrainer::build() const
 	Vector<pair<float, size_t>> sortedVocabs;
 	for (size_t i = 0; i < prefixLProbs.size(); ++i)
 	{
-		if (!prefixFreqs[i]) continue;
+		if (!prefixFreqs[i] && (
+			i < knownPrefixSize ||
+			prefixAvailable[i - knownPrefixSize] != PrefixAvailability::preserved
+		)) continue;
 		sortedVocabs.emplace_back(prefixLProbs[i], i);
 	}
 
@@ -2392,6 +2429,15 @@ SwTokenizer UnigramSwTrainer::build() const
 			builder.addToken(utf16To8(chrPrefix[p.second]), POSTag::unknown, SwTokenFlag::subword, p.first);
 		}
 	}
+
+	if (config.fallbackByte)
+	{
+		for (size_t i = 0; i < 256; ++i)
+		{
+			builder.addToken(to_string(i), POSTag::unknown, SwTokenFlag::byte, 0);
+		}
+	}
+
 	return builder.build();
 }
 
