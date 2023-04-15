@@ -292,6 +292,9 @@ namespace kiwi
 		size_t addSentences(const std::function<std::string()>& feeder);
 		size_t addSentences(const std::function<std::u16string()>& feeder);
 
+		UnigramSwTrainerConfig& getTrainConfig() { return trainConfig; }
+		const UnigramSwTrainerConfig& getTrainConfig() const { return trainConfig; }
+
 		float buildSubwordVocabs(const size_t minCnt = 5, const size_t maxPrefixLength = 15);
 		float updateProb(bool init = false);
 		size_t reduceVocab(float ratio, size_t minVocabSize = 0);

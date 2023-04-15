@@ -1742,6 +1742,7 @@ float UnigramSwTrainer::buildSubwordVocabs(const size_t minCnt, const size_t max
 	}
 
 	knownPrefixSize = std::max((size_t)maxV + 1, knownPrefixSize);
+	tokenFreqs.clear();
 	tokenFreqs.resize((int64_t)knownPrefixSize - minV);
 	for (auto i : rawTokens)
 	{
@@ -1788,7 +1789,11 @@ float UnigramSwTrainer::buildSubwordVocabs(const size_t minCnt, const size_t max
 
 	utils::ContinuousTrie<utils::TrieNode<char16_t, size_t>> trie{ 1 };
 
+	chrPrefix.clear();
 	chrPrefix.resize(knownPrefixSize);
+	
+	prefixAvailable.clear();
+
 
 	/*for (size_t i = 0; i < ivSize; ++i)
 	{
@@ -1941,7 +1946,9 @@ float UnigramSwTrainer::buildSubwordVocabs(const size_t minCnt, const size_t max
 
 	chrTrie = utils::FrozenTrie<char16_t, size_t>{ trie, ArchTypeHolder<ArchType::none>() };
 
+	wordBestTokenizations.clear();
 	wordBestTokenizations.resize(wordMap.size());
+	invWordMap.clear();
 	invWordMap.resize(wordMap.size());
 	for (auto& p : wordMap)
 	{
