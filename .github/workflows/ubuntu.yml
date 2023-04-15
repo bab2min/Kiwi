@@ -9,26 +9,22 @@ jobs:
     strategy:
       matrix:
         include:
-          # Ubuntu 18.04 + gcc-9
-          - name: "Ubuntu 18.04 + gcc-9"
-            os: ubuntu-18.04
-            compiler: gcc
-            version: "9"
-          # Ubuntu 20.04 + gcc-10
           - name: "Ubuntu 20.04 + gcc-10"
             os: ubuntu-20.04
             compiler: gcc
             version: "10"
-          # Ubuntu 18.04 + clang-9
-          - name: "Ubuntu 18.04 + clang-9"
-            os: ubuntu-18.04
-            compiler: clang
-            version: "9"
-          # Ubuntu 20.04 + clang-10
+          - name: "Ubuntu 22.04 + gcc-11"
+            os: ubuntu-22.04
+            compiler: gcc
+            version: "11"
           - name: "Ubuntu 20.04 + clang-10"
             os: ubuntu-20.04
             compiler: clang
             version: "10"
+          - name: "Ubuntu 22.04 + clang-11"
+            os: ubuntu-22.04
+            compiler: clang
+            version: "11"
 
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.name }}

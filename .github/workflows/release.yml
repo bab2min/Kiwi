@@ -243,7 +243,7 @@ jobs:
       matrix:
         arch: [aarch64, ppc64le]
     name: Centos7-${{ matrix.arch }}
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
       with:
