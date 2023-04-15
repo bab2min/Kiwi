@@ -22,6 +22,8 @@ namespace kiwi
 	class Kiwi;
 	template<class Ty> class RaggedVector;
 
+	const char* tagToReprStr(POSTag tag);
+
 	enum class SwTokenFlag : uint8_t
 	{
 		none = 0,
@@ -55,10 +57,9 @@ namespace kiwi
 			unk, cls, sep, pad, mask, bos, eos, glue
 		};
 		std::array<std::string, eos + 1> specialTokens;
-		size_t multipleUnkTokens = 0; // not implemented yet
 		bool doLowercase = false;
 		bool splitChinese = true;
-		bool wholeTokenUnk = false;
+		bool wholeWordUnk = false;
 		bool integrateAllomoprh = true; // not implemented yet
 		bool splitPunct = true;
 		bool simpleTag = true;
@@ -69,7 +70,6 @@ namespace kiwi
 		bool strict = false; // not implemented yet
 		bool fallbackHangul = true;
 		bool fallbackByte = false;
-
 
 		SwTokenizerConfig()
 		{
@@ -183,6 +183,9 @@ namespace kiwi
 		template<class TokenIt>
 		void encode(std::vector<uint32_t>& out, TokenIt first, TokenIt last, std::vector<std::pair<uint32_t, uint32_t>>* offset = nullptr) const;
 
+		template<class It>
+		std::string decode(It first, It last) const;
+
 	public:
 		SwTokenizer(ArchType arch = ArchType::default_);
 		SwTokenizer(const SwTokenizer&);
@@ -197,8 +200,8 @@ namespace kiwi
 		bool ready() const { return dfTokenizeSubword; }
 		const Kiwi* getKiwi() const { return kiwi; }
 		
-		bool getWholeWordUnk() const { return config.wholeTokenUnk; }
-		void setWholeWordUnk(bool v) { config.wholeTokenUnk = v; }
+		bool getWholeWordUnk() const { return config.wholeWordUnk; }
+		void setWholeWordUnk(bool v) { config.wholeWordUnk = v; }
 
 		void encode(std::vector<uint32_t>& out, const std::string& str, std::vector<std::pair<uint32_t, uint32_t>>* offset = nullptr) const;
 		std::vector<uint32_t> encode(const std::string& str, std::vector<std::pair<uint32_t, uint32_t>>* offset = nullptr) const;
@@ -211,6 +214,7 @@ namespace kiwi
 		std::vector<uint32_t> encode(const std::vector<std::tuple<std::u16string, POSTag, bool>>& morphs) const;
 
 		std::string decode(const std::vector<uint32_t>& ids) const;
+		std::string decode(const uint32_t* ids, size_t length) const;
 
 		std::future<std::vector<uint32_t>> asyncEncode(const std::string& str) const;
 		std::future<std::pair<std::vector<uint32_t>, std::vector<std::pair<uint32_t, uint32_t>>>> asyncEncodeOffset(const std::string& str) const;

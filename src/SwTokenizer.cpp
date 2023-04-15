@@ -136,7 +136,7 @@ namespace kiwi
 		return tag;
 	}
 
-	inline const char* tagToReprStr(POSTag tag)
+	const char* tagToReprStr(POSTag tag)
 	{
 		tag = toReprTag(tag);
 		switch (tag)
@@ -393,7 +393,7 @@ namespace kiwi
 					continue;
 				}
 
-				if (config.wholeTokenUnk)
+				if (config.wholeWordUnk)
 				{
 					pathes.emplace_back();
 					if (generateOffset) pathesEndPtr.emplace_back();
@@ -502,7 +502,7 @@ namespace kiwi
 
 			if (cands.empty())
 			{
-				if (config.wholeTokenUnk)
+				if (config.wholeWordUnk)
 				{
 					pathes.emplace_back();
 					if (generateOffset) pathesEndPtr.emplace_back();
@@ -1219,12 +1219,14 @@ void SwTokenizer::encode(vector<uint32_t>& out, const vector<tuple<u16string, PO
 	);
 }
 
-string SwTokenizer::decode(const vector<uint32_t>& ids) const
+template<class It>
+string SwTokenizer::decode(It first, It last) const
 {
 	auto joiner = kiwi->newJoiner(false);
 	string u8bytes;
-	for (auto id : ids)
+	for (; first != last; ++first)
 	{
+		auto id = *first;
 		auto& v = vocab.vocabs[id];
 		// byte
 		if (v.flags == SwTokenFlag::byte)
@@ -1263,22 +1265,32 @@ string SwTokenizer::decode(const vector<uint32_t>& ids) const
 	
 }
 
+string SwTokenizer::decode(const vector<uint32_t>& ids) const
+{
+	return decode(ids.begin(), ids.end());
+}
+
+string SwTokenizer::decode(const uint32_t* ids, size_t length) const
+{
+	return decode(ids, ids + length);
+}
+
 future<vector<uint32_t>> SwTokenizer::asyncEncode(const string& str) const
 {
-	return kiwi->getThreadPool()->enqueue([&](size_t)
+	return kiwi->getThreadPool()->enqueue([&](size_t, const string& str)
 	{
 		return encode(str);
-	});
+	}, str);
 }
 
 future<pair<vector<uint32_t>, vector<pair<uint32_t, uint32_t>>>> SwTokenizer::asyncEncodeOffset(const string& str) const
 {
-	return kiwi->getThreadPool()->enqueue([&](size_t)
+	return kiwi->getThreadPool()->enqueue([&](size_t, const string& str)
 	{
 		vector<pair<uint32_t, uint32_t>> offset;
 		auto ids = encode(str, &offset);
 		return make_pair(move(ids), move(offset));
-	});
+	}, str);
 }
 
 ostream& SwTokenizer::save(ostream& ostr) const
@@ -1639,6 +1651,8 @@ size_t UnigramSwTrainer::_addSentences(Feeder&& feeder)
 							tokenizations.insert_data(subids.begin(), subids.begin() + i);
 							tokenizations.add_data(kiwi->morphToId(toReprMorph(it->second)));
 						}
+						knownPrefixSize = std::max(knownPrefixSize, (size_t)*std::max_element(tokenizations.raw().begin(), tokenizations.raw().end()) + 1);
+						knownPrefixSize = std::max(knownPrefixSize, (size_t)kiwi->morphToId(wc.morph) + 1);
 						wordSuffix.emplace(wid, move(wc));
 					}
 					rsents.add_data(-(int32_t)wid - 1);
@@ -1651,6 +1665,8 @@ size_t UnigramSwTrainer::_addSentences(Feeder&& feeder)
 					wordCnts.resize(max(wordCnts.size(), wid + 1));
 					wordCnts[wid]++;
 					WordCand wc{ toReprMorph(token.morph), toReprMorph(verbSuffix) };
+					knownPrefixSize = std::max(knownPrefixSize, (size_t)kiwi->morphToId(wc.suffix) + 1);
+					knownPrefixSize = std::max(knownPrefixSize, (size_t)kiwi->morphToId(wc.morph) + 1);
 					wordSuffix.emplace(wid, move(wc));
 					rsents.add_data(-(int32_t)wid - 1);
 				}
@@ -1662,6 +1678,9 @@ size_t UnigramSwTrainer::_addSentences(Feeder&& feeder)
 					wordCnts[wid]++;
 					WordCand wc{ toReprMorph(token.morph), toReprMorph(eomiSuffix.second) };
 					wc.baseEomi = toReprMorph(eomiSuffix.first);
+					knownPrefixSize = std::max(knownPrefixSize, (size_t)kiwi->morphToId(wc.suffix) + 1);
+					knownPrefixSize = std::max(knownPrefixSize, (size_t)kiwi->morphToId(wc.morph) + 1);
+					knownPrefixSize = std::max(knownPrefixSize, (size_t)kiwi->morphToId(wc.baseEomi) + 1);
 					wordSuffix.emplace(wid, move(wc));
 					rsents.add_data(-(int32_t)wid - 1);
 				}
@@ -1719,8 +1738,8 @@ float UnigramSwTrainer::buildSubwordVocabs(const size_t minCnt, const size_t max
 		maxV = max(v, maxV);
 	}
 
-	knownPrefixSize = maxV + 1;
-	tokenFreqs.resize(maxV + 1 - minV);
+	knownPrefixSize = std::max((size_t)maxV + 1, knownPrefixSize);
+	tokenFreqs.resize((int64_t)knownPrefixSize - minV);
 	for (auto i : rawTokens)
 	{
 		tokenFreqs[i >= 0 ? i : (i + tokenFreqs.size())]++;
@@ -2265,7 +2284,7 @@ float UnigramSwTrainer::updateProb(bool init)
 	double totCntF = totCnt;
 	for (size_t i = 0; i < prefixFreqs.size(); ++i)
 	{
-		prefixLProbs[i] = log(prefixFreqs[i] / totCntF * discnt + smoothing);
+		prefixLProbs[i] = log(prefixFreqs[i] / max(totCntF, 1.) * discnt + smoothing);
 	}
 
 	if (config.useGlueToken && init)
@@ -2278,10 +2297,17 @@ float UnigramSwTrainer::updateProb(bool init)
 	double m = 0;
 	for (size_t i = 0; i < prefixFreqs.size(); ++i)
 	{
-		if (!prefixFreqs[i]) continue;
-		m += (prefixLProbs[i] - m) * prefixFreqs[i] / (c + prefixFreqs[i]);
-		c += prefixFreqs[i];
-		currentVocabSize++;
+		if (prefixFreqs[i])
+		{
+			m += (prefixLProbs[i] - m) * prefixFreqs[i] / (c + prefixFreqs[i]);
+			c += prefixFreqs[i];
+		}
+		if (prefixFreqs[i] || (
+			i >= knownPrefixSize && prefixAvailable[i - knownPrefixSize] == PrefixAvailability::preserved
+		))
+		{
+			currentVocabSize++;
+		}
 	}
 	return m;
 }
@@ -2305,6 +2331,8 @@ size_t UnigramSwTrainer::reduceVocab(float ratio, size_t minVocabSize)
 	}
 	sort(alivePrefices.begin(), alivePrefices.end());
 	size_t reductionSize = min((size_t)(currentVocabSize * ratio), max(currentVocabSize, minVocabSize) - minVocabSize);
+
+	if (reductionSize <= 0) return 0;
 
 	size_t r = 0;
 	for (size_t i = 0; i < alivePrefices.size(); ++i)
