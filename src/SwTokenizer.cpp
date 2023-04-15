@@ -1336,6 +1336,9 @@ ostream& SwTokenizer::save(ostream& ostr) const
 		case SwTokenFlag::glue:
 			jvocab[i][2] = "glue";
 			break;
+		case SwTokenFlag::byte:
+			jvocab[i][2] = "byte";
+			break;
 		}
 		jvocab[i][3] = tokenLProbs[i];
 	}
@@ -2192,14 +2195,14 @@ pair<Vector<uint32_t>, float> UnigramSwTrainer::tokenizeBest(const WordCand& m) 
 	if (m.morph)
 	{
 		whole.first.emplace_back(wholeId);
-		whole.second = prefixLProbs[wholeId] - (prefixAvailable[wholeId] == PrefixAvailability::deleted ? 1e+9 : 0);
+		whole.second = prefixLProbs[wholeId] - ((wholeId >= knownPrefixSize && prefixAvailable[wholeId - knownPrefixSize] == PrefixAvailability::deleted) ? 1e+9 : 0);
 	}
 
 	if (m.baseEomi)
 	{
 		auto id = kiwi->morphToId(m.baseEomi);
 		split.first.emplace_back(id);
-		split.second = prefixLProbs[id] - (prefixAvailable[id] == PrefixAvailability::deleted ? 1e+9 : 0);
+		split.second = prefixLProbs[id] - ((id >= knownPrefixSize && prefixAvailable[id - knownPrefixSize] == PrefixAvailability::deleted) ? 1e+9 : 0);
 
 		id = kiwi->morphToId(m.suffix);
 		split.first.emplace_back(id);
@@ -2218,7 +2221,7 @@ pair<Vector<uint32_t>, float> UnigramSwTrainer::tokenizeBest(const WordCand& m) 
 				if (i >= 0)
 				{
 					ids.emplace_back(i);
-					score += prefixLProbs[i] - (prefixAvailable[i] == PrefixAvailability::deleted ? 1e+9 : 0);
+					score += prefixLProbs[i] - ((i >= knownPrefixSize && prefixAvailable[i - knownPrefixSize] == PrefixAvailability::deleted) ? 1e+9 : 0);
 				}
 				else
 				{

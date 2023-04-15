@@ -118,10 +118,7 @@
     <ClCompile Include="src\Joiner.cpp" />
     <ClCompile Include="src\search.cpp" />
     <ClCompile Include="src\TagUtils.cpp" />
-    <ClCompile Include="src\SwTokenizer.cpp">
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Disabled</Optimization>
-      <IntrinsicFunctions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</IntrinsicFunctions>
-    </ClCompile>
+    <ClCompile Include="src\SwTokenizer.cpp" />
     <ClCompile Include="src\TypoTransformer.cpp" />
     <ClCompile Include="src\UnicodeCase.cpp" />
     <ClCompile Include="third_party\mimalloc\src\static.c" />
