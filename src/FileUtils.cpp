@@ -29,4 +29,24 @@ namespace kiwi
 		f.exceptions(exc);
 		return f;
 	}
+
+	ofstream& openFile(ofstream& f, const string& filePath, ios_base::openmode mode)
+	{
+		auto exc = f.exceptions();
+		f.exceptions(ofstream::failbit | ofstream::badbit);
+		try
+		{
+#if defined(_WIN32) || defined(_WIN64)
+			f.open((const wchar_t*)utf8To16(filePath).c_str(), mode);
+#else
+			f.open(filePath, mode);
+#endif
+		}
+		catch (const ios_base::failure&)
+		{
+			throw Exception{ "Cannot open file : " + filePath };
+		}
+		f.exceptions(exc);
+		return f;
+	}
 }
