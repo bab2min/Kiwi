@@ -21,10 +21,6 @@ jobs:
             os: ubuntu-20.04
             compiler: clang
             version: "10"
-          - name: "Ubuntu 22.04 + clang-11"
-            os: ubuntu-22.04
-            compiler: clang
-            version: "11"
 
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.name }}
