@@ -961,7 +961,7 @@ void SwTokenizer::encode(vector<uint32_t>& ret, TokenIt first, TokenIt last, vec
 
 	for (; first != last; ++first)
 	{
-		decltype(auto) t = *first;
+		decltype(*first) t = *first;
 		size_t id = t.morph - baseMorph;
 		// Morpheme
 		if (id < morphToSw.size() && morphToSw[id] != -1)

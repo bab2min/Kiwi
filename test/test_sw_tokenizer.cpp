@@ -19,8 +19,8 @@ inline std::string to_string_with_fill(Ty value, char chr, size_t width = 0)
 	return ret;
 }
 
-template<class Ty, size_t n>
-constexpr std::vector<std::pair<Ty, Ty>> toPair(const Ty(&init)[n])
+template<class Ty, class ATy, size_t n>
+constexpr std::vector<std::pair<Ty, Ty>> toPair(const ATy(&init)[n])
 {
 	static_assert(n % 2 == 0, "initializer_list must have an even number of elements.");
 	return std::vector<std::pair<Ty, Ty>>{ (const std::pair<Ty, Ty>*)init, (const std::pair<Ty, Ty>*)init + n / 2 };
