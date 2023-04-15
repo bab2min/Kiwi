@@ -19,12 +19,20 @@ inline std::string to_string_with_fill(Ty value, char chr, size_t width = 0)
 	return ret;
 }
 
+#if defined(__GNUC__) && __GNUC__ < 5
+template<class Ty>
+constexpr std::vector<std::pair<Ty, Ty>> toPair(std::initializer_list<Ty> init)
+{
+	return std::vector<std::pair<Ty, Ty>>{ (const std::pair<Ty, Ty>*)init.begin(), (const std::pair<Ty, Ty>*)init.begin() + init.size() / 2 };
+}
+#else
 template<class Ty, class ATy, size_t n>
 constexpr std::vector<std::pair<Ty, Ty>> toPair(const ATy(&init)[n])
 {
 	static_assert(n % 2 == 0, "initializer_list must have an even number of elements.");
 	return std::vector<std::pair<Ty, Ty>>{ (const std::pair<Ty, Ty>*)init, (const std::pair<Ty, Ty>*)init + n / 2 };
 }
+#endif
 
 TEST(KiwiSwTokenizer, Builder)
 {
