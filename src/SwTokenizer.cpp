@@ -374,6 +374,12 @@ namespace kiwi
 					auto v = pathes.empty() ? Vector<uint32_t>{} : pathes.back().first;
 					auto s = pathes.empty() ? 0 : pathes.back().second;
 
+					if (c >= 0x10000) // surrogate
+					{
+						pathes.emplace_back();
+						if (generateOffset) pathesEndPtr.emplace_back();
+					}
+
 					u8bytes.clear();
 					if (sp) u8bytes.push_back(' ');
 					utf8FromCode(u8bytes, c);
