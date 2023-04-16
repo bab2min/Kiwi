@@ -398,7 +398,7 @@ namespace kiwi
 					pathes.emplace_back();
 					if (generateOffset) pathesEndPtr.emplace_back();
 				}
-				else
+				else if (unkTokenId != (size_t)-1)
 				{
 					if (pathes.empty())
 					{
@@ -421,6 +421,20 @@ namespace kiwi
 							if (generateOffset) pathesEndPtr.back().back() = i + 1;
 						}
 						pathes.emplace_back(move(v), s);
+					}
+				}
+				else
+				{
+					if (pathes.empty())
+					{
+						pathes.emplace_back(Vector<uint32_t>{ }, -100);
+						if (generateOffset) pathesEndPtr.emplace_back(Vector<uint32_t>{ });
+					}
+					else
+					{
+						auto v = pathes.back();
+						pathes.emplace_back(move(v));
+						if (generateOffset) pathesEndPtr.push_back(pathesEndPtr.back());
 					}
 				}
 				node = trie.root();
@@ -507,7 +521,7 @@ namespace kiwi
 					pathes.emplace_back();
 					if (generateOffset) pathesEndPtr.emplace_back();
 				}
-				else
+				else if (unkTokenId != (size_t)-1)
 				{
 					if (pathes.empty())
 					{
@@ -532,6 +546,20 @@ namespace kiwi
 						pathes.emplace_back(move(v), s);
 					}
 				}
+				else
+				{
+					if (pathes.empty())
+					{
+						pathes.emplace_back(Vector<uint32_t>{ }, -100);
+						if (generateOffset) pathesEndPtr.emplace_back(Vector<uint32_t>{ });
+					}
+					else
+					{
+						auto v = pathes.back();
+						pathes.emplace_back(move(v));
+						if (generateOffset) pathesEndPtr.push_back(pathesEndPtr.back());
+					}
+				}
 			}
 			else
 			{
@@ -551,7 +579,7 @@ namespace kiwi
 
 		if (pathes.back().first.empty())
 		{
-			out.emplace_back(unkTokenId);
+			if (unkTokenId != (size_t)-1) out.emplace_back(unkTokenId);
 			if (generateOffset) offset->emplace_back(offsetBias, offsetBias + str.size());
 			return false;
 		}
@@ -657,7 +685,7 @@ SwTokenizer SwTokenizerBuilder::build() const
 					id = (u16form[0] - 0xAC00) / 28;
 					if (t.flags == SwTokenFlag::subword) id += numHangulOpenSyllable;
 				}
-				else if (isHangulCoda(u16form[0]))
+				else if (isHangulCoda(u16form[0]) && t.flags == SwTokenFlag::subword)
 				{
 					id = numHangulOpenSyllable * 2 + (u16form[0] - 0x11A8);
 				}
@@ -673,7 +701,7 @@ SwTokenizer SwTokenizerBuilder::build() const
 				if (config.fallbackByte)
 				{
 					int id = stoi(t.form);
-					if (id < 0 || id >= 256) throw Exception{ "wrong byte token: " + t.form };
+					if (id < 0 || id >= 256) throw SwTokenizerException{ "wrong byte token: " + t.form };
 					ret.byteFallbackChrs[id] = tokenId;
 					vocab.vocabs.back().byte = id;
 				}
@@ -692,7 +720,7 @@ SwTokenizer SwTokenizerBuilder::build() const
 
 			if (trie.build(u16form.begin(), u16form.end(), tokenId + 1)->val != tokenId + 1)
 			{
-				throw Exception{ "duplicated token: " + t.form };
+				throw SwTokenizerException{ "duplicated token: " + t.form };
 			}
 		}
 		else
@@ -715,7 +743,7 @@ SwTokenizer SwTokenizerBuilder::build() const
 
 				if (ret.morphToSw[morphId] != -1)
 				{
-					throw Exception{ "duplicated token: " + t.form + "/" + tagToString(t.pos) };
+					throw SwTokenizerException{ "duplicated token: " + t.form + "/" + tagToString(t.pos) };
 				}
 				ret.morphToSw[morphId] = tokenId;
 			}
@@ -740,11 +768,11 @@ SwTokenizer SwTokenizerBuilder::build() const
 		{
 			if (any_of(config.specialTokens[i].begin(), config.specialTokens[i].end(), isSpace))
 			{
-				throw Exception{ "Special token shouldn't contain any whitespace characters, but: " + config.specialTokens[i]};
+				throw SwTokenizerException{ "Special token shouldn't contain any whitespace characters, but: " + config.specialTokens[i]};
 			}
 			auto u16str = utf8To16(config.specialTokens[i]);
 			auto node = trie.find(u16str.begin(), u16str.end());
-			if (!node) throw Exception{ "Token " + config.specialTokens[i] + " is not found in the vocabulary."};
+			if (!node) throw SwTokenizerException{ "Token " + config.specialTokens[i] + " is not found in the vocabulary."};
 			ret.specialTokenIds[i] = node->val - 1;
 		}
 	}
@@ -857,7 +885,7 @@ SwTokenizer::SwTokenizer(ArchType archType)
 		dfTokenizeSubword = reinterpret_cast<void*>(table[static_cast<ptrdiff_t>(archType)]);
 		dfTokenizeSubwordWithOffset = reinterpret_cast<void*>(tableWithOffset[static_cast<ptrdiff_t>(archType)]);
 
-		if (!dfTokenizeSubword || !dfTokenizeSubwordWithOffset) throw Exception{ string{ "Unsupported archType: " } + archToStr(archType) };
+		if (!dfTokenizeSubword || !dfTokenizeSubwordWithOffset) throw SwTokenizerException{ string{ "Unsupported archType: " } + archToStr(archType) };
 	}
 }
 
@@ -1314,6 +1342,43 @@ future<pair<vector<uint32_t>, vector<pair<uint32_t, uint32_t>>>> SwTokenizer::as
 	}, str);
 }
 
+namespace kiwi
+{
+	template<class Ty, class Key>
+	inline Ty getItem(const nlohmann::json& json, Key&& key)
+	{
+		auto it = json.find(key);
+		if (json.end() == it) throw SwTokenizerException{ "Missing key '" + string{ key } + "'" };
+		try
+		{
+			return it->get<Ty>();
+		}
+		catch (...)
+		{
+			throw SwTokenizerException{ "key '" + string{ key } + "' has wrong type." };
+		}
+	}
+
+	template<class Ty, class Key>
+	inline Ty getItemWithDefault(const nlohmann::json& json, Key&& key, const Ty& v)
+	{
+		auto it = json.find(key);
+		if (json.end() == it || it->is_null()) return v;
+		try
+		{
+			return it->get<Ty>();
+		}
+		catch (...)
+		{
+			throw SwTokenizerException{ "key '" + string{ key } + "' has wrong type." };
+		}
+	}
+
+	static constexpr const char* spTokenNames[] = {
+		"unk_token", "cls_token", "sep_token", "pad_token", "mask_token", "bos_token", "eos_token",
+	};
+}
+
 ostream& SwTokenizer::save(ostream& ostr) const
 {
 	nlohmann::json j;
@@ -1335,6 +1400,13 @@ ostream& SwTokenizer::save(ostream& ostr) const
 		{ "newline_token", config.newlineToken },
 	};
 	if (specialTokenIds[SwTokenizerConfig::glue] != -1) j["model"]["glue_token"] = specialTokenIds[SwTokenizerConfig::glue];
+
+	for (size_t i = 0; i <= SwTokenizerConfig::eos; ++i)
+	{
+		if (specialTokenIds[i] != -1) j["model"][spTokenNames[i]] = config.specialTokens[i];
+		else j["model"][spTokenNames[i]] = nullptr;
+	}
+
 	nlohmann::json jvocab = { size() };
 	for (size_t i = 0; i < size(); ++i)
 	{
@@ -1374,24 +1446,32 @@ ostream& SwTokenizer::save(ostream& ostr) const
 SwTokenizer SwTokenizer::load(const Kiwi& kiwi, istream& istr)
 {
 	auto j = nlohmann::json::parse(istr);
-	if (!j["decoder"].is_object()) throw Exception{ "Missing key 'decoder'" };
-	if (!j["model"].is_object()) throw Exception{ "Missing key 'model'" };
-	if (j["decoder"]["type"].get<string>() != "Kiwi") throw Exception{ "Unsupported `decoder.type`: " + j["decoder"]["type"].dump() };
+	if (!j["decoder"].is_object()) throw SwTokenizerException{ "Missing key 'decoder'" };
+	if (!j["model"].is_object()) throw SwTokenizerException{ "Missing key 'model'" };
+	if (j["decoder"]["type"].get<string>() != "Kiwi") throw SwTokenizerException{ "Unsupported `decoder.type`: " + j["decoder"]["type"].dump() };
 	SwTokenizerConfig config;
 	auto& m = j["model"];
-	if (!m["vocab"].is_array()) throw Exception{ "Missing key 'vocab'" };
-	config.doLowercase = m["lowercase"].get<bool>();
-	config.splitChinese = m["split_chinese"].get<bool>();
-	config.splitPunct = m["split_punct"].get<bool>();
-	config.splitVerb = m["split_verb"].get<bool>();
-	config.splitEomi = m["split_eomi"].get<bool>();
-	config.simpleTag = m["simple_tag"].get<bool>();
+	if (!m["vocab"].is_array()) throw SwTokenizerException{ "Missing key 'vocab'" };
+	config.doLowercase = getItem<bool>(m, "lowercase");
+	config.splitChinese = getItem<bool>(m, "split_chinese");
+	config.splitPunct = getItem<bool>(m, "split_punct");
+	config.splitVerb = getItem<bool>(m, "split_verb");
+	config.splitEomi = getItem<bool>(m, "split_eomi");
+	config.simpleTag = getItem<bool>(m, "simple_tag");
 	config.useGlueToken = m["glue_token"].is_number();
-	config.fallbackHangul = m["fallback_hangul"].get<bool>();
-	config.fallbackByte = m["fallback_byte"].get<bool>();
+	config.fallbackHangul = getItem<bool>(m, "fallback_hangul");
+	config.fallbackByte = getItem<bool>(m, "fallback_byte");
+	config.newlineToken = getItem<bool>(m, "newline_token");
+
+	for (size_t i = 0; i <= SwTokenizerConfig::eos; ++i)
+	{
+		config.specialTokens[i] = getItemWithDefault<string>(m, spTokenNames[i], "");
+	}
+
 	SwTokenizerBuilder builder{ kiwi, config };
 	for (auto& v : m["vocab"])
 	{
+		if (v.size() != 4) throw SwTokenizerException{ "Invalid vocab item: " + v.dump()};
 		string form = v[0].get<string>();
 		POSTag tag = POSTag::unknown;
 		if (!v[1].is_null())
@@ -1399,7 +1479,7 @@ SwTokenizer SwTokenizer::load(const Kiwi& kiwi, istream& istr)
 			if (config.simpleTag) tag = reprStrToTag(v[1].get<string>());
 			else tag = toPOSTag(utf8To16(v[1].get<string>()));
 
-			if (tag == POSTag::max) throw Exception{ "Wrong tag item: " + v[1].get<string>() };
+			if (tag == POSTag::max) throw SwTokenizerException{ "Invalid vocab item " + v.dump() };
 		}
 		SwTokenFlag flag = SwTokenFlag::none;
 		if (v[2].get<string>() == "word") flag = SwTokenFlag::none;
@@ -1410,6 +1490,7 @@ SwTokenizer SwTokenizer::load(const Kiwi& kiwi, istream& istr)
 		float lprob = v[3].get<float>();
 		builder.addToken(form, tag, flag, lprob);
 	}
+	
 	return builder.build();
 }
 
