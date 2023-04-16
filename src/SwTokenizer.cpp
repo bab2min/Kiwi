@@ -1351,7 +1351,7 @@ namespace kiwi
 		if (json.end() == it) throw SwTokenizerException{ "Missing key '" + string{ key } + "'" };
 		try
 		{
-			return it->get<Ty>();
+			return it->template get<Ty>();
 		}
 		catch (...)
 		{
@@ -1366,7 +1366,7 @@ namespace kiwi
 		if (json.end() == it || it->is_null()) return v;
 		try
 		{
-			return it->get<Ty>();
+			return it->template get<Ty>();
 		}
 		catch (...)
 		{
