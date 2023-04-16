@@ -95,6 +95,7 @@ namespace kiwi
 		double chrCoverage = 0.9995;
 		bool reduceStrict = false;
 		bool removeRepetitive = true;
+		bool preventMixedDigitTokens = true;
 	};
 
 	class SwTokenizer;

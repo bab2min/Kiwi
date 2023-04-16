@@ -1675,11 +1675,14 @@ size_t UnigramSwTrainer::_addSentences(Feeder&& feeder)
 		Vector<const Morpheme*> contMorphs;
 		Vector<size_t> contBoundaries;
 		bool spacePrefix = false;
+		bool isPrevNumber = false;
 		rsents.emplace_back();
 		for (auto& token : res.first.first)
 		{
 			if ((isTagForPrefix(token.tag) || !token.morph->kform || token.morph->kform->empty()) 
-				&& lastTokenEnd == token.position)
+				&& lastTokenEnd == token.position
+				&& !(trainConfig.preventMixedDigitTokens && token.tag == POSTag::sn)
+				&& !isPrevNumber)
 			{
 				if (contToken.empty())
 				{
@@ -1701,7 +1704,8 @@ size_t UnigramSwTrainer::_addSentences(Feeder&& feeder)
 				contToken.clear();
 				contMorphs.clear();
 				contBoundaries.clear();
-				lastTokenEnd = -1;
+				if (!(trainConfig.preventMixedDigitTokens && token.tag == POSTag::sn)
+					&& !isPrevNumber) lastTokenEnd = -1;
 			}
 
 			if (isTagForPrefix(token.tag) || !token.morph->kform || token.morph->kform->empty())
@@ -1714,6 +1718,7 @@ size_t UnigramSwTrainer::_addSentences(Feeder&& feeder)
 				contMorphs.emplace_back(token.morph);
 				contBoundaries.emplace_back(contToken.size());
 				lastTokenEnd = token.position + token.length;
+				isPrevNumber = (trainConfig.preventMixedDigitTokens && token.tag == POSTag::sn);
 			}
 			else
 			{
