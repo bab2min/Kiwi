@@ -66,7 +66,7 @@ namespace kiwi
 		bool splitVerb = true;
 		bool splitEomi = true;
 		bool useGlueToken = true;
-		bool newlineToken = false; // not implemented yet
+		bool newlineToken = false;
 		bool strict = false; // not implemented yet
 		bool fallbackHangul = true;
 		bool fallbackByte = false;
@@ -84,6 +84,7 @@ namespace kiwi
 				ret += p.empty() ? 0 : 1;
 			}
 			if (fallbackByte) ret += 256;
+			else if (newlineToken) ret += 1;
 			return ret;
 		}
 	};

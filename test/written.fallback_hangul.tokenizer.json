@@ -13,6 +13,8 @@
   "split_verb": true,
   "fallback_hangul": true,
   "fallback_byte": false,
+  "newline_token": false,
+  "unk_token": "[UNK]",
   "vocab": [
    [
     "[UNK]",

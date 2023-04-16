@@ -1,4 +1,4 @@
-#include "gtest/gtest.h"
+﻿#include "gtest/gtest.h"
 #include <fstream>
 #include <kiwi/Kiwi.h>
 #include <kiwi/SwTokenizer.h>
@@ -308,3 +308,23 @@ TEST(KiwiSwTokenizer, FallbackByte)
 	}
 }
 
+TEST(KiwiSwTokenizer, Newline)
+{
+	auto c = u8"줄 바꿈이 하나\n둘\n\n셋\n\n\n있어요.";
+	SwTokenizer tokenizer;
+	{
+		std::ifstream ifs{ "test/written.fallback_byte.tokenizer.json" };
+		tokenizer = SwTokenizer::load(reuseKiwiInstance(), ifs);
+		auto encoded = tokenizer.encode(c);
+		auto decoded = tokenizer.decode(encoded);
+		EXPECT_EQ(decoded, u8"줄 바꿈이 하나 둘 셋 있어요.");
+	}
+
+	{
+		std::ifstream ifs{ "test/written.newline.tokenizer.json" };
+		tokenizer = SwTokenizer::load(reuseKiwiInstance(), ifs);
+		auto encoded = tokenizer.encode(c);
+		auto decoded = tokenizer.decode(encoded);
+		EXPECT_EQ(decoded, u8"줄 바꿈이 하나\n둘\n\n셋\n\n\n있어요.");
+	}
+}

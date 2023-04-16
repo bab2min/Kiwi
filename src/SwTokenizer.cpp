@@ -1,4 +1,4 @@
-﻿#include <unordered_set>
+#include <unordered_set>
 #include <set>
 
 #include <nlohmann/json.hpp>
@@ -620,7 +620,7 @@ SwTokenizer SwTokenizerBuilder::build() const
 	{
 		ret.hangulFallbackChrs.resize(numHangulOpenSyllable * 2 + 27, -1);
 	}
-	if (config.fallbackByte)
+	if (config.fallbackByte || config.newlineToken)
 	{
 		ret.byteFallbackChrs.resize(256);
 	}
@@ -959,10 +959,31 @@ void SwTokenizer::encode(vector<uint32_t>& ret, TokenIt first, TokenIt last, vec
 		tokenBuf.clear();
 	};
 
+	size_t lastLineNumber = 0;
 	for (; first != last; ++first)
 	{
 		decltype(*first) t = *first;
 		size_t id = t.morph - baseMorph;
+
+		if (config.newlineToken && t.lineNumber > lastLineNumber)
+		{
+			pushSubwords();
+			
+			uint32_t prevPosition = 0;
+			if (offset && !offset->empty())
+			{
+				prevPosition = offset->back().second;
+			}
+
+			for (size_t i = lastLineNumber; i < t.lineNumber; ++i)
+			{
+				ret.emplace_back(byteFallbackChrs['\n']);
+				if (offset) offset->emplace_back(prevPosition, t.position);
+			}
+			startPosition = -1;
+			lastLineNumber = t.lineNumber;
+		}
+
 		// Morpheme
 		if (id < morphToSw.size() && morphToSw[id] != -1)
 		{
@@ -1311,6 +1332,7 @@ ostream& SwTokenizer::save(ostream& ostr) const
 		{ "glue_token", nullptr },
 		{ "fallback_hangul", config.fallbackHangul },
 		{ "fallback_byte", config.fallbackByte },
+		{ "newline_token", config.newlineToken },
 	};
 	if (specialTokenIds[SwTokenizerConfig::glue] != -1) j["model"]["glue_token"] = specialTokenIds[SwTokenizerConfig::glue];
 	nlohmann::json jvocab = { size() };
@@ -2474,6 +2496,10 @@ SwTokenizer UnigramSwTrainer::build() const
 		{
 			builder.addToken(to_string(i), POSTag::unknown, SwTokenFlag::byte, 0);
 		}
+	}
+	else if (config.newlineToken)
+	{
+		builder.addToken("10", POSTag::unknown, SwTokenFlag::byte, 0);
 	}
 
 	return builder.build();
