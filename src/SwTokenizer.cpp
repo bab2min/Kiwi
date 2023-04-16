@@ -1,4 +1,4 @@
-#include <unordered_set>
+﻿#include <unordered_set>
 #include <set>
 
 #include <nlohmann/json.hpp>
@@ -1862,10 +1862,11 @@ float UnigramSwTrainer::buildSubwordVocabs(const size_t minCnt, const size_t max
 		{
 			U16StringView s{ p.first };
 			if (!s.empty() && s[0] == u' ') s = s.substr(1);
+			if (!s.empty() && s.back() <= 1) s = s.substr(0, s.size() - 1);
 			foreachU32Chr(s, [&, i = 0](char32_t c) mutable
 			{
 				chrCnts[c]++;
-				if (i++ == 0) prefixChrCnts[c]++;
+				if (i++ == 0 && p.first.front() == u' ') prefixChrCnts[c]++;
 			});
 			if (p.first.size() <= 1) continue;
 			chrLength += (p.first.size() + 1) * wordCnts[p.second];
@@ -1877,6 +1878,7 @@ float UnigramSwTrainer::buildSubwordVocabs(const size_t minCnt, const size_t max
 		{
 			U16StringView s{ p.first };
 			if (!s.empty() && s[0] == u' ') s = s.substr(1);
+			if (!s.empty() && s.back() <= 1) s = s.substr(0, s.size() - 1);
 			if (s.size() <= 1) continue;
 			for (size_t i = 0; i < wordCnts[p.second]; ++i)
 			{
@@ -1952,6 +1954,7 @@ float UnigramSwTrainer::buildSubwordVocabs(const size_t minCnt, const size_t max
 	for (auto p : chrCnts)
 	{
 		auto c = p.first;
+		if (config.splitChinese && isChineseChr(c)) continue;
 		if (c < 0x10000)
 		{
 			char16_t c16 = c;
