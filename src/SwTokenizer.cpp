@@ -997,7 +997,7 @@ void SwTokenizer::encode(vector<uint32_t>& ret, TokenIt first, TokenIt last, vec
 	for (; first != last; ++first)
 	{
 		decltype(*first) t = *first;
-		size_t id = t.morph - baseMorph;
+		size_t id = t.morph ? (t.morph - baseMorph) : -1;
 
 		if (config.newlineToken && t.lineNumber > lastLineNumber)
 		{
@@ -1049,7 +1049,7 @@ void SwTokenizer::encode(vector<uint32_t>& ret, TokenIt first, TokenIt last, vec
 
 		if (config.splitVerb && isVerbClass(t.tag))
 		{
-			if (t.morph->complex)
+			if (t.morph && t.morph->complex)
 			{
 				pushSubwords();
 				if (offset)
@@ -1100,7 +1100,7 @@ void SwTokenizer::encode(vector<uint32_t>& ret, TokenIt first, TokenIt last, vec
 
 		if (config.splitEomi && isEClass(t.tag))
 		{
-			if (t.morph->complex)
+			if (t.morph && t.morph->complex)
 			{
 				pushSubwords();
 				size_t i = 0;
@@ -1126,6 +1126,11 @@ void SwTokenizer::encode(vector<uint32_t>& ret, TokenIt first, TokenIt last, vec
 				lastPosition = t.position + t.length;
 				continue;
 			}
+		}
+
+		if (t.str.empty())
+		{
+			throw SwTokenizerException{ "`encode` accepts empty str token." };
 		}
 
 		if (startPosition != -1 && lastPosition == t.position)
@@ -1175,43 +1180,48 @@ namespace kiwi
 		const Ty* ptr = nullptr;
 		size_t accumPosition = 0;
 
+		mutable size_t tokenIdx = -1;
+		mutable size_t offset = 0;
+		mutable Vector<TokenInfo> tokens;
+
 		template<class Str>
-		TokenInfo convert(const pair<Str, POSTag>& p) const
+		void store(const pair<Str, POSTag>& p) const
 		{
-			TokenInfo ret;
-			ret.str = toUTF16(p.first);
-			ret.tag = p.second;
-			ret.position = accumPosition;
-			ret.length = ret.str.size();
-			auto morphs = kw->findMorpheme(ret.str, ret.tag);
-			if (!morphs.empty()) ret.morph = morphs[0];
-			return ret;
+			return store(make_tuple(p.first, p.second, false));
 		}
 
 		template<class Str>
-		TokenInfo convert(const tuple<Str, POSTag, bool>& p) const
+		void store(const tuple<Str, POSTag, bool>& p) const
 		{
-			TokenInfo ret;
-			ret.str = toUTF16(get<0>(p));
-			ret.tag = get<1>(p);
-			ret.position = accumPosition + (get<2>(p) ? 1 : 0);
-			ret.length = ret.str.size();
-			auto morphs = kw->findMorpheme(ret.str, ret.tag);
-			if (!morphs.empty()) ret.morph = morphs[0];
-			return ret;
+			tokens.clear();
+			tokenIdx = 0;
+			u16string str = toUTF16(get<0>(p));
+			POSTag tag = get<1>(p);
+			size_t position = accumPosition + (get<2>(p) ? 1 : 0);
+			size_t length = str.size();
+			offset = str.size() + (get<2>(p) ? 1 : 0);
+			auto morphs = kw->findMorpheme(str, tag);
+			if (morphs.empty())
+			{
+				if (isVerbClass(tag))
+				{
+					str.push_back(u'다');
+					auto results = kw->analyze(str, Match::none).first;
+					tokens.insert(tokens.end(), results.begin(), results.end() - (results.size() > 1 ? 1 : 0));
+					for (auto& t : tokens) t.position += position;
+				}
+				else
+				{
+					tokens.emplace_back(move(str), tag, position, length);
+				}
+			}
+			else
+			{
+				tokens.emplace_back(move(str), tag, position, length);
+				tokens.back().morph = morphs[0];
+			}
 		}
 
-		template<class Str>
-		size_t offset(const pair<Str, POSTag>& p) const
-		{
-			return toUTF16(p.first).size();
-		}
-
-		template<class Str>
-		size_t offset(const tuple<Str, POSTag, bool>& p) const
-		{
-			return toUTF16(get<0>(p)).size() + (get<2>(p) ? 1 : 0);
-		}
 
 	public:
 
@@ -1220,15 +1230,20 @@ namespace kiwi
 		{
 		}
 
-		TokenInfo operator*() const
+		const TokenInfo& operator*() const
 		{
-			return convert(*ptr);
+			if (tokenIdx == -1) store(*ptr);
+			return tokens[tokenIdx];
 		}
 
 		TokenInfoConvertingIterator& operator++()
 		{
-			accumPosition += offset(*ptr);
-			++ptr;
+			if (++tokenIdx >= tokens.size())
+			{
+				tokenIdx = -1;
+				accumPosition += offset;
+				++ptr;
+			}
 			return *this;
 		}
 
