@@ -1212,12 +1212,12 @@ namespace kiwi
 				}
 				else
 				{
-					tokens.emplace_back(move(str), tag, position, length);
+					tokens.emplace_back(move(str), tag, length, position);
 				}
 			}
 			else
 			{
-				tokens.emplace_back(move(str), tag, position, length);
+				tokens.emplace_back(move(str), tag, length, position);
 				tokens.back().morph = morphs[0];
 			}
 		}
