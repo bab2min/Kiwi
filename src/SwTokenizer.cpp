@@ -299,6 +299,9 @@ namespace kiwi
 		if (spacePrefix) node = node->template nextOpt<arch>(trie, u' ');
 		for (size_t i = 0; i < str.size(); ++i)
 		{
+			cands.clear();
+			if (generateOffset) candsEndPtr.clear();
+
 			auto nnode = node->template nextOpt<arch>(trie, str[i]);
 			while (!nnode)
 			{
@@ -306,8 +309,83 @@ namespace kiwi
 				if (!node) break;
 				nnode = node->template nextOpt<arch>(trie, str[i]);
 			}
-			
-			if (!nnode) 
+
+			if (nnode)
+			{
+				size_t v = nnode->val(trie);
+
+				if (trie.hasMatch(v))
+				{
+					auto tokenId = v - 1;
+					auto& p = vocabs[tokenId];
+					if (p.length == i + 1)
+					{
+						if (p.flags != SwTokenFlag::glue)
+						{
+							cands.emplace_back(Vector<uint32_t>{ (uint32_t)tokenId }, tokenLProbs[tokenId]);
+							if (generateOffset) candsEndPtr.emplace_back(Vector<uint32_t>{ (uint32_t)(i + 1) });
+						}
+					}
+					else
+					{
+						auto& l = pathes[i - p.length];
+						if (!l.first.empty() && (
+							!(p.flags == SwTokenFlag::none && !config.useGlueToken)
+							|| p.flags == SwTokenFlag::glue
+							|| p.flags == SwTokenFlag::chinese
+							))
+						{
+							cands.emplace_back(l);
+							if (generateOffset) candsEndPtr.emplace_back(pathesEndPtr[i - p.length]);
+
+							if (p.flags == SwTokenFlag::none)
+							{
+								cands.back().first.emplace_back(glueTokenId);
+								cands.back().second += tokenLProbs[glueTokenId];
+								if (generateOffset) candsEndPtr.back().emplace_back(i - p.length + 1);
+							}
+							cands.back().first.emplace_back(tokenId);
+							cands.back().second += tokenLProbs[tokenId];
+							if (generateOffset) candsEndPtr.back().emplace_back(i + 1);
+						}
+					}
+				}
+
+				if (trie.hasMatch(v) || trie.hasSubmatch(v))
+				{
+					for (auto submatcher = nnode->fail(); submatcher; submatcher = submatcher->fail())
+					{
+						v = submatcher->val(trie);
+						if (trie.hasMatch(v))
+						{
+							auto tokenId = v - 1;
+							auto& p = vocabs[tokenId];
+							if (p.length > i) continue;
+							auto& l = pathes[i - p.length];
+							if (!l.first.empty() && (
+								!(p.flags == SwTokenFlag::none && !config.useGlueToken)
+								|| p.flags == SwTokenFlag::glue
+								|| p.flags == SwTokenFlag::chinese
+								))
+							{
+								cands.emplace_back(l);
+								if (generateOffset) candsEndPtr.emplace_back(pathesEndPtr[i - p.length]);
+								if (p.flags == SwTokenFlag::none)
+								{
+									cands.back().first.emplace_back(glueTokenId);
+									cands.back().second += tokenLProbs[glueTokenId];
+									if (generateOffset) candsEndPtr.back().emplace_back(i - p.length + 1);
+								}
+								cands.back().first.emplace_back(tokenId);
+								cands.back().second += tokenLProbs[tokenId];
+								if (generateOffset) candsEndPtr.back().emplace_back(i + 1);
+							}
+						}
+					}
+				}
+			}
+
+			if (cands.empty())
 			{
 				if (config.fallbackHangul && isHangulSyllable(str[i]) && (str[i] - 0xAC00) % 28 > 0)
 				{
@@ -351,8 +429,7 @@ namespace kiwi
 								else pathesEndPtr.push_back(pathesEndPtr.back());
 								pathesEndPtr.back().resize(pathesEndPtr.size() + inserted, i + 1);
 							}
-							node = trie.root();
-							continue;
+							goto endOfLoop;
 						}
 					}
 				}
@@ -370,7 +447,7 @@ namespace kiwi
 					{
 						c = str[i];
 					}
-					
+
 					auto v = pathes.empty() ? Vector<uint32_t>{} : pathes.back().first;
 					auto s = pathes.empty() ? 0 : pathes.back().second;
 
@@ -395,133 +472,9 @@ namespace kiwi
 						else pathesEndPtr.push_back(pathesEndPtr.back());
 						pathesEndPtr.back().resize(pathesEndPtr.size() + u8bytes.size(), i + 1);
 					}
-					node = trie.root();
-					continue;
+					goto endOfLoop;
 				}
 
-				if (config.wholeWordUnk)
-				{
-					pathes.emplace_back();
-					if (generateOffset) pathesEndPtr.emplace_back();
-				}
-				else if (unkTokenId != (size_t)-1)
-				{
-					if (pathes.empty())
-					{
-						pathes.emplace_back(Vector<uint32_t>{ (uint32_t)unkTokenId }, -100);
-						if (generateOffset) pathesEndPtr.emplace_back(Vector<uint32_t>{ (uint32_t)(i + 1) });
-					}
-					else
-					{
-						auto v = pathes.back().first;
-						auto s = pathes.back().second;
-						if (generateOffset) pathesEndPtr.push_back(pathesEndPtr.back());
-						if (v.back() != unkTokenId)
-						{
-							v.emplace_back(unkTokenId);
-							s -= 100;
-							if (generateOffset) pathesEndPtr.back().emplace_back(i + 1);
-						}
-						else
-						{
-							if (generateOffset) pathesEndPtr.back().back() = i + 1;
-						}
-						pathes.emplace_back(move(v), s);
-					}
-				}
-				else
-				{
-					if (pathes.empty())
-					{
-						pathes.emplace_back(Vector<uint32_t>{ }, -100);
-						if (generateOffset) pathesEndPtr.emplace_back(Vector<uint32_t>{ });
-					}
-					else
-					{
-						auto v = pathes.back();
-						pathes.emplace_back(move(v));
-						if (generateOffset) pathesEndPtr.push_back(pathesEndPtr.back());
-					}
-				}
-				node = trie.root();
-				continue;
-			}
-			size_t v = nnode->val(trie);
-
-			cands.clear();
-			if (generateOffset) candsEndPtr.clear();
-			if (trie.hasMatch(v))
-			{
-				auto tokenId = v - 1;
-				auto& p = vocabs[tokenId];
-				if (p.length == i + 1)
-				{
-					if (p.flags != SwTokenFlag::glue)
-					{
-						cands.emplace_back(Vector<uint32_t>{ (uint32_t)tokenId }, tokenLProbs[tokenId]);
-						if (generateOffset) candsEndPtr.emplace_back(Vector<uint32_t>{ (uint32_t)(i + 1) });
-					}
-				}
-				else
-				{
-					auto& l = pathes[i - p.length];
-					if (!l.first.empty() && (
-						!(p.flags == SwTokenFlag::none && !config.useGlueToken)
-						|| p.flags == SwTokenFlag::glue
-						|| p.flags == SwTokenFlag::chinese
-					))
-					{
-						cands.emplace_back(l);
-						if (generateOffset) candsEndPtr.emplace_back(pathesEndPtr[i - p.length]);
-
-						if (p.flags == SwTokenFlag::none)
-						{
-							cands.back().first.emplace_back(glueTokenId);
-							cands.back().second += tokenLProbs[glueTokenId];
-							if (generateOffset) candsEndPtr.back().emplace_back(i - p.length + 1);
-						}
-						cands.back().first.emplace_back(tokenId);
-						cands.back().second += tokenLProbs[tokenId];
-						if (generateOffset) candsEndPtr.back().emplace_back(i + 1);
-					}
-				}
-			}
-
-			if (trie.hasMatch(v) || trie.hasSubmatch(v))
-			{
-				for (auto submatcher = nnode->fail(); submatcher; submatcher = submatcher->fail())
-				{
-					v = submatcher->val(trie);
-					if (trie.hasMatch(v))
-					{
-						auto tokenId = v - 1;
-						auto& p = vocabs[tokenId];
-						if (p.length > i) continue;
-						auto& l = pathes[i - p.length];
-						if (!l.first.empty() && (
-							!(p.flags == SwTokenFlag::none && !config.useGlueToken)
-							|| p.flags == SwTokenFlag::glue
-							|| p.flags == SwTokenFlag::chinese
-						))
-						{
-							cands.emplace_back(l);
-							if (generateOffset) candsEndPtr.emplace_back(pathesEndPtr[i - p.length]);
-							if (p.flags == SwTokenFlag::none)
-							{
-								cands.back().first.emplace_back(glueTokenId);
-								cands.back().second += tokenLProbs[glueTokenId];
-								if (generateOffset) candsEndPtr.back().emplace_back(i - p.length + 1);
-							}
-							cands.back().first.emplace_back(tokenId);
-							cands.back().second += tokenLProbs[tokenId];
-							if (generateOffset) candsEndPtr.back().emplace_back(i + 1);
-						}
-					}
-				}
-			}
-
-			if (cands.empty())
-			{
 				if (config.wholeWordUnk)
 				{
 					pathes.emplace_back();
@@ -580,7 +533,8 @@ namespace kiwi
 				pathes.emplace_back(move(cands[bestPath]));
 				if (generateOffset) pathesEndPtr.emplace_back(move(candsEndPtr[bestPath]));
 			}
-			node = nnode;
+		endOfLoop:
+			node = nnode ? nnode : trie.root();
 		}
 
 		if (pathes.back().first.empty())
