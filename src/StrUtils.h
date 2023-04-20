@@ -112,7 +112,7 @@ namespace kiwi
 		for (auto it = str.begin(); it != str.end(); ++it)
 		{
 			uint32_t code = 0;
-			uint32_t byte = *it;
+			uint32_t byte = (uint8_t)*it;
 			if ((byte & 0xF8) == 0xF0)
 			{
 				code = (uint32_t)((byte & 0x07) << 18);

@@ -569,6 +569,111 @@ namespace kiwi
 			static constexpr FnTokenizeSubword value = &tokenizeSubword<static_cast<ArchType>(i), generateOffset>;
 		};
 	};
+
+	inline void utf8To16IgnoringErrors(nonstd::string_view str, std::u16string& ret)
+	{
+		ret.clear();
+		for (auto it = str.begin(); it != str.end(); ++it)
+		{
+			uint32_t code = 0;
+			auto safeIt = it;
+			bool success = true;
+			do
+			{
+				uint32_t byte = (uint8_t)*it;
+				if ((byte & 0xF8) == 0xF0)
+				{
+					code = (uint32_t)((byte & 0x07) << 18);
+					if (++it == str.end() || ((byte = *it) & 0xC0) != 0x80)
+					{
+						success = false;
+						break;
+					}
+
+					code |= (uint32_t)((byte & 0x3F) << 12);
+					if (++it == str.end() || ((byte = *it) & 0xC0) != 0x80)
+					{
+						success = false;
+						break;
+					}
+					code |= (uint32_t)((byte & 0x3F) << 6);
+					if (++it == str.end() || ((byte = *it) & 0xC0) != 0x80)
+					{
+						success = false;
+						break;
+					}
+					code |= (byte & 0x3F);
+				}
+				else if ((byte & 0xF0) == 0xE0)
+				{
+					code = (uint32_t)((byte & 0x0F) << 12);
+					if (++it == str.end() || ((byte = *it) & 0xC0) != 0x80)
+					{
+						success = false;
+						break;
+					}
+					code |= (uint32_t)((byte & 0x3F) << 6);
+					if (++it == str.end() || ((byte = *it) & 0xC0) != 0x80)
+					{
+						success = false;
+						break;
+					}
+					code |= (byte & 0x3F);
+				}
+				else if ((byte & 0xE0) == 0xC0)
+				{
+					code = (uint32_t)((byte & 0x1F) << 6);
+					if (++it == str.end() || ((byte = *it) & 0xC0) != 0x80)
+					{
+						success = false;
+						break;
+					}
+					code |= (byte & 0x3F);
+				}
+				else if ((byte & 0x80) == 0x00)
+				{
+					code = byte;
+				}
+				else
+				{
+					success = false;
+					break;
+				}
+			} while (0);
+
+			if (success)
+			{
+				if (code < 0x10000)
+				{
+					ret.push_back((char16_t)code);
+				}
+				else if (code < 0x10FFFF)
+				{
+					code -= 0x10000;
+					ret.push_back((char16_t)(0xD800 | (code >> 10)));
+					ret.push_back((char16_t)(0xDC00 | (code & 0x3FF)));
+				}
+			}
+			else
+			{
+				for (auto j = safeIt; j <= it; ++j)
+				{
+					uint8_t byte = *j;
+					ret += u"<0x";
+					ret.push_back(u"0123456789ABCDEF"[byte >> 4]);
+					ret.push_back(u"0123456789ABCDEF"[byte & 0xF]);
+					ret += u">";
+				}
+			}
+		}
+	}
+
+	inline std::u16string utf8To16IgnoringErrors(nonstd::string_view str)
+	{
+		std::u16string ret;
+		utf8To16IgnoringErrors(str, ret);
+		return ret;
+	}
 }
 
 SwTokenizerBuilder::SwTokenizerBuilder(const Kiwi& _kiwi, const SwTokenizerConfig& _config)
@@ -1244,7 +1349,7 @@ void SwTokenizer::encode(vector<uint32_t>& out, const vector<tuple<u16string, PO
 }
 
 template<class It>
-string SwTokenizer::decode(It first, It last) const
+string SwTokenizer::decode(It first, It last, bool ignoreErrors) const
 {
 	auto joiner = kiwi->newJoiner(false);
 	string u8bytes;
@@ -1262,7 +1367,7 @@ string SwTokenizer::decode(It first, It last) const
 		{
 			if (!u8bytes.empty())
 			{
-				joiner.add(utf8To16(u8bytes), POSTag::unknown);
+				joiner.add(ignoreErrors? utf8To16IgnoringErrors(u8bytes) : utf8To16(u8bytes), POSTag::unknown);
 				u8bytes.clear();
 			}
 		}
@@ -1282,21 +1387,21 @@ string SwTokenizer::decode(It first, It last) const
 
 	if (!u8bytes.empty())
 	{
-		joiner.add(utf8To16(u8bytes), POSTag::unknown);
+		joiner.add(ignoreErrors ? utf8To16IgnoringErrors(u8bytes) : utf8To16(u8bytes), POSTag::unknown);
 		u8bytes.clear();
 	}
 	return joiner.getU8();
 	
 }
 
-string SwTokenizer::decode(const vector<uint32_t>& ids) const
+string SwTokenizer::decode(const vector<uint32_t>& ids, bool ignoreErrors) const
 {
-	return decode(ids.begin(), ids.end());
+	return decode(ids.begin(), ids.end(), ignoreErrors);
 }
 
-string SwTokenizer::decode(const uint32_t* ids, size_t length) const
+string SwTokenizer::decode(const uint32_t* ids, size_t length, bool ignoreErrors) const
 {
-	return decode(ids, ids + length);
+	return decode(ids, ids + length, ignoreErrors);
 }
 
 future<vector<uint32_t>> SwTokenizer::asyncEncode(const string& str) const

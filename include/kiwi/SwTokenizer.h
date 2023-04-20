@@ -186,7 +186,7 @@ namespace kiwi
 		void encode(std::vector<uint32_t>& out, TokenIt first, TokenIt last, std::vector<std::pair<uint32_t, uint32_t>>* offset = nullptr) const;
 
 		template<class It>
-		std::string decode(It first, It last) const;
+		std::string decode(It first, It last, bool ignoreErrors = true) const;
 
 	public:
 		SwTokenizer(ArchType arch = ArchType::default_);
@@ -215,8 +215,8 @@ namespace kiwi
 		void encode(std::vector<uint32_t>& out, const std::vector<std::tuple<std::u16string, POSTag, bool>>& morphs) const;
 		std::vector<uint32_t> encode(const std::vector<std::tuple<std::u16string, POSTag, bool>>& morphs) const;
 
-		std::string decode(const std::vector<uint32_t>& ids) const;
-		std::string decode(const uint32_t* ids, size_t length) const;
+		std::string decode(const std::vector<uint32_t>& ids, bool ignoreErrors = true) const;
+		std::string decode(const uint32_t* ids, size_t length, bool ignoreErrors = true) const;
 
 		std::future<std::vector<uint32_t>> asyncEncode(const std::string& str) const;
 		std::future<std::pair<std::vector<uint32_t>, std::vector<std::pair<uint32_t, uint32_t>>>> asyncEncodeOffset(const std::string& str) const;
