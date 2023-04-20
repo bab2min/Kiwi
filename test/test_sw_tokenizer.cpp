@@ -335,7 +335,7 @@ TEST(KiwiSwTokenizer, FallbackByteDecodeIgnoreErrors)
 	std::ifstream ifs{ "test/written.fallback_byte.tokenizer.json" };
 	tokenizer = SwTokenizer::load(reuseKiwiInstance(), ifs);
 	
-	std::vector<uint32_t> d{ 32255, 32254, 32253 };
+	std::vector<uint32_t> d{ 32255, 32254, 32253, 10, 32230, 32128 };
 
 	{
 		EXPECT_ANY_THROW(tokenizer.decode(d, false));
@@ -343,6 +343,6 @@ TEST(KiwiSwTokenizer, FallbackByteDecodeIgnoreErrors)
 
 	{
 		auto decoded = tokenizer.decode(d);
-		EXPECT_EQ(decoded, u8"<0xFF><0xFE><0xFD>");
+		EXPECT_EQ(decoded, u8"<0xFF><0xFE><0xFD>에<0xE6><0x80>");
 	}
 }

@@ -656,7 +656,7 @@ namespace kiwi
 			}
 			else
 			{
-				for (auto j = safeIt; j <= it; ++j)
+				for (auto j = safeIt; j <= it && j != str.end(); ++j)
 				{
 					uint8_t byte = *j;
 					ret += u"<0x";
@@ -664,6 +664,7 @@ namespace kiwi
 					ret.push_back(u"0123456789ABCDEF"[byte & 0xF]);
 					ret += u">";
 				}
+				if (it == str.end()) return;
 			}
 		}
 	}
