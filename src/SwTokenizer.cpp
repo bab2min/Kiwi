@@ -1481,6 +1481,7 @@ ostream& SwTokenizer::save(ostream& ostr) const
 		{ "newline_token", config.newlineToken },
 	};
 	if (specialTokenIds[SwTokenizerConfig::glue] != -1) j["model"]["glue_token"] = specialTokenIds[SwTokenizerConfig::glue];
+	j["additional"] = nlohmann::json::parse(config.additionalJson);
 
 	for (size_t i = 0; i <= SwTokenizerConfig::eos; ++i)
 	{
@@ -1543,6 +1544,10 @@ SwTokenizer SwTokenizer::load(const Kiwi& kiwi, istream& istr)
 	config.fallbackHangul = getItem<bool>(m, "fallback_hangul");
 	config.fallbackByte = getItem<bool>(m, "fallback_byte");
 	config.newlineToken = getItem<bool>(m, "newline_token");
+	if (j.count("additional"))
+	{
+		config.additionalJson = j["additional"].dump();
+	}
 
 	for (size_t i = 0; i <= SwTokenizerConfig::eos; ++i)
 	{

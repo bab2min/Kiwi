@@ -70,6 +70,7 @@ namespace kiwi
 		bool strict = false; // not implemented yet
 		bool fallbackHangul = true;
 		bool fallbackByte = false;
+		std::string additionalJson;
 
 		SwTokenizerConfig()
 		{
