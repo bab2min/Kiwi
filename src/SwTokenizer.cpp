@@ -990,10 +990,10 @@ SwTokenizer::Vocab& SwTokenizer::Vocab::operator=(const Vocab& o)
 	return *this;
 }
 
-vector<uint32_t> SwTokenizer::encode(const string& str, vector<pair<uint32_t, uint32_t>>* offset) const
+vector<uint32_t> SwTokenizer::encode(const string& str, vector<pair<uint32_t, uint32_t>>* offset, bool offsetInChrLevel) const
 {
 	vector<uint32_t> ret;
-	encode(ret, str, offset);
+	encode(ret, str, offset, offsetInChrLevel);
 	return ret;
 }
 
@@ -1212,12 +1212,23 @@ void SwTokenizer::encode(vector<uint32_t>& ret, TokenIt first, TokenIt last, vec
 	pushSubwords();
 }
 
-void SwTokenizer::encode(vector<uint32_t>& ret, const string& str, vector<pair<uint32_t, uint32_t>>* offset) const
+void SwTokenizer::encode(vector<uint32_t>& ret, const string& str, vector<pair<uint32_t, uint32_t>>* offset, bool offsetInChrLevel) const
 {
-	Vector<size_t> bytePositions;
+	Vector<size_t> positions;
 	size_t offsetStart = offset ? offset->size() : 0;
-	auto tokens = kiwi->analyze(utf8To16(str, bytePositions), Match::normalizeCoda | Match::zCoda).first;
-	bytePositions.emplace_back(str.size());
+	u16string u16;
+	if (offsetInChrLevel)
+	{
+		u16 = utf8To16ChrPoisition(str, positions);
+		positions.emplace_back(positions.empty() ? 0 : (positions.back() + 1));
+	}
+	else
+	{
+		u16 = utf8To16(str, positions);
+		positions.emplace_back(str.size());
+	}
+	auto tokens = kiwi->analyze(move(u16), Match::normalizeCoda | Match::zCoda).first;
+	
 	
 	encode(ret, tokens.begin(), tokens.end(), offset);
 
@@ -1225,8 +1236,8 @@ void SwTokenizer::encode(vector<uint32_t>& ret, const string& str, vector<pair<u
 	{
 		for (size_t i = offsetStart; i < offset->size(); ++i)
 		{
-			(*offset)[i].first = bytePositions[(*offset)[i].first];
-			(*offset)[i].second = bytePositions[(*offset)[i].second];
+			(*offset)[i].first = positions[(*offset)[i].first];
+			(*offset)[i].second = positions[(*offset)[i].second];
 		}
 	}
 }
@@ -1413,12 +1424,12 @@ future<vector<uint32_t>> SwTokenizer::asyncEncode(const string& str) const
 	}, str);
 }
 
-future<pair<vector<uint32_t>, vector<pair<uint32_t, uint32_t>>>> SwTokenizer::asyncEncodeOffset(const string& str) const
+future<pair<vector<uint32_t>, vector<pair<uint32_t, uint32_t>>>> SwTokenizer::asyncEncodeOffset(const string& str, bool offsetInChrLevel) const
 {
-	return kiwi->getThreadPool()->enqueue([&](size_t, const string& str)
+	return kiwi->getThreadPool()->enqueue([&, offsetInChrLevel](size_t, const string& str)
 	{
 		vector<pair<uint32_t, uint32_t>> offset;
-		auto ids = encode(str, &offset);
+		auto ids = encode(str, &offset, offsetInChrLevel);
 		return make_pair(move(ids), move(offset));
 	}, str);
 }

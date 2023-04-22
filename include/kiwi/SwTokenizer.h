@@ -206,8 +206,8 @@ namespace kiwi
 		bool getWholeWordUnk() const { return config.wholeWordUnk; }
 		void setWholeWordUnk(bool v) { config.wholeWordUnk = v; }
 
-		void encode(std::vector<uint32_t>& out, const std::string& str, std::vector<std::pair<uint32_t, uint32_t>>* offset = nullptr) const;
-		std::vector<uint32_t> encode(const std::string& str, std::vector<std::pair<uint32_t, uint32_t>>* offset = nullptr) const;
+		void encode(std::vector<uint32_t>& out, const std::string& str, std::vector<std::pair<uint32_t, uint32_t>>* offset = nullptr, bool offsetInChrLevel = false) const;
+		std::vector<uint32_t> encode(const std::string& str, std::vector<std::pair<uint32_t, uint32_t>>* offset = nullptr, bool offsetInChrLevel = false) const;
 		
 		void encode(std::vector<uint32_t>& out, const std::vector<std::pair<std::string, POSTag>>& morphs) const;
 		std::vector<uint32_t> encode(const std::vector<std::pair<std::string, POSTag>>& morphs) const;
@@ -220,7 +220,7 @@ namespace kiwi
 		std::string decode(const uint32_t* ids, size_t length, bool ignoreErrors = true) const;
 
 		std::future<std::vector<uint32_t>> asyncEncode(const std::string& str) const;
-		std::future<std::pair<std::vector<uint32_t>, std::vector<std::pair<uint32_t, uint32_t>>>> asyncEncodeOffset(const std::string& str) const;
+		std::future<std::pair<std::vector<uint32_t>, std::vector<std::pair<uint32_t, uint32_t>>>> asyncEncodeOffset(const std::string& str, bool offsetInChrLevel = false) const;
 
 		const SwTokenizerConfig& getConfig() const { return config; }
 		const std::string& getSpecialToken(SwTokenizerConfig::SpecialToken token) const { return config.specialTokens[token]; }
