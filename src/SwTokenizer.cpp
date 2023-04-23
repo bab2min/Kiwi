@@ -997,24 +997,24 @@ vector<uint32_t> SwTokenizer::encode(const string& str, vector<pair<uint32_t, ui
 	return ret;
 }
 
-vector<uint32_t> SwTokenizer::encode(const vector<pair<string, POSTag>>& morphs) const
+vector<uint32_t> SwTokenizer::encode(const vector<pair<string, POSTag>>& morphs, vector<pair<uint32_t, uint32_t>>* offset) const
 {
 	vector<uint32_t> ret;
-	encode(ret, morphs);
+	encode(ret, morphs, offset);
 	return ret;
 }
 
-vector<uint32_t> SwTokenizer::encode(const vector<pair<u16string, POSTag>>& morphs) const
+vector<uint32_t> SwTokenizer::encode(const vector<pair<u16string, POSTag>>& morphs, vector<pair<uint32_t, uint32_t>>* offset) const
 {
 	vector<uint32_t> ret;
-	encode(ret, morphs);
+	encode(ret, morphs, offset);
 	return ret;
 }
 
-vector<uint32_t> SwTokenizer::encode(const vector<tuple<u16string, POSTag, bool>>& morphs) const
+vector<uint32_t> SwTokenizer::encode(const vector<tuple<u16string, POSTag, bool>>& morphs, vector<pair<uint32_t, uint32_t>>* offset) const
 {
 	vector<uint32_t> ret;
-	encode(ret, morphs);
+	encode(ret, morphs, offset);
 	return ret;
 }
 
@@ -1249,6 +1249,7 @@ namespace kiwi
 	{
 		const Kiwi* kw = nullptr;
 		const Ty* ptr = nullptr;
+		Vector<uint32_t>* offsetOut = nullptr;
 		size_t accumPosition = 0;
 
 		mutable size_t tokenIdx = -1;
@@ -1270,6 +1271,7 @@ namespace kiwi
 			POSTag tag = get<1>(p);
 			size_t position = accumPosition + (get<2>(p) ? 1 : 0);
 			size_t length = str.size();
+			if (offsetOut) offsetOut->emplace_back(position + length);
 			offset = str.size() + (get<2>(p) ? 1 : 0);
 			auto morphs = kw->findMorpheme(str, tag);
 			if (morphs.empty())
@@ -1296,8 +1298,8 @@ namespace kiwi
 
 	public:
 
-		TokenInfoConvertingIterator(const Kiwi* _kw, const Ty* _ptr = nullptr)
-			: kw{ _kw }, ptr{ _ptr }
+		TokenInfoConvertingIterator(const Kiwi* _kw, const Ty* _ptr = nullptr, Vector<uint32_t>* _offsetOut = nullptr)
+			: kw{ _kw }, ptr{ _ptr }, offsetOut{ _offsetOut }
 		{
 		}
 
@@ -1330,34 +1332,70 @@ namespace kiwi
 	};
 
 	template<class Ty>
-	TokenInfoConvertingIterator<Ty> makeTokenInfoConvertingIterator(const Kiwi* kw, const Ty* ptr)
+	TokenInfoConvertingIterator<Ty> makeTokenInfoConvertingIterator(const Kiwi* kw, const Ty* ptr, Vector<uint32_t>* offsetOut)
 	{
-		return TokenInfoConvertingIterator<Ty>{ kw, ptr };
+		return TokenInfoConvertingIterator<Ty>{ kw, ptr, offsetOut };
 	}
 }
 
-void SwTokenizer::encode(vector<uint32_t>& out, const vector<pair<string, POSTag>>& morphs) const
+void SwTokenizer::encode(vector<uint32_t>& out, const vector<pair<string, POSTag>>& morphs, vector<pair<uint32_t, uint32_t>>* offset) const
 {
+	Vector<uint32_t> chrOffset;
+	if (offset) chrOffset.emplace_back(0);
+	size_t offsetStart = offset ? offset->size() : 0;
 	encode(out, 
-		makeTokenInfoConvertingIterator(kiwi, morphs.data()), 
-		makeTokenInfoConvertingIterator(kiwi, morphs.data() + morphs.size())
+		makeTokenInfoConvertingIterator(kiwi, morphs.data(), offset ? &chrOffset : nullptr), 
+		makeTokenInfoConvertingIterator(kiwi, morphs.data() + morphs.size(), offset ? &chrOffset : nullptr),
+		offset
 	);
+	if (offset)
+	{
+		for (size_t i = offsetStart; i < offset->size(); ++i)
+		{
+			(*offset)[i].first = std::upper_bound(chrOffset.begin(), chrOffset.end(), (*offset)[i].first) - chrOffset.begin() - 1;
+			(*offset)[i].second = std::lower_bound(chrOffset.begin(), chrOffset.end(), (*offset)[i].second) - chrOffset.begin();
+		}
+	}
 }
 
-void SwTokenizer::encode(vector<uint32_t>& out, const vector<pair<u16string, POSTag>>& morphs) const
+void SwTokenizer::encode(vector<uint32_t>& out, const vector<pair<u16string, POSTag>>& morphs, vector<pair<uint32_t, uint32_t>>* offset) const
 {
+	Vector<uint32_t> chrOffset;
+	if (offset) chrOffset.emplace_back(0);
+	size_t offsetStart = offset ? offset->size() : 0;
 	encode(out,
-		makeTokenInfoConvertingIterator(kiwi, morphs.data()),
-		makeTokenInfoConvertingIterator(kiwi, morphs.data() + morphs.size())
+		makeTokenInfoConvertingIterator(kiwi, morphs.data(), offset ? &chrOffset : nullptr),
+		makeTokenInfoConvertingIterator(kiwi, morphs.data() + morphs.size(), offset ? &chrOffset : nullptr),
+		offset
 	);
+	if (offset)
+	{
+		for (size_t i = offsetStart; i < offset->size(); ++i)
+		{
+			(*offset)[i].first = std::upper_bound(chrOffset.begin(), chrOffset.end(), (*offset)[i].first) - chrOffset.begin() - 1;
+			(*offset)[i].second = std::lower_bound(chrOffset.begin(), chrOffset.end(), (*offset)[i].second) - chrOffset.begin();
+		}
+	}
 }
 
-void SwTokenizer::encode(vector<uint32_t>& out, const vector<tuple<u16string, POSTag, bool>>& morphs) const
+void SwTokenizer::encode(vector<uint32_t>& out, const vector<tuple<u16string, POSTag, bool>>& morphs, vector<pair<uint32_t, uint32_t>>* offset) const
 {
+	Vector<uint32_t> chrOffset;
+	if (offset) chrOffset.emplace_back(0);
+	size_t offsetStart = offset ? offset->size() : 0;
 	encode(out,
-		makeTokenInfoConvertingIterator(kiwi, morphs.data()),
-		makeTokenInfoConvertingIterator(kiwi, morphs.data() + morphs.size())
+		makeTokenInfoConvertingIterator(kiwi, morphs.data(), offset ? &chrOffset : nullptr),
+		makeTokenInfoConvertingIterator(kiwi, morphs.data() + morphs.size(), offset ? &chrOffset : nullptr),
+		offset
 	);
+	if (offset)
+	{
+		for (size_t i = offsetStart; i < offset->size(); ++i)
+		{
+			(*offset)[i].first = std::upper_bound(chrOffset.begin(), chrOffset.end(), (*offset)[i].first) - chrOffset.begin() - 1;
+			(*offset)[i].second = std::lower_bound(chrOffset.begin(), chrOffset.end(), (*offset)[i].second) - chrOffset.begin();
+		}
+	}
 }
 
 template<class It>

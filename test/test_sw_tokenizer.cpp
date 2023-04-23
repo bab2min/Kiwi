@@ -210,17 +210,19 @@ TEST(KiwiSwTokenizer, EncodeFromAlreadyTokenized)
 		auto result = tokenizer.getKiwi()->analyze(c, Match::allWithNormalizing | Match::zCoda).first;
 		std::vector<std::pair<std::u16string, POSTag>> tokens;
 		std::vector<std::tuple<std::u16string, POSTag, bool>> tokensWithSpaceness;
+		std::vector<std::pair<uint32_t, uint32_t>> offset;
 		for (auto& t : result)
 		{
 			tokens.emplace_back(t.str, t.tag);
 			bool hasSpacePrefix = &t == result.data() || ((&t)[-1].position + (&t)[-1].length < t.position);
 			tokensWithSpaceness.emplace_back(t.str, t.tag, hasSpacePrefix);
 		}
-		auto encoded = tokenizer.encode(tokens);
+		auto encoded = tokenizer.encode(tokens, &offset);
 		auto decoded = tokenizer.decode(encoded);
 		EXPECT_EQ(decoded, c);
 		
-		auto encodedUsingSpaceness = tokenizer.encode(tokensWithSpaceness);
+		offset.clear();
+		auto encodedUsingSpaceness = tokenizer.encode(tokensWithSpaceness, &offset);
 		auto decodedUsingSpaceness = tokenizer.decode(encodedUsingSpaceness);
 		EXPECT_EQ(decodedUsingSpaceness, c);
 	}
