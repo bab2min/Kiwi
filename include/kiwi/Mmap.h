@@ -62,6 +62,7 @@ namespace kiwi
 				hFileMap = CreateFileMapping(hFile, nullptr, PAGE_READONLY, 0, 0, nullptr);
 				if (hFileMap == nullptr) throw std::ios_base::failure("Cannot open '" + filepath + "' Code:" + std::to_string(GetLastError()));
 				view = (const char*)MapViewOfFile(hFileMap, FILE_MAP_READ, 0, 0, 0);
+				if (!view) throw std::ios_base::failure("Cannot MapViewOfFile() Code:" + std::to_string(GetLastError()));
 				DWORD high;
 				len = GetFileSize(hFile, &high);
 				len |= (uint64_t)high << 32;
@@ -70,15 +71,29 @@ namespace kiwi
 			MMap(const MMap&) = delete;
 			MMap& operator=(const MMap&) = delete;
 
-			MMap(MMap&&) noexcept = default;
-			MMap& operator=(MMap&&) noexcept = default;
+			MMap(MMap&& o) noexcept
+				: view{ o.view }, len{ o.len }
+			{
+				o.view = nullptr;
+				std::swap(hFile, o.hFile);
+				std::swap(hFileMap, o.hFileMap);
+			}
+
+			MMap& operator=(MMap&& o) noexcept
+			{
+				std::swap(view, o.view);
+				std::swap(len, o.len);
+				std::swap(hFile, o.hFile);
+				std::swap(hFileMap, o.hFileMap);
+				return *this;
+			}
 
 			~MMap()
 			{
 				if (hFileMap)
 				{
 					UnmapViewOfFile(view);
-					hFileMap.~HandleGuard();
+					view = nullptr;
 				}
 			}
 
