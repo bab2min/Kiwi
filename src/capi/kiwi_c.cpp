@@ -1,6 +1,8 @@
 #include <cmath>
 #include <memory>
+#include <fstream>
 #include <kiwi/Kiwi.h>
+#include <kiwi/SwTokenizer.h>
 #include <kiwi/capi.h>
 
 using namespace std;
@@ -40,6 +42,21 @@ struct kiwi_joiner : public tuple<cmb::AutoJoiner, string, u16string>
 
 struct kiwi_typo : public TypoTransformer
 {
+};
+
+struct kiwi_swtokenizer
+{
+	SwTokenizer tokenizer;
+	const char* encodeLastText = nullptr;
+	const int* decodeLastTokenIds = nullptr;
+
+	vector<uint32_t> cachedTokenIds;
+	vector<pair<uint32_t, uint32_t>> cachedOffset;
+	string cachedText;
+
+	kiwi_swtokenizer(SwTokenizer&& _tokenizer)
+		: tokenizer{move(_tokenizer)}
+	{}
 };
 
 thread_local exception_ptr currentError;
@@ -1127,3 +1144,104 @@ int kiwi_joiner_close(kiwi_joiner_h handle)
 		return KIWIERR_FAIL;
 	}
 }
+
+kiwi_swtokenizer_h kiwi_swt_init(const char* path, kiwi_h kiwi)
+{
+	if (!kiwi) return nullptr;
+	try
+	{
+		std::ifstream ifs;
+		return new kiwi_swtokenizer{ SwTokenizer::load(*(Kiwi*)kiwi, openFile(ifs, path)) };
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return nullptr;
+	}
+}
+
+int kiwi_swt_encode(kiwi_swtokenizer_h handle, const char* text, int* token_ids, int token_ids_buf_size, int* offsets, int offset_buf_size)
+{
+	if (!handle || !text) return KIWIERR_INVALID_HANDLE;
+	try
+	{
+		vector<pair<uint32_t, uint32_t>> offset;
+		vector<uint32_t> tokenIds;
+		if (!token_ids)
+		{
+			tokenIds = handle->tokenizer.encode(text, &offset);
+			handle->encodeLastText = text;
+			handle->cachedTokenIds = move(tokenIds);
+			handle->cachedOffset = move(offset);
+			return handle->cachedTokenIds.size();
+		}
+
+		if (handle->encodeLastText == text)
+		{
+			tokenIds = move(handle->cachedTokenIds);
+			offset = move(handle->cachedOffset);
+		}
+		else
+		{
+			tokenIds = handle->tokenizer.encode(text, offsets ? &offset : nullptr);
+		}
+		size_t o = min((size_t)token_ids_buf_size, tokenIds.size());
+		memcpy(token_ids, tokenIds.data(), sizeof(int) * o);
+		if (offsets) memcpy(offsets, offset.data(), sizeof(int) * min((size_t)offset_buf_size, offset.size() * 2));
+		return o;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return KIWIERR_FAIL;
+	}
+}
+
+int kiwi_swt_decode(kiwi_swtokenizer_h handle, const int* token_ids, int token_size, char* text, int text_buf_size)
+{
+	if (!handle || !token_ids) return KIWIERR_INVALID_HANDLE;
+	try
+	{
+		string decoded;
+		if (!text)
+		{
+			decoded = handle->tokenizer.decode((const uint32_t*)token_ids, token_size);
+			handle->decodeLastTokenIds = token_ids;
+			handle->cachedText = move(decoded);
+			return handle->cachedText.size();
+		}
+
+		if (handle->decodeLastTokenIds == token_ids)
+		{
+			decoded = move(handle->cachedText);
+		}
+		else
+		{
+			decoded = handle->tokenizer.decode((const uint32_t*)token_ids, token_size);
+		}
+		size_t o = min((size_t)text_buf_size, decoded.size());
+		memcpy(text, decoded.data(), o);
+		return o;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return KIWIERR_FAIL;
+	}
+}
+
+int kiwi_swt_close(kiwi_swtokenizer_h handle)
+{
+	if (!handle) return KIWIERR_INVALID_HANDLE;
+	try
+	{
+		delete handle;
+		return 0;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return KIWIERR_FAIL;
+	}
+}
+

@@ -34,6 +34,8 @@ typedef struct kiwi_joiner* kiwi_joiner_h;
 typedef struct kiwi_typo* kiwi_typo_h;
 typedef unsigned short kchar16_t;
 
+typedef struct kiwi_swtokenizer* kiwi_swtokenizer_h;
+
 typedef struct {
 	uint_fast32_t chr_position; /**< 시작 위치(UTF16 문자 기준) */
 	uint_fast32_t word_position; /**< 어절 번호(공백 기준)*/
@@ -115,16 +117,20 @@ enum
 	KIWI_MATCH_EMAIL = 2,
 	KIWI_MATCH_HASHTAG = 4,
 	KIWI_MATCH_MENTION = 8,
-	KIWI_MATCH_ALL = KIWI_MATCH_URL | KIWI_MATCH_EMAIL | KIWI_MATCH_HASHTAG | KIWI_MATCH_MENTION,
-	KIWI_MATCH_NORMALIZE_CODA = 1 << 16,
-	KIWI_MATCH_ALL_WITH_NORMALIZING = KIWI_MATCH_ALL | KIWI_MATCH_NORMALIZE_CODA,
 
+	KIWI_MATCH_NORMALIZE_CODA = 1 << 16,
 	KIWI_MATCH_JOIN_NOUN_PREFIX = 1 << 17,
 	KIWI_MATCH_JOIN_NOUN_SUFFIX = 1 << 18,
 	KIWI_MATCH_JOIN_VERB_SUFFIX = 1 << 19,
 	KIWI_MATCH_JOIN_ADJ_SUFFIX = 1 << 20,
+	KIWI_MATCH_JOIN_ADV_SUFFIX = 1 << 21,
 	KIWI_MATCH_JOIN_V_SUFFIX = KIWI_MATCH_JOIN_VERB_SUFFIX | KIWI_MATCH_JOIN_ADJ_SUFFIX,
-	KIWI_MATCH_JOIN_NOUN_AFFIX = KIWI_MATCH_JOIN_NOUN_PREFIX | KIWI_MATCH_JOIN_NOUN_SUFFIX | KIWI_MATCH_JOIN_V_SUFFIX,
+	KIWI_MATCH_JOIN_AFFIX = KIWI_MATCH_JOIN_NOUN_PREFIX | KIWI_MATCH_JOIN_NOUN_SUFFIX | KIWI_MATCH_JOIN_V_SUFFIX | KIWI_MATCH_JOIN_ADV_SUFFIX,
+	KIWI_MATCH_SPLIT_COMPLEX = 1 << 22,
+	KIWI_MATCH_Z_CODA = 1 << 23,
+
+	KIWI_MATCH_ALL = KIWI_MATCH_URL | KIWI_MATCH_EMAIL | KIWI_MATCH_HASHTAG | KIWI_MATCH_MENTION | KIWI_MATCH_Z_CODA,
+	KIWI_MATCH_ALL_WITH_NORMALIZING = KIWI_MATCH_ALL | KIWI_MATCH_NORMALIZE_CODA,
 };
 
 #ifdef __cplusplus  
@@ -139,9 +145,9 @@ extern "C" {
 DECL_DLL const char* kiwi_version();
 
 /**
- * @brief 현재 스레드에서 발생한 에러 메세지를 반환합니다. 발생한 에러가 없을 경우 nullptr를 반환합니다.
+ * @brief 현재 스레드에서 발생한 에러 메세지를 반환합니다. 발생한 에러가 없을 경우 null를 반환합니다.
  * 
- * @return 에러 메세지 혹은 nullptr.
+ * @return 에러 메세지 혹은 null.
  */
 DECL_DLL const char* kiwi_error();
 
@@ -159,7 +165,7 @@ DECL_DLL void kiwi_clear_error();
  * @param num_threads 사용할 스레드의 개수. 0으로 지정시 가용한 스레드 개수를 자동으로 판단합니다.
  * @param options 생성 옵션. KIWI_BUILD_* 열거형을 참조하십시오.
  * @return 성공 시 Kiwi Builder의 핸들을 반환합니다. 
- * 실패시 nullptr를 반환하고 에러 메세지를 설정합니다. 
+ * 실패시 null를 반환하고 에러 메세지를 설정합니다. 
  * 에러 메세지는 kiwi_error()를 통해 확인할 수 있습니다.
  * 
  * @see kiwi_builder_close
@@ -167,7 +173,7 @@ DECL_DLL void kiwi_clear_error();
 DECL_DLL kiwi_builder_h kiwi_builder_init(const char* model_path, int num_threads, int options);
 
 /**
- * @brief 사용이 끝난 KiwiBuilder를 삭제합니다.
+ * @brief 사용이 끝난 KiwiBuilder를 해제합니다.
  * 
  * @param handle KiwiBuilder의 핸들.
  * @return 성공 시 0를 반환합니다.
@@ -509,7 +515,7 @@ DECL_DLL kiwi_ss_h kiwi_split_into_sents(kiwi_h handle, const char* text, int ma
 DECL_DLL kiwi_joiner_h kiwi_new_joiner(kiwi_h handle, int lm_search);
 
 /**
- * @brief 사용이 완료된 Kiwi객체를 삭제합니다.
+ * @brief 사용이 완료된 Kiwi객체를 해제합니다.
  * 
  * @param handle Kiwi 핸들
  * @return 성공시 0을 반환합니다. 실패시 0이 아닌 값을 반환합니다.
@@ -655,7 +661,7 @@ DECL_DLL float kiwi_res_score(kiwi_res_h result, int index, int num);
 DECL_DLL float kiwi_res_typo_cost(kiwi_res_h result, int index, int num);
 
 /**
- * @brief 사용이 완료된 형태소 분석 결과를 삭제합니다.
+ * @brief 사용이 완료된 형태소 분석 결과를 해제합니다.
  *
  * @param handle 형태소 분석 결과 핸들
  * @return 성공시 0을 반환합니다. 실패시 0이 아닌 값을 반환합니다.
@@ -753,7 +759,7 @@ DECL_DLL int kiwi_ss_begin_position(kiwi_ss_h result, int index);
 DECL_DLL int kiwi_ss_end_position(kiwi_ss_h result, int index);
 
 /**
- * @brief 사용이 완료된 문장 분리 객체를 삭제합니다.
+ * @brief 사용이 완료된 문장 분리 객체를 해제합니다.
  *
  * @param handle 문장 분리 결과 핸들
  * @return 성공시 0을 반환합니다. 실패시 0이 아닌 값을 반환합니다.
@@ -790,14 +796,88 @@ DECL_DLL const char* kiwi_joiner_get(kiwi_joiner_h handle);
 DECL_DLL const kchar16_t* kiwi_joiner_get_w(kiwi_joiner_h handle);
 
 /**
- * @brief 사용이 완료된 Joiner 객체를 삭제합니다.
+ * @brief 사용이 완료된 Joiner 객체를 해제합니다.
  *
- * @param handle 삭제할 Joiner 객체의 핸들
+ * @param handle 해제할 Joiner 객체의 핸들
  * @return 성공시 0을 반환합니다. 실패시 0이 아닌 값을 반환합니다.
  * 
  * @note kiwi_new_joiner 함수에서 반환된 kiwi_joiner_h는 반드시 이 함수로 해제되어야 합니다.
  */
 DECL_DLL int kiwi_joiner_close(kiwi_joiner_h handle);
+
+/**
+ * @brief 새로운 SwTokenizer 객체를 생성합니다.
+ * 
+ * @param path 읽어들일 json 파일의 경로
+ * @param kiwi SwTokenizer에서 사용할 Kiwi의 핸들
+ * @return 성공 시 SwTokenizer의 핸들을 반환합니다. 실패 시 null를 반환합니다.
+ * 
+ * @note 인자로 주어진 kiwi는 해당 SwTokenizer가 사용 중일 때는 해제되면 안됩니다.
+ * 이 함수로 생성된 핸들은 사용이 끝난 뒤 kiwi_swt_close로 해제되어야 합니다.
+ */
+DECL_DLL kiwi_swtokenizer_h kiwi_swt_init(const char* path, kiwi_h kiwi);
+
+/**
+ * @brief 주어진 문자열을 token ids로 변환합니다.
+ * 
+ * @param handle SwTokenizer의 핸들
+ * @param text token ids로 변환할 UTF8 문자열
+ * @param token_ids token ids 결과를 돌려받을 버퍼. 이 값을 null로 줄 경우 전체 토큰의 개수를 계산해줍니다.
+ * @param token_ids_buf_size token_ids 버퍼의 크기
+ * @param offsets token ids의 바이트 단위 offset를 돌려받을 버퍼. offset이 필요없는 경우에는 null로 지정할 수 있습니다.
+ * @param offset_buf_size offsets 버퍼의 크기. offset 버퍼의 크기는 최소 token_ids 버퍼 크기의 두 배여야 합니다.
+ * @return token_ids가 null인 경우 해당 텍스트를 변환했을때의 토큰 개수를 반환합니다. 실패 시 -1를 반환합니다.
+ * token_ids가 null이 아닌 경우 성공 시 token_ids에 입력된 토큰의 개수를 반환합니다. 실패 시 -1를 반환합니다.
+ * 
+ * @note 임의의 텍스트를 token ids로 변환하면 정확하게 몇 개의 토큰이 생성될 지 아는 것은 어렵습니다. 
+ * 따라서 먼저 token_ids를 null로 입력하여 토큰의 개수를 확인한 뒤 충분한 크기의 메모리를 확보하여 이 함수를 다시 호출하는 것이 좋습니다.
+ * 
+ \code{.c}
+ const char* text = "어떤 텍스트";
+ int token_size = kiwi_swt_encode(handle, text, NULL, 0, NULL, 0);
+ if (token_size < 0) exit(1); // failure
+ int* token_ids_buf = malloc(sizeof(int) * token_size);
+ int* offset_ids_buf = malloc(sizeof(int) * token_size * 2);
+ int result = kiwi_swt_encode(handle, text, token_ids_buf, token_size, offset_ids_buf, token_size * 2);
+ if (result < 0) exit(1); // failure
+ \endcode 
+ */
+DECL_DLL int kiwi_swt_encode(kiwi_swtokenizer_h handle, const char* text, int* token_ids, int token_ids_buf_size, int* offsets, int offset_buf_size);
+
+/**
+ * @brief 주어진 token ids를 UTF8 문자열로 변환합니다.
+ * 
+ * @param handle SwTokenizer의 핸들
+ * @param token_ids UTF8 문자열로 변환할 token ids
+ * @param token_size token ids의 길이
+ * @param text 변환된 문자열이 저장될 버퍼. 이 값을 null로 줄 경우에 해당 문자열을 저장하는데에 필요한 버퍼의 크기를 반환해줍니다.
+ * @param text_buf_size text 버퍼의 크기
+ * @return text가 null인 경우 텍스트로 변환했을때의 바이트 길이를 반환합니다. 실패 시 -1를 반환합니다.
+ * text가 null이 아닌 경우 성공 시 text에 입력된 바이트 개수를 반환합니다. 실패 시 -1를 반환합니다.
+ * 
+ * @note 임의의 token ids를 변환 시의 결과 텍스트 길이를 정확하게 예측하는 것은 어렵습니다. 
+ * 따라서 먼저 text를 null로 입력하여 결과 텍스트의 길이를 확인한 뒤 충분한 크기의 메모리를 확보하여 이 함수를 다시 호출하는 것이 좋습니다.
+ * 
+ \code{.c}
+ int token_ids[5] = {10, 15, 20, 13, 8};
+ int text_size = kiwi_swt_decode(handle, token_ids, 5, NULL, 0);
+ if (text_size < 0) exit(1); // failure
+ char* text_buf = malloc(text_size);
+ int result = kiwi_swt_decode(handle, token_ids, 5, text, text_size);
+ if (result < 0) exit(1); // failure
+ \endcode 
+ */
+DECL_DLL int kiwi_swt_decode(kiwi_swtokenizer_h handle, const int* token_ids, int token_size, char* text, int text_buf_size);
+
+/**
+ * @brief 사용이 끝난 SwTokenizer 객체를 해제합니다.
+ * 
+ * @param handle 해제할 SwTokenizer의 핸들
+ * @return 성공 시 0, 실패 시 0이 아닌 값을 반환합니다.
+ * 
+ * @note kiwi_swt_init
+ */
+DECL_DLL int kiwi_swt_close(kiwi_swtokenizer_h handle);
 
 #ifdef __cplusplus  
 }
