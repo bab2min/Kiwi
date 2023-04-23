@@ -1492,7 +1492,14 @@ ostream& SwTokenizer::save(ostream& ostr) const
 		{ "newline_token", config.newlineToken },
 	};
 	if (specialTokenIds[SwTokenizerConfig::glue] != -1) j["model"]["glue_token"] = specialTokenIds[SwTokenizerConfig::glue];
-	j["additional"] = nlohmann::json::parse(config.additionalJson);
+	if (config.additionalJson.empty())
+	{
+		j["additional"] = nullptr; 
+	}
+	else
+	{
+		j["additional"] = nlohmann::json::parse(config.additionalJson);
+	}
 
 	for (size_t i = 0; i <= SwTokenizerConfig::eos; ++i)
 	{
