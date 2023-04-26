@@ -427,7 +427,7 @@ namespace kiwi
 							{
 								if (pathesEndPtr.empty()) pathesEndPtr.emplace_back();
 								else pathesEndPtr.push_back(pathesEndPtr.back());
-								pathesEndPtr.back().resize(pathesEndPtr.size() + inserted, i + 1);
+								pathesEndPtr.back().resize(pathesEndPtr.back().size() + inserted, i + 1);
 							}
 							goto endOfLoop;
 						}
@@ -470,7 +470,7 @@ namespace kiwi
 					{
 						if (pathesEndPtr.empty()) pathesEndPtr.emplace_back();
 						else pathesEndPtr.push_back(pathesEndPtr.back());
-						pathesEndPtr.back().resize(pathesEndPtr.size() + u8bytes.size(), i + 1);
+						pathesEndPtr.back().resize(pathesEndPtr.back().size() + u8bytes.size(), i + 1);
 					}
 					goto endOfLoop;
 				}
