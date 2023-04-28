@@ -551,7 +551,7 @@ namespace kiwi
 				auto& p = pathesEndPtr.back();
 				for (size_t i = 0; i < p.size(); ++i)
 				{
-					offset->emplace_back(offsetBias + (i ? p[i - 1] : 0), offsetBias + p[i]);
+					offset->emplace_back(offsetBias + (i ? p[i - 1] : 0) - (i && p[i - 1] == p[i] ? 1 : 0), offsetBias + p[i]);
 				}
 			}
 			return true;
