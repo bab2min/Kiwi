@@ -267,3 +267,38 @@ TEST(KiwiC, AnalyzeBasicTypoSet)
 	EXPECT_EQ(kiwi_builder_close(builder), 0);
 	EXPECT_EQ(kiwi_close(typo_kw), 0);
 }
+
+TEST(KiwiC, Tokenizer)
+{
+	kiwi_h okw = reuse_kiwi_instance();
+	kiwi_swtokenizer_h swt = kiwi_swt_init("test/written.tokenizer.json", okw);
+	EXPECT_NE(swt, nullptr);
+	for (auto c : {
+		u8"",
+		u8"한국어에 특화된 토크나이저입니다.",
+		u8"감사히 먹겠습니당!",
+		u8"노래진 손톱을 봤던걸요.",
+		u8"제임스웹우주천체망원경",
+		u8"그만해여~",
+		})
+	{
+		int token_size = kiwi_swt_encode(swt, c, -1, nullptr, 0, nullptr, 0);
+		EXPECT_GE(token_size, 0);
+		int* token_ids_buf = (int*)malloc(token_size * sizeof(int));
+		EXPECT_GE(kiwi_swt_encode(swt, c, -1, token_ids_buf, token_size, nullptr, 0), 0);
+
+		int char_size = kiwi_swt_decode(swt, token_ids_buf, token_size, nullptr, 0);
+		EXPECT_GE(char_size, 0);
+		char* char_buf = (char*)malloc(char_size + 1);
+		EXPECT_GE(kiwi_swt_decode(swt, token_ids_buf, token_size, char_buf, char_size), 0);
+		char_buf[char_size] = 0;
+
+		EXPECT_STREQ(c, char_buf);
+
+		free(char_buf);
+		free(token_ids_buf);
+	}
+	
+
+	EXPECT_EQ(kiwi_swt_close(swt), 0);
+}
