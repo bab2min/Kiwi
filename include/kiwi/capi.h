@@ -822,6 +822,7 @@ DECL_DLL kiwi_swtokenizer_h kiwi_swt_init(const char* path, kiwi_h kiwi);
  * 
  * @param handle SwTokenizer의 핸들
  * @param text token ids로 변환할 UTF8 문자열
+ * @param text_size text가 가리키는 문자열의 길이. 음수로 지정할 경우 text를 null-terminated string으로 간주하고 자동으로 길이를 계산합니다.
  * @param token_ids token ids 결과를 돌려받을 버퍼. 이 값을 null로 줄 경우 전체 토큰의 개수를 계산해줍니다.
  * @param token_ids_buf_size token_ids 버퍼의 크기
  * @param offsets token ids의 바이트 단위 offset를 돌려받을 버퍼. offset이 필요없는 경우에는 null로 지정할 수 있습니다.
@@ -834,15 +835,15 @@ DECL_DLL kiwi_swtokenizer_h kiwi_swt_init(const char* path, kiwi_h kiwi);
  * 
  \code{.c}
  const char* text = "어떤 텍스트";
- int token_size = kiwi_swt_encode(handle, text, NULL, 0, NULL, 0);
+ int token_size = kiwi_swt_encode(handle, text, -1, NULL, 0, NULL, 0);
  if (token_size < 0) exit(1); // failure
  int* token_ids_buf = malloc(sizeof(int) * token_size);
  int* offset_ids_buf = malloc(sizeof(int) * token_size * 2);
- int result = kiwi_swt_encode(handle, text, token_ids_buf, token_size, offset_ids_buf, token_size * 2);
+ int result = kiwi_swt_encode(handle, text, -1, token_ids_buf, token_size, offset_ids_buf, token_size * 2);
  if (result < 0) exit(1); // failure
  \endcode 
  */
-DECL_DLL int kiwi_swt_encode(kiwi_swtokenizer_h handle, const char* text, int* token_ids, int token_ids_buf_size, int* offsets, int offset_buf_size);
+DECL_DLL int kiwi_swt_encode(kiwi_swtokenizer_h handle, const char* text, int text_size, int* token_ids, int token_ids_buf_size, int* offsets, int offset_buf_size);
 
 /**
  * @brief 주어진 token ids를 UTF8 문자열로 변환합니다.
@@ -858,13 +859,17 @@ DECL_DLL int kiwi_swt_encode(kiwi_swtokenizer_h handle, const char* text, int* t
  * @note 임의의 token ids를 변환 시의 결과 텍스트 길이를 정확하게 예측하는 것은 어렵습니다. 
  * 따라서 먼저 text를 null로 입력하여 결과 텍스트의 길이를 확인한 뒤 충분한 크기의 메모리를 확보하여 이 함수를 다시 호출하는 것이 좋습니다.
  * 
+ * 이 함수가 text에 생성된 문자열을 쓸 때 null 문자는 포함되지 않습니다. 
+ * 따라서 null-terminated string으로 사용하고자 한다면 버퍼 할당 시 1바이트를 추가로 할당하여 마지막 바이트에 '\0'을 입력하는 것이 필요합니다.
+ * 
  \code{.c}
  int token_ids[5] = {10, 15, 20, 13, 8};
  int text_size = kiwi_swt_decode(handle, token_ids, 5, NULL, 0);
  if (text_size < 0) exit(1); // failure
- char* text_buf = malloc(text_size);
+ char* text_buf = malloc(text_size + 1); // + 1 for null character
  int result = kiwi_swt_decode(handle, token_ids, 5, text, text_size);
  if (result < 0) exit(1); // failure
+ text_buf[text_size] = 0; // set the last byte as null
  \endcode 
  */
 DECL_DLL int kiwi_swt_decode(kiwi_swtokenizer_h handle, const int* token_ids, int token_size, char* text, int text_buf_size);
