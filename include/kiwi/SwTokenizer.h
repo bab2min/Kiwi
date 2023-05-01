@@ -211,10 +211,15 @@ namespace kiwi
 		
 		void encode(std::vector<uint32_t>& out, const std::vector<std::pair<std::string, POSTag>>& morphs, std::vector<std::pair<uint32_t, uint32_t>>* offset = nullptr) const;
 		std::vector<uint32_t> encode(const std::vector<std::pair<std::string, POSTag>>& morphs, std::vector<std::pair<uint32_t, uint32_t>>* offset = nullptr) const;
+		
 		void encode(std::vector<uint32_t>& out, const std::vector<std::pair<std::u16string, POSTag>>& morphs, std::vector<std::pair<uint32_t, uint32_t>>* offset = nullptr) const;
 		std::vector<uint32_t> encode(const std::vector<std::pair<std::u16string, POSTag>>& morphs, std::vector<std::pair<uint32_t, uint32_t>>* offset = nullptr) const;
+		
 		void encode(std::vector<uint32_t>& out, const std::vector<std::tuple<std::u16string, POSTag, bool>>& morphs, std::vector<std::pair<uint32_t, uint32_t>>* offset = nullptr) const;
 		std::vector<uint32_t> encode(const std::vector<std::tuple<std::u16string, POSTag, bool>>& morphs, std::vector<std::pair<uint32_t, uint32_t>>* offset = nullptr) const;
+
+		void encode(std::vector<uint32_t>& out, const TokenInfo* tokens, size_t size, std::vector<std::pair<uint32_t, uint32_t>>* offset = nullptr) const;
+		std::vector<uint32_t> encode(const TokenInfo* tokens, size_t size, std::vector<std::pair<uint32_t, uint32_t>>* offset = nullptr) const;
 
 		std::string decode(const std::vector<uint32_t>& ids, bool ignoreErrors = true) const;
 		std::string decode(const uint32_t* ids, size_t length, bool ignoreErrors = true) const;

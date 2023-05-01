@@ -998,6 +998,14 @@ vector<uint32_t> SwTokenizer::encode(const string& str, vector<pair<uint32_t, ui
 	return ret;
 }
 
+
+vector<uint32_t> SwTokenizer::encode(const TokenInfo* tokens, size_t size, vector<pair<uint32_t, uint32_t>>* offset) const
+{
+	vector<uint32_t> ret;
+	encode(ret, tokens, tokens + size, offset);
+	return ret;
+}
+
 vector<uint32_t> SwTokenizer::encode(const vector<pair<string, POSTag>>& morphs, vector<pair<uint32_t, uint32_t>>* offset) const
 {
 	vector<uint32_t> ret;
@@ -1230,7 +1238,6 @@ void SwTokenizer::encode(vector<uint32_t>& ret, const string& str, vector<pair<u
 	}
 	auto tokens = kiwi->analyze(move(u16), Match::normalizeCoda | Match::zCoda).first;
 	
-	
 	encode(ret, tokens.begin(), tokens.end(), offset);
 
 	if (offset)
@@ -1241,6 +1248,11 @@ void SwTokenizer::encode(vector<uint32_t>& ret, const string& str, vector<pair<u
 			(*offset)[i].second = positions[(*offset)[i].second];
 		}
 	}
+}
+
+void SwTokenizer::encode(vector<uint32_t>& ret, const TokenInfo* tokens, size_t size, vector<pair<uint32_t, uint32_t>>* offset) const
+{
+	encode(ret, tokens, tokens + size, offset);
 }
 
 namespace kiwi
