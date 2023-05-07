@@ -1,4 +1,4 @@
-#include "gtest/gtest.h"
+﻿#include "gtest/gtest.h"
 #include <fstream>
 #include <kiwi/Kiwi.h>
 #include <kiwi/SwTokenizer.h>
@@ -162,6 +162,24 @@ TEST(KiwiSwTokenizer, Builder)
 
 		reconstructed = tokenizer.decode(res);
 		EXPECT_EQ(reconstructed, u8"[CLS] [UNK] [UNK] [UNK]");
+	}
+}
+
+TEST(KiwiSwTokenizer, EncodeError)
+{
+	SwTokenizer tokenizer;
+	{
+		std::ifstream ifs{ "tokenizers/kor.16k.json" };
+		tokenizer = SwTokenizer::load(reuseKiwiInstance(), ifs);
+	}
+
+	for (auto c : {
+		u8"또는 “𡆮”으로 새겨야 하는 것",
+		})
+	{
+		auto encoded = tokenizer.encode(c);
+		auto decoded = tokenizer.decode(encoded);
+		//EXPECT_EQ(decoded, c);
 	}
 }
 
