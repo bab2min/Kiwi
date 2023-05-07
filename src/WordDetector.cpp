@@ -12,7 +12,6 @@
 #include <kiwi/ThreadPool.h>
 #include <kiwi/Utils.h>
 #include "StrUtils.h"
-#include "FileUtils.h"
 #include "serializer.hpp"
 
 using namespace std;

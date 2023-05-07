@@ -1,6 +1,8 @@
 #include <cmath>
 #include <memory>
+#include <fstream>
 #include <kiwi/Kiwi.h>
+#include <kiwi/SwTokenizer.h>
 #include <kiwi/capi.h>
 
 using namespace std;
@@ -40,6 +42,21 @@ struct kiwi_joiner : public tuple<cmb::AutoJoiner, string, u16string>
 
 struct kiwi_typo : public TypoTransformer
 {
+};
+
+struct kiwi_swtokenizer
+{
+	SwTokenizer tokenizer;
+	size_t encodeLastText = 0;
+	size_t decodeLastTokenIds = 0;
+
+	vector<uint32_t> cachedTokenIds;
+	vector<pair<uint32_t, uint32_t>> cachedOffset;
+	string cachedText;
+
+	kiwi_swtokenizer(SwTokenizer&& _tokenizer)
+		: tokenizer{move(_tokenizer)}
+	{}
 };
 
 thread_local exception_ptr currentError;
@@ -1127,3 +1144,120 @@ int kiwi_joiner_close(kiwi_joiner_h handle)
 		return KIWIERR_FAIL;
 	}
 }
+
+kiwi_swtokenizer_h kiwi_swt_init(const char* path, kiwi_h kiwi)
+{
+	if (!kiwi) return nullptr;
+	try
+	{
+		std::ifstream ifs;
+		return new kiwi_swtokenizer{ SwTokenizer::load(*(Kiwi*)kiwi, openFile(ifs, path)) };
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return nullptr;
+	}
+}
+
+int kiwi_swt_encode(kiwi_swtokenizer_h handle, const char* text, int text_size, int* token_ids, int token_ids_buf_size, int* offsets, int offset_buf_size)
+{
+	if (!handle || !text) return KIWIERR_INVALID_HANDLE;
+	try
+	{
+		vector<pair<uint32_t, uint32_t>> offset;
+		vector<uint32_t> tokenIds;
+		auto str = text_size >= 0 ? string{ text, text + text_size } : string{ text };
+		auto strHash = hash<string>{}(str);
+
+		if (!token_ids)
+		{
+			tokenIds = handle->tokenizer.encode(str, &offset);
+			handle->encodeLastText = strHash;
+			handle->cachedTokenIds = move(tokenIds);
+			handle->cachedOffset = move(offset);
+			return handle->cachedTokenIds.size();
+		}
+
+		if (handle->encodeLastText == strHash)
+		{
+			tokenIds = move(handle->cachedTokenIds);
+			offset = move(handle->cachedOffset);
+			handle->encodeLastText = 0;
+		}
+		else
+		{
+			tokenIds = handle->tokenizer.encode(str, offsets ? &offset : nullptr);
+		}
+		size_t o = min((size_t)token_ids_buf_size, tokenIds.size());
+		memcpy(token_ids, tokenIds.data(), sizeof(int) * o);
+		if (offsets) memcpy(offsets, offset.data(), sizeof(int) * min((size_t)offset_buf_size, offset.size() * 2));
+		return o;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return KIWIERR_FAIL;
+	}
+}
+
+inline size_t hashVectorInt(const int* data, int size) 
+{
+	size_t seed = size;
+	for (int i = 0; i < size; ++i) 
+	{
+		seed ^= (uint32_t)data[i] + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+	}
+	return seed;
+}
+
+int kiwi_swt_decode(kiwi_swtokenizer_h handle, const int* token_ids, int token_size, char* text, int text_buf_size)
+{
+	if (!handle || !token_ids) return KIWIERR_INVALID_HANDLE;
+	try
+	{
+		string decoded;
+		auto hash = hashVectorInt(token_ids, token_size);
+		if (!text)
+		{
+			decoded = handle->tokenizer.decode((const uint32_t*)token_ids, token_size);
+			handle->decodeLastTokenIds = hash;
+			handle->cachedText = move(decoded);
+			return handle->cachedText.size();
+		}
+
+		if (handle->decodeLastTokenIds == hash)
+		{
+			decoded = move(handle->cachedText);
+			handle->decodeLastTokenIds = 0;
+		}
+		else
+		{
+			decoded = handle->tokenizer.decode((const uint32_t*)token_ids, token_size);
+		}
+		size_t o = min((size_t)text_buf_size, decoded.size());
+		memcpy(text, decoded.data(), o);
+		return o;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return KIWIERR_FAIL;
+	}
+}
+
+int kiwi_swt_close(kiwi_swtokenizer_h handle)
+{
+	if (!handle) return KIWIERR_INVALID_HANDLE;
+	try
+	{
+		delete handle;
+		return 0;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return KIWIERR_FAIL;
+	}
+}
+

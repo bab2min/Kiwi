@@ -94,6 +94,12 @@ namespace kiwi
 		using Exception::Exception;
 	};
 
+	class SwTokenizerException : public Exception
+	{
+	public:
+		using Exception::Exception;
+	};
+
 	template<class Ty>
 	struct Hash
 	{

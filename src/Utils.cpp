@@ -14,23 +14,25 @@ namespace kiwi
 		return utf8To16(nonstd::to_string_view(str), bytePositions);
 	}
 
-	std::string utf8FromCode(size_t code)
+	size_t utf8FromCode(std::string& ret, char32_t code)
 	{
-		std::string ret;
 		if (code <= 0x7F)
 		{
 			ret.push_back(code);
+			return 1;
 		}
 		else if (code <= 0x7FF)
 		{
 			ret.push_back(0xC0 | (code >> 6));
 			ret.push_back(0x80 | (code & 0x3F));
+			return 2;
 		}
 		else if (code <= 0xFFFF)
 		{
 			ret.push_back(0xE0 | (code >> 12));
 			ret.push_back(0x80 | ((code >> 6) & 0x3F));
 			ret.push_back(0x80 | (code & 0x3F));
+			return 3;
 		}
 		else if (code <= 0x10FFFF)
 		{
@@ -38,7 +40,15 @@ namespace kiwi
 			ret.push_back(0x80 | ((code >> 12) & 0x3F));
 			ret.push_back(0x80 | ((code >> 6) & 0x3F));
 			ret.push_back(0x80 | (code & 0x3F));
+			return 4;
 		}
+		return 0;
+	}
+
+	std::string utf8FromCode(char32_t code)
+	{
+		std::string ret;
+		utf8FromCode(ret, code);
 		return ret;
 	}
 

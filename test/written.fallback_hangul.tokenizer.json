@@ -11,7 +11,7 @@
   "split_eomi": true,
   "split_punct": true,
   "split_verb": true,
-  "fallback_hangul": false,
+  "fallback_hangul": true,
   "fallback_byte": false,
   "newline_token": false,
   "unk_token": "[UNK]",

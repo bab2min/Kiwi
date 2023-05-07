@@ -112,7 +112,7 @@ namespace kiwi
 		for (auto it = str.begin(); it != str.end(); ++it)
 		{
 			uint32_t code = 0;
-			uint32_t byte = *it;
+			uint32_t byte = (uint8_t)*it;
 			if ((byte & 0xF8) == 0xF0)
 			{
 				code = (uint32_t)((byte & 0x07) << 18);
@@ -176,7 +176,8 @@ namespace kiwi
 		return ret;
 	}
 
-	inline std::u16string utf8To16(nonstd::string_view str, std::vector<size_t>& bytePositions)
+	template<class Ty, class Alloc>
+	inline std::u16string utf8To16(nonstd::string_view str, std::vector<Ty, Alloc>& bytePositions)
 	{
 		std::u16string ret;
 		bytePositions.clear();
@@ -236,6 +237,76 @@ namespace kiwi
 				ret.push_back((char16_t)(0xDC00 | (code & 0x3FF)));
 				bytePositions.emplace_back(pos);
 				bytePositions.emplace_back(pos);
+			}
+			else
+			{
+				throw UnicodeException{ "unicode error" };
+			}
+		}
+		return ret;
+	}
+
+	template<class Ty, class Alloc>
+	inline std::u16string utf8To16ChrPoisition(nonstd::string_view str, std::vector<Ty, Alloc>& chrPositions)
+	{
+		std::u16string ret;
+		size_t chrPosition = 0;
+		chrPositions.clear();
+		for (auto it = str.begin(); it != str.end(); ++it)
+		{
+			uint32_t code = 0;
+			uint32_t byte = *it;
+			if ((byte & 0xF8) == 0xF0)
+			{
+				code = (uint32_t)((byte & 0x07) << 18);
+				if (++it == str.end()) throw UnicodeException{ "unexpected ending" };
+				if (((byte = *it) & 0xC0) != 0x80) throw UnicodeException{ "unexpected trailing byte" };
+				code |= (uint32_t)((byte & 0x3F) << 12);
+				if (++it == str.end()) throw UnicodeException{ "unexpected ending" };
+				if (((byte = *it) & 0xC0) != 0x80) throw UnicodeException{ "unexpected trailing byte" };
+				code |= (uint32_t)((byte & 0x3F) << 6);
+				if (++it == str.end()) throw UnicodeException{ "unexpected ending" };
+				if (((byte = *it) & 0xC0) != 0x80) throw UnicodeException{ "unexpected trailing byte" };
+				code |= (byte & 0x3F);
+			}
+			else if ((byte & 0xF0) == 0xE0)
+			{
+				code = (uint32_t)((byte & 0x0F) << 12);
+				if (++it == str.end()) throw UnicodeException{ "unexpected ending" };
+				if (((byte = *it) & 0xC0) != 0x80) throw UnicodeException{ "unexpected trailing byte" };
+				code |= (uint32_t)((byte & 0x3F) << 6);
+				if (++it == str.end()) throw UnicodeException{ "unexpected ending" };
+				if (((byte = *it) & 0xC0) != 0x80) throw UnicodeException{ "unexpected trailing byte" };
+				code |= (byte & 0x3F);
+			}
+			else if ((byte & 0xE0) == 0xC0)
+			{
+				code = (uint32_t)((byte & 0x1F) << 6);
+				if (++it == str.end()) throw UnicodeException{ "unexpected ending" };
+				if (((byte = *it) & 0xC0) != 0x80) throw UnicodeException{ "unexpected trailing byte" };
+				code |= (byte & 0x3F);
+			}
+			else if ((byte & 0x80) == 0x00)
+			{
+				code = byte;
+			}
+			else
+			{
+				throw UnicodeException{ "unicode error" };
+			}
+
+			if (code < 0x10000)
+			{
+				ret.push_back((char16_t)code);
+				chrPositions.emplace_back(chrPosition++);
+			}
+			else if (code < 0x10FFFF)
+			{
+				code -= 0x10000;
+				ret.push_back((char16_t)(0xD800 | (code >> 10)));
+				ret.push_back((char16_t)(0xDC00 | (code & 0x3FF)));
+				chrPositions.emplace_back(chrPosition);
+				chrPositions.emplace_back(chrPosition++);
 			}
 			else
 			{
@@ -471,6 +542,7 @@ namespace kiwi
 		if (tagStr == u"NF") return POSTag::unknown;
 		if (tagStr == u"NV") return POSTag::unknown;
 		if (tagStr == u"NA") return POSTag::unknown;
+		if (tagStr == u"UNK") return POSTag::unknown;
 		if (tagStr == u"SL") return POSTag::sl;
 		if (tagStr == u"SH") return POSTag::sh;
 		if (tagStr == u"SN") return POSTag::sn;

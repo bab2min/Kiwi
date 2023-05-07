@@ -1684,6 +1684,7 @@ namespace kiwi
 		auto normalized = normalizeHangul(s);
 		auto form = (*reinterpret_cast<FnFindForm>(dfFindForm))(formTrie, normalized);
 		if (!form) return;
+		tag = clearIrregular(tag);
 		for (auto c : form->candidate)
 		{
 			if (c->combineSocket

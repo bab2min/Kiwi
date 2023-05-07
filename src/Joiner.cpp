@@ -88,7 +88,7 @@ namespace kiwi
 
 			if (isSpaceInsertable(clearIrregular(lastTag), clearIrregular(tag), form))
 			{
-				stack.push_back(u' ');
+				if (stack.empty() || !isSpace(stack.back())) stack.push_back(u' ');
 				activeStart = stack.size();
 				stack += normalizeHangul(form);
 			}

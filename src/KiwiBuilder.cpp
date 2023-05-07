@@ -7,7 +7,6 @@
 #include "ArchAvailable.h"
 #include "KTrie.h"
 #include "StrUtils.h"
-#include "FileUtils.h"
 #include "FrozenTrie.hpp"
 #include "Knlm.hpp"
 #include "serializer.hpp"

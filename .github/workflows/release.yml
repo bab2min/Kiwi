@@ -123,9 +123,8 @@ jobs:
     strategy:
       matrix:
         include:
-          # macOS 10.15 + Xcode 11.7
-          - name: "macOS 10.15 + Xcode 11.7"
-            os: macos-10.15
+          - name: "macOS 11 + Xcode 11.7"
+            os: macos-11
             compiler: xcode
             version: "11.7"
 
@@ -243,7 +242,7 @@ jobs:
       matrix:
         arch: [aarch64, ppc64le]
     name: Centos7-${{ matrix.arch }}
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
       with:
