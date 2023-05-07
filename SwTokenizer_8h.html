@@ -67,7 +67,8 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#enum-members">Enumerations</a>  </div>
+<a href="#enum-members">Enumerations</a> &#124;
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">SwTokenizer.h File Reference</div>  </div>
 </div><!--header-->
@@ -75,7 +76,8 @@ $(function() {
 
 <p>Subword Tokenizer.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &quot;<a class="el" href="Types_8h.html">Types.h</a>&quot;</code><br />
+<div class="textblock"><code>#include &lt;future&gt;</code><br />
+<code>#include &quot;<a class="el" href="Types_8h.html">Types.h</a>&quot;</code><br />
 <code>#include &quot;FrozenTrie.h&quot;</code><br />
 <code>#include &quot;Utils.h&quot;</code><br />
 <code>#include &quot;Trie.hpp&quot;</code><br />
@@ -108,11 +110,18 @@ Enumerations</h2></td></tr>
 , <b>glue</b> = 2
 , <b>subword</b> = 3
 , <br />
-&#160;&#160;<b>punct</b>
+&#160;&#160;<b>byte</b> = 4
+, <b>punct</b>
 , <b>chinese</b>
 <br />
  }</td></tr>
 <tr class="separator:ab81a1e4961ed783a4e92983ba7750096"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a71968106af5205622baf16ca90eb8105"><td class="memItemLeft" align="right" valign="top"><a id="a71968106af5205622baf16ca90eb8105"></a>
+const char *&#160;</td><td class="memItemRight" valign="bottom"><b>kiwi::tagToReprStr</b> (POSTag tag)</td></tr>
+<tr class="separator:a71968106af5205622baf16ca90eb8105"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Subword Tokenizer. </p>

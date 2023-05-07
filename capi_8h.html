@@ -133,6 +133,9 @@ typedef struct kiwi_typo *&#160;</td><td class="memItemRight" valign="bottom"><b
 <tr class="memitem:aec0475678556a23255faafdb6104971c"><td class="memItemLeft" align="right" valign="top"><a id="aec0475678556a23255faafdb6104971c"></a>
 typedef unsigned short&#160;</td><td class="memItemRight" valign="bottom"><b>kchar16_t</b></td></tr>
 <tr class="separator:aec0475678556a23255faafdb6104971c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4f5dd8d59ae514276452075a975f7ef6"><td class="memItemLeft" align="right" valign="top"><a id="a4f5dd8d59ae514276452075a975f7ef6"></a>
+typedef struct kiwi_swtokenizer *&#160;</td><td class="memItemRight" valign="bottom"><b>kiwi_swtokenizer_h</b></td></tr>
+<tr class="separator:a4f5dd8d59ae514276452075a975f7ef6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1b38cdecc30ec0b3f84086a18ca06512"><td class="memItemLeft" align="right" valign="top">typedef int(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a1b38cdecc30ec0b3f84086a18ca06512">kiwi_reader_t</a>) (int, char *, void *)</td></tr>
 <tr class="memdesc:a1b38cdecc30ec0b3f84086a18ca06512"><td class="mdescLeft">&#160;</td><td class="mdescRight">문자열을 읽어들여 Kiwi에 제공하기 위한 콜백 함수 타입.  <a href="capi_8h.html#a1b38cdecc30ec0b3f84086a18ca06512">More...</a><br /></td></tr>
 <tr class="separator:a1b38cdecc30ec0b3f84086a18ca06512"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -180,17 +183,20 @@ Enumerations</h2></td></tr>
 , <b>KIWI_MATCH_HASHTAG</b> = 4
 , <b>KIWI_MATCH_MENTION</b> = 8
 , <br />
-&#160;&#160;<b>KIWI_MATCH_ALL</b> = KIWI_MATCH_URL | KIWI_MATCH_EMAIL | KIWI_MATCH_HASHTAG | KIWI_MATCH_MENTION
-, <b>KIWI_MATCH_NORMALIZE_CODA</b> = 1 &lt;&lt; 16
-, <b>KIWI_MATCH_ALL_WITH_NORMALIZING</b> = KIWI_MATCH_ALL | KIWI_MATCH_NORMALIZE_CODA
+&#160;&#160;<b>KIWI_MATCH_NORMALIZE_CODA</b> = 1 &lt;&lt; 16
 , <b>KIWI_MATCH_JOIN_NOUN_PREFIX</b> = 1 &lt;&lt; 17
-, <br />
-&#160;&#160;<b>KIWI_MATCH_JOIN_NOUN_SUFFIX</b> = 1 &lt;&lt; 18
+, <b>KIWI_MATCH_JOIN_NOUN_SUFFIX</b> = 1 &lt;&lt; 18
 , <b>KIWI_MATCH_JOIN_VERB_SUFFIX</b> = 1 &lt;&lt; 19
-, <b>KIWI_MATCH_JOIN_ADJ_SUFFIX</b> = 1 &lt;&lt; 20
-, <b>KIWI_MATCH_JOIN_V_SUFFIX</b> = KIWI_MATCH_JOIN_VERB_SUFFIX | KIWI_MATCH_JOIN_ADJ_SUFFIX
 , <br />
-&#160;&#160;<b>KIWI_MATCH_JOIN_NOUN_AFFIX</b> = KIWI_MATCH_JOIN_NOUN_PREFIX | KIWI_MATCH_JOIN_NOUN_SUFFIX | KIWI_MATCH_JOIN_V_SUFFIX
+&#160;&#160;<b>KIWI_MATCH_JOIN_ADJ_SUFFIX</b> = 1 &lt;&lt; 20
+, <b>KIWI_MATCH_JOIN_ADV_SUFFIX</b> = 1 &lt;&lt; 21
+, <b>KIWI_MATCH_JOIN_V_SUFFIX</b> = KIWI_MATCH_JOIN_VERB_SUFFIX | KIWI_MATCH_JOIN_ADJ_SUFFIX
+, <b>KIWI_MATCH_JOIN_AFFIX</b> = KIWI_MATCH_JOIN_NOUN_PREFIX | KIWI_MATCH_JOIN_NOUN_SUFFIX | KIWI_MATCH_JOIN_V_SUFFIX | KIWI_MATCH_JOIN_ADV_SUFFIX
+, <br />
+&#160;&#160;<b>KIWI_MATCH_SPLIT_COMPLEX</b> = 1 &lt;&lt; 22
+, <b>KIWI_MATCH_Z_CODA</b> = 1 &lt;&lt; 23
+, <b>KIWI_MATCH_ALL</b> = KIWI_MATCH_URL | KIWI_MATCH_EMAIL | KIWI_MATCH_HASHTAG | KIWI_MATCH_MENTION | KIWI_MATCH_Z_CODA
+, <b>KIWI_MATCH_ALL_WITH_NORMALIZING</b> = KIWI_MATCH_ALL | KIWI_MATCH_NORMALIZE_CODA
 <br />
  }</td></tr>
 <tr class="separator:abc6126af1d45847bc59afa0aa3216b04"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -201,7 +207,7 @@ Functions</h2></td></tr>
 <tr class="memdesc:a0dc43be38208babb62874dd24bf29093"><td class="mdescLeft">&#160;</td><td class="mdescRight">설치된 Kiwi의 버전을 반환합니다.  <a href="capi_8h.html#a0dc43be38208babb62874dd24bf29093">More...</a><br /></td></tr>
 <tr class="separator:a0dc43be38208babb62874dd24bf29093"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afeefb305c962012957279d889e6dac3e"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#afeefb305c962012957279d889e6dac3e">kiwi_error</a> ()</td></tr>
-<tr class="memdesc:afeefb305c962012957279d889e6dac3e"><td class="mdescLeft">&#160;</td><td class="mdescRight">현재 스레드에서 발생한 에러 메세지를 반환합니다. 발생한 에러가 없을 경우 nullptr를 반환합니다.  <a href="capi_8h.html#afeefb305c962012957279d889e6dac3e">More...</a><br /></td></tr>
+<tr class="memdesc:afeefb305c962012957279d889e6dac3e"><td class="mdescLeft">&#160;</td><td class="mdescRight">현재 스레드에서 발생한 에러 메세지를 반환합니다. 발생한 에러가 없을 경우 null를 반환합니다.  <a href="capi_8h.html#afeefb305c962012957279d889e6dac3e">More...</a><br /></td></tr>
 <tr class="separator:afeefb305c962012957279d889e6dac3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa3f32e4c147a58e5952676f03712e39c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#aa3f32e4c147a58e5952676f03712e39c">kiwi_clear_error</a> ()</td></tr>
 <tr class="memdesc:aa3f32e4c147a58e5952676f03712e39c"><td class="mdescLeft">&#160;</td><td class="mdescRight">현재 스레드의 에러 메세지를 초기화합니다.  <a href="capi_8h.html#aa3f32e4c147a58e5952676f03712e39c">More...</a><br /></td></tr>
@@ -210,7 +216,7 @@ Functions</h2></td></tr>
 <tr class="memdesc:afab914642519cf01fb15017989045cbf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Kiwi Builder를 생성합니다.  <a href="capi_8h.html#afab914642519cf01fb15017989045cbf">More...</a><br /></td></tr>
 <tr class="separator:afab914642519cf01fb15017989045cbf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8ee24152f80c94f558f3ca9f5760d54d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a8ee24152f80c94f558f3ca9f5760d54d">kiwi_builder_close</a> (kiwi_builder_h handle)</td></tr>
-<tr class="memdesc:a8ee24152f80c94f558f3ca9f5760d54d"><td class="mdescLeft">&#160;</td><td class="mdescRight">사용이 끝난 KiwiBuilder를 삭제합니다.  <a href="capi_8h.html#a8ee24152f80c94f558f3ca9f5760d54d">More...</a><br /></td></tr>
+<tr class="memdesc:a8ee24152f80c94f558f3ca9f5760d54d"><td class="mdescLeft">&#160;</td><td class="mdescRight">사용이 끝난 KiwiBuilder를 해제합니다.  <a href="capi_8h.html#a8ee24152f80c94f558f3ca9f5760d54d">More...</a><br /></td></tr>
 <tr class="separator:a8ee24152f80c94f558f3ca9f5760d54d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad43fce424031604034a6350146edc366"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#ad43fce424031604034a6350146edc366">kiwi_builder_add_word</a> (kiwi_builder_h handle, const char *word, const char *pos, float score)</td></tr>
 <tr class="memdesc:ad43fce424031604034a6350146edc366"><td class="mdescLeft">&#160;</td><td class="mdescRight">사용자 형태소를 추가합니다. 이 함수로 등록한 형태소의 경우 언어 모델 내에서 UNK(사전 미등재 단어)로 처리됩니다. 특정 형태소의 변이형을 등록하려는 경우 kiwi_builder_add_alias_word 함수를 사용하는 걸 권장합니다.  <a href="capi_8h.html#ad43fce424031604034a6350146edc366">More...</a><br /></td></tr>
@@ -282,7 +288,7 @@ Functions</h2></td></tr>
 <tr class="memdesc:a7d9f0bc86e63d79491d73eb61117ba07"><td class="mdescLeft">&#160;</td><td class="mdescRight">형태소를 결합하여 텍스트로 만들어주는 Joiner를 새로 생성합니다.  <a href="capi_8h.html#a7d9f0bc86e63d79491d73eb61117ba07">More...</a><br /></td></tr>
 <tr class="separator:a7d9f0bc86e63d79491d73eb61117ba07"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7b9edfa303fddc98d9d505ee58d3211b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a7b9edfa303fddc98d9d505ee58d3211b">kiwi_close</a> (kiwi_h handle)</td></tr>
-<tr class="memdesc:a7b9edfa303fddc98d9d505ee58d3211b"><td class="mdescLeft">&#160;</td><td class="mdescRight">사용이 완료된 Kiwi객체를 삭제합니다.  <a href="capi_8h.html#a7b9edfa303fddc98d9d505ee58d3211b">More...</a><br /></td></tr>
+<tr class="memdesc:a7b9edfa303fddc98d9d505ee58d3211b"><td class="mdescLeft">&#160;</td><td class="mdescRight">사용이 완료된 Kiwi객체를 해제합니다.  <a href="capi_8h.html#a7b9edfa303fddc98d9d505ee58d3211b">More...</a><br /></td></tr>
 <tr class="separator:a7b9edfa303fddc98d9d505ee58d3211b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3e1b43fb351b73e0835aae7bf56fdc9c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a3e1b43fb351b73e0835aae7bf56fdc9c">kiwi_res_size</a> (kiwi_res_h result)</td></tr>
 <tr class="memdesc:a3e1b43fb351b73e0835aae7bf56fdc9c"><td class="mdescLeft">&#160;</td><td class="mdescRight">분석 결과 내에 포함된 리스트의 개수를 반환합니다.  <a href="capi_8h.html#a3e1b43fb351b73e0835aae7bf56fdc9c">More...</a><br /></td></tr>
@@ -327,7 +333,7 @@ Functions</h2></td></tr>
 <tr class="memdesc:a6ba1b7783b17bbe107d2d6502c5d496b"><td class="mdescLeft">&#160;</td><td class="mdescRight">index번째 분석 결과의 num번째 형태소의 오타 교정 비용을 반환합니다.  <a href="capi_8h.html#a6ba1b7783b17bbe107d2d6502c5d496b">More...</a><br /></td></tr>
 <tr class="separator:a6ba1b7783b17bbe107d2d6502c5d496b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab793f64bc59b828f44135f1092a16d97"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#ab793f64bc59b828f44135f1092a16d97">kiwi_res_close</a> (kiwi_res_h result)</td></tr>
-<tr class="memdesc:ab793f64bc59b828f44135f1092a16d97"><td class="mdescLeft">&#160;</td><td class="mdescRight">사용이 완료된 형태소 분석 결과를 삭제합니다.  <a href="capi_8h.html#ab793f64bc59b828f44135f1092a16d97">More...</a><br /></td></tr>
+<tr class="memdesc:ab793f64bc59b828f44135f1092a16d97"><td class="mdescLeft">&#160;</td><td class="mdescRight">사용이 완료된 형태소 분석 결과를 해제합니다.  <a href="capi_8h.html#ab793f64bc59b828f44135f1092a16d97">More...</a><br /></td></tr>
 <tr class="separator:ab793f64bc59b828f44135f1092a16d97"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3421fe0f93fc5991dee5fbef4205a226"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a3421fe0f93fc5991dee5fbef4205a226">kiwi_ws_size</a> (kiwi_ws_h result)</td></tr>
 <tr class="separator:a3421fe0f93fc5991dee5fbef4205a226"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -350,7 +356,7 @@ Functions</h2></td></tr>
 <tr class="memitem:ad4ce67949349f809b16aee8d6059b38b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#ad4ce67949349f809b16aee8d6059b38b">kiwi_ss_end_position</a> (kiwi_ss_h result, int index)</td></tr>
 <tr class="separator:ad4ce67949349f809b16aee8d6059b38b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5de6d686c50da0bece243ec049f82fc0"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a5de6d686c50da0bece243ec049f82fc0">kiwi_ss_close</a> (kiwi_ss_h result)</td></tr>
-<tr class="memdesc:a5de6d686c50da0bece243ec049f82fc0"><td class="mdescLeft">&#160;</td><td class="mdescRight">사용이 완료된 문장 분리 객체를 삭제합니다.  <a href="capi_8h.html#a5de6d686c50da0bece243ec049f82fc0">More...</a><br /></td></tr>
+<tr class="memdesc:a5de6d686c50da0bece243ec049f82fc0"><td class="mdescLeft">&#160;</td><td class="mdescRight">사용이 완료된 문장 분리 객체를 해제합니다.  <a href="capi_8h.html#a5de6d686c50da0bece243ec049f82fc0">More...</a><br /></td></tr>
 <tr class="separator:a5de6d686c50da0bece243ec049f82fc0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3564e88965726f312880ace77fe86282"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a3564e88965726f312880ace77fe86282">kiwi_joiner_add</a> (kiwi_joiner_h handle, const char *form, const char *tag, int option)</td></tr>
 <tr class="memdesc:a3564e88965726f312880ace77fe86282"><td class="mdescLeft">&#160;</td><td class="mdescRight">Joiner에 새 형태소를 삽입합니다.  <a href="capi_8h.html#a3564e88965726f312880ace77fe86282">More...</a><br /></td></tr>
@@ -362,8 +368,20 @@ Functions</h2></td></tr>
 <tr class="memdesc:a71f96f85afa099ebd504bee335820b81"><td class="mdescLeft">&#160;</td><td class="mdescRight">Joiner에 삽입된 형태소들을 텍스트로 결합하여 반환합니다.  <a href="capi_8h.html#a71f96f85afa099ebd504bee335820b81">More...</a><br /></td></tr>
 <tr class="separator:a71f96f85afa099ebd504bee335820b81"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeea8d4f01d5152f1e14f3f65fc6189e4"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#aeea8d4f01d5152f1e14f3f65fc6189e4">kiwi_joiner_close</a> (kiwi_joiner_h handle)</td></tr>
-<tr class="memdesc:aeea8d4f01d5152f1e14f3f65fc6189e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">사용이 완료된 Joiner 객체를 삭제합니다.  <a href="capi_8h.html#aeea8d4f01d5152f1e14f3f65fc6189e4">More...</a><br /></td></tr>
+<tr class="memdesc:aeea8d4f01d5152f1e14f3f65fc6189e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">사용이 완료된 Joiner 객체를 해제합니다.  <a href="capi_8h.html#aeea8d4f01d5152f1e14f3f65fc6189e4">More...</a><br /></td></tr>
 <tr class="separator:aeea8d4f01d5152f1e14f3f65fc6189e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afa9d5819ac6e264b7397aa8e84d6fd06"><td class="memItemLeft" align="right" valign="top">kiwi_swtokenizer_h&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#afa9d5819ac6e264b7397aa8e84d6fd06">kiwi_swt_init</a> (const char *path, kiwi_h kiwi)</td></tr>
+<tr class="memdesc:afa9d5819ac6e264b7397aa8e84d6fd06"><td class="mdescLeft">&#160;</td><td class="mdescRight">새로운 SwTokenizer 객체를 생성합니다.  <a href="capi_8h.html#afa9d5819ac6e264b7397aa8e84d6fd06">More...</a><br /></td></tr>
+<tr class="separator:afa9d5819ac6e264b7397aa8e84d6fd06"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0d7731bf5bf13b9bc5dbb62f181995fc"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a0d7731bf5bf13b9bc5dbb62f181995fc">kiwi_swt_encode</a> (kiwi_swtokenizer_h handle, const char *text, int text_size, int *token_ids, int token_ids_buf_size, int *offsets, int offset_buf_size)</td></tr>
+<tr class="memdesc:a0d7731bf5bf13b9bc5dbb62f181995fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">주어진 문자열을 token ids로 변환합니다.  <a href="capi_8h.html#a0d7731bf5bf13b9bc5dbb62f181995fc">More...</a><br /></td></tr>
+<tr class="separator:a0d7731bf5bf13b9bc5dbb62f181995fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ade4b9a93d03e2ff048d8a83c1f46dc6a"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#ade4b9a93d03e2ff048d8a83c1f46dc6a">kiwi_swt_decode</a> (kiwi_swtokenizer_h handle, const int *token_ids, int token_size, char *text, int text_buf_size)</td></tr>
+<tr class="memdesc:ade4b9a93d03e2ff048d8a83c1f46dc6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">주어진 token ids를 UTF8 문자열로 변환합니다.  <a href="capi_8h.html#ade4b9a93d03e2ff048d8a83c1f46dc6a">More...</a><br /></td></tr>
+<tr class="separator:ade4b9a93d03e2ff048d8a83c1f46dc6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae33ff77327c496ab5b45f18ffd16f16a"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#ae33ff77327c496ab5b45f18ffd16f16a">kiwi_swt_close</a> (kiwi_swtokenizer_h handle)</td></tr>
+<tr class="memdesc:ae33ff77327c496ab5b45f18ffd16f16a"><td class="mdescLeft">&#160;</td><td class="mdescRight">사용이 끝난 SwTokenizer 객체를 해제합니다.  <a href="capi_8h.html#ae33ff77327c496ab5b45f18ffd16f16a">More...</a><br /></td></tr>
+<tr class="separator:ae33ff77327c496ab5b45f18ffd16f16a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
@@ -970,7 +988,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>사용이 끝난 KiwiBuilder를 삭제합니다. </p>
+<p>사용이 끝난 KiwiBuilder를 해제합니다. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">handle</td><td>KiwiBuilder의 핸들. </td></tr>
@@ -1311,8 +1329,8 @@ Variables</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>성공 시 Kiwi Builder의 핸들을 반환합니다. 실패시 nullptr를 반환하고 에러 메세지를 설정합니다. 에러 메세지는 <a class="el" href="capi_8h.html#afeefb305c962012957279d889e6dac3e" title="현재 스레드에서 발생한 에러 메세지를 반환합니다. 발생한 에러가 없을 경우 nullptr를 반환합니다.">kiwi_error()</a>를 통해 확인할 수 있습니다.</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="capi_8h.html#a8ee24152f80c94f558f3ca9f5760d54d" title="사용이 끝난 KiwiBuilder를 삭제합니다.">kiwi_builder_close</a> </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>성공 시 Kiwi Builder의 핸들을 반환합니다. 실패시 null를 반환하고 에러 메세지를 설정합니다. 에러 메세지는 <a class="el" href="capi_8h.html#afeefb305c962012957279d889e6dac3e" title="현재 스레드에서 발생한 에러 메세지를 반환합니다. 발생한 에러가 없을 경우 null를 반환합니다.">kiwi_error()</a>를 통해 확인할 수 있습니다.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="capi_8h.html#a8ee24152f80c94f558f3ca9f5760d54d" title="사용이 끝난 KiwiBuilder를 해제합니다.">kiwi_builder_close</a> </dd></dl>
 
 </div>
 </div>
@@ -1390,7 +1408,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>사용이 완료된 Kiwi객체를 삭제합니다. </p>
+<p>사용이 완료된 Kiwi객체를 해제합니다. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">handle</td><td>Kiwi 핸들 </td></tr>
@@ -1417,8 +1435,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>현재 스레드에서 발생한 에러 메세지를 반환합니다. 발생한 에러가 없을 경우 nullptr를 반환합니다. </p>
-<dl class="section return"><dt>Returns</dt><dd>에러 메세지 혹은 nullptr. </dd></dl>
+<p>현재 스레드에서 발생한 에러 메세지를 반환합니다. 발생한 에러가 없을 경우 null를 반환합니다. </p>
+<dl class="section return"><dt>Returns</dt><dd>에러 메세지 혹은 null. </dd></dl>
 
 </div>
 </div>
@@ -1623,10 +1641,10 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>사용이 완료된 Joiner 객체를 삭제합니다. </p>
+<p>사용이 완료된 Joiner 객체를 해제합니다. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">handle</td><td>삭제할 Joiner 객체의 핸들 </td></tr>
+    <tr><td class="paramname">handle</td><td>해제할 Joiner 객체의 핸들 </td></tr>
   </table>
   </dd>
 </dl>
@@ -1743,7 +1761,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>사용이 완료된 형태소 분석 결과를 삭제합니다. </p>
+<p>사용이 완료된 형태소 분석 결과를 해제합니다. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">handle</td><td>형태소 분석 결과 핸들 </td></tr>
@@ -2601,7 +2619,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>사용이 완료된 문장 분리 객체를 삭제합니다. </p>
+<p>사용이 완료된 문장 분리 객체를 해제합니다. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">handle</td><td>문장 분리 결과 핸들 </td></tr>
@@ -2671,6 +2689,224 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd></dd></dl>
+
+</div>
+</div>
+<a id="ae33ff77327c496ab5b45f18ffd16f16a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae33ff77327c496ab5b45f18ffd16f16a">&#9670;&nbsp;</a></span>kiwi_swt_close()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int kiwi_swt_close </td>
+          <td>(</td>
+          <td class="paramtype">kiwi_swtokenizer_h&#160;</td>
+          <td class="paramname"><em>handle</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>사용이 끝난 SwTokenizer 객체를 해제합니다. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">handle</td><td>해제할 SwTokenizer의 핸들 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>성공 시 0, 실패 시 0이 아닌 값을 반환합니다.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>kiwi_swt_init </dd></dl>
+
+</div>
+</div>
+<a id="ade4b9a93d03e2ff048d8a83c1f46dc6a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ade4b9a93d03e2ff048d8a83c1f46dc6a">&#9670;&nbsp;</a></span>kiwi_swt_decode()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int kiwi_swt_decode </td>
+          <td>(</td>
+          <td class="paramtype">kiwi_swtokenizer_h&#160;</td>
+          <td class="paramname"><em>handle</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int *&#160;</td>
+          <td class="paramname"><em>token_ids</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>token_size</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char *&#160;</td>
+          <td class="paramname"><em>text</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>text_buf_size</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>주어진 token ids를 UTF8 문자열로 변환합니다. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">handle</td><td>SwTokenizer의 핸들 </td></tr>
+    <tr><td class="paramname">token_ids</td><td>UTF8 문자열로 변환할 token ids </td></tr>
+    <tr><td class="paramname">token_size</td><td>token ids의 길이 </td></tr>
+    <tr><td class="paramname">text</td><td>변환된 문자열이 저장될 버퍼. 이 값을 null로 줄 경우에 해당 문자열을 저장하는데에 필요한 버퍼의 크기를 반환해줍니다. </td></tr>
+    <tr><td class="paramname">text_buf_size</td><td>text 버퍼의 크기 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>text가 null인 경우 텍스트로 변환했을때의 바이트 길이를 반환합니다. 실패 시 -1를 반환합니다. text가 null이 아닌 경우 성공 시 text에 입력된 바이트 개수를 반환합니다. 실패 시 -1를 반환합니다.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>임의의 token ids를 변환 시의 결과 텍스트 길이를 정확하게 예측하는 것은 어렵습니다. 따라서 먼저 text를 null로 입력하여 결과 텍스트의 길이를 확인한 뒤 충분한 크기의 메모리를 확보하여 이 함수를 다시 호출하는 것이 좋습니다.</dd></dl>
+<p>이 함수가 text에 생성된 문자열을 쓸 때 null 문자는 포함되지 않습니다. 따라서 null-terminated string으로 사용하고자 한다면 버퍼 할당 시 1바이트를 추가로 할당하여 마지막 바이트에 '\0'을 입력하는 것이 필요합니다.</p>
+<div class="fragment"><div class="line"><span class="keywordtype">int</span> token_ids[5] = {10, 15, 20, 13, 8};</div>
+<div class="line"><span class="keywordtype">int</span> text_size = <a class="code" href="capi_8h.html#ade4b9a93d03e2ff048d8a83c1f46dc6a">kiwi_swt_decode</a>(handle, token_ids, 5, NULL, 0);</div>
+<div class="line"><span class="keywordflow">if</span> (text_size &lt; 0) exit(1); <span class="comment">// failure</span></div>
+<div class="line"><span class="keywordtype">char</span>* text_buf = malloc(text_size + 1); <span class="comment">// + 1 for null character</span></div>
+<div class="line"><span class="keywordtype">int</span> result = <a class="code" href="capi_8h.html#ade4b9a93d03e2ff048d8a83c1f46dc6a">kiwi_swt_decode</a>(handle, token_ids, 5, text, text_size);</div>
+<div class="line"><span class="keywordflow">if</span> (result &lt; 0) exit(1); <span class="comment">// failure</span></div>
+<div class="line">text_buf[text_size] = 0; <span class="comment">// set the last byte as null</span></div>
+<div class="ttc" id="acapi_8h_html_ade4b9a93d03e2ff048d8a83c1f46dc6a"><div class="ttname"><a href="capi_8h.html#ade4b9a93d03e2ff048d8a83c1f46dc6a">kiwi_swt_decode</a></div><div class="ttdeci">int kiwi_swt_decode(kiwi_swtokenizer_h handle, const int *token_ids, int token_size, char *text, int text_buf_size)</div><div class="ttdoc">주어진 token ids를 UTF8 문자열로 변환합니다.</div></div>
+</div><!-- fragment --> 
+</div>
+</div>
+<a id="a0d7731bf5bf13b9bc5dbb62f181995fc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0d7731bf5bf13b9bc5dbb62f181995fc">&#9670;&nbsp;</a></span>kiwi_swt_encode()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int kiwi_swt_encode </td>
+          <td>(</td>
+          <td class="paramtype">kiwi_swtokenizer_h&#160;</td>
+          <td class="paramname"><em>handle</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>text</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>text_size</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int *&#160;</td>
+          <td class="paramname"><em>token_ids</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>token_ids_buf_size</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int *&#160;</td>
+          <td class="paramname"><em>offsets</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>offset_buf_size</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>주어진 문자열을 token ids로 변환합니다. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">handle</td><td>SwTokenizer의 핸들 </td></tr>
+    <tr><td class="paramname">text</td><td>token ids로 변환할 UTF8 문자열 </td></tr>
+    <tr><td class="paramname">text_size</td><td>text가 가리키는 문자열의 길이. 음수로 지정할 경우 text를 null-terminated string으로 간주하고 자동으로 길이를 계산합니다. </td></tr>
+    <tr><td class="paramname">token_ids</td><td>token ids 결과를 돌려받을 버퍼. 이 값을 null로 줄 경우 전체 토큰의 개수를 계산해줍니다. </td></tr>
+    <tr><td class="paramname">token_ids_buf_size</td><td>token_ids 버퍼의 크기 </td></tr>
+    <tr><td class="paramname">offsets</td><td>token ids의 바이트 단위 offset를 돌려받을 버퍼. offset이 필요없는 경우에는 null로 지정할 수 있습니다. </td></tr>
+    <tr><td class="paramname">offset_buf_size</td><td>offsets 버퍼의 크기. offset 버퍼의 크기는 최소 token_ids 버퍼 크기의 두 배여야 합니다. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>token_ids가 null인 경우 해당 텍스트를 변환했을때의 토큰 개수를 반환합니다. 실패 시 -1를 반환합니다. token_ids가 null이 아닌 경우 성공 시 token_ids에 입력된 토큰의 개수를 반환합니다. 실패 시 -1를 반환합니다.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>임의의 텍스트를 token ids로 변환하면 정확하게 몇 개의 토큰이 생성될 지 아는 것은 어렵습니다. 따라서 먼저 token_ids를 null로 입력하여 토큰의 개수를 확인한 뒤 충분한 크기의 메모리를 확보하여 이 함수를 다시 호출하는 것이 좋습니다.</dd></dl>
+<div class="fragment"><div class="line"><span class="keyword">const</span> <span class="keywordtype">char</span>* text = <span class="stringliteral">&quot;어떤 텍스트&quot;</span>;</div>
+<div class="line"><span class="keywordtype">int</span> token_size = <a class="code" href="capi_8h.html#a0d7731bf5bf13b9bc5dbb62f181995fc">kiwi_swt_encode</a>(handle, text, -1, NULL, 0, NULL, 0);</div>
+<div class="line"><span class="keywordflow">if</span> (token_size &lt; 0) exit(1); <span class="comment">// failure</span></div>
+<div class="line"><span class="keywordtype">int</span>* token_ids_buf = malloc(<span class="keyword">sizeof</span>(<span class="keywordtype">int</span>) * token_size);</div>
+<div class="line"><span class="keywordtype">int</span>* offset_ids_buf = malloc(<span class="keyword">sizeof</span>(<span class="keywordtype">int</span>) * token_size * 2);</div>
+<div class="line"><span class="keywordtype">int</span> result = <a class="code" href="capi_8h.html#a0d7731bf5bf13b9bc5dbb62f181995fc">kiwi_swt_encode</a>(handle, text, -1, token_ids_buf, token_size, offset_ids_buf, token_size * 2);</div>
+<div class="line"><span class="keywordflow">if</span> (result &lt; 0) exit(1); <span class="comment">// failure</span></div>
+<div class="ttc" id="acapi_8h_html_a0d7731bf5bf13b9bc5dbb62f181995fc"><div class="ttname"><a href="capi_8h.html#a0d7731bf5bf13b9bc5dbb62f181995fc">kiwi_swt_encode</a></div><div class="ttdeci">int kiwi_swt_encode(kiwi_swtokenizer_h handle, const char *text, int text_size, int *token_ids, int token_ids_buf_size, int *offsets, int offset_buf_size)</div><div class="ttdoc">주어진 문자열을 token ids로 변환합니다.</div></div>
+</div><!-- fragment --> 
+</div>
+</div>
+<a id="afa9d5819ac6e264b7397aa8e84d6fd06"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afa9d5819ac6e264b7397aa8e84d6fd06">&#9670;&nbsp;</a></span>kiwi_swt_init()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">kiwi_swtokenizer_h kiwi_swt_init </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>path</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">kiwi_h&#160;</td>
+          <td class="paramname"><em>kiwi</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>새로운 SwTokenizer 객체를 생성합니다. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>읽어들일 json 파일의 경로 </td></tr>
+    <tr><td class="paramname">kiwi</td><td>SwTokenizer에서 사용할 Kiwi의 핸들 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>성공 시 SwTokenizer의 핸들을 반환합니다. 실패 시 null를 반환합니다.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>인자로 주어진 kiwi는 해당 SwTokenizer가 사용 중일 때는 해제되면 안됩니다. 이 함수로 생성된 핸들은 사용이 끝난 뒤 kiwi_swt_close로 해제되어야 합니다. </dd></dl>
 
 </div>
 </div>
