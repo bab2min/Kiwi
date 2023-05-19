@@ -427,8 +427,8 @@ size_t kiwi::splitByTrie(
 		}
 		lastMatchedPattern = POSTag::unknown;
 
-		// 문장 종결 지점이 나타나면 중단
-		if (chrType == POSTag::unknown && lastChrType == POSTag::sf)
+		// 문장 종결 지점이 나타나거나 Graph가 너무 길어지면 공백 문자에서 중단
+		if (chrType == POSTag::unknown && (lastChrType == POSTag::sf || n > 4096))
 		{
 			lastChrType = chrType;
 			break;
