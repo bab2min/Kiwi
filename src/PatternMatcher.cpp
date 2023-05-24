@@ -15,7 +15,7 @@ namespace kiwi
 			pattern::CutSZCharSetParser<PP_GET_64("-A-Za-z0-9.", 0)>::type alphaNumDotDash;
 			pattern::CutSZCharSetParser<PP_GET_64("-a-zA-Z0-9@:%._+~#=", 0)>::type domain;
 			pattern::CutSZCharSetParser<PP_GET_64("-a-zA-Z0-9()@:%_+.~#!?&/=", 0)>::type path;
-			pattern::CutSZCharSetParser<PP_GET_64("^# \t\n\r\v\f.,", 0)>::type hashtags;
+			pattern::CutSZCharSetParser<PP_GET_64("^# \t\n\r\v\f.,()[]<>{}", 0)>::type hashtags;
 			pattern::CutSZCharSetParser<PP_GET_64(" \t\n\r\v\f", 0)>::type space;
 		} md;
 
