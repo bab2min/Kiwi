@@ -33,11 +33,10 @@ namespace kiwi
 
 	struct KGraphNode
 	{
-		//KString uform;
 		U16StringView uform;
 		const Form* form = nullptr;
 		uint32_t prev = 0, sibling = 0;
-		uint16_t startPos = 0, endPos = 0;
+		uint32_t startPos = 0, endPos = 0;
 		float typoCost = 0;
 		uint32_t typoFormId = 0;
 
