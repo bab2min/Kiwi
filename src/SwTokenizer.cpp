@@ -454,7 +454,11 @@ namespace kiwi
 					if (c >= 0x10000) // surrogate
 					{
 						pathes.emplace_back();
-						if (generateOffset) pathesEndPtr.emplace_back();
+						if (generateOffset)
+						{
+							if (pathesEndPtr.empty()) pathesEndPtr.emplace_back();
+							else pathesEndPtr.push_back(pathesEndPtr.back());
+						}
 					}
 
 					u8bytes.clear();
