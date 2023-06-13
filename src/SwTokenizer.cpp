@@ -1449,7 +1449,7 @@ string SwTokenizer::decode(It first, It last, bool ignoreErrors) const
 		
 		// subword
 		bool insertSpace = v.flags == SwTokenFlag::none || v.flags == SwTokenFlag::special;
-		joiner.add(U16StringView{ v.form, v.length }, insertSpace ? POSTag::p : POSTag::unknown);
+		joiner.add(U16StringView{ v.form, v.length }, POSTag::unknown, insertSpace ? cmb::Space::insert_space : cmb::Space::none);
 	}
 
 	if (!u8bytes.empty())

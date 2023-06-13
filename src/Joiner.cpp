@@ -16,9 +16,9 @@ namespace kiwi
 
 		inline bool isSpaceInsertable(POSTag l, POSTag r, U16StringView rform)
 		{
-			if (r == POSTag::p) return true; // forced space insertion
 			if (l == r && (POSTag::sf <= l && l <= POSTag::sn)) return true;
-			if (r == POSTag::vcp || r == POSTag::xsa || r == POSTag::xsai || r == POSTag::xsv || r == POSTag::xsn) return isJClass(l);
+			if (r == POSTag::vcp) return false;
+			if (r == POSTag::xsa || r == POSTag::xsai || r == POSTag::xsv || r == POSTag::xsn) return isJClass(l);
 			if (l == POSTag::xpn || l == POSTag::so || l == POSTag::ss || l == POSTag::sw) return false;
 			if (l == POSTag::sn && r == POSTag::nnb) return false;
 			if (!(l == POSTag::sn || l == POSTag::sl)
@@ -77,7 +77,7 @@ namespace kiwi
 			return 0;
 		}
 
-		void Joiner::add(U16StringView form, POSTag tag)
+		void Joiner::add(U16StringView form, POSTag tag, Space space)
 		{
 			if (stack.size() == activeStart)
 			{
@@ -86,7 +86,7 @@ namespace kiwi
 				return;
 			}
 
-			if (isSpaceInsertable(clearIrregular(lastTag), clearIrregular(tag), form))
+			if (space == Space::insert_space || (space == Space::none && isSpaceInsertable(clearIrregular(lastTag), clearIrregular(tag), form)))
 			{
 				if (stack.empty() || !isSpace(stack.back())) stack.push_back(u' ');
 				activeStart = stack.size();
@@ -155,14 +155,14 @@ namespace kiwi
 			lastTag = tag;
 		}
 
-		void Joiner::add(const u16string& form, POSTag tag)
+		void Joiner::add(const u16string& form, POSTag tag, Space space)
 		{
-			return add(nonstd::to_string_view(form), tag);
+			return add(nonstd::to_string_view(form), tag, space);
 		}
 
-		void Joiner::add(const char16_t* form, POSTag tag)
+		void Joiner::add(const char16_t* form, POSTag tag, Space space)
 		{
-			return add(U16StringView{ form }, tag);
+			return add(U16StringView{ form }, tag, space);
 		}
 
 		u16string Joiner::getU16() const
@@ -207,13 +207,13 @@ namespace kiwi
 		}
 
 		template<class LmState>
-		void AutoJoiner::add(size_t morphemeId, Vector<Candidate<LmState>>& candidates)
+		void AutoJoiner::add(size_t morphemeId, Space space, Vector<Candidate<LmState>>& candidates)
 		{
 			auto& morph = kiwi->morphemes[morphemeId];
 			for (auto& cand : candidates)
 			{
 				cand.score += cand.lmState.next(kiwi->langMdl, morph.lmMorphemeId);
-				cand.joiner.add(morph.getForm(), morph.tag);
+				cand.joiner.add(morph.getForm(), morph.tag, space);
 			}
 			
 			sort(candidates.begin(), candidates.end(), [](const cmb::Candidate<LmState>& a, const cmb::Candidate<LmState>& b)
@@ -254,7 +254,7 @@ namespace kiwi
 		}
 
 		template<class LmState>
-		void AutoJoiner::add(U16StringView form, POSTag tag, bool inferRegularity, Vector<Candidate<LmState>>& candidates)
+		void AutoJoiner::add(U16StringView form, POSTag tag, bool inferRegularity, Space space, Vector<Candidate<LmState>>& candidates)
 		{
 			const Form* formHead;
 			auto node = kiwi->formTrie.root();
@@ -286,7 +286,7 @@ namespace kiwi
 					for (auto& cand : candidates)
 					{
 						cand.score += cand.lmState.next(kiwi->langMdl, lmId);
-						cand.joiner.add(form, tag);
+						cand.joiner.add(form, tag, space);
 					}
 				}
 				else
@@ -299,14 +299,14 @@ namespace kiwi
 							candidates.emplace_back(candidates[o]);
 							auto& n = candidates.back();
 							n.score += n.lmState.next(kiwi->langMdl, cands[i]->lmMorphemeId);
-							n.joiner.add(form, cands[i]->tag);
+							n.joiner.add(form, cands[i]->tag, space);
 						}
 					}
 					for (size_t o = 0; o < oSize; ++o)
 					{
 						auto& n = candidates[o];
 						n.score += n.lmState.next(kiwi->langMdl, cands[0]->lmMorphemeId);
-						n.joiner.add(form, cands[0]->tag);
+						n.joiner.add(form, cands[0]->tag, space);
 					}
 				}
 			}
@@ -316,7 +316,7 @@ namespace kiwi
 				for (auto& cand : candidates)
 				{
 					cand.score += cand.lmState.next(kiwi->langMdl, lmId);
-					cand.joiner.add(form, tag);
+					cand.joiner.add(form, tag, space);
 				}
 			}
 			sort(candidates.begin(), candidates.end(), [](const cmb::Candidate<LmState>& a, const cmb::Candidate<LmState>& b)
@@ -326,7 +326,7 @@ namespace kiwi
 		}
 
 		template<ArchType arch>
-		void AutoJoiner::addWithoutSearch(U16StringView form, POSTag tag, bool inferRegularity, Vector<Candidate<VoidState<arch>>>& candidates)
+		void AutoJoiner::addWithoutSearch(U16StringView form, POSTag tag, bool inferRegularity, Space space, Vector<Candidate<VoidState<arch>>>& candidates)
 		{
 			if (inferRegularity)
 			{
@@ -357,16 +357,16 @@ namespace kiwi
 					}
 				}
 			}
-			candidates[0].joiner.add(form, tag);
+			candidates[0].joiner.add(form, tag, space);
 		}
 
 		template<ArchType arch>
-		void AutoJoiner::addWithoutSearch(size_t morphemeId, Vector<Candidate<VoidState<arch>>>& candidates)
+		void AutoJoiner::addWithoutSearch(size_t morphemeId, Space space, Vector<Candidate<VoidState<arch>>>& candidates)
 		{
 			auto& morph = kiwi->morphemes[morphemeId];
 			for (auto& cand : candidates)
 			{
-				cand.joiner.add(morph.getForm(), morph.tag);
+				cand.joiner.add(morph.getForm(), morph.tag, space);
 			}
 		}
 
@@ -376,22 +376,23 @@ namespace kiwi
 			U16StringView form;
 			POSTag tag;
 			bool inferRegularity;
+			Space space;
 
-			AddVisitor(AutoJoiner* _joiner, U16StringView _form, POSTag _tag, bool _inferRegularity)
-				: joiner{ _joiner }, form{ _form }, tag{ _tag }, inferRegularity{ _inferRegularity }
+			AddVisitor(AutoJoiner* _joiner, U16StringView _form, POSTag _tag, bool _inferRegularity, Space _space)
+				: joiner{ _joiner }, form{ _form }, tag{ _tag }, inferRegularity{ _inferRegularity }, space{ _space }
 			{
 			}
 
 			template<ArchType arch>
 			void operator()(Vector<Candidate<VoidState<arch>>>& o) const
 			{
-				return joiner->addWithoutSearch(form, tag, inferRegularity, o);
+				return joiner->addWithoutSearch(form, tag, inferRegularity, space, o);
 			}
 
 			template<class LmState>
 			void operator()(Vector<Candidate<LmState>>& o) const
 			{
-				return joiner->add(form, tag, inferRegularity, o);
+				return joiner->add(form, tag, inferRegularity, space, o);
 			}
 		};
 
@@ -399,22 +400,23 @@ namespace kiwi
 		{
 			AutoJoiner* joiner;
 			size_t morphemeId;
+			Space space;
 
-			AddVisitor2(AutoJoiner* _joiner, size_t _morphemeId)
-				: joiner{ _joiner }, morphemeId{ _morphemeId }
+			AddVisitor2(AutoJoiner* _joiner, size_t _morphemeId, Space _space)
+				: joiner{ _joiner }, morphemeId{ _morphemeId }, space{ _space }
 			{
 			}
 
 			template<ArchType arch>
 			void operator()(Vector<Candidate<VoidState<arch>>>& o) const
 			{
-				return joiner->addWithoutSearch(morphemeId, o);
+				return joiner->addWithoutSearch(morphemeId, space, o);
 			}
 
 			template<class LmState>
 			void operator()(Vector<Candidate<LmState>>& o) const
 			{
-				return joiner->add(morphemeId, o);
+				return joiner->add(morphemeId, space, o);
 			}
 		};
 
@@ -436,24 +438,24 @@ namespace kiwi
 			}
 		};
 
-		void AutoJoiner::add(size_t morphemeId)
+		void AutoJoiner::add(size_t morphemeId, Space space)
 		{
-			return mapbox::util::apply_visitor(AddVisitor2{ this, morphemeId }, reinterpret_cast<CandVector&>(candBuf));
+			return mapbox::util::apply_visitor(AddVisitor2{ this, morphemeId, space }, reinterpret_cast<CandVector&>(candBuf));
 		}
 
-		void AutoJoiner::add(const u16string& form, POSTag tag, bool inferRegularity)
+		void AutoJoiner::add(const u16string& form, POSTag tag, bool inferRegularity, Space space)
 		{
-			return mapbox::util::apply_visitor(AddVisitor{ this, nonstd::to_string_view(form), tag, inferRegularity }, reinterpret_cast<CandVector&>(candBuf));
+			return mapbox::util::apply_visitor(AddVisitor{ this, nonstd::to_string_view(form), tag, inferRegularity, space }, reinterpret_cast<CandVector&>(candBuf));
 		}
 
-		void AutoJoiner::add(const char16_t* form, POSTag tag, bool inferRegularity)
+		void AutoJoiner::add(const char16_t* form, POSTag tag, bool inferRegularity, Space space)
 		{
-			return mapbox::util::apply_visitor(AddVisitor{ this, U16StringView{ form }, tag, inferRegularity }, reinterpret_cast<CandVector&>(candBuf));
+			return mapbox::util::apply_visitor(AddVisitor{ this, U16StringView{ form }, tag, inferRegularity, space }, reinterpret_cast<CandVector&>(candBuf));
 		}
 
-		void AutoJoiner::add(U16StringView form, POSTag tag)
+		void AutoJoiner::add(U16StringView form, POSTag tag, Space space)
 		{
-			return mapbox::util::apply_visitor(AddVisitor{ this, form, tag, false }, reinterpret_cast<CandVector&>(candBuf));
+			return mapbox::util::apply_visitor(AddVisitor{ this, form, tag, false, space }, reinterpret_cast<CandVector&>(candBuf));
 		}
 
 		u16string AutoJoiner::getU16() const

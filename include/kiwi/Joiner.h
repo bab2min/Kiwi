@@ -15,6 +15,13 @@ namespace kiwi
 		class CompiledRule;
 		class AutoJoiner;
 
+		enum class Space
+		{
+			none = 0,
+			no_space = 1,
+			insert_space = 2,
+		};
+
 		class Joiner
 		{
 			friend class CompiledRule;
@@ -26,7 +33,7 @@ namespace kiwi
 			POSTag lastTag = POSTag::unknown, anteLastTag = POSTag::unknown;
 
 			explicit Joiner(const CompiledRule& _cr);			
-			void add(U16StringView form, POSTag tag);
+			void add(U16StringView form, POSTag tag, Space space);
 
 		public:
 			~Joiner();
@@ -36,8 +43,8 @@ namespace kiwi
 			Joiner& operator=(const Joiner&);
 			Joiner& operator=(Joiner&&);
 
-			void add(const std::u16string& form, POSTag tag);
-			void add(const char16_t* form, POSTag tag);
+			void add(const std::u16string& form, POSTag tag, Space space);
+			void add(const char16_t* form, POSTag tag, Space space);
 
 			std::u16string getU16() const;
 			std::string getU8() const;
@@ -86,27 +93,28 @@ namespace kiwi
 			void foreachMorpheme(const Form* formHead, Func&& func) const;
 
 			template<class LmState>
-			void add(size_t morphemeId, Vector<Candidate<LmState>>& candidates);
+			void add(size_t morphemeId, Space space, Vector<Candidate<LmState>>& candidates);
 
 			template<class LmState>
-			void add(U16StringView form, POSTag tag, bool inferRegularity, Vector<Candidate<LmState>>& candidates);
+			void add(U16StringView form, POSTag tag, bool inferRegularity, Space space, Vector<Candidate<LmState>>& candidates);
 
 			template<ArchType arch>
-			void addWithoutSearch(size_t morphemeId, Vector<Candidate<VoidState<arch>>>& candidates);
+			void addWithoutSearch(size_t morphemeId, Space space, Vector<Candidate<VoidState<arch>>>& candidates);
 
 			template<ArchType arch>
-			void addWithoutSearch(U16StringView form, POSTag tag, bool inferRegularity, Vector<Candidate<VoidState<arch>>>& candidates);
+			void addWithoutSearch(U16StringView form, POSTag tag, bool inferRegularity, Space space, Vector<Candidate<VoidState<arch>>>& candidates);
 		public:
+
 			~AutoJoiner();
 			AutoJoiner(const AutoJoiner&);
 			AutoJoiner(AutoJoiner&&);
 			AutoJoiner& operator=(const AutoJoiner&);
 			AutoJoiner& operator=(AutoJoiner&&);
 
-			void add(size_t morphemeId);
-			void add(U16StringView form, POSTag tag);
-			void add(const std::u16string& form, POSTag tag, bool inferRegularity = true);
-			void add(const char16_t* form, POSTag tag, bool inferRegularity = true);
+			void add(size_t morphemeId, Space space = Space::none);
+			void add(U16StringView form, POSTag tag, Space space = Space::none);
+			void add(const std::u16string& form, POSTag tag, bool inferRegularity = true, Space space = Space::none);
+			void add(const char16_t* form, POSTag tag, bool inferRegularity = true, Space space = Space::none);
 
 			std::u16string getU16() const;
 			std::string getU8() const;
