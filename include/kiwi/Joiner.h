@@ -6,8 +6,7 @@
 namespace kiwi
 {
 	class Kiwi;
-	template<ArchType arch>
-	class VoidState;
+	template<ArchType arch> class VoidState;
 	struct Form;
 
 	namespace cmb
@@ -43,8 +42,8 @@ namespace kiwi
 			Joiner& operator=(const Joiner&);
 			Joiner& operator=(Joiner&&);
 
-			void add(const std::u16string& form, POSTag tag, Space space);
-			void add(const char16_t* form, POSTag tag, Space space);
+			void add(const std::u16string& form, POSTag tag, Space space = Space::none);
+			void add(const char16_t* form, POSTag tag, Space space = Space::none);
 
 			std::u16string getU16() const;
 			std::string getU8() const;
