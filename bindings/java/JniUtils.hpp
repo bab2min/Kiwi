@@ -1,7 +1,9 @@
 #pragma once
 #include <array>
+#include <string>
 #include <string_view>
 #include <vector>
+#include <optional>
 
 #include <jni.h>
 
@@ -291,6 +293,24 @@ namespace jni
 	};
 
 	template<>
+	struct ValueBuilder<char16_t>
+	{
+		using CppType = char16_t;
+		using JniType = jchar;
+		static constexpr auto typeStr = "C"sv;
+
+		CppType fromJava(JNIEnv* env, JniType v)
+		{
+			return v;
+		}
+
+		JniType toJava(JNIEnv* env, CppType v)
+		{
+			return v;
+		}
+	};
+
+	template<>
 	struct ValueBuilder<float>
 	{
 		using CppType = float;
@@ -335,6 +355,7 @@ namespace jni
 
 		CppType fromJava(JNIEnv* env, JniType v)
 		{
+			if (!v) throw std::bad_optional_access{};
 			auto* c = env->GetStringUTFChars(v, nullptr);
 			auto size = env->GetStringUTFLength(v);
 			return std::string{ c, c + size };
@@ -355,6 +376,7 @@ namespace jni
 
 		CppType fromJava(JNIEnv* env, JniType v)
 		{
+			if (!v) throw std::bad_optional_access{};
 			auto* c = env->GetStringChars(v, nullptr);
 			auto size = env->GetStringLength(v);
 			return std::u16string{ (const char16_t*)c, (const char16_t*)c + size };
@@ -375,7 +397,8 @@ namespace jni
 
 		CppType& fromJava(JNIEnv* env, JniType v)
 		{
-			auto ptr = (Ty*)env->GetLongField(obj, JObject<Ty>::jInstField);
+			if (!v) throw std::bad_optional_access{};
+			auto ptr = (Ty*)env->GetLongField(v, JObject<Ty>::jInstField);
 			if (!ptr) throw std::runtime_error{ "Object is already closed or not initialized." };
 			return *ptr;
 		}
@@ -391,7 +414,7 @@ namespace jni
 	};
 
 	template<class Ty>
-	struct ValueBuilder<std::vector<Ty>>
+	struct ValueBuilder<std::vector<Ty>, std::enable_if_t<!std::is_integral_v<Ty> && !std::is_floating_point_v<Ty>>>
 	{
 		using CppType = std::vector<Ty>;
 		using JniType = jobjectArray;
@@ -399,13 +422,14 @@ namespace jni
 
 		CppType fromJava(JNIEnv* env, JniType v)
 		{
+			if (!v) throw std::bad_optional_access{};
 			size_t len = env->GetArrayLength(v);
 			ValueBuilder<Ty> vb;
 			std::vector<Ty> ret;
 			ret.reserve(len);
 			for (size_t i = 0; i < len; ++i)
 			{
-				ret.emplace_back(vb.fromJava(env->GetObjectArrayElement(v, i)));
+				ret.emplace_back(vb.fromJava(env, env->GetObjectArrayElement(v, i)));
 			}
 			return ret;
 		}
@@ -419,6 +443,187 @@ namespace jni
 				env->SetObjectArrayElement(arr, i, vb.toJava(env, v[i]));
 			}
 			return arr;
+		}
+	};
+
+	template<class Ty>
+	struct ValueBuilder<std::optional<std::vector<Ty>>, std::enable_if_t<!std::is_integral_v<Ty> && !std::is_floating_point_v<Ty>>>
+	{
+		using CppType = std::optional<std::vector<Ty>>;
+		using JniType = jobjectArray;
+		static constexpr auto typeStr = StringConcat_v<svLBrack, svL, jclassName<Ty>, svSC>;
+
+		CppType fromJava(JNIEnv* env, JniType v)
+		{
+			if (!v) return {};
+			size_t len = env->GetArrayLength(v);
+			ValueBuilder<Ty> vb;
+			std::vector<Ty> ret;
+			ret.reserve(len);
+			for (size_t i = 0; i < len; ++i)
+			{
+				ret.emplace_back(vb.fromJava(env, env->GetObjectArrayElement(v, i)));
+			}
+			return ret;
+		}
+
+		JniType toJava(JNIEnv* env, const CppType& v)
+		{
+			if (!v) return nullptr;
+			auto arr = env->NewObjectArray(v->size(), JObject<Ty>::jClass, nullptr);
+			ValueBuilder<Ty> vb;
+			for (size_t i = 0; i < v->size(); ++i)
+			{
+				env->SetObjectArrayElement(arr, i, vb.toJava(env, (*v)[i]));
+			}
+			return arr;
+		}
+	};
+
+	template<class Ty>
+	struct ValueBuilder<std::vector<Ty>, std::enable_if_t<std::is_integral_v<Ty>>>
+	{
+		using CppType = std::vector<Ty>;
+		using JniType = std::conditional_t<sizeof(Ty) == 1, jbyteArray,
+			std::conditional_t<sizeof(Ty) == 2, jshortArray,
+				std::conditional_t<sizeof(Ty) == 4, jintArray,
+					std::conditional_t<sizeof(Ty) == 8, jlongArray, void>
+				>
+			>
+		>;
+		static constexpr auto typeStr = sizeof(Ty) == 1 ? "[B"sv : 
+			sizeof(Ty) == 2 ? "[S"sv :
+			sizeof(Ty) == 4 ? "[I"sv :
+			sizeof(Ty) == 8 ? "[J"sv : "";
+
+		CppType fromJava(JNIEnv* env, JniType v)
+		{
+			if (!v) throw std::bad_optional_access{};
+			size_t len = env->GetArrayLength(v);
+			std::vector<Ty> ret(len);
+			if constexpr (sizeof(Ty) == 1)
+			{
+				auto ptr = env->GetByteArrayElements(v, nullptr);
+				std::copy(ptr, ptr + len, ret.data());
+			}
+			else if constexpr (sizeof(Ty) == 2)
+			{
+				auto ptr = env->GetShortArrayElements(v, nullptr);
+				std::copy(ptr, ptr + len, ret.data());
+			}
+			else if constexpr (sizeof(Ty) == 4)
+			{
+				auto ptr = env->GetIntArrayElements(v, nullptr);
+				std::copy(ptr, ptr + len, ret.data());
+			}
+			else if constexpr (sizeof(Ty) == 8)
+			{
+				auto ptr = env->GetLongArrayElements(v, nullptr);
+				std::copy(ptr, ptr + len, ret.data());
+			}
+			return ret;
+		}
+
+		JniType toJava(JNIEnv* env, const CppType& v)
+		{
+			if constexpr (sizeof(Ty) == 1)
+			{
+				auto arr = env->NewByteArray(v.size());
+				auto ptr = env->GetByteArrayElements(arr, nullptr);
+				std::copy(v.begin(), v.end(), ptr);
+				return arr;
+			}
+			else if constexpr (sizeof(Ty) == 2)
+			{
+				auto arr = env->NewShortArray(v.size());
+				auto ptr = env->GetShortArrayElements(arr, nullptr);
+				std::copy(v.begin(), v.end(), ptr);
+				return arr;
+			}
+			else if constexpr (sizeof(Ty) == 4)
+			{
+				auto arr = env->NewIntArray(v.size());
+				auto ptr = env->GetIntArrayElements(arr, nullptr);
+				std::copy(v.begin(), v.end(), ptr);
+				return arr;
+			}
+			else if constexpr (sizeof(Ty) == 8)
+			{
+				auto arr = env->NewLongArray(v.size());
+				auto ptr = env->GetLongArrayElements(arr, nullptr);
+				std::copy(v.begin(), v.end(), ptr);
+				return arr;
+			}
+		}
+	};
+
+	template<>
+	struct ValueBuilder<std::vector<char16_t>>
+	{
+		using CppType = std::vector<char16_t>;
+		using JniType = jcharArray;
+		static constexpr auto typeStr = "[C"sv;
+
+		CppType fromJava(JNIEnv* env, JniType v)
+		{
+			if (!v) throw std::bad_optional_access{};
+			size_t len = env->GetArrayLength(v);
+			std::vector<char16_t> ret(len);
+			auto ptr = env->GetCharArrayElements(v, nullptr);
+			std::copy(ptr, ptr + len, ret.data());
+			return ret;
+		}
+
+		JniType toJava(JNIEnv* env, const CppType& v)
+		{
+			auto arr = env->NewCharArray(v.size());
+			auto ptr = env->GetCharArrayElements(arr, nullptr);
+			std::copy(v.begin(), v.end(), ptr);
+			return arr;
+		}
+	};
+
+	template<class Ty>
+	struct ValueBuilder<std::vector<Ty>, std::enable_if_t<std::is_floating_point_v<Ty>>>
+	{
+		using CppType = std::vector<Ty>;
+		using JniType = std::conditional_t<sizeof(Ty) == 4, jfloatArray, jdoubleArray>;
+		static constexpr auto typeStr = sizeof(Ty) == 4 ? "[F"sv : "[D"sv;
+
+		CppType fromJava(JNIEnv* env, JniType v)
+		{
+			if (!v) throw std::bad_optional_access{};
+			size_t len = env->GetArrayLength(v);
+			std::vector<Ty> ret(len);
+			if constexpr (sizeof(Ty) == 4)
+			{
+				auto ptr = env->GetFloatArrayElements(v, nullptr);
+				std::copy(ptr, ptr + len, ret.data());
+			}
+			else
+			{
+				auto ptr = env->GetDoubleArrayElements(v, nullptr);
+				std::copy(ptr, ptr + len, ret.data());
+			}
+			return ret;
+		}
+
+		JniType toJava(JNIEnv* env, const CppType& v)
+		{
+			if constexpr (sizeof(Ty) == 4)
+			{
+				auto arr = env->NewFloatArray(v.size());
+				auto ptr = env->GetFloatArrayElements(arr, nullptr);
+				std::copy(v.begin(), v.end(), ptr);
+				return arr;
+			}
+			else
+			{
+				auto arr = env->NewDoubleArray(v.size());
+				auto ptr = env->GetDoubleArrayElements(arr, nullptr);
+				std::copy(v.begin(), v.end(), ptr);
+				return arr;
+			}
 		}
 	};
 
@@ -604,14 +809,25 @@ namespace jni
 		{
 			return func();
 		}
+		catch (const std::bad_optional_access& e)
+		{
+			jclass exc = env->FindClass("java/lang/NullPointerException");
+			env->ThrowNew(exc, e.what());
+		}
+		catch (const std::invalid_argument& e)
+		{
+			jclass exc = env->FindClass("java/lang/IllegalArgumentException");
+			env->ThrowNew(exc, e.what());
+		}
 		catch (const std::exception& e)
 		{
 			jclass exc = env->FindClass("java/lang/Exception");
 			env->ThrowNew(exc, e.what());
-			if constexpr (!std::is_same_v<decltype(func()), void>)
-			{
-				return decltype(func()){};
-			}
+		}
+
+		if constexpr (!std::is_same_v<decltype(func()), void>)
+		{
+			return decltype(func()){};
 		}
 	}
 
@@ -744,6 +960,66 @@ namespace jni
 		using JniType = jobject;
 
 		template<class VTy>
+		bool getProperty(JNIEnv* env, jobject obj, jfieldID field, VTy& v)
+		{
+			using JniFieldType = typename ValueBuilder<VTy>::JniType;
+			if constexpr (std::is_same_v<JniFieldType, jbyte>)
+			{
+				v = ValueBuilder<VTy>{}.fromJava(env, env->GetByteField(obj, field));
+			}
+			else if constexpr (std::is_same_v<JniFieldType, jshort>)
+			{
+				v = ValueBuilder<VTy>{}.fromJava(env, env->GetShortField(obj, field));
+			}
+			else if constexpr (std::is_same_v<JniFieldType, jint>)
+			{
+				v = ValueBuilder<VTy>{}.fromJava(env, env->GetIntField(obj, field));
+			}
+			else if constexpr (std::is_same_v<JniFieldType, jlong>)
+			{
+				v = ValueBuilder<VTy>{}.fromJava(env, env->GetLongField(obj, field));
+			}
+			else if constexpr (std::is_same_v<JniFieldType, jfloat>)
+			{
+				v = ValueBuilder<VTy>{}.fromJava(env, env->GetFloatField(obj, field));
+			}
+			else if constexpr (std::is_same_v<JniFieldType, jdouble>)
+			{
+				v = ValueBuilder<VTy>{}.fromJava(env, env->GetDoubleField(obj, field));
+			}
+			else if constexpr (std::is_same_v<JniFieldType, jboolean>)
+			{
+				v = ValueBuilder<VTy>{}.fromJava(env, env->GetBooleanField(obj, field));
+			}
+			else if constexpr (std::is_same_v<JniFieldType, jchar>)
+			{
+				v = ValueBuilder<VTy>{}.fromJava(env, env->GetCharField(obj, field));
+			}
+			else
+			{
+				v = ValueBuilder<VTy>{}.fromJava(env, (JniFieldType)env->GetObjectField(obj, field));
+			}
+			return true;
+		}
+
+		template<size_t... idx>
+		bool getProperties(JNIEnv* env, jobject obj, CppType& v, std::index_sequence<idx...>)
+		{
+			return (... && getProperty(env, obj, DefTy::jFields[idx], v.*memPtrs));
+		}
+
+		CppType fromJava(JNIEnv* env, JniType v)
+		{
+			if (!v) throw std::bad_optional_access{};
+			CppType ret;
+			if (!getProperties(env, v, ret, std::make_index_sequence<sizeof...(memPtrs)>{}))
+			{
+				throw std::runtime_error{ "Failed to get fields of " + std::string{jclassName<CppType>} + "." };
+			}
+			return ret;
+		}
+
+		template<class VTy>
 		bool setProperty(JNIEnv* env, jobject obj, jfieldID field, const VTy& v)
 		{
 			using JniFieldType = typename ValueBuilder<VTy>::JniType;
@@ -774,6 +1050,10 @@ namespace jni
 			else if constexpr (std::is_same_v<JniFieldType, jboolean>)
 			{
 				env->SetBooleanField(obj, field, ValueBuilder<VTy>{}.toJava(env, v));
+			}
+			else if constexpr (std::is_same_v<JniFieldType, jchar>)
+			{
+				env->SetCharField(obj, field, ValueBuilder<VTy>{}.toJava(env, v));
 			}
 			else
 			{

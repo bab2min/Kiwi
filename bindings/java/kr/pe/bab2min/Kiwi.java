@@ -1,63 +1,6 @@
 package kr.pe.bab2min;
 
-class KiwiBuilder implements AutoCloseable  {
-	private long _inst;
-
-	public static class BuildOption	{
-		final static public int none = 0,
-		integrateAllomorph = 1 << 0,
-		loadDefaultDict = 1 << 1,
-		loadTypoDict = 1 << 2,
-		default_ = integrateAllomorph | loadDefaultDict | loadTypoDict;
-	}
-
-	public static class AnalyzedMorph {
-		public String form;
-		public byte tag = Kiwi.POSTag.nng;
-		public int start = -1, end = -1;
-	}
-
-	public KiwiBuilder(long _inst) {
-		this._inst = _inst;
-	}
-
-	public KiwiBuilder(String modelPath, int numWorkers, int buildOptions, boolean useSBG) {
-		ctor(modelPath, numWorkers, buildOptions, useSBG);
-	}
-
-	public KiwiBuilder(String modelPath, int numWorkers, int buildOptions) {
-		ctor(modelPath, numWorkers, buildOptions, false);
-	}
-
-	public KiwiBuilder(String modelPath, int numWorkers) {
-		ctor(modelPath, numWorkers, BuildOption.default_, false);
-	}
-
-	public KiwiBuilder(String modelPath) {
-		ctor(modelPath, 1, BuildOption.default_, false);
-	}
-
-	protected void finalize() {
-		close();
-	}
-
-	public boolean isAlive() {
-		return _inst != 0;
-	}
-
-	private native void ctor(String modelPath, int numWorkers, int buildOptions, boolean useSBG);
-	public native void close();
-	
-	public native Kiwi build();
-	public native boolean addWord(String form, byte tag, float score);
-	public native boolean addWord(String form, byte tag, float score, String origForm);
-	public native boolean addPreAnalyzedWord(String form, AnalyzedMorph[] analyzed, float score);
-	public native int loadDictionary(String path);
-
-	static {
-		System.loadLibrary("KiwiJava");
-	}
-}
+import java.util.Arrays;
 
 public class Kiwi implements AutoCloseable  {
 	private long _inst;
@@ -177,6 +120,12 @@ public class Kiwi implements AutoCloseable  {
 		}
 	}
 
+	public static class Space {
+		final public static byte none = 0,
+		no_space = 1,
+		insert_space = 2;
+	}
+
 	public static class Token {
 		public String form;
 		public int position;
@@ -202,38 +151,102 @@ public class Kiwi implements AutoCloseable  {
 		public float score;
 	}
 
-	public class Sentence {
-		public String sent;
-		public int begin;
+	public static class Sentence {
+		public String text;
+		public int start;
 		public int end;
 		public Sentence[] subSents;
+		public Token[] tokens;
+
+		public String toString() {
+			return String.format("Sentence(text=%s, start=%d, end=%d, subSents=%s)", text, start, end, Arrays.toString(subSents));
+		}
+	}
+
+	public static class JoinableToken {
+		public String form;
+		public byte tag;
+		public boolean inferRegularity = true;
+		public byte space = 0;
+
+		public JoinableToken() {
+		}
+
+		public JoinableToken(String form, byte tag) {
+			this.form = form;
+			this.tag = tag;
+		}
+
+		public JoinableToken(String form, byte tag, boolean inferRegularity) {
+			this.form = form;
+			this.tag = tag;
+			this.inferRegularity = inferRegularity;
+		}
+
+		public JoinableToken(String form, byte tag, boolean inferRegularity, byte space) {
+			this.form = form;
+			this.tag = tag;
+			this.inferRegularity = inferRegularity;
+			this.space = space;
+		}
+
+		public JoinableToken(Token token) {
+			this.form = token.form;
+			this.tag = token.tag;
+			this.inferRegularity = false;
+			this.space = 0;
+		}
 	}
 
 	public Kiwi(long _inst) {
 		this._inst = _inst;
 	}
 
-	protected void finalize() {
+	public static Kiwi init(String modelPath, int numWorkers, int buildOptions, boolean useSBG) throws Exception {
+		try(KiwiBuilder b = new KiwiBuilder(modelPath, numWorkers, buildOptions, useSBG)) {
+			return b.build();
+		}
+	}
+
+	public static Kiwi init(String modelPath, int numWorkers, int buildOptions) throws Exception {
+		try(KiwiBuilder b = new KiwiBuilder(modelPath, numWorkers, buildOptions)) {
+			return b.build();
+		}
+	}
+
+	public static Kiwi init(String modelPath, int numWorkers) throws Exception {
+		try(KiwiBuilder b = new KiwiBuilder(modelPath, numWorkers)) {
+			return b.build();
+		}
+	}
+
+	public static Kiwi init(String modelPath) throws Exception {
+		try(KiwiBuilder b = new KiwiBuilder(modelPath)) {
+			return b.build();
+		}
+	}
+
+	protected void finalize() throws Exception {
 		close();
 	}
 
-	public native void close();
+	@Override
+	public native void close() throws Exception;
 
 	public boolean isAlive() {
 		return _inst != 0;
 	}
 
 	public native TokenResult[] analyze(String text, int topN, int matchOption);
-	public native String join();
+	public native Sentence[] splitIntoSents(String text, int matchOption, boolean returnTokens);
+	public native String join(JoinableToken[] tokens);
 
 	public Token[] tokenize(String text, int matchOption) {
 		return analyze(text, 1, matchOption)[0].tokens;
 	}
 
 	public Sentence[] splitIntoSents(String text, int matchOption) {
-		Token[] tokens = tokenize(text, matchOption);
-
-		return null;
+		return splitIntoSents(text, matchOption, false);
 	}
 
 	static {

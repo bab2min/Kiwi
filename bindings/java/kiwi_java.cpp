@@ -2,6 +2,23 @@
 #include "JniUtils.hpp"
 
 #include <kiwi/Kiwi.h>
+#include <kiwi/Joiner.h>
+
+struct Sentence
+{
+	std::u16string text;
+	uint32_t start, end;
+	std::vector<Sentence> subSents;
+	std::optional<std::vector<kiwi::TokenInfo>> tokens;
+};
+
+struct JoinableToken
+{
+	std::u16string form;
+	kiwi::POSTag tag;
+	bool inferRegularity;
+	kiwi::cmb::Space space;
+};
 
 static auto gClsTokenInfo = jni::DataClassDefinition<kiwi::TokenInfo>()
 	.template property<&kiwi::TokenInfo::str>("form")
@@ -21,6 +38,19 @@ static auto gClsTokenInfo = jni::DataClassDefinition<kiwi::TokenInfo>()
 static auto gClsTokenResult = jni::DataClassDefinition<kiwi::TokenResult>()
 	.template property<&kiwi::TokenResult::first>("tokens")
 	.template property<&kiwi::TokenResult::second>("score");
+
+static auto gClsSentence = jni::DataClassDefinition<Sentence>()
+	.template property<&Sentence::text>("text")
+	.template property<&Sentence::start>("start")
+	.template property<&Sentence::end>("end")
+	.template property<&Sentence::subSents>("subSents")
+	.template property<&Sentence::tokens>("tokens");
+
+static auto gClsJoinableToken = jni::DataClassDefinition<JoinableToken>()
+	.template property<&JoinableToken::form>("form")
+	.template property<&JoinableToken::tag>("tag")
+	.template property<&JoinableToken::inferRegularity>("inferRegularity")
+	.template property<&JoinableToken::space>("space");
 
 namespace jni
 {
@@ -76,9 +106,31 @@ namespace jni
 	};
 
 	template<>
+	struct ValueBuilder<kiwi::cmb::Space> : public ValueBuilder<uint8_t>
+	{
+		using CppType = kiwi::cmb::Space;
+		using JniType = jbyte;
+
+		CppType fromJava(JNIEnv* env, JniType v)
+		{
+			return (CppType)v;
+		}
+
+		JniType toJava(JNIEnv* env, CppType v)
+		{
+			return (JniType)v;
+		}
+	};
+
+	template<>
 	struct JClassName<kiwi::TokenResult>
 	{
 		static constexpr auto value = std::string_view{ "kr/pe/bab2min/Kiwi$TokenResult" };
+	};
+
+	template<>
+	struct ValueBuilder<kiwi::TokenResult> : public ValueBuilder<decltype(gClsTokenResult)>
+	{
 	};
 
 	template<>
@@ -88,12 +140,29 @@ namespace jni
 	};
 
 	template<>
-	struct ValueBuilder<kiwi::TokenResult> : public ValueBuilder<decltype(gClsTokenResult)>
+	struct ValueBuilder<kiwi::TokenInfo> : public ValueBuilder<decltype(gClsTokenInfo)>
 	{
 	};
 
 	template<>
-	struct ValueBuilder<kiwi::TokenInfo> : public ValueBuilder<decltype(gClsTokenInfo)>
+	struct JClassName<Sentence>
+	{
+		static constexpr auto value = std::string_view{ "kr/pe/bab2min/Kiwi$Sentence" };
+	};
+
+	template<>
+	struct ValueBuilder<Sentence> : public ValueBuilder<decltype(gClsSentence)>
+	{
+	};
+
+	template<>
+	struct JClassName<JoinableToken>
+	{
+		static constexpr auto value = std::string_view{ "kr/pe/bab2min/Kiwi$JoinableToken" };
+	};
+
+	template<>
+	struct ValueBuilder<JoinableToken> : public ValueBuilder<decltype(gClsJoinableToken)>
 	{
 	};
 }
@@ -110,6 +179,58 @@ public:
 	auto analyze(const std::u16string& text, uint64_t topN, kiwi::Match matchOption) const
 	{
 		return Kiwi::analyze(text, topN, matchOption);
+	}
+
+	std::vector<Sentence> splitIntoSents(const std::u16string& text, kiwi::Match matchOption, bool returnTokens) const
+	{
+		std::vector<Sentence> ret;
+		auto tokens = Kiwi::analyze(text, matchOption).first;
+		uint32_t sentPos = -1;
+		size_t i = 0, t = 0;
+		for (auto& token : tokens)
+		{
+			if (token.sentPosition != sentPos)
+			{
+				if (!ret.empty())
+				{
+					ret.back().text = text.substr(ret.back().start, ret.back().end - ret.back().start);
+					if (returnTokens)
+					{
+						ret.back().tokens.emplace(std::make_move_iterator(tokens.begin() + t), std::make_move_iterator(tokens.begin() + i));
+					}
+				}
+				ret.emplace_back();
+				ret.back().start = token.position;
+				ret.back().end = token.position + token.length;
+				sentPos = token.sentPosition;
+				t = i;
+			}
+			else
+			{
+				ret.back().end = token.position + token.length;
+			}
+			++i;
+		}
+		if (!ret.empty())
+		{
+			ret.back().text = text.substr(ret.back().start, ret.back().end - ret.back().start);
+			if (returnTokens)
+			{
+				ret.back().tokens.emplace(std::make_move_iterator(tokens.begin() + t), std::make_move_iterator(tokens.begin() + i));
+			}
+		}
+		// To Do: process for subSents
+		return ret;
+	}
+
+	std::u16string join(std::vector<JoinableToken>&& tokens) const
+	{
+		auto joiner = Kiwi::newJoiner();
+		for (auto& token : tokens)
+		{
+			joiner.add(token.form, token.tag, token.inferRegularity, token.space);
+		}
+		return joiner.getU16();
 	}
 };
 
@@ -140,10 +261,14 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved)
 		.template method<&JKiwiBuilder::loadDictionary>("loadDictionary"),
 
 		jni::define<JKiwi>()
-			.template method<&JKiwi::analyze>("analyze"),
+			.template method<&JKiwi::analyze>("analyze")
+			.template method<&JKiwi::splitIntoSents>("splitIntoSents")
+			.template method<&JKiwi::join>("join"),
 
 		gClsTokenInfo,
-		gClsTokenResult
+		gClsTokenResult,
+		gClsSentence,
+		gClsJoinableToken
 	);
 }
 
