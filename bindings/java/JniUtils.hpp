@@ -2,8 +2,10 @@
 #include <array>
 #include <string>
 #include <string_view>
+#include <tuple>
 #include <vector>
 #include <optional>
+#include <iostream>
 
 #include <jni.h>
 
@@ -898,12 +900,12 @@ namespace jni
 	}
 
 	template<class Ty, class... Args>
-	constexpr auto makeCtorDef()
+	constexpr NativeMethod makeCtorDef()
 	{
 		using FuncPtr = void(*)(JNIEnv*, jobject, ToJniType<Args>...);
 
 		return NativeMethod{ "ctor", StringConcat_v<svLParen, toJniTypeStr<Args>..., svRParen, svV, svNullTerm>.data(), 
-			(FuncPtr)[](JNIEnv* env, jobject obj, ToJniType<Args>... args)
+			(void*)(FuncPtr)[](JNIEnv* env, jobject obj, ToJniType<Args>... args)
 		{
 			return handleExc(env, [&]()
 			{
@@ -915,14 +917,14 @@ namespace jni
 	}
 
 	template<class Ty, class... Args>
-	static constexpr auto ctorDef = makeCtorDef<Ty, Args...>();
+	static constexpr NativeMethod ctorDef = makeCtorDef<Ty, Args...>();
 
 	template<class Ty>
-	constexpr auto makeDtorDef()
+	constexpr NativeMethod makeDtorDef()
 	{
 		using FuncPtr = void(*)(JNIEnv*, jobject);
 
-		return NativeMethod{ "close", "()V", (FuncPtr)[](JNIEnv* env, jobject obj)
+		return NativeMethod{ "close", "()V", (void*)(FuncPtr)[](JNIEnv* env, jobject obj)
 		{
 			return handleExc(env, [&]()
 			{
@@ -938,16 +940,16 @@ namespace jni
 	}
 
 	template<class Ty>
-	static constexpr auto dtorDef = makeDtorDef<Ty>();
+	static constexpr NativeMethod dtorDef = makeDtorDef<Ty>();
 
 	template<class Ty, auto memFn>
-	constexpr auto makeMethodDef()
+	constexpr NativeMethod makeMethodDef()
 	{
 		return NativeMethod{ nullptr, CppWrapper<decltype(memFn), Ty>::typeStr.data(), (void*)CppWrapper<decltype(memFn), Ty>::template method<memFn>()};
 	}
 
 	template<class Ty, auto memFn>
-	static constexpr auto methodDef = makeMethodDef<Ty, memFn>();
+	static constexpr NativeMethod methodDef = makeMethodDef<Ty, memFn>();
 
 	template<class Ty, const NativeMethod& ... methods>
 	class ClassDefinition
@@ -1194,20 +1196,21 @@ namespace jni
 
 			if constexpr (IsClassDefinition<DefTy>::value)
 			{
-				auto cls = JObject<DefTy::Class>::jClass = (jclass)env->NewGlobalRef(env->FindClass(jclassName<DefTy::Class>.data()));
+				auto cls = JObject<typename DefTy::Class>::jClass 
+					= (jclass)env->NewGlobalRef(env->FindClass(jclassName<typename DefTy::Class>.data()));
 				if (!cls) return false;
 
-				JObject<DefTy::Class>::jInstField = env->GetFieldID(cls, "_inst", "J");
-				if (!JObject<DefTy::Class>::jInstField)
+				JObject<typename DefTy::Class>::jInstField = env->GetFieldID(cls, "_inst", "J");
+				if (!JObject<typename DefTy::Class>::jInstField)
 				{
-					std::cerr << jclassName<DefTy::Class> << " has no `_inst` field." << std::endl;
+					std::cerr << jclassName<typename DefTy::Class> << " has no `_inst` field." << std::endl;
 					return false;
 				}
 
-				JObject<DefTy::Class>::jInitMethod = env->GetMethodID(cls, "<init>", "(J)V");
-				if (!JObject<DefTy::Class>::jInitMethod)
+				JObject<typename DefTy::Class>::jInitMethod = env->GetMethodID(cls, "<init>", "(J)V");
+				if (!JObject<typename DefTy::Class>::jInitMethod)
 				{
-					std::cerr << jclassName<DefTy::Class> << " has no constructor with a long argument" << std::endl;
+					std::cerr << jclassName<typename DefTy::Class> << " has no constructor with a long argument" << std::endl;
 					return false;
 				}
 
@@ -1225,22 +1228,23 @@ namespace jni
 
 				if (env->RegisterNatives(cls, defs, size) != JNI_OK) return false;
 
-				addedClasses.emplace_back(jclassName<DefTy::Class>.data());
+				addedClasses.emplace_back(jclassName<typename DefTy::Class>.data());
 				return true;
 			}
 			else
 			{
-				auto cls = JObject<DefTy::Class>::jClass = def.jClass = (jclass)env->NewGlobalRef(env->FindClass(jclassName<DefTy::Class>.data()));
+				auto cls = JObject<typename DefTy::Class>::jClass
+					= def.jClass = (jclass)env->NewGlobalRef(env->FindClass(jclassName<typename DefTy::Class>.data()));
 				if (!cls) return false;
 
 				def.jInitMethod = env->GetMethodID(cls, "<init>", "()V");
 				if (!def.jInitMethod)
 				{
-					std::cerr << jclassName<DefTy::Class> << " has no default constructor." << std::endl;
+					std::cerr << jclassName<typename DefTy::Class> << " has no default constructor." << std::endl;
 					return false;
 				}
 
-				auto idx = std::make_index_sequence<std::tuple_size_v<DefTy::MemPtrTypes>>{};
+				auto idx = std::make_index_sequence<std::tuple_size_v<typename DefTy::MemPtrTypes>>{};
 				if (!fetchPropertyIds(def, env, cls, idx, def.properties)) return false;
 				return true;
 			}

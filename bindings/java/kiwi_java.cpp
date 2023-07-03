@@ -290,6 +290,16 @@ public:
 
 	using kiwi::KiwiBuilder::KiwiBuilder;
 
+	bool addWord(const std::u16string& form, kiwi::POSTag tag, float score)
+	{
+		return KiwiBuilder::addWord(form, tag, score);
+	}
+
+	bool addWord2(const std::u16string& form, kiwi::POSTag tag, float score, const std::u16string& orig)
+	{
+		return KiwiBuilder::addWord(form, tag, score, orig);
+	}
+
 	bool addPreAnalyzedWord(const std::u16string& form, std::vector<AnalyzedMorph>&& analyzed, float score)
 	{
 		std::vector<std::pair<std::u16string, kiwi::POSTag>> morphs;
@@ -328,13 +338,14 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved)
 
 		jni::define<JKiwiBuilder>()
 			.template ctor<std::string, size_t, kiwi::BuildOption, bool>()
-			.template method<static_cast<bool(JKiwiBuilder::*)(const std::u16string&, kiwi::POSTag, float)>(&JKiwiBuilder::addWord)>("addWord")
-			.template method<static_cast<bool(JKiwiBuilder::*)(const std::u16string&, kiwi::POSTag, float, const std::u16string&)>(&JKiwiBuilder::addWord)>("addWord")
+			.template method<&JKiwiBuilder::addWord>("addWord")
+			.template method<&JKiwiBuilder::addWord2>("addWord")
 			.template method<&JKiwiBuilder::addPreAnalyzedWord>("addPreAnalyzedWord")
 			.template method<&JKiwiBuilder::build>("build")
 			.template method<&JKiwiBuilder::loadDictionary>("loadDictionary"),
 
 		jni::define<JKiwi>()
+			.template method<&JKiwi::getVersion>("getVersion")
 			.template method<&JKiwi::analyze>("analyze")
 			.template method<&JKiwi::splitIntoSents>("splitIntoSents")
 			.template method<&JKiwi::join>("join"),
