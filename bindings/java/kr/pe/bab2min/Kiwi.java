@@ -1,6 +1,7 @@
 package kr.pe.bab2min;
 
 import java.util.Arrays;
+import java.util.Scanner;
 
 public class Kiwi implements AutoCloseable  {
 	private long _inst;
@@ -241,6 +242,8 @@ public class Kiwi implements AutoCloseable  {
 	public native Sentence[] splitIntoSents(String text, int matchOption, boolean returnTokens);
 	public native String join(JoinableToken[] tokens);
 
+	public static native String getVersion();
+
 	public Token[] tokenize(String text, int matchOption) {
 		return analyze(text, 1, matchOption)[0].tokens;
 	}
@@ -251,5 +254,23 @@ public class Kiwi implements AutoCloseable  {
 
 	static {
 		System.loadLibrary("KiwiJava");
+	}
+
+	public static void main(String[] args) throws Exception {
+		if (args.length <= 0) {
+			System.out.println(String.format("java -jar kiwi-%s.jar <model_path>", getVersion()));
+			System.out.println("Error: model_path is not given!");
+			return;
+		}
+		Kiwi kiwi = init(args[0]);
+		System.out.println(String.format("Kiwi %s is loaded!", getVersion()));
+		try(Scanner input = new Scanner(System.in)) {
+			System.out.print(">> ");
+			while (input.hasNext()) {
+				Token[] tokens = kiwi.tokenize(input.nextLine(), Match.allWithNormalizing);
+				System.out.println(Arrays.deepToString(tokens));
+				System.out.print(">> ");
+			}
+		}
 	}
 }

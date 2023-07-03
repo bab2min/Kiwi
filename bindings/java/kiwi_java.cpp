@@ -217,6 +217,11 @@ public:
 
 	JKiwi(Kiwi&& inst) : Kiwi{ std::move(inst) } {}
 
+	static std::string getVersion()
+	{
+		return KIWI_VERSION_STRING;
+	}
+
 	auto analyze(const std::u16string& text, uint64_t topN, kiwi::Match matchOption) const
 	{
 		return Kiwi::analyze(text, topN, matchOption);

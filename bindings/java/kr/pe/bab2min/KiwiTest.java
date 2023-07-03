@@ -18,6 +18,11 @@ public class KiwiTest {
 	}
 
 	@Test
+	public void testVersion() {
+		System.out.println(Kiwi.getVersion());
+	}
+
+	@Test
 	public void testInit() throws Exception {
 		Kiwi kiwi = Kiwi.init(modelPath);
 		System.out.println(Arrays.deepToString(kiwi.tokenize("자바에서도 Kiwi를!", Kiwi.Match.allWithNormalizing)));

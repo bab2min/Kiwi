@@ -747,6 +747,30 @@ namespace jni
 			using Arg = typename std::tuple_element<N, ArgsTuple>::type;
 
 			static const std::size_t nargs{ sizeof...(Ts) };
+
+			static constexpr auto typeStr = StringConcat_v<svLParen, toJniTypeStr<remove_cvref_t<Ts>>..., svRParen, toJniTypeStr<R>>;
+
+			using JniType = ToJniType<R>(*)(JNIEnv*, jobject, ToJniType<remove_cvref_t<Ts>>...);
+
+			template<Type func>
+			static constexpr JniType method()
+			{
+				return [](JNIEnv* env, jobject obj, ToJniType<remove_cvref_t<Ts>>... args) -> ToJniType<R>
+				{
+					return handleExc(env, [&]() -> ToJniType<R>
+					{
+						if constexpr (std::is_same_v<R, void>)
+						{
+							(*func)(ValueBuilder<remove_cvref_t<Ts>>{}.fromJava(env, args)...);
+						}
+						else
+						{
+							auto ret = (*func)(ValueBuilder<remove_cvref_t<Ts>>{}.fromJava(env, args)...);
+							return ValueBuilder<R>{}.toJava(env, std::move(ret));
+						}
+					});
+				};
+			}
 		};
 
 		/* member function pointer */
