@@ -58,6 +58,31 @@ public class KiwiTest {
 	}
 	
 	@Test
+	public void testAddPreAnalyzedWord() throws Exception {
+		KiwiBuilder builder = new KiwiBuilder(modelPath);
+		KiwiBuilder.AnalyzedMorph[] morphs = new KiwiBuilder.AnalyzedMorph[] {
+			new KiwiBuilder.AnalyzedMorph("너무", Kiwi.POSTag.mag),
+			new KiwiBuilder.AnalyzedMorph("하", Kiwi.POSTag.xsv),
+			new KiwiBuilder.AnalyzedMorph("어", Kiwi.POSTag.ef),
+		};
+		assertEquals(builder.addPreAnalyzedWord("넘해", morphs, 0.f), true);
+		Kiwi kiwi = builder.build();
+		Kiwi.Token[] tokens = kiwi.tokenize("그건좀넘해", Kiwi.Match.allWithNormalizing);
+		System.out.println(Arrays.deepToString(tokens));
+	}
+	
+	@Test
+	public void testTypos() throws Exception {
+		KiwiBuilder builder = new KiwiBuilder(modelPath);
+		Kiwi kiwi = builder.build(KiwiBuilder.basicTypoSet);
+		Kiwi.Token[] tokens = kiwi.tokenize("나 죰 도와죠.", Kiwi.Match.allWithNormalizing);
+		System.out.println(Arrays.deepToString(tokens));
+		assertEquals(tokens[1].form, "좀");
+		assertEquals(tokens[4].form, "주");
+		assertEquals(tokens[5].form, "어");
+	}
+	
+	@Test
 	public void testSplitIntoSents() throws Exception {
 		Kiwi.Sentence[] sents = getReusableKiwi().splitIntoSents("안녕하십니까 이건 총 몇 문장일까", Kiwi.Match.allWithNormalizing);
 		System.out.println(Arrays.deepToString(sents));
