@@ -93,6 +93,14 @@ namespace jni
 	static constexpr auto toJniTypeStr = ValueBuilder<Ty>::typeStr;
 
 	template<>
+	struct ValueBuilder<void>
+	{
+		using CppType = void;
+		using JniType = void;
+		static constexpr auto typeStr = "V"sv;
+	};
+
+	template<>
 	struct ValueBuilder<uint8_t>
 	{
 		using CppType = uint8_t;
@@ -414,6 +422,48 @@ namespace jni
 	};
 
 	template<class Ty>
+	struct ValueBuilder<std::optional<Ty>, std::enable_if_t<std::is_base_of_v<JObject<Ty>, Ty>>>
+	{
+		using CppType = std::optional<Ty>;
+		using JniType = jobject;
+		static constexpr auto typeStr = StringConcat_v<svL, jclassName<Ty>, svSC>;
+
+		CppType fromJava(JNIEnv* env, JniType v)
+		{
+			if (!v) return {};
+			auto ptr = (Ty*)env->GetLongField(v, JObject<Ty>::jInstField);
+			if (!ptr) throw std::runtime_error{ "Object is already closed or not initialized." };
+			return *ptr;
+		}
+
+		JniType toJava(JNIEnv* env, CppType&& v)
+		{
+			if (!v) return nullptr;
+			auto ptr = new CppType{ std::move(*v) };
+			if (!ptr) throw std::runtime_error{ std::string{ jclassName<Ty> } + ": failed to prepare c++ object." };
+			auto ret = env->NewObject(JObject<Ty>::jClass, JObject<Ty>::jInitMethod, (jlong)ptr);
+			if (!ret) throw std::runtime_error{ std::string{ jclassName<Ty> } + ": failed to construct object." };
+			return ret;
+		}
+	};
+
+	template<class Ty>
+	struct ValueBuilder<Ty*, std::enable_if_t<std::is_base_of_v<JObject<Ty>, Ty>>>
+	{
+		using CppType = Ty*;
+		using JniType = jobject;
+		static constexpr auto typeStr = StringConcat_v<svL, jclassName<Ty>, svSC>;
+
+		CppType fromJava(JNIEnv* env, JniType v)
+		{
+			if (!v) return nullptr;
+			auto ptr = (Ty*)env->GetLongField(v, JObject<Ty>::jInstField);
+			if (!ptr) throw std::runtime_error{ "Object is already closed or not initialized." };
+			return ptr;
+		}
+	};
+
+	template<class Ty>
 	struct ValueBuilder<std::vector<Ty>, std::enable_if_t<!std::is_integral_v<Ty> && !std::is_floating_point_v<Ty>>>
 	{
 		using CppType = std::vector<Ty>;
@@ -727,8 +777,16 @@ namespace jni
 					{
 						auto ptr = (ClassType*)env->GetLongField(obj, JObject<ClassType>::jInstField);
 						if (!ptr) throw std::runtime_error{ "Object is already closed or not initialized." };
-						auto ret = (ptr->*func)(ValueBuilder<remove_cvref_t<Ts>>{}.fromJava(env, args)...);
-						return ValueBuilder<R>{}.toJava(env, std::move(ret));
+						
+						if constexpr (std::is_same_v<R, void>)
+						{
+							(ptr->*func)(ValueBuilder<remove_cvref_t<Ts>>{}.fromJava(env, args)...);
+						}
+						else
+						{
+							auto ret = (ptr->*func)(ValueBuilder<remove_cvref_t<Ts>>{}.fromJava(env, args)...);
+							return ValueBuilder<R>{}.toJava(env, std::move(ret));
+						}
 					});
 				};
 			}
@@ -764,8 +822,16 @@ namespace jni
 					{
 						auto ptr = (ClassType*)env->GetLongField(obj, JObject<ClassType>::jInstField);
 						if (!ptr) throw std::runtime_error{ "Object is already closed or not initialized." };
-						auto ret = (ptr->*func)(ValueBuilder<remove_cvref_t<Ts>>{}.fromJava(env, args)...);
-						return ValueBuilder<R>{}.toJava(env, std::move(ret));
+
+						if constexpr (std::is_same_v<R, void>)
+						{
+							(ptr->*func)(ValueBuilder<remove_cvref_t<Ts>>{}.fromJava(env, args)...);
+						}
+						else
+						{
+							auto ret = (ptr->*func)(ValueBuilder<remove_cvref_t<Ts>>{}.fromJava(env, args)...);
+							return ValueBuilder<R>{}.toJava(env, std::move(ret));
+						}
 					});
 				};
 			}

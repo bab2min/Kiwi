@@ -20,6 +20,13 @@ struct JoinableToken
 	kiwi::cmb::Space space;
 };
 
+struct AnalyzedMorph
+{
+	std::u16string form;
+	kiwi::POSTag tag;
+	int start, end;
+};
+
 static auto gClsTokenInfo = jni::DataClassDefinition<kiwi::TokenInfo>()
 	.template property<&kiwi::TokenInfo::str>("form")
 	.template property<&kiwi::TokenInfo::position>("position")
@@ -51,6 +58,12 @@ static auto gClsJoinableToken = jni::DataClassDefinition<JoinableToken>()
 	.template property<&JoinableToken::tag>("tag")
 	.template property<&JoinableToken::inferRegularity>("inferRegularity")
 	.template property<&JoinableToken::space>("space");
+
+static auto gClsAnalyzedMorph = jni::DataClassDefinition<AnalyzedMorph>()
+	.template property<&AnalyzedMorph::form>("form")
+	.template property<&AnalyzedMorph::tag>("tag")
+	.template property<&AnalyzedMorph::start>("start")
+	.template property<&AnalyzedMorph::end>("end");
 
 namespace jni
 {
@@ -123,6 +136,23 @@ namespace jni
 	};
 
 	template<>
+	struct ValueBuilder<kiwi::CondVowel> : public ValueBuilder<uint8_t>
+	{
+		using CppType = kiwi::CondVowel;
+		using JniType = jbyte;
+
+		CppType fromJava(JNIEnv* env, JniType v)
+		{
+			return (CppType)v;
+		}
+
+		JniType toJava(JNIEnv* env, CppType v)
+		{
+			return (JniType)v;
+		}
+	};
+
+	template<>
 	struct JClassName<kiwi::TokenResult>
 	{
 		static constexpr auto value = std::string_view{ "kr/pe/bab2min/Kiwi$TokenResult" };
@@ -163,6 +193,17 @@ namespace jni
 
 	template<>
 	struct ValueBuilder<JoinableToken> : public ValueBuilder<decltype(gClsJoinableToken)>
+	{
+	};
+
+	template<>
+	struct JClassName<AnalyzedMorph>
+	{
+		static constexpr auto value = std::string_view{ "kr/pe/bab2min/KiwiBuilder$AnalyzedMorph" };
+	};
+
+	template<>
+	struct ValueBuilder<AnalyzedMorph> : public ValueBuilder<decltype(gClsAnalyzedMorph)>
 	{
 	};
 }
@@ -234,6 +275,14 @@ public:
 	}
 };
 
+class JTypoTransformer : public kiwi::TypoTransformer, jni::JObject<JTypoTransformer>
+{
+public:
+	static constexpr std::string_view className = "kr/pe/bab2min/KiwiBuilder$TypoTransformer";
+
+	using kiwi::TypoTransformer::TypoTransformer;
+};
+
 class JKiwiBuilder : public kiwi::KiwiBuilder, jni::JObject<JKiwiBuilder>
 {
 public:
@@ -241,9 +290,29 @@ public:
 
 	using kiwi::KiwiBuilder::KiwiBuilder;
 
-	JKiwi build() const
+	bool addPreAnalyzedWord(const std::u16string& form, std::vector<AnalyzedMorph>&& analyzed, float score)
 	{
-		return KiwiBuilder::build();
+		std::vector<std::pair<std::u16string, kiwi::POSTag>> morphs;
+		std::vector<std::pair<size_t, size_t>> positions;
+		for (auto& i : analyzed)
+		{
+			morphs.emplace_back(std::move(i.form), std::move(i.tag));
+			if (i.start >= 0 && i.end >= 0) positions.emplace_back(i.start, i.end);
+		}
+		if (positions.size() < morphs.size()) positions.clear();
+		return KiwiBuilder::addPreAnalyzedWord(form, morphs, positions, score);
+	}
+
+	JKiwi build(JTypoTransformer* typos, float typoCostThreshold) const
+	{
+		if (typos) 
+		{
+			return KiwiBuilder::build(*typos, typoCostThreshold);
+		}
+		else
+		{
+			return KiwiBuilder::build();
+		}
 	}
 };
 
@@ -253,12 +322,17 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved)
 {
 	return gModule.load(vm,
 
+		jni::define<JTypoTransformer>()
+			.template ctor<>()
+			.template method<&JTypoTransformer::addTypo>("_addTypo"),
+
 		jni::define<JKiwiBuilder>()
-		.template ctor<std::string, size_t, kiwi::BuildOption, bool>()
-		.template method<static_cast<bool(JKiwiBuilder::*)(const std::u16string&, kiwi::POSTag, float)>(&JKiwiBuilder::addWord)>("addWord")
-		.template method<static_cast<bool(JKiwiBuilder::*)(const std::u16string&, kiwi::POSTag, float, const std::u16string&)>(&JKiwiBuilder::addWord)>("addWord")
-		.template method<&JKiwiBuilder::build>("build")
-		.template method<&JKiwiBuilder::loadDictionary>("loadDictionary"),
+			.template ctor<std::string, size_t, kiwi::BuildOption, bool>()
+			.template method<static_cast<bool(JKiwiBuilder::*)(const std::u16string&, kiwi::POSTag, float)>(&JKiwiBuilder::addWord)>("addWord")
+			.template method<static_cast<bool(JKiwiBuilder::*)(const std::u16string&, kiwi::POSTag, float, const std::u16string&)>(&JKiwiBuilder::addWord)>("addWord")
+			.template method<&JKiwiBuilder::addPreAnalyzedWord>("addPreAnalyzedWord")
+			.template method<&JKiwiBuilder::build>("build")
+			.template method<&JKiwiBuilder::loadDictionary>("loadDictionary"),
 
 		jni::define<JKiwi>()
 			.template method<&JKiwi::analyze>("analyze")
@@ -268,7 +342,8 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved)
 		gClsTokenInfo,
 		gClsTokenResult,
 		gClsSentence,
-		gClsJoinableToken
+		gClsJoinableToken,
+		gClsAnalyzedMorph
 	);
 }
 
