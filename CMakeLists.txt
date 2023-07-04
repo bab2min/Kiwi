@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 
-project(kiwi VERSION 0.15.1 DESCRIPTION "Kiwi, Korean Intelligent Word Identifier")
+project(kiwi VERSION 0.15.2 DESCRIPTION "Kiwi, Korean Intelligent Word Identifier")
 
 set ( CMAKE_CXX_STANDARD 14 )
 set ( CMAKE_VERBOSE_MAKEFILE true )
@@ -9,7 +9,7 @@ option(KIWI_USE_MIMALLOC  "Use mimalloc for faster memory allocation" ON)
 option(KIWI_USE_CPUINFO  "Use cpuinfo for dynamic CPU dispatching" ON)
 option(KIWI_STATIC_WITHOUT_MT  "Use /MT Option in building kiwi_static" OFF)
 option(KIWI_BUILD_TEST  "Build Test sets" ON)
-option(KIWI_JAVA_BINDING  "Build Java binding" ON)
+option(KIWI_JAVA_BINDING  "Build Java binding" OFF)
 set(KIWI_CPU_ARCH "" CACHE STRING "Set architecture type for macOS")
 
 if (NOT CMAKE_BUILD_TYPE)
