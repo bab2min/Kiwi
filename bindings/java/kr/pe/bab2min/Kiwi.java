@@ -1,10 +1,15 @@
 package kr.pe.bab2min;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Scanner;
 
 public class Kiwi implements AutoCloseable  {
 	private long _inst;
+	final private static String _version = "0.15.2";
 
 	public static class Match {
 		final static public int none = 0,
@@ -252,13 +257,49 @@ public class Kiwi implements AutoCloseable  {
 		return splitIntoSents(text, matchOption, false);
 	}
 
+	public static void loadLibrary() throws SecurityException, UnsatisfiedLinkError, NullPointerException {
+		try {
+			System.loadLibrary("KiwiJava-" + _version);
+		} catch (UnsatisfiedLinkError e) {
+			InputStream in = null;
+			String foundName = null;
+			for (String name : new String[]{"KiwiJava-" + _version + ".dll", "libKiwiJava-" + _version + ".so", "libKiwiJava-" + _version + ".dylib"}) {
+				in = Kiwi.class.getResourceAsStream("/" + name);
+				if (in != null) {
+					foundName = name;
+					break;
+				}
+			}
+			if (in == null) throw new UnsatisfiedLinkError("Cannot find a library named KiwiJava-" + _version);
+			byte[] buffer = new byte[4096];
+			int read = -1;
+			try {
+				File temp = File.createTempFile(foundName, "");
+				try(FileOutputStream fos = new FileOutputStream(temp)) {
+					while((read = in.read(buffer)) != -1) {
+						fos.write(buffer, 0, read);
+					}
+					fos.close();
+				} catch(IOException e2) {
+					throw new UnsatisfiedLinkError(e2.getMessage());
+				}
+				in.close();
+
+				System.load(temp.getAbsolutePath());
+			} catch(IOException e2) {
+				throw new UnsatisfiedLinkError(e2.getMessage());
+			}
+		}
+		
+	}
+
 	static {
-		System.loadLibrary("KiwiJava");
+		loadLibrary();
 	}
 
 	public static void main(String[] args) throws Exception {
 		if (args.length <= 0) {
-			System.out.println(String.format("java -jar kiwi-%s.jar <model_path>", getVersion()));
+			System.out.println(String.format("java -jar kiwi-java-%s.jar <model_path>", getVersion()));
 			System.out.println("Error: model_path is not given!");
 			return;
 		}

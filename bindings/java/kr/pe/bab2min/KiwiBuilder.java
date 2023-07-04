@@ -127,7 +127,7 @@ public class KiwiBuilder implements AutoCloseable  {
 	}
 
 	static {
-		System.loadLibrary("KiwiJava");
+		Kiwi.loadLibrary();
 	}
 
 	final public static TypoTransformer basicTypoSet = new TypoTransformer()
