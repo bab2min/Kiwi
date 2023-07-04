@@ -5,6 +5,7 @@ include (UseJava)
 include_directories (
 	${JNI_INCLUDE_DIRS}
 )
+set(CMAKE_JAVA_COMPILE_FLAGS -source 8 -target 8 -encoding utf-8)
 set(pkg_name "KiwiJava-${PROJECT_VERSION}")
 add_library (${pkg_name} SHARED kiwi_java.cpp
     $<TARGET_OBJECTS:${PROJECT_NAME}>
