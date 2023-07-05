@@ -12,11 +12,18 @@ add_library (${pkg_name} SHARED kiwi_java.cpp
     $<TARGET_OBJECTS:clog>
     $<TARGET_OBJECTS:cpuinfo>
 )
-target_link_libraries (${pkg_name} ${JAVA_JVM_LIBRARY})
+if(UNIX AND NOT APPLE)
+    target_link_libraries( ${pkg_name}
+        ${JAVA_JVM_LIBRARY}
+        rt
+    )
+else()
+    target_link_libraries (${pkg_name} ${JAVA_JVM_LIBRARY})
+endif()
 target_compile_features(${pkg_name} PUBLIC cxx_std_17)
 if(MSVC)
     target_compile_options(${pkg_name} PUBLIC
-    /MT
+        /MT
     )
 endif()
 add_jar (${PROJECT_NAME}-java-${PROJECT_VERSION} kr/pe/bab2min/Kiwi.java kr/pe/bab2min/KiwiBuilder.java ENTRY_POINT kr.pe.bab2min.Kiwi)
