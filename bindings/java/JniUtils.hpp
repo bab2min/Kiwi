@@ -252,6 +252,44 @@ namespace jni
 			return v;
 		}
 	};
+
+#ifdef __APPLE__
+	template<>
+	struct ValueBuilder<unsigned long>
+	{
+		using CppType = unsigned long;
+		using JniType = jint;
+		static constexpr auto typeStr = "I"sv;
+
+		CppType fromJava(JNIEnv* env, JniType v)
+		{
+			return v;
+		}
+
+		JniType toJava(JNIEnv* env, CppType v)
+		{
+			return v;
+		}
+	};
+
+	template<>
+	struct ValueBuilder<long>
+	{
+		using CppType = long;
+		using JniType = jint;
+		static constexpr auto typeStr = "I"sv;
+
+		CppType fromJava(JNIEnv* env, JniType v)
+		{
+			return v;
+		}
+
+		JniType toJava(JNIEnv* env, CppType v)
+		{
+			return v;
+		}
+	};
+#endif
 #else
 	template<>
 	struct ValueBuilder<uint64_t>
@@ -288,6 +326,43 @@ namespace jni
 			return v;
 		}
 	};
+#ifdef __APPLE__
+	template<>
+	struct ValueBuilder<unsigned long>
+	{
+		using CppType = unsigned long;
+		using JniType = jlong;
+		static constexpr auto typeStr = "J"sv;
+
+		CppType fromJava(JNIEnv* env, JniType v)
+		{
+			return v;
+		}
+
+		JniType toJava(JNIEnv* env, CppType v)
+		{
+			return v;
+		}
+	};
+
+	template<>
+	struct ValueBuilder<long>
+	{
+		using CppType = long;
+		using JniType = jlong;
+		static constexpr auto typeStr = "J"sv;
+
+		CppType fromJava(JNIEnv* env, JniType v)
+		{
+			return v;
+		}
+
+		JniType toJava(JNIEnv* env, CppType v)
+		{
+			return v;
+		}
+	};
+#endif
 #endif
 
 	template<>
