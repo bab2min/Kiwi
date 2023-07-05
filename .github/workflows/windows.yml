@@ -29,7 +29,7 @@ jobs:
         cmakeBuildType: Release
         buildWithCMake: true
         #cmakeGenerator: VS16Win${{ matrix.arch }}
-        cmakeAppendedArgs: -G"Visual Studio 16 2019" -A${{ matrix.arch }}
+        cmakeAppendedArgs: -G"Visual Studio 16 2019" -A${{ matrix.arch }} -DKIWI_JAVA_BINDING=1
         buildWithCMakeArgs: --config Release
         buildDirectory: build
     - name: Run Evaluator
@@ -45,8 +45,15 @@ jobs:
           build\Release\*kiwi*
           build\test\Release\*kiwi*
           eval_results\*.txt
+          build\bindings\java\*.jar
     - name: Run Unit Test
       run: .\build\test\Release\kiwi-test.exe
+    - name: Run Java Unit Test
+      run: |
+        curl -OL https://repo1.maven.org/maven2/junit/junit/4.13.2/junit-4.13.2.jar
+        curl -OL https://repo1.maven.org/maven2/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar
+        javac -cp "*;build/bindings/java/*" -encoding utf-8 bindings/java/kr/pe/bab2min/KiwiTest.java
+        java -cp "*;build/bindings/java/*" org.junit.runner.JUnitCore kr.pe.bab2min.KiwiTest
     - name: Run Benchmark
       run: |
         curl -OL https://latina.bab2min.pe.kr/_data/kowiki1000.txt
