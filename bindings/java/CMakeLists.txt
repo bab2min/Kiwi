@@ -22,6 +22,7 @@ endif()
 add_jar (${PROJECT_NAME}-java-${PROJECT_VERSION} kr/pe/bab2min/Kiwi.java kr/pe/bab2min/KiwiBuilder.java ENTRY_POINT kr.pe.bab2min.Kiwi)
 
 add_custom_command(TARGET ${PROJECT_NAME}-java-${PROJECT_VERSION} POST_BUILD
+    COMMAND mv $<TARGET_FILE:${pkg_name}> $<TARGET_FILE_NAME:${pkg_name}>
     COMMAND jar uf ${PROJECT_NAME}-java-${PROJECT_VERSION}.jar $<TARGET_FILE_NAME:${pkg_name}>
     DEPENDS ${PROJECT_NAME}-java-${PROJECT_VERSION}
 )
