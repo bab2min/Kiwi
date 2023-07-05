@@ -51,11 +51,17 @@ namespace jni
 	template<class Func>
 	inline auto handleExc(JNIEnv* env, Func&& func);
 
+	template<class Ty>
 	struct NativeMethod
 	{
 		const char* name;
 		const char* signature;
-		void* fnPtr;
+		Ty fnPtr;
+
+		operator JNINativeMethod() const
+		{
+			return { (char*)name, (char*)signature, (void*)fnPtr };
+		}
 	};
 
 	template<class Ty>
@@ -869,7 +875,7 @@ namespace jni
 		{
 			using Type = R(C::*);
 			using ReturnType = R;
-			using ClassType = std::conditional_t<std::is_same_v<ClsOverride, void>, C, ClsOverride>;;
+			using ClassType = std::conditional_t<std::is_same_v<ClsOverride, void>, C, ClsOverride>;
 		};
 
 	}
@@ -924,12 +930,12 @@ namespace jni
 	}
 
 	template<class Ty, class... Args>
-	constexpr NativeMethod makeCtorDef()
+	constexpr auto makeCtorDef()
 	{
 		using FuncPtr = void(*)(JNIEnv*, jobject, ToJniType<Args>...);
 
-		return NativeMethod{ "ctor", StringConcat_v<svLParen, toJniTypeStr<Args>..., svRParen, svV, svNullTerm>.data(), 
-			(void*)(FuncPtr)[](JNIEnv* env, jobject obj, ToJniType<Args>... args)
+		return NativeMethod<FuncPtr>{ "ctor", StringConcat_v<svLParen, toJniTypeStr<Args>..., svRParen, svV, svNullTerm>.data(), 
+			(FuncPtr)[](JNIEnv* env, jobject obj, ToJniType<Args>... args)
 		{
 			return handleExc(env, [&]()
 			{
@@ -944,11 +950,11 @@ namespace jni
 	static constexpr NativeMethod ctorDef = makeCtorDef<Ty, Args...>();
 
 	template<class Ty>
-	constexpr NativeMethod makeDtorDef()
+	constexpr auto makeDtorDef()
 	{
 		using FuncPtr = void(*)(JNIEnv*, jobject);
 
-		return NativeMethod{ "close", "()V", (void*)(FuncPtr)[](JNIEnv* env, jobject obj)
+		return NativeMethod<FuncPtr>{ "close", "()V", (FuncPtr)[](JNIEnv* env, jobject obj)
 		{
 			return handleExc(env, [&]()
 			{
@@ -967,15 +973,16 @@ namespace jni
 	static constexpr NativeMethod dtorDef = makeDtorDef<Ty>();
 
 	template<class Ty, auto memFn>
-	constexpr NativeMethod makeMethodDef()
+	constexpr auto makeMethodDef()
 	{
-		return NativeMethod{ nullptr, CppWrapper<decltype(memFn), Ty>::typeStr.data(), (void*)CppWrapper<decltype(memFn), Ty>::template method<memFn>()};
+		using FuncPtr = decltype(CppWrapper<decltype(memFn), Ty>::template method<memFn>());
+		return NativeMethod<FuncPtr>{ nullptr, CppWrapper<decltype(memFn), Ty>::typeStr.data(), CppWrapper<decltype(memFn), Ty>::template method<memFn>()};
 	}
 
 	template<class Ty, auto memFn>
 	static constexpr NativeMethod methodDef = makeMethodDef<Ty, memFn>();
 
-	template<class Ty, const NativeMethod& ... methods>
+	template<class Ty, const auto& ... methods>
 	class ClassDefinition
 	{
 		friend class Module;
@@ -985,7 +992,7 @@ namespace jni
 		using Class = Ty;
 		static_assert(std::is_base_of_v<JObject<Class>, Class>, "Only JObject has its ClassDefinition.");
 
-		inline static std::array<NativeMethod, sizeof...(methods)> methodDefs{ methods... };
+		inline static std::array<JNINativeMethod, sizeof...(methods)> methodDefs{ ((JNINativeMethod)methods)... };
 
 		constexpr ClassDefinition(const std::vector<const char*>& _methodNames = {}) : methodNames{ _methodNames } {}
 
@@ -1180,7 +1187,7 @@ namespace jni
 	template<class Ty>
 	struct IsClassDefinition : std::false_type {};
 
-	template<class Ty, const NativeMethod& ... methods>
+	template<class Ty, const auto& ... methods>
 	struct IsClassDefinition<ClassDefinition<Ty, methods...>> : std::true_type {};
 
 	template<class Ty>
