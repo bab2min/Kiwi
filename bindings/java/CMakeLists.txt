@@ -14,6 +14,11 @@ add_library (${pkg_name} SHARED kiwi_java.cpp
 )
 target_link_libraries (${pkg_name} ${JAVA_JVM_LIBRARY})
 target_compile_features(${pkg_name} PUBLIC cxx_std_17)
+if(MSVC)
+    target_compile_options(${pkg_name} PUBLIC
+    /MT
+    )
+endif()
 add_jar (${PROJECT_NAME}-java-${PROJECT_VERSION} kr/pe/bab2min/Kiwi.java kr/pe/bab2min/KiwiBuilder.java ENTRY_POINT kr.pe.bab2min.Kiwi)
 
 add_custom_command(TARGET ${PROJECT_NAME}-java-${PROJECT_VERSION} POST_BUILD
