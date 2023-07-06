@@ -302,7 +302,7 @@ jobs:
           mv test/kiwi-* bin/
           cp -r ../include/kiwi include/
           tar -zcvf /artifacts/asset.tgz include/ lib/ bin/
-          mv build/bindings/java/kiwi-java*.jar /artifacts/kiwi-java.jar
+          mv bindings/java/kiwi-java*.jar /artifacts/kiwi-java.jar
     - name: Get release
       id: get_release
       uses: bruceadams/get-release@v1.2.2
