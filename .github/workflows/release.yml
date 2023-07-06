@@ -144,15 +144,11 @@ jobs:
   build-macos:
     strategy:
       matrix:
-        include:
-          - name: "macOS 11 + Xcode 11.7"
-            os: macos-11
-            compiler: xcode
-            version: "11.7"
-            arch: ["x86_64", "arm64"]
+          os: [macos-11]
+          arch: [x86_64, arm64]
 
     runs-on: ${{ matrix.os }}
-    name: ${{ matrix.name }} - ${{ matrix.arch }}
+    name: ${{ matrix.os }} - ${{ matrix.arch }}
 
     steps:
     - uses: actions/checkout@v2
@@ -164,19 +160,8 @@ jobs:
       uses: bruceadams/get-release@v1.2.2
       env:
         GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-    - name: Configure Compiler
-      run: |
-        if [ "${{ matrix.compiler }}" = "gcc" ]; then
-          echo "CC=gcc-${{ matrix.version }}" >> $GITHUB_ENV
-          echo "CXX=g++-${{ matrix.version }}" >> $GITHUB_ENV
-        else
-          ls -ls /Applications/
-          sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app
-          echo "CC=clang" >> $GITHUB_ENV
-          echo "CXX=clang++" >> $GITHUB_ENV
-        fi
     - name: Configure Build
-      run: mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_CPU_ARCH=${{ matrix.arch }} -DKIWI_JAVA_BINDING=1 ..
+      run: mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_DEPLOYMENT_TARGET=10.14 -DKIWI_CPU_ARCH=${{ matrix.arch }} -DKIWI_JAVA_BINDING=1 ..
     - name: Build
       run: cd build && make -j2
     - run: |
