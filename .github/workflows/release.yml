@@ -74,9 +74,11 @@ jobs:
       with:
         submodules: true
     - name: Update CMake
-      run: /opt/python/cp36-cp36m/bin/pip install cmake
+      run: |
+        /opt/python/cp36-cp36m/bin/pip install cmake
+        yum install java-1.8.0-openjdk-devel.x86_64 -y
     - name: Configure Build
-      run: mkdir build && cd build && /opt/python/cp36-cp36m/bin/cmake -DCMAKE_BUILD_TYPE=Release ..
+      run: mkdir build && cd build && /opt/python/cp36-cp36m/bin/cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_JAVA_BINDING=1 ..
     - name: Build
       run: cd build && make -j2
     - run: |
@@ -93,6 +95,13 @@ jobs:
       with:
         name: asset_Centos6
         path: asset.tgz
+    - run: |
+        mv build/bindings/java/kiwi-java*.jar kiwi-java.jar
+    - name: Archive jar binaries
+      uses: actions/upload-artifact@v1
+      with:
+        name: jar_Centos6
+        path: kiwi-java.jar
 
   upload-asset-from-centos6:
     name: Upload asset from Centos6
@@ -100,15 +109,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/download-artifact@v2
-      with:
-        name: asset_Centos6
-        path: arts
     - name: Get release
       id: get_release
       uses: bruceadams/get-release@v1.2.2
       env:
         GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+    - uses: actions/download-artifact@v2
+      with:
+        name: asset_Centos6
+        path: arts
     - name: Upload release binary
       uses: actions/upload-release-asset@v1.0.2
       env:
@@ -117,6 +126,19 @@ jobs:
         upload_url: ${{ steps.get_release.outputs.upload_url }}
         asset_path: arts/asset.tgz
         asset_name: kiwi_lnx_x86_64_${{ steps.get_release.outputs.tag_name }}.tgz
+        asset_content_type: application/octet-stream
+    - uses: actions/download-artifact@v2
+      with:
+        name: jar_Centos6
+        path: arts
+    - name: Upload release jar
+      uses: actions/upload-release-asset@v1.0.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+      with:
+        upload_url: ${{ steps.get_release.outputs.upload_url }}
+        asset_path: arts/kiwi-java.jar
+        asset_name: kiwi-java-${{ steps.get_release.outputs.tag_name }}-lnx-x86-64.jar
         asset_content_type: application/octet-stream
 
   build-macos:
@@ -127,9 +149,10 @@ jobs:
             os: macos-11
             compiler: xcode
             version: "11.7"
+            arch: ["x86_64", "arm64"]
 
     runs-on: ${{ matrix.os }}
-    name: ${{ matrix.name }}
+    name: ${{ matrix.name }} - ${{ matrix.arch }}
 
     steps:
     - uses: actions/checkout@v2
@@ -153,7 +176,7 @@ jobs:
           echo "CXX=clang++" >> $GITHUB_ENV
         fi
     - name: Configure Build
-      run: mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release ..
+      run: mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_CPU_ARCH=${{ matrix.arch }} -DKIWI_JAVA_BINDING=1 ..
     - name: Build
       run: cd build && make -j2
     - run: |
@@ -172,10 +195,23 @@ jobs:
       with:
         upload_url: ${{ steps.get_release.outputs.upload_url }}
         asset_path: asset.tgz
-        asset_name: kiwi_mac_x86_64_${{ steps.get_release.outputs.tag_name }}.tgz
+        asset_name: kiwi_mac_${{ matrix.arch }}_${{ steps.get_release.outputs.tag_name }}.tgz
         asset_content_type: application/octet-stream
-    - run: tar -zcvf model.tgz ModelGenerator/sj.* ModelGenerator/extract.mdl ModelGenerator/*.dict ModelGenerator/combiningRule.txt ModelGenerator/skipbigram.mdl
+    - run: |
+        mv build/bindings/java/kiwi-java*.jar kiwi-java.jar
+    - name: Upload release jar
+      uses: actions/upload-release-asset@v1.0.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+      with:
+        upload_url: ${{ steps.get_release.outputs.upload_url }}
+        asset_path: kiwi-java.jar
+        asset_name: kiwi-java-${{ steps.get_release.outputs.tag_name }}-mac-${{ matrix.arch }}.jar
+        asset_content_type: application/octet-stream
+    - if: matrix.arch == 'arm64'
+      run: tar -zcvf model.tgz ModelGenerator/sj.* ModelGenerator/extract.mdl ModelGenerator/*.dict ModelGenerator/combiningRule.txt ModelGenerator/skipbigram.mdl
     - name: Upload release binary
+      if: matrix.arch == 'arm64'
       uses: actions/upload-release-asset@v1.0.2
       env:
         GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
@@ -213,7 +249,7 @@ jobs:
         cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
         cmakeBuildType: Release
         buildWithCMake: true
-        cmakeAppendedArgs: -G"Visual Studio 16 2019" -A${{ matrix.arch }}
+        cmakeAppendedArgs: -G"Visual Studio 16 2019" -A${{ matrix.arch }} -DKIWI_JAVA_BINDING=1
         buildWithCMakeArgs: --config Release
         buildDirectory: build
     - run: |
@@ -235,6 +271,17 @@ jobs:
         upload_url: ${{ steps.get_release.outputs.upload_url }}
         asset_path: asset.zip
         asset_name: kiwi_win_${{ matrix.arch }}_${{ steps.get_release.outputs.tag_name }}.zip
+        asset_content_type: application/octet-stream
+    - run: |
+        mv build/bindings/java/kiwi-java*.jar kiwi-java.jar
+    - name: Upload release jar
+      uses: actions/upload-release-asset@v1.0.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+      with:
+        upload_url: ${{ steps.get_release.outputs.upload_url }}
+        asset_path: kiwi-java.jar
+        asset_name: kiwi-java-${{ steps.get_release.outputs.tag_name }}-win-${{ matrix.arch }}.jar
         asset_content_type: application/octet-stream
 
   build-other-arch:
@@ -258,7 +305,8 @@ jobs:
         dockerRunArgs: |
           --volume "${PWD}/artifacts:/artifacts"
         run: |
-          mkdir build && pushd build && cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_USE_MIMALLOC=0 ..
+          yum install java-1.8.0-openjdk-devel -y
+          mkdir build && pushd build && cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_USE_MIMALLOC=0 -DKIWI_JAVA_BINDING=1 ..
           make -j2 && popd
           ./build/test/kiwi-test
           mkdir eval_results && ./build/kiwi-evaluator -m ./ModelGenerator eval_data/*.txt -o eval_results/
@@ -269,6 +317,7 @@ jobs:
           mv test/kiwi-* bin/
           cp -r ../include/kiwi include/
           tar -zcvf /artifacts/asset.tgz include/ lib/ bin/
+          mv build/bindings/java/kiwi-java*.jar /artifacts/kiwi-java.jar
     - name: Get release
       id: get_release
       uses: bruceadams/get-release@v1.2.2
@@ -282,4 +331,13 @@ jobs:
         upload_url: ${{ steps.get_release.outputs.upload_url }}
         asset_path: artifacts/asset.tgz
         asset_name: kiwi_lnx_${{ matrix.arch }}_${{ steps.get_release.outputs.tag_name }}.tgz
+        asset_content_type: application/octet-stream
+    - name: Upload release jar
+      uses: actions/upload-release-asset@v1.0.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+      with:
+        upload_url: ${{ steps.get_release.outputs.upload_url }}
+        asset_path: artifacts/kiwi-java.jar
+        asset_name: kiwi-java-${{ steps.get_release.outputs.tag_name }}-lnx-${{ matrix.arch }}.jar
         asset_content_type: application/octet-stream

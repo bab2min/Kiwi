@@ -24,7 +24,8 @@ jobs:
         dockerRunArgs: |
           --volume "${PWD}/artifacts:/artifacts"
         run: |
-          mkdir build && pushd build && cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_USE_MIMALLOC=0 ..
+          yum install java-1.8.0-openjdk-devel -y
+          mkdir build && pushd build && cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_USE_MIMALLOC=0 -DKIWI_JAVA_BINDING=1 ..
           make -j2 && popd
           ./build/test/kiwi-test
           mkdir eval_results && ./build/kiwi-evaluator -m ./ModelGenerator eval_data/*.txt -o eval_results/ && ./build/kiwi-evaluator -m ./ModelGenerator eval_data/*.txt --sbg -o eval_results/
@@ -38,3 +39,4 @@ jobs:
           artifacts/build/*kiwi*
           artifacts/build/test/*kiwi*
           artifacts/eval_results/*.txt
+          artifacts/build/binding/java/*.jar

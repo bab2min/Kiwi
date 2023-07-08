@@ -24,19 +24,28 @@ jobs:
     - name: Pull LFS files
       run: git config --global --add safe.directory /__w/Kiwi/Kiwi && git lfs pull
     - name: Update CMake
-      run: /opt/python/cp36-cp36m/bin/pip install cmake
+      run: |
+        /opt/python/cp36-cp36m/bin/pip install cmake
+        yum install java-1.8.0-openjdk-devel.x86_64 -y
     - name: Configure Build
-      run: mkdir build && cd build && /opt/python/cp36-cp36m/bin/cmake -DCMAKE_BUILD_TYPE=Release ..
+      run: mkdir build && cd build && /opt/python/cp36-cp36m/bin/cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_JAVA_BINDING=1  ..
     - name: Build
       run: cd build && make -j2
     - name: Run Unit Test
       run: ./build/test/kiwi-test
+    - name: Run Java Unit Test
+      run: |
+        cd bindings/java
+        curl -OL https://repo1.maven.org/maven2/junit/junit/4.13.2/junit-4.13.2.jar
+        curl -OL https://repo1.maven.org/maven2/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar
+        javac -cp "*:../../build/bindings/java/*:." -encoding utf-8 kr/pe/bab2min/KiwiTest.java
+        java -cp "*:../../build/bindings/java/*:." org.junit.runner.JUnitCore kr.pe.bab2min.KiwiTest
     - name: Run Evaluator
       run: |
         mkdir eval_results
         ./build/kiwi-evaluator -m ./ModelGenerator eval_data/*.txt -o eval_results/
         ./build/kiwi-evaluator -m ./ModelGenerator eval_data/*.txt --sbg -o eval_results/
-    - run: tar -zcvf arts.tgz build/*kiwi* build/test/*kiwi* eval_results/*.txt
+    - run: tar -zcvf arts.tgz build/*kiwi* build/test/*kiwi* eval_results/*.txt build/bindings/java/*.jar
     - name: Archive binaries
       uses: actions/upload-artifact@v1
       with:

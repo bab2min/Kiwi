@@ -347,3 +347,9 @@ ModelGenerator/*
 models/
 *.vcxproj.filters
 *.vsps
+*.class
+*.jar
+*.dll
+CMakeFiles/
+Makefile
+*.cmake

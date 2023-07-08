@@ -46,11 +46,18 @@ jobs:
           echo "CXX=clang++" >> $GITHUB_ENV
         fi
     - name: Configure Build
-      run: mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release ..
+      run: mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_JAVA_BINDING=1 ..
     - name: Build
       run: cd build && make -j2
     - name: Run Unit Test
       run: ./build/test/kiwi-test
+    - name: Run Java Unit Test
+      run: |
+        cd bindings/java
+        curl -OL https://repo1.maven.org/maven2/junit/junit/4.13.2/junit-4.13.2.jar
+        curl -OL https://repo1.maven.org/maven2/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar
+        javac -cp "*:../../build/bindings/java/*:." -encoding utf-8 kr/pe/bab2min/KiwiTest.java
+        java -cp "*:../../build/bindings/java/*:." org.junit.runner.JUnitCore kr.pe.bab2min.KiwiTest
     - name: Run Evaluator
       run: |
         mkdir eval_results
@@ -75,3 +82,4 @@ jobs:
           build/*kiwi*
           build/test/*kiwi*
           eval_results/*.txt
+          build/bindings/java/*.jar
