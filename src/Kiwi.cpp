@@ -96,16 +96,16 @@ namespace kiwi
 		};
 	};
 
-	const vector<PretokenizedSpan>* Kiwi::mapPretokenizedSpansToU16(const vector<PretokenizedSpan>* orig, const vector<size_t>& bytePositions, vector<PretokenizedSpan>& buf)
+	vector<PretokenizedSpan> Kiwi::mapPretokenizedSpansToU16(const vector<PretokenizedSpan>& orig, const vector<size_t>& bytePositions)
 	{
-		if (!orig) return nullptr;
-		for (auto& s : *orig)
+		vector<PretokenizedSpan> buf;
+		for (auto& s : orig)
 		{
 			buf.emplace_back(s);
 			buf.back().begin = upper_bound(bytePositions.begin(), bytePositions.end(), s.begin) - bytePositions.begin() - 1;
 			buf.back().end = lower_bound(bytePositions.begin(), bytePositions.end(), s.end) - bytePositions.begin();
 		}
-		return &buf;
+		return buf;
 	}
 
 	Kiwi::Kiwi(ArchType arch, LangModel _langMdl, bool typoTolerant)
@@ -1580,7 +1580,7 @@ namespace kiwi
 
 	vector<TokenResult> Kiwi::analyze(const u16string& str, size_t topN, Match matchOptions, 
 		const std::unordered_set<const Morpheme*>* blocklist,
-		const std::vector<PretokenizedSpan>* pretokenized
+		const std::vector<PretokenizedSpan>& pretokenized
 	) const
 	{
 		thread_local KString normalizedStr;
@@ -1593,9 +1593,9 @@ namespace kiwi
 
 		if (!!(matchOptions & Match::normalizeCoda)) normalizeCoda(normalizedStr.begin(), normalizedStr.end());
 
-		if (pretokenized) makePretokenizedSpanGroup(
+		makePretokenizedSpanGroup(
 			pretokenizedGroup, 
-			*pretokenized, 
+			pretokenized, 
 			positionTable, 
 			normalizedStr, 
 			reinterpret_cast<FnFindForm>(dfFindForm), 
@@ -1661,105 +1661,105 @@ namespace kiwi
 		return &morphemes[getDefaultMorphemeId(tag)];
 	}
 
-	template<class Str, class ...Rest>
-	auto Kiwi::_asyncAnalyze(Str&& str, Rest&&... args) const
+	template<class Str, class Pretokenized, class ...Rest>
+	auto Kiwi::_asyncAnalyze(Str&& str, Pretokenized&& pt, Rest&&... args) const
 	{
 		if (!pool) throw Exception{ "`asyncAnalyze` doesn't work at single thread mode." };
-		return pool->enqueue([=, str = std::forward<Str>(str)](size_t, Rest... largs)
+		return pool->enqueue([=, str = forward<Str>(str), pt = forward<Pretokenized>(pt)](size_t, Rest... largs)
 		{
-			return analyze(str, largs...);
+			return analyze(str, largs..., pt);
 		}, forward<Rest>(args)...);
 	}
 
-	template<class Str, class ...Rest>
-	auto Kiwi::_asyncAnalyzeEcho(Str&& str, Rest&&... args) const
+	template<class Str, class Pretokenized, class ...Rest>
+	auto Kiwi::_asyncAnalyzeEcho(Str&& str, Pretokenized&& pt, Rest&&... args) const
 	{
 		if (!pool) throw Exception{ "`asyncAnalyze` doesn't work at single thread mode." };
-		return pool->enqueue([=, str = std::forward<Str>(str)](size_t, Rest... largs) mutable
+		return pool->enqueue([=, str = forward<Str>(str), pt = forward<Pretokenized>(pt)](size_t, Rest... largs) mutable
 		{
-			auto ret = analyze(str, largs...);
+			auto ret = analyze(str, largs..., pt);
 			return make_pair(move(ret), move(str));
 		}, forward<Rest>(args)...);
 	}
 
 	future<vector<TokenResult>> Kiwi::asyncAnalyze(const string& str, size_t topN, Match matchOptions, 
-		const std::unordered_set<const Morpheme*>* blocklist,
-		const std::vector<PretokenizedSpan>* pretokenized
+		const unordered_set<const Morpheme*>* blocklist,
+		const vector<PretokenizedSpan>& pretokenized
 	) const
 	{
-		return _asyncAnalyze(str, topN, matchOptions, blocklist, pretokenized);
+		return _asyncAnalyze(str, pretokenized, topN, matchOptions, blocklist);
 	}
 
 	future<vector<TokenResult>> Kiwi::asyncAnalyze(string&& str, size_t topN, Match matchOptions, 
-		const std::unordered_set<const Morpheme*>* blocklist,
-		const std::vector<PretokenizedSpan>* pretokenized
+		const unordered_set<const Morpheme*>* blocklist,
+		vector<PretokenizedSpan>&& pretokenized
 	) const
 	{
-		return _asyncAnalyze(std::move(str), topN, matchOptions, blocklist, pretokenized);
+		return _asyncAnalyze(move(str), move(pretokenized), topN, matchOptions, blocklist);
 	}
 
 	future<TokenResult> Kiwi::asyncAnalyze(const string& str, Match matchOptions, 
-		const std::unordered_set<const Morpheme*>* blocklist,
-		const std::vector<PretokenizedSpan>* pretokenized
+		const unordered_set<const Morpheme*>* blocklist,
+		const vector<PretokenizedSpan>& pretokenized
 	) const
 	{
-		return _asyncAnalyze(str, matchOptions, blocklist, pretokenized);
+		return _asyncAnalyze(str, pretokenized, matchOptions, blocklist);
 	}
 
 	future<TokenResult> Kiwi::asyncAnalyze(string&& str, Match matchOptions, 
-		const std::unordered_set<const Morpheme*>* blocklist,
-		const std::vector<PretokenizedSpan>* pretokenized
+		const unordered_set<const Morpheme*>* blocklist,
+		vector<PretokenizedSpan>&& pretokenized
 	) const
 	{
-		return _asyncAnalyze(std::move(str), matchOptions, blocklist, pretokenized);
+		return _asyncAnalyze(move(str), move(pretokenized), matchOptions, blocklist);
 	}
 
 	future<pair<TokenResult, string>> Kiwi::asyncAnalyzeEcho(string&& str, Match matchOptions, 
-		const std::unordered_set<const Morpheme*>* blocklist,
-		const std::vector<PretokenizedSpan>* pretokenized
+		const unordered_set<const Morpheme*>* blocklist,
+		vector<PretokenizedSpan>&& pretokenized
 	) const
 	{
-		return _asyncAnalyzeEcho(std::move(str), matchOptions, blocklist, pretokenized);
+		return _asyncAnalyzeEcho(move(str), move(pretokenized), matchOptions, blocklist);
 	}
 
 	future<vector<TokenResult>> Kiwi::asyncAnalyze(const u16string& str, size_t topN, Match matchOptions, 
-		const std::unordered_set<const Morpheme*>* blocklist,
-		const std::vector<PretokenizedSpan>* pretokenized
+		const unordered_set<const Morpheme*>* blocklist,
+		const vector<PretokenizedSpan>& pretokenized
 	) const
 	{
-		return _asyncAnalyze(str, topN, matchOptions, blocklist, pretokenized);
+		return _asyncAnalyze(str, pretokenized, topN, matchOptions, blocklist);
 	}
 
 	future<vector<TokenResult>> Kiwi::asyncAnalyze(u16string&& str, size_t topN, Match matchOptions, 
-		const std::unordered_set<const Morpheme*>* blocklist,
-		const std::vector<PretokenizedSpan>* pretokenized
+		const unordered_set<const Morpheme*>* blocklist,
+		vector<PretokenizedSpan>&& pretokenized
 	) const
 	{
-		return _asyncAnalyze(std::move(str), topN, matchOptions, blocklist, pretokenized);
+		return _asyncAnalyze(move(str), move(pretokenized), topN, matchOptions, blocklist);
 	}
 
 	future<TokenResult> Kiwi::asyncAnalyze(const u16string& str, Match matchOptions, 
-		const std::unordered_set<const Morpheme*>* blocklist,
-		const std::vector<PretokenizedSpan>* pretokenized
+		const unordered_set<const Morpheme*>* blocklist,
+		const vector<PretokenizedSpan>& pretokenized
 	) const
 	{
-		return _asyncAnalyze(str, matchOptions, blocklist, pretokenized);
+		return _asyncAnalyze(str, pretokenized, matchOptions, blocklist);
 	}
 
 	future<TokenResult> Kiwi::asyncAnalyze(u16string&& str, Match matchOptions, 
-		const std::unordered_set<const Morpheme*>* blocklist,
-		const std::vector<PretokenizedSpan>* pretokenized
+		const unordered_set<const Morpheme*>* blocklist,
+		vector<PretokenizedSpan>&& pretokenized
 	) const
 	{
-		return _asyncAnalyze(std::move(str), matchOptions, blocklist, pretokenized);
+		return _asyncAnalyze(move(str), move(pretokenized), matchOptions, blocklist);
 	}
 
 	future<pair<TokenResult, u16string>> Kiwi::asyncAnalyzeEcho(u16string&& str, Match matchOptions, 
-		const std::unordered_set<const Morpheme*>* blocklist,
-		const std::vector<PretokenizedSpan>* pretokenized
+		const unordered_set<const Morpheme*>* blocklist,
+		vector<PretokenizedSpan>&& pretokenized
 	) const
 	{
-		return _asyncAnalyzeEcho(std::move(str), matchOptions, blocklist, pretokenized);
+		return _asyncAnalyzeEcho(move(str), move(pretokenized), matchOptions, blocklist);
 	}
 
 	using FnNewAutoJoiner = cmb::AutoJoiner(Kiwi::*)() const;

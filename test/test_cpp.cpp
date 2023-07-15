@@ -183,7 +183,7 @@ TEST(KiwiCpp, Pretokenized)
 			{ 34, 39, {} },
 		};
 
-		res = kiwi.analyze(str, Match::allWithNormalizing, nullptr, &pretokenized).first;
+		res = kiwi.analyze(str, Match::allWithNormalizing, nullptr, pretokenized).first;
 		EXPECT_EQ(res[1].str, u"패트와 매트");
 		EXPECT_EQ(res[3].str, u"2017년");
 		EXPECT_EQ(res[13].str, u"2016년");
@@ -196,7 +196,7 @@ TEST(KiwiCpp, Pretokenized)
 			{ 21, 24, { { u"개봉하", 0, 3, POSTag::vv }, { u"었", 2, 3, POSTag::ep } }},
 		};
 
-		res = kiwi.analyze(str, Match::allWithNormalizing, nullptr, &pretokenized).first;
+		res = kiwi.analyze(str, Match::allWithNormalizing, nullptr, pretokenized).first;
 		EXPECT_EQ(res[7].str, u"개봉하");
 		EXPECT_EQ(res[7].tag, POSTag::vv);
 		EXPECT_EQ(res[7].position, 21);
