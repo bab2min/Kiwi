@@ -534,27 +534,33 @@ namespace kiwi
 	}
 
 	using Wid = uint32_t;
-	struct MInfo
-	{
-		Wid wid;
-		uint16_t ownFormId;
-		uint8_t combineSocket;
-		MInfo(Wid _wid = 0, uint8_t _combineSocket = 0, uint16_t _ownFormId = 0)
-			: wid(_wid), ownFormId(_ownFormId), combineSocket(_combineSocket)
-		{}
-	};
 
-	using SpecialState = array<uint8_t, 2>;
+	struct SpecialState
+	{
+		uint8_t singleQuote : 4;
+		uint8_t doubleQuote : 4;
+
+		SpecialState() : singleQuote{0}, doubleQuote{0}
+		{
+		}
+
+		operator uint8_t()
+		{
+			return reinterpret_cast<uint8_t&>(*this);
+		}
+	};
 
 	template<class LmState>
 	struct WordLL
 	{
 		const Morpheme* morpheme = nullptr;
-		MInfo back;
 		float accScore = 0, accTypoCost = 0;
 		const WordLL* parent = nullptr;
 		LmState lmState;
-		SpecialState spState = { { 0, } };
+		Wid wid = 0;
+		uint16_t ownFormId = 0;
+		uint8_t combineSocket = 0;
+		SpecialState spState;
 
 		WordLL() = default;
 
@@ -571,7 +577,7 @@ namespace kiwi
 		float accScore = 0, accTypoCost = 0;
 		const WordLL<LmState>* parent = nullptr;
 		LmState lmState;
-		SpecialState spState = { { 0, } };
+		SpecialState spState;
 
 		WordLLP() = default;
 
@@ -615,10 +621,10 @@ namespace kiwi
 			for (auto& p : cache[prev - startNode])
 			{
 				float candScore = p.accScore;
-				if (p.back.combineSocket)
+				if (p.combineSocket)
 				{
 					// merge <v> <chunk> with only the same socket
-					if (p.back.combineSocket != curMorph->combineSocket || (curMorph->chunks.empty() || curMorph->complex))
+					if (p.combineSocket != curMorph->combineSocket || (curMorph->chunks.empty() || curMorph->complex))
 					{
 						continue;
 					}
@@ -627,19 +633,19 @@ namespace kiwi
 						if (allowedSpaceBetweenChunk) candScore -= spacePenalty;
 						else continue;
 					}
-					seq[0] = morphBase[p.back.wid].getCombined()->lmMorphemeId;
+					seq[0] = morphBase[p.wid].getCombined()->lmMorphemeId;
 				}
 
 				const kchar_t* leftFormFirst, * leftFormLast;
-				if (p.back.ownFormId)
+				if (p.ownFormId)
 				{
-					leftFormFirst = ownForms[p.back.ownFormId - 1].data();
-					leftFormLast = ownForms[p.back.ownFormId - 1].data() + ownForms[0].size();
+					leftFormFirst = ownForms[p.ownFormId - 1].data();
+					leftFormLast = ownForms[p.ownFormId - 1].data() + ownForms[0].size();
 				}
-				else if (morphBase[p.back.wid].kform)
+				else if (morphBase[p.wid].kform)
 				{
-					leftFormFirst = morphBase[p.back.wid].kform->data();
-					leftFormLast = morphBase[p.back.wid].kform->data() + morphBase[p.back.wid].kform->size();
+					leftFormFirst = morphBase[p.wid].kform->data();
+					leftFormLast = morphBase[p.wid].kform->data() + morphBase[p.wid].kform->size();
 				}
 				else
 				{
@@ -662,7 +668,7 @@ namespace kiwi
 				Wid lSeq = 0;
 				if (curMorph->combineSocket && (curMorph->chunks.empty() || curMorph->complex))
 				{
-					lSeq = p.back.wid;
+					lSeq = p.wid;
 				}
 				else
 				{
@@ -683,7 +689,7 @@ namespace kiwi
 					nextPredCands,
 					lSeq, 
 					candScore,
-					WordLLP<LmState>{ &morphBase[p.back.wid], candScore, p.accTypoCost + node->typoCost, &p, move(cLmState), p.spState }, 
+					WordLLP<LmState>{ &morphBase[p.wid], candScore, p.accTypoCost + node->typoCost, &p, move(cLmState), p.spState }, 
 					3, 
 					GenericGreater{}
 				);
@@ -789,14 +795,14 @@ namespace kiwi
 					{
 						for (auto& p : cache[prev - startNode])
 						{
-							auto lastTag = kw->morphemes[p.back.wid].tag;
+							auto lastTag = kw->morphemes[p.wid].tag;
 							if (!isJClass(lastTag) && !isEClass(lastTag)) continue;
 							nCache.emplace_back(p);
 							nCache.back().accScore += curMorph->userScore * kw->typoCostWeight;
 							nCache.back().accTypoCost -= curMorph->userScore;
 							nCache.back().parent = &p;
 							nCache.back().morpheme = &kw->morphemes[curMorph->lmMorphemeId];
-							nCache.back().back.wid = curMorph->lmMorphemeId;
+							nCache.back().wid = curMorph->lmMorphemeId;
 						}
 					}
 					continue;
@@ -907,14 +913,14 @@ namespace kiwi
 						}
 						if (curMorphSpecialType <= Kiwi::SpecialMorph::singleQuoteNA)
 						{
-							if (static_cast<uint8_t>(curMorphSpecialType) != q.spState[0])
+							if (static_cast<uint8_t>(curMorphSpecialType) != q.spState.singleQuote)
 							{
 								q.accScore -= 2;
 							}
 						}
 						else if (curMorphSpecialType <= Kiwi::SpecialMorph::doubleQuoteNA)
 						{
-							if ((static_cast<uint8_t>(curMorphSpecialType) - 3) != q.spState[1])
+							if ((static_cast<uint8_t>(curMorphSpecialType) - 3) != q.spState.doubleQuote)
 							{
 								q.accScore -= 2;
 							}
@@ -932,12 +938,12 @@ namespace kiwi
 						if (q.accScore <= tMax - kw->cutOffThreshold) continue;
 						nCache.emplace_back(curMorph, q.accScore, q.accTypoCost, q.parent, q.lmState, q.spState);
 						
-						if (curMorphSpecialType == Kiwi::SpecialMorph::singleQuoteOpen) nCache.back().spState[0] = 1;
-						else if (curMorphSpecialType == Kiwi::SpecialMorph::singleQuoteClose) nCache.back().spState[0] = 0;
-						else if (curMorphSpecialType == Kiwi::SpecialMorph::doubleQuoteOpen) nCache.back().spState[1] = 1;
-						else if (curMorphSpecialType == Kiwi::SpecialMorph::doubleQuoteClose) nCache.back().spState[1] = 0;
+						if (curMorphSpecialType == Kiwi::SpecialMorph::singleQuoteOpen) nCache.back().spState.singleQuote = 1;
+						else if (curMorphSpecialType == Kiwi::SpecialMorph::singleQuoteClose) nCache.back().spState.singleQuote = 0;
+						else if (curMorphSpecialType == Kiwi::SpecialMorph::doubleQuoteOpen) nCache.back().spState.doubleQuote = 1;
+						else if (curMorphSpecialType == Kiwi::SpecialMorph::doubleQuoteClose) nCache.back().spState.doubleQuote = 0;
 
-						auto& back = nCache.back().back;
+						auto& back = nCache.back();
 						if (curMorph->chunks.empty() || curMorph->complex)
 						{
 							back.wid = oseq[0];
@@ -946,7 +952,6 @@ namespace kiwi
 						}
 						else
 						{
-							auto& p = curMorph->chunks.getSecond(chSize - 1);
 							back.wid = oseq[chSize - 1];
 						}
 					}
@@ -997,7 +1002,7 @@ namespace kiwi
 			{
 				ret.emplace_back(
 					unifyMorpheme(morpheme),
-					cur->back.ownFormId ? KString{ ownFormList[cur->back.ownFormId - 1].data(), ownFormList[cur->back.ownFormId - 1].size()} : KString{},
+					cur->ownFormId ? KString{ ownFormList[cur->ownFormId - 1].data(), ownFormList[cur->ownFormId - 1].size()} : KString{},
 					gNode.startPos,
 					gNode.endPos,
 					scoreDiff,
@@ -1073,7 +1078,7 @@ namespace kiwi
 		unknownNodeLCands.emplace_back(kw->getDefaultMorpheme(POSTag::nnp));
 
 		// start node
-		cache.front().emplace_back(&kw->morphemes[0], 0.f, 0.f, nullptr, LmState{kw->langMdl}, SpecialState{0,});
+		cache.front().emplace_back(&kw->morphemes[0], 0.f, 0.f, nullptr, LmState{kw->langMdl}, SpecialState{});
 
 		// middle nodes
 		for (size_t i = 1; i < graphSize - 1; ++i)
@@ -1118,7 +1123,7 @@ namespace kiwi
 					{
 						lastNgram[j - 1] = it->morpheme - kw->morphemes.data();
 					}
-					lastNgram[3] |= (c.spState[0] << 14) | (c.spState[1] << 15);
+					lastNgram[3] |= (uint8_t)c.spState;
 					auto insertResult = bestPathes.emplace(lastNgram, make_pair(&c, c.accScore));
 					if (!insertResult.second)
 					{
@@ -1127,7 +1132,7 @@ namespace kiwi
 							insertResult.first->second = make_pair(&c, c.accScore);
 						}
 					}
-					if (c.back.combineSocket)
+					if (c.combineSocket)
 					{
 						cutoffScoreWithCombined = max(cutoffScoreWithCombined, c.accScore);
 					}
@@ -1143,7 +1148,7 @@ namespace kiwi
 				for (auto& p : bestPathes)
 				{
 					auto& c = *p.second.first;
-					float cutoff = (c.back.combineSocket) ? cutoffScoreWithCombined : cutoffScore;
+					float cutoff = (c.combineSocket) ? cutoffScoreWithCombined : cutoffScore;
 					if (reduced.size() < topN || c.accScore >= cutoff) reduced.emplace_back(move(c));
 				}
 				cache[i] = move(reduced);
@@ -1169,7 +1174,7 @@ namespace kiwi
 		{
 			for (auto& p : cache[prev - startNode])
 			{
-				if (p.back.combineSocket) continue;
+				if (p.combineSocket) continue;
 				if (!p.morpheme->chunks.empty() && !p.morpheme->complex)
 				{
 					if (p.morpheme->chunks.size() <= (p.morpheme->combineSocket ? 2 : 1))
@@ -1179,8 +1184,8 @@ namespace kiwi
 				}
 
 				float c = p.accScore + (openEnd ? 0 : p.lmState.next(kw->langMdl, eosId));
-				if (p.spState[0]) c -= 2;
-				if (p.spState[1]) c -= 2;
+				if (p.spState.singleQuote) c -= 2;
+				if (p.spState.doubleQuote) c -= 2;
 				cache.back().emplace_back(nullptr, c, p.accTypoCost, &p, p.lmState, p.spState);
 			}
 		}
