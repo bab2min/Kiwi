@@ -323,6 +323,19 @@ namespace kiwi
 		}
 	};
 
+	struct BasicToken
+	{
+		std::u16string form;
+		uint32_t begin = -1, end = -1;
+		POSTag tag = POSTag::unknown;
+	};
+
+	struct PretokenizedSpan
+	{
+		uint32_t begin = 0, end = 0;
+		std::vector<BasicToken> tokenization;
+	};
+
 	/**
 	 * @brief 분석 완료된 형태소의 목록(`std::vector<TokenInfo>`)과 점수(`float`)의 pair 타입
 	 * 

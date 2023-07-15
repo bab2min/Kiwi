@@ -96,6 +96,18 @@ namespace kiwi
 		};
 	};
 
+	const vector<PretokenizedSpan>* Kiwi::mapPretokenizedSpansToU16(const vector<PretokenizedSpan>* orig, const vector<size_t>& bytePositions, vector<PretokenizedSpan>& buf)
+	{
+		if (!orig) return nullptr;
+		for (auto& s : *orig)
+		{
+			buf.emplace_back(s);
+			buf.back().begin = upper_bound(bytePositions.begin(), bytePositions.end(), s.begin) - bytePositions.begin() - 1;
+			buf.back().end = lower_bound(bytePositions.begin(), bytePositions.end(), s.end) - bytePositions.begin();
+		}
+		return &buf;
+	}
+
 	Kiwi::Kiwi(ArchType arch, LangModel _langMdl, bool typoTolerant)
 		: langMdl(_langMdl)
 	{
@@ -822,7 +834,7 @@ namespace kiwi
 					for (size_t i = 0; i < chSize; ++i)
 					{
 						seq[i] = curMorph->chunks[i]->lmMorphemeId;
-						if (curMorph->chunks[i] - kw->morphemes.data() >= langVocabSize)
+						if (within(curMorph->chunks[i], kw->morphemes.data() + langVocabSize, kw->morphemes.data() + kw->morphemes.size()))
 						{
 							oseq[i] = curMorph->chunks[i] - kw->morphemes.data();
 						}
@@ -835,7 +847,7 @@ namespace kiwi
 				else
 				{
 					seq[0] = curMorph->lmMorphemeId;
-					if ((curMorph->getCombined() ? curMorph->getCombined() : curMorph) - kw->morphemes.data() >= langVocabSize)
+					if (within(curMorph->getCombined() ? curMorph->getCombined() : curMorph, kw->morphemes.data() + langVocabSize, kw->morphemes.data() + kw->morphemes.size()))
 					{
 						isUserWord = true;
 						oseq[0] = curMorph - kw->morphemes.data();
@@ -969,7 +981,7 @@ namespace kiwi
 		const KGraphNode* graph, 
 		const Vector<U16StringView>& ownFormList,
 		float typoCostWeight,
-		const Morpheme* morphBase,
+		const Morpheme* morphFirst,
 		size_t langVocabSize)
 	{
 		Vector<const WordLL<LmState>*> steps;
@@ -980,8 +992,8 @@ namespace kiwi
 
 		const auto unifyMorpheme = [&](const Morpheme* morph)
 		{
-			if (morph >= morphBase + langVocabSize || morph->combined) return morph;
-			return morphBase + morph->lmMorphemeId;
+			if (!within(morph, morphFirst, morphFirst + langVocabSize) || morph->combined) return morph;
+			return morphFirst + morph->lmMorphemeId;
 		};
 
 		PathEvaluator::Path ret;
@@ -1217,7 +1229,10 @@ namespace kiwi
 		Vector<pair<Path, float>> ret;
 		for (size_t i = 0; i < min(topN, cand.size()); ++i)
 		{
-			ret.emplace_back(generateTokenList(&cand[i], csearcher, graph, ownFormList, kw->typoCostWeight, kw->morphemes.data(), langVocabSize), cand[i].accScore);
+			ret.emplace_back(generateTokenList(
+				&cand[i], csearcher, graph, ownFormList, kw->typoCostWeight, 
+				kw->morphemes.data(), langVocabSize
+			), cand[i].accScore);
 		}
 		return ret;
 	}
@@ -1340,7 +1355,8 @@ namespace kiwi
 		Match matchOptions,
 		bool integrateAllomorph,
 		const Vector<uint32_t>& positionTable,
-		const Vector<uint16_t>& wordPositions
+		const Vector<uint16_t>& wordPositions,
+		const PretokenizedSpanGroup& pretokenizedGroup
 	)
 	{
 		if (ret.empty())
@@ -1390,7 +1406,7 @@ namespace kiwi
 				} while (0);
 				rarr.emplace_back(joined, s.morph->tag);
 				auto& token = rarr.back();
-				token.morph = s.morph;
+				token.morph = within(s.morph, pretokenizedGroup.morphemes) ? nullptr : s.morph;
 				size_t beginPos = (upper_bound(positionTable.begin(), positionTable.end(), s.begin) - positionTable.begin()) - 1;
 				size_t endPos = lower_bound(positionTable.begin(), positionTable.end(), s.end) - positionTable.begin();
 				token.position = (uint32_t)beginPos;
@@ -1408,15 +1424,184 @@ namespace kiwi
 		}
 	}
 
-	vector<TokenResult> Kiwi::analyze(const u16string& str, size_t topN, Match matchOptions, const std::unordered_set<const Morpheme*>* blocklist) const
+	inline void makePretokenizedSpanGroup(
+		PretokenizedSpanGroup& ret, 
+		const std::vector<PretokenizedSpan>& pretokenized, 
+		const Vector<uint32_t>& positionTable, 
+		const KString& normStr,
+		FnFindForm findForm,
+		const utils::FrozenTrie<kchar_t, const Form*>& formTrie
+	)
+	{
+		if (pretokenized.empty()) return;
+		size_t totTokens = 0;
+		for (auto& s : pretokenized)
+		{
+			
+			if (s.tokenization.size() <= 1)
+			{
+				totTokens++;
+			}
+			else
+			{
+				totTokens += s.tokenization.size() + 1;
+			}
+		}
+
+		ret.spans.reserve(pretokenized.size());
+		ret.formStrs.reserve(totTokens);
+		ret.forms.reserve(pretokenized.size());
+		ret.morphemes.reserve(totTokens);
+		for (auto& s : pretokenized)
+		{
+			ret.spans.emplace_back();
+			auto& span = ret.spans.back();
+			span.begin = positionTable[s.begin];
+			span.end = positionTable[s.end];
+
+			if (s.tokenization.empty())
+			{
+				auto formStr = normStr.substr(span.begin, span.end - span.begin);
+				span.form = findForm(formTrie, formStr); // reuse the predefined form & morpheme
+				if (!span.form) // or use a fallback form
+				{
+					span.form = formTrie.value((size_t)POSTag::nnp);
+				}
+			}
+			else if (s.tokenization.size() == 1)
+			{
+				auto formStr = normalizeHangul(s.tokenization[0].form);
+				auto* tform = findForm(formTrie, formStr); 
+				if (tform && tform->candidate.size() == 1 && tform->candidate[0]->tag == s.tokenization[0].tag) // reuse the predefined form & morpheme
+				{
+					span.form = tform;
+				}
+				else if (formStr == normStr.substr(span.begin, span.end - span.begin)) // use a fallback form
+				{
+					span.form = formTrie.value((size_t)clearIrregular(s.tokenization[0].tag));
+				}
+				else  // or add a new form & morpheme
+				{
+					ret.forms.emplace_back();
+					auto& form = ret.forms.back();
+					form.form = move(formStr);
+					form.candidate = FixedVector<const Morpheme*>{ 1 };
+					const Morpheme* foundMorph = nullptr;
+					if (tform)
+					{
+						for (auto m : tform->candidate)
+						{
+							if (m->tag == s.tokenization[0].tag)
+							{
+								foundMorph = m;
+								break;
+							}
+						}
+					}
+					
+					if (foundMorph)
+					{
+						form.candidate[0] = foundMorph;
+					}
+					else
+					{
+						ret.morphemes.emplace_back();
+						auto& morph = ret.morphemes.back();
+						morph.kform = &form.form;
+						morph.tag = s.tokenization[0].tag;
+						morph.vowel = CondVowel::none;
+						morph.polar = CondPolarity::none;
+						morph.lmMorphemeId = getDefaultMorphemeId(s.tokenization[0].tag);
+						form.candidate[0] = &morph;
+					}
+					span.form = &form;
+				}
+			}
+			else
+			{
+				ret.forms.emplace_back();
+				auto& form = ret.forms.back();
+				form.candidate = FixedVector<const Morpheme*>{ 1 };
+				ret.morphemes.emplace_back();
+				auto& morph = ret.morphemes.back();
+				morph.vowel = CondVowel::none;
+				morph.polar = CondPolarity::none;
+				morph.chunks = FixedPairVector<const Morpheme*, std::pair<uint8_t, uint8_t>>{ s.tokenization.size() };
+				for (size_t i = 0; i < s.tokenization.size(); ++i)
+				{
+					auto& t = s.tokenization[i];
+					auto formStr = normalizeHangul(t.form);
+					auto* tform = findForm(formTrie, formStr);
+					const Morpheme* foundMorph = nullptr;
+					if (tform)
+					{
+						for (auto m : tform->candidate)
+						{
+							if (m->tag == t.tag)
+							{
+								foundMorph = m;
+								break;
+							}
+						}
+					}
+
+					if (!foundMorph)
+					{
+						ret.morphemes.emplace_back();
+						auto& cmorph = ret.morphemes.back();
+						ret.formStrs.emplace_back(move(formStr));
+						cmorph.kform = &ret.formStrs.back();
+						cmorph.vowel = CondVowel::none;
+						cmorph.polar = CondPolarity::none;
+						cmorph.tag = t.tag;
+						cmorph.lmMorphemeId = getDefaultMorphemeId(t.tag);
+						foundMorph = &cmorph;
+					}
+
+					morph.chunks[i] = foundMorph;
+					morph.chunks.getSecond(i) = make_pair(positionTable[t.begin + s.begin] - span.begin, positionTable[t.end + s.begin] - span.begin);
+				}
+
+				form.candidate[0] = &morph;
+				span.form = &form;
+			}
+		}
+		
+		sort(ret.spans.begin(), ret.spans.end(), [](const PretokenizedSpanGroup::Span& a, const PretokenizedSpanGroup::Span& b)
+		{
+			return a.begin < b.begin;
+		});
+
+		for (size_t i = 1; i < ret.spans.size(); ++i)
+		{
+			if (ret.spans[i - 1].end > ret.spans[i].begin) throw invalid_argument{ "`PretokenizedSpan`s should not have overlapped ranges." };
+		}
+	}
+
+	vector<TokenResult> Kiwi::analyze(const u16string& str, size_t topN, Match matchOptions, 
+		const std::unordered_set<const Morpheme*>* blocklist,
+		const std::vector<PretokenizedSpan>* pretokenized
+	) const
 	{
 		thread_local KString normalizedStr;
 		thread_local Vector<uint32_t> positionTable;
+		thread_local PretokenizedSpanGroup pretokenizedGroup;
 		normalizedStr.clear();
 		positionTable.clear();
+		pretokenizedGroup.clear();
 		normalizeHangulWithPosition(str.begin(), str.end(), back_inserter(normalizedStr), back_inserter(positionTable));
 
 		if (!!(matchOptions & Match::normalizeCoda)) normalizeCoda(normalizedStr.begin(), normalizedStr.end());
+
+		if (pretokenized) makePretokenizedSpanGroup(
+			pretokenizedGroup, 
+			*pretokenized, 
+			positionTable, 
+			normalizedStr, 
+			reinterpret_cast<FnFindForm>(dfFindForm), 
+			formTrie
+		);
+
 		// 분석할 문장에 포함된 개별 문자에 대해 어절번호를 생성한다
 		thread_local Vector<uint16_t> wordPositions;
 		wordPositions.clear();
@@ -1424,6 +1609,8 @@ namespace kiwi
 		
 		vector<TokenResult> ret;
 		thread_local Vector<KGraphNode> nodes;
+		const auto* pretokenizedFirst = pretokenizedGroup.spans.data();
+		const auto* pretokenizedLast = pretokenizedFirst + pretokenizedGroup.spans.size();
 		size_t splitEnd = 0;
 		while (splitEnd < normalizedStr.size())
 		{
@@ -1438,7 +1625,9 @@ namespace kiwi
 				matchOptions,
 				maxUnkFormSize,
 				spaceTolerance,
-				typoCostWeight
+				typoCostWeight,
+				pretokenizedFirst,
+				pretokenizedLast
 			);
 
 			if (nodes.size() <= 2) continue;
@@ -1453,7 +1642,7 @@ namespace kiwi
 				blocklist
 			);
 
-			insertPathIntoResults(ret, res, topN, matchOptions, integrateAllomorph, positionTable, wordPositions);
+			insertPathIntoResults(ret, res, topN, matchOptions, integrateAllomorph, positionTable, wordPositions, pretokenizedGroup);
 		}
 		
 		auto newlines = allNewLinePositions(str);
@@ -1493,54 +1682,84 @@ namespace kiwi
 		}, forward<Rest>(args)...);
 	}
 
-	future<vector<TokenResult>> Kiwi::asyncAnalyze(const string& str, size_t topN, Match matchOptions, const std::unordered_set<const Morpheme*>* blocklist) const
+	future<vector<TokenResult>> Kiwi::asyncAnalyze(const string& str, size_t topN, Match matchOptions, 
+		const std::unordered_set<const Morpheme*>* blocklist,
+		const std::vector<PretokenizedSpan>* pretokenized
+	) const
 	{
-		return _asyncAnalyze(str, topN, matchOptions, blocklist);
+		return _asyncAnalyze(str, topN, matchOptions, blocklist, pretokenized);
 	}
 
-	future<vector<TokenResult>> Kiwi::asyncAnalyze(string&& str, size_t topN, Match matchOptions, const std::unordered_set<const Morpheme*>* blocklist) const
+	future<vector<TokenResult>> Kiwi::asyncAnalyze(string&& str, size_t topN, Match matchOptions, 
+		const std::unordered_set<const Morpheme*>* blocklist,
+		const std::vector<PretokenizedSpan>* pretokenized
+	) const
 	{
-		return _asyncAnalyze(std::move(str), topN, matchOptions, blocklist);
+		return _asyncAnalyze(std::move(str), topN, matchOptions, blocklist, pretokenized);
 	}
 
-	future<TokenResult> Kiwi::asyncAnalyze(const string& str, Match matchOptions, const std::unordered_set<const Morpheme*>* blocklist) const
+	future<TokenResult> Kiwi::asyncAnalyze(const string& str, Match matchOptions, 
+		const std::unordered_set<const Morpheme*>* blocklist,
+		const std::vector<PretokenizedSpan>* pretokenized
+	) const
 	{
-		return _asyncAnalyze(str, matchOptions, blocklist);
+		return _asyncAnalyze(str, matchOptions, blocklist, pretokenized);
 	}
 
-	future<TokenResult> Kiwi::asyncAnalyze(string&& str, Match matchOptions, const std::unordered_set<const Morpheme*>* blocklist) const
+	future<TokenResult> Kiwi::asyncAnalyze(string&& str, Match matchOptions, 
+		const std::unordered_set<const Morpheme*>* blocklist,
+		const std::vector<PretokenizedSpan>* pretokenized
+	) const
 	{
-		return _asyncAnalyze(std::move(str), matchOptions, blocklist);
+		return _asyncAnalyze(std::move(str), matchOptions, blocklist, pretokenized);
 	}
 
-	future<pair<TokenResult, string>> Kiwi::asyncAnalyzeEcho(string&& str, Match matchOptions, const std::unordered_set<const Morpheme*>* blocklist) const
+	future<pair<TokenResult, string>> Kiwi::asyncAnalyzeEcho(string&& str, Match matchOptions, 
+		const std::unordered_set<const Morpheme*>* blocklist,
+		const std::vector<PretokenizedSpan>* pretokenized
+	) const
 	{
-		return _asyncAnalyzeEcho(std::move(str), matchOptions, blocklist);
+		return _asyncAnalyzeEcho(std::move(str), matchOptions, blocklist, pretokenized);
 	}
 
-	future<vector<TokenResult>> Kiwi::asyncAnalyze(const u16string& str, size_t topN, Match matchOptions, const std::unordered_set<const Morpheme*>* blocklist) const
+	future<vector<TokenResult>> Kiwi::asyncAnalyze(const u16string& str, size_t topN, Match matchOptions, 
+		const std::unordered_set<const Morpheme*>* blocklist,
+		const std::vector<PretokenizedSpan>* pretokenized
+	) const
 	{
-		return _asyncAnalyze(str, topN, matchOptions, blocklist);
+		return _asyncAnalyze(str, topN, matchOptions, blocklist, pretokenized);
 	}
 
-	future<vector<TokenResult>> Kiwi::asyncAnalyze(u16string&& str, size_t topN, Match matchOptions, const std::unordered_set<const Morpheme*>* blocklist) const
+	future<vector<TokenResult>> Kiwi::asyncAnalyze(u16string&& str, size_t topN, Match matchOptions, 
+		const std::unordered_set<const Morpheme*>* blocklist,
+		const std::vector<PretokenizedSpan>* pretokenized
+	) const
 	{
-		return _asyncAnalyze(std::move(str), topN, matchOptions, blocklist);
+		return _asyncAnalyze(std::move(str), topN, matchOptions, blocklist, pretokenized);
 	}
 
-	future<TokenResult> Kiwi::asyncAnalyze(const u16string& str, Match matchOptions, const std::unordered_set<const Morpheme*>* blocklist) const
+	future<TokenResult> Kiwi::asyncAnalyze(const u16string& str, Match matchOptions, 
+		const std::unordered_set<const Morpheme*>* blocklist,
+		const std::vector<PretokenizedSpan>* pretokenized
+	) const
 	{
-		return _asyncAnalyze(str, matchOptions, blocklist);
+		return _asyncAnalyze(str, matchOptions, blocklist, pretokenized);
 	}
 
-	future<TokenResult> Kiwi::asyncAnalyze(u16string&& str, Match matchOptions, const std::unordered_set<const Morpheme*>* blocklist) const
+	future<TokenResult> Kiwi::asyncAnalyze(u16string&& str, Match matchOptions, 
+		const std::unordered_set<const Morpheme*>* blocklist,
+		const std::vector<PretokenizedSpan>* pretokenized
+	) const
 	{
-		return _asyncAnalyze(std::move(str), matchOptions, blocklist);
+		return _asyncAnalyze(std::move(str), matchOptions, blocklist, pretokenized);
 	}
 
-	future<pair<TokenResult, u16string>> Kiwi::asyncAnalyzeEcho(u16string&& str, Match matchOptions, const std::unordered_set<const Morpheme*>* blocklist) const
+	future<pair<TokenResult, u16string>> Kiwi::asyncAnalyzeEcho(u16string&& str, Match matchOptions, 
+		const std::unordered_set<const Morpheme*>* blocklist,
+		const std::vector<PretokenizedSpan>* pretokenized
+	) const
 	{
-		return _asyncAnalyzeEcho(std::move(str), matchOptions, blocklist);
+		return _asyncAnalyzeEcho(std::move(str), matchOptions, blocklist, pretokenized);
 	}
 
 	using FnNewAutoJoiner = cmb::AutoJoiner(Kiwi::*)() const;
