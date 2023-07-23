@@ -324,6 +324,20 @@ size_t kiwi::splitByTrie(
 		// Pretokenized 매칭
 		if (pretokenizedFirst < pretokenizedLast && pretokenizedFirst->begin == n + startOffset)
 		{
+			if (lastChrType != POSTag::unknown)
+			{
+				// sequence of speical characters found
+				if (lastChrType != POSTag::max && !isWebTag(lastChrType))
+				{
+					if (appendNewNode(out, endPosMap, specialStartPos, U16StringView{ &str[nonSpaces[specialStartPos]], n - nonSpaces[specialStartPos] }, (uint16_t)nonSpaces.size()))
+					{
+						out.back().form = trie.value((size_t)lastChrType);
+					}
+				}
+				lastSpecialEndPos = specialStartPos;
+				specialStartPos = nonSpaces.size();
+			}
+
 			uint32_t length = pretokenizedFirst->end - pretokenizedFirst->begin;
 			branchOut(nonSpaces.size(), n);
 			if (appendNewNode(out, endPosMap, nonSpaces.size(), pretokenizedFirst->form, nonSpaces.size() + length))

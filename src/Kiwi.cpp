@@ -1372,9 +1372,9 @@ namespace kiwi
 			}
 		}
 
-		for (size_t i = 0; i < pathes.size(); ++i)
+		for (size_t i = 0; i < ret.size(); ++i)
 		{
-			auto& r = pathes[i];
+			auto& r = pathes[min(i, pathes.size() - 1)];
 			auto& rarr = ret[i].first;
 			const KString* prevMorph = nullptr;
 			for (auto& s : r.first)
@@ -1436,8 +1436,7 @@ namespace kiwi
 		if (pretokenized.empty()) return;
 		size_t totTokens = 0;
 		for (auto& s : pretokenized)
-		{
-			
+		{	
 			if (s.tokenization.size() <= 1)
 			{
 				totTokens++;
