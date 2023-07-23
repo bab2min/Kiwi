@@ -1525,6 +1525,7 @@ namespace kiwi
 				auto& morph = ret.morphemes.back();
 				morph.vowel = CondVowel::none;
 				morph.polar = CondPolarity::none;
+				morph.complex = 0;
 				morph.chunks = FixedPairVector<const Morpheme*, std::pair<uint8_t, uint8_t>>{ s.tokenization.size() };
 				for (size_t i = 0; i < s.tokenization.size(); ++i)
 				{
@@ -1552,6 +1553,7 @@ namespace kiwi
 						cmorph.kform = &ret.formStrs.back();
 						cmorph.vowel = CondVowel::none;
 						cmorph.polar = CondPolarity::none;
+						cmorph.complex = 0;
 						cmorph.tag = t.tag;
 						cmorph.lmMorphemeId = getDefaultMorphemeId(t.tag);
 						foundMorph = &cmorph;
