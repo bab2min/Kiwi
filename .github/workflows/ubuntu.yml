@@ -49,7 +49,7 @@ jobs:
       if: failure()
       run: |
         mkdir build_debug && cd build_debug && cmake -DCMAKE_BUILD_TYPE=Debug .. && make -j2
-        cd .. && ./build_debug/test/kiwi-test
+        cd .. && gdb -ex run -ex bt ./build_debug/test/kiwi-test
     - name: Run Java Unit Test
       run: |
         cd bindings/java
