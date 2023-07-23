@@ -178,9 +178,9 @@ TEST(KiwiCpp, Pretokenized)
 	std::vector<TokenInfo> res;
 	{
 		std::vector<PretokenizedSpan> pretokenized = {
-			{ 3, 9, {} },
-			{ 11, 16, {} },
-			{ 34, 39, {} },
+			PretokenizedSpan{ 3, 9, {} },
+			PretokenizedSpan{ 11, 16, {} },
+			PretokenizedSpan{ 34, 39, {} },
 		};
 
 		res = kiwi.analyze(str, Match::allWithNormalizing, nullptr, pretokenized).first;
@@ -191,9 +191,9 @@ TEST(KiwiCpp, Pretokenized)
 
 	{
 		std::vector<PretokenizedSpan> pretokenized = {
-			{ 27, 29, { { u"페트", 0, 2, POSTag::nnb } } },
-			{ 30, 32, {} },
-			{ 21, 24, { { u"개봉하", 0, 3, POSTag::vv }, { u"었", 2, 3, POSTag::ep } }},
+			PretokenizedSpan{ 27, 29, { BasicToken{ u"페트", 0, 2, POSTag::nnb } } },
+			PretokenizedSpan{ 30, 32, {} },
+			PretokenizedSpan{ 21, 24, { BasicToken{ u"개봉하", 0, 3, POSTag::vv }, BasicToken{ u"었", 2, 3, POSTag::ep } }},
 		};
 
 		res = kiwi.analyze(str, Match::allWithNormalizing, nullptr, pretokenized).first;
