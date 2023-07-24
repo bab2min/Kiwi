@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['kiwi_330',['Kiwi',['../classkiwi_1_1Kiwi.html',1,'kiwi']]],
-  ['kiwi_5ftoken_5finfo_5ft_331',['kiwi_token_info_t',['../structkiwi__token__info__t.html',1,'']]],
-  ['kiwibuilder_332',['KiwiBuilder',['../classkiwi_1_1KiwiBuilder.html',1,'kiwi']]],
-  ['knlangmodelbase_333',['KnLangModelBase',['../classkiwi_1_1lm_1_1KnLangModelBase.html',1,'kiwi::lm']]]
+  ['kiwi_333',['Kiwi',['../classkiwi_1_1Kiwi.html',1,'kiwi']]],
+  ['kiwi_5ftoken_5finfo_5ft_334',['kiwi_token_info_t',['../structkiwi__token__info__t.html',1,'']]],
+  ['kiwibuilder_335',['KiwiBuilder',['../classkiwi_1_1KiwiBuilder.html',1,'kiwi']]],
+  ['knlangmodelbase_336',['KnLangModelBase',['../classkiwi_1_1lm_1_1KnLangModelBase.html',1,'kiwi::lm']]]
 ];
