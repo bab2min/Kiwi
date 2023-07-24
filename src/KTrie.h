@@ -31,6 +31,28 @@ namespace kiwi
 	template<class K, class V> using map = std::map<K, V>;
 #endif
 
+	struct PretokenizedSpanGroup
+	{
+		struct Span
+		{
+			uint32_t begin = 0, end = 0;
+			const Form* form = nullptr;
+		};
+
+		Vector<Span> spans;
+		Vector<KString> formStrs;
+		Vector<Form> forms;
+		Vector<Morpheme> morphemes;
+
+		void clear()
+		{
+			spans.clear();
+			formStrs.clear();
+			forms.clear();
+			morphemes.clear();
+		}
+	};
+
 	struct KGraphNode
 	{
 		U16StringView uform;
@@ -61,7 +83,9 @@ namespace kiwi
 		Match matchOptions, 
 		size_t maxUnkFormSize, 
 		size_t spaceTolerance,
-		float typoCostWeight
+		float typoCostWeight,
+		const PretokenizedSpanGroup::Span*& pretokenizedFirst,
+		const PretokenizedSpanGroup::Span* pretokenizedLast
 	);
 
 	template<ArchType arch>

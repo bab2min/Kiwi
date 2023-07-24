@@ -170,6 +170,48 @@ TEST(KiwiCpp, EmptyToken)
 	}
 }
 
+TEST(KiwiCpp, Pretokenized)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	auto str = u"드디어패트와 매트가 2017년에 국내 개봉했다. 패트와매트는 2016년...";
+	
+	std::vector<TokenInfo> res;
+	{
+		std::vector<PretokenizedSpan> pretokenized = {
+			PretokenizedSpan{ 3, 9, {} },
+			PretokenizedSpan{ 11, 16, {} },
+			PretokenizedSpan{ 34, 39, {} },
+		};
+
+		res = kiwi.analyze(str, Match::allWithNormalizing, nullptr, pretokenized).first;
+		EXPECT_EQ(res[1].str, u"패트와 매트");
+		EXPECT_EQ(res[3].str, u"2017년");
+		EXPECT_EQ(res[13].str, u"2016년");
+	}
+
+	{
+		std::vector<PretokenizedSpan> pretokenized = {
+			PretokenizedSpan{ 27, 29, { BasicToken{ u"페트", 0, 2, POSTag::nnb } } },
+			PretokenizedSpan{ 30, 32, {} },
+			PretokenizedSpan{ 21, 24, { BasicToken{ u"개봉하", 0, 3, POSTag::vv }, BasicToken{ u"었", 2, 3, POSTag::ep } }},
+		};
+
+		res = kiwi.analyze(str, Match::allWithNormalizing, nullptr, pretokenized).first;
+		EXPECT_EQ(res[7].str, u"개봉하");
+		EXPECT_EQ(res[7].tag, POSTag::vv);
+		EXPECT_EQ(res[7].position, 21);
+		EXPECT_EQ(res[7].length, 3);
+		EXPECT_EQ(res[8].str, u"었");
+		EXPECT_EQ(res[8].tag, POSTag::ep);
+		EXPECT_EQ(res[8].position, 23);
+		EXPECT_EQ(res[8].length, 1);
+		EXPECT_EQ(res[11].str, u"페트");
+		EXPECT_EQ(res[11].tag, POSTag::nnb);
+		EXPECT_EQ(res[13].str, u"매트");
+		EXPECT_EQ(res[13].tag, POSTag::nng);
+	}
+}
+
 TEST(KiwiCpp, HSDataset)
 {
 	KiwiBuilder kw{ MODEL_PATH, 0, BuildOption::default_, };

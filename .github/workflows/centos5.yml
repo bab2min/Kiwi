@@ -33,6 +33,11 @@ jobs:
       run: cd build && make -j2
     - name: Run Unit Test
       run: ./build/test/kiwi-test
+    - name: Run Unit Test in Debug mode
+      if: failure()
+      run: |
+        mkdir build_debug && cd build_debug && /opt/python/cp36-cp36m/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DKIWI_USE_MIMALLOC=0 -DKIWI_USE_CPUINFO=0 .. && make -j2
+        cd .. && gdb -ex run -ex bt ./build_debug/test/kiwi-test
     - name: Run Evaluator
       run: |
         mkdir eval_results

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file Types.h
  * @author bab2min (bab2min@gmail.com)
  * @brief Kiwi C++ API에 쓰이는 주요 타입들을 모아놓은 헤더 파일
@@ -321,6 +321,27 @@ namespace kiwi
 		{
 			return !operator==(o);
 		}
+	};
+
+	struct BasicToken
+	{
+		std::u16string form;
+		uint32_t begin = -1, end = -1;
+		POSTag tag = POSTag::unknown;
+
+		BasicToken(const std::u16string& _form, uint32_t _begin = -1, uint32_t _end = -1, POSTag _tag = POSTag::unknown)
+			: form{ _form }, begin{ _begin }, end{ _end }, tag{ _tag }
+		{}
+	};
+
+	struct PretokenizedSpan
+	{
+		uint32_t begin = 0, end = 0;
+		std::vector<BasicToken> tokenization;
+
+		PretokenizedSpan(uint32_t _begin = 0, uint32_t _end = 0, const std::vector<BasicToken>& _tokenization = {})
+			: begin{ _begin }, end{ _end }, tokenization{ _tokenization }
+		{}
 	};
 
 	/**

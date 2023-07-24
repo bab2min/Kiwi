@@ -51,6 +51,11 @@ jobs:
       run: cd build && make -j2
     - name: Run Unit Test
       run: ./build/test/kiwi-test
+    - name: Run Unit Test in Debug mode
+      if: failure()
+      run: |
+        mkdir build_debug && cd build_debug && cmake -DCMAKE_BUILD_TYPE=Debug .. && make -j2
+        cd .. && lldb -o run -o bt ./build_debug/test/kiwi-test
     - name: Run Java Unit Test
       run: |
         cd bindings/java

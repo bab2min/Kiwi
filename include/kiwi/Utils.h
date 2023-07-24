@@ -40,34 +40,46 @@ namespace kiwi
 	const char* tagRToString(char16_t form, POSTag t);
 	const kchar_t* tagRToKString(char16_t form, POSTag t);
 
+	template<class A, class B, class C>
+	inline bool within(A value, B lower, C upper)
+	{
+		return lower <= value && value < upper;
+	}
+
+	template<class A, class B>
+	inline bool within(const A* value, const std::vector<A, B>& cont)
+	{
+		return cont.data() <= value && value < cont.data() + cont.size();
+	}
+
 	inline bool isHangulSyllable(char16_t chr)
 	{
-		return 0xAC00 <= chr && chr < 0xD7A4;
+		return within(chr, 0xAC00, 0xD7A4);
 	}
 
 	inline bool isHangulCoda(char16_t chr)
 	{
-		return 0x11A8 <= chr && chr < (0x11A7 + 28);
+		return within(chr, 0x11A8, 0x11A7 + 28);
 	}
 
 	inline bool isOldHangulOnset(char16_t chr)
 	{
-		return (0x1100 <= chr && chr < 0x1160) || (0xA960 <= chr && chr < 0xA980);
+		return within(chr, 0x1100, 0x1160) || within(chr, 0xA960, 0xA980);
 	}
 
 	inline bool isOldHangulVowel(char16_t chr)
 	{
-		return (0x1160 <= chr && chr < 0x11A8) || (0xD7B0 <= chr && chr < 0xD7CB);
+		return within(chr, 0x1160, 0x11A8) || within(chr, 0xD7B0, 0xD7CB);
 	}
 
 	inline bool isOldHangulCoda(char16_t chr)
 	{
-		return (0x11A8 <= chr && chr < 0x1200) || (0xD7CB <= chr && chr < 0xD800);
+		return within(chr, 0x11A8, 0x1200) || within(chr, 0xD7CB, 0xD800);
 	}
 
 	inline bool isOldHangulToneMark(char16_t chr)
 	{
-		return 0x302E <= chr && chr < 0x3030;
+		return within(chr, 0x302E, 0x3030);
 	}
 
 	inline std::ostream& operator <<(std::ostream& os, const KString& str)

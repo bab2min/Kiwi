@@ -197,7 +197,9 @@ size_t kiwi::splitByTrie(
 	Match matchOptions, 
 	size_t maxUnkFormSize, 
 	size_t spaceTolerance,
-	float typoCostWeight
+	float typoCostWeight,
+	const PretokenizedSpanGroup::Span*& pretokenizedFirst,
+	const PretokenizedSpanGroup::Span* pretokenizedLast
 )
 {
 	thread_local Vector<pair<uint32_t, uint32_t>> endPosMap;
@@ -217,7 +219,6 @@ size_t kiwi::splitByTrie(
 	Vector<TypoCostInfo> candTypoCostStarts;
 	auto* curNode = trie.root();
 	auto* nextNode = trie.root();
-	
 	
 	size_t lastSpecialEndPos = 0, specialStartPos = 0;
 	POSTag chrType, lastChrType = POSTag::unknown, lastMatchedPattern = POSTag::unknown;
@@ -309,6 +310,8 @@ size_t kiwi::splitByTrie(
 	};
 
 	bool zCodaFollowable = false;
+	const Form* const fallbackFormBegin = trie.value((size_t)POSTag::nng);
+	const Form* const fallbackFormEnd = trie.value((size_t)POSTag::max);
 	for (; n < str.size(); ++n)
 	{
 		char16_t c = str[n];
@@ -318,6 +321,43 @@ size_t kiwi::splitByTrie(
 			c32 = mergeSurrogate(c32, str[n + 1]);
 		}
 
+		// Pretokenized 매칭
+		if (pretokenizedFirst < pretokenizedLast && pretokenizedFirst->begin == n + startOffset)
+		{
+			if (lastChrType != POSTag::unknown)
+			{
+				// sequence of speical characters found
+				if (lastChrType != POSTag::max && !isWebTag(lastChrType))
+				{
+					if (appendNewNode(out, endPosMap, specialStartPos, U16StringView{ &str[nonSpaces[specialStartPos]], n - nonSpaces[specialStartPos] }, (uint16_t)nonSpaces.size()))
+					{
+						out.back().form = trie.value((size_t)lastChrType);
+					}
+				}
+				lastSpecialEndPos = specialStartPos;
+				specialStartPos = nonSpaces.size();
+			}
+
+			uint32_t length = pretokenizedFirst->end - pretokenizedFirst->begin;
+			branchOut(nonSpaces.size(), n);
+			if (appendNewNode(out, endPosMap, nonSpaces.size(), pretokenizedFirst->form, nonSpaces.size() + length))
+			{
+				if (within(pretokenizedFirst->form, fallbackFormBegin, fallbackFormEnd))
+				{
+					out.back().uform = U16StringView{ &str[n], length };
+				}
+			}
+			
+			nonSpaces.resize(nonSpaces.size() + length);
+			iota(nonSpaces.end() - length, nonSpaces.end(), n);
+			n += length - 1;
+			specialStartPos = lastSpecialEndPos = nonSpaces.size();
+			pretokenizedFirst++;
+			chrType = POSTag::max;
+			goto continueFor;
+		}
+
+		// 패턴 매칭
 		{
 			auto m = matchPattern(n ? str[n - 1] : u' ', str.data() + n, str.data() + str.size(), matchOptions);
 			chrType = m.second;

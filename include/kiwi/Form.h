@@ -57,7 +57,7 @@ namespace kiwi
 		/**
 		 * @brief 여러 형태소가 결합되어 형태가 변경된 경우, 원 형태소의 위치 정보를 표기하기 위해 사용된다.
 		 *
-		 * @note pair.first는 시작 지점, pair.second는 길이를 나타낸다. chunkPositions.size()는 항상 chunks.size()와 같다.
+		 * @note pair.first는 시작 지점, pair.second는 끝 지점을 나타낸다. chunkPositions.size()는 항상 chunks.size()와 같다.
 		 */
 		Vector<std::pair<uint8_t, uint8_t>> chunkPositions;
 
