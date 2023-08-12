@@ -279,6 +279,7 @@ namespace kiwi
 			"JKS", "JKC", "JKG", "JKO", "JKB", "JKV", "JKQ", "JX", "JC",
 			"EP", "EF", "EC", "ETN", "ETM",
 			"Z_CODA",
+			"USER0", "USER1", "USER2", "USER3", "USER4",
 			"P",
 			"@"
 		};
@@ -320,6 +321,7 @@ namespace kiwi
 			u"JKS", u"JKC", u"JKG", u"JKO", u"JKB", u"JKV", u"JKQ", u"JX", u"JC",
 			u"EP", u"EF", u"EC", u"ETN", u"ETM",
 			u"Z_CODA",
+			u"USER0", u"USER1", u"USER2", u"USER3", u"USER4",
 			u"P",
 			u"@"
 		};

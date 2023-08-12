@@ -1004,9 +1004,9 @@ size_t KiwiBuilder::addForm(Vector<FormRaw>& newForms, UnorderedMap<KString, siz
 	return ret.first->second;
 }
 
-bool KiwiBuilder::addWord(U16StringView newForm, POSTag tag, float score, size_t origMorphemeId)
+pair<uint32_t, bool> KiwiBuilder::addWord(U16StringView newForm, POSTag tag, float score, size_t origMorphemeId)
 {
-	if (newForm.empty()) return false;
+	if (newForm.empty()) return make_pair((uint32_t)0, false);
 
 	auto normalizedForm = normalizeHangul(newForm);
 	auto& f = addForm(normalizedForm);
@@ -1021,21 +1021,22 @@ bool KiwiBuilder::addWord(U16StringView newForm, POSTag tag, float score, size_t
 			if (morphemes[p].tag == tag && morphemes[p].lmMorphemeId == origMorphemeId)
 			{
 				morphemes[p].userScore = score;
-				return false;
+				return make_pair((uint32_t)p, false);
 			}
 		}
 	}
 
-	f.candidate.emplace_back(morphemes.size());
+	size_t newMorphId = morphemes.size();
+	f.candidate.emplace_back(newMorphId);
 	morphemes.emplace_back(tag);
 	auto& newMorph = morphemes.back();
 	newMorph.kform = &f - &forms[0];
 	newMorph.userScore = score;
 	newMorph.lmMorphemeId = origMorphemeId;
-	return true;
+	return make_pair((uint32_t)newMorphId, true);
 }
 
-bool KiwiBuilder::addWord(const std::u16string& newForm, POSTag tag, float score, size_t origMorphemeId)
+pair<uint32_t, bool> KiwiBuilder::addWord(const std::u16string& newForm, POSTag tag, float score, size_t origMorphemeId)
 {
 	return addWord(nonstd::to_string_view(newForm), tag, score, origMorphemeId);
 }
@@ -1332,17 +1333,17 @@ void KiwiBuilder::buildCombinedMorphemes(
 	}
 }
 
-bool KiwiBuilder::addWord(U16StringView form, POSTag tag, float score)
+pair<uint32_t, bool> KiwiBuilder::addWord(U16StringView form, POSTag tag, float score)
 {
 	return addWord(form, tag, score, getDefaultMorphemeId(tag));
 }
 
-bool KiwiBuilder::addWord(const u16string& form, POSTag tag, float score)
+pair<uint32_t, bool> KiwiBuilder::addWord(const u16string& form, POSTag tag, float score)
 {
 	return addWord(nonstd::to_string_view(form), tag, score);
 }
 
-bool KiwiBuilder::addWord(const char16_t* form, POSTag tag, float score)
+pair<uint32_t, bool> KiwiBuilder::addWord(const char16_t* form, POSTag tag, float score)
 {
 	return addWord(U16StringView{ form }, tag, score);
 }
@@ -1363,7 +1364,7 @@ size_t KiwiBuilder::findMorpheme(U16StringView form, POSTag tag) const
 	return -1;
 }
 
-bool KiwiBuilder::addWord(U16StringView newForm, POSTag tag, float score, U16StringView origForm)
+pair<uint32_t, bool> KiwiBuilder::addWord(U16StringView newForm, POSTag tag, float score, U16StringView origForm)
 {
 	size_t origMorphemeId = findMorpheme(origForm, tag);
 
@@ -1375,12 +1376,12 @@ bool KiwiBuilder::addWord(U16StringView newForm, POSTag tag, float score, U16Str
 	return addWord(newForm, tag, score, origMorphemeId);
 }
 
-bool KiwiBuilder::addWord(const u16string& newForm, POSTag tag, float score, const u16string& origForm)
+pair<uint32_t, bool> KiwiBuilder::addWord(const u16string& newForm, POSTag tag, float score, const u16string& origForm)
 {
 	return addWord(nonstd::to_string_view(newForm), tag, score, origForm);
 }
 
-bool KiwiBuilder::addWord(const char16_t* newForm, POSTag tag, float score, const char16_t* origForm)
+pair<uint32_t, bool> KiwiBuilder::addWord(const char16_t* newForm, POSTag tag, float score, const char16_t* origForm)
 {
 	return addWord(U16StringView(newForm), tag, score, U16StringView(origForm));
 }
@@ -1530,7 +1531,7 @@ size_t KiwiBuilder::loadDictionary(const string& dictPath)
 				}
 				else
 				{
-					addedCnt += addWord(fields[0], morphemes[0].second, score, morphemes[0].first);
+					addedCnt += addWord(fields[0], morphemes[0].second, score, morphemes[0].first).second;
 				}
 			}
 		}
@@ -1541,7 +1542,7 @@ size_t KiwiBuilder::loadDictionary(const string& dictPath)
 			{
 				throw Exception("[loadUserDictionary] Unknown Tag '" + utf16To8(fields[1]) + "' at line " + to_string(lineNo));
 			}
-			addedCnt += addWord(fields[0], pos, score) ? 1 : 0;
+			addedCnt += addWord(fields[0], pos, score).second ? 1 : 0;
 		}
 	}
 	return addedCnt;

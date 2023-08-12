@@ -543,9 +543,11 @@ namespace kiwi
 		if (tagStr == u"NV") return POSTag::unknown;
 		if (tagStr == u"NA") return POSTag::unknown;
 		if (tagStr == u"UNK") return POSTag::unknown;
+		if (tagStr == u"UN") return POSTag::unknown;
 		if (tagStr == u"SL") return POSTag::sl;
 		if (tagStr == u"SH") return POSTag::sh;
 		if (tagStr == u"SN") return POSTag::sn;
+		if (tagStr == u"Z_CODA") return POSTag::z_coda;
 		if (tagStr == u"V") return POSTag::p;
 		if (tagStr == u"A") return POSTag::p;
 		if (tagStr == u"^") return POSTag::unknown;
@@ -554,6 +556,12 @@ namespace kiwi
 		if (tagStr == u"W_HASHTAG") return POSTag::w_hashtag;
 		if (tagStr == u"W_MENTION") return POSTag::w_mention;
 		if (tagStr == u"W_SERIAL") return POSTag::w_serial;
+
+		if (tagStr == u"USER0") return POSTag::user0;
+		if (tagStr == u"USER1") return POSTag::user1;
+		if (tagStr == u"USER2") return POSTag::user2;
+		if (tagStr == u"USER3") return POSTag::user3;
+		if (tagStr == u"USER4") return POSTag::user4;
 		
 		if (tagStr == u"VV-I") return setIrregular(POSTag::vv);
 		if (tagStr == u"VA-I") return setIrregular(POSTag::va);

@@ -42,4 +42,9 @@ namespace kiwi
 	{
 		return POSTag::sf <= tag && tag <= POSTag::sn;
 	}
+
+	inline bool isUserClass(POSTag tag)
+	{
+		return POSTag::user0 <= tag && tag <= POSTag::user4;
+	}
 }

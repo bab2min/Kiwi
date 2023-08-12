@@ -193,6 +193,7 @@ namespace kiwi
 		jks, jkc, jkg, jko, jkb, jkv, jkq, jx, jc,
 		ep, ef, ec, etn, etm,
 		z_coda,
+		user0, user1, user2, user3, user4,
 		p, /**< 분할된 동사/형용사를 나타내는데 사용됨 */
 		max, /**< POSTag의 총 개수를 나타내는 용도 */
 		pv = p,
@@ -243,7 +244,7 @@ namespace kiwi
 		non_vowel, /**< `vowel`의 부정 */
 		non_vocalic, /**< `vocalic`의 부정 */
 		non_vocalic_h, /**< `vocalic_h`의 부정 */
-		applosive, /**< 불파음 받침(ㄴㄹㅁㅇ을 제외한 모든 받침)*/
+		applosive = 8, /**< 불파음 받침(ㄴㄹㅁㅇ을 제외한 모든 받침)*/ // not necessary, but fixed MSVC's weird bug
 	};
 
 	/**
@@ -329,7 +330,7 @@ namespace kiwi
 		uint32_t begin = -1, end = -1;
 		POSTag tag = POSTag::unknown;
 
-		BasicToken(const std::u16string& _form, uint32_t _begin = -1, uint32_t _end = -1, POSTag _tag = POSTag::unknown)
+		BasicToken(const std::u16string& _form = {}, uint32_t _begin = -1, uint32_t _end = -1, POSTag _tag = POSTag::unknown)
 			: form{ _form }, begin{ _begin }, end{ _end }, tag{ _tag }
 		{}
 	};

@@ -39,16 +39,19 @@ namespace kiwi
 			uint32_t begin = 0, end = 0;
 			float wordScore = 0, typoCost = 0;
 			uint32_t typoFormId = 0;
+			uint32_t nodeId = 0;
+
 			Result(const Morpheme* _morph = nullptr,
 				const KString& _str = {},
 				uint32_t _begin = 0,
 				uint32_t _end = 0,
 				float _wordScore = 0,
 				float _typoCost = 0,
-				uint32_t _typoFormId = 0
+				uint32_t _typoFormId = 0,
+				uint32_t _nodeId = 0
 			)
-				: morph{ _morph }, str{ _str }, begin{ _begin }, end{ _end }, 
-				wordScore{ _wordScore }, typoCost{ _typoCost }, typoFormId{ _typoFormId }
+				: morph{ _morph }, str{ _str }, begin{ _begin }, end{ _end },
+				wordScore{ _wordScore }, typoCost{ _typoCost }, typoFormId{ _typoFormId }, nodeId{ _nodeId }
 			{
 			}
 
@@ -1019,7 +1022,8 @@ namespace kiwi
 					gNode.endPos,
 					scoreDiff,
 					typoCostDiff,
-					gNode.typoFormId
+					typoCostDiff ? gNode.typoFormId : 0,
+					&gNode - graph
 				);
 			}
 			else if (morpheme->combineSocket)
@@ -1028,7 +1032,7 @@ namespace kiwi
 				ret.back().end = gNode.startPos + morpheme->chunks.getSecond(0).second;
 				ret.back().wordScore = scoreDiff;
 				ret.back().typoCost = typoCostDiff;
-				ret.back().typoFormId = gNode.typoFormId;
+				ret.back().typoFormId = typoCostDiff ? gNode.typoFormId : 0;
 				for (size_t ch = 1; ch < numNewTokens; ++ch)
 				{
 					auto& p = morpheme->chunks.getSecond(ch);
@@ -1039,7 +1043,8 @@ namespace kiwi
 						gNode.startPos + p.second,
 						scoreDiff,
 						typoCostDiff,
-						gNode.typoFormId
+						typoCostDiff ? gNode.typoFormId : 0,
+						&gNode - graph
 					);
 				}
 			}
@@ -1055,7 +1060,8 @@ namespace kiwi
 						gNode.startPos + p.second,
 						scoreDiff,
 						typoCostDiff,
-						gNode.typoFormId
+						typoCostDiff ? gNode.typoFormId : 0,
+						&gNode - graph
 					);
 				}
 			}
@@ -1356,7 +1362,8 @@ namespace kiwi
 		bool integrateAllomorph,
 		const Vector<uint32_t>& positionTable,
 		const Vector<uint16_t>& wordPositions,
-		const PretokenizedSpanGroup& pretokenizedGroup
+		const PretokenizedSpanGroup& pretokenizedGroup,
+		const Vector<uint32_t>& nodeInWhichPretokenized
 	)
 	{
 		if (ret.empty())
@@ -1414,6 +1421,11 @@ namespace kiwi
 				token.score = s.wordScore;
 				token.typoCost = s.typoCost;
 				token.typoFormId = s.typoFormId;
+				auto ptId = nodeInWhichPretokenized[s.nodeId] + 1;
+				if (ptId)
+				{
+					token.typoFormId = ptId;
+				}
 
 				// Token의 시작위치(position)을 이용해 Token이 포함된 어절번호(wordPosition)를 얻음
 				token.wordPosition = wordPositions[token.position];
@@ -1579,6 +1591,26 @@ namespace kiwi
 		}
 	}
 
+	inline void findPretokenizedGroupOfNode(Vector<uint32_t>& ret, const Vector<KGraphNode>& nodes,
+		const PretokenizedSpanGroup::Span* first, const PretokenizedSpanGroup::Span* last)
+	{
+		ret.clear();
+		auto* cur = first;
+		for (size_t i = 0; i < nodes.size() && cur != last; ++i)
+		{
+			if (cur->begin <= nodes[i].startPos && nodes[i].endPos <= cur->end)
+			{
+				ret.emplace_back(cur - first);
+			}
+			else
+			{
+				ret.emplace_back(-1);
+				if (nodes[i].startPos >= cur->end) ++cur;
+			}
+		}
+		ret.resize(nodes.size(), -1);
+	}
+
 	vector<TokenResult> Kiwi::analyze(const u16string& str, size_t topN, Match matchOptions, 
 		const std::unordered_set<const Morpheme*>* blocklist,
 		const std::vector<PretokenizedSpan>& pretokenized
@@ -1610,12 +1642,14 @@ namespace kiwi
 		
 		vector<TokenResult> ret;
 		thread_local Vector<KGraphNode> nodes;
+		thread_local Vector<uint32_t> nodeInWhichPretokenized;
 		const auto* pretokenizedFirst = pretokenizedGroup.spans.data();
 		const auto* pretokenizedLast = pretokenizedFirst + pretokenizedGroup.spans.size();
 		size_t splitEnd = 0;
 		while (splitEnd < normalizedStr.size())
 		{
 			nodes.clear();
+			auto* pretokenizedPrev = pretokenizedFirst;
 			splitEnd = (*reinterpret_cast<FnSplitByTrie>(dfSplitByTrie))(
 				nodes,
 				forms.data(),
@@ -1632,6 +1666,7 @@ namespace kiwi
 			);
 
 			if (nodes.size() <= 2) continue;
+			findPretokenizedGroupOfNode(nodeInWhichPretokenized, nodes, pretokenizedPrev, pretokenizedFirst);
 
 			Vector<std::pair<PathEvaluator::Path, float>> res = (*reinterpret_cast<FnFindBestPath>(dfFindBestPath))(
 				this,
@@ -1642,8 +1677,7 @@ namespace kiwi
 				!!(matchOptions & Match::splitComplex),
 				blocklist
 			);
-
-			insertPathIntoResults(ret, res, topN, matchOptions, integrateAllomorph, positionTable, wordPositions, pretokenizedGroup);
+			insertPathIntoResults(ret, res, topN, matchOptions, integrateAllomorph, positionTable, wordPositions, pretokenizedGroup, nodeInWhichPretokenized);
 		}
 		
 		auto newlines = allNewLinePositions(str);

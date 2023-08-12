@@ -297,12 +297,12 @@ public:
 
 	bool addWord(const std::u16string& form, kiwi::POSTag tag, float score)
 	{
-		return KiwiBuilder::addWord(form, tag, score);
+		return KiwiBuilder::addWord(form, tag, score).second;
 	}
 
 	bool addWord2(const std::u16string& form, kiwi::POSTag tag, float score, const std::u16string& orig)
 	{
-		return KiwiBuilder::addWord(form, tag, score, orig);
+		return KiwiBuilder::addWord(form, tag, score, orig).second;
 	}
 
 	bool addPreAnalyzedWord(const std::u16string& form, std::vector<AnalyzedMorph>&& analyzed, float score)
