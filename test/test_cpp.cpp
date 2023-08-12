@@ -212,6 +212,35 @@ TEST(KiwiCpp, Pretokenized)
 	}
 }
 
+TEST(KiwiCpp, TagRoundTrip)
+{
+	for (size_t i = 0; i < (size_t)POSTag::p; ++i)
+	{
+		auto u8tag = tagToString((POSTag)i);
+		auto u16tag = tagToKString((POSTag)i);
+		EXPECT_EQ(utf16To8(u16tag), u8tag);
+		auto r = toPOSTag(u16tag);
+		EXPECT_EQ(r, (POSTag)i);
+	}
+}
+
+TEST(KiwiCpp, UserTag)
+{
+	KiwiBuilder kw{ MODEL_PATH, 0, BuildOption::default_, };
+	EXPECT_TRUE(kw.addWord(u"사용자태그", POSTag::user0));
+	EXPECT_TRUE(kw.addWord(u"이것도유저", POSTag::user1));
+	EXPECT_TRUE(kw.addWord(u"특수한표지", POSTag::user2));
+	auto kiwi = kw.build();
+	auto tokens = kiwi.analyze(u"사용자태그를 사용할때는 특수한표지를 넣는다. 이것도유저의 권리이다.", Match::allWithNormalizing).first;
+
+	EXPECT_EQ(tokens[0].str, u"사용자태그");
+	EXPECT_EQ(tokens[0].tag, POSTag::user0);
+	EXPECT_EQ(tokens[12].str, u"이것도유저");
+	EXPECT_EQ(tokens[12].tag, POSTag::user1);
+	EXPECT_EQ(tokens[7].str, u"특수한표지");
+	EXPECT_EQ(tokens[7].tag, POSTag::user2);
+}
+
 TEST(KiwiCpp, HSDataset)
 {
 	KiwiBuilder kw{ MODEL_PATH, 0, BuildOption::default_, };
