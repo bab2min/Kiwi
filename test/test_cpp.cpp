@@ -510,6 +510,10 @@ TEST(KiwiCpp, AnalyzeSBG)
 {
 	Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 0, BuildOption::none, true }.build();
 	kiwi.analyze(TEST_SENT, Match::all);
+
+	auto tokens = kiwi.analyze(u"이 번호로 전화를 이따가 꼭 반드시 걸어.", kiwi::Match::allWithNormalizing).first;
+	EXPECT_EQ(tokens.size(), 11);
+	EXPECT_EQ(tokens[8].str, u"걸");
 }
 
 TEST(KiwiCpp, AnalyzeMultithread)
