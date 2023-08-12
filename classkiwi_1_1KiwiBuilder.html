@@ -124,28 +124,28 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a5e48b27691f354481ef40cba134e00e6"><td class="memItemLeft" align="right" valign="top"><a id="a5e48b27691f354481ef40cba134e00e6"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>saveModel</b> (const std::string &amp;modelPath) const</td></tr>
 <tr class="separator:a5e48b27691f354481ef40cba134e00e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a36bfec30ad9e9c51a9a0719bf421c250"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1KiwiBuilder.html#a36bfec30ad9e9c51a9a0719bf421c250">addWord</a> (const std::u16string &amp;form, <a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebb">POSTag</a> tag=POSTag::nnp, float score=0)</td></tr>
-<tr class="memdesc:a36bfec30ad9e9c51a9a0719bf421c250"><td class="mdescLeft">&#160;</td><td class="mdescRight">사전에 새로운 형태소를 추가한다. 이미 동일한 형태소가 있는 경우는 무시된다.  <a href="classkiwi_1_1KiwiBuilder.html#a36bfec30ad9e9c51a9a0719bf421c250">More...</a><br /></td></tr>
-<tr class="separator:a36bfec30ad9e9c51a9a0719bf421c250"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adb4da611d32864e667ca2784e6f89187"><td class="memItemLeft" align="right" valign="top"><a id="adb4da611d32864e667ca2784e6f89187"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>addWord</b> (const char16_t *form, <a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebb">POSTag</a> tag=POSTag::nnp, float score=0)</td></tr>
-<tr class="separator:adb4da611d32864e667ca2784e6f89187"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a40e6412e9e8955db984197bd0dcfbf21"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1KiwiBuilder.html#a40e6412e9e8955db984197bd0dcfbf21">addWord</a> (const std::u16string &amp;newForm, <a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebb">POSTag</a> tag, float score, const std::u16string &amp;origForm)</td></tr>
-<tr class="memdesc:a40e6412e9e8955db984197bd0dcfbf21"><td class="mdescLeft">&#160;</td><td class="mdescRight">사전에 기존 형태소의 변이형을 추가한다. 이미 동일한 형태소가 있는 경우는 무시된다.  <a href="classkiwi_1_1KiwiBuilder.html#a40e6412e9e8955db984197bd0dcfbf21">More...</a><br /></td></tr>
-<tr class="separator:a40e6412e9e8955db984197bd0dcfbf21"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aed1569590be6bd92d7598015e9f9011c"><td class="memItemLeft" align="right" valign="top"><a id="aed1569590be6bd92d7598015e9f9011c"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>addWord</b> (const char16_t *newForm, <a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebb">POSTag</a> tag, float score, const char16_t *origForm)</td></tr>
-<tr class="separator:aed1569590be6bd92d7598015e9f9011c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a875ef561d1c1f7665590d0ce18cc4ac3"><td class="memItemLeft" align="right" valign="top">std::pair&lt; uint32_t, bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1KiwiBuilder.html#a875ef561d1c1f7665590d0ce18cc4ac3">addWord</a> (const std::u16string &amp;form, <a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebb">POSTag</a> tag=POSTag::nnp, float score=0)</td></tr>
+<tr class="memdesc:a875ef561d1c1f7665590d0ce18cc4ac3"><td class="mdescLeft">&#160;</td><td class="mdescRight">사전에 새로운 형태소를 추가한다. 이미 동일한 형태소가 있는 경우는 무시된다.  <a href="classkiwi_1_1KiwiBuilder.html#a875ef561d1c1f7665590d0ce18cc4ac3">More...</a><br /></td></tr>
+<tr class="separator:a875ef561d1c1f7665590d0ce18cc4ac3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac17788b83d521ee9f113f2df4bb9176e"><td class="memItemLeft" align="right" valign="top"><a id="ac17788b83d521ee9f113f2df4bb9176e"></a>
+std::pair&lt; uint32_t, bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>addWord</b> (const char16_t *form, <a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebb">POSTag</a> tag=POSTag::nnp, float score=0)</td></tr>
+<tr class="separator:ac17788b83d521ee9f113f2df4bb9176e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a971ff2a6f7ddca86f1c9c7ad888313ac"><td class="memItemLeft" align="right" valign="top">std::pair&lt; uint32_t, bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1KiwiBuilder.html#a971ff2a6f7ddca86f1c9c7ad888313ac">addWord</a> (const std::u16string &amp;newForm, <a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebb">POSTag</a> tag, float score, const std::u16string &amp;origForm)</td></tr>
+<tr class="memdesc:a971ff2a6f7ddca86f1c9c7ad888313ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">사전에 기존 형태소의 변이형을 추가한다. 이미 동일한 형태소가 있는 경우는 무시된다.  <a href="classkiwi_1_1KiwiBuilder.html#a971ff2a6f7ddca86f1c9c7ad888313ac">More...</a><br /></td></tr>
+<tr class="separator:a971ff2a6f7ddca86f1c9c7ad888313ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aac830c8f852edebd276dfa40ddfdf993"><td class="memItemLeft" align="right" valign="top"><a id="aac830c8f852edebd276dfa40ddfdf993"></a>
+std::pair&lt; uint32_t, bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>addWord</b> (const char16_t *newForm, <a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebb">POSTag</a> tag, float score, const char16_t *origForm)</td></tr>
+<tr class="separator:aac830c8f852edebd276dfa40ddfdf993"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa7ca37c66851bb345568a76899fdcba4"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1KiwiBuilder.html#aa7ca37c66851bb345568a76899fdcba4">addPreAnalyzedWord</a> (const std::u16string &amp;form, const std::vector&lt; std::pair&lt; std::u16string, <a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebb">POSTag</a> &gt;&gt; &amp;analyzed, std::vector&lt; std::pair&lt; size_t, size_t &gt;&gt; positions={}, float score=0)</td></tr>
 <tr class="memdesc:aa7ca37c66851bb345568a76899fdcba4"><td class="mdescLeft">&#160;</td><td class="mdescRight">사전에 기분석 형태소열을 추가한다. 이미 동일한 기분석 형태소열이 있는 경우는 무시된다.  <a href="classkiwi_1_1KiwiBuilder.html#aa7ca37c66851bb345568a76899fdcba4">More...</a><br /></td></tr>
 <tr class="separator:aa7ca37c66851bb345568a76899fdcba4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac8722d7e786d841fd92b8c0ed275c809"><td class="memItemLeft" align="right" valign="top"><a id="ac8722d7e786d841fd92b8c0ed275c809"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>addPreAnalyzedWord</b> (const char16_t *form, const std::vector&lt; std::pair&lt; const char16_t *, <a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebb">POSTag</a> &gt;&gt; &amp;analyzed, std::vector&lt; std::pair&lt; size_t, size_t &gt;&gt; positions={}, float score=0)</td></tr>
 <tr class="separator:ac8722d7e786d841fd92b8c0ed275c809"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a730f5bf0d5e2180bc81ccc28deb4e792"><td class="memTemplParams" colspan="2">template&lt;class Replacer &gt; </td></tr>
-<tr class="memitem:a730f5bf0d5e2180bc81ccc28deb4e792"><td class="memTemplItemLeft" align="right" valign="top">std::vector&lt; std::u16string &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classkiwi_1_1KiwiBuilder.html#a730f5bf0d5e2180bc81ccc28deb4e792">addRule</a> (<a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebb">POSTag</a> tag, Replacer &amp;&amp;repl, float score=0)</td></tr>
-<tr class="memdesc:a730f5bf0d5e2180bc81ccc28deb4e792"><td class="mdescLeft">&#160;</td><td class="mdescRight">규칙에 의해 변형된 형태소 목록을 생성하여 자동 추가한다.  <a href="classkiwi_1_1KiwiBuilder.html#a730f5bf0d5e2180bc81ccc28deb4e792">More...</a><br /></td></tr>
-<tr class="separator:a730f5bf0d5e2180bc81ccc28deb4e792"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aea698e26e6afb0983a8168ecd22ec688"><td class="memTemplParams" colspan="2">template&lt;class Replacer &gt; </td></tr>
+<tr class="memitem:aea698e26e6afb0983a8168ecd22ec688"><td class="memTemplItemLeft" align="right" valign="top">std::vector&lt; std::pair&lt; uint32_t, std::u16string &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classkiwi_1_1KiwiBuilder.html#aea698e26e6afb0983a8168ecd22ec688">addRule</a> (<a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebb">POSTag</a> tag, Replacer &amp;&amp;repl, float score=0)</td></tr>
+<tr class="memdesc:aea698e26e6afb0983a8168ecd22ec688"><td class="mdescLeft">&#160;</td><td class="mdescRight">규칙에 의해 변형된 형태소 목록을 생성하여 자동 추가한다.  <a href="classkiwi_1_1KiwiBuilder.html#aea698e26e6afb0983a8168ecd22ec688">More...</a><br /></td></tr>
+<tr class="separator:aea698e26e6afb0983a8168ecd22ec688"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1c34aeb8fac1f3b324e0de63d45f4eea"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1KiwiBuilder.html#a1c34aeb8fac1f3b324e0de63d45f4eea">loadDictionary</a> (const std::string &amp;dictPath)</td></tr>
 <tr class="separator:a1c34aeb8fac1f3b324e0de63d45f4eea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6cbb32e9c55dbd443931b4b8b612262e"><td class="memItemLeft" align="right" valign="top"><a id="a6cbb32e9c55dbd443931b4b8b612262e"></a>
@@ -315,8 +315,8 @@ std::vector&lt; <a class="el" href="structkiwi_1_1WordInfo.html">WordInfo</a> &g
 
 </div>
 </div>
-<a id="a730f5bf0d5e2180bc81ccc28deb4e792"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a730f5bf0d5e2180bc81ccc28deb4e792">&#9670;&nbsp;</a></span>addRule()</h2>
+<a id="aea698e26e6afb0983a8168ecd22ec688"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aea698e26e6afb0983a8168ecd22ec688">&#9670;&nbsp;</a></span>addRule()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -327,7 +327,7 @@ template&lt;class Replacer &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt;std::u16string&gt; kiwi::KiwiBuilder::addRule </td>
+          <td class="memname">std::vector&lt;std::pair&lt;uint32_t, std::u16string&gt; &gt; kiwi::KiwiBuilder::addRule </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebb">POSTag</a>&#160;</td>
           <td class="paramname"><em>tag</em>, </td>
@@ -366,18 +366,18 @@ template&lt;class Replacer &gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>새로 추가된 변형된 형태소 목록 </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>새로 추가된 변형된 형태소의 ID와 그 형태를 pair로 묶은 목록 </dd></dl>
 
 </div>
 </div>
-<a id="a36bfec30ad9e9c51a9a0719bf421c250"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a36bfec30ad9e9c51a9a0719bf421c250">&#9670;&nbsp;</a></span>addWord() <span class="overload">[1/2]</span></h2>
+<a id="a875ef561d1c1f7665590d0ce18cc4ac3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a875ef561d1c1f7665590d0ce18cc4ac3">&#9670;&nbsp;</a></span>addWord() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool kiwi::KiwiBuilder::addWord </td>
+          <td class="memname">std::pair&lt;uint32_t, bool&gt; kiwi::KiwiBuilder::addWord </td>
           <td>(</td>
           <td class="paramtype">const std::u16string &amp;&#160;</td>
           <td class="paramname"><em>form</em>, </td>
@@ -411,19 +411,19 @@ template&lt;class Replacer &gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><code>form/tag</code> 형태소를 추가하는데 성공했으면 true, 동일한 형태소가 존재하여 추가에 실패한 경우 false를 반환한다. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>추가된 형태소의 ID와 성공 여부를 pair로 반환한다. <code>form/tag</code> 형태소가 이미 존재하는 경우 추가에 실패한다. </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>이 방법으로 추가된 형태소는 언어모델 탐색에서 어휘 사전 외 토큰(OOV 토큰)으로 처리된다. 이 방법으로 추가된 형태소는 항상 분석 과정에서 최우선으로 탐색되지는 않으므로 최상의 결과를 위해서는 <code>score</code> 값을 조절할 필요가 있다. <code>score</code> 값을 높게 설정할수록 다른 후보들과의 경쟁에서 이 형태소가 더 높은 점수를 받아 최종 분석 결과에 노출될 가능성이 높아진다. 만약 이 방법으로 추가된 형태소가 원치 않는 상황에서 과도하게 출력되는 경우라면 <code>score</code>를 더 작은 값으로, 반대로 원하는 상황에서도 출력되지 않는 경우라면 <code>score</code>를 더 큰 값으로 조절하는 게 좋다. </dd></dl>
 
 </div>
 </div>
-<a id="a40e6412e9e8955db984197bd0dcfbf21"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a40e6412e9e8955db984197bd0dcfbf21">&#9670;&nbsp;</a></span>addWord() <span class="overload">[2/2]</span></h2>
+<a id="a971ff2a6f7ddca86f1c9c7ad888313ac"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a971ff2a6f7ddca86f1c9c7ad888313ac">&#9670;&nbsp;</a></span>addWord() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool kiwi::KiwiBuilder::addWord </td>
+          <td class="memname">std::pair&lt;uint32_t, bool&gt; kiwi::KiwiBuilder::addWord </td>
           <td>(</td>
           <td class="paramtype">const std::u16string &amp;&#160;</td>
           <td class="paramname"><em>newForm</em>, </td>
@@ -464,7 +464,7 @@ template&lt;class Replacer &gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><code>newForm/tag</code> 형태소를 추가하는데 성공했으면 true, 동일한 형태소가 존재하여 추가에 실패한 경우 false를 반환한다. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>추가된 형태소의 ID와 성공 여부를 pair로 반환한다. <code>newForm/tag</code> 형태소가 이미 존재하는 경우 추가에 실패한다. </dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname"><a class="el" href="classkiwi_1_1UnknownMorphemeException.html">kiwi::UnknownMorphemeException</a></td><td><code>origForm/tag</code>에 해당하는 형태소가 없을 경우 예외를 발생시킨다. </td></tr>
