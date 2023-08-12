@@ -799,7 +799,15 @@ namespace kiwi
 					{
 						for (size_t j = 0; j < 3; ++j) g += pats[j] * (min_cnt * discnts[rkeys.size()][j]);
 					}
-					g /= node->val;
+					// if this node is bos
+					if (rkeys.size() == 1 && rkeys[0] == (history_transformer ? (*history_transformer)[0] : 0))
+					{
+						g = (g + node->val) / (2 * node->val);
+					}
+					else
+					{
+						g /= node->val;
+					}
 					gamma[i] = g;
 
 					if (rkeys.size() <= 1)
