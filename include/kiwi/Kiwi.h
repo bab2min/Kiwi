@@ -553,10 +553,10 @@ namespace kiwi
 
 		size_t findMorpheme(U16StringView form, POSTag tag) const;
 		
-		bool addWord(U16StringView newForm, POSTag tag, float score, size_t origMorphemeId);
-		bool addWord(const std::u16string& newForm, POSTag tag, float score, size_t origMorphemeId);
-		bool addWord(U16StringView form, POSTag tag = POSTag::nnp, float score = 0);
-		bool addWord(U16StringView newForm, POSTag tag, float score, U16StringView origForm);
+		std::pair<uint32_t, bool> addWord(U16StringView newForm, POSTag tag, float score, size_t origMorphemeId);
+		std::pair<uint32_t, bool> addWord(const std::u16string& newForm, POSTag tag, float score, size_t origMorphemeId);
+		std::pair<uint32_t, bool> addWord(U16StringView form, POSTag tag = POSTag::nnp, float score = 0);
+		std::pair<uint32_t, bool> addWord(U16StringView newForm, POSTag tag, float score, U16StringView origForm);
 
 		template<class U16>
 		bool addPreAnalyzedWord(U16StringView form,
@@ -670,15 +670,15 @@ namespace kiwi
 		 * @param form 새로운 형태소의 형태
 		 * @param tag 품사 태그
 		 * @param score 페널티 점수. 이에 대한 자세한 설명은 하단의 note 참조.
-		 * @return `form/tag` 형태소를 추가하는데 성공했으면 true, 동일한 형태소가 존재하여 추가에 실패한 경우 false를 반환한다.
+		 * @return 추가된 형태소의 ID와 성공 여부를 pair로 반환한다. `form/tag` 형태소가 이미 존재하는 경우 추가에 실패한다.
 		 * @note 이 방법으로 추가된 형태소는 언어모델 탐색에서 어휘 사전 외 토큰(OOV 토큰)으로 처리된다.
 		 * 이 방법으로 추가된 형태소는 항상 분석 과정에서 최우선으로 탐색되지는 않으므로 최상의 결과를 위해서는 `score` 값을 조절할 필요가 있다.
 		 * `score` 값을 높게 설정할수록 다른 후보들과의 경쟁에서 이 형태소가 더 높은 점수를 받아 최종 분석 결과에 노출될 가능성이 높아진다.
 		 * 만약 이 방법으로 추가된 형태소가 원치 않는 상황에서 과도하게 출력되는 경우라면 `score`를 더 작은 값으로, 
 		 * 반대로 원하는 상황에서도 출력되지 않는 경우라면 `score`를 더 큰 값으로 조절하는 게 좋다.
 		 */
-		bool addWord(const std::u16string& form, POSTag tag = POSTag::nnp, float score = 0);
-		bool addWord(const char16_t* form, POSTag tag = POSTag::nnp, float score = 0);
+		std::pair<uint32_t, bool> addWord(const std::u16string& form, POSTag tag = POSTag::nnp, float score = 0);
+		std::pair<uint32_t, bool> addWord(const char16_t* form, POSTag tag = POSTag::nnp, float score = 0);
 
 		/**
 		 * @brief 사전에 기존 형태소의 변이형을 추가한다. 이미 동일한 형태소가 있는 경우는 무시된다.
@@ -687,12 +687,12 @@ namespace kiwi
 		 * @param tag 품사 태그
 		 * @param score 새로운 형태의 페널티 점수. 이에 대한 자세한 설명은 하단의 `addWord`함수의 note 참조.
 		 * @param origForm 기존 형태
-		 * @return `newForm/tag` 형태소를 추가하는데 성공했으면 true, 동일한 형태소가 존재하여 추가에 실패한 경우 false를 반환한다.
+		 * @return 추가된 형태소의 ID와 성공 여부를 pair로 반환한다. `newForm/tag` 형태소가 이미 존재하는 경우 추가에 실패한다.
 		 * @exception kiwi::UnknownMorphemeException `origForm/tag`에 해당하는 형태소가 없을 경우 예외를 발생시킨다.
 		 * @note 이 방법으로 추가된 형태소는 언어모델 탐색 과정에서 `origForm/tag` 토큰으로 처리된다.
 		 */
-		bool addWord(const std::u16string& newForm, POSTag tag, float score, const std::u16string& origForm);
-		bool addWord(const char16_t* newForm, POSTag tag, float score, const char16_t* origForm);
+		std::pair<uint32_t, bool> addWord(const std::u16string& newForm, POSTag tag, float score, const std::u16string& origForm);
+		std::pair<uint32_t, bool> addWord(const char16_t* newForm, POSTag tag, float score, const char16_t* origForm);
 
 		/**
 		 * @brief 사전에 기분석 형태소열을 추가한다. 이미 동일한 기분석 형태소열이 있는 경우는 무시된다.
@@ -723,12 +723,12 @@ namespace kiwi
 		 * @param tag 
 		 * @param repl 
 		 * @param score 
-		 * @return 새로 추가된 변형된 형태소 목록
+		 * @return 새로 추가된 변형된 형태소의 ID와 그 형태를 pair로 묶은 목록
 		 */
 		template<class Replacer>
-		std::vector<std::u16string> addRule(POSTag tag, Replacer&& repl, float score = 0)
+		std::vector<std::pair<uint32_t, std::u16string>> addRule(POSTag tag, Replacer&& repl, float score = 0)
 		{
-			std::vector<std::u16string> ret;
+			std::vector<std::pair<uint32_t, std::u16string>> ret;
 			size_t formSize = forms.size();
 			for (size_t i = 0; i < formSize; ++i)
 			{
@@ -747,9 +747,10 @@ namespace kiwi
 				std::u16string output = repl(input);
 				if (input == output) continue;
 				size_t morphemeId = m->lmMorphemeId ? m->lmMorphemeId : (size_t)(m - morphemes.data());
-				if (addWord(output, tag, score + (m->lmMorphemeId ? m->userScore : 0), morphemeId))
+				auto added = addWord(output, tag, score + (m->lmMorphemeId ? m->userScore : 0), morphemeId);
+				if (added.second)
 				{
-					ret.emplace_back(output);
+					ret.emplace_back(added.first, output);
 				}
 			}
 			return ret;
