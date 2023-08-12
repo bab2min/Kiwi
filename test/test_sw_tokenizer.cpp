@@ -270,12 +270,12 @@ TEST(KiwiSwTokenizer, WholeWordUnk)
 		tokenizer = SwTokenizer::load(reuseKiwiInstance(), ifs);
 	}
 
-	auto c = u8"화폐의 주인공은 110여 년 전의 여류 직업 소설가 '히구치 이치요樋口一葉'이다.";
+	auto c = u8"화폐의 주인공은 110여 년 전의 여류 직업 소설가 '히구치 이치樋口一葉'이다.";
 	{
 		tokenizer.setWholeWordUnk(false);
 		auto encoded = tokenizer.encode(c);
 		auto decoded = tokenizer.decode(encoded);
-		EXPECT_EQ(decoded, u8"화폐의 주인공은 110여 년 전의 여류 직업 소설가'히구치 이치요 [UNK]口一葉'이다.");
+		EXPECT_EQ(decoded, u8"화폐의 주인공은 110여 년 전의 여류 직업 소설가'히구치 이치 [UNK]口一葉'이다.");
 	}
 
 	{

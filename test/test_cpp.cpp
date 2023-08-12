@@ -227,9 +227,9 @@ TEST(KiwiCpp, TagRoundTrip)
 TEST(KiwiCpp, UserTag)
 {
 	KiwiBuilder kw{ MODEL_PATH, 0, BuildOption::default_, };
-	EXPECT_TRUE(kw.addWord(u"사용자태그", POSTag::user0));
-	EXPECT_TRUE(kw.addWord(u"이것도유저", POSTag::user1));
-	EXPECT_TRUE(kw.addWord(u"특수한표지", POSTag::user2));
+	EXPECT_TRUE(kw.addWord(u"사용자태그", POSTag::user0).second);
+	EXPECT_TRUE(kw.addWord(u"이것도유저", POSTag::user1).second);
+	EXPECT_TRUE(kw.addWord(u"특수한표지", POSTag::user2).second);
 	auto kiwi = kw.build();
 	auto tokens = kiwi.analyze(u"사용자태그를 사용할때는 특수한표지를 넣는다. 이것도유저의 권리이다.", Match::allWithNormalizing).first;
 
@@ -479,7 +479,7 @@ TEST(KiwiCpp, Pattern)
 TEST(KiwiCpp, BuilderAddWords)
 {
 	KiwiBuilder builder{ MODEL_PATH };
-	EXPECT_TRUE(builder.addWord(KWORD, POSTag::nnp, 0.0));
+	EXPECT_TRUE(builder.addWord(KWORD, POSTag::nnp, 0.0).second);
 	Kiwi kiwi = builder.build();
 
 	auto res = kiwi.analyze(KWORD, Match::all);
@@ -724,7 +724,7 @@ TEST(KiwiCpp, IssueP111_SentenceSplitError)
 	EXPECT_GT(res.size(), 1);
 
 	KiwiBuilder builder{ MODEL_PATH, 1 };
-	EXPECT_TRUE(builder.addWord(u"모", POSTag::nng));
+	EXPECT_TRUE(builder.addWord(u"모", POSTag::nng).second);
 	Kiwi kiwi2 = builder.build();
 	auto res2 = kiwi2.splitIntoSents(text);
 	EXPECT_EQ(res.size(), res2.size());
@@ -941,8 +941,8 @@ TEST(KiwiCpp, AutoJoiner)
 TEST(KiwiCpp, UserWordWithNumeric)
 {
 	KiwiBuilder builder{ MODEL_PATH };
-	EXPECT_TRUE(builder.addWord(u"코로나19", POSTag::nnp, 0.0));
-	EXPECT_TRUE(builder.addWord(u"2차전지", POSTag::nnp, 0.0));
+	EXPECT_TRUE(builder.addWord(u"코로나19", POSTag::nnp, 0.0).second);
+	EXPECT_TRUE(builder.addWord(u"2차전지", POSTag::nnp, 0.0).second);
 	builder.addWord(u"K9", POSTag::nnp, 3.0);
 	builder.addWord(u"K55", POSTag::nnp, 3.0);
 	Kiwi kiwi = builder.build();
