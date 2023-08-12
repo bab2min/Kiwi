@@ -128,7 +128,7 @@ int kiwi_builder_add_word(kiwi_builder_h handle, const char* word, const char* p
 	auto* kb = (KiwiBuilder*)handle;
 	try
 	{
-		if (kb->addWord(utf8To16(word), parse_tag(pos), score)) return 0;
+		if (kb->addWord(utf8To16(word), parse_tag(pos), score).second) return 0;
 		return KIWIERR_FAIL;
 	}
 	catch (...)
@@ -144,7 +144,7 @@ int kiwi_builder_add_alias_word(kiwi_builder_h handle, const char* alias, const 
 	auto* kb = (KiwiBuilder*)handle;
 	try
 	{
-		if (kb->addWord(utf8To16(alias), parse_tag(pos), score, utf8To16(orig_word))) return 0;
+		if (kb->addWord(utf8To16(alias), parse_tag(pos), score, utf8To16(orig_word)).second) return 0;
 		return KIWIERR_FAIL;
 	}
 	catch (...)
