@@ -49,8 +49,9 @@ public class Kiwi implements AutoCloseable  {
 		jks = 37, jkc = 38, jkg = 39, jko = 40, jkb = 41, jkv = 42, jkq = 43, jx = 44, jc = 45,
 		ep = 46, ef = 47, ec = 48, etn = 49, etm = 50,
 		z_coda = 51,
-		p = 52,
-		max = 53,
+		user0 = 52, user1 = 53, user2 = 54, user3 = 55, user4 = 56,
+		p = 57,
+		max = 58,
 		pv = p,
 		pa = (byte)(p + 1),
 		irregular = - 128,
@@ -116,6 +117,11 @@ public class Kiwi implements AutoCloseable  {
 				case etn: return "ETN";
 				case etm: return "ETM";
 				case z_coda: return "Z_CODA";
+				case user0: return "USER0";
+				case user1: return "USER1";
+				case user2: return "USER2";
+				case user3: return "USER3";
+				case user4: return "USER4";
 				
 				case vvi: return "VV-I";
 				case vai: return "VA-I";
