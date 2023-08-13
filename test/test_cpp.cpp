@@ -355,6 +355,59 @@ TEST(KiwiCpp, SentenceBoundaryErrors)
 	}
 }
 
+TEST(KiwiCpp, SentenceBoundaryWithOrderedBullet)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+
+	for (auto str : {
+		u"가. 스카이 초이스는 편당 요금을 지불",
+		u"나. 스카이 초이스는 편당 요금을 지불",
+		u"다. 스카이 초이스는 편당 요금을 지불",
+		u"라. 스카이 초이스는 편당 요금을 지불",
+		u"ㄱ. 스카이 초이스는 편당 요금을 지불",
+		u"ㄴ. 스카이 초이스는 편당 요금을 지불",
+		u"가) 스카이 초이스는 편당 요금을 지불",
+		u"나) 스카이 초이스는 편당 요금을 지불",
+		u"1) 스카이 초이스는 편당 요금을 지불",
+		u"2) 스카이 초이스는 편당 요금을 지불",
+		u"ㄱ) 스카이 초이스는 편당 요금을 지불",
+		u"ㄴ) 스카이 초이스는 편당 요금을 지불",
+		})
+	{
+		TokenResult res;
+		std::vector<std::pair<size_t, size_t>> sentRanges = kiwi.splitIntoSents(str, Match::allWithNormalizing, &res);
+		EXPECT_EQ(res.first[0].tag, POSTag::sb);
+		EXPECT_EQ(sentRanges.size(), 1);
+		if (sentRanges.size() > 1)
+		{
+			for (auto& r : sentRanges)
+			{
+				std::cerr << std::u16string{ &str[r.first], r.second - r.first } << std::endl;
+			}
+			std::cerr << std::endl;
+		}
+	}
+
+	for (auto str : {
+		u"집에가.",
+		u"하지마.",
+		u"이거사.",
+		u"민철아.",
+		u"자자.",
+		u"따뜻한 차.",
+		u"(집에가)",
+		u"(하지마)",
+		u"(이거사)",
+		u"(민철아)",
+		u"(자자)",
+		u"(따뜻한 차)",
+	})
+	{
+		auto tokens = kiwi.analyze(str, Match::allWithNormalizing).first;
+		EXPECT_NE(tokens.back().tag, POSTag::sb);
+	}
+}
+
 TEST(KiwiCpp, SplitByPolarity)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
