@@ -43,15 +43,15 @@ public class Kiwi implements AutoCloseable  {
 		ic = 12,
 		xpn = 13, xsn = 14, xsv = 15, xsa = 16, xsm = 17, xr = 18,
 		vcp = 19, vcn = 20,
-		sf = 21, sp = 22, ss = 23, sso = 24, ssc = 25, se = 26, so = 27, sw = 28,
-		sl = 29, sh = 30, sn = 31,
-		w_url = 32, w_email = 33, w_mention = 34, w_hashtag = 35, w_serial = 36,
-		jks = 37, jkc = 38, jkg = 39, jko = 40, jkb = 41, jkv = 42, jkq = 43, jx = 44, jc = 45,
-		ep = 46, ef = 47, ec = 48, etn = 49, etm = 50,
-		z_coda = 51,
-		user0 = 52, user1 = 53, user2 = 54, user3 = 55, user4 = 56,
-		p = 57,
-		max = 58,
+		sf = 21, sp = 22, ss = 23, sso = 24, ssc = 25, se = 26, so = 27, sw = 28, sb = 29,
+		sl = 30, sh = 31, sn = 32,
+		w_url = 33, w_email = 34, w_mention = 35, w_hashtag = 36, w_serial = 37,
+		jks = 38, jkc = 39, jkg = 40, jko = 41, jkb = 42, jkv = 43, jkq = 44, jx = 45, jc = 46,
+		ep = 47, ef = 48, ec = 49, etn = 50, etm = 51,
+		z_coda = 52,
+		user0 = 53, user1 = 54, user2 = 55, user3 = 56, user4 = 57,
+		p = 58,
+		max = 59,
 		pv = p,
 		pa = (byte)(p + 1),
 		irregular = - 128,
@@ -94,6 +94,7 @@ public class Kiwi implements AutoCloseable  {
 				case se: return "SE";
 				case so: return "SO";
 				case sw: return "SW";
+				case sb: return "SB";
 				case sl: return "SL";
 				case sh: return "SH";
 				case sn: return "SN";

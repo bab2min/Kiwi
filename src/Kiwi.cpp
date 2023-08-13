@@ -730,7 +730,7 @@ namespace kiwi
 			if (tag == POSTag::ssc || c == u'"' || c == u'\'') return false;
 			
 			// 나머지 특수문자는 왼쪽 경계로 처리
-			if (POSTag::sf <= tag && tag <= POSTag::sw) return true;
+			if (POSTag::sf <= tag && tag <= POSTag::sb) return true;
 		}
 		return false;
 	}

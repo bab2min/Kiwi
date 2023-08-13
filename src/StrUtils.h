@@ -539,6 +539,7 @@ namespace kiwi
 		if (tagStr == u"SE") return POSTag::se;
 		if (tagStr == u"SO") return POSTag::so;
 		if (tagStr == u"SW") return POSTag::sw;
+		if (tagStr == u"SB") return POSTag::sb;
 		if (tagStr == u"NF") return POSTag::unknown;
 		if (tagStr == u"NV") return POSTag::unknown;
 		if (tagStr == u"NA") return POSTag::unknown;

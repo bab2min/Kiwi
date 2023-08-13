@@ -187,7 +187,7 @@ namespace kiwi
 		ic,
 		xpn, xsn, xsv, xsa, xsm, xr,
 		vcp, vcn,
-		sf, sp, ss, sso, ssc, se, so, sw,
+		sf, sp, ss, sso, ssc, se, so, sw, sb,
 		sl, sh, sn,
 		w_url, w_email, w_mention, w_hashtag, w_serial,
 		jks, jkc, jkg, jko, jkb, jkv, jkq, jx, jc,
