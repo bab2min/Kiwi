@@ -827,18 +827,18 @@ TEST(KiwiCpp, IssueP131_SentenceSplitError)
 	Kiwi& kiwi = reuseKiwiInstance();
 	auto res = kiwi.splitIntoSents(text[0]);
 	EXPECT_EQ(res.size(), 2);
-	EXPECT_EQ(res[0], std::make_pair(0, 7));
-	EXPECT_EQ(res[1], std::make_pair(8, 12));
+	EXPECT_EQ(res[0], std::make_pair((size_t)0, (size_t)7));
+	EXPECT_EQ(res[1], std::make_pair((size_t)8, (size_t)12));
 
 	res = kiwi.splitIntoSents(text[1]);
 	EXPECT_EQ(res.size(), 2);
-	EXPECT_EQ(res[0], std::make_pair(0, 7));
-	EXPECT_EQ(res[1], std::make_pair(8, 12));
+	EXPECT_EQ(res[0], std::make_pair((size_t)0, (size_t)7));
+	EXPECT_EQ(res[1], std::make_pair((size_t)8, (size_t)12));
 
 	res = kiwi.splitIntoSents(text[2]);
 	EXPECT_EQ(res.size(), 2);
-	EXPECT_EQ(res[0], std::make_pair(0, 9));
-	EXPECT_EQ(res[1], std::make_pair(10, 12));
+	EXPECT_EQ(res[0], std::make_pair((size_t)0, (size_t)9));
+	EXPECT_EQ(res[1], std::make_pair((size_t)10, (size_t)12));
 }
 
 TEST(KiwiCpp, AddRule)
