@@ -32,7 +32,7 @@ namespace kiwi
 		setComplex(_complex);
 	}
 
-	DEFINE_SERIALIZER_OUTSIDE(MorphemeRaw, kform, tag, vpPack, combineSocket, combined, userScore, chunks, chunkPositions, lmMorphemeId, groupId);
+	DEFINE_SERIALIZER_OUTSIDE(MorphemeRaw, kform, tag, vpPack, senseId, combineSocket, combined, userScore, chunks, chunkPositions, lmMorphemeId, groupId);
 
 	Morpheme::Morpheme() = default;
 
@@ -110,6 +110,7 @@ namespace kiwi
 		ret.combined = o.combined;
 		ret.userScore = o.userScore;
 		ret.lmMorphemeId = o.lmMorphemeId;
+		ret.senseId = o.senseId;
 		ret.chunks = FixedPairVector<const Morpheme*, std::pair<uint8_t, uint8_t>>{ o.chunks.size() };
 		for (size_t i = 0; i < o.chunks.size(); ++i)
 		{

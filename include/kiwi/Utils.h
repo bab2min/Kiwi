@@ -115,6 +115,7 @@ namespace kiwi
 
 	POSTag identifySpecialChr(char32_t chr);
 	size_t getSSType(char16_t c);
+	size_t getSBType(const std::u16string& form);
 
 	inline bool isSpace(char16_t c)
 	{

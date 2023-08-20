@@ -317,6 +317,9 @@ TEST(KiwiCpp, SentenceBoundaryErrors)
 	Kiwi& kiwi = reuseKiwiInstance();
 
 	for (auto str : {
+		u8"관련 법령 이전에 만들어져 경사로 설치 의무 대상은 아닙니다.",
+		u8"적법절차의 실질적인 내용을 침해하였는지 여부 등에 관하여 충분히 심리하지",
+		u8"2023. 5. 10 주식회사 키위(이하 '회사'라 한다) 대표이사 XXX는 저녁을 직원들에게 사주었다.",
 		u8"실패할까봐",
 		u8"집에 갈까 봐요",
 		u8"너무 낮지 싶어요",
@@ -333,6 +336,7 @@ TEST(KiwiCpp, SentenceBoundaryErrors)
 		u8"2017.12.11. 1차 심의결과가 종합적 검토를 위해 보류로 의결됨",
 		u8"짤막 T.M.I : 이 그릴이 4천만원......",
 		u8"Dr. Octo가 진행한다.",
+		u8"지도부가 어떻게 구성되느냐에 따라",
 		u8"좋겠다하는데",
 		u8"최다 우승팀이 되었다(3번 우승).",
 		u8"최고 기록이었다.[4][5]",
@@ -351,6 +355,88 @@ TEST(KiwiCpp, SentenceBoundaryErrors)
 				std::cerr << std::string{ &str[r.first], r.second - r.first } << std::endl;
 			}
 			std::cerr << std::endl;
+		}
+	}
+}
+
+TEST(KiwiCpp, SentenceBoundaryWithOrderedBullet)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+
+	for (auto str : {
+		u"가. 스카이 초이스는 편당 요금을 지불",
+		u"나. 스카이 초이스는 편당 요금을 지불",
+		u"다. 스카이 초이스는 편당 요금을 지불",
+		u"라. 스카이 초이스는 편당 요금을 지불",
+		u"ㄱ. 스카이 초이스는 편당 요금을 지불",
+		u"ㄴ. 스카이 초이스는 편당 요금을 지불",
+		u"가) 스카이 초이스는 편당 요금을 지불",
+		u"나) 스카이 초이스는 편당 요금을 지불",
+		u"1) 스카이 초이스는 편당 요금을 지불",
+		u"2) 스카이 초이스는 편당 요금을 지불",
+		u"ㄱ) 스카이 초이스는 편당 요금을 지불",
+		u"ㄴ) 스카이 초이스는 편당 요금을 지불",
+		})
+	{
+		TokenResult res;
+		std::vector<std::pair<size_t, size_t>> sentRanges = kiwi.splitIntoSents(str, Match::allWithNormalizing, &res);
+		EXPECT_EQ(res.first[0].tag, POSTag::sb);
+		EXPECT_EQ(sentRanges.size(), 1);
+		if (sentRanges.size() > 1)
+		{
+			for (auto& r : sentRanges)
+			{
+				std::cerr << std::u16string{ &str[r.first], r.second - r.first } << std::endl;
+			}
+			std::cerr << std::endl;
+		}
+	}
+
+	for (auto str : {
+		u"집에가.",
+		u"하지마.",
+		u"이거사.",
+		u"민철아.",
+		u"자자.",
+		u"따뜻한 차.",
+		u"(집에가)",
+		u"(하지마)",
+		u"(이거사)",
+		u"(민철아)",
+		u"(자자)",
+		u"(따뜻한 차)",
+	})
+	{
+		auto tokens = kiwi.analyze(str, Match::allWithNormalizing).first;
+		EXPECT_NE(tokens.back().tag, POSTag::sb);
+	}
+
+	for (auto str : {
+		u"가. 편당 요금을 지불한다.  나. 편당 요금을 지불한다.  다. 편당 요금을 지불한다.",
+		u"가) 편당 요금을 지불한다.  나) 편당 요금을 지불한다.  다) 편당 요금을 지불한다.",
+		u"1) 편당 요금을 지불한다.  2) 편당 요금을 지불한다.  3) 편당 요금을 지불한다.",
+		u"가. 편당 요금을 지불한다  나. 편당 요금을 지불한다  다. 편당 요금을 지불한다",
+		u"가) 편당 요금을 지불한다  나) 편당 요금을 지불한다  다) 편당 요금을 지불한다",
+		//u"1) 편당 요금을 지불한다  2) 편당 요금을 지불한다  3) 편당 요금을 지불한다",
+		u"가. 편당 요금을 지불  나. 편당 요금을 지불  다. 편당 요금을 지불",
+		u"가) 편당 요금을 지불  나) 편당 요금을 지불  다) 편당 요금을 지불",
+		u"1) 편당 요금을 지불  2) 편당 요금을 지불  3) 편당 요금을 지불",
+	})
+	{
+		auto res = kiwi.analyze(str, 5, Match::allWithNormalizing);
+		auto& tokens = res[0].first;
+		std::vector<size_t> sb;
+		for (auto& t : tokens)
+		{
+			if (t.tag == POSTag::sb) sb.emplace_back(&t - tokens.data());
+		}
+		EXPECT_EQ(sb.size(), 3);
+		
+		if (sb.size() == 3)
+		{
+			EXPECT_EQ(tokens[sb[0]].pairedToken, sb[1]);
+			EXPECT_EQ(tokens[sb[1]].pairedToken, sb[2]);
+			EXPECT_EQ(tokens[sb[2]].pairedToken, (uint32_t)-1);
 		}
 	}
 }
@@ -694,9 +780,6 @@ TEST(KiwiCpp, Issue71_SentenceSplit_u16)
 	EXPECT_EQ(sents[3], u"다만 역시 토끼정 본점 답죠?ㅎㅅㅎ");
 	EXPECT_EQ(sents[4], u"그 맛이 크으..");
 	EXPECT_EQ(sents[5], u"아주 맛있었음...! ^^");
-
-	sentRanges = kiwi.splitIntoSents(u"지도부가 어떻게 구성되느냐에 따라");
-	EXPECT_EQ(sentRanges.size(), 1);
 }
 
 TEST(KiwiCpp, Issue71_SentenceSplit_u8)

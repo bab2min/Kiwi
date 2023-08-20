@@ -50,6 +50,7 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 		CondVowel cvowel = CondVowel::none;
 		CondPolarity cpolar = CondPolarity::none;
 		bool complex = false;
+		uint8_t senseId = 0;
 		KString origForm, groupForm;
 		int addAlias = 0;
 		size_t origMorphId = 0;
@@ -62,13 +63,14 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 			CondVowel _cvowel = CondVowel::none,
 			CondPolarity _cpolar = CondPolarity::none,
 			bool _complex = false,
+			uint8_t _senseId = 0,
 			const KString& _origForm = {},
 			const KString& _groupForm = {},
 			int _addAlias = 0,
 			size_t _origMorphId = 0,
 			size_t _groupPriority = 0
 		) :
-			form{ _form }, weight{ _weight }, tag{ _tag }, origTag{ _origTag }, cvowel{ _cvowel }, cpolar{ _cpolar }, complex{ _complex },
+			form{ _form }, weight{ _weight }, tag{ _tag }, origTag{ _origTag }, cvowel{ _cvowel }, cpolar{ _cpolar }, complex{ _complex }, senseId{ _senseId },
 			origForm{ _origForm }, groupForm{ _groupForm }, addAlias{ _addAlias }, origMorphId{ _origMorphId }, groupPriority{ _groupPriority }
 		{
 		}
@@ -80,7 +82,7 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 	MorphemeMap morphMap;
 	UnorderedMap<pair<KString, POSTag>, size_t> groupMap;
 
-	const auto& insertMorph = [&](KString&& form, float score, POSTag tag, CondVowel cvowel, CondPolarity cpolar, bool complex, size_t origMorphemeId = 0, size_t groupId = 0)
+	const auto& insertMorph = [&](KString&& form, float score, POSTag tag, CondVowel cvowel, CondPolarity cpolar, bool complex, uint8_t senseId, size_t origMorphemeId = 0, size_t groupId = 0)
 	{
 		auto& fm = addForm(form);
 		bool unified = false;
@@ -126,6 +128,7 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 			morphemes.back().userScore = score;
 			morphemes.back().lmMorphemeId = origMorphemeId;
 			morphemes.back().groupId = groupId;
+			morphemes.back().senseId = senseId;
 			return mid;
 		}
 	};
@@ -160,6 +163,7 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 		POSTag origTag = tag;
 		int addAlias = 0;
 		size_t groupPriority = 0;
+		uint8_t senseId = 0;
 		if (fields.size() > 3)
 		{
 			for (size_t i = 3; i < fields.size(); ++i)
@@ -260,6 +264,10 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 						groupPriority = stol(s.begin(), s.end());
 					}
 				}
+				else if (f[0] == '.')
+				{
+					senseId = stol(f.begin() + 1, f.end());
+				}
 				else
 				{
 					throw Exception{ "wrong line: " + line };
@@ -272,14 +280,14 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 			// groupId 삽입용 long tail에 대해서
 			if (form != groupForm)
 			{
-				longTails.emplace_back(form, 0, tag, POSTag::unknown, cvowel, cpolar, complex, u"", groupForm, 0, 0, groupPriority);
+				longTails.emplace_back(form, 0, tag, POSTag::unknown, cvowel, cpolar, complex, senseId, u"", groupForm, 0, 0, groupPriority);
 			}
 
-			insertMorph(move(form), morphWeight, tag, cvowel, cpolar, complex);
+			insertMorph(move(form), morphWeight, tag, cvowel, cpolar, complex, senseId);
 		}
 		else
 		{
-			longTails.emplace_back(form, altWeight < 0 ? altWeight : morphWeight, tag, origTag, cvowel, cpolar, complex, origMorphemeOfAlias, groupForm, addAlias, 0, groupPriority);
+			longTails.emplace_back(form, altWeight < 0 ? altWeight : morphWeight, tag, origTag, cvowel, cpolar, complex, senseId, origMorphemeOfAlias, groupForm, addAlias, 0, groupPriority);
 			longTailWeights[tag] += morphWeight;
 		}
 		
@@ -344,6 +352,7 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 					p.cvowel, 
 					p.cpolar, 
 					p.complex, 
+					p.senseId,
 					getDefaultMorphemeId(p.tag), 
 					groupId
 				);
@@ -358,7 +367,7 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 				float score = log(normalized);
 				if (p.addAlias > 1) score = 0;
 				else if (p.weight < 0) score = p.weight;
-				insertMorph(move(p.form), score, p.tag, p.cvowel, p.cpolar, p.complex, p.origMorphId, groupId);
+				insertMorph(move(p.form), score, p.tag, p.cvowel, p.cpolar, p.complex, p.senseId, p.origMorphId, groupId);
 			}
 			else
 			{
@@ -825,7 +834,7 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 	auto sbgTokenFilter = [&](size_t a)
 	{
 		auto tag = morphemes[a].tag;
-		if (isEClass(tag) || isJClass(tag)) return false;
+		if (isEClass(tag) || isJClass(tag) || tag == POSTag::sb) return false;
 		if (tag == POSTag::vcp || tag == POSTag::vcn) return false;
 		if (isVerbClass(tag) && forms[morphemes[a].kform].form == u"하") return false;
 		return true;
