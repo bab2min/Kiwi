@@ -322,6 +322,8 @@ namespace kiwi
 		{
 			return !operator==(o);
 		}
+
+		uint32_t endPos() const { return position + length; }
 	};
 
 	struct BasicToken
