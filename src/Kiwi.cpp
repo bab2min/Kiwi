@@ -482,15 +482,32 @@ namespace kiwi
 			auto& t = tokens[i];
 			if ((i >= nestedEnd) && sp.next(t, nlPos, nestedSentEnd && i == nestedSentEnd))
 			{
+				bool includePrevToken = i > 1 && 
+					(tokens[i - 1].tag == POSTag::so 
+						|| tokens[i - 1].tag == POSTag::sw 
+						|| tokens[i - 1].tag == POSTag::sp 
+						|| tokens[i - 1].tag == POSTag::se)
+					&& tokens[i - 1].endPos() == tokens[i].position
+					&& tokens[i - 1].position > tokens[i - 2].endPos();
 				if (nestedSentEnd)
 				{
 					subSentPos++;
 					accumSubSent++;
+					if (includePrevToken)
+					{
+						tokens[i - 1].subSentPosition = subSentPos;
+					}
 				}
 				else
 				{
 					sentPos++;
 					accumSubSent = 1;
+					if (includePrevToken)
+					{
+						tokens[i - 1].sentPosition = sentPos;
+						tokens[i - 1].wordPosition = 0;
+						accumWordPos = 0;
+					}
 				}
 			}
 
