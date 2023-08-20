@@ -1,4 +1,4 @@
-#include <cassert>
+ï»¿#include <cassert>
 #include <kiwi/Utils.h>
 #include "StrUtils.h"
 
@@ -58,12 +58,12 @@ namespace kiwi
 	}
 
 	/**
-	* ¹®ÀÚÀÇ Å¸ÀÔÀ» º¯º°ÇÑ´Ù. Å¸ÀÔ¿¡ µû¶ó ´ÙÀ½ °ªÀ» ¹İÈ¯ÇÑ´Ù.
+	* ë¬¸ìì˜ íƒ€ì…ì„ ë³€ë³„í•œë‹¤. íƒ€ì…ì— ë”°ë¼ ë‹¤ìŒ ê°’ì„ ë°˜í™˜í•œë‹¤.
 	* 
-	* - °ø¹é: POSTag::unknown
-	* - ÇÑ±Û: POSTag::max
-	* - ¼ıÀÚ: POSTag::sn
-	* - ·Î¸¶ÀÚ ¾ËÆÄºª: POSTag::sl
+	* - ê³µë°±: POSTag::unknown
+	* - í•œê¸€: POSTag::max
+	* - ìˆ«ì: POSTag::sn
+	* - ë¡œë§ˆì ì•ŒíŒŒë²³: POSTag::sl
 	* 
 	*/
 	POSTag identifySpecialChr(char32_t chr)
@@ -252,6 +252,42 @@ namespace kiwi
 			return 0;
 		}
 		return 0;
+	}
+
+	size_t getSBType(const std::u16string& form)
+	{
+		size_t format = 0, group = 0;
+		char32_t chr = form[0];
+		if (form.back() == u'.')
+		{
+			format = 1;
+		}
+		else if (form.back() == u')')
+		{
+			if (form[0] == u'(')
+			{
+				chr = form[1];
+				format = 2;
+			}
+			else
+			{
+				format = 3;
+			}
+		}
+		
+		if (u'ê°€' <= chr && chr <= u'í£') group = 1;
+		else if (u'ã„±' <= chr && chr <= u'ã…') group = 2;
+		else if (u'0' <= chr && chr <= u'9') group = 3;
+		else if (u'â… ' <= chr && chr <= u'â…«') group = 4;
+		else if (u'â…°' <= chr && chr <= u'â…»') group = 5;
+		else if (u'â‘ ' <= chr && chr <= u'â‘³') return 24;
+		else if (u'â€' <= chr && chr <= u'â‰') return 24;
+		else if (u'â¶' <= chr && chr <= u'â¿') return 25;
+		else if (u'âŠ' <= chr && chr <= u'â“') return 25;
+		else if (u'â‘´' <= chr && chr <= u'â’‡') return 26;
+		else if (u'â’ˆ' <= chr && chr <= u'â’›') return 27;
+
+		return format | (group << 2);
 	}
 
 	POSTag toPOSTag(const std::u16string& tagStr)

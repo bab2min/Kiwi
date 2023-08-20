@@ -29,6 +29,32 @@ namespace kiwi
 	template<typename K, typename V> using BMap = Map<K, V>;
 #endif
 
+	struct SpecialState
+	{
+		uint8_t singleQuote : 1;
+		uint8_t doubleQuote : 1;
+		uint8_t bulletHash : 6;
+
+		SpecialState() : singleQuote{ 0 }, doubleQuote{ 0 }, bulletHash{ 0 }
+		{
+		}
+
+		operator uint8_t() const
+		{
+			return reinterpret_cast<const uint8_t&>(*this);
+		}
+
+		bool operator<(const SpecialState& o) const
+		{
+			return (uint8_t)(*this) < (uint8_t)o;
+		}
+
+		bool operator==(const SpecialState& o) const
+		{
+			return (uint8_t)(*this) == (uint8_t)o;
+		}
+	};
+
 	class PathEvaluator
 	{
 	public:
@@ -68,8 +94,25 @@ namespace kiwi
 		};
 		using Path = Vector<Result>;
 
+		struct ChunkResult
+		{
+			Path path;
+			float score = 0;
+			SpecialState prevState;
+			SpecialState curState;
+
+			ChunkResult(Path&& _path = {}, float _score = 0, SpecialState _prevState = {}, SpecialState _curState = {})
+				: path{ move(_path) }, score{ _score }, prevState{ _prevState }, curState{ _curState }
+			{}
+
+			ChunkResult(const Path& _path, float _score = 0, SpecialState _prevState = {}, SpecialState _curState = {})
+				: path{ _path }, score{ _score }, prevState{ _prevState }, curState{ _curState }
+			{}
+		};
+
 		template<class LmState>
-		static Vector<std::pair<Path, float>> findBestPath(const Kiwi* kw, 
+		static Vector<ChunkResult> findBestPath(const Kiwi* kw,
+			const Vector<SpecialState>& prevSpStates,
 			const KGraphNode* graph, 
 			const size_t graphSize,
 			size_t topN, 
@@ -207,28 +250,46 @@ namespace kiwi
 	inline void fillPairedTokenInfo(vector<TokenInfo>& tokens)
 	{
 		Vector<pair<uint32_t, uint32_t>> pStack;
+		Vector<pair<uint32_t, uint32_t>> bStack;
 		for (auto& t : tokens)
 		{
-			if (t.tag != POSTag::sso && t.tag != POSTag::ssc) continue;
-			uint32_t i = &t - tokens.data();
-			uint32_t type = getSSType(t.str[0]);
-			if (!type) continue;
+			const uint32_t i = &t - tokens.data();
 			if (t.tag == POSTag::sso)
 			{
+				uint32_t type = getSSType(t.str[0]);
+				if (!type) continue;
 				pStack.emplace_back(i, type);
 			}
 			else if (t.tag == POSTag::ssc)
 			{
-				for (size_t j = 0; j < pStack.size(); ++j)
+				uint32_t type = getSSType(t.str[0]);
+				if (!type) continue;
+				for (auto j = pStack.rbegin(); j != pStack.rend(); ++j)
 				{
-					if (pStack.rbegin()[j].second == type)
-					{
-						t.pairedToken = pStack.rbegin()[j].first;
-						tokens[pStack.rbegin()[j].first].pairedToken = i;
-						pStack.erase(pStack.end() - j - 1, pStack.end());
-						break;
-					}
+					if (j->second != type) continue;
+					t.pairedToken = j->first;
+					tokens[j->first].pairedToken = i;
+					pStack.erase(j.base() - 1, pStack.end());
+					break;
 				}
+			}
+			else if (t.tag == POSTag::sb)
+			{
+				uint32_t type = getSBType(t.str);
+				if (!type) continue;
+				
+				for (auto j = bStack.rbegin(); j != bStack.rend(); ++j)
+				{
+					if (j->second != type) continue;
+					tokens[j->first].pairedToken = i;
+					bStack.erase(j.base() - 1, bStack.end());
+					break;
+				}
+				bStack.emplace_back(i, type);
+			}
+			else
+			{
+				continue;
 			}
 		}
 	}
@@ -550,21 +611,6 @@ namespace kiwi
 
 	using Wid = uint32_t;
 
-	struct SpecialState
-	{
-		uint8_t singleQuote : 4;
-		uint8_t doubleQuote : 4;
-
-		SpecialState() : singleQuote{0}, doubleQuote{0}
-		{
-		}
-
-		operator uint8_t()
-		{
-			return reinterpret_cast<uint8_t&>(*this);
-		}
-	};
-
 	template<class LmState>
 	struct WordLL
 	{
@@ -772,6 +818,11 @@ namespace kiwi
 		return isVerbClass(morph->tag) && morph->kform && !morph->kform->empty() && !isHangulCoda(morph->kform->back());
 	}
 
+	inline uint8_t hashSbTypeOrder(uint8_t type, uint8_t order)
+	{
+		return ((type << 1) ^ (type >> 7) ^ order) % 63 + 1;
+	}
+
 	template<class LmState, class CandTy, class CacheTy>
 	float PathEvaluator::evalPath(const Kiwi* kw, 
 		const KGraphNode* startNode, 
@@ -883,6 +934,8 @@ namespace kiwi
 				estimatedLL += kw->tagScorer.evalLeftBoundary(hasLeftBoundary(node), curMorph->tag);
 
 				auto curMorphSpecialType = kw->determineSpecialMorphType(kw->morphToId(curMorph));
+				auto curMorphSbType = curMorph->tag == POSTag::sb ? getSBType(joinHangul(*curMorph->kform)) : 0;
+				auto curMorphSbOrder = curMorphSbType ? curMorph->senseId : 0;
 				
 				bool vowelE = isEClass(curMorph->tag) && curMorph->kform && hasNoOnset(*curMorph->kform);
 				bool infJ = isInflectendaJ(curMorph);
@@ -940,6 +993,10 @@ namespace kiwi
 								q.accScore -= 2;
 							}
 						}
+						if (curMorphSbType && q.spState.bulletHash == hashSbTypeOrder(curMorphSbType, curMorphSbOrder))
+						{
+							q.accScore += 3;
+						}
 
 						tMax = max(tMax, q.accScore + discountForCombining);
 					}
@@ -957,6 +1014,10 @@ namespace kiwi
 						else if (curMorphSpecialType == Kiwi::SpecialMorph::singleQuoteClose) nCache.back().spState.singleQuote = 0;
 						else if (curMorphSpecialType == Kiwi::SpecialMorph::doubleQuoteOpen) nCache.back().spState.doubleQuote = 1;
 						else if (curMorphSpecialType == Kiwi::SpecialMorph::doubleQuoteClose) nCache.back().spState.doubleQuote = 0;
+						if (curMorphSbType)
+						{
+							nCache.back().spState.bulletHash = hashSbTypeOrder(curMorphSbType, curMorphSbOrder + 1);
+						}
 
 						auto& back = nCache.back();
 						if (curMorph->chunks.empty() || curMorph->complex)
@@ -979,7 +1040,7 @@ namespace kiwi
 
 
 	template<class LmState>
-	inline PathEvaluator::Path generateTokenList(const WordLL<LmState>* result, 
+	inline pair<PathEvaluator::Path, const WordLL<LmState>*> generateTokenList(const WordLL<LmState>* result, 
 		const utils::ContainerSearcher<WordLL<LmState>>& csearcher, 
 		const KGraphNode* graph, 
 		const Vector<U16StringView>& ownFormList,
@@ -1067,11 +1128,12 @@ namespace kiwi
 			}
 			prev = cur;
 		}
-		return ret;
+		return make_pair(ret, steps.back()->parent);
 	}
 
 	template<class LmState>
-	Vector<pair<PathEvaluator::Path, float>> PathEvaluator::findBestPath(const Kiwi* kw, 
+	Vector<PathEvaluator::ChunkResult> PathEvaluator::findBestPath(const Kiwi* kw,
+		const Vector<SpecialState>& prevSpStates,
 		const KGraphNode* graph, 
 		const size_t graphSize,
 		size_t topN, 
@@ -1096,7 +1158,20 @@ namespace kiwi
 		unknownNodeLCands.emplace_back(kw->getDefaultMorpheme(POSTag::nnp));
 
 		// start node
-		cache.front().emplace_back(&kw->morphemes[0], 0.f, 0.f, nullptr, LmState{kw->langMdl}, SpecialState{});
+		if (prevSpStates.empty())
+		{
+			cache.front().emplace_back(&kw->morphemes[0], 0.f, 0.f, nullptr, LmState{ kw->langMdl }, SpecialState{});
+		}
+		else
+		{
+			auto uniqStates = prevSpStates;
+			sort(uniqStates.begin(), uniqStates.end());
+			uniqStates.erase(unique(uniqStates.begin(), uniqStates.end()), uniqStates.end());
+			for (auto& spState : uniqStates)
+			{
+				cache.front().emplace_back(&kw->morphemes[0], 0.f, 0.f, nullptr, LmState{ kw->langMdl }, spState);
+			}
+		}
 
 		// middle nodes
 		for (size_t i = 1; i < graphSize - 1; ++i)
@@ -1232,13 +1307,14 @@ namespace kiwi
 #endif
 
 		utils::ContainerSearcher<WordLL<LmState>> csearcher{ cache };
-		Vector<pair<Path, float>> ret;
+		Vector<ChunkResult> ret;
 		for (size_t i = 0; i < min(topN, cand.size()); ++i)
 		{
-			ret.emplace_back(generateTokenList(
-				&cand[i], csearcher, graph, ownFormList, kw->typoCostWeight, 
+			auto tokens = generateTokenList(
+				&cand[i], csearcher, graph, ownFormList, kw->typoCostWeight,
 				kw->morphemes.data(), langVocabSize
-			), cand[i].accScore);
+			);
+			ret.emplace_back(move(tokens.first), cand[i].accScore, tokens.second->spState, cand[i].spState);
 		}
 		return ret;
 	}
@@ -1356,7 +1432,8 @@ namespace kiwi
 
 	inline void insertPathIntoResults(
 		vector<TokenResult>& ret, 
-		const Vector<std::pair<PathEvaluator::Path, float>>& pathes, 
+		Vector<SpecialState>& spStatesByRet,
+		const Vector<PathEvaluator::ChunkResult>& pathes,
 		size_t topN, 
 		Match matchOptions,
 		bool integrateAllomorph,
@@ -1366,25 +1443,74 @@ namespace kiwi
 		const Vector<uint32_t>& nodeInWhichPretokenized
 	)
 	{
+		Vector<size_t> parentMap;
+
 		if (ret.empty())
 		{
 			ret.resize(pathes.size());
+			spStatesByRet.resize(pathes.size());
+			parentMap.resize(pathes.size());
+			iota(parentMap.begin(), parentMap.end(), 0);
 		}
-		else if (ret.size() < pathes.size())
+		else
 		{
-			while (ret.size() < pathes.size())
+			UnorderedMap<uint8_t, uint32_t> prevParents;
+			Vector<uint8_t> selectedPathes(pathes.size());
+			for (size_t i = 0; i < ret.size(); ++i)
 			{
-				auto b = ret.back();
-				ret.emplace_back(move(b));
+				auto pred = [&](const PathEvaluator::ChunkResult& p)
+				{
+					return p.prevState == spStatesByRet[i];
+				};
+				size_t parent = find_if(pathes.begin() + prevParents[spStatesByRet[i]], pathes.end(), pred) - pathes.begin();
+				if (parent >= pathes.size() && prevParents[spStatesByRet[i]])
+				{
+					parent = find_if(pathes.begin(), pathes.end(), pred) - pathes.begin();
+				}
+
+				parentMap.emplace_back(parent);
+				if (parent < pathes.size())
+				{
+					selectedPathes[parent] = 1;
+					prevParents[spStatesByRet[i]] = parent + 1;
+				}
+			}
+
+			for (size_t i = 0; i < pathes.size(); ++i)
+			{
+				if (selectedPathes[i]) continue;
+				size_t parent = find(spStatesByRet.begin(), spStatesByRet.end(), pathes[i].prevState) - spStatesByRet.begin();
+				
+				if (parent < ret.size())
+				{
+					ret.push_back(ret[parent]);
+					spStatesByRet.push_back(spStatesByRet[parent]);
+					parentMap.emplace_back(i);
+				}
+				else
+				{
+					// Here is unreachable branch in the normal case.
+					throw std::runtime_error{ "" };
+				}
 			}
 		}
 
+		size_t validTarget = 0;
 		for (size_t i = 0; i < ret.size(); ++i)
 		{
-			auto& r = pathes[min(i, pathes.size() - 1)];
-			auto& rarr = ret[i].first;
+			if (parentMap[i] < pathes.size())
+			{
+				if (validTarget != i) ret[validTarget] = move(ret[i]);
+			}
+			else
+			{
+				continue;
+			}
+
+			auto& r = pathes[parentMap[i]];
+			auto& rarr = ret[validTarget].first;
 			const KString* prevMorph = nullptr;
-			for (auto& s : r.first)
+			for (auto& s : r.path)
 			{
 				if (!s.str.empty() && s.str[0] == ' ') continue;
 				u16string joined;
@@ -1432,8 +1558,12 @@ namespace kiwi
 				prevMorph = s.morph->kform;
 			}
 			rarr.erase(joinAffixTokens(rarr.begin(), rarr.end(), matchOptions), rarr.end());
-			ret[i].second += r.second;
+			ret[validTarget].second += r.score;
+			spStatesByRet[validTarget] = r.curState;
+			validTarget++;
 		}
+		ret.erase(ret.begin() + validTarget, ret.end());
+		spStatesByRet.erase(spStatesByRet.begin() + validTarget, spStatesByRet.end());
 	}
 
 	inline void makePretokenizedSpanGroup(
@@ -1641,6 +1771,7 @@ namespace kiwi
 		getWordPositions(wordPositions, str.begin(), str.end());
 		
 		vector<TokenResult> ret;
+		Vector<SpecialState> spStatesByRet;
 		thread_local Vector<KGraphNode> nodes;
 		thread_local Vector<uint32_t> nodeInWhichPretokenized;
 		const auto* pretokenizedFirst = pretokenizedGroup.spans.data();
@@ -1668,8 +1799,9 @@ namespace kiwi
 			if (nodes.size() <= 2) continue;
 			findPretokenizedGroupOfNode(nodeInWhichPretokenized, nodes, pretokenizedPrev, pretokenizedFirst);
 
-			Vector<std::pair<PathEvaluator::Path, float>> res = (*reinterpret_cast<FnFindBestPath>(dfFindBestPath))(
+			Vector<PathEvaluator::ChunkResult> res = (*reinterpret_cast<FnFindBestPath>(dfFindBestPath))(
 				this,
+				spStatesByRet,
 				nodes.data(),
 				nodes.size(),
 				topN,
@@ -1677,7 +1809,7 @@ namespace kiwi
 				!!(matchOptions & Match::splitComplex),
 				blocklist
 			);
-			insertPathIntoResults(ret, res, topN, matchOptions, integrateAllomorph, positionTable, wordPositions, pretokenizedGroup, nodeInWhichPretokenized);
+			insertPathIntoResults(ret, spStatesByRet, res, topN, matchOptions, integrateAllomorph, positionTable, wordPositions, pretokenizedGroup, nodeInWhichPretokenized);
 		}
 		
 		auto newlines = allNewLinePositions(str);

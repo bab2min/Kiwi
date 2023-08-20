@@ -470,8 +470,11 @@ size_t kiwi::splitByTrie(
 		// 문장 종결 지점이 나타나거나 Graph가 너무 길어지면 공백 문자에서 중단
 		if (chrType == POSTag::unknown && ((lastChrType == POSTag::sf && n >= 4) || n > 4096))
 		{
-			lastChrType = chrType;
-			break;
+			if (!isSpace(str[n - 3]) && !isSpace(str[n - 2]))
+			{
+				lastChrType = chrType;
+				break;
+			}
 		}
 
 		// spaceTolerance > 0이면 공백문자를 무시하고 분할 진행
