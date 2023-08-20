@@ -885,6 +885,18 @@ namespace kiwi
 				if (!curMorph->chunks.empty() && !curMorph->complex)
 				{
 					chSize = curMorph->chunks.size();
+					// '하다/하게/하지'가 '다/게/지'로 축약된 경우인데 앞에 공백이 있는 경우는 탐색후보에서 제외
+					if (node->prev && node[-(int)node->prev].endPos < node->startPos
+						&& curMorph->kform
+						&& curMorph->kform->size() == 1
+						&& ((*curMorph->kform)[0] == u'다' || (*curMorph->kform)[0] == u'게' || (*curMorph->kform)[0] == u'지')
+						&& curMorph->chunks[0]->kform
+						&& curMorph->chunks[0]->kform->size() == 1
+						&& (*curMorph->chunks[0]->kform)[0] == u'하')
+					{
+						continue;
+					}
+
 					for (size_t i = 0; i < chSize; ++i)
 					{
 						seq[i] = curMorph->chunks[i]->lmMorphemeId;
