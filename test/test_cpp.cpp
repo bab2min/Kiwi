@@ -410,6 +410,35 @@ TEST(KiwiCpp, SentenceBoundaryWithOrderedBullet)
 		auto tokens = kiwi.analyze(str, Match::allWithNormalizing).first;
 		EXPECT_NE(tokens.back().tag, POSTag::sb);
 	}
+
+	for (auto str : {
+		u"가. 편당 요금을 지불한다.  나. 편당 요금을 지불한다.  다. 편당 요금을 지불한다.",
+		u"가) 편당 요금을 지불한다.  나) 편당 요금을 지불한다.  다) 편당 요금을 지불한다.",
+		u"1) 편당 요금을 지불한다.  2) 편당 요금을 지불한다.  3) 편당 요금을 지불한다.",
+		u"가. 편당 요금을 지불한다  나. 편당 요금을 지불한다  다. 편당 요금을 지불한다",
+		u"가) 편당 요금을 지불한다  나) 편당 요금을 지불한다  다) 편당 요금을 지불한다",
+		u"1) 편당 요금을 지불한다  2) 편당 요금을 지불한다  3) 편당 요금을 지불한다",
+		u"가. 편당 요금을 지불  나. 편당 요금을 지불  다. 편당 요금을 지불",
+		u"가) 편당 요금을 지불  나) 편당 요금을 지불  다) 편당 요금을 지불",
+		u"1) 편당 요금을 지불  2) 편당 요금을 지불  3) 편당 요금을 지불",
+	})
+	{
+		auto res = kiwi.analyze(str, 5, Match::allWithNormalizing);
+		auto& tokens = res[0].first;
+		std::vector<size_t> sb;
+		for (auto& t : tokens)
+		{
+			if (t.tag == POSTag::sb) sb.emplace_back(&t - tokens.data());
+		}
+		EXPECT_EQ(sb.size(), 3);
+		
+		if (sb.size() == 3)
+		{
+			EXPECT_EQ(tokens[sb[0]].pairedToken, sb[1]);
+			EXPECT_EQ(tokens[sb[1]].pairedToken, sb[2]);
+			EXPECT_EQ(tokens[sb[2]].pairedToken, (uint32_t)-1);
+		}
+	}
 }
 
 TEST(KiwiCpp, SplitByPolarity)
