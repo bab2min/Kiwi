@@ -817,6 +817,30 @@ TEST(KiwiCpp, IssueP111_SentenceSplitError)
 	EXPECT_EQ(res.size(), res2.size());
 }
 
+TEST(KiwiCpp, IssueP131_SentenceSplitError)
+{
+	const char16_t* text[] = {
+		u"특파원입니다. --지난",
+		u"특파원입니다.\n--지난",
+		u"특파원입니다.-- 지난",
+	};
+	Kiwi& kiwi = reuseKiwiInstance();
+	auto res = kiwi.splitIntoSents(text[0]);
+	EXPECT_EQ(res.size(), 2);
+	EXPECT_EQ(res[0], std::make_pair((size_t)0, (size_t)7));
+	EXPECT_EQ(res[1], std::make_pair((size_t)8, (size_t)12));
+
+	res = kiwi.splitIntoSents(text[1]);
+	EXPECT_EQ(res.size(), 2);
+	EXPECT_EQ(res[0], std::make_pair((size_t)0, (size_t)7));
+	EXPECT_EQ(res[1], std::make_pair((size_t)8, (size_t)12));
+
+	res = kiwi.splitIntoSents(text[2]);
+	EXPECT_EQ(res.size(), 2);
+	EXPECT_EQ(res[0], std::make_pair((size_t)0, (size_t)9));
+	EXPECT_EQ(res[1], std::make_pair((size_t)10, (size_t)12));
+}
+
 TEST(KiwiCpp, AddRule)
 {
 	Kiwi& okiwi = reuseKiwiInstance();
