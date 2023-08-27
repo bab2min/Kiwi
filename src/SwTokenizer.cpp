@@ -115,6 +115,7 @@ namespace kiwi
 		case POSTag::se:
 		case POSTag::so:
 		case POSTag::sw:
+		case POSTag::sb:
 			return POSTag::sf;
 		case POSTag::jks:
 		case POSTag::jkc:
