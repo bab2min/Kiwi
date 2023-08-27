@@ -367,7 +367,7 @@ public:
 	JMultipleTokenResult analyze2(jni::JRef<JKiwi> _ref, jni::JIterator<std::u16string> texts, uint64_t topN, kiwi::Match matchOption, JMorphemeSet* blocklist, jni::JIterator<jni::JIterator<kiwi::PretokenizedSpan>> pretokenized) const
 	{
 		if (!texts) throw std::bad_optional_access{};
-		return { _ref, std::move(texts), topN, matchOption, blocklist, std::move(pretokenized) };
+		return { _ref, std::move(texts), (size_t)topN, matchOption, blocklist, std::move(pretokenized) };
 	}
 
 	std::vector<Sentence> splitIntoSents(const std::u16string& text, kiwi::Match matchOption, bool returnTokens) const
