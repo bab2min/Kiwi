@@ -5,7 +5,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Scanner;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 public class Kiwi implements AutoCloseable  {
 	private long _inst;
@@ -164,11 +167,64 @@ public class Kiwi implements AutoCloseable  {
 		public float score;
 	}
 
+	public static class FutureTokenResult implements Future<TokenResult[]>, AutoCloseable {
+		private long _inst;
+
+		public FutureTokenResult(long _inst) {
+			this._inst = _inst;
+		}
+
+		public boolean cancel(boolean mayInterruptIfRunning) {
+			return false;
+		}
+
+		public boolean isCancelled() {
+			return false;
+		}
+
+		public native boolean isDone();
+
+		public native TokenResult[] get();
+
+		public TokenResult[] get(long timeout, TimeUnit unit) {
+			// not supported yet
+			return get();
+		}
+
+		protected void finalize() throws Exception {
+			close();
+		}
+
+		public native void close() throws Exception;
+	}
+
+	public static class MultipleTokenResult implements Iterator<TokenResult[]>, AutoCloseable {
+		private long _inst;
+
+		public MultipleTokenResult(long _inst) {
+			this._inst = _inst;
+		}
+
+		public native boolean hasNext();
+		public native TokenResult[] next();
+
+		protected void finalize() throws Exception {
+			close();
+		}
+
+		public boolean isAlive() {
+			return _inst != 0;
+		}
+
+		@Override
+		public native void close() throws Exception;
+	}
+
 	public static class Sentence {
 		public String text;
 		public int start;
 		public int end;
-		public Sentence[] subSents;
+		public Sentence[] subSents; // not supported yet
 		public Token[] tokens;
 
 		public String toString() {
@@ -191,15 +247,12 @@ public class Kiwi implements AutoCloseable  {
 		}
 
 		public JoinableToken(String form, byte tag, boolean inferRegularity) {
-			this.form = form;
-			this.tag = tag;
+			this(form, tag);
 			this.inferRegularity = inferRegularity;
 		}
 
 		public JoinableToken(String form, byte tag, boolean inferRegularity, byte space) {
-			this.form = form;
-			this.tag = tag;
-			this.inferRegularity = inferRegularity;
+			this(form, tag, inferRegularity);
 			this.space = space;
 		}
 
@@ -208,6 +261,77 @@ public class Kiwi implements AutoCloseable  {
 			this.tag = token.tag;
 			this.inferRegularity = false;
 			this.space = 0;
+		}
+	}
+
+	public static class MorphemeSet implements AutoCloseable {
+		private long _inst;
+		private Kiwi kiwi = null;
+
+		public MorphemeSet(long _inst) {
+			this._inst = _inst;
+		}
+
+		public MorphemeSet(Kiwi kiwi) {
+			this.kiwi = kiwi;
+			ctor(kiwi);
+		}
+
+		protected void finalize() throws Exception {
+			close();
+		}
+
+		public boolean isAlive() {
+			return _inst != 0;
+		}
+
+		private native void ctor(Kiwi kiwi);
+
+		@Override
+		public native void close() throws Exception;
+
+		public native int add(String form, byte tag);
+
+		public int add(String form) {
+			return add(form, POSTag.unknown);
+		}
+	}
+
+	public static class BasicToken {
+		public String form;
+		public int begin = -1, end = -1;
+		public byte tag = POSTag.unknown;
+
+		public BasicToken() {
+		}
+
+		public BasicToken(String form, int begin, int end) {
+			this.form = form;
+			this.begin = begin;
+			this.end = end;
+		}
+
+		public BasicToken(String form, int begin, int end, byte tag) {
+			this(form, begin, end);
+			this.tag = tag;
+		}
+	}
+
+	public static class PretokenizedSpan {
+		public int begin = 0, end = 0;
+		public BasicToken[] tokenization = null;
+
+		public PretokenizedSpan() {
+		}
+
+		public PretokenizedSpan(int begin, int end) {
+			this.begin = begin;
+			this.end = end;
+		}
+
+		public PretokenizedSpan(int begin, int end, BasicToken[] tokenization) {
+			this(begin, end);
+			this.tokenization = tokenization;
 		}
 	}
 
@@ -250,11 +374,45 @@ public class Kiwi implements AutoCloseable  {
 		return _inst != 0;
 	}
 
-	public native TokenResult[] analyze(String text, int topN, int matchOption);
+	public native TokenResult[] analyze(String text, int topN, int matchOption, MorphemeSet blocklist, Iterator<PretokenizedSpan> pretokenized);
+	public native FutureTokenResult asyncAnalyze(String text, int topN, int matchOption, MorphemeSet blocklist, Iterator<PretokenizedSpan> pretokenized);
+	public native MultipleTokenResult analyze(Iterator<String> texts, int topN, int matchOption, MorphemeSet blocklist, Iterator<Iterator<PretokenizedSpan>> pretokenized);
 	public native Sentence[] splitIntoSents(String text, int matchOption, boolean returnTokens);
 	public native String join(JoinableToken[] tokens);
 
 	public static native String getVersion();
+
+	public TokenResult[] analyze(String text, int topN, int matchOption, MorphemeSet blocklist) {
+		return analyze(text, topN, matchOption, blocklist, null);
+	}
+
+	public TokenResult[] analyze(String text, int topN, int matchOption) {
+		return analyze(text, topN, matchOption, null);
+	}
+
+	public FutureTokenResult asyncAnalyze(String text, int topN, int matchOption, MorphemeSet blocklist) {
+		return asyncAnalyze(text, topN, matchOption, blocklist, null);
+	}
+
+	public FutureTokenResult asyncAnalyze(String text, int topN, int matchOption) {
+		return asyncAnalyze(text, topN, matchOption, null);
+	}
+
+	public MultipleTokenResult analyze(Iterator<String> texts, int topN, int matchOption, MorphemeSet blocklist) {
+		return analyze(texts, topN, matchOption, blocklist, null);
+	}
+
+	public MultipleTokenResult analyze(Iterator<String> texts, int topN, int matchOption) {
+		return analyze(texts, topN, matchOption, null);
+	}
+
+	public Token[] tokenize(String text, int matchOption, MorphemeSet blocklist, Iterator<PretokenizedSpan> pretokenized) {
+		return analyze(text, 1, matchOption, blocklist, pretokenized)[0].tokens;
+	}
+
+	public Token[] tokenize(String text, int matchOption, MorphemeSet blocklist) {
+		return analyze(text, 1, matchOption, blocklist)[0].tokens;
+	}
 
 	public Token[] tokenize(String text, int matchOption) {
 		return analyze(text, 1, matchOption)[0].tokens;
@@ -262,6 +420,10 @@ public class Kiwi implements AutoCloseable  {
 
 	public Sentence[] splitIntoSents(String text, int matchOption) {
 		return splitIntoSents(text, matchOption, false);
+	}
+
+	public MorphemeSet newMorphemeSet() {
+		return new MorphemeSet(this);
 	}
 
 	public static void loadLibrary() throws SecurityException, UnsatisfiedLinkError, NullPointerException {
