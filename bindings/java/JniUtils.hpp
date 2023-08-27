@@ -47,6 +47,7 @@ namespace jni
 	static constexpr auto svL = "L"sv;
 	static constexpr auto svSC = ";"sv;
 	static constexpr auto svNullTerm = "\x00"sv;
+	static constexpr auto svNotInstanceOf = "Object isn't instance of "sv;
 
 	template<class Func>
 	inline auto handleExc(JNIEnv* env, Func&& func);
@@ -81,6 +82,104 @@ namespace jni
 
 	template<class Ty>
 	jmethodID JObject<Ty>::jInitMethod = nullptr;
+
+	template<class Ty>
+	class JRef
+	{
+	protected:
+		JNIEnv* env;
+		jobject inst;
+	public:
+		JRef(JNIEnv* _env = nullptr, jobject _inst = nullptr)
+			: env{ _env }, inst{ _inst }
+		{}
+
+		JRef(const JRef&) = default;
+		JRef(JRef&&) = default;
+
+		Ty& get();
+		const Ty& get() const;
+
+		bool empty() const { return !inst; }
+		operator bool() const { return !!inst; }
+		operator jobject() const { return inst; }
+
+		Ty* operator->()
+		{
+			return &get();
+		}
+
+		const Ty* operator->() const
+		{
+			return &get();
+		}
+	};
+
+	template<class Ty>
+	class JUniqueGlobalRef : public JRef<Ty>
+	{
+	public:
+		JUniqueGlobalRef()
+		{}
+
+		JUniqueGlobalRef(JRef ref)
+			: JRef{ ref }
+		{
+			inst = env->NewGlobalRef(inst);
+		}
+
+		JUniqueGlobalRef(const JUniqueGlobalRef&) = delete;
+		JUniqueGlobalRef(JUniqueGlobalRef&& o)
+		{
+			std::swap(env, o.env);
+			std::swap(inst, o.inst);
+		}
+
+		JUniqueGlobalRef& operator=(const JUniqueGlobalRef&) = delete;
+		JUniqueGlobalRef& operator=(JUniqueGlobalRef&& o)
+		{
+			std::swap(env, o.env);
+			std::swap(inst, o.inst);
+			return *this;
+		}
+
+		~JUniqueGlobalRef()
+		{
+			if (env && inst)
+			{
+				env->DeleteGlobalRef(inst);
+				env = nullptr;
+				inst = nullptr;
+			}
+		}
+	};
+
+	class JIteratorBase : public JUniqueGlobalRef<int>
+	{
+	public:
+		static inline jclass jClass;
+		static inline jmethodID jHasNext;
+		static inline jmethodID jNext;
+
+		JIteratorBase(JNIEnv* _env, jobject _inst)
+			: JUniqueGlobalRef{ JRef{ _env, _inst } }
+		{}
+	};
+
+	template<class Ty>
+	class JIterator : public JIteratorBase
+	{
+	public:
+		using JIteratorBase::JIteratorBase;
+
+		bool hasNext();
+		Ty next();
+
+		int& get() = delete;
+		const int& get() const = delete;
+		int* operator->() = delete;
+		const int* operator->() const = delete;
+	};
 
 	template<class Ty>
 	struct JClassName
@@ -446,10 +545,18 @@ namespace jni
 
 		CppType fromJava(JNIEnv* env, JniType v)
 		{
-			if (!v) throw std::bad_optional_access{};
+			if (!v)
+			{
+				throw std::bad_optional_access{};
+			}
 			auto* c = env->GetStringUTFChars(v, nullptr);
 			auto size = env->GetStringUTFLength(v);
 			return std::string{ c, c + size };
+		}
+
+		CppType fromJava(JNIEnv* env, jobject v)
+		{
+			return fromJava(env, (jstring)v);
 		}
 
 		JniType toJava(JNIEnv* env, const CppType& v)
@@ -467,10 +574,18 @@ namespace jni
 
 		CppType fromJava(JNIEnv* env, JniType v)
 		{
-			if (!v) throw std::bad_optional_access{};
+			if (!v)
+			{
+				throw std::bad_optional_access{};
+			}
 			auto* c = env->GetStringChars(v, nullptr);
 			auto size = env->GetStringLength(v);
 			return std::u16string{ (const char16_t*)c, (const char16_t*)c + size };
+		}
+
+		CppType fromJava(JNIEnv* env, jobject v)
+		{
+			return fromJava(env, (jstring)v);
 		}
 
 		JniType toJava(JNIEnv* env, const CppType& v)
@@ -488,7 +603,11 @@ namespace jni
 
 		CppType& fromJava(JNIEnv* env, JniType v)
 		{
-			if (!v) throw std::bad_optional_access{};
+			if (!v)
+			{
+				throw std::bad_optional_access{};
+			}
+			if (!env->IsInstanceOf(v, JObject<Ty>::jClass)) throw std::runtime_error{ StringConcat_v<svNotInstanceOf, typeStr, svNullTerm>.data()};
 			auto ptr = (Ty*)env->GetLongField(v, JObject<Ty>::jInstField);
 			if (!ptr) throw std::runtime_error{ "Object is already closed or not initialized." };
 			return *ptr;
@@ -514,6 +633,7 @@ namespace jni
 		CppType fromJava(JNIEnv* env, JniType v)
 		{
 			if (!v) return {};
+			if (!env->IsInstanceOf(v, JObject<Ty>::jClass)) throw std::runtime_error{ StringConcat_v<svNotInstanceOf, typeStr, svNullTerm>.data()};
 			auto ptr = (Ty*)env->GetLongField(v, JObject<Ty>::jInstField);
 			if (!ptr) throw std::runtime_error{ "Object is already closed or not initialized." };
 			return *ptr;
@@ -540,9 +660,28 @@ namespace jni
 		CppType fromJava(JNIEnv* env, JniType v)
 		{
 			if (!v) return nullptr;
+			if (!env->IsInstanceOf(v, JObject<Ty>::jClass)) throw std::runtime_error{ StringConcat_v<svNotInstanceOf, typeStr, svNullTerm>.data()};
 			auto ptr = (Ty*)env->GetLongField(v, JObject<Ty>::jInstField);
 			if (!ptr) throw std::runtime_error{ "Object is already closed or not initialized." };
 			return ptr;
+		}
+	};
+
+	template<class Ty>
+	struct ValueBuilder<JRef<Ty>, std::enable_if_t<std::is_base_of_v<JObject<Ty>, Ty>>>
+	{
+		using CppType = JRef<Ty>;
+		using JniType = jobject;
+		static constexpr auto typeStr = StringConcat_v<svL, jclassName<Ty>, svSC>;
+
+		CppType fromJava(JNIEnv* env, JniType v)
+		{
+			return CppType{ env, v };
+		}
+
+		JniType toJava(JNIEnv* env, CppType&& v)
+		{
+			return (jobject)v;
 		}
 	};
 
@@ -555,7 +694,10 @@ namespace jni
 
 		CppType fromJava(JNIEnv* env, JniType v)
 		{
-			if (!v) throw std::bad_optional_access{};
+			if (!v)
+			{
+				return {};
+			}
 			size_t len = env->GetArrayLength(v);
 			ValueBuilder<Ty> vb;
 			std::vector<Ty> ret;
@@ -631,7 +773,10 @@ namespace jni
 
 		CppType fromJava(JNIEnv* env, JniType v)
 		{
-			if (!v) throw std::bad_optional_access{};
+			if (!v)
+			{
+				throw std::bad_optional_access{};
+			}
 			size_t len = env->GetArrayLength(v);
 			std::vector<Ty> ret(len);
 			if constexpr (sizeof(Ty) == 1)
@@ -699,7 +844,10 @@ namespace jni
 
 		CppType fromJava(JNIEnv* env, JniType v)
 		{
-			if (!v) throw std::bad_optional_access{};
+			if (!v)
+			{
+				throw std::bad_optional_access{};
+			}
 			size_t len = env->GetArrayLength(v);
 			std::vector<char16_t> ret(len);
 			auto ptr = env->GetCharArrayElements(v, nullptr);
@@ -725,7 +873,10 @@ namespace jni
 
 		CppType fromJava(JNIEnv* env, JniType v)
 		{
-			if (!v) throw std::bad_optional_access{};
+			if (!v)
+			{
+				throw std::bad_optional_access{};
+			}
 			size_t len = env->GetArrayLength(v);
 			std::vector<Ty> ret(len);
 			if constexpr (sizeof(Ty) == 4)
@@ -759,6 +910,49 @@ namespace jni
 			}
 		}
 	};
+
+	template<class Ty>
+	struct ValueBuilder<JIterator<Ty>>
+	{
+		using CppType = JIterator<Ty>;
+		using JniType = jobject;
+		static constexpr auto typeStr = "Ljava/util/Iterator;"sv;
+
+		CppType fromJava(JNIEnv* env, JniType v)
+		{
+			if (!v)
+			{
+				return CppType{ env, v };
+			}
+			if (!env->IsInstanceOf(v, JIteratorBase::jClass)) throw std::runtime_error{ StringConcat_v<svNotInstanceOf, typeStr, svNullTerm>.data()};
+			return CppType{ env, v };
+		}
+	};
+
+	template<class Ty>
+	bool JIterator<Ty>::hasNext()
+	{
+		return env->CallBooleanMethod(inst, jHasNext);
+	}
+
+	template<class Ty>
+	Ty JIterator<Ty>::next()
+	{
+		auto ret = env->CallObjectMethod(inst, jNext);
+		return ValueBuilder<Ty>{}.fromJava(env, ret);
+	}
+
+	template<class Ty>
+	Ty& JRef<Ty>::get()
+	{
+		return ValueBuilder<Ty>{}.fromJava(env, inst);
+	}
+
+	template<class Ty>
+	const Ty& JRef<Ty>::get() const
+	{
+		return ValueBuilder<Ty>{}.fromJava(env, inst);
+	}
 
 	template<class Ty>
 	using remove_cvref_t = std::remove_cv_t<std::remove_reference_t<Ty>>;
@@ -937,6 +1131,135 @@ namespace jni
 						else
 						{
 							auto ret = (ptr->*func)(ValueBuilder<remove_cvref_t<Ts>>{}.fromJava(env, args)...);
+							return ValueBuilder<R>{}.toJava(env, std::move(ret));
+						}
+					});
+				};
+			}
+		};
+
+		template <typename R, typename... Ts, class ClsOverride>
+		struct CppWrapperImpl<R(*)(jobject, Ts...), ClsOverride>
+		{
+			using Type = R(*)(jobject, Ts...);
+			using FunctionPointerType = R(*)(jobject, Ts...);
+			using ReturnType = R;
+			using ClassType = std::conditional_t<std::is_same_v<ClsOverride, void>, void, ClsOverride>;
+			using ArgsTuple = std::tuple<Ts...>;
+
+			template <std::size_t N>
+			using Arg = typename std::tuple_element<N, ArgsTuple>::type;
+
+			static const std::size_t nargs{ sizeof...(Ts) };
+
+			static constexpr auto typeStr = StringConcat_v<svLParen, toJniTypeStr<remove_cvref_t<Ts>>..., svRParen, toJniTypeStr<R>>;
+
+			using JniType = ToJniType<R>(*)(JNIEnv*, jobject, ToJniType<remove_cvref_t<Ts>>...);
+
+			template<Type func>
+			static constexpr JniType method()
+			{
+				return [](JNIEnv* env, jobject obj, ToJniType<remove_cvref_t<Ts>>... args) -> ToJniType<R>
+				{
+					return handleExc(env, [&]() -> ToJniType<R>
+					{
+						if constexpr (std::is_same_v<R, void>)
+						{
+							(*func)(obj, ValueBuilder<remove_cvref_t<Ts>>{}.fromJava(env, args)...);
+						}
+						else
+						{
+							auto ret = (*func)(obj, ValueBuilder<remove_cvref_t<Ts>>{}.fromJava(env, args)...);
+							return ValueBuilder<R>{}.toJava(env, std::move(ret));
+						}
+					});
+				};
+			}
+		};
+
+		/* member function pointer */
+		template <typename C, typename R, typename... Ts, class ClsOverride>
+		struct CppWrapperImpl<R(C::*)(JRef<C>, Ts...), ClsOverride>
+		{
+			using Type = R(C::*)(Ts...);
+			using FunctionPointerType = R(*)(C*, JRef<C>, Ts...);
+			using ReturnType = R;
+			using ClassType = std::conditional_t<std::is_same_v<ClsOverride, void>, C, ClsOverride>;;
+			using ArgsTuple = std::tuple<Ts...>;
+
+			template <std::size_t N>
+			using Arg = typename std::tuple_element<N, ArgsTuple>::type;
+
+			static constexpr std::size_t nargs{ sizeof...(Ts) };
+
+			static constexpr auto typeStr = StringConcat_v<svLParen, toJniTypeStr<remove_cvref_t<Ts>>..., svRParen, toJniTypeStr<R>>;
+
+			using JniType = ToJniType<R>(*)(JNIEnv*, jobject, ToJniType<remove_cvref_t<Ts>>...);
+
+			template<Type func>
+			static constexpr JniType method()
+			{
+				static_assert(std::is_base_of_v<JObject<ClassType>, ClassType>, "Only methods of JObject can be registered.");
+
+				return [](JNIEnv* env, jobject obj, ToJniType<remove_cvref_t<Ts>>... args) -> ToJniType<R>
+				{
+					return handleExc(env, [&]() -> ToJniType<R>
+					{
+						auto ptr = (ClassType*)env->GetLongField(obj, JObject<ClassType>::jInstField);
+						if (!ptr) throw std::runtime_error{ "Object is already closed or not initialized." };
+
+						if constexpr (std::is_same_v<R, void>)
+						{
+							(ptr->*func)(JRef<C>{env, obj}, ValueBuilder<remove_cvref_t<Ts>>{}.fromJava(env, args)...);
+						}
+						else
+						{
+							auto ret = (ptr->*func)(JRef<C>{env, obj}, ValueBuilder<remove_cvref_t<Ts>>{}.fromJava(env, args)...);
+							return ValueBuilder<R>{}.toJava(env, std::move(ret));
+						}
+					});
+				};
+			}
+		};
+
+		/* const member function pointer */
+		template <typename C, typename R, typename... Ts, class ClsOverride>
+		struct CppWrapperImpl<R(C::*)(JRef<C>, Ts...) const, ClsOverride>
+		{
+			using Type = R(C::*)(JRef<C>, Ts...) const;
+			using FunctionPointerType = R(*)(C*, JRef<C>, Ts...);
+			using ReturnType = R;
+			using ClassType = std::conditional_t<std::is_same_v<ClsOverride, void>, C, ClsOverride>;;
+			using ArgsTuple = std::tuple<Ts...>;
+
+			template <std::size_t N>
+			using Arg = typename std::tuple_element<N, ArgsTuple>::type;
+
+			static constexpr std::size_t nargs{ sizeof...(Ts) };
+
+			static constexpr auto typeStr = StringConcat_v<svLParen, toJniTypeStr<remove_cvref_t<Ts>>..., svRParen, toJniTypeStr<R>>;
+
+			using JniType = ToJniType<R>(*)(JNIEnv*, jobject, ToJniType<remove_cvref_t<Ts>>...);
+
+			template<Type func>
+			static constexpr JniType method()
+			{
+				static_assert(std::is_base_of_v<JObject<ClassType>, ClassType>, "Only methods of JObject can be registered.");
+
+				return [](JNIEnv* env, jobject obj, ToJniType<remove_cvref_t<Ts>>... args) -> ToJniType<R>
+				{
+					return handleExc(env, [&]() -> ToJniType<R>
+					{
+						auto ptr = (ClassType*)env->GetLongField(obj, JObject<ClassType>::jInstField);
+						if (!ptr) throw std::runtime_error{ "Object is already closed or not initialized." };
+
+						if constexpr (std::is_same_v<R, void>)
+						{
+							(ptr->*func)(JRef<C>{env, obj}, ValueBuilder<remove_cvref_t<Ts>>{}.fromJava(env, args)...);
+						}
+						else
+						{
+							auto ret = (ptr->*func)(JRef<C>{env, obj}, ValueBuilder<remove_cvref_t<Ts>>{}.fromJava(env, args)...);
 							return ValueBuilder<R>{}.toJava(env, std::move(ret));
 						}
 					});
@@ -1185,6 +1508,7 @@ namespace jni
 		CppType fromJava(JNIEnv* env, JniType v)
 		{
 			if (!v) throw std::bad_optional_access{};
+			if (!env->IsInstanceOf(v, DefTy::jClass)) throw std::runtime_error{ StringConcat_v<svNotInstanceOf, jclassName<CppType>, svNullTerm>.data()};
 			CppType ret;
 			if (!getProperties(env, v, ret, std::make_index_sequence<sizeof...(memPtrs)>{}))
 			{
@@ -1365,6 +1689,10 @@ namespace jni
 		{
 			JNIEnv* env;
 			if (vm->GetEnv((void**)&env, javaVersion) != JNI_OK) return -1;
+
+			JIteratorBase::jClass = (jclass)env->NewGlobalRef(env->FindClass("java/util/Iterator"));
+			JIteratorBase::jHasNext = env->GetMethodID(JIteratorBase::jClass, "hasNext", "()Z");
+			JIteratorBase::jNext = env->GetMethodID(JIteratorBase::jClass, "next", "()Ljava/lang/Object;");
 
 			if (!(... && addClass(env, std::forward<Args>(args)))) return -1;
 			return javaVersion;
