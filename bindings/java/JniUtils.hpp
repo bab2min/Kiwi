@@ -122,34 +122,34 @@ namespace jni
 		JUniqueGlobalRef()
 		{}
 
-		JUniqueGlobalRef(JRef ref)
-			: JRef{ ref }
+		JUniqueGlobalRef(JRef<Ty> ref)
+			: JRef<Ty>{ ref }
 		{
-			inst = env->NewGlobalRef(inst);
+			this->inst = this->env->NewGlobalRef(this->inst);
 		}
 
 		JUniqueGlobalRef(const JUniqueGlobalRef&) = delete;
 		JUniqueGlobalRef(JUniqueGlobalRef&& o)
 		{
-			std::swap(env, o.env);
-			std::swap(inst, o.inst);
+			std::swap(this->env, o.env);
+			std::swap(this->inst, o.inst);
 		}
 
 		JUniqueGlobalRef& operator=(const JUniqueGlobalRef&) = delete;
 		JUniqueGlobalRef& operator=(JUniqueGlobalRef&& o)
 		{
-			std::swap(env, o.env);
-			std::swap(inst, o.inst);
+			std::swap(this->env, o.env);
+			std::swap(this->inst, o.inst);
 			return *this;
 		}
 
 		~JUniqueGlobalRef()
 		{
-			if (env && inst)
+			if (this->env && this->inst)
 			{
-				env->DeleteGlobalRef(inst);
-				env = nullptr;
-				inst = nullptr;
+				this->env->DeleteGlobalRef(this->inst);
+				this->env = nullptr;
+				this->inst = nullptr;
 			}
 		}
 	};
