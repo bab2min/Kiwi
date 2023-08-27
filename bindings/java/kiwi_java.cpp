@@ -65,6 +65,17 @@ static auto gClsAnalyzedMorph = jni::DataClassDefinition<AnalyzedMorph>()
 	.template property<&AnalyzedMorph::start>("start")
 	.template property<&AnalyzedMorph::end>("end");
 
+static auto gClsBasicToken = jni::DataClassDefinition<kiwi::BasicToken>()
+	.template property<&kiwi::BasicToken::form>("form")
+	.template property<&kiwi::BasicToken::begin>("begin")
+	.template property<&kiwi::BasicToken::end>("end")
+	.template property<&kiwi::BasicToken::tag>("tag");
+
+static auto gClsPretokenizedSpan = jni::DataClassDefinition<kiwi::PretokenizedSpan>()
+	.template property<&kiwi::PretokenizedSpan::begin>("begin")
+	.template property<&kiwi::PretokenizedSpan::end>("end")
+	.template property<&kiwi::PretokenizedSpan::tokenization>("tokenization");
+
 namespace jni
 {
 	template<>
@@ -206,7 +217,118 @@ namespace jni
 	struct ValueBuilder<AnalyzedMorph> : public ValueBuilder<decltype(gClsAnalyzedMorph)>
 	{
 	};
+
+	template<>
+	struct JClassName<kiwi::BasicToken>
+	{
+		static constexpr auto value = std::string_view{ "kr/pe/bab2min/Kiwi$BasicToken" };
+	};
+
+	template<>
+	struct ValueBuilder<kiwi::BasicToken> : public ValueBuilder<decltype(gClsBasicToken)>
+	{
+	};
+
+	template<>
+	struct JClassName<kiwi::PretokenizedSpan>
+	{
+		static constexpr auto value = std::string_view{ "kr/pe/bab2min/Kiwi$PretokenizedSpan" };
+	};
+
+	template<>
+	struct ValueBuilder<kiwi::PretokenizedSpan> : public ValueBuilder<decltype(gClsPretokenizedSpan)>
+	{
+	};
 }
+
+class JKiwi;
+
+class JMorphemeSet : jni::JObject<JMorphemeSet>
+{
+public:
+	static constexpr std::string_view className = "kr/pe/bab2min/Kiwi$MorphemeSet";
+
+	kiwi::Kiwi* kiwiObj = nullptr;
+	std::unordered_set<const kiwi::Morpheme*> morphSet;
+
+	JMorphemeSet(JKiwi* _kiwiObj = nullptr);
+
+	int add(const std::u16string& form, kiwi::POSTag tag)
+	{
+		if (!kiwiObj) return -1;
+		auto found = kiwiObj->findMorpheme(form, tag);
+		int added = 0;
+		for(auto& m : found) added += morphSet.emplace(m).second ? 1 : 0;
+		return added;
+	}
+};
+
+class JMultipleTokenResult : jni::JObject<JMultipleTokenResult>
+{
+public:
+	static constexpr std::string_view className = "kr/pe/bab2min/Kiwi$MultipleTokenResult";
+	jni::JUniqueGlobalRef<JKiwi> dp;
+	std::deque<std::future<std::vector<kiwi::TokenResult>>> futures;
+
+	jni::JIterator<std::u16string> texts;
+	size_t topN;
+	kiwi::Match matchOption;
+	JMorphemeSet* blocklist;
+	jni::JIterator<jni::JIterator<kiwi::PretokenizedSpan>> pretokenized;
+
+	JMultipleTokenResult(jni::JUniqueGlobalRef<JKiwi>&& _dp,
+		jni::JIterator<std::u16string> _texts,
+		size_t _topN,
+		kiwi::Match _matchOption,
+		JMorphemeSet* _blocklist,
+		jni::JIterator<jni::JIterator<kiwi::PretokenizedSpan>> _pretokenized
+	);
+	JMultipleTokenResult(JMultipleTokenResult&&) = default;
+	JMultipleTokenResult& operator=(JMultipleTokenResult&&) = default;
+
+	~JMultipleTokenResult()
+	{
+		waitQueue();
+	}
+
+	void waitQueue()
+	{
+		while (!futures.empty())
+		{
+			auto f = std::move(futures.front());
+			futures.pop_front();
+			f.get();
+		}
+	}
+
+	bool feed();
+
+	bool hasNext() const;
+
+	std::vector<kiwi::TokenResult> next();
+};
+
+class JFutureTokenResult : public std::future<std::vector<kiwi::TokenResult>>, jni::JObject<JFutureTokenResult>
+{
+public:
+	static constexpr std::string_view className = "kr/pe/bab2min/Kiwi$FutureTokenResult";
+	jni::JUniqueGlobalRef<JKiwi> dp;
+
+	JFutureTokenResult(jni::JUniqueGlobalRef<JKiwi>&& _dp, std::future<std::vector<kiwi::TokenResult>>&& inst) 
+		: dp{ std::move(_dp) }, future{ std::move(inst) } 
+	{}
+
+	bool isDone() const
+	{
+		using namespace std::chrono_literals;
+		return future::wait_for(1ns) == std::future_status::ready;
+	}
+
+	std::vector<kiwi::TokenResult> get() 
+	{
+		return future::get();
+	}
+};
 
 class JKiwi : public kiwi::Kiwi, jni::JObject<JKiwi>
 {
@@ -216,15 +338,36 @@ public:
 	using kiwi::Kiwi::Kiwi;
 
 	JKiwi(Kiwi&& inst) : Kiwi{ std::move(inst) } {}
-
+	
 	static std::string getVersion()
 	{
 		return KIWI_VERSION_STRING;
 	}
 
-	auto analyze(const std::u16string& text, uint64_t topN, kiwi::Match matchOption) const
+	auto analyze(const std::u16string& text, uint64_t topN, kiwi::Match matchOption, JMorphemeSet* blocklist, jni::JIterator<kiwi::PretokenizedSpan> pretokenized) const
 	{
-		return Kiwi::analyze(text, topN, matchOption);
+		std::vector<kiwi::PretokenizedSpan> pretokenizedSpans;
+		if (pretokenized)
+		{
+			while (pretokenized.hasNext()) pretokenizedSpans.emplace_back(pretokenized.next());
+		}
+		return Kiwi::analyze(text, topN, matchOption, blocklist ? &blocklist->morphSet : nullptr, pretokenizedSpans);
+	}
+
+	JFutureTokenResult asyncAnalyze(jni::JRef<JKiwi> _ref, const std::u16string& text, uint64_t topN, kiwi::Match matchOption, JMorphemeSet* blocklist, jni::JIterator<kiwi::PretokenizedSpan> pretokenized) const
+	{
+		std::vector<kiwi::PretokenizedSpan> pretokenizedSpans;
+		if (pretokenized)
+		{
+			while (pretokenized.hasNext()) pretokenizedSpans.emplace_back(pretokenized.next());
+		}
+		return { _ref, Kiwi::asyncAnalyze(text, topN, matchOption, blocklist ? &blocklist->morphSet : nullptr, pretokenizedSpans) };
+	}
+
+	JMultipleTokenResult analyze2(jni::JRef<JKiwi> _ref, jni::JIterator<std::u16string> texts, uint64_t topN, kiwi::Match matchOption, JMorphemeSet* blocklist, jni::JIterator<jni::JIterator<kiwi::PretokenizedSpan>> pretokenized) const
+	{
+		if (!texts) throw std::bad_optional_access{};
+		return { _ref, std::move(texts), topN, matchOption, blocklist, std::move(pretokenized) };
 	}
 
 	std::vector<Sentence> splitIntoSents(const std::u16string& text, kiwi::Match matchOption, bool returnTokens) const
@@ -279,6 +422,69 @@ public:
 		return joiner.getU16();
 	}
 };
+
+JMorphemeSet::JMorphemeSet(JKiwi* _kiwiObj)
+	: kiwiObj{ _kiwiObj }
+{
+}
+
+JMultipleTokenResult::JMultipleTokenResult(jni::JUniqueGlobalRef<JKiwi>&& _dp,
+	jni::JIterator<std::u16string> _texts,
+	size_t _topN,
+	kiwi::Match _matchOption,
+	JMorphemeSet* _blocklist,
+	jni::JIterator<jni::JIterator<kiwi::PretokenizedSpan>> _pretokenized
+)
+	: dp{ std::move(_dp) },
+	texts{ std::move(_texts) },
+	matchOption{ _matchOption },
+	blocklist{ _blocklist },
+	pretokenized{ std::move(_pretokenized) }
+{
+	for (size_t i = 0; i < dp->getThreadPool()->size(); ++i)
+	{
+		if (!feed()) break;
+	}
+}
+
+bool JMultipleTokenResult::feed()
+{
+	if (!texts.hasNext()) return false;
+	std::vector<kiwi::PretokenizedSpan> pretokenizedSpans;
+
+	if (pretokenized)
+	{
+		if (!pretokenized.hasNext())
+		{
+			throw std::runtime_error{ "The length of `pretokenized` must be equal to `texts`." };
+		}
+
+		auto pt = pretokenized.next();
+		while (pt && pt.hasNext()) pretokenizedSpans.emplace_back(pt.next());
+	}
+
+	futures.emplace_back(static_cast<kiwi::Kiwi&>(dp.get()).asyncAnalyze(
+		texts.next(), 
+		topN, 
+		matchOption, 
+		blocklist ? &blocklist->morphSet : nullptr, 
+		std::move(pretokenizedSpans)
+	));
+	return true;
+}
+
+bool JMultipleTokenResult::hasNext() const
+{
+	return !futures.empty();
+}
+
+std::vector<kiwi::TokenResult> JMultipleTokenResult::next()
+{
+	feed();
+	auto f = std::move(futures.front());
+	futures.pop_front();
+	return f.get();
+}
 
 class JTypoTransformer : public kiwi::TypoTransformer, jni::JObject<JTypoTransformer>
 {
@@ -349,9 +555,23 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved)
 			.template method<&JKiwiBuilder::build>("build")
 			.template method<&JKiwiBuilder::loadDictionary>("loadDictionary"),
 
+		jni::define<JMorphemeSet>()
+			.template ctor<JKiwi*>()
+			.template method<&JMorphemeSet::add>("add"),
+
+		jni::define<JMultipleTokenResult>()
+			.template method<&JMultipleTokenResult::hasNext>("hasNext")
+			.template method<&JMultipleTokenResult::next>("next"),
+
+		jni::define<JFutureTokenResult>()
+			.template method<&JFutureTokenResult::isDone>("isDone")
+			.template method<&JFutureTokenResult::get>("get"),
+
 		jni::define<JKiwi>()
 			.template method<&JKiwi::getVersion>("getVersion")
 			.template method<&JKiwi::analyze>("analyze")
+			.template method<&JKiwi::analyze2>("analyze")
+			.template method<&JKiwi::asyncAnalyze>("asyncAnalyze")
 			.template method<&JKiwi::splitIntoSents>("splitIntoSents")
 			.template method<&JKiwi::join>("join"),
 
@@ -359,7 +579,9 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved)
 		gClsTokenResult,
 		gClsSentence,
 		gClsJoinableToken,
-		gClsAnalyzedMorph
+		gClsAnalyzedMorph,
+		gClsBasicToken,
+		gClsPretokenizedSpan
 	);
 }
 
