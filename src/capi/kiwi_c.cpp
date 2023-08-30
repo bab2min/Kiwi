@@ -44,6 +44,20 @@ struct kiwi_typo : public TypoTransformer
 {
 };
 
+struct kiwi_morphset
+{
+	Kiwi* inst = nullptr;
+	std::unordered_set<const Morpheme*> morphemes;
+
+	kiwi_morphset(Kiwi* _inst) : inst{ _inst }
+	{
+	}
+};
+
+struct kiwi_pretokenized : public std::vector<PretokenizedSpan>
+{
+};
+
 struct kiwi_swtokenizer
 {
 	SwTokenizer tokenizer;
@@ -541,13 +555,13 @@ float kiwi_get_option_f(kiwi_h handle, int option)
 	return KIWIERR_INVALID_INDEX;
 }
 
-kiwi_res_h kiwi_analyze_w(kiwi_h handle, const kchar16_t * text, int topN, int matchOptions)
+kiwi_morphset_h kiwi_new_morphset(kiwi_h handle)
 {
 	if (!handle) return nullptr;
 	Kiwi* kiwi = (Kiwi*)handle;
 	try
 	{
-		return new kiwi_res{ kiwi->analyze((const char16_t*)text, topN, (Match)matchOptions), {} };
+		return new kiwi_morphset{ kiwi };
 	}
 	catch (...)
 	{
@@ -556,13 +570,17 @@ kiwi_res_h kiwi_analyze_w(kiwi_h handle, const kchar16_t * text, int topN, int m
 	}
 }
 
-kiwi_res_h kiwi_analyze(kiwi_h handle, const char * text, int topN, int matchOptions)
+kiwi_res_h kiwi_analyze_w(kiwi_h handle, const kchar16_t * text, int topN, int matchOptions, kiwi_morphset_h blocklilst, kiwi_pretokenized_h pretokenized)
 {
 	if (!handle) return nullptr;
 	Kiwi* kiwi = (Kiwi*)handle;
 	try
 	{
-		return new kiwi_res{ kiwi->analyze(text, topN, (Match)matchOptions),{} };
+		return new kiwi_res{ kiwi->analyze(
+			(const char16_t*)text, topN, (Match)matchOptions, 
+			blocklilst ? &blocklilst->morphemes : nullptr,
+			pretokenized ? *pretokenized : std::vector<PretokenizedSpan>{}
+		), {} };
 	}
 	catch (...)
 	{
@@ -571,7 +589,26 @@ kiwi_res_h kiwi_analyze(kiwi_h handle, const char * text, int topN, int matchOpt
 	}
 }
 
-int kiwi_analyze_mw(kiwi_h handle, kiwi_reader_w_t reader, kiwi_receiver_t receiver, void * userData, int topN, int matchOptions)
+kiwi_res_h kiwi_analyze(kiwi_h handle, const char * text, int topN, int matchOptions, kiwi_morphset_h blocklilst, kiwi_pretokenized_h pretokenized)
+{
+	if (!handle) return nullptr;
+	Kiwi* kiwi = (Kiwi*)handle;
+	try
+	{
+		return new kiwi_res{ kiwi->analyze(
+			text, topN, (Match)matchOptions, 
+			blocklilst ? &blocklilst->morphemes : nullptr,
+			pretokenized ? *pretokenized : std::vector<PretokenizedSpan>{}
+		),{} };
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return nullptr;
+	}
+}
+
+int kiwi_analyze_mw(kiwi_h handle, kiwi_reader_w_t reader, kiwi_receiver_t receiver, void * userData, int topN, int matchOptions, kiwi_morphset_h blocklilst)
 {
 	if (!handle) return KIWIERR_INVALID_HANDLE;
 	Kiwi* kiwi = (Kiwi*)handle;
@@ -589,7 +626,7 @@ int kiwi_analyze_mw(kiwi_h handle, kiwi_reader_w_t reader, kiwi_receiver_t recei
 		{
 			auto result = new kiwi_res{ move(res), {} };
 			(*receiver)(receiver_idx++, result, userData);
-		}, (Match)matchOptions);
+		}, (Match)matchOptions, blocklilst ? &blocklilst->morphemes : nullptr);
 		return reader_idx;
 	}
 	catch (...)
@@ -599,7 +636,7 @@ int kiwi_analyze_mw(kiwi_h handle, kiwi_reader_w_t reader, kiwi_receiver_t recei
 	}
 }
 
-int kiwi_analyze_m(kiwi_h handle, kiwi_reader_t reader, kiwi_receiver_t receiver, void * userData, int topN, int matchOptions)
+int kiwi_analyze_m(kiwi_h handle, kiwi_reader_t reader, kiwi_receiver_t receiver, void * userData, int topN, int matchOptions, kiwi_morphset_h blocklilst)
 {
 	if (!handle) return KIWIERR_INVALID_HANDLE;
 	Kiwi* kiwi = (Kiwi*)handle;
@@ -617,7 +654,7 @@ int kiwi_analyze_m(kiwi_h handle, kiwi_reader_t reader, kiwi_receiver_t receiver
 		{
 			auto result = new kiwi_res{ move(res),{} };
 			(*receiver)(receiver_idx++, result, userData);
-		}, (Match)matchOptions);
+		}, (Match)matchOptions, blocklilst ? &blocklilst->morphemes : nullptr);
 		return reader_idx;
 	}
 	catch (...)
@@ -1145,6 +1182,55 @@ int kiwi_joiner_close(kiwi_joiner_h handle)
 	}
 }
 
+int kiwi_morphset_add(kiwi_morphset_h handle, const char* form, const char* tag)
+{
+	if (!handle) return KIWIERR_INVALID_HANDLE;
+	try
+	{
+		POSTag ptag = tag ? parse_tag(tag) : POSTag::unknown;
+		auto found = handle->inst->findMorpheme(utf8To16(form), ptag);
+		handle->morphemes.insert(found.begin(), found.end());
+		return found.size();
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return KIWIERR_FAIL;
+	}
+}
+
+int kiwi_morphset_add_w(kiwi_morphset_h handle, const kchar16_t* form, const char* tag)
+{
+	if (!handle) return KIWIERR_INVALID_HANDLE;
+	try
+	{
+		POSTag ptag = tag ? parse_tag(tag) : POSTag::unknown;
+		auto found = handle->inst->findMorpheme((const char16_t*)form, ptag);
+		handle->morphemes.insert(found.begin(), found.end());
+		return found.size();
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return KIWIERR_FAIL;
+	}
+}
+
+int kiwi_morphset_close(kiwi_morphset_h handle)
+{
+	if (!handle) return KIWIERR_INVALID_HANDLE;
+	try
+	{
+		delete handle;
+		return 0;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return KIWIERR_FAIL;
+	}
+}
+
 kiwi_swtokenizer_h kiwi_swt_init(const char* path, kiwi_h kiwi)
 {
 	if (!kiwi) return nullptr;
@@ -1247,6 +1333,82 @@ int kiwi_swt_decode(kiwi_swtokenizer_h handle, const int* token_ids, int token_s
 }
 
 int kiwi_swt_close(kiwi_swtokenizer_h handle)
+{
+	if (!handle) return KIWIERR_INVALID_HANDLE;
+	try
+	{
+		delete handle;
+		return 0;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return KIWIERR_FAIL;
+	}
+}
+
+kiwi_pretokenized_h kiwi_pt_init()
+{
+	try
+	{
+		return new kiwi_pretokenized{};
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return nullptr;
+	}
+}
+
+int kiwi_pt_add_span(kiwi_pretokenized_h handle, int begin, int end)
+{
+	if (!handle) return KIWIERR_INVALID_HANDLE;
+	try
+	{
+		if (begin < 0 || end < 0) return KIWIERR_INVALID_INDEX;
+		handle->emplace_back(PretokenizedSpan{ (uint32_t)begin, (uint32_t)end });
+		return handle->size() - 1;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return KIWIERR_FAIL;
+	}
+}
+
+int kiwi_pt_add_token_to_span(kiwi_pretokenized_h handle, int span_id, const char* form, const char* tag, int begin, int end)
+{
+	if (!handle) return KIWIERR_INVALID_HANDLE;
+	try
+	{
+		if (begin < 0 || end < 0 || span_id >= handle->size()) return KIWIERR_INVALID_INDEX;
+		(*handle)[span_id].tokenization.emplace_back(utf8To16(form), begin, end, parse_tag(tag));
+		return 0;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return KIWIERR_FAIL;
+	}
+}
+
+int kiwi_pt_add_token_to_span_w(kiwi_pretokenized_h handle, int span_id, const kchar16_t* form, const char* tag, int begin, int end)
+{
+	if (!handle) return KIWIERR_INVALID_HANDLE;
+	try
+	{
+		if (begin < 0 || end < 0 || span_id >= handle->size()) return KIWIERR_INVALID_INDEX;
+		(*handle)[span_id].tokenization.emplace_back((const char16_t*)form, begin, end, parse_tag(tag));
+		return 0;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return KIWIERR_FAIL;
+	}
+}
+
+int kiwi_pt_close(kiwi_pretokenized_h handle)
 {
 	if (!handle) return KIWIERR_INVALID_HANDLE;
 	try
