@@ -32,23 +32,25 @@ typedef struct kiwi_ws* kiwi_ws_h;
 typedef struct kiwi_ss* kiwi_ss_h;
 typedef struct kiwi_joiner* kiwi_joiner_h;
 typedef struct kiwi_typo* kiwi_typo_h;
+typedef struct kiwi_morphset* kiwi_morphset_h;
+typedef struct kiwi_pretokenized* kiwi_pretokenized_h;
 typedef unsigned short kchar16_t;
 
 typedef struct kiwi_swtokenizer* kiwi_swtokenizer_h;
 
 typedef struct {
-	uint_fast32_t chr_position; /**< 시작 위치(UTF16 문자 기준) */
-	uint_fast32_t word_position; /**< 어절 번호(공백 기준)*/
-	uint_fast32_t sent_position; /**< 문장 번호*/
-	uint_fast32_t line_number; /**< 줄 번호*/
-	uint_fast16_t length; /**< 길이(UTF16 문자 기준) */
-	uint_fast8_t tag; /**< 품사 태그 */
-	uint_fast8_t sense_id; /**< 의미 번호 */
+	uint32_t chr_position; /**< 시작 위치(UTF16 문자 기준) */
+	uint32_t word_position; /**< 어절 번호(공백 기준)*/
+	uint32_t sent_position; /**< 문장 번호*/
+	uint32_t line_number; /**< 줄 번호*/
+	uint16_t length; /**< 길이(UTF16 문자 기준) */
+	uint8_t tag; /**< 품사 태그 */
+	uint8_t sense_id; /**< 의미 번호 */
 	float score; /**< 해당 형태소의 언어모델 점수 */
 	float typo_cost; /**< 오타가 교정된 경우 오타 비용. 그렇지 않은 경우 0 */
-	uint_fast32_t typo_form_id; /**< 교정 전 오타의 형태에 대한 정보 (typoCost가 0인 경우 의미 없음) */
-	uint_fast32_t paired_token; /**< SSO, SSC 태그에 속하는 형태소의 경우 쌍을 이루는 반대쪽 형태소의 위치(-1인 경우 해당하는 형태소가 없는 것을 뜻함) */
-	uint_fast32_t sub_sent_position; /**< 인용부호나 괄호로 둘러싸인 하위 문장의 번호. 1부터 시작. 0인 경우 하위 문장이 아님을 뜻함 */
+	uint32_t typo_form_id; /**< 교정 전 오타의 형태에 대한 정보 (typoCost가 0인 경우 의미 없음) */
+	uint32_t paired_token; /**< SSO, SSC 태그에 속하는 형태소의 경우 쌍을 이루는 반대쪽 형태소의 위치(-1인 경우 해당하는 형태소가 없는 것을 뜻함) */
+	uint32_t sub_sent_position; /**< 인용부호나 괄호로 둘러싸인 하위 문장의 번호. 1부터 시작. 0인 경우 하위 문장이 아님을 뜻함 */
 } kiwi_token_info_t;
 
 /*
@@ -426,17 +428,27 @@ DECL_DLL void kiwi_set_option_f(kiwi_h handle, int option, float value);
 DECL_DLL float kiwi_get_option_f(kiwi_h handle, int option);
 
 /**
+ * @brief 새 형태소집합을 생성합니다. 형태소집합은 kiwi_analyze 함수의 blocklist 등으로 사용될 수 있습니다.
+ * 
+ * @param handle Kiwi.
+ * @return 새 형태소 집합의 핸들. kiwi_morphset_* 함수에 사용가능합니다. 이 핸들은 사용 후 kiwi_morphset_close를 통해 반드시 해제되어야 합니다.
+ */
+DECL_DLL kiwi_morphset_h kiwi_new_morphset(kiwi_h handle);
+
+/**
  * @brief 텍스트를 분석해 형태소 결과를 반환합니다.
  *
  * @param handle Kiwi.
  * @param text 분석할 텍스트 (utf-16).
  * @param top_n 반환할 결과물.
  * @param match_options KIWI_MATCH_ALL 등 KIWI_MATCH_* 열거형 참고.
+ * @param blocklist 분석 후보 탐색 과정에서 blocklist에 포함된 형태소들은 배제됩니다. null 입력 시에는 blocklist를 사용하지 않습니다.
+ * @param pretokenized 입력 텍스트 중 특정 영역의 분석 방법을 강제로 지정합니다. null 입력 시에는 pretokenization을 사용하지 않습니다.
  * @return 형태소 분석 결과의 핸들. kiwi_res_* 함수를 통해 값에 접근가능합니다. 이 핸들은 사용 후 kiwi_res_close를 사용해 반드시 해제되어야 합니다.
  * 
  * @see kiwi_analyze
  */
-DECL_DLL kiwi_res_h kiwi_analyze_w(kiwi_h handle, const kchar16_t* text, int top_n, int match_options);
+DECL_DLL kiwi_res_h kiwi_analyze_w(kiwi_h handle, const kchar16_t* text, int top_n, int match_options, kiwi_morphset_h blocklist, kiwi_pretokenized_h pretokenized);
 
 /**
  * @brief 텍스트를 분석해 형태소 결과를 반환합니다.
@@ -445,11 +457,13 @@ DECL_DLL kiwi_res_h kiwi_analyze_w(kiwi_h handle, const kchar16_t* text, int top
  * @param text 분석할 텍스트 (utf-8).
  * @param top_n 반환할 결과물.
  * @param match_options KIWI_MATCH_ALL 등 KIWI_MATCH_* 열거형 참고.
+ * @param blocklist 분석 후보 탐색 과정에서 blocklist에 포함된 형태소들은 배제됩니다. null 입력 시에는 blocklist를 사용하지 않습니다.
+ * @param pretokenized 입력 텍스트 중 특정 영역의 분석 방법을 강제로 지정합니다. null 입력 시에는 pretokenization을 사용하지 않습니다.
  * @return 형태소 분석 결과의 핸들. kiwi_res_* 함수를 통해 값에 접근가능합니다. 이 핸들은 사용 후 kiwi_res_close를 사용해 반드시 해제되어야 합니다.
  * 
  * @see kiwi_analyze_w
  */
-DECL_DLL kiwi_res_h kiwi_analyze(kiwi_h handle, const char* text, int top_n, int match_options);
+DECL_DLL kiwi_res_h kiwi_analyze(kiwi_h handle, const char* text, int top_n, int match_options, kiwi_morphset_h blocklist, kiwi_pretokenized_h pretokenized);
 
 /**
  * @brief 
@@ -462,7 +476,7 @@ DECL_DLL kiwi_res_h kiwi_analyze(kiwi_h handle, const char* text, int top_n, int
  * @param match_options 
  * @return  
  */
-DECL_DLL int kiwi_analyze_mw(kiwi_h handle, kiwi_reader_w_t reader, kiwi_receiver_t receiver, void* user_data, int top_n, int match_options);
+DECL_DLL int kiwi_analyze_mw(kiwi_h handle, kiwi_reader_w_t reader, kiwi_receiver_t receiver, void* user_data, int top_n, int match_options, kiwi_morphset_h blocklist);
 
 /**
  * @brief 
@@ -475,7 +489,7 @@ DECL_DLL int kiwi_analyze_mw(kiwi_h handle, kiwi_reader_w_t reader, kiwi_receive
  * @param match_options 
  * @return  
  */
-DECL_DLL int kiwi_analyze_m(kiwi_h handle, kiwi_reader_t reader, kiwi_receiver_t receiver, void* user_data, int top_n, int match_options);
+DECL_DLL int kiwi_analyze_m(kiwi_h handle, kiwi_reader_t reader, kiwi_receiver_t receiver, void* user_data, int top_n, int match_options, kiwi_morphset_h blocklist);
 
 /**
  * @brief 텍스트를 문장 단위로 분할합니다.
@@ -806,6 +820,36 @@ DECL_DLL const kchar16_t* kiwi_joiner_get_w(kiwi_joiner_h handle);
 DECL_DLL int kiwi_joiner_close(kiwi_joiner_h handle);
 
 /**
+ * @brief 형태소 집합에 특정 형태소를 삽입합니다.
+ * 
+ * @param handle 형태소 집합의 핸들
+ * @param form 삽입할 형태소의 형태
+ * @param tag 삽입할 형태소의 품사 태그. 만약 이 값을 null로 설정하면 형태가 form과 일치하는 형태소가 품사에 상관없이 모두 삽입됩니다.
+ * @return 집합에 추가된 형태소의 개수를 반환합니다. 만약 form, tag로 지정한 형태소가 없는 경우 0을 반환합니다. 오류 발생 시 음수를 반환합니다.
+ */
+DECL_DLL int kiwi_morphset_add(kiwi_morphset_h handle, const char* form, const char* tag);
+
+/**
+ * @brief 형태소 집합에 특정 형태소를 삽입합니다.
+ *
+ * @param handle 형태소 집합의 핸들
+ * @param form 삽입할 형태소의 형태
+ * @param tag 삽입할 형태소의 품사 태그. 만약 이 값을 null로 설정하면 형태가 form과 일치하는 형태소가 품사에 상관없이 모두 삽입됩니다.
+ * @return 집합에 추가된 형태소의 개수를 반환합니다. 만약 form, tag로 지정한 형태소가 없는 경우 0을 반환합니다. 오류 발생 시 음수를 반환합니다.
+ */
+DECL_DLL int kiwi_morphset_add_w(kiwi_morphset_h handle, const kchar16_t* form, const char* tag);
+
+/**
+ * @brief 사용이 완료된 형태소 집합 객체를 해제합니다.
+ *
+ * @param handle 해제할 형태소 집합의 핸들
+ * @return 성공시 0을 반환합니다. 실패시 0이 아닌 값을 반환합니다.
+ *
+ * @note kiwi_new_morphset 함수에서 반환된 kiwi_morphset_h는 반드시 이 함수로 해제되어야 합니다.
+ */
+DECL_DLL int kiwi_morphset_close(kiwi_morphset_h handle);
+
+/**
  * @brief 새로운 SwTokenizer 객체를 생성합니다.
  * 
  * @param path 읽어들일 json 파일의 경로
@@ -883,6 +927,71 @@ DECL_DLL int kiwi_swt_decode(kiwi_swtokenizer_h handle, const int* token_ids, in
  * @note kiwi_swt_init
  */
 DECL_DLL int kiwi_swt_close(kiwi_swtokenizer_h handle);
+
+/**
+ * @brief 새로운 Pretokenzation 객체를 생성합니다.
+ *
+ * @return 성공 시 Pretokenzation의 핸들을 반환합니다. 실패 시 null를 반환합니다.
+ *
+ * @note 이 객체는 kiwi_analyze 계열 함수의 `pretokenized` 인자로 사용됩니다.
+ */
+DECL_DLL kiwi_pretokenized_h kiwi_pt_init();
+
+/**
+ * @brief Pretokenization 객체에 새 구간을 추가합니다.
+ *
+ * @param handle Pretokenization의 핸들
+ * @param begin 구간의 시작 지점
+ * @param end 구간의 끝 지점
+ * @return 성공 시 새 구간의 id, 실패시 음수를 반환합니다.
+ * 
+ * @note begin, end로 지정하는 시작/끝 지점의 단위는 이 객체가 kiwi_analyze에 사용되는지, kiwi_analyze_w에 사용되는지에 따라 달라집니다.
+ *     kiwi_analyze에 사용되는 경우 utf-8 문자열의 바이트 단위에 따라 시작/끝 지점이 처리되고,
+ *     kiwi_analyze_w에 사용되는 경우 utf-16 문자열의 글자 단위에 따라 시작/끝 지점이 처리됩니다.
+ * 
+ * @see kiwi_analyze, kiwi_analyze_w
+ */
+DECL_DLL int kiwi_pt_add_span(kiwi_pretokenized_h handle, int begin, int end);
+
+/**
+ * @brief Pretokenization 객체의 구간에 새 분석 결과를 추가합니다.
+ *
+ * @param handle Pretokenization의 핸들
+ * @param span_id 구간의 id
+ * @param form 분석 결과의 형태
+ * @param tag 분석 결과의 품사 태그
+ * @param begin 분석 결과의 시작 지점
+ * @param end 분석 결와의 끝 지점
+ * @return 성공 시 0, 실패 시 0이 아닌 값을 반환합니다.
+ *
+ * @note begin, end로 지정하는 시작/끝 지점의 단위는 kiwi_pt_add_span와 마찬가지로 Pretokenization객체가 사용되는 곳이 kiwi_analyze인지 kiwi_analyze_w인지에 따라 달라집니다.
+ */
+DECL_DLL int kiwi_pt_add_token_to_span(kiwi_pretokenized_h handle, int span_id, const char* form, const char* tag, int begin, int end);
+
+/**
+ * @brief Pretokenization 객체의 구간에 새 분석 결과를 추가합니다.
+ *
+ * @param handle Pretokenization의 핸들
+ * @param span_id 구간의 id
+ * @param form 분석 결과의 형태
+ * @param tag 분석 결과의 품사 태그
+ * @param begin 분석 결과의 시작 지점
+ * @param end 분석 결와의 끝 지점
+ * @return 성공 시 0, 실패 시 0이 아닌 값을 반환합니다.
+ *
+ * @note begin, end로 지정하는 시작/끝 지점의 단위는 kiwi_pt_add_span와 마찬가지로 Pretokenization객체가 사용되는 곳이 kiwi_analyze인지 kiwi_analyze_w인지에 따라 달라집니다.
+ */
+DECL_DLL int kiwi_pt_add_token_to_span_w(kiwi_pretokenized_h handle, int span_id, const kchar16_t* form, const char* tag, int begin, int end);
+
+/**
+ * @brief 사용이 끝난 Pretokenzation 객체를 해제합니다.
+ *
+ * @param handle 해제할 Pretokenzation의 핸들
+ * @return 성공 시 0, 실패 시 0이 아닌 값을 반환합니다.
+ *
+ * @note kiwi_pt_init
+ */
+DECL_DLL int kiwi_pt_close(kiwi_pretokenized_h handle);
 
 #ifdef __cplusplus  
 }
