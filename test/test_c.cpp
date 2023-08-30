@@ -35,7 +35,7 @@ TEST(KiwiC, BuilderAddWords)
 	EXPECT_NE(kw, nullptr);
 	EXPECT_EQ(kiwi_builder_close(kb), 0);
 	
-	kiwi_res_h res = kiwi_analyze(kw, KWORD8, 1, KIWI_MATCH_ALL);
+	kiwi_res_h res = kiwi_analyze(kw, KWORD8, 1, KIWI_MATCH_ALL, nullptr, nullptr);
 	EXPECT_NE(res, nullptr);
 	const char* word = kiwi_res_form(res, 0, 0);
 	EXPECT_NE(word, nullptr);
@@ -64,7 +64,7 @@ TEST(KiwiC, AnalyzeMultithread)
 	auto data = loadTestCorpus();
 	kiwi_h kw = kiwi_init(MODEL_PATH, 2, KIWI_BUILD_DEFAULT);
 	EXPECT_NE(kw, nullptr);
-	EXPECT_EQ(kiwi_analyze_m(kw, mt_reader, mt_receiver, &data, 1, KIWI_MATCH_ALL), data.size());
+	EXPECT_EQ(kiwi_analyze_m(kw, mt_reader, mt_receiver, &data, 1, KIWI_MATCH_ALL, nullptr), data.size());
 	EXPECT_EQ(kiwi_close(kw), 0);
 }
 
@@ -139,7 +139,7 @@ int kb_replacer(const char* input, int size, char* output, void* user_data)
 TEST(KiwiC, AddRule)
 {
 	kiwi_h okw = reuse_kiwi_instance();
-	kiwi_res_h ores = kiwi_analyze(okw, u8"했어요! 하잖아요! 할까요? 좋아요!", 1, KIWI_MATCH_ALL_WITH_NORMALIZING);
+	kiwi_res_h ores = kiwi_analyze(okw, u8"했어요! 하잖아요! 할까요? 좋아요!", 1, KIWI_MATCH_ALL_WITH_NORMALIZING, nullptr, nullptr);
 
 	{
 		kiwi_builder_h kb = kiwi_builder_init(MODEL_PATH, 0, KIWI_BUILD_DEFAULT & ~KIWI_BUILD_LOAD_TYPO_DICT);
@@ -147,7 +147,7 @@ TEST(KiwiC, AddRule)
 		EXPECT_GT(kiwi_builder_add_rule(kb, "ef", kb_replacer, nullptr, 0), 0);
 		
 		kiwi_h kw = kiwi_builder_build(kb, nullptr, 0);
-		kiwi_res_h res = kiwi_analyze(kw, u8"했어용! 하잖아용! 할까용? 좋아용!", 1, KIWI_MATCH_ALL_WITH_NORMALIZING);
+		kiwi_res_h res = kiwi_analyze(kw, u8"했어용! 하잖아용! 할까용? 좋아용!", 1, KIWI_MATCH_ALL_WITH_NORMALIZING, nullptr, nullptr);
 		EXPECT_EQ(kiwi_res_prob(ores, 0), kiwi_res_prob(res, 0));
 		kiwi_res_close(res);
 		kiwi_close(kw);
@@ -160,7 +160,7 @@ TEST(KiwiC, AddRule)
 		EXPECT_GT(kiwi_builder_add_rule(kb, "ef", kb_replacer, nullptr, -1), 0);
 
 		kiwi_h kw = kiwi_builder_build(kb, nullptr, 0);
-		kiwi_res_h res = kiwi_analyze(kw, u8"했어용! 하잖아용! 할까용? 좋아용!", 1, KIWI_MATCH_ALL_WITH_NORMALIZING);
+		kiwi_res_h res = kiwi_analyze(kw, u8"했어용! 하잖아용! 할까용? 좋아용!", 1, KIWI_MATCH_ALL_WITH_NORMALIZING, nullptr, nullptr);
 		EXPECT_FLOAT_EQ(kiwi_res_prob(ores, 0) - 4, kiwi_res_prob(res, 0));
 		kiwi_res_close(res);
 		kiwi_close(kw);
@@ -186,7 +186,7 @@ TEST(KiwiC, AddPreAnalyzedWord)
 	EXPECT_EQ(kiwi_builder_add_pre_analyzed_word(kb, u8"팅겼어", 3, morphs, pos, 0, nullptr), 0);
 
 	kiwi_h kw = kiwi_builder_build(kb, nullptr, 0);
-	kiwi_res_h res = kiwi_analyze(kw, u8"팅겼어...", 1, KIWI_MATCH_ALL_WITH_NORMALIZING);
+	kiwi_res_h res = kiwi_analyze(kw, u8"팅겼어...", 1, KIWI_MATCH_ALL_WITH_NORMALIZING, nullptr, nullptr);
 	
 	ASSERT_GE(kiwi_res_word_num(res, 0), 4);
 	EXPECT_STREQ(kiwi_res_form(res, 0, 0), u8"팅기");
@@ -240,7 +240,7 @@ TEST(KiwiC, Joiner)
 TEST(KiwiC, Regularity)
 {
 	kiwi_h okw = reuse_kiwi_instance();
-	kiwi_res_h r = kiwi_analyze(okw, "걷었다", 1, KIWI_MATCH_ALL_WITH_NORMALIZING);
+	kiwi_res_h r = kiwi_analyze(okw, "걷었다", 1, KIWI_MATCH_ALL_WITH_NORMALIZING, nullptr, nullptr);
 
 	EXPECT_STREQ(kiwi_res_tag(r, 0, 0), "VV-R");
 
@@ -257,8 +257,8 @@ TEST(KiwiC, AnalyzeBasicTypoSet)
 	kiwi_res_h o, c;
 	for (const char* s : { u8"외않됀데?", u8"나 죰 도와죠.", u8"잘했따", u8"외구거 공부", u8"맗은 믈을 마셧다!" })
 	{
-		o = kiwi_analyze(okw, s, 1, KIWI_MATCH_ALL_WITH_NORMALIZING);
-		c = kiwi_analyze(typo_kw, s, 1, KIWI_MATCH_ALL_WITH_NORMALIZING);
+		o = kiwi_analyze(okw, s, 1, KIWI_MATCH_ALL_WITH_NORMALIZING, nullptr, nullptr);
+		c = kiwi_analyze(typo_kw, s, 1, KIWI_MATCH_ALL_WITH_NORMALIZING, nullptr, nullptr);
 		EXPECT_TRUE(kiwi_res_prob(o, 0) < kiwi_res_prob(c, 0));
 		EXPECT_EQ(kiwi_res_close(o), 0);
 		EXPECT_EQ(kiwi_res_close(c), 0);
@@ -301,4 +301,92 @@ TEST(KiwiC, Tokenizer)
 	
 
 	EXPECT_EQ(kiwi_swt_close(swt), 0);
+}
+
+TEST(KiwiC, Blocklist)
+{
+	kiwi_h okw = reuse_kiwi_instance();
+	auto str = u"좋아하다.";
+	{
+		kiwi_res_h o = kiwi_analyze_w(okw, (const kchar16_t*)str, 1, KIWI_MATCH_ALL_WITH_NORMALIZING, nullptr, nullptr);
+		EXPECT_EQ((const char16_t*)kiwi_res_form_w(o, 0, 0), std::u16string{ u"좋아하" });
+		EXPECT_EQ(kiwi_res_close(o), 0);
+	}
+
+	{
+		kiwi_morphset_h ms = kiwi_new_morphset(okw);
+		EXPECT_GT(kiwi_morphset_add_w(ms, (const kchar16_t*)u"좋아하", nullptr), 0);
+		kiwi_res_h o = kiwi_analyze_w(okw, (const kchar16_t*)str, 1, KIWI_MATCH_ALL_WITH_NORMALIZING, ms, nullptr);
+		EXPECT_EQ((const char16_t*)kiwi_res_form_w(o, 0, 0), std::u16string{ u"좋" });
+		EXPECT_EQ(kiwi_res_close(o), 0);
+		EXPECT_EQ(kiwi_morphset_close(ms), 0);
+	}
+}
+
+TEST(KiwiC, Pretokenized)
+{
+	kiwi_h okw = reuse_kiwi_instance();
+	auto str = u"드디어패트와 매트가 2017년에 국내 개봉했다. 패트와매트는 2016년...";
+	auto u8str = u8"드디어패트와 매트가 2017년에 국내 개봉했다. 패트와매트는 2016년...";
+
+	{
+		auto pretokenized = kiwi_pt_init();
+		EXPECT_EQ(kiwi_pt_add_span(pretokenized, 9, 25), 0);
+		EXPECT_EQ(kiwi_pt_add_span(pretokenized, 29, 36), 1);
+		EXPECT_EQ(kiwi_pt_add_span(pretokenized, 80, 87), 2);
+		
+		kiwi_res_h o = kiwi_analyze(okw, u8str, 1, KIWI_MATCH_ALL_WITH_NORMALIZING, nullptr, pretokenized);
+
+		EXPECT_EQ(kiwi_res_form(o, 0, 1), std::string{ u8"패트와 매트" });
+		EXPECT_EQ(kiwi_res_form(o, 0, 3), std::string{ u8"2017년" });
+		EXPECT_EQ(kiwi_res_form(o, 0, 13), std::string{ u8"2016년" });
+
+		EXPECT_EQ(kiwi_res_close(o), 0);
+		EXPECT_EQ(kiwi_pt_close(pretokenized), 0);
+	}
+
+	{
+		auto pretokenized = kiwi_pt_init();
+		EXPECT_EQ(kiwi_pt_add_span(pretokenized, 3, 9), 0);
+		EXPECT_EQ(kiwi_pt_add_span(pretokenized, 11, 16), 1);
+		EXPECT_EQ(kiwi_pt_add_span(pretokenized, 34, 39), 2);
+
+		kiwi_res_h o = kiwi_analyze_w(okw, (const kchar16_t*)str, 1, KIWI_MATCH_ALL_WITH_NORMALIZING, nullptr, pretokenized);
+
+		EXPECT_EQ((const char16_t*)kiwi_res_form_w(o, 0, 1), std::u16string{ u"패트와 매트" });
+		EXPECT_EQ((const char16_t*)kiwi_res_form_w(o, 0, 3), std::u16string{ u"2017년" });
+		EXPECT_EQ((const char16_t*)kiwi_res_form_w(o, 0, 13), std::u16string{ u"2016년" });
+
+		EXPECT_EQ(kiwi_res_close(o), 0);
+		EXPECT_EQ(kiwi_pt_close(pretokenized), 0);
+	}
+
+	{
+		auto pretokenized = kiwi_pt_init();
+		EXPECT_EQ(kiwi_pt_add_span(pretokenized, 27, 29), 0);
+		EXPECT_EQ(kiwi_pt_add_token_to_span_w(pretokenized, 0, (const kchar16_t*)u"페트", "nnb", 0, 2), 0);
+
+		EXPECT_EQ(kiwi_pt_add_span(pretokenized, 30, 32), 1);
+		EXPECT_EQ(kiwi_pt_add_span(pretokenized, 21, 24), 2);
+		EXPECT_EQ(kiwi_pt_add_token_to_span_w(pretokenized, 2, (const kchar16_t*)u"개봉하", "vv", 0, 3), 0);
+		EXPECT_EQ(kiwi_pt_add_token_to_span_w(pretokenized, 2, (const kchar16_t*)u"었", "ep", 2, 3), 0);
+
+		kiwi_res_h o = kiwi_analyze_w(okw, (const kchar16_t*)str, 1, KIWI_MATCH_ALL_WITH_NORMALIZING, nullptr, pretokenized);
+
+		EXPECT_EQ((const char16_t*)kiwi_res_form_w(o, 0, 7), std::u16string{ u"개봉하" });
+		EXPECT_STREQ(kiwi_res_tag(o, 0, 7), "VV");
+		EXPECT_EQ(kiwi_res_token_info(o, 0, 7)->chr_position, 21);
+		EXPECT_EQ(kiwi_res_token_info(o, 0, 7)->length, 3);
+		EXPECT_EQ((const char16_t*)kiwi_res_form_w(o, 0, 8), std::u16string{ u"었" });
+		EXPECT_STREQ(kiwi_res_tag(o, 0, 8), "EP");
+		EXPECT_EQ(kiwi_res_token_info(o, 0, 8)->chr_position, 23);
+		EXPECT_EQ(kiwi_res_token_info(o, 0, 8)->length, 1);
+		EXPECT_EQ((const char16_t*)kiwi_res_form_w(o, 0, 11), std::u16string{ u"페트" });
+		EXPECT_STREQ(kiwi_res_tag(o, 0, 11), "NNB");
+		EXPECT_EQ((const char16_t*)kiwi_res_form_w(o, 0, 13), std::u16string{ u"매트" });
+		EXPECT_STREQ(kiwi_res_tag(o, 0, 13), "NNG");
+
+		EXPECT_EQ(kiwi_res_close(o), 0);
+		EXPECT_EQ(kiwi_pt_close(pretokenized), 0);
+	}
 }
