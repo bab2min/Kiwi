@@ -257,7 +257,7 @@ https://github.com/bab2min/kiwi-gui 에서 다운받을 수 있습니다.
 
 세종 품사 태그를 기초로 하되, 일부 품사 태그를 추가/수정하여 사용하고 있습니다.
 
-<table>
+<table class='sp'>
 <tr><th>대분류</th><th>태그</th><th>설명</th></tr>
 <tr><th rowspan='5'>체언(N)</th><td>NNG</td><td>일반 명사</td></tr>
 <tr><td>NNP</td><td>고유 명사</td></tr>
@@ -293,7 +293,7 @@ https://github.com/bab2min/kiwi-gui 에서 다운받을 수 있습니다.
 <tr><td>XSA</td><td>형용사 파생 접미사</td></tr>
 <tr><td>XSM</td><td>부사 파생 접미사<sup>*</sup></td></tr>
 <tr><th rowspan='1'>어근</th><td>XR</td><td>어근</td></tr>
-<tr><th rowspan='11'>부호, 외국어, 특수문자(S)</th><td>SF</td><td>종결 부호(. ! ?)</td></tr>
+<tr><th rowspan='12'>부호, 외국어, 특수문자(S)</th><td>SF</td><td>종결 부호(. ! ?)</td></tr>
 <tr><td>SP</td><td>구분 부호(, / : ;)</td></tr>
 <tr><td>SS</td><td>인용 부호 및 괄호(' " ( ) [ ] < > { } ― ‘ ’ “ ” ≪ ≫ 등)</td></tr>
 <tr><td>SSO</td><td>SS 중 여는 부호<sup>*</sup></td></tr>
@@ -304,13 +304,15 @@ https://github.com/bab2min/kiwi-gui 에서 다운받을 수 있습니다.
 <tr><td>SL</td><td>알파벳(A-Z a-z)</td></tr>
 <tr><td>SH</td><td>한자</td></tr>
 <tr><td>SN</td><td>숫자(0-9)</td></tr>
+<tr><td>SB</td><td>순서 있는 글머리(가. 나. 1. 2. 가) 나) 등)<sup>*</sup></td></tr>
 <tr><th rowspan='1'>분석 불능</th><td>UN</td><td>분석 불능<sup>*</sup></td></tr>
 <tr><th rowspan='5'>웹(W)</th><td>W_URL</td><td>URL 주소<sup>*</sup></td></tr>
 <tr><td>W_EMAIL</td><td>이메일 주소<sup>*</sup></td></tr>
 <tr><td>W_HASHTAG</td><td>해시태그(#abcd)<sup>*</sup></td></tr>
 <tr><td>W_MENTION</td><td>멘션(@abcd)<sup>*</sup></td></tr>
 <tr><td>W_SERIAL</td><td>일련번호(전화번호, 통장번호, IP주소 등)<sup>*</sup></td></tr>
-<tr><th rowspan='1'>기타</th><td>Z_CODA</td><td>덧붙은 받침<sup>*</sup></td></tr>
+<tr><th rowspan='2'>기타</th><td>Z_CODA</td><td>덧붙은 받침<sup>*</sup></td></tr>
+<tr><td>USER0~4</td><td>사용자 정의 태그<sup>*</sup></td></tr>
 </table>
 
 <sup>*</sup> 세종 품사 태그와 다른 독자적인 태그입니다.
