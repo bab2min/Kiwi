@@ -354,6 +354,7 @@ size_t kiwi::splitByTrie(
 			specialStartPos = lastSpecialEndPos = nonSpaces.size();
 			pretokenizedFirst++;
 			chrType = POSTag::max;
+			curNode = trie.root();
 			goto continueFor;
 		}
 
