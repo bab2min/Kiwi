@@ -1,9 +1,9 @@
 var searchData=
 [
-  ['candidate_487',['candidate',['../structkiwi_1_1FormRaw.html#aaeb9a4a50365e34fd542d2ea07ded938',1,'kiwi::FormRaw']]],
-  ['chr_5fposition_488',['chr_position',['../structkiwi__token__info__t.html#a8c2ed0afb7f93f055b750f7fdde93217',1,'kiwi_token_info_t']]],
-  ['chunkpositions_489',['chunkPositions',['../structkiwi_1_1MorphemeRaw.html#a7d80c10abfd88e3401705944a38d1f4e',1,'kiwi::MorphemeRaw']]],
-  ['chunks_490',['chunks',['../structkiwi_1_1MorphemeRaw.html#a4c309ab23a3cd1457af0101201439704',1,'kiwi::MorphemeRaw']]],
-  ['combined_491',['combined',['../structkiwi_1_1MorphemeRaw.html#a613da3b0ee678935b86b3671fcd20e45',1,'kiwi::MorphemeRaw']]],
-  ['combinesocket_492',['combineSocket',['../structkiwi_1_1MorphemeRaw.html#a82c6720fbccbbad4b200c565f7380f37',1,'kiwi::MorphemeRaw']]]
+  ['candidate_505',['candidate',['../structkiwi_1_1FormRaw.html#aaeb9a4a50365e34fd542d2ea07ded938',1,'kiwi::FormRaw']]],
+  ['chr_5fposition_506',['chr_position',['../structkiwi__token__info__t.html#abe6f9a976243d5818a47e564a4e7fb2c',1,'kiwi_token_info_t']]],
+  ['chunkpositions_507',['chunkPositions',['../structkiwi_1_1MorphemeRaw.html#a7d80c10abfd88e3401705944a38d1f4e',1,'kiwi::MorphemeRaw']]],
+  ['chunks_508',['chunks',['../structkiwi_1_1MorphemeRaw.html#a4c309ab23a3cd1457af0101201439704',1,'kiwi::MorphemeRaw']]],
+  ['combined_509',['combined',['../structkiwi_1_1MorphemeRaw.html#a613da3b0ee678935b86b3671fcd20e45',1,'kiwi::MorphemeRaw']]],
+  ['combinesocket_510',['combineSocket',['../structkiwi_1_1MorphemeRaw.html#a82c6720fbccbbad4b200c565f7380f37',1,'kiwi::MorphemeRaw']]]
 ];

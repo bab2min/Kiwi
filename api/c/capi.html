@@ -55,6 +55,8 @@
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv49kiwi_ss_h"><code class="docutils literal notranslate"><span class="pre">kiwi_ss_h</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv413kiwi_joiner_h"><code class="docutils literal notranslate"><span class="pre">kiwi_joiner_h</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv411kiwi_typo_h"><code class="docutils literal notranslate"><span class="pre">kiwi_typo_h</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv415kiwi_morphset_h"><code class="docutils literal notranslate"><span class="pre">kiwi_morphset_h</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv419kiwi_pretokenized_h"><code class="docutils literal notranslate"><span class="pre">kiwi_pretokenized_h</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv49kchar16_t"><code class="docutils literal notranslate"><span class="pre">kchar16_t</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv418kiwi_swtokenizer_h"><code class="docutils literal notranslate"><span class="pre">kiwi_swtokenizer_h</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv413kiwi_reader_t"><code class="docutils literal notranslate"><span class="pre">kiwi_reader_t</span></code></a></li>
@@ -127,10 +129,11 @@
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv415kiwi_get_option6kiwi_hi"><code class="docutils literal notranslate"><span class="pre">kiwi_get_option()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv417kiwi_set_option_f6kiwi_hif"><code class="docutils literal notranslate"><span class="pre">kiwi_set_option_f()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv417kiwi_get_option_f6kiwi_hi"><code class="docutils literal notranslate"><span class="pre">kiwi_get_option_f()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#_CPPv414kiwi_analyze_w6kiwi_hPK9kchar16_tii"><code class="docutils literal notranslate"><span class="pre">kiwi_analyze_w()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#_CPPv412kiwi_analyze6kiwi_hPKcii"><code class="docutils literal notranslate"><span class="pre">kiwi_analyze()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#_CPPv415kiwi_analyze_mw6kiwi_h15kiwi_reader_w_t15kiwi_receiver_tPvii"><code class="docutils literal notranslate"><span class="pre">kiwi_analyze_mw()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#_CPPv414kiwi_analyze_m6kiwi_h13kiwi_reader_t15kiwi_receiver_tPvii"><code class="docutils literal notranslate"><span class="pre">kiwi_analyze_m()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv417kiwi_new_morphset6kiwi_h"><code class="docutils literal notranslate"><span class="pre">kiwi_new_morphset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv414kiwi_analyze_w6kiwi_hPK9kchar16_tii15kiwi_morphset_h19kiwi_pretokenized_h"><code class="docutils literal notranslate"><span class="pre">kiwi_analyze_w()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv412kiwi_analyze6kiwi_hPKcii15kiwi_morphset_h19kiwi_pretokenized_h"><code class="docutils literal notranslate"><span class="pre">kiwi_analyze()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv415kiwi_analyze_mw6kiwi_h15kiwi_reader_w_t15kiwi_receiver_tPvii15kiwi_morphset_h"><code class="docutils literal notranslate"><span class="pre">kiwi_analyze_mw()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv414kiwi_analyze_m6kiwi_h13kiwi_reader_t15kiwi_receiver_tPvii15kiwi_morphset_h"><code class="docutils literal notranslate"><span class="pre">kiwi_analyze_m()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv423kiwi_split_into_sents_w6kiwi_hPK9kchar16_tiP10kiwi_res_h"><code class="docutils literal notranslate"><span class="pre">kiwi_split_into_sents_w()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv421kiwi_split_into_sents6kiwi_hPKciP10kiwi_res_h"><code class="docutils literal notranslate"><span class="pre">kiwi_split_into_sents()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv415kiwi_new_joiner6kiwi_hi"><code class="docutils literal notranslate"><span class="pre">kiwi_new_joiner()</span></code></a></li>
@@ -165,10 +168,18 @@
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv415kiwi_joiner_get13kiwi_joiner_h"><code class="docutils literal notranslate"><span class="pre">kiwi_joiner_get()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv417kiwi_joiner_get_w13kiwi_joiner_h"><code class="docutils literal notranslate"><span class="pre">kiwi_joiner_get_w()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv417kiwi_joiner_close13kiwi_joiner_h"><code class="docutils literal notranslate"><span class="pre">kiwi_joiner_close()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv417kiwi_morphset_add15kiwi_morphset_hPKcPKc"><code class="docutils literal notranslate"><span class="pre">kiwi_morphset_add()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv419kiwi_morphset_add_w15kiwi_morphset_hPK9kchar16_tPKc"><code class="docutils literal notranslate"><span class="pre">kiwi_morphset_add_w()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv419kiwi_morphset_close15kiwi_morphset_h"><code class="docutils literal notranslate"><span class="pre">kiwi_morphset_close()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv413kiwi_swt_initPKc6kiwi_h"><code class="docutils literal notranslate"><span class="pre">kiwi_swt_init()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv415kiwi_swt_encode18kiwi_swtokenizer_hPKciPiiPii"><code class="docutils literal notranslate"><span class="pre">kiwi_swt_encode()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv415kiwi_swt_decode18kiwi_swtokenizer_hPKiiPci"><code class="docutils literal notranslate"><span class="pre">kiwi_swt_decode()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv414kiwi_swt_close18kiwi_swtokenizer_h"><code class="docutils literal notranslate"><span class="pre">kiwi_swt_close()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv412kiwi_pt_initv"><code class="docutils literal notranslate"><span class="pre">kiwi_pt_init()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv416kiwi_pt_add_span19kiwi_pretokenized_hii"><code class="docutils literal notranslate"><span class="pre">kiwi_pt_add_span()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv425kiwi_pt_add_token_to_span19kiwi_pretokenized_hiPKcPKcii"><code class="docutils literal notranslate"><span class="pre">kiwi_pt_add_token_to_span()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv427kiwi_pt_add_token_to_span_w19kiwi_pretokenized_hiPK9kchar16_tPKcii"><code class="docutils literal notranslate"><span class="pre">kiwi_pt_add_token_to_span_w()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv413kiwi_pt_close19kiwi_pretokenized_h"><code class="docutils literal notranslate"><span class="pre">kiwi_pt_close()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv415kiwi_basic_typo"><code class="docutils literal notranslate"><span class="pre">kiwi_basic_typo</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv417kiwi_token_info_t"><code class="docutils literal notranslate"><span class="pre">kiwi_token_info_t</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17kiwi_token_info_t12chr_positionE"><code class="docutils literal notranslate"><span class="pre">kiwi_token_info_t::chr_position</span></code></a></li>
@@ -287,6 +298,16 @@
 <dl class="cpp type">
 <dt class="sig sig-object cpp" id="_CPPv411kiwi_typo_h">
 <span id="_CPPv311kiwi_typo_h"></span><span id="_CPPv211kiwi_typo_h"></span><span id="kiwi_typo_h"></span><span class="target" id="capi_8h_1ac7b9d80159f051beab397b20a37f715f"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">kiwi_typo</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_typo_h</span></span></span><a class="headerlink" href="#_CPPv411kiwi_typo_h" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv415kiwi_morphset_h">
+<span id="_CPPv315kiwi_morphset_h"></span><span id="_CPPv215kiwi_morphset_h"></span><span id="kiwi_morphset_h"></span><span class="target" id="capi_8h_1a09e116dbe7a93459abe47e5eb55af01d"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">kiwi_morphset</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_morphset_h</span></span></span><a class="headerlink" href="#_CPPv415kiwi_morphset_h" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv419kiwi_pretokenized_h">
+<span id="_CPPv319kiwi_pretokenized_h"></span><span id="_CPPv219kiwi_pretokenized_h"></span><span id="kiwi_pretokenized_h"></span><span class="target" id="capi_8h_1aed976593dfa6404e7e6f3a3584897028"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">kiwi_pretokenized</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_pretokenized_h</span></span></span><a class="headerlink" href="#_CPPv419kiwi_pretokenized_h" title="Link to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp type">
@@ -974,12 +995,26 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv414kiwi_analyze_w6kiwi_hPK9kchar16_tii">
-<span id="_CPPv314kiwi_analyze_w6kiwi_hPK9kchar16_tii"></span><span id="_CPPv214kiwi_analyze_w6kiwi_hPK9kchar16_tii"></span><span id="kiwi_analyze_w__kiwi_h.kchar16_tCP.i.i"></span><span class="target" id="capi_8h_1ab3d1784020b6f2a1b77e84463c4a5eb8"></span><a class="reference internal" href="#_CPPv410kiwi_res_h" title="kiwi_res_h"><span class="n"><span class="pre">kiwi_res_h</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_analyze_w</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv46kiwi_h" title="kiwi_h"><span class="n"><span class="pre">kiwi_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49kchar16_t" title="kchar16_t"><span class="n"><span class="pre">kchar16_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">text</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">top_n</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">match_options</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414kiwi_analyze_w6kiwi_hPK9kchar16_tii" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv417kiwi_new_morphset6kiwi_h">
+<span id="_CPPv317kiwi_new_morphset6kiwi_h"></span><span id="_CPPv217kiwi_new_morphset6kiwi_h"></span><span id="kiwi_new_morphset__kiwi_h"></span><span class="target" id="capi_8h_1a83723c23552d362ce7870842e24fc60d"></span><a class="reference internal" href="#_CPPv415kiwi_morphset_h" title="kiwi_morphset_h"><span class="n"><span class="pre">kiwi_morphset_h</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_new_morphset</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv46kiwi_h" title="kiwi_h"><span class="n"><span class="pre">kiwi_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417kiwi_new_morphset6kiwi_h" title="Link to this definition"></a><br /></dt>
+<dd><p>새 형태소집합을 생성합니다. 형태소집합은 kiwi_analyze 함수의 blocklist 등으로 사용될 수 있습니다. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>handle</strong> – Kiwi. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>새 형태소 집합의 핸들. kiwi_morphset_* 함수에 사용가능합니다. 이 핸들은 사용 후 kiwi_morphset_close를 통해 반드시 해제되어야 합니다. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv414kiwi_analyze_w6kiwi_hPK9kchar16_tii15kiwi_morphset_h19kiwi_pretokenized_h">
+<span id="_CPPv314kiwi_analyze_w6kiwi_hPK9kchar16_tii15kiwi_morphset_h19kiwi_pretokenized_h"></span><span id="_CPPv214kiwi_analyze_w6kiwi_hPK9kchar16_tii15kiwi_morphset_h19kiwi_pretokenized_h"></span><span id="kiwi_analyze_w__kiwi_h.kchar16_tCP.i.i.kiwi_morphset_h.kiwi_pretokenized_h"></span><span class="target" id="capi_8h_1abadc88617cb96793c7a61778443ee5ed"></span><a class="reference internal" href="#_CPPv410kiwi_res_h" title="kiwi_res_h"><span class="n"><span class="pre">kiwi_res_h</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_analyze_w</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv46kiwi_h" title="kiwi_h"><span class="n"><span class="pre">kiwi_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49kchar16_t" title="kchar16_t"><span class="n"><span class="pre">kchar16_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">text</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">top_n</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">match_options</span></span>, <a class="reference internal" href="#_CPPv415kiwi_morphset_h" title="kiwi_morphset_h"><span class="n"><span class="pre">kiwi_morphset_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">blocklist</span></span>, <a class="reference internal" href="#_CPPv419kiwi_pretokenized_h" title="kiwi_pretokenized_h"><span class="n"><span class="pre">kiwi_pretokenized_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">pretokenized</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414kiwi_analyze_w6kiwi_hPK9kchar16_tii15kiwi_morphset_h19kiwi_pretokenized_h" title="Link to this definition"></a><br /></dt>
 <dd><p>텍스트를 분석해 형태소 결과를 반환합니다. </p>
 <p><div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference internal" href="#capi_8h_1ab6ec0d26dbd4f25b85a0edf9784425d1"><span class="std std-ref">kiwi_analyze</span></a></p>
+<p><a class="reference internal" href="#capi_8h_1a8aa4a9b64c467c3bd335f284167a69bf"><span class="std std-ref">kiwi_analyze</span></a></p>
 </div>
 </p>
 <dl class="field-list simple">
@@ -989,6 +1024,8 @@
 <li><p><strong>text</strong> – 분석할 텍스트 (utf-16). </p></li>
 <li><p><strong>top_n</strong> – 반환할 결과물. </p></li>
 <li><p><strong>match_options</strong> – KIWI_MATCH_ALL 등 KIWI_MATCH_* 열거형 참고. </p></li>
+<li><p><strong>blocklist</strong> – 분석 후보 탐색 과정에서 blocklist에 포함된 형태소들은 배제됩니다. null 입력 시에는 blocklist를 사용하지 않습니다. </p></li>
+<li><p><strong>pretokenized</strong> – 입력 텍스트 중 특정 영역의 분석 방법을 강제로 지정합니다. null 입력 시에는 pretokenization을 사용하지 않습니다. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -998,12 +1035,12 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv412kiwi_analyze6kiwi_hPKcii">
-<span id="_CPPv312kiwi_analyze6kiwi_hPKcii"></span><span id="_CPPv212kiwi_analyze6kiwi_hPKcii"></span><span id="kiwi_analyze__kiwi_h.cCP.i.i"></span><span class="target" id="capi_8h_1ab6ec0d26dbd4f25b85a0edf9784425d1"></span><a class="reference internal" href="#_CPPv410kiwi_res_h" title="kiwi_res_h"><span class="n"><span class="pre">kiwi_res_h</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_analyze</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv46kiwi_h" title="kiwi_h"><span class="n"><span class="pre">kiwi_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">text</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">top_n</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">match_options</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412kiwi_analyze6kiwi_hPKcii" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv412kiwi_analyze6kiwi_hPKcii15kiwi_morphset_h19kiwi_pretokenized_h">
+<span id="_CPPv312kiwi_analyze6kiwi_hPKcii15kiwi_morphset_h19kiwi_pretokenized_h"></span><span id="_CPPv212kiwi_analyze6kiwi_hPKcii15kiwi_morphset_h19kiwi_pretokenized_h"></span><span id="kiwi_analyze__kiwi_h.cCP.i.i.kiwi_morphset_h.kiwi_pretokenized_h"></span><span class="target" id="capi_8h_1a8aa4a9b64c467c3bd335f284167a69bf"></span><a class="reference internal" href="#_CPPv410kiwi_res_h" title="kiwi_res_h"><span class="n"><span class="pre">kiwi_res_h</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_analyze</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv46kiwi_h" title="kiwi_h"><span class="n"><span class="pre">kiwi_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">text</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">top_n</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">match_options</span></span>, <a class="reference internal" href="#_CPPv415kiwi_morphset_h" title="kiwi_morphset_h"><span class="n"><span class="pre">kiwi_morphset_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">blocklist</span></span>, <a class="reference internal" href="#_CPPv419kiwi_pretokenized_h" title="kiwi_pretokenized_h"><span class="n"><span class="pre">kiwi_pretokenized_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">pretokenized</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412kiwi_analyze6kiwi_hPKcii15kiwi_morphset_h19kiwi_pretokenized_h" title="Link to this definition"></a><br /></dt>
 <dd><p>텍스트를 분석해 형태소 결과를 반환합니다. </p>
 <p><div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference internal" href="#capi_8h_1ab3d1784020b6f2a1b77e84463c4a5eb8"><span class="std std-ref">kiwi_analyze_w</span></a></p>
+<p><a class="reference internal" href="#capi_8h_1abadc88617cb96793c7a61778443ee5ed"><span class="std std-ref">kiwi_analyze_w</span></a></p>
 </div>
 </p>
 <dl class="field-list simple">
@@ -1013,6 +1050,8 @@
 <li><p><strong>text</strong> – 분석할 텍스트 (utf-8). </p></li>
 <li><p><strong>top_n</strong> – 반환할 결과물. </p></li>
 <li><p><strong>match_options</strong> – KIWI_MATCH_ALL 등 KIWI_MATCH_* 열거형 참고. </p></li>
+<li><p><strong>blocklist</strong> – 분석 후보 탐색 과정에서 blocklist에 포함된 형태소들은 배제됩니다. null 입력 시에는 blocklist를 사용하지 않습니다. </p></li>
+<li><p><strong>pretokenized</strong> – 입력 텍스트 중 특정 영역의 분석 방법을 강제로 지정합니다. null 입력 시에는 pretokenization을 사용하지 않습니다. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1022,8 +1061,8 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv415kiwi_analyze_mw6kiwi_h15kiwi_reader_w_t15kiwi_receiver_tPvii">
-<span id="_CPPv315kiwi_analyze_mw6kiwi_h15kiwi_reader_w_t15kiwi_receiver_tPvii"></span><span id="_CPPv215kiwi_analyze_mw6kiwi_h15kiwi_reader_w_t15kiwi_receiver_tPvii"></span><span id="kiwi_analyze_mw__kiwi_h.kiwi_reader_w_t.kiwi_receiver_t.voidP.i.i"></span><span class="target" id="capi_8h_1abcc2c8b8a735f00cbcb67619a0a19a13"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_analyze_mw</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv46kiwi_h" title="kiwi_h"><span class="n"><span class="pre">kiwi_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span>, <a class="reference internal" href="#_CPPv415kiwi_reader_w_t" title="kiwi_reader_w_t"><span class="n"><span class="pre">kiwi_reader_w_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">reader</span></span>, <a class="reference internal" href="#_CPPv415kiwi_receiver_t" title="kiwi_receiver_t"><span class="n"><span class="pre">kiwi_receiver_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">receiver</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">user_data</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">top_n</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">match_options</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415kiwi_analyze_mw6kiwi_h15kiwi_reader_w_t15kiwi_receiver_tPvii" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv415kiwi_analyze_mw6kiwi_h15kiwi_reader_w_t15kiwi_receiver_tPvii15kiwi_morphset_h">
+<span id="_CPPv315kiwi_analyze_mw6kiwi_h15kiwi_reader_w_t15kiwi_receiver_tPvii15kiwi_morphset_h"></span><span id="_CPPv215kiwi_analyze_mw6kiwi_h15kiwi_reader_w_t15kiwi_receiver_tPvii15kiwi_morphset_h"></span><span id="kiwi_analyze_mw__kiwi_h.kiwi_reader_w_t.kiwi_receiver_t.voidP.i.i.kiwi_morphset_h"></span><span class="target" id="capi_8h_1adb8947c6dae2f7574bf585ae657f1f1b"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_analyze_mw</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv46kiwi_h" title="kiwi_h"><span class="n"><span class="pre">kiwi_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span>, <a class="reference internal" href="#_CPPv415kiwi_reader_w_t" title="kiwi_reader_w_t"><span class="n"><span class="pre">kiwi_reader_w_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">reader</span></span>, <a class="reference internal" href="#_CPPv415kiwi_receiver_t" title="kiwi_receiver_t"><span class="n"><span class="pre">kiwi_receiver_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">receiver</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">user_data</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">top_n</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">match_options</span></span>, <a class="reference internal" href="#_CPPv415kiwi_morphset_h" title="kiwi_morphset_h"><span class="n"><span class="pre">kiwi_morphset_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">blocklist</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415kiwi_analyze_mw6kiwi_h15kiwi_reader_w_t15kiwi_receiver_tPvii15kiwi_morphset_h" title="Link to this definition"></a><br /></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1042,8 +1081,8 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv414kiwi_analyze_m6kiwi_h13kiwi_reader_t15kiwi_receiver_tPvii">
-<span id="_CPPv314kiwi_analyze_m6kiwi_h13kiwi_reader_t15kiwi_receiver_tPvii"></span><span id="_CPPv214kiwi_analyze_m6kiwi_h13kiwi_reader_t15kiwi_receiver_tPvii"></span><span id="kiwi_analyze_m__kiwi_h.kiwi_reader_t.kiwi_receiver_t.voidP.i.i"></span><span class="target" id="capi_8h_1a264f6b307c5b2397e13f8d1db23694ce"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_analyze_m</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv46kiwi_h" title="kiwi_h"><span class="n"><span class="pre">kiwi_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span>, <a class="reference internal" href="#_CPPv413kiwi_reader_t" title="kiwi_reader_t"><span class="n"><span class="pre">kiwi_reader_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">reader</span></span>, <a class="reference internal" href="#_CPPv415kiwi_receiver_t" title="kiwi_receiver_t"><span class="n"><span class="pre">kiwi_receiver_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">receiver</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">user_data</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">top_n</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">match_options</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414kiwi_analyze_m6kiwi_h13kiwi_reader_t15kiwi_receiver_tPvii" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv414kiwi_analyze_m6kiwi_h13kiwi_reader_t15kiwi_receiver_tPvii15kiwi_morphset_h">
+<span id="_CPPv314kiwi_analyze_m6kiwi_h13kiwi_reader_t15kiwi_receiver_tPvii15kiwi_morphset_h"></span><span id="_CPPv214kiwi_analyze_m6kiwi_h13kiwi_reader_t15kiwi_receiver_tPvii15kiwi_morphset_h"></span><span id="kiwi_analyze_m__kiwi_h.kiwi_reader_t.kiwi_receiver_t.voidP.i.i.kiwi_morphset_h"></span><span class="target" id="capi_8h_1a9380188bd199dfbda8471c76104a8d87"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_analyze_m</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv46kiwi_h" title="kiwi_h"><span class="n"><span class="pre">kiwi_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span>, <a class="reference internal" href="#_CPPv413kiwi_reader_t" title="kiwi_reader_t"><span class="n"><span class="pre">kiwi_reader_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">reader</span></span>, <a class="reference internal" href="#_CPPv415kiwi_receiver_t" title="kiwi_receiver_t"><span class="n"><span class="pre">kiwi_receiver_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">receiver</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">user_data</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">top_n</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">match_options</span></span>, <a class="reference internal" href="#_CPPv415kiwi_morphset_h" title="kiwi_morphset_h"><span class="n"><span class="pre">kiwi_morphset_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">blocklist</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414kiwi_analyze_m6kiwi_h13kiwi_reader_t15kiwi_receiver_tPvii15kiwi_morphset_h" title="Link to this definition"></a><br /></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1643,6 +1682,60 @@
 </dd></dl>
 
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv417kiwi_morphset_add15kiwi_morphset_hPKcPKc">
+<span id="_CPPv317kiwi_morphset_add15kiwi_morphset_hPKcPKc"></span><span id="_CPPv217kiwi_morphset_add15kiwi_morphset_hPKcPKc"></span><span id="kiwi_morphset_add__kiwi_morphset_h.cCP.cCP"></span><span class="target" id="capi_8h_1a57f0b97e0332aa203391b558aaa1c877"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_morphset_add</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv415kiwi_morphset_h" title="kiwi_morphset_h"><span class="n"><span class="pre">kiwi_morphset_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">form</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">tag</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417kiwi_morphset_add15kiwi_morphset_hPKcPKc" title="Link to this definition"></a><br /></dt>
+<dd><p>형태소 집합에 특정 형태소를 삽입합니다. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>handle</strong> – 형태소 집합의 핸들 </p></li>
+<li><p><strong>form</strong> – 삽입할 형태소의 형태 </p></li>
+<li><p><strong>tag</strong> – 삽입할 형태소의 품사 태그. 만약 이 값을 null로 설정하면 형태가 form과 일치하는 형태소가 품사에 상관없이 모두 삽입됩니다. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>집합에 추가된 형태소의 개수를 반환합니다. 만약 form, tag로 지정한 형태소가 없는 경우 0을 반환합니다. 오류 발생 시 음수를 반환합니다. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv419kiwi_morphset_add_w15kiwi_morphset_hPK9kchar16_tPKc">
+<span id="_CPPv319kiwi_morphset_add_w15kiwi_morphset_hPK9kchar16_tPKc"></span><span id="_CPPv219kiwi_morphset_add_w15kiwi_morphset_hPK9kchar16_tPKc"></span><span id="kiwi_morphset_add_w__kiwi_morphset_h.kchar16_tCP.cCP"></span><span class="target" id="capi_8h_1a6bf5fee48deb177d70ff7823c41593c2"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_morphset_add_w</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv415kiwi_morphset_h" title="kiwi_morphset_h"><span class="n"><span class="pre">kiwi_morphset_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49kchar16_t" title="kchar16_t"><span class="n"><span class="pre">kchar16_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">form</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">tag</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419kiwi_morphset_add_w15kiwi_morphset_hPK9kchar16_tPKc" title="Link to this definition"></a><br /></dt>
+<dd><p>형태소 집합에 특정 형태소를 삽입합니다. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>handle</strong> – 형태소 집합의 핸들 </p></li>
+<li><p><strong>form</strong> – 삽입할 형태소의 형태 </p></li>
+<li><p><strong>tag</strong> – 삽입할 형태소의 품사 태그. 만약 이 값을 null로 설정하면 형태가 form과 일치하는 형태소가 품사에 상관없이 모두 삽입됩니다. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>집합에 추가된 형태소의 개수를 반환합니다. 만약 form, tag로 지정한 형태소가 없는 경우 0을 반환합니다. 오류 발생 시 음수를 반환합니다. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv419kiwi_morphset_close15kiwi_morphset_h">
+<span id="_CPPv319kiwi_morphset_close15kiwi_morphset_h"></span><span id="_CPPv219kiwi_morphset_close15kiwi_morphset_h"></span><span id="kiwi_morphset_close__kiwi_morphset_h"></span><span class="target" id="capi_8h_1ab69e96458602e7cf2ac5aa0e28d391f1"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_morphset_close</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv415kiwi_morphset_h" title="kiwi_morphset_h"><span class="n"><span class="pre">kiwi_morphset_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419kiwi_morphset_close15kiwi_morphset_h" title="Link to this definition"></a><br /></dt>
+<dd><p>사용이 완료된 형태소 집합 객체를 해제합니다. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>kiwi_new_morphset 함수에서 반환된 kiwi_morphset_h는 반드시 이 함수로 해제되어야 합니다. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>handle</strong> – 해제할 형태소 집합의 핸들 </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>성공시 0을 반환합니다. 실패시 0이 아닌 값을 반환합니다.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv413kiwi_swt_initPKc6kiwi_h">
 <span id="_CPPv313kiwi_swt_initPKc6kiwi_h"></span><span id="_CPPv213kiwi_swt_initPKc6kiwi_h"></span><span id="kiwi_swt_init__cCP.kiwi_h"></span><span class="target" id="capi_8h_1afa9d5819ac6e264b7397aa8e84d6fd06"></span><a class="reference internal" href="#_CPPv418kiwi_swtokenizer_h" title="kiwi_swtokenizer_h"><span class="n"><span class="pre">kiwi_swtokenizer_h</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_swt_init</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">path</span></span>, <a class="reference internal" href="#_CPPv46kiwi_h" title="kiwi_h"><span class="n"><span class="pre">kiwi_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">kiwi</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413kiwi_swt_initPKc6kiwi_h" title="Link to this definition"></a><br /></dt>
 <dd><p>새로운 SwTokenizer 객체를 생성합니다. </p>
@@ -1752,6 +1845,116 @@
 </dl>
 </dd></dl>
 
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412kiwi_pt_initv">
+<span id="_CPPv312kiwi_pt_initv"></span><span id="_CPPv212kiwi_pt_initv"></span><span id="kiwi_pt_init"></span><span class="target" id="capi_8h_1aeb1c05929a4a5320d3d0cda28045d5ed"></span><a class="reference internal" href="#_CPPv419kiwi_pretokenized_h" title="kiwi_pretokenized_h"><span class="n"><span class="pre">kiwi_pretokenized_h</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_pt_init</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412kiwi_pt_initv" title="Link to this definition"></a><br /></dt>
+<dd><p>새로운 Pretokenzation 객체를 생성합니다. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>이 객체는 kiwi_analyze 계열 함수의 <code class="docutils literal notranslate"><span class="pre">pretokenized</span></code> 인자로 사용됩니다. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>성공 시 Pretokenzation의 핸들을 반환합니다. 실패 시 null를 반환합니다.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv416kiwi_pt_add_span19kiwi_pretokenized_hii">
+<span id="_CPPv316kiwi_pt_add_span19kiwi_pretokenized_hii"></span><span id="_CPPv216kiwi_pt_add_span19kiwi_pretokenized_hii"></span><span id="kiwi_pt_add_span__kiwi_pretokenized_h.i.i"></span><span class="target" id="capi_8h_1a5eba9ff0b21aa87c9592c4e0b46f3851"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_pt_add_span</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv419kiwi_pretokenized_h" title="kiwi_pretokenized_h"><span class="n"><span class="pre">kiwi_pretokenized_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">begin</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">end</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416kiwi_pt_add_span19kiwi_pretokenized_hii" title="Link to this definition"></a><br /></dt>
+<dd><p>Pretokenization 객체에 새 구간을 추가합니다. </p>
+<p><div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#capi_8h_1a8aa4a9b64c467c3bd335f284167a69bf"><span class="std std-ref">kiwi_analyze</span></a>, <a class="reference internal" href="#capi_8h_1abadc88617cb96793c7a61778443ee5ed"><span class="std std-ref">kiwi_analyze_w</span></a></p>
+</div>
+</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>begin, end로 지정하는 시작/끝 지점의 단위는 이 객체가 kiwi_analyze에 사용되는지, kiwi_analyze_w에 사용되는지에 따라 달라집니다. kiwi_analyze에 사용되는 경우 utf-8 문자열의 바이트 단위에 따라 시작/끝 지점이 처리되고, kiwi_analyze_w에 사용되는 경우 utf-16 문자열의 글자 단위에 따라 시작/끝 지점이 처리됩니다.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>handle</strong> – Pretokenization의 핸들 </p></li>
+<li><p><strong>begin</strong> – 구간의 시작 지점 </p></li>
+<li><p><strong>end</strong> – 구간의 끝 지점 </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>성공 시 새 구간의 id, 실패시 음수를 반환합니다.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv425kiwi_pt_add_token_to_span19kiwi_pretokenized_hiPKcPKcii">
+<span id="_CPPv325kiwi_pt_add_token_to_span19kiwi_pretokenized_hiPKcPKcii"></span><span id="_CPPv225kiwi_pt_add_token_to_span19kiwi_pretokenized_hiPKcPKcii"></span><span id="kiwi_pt_add_token_to_span__kiwi_pretokenized_h.i.cCP.cCP.i.i"></span><span class="target" id="capi_8h_1a1b4af82dc8c13eb91b8d550ac3de606d"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_pt_add_token_to_span</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv419kiwi_pretokenized_h" title="kiwi_pretokenized_h"><span class="n"><span class="pre">kiwi_pretokenized_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">span_id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">form</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">tag</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">begin</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">end</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv425kiwi_pt_add_token_to_span19kiwi_pretokenized_hiPKcPKcii" title="Link to this definition"></a><br /></dt>
+<dd><p>Pretokenization 객체의 구간에 새 분석 결과를 추가합니다. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>begin, end로 지정하는 시작/끝 지점의 단위는 kiwi_pt_add_span와 마찬가지로 Pretokenization객체가 사용되는 곳이 kiwi_analyze인지 kiwi_analyze_w인지에 따라 달라집니다. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>handle</strong> – Pretokenization의 핸들 </p></li>
+<li><p><strong>span_id</strong> – 구간의 id </p></li>
+<li><p><strong>form</strong> – 분석 결과의 형태 </p></li>
+<li><p><strong>tag</strong> – 분석 결과의 품사 태그 </p></li>
+<li><p><strong>begin</strong> – 분석 결과의 시작 지점 </p></li>
+<li><p><strong>end</strong> – 분석 결와의 끝 지점 </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>성공 시 0, 실패 시 0이 아닌 값을 반환합니다.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv427kiwi_pt_add_token_to_span_w19kiwi_pretokenized_hiPK9kchar16_tPKcii">
+<span id="_CPPv327kiwi_pt_add_token_to_span_w19kiwi_pretokenized_hiPK9kchar16_tPKcii"></span><span id="_CPPv227kiwi_pt_add_token_to_span_w19kiwi_pretokenized_hiPK9kchar16_tPKcii"></span><span id="kiwi_pt_add_token_to_span_w__kiwi_pretokenized_h.i.kchar16_tCP.cCP.i.i"></span><span class="target" id="capi_8h_1ae52d3fee7da980039579e7434c7b47fa"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_pt_add_token_to_span_w</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv419kiwi_pretokenized_h" title="kiwi_pretokenized_h"><span class="n"><span class="pre">kiwi_pretokenized_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">span_id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49kchar16_t" title="kchar16_t"><span class="n"><span class="pre">kchar16_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">form</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">tag</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">begin</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">end</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv427kiwi_pt_add_token_to_span_w19kiwi_pretokenized_hiPK9kchar16_tPKcii" title="Link to this definition"></a><br /></dt>
+<dd><p>Pretokenization 객체의 구간에 새 분석 결과를 추가합니다. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>begin, end로 지정하는 시작/끝 지점의 단위는 kiwi_pt_add_span와 마찬가지로 Pretokenization객체가 사용되는 곳이 kiwi_analyze인지 kiwi_analyze_w인지에 따라 달라집니다. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>handle</strong> – Pretokenization의 핸들 </p></li>
+<li><p><strong>span_id</strong> – 구간의 id </p></li>
+<li><p><strong>form</strong> – 분석 결과의 형태 </p></li>
+<li><p><strong>tag</strong> – 분석 결과의 품사 태그 </p></li>
+<li><p><strong>begin</strong> – 분석 결과의 시작 지점 </p></li>
+<li><p><strong>end</strong> – 분석 결와의 끝 지점 </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>성공 시 0, 실패 시 0이 아닌 값을 반환합니다.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413kiwi_pt_close19kiwi_pretokenized_h">
+<span id="_CPPv313kiwi_pt_close19kiwi_pretokenized_h"></span><span id="_CPPv213kiwi_pt_close19kiwi_pretokenized_h"></span><span id="kiwi_pt_close__kiwi_pretokenized_h"></span><span class="target" id="capi_8h_1ad8f3a34a58d42dbc7a046f837159575e"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_pt_close</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv419kiwi_pretokenized_h" title="kiwi_pretokenized_h"><span class="n"><span class="pre">kiwi_pretokenized_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413kiwi_pt_close19kiwi_pretokenized_h" title="Link to this definition"></a><br /></dt>
+<dd><p>사용이 끝난 Pretokenzation 객체를 해제합니다. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>kiwi_pt_init </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>handle</strong> – 해제할 Pretokenzation의 핸들 </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>성공 시 0, 실패 시 0이 아닌 값을 반환합니다.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-variables">Variables</p>
@@ -1773,43 +1976,43 @@
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N17kiwi_token_info_t12chr_positionE">
-<span id="_CPPv3N17kiwi_token_info_t12chr_positionE"></span><span id="_CPPv2N17kiwi_token_info_t12chr_positionE"></span><span id="kiwi_token_info_t::chr_position__uint_fast32_t"></span><span class="target" id="structkiwi__token__info__t_1a8c2ed0afb7f93f055b750f7fdde93217"></span><span class="n"><span class="pre">uint_fast32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">chr_position</span></span></span><a class="headerlink" href="#_CPPv4N17kiwi_token_info_t12chr_positionE" title="Link to this definition"></a><br /></dt>
+<span id="_CPPv3N17kiwi_token_info_t12chr_positionE"></span><span id="_CPPv2N17kiwi_token_info_t12chr_positionE"></span><span id="kiwi_token_info_t::chr_position__uint32_t"></span><span class="target" id="structkiwi__token__info__t_1abe6f9a976243d5818a47e564a4e7fb2c"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">chr_position</span></span></span><a class="headerlink" href="#_CPPv4N17kiwi_token_info_t12chr_positionE" title="Link to this definition"></a><br /></dt>
 <dd><p>시작 위치(UTF16 문자 기준) </p>
 </dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N17kiwi_token_info_t13word_positionE">
-<span id="_CPPv3N17kiwi_token_info_t13word_positionE"></span><span id="_CPPv2N17kiwi_token_info_t13word_positionE"></span><span id="kiwi_token_info_t::word_position__uint_fast32_t"></span><span class="target" id="structkiwi__token__info__t_1ab3b9e684f690cf257d726b31a5f3c159"></span><span class="n"><span class="pre">uint_fast32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">word_position</span></span></span><a class="headerlink" href="#_CPPv4N17kiwi_token_info_t13word_positionE" title="Link to this definition"></a><br /></dt>
+<span id="_CPPv3N17kiwi_token_info_t13word_positionE"></span><span id="_CPPv2N17kiwi_token_info_t13word_positionE"></span><span id="kiwi_token_info_t::word_position__uint32_t"></span><span class="target" id="structkiwi__token__info__t_1ab5b6ded81235f760816348be905d8b28"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">word_position</span></span></span><a class="headerlink" href="#_CPPv4N17kiwi_token_info_t13word_positionE" title="Link to this definition"></a><br /></dt>
 <dd><p>어절 번호(공백 기준) </p>
 </dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N17kiwi_token_info_t13sent_positionE">
-<span id="_CPPv3N17kiwi_token_info_t13sent_positionE"></span><span id="_CPPv2N17kiwi_token_info_t13sent_positionE"></span><span id="kiwi_token_info_t::sent_position__uint_fast32_t"></span><span class="target" id="structkiwi__token__info__t_1a2b11a00822e73ac06ea6c4f24a9db099"></span><span class="n"><span class="pre">uint_fast32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sent_position</span></span></span><a class="headerlink" href="#_CPPv4N17kiwi_token_info_t13sent_positionE" title="Link to this definition"></a><br /></dt>
+<span id="_CPPv3N17kiwi_token_info_t13sent_positionE"></span><span id="_CPPv2N17kiwi_token_info_t13sent_positionE"></span><span id="kiwi_token_info_t::sent_position__uint32_t"></span><span class="target" id="structkiwi__token__info__t_1a4c1ebc4ae5d3640f9cb43d133b9b95c5"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sent_position</span></span></span><a class="headerlink" href="#_CPPv4N17kiwi_token_info_t13sent_positionE" title="Link to this definition"></a><br /></dt>
 <dd><p>문장 번호 </p>
 </dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N17kiwi_token_info_t11line_numberE">
-<span id="_CPPv3N17kiwi_token_info_t11line_numberE"></span><span id="_CPPv2N17kiwi_token_info_t11line_numberE"></span><span id="kiwi_token_info_t::line_number__uint_fast32_t"></span><span class="target" id="structkiwi__token__info__t_1aef3c13fb97d37be9cf66cd96ef116636"></span><span class="n"><span class="pre">uint_fast32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">line_number</span></span></span><a class="headerlink" href="#_CPPv4N17kiwi_token_info_t11line_numberE" title="Link to this definition"></a><br /></dt>
+<span id="_CPPv3N17kiwi_token_info_t11line_numberE"></span><span id="_CPPv2N17kiwi_token_info_t11line_numberE"></span><span id="kiwi_token_info_t::line_number__uint32_t"></span><span class="target" id="structkiwi__token__info__t_1a3bd64985decbd817cbb73fb0b7435cdb"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">line_number</span></span></span><a class="headerlink" href="#_CPPv4N17kiwi_token_info_t11line_numberE" title="Link to this definition"></a><br /></dt>
 <dd><p>줄 번호 </p>
 </dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N17kiwi_token_info_t6lengthE">
-<span id="_CPPv3N17kiwi_token_info_t6lengthE"></span><span id="_CPPv2N17kiwi_token_info_t6lengthE"></span><span id="kiwi_token_info_t::length__uint_fast16_t"></span><span class="target" id="structkiwi__token__info__t_1aa58f7371dcc20a58969b69ac0aeda481"></span><span class="n"><span class="pre">uint_fast16_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">length</span></span></span><a class="headerlink" href="#_CPPv4N17kiwi_token_info_t6lengthE" title="Link to this definition"></a><br /></dt>
+<span id="_CPPv3N17kiwi_token_info_t6lengthE"></span><span id="_CPPv2N17kiwi_token_info_t6lengthE"></span><span id="kiwi_token_info_t::length__uint16_t"></span><span class="target" id="structkiwi__token__info__t_1a6c22f2650a9fba79ede097a4a45790e5"></span><span class="n"><span class="pre">uint16_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">length</span></span></span><a class="headerlink" href="#_CPPv4N17kiwi_token_info_t6lengthE" title="Link to this definition"></a><br /></dt>
 <dd><p>길이(UTF16 문자 기준) </p>
 </dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N17kiwi_token_info_t3tagE">
-<span id="_CPPv3N17kiwi_token_info_t3tagE"></span><span id="_CPPv2N17kiwi_token_info_t3tagE"></span><span id="kiwi_token_info_t::tag__uint_fast8_t"></span><span class="target" id="structkiwi__token__info__t_1a5c8321c009ebcbc2e79a2e461c752571"></span><span class="n"><span class="pre">uint_fast8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">tag</span></span></span><a class="headerlink" href="#_CPPv4N17kiwi_token_info_t3tagE" title="Link to this definition"></a><br /></dt>
+<span id="_CPPv3N17kiwi_token_info_t3tagE"></span><span id="_CPPv2N17kiwi_token_info_t3tagE"></span><span id="kiwi_token_info_t::tag__uint8_t"></span><span class="target" id="structkiwi__token__info__t_1a2f8255848916bffeba1eaabdc3dae17e"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">tag</span></span></span><a class="headerlink" href="#_CPPv4N17kiwi_token_info_t3tagE" title="Link to this definition"></a><br /></dt>
 <dd><p>품사 태그 </p>
 </dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N17kiwi_token_info_t8sense_idE">
-<span id="_CPPv3N17kiwi_token_info_t8sense_idE"></span><span id="_CPPv2N17kiwi_token_info_t8sense_idE"></span><span id="kiwi_token_info_t::sense_id__uint_fast8_t"></span><span class="target" id="structkiwi__token__info__t_1a88381b21fdcc88f02e06d11bddfa48f2"></span><span class="n"><span class="pre">uint_fast8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sense_id</span></span></span><a class="headerlink" href="#_CPPv4N17kiwi_token_info_t8sense_idE" title="Link to this definition"></a><br /></dt>
+<span id="_CPPv3N17kiwi_token_info_t8sense_idE"></span><span id="_CPPv2N17kiwi_token_info_t8sense_idE"></span><span id="kiwi_token_info_t::sense_id__uint8_t"></span><span class="target" id="structkiwi__token__info__t_1a6a6f48513896c46ae1146c0d0cd5adf4"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sense_id</span></span></span><a class="headerlink" href="#_CPPv4N17kiwi_token_info_t8sense_idE" title="Link to this definition"></a><br /></dt>
 <dd><p>의미 번호 </p>
 </dd></dl>
 
@@ -1827,19 +2030,19 @@
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N17kiwi_token_info_t12typo_form_idE">
-<span id="_CPPv3N17kiwi_token_info_t12typo_form_idE"></span><span id="_CPPv2N17kiwi_token_info_t12typo_form_idE"></span><span id="kiwi_token_info_t::typo_form_id__uint_fast32_t"></span><span class="target" id="structkiwi__token__info__t_1a05f73924d87c86ad22e837e98f7c4e7d"></span><span class="n"><span class="pre">uint_fast32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">typo_form_id</span></span></span><a class="headerlink" href="#_CPPv4N17kiwi_token_info_t12typo_form_idE" title="Link to this definition"></a><br /></dt>
+<span id="_CPPv3N17kiwi_token_info_t12typo_form_idE"></span><span id="_CPPv2N17kiwi_token_info_t12typo_form_idE"></span><span id="kiwi_token_info_t::typo_form_id__uint32_t"></span><span class="target" id="structkiwi__token__info__t_1abd087ff84894fd3e786670f0a4caf3b0"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">typo_form_id</span></span></span><a class="headerlink" href="#_CPPv4N17kiwi_token_info_t12typo_form_idE" title="Link to this definition"></a><br /></dt>
 <dd><p>교정 전 오타의 형태에 대한 정보 (typoCost가 0인 경우 의미 없음) </p>
 </dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N17kiwi_token_info_t12paired_tokenE">
-<span id="_CPPv3N17kiwi_token_info_t12paired_tokenE"></span><span id="_CPPv2N17kiwi_token_info_t12paired_tokenE"></span><span id="kiwi_token_info_t::paired_token__uint_fast32_t"></span><span class="target" id="structkiwi__token__info__t_1aaa638b5454e57531bba051eede546804"></span><span class="n"><span class="pre">uint_fast32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">paired_token</span></span></span><a class="headerlink" href="#_CPPv4N17kiwi_token_info_t12paired_tokenE" title="Link to this definition"></a><br /></dt>
+<span id="_CPPv3N17kiwi_token_info_t12paired_tokenE"></span><span id="_CPPv2N17kiwi_token_info_t12paired_tokenE"></span><span id="kiwi_token_info_t::paired_token__uint32_t"></span><span class="target" id="structkiwi__token__info__t_1a5f9c5c35bf58d11cc9b3b9271cf5bc42"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">paired_token</span></span></span><a class="headerlink" href="#_CPPv4N17kiwi_token_info_t12paired_tokenE" title="Link to this definition"></a><br /></dt>
 <dd><p>SSO, SSC 태그에 속하는 형태소의 경우 쌍을 이루는 반대쪽 형태소의 위치(-1인 경우 해당하는 형태소가 없는 것을 뜻함) </p>
 </dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N17kiwi_token_info_t17sub_sent_positionE">
-<span id="_CPPv3N17kiwi_token_info_t17sub_sent_positionE"></span><span id="_CPPv2N17kiwi_token_info_t17sub_sent_positionE"></span><span id="kiwi_token_info_t::sub_sent_position__uint_fast32_t"></span><span class="target" id="structkiwi__token__info__t_1a6af137a85aa6e59330b1f9a08d87ff5e"></span><span class="n"><span class="pre">uint_fast32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sub_sent_position</span></span></span><a class="headerlink" href="#_CPPv4N17kiwi_token_info_t17sub_sent_positionE" title="Link to this definition"></a><br /></dt>
+<span id="_CPPv3N17kiwi_token_info_t17sub_sent_positionE"></span><span id="_CPPv2N17kiwi_token_info_t17sub_sent_positionE"></span><span id="kiwi_token_info_t::sub_sent_position__uint32_t"></span><span class="target" id="structkiwi__token__info__t_1a091b9092a427c8d36947b83ed6b58897"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sub_sent_position</span></span></span><a class="headerlink" href="#_CPPv4N17kiwi_token_info_t17sub_sent_positionE" title="Link to this definition"></a><br /></dt>
 <dd><p>인용부호나 괄호로 둘러싸인 하위 문장의 번호. 1부터 시작. 0인 경우 하위 문장이 아님을 뜻함 </p>
 </dd></dl>
 
