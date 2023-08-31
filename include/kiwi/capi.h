@@ -250,7 +250,7 @@ DECL_DLL int kiwi_builder_add_rule(kiwi_builder_h handle, const char* pos, kiwi_
  * @brief 사용자 사전으로부터 단어를 읽어들입니다.
  * 
  * @param handle KiwiBuilder의 핸들.
- * @param dict_path 사전 파일 경로.
+ * @param dict_path 사전 파일 경로 (디렉토리가 아니라 파일명까지 입력해야함).
  * @return 추가된 단어 수.
  */
 DECL_DLL int kiwi_builder_load_dict(kiwi_builder_h handle, const char* dict_path);
