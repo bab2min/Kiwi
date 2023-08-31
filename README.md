@@ -150,6 +150,9 @@ https://github.com/bab2min/kiwi-gui
 ### Python3 Wrapper
 또한 Python3용 API인 Kiwipiepy가 제공됩니다. 이에 대해서는 https://github.com/bab2min/kiwipiepy 를 참조하시길 바랍니다.
 
+### Java Wrapper
+Java 1.8 이상에서 사용 가능한 KiwiJava가 Java binding으로 제공됩니다. 이에 대해서는 [bindings/java](bindings/java)를 참조하시길 바랍니다.
+
 ### R Wrapper
 [mrchypark](https://github.com/mrchypark)님께서 작업해주신 R언어용 wrapper인 [elbird](https://mrchypark.github.io/elbird/)가 있습니다.
 
@@ -164,6 +167,12 @@ https://github.com/bab2min/kiwi-gui 에서 다운받을 수 있습니다.
 
 
 ## 업데이트 내역
+* v0.16
+  * 부분적으로 분석된 텍스트 처리를 위한 PretokenizedSpan 기능 구현 & Kiwi::analyze에 pretokenized 인자 추가
+  * 사용자 정의로 쓸 수 있는 user0~4 태그 추가
+  * 순서 있는 글머리를 위한 sb 태그 추가
+  * Java용 바인딩인 KiwiJava 제공 (실험적)
+
 * v0.15
   * 둘 이상의 형태소로 더 잘게 분리될 수 있는 형태소를 추가 분리하는 옵션인 `splitComplex` 도입
   * 부사파생접사를 위한 `XSM` 태그 추가 및 이에 해당하는 형태소 `-이`, `-히`, `-로`, `-스레` 추가
