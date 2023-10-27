@@ -452,10 +452,11 @@ TEST(KiwiCpp, FalsePositiveSB)
 		u"기계는 명령만 듣는다.라는 생각이 이제 사람들에게 완전히 정착이 되었다는 상황인데, 그럴싸하죠",
 		u"후반 빨간 모아이들의 공격은 엄청나게 거세다.상하로 점프하며 이온링을 발사하는 중보스 모아이상들.",
 		u"또 전화세, 전기세, 보험료등 월 정기지출도 지출통장으로 바꾼 다. 셋째, 물건을 살땐 무조건 카드로 긁는다.",
+		u"에티하드항공이 최고의 이코노미 클래스 상을 두 번째로 받은 해는 2020년이다. 이전에는 2012년과 2013년에 최고의 이코노미 클래스 상을 수상한 적이 있어요.",
 
 	})
 	{
-		auto tokens = kiwi.analyze(str, Match::allWithNormalizing).first;
+		auto tokens = kiwi.analyze(str, 10, Match::allWithNormalizing)[0].first;
 		auto sbCount = std::count_if(tokens.begin(), tokens.end(), [](const TokenInfo& t)
 		{
 			return t.tag == POSTag::sb;
