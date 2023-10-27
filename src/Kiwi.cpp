@@ -666,6 +666,68 @@ namespace kiwi
 		}
 	};
 
+	template<class LmState>
+	struct PathHash
+	{
+		LmState lmState;
+		uint16_t lastMorpheme;
+		uint8_t spState;
+
+		PathHash(LmState _lmState = {}, uint16_t _lastMorpheme = 0, SpecialState _spState = {})
+			: lmState{ _lmState }, lastMorpheme{ _lastMorpheme }, spState{ _spState }
+		{
+		}
+
+		bool operator==(const PathHash& o) const
+		{
+			return lmState == o.lmState && lastMorpheme == o.lastMorpheme && spState == o.spState;
+		}
+	};
+
+	template<size_t windowSize, ArchType _arch, class VocabTy>
+	struct PathHash<SbgState<windowSize, _arch, VocabTy>>
+	{
+		array<VocabTy, 4> lastMorphemes;
+
+		PathHash(const SbgState<windowSize, _arch, VocabTy>& _lmState = {}, uint16_t _lastMorpheme = 0, SpecialState _spState = {})
+		{
+			_lmState.getLastHistory(lastMorphemes.data(), lastMorphemes.size());
+			lastMorphemes.back() = _lastMorpheme;
+			lastMorphemes[0] = ((lastMorphemes[0] << 8) >> 8) | ((uint8_t)_spState) << ((sizeof(VocabTy) - 1) * 8);
+		}
+
+		bool operator==(const PathHash& o) const
+		{
+			return lastMorphemes == o.lastMorphemes;
+		}
+	};
+
+	template<class LmState>
+	struct Hash<PathHash<LmState>>
+	{
+		size_t operator()(const PathHash<LmState>& p) const
+		{
+			size_t ret = 0;
+			if (sizeof(PathHash<LmState>) % sizeof(size_t))
+			{
+				auto ptr = reinterpret_cast<const uint32_t*>(&p);
+				for (size_t i = 0; i < sizeof(PathHash<LmState>) / sizeof(uint32_t); ++i)
+				{
+					ret ^= ptr[i];
+				}
+			}
+			else
+			{
+				auto ptr = reinterpret_cast<const size_t*>(&p);
+				for (size_t i = 0; i < sizeof(PathHash<LmState>) / sizeof(size_t); ++i)
+				{
+					ret ^= ptr[i];
+				}
+			}
+			return ret;
+		}
+	};
+
 	struct GenericGreater
 	{
 		template<class A, class B>
@@ -733,7 +795,11 @@ namespace kiwi
 
 				CondVowel cvowel = curMorph->vowel;
 				CondPolarity cpolar = curMorph->polar;
-				if (ignoreCondScore)
+				if (p.morpheme->tag == POSTag::ssc) 
+				{
+					// 이전 형태소가 닫는 괄호인 경우 좌측 결합조건을 적용하지 않음
+				}
+				else if (ignoreCondScore)
 				{
 					candScore += FeatureTestor::isMatched(leftFormFirst, leftFormLast, cvowel, cpolar) ? 0 : ignoreCondScore;
 				}
@@ -1247,18 +1313,12 @@ namespace kiwi
 			// heuristically remove cands having lower ll to speed up
 			if (cache[i].size() > topN)
 			{
-				UnorderedMap<array<uint16_t, 4>, pair<WordLL<LmState>*, float>> bestPathes;
+				UnorderedMap<PathHash<LmState>, pair<WordLL<LmState>*, float>> bestPathes;
 				float cutoffScore = -INFINITY, cutoffScoreWithCombined = -INFINITY;
 				for (auto& c : cache[i])
 				{
-					array<uint16_t, 4> lastNgram = { 0, };
-					size_t j = lastNgram.size();
-					for (const WordLL<LmState>* it = &c; it && j > 0; it = it->parent, --j)
-					{
-						lastNgram[j - 1] = it->morpheme - kw->morphemes.data();
-					}
-					lastNgram[3] ^= (uint8_t)c.spState << 8;
-					auto insertResult = bestPathes.emplace(lastNgram, make_pair(&c, c.accScore));
+					PathHash<LmState> ph{ c.lmState, (uint16_t)(c.morpheme - kw->morphemes.data()), c.spState };
+					auto insertResult = bestPathes.emplace(ph, make_pair(&c, c.accScore));
 					if (!insertResult.second)
 					{
 						if (c.accScore > insertResult.first->second.second)
