@@ -1257,7 +1257,7 @@ namespace kiwi
 					{
 						lastNgram[j - 1] = it->morpheme - kw->morphemes.data();
 					}
-					lastNgram[3] ^= (uint8_t)c.spState;
+					lastNgram[3] ^= (uint8_t)c.spState << 8;
 					auto insertResult = bestPathes.emplace(lastNgram, make_pair(&c, c.accScore));
 					if (!insertResult.second)
 					{
