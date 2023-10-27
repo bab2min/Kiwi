@@ -48,10 +48,11 @@ namespace kiwi
 
 TagSequenceScorer::TagSequenceScorer(float _weight) : weight{ _weight }
 {
-	for (auto t : { POSTag::nnp, POSTag::np, POSTag::ic, POSTag::sb})
+	for (auto t : { POSTag::nnp, POSTag::np, POSTag::ic })
 	{
 		leftBoundaryScores[0][(size_t)t] = -1;
 	}
+	leftBoundaryScores[0][(size_t)POSTag::sb] = -3;
 
 	for (size_t r = 0; r < (size_t)POSTag::max; ++r)
 	{

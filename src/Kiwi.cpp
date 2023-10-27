@@ -1022,6 +1022,18 @@ namespace kiwi
 								q.accScore -= 2;
 							}
 						}
+						
+						// discount for SB in form "[가-하]."
+						if (curMorphSbType == 5)
+						{
+							q.accScore -= 5;
+						}
+
+						if (curMorphSbType && isEClass(q.lastMorpheme->tag) && q.lastMorpheme->tag != POSTag::ef)
+						{
+							q.accScore -= 10;
+						}
+
 						if (curMorphSbType && q.spState.bulletHash == hashSbTypeOrder(curMorphSbType, curMorphSbOrder))
 						{
 							q.accScore += 3;

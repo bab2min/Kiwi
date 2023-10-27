@@ -441,6 +441,29 @@ TEST(KiwiCpp, SentenceBoundaryWithOrderedBullet)
 	}
 }
 
+
+TEST(KiwiCpp, FalsePositiveSB)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+
+	for (auto str : {
+		u"하다. 가운데 비닐을 요렇게 벗겨주고요!",
+		u"자, 이것이 `열쇠`다.`` 암상인 앞의 캡슐이 열리며 그곳에서 새로운 파워업 아이템 `쿠나이`를 얻을 수 있다.",
+		u"기계는 명령만 듣는다.라는 생각이 이제 사람들에게 완전히 정착이 되었다는 상황인데, 그럴싸하죠",
+		u"후반 빨간 모아이들의 공격은 엄청나게 거세다.상하로 점프하며 이온링을 발사하는 중보스 모아이상들.",
+		u"또 전화세, 전기세, 보험료등 월 정기지출도 지출통장으로 바꾼 다. 셋째, 물건을 살땐 무조건 카드로 긁는다.",
+
+	})
+	{
+		auto tokens = kiwi.analyze(str, Match::allWithNormalizing).first;
+		auto sbCount = std::count_if(tokens.begin(), tokens.end(), [](const TokenInfo& t)
+		{
+			return t.tag == POSTag::sb;
+		});
+		EXPECT_EQ(sbCount, 0);
+	}
+}
+
 TEST(KiwiCpp, SplitByPolarity)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
