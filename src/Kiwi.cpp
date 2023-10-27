@@ -1022,6 +1022,18 @@ namespace kiwi
 								q.accScore -= 2;
 							}
 						}
+						
+						// discount for SB in form "[가-하]."
+						if (curMorphSbType == 5)
+						{
+							q.accScore -= 5;
+						}
+
+						if (curMorphSbType && isEClass(q.lastMorpheme->tag) && q.lastMorpheme->tag != POSTag::ef)
+						{
+							q.accScore -= 10;
+						}
+
 						if (curMorphSbType && q.spState.bulletHash == hashSbTypeOrder(curMorphSbType, curMorphSbOrder))
 						{
 							q.accScore += 3;
@@ -1245,7 +1257,7 @@ namespace kiwi
 					{
 						lastNgram[j - 1] = it->morpheme - kw->morphemes.data();
 					}
-					lastNgram[3] |= (uint8_t)c.spState;
+					lastNgram[3] ^= (uint8_t)c.spState;
 					auto insertResult = bestPathes.emplace(lastNgram, make_pair(&c, c.accScore));
 					if (!insertResult.second)
 					{
@@ -1847,6 +1859,11 @@ namespace kiwi
 			fillPairedTokenInfo(r.first);
 			fillSentLineInfo(r.first, newlines);
 		}
+
+		sort(ret.begin(), ret.end(), [](const TokenResult& a, const TokenResult& b)
+		{
+			return a.second > b.second;
+		});
 
 		if (ret.empty()) ret.emplace_back();
 		return ret;
