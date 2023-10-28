@@ -54,7 +54,7 @@ namespace kiwi
 	};
 
 	template<size_t windowSize, ArchType _arch, class VocabTy>
-	class SbgState : KnLMState<_arch, VocabTy>
+	class SbgState : public KnLMState<_arch, VocabTy>
 	{
 		size_t historyPos = 0;
 		std::array<VocabTy, windowSize> history = { {0,} };
