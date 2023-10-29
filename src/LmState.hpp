@@ -30,12 +30,12 @@ namespace kiwi
 	template<ArchType _arch, class VocabTy>
 	class KnLMState
 	{
-		ptrdiff_t node = 0;
+		int32_t node = 0;
 	public:
 		static constexpr ArchType arch = _arch;
 
 		KnLMState() = default;
-		KnLMState(const LangModel& lm) : node{ static_cast<const lm::KnLangModel<arch, VocabTy>&>(*lm.knlm).getBosNodeIdx() } {}
+		KnLMState(const LangModel& lm) : node{ (int32_t)static_cast<const lm::KnLangModel<arch, VocabTy>&>(*lm.knlm).getBosNodeIdx() } {}
 
 		bool operator==(const KnLMState& other) const
 		{
