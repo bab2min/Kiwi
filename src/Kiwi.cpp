@@ -613,7 +613,7 @@ namespace kiwi
 
 		if (ret.empty())
 		{
-			const size_t n = pathes.size();
+			const size_t n = min(pathes.size(), topN * 2);
 			ret.resize(n);
 			spStatesByRet.resize(n);
 			parentMap.resize(n);

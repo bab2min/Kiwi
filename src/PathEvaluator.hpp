@@ -1081,6 +1081,7 @@ namespace kiwi
 		{
 			return a.score > b.score;
 		});
+		if (ret.size() > topN * 2) ret.erase(ret.begin() + topN * 2, ret.end());
 		return ret;
 	}
 }
