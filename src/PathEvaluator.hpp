@@ -1030,9 +1030,13 @@ namespace kiwi
 		auto& cand = cache.back();
 		sort(cand.begin(), cand.end(),
 			[](const WordLL<LmState>& a, const WordLL<LmState>& b)
-		{
-			return a.accScore > b.accScore;
-		}
+			{
+				if (a.rootId < b.rootId) return true;
+				if (a.rootId > b.rootId) return false;
+				if (a.spState < b.spState) return true;
+				if (a.spState > b.spState) return false;
+				return a.accScore > b.accScore;
+			}
 		);
 
 #ifdef DEBUG_PRINT
@@ -1052,14 +1056,31 @@ namespace kiwi
 
 		utils::ContainerSearcher<WordLL<LmState>> csearcher{ cache };
 		Vector<ChunkResult> ret;
-		for (size_t i = 0; i < min(topN, cand.size()); ++i)
+		size_t startIdx = 0;
+		pair<uint8_t, uint8_t> prevRootIdAndSpState;
+		if (!cand.empty()) prevRootIdAndSpState = make_pair(cand[0].rootId, (uint8_t)cand[0].spState);
+		for (size_t i = 0; i < cand.size(); ++i)
 		{
-			auto tokens = generateTokenList(
-				&cand[i], csearcher, graph, ownFormList, kw->typoCostWeight,
-				kw->morphemes.data(), langVocabSize
-			);
-			ret.emplace_back(move(tokens.first), cand[i].accScore, tokens.second->spState, cand[i].spState);
+			auto curRootIdAndSpState = make_pair(cand[i].rootId, (uint8_t)cand[i].spState);
+			if (prevRootIdAndSpState != curRootIdAndSpState)
+			{
+				startIdx = i;
+				prevRootIdAndSpState = curRootIdAndSpState;
+			}
+
+			if (i - startIdx < topN)
+			{
+				auto tokens = generateTokenList(
+					&cand[i], csearcher, graph, ownFormList, kw->typoCostWeight,
+					kw->morphemes.data(), langVocabSize
+				);
+				ret.emplace_back(move(tokens.first), cand[i].accScore, tokens.second->spState, cand[i].spState);
+			}
 		}
+		sort(ret.begin(), ret.end(), [](const ChunkResult& a, const ChunkResult& b)
+		{
+			return a.score > b.score;
+		});
 		return ret;
 	}
 }

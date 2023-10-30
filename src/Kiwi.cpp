@@ -613,9 +613,10 @@ namespace kiwi
 
 		if (ret.empty())
 		{
-			ret.resize(pathes.size());
-			spStatesByRet.resize(pathes.size());
-			parentMap.resize(pathes.size());
+			const size_t n = pathes.size();
+			ret.resize(n);
+			spStatesByRet.resize(n);
+			parentMap.resize(n);
 			iota(parentMap.begin(), parentMap.end(), 0);
 		}
 		else
@@ -661,10 +662,14 @@ namespace kiwi
 			}
 		}
 
+		UnorderedMap<uint8_t, uint32_t> spStateCnt;
 		size_t validTarget = 0;
 		for (size_t i = 0; i < ret.size(); ++i)
 		{
-			if (parentMap[i] < pathes.size())
+			auto& r = pathes[parentMap[i]];
+			auto& rarr = ret[validTarget].first;
+
+			if (parentMap[i] < pathes.size() && spStateCnt[r.curState] < topN)
 			{
 				if (validTarget != i) ret[validTarget] = move(ret[i]);
 			}
@@ -673,8 +678,6 @@ namespace kiwi
 				continue;
 			}
 
-			auto& r = pathes[parentMap[i]];
-			auto& rarr = ret[validTarget].first;
 			const KString* prevMorph = nullptr;
 			for (auto& s : r.path)
 			{
@@ -726,6 +729,7 @@ namespace kiwi
 			rarr.erase(joinAffixTokens(rarr.begin(), rarr.end(), matchOptions), rarr.end());
 			ret[validTarget].second += r.score;
 			spStatesByRet[validTarget] = r.curState;
+			spStateCnt[r.curState]++;
 			validTarget++;
 		}
 		ret.erase(ret.begin() + validTarget, ret.end());
@@ -977,6 +981,12 @@ namespace kiwi
 			);
 			insertPathIntoResults(ret, spStatesByRet, res, topN, matchOptions, integrateAllomorph, positionTable, wordPositions, pretokenizedGroup, nodeInWhichPretokenized);
 		}
+
+		sort(ret.begin(), ret.end(), [](const TokenResult& a, const TokenResult& b)
+		{
+			return a.second > b.second;
+		});
+		if (ret.size() > topN) ret.erase(ret.begin() + topN, ret.end());
 		
 		auto newlines = allNewLinePositions(str);
 		for (auto& r : ret)
@@ -984,11 +994,6 @@ namespace kiwi
 			fillPairedTokenInfo(r.first);
 			fillSentLineInfo(r.first, newlines);
 		}
-
-		sort(ret.begin(), ret.end(), [](const TokenResult& a, const TokenResult& b)
-		{
-			return a.second > b.second;
-		});
 
 		if (ret.empty()) ret.emplace_back();
 		return ret;
