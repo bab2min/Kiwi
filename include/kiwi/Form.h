@@ -2,7 +2,7 @@
  * @file Form.h
  * @author bab2min (bab2min@gmail.com)
  * @brief 형태 및 형태소에 관한 정보를 담는 구조체들이 선언된 헤더
- * @version 0.15.0
+ * @version 0.16.1
  * @date 2022-09-01
  * 
  * 
