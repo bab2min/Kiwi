@@ -341,7 +341,8 @@ namespace kiwi
 				}
 			}
 
-			float progress(ptrdiff_t& node_idx, KeyType next) const
+			template<class IdxType>
+			float progress(IdxType& node_idx, KeyType next) const
 			{
 				float acc = 0;
 				while (1)
@@ -358,7 +359,7 @@ namespace kiwi
 						{
 							if (htx_data)
 							{
-								ptrdiff_t lv;
+								IdxType lv;
 								if (nst::search<arch>(
 									&key_data[0],
 									value_data,
@@ -413,7 +414,7 @@ namespace kiwi
 						}
 						if (htx_data)
 						{
-							ptrdiff_t lv;
+							IdxType lv;
 							if (nst::search<arch>(
 								&key_data[0],
 								value_data,

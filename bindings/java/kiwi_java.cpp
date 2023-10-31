@@ -437,6 +437,7 @@ JMultipleTokenResult::JMultipleTokenResult(jni::JUniqueGlobalRef<JKiwi>&& _dp,
 )
 	: dp{ std::move(_dp) },
 	texts{ std::move(_texts) },
+	topN{ _topN },
 	matchOption{ _matchOption },
 	blocklist{ _blocklist },
 	pretokenized{ std::move(_pretokenized) }

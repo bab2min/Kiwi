@@ -16,6 +16,11 @@ namespace kiwi
 		VoidState() = default;
 		VoidState(const LangModel& lm) {}
 
+		bool operator==(const VoidState& other) const
+		{
+			return true;
+		}
+
 		float next(const LangModel& lm, size_t next)
 		{
 			return 0;
@@ -25,12 +30,17 @@ namespace kiwi
 	template<ArchType _arch, class VocabTy>
 	class KnLMState
 	{
-		ptrdiff_t node = 0;
+		int32_t node = 0;
 	public:
 		static constexpr ArchType arch = _arch;
 
 		KnLMState() = default;
-		KnLMState(const LangModel& lm) : node{ static_cast<const lm::KnLangModel<arch, VocabTy>&>(*lm.knlm).getBosNodeIdx() } {}
+		KnLMState(const LangModel& lm) : node{ (int32_t)static_cast<const lm::KnLangModel<arch, VocabTy>&>(*lm.knlm).getBosNodeIdx() } {}
+
+		bool operator==(const KnLMState& other) const
+		{
+			return node == other.node;
+		}
 
 		float next(const LangModel& lm, VocabTy next)
 		{
@@ -44,7 +54,7 @@ namespace kiwi
 	};
 
 	template<size_t windowSize, ArchType _arch, class VocabTy>
-	class SbgState : KnLMState<_arch, VocabTy>
+	class SbgState : public KnLMState<_arch, VocabTy>
 	{
 		size_t historyPos = 0;
 		std::array<VocabTy, windowSize> history = { {0,} };
@@ -53,6 +63,19 @@ namespace kiwi
 
 		SbgState() = default;
 		SbgState(const LangModel& lm) : KnLMState<_arch, VocabTy>{ lm } {}
+
+		bool operator==(const SbgState& other) const
+		{
+			return KnLMState<_arch, VocabTy>::operator==(other) && historyPos == other.historyPos && history == other.history;
+		}
+
+		void getLastHistory(VocabTy* out, size_t n) const
+		{
+			for (size_t i = 0; i < n; ++i)
+			{
+				out[i] = history[(historyPos + windowSize + i - n) % windowSize];
+			}
+		}
 
 		float next(const LangModel& lm, VocabTy next)
 		{
