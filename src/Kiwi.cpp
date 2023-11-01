@@ -666,10 +666,7 @@ namespace kiwi
 		size_t validTarget = 0;
 		for (size_t i = 0; i < ret.size(); ++i)
 		{
-			auto& r = pathes[parentMap[i]];
-			auto& rarr = ret[validTarget].first;
-
-			if (parentMap[i] < pathes.size() && spStateCnt[r.curState] < topN)
+			if (parentMap[i] < pathes.size() && spStateCnt[pathes[parentMap[i]].curState] < topN)
 			{
 				if (validTarget != i) ret[validTarget] = move(ret[i]);
 			}
@@ -677,6 +674,9 @@ namespace kiwi
 			{
 				continue;
 			}
+
+			auto& r = pathes[parentMap[i]];
+			auto& rarr = ret[validTarget].first;
 
 			const KString* prevMorph = nullptr;
 			for (auto& s : r.path)
