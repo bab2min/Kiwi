@@ -32,6 +32,21 @@ inline testing::AssertionResult testTokenization(Kiwi& kiwi, const std::u16strin
 	}
 }
 
+#if defined(__GNUC__) && __GNUC__ < 5
+template<class Ty>
+constexpr std::vector<std::pair<Ty, Ty>> toPair(std::initializer_list<Ty> init)
+{
+	return std::vector<std::pair<Ty, Ty>>{ (const std::pair<Ty, Ty>*)init.begin(), (const std::pair<Ty, Ty>*)init.begin() + init.size() / 2 };
+}
+#else
+template<class Ty, class ATy, size_t n>
+constexpr std::vector<std::pair<Ty, Ty>> toPair(const ATy(&init)[n])
+{
+	static_assert(n % 2 == 0, "initializer_list must have an even number of elements.");
+	return std::vector<std::pair<Ty, Ty>>{ (const std::pair<Ty, Ty>*)init, (const std::pair<Ty, Ty>*)init + n / 2 };
+}
+#endif
+
 Kiwi& reuseKiwiInstance()
 {
 	static Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 0, BuildOption::default_, }.build();
@@ -960,118 +975,139 @@ TEST(KiwiCpp, JoinAffix)
 TEST(KiwiCpp, AutoJoiner)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
+	std::vector<std::pair<uint32_t, uint32_t>> ranges;
 	auto joiner = kiwi.newJoiner();
 	joiner.add(u"시동", POSTag::nng);
 	joiner.add(u"를", POSTag::jko);
-	EXPECT_EQ(joiner.getU16(), u"시동을");
+	EXPECT_EQ(joiner.getU16(&ranges), u"시동을");
+	EXPECT_EQ(ranges, toPair<uint32_t>({ 0, 2, 2, 3 }));
 
 	joiner = kiwi.newJoiner();
 	joiner.add(u"시동", POSTag::nng);
 	joiner.add(u"ᆯ", POSTag::jko);
-	EXPECT_EQ(joiner.getU16(), u"시동을");
+	EXPECT_EQ(joiner.getU16(&ranges), u"시동을");
+	EXPECT_EQ(ranges, toPair<uint32_t>({ 0, 2, 2, 3 }));
 
 	joiner = kiwi.newJoiner();
 	joiner.add(u"나", POSTag::np);
 	joiner.add(u"ᆯ", POSTag::jko);
-	EXPECT_EQ(joiner.getU16(), u"날");
+	EXPECT_EQ(joiner.getU16(&ranges), u"날");
+	EXPECT_EQ(ranges, toPair<uint32_t>({ 0, 1, 0, 1 }));
 
 	joiner = kiwi.newJoiner();
 	joiner.add(u"시도", POSTag::nng);
 	joiner.add(u"를", POSTag::jko);
-	EXPECT_EQ(joiner.getU16(), u"시도를");
+	EXPECT_EQ(joiner.getU16(&ranges), u"시도를");
+	EXPECT_EQ(ranges, toPair<uint32_t>({ 0, 2, 2, 3 }));
 
 	joiner = kiwi.newJoiner();
 	joiner.add(u"바다", POSTag::nng);
 	joiner.add(u"가", POSTag::jks);
-	EXPECT_EQ(joiner.getU16(), u"바다가");
+	EXPECT_EQ(joiner.getU16(&ranges), u"바다가");
+	EXPECT_EQ(ranges, toPair<uint32_t>({ 0, 2, 2, 3 }));
 
 	joiner = kiwi.newJoiner();
 	joiner.add(u"바닥", POSTag::nng);
 	joiner.add(u"가", POSTag::jks);
-	EXPECT_EQ(joiner.getU16(), u"바닥이");
+	EXPECT_EQ(joiner.getU16(&ranges), u"바닥이");
+	EXPECT_EQ(ranges, toPair<uint32_t>({ 0, 2, 2, 3 }));
 
 	joiner = kiwi.newJoiner();
 	joiner.add(u"불", POSTag::nng);
 	joiner.add(u"으로", POSTag::jkb);
-	EXPECT_EQ(joiner.getU16(), u"불로");
+	EXPECT_EQ(joiner.getU16(&ranges), u"불로");
+	EXPECT_EQ(ranges, toPair<uint32_t>({ 0, 1, 1, 2 }));
 
 	joiner = kiwi.newJoiner();
 	joiner.add(u"북", POSTag::nng);
 	joiner.add(u"으로", POSTag::jkb);
-	EXPECT_EQ(joiner.getU16(), u"북으로");
+	EXPECT_EQ(joiner.getU16(&ranges), u"북으로");
+	EXPECT_EQ(ranges, toPair<uint32_t>({ 0, 1, 1, 3 }));
 
 	joiner = kiwi.newJoiner();
 	joiner.add(u"갈", POSTag::vv);
 	joiner.add(u"면", POSTag::ec);
-	EXPECT_EQ(joiner.getU16(), u"갈면");
+	EXPECT_EQ(joiner.getU16(&ranges), u"갈면");
+	EXPECT_EQ(ranges, toPair<uint32_t>({ 0, 1, 1, 2 }));
 
 	joiner = kiwi.newJoiner();
 	joiner.add(u"갈", POSTag::vv);
 	joiner.add(u"시", POSTag::ep);
 	joiner.add(u"았", POSTag::ep);
 	joiner.add(u"면", POSTag::ec);
-	EXPECT_EQ(joiner.getU16(), u"가셨으면");
+	EXPECT_EQ(joiner.getU16(&ranges), u"가셨으면");
+	EXPECT_EQ(ranges, toPair<uint32_t>({ 0, 1, 1, 2, 1, 2, 2, 4 }));
 
 	joiner = kiwi.newJoiner();
 	joiner.add(u"하", POSTag::vv);
 	joiner.add(u"았", POSTag::ep);
 	joiner.add(u"다", POSTag::ef);
-	EXPECT_EQ(joiner.getU16(), u"했다");
+	EXPECT_EQ(joiner.getU16(&ranges), u"했다");
+	EXPECT_EQ(ranges, toPair<uint32_t>({ 0, 1, 0, 1, 1, 2 }));
 
 	joiner = kiwi.newJoiner();
 	joiner.add(u"날", POSTag::vv);
 	joiner.add(u"어", POSTag::ef);
-	EXPECT_EQ(joiner.getU16(), u"날아");
+	EXPECT_EQ(joiner.getU16(&ranges), u"날아");
+	EXPECT_EQ(ranges, toPair<uint32_t>({ 0, 1, 1, 2 }));
 
 	joiner = kiwi.newJoiner();
 	joiner.add(u"고기", POSTag::nng);
 	joiner.add(u"을", POSTag::jko);
 	joiner.add(u"굽", POSTag::vv);
 	joiner.add(u"어", POSTag::ef);
-	EXPECT_EQ(joiner.getU16(), u"고기를 구워");
+	EXPECT_EQ(joiner.getU16(&ranges), u"고기를 구워");
+	EXPECT_EQ(ranges, toPair<uint32_t>({ 0, 2, 2, 3, 4, 6, 5, 6 }));
 
 	joiner = kiwi.newJoiner();
 	joiner.add(u"길", POSTag::nng);
 	joiner.add(u"을", POSTag::jko);
 	joiner.add(u"걷", POSTag::vv);
 	joiner.add(u"어요", POSTag::ef);
-	EXPECT_EQ(joiner.getU16(), u"길을 걸어요");
+	EXPECT_EQ(joiner.getU16(&ranges), u"길을 걸어요");
+	EXPECT_EQ(ranges, toPair<uint32_t>({ 0, 1, 1, 2, 3, 4, 4, 6 }));
 
 	joiner = kiwi.newJoiner(false);
 	joiner.add(u"길", POSTag::nng);
 	joiner.add(u"을", POSTag::jko);
 	joiner.add(u"걷", POSTag::vv);
 	joiner.add(u"어요", POSTag::ef);
-	EXPECT_EQ(joiner.getU16(), u"길을 걷어요");
+	EXPECT_EQ(joiner.getU16(&ranges), u"길을 걷어요");
+	EXPECT_EQ(ranges, toPair<uint32_t>({ 0, 1, 1, 2, 3, 4, 4, 6 }));
 
 	joiner = kiwi.newJoiner();
 	joiner.add(u"땅", POSTag::nng);
 	joiner.add(u"에", POSTag::jkb);
 	joiner.add(u"묻", POSTag::vv);
 	joiner.add(u"어요", POSTag::ef);
-	EXPECT_EQ(joiner.getU16(), u"땅에 묻어요");
+	EXPECT_EQ(joiner.getU16(&ranges), u"땅에 묻어요");
+	EXPECT_EQ(ranges, toPair<uint32_t>({ 0, 1, 1, 2, 3, 4, 4, 6 }));
 
 	joiner = kiwi.newJoiner();
 	joiner.add(u"땅", POSTag::nng);
 	joiner.add(u"이", POSTag::vcp);
 	joiner.add(u"에요", POSTag::ef);
-	EXPECT_EQ(joiner.getU16(), u"땅이에요");
+	EXPECT_EQ(joiner.getU16(&ranges), u"땅이에요");
+	EXPECT_EQ(ranges, toPair<uint32_t>({ 0, 1, 1, 2, 2, 4 }));
 
 	joiner = kiwi.newJoiner();
 	joiner.add(u"바다", POSTag::nng);
 	joiner.add(u"이", POSTag::vcp);
 	joiner.add(u"에요", POSTag::ef);
-	EXPECT_EQ(joiner.getU16(), u"바다에요");
+	EXPECT_EQ(joiner.getU16(&ranges), u"바다에요");
+	EXPECT_EQ(ranges, toPair<uint32_t>({ 0, 2, 2, 2, 2, 4 }));
 
 	joiner = kiwi.newJoiner();
 	joiner.add(u"좋", POSTag::va);
 	joiner.add(u"은데", POSTag::ec);
-	EXPECT_EQ(joiner.getU16(), u"좋은데");
+	EXPECT_EQ(joiner.getU16(&ranges), u"좋은데");
+	EXPECT_EQ(ranges, toPair<uint32_t>({ 0, 1, 1, 3 }));
 
 	joiner = kiwi.newJoiner();
 	joiner.add(u"크", POSTag::va);
 	joiner.add(u"은데", POSTag::ec);
-	EXPECT_EQ(joiner.getU16(), u"큰데");
+	EXPECT_EQ(joiner.getU16(&ranges), u"큰데");
+	EXPECT_EQ(ranges, toPair<uint32_t>({ 0, 1, 0, 2 }));
 }
 
 TEST(KiwiCpp, UserWordWithNumeric)
