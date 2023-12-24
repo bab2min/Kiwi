@@ -108,6 +108,31 @@ namespace kiwi
 		return ret;
 	}
 
+	template<class It, class Ty, class Alloc>
+	inline std::u16string joinHangul(It first, It last, std::vector<Ty, Alloc>& positionOut)
+	{
+		std::u16string ret;
+		ret.reserve(std::distance(first, last));
+		positionOut.clear();
+		positionOut.reserve(std::distance(first, last));
+		for (; first != last; ++first)
+		{
+			auto c = *first;
+			if (isHangulCoda(c) && !ret.empty() && isHangulSyllable(ret.back()))
+			{
+				if ((ret.back() - 0xAC00) % 28) ret.push_back(c);
+				else ret.back() += c - 0x11A7;
+				positionOut.emplace_back(ret.size() - 1);
+			}
+			else
+			{
+				ret.push_back(c);
+				positionOut.emplace_back(ret.size() - 1);
+			}
+		}
+		return ret;
+	}
+
 	inline std::u16string joinHangul(const KString& hangul)
 	{
 		return joinHangul(hangul.begin(), hangul.end());

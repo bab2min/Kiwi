@@ -79,9 +79,11 @@ namespace kiwi
 
 		void Joiner::add(U16StringView form, POSTag tag, Space space)
 		{
+			KString normForm = normalizeHangul(form);
 			if (stack.size() == activeStart)
 			{
-				stack += normalizeHangul(form);
+				ranges.emplace_back(stack.size(), stack.size() + normForm.size());
+				stack += normForm;
 				lastTag = tag;
 				return;
 			}
@@ -90,7 +92,8 @@ namespace kiwi
 			{
 				if (stack.empty() || !isSpace(stack.back())) stack.push_back(u' ');
 				activeStart = stack.size();
-				stack += normalizeHangul(form);
+				ranges.emplace_back(stack.size(), stack.size() + normForm.size());
+				stack += normForm;
 			}
 			else
 			{
@@ -99,8 +102,6 @@ namespace kiwi
 				{
 					cv = isHangulSyllable(stack[activeStart - 1]) ? CondVowel::vowel : CondVowel::non_vowel;
 				}
-
-				KString normForm = normalizeHangul(form);
 
 				if (!stack.empty() && (isJClass(tag) || isEClass(tag)))
 				{
@@ -148,8 +149,10 @@ namespace kiwi
 				}
 				auto r = cr->combineOneImpl({ stack.data() + activeStart, stack.size() - activeStart }, lastTag, normForm, tag, cv);
 				stack.erase(stack.begin() + activeStart, stack.end());
-				stack += r.first;
-				activeStart += r.second;
+				ranges.back().second = activeStart + get<1>(r);
+				ranges.emplace_back(activeStart + get<2>(r), activeStart + get<0>(r).size());
+				stack += get<0>(r);
+				activeStart += get<2>(r);
 			}
 			anteLastTag = lastTag;
 			lastTag = tag;
@@ -165,14 +168,46 @@ namespace kiwi
 			return add(U16StringView{ form }, tag, space);
 		}
 
-		u16string Joiner::getU16() const
+		u16string Joiner::getU16(vector<pair<uint32_t, uint32_t>>* rangesOut) const
 		{
-			return joinHangul(stack);
+			if (rangesOut)
+			{
+				rangesOut->clear();
+				rangesOut->reserve(ranges.size());
+				Vector<uint32_t> u16pos;
+				auto ret = joinHangul(stack.begin(), stack.end(), u16pos);
+				u16pos.emplace_back(ret.size());
+				for (auto& r : ranges)
+				{
+					auto endOffset = u16pos[r.second] + (r.second > 0 && u16pos[r.second - 1] == u16pos[r.second] ? 1 : 0);
+					rangesOut->emplace_back(u16pos[r.first], endOffset);
+				}
+				return ret;
+			}
+			else
+			{
+				return joinHangul(stack);
+			}
 		}
 
-		string Joiner::getU8() const
+		string Joiner::getU8(vector<pair<uint32_t, uint32_t>>* rangesOut) const
 		{
-			return utf16To8(joinHangul(stack));
+			auto u16 = getU16(rangesOut);
+			if (rangesOut)
+			{
+				Vector<uint32_t> positions;
+				auto ret = utf16To8(u16, positions);
+				for (auto& r : *rangesOut)
+				{
+					r.first = positions[r.first];
+					r.second = positions[r.second];
+				}
+				return ret;
+			}
+			else
+			{
+				return utf16To8(u16);
+			}
 		}
 
 		AutoJoiner::~AutoJoiner()
@@ -422,19 +457,33 @@ namespace kiwi
 
 		struct GetU16Visitor
 		{
+			vector<pair<uint32_t, uint32_t>>* rangesOut;
+
+			GetU16Visitor(vector<pair<uint32_t, uint32_t>>* _rangesOut)
+				: rangesOut{ _rangesOut }
+			{
+			}
+
 			template<class LmState>
 			u16string operator()(const Vector<Candidate<LmState>>& o) const
 			{
-				return o[0].joiner.getU16();
+				return o[0].joiner.getU16(rangesOut);
 			}
 		};
 
 		struct GetU8Visitor
 		{
+			vector<pair<uint32_t, uint32_t>>* rangesOut;
+
+			GetU8Visitor(vector<pair<uint32_t, uint32_t>>* _rangesOut)
+				: rangesOut{ _rangesOut }
+			{
+			}
+
 			template<class LmState>
 			string operator()(const Vector<Candidate<LmState>>& o) const
 			{
-				return o[0].joiner.getU8();
+				return o[0].joiner.getU8(rangesOut);
 			}
 		};
 
@@ -458,14 +507,14 @@ namespace kiwi
 			return mapbox::util::apply_visitor(AddVisitor{ this, form, tag, false, space }, reinterpret_cast<CandVector&>(candBuf));
 		}
 
-		u16string AutoJoiner::getU16() const
+		u16string AutoJoiner::getU16(vector<pair<uint32_t, uint32_t>>* rangesOut) const
 		{
-			return mapbox::util::apply_visitor(GetU16Visitor{}, reinterpret_cast<const CandVector&>(candBuf));
+			return mapbox::util::apply_visitor(GetU16Visitor{ rangesOut }, reinterpret_cast<const CandVector&>(candBuf));
 		}
 
-		string AutoJoiner::getU8() const
+		string AutoJoiner::getU8(vector<pair<uint32_t, uint32_t>>* rangesOut) const
 		{
-			return mapbox::util::apply_visitor(GetU8Visitor{}, reinterpret_cast<const CandVector&>(candBuf));
+			return mapbox::util::apply_visitor(GetU8Visitor{ rangesOut }, reinterpret_cast<const CandVector&>(candBuf));
 		}
 	}
 }

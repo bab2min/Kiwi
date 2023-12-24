@@ -393,6 +393,56 @@ namespace kiwi
 		return ret;
 	}
 
+	template<class Ty, class Alloc>
+	inline std::string utf16To8(nonstd::u16string_view str, std::vector<Ty, Alloc>& positions)
+	{
+		std::string ret;
+		positions.clear();
+		for (auto it = str.begin(); it != str.end(); ++it)
+		{
+			size_t code = *it;
+			positions.emplace_back(ret.size());
+			if (isHighSurrogate(code))
+			{
+				if (++it == str.end()) throw UnicodeException{ "unpaired surrogate" };
+				size_t code2 = *it;
+				if (!isLowSurrogate(code2)) throw UnicodeException{ "unpaired surrogate" };
+				positions.emplace_back(ret.size());
+				code = mergeSurrogate(code, code2);
+			}
+
+			if (code <= 0x7F)
+			{
+				ret.push_back((char)code);
+			}
+			else if (code <= 0x7FF)
+			{
+				ret.push_back((char)(0xC0 | (code >> 6)));
+				ret.push_back((char)(0x80 | (code & 0x3F)));
+			}
+			else if (code <= 0xFFFF)
+			{
+				ret.push_back((char)(0xE0 | (code >> 12)));
+				ret.push_back((char)(0x80 | ((code >> 6) & 0x3F)));
+				ret.push_back((char)(0x80 | (code & 0x3F)));
+			}
+			else if (code <= 0x10FFFF)
+			{
+				ret.push_back((char)(0xF0 | (code >> 18)));
+				ret.push_back((char)(0x80 | ((code >> 12) & 0x3F)));
+				ret.push_back((char)(0x80 | ((code >> 6) & 0x3F)));
+				ret.push_back((char)(0x80 | (code & 0x3F)));
+			}
+			else
+			{
+				throw UnicodeException{ "unicode error" };
+			}
+		}
+		positions.emplace_back(ret.size());
+
+		return ret;
+	}
+
 	inline std::string utf16To8(const char16_t* str)
 	{
 		return utf16To8(U16StringView{ str });
