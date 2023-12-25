@@ -30,6 +30,7 @@ namespace kiwi
 	template<ArchType _arch, class VocabTy>
 	class KnLMState
 	{
+		friend class Hash<KnLMState<_arch, VocabTy>>;
 		int32_t node = 0;
 	public:
 		static constexpr ArchType arch = _arch;
@@ -56,6 +57,7 @@ namespace kiwi
 	template<size_t windowSize, ArchType _arch, class VocabTy>
 	class SbgState : public KnLMState<_arch, VocabTy>
 	{
+		friend class Hash<SbgState<windowSize, _arch, VocabTy>>;
 		size_t historyPos = 0;
 		std::array<VocabTy, windowSize> history = { {0,} };
 	public:
@@ -99,6 +101,41 @@ namespace kiwi
 		}
 	};
 
+	// hash for LmState
+	template<ArchType arch>
+	struct Hash<VoidState<arch>>
+	{
+		size_t operator()(const VoidState<arch>& state) const
+		{
+			return 0;
+		}
+	};
+	
+	template<ArchType arch, class VocabTy>
+	struct Hash<KnLMState<arch, VocabTy>>
+	{
+		size_t operator()(const KnLMState<arch, VocabTy>& state) const
+		{
+			std::hash<int32_t> hasher;
+			return hasher(state.node);
+		}
+	};
+
+	template<size_t windowSize, ArchType arch, class VocabTy>
+	struct Hash<SbgState<windowSize, arch, VocabTy>>
+	{
+		size_t operator()(const SbgState<windowSize, arch, VocabTy>& state) const
+		{
+			Hash<KnLMState<arch, VocabTy>> hasher;
+			std::hash<VocabTy> vocabHasher;
+			size_t ret = hasher(state);
+			for (size_t i = 0; i < windowSize; ++i)
+			{
+				ret = vocabHasher(state.history[i]) ^ ((ret << 3) | (ret >> (sizeof(size_t) * 8 - 3)));
+			}
+			return ret;
+		}
+	};
 
 	template<class VocabTy>
 	struct WrappedKnLM

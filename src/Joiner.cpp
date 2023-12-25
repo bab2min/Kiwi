@@ -1,4 +1,4 @@
-﻿#include "Joiner.hpp"
+#include "Joiner.hpp"
 #include "FrozenTrie.hpp"
 
 using namespace std;
@@ -342,6 +342,31 @@ namespace kiwi
 						auto& n = candidates[o];
 						n.score += n.lmState.next(kiwi->langMdl, cands[0]->lmMorphemeId);
 						n.joiner.add(form, cands[0]->tag, space);
+					}
+
+					UnorderedMap<LmState, pair<float, uint32_t>> bestScoreByState;
+					for (size_t i = 0; i < candidates.size(); ++i)
+					{
+						auto& c = candidates[i];
+						auto inserted = bestScoreByState.emplace(c.lmState, make_pair(c.score, i));
+						if (!inserted.second)
+						{
+							if (inserted.first->second.first < c.score)
+							{
+								inserted.first->second = make_pair(c.score, i);
+							}
+						}
+					}
+
+					if (bestScoreByState.size() < candidates.size())
+					{
+						Vector<Candidate<LmState>> newCandidates;
+						newCandidates.reserve(bestScoreByState.size());
+						for (auto& p : bestScoreByState)
+						{
+							newCandidates.emplace_back(move(candidates[p.second.second]));
+						}
+						candidates = move(newCandidates);
 					}
 				}
 			}
