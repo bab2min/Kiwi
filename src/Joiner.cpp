@@ -26,6 +26,7 @@ namespace kiwi
 			if (l == POSTag::sn && r == POSTag::nr) return false;
 			if (l == POSTag::sso || l == POSTag::ssc) return false;
 			if (r == POSTag::sso) return true;
+			if ((isJClass(l) || isEClass(l)) && r == POSTag::ss) return true;
 
 			if (r == POSTag::vx && rform.size() == 1 && (rform[0] == u'하' || rform[0] == u'지')) return false;
 
