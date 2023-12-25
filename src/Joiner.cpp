@@ -1,4 +1,4 @@
-#include "Joiner.hpp"
+﻿#include "Joiner.hpp"
 #include "FrozenTrie.hpp"
 
 using namespace std;
@@ -300,16 +300,23 @@ namespace kiwi
 				if (!node) break;
 			}
 
+			// prevent unknown or partial tag
+			POSTag fixedTag = tag;
+			if (tag == POSTag::unknown || tag == POSTag::p)
+			{
+				fixedTag = POSTag::nnp;
+			}
+
 			if (node && kiwi->formTrie.hasMatch(formHead = node->val(kiwi->formTrie)))
 			{
 				Vector<const Morpheme*> cands;
 				foreachMorpheme(formHead, [&](const Morpheme* m)
 				{
-					if (inferRegularity && clearIrregular(m->tag) == clearIrregular(tag))
+					if (inferRegularity && clearIrregular(m->tag) == clearIrregular(fixedTag))
 					{
 						cands.emplace_back(m);
 					}
-					else if (!inferRegularity && m->tag == tag)
+					else if (!inferRegularity && m->tag == fixedTag)
 					{
 						cands.emplace_back(m);
 					}
@@ -317,7 +324,7 @@ namespace kiwi
 				
 				if (cands.size() <= 1)
 				{
-					auto lmId = cands.empty() ? getDefaultMorphemeId(clearIrregular(tag)) : cands[0]->lmMorphemeId;
+					auto lmId = cands.empty() ? getDefaultMorphemeId(clearIrregular(fixedTag)) : cands[0]->lmMorphemeId;
 					if (!cands.empty()) tag = cands[0]->tag;
 					for (auto& cand : candidates)
 					{
@@ -373,7 +380,7 @@ namespace kiwi
 			}
 			else
 			{
-				auto lmId = getDefaultMorphemeId(clearIrregular(tag));
+				auto lmId = getDefaultMorphemeId(clearIrregular(fixedTag));
 				for (auto& cand : candidates)
 				{
 					cand.score += cand.lmState.next(kiwi->langMdl, lmId);
