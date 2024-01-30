@@ -26,6 +26,7 @@ namespace kiwi
 			if (l == POSTag::sn && r == POSTag::nr) return false;
 			if (l == POSTag::sso || l == POSTag::ssc) return false;
 			if (r == POSTag::sso) return true;
+			if ((isJClass(l) || isEClass(l)) && r == POSTag::ss) return true;
 
 			if (r == POSTag::vx && rform.size() == 1 && (rform[0] == u'하' || rform[0] == u'지')) return false;
 
@@ -79,9 +80,11 @@ namespace kiwi
 
 		void Joiner::add(U16StringView form, POSTag tag, Space space)
 		{
+			KString normForm = normalizeHangul(form);
 			if (stack.size() == activeStart)
 			{
-				stack += normalizeHangul(form);
+				ranges.emplace_back(stack.size(), stack.size() + normForm.size());
+				stack += normForm;
 				lastTag = tag;
 				return;
 			}
@@ -90,7 +93,8 @@ namespace kiwi
 			{
 				if (stack.empty() || !isSpace(stack.back())) stack.push_back(u' ');
 				activeStart = stack.size();
-				stack += normalizeHangul(form);
+				ranges.emplace_back(stack.size(), stack.size() + normForm.size());
+				stack += normForm;
 			}
 			else
 			{
@@ -99,8 +103,6 @@ namespace kiwi
 				{
 					cv = isHangulSyllable(stack[activeStart - 1]) ? CondVowel::vowel : CondVowel::non_vowel;
 				}
-
-				KString normForm = normalizeHangul(form);
 
 				if (!stack.empty() && (isJClass(tag) || isEClass(tag)))
 				{
@@ -148,8 +150,10 @@ namespace kiwi
 				}
 				auto r = cr->combineOneImpl({ stack.data() + activeStart, stack.size() - activeStart }, lastTag, normForm, tag, cv);
 				stack.erase(stack.begin() + activeStart, stack.end());
-				stack += r.first;
-				activeStart += r.second;
+				ranges.back().second = activeStart + get<1>(r);
+				ranges.emplace_back(activeStart + get<2>(r), activeStart + get<0>(r).size());
+				stack += get<0>(r);
+				activeStart += get<2>(r);
 			}
 			anteLastTag = lastTag;
 			lastTag = tag;
@@ -165,14 +169,46 @@ namespace kiwi
 			return add(U16StringView{ form }, tag, space);
 		}
 
-		u16string Joiner::getU16() const
+		u16string Joiner::getU16(vector<pair<uint32_t, uint32_t>>* rangesOut) const
 		{
-			return joinHangul(stack);
+			if (rangesOut)
+			{
+				rangesOut->clear();
+				rangesOut->reserve(ranges.size());
+				Vector<uint32_t> u16pos;
+				auto ret = joinHangul(stack.begin(), stack.end(), u16pos);
+				u16pos.emplace_back(ret.size());
+				for (auto& r : ranges)
+				{
+					auto endOffset = u16pos[r.second] + (r.second > 0 && u16pos[r.second - 1] == u16pos[r.second] ? 1 : 0);
+					rangesOut->emplace_back(u16pos[r.first], endOffset);
+				}
+				return ret;
+			}
+			else
+			{
+				return joinHangul(stack);
+			}
 		}
 
-		string Joiner::getU8() const
+		string Joiner::getU8(vector<pair<uint32_t, uint32_t>>* rangesOut) const
 		{
-			return utf16To8(joinHangul(stack));
+			auto u16 = getU16(rangesOut);
+			if (rangesOut)
+			{
+				Vector<uint32_t> positions;
+				auto ret = utf16To8(u16, positions);
+				for (auto& r : *rangesOut)
+				{
+					r.first = positions[r.first];
+					r.second = positions[r.second];
+				}
+				return ret;
+			}
+			else
+			{
+				return utf16To8(u16);
+			}
 		}
 
 		AutoJoiner::~AutoJoiner()
@@ -264,16 +300,23 @@ namespace kiwi
 				if (!node) break;
 			}
 
+			// prevent unknown or partial tag
+			POSTag fixedTag = tag;
+			if (tag == POSTag::unknown || tag == POSTag::p)
+			{
+				fixedTag = POSTag::nnp;
+			}
+
 			if (node && kiwi->formTrie.hasMatch(formHead = node->val(kiwi->formTrie)))
 			{
 				Vector<const Morpheme*> cands;
 				foreachMorpheme(formHead, [&](const Morpheme* m)
 				{
-					if (inferRegularity && clearIrregular(m->tag) == clearIrregular(tag))
+					if (inferRegularity && clearIrregular(m->tag) == clearIrregular(fixedTag))
 					{
 						cands.emplace_back(m);
 					}
-					else if (!inferRegularity && m->tag == tag)
+					else if (!inferRegularity && m->tag == fixedTag)
 					{
 						cands.emplace_back(m);
 					}
@@ -281,7 +324,7 @@ namespace kiwi
 				
 				if (cands.size() <= 1)
 				{
-					auto lmId = cands.empty() ? getDefaultMorphemeId(clearIrregular(tag)) : cands[0]->lmMorphemeId;
+					auto lmId = cands.empty() ? getDefaultMorphemeId(clearIrregular(fixedTag)) : cands[0]->lmMorphemeId;
 					if (!cands.empty()) tag = cands[0]->tag;
 					for (auto& cand : candidates)
 					{
@@ -308,11 +351,36 @@ namespace kiwi
 						n.score += n.lmState.next(kiwi->langMdl, cands[0]->lmMorphemeId);
 						n.joiner.add(form, cands[0]->tag, space);
 					}
+
+					UnorderedMap<LmState, pair<float, uint32_t>> bestScoreByState;
+					for (size_t i = 0; i < candidates.size(); ++i)
+					{
+						auto& c = candidates[i];
+						auto inserted = bestScoreByState.emplace(c.lmState, make_pair(c.score, i));
+						if (!inserted.second)
+						{
+							if (inserted.first->second.first < c.score)
+							{
+								inserted.first->second = make_pair(c.score, i);
+							}
+						}
+					}
+
+					if (bestScoreByState.size() < candidates.size())
+					{
+						Vector<Candidate<LmState>> newCandidates;
+						newCandidates.reserve(bestScoreByState.size());
+						for (auto& p : bestScoreByState)
+						{
+							newCandidates.emplace_back(move(candidates[p.second.second]));
+						}
+						candidates = move(newCandidates);
+					}
 				}
 			}
 			else
 			{
-				auto lmId = getDefaultMorphemeId(clearIrregular(tag));
+				auto lmId = getDefaultMorphemeId(clearIrregular(fixedTag));
 				for (auto& cand : candidates)
 				{
 					cand.score += cand.lmState.next(kiwi->langMdl, lmId);
@@ -422,19 +490,33 @@ namespace kiwi
 
 		struct GetU16Visitor
 		{
+			vector<pair<uint32_t, uint32_t>>* rangesOut;
+
+			GetU16Visitor(vector<pair<uint32_t, uint32_t>>* _rangesOut)
+				: rangesOut{ _rangesOut }
+			{
+			}
+
 			template<class LmState>
 			u16string operator()(const Vector<Candidate<LmState>>& o) const
 			{
-				return o[0].joiner.getU16();
+				return o[0].joiner.getU16(rangesOut);
 			}
 		};
 
 		struct GetU8Visitor
 		{
+			vector<pair<uint32_t, uint32_t>>* rangesOut;
+
+			GetU8Visitor(vector<pair<uint32_t, uint32_t>>* _rangesOut)
+				: rangesOut{ _rangesOut }
+			{
+			}
+
 			template<class LmState>
 			string operator()(const Vector<Candidate<LmState>>& o) const
 			{
-				return o[0].joiner.getU8();
+				return o[0].joiner.getU8(rangesOut);
 			}
 		};
 
@@ -458,14 +540,14 @@ namespace kiwi
 			return mapbox::util::apply_visitor(AddVisitor{ this, form, tag, false, space }, reinterpret_cast<CandVector&>(candBuf));
 		}
 
-		u16string AutoJoiner::getU16() const
+		u16string AutoJoiner::getU16(vector<pair<uint32_t, uint32_t>>* rangesOut) const
 		{
-			return mapbox::util::apply_visitor(GetU16Visitor{}, reinterpret_cast<const CandVector&>(candBuf));
+			return mapbox::util::apply_visitor(GetU16Visitor{ rangesOut }, reinterpret_cast<const CandVector&>(candBuf));
 		}
 
-		string AutoJoiner::getU8() const
+		string AutoJoiner::getU8(vector<pair<uint32_t, uint32_t>>* rangesOut) const
 		{
-			return mapbox::util::apply_visitor(GetU8Visitor{}, reinterpret_cast<const CandVector&>(candBuf));
+			return mapbox::util::apply_visitor(GetU8Visitor{ rangesOut }, reinterpret_cast<const CandVector&>(candBuf));
 		}
 	}
 }

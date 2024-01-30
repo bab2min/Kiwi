@@ -28,6 +28,7 @@ namespace kiwi
 			template<class LmState> friend struct Candidate;
 			const CompiledRule* cr = nullptr;
 			KString stack;
+			std::vector<std::pair<uint32_t, uint32_t>> ranges;
 			size_t activeStart = 0;
 			POSTag lastTag = POSTag::unknown, anteLastTag = POSTag::unknown;
 
@@ -45,8 +46,8 @@ namespace kiwi
 			void add(const std::u16string& form, POSTag tag, Space space = Space::none);
 			void add(const char16_t* form, POSTag tag, Space space = Space::none);
 
-			std::u16string getU16() const;
-			std::string getU8() const;
+			std::u16string getU16(std::vector<std::pair<uint32_t, uint32_t>>* rangesOut = nullptr) const;
+			std::string getU8(std::vector<std::pair<uint32_t, uint32_t>>* rangesOut = nullptr) const;
 		};
 
 		template<class LmState>
@@ -115,8 +116,8 @@ namespace kiwi
 			void add(const std::u16string& form, POSTag tag, bool inferRegularity = true, Space space = Space::none);
 			void add(const char16_t* form, POSTag tag, bool inferRegularity = true, Space space = Space::none);
 
-			std::u16string getU16() const;
-			std::string getU8() const;
+			std::u16string getU16(std::vector<std::pair<uint32_t, uint32_t>>* rangesOut = nullptr) const;
+			std::string getU8(std::vector<std::pair<uint32_t, uint32_t>>* rangesOut = nullptr) const;
 		};
 	}
 }

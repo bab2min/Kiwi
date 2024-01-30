@@ -215,7 +215,10 @@ namespace kiwi
 				CondVowel cv = CondVowel::none, CondPolarity cp = CondPolarity::none
 			) const;
 
-			std::pair<KString, size_t> combineOneImpl(
+			/**
+			* @return tuple(combinedForm, leftFormBoundary, rightFormBoundary)
+			*/
+			std::tuple<KString, size_t, size_t> combineOneImpl(
 				U16StringView leftForm, POSTag leftTag,
 				U16StringView rightForm, POSTag rightTag,
 				CondVowel cv = CondVowel::none, CondPolarity cp = CondPolarity::none

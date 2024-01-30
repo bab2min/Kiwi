@@ -1147,7 +1147,7 @@ Vector<KString> CompiledRule::combineImpl(
 	return ret;
 }
 
-pair<KString, size_t> CompiledRule::combineOneImpl(
+tuple<KString, size_t, size_t> CompiledRule::combineOneImpl(
 	U16StringView leftForm, POSTag leftTag,
 	U16StringView rightForm, POSTag rightTag,
 	CondVowel cv, CondPolarity cp
@@ -1163,12 +1163,12 @@ pair<KString, size_t> CompiledRule::combineOneImpl(
 	{
 		for (auto& p : mapbox::util::apply_visitor(CombineVisitor{ leftForm, rightForm }, dfa[it->second]))
 		{
-			if(p.score >= 0) return make_pair(p.str, p.rightBegin);
+			if(p.score >= 0) return make_tuple(p.str, p.leftEnd, p.rightBegin);
 			KString ret;
 			ret.reserve(leftForm.size() + rightForm.size());
 			ret.insert(ret.end(), leftForm.begin(), leftForm.end());
 			ret.insert(ret.end(), rightForm.begin(), rightForm.end());
-			return make_pair(ret, leftForm.size());
+			return make_tuple(ret, leftForm.size(), leftForm.size());
 		}
 	}
 
@@ -1183,7 +1183,7 @@ pair<KString, size_t> CompiledRule::combineOneImpl(
 		{
 			for (auto& p : mapbox::util::apply_visitor(CombineVisitor{ leftForm, rightForm }, dfa[it->second]))
 			{
-				return make_pair(p.str, p.rightBegin);
+				return make_tuple(p.str, p.leftEnd, p.rightBegin);
 			}
 		}
 	}
@@ -1198,14 +1198,14 @@ pair<KString, size_t> CompiledRule::combineOneImpl(
 			ret.insert(ret.end(), leftForm.begin(), leftForm.end());
 			ret.push_back(u'아'); // `어`를 `아`로 교체하여 삽입
 			ret.insert(ret.end(), rightForm.begin() + 1, rightForm.end());
-			return make_pair(ret, leftForm.size());
+			return make_tuple(ret, leftForm.size(), leftForm.size());
 		}
 	}
 	KString ret;
 	ret.reserve(leftForm.size() + rightForm.size());
 	ret.insert(ret.end(), leftForm.begin(), leftForm.end());
 	ret.insert(ret.end(), rightForm.begin(), rightForm.end());
-	return make_pair(ret, leftForm.size());
+	return make_tuple(ret, leftForm.size(), leftForm.size());
 }
 
 Vector<tuple<size_t, size_t, CondPolarity>> CompiledRule::testLeftPattern(U16StringView leftForm, size_t ruleId) const
