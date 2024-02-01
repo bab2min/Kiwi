@@ -82,6 +82,14 @@ namespace kiwi
 		return within(chr, 0x302E, 0x3030);
 	}
 
+	struct ComparatorIgnoringSpace
+	{
+		static bool less(const KString& a, const KString& b, const kchar_t space = u' ');
+		static bool equal(const KString& a, const KString& b, const kchar_t space = u' ');
+	};
+
+	KString removeSpace(const KString& str, const kchar_t space = u' ');
+
 	inline std::ostream& operator <<(std::ostream& os, const KString& str)
 	{
 		return os << utf16To8({ str.begin(), str.end() });
