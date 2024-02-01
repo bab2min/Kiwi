@@ -403,21 +403,38 @@ namespace kiwi
 			template<class Cont>
 			struct CacheStore
 			{
-				Cont* cont = nullptr;
+				Cont cont;
 				std::vector<size_t> ptrs;
+
+				operator bool() const { return !cont.empty(); }
+				const Cont& operator*() const { return cont; }
+				void set(const Cont& _cont) { cont = _cont; }
 			};
 
-			template<class Cont, class Value>
-			Node* buildWithCaching(Cont& cont, Value&& val, CacheStore<Cont>& cache)
+			template<class Cont>
+			struct CacheStore<Cont*>
 			{
+				Cont* cont = nullptr;
+				std::vector<size_t> ptrs;
+
+				operator bool() const { return cont; }
+				const Cont& operator*() const { return *cont; }
+				void set(const Cont& _cont) { cont = &_cont; }
+			};
+
+			template<class Cont, class Value, class CacheCont>
+			Node* buildWithCaching(Cont&& cont, Value&& val, CacheStore<CacheCont>& cache)
+			{
+				static_assert(std::is_pointer<CacheCont>::value ? std::is_reference<Cont>::value && !std::is_rvalue_reference<Cont>::value : true,
+					"Cont should reference type if using pointer type CacheStore.");
 				auto allocNode = [&]() { return newNode(); };
 				//reserveMore(cont.size());
 				
 				size_t commonPrefix = 0;
-				if (cache.cont)
+				if (!!cache)
 				{
-					while (commonPrefix < std::min(cache.cont->size(), cont.size())
-						&& cont[commonPrefix] == (*cache.cont)[commonPrefix]
+					while (commonPrefix < std::min((*cache).size(), cont.size())
+						&& cont[commonPrefix] == (*cache)[commonPrefix]
 					) ++commonPrefix;
 				}
 
@@ -430,7 +447,7 @@ namespace kiwi
 					cache.ptrs[i] = node - nodes.data();
 				}
 				if (!node->val) node->val = val;
-				cache.cont = &cont;
+				cache.set(cont);
 				return node;
 			}
 

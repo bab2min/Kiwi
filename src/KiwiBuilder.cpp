@@ -1,4 +1,4 @@
-﻿#include <fstream>
+#include <fstream>
 #include <random>
 
 #include <kiwi/Kiwi.h>
@@ -1760,7 +1760,7 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 		}
 		formTrie.reserveMore(estimatedNodeSize);
 
-		decltype(formTrie)::CacheStore<const KString> cache;
+		decltype(formTrie)::CacheStore<KString> cache;
 		for (auto f : sortedForms)
 		{
 			formTrie.buildWithCaching(f->form, f, cache);
@@ -1840,7 +1840,7 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 		ret.typoPtrs.emplace_back(ret.typoPool.size());
 		formTrie.reserveMore(estimatedNodeSize);
 
-		decltype(formTrie)::CacheStore<const KString> cache;
+		decltype(formTrie)::CacheStore<const KString*> cache;
 		size_t cumulated = 0;
 		for (auto f : typoGroupSorted)
 		{
