@@ -61,6 +61,7 @@ namespace kiwi
 		uint32_t startPos = 0, endPos = 0;
 		float typoCost = 0;
 		uint32_t typoFormId = 0;
+		uint32_t spaceErrors = 0;
 
 		KGraphNode(const Form* _form = nullptr, uint16_t _endPos = 0, float _typoCost = 0) : form(_form), endPos(_endPos), typoCost(_typoCost) {}
 		KGraphNode(U16StringView _uform, uint16_t _endPos, float _typoCost = 0) : uform(_uform), endPos(_endPos), typoCost(_typoCost) {}

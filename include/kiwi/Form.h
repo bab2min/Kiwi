@@ -191,15 +191,16 @@ namespace kiwi
 	};
 
 	/**
-	 * @brief 형태에 관한 모든 정보를 담는 구조체의 템플릿
+	 * @brief 형태에 관한 모든 정보를 담는 구조체
 	 * 
-	 * @note 변경 불가능한 상태로 인덱스는 모두 포인터로, std::vector는 FixedVector로 변경되어 수정이 불가능한 대신
+	 * @note 이 구조체는 변경 불가능한 상태로 사용된다. 인덱스는 모두 포인터로, std::vector는 FixedVector로 변경되어 수정이 불가능한 대신
 	 * 각 값에 효율적으로 빠르게 접근 가능하다. `kiwi::Kiwi` 내 실제 형태소 분석 단계에 쓰인다.
 	 */
 	struct Form
 	{
 		KString form;
 		FixedVector<const Morpheme*> candidate;
+		uint32_t numSpaces = 0;
 		CondVowel vowel = CondVowel::none;
 		CondPolarity polar = CondPolarity::none;
 		uint8_t formHash = 0;
@@ -212,10 +213,10 @@ namespace kiwi
 		Form& operator=(const Form&);
 		Form& operator=(Form&&);
 
-		bool operator<(const Form& o) const
-		{
-			return form < o.form;
-		}
+		// Form을 정렬하는 데에 사용. Form::form에서 공백 문자를 제거한 뒤 사전식으로 정렬.
+		bool operator<(const Form& o) const;
+
+		size_t sizeWithoutSpace() const { return form.size() - numSpaces; }
 	};
 
 	struct TypoForm

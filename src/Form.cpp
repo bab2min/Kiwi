@@ -81,9 +81,15 @@ namespace kiwi
 
 	Form& Form::operator=(Form&&) = default;
 
+	bool Form::operator<(const Form& o) const
+	{
+		return ComparatorIgnoringSpace::less(form, o.form);
+	}
+
 	Form bake(const FormRaw& o, const Morpheme* morphBase, bool zCodaAppendable, const Vector<uint32_t>& additionalCands)
 	{
 		Form ret;
+		ret.numSpaces = count(o.form.begin(), o.form.end(), u' ');
 		ret.form = o.form;
 		ret.candidate = FixedVector<const Morpheme*>{ o.candidate.size() + additionalCands.size()};
 		for (size_t i = 0; i < o.candidate.size(); ++i)

@@ -988,6 +988,38 @@ void KiwiBuilder::addAllomorphsToRule()
 	}
 }
 
+/**
+ * @brief 입력 문자열에서 연속한 1개 이상의 공백을 하나의 공백으로 정규화합니다.
+ * 
+ * @note 공백 문자들은 모두 U+0020(공백)으로 통일됩니다.
+ */
+inline KString normalizeWhitespace(const KString& str)
+{
+	KString ret;
+	bool prevIsSpace = false;
+	for (auto c : str)
+	{
+		if (isSpace(c))
+		{
+			if (!prevIsSpace)
+			{
+				if (!ret.empty()) ret += u' ';
+				prevIsSpace = true;
+			}
+		}
+		else
+		{
+			ret += c;
+			prevIsSpace = false;
+		}
+	}
+	if (!ret.empty() && ret.back() == u' ')
+	{
+		ret.pop_back();
+	}
+	return ret;
+}
+
 FormRaw& KiwiBuilder::addForm(const KString& form)
 {
 	auto ret = formMap.emplace(form, forms.size());
@@ -1017,7 +1049,7 @@ pair<uint32_t, bool> KiwiBuilder::addWord(U16StringView newForm, POSTag tag, flo
 {
 	if (newForm.empty()) return make_pair((uint32_t)0, false);
 
-	auto normalizedForm = normalizeHangul(newForm);
+	auto normalizedForm = normalizeWhitespace(normalizeHangul(newForm));
 	auto& f = addForm(normalizedForm);
 	if (f.candidate.empty())
 	{
@@ -1359,7 +1391,7 @@ pair<uint32_t, bool> KiwiBuilder::addWord(const char16_t* form, POSTag tag, floa
 
 size_t KiwiBuilder::findMorpheme(U16StringView form, POSTag tag) const
 {
-	auto normalized = normalizeHangul(form);
+	auto normalized = normalizeWhitespace(normalizeHangul(form));
 	auto it = formMap.find(normalized);
 	if (it == formMap.end()) return -1;
 
@@ -1417,6 +1449,7 @@ bool KiwiBuilder::addPreAnalyzedWord(U16StringView form, const vector<pair<U16, 
 	}
 
 	auto normalized = normalizeHangulWithPosition(form);
+	normalized.first = normalizeWhitespace(normalized.first);
 
 	for (auto& p : positions)
 	{
@@ -1696,7 +1729,7 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 	uint8_t formHash = 0;
 	for (size_t i = 1; i < ret.forms.size(); ++i)
 	{
-		if (ret.forms[i].form != ret.forms[i - 1].form) ++formHash;
+		if (!ComparatorIgnoringSpace::equal(ret.forms[i].form, ret.forms[i - 1].form)) ++formHash;
 		ret.forms[i].formHash = formHash;
 	}
 
@@ -1739,7 +1772,7 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 	{
 		sort(sortedForms.begin(), sortedForms.end(), [](const Form* a, const Form* b)
 		{
-			return a->form < b->form;
+			return ComparatorIgnoringSpace::less(a->form, b->form);
 		});
 
 		size_t estimatedNodeSize = 0;
@@ -1748,7 +1781,7 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 		{
 			if (!prevForm)
 			{
-				estimatedNodeSize += f->form.size();
+				estimatedNodeSize += f->form.size() - count(f->form.begin(), f->form.end(), u' ');
 				prevForm = &f->form;
 				continue;
 			}
@@ -1763,7 +1796,7 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 		decltype(formTrie)::CacheStore<KString> cache;
 		for (auto f : sortedForms)
 		{
-			formTrie.buildWithCaching(f->form, f, cache);
+			formTrie.buildWithCaching(removeSpace(f->form), f, cache);
 		}
 	}
 	// 오타 교정이 있는 경우 가능한 모든 오타에 대해 Trie 생성
@@ -1777,7 +1810,7 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 			for (auto t : ptypos._generate(f->form, typoCostThreshold))
 			{
 				if (t.leftCond != CondVowel::none && f->vowel != CondVowel::none && t.leftCond != f->vowel) continue;
-				typoGroup[t.str].emplace_back(f - ret.forms.data(), t.cost, t.leftCond);
+				typoGroup[removeSpace(t.str)].emplace_back(f - ret.forms.data(), t.cost, t.leftCond);
 			}
 		}
 
@@ -1826,7 +1859,7 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 			hash = !hash;
 			if (!prevForm)
 			{
-				estimatedNodeSize += f->first.size();
+				estimatedNodeSize += f->first.size() - count(f->first.begin(), f->first.end(), u' ');
 				prevForm = &f->first;
 				continue;
 			}
