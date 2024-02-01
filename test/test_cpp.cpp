@@ -619,6 +619,11 @@ TEST(KiwiCpp, WordsWithSpaces)
 	res4 = kiwi.analyze(u"농협용 인육 가공공장", Match::all);
 	EXPECT_EQ(res3.first[0].str, u"농협 용인 육가공 공장");
 	EXPECT_EQ(res4.first[0].str, u"농협 용인 육가공 공장");
+
+	res5 = kiwi.analyze(u"농협용\n인육 가공\n공장에서", Match::all);
+	EXPECT_EQ(res5.first[0].str, u"농협 용인 육가공 공장");
+	EXPECT_EQ(res5.first[0].lineNumber, 0);
+	EXPECT_EQ(res5.first[1].lineNumber, 2);
 }
 
 TEST(KiwiCpp, Pattern)
