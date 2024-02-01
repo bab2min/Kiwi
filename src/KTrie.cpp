@@ -304,6 +304,7 @@ size_t kiwi::splitByTrie(
 				}
 				else
 				{
+					// TO DO: 아래의 spaceErrors 계산방식은 오타 교정 모드에서는 부정확한 값을 낼 수 있음. 더 정교한 방식으로 개선 필요
 					const size_t lengthWithSpaces = countChrWithNormalizedSpace(nonSpaces.begin() + nBegin, nonSpaces.end());
 					size_t spaceErrors = 0;
 					if (lengthWithSpaces <= cand->form.size() + spaceTolerance 
