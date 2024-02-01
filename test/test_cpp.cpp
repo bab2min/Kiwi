@@ -519,8 +519,106 @@ TEST(KiwiCpp, SpaceTolerant)
 	tokens = kiwi.analyze(str, Match::all).first;
 	EXPECT_EQ(tokens.size(), 5);
 
+	EXPECT_EQ(
+		kiwi.analyze(u"띄 어 쓰 기", Match::all).second,
+		kiwi.analyze(u"띄     어 쓰 기", Match::all).second
+	);
+
 	kiwi.setSpaceTolerance(0);
 	kiwi.setSpacePenalty(8);
+}
+
+TEST(KiwiCpp, WordsWithSpaces)
+{
+	KiwiBuilder kw{ MODEL_PATH, 0, BuildOption::default_, };
+	EXPECT_TRUE(kw.addWord(u"대학생 선교회", POSTag::nnp, 0.0).second);
+	Kiwi kiwi = kw.build();
+
+	auto res1 = kiwi.analyze(u"대학생 선교회", Match::all);
+	auto res2 = kiwi.analyze(u"대학생선교회", Match::all);
+	auto res3 = kiwi.analyze(u"대학생 \t 선교회", Match::all);
+	auto res4 = kiwi.analyze(u"대 학생선교회", Match::all);
+	auto res5 = kiwi.analyze(u"대 학생 선교회", Match::all);
+	auto res6 = kiwi.analyze(u"대학 생선 교회", Match::all);
+	EXPECT_EQ(res1.first.size(), 1);
+	EXPECT_EQ(res2.first.size(), 1);
+	EXPECT_EQ(res3.first.size(), 1);
+	EXPECT_NE(res4.first.size(), 1);
+	EXPECT_NE(res5.first.size(), 1);
+	EXPECT_NE(res6.first.size(), 1);
+	
+	EXPECT_EQ(res1.first[0].str, u"대학생 선교회");
+	EXPECT_EQ(res2.first[0].str, u"대학생 선교회");
+	EXPECT_EQ(res3.first[0].str, u"대학생 선교회");
+	EXPECT_NE(res4.first[0].str, u"대학생 선교회");
+	EXPECT_NE(res5.first[0].str, u"대학생 선교회");
+	EXPECT_NE(res6.first[0].str, u"대학생 선교회");
+	
+	EXPECT_EQ(res1.first[0].tag, POSTag::nnp);
+	EXPECT_EQ(res2.first[0].tag, POSTag::nnp);
+	EXPECT_EQ(res3.first[0].tag, POSTag::nnp);
+	EXPECT_EQ(res1.second, res2.second);
+	EXPECT_EQ(res1.second, res3.second);
+
+	kiwi.setSpaceTolerance(1);
+	res1 = kiwi.analyze(u"대학생 선교회", Match::all);
+	res2 = kiwi.analyze(u"대학생선교회", Match::all);
+	res3 = kiwi.analyze(u"대학생 \t 선교회", Match::all);
+	res4 = kiwi.analyze(u"대 학생선교회", Match::all);
+	res5 = kiwi.analyze(u"대 학생 선교회", Match::all);
+	res6 = kiwi.analyze(u"대학 생선 교회", Match::all);
+
+	EXPECT_EQ(res1.first.size(), 1);
+	EXPECT_EQ(res2.first.size(), 1);
+	EXPECT_EQ(res3.first.size(), 1);
+	EXPECT_EQ(res4.first.size(), 1);
+	EXPECT_EQ(res5.first.size(), 1);
+	EXPECT_NE(res6.first.size(), 1);
+
+	EXPECT_EQ(res1.first[0].str, u"대학생 선교회");
+	EXPECT_EQ(res2.first[0].str, u"대학생 선교회");
+	EXPECT_EQ(res3.first[0].str, u"대학생 선교회");
+	EXPECT_EQ(res4.first[0].str, u"대학생 선교회");
+	EXPECT_EQ(res5.first[0].str, u"대학생 선교회");
+	EXPECT_NE(res6.first[0].str, u"대학생 선교회");
+
+	EXPECT_LT(res4.second, res1.second);
+	EXPECT_LT(res5.second, res1.second);
+
+	EXPECT_TRUE(kw.addWord(u"농협 용인 육가공 공장", POSTag::nnp, 0.0).second);
+	kiwi = kw.build();
+
+	res1 = kiwi.analyze(u"농협 용인 육가공 공장", Match::all);
+	res2 = kiwi.analyze(u"농협용인 육가공 공장", Match::all);
+	res3 = kiwi.analyze(u"농협 용인육가공 공장", Match::all);
+	res4 = kiwi.analyze(u"농협 용인 육가공공장", Match::all);
+	res5 = kiwi.analyze(u"농협용인육가공공장", Match::all);
+	res6 = kiwi.analyze(u"농협용 인육 가공 공장", Match::all);
+
+	EXPECT_EQ(res1.first[0].str, u"농협 용인 육가공 공장");
+	EXPECT_EQ(res2.first[0].str, u"농협 용인 육가공 공장");
+	EXPECT_EQ(res3.first[0].str, u"농협 용인 육가공 공장");
+	EXPECT_EQ(res4.first[0].str, u"농협 용인 육가공 공장");
+	EXPECT_EQ(res5.first[0].str, u"농협 용인 육가공 공장");
+	EXPECT_NE(res6.first[0].str, u"농협 용인 육가공 공장");
+	EXPECT_EQ(res1.second, res2.second);
+	EXPECT_EQ(res1.second, res3.second);
+	EXPECT_EQ(res1.second, res4.second);
+	EXPECT_EQ(res1.second, res5.second);
+
+	kiwi.setSpaceTolerance(1);
+	res2 = kiwi.analyze(u"농협용인육 가공 공장", Match::all);
+	res3 = kiwi.analyze(u"농협용 인육 가공 공장", Match::all);
+	res4 = kiwi.analyze(u"농협용 인육 가공공장", Match::all);
+	EXPECT_EQ(res2.first[0].str, u"농협 용인 육가공 공장");
+	EXPECT_NE(res3.first[0].str, u"농협 용인 육가공 공장");
+	EXPECT_NE(res4.first[0].str, u"농협 용인 육가공 공장");
+
+	kiwi.setSpaceTolerance(2);
+	res3 = kiwi.analyze(u"농협용 인육 가공 공장", Match::all);
+	res4 = kiwi.analyze(u"농협용 인육 가공공장", Match::all);
+	EXPECT_EQ(res3.first[0].str, u"농협 용인 육가공 공장");
+	EXPECT_EQ(res4.first[0].str, u"농협 용인 육가공 공장");
 }
 
 TEST(KiwiCpp, Pattern)
