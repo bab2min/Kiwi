@@ -309,7 +309,7 @@ size_t kiwi::splitByTrie(
 					if (lengthWithSpaces <= cand->form.size() + spaceTolerance 
 						&& (!cand->numSpaces || (spaceErrors = countSpaceErrors(cand->form, nonSpaces.data() + nBegin, nonSpaces.data() + nonSpaces.size())) <= spaceTolerance))
 					{
-						if (!cand->numSpaces) spaceErrors = lengthWithSpaces - cand->form.size();
+						if (!cand->numSpaces && lengthWithSpaces > cand->form.size()) spaceErrors = lengthWithSpaces - cand->form.size();
 						const float typoCost = typoTolerant ? candTypoCostStarts[&cand - candidates.data()].cost : 0.f;
 						if (appendNewNode(out, endPosMap, nBegin, cand, (uint16_t)nonSpaces.size(), typoCost))
 						{
