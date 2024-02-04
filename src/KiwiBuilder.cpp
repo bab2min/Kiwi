@@ -632,6 +632,11 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, size_t _numThreads, BuildOptio
 		loadDictionary(modelPath + "/typo.dict");
 	}
 
+	if (!!(options & BuildOption::loadMultiDict))
+	{
+		loadDictionary(modelPath + "/multi.dict");
+	}
+
 	{
 		ifstream ifs;
 		combiningRule = make_shared<cmb::CompiledRule>(cmb::RuleSet{ openFile(ifs, modelPath + string{ "/combiningRule.txt" }) }.compile());
@@ -1807,10 +1812,20 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 		auto ptypos = typos.prepare();
 		for (auto f : sortedForms)
 		{
-			for (auto t : ptypos._generate(f->form, typoCostThreshold))
+			// 현재는 공백이 없는 단일 단어에 대해서만 오타 교정을 수행
+			// 공백이 포함된 복합 명사류의 경우 오타 후보가 지나치게 많아져
+			// 메모리 요구량이 급격히 증가하기 때문.
+			if (f->numSpaces == 0)
 			{
-				if (t.leftCond != CondVowel::none && f->vowel != CondVowel::none && t.leftCond != f->vowel) continue;
-				typoGroup[removeSpace(t.str)].emplace_back(f - ret.forms.data(), t.cost, t.leftCond);
+				for (auto t : ptypos._generate(f->form, typoCostThreshold))
+				{
+					if (t.leftCond != CondVowel::none && f->vowel != CondVowel::none && t.leftCond != f->vowel) continue;
+					typoGroup[removeSpace(t.str)].emplace_back(f - ret.forms.data(), t.cost, t.leftCond);
+				}
+			}
+			else
+			{
+				typoGroup[removeSpace(f->form)].emplace_back(f - ret.forms.data(), 0, CondVowel::none);
 			}
 		}
 
