@@ -1518,11 +1518,6 @@ size_t KiwiBuilder::loadDictionary(const string& dictPath)
 
 		while (!fields[0].empty() && fields[0][0] == ' ') fields[0] = fields[0].substr(1);
 
-		if (fields[0].find(' ') != fields[0].npos)
-		{
-			throw Exception("[loadUserDictionary] Form should not contain space. at line " + to_string(lineNo) + " : " + line);
-		}
-
 		float score = 0.f;
 		if (fieldSize > 2) score = stof(fields[2].begin(), fields[2].end());
 
@@ -1530,7 +1525,7 @@ size_t KiwiBuilder::loadDictionary(const string& dictPath)
 		{
 			vector<pair<U16StringView, POSTag>> morphemes;
 
-			for (auto& m : split(fields[1], u'+'))
+			for (auto& m : split(fields[1], u'+', u'+'))
 			{
 				size_t b = 0, e = m.size();
 				while (b < e && m[e - 1] == ' ') --e;
@@ -1578,7 +1573,7 @@ size_t KiwiBuilder::loadDictionary(const string& dictPath)
 				}
 				else
 				{
-					addedCnt += addWord(fields[0], morphemes[0].second, score, morphemes[0].first).second;
+					addedCnt += addWord(fields[0], morphemes[0].second, score, replace(morphemes[0].first, u"++", u"+")).second;
 				}
 			}
 		}
