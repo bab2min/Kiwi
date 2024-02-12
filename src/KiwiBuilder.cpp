@@ -1,4 +1,4 @@
-﻿#include <fstream>
+#include <fstream>
 #include <random>
 
 #include <kiwi/Kiwi.h>
@@ -632,6 +632,11 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, size_t _numThreads, BuildOptio
 		loadDictionary(modelPath + "/typo.dict");
 	}
 
+	if (!!(options & BuildOption::loadMultiDict))
+	{
+		loadDictionary(modelPath + "/multi.dict");
+	}
+
 	{
 		ifstream ifs;
 		combiningRule = make_shared<cmb::CompiledRule>(cmb::RuleSet{ openFile(ifs, modelPath + string{ "/combiningRule.txt" }) }.compile());
@@ -988,6 +993,38 @@ void KiwiBuilder::addAllomorphsToRule()
 	}
 }
 
+/**
+ * @brief 입력 문자열에서 연속한 1개 이상의 공백을 하나의 공백으로 정규화합니다.
+ * 
+ * @note 공백 문자들은 모두 U+0020(공백)으로 통일됩니다.
+ */
+inline KString normalizeWhitespace(const KString& str)
+{
+	KString ret;
+	bool prevIsSpace = false;
+	for (auto c : str)
+	{
+		if (isSpace(c))
+		{
+			if (!prevIsSpace)
+			{
+				if (!ret.empty()) ret += u' ';
+				prevIsSpace = true;
+			}
+		}
+		else
+		{
+			ret += c;
+			prevIsSpace = false;
+		}
+	}
+	if (!ret.empty() && ret.back() == u' ')
+	{
+		ret.pop_back();
+	}
+	return ret;
+}
+
 FormRaw& KiwiBuilder::addForm(const KString& form)
 {
 	auto ret = formMap.emplace(form, forms.size());
@@ -1013,11 +1050,11 @@ size_t KiwiBuilder::addForm(Vector<FormRaw>& newForms, UnorderedMap<KString, siz
 	return ret.first->second;
 }
 
-pair<uint32_t, bool> KiwiBuilder::addWord(U16StringView newForm, POSTag tag, float score, size_t origMorphemeId)
+pair<uint32_t, bool> KiwiBuilder::addWord(U16StringView newForm, POSTag tag, float score, size_t origMorphemeId, size_t lmMorphemeId)
 {
 	if (newForm.empty()) return make_pair((uint32_t)0, false);
 
-	auto normalizedForm = normalizeHangul(newForm);
+	auto normalizedForm = normalizeWhitespace(normalizeHangul(newForm));
 	auto& f = addForm(normalizedForm);
 	if (f.candidate.empty())
 	{
@@ -1027,7 +1064,7 @@ pair<uint32_t, bool> KiwiBuilder::addWord(U16StringView newForm, POSTag tag, flo
 		for (auto p : f.candidate)
 		{
 			// if `form` already has the same `tag`, skip adding
-			if (morphemes[p].tag == tag && morphemes[p].lmMorphemeId == origMorphemeId)
+			if (morphemes[p].tag == tag && morphemes[p].lmMorphemeId == lmMorphemeId)
 			{
 				morphemes[p].userScore = score;
 				return make_pair((uint32_t)p, false);
@@ -1041,13 +1078,14 @@ pair<uint32_t, bool> KiwiBuilder::addWord(U16StringView newForm, POSTag tag, flo
 	auto& newMorph = morphemes.back();
 	newMorph.kform = &f - &forms[0];
 	newMorph.userScore = score;
-	newMorph.lmMorphemeId = origMorphemeId;
+	newMorph.lmMorphemeId = origMorphemeId ? morphemes[origMorphemeId].lmMorphemeId : lmMorphemeId;
+	newMorph.origMorphemeId = origMorphemeId;
 	return make_pair((uint32_t)newMorphId, true);
 }
 
-pair<uint32_t, bool> KiwiBuilder::addWord(const std::u16string& newForm, POSTag tag, float score, size_t origMorphemeId)
+pair<uint32_t, bool> KiwiBuilder::addWord(const std::u16string& newForm, POSTag tag, float score, size_t origMorphemeId, size_t lmMorphemeId)
 {
-	return addWord(nonstd::to_string_view(newForm), tag, score, origMorphemeId);
+	return addWord(nonstd::to_string_view(newForm), tag, score, origMorphemeId, lmMorphemeId);
 }
 
 void KiwiBuilder::addCombinedMorpheme(
@@ -1344,7 +1382,7 @@ void KiwiBuilder::buildCombinedMorphemes(
 
 pair<uint32_t, bool> KiwiBuilder::addWord(U16StringView form, POSTag tag, float score)
 {
-	return addWord(form, tag, score, getDefaultMorphemeId(tag));
+	return addWord(form, tag, score, 0, getDefaultMorphemeId(tag));
 }
 
 pair<uint32_t, bool> KiwiBuilder::addWord(const u16string& form, POSTag tag, float score)
@@ -1359,7 +1397,7 @@ pair<uint32_t, bool> KiwiBuilder::addWord(const char16_t* form, POSTag tag, floa
 
 size_t KiwiBuilder::findMorpheme(U16StringView form, POSTag tag) const
 {
-	auto normalized = normalizeHangul(form);
+	auto normalized = normalizeWhitespace(normalizeHangul(form));
 	auto it = formMap.find(normalized);
 	if (it == formMap.end()) return -1;
 
@@ -1382,7 +1420,7 @@ pair<uint32_t, bool> KiwiBuilder::addWord(U16StringView newForm, POSTag tag, flo
 		throw UnknownMorphemeException{ "cannot find the original morpheme " + utf16To8(origForm) + "/" + tagToString(tag) };
 	}
 
-	return addWord(newForm, tag, score, origMorphemeId);
+	return addWord(newForm, tag, score, origMorphemeId, 0);
 }
 
 pair<uint32_t, bool> KiwiBuilder::addWord(const u16string& newForm, POSTag tag, float score, const u16string& origForm)
@@ -1417,6 +1455,7 @@ bool KiwiBuilder::addPreAnalyzedWord(U16StringView form, const vector<pair<U16, 
 	}
 
 	auto normalized = normalizeHangulWithPosition(form);
+	normalized.first = normalizeWhitespace(normalized.first);
 
 	for (auto& p : positions)
 	{
@@ -1480,11 +1519,6 @@ size_t KiwiBuilder::loadDictionary(const string& dictPath)
 
 		while (!fields[0].empty() && fields[0][0] == ' ') fields[0] = fields[0].substr(1);
 
-		if (fields[0].find(' ') != fields[0].npos)
-		{
-			throw Exception("[loadUserDictionary] Form should not contain space. at line " + to_string(lineNo) + " : " + line);
-		}
-
 		float score = 0.f;
 		if (fieldSize > 2) score = stof(fields[2].begin(), fields[2].end());
 
@@ -1492,7 +1526,7 @@ size_t KiwiBuilder::loadDictionary(const string& dictPath)
 		{
 			vector<pair<U16StringView, POSTag>> morphemes;
 
-			for (auto& m : split(fields[1], u'+'))
+			for (auto& m : split(fields[1], u'+', u'+'))
 			{
 				size_t b = 0, e = m.size();
 				while (b < e && m[e - 1] == ' ') --e;
@@ -1540,7 +1574,7 @@ size_t KiwiBuilder::loadDictionary(const string& dictPath)
 				}
 				else
 				{
-					addedCnt += addWord(fields[0], morphemes[0].second, score, morphemes[0].first).second;
+					addedCnt += addWord(fields[0], morphemes[0].second, score, replace(morphemes[0].first, u"++", u"+")).second;
 				}
 			}
 		}
@@ -1696,7 +1730,7 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 	uint8_t formHash = 0;
 	for (size_t i = 1; i < ret.forms.size(); ++i)
 	{
-		if (ret.forms[i].form != ret.forms[i - 1].form) ++formHash;
+		if (!ComparatorIgnoringSpace::equal(ret.forms[i].form, ret.forms[i - 1].form)) ++formHash;
 		ret.forms[i].formHash = formHash;
 	}
 
@@ -1739,7 +1773,7 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 	{
 		sort(sortedForms.begin(), sortedForms.end(), [](const Form* a, const Form* b)
 		{
-			return a->form < b->form;
+			return ComparatorIgnoringSpace::less(a->form, b->form);
 		});
 
 		size_t estimatedNodeSize = 0;
@@ -1748,7 +1782,7 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 		{
 			if (!prevForm)
 			{
-				estimatedNodeSize += f->form.size();
+				estimatedNodeSize += f->form.size() - count(f->form.begin(), f->form.end(), u' ');
 				prevForm = &f->form;
 				continue;
 			}
@@ -1760,10 +1794,10 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 		}
 		formTrie.reserveMore(estimatedNodeSize);
 
-		decltype(formTrie)::CacheStore<const KString> cache;
+		decltype(formTrie)::CacheStore<KString> cache;
 		for (auto f : sortedForms)
 		{
-			formTrie.buildWithCaching(f->form, f, cache);
+			formTrie.buildWithCaching(removeSpace(f->form), f, cache);
 		}
 	}
 	// 오타 교정이 있는 경우 가능한 모든 오타에 대해 Trie 생성
@@ -1774,10 +1808,20 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 		auto ptypos = typos.prepare();
 		for (auto f : sortedForms)
 		{
-			for (auto t : ptypos._generate(f->form, typoCostThreshold))
+			// 현재는 공백이 없는 단일 단어에 대해서만 오타 교정을 수행
+			// 공백이 포함된 복합 명사류의 경우 오타 후보가 지나치게 많아져
+			// 메모리 요구량이 급격히 증가하기 때문.
+			if (f->numSpaces == 0)
 			{
-				if (t.leftCond != CondVowel::none && f->vowel != CondVowel::none && t.leftCond != f->vowel) continue;
-				typoGroup[t.str].emplace_back(f - ret.forms.data(), t.cost, t.leftCond);
+				for (auto t : ptypos._generate(f->form, typoCostThreshold))
+				{
+					if (t.leftCond != CondVowel::none && f->vowel != CondVowel::none && t.leftCond != f->vowel) continue;
+					typoGroup[removeSpace(t.str)].emplace_back(f - ret.forms.data(), t.cost, t.leftCond);
+				}
+			}
+			else
+			{
+				typoGroup[removeSpace(f->form)].emplace_back(f - ret.forms.data(), 0, CondVowel::none);
 			}
 		}
 
@@ -1826,7 +1870,7 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 			hash = !hash;
 			if (!prevForm)
 			{
-				estimatedNodeSize += f->first.size();
+				estimatedNodeSize += f->first.size() - count(f->first.begin(), f->first.end(), u' ');
 				prevForm = &f->first;
 				continue;
 			}
@@ -1840,7 +1884,7 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 		ret.typoPtrs.emplace_back(ret.typoPool.size());
 		formTrie.reserveMore(estimatedNodeSize);
 
-		decltype(formTrie)::CacheStore<const KString> cache;
+		decltype(formTrie)::CacheStore<const KString*> cache;
 		size_t cumulated = 0;
 		for (auto f : typoGroupSorted)
 		{

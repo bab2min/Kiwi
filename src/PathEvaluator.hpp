@@ -685,9 +685,9 @@ namespace kiwi
 		Vector<WordLL<LmState>> refCache;
 
 		float whitespaceDiscount = 0;
-		if (node->uform.empty() && node->endPos - node->startPos > node->form->form.size())
+		if (node->uform.empty() && !node->form->form.empty() && node->spaceErrors)
 		{
-			whitespaceDiscount = -kw->spacePenalty * (node->endPos - node->startPos - node->form->form.size());
+			whitespaceDiscount = -kw->spacePenalty * node->spaceErrors;
 		}
 		const float typoDiscount = -node->typoCost * kw->typoCostWeight;
 		float unknownFormDiscount = 0;

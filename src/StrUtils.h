@@ -69,42 +69,98 @@ namespace kiwi
 
 
 	template<class BaseStr, class BaseChr, class OutIterator>
-	OutIterator split(BaseStr&& s, BaseChr delim, OutIterator result, size_t maxSplit=-1)
+	OutIterator split(BaseStr&& s, BaseChr delim, OutIterator result, size_t maxSplit = -1, BaseChr delimEscape = 0)
 	{
-		size_t p = 0;
+		size_t p = 0, e = 0;
 		for (size_t i = 0; i < maxSplit; ++i)
 		{
 			size_t t = s.find(delim, p);
 			if (t == s.npos)
 			{
-				*(result++) = nonstd::basic_string_view<BaseChr>{ &s[p] , s.size() - p};
+				*(result++) = nonstd::basic_string_view<BaseChr>{ &s[e] , s.size() - e};
 				return result;
 			}
 			else
 			{
-				*(result++) = nonstd::basic_string_view<BaseChr>{ &s[p] , t - p };
-				p = t + 1;
+				if (delimEscape && delimEscape != delim && t > 0 && s[t - 1] == delimEscape)
+				{
+					p = t + 1;
+				}
+				else if (delimEscape && delimEscape == delim && t < s.size() - 1 && s[t + 1] == delimEscape)
+				{
+					p = t + 2;
+				}
+				else
+				{
+					*(result++) = nonstd::basic_string_view<BaseChr>{ &s[e] , t - e };
+					p = t + 1;
+					e = t + 1;
+				}
 			}
 		}
-		*(result++) = nonstd::basic_string_view<BaseChr>{ &s[p] , s.size() - p };
+		*(result++) = nonstd::basic_string_view<BaseChr>{ &s[e] , s.size() - e };
 		return result;
 	}
 
 	template<class BaseChr, class Trait>
-	inline std::vector<nonstd::basic_string_view<BaseChr, Trait>> split(nonstd::basic_string_view<BaseChr, Trait> s, BaseChr delim)
+	inline std::vector<nonstd::basic_string_view<BaseChr, Trait>> split(nonstd::basic_string_view<BaseChr, Trait> s, BaseChr delim, BaseChr delimEscape = 0)
 	{
 		std::vector<nonstd::basic_string_view<BaseChr, Trait>> ret;
-		split(s, delim, std::back_inserter(ret));
+		split(s, delim, std::back_inserter(ret), -1, delimEscape);
 		return ret;
 	}
 
 	template<class BaseChr, class Trait, class Alloc>
-	inline std::vector<nonstd::basic_string_view<BaseChr, Trait>> split(const std::basic_string<BaseChr, Trait, Alloc>& s, BaseChr delim)
+	inline std::vector<nonstd::basic_string_view<BaseChr, Trait>> split(const std::basic_string<BaseChr, Trait, Alloc>& s, BaseChr delim, BaseChr delimEscape = 0)
 	{
 		std::vector<nonstd::basic_string_view<BaseChr, Trait>> ret;
-		split(s, delim, std::back_inserter(ret));
+		split(s, delim, std::back_inserter(ret), -1, delimEscape);
 		return ret;
 	}
+
+	template<class BaseStr, class StrFrom, class StrTo, class OutIterator>
+	OutIterator replace(BaseStr&& s, StrFrom&& from, StrTo&& to, OutIterator result)
+	{
+		size_t p = 0;
+		while (true)
+		{
+			size_t t = s.find(from, p);
+			if (t == s.npos)
+			{
+				break;
+			}
+			else
+			{
+				result = std::copy(s.begin() + p, s.begin() + t, result);
+				result = std::copy(to.begin(), to.end(), result);
+				p = t + from.size();
+			}
+		}
+		result = std::copy(s.begin() + p, s.end(), result);
+		return result;
+	}
+
+	template<class BaseChr, class Trait, class Alloc = std::allocator<BaseChr>>
+	inline std::basic_string<BaseChr, Trait, Alloc> replace(
+		nonstd::basic_string_view<BaseChr, Trait> s, 
+		nonstd::basic_string_view<BaseChr, Trait> from, 
+		nonstd::basic_string_view<BaseChr, Trait> to)
+	{
+		std::basic_string<BaseChr, Trait, Alloc> ret;
+		ret.reserve(s.size());
+		replace(s, from, to, std::back_inserter(ret));
+		return ret;
+	}
+
+	template<class BaseChr, class Trait, size_t fromSize, size_t toSize, class Alloc = std::allocator<BaseChr>>
+	inline std::basic_string<BaseChr, Trait, Alloc> replace(
+		nonstd::basic_string_view<BaseChr, Trait> s,
+		const BaseChr(&from)[fromSize],
+		const BaseChr(&to)[toSize])
+	{
+		return replace(s, nonstd::basic_string_view<BaseChr, Trait>{ from, fromSize - 1 }, nonstd::basic_string_view<BaseChr, Trait>{ to, toSize - 1 });
+	}
+	
 
 	inline void utf8To16(nonstd::string_view str, std::u16string& ret)
 	{

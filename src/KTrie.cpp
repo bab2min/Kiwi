@@ -186,6 +186,35 @@ namespace kiwi
 
 }
 
+// nonSpaces idx 데이터로부터 글자 수 + 공백 블록 수를 계산한다.
+template<class It>
+inline size_t countChrWithNormalizedSpace(It first, It last)
+{
+	size_t n = std::distance(first, last);
+	auto prevIdx = *first++;
+	for (; first != last; ++first)
+	{
+		if (*first != prevIdx + 1) ++n;
+		prevIdx = *first;
+	}
+	return n;
+}
+
+// 공백 문자의 위치가 형태소의 공백 위치와 불일치하는 개수를 센다.
+inline size_t countSpaceErrors(const KString& form, const uint32_t* spaceIdxFirst, const uint32_t* spaceIdxLast)
+{
+	size_t n = 0;
+	size_t spaceOffset = 0;
+	const size_t size = std::distance(spaceIdxFirst, spaceIdxLast);
+	for (size_t i = 1; i < size; ++i)
+	{
+		const bool hasSpace = spaceIdxFirst[i] - spaceIdxFirst[i - 1] > 1;
+		if (hasSpace && form[i + spaceOffset] != u' ') ++n;
+		spaceOffset += form[i + spaceOffset] == u' ' ? 1 : 0;
+	}
+	return n;
+}
+
 template<ArchType arch, bool typoTolerant>
 size_t kiwi::splitByTrie(
 	Vector<KGraphNode>& ret,
@@ -229,10 +258,10 @@ size_t kiwi::splitByTrie(
 			bool alreadySpecialChrProcessed = false;
 			for (auto& cand : candidates)
 			{
-				size_t nBegin = typoTolerant ? candTypoCostStarts[&cand - candidates.data()].start : (nonSpaces.size() - cand->form.size());
-				bool longestMatched = any_of(out.begin() + 1, out.end(), [&](const KGraphNode& g)
+				const size_t nBegin = typoTolerant ? candTypoCostStarts[&cand - candidates.data()].start : (nonSpaces.size() - cand->sizeWithoutSpace());
+				const bool longestMatched = any_of(out.begin() + 1, out.end(), [&](const KGraphNode& g)
 				{
-					return nBegin == g.endPos && lastSpecialEndPos == g.endPos - (g.uform.empty() ? g.form->form.size() : g.uform.size());
+					return nBegin == g.endPos && lastSpecialEndPos == g.endPos - (g.uform.empty() ? g.form->sizeWithoutSpace() : g.uform.size());
 				});
 
 				// insert unknown form 
@@ -252,7 +281,7 @@ size_t kiwi::splitByTrie(
 						}
 					}
 
-					size_t newNodeLength = nBegin - lastSpecialEndPos;
+					const size_t newNodeLength = nBegin - lastSpecialEndPos;
 					if (maxUnkFormSize && newNodeLength <= maxUnkFormSize)
 					{
 						appendNewNode(out, endPosMap, lastSpecialEndPos, str.substr(nonSpaces[lastSpecialEndPos], nonSpaces[nBegin] - nonSpaces[lastSpecialEndPos]), (uint16_t)nBegin);
@@ -275,13 +304,21 @@ size_t kiwi::splitByTrie(
 				}
 				else
 				{
-					size_t lengthWithSpaces = nonSpaces.back() + 1 - nonSpaces[nBegin];
-					if (lengthWithSpaces <= cand->form.size() + spaceTolerance)
+					// TO DO: 아래의 spaceErrors 계산방식은 오타 교정 모드에서는 부정확한 값을 낼 수 있음. 더 정교한 방식으로 개선 필요
+					const size_t lengthWithSpaces = countChrWithNormalizedSpace(nonSpaces.begin() + nBegin, nonSpaces.end());
+					size_t spaceErrors = 0;
+					if (lengthWithSpaces <= cand->form.size() + spaceTolerance 
+						&& (!cand->numSpaces || (spaceErrors = countSpaceErrors(cand->form, nonSpaces.data() + nBegin, nonSpaces.data() + nonSpaces.size())) <= spaceTolerance))
 					{
-						float typoCost = typoTolerant ? candTypoCostStarts[&cand - candidates.data()].cost : 0.f;
-						if (appendNewNode(out, endPosMap, nBegin, cand, (uint16_t)nonSpaces.size(), typoCost) && typoTolerant)
+						if (!cand->numSpaces && lengthWithSpaces > cand->form.size()) spaceErrors = lengthWithSpaces - cand->form.size();
+						const float typoCost = typoTolerant ? candTypoCostStarts[&cand - candidates.data()].cost : 0.f;
+						if (appendNewNode(out, endPosMap, nBegin, cand, (uint16_t)nonSpaces.size(), typoCost))
 						{
-							out.back().typoFormId = candTypoCostStarts[&cand - candidates.data()].typoId;
+							out.back().spaceErrors = spaceErrors;
+							if (typoTolerant)
+							{
+								out.back().typoFormId = candTypoCostStarts[&cand - candidates.data()].typoId;
+							}
 						}
 					}
 				}
@@ -300,7 +337,7 @@ size_t kiwi::splitByTrie(
 
 		bool duplicated = any_of(out.begin() + 1, out.end(), [&](const KGraphNode& g)
 		{
-			size_t startPos = g.endPos - (g.uform.empty() ? g.form->form.size() : g.uform.size());
+			size_t startPos = g.endPos - (g.uform.empty() ? g.form->sizeWithoutSpace() : g.uform.size());
 			return startPos == lastSpecialEndPos && g.endPos == unkFormEndPos;
 		});
 		if (unkFormEndPos > lastSpecialEndPos && !duplicated)
@@ -478,8 +515,8 @@ size_t kiwi::splitByTrie(
 			}
 		}
 
-		// spaceTolerance > 0이면 공백문자를 무시하고 분할 진행
-		if (spaceTolerance > 0 && chrType == POSTag::unknown)
+		// 공백문자를 무시하고 분할 진행
+		if (chrType == POSTag::unknown)
 		{
 			branchOut(nonSpaces.size(), n);
 			lastSpecialEndPos = nonSpaces.size();

@@ -274,7 +274,9 @@ namespace kiwi
 
 		loadTypoDict = 1 << 2, /**< 오타 사전(typo.dict)의 로딩 여부를 설정한다.*/
 
-		default_ = integrateAllomorph | loadDefaultDict | loadTypoDict,
+		loadMultiDict = 1 << 3, /**< 복합명사 사전(multi.dict)의 로딩 여부를 설정한다. 복합명사 사전은 복합명사의 구성 형태소를 저장하고 있다. */
+
+		default_ = integrateAllomorph | loadDefaultDict | loadTypoDict | loadMultiDict,
 	};
 
 	struct Morpheme;

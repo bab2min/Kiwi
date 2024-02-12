@@ -412,4 +412,90 @@ namespace kiwi
 		}
 		return tagToKString(t);
 	}
+
+	bool ComparatorIgnoringSpace::less(const KString& a, const KString& b, const char16_t space)
+	{
+		size_t i = 0, j = 0;
+		while (i < a.size() && j < b.size())
+		{
+			if (a[i] == space && b[j] == space)
+			{
+				++i;
+				++j;
+				continue;
+			}
+
+			if (a[i] == space)
+			{
+				++i;
+				continue;
+			}
+
+			if (b[j] == space)
+			{
+				++j;
+				continue;
+			}
+
+			if (a[i] == b[j])
+			{
+				++i;
+				++j;
+				continue;
+			}
+
+			return a[i] < b[j];
+		}
+		if (i >= a.size() && j >= b.size()) return false;
+		if (i >= a.size()) return true;
+		return false;
+	}
+
+	bool ComparatorIgnoringSpace::equal(const KString& a, const KString& b, const kchar_t space)
+	{
+		size_t i = 0, j = 0;
+		while (i < a.size() && j < b.size())
+		{
+			if (a[i] == space && b[j] == space)
+			{
+				++i;
+				++j;
+				continue;
+			}
+
+			if (a[i] == space)
+			{
+				++i;
+				continue;
+			}
+
+			if (b[j] == space)
+			{
+				++j;
+				continue;
+			}
+
+			if (a[i] == b[j])
+			{
+				++i;
+				++j;
+				continue;
+			}
+
+			return false;
+		}
+		if (i >= a.size() && j >= b.size()) return true;
+		return false;
+	}
+
+	KString removeSpace(const KString& str, const kchar_t space)
+	{
+		KString ret;
+		for (auto c : str)
+		{
+			if (c != space) ret.push_back(c);
+		}
+		return ret;
+	}
+
 }

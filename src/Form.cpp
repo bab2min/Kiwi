@@ -1,4 +1,5 @@
-﻿#include <cassert>
+#include <cassert>
+#include <algorithm>
 #include <kiwi/Utils.h>
 #include <kiwi/Form.h>
 #include "serializer.hpp"
@@ -32,7 +33,7 @@ namespace kiwi
 		setComplex(_complex);
 	}
 
-	DEFINE_SERIALIZER_OUTSIDE(MorphemeRaw, kform, tag, vpPack, senseId, combineSocket, combined, userScore, chunks, chunkPositions, lmMorphemeId, groupId);
+	DEFINE_SERIALIZER_OUTSIDE(MorphemeRaw, kform, tag, vpPack, senseId, combineSocket, combined, userScore, chunks, chunkPositions, lmMorphemeId, /*origMorphemeId,*/ groupId);
 
 	Morpheme::Morpheme() = default;
 
@@ -81,9 +82,15 @@ namespace kiwi
 
 	Form& Form::operator=(Form&&) = default;
 
+	bool Form::operator<(const Form& o) const
+	{
+		return ComparatorIgnoringSpace::less(form, o.form);
+	}
+
 	Form bake(const FormRaw& o, const Morpheme* morphBase, bool zCodaAppendable, const Vector<uint32_t>& additionalCands)
 	{
 		Form ret;
+		ret.numSpaces = count(o.form.begin(), o.form.end(), u' ');
 		ret.form = o.form;
 		ret.candidate = FixedVector<const Morpheme*>{ o.candidate.size() + additionalCands.size()};
 		for (size_t i = 0; i < o.candidate.size(); ++i)
@@ -110,6 +117,7 @@ namespace kiwi
 		ret.combined = o.combined;
 		ret.userScore = o.userScore;
 		ret.lmMorphemeId = o.lmMorphemeId;
+		ret.origMorphemeId = o.origMorphemeId;
 		ret.senseId = o.senseId;
 		ret.chunks = FixedPairVector<const Morpheme*, std::pair<uint8_t, uint8_t>>{ o.chunks.size() };
 		for (size_t i = 0; i < o.chunks.size(); ++i)

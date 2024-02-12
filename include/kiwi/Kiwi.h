@@ -553,8 +553,8 @@ namespace kiwi
 
 		size_t findMorpheme(U16StringView form, POSTag tag) const;
 		
-		std::pair<uint32_t, bool> addWord(U16StringView newForm, POSTag tag, float score, size_t origMorphemeId);
-		std::pair<uint32_t, bool> addWord(const std::u16string& newForm, POSTag tag, float score, size_t origMorphemeId);
+		std::pair<uint32_t, bool> addWord(U16StringView newForm, POSTag tag, float score, size_t origMorphemeId, size_t lmMorphemeId);
+		std::pair<uint32_t, bool> addWord(const std::u16string& newForm, POSTag tag, float score, size_t origMorphemeId, size_t lmMorphemeId);
 		std::pair<uint32_t, bool> addWord(U16StringView form, POSTag tag = POSTag::nnp, float score = 0);
 		std::pair<uint32_t, bool> addWord(U16StringView newForm, POSTag tag, float score, U16StringView origForm);
 
@@ -747,7 +747,7 @@ namespace kiwi
 				std::u16string output = repl(input);
 				if (input == output) continue;
 				size_t morphemeId = m->lmMorphemeId ? m->lmMorphemeId : (size_t)(m - morphemes.data());
-				auto added = addWord(output, tag, score + (m->lmMorphemeId ? m->userScore : 0), morphemeId);
+				auto added = addWord(output, tag, score + (m->lmMorphemeId ? m->userScore : 0), morphemeId, 0);
 				if (added.second)
 				{
 					ret.emplace_back(added.first, output);
