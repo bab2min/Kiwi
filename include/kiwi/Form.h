@@ -78,6 +78,7 @@ namespace kiwi
 		 * 이형태 형태소의 경우 원형 형태소의 인덱스 값을 가진다.
 		 */
 		uint32_t lmMorphemeId = 0;
+		uint32_t origMorphemeId = 0;
 
 		/**
 		 * @brief 형태소의 그룹 인덱스.
@@ -147,7 +148,7 @@ namespace kiwi
 		int32_t combined = 0;
 		FixedPairVector<const Morpheme*, std::pair<uint8_t, uint8_t>> chunks;
 		float userScore = 0;
-		uint32_t lmMorphemeId = 0;
+		uint32_t lmMorphemeId = 0, origMorphemeId = 0;
 
 		Morpheme();
 		~Morpheme();

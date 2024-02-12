@@ -1050,7 +1050,7 @@ size_t KiwiBuilder::addForm(Vector<FormRaw>& newForms, UnorderedMap<KString, siz
 	return ret.first->second;
 }
 
-pair<uint32_t, bool> KiwiBuilder::addWord(U16StringView newForm, POSTag tag, float score, size_t origMorphemeId)
+pair<uint32_t, bool> KiwiBuilder::addWord(U16StringView newForm, POSTag tag, float score, size_t origMorphemeId, size_t lmMorphemeId)
 {
 	if (newForm.empty()) return make_pair((uint32_t)0, false);
 
@@ -1064,7 +1064,7 @@ pair<uint32_t, bool> KiwiBuilder::addWord(U16StringView newForm, POSTag tag, flo
 		for (auto p : f.candidate)
 		{
 			// if `form` already has the same `tag`, skip adding
-			if (morphemes[p].tag == tag && morphemes[p].lmMorphemeId == origMorphemeId)
+			if (morphemes[p].tag == tag && morphemes[p].lmMorphemeId == lmMorphemeId)
 			{
 				morphemes[p].userScore = score;
 				return make_pair((uint32_t)p, false);
@@ -1078,13 +1078,14 @@ pair<uint32_t, bool> KiwiBuilder::addWord(U16StringView newForm, POSTag tag, flo
 	auto& newMorph = morphemes.back();
 	newMorph.kform = &f - &forms[0];
 	newMorph.userScore = score;
-	newMorph.lmMorphemeId = origMorphemeId;
+	newMorph.lmMorphemeId = origMorphemeId ? morphemes[origMorphemeId].lmMorphemeId : lmMorphemeId;
+	newMorph.origMorphemeId = origMorphemeId;
 	return make_pair((uint32_t)newMorphId, true);
 }
 
-pair<uint32_t, bool> KiwiBuilder::addWord(const std::u16string& newForm, POSTag tag, float score, size_t origMorphemeId)
+pair<uint32_t, bool> KiwiBuilder::addWord(const std::u16string& newForm, POSTag tag, float score, size_t origMorphemeId, size_t lmMorphemeId)
 {
-	return addWord(nonstd::to_string_view(newForm), tag, score, origMorphemeId);
+	return addWord(nonstd::to_string_view(newForm), tag, score, origMorphemeId, lmMorphemeId);
 }
 
 void KiwiBuilder::addCombinedMorpheme(
@@ -1381,7 +1382,7 @@ void KiwiBuilder::buildCombinedMorphemes(
 
 pair<uint32_t, bool> KiwiBuilder::addWord(U16StringView form, POSTag tag, float score)
 {
-	return addWord(form, tag, score, getDefaultMorphemeId(tag));
+	return addWord(form, tag, score, 0, getDefaultMorphemeId(tag));
 }
 
 pair<uint32_t, bool> KiwiBuilder::addWord(const u16string& form, POSTag tag, float score)
@@ -1419,7 +1420,7 @@ pair<uint32_t, bool> KiwiBuilder::addWord(U16StringView newForm, POSTag tag, flo
 		throw UnknownMorphemeException{ "cannot find the original morpheme " + utf16To8(origForm) + "/" + tagToString(tag) };
 	}
 
-	return addWord(newForm, tag, score, origMorphemeId);
+	return addWord(newForm, tag, score, origMorphemeId, 0);
 }
 
 pair<uint32_t, bool> KiwiBuilder::addWord(const u16string& newForm, POSTag tag, float score, const u16string& origForm)
