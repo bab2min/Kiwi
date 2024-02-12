@@ -4,11 +4,7 @@ digraph "Graphical Class Hierarchy"
   edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
   node [fontname="Helvetica",fontsize="10",shape=record];
   rankdir="LR";
-  Node112 [label="std::streambuf",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",tooltip=" "];
-  Node112 -> Node0 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node0 [label="kiwi::utils::membuf\l\< false, true \>",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structkiwi_1_1utils_1_1membuf.html",tooltip=" "];
-  Node112 -> Node114 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node114 [label="kiwi::utils::membuf\l\< true, false \>",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structkiwi_1_1utils_1_1membuf.html",tooltip=" "];
-  Node112 -> Node115 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node115 [label="kiwi::utils::membuf\l\< read, write \>",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structkiwi_1_1utils_1_1membuf.html",tooltip=" "];
+  Node85 [label="PatInfoHasSubmatch",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",tooltip=" "];
+  Node85 -> Node0 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node0 [label="kiwi::utils::FrozenTrie\l\< char16_t, PatInfo, int32\l_t, PatInfoHasSubmatch \>",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classkiwi_1_1utils_1_1FrozenTrie.html",tooltip=" "];
 }

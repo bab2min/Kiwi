@@ -79,6 +79,8 @@ $(function() {
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi_1_1utils_1_1ContinuousTrie_1_1CacheStore.html">CacheStore</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi_1_1utils_1_1ContinuousTrie_1_1CacheStore_3_01Cont_01_5_01_4.html">CacheStore&lt; Cont * &gt;</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
@@ -150,10 +152,10 @@ template&lt;class Iter , class Value &gt; </td></tr>
 template&lt;class Iter &gt; </td></tr>
 <tr class="memitem:a467846171e9acff5fa14343177cf12e3"><td class="memTemplItemLeft" align="right" valign="top">Node *&#160;</td><td class="memTemplItemRight" valign="bottom"><b>find</b> (Iter first, Iter last)</td></tr>
 <tr class="separator:a467846171e9acff5fa14343177cf12e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a473b6bb9bec880d80ec4aaea0e6e0ac7"><td class="memTemplParams" colspan="2"><a id="a473b6bb9bec880d80ec4aaea0e6e0ac7"></a>
-template&lt;class Cont , class Value &gt; </td></tr>
-<tr class="memitem:a473b6bb9bec880d80ec4aaea0e6e0ac7"><td class="memTemplItemLeft" align="right" valign="top">Node *&#160;</td><td class="memTemplItemRight" valign="bottom"><b>buildWithCaching</b> (Cont &amp;cont, Value &amp;&amp;val, <a class="el" href="structkiwi_1_1utils_1_1ContinuousTrie_1_1CacheStore.html">CacheStore</a>&lt; Cont &gt; &amp;cache)</td></tr>
-<tr class="separator:a473b6bb9bec880d80ec4aaea0e6e0ac7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac22d4e3fd73a5aaa9b095dab67f8325f"><td class="memTemplParams" colspan="2"><a id="ac22d4e3fd73a5aaa9b095dab67f8325f"></a>
+template&lt;class Cont , class Value , class CacheCont &gt; </td></tr>
+<tr class="memitem:ac22d4e3fd73a5aaa9b095dab67f8325f"><td class="memTemplItemLeft" align="right" valign="top">Node *&#160;</td><td class="memTemplItemRight" valign="bottom"><b>buildWithCaching</b> (Cont &amp;&amp;cont, Value &amp;&amp;val, <a class="el" href="structkiwi_1_1utils_1_1ContinuousTrie_1_1CacheStore.html">CacheStore</a>&lt; CacheCont &gt; &amp;cache)</td></tr>
+<tr class="separator:ac22d4e3fd73a5aaa9b095dab67f8325f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3ff0e74cf06e666b4b430d07bc16f7da"><td class="memItemLeft" align="right" valign="top"><a id="a3ff0e74cf06e666b4b430d07bc16f7da"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>fillFail</b> (bool ignoreNegative=false)</td></tr>
 <tr class="separator:a3ff0e74cf06e666b4b430d07bc16f7da"><td class="memSeparator" colspan="2">&#160;</td></tr>

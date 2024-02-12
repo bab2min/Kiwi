@@ -74,7 +74,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>형태에 관한 모든 정보를 담는 구조체의 템플릿  
+<p>형태에 관한 모든 정보를 담는 구조체  
  <a href="structkiwi_1_1Form.html#details">More...</a></p>
 
 <p><code>#include &lt;Form.h&gt;</code></p>
@@ -101,6 +101,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a29fdf43dbd702c51a0bc3f9b65a911f5"><td class="memItemLeft" align="right" valign="top"><a id="a29fdf43dbd702c51a0bc3f9b65a911f5"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;</b> (const <a class="el" href="structkiwi_1_1Form.html">Form</a> &amp;o) const</td></tr>
 <tr class="separator:a29fdf43dbd702c51a0bc3f9b65a911f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:add4ec5974e0a16ea8c221b1a7086f468"><td class="memItemLeft" align="right" valign="top"><a id="add4ec5974e0a16ea8c221b1a7086f468"></a>
+size_t&#160;</td><td class="memItemRight" valign="bottom"><b>sizeWithoutSpace</b> () const</td></tr>
+<tr class="separator:add4ec5974e0a16ea8c221b1a7086f468"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -110,6 +113,9 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:a05479b57fda21f7951dc64b7198c2bb0"><td class="memItemLeft" align="right" valign="top"><a id="a05479b57fda21f7951dc64b7198c2bb0"></a>
 <a class="el" href="classkiwi_1_1FixedVector.html">FixedVector</a>&lt; const <a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>candidate</b></td></tr>
 <tr class="separator:a05479b57fda21f7951dc64b7198c2bb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2af93dade55309618df25ced533476b6"><td class="memItemLeft" align="right" valign="top"><a id="a2af93dade55309618df25ced533476b6"></a>
+uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>numSpaces</b> = 0</td></tr>
+<tr class="separator:a2af93dade55309618df25ced533476b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a12cce1bf068ef6d5faf2b81527d36a1f"><td class="memItemLeft" align="right" valign="top"><a id="a12cce1bf068ef6d5faf2b81527d36a1f"></a>
 <a class="el" href="Types_8h.html#a11856481b15f24bf19cb647734ea1085">CondVowel</a>&#160;</td><td class="memItemRight" valign="bottom"><b>vowel</b> = <a class="el" href="Types_8h.html#a11856481b15f24bf19cb647734ea1085a334c4a4c42fdb79d7ebc3e73b517e6f8">CondVowel::none</a></td></tr>
 <tr class="separator:a12cce1bf068ef6d5faf2b81527d36a1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -124,8 +130,8 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>zCodaAppendable</b
 <tr class="separator:a6f685121b69865396fa3e78f74950b29"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>형태에 관한 모든 정보를 담는 구조체의 템플릿 </p>
-<dl class="section note"><dt>Note</dt><dd>변경 불가능한 상태로 인덱스는 모두 포인터로, std::vector는 FixedVector로 변경되어 수정이 불가능한 대신 각 값에 효율적으로 빠르게 접근 가능하다. <code><a class="el" href="classkiwi_1_1Kiwi.html" title="실제 형태소 분석을 수행하는 클래스.">kiwi::Kiwi</a></code> 내 실제 형태소 분석 단계에 쓰인다. </dd></dl>
+<div class="textblock"><p>형태에 관한 모든 정보를 담는 구조체 </p>
+<dl class="section note"><dt>Note</dt><dd>이 구조체는 변경 불가능한 상태로 사용된다. 인덱스는 모두 포인터로, std::vector는 FixedVector로 변경되어 수정이 불가능한 대신 각 값에 효율적으로 빠르게 접근 가능하다. <code><a class="el" href="classkiwi_1_1Kiwi.html" title="실제 형태소 분석을 수행하는 클래스.">kiwi::Kiwi</a></code> 내 실제 형태소 분석 단계에 쓰인다. </dd></dl>
 </div><hr/>The documentation for this struct was generated from the following file:<ul>
 <li>include/kiwi/<a class="el" href="Form_8h.html">Form.h</a></li>
 </ul>
