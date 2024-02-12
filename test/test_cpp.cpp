@@ -528,6 +528,23 @@ TEST(KiwiCpp, SpaceTolerant)
 	kiwi.setSpacePenalty(8);
 }
 
+TEST(KiwiCpp, MultiWordDictionary)
+{
+	auto& kiwi = reuseKiwiInstance();
+	const auto text = u"밀리언 달러 베이비랑 바람과 함께 사라지다랑 뭐가 더 재밌었어?";
+
+	auto res = kiwi.analyze(text, Match::allWithNormalizing).first;
+	EXPECT_EQ(res[0].str, u"밀리언 달러 베이비");
+	EXPECT_EQ(res[0].tag, POSTag::nnp);
+
+	EXPECT_EQ(res[2].str, u"바람과 함께 사라지다");
+	EXPECT_EQ(res[2].tag, POSTag::nnp);
+
+	auto kiwi2 = KiwiBuilder{ MODEL_PATH, 0, BuildOption::default_ & ~BuildOption::loadMultiDict, }.build();
+	res = kiwi2.analyze(text, Match::allWithNormalizing).first;
+	EXPECT_NE(res[0].str, u"밀리언 달러 베이비");
+}
+
 TEST(KiwiCpp, WordsWithSpaces)
 {
 	KiwiBuilder kw{ MODEL_PATH, 0, BuildOption::default_, };
