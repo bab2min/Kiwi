@@ -1,4 +1,5 @@
 ﻿#include <cassert>
+#include <algorithm>
 #include <kiwi/Utils.h>
 #include <kiwi/Form.h>
 #include "serializer.hpp"
