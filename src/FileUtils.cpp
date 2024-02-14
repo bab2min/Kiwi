@@ -23,7 +23,7 @@ namespace kiwi
 		}
 		catch (const ios_base::failure&)
 		{
-			throw Exception{ "Cannot open file : " + filePath };
+			throw IOException{ "Cannot open file : " + filePath };
 		}
 		f.exceptions(exc);
 		return f;
@@ -43,7 +43,7 @@ namespace kiwi
 		}
 		catch (const ios_base::failure&)
 		{
-			throw Exception{ "Cannot open file : " + filePath };
+			throw IOException{ "Cannot open file : " + filePath };
 		}
 		f.exceptions(exc);
 		return f;

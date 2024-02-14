@@ -82,6 +82,18 @@ namespace kiwi
 		using std::runtime_error::runtime_error;
 	};
 
+	class IOException : public Exception
+	{
+	public:
+		using Exception::Exception;
+	};
+
+	class FormatException : public Exception
+	{
+	public:
+		using Exception::Exception;
+	};
+
 	class UnicodeException : public Exception
 	{
 	public:
