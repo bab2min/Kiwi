@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['exception_307',['Exception',['../classkiwi_1_1Exception.html',1,'kiwi']]]
+  ['exception_309',['Exception',['../classkiwi_1_1Exception.html',1,'kiwi']]]
 ];
