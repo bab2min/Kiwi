@@ -514,6 +514,12 @@ size_t kiwi::splitByTrie(
 				break;
 			}
 		}
+		// 혹은 공백 문자가 아예 없는 경우 너무 길어지는 것을 방지하기 위해 강제로 중단
+		else if (n >= 8192)
+		{
+			lastChrType = chrType;
+			break;
+		}
 
 		// 공백문자를 무시하고 분할 진행
 		if (chrType == POSTag::unknown)
