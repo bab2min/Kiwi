@@ -240,10 +240,15 @@ size_t PatternMatcherImpl::testSerial(const char16_t* first, const char16_t* las
 	{
 		++b;
 		if (b != last && *b == ' ') ++b;
-		if (b == last || !isDigit(*b)) return b - first;
+		if (b == last || !isDigit(*b))
+		{
+			if (b[-1] == ' ') --b;
+			return b - first;
+		}
 		++b;
 		while (b != last && isDigit(*b)) ++b;
 	}
+	if (b[-1] == ' ') --b;
 	return b - first;
 }
 

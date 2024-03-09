@@ -160,7 +160,23 @@ namespace kiwi
 		case u'\r':
 		case u'\t':
 		case u'\v':
+		case u'\xA0':
+		case u'\u1680':
+		case u'\u2000':
+		case u'\u2001':
+		case u'\u2002':
+		case u'\u2003':
+		case u'\u2004':
+		case u'\u2005':
+		case u'\u2006':
+		case u'\u2007':
+		case u'\u2008':
+		case u'\u2009':
+		case u'\u200A':
+		case u'\u202F':
+		case u'\u205F':
 		case u'\u2800':
+		case u'\u3000':
 			return true;
 		}
 		return false;

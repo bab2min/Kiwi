@@ -531,13 +531,13 @@ TEST(KiwiCpp, SpaceTolerant)
 TEST(KiwiCpp, MultiWordDictionary)
 {
 	auto& kiwi = reuseKiwiInstance();
-	const auto text = u"밀리언 달러 베이비랑 바람과 함께 사라지다랑 뭐가 더 재밌었어?";
+	const auto text = u"밀리언 달러 베이비랑 더 웨이 백 중 뭐가 더 재밌었어?";
 
 	auto res = kiwi.analyze(text, Match::allWithNormalizing).first;
 	EXPECT_EQ(res[0].str, u"밀리언 달러 베이비");
 	EXPECT_EQ(res[0].tag, POSTag::nnp);
 
-	EXPECT_EQ(res[2].str, u"바람과 함께 사라지다");
+	EXPECT_EQ(res[2].str, u"더 웨이 백");
 	EXPECT_EQ(res[2].tag, POSTag::nnp);
 
 	auto kiwi2 = KiwiBuilder{ MODEL_PATH, 0, BuildOption::default_ & ~BuildOption::loadMultiDict, }.build();
@@ -547,7 +547,7 @@ TEST(KiwiCpp, MultiWordDictionary)
 
 TEST(KiwiCpp, WordsWithSpaces)
 {
-	KiwiBuilder kw{ MODEL_PATH, 0, BuildOption::default_, };
+	KiwiBuilder kw{ MODEL_PATH, 0, BuildOption::default_ & ~BuildOption::loadMultiDict, };
 	EXPECT_TRUE(kw.addWord(u"대학생 선교회", POSTag::nnp, 0.0).second);
 	Kiwi kiwi = kw.build();
 
@@ -643,6 +643,22 @@ TEST(KiwiCpp, WordsWithSpaces)
 	EXPECT_EQ(res5.first[1].lineNumber, 2);
 }
 
+TEST(KiwiCpp, MultiDict)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	auto res = kiwi.analyze(u"프렌치카페 로스터리 크리스마스에디션 인증샷", Match::all).first;
+	for (auto& r : res)
+	{
+		EXPECT_NE(r.str, u"리 크리스마스");
+	}
+
+	res = kiwi.analyze(u"추첨이벤트 2018년 리빙디자인페어 행사기간", Match::all).first;
+	for (auto& r : res)
+	{
+		EXPECT_NE(r.str, u"리 빙");
+	}
+}
+
 TEST(KiwiCpp, Pattern)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
@@ -716,6 +732,7 @@ TEST(KiwiCpp, Pattern)
 	tokens = kiwi.analyze(u"2001. 01. 02. 에", Match::all).first;
 	EXPECT_EQ(tokens.size(), 2);
 	EXPECT_EQ(tokens[0].tag, POSTag::w_serial);
+	EXPECT_EQ(tokens[0].str.back(), u'.');
 
 	tokens = kiwi.analyze(u"010-1234-5678에", Match::all).first;
 	EXPECT_EQ(tokens.size(), 2);
