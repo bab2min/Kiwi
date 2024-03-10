@@ -167,7 +167,7 @@ https://github.com/bab2min/kiwi-gui 에서 다운받을 수 있습니다.
 
 
 ## 업데이트 내역
-업데이트 내역은 [릴리즈 노트](./releases)를 참고해주세요.
+업데이트 내역은 [릴리즈 노트](//github.com/bab2min/Kiwi/releases)를 참고해주세요.
 
 ## 품사 태그
 
