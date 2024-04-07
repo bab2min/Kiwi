@@ -1682,7 +1682,7 @@ namespace kiwi
 
 Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) const
 {
-	Kiwi ret{ archType, langMdl, !typos.empty()};
+	Kiwi ret{ archType, langMdl, !typos.empty(), typos.isContinualTypoEnabled() };
 
 	Vector<FormRaw> combinedForms;
 	Vector<MorphemeRaw> combinedMorphemes;
@@ -1806,9 +1806,10 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 		using TypoInfo = tuple<uint32_t, float, CondVowel>;
 		UnorderedMap<KString, Vector<TypoInfo>> typoGroup;
 		auto ptypos = typos.prepare();
+		ret.continualTypoCost = ptypos.getContinualTypoCost();
 		for (auto f : sortedForms)
 		{
-			// 현재는 공백이 없는 단일 단어에 대해서만 오타 교정을 수행
+			// 현재는 공백이 없는 단일 단어에 대해서만 오타 교정을 수행.
 			// 공백이 포함된 복합 명사류의 경우 오타 후보가 지나치게 많아져
 			// 메모리 요구량이 급격히 증가하기 때문.
 			if (f->numSpaces == 0)

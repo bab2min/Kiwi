@@ -13,7 +13,7 @@ using namespace kiwi;
 namespace kiwi
 {
 	template<class... Args>
-	inline bool appendNewNode(Vector<KGraphNode>& nodes, Vector<pair<uint32_t, uint32_t>>& endPosMap, size_t startPos, Args&&... args)
+	inline bool appendNewNode(Vector<KGraphNode>& nodes, Vector<pair<uint32_t, uint32_t>>& endPosMap, size_t startPos, size_t endPos, Args&&... args)
 	{
 		static constexpr uint32_t npos = -1;
 
@@ -23,9 +23,8 @@ namespace kiwi
 		}
 
 		size_t newId = nodes.size();
-		nodes.emplace_back(forward<Args>(args)...);
+		nodes.emplace_back(startPos, endPos, forward<Args>(args)...);
 		auto& nnode = nodes.back();
-		nnode.startPos = startPos;
 
 		nnode.prev = newId - endPosMap[startPos].first;
 		if (nnode.endPos >= endPosMap.size()) return true;
@@ -43,15 +42,88 @@ namespace kiwi
 		return true;
 	}
 
-	struct TypoCostInfo
+	template<bool typoTolerant, bool continualTypoTolerant>
+	struct FormCandidate
 	{
-		float cost;
-		uint32_t start;
-		uint32_t typoId;
+		const Form* form = nullptr;
+		float cost = 0;
+		uint32_t start = 0;
+		uint32_t typoId = 0;
+		uint32_t end = 0; // only used in continual typo tolerant mode
 
-		TypoCostInfo(float _cost = 0, uint32_t _start = 0, uint32_t _typoId = 0)
-			: cost{ _cost }, start{ _start }, typoId{ _typoId }
+		FormCandidate(const Form* _form = nullptr, float _cost = 0, uint32_t _start = 0, uint32_t _typoId = 0, uint32_t _end = 0)
+			: form{ _form }, cost{ _cost }, start{ _start }, typoId{ _typoId }, end{ _end }
 		{}
+
+		size_t getStartPos(size_t ) const
+		{
+			return start;
+		}
+
+		size_t getEndPos(size_t currentPos) const
+		{
+			return end ? end : currentPos;
+		}
+
+		float getTypoCost() const
+		{
+			return cost;
+		}
+
+		uint32_t getTypoId() const
+		{
+			return typoId;
+		}
+
+		size_t getFormSizeWithTypos(const size_t* typoPtrs) const
+		{
+			return typoPtrs[typoId + 1] - typoPtrs[typoId];
+		}
+
+		bool operator==(const Form* f) const
+		{
+			return form == f;
+		}
+	};
+
+	template<>
+	struct FormCandidate<false, false>
+	{
+		const Form* form = nullptr;
+
+		FormCandidate(const Form* _form = nullptr, float = 0, uint32_t = 0, uint32_t = 0, uint32_t = 0)
+			: form{ _form }
+		{}
+
+		size_t getStartPos(size_t currentPos) const
+		{
+			return currentPos - form->sizeWithoutSpace();
+		}
+
+		size_t getEndPos(size_t currentPos) const
+		{
+			return currentPos;
+		}
+
+		float getTypoCost() const
+		{
+			return 0;
+		}
+
+		uint32_t getTypoId() const
+		{
+			return 0;
+		}
+
+		size_t getFormSizeWithTypos(const size_t*) const
+		{
+			return form->form.size();
+		}
+
+		bool operator==(const Form* f) const
+		{
+			return form == f;
+		}
 	};
 
 	template<bool typoTolerant>
@@ -71,17 +143,20 @@ namespace kiwi
 		}
 	}
 
-	template<bool typoTolerant>
+	template<bool typoTolerant, bool continualTypoTolerant>
 	bool insertCandidates(
-		Vector<const Form*>& candidates,
-		Vector<TypoCostInfo>& candTypoCostStarts,
+		Vector<FormCandidate<typoTolerant, continualTypoTolerant>>& candidates,
 		const Form* foundCand,
 		const Form* formBase,
 		const size_t* typoPtrs,
 		U16StringView str,
-		const Vector<uint32_t>& nonSpaces
+		const Vector<uint32_t>& nonSpaces,
+		uint32_t startPosition = 0,
+		uint32_t endPosition = 0,
+		float cost = 0
 	)
 	{
+		static constexpr size_t posMultiplier = continualTypoTolerant ? 4 : 1;
 		if (typoTolerant)
 		{
 			auto tCand = reinterpret_cast<const TypoForm*>(foundCand);
@@ -89,13 +164,12 @@ namespace kiwi
 
 			while (1)
 			{
-				auto typoFormSize = typoPtrs[tCand->typoId + 1] - typoPtrs[tCand->typoId];
+				const auto typoFormSize = typoPtrs[tCand->typoId + 1] - typoPtrs[tCand->typoId];
 				auto cand = &tCand->form(formBase);
 				if (FeatureTestor::isMatched(&str[0], &str[nonSpaces[nonSpaces.size() - typoFormSize]], tCand->leftCond)
 					&& FeatureTestor::isMatchedApprox(&str[0], &str[nonSpaces[nonSpaces.size() - typoFormSize]], cand->vowel, cand->polar))
 				{
-					candidates.emplace_back(cand);
-					candTypoCostStarts.emplace_back(tCand->score(), nonSpaces.size() - typoFormSize, tCand->typoId);
+					candidates.emplace_back(cand, tCand->score() + cost, startPosition ? startPosition : ((nonSpaces.size() - typoFormSize) * posMultiplier), tCand->typoId, endPosition);
 				}
 				if (tCand[0].hash() != tCand[1].hash()) break;
 				++tCand;
@@ -116,6 +190,23 @@ namespace kiwi
 			}
 		}
 		return true;
+	}
+
+	template<bool typoTolerant>
+	size_t getFormLength(
+		const Form* form,
+		const Form* formBase
+	)
+	{
+		if (typoTolerant)
+		{
+			auto tCand = reinterpret_cast<const TypoForm*>(form);
+			return tCand->form(formBase).form.size();
+		}
+		else
+		{
+			return form->form.size();
+		}
 	}
 
 	inline void removeUnconnected(Vector<KGraphNode>& ret, const Vector<KGraphNode>& graph, const Vector<std::pair<uint32_t, uint32_t>>& endPosMap)
@@ -142,8 +233,8 @@ namespace kiwi
 				if (graph[i].endPos != node.startPos) continue;
 				if (connectedList[i]) continue;
 				updateList.emplace_back(i);
+				connectedList[i] = 1;
 			}
-			fill(connectedList.begin() + scanStart, connectedList.begin() + scanEnd, 1);
 		}
 
 		size_t connectedCnt = accumulate(connectedList.begin(), connectedList.end(), 0);
@@ -172,38 +263,271 @@ namespace kiwi
 		}
 	}
 
-}
-
-// nonSpaces idx 데이터로부터 글자 수 + 공백 블록 수를 계산한다.
-template<class It>
-inline size_t countChrWithNormalizedSpace(It first, It last)
-{
-	size_t n = std::distance(first, last);
-	auto prevIdx = *first++;
-	for (; first != last; ++first)
+	// nonSpaces idx 데이터로부터 글자 수 + 공백 블록 수를 계산한다.
+	template<class It>
+	inline size_t countChrWithNormalizedSpace(It first, It last)
 	{
-		if (*first != prevIdx + 1) ++n;
-		prevIdx = *first;
+		size_t n = std::distance(first, last);
+		auto prevIdx = *first++;
+		for (; first != last; ++first)
+		{
+			if (*first != prevIdx + 1) ++n;
+			prevIdx = *first;
+		}
+		return n;
 	}
-	return n;
-}
 
-// 공백 문자의 위치가 형태소의 공백 위치와 불일치하는 개수를 센다.
-inline size_t countSpaceErrors(const KString& form, const uint32_t* spaceIdxFirst, const uint32_t* spaceIdxLast)
-{
-	size_t n = 0;
-	size_t spaceOffset = 0;
-	const size_t size = std::distance(spaceIdxFirst, spaceIdxLast);
-	for (size_t i = 1; i < size; ++i)
+	// 공백 문자의 위치가 형태소의 공백 위치와 불일치하는 개수를 센다.
+	inline size_t countSpaceErrors(const KString& form, const uint32_t* spaceIdxFirst, const uint32_t* spaceIdxLast)
 	{
-		const bool hasSpace = spaceIdxFirst[i] - spaceIdxFirst[i - 1] > 1;
-		if (hasSpace && form[i + spaceOffset] != u' ') ++n;
-		spaceOffset += form[i + spaceOffset] == u' ' ? 1 : 0;
+		size_t n = 0;
+		size_t spaceOffset = 0;
+		const size_t size = std::distance(spaceIdxFirst, spaceIdxLast);
+		for (size_t i = 1; i < size; ++i)
+		{
+			const bool hasSpace = spaceIdxFirst[i] - spaceIdxFirst[i - 1] > 1;
+			if (hasSpace && form[i + spaceOffset] != u' ') ++n;
+			spaceOffset += form[i + spaceOffset] == u' ' ? 1 : 0;
+		}
+		return n;
 	}
-	return n;
+
+	// onset: ㅇ=11, ㅎ=18
+	inline char16_t overrideOnset(char16_t c, const int onset = 11)
+	{
+		if (!isHangulSyllable(c)) return 0;
+		const int vowel = (c - 0xAC00) / 28 % 21;
+		const int coda = (c - 0xAC00) % 28;
+		return 0xAC00 + onset * 28 * 21 + vowel * 28 + coda;
+	}
+
+	// 받침 + 초성 ㅇ이 연철된 경우
+	struct ContinualIeungDecomposer
+	{
+		static constexpr size_t boundaryId = 1;
+		char16_t onsetToCoda(char16_t c)
+		{
+			static constexpr char16_t onsetToCoda[] = {
+				0x11A8, // ㄱ
+				0x11A9, // ㄲ
+				0x11AB, // ㄴ
+				0x11AE, // ㄷ
+				0, // ㄸ
+				0x11AF, // ㄹ
+				0x11B7, // ㅁ
+				0x11B8, // ㅂ
+				0, // ㅃ
+				0x11BA, // ㅅ
+				0x11BB, // ㅆ
+				0, // ㅇ
+				0x11BD, // ㅈ
+				0, // ㅉ
+				0x11BE, // ㅊ
+				0x11BF, // ㅋ
+				0x11C0, // ㅌ
+				0x11C1, // ㅍ
+				0x11C2, // ㅎ
+			};
+
+			if (isHangulSyllable(c))
+			{
+				int onset = (c - 0xAC00) / 28 / 21;
+				return onsetToCoda[onset];
+			}
+
+			switch (c)
+			{
+				case u'ㄱ': return 0x11A8;
+				case u'ㄲ': return 0x11A9;
+				case u'ㄴ': return 0x11AB;
+				case u'ㄷ': return 0x11AE;
+				case u'ㄹ': return 0x11AF;
+				case u'ㅁ': return 0x11B7;
+				case u'ㅂ': return 0x11B8;
+				case u'ㅅ': return 0x11BA;
+				case u'ㅆ': return 0x11BB;
+				case u'ㅈ': return 0x11BD;
+				case u'ㅊ': return 0x11BE;
+				case u'ㅋ': return 0x11BF;
+				case u'ㅌ': return 0x11C0;
+				case u'ㅍ': return 0x11C1;
+				case u'ㅎ': return 0x11C2;
+				default: return 0;
+			}
+
+			return 0;
+		}
+
+		char16_t dropRightSyllable(char16_t c)
+		{
+			return overrideOnset(c, 11);
+		}
+	};
+
+	// 받침 + 초성 ㅎ이 연철된 경우
+	struct ContinualHieutDecomposer
+	{
+		static constexpr size_t boundaryId = 2;
+		char16_t onsetToCoda(char16_t c)
+		{
+			static constexpr char16_t onsetToCoda[] = {
+				0, // ㄱ
+				0, // ㄲ
+				0x11AB, // ㄴ
+				0, // ㄷ
+				0, // ㄸ
+				0x11AF, // ㄹ
+				0x11B7, // ㅁ
+				0, // ㅂ
+				0, // ㅃ
+				0x11BA, // ㅅ
+				0, // ㅆ
+				0, // ㅇ
+				0, // ㅈ
+				0, // ㅉ
+				0x11BD, // ㅊ->ㅈ
+				0x11A8, // ㅋ->ㄱ
+				0x11AE, // ㅌ->ㄷ
+				0x11B8, // ㅍ->ㅂ
+				0, // ㅎ
+			};
+
+			if (isHangulSyllable(c))
+			{
+				int onset = (c - 0xAC00) / 28 / 21;
+				return onsetToCoda[onset];
+			}
+			return 0;
+		}
+
+		char16_t dropRightSyllable(char16_t c)
+		{
+			return overrideOnset(c, 18);
+		}
+	};
+
+	// 받침 ㅎ + ㅎ이 아닌 초성이 연철된 경우
+	struct ContinualCodaDecomposer
+	{
+		static constexpr size_t boundaryId = 3;
+		char16_t onsetToCoda(char16_t c)
+		{
+			static constexpr char16_t onsetToCoda[] = {
+				0, // ㄱ
+				0, // ㄲ
+				0, // ㄴ
+				0, // ㄷ
+				0, // ㄸ
+				0, // ㄹ
+				0, // ㅁ
+				0, // ㅂ
+				0, // ㅃ
+				0, // ㅅ
+				0, // ㅆ
+				0, // ㅇ
+				0, // ㅈ
+				0, // ㅉ
+				0x11C2, // ㅊ->ㅎ
+				0x11C2, // ㅋ->ㅎ
+				0x11C2, // ㅌ->ㅎ
+				0x11C2, // ㅍ->ㅎ
+				0, // ㅎ
+			};
+
+			if (isHangulSyllable(c))
+			{
+				int onset = (c - 0xAC00) / 28 / 21;
+				return onsetToCoda[onset];
+			}
+			return 0;
+		}
+
+		char16_t dropRightSyllable(char16_t c)
+		{
+			const int onset = (c - 0xAC00) / 28 / 21;
+			const int vowel = (c - 0xAC00) / 28 % 21;
+			const int coda = (c - 0xAC00) % 28;
+			static constexpr char16_t onsetMap[] = {
+				0, // ㄱ
+				0, // ㄲ
+				0, // ㄴ
+				0, // ㄷ
+				0, // ㄸ
+				0, // ㄹ
+				0, // ㅁ
+				0, // ㅂ
+				0, // ㅃ
+				0, // ㅅ
+				0, // ㅆ
+				0, // ㅇ
+				0, // ㅈ
+				0, // ㅉ
+				12, // ㅊ->ㅈ
+				0, // ㅋ->ㄱ
+				3, // ㅌ->ㄷ
+				7, // ㅍ->ㅂ
+				0, // ㅎ
+			};
+			return 0xAC00 + (onsetMap[onset] * 21 + vowel) * 28 + coda;
+		}
+	};
+
+	template<ArchType arch, class Decomposer, bool typoTolerant, bool continualTypoTolerant>
+	inline void insertContinualTypoNode(
+		Vector<FormCandidate<typoTolerant, continualTypoTolerant>>& candidates,
+		Vector<pair<size_t, const utils::FrozenTrie<kchar_t, const Form*>::Node*>>& continualTypoRightNodes,
+		Decomposer decomposer,
+		float continualTypoCost,
+		char16_t c,
+		const Form* formBase,
+		const size_t* typoPtrs,
+		const utils::FrozenTrie<kchar_t, const Form*>& trie,
+		U16StringView str,
+		const Vector<uint32_t>& nonSpaces,
+		const utils::FrozenTrie<kchar_t, const Form*>::Node* curNode
+	)
+	{
+		if (!continualTypoTolerant) return;
+		static constexpr size_t posMultiplier = continualTypoTolerant ? 4 : 1;
+
+		char16_t codaFromContinual = decomposer.onsetToCoda(c), 
+			droppedSyllable = decomposer.dropRightSyllable(c);
+		if (!codaFromContinual || !droppedSyllable) return;
+
+		const auto boundary = (nonSpaces.size() - 1) * posMultiplier + Decomposer::boundaryId;
+		bool inserted = false;
+		auto* contNode = curNode->template nextOpt<arch>(trie, codaFromContinual);
+		while (!contNode)
+		{
+			curNode = curNode->fail();
+			if (!curNode) break;
+			contNode = curNode->template nextOpt<arch>(trie, codaFromContinual);
+		}
+
+		if (!contNode) return;
+
+		for (auto submatcher = contNode; submatcher; submatcher = submatcher->fail())
+		{
+			const Form* cand = submatcher->val(trie);
+			if (!cand) break;
+			else if (!trie.hasSubmatch(cand))
+			{
+				if (getFormLength<typoTolerant>(cand, formBase) <= 1) break;
+				inserted = true;
+				if (!insertCandidates(candidates, cand, formBase, typoPtrs, str, nonSpaces, 0, boundary, continualTypoCost / 2)) break;
+			}
+		}
+
+		if (!inserted) return;
+
+		if (auto* dropNode = trie.root()->template nextOpt<arch>(trie, droppedSyllable))
+		{
+			continualTypoRightNodes.emplace_back(boundary, dropNode);
+		}
+	}
 }
 
-template<ArchType arch, bool typoTolerant>
+template<ArchType arch, bool typoTolerant, bool continualTypoTolerant>
 size_t kiwi::splitByTrie(
 	Vector<KGraphNode>& ret,
 	const Form* formBase,
@@ -214,11 +538,27 @@ size_t kiwi::splitByTrie(
 	Match matchOptions, 
 	size_t maxUnkFormSize, 
 	size_t spaceTolerance,
-	float typoCostWeight,
+	float continualTypoCost,
 	const PretokenizedSpanGroup::Span*& pretokenizedFirst,
 	const PretokenizedSpanGroup::Span* pretokenizedLast
 )
 {
+	/*
+	* posMultiplier는 연철 교정 모드(continualTypoTolerant)에서 사용된다.
+	* 이 경우 음절 경계로 분할되는 형태소들은 모두 4의 배수로 인덱싱되고
+	* 연철되어 두 음절에 걸쳐 있는 형태소들은 4n + 1, 2, 3으로 인덱싱된다.
+	* 4n + 1: 받침 + 초성 ㅇ이 연철되어 결합한 경우(ex: 사람이 -> 사라미)
+	* 4n + 2: 받침 + 초성 ㅎ이 연철되어 결합한 경우(ex: 급하다 -> 그파다)
+	* 4n + 3: ㅎ 받침 + ㅎ이 아닌 초성이 연철되어 결합한 경우(ex: 않다 -> 안타)
+	* 
+	* 연철 교정 모드가 사용되지 않을 경우
+	* '사라ㅁ이'에서 형태소 '사라ㅁ'과 '이'의 (시작, 끝지점)은 각각 (0, 3), (3, 4)가 된다.
+	* 연철 교정 모드가 사용될 경우
+	* '사라ㅁ이'에서 형태소 '사라ㅁ'과 '이'의 (시작, 끝지점)은 각각 (0, 12), (12, 16)가 된다.
+	* 그리고 '사라미'에서는 형태소 '사라ㅁ'은 (0, 9), '이'는 (9, 12)가 된다.
+	*/
+	static constexpr size_t posMultiplier = continualTypoTolerant ? 4 : 1;
+
 	/*
 	* endPosMap[i]에는 out[x].endPos == i를 만족하는 첫번째 x(first)와 마지막 x + 1(second)가 들어 있다.
 	* first == second인 경우 endPos가 i인 노드가 없다는 것을 의미한다.
@@ -226,41 +566,45 @@ size_t kiwi::splitByTrie(
 	*/
 	thread_local Vector<pair<uint32_t, uint32_t>> endPosMap;
 	endPosMap.clear();
-	endPosMap.resize(str.size() + 1, make_pair<uint32_t, uint32_t>(-1, -1));
+	endPosMap.resize(str.size() * posMultiplier + 1, make_pair<uint32_t, uint32_t>(-1, -1));
 	endPosMap[0] = make_pair(0, 1);
 	
 	thread_local Vector<uint32_t> nonSpaces;
 	nonSpaces.clear();
-	nonSpaces.reserve(str.size());
+	nonSpaces.reserve(str.size() * posMultiplier);
 
 	thread_local Vector<KGraphNode> out;
 	out.clear();
 	out.emplace_back();
 	size_t n = 0;
-	Vector<const Form*> candidates;
-	Vector<TypoCostInfo> candTypoCostStarts;
+	Vector<FormCandidate<typoTolerant, continualTypoTolerant>> candidates;
 	auto* curNode = trie.root();
 	auto* nextNode = trie.root();
-	
+	Vector<pair<size_t, decltype(curNode)>> continualTypoRightNodes;
+
 	size_t lastSpecialEndPos = 0, specialStartPos = 0;
 	POSTag chrType, lastChrType = POSTag::unknown, lastMatchedPattern = POSTag::unknown;
-	auto branchOut = [&](size_t unkFormEndPos = 0, size_t unkFormEndPosWithSpace = 0, bool specialMatched = false)
+	auto flushBranch = [&](size_t unkFormEndPos = 0, size_t unkFormEndPosWithSpace = 0, bool specialMatched = false)
 	{
 		if (!candidates.empty())
 		{
 			bool alreadySpecialChrProcessed = false;
 			for (auto& cand : candidates)
 			{
-				const size_t nBegin = typoTolerant ? candTypoCostStarts[&cand - candidates.data()].start : (nonSpaces.size() - cand->sizeWithoutSpace());
-				const auto scanStart = max(endPosMap[nBegin].first, (uint32_t)1), scanEnd = endPosMap[nBegin].second;
+				const size_t nBegin = cand.getStartPos(nonSpaces.size() * posMultiplier) / posMultiplier,
+					nBeginWithMultiplier = cand.getStartPos(nonSpaces.size() * posMultiplier),
+					nEndWithMultiplier = cand.getEndPos(nonSpaces.size() * posMultiplier);
+				const auto scanStart = max(endPosMap[nBeginWithMultiplier].first, (uint32_t)1), scanEnd = endPosMap[nBeginWithMultiplier].second;
 				const bool longestMatched = scanStart < scanEnd && any_of(out.begin() + scanStart, out.begin() + scanEnd, [&](const KGraphNode& g)
 				{
-					return nBegin == g.endPos && lastSpecialEndPos == g.endPos - (g.uform.empty() ? g.form->sizeWithoutSpace() : g.uform.size());
+					return nBeginWithMultiplier == g.endPos && lastSpecialEndPos == g.endPos - (g.uform.empty() ? g.form->sizeWithoutSpace() : g.uform.size()) * posMultiplier;
 				});
 
 				// insert unknown form 
-				if (nBegin > lastSpecialEndPos && !longestMatched
-					&& !isHangulCoda(cand->form[0]))
+				if (nBeginWithMultiplier % posMultiplier == 0
+					&& nEndWithMultiplier % posMultiplier == 0
+					&& nBegin > lastSpecialEndPos && !longestMatched
+					&& !isHangulCoda(cand.form->form[0]))
 				{
 					{
 						size_t lastPos = out.back().endPos;
@@ -270,7 +614,9 @@ size_t kiwi::splitByTrie(
 							if (lastPos && isHangulCoda(str[nonSpaces[lastPos]])) lastPos--; // prevent coda to be matched alone.
 							if (lastPos != lastSpecialEndPos)
 							{
-								appendNewNode(out, endPosMap, lastPos, str.substr(nonSpaces[lastPos], nonSpaces[nBegin] - nonSpaces[lastPos]), (uint16_t)nBegin);
+								appendNewNode(out, endPosMap, 
+									lastPos * posMultiplier, nBegin * posMultiplier, 
+									str.substr(nonSpaces[lastPos], nonSpaces[nBegin] - nonSpaces[lastPos]));
 							}
 						}
 					}
@@ -278,19 +624,23 @@ size_t kiwi::splitByTrie(
 					const size_t newNodeLength = nBegin - lastSpecialEndPos;
 					if (maxUnkFormSize && newNodeLength <= maxUnkFormSize)
 					{
-						appendNewNode(out, endPosMap, lastSpecialEndPos, str.substr(nonSpaces[lastSpecialEndPos], nonSpaces[nBegin] - nonSpaces[lastSpecialEndPos]), (uint16_t)nBegin);
+						appendNewNode(out, endPosMap, 
+							lastSpecialEndPos * posMultiplier, nBegin * posMultiplier, 
+							str.substr(nonSpaces[lastSpecialEndPos], nonSpaces[nBegin] - nonSpaces[lastSpecialEndPos]));
 					}
 				}				
 
 				// if special character
-				if (cand->candidate[0] <= trie.value((size_t)POSTag::sn)->candidate[0])
+				if (cand.form->candidate[0] <= trie.value((size_t)POSTag::sn)->candidate[0])
 				{
 					// special character should be processed one by one chr.
 					if (!alreadySpecialChrProcessed)
 					{
-						if (appendNewNode(out, endPosMap, nonSpaces.size() - 1, U16StringView{ cand->form.data() + cand->form.size() - 1, 1 }, (uint16_t)nonSpaces.size()))
+						if (appendNewNode(out, endPosMap, 
+							(nonSpaces.size() - 1) * posMultiplier, nEndWithMultiplier,
+							U16StringView{ cand.form->form.data() + cand.form->form.size() - 1, 1 }))
 						{
-							out.back().form = trie.value((size_t)cand->candidate[0]->tag);
+							out.back().form = trie.value((size_t)cand.form->candidate[0]->tag);
 						}
 						lastSpecialEndPos = nonSpaces.size();
 						alreadySpecialChrProcessed = true;
@@ -298,46 +648,51 @@ size_t kiwi::splitByTrie(
 				}
 				else
 				{
-					// TO DO: 아래의 spaceErrors 계산방식은 오타 교정 모드에서는 부정확한 값을 낼 수 있음. 더 정교한 방식으로 개선 필요
 					const size_t lengthWithSpaces = countChrWithNormalizedSpace(nonSpaces.begin() + nBegin, nonSpaces.end());
+					const size_t formSizeWithTypos = cand.getFormSizeWithTypos(typoPtrs);
 					size_t spaceErrors = 0;
-					if (lengthWithSpaces <= cand->form.size() + spaceTolerance 
-						&& (!cand->numSpaces || (spaceErrors = countSpaceErrors(cand->form, nonSpaces.data() + nBegin, nonSpaces.data() + nonSpaces.size())) <= spaceTolerance))
+					if (lengthWithSpaces <= formSizeWithTypos + spaceTolerance
+						&& (!cand.form->numSpaces || (spaceErrors = countSpaceErrors(cand.form->form, nonSpaces.data() + nBegin, nonSpaces.data() + nonSpaces.size())) <= spaceTolerance))
 					{
-						if (!cand->numSpaces && lengthWithSpaces > cand->form.size()) spaceErrors = lengthWithSpaces - cand->form.size();
-						const float typoCost = typoTolerant ? candTypoCostStarts[&cand - candidates.data()].cost : 0.f;
-						if (appendNewNode(out, endPosMap, nBegin, cand, (uint16_t)nonSpaces.size(), typoCost))
+						if (!cand.form->numSpaces && lengthWithSpaces > formSizeWithTypos) spaceErrors = lengthWithSpaces - formSizeWithTypos;
+						const float typoCost = cand.getTypoCost();
+						if (appendNewNode(out, endPosMap, 
+							nBeginWithMultiplier, nEndWithMultiplier,
+							cand.form, typoCost))
 						{
 							out.back().spaceErrors = spaceErrors;
 							if (typoTolerant)
 							{
-								out.back().typoFormId = candTypoCostStarts[&cand - candidates.data()].typoId;
+								out.back().typoFormId = cand.getTypoId();
 							}
 						}
 					}
 				}
 			}
 			candidates.clear();
-			if (typoTolerant) candTypoCostStarts.clear();
 		}
 		else if (out.size() > 1 && !specialMatched)
 		{
 			size_t lastPos = out.back().endPos;
 			if (lastPos < unkFormEndPos && !isHangulCoda(str[nonSpaces[lastPos]]))
 			{
-				appendNewNode(out, endPosMap, lastPos, str.substr(nonSpaces[lastPos], unkFormEndPosWithSpace - nonSpaces[lastPos]), (uint16_t)unkFormEndPos);
+				appendNewNode(out, endPosMap, 
+					lastPos * posMultiplier, unkFormEndPos * posMultiplier, 
+					str.substr(nonSpaces[lastPos], unkFormEndPosWithSpace - nonSpaces[lastPos]));
 			}
 		}
 
-		const auto scanStart = max(endPosMap[unkFormEndPos].first, (uint32_t)1), scanEnd = endPosMap[unkFormEndPos].second;
+		const auto scanStart = max(endPosMap[unkFormEndPos * posMultiplier].first, (uint32_t)1), scanEnd = endPosMap[unkFormEndPos * posMultiplier].second;
 		const bool duplicated = scanStart < scanEnd && any_of(out.begin() + scanStart, out.begin() + scanEnd, [&](const KGraphNode& g)
 		{
-			size_t startPos = g.endPos - (g.uform.empty() ? g.form->sizeWithoutSpace() : g.uform.size());
-			return startPos == lastSpecialEndPos && g.endPos == unkFormEndPos;
+			size_t startPos = g.endPos - (g.uform.empty() ? g.form->sizeWithoutSpace() : g.uform.size()) * posMultiplier;
+			return startPos == lastSpecialEndPos * posMultiplier && g.endPos == unkFormEndPos * posMultiplier;
 		});
 		if (unkFormEndPos > lastSpecialEndPos && !duplicated)
 		{
-			appendNewNode(out, endPosMap, lastSpecialEndPos, str.substr(nonSpaces[lastSpecialEndPos], unkFormEndPosWithSpace - nonSpaces[lastSpecialEndPos]), (uint16_t)unkFormEndPos);
+			appendNewNode(out, endPosMap, 
+				lastSpecialEndPos * posMultiplier, unkFormEndPos * posMultiplier, 
+				str.substr(nonSpaces[lastSpecialEndPos], unkFormEndPosWithSpace - nonSpaces[lastSpecialEndPos]));
 		}
 	};
 
@@ -361,7 +716,9 @@ size_t kiwi::splitByTrie(
 				// sequence of speical characters found
 				if (lastChrType != POSTag::max && !isWebTag(lastChrType))
 				{
-					if (appendNewNode(out, endPosMap, specialStartPos, U16StringView{ &str[nonSpaces[specialStartPos]], n - nonSpaces[specialStartPos] }, (uint16_t)nonSpaces.size()))
+					if (appendNewNode(out, endPosMap, 
+						specialStartPos * posMultiplier, nonSpaces.size() * posMultiplier, 
+						U16StringView{ &str[nonSpaces[specialStartPos]], n - nonSpaces[specialStartPos] }))
 					{
 						out.back().form = trie.value((size_t)lastChrType);
 					}
@@ -371,8 +728,10 @@ size_t kiwi::splitByTrie(
 			}
 
 			uint32_t length = pretokenizedFirst->end - pretokenizedFirst->begin;
-			branchOut(nonSpaces.size(), n);
-			if (appendNewNode(out, endPosMap, nonSpaces.size(), pretokenizedFirst->form, nonSpaces.size() + length))
+			flushBranch(nonSpaces.size(), n);
+			if (appendNewNode(out, endPosMap, 
+				nonSpaces.size() * posMultiplier, (nonSpaces.size() + length) * posMultiplier, 
+				pretokenizedFirst->form))
 			{
 				if (within(pretokenizedFirst->form, fallbackFormBegin, fallbackFormEnd))
 				{
@@ -401,7 +760,9 @@ size_t kiwi::splitByTrie(
 					// sequence of speical characters found
 					if (lastChrType != POSTag::max && !isWebTag(lastChrType))
 					{
-						if (appendNewNode(out, endPosMap, specialStartPos, U16StringView{ &str[nonSpaces[specialStartPos]], n - nonSpaces[specialStartPos] }, (uint16_t)nonSpaces.size()))
+						if (appendNewNode(out, endPosMap, 
+							specialStartPos * posMultiplier, nonSpaces.size() * posMultiplier, 
+							U16StringView{ &str[nonSpaces[specialStartPos]], n - nonSpaces[specialStartPos] }))
 						{
 							out.back().form = trie.value((size_t)lastChrType);
 						}
@@ -413,7 +774,7 @@ size_t kiwi::splitByTrie(
 				size_t patStart = nonSpaces.size();
 				for (size_t i = 0; i < m.first; ++i)
 				{
-					branchOut(nonSpaces.size(), n + i, i > 0);
+					flushBranch(nonSpaces.size(), n + i, i > 0);
 					nextNode = curNode->template nextOpt<arch>(trie, str[n + i]);
 					while (!nextNode) // if curNode has no exact next node, goto fail
 					{
@@ -426,7 +787,7 @@ size_t kiwi::splitByTrie(
 								if (!cand) break;
 								else if (!trie.hasSubmatch(cand))
 								{
-									if (!insertCandidates<typoTolerant>(candidates, candTypoCostStarts, cand, formBase, typoPtrs, str, nonSpaces)) break;
+									if (!insertCandidates(candidates, cand, formBase, typoPtrs, str, nonSpaces)) break;
 								}
 							}
 							nextNode = curNode->template nextOpt<arch>(trie, str[n + i]);
@@ -447,14 +808,16 @@ size_t kiwi::splitByTrie(
 						if (!cand) break;
 						else if (!trie.hasSubmatch(cand))
 						{
-							if (!insertCandidates<typoTolerant>(candidates, candTypoCostStarts, cand, formBase, typoPtrs, str, nonSpaces)) break;
+							if (!insertCandidates(candidates, cand, formBase, typoPtrs, str, nonSpaces)) break;
 						}
 					}
 				continuePatternFor:;
 				}
-				branchOut(nonSpaces.size(), n + m.first, true);
+				flushBranch(nonSpaces.size(), n + m.first, true);
 
-				if (appendNewNode(out, endPosMap, patStart, U16StringView{ &str[n], m.first }, (uint16_t)(patStart + m.first)))
+				if (appendNewNode(out, endPosMap, 
+					patStart * posMultiplier, (patStart + m.first) * posMultiplier, 
+					U16StringView{ &str[n], m.first }))
 				{
 					out.back().form = trie.value((size_t)chrType);
 				}
@@ -478,19 +841,23 @@ size_t kiwi::splitByTrie(
 			// sequence of speical characters found
 			if (lastChrType != POSTag::max && lastChrType != POSTag::unknown && lastChrType != lastMatchedPattern)
 			{
-				const auto scanStart = max(endPosMap[nonSpaces.size()].first, (uint32_t)1), scanEnd = endPosMap[nonSpaces.size()].second;
+				const auto scanStart = max(endPosMap[specialStartPos * posMultiplier].first, (uint32_t)1), scanEnd = endPosMap[specialStartPos * posMultiplier].second;
 				const bool duplicated = scanStart < scanEnd && any_of(out.begin() + scanStart, out.begin() + scanEnd, [&](const KGraphNode& g)
 				{
-					return nonSpaces.size() == g.endPos;
+					return specialStartPos * posMultiplier == g.endPos;
 				});
 				if (nonSpaces.size() > lastSpecialEndPos && specialStartPos > lastSpecialEndPos && !duplicated)
 				{
-					appendNewNode(out, endPosMap, lastSpecialEndPos, str.substr(nonSpaces[lastSpecialEndPos], nonSpaces[specialStartPos] - nonSpaces[lastSpecialEndPos]), (uint16_t)specialStartPos);
+					appendNewNode(out, endPosMap, 
+						lastSpecialEndPos * posMultiplier, specialStartPos * posMultiplier, 
+						str.substr(nonSpaces[lastSpecialEndPos], nonSpaces[specialStartPos] - nonSpaces[lastSpecialEndPos]));
 				}
 
 				if (lastChrType != POSTag::ss) // ss 태그는 morpheme 내에 등록된 후보에서 직접 탐색하도록 한다
 				{
-					if (appendNewNode(out, endPosMap, specialStartPos, U16StringView{ &str[nonSpaces[specialStartPos]], n - nonSpaces[specialStartPos] }, (uint16_t)nonSpaces.size()))
+					if (appendNewNode(out, endPosMap, 
+						specialStartPos * posMultiplier, nonSpaces.size() * posMultiplier, 
+						U16StringView{ &str[nonSpaces[specialStartPos]], n - nonSpaces[specialStartPos] }))
 					{
 						out.back().form = trie.value((size_t)lastChrType);
 					}
@@ -520,17 +887,18 @@ size_t kiwi::splitByTrie(
 		// 공백문자를 무시하고 분할 진행
 		if (chrType == POSTag::unknown)
 		{
-			branchOut(nonSpaces.size(), n);
+			flushBranch(nonSpaces.size(), n);
 			lastSpecialEndPos = nonSpaces.size();
 			goto continueFor;
 		}
 
 		if (isOldHangulToneMark(c))
 		{
-			branchOut(nonSpaces.size(), n);
+			flushBranch(nonSpaces.size(), n);
 			goto continueFor;
 		}
 
+		auto* curNodeForContinualTypo = curNode;
 		nextNode = curNode->template nextOpt<arch>(trie, c);
 		while (!nextNode) // if curNode has no exact next node, goto fail
 		{
@@ -544,7 +912,7 @@ size_t kiwi::splitByTrie(
 					else if (!trie.hasSubmatch(cand))
 					{
 						zCodaFollowable = zCodaFollowable || getZCodaAppendable<typoTolerant>(cand, formBase);
-						if (!insertCandidates<typoTolerant>(candidates, candTypoCostStarts, cand, formBase, typoPtrs, str, nonSpaces)) break;
+						if (!insertCandidates(candidates, cand, formBase, typoPtrs, str, nonSpaces)) break;
 					}
 				}
 				nextNode = curNode->template nextOpt<arch>(trie, c);
@@ -553,11 +921,11 @@ size_t kiwi::splitByTrie(
 			{
 				if (chrType != POSTag::max)
 				{
-					branchOut(specialStartPos, specialStartPos < nonSpaces.size() ? nonSpaces[specialStartPos] : n);
+					flushBranch(specialStartPos, specialStartPos < nonSpaces.size() ? nonSpaces[specialStartPos] : n);
 				}
 				else
 				{
-					branchOut();
+					flushBranch();
 				}
 				
 				// spaceTolerance == 0이고 공백 문자인 경우
@@ -578,11 +946,7 @@ size_t kiwi::splitByTrie(
 				
 				if (!!(matchOptions & Match::zCoda) && zCodaFollowable && isHangulCoda(c) && (n + 1 >= str.size() || !isHangulSyllable(str[n + 1])))
 				{
-					candidates.emplace_back(formBase + defaultTagSize + (c - 0x11A8) - 1);
-					if (typoTolerant)
-					{
-						candTypoCostStarts.emplace_back(0, nonSpaces.size() - 1);
-					}
+					candidates.emplace_back(formBase + defaultTagSize + (c - 0x11A8) - 1, 0, nonSpaces.size() - 1);
 				}
 				zCodaFollowable = false;
 
@@ -590,27 +954,45 @@ size_t kiwi::splitByTrie(
 			}
 		}
 
+		if (continualTypoTolerant)
+		{
+			size_t outputIdx = 0;
+			for (auto& rn : continualTypoRightNodes)
+			{
+				rn.second = rn.second->template nextOpt<arch>(trie, c);
+				if (!rn.second) continue;
+				continualTypoRightNodes[outputIdx++] = rn;
+			}
+			continualTypoRightNodes.resize(outputIdx);
+		}
+
 		if (chrType != POSTag::max)
 		{
-			branchOut(specialStartPos, specialStartPos < nonSpaces.size() ? nonSpaces[specialStartPos] : n);
+			flushBranch(specialStartPos, specialStartPos < nonSpaces.size() ? nonSpaces[specialStartPos] : n);
 		}
 		else
 		{
-			branchOut();
+			flushBranch();
 		}
 		
 		nonSpaces.emplace_back(n);
 
 		if (!!(matchOptions & Match::zCoda) && zCodaFollowable && isHangulCoda(c) && (n + 1 >= str.size() || !isHangulSyllable(str[n + 1])))
 		{
-			candidates.emplace_back(formBase + defaultTagSize + (c - 0x11A8) - 1);
-			if (typoTolerant)
-			{
-				candTypoCostStarts.emplace_back(0, nonSpaces.size() - 1);
-			}
+			candidates.emplace_back(formBase + defaultTagSize + (c - 0x11A8) - 1, 0, nonSpaces.size() - 1);
 		}
 		zCodaFollowable = false;
 
+		if (continualTypoTolerant && lastChrType == POSTag::max)
+		{
+			insertContinualTypoNode<arch>(candidates, continualTypoRightNodes, ContinualIeungDecomposer{}, 
+				continualTypoCost, c, formBase, typoPtrs, trie, str, nonSpaces, curNodeForContinualTypo);
+			insertContinualTypoNode<arch>(candidates, continualTypoRightNodes, ContinualHieutDecomposer{},
+				continualTypoCost, c, formBase, typoPtrs, trie, str, nonSpaces, curNodeForContinualTypo);
+			insertContinualTypoNode<arch>(candidates, continualTypoRightNodes, ContinualCodaDecomposer{}, 
+				continualTypoCost, c, formBase, typoPtrs, trie, str, nonSpaces, curNodeForContinualTypo);
+		}
+		
 		// from this, curNode has the exact next node
 		curNode = nextNode;
 		// if it has exit node, patterns have been found
@@ -621,7 +1003,19 @@ size_t kiwi::splitByTrie(
 			else if (!trie.hasSubmatch(cand))
 			{
 				zCodaFollowable = zCodaFollowable || getZCodaAppendable<typoTolerant>(cand, formBase);
-				if (!insertCandidates<typoTolerant>(candidates, candTypoCostStarts, cand, formBase, typoPtrs, str, nonSpaces)) break;
+				if (!insertCandidates(candidates, cand, formBase, typoPtrs, str, nonSpaces)) break;
+			}
+		}
+
+		if (continualTypoTolerant)
+		{
+			for (auto& rn : continualTypoRightNodes)
+			{
+				const Form* cand = rn.second->val(trie);
+				if (cand && !trie.hasSubmatch(cand))
+				{
+					if (!insertCandidates(candidates, cand, formBase, typoPtrs, str, nonSpaces, rn.first, 0, continualTypoCost / 2)) break;
+				}
 			}
 		}
 	continueFor:
@@ -631,16 +1025,20 @@ size_t kiwi::splitByTrie(
 	// sequence of speical characters found
 	if (lastChrType != POSTag::max && lastChrType != POSTag::unknown && !isWebTag(lastChrType))
 	{
-		const auto scanStart = max(endPosMap[nonSpaces.size()].first, (uint32_t)1), scanEnd = endPosMap[nonSpaces.size()].second;
+		const auto scanStart = max(endPosMap[specialStartPos * posMultiplier].first, (uint32_t)1), scanEnd = endPosMap[specialStartPos * posMultiplier].second;
 		const bool duplicated = scanStart < scanEnd && any_of(out.begin() + scanStart, out.begin() + scanEnd, [&](const KGraphNode& g)
 		{
-			return nonSpaces.size() == g.endPos;
+			return specialStartPos * posMultiplier == g.endPos;
 		});
 		if (nonSpaces.size() > lastSpecialEndPos && specialStartPos > lastSpecialEndPos  && !duplicated)
 		{
-			appendNewNode(out, endPosMap, lastSpecialEndPos, str.substr(nonSpaces[lastSpecialEndPos], nonSpaces[specialStartPos] - nonSpaces[lastSpecialEndPos]), (uint16_t)specialStartPos);
+			appendNewNode(out, endPosMap, 
+				lastSpecialEndPos * posMultiplier, specialStartPos * posMultiplier, 
+				str.substr(nonSpaces[lastSpecialEndPos], nonSpaces[specialStartPos] - nonSpaces[lastSpecialEndPos]));
 		}
-		if (appendNewNode(out, endPosMap, specialStartPos, U16StringView{ &str[nonSpaces[specialStartPos]], n - nonSpaces[specialStartPos] }, (uint16_t)nonSpaces.size()))
+		if (appendNewNode(out, endPosMap, 
+			specialStartPos * posMultiplier, nonSpaces.size() * posMultiplier, 
+			U16StringView{ &str[nonSpaces[specialStartPos]], n - nonSpaces[specialStartPos] }))
 		{
 			out.back().form = trie.value((size_t)lastChrType);
 		}
@@ -653,14 +1051,15 @@ size_t kiwi::splitByTrie(
 		if (curNode->val(trie) && !trie.hasSubmatch(curNode->val(trie)))
 		{
 			const Form* cand = curNode->val(trie);
-			if (!insertCandidates<typoTolerant>(candidates, candTypoCostStarts, cand, formBase, typoPtrs, str, nonSpaces)) break;
+			if (!insertCandidates(candidates, cand, formBase, typoPtrs, str, nonSpaces)) break;
 		}
 		curNode = curNode->fail();
 	}
-	branchOut(nonSpaces.size(), n);
+	flushBranch(nonSpaces.size(), n);
 
-	appendNewNode(out, endPosMap, nonSpaces.size(), nullptr, nonSpaces.size() + 1);
-	out.back().endPos = nonSpaces.size();
+	appendNewNode(out, endPosMap, 
+		nonSpaces.size() * posMultiplier, (nonSpaces.size() + 1) * posMultiplier, nullptr);
+	out.back().endPos = nonSpaces.size() * posMultiplier;
 
 	nonSpaces.emplace_back(n);
 
@@ -668,8 +1067,8 @@ size_t kiwi::splitByTrie(
 	for (size_t i = 1; i < ret.size() - 1; ++i)
 	{
 		auto& r = ret[i];
-		r.startPos = nonSpaces[r.startPos] + startOffset;
-		r.endPos = nonSpaces[r.endPos - 1] + 1 + startOffset;
+		r.startPos = nonSpaces[r.startPos / posMultiplier] + startOffset;
+		r.endPos = nonSpaces[(r.endPos + posMultiplier - 1) / posMultiplier - 1] + 1 + startOffset;
 	}
 	ret.back().startPos = ret.back().endPos = str.size() + startOffset;
 	while (n < str.size() && isSpace(str[n])) ++n;
@@ -694,30 +1093,30 @@ const Form* kiwi::findForm(
 
 namespace kiwi
 {
-	template<bool typoTolerant>
+	template<bool typoTolerant, bool continualTypoTolerant>
 	struct SplitByTrieGetter
 	{
 		template<std::ptrdiff_t i>
 		struct Wrapper
 		{
-			static constexpr FnSplitByTrie value = &splitByTrie<static_cast<ArchType>(i), typoTolerant>;
+			static constexpr FnSplitByTrie value = &splitByTrie<static_cast<ArchType>(i), typoTolerant, continualTypoTolerant>;
 		};
 	};
 }
 
-FnSplitByTrie kiwi::getSplitByTrieFn(ArchType arch, bool typoTolerant)
+FnSplitByTrie kiwi::getSplitByTrieFn(ArchType arch, bool typoTolerant, bool continualTypoTolerant)
 {
-	static tp::Table<FnSplitByTrie, AvailableArch> table{ SplitByTrieGetter<false>{} };
-	static tp::Table<FnSplitByTrie, AvailableArch> tableTT{ SplitByTrieGetter<true>{} };
+	static std::array<tp::Table<FnSplitByTrie, AvailableArch>, 4> table{ 
+		SplitByTrieGetter<false, false>{},
+		SplitByTrieGetter<true, false>{},
+		SplitByTrieGetter<false, true>{},
+		SplitByTrieGetter<true, true>{}
+	};
 	
-	if (typoTolerant)
-	{
-		return tableTT[static_cast<std::ptrdiff_t>(arch)];
-	}
-	else
-	{
-		return table[static_cast<std::ptrdiff_t>(arch)];
-	}
+	size_t idx = 0;
+	if (typoTolerant) idx += 1;
+	if (continualTypoTolerant) idx += 2;
+	return table[idx][static_cast<std::ptrdiff_t>(arch)];
 }
 
 namespace kiwi

@@ -63,8 +63,10 @@ namespace kiwi
 		uint32_t typoFormId = 0;
 		uint32_t spaceErrors = 0;
 
-		KGraphNode(const Form* _form = nullptr, uint16_t _endPos = 0, float _typoCost = 0) : form(_form), endPos(_endPos), typoCost(_typoCost) {}
-		KGraphNode(U16StringView _uform, uint16_t _endPos, float _typoCost = 0) : uform(_uform), endPos(_endPos), typoCost(_typoCost) {}
+		KGraphNode(uint16_t _startPos = 0, uint16_t _endPos = 0, const Form* _form = nullptr, float _typoCost = 0) 
+			: form(_form), startPos(_startPos), endPos(_endPos), typoCost(_typoCost) {}
+		KGraphNode(uint16_t _startPos, uint16_t _endPos, U16StringView _uform, float _typoCost = 0) 
+			: uform(_uform), startPos(_startPos), endPos(_endPos), typoCost(_typoCost) {}
 
 		KGraphNode* getPrev() { return prev ? this - prev : nullptr; }
 		const KGraphNode* getPrev() const { return prev ? this - prev : nullptr; }
@@ -73,7 +75,13 @@ namespace kiwi
 		const KGraphNode* getSibling() const { return sibling ? this + sibling : nullptr; }
 	};
 
-	template<ArchType arch, bool typoTolerant = false>
+	/**
+	* @brief string을 분할하여 Form으로 구성된 그래프를 생성한다.
+	* @tparam arch Trie탐색에 사용할 CPU 아키텍처 타입
+	* @tparam typoTolerant 오타가 포함된 형태를 탐색할지 여부
+	* @tparam continualTypoTolerant 연철된 오타를 탐색할지 여부
+	*/
+	template<ArchType arch, bool typoTolerant = false, bool continualTypoTolerant = false>
 	size_t splitByTrie(
 		Vector<KGraphNode>& out,
 		const Form* formBase,
@@ -84,7 +92,7 @@ namespace kiwi
 		Match matchOptions, 
 		size_t maxUnkFormSize, 
 		size_t spaceTolerance,
-		float typoCostWeight,
+		float continualTypoCost,
 		const PretokenizedSpanGroup::Span*& pretokenizedFirst,
 		const PretokenizedSpanGroup::Span* pretokenizedLast
 	);
@@ -96,7 +104,7 @@ namespace kiwi
 	);
 	
 	using FnSplitByTrie = decltype(&splitByTrie<ArchType::default_>);
-	FnSplitByTrie getSplitByTrieFn(ArchType arch, bool typoTolerant);
+	FnSplitByTrie getSplitByTrieFn(ArchType arch, bool typoTolerant, bool continualTypoTolerant);
 
 	using FnFindForm = decltype(&findForm<ArchType::default_>);
 	FnFindForm getFindFormFn(ArchType arch);

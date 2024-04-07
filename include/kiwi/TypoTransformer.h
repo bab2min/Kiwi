@@ -164,6 +164,7 @@ namespace kiwi
 		utils::FrozenTrie<char16_t, PatInfo, int32_t, PatInfoHasSubmatch> patTrie;
 		KString strPool;
 		Vector<ReplInfo> replacements;
+		float continualTypoThreshold = INFINITY;
 
 		template<bool u16wrap = false>
 		TypoCandidates<u16wrap> _generate(const KString& orig, float costThreshold = 2.5f) const;
@@ -178,6 +179,11 @@ namespace kiwi
 		PreparedTypoTransformer& operator=(PreparedTypoTransformer&&);
 
 		bool ready() const { return !replacements.empty(); }
+		
+		float getContinualTypoCost() const
+		{
+			return continualTypoThreshold;
+		}
 
 		TypoCandidates<true> generate(const std::u16string& orig, float costThreshold = 2.5f) const;
 	};
@@ -203,6 +209,7 @@ namespace kiwi
 		utils::ContinuousTrie<TrieNode> patTrie;
 		KString strPool;
 		Vector<Vector<ReplInfo>> replacements;
+		float continualTypoThreshold = INFINITY;
 
 		void addTypoImpl(const KString& orig, const KString& error, float cost, CondVowel leftCond = CondVowel::none);
 		void addTypoWithCond(const KString& orig, const KString& error, float cost, CondVowel leftCond = CondVowel::none);
@@ -212,8 +219,29 @@ namespace kiwi
 		using TypoDef = std::tuple<std::initializer_list<const char16_t*>, std::initializer_list<const char16_t*>, float, CondVowel>;
 
 		TypoTransformer();
+
 		TypoTransformer(std::initializer_list<TypoDef> lst)
 			: TypoTransformer()
+		{
+			addTypos(lst);
+		}
+
+		~TypoTransformer();
+		TypoTransformer(const TypoTransformer&);
+		TypoTransformer(TypoTransformer&&) noexcept;
+		TypoTransformer& operator=(const TypoTransformer&);
+		TypoTransformer& operator=(TypoTransformer&&);
+
+		bool isContinualTypoEnabled() const;
+
+		bool empty() const
+		{
+			return replacements.empty() && !isContinualTypoEnabled();
+		}
+
+		void addTypo(const std::u16string& orig, const std::u16string& error, float cost = 1, CondVowel leftCond = CondVowel::none);
+
+		TypoTransformer& addTypos(std::initializer_list<TypoDef> lst)
 		{
 			for (auto& l : lst)
 			{
@@ -225,20 +253,10 @@ namespace kiwi
 					}
 				}
 			}
+			return *this;
 		}
 
-		~TypoTransformer();
-		TypoTransformer(const TypoTransformer&);
-		TypoTransformer(TypoTransformer&&) noexcept;
-		TypoTransformer& operator=(const TypoTransformer&);
-		TypoTransformer& operator=(TypoTransformer&&);
-
-		bool empty() const
-		{
-			return replacements.empty();
-		}
-
-		void addTypo(const std::u16string& orig, const std::u16string& error, float cost = 1, CondVowel leftCond = CondVowel::none);
+		TypoTransformer copyWithNewContinualTypoCost(float threshold) const;
 
 		PreparedTypoTransformer prepare() const
 		{
@@ -246,5 +264,13 @@ namespace kiwi
 		}
 	};
 
-	extern const TypoTransformer withoutTypo, basicTypoSet;
+	enum class DefaultTypoSet
+	{
+		withoutTypo,
+		basicTypoSet,
+		continualTypoSet,
+		basicTypoSetWithContinual,
+	};
+
+	const TypoTransformer& getDefaultTypoSet(DefaultTypoSet set);
 }
