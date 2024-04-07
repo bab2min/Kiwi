@@ -251,7 +251,7 @@ TEST(KiwiC, AnalyzeBasicTypoSet)
 {
 	kiwi_h okw = reuse_kiwi_instance(), typo_kw;
 	kiwi_builder_h builder = kiwi_builder_init(MODEL_PATH, 0, KIWI_BUILD_DEFAULT);
-	typo_kw = kiwi_builder_build(builder, kiwi_basic_typo, 2.5f);
+	typo_kw = kiwi_builder_build(builder, kiwi_typo_get_default(KIWI_TYPO_BASIC_TYPO_SET), 2.5f);
 	kiwi_set_option_f(typo_kw, KIWI_TYPO_COST_WEIGHT, 5);
 
 	kiwi_res_h o, c;
