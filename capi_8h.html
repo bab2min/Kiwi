@@ -70,8 +70,7 @@ $(function() {
 <a href="#define-members">Macros</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
 <a href="#enum-members">Enumerations</a> &#124;
-<a href="#func-members">Functions</a> &#124;
-<a href="#var-members">Variables</a>  </div>
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">capi.h File Reference</div>  </div>
 </div><!--header-->
@@ -207,6 +206,12 @@ Enumerations</h2></td></tr>
 <br />
  }</td></tr>
 <tr class="separator:abc6126af1d45847bc59afa0aa3216b04"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adc29c2ff13d900c2f185ee95427fb06c"><td class="memItemLeft" align="right" valign="top"><a id="adc29c2ff13d900c2f185ee95427fb06c"></a>enum &#160;</td><td class="memItemRight" valign="bottom">{ <b>KIWI_TYPO_WITHOUT_TYPO</b> = 0
+, <b>KIWI_TYPO_BASIC_TYPO_SET</b> = 1
+, <b>KIWI_TYPO_CONTINUAL_TYPO_SET</b> = 2
+, <b>KIWI_TYPO_BASIC_TYPO_SET_WITH_CONTINUAL</b> = 3
+ }</td></tr>
+<tr class="separator:adc29c2ff13d900c2f185ee95427fb06c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -256,6 +261,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a31db8ff0ece5cb8d055c0bb39bc43939"><td class="memItemLeft" align="right" valign="top">kiwi_typo_h&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a31db8ff0ece5cb8d055c0bb39bc43939">kiwi_typo_get_basic</a> ()</td></tr>
 <tr class="memdesc:a31db8ff0ece5cb8d055c0bb39bc43939"><td class="mdescLeft">&#160;</td><td class="mdescRight">Kiwi 기본 내장 오타 교정기의 핸들을 반환합니다.  <a href="capi_8h.html#a31db8ff0ece5cb8d055c0bb39bc43939">More...</a><br /></td></tr>
 <tr class="separator:a31db8ff0ece5cb8d055c0bb39bc43939"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac7f1ea188150fe85eb5d2d0b90cf8883"><td class="memItemLeft" align="right" valign="top">kiwi_typo_h&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#ac7f1ea188150fe85eb5d2d0b90cf8883">kiwi_typo_get_default</a> (int kiwi_typo_set)</td></tr>
+<tr class="memdesc:ac7f1ea188150fe85eb5d2d0b90cf8883"><td class="mdescLeft">&#160;</td><td class="mdescRight">Kiwi에 기본적으로 내장된 오타 교정기의 핸들을 반환합니다.  <a href="capi_8h.html#ac7f1ea188150fe85eb5d2d0b90cf8883">More...</a><br /></td></tr>
+<tr class="separator:ac7f1ea188150fe85eb5d2d0b90cf8883"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8bf7951126a90feb5db5eb03741b5b5b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a8bf7951126a90feb5db5eb03741b5b5b">kiwi_typo_add</a> (kiwi_typo_h handle, const char **orig, int orig_size, const char **error, int error_size, float cost, int condition)</td></tr>
 <tr class="separator:a8bf7951126a90feb5db5eb03741b5b5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a37fd1440ce53804ce6820760ed2b2d05"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a37fd1440ce53804ce6820760ed2b2d05">kiwi_typo_close</a> (kiwi_typo_h handle)</td></tr>
@@ -416,12 +424,6 @@ Functions</h2></td></tr>
 <tr class="memitem:ad8f3a34a58d42dbc7a046f837159575e"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#ad8f3a34a58d42dbc7a046f837159575e">kiwi_pt_close</a> (kiwi_pretokenized_h handle)</td></tr>
 <tr class="memdesc:ad8f3a34a58d42dbc7a046f837159575e"><td class="mdescLeft">&#160;</td><td class="mdescRight">사용이 끝난 Pretokenzation 객체를 해제합니다.  <a href="capi_8h.html#ad8f3a34a58d42dbc7a046f837159575e">More...</a><br /></td></tr>
 <tr class="separator:ad8f3a34a58d42dbc7a046f837159575e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
-Variables</h2></td></tr>
-<tr class="memitem:ae4952a2cdec37114719c25eee5fe4c8a"><td class="memItemLeft" align="right" valign="top">const kiwi_typo_h&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#ae4952a2cdec37114719c25eee5fe4c8a">kiwi_basic_typo</a></td></tr>
-<tr class="memdesc:ae4952a2cdec37114719c25eee5fe4c8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Kiwi 기본 내장 오타 교정기의 핸들  <a href="capi_8h.html#ae4952a2cdec37114719c25eee5fe4c8a">More...</a><br /></td></tr>
-<tr class="separator:ae4952a2cdec37114719c25eee5fe4c8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Kiwi C API를 담고 있는 헤더 파일 </p>
@@ -3456,6 +3458,28 @@ Variables</h2></td></tr>
 
 <p>Kiwi 기본 내장 오타 교정기의 핸들을 반환합니다. </p>
 <dl class="section return"><dt>Returns</dt><dd></dd></dl>
+<dl class="section note"><dt>Note</dt><dd>이 핸들은 kiwi_typo_close에 사용할 수 없음. 이 함수의 반환값은 kiwi_typo_get_default(KIWI_TYPO_BASIC_TYPO_SET)과 동일합니다. 이 함수보다 더 다양한 기능을 제공하는 kiwi_typo_get_default를 사용하는 것을 권장합니다. </dd></dl>
+
+</div>
+</div>
+<a id="ac7f1ea188150fe85eb5d2d0b90cf8883"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac7f1ea188150fe85eb5d2d0b90cf8883">&#9670;&nbsp;</a></span>kiwi_typo_get_default()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">kiwi_typo_h kiwi_typo_get_default </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>kiwi_typo_set</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Kiwi에 기본적으로 내장된 오타 교정기의 핸들을 반환합니다. </p>
+<dl class="section return"><dt>Returns</dt><dd></dd></dl>
 <dl class="section note"><dt>Note</dt><dd>이 핸들은 kiwi_typo_close에 사용할 수 없음. </dd></dl>
 
 </div>
@@ -3731,32 +3755,6 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><br  />
  </dd></dl>
-
-</div>
-</div>
-<h2 class="groupheader">Variable Documentation</h2>
-<a id="ae4952a2cdec37114719c25eee5fe4c8a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae4952a2cdec37114719c25eee5fe4c8a">&#9670;&nbsp;</a></span>kiwi_basic_typo</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const kiwi_typo_h kiwi_basic_typo</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Kiwi 기본 내장 오타 교정기의 핸들 </p>
-<dl class="section note"><dt>Note</dt><dd>이 핸들은 kiwi_typo_close에 사용할 수 없음. </dd></dl>
 
 </div>
 </div>

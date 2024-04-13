@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['kiwi_430',['Kiwi',['../classkiwi_1_1Kiwi.html#a447ca75684e8a73ce682022268be1e4c',1,'kiwi::Kiwi']]],
+  ['kiwi_430',['Kiwi',['../classkiwi_1_1Kiwi.html#a94fc96e67953b7946492675102d72890',1,'kiwi::Kiwi']]],
   ['kiwi_5fanalyze_431',['kiwi_analyze',['../capi_8h.html#a8aa4a9b64c467c3bd335f284167a69bf',1,'capi.h']]],
   ['kiwi_5fanalyze_5fm_432',['kiwi_analyze_m',['../capi_8h.html#a9380188bd199dfbda8471c76104a8d87',1,'capi.h']]],
   ['kiwi_5fanalyze_5fmw_433',['kiwi_analyze_mw',['../capi_8h.html#adb8947c6dae2f7574bf585ae657f1f1b',1,'capi.h']]],
@@ -67,14 +67,15 @@ var searchData=
   ['kiwi_5ftypo_5fadd_494',['kiwi_typo_add',['../capi_8h.html#a8bf7951126a90feb5db5eb03741b5b5b',1,'capi.h']]],
   ['kiwi_5ftypo_5fclose_495',['kiwi_typo_close',['../capi_8h.html#a37fd1440ce53804ce6820760ed2b2d05',1,'capi.h']]],
   ['kiwi_5ftypo_5fget_5fbasic_496',['kiwi_typo_get_basic',['../capi_8h.html#a31db8ff0ece5cb8d055c0bb39bc43939',1,'capi.h']]],
-  ['kiwi_5ftypo_5finit_497',['kiwi_typo_init',['../capi_8h.html#ab5ba00d44e03a9b3e5040eeb838464c1',1,'capi.h']]],
-  ['kiwi_5fversion_498',['kiwi_version',['../capi_8h.html#a0dc43be38208babb62874dd24bf29093',1,'capi.h']]],
-  ['kiwi_5fws_5fclose_499',['kiwi_ws_close',['../capi_8h.html#a35059ffa56ef5418e84666d1e2f7f857',1,'capi.h']]],
-  ['kiwi_5fws_5fform_500',['kiwi_ws_form',['../capi_8h.html#a520bb4eb24c6f0073945cb4e8c6743a5',1,'capi.h']]],
-  ['kiwi_5fws_5fform_5fw_501',['kiwi_ws_form_w',['../capi_8h.html#acbffb7ad81bc4d925b6ad7a0a20cafe6',1,'capi.h']]],
-  ['kiwi_5fws_5ffreq_502',['kiwi_ws_freq',['../capi_8h.html#adb9c4765cd3a676c4d54fbd7c6391d51',1,'capi.h']]],
-  ['kiwi_5fws_5fpos_5fscore_503',['kiwi_ws_pos_score',['../capi_8h.html#a25feabab022bf3be5fba1013bdbf851a',1,'capi.h']]],
-  ['kiwi_5fws_5fscore_504',['kiwi_ws_score',['../capi_8h.html#a1a8749430c7b7ef9b196cb75c0ce355c',1,'capi.h']]],
-  ['kiwi_5fws_5fsize_505',['kiwi_ws_size',['../capi_8h.html#a3421fe0f93fc5991dee5fbef4205a226',1,'capi.h']]],
-  ['kiwibuilder_506',['KiwiBuilder',['../classkiwi_1_1KiwiBuilder.html#a22d8ffb811ea9ceb0e146c0a736c7d3d',1,'kiwi::KiwiBuilder::KiwiBuilder(const std::string &amp;modelPath, size_t numThreads=0, BuildOption options=BuildOption::integrateAllomorph|BuildOption::loadDefaultDict, bool useSBG=false)'],['../classkiwi_1_1KiwiBuilder.html#aaf6cf74f8ba2b589a939932a6851e8d0',1,'kiwi::KiwiBuilder::KiwiBuilder(const std::string &amp;modelPath, const ModelBuildArgs &amp;args)'],['../classkiwi_1_1KiwiBuilder.html#a6338925fdfa3ac713fbd6a860866e7f7',1,'kiwi::KiwiBuilder::KiwiBuilder(const ModelBuildArgs &amp;args)'],['../classkiwi_1_1KiwiBuilder.html#a400409ef1f682bfbfe65706a0bc5285f',1,'kiwi::KiwiBuilder::KiwiBuilder()']]]
+  ['kiwi_5ftypo_5fget_5fdefault_497',['kiwi_typo_get_default',['../capi_8h.html#ac7f1ea188150fe85eb5d2d0b90cf8883',1,'capi.h']]],
+  ['kiwi_5ftypo_5finit_498',['kiwi_typo_init',['../capi_8h.html#ab5ba00d44e03a9b3e5040eeb838464c1',1,'capi.h']]],
+  ['kiwi_5fversion_499',['kiwi_version',['../capi_8h.html#a0dc43be38208babb62874dd24bf29093',1,'capi.h']]],
+  ['kiwi_5fws_5fclose_500',['kiwi_ws_close',['../capi_8h.html#a35059ffa56ef5418e84666d1e2f7f857',1,'capi.h']]],
+  ['kiwi_5fws_5fform_501',['kiwi_ws_form',['../capi_8h.html#a520bb4eb24c6f0073945cb4e8c6743a5',1,'capi.h']]],
+  ['kiwi_5fws_5fform_5fw_502',['kiwi_ws_form_w',['../capi_8h.html#acbffb7ad81bc4d925b6ad7a0a20cafe6',1,'capi.h']]],
+  ['kiwi_5fws_5ffreq_503',['kiwi_ws_freq',['../capi_8h.html#adb9c4765cd3a676c4d54fbd7c6391d51',1,'capi.h']]],
+  ['kiwi_5fws_5fpos_5fscore_504',['kiwi_ws_pos_score',['../capi_8h.html#a25feabab022bf3be5fba1013bdbf851a',1,'capi.h']]],
+  ['kiwi_5fws_5fscore_505',['kiwi_ws_score',['../capi_8h.html#a1a8749430c7b7ef9b196cb75c0ce355c',1,'capi.h']]],
+  ['kiwi_5fws_5fsize_506',['kiwi_ws_size',['../capi_8h.html#a3421fe0f93fc5991dee5fbef4205a226',1,'capi.h']]],
+  ['kiwibuilder_507',['KiwiBuilder',['../classkiwi_1_1KiwiBuilder.html#a22d8ffb811ea9ceb0e146c0a736c7d3d',1,'kiwi::KiwiBuilder::KiwiBuilder(const std::string &amp;modelPath, size_t numThreads=0, BuildOption options=BuildOption::integrateAllomorph|BuildOption::loadDefaultDict, bool useSBG=false)'],['../classkiwi_1_1KiwiBuilder.html#aaf6cf74f8ba2b589a939932a6851e8d0',1,'kiwi::KiwiBuilder::KiwiBuilder(const std::string &amp;modelPath, const ModelBuildArgs &amp;args)'],['../classkiwi_1_1KiwiBuilder.html#a6338925fdfa3ac713fbd6a860866e7f7',1,'kiwi::KiwiBuilder::KiwiBuilder(const ModelBuildArgs &amp;args)'],['../classkiwi_1_1KiwiBuilder.html#a400409ef1f682bfbfe65706a0bc5285f',1,'kiwi::KiwiBuilder::KiwiBuilder()']]]
 ];
