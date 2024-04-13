@@ -181,6 +181,12 @@ namespace kiwi
 		}
 	}
 
+	/*
+	* 문장 분리 기준
+	* 1) 종결어미(ef) (요/jx)? (z_coda)? (so|sw|sh|sp|se|sf|(닫는 괄호))*
+	* 2) 종결구두점(sf) (so|sw|sh|sp|se|(닫는 괄호))*
+	* 3) 단 종결어미(ef) 바로 다음에 '요'가 아닌 조사(j)나 보조용언(vx), vcp, etm, 다른 어미(ec)가 뒤따르는 경우는 제외
+	*/
 	class SentenceParser
 	{
 		enum class State
@@ -240,6 +246,7 @@ namespace kiwi
 				case POSTag::jx:
 				case POSTag::vcp:
 				case POSTag::etm:
+				case POSTag::ec:
 					if (t.tag == POSTag::jx && *t.morph->kform == u"요")
 					{
 						if (state == State::ef)
@@ -262,8 +269,10 @@ namespace kiwi
 				case POSTag::sh:
 				case POSTag::sp:
 				case POSTag::se:
-				case POSTag::sf:
 				case POSTag::ssc:
+					break;
+				case POSTag::sf:
+					state = State::sf;
 					break;
 				case POSTag::sso:
 					if (lineNumber == lastLineNumber) break;
@@ -354,13 +363,6 @@ namespace kiwi
 	*/
 	inline void fillSentLineInfo(vector<TokenInfo>& tokens, const vector<size_t>& newlines)
 	{
-		/*
-		* 문장 분리 기준
-		* 1) 종결어미(ef) (요/jx)? (z_coda)? (so|sw|sh|sp|se|sf|(닫는 괄호))*
-		* 2) 종결구두점(sf) (so|sw|sh|sp|se|(닫는 괄호))*
-		* 3) 단 종결어미(ef) 바로 다음에 '요'가 아닌 조사(j)나 보조용언(vx), vcp, etm이 뒤따르는 경우는 제외
-		*/
-
 		SentenceParser sp;
 		uint32_t sentPos = 0, lastSentPos = 0, subSentPos = 0, accumSubSent = 1, accumWordPos = 0, lastWordPos = 0;
 		size_t nlPos = 0, lastNlPos = 0, nestedSentEnd = 0, nestedEnd = 0;
@@ -536,7 +538,7 @@ namespace kiwi
 
 		auto next = first;
 		++next;
-		while(next != last)
+		while (next != last)
 		{
 			TokenInfo& current = *first;
 			TokenInfo& nextToken = *next;
