@@ -124,6 +124,38 @@ public class KiwiTest {
 	}
 
 	@Test
+	public void testContinualTypos() throws Exception {
+		System.gc();
+		KiwiBuilder builder = new KiwiBuilder(modelPath);
+		Kiwi kiwi = builder.build(KiwiBuilder.continualTypoSet);
+		
+		Kiwi.Token[] tokens = kiwi.tokenize("프로그래미", Kiwi.Match.allWithNormalizing);
+		System.out.println(Arrays.deepToString(tokens));
+		assertEquals(tokens[0].form, "프로그램");
+		assertEquals(tokens[1].form, "이");
+
+		tokens = kiwi.tokenize("프로그래믈", Kiwi.Match.allWithNormalizing);
+		System.out.println(Arrays.deepToString(tokens));
+		assertEquals(tokens[0].form, "프로그램");
+		assertEquals(tokens[1].form, "을");
+
+		tokens = kiwi.tokenize("오늘사무시레서", Kiwi.Match.allWithNormalizing);
+		System.out.println(Arrays.deepToString(tokens));
+		assertEquals(tokens[1].form, "사무실");
+		assertEquals(tokens[2].form, "에서");
+
+		tokens = kiwi.tokenize("법원이 기가캤다.", Kiwi.Match.allWithNormalizing);
+		System.out.println(Arrays.deepToString(tokens));
+		assertEquals(tokens[2].form, "기각");
+		assertEquals(tokens[3].form, "하");
+
+		tokens = kiwi.tokenize("하나도 업써.", Kiwi.Match.allWithNormalizing);
+		System.out.println(Arrays.deepToString(tokens));
+		assertEquals(tokens[2].form, "없");
+		assertEquals(tokens[3].form, "어");
+	}
+
+	@Test
 	public void testBlocklist() throws Exception {
 		System.gc();
 		Kiwi kiwi = getReusableKiwi();
