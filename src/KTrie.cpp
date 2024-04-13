@@ -579,6 +579,7 @@ size_t kiwi::splitByTrie(
 	size_t n = 0;
 	Vector<FormCandidate<typoTolerant, continualTypoTolerant>> candidates;
 	auto* curNode = trie.root();
+	auto* curNodeForContinualTypo = trie.root();
 	auto* nextNode = trie.root();
 	Vector<pair<size_t, decltype(curNode)>> continualTypoRightNodes;
 
@@ -898,7 +899,7 @@ size_t kiwi::splitByTrie(
 			goto continueFor;
 		}
 
-		auto* curNodeForContinualTypo = curNode;
+		curNodeForContinualTypo = curNode;
 		nextNode = curNode->template nextOpt<arch>(trie, c);
 		while (!nextNode) // if curNode has no exact next node, goto fail
 		{

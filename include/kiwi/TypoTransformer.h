@@ -256,6 +256,11 @@ namespace kiwi
 			return *this;
 		}
 
+		void setContinualTypoCost(float threshold)
+		{
+			continualTypoThreshold = threshold;
+		}
+
 		TypoTransformer copyWithNewContinualTypoCost(float threshold) const;
 
 		PreparedTypoTransformer prepare() const
