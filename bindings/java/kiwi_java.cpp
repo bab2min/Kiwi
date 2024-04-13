@@ -546,7 +546,8 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved)
 
 		jni::define<JTypoTransformer>()
 			.template ctor<>()
-			.template method<&JTypoTransformer::addTypo>("_addTypo"),
+			.template method<&JTypoTransformer::addTypo>("_addTypo")
+			.template method<&JTypoTransformer::setContinualTypoCost>("_setContinualTypoCost"),
 
 		jni::define<JKiwiBuilder>()
 			.template ctor<std::string, size_t, kiwi::BuildOption, bool>()

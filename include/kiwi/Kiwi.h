@@ -68,6 +68,7 @@ namespace kiwi
 		float unkFormScoreBias = 5;
 		float spacePenalty = 7;
 		float typoCostWeight = 6;
+		float continualTypoCost = INFINITY;
 		size_t maxUnkFormSize = 6;
 		size_t spaceTolerance = 0;
 
@@ -126,7 +127,7 @@ namespace kiwi
 		 * @note 이 생성자는 기본 생성자로 이를 통해 생성된 객체는 바로 형태소 분석에 사용할 수 없다.
 		 * kiwi::KiwiBuilder 를 통해 생성된 객체만이 형태소 분석에 사용할 수 있다.
 		 */
-		Kiwi(ArchType arch = ArchType::default_, LangModel _langMdl = {}, bool typoTolerant = false);
+		Kiwi(ArchType arch = ArchType::default_, LangModel _langMdl = {}, bool typoTolerant = false, bool continualTypoTolerant = false);
 
 		~Kiwi();
 
@@ -780,6 +781,11 @@ namespace kiwi
 		 * @return 형태소 분석 준비가 완료된 Kiwi의 객체.
 		 */
 		Kiwi build(const TypoTransformer& typos = {}, float typoCostThreshold = 2.5f) const;
+
+		Kiwi build(DefaultTypoSet typos, float typoCostThreshold = 2.5f) const
+		{
+			return build(getDefaultTypoSet(typos), typoCostThreshold);
+		}
 
 		using TokenFilter = std::function<bool(const std::u16string&, POSTag)>;
 

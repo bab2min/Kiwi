@@ -325,12 +325,6 @@ DECL_DLL kiwi_ws_h kiwi_builder_extract_add_words_w(kiwi_builder_h handle, kiwi_
  */
 DECL_DLL kiwi_h kiwi_builder_build(kiwi_builder_h handle, kiwi_typo_h typos, float typo_cost_threshold);
 
-/**
- * @brief Kiwi 기본 내장 오타 교정기의 핸들
- * 
- * @note 이 핸들은 kiwi_typo_close에 사용할 수 없음.
- */
-extern DECL_DLL const kiwi_typo_h kiwi_basic_typo;
 
 /**
  * @brief 
@@ -346,9 +340,29 @@ DECL_DLL kiwi_typo_h kiwi_typo_init();
  *
  * @return
  *
- * @note 이 핸들은 kiwi_typo_close에 사용할 수 없음.
+ * @note 이 핸들은 kiwi_typo_close에 사용할 수 없음. 
+ * 이 함수의 반환값은 kiwi_typo_get_default(KIWI_TYPO_BASIC_TYPO_SET)과 동일합니다.
+ * 이 함수보다 더 다양한 기능을 제공하는 kiwi_typo_get_default를 사용하는 것을 권장합니다.
  */
 DECL_DLL kiwi_typo_h kiwi_typo_get_basic();
+
+
+enum
+{
+	KIWI_TYPO_WITHOUT_TYPO = 0,
+	KIWI_TYPO_BASIC_TYPO_SET = 1,
+	KIWI_TYPO_CONTINUAL_TYPO_SET = 2,
+	KIWI_TYPO_BASIC_TYPO_SET_WITH_CONTINUAL = 3,
+};
+
+/**
+ * @brief Kiwi에 기본적으로 내장된 오타 교정기의 핸들을 반환합니다.
+ *
+ * @return
+ *
+ * @note 이 핸들은 kiwi_typo_close에 사용할 수 없음.
+ */
+DECL_DLL kiwi_typo_h kiwi_typo_get_default(int kiwi_typo_set);
 
 /**
  * @brief

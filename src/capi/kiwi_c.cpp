@@ -368,7 +368,7 @@ kiwi_h kiwi_builder_build(kiwi_builder_h handle, kiwi_typo_h typos, float typo_c
 	auto* kb = (KiwiBuilder*)handle;
 	try
 	{
-		const TypoTransformer* tt = &withoutTypo;
+		const TypoTransformer* tt = &getDefaultTypoSet(DefaultTypoSet::withoutTypo);
 		if (typos)
 		{
 			tt = typos;
@@ -381,8 +381,6 @@ kiwi_h kiwi_builder_build(kiwi_builder_h handle, kiwi_typo_h typos, float typo_c
 		return nullptr;
 	}
 }
-
-const kiwi_typo_h kiwi_basic_typo = (kiwi_typo_h)&basicTypoSet;
 
 kiwi_typo_h kiwi_typo_init()
 {
@@ -399,7 +397,20 @@ kiwi_typo_h kiwi_typo_init()
 
 kiwi_typo_h kiwi_typo_get_basic()
 {
-	return (kiwi_typo_h)&basicTypoSet;
+	return kiwi_typo_get_default(KIWI_TYPO_BASIC_TYPO_SET);
+}
+
+kiwi_typo_h kiwi_typo_get_default(int kiwi_typo_set)
+{
+	try
+	{
+		return (kiwi_typo_h)&getDefaultTypoSet((DefaultTypoSet)kiwi_typo_set);
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return nullptr;
+	}
 }
 
 int kiwi_typo_add(kiwi_typo_h handle, const char** orig, int orig_size, const char** error, int error_size, float cost, int condition)
