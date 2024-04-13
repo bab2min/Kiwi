@@ -12,13 +12,13 @@ using namespace std;
 using namespace kiwi;
 
 int doEvaluate(const string& modelPath, const string& output, const vector<string>& input, 
-	bool normCoda, bool zCoda, bool useSBG, float typoCostWeight)
+	bool normCoda, bool zCoda, bool useSBG, float typoCostWeight, bool cTypo)
 {
 	try
 	{
 		tutils::Timer timer;
 		Kiwi kw = KiwiBuilder{ modelPath, 1, BuildOption::default_, useSBG }.build(
-			typoCostWeight > 0 ? basicTypoSet : withoutTypo
+			typoCostWeight > 0 ? (cTypo ? DefaultTypoSet::basicTypoSetWithContinual : DefaultTypoSet::basicTypoSet) : DefaultTypoSet::withoutTypo
 		);
 		if (typoCostWeight > 0) kw.setTypoCostWeight(typoCostWeight);
 		
@@ -97,6 +97,7 @@ int main(int argc, const char* argv[])
 	SwitchArg withoutZCoda{ "", "wzcoda", "without z-coda", false };
 	SwitchArg useSBG{ "", "sbg", "use SkipBigram", false };
 	ValueArg<float> typoTolerant{ "", "typo", "make typo-tolerant model", false, 0.f, "float"};
+	SwitchArg cTypo{ "", "ctypo", "make continual-typo-tolerant model", false };
 	UnlabeledMultiArg<string> files{ "files", "evaluation set files", true, "string" };
 
 	cmd.add(model);
@@ -106,6 +107,7 @@ int main(int argc, const char* argv[])
 	cmd.add(withoutZCoda);
 	cmd.add(useSBG);
 	cmd.add(typoTolerant);
+	cmd.add(cTypo);
 
 	try
 	{
@@ -116,6 +118,6 @@ int main(int argc, const char* argv[])
 		cerr << "error: " << e.error() << " for arg " << e.argId() << endl;
 		return -1;
 	}
-	return doEvaluate(model, output, files.getValue(), !withoutNormCoda, !withoutZCoda, useSBG, typoTolerant);
+	return doEvaluate(model, output, files.getValue(), !withoutNormCoda, !withoutZCoda, useSBG, typoTolerant, cTypo);
 }
 
