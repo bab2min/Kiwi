@@ -27,9 +27,9 @@ private:
 	std::vector<TestResult> testsets, errors;
 	const kiwi::Kiwi* kw = nullptr;
 	kiwi::Match matchOption;
-	size_t topN = 3;
+	size_t topN = 1;
 public:
-	Evaluator(const std::string& testSetFile, const kiwi::Kiwi* _kw, kiwi::Match _matchOption = kiwi::Match::all, size_t topN = 3);
+	Evaluator(const std::string& testSetFile, const kiwi::Kiwi* _kw, kiwi::Match _matchOption = kiwi::Match::all, size_t topN = 1);
 	void run();
 	Score evaluate();
 	const std::vector<TestResult>& getErrors() const { return errors; }
