@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|ARM64">
@@ -71,7 +71,7 @@
     <ClInclude Include="common.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\kiwi_c_static.vcxproj">
+    <ProjectReference Include="..\vsproj\kiwi_c_static.vcxproj">
       <Project>{e7aa2d5d-631a-4a0d-ba7c-f5bea56c54e7}</Project>
     </ProjectReference>
   </ItemGroup>
