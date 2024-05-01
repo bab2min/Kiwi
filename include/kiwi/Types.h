@@ -309,7 +309,7 @@ namespace kiwi
 		uint8_t senseId = 0; /**< 의미 번호 */
 		float score = 0; /**< 해당 형태소의 언어모델 점수 */
 		float typoCost = 0; /**< 오타가 교정된 경우 오타 비용. 그렇지 않은 경우 0 */
-		uint32_t typoFormId = 0; /**< 교정 전 오타의 형태에 대한 정보 (typoCost가 0인 경우 의미 없음) */
+		uint32_t typoFormId = 0; /**< 교정 전 오타의 형태에 대한 정보 (typoCost가 0인 경우 PreTokenizedSpan의 ID값) */
 		uint32_t pairedToken = -1; /**< SSO, SSC 태그에 속하는 형태소의 경우 쌍을 이루는 반대쪽 형태소의 위치(-1인 경우 해당하는 형태소가 없는 것을 뜻함) */
 		uint32_t subSentPosition = 0; /**< 인용부호나 괄호로 둘러싸인 하위 문장의 번호. 1부터 시작. 0인 경우 하위 문장이 아님을 뜻함 */
 		const Morpheme* morph = nullptr; /**< 기타 형태소 정보에 대한 포인터 (OOV인 경우 nullptr) */
