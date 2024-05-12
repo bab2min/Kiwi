@@ -188,8 +188,8 @@ TEST(KiwiCpp, Script)
 	EXPECT_EQ(res[3].tag, POSTag::sw);
 	EXPECT_EQ(res[3].script, ScriptType::kana);
 
-	res = kiwi.analyze(u"👍🏻👍🏿 👨‍👩‍👦", Match::allWithNormalizing).first;
-	EXPECT_EQ(res.size(), 2);
+	res = kiwi.analyze(u"👍🏻👍🏿 👨‍👩‍👦 ℹ️ ✍🏼", Match::allWithNormalizing).first;
+	EXPECT_EQ(res.size(), 4);
 	EXPECT_EQ(res[0].tag, POSTag::sw);
 	EXPECT_EQ(res[0].script, ScriptType::symbols_and_pictographs);
 	EXPECT_EQ(res[0].position, 0);
@@ -198,6 +198,10 @@ TEST(KiwiCpp, Script)
 	EXPECT_EQ(res[1].script, ScriptType::symbols_and_pictographs);
 	EXPECT_EQ(res[1].position, 9);
 	EXPECT_EQ(res[1].length, 8);
+	EXPECT_EQ(res[2].tag, POSTag::sw);
+	EXPECT_EQ(res[2].script, ScriptType::letterlike_symbols);
+	EXPECT_EQ(res[3].tag, POSTag::sw);
+	EXPECT_EQ(res[3].script, ScriptType::dingbats);
 }
 
 TEST(KiwiCpp, EmptyToken)

@@ -848,7 +848,10 @@ size_t kiwi::splitByTrie(
 
 		chrType = identifySpecialChr(c32);
 		scriptType = chr2ScriptType(c32);
-		if (lastChrType == POSTag::sw && c32 == 0x200d) // zero width joiner
+		if (lastChrType == POSTag::sw && 
+			(c32 == 0x200d || // zero width joiner
+			 (0x1f3fb <= c32 && c32 <= 0x1f3ff) || // skin color modifier
+			 scriptType == ScriptType::variation_selectors)) // variation selectors
 		{
 			chrType = lastChrType;
 			scriptType = lastScriptType;
