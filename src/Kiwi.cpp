@@ -598,6 +598,23 @@ namespace kiwi
 		return ++first;
 	}
 
+	inline void updateTokenInfoScript(TokenInfo& info)
+	{
+		if (!(info.tag == POSTag::sl || info.tag == POSTag::sh || info.tag == POSTag::sw)) return;
+		if ((info.morph && info.morph->kform && !info.morph->kform->empty())) return;
+		if (info.str.empty()) return;
+		char32_t c = info.str[0];
+		if (isHighSurrogate(c))
+		{
+			c = mergeSurrogate(c, info.str[1]);
+		}
+		info.script = chr2ScriptType(c);
+		if (info.script == ScriptType::latin)
+		{
+			info.tag = POSTag::sl;
+		}
+	}
+
 	inline void insertPathIntoResults(
 		vector<TokenResult>& ret, 
 		Vector<SpecialState>& spStatesByRet,
@@ -718,6 +735,8 @@ namespace kiwi
 				token.score = s.wordScore;
 				token.typoCost = s.typoCost;
 				token.typoFormId = s.typoFormId;
+				token.senseId = s.morph->senseId;
+				updateTokenInfoScript(token);
 				auto ptId = nodeInWhichPretokenized[s.nodeId] + 1;
 				if (ptId)
 				{
