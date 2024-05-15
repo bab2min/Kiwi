@@ -115,8 +115,14 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a66fb9fa90738360f753f93a568b254b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a45967e9870d0b947d30e7ad8fece4898"><td class="memItemLeft" align="right" valign="top"><a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebb">POSTag</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi_1_1TokenInfo.html#a45967e9870d0b947d30e7ad8fece4898">tag</a> = <a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebbaad921d60486366258809553a3db49a4a">POSTag::unknown</a></td></tr>
 <tr class="separator:a45967e9870d0b947d30e7ad8fece4898"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab7e062c457af1a22400689cdcfb66f72"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi_1_1TokenInfo.html#ab7e062c457af1a22400689cdcfb66f72">senseId</a> = 0</td></tr>
-<tr class="separator:ab7e062c457af1a22400689cdcfb66f72"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad0da1f83b105c2c8c746f030726867ba"><td class="memItemLeft" ><a id="ad0da1f83b105c2c8c746f030726867ba"></a>
+union {</td></tr>
+<tr class="memitem:a6f5aba4cf92d968e9b037b2acff2ed07"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="structkiwi_1_1TokenInfo.html#ab7e062c457af1a22400689cdcfb66f72">senseId</a> = 0</td></tr>
+<tr class="separator:a6f5aba4cf92d968e9b037b2acff2ed07"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a203a7dda40d69323c5892c45f91af087"><td class="memItemLeft" >&#160;&#160;&#160;ScriptType&#160;&#160;&#160;<a class="el" href="structkiwi_1_1TokenInfo.html#a50b433d4d5d661c7d04ade93d7909cf9">script</a></td></tr>
+<tr class="separator:a203a7dda40d69323c5892c45f91af087"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad0da1f83b105c2c8c746f030726867ba"><td class="memItemLeft" valign="top">};&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
+<tr class="separator:ad0da1f83b105c2c8c746f030726867ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9b27979bcbb4a0ddcca86fdb8ac0087c"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi_1_1TokenInfo.html#a9b27979bcbb4a0ddcca86fdb8ac0087c">score</a> = 0</td></tr>
 <tr class="separator:a9b27979bcbb4a0ddcca86fdb8ac0087c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a665bcabafa2c41815d0a5ad51a27e833"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi_1_1TokenInfo.html#a665bcabafa2c41815d0a5ad51a27e833">typoCost</a> = 0</td></tr>
@@ -220,6 +226,21 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>해당 형태소의 언어모델 점수 </p>
+
+</div>
+</div>
+<a id="a50b433d4d5d661c7d04ade93d7909cf9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a50b433d4d5d661c7d04ade93d7909cf9">&#9670;&nbsp;</a></span>script</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">ScriptType kiwi::TokenInfo::script</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>유니코드 영역에 기반한 문자 타입 </p>
 
 </div>
 </div>
