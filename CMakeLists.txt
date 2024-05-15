@@ -50,6 +50,7 @@ set ( CORE_SRCS
   src/KTrie.cpp
   src/PatternMatcher.cpp
   src/search.cpp
+  src/ScriptType.cpp
   src/SwTokenizer.cpp
   src/TagUtils.cpp
   src/TypoTransformer.cpp
