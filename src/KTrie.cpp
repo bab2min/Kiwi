@@ -527,6 +527,16 @@ namespace kiwi
 	}
 }
 
+inline bool isDiscontinuous(POSTag prevTag, POSTag curTag, ScriptType prevScript, ScriptType curScript)
+{
+	if ((prevTag == POSTag::sl || prevTag == POSTag::sh || prevTag == POSTag::sw) &&
+		(curTag == POSTag::sl || curTag == POSTag::sh || curTag == POSTag::sw))
+	{
+		return prevScript != curScript;
+	}
+	return prevTag != curTag;
+}
+
 template<ArchType arch, bool typoTolerant, bool continualTypoTolerant>
 size_t kiwi::splitByTrie(
 	Vector<KGraphNode>& ret,
@@ -585,6 +595,7 @@ size_t kiwi::splitByTrie(
 
 	size_t lastSpecialEndPos = 0, specialStartPos = 0;
 	POSTag chrType, lastChrType = POSTag::unknown, lastMatchedPattern = POSTag::unknown;
+	ScriptType scriptType, lastScriptType = ScriptType::unknown;
 	auto flushBranch = [&](size_t unkFormEndPos = 0, size_t unkFormEndPosWithSpace = 0, bool specialMatched = false)
 	{
 		if (!candidates.empty())
@@ -836,8 +847,17 @@ size_t kiwi::splitByTrie(
 		}
 
 		chrType = identifySpecialChr(c32);
+		scriptType = chr2ScriptType(c32);
+		if (lastChrType == POSTag::sw && 
+			(c32 == 0x200d || // zero width joiner
+			 (0x1f3fb <= c32 && c32 <= 0x1f3ff) || // skin color modifier
+			 scriptType == ScriptType::variation_selectors)) // variation selectors
+		{
+			chrType = lastChrType;
+			scriptType = lastScriptType;
+		}
 
-		if (lastChrType != chrType || lastChrType == POSTag::sso || lastChrType == POSTag::ssc)
+		if (isDiscontinuous(lastChrType, chrType, lastScriptType, scriptType) || lastChrType == POSTag::sso || lastChrType == POSTag::ssc)
 		{
 			// sequence of speical characters found
 			if (lastChrType != POSTag::max && lastChrType != POSTag::unknown && lastChrType != lastMatchedPattern)
@@ -875,6 +895,7 @@ size_t kiwi::splitByTrie(
 			if (!isSpace(str[n - 3]) && !isSpace(str[n - 2]))
 			{
 				lastChrType = chrType;
+				lastScriptType = scriptType;
 				break;
 			}
 		}
@@ -882,6 +903,7 @@ size_t kiwi::splitByTrie(
 		else if (n >= 8192)
 		{
 			lastChrType = chrType;
+			lastScriptType = scriptType;
 			break;
 		}
 
@@ -1021,6 +1043,7 @@ size_t kiwi::splitByTrie(
 		}
 	continueFor:
 		lastChrType = chrType;
+		lastScriptType = scriptType;
 	}
 
 	// sequence of speical characters found

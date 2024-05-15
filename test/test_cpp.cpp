@@ -163,10 +163,45 @@ TEST(KiwiCpp, OldHangul)
 TEST(KiwiCpp, ChineseVsEmoji)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
-	auto res = kiwi.analyze(u"韓𠀀𠀁𠀂𠀃🔥🤔🙃🐶", Match::allWithNormalizing).first;
+	auto res = kiwi.analyze(u"韓𠀀𠀁𠀂𠀃🔥🤔🐶", Match::allWithNormalizing).first;
 	EXPECT_EQ(res.size(), 2);
 	EXPECT_EQ(res[0].tag, POSTag::sh);
 	EXPECT_EQ(res[1].tag, POSTag::sw);
+}
+
+TEST(KiwiCpp, Script)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	auto res = kiwi.analyze(u"résumé", Match::allWithNormalizing).first;
+	EXPECT_EQ(res.size(), 1);
+	EXPECT_EQ(res[0].tag, POSTag::sl);
+	EXPECT_EQ(res[0].script, ScriptType::latin);
+
+	res = kiwi.analyze(u"中国の歴史における", Match::allWithNormalizing).first;
+	EXPECT_EQ(res.size(), 4);
+	EXPECT_EQ(res[0].tag, POSTag::sh);
+	EXPECT_EQ(res[0].script, ScriptType::hanja);
+	EXPECT_EQ(res[1].tag, POSTag::sw);
+	EXPECT_EQ(res[1].script, ScriptType::kana);
+	EXPECT_EQ(res[2].tag, POSTag::sh);
+	EXPECT_EQ(res[2].script, ScriptType::hanja);
+	EXPECT_EQ(res[3].tag, POSTag::sw);
+	EXPECT_EQ(res[3].script, ScriptType::kana);
+
+	res = kiwi.analyze(u"👍🏻👍🏿 👨‍👩‍👦 ℹ️ ✍🏼", Match::allWithNormalizing).first;
+	EXPECT_EQ(res.size(), 4);
+	EXPECT_EQ(res[0].tag, POSTag::sw);
+	EXPECT_EQ(res[0].script, ScriptType::symbols_and_pictographs);
+	EXPECT_EQ(res[0].position, 0);
+	EXPECT_EQ(res[0].length, 8);
+	EXPECT_EQ(res[1].tag, POSTag::sw);
+	EXPECT_EQ(res[1].script, ScriptType::symbols_and_pictographs);
+	EXPECT_EQ(res[1].position, 9);
+	EXPECT_EQ(res[1].length, 8);
+	EXPECT_EQ(res[2].tag, POSTag::sw);
+	EXPECT_EQ(res[2].script, ScriptType::letterlike_symbols);
+	EXPECT_EQ(res[3].tag, POSTag::sw);
+	EXPECT_EQ(res[3].script, ScriptType::dingbats);
 }
 
 TEST(KiwiCpp, EmptyToken)

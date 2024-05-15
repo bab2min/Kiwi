@@ -40,6 +40,7 @@
     <ClInclude Include="..\include\kiwi\Macro.h" />
     <ClInclude Include="..\include\kiwi\Mmap.h" />
     <ClInclude Include="..\include\kiwi\PatternMatcher.h" />
+    <ClInclude Include="..\include\kiwi\ScriptType.h" />
     <ClInclude Include="..\include\kiwi\SkipBigramModel.h" />
     <ClInclude Include="..\include\kiwi\TagUtils.h" />
     <ClInclude Include="..\include\kiwi\TemplateUtils.hpp" />
@@ -56,7 +57,6 @@
     <ClInclude Include="..\src\bitset.hpp" />
     <ClInclude Include="..\src\Combiner.h" />
     <ClInclude Include="..\src\count.hpp" />
-    <ClCompile Include="..\src\FileUtils.cpp" />
     <ClInclude Include="..\src\FrozenTrie.hpp" />
     <ClInclude Include="..\src\FeatureTestor.h" />
     <ClInclude Include="..\src\HSkipBigramTrainer.hpp" />
@@ -115,10 +115,11 @@
     </ClCompile>
     <ClCompile Include="..\src\ArchUtils.cpp" />
     <ClCompile Include="..\src\Combiner.cpp" />
-    <ClCompile Include="..\src\HSDataset.cpp" />
+    <ClCompile Include="..\src\FileUtils.cpp" />
     <ClCompile Include="..\src\Joiner.cpp" />
     <ClCompile Include="..\src\search.cpp" />
     <ClCompile Include="..\src\TagUtils.cpp" />
+    <ClCompile Include="..\src\ScriptType.cpp" />
     <ClCompile Include="..\src\SwTokenizer.cpp" />
     <ClCompile Include="..\src\TypoTransformer.cpp" />
     <ClCompile Include="..\src\UnicodeCase.cpp" />

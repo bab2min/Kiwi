@@ -26,6 +26,7 @@
 #endif
 
 #include "TemplateUtils.hpp"
+#include "ScriptType.h"
 
 #define KIWI_DEFINE_ENUM_FLAG_OPERATORS(Type) \
 inline Type operator~(Type a)\
@@ -306,7 +307,10 @@ namespace kiwi
 		uint32_t lineNumber = 0; /**< 줄 번호*/
 		uint16_t length = 0; /**< 길이(UTF16 문자 기준) */
 		POSTag tag = POSTag::unknown; /**< 품사 태그 */
-		uint8_t senseId = 0; /**< 의미 번호 */
+		union {
+			uint8_t senseId = 0; /**< 의미 번호 */
+			ScriptType script; /**< 유니코드 영역에 기반한 문자 타입 */
+		};
 		float score = 0; /**< 해당 형태소의 언어모델 점수 */
 		float typoCost = 0; /**< 오타가 교정된 경우 오타 비용. 그렇지 않은 경우 0 */
 		uint32_t typoFormId = 0; /**< 교정 전 오타의 형태에 대한 정보 (typoCost가 0인 경우 PreTokenizedSpan의 ID값) */
