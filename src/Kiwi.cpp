@@ -898,8 +898,11 @@ namespace kiwi
 	{
 		ret.clear();
 		auto* cur = first;
-		for (size_t i = 0; i < nodes.size() && cur != last; ++i)
+		for (size_t i = 0; i < nodes.size(); ++i)
 		{
+			while (cur != last && nodes[i].startPos >= cur->end) ++cur;
+			if (cur == last) break;
+
 			if (cur->begin <= nodes[i].startPos && nodes[i].endPos <= cur->end)
 			{
 				ret.emplace_back(cur - first);
@@ -907,7 +910,6 @@ namespace kiwi
 			else
 			{
 				ret.emplace_back(-1);
-				if (nodes[i].startPos >= cur->end) ++cur;
 			}
 		}
 		ret.resize(nodes.size(), -1);
