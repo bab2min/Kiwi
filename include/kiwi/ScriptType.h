@@ -240,4 +240,6 @@ namespace kiwi
     ScriptType chr2ScriptType(char32_t c);
 
     const char* getScriptName(ScriptType type);
+
+    bool isEmoji(char32_t c0, char32_t c1 = 0);
 }
