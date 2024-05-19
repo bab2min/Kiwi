@@ -600,7 +600,7 @@ namespace kiwi
 
 	inline void updateTokenInfoScript(TokenInfo& info)
 	{
-		if (!(info.tag == POSTag::sl || info.tag == POSTag::sh || info.tag == POSTag::sw)) return;
+		if (!(info.tag == POSTag::sl || info.tag == POSTag::sh || info.tag == POSTag::sw || info.tag == POSTag::w_emoji)) return;
 		if ((info.morph && info.morph->kform && !info.morph->kform->empty())) return;
 		if (info.str.empty()) return;
 		char32_t c = info.str[0];

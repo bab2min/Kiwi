@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file Types.h
  * @author bab2min (bab2min@gmail.com)
  * @brief Kiwi C++ API에 쓰이는 주요 타입들을 모아놓은 헤더 파일
@@ -202,7 +202,7 @@ namespace kiwi
 		vcp, vcn,
 		sf, sp, ss, sso, ssc, se, so, sw, sb,
 		sl, sh, sn,
-		w_url, w_email, w_mention, w_hashtag, w_serial,
+		w_url, w_email, w_mention, w_hashtag, w_serial, w_emoji,
 		jks, jkc, jkg, jko, jkb, jkv, jkq, jx, jc,
 		ep, ef, ec, etn, etm,
 		z_coda,

@@ -1,6 +1,8 @@
 #include <kiwi/PatternMatcher.h>
 #include <kiwi/Utils.h>
+#include <kiwi/ScriptType.h>
 #include "pattern.hpp"
+#include "StrUtils.h"
 
 using namespace std;
 using namespace kiwi;
@@ -26,6 +28,7 @@ namespace kiwi
 		size_t testNumeric(const char16_t left, const char16_t* first, const char16_t* last) const;
 		size_t testSerial(const char16_t* first, const char16_t* last) const;
 		size_t testAbbr(const char16_t* first, const char16_t* last) const;
+		size_t testEmoji(const char16_t* first, const char16_t* last) const;
 
 	public:
 		std::pair<size_t, POSTag> match(char16_t left, const char16_t* first, const char16_t* last, Match matchOptions) const;
@@ -290,6 +293,77 @@ size_t PatternMatcherImpl::testAbbr(const char16_t* first, const char16_t* last)
 	return b - first;
 }
 
+size_t PatternMatcherImpl::testEmoji(const char16_t* first, const char16_t* last) const
+{
+	const char16_t* b = first;
+	while (b + 1 < last)
+	{
+		char32_t c0 = 0, c1 = 0;
+		const char16_t* b1 = b;
+		if (isHighSurrogate(*b1))
+		{
+			c0 = mergeSurrogate(b1[0], b1[1]);
+			b1 += 2;
+		}
+		else
+		{
+			c0 = *b1++;
+		}
+
+		const char16_t* b2 = b1;
+		if (b2 < last)
+		{
+			if (isHighSurrogate(*b2) && b2 + 1 < last)
+			{
+				c1 = mergeSurrogate(b2[0], b2[1]);
+				b2 += 2;
+			}
+			else
+			{
+				c1 = *b2++;
+			}
+		}
+
+		auto r = isEmoji(c0, c1);
+		if (r == 1)
+		{
+			b = b1;
+		}
+		else if (r == 2)
+		{
+			b = b2;
+		}
+		else
+		{
+			break;
+		}
+
+		if (b == last) return b - first;
+		if (0xfe00 <= *b && *b <= 0xfe0f) // variation selectors
+		{
+			++b;
+			if (b == last) return b - first;
+		}
+		else if (b + 1 < last && isHighSurrogate(b[0]))
+		{
+			c1 = mergeSurrogate(b[0], b[1]);
+			if (0x1f3fb <= c1 && c1 <= 0x1f3ff) // skin color modifier
+			{
+				b += 2;
+				if (b == last) return b - first;
+			}
+		}
+
+		if (*b == 0x200d) // zero width joiner
+		{
+			++b;
+			continue;
+		}
+		break;
+	}
+	return b - first;
+}
+
 pair<size_t, POSTag> PatternMatcherImpl::match(char16_t left, const char16_t * first, const char16_t * last, Match matchOptions) const
 {
 	size_t size;
@@ -299,6 +373,7 @@ pair<size_t, POSTag> PatternMatcherImpl::match(char16_t left, const char16_t * f
 	if (!!(matchOptions & Match::email) && (size = testEmail(first, last))) return make_pair(size, POSTag::w_email);
 	if (!!(matchOptions & Match::mention) && (size = testMention(first, last))) return make_pair(size, POSTag::w_mention);
 	if (!!(matchOptions & Match::url) && (size = testUrl(first, last))) return make_pair(size, POSTag::w_url);
+	if (!!(matchOptions & Match::emoji) && (size = testEmoji(first, last))) return make_pair(size, POSTag::w_emoji);
 	if ((size = testAbbr(first, last))) return make_pair(size, POSTag::sl);
 	return make_pair(0, POSTag::unknown);
 }

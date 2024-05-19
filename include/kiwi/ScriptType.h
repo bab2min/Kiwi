@@ -241,5 +241,10 @@ namespace kiwi
 
     const char* getScriptName(ScriptType type);
 
-    bool isEmoji(char32_t c0, char32_t c1 = 0);
+    /**
+     * @brief Check if the character is an emoji
+     * 
+     * @return 0 if the character is not an emoji, 1 if c0 is an emoji, 2 if c0 and c1 are combined to form an emoji.
+     */
+    size_t isEmoji(char32_t c0, char32_t c1 = 0);
 }
