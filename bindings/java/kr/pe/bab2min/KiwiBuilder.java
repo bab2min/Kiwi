@@ -8,7 +8,8 @@ public class KiwiBuilder implements AutoCloseable  {
 		integrateAllomorph = 1 << 0,
 		loadDefaultDict = 1 << 1,
 		loadTypoDict = 1 << 2,
-		default_ = integrateAllomorph | loadDefaultDict | loadTypoDict;
+		loadMultiDict = 1 << 3,
+		default_ = integrateAllomorph | loadDefaultDict | loadTypoDict | loadMultiDict;
 	}
 
 	public static class AnalyzedMorph {

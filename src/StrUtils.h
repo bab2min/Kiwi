@@ -663,6 +663,7 @@ namespace kiwi
 		if (tagStr == u"W_HASHTAG") return POSTag::w_hashtag;
 		if (tagStr == u"W_MENTION") return POSTag::w_mention;
 		if (tagStr == u"W_SERIAL") return POSTag::w_serial;
+		if (tagStr == u"W_EMOJI") return POSTag::w_emoji;
 
 		if (tagStr == u"USER0") return POSTag::user0;
 		if (tagStr == u"USER1") return POSTag::user1;

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <iostream>
 #include <string>
 #include <memory>
@@ -30,7 +30,7 @@ namespace kiwi
 
 	inline bool isWebTag(POSTag t)
 	{
-		return POSTag::w_url <= t && t <= POSTag::w_hashtag;
+		return POSTag::w_url <= t && t <= POSTag::w_emoji;
 	}
 
 	POSTag toPOSTag(const std::u16string& tagStr);
