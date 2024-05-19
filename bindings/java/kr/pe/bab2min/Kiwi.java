@@ -21,6 +21,7 @@ public class Kiwi implements AutoCloseable  {
 		hashtag = 1 << 2,
 		mention = 1 << 3,
 		serial = 1 << 4,
+		emoji = 1 << 5,
 		normalizeCoda = 1 << 16,
 		joinNounPrefix = 1 << 17,
 		joinNounSuffix = 1 << 18,
@@ -48,13 +49,13 @@ public class Kiwi implements AutoCloseable  {
 		vcp = 19, vcn = 20,
 		sf = 21, sp = 22, ss = 23, sso = 24, ssc = 25, se = 26, so = 27, sw = 28, sb = 29,
 		sl = 30, sh = 31, sn = 32,
-		w_url = 33, w_email = 34, w_mention = 35, w_hashtag = 36, w_serial = 37,
-		jks = 38, jkc = 39, jkg = 40, jko = 41, jkb = 42, jkv = 43, jkq = 44, jx = 45, jc = 46,
-		ep = 47, ef = 48, ec = 49, etn = 50, etm = 51,
-		z_coda = 52,
-		user0 = 53, user1 = 54, user2 = 55, user3 = 56, user4 = 57,
-		p = 58,
-		max = 59,
+		w_url = 33, w_email = 34, w_mention = 35, w_hashtag = 36, w_serial = 37, w_emoji = 38,
+		jks = 39, jkc = 40, jkg = 41, jko = 42, jkb = 43, jkv = 44, jkq = 45, jx = 46, jc = 47,
+		ep = 48, ef = 49, ec = 50, etn = 51, etm = 52,
+		z_coda = 53,
+		user0 = 54, user1 = 55, user2 = 56, user3 = 57, user4 = 58,
+		p = 59,
+		max = 60,
 		pv = p,
 		pa = (byte)(p + 1),
 		irregular = - 128,
@@ -106,6 +107,7 @@ public class Kiwi implements AutoCloseable  {
 				case w_mention: return "W_MENTION";
 				case w_hashtag: return "W_HASHTAG";
 				case w_serial: return "W_SERIAL";
+				case w_emoji: return "W_EMOJI";
 				case jks: return "JKS";
 				case jkc: return "JKC";
 				case jkg: return "JKG";
