@@ -1,4 +1,3 @@
-#pragma once
 #include <kiwi/ScriptType.h>
 
 namespace kiwi
@@ -567,7 +566,7 @@ namespace kiwi
         return "unknown";
     }
 
-    size_t isEmoji(char32_t c0, char32_t c1)
+    int isEmoji(char32_t c0, char32_t c1)
     {
         if (0x1f004 == c0) return 1;
         if (0x1f0cf == c0) return 1;
