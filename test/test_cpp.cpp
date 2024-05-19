@@ -163,10 +163,17 @@ TEST(KiwiCpp, OldHangul)
 TEST(KiwiCpp, ChineseVsEmoji)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
-	auto res = kiwi.analyze(u"韓𠀀𠀁𠀂𠀃🔥🤔🐶", Match::allWithNormalizing).first;
+	auto res = kiwi.analyze(u"韓𠀀𠀁𠀂𠀃🔥🤔🐶", Match::allWithNormalizing & ~Match::emoji).first;
 	EXPECT_EQ(res.size(), 2);
 	EXPECT_EQ(res[0].tag, POSTag::sh);
 	EXPECT_EQ(res[1].tag, POSTag::sw);
+
+	res = kiwi.analyze(u"韓𠀀𠀁𠀂𠀃🔥🤔🐶", Match::allWithNormalizing).first;
+	EXPECT_EQ(res.size(), 4);
+	EXPECT_EQ(res[0].tag, POSTag::sh);
+	EXPECT_EQ(res[1].tag, POSTag::w_emoji);
+	EXPECT_EQ(res[2].tag, POSTag::w_emoji);
+	EXPECT_EQ(res[3].tag, POSTag::w_emoji);
 }
 
 TEST(KiwiCpp, Script)
