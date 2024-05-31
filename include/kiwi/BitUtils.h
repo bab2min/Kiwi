@@ -118,7 +118,11 @@ namespace kiwi
 		{
 #if defined(__GNUC__)
 			return __builtin_popcount(v);
-#elif defined(_MSC_VER)
+#elif defined(_MSC_VER) && defined(KIWI_ARCH_ARM64)
+			uint64x1_t w = { v };
+			w = neon_cnt(w);
+			return w.n64_u64[0];
+#elif defined(_MSV_VER)
 			return __popcnt(v);
 #else
 			throw "";
@@ -129,6 +133,10 @@ namespace kiwi
 		{
 #if defined(__GNUC__)
 			return __builtin_popcountll(v);
+#elif defined(_MSC_VER) && defined(KIWI_ARCH_ARM64)
+			uint64x1_t w = { v };
+			w = neon_cnt(w);
+			return w.n64_u64[0];
 #elif defined(_MSC_VER) && defined(_M_X64)
 			return __popcnt64(v);
 #else

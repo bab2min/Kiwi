@@ -893,6 +893,28 @@ namespace kiwi
 #endif
 
 #if CPUINFO_ARCH_ARM || CPUINFO_ARCH_ARM64 || KIWI_ARCH_ARM64
+
+#if defined(_MSC_VER)
+#define ALIGNED_(x) __declspec(align(x))
+#define _MERGE_U8x8(a, b, c, d, e, f, g, h) (uint64_t(a) | (uint64_t(b) << 8) | (uint64_t(c) << 16) | (uint64_t(d) << 24) | (uint64_t(e) << 32) | (uint64_t(f) << 40) | (uint64_t(g) << 48) | (uint64_t(h) << 56))
+#define _MERGE_U16x4(a, b, c, d) (uint64_t(a) | (uint64_t(b) << 16) | (uint64_t(c) << 32) | (uint64_t(d) << 48))
+#define _MERGE_U32x2(a, b) (uint64_t(a) | (uint64_t(b) << 32))
+
+#define INIT_U8x16(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p) (_MERGE_U8x8(a, b, c, d, e, f, g, h)), (_MERGE_U8x8(i, j, k, l, m, n, o, p))
+#define INIT_U16x8(a, b, c, d, e, f, g, h) (_MERGE_U16x4(a, b, c, d), _MERGE_U16x4(e, f, g, h))
+#define INIT_U32x4(a, b, c, d) (_MERGE_U32x2(a, b), _MERGE_U32x2(c, d))
+
+#else
+#if defined(__GNUC__)
+#define ALIGNED_(x) __attribute__ ((aligned(x)))
+
+#define INIT_U8x16(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p) a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p
+#define INIT_U16x8(a, b, c, d, e, f, g, h) a, b, c, d, e, f, g, h
+#define INIT_U32x4(a, b, c, d) a, b, c, d
+
+#endif
+#endif
+
 namespace kiwi
 {
 	namespace nst
@@ -905,7 +927,7 @@ namespace kiwi
 
 			int8x16_t ptarget = vdupq_n_s8(target), pkey;
 			uint8x16_t peq, pgt, pmasked;
-			static const uint8x16_t __attribute__((aligned(16))) mask = { 1, 2, 4, 8, 16, 32, 64, 128, 1, 2, 4, 8, 16, 32, 64, 128 };
+			static const uint8x16_t ALIGNED_(16) mask = { INIT_U8x16(1, 2, 4, 8, 16, 32, 64, 128, 1, 2, 4, 8, 16, 32, 64, 128) };
 
 			while (i < size)
 			{
@@ -938,7 +960,7 @@ namespace kiwi
 
 			int16x8_t ptarget = vdupq_n_s16(target), pkey;
 			uint16x8_t peq, pgt;
-			static const uint16x8_t __attribute__((aligned(16))) mask = { 1, 2, 4, 8, 16, 32, 64, 128 };
+			static const uint16x8_t ALIGNED_(16) mask = { INIT_U16x8(1, 2, 4, 8, 16, 32, 64, 128) };
 
 			while (i < size)
 			{
@@ -968,7 +990,7 @@ namespace kiwi
 
 			int32x4_t ptarget = vdupq_n_s32(target), pkey;
 			uint32x4_t peq, pgt;
-			static const uint32x4_t __attribute__((aligned(16))) mask = { 1, 2, 4, 8 };
+			static const uint32x4_t ALIGNED_(16) mask = { INIT_U32x4(1, 2, 4, 8) };
 
 			while (i < size)
 			{
@@ -998,7 +1020,7 @@ namespace kiwi
 
 			int64x2_t ptarget = vdupq_n_s64(target), pkey;
 			uint64x2_t peq, pgt;
-			static const uint64x2_t __attribute__((aligned(16))) mask = { 1, 2 };
+			static const uint64x2_t ALIGNED_(16) mask = { 1, 2 };
 
 			while (i < size)
 			{
