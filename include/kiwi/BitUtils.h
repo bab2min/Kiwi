@@ -122,7 +122,7 @@ namespace kiwi
 			uint64x1_t w = { v };
 			w = neon_cnt(w);
 			return w.n64_u64[0];
-#elif defined(_MSV_VER)
+#elif defined(_MSC_VER)
 			return __popcnt(v);
 #else
 			throw "";
