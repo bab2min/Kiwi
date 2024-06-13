@@ -243,12 +243,7 @@ namespace kiwi
 
     inline constexpr bool areTagsEqual(POSTag a, POSTag b, bool ignoreRegularity = false)
     {
-        if (ignoreRegularity)
-        {
-            a = clearIrregular(a);
-            b = clearIrregular(b);
-        }
-        return a == b;
+        return ignoreRegularity ? (clearIrregular(a) == clearIrregular(b)) : (a == b);
     }
 
 	constexpr size_t defaultTagSize = (size_t)POSTag::p;
