@@ -8,6 +8,9 @@ set ( CMAKE_VERBOSE_MAKEFILE true )
 option(KIWI_USE_MIMALLOC  "Use mimalloc for faster memory allocation" ON)
 option(KIWI_USE_CPUINFO  "Use cpuinfo for dynamic CPU dispatching" ON)
 option(KIWI_STATIC_WITHOUT_MT  "Use /MT Option in building kiwi_static" OFF)
+option(KIWI_BUILD_CLI  "Build CLI tool" ON)
+option(KIWI_BUILD_EVALUATOR  "Build Evaluator" ON)
+option(KIWI_BUILD_MODEL_BUILDER  "Build Model Builder" ON)
 option(KIWI_BUILD_TEST  "Build Test sets" ON)
 option(KIWI_JAVA_BINDING  "Build Java binding" OFF)
 set(KIWI_CPU_ARCH "" CACHE STRING "Set architecture type for macOS")
@@ -23,7 +26,9 @@ if (NOT CMAKE_BUILD_TYPE)
 endif()
 
 if(NOT KIWI_CPU_ARCH)
-  if (CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)|(amd64)|(AMD64)")
+  if (EMSCRIPTEN)
+    set(KIWI_CPU_ARCH "wasm")
+  elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)|(amd64)|(AMD64)")
     set(KIWI_CPU_ARCH "x86_64")
   elseif (HOST_ARCHITECTURE MATCHES "^arm64" OR CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm|aarch64)")
     set(KIWI_CPU_ARCH "arm64")
@@ -174,6 +179,8 @@ elseif (KIWI_CPU_ARCH MATCHES "arm64")
     src/archImpl/neon.cpp
   )
   set_source_files_properties(src/archImpl/neon.cpp PROPERTIES COMPILE_FLAGS "-march=armv8-a")
+elseif (KIWI_CPU_ARCH MATCHES "wasm")
+  message("Compiling for wasm")
 else()
   message("Compiling for other")
 endif()
@@ -208,30 +215,36 @@ target_compile_options("${PROJECT_NAME}" PRIVATE "${ADDITIONAL_FLAGS}")
 #target_link_libraries("${PROJECT_NAME}_static" cpuinfo_internals)
 #target_link_libraries("${PROJECT_NAME}" cpuinfo)
 
-add_executable( "${PROJECT_NAME}-cli-${PROJECT_VERSION}"
-  tools/runner.cpp
-)
+if (KIWI_BUILD_CLI)
+  add_executable( "${PROJECT_NAME}-cli-${PROJECT_VERSION}"
+    tools/runner.cpp
+  )
 
-target_link_libraries( "${PROJECT_NAME}-cli-${PROJECT_VERSION}"
-  "${PROJECT_NAME}_static"
-)
+  target_link_libraries( "${PROJECT_NAME}-cli-${PROJECT_VERSION}"
+    "${PROJECT_NAME}_static"
+  )
+endif()
 
-add_executable( "${PROJECT_NAME}-evaluator"
-  tools/Evaluator.cpp
-  tools/evaluator_main.cpp
-)
+if (KIWI_BUILD_EVALUATOR)
+  add_executable( "${PROJECT_NAME}-evaluator"
+    tools/Evaluator.cpp
+    tools/evaluator_main.cpp
+  )
 
-target_link_libraries( "${PROJECT_NAME}-evaluator"
-  "${PROJECT_NAME}_static"
-)
+  target_link_libraries( "${PROJECT_NAME}-evaluator"
+    "${PROJECT_NAME}_static"
+  )
+endif()
 
-add_executable( "${PROJECT_NAME}-model-builder"
-  tools/model_builder.cpp
-)
+if (KIWI_BUILD_MODEL_BUILDER)
+  add_executable( "${PROJECT_NAME}-model-builder"
+    tools/model_builder.cpp
+  )
 
-target_link_libraries( "${PROJECT_NAME}-model-builder"
-  "${PROJECT_NAME}_static"
-)
+  target_link_libraries( "${PROJECT_NAME}-model-builder"
+    "${PROJECT_NAME}_static"
+  )
+endif()
 
 if(MSVC)
   if(KIWI_STATIC_WITHOUT_MT)
@@ -262,13 +275,17 @@ if(UNIX AND NOT APPLE)
     rt
   )
 
-  target_link_libraries( "${PROJECT_NAME}-cli-${PROJECT_VERSION}"
-    rt
-  )
+  if (KIWI_BUILD_CLI)
+    target_link_libraries( "${PROJECT_NAME}-cli-${PROJECT_VERSION}"
+      rt
+    )
+  endif()
 
-  target_link_libraries( "${PROJECT_NAME}-evaluator"
-    rt
-  )
+  if (KIWI_BUILD_EVALUATOR)
+    target_link_libraries( "${PROJECT_NAME}-evaluator"
+      rt
+    )
+  endif()
 endif()
 
 target_compile_definitions("${PROJECT_NAME}"
@@ -290,4 +307,8 @@ endif()
 
 if(KIWI_JAVA_BINDING)
   add_subdirectory( bindings/java )
+endif()
+
+if(EMSCRIPTEN)
+  add_subdirectory( bindings/wasm )
 endif()
