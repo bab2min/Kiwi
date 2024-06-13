@@ -804,36 +804,40 @@ namespace kiwi
 			{
 				auto formStr = normalizeHangul(s.tokenization[0].form);
 				auto* tform = findForm(formTrie, formStr); 
-				if (tform && tform->candidate.size() == 1 && tform->candidate[0]->tag == s.tokenization[0].tag) // reuse the predefined form & morpheme
+				if (tform && tform->candidate.size() == 1 &&
+					areTagsEqual(tform->candidate[0]->tag, s.tokenization[0].tag, !!s.tokenization[0].inferRegularity))
+					// reuse the predefined form & morpheme
 				{
 					span.form = tform;
-				}
-				else if (formStr == normStr.substr(span.begin, span.end - span.begin)) // use a fallback form
-				{
-					span.form = formTrie.value((size_t)clearIrregular(s.tokenization[0].tag));
 				}
 				else  // or add a new form & morpheme
 				{
 					ret.forms.emplace_back();
 					auto& form = ret.forms.back();
 					form.form = move(formStr);
-					form.candidate = FixedVector<const Morpheme*>{ 1 };
-					const Morpheme* foundMorph = nullptr;
+					const Morpheme* foundMorph[2] = { nullptr, nullptr };
 					if (tform)
 					{
+						size_t i = 0;
 						for (auto m : tform->candidate)
 						{
-							if (m->tag == s.tokenization[0].tag)
+							if (areTagsEqual(m->tag, s.tokenization[0].tag, s.tokenization[0].inferRegularity))
 							{
-								foundMorph = m;
-								break;
+								foundMorph[i++] = m;
+								if (i >= 2) break;
 							}
 						}
 					}
+
+					form.candidate = FixedVector<const Morpheme*>{ (size_t)(foundMorph[1] ? 2 : 1) };
 					
-					if (foundMorph)
+					if (foundMorph[0])
 					{
-						form.candidate[0] = foundMorph;
+						form.candidate[0] = foundMorph[0];
+						if (foundMorph[1])
+						{
+							form.candidate[1] = foundMorph[1];
+						}
 					}
 					else
 					{
