@@ -2,7 +2,7 @@
  * @file SwTokenizer.h
  * @author bab2min (bab2min@gmail.com)
  * @brief Subword Tokenizer
- * @version 0.16.1
+ * @version 0.18.0
  * @date 2022-07-28
  *
  *
@@ -31,6 +31,7 @@ namespace kiwi
 		glue = 2,
 		subword = 3,
 		byte = 4,
+		multimorph = 5,
 		punct,
 		chinese,
 	};
@@ -97,6 +98,7 @@ namespace kiwi
 		bool reduceStrict = false;
 		bool removeRepetitive = true;
 		bool preventMixedDigitTokens = true;
+		bool allowMultiMorphTokens = false;
 	};
 
 	class SwTokenizer;
