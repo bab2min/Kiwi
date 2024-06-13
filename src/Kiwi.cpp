@@ -247,7 +247,7 @@ namespace kiwi
 				case POSTag::vcp:
 				case POSTag::etm:
 				case POSTag::ec:
-					if (t.tag == POSTag::jx && *t.morph->kform == u"요")
+					if (t.tag == POSTag::jx && t.morph && *t.morph->kform == u"요")
 					{
 						if (state == State::ef)
 						{
