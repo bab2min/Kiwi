@@ -136,7 +136,7 @@ namespace kiwi
 #endif
 		}
 
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(EMSCRIPTEN)
 		inline int countTrailingZeroes(size_t v) { return countTrailingZeroes((uint64_t)v); }
 		
 		inline int countLeadingZeroes(size_t v) { return countLeadingZeroes((uint64_t)v); }
