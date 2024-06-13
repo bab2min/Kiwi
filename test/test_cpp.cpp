@@ -271,6 +271,34 @@ TEST(KiwiCpp, Pretokenized)
 		EXPECT_EQ(res[13].str, u"매트");
 		EXPECT_EQ(res[13].tag, POSTag::nng);
 	}
+
+	{
+		std::vector<PretokenizedSpan> pretokenized = {
+			PretokenizedSpan{ 9, 10, { BasicToken{ u"가", 0, 1, POSTag::jks } } },
+			PretokenizedSpan{ 16, 17, { BasicToken{ u"에", 0, 1, POSTag::jkb } } },
+		};
+
+		auto ref = kiwi.analyze(str, Match::allWithNormalizing).first;
+		res = kiwi.analyze(str, Match::allWithNormalizing, nullptr, pretokenized).first;
+		EXPECT_EQ(res[2].tag, POSTag::jks);
+		EXPECT_EQ(res[2].morph, ref[2].morph);
+		EXPECT_EQ(res[2].score, ref[2].score);
+		EXPECT_EQ(res[5].tag, POSTag::jkb);
+		EXPECT_EQ(res[5].morph, ref[5].morph);
+		EXPECT_EQ(res[5].score, ref[5].score);
+	}
+
+	{
+		auto str2 = u"길을 걷다";
+		std::vector<PretokenizedSpan> pretokenized = {
+			PretokenizedSpan{ 3, 4, { BasicToken{ u"걷", 0, 1, POSTag::vv } } },
+		};
+
+		auto ref = kiwi.analyze(str2, Match::allWithNormalizing).first;
+		res = kiwi.analyze(str2, Match::allWithNormalizing, nullptr, pretokenized).first;
+		EXPECT_EQ(res[2].tag, POSTag::vvi);
+		EXPECT_EQ(res[2].morph, ref[2].morph);
+	}
 }
 
 TEST(KiwiCpp, TagRoundTrip)

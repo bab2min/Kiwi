@@ -312,11 +312,7 @@ namespace kiwi
 				Vector<const Morpheme*> cands;
 				foreachMorpheme(formHead, [&](const Morpheme* m)
 				{
-					if (inferRegularity && clearIrregular(m->tag) == clearIrregular(fixedTag))
-					{
-						cands.emplace_back(m);
-					}
-					else if (!inferRegularity && m->tag == fixedTag)
+					if (areTagsEqual(m->tag, fixedTag, inferRegularity))
 					{
 						cands.emplace_back(m);
 					}
@@ -412,7 +408,7 @@ namespace kiwi
 						Vector<const Morpheme*> cands;
 						foreachMorpheme(formHead, [&](const Morpheme* m)
 						{
-							if (clearIrregular(m->tag) == clearIrregular(tag))
+							if (areTagsEqual(m->tag, tag, true))
 							{
 								cands.emplace_back(m);
 							}
