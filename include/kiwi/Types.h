@@ -241,6 +241,16 @@ namespace kiwi
 		return irregular ? setIrregular(tag) : clearIrregular(tag);
 	}
 
+    inline constexpr bool areTagsEqual(POSTag a, POSTag b, bool ignoreRegularity = false)
+    {
+        if (ignoreRegularity)
+        {
+            a = clearIrregular(a);
+            b = clearIrregular(b);
+        }
+        return a == b;
+    }
+
 	constexpr size_t defaultTagSize = (size_t)POSTag::p;
 
 	/**
@@ -349,9 +359,10 @@ namespace kiwi
 		std::u16string form;
 		uint32_t begin = -1, end = -1;
 		POSTag tag = POSTag::unknown;
+		uint8_t inferRegularity = 1;
 
-		BasicToken(const std::u16string& _form = {}, uint32_t _begin = -1, uint32_t _end = -1, POSTag _tag = POSTag::unknown)
-			: form{ _form }, begin{ _begin }, end{ _end }, tag{ _tag }
+		BasicToken(const std::u16string& _form = {}, uint32_t _begin = -1, uint32_t _end = -1, POSTag _tag = POSTag::unknown, uint8_t _inferRegularity = 1)
+			: form{ _form }, begin{ _begin }, end{ _end }, tag{ _tag }, inferRegularity{ _inferRegularity }
 		{}
 	};
 
