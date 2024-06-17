@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+    </head>
+    <body>
+        <script type="module">
+            import { KiwiBuilder, Match } from './package/dist/index.js';
+            globalThis.KiwiBuilder = KiwiBuilder;
+            globalThis.Match = Match;
+
+            KiwiBuilder.create('./package/src/build/kiwi-wasm.wasm').then(
+                (builder) => {
+                    globalThis.builder = builder;
+                }
+            );
+
+            const requiredFiles = [
+                'combiningRule.txt',
+                'default.dict',
+                'extract.mdl',
+                'multi.dict',
+                'sj.knlm',
+                'sj.morph',
+                'skipbigram.mdl',
+                'typo.dict',
+            ];
+
+            globalThis.requiredFiles = Object.fromEntries(requiredFiles.map((file) => [file, '/ModelGenerator/' + file]));
+        </script>
+    </body>
+</html>
