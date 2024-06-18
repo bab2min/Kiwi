@@ -45,11 +45,52 @@ export enum Match {
     allWithNormalizing = all | normalizeCoda,
 }
 
+interface SentenceSpan {
+    start: number;
+    end: number;
+}
+
+interface SentenceSplitResult {
+    spans: SentenceSpan[];
+    tokenResult: TokenResult | null;
+}
+
+export enum Space {
+    none = 0,
+    noSpace = 1,
+    insertSpace = 2,
+}
+
+export interface SentenceJoinMorph {
+    form: string;
+    tag: string;
+    space?: Space;
+}
+
+interface SentenceJoinResult {
+    str: string;
+    ranges: SentenceSpan[] | null;
+}
+
 export interface Kiwi {
     ready: () => boolean;
     isTypoTolerant: () => boolean;
     analyze: (str: string, matchOptions?: Match) => TokenResult;
-    analyzeTopN: (str: string, n: number, matchOptions?: Match) => TokenResult[];
+    analyzeTopN: (
+        str: string,
+        n: number,
+        matchOptions?: Match
+    ) => TokenResult[];
+    splitIntoSents: (
+        str: string,
+        matchOptions?: Match,
+        withTokenResult?: boolean
+    ) => SentenceSplitResult;
+    joinSent: (
+        morphs: SentenceJoinMorph[],
+        lmSearch?: boolean,
+        withRanges?: boolean
+    ) => SentenceJoinResult;
     getCutOffThreshold: () => number;
     setCutOffThreshold: (v: number) => void;
     getUnkScoreBias: () => number;

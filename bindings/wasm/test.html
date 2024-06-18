@@ -11,7 +11,7 @@
             globalThis.KiwiBuilder = KiwiBuilder;
             globalThis.Match = Match;
 
-            KiwiBuilder.create('./package/src/build/kiwi-wasm.wasm').then(
+            KiwiBuilder.create('./package/dist/kiwi-wasm.wasm').then(
                 (builder) => {
                     globalThis.builder = builder;
                 }

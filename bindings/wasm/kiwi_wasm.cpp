@@ -147,10 +147,69 @@ json kiwiAnalyzeTopN(Kiwi& kiwi, const json& args) {
     const std::string str = args[0];
     const int topN = args[1];
     const Match matchOptions = getAtOrDefault(args, 2, Match::allWithNormalizing);
-    
+
     const std::vector<TokenResult> tokenResults = kiwi.analyze(str, topN, matchOptions);
 
     return serializeTokenResultVec(tokenResults);
+}
+
+json kiwiSplitIntoSents(Kiwi& kiwi, const json& args) {
+    const std::string str = args[0];
+    const Match matchOptions = getAtOrDefault(args, 1, Match::allWithNormalizing);
+    const bool withTokenResult = getAtOrDefault(args, 2, false);
+
+    TokenResult tokenResult;
+    const auto sentenceSpans = kiwi.splitIntoSents(str, matchOptions, withTokenResult ? &tokenResult : nullptr);
+
+    json spans = json::array();
+    for (const auto& span : sentenceSpans) {
+        spans.push_back({
+            { "start", span.first },
+            { "end", span.second },
+        });
+    }
+    
+    return {
+        { "spans", spans },
+        { "tokenResult", withTokenResult ? serializeTokenResult(tokenResult) : nullptr },
+    };
+}
+
+json kiwiJoinSent(Kiwi& kiwi, const json& args) {
+    const json morphs = args[0];
+    const bool lmSearch = getAtOrDefault(args, 1, true);
+    const bool withRanges = getAtOrDefault(args, 2, false);
+
+    auto joiner = kiwi.newJoiner(lmSearch);
+
+    for (const auto& morph : morphs) {
+        const std::string form8 = morph["form"];
+        const std::u16string form = utf8To16(form8);
+
+        const std::string tagStr8 = morph["tag"];
+        const std::u16string tagStr = utf8To16(tagStr8);
+        const POSTag tag = toPOSTag(tagStr);
+
+        const cmb::Space space = morph.value("space", cmb::Space::none);
+
+        joiner.add(form, tag, true, space);
+    }
+
+    std::vector<std::pair<uint32_t, uint32_t>> ranges;
+    const std::string str = joiner.getU8(withRanges ? &ranges : nullptr);
+
+    json rangesRet = json::array();
+    for (const auto& range : ranges) {
+        rangesRet.push_back({
+            { "start", range.first },
+            { "end", range.second },
+        });
+    }
+
+    return {
+        { "str", str },
+        { "ranges", withRanges ? rangesRet : nullptr },
+    };
 }
 
 json kiwiGetCutOffThreshold(Kiwi& kiwi, const json& args) {
@@ -239,6 +298,8 @@ std::map<std::string, InstanceApiMethod> instanceApiMethods = {
     { "isTypoTolerant", kiwiIsTypoTolerant },
     { "analyze", kiwiAnalyze },
     { "analyzeTopN", kiwiAnalyzeTopN },
+    { "splitIntoSents", kiwiSplitIntoSents },
+    { "joinSent", kiwiJoinSent },
     { "getCutOffThreshold", kiwiGetCutOffThreshold },
     { "setCutOffThreshold", kiwiSetCutOffThreshold },
     { "getUnkScoreBias", kiwiGetUnkScoreBias },
@@ -264,7 +325,7 @@ std::string api(std::string dataStr) {
     const std::string methodName = data["method"];
     const json args = data["args"];
     const json id = data.value("id", json(nullptr));
-    
+
     if (id.is_number_integer()) {
         const int instanceId = id;
         auto& instance = instances[instanceId];
