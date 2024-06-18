@@ -153,6 +153,30 @@ json kiwiAnalyzeTopN(Kiwi& kiwi, const json& args) {
     return serializeTokenResultVec(tokenResults);
 }
 
+json kiwiTokenize(Kiwi& kiwi, const json& args) {
+    const std::string str = args[0];
+    const Match matchOptions = getAtOrDefault(args, 1, Match::allWithNormalizing);
+    
+    const TokenResult tokenResult = kiwi.analyze(str, (Match)matchOptions);
+
+    return serializeTokenInfoVec(tokenResult.first);
+}
+
+json kiwiTokenizeTopN(Kiwi& kiwi, const json& args) {
+    const std::string str = args[0];
+    const int topN = args[1];
+    const Match matchOptions = getAtOrDefault(args, 2, Match::allWithNormalizing);
+
+    const std::vector<TokenResult> tokenResults = kiwi.analyze(str, topN, matchOptions);
+
+    json result = json::array();
+    for (const TokenResult& tokenResult : tokenResults) {
+        result.push_back(serializeTokenInfoVec(tokenResult.first));
+    }
+
+    return result;
+}
+
 json kiwiSplitIntoSents(Kiwi& kiwi, const json& args) {
     const std::string str = args[0];
     const Match matchOptions = getAtOrDefault(args, 1, Match::allWithNormalizing);
@@ -298,6 +322,8 @@ std::map<std::string, InstanceApiMethod> instanceApiMethods = {
     { "isTypoTolerant", kiwiIsTypoTolerant },
     { "analyze", kiwiAnalyze },
     { "analyzeTopN", kiwiAnalyzeTopN },
+    { "tokenize", kiwiTokenize },
+    { "tokenizeTopN", kiwiTokenizeTopN},
     { "splitIntoSents", kiwiSplitIntoSents },
     { "joinSent", kiwiJoinSent },
     { "getCutOffThreshold", kiwiGetCutOffThreshold },

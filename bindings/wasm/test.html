@@ -6,6 +6,18 @@
         <title>Document</title>
     </head>
     <body>
+        <h2>KiwiBuilder/Kiwi Test Page</h2>
+
+        <h4>Requirements</h4>
+        <p>Run build.sh to build the wasm module and generate the required binding</p>
+        <p>Web server running at the root of the repository (npx http-server or Live Server extension in VSCode)</p>
+
+        <h4>Usage</h4>
+        <p>Open the browser console to interact with KiwiBuilder</p>
+        <p>The default model files are available as modelFiles</p>
+        <p>To get started with a Kiwi instance use the following:</p>
+        <p>kiwi = await builder.build({ modelFiles })</p>
+
         <script type="module">
             import { KiwiBuilder, Match } from './package/dist/index.js';
             globalThis.KiwiBuilder = KiwiBuilder;
@@ -28,7 +40,7 @@
                 'typo.dict',
             ];
 
-            globalThis.requiredFiles = Object.fromEntries(requiredFiles.map((file) => [file, '/ModelGenerator/' + file]));
+            globalThis.modelFiles = Object.fromEntries(requiredFiles.map((file) => [file, '/ModelGenerator/' + file]));
         </script>
     </body>
 </html>

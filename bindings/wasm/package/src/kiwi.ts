@@ -81,6 +81,12 @@ export interface Kiwi {
         n: number,
         matchOptions?: Match
     ) => TokenResult[];
+    tokenize: (str: string, matchOptions?: Match) => TokenInfo[];
+    tokenizeTopN: (
+        str: string,
+        n: number,
+        matchOptions?: Match
+    ) => TokenInfo[][];
     splitIntoSents: (
         str: string,
         matchOptions?: Match,
