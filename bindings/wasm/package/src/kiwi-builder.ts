@@ -56,9 +56,9 @@ async function createKiwiApi(wasmPath: string): Promise<KiwiApi> {
 }
 
 export class KiwiBuilder {
-    api: KiwiApi;
+    private api: KiwiApi;
 
-    constructor(api: KiwiApi) {
+    private constructor(api: KiwiApi) {
         this.api = api;
     }
 
