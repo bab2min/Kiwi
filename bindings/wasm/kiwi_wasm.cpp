@@ -19,10 +19,69 @@ int nextInstanceId() {
 }
 
 
+static std::map<int, std::unordered_set<const Morpheme*>> morphemeSets;
+
+int nextMorphemeSetId() {
+    static int id = 0;
+    return id++;
+}
+
+
 template<typename T>
 inline T getAtOrDefault(const json& args, size_t index, const T& defaultValue) {
     return args.size() > index ? args.at(index).get<T>() : defaultValue;
 }
+
+
+inline std::unordered_set<const Morpheme*> parseMorphemeSet(const Kiwi& kiwi, const json& morphs) {
+    std::unordered_set<const Morpheme*> set;
+
+    for (const auto& morph : morphs) {
+        const std::string form8 = morph["form"];
+        const std::u16string form = utf8To16(form8);
+
+        POSTag tag = POSTag::unknown;
+        if (morph.contains("tag")) {
+            const std::string tagStr8 = morph["tag"];
+            const std::u16string tagStr = utf8To16(tagStr8);
+            tag = toPOSTag(tagStr);
+        }
+
+        auto matches = kiwi.findMorpheme(form, tag);
+        set.insert(matches.begin(), matches.end());
+    }
+
+    return set;
+}
+
+
+class BlockListArg {
+    std::unordered_set<const Morpheme*> tempSet;
+    int blockListId;
+
+public:
+    BlockListArg(const Kiwi& kiwi, const json& args, size_t index) : blockListId(-1) {
+        if (args.size() <= index) {
+            return;
+        }
+        const auto& arg = args.at(index);
+        if (arg.is_number_integer()) {
+            blockListId = arg.get<int>();
+        } else if (arg.is_array()) {
+            tempSet = parseMorphemeSet(kiwi, arg);
+        }
+    }
+
+    const std::unordered_set<const Morpheme*>* setPtr() const {
+        if (blockListId >= 0) {
+            return &morphemeSets[blockListId];
+        }
+        if (!tempSet.empty()) {
+            return &tempSet;
+        }
+        return nullptr;
+    }
+};
 
 
 inline json serializeTokenInfo(const TokenInfo& tokenInfo) {
@@ -137,8 +196,9 @@ json kiwiIsTypoTolerant(Kiwi& kiwi, const json& args) {
 json kiwiAnalyze(Kiwi& kiwi, const json& args) {
     const std::string str = args[0];
     const Match matchOptions = getAtOrDefault(args, 1, Match::allWithNormalizing);
+    const BlockListArg blockListArg(kiwi, args, 2);
     
-    const TokenResult tokenResult = kiwi.analyze(str, (Match)matchOptions);
+    const TokenResult tokenResult = kiwi.analyze(str, (Match)matchOptions, blockListArg.setPtr());
 
     return serializeTokenResult(tokenResult);
 }
@@ -147,8 +207,9 @@ json kiwiAnalyzeTopN(Kiwi& kiwi, const json& args) {
     const std::string str = args[0];
     const int topN = args[1];
     const Match matchOptions = getAtOrDefault(args, 2, Match::allWithNormalizing);
+    const BlockListArg blockListArg(kiwi, args, 3);
 
-    const std::vector<TokenResult> tokenResults = kiwi.analyze(str, topN, matchOptions);
+    const std::vector<TokenResult> tokenResults = kiwi.analyze(str, topN, matchOptions, blockListArg.setPtr());
 
     return serializeTokenResultVec(tokenResults);
 }
@@ -156,8 +217,9 @@ json kiwiAnalyzeTopN(Kiwi& kiwi, const json& args) {
 json kiwiTokenize(Kiwi& kiwi, const json& args) {
     const std::string str = args[0];
     const Match matchOptions = getAtOrDefault(args, 1, Match::allWithNormalizing);
+    const BlockListArg blockListArg(kiwi, args, 2);
     
-    const TokenResult tokenResult = kiwi.analyze(str, (Match)matchOptions);
+    const TokenResult tokenResult = kiwi.analyze(str, (Match)matchOptions, blockListArg.setPtr());
 
     return serializeTokenInfoVec(tokenResult.first);
 }
@@ -166,8 +228,9 @@ json kiwiTokenizeTopN(Kiwi& kiwi, const json& args) {
     const std::string str = args[0];
     const int topN = args[1];
     const Match matchOptions = getAtOrDefault(args, 2, Match::allWithNormalizing);
+    const BlockListArg blockListArg(kiwi, args, 3);
 
-    const std::vector<TokenResult> tokenResults = kiwi.analyze(str, topN, matchOptions);
+    const std::vector<TokenResult> tokenResults = kiwi.analyze(str, topN, matchOptions, blockListArg.setPtr());
 
     json result = json::array();
     for (const TokenResult& tokenResult : tokenResults) {
@@ -308,6 +371,23 @@ json kiwiSetIntegrateAllomorph(Kiwi& kiwi, const json& args) {
     return nullptr;
 }
 
+json kiwiCreateMorphemeSet(Kiwi& kiwi, const json& args) {
+    const int id = nextMorphemeSetId();
+
+    const json morphs = args[0];
+    std::unordered_set<const Morpheme*> set = parseMorphemeSet(kiwi, morphs);
+    
+    morphemeSets.emplace(id, set);
+
+    return id;
+}
+
+json kiwiDestroyMorphemeSet(Kiwi& kiwi, const json& args) {
+    const int id = args[0];
+    morphemeSets.erase(id);
+    return nullptr;
+}
+
 
 using ApiMethod = json(*)(const json&);
 using InstanceApiMethod = json(*)(Kiwi&, const json&);
@@ -342,6 +422,8 @@ std::map<std::string, InstanceApiMethod> instanceApiMethods = {
     { "setTypoCostWeight", kiwiSetTypoCostWeight },
     { "getIntegrateAllomorph", kiwiGetIntegrateAllomorph },
     { "setIntegrateAllomorph", kiwiSetIntegrateAllomorph },
+    { "createMorphemeSet", kiwiCreateMorphemeSet },
+    { "destroyMorphemeSet", kiwiDestroyMorphemeSet },
 };
 
 

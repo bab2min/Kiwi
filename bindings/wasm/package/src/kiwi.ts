@@ -1,6 +1,6 @@
 import { AsyncMethods } from './util.js';
 
-interface TokenInfo {
+export interface TokenInfo {
     str: string;
     position: number;
     wordPosition: number;
@@ -14,7 +14,7 @@ interface TokenInfo {
     subSentPosition: number;
 }
 
-interface TokenResult {
+export interface TokenResult {
     tokens: TokenInfo[];
     score: number;
 }
@@ -45,12 +45,12 @@ export enum Match {
     allWithNormalizing = all | normalizeCoda,
 }
 
-interface SentenceSpan {
+export interface SentenceSpan {
     start: number;
     end: number;
 }
 
-interface SentenceSplitResult {
+export interface SentenceSplitResult {
     spans: SentenceSpan[];
     tokenResult: TokenResult | null;
 }
@@ -61,31 +61,46 @@ export enum Space {
     insertSpace = 2,
 }
 
-export interface SentenceJoinMorph {
+export interface Morph {
     form: string;
     tag: string;
+}
+
+export interface SentenceJoinMorph extends Morph {
     space?: Space;
 }
 
-interface SentenceJoinResult {
+export interface SentenceJoinResult {
     str: string;
     ranges: SentenceSpan[] | null;
 }
 
+export type MorphemeSet = number;
+
 export interface Kiwi {
     ready: () => boolean;
     isTypoTolerant: () => boolean;
-    analyze: (str: string, matchOptions?: Match) => TokenResult;
+    analyze: (
+        str: string,
+        matchOptions?: Match,
+        blockList?: Morph[] | MorphemeSet
+    ) => TokenResult;
     analyzeTopN: (
         str: string,
         n: number,
-        matchOptions?: Match
+        matchOptions?: Match,
+        blockList?: Morph[] | MorphemeSet
     ) => TokenResult[];
-    tokenize: (str: string, matchOptions?: Match) => TokenInfo[];
+    tokenize: (
+        str: string,
+        matchOptions?: Match,
+        blockList?: Morph[] | MorphemeSet
+    ) => TokenInfo[];
     tokenizeTopN: (
         str: string,
         n: number,
-        matchOptions?: Match
+        matchOptions?: Match,
+        blockList?: Morph[] | MorphemeSet
     ) => TokenInfo[][];
     splitIntoSents: (
         str: string,
@@ -113,6 +128,8 @@ export interface Kiwi {
     setTypoCostWeight: (v: number) => void;
     getIntegrateAllomorphic: () => boolean;
     setIntegrateAllomorphic: (v: boolean) => void;
+    createMorphemeSet: (morphs: Morph[]) => MorphemeSet;
+    destroyMorphemeSet: (id: MorphemeSet) => void;
 }
 
 export type KiwiAsync = AsyncMethods<Kiwi>;
