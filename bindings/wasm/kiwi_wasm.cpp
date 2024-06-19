@@ -84,6 +84,48 @@ public:
 };
 
 
+std::vector<PretokenizedSpan> parsePretokenizedArg(const json& args, size_t index) {
+    std::vector<PretokenizedSpan> spans;
+
+    if (args.size() <= index) {
+        return spans;
+    }
+
+    const json& arg = args.at(index);
+
+    if (!arg.is_array()) {
+        return spans;
+    }
+
+    for (const auto& span : arg) {
+        const uint32_t start = span["start"];
+        const uint32_t end = span["end"];
+
+        std::vector<BasicToken> tokenization;
+
+        for (const auto& token : span["tokenization"]) {
+            const std::string form8 = token["form"];
+            const std::u16string form = utf8To16(form8);
+
+            const uint32_t start = token["start"];
+            const uint32_t end = token["end"];
+            POSTag tag = POSTag::unknown;
+            if (token.contains("tag")) {
+                const std::string tagStr8 = token["tag"];
+                const std::u16string tagStr = utf8To16(tagStr8);
+                tag = toPOSTag(tagStr);
+            }
+
+            tokenization.push_back(BasicToken{ form, start, end, tag });
+        }
+
+        spans.push_back(PretokenizedSpan{ start, end, tokenization });
+    }
+
+    return spans;
+}
+
+
 inline json serializeTokenInfo(const TokenInfo& tokenInfo) {
     return {
         { "str", utf16To8(tokenInfo.str) },
@@ -197,8 +239,9 @@ json kiwiAnalyze(Kiwi& kiwi, const json& args) {
     const std::string str = args[0];
     const Match matchOptions = getAtOrDefault(args, 1, Match::allWithNormalizing);
     const BlockListArg blockListArg(kiwi, args, 2);
+    const auto pretokenized = parsePretokenizedArg(args, 3);
     
-    const TokenResult tokenResult = kiwi.analyze(str, (Match)matchOptions, blockListArg.setPtr());
+    const TokenResult tokenResult = kiwi.analyze(str, (Match)matchOptions, blockListArg.setPtr(), pretokenized);
 
     return serializeTokenResult(tokenResult);
 }
@@ -208,8 +251,9 @@ json kiwiAnalyzeTopN(Kiwi& kiwi, const json& args) {
     const int topN = args[1];
     const Match matchOptions = getAtOrDefault(args, 2, Match::allWithNormalizing);
     const BlockListArg blockListArg(kiwi, args, 3);
+    const auto pretokenized = parsePretokenizedArg(args, 4);
 
-    const std::vector<TokenResult> tokenResults = kiwi.analyze(str, topN, matchOptions, blockListArg.setPtr());
+    const std::vector<TokenResult> tokenResults = kiwi.analyze(str, topN, matchOptions, blockListArg.setPtr(), pretokenized);
 
     return serializeTokenResultVec(tokenResults);
 }
@@ -218,8 +262,9 @@ json kiwiTokenize(Kiwi& kiwi, const json& args) {
     const std::string str = args[0];
     const Match matchOptions = getAtOrDefault(args, 1, Match::allWithNormalizing);
     const BlockListArg blockListArg(kiwi, args, 2);
+    const auto pretokenized = parsePretokenizedArg(args, 3);
     
-    const TokenResult tokenResult = kiwi.analyze(str, (Match)matchOptions, blockListArg.setPtr());
+    const TokenResult tokenResult = kiwi.analyze(str, (Match)matchOptions, blockListArg.setPtr(), pretokenized);
 
     return serializeTokenInfoVec(tokenResult.first);
 }
@@ -229,8 +274,9 @@ json kiwiTokenizeTopN(Kiwi& kiwi, const json& args) {
     const int topN = args[1];
     const Match matchOptions = getAtOrDefault(args, 2, Match::allWithNormalizing);
     const BlockListArg blockListArg(kiwi, args, 3);
+    const auto pretokenized = parsePretokenizedArg(args, 4);
 
-    const std::vector<TokenResult> tokenResults = kiwi.analyze(str, topN, matchOptions, blockListArg.setPtr());
+    const std::vector<TokenResult> tokenResults = kiwi.analyze(str, topN, matchOptions, blockListArg.setPtr(), pretokenized);
 
     json result = json::array();
     for (const TokenResult& tokenResult : tokenResults) {

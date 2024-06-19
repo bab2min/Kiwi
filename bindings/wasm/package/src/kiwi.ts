@@ -77,30 +77,45 @@ export interface SentenceJoinResult {
 
 export type MorphemeSet = number;
 
+export interface PretokenizedToken extends Morph {
+    start: number;
+    end: number;
+}
+
+export interface PretokenizedSpan {
+    start: number;
+    end: number;
+    tokenization: PretokenizedToken[];
+}
+
 export interface Kiwi {
     ready: () => boolean;
     isTypoTolerant: () => boolean;
     analyze: (
         str: string,
         matchOptions?: Match,
-        blockList?: Morph[] | MorphemeSet
+        blockList?: Morph[] | MorphemeSet,
+        pretokenized?: PretokenizedSpan[]
     ) => TokenResult;
     analyzeTopN: (
         str: string,
         n: number,
         matchOptions?: Match,
-        blockList?: Morph[] | MorphemeSet
+        blockList?: Morph[] | MorphemeSet,
+        pretokenized?: PretokenizedSpan[]
     ) => TokenResult[];
     tokenize: (
         str: string,
         matchOptions?: Match,
-        blockList?: Morph[] | MorphemeSet
+        blockList?: Morph[] | MorphemeSet,
+        pretokenized?: PretokenizedSpan[]
     ) => TokenInfo[];
     tokenizeTopN: (
         str: string,
         n: number,
         matchOptions?: Match,
-        blockList?: Morph[] | MorphemeSet
+        blockList?: Morph[] | MorphemeSet,
+        pretokenized?: PretokenizedSpan[]
     ) => TokenInfo[][];
     splitIntoSents: (
         str: string,
