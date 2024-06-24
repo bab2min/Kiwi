@@ -1,4 +1,3 @@
-import { KiwiBuilder } from './kiwi-builder.js';
-import { Match, Space, SentenceJoinMorph } from './kiwi.js';
-
-export { KiwiBuilder, Match, Space, SentenceJoinMorph };
+export * from './build-args.js';
+export * from './kiwi-builder.js';
+export * from './kiwi.js';

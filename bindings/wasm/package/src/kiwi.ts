@@ -151,7 +151,7 @@ export interface PretokenizedSpan {
 
 /**
  * Interface that performs the actual morphological analysis.
- * Cannot be constructed directly, use `KiwiBuilder` instead.
+ * Cannot be constructed directly, use {@link KiwiBuilder} to create a new instance.
  */
 export interface Kiwi {
     /**
