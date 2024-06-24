@@ -336,27 +336,11 @@ jobs:
         submodules: true
         lfs: true
     - uses: mymindstorm/setup-emsdk@v14
-    - name: Get release
-      id: get_release
-      uses: bruceadams/get-release@v1.2.2
-      env:
-        GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-    - name: Configure Build
-      run: mkdir build && cd build && emcmake cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_USE_CPUINFO=OFF -DKIWI_BUILD_TEST=OFF -DKIWI_USE_MIMALLOC=OFF -DKIWI_BUILD_CLI=OFF -DKIWI_BUILD_EVALUATOR=OFF -DKIWI_BUILD_MODEL_BUILDER=OFF ..
     - name: Build
-      run: cd build && make -j2
-    - run: |
-        mkdir result
-        cd result
-        mv ../build/bindings/wasm/kiwi-wasm.js
-        mv ../build/bindings/wasm/kiwi-wasm.wasm
-        tar -zcvf ../asset.tgz kiwi-wasm.js kiwi-wasm.wasm
-    - name: Upload release binary
-      uses: actions/upload-release-asset@v1.0.2
-      env:
-        GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+      run: |
+        cd bindings/wasm
+        ./build.sh
+    - uses: JS-DevTools/npm-publish@v3
       with:
-        upload_url: ${{ steps.get_release.outputs.upload_url }}
-        asset_path: asset.tgz
-        asset_name: kiwi_wasm_${{ steps.get_release.outputs.tag_name }}.tgz
-        asset_content_type: application/octet-stream
+        token: ${{ secrets.NPM_TOKEN }}
+        package: bindings/wasm/package
