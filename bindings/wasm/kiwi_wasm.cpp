@@ -126,7 +126,7 @@ std::vector<PretokenizedSpan> parsePretokenizedArg(const json& args, size_t inde
 }
 
 
-inline json serializeTokenInfo(const TokenInfo& tokenInfo) {
+inline json serializeTokenInfo(const Kiwi& kiwi, const TokenInfo& tokenInfo) {
     return {
         { "str", utf16To8(tokenInfo.str) },
         { "position", tokenInfo.position },
@@ -140,28 +140,29 @@ inline json serializeTokenInfo(const TokenInfo& tokenInfo) {
         { "typoFormId", tokenInfo.typoFormId },
         { "pairedToken", tokenInfo.pairedToken },
         { "subSentPosition", tokenInfo.subSentPosition },
+        { "morphId", kiwi.morphToId(tokenInfo.morph) },
     };
 }
 
-inline json serializeTokenInfoVec(const std::vector<TokenInfo>& tokenInfoVec) {
+inline json serializeTokenInfoVec(const Kiwi& kiwi, const std::vector<TokenInfo>& tokenInfoVec) {
     json result = json::array();
     for (const TokenInfo& tokenInfo : tokenInfoVec) {
-        result.push_back(serializeTokenInfo(tokenInfo));
+        result.push_back(serializeTokenInfo(kiwi, tokenInfo));
     }
     return result;
 }
 
-inline json serializeTokenResult(const TokenResult& tokenResult) {
+inline json serializeTokenResult(const Kiwi& kiwi, const TokenResult& tokenResult) {
     return {
-        { "tokens", serializeTokenInfoVec(tokenResult.first) },
+        { "tokens", serializeTokenInfoVec(kiwi, tokenResult.first) },
         { "score", tokenResult.second },
     };
 }
 
-inline json serializeTokenResultVec(const std::vector<TokenResult>& tokenResultVec) {
+inline json serializeTokenResultVec(const Kiwi& kiwi, const std::vector<TokenResult>& tokenResultVec) {
     json result = json::array();
     for (const TokenResult& tokenResult : tokenResultVec) {
-        result.push_back(serializeTokenResult(tokenResult));
+        result.push_back(serializeTokenResult(kiwi, tokenResult));
     }
     return result;
 }
@@ -243,7 +244,7 @@ json kiwiAnalyze(Kiwi& kiwi, const json& args) {
     
     const TokenResult tokenResult = kiwi.analyze(str, (Match)matchOptions, blockListArg.setPtr(), pretokenized);
 
-    return serializeTokenResult(tokenResult);
+    return serializeTokenResult(kiwi, tokenResult);
 }
 
 json kiwiAnalyzeTopN(Kiwi& kiwi, const json& args) {
@@ -255,7 +256,7 @@ json kiwiAnalyzeTopN(Kiwi& kiwi, const json& args) {
 
     const std::vector<TokenResult> tokenResults = kiwi.analyze(str, topN, matchOptions, blockListArg.setPtr(), pretokenized);
 
-    return serializeTokenResultVec(tokenResults);
+    return serializeTokenResultVec(kiwi, tokenResults);
 }
 
 json kiwiTokenize(Kiwi& kiwi, const json& args) {
@@ -266,7 +267,7 @@ json kiwiTokenize(Kiwi& kiwi, const json& args) {
     
     const TokenResult tokenResult = kiwi.analyze(str, (Match)matchOptions, blockListArg.setPtr(), pretokenized);
 
-    return serializeTokenInfoVec(tokenResult.first);
+    return serializeTokenInfoVec(kiwi, tokenResult.first);
 }
 
 json kiwiTokenizeTopN(Kiwi& kiwi, const json& args) {
@@ -280,7 +281,7 @@ json kiwiTokenizeTopN(Kiwi& kiwi, const json& args) {
 
     json result = json::array();
     for (const TokenResult& tokenResult : tokenResults) {
-        result.push_back(serializeTokenInfoVec(tokenResult.first));
+        result.push_back(serializeTokenInfoVec(kiwi, tokenResult.first));
     }
 
     return result;
@@ -304,7 +305,7 @@ json kiwiSplitIntoSents(Kiwi& kiwi, const json& args) {
     
     return {
         { "spans", spans },
-        { "tokenResult", withTokenResult ? serializeTokenResult(tokenResult) : nullptr },
+        { "tokenResult", withTokenResult ? serializeTokenResult(kiwi, tokenResult) : nullptr },
     };
 }
 
