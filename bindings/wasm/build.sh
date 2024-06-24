@@ -27,7 +27,7 @@ else
     CORE_COUNT=1
 fi
 
-# Build the wasm module
+# Build the wasm module and read the project version
 mkdir -p build
 cd build
 emcmake cmake \
@@ -40,16 +40,22 @@ emcmake cmake \
     -DKIWI_BUILD_MODEL_BUILDER=OFF \
     $REPO_ROOT_DIR
 make -j $CORE_COUNT
+PROJECT_VERSION=$(grep -m 1 CMAKE_PROJECT_VERSION:STATIC CMakeCache.txt | cut -d'=' -f2)
+if [ -z "$PROJECT_VERSION" ]; then
+    echo "Failed to read project version from CMakeCache.txt"
+    exit 1
+fi
 cd ..
 
 # Copy the generated files to the package
 cp build/bindings/wasm/kiwi-wasm.js package/src/build/kiwi-wasm.js
 cp build/bindings/wasm/kiwi-wasm.wasm package/dist/kiwi-wasm.wasm
 
-# Build typescript wrapper package
+# Build typescript wrapper package and update the version
 cd package
 npm install
 npm run build
+npm version --no-git-tag-version --allow-same-version $PROJECT_VERSION
 cd ..
 
 # Build the demo package if --demo or --demo-dev is passed
