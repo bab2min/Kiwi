@@ -30,6 +30,41 @@ export interface UserWord {
     origWord?: string;
 };
 
+export interface PreanalyzedToken {
+    /**
+     * Form of the token.
+     */
+    form: string;
+    /**
+     * Part-of-speech tag of the token.
+     */
+    tag: string;
+    /**
+     * Start position of the token in the preanalyzed word. If omitted, all token positions are automatically calculated.
+     */
+    start?: number;
+    /**
+     * Ebd position of the token in the preanalyzed word. If omitted, all token positions are automatically calculated.
+     */
+    end?: number;
+}
+
+export interface PreanalyzedWord {
+    /**
+     * Form to add.
+     */
+    form: string;
+    /**
+     * The result of the morphological analysis of form.
+     */
+    analyzed: PreanalyzedToken[];
+    /**
+     * The weighted score of the morpheme sequence to add.
+     * If there are multiple morpheme combinations that match the form, the word with the higher score will be prioritized.
+     */
+    score?: number;
+}
+
 export interface TypoDefinition {
     /**
      * Source strings
@@ -99,6 +134,10 @@ export interface BuildArgs {
      * Additional user words to load.
      */
     userWords?: UserWord[];
+    /**
+     * Preanalyzed words to load.
+     */
+    preanalyzedWords?: PreanalyzedWord[];
     /**
      * Specifies the language model to use for morphological analysis. Defaults to 'knlm'.
      * - `knlm`: Fast and can model the relationships between morphemes within a short distance (usually two or three) with high accuracy. However, it has the limitation that it cannot take into account the relationships between morphemes over a long distance.

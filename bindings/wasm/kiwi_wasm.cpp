@@ -229,8 +229,36 @@ json build(const json& args) {
         }
     }
 
-    const auto typos = buildArgs.value("typos", json(nullptr));
+    const auto preanalyzedWords = buildArgs.value("preanalyzedWords", json::array());
+    for (const auto& preanalyzedWord : preanalyzedWords) {
+        const std::string form8 = preanalyzedWord["form"];
+        const std::u16string form = utf8To16(form8);
+        const float score = preanalyzedWord.value("score", 0.0f);
 
+        std::vector<std::pair<std::u16string, POSTag>> analyzed;
+        std::vector<std::pair<size_t, size_t>> positions;
+
+        for (const auto& analyzedToken : preanalyzedWord["analyzed"]) {
+            const std::string form8 = analyzedToken["form"];
+            const std::u16string form = utf8To16(form8);
+
+            const std::string tag8 = analyzedToken["tag"];
+            const std::u16string tag16 = utf8To16(tag8);
+            const POSTag tag = toPOSTag(tag16);
+
+            analyzed.push_back({ form, tag });
+
+            if (analyzedToken.contains("start") && analyzedToken.contains("end")) {
+                const size_t start = analyzedToken["start"];
+                const size_t end = analyzedToken["end"];
+                positions.push_back({ start, end });
+            }
+        }
+
+        builder.addPreAnalyzedWord(form, analyzed, positions, score);
+    }
+
+    const auto typos = buildArgs.value("typos", json(nullptr));
     const float typoCostThreshold = buildArgs.value("typoCostThreshold", 2.5f);
 
     if (typos.is_null()) {
