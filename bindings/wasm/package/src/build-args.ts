@@ -30,6 +30,38 @@ export interface UserWord {
     origWord?: string;
 };
 
+export interface TypoDefinition {
+    /**
+     * Source strings
+     */
+    orig: string[];
+    /**
+     * The typos to be replaced
+     */
+    error: string[];
+    /**
+     * Replacement cost. Defaults to 1.
+     */
+    cost?: number;
+    /**
+     * Conditions under which typos can be replaced.
+     * One of `none`, `any` (after any letter), `vowel` (after a vowel), or `applosive` (after an applosive).
+     * Defaults to `none` when omitted.
+     */
+    condition?: "none" | "any" | "vowel" | "applosive";
+}
+
+export interface TypoTransformer {
+    /**
+     * A list of {@link TypoDefinition} that define typo generation rules.
+     */
+    defs: TypoDefinition[];
+    /**
+     * The cost of continual typos. Defaults to 1.
+     */
+    continualTypoCost?: number;
+}
+
 export interface BuildArgs {
     /**
      * The model files to load. Required.
@@ -74,9 +106,11 @@ export interface BuildArgs {
      */
     modelType?: 'knlm' | 'sbg';
     /**
-     * The typo information to use for correction. Defaults to none, which disables typo correction.
+     * The typo information to use for correction.
+     * Can be one of the built in `none`, `basic`, `continual`, `basicWithContinual` typo sets, or a custom {@link TypoTransformer}.
+     * Defaults to `none`, which disables typo correction.
      */
-    typos?: 'basic' | 'continual' | 'basic_with_continual';
+    typos?: 'none' | 'basic' | 'continual' | 'basicWithContinual' | TypoTransformer;
     /**
      * The maximum typo cost to consider when correcting typos. Typos beyond this cost will not be explored. Defaults to 2.5.
      */

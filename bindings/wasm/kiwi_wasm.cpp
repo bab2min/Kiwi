@@ -231,9 +231,12 @@ json build(const json& args) {
 
     const auto typos = buildArgs.value("typos", json(nullptr));
 
-    DefaultTypoSet typoSet = DefaultTypoSet::withoutTypo;
+    const float typoCostThreshold = buildArgs.value("typoCostThreshold", 2.5f);
 
-    if (typos.is_string()) {
+    if (typos.is_null()) {
+        instances.emplace(id, builder.build(DefaultTypoSet::withoutTypo, typoCostThreshold));
+    } else if (typos.is_string()) {
+        DefaultTypoSet typoSet = DefaultTypoSet::withoutTypo;
         const std::string typosStr = typos.get<std::string>();
 
         if (typosStr == "basic") {
@@ -242,14 +245,39 @@ json build(const json& args) {
             typoSet = DefaultTypoSet::continualTypoSet;
         } else if (typosStr == "basicWithContinual") {
             typoSet = DefaultTypoSet::basicTypoSetWithContinual;
-        } else {
-            throw std::runtime_error("Invalid typo set: " + typosStr);
         }
+
+        instances.emplace(id, builder.build(typoSet, typoCostThreshold));
+    } else {
+        TypoTransformer typoTransformer;
+
+        for (const auto& def : typos.value("defs", json::array())) {
+            const float cost = def.value("cost", 1.0f);
+            
+            CondVowel condVowel = CondVowel::none;
+            const std::string condVowelStr = def.value("condVowel", "none");
+
+            if (condVowelStr == "any") {
+                condVowel = CondVowel::any;
+            } else if (condVowelStr == "vowel") {
+                condVowel = CondVowel::vowel;
+            } else if (condVowelStr == "applosive") {
+                condVowel = CondVowel::applosive;
+            }
+
+            for (const auto& orig8 : def["orig"]) {
+                const auto orig16 = utf8To16(orig8);
+                for (const auto& error8 : def["error"]) {
+                    typoTransformer.addTypo(orig16, utf8To16(error8), cost, condVowel);
+                }
+            }
+        }
+
+        const float continualTypoCost = typos.value("continualTypoCost", 1.0f);
+        typoTransformer.setContinualTypoCost(continualTypoCost);
+
+        instances.emplace(id, builder.build(typoTransformer, typoCostThreshold));
     }
-
-    const float typoCostThreshold = buildArgs.value("typoCostThreshold", 2.5f);
-
-    instances.emplace(id, builder.build(typoSet, typoCostThreshold));
 
     return id;
 }
