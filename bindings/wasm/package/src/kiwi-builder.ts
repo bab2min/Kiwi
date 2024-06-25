@@ -120,4 +120,12 @@ export class KiwiBuilder {
             },
         }) as Kiwi;
     }
+
+    /**
+     * Get the version of the Kiwi wasm module.
+     * @returns The version of the Kiwi wasm module.
+     */
+    version(): string {
+        return this.api.cmd({ method: 'version', args: [] }) as string;
+    }
 }
