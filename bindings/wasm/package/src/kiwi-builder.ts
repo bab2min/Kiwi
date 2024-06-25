@@ -92,6 +92,11 @@ export class KiwiBuilder {
             modelPath: loadResult.modelPath,
         };
         apiBuildArgs.modelFiles = undefined;
+        if (apiBuildArgs.userDicts) {
+            apiBuildArgs.userDicts = apiBuildArgs.userDicts.map(
+                (path) => loadResult.modelPath + '/' + path
+            );
+        }
 
         const id = this.api.cmd({
             method: 'build',

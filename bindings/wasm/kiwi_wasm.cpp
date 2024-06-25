@@ -195,12 +195,39 @@ json build(const json& args) {
         buildOptions |= BuildOption::loadMultiDict;
     }
 
-    const KiwiBuilder builder = KiwiBuilder{
+    KiwiBuilder builder = KiwiBuilder{
         modelPath,
         numThreads,
         buildOptions,
         useSBG,
     };
+
+    const auto userDicts = buildArgs.value("userDicts", json::array());
+    for (const auto& pathJson : userDicts) {
+        const std::string path = pathJson;
+        builder.loadDictionary(path);
+    }
+
+    const auto userWords = buildArgs.value("userWords", json::array());
+    for (const auto& word : userWords) {
+        const std::string word8 = word["word"];
+        const std::u16string word16 = utf8To16(word8);
+
+        const std::string tag8 = word.value("tag", "NNG");
+        const std::u16string tag16 = utf8To16(tag8);
+        const POSTag tag = toPOSTag(tag16);
+
+        const float score = word.value("score", 0.0f);
+
+        if (word.contains("origWord")) {
+            const std::string origWord8 = word["origWord"];
+            const std::u16string origWord16 = utf8To16(origWord8);
+
+            builder.addWord(word16, tag, score, origWord16);
+        } else {
+            builder.addWord(word16, tag, score);
+        }
+    }
 
     const auto typos = buildArgs.value("typos", json(nullptr));
 

@@ -4,6 +4,32 @@
  */
 export type ModelFiles = { [name: string]: ArrayBufferView | string };
 
+/**
+ * A single user word to add.
+ */
+export interface UserWord {
+    /**
+     * The word to add.
+     */
+    word: string;
+    /**
+     * Part-of-speech tag. Defaults to 'NNP'.
+     */
+    tag?: string;
+    /**
+     * The weighted score of the morpheme to add.
+     * If there are multiple morpheme combinations that match the form,the word with the higher score will be prioritized.
+     * Defaults to 0.
+     */
+    score?: number;
+    /**
+     * The original morpheme of the morpheme to be added.
+     * If the morpheme to be added is a variant of a particular morpheme, the original morpheme can be passed as this argument.
+     * If it is not present, it can be omitted.
+     */
+    origWord?: string;
+};
+
 export interface BuildArgs {
     /**
      * The model files to load. Required.
@@ -33,6 +59,14 @@ export interface BuildArgs {
      * Defaults to `true`.
      */
     loadMultiDict?: boolean;
+    /**
+     * Additional user dictionaries to load. Used files must appear in the `modelFiles` object.
+     */
+    userDicts?: string[];
+    /**
+     * Additional user words to load.
+     */
+    userWords?: UserWord[];
     /**
      * Specifies the language model to use for morphological analysis. Defaults to 'knlm'.
      * - `knlm`: Fast and can model the relationships between morphemes within a short distance (usually two or three) with high accuracy. However, it has the limitation that it cannot take into account the relationships between morphemes over a long distance.
