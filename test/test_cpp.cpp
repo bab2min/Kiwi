@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 #include <kiwi/Kiwi.h>
-#include <kiwi/HSDataset.h>
+#include <kiwi/Dataset.h>
 #include "common.h"
 
 class TestInitializer

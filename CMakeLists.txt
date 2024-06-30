@@ -48,7 +48,7 @@ set ( CORE_SRCS
   src/Form.cpp
   src/FeatureTestor.cpp
   src/FileUtils.cpp
-  src/HSDataset.cpp
+  src/Dataset.cpp
   src/Joiner.cpp
   src/Kiwi.cpp
   src/KiwiBuilder.cpp

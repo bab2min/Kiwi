@@ -1,4 +1,4 @@
-#include <kiwi/HSDataset.h>
+#include <kiwi/Dataset.h>
 #include "RaggedVector.hpp"
 
 using namespace kiwi;
