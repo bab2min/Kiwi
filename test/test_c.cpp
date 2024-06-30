@@ -390,3 +390,10 @@ TEST(KiwiC, Pretokenized)
 		EXPECT_EQ(kiwi_pt_close(pretokenized), 0);
 	}
 }
+
+TEST(KiwiC, ScriptName)
+{
+	EXPECT_STREQ(kiwi_get_script_name(0), "Unknown");
+	EXPECT_STREQ(kiwi_get_script_name(1), "Latin");
+	EXPECT_STREQ(kiwi_get_script_name(30), "Hangul");
+}
