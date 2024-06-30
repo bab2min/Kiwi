@@ -1695,7 +1695,7 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 	ret.morphemes.reserve(morphemes.size() + combinedMorphemes.size());
 	ret.combiningRule = combiningRule;
 	ret.integrateAllomorph = !!(options & BuildOption::integrateAllomorph);
-	if (numThreads >= 1)
+	if (numThreads > 1)
 	{
 		ret.pool = make_unique<utils::ThreadPool>(numThreads);
 	}

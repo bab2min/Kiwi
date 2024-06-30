@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>Kiwi Demo</title>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400&display=swap"
+            rel="stylesheet"
+        />
+
+        <link rel="stylesheet" href="./src/style.css" />
+
+        <script src="./src/index.ts" type="module" defer></script>
+    </head>
+
+    <body>
+        <div class="title-wrap">
+            <img src="./public/logo.png" alt="Kiwi Logo" class="logo" />
+            <div id="version">Loading...</div>
+        </div>
+
+        <input
+            id="input"
+            type="text"
+            value="프랑스의 세계적인 의상 디자이너 엠마누엘 웅가로가 실내 장식용 직물 디자이너로 나섰다."
+            hidden
+        />
+
+        <table id="result" hidden>
+            <tr>
+                <th>시작 위치</th>
+                <th>길이</th>
+                <th>표면</th>
+                <th>형태</th>
+                <th>품사 태그</th>
+                <th>점수</th>
+            </tr>
+        </table>
+    </body>
+</html>

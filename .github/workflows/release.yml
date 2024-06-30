@@ -326,3 +326,21 @@ jobs:
         asset_path: artifacts/kiwi-java.jar
         asset_name: kiwi-java-${{ steps.get_release.outputs.tag_name }}-lnx-${{ matrix.arch }}.jar
         asset_content_type: application/octet-stream
+
+  build-emscripten:
+    name: Emscripten
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+        lfs: true
+    - uses: mymindstorm/setup-emsdk@v14
+    - name: Build
+      run: |
+        cd bindings/wasm
+        ./build.sh
+    - uses: JS-DevTools/npm-publish@v3
+      with:
+        token: ${{ secrets.NPM_TOKEN }}
+        package: bindings/wasm/package

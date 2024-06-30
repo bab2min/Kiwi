@@ -1,0 +1,32 @@
+{
+    "name": "kiwi-nlp",
+    "version": "0.17.1",
+    "description": "Kiwi, Korean Intelligent Word Identifier",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/bab2min/Kiwi.git"
+    },
+    "main": "dist/index.js",
+    "files": [
+        "dist"
+    ],
+    "keywords": [
+        "korean",
+        "nlp",
+        "tokenizer"
+    ],
+    "author": "bab2min <bab2min@gmail.com> (lab.bab2min.pe.kr)",
+    "license": "LGPL-2.1-or-later",
+    "bugs": {
+        "url": "https://github.com/bab2min/Kiwi/issues"
+    },
+    "homepage": "https://lab.bab2min.pe.kr/kiwi",
+    "devDependencies": {
+        "typedoc": "^0.26.2",
+        "typescript": "^5.4.5"
+    },
+    "scripts": {
+        "build": "tsc",
+        "doc": "typedoc --out doc src"
+    }
+}

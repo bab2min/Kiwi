@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+        "module": "ES6",
+        "target": "ES2017",
+        "allowJs": true,
+        "declaration": true,
+        "outDir": "./dist"
+    },
+    "include": ["src/**/*"],
+}

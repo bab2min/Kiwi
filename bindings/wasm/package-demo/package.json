@@ -1,0 +1,19 @@
+{
+    "name": "package-demo",
+    "private": true,
+    "version": "0.0.0",
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "tsc && vite build",
+        "preview": "vite preview"
+    },
+    "dependencies": {
+        "kiwi-nlp": "file:../package",
+        "vite-plugin-static-copy": "^1.0.5"
+    },
+    "devDependencies": {
+        "typescript": "^5.2.2",
+        "vite": "^5.2.0"
+    }
+}
