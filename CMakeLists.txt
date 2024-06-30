@@ -56,6 +56,7 @@ set ( CORE_SRCS
   src/PatternMatcher.cpp
   src/search.cpp
   src/ScriptType.cpp
+  src/SubstringExtractor.cpp
   src/SwTokenizer.cpp
   src/TagUtils.cpp
   src/TypoTransformer.cpp

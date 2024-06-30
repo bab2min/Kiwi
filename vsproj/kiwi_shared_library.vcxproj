@@ -42,6 +42,7 @@
     <ClInclude Include="..\include\kiwi\PatternMatcher.h" />
     <ClInclude Include="..\include\kiwi\ScriptType.h" />
     <ClInclude Include="..\include\kiwi\SkipBigramModel.h" />
+    <ClInclude Include="..\include\kiwi\SubstringExtractor.h" />
     <ClInclude Include="..\include\kiwi\TagUtils.h" />
     <ClInclude Include="..\include\kiwi\TemplateUtils.hpp" />
     <ClInclude Include="..\include\kiwi\ThreadPool.h" />
@@ -119,6 +120,7 @@
     <ClCompile Include="..\src\FileUtils.cpp" />
     <ClCompile Include="..\src\Joiner.cpp" />
     <ClCompile Include="..\src\search.cpp" />
+    <ClCompile Include="..\src\SubstringExtractor.cpp" />
     <ClCompile Include="..\src\TagUtils.cpp" />
     <ClCompile Include="..\src\ScriptType.cpp" />
     <ClCompile Include="..\src\SwTokenizer.cpp" />
