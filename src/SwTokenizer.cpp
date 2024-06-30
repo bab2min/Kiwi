@@ -89,6 +89,7 @@ namespace kiwi
 		case POSTag::np:
 		case POSTag::nr:
 		case POSTag::xr:
+		case POSTag::xpn:
 			return POSTag::nng;
 		case POSTag::vv:
 		case POSTag::va:
@@ -195,7 +196,7 @@ namespace kiwi
 		return utf8To16(str);
 	}
 
-	template<class Fn>
+	template<class Fn, typename enable_if<is_convertible<Fn, function<void(char32_t)>>::value, int>::type = 0>
 	void foreachU32Chr(U16StringView s, Fn&& fn)
 	{
 		for (size_t i = 0; i < s.size(); ++i)
@@ -208,6 +209,23 @@ namespace kiwi
 			else
 			{
 				fn(s[i]);
+			}
+		}
+	}
+
+	template<class Fn, typename enable_if<is_convertible<Fn, function<void(char32_t, size_t, size_t)>>::value, int>::type = 0>
+	void foreachU32Chr(U16StringView s, Fn&& fn)
+	{
+		for (size_t i = 0; i < s.size(); ++i)
+		{
+			if (isHighSurrogate(s[i]))
+			{
+				fn(mergeSurrogate(s[i], s[i + 1]), i, i + 2);
+				++i;
+			}
+			else
+			{
+				fn(s[i], i, i + 1);
 			}
 		}
 	}
@@ -319,7 +337,7 @@ namespace kiwi
 				{
 					auto tokenId = v - 1;
 					auto& p = vocabs[tokenId];
-					if (p.length == i + 1)
+					if (p.internalLength == i + 1)
 					{
 						if (p.flags != SwTokenFlag::glue)
 						{
@@ -329,7 +347,7 @@ namespace kiwi
 					}
 					else
 					{
-						auto& l = pathes[i - p.length];
+						auto& l = pathes[i - p.internalLength];
 						if (!l.first.empty() && (
 							!(p.flags == SwTokenFlag::none && !config.useGlueToken)
 							|| p.flags == SwTokenFlag::glue
@@ -337,13 +355,13 @@ namespace kiwi
 							))
 						{
 							cands.emplace_back(l);
-							if (generateOffset) candsEndPtr.emplace_back(pathesEndPtr[i - p.length]);
+							if (generateOffset) candsEndPtr.emplace_back(pathesEndPtr[i - p.internalLength]);
 
-							if (p.flags == SwTokenFlag::none)
+							if (p.flags == SwTokenFlag::none && p.pos == POSTag::unknown)
 							{
 								cands.back().first.emplace_back(glueTokenId);
 								cands.back().second += tokenLProbs[glueTokenId];
-								if (generateOffset) candsEndPtr.back().emplace_back(i - p.length + 1);
+								if (generateOffset) candsEndPtr.back().emplace_back(i - p.internalLength + 1);
 							}
 							cands.back().first.emplace_back(tokenId);
 							cands.back().second += tokenLProbs[tokenId];
@@ -361,8 +379,8 @@ namespace kiwi
 						{
 							auto tokenId = v - 1;
 							auto& p = vocabs[tokenId];
-							if (p.length > i) continue;
-							auto& l = pathes[i - p.length];
+							if (p.internalLength > i) continue;
+							auto& l = pathes[i - p.internalLength];
 							if (!l.first.empty() && (
 								!(p.flags == SwTokenFlag::none && !config.useGlueToken)
 								|| p.flags == SwTokenFlag::glue
@@ -370,12 +388,12 @@ namespace kiwi
 								))
 							{
 								cands.emplace_back(l);
-								if (generateOffset) candsEndPtr.emplace_back(pathesEndPtr[i - p.length]);
+								if (generateOffset) candsEndPtr.emplace_back(pathesEndPtr[i - p.internalLength]);
 								if (p.flags == SwTokenFlag::none)
 								{
 									cands.back().first.emplace_back(glueTokenId);
 									cands.back().second += tokenLProbs[glueTokenId];
-									if (generateOffset) candsEndPtr.back().emplace_back(i - p.length + 1);
+									if (generateOffset) candsEndPtr.back().emplace_back(i - p.internalLength + 1);
 								}
 								cands.back().first.emplace_back(tokenId);
 								cands.back().second += tokenLProbs[tokenId];
@@ -681,6 +699,68 @@ namespace kiwi
 		utf8To16IgnoringErrors(str, ret);
 		return ret;
 	}
+
+	/**
+	* @brief Convert a unicode character (U+0000 - U+10FFFF) or a morpheme id ( >= 0x80000000) 
+	*		 into ChrMorphCode for efficient memory usage.
+	*        ChrMorphCode is assigned as follows:
+	* 
+	*        0x00000000 ~ 0x0000DFFF: unicode character (U+0000 - U+DFFF)
+	*	     0x0000E000 ~ 0x0000FFFF: morpheme id (0x0000 - 0x1FFF)
+	*        0x00010000 ~ 0x000FFFFF: unicode character (U+10000 - U+FFFFF)
+	*	     0x00100000 ~ 0x00101FFF: unicode character (U+E000 - U+FFFF)
+	*        0x00102000 ~ 0x0010FFFF: morpheme id (0x2000 - 0xFFFF)
+	* 
+	*        unicode character in U+100000 - U+10FFFF is ignored and converted to 0.
+	*/
+	inline char32_t toChrMorphCode(char32_t c)
+	{
+		if (c < 0xE000) return c;
+		if (c < 0x10000) return 0x100000 + c - 0xE000;
+		if (c < 0x100000) return c;
+		if (c < 0x80000000) return 0;
+		if (c < 0x80002000) return c - 0x80000000 + 0xE000;
+		return c - 0x80000000 + 0x100000;
+	}
+
+	inline char32_t fromChrMorphCode(char32_t c)
+	{
+		if (c < 0xE000) return c;
+		if (c < 0x10000) return c - 0xE000 + 0x80000000;
+		if (c < 0x100000) return c;
+		if (c < 0x102000) return c - 0x100000 + 0xE000;
+		return c - 0x100000 + 0x80000000;
+	}
+
+	template<class OutTy>
+	inline OutTy toChrMorphCode(char32_t chr, OutTy out)
+	{
+		auto d = decomposeSurrogate(toChrMorphCode(chr));
+		*out++ = d[0];
+		if (d[1]) *out++ = d[1];
+		return out;
+	}
+
+	template<class InTy, class OutTy>
+	inline OutTy toChrMorphCode(InTy first, InTy last, OutTy out)
+	{
+		static_assert(is_same<char16_t, 
+			typename remove_const<typename remove_reference<decltype(*first)>::type>::type
+		>::value, "input must be an iterator for char16_t.");
+		while (first != last)
+		{
+			auto i = *first++;
+			if (isHighSurrogate(i))
+			{
+				out = toChrMorphCode(mergeSurrogate(i, *first++), out);
+			}
+			else
+			{
+				out = toChrMorphCode(i, out);
+			}
+		}
+		return out;
+	}
 }
 
 SwTokenizerBuilder::SwTokenizerBuilder(const Kiwi& _kiwi, const SwTokenizerConfig& _config)
@@ -725,15 +805,142 @@ SwTokenizer SwTokenizerBuilder::build() const
 		ret.byteFallbackChrs.resize(256);
 	}
 
+	const bool hasMultiMorph = any_of(tokens.begin(), tokens.end(), [](const SwTokenizerBuilder::Token& t) { return t.flags == SwTokenFlag::multimorph; });
+	ret.multiMorphMode = hasMultiMorph;
+
+	UnorderedMap<u16string, size_t> morphToCode;
+	if (hasMultiMorph)
+	{
+		for (auto& t : tokens)
+		{
+			if (t.flags != SwTokenFlag::none) continue;
+			if (t.pos == POSTag::unknown) continue;
+			const size_t tokenId = &t - tokens.data();
+			const auto u16form = utf8To16(t.form);
+			auto flat = u16form;
+			flat.push_back(u'/');
+			flat += utf8To16(string((config.simpleTag ? tagToReprStr : tagToString)(t.pos)));
+			const size_t morphCode = morphToCode.size();
+			if (!morphToCode.emplace(flat, morphCode).second)
+			{
+				throw SwTokenizerException{ "duplicated token: " + t.form + "/" + tagToString(t.pos) };
+			}
+			
+			const auto rtag = toReprTag(t.pos);
+
+			matchedMorphs.clear();
+			kiwi->findMorpheme(matchedMorphs, u16form, config.simpleTag ? POSTag::unknown : t.pos);
+			if (matchedMorphs.empty())
+			{
+				throw SwTokenizerException{ "no morpheme found for token: " + t.form + "/" + tagToString(t.pos) };
+			}
+			bool inserted = false;
+			const size_t code = ret.codeToMorph.size();
+			for (auto m : matchedMorphs)
+			{
+				if (config.simpleTag && toReprTag(m->tag) != rtag) continue;
+				if (joinHangul(m->getForm()) != u16form) continue;
+				ret.morphToCode.emplace(kiwi->morphToId(m), code);
+				if (!inserted)
+				{
+					ret.codeToMorph.emplace_back(kiwi->morphToId(m));
+					inserted = true;
+				}
+			}
+		}
+
+		for (auto& t : tokens)
+		{
+			if (t.flags != SwTokenFlag::multimorph) continue;
+			const auto morphs = split(t.form, ' ');
+			for (auto& morph : morphs)
+			{
+				const size_t morphCode = morphToCode.size();
+				if (!morphToCode.emplace(utf8To16(morph), morphCode).second)
+				{
+					continue;
+				}
+				const auto formTag = split(morph, '/');
+				if (formTag.size() != 2)
+				{
+					throw SwTokenizerException{ "wrong multimorph: " + t.form };
+				}
+				const auto u16form = utf8To16(formTag[0]);
+				const auto rtag = reprStrToTag(formTag[1].to_string());
+
+				matchedMorphs.clear();
+				kiwi->findMorpheme(matchedMorphs, u16form, config.simpleTag ? POSTag::unknown : t.pos);
+				if (matchedMorphs.empty())
+				{
+					throw SwTokenizerException{ "no morpheme found for token: " + t.form + "/" + tagToString(t.pos) };
+				}
+				bool inserted = false;
+				const size_t code = ret.codeToMorph.size();
+				for (auto m : matchedMorphs)
+				{
+					if (config.simpleTag && toReprTag(m->tag) != rtag) continue;
+					if (joinHangul(m->getForm()) != u16form) continue;
+					ret.morphToCode.emplace(kiwi->morphToId(m), code);
+					if (!inserted)
+					{
+						ret.codeToMorph.emplace_back(kiwi->morphToId(m));
+						inserted = true;
+					}
+				}
+			}
+		}
+	}
+
 	for (auto& t : tokens)
 	{
-		size_t tokenId = &t - tokens.data();
+		const size_t tokenId = &t - tokens.data();
 		auto u16form = utf8To16(t.form);
+		u16string internalForm;
+		if (hasMultiMorph)
+		{
+			if (t.flags == SwTokenFlag::multimorph)
+			{
+				auto morphs = split(u16form, u' ');
+				for (auto& morph : morphs)
+				{
+					auto it = morphToCode.find(morph.to_string());
+					if (it == morphToCode.end())
+					{
+						throw SwTokenizerException{ "unknown multimorph: " + utf16To8(u16form)};
+					}
+					toChrMorphCode(it->second + 0x80000000, back_inserter(internalForm));
+				}
+			}
+			else if (t.flags == SwTokenFlag::none && t.pos != POSTag::unknown)
+			{
+				auto morph = u16form;
+				morph.push_back(u'/');
+				morph += utf8To16(string{ (config.simpleTag ? tagToReprStr : tagToString)(t.pos) });
+				auto it = morphToCode.find(morph);
+				if (it == morphToCode.end())
+				{
+					throw SwTokenizerException{ "unknown morph: " + utf16To8(morph) };
+				}
+				toChrMorphCode(it->second + 0x80000000, back_inserter(internalForm));
+			}
+			else
+			{
+				toChrMorphCode(u16form.begin(), u16form.end(), back_inserter(internalForm));
+			}
+		}
 		vocab.vocabStrPool += u16form;
 		vocab.vocabStrPool.push_back('\0');
 		vocab.vocabs.emplace_back((const char16_t*)offset, u16form.size(), t.pos, t.flags);
 		ret.tokenLProbs.emplace_back(t.lprob);
 		offset += u16form.size() + 1;
+		if (hasMultiMorph && internalForm != u16form)
+		{
+			vocab.vocabStrPool += internalForm;
+			vocab.vocabStrPool.push_back('\0');
+			vocab.vocabs.back().internalFormOffset = u16form.size() + 1;
+			vocab.vocabs.back().internalLength = internalForm.size();
+			offset += internalForm.size() + 1;
+		}
 
 		if (t.pos == POSTag::unknown)
 		{
@@ -849,16 +1056,34 @@ SwTokenizer SwTokenizerBuilder::build() const
 		}
 	}
 	
-	for (auto& t : tokens)
+	if (hasMultiMorph)
 	{
-		size_t tokenId = &t - tokens.data();
-		if (t.pos != POSTag::unknown) continue;
-		if (t.flags != SwTokenFlag::none) continue;
-		auto& v = vocab.vocabs[tokenId];
-		auto node = trie.build(v.form, v.form + v.length, tokenId + 1);
-		if (node->val != tokenId + 1)
+		for (auto& t : tokens)
 		{
-			ret.tokenFallbacks[node->val - 1] = tokenId;
+			size_t tokenId = &t - tokens.data();
+			if (t.flags == SwTokenFlag::special || t.flags == SwTokenFlag::glue || t.flags == SwTokenFlag::byte) continue;
+
+			auto& v = vocab.vocabs[tokenId];
+			auto node = trie.build(v.internalForm(), v.internalForm() + v.internalLength, tokenId + 1);
+			if (node->val != tokenId + 1)
+			{
+				ret.tokenFallbacks[node->val - 1] = tokenId;
+			}
+		}
+	}
+	else
+	{
+		for (auto& t : tokens)
+		{
+			size_t tokenId = &t - tokens.data();
+			if (t.pos != POSTag::unknown) continue;
+			if (t.flags != SwTokenFlag::none) continue;
+			auto& v = vocab.vocabs[tokenId];
+			auto node = trie.build(v.form, v.form + v.length, tokenId + 1);
+			if (node->val != tokenId + 1)
+			{
+				ret.tokenFallbacks[node->val - 1] = tokenId;
+			}
 		}
 	}
 
@@ -895,6 +1120,7 @@ SwTokenizer SwTokenizerBuilder::build() const
 		auto morph = kiwi->idToMorph(i);
 		if (!morph->kform || morph->kform->size() <= 1) continue;
 		if (i < ret.morphToSw.size() && ret.morphToSw[i] != -1) continue;
+
 		if (config.splitEomi && isEClass(morph->tag))
 		{
 			auto& f = morph->getForm();
@@ -905,24 +1131,59 @@ SwTokenizer SwTokenizerBuilder::build() const
 				foundMorphs.clear();
 				auto prefix = joinHangul(f.substr(0, f.size() - p.first.size()));
 				kiwi->findMorpheme(foundMorphs, prefix);
-
+				const Morpheme* foundMorph = nullptr;
 				for (auto m : foundMorphs)
 				{
 					if (toReprTag(morph->tag, config.simpleTag) == toReprTag(m->tag, config.simpleTag))
 					{
-						auto j = kiwi->morphToId(m);
-						if (j < ret.morphToSw.size() && ret.morphToSw[j] != -1)
+						foundMorph = m;
+						break;
+					}
+				}
+
+				if (!foundMorph) continue;
+				if (hasMultiMorph)
+				{
+					Vector<uint32_t> tokenized;
+					Vector<uint32_t> boundaries;
+					auto u16form = joinHangul(foundMorph->getForm());
+					u16form.push_back(u'/');
+					u16form += utf8To16(string{ (config.simpleTag ? tagToReprStr : tagToString)(foundMorph->tag) });
+					auto it = morphToCode.find(u16form);
+					if (it == morphToCode.end())
+					{
+						foreachU32Chr(joinHangul(foundMorph->getForm()), [&](char32_t c)
 						{
-							ret.splitCands.emplace(i, SwTokenizer::SplittedWord{ 
-								Vector<uint32_t>{ ret.morphToSw[j], p.second },
-								Vector<uint32_t>{ (uint32_t)(f.size() - p.first.size()), (uint32_t)f.size() }
+							tokenized.emplace_back(toChrMorphCode(c));
+						});
+					}
+					else
+					{
+						tokenized.emplace_back(toChrMorphCode(it->second + 0x80000000));
+					}
+					u16form = joinHangul(p.first);
+					u16form.push_back(u'/');
+					u16form += utf8To16(string{ (config.simpleTag ? tagToReprStr : tagToString)(POSTag::jx) });
+					it = morphToCode.find(u16form);
+					tokenized.emplace_back(toChrMorphCode(it->second + 0x80000000));
+					ret.splitCands.emplace(i, SwTokenizer::SplittedWord{
+						move(tokenized),
+						move(boundaries)
+					});
+				}
+				else
+				{
+					auto j = kiwi->morphToId(foundMorph);
+					if (j < ret.morphToSw.size() && ret.morphToSw[j] != -1)
+					{
+						ret.splitCands.emplace(i, SwTokenizer::SplittedWord{
+							Vector<uint32_t>{ ret.morphToSw[j], p.second },
+							Vector<uint32_t>{ (uint32_t)(f.size() - p.first.size()), (uint32_t)f.size() }
 							});
-							goto endSplitEomi;
-						}
+						break;
 					}
 				}
 			}
-		endSplitEomi:;
 		}
 		else if (config.splitVerb && isVerbClass(morph->tag) && !morph->complex)
 		{
@@ -930,19 +1191,79 @@ SwTokenizer SwTokenizerBuilder::build() const
 			if (!suffix) continue;
 			auto prefix = morph->kform->substr(0, morph->kform->size() - suffix->kform->size());
 			buf.clear();
-			vector<pair<uint32_t, uint32_t>> offsets;
-			ret.tokenizeSubword(joinHangul(prefix), true, buf, &offsets);
 			Vector<uint32_t> tokenized;
 			Vector<uint32_t> boundaries;
-			tokenized.insert(tokenized.end(), buf.begin(), buf.end());
-			tokenized.emplace_back(ret.morphToSw[kiwi->morphToId(suffix)]);
-			for (auto& p : offsets) boundaries.emplace_back(p.second);
-			boundaries.emplace_back(morph->kform->size());
+			if (hasMultiMorph)
+			{
+				foreachU32Chr(joinHangul(prefix), [&](char32_t c)
+				{
+					tokenized.emplace_back(toChrMorphCode(c));
+				});
+				auto u16form = joinHangul(suffix->getForm());
+				u16form.push_back(u'/');
+				u16form += utf8To16(string{ (config.simpleTag ? tagToReprStr : tagToString)(suffix->tag) });
+				auto it = morphToCode.find(u16form);
+				if (it == morphToCode.end())
+				{
+					foreachU32Chr(joinHangul(suffix->getForm()), [&](char32_t c)
+					{
+						tokenized.emplace_back(toChrMorphCode(c));
+					});
+				}
+				else
+				{
+					tokenized.emplace_back(toChrMorphCode(it->second + 0x80000000));
+					//boundaries.emplace_back(morph->chunks.getSecond(j).second);
+				}
+			}
+			else
+			{
+				vector<pair<uint32_t, uint32_t>> offsets;
+				ret.tokenizeSubword(joinHangul(prefix), true, buf, &offsets);
+				tokenized.insert(tokenized.end(), buf.begin(), buf.end());
+				tokenized.emplace_back(ret.morphToSw[kiwi->morphToId(suffix)]);
+				for (auto& p : offsets) boundaries.emplace_back(p.second);
+				boundaries.emplace_back(morph->kform->size());
+			}
 			ret.splitCands.emplace(i, SwTokenizer::SplittedWord{
 				move(tokenized),
 				move(boundaries)
 			});
 		}
+		else if (config.splitVerb && isVerbClass(morph->tag) && hasMultiMorph)
+		{
+			auto suffix = findVerbalSuffix(morph, verbalSuffices);
+			if (!suffix) continue;
+			Vector<uint32_t> tokenized;
+			Vector<uint32_t> boundaries;
+			for (size_t j = 0; j < morph->chunks.size(); ++j)
+			{
+				auto submorph = morph->chunks[j];
+				
+				auto u16form = joinHangul(submorph->getForm());
+				u16form.push_back(u'/');
+				u16form += utf8To16(string{ (config.simpleTag ? tagToReprStr : tagToString)(submorph->tag) });
+				auto it = morphToCode.find(u16form);
+				if (it == morphToCode.end())
+				{
+					foreachU32Chr(joinHangul(submorph->getForm()), [&](char32_t c)
+					{
+						tokenized.emplace_back(toChrMorphCode(c));
+					});
+				}
+				else
+				{
+					tokenized.emplace_back(toChrMorphCode(it->second + 0x80000000));
+					//boundaries.emplace_back(morph->chunks.getSecond(j).second);
+				}
+			}
+			ret.splitCands.emplace(i, SwTokenizer::SplittedWord{
+				move(tokenized),
+				move(boundaries)
+			});
+		endSplitComplexVerb:;
+		}
+
 	}
 
 	return ret;
@@ -1053,6 +1374,19 @@ bool SwTokenizer::tokenizeSubword(U16StringView str,
 
 template<class TokenIt>
 void SwTokenizer::encode(vector<uint32_t>& ret, TokenIt first, TokenIt last, vector<pair<uint32_t, uint32_t>>* offset) const
+{
+	if (multiMorphMode)
+	{
+		return encodeWithMultiMorph(ret, first, last, offset);
+	}
+	else
+	{
+		return encodeWithoutMultiMorph(ret, first, last, offset);
+	}
+}
+
+template<class TokenIt>
+void SwTokenizer::encodeWithoutMultiMorph(vector<uint32_t>& ret, TokenIt first, TokenIt last, vector<pair<uint32_t, uint32_t>>* offset) const
 {
 	Vector<uint8_t> codaBias;
 	auto* baseMorph = kiwi->idToMorph(0);
@@ -1221,6 +1555,117 @@ void SwTokenizer::encode(vector<uint32_t>& ret, TokenIt first, TokenIt last, vec
 			if (config.doLowercase) toLower16(t.str.begin(), t.str.end(), back_inserter(tokenBuf));
 			else tokenBuf += t.str;
 			lastPosition = t.position + t.length;
+		}
+	}
+	pushSubwords();
+}
+
+template<class TokenIt>
+void SwTokenizer::encodeWithMultiMorph(vector<uint32_t>& ret, TokenIt first, TokenIt last, vector<pair<uint32_t, uint32_t>>* offset) const
+{
+	Vector<uint8_t> codaBias;
+	auto* baseMorph = kiwi->idToMorph(0);
+	size_t startPosition = 0, lastPosition = -1;
+	size_t offsetStart = offset ? offset->size() : 0;
+	u16string tokenBuf;
+	bool spacePrefix = true;
+	const auto pushSubwords = [&]()
+	{
+		if (tokenBuf.empty()) return;
+		auto success = tokenizeSubword(tokenBuf, spacePrefix, ret, offset, startPosition);
+		tokenBuf.clear();
+	};
+
+	size_t lastLineNumber = 0;
+	for (; first != last; ++first)
+	{
+		decltype(*first) t = *first;
+		size_t id = t.morph ? (t.morph - baseMorph) : -1;
+
+		if (config.newlineToken && t.lineNumber > lastLineNumber)
+		{
+			pushSubwords();
+
+			uint32_t prevPosition = 0;
+			if (offset && !offset->empty())
+			{
+				prevPosition = offset->back().second;
+			}
+
+			for (size_t i = lastLineNumber; i < t.lineNumber; ++i)
+			{
+				ret.emplace_back(byteFallbackChrs['\n']);
+				if (offset) offset->emplace_back(prevPosition, t.position);
+			}
+			//startPosition = -1;
+			lastLineNumber = t.lineNumber;
+		}
+
+		auto codeIt = morphToCode.find(id);
+		if (codeIt != morphToCode.end())
+		{
+			if (t.position > lastPosition)
+			{
+				pushSubwords();
+				startPosition = t.position;
+				spacePrefix = false;
+			}
+			// Morpheme
+			toChrMorphCode(codeIt->second + 0x80000000, back_inserter(tokenBuf));
+			lastPosition = t.position + t.length;
+			continue;
+		}
+
+		auto candIt = splitCands.find(id);
+		if (candIt != splitCands.end())
+		{
+			if (t.position > lastPosition)
+			{
+				pushSubwords();
+				startPosition = t.position;
+				spacePrefix = false;
+			}
+			for (auto c : candIt->second.tokenIds)
+			{
+				auto d = decomposeSurrogate(c);
+				tokenBuf.push_back(d[0]);
+				if (d[1]) tokenBuf.push_back(d[1]);
+			}
+			lastPosition = t.position + t.length;
+			continue;
+		}
+		
+		if (lastPosition == t.position)
+		{
+			// Same word
+			if (config.doLowercase)
+			{
+
+			}
+			else
+			{
+				toChrMorphCode(t.str.begin(), t.str.end(), back_inserter(tokenBuf));
+			}
+			lastPosition = t.position + t.length;
+			continue;
+		}
+		
+
+		{
+			// New word
+			pushSubwords();
+			if (config.doLowercase)
+			{
+
+			}
+			else
+			{
+				toChrMorphCode(t.str.begin(), t.str.end(), back_inserter(tokenBuf));
+			}
+			startPosition = t.position;
+			spacePrefix = lastPosition < startPosition || lastPosition == -1;
+			lastPosition = t.position + t.length;
+			continue;
 		}
 	}
 	pushSubwords();
@@ -1440,17 +1885,43 @@ string SwTokenizer::decode(It first, It last, bool ignoreErrors) const
 			}
 		}
 
-		// to do: detect the best tag from ambiguous tags in simpleTag mode
-		// morpheme
-		if (id < swToMorph.size() && swToMorph[id] != -1)
+		if (multiMorphMode)
 		{
-			joiner.add(swToMorph[id]);
-			continue;
+			if ((v.flags == SwTokenFlag::none && v.pos != POSTag::unknown) || v.flags == SwTokenFlag::multimorph)
+			{
+				foreachU32Chr(U16StringView{ v.internalForm(), v.internalLength }, [&](char32_t c)
+				{
+					c = fromChrMorphCode(c);
+					if (c >= 0x80000000)
+					{
+						joiner.add(codeToMorph[c - 0x80000000]);
+					}
+					else
+					{
+						throw SwTokenizerException{ "Invalid morpheme code: " + utf16To8(v.form) };
+					}
+				});
+				continue;
+			}
+
+			// subword
+			bool insertSpace = v.flags == SwTokenFlag::none || v.flags == SwTokenFlag::special;
+			joiner.add(U16StringView{ v.form, v.length }, POSTag::unknown, insertSpace ? cmb::Space::insert_space : cmb::Space::none);
 		}
-		
-		// subword
-		bool insertSpace = v.flags == SwTokenFlag::none || v.flags == SwTokenFlag::special;
-		joiner.add(U16StringView{ v.form, v.length }, POSTag::unknown, insertSpace ? cmb::Space::insert_space : cmb::Space::none);
+		else
+		{
+			// to do: detect the best tag from ambiguous tags in simpleTag mode
+			// morpheme
+			if (id < swToMorph.size() && swToMorph[id] != -1)
+			{
+				joiner.add(swToMorph[id]);
+				continue;
+			}
+
+			// subword
+			bool insertSpace = v.flags == SwTokenFlag::none || v.flags == SwTokenFlag::special;
+			joiner.add(U16StringView{ v.form, v.length }, POSTag::unknown, insertSpace ? cmb::Space::insert_space : cmb::Space::none);
+		}
 	}
 
 	if (!u8bytes.empty())
@@ -1568,7 +2039,41 @@ ostream& SwTokenizer::save(ostream& ostr) const
 	{
 		auto& v = vocab.vocabs[i];
 		jvocab[i] = { nullptr, nullptr, nullptr, nullptr };
-		jvocab[i][0] = utf16To8(U16StringView{ v.form, v.length });
+		if (multiMorphMode)
+		{
+			string form;
+			bool lastSpace = false;
+			foreachU32Chr(U16StringView{ v.form, v.length }, [&](char32_t c)
+			{
+				c = fromChrMorphCode(c);
+				if (c < 0x80000000)
+				{
+					char32To8(c, back_inserter(form));
+				}
+				else
+				{
+					if (v.pos != POSTag::unknown && lastSpace)
+					{
+						throw SwTokenizerException{ "Invalid vocab item at id=" + to_string(i)};
+					}
+					const auto* morph = kiwi->idToMorph(codeToMorph[c - 0x80000000]);
+					form += utf16To8(joinHangul(morph->getForm()));
+					if (v.pos == POSTag::unknown)
+					{
+						form.push_back(u'/');
+						form += (config.simpleTag ? tagToReprStr : tagToString)(morph->tag);
+					}
+					form.push_back(u' ');
+					lastSpace = true;
+				}
+			});
+			if (lastSpace) form.pop_back();
+			jvocab[i][0] = form;
+		}
+		else
+		{
+			jvocab[i][0] = utf16To8(U16StringView{ v.form, v.length });
+		}
 		if (v.pos != POSTag::unknown) jvocab[i][1] = (config.simpleTag ? tagToReprStr : tagToString)(v.pos);
 		switch (v.flags)
 		{
@@ -1588,6 +2093,9 @@ ostream& SwTokenizer::save(ostream& ostr) const
 			break;
 		case SwTokenFlag::byte:
 			jvocab[i][2] = "byte";
+			break;
+		case SwTokenFlag::multimorph:
+			jvocab[i][2] = "multimorph";
 			break;
 		}
 		jvocab[i][3] = tokenLProbs[i];
@@ -1647,6 +2155,8 @@ SwTokenizer SwTokenizer::load(const Kiwi& kiwi, istream& istr)
 		else if (v[2].get<string>() == "special") flag = SwTokenFlag::special;
 		else if (v[2].get<string>() == "glue") flag = SwTokenFlag::glue;
 		else if (v[2].get<string>() == "byte") flag = SwTokenFlag::byte;
+		else if (v[2].get<string>() == "multimorph") flag = SwTokenFlag::multimorph;
+		else throw SwTokenizerException{ "Invalid vocab item " + v.dump() };
 		float lprob = v[3].get<float>();
 		builder.addToken(form, tag, flag, lprob);
 	}
@@ -1672,9 +2182,7 @@ UnigramSwTrainer& UnigramSwTrainer::operator=(const UnigramSwTrainer&) = default
 UnigramSwTrainer& UnigramSwTrainer::operator=(UnigramSwTrainer&&) = default;
 
 void UnigramSwTrainer::addWord(const u16string& str, const Vector<const Morpheme*>& morphs, const Vector<size_t>& boundaries, bool spacePrefix)
-{
-	auto& rsents = sents.get();
-	
+{	
 	const auto emplace = [&](size_t s, size_t e, bool spacePrefix, const Morpheme* morph = nullptr, const Vector<size_t>* bounds = nullptr)
 	{
 		u16string sstr;
@@ -1684,7 +2192,6 @@ void UnigramSwTrainer::addWord(const u16string& str, const Vector<const Morpheme
 		auto wid = wordMap.emplace(sstr, wordMap.size()).first->second;
 		wordCnts.resize(max(wordCnts.size(), wid + 1));
 		wordCnts[wid]++;
-		rsents.add_data(-(int32_t)wid - 1);
 		if (morph && !wordSuffix.count(wid))
 		{
 			WordCand wc{ nullptr };
@@ -1739,8 +2246,11 @@ void UnigramSwTrainer::addWord(const u16string& str, const Vector<const Morpheme
 		for (size_t i = 0; i < str.size(); ++i)
 		{
 			bool surrogate = isHighSurrogate(str[i]);
-			if (config.splitChinese
-				&& isChineseChr(surrogate ? mergeSurrogate(str[i], str[i + 1]) : str[i]))
+			auto c32 = surrogate ? mergeSurrogate(str[i], str[i + 1]) : str[i];
+			if (trainConfig.maxMultiMorphSize > 1) c32 = fromChrMorphCode(c32);
+
+			if (c32 < 0x80000000 && config.splitChinese
+				&& isChineseChr(c32))
 			{
 				if (start < i) emplace(start, i, start == 0 ? spacePrefix : false);
 				emplace(i, i + (surrogate ? 2 : 1), true);
@@ -1749,12 +2259,13 @@ void UnigramSwTrainer::addWord(const u16string& str, const Vector<const Morpheme
 				continue;
 			}
 
-			if (config.splitPunct
-				&& isTagForPunct(identifySpecialChr(str[i])))
+			if (c32 < 0x80000000 && config.splitPunct
+				&& isTagForPunct(identifySpecialChr(c32)))
 			{
 				if (start < i) emplace(start, i, start == 0 ? spacePrefix : false);
-				emplace(i, i + 1, true);
-				start = i + 1;
+				emplace(i, i + (surrogate ? 2 : 1), true);
+				start = i + (surrogate ? 2 : 1);
+				i += (surrogate ? 1 : 0);
 				continue;
 			}
 		}
@@ -1768,11 +2279,344 @@ const Morpheme* UnigramSwTrainer::toReprMorph(const Morpheme* morph)
 	return reprMorphMap.emplace(key, morph).first->second;
 }
 
+char32_t UnigramSwTrainer::morphToChrMorphCode(const Morpheme* morph)
+{
+	auto key = make_pair(*morph->kform, config.simpleTag ? toReprTag(morph->tag) : morph->tag);
+	auto res = morphCodeMap.emplace(key, morphCodeMap.size());
+	if (res.second)
+	{
+		invMorphCodeMap.emplace_back(morph);
+	}
+	return (char32_t)(res.first->second + 0x80000000);
+}
+
+void UnigramSwTrainer::addKiwiResult(vector<TokenInfo>& tokens,
+	const Vector<const Morpheme*>& verbalSuffices,
+	const Vector<const Morpheme*>& eomiSuffices,
+	const UnorderedMap<Vector<const Morpheme*>, const Morpheme*>& complexMorphemes)
+{
+	if (tokens.empty()) return;
+	if (trainConfig.maxMultiMorphSize <= 1)
+	{
+		return addKiwiResultWithoutMultiMorph(tokens, verbalSuffices, eomiSuffices, complexMorphemes);
+	}
+	else
+	{
+		return addKiwiResultWithMultiMorph(tokens, verbalSuffices, eomiSuffices, complexMorphemes);
+	}
+}
+
+void UnigramSwTrainer::addKiwiResultWithoutMultiMorph(vector<TokenInfo>& tokens,
+	const Vector<const Morpheme*>& verbalSuffices,
+	const Vector<const Morpheme*>& eomiSuffices,
+	const UnorderedMap<Vector<const Morpheme*>, const Morpheme*>& complexMorphemes)
+{
+	uint32_t lastTokenEnd = -1;
+	u16string contToken;
+	Vector<const Morpheme*> contMorphs;
+	Vector<size_t> contBoundaries;
+	bool spacePrefix = false;
+	bool isPrevNumber = false;
+	for (auto& token : tokens)
+	{
+		if ((isTagForPrefix(token.tag) || !token.morph->kform || token.morph->kform->empty())
+			&& lastTokenEnd == token.position
+			&& !(trainConfig.preventMixedDigitTokens && token.tag == POSTag::sn)
+			&& !isPrevNumber)
+		{
+			if (contToken.empty())
+			{
+				spacePrefix = false;
+				if (config.splitPunct && isTagForPunct(token.tag)) spacePrefix = true;
+				if (config.splitChinese && token.tag == POSTag::sh) spacePrefix = true;
+			}
+			if (config.doLowercase) toLower16(token.str.begin(), token.str.end(), back_inserter(contToken));
+			else contToken += token.str;
+			contMorphs.emplace_back(token.morph);
+			contBoundaries.emplace_back(contToken.size());
+			lastTokenEnd = token.position + token.length;
+			continue;
+		}
+
+		if (!contToken.empty())
+		{
+			addWord(contToken, contMorphs, contBoundaries, spacePrefix);
+			contToken.clear();
+			contMorphs.clear();
+			contBoundaries.clear();
+			if (!(trainConfig.preventMixedDigitTokens && token.tag == POSTag::sn)
+				&& !isPrevNumber) lastTokenEnd = -1;
+		}
+
+		if (isTagForPrefix(token.tag) || !token.morph->kform || token.morph->kform->empty())
+		{
+			spacePrefix = lastTokenEnd != token.position && !isOldHangulCoda(token.str[0]) && !isOldHangulVowel(token.str[0]);
+			if (config.splitPunct && isTagForPunct(token.tag)) spacePrefix = true;
+			if (config.splitChinese && token.tag == POSTag::sh) spacePrefix = true;
+			if (config.doLowercase) toLower16(token.str.begin(), token.str.end(), back_inserter(contToken));
+			else contToken += token.str;
+			contMorphs.emplace_back(token.morph);
+			contBoundaries.emplace_back(contToken.size());
+			lastTokenEnd = token.position + token.length;
+			isPrevNumber = (trainConfig.preventMixedDigitTokens && token.tag == POSTag::sn);
+		}
+		else
+		{
+			const Morpheme* verbSuffix = nullptr;
+			auto eomiSuffix = findEomiSuffix(kiwi, token.morph, eomiSuffices);
+			if (config.splitVerb && token.morph->complex)
+			{
+				token.str.insert(token.str.begin(), u' ');
+				token.str.push_back(u'\x00'); // add suffix for distinguishing from normal words
+				auto wid = wordMap.emplace(token.str, wordMap.size()).first->second;
+				wordCnts.resize(max(wordCnts.size(), wid + 1));
+				wordCnts[wid]++;
+				if (!wordSuffix.count(wid))
+				{
+					Vector<const Morpheme*> submorphs{
+						token.morph->chunks.begin(),
+						token.morph->chunks.end()
+					};
+					Vector<int32_t> subids;
+					bool first = true;
+					for (auto m : submorphs)
+					{
+						if (isTagForPrefix(m->tag))
+						{
+							auto s = joinHangul(*m->kform);
+							if (first) s.insert(s.begin(), u' ');
+							auto wid = wordMap.emplace(move(s), wordMap.size()).first->second;
+							wordCnts.resize(max(wordCnts.size(), wid + 1));
+							subids.emplace_back(-(int32_t)wid - 1);
+						}
+						else
+						{
+							subids.emplace_back(kiwi->morphToId(toReprMorph(m)));
+						}
+						first = false;
+					}
+
+					WordCand wc{ toReprMorph(token.morph) };
+					auto& tokenizations = wc.tokenizations.get();
+					tokenizations.emplace_back();
+					tokenizations.insert_data(subids.begin(), subids.end());
+					for (size_t i = 1; i < submorphs.size() - 2; ++i)
+					{
+						auto it = complexMorphemes.find(Vector<const Morpheme*>{ submorphs.begin() + i, submorphs.end() });
+						if (it == complexMorphemes.end()) continue;
+						tokenizations.emplace_back();
+						tokenizations.insert_data(subids.begin(), subids.begin() + i);
+						tokenizations.add_data(kiwi->morphToId(toReprMorph(it->second)));
+					}
+					knownPrefixSize = std::max(knownPrefixSize, (size_t)*std::max_element(tokenizations.raw().begin(), tokenizations.raw().end()) + 1);
+					knownPrefixSize = std::max(knownPrefixSize, (size_t)kiwi->morphToId(wc.morph) + 1);
+					wordSuffix.emplace(wid, move(wc));
+				}
+			}
+			else if (config.splitVerb && (verbSuffix = findVerbalSuffix(token.morph, verbalSuffices)))
+			{
+				token.str.insert(token.str.begin(), u' ');
+				token.str.push_back(u'\x00'); // add suffix for distinguishing from normal words
+				auto wid = wordMap.emplace(token.str, wordMap.size()).first->second;
+				wordCnts.resize(max(wordCnts.size(), wid + 1));
+				wordCnts[wid]++;
+				WordCand wc{ toReprMorph(token.morph), toReprMorph(verbSuffix) };
+				knownPrefixSize = std::max(knownPrefixSize, (size_t)kiwi->morphToId(wc.suffix) + 1);
+				knownPrefixSize = std::max(knownPrefixSize, (size_t)kiwi->morphToId(wc.morph) + 1);
+				wordSuffix.emplace(wid, move(wc));
+			}
+			else if (config.splitEomi && eomiSuffix.first)
+			{
+				token.str.push_back(u'\x01'); // add suffix for distinguishing from normal words
+				auto wid = wordMap.emplace(token.str, wordMap.size()).first->second;
+				wordCnts.resize(max(wordCnts.size(), wid + 1));
+				wordCnts[wid]++;
+				WordCand wc{ toReprMorph(token.morph), toReprMorph(eomiSuffix.second) };
+				wc.baseEomi = toReprMorph(eomiSuffix.first);
+				knownPrefixSize = std::max(knownPrefixSize, (size_t)kiwi->morphToId(wc.suffix) + 1);
+				knownPrefixSize = std::max(knownPrefixSize, (size_t)kiwi->morphToId(wc.morph) + 1);
+				knownPrefixSize = std::max(knownPrefixSize, (size_t)kiwi->morphToId(wc.baseEomi) + 1);
+				wordSuffix.emplace(wid, move(wc));
+			}
+			else
+			{
+				auto morphId = kiwi->morphToId(toReprMorph(token.morph));
+				morphCnts.resize(max(morphCnts.size(), morphId + 1));
+				morphCnts[morphId]++;
+			}
+			lastTokenEnd = token.position + token.length;
+		}
+	}
+
+	if (!contToken.empty())
+	{
+		addWord(contToken, contMorphs, contBoundaries, spacePrefix);
+	}
+	else
+	{
+	}
+}
+
+void UnigramSwTrainer::addWord(const TokenInfo* first, const TokenInfo* last, bool spacePrefix)
+{
+	u16string converted;
+	Vector<size_t> boundaries;
+	POSTag prevTag = POSTag::unknown;
+	for (auto it = first; it != last; ++it)
+	{
+		auto& token = *it;
+		if (isTagForPrefix(token.tag) || !token.morph->kform || token.morph->kform->empty())
+		{
+			if (!converted.empty() && !isTagForPrefix(prevTag))
+			{
+				boundaries.emplace_back(converted.size());
+			}
+			toChrMorphCode(token.str.begin(), token.str.end(), back_inserter(converted));
+			boundaries.emplace_back(converted.size());
+		}
+		else
+		{
+			toChrMorphCode(morphToChrMorphCode(token.morph), back_inserter(converted));
+		}
+		prevTag = token.tag;
+	}
+	if (boundaries.empty() || boundaries.back() != converted.size())
+	{
+		boundaries.emplace_back(converted.size());
+	}
+
+	addWord(converted, {}, boundaries, isTagForPrefix(first->tag) ? spacePrefix : false);
+}
+
+void UnigramSwTrainer::addKiwiResultWithMultiMorph(vector<TokenInfo>& tokens,
+	const Vector<const Morpheme*>& verbalSuffices,
+	const Vector<const Morpheme*>& eomiSuffices,
+	const UnorderedMap<Vector<const Morpheme*>, const Morpheme*>& complexMorphemes)
+{
+	uint32_t lastWordPosition = -1;
+	size_t lastTokenIdx = 0;
+	bool spacePrefix = true;
+	POSTag prevTag = POSTag::unknown;
+	for (auto& token : tokens)
+	{
+		const bool splitTokens = (token.wordPosition != lastWordPosition)
+			|| (config.splitPunct && isTagForPunct(token.tag))
+			|| (config.splitChinese && token.tag == POSTag::sh);
+		const bool splitDigitTokens = trainConfig.preventMixedDigitTokens && ((token.tag == POSTag::sn) != (prevTag == POSTag::sn));
+		if (splitTokens || splitDigitTokens)
+		{
+			size_t curTokenIdx = &token - &tokens[0];
+			if (lastTokenIdx < curTokenIdx)
+			{
+				addWord(tokens.data() + lastTokenIdx, tokens.data() + curTokenIdx, spacePrefix);
+			}
+			spacePrefix = splitTokens;
+			lastTokenIdx = curTokenIdx;
+			lastWordPosition = token.wordPosition;
+		}
+		prevTag = token.tag;
+	}
+
+	if (lastTokenIdx < tokens.size())
+	{
+		addWord(tokens.data() + lastTokenIdx, tokens.data() + tokens.size(), spacePrefix);
+	}
+}
+
+void UnigramSwTrainer::initAltReprForChrMorphCode()
+{
+	if (trainConfig.maxMultiMorphSize <= 1)
+	{
+		return;
+	}
+
+	altReprForChrMorphCode.clear();
+
+	const auto* morphBase = kiwi->idToMorph(0);
+	Vector<const Morpheme*> verbalSuffices;
+	Vector<const Morpheme*> eomiSuffices;
+
+	if (config.splitVerb)
+	{
+		for (size_t i = 0; i < kiwi->getMorphemeSize(); ++i)
+		{
+			if (!isVerbClass(morphBase[i].tag)) continue;
+			if (morphBase[i].complex)
+			{
+				const auto code = morphToChrMorphCode(&morphBase[i]);
+				u16string altCode;
+				for (const auto* morph : morphBase[i].chunks)
+				{
+					if (isTagForPrefix(morph->tag))
+					{
+						const auto u16form = joinHangul(morph->getForm());
+						toChrMorphCode(u16form.begin(), u16form.end(), back_inserter(altCode));
+					}
+					else
+					{
+						toChrMorphCode(morphToChrMorphCode(morph), back_inserter(altCode));
+					}
+				}
+				altReprForChrMorphCode.emplace(code, altCode);
+			}
+			else if (morphBase[i].kform && !morphBase[i].kform->empty())
+			{
+				if (morphBase[i].tag == POSTag::vcp || *morphBase[i].kform == u"이") continue;
+				verbalSuffices.emplace_back(&morphBase[i]);
+			}
+		}
+
+		sort(verbalSuffices.begin(), verbalSuffices.end(), [&](const Morpheme* a, const Morpheme* b)
+		{
+			return a->kform->size() > b->kform->size();
+		});
+
+
+		for (const auto* verbMorph : verbalSuffices)
+		{
+			const auto* verbalSuffix = findVerbalSuffix(verbMorph, verbalSuffices);
+			if (!verbalSuffix) continue;
+			const auto code = morphToChrMorphCode(verbMorph);
+			u16string altCode;
+			const auto u16form = joinHangul(verbMorph->getForm().begin(), verbMorph->getForm().end() - verbalSuffix->getForm().size());
+			toChrMorphCode(u16form.begin(), u16form.end(), back_inserter(altCode));
+			toChrMorphCode(morphToChrMorphCode(verbalSuffix), back_inserter(altCode));
+			altReprForChrMorphCode.emplace(code, altCode);
+		}
+	}
+
+	if (config.splitEomi)
+	{
+		for (size_t i = 0; i < kiwi->getMorphemeSize(); ++i)
+		{
+			if (morphBase[i].tag != POSTag::jx
+				|| !morphBase[i].kform
+				|| morphBase[i].kform->empty()) continue;
+			if (morphBase[morphBase[i].lmMorphemeId].getForm() == u"이요"
+				&& morphBase[i].getForm()[0] != u'이')
+			{
+				eomiSuffices.emplace_back(morphBase + i);
+			}
+		}
+
+		for (size_t i = 0; i < kiwi->getMorphemeSize(); ++i)
+		{
+			const auto r = findEomiSuffix(kiwi, morphBase + i, eomiSuffices);
+			if (!r.first || !r.second) continue;
+			const auto code = toChrMorphCode(0x80000000 + i);
+			u16string altCode;
+			toChrMorphCode(morphToChrMorphCode(r.first), back_inserter(altCode));
+			toChrMorphCode(morphToChrMorphCode(r.second), back_inserter(altCode));
+			altReprForChrMorphCode.emplace(code, altCode);
+		}
+	}
+	
+}
+
 template<class Feeder>
 size_t UnigramSwTrainer::_addSentences(Feeder&& feeder)
 {
 	Deque<future<pair<TokenResult, u16string>>> futures;
-	auto& rsents = sents.get();
 	const auto* morphBase = kiwi->idToMorph(0);
 	Vector<const Morpheme*> verbalSuffices;
 	Vector<const Morpheme*> eomiSuffices;
@@ -1786,7 +2630,7 @@ size_t UnigramSwTrainer::_addSentences(Feeder&& feeder)
 			if (morphBase[i].complex)
 			{
 				complexMorphemes.emplace(
-					Vector<const Morpheme*>{ morphBase[i].chunks.begin(), morphBase[i].chunks.end() }, 
+					Vector<const Morpheme*>{ morphBase[i].chunks.begin(), morphBase[i].chunks.end() },
 					&morphBase[i]
 				);
 			}
@@ -1801,7 +2645,7 @@ size_t UnigramSwTrainer::_addSentences(Feeder&& feeder)
 			return a->kform->size() > b->kform->size();
 		});
 	}
-
+	
 	if (config.splitEomi)
 	{
 		// '~요' 및 그 이형태에 대해서만 분리한다
@@ -1818,158 +2662,6 @@ size_t UnigramSwTrainer::_addSentences(Feeder&& feeder)
 		}
 	}
 
-	const auto receiveResult = [&]()
-	{
-		auto res = futures.front().get();
-		futures.pop_front();
-		if (res.first.first.empty()) return;
-
-		uint32_t lastTokenEnd = -1;
-		u16string contToken;
-		Vector<const Morpheme*> contMorphs;
-		Vector<size_t> contBoundaries;
-		bool spacePrefix = false;
-		bool isPrevNumber = false;
-		rsents.emplace_back();
-		for (auto& token : res.first.first)
-		{
-			if ((isTagForPrefix(token.tag) || !token.morph->kform || token.morph->kform->empty()) 
-				&& lastTokenEnd == token.position
-				&& !(trainConfig.preventMixedDigitTokens && token.tag == POSTag::sn)
-				&& !isPrevNumber)
-			{
-				if (contToken.empty())
-				{
-					spacePrefix = false;
-					if (config.splitPunct && isTagForPunct(token.tag)) spacePrefix = true;
-					if (config.splitChinese && token.tag == POSTag::sh) spacePrefix = true;
-				}
-				if (config.doLowercase) toLower16(token.str.begin(), token.str.end(), back_inserter(contToken));
-				else contToken += token.str;
-				contMorphs.emplace_back(token.morph);
-				contBoundaries.emplace_back(contToken.size());
-				lastTokenEnd = token.position + token.length;
-				continue;
-			}
-
-			if (!contToken.empty())
-			{
-				addWord(contToken, contMorphs, contBoundaries, spacePrefix);
-				contToken.clear();
-				contMorphs.clear();
-				contBoundaries.clear();
-				if (!(trainConfig.preventMixedDigitTokens && token.tag == POSTag::sn)
-					&& !isPrevNumber) lastTokenEnd = -1;
-			}
-
-			if (isTagForPrefix(token.tag) || !token.morph->kform || token.morph->kform->empty())
-			{
-				spacePrefix = lastTokenEnd != token.position && !isOldHangulCoda(token.str[0]) && !isOldHangulVowel(token.str[0]);
-				if (config.splitPunct && isTagForPunct(token.tag)) spacePrefix = true;
-				if (config.splitChinese && token.tag == POSTag::sh) spacePrefix = true;
-				if (config.doLowercase) toLower16(token.str.begin(), token.str.end(), back_inserter(contToken));
-				else contToken += token.str;
-				contMorphs.emplace_back(token.morph);
-				contBoundaries.emplace_back(contToken.size());
-				lastTokenEnd = token.position + token.length;
-				isPrevNumber = (trainConfig.preventMixedDigitTokens && token.tag == POSTag::sn);
-			}
-			else
-			{
-				const Morpheme* verbSuffix = nullptr;
-				auto eomiSuffix = findEomiSuffix(kiwi, token.morph, eomiSuffices);
-				if (config.splitVerb && token.morph->complex)
-				{
-					token.str.insert(token.str.begin(), u' ');
-					token.str.push_back(u'\x00'); // add suffix for distinguishing from normal words
-					auto wid = wordMap.emplace(token.str, wordMap.size()).first->second;
-					wordCnts.resize(max(wordCnts.size(), wid + 1));
-					wordCnts[wid]++;
-					if (!wordSuffix.count(wid))
-					{
-						Vector<const Morpheme*> submorphs{
-							token.morph->chunks.begin(),
-							token.morph->chunks.end()
-						};
-						Vector<int32_t> subids;
-						bool first = true;
-						for (auto m : submorphs)
-						{
-							if (isTagForPrefix(m->tag))
-							{
-								auto s = joinHangul(*m->kform);
-								if (first) s.insert(s.begin(), u' ');
-								auto wid = wordMap.emplace(move(s), wordMap.size()).first->second;
-								wordCnts.resize(max(wordCnts.size(), wid + 1));
-								subids.emplace_back(-(int32_t)wid - 1);
-							}
-							else
-							{
-								subids.emplace_back(kiwi->morphToId(toReprMorph(m)));
-							}
-							first = false;
-						}
-
-						WordCand wc{ toReprMorph(token.morph) };
-						auto& tokenizations = wc.tokenizations.get();
-						tokenizations.emplace_back();
-						tokenizations.insert_data(subids.begin(), subids.end());
-						for (size_t i = 1; i < submorphs.size() - 2; ++i)
-						{
-							auto it = complexMorphemes.find(Vector<const Morpheme*>{ submorphs.begin() + i, submorphs.end() });
-							if (it == complexMorphemes.end()) continue;
-							tokenizations.emplace_back();
-							tokenizations.insert_data(subids.begin(), subids.begin() + i);
-							tokenizations.add_data(kiwi->morphToId(toReprMorph(it->second)));
-						}
-						knownPrefixSize = std::max(knownPrefixSize, (size_t)*std::max_element(tokenizations.raw().begin(), tokenizations.raw().end()) + 1);
-						knownPrefixSize = std::max(knownPrefixSize, (size_t)kiwi->morphToId(wc.morph) + 1);
-						wordSuffix.emplace(wid, move(wc));
-					}
-					rsents.add_data(-(int32_t)wid - 1);
-				}
-				else if (config.splitVerb && (verbSuffix = findVerbalSuffix(token.morph, verbalSuffices)))
-				{
-					token.str.insert(token.str.begin(), u' ');
-					token.str.push_back(u'\x00'); // add suffix for distinguishing from normal words
-					auto wid = wordMap.emplace(token.str, wordMap.size()).first->second;
-					wordCnts.resize(max(wordCnts.size(), wid + 1));
-					wordCnts[wid]++;
-					WordCand wc{ toReprMorph(token.morph), toReprMorph(verbSuffix) };
-					knownPrefixSize = std::max(knownPrefixSize, (size_t)kiwi->morphToId(wc.suffix) + 1);
-					knownPrefixSize = std::max(knownPrefixSize, (size_t)kiwi->morphToId(wc.morph) + 1);
-					wordSuffix.emplace(wid, move(wc));
-					rsents.add_data(-(int32_t)wid - 1);
-				}
-				else if (config.splitEomi && eomiSuffix.first)
-				{
-					token.str.push_back(u'\x01'); // add suffix for distinguishing from normal words
-					auto wid = wordMap.emplace(token.str, wordMap.size()).first->second;
-					wordCnts.resize(max(wordCnts.size(), wid + 1));
-					wordCnts[wid]++;
-					WordCand wc{ toReprMorph(token.morph), toReprMorph(eomiSuffix.second) };
-					wc.baseEomi = toReprMorph(eomiSuffix.first);
-					knownPrefixSize = std::max(knownPrefixSize, (size_t)kiwi->morphToId(wc.suffix) + 1);
-					knownPrefixSize = std::max(knownPrefixSize, (size_t)kiwi->morphToId(wc.morph) + 1);
-					knownPrefixSize = std::max(knownPrefixSize, (size_t)kiwi->morphToId(wc.baseEomi) + 1);
-					wordSuffix.emplace(wid, move(wc));
-					rsents.add_data(-(int32_t)wid - 1);
-				}
-				else
-				{
-					rsents.add_data(kiwi->morphToId(toReprMorph(token.morph)));
-				}
-				lastTokenEnd = token.position + token.length;
-			}
-		}
-		
-		if (!contToken.empty())
-		{
-			addWord(contToken, contMorphs, contBoundaries, spacePrefix);
-		}
-		addedSentences++;
-	};
-
 	while(1)
 	{
 		auto s = feeder();
@@ -1978,13 +2670,19 @@ size_t UnigramSwTrainer::_addSentences(Feeder&& feeder)
 		futures.emplace_back(kiwi->asyncAnalyzeEcho(move(s16), Match::normalizeCoda | Match::zCoda));
 		if (futures.size() > kiwi->getNumThreads() * 4 && !futures.empty())
 		{
-			receiveResult();
+			auto res = futures.front().get();
+			futures.pop_front();
+			addKiwiResult(res.first.first, verbalSuffices, eomiSuffices, complexMorphemes);
+			addedSentences++;
 		}
 	}
 
 	while (!futures.empty())
 	{
-		receiveResult();
+		auto res = futures.front().get();
+		futures.pop_front();
+		addKiwiResult(res.first.first, verbalSuffices, eomiSuffices, complexMorphemes);
+		addedSentences++;
 	}
 	return addedSentences;
 }
@@ -2001,21 +2699,13 @@ size_t UnigramSwTrainer::addSentences(const function<u16string()>& feeder)
 
 float UnigramSwTrainer::buildSubwordVocabs(const size_t minCnt, const size_t maxPrefixLength)
 {
-	auto& rawTokens = sents.get().raw();
-	int32_t minV = 0, maxV = 0;
-	for (auto v : rawTokens)
-	{
-		minV = min(v, minV);
-		maxV = max(v, maxV);
-	}
+	initAltReprForChrMorphCode();
 
-	knownPrefixSize = std::max((size_t)maxV + 1, knownPrefixSize);
+	knownPrefixSize = morphCnts.size();
 	tokenFreqs.clear();
-	tokenFreqs.resize((int64_t)knownPrefixSize - minV);
-	for (auto i : rawTokens)
-	{
-		tokenFreqs[i >= 0 ? i : (i + tokenFreqs.size())]++;
-	}
+	tokenFreqs.reserve(knownPrefixSize + wordCnts.size());
+	tokenFreqs.insert(tokenFreqs.end(), morphCnts.begin(), morphCnts.end());
+	tokenFreqs.insert(tokenFreqs.end(), wordCnts.rbegin(), wordCnts.rend());
 
 	u16string allTexts;
 	map<char32_t, uint32_t> chrCnts, prefixChrCnts;
@@ -2052,7 +2742,31 @@ float UnigramSwTrainer::buildSubwordVocabs(const size_t minCnt, const size_t max
 			}
 		}
 
-		chrsPreserved = getChrsPreserved(chrCnts, trainConfig.chrCoverage);
+		if (trainConfig.maxMultiMorphSize <= 1)
+		{
+			chrsPreserved = getChrsPreserved(chrCnts, trainConfig.chrCoverage);
+		}
+		else
+		{
+			map<char32_t, uint32_t> onlyChrCnts, onlyMorphCnt;
+			for (auto& p : chrCnts)
+			{
+				if (fromChrMorphCode(p.first) < 0x80000000)
+				{
+					onlyChrCnts[p.first] = p.second;
+				}
+				else
+				{
+					//onlyMorphCnt[p.first] = p.second;
+				}
+			}
+			chrsPreserved = getChrsPreserved(onlyChrCnts, trainConfig.chrCoverage);
+			/*auto morphPreserved = getChrsPreserved(onlyMorphCnt, trainConfig.chrCoverage);
+			for (auto& p : morphPreserved)
+			{
+				chrsPreserved.insert(p);
+			}*/
+		}
 	}
 
 	sais::FmIndex<char16_t> fi{ allTexts.data(), allTexts.size() };
@@ -2116,10 +2830,23 @@ float UnigramSwTrainer::buildSubwordVocabs(const size_t minCnt, const size_t max
 		}
 	}
 
+	if (!altReprForChrMorphCode.empty())
+	{
+		for (auto& p : altReprForChrMorphCode)
+		{
+			foreachU32Chr(p.second, [&](char32_t c)
+			{
+				chrCnts[c]++;
+			});
+		}
+	}
+
 	for (auto p : chrCnts)
 	{
 		auto c = p.first;
-		if (config.splitChinese && isChineseChr(c)) continue;
+		auto chr = trainConfig.maxMultiMorphSize <= 1 ? c : fromChrMorphCode(c);
+		if (config.splitChinese && chr < 0x80000000 && isChineseChr(chr)) continue;
+		if (config.splitPunct && chr < 0x80000000 && isTagForPunct(identifySpecialChr(chr))) continue;
 		if (c < 0x10000)
 		{
 			char16_t c16 = c;
@@ -2137,6 +2864,7 @@ float UnigramSwTrainer::buildSubwordVocabs(const size_t minCnt, const size_t max
 	for (auto p : prefixChrCnts)
 	{
 		auto c = p.first;
+		if (c >= 0x80000000) continue;
 		if (c < 0x10000)
 		{
 			char16_t c16 = c;
@@ -2166,6 +2894,24 @@ float UnigramSwTrainer::buildSubwordVocabs(const size_t minCnt, const size_t max
 			if (isLowSurrogate(s.front()) || isHighSurrogate(s.back())) return false;
 			if (count(s.begin(), s.end(), '\x00') || count(s.begin(), s.end(), '\x01') || count(s.begin() + 1, s.end(), u' ') || s.size() > maxPrefixLength) return false;
 			if (trainConfig.removeRepetitive && testRepetition(s.data() + (isSubword ? 0 : 1), s.size() - (isSubword ? 0 : 1))) return false;
+
+			if (trainConfig.maxMultiMorphSize > 1)
+			{
+				size_t chrCnt = 0, morphCnt = 0;
+				foreachU32Chr(s, [&](char32_t c)
+				{
+					c = fromChrMorphCode(c);
+					if (c < 0x80000000)
+					{
+						chrCnt++;
+					}
+					else
+					{
+						morphCnt++;
+					}
+				});
+				if (chrCnt > 0 && morphCnt > 0 || morphCnt > trainConfig.maxMultiMorphSize) return false;
+			}
 		
 			size_t cnt = t.back().second - t.back().first;
 			if (candCnts.size() <= realSize - 2) candCnts.resize(realSize - 1);
@@ -2268,6 +3014,10 @@ Vector<uint32_t> UnigramSwTrainer::tokenizeShort(U16StringView s, bool spacePref
 		while (!nnode)
 		{
 			node = node->fail();
+			if (!node)
+			{
+				throw runtime_error{ "invalid character" };
+			}
 			nnode = node->template nextOpt<ArchType::none>(chrTrie, s[i]);
 		}
 		size_t prefixId = nnode->val(chrTrie);
@@ -2539,7 +3289,6 @@ pair<Vector<uint32_t>, float> UnigramSwTrainer::tokenizeBest(const WordCand& m) 
 
 float UnigramSwTrainer::updateProb(bool init)
 {
-	auto& rawTokens = sents.get().raw();
 	prefixFreqs.clear();
 	prefixFreqs.resize(chrPrefix.size());
 	prefixLProbs.resize(chrPrefix.size());
@@ -2630,9 +3379,55 @@ void UnigramSwTrainer::updateTokenization()
 	utils::forEach(kiwi->getThreadPool(), wordMap, [&](size_t tid, const pair<const u16string, size_t>& p)
 	{
 		auto wordSuffixIt = wordSuffix.find(p.second);
+		Vector<u16string> altCands;
+		Vector<u32string> altCandsTest;
+		if (trainConfig.maxMultiMorphSize > 1)
+		{
+			foreachU32Chr(p.first, [&](char32_t c, size_t s, size_t e)
+			{
+				const auto it = altReprForChrMorphCode.find(c);
+				if (it == altReprForChrMorphCode.end()) return;
+				altCands.emplace_back(
+					p.first.substr(0, s) + it->second + p.first.substr(e)
+				);
+				altCandsTest.emplace_back();
+				foreachU32Chr(p.first.substr(0, s), [&](char32_t c)
+				{
+					altCandsTest.back().push_back(c);
+				});
+				foreachU32Chr(it->second, [&](char32_t c)
+				{
+					altCandsTest.back().push_back(c);
+				});
+				foreachU32Chr(p.first.substr(e), [&](char32_t c)
+				{
+					altCandsTest.back().push_back(c);
+				});
+			});
+		}
+
 		if (wordSuffixIt == wordSuffix.end())
 		{
-			wordBestTokenizations[p.second] = tokenizeBest(p.first).first;
+			if (altCands.empty())
+			{
+				wordBestTokenizations[p.second] = tokenizeBest(p.first).first;
+			}
+			else
+			{
+				float bestScore = -INFINITY;
+				auto r = tokenizeBest(p.first);
+				wordBestTokenizations[p.second] = move(r.first);
+				bestScore = r.second;
+				for (auto& s : altCands)
+				{
+					r = tokenizeBest(s);
+					if (r.second > bestScore)
+					{
+						wordBestTokenizations[p.second] = move(r.first);
+						bestScore = r.second;
+					}
+				}
+			}
 		}
 		else if (wordSuffixIt->second.hasBoundaries)
 		{
@@ -2718,24 +3513,90 @@ SwTokenizer UnigramSwTrainer::build() const
 		if (!p.empty()) builder.addToken(p, POSTag::unknown, SwTokenFlag::special, 0);
 	}
 
-	for (auto& p : sortedVocabs)
+	if (trainConfig.maxMultiMorphSize <= 1)
 	{
-		if (p.second < knownPrefixSize)
+		for (auto& p : sortedVocabs)
 		{
-			auto m = kiwi->idToMorph(p.second);
-			builder.addToken(utf16To8(joinHangul(m->getForm())), m->tag, SwTokenFlag::none, p.first);
+			if (p.second < knownPrefixSize)
+			{
+				auto m = kiwi->idToMorph(p.second);
+				builder.addToken(utf16To8(joinHangul(m->getForm())), m->tag, SwTokenFlag::none, p.first);
+			}
+			else if (config.useGlueToken && p.second == knownPrefixSize)
+			{
+				builder.addToken("", POSTag::unknown, SwTokenFlag::glue, p.first);
+			}
+			else if (chrPrefix[p.second][0] == u' ')
+			{
+				builder.addToken(utf16To8(chrPrefix[p.second].substr(1)), POSTag::unknown, SwTokenFlag::none, p.first);
+			}
+			else
+			{
+				builder.addToken(utf16To8(chrPrefix[p.second]), POSTag::unknown, SwTokenFlag::subword, p.first);
+			}
 		}
-		else if (config.useGlueToken && p.second == knownPrefixSize)
+	}
+	else
+	{
+		for (auto& p : sortedVocabs)
 		{
-			builder.addToken("", POSTag::unknown, SwTokenFlag::glue, p.first);
-		}
-		else if (chrPrefix[p.second][0] == u' ')
-		{
-			builder.addToken(utf16To8(chrPrefix[p.second].substr(1)), POSTag::unknown, SwTokenFlag::none, p.first);
-		}
-		else
-		{
-			builder.addToken(utf16To8(chrPrefix[p.second]), POSTag::unknown, SwTokenFlag::subword, p.first);
+			u16string token;
+			Vector<const Morpheme*> morphs;
+			foreachU32Chr(chrPrefix[p.second], [&](char32_t c)
+			{
+				c = fromChrMorphCode(c);
+				if (c < 0x80000000)
+				{
+					auto d = decomposeSurrogate(c);
+					token.push_back(d[0]);
+					if (d[1]) token.push_back(d[1]);
+				}
+				else
+				{
+					morphs.emplace_back(invMorphCodeMap[c - 0x80000000]);
+				}
+			});
+
+			if (config.useGlueToken && p.second == knownPrefixSize)
+			{
+				builder.addToken("", POSTag::unknown, SwTokenFlag::glue, p.first);
+			}
+			else if (morphs.empty())
+			{
+				if (token[0] == u' ')
+				{
+					builder.addToken(utf16To8(token.substr(1)), POSTag::unknown, SwTokenFlag::none, p.first);
+				}
+				else
+				{
+					builder.addToken(utf16To8(token), POSTag::unknown, SwTokenFlag::subword, p.first);
+				}
+			}
+			else if (token.empty())
+			{
+				if (morphs.size() == 1)
+				{
+					builder.addToken(utf16To8(joinHangul(morphs[0]->getForm())), morphs[0]->tag, SwTokenFlag::none, p.first);
+				}
+				else
+				{
+					string multi;
+					for (auto m : morphs)
+					{
+						multi += utf16To8(joinHangul(m->getForm()));
+						multi.push_back('/');
+						multi += (config.simpleTag ? tagToReprStr : tagToString)(m->tag);
+						multi.push_back(' ');
+					}
+					multi.pop_back();
+					builder.addToken(move(multi), POSTag::unknown, SwTokenFlag::multimorph, p.first);
+				}
+			}
+			else
+			{
+				// this should not happen
+				throw runtime_error{ "invalid tokenization" };
+			}
 		}
 	}
 

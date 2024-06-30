@@ -40,15 +40,22 @@ namespace kiwi
 	{
 		const char16_t* form = nullptr;
 		uint32_t length = 0;
+		uint32_t internalFormOffset = 0;
+		uint32_t internalLength = 0;
 		POSTag pos = POSTag::unknown;
 		SwTokenFlag flags = SwTokenFlag::none;
 		uint8_t byte = 0;
 
-		SwToken(const char16_t* _form = nullptr, size_t _length = 0,
-			POSTag _pos = POSTag::unknown, SwTokenFlag _flags = SwTokenFlag::none, uint8_t _byte = 0)
-			: form{ _form }, length{ (uint32_t)_length }, pos{ _pos }, flags{ _flags }, byte{ _byte }
+		SwToken(const char16_t* _form = nullptr, 
+			size_t _length = 0,
+			POSTag _pos = POSTag::unknown, 
+			SwTokenFlag _flags = SwTokenFlag::none, 
+			uint8_t _byte = 0)
+			: form{ _form }, length{ (uint32_t)_length }, internalLength{ (uint32_t)_length }, pos { _pos }, flags{ _flags }, byte{ _byte }
 		{
 		}
+
+		const char16_t* internalForm() const { return form + internalFormOffset; }
 	};
 
 	struct SwTokenizerConfig
@@ -58,6 +65,7 @@ namespace kiwi
 			unk, cls, sep, pad, mask, bos, eos, glue
 		};
 		std::array<std::string, eos + 1> specialTokens;
+		std::string additionalJson;
 		bool doLowercase = false;
 		bool splitChinese = true;
 		bool wholeWordUnk = false;
@@ -71,7 +79,7 @@ namespace kiwi
 		bool strict = false; // not implemented yet
 		bool fallbackHangul = true;
 		bool fallbackByte = false;
-		std::string additionalJson;
+		
 
 		SwTokenizerConfig()
 		{
@@ -98,7 +106,7 @@ namespace kiwi
 		bool reduceStrict = false;
 		bool removeRepetitive = true;
 		bool preventMixedDigitTokens = true;
-		bool allowMultiMorphTokens = false;
+		size_t maxMultiMorphSize = 0;
 	};
 
 	class SwTokenizer;
@@ -165,6 +173,7 @@ namespace kiwi
 		void* dfTokenizeSubword = nullptr;
 		void* dfTokenizeSubwordWithOffset = nullptr;
 		const Kiwi* kiwi = nullptr;
+		bool multiMorphMode = false;
 		SwTokenizerConfig config;
 		Vocab vocab;
 		utils::FrozenTrie<kchar_t, uint32_t> trie;
@@ -172,6 +181,8 @@ namespace kiwi
 		Vector<float> tokenLProbs;
 		Vector<uint32_t> morphToSw;
 		Vector<uint32_t> swToMorph;
+		Vector<uint32_t> codeToMorph;
+		UnorderedMap<uint32_t, uint32_t> morphToCode;
 		Vector<uint32_t> hangulFallbackChrs;
 		Vector<uint32_t> byteFallbackChrs;
 		std::array<size_t, SwTokenizerConfig::glue + 1> specialTokenIds = { { 0, } };
@@ -187,6 +198,12 @@ namespace kiwi
 
 		template<class TokenIt>
 		void encode(std::vector<uint32_t>& out, TokenIt first, TokenIt last, std::vector<std::pair<uint32_t, uint32_t>>* offset = nullptr) const;
+
+		template<class TokenIt>
+		void encodeWithoutMultiMorph(std::vector<uint32_t>& out, TokenIt first, TokenIt last, std::vector<std::pair<uint32_t, uint32_t>>* offset = nullptr) const;
+
+		template<class TokenIt>
+		void encodeWithMultiMorph(std::vector<uint32_t>& out, TokenIt first, TokenIt last, std::vector<std::pair<uint32_t, uint32_t>>* offset = nullptr) const;
 
 		template<class It>
 		std::string decode(It first, It last, bool ignoreErrors = true) const;
@@ -265,11 +282,13 @@ namespace kiwi
 
 		UnorderedMap<std::u16string, size_t> wordMap;
 		Vector<std::pair<const std::u16string, size_t>*> invWordMap;
-		Vector<size_t> wordCnts;
+		Vector<size_t> wordCnts, morphCnts;
 		UnorderedMap<size_t, WordCand> wordSuffix;
 		UnorderedMap<std::pair<KString, POSTag>, const Morpheme*> reprMorphMap;
-		HiddenMember<RaggedVector<int32_t>, sizeof(Vector<size_t>) * 2> sents;
+		UnorderedMap<std::pair<KString, POSTag>, size_t> morphCodeMap;
+		Vector<const Morpheme*> invMorphCodeMap;
 		Vector<size_t> tokenFreqs;
+		UnorderedMap<char32_t, std::u16string> altReprForChrMorphCode;
 
 		Vector<std::u16string> chrPrefix;
 		utils::FrozenTrie<char16_t, size_t> chrTrie;
@@ -280,9 +299,27 @@ namespace kiwi
 		Vector<PrefixAvailability> prefixAvailable;
 
 		void addWord(const std::u16string& s, const Vector<const Morpheme*>& morphs, const Vector<size_t>& boundaries, bool spacePrefix);
+		void addWord(const TokenInfo* first, const TokenInfo* last, bool spacePrefix);
+
+		void addKiwiResult(std::vector<TokenInfo>& tokens, 
+			const Vector<const Morpheme*>& verbalSuffices, 
+			const Vector<const Morpheme*>& eomiSuffices, 
+			const UnorderedMap<Vector<const Morpheme*>, const Morpheme*>& complexMorphemes);
+
+		void addKiwiResultWithoutMultiMorph(std::vector<TokenInfo>& tokens,
+			const Vector<const Morpheme*>& verbalSuffices,
+			const Vector<const Morpheme*>& eomiSuffices,
+			const UnorderedMap<Vector<const Morpheme*>, const Morpheme*>& complexMorphemes);
+
+		void addKiwiResultWithMultiMorph(std::vector<TokenInfo>& tokens,
+			const Vector<const Morpheme*>& verbalSuffices,
+			const Vector<const Morpheme*>& eomiSuffices,
+			const UnorderedMap<Vector<const Morpheme*>, const Morpheme*>& complexMorphemes);
 
 		template<class Feeder>
 		size_t _addSentences(Feeder&& feeder);
+
+		void initAltReprForChrMorphCode();
 
 		Vector<uint32_t> tokenizeShort(U16StringView s, bool spacePrefix = false) const;
 		Vector<uint32_t> tokenizeShort(U16StringView s, const Vector<int32_t>& boundaries) const;
@@ -290,6 +327,8 @@ namespace kiwi
 		std::pair<Vector<uint32_t>, float> tokenizeBest(const WordCand& m) const;
 
 		const Morpheme* toReprMorph(const Morpheme* m);
+
+		char32_t morphToChrMorphCode(const Morpheme* m);
 
 	public:
 		UnigramSwTrainer(const Kiwi& kiwi, const SwTokenizerConfig& config, const UnigramSwTrainerConfig& trainConfig);

@@ -161,6 +161,38 @@ namespace kiwi
 		return replace(s, nonstd::basic_string_view<BaseChr, Trait>{ from, fromSize - 1 }, nonstd::basic_string_view<BaseChr, Trait>{ to, toSize - 1 });
 	}
 	
+	template<class OutTy>
+	inline OutTy char32To8(char32_t c, OutTy out)
+	{
+		if (c < 0x80)
+		{
+			*out++ = (char)c;
+		}
+		else if (c < 0x800)
+		{
+			*out++ = (char)(0xC0 | (c >> 6));
+			*out++ = (char)(0x80 | (c & 0x3F));
+		}
+		else if (c < 0x10000)
+		{
+			*out++ = (char)(0xE0 | (c >> 12));
+			*out++ = (char)(0x80 | ((c >> 6) & 0x3F));
+			*out++ = (char)(0x80 | (c & 0x3F));
+		}
+		else if (c < 0x110000)
+		{
+			*out++ = (char)(0xF0 | (c >> 18));
+			*out++ = (char)(0x80 | ((c >> 12) & 0x3F));
+			*out++ = (char)(0x80 | ((c >> 6) & 0x3F));
+			*out++ = (char)(0x80 | (c & 0x3F));
+		}
+		else
+		{
+			throw UnicodeException{ "unicode error" };
+		}
+		return out;
+	}
+	
 
 	inline void utf8To16(nonstd::string_view str, std::u16string& ret)
 	{
@@ -418,32 +450,7 @@ namespace kiwi
 				code = mergeSurrogate(code, code2);
 			}
 
-			if (code <= 0x7F)
-			{
-				ret.push_back((char)code);
-			}
-			else if (code <= 0x7FF)
-			{
-				ret.push_back((char)(0xC0 | (code >> 6)));
-				ret.push_back((char)(0x80 | (code & 0x3F)));
-			}
-			else if (code <= 0xFFFF)
-			{
-				ret.push_back((char)(0xE0 | (code >> 12)));
-				ret.push_back((char)(0x80 | ((code >> 6) & 0x3F)));
-				ret.push_back((char)(0x80 | (code & 0x3F)));
-			}
-			else if (code <= 0x10FFFF)
-			{
-				ret.push_back((char)(0xF0 | (code >> 18)));
-				ret.push_back((char)(0x80 | ((code >> 12) & 0x3F)));
-				ret.push_back((char)(0x80 | ((code >> 6) & 0x3F)));
-				ret.push_back((char)(0x80 | (code & 0x3F)));
-			}
-			else
-			{
-				throw UnicodeException{ "unicode error" };
-			}
+			char32To8(code, std::back_inserter(ret));
 		}
 
 		return ret;
@@ -467,32 +474,7 @@ namespace kiwi
 				code = mergeSurrogate(code, code2);
 			}
 
-			if (code <= 0x7F)
-			{
-				ret.push_back((char)code);
-			}
-			else if (code <= 0x7FF)
-			{
-				ret.push_back((char)(0xC0 | (code >> 6)));
-				ret.push_back((char)(0x80 | (code & 0x3F)));
-			}
-			else if (code <= 0xFFFF)
-			{
-				ret.push_back((char)(0xE0 | (code >> 12)));
-				ret.push_back((char)(0x80 | ((code >> 6) & 0x3F)));
-				ret.push_back((char)(0x80 | (code & 0x3F)));
-			}
-			else if (code <= 0x10FFFF)
-			{
-				ret.push_back((char)(0xF0 | (code >> 18)));
-				ret.push_back((char)(0x80 | ((code >> 12) & 0x3F)));
-				ret.push_back((char)(0x80 | ((code >> 6) & 0x3F)));
-				ret.push_back((char)(0x80 | (code & 0x3F)));
-			}
-			else
-			{
-				throw UnicodeException{ "unicode error" };
-			}
+			char32To8(code, std::back_inserter(ret));
 		}
 		positions.emplace_back(ret.size());
 
