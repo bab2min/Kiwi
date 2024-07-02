@@ -9,22 +9,22 @@ jobs:
     strategy:
       matrix:
         include:
-          - name: "macOS 11 + Xcode 11.7"
-            os: macos-11
+          - name: "macOS 13 + Xcode 14.3"
+            os: macos-13
             compiler: xcode
-            version: "11.7"
-          - name: "macOS 11 + Xcode 12.2"
-            os: macos-11
+            version: "14.3"
+          - name: "macOS 13 + gcc-13"
+            os: macos-13
+            compiler: gcc
+            version: "13"
+          - name: "macOS 13 Arm64 + Xcode 14.3"
+            os: macos-13-arm64
             compiler: xcode
-            version: "12.4"
-          - name: "macOS 11 + gcc-10"
-            os: macos-11
+            version: "14.3"
+          - name: "macOS 13 Arm64 + gcc-13"
+            os: macos-13-arm64
             compiler: gcc
-            version: "10"
-          - name: "macOS 11 + gcc-11"
-            os: macos-11
-            compiler: gcc
-            version: "11"
+            version: "13"
 
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.name }}
@@ -68,7 +68,8 @@ jobs:
         mkdir eval_results
         ./build/kiwi-evaluator -m ./ModelGenerator eval_data/*.txt -o eval_results/
         ./build/kiwi-evaluator -m ./ModelGenerator eval_data/*.txt --sbg -o eval_results/
-    - name: Run Benchmark
+    - name: Run Benchmark (x86_64)
+      if: ${{ matrix.os }} == 'macos-13'
       run: |
         curl -OL https://latina.bab2min.pe.kr/_data/kowiki1000.txt
         ./build/kiwi-cli-* -m ./ModelGenerator -e -o test.out kowiki1000.txt
@@ -79,6 +80,16 @@ jobs:
         KIWI_ARCH_TYPE=avx2 ./build/kiwi-cli-* -m ./ModelGenerator -e -o test.out kowiki1000.txt
         KIWI_ARCH_TYPE=avx2 ./build/kiwi-cli-* -m ./ModelGenerator -e -o test.out --sbg kowiki1000.txt
         KIWI_ARCH_TYPE=avx2 ./build/kiwi-cli-* -m ./ModelGenerator -e -o test.out --typos 6 kowiki1000.txt
+    - name: Run Benchmark (arm64)
+      if: ${{ matrix.os }} == 'macos-13-arm64'
+      run: |
+        curl -OL https://latina.bab2min.pe.kr/_data/kowiki1000.txt
+        ./build/kiwi-cli-* -m ./ModelGenerator -e -o test.out kowiki1000.txt
+        KIWI_ARCH_TYPE=none ./build/kiwi-cli-* -m ./ModelGenerator -e -o test.out kowiki1000.txt
+        KIWI_ARCH_TYPE=balanced ./build/kiwi-cli-* -m ./ModelGenerator -e -o test.out kowiki1000.txt
+        KIWI_ARCH_TYPE=neon ./build/kiwi-cli-* -m ./ModelGenerator -e -o test.out kowiki1000.txt
+        KIWI_ARCH_TYPE=neon ./build/kiwi-cli-* -m ./ModelGenerator -e -o test.out --sbg kowiki1000.txt
+        KIWI_ARCH_TYPE=neon ./build/kiwi-cli-* -m ./ModelGenerator -e -o test.out --typos 6 kowiki1000.txt
     - name: Archive binaries
       uses: actions/upload-artifact@v2
       with:
