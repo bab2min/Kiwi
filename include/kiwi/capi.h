@@ -2,8 +2,8 @@
  * @file capi.h
  * @author bab2min (bab2min@gmail.com)
  * @brief Kiwi C API를 담고 있는 헤더 파일
- * @version 0.17.0
- * @date 2022-09-01
+ * @version 0.18.0
+ * @date 2024-07-01
  * 
  * 
  */
@@ -45,7 +45,11 @@ typedef struct {
 	uint32_t line_number; /**< 줄 번호*/
 	uint16_t length; /**< 길이(UTF16 문자 기준) */
 	uint8_t tag; /**< 품사 태그 */
-	uint8_t sense_id; /**< 의미 번호 */
+	union
+	{
+		uint8_t sense_id; /**< 의미 번호 */
+		uint8_t script; /**< 유니코드 영역에 기반한 문자 타입 */
+	};
 	float score; /**< 해당 형태소의 언어모델 점수 */
 	float typo_cost; /**< 오타가 교정된 경우 오타 비용. 그렇지 않은 경우 0 */
 	uint32_t typo_form_id; /**< 교정 전 오타의 형태에 대한 정보 (typoCost가 0인 경우 의미 없음) */
@@ -1007,6 +1011,16 @@ DECL_DLL int kiwi_pt_add_token_to_span_w(kiwi_pretokenized_h handle, int span_id
  * @note kiwi_pt_init
  */
 DECL_DLL int kiwi_pt_close(kiwi_pretokenized_h handle);
+
+/**
+ * @brief `kiwi_token_info_t`의 `script`가 가리키는 문자 영역의 유니코드 상 이름을 반환합니다.
+ *
+ * @param script `kiwi_token_info_t`의 `script` 필드 값
+ * @return 유니코드 영역의 이름을 반환합니다. 알 수 없을 경우 "Unknown"을 반환합니다.
+ *
+ * @note 이 함수가 반환하는 값은 string literal이므로 별도로 해제할 필요가 없습니다.
+ */
+DECL_DLL const char* kiwi_get_script_name(uint8_t script);
 
 #ifdef __cplusplus  
 }

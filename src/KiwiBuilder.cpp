@@ -3,7 +3,7 @@
 
 #include <kiwi/Kiwi.h>
 #include <kiwi/Utils.h>
-#include <kiwi/HSDataset.h>
+#include <kiwi/Dataset.h>
 #include "ArchAvailable.h"
 #include "KTrie.h"
 #include "StrUtils.h"

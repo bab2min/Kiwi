@@ -563,7 +563,7 @@ namespace kiwi
         if (type == ScriptType::chess_symbols) return "Chess Symbols";
         if (type == ScriptType::symbols_for_legacy_computing) return "Symbols for Legacy Computing";
         if (type == ScriptType::tags) return "Tags";
-        return "unknown";
+        return "Unknown";
     }
 
     int isEmoji(char32_t c0, char32_t c1)

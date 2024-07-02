@@ -144,7 +144,7 @@ jobs:
   build-macos:
     strategy:
       matrix:
-          os: [macos-11]
+          os: [macos-13]
           arch: [x86_64, arm64]
 
     runs-on: ${{ matrix.os }}

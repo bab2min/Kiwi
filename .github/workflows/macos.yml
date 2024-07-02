@@ -9,22 +9,14 @@ jobs:
     strategy:
       matrix:
         include:
-          - name: "macOS 11 + Xcode 11.7"
-            os: macos-11
+          - name: "macOS 13 + Xcode 15.0"
+            os: macos-13
             compiler: xcode
-            version: "11.7"
-          - name: "macOS 11 + Xcode 12.2"
-            os: macos-11
+            version: "15.0"
+          - name: "macOS 14 Arm64 + Xcode 15.0"
+            os: macos-14
             compiler: xcode
-            version: "12.4"
-          - name: "macOS 11 + gcc-10"
-            os: macos-11
-            compiler: gcc
-            version: "10"
-          - name: "macOS 11 + gcc-11"
-            os: macos-11
-            compiler: gcc
-            version: "11"
+            version: "15.0"
 
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.name }}
@@ -42,8 +34,8 @@ jobs:
         else
           ls -ls /Applications/
           sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app
-          echo "CC=clang" >> $GITHUB_ENV
-          echo "CXX=clang++" >> $GITHUB_ENV
+          echo "CC=$(brew --prefix llvm@15)/bin/clang" >> $GITHUB_ENV
+          echo "CXX=$(brew --prefix llvm@15)/bin/clang++" >> $GITHUB_ENV
         fi
     - name: Configure Build
       run: mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_JAVA_BINDING=1 ..
@@ -68,7 +60,8 @@ jobs:
         mkdir eval_results
         ./build/kiwi-evaluator -m ./ModelGenerator eval_data/*.txt -o eval_results/
         ./build/kiwi-evaluator -m ./ModelGenerator eval_data/*.txt --sbg -o eval_results/
-    - name: Run Benchmark
+    - name: Run Benchmark (x86_64)
+      if: ${{ matrix.os }} == 'macos-13'
       run: |
         curl -OL https://latina.bab2min.pe.kr/_data/kowiki1000.txt
         ./build/kiwi-cli-* -m ./ModelGenerator -e -o test.out kowiki1000.txt
@@ -79,6 +72,16 @@ jobs:
         KIWI_ARCH_TYPE=avx2 ./build/kiwi-cli-* -m ./ModelGenerator -e -o test.out kowiki1000.txt
         KIWI_ARCH_TYPE=avx2 ./build/kiwi-cli-* -m ./ModelGenerator -e -o test.out --sbg kowiki1000.txt
         KIWI_ARCH_TYPE=avx2 ./build/kiwi-cli-* -m ./ModelGenerator -e -o test.out --typos 6 kowiki1000.txt
+    - name: Run Benchmark (arm64)
+      if: ${{ matrix.os }} == 'macos-14'
+      run: |
+        curl -OL https://latina.bab2min.pe.kr/_data/kowiki1000.txt
+        ./build/kiwi-cli-* -m ./ModelGenerator -e -o test.out kowiki1000.txt
+        KIWI_ARCH_TYPE=none ./build/kiwi-cli-* -m ./ModelGenerator -e -o test.out kowiki1000.txt
+        KIWI_ARCH_TYPE=balanced ./build/kiwi-cli-* -m ./ModelGenerator -e -o test.out kowiki1000.txt
+        KIWI_ARCH_TYPE=neon ./build/kiwi-cli-* -m ./ModelGenerator -e -o test.out kowiki1000.txt
+        KIWI_ARCH_TYPE=neon ./build/kiwi-cli-* -m ./ModelGenerator -e -o test.out --sbg kowiki1000.txt
+        KIWI_ARCH_TYPE=neon ./build/kiwi-cli-* -m ./ModelGenerator -e -o test.out --typos 6 kowiki1000.txt
     - name: Archive binaries
       uses: actions/upload-artifact@v2
       with:
