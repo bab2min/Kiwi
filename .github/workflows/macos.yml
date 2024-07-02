@@ -9,14 +9,14 @@ jobs:
     strategy:
       matrix:
         include:
-          - name: "macOS 13 + Xcode 14.3"
+          - name: "macOS 13 + gcc 13"
             os: macos-13
-            compiler: xcode
-            version: "14.3"
-          - name: "macOS 14 Arm64 + Xcode 15.3"
+            compiler: gcc
+            version: "13"
+          - name: "macOS 14 Arm64 + gcc 13"
             os: macos-14
-            compiler: xcode
-            version: "15.3"
+            compiler: gcc
+            version: "13"
 
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.name }}
