@@ -191,6 +191,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv425kiwi_pt_add_token_to_span19kiwi_pretokenized_hiPKcPKcii"><code class="docutils literal notranslate"><span class="pre">kiwi_pt_add_token_to_span()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv427kiwi_pt_add_token_to_span_w19kiwi_pretokenized_hiPK9kchar16_tPKcii"><code class="docutils literal notranslate"><span class="pre">kiwi_pt_add_token_to_span_w()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv413kiwi_pt_close19kiwi_pretokenized_h"><code class="docutils literal notranslate"><span class="pre">kiwi_pt_close()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv420kiwi_get_script_name7uint8_t"><code class="docutils literal notranslate"><span class="pre">kiwi_get_script_name()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv417kiwi_token_info_t"><code class="docutils literal notranslate"><span class="pre">kiwi_token_info_t</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17kiwi_token_info_t12chr_positionE"><code class="docutils literal notranslate"><span class="pre">kiwi_token_info_t::chr_position</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17kiwi_token_info_t13word_positionE"><code class="docutils literal notranslate"><span class="pre">kiwi_token_info_t::word_position</span></code></a></li>
@@ -199,6 +200,8 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17kiwi_token_info_t6lengthE"><code class="docutils literal notranslate"><span class="pre">kiwi_token_info_t::length</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17kiwi_token_info_t3tagE"><code class="docutils literal notranslate"><span class="pre">kiwi_token_info_t::tag</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17kiwi_token_info_t8sense_idE"><code class="docutils literal notranslate"><span class="pre">kiwi_token_info_t::sense_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17kiwi_token_info_t6scriptE"><code class="docutils literal notranslate"><span class="pre">kiwi_token_info_t::script</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17kiwi_token_info_tUt1_6E"><code class="docutils literal notranslate"><span class="pre">kiwi_token_info_t::&#64;6</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17kiwi_token_info_t5scoreE"><code class="docutils literal notranslate"><span class="pre">kiwi_token_info_t::score</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17kiwi_token_info_t9typo_costE"><code class="docutils literal notranslate"><span class="pre">kiwi_token_info_t::typo_cost</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17kiwi_token_info_t12typo_form_idE"><code class="docutils literal notranslate"><span class="pre">kiwi_token_info_t::typo_form_id</span></code></a></li>
@@ -244,9 +247,9 @@
 <p><dl class="simple">
 <dt><strong>Author</strong></dt><dd><p>bab2min (<a class="reference external" href="mailto:bab2min&#37;&#52;&#48;gmail&#46;com">bab2min<span>&#64;</span>gmail<span>&#46;</span>com</a>) </p>
 </dd>
-<dt><strong>Version</strong></dt><dd><p>0.17.0 </p>
+<dt><strong>Version</strong></dt><dd><p>0.18.0 </p>
 </dd>
-<dt><strong>Date</strong></dt><dd><p>2022-09-01 </p>
+<dt><strong>Date</strong></dt><dd><p>2024-07-01 </p>
 </dd>
 </dl>
 </p>
@@ -2011,6 +2014,24 @@
 </dl>
 </dd></dl>
 
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv420kiwi_get_script_name7uint8_t">
+<span id="_CPPv320kiwi_get_script_name7uint8_t"></span><span id="_CPPv220kiwi_get_script_name7uint8_t"></span><span id="kiwi_get_script_name__uint8_t"></span><span class="target" id="capi_8h_1a67cf6f11c6cca59736a4179da30d9655"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_get_script_name</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">script</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420kiwi_get_script_name7uint8_t" title="Link to this definition"></a><br /></dt>
+<dd><p><code class="docutils literal notranslate"><a class="reference internal" href="#structkiwi__token__info__t"><span class="std std-ref"><span class="pre">kiwi_token_info_t</span></span></a></code>의 <code class="docutils literal notranslate"><span class="pre">script</span></code>가 가리키는 문자 영역의 유니코드 상 이름을 반환합니다. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>이 함수가 반환하는 값은 string literal이므로 별도로 해제할 필요가 없습니다. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>script</strong> – <code class="docutils literal notranslate"><a class="reference internal" href="#structkiwi__token__info__t"><span class="std std-ref"><span class="pre">kiwi_token_info_t</span></span></a></code>의 <code class="docutils literal notranslate"><span class="pre">script</span></code> 필드 값 </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>유니코드 영역의 이름을 반환합니다. 알 수 없을 경우 “Unknown”을 반환합니다.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv417kiwi_token_info_t">
@@ -2058,6 +2079,17 @@
 <span id="_CPPv3N17kiwi_token_info_t8sense_idE"></span><span id="_CPPv2N17kiwi_token_info_t8sense_idE"></span><span id="kiwi_token_info_t::sense_id__uint8_t"></span><span class="target" id="structkiwi__token__info__t_1a6a6f48513896c46ae1146c0d0cd5adf4"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sense_id</span></span></span><a class="headerlink" href="#_CPPv4N17kiwi_token_info_t8sense_idE" title="Link to this definition"></a><br /></dt>
 <dd><p>의미 번호 </p>
 </dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17kiwi_token_info_t6scriptE">
+<span id="_CPPv3N17kiwi_token_info_t6scriptE"></span><span id="_CPPv2N17kiwi_token_info_t6scriptE"></span><span id="kiwi_token_info_t::script__uint8_t"></span><span class="target" id="structkiwi__token__info__t_1a6f716f65a91f064b4fdc68d46e82ec30"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">script</span></span></span><a class="headerlink" href="#_CPPv4N17kiwi_token_info_t6scriptE" title="Link to this definition"></a><br /></dt>
+<dd><p>유니코드 영역에 기반한 문자 타입 </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17kiwi_token_info_tUt1_6E">
+<span id="_CPPv3N17kiwi_token_info_tUt1_6E"></span><span class="target" id="structkiwi__token__info__t_1a5a3a57f41ae6efa235baa53163ef12f7"></span><span class="k"><span class="pre">union</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv417kiwi_token_info_t" title="kiwi_token_info_t"><span class="n"><span class="pre">kiwi_token_info_t</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">[anonymous]</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">[anonymous]</span></span></span><a class="headerlink" href="#_CPPv4N17kiwi_token_info_tUt1_6E" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N17kiwi_token_info_t5scoreE">

@@ -424,12 +424,15 @@ Functions</h2></td></tr>
 <tr class="memitem:ad8f3a34a58d42dbc7a046f837159575e"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#ad8f3a34a58d42dbc7a046f837159575e">kiwi_pt_close</a> (kiwi_pretokenized_h handle)</td></tr>
 <tr class="memdesc:ad8f3a34a58d42dbc7a046f837159575e"><td class="mdescLeft">&#160;</td><td class="mdescRight">사용이 끝난 Pretokenzation 객체를 해제합니다.  <a href="capi_8h.html#ad8f3a34a58d42dbc7a046f837159575e">More...</a><br /></td></tr>
 <tr class="separator:ad8f3a34a58d42dbc7a046f837159575e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a67cf6f11c6cca59736a4179da30d9655"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a67cf6f11c6cca59736a4179da30d9655">kiwi_get_script_name</a> (uint8_t script)</td></tr>
+<tr class="memdesc:a67cf6f11c6cca59736a4179da30d9655"><td class="mdescLeft">&#160;</td><td class="mdescRight"><code><a class="el" href="structkiwi__token__info__t.html">kiwi_token_info_t</a></code>의 <code>script</code>가 가리키는 문자 영역의 유니코드 상 이름을 반환합니다.  <a href="capi_8h.html#a67cf6f11c6cca59736a4179da30d9655">More...</a><br /></td></tr>
+<tr class="separator:a67cf6f11c6cca59736a4179da30d9655"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Kiwi C API를 담고 있는 헤더 파일 </p>
 <dl class="section author"><dt>Author</dt><dd>bab2min (<a href="#" onclick="location.href='mai'+'lto:'+'bab'+'2m'+'in@'+'gm'+'ail'+'.c'+'om'; return false;">bab2m<span style="display: none;">.nosp@m.</span>in@g<span style="display: none;">.nosp@m.</span>mail.<span style="display: none;">.nosp@m.</span>com</a>) </dd></dl>
-<dl class="section version"><dt>Version</dt><dd>0.17.0 </dd></dl>
-<dl class="section date"><dt>Date</dt><dd>2022-09-01 </dd></dl>
+<dl class="section version"><dt>Version</dt><dd>0.18.0 </dd></dl>
+<dl class="section date"><dt>Date</dt><dd>2024-07-01 </dd></dl>
 </div><h2 class="groupheader">Typedef Documentation</h2>
 <a id="aaca30b98ab19263d7f0494b80ff5d095"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aaca30b98ab19263d7f0494b80ff5d095">&#9670;&nbsp;</a></span>kiwi_builder_replacer_t</h2>
@@ -1601,6 +1604,34 @@ Functions</h2></td></tr>
 <li>KIWI_UNK_FORM_SCORE_BIAS: 미등재 형태 추출 시 사용하는 편차 값</li>
 <li>KIWI_SPACE_PENALTY: 무시하는 공백 1개당 발생하는 언어 점수 페널티 값 </li>
 </ul>
+
+</div>
+</div>
+<a id="a67cf6f11c6cca59736a4179da30d9655"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a67cf6f11c6cca59736a4179da30d9655">&#9670;&nbsp;</a></span>kiwi_get_script_name()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const char* kiwi_get_script_name </td>
+          <td>(</td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>script</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><code><a class="el" href="structkiwi__token__info__t.html">kiwi_token_info_t</a></code>의 <code>script</code>가 가리키는 문자 영역의 유니코드 상 이름을 반환합니다. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">script</td><td><code><a class="el" href="structkiwi__token__info__t.html">kiwi_token_info_t</a></code>의 <code>script</code> 필드 값 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>유니코드 영역의 이름을 반환합니다. 알 수 없을 경우 "Unknown"을 반환합니다.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>이 함수가 반환하는 값은 string literal이므로 별도로 해제할 필요가 없습니다. </dd></dl>
 
 </div>
 </div>

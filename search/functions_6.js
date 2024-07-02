@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['morphemeraw_510',['MorphemeRaw',['../structkiwi_1_1MorphemeRaw.html#adbfe0b0a46369012e8bccab4f0f70732',1,'kiwi::MorphemeRaw']]]
+  ['morphemeraw_512',['MorphemeRaw',['../structkiwi_1_1MorphemeRaw.html#adbfe0b0a46369012e8bccab4f0f70732',1,'kiwi::MorphemeRaw']]]
 ];

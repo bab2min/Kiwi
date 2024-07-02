@@ -83,8 +83,14 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a6c22f2650a9fba79ede097a4a45790e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2f8255848916bffeba1eaabdc3dae17e"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi__token__info__t.html#a2f8255848916bffeba1eaabdc3dae17e">tag</a></td></tr>
 <tr class="separator:a2f8255848916bffeba1eaabdc3dae17e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6a6f48513896c46ae1146c0d0cd5adf4"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi__token__info__t.html#a6a6f48513896c46ae1146c0d0cd5adf4">sense_id</a></td></tr>
-<tr class="separator:a6a6f48513896c46ae1146c0d0cd5adf4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5a3a57f41ae6efa235baa53163ef12f7"><td class="memItemLeft" ><a id="a5a3a57f41ae6efa235baa53163ef12f7"></a>
+union {</td></tr>
+<tr class="memitem:aa3318546b7aa1a4d56788dfdc11f48c8"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="structkiwi__token__info__t.html#a6a6f48513896c46ae1146c0d0cd5adf4">sense_id</a></td></tr>
+<tr class="separator:aa3318546b7aa1a4d56788dfdc11f48c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a93b79a4cdec95bc8967ea305f88278aa"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="structkiwi__token__info__t.html#a6f716f65a91f064b4fdc68d46e82ec30">script</a></td></tr>
+<tr class="separator:a93b79a4cdec95bc8967ea305f88278aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5a3a57f41ae6efa235baa53163ef12f7"><td class="memItemLeft" valign="top">};&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
+<tr class="separator:a5a3a57f41ae6efa235baa53163ef12f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a27403cec79ba0637f33534ee1ee624d7"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi__token__info__t.html#a27403cec79ba0637f33534ee1ee624d7">score</a></td></tr>
 <tr class="separator:a27403cec79ba0637f33534ee1ee624d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae4a0a293df8c1fabb3cc131a21590e73"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi__token__info__t.html#ae4a0a293df8c1fabb3cc131a21590e73">typo_cost</a></td></tr>
@@ -169,6 +175,21 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>해당 형태소의 언어모델 점수 </p>
+
+</div>
+</div>
+<a id="a6f716f65a91f064b4fdc68d46e82ec30"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6f716f65a91f064b4fdc68d46e82ec30">&#9670;&nbsp;</a></span>script</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t kiwi_token_info_t::script</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>유니코드 영역에 기반한 문자 타입 </p>
 
 </div>
 </div>
