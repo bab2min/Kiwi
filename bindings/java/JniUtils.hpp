@@ -924,7 +924,8 @@ namespace jni
 			{
 				return CppType{ env, v };
 			}
-			if (!env->IsInstanceOf(v, JIteratorBase::jClass)) throw std::runtime_error{ StringConcat_v<svNotInstanceOf, typeStr, svNullTerm>.data()};
+			// The following line crashes clang compiler. I don't know why, but it's not necessary. So I commented it out.
+			if (!env->IsInstanceOf(v, JIteratorBase::jClass)) throw std::runtime_error{ ""/*StringConcat_v<svNotInstanceOf, typeStr, svNullTerm>.data()*/};
 			return CppType{ env, v };
 		}
 	};

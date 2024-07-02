@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 
-project(kiwi VERSION 0.17.1 DESCRIPTION "Kiwi, Korean Intelligent Word Identifier")
+project(kiwi VERSION 0.18.0 DESCRIPTION "Kiwi, Korean Intelligent Word Identifier")
 
 set ( CMAKE_CXX_STANDARD 14 )
 set ( CMAKE_VERBOSE_MAKEFILE true )
@@ -48,7 +48,7 @@ set ( CORE_SRCS
   src/Form.cpp
   src/FeatureTestor.cpp
   src/FileUtils.cpp
-  src/HSDataset.cpp
+  src/Dataset.cpp
   src/Joiner.cpp
   src/Kiwi.cpp
   src/KiwiBuilder.cpp
@@ -56,6 +56,7 @@ set ( CORE_SRCS
   src/PatternMatcher.cpp
   src/search.cpp
   src/ScriptType.cpp
+  src/SubstringExtractor.cpp
   src/SwTokenizer.cpp
   src/TagUtils.cpp
   src/TypoTransformer.cpp

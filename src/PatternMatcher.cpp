@@ -272,7 +272,7 @@ size_t PatternMatcherImpl::testAbbr(const char16_t* first, const char16_t* last)
 	if (b != last && *b == ' ')
 	{
 		if (l > (isUpperAlpha(*first) ? 5 : 3)) return 0; // reject too long patterns for abbreviation
-		++b;
+		return b - first;
 	}
 	else
 	{
@@ -287,7 +287,6 @@ size_t PatternMatcherImpl::testAbbr(const char16_t* first, const char16_t* last)
 		
 		if (b != last && *b == '.') ++b;
 		else return b - first;
-		if (b != last && *b == ' ') ++b;
 	}
 	if (b[-1] == ' ') --b;
 	return b - first;

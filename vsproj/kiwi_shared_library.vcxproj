@@ -32,7 +32,7 @@
     <ClInclude Include="..\include\kiwi\FixedVector.hpp" />
     <ClInclude Include="..\include\kiwi\Form.h" />
     <ClInclude Include="..\include\kiwi\FrozenTrie.h" />
-    <ClInclude Include="..\include\kiwi\HSDataset.h" />
+    <ClInclude Include="..\include\kiwi\Dataset.h" />
     <ClInclude Include="..\include\kiwi\Joiner.h" />
     <ClInclude Include="..\include\kiwi\Kiwi.h" />
     <ClInclude Include="..\include\kiwi\Knlm.h" />
@@ -42,6 +42,7 @@
     <ClInclude Include="..\include\kiwi\PatternMatcher.h" />
     <ClInclude Include="..\include\kiwi\ScriptType.h" />
     <ClInclude Include="..\include\kiwi\SkipBigramModel.h" />
+    <ClInclude Include="..\include\kiwi\SubstringExtractor.h" />
     <ClInclude Include="..\include\kiwi\TagUtils.h" />
     <ClInclude Include="..\include\kiwi\TemplateUtils.hpp" />
     <ClInclude Include="..\include\kiwi\ThreadPool.h" />
@@ -115,9 +116,11 @@
     </ClCompile>
     <ClCompile Include="..\src\ArchUtils.cpp" />
     <ClCompile Include="..\src\Combiner.cpp" />
+    <ClCompile Include="..\src\Dataset.cpp" />
     <ClCompile Include="..\src\FileUtils.cpp" />
     <ClCompile Include="..\src\Joiner.cpp" />
     <ClCompile Include="..\src\search.cpp" />
+    <ClCompile Include="..\src\SubstringExtractor.cpp" />
     <ClCompile Include="..\src\TagUtils.cpp" />
     <ClCompile Include="..\src\ScriptType.cpp" />
     <ClCompile Include="..\src\SwTokenizer.cpp" />

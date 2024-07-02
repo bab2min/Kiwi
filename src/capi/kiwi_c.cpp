@@ -1434,3 +1434,7 @@ int kiwi_pt_close(kiwi_pretokenized_h handle)
 	}
 }
 
+const char* kiwi_get_script_name(uint8_t script)
+{
+	return getScriptName((ScriptType)script);
+}
