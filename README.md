@@ -154,10 +154,13 @@ https://github.com/bab2min/kiwi-gui
 Java 1.8 이상에서 사용 가능한 KiwiJava가 Java binding으로 제공됩니다. 이에 대해서는 [bindings/java](bindings/java)를 참조하시길 바랍니다.
 
 ### R Wrapper
-[mrchypark](https://github.com/mrchypark)님께서 작업해주신 R언어용 wrapper인 [elbird](https://mrchypark.github.io/elbird/)가 있습니다.
+[mrchypark](https://github.com/mrchypark)님께서 기여해주신 R언어용 wrapper인 [elbird](https://mrchypark.github.io/elbird/)가 있습니다.
 
 ### GO Wrapper
 [codingpot](https://discord.gg/rnNJBag42N) 커뮤니티가 작업해주신 go언어용 wrapper인 [kiwigo](https://github.com/codingpot/kiwigo)가 있습니다.
+
+### Web Assembly (Javascript/Typescript)
+[RicBent](https://github.com/RicBent)님께서 기여해주신 Web Assembly binding이 있습니다. 이에 대해서는 [bindings/wasm](bindings/wasm)를 참조하시길 바랍니다.
 
 ### 응용 프로그램
 Kiwi는 C# 기반의 GUI 형태로도 제공됩니다.
