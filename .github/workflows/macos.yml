@@ -9,14 +9,14 @@ jobs:
     strategy:
       matrix:
         include:
-          - name: "macOS 13 + gcc 13"
+          - name: "macOS 13 + Xcode 15.0"
             os: macos-13
-            compiler: gcc
-            version: "13"
-          - name: "macOS 14 Arm64 + gcc 13"
+            compiler: xcode
+            version: "15.0"
+          - name: "macOS 14 Arm64 + Xcode 15.0"
             os: macos-14
-            compiler: gcc
-            version: "13"
+            compiler: xcode
+            version: "15.0"
 
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.name }}
@@ -29,15 +29,13 @@ jobs:
     - name: Configure Compiler
       run: |
         if [ "${{ matrix.compiler }}" = "gcc" ]; then
-          ls -ls /Applications/
-          sudo xcode-select -switch /Applications/Xcode_14.3.app
           echo "CC=gcc-${{ matrix.version }}" >> $GITHUB_ENV
           echo "CXX=g++-${{ matrix.version }}" >> $GITHUB_ENV
         else
           ls -ls /Applications/
           sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app
-          echo "CC=clang" >> $GITHUB_ENV
-          echo "CXX=clang++" >> $GITHUB_ENV
+          echo "CC=$(brew --prefix llvm@15)/bin/clang" >> $GITHUB_ENV
+          echo "CXX=$(brew --prefix llvm@15)/bin/clang++" >> $GITHUB_ENV
         fi
     - name: Configure Build
       run: mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_JAVA_BINDING=1 ..
