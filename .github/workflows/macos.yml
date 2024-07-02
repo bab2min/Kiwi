@@ -29,6 +29,8 @@ jobs:
     - name: Configure Compiler
       run: |
         if [ "${{ matrix.compiler }}" = "gcc" ]; then
+          ls -ls /Applications/
+          sudo xcode-select -switch /Applications/Xcode_13.2.app
           echo "CC=gcc-${{ matrix.version }}" >> $GITHUB_ENV
           echo "CXX=g++-${{ matrix.version }}" >> $GITHUB_ENV
         else
