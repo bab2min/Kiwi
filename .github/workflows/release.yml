@@ -157,7 +157,7 @@ jobs:
         lfs: true
     - name: Get release
       id: get_release
-      uses: bruceadams/get-release@v1.2.2
+      uses: bruceadams/get-release@v1.3.2
       env:
         GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
     - name: Configure Build
@@ -350,7 +350,6 @@ jobs:
         npm run doc
     - name: Publish documenation
       uses: peaceiris/actions-gh-pages@v3
-      if: github.ref == 'refs/heads/main'
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: bindings/wasm/package/doc
