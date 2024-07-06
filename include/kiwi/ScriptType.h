@@ -235,6 +235,7 @@ namespace kiwi
         chess_symbols,
         symbols_for_legacy_computing,
         tags,
+        max,
     };
 
     ScriptType chr2ScriptType(char32_t c);
