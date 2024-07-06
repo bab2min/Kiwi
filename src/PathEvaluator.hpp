@@ -504,22 +504,23 @@ namespace kiwi
 				if (prevPath.ownFormId)
 				{
 					leftFormFirst = ownForms[prevPath.ownFormId - 1].data();
-					leftFormLast = ownForms[prevPath.ownFormId - 1].data() + ownForms[0].size();
+					leftFormLast = leftFormFirst + ownForms[0].size();
 				}
-				else if (morphBase[prevPath.wid].kform)
+				else if (morphBase[prevPath.wid].kform && !morphBase[prevPath.wid].kform->empty())
 				{
 					leftFormFirst = morphBase[prevPath.wid].kform->data();
-					leftFormLast = morphBase[prevPath.wid].kform->data() + morphBase[prevPath.wid].kform->size();
+					leftFormLast = leftFormFirst + morphBase[prevPath.wid].kform->size();
 				}
 				else
 				{
-					leftFormFirst = nullptr;
-					leftFormLast = nullptr;
+					leftFormFirst = prevPath.morpheme->getForm().data();
+					leftFormLast = leftFormFirst + prevPath.morpheme->getForm().size();
 				}
 
-				CondVowel cvowel = curMorph->vowel;
-				CondPolarity cpolar = curMorph->polar;
-				if (prevPath.morpheme->tag == POSTag::ssc)
+				const CondVowel cvowel = curMorph->vowel;
+				const CondPolarity cpolar = curMorph->polar;
+				const bool leftFormEndswithSSC = leftFormFirst < leftFormLast && identifySpecialChr(leftFormLast[-1]) == POSTag::ssc;
+				if (prevPath.morpheme->tag == POSTag::ssc || leftFormEndswithSSC)
 				{
 					// 이전 형태소가 닫는 괄호인 경우 좌측 결합조건을 적용하지 않음
 				}
