@@ -406,4 +406,24 @@ namespace mp
 			if (pool) pool->_limitedSize = prevSize;
 		}
 	};
+
+	template<class Mutex>
+	class OptionalLockGuard
+	{
+		Mutex* mutex;
+
+	public:
+		OptionalLockGuard(Mutex* _mutex = nullptr) : mutex{ _mutex }
+		{
+			if (mutex) mutex->lock();
+		}
+
+		~OptionalLockGuard()
+		{
+			if (mutex) mutex->unlock();
+		}
+
+		OptionalLockGuard(const OptionalLockGuard&) = delete;
+		OptionalLockGuard& operator=(const OptionalLockGuard&) = delete;
+	};
 }

@@ -97,6 +97,26 @@ namespace kiwi
 			std::unique_ptr<Key[]> nextKeys;
 			std::unique_ptr<Diff[]> nextDiffs;
 
+			template<class Fn>
+			void traverse(Fn&& visitor, const Node* node, std::vector<Key>& prefix, size_t maxDepth) const
+			{
+				auto* keys = &nextKeys[node->nextOffset];
+				auto* diffs = &nextDiffs[node->nextOffset];
+				for (size_t i = 0; i < node->numNexts; ++i)
+				{
+					const auto* child = node + diffs[i];
+					const auto val = child->val(*this);
+					if (!hasMatch(val)) continue;
+					prefix.emplace_back(keys[i]);
+					visitor(val, prefix);
+					if (prefix.size() < maxDepth)
+					{
+						traverse(visitor, child, prefix, maxDepth);
+					}
+					prefix.pop_back();
+				}
+			}
+
 		public:
 
 			FrozenTrie() = default;
@@ -117,6 +137,13 @@ namespace kiwi
 			const Value& value(size_t idx) const { return values[idx]; };
 
 			bool hasMatch(_Value v) const { return !this->isNull(v) && !this->hasSubmatch(v); }
+
+			template<class Fn>
+			void traverse(Fn&& visitor, size_t maxDepth = -1) const
+			{
+				std::vector<Key> prefix;
+				traverse(std::forward<Fn>(visitor), root(), prefix, maxDepth);
+			}
 		};
 	}
 }

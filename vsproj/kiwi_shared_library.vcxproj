@@ -119,6 +119,7 @@
     <ClCompile Include="..\src\Dataset.cpp" />
     <ClCompile Include="..\src\FileUtils.cpp" />
     <ClCompile Include="..\src\Joiner.cpp" />
+    <ClCompile Include="..\src\Knlm.cpp" />
     <ClCompile Include="..\src\search.cpp" />
     <ClCompile Include="..\src\SubstringExtractor.cpp" />
     <ClCompile Include="..\src\TagUtils.cpp" />

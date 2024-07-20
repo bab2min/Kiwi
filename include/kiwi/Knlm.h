@@ -7,7 +7,9 @@
 #include <algorithm>
 #include <numeric>
 
+#include "Utils.h"
 #include "Mmap.h"
+#include "ArchUtils.h"
 
 namespace kiwi
 {
@@ -43,6 +45,7 @@ namespace kiwi
 			virtual float _progress(ptrdiff_t& node_idx, size_t next) const = 0;
 			virtual std::vector<float> allNextLL(ptrdiff_t node_idx) const = 0;
 			virtual std::vector<float> allNextLL(ptrdiff_t node_idx, std::vector<ptrdiff_t>& next_node_idx) const = 0;
+			virtual void nextTopN(ptrdiff_t node_idx, size_t top_n, uint32_t* idx_out, float* ll_out) const = 0;
 
 		public:
 
@@ -58,8 +61,8 @@ namespace kiwi
 
 			static std::unique_ptr<KnLangModelBase> create(utils::MemoryObject&& mem, ArchType archType = ArchType::none);
 
-			template<class TrieNode, class HistoryTx = std::vector<Vid>>
-			static utils::MemoryOwner build(const utils::ContinuousTrie<TrieNode>& ngram_cf,
+			template<class Trie, class HistoryTx = std::vector<Vid>>
+			static utils::MemoryOwner build(Trie&& ngram_cf,
 				size_t order, size_t min_cf, size_t last_min_cf,
 				size_t unk_id, size_t bos_id, size_t eos_id,
 				float unigram_alpha, size_t quantize, bool compress,
@@ -127,6 +130,19 @@ namespace kiwi
 					_progress(node_idx, *in_first);
 					*out_first = allNextLL(node_idx);
 					++out_first;
+				}
+			}
+
+			template<class InTy>
+			void predictTopN(InTy in_first, InTy in_last, size_t top_n, uint32_t* idx_out, float* ll_out) const
+			{
+				ptrdiff_t node_idx = 0;
+				for (; in_first != in_last; ++in_first)
+				{
+					_progress(node_idx, *in_first);
+					nextTopN(node_idx, top_n, idx_out, ll_out);
+					idx_out += top_n;
+					ll_out += top_n;
 				}
 			}
 

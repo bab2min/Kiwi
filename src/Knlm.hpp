@@ -4,9 +4,9 @@
 #include <cmath>
 #include <kiwi/Knlm.h>
 #include <kiwi/Trie.hpp>
+#include <kiwi/FrozenTrie.h>
 #include <kiwi/Utils.h>
 #include <kiwi/TemplateUtils.hpp>
-#include <kiwi/ArchUtils.h>
 #include "ArchAvailable.h"
 #include "search.h"
 #include "BitEncoder.hpp"
@@ -627,46 +627,93 @@ namespace kiwi
 				}
 				return ret;
 			}
-		};
 
-		template<ArchType archType>
-		std::unique_ptr<KnLangModelBase> createOptimizedModel(utils::MemoryObject&& mem)
-		{
-			auto* ptr = reinterpret_cast<const char*>(mem.get());
-			auto& header = *reinterpret_cast<const Header*>(ptr);
-			switch (header.key_size)
+			template<class KeyOut>
+			void _nextTopN(ptrdiff_t node_idx, size_t top_n, KeyOut* idx_out, float* ll_out) const
 			{
-			case 1:
-				return make_unique<KnLangModel<archType, uint8_t>>(std::move(mem));
-			case 2:
-				return make_unique<KnLangModel<archType, uint16_t>>(std::move(mem));
-			case 4:
-				return make_unique<KnLangModel<archType, uint32_t>>(std::move(mem));
-			case 8:
-				return make_unique<KnLangModel<archType, uint64_t>>(std::move(mem));
-			default:
-				throw std::runtime_error{ "Unsupported `key_size` : " + std::to_string((size_t)header.key_size) };
+				thread_local Vector<std::pair<float, KeyOut>> buf;
+				buf.clear();
+				auto* node = &node_data[node_idx];
+				auto* keys = &key_data[node->next_offset];
+				auto* values = &value_data[node->next_offset];
+				for (size_t i = 0; i < node->num_nexts; ++i)
+				{
+					if (values[i] < 0)
+					{
+						buf.emplace_back(reinterpret_cast<const float&>(values[i]), keys[i]);
+					}
+					else
+					{
+						buf.emplace_back(ll_data[node_idx + values[i]], keys[i]);
+					}
+				}
+				std::make_heap(buf.begin(), buf.end());
+
+				float acc = 0;
+				while (node->num_nexts < top_n && node->lower)
+				{
+					acc += gamma_data[node - &node_data[0]];
+					node += node->lower;
+					keys = &key_data[node->next_offset];
+					values = &value_data[node->next_offset];
+					for (size_t i = 0; i < node->num_nexts; ++i)
+					{
+						if (values[i] < 0)
+						{
+							buf.emplace_back(acc + reinterpret_cast<const float&>(values[i]), keys[i]);
+						}
+						else
+						{
+							buf.emplace_back(acc + ll_data[node - &node_data[0] + values[i]], keys[i]);
+						}
+						std::push_heap(buf.begin(), buf.end());
+					}
+				}
+
+				size_t i;
+				if (top_n <= 16)
+				{
+					for (i = 0; i < top_n && !buf.empty();)
+					{
+						std::pop_heap(buf.begin(), buf.end());
+						if (std::find(idx_out, idx_out + i, buf.back().second) == idx_out + i)
+						{
+							idx_out[i] = buf.back().second;
+							ll_out[i] = buf.back().first;
+							++i;
+						}
+						buf.pop_back();
+					}
+				}
+				else
+				{
+					thread_local std::unordered_set<KeyOut> uniq;
+					uniq.clear();
+					for (i = 0; i < top_n && !buf.empty();)
+					{
+						std::pop_heap(buf.begin(), buf.end());
+						if (uniq.insert(buf.back().second).second)
+						{
+							idx_out[i] = buf.back().second;
+							ll_out[i] = buf.back().first;
+							++i;
+						}
+						buf.pop_back();
+					}
+				}
+
+				for (; i < top_n; ++i)
+				{
+					idx_out[i] = 0;
+					ll_out[i] = -INFINITY;
+				}
 			}
-		}
 
-		using FnCreateOptimizedModel = decltype(&createOptimizedModel<ArchType::none>);
-
-		struct CreateOptimizedModelGetter
-		{
-			template<std::ptrdiff_t i>
-			struct Wrapper
+			void nextTopN(ptrdiff_t node_idx, size_t top_n, uint32_t* idx_out, float* ll_out) const final
 			{
-				static constexpr FnCreateOptimizedModel value = &createOptimizedModel<static_cast<ArchType>(i)>;
-			};
+				return _nextTopN(node_idx, top_n, idx_out, ll_out);
+			}
 		};
-
-		inline std::unique_ptr<KnLangModelBase> KnLangModelBase::create(utils::MemoryObject&& mem, ArchType archType)
-		{
-			static tp::Table<FnCreateOptimizedModel, AvailableArch> table{ CreateOptimizedModelGetter{} };
-			auto fn = table[static_cast<std::ptrdiff_t>(archType)];
-			if (!fn) throw std::runtime_error{ std::string{"Unsupported architecture : "} + archToStr(archType) };
-			return (*fn)(std::move(mem));
-		}
 
 		template<size_t bits>
 		void quantize(const std::vector<float>& ll_table, const std::vector<float>& gamma_table,
@@ -775,9 +822,9 @@ namespace kiwi
 					for (auto& e : discnts[1]) e *= 0.25;
 				}
 
-				std::vector<uint16_t> rkeys;
+				std::vector<KeyType> rkeys;
 				// set gamma & unigram ll
-				compressed_ngrams[0].traverseWithKeys([&](const TrieNode* node, const std::vector<uint16_t>& rkeys)
+				compressed_ngrams[0].traverseWithKeys([&](const TrieNode* node, const std::vector<KeyType>& rkeys)
 				{
 					if (rkeys.empty()) return;
 					ptrdiff_t i = (ptrdiff_t)(node - &compressed_ngrams[0]);
@@ -828,7 +875,7 @@ namespace kiwi
 				// set n-gram ll
 				for (size_t o = 2; o <= header.order; ++o)
 				{
-					compressed_ngrams[0].traverseWithKeys([&](const TrieNode* node, const std::vector<uint16_t>& rkeys)
+					compressed_ngrams[0].traverseWithKeys([&](const TrieNode* node, const std::vector<KeyType>& rkeys)
 					{
 						ptrdiff_t i = (ptrdiff_t)(node - &compressed_ngrams[0]);
 						if (rkeys.size() == o)
@@ -986,13 +1033,30 @@ namespace kiwi
 			return ret;
 		}
 
-		template<class TrieNode, class HistoryTx>
-		utils::MemoryOwner KnLangModelBase::build(const utils::ContinuousTrie<TrieNode>& ngram_cf, 
+		template<class Trie>
+		struct GetNodeType;
+
+		template<class TrieNode>
+		struct GetNodeType<utils::ContinuousTrie<TrieNode>>
+		{
+			using type = TrieNode;
+		};
+
+		template<class Key, class Value, class Diff, class SubMatch>
+		struct GetNodeType<utils::FrozenTrie<Key, Value, Diff, SubMatch>>
+		{
+			using type = utils::TrieNodeEx<Key, Value>;
+		};
+
+		template<class Trie, class HistoryTx>
+		utils::MemoryOwner KnLangModelBase::build(Trie&& ngram_cf, 
 			size_t order, size_t min_cf, size_t last_min_cf,
 			size_t unk_id, size_t bos_id, size_t eos_id, float unigram_alpha, size_t quantize, bool compress,
 			const std::vector<std::pair<Vid, Vid>>* bigram_list, const HistoryTx* history_transformer
 		)
 		{
+			using TrieNode = typename GetNodeType<typename std::remove_reference<typename std::remove_const<Trie>::type>::type>::type;
+			using Key = typename TrieNode::Key;
 			if (quantize > 16) throw std::invalid_argument{ "16+ bits quantization not supported."};
 			size_t max_vid = 0;
 			utils::ContinuousTrie<TrieNode> compressed_ngrams{ 1 };
@@ -1022,16 +1086,16 @@ namespace kiwi
 			}
 
 			{
-				std::vector<uint16_t> rkeys;
+				std::vector<Key> rkeys;
 				utils::ContinuousTrie<TrieNode> reverse_ngrams{ 1 };
 
-				ngram_cf[0].traverseWithKeys([&](const TrieNode* node, const std::vector<uint16_t>& rkeys)
+				ngram_cf.traverse([&](const uint32_t cnt, const std::vector<Key>& rkeys)
 				{
 					// unigram prob counting
 					if (rkeys.size() == 1)
 					{
 						if (rkeys[0] >= unigram_cnts.size()) unigram_cnts.resize(rkeys[0] + 1);
-						unigram_cnts[rkeys[0]] += node->val;
+						unigram_cnts[rkeys[0]] += cnt;
 					}
 
 					if (bigram_list == nullptr && rkeys.size() == 2)
@@ -1042,23 +1106,23 @@ namespace kiwi
 
 					size_t min_cnt = rkeys.size() == order ? last_min_cf : min_cf;
 
-					if (node->val < min_cnt) return;
+					if (cnt < min_cnt) return;
 
 					if (!rkeys.empty()) max_vid = std::max(max_vid, (size_t)rkeys.back());
 
 					// last-gram discounting
 					if (rkeys.size() == order)
 					{
-						size_t n = node->val / last_min_cf;
+						size_t n = cnt / last_min_cf;
 						if (n <= 4) ngram_ncnt[order - 1][n - 1]++;
 					}
 
 					if (rkeys.size() >= 2)
 					{
-						reverse_ngrams.build(rkeys.rbegin(), rkeys.rend(), 0)->val = node->val;
+						reverse_ngrams.build(rkeys.rbegin(), rkeys.rend(), 0)->val = cnt;
 					}
-					compressed_ngrams.build(rkeys.begin(), rkeys.end(), 0)->val += node->val;
-				}, rkeys);
+					compressed_ngrams.build(rkeys.begin(), rkeys.end(), 0)->val += cnt;
+				});
 				if (history_transformer)
 				{
 					compressed_ngrams.fillFail([&](size_t i) { return (*history_transformer)[i]; }, true);
@@ -1068,7 +1132,7 @@ namespace kiwi
 					compressed_ngrams.fillFail(true);
 				}
 
-				reverse_ngrams[0].traverseWithKeys([&](const TrieNode* node, const std::vector<uint16_t>& rkeys)
+				reverse_ngrams.traverseWithKeys([&](const TrieNode* node, const std::vector<Key>& rkeys)
 				{
 					if (rkeys.size() >= 1)
 					{

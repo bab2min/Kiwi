@@ -1,9 +1,8 @@
 ﻿#pragma once
-#include <string>
 #include <vector>
 #include <utility>
-#include <array>
 #include <kiwi/Types.h>
+#include <kiwi/Utils.h>
 #include "string_view.hpp"
 
 namespace kiwi
@@ -368,38 +367,6 @@ namespace kiwi
 			{
 				throw UnicodeException{ "unicode error" };
 			}
-		}
-		return ret;
-	}
-
-	inline bool isHighSurrogate(char16_t c)
-	{
-		return (c & 0xFC00) == 0xD800;
-	}
-
-	inline bool isLowSurrogate(char16_t c)
-	{
-		return (c & 0xFC00) == 0xDC00;
-	}
-
-	inline char32_t mergeSurrogate(char16_t h, char16_t l)
-	{
-		return (((h & 0x3FF) << 10) | (l & 0x3FF)) + 0x10000;
-	}
-
-	inline std::array<char16_t, 2> decomposeSurrogate(char32_t c)
-	{
-		std::array<char16_t, 2> ret;
-		if (c < 0x10000)
-		{
-			ret[0] = c;
-			ret[1] = 0;
-		}
-		else
-		{
-			c -= 0x10000;
-			ret[0] = ((c >> 10) & 0x3FF) | 0xD800;
-			ret[1] = (c & 0x3FF) | 0xDC00;
 		}
 		return ret;
 	}

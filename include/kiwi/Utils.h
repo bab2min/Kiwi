@@ -1,7 +1,8 @@
-#pragma once
+﻿#pragma once
 #include <iostream>
 #include <string>
 #include <memory>
+#include <array>
 #include "Types.h"
 
 namespace kiwi
@@ -82,6 +83,11 @@ namespace kiwi
 		return within(chr, 0x302E, 0x3030);
 	}
 
+	inline bool isCompatibleHangulConsonant(char16_t chr)
+	{
+		return within(chr, 0x3131, 0x314E) || within(chr, 0x3165, 0x3186);
+	}
+
 	struct ComparatorIgnoringSpace
 	{
 		static bool less(const KString& a, const KString& b, const kchar_t space = u' ');
@@ -144,6 +150,38 @@ namespace kiwi
 	inline std::u16string joinHangul(const KString& hangul)
 	{
 		return joinHangul(hangul.begin(), hangul.end());
+	}
+
+	inline bool isHighSurrogate(char16_t c)
+	{
+		return (c & 0xFC00) == 0xD800;
+	}
+
+	inline bool isLowSurrogate(char16_t c)
+	{
+		return (c & 0xFC00) == 0xDC00;
+	}
+
+	inline char32_t mergeSurrogate(char16_t h, char16_t l)
+	{
+		return (((h & 0x3FF) << 10) | (l & 0x3FF)) + 0x10000;
+	}
+
+	inline std::array<char16_t, 2> decomposeSurrogate(char32_t c)
+	{
+		std::array<char16_t, 2> ret;
+		if (c < 0x10000)
+		{
+			ret[0] = c;
+			ret[1] = 0;
+		}
+		else
+		{
+			c -= 0x10000;
+			ret[0] = ((c >> 10) & 0x3FF) | 0xD800;
+			ret[1] = (c & 0x3FF) | 0xDC00;
+		}
+		return ret;
 	}
 
 	POSTag identifySpecialChr(char32_t chr);

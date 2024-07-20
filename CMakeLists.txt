@@ -52,6 +52,7 @@ set ( CORE_SRCS
   src/Joiner.cpp
   src/Kiwi.cpp
   src/KiwiBuilder.cpp
+  src/Knlm.cpp
   src/KTrie.cpp
   src/PatternMatcher.cpp
   src/search.cpp
