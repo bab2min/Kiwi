@@ -284,19 +284,21 @@ Kiwi는 LGPL v3 라이센스로 배포됩니다.
 
 ## 인용하기
 DOI 혹은 아래의 BibTex를 이용해 인용해주세요.
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7041425.svg)](https://doi.org/10.5281/zenodo.7041425)
+[![DOI](https://img.shields.io/badge/DOI-10.23287/KJDH.2024.1.1.6-1BB31B.svg)](https://doi.org/10.23287/KJDH.2024.1.1.6)
 
 ```text
-@software{minchul_lee_2022_7041425,
-  author       = {Minchul Lee},
-  title        = {Kiwi, Korean Intelligent Word Identifier},
-  month        = sep,
-  year         = 2022,
-  publisher    = {Zenodo},
-  version      = {v0.14.0},
-  doi          = {10.5281/zenodo.7041425},
-  publisher = {GitHub},
-  journal = {GitHub repository},
-  howpublished = {\url{https://github.com/bab2min/Kiwi}}
+@article{43508,
+title = {Kiwi: Developing a Korean Morphological Analyzer  Based on Statistical Language Models and Skip-Bigram},
+journal = {Korean Journal of Digital Humanities},
+volume = {1},
+number = {1},
+page = {109-136},
+year = {2024},
+issn = {3058-311X},
+doi = {https://doi.org/10.23287/KJDH.2024.1.1.6},
+url = {https://kjdh/v.1/1/109/43508},
+author = {Min-chul Lee},
+keywords = {한국어, 자연어처리, 형태소 분석기, 모호성 해소, 언어 모델},
+abstract = {One of the challenges faced by models in Korean morphological analysis is ambiguity. This arises because different combinations of morphemes with completely different base forms can share the same surface form in Korean, necessitating the model's ability to consider context for accurate analysis. The morphological analyzer Kiwi addresses this issue by proposing a combination of a statistical language model that considers local context and a Skip-Bigram model that considers global context. This proposed method achieved an average accuracy of 86.7% in resolving ambiguities, outperforming existing open-source morphological analyzers, particularly deep learning-based ones, which typically achieve between 50-70%. Additionally, thanks to the optimized lightweight model, Kiwi shows faster speeds compared to other analyzers, making it useful for analyzing large volumes of text. Kiwi, released as open source, is widely used in various fields such as text mining, natural language processing, and the humanities due to these features. Although this study improved both the accuracy and efficiency of morphological analysis, it shows limitations in handling out-of-vocabulary problem and analyzing Korean dialects, necessitating further improvements in these areas.},
 }
 ```
