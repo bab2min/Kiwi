@@ -285,7 +285,22 @@ Kiwi는 LGPL v3 라이센스로 배포됩니다.
 ## 인용하기
 DOI 혹은 아래의 BibTex를 이용해 인용해주세요.
 [![DOI](https://img.shields.io/badge/DOI-10.23287/KJDH.2024.1.1.6-1BB31B.svg)](https://doi.org/10.23287/KJDH.2024.1.1.6)
-
+```text
+@article{43508,
+title = {Kiwi: 통계적 언어 모델과 Skip-Bigram을 이용한  한국어 형태소 분석기 구현},
+journal = {디지털인문학},
+volume = {1},
+number = {1},
+page = {109-136},
+year = {2024},
+issn = {3058-311X},
+doi = {https://doi.org/10.23287/KJDH.2024.1.1.6},
+url = {https://kjdh/v.1/1/109/43508},
+author = {민철 이},
+keywords = {한국어, 자연어처리, 형태소 분석기, 모호성 해소, 언어 모델},
+abstract = {한국어 형태소 분석 시 모델이 마주하는 어려움 중 하나는 모호성이다. 이는 한국어에서 기저형이 전혀 다른 형태소 조합이 동일한 표면형을 가질 수 있기 때문에 발생하며 이를 바르게 분석하기 위해서는 문맥을 고려하는 능력이 모델에게 필수적이다. 형태소 분석기 Kiwi는 이를 해결하기 위해 근거리 맥락을 고려하는 통계적 언어 모델과 원거리 맥락을 고려하는 Skip-Bigram 모델을 조합하는 방식을 제안한다. 제안된 방식은 모호성 해소에서 평균 정확도 86.7%를 달성하여 평균 50~70%에 머무르는 기존의 오픈소스 형태소 분석기, 특히 딥러닝 기반의 분석기들보다도 앞서는 결과를 보였다. 또한 최적화된 경량 모델을 사용한 덕분에 타 분석기보다 빠른 속도를 보여 대량의 텍스트를 분석하는 데에도 유용하게 쓰일 수 있다. 오픈소스로 공개된 Kiwi는 전술한 특징들 덕분에 텍스트 마이닝, 자연어처리, 인문학 등 다양한 분야에서 널리 사용되고 있다. 본 연구는 형태소 분석의 정확도와 효율성을 모두 개선했으나, 미등록어 처리와 한국어 방언 분석 등의 과제에서 한계를 보여 이에 대한 추가 보완이 필요하다.},
+}
+```
 ```text
 @article{43508,
 title = {Kiwi: Developing a Korean Morphological Analyzer  Based on Statistical Language Models and Skip-Bigram},
@@ -302,3 +317,4 @@ keywords = {한국어, 자연어처리, 형태소 분석기, 모호성 해소, �
 abstract = {One of the challenges faced by models in Korean morphological analysis is ambiguity. This arises because different combinations of morphemes with completely different base forms can share the same surface form in Korean, necessitating the model's ability to consider context for accurate analysis. The morphological analyzer Kiwi addresses this issue by proposing a combination of a statistical language model that considers local context and a Skip-Bigram model that considers global context. This proposed method achieved an average accuracy of 86.7% in resolving ambiguities, outperforming existing open-source morphological analyzers, particularly deep learning-based ones, which typically achieve between 50-70%. Additionally, thanks to the optimized lightweight model, Kiwi shows faster speeds compared to other analyzers, making it useful for analyzing large volumes of text. Kiwi, released as open source, is widely used in various fields such as text mining, natural language processing, and the humanities due to these features. Although this study improved both the accuracy and efficiency of morphological analysis, it shows limitations in handling out-of-vocabulary problem and analyzing Korean dialects, necessitating further improvements in these areas.},
 }
 ```
+
