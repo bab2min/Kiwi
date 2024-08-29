@@ -159,8 +159,8 @@ namespace kiwi
 			{
 				auto* ptr = reinterpret_cast<const char*>(base.get());
 				auto& header = getHeader();
-				size_t quantized = header.quantized & 0x1F;
-				bool compressed = header.quantized & 0x80;
+				const size_t quantized = header.quantized & 0x1F;
+				const bool compressed = header.quantized & 0x80;
 
 				Vector<KeyType> d_node_size;
 				auto* node_sizes = reinterpret_cast<const KeyType*>(ptr + header.node_offset);
@@ -640,11 +640,11 @@ namespace kiwi
 				{
 					if (values[i] < 0)
 					{
-						buf.emplace_back(reinterpret_cast<const float&>(values[i]), keys[i]);
+						buf.emplace_back(reinterpret_cast<const float&>(values[i]), (KeyOut)keys[i]);
 					}
 					else
 					{
-						buf.emplace_back(ll_data[node_idx + values[i]], keys[i]);
+						buf.emplace_back(ll_data[node_idx + values[i]], (KeyOut)keys[i]);
 					}
 				}
 				std::make_heap(buf.begin(), buf.end());
@@ -660,11 +660,11 @@ namespace kiwi
 					{
 						if (values[i] < 0)
 						{
-							buf.emplace_back(acc + reinterpret_cast<const float&>(values[i]), keys[i]);
+							buf.emplace_back(acc + reinterpret_cast<const float&>(values[i]), (KeyOut)keys[i]);
 						}
 						else
 						{
-							buf.emplace_back(acc + ll_data[node - &node_data[0] + values[i]], keys[i]);
+							buf.emplace_back(acc + ll_data[node - &node_data[0] + values[i]], (KeyOut)keys[i]);
 						}
 						std::push_heap(buf.begin(), buf.end());
 					}
@@ -790,10 +790,10 @@ namespace kiwi
 			std::vector<float> ll_table, gamma_table;
 			std::ostringstream llq, gammaq, c_node_size;
 			std::vector<KeyType> keys;
-			size_t quantized = header.quantized & 0x1F;
-			bool compressed = (header.quantized & 0x80) != 0;
+			const size_t quantized = header.quantized & 0x1F;
+			const bool compressed = (header.quantized & 0x80) != 0;
 
-			size_t quantize_size = (1 << (header.quantized & 0x1F));
+			const size_t quantize_size = ((size_t)1 << (header.quantized & 0x1F));
 			for (auto& node : compressed_ngrams)
 			{
 				size_t i = (size_t)(&node - &compressed_ngrams[0]);

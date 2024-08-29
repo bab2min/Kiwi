@@ -352,7 +352,7 @@ namespace kiwi
 					for (size_t i = 0; i < candidates.size(); ++i)
 					{
 						auto& c = candidates[i];
-						auto inserted = bestScoreByState.emplace(c.lmState, make_pair(c.score, i));
+						auto inserted = bestScoreByState.emplace(c.lmState, make_pair(c.score, (uint32_t)i));
 						if (!inserted.second)
 						{
 							if (inserted.first->second.first < c.score)

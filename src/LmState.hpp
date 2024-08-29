@@ -30,7 +30,7 @@ namespace kiwi
 	template<ArchType _arch, class VocabTy>
 	class KnLMState
 	{
-		friend class Hash<KnLMState<_arch, VocabTy>>;
+		friend struct Hash<KnLMState<_arch, VocabTy>>;
 		int32_t node = 0;
 	public:
 		static constexpr ArchType arch = _arch;
@@ -57,7 +57,7 @@ namespace kiwi
 	template<size_t windowSize, ArchType _arch, class VocabTy>
 	class SbgState : public KnLMState<_arch, VocabTy>
 	{
-		friend class Hash<SbgState<windowSize, _arch, VocabTy>>;
+		friend struct Hash<SbgState<windowSize, _arch, VocabTy>>;
 		size_t historyPos = 0;
 		std::array<VocabTy, windowSize> history = { {0,} };
 	public:
