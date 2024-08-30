@@ -303,6 +303,11 @@ namespace kiwi
 						setp(epptr() + off, epptr());
 					else if (dir == std::ios_base::beg)
 						setp(pbase() + off, epptr());
+					
+					if (!(which & std::ios_base::in))
+					{
+						return pptr() - pbase();
+					}
 				}
 				return gptr() - eback();
 			}

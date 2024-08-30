@@ -1,4 +1,4 @@
-﻿#include <fstream>
+#include <fstream>
 
 #include <kiwi/Kiwi.h>
 #include <kiwi/Utils.h>
@@ -585,7 +585,7 @@ namespace kiwi
 					}
 					else
 					{
-						auto inserted = bestPathIndex.emplace(ph, make_pair(bestPathValues.size(), 1));
+						auto inserted = bestPathIndex.emplace(ph, make_pair((uint32_t)bestPathValues.size(), 1));
 						if (inserted.second)
 						{
 							bestPathValues.emplace_back(curMorph, candScore, prevPath.accTypoCost + node->typoCost, &prevPath, move(cLmState), spState);

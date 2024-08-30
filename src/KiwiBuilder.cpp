@@ -723,10 +723,11 @@ KiwiBuilder::KiwiBuilder(const ModelBuildArgs& args)
 		new (&pool) utils::ThreadPool{ args.numWorkers };
 	}
 	auto cntNodes = utils::count(sents.begin(), sents.end(), args.lmMinCnt, 1, args.lmOrder, (args.numWorkers > 1 ? &pool : nullptr), &bigramList, args.useLmTagHistory ? &historyTx : nullptr);
-	cntNodes.root().getNext(lmVocabSize)->val /= 2;
+	std::vector<size_t> minCnts(args.lmOrder, args.lmMinCnt);
+	minCnts.back() = args.lmLastOrderMinCnt;
 	langMdl.knlm = lm::KnLangModelBase::create(lm::KnLangModelBase::build(
 		cntNodes, 
-		args.lmOrder, args.lmMinCnt, args.lmLastOrderMinCnt, 
+		args.lmOrder, minCnts, 
 		2, 0, 1, 1e-5, 
 		args.quantizeLm ? 8 : 0,
 		args.compressLm,

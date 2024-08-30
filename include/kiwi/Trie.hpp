@@ -133,6 +133,24 @@ namespace kiwi
 			}
 
 			template<typename _Fn, typename _CKey>
+			void traverse(_Fn&& fn, std::vector<_CKey>& rkeys, size_t maxDepth = -1, bool ignoreNegative = false) const
+			{
+				fn(this->val, rkeys);
+
+				if (rkeys.size() >= maxDepth) return;
+
+				for (auto& p : next)
+				{
+					if (ignoreNegative ? (p.second > 0) : (p.second))
+					{
+						rkeys.emplace_back(p.first);
+						getNext(p.first)->traverse(fn, rkeys, maxDepth, ignoreNegative);
+						rkeys.pop_back();
+					}
+				}
+			}
+
+			template<typename _Fn, typename _CKey>
 			void traverseWithKeys(_Fn&& fn, std::vector<_CKey>& rkeys, size_t maxDepth = -1, bool ignoreNegative = false) const
 			{
 				fn((Node*)this, rkeys);
@@ -460,6 +478,13 @@ namespace kiwi
 			void fillFail(HistoryTx&& htx, bool ignoreNegative = false)
 			{
 				return nodes[0].fillFail(std::forward<HistoryTx>(htx), ignoreNegative);
+			}
+
+			template<typename _Fn>
+			void traverse(_Fn&& fn, size_t maxDepth = -1, bool ignoreNegative = false) const
+			{
+				std::vector<typename Node::Key> rkeys;
+				return nodes[0].traverse(std::forward<_Fn>(fn), rkeys, maxDepth, ignoreNegative);
 			}
 
 			template<typename _Fn, typename _CKey>

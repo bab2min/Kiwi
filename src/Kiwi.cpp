@@ -847,6 +847,7 @@ namespace kiwi
 						morph.tag = s.tokenization[0].tag;
 						morph.vowel = CondVowel::none;
 						morph.polar = CondPolarity::none;
+						morph.complex = 0;
 						morph.lmMorphemeId = getDefaultMorphemeId(s.tokenization[0].tag);
 						form.candidate[0] = &morph;
 					}

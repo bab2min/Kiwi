@@ -14,7 +14,7 @@ namespace sais
 		std::unique_ptr<ChrTy[]> cKeys;
 		std::unique_ptr<size_t[]> cValues;
 		size_t length = 0, vocabSize = 0;
-		WaveletTree waveletTree;
+		WaveletTree<ChrTy> waveletTree;
 	public:
 		FmIndex() = default;
 
@@ -25,14 +25,14 @@ namespace sais
 			if (length < 0x80000000)
 			{
 				auto ibuf = std::unique_ptr<int32_t[]>(new int32_t[length + 1]);
-				bwt<char16_t, int32_t>(data, bwtData.get(), ibuf.get(), length, 0, nullptr, pool);
+				bwt<ChrTy, int32_t>(data, bwtData.get(), ibuf.get(), length, 0, nullptr, pool);
 			}
 			else
 			{
 				auto ibuf = std::unique_ptr<int64_t[]>(new int64_t[length + 1]);
-				bwt<char16_t, int64_t>(data, bwtData.get(), ibuf.get(), length, 0, nullptr, pool);
+				bwt<ChrTy, int64_t>(data, bwtData.get(), ibuf.get(), length, 0, nullptr, pool);
 			}
-			waveletTree = WaveletTree{ bwtData.get(), length };
+			waveletTree = WaveletTree<ChrTy>{ bwtData.get(), length };
 
 			/*freqs = std::unique_ptr<size_t[]>(new size_t[(size_t)1 << (sizeof(ChrTy) * 8)]);
 			std::fill(freqs.get(), freqs.get() + ((size_t)1 << (sizeof(ChrTy) * 8)), 0);
@@ -114,30 +114,34 @@ namespace sais
 		}
 
 		template<class Fn>
-		size_t enumSuffices(size_t minCnt, Fn&& fn) const
+		size_t enumSuffices(size_t minCnt, Fn&& fn, mp::ThreadPool* tp = nullptr) const
 		{
-			SuffixTy suffix;
-			TraceTy trace;
-			size_t numSuffices = 0;
-			for (size_t k = 0; k < vocabSize; ++k)
+			auto numSuffices = mp::runParallel(tp, [&](const size_t i, const size_t numWorkers, mp::Barrier*)
 			{
-				auto p = std::make_pair(cValues[k], (k + 1 < vocabSize) ? cValues[k + 1] : length);
-				if (p.second - p.first < minCnt) continue;
-				suffix.push_back(cKeys[k]);
-				trace.emplace_back(p);
-				if (!fn(const_cast<const SuffixTy&>(suffix), const_cast<const TraceTy&>(trace)))
+				SuffixTy suffix;
+				TraceTy trace;
+				size_t numSuffices = 0;
+				for (size_t k = i; k < vocabSize; k += numWorkers)
 				{
+					auto p = std::make_pair(cValues[k], (k + 1 < vocabSize) ? cValues[k + 1] : length);
+					if (p.second - p.first < minCnt) continue;
+					suffix.push_back(cKeys[k]);
+					trace.emplace_back(p);
+					if (!fn(const_cast<const SuffixTy&>(suffix), const_cast<const TraceTy&>(trace)))
+					{
+						suffix.pop_back();
+						trace.pop_back();
+						continue;
+					}
+					numSuffices++;
+
+					numSuffices += enumSuffices(minCnt, suffix, trace, p.first, p.second, fn);
 					suffix.pop_back();
 					trace.pop_back();
-					continue;
 				}
-				numSuffices++;
-
-				numSuffices += enumSuffices(minCnt, suffix, trace, p.first, p.second, fn);
-				suffix.pop_back();
-				trace.pop_back();
-			}
-			return numSuffices;
+				return numSuffices;
+			});
+			return std::accumulate(numSuffices.begin(), numSuffices.end(), (size_t)0);
 		}
 	};
 }

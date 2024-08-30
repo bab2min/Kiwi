@@ -111,7 +111,7 @@ namespace kiwi
 			for (size_t i = 0; i < trie.size(); ++i)
 			{
 				auto& o = trie[i];
-				nodes[i].numNexts = o.next.size();
+				nodes[i].numNexts = (Key)o.next.size();
 				values[i] = xform(o);
 				nodes[i].nextOffset = ptr;
 

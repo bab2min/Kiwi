@@ -7,7 +7,9 @@
 #include <algorithm>
 #include <numeric>
 
+#include "Utils.h"
 #include "Mmap.h"
+#include "ArchUtils.h"
 
 namespace kiwi
 {
@@ -20,6 +22,7 @@ namespace kiwi
 			uint64_t num_nodes, node_offset, key_offset, ll_offset, gamma_offset, qtable_offset, htx_offset;
 			uint64_t unk_id, bos_id, eos_id, vocab_size;
 			uint8_t order, key_size, diff_size, quantized;
+			uint32_t extra_buf_size;
 		};
 
 		template<class KeyType, class DiffType = int32_t>
@@ -43,6 +46,7 @@ namespace kiwi
 			virtual float _progress(ptrdiff_t& node_idx, size_t next) const = 0;
 			virtual std::vector<float> allNextLL(ptrdiff_t node_idx) const = 0;
 			virtual std::vector<float> allNextLL(ptrdiff_t node_idx, std::vector<ptrdiff_t>& next_node_idx) const = 0;
+			virtual void nextTopN(ptrdiff_t node_idx, size_t top_n, uint32_t* idx_out, float* ll_out) const = 0;
 
 		public:
 
@@ -55,21 +59,28 @@ namespace kiwi
 			virtual size_t llSize() const = 0;
 			virtual const float* getLLBuf() const = 0;
 			virtual const float* getGammaBuf() const = 0;
+			virtual const void* getExtraBuf() const = 0;
 
 			static std::unique_ptr<KnLangModelBase> create(utils::MemoryObject&& mem, ArchType archType = ArchType::none);
 
-			template<class TrieNode, class HistoryTx = std::vector<Vid>>
-			static utils::MemoryOwner build(const utils::ContinuousTrie<TrieNode>& ngram_cf,
-				size_t order, size_t min_cf, size_t last_min_cf,
+			template<class Trie, class HistoryTx = std::vector<Vid>>
+			static utils::MemoryOwner build(Trie&& ngram_cf,
+				size_t order, const std::vector<size_t>& min_cf_by_order,
 				size_t unk_id, size_t bos_id, size_t eos_id,
 				float unigram_alpha, size_t quantize, bool compress,
 				const std::vector<std::pair<Vid, Vid>>* bigram_list = nullptr,
-				const HistoryTx* historyTransformer = nullptr
+				const HistoryTx* history_transformer = nullptr,
+				const void* extra_buf = nullptr,
+				size_t extra_buf_size = 0
 			);
 
 			const utils::MemoryObject& getMemory() const { return base; }
 
-			//virtual float progress(ptrdiff_t& node_idx, size_t next) const = 0;
+			template<class Ty>
+			float progress(ptrdiff_t& node_idx, Ty next) const
+			{
+				return _progress(node_idx, next);
+			}
 
 			template<class InTy, class OutTy>
 			void evaluate(InTy in_first, InTy in_last, OutTy out_first) const
@@ -127,6 +138,19 @@ namespace kiwi
 					_progress(node_idx, *in_first);
 					*out_first = allNextLL(node_idx);
 					++out_first;
+				}
+			}
+
+			template<class InTy>
+			void predictTopN(InTy in_first, InTy in_last, size_t top_n, uint32_t* idx_out, float* ll_out) const
+			{
+				ptrdiff_t node_idx = 0;
+				for (; in_first != in_last; ++in_first)
+				{
+					_progress(node_idx, *in_first);
+					nextTopN(node_idx, top_n, idx_out, ll_out);
+					idx_out += top_n;
+					ll_out += top_n;
 				}
 			}
 
