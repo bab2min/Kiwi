@@ -436,11 +436,14 @@ class SaisImpl
 
             gather_lms_suffixes_16u(T, SA, n, (fast_sint_t)n - 1 - m, omp_block_start, omp_block_size);
 
-            mp::barrier(barrier);
-
-            if (pool && thread_state[id].state.m > 0)
+            if (num_threads > 1)
             {
-                SA[(fast_sint_t)n - 1 - m] = (SaTy)thread_state[id].state.last_lms_suffix;
+                mp::barrier(barrier);
+
+                if (pool && thread_state[id].state.m > 0)
+                {
+                    SA[(fast_sint_t)n - 1 - m] = (SaTy)thread_state[id].state.last_lms_suffix;
+                }
             }
         }, mp::ParallelCond{n >= 65536});
     }
