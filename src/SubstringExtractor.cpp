@@ -173,13 +173,44 @@ namespace kiwi
 	template<class IntTy>
 	using PrefixTrieNode = utils::TrieNodeEx<IntTy, uint32_t, utils::ConstAccess<map<IntTy, int32_t>>>;
 
-	PrefixCounter::PrefixCounter(size_t _prefixSize, size_t _minCf, size_t _numWorkers)
+	PrefixCounter::PrefixCounter(
+		size_t _prefixSize, 
+		size_t _minCf, 
+		size_t _numWorkers,
+		const std::vector<std::vector<size_t>>& clusters
+		)
 		: prefixSize(_prefixSize), minCf(_minCf), id2Token(2), buf(1)
 	{
-		if (_numWorkers == 0) _numWorkers = min(thread::hardware_concurrency(), 8u);
+		if (_numWorkers == (size_t)-1) _numWorkers = min(thread::hardware_concurrency(), 8u);
 		if (_numWorkers > 1)
 		{
 			threadPool = make_unique<mp::ThreadPool>(_numWorkers);
+		}
+
+		if (clusters.empty()) return;
+
+		unordered_set<size_t> alreadyAllocated;
+		for (auto cs : clusters)
+		{
+			if (cs.empty()) continue;
+			sort(cs.begin(), cs.end());
+			const auto cid = cs[0];
+			for (auto c : cs)
+			{
+				if (alreadyAllocated.find(c) != alreadyAllocated.end())
+				{
+					throw runtime_error("Duplicated cluster id");
+				}
+				alreadyAllocated.insert(c);
+
+				if (c >= tokenClusters.size())
+				{
+					const auto e = c + 1;
+					tokenClusters.resize(e, -1);
+					tokenCnts.resize(e);
+				}
+				tokenClusters[c] = cid;
+			}
 		}
 	}
 
@@ -188,7 +219,16 @@ namespace kiwi
 	{
 		for (; first != last; ++first)
 		{
-			const auto token = *first;
+			auto token = *first;
+			if (token < tokenClusters.size())
+			{
+				if (tokenClusters[token] != (size_t)-1)
+				{
+					tokenCnts[token]++;
+					token = tokenClusters[token];
+				}
+			}
+
 			auto it = token2id.find(token);
 			if (it == token2id.end())
 			{
@@ -295,18 +335,89 @@ namespace kiwi
 		return utils::freezeTrie(move(trie), ArchType::balanced);
 	}
 
+	Vector<pair<uint32_t, float>> PrefixCounter::computeClusterScore() const
+	{
+		UnorderedMap<size_t, size_t> clusterCnts;
+		for (size_t i = 0; i < tokenClusters.size(); ++i)
+		{
+			if (tokenClusters[i] != (size_t)-1)
+			{
+				clusterCnts[tokenClusters[i]] += tokenCnts[i];
+			}
+		}
+
+		Vector<pair<uint32_t, float>> ret;
+		ret.reserve(tokenClusters.size());
+		for (size_t i = 0; i < tokenClusters.size(); ++i)
+		{
+			if (tokenClusters[i] == (size_t)-1)
+			{
+				ret.emplace_back(-1, 0);
+			}
+			else
+			{
+				ret.emplace_back(tokenClusters[i], (float)log((double)tokenCnts[i] / clusterCnts[tokenClusters[i]]));
+			}
+		}
+		return ret;
+	}
+
 	unique_ptr<lm::KnLangModelBase> PrefixCounter::buildLM(
-		size_t lastMinCf, 
+		const std::vector<size_t>& minCfByOrder,
 		size_t bosTokenId,
 		size_t eosTokenId,
 		size_t unkTokenId,
 		ArchType archType) const
 	{
+		Vector<char> extraBuf;
+		if (!tokenClusters.empty())
+		{
+			auto clusterScore = computeClusterScore();
+			extraBuf.resize(clusterScore.size() * sizeof(uint64_t) + sizeof(uint64_t) * 2);
+			memcpy(extraBuf.data(), "UNIGRAM\0", sizeof(uint64_t));
+			uint64_t size = clusterScore.size();
+			memcpy(extraBuf.data() + sizeof(uint64_t), &size, sizeof(uint64_t));
+			memcpy(extraBuf.data() + sizeof(uint64_t) * 2, clusterScore.data(), clusterScore.size() * sizeof(uint64_t));
+		}
+
 		utils::MemoryOwner mem;
 		{
 			auto trie = count();
-			mem = lm::KnLangModelBase::build(move(trie), prefixSize, minCf, lastMinCf, unkTokenId, bosTokenId, eosTokenId, 1e-5f, 0, false);
+			mem = lm::KnLangModelBase::build(move(trie), prefixSize, minCfByOrder, unkTokenId, bosTokenId, eosTokenId, 
+				1e-5f, 0, false, nullptr, (const Vector<int>*)nullptr,
+				extraBuf.data(), extraBuf.size());
 		}
 		return lm::KnLangModelBase::create(move(mem), archType);
+	}
+
+	ClusterData::ClusterData() = default;
+
+	ClusterData::ClusterData(const void* _ptr, size_t _size)
+	{
+		if (!_ptr || !_size) return;
+		if (_size < sizeof(uint64_t) * 2) throw runtime_error("Invalid cluster data");
+		auto ptr = (const uint64_t*)_ptr;
+		if (memcmp(ptr, "UNIGRAM\0", sizeof(uint64_t)) != 0) throw runtime_error("Invalid cluster data");
+		const auto size = ptr[1];
+		if (_size < sizeof(uint64_t) * 2 + size * sizeof(uint64_t)) throw runtime_error("Invalid cluster data");
+		clusterScores = (const pair<uint32_t, float>*)(ptr + 2);
+		clusterSize = size;
+	}
+
+	size_t ClusterData::size() const
+	{
+		return clusterSize;
+	}
+
+	size_t ClusterData::cluster(size_t i) const
+	{
+		if (i >= clusterSize || clusterScores[i].first == (uint32_t)-1) return i;
+		return clusterScores[i].first;
+	}
+
+	float ClusterData::score(size_t i) const
+	{
+		if (i >= clusterSize || clusterScores[i].first == (uint32_t)-1) return 0;
+		return clusterScores[i].second;
 	}
 }
