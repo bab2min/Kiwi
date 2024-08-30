@@ -17,6 +17,9 @@ namespace kiwi
 {
 	namespace lm
 	{
+		static constexpr size_t serialAlignment = 16;
+
+
 		using QCode = qe::QCode<0, 2, 8, 16>;
 
 		template<size_t bits>
@@ -79,6 +82,12 @@ namespace kiwi
 			}
 		}
 
+		inline const void* toAlignedPtr(const void* ptr, size_t alignment = serialAlignment)
+		{
+			auto addr = reinterpret_cast<size_t>(ptr);
+			return reinterpret_cast<const void*>((addr + alignment - 1) & ~(alignment - 1));
+		}
+
 		template<ArchType arch, class KeyType, class DiffType = int32_t>
 		class KnLangModel : public KnLangModelBase
 		{
@@ -92,6 +101,7 @@ namespace kiwi
 			const float* ll_data = nullptr;
 			const float* gamma_data = nullptr;
 			const KeyType* htx_data = nullptr;
+			const void* extra_buf = nullptr;
 			Vector<float> restored_floats;
 			float unk_ll = 0;
 			ptrdiff_t bos_node_idx = 0;
@@ -209,12 +219,14 @@ namespace kiwi
 						num_non_leaf_nodes,
 						num_leaf_nodes
 					);
+					extra_buf = toAlignedPtr(gamma_table + ((size_t)1 << quantized));
 				}
 				else
 				{
 					ll_data = reinterpret_cast<const float*>(ptr + header.ll_offset);
 					gamma_data = reinterpret_cast<const float*>(ptr + header.gamma_offset);
 					leaf_ll_data = ll_data + num_non_leaf_nodes;
+					extra_buf = toAlignedPtr(gamma_data + num_non_leaf_nodes);
 				}
 
 				size_t htx_vocab_size = header.vocab_size;
@@ -222,6 +234,12 @@ namespace kiwi
 				{
 					htx_data = reinterpret_cast<const KeyType*>(ptr + header.htx_offset);
 					htx_vocab_size = *std::max_element(htx_data, htx_data + header.vocab_size) + 1;
+					extra_buf = toAlignedPtr(htx_data + header.vocab_size);
+				}
+
+				if (!header.extra_buf_size)
+				{
+					extra_buf = nullptr;
 				}
 
 				// restore node's data
@@ -446,6 +464,11 @@ namespace kiwi
 			const float* getGammaBuf() const final
 			{
 				return gamma_data;
+			}
+
+			const void* getExtraBuf() const final
+			{
+				return extra_buf;
 			}
 
 			ptrdiff_t getLowerNode(ptrdiff_t node_idx) const final
@@ -772,15 +795,33 @@ namespace kiwi
 			return table[bits - 1](ll_table, gamma_table, ll, leaf_ll, gamma, llq, gammaq);
 		}
 
+		inline size_t alignedOffsetInc(size_t& offset, size_t inc, size_t alignment = serialAlignment)
+		{
+			return offset = (offset + inc + alignment - 1) & ~(alignment - 1);
+		}
+
+		inline std::ostream& writePadding(std::ostream& os, size_t alignment = serialAlignment)
+		{
+			const size_t pos = os.tellp();
+			size_t pad = ((pos + alignment - 1) & ~(alignment - 1)) - pos;
+			for (size_t i = 0; i < pad; ++i)
+			{
+				os.put(0);
+			}
+			return os;
+		}
+
 		template<class KeyType, class TrieNode, class HistoryTx>
 		utils::MemoryOwner buildCompressedModel(Header header,
-			size_t min_cf, size_t last_min_cf,
+			const std::vector<size_t>& min_cf_by_order,
 			float unigram_alpha,
 			utils::ContinuousTrie<TrieNode>&& compressed_ngrams,
 			const std::vector<double>& unigram_pats,
 			const std::vector<double>& unigram_cnts,
 			const std::vector<std::array<size_t, 4>>& ngram_ncnt,
-			const HistoryTx* history_transformer = nullptr
+			const HistoryTx* history_transformer = nullptr,
+			const void* extra_buf = nullptr,
+			size_t extra_buf_size = 0
 		)
 		{
 			header.key_size = sizeof(KeyType);
@@ -814,7 +855,7 @@ namespace kiwi
 					double y = ncnt[0] / (ncnt[0] + 2. * ncnt[1]);
 					for (size_t j = 0; j < 3; ++j)
 					{
-						discnts[i][j] = ncnt[j] ? ((j + 1) - (j + 2) * y * ncnt[j + 1] / ncnt[j]) : 0;
+						discnts[i][j] = ncnt[j] ? std::max((j + 1) - (j + 2) * y * ncnt[j + 1] / ncnt[j], 0.) : 0;
 					}
 				}
 				if (history_transformer)
@@ -828,7 +869,7 @@ namespace kiwi
 				{
 					if (rkeys.empty()) return;
 					ptrdiff_t i = (ptrdiff_t)(node - &compressed_ngrams[0]);
-					size_t min_cnt = rkeys.size() < header.order - 1 ? min_cf : last_min_cf;
+					const size_t min_cnt = std::max(min_cf_by_order[std::max(std::min(rkeys.size(), min_cf_by_order.size()), (size_t)1) - 1], (size_t)1);
 
 					std::array<size_t, 3> pats = { 0, };
 					ptrdiff_t rest = node->val;
@@ -880,7 +921,7 @@ namespace kiwi
 						ptrdiff_t i = (ptrdiff_t)(node - &compressed_ngrams[0]);
 						if (rkeys.size() == o)
 						{
-							size_t min_cnt = o < header.order ? min_cf : last_min_cf;
+							const size_t min_cnt = std::max(min_cf_by_order[std::max(std::min(rkeys.size(), min_cf_by_order.size()), (size_t)1) - 1], (size_t)1);
 							if (node->val)
 							{
 								double l = (node->val - min_cnt * discnts[rkeys.size() - 1][std::min(node->val / min_cnt, (size_t)3) - 1]) / (double)node->getParent()->val;
@@ -964,42 +1005,44 @@ namespace kiwi
 
 			size_t final_size = 0;
 
-			header.node_offset = (final_size += sizeof(Header));
+			header.node_offset = alignedOffsetInc(final_size, sizeof(Header));
 			if (compressed)
 			{
-				header.key_offset = (final_size += c_node_size.tellp());
+				header.key_offset = alignedOffsetInc(final_size, c_node_size.tellp());
 			}
 			else
 			{
-				header.key_offset = (final_size += sizeof(KeyType) * node_sizes.size());
+				header.key_offset = alignedOffsetInc(final_size, sizeof(KeyType) * node_sizes.size());
 			}
-			header.ll_offset = (final_size += sizeof(KeyType) * keys.size());
+			header.ll_offset = alignedOffsetInc(final_size, sizeof(KeyType) * keys.size());
 			if (quantized)
 			{
-				header.gamma_offset = (final_size += llq.tellp());
-				header.qtable_offset = (final_size += gammaq.tellp());
-				final_size += sizeof(float) * quantize_size * 2;
+				header.gamma_offset = alignedOffsetInc(final_size, llq.tellp());
+				header.qtable_offset = alignedOffsetInc(final_size, gammaq.tellp());
+				alignedOffsetInc(final_size, sizeof(float) * quantize_size * 2);
 			}
 			else
 			{
-				header.gamma_offset = (final_size += sizeof(float) * (ll.size() + leaf_ll.size()));
+				header.gamma_offset = alignedOffsetInc(final_size, sizeof(float) * (ll.size() + leaf_ll.size()));
 				header.qtable_offset = 0;
-				final_size += sizeof(float) * gamma.size();
+				alignedOffsetInc(final_size, sizeof(float) * gamma.size());
 			}
 
 			if (history_transformer)
 			{
 				header.htx_offset = final_size;
-				final_size += sizeof(KeyType) * header.vocab_size;
+				alignedOffsetInc(final_size, sizeof(KeyType) * header.vocab_size);
 			}
 			else
 			{
 				header.htx_offset = 0;
 			}
+			header.extra_buf_size = extra_buf_size;
 
-			utils::MemoryOwner ret{ final_size };
+			utils::MemoryOwner ret{ final_size + extra_buf_size };
 			utils::omstream ostr{ (char*)ret.get(), (std::ptrdiff_t)ret.size() };
 			ostr.write((const char*)&header, sizeof(Header));
+			writePadding(ostr);
 			if (compressed)
 			{
 				ostr.write((const char*)c_node_size.str().data(), c_node_size.tellp());
@@ -1008,11 +1051,15 @@ namespace kiwi
 			{
 				ostr.write((const char*)node_sizes.data(), sizeof(KeyType) * node_sizes.size());
 			}
+			writePadding(ostr);
 			ostr.write((const char*)keys.data(), sizeof(KeyType) * keys.size());
+			writePadding(ostr);
 			if (quantized)
 			{
 				ostr.write((const char*)llq.str().data(), llq.tellp());
+				writePadding(ostr);
 				ostr.write((const char*)gammaq.str().data(), gammaq.tellp());
+				writePadding(ostr);
 				ostr.write((const char*)ll_table.data(), sizeof(float) * quantize_size);
 				ostr.write((const char*)gamma_table.data(), sizeof(float) * quantize_size);
 			}
@@ -1020,8 +1067,10 @@ namespace kiwi
 			{
 				ostr.write((const char*)ll.data(), sizeof(float) * ll.size());
 				ostr.write((const char*)leaf_ll.data(), sizeof(float) * leaf_ll.size());
+				writePadding(ostr);
 				ostr.write((const char*)gamma.data(), sizeof(float) * gamma.size());
 			}
+			writePadding(ostr);
 
 			if (history_transformer)
 			{
@@ -1029,6 +1078,12 @@ namespace kiwi
 				std::copy(history_transformer->begin(), history_transformer->end(), std::back_inserter(htx));
 				htx.resize(header.vocab_size);
 				ostr.write((const char*)htx.data(), sizeof(KeyType) * htx.size());
+			}
+			writePadding(ostr);
+
+			if (extra_buf_size)
+			{
+				ostr.write((const char*)extra_buf, extra_buf_size);
 			}
 			return ret;
 		}
@@ -1050,9 +1105,10 @@ namespace kiwi
 
 		template<class Trie, class HistoryTx>
 		utils::MemoryOwner KnLangModelBase::build(Trie&& ngram_cf, 
-			size_t order, size_t min_cf, size_t last_min_cf,
+			size_t order, const std::vector<size_t>& min_cf_by_order, 
 			size_t unk_id, size_t bos_id, size_t eos_id, float unigram_alpha, size_t quantize, bool compress,
-			const std::vector<std::pair<Vid, Vid>>* bigram_list, const HistoryTx* history_transformer
+			const std::vector<std::pair<Vid, Vid>>* bigram_list, const HistoryTx* history_transformer,
+			const void* extra_buf, size_t extra_buf_size
 		)
 		{
 			using TrieNode = typename GetNodeType<typename std::remove_reference<typename std::remove_const<Trie>::type>::type>::type;
@@ -1062,9 +1118,6 @@ namespace kiwi
 			utils::ContinuousTrie<TrieNode> compressed_ngrams{ 1 };
 			std::vector<double> unigram_pats, unigram_cnts;
 			std::vector<std::array<size_t, 4>> ngram_ncnt(order);
-
-			if (min_cf == 0) min_cf = 1;
-			if (last_min_cf < min_cf) last_min_cf = min_cf;
 
 			if (bigram_list)
 			{
@@ -1104,7 +1157,7 @@ namespace kiwi
 						unigram_pats[rkeys[1]] += 1;
 					}
 
-					size_t min_cnt = rkeys.size() == order ? last_min_cf : min_cf;
+					const size_t min_cnt = std::max(min_cf_by_order[std::max(std::min(rkeys.size(), min_cf_by_order.size()), (size_t)1) - 1], (size_t)1);
 
 					if (cnt < min_cnt) return;
 
@@ -1113,7 +1166,7 @@ namespace kiwi
 					// last-gram discounting
 					if (rkeys.size() == order)
 					{
-						size_t n = cnt / last_min_cf;
+						size_t n = cnt / min_cnt;
 						if (n <= 4) ngram_ncnt[order - 1][n - 1]++;
 					}
 
@@ -1160,19 +1213,35 @@ namespace kiwi
 
 			if (max_vid <= 0xFF)
 			{
-				return buildCompressedModel<uint8_t>(header, min_cf, last_min_cf, unigram_alpha, move(compressed_ngrams), unigram_pats, unigram_cnts, ngram_ncnt, history_transformer);
+				return buildCompressedModel<uint8_t>(header, min_cf_by_order, 
+					unigram_alpha, move(compressed_ngrams), 
+					unigram_pats, unigram_cnts, ngram_ncnt, 
+					history_transformer,
+					extra_buf, extra_buf_size);
 			}
 			else if (max_vid <= 0xFFFF)
 			{
-				return buildCompressedModel<uint16_t>(header, min_cf, last_min_cf, unigram_alpha, move(compressed_ngrams), unigram_pats, unigram_cnts, ngram_ncnt, history_transformer);
+				return buildCompressedModel<uint16_t>(header, min_cf_by_order,
+					unigram_alpha, move(compressed_ngrams), 
+					unigram_pats, unigram_cnts, ngram_ncnt, 
+					history_transformer,
+					extra_buf, extra_buf_size);
 			}
 			else if (max_vid <= 0xFFFFFFFF)
 			{
-				return buildCompressedModel<uint32_t>(header, min_cf, last_min_cf, unigram_alpha, move(compressed_ngrams), unigram_pats, unigram_cnts, ngram_ncnt, history_transformer);
+				return buildCompressedModel<uint32_t>(header, min_cf_by_order,
+					unigram_alpha, move(compressed_ngrams), 
+					unigram_pats, unigram_cnts, ngram_ncnt, 
+					history_transformer,
+					extra_buf, extra_buf_size);
 			}
 			else
 			{
-				return buildCompressedModel<uint64_t>(header, min_cf, last_min_cf, unigram_alpha, move(compressed_ngrams), unigram_pats, unigram_cnts, ngram_ncnt, history_transformer);
+				return buildCompressedModel<uint64_t>(header, min_cf_by_order,
+					unigram_alpha, move(compressed_ngrams), 
+					unigram_pats, unigram_cnts, ngram_ncnt, 
+					history_transformer,
+					extra_buf, extra_buf_size);
 			}
 		}
 	}
