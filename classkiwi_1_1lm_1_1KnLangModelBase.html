@@ -101,9 +101,16 @@ virtual const float *&#160;</td><td class="memItemRight" valign="bottom"><b>getL
 <tr class="memitem:a9f3cb4dfca202d6b3689fc5af120cfb4"><td class="memItemLeft" align="right" valign="top"><a id="a9f3cb4dfca202d6b3689fc5af120cfb4"></a>
 virtual const float *&#160;</td><td class="memItemRight" valign="bottom"><b>getGammaBuf</b> () const =0</td></tr>
 <tr class="separator:a9f3cb4dfca202d6b3689fc5af120cfb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a70e3f3d5a9293543eed077c9e47ff5fe"><td class="memItemLeft" align="right" valign="top"><a id="a70e3f3d5a9293543eed077c9e47ff5fe"></a>
+virtual const void *&#160;</td><td class="memItemRight" valign="bottom"><b>getExtraBuf</b> () const =0</td></tr>
+<tr class="separator:a70e3f3d5a9293543eed077c9e47ff5fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa91a730e0798a42836f9b5a0799d0543"><td class="memItemLeft" align="right" valign="top"><a id="aa91a730e0798a42836f9b5a0799d0543"></a>
 const <a class="el" href="classkiwi_1_1utils_1_1MemoryObject.html">utils::MemoryObject</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>getMemory</b> () const</td></tr>
 <tr class="separator:aa91a730e0798a42836f9b5a0799d0543"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4c30e1be3dd87f408d5904e33d6d8ad2"><td class="memTemplParams" colspan="2"><a id="a4c30e1be3dd87f408d5904e33d6d8ad2"></a>
+template&lt;class Ty &gt; </td></tr>
+<tr class="memitem:a4c30e1be3dd87f408d5904e33d6d8ad2"><td class="memTemplItemLeft" align="right" valign="top">float&#160;</td><td class="memTemplItemRight" valign="bottom"><b>progress</b> (ptrdiff_t &amp;node_idx, Ty next) const</td></tr>
+<tr class="separator:a4c30e1be3dd87f408d5904e33d6d8ad2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaecb93d9cd0eed052505e6c8a1a36128"><td class="memTemplParams" colspan="2"><a id="aaecb93d9cd0eed052505e6c8a1a36128"></a>
 template&lt;class InTy , class OutTy &gt; </td></tr>
 <tr class="memitem:aaecb93d9cd0eed052505e6c8a1a36128"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>evaluate</b> (InTy in_first, InTy in_last, OutTy out_first) const</td></tr>
@@ -124,6 +131,10 @@ template&lt;class InTy &gt; </td></tr>
 template&lt;class InTy , class OutTy &gt; </td></tr>
 <tr class="memitem:a4bb0d466c5dafc96651c13b5a41f82e1"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>predict</b> (InTy in_first, InTy in_last, OutTy out_first) const</td></tr>
 <tr class="separator:a4bb0d466c5dafc96651c13b5a41f82e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3a97dad9aa04cd0b362d876432a0eb30"><td class="memTemplParams" colspan="2"><a id="a3a97dad9aa04cd0b362d876432a0eb30"></a>
+template&lt;class InTy &gt; </td></tr>
+<tr class="memitem:a3a97dad9aa04cd0b362d876432a0eb30"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>predictTopN</b> (InTy in_first, InTy in_last, size_t top_n, uint32_t *idx_out, float *ll_out) const</td></tr>
+<tr class="separator:a3a97dad9aa04cd0b362d876432a0eb30"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa4b860b076dc6a1b12094c3fc87b2675"><td class="memTemplParams" colspan="2"><a id="aa4b860b076dc6a1b12094c3fc87b2675"></a>
 template&lt;class PfTy , class SfTy , class OutTy &gt; </td></tr>
 <tr class="memitem:aa4b860b076dc6a1b12094c3fc87b2675"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>fillIn</b> (PfTy prefix_first, PfTy prefix_last, SfTy suffix_first, SfTy suffix_last, OutTy out_first, bool reduce=true) const</td></tr>
@@ -134,10 +145,10 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:ad1e69a913d0ec0a1860426cf85e7557c"><td class="memItemLeft" align="right" valign="top"><a id="ad1e69a913d0ec0a1860426cf85e7557c"></a>
 static std::unique_ptr&lt; <a class="el" href="classkiwi_1_1lm_1_1KnLangModelBase.html">KnLangModelBase</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>create</b> (<a class="el" href="classkiwi_1_1utils_1_1MemoryObject.html">utils::MemoryObject</a> &amp;&amp;mem, ArchType archType=ArchType::none)</td></tr>
 <tr class="separator:ad1e69a913d0ec0a1860426cf85e7557c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2288cfe9c7c20fc036e9ad222d04164c"><td class="memTemplParams" colspan="2"><a id="a2288cfe9c7c20fc036e9ad222d04164c"></a>
-template&lt;class TrieNode , class HistoryTx  = std::vector&lt;Vid&gt;&gt; </td></tr>
-<tr class="memitem:a2288cfe9c7c20fc036e9ad222d04164c"><td class="memTemplItemLeft" align="right" valign="top">static <a class="el" href="classkiwi_1_1utils_1_1MemoryOwner.html">utils::MemoryOwner</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><b>build</b> (const <a class="el" href="classkiwi_1_1utils_1_1ContinuousTrie.html">utils::ContinuousTrie</a>&lt; TrieNode &gt; &amp;ngram_cf, size_t order, size_t min_cf, size_t last_min_cf, size_t unk_id, size_t bos_id, size_t eos_id, float unigram_alpha, size_t quantize, bool compress, const std::vector&lt; std::pair&lt; Vid, Vid &gt;&gt; *bigram_list=nullptr, const HistoryTx *historyTransformer=nullptr)</td></tr>
-<tr class="separator:a2288cfe9c7c20fc036e9ad222d04164c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a47652386ea64befbb4c24807d37aa5ed"><td class="memTemplParams" colspan="2"><a id="a47652386ea64befbb4c24807d37aa5ed"></a>
+template&lt;class Trie , class HistoryTx  = std::vector&lt;Vid&gt;&gt; </td></tr>
+<tr class="memitem:a47652386ea64befbb4c24807d37aa5ed"><td class="memTemplItemLeft" align="right" valign="top">static <a class="el" href="classkiwi_1_1utils_1_1MemoryOwner.html">utils::MemoryOwner</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><b>build</b> (Trie &amp;&amp;ngram_cf, size_t order, const std::vector&lt; size_t &gt; &amp;min_cf_by_order, size_t unk_id, size_t bos_id, size_t eos_id, float unigram_alpha, size_t quantize, bool compress, const std::vector&lt; std::pair&lt; Vid, Vid &gt;&gt; *bigram_list=nullptr, const HistoryTx *history_transformer=nullptr, const void *extra_buf=nullptr, size_t extra_buf_size=0)</td></tr>
+<tr class="separator:a47652386ea64befbb4c24807d37aa5ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
@@ -153,6 +164,9 @@ virtual std::vector&lt; float &gt;&#160;</td><td class="memItemRight" valign="bo
 <tr class="memitem:ab9bd152527ca2fce8e00b202ea2886e6"><td class="memItemLeft" align="right" valign="top"><a id="ab9bd152527ca2fce8e00b202ea2886e6"></a>
 virtual std::vector&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>allNextLL</b> (ptrdiff_t node_idx, std::vector&lt; ptrdiff_t &gt; &amp;next_node_idx) const =0</td></tr>
 <tr class="separator:ab9bd152527ca2fce8e00b202ea2886e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acd4f9db9c722f4d251f5da25b11a5d26"><td class="memItemLeft" align="right" valign="top"><a id="acd4f9db9c722f4d251f5da25b11a5d26"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>nextTopN</b> (ptrdiff_t node_idx, size_t top_n, uint32_t *idx_out, float *ll_out) const =0</td></tr>
+<tr class="separator:acd4f9db9c722f4d251f5da25b11a5d26"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>

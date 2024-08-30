@@ -4,5 +4,5 @@ digraph "Graphical Class Hierarchy"
   edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
   node [fontname="Helvetica",fontsize="10",shape=record];
   rankdir="LR";
-  Node0 [label="kiwi::HiddenMember\l\< Ty, size \>",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classkiwi_1_1HiddenMember.html",tooltip=" "];
+  Node0 [label="kiwi::HiddenMember\l\< kiwi::RaggedVector\l\< uint16_t \>, sizeof\l(Vector\< size_t \>) *2 \>",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classkiwi_1_1HiddenMember.html",tooltip=" "];
 }
