@@ -44,7 +44,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/download-artifact@v2
+    - uses: actions/download-artifact@v4.1.7
       with:
         name: asset_Centos5
         path: arts
@@ -114,7 +114,7 @@ jobs:
       uses: bruceadams/get-release@v1.2.2
       env:
         GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-    - uses: actions/download-artifact@v2
+    - uses: actions/download-artifact@v4.1.7
       with:
         name: asset_Centos6
         path: arts
@@ -127,7 +127,7 @@ jobs:
         asset_path: arts/asset.tgz
         asset_name: kiwi_lnx_x86_64_${{ steps.get_release.outputs.tag_name }}.tgz
         asset_content_type: application/octet-stream
-    - uses: actions/download-artifact@v2
+    - uses: actions/download-artifact@v4.1.7
       with:
         name: jar_Centos6
         path: arts
