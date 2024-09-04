@@ -1060,7 +1060,7 @@ size_t kiwi::splitByTrie(
 				lastSpecialEndPos * posMultiplier, specialStartPos * posMultiplier, 
 				str.substr(nonSpaces[lastSpecialEndPos], nonSpaces[specialStartPos] - nonSpaces[lastSpecialEndPos]));
 		}
-		if (appendNewNode(out, endPosMap, 
+		if (specialStartPos < nonSpaces.size() && appendNewNode(out, endPosMap,
 			specialStartPos * posMultiplier, nonSpaces.size() * posMultiplier, 
 			U16StringView{ &str[nonSpaces[specialStartPos]], n - nonSpaces[specialStartPos] }))
 		{

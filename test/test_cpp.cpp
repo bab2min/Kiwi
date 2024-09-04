@@ -1484,3 +1484,16 @@ TEST(KiwiCpp, NestedSentenceSplit)
 		EXPECT_EQ(ranges.size(), 1);
 	}
 }
+
+TEST(KiwiCpp, IssueP172_LengthError)
+{
+	std::u16string text;
+	text += u"\n";
+	for (int i = 0; i < 4000; ++i)
+	{
+		text += u"좋은채팅사이트《35141561234.wang.com》";
+	}
+	Kiwi& kiwi = reuseKiwiInstance();
+	auto res = kiwi.analyze(text, Match::allWithNormalizing).first;
+	EXPECT_GT(res.size(), 0);
+}
