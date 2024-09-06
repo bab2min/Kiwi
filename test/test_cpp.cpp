@@ -1124,6 +1124,19 @@ TEST(KiwiCpp, IssueP131_SentenceSplitError)
 	EXPECT_EQ(res[1], std::make_pair((size_t)10, (size_t)12));
 }
 
+TEST(KiwiCpp, Issue181_SentenceSplitError)
+{
+	const char16_t* text = u"존 슈발John Schwall은 그에 꼭 들어맞는 흥미로운 사례였다. 슈발의 아버지와 할아버지는 스테이튼 아일랜드의 소방관이었다. “제 친가 쪽의 남자들은 모두 소방관이에요. 전 다 른 일을 하고 싶었죠.” 슈발이 말했다.";
+	Kiwi& kiwi = reuseKiwiInstance();
+	auto res = kiwi.splitIntoSents(text);
+	EXPECT_EQ(res.size(), 5);
+	EXPECT_EQ(res[0], std::make_pair((size_t)0, (size_t)38));
+	EXPECT_EQ(res[1], std::make_pair((size_t)39, (size_t)72));
+	EXPECT_EQ(res[2], std::make_pair((size_t)73, (size_t)97));
+	EXPECT_EQ(res[3], std::make_pair((size_t)98, (size_t)115));
+	EXPECT_EQ(res[4], std::make_pair((size_t)116, (size_t)124));
+}
+
 TEST(KiwiCpp, AddRule)
 {
 	Kiwi& okiwi = reuseKiwiInstance();
