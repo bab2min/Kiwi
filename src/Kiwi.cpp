@@ -375,7 +375,8 @@ namespace kiwi
 					(tokens[i - 1].tag == POSTag::so 
 						|| tokens[i - 1].tag == POSTag::sw 
 						|| tokens[i - 1].tag == POSTag::sp 
-						|| tokens[i - 1].tag == POSTag::se)
+						|| tokens[i - 1].tag == POSTag::se
+						|| tokens[i - 1].tag == POSTag::sso)
 					&& tokens[i - 1].endPos() == tokens[i].position
 					&& tokens[i - 1].position > tokens[i - 2].endPos();
 				if (nestedSentEnd)
