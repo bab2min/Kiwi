@@ -58,9 +58,29 @@ namespace kiwi
 		return within(chr, 0xAC00, 0xD7A4);
 	}
 
+	inline bool isHangulOnset(char16_t chr)
+	{
+		return within(chr, 0x1100, 0x1100 + 19);
+	}
+
 	inline bool isHangulCoda(char16_t chr)
 	{
-		return within(chr, 0x11A8, 0x11A7 + 28);
+		return within(chr, 0x11A8, 0x11A8 + 27);
+	}
+
+	inline bool isHangulVowel(char16_t chr)
+	{
+		return within(chr, 0x314F, 0x3164);
+	}
+
+	inline char16_t joinOnsetVowel(size_t onset, size_t vowel)
+	{
+		return 0xAC00 + (char16_t)((onset * 21 + vowel) * 28);
+	}
+
+	inline int extractVowel(char16_t chr)
+	{
+		return ((chr - 0xAC00) / 28) % 21;
 	}
 
 	inline bool isOldHangulOnset(char16_t chr)
@@ -87,6 +107,8 @@ namespace kiwi
 	{
 		return within(chr, 0x3131, 0x314E) || within(chr, 0x3165, 0x3186);
 	}
+
+	char16_t toCompatibleHangulConsonant(char16_t chr);
 
 	struct ComparatorIgnoringSpace
 	{
