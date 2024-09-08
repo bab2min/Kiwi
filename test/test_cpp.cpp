@@ -1228,6 +1228,27 @@ TEST(KiwiCpp, JoinAffix)
 	EXPECT_EQ(res5.first[5].str, u"배송되");
 }
 
+TEST(KiwiCpp, CompatibleJamo)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	auto res1 = kiwi.analyze(u"이긴다. 이김. 이길것.", Match::none).first;
+	EXPECT_EQ(res1.size(), 10);
+	EXPECT_EQ(res1[1].str, u"ᆫ다");
+	EXPECT_EQ(res1[4].str, u"ᆷ");
+	EXPECT_EQ(res1[7].str, u"ᆯ");
+
+	auto res2 = kiwi.analyze(u"이긴다. 이김. 이길것.", Match::compatibleJamo).first;
+	EXPECT_EQ(res2.size(), 10);
+	EXPECT_EQ(res2[1].str, u"ㄴ다");
+	EXPECT_EQ(res2[4].str, u"ㅁ");
+	EXPECT_EQ(res2[7].str, u"ㄹ");
+
+	auto res3 = kiwi.analyze(u"ᄀᄁᄂᄃᄄᄅᄆᄇᄈᄉᄊᄋᄌᄍᄎᄏᄐᄑᄒ ᆨᆩᆪᆫᆬᆭᆮᆯᆰᆱᆲᆳᆴᆵᆶᆷᆸᆹᆺᆻᆼᆽᆾᆿᇀᇁᇂ", Match::compatibleJamo).first;
+	EXPECT_EQ(res3.size(), 2);
+	EXPECT_EQ(res3[0].str, u"ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ");
+	EXPECT_EQ(res3[1].str, u"ㄱㄲㄳㄴㄵㄶㄷㄹㄺㄻㄼㄽㄾㄿㅀㅁㅂㅄㅅㅆㅇㅈㅊㅋㅌㅍㅎ");
+}
+
 TEST(KiwiCpp, AutoJoiner)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
