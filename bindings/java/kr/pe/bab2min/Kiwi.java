@@ -30,6 +30,7 @@ public class Kiwi implements AutoCloseable  {
 		joinAdvSuffix = 1 << 21,
 		splitComplex = 1 << 22,
 		zCoda = 1 << 23,
+		compatibleJamo = 1 << 24,
 		joinVSuffix = joinVerbSuffix | joinAdjSuffix,
 		joinAffix = joinNounPrefix | joinNounSuffix | joinVerbSuffix | joinAdjSuffix | joinAdvSuffix,
 		all = url | email | hashtag | mention | serial | zCoda,
