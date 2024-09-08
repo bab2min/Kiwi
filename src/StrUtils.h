@@ -728,21 +728,6 @@ namespace kiwi
 		}
 	}
 
-	inline bool isHangulOnset(char16_t c)
-	{
-		return u'ᄀ' <= c && c <= u'ᄒ';
-	}
-
-	inline bool isHangulVowel(char16_t c)
-	{
-		return u'ㅏ' <= c && c <= u'ㅣ';
-	}
-
-	inline char16_t joinOnsetVowel(size_t onset, size_t vowel)
-	{
-		return u'가' + (char16_t)((onset * 21 + vowel) * 28);
-	}
-
 	inline bool isChineseChr(char32_t c)
 	{
 		return (0x4E00 <= c && c <= 0x9FFF)

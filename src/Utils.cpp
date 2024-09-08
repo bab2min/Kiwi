@@ -498,4 +498,16 @@ namespace kiwi
 		return ret;
 	}
 
+	char16_t toCompatibleHangulConsonant(char16_t chr)
+	{
+		if (isHangulOnset(chr))
+		{
+			return u"ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ"[chr - 0x1100];
+		}
+		else if (isHangulCoda(chr))
+		{
+			return u"ㄱㄲㄳㄴㄵㄶㄷㄹㄺㄻㄼㄽㄾㄿㅀㅁㅂㅄㅅㅆㅇㅈㅊㅋㅌㅍㅎ"[chr - 0x11A8];
+		}
+		return chr;
+	}
 }

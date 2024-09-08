@@ -616,6 +616,14 @@ namespace kiwi
 		}
 	}
 
+	inline void toCompatibleJamo(u16string& str)
+	{
+		for (auto& c : str)
+		{
+			c = toCompatibleHangulConsonant(c);
+		}
+	}
+
 	inline void insertPathIntoResults(
 		vector<TokenResult>& ret, 
 		Vector<SpecialState>& spStatesByRet,
@@ -726,6 +734,12 @@ namespace kiwi
 					}
 					joined = joinHangul(s.str.empty() ? *s.morph->kform : s.str);
 				} while (0);
+				
+				if (!!(matchOptions & Match::compatibleJamo))
+				{
+					toCompatibleJamo(joined);
+				}
+
 				rarr.emplace_back(joined, s.morph->tag);
 				auto& token = rarr.back();
 				token.morph = within(s.morph, pretokenizedGroup.morphemes) ? nullptr : s.morph;
