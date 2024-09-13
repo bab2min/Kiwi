@@ -275,6 +275,7 @@ namespace kiwi
 		basicTypoSet,
 		continualTypoSet,
 		basicTypoSetWithContinual,
+		lengtheningTypoSet,
 	};
 
 	const TypoTransformer& getDefaultTypoSet(DefaultTypoSet set);
