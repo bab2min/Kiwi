@@ -312,6 +312,11 @@ bool TypoTransformer::isContinualTypoEnabled() const
 	return isfinite(continualTypoThreshold);
 }
 
+bool TypoTransformer::isLengtheningTypoEnabled() const
+{
+	return isfinite(lengtheningTypoThreshold);
+}
+
 TypoTransformer TypoTransformer::copyWithNewContinualTypoCost(float threshold) const
 {
 	TypoTransformer ret = *this;
@@ -319,10 +324,17 @@ TypoTransformer TypoTransformer::copyWithNewContinualTypoCost(float threshold) c
 	return ret;
 }
 
+TypoTransformer TypoTransformer::copyWithNewLengtheningTypoCost(float threshold) const
+{
+	TypoTransformer ret = *this;
+	ret.lengtheningTypoThreshold = threshold;
+	return ret;
+}
+
 PreparedTypoTransformer::PreparedTypoTransformer() = default;
 
 PreparedTypoTransformer::PreparedTypoTransformer(const TypoTransformer& tt)
-	: strPool{ tt.strPool }, continualTypoThreshold{ tt.continualTypoThreshold }
+	: strPool{ tt.strPool }, continualTypoThreshold{ tt.continualTypoThreshold }, lengtheningTypoThreshold{ tt.lengtheningTypoThreshold }
 {
 	size_t tot = 0;
 	for (auto& rs : tt.replacements) tot += rs.size();
@@ -557,6 +569,7 @@ namespace kiwi
 
 			TypoDef{ {u"ㅣ워", u"ㅣ어", u"ㅕ"}, {u"ㅣ워", u"ㅣ어", u"ㅕ"}, 1.5f, CondVowel::none},
 		};
+
 		static const TypoTransformer continualTypoSet = withoutTypo.copyWithNewContinualTypoCost(1.f).addTypos({
 			TypoDef{ {u"ᆪ"}, {u"ᆨᆺ", u"ᆨᆻ"}, 1e-12f, CondVowel::none },
 			TypoDef{ {u"ᆬ"}, {u"ᆫᆽ"}, 1e-12f, CondVowel::none },
@@ -585,24 +598,21 @@ namespace kiwi
 			TypoDef{ {u"ᆹ"}, {u"ᆸᆺ", u"ᆸᆻ"}, 1e-12f, CondVowel::none },
 		});
 
-		if (set == DefaultTypoSet::withoutTypo)
+		static const TypoTransformer lengtheningTypoSet = withoutTypo.copyWithNewLengtheningTypoCost(0.5f);
+
+		switch (set)
 		{
+		case kiwi::DefaultTypoSet::withoutTypo:
 			return withoutTypo;
-		}
-		else if (set == DefaultTypoSet::basicTypoSet)
-		{
+		case kiwi::DefaultTypoSet::basicTypoSet:
 			return basicTypoSet;
-		}
-		else if (set == DefaultTypoSet::continualTypoSet)
-		{
+		case kiwi::DefaultTypoSet::continualTypoSet:
 			return continualTypoSet;
-		}
-		else if (set == DefaultTypoSet::basicTypoSetWithContinual)
-		{
+		case kiwi::DefaultTypoSet::basicTypoSetWithContinual:
 			return basicTypoSetWithContinual;
-		}
-		else
-		{
+		case kiwi::DefaultTypoSet::lengtheningTypoSet:
+			return lengtheningTypoSet;
+		default:
 			throw invalid_argument{ "Invalid `DefaultTypoSet`" };
 		}
 	}

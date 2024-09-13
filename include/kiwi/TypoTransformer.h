@@ -165,6 +165,7 @@ namespace kiwi
 		KString strPool;
 		Vector<ReplInfo> replacements;
 		float continualTypoThreshold = INFINITY;
+		float lengtheningTypoThreshold = INFINITY;
 
 		template<bool u16wrap = false>
 		TypoCandidates<u16wrap> _generate(const KString& orig, float costThreshold = 2.5f) const;
@@ -183,6 +184,11 @@ namespace kiwi
 		float getContinualTypoCost() const
 		{
 			return continualTypoThreshold;
+		}
+
+		float getLengtheningTypoCost() const
+		{
+			return lengtheningTypoThreshold;
 		}
 
 		TypoCandidates<true> generate(const std::u16string& orig, float costThreshold = 2.5f) const;
@@ -210,6 +216,7 @@ namespace kiwi
 		KString strPool;
 		Vector<Vector<ReplInfo>> replacements;
 		float continualTypoThreshold = INFINITY;
+		float lengtheningTypoThreshold = INFINITY;
 
 		void addTypoImpl(const KString& orig, const KString& error, float cost, CondVowel leftCond = CondVowel::none);
 		void addTypoWithCond(const KString& orig, const KString& error, float cost, CondVowel leftCond = CondVowel::none);
@@ -233,10 +240,11 @@ namespace kiwi
 		TypoTransformer& operator=(TypoTransformer&&);
 
 		bool isContinualTypoEnabled() const;
+		bool isLengtheningTypoEnabled() const;
 
 		bool empty() const
 		{
-			return replacements.empty() && !isContinualTypoEnabled();
+			return replacements.empty() && !isContinualTypoEnabled() && !isLengtheningTypoEnabled();
 		}
 
 		void addTypo(const std::u16string& orig, const std::u16string& error, float cost = 1, CondVowel leftCond = CondVowel::none);
@@ -262,6 +270,13 @@ namespace kiwi
 		}
 
 		TypoTransformer copyWithNewContinualTypoCost(float threshold) const;
+
+		void setLengtheningTypoCost(float threshold)
+		{
+			lengtheningTypoThreshold = threshold;
+		}
+
+		TypoTransformer copyWithNewLengtheningTypoCost(float threshold) const;
 
 		PreparedTypoTransformer prepare() const
 		{

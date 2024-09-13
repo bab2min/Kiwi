@@ -80,8 +80,13 @@ namespace kiwi
 	* @tparam arch Trie탐색에 사용할 CPU 아키텍처 타입
 	* @tparam typoTolerant 오타가 포함된 형태를 탐색할지 여부
 	* @tparam continualTypoTolerant 연철된 오타를 탐색할지 여부
+	* @tparam lengtheningTypoTolerant 여러 음절로 늘려진 오타를 탐색할지 여부
 	*/
-	template<ArchType arch, bool typoTolerant = false, bool continualTypoTolerant = false>
+	template<ArchType arch, 
+		bool typoTolerant = false, 
+		bool continualTypoTolerant = false,
+		bool lengtheningTypoTolerant = false
+	>
 	size_t splitByTrie(
 		Vector<KGraphNode>& out,
 		const Form* formBase,
@@ -93,6 +98,7 @@ namespace kiwi
 		size_t maxUnkFormSize, 
 		size_t spaceTolerance,
 		float continualTypoCost,
+		float lengtheningTypoCost,
 		const PretokenizedSpanGroup::Span*& pretokenizedFirst,
 		const PretokenizedSpanGroup::Span* pretokenizedLast
 	);
@@ -104,7 +110,7 @@ namespace kiwi
 	);
 	
 	using FnSplitByTrie = decltype(&splitByTrie<ArchType::default_>);
-	FnSplitByTrie getSplitByTrieFn(ArchType arch, bool typoTolerant, bool continualTypoTolerant);
+	FnSplitByTrie getSplitByTrieFn(ArchType arch, bool typoTolerant, bool continualTypoTolerant, bool lengtheningTypoTolerant);
 
 	using FnFindForm = decltype(&findForm<ArchType::default_>);
 	FnFindForm getFindFormFn(ArchType arch);
