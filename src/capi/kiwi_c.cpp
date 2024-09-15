@@ -443,6 +443,80 @@ int kiwi_typo_add(kiwi_typo_h handle, const char** orig, int orig_size, const ch
 	}
 }
 
+kiwi_typo_h kiwi_typo_copy(kiwi_typo_h handle)
+{
+	if (!handle) return nullptr;
+	try
+	{
+		return new kiwi_typo{ *handle };
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return nullptr;
+	}
+}
+
+int kiwi_typo_update(kiwi_typo_h handle, kiwi_typo_h src)
+{
+	if (!handle) return KIWIERR_INVALID_HANDLE;
+	try
+	{
+		handle->update(*src);
+		return 0;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return -1;
+	}
+}
+
+int kiwi_typo_scale_cost(kiwi_typo_h handle, float cost)
+{
+	if (!handle) return KIWIERR_INVALID_HANDLE;
+	try
+	{
+		handle->scaleCost(cost);
+		return 0;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return -1;
+	}
+}
+
+int kiwi_typo_set_continual_typo_cost(kiwi_typo_h handle, float threshold)
+{
+	if (!handle) return KIWIERR_INVALID_HANDLE;
+	try
+	{
+		handle->setContinualTypoCost(threshold);
+		return 0;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return -1;
+	}
+}
+
+int kiwi_typo_set_lengthening_typo_cost(kiwi_typo_h handle, float threshold)
+{
+	if (!handle) return KIWIERR_INVALID_HANDLE;
+	try
+	{
+		handle->setLengtheningTypoCost(threshold);
+		return 0;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return -1;
+	}
+}
+
 int kiwi_typo_close(kiwi_typo_h handle)
 {
 	if (!handle) return KIWIERR_INVALID_HANDLE;

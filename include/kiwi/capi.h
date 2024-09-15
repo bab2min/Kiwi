@@ -332,11 +332,11 @@ DECL_DLL kiwi_h kiwi_builder_build(kiwi_builder_h handle, kiwi_typo_h typos, flo
 
 
 /**
- * @brief 
+ * @brief 오타 교정기를 새로 생성합니다.
  * 
- * @return
+ * @return 성공 시 오타 교정기의 핸들을 반환합니다. 실패 시 null를 반환하고 에러 메세지를 설정합니다.
  * 
- * @note
+ * @note 생성된 오타 교정기는 kiwi_typo_close를 통해 반드시 해제되어야 합니다.
  */
 DECL_DLL kiwi_typo_h kiwi_typo_init();
 
@@ -358,32 +358,84 @@ enum
 	KIWI_TYPO_BASIC_TYPO_SET = 1,
 	KIWI_TYPO_CONTINUAL_TYPO_SET = 2,
 	KIWI_TYPO_BASIC_TYPO_SET_WITH_CONTINUAL = 3,
+	KIWI_TYPO_LENGTHENING_TYPO_SET = 4,
 };
 
 /**
  * @brief Kiwi에 기본적으로 내장된 오타 교정기의 핸들을 반환합니다.
  *
- * @return
+ * @return 성공 시 오타 교정기의 핸들을 반환합니다. 실패 시 null를 반환하고 에러 메세지를 설정합니다.
  *
  * @note 이 핸들은 kiwi_typo_close에 사용할 수 없음.
  */
 DECL_DLL kiwi_typo_h kiwi_typo_get_default(int kiwi_typo_set);
 
 /**
- * @brief
+ * @brief 오타 교정기에 새로운 오타 정의를 추가합니다.
  *
  * @return
  *
- * @note
+ * @note 이 함수는 kiwi_typo_get_default로 얻은 핸들에는 사용할 수 없습니다.
  */
 DECL_DLL int kiwi_typo_add(kiwi_typo_h handle, const char** orig, int orig_size, const char** error, int error_size, float cost, int condition);
 
 /**
- * @brief
+* @brief 오타 교정기를 복사하여 새로운 핸들을 생성합니다.
+*
+* @return 성공 시 새로운 오타 교정기의 핸들을 반환합니다. 실패 시 null를 반환하고 에러 메세지를 설정합니다.
+*
+* @note 복사하여 새로 생성된 오타 교정기의 핸들은 kiwi_typo_close를 통해 반드시 해제되어야 합니다.
+*/
+DECL_DLL kiwi_typo_h kiwi_typo_copy(kiwi_typo_h handle);
+
+/**
+* @brief 현재 오타 교정기에 다른 오타 교정기 내의 오타 정의들을 추가합니다.
+* 
+* @param handle 오타가 삽입될 교정기의 핸들
+* @param src 오타 정의 출처
+* @return 성공 시 0를 반환합니다. 실패 시 음수를 반환하고 에러 메세지를 설정합니다.
+* 
+* @note kiwi_typo_get_default로 얻은 핸들은 handle로 사용할 수 없습니다. src로 사용하는 것은 가능합니다.
+*/
+DECL_DLL int kiwi_typo_update(kiwi_typo_h handle, kiwi_typo_h src);
+
+/**
+* @brief 현재 오타 교정기의 오타 비용을 일정한 비율로 늘리거나 줄입니다.
+*
+* @param handle 오타 교정기의 핸들
+* @param scale 0보다 큰 실수. 모든 오타 비용에 이 값이 곱해집니다.
+* @return 성공 시 0를 반환합니다. 실패 시 음수를 반환하고 에러 메세지를 설정합니다.
+*/
+DECL_DLL int kiwi_typo_scale_cost(kiwi_typo_h handle, float scale);
+
+/**
+* @brief 현재 오타 교정기의 연철 오타 비용을 설정합니다.
+* 
+* @param handle 오타 교정기의 핸들
+* @param threshold 연철 오타의 새로운 비용
+* @return 성공 시 0를 반환합니다. 실패 시 음수를 반환하고 에러 메세지를 설정합니다.
+* 
+* @note 연철 오타의 초기값은 무한대, 즉 비활성화 상태입니다. 유한한 값으로 설정하면 연철 오타가 활성화됩니다.
+*/
+DECL_DLL int kiwi_typo_set_continual_typo_cost(kiwi_typo_h handle, float threshold);
+
+/**
+* @brief 현재 오타 교정기의 장음화 오타 비용을 설정합니다.
+* 
+* @param handle 오타 교정기의 핸들
+* @param threshold 장음화 오타의 새로운 비용
+* @return 성공 시 0를 반환합니다. 실패 시 음수를 반환하고 에러 메세지를 설정합니다.
+* 
+* @note 장음화 오타의 초기값은 무한대, 즉 비활성화 상태입니다. 유한한 값으로 설정하면 장음화 오타가 활성화됩니다.
+*/
+DECL_DLL int kiwi_typo_set_lengthening_typo_cost(kiwi_typo_h handle, float threshold);
+
+/**
+ * @brief 생성된 오타 교정기를 해제합니다.
  *
- * @return
+ * @return 성공 시 0를 반환합니다. 실패 시 음수를 반환하고 에러 메세지를 설정합니다.
  *
- * @note
+ * @note kiwi_typo_get_default로 얻은 핸들은 절대 해제해서는 안됩니다.
  */
 DECL_DLL int kiwi_typo_close(kiwi_typo_h handle);
 
