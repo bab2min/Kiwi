@@ -205,10 +205,7 @@ TypoIterator<u16wrap>& TypoIterator<u16wrap>::operator++()
 }
 
 TypoTransformer::TypoTransformer()
-	: patTrie{ 1 }
 {
-	char16_t c = 0;
-	patTrie.build(&c, &c + 1, 0);
 }
 
 TypoTransformer::~TypoTransformer() = default;
@@ -217,39 +214,17 @@ TypoTransformer::TypoTransformer(TypoTransformer&&) noexcept = default;
 TypoTransformer& TypoTransformer::operator=(const TypoTransformer&) = default;
 TypoTransformer& TypoTransformer::operator=(TypoTransformer&&) = default;
 
-void TypoTransformer::addTypoImpl(const KString& orig, const KString& error, float cost, CondVowel leftCond)
-{
-	if (orig == error) return;
-
-	size_t replIdx = patTrie.build(orig.begin(), orig.end(), replacements.size() + 1)->val - 1;
-	if (replIdx == replacements.size())
-	{
-		replacements.emplace_back();
-	}
-	bool updated = false;
-	for (auto& p : replacements[replIdx])
-	{
-		if (p.leftCond == leftCond && strPool.substr(p.begin, p.end - p.begin) == error)
-		{
-			p.cost = isfinite(cost) ? min(p.cost, cost) : cost;
-			updated = true;
-			break;
-		}
-	}
-	if (!updated)
-	{
-		replacements[replIdx].emplace_back(strPool.size(), strPool.size() + error.size(), cost, leftCond);
-		strPool += error;
-	}
-}
-
 void TypoTransformer::addTypoWithCond(const KString& orig, const KString& error, float cost, CondVowel leftCond)
 {
 	if (orig == error) return;
 
 	if (leftCond == CondVowel::none || leftCond == CondVowel::vowel || leftCond == CondVowel::any)
 	{
-		addTypoImpl(orig, error, cost, leftCond);
+		auto inserted = typos.emplace(make_tuple(orig, error, leftCond), cost);
+		if (!inserted.second)
+		{
+			inserted.first->second = isfinite(cost) ? min(inserted.first->second, cost) : cost;
+		}
 	}
 	else if (leftCond == CondVowel::applosive)
 	{
@@ -260,7 +235,11 @@ void TypoTransformer::addTypoWithCond(const KString& orig, const KString& error,
 			o += orig;
 			if (c) e.push_back(c);
 			e += error;
-			addTypoImpl(o, e, cost, c ? CondVowel::none : leftCond);
+			auto inserted = typos.emplace(make_tuple(o, e, c ? CondVowel::none : leftCond), cost);
+			if (!inserted.second)
+			{
+				inserted.first->second = isfinite(cost) ? min(inserted.first->second, cost) : cost;
+			}
 		}
 	}
 	else
@@ -317,6 +296,11 @@ bool TypoTransformer::isLengtheningTypoEnabled() const
 	return isfinite(lengtheningTypoThreshold);
 }
 
+bool TypoTransformer::empty() const
+{
+	return typos.empty() && !isContinualTypoEnabled() && !isLengtheningTypoEnabled();
+}
+
 TypoTransformer TypoTransformer::copyWithNewContinualTypoCost(float threshold) const
 {
 	TypoTransformer ret = *this;
@@ -331,17 +315,107 @@ TypoTransformer TypoTransformer::copyWithNewLengtheningTypoCost(float threshold)
 	return ret;
 }
 
+void TypoTransformer::update(const TypoTransformer& o)
+{
+	for (auto& p : o.typos)
+	{
+		auto inserted = typos.emplace(p);
+		if (!inserted.second)
+		{
+			inserted.first->second = min(inserted.first->second, p.second);
+		}
+	}
+	
+	continualTypoThreshold = min(continualTypoThreshold, o.continualTypoThreshold);
+	lengtheningTypoThreshold = min(lengtheningTypoThreshold, o.lengtheningTypoThreshold);
+}
+
+void TypoTransformer::scaleCost(float scale)
+{
+	if (!isfinite(scale) || scale <= 0) throw invalid_argument{ "`scale` must be positive real." };
+	
+	for (auto& p : typos)
+	{
+		p.second *= scale;
+	}
+	if (isfinite(continualTypoThreshold)) continualTypoThreshold *= scale;
+	if (isfinite(lengtheningTypoThreshold)) lengtheningTypoThreshold *= scale;
+}
+
+namespace kiwi
+{
+	struct IntermediateTypoTransformer
+	{
+		using TrieNode = utils::TrieNode<char16_t, size_t, utils::ConstAccess<UnorderedMap<char16_t, int32_t>>>;
+
+		struct ReplInfo
+		{
+			uint32_t begin, end;
+			float cost;
+			CondVowel leftCond;
+
+			ReplInfo(uint32_t _begin = 0, uint32_t _end = 0, float _cost = 0, CondVowel _leftCond = CondVowel::none)
+				: begin{ _begin }, end{ _end }, cost{ _cost }, leftCond{ _leftCond }
+			{}
+		};
+
+		utils::ContinuousTrie<TrieNode> patTrie;
+		KString strPool;
+		Vector<Vector<ReplInfo>> replacements;
+
+		IntermediateTypoTransformer()
+			: patTrie{ 1 }
+		{
+			char16_t c = 0;
+			patTrie.build(&c, &c + 1, 0);
+		}
+
+		void addTypo(const KString& orig, const KString& error, float cost, CondVowel leftCond = CondVowel::none)
+		{
+			if (orig == error) return;
+
+			size_t replIdx = patTrie.build(orig.begin(), orig.end(), replacements.size() + 1)->val - 1;
+			if (replIdx == replacements.size())
+			{
+				replacements.emplace_back();
+			}
+			bool updated = false;
+			for (auto& p : replacements[replIdx])
+			{
+				if (p.leftCond == leftCond && strPool.substr(p.begin, p.end - p.begin) == error)
+				{
+					p.cost = isfinite(cost) ? min(p.cost, cost) : cost;
+					updated = true;
+					break;
+				}
+			}
+			if (!updated)
+			{
+				replacements[replIdx].emplace_back(strPool.size(), strPool.size() + error.size(), cost, leftCond);
+				strPool += error;
+			}
+		}
+	};
+}
+
 PreparedTypoTransformer::PreparedTypoTransformer() = default;
 
 PreparedTypoTransformer::PreparedTypoTransformer(const TypoTransformer& tt)
-	: strPool{ tt.strPool }, continualTypoThreshold{ tt.continualTypoThreshold }, lengtheningTypoThreshold{ tt.lengtheningTypoThreshold }
+	: continualTypoThreshold{ tt.continualTypoThreshold }, lengtheningTypoThreshold{ tt.lengtheningTypoThreshold }
 {
+	IntermediateTypoTransformer itt;
+	for (auto& t : tt.typos)
+	{
+		itt.addTypo(get<0>(t.first), get<1>(t.first), t.second, get<2>(t.first));
+	}
+	strPool = std::move(itt.strPool);
+
 	size_t tot = 0;
-	for (auto& rs : tt.replacements) tot += rs.size();
+	for (auto& rs : itt.replacements) tot += rs.size();
 	replacements.reserve(tot);
 	
 	Vector<std::pair<const ReplInfo*, uint32_t>> patData;
-	for (auto& rs : tt.replacements)
+	for (auto& rs : itt.replacements)
 	{
 		patData.emplace_back(replacements.data() + replacements.size(), rs.size());
 		for (auto& r : rs)
@@ -350,7 +424,7 @@ PreparedTypoTransformer::PreparedTypoTransformer(const TypoTransformer& tt)
 		}
 	}
 	
-	patTrie = decltype(patTrie){ tt.patTrie, ArchTypeHolder<ArchType::none>{}, [&](const TypoTransformer::TrieNode& o) -> PatInfo
+	patTrie = decltype(patTrie){ itt.patTrie, ArchTypeHolder<ArchType::none>{}, [&](const IntermediateTypoTransformer::TrieNode& o) -> PatInfo
 		{
 			uint32_t depth = o.depth;
 			if (o.val && patData[o.val - 1].first->leftCond == CondVowel::applosive)
@@ -570,7 +644,7 @@ namespace kiwi
 			TypoDef{ {u"ㅣ워", u"ㅣ어", u"ㅕ"}, {u"ㅣ워", u"ㅣ어", u"ㅕ"}, 1.5f, CondVowel::none},
 		};
 
-		static const TypoTransformer continualTypoSet = withoutTypo.copyWithNewContinualTypoCost(1.f).addTypos({
+		static const TypoTransformer continualTypoSet = TypoTransformer::fromContinualTypoCost(1.f).addTypos({
 			TypoDef{ {u"ᆪ"}, {u"ᆨᆺ", u"ᆨᆻ"}, 1e-12f, CondVowel::none },
 			TypoDef{ {u"ᆬ"}, {u"ᆫᆽ"}, 1e-12f, CondVowel::none },
 			TypoDef{ {u"ᆭ"}, {u"ᆫᇂ"}, 1e-12f, CondVowel::none },
@@ -584,21 +658,9 @@ namespace kiwi
 			TypoDef{ {u"ᆹ"}, {u"ᆸᆺ", u"ᆸᆻ"}, 1e-12f, CondVowel::none },
 		});
 
-		static const TypoTransformer basicTypoSetWithContinual = basicTypoSet.copyWithNewContinualTypoCost(1.f).addTypos({
-			TypoDef{ {u"ᆪ"}, {u"ᆨᆺ", u"ᆨᆻ"}, 1e-12f, CondVowel::none },
-			TypoDef{ {u"ᆬ"}, {u"ᆫᆽ"}, 1e-12f, CondVowel::none },
-			TypoDef{ {u"ᆭ"}, {u"ᆫᇂ"}, 1e-12f, CondVowel::none },
-			TypoDef{ {u"ᆰ"}, {u"ᆯᆨ"}, 1e-12f, CondVowel::none },
-			TypoDef{ {u"ᆱ"}, {u"ᆯᆷ"}, 1e-12f, CondVowel::none },
-			TypoDef{ {u"ᆲ"}, {u"ᆯᆸ"}, 1e-12f, CondVowel::none },
-			TypoDef{ {u"ᆳ"}, {u"ᆯᆺ"}, 1e-12f, CondVowel::none },
-			TypoDef{ {u"ᆴ"}, {u"ᆯᇀ"}, 1e-12f, CondVowel::none },
-			TypoDef{ {u"ᆵ"}, {u"ᆯᇁ"}, 1e-12f, CondVowel::none },
-			TypoDef{ {u"ᆶ"}, {u"ᆯᇂ"}, 1e-12f, CondVowel::none },
-			TypoDef{ {u"ᆹ"}, {u"ᆸᆺ", u"ᆸᆻ"}, 1e-12f, CondVowel::none },
-		});
+		static const TypoTransformer basicTypoSetWithContinual = basicTypoSet | continualTypoSet;
 
-		static const TypoTransformer lengtheningTypoSet = withoutTypo.copyWithNewLengtheningTypoCost(0.5f);
+		static const TypoTransformer lengtheningTypoSet = TypoTransformer::fromLengtheningTypoCost(0.5f);
 
 		switch (set)
 		{
