@@ -10,11 +10,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: true
         lfs: true
-    - uses: bab2min/run-on-arch-action@use-custom-image
+    - uses: bab2min/run-on-arch-action@multiple-step
       id: runcmd
       with:
         image: quay.io/pypa/manylinux2014_ppc64le
@@ -32,9 +32,9 @@ jobs:
           cp -r build /artifacts/
           cp -r eval_results /artifacts/
     - name: Archive binaries
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v3
       with:
-        name: Artifacts ${{ matrix.name }}
+        name: Artifacts PPC64LE-Centos7
         path: |
           artifacts/build/*kiwi*
           artifacts/build/test/*kiwi*

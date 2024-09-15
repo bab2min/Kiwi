@@ -26,7 +26,7 @@ jobs:
     name: ${{ matrix.name }}
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: true
         lfs: true
@@ -75,7 +75,7 @@ jobs:
         KIWI_ARCH_TYPE=avx512bw ./build/kiwi-cli-* -m ./ModelGenerator -e -o test.out --sbg kowiki1000.txt
         KIWI_ARCH_TYPE=avx512bw ./build/kiwi-cli-* -m ./ModelGenerator -e -o test.out --typos 6 kowiki1000.txt
     - name: Archive binaries
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v3
       with:
         name: Artifacts ${{ matrix.name }}
         path: |

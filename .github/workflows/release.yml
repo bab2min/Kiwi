@@ -5,24 +5,32 @@ on:
     types: [created]
 
 jobs:
-  build-centos:
-    name: Centos5
+  build-centos7:
+    name: Centos7
     runs-on: ubuntu-latest
-    container:
-      image: docker://hoshizora/manylinux1-clang_x86_64
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
       with:
         submodules: true
-    - name: Checkout Old Version googletest
-      run: cd third_party/googletest && git checkout v1.8.x && cd ../..
-    - name: Update CMake
-      run: /opt/python/cp36-cp36m/bin/pip install "cmake<3.20"
-    - name: Configure Build
-      run: mkdir build && cd build && /opt/python/cp36-cp36m/bin/cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_USE_MIMALLOC=0 -DKIWI_USE_CPUINFO=0 ..
-    - name: Build
-      run: cd build && make -j2
+    - name: Get release
+      id: get_release
+      uses: bruceadams/get-release@v1.3.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+    - uses: bab2min/run-on-arch-action@multiple-step
+      with:
+        image: quay.io/pypa/manylinux2014_x86_64
+        githubToken: ${{ github.token }}
+        multipleRun: |
+          - name: Update CMake
+            run: |
+              /opt/python/cp310-cp310/bin/pip install cmake
+              yum install java-1.8.0-openjdk-devel.x86_64 -y
+          - name: Configure Build
+            run: mkdir build && cd build && /opt/python/cp310-cp310/bin/cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_JAVA_BINDING=1 ..
+          - name: Build
+            run: cd build && make -j2
     - run: |
         mkdir result
         cd result
@@ -32,112 +40,24 @@ jobs:
         mv ../build/test/kiwi-* bin/
         cp -r ../include/kiwi include/
         tar -zcvf ../asset.tgz include/ lib/ bin/
-    - name: Archive binaries
-      uses: actions/upload-artifact@v4
-      with:
-        name: asset_Centos5
-        path: asset.tgz
-
-  upload-asset-from-centos:
-    name: Upload asset from Centos5
-    needs: build-centos
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/download-artifact@v4
-      with:
-        name: asset_Centos5
-        path: arts
-    - name: Get release
-      id: get_release
-      uses: bruceadams/get-release@v1.2.2
-      env:
-        GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
     - name: Upload release binary
       uses: actions/upload-release-asset@v1.0.2
       env:
         GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       with:
         upload_url: ${{ steps.get_release.outputs.upload_url }}
-        asset_path: arts/asset.tgz
-        asset_name: kiwi_lnx_centos5_x86_64_${{ steps.get_release.outputs.tag_name }}.tgz
-        asset_content_type: application/octet-stream
-
-  build-centos6:
-    name: Centos6
-    runs-on: ubuntu-latest
-    container:
-      image: docker://quay.io/pypa/manylinux2010_x86_64
-
-    steps:
-    - uses: actions/checkout@v1
-      with:
-        submodules: true
-    - name: Update CMake
-      run: |
-        /opt/python/cp36-cp36m/bin/pip install cmake
-        yum install java-1.8.0-openjdk-devel.x86_64 -y
-    - name: Configure Build
-      run: mkdir build && cd build && /opt/python/cp36-cp36m/bin/cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_JAVA_BINDING=1 ..
-    - name: Build
-      run: cd build && make -j2
-    - run: |
-        mkdir result
-        cd result
-        mkdir include && mkdir lib && mkdir bin
-        mv ../build/libkiwi* lib/
-        mv ../build/kiwi-* bin/
-        mv ../build/test/kiwi-* bin/
-        cp -r ../include/kiwi include/
-        tar -zcvf ../asset.tgz include/ lib/ bin/
-    - name: Archive binaries
-      uses: actions/upload-artifact@v4
-      with:
-        name: asset_Centos6
-        path: asset.tgz
-    - run: |
-        mv build/bindings/java/kiwi-java*.jar kiwi-java.jar
-    - name: Archive jar binaries
-      uses: actions/upload-artifact@v4
-      with:
-        name: jar_Centos6
-        path: kiwi-java.jar
-
-  upload-asset-from-centos6:
-    name: Upload asset from Centos6
-    needs: build-centos6
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Get release
-      id: get_release
-      uses: bruceadams/get-release@v1.2.2
-      env:
-        GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-    - uses: actions/download-artifact@v4
-      with:
-        name: asset_Centos6
-        path: arts
-    - name: Upload release binary
-      uses: actions/upload-release-asset@v1.0.2
-      env:
-        GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-      with:
-        upload_url: ${{ steps.get_release.outputs.upload_url }}
-        asset_path: arts/asset.tgz
+        asset_path: asset.tgz
         asset_name: kiwi_lnx_x86_64_${{ steps.get_release.outputs.tag_name }}.tgz
         asset_content_type: application/octet-stream
-    - uses: actions/download-artifact@v4
-      with:
-        name: jar_Centos6
-        path: arts
+    - run: |
+        mv build/bindings/java/kiwi-java*.jar kiwi-java.jar
     - name: Upload release jar
       uses: actions/upload-release-asset@v1.0.2
       env:
         GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       with:
         upload_url: ${{ steps.get_release.outputs.upload_url }}
-        asset_path: arts/kiwi-java.jar
+        asset_path: kiwi-java.jar
         asset_name: kiwi-java-${{ steps.get_release.outputs.tag_name }}-lnx-x86-64.jar
         asset_content_type: application/octet-stream
 
@@ -151,7 +71,7 @@ jobs:
     name: ${{ matrix.os }} - ${{ matrix.arch }}
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: true
         lfs: true
@@ -216,7 +136,7 @@ jobs:
     name: ${{ matrix.os }} ${{ matrix.arch }}
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: true
         lfs: true
@@ -276,7 +196,7 @@ jobs:
     name: Centos7-${{ matrix.arch }}
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: true
         lfs: true
@@ -331,7 +251,7 @@ jobs:
     name: Emscripten
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: true
         lfs: true

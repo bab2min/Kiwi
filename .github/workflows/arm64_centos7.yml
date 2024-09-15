@@ -10,11 +10,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: true
         lfs: true
-    - uses: bab2min/run-on-arch-action@use-custom-image
+    - uses: bab2min/run-on-arch-action@multiple-step
       id: runcmd
       with:
         image: quay.io/pypa/manylinux2014_aarch64
@@ -23,24 +23,30 @@ jobs:
           mkdir -p "${PWD}/artifacts"
         dockerRunArgs: |
           --volume "${PWD}/artifacts:/artifacts"
-        run: |
-          yum install java-1.8.0-openjdk-devel -y
-          mkdir build && pushd build && cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_USE_MIMALLOC=0 -DKIWI_JAVA_BINDING=1 ..
-          make -j2 && popd
-          ./build/test/kiwi-test
-          mkdir eval_results && ./build/kiwi-evaluator -m ./ModelGenerator eval_data/*.txt -o eval_results/ && ./build/kiwi-evaluator -m ./ModelGenerator eval_data/*.txt --sbg -o eval_results/
-          mkdir eval_results_balanced && KIWI_ARCH_TYPE=balanced ./build/kiwi-evaluator -m ./ModelGenerator eval_data/*.txt -o eval_results_balanced/
-          cp -r build /artifacts/
-          cp -r eval_results /artifacts/
-
-          curl -OL https://latina.bab2min.pe.kr/_data/kowiki1000.txt
-          KIWI_ARCH_TYPE=none ./build/kiwi-cli-* -m ./ModelGenerator -e -o test.out kowiki1000.txt
-          KIWI_ARCH_TYPE=balanced ./build/kiwi-cli-* -m ./ModelGenerator -e -o test.out kowiki1000.txt
-          KIWI_ARCH_TYPE=neon ./build/kiwi-cli-* -m ./ModelGenerator -e -o test.out kowiki1000.txt
+        multipleRun: |
+          - name: Install dependencies
+            run: |
+              yum install java-1.8.0-openjdk-devel -y
+          - name: Build
+            run: |
+              mkdir build && pushd build && cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_USE_MIMALLOC=0 -DKIWI_JAVA_BINDING=1 ..
+              make -j2 && popd
+          - name: Test
+            run: |
+              ./build/test/kiwi-test
+              mkdir eval_results && ./build/kiwi-evaluator -m ./ModelGenerator eval_data/*.txt -o eval_results/ && ./build/kiwi-evaluator -m ./ModelGenerator eval_data/*.txt --sbg -o eval_results/
+              cp -r build /artifacts/
+              cp -r eval_results /artifacts/
+          - name: Benchmark
+            run: |
+              curl -OL https://latina.bab2min.pe.kr/_data/kowiki1000.txt
+              KIWI_ARCH_TYPE=none ./build/kiwi-cli-* -m ./ModelGenerator -e -o test.out kowiki1000.txt
+              KIWI_ARCH_TYPE=balanced ./build/kiwi-cli-* -m ./ModelGenerator -e -o test.out kowiki1000.txt
+              KIWI_ARCH_TYPE=neon ./build/kiwi-cli-* -m ./ModelGenerator -e -o test.out kowiki1000.txt
     - name: Archive binaries
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v3
       with:
-        name: Artifacts ${{ matrix.name }}
+        name: Artifacts Arm64-Centos7
         path: |
           artifacts/build/*kiwi*
           artifacts/build/test/*kiwi*
