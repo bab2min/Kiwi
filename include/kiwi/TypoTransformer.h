@@ -278,6 +278,11 @@ namespace kiwi
 			return *this;
 		}
 
+		const UnorderedMap<std::tuple<KString, KString, CondVowel>, float>& getTypos() const
+		{
+			return typos;
+		}
+
 		/**
 		* @brief 연철 오타의 비용을 새로 설정합니다.
 		* 
@@ -287,6 +292,11 @@ namespace kiwi
 		void setContinualTypoCost(float threshold)
 		{
 			continualTypoThreshold = threshold;
+		}
+
+		float getContinualTypoCost() const
+		{
+			return continualTypoThreshold;
 		}
 
 		static TypoTransformer fromContinualTypoCost(float threshold)
@@ -307,6 +317,11 @@ namespace kiwi
 		void setLengtheningTypoCost(float threshold)
 		{
 			lengtheningTypoThreshold = threshold;
+		}
+
+		float getLengtheningTypoCost() const
+		{
+			return lengtheningTypoThreshold;
 		}
 
 		static TypoTransformer fromLengtheningTypoCost(float threshold)
