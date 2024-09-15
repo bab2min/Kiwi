@@ -33,7 +33,7 @@ jobs:
         cp -r ../include/kiwi include/
         tar -zcvf ../asset.tgz include/ lib/ bin/
     - name: Archive binaries
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
         name: asset_Centos5
         path: asset.tgz
@@ -44,7 +44,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/download-artifact@v2
+    - uses: actions/download-artifact@v4
       with:
         name: asset_Centos5
         path: arts
@@ -91,14 +91,14 @@ jobs:
         cp -r ../include/kiwi include/
         tar -zcvf ../asset.tgz include/ lib/ bin/
     - name: Archive binaries
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
         name: asset_Centos6
         path: asset.tgz
     - run: |
         mv build/bindings/java/kiwi-java*.jar kiwi-java.jar
     - name: Archive jar binaries
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
         name: jar_Centos6
         path: kiwi-java.jar
@@ -114,7 +114,7 @@ jobs:
       uses: bruceadams/get-release@v1.2.2
       env:
         GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-    - uses: actions/download-artifact@v2
+    - uses: actions/download-artifact@v4
       with:
         name: asset_Centos6
         path: arts
@@ -127,7 +127,7 @@ jobs:
         asset_path: arts/asset.tgz
         asset_name: kiwi_lnx_x86_64_${{ steps.get_release.outputs.tag_name }}.tgz
         asset_content_type: application/octet-stream
-    - uses: actions/download-artifact@v2
+    - uses: actions/download-artifact@v4
       with:
         name: jar_Centos6
         path: arts
