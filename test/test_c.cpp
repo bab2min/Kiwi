@@ -268,6 +268,37 @@ TEST(KiwiC, AnalyzeBasicTypoSet)
 	EXPECT_EQ(kiwi_close(typo_kw), 0);
 }
 
+TEST(KiwiC, CustomTypoSet)
+{
+	kiwi_h okw = reuse_kiwi_instance(), typo_kw;
+	kiwi_builder_h builder = kiwi_builder_init(MODEL_PATH, 0, KIWI_BUILD_DEFAULT);
+	kiwi_typo_h basic_typo = kiwi_typo_get_default(KIWI_TYPO_BASIC_TYPO_SET),
+		continual_typo = kiwi_typo_get_default(KIWI_TYPO_CONTINUAL_TYPO_SET),
+		lengthening_typo = kiwi_typo_get_default(KIWI_TYPO_LENGTHENING_TYPO_SET),
+		custom_typo = kiwi_typo_init();
+
+	kiwi_typo_update(custom_typo, basic_typo);
+	kiwi_typo_update(custom_typo, continual_typo);
+	kiwi_typo_update(custom_typo, lengthening_typo);
+
+	typo_kw = kiwi_builder_build(builder, custom_typo, 2.5f);
+	kiwi_set_option_f(typo_kw, KIWI_TYPO_COST_WEIGHT, 5);
+
+	kiwi_res_h o, c;
+	for (const char* s : { u8"외않됀데?", u8"나 죰 도와죠.", u8"자알했따", u8"외구거 공부", u8"맗은 믈을 마셧다!" })
+	{
+		o = kiwi_analyze(okw, s, 1, KIWI_MATCH_ALL_WITH_NORMALIZING, nullptr, nullptr);
+		c = kiwi_analyze(typo_kw, s, 1, KIWI_MATCH_ALL_WITH_NORMALIZING, nullptr, nullptr);
+		EXPECT_TRUE(kiwi_res_prob(o, 0) < kiwi_res_prob(c, 0));
+		EXPECT_EQ(kiwi_res_close(o), 0);
+		EXPECT_EQ(kiwi_res_close(c), 0);
+	}
+
+	EXPECT_EQ(kiwi_typo_close(custom_typo), 0);
+	EXPECT_EQ(kiwi_builder_close(builder), 0);
+	EXPECT_EQ(kiwi_close(typo_kw), 0);
+}
+
 TEST(KiwiC, Tokenizer)
 {
 	kiwi_h okw = reuse_kiwi_instance();
