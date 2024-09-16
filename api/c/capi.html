@@ -114,6 +114,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NUt1_424KIWI_TYPO_BASIC_TYPO_SETE"><code class="docutils literal notranslate"><span class="pre">&#64;4::KIWI_TYPO_BASIC_TYPO_SET</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NUt1_428KIWI_TYPO_CONTINUAL_TYPO_SETE"><code class="docutils literal notranslate"><span class="pre">&#64;4::KIWI_TYPO_CONTINUAL_TYPO_SET</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NUt1_439KIWI_TYPO_BASIC_TYPO_SET_WITH_CONTINUALE"><code class="docutils literal notranslate"><span class="pre">&#64;4::KIWI_TYPO_BASIC_TYPO_SET_WITH_CONTINUAL</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NUt1_430KIWI_TYPO_LENGTHENING_TYPO_SETE"><code class="docutils literal notranslate"><span class="pre">&#64;4::KIWI_TYPO_LENGTHENING_TYPO_SET</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv412kiwi_versionv"><code class="docutils literal notranslate"><span class="pre">kiwi_version()</span></code></a></li>
@@ -135,6 +136,11 @@
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv419kiwi_typo_get_basicv"><code class="docutils literal notranslate"><span class="pre">kiwi_typo_get_basic()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv421kiwi_typo_get_defaulti"><code class="docutils literal notranslate"><span class="pre">kiwi_typo_get_default()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv413kiwi_typo_add11kiwi_typo_hPPKciPPKcifi"><code class="docutils literal notranslate"><span class="pre">kiwi_typo_add()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv414kiwi_typo_copy11kiwi_typo_h"><code class="docutils literal notranslate"><span class="pre">kiwi_typo_copy()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv416kiwi_typo_update11kiwi_typo_h11kiwi_typo_h"><code class="docutils literal notranslate"><span class="pre">kiwi_typo_update()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv420kiwi_typo_scale_cost11kiwi_typo_hf"><code class="docutils literal notranslate"><span class="pre">kiwi_typo_scale_cost()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv433kiwi_typo_set_continual_typo_cost11kiwi_typo_hf"><code class="docutils literal notranslate"><span class="pre">kiwi_typo_set_continual_typo_cost()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv435kiwi_typo_set_lengthening_typo_cost11kiwi_typo_hf"><code class="docutils literal notranslate"><span class="pre">kiwi_typo_set_lengthening_typo_cost()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv415kiwi_typo_close11kiwi_typo_h"><code class="docutils literal notranslate"><span class="pre">kiwi_typo_close()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv49kiwi_initPKcii"><code class="docutils literal notranslate"><span class="pre">kiwi_init()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv415kiwi_set_option6kiwi_hii"><code class="docutils literal notranslate"><span class="pre">kiwi_set_option()</span></code></a></li>
@@ -598,6 +604,11 @@
 <span id="_CPPv3NUt1_439KIWI_TYPO_BASIC_TYPO_SET_WITH_CONTINUALE"></span><span class="target" id="capi_8h_1adc29c2ff13d900c2f185ee95427fb06ca7cae2ff81c6e6a969e0c7a5ac0c4af01"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">KIWI_TYPO_BASIC_TYPO_SET_WITH_CONTINUAL</span></span></span><a class="headerlink" href="#_CPPv4NUt1_439KIWI_TYPO_BASIC_TYPO_SET_WITH_CONTINUALE" title="Link to this definition"></a><br /></dt>
 <dd></dd></dl>
 
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4NUt1_430KIWI_TYPO_LENGTHENING_TYPO_SETE">
+<span id="_CPPv3NUt1_430KIWI_TYPO_LENGTHENING_TYPO_SETE"></span><span class="target" id="capi_8h_1adc29c2ff13d900c2f185ee95427fb06ca17e1117fad2f1f9dbeb58555131974ef"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">KIWI_TYPO_LENGTHENING_TYPO_SET</span></span></span><a class="headerlink" href="#_CPPv4NUt1_430KIWI_TYPO_LENGTHENING_TYPO_SETE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 </div>
@@ -884,13 +895,14 @@
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv414kiwi_typo_initv">
 <span id="_CPPv314kiwi_typo_initv"></span><span id="_CPPv214kiwi_typo_initv"></span><span id="kiwi_typo_init"></span><span class="target" id="capi_8h_1ab5ba00d44e03a9b3e5040eeb838464c1"></span><a class="reference internal" href="#_CPPv411kiwi_typo_h" title="kiwi_typo_h"><span class="n"><span class="pre">kiwi_typo_h</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_typo_init</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414kiwi_typo_initv" title="Link to this definition"></a><br /></dt>
-<dd><div class="admonition note">
+<dd><p>오타 교정기를 새로 생성합니다. </p>
+<div class="admonition note">
 <p class="admonition-title">Note</p>
-<p></p>
+<p>생성된 오타 교정기는 kiwi_typo_close를 통해 반드시 해제되어야 합니다. </p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p></p>
+<dd class="field-odd"><p>성공 시 오타 교정기의 핸들을 반환합니다. 실패 시 null를 반환하고 에러 메세지를 설정합니다.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -920,7 +932,7 @@
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p></p>
+<dd class="field-odd"><p>성공 시 오타 교정기의 핸들을 반환합니다. 실패 시 null를 반환하고 에러 메세지를 설정합니다.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -928,9 +940,10 @@
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv413kiwi_typo_add11kiwi_typo_hPPKciPPKcifi">
 <span id="_CPPv313kiwi_typo_add11kiwi_typo_hPPKciPPKcifi"></span><span id="_CPPv213kiwi_typo_add11kiwi_typo_hPPKciPPKcifi"></span><span id="kiwi_typo_add__kiwi_typo_h.cCPP.i.cCPP.i.float.i"></span><span class="target" id="capi_8h_1a8bf7951126a90feb5db5eb03741b5b5b"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_typo_add</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv411kiwi_typo_h" title="kiwi_typo_h"><span class="n"><span class="pre">kiwi_typo_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">orig</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">orig_size</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">error</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">error_size</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">cost</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">condition</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413kiwi_typo_add11kiwi_typo_hPPKciPPKcifi" title="Link to this definition"></a><br /></dt>
-<dd><div class="admonition note">
+<dd><p>오타 교정기에 새로운 오타 정의를 추가합니다. </p>
+<div class="admonition note">
 <p class="admonition-title">Note</p>
-<p></p>
+<p>이 함수는 kiwi_typo_get_default로 얻은 핸들에는 사용할 수 없습니다. </p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -940,15 +953,111 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv415kiwi_typo_close11kiwi_typo_h">
-<span id="_CPPv315kiwi_typo_close11kiwi_typo_h"></span><span id="_CPPv215kiwi_typo_close11kiwi_typo_h"></span><span id="kiwi_typo_close__kiwi_typo_h"></span><span class="target" id="capi_8h_1a37fd1440ce53804ce6820760ed2b2d05"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_typo_close</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv411kiwi_typo_h" title="kiwi_typo_h"><span class="n"><span class="pre">kiwi_typo_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415kiwi_typo_close11kiwi_typo_h" title="Link to this definition"></a><br /></dt>
-<dd><div class="admonition note">
+<dt class="sig sig-object cpp" id="_CPPv414kiwi_typo_copy11kiwi_typo_h">
+<span id="_CPPv314kiwi_typo_copy11kiwi_typo_h"></span><span id="_CPPv214kiwi_typo_copy11kiwi_typo_h"></span><span id="kiwi_typo_copy__kiwi_typo_h"></span><span class="target" id="capi_8h_1a2dd8c2bb86748620bd98e3d77f9896e8"></span><a class="reference internal" href="#_CPPv411kiwi_typo_h" title="kiwi_typo_h"><span class="n"><span class="pre">kiwi_typo_h</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_typo_copy</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv411kiwi_typo_h" title="kiwi_typo_h"><span class="n"><span class="pre">kiwi_typo_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414kiwi_typo_copy11kiwi_typo_h" title="Link to this definition"></a><br /></dt>
+<dd><p>오타 교정기를 복사하여 새로운 핸들을 생성합니다. </p>
+<div class="admonition note">
 <p class="admonition-title">Note</p>
-<p></p>
+<p>복사하여 새로 생성된 오타 교정기의 핸들은 kiwi_typo_close를 통해 반드시 해제되어야 합니다. </p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p></p>
+<dd class="field-odd"><p>성공 시 새로운 오타 교정기의 핸들을 반환합니다. 실패 시 null를 반환하고 에러 메세지를 설정합니다.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv416kiwi_typo_update11kiwi_typo_h11kiwi_typo_h">
+<span id="_CPPv316kiwi_typo_update11kiwi_typo_h11kiwi_typo_h"></span><span id="_CPPv216kiwi_typo_update11kiwi_typo_h11kiwi_typo_h"></span><span id="kiwi_typo_update__kiwi_typo_h.kiwi_typo_h"></span><span class="target" id="capi_8h_1a6b349d40fdc98c53e7ea563eae92847f"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_typo_update</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv411kiwi_typo_h" title="kiwi_typo_h"><span class="n"><span class="pre">kiwi_typo_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span>, <a class="reference internal" href="#_CPPv411kiwi_typo_h" title="kiwi_typo_h"><span class="n"><span class="pre">kiwi_typo_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">src</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416kiwi_typo_update11kiwi_typo_h11kiwi_typo_h" title="Link to this definition"></a><br /></dt>
+<dd><p>현재 오타 교정기에 다른 오타 교정기 내의 오타 정의들을 추가합니다. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>kiwi_typo_get_default로 얻은 핸들은 handle로 사용할 수 없습니다. src로 사용하는 것은 가능합니다. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>handle</strong> – 오타가 삽입될 교정기의 핸들 </p></li>
+<li><p><strong>src</strong> – 오타 정의 출처 </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>성공 시 0를 반환합니다. 실패 시 음수를 반환하고 에러 메세지를 설정합니다.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv420kiwi_typo_scale_cost11kiwi_typo_hf">
+<span id="_CPPv320kiwi_typo_scale_cost11kiwi_typo_hf"></span><span id="_CPPv220kiwi_typo_scale_cost11kiwi_typo_hf"></span><span id="kiwi_typo_scale_cost__kiwi_typo_h.float"></span><span class="target" id="capi_8h_1a9f8f9721a317c16ac8debe576a6b79cc"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_typo_scale_cost</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv411kiwi_typo_h" title="kiwi_typo_h"><span class="n"><span class="pre">kiwi_typo_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">scale</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420kiwi_typo_scale_cost11kiwi_typo_hf" title="Link to this definition"></a><br /></dt>
+<dd><p>현재 오타 교정기의 오타 비용을 일정한 비율로 늘리거나 줄입니다. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>handle</strong> – 오타 교정기의 핸들 </p></li>
+<li><p><strong>scale</strong> – 0보다 큰 실수. 모든 오타 비용에 이 값이 곱해집니다. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>성공 시 0를 반환합니다. 실패 시 음수를 반환하고 에러 메세지를 설정합니다. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv433kiwi_typo_set_continual_typo_cost11kiwi_typo_hf">
+<span id="_CPPv333kiwi_typo_set_continual_typo_cost11kiwi_typo_hf"></span><span id="_CPPv233kiwi_typo_set_continual_typo_cost11kiwi_typo_hf"></span><span id="kiwi_typo_set_continual_typo_cost__kiwi_typo_h.float"></span><span class="target" id="capi_8h_1a8c076e366216b5642facc182981867eb"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_typo_set_continual_typo_cost</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv411kiwi_typo_h" title="kiwi_typo_h"><span class="n"><span class="pre">kiwi_typo_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">threshold</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv433kiwi_typo_set_continual_typo_cost11kiwi_typo_hf" title="Link to this definition"></a><br /></dt>
+<dd><p>현재 오타 교정기의 연철 오타 비용을 설정합니다. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>연철 오타의 초기값은 무한대, 즉 비활성화 상태입니다. 유한한 값으로 설정하면 연철 오타가 활성화됩니다. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>handle</strong> – 오타 교정기의 핸들 </p></li>
+<li><p><strong>threshold</strong> – 연철 오타의 새로운 비용 </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>성공 시 0를 반환합니다. 실패 시 음수를 반환하고 에러 메세지를 설정합니다.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv435kiwi_typo_set_lengthening_typo_cost11kiwi_typo_hf">
+<span id="_CPPv335kiwi_typo_set_lengthening_typo_cost11kiwi_typo_hf"></span><span id="_CPPv235kiwi_typo_set_lengthening_typo_cost11kiwi_typo_hf"></span><span id="kiwi_typo_set_lengthening_typo_cost__kiwi_typo_h.float"></span><span class="target" id="capi_8h_1a908abd7e80b5a0bec65d1019a35ac61d"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_typo_set_lengthening_typo_cost</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv411kiwi_typo_h" title="kiwi_typo_h"><span class="n"><span class="pre">kiwi_typo_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">threshold</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv435kiwi_typo_set_lengthening_typo_cost11kiwi_typo_hf" title="Link to this definition"></a><br /></dt>
+<dd><p>현재 오타 교정기의 장음화 오타 비용을 설정합니다. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>장음화 오타의 초기값은 무한대, 즉 비활성화 상태입니다. 유한한 값으로 설정하면 장음화 오타가 활성화됩니다. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>handle</strong> – 오타 교정기의 핸들 </p></li>
+<li><p><strong>threshold</strong> – 장음화 오타의 새로운 비용 </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>성공 시 0를 반환합니다. 실패 시 음수를 반환하고 에러 메세지를 설정합니다.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv415kiwi_typo_close11kiwi_typo_h">
+<span id="_CPPv315kiwi_typo_close11kiwi_typo_h"></span><span id="_CPPv215kiwi_typo_close11kiwi_typo_h"></span><span id="kiwi_typo_close__kiwi_typo_h"></span><span class="target" id="capi_8h_1a37fd1440ce53804ce6820760ed2b2d05"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_typo_close</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv411kiwi_typo_h" title="kiwi_typo_h"><span class="n"><span class="pre">kiwi_typo_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415kiwi_typo_close11kiwi_typo_h" title="Link to this definition"></a><br /></dt>
+<dd><p>생성된 오타 교정기를 해제합니다. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>kiwi_typo_get_default로 얻은 핸들은 절대 해제해서는 안됩니다. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>성공 시 0를 반환합니다. 실패 시 음수를 반환하고 에러 메세지를 설정합니다.</p>
 </dd>
 </dl>
 </dd></dl>

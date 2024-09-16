@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['splitintosents_520',['splitIntoSents',['../classkiwi_1_1Kiwi.html#a52218c510d6c8ee53fea28402a177902',1,'kiwi::Kiwi::splitIntoSents(const std::u16string &amp;str, Match matchOptions=Match::allWithNormalizing, TokenResult *tokenizedResultOut=nullptr) const'],['../classkiwi_1_1Kiwi.html#a1a8f39476bb72b3c75b83dc6f7a43992',1,'kiwi::Kiwi::splitIntoSents(const std::string &amp;str, Match matchOptions=Match::allWithNormalizing, TokenResult *tokenizedResultOut=nullptr) const']]]
+  ['ready_541',['ready',['../classkiwi_1_1Kiwi.html#a278af7fd34a725f39b2fcfd528d34b6e',1,'kiwi::Kiwi::ready()'],['../classkiwi_1_1KiwiBuilder.html#a1f90bdbca2a4d4a7d5a9b8b2fb052cfd',1,'kiwi::KiwiBuilder::ready()']]]
 ];

@@ -66,15 +66,20 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#friends">Friends</a> &#124;
 <a href="classkiwi_1_1TypoTransformer-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">kiwi::TypoTransformer Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>오타 교정에 사용되는 오타 생성기 정의자  
+ <a href="classkiwi_1_1TypoTransformer.html#details">More...</a></p>
+
+<p><code>#include &lt;TypoTransformer.h&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
@@ -102,24 +107,70 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a8e1cc68e5321ff747716267d85299754"><td class="memItemLeft" align="right" valign="top"><a id="a8e1cc68e5321ff747716267d85299754"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>isContinualTypoEnabled</b> () const</td></tr>
 <tr class="separator:a8e1cc68e5321ff747716267d85299754"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1f40b13bf8fc5340ba6424923b88845f"><td class="memItemLeft" align="right" valign="top"><a id="a1f40b13bf8fc5340ba6424923b88845f"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>isLengtheningTypoEnabled</b> () const</td></tr>
+<tr class="separator:a1f40b13bf8fc5340ba6424923b88845f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5de4a908734005ba577ed1f850bd136b"><td class="memItemLeft" align="right" valign="top"><a id="a5de4a908734005ba577ed1f850bd136b"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>empty</b> () const</td></tr>
 <tr class="separator:a5de4a908734005ba577ed1f850bd136b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abf4b5cb637d4c7fac40a9c9d153f4271"><td class="memItemLeft" align="right" valign="top"><a id="abf4b5cb637d4c7fac40a9c9d153f4271"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>addTypo</b> (const std::u16string &amp;orig, const std::u16string &amp;error, float cost=1, <a class="el" href="Types_8h.html#a11856481b15f24bf19cb647734ea1085">CondVowel</a> leftCond=<a class="el" href="Types_8h.html#a11856481b15f24bf19cb647734ea1085a334c4a4c42fdb79d7ebc3e73b517e6f8">CondVowel::none</a>)</td></tr>
+<tr class="memitem:abf4b5cb637d4c7fac40a9c9d153f4271"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1TypoTransformer.html#abf4b5cb637d4c7fac40a9c9d153f4271">addTypo</a> (const std::u16string &amp;orig, const std::u16string &amp;error, float cost=1, <a class="el" href="Types_8h.html#a11856481b15f24bf19cb647734ea1085">CondVowel</a> leftCond=<a class="el" href="Types_8h.html#a11856481b15f24bf19cb647734ea1085a334c4a4c42fdb79d7ebc3e73b517e6f8">CondVowel::none</a>)</td></tr>
+<tr class="memdesc:abf4b5cb637d4c7fac40a9c9d153f4271"><td class="mdescLeft">&#160;</td><td class="mdescRight">새 오타를 정의합니다.  <a href="classkiwi_1_1TypoTransformer.html#abf4b5cb637d4c7fac40a9c9d153f4271">More...</a><br /></td></tr>
 <tr class="separator:abf4b5cb637d4c7fac40a9c9d153f4271"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a378fede4c1179c74a0099cfb9ae59ac6"><td class="memItemLeft" align="right" valign="top"><a id="a378fede4c1179c74a0099cfb9ae59ac6"></a>
 <a class="el" href="classkiwi_1_1TypoTransformer.html">TypoTransformer</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>addTypos</b> (std::initializer_list&lt; TypoDef &gt; lst)</td></tr>
 <tr class="separator:a378fede4c1179c74a0099cfb9ae59ac6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad516e656a12823d8fefc7f610ddc3809"><td class="memItemLeft" align="right" valign="top"><a id="ad516e656a12823d8fefc7f610ddc3809"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setContinualTypoCost</b> (float threshold)</td></tr>
+<tr class="memitem:aba296d374882104ebc652324db98f7b8"><td class="memItemLeft" align="right" valign="top"><a id="aba296d374882104ebc652324db98f7b8"></a>
+const <a class="el" href="Types_8h.html#a22049affb93ad297719245d28ffc10ff">UnorderedMap</a>&lt; std::tuple&lt; <a class="el" href="Types_8h.html#a1f2cff3b6a7a1d78c447635f1d84ebe1">KString</a>, <a class="el" href="Types_8h.html#a1f2cff3b6a7a1d78c447635f1d84ebe1">KString</a>, <a class="el" href="Types_8h.html#a11856481b15f24bf19cb647734ea1085">CondVowel</a> &gt;, float &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>getTypos</b> () const</td></tr>
+<tr class="separator:aba296d374882104ebc652324db98f7b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad516e656a12823d8fefc7f610ddc3809"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1TypoTransformer.html#ad516e656a12823d8fefc7f610ddc3809">setContinualTypoCost</a> (float threshold)</td></tr>
+<tr class="memdesc:ad516e656a12823d8fefc7f610ddc3809"><td class="mdescLeft">&#160;</td><td class="mdescRight">연철 오타의 비용을 새로 설정합니다.  <a href="classkiwi_1_1TypoTransformer.html#ad516e656a12823d8fefc7f610ddc3809">More...</a><br /></td></tr>
 <tr class="separator:ad516e656a12823d8fefc7f610ddc3809"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a81dee1cefdd87b1e18708c75ad9ec881"><td class="memItemLeft" align="right" valign="top"><a id="a81dee1cefdd87b1e18708c75ad9ec881"></a>
+float&#160;</td><td class="memItemRight" valign="bottom"><b>getContinualTypoCost</b> () const</td></tr>
+<tr class="separator:a81dee1cefdd87b1e18708c75ad9ec881"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9ffbfa4bf25bd298648af66c5f2f4597"><td class="memItemLeft" align="right" valign="top"><a id="a9ffbfa4bf25bd298648af66c5f2f4597"></a>
 <a class="el" href="classkiwi_1_1TypoTransformer.html">TypoTransformer</a>&#160;</td><td class="memItemRight" valign="bottom"><b>copyWithNewContinualTypoCost</b> (float threshold) const</td></tr>
 <tr class="separator:a9ffbfa4bf25bd298648af66c5f2f4597"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a21b15a375a100411ce753be84ca344b7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1TypoTransformer.html#a21b15a375a100411ce753be84ca344b7">setLengtheningTypoCost</a> (float threshold)</td></tr>
+<tr class="memdesc:a21b15a375a100411ce753be84ca344b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">장음화 오타의 비용을 새로 설정합니다.  <a href="classkiwi_1_1TypoTransformer.html#a21b15a375a100411ce753be84ca344b7">More...</a><br /></td></tr>
+<tr class="separator:a21b15a375a100411ce753be84ca344b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a010f6ceafdbd7befc14268a493834f85"><td class="memItemLeft" align="right" valign="top"><a id="a010f6ceafdbd7befc14268a493834f85"></a>
+float&#160;</td><td class="memItemRight" valign="bottom"><b>getLengtheningTypoCost</b> () const</td></tr>
+<tr class="separator:a010f6ceafdbd7befc14268a493834f85"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a30a817fe6f8c13e1afe8705c45d4b093"><td class="memItemLeft" align="right" valign="top"><a id="a30a817fe6f8c13e1afe8705c45d4b093"></a>
+<a class="el" href="classkiwi_1_1TypoTransformer.html">TypoTransformer</a>&#160;</td><td class="memItemRight" valign="bottom"><b>copyWithNewLengtheningTypoCost</b> (float threshold) const</td></tr>
+<tr class="separator:a30a817fe6f8c13e1afe8705c45d4b093"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aec265fa45cb5c91e14d640a8ac4fc1d7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1TypoTransformer.html#aec265fa45cb5c91e14d640a8ac4fc1d7">update</a> (const <a class="el" href="classkiwi_1_1TypoTransformer.html">TypoTransformer</a> &amp;o)</td></tr>
+<tr class="memdesc:aec265fa45cb5c91e14d640a8ac4fc1d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">다른 TypoTransformer의 오타를 현재 TypoTransformer에 추가합니다.  <a href="classkiwi_1_1TypoTransformer.html#aec265fa45cb5c91e14d640a8ac4fc1d7">More...</a><br /></td></tr>
+<tr class="separator:aec265fa45cb5c91e14d640a8ac4fc1d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab7c30b11458008912927958d94b4d2cc"><td class="memItemLeft" align="right" valign="top"><a id="ab7c30b11458008912927958d94b4d2cc"></a>
+<a class="el" href="classkiwi_1_1TypoTransformer.html">TypoTransformer</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator|=</b> (const <a class="el" href="classkiwi_1_1TypoTransformer.html">TypoTransformer</a> &amp;o)</td></tr>
+<tr class="separator:ab7c30b11458008912927958d94b4d2cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6bc68a2267a36c076bae5220dc97904d"><td class="memItemLeft" align="right" valign="top"><a id="a6bc68a2267a36c076bae5220dc97904d"></a>
+<a class="el" href="classkiwi_1_1TypoTransformer.html">TypoTransformer</a>&#160;</td><td class="memItemRight" valign="bottom"><b>operator|</b> (const <a class="el" href="classkiwi_1_1TypoTransformer.html">TypoTransformer</a> &amp;o) const</td></tr>
+<tr class="separator:a6bc68a2267a36c076bae5220dc97904d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a70bc708f8fe18de4daee39d2d40cacf1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1TypoTransformer.html#a70bc708f8fe18de4daee39d2d40cacf1">scaleCost</a> (float scale)</td></tr>
+<tr class="memdesc:a70bc708f8fe18de4daee39d2d40cacf1"><td class="mdescLeft">&#160;</td><td class="mdescRight">현재 TypoTransformer의 모든 오타의 비용을 scale배 합니다.  <a href="classkiwi_1_1TypoTransformer.html#a70bc708f8fe18de4daee39d2d40cacf1">More...</a><br /></td></tr>
+<tr class="separator:a70bc708f8fe18de4daee39d2d40cacf1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af0b0bc9a071368bbe6f0a06df4c8088e"><td class="memItemLeft" align="right" valign="top"><a id="af0b0bc9a071368bbe6f0a06df4c8088e"></a>
+<a class="el" href="classkiwi_1_1TypoTransformer.html">TypoTransformer</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator*=</b> (float scale)</td></tr>
+<tr class="separator:af0b0bc9a071368bbe6f0a06df4c8088e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac51ea73a47aa21b4c9cd82c6cec7fbc1"><td class="memItemLeft" align="right" valign="top"><a id="ac51ea73a47aa21b4c9cd82c6cec7fbc1"></a>
+<a class="el" href="classkiwi_1_1TypoTransformer.html">TypoTransformer</a>&#160;</td><td class="memItemRight" valign="bottom"><b>operator*</b> (float scale) const</td></tr>
+<tr class="separator:ac51ea73a47aa21b4c9cd82c6cec7fbc1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afe3425d49368c8b7f17dabd9cbfdada5"><td class="memItemLeft" align="right" valign="top"><a id="afe3425d49368c8b7f17dabd9cbfdada5"></a>
-<a class="el" href="classkiwi_1_1PreparedTypoTransformer.html">PreparedTypoTransformer</a>&#160;</td><td class="memItemRight" valign="bottom"><b>prepare</b> () const</td></tr>
+<a class="el" href="classkiwi_1_1PreparedTypoTransformer.html">PreparedTypoTransformer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1TypoTransformer.html#afe3425d49368c8b7f17dabd9cbfdada5">prepare</a> () const</td></tr>
+<tr class="memdesc:afe3425d49368c8b7f17dabd9cbfdada5"><td class="mdescLeft">&#160;</td><td class="mdescRight">현재 TypoTransformer를 사용하여 PreparedTypoTransformer를 생성합니다. PreparedTypoTransformer는 실제로 오타를 생성하거나 kiwi::KiwiBuilder에 전달되어 오타 교정에 사용될 수 있습니다. <br /></td></tr>
 <tr class="separator:afe3425d49368c8b7f17dabd9cbfdada5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:a7d9080b96723f1bdd85e79e89953f2db"><td class="memItemLeft" align="right" valign="top"><a id="a7d9080b96723f1bdd85e79e89953f2db"></a>
+static <a class="el" href="classkiwi_1_1TypoTransformer.html">TypoTransformer</a>&#160;</td><td class="memItemRight" valign="bottom"><b>fromContinualTypoCost</b> (float threshold)</td></tr>
+<tr class="separator:a7d9080b96723f1bdd85e79e89953f2db"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a99a3b4fa25f5c450be3ab6f8ffd5a5c9"><td class="memItemLeft" align="right" valign="top"><a id="a99a3b4fa25f5c450be3ab6f8ffd5a5c9"></a>
+static <a class="el" href="classkiwi_1_1TypoTransformer.html">TypoTransformer</a>&#160;</td><td class="memItemRight" valign="bottom"><b>fromLengtheningTypoCost</b> (float threshold)</td></tr>
+<tr class="separator:a99a3b4fa25f5c450be3ab6f8ffd5a5c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>
@@ -130,8 +181,187 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>KiwiBuilder</b></td>
 class&#160;</td><td class="memItemRight" valign="bottom"><b>PreparedTypoTransformer</b></td></tr>
 <tr class="separator:a5d45ff6c1ea74100958e1876b11666f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>오타 교정에 사용되는 오타 생성기 정의자 </p>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="abf4b5cb637d4c7fac40a9c9d153f4271"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abf4b5cb637d4c7fac40a9c9d153f4271">&#9670;&nbsp;</a></span>addTypo()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void kiwi::TypoTransformer::addTypo </td>
+          <td>(</td>
+          <td class="paramtype">const std::u16string &amp;&#160;</td>
+          <td class="paramname"><em>orig</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::u16string &amp;&#160;</td>
+          <td class="paramname"><em>error</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>cost</em> = <code>1</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="Types_8h.html#a11856481b15f24bf19cb647734ea1085">CondVowel</a>&#160;</td>
+          <td class="paramname"><em>leftCond</em> = <code><a class="el" href="Types_8h.html#a11856481b15f24bf19cb647734ea1085a334c4a4c42fdb79d7ebc3e73b517e6f8">CondVowel::none</a></code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>새 오타를 정의합니다. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">orig</td><td>원본 문자열 </td></tr>
+    <tr><td class="paramname">error</td><td>오류 문자열 </td></tr>
+    <tr><td class="paramname">cost</td><td>오류 문자열로 변환하는데 드는 비용. 이 값을 무한대로 설정하면 해당 오타가 비활성화됩니다. </td></tr>
+    <tr><td class="paramname">leftCond</td><td>원본 문자열이 오류 문자열로 변환될 때 요구되는 왼쪽 모음의 조건</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>orig, error는 모두 완전한 음절이거나 모음이거나 초성이어야 합니다. 그렇지 않은 경우 invalid_argument 예외가 발생합니다. addTypo(u"ㅐ", u"ㅔ")는 비용 1을 들여 ㅐ를 ㅔ로 바꾸는 변환을 새로 정의합니다. addTypo(u"ㅐ", u"에")는 실패하고 예외를 발생시킵니다. </dd></dl>
+
+</div>
+</div>
+<a id="a70bc708f8fe18de4daee39d2d40cacf1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a70bc708f8fe18de4daee39d2d40cacf1">&#9670;&nbsp;</a></span>scaleCost()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void kiwi::TypoTransformer::scaleCost </td>
+          <td>(</td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>scale</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>현재 TypoTransformer의 모든 오타의 비용을 scale배 합니다. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">scale</td><td>배율 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>scale은 0보다 큰 양수여야 합니다. 0, 음수, 무한대의 경우 invalid_argument 예외가 발생합니다. </dd></dl>
+
+</div>
+</div>
+<a id="ad516e656a12823d8fefc7f610ddc3809"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad516e656a12823d8fefc7f610ddc3809">&#9670;&nbsp;</a></span>setContinualTypoCost()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void kiwi::TypoTransformer::setContinualTypoCost </td>
+          <td>(</td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>threshold</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>연철 오타의 비용을 새로 설정합니다. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">threshold</td><td>연철 오타의 비용 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>연철 오타의 초기값은 무한대, 즉 비활성화 상태입니다. 유한한 값으로 설정하면 연철 오타가 활성화됩니다. </dd></dl>
+
+</div>
+</div>
+<a id="a21b15a375a100411ce753be84ca344b7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a21b15a375a100411ce753be84ca344b7">&#9670;&nbsp;</a></span>setLengtheningTypoCost()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void kiwi::TypoTransformer::setLengtheningTypoCost </td>
+          <td>(</td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>threshold</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>장음화 오타의 비용을 새로 설정합니다. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">threshold</td><td>장음화 오타의 비용 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>장음화 오타의 초기값은 무한대, 즉 비활성화 상태입니다. 유한한 값으로 설정하면 장음화 오타가 활성화됩니다. </dd></dl>
+
+</div>
+</div>
+<a id="aec265fa45cb5c91e14d640a8ac4fc1d7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aec265fa45cb5c91e14d640a8ac4fc1d7">&#9670;&nbsp;</a></span>update()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void kiwi::TypoTransformer::update </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classkiwi_1_1TypoTransformer.html">TypoTransformer</a> &amp;&#160;</td>
+          <td class="paramname"><em>o</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>다른 TypoTransformer의 오타를 현재 TypoTransformer에 추가합니다. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">o</td><td>추가할 <a class="el" href="classkiwi_1_1TypoTransformer.html" title="오타 교정에 사용되는 오타 생성기 정의자">TypoTransformer</a> </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>현재 TypoTransformer와 o에서 동일한 오타를 정의하고 있는 경우 비용이 더 낮은 정의가 선택됩니다. 연철 오타와 장음화 오타 역시 마찬가지로 양쪽 중 더 낮은 쪽의 비용이 선택됩니다. </dd></dl>
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>include/kiwi/TypoTransformer.h</li>
+<li>include/kiwi/<a class="el" href="TypoTransformer_8h.html">TypoTransformer.h</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

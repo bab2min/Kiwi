@@ -97,9 +97,9 @@ Public Types</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a94fc96e67953b7946492675102d72890"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1Kiwi.html#a94fc96e67953b7946492675102d72890">Kiwi</a> (ArchType arch=ArchType::default_, <a class="el" href="structkiwi_1_1LangModel.html">LangModel</a> _langMdl={}, bool typoTolerant=false, bool continualTypoTolerant=false)</td></tr>
-<tr class="memdesc:a94fc96e67953b7946492675102d72890"><td class="mdescLeft">&#160;</td><td class="mdescRight">빈 <a class="el" href="classkiwi_1_1Kiwi.html" title="실제 형태소 분석을 수행하는 클래스.">Kiwi</a> 객체를 생성한다.  <a href="classkiwi_1_1Kiwi.html#a94fc96e67953b7946492675102d72890">More...</a><br /></td></tr>
-<tr class="separator:a94fc96e67953b7946492675102d72890"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae7102d4533a34fe89cce17b1c93bdc07"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1Kiwi.html#ae7102d4533a34fe89cce17b1c93bdc07">Kiwi</a> (ArchType arch=ArchType::default_, <a class="el" href="structkiwi_1_1LangModel.html">LangModel</a> _langMdl={}, bool typoTolerant=false, bool continualTypoTolerant=false, bool lengtheningTypoTolerant=false)</td></tr>
+<tr class="memdesc:ae7102d4533a34fe89cce17b1c93bdc07"><td class="mdescLeft">&#160;</td><td class="mdescRight">빈 <a class="el" href="classkiwi_1_1Kiwi.html" title="실제 형태소 분석을 수행하는 클래스.">Kiwi</a> 객체를 생성한다.  <a href="classkiwi_1_1Kiwi.html#ae7102d4533a34fe89cce17b1c93bdc07">More...</a><br /></td></tr>
+<tr class="separator:ae7102d4533a34fe89cce17b1c93bdc07"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a823fae39cb92135cf1507ddcea7d3004"><td class="memItemLeft" align="right" valign="top"><a id="a823fae39cb92135cf1507ddcea7d3004"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>Kiwi</b> (const <a class="el" href="classkiwi_1_1Kiwi.html">Kiwi</a> &amp;)=delete</td></tr>
 <tr class="separator:a823fae39cb92135cf1507ddcea7d3004"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -273,8 +273,8 @@ template&lt;template&lt; ArchType &gt; class LmState&gt; </td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>실제 형태소 분석을 수행하는 클래스. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a94fc96e67953b7946492675102d72890"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a94fc96e67953b7946492675102d72890">&#9670;&nbsp;</a></span>Kiwi()</h2>
+<a id="ae7102d4533a34fe89cce17b1c93bdc07"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae7102d4533a34fe89cce17b1c93bdc07">&#9670;&nbsp;</a></span>Kiwi()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -301,7 +301,13 @@ template&lt;template&lt; ArchType &gt; class LmState&gt; </td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>continualTypoTolerant</em> = <code>false</code>&#160;</td>
+          <td class="paramname"><em>continualTypoTolerant</em> = <code>false</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>lengtheningTypoTolerant</em> = <code>false</code>&#160;</td>
         </tr>
         <tr>
           <td></td>

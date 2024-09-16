@@ -74,6 +74,11 @@ $(function() {
 <div class="title">kiwi::PreparedTypoTransformer Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>오타 생성 및 교정 준비가 완료된 오타 생성기. <a class="el" href="classkiwi_1_1TypoTransformer.html#afe3425d49368c8b7f17dabd9cbfdada5" title="현재 TypoTransformer를 사용하여 PreparedTypoTransformer를 생성합니다. PreparedTypoTransformer는 실제로 오타를 생성하거나 kiwi:...">kiwi::TypoTransformer::prepare()</a>로부터 생성됩니다.  
+ <a href="classkiwi_1_1PreparedTypoTransformer.html#details">More...</a></p>
+
+<p><code>#include &lt;TypoTransformer.h&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -98,8 +103,11 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>ready</b> () const</t
 <tr class="memitem:ab8bb3239c2562f86315c03819b3a5a15"><td class="memItemLeft" align="right" valign="top"><a id="ab8bb3239c2562f86315c03819b3a5a15"></a>
 float&#160;</td><td class="memItemRight" valign="bottom"><b>getContinualTypoCost</b> () const</td></tr>
 <tr class="separator:ab8bb3239c2562f86315c03819b3a5a15"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abbe0471e6bae7162d488bb3379f149de"><td class="memItemLeft" align="right" valign="top"><a id="abbe0471e6bae7162d488bb3379f149de"></a>
-<a class="el" href="classkiwi_1_1TypoCandidates.html">TypoCandidates</a>&lt; true &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>generate</b> (const std::u16string &amp;orig, float costThreshold=2.5f) const</td></tr>
+<tr class="memitem:aa2627a55c04782db44fa9220a1e9137e"><td class="memItemLeft" align="right" valign="top"><a id="aa2627a55c04782db44fa9220a1e9137e"></a>
+float&#160;</td><td class="memItemRight" valign="bottom"><b>getLengtheningTypoCost</b> () const</td></tr>
+<tr class="separator:aa2627a55c04782db44fa9220a1e9137e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abbe0471e6bae7162d488bb3379f149de"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classkiwi_1_1TypoCandidates.html">TypoCandidates</a>&lt; true &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1PreparedTypoTransformer.html#abbe0471e6bae7162d488bb3379f149de">generate</a> (const std::u16string &amp;orig, float costThreshold=2.5f) const</td></tr>
+<tr class="memdesc:abbe0471e6bae7162d488bb3379f149de"><td class="mdescLeft">&#160;</td><td class="mdescRight">주어진 문자열에 대해 오타 후보를 생성합니다.  <a href="classkiwi_1_1PreparedTypoTransformer.html#abbe0471e6bae7162d488bb3379f149de">More...</a><br /></td></tr>
 <tr class="separator:abbe0471e6bae7162d488bb3379f149de"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
@@ -108,8 +116,48 @@ Friends</h2></td></tr>
 class&#160;</td><td class="memItemRight" valign="bottom"><b>KiwiBuilder</b></td></tr>
 <tr class="separator:ab2c33d7538f624b7652fb7fd9b898542"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>오타 생성 및 교정 준비가 완료된 오타 생성기. <a class="el" href="classkiwi_1_1TypoTransformer.html#afe3425d49368c8b7f17dabd9cbfdada5" title="현재 TypoTransformer를 사용하여 PreparedTypoTransformer를 생성합니다. PreparedTypoTransformer는 실제로 오타를 생성하거나 kiwi:...">kiwi::TypoTransformer::prepare()</a>로부터 생성됩니다. </p>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="abbe0471e6bae7162d488bb3379f149de"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abbe0471e6bae7162d488bb3379f149de">&#9670;&nbsp;</a></span>generate()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classkiwi_1_1TypoCandidates.html">TypoCandidates</a>&lt;true&gt; kiwi::PreparedTypoTransformer::generate </td>
+          <td>(</td>
+          <td class="paramtype">const std::u16string &amp;&#160;</td>
+          <td class="paramname"><em>orig</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>costThreshold</em> = <code>2.5f</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>주어진 문자열에 대해 오타 후보를 생성합니다. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">orig</td><td>원본 문자열 </td></tr>
+    <tr><td class="paramname">costThreshold</td><td>생성할 오타 후보의 비용 상한 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>include/kiwi/TypoTransformer.h</li>
+<li>include/kiwi/<a class="el" href="TypoTransformer_8h.html">TypoTransformer.h</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
