@@ -493,6 +493,16 @@ public:
 	static constexpr std::string_view className = "kr/pe/bab2min/KiwiBuilder$TypoTransformer";
 
 	using kiwi::TypoTransformer::TypoTransformer;
+
+	JTypoTransformer copy() const
+	{
+		return *this;
+	}
+
+	void update(const JTypoTransformer& o)
+	{
+		TypoTransformer::update(o);
+	}
 };
 
 class JKiwiBuilder : public kiwi::KiwiBuilder, jni::JObject<JKiwiBuilder>
@@ -547,7 +557,11 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved)
 		jni::define<JTypoTransformer>()
 			.template ctor<>()
 			.template method<&JTypoTransformer::addTypo>("_addTypo")
-			.template method<&JTypoTransformer::setContinualTypoCost>("_setContinualTypoCost"),
+			.template method<&JTypoTransformer::setContinualTypoCost>("_setContinualTypoCost")
+			.template method<&JTypoTransformer::setLengtheningTypoCost>("_setLengtheningTypoCost")
+			.template method<&JTypoTransformer::copy>("copy")
+			.template method<&JTypoTransformer::update>("_update")
+			.template method<&JTypoTransformer::scaleCost>("_scaleCost"),
 
 		jni::define<JKiwiBuilder>()
 			.template ctor<std::string, size_t, kiwi::BuildOption, bool>()

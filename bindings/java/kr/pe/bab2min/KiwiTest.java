@@ -4,6 +4,9 @@ import java.util.Arrays;
 import java.util.concurrent.Future;
 
 import org.junit.Test;
+
+import kr.pe.bab2min.KiwiBuilder.TypoTransformer;
+
 import static org.junit.Assert.*;
 
 public class KiwiTest {
@@ -153,6 +156,30 @@ public class KiwiTest {
 		System.out.println(Arrays.deepToString(tokens));
 		assertEquals(tokens[2].form, "없");
 		assertEquals(tokens[3].form, "어");
+	}
+
+	@Test
+	public void testCustomTypos() throws Exception {
+		System.gc();
+		KiwiBuilder builder = new KiwiBuilder(modelPath);
+		TypoTransformer typoSet = KiwiBuilder.basicTypoSet.copy()
+									.update(KiwiBuilder.continualTypoSet)
+									.update(KiwiBuilder.lengtheningTypoSet);
+		Kiwi kiwi = builder.build(typoSet);
+		
+		Kiwi.Token[] tokens = kiwi.tokenize("프로그래미", Kiwi.Match.allWithNormalizing);
+		System.out.println(Arrays.deepToString(tokens));
+		assertEquals(tokens[0].form, "프로그램");
+		assertEquals(tokens[1].form, "이");
+
+		tokens = kiwi.tokenize("지인짜?", Kiwi.Match.allWithNormalizing);
+		System.out.println(Arrays.deepToString(tokens));
+		assertEquals(tokens[0].form, "진짜");
+		assertEquals(tokens[1].form, "?");
+
+		tokens = kiwi.tokenize("맗은 물", Kiwi.Match.allWithNormalizing);
+		System.out.println(Arrays.deepToString(tokens));
+		assertEquals(tokens[0].form, "맑");
 	}
 
 	@Test
