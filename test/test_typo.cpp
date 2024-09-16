@@ -204,3 +204,42 @@ TEST(KiwiTypo, BasicTypoSetWithContinual)
 	EXPECT_EQ(res[1].str, u"많");
 	EXPECT_EQ(res[2].str, u"다");
 }
+
+TEST(KiwiTypo, LengtheningTypoSet)
+{
+	KiwiBuilder builder{ MODEL_PATH, 0, BuildOption::default_, };
+	Kiwi typoKiwi = builder.build(DefaultTypoSet::lengtheningTypoSet);
+	const float typoCost = typoKiwi.getTypoCostWeight() * 0.5f;
+
+	auto ref = typoKiwi.analyze(u"진짜?", Match::allWithNormalizing);
+	auto res = typoKiwi.analyze(u"지인짜?", Match::allWithNormalizing);
+	EXPECT_FLOAT_EQ(ref.second - typoCost, res.second);
+	EXPECT_EQ(res.first.size(), 2);
+	EXPECT_EQ(res.first[0].str, u"진짜");
+	EXPECT_EQ(res.first[1].str, u"?");
+
+	res = typoKiwi.analyze(u"지인짜아?", Match::allWithNormalizing);
+	EXPECT_FLOAT_EQ(ref.second - 2 * typoCost, res.second);
+	EXPECT_EQ(res.first.size(), 2);
+	EXPECT_EQ(res.first[0].str, u"진짜");
+	EXPECT_EQ(res.first[1].str, u"?");
+
+	res = typoKiwi.analyze(u"그으으래?", Match::allWithNormalizing);
+	EXPECT_EQ(res.first.size(), 2);
+	EXPECT_EQ(res.first[0].str, u"그래");
+	EXPECT_EQ(res.first[1].str, u"?");
+
+	res = typoKiwi.analyze(u"그으으으으래?", Match::allWithNormalizing);
+	EXPECT_EQ(res.first.size(), 2);
+	EXPECT_EQ(res.first[0].str, u"그래");
+	EXPECT_EQ(res.first[1].str, u"?");
+
+	res = typoKiwi.analyze(u"학교오를 가야아해", Match::allWithNormalizing);
+	EXPECT_EQ(res.first.size(), 6);
+	EXPECT_EQ(res.first[0].str, u"학교");
+	EXPECT_EQ(res.first[1].str, u"를");
+	EXPECT_EQ(res.first[2].str, u"가");
+	EXPECT_EQ(res.first[3].str, u"어야");
+	EXPECT_EQ(res.first[4].str, u"하");
+	EXPECT_EQ(res.first[5].str, u"어");
+}

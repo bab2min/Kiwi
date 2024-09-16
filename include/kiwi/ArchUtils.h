@@ -30,13 +30,13 @@ namespace kiwi
 	template<>
 	struct ArchInfo<ArchType::none>
 	{
-		static constexpr size_t alignment = 0;
+		static constexpr size_t alignment = 4;
 	};
 
 	template<>
 	struct ArchInfo<ArchType::balanced>
 	{
-		static constexpr size_t alignment = 0;
+		static constexpr size_t alignment = 4;
 	};
 
 	template<>

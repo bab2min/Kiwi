@@ -1683,7 +1683,7 @@ namespace kiwi
 
 Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) const
 {
-	Kiwi ret{ archType, langMdl, !typos.empty(), typos.isContinualTypoEnabled() };
+	Kiwi ret{ archType, langMdl, !typos.empty(), typos.isContinualTypoEnabled(), typos.isLengtheningTypoEnabled()};
 
 	Vector<FormRaw> combinedForms;
 	Vector<MorphemeRaw> combinedMorphemes;
@@ -1808,6 +1808,7 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 		UnorderedMap<KString, Vector<TypoInfo>> typoGroup;
 		auto ptypos = typos.prepare();
 		ret.continualTypoCost = ptypos.getContinualTypoCost();
+		ret.lengtheningTypoCost = ptypos.getLengtheningTypoCost();
 		for (auto f : sortedForms)
 		{
 			// 현재는 공백이 없는 단일 단어에 대해서만 오타 교정을 수행.

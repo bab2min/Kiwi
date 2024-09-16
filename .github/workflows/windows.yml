@@ -15,7 +15,7 @@ jobs:
     name: ${{ matrix.os }} ${{ matrix.arch }}
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: true
         lfs: true
@@ -38,7 +38,7 @@ jobs:
         .\build\Release\kiwi-evaluator.exe -m .\ModelGenerator (Get-ChildItem eval_data\*.txt | Select-Object -Expand FullName) -o eval_results\
         .\build\Release\kiwi-evaluator.exe -m .\ModelGenerator --sbg (Get-ChildItem eval_data\*.txt | Select-Object -Expand FullName) -o eval_results\
     - name: Archive binaries
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: Artifacts ${{ matrix.os }} ${{ matrix.arch }}bit
         path: |

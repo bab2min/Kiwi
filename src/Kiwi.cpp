@@ -41,11 +41,18 @@ namespace kiwi
 		return buf;
 	}
 
-	Kiwi::Kiwi(ArchType arch, LangModel _langMdl, bool typoTolerant, bool continualTypoTolerant)
+	Kiwi::Kiwi(ArchType arch, 
+		LangModel _langMdl, 
+		bool typoTolerant, 
+		bool continualTypoTolerant, 
+		bool lengtheningTypoTolerant)
 		: langMdl(_langMdl)
 	{
 		selectedArch = arch;
-		dfSplitByTrie = (void*)getSplitByTrieFn(selectedArch, typoTolerant, continualTypoTolerant);
+		dfSplitByTrie = (void*)getSplitByTrieFn(selectedArch, 
+			typoTolerant, 
+			continualTypoTolerant, 
+			lengtheningTypoTolerant);
 		dfFindForm = (void*)getFindFormFn(selectedArch);
 
 		static tp::Table<FnFindBestPath, AvailableArch> lmKnLM_8{ FindBestPathGetter<WrappedKnLM<uint8_t>::type>{} };
@@ -1005,6 +1012,7 @@ namespace kiwi
 				maxUnkFormSize,
 				spaceTolerance,
 				continualTypoCost,
+				lengtheningTypoCost,
 				pretokenizedFirst,
 				pretokenizedLast
 			);

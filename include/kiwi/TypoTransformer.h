@@ -1,3 +1,12 @@
+﻿/**
+ * @file TypoTransformer.h
+ * @author bab2min (bab2min@gmail.com)
+ * @brief 오타 교정에 사용되는 TypoTransformer 및 관련 클래스들을 정의합니다.
+ * @version 0.19.0
+ * @date 2024-09-15
+ *
+ *
+ */
 #pragma once
 
 #include "Types.h"
@@ -114,6 +123,9 @@ namespace kiwi
 	class KiwiBuilder;
 	class TypoTransformer;
 
+	/**
+	* @brief 오타 생성 및 교정 준비가 완료된 오타 생성기. kiwi::TypoTransformer::prepare()로부터 생성됩니다.
+	*/
 	class PreparedTypoTransformer
 	{
 		friend class KiwiBuilder;
@@ -165,6 +177,7 @@ namespace kiwi
 		KString strPool;
 		Vector<ReplInfo> replacements;
 		float continualTypoThreshold = INFINITY;
+		float lengtheningTypoThreshold = INFINITY;
 
 		template<bool u16wrap = false>
 		TypoCandidates<u16wrap> _generate(const KString& orig, float costThreshold = 2.5f) const;
@@ -185,33 +198,33 @@ namespace kiwi
 			return continualTypoThreshold;
 		}
 
+		float getLengtheningTypoCost() const
+		{
+			return lengtheningTypoThreshold;
+		}
+
+		/**
+		* @brief 주어진 문자열에 대해 오타 후보를 생성합니다.
+		* 
+		* @param orig 원본 문자열
+		* @param costThreshold 생성할 오타 후보의 비용 상한
+		*/
 		TypoCandidates<true> generate(const std::u16string& orig, float costThreshold = 2.5f) const;
 	};
 
+	/**
+	* @brief 오타 교정에 사용되는 오타 생성기 정의자
+	*/
 	class TypoTransformer
 	{
 		friend class KiwiBuilder;
 		friend class PreparedTypoTransformer;
 
-		using TrieNode = utils::TrieNode<char16_t, size_t, utils::ConstAccess<UnorderedMap<char16_t, int32_t>>>;
-
-		struct ReplInfo
-		{
-			uint32_t begin, end;
-			float cost;
-			CondVowel leftCond;
-
-			ReplInfo(uint32_t _begin = 0, uint32_t _end = 0, float _cost = 0, CondVowel _leftCond = CondVowel::none)
-				: begin{ _begin }, end{ _end }, cost{ _cost }, leftCond{ _leftCond }
-			{}
-		};
-
-		utils::ContinuousTrie<TrieNode> patTrie;
-		KString strPool;
-		Vector<Vector<ReplInfo>> replacements;
 		float continualTypoThreshold = INFINITY;
+		float lengtheningTypoThreshold = INFINITY;
 
-		void addTypoImpl(const KString& orig, const KString& error, float cost, CondVowel leftCond = CondVowel::none);
+		UnorderedMap<std::tuple<KString, KString, CondVowel>, float> typos;
+
 		void addTypoWithCond(const KString& orig, const KString& error, float cost, CondVowel leftCond = CondVowel::none);
 		void addTypoNormalized(const KString& orig, const KString& error, float cost = 1, CondVowel leftCond = CondVowel::none);
 
@@ -233,12 +246,21 @@ namespace kiwi
 		TypoTransformer& operator=(TypoTransformer&&);
 
 		bool isContinualTypoEnabled() const;
+		bool isLengtheningTypoEnabled() const;
+		bool empty() const;
 
-		bool empty() const
-		{
-			return replacements.empty() && !isContinualTypoEnabled();
-		}
-
+		/**
+		* @brief 새 오타를 정의합니다.
+		* 
+		* @param orig 원본 문자열
+		* @param error 오류 문자열
+		* @param cost 오류 문자열로 변환하는데 드는 비용. 이 값을 무한대로 설정하면 해당 오타가 비활성화됩니다.
+		* @param leftCond 원본 문자열이 오류 문자열로 변환될 때 요구되는 왼쪽 모음의 조건
+		* 
+		* @note orig, error는 모두 완전한 음절이거나 모음이거나 초성이어야 합니다. 그렇지 않은 경우 invalid_argument 예외가 발생합니다.
+		*		addTypo(u"ㅐ", u"ㅔ")는 비용 1을 들여 ㅐ를 ㅔ로 바꾸는 변환을 새로 정의합니다. 
+		*		addTypo(u"ㅐ", u"에")는 실패하고 예외를 발생시킵니다.
+		*/
 		void addTypo(const std::u16string& orig, const std::u16string& error, float cost = 1, CondVowel leftCond = CondVowel::none);
 
 		TypoTransformer& addTypos(std::initializer_list<TypoDef> lst)
@@ -256,13 +278,108 @@ namespace kiwi
 			return *this;
 		}
 
+		const UnorderedMap<std::tuple<KString, KString, CondVowel>, float>& getTypos() const
+		{
+			return typos;
+		}
+
+		/**
+		* @brief 연철 오타의 비용을 새로 설정합니다.
+		* 
+		* @param threshold 연철 오타의 비용
+		* @note 연철 오타의 초기값은 무한대, 즉 비활성화 상태입니다. 유한한 값으로 설정하면 연철 오타가 활성화됩니다.
+		*/
 		void setContinualTypoCost(float threshold)
 		{
 			continualTypoThreshold = threshold;
 		}
 
+		float getContinualTypoCost() const
+		{
+			return continualTypoThreshold;
+		}
+
+		static TypoTransformer fromContinualTypoCost(float threshold)
+		{
+			TypoTransformer ret;
+			ret.setContinualTypoCost(threshold);
+			return ret;
+		}
+
 		TypoTransformer copyWithNewContinualTypoCost(float threshold) const;
 
+		/**
+		* @brief 장음화 오타의 비용을 새로 설정합니다.
+		* 
+		* @param threshold 장음화 오타의 비용
+		* @note 장음화 오타의 초기값은 무한대, 즉 비활성화 상태입니다. 유한한 값으로 설정하면 장음화 오타가 활성화됩니다.
+		*/
+		void setLengtheningTypoCost(float threshold)
+		{
+			lengtheningTypoThreshold = threshold;
+		}
+
+		float getLengtheningTypoCost() const
+		{
+			return lengtheningTypoThreshold;
+		}
+
+		static TypoTransformer fromLengtheningTypoCost(float threshold)
+		{
+			TypoTransformer ret;
+			ret.setLengtheningTypoCost(threshold);
+			return ret;
+		}
+
+		TypoTransformer copyWithNewLengtheningTypoCost(float threshold) const;
+
+		/**
+		* @brief 다른 TypoTransformer의 오타를 현재 TypoTransformer에 추가합니다.
+		* 
+		* @param o 추가할 TypoTransformer
+		* @note 현재 TypoTransformer와 o에서 동일한 오타를 정의하고 있는 경우 비용이 더 낮은 정의가 선택됩니다.
+		*		연철 오타와 장음화 오타 역시 마찬가지로 양쪽 중 더 낮은 쪽의 비용이 선택됩니다.
+		*/
+		void update(const TypoTransformer& o);
+
+		TypoTransformer& operator|=(const TypoTransformer& o)
+		{
+			update(o);
+			return *this;
+		}
+
+		TypoTransformer operator|(const TypoTransformer& o) const
+		{
+			TypoTransformer ret = *this;
+			ret.update(o);
+			return ret;
+		}
+
+		/**
+		* @brief 현재 TypoTransformer의 모든 오타의 비용을 scale배 합니다.
+		*
+		* @param scale 배율
+		* @note scale은 0보다 큰 양수여야 합니다. 0, 음수, 무한대의 경우 invalid_argument 예외가 발생합니다.
+		*/
+		void scaleCost(float scale);
+
+		TypoTransformer& operator*=(float scale)
+		{
+			scaleCost(scale);
+			return *this;
+		}
+
+		TypoTransformer operator*(float scale) const
+		{
+			TypoTransformer ret = *this;
+			ret.scaleCost(scale);
+			return ret;
+		}
+
+		/**
+		* @brief 현재 TypoTransformer를 사용하여 PreparedTypoTransformer를 생성합니다. 
+		*		PreparedTypoTransformer는 실제로 오타를 생성하거나 kiwi::KiwiBuilder에 전달되어 오타 교정에 사용될 수 있습니다.
+		*/
 		PreparedTypoTransformer prepare() const
 		{
 			return { *this };
@@ -275,7 +392,13 @@ namespace kiwi
 		basicTypoSet,
 		continualTypoSet,
 		basicTypoSetWithContinual,
+		lengtheningTypoSet,
 	};
 
+	/**
+	* @brief 기본 내장 오타 생성기를 반환합니다.
+	* 
+	* @param set 사용할 기본 내장 오타 생성기의 종류
+	*/
 	const TypoTransformer& getDefaultTypoSet(DefaultTypoSet set);
 }

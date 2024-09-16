@@ -42,7 +42,7 @@ namespace kiwi
 		return true;
 	}
 
-	template<bool typoTolerant, bool continualTypoTolerant>
+	template<bool typoTolerant, bool continualTypoTolerant, bool lengtheningTypoTolerant>
 	struct FormCandidate
 	{
 		const Form* form = nullptr;
@@ -51,8 +51,17 @@ namespace kiwi
 		uint32_t typoId = 0;
 		uint32_t end = 0; // only used in continual typo tolerant mode
 
-		FormCandidate(const Form* _form = nullptr, float _cost = 0, uint32_t _start = 0, uint32_t _typoId = 0, uint32_t _end = 0)
-			: form{ _form }, cost{ _cost }, start{ _start }, typoId{ _typoId }, end{ _end }
+		FormCandidate(const Form* _form = nullptr, 
+			float _cost = 0, 
+			uint32_t _start = 0, 
+			uint32_t _typoId = 0, 
+			uint32_t _end = 0, 
+			uint32_t = 0)
+			: form{ _form }, 
+			cost{ _cost }, 
+			start{ _start }, 
+			typoId{ _typoId }, 
+			end{ _end }
 		{}
 
 		size_t getStartPos(size_t ) const
@@ -87,11 +96,11 @@ namespace kiwi
 	};
 
 	template<>
-	struct FormCandidate<false, false>
+	struct FormCandidate<false, false, false>
 	{
 		const Form* form = nullptr;
 
-		FormCandidate(const Form* _form = nullptr, float = 0, uint32_t = 0, uint32_t = 0, uint32_t = 0)
+		FormCandidate(const Form* _form = nullptr, float = 0, uint32_t = 0, uint32_t = 0, uint32_t = 0, uint32_t = 0)
 			: form{ _form }
 		{}
 
@@ -126,6 +135,28 @@ namespace kiwi
 		}
 	};
 
+	template<bool typoTolerant, bool continualTypoTolerant>
+	struct FormCandidate<typoTolerant, continualTypoTolerant, true> : public FormCandidate<typoTolerant, continualTypoTolerant, false>
+	{
+		using BaseType = FormCandidate<typoTolerant, continualTypoTolerant, false>;
+		uint32_t lengthenedSize = 0;
+
+		FormCandidate(const Form* _form = nullptr,
+			float _cost = 0,
+			uint32_t _start = 0,
+			uint32_t _typoId = 0,
+			uint32_t _end = 0,
+			uint32_t _lengthenedSize = 0)
+			: FormCandidate<typoTolerant, continualTypoTolerant, false>{ _form, _cost, _start, _typoId, _end, _lengthenedSize },
+			lengthenedSize{ _lengthenedSize }
+		{}
+
+		size_t getFormSizeWithTypos(const size_t* typoPtrs) const
+		{
+			return BaseType::getFormSizeWithTypos(typoPtrs) + lengthenedSize;
+		}
+	};
+
 	template<bool typoTolerant>
 	bool getZCodaAppendable(
 		const Form* foundCand,
@@ -143,9 +174,9 @@ namespace kiwi
 		}
 	}
 
-	template<bool typoTolerant, bool continualTypoTolerant>
+	template<bool typoTolerant, bool continualTypoTolerant, bool lengtheningTypoTolerant>
 	bool insertCandidates(
-		Vector<FormCandidate<typoTolerant, continualTypoTolerant>>& candidates,
+		Vector<FormCandidate<typoTolerant, continualTypoTolerant, lengtheningTypoTolerant>>& candidates,
 		const Form* foundCand,
 		const Form* formBase,
 		const size_t* typoPtrs,
@@ -153,7 +184,8 @@ namespace kiwi
 		const Vector<uint32_t>& nonSpaces,
 		uint32_t startPosition = 0,
 		uint32_t endPosition = 0,
-		float cost = 0
+		float cost = 0,
+		uint32_t lengthenedSize = 0
 	)
 	{
 		static constexpr size_t posMultiplier = continualTypoTolerant ? 4 : 1;
@@ -164,12 +196,17 @@ namespace kiwi
 
 			while (1)
 			{
-				const auto typoFormSize = typoPtrs[tCand->typoId + 1] - typoPtrs[tCand->typoId];
+				const auto typoFormSize = typoPtrs[tCand->typoId + 1] - typoPtrs[tCand->typoId] + lengthenedSize;
 				auto cand = &tCand->form(formBase);
 				if (FeatureTestor::isMatched(&str[0], &str[nonSpaces[nonSpaces.size() - typoFormSize]], tCand->leftCond)
 					&& FeatureTestor::isMatchedApprox(&str[0], &str[nonSpaces[nonSpaces.size() - typoFormSize]], cand->vowel, cand->polar))
 				{
-					candidates.emplace_back(cand, tCand->score() + cost, startPosition ? startPosition : ((nonSpaces.size() - typoFormSize) * posMultiplier), tCand->typoId, endPosition);
+					candidates.emplace_back(cand, 
+						tCand->score() + cost, 
+						startPosition ? startPosition : ((nonSpaces.size() - typoFormSize) * posMultiplier), 
+						tCand->typoId, 
+						endPosition, 
+						lengthenedSize);
 				}
 				if (tCand[0].hash() != tCand[1].hash()) break;
 				++tCand;
@@ -472,9 +509,9 @@ namespace kiwi
 		}
 	};
 
-	template<ArchType arch, class Decomposer, bool typoTolerant, bool continualTypoTolerant>
+	template<ArchType arch, class Decomposer, bool typoTolerant, bool continualTypoTolerant, bool lengtheningTypoTolerant>
 	inline void insertContinualTypoNode(
-		Vector<FormCandidate<typoTolerant, continualTypoTolerant>>& candidates,
+		Vector<FormCandidate<typoTolerant, continualTypoTolerant, lengtheningTypoTolerant>>& candidates,
 		Vector<pair<size_t, const utils::FrozenTrie<kchar_t, const Form*>::Node*>>& continualTypoRightNodes,
 		Decomposer decomposer,
 		float continualTypoCost,
@@ -490,7 +527,7 @@ namespace kiwi
 		if (!continualTypoTolerant) return;
 		static constexpr size_t posMultiplier = continualTypoTolerant ? 4 : 1;
 
-		char16_t codaFromContinual = decomposer.onsetToCoda(c), 
+		const char16_t codaFromContinual = decomposer.onsetToCoda(c), 
 			droppedSyllable = decomposer.dropRightSyllable(c);
 		if (!codaFromContinual || !droppedSyllable) return;
 
@@ -537,7 +574,11 @@ inline bool isDiscontinuous(POSTag prevTag, POSTag curTag, ScriptType prevScript
 	return prevTag != curTag;
 }
 
-template<ArchType arch, bool typoTolerant, bool continualTypoTolerant>
+template<ArchType arch, 
+	bool typoTolerant, 
+	bool continualTypoTolerant,
+	bool lengtheningTypoTolerant
+>
 size_t kiwi::splitByTrie(
 	Vector<KGraphNode>& ret,
 	const Form* formBase,
@@ -549,6 +590,7 @@ size_t kiwi::splitByTrie(
 	size_t maxUnkFormSize, 
 	size_t spaceTolerance,
 	float continualTypoCost,
+	float lengtheningTypoCost,
 	const PretokenizedSpanGroup::Span*& pretokenizedFirst,
 	const PretokenizedSpanGroup::Span* pretokenizedLast
 )
@@ -587,11 +629,13 @@ size_t kiwi::splitByTrie(
 	out.clear();
 	out.emplace_back();
 	size_t n = 0;
-	Vector<FormCandidate<typoTolerant, continualTypoTolerant>> candidates;
+	Vector<FormCandidate<typoTolerant, continualTypoTolerant, lengtheningTypoTolerant>> candidates;
+	using NodePtrTy = decltype(trie.root());
 	auto* curNode = trie.root();
-	auto* curNodeForContinualTypo = trie.root();
+	auto* curNodeForTypo = trie.root();
 	auto* nextNode = trie.root();
-	Vector<pair<size_t, decltype(curNode)>> continualTypoRightNodes;
+	Vector<pair<size_t, NodePtrTy>> continualTypoRightNodes;
+	Vector<pair<size_t, NodePtrTy>> lengtheningTypoNodes;
 
 	size_t lastSpecialEndPos = 0, specialStartPos = 0;
 	POSTag chrType, lastChrType = POSTag::unknown, lastMatchedPattern = POSTag::unknown;
@@ -921,7 +965,7 @@ size_t kiwi::splitByTrie(
 			goto continueFor;
 		}
 
-		curNodeForContinualTypo = curNode;
+		curNodeForTypo = curNode;
 		nextNode = curNode->template nextOpt<arch>(trie, c);
 		while (!nextNode) // if curNode has no exact next node, goto fail
 		{
@@ -973,6 +1017,17 @@ size_t kiwi::splitByTrie(
 				}
 				zCodaFollowable = false;
 
+				// invalidate typo nodes
+				if (continualTypoTolerant)
+				{
+					continualTypoRightNodes.clear();
+				}
+
+				if (lengtheningTypoTolerant)
+				{
+					lengtheningTypoNodes.clear();
+				}
+
 				goto continueFor; 
 			}
 		}
@@ -987,6 +1042,63 @@ size_t kiwi::splitByTrie(
 				continualTypoRightNodes[outputIdx++] = rn;
 			}
 			continualTypoRightNodes.resize(outputIdx);
+		}
+
+		if (lengtheningTypoTolerant)
+		{
+			static uint8_t lengthenVowelTable[] = {
+				0, // ㅏ
+				1, // ㅐ
+				0, // ㅑ
+				1, // ㅒ
+				4, // ㅓ
+				5, // ㅔ
+				4, // ㅕ
+				5, // ㅖ
+				8, // ㅗ
+				0, // ㅘ
+				1, // ㅙ
+				1, // ㅚ
+				8, // ㅛ
+				13, // ㅜ
+				4, // ㅝ
+				5, // ㅞ
+				20, // ㅟ
+				13, // ㅠ
+				18, // ㅡ
+				20, // ㅢ
+				20, // ㅣ
+			};
+			const size_t prevLengtheningSize = lengtheningTypoNodes.size();
+			if (n > 0 && isHangulSyllable(str[n - 1]) &&
+				(u'아' <= c && c < u'자') && lengthenVowelTable[extractVowel(str[n - 1])] == extractVowel(c))
+			{
+				lengtheningTypoNodes.emplace_back(1, curNodeForTypo);
+				for (size_t i = 0; i < prevLengtheningSize; ++i)
+				{
+					auto& node = lengtheningTypoNodes[i];
+					lengtheningTypoNodes.emplace_back(node.first + 1, node.second);
+				}
+			}
+
+			thread_local UnorderedSet<pair<size_t, NodePtrTy>> uniq;
+			uniq.clear();
+			size_t outputIdx = 0;
+			for (size_t i = 0; i < prevLengtheningSize; ++i)
+			{
+				auto& node = lengtheningTypoNodes[i];
+				node.second = node.second->template nextOpt<arch>(trie, c);
+				if (!node.second) continue;
+				if (!uniq.emplace(node).second) continue;
+				lengtheningTypoNodes[outputIdx++] = node;
+			}
+			for (size_t i = prevLengtheningSize; i < lengtheningTypoNodes.size(); ++i)
+			{
+				auto& node = lengtheningTypoNodes[i];
+				if (!uniq.emplace(node).second) continue;
+				lengtheningTypoNodes[outputIdx++] = node;
+			}
+			lengtheningTypoNodes.erase(lengtheningTypoNodes.begin() + outputIdx, lengtheningTypoNodes.end());
 		}
 
 		if (chrType != POSTag::max)
@@ -1009,13 +1121,13 @@ size_t kiwi::splitByTrie(
 		if (continualTypoTolerant && lastChrType == POSTag::max)
 		{
 			insertContinualTypoNode<arch>(candidates, continualTypoRightNodes, ContinualIeungDecomposer{}, 
-				continualTypoCost, c, formBase, typoPtrs, trie, str, nonSpaces, curNodeForContinualTypo);
+				continualTypoCost, c, formBase, typoPtrs, trie, str, nonSpaces, curNodeForTypo);
 			insertContinualTypoNode<arch>(candidates, continualTypoRightNodes, ContinualHieutDecomposer{},
-				continualTypoCost, c, formBase, typoPtrs, trie, str, nonSpaces, curNodeForContinualTypo);
+				continualTypoCost, c, formBase, typoPtrs, trie, str, nonSpaces, curNodeForTypo);
 			insertContinualTypoNode<arch>(candidates, continualTypoRightNodes, ContinualCodaDecomposer{}, 
-				continualTypoCost, c, formBase, typoPtrs, trie, str, nonSpaces, curNodeForContinualTypo);
+				continualTypoCost, c, formBase, typoPtrs, trie, str, nonSpaces, curNodeForTypo);
 		}
-		
+
 		// from this, curNode has the exact next node
 		curNode = nextNode;
 		// if it has exit node, patterns have been found
@@ -1041,6 +1153,19 @@ size_t kiwi::splitByTrie(
 				}
 			}
 		}
+
+		if (lengtheningTypoTolerant)
+		{
+			for (auto& node : lengtheningTypoNodes)
+			{
+				const Form* cand = node.second->val(trie);
+				if (cand && !trie.hasSubmatch(cand))
+				{
+					insertCandidates(candidates, cand, formBase, typoPtrs, str, nonSpaces, 0, 0, lengtheningTypoCost * node.first, node.first);
+				}
+			}
+		}
+
 	continueFor:
 		lastChrType = chrType;
 		lastScriptType = scriptType;
@@ -1117,29 +1242,34 @@ const Form* kiwi::findForm(
 
 namespace kiwi
 {
-	template<bool typoTolerant, bool continualTypoTolerant>
+	template<bool typoTolerant, bool continualTypoTolerant, bool lengtheningTypoTolerant>
 	struct SplitByTrieGetter
 	{
 		template<std::ptrdiff_t i>
 		struct Wrapper
 		{
-			static constexpr FnSplitByTrie value = &splitByTrie<static_cast<ArchType>(i), typoTolerant, continualTypoTolerant>;
+			static constexpr FnSplitByTrie value = &splitByTrie<static_cast<ArchType>(i), typoTolerant, continualTypoTolerant, lengtheningTypoTolerant>;
 		};
 	};
 }
 
-FnSplitByTrie kiwi::getSplitByTrieFn(ArchType arch, bool typoTolerant, bool continualTypoTolerant)
+FnSplitByTrie kiwi::getSplitByTrieFn(ArchType arch, bool typoTolerant, bool continualTypoTolerant, bool lengtheningTypoTolerant)
 {
-	static std::array<tp::Table<FnSplitByTrie, AvailableArch>, 4> table{ 
-		SplitByTrieGetter<false, false>{},
-		SplitByTrieGetter<true, false>{},
-		SplitByTrieGetter<false, true>{},
-		SplitByTrieGetter<true, true>{}
+	static std::array<tp::Table<FnSplitByTrie, AvailableArch>, 8> table{ 
+		SplitByTrieGetter<false, false, false>{},
+		SplitByTrieGetter<true, false, false>{},
+		SplitByTrieGetter<false, true, false>{},
+		SplitByTrieGetter<true, true, false>{},
+		SplitByTrieGetter<false, false, true>{},
+		SplitByTrieGetter<true, false, true>{},
+		SplitByTrieGetter<false, true, true>{},
+		SplitByTrieGetter<true, true, true>{},
 	};
 	
 	size_t idx = 0;
 	if (typoTolerant) idx += 1;
 	if (continualTypoTolerant) idx += 2;
+	if (lengtheningTypoTolerant) idx += 4;
 	return table[idx][static_cast<std::ptrdiff_t>(arch)];
 }
 
