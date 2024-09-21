@@ -1,4 +1,4 @@
-#include <fstream>
+﻿#include <fstream>
 
 #include <kiwi/Kiwi.h>
 #include <kiwi/Utils.h>
@@ -277,6 +277,20 @@ namespace kiwi
 			return a.accScore > b.accScore;
 		}
 	};
+
+	template<class LmState>
+	inline std::ostream& printDebugPath(std::ostream& os, const WordLL<LmState>& src)
+	{
+		if (src.parent)
+		{
+			printDebugPath(os, *src.parent);
+		}
+		
+		if (src.morpheme) src.morpheme->print(os);
+		else os << "NULL";
+		os << " , ";
+		return os;
+	}
 
 	inline bool hasLeftBoundary(const KGraphNode* node)
 	{
@@ -963,6 +977,16 @@ namespace kiwi
 			}
 		}
 
+#ifdef DEBUG_PRINT
+		cerr << "Token[" << 0 << "]" << endl;
+		for (auto& tt : cache[0])
+		{
+			cerr << "(" << tt.accScore << "):\t";
+			printDebugPath(cerr, tt);
+			cerr << endl;
+		}
+#endif
+
 		// middle nodes
 		for (size_t i = 1; i < graphSize - 1; ++i)
 		{
@@ -993,17 +1017,13 @@ namespace kiwi
 			}
 
 #ifdef DEBUG_PRINT
-			cout << "== " << i << " ==" << endl;
+			cerr << "Token[" << i << "]" << endl;
 			for (auto& tt : cache[i])
 			{
-				cout << tt.accScore << '\t';
-				for (auto& m : tt.morphs)
-				{
-					kw->morphemes[m.wid].print(cout) << '\t';
-				}
-				cout << endl;
+				cerr << "(" << tt.accScore << "):\t";
+				printDebugPath(cerr, tt);
+				cerr << endl;
 			}
-			cout << "========" << endl;
 #endif
 		}
 
@@ -1041,18 +1061,13 @@ namespace kiwi
 		);
 
 #ifdef DEBUG_PRINT
-		cout << "== LAST ==" << endl;
+		cerr << "Token[last]" << endl;
 		for (auto& tt : cache.back())
 		{
-			cout << tt.accScore << '\t';
-			for (auto& m : tt.morphs)
-			{
-				kw->morphemes[m.wid].print(cout) << '\t';
-			}
-			cout << endl;
+			cerr << "(" << tt.accScore << "):\t";
+			printDebugPath(cerr, tt);
+			cerr << endl;
 		}
-		cout << "========" << endl;
-
 #endif
 
 		utils::ContainerSearcher<WordLL<LmState>> csearcher{ cache };
