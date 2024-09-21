@@ -212,7 +212,7 @@ namespace kiwi
 
 		bool operator==(const PathHash& o) const
 		{
-			return lmState == o.lmState && spState == o.spState;
+			return lmState == o.lmState && rootId == o.rootId && spState == o.spState;
 		}
 	};
 
@@ -1057,6 +1057,17 @@ namespace kiwi
 
 		utils::ContainerSearcher<WordLL<LmState>> csearcher{ cache };
 		Vector<ChunkResult> ret;
+		size_t numUniqRootIdAndSpState;
+		{
+			UnorderedSet<pair<uint8_t, uint8_t>> uniqRootIdAndSpState;
+			for (auto& c : cand)
+			{
+				uniqRootIdAndSpState.emplace(c.rootId, (uint8_t)c.spState);
+			}
+			numUniqRootIdAndSpState = uniqRootIdAndSpState.size();
+		}
+
+		const size_t numCandsPerRootIdAndSpState = (size_t)std::ceil(topN * 2 / (double)numUniqRootIdAndSpState);
 		size_t startIdx = 0;
 		pair<uint8_t, uint8_t> prevRootIdAndSpState;
 		if (!cand.empty()) prevRootIdAndSpState = make_pair(cand[0].rootId, (uint8_t)cand[0].spState);
@@ -1069,7 +1080,7 @@ namespace kiwi
 				prevRootIdAndSpState = curRootIdAndSpState;
 			}
 
-			if (i - startIdx < topN)
+			if (i - startIdx < numCandsPerRootIdAndSpState)
 			{
 				auto tokens = generateTokenList(
 					&cand[i], csearcher, graph, ownFormList, kw->typoCostWeight,
@@ -1082,7 +1093,6 @@ namespace kiwi
 		{
 			return a.score > b.score;
 		});
-		if (ret.size() > topN * 2) ret.erase(ret.begin() + topN * 2, ret.end());
 		return ret;
 	}
 }
