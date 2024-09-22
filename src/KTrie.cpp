@@ -972,16 +972,6 @@ size_t kiwi::splitByTrie(
 			if (curNode->fail())
 			{
 				curNode = curNode->fail();
-				for (auto submatcher = curNode; submatcher; submatcher = submatcher->fail())
-				{
-					const Form* cand = submatcher->val(trie);
-					if (!cand) break;
-					else if (!trie.hasSubmatch(cand))
-					{
-						zCodaFollowable = zCodaFollowable || getZCodaAppendable<typoTolerant>(cand, formBase);
-						if (!insertCandidates(candidates, cand, formBase, typoPtrs, str, nonSpaces)) break;
-					}
-				}
 				nextNode = curNode->template nextOpt<arch>(trie, c);
 			}
 			else
