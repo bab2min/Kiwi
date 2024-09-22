@@ -71,7 +71,7 @@ namespace kiwi
 		if (isSpace(chr)) return POSTag::unknown;
 		if (0x2000 <= chr && chr <= 0x200F) return POSTag::unknown;
 
-		if (iswdigit(chr)) return POSTag::sn;
+		if ('0' <= chr && chr <= '9') return POSTag::sn;
 		if (('A' <= chr && chr <= 'Z') ||
 			('a' <= chr && chr <= 'z'))  return POSTag::sl;
 		if (0xAC00 <= chr && chr < 0xD7A4) return POSTag::max;
