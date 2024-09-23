@@ -119,7 +119,7 @@ namespace mp
 					std::bind(std::forward<F>(f), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::forward<Args>(args)...));
 				if (stop) throw std::runtime_error("enqueue on stopped ThreadPool");
 				ret.emplace_back(task->get_future());
-				tasks[i].emplace([&, task, b](size_t id) { (*task)(id, std::min(workers, tasks.size()), b.get()); });
+				tasks[i].emplace([&, task, workers, b](size_t id) { (*task)(id, std::min(workers, tasks.size()), b.get()); });
 			}
 		}
 		condition.notify_all();

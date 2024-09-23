@@ -85,6 +85,78 @@ namespace sais
 			return std::make_pair(b, e);
 		}
 
+		template<class It>
+		std::pair<size_t, size_t> findRange(It first, It last) const
+		{
+			if (first == last) return std::make_pair(0, 0);
+
+			std::pair<size_t, size_t> range = initRange(*first);
+			if (range.first == 0 && range.second == 0)
+			{
+				return range;
+			}
+			++first;
+			for (; first != last; ++first)
+			{
+				range = nextRange(range, *first);
+				if (range.first == 0 && range.second == 0)
+				{
+					return range;
+				}
+			}
+			return range;
+		}
+
+		template<class It, class Alloc>
+		bool findTrace(std::vector<size_t, Alloc>& out, It first, It last) const
+		{
+			out.clear();
+			if (first == last) return false;
+			std::pair<size_t, size_t> range = initRange(*first);
+			++first;
+			for (; first != last; ++first)
+			{
+				auto nextChr = *first;
+				auto it = std::lower_bound(cKeys.get(), cKeys.get() + vocabSize, nextChr);
+				if (it == cKeys.get() + vocabSize || *it != nextChr) return false;
+				const size_t b = cValues[it - cKeys.get()];
+				const size_t ob = waveletTree.rank(nextChr, range.first);
+				const size_t oe = waveletTree.rank(nextChr, range.second);
+				if (ob > oe) return false;
+				
+				const size_t rSize = range.second - range.first;
+				const size_t numHistories = out.size() / rSize;
+				size_t validIdx = 0;
+				for (size_t h = 0; h < numHistories; ++h)
+				{
+					for (size_t i = range.first; i < range.second; ++i)
+					{
+						if (bwtData[i] == nextChr)
+						{
+							out[validIdx] = out[h * rSize + i - range.first];
+							validIdx++;
+						}
+					}
+				}
+				out.resize(validIdx);
+
+				for (size_t i = range.first; i < range.second; ++i)
+				{
+					if (bwtData[i] == nextChr)
+					{
+						out.emplace_back(i);
+					}
+				}
+				
+				range = std::make_pair(b + ob, b + oe);
+			}
+			for (size_t i = range.first; i < range.second; ++i)
+			{
+				out.emplace_back(i);
+			}
+			return true;
+		}
+
 		using SuffixTy = std::basic_string<ChrTy>;
 		using TraceTy = std::vector<std::pair<size_t, size_t>>;
 
@@ -111,6 +183,19 @@ namespace sais
 				trace.pop_back();
 			});
 			return ret;
+		}
+
+		template<class It, class Fn>
+		size_t enumSufficesOfString(size_t minCnt, It first, It last, Fn&& fn) const
+		{
+			std::pair<size_t, size_t> range = findRange(first, last);
+			if (range.first == 0 && range.second == 0)
+			{
+				return 0;
+			}
+			SuffixTy suffix;
+			TraceTy trace;
+			return enumSuffices(minCnt, suffix, trace, range.first, range.second, std::move(fn));
 		}
 
 		template<class Fn>
