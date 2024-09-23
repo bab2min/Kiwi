@@ -950,6 +950,7 @@ namespace kiwi
 						&gNode - graph
 					);
 				}
+				ret.back().end = gNode.endPos;
 			}
 			else
 			{
@@ -967,6 +968,7 @@ namespace kiwi
 						&gNode - graph
 					);
 				}
+				ret.back().end = gNode.endPos;
 			}
 			prev = cur;
 		}
