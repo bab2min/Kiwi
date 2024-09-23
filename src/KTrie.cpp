@@ -1151,7 +1151,7 @@ size_t kiwi::splitByTrie(
 				const Form* cand = node.second->val(trie);
 				if (cand && !trie.hasSubmatch(cand))
 				{
-					insertCandidates(candidates, cand, formBase, typoPtrs, str, nonSpaces, 0, 0, lengtheningTypoCost * node.first, node.first);
+					insertCandidates(candidates, cand, formBase, typoPtrs, str, nonSpaces, 0, 0, lengtheningTypoCost * (3 + node.first), node.first);
 				}
 			}
 		}

@@ -209,17 +209,17 @@ TEST(KiwiTypo, LengtheningTypoSet)
 {
 	KiwiBuilder builder{ MODEL_PATH, 0, BuildOption::default_, };
 	Kiwi typoKiwi = builder.build(DefaultTypoSet::lengtheningTypoSet);
-	const float typoCost = typoKiwi.getTypoCostWeight() * 0.5f;
+	const float typoCost = typoKiwi.getTypoCostWeight() * 0.25f;
 
 	auto ref = typoKiwi.analyze(u"진짜?", Match::allWithNormalizing);
 	auto res = typoKiwi.analyze(u"지인짜?", Match::allWithNormalizing);
-	EXPECT_FLOAT_EQ(ref.second - typoCost, res.second);
+	EXPECT_FLOAT_EQ(ref.second - 4 * typoCost, res.second);
 	EXPECT_EQ(res.first.size(), 2);
 	EXPECT_EQ(res.first[0].str, u"진짜");
 	EXPECT_EQ(res.first[1].str, u"?");
 
 	res = typoKiwi.analyze(u"지인짜아?", Match::allWithNormalizing);
-	EXPECT_FLOAT_EQ(ref.second - 2 * typoCost, res.second);
+	EXPECT_FLOAT_EQ(ref.second - 5 * typoCost, res.second);
 	EXPECT_EQ(res.first.size(), 2);
 	EXPECT_EQ(res.first[0].str, u"진짜");
 	EXPECT_EQ(res.first[1].str, u"?");

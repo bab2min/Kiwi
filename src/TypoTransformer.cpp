@@ -660,7 +660,7 @@ namespace kiwi
 
 		static const TypoTransformer basicTypoSetWithContinual = basicTypoSet | continualTypoSet;
 
-		static const TypoTransformer lengtheningTypoSet = TypoTransformer::fromLengtheningTypoCost(0.5f);
+		static const TypoTransformer lengtheningTypoSet = TypoTransformer::fromLengtheningTypoCost(0.25f);
 
 		switch (set)
 		{
