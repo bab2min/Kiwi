@@ -13,12 +13,12 @@ using namespace kiwi;
 
 int doEvaluate(const string& modelPath, const string& output, const vector<string>& input, 
 	bool normCoda, bool zCoda, bool multiDict, bool useSBG, 
-	float typoCostWeight, bool bTypo, bool cTypo,
+	float typoCostWeight, bool bTypo, bool cTypo, bool lTypo,
 	int repeat)
 {
 	try
 	{
-		if (typoCostWeight > 0 && !bTypo && !cTypo)
+		if (typoCostWeight > 0 && !bTypo && !cTypo && !lTypo)
 		{
 			bTypo = true;
 		}
@@ -26,14 +26,30 @@ int doEvaluate(const string& modelPath, const string& output, const vector<strin
 		{
 			bTypo = false;
 			cTypo = false;
+			lTypo = false;
 		}
-
-		DefaultTypoSet typos[] = { DefaultTypoSet::withoutTypo, DefaultTypoSet::basicTypoSet, DefaultTypoSet::continualTypoSet, DefaultTypoSet::basicTypoSetWithContinual};
 
 		tutils::Timer timer;
 		auto option = (BuildOption::default_ & ~BuildOption::loadMultiDict) | (multiDict ? BuildOption::loadMultiDict : BuildOption::none);
+		auto typo = getDefaultTypoSet(DefaultTypoSet::withoutTypo);
+
+		if (bTypo)
+		{
+			typo |= getDefaultTypoSet(DefaultTypoSet::basicTypoSet);
+		}
+
+		if (cTypo)
+		{
+			typo |= getDefaultTypoSet(DefaultTypoSet::continualTypoSet);
+		}
+
+		if (lTypo)
+		{
+			typo |= getDefaultTypoSet(DefaultTypoSet::lengtheningTypoSet);
+		}
+
 		Kiwi kw = KiwiBuilder{ modelPath, 1, option, useSBG }.build(
-			typos[(bTypo ? 1 : 0) + (cTypo ? 2 : 0)]
+			typo
 		);
 		if (typoCostWeight > 0) kw.setTypoCostWeight(typoCostWeight);
 		
@@ -118,6 +134,7 @@ int main(int argc, const char* argv[])
 	ValueArg<float> typoWeight{ "", "typo", "typo weight", false, 0.f, "float"};
 	SwitchArg bTypo{ "", "btypo", "make basic-typo-tolerant model", false };
 	SwitchArg cTypo{ "", "ctypo", "make continual-typo-tolerant model", false };
+	SwitchArg lTypo{ "", "ltypo", "make lengthening-typo-tolerant model", false };
 	ValueArg<int> repeat{ "", "repeat", "repeat evaluation for benchmark", false, 1, "int" };
 	UnlabeledMultiArg<string> files{ "files", "evaluation set files", true, "string" };
 
@@ -131,6 +148,7 @@ int main(int argc, const char* argv[])
 	cmd.add(typoWeight);
 	cmd.add(bTypo);
 	cmd.add(cTypo);
+	cmd.add(lTypo);
 	cmd.add(repeat);
 
 	try
@@ -143,6 +161,6 @@ int main(int argc, const char* argv[])
 		return -1;
 	}
 	return doEvaluate(model, output, files.getValue(), 
-		!noNormCoda, !noZCoda, !noMulti, useSBG, typoWeight, bTypo, cTypo, repeat);
+		!noNormCoda, !noZCoda, !noMulti, useSBG, typoWeight, bTypo, cTypo, lTypo, repeat);
 }
 
