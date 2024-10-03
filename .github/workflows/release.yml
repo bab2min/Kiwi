@@ -31,15 +31,17 @@ jobs:
             run: mkdir build && cd build && /opt/python/cp310-cp310/bin/cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_JAVA_BINDING=1 ..
           - name: Build
             run: cd build && make -j2
-    - run: |
-        mkdir result
-        cd result
-        mkdir include && mkdir lib && mkdir bin
-        mv ../build/libkiwi* lib/
-        mv ../build/kiwi-* bin/
-        mv ../build/test/kiwi-* bin/
-        cp -r ../include/kiwi include/
-        tar -zcvf ../asset.tgz include/ lib/ bin/
+          - run: |
+              mkdir result
+              cd result
+              mkdir include && mkdir lib && mkdir bin
+              mv ../build/libkiwi* lib/
+              mv ../build/kiwi-* bin/
+              mv ../build/test/kiwi-* bin/
+              cp -r ../include/kiwi include/
+              tar -zcvf ../asset.tgz include/ lib/ bin/
+          - run: |
+              mv build/bindings/java/kiwi-java*.jar kiwi-java.jar
     - name: Upload release binary
       uses: actions/upload-release-asset@v1.0.2
       env:
@@ -49,8 +51,6 @@ jobs:
         asset_path: asset.tgz
         asset_name: kiwi_lnx_x86_64_${{ steps.get_release.outputs.tag_name }}.tgz
         asset_content_type: application/octet-stream
-    - run: |
-        mv build/bindings/java/kiwi-java*.jar kiwi-java.jar
     - name: Upload release jar
       uses: actions/upload-release-asset@v1.0.2
       env:
