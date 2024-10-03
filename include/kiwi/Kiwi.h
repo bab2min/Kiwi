@@ -551,6 +551,7 @@ namespace kiwi
 		template<class Fn>
 		MorphemeMap loadMorphemesFromTxt(std::istream& is, Fn&& filter);
 
+		MorphemeMap restoreMorphemeMap(bool separateDefaultMorpheme = false) const;
 
 		template<class VocabTy>
 		void _addCorpusTo(RaggedVector<VocabTy>& out, std::istream& is, MorphemeMap& morphMap, double splitRatio, RaggedVector<VocabTy>* splitOut) const;
@@ -803,6 +804,7 @@ namespace kiwi
 			double dropoutProb = 0,
 			const TokenFilter& tokenFilter = {},
 			double splitRatio = 0,
+			bool separateDefaultMorpheme = false,
 			HSDataset* splitDataset = nullptr
 		) const;
 	};

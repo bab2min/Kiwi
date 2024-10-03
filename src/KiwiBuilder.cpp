@@ -436,13 +436,20 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 	return morphMap;
 }
 
-auto KiwiBuilder::restoreMorphemeMap() const -> MorphemeMap
+auto KiwiBuilder::restoreMorphemeMap(bool separateDefaultMorpheme) const -> MorphemeMap
 {
 	MorphemeMap ret;
 	for (size_t i = defaultTagSize + 1; i < morphemes.size(); ++i)
 	{
 		size_t id = morphemes[i].lmMorphemeId;
-		if (!id) id = i;
+		if (!id)
+		{
+			id = i;
+		}
+		else if (separateDefaultMorpheme && id < defaultFormSize + 2)
+		{
+			id = i;
+		}
 		ret.emplace(make_pair(forms[morphemes[i].kform].form, morphemes[i].tag), make_pair(id, id));
 	}
 	for (auto& m : morphemes)
