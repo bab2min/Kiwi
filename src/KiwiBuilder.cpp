@@ -458,12 +458,16 @@ auto KiwiBuilder::restoreMorphemeMap() const -> MorphemeMap
 	return ret;
 }
 
-void KiwiBuilder::addCorpusTo(RaggedVector<uint16_t>& out, std::istream& is, MorphemeMap& morphMap,
+template<class VocabTy>
+void KiwiBuilder::_addCorpusTo(
+	RaggedVector<VocabTy>& out, 
+	std::istream& is, 
+	MorphemeMap& morphMap,
 	double splitRatio,
-	RaggedVector<uint16_t>* splitOut
+	RaggedVector<VocabTy>* splitOut
 ) const
 {
-	Vector<uint16_t> wids;
+	Vector<VocabTy> wids;
 	double splitCnt = 0;
 	size_t numLine = 0;
 	string line;
@@ -549,6 +553,21 @@ void KiwiBuilder::addCorpusTo(RaggedVector<uint16_t>& out, std::istream& is, Mor
 			wids.emplace_back(getDefaultMorphemeId(POSTag::nng));
 		}
 	}
+}
+
+void KiwiBuilder::addCorpusTo(RaggedVector<uint8_t>& out, std::istream& is, MorphemeMap& morphMap, double splitRatio, RaggedVector<uint8_t>* splitOut) const
+{
+	return _addCorpusTo(out, is, morphMap, splitRatio, splitOut);
+}
+
+void KiwiBuilder::addCorpusTo(RaggedVector<uint16_t>& out, std::istream& is, MorphemeMap& morphMap, double splitRatio, RaggedVector<uint16_t>* splitOut) const
+{
+	return _addCorpusTo(out, is, morphMap, splitRatio, splitOut);
+}
+
+void KiwiBuilder::addCorpusTo(RaggedVector<uint32_t>& out, std::istream& is, MorphemeMap& morphMap, double splitRatio, RaggedVector<uint32_t>* splitOut) const
+{
+	return _addCorpusTo(out, is, morphMap, splitRatio, splitOut);
 }
 
 void KiwiBuilder::updateForms()

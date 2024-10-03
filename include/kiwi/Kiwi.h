@@ -551,9 +551,13 @@ namespace kiwi
 		template<class Fn>
 		MorphemeMap loadMorphemesFromTxt(std::istream& is, Fn&& filter);
 
-		MorphemeMap restoreMorphemeMap() const;
 
+		template<class VocabTy>
+		void _addCorpusTo(RaggedVector<VocabTy>& out, std::istream& is, MorphemeMap& morphMap, double splitRatio, RaggedVector<VocabTy>* splitOut) const;
+		
+		void addCorpusTo(RaggedVector<uint8_t>& out, std::istream& is, MorphemeMap& morphMap, double splitRatio = 0, RaggedVector<uint8_t>* splitOut = nullptr) const;
 		void addCorpusTo(RaggedVector<uint16_t>& out, std::istream& is, MorphemeMap& morphMap, double splitRatio = 0, RaggedVector<uint16_t>* splitOut = nullptr) const;
+		void addCorpusTo(RaggedVector<uint32_t>& out, std::istream& is, MorphemeMap& morphMap, double splitRatio = 0, RaggedVector<uint32_t>* splitOut = nullptr) const;
 		void updateForms();
 		void updateMorphemes();
 
