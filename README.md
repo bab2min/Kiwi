@@ -3,7 +3,7 @@
 ![KiwiLogo](https://repository-images.githubusercontent.com/82677855/eb9fa478-175d-47a5-8e07-0e169c030ff5)
 
 x86_64: 
-[![Action Status Centos5](https://github.com/bab2min/Kiwi/workflows/Centos5/badge.svg)](https://github.com/bab2min/Kiwi/actions)
+[![Action Status Centos5](https://github.com/bab2min/Kiwi/workflows/Centos7/badge.svg)](https://github.com/bab2min/Kiwi/actions)
 [![Action Status Windows](https://github.com/bab2min/Kiwi/workflows/Windows/badge.svg)](https://github.com/bab2min/Kiwi/actions)
 [![Action Status Ubuntu](https://github.com/bab2min/Kiwi/workflows/Ubuntu/badge.svg)](https://github.com/bab2min/Kiwi/actions)
 [![Action Status macOS](https://github.com/bab2min/Kiwi/workflows/macOS/badge.svg)](https://github.com/bab2min/Kiwi/actions)
