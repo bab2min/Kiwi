@@ -2163,7 +2163,8 @@ float UnigramSwTrainer::buildSubwordVocabs(const size_t minCnt, const size_t max
 			bool isSubword = s[0] != u' ';
 			size_t realSize = s.size() - (isSubword ? 0 : 1);
 			if (realSize <= 1) return true;
-			if (isLowSurrogate(s.front()) || isHighSurrogate(s.back())) return false;
+			if (isLowSurrogate(s.front())) return false;
+			if (isHighSurrogate(s.back())) return true;
 			if (count(s.begin(), s.end(), '\x00') || count(s.begin(), s.end(), '\x01') || count(s.begin() + 1, s.end(), u' ') || s.size() > maxPrefixLength) return false;
 			if (trainConfig.removeRepetitive && testRepetition(s.data() + (isSubword ? 0 : 1), s.size() - (isSubword ? 0 : 1))) return false;
 		

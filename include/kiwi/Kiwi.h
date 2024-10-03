@@ -546,14 +546,19 @@ namespace kiwi
 		FormRaw& addForm(const KString& form);
 		size_t addForm(Vector<FormRaw>& newForms, UnorderedMap<KString, size_t>& newFormMap, KString form) const;
 
-		using MorphemeMap = UnorderedMap<std::pair<KString, POSTag>, std::pair<size_t, size_t>>;
+		using MorphemeMap = UnorderedMap<std::tuple<KString, uint8_t, POSTag>, std::pair<size_t, size_t>>;
 		
 		template<class Fn>
 		MorphemeMap loadMorphemesFromTxt(std::istream& is, Fn&& filter);
 
-		MorphemeMap restoreMorphemeMap() const;
+		MorphemeMap restoreMorphemeMap(bool separateDefaultMorpheme = false) const;
 
+		template<class VocabTy>
+		void _addCorpusTo(RaggedVector<VocabTy>& out, std::istream& is, MorphemeMap& morphMap, double splitRatio, RaggedVector<VocabTy>* splitOut) const;
+		
+		void addCorpusTo(RaggedVector<uint8_t>& out, std::istream& is, MorphemeMap& morphMap, double splitRatio = 0, RaggedVector<uint8_t>* splitOut = nullptr) const;
 		void addCorpusTo(RaggedVector<uint16_t>& out, std::istream& is, MorphemeMap& morphMap, double splitRatio = 0, RaggedVector<uint16_t>* splitOut = nullptr) const;
+		void addCorpusTo(RaggedVector<uint32_t>& out, std::istream& is, MorphemeMap& morphMap, double splitRatio = 0, RaggedVector<uint32_t>* splitOut = nullptr) const;
 		void updateForms();
 		void updateMorphemes();
 
@@ -610,6 +615,7 @@ namespace kiwi
 			size_t lmMinCnt = 1;
 			size_t lmLastOrderMinCnt = 2;
 			size_t numWorkers = 1;
+			size_t sbgSize = 1000000;
 			bool useLmTagHistory = true;
 			bool quantizeLm = true;
 			bool compressLm = true;
@@ -799,6 +805,7 @@ namespace kiwi
 			double dropoutProb = 0,
 			const TokenFilter& tokenFilter = {},
 			double splitRatio = 0,
+			bool separateDefaultMorpheme = false,
 			HSDataset* splitDataset = nullptr
 		) const;
 	};

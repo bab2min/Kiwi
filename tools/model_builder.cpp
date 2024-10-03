@@ -52,6 +52,7 @@ int main(int argc, const char* argv[])
 	ValueArg<size_t> lmMinCnt{ "", "min_cnt", "min count of LM", false, 1, "int" };
 	ValueArg<size_t> lmLastOrderMinCnt{ "", "last_min_cnt", "min count of the last order of LM", false, 2, "int" };
 	ValueArg<string> output{ "o", "output", "output model path", true, "", "string" };
+	ValueArg<size_t> sbgSize{ "", "sbg_size", "sbg size", false, 1000000, "int" };
 	UnlabeledMultiArg<string> inputs{ "inputs", "input copora", true, "string" };
 
 	cmd.add(output);
@@ -66,6 +67,7 @@ int main(int argc, const char* argv[])
 	cmd.add(lmMinCnt);
 	cmd.add(lmLastOrderMinCnt);
 	cmd.add(workers);
+	cmd.add(sbgSize);
 
 	try
 	{
@@ -87,6 +89,7 @@ int main(int argc, const char* argv[])
 	args.lmMinCnt = lmMinCnt;
 	args.lmLastOrderMinCnt = lmLastOrderMinCnt;
 	args.numWorkers = workers;
+	args.sbgSize = sbgSize;
 	return run(args, output, skipBigram);
 }
 

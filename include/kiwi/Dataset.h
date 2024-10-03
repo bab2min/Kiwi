@@ -44,7 +44,7 @@ namespace kiwi
 
 		static constexpr int32_t nonVocab = -1;
 
-		HiddenMember<RaggedVector<uint16_t>, sizeof(Vector<size_t>) * 2> sents;
+		HiddenMember<RaggedVector<uint32_t>, sizeof(Vector<size_t>) * 2> sents;
 		std::shared_ptr<lm::KnLangModelBase> knlm;
 		std::unique_ptr<utils::ThreadPool> workers;
 		std::discrete_distribution<> dropout;
@@ -55,6 +55,7 @@ namespace kiwi
 		Deque<OptionalFuture<size_t>> futures;
 		const Vector<MorphemeRaw>* morphemes = nullptr;
 		const Vector<FormRaw>* forms = nullptr;
+		size_t knlmVocabSize = 0;
 		size_t batchSize = 0;
 		size_t windowSize = 0;
 		size_t totalTokens = 0;
@@ -87,12 +88,13 @@ namespace kiwi
 		size_t next(int64_t* in, int64_t* out, float* lmLProbs, int64_t* outNgramNode, float& restLmOut, uint32_t& restLmCntOut);
 
 		size_t vocabSize() const { return vocabToToken.size(); }
+		size_t getKnlmVocabSize() const;
 		size_t ngramNodeSize() const;
 		const MorphemeRaw& vocabInfo(uint32_t vocab) const;
 		std::u16string vocabForm(uint32_t vocab) const;
 		std::vector<size_t> estimVocabFrequency() const;
 
-		Range<Vector<uint16_t>::const_iterator> getSent(size_t idx) const;
-		std::vector<uint16_t> getAugmentedSent(size_t idx);
+		Range<Vector<uint32_t>::const_iterator> getSent(size_t idx) const;
+		std::vector<uint32_t> getAugmentedSent(size_t idx);
 	};
 }
