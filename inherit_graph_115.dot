@@ -4,5 +4,5 @@ digraph "Graphical Class Hierarchy"
   edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
   node [fontname="Helvetica",fontsize="10",shape=record];
   rankdir="LR";
-  Node0 [label="kiwi::tp::SeqMax\< Ty \>",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structkiwi_1_1tp_1_1SeqMax.html",tooltip=" "];
+  Node0 [label="nonstd::sv_lite::basic\l_string_view\< CharT, Traits \>",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classnonstd_1_1sv__lite_1_1basic__string__view.html",tooltip=" "];
 }

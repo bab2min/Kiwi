@@ -3,7 +3,7 @@ var searchData=
   ['cachestore_23',['CacheStore',['../structkiwi_1_1utils_1_1ContinuousTrie_1_1CacheStore.html',1,'kiwi::utils::ContinuousTrie']]],
   ['cachestore_3c_20cont_20_2a_20_3e_24',['CacheStore&lt; Cont * &gt;',['../structkiwi_1_1utils_1_1ContinuousTrie_1_1CacheStore_3_01Cont_01_5_01_4.html',1,'kiwi::utils::ContinuousTrie']]],
   ['candidate_25',['candidate',['../structkiwi_1_1FormRaw.html#aaeb9a4a50365e34fd542d2ea07ded938',1,'kiwi::FormRaw']]],
-  ['candidate_26',['Candidate',['../structkiwi_1_1cmb_1_1Candidate.html',1,'kiwi::cmb']]],
+  ['candidate_26',['Candidate',['../structkiwi_1_1cmb_1_1Candidate.html',1,'kiwi::cmb::Candidate&lt; LmState &gt;'],['../structkiwi_1_1NgramExtractor_1_1Candidate.html',1,'kiwi::NgramExtractor::Candidate']]],
   ['candidate_3c_20voidstate_3c_20arch_20_3e_20_3e_27',['Candidate&lt; VoidState&lt; arch &gt; &gt;',['../structkiwi_1_1cmb_1_1Candidate_3_01VoidState_3_01arch_01_4_01_4.html',1,'kiwi::cmb']]],
   ['capi_2eh_28',['capi.h',['../capi_8h.html',1,'']]],
   ['chr_5fposition_29',['chr_position',['../structkiwi__token__info__t.html#abe6f9a976243d5818a47e564a4e7fb2c',1,'kiwi_token_info_t']]],
