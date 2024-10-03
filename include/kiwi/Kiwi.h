@@ -546,7 +546,7 @@ namespace kiwi
 		FormRaw& addForm(const KString& form);
 		size_t addForm(Vector<FormRaw>& newForms, UnorderedMap<KString, size_t>& newFormMap, KString form) const;
 
-		using MorphemeMap = UnorderedMap<std::pair<KString, POSTag>, std::pair<size_t, size_t>>;
+		using MorphemeMap = UnorderedMap<std::tuple<KString, uint8_t, POSTag>, std::pair<size_t, size_t>>;
 		
 		template<class Fn>
 		MorphemeMap loadMorphemesFromTxt(std::istream& is, Fn&& filter);
@@ -615,6 +615,7 @@ namespace kiwi
 			size_t lmMinCnt = 1;
 			size_t lmLastOrderMinCnt = 2;
 			size_t numWorkers = 1;
+			size_t sbgSize = 1000000;
 			bool useLmTagHistory = true;
 			bool quantizeLm = true;
 			bool compressLm = true;
