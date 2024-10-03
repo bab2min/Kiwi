@@ -442,7 +442,7 @@ DECL_DLL int kiwi_typo_close(kiwi_typo_h handle);
 /**
  * @brief KiwiBuilder를 거치지 않고 바로 Kiwi instance를 생성합니다.
  * 
- * @param model_path 모델이 들어있는 디렉토리 경로 (e.g., ./ModelGenerator).
+ * @param model_path 모델이 들어있는 디렉토리 경로 (e.g., ./models/base).
  * @param num_threads 사용할 쓰레드의 수 (0일 경우, 자동으로 설정).
  * @param options 생성 옵션. KIWI_BUILD_* 참조.
  * @return Kiwi의 핸들.

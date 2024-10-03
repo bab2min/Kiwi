@@ -114,7 +114,7 @@ jobs:
         asset_name: kiwi-java-${{ steps.get_release.outputs.tag_name }}-mac-${{ matrix.arch }}.jar
         asset_content_type: application/octet-stream
     - if: matrix.arch == 'arm64'
-      run: tar -zcvf model.tgz ModelGenerator/sj.* ModelGenerator/extract.mdl ModelGenerator/*.dict ModelGenerator/combiningRule.txt ModelGenerator/skipbigram.mdl
+      run: tar -zcvf model.tgz models/base/sj.* models/base/extract.mdl models/base/*.dict models/base/combiningRule.txt models/base/skipbigram.mdl
     - name: Upload release binary
       if: matrix.arch == 'arm64'
       uses: actions/upload-release-asset@v1.0.2
@@ -214,7 +214,7 @@ jobs:
           mkdir build && pushd build && cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_USE_MIMALLOC=0 -DKIWI_JAVA_BINDING=1 ..
           make -j2 && popd
           ./build/test/kiwi-test
-          mkdir eval_results && ./build/kiwi-evaluator -m ./ModelGenerator eval_data/*.txt -o eval_results/
+          mkdir eval_results && ./build/kiwi-evaluator -m ./models/base eval_data/*.txt -o eval_results/
           cd build
           mkdir include && mkdir lib && mkdir bin
           mv libkiwi* lib/

@@ -11,7 +11,7 @@ import static org.junit.Assert.*;
 
 public class KiwiTest {
 
-	private static String modelPath = "../../ModelGenerator";
+	private static String modelPath = "../../models/base";
 	private static Kiwi reusableInst = null;
 
 	Kiwi getReusableKiwi() throws Exception {
