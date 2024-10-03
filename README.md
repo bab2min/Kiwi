@@ -80,7 +80,7 @@ $ ldconfig
 
 설치가 잘 됐는지 확인하기 위해서는 `kiwi-evaluator`를 실행해봅니다.
 ```console
-$ ./kiwi-evaluator --model ../ModelGenerator ../eval_data/* --sbg
+$ ./kiwi-evaluator --model ../models/base ../eval_data/* --sbg
 Loading Time : 981.745 ms
 ArchType : avx2
 LM Size : 34.1853 MB
@@ -110,7 +110,7 @@ Avg Score
 
 0.13.0 버전부터 추가된 오타 교정 기능이 잘 작동하는지 확인하기 위해서는 다음과 같이 실행합니다.
 ```console
-$ ./kiwi-evaluator --model ../ModelGenerator ../eval_data/* --sbg --typo 6
+$ ./kiwi-evaluator --model ../models/base ../eval_data/* --sbg --typo 6
 Loading Time : 9414.45 ms
 ArchType : avx2
 LM Size : 34.1853 MB

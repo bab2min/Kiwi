@@ -12,7 +12,7 @@ KiwiJava의 jar 파일은 자체적으로 실행 가능한 main함수를 가지�
 
 # 모델 파일 다운로드
 $ wget https://github.com/bab2min/Kiwi/releases/download/v0.16.0/kiwi_model_v0.16.0_base.tgz
-$ tar -zxvf kiwi_model_v0.16.0_base.tgz # 압축 해제. 모델을 포함한 ModelGenerator라는 폴더가 생성됨
+$ tar -zxvf kiwi_model_v0.16.0_base.tgz # 압축 해제. 모델을 포함한 models/base라는 폴더가 생성됨
 
 # KiwiJava 다운로드
 $ wget https://github.com/bab2min/Kiwi/releases/download/v0.16.1/kiwi-java-v0.16.1-lnx-x86-64.jar
@@ -21,7 +21,7 @@ $ wget https://github.com/bab2min/Kiwi/releases/download/v0.16.1/kiwi-java-v0.16
 # 즉, kiwi_model_v0.16.0은 kiwi-java-v0.16.* 전부에서 사용가능합니다.
 
 # jar 구동. 구동 인자로 모델 경로를 입력해주어야 함
-$ java -jar kiwi-java-v0.16.1-lnx-x86-64.jar ModelGenerator/
+$ java -jar kiwi-java-v0.16.1-lnx-x86-64.jar models/base/
 Kiwi 0.16.1 is loaded!
 >> 안녕하세요?
 [Token(form=안녕, tag=NNG, position=0, length=2),

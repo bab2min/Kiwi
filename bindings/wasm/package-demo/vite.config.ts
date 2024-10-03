@@ -3,7 +3,7 @@ import { viteStaticCopy } from 'vite-plugin-static-copy';
 import { requiredModelFiles } from './src/modelFiles';
 
 const targets = requiredModelFiles.map((file) => ({
-    src: '../../../ModelGenerator/' + file,
+    src: '../../../models/base/' + file,
     dest: 'model',
 }));
 

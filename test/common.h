@@ -4,7 +4,7 @@
 #include <iostream>
 #include <fstream>
 
-#define MODEL_PATH "./ModelGenerator"
+#define MODEL_PATH "./models/base"
 #define KWORD u"킼윜"
 #define KWORD8 u8"킼윜"
 

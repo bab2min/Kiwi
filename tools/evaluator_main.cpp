@@ -125,7 +125,7 @@ int main(int argc, const char* argv[])
 {
 	CmdLine cmd{ "Kiwi evaluator" };
 
-	ValueArg<string> model{ "m", "model", "Kiwi model path", false, "ModelGenerator", "string" };
+	ValueArg<string> model{ "m", "model", "Kiwi model path", false, "models/base", "string" };
 	ValueArg<string> output{ "o", "output", "output dir for evaluation errors", false, "", "string" };
 	SwitchArg noNormCoda{ "", "no-normcoda", "without normalizing coda", false };
 	SwitchArg noZCoda{ "", "no-zcoda", "without z-coda", false };
