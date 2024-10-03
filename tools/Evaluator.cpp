@@ -1,4 +1,4 @@
-#include <fstream>
+﻿#include <fstream>
 #include <iostream>
 
 #include <kiwi/Utils.h>
@@ -130,7 +130,10 @@ Evaluator::Score Evaluator::evaluate()
 
 ostream& operator<<(ostream& o, const kiwi::TokenInfo& t)
 {
-	return o << utf16To8(t.str) << "/" << kiwi::tagToString(t.tag);
+	o << utf16To8(t.str);
+	if (t.senseId) o << "__" << (int)t.senseId;
+	o << "/" << kiwi::tagToString(t.tag);
+	return o;
 }
 
 void Evaluator::TestResult::writeResult(ostream& out) const
