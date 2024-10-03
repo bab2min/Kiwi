@@ -368,9 +368,9 @@ namespace kiwi
 						newCandidates.reserve(bestScoreByState.size());
 						for (auto& p : bestScoreByState)
 						{
-							newCandidates.emplace_back(move(candidates[p.second.second]));
+							newCandidates.emplace_back(std::move(candidates[p.second.second]));
 						}
-						candidates = move(newCandidates);
+						candidates = std::move(newCandidates);
 					}
 				}
 			}
