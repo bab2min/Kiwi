@@ -2078,8 +2078,14 @@ HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes,
 		tokenSize = std::max(tokenSize, sents.raw().empty() ? (size_t)0 : *std::max_element(sents.raw().begin(), sents.raw().end()) + 1);
 	}
 
+	const size_t knlmVocabSize = langMdl.knlm->getHeader().vocab_size;
+	size_t filteredKnlmVocabSize = 0;
 	for (size_t i = 0; i < tokenSize; ++i)
 	{
+		if (i == knlmVocabSize)
+		{
+			filteredKnlmVocabSize = dataset.vocabToToken.size();
+		}
 		if (tokenFilter && !tokenFilter(joinHangul(forms[morphemes[i].kform].form), morphemes[i].tag))
 		{
 			dataset.tokenToVocab.emplace_back(HSDataset::nonVocab);
@@ -2088,6 +2094,11 @@ HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes,
 		dataset.tokenToVocab.emplace_back(dataset.vocabToToken.size());
 		dataset.vocabToToken.emplace_back(i);
 	}
+	if (tokenSize == knlmVocabSize)
+	{
+		filteredKnlmVocabSize = dataset.vocabToToken.size();
+	}
+	dataset.knlmVocabSize = filteredKnlmVocabSize;
 
 	for (size_t i = 0; i < sents.size(); ++i)
 	{
@@ -2098,6 +2109,7 @@ HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes,
 	{
 		splitDataset->tokenToVocab = dataset.tokenToVocab;
 		splitDataset->vocabToToken = dataset.vocabToToken;
+		splitDataset->knlmVocabSize = dataset.knlmVocabSize;
 		for (size_t i = 0; i < splitDataset->sents.get().size(); ++i)
 		{
 			splitDataset->totalTokens += splitDataset->numValidTokensInSent(i) - 1;

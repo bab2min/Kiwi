@@ -258,6 +258,11 @@ std::u16string HSDataset::vocabForm(uint32_t vocab) const
 	return joinHangul((*forms)[(*morphemes)[vocabToToken[vocab]].kform].form);
 }
 
+size_t HSDataset::getKnlmVocabSize() const
+{
+	return knlmVocabSize;
+}
+
 std::vector<size_t> kiwi::HSDataset::estimVocabFrequency() const
 {
 	std::vector<size_t> ret(vocabSize()), augs(getDefaultMorphemeId(POSTag::max));
@@ -279,7 +284,7 @@ std::vector<size_t> kiwi::HSDataset::estimVocabFrequency() const
 	return ret;
 }
 
-Range<Vector<uint16_t>::const_iterator> HSDataset::getSent(size_t idx) const
+Range<Vector<uint32_t>::const_iterator> HSDataset::getSent(size_t idx) const
 {
 	return sents.get()[idx];
 }
@@ -289,9 +294,9 @@ void HSDataset::seed(size_t newSeed)
 	rng.seed(newSeed);
 }
 
-std::vector<uint16_t> HSDataset::getAugmentedSent(size_t idx)
+std::vector<uint32_t> HSDataset::getAugmentedSent(size_t idx)
 {
-	std::vector<uint16_t> ret;
+	std::vector<uint32_t> ret;
 	auto sent = sents.get()[idx];
 	ret.emplace_back(*sent.begin());
 	for (auto p = sent.begin() + 1; p != sent.end() - 1; ++p)
