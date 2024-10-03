@@ -1,6 +1,6 @@
 # KiwiJava, 한국어 형태소 분석기 Kiwi의 Java 바인딩
 Kiwi v0.16.0에서부터는 자체적으로 Kiwi의 Java 바인딩인 KiwiJava를 제공합니다. KiwiJava는 [최신 Release](https://github.com/bab2min/Kiwi/releases/)에서 `kiwi-java-*.jar`라는 이름으로 제공됩니다.
-jar 파일 내부에 OS 종속적인 바이너리가 포함되어 있는 관계로 JVM이 구동되는 가상머신의 환경(win(Windows), lnx(Linux), mac(macOS))에 맞춰서 적합한 jar파일을 받아야 합니다.
+jar 파일 내부에 OS에 종속적인 바이너리가 포함되어 있으므로 JVM이 구동되는 가상머신의 환경(win(Windows), lnx(Linux), mac(macOS))에 맞춰서 적합한 jar파일을 받아야 합니다.
 
 * KiwiJava는 Java 1.8 이상과 호환됩니다.
 
@@ -11,18 +11,18 @@ KiwiJava의 jar 파일은 자체적으로 실행 가능한 main함수를 가지�
 # Linux x86-64 환경을 가정
 
 # 모델 파일 다운로드
-$ wget https://github.com/bab2min/Kiwi/releases/download/v0.16.0/kiwi_model_v0.16.0_base.tgz
-$ tar -zxvf kiwi_model_v0.16.0_base.tgz # 압축 해제. 모델을 포함한 models/base라는 폴더가 생성됨
+$ wget https://github.com/bab2min/Kiwi/releases/download/v0.19.0/kiwi_model_v0.19.0_base.tgz
+$ tar -zxvf kiwi_model_v0.19.0_base.tgz # 압축 해제. 모델을 포함한 models/base라는 폴더가 생성됨
 
 # KiwiJava 다운로드
-$ wget https://github.com/bab2min/Kiwi/releases/download/v0.16.1/kiwi-java-v0.16.1-lnx-x86-64.jar
+$ wget https://github.com/bab2min/Kiwi/releases/download/v0.19.0/kiwi-java-v0.19.0-lnx-x86-64.jar
 
 # 모델 파일은 Patch가 다르더라도 Major, Minor 버전이 동일하면 호환됩니다.
-# 즉, kiwi_model_v0.16.0은 kiwi-java-v0.16.* 전부에서 사용가능합니다.
+# 즉, kiwi_model_v0.19.0은 kiwi-java-v0.19.* 전부에서 사용가능합니다.
 
 # jar 구동. 구동 인자로 모델 경로를 입력해주어야 함
-$ java -jar kiwi-java-v0.16.1-lnx-x86-64.jar models/base/
-Kiwi 0.16.1 is loaded!
+$ java -jar kiwi-java-v0.19.0-lnx-x86-64.jar models/base/
+Kiwi 0.19.0 is loaded!
 >> 안녕하세요?
 [Token(form=안녕, tag=NNG, position=0, length=2),
  Token(form=하, tag=XSA, position=2, length=1),
