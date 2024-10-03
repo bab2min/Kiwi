@@ -775,8 +775,25 @@ namespace kiwi
 			spStateCnt[r.curState]++;
 			validTarget++;
 		}
-		ret.erase(ret.begin() + validTarget, ret.end());
-		spStatesByRet.erase(spStatesByRet.begin() + validTarget, spStatesByRet.end());
+		Vector<size_t> idx(validTarget);
+		iota(idx.begin(), idx.end(), 0);
+		sort(idx.begin(), idx.end(), [&](size_t a, size_t b) { return ret[a].second > ret[b].second; });
+		
+		Vector<TokenResult> sortedRet;
+		Vector<SpecialState> sortedSpStatesByRet;
+		const size_t maxCands = min(topN * 2, validTarget);
+		for (size_t i = 0; i < maxCands; ++i)
+		{
+			sortedRet.emplace_back(move(ret[idx[i]]));
+			sortedSpStatesByRet.emplace_back(spStatesByRet[idx[i]]);
+		}
+		ret.clear();
+		spStatesByRet.clear();
+		for (size_t i = 0; i < maxCands; ++i)
+		{
+			ret.emplace_back(move(sortedRet[i]));
+			spStatesByRet.emplace_back(sortedSpStatesByRet[i]);
+		}
 	}
 
 	inline void makePretokenizedSpanGroup(
