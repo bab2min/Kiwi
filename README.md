@@ -22,7 +22,7 @@ Kiwi는 빠른 속도와 범용적인 성능을 지향하는 한국어 형태소
 
 ![속도](https://bab2min.github.io/kiwipiepy/images/TokenizeSpeed.PNG)
 
-텍스트 분석 속도가 다른 한국어 형태소분석기들과 비교하여 꽤 빠른 편입니다. (속도 측정은 [이 코드](https://github.com/bab2min/kiwipiepy/blob/main/evaluate.py)를 통해 수행 가능합니다. )
+텍스트 분석 속도가 다른 한국어 형태소분석기들과 비교하여 꽤 빠른 편입니다. 자세한 벤치마크 결과는 [이 문서](https://docs.google.com/spreadsheets/d/1XmuYKDpV5d_WTGNgY73BJGHZ8_AUZKQXpEys819qH2Y/edit?gid=1956520937#gid=1956520937)에서 확인 가능합니다.
 
 ![모호성 해소 성능](https://bab2min.github.io/kiwipiepy/images/DisambAcc.PNG)
 
