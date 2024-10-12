@@ -414,7 +414,7 @@ TEST(KiwiCpp, HSDataset)
 	};
 
 	HSDataset trainset, devset;
-	trainset = kw.makeHSDataset(data, batchSize, windowSize, 1, 0., tokenFilter, 0.1, false, &devset);
+	trainset = kw.makeHSDataset(data, batchSize, 0, windowSize, 1, 0., tokenFilter, {}, 0.1, false, {}, 0, &devset);
 	for (size_t i = 0; i < 2; ++i)
 	{
 		{

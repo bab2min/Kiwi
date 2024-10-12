@@ -784,10 +784,8 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, size_t _numThreads, BuildOptio
 	}
 }
 
-KiwiBuilder::KiwiBuilder(const ModelBuildArgs& args)
+void KiwiBuilder::initMorphemes()
 {
-	archType = getSelectedArch(ArchType::default_);
-
 	forms.resize(defaultFormSize);
 	morphemes.resize(defaultFormSize + 2); // additional places for <s>, </s>
 	for (size_t i = 1; i < defaultTagSize; ++i)
@@ -804,6 +802,18 @@ KiwiBuilder::KiwiBuilder(const ModelBuildArgs& args)
 		morphemes[i + defaultTagSize + 1].kform = i + defaultTagSize - 1;
 		morphemes[i + defaultTagSize + 1].userScore = -1.5f;
 	}
+
+}
+
+KiwiBuilder::KiwiBuilder(const ModelBuildArgs& args)
+{
+	if (!(args.lmMinCnts.size() == 1 || args.lmMinCnts.size() == args.lmOrder))
+	{
+		throw invalid_argument{ "lmMinCnts should have 1 or lmOrder elements" };
+	}
+
+	archType = getSelectedArch(ArchType::default_);
+	initMorphemes();
 
 	ifstream ifs;
 	auto realMorph = loadMorphemesFromTxt(openFile(ifs, args.morphemeDef), [&](POSTag tag, float cnt)
@@ -2179,43 +2189,72 @@ vector<WordInfo> KiwiBuilder::extractAddWords(const U16MultipleReader& reader, s
 }
 
 HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes, 
-	size_t batchSize, size_t windowSize, size_t numWorkers, 
+	size_t batchSize, size_t causalContextSize, size_t windowSize, size_t numWorkers, 
 	double dropoutProb,
 	const TokenFilter& tokenFilter,
+	const TokenFilter& windowFilter,
 	double splitRatio,
 	bool separateDefaultMorpheme,
+	const string& morphemeDefPath,
+	size_t morphemeDefMinCnt,
 	HSDataset* splitDataset
 ) const
 {
-	auto realMorph = restoreMorphemeMap(separateDefaultMorpheme);
-	HSDataset dataset{ batchSize, windowSize, numWorkers, dropoutProb };
+	HSDataset dataset{ batchSize, causalContextSize, windowSize, numWorkers, dropoutProb };
 	auto& sents = dataset.sents.get();
-	dataset.knlm = langMdl.knlm;
-	dataset.morphemes = &morphemes;
-	dataset.forms = &forms;
+	const KiwiBuilder* srcBuilder = this;
+	MorphemeMap realMorph;
+	size_t maxTokenId = 0;
+	if (morphemeDefPath.empty())
+	{
+		realMorph = restoreMorphemeMap(separateDefaultMorpheme);
+	}
+	else
+	{
+		dataset.dummyBuilder = make_shared<KiwiBuilder>();
+		dataset.dummyBuilder->initMorphemes();
+		ifstream ifs;
+		realMorph = dataset.dummyBuilder->loadMorphemesFromTxt(openFile(ifs, morphemeDefPath), [&](POSTag tag, float cnt)
+		{
+			return cnt >= morphemeDefMinCnt;
+		});
+		srcBuilder = dataset.dummyBuilder.get();
+
+		for (auto& p : realMorph)
+		{
+			maxTokenId = max(p.second.first + 1, maxTokenId);
+		}
+	}
+
+	auto& knlm = srcBuilder->langMdl.knlm;
+	dataset.knlm = knlm;
+	dataset.morphemes = &srcBuilder->morphemes;
+	dataset.forms = &srcBuilder->forms;
 
 	if (splitDataset)
 	{
-		*splitDataset = HSDataset{ batchSize, windowSize, numWorkers, dropoutProb };
-		splitDataset->knlm = langMdl.knlm;
-		splitDataset->morphemes = &morphemes;
-		splitDataset->forms = &forms;
+		*splitDataset = HSDataset{ batchSize, causalContextSize, windowSize, numWorkers, dropoutProb };
+		splitDataset->dummyBuilder = dataset.dummyBuilder;
+		splitDataset->knlm = knlm;
+		splitDataset->morphemes = &srcBuilder->morphemes;
+		splitDataset->forms = &srcBuilder->forms;
 	}
 
 	for (auto& path : inputPathes)
 	{
 		ifstream ifs;
-		addCorpusTo(sents, openFile(ifs, path), realMorph, splitRatio, splitDataset ? &splitDataset->sents.get() : nullptr);
+		srcBuilder->addCorpusTo(sents, openFile(ifs, path), realMorph, splitRatio, splitDataset ? &splitDataset->sents.get() : nullptr);
 	}
-	size_t tokenSize = sents.raw().empty() ? 0 : *std::max_element(sents.raw().begin(), sents.raw().end()) + 1;
+	size_t tokenSize = sents.raw().empty() ? 0 : *max_element(sents.raw().begin(), sents.raw().end()) + 1;
 
 	if (splitDataset)
 	{
 		auto& sents = splitDataset->sents.get();
-		tokenSize = std::max(tokenSize, sents.raw().empty() ? (size_t)0 : *std::max_element(sents.raw().begin(), sents.raw().end()) + 1);
+		tokenSize = max(tokenSize, sents.raw().empty() ? (size_t)0 : *max_element(sents.raw().begin(), sents.raw().end()) + 1);
 	}
 
-	const size_t knlmVocabSize = langMdl.knlm->getHeader().vocab_size;
+	const size_t knlmVocabSize = knlm ? knlm->getHeader().vocab_size : maxTokenId;
+	tokenSize = max(tokenSize, knlmVocabSize);
 	size_t filteredKnlmVocabSize = 0;
 	for (size_t i = 0; i < tokenSize; ++i)
 	{
@@ -2223,7 +2262,17 @@ HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes,
 		{
 			filteredKnlmVocabSize = dataset.vocabToToken.size();
 		}
-		if (tokenFilter && !tokenFilter(joinHangul(forms[morphemes[i].kform].form), morphemes[i].tag))
+		
+		if (windowFilter && !windowFilter(joinHangul(srcBuilder->forms[srcBuilder->morphemes[i].kform].form), srcBuilder->morphemes[i].tag))
+		{
+			dataset.windowTokenValidness.emplace_back(0);
+		}
+		else
+		{
+			dataset.windowTokenValidness.emplace_back(1);
+		}
+
+		if (tokenFilter && !tokenFilter(joinHangul(srcBuilder->forms[srcBuilder->morphemes[i].kform].form), srcBuilder->morphemes[i].tag))
 		{
 			dataset.tokenToVocab.emplace_back(HSDataset::nonVocab);
 			continue;
@@ -2244,6 +2293,7 @@ HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes,
 	
 	if (splitDataset)
 	{
+		splitDataset->windowTokenValidness = dataset.windowTokenValidness;
 		splitDataset->tokenToVocab = dataset.tokenToVocab;
 		splitDataset->vocabToToken = dataset.vocabToToken;
 		splitDataset->knlmVocabSize = dataset.knlmVocabSize;
