@@ -1215,9 +1215,10 @@ size_t kiwi::splitByTrie(
 	return n + startOffset;
 }
 
-template<ArchType arch>
+template<ArchType arch, bool typoTolerant>
 const Form* kiwi::findForm(
 	const utils::FrozenTrie<kchar_t, const Form*>& trie,
+	const Form* formData,
 	const KString& str
 )
 {
@@ -1228,7 +1229,12 @@ const Form* kiwi::findForm(
 		if (!node) return nullptr;
 	}
 	if (trie.hasSubmatch(node->val(trie))) return nullptr;
-	return node->val(trie);
+	auto ret = node->val(trie);
+	if (typoTolerant)
+	{
+		ret = &reinterpret_cast<const TypoForm*>(ret)->form(formData);
+	}
+	return ret;
 }
 
 namespace kiwi
@@ -1266,19 +1272,23 @@ FnSplitByTrie kiwi::getSplitByTrieFn(ArchType arch, bool typoTolerant, bool cont
 
 namespace kiwi
 {
+	template<bool typoTolerant>
 	struct FindFormGetter
 	{
 		template<std::ptrdiff_t i>
 		struct Wrapper
 		{
-			static constexpr FnFindForm value = &findForm<static_cast<ArchType>(i)>;
+			static constexpr FnFindForm value = &findForm<static_cast<ArchType>(i), typoTolerant>;
 		};
 	};
 }
 
-FnFindForm kiwi::getFindFormFn(ArchType arch)
+FnFindForm kiwi::getFindFormFn(ArchType arch, bool typoTolerant)
 {
-	static tp::Table<FnFindForm, AvailableArch> table{ FindFormGetter{} };
+	static std::array<tp::Table<FnFindForm, AvailableArch>, 2> table{ 
+		FindFormGetter<false>{},
+		FindFormGetter<true>{},
+	};
 
-	return table[static_cast<std::ptrdiff_t>(arch)];
+	return table[typoTolerant ? 1 : 0][static_cast<std::ptrdiff_t>(arch)];
 }

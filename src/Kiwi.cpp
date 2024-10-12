@@ -53,7 +53,7 @@ namespace kiwi
 			typoTolerant, 
 			continualTypoTolerant, 
 			lengtheningTypoTolerant);
-		dfFindForm = (void*)getFindFormFn(selectedArch);
+		dfFindForm = (void*)getFindFormFn(selectedArch, typoTolerant);
 
 		static tp::Table<FnFindBestPath, AvailableArch> lmKnLM_8{ FindBestPathGetter<WrappedKnLM<uint8_t>::type>{} };
 		static tp::Table<FnFindBestPath, AvailableArch> lmKnLM_16{ FindBestPathGetter<WrappedKnLM<uint16_t>::type>{} };
@@ -802,7 +802,8 @@ namespace kiwi
 		const Vector<uint32_t>& positionTable, 
 		const KString& normStr,
 		FnFindForm findForm,
-		const utils::FrozenTrie<kchar_t, const Form*>& formTrie
+		const utils::FrozenTrie<kchar_t, const Form*>& formTrie,
+		const Form* formData
 	)
 	{
 		if (pretokenized.empty()) return;
@@ -833,7 +834,7 @@ namespace kiwi
 			if (s.tokenization.empty())
 			{
 				auto formStr = normStr.substr(span.begin, span.end - span.begin);
-				span.form = findForm(formTrie, formStr); // reuse the predefined form & morpheme
+				span.form = findForm(formTrie, formData, formStr); // reuse the predefined form & morpheme
 				if (!span.form) // or use a fallback form
 				{
 					span.form = formTrie.value((size_t)POSTag::nnp);
@@ -842,7 +843,7 @@ namespace kiwi
 			else if (s.tokenization.size() == 1)
 			{
 				auto formStr = normalizeHangul(s.tokenization[0].form);
-				auto* tform = findForm(formTrie, formStr); 
+				auto* tform = findForm(formTrie, formData, formStr); 
 				if (tform && tform->candidate.size() == 1 &&
 					areTagsEqual(tform->candidate[0]->tag, s.tokenization[0].tag, !!s.tokenization[0].inferRegularity))
 					// reuse the predefined form & morpheme
@@ -908,7 +909,7 @@ namespace kiwi
 				{
 					auto& t = s.tokenization[i];
 					auto formStr = normalizeHangul(t.form);
-					auto* tform = findForm(formTrie, formStr);
+					auto* tform = findForm(formTrie, formData, formStr);
 					const Morpheme* foundMorph = nullptr;
 					if (tform)
 					{
@@ -999,7 +1000,8 @@ namespace kiwi
 			positionTable, 
 			normalizedStr, 
 			reinterpret_cast<FnFindForm>(dfFindForm), 
-			formTrie
+			formTrie,
+			forms.data()
 		);
 
 		// 분석할 문장에 포함된 개별 문자에 대해 어절번호를 생성한다
@@ -1317,7 +1319,7 @@ namespace kiwi
 	void Kiwi::findMorpheme(vector<const Morpheme*>& ret, const u16string& s, POSTag tag) const
 	{
 		auto normalized = normalizeHangul(s);
-		auto form = (*reinterpret_cast<FnFindForm>(dfFindForm))(formTrie, normalized);
+		auto form = (*reinterpret_cast<FnFindForm>(dfFindForm))(formTrie, forms.data(), normalized);
 		if (!form) return;
 		tag = clearIrregular(tag);
 		for (auto c : form->candidate)
