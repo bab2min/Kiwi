@@ -872,7 +872,8 @@ KiwiBuilder::KiwiBuilder(const ModelBuildArgs& args)
 		pool.~ThreadPool();
 		new (&pool) utils::ThreadPool{ args.numWorkers };
 	}
-	auto cntNodes = utils::count(sents.begin(), sents.end(), args.lmMinCnt, 1, args.lmOrder, (args.numWorkers > 1 ? &pool : nullptr), &bigramList, args.useLmTagHistory ? &historyTx : nullptr);
+	size_t lmMinCnt = *std::min(args.lmMinCnts.begin(), args.lmMinCnts.end());
+	auto cntNodes = utils::count(sents.begin(), sents.end(), lmMinCnt, 1, args.lmOrder, (args.numWorkers > 1 ? &pool : nullptr), &bigramList, args.useLmTagHistory ? &historyTx : nullptr);
 	// discount for bos node cnt
 	if (args.useLmTagHistory)
 	{
@@ -882,8 +883,16 @@ KiwiBuilder::KiwiBuilder(const ModelBuildArgs& args)
 	{
 		cntNodes.root().getNext(0)->val /= 2;
 	}
-	std::vector<size_t> minCnts(args.lmOrder, args.lmMinCnt);
-	minCnts.back() = args.lmLastOrderMinCnt;
+	std::vector<size_t> minCnts;
+	if (args.lmMinCnts.size() == 1)
+	{
+		minCnts.clear();
+		minCnts.resize(args.lmOrder, args.lmMinCnts[0]);
+	}
+	else if (args.lmMinCnts.size() == args.lmOrder)
+	{
+		minCnts = args.lmMinCnts;
+	}
 	langMdl.knlm = lm::KnLangModelBase::create(lm::KnLangModelBase::build(
 		cntNodes, 
 		args.lmOrder, minCnts, 

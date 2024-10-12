@@ -614,8 +614,7 @@ namespace kiwi
 			std::vector<std::string> corpora;
 			size_t minMorphCnt = 10;
 			size_t lmOrder = 4;
-			size_t lmMinCnt = 1;
-			size_t lmLastOrderMinCnt = 2;
+			std::vector<size_t> lmMinCnts = { 1 };
 			size_t numWorkers = 1;
 			size_t sbgSize = 1000000;
 			bool useLmTagHistory = true;
