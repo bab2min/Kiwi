@@ -361,6 +361,18 @@ TEST(KiwiCpp, UserTag)
 	EXPECT_EQ(tokens[7].tag, POSTag::user2);
 }
 
+TEST(KiwiCpp, STagPrefix)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	auto res = kiwi.analyze(u"자신있는 지역은 `후분양`으로 나올듯 싶습니다.", Match::allWithNormalizing).first;
+	EXPECT_EQ(res[0].str, u"자신");
+	EXPECT_EQ(res[1].str, u"있");
+	EXPECT_EQ(res[2].str, u"는");
+	EXPECT_EQ(res[3].str, u"지역");
+	EXPECT_EQ(res[4].str, u"은");
+	EXPECT_EQ(res[5].str, u"`");
+}
+
 TEST(KiwiCpp, HSDataset)
 {
 	KiwiBuilder kw{ MODEL_PATH, 0, BuildOption::default_, };
