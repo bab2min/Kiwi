@@ -653,7 +653,8 @@ size_t kiwi::splitByTrie(
 				const auto scanStart = max(endPosMap[nBeginWithMultiplier].first, (uint32_t)1), scanEnd = endPosMap[nBeginWithMultiplier].second;
 				const bool longestMatched = scanStart < scanEnd && any_of(out.begin() + scanStart, out.begin() + scanEnd, [&](const KGraphNode& g)
 				{
-					return nBeginWithMultiplier == g.endPos && lastSpecialEndPos == g.endPos - (g.uform.empty() ? g.form->sizeWithoutSpace() : g.uform.size()) * posMultiplier;
+					const auto start = g.endPos - (g.uform.empty() ? g.form->sizeWithoutSpace() : g.uform.size()) * posMultiplier;
+					return nBeginWithMultiplier == g.endPos && (lastSpecialEndPos == start || specialStartPos == start);
 				});
 
 				// insert unknown form 
