@@ -734,10 +734,11 @@ void KiwiBuilder::updateMorphemes()
 void KiwiBuilder::loadMorphBin(std::istream& is)
 {
 	serializer::readMany(is, serializer::toKey("KIWI"), forms, morphemes);
-	size_t cnt = 0;
 	for (auto& form : forms)
 	{
-		formMap.emplace(form.form, cnt++);
+		const size_t idx = &form - &forms[0];
+		if (idx < defaultFormSize + 27) continue;
+		formMap.emplace(form.form, idx);
 	}
 }
 
@@ -1363,10 +1364,13 @@ void KiwiBuilder::addCombinedMorphemes(
 		else return newForms[id - forms.size()];
 	};
 
-	auto res = combiningRule->combine(getForm(getMorph(leftId).kform).form, getForm(getMorph(rightId).kform).form, ruleId);
+	auto& leftForm = getForm(getMorph(leftId).kform).form;
+	auto& rightForm = getForm(getMorph(rightId).kform).form;
+
+	auto res = combiningRule->combine(leftForm, rightForm, ruleId);
 	for (auto& r : res)
 	{
-		if (!r.ignoreRCond && !FeatureTestor::isMatched(&getForm(getMorph(leftId).kform).form, getMorph(rightId).vowel()))
+		if (!r.ignoreRCond && !FeatureTestor::isMatched(&leftForm, getMorph(rightId).vowel()))
 		{
 			continue;
 		}
