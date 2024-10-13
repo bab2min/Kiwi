@@ -135,6 +135,16 @@ TEST(KiwiCpp, SingleResult)
 	}
 }
 
+TEST(KiwiCpp, SingleConsonantMorpheme)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	auto res = kiwi.analyze(u"구원의 손길을 내민 시민들", Match::allWithNormalizing).first;
+	EXPECT_EQ(res[4].str, u"내밀");
+
+	res = kiwi.analyze(u"서툰 모습을", Match::allWithNormalizing).first;
+	EXPECT_EQ(res[0].str, u"서툴");
+}
+
 TEST(KiwiCpp, SplitComplex)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
