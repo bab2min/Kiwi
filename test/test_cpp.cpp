@@ -145,6 +145,18 @@ TEST(KiwiCpp, SingleConsonantMorpheme)
 	EXPECT_EQ(res[0].str, u"서툴");
 }
 
+TEST(KiwiCpp, SpecialTokenErrorOnContinualTypo)
+{
+	KiwiBuilder builder{ MODEL_PATH, 0, BuildOption::default_, };
+	Kiwi typoKiwi = builder.build(DefaultTypoSet::continualTypoSet);
+	
+	auto res = typoKiwi.analyze(u"감사합니다 -친구들과", Match::allWithNormalizing).first;
+	EXPECT_EQ(res[0].str, u"감사");
+	EXPECT_EQ(res[1].str, u"하");
+	EXPECT_EQ(res[3].str, u"-");
+	EXPECT_EQ(res[3].tag, POSTag::so);
+}
+
 TEST(KiwiCpp, SplitComplex)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
