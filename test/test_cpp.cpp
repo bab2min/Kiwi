@@ -413,7 +413,7 @@ TEST(KiwiCpp, HSDataset)
 	for (size_t w : {0, 1, 2, 4})
 	{
 		//std::cout << w << std::endl;
-		auto dataset = kw.makeHSDataset(data, batchSize, windowSize, w, 0.);
+		auto dataset = kw.makeHSDataset(data, batchSize, 0, windowSize, w, 0.);
 		for (size_t i = 0; i < 2; ++i)
 		{
 			size_t totalBatchCnt = 0, totalTokenCnt = 0, s;
