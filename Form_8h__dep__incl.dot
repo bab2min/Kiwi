@@ -1,9 +1,10 @@
 digraph "include/kiwi/Form.h"
 {
  // LATEX_PDF_SIZE
-  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
-  node [fontname="Helvetica",fontsize="10",shape=record];
-  Node1 [label="include/kiwi/Form.h",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip="형태 및 형태소에 관한 정보를 담는 구조체들이 선언된 헤더"];
-  Node1 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node2 [label="include/kiwi/Kiwi.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$Kiwi_8h.html",tooltip="Kiwi C++ API를 담고 있는 헤더 파일"];
+  bgcolor="transparent";
+  edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
+  node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
+  Node1 [id="Node000001",label="include/kiwi/Form.h",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip="형태 및 형태소에 관한 정보를 담는 구조체들이 선언된 헤더"];
+  Node1 -> Node2 [id="edge1_Node000001_Node000002",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node2 [id="Node000002",label="include/kiwi/Kiwi.h",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$Kiwi_8h.html",tooltip="Kiwi C++ API를 담고 있는 헤더 파일"];
 }

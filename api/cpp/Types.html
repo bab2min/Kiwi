@@ -82,19 +82,19 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N4kiwi12setIrregularE6POSTagb"><code class="docutils literal notranslate"><span class="pre">kiwi::setIrregular()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N4kiwi12areTagsEqualE6POSTag6POSTagb"><code class="docutils literal notranslate"><span class="pre">kiwi::areTagsEqual()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N4kiwi14defaultTagSizeE"><code class="docutils literal notranslate"><span class="pre">kiwi::defaultTagSize</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N4kiwi10BasicTokenE"><code class="docutils literal notranslate"><span class="pre">kiwi::BasicToken</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N4kiwi9ExceptionE"><code class="docutils literal notranslate"><span class="pre">kiwi::Exception</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N4kiwi11IOExceptionE"><code class="docutils literal notranslate"><span class="pre">kiwi::IOException</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N4kiwi15FormatExceptionE"><code class="docutils literal notranslate"><span class="pre">kiwi::FormatException</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0EN4kiwi4HashE"><code class="docutils literal notranslate"><span class="pre">kiwi::Hash</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4IEN4kiwi4HashI12CondPolarityEE"><code class="docutils literal notranslate"><span class="pre">kiwi::Hash</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4IEN4kiwi4HashI9CondVowelEE"><code class="docutils literal notranslate"><span class="pre">kiwi::Hash</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4IEN4kiwi4HashI6POSTagEE"><code class="docutils literal notranslate"><span class="pre">kiwi::Hash</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N4kiwi11IOExceptionE"><code class="docutils literal notranslate"><span class="pre">kiwi::IOException</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N4kiwi16PretokenizedSpanE"><code class="docutils literal notranslate"><span class="pre">kiwi::PretokenizedSpan</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N4kiwi20SwTokenizerExceptionE"><code class="docutils literal notranslate"><span class="pre">kiwi::SwTokenizerException</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N4kiwi9TokenInfoE"><code class="docutils literal notranslate"><span class="pre">kiwi::TokenInfo</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N4kiwi16UnicodeExceptionE"><code class="docutils literal notranslate"><span class="pre">kiwi::UnicodeException</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N4kiwi24UnknownMorphemeExceptionE"><code class="docutils literal notranslate"><span class="pre">kiwi::UnknownMorphemeException</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N4kiwi20SwTokenizerExceptionE"><code class="docutils literal notranslate"><span class="pre">kiwi::SwTokenizerException</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0EN4kiwi4HashE"><code class="docutils literal notranslate"><span class="pre">kiwi::Hash</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N4kiwi9TokenInfoE"><code class="docutils literal notranslate"><span class="pre">kiwi::TokenInfo</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N4kiwi10BasicTokenE"><code class="docutils literal notranslate"><span class="pre">kiwi::BasicToken</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N4kiwi16PretokenizedSpanE"><code class="docutils literal notranslate"><span class="pre">kiwi::PretokenizedSpan</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4IEN4kiwi4HashI6POSTagEE"><code class="docutils literal notranslate"><span class="pre">kiwi::Hash</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4IEN4kiwi4HashI9CondVowelEE"><code class="docutils literal notranslate"><span class="pre">kiwi::Hash</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4IEN4kiwi4HashI12CondPolarityEE"><code class="docutils literal notranslate"><span class="pre">kiwi::Hash</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -215,7 +215,7 @@
 <dd><p>std::unordered_map의 내부용 타입. mimalloc 옵션에 따라 mi_stl_allocator로부터 메모리를 할당받는다. </p>
 <p><div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p>Vector </p>
+<p><a class="reference internal" href="#Types_8h_1a48d29484f2a48f6a4de60bbfd7746232"><span class="std std-ref">Vector</span></a></p>
 </div>
 </p>
 <div class="admonition note">
@@ -235,7 +235,7 @@
 <dd><p>std::u16string의 내부용 타입. mimalloc 옵션에 따라 mi_stl_allocator로부터 메모리를 할당받는다. </p>
 <p><div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p>Vector </p>
+<p><a class="reference internal" href="#Types_8h_1a48d29484f2a48f6a4de60bbfd7746232"><span class="std std-ref">Vector</span></a></p>
 </div>
 </p>
 <div class="admonition note">
@@ -823,6 +823,47 @@
 <dd></dd></dl>
 
 </div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi10BasicTokenE">
+<span id="_CPPv3N4kiwi10BasicTokenE"></span><span id="_CPPv2N4kiwi10BasicTokenE"></span><span id="kiwi::BasicToken"></span><span class="target" id="structkiwi_1_1BasicToken"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BasicToken</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi10BasicTokenE" title="Link to this definition"></a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi10BasicToken10BasicTokenERKNSt9u16stringE8uint32_t8uint32_t6POSTag7uint8_t">
+<span id="_CPPv3N4kiwi10BasicToken10BasicTokenERKNSt9u16stringE8uint32_t8uint32_t6POSTag7uint8_t"></span><span id="_CPPv2N4kiwi10BasicToken10BasicTokenERKNSt9u16stringE8uint32_t8uint32_t6POSTag7uint8_t"></span><span id="kiwi::BasicToken::BasicToken__std::u16stringCR.uint32_t.uint32_t.POSTag.uint8_t"></span><span class="target" id="structkiwi_1_1BasicToken_1a21a052bb987c3d5e366a2e803f68d4b8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BasicToken</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">u16string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_form</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="p"><span class="pre">}</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_begin</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">1</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_end</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">1</span></span>, <a class="reference internal" href="#_CPPv4N4kiwi6POSTagE" title="kiwi::POSTag"><span class="n"><span class="pre">POSTag</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">_tag</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N4kiwi6POSTagE" title="kiwi::POSTag"><span class="n"><span class="pre">POSTag</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4kiwi6POSTag7unknownE" title="kiwi::POSTag::unknown"><span class="n"><span class="pre">unknown</span></span></a>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_inferRegularity</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4kiwi10BasicToken10BasicTokenERKNSt9u16stringE8uint32_t8uint32_t6POSTag7uint8_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi10BasicToken4formE">
+<span id="_CPPv3N4kiwi10BasicToken4formE"></span><span id="_CPPv2N4kiwi10BasicToken4formE"></span><span id="kiwi::BasicToken::form__std::u16string"></span><span class="target" id="structkiwi_1_1BasicToken_1a4d86cc6e7b7d168d0b0302b0b6cbf7d8"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">u16string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">form</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi10BasicToken4formE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi10BasicToken5beginE">
+<span id="_CPPv3N4kiwi10BasicToken5beginE"></span><span id="_CPPv2N4kiwi10BasicToken5beginE"></span><span id="kiwi::BasicToken::begin__uint32_t"></span><span class="target" id="structkiwi_1_1BasicToken_1a8a88e7a2b71b1d424c47e4b2752dfa62"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">begin</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N4kiwi10BasicToken5beginE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi10BasicToken3endE">
+<span id="_CPPv3N4kiwi10BasicToken3endE"></span><span id="_CPPv2N4kiwi10BasicToken3endE"></span><span id="kiwi::BasicToken::end__uint32_t"></span><span class="target" id="structkiwi_1_1BasicToken_1ac79fe5513ebf566779c26ffcae361637"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">end</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N4kiwi10BasicToken3endE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi10BasicToken3tagE">
+<span id="_CPPv3N4kiwi10BasicToken3tagE"></span><span id="_CPPv2N4kiwi10BasicToken3tagE"></span><span id="kiwi::BasicToken::tag__POSTag"></span><span class="target" id="structkiwi_1_1BasicToken_1aca6c62b40abbdc3de9602f503d666d3e"></span><a class="reference internal" href="#_CPPv4N4kiwi6POSTagE" title="kiwi::POSTag"><span class="n"><span class="pre">POSTag</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">tag</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N4kiwi6POSTagE" title="kiwi::POSTag"><span class="n"><span class="pre">POSTag</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4kiwi6POSTag7unknownE" title="kiwi::POSTag::unknown"><span class="n"><span class="pre">unknown</span></span></a><a class="headerlink" href="#_CPPv4N4kiwi10BasicToken3tagE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi10BasicToken15inferRegularityE">
+<span id="_CPPv3N4kiwi10BasicToken15inferRegularityE"></span><span id="_CPPv2N4kiwi10BasicToken15inferRegularityE"></span><span id="kiwi::BasicToken::inferRegularity__uint8_t"></span><span class="target" id="structkiwi_1_1BasicToken_1a0c2c8f7d013e194de084bdd3f5168ea2"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">inferRegularity</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N4kiwi10BasicToken15inferRegularityE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N4kiwi9ExceptionE">
 <span id="_CPPv3N4kiwi9ExceptionE"></span><span id="_CPPv2N4kiwi9ExceptionE"></span><span id="kiwi::Exception"></span><span class="target" id="classkiwi_1_1Exception"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Exception</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">runtime_error</span></span><a class="headerlink" href="#_CPPv4N4kiwi9ExceptionE" title="Link to this definition"></a><br /></dt>
@@ -830,28 +871,8 @@
 </dd></dl>
 
 <dl class="cpp class">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi11IOExceptionE">
-<span id="_CPPv3N4kiwi11IOExceptionE"></span><span id="_CPPv2N4kiwi11IOExceptionE"></span><span id="kiwi::IOException"></span><span class="target" id="classkiwi_1_1IOException"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IOException</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="Form.html#_CPPv44kiwi" title="kiwi"><span class="n"><span class="pre">kiwi</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4kiwi9ExceptionE" title="kiwi::Exception"><span class="n"><span class="pre">Exception</span></span></a><a class="headerlink" href="#_CPPv4N4kiwi11IOExceptionE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N4kiwi15FormatExceptionE">
 <span id="_CPPv3N4kiwi15FormatExceptionE"></span><span id="_CPPv2N4kiwi15FormatExceptionE"></span><span id="kiwi::FormatException"></span><span class="target" id="classkiwi_1_1FormatException"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FormatException</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="Form.html#_CPPv44kiwi" title="kiwi"><span class="n"><span class="pre">kiwi</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4kiwi9ExceptionE" title="kiwi::Exception"><span class="n"><span class="pre">Exception</span></span></a><a class="headerlink" href="#_CPPv4N4kiwi15FormatExceptionE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp class">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi16UnicodeExceptionE">
-<span id="_CPPv3N4kiwi16UnicodeExceptionE"></span><span id="_CPPv2N4kiwi16UnicodeExceptionE"></span><span id="kiwi::UnicodeException"></span><span class="target" id="classkiwi_1_1UnicodeException"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">UnicodeException</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="Form.html#_CPPv44kiwi" title="kiwi"><span class="n"><span class="pre">kiwi</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4kiwi9ExceptionE" title="kiwi::Exception"><span class="n"><span class="pre">Exception</span></span></a><a class="headerlink" href="#_CPPv4N4kiwi16UnicodeExceptionE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp class">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi24UnknownMorphemeExceptionE">
-<span id="_CPPv3N4kiwi24UnknownMorphemeExceptionE"></span><span id="_CPPv2N4kiwi24UnknownMorphemeExceptionE"></span><span id="kiwi::UnknownMorphemeException"></span><span class="target" id="classkiwi_1_1UnknownMorphemeException"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">UnknownMorphemeException</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="Form.html#_CPPv44kiwi" title="kiwi"><span class="n"><span class="pre">kiwi</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4kiwi9ExceptionE" title="kiwi::Exception"><span class="n"><span class="pre">Exception</span></span></a><a class="headerlink" href="#_CPPv4N4kiwi24UnknownMorphemeExceptionE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp class">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi20SwTokenizerExceptionE">
-<span id="_CPPv3N4kiwi20SwTokenizerExceptionE"></span><span id="_CPPv2N4kiwi20SwTokenizerExceptionE"></span><span id="kiwi::SwTokenizerException"></span><span class="target" id="classkiwi_1_1SwTokenizerException"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SwTokenizerException</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="Form.html#_CPPv44kiwi" title="kiwi"><span class="n"><span class="pre">kiwi</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4kiwi9ExceptionE" title="kiwi::Exception"><span class="n"><span class="pre">Exception</span></span></a><a class="headerlink" href="#_CPPv4N4kiwi20SwTokenizerExceptionE" title="Link to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp struct">
@@ -866,6 +887,86 @@
 
 </div>
 </dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4IEN4kiwi4HashI12CondPolarityEE">
+<span id="_CPPv3IEN4kiwi4HashI12CondPolarityEE"></span><span id="_CPPv2IEN4kiwi4HashI12CondPolarityEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structkiwi_1_1Hash_3_01CondPolarity_01_4"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Hash</span></span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N4kiwi12CondPolarityE" title="kiwi::CondPolarity"><span class="n"><span class="pre">CondPolarity</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4IEN4kiwi4HashI12CondPolarityEE" title="Link to this definition"></a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4kiwi4HashI12CondPolarityEclE12CondPolarity">
+<span id="_CPPv3NK4kiwi4HashI12CondPolarityEclE12CondPolarity"></span><span id="_CPPv2NK4kiwi4HashI12CondPolarityEclE12CondPolarity"></span><span id="kiwi::Hash:CondPolarity:::call-operator__CondPolarityC"></span><span class="target" id="structkiwi_1_1Hash_3_01CondPolarity_01_4_1a19a9f85925db665d8fed27d72afb40a0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">()</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N4kiwi12CondPolarityE" title="kiwi::CondPolarity"><span class="n"><span class="pre">CondPolarity</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">v</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4kiwi4HashI12CondPolarityEclE12CondPolarity" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4IEN4kiwi4HashI9CondVowelEE">
+<span id="_CPPv3IEN4kiwi4HashI9CondVowelEE"></span><span id="_CPPv2IEN4kiwi4HashI9CondVowelEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structkiwi_1_1Hash_3_01CondVowel_01_4"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Hash</span></span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N4kiwi9CondVowelE" title="kiwi::CondVowel"><span class="n"><span class="pre">CondVowel</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4IEN4kiwi4HashI9CondVowelEE" title="Link to this definition"></a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4kiwi4HashI9CondVowelEclE9CondVowel">
+<span id="_CPPv3NK4kiwi4HashI9CondVowelEclE9CondVowel"></span><span id="_CPPv2NK4kiwi4HashI9CondVowelEclE9CondVowel"></span><span id="kiwi::Hash:CondVowel:::call-operator__CondVowelC"></span><span class="target" id="structkiwi_1_1Hash_3_01CondVowel_01_4_1ac60ed6d98e0adc86a4587d969664da7a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">()</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N4kiwi9CondVowelE" title="kiwi::CondVowel"><span class="n"><span class="pre">CondVowel</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">v</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4kiwi4HashI9CondVowelEclE9CondVowel" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4IEN4kiwi4HashI6POSTagEE">
+<span id="_CPPv3IEN4kiwi4HashI6POSTagEE"></span><span id="_CPPv2IEN4kiwi4HashI6POSTagEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structkiwi_1_1Hash_3_01POSTag_01_4"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Hash</span></span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N4kiwi6POSTagE" title="kiwi::POSTag"><span class="n"><span class="pre">POSTag</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4IEN4kiwi4HashI6POSTagEE" title="Link to this definition"></a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4kiwi4HashI6POSTagEclE6POSTag">
+<span id="_CPPv3NK4kiwi4HashI6POSTagEclE6POSTag"></span><span id="_CPPv2NK4kiwi4HashI6POSTagEclE6POSTag"></span><span id="kiwi::Hash:POSTag:::call-operator__POSTagC"></span><span class="target" id="structkiwi_1_1Hash_3_01POSTag_01_4_1a2ce91e7598449e14a481d982068626f4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">()</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N4kiwi6POSTagE" title="kiwi::POSTag"><span class="n"><span class="pre">POSTag</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">v</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4kiwi4HashI6POSTagEclE6POSTag" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi11IOExceptionE">
+<span id="_CPPv3N4kiwi11IOExceptionE"></span><span id="_CPPv2N4kiwi11IOExceptionE"></span><span id="kiwi::IOException"></span><span class="target" id="classkiwi_1_1IOException"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IOException</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="Form.html#_CPPv44kiwi" title="kiwi"><span class="n"><span class="pre">kiwi</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4kiwi9ExceptionE" title="kiwi::Exception"><span class="n"><span class="pre">Exception</span></span></a><a class="headerlink" href="#_CPPv4N4kiwi11IOExceptionE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi16PretokenizedSpanE">
+<span id="_CPPv3N4kiwi16PretokenizedSpanE"></span><span id="_CPPv2N4kiwi16PretokenizedSpanE"></span><span id="kiwi::PretokenizedSpan"></span><span class="target" id="structkiwi_1_1PretokenizedSpan"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PretokenizedSpan</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi16PretokenizedSpanE" title="Link to this definition"></a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi16PretokenizedSpan16PretokenizedSpanE8uint32_t8uint32_tRKNSt6vectorI10BasicTokenEE">
+<span id="_CPPv3N4kiwi16PretokenizedSpan16PretokenizedSpanE8uint32_t8uint32_tRKNSt6vectorI10BasicTokenEE"></span><span id="_CPPv2N4kiwi16PretokenizedSpan16PretokenizedSpanE8uint32_t8uint32_tRKNSt6vectorI10BasicTokenEE"></span><span id="kiwi::PretokenizedSpan::PretokenizedSpan__uint32_t.uint32_t.std::vector:BasicToken:CR"></span><span class="target" id="structkiwi_1_1PretokenizedSpan_1a077bcb91c6a0502f37f1376a75fa003c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PretokenizedSpan</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_begin</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_end</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N4kiwi10BasicTokenE" title="kiwi::BasicToken"><span class="n"><span class="pre">BasicToken</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_tokenization</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="p"><span class="pre">}</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4kiwi16PretokenizedSpan16PretokenizedSpanE8uint32_t8uint32_tRKNSt6vectorI10BasicTokenEE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi16PretokenizedSpan5beginE">
+<span id="_CPPv3N4kiwi16PretokenizedSpan5beginE"></span><span id="_CPPv2N4kiwi16PretokenizedSpan5beginE"></span><span id="kiwi::PretokenizedSpan::begin__uint32_t"></span><span class="target" id="structkiwi_1_1PretokenizedSpan_1a1d96c9638d60e69c25688934adb7f1a0"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">begin</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N4kiwi16PretokenizedSpan5beginE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi16PretokenizedSpan3endE">
+<span id="_CPPv3N4kiwi16PretokenizedSpan3endE"></span><span id="_CPPv2N4kiwi16PretokenizedSpan3endE"></span><span id="kiwi::PretokenizedSpan::end__uint32_t"></span><span class="target" id="structkiwi_1_1PretokenizedSpan_1a2a25622af61ac5a46ddb1bb6eea84688"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">end</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N4kiwi16PretokenizedSpan3endE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi16PretokenizedSpan12tokenizationE">
+<span id="_CPPv3N4kiwi16PretokenizedSpan12tokenizationE"></span><span id="_CPPv2N4kiwi16PretokenizedSpan12tokenizationE"></span><span id="kiwi::PretokenizedSpan::tokenization__std::vector:BasicToken:"></span><span class="target" id="structkiwi_1_1PretokenizedSpan_1ad28ef48e710b515a9aa767e02460c553"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N4kiwi10BasicTokenE" title="kiwi::BasicToken"><span class="n"><span class="pre">BasicToken</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">tokenization</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi16PretokenizedSpan12tokenizationE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi20SwTokenizerExceptionE">
+<span id="_CPPv3N4kiwi20SwTokenizerExceptionE"></span><span id="_CPPv2N4kiwi20SwTokenizerExceptionE"></span><span id="kiwi::SwTokenizerException"></span><span class="target" id="classkiwi_1_1SwTokenizerException"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SwTokenizerException</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="Form.html#_CPPv44kiwi" title="kiwi"><span class="n"><span class="pre">kiwi</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4kiwi9ExceptionE" title="kiwi::Exception"><span class="n"><span class="pre">Exception</span></span></a><a class="headerlink" href="#_CPPv4N4kiwi20SwTokenizerExceptionE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv4N4kiwi9TokenInfoE">
@@ -958,8 +1059,8 @@
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi9TokenInfoUt2_10E">
-<span id="_CPPv3N4kiwi9TokenInfoUt2_10E"></span><span class="target" id="structkiwi_1_1TokenInfo_1acac2e2c9223da00d3ff4a53661c06cb8"></span><span class="k"><span class="pre">union</span></span><span class="w"> </span><a class="reference internal" href="Form.html#_CPPv44kiwi" title="kiwi"><span class="n"><span class="pre">kiwi</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4kiwi9TokenInfoE" title="kiwi::TokenInfo"><span class="n"><span class="pre">TokenInfo</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">[anonymous]</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">[anonymous]</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi9TokenInfoUt2_10E" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp">
+<span class="target" id="structkiwi_1_1TokenInfo_1acac2e2c9223da00d3ff4a53661c06cb8"></span><span class="sig-name descname"><span class="pre">union</span> <span class="pre">kiwi::TokenInfo</span></span></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
@@ -1001,116 +1102,15 @@
 </div>
 </dd></dl>
 
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi10BasicTokenE">
-<span id="_CPPv3N4kiwi10BasicTokenE"></span><span id="_CPPv2N4kiwi10BasicTokenE"></span><span id="kiwi::BasicToken"></span><span class="target" id="structkiwi_1_1BasicToken"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BasicToken</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi10BasicTokenE" title="Link to this definition"></a><br /></dt>
-<dd><div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi10BasicToken10BasicTokenERKNSt9u16stringE8uint32_t8uint32_t6POSTag7uint8_t">
-<span id="_CPPv3N4kiwi10BasicToken10BasicTokenERKNSt9u16stringE8uint32_t8uint32_t6POSTag7uint8_t"></span><span id="_CPPv2N4kiwi10BasicToken10BasicTokenERKNSt9u16stringE8uint32_t8uint32_t6POSTag7uint8_t"></span><span id="kiwi::BasicToken::BasicToken__std::u16stringCR.uint32_t.uint32_t.POSTag.uint8_t"></span><span class="target" id="structkiwi_1_1BasicToken_1a21a052bb987c3d5e366a2e803f68d4b8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BasicToken</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">u16string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_form</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="p"><span class="pre">}</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_begin</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">1</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_end</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">1</span></span>, <a class="reference internal" href="#_CPPv4N4kiwi6POSTagE" title="kiwi::POSTag"><span class="n"><span class="pre">POSTag</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">_tag</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N4kiwi6POSTagE" title="kiwi::POSTag"><span class="n"><span class="pre">POSTag</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4kiwi6POSTag7unknownE" title="kiwi::POSTag::unknown"><span class="n"><span class="pre">unknown</span></span></a>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_inferRegularity</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4kiwi10BasicToken10BasicTokenERKNSt9u16stringE8uint32_t8uint32_t6POSTag7uint8_t" title="Link to this definition"></a><br /></dt>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi16UnicodeExceptionE">
+<span id="_CPPv3N4kiwi16UnicodeExceptionE"></span><span id="_CPPv2N4kiwi16UnicodeExceptionE"></span><span id="kiwi::UnicodeException"></span><span class="target" id="classkiwi_1_1UnicodeException"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">UnicodeException</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="Form.html#_CPPv44kiwi" title="kiwi"><span class="n"><span class="pre">kiwi</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4kiwi9ExceptionE" title="kiwi::Exception"><span class="n"><span class="pre">Exception</span></span></a><a class="headerlink" href="#_CPPv4N4kiwi16UnicodeExceptionE" title="Link to this definition"></a><br /></dt>
 <dd></dd></dl>
 
-</div>
-<div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi10BasicToken4formE">
-<span id="_CPPv3N4kiwi10BasicToken4formE"></span><span id="_CPPv2N4kiwi10BasicToken4formE"></span><span id="kiwi::BasicToken::form__std::u16string"></span><span class="target" id="structkiwi_1_1BasicToken_1a4d86cc6e7b7d168d0b0302b0b6cbf7d8"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">u16string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">form</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi10BasicToken4formE" title="Link to this definition"></a><br /></dt>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi24UnknownMorphemeExceptionE">
+<span id="_CPPv3N4kiwi24UnknownMorphemeExceptionE"></span><span id="_CPPv2N4kiwi24UnknownMorphemeExceptionE"></span><span id="kiwi::UnknownMorphemeException"></span><span class="target" id="classkiwi_1_1UnknownMorphemeException"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">UnknownMorphemeException</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="Form.html#_CPPv44kiwi" title="kiwi"><span class="n"><span class="pre">kiwi</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4kiwi9ExceptionE" title="kiwi::Exception"><span class="n"><span class="pre">Exception</span></span></a><a class="headerlink" href="#_CPPv4N4kiwi24UnknownMorphemeExceptionE" title="Link to this definition"></a><br /></dt>
 <dd></dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi10BasicToken5beginE">
-<span id="_CPPv3N4kiwi10BasicToken5beginE"></span><span id="_CPPv2N4kiwi10BasicToken5beginE"></span><span id="kiwi::BasicToken::begin__uint32_t"></span><span class="target" id="structkiwi_1_1BasicToken_1a8a88e7a2b71b1d424c47e4b2752dfa62"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">begin</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N4kiwi10BasicToken5beginE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi10BasicToken3endE">
-<span id="_CPPv3N4kiwi10BasicToken3endE"></span><span id="_CPPv2N4kiwi10BasicToken3endE"></span><span id="kiwi::BasicToken::end__uint32_t"></span><span class="target" id="structkiwi_1_1BasicToken_1ac79fe5513ebf566779c26ffcae361637"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">end</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N4kiwi10BasicToken3endE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi10BasicToken3tagE">
-<span id="_CPPv3N4kiwi10BasicToken3tagE"></span><span id="_CPPv2N4kiwi10BasicToken3tagE"></span><span id="kiwi::BasicToken::tag__POSTag"></span><span class="target" id="structkiwi_1_1BasicToken_1aca6c62b40abbdc3de9602f503d666d3e"></span><a class="reference internal" href="#_CPPv4N4kiwi6POSTagE" title="kiwi::POSTag"><span class="n"><span class="pre">POSTag</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">tag</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N4kiwi6POSTagE" title="kiwi::POSTag"><span class="n"><span class="pre">POSTag</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4kiwi6POSTag7unknownE" title="kiwi::POSTag::unknown"><span class="n"><span class="pre">unknown</span></span></a><a class="headerlink" href="#_CPPv4N4kiwi10BasicToken3tagE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi10BasicToken15inferRegularityE">
-<span id="_CPPv3N4kiwi10BasicToken15inferRegularityE"></span><span id="_CPPv2N4kiwi10BasicToken15inferRegularityE"></span><span id="kiwi::BasicToken::inferRegularity__uint8_t"></span><span class="target" id="structkiwi_1_1BasicToken_1a0c2c8f7d013e194de084bdd3f5168ea2"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">inferRegularity</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N4kiwi10BasicToken15inferRegularityE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-</div>
-</dd></dl>
-
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi16PretokenizedSpanE">
-<span id="_CPPv3N4kiwi16PretokenizedSpanE"></span><span id="_CPPv2N4kiwi16PretokenizedSpanE"></span><span id="kiwi::PretokenizedSpan"></span><span class="target" id="structkiwi_1_1PretokenizedSpan"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PretokenizedSpan</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi16PretokenizedSpanE" title="Link to this definition"></a><br /></dt>
-<dd><div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi16PretokenizedSpan16PretokenizedSpanE8uint32_t8uint32_tRKNSt6vectorI10BasicTokenEE">
-<span id="_CPPv3N4kiwi16PretokenizedSpan16PretokenizedSpanE8uint32_t8uint32_tRKNSt6vectorI10BasicTokenEE"></span><span id="_CPPv2N4kiwi16PretokenizedSpan16PretokenizedSpanE8uint32_t8uint32_tRKNSt6vectorI10BasicTokenEE"></span><span id="kiwi::PretokenizedSpan::PretokenizedSpan__uint32_t.uint32_t.std::vector:BasicToken:CR"></span><span class="target" id="structkiwi_1_1PretokenizedSpan_1a077bcb91c6a0502f37f1376a75fa003c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PretokenizedSpan</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_begin</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_end</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N4kiwi10BasicTokenE" title="kiwi::BasicToken"><span class="n"><span class="pre">BasicToken</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_tokenization</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="p"><span class="pre">}</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4kiwi16PretokenizedSpan16PretokenizedSpanE8uint32_t8uint32_tRKNSt6vectorI10BasicTokenEE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-</div>
-<div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi16PretokenizedSpan5beginE">
-<span id="_CPPv3N4kiwi16PretokenizedSpan5beginE"></span><span id="_CPPv2N4kiwi16PretokenizedSpan5beginE"></span><span id="kiwi::PretokenizedSpan::begin__uint32_t"></span><span class="target" id="structkiwi_1_1PretokenizedSpan_1a1d96c9638d60e69c25688934adb7f1a0"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">begin</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N4kiwi16PretokenizedSpan5beginE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi16PretokenizedSpan3endE">
-<span id="_CPPv3N4kiwi16PretokenizedSpan3endE"></span><span id="_CPPv2N4kiwi16PretokenizedSpan3endE"></span><span id="kiwi::PretokenizedSpan::end__uint32_t"></span><span class="target" id="structkiwi_1_1PretokenizedSpan_1a2a25622af61ac5a46ddb1bb6eea84688"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">end</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N4kiwi16PretokenizedSpan3endE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N4kiwi16PretokenizedSpan12tokenizationE">
-<span id="_CPPv3N4kiwi16PretokenizedSpan12tokenizationE"></span><span id="_CPPv2N4kiwi16PretokenizedSpan12tokenizationE"></span><span id="kiwi::PretokenizedSpan::tokenization__std::vector:BasicToken:"></span><span class="target" id="structkiwi_1_1PretokenizedSpan_1ad28ef48e710b515a9aa767e02460c553"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N4kiwi10BasicTokenE" title="kiwi::BasicToken"><span class="n"><span class="pre">BasicToken</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">tokenization</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi16PretokenizedSpan12tokenizationE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-</div>
-</dd></dl>
-
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4IEN4kiwi4HashI6POSTagEE">
-<span id="_CPPv3IEN4kiwi4HashI6POSTagEE"></span><span id="_CPPv2IEN4kiwi4HashI6POSTagEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structkiwi_1_1Hash_3_01POSTag_01_4"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Hash</span></span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N4kiwi6POSTagE" title="kiwi::POSTag"><span class="n"><span class="pre">POSTag</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4IEN4kiwi4HashI6POSTagEE" title="Link to this definition"></a><br /></dt>
-<dd><div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK4kiwi4HashI6POSTagEclE6POSTag">
-<span id="_CPPv3NK4kiwi4HashI6POSTagEclE6POSTag"></span><span id="_CPPv2NK4kiwi4HashI6POSTagEclE6POSTag"></span><span id="kiwi::Hash:POSTag:::call-operator__POSTagC"></span><span class="target" id="structkiwi_1_1Hash_3_01POSTag_01_4_1a2ce91e7598449e14a481d982068626f4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">()</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N4kiwi6POSTagE" title="kiwi::POSTag"><span class="n"><span class="pre">POSTag</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">v</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4kiwi4HashI6POSTagEclE6POSTag" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-</div>
-</dd></dl>
-
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4IEN4kiwi4HashI9CondVowelEE">
-<span id="_CPPv3IEN4kiwi4HashI9CondVowelEE"></span><span id="_CPPv2IEN4kiwi4HashI9CondVowelEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structkiwi_1_1Hash_3_01CondVowel_01_4"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Hash</span></span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N4kiwi9CondVowelE" title="kiwi::CondVowel"><span class="n"><span class="pre">CondVowel</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4IEN4kiwi4HashI9CondVowelEE" title="Link to this definition"></a><br /></dt>
-<dd><div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK4kiwi4HashI9CondVowelEclE9CondVowel">
-<span id="_CPPv3NK4kiwi4HashI9CondVowelEclE9CondVowel"></span><span id="_CPPv2NK4kiwi4HashI9CondVowelEclE9CondVowel"></span><span id="kiwi::Hash:CondVowel:::call-operator__CondVowelC"></span><span class="target" id="structkiwi_1_1Hash_3_01CondVowel_01_4_1ac60ed6d98e0adc86a4587d969664da7a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">()</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N4kiwi9CondVowelE" title="kiwi::CondVowel"><span class="n"><span class="pre">CondVowel</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">v</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4kiwi4HashI9CondVowelEclE9CondVowel" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-</div>
-</dd></dl>
-
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4IEN4kiwi4HashI12CondPolarityEE">
-<span id="_CPPv3IEN4kiwi4HashI12CondPolarityEE"></span><span id="_CPPv2IEN4kiwi4HashI12CondPolarityEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structkiwi_1_1Hash_3_01CondPolarity_01_4"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Hash</span></span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N4kiwi12CondPolarityE" title="kiwi::CondPolarity"><span class="n"><span class="pre">CondPolarity</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4IEN4kiwi4HashI12CondPolarityEE" title="Link to this definition"></a><br /></dt>
-<dd><div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK4kiwi4HashI12CondPolarityEclE12CondPolarity">
-<span id="_CPPv3NK4kiwi4HashI12CondPolarityEclE12CondPolarity"></span><span id="_CPPv2NK4kiwi4HashI12CondPolarityEclE12CondPolarity"></span><span id="kiwi::Hash:CondPolarity:::call-operator__CondPolarityC"></span><span class="target" id="structkiwi_1_1Hash_3_01CondPolarity_01_4_1a19a9f85925db665d8fed27d72afb40a0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">()</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N4kiwi12CondPolarityE" title="kiwi::CondPolarity"><span class="n"><span class="pre">CondPolarity</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">v</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4kiwi4HashI12CondPolarityEclE12CondPolarity" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-</div>
-</dd></dl>
 
 </dd></dl>
 
