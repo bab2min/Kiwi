@@ -103,17 +103,18 @@ namespace kiwi
 		const PretokenizedSpanGroup::Span* pretokenizedLast
 	);
 
-	template<ArchType arch>
+	template<ArchType arch, bool typoTolerant>
 	const Form* findForm(
 		const utils::FrozenTrie<kchar_t, const Form*>& trie,
+		const Form* formData,
 		const KString& str
 	);
 	
 	using FnSplitByTrie = decltype(&splitByTrie<ArchType::default_>);
 	FnSplitByTrie getSplitByTrieFn(ArchType arch, bool typoTolerant, bool continualTypoTolerant, bool lengtheningTypoTolerant);
 
-	using FnFindForm = decltype(&findForm<ArchType::default_>);
-	FnFindForm getFindFormFn(ArchType arch);
+	using FnFindForm = decltype(&findForm<ArchType::default_, false>);
+	FnFindForm getFindFormFn(ArchType arch, bool typoTolerant);
 
 	struct KTrie : public utils::TrieNode<char16_t, const Form*, utils::ConstAccess<map<char16_t, int32_t>>, KTrie>
 	{

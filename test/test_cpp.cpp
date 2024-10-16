@@ -135,6 +135,28 @@ TEST(KiwiCpp, SingleResult)
 	}
 }
 
+TEST(KiwiCpp, SingleConsonantMorpheme)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	auto res = kiwi.analyze(u"구원의 손길을 내민 시민들", Match::allWithNormalizing).first;
+	EXPECT_EQ(res[4].str, u"내밀");
+
+	res = kiwi.analyze(u"서툰 모습을", Match::allWithNormalizing).first;
+	EXPECT_EQ(res[0].str, u"서툴");
+}
+
+TEST(KiwiCpp, SpecialTokenErrorOnContinualTypo)
+{
+	KiwiBuilder builder{ MODEL_PATH, 0, BuildOption::default_, };
+	Kiwi typoKiwi = builder.build(DefaultTypoSet::continualTypoSet);
+	
+	auto res = typoKiwi.analyze(u"감사합니다 -친구들과", Match::allWithNormalizing).first;
+	EXPECT_EQ(res[0].str, u"감사");
+	EXPECT_EQ(res[1].str, u"하");
+	EXPECT_EQ(res[3].str, u"-");
+	EXPECT_EQ(res[3].tag, POSTag::so);
+}
+
 TEST(KiwiCpp, SplitComplex)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
@@ -391,7 +413,7 @@ TEST(KiwiCpp, HSDataset)
 	for (size_t w : {0, 1, 2, 4})
 	{
 		//std::cout << w << std::endl;
-		auto dataset = kw.makeHSDataset(data, batchSize, windowSize, w, 0.);
+		auto dataset = kw.makeHSDataset(data, batchSize, 0, windowSize, w, 0.);
 		for (size_t i = 0; i < 2; ++i)
 		{
 			size_t totalBatchCnt = 0, totalTokenCnt = 0, s;
@@ -414,7 +436,7 @@ TEST(KiwiCpp, HSDataset)
 	};
 
 	HSDataset trainset, devset;
-	trainset = kw.makeHSDataset(data, batchSize, windowSize, 1, 0., tokenFilter, 0.1, false, &devset);
+	trainset = kw.makeHSDataset(data, batchSize, 0, windowSize, 1, 0., tokenFilter, {}, 0.1, false, {}, 0, &devset);
 	for (size_t i = 0; i < 2; ++i)
 	{
 		{

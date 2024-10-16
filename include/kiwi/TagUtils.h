@@ -35,7 +35,7 @@ namespace kiwi
 	inline bool isSuffix(POSTag tag)
 	{
 		tag = clearIrregular(tag);
-		return POSTag::xsn <= tag && tag <= POSTag::xsa;
+		return POSTag::xsn <= tag && tag <= POSTag::xsm;
 	}
 	
 	inline bool isSpecialClass(POSTag tag)

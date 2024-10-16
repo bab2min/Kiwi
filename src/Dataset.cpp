@@ -3,11 +3,12 @@
 
 using namespace kiwi;
 
-HSDataset::HSDataset(size_t _batchSize, size_t _windowSize, size_t _workers, double _dropoutProb)
+HSDataset::HSDataset(size_t _batchSize, size_t _causalContextSize, size_t _windowSize, size_t _workers, double _dropoutProb)
 	: workers{ _workers ? make_unique<utils::ThreadPool>(_workers) : nullptr },
 	dropout{ {1 - _dropoutProb * 3, _dropoutProb, _dropoutProb, _dropoutProb} }, 
 	locals( _workers ? workers->size() : 1),
 	batchSize{ _batchSize },
+	causalContextSize{ _causalContextSize },
 	windowSize{ _windowSize }
 {
 }
@@ -113,12 +114,21 @@ size_t HSDataset::_next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode,
 
 			local.lmLProbsBuf.resize(tokens.size());
 			local.outNgramNodeBuf.resize(tokens.size());
-			knlm->evaluate(tokens.begin(), tokens.end(), local.lmLProbsBuf.begin(), local.outNgramNodeBuf.begin());
+			if (knlm)
+			{
+				knlm->evaluate(tokens.begin(), tokens.end(), local.lmLProbsBuf.begin(), local.outNgramNodeBuf.begin());
+			}
 
 			auto& history = local.historyBuf;
 			history.clear();
-			history.resize(windowSize, -1);
-			history.back() = tokenToVocab[tokens[0]];
+			if (windowSize) 
+			{
+				history.resize(windowSize, -1);
+				if (windowTokenValidness[tokens[0]])
+				{
+					history.back() = tokenToVocab[tokens[0]];
+				}
+			}
 			for (size_t i = 1; i < tokens.size(); ++i)
 			{
 				int32_t v = tokenToVocab[tokens[i]];
@@ -134,13 +144,32 @@ size_t HSDataset::_next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode,
 					local.restLmLProbsCntData[r] += 1;
 					continue;
 				}
-				std::copy(history.begin(), history.end(), std::back_inserter(local.inData));
+
+				if (causalContextSize)
+				{
+					for (size_t j = 0; j < causalContextSize; ++j)
+					{
+						local.inData.emplace_back(i + j < causalContextSize ? 
+							nonVocab : tokenToVocab[tokens[i + j - causalContextSize]]);
+					}
+				}
+				if (windowSize)
+				{
+					if (windowTokenValidness[v])
+					{
+						std::copy(history.begin(), history.end(), std::back_inserter(local.inData));
+						history.pop_front();
+						history.push_back(v);
+					}
+					else
+					{
+						local.inData.resize(local.inData.size() + windowSize, -1);
+					}
+				}
+
 				local.outData.emplace_back(v);
 				local.lmLProbsData.emplace_back(local.lmLProbsBuf[i]);
 				local.outNgramNodeData.emplace_back(local.outNgramNodeBuf[i]);
-
-				history.pop_front();
-				history.push_back(v);
 			}
 
 			size_t r = local.outData.size() / batchSize;
@@ -217,14 +246,14 @@ size_t HSDataset::_next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode,
 	auto& l = locals[localId];
 
 	size_t rest = std::min(l.outData.size(), batchSize);
-	std::copy(l.inData.begin(), l.inData.begin() + rest * windowSize, in);
+	std::copy(l.inData.begin(), l.inData.begin() + rest * (causalContextSize + windowSize), in);
 	std::copy(l.outData.begin(), l.outData.begin() + rest, out);
 	std::copy(l.lmLProbsData.begin(), l.lmLProbsData.begin() + rest, lmLProbs);
 	std::copy(l.outNgramNodeData.begin(), l.outNgramNodeData.begin() + rest, outNgramNode);
 	restLmOut = l.restLmLProbsData.front();
 	restLmCntOut = l.restLmLProbsCntData.front();
 
-	l.inData.erase(l.inData.begin(), l.inData.begin() + rest * windowSize);
+	l.inData.erase(l.inData.begin(), l.inData.begin() + rest * (causalContextSize + windowSize));
 	l.outData.erase(l.outData.begin(), l.outData.begin() + rest);
 	l.lmLProbsData.erase(l.lmLProbsData.begin(), l.lmLProbsData.begin() + rest);
 	l.outNgramNodeData.erase(l.outNgramNodeData.begin(), l.outNgramNodeData.begin() + rest);
@@ -245,7 +274,7 @@ size_t HSDataset::next(int64_t* in, int64_t* out, float* lmLProbs, int64_t* outN
 
 size_t HSDataset::ngramNodeSize() const
 {
-	return knlm->nonLeafNodeSize();
+	return knlm ? knlm->nonLeafNodeSize() : 0;
 }
 
 const MorphemeRaw& HSDataset::vocabInfo(uint32_t vocab) const

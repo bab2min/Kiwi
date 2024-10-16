@@ -548,6 +548,8 @@ namespace kiwi
 
 		using MorphemeMap = UnorderedMap<std::tuple<KString, uint8_t, POSTag>, std::pair<size_t, size_t>>;
 		
+		void initMorphemes();
+
 		template<class Fn>
 		MorphemeMap loadMorphemesFromTxt(std::istream& is, Fn&& filter);
 
@@ -612,8 +614,7 @@ namespace kiwi
 			std::vector<std::string> corpora;
 			size_t minMorphCnt = 10;
 			size_t lmOrder = 4;
-			size_t lmMinCnt = 1;
-			size_t lmLastOrderMinCnt = 2;
+			std::vector<size_t> lmMinCnts = { 1 };
 			size_t numWorkers = 1;
 			size_t sbgSize = 1000000;
 			bool useLmTagHistory = true;
@@ -801,11 +802,14 @@ namespace kiwi
 		using TokenFilter = std::function<bool(const std::u16string&, POSTag)>;
 
 		HSDataset makeHSDataset(const std::vector<std::string>& inputPathes, 
-			size_t batchSize, size_t windowSize, size_t numWorkers, 
+			size_t batchSize, size_t causalContextSize, size_t windowSize, size_t numWorkers, 
 			double dropoutProb = 0,
 			const TokenFilter& tokenFilter = {},
+			const TokenFilter& windowFilter = {},
 			double splitRatio = 0,
 			bool separateDefaultMorpheme = false,
+			const std::string& morphemeDefPath = {},
+			size_t morphemeDefMinCnt = 0,
 			HSDataset* splitDataset = nullptr
 		) const;
 	};

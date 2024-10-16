@@ -8,6 +8,27 @@
 using namespace std;
 using namespace kiwi;
 
+vector<size_t> splitMultipleInts(const string& s, const char delim = ',')
+{
+	vector<size_t> ret;
+	size_t p = 0, e = 0;
+	while (1)
+	{
+		size_t t = s.find(delim, p);
+		if (t == s.npos)
+		{
+			ret.emplace_back(atoi(&s[e]));
+			return ret;
+		}
+		else
+		{
+			ret.emplace_back(atoi(&s[e]));
+			p = t + 1;
+			e = t + 1;
+		}
+	}
+}
+
 int run(const KiwiBuilder::ModelBuildArgs& args, const string& output, bool skipBigram)
 {
 	try
@@ -49,7 +70,7 @@ int main(int argc, const char* argv[])
 	ValueArg<size_t> workers{ "w", "workers", "number of workers", false, 1, "int" };
 	ValueArg<size_t> morMinCnt{ "", "morpheme_min_cnt", "min count of morpheme", false, 10, "int" };
 	ValueArg<size_t> lmOrder{ "", "order", "order of LM", false, 4, "int" };
-	ValueArg<size_t> lmMinCnt{ "", "min_cnt", "min count of LM", false, 1, "int" };
+	ValueArg<string> lmMinCnt{ "", "min_cnt", "min count of LM", false, "1", "multiple ints with comma"};
 	ValueArg<size_t> lmLastOrderMinCnt{ "", "last_min_cnt", "min count of the last order of LM", false, 2, "int" };
 	ValueArg<string> output{ "o", "output", "output model path", true, "", "string" };
 	ValueArg<size_t> sbgSize{ "", "sbg_size", "sbg size", false, 1000000, "int" };
@@ -86,10 +107,24 @@ int main(int argc, const char* argv[])
 	args.useLmTagHistory = tagHistory;
 	args.minMorphCnt = morMinCnt;
 	args.lmOrder = lmOrder;
-	args.lmMinCnt = lmMinCnt;
-	args.lmLastOrderMinCnt = lmLastOrderMinCnt;
 	args.numWorkers = workers;
 	args.sbgSize = sbgSize;
+
+	auto v = splitMultipleInts(lmMinCnt.getValue());
+	
+	if (v.empty())
+	{
+		args.lmMinCnts.resize(1, 1);
+	}
+	else if (v.size() == 1 || v.size() == lmOrder)
+	{
+		args.lmMinCnts = v;
+	}
+	else
+	{
+		cerr << "error: min_cnt size should be 1 or equal to order" << endl;
+		return -1;
+	}
 	return run(args, output, skipBigram);
 }
 
