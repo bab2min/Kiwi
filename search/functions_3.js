@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['istypotolerant_0',['isTypoTolerant',['../classkiwi_1_1Kiwi.html#a56ef14c138b0a3aba65f14aa58153622',1,'kiwi::Kiwi']]]
+  ['istypotolerant_453',['isTypoTolerant',['../classkiwi_1_1Kiwi.html#a56ef14c138b0a3aba65f14aa58153622',1,'kiwi::Kiwi']]]
 ];
