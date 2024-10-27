@@ -6370,7 +6370,7 @@
 와인	NNG	270
 은혜	NNG	270
 공평	NNG	270
-횟수	NNG	270
+횟수	NNG	270	complex 회/NNG ᆺ/Z_SIOT 수/NNG 010112
 반짝이	VV	270	complex 반짝/MAG 이/XSV 0223
 서랍	NNG	270
 허무	NNG	270
@@ -14689,7 +14689,7 @@ LG화학	NNP	82
 조흥은행	NNP	75
 노라	EC	75
 영양가	NNG	75
-툇마루	NNG	75
+툇마루	NNG	75	complex 퇴/NNG ᆺ/Z_SIOT 마루/NNG 010113
 오묘	XR	75
 의미심장	XR	75
 주인집	NNG	75
@@ -16670,7 +16670,7 @@ LG화학	NNP	82
 막중	XR	61
 엄중	XR	61
 경박	XR	61
-셋방	NNG	61
+셋방	NNG	61	complex 세/NNG ᆺ/Z_SIOT 방/NNG 010112
 애무	NNG	61
 천진	NNG	61
 맞아들이	VV	61	complex 맞/VV 어/EC 들이/VV 011224
@@ -23962,7 +23962,7 @@ SK그룹	NNP	33
 판매자	NNG	33
 차두리	NNP	33
 자필	NNG	33
-곳간	NNG	33
+곳간	NNG	33	complex 고/NNG ᆺ/Z_SIOT 간/NNB 010112
 에베레스트	NNP	33
 국전	NNG	33
 온존	NNG	33

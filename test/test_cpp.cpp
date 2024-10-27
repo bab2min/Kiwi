@@ -994,12 +994,23 @@ TEST(KiwiCpp, ZSiot)
 		auto resNone = kiwi.analyze(s, Match::allWithNormalizing);
 		auto resSplit = kiwi.analyze(s, Match::allWithNormalizing | Match::splitSaisiot);
 		auto resMerge = kiwi.analyze(s, Match::allWithNormalizing | Match::mergeSaisiot);
+		EXPECT_FALSE(std::any_of(resNone.first.begin(), resNone.first.end(), [](const TokenInfo& token) { return token.tag == POSTag::z_siot; }));
 		EXPECT_EQ(resSplit.first.size(), 3);
 		EXPECT_EQ(resSplit.first[0].tag, POSTag::nng);
 		EXPECT_EQ(resSplit.first[1].tag, POSTag::z_siot);
 		EXPECT_EQ(resSplit.first[2].tag, POSTag::nng);
 		EXPECT_EQ(resMerge.first.size(), 1);
 		EXPECT_EQ(resMerge.first[0].tag, POSTag::nng);
+	}
+
+	for (auto s : {u"발렛 파킹", u"미닛"})
+	{
+		auto resNone = kiwi.analyze(s, Match::allWithNormalizing);
+		auto resSplit = kiwi.analyze(s, Match::allWithNormalizing | Match::splitSaisiot);
+		auto resMerge = kiwi.analyze(s, Match::allWithNormalizing | Match::mergeSaisiot);
+		EXPECT_EQ(resNone.second, resSplit.second);
+		EXPECT_EQ(resNone.second, resMerge.second);
+		EXPECT_FALSE(std::any_of(resSplit.first.begin(), resSplit.first.end(), [](const TokenInfo& token) { return token.tag == POSTag::z_siot; }));
 	}
 }
 

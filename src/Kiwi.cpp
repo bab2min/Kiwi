@@ -1065,6 +1065,7 @@ namespace kiwi
 				false,
 				!!(matchOptions & Match::splitComplex),
 				!!(matchOptions & Match::splitSaisiot),
+				!!(matchOptions & Match::mergeSaisiot),
 				blocklist
 			);
 			insertPathIntoResults(ret, spStatesByRet, res, topN, matchOptions, integrateAllomorph, positionTable, wordPositions, pretokenizedGroup, nodeInWhichPretokenized);
