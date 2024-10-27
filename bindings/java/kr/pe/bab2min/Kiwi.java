@@ -31,6 +31,8 @@ public class Kiwi implements AutoCloseable  {
 		splitComplex = 1 << 22,
 		zCoda = 1 << 23,
 		compatibleJamo = 1 << 24,
+		splitSaisiot = 1 << 25,
+		mergeSaisiot = 1 << 26,
 		joinVSuffix = joinVerbSuffix | joinAdjSuffix,
 		joinAffix = joinNounPrefix | joinNounSuffix | joinVerbSuffix | joinAdjSuffix | joinAdvSuffix,
 		all = url | email | hashtag | mention | serial | zCoda,
@@ -53,10 +55,10 @@ public class Kiwi implements AutoCloseable  {
 		w_url = 33, w_email = 34, w_mention = 35, w_hashtag = 36, w_serial = 37, w_emoji = 38,
 		jks = 39, jkc = 40, jkg = 41, jko = 42, jkb = 43, jkv = 44, jkq = 45, jx = 46, jc = 47,
 		ep = 48, ef = 49, ec = 50, etn = 51, etm = 52,
-		z_coda = 53,
-		user0 = 54, user1 = 55, user2 = 56, user3 = 57, user4 = 58,
-		p = 59,
-		max = 60,
+		z_coda = 53, z_siot = 54,
+		user0 = 55, user1 = 56, user2 = 57, user3 = 58, user4 = 59,
+		p = 60,
+		max = 61,
 		pv = p,
 		pa = (byte)(p + 1),
 		irregular = - 128,
@@ -124,6 +126,7 @@ public class Kiwi implements AutoCloseable  {
 				case etn: return "ETN";
 				case etm: return "ETM";
 				case z_coda: return "Z_CODA";
+				case z_siot: return "Z_SIOT";
 				case user0: return "USER0";
 				case user1: return "USER1";
 				case user2: return "USER2";
