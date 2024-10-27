@@ -265,25 +265,26 @@ Enumerations</h2></td></tr>
 , <br />
 &#160;&#160;<b>etm</b>
 , <b>z_coda</b>
+, <b>z_siot</b>
 , <b>user0</b>
-, <b>user1</b>
 , <br />
-&#160;&#160;<b>user2</b>
+&#160;&#160;<b>user1</b>
+, <b>user2</b>
 , <b>user3</b>
 , <b>user4</b>
-, <a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebba83878c91171338902e0fe0fb97a8c47a">p</a>
 , <br />
-&#160;&#160;<a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebba2ffe4e77325d9a7152f7086ea7aa5114">max</a>
+&#160;&#160;<a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebba83878c91171338902e0fe0fb97a8c47a">p</a>
+, <a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebba2ffe4e77325d9a7152f7086ea7aa5114">max</a>
 , <b>pv</b> = p
 , <b>pa</b> = p + 1
-, <a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebba39d3202ec495577fd03ee14c24767dd9">irregular</a> = 0x80
 , <br />
-&#160;&#160;<b>vvi</b> = vv | irregular
+&#160;&#160;<a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebba39d3202ec495577fd03ee14c24767dd9">irregular</a> = 0x80
+, <b>vvi</b> = vv | irregular
 , <b>vai</b> = va | irregular
 , <b>vxi</b> = vx | irregular
-, <b>xsai</b> = xsa | irregular
 , <br />
-&#160;&#160;<b>pvi</b> = pv | irregular
+&#160;&#160;<b>xsai</b> = xsa | irregular
+, <b>pvi</b> = pv | irregular
 , <b>pai</b> = pa | irregular
 <br />
  }</td></tr>
@@ -305,13 +306,13 @@ Enumerations</h2></td></tr>
  }</td></tr>
 <tr class="memdesc:a11856481b15f24bf19cb647734ea1085"><td class="mdescLeft">&#160;</td><td class="mdescRight">선행 형태소의 종성 여부 조건과 관련된 열거형  <a href="Types_8h.html#a11856481b15f24bf19cb647734ea1085">More...</a><br /></td></tr>
 <tr class="separator:a11856481b15f24bf19cb647734ea1085"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5faf67ee26840604ea6a76541c8f0b20"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Types_8h.html#a5faf67ee26840604ea6a76541c8f0b20">kiwi::CondPolarity</a> : char { <a class="el" href="Types_8h.html#a5faf67ee26840604ea6a76541c8f0b20a334c4a4c42fdb79d7ebc3e73b517e6f8">none</a>
-, <a class="el" href="Types_8h.html#a5faf67ee26840604ea6a76541c8f0b20a82082716189f80fd070b89ac716570ba">positive</a>
-, <a class="el" href="Types_8h.html#a5faf67ee26840604ea6a76541c8f0b20a228d6a97a9838dc800e58b3c74ba7b11">negative</a>
-, <a class="el" href="Types_8h.html#a5faf67ee26840604ea6a76541c8f0b20a8f72c327aea57de5c5a3f9f21b56a233">non_adj</a>
+<tr class="memitem:a7903fe33da04a788b0bb009094596894"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Types_8h.html#a7903fe33da04a788b0bb009094596894">kiwi::CondPolarity</a> : uint8_t { <a class="el" href="Types_8h.html#a7903fe33da04a788b0bb009094596894a334c4a4c42fdb79d7ebc3e73b517e6f8">none</a>
+, <a class="el" href="Types_8h.html#a7903fe33da04a788b0bb009094596894a82082716189f80fd070b89ac716570ba">positive</a>
+, <a class="el" href="Types_8h.html#a7903fe33da04a788b0bb009094596894a228d6a97a9838dc800e58b3c74ba7b11">negative</a>
+, <a class="el" href="Types_8h.html#a7903fe33da04a788b0bb009094596894a8f72c327aea57de5c5a3f9f21b56a233">non_adj</a>
  }</td></tr>
-<tr class="memdesc:a5faf67ee26840604ea6a76541c8f0b20"><td class="mdescLeft">&#160;</td><td class="mdescRight">선행 형태소의 양/음성 조건(모음 조화)과 관련된 열거형  <a href="Types_8h.html#a5faf67ee26840604ea6a76541c8f0b20">More...</a><br /></td></tr>
-<tr class="separator:a5faf67ee26840604ea6a76541c8f0b20"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memdesc:a7903fe33da04a788b0bb009094596894"><td class="mdescLeft">&#160;</td><td class="mdescRight">선행 형태소의 양/음성 조건(모음 조화)과 관련된 열거형  <a href="Types_8h.html#a7903fe33da04a788b0bb009094596894">More...</a><br /></td></tr>
+<tr class="separator:a7903fe33da04a788b0bb009094596894"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7b5ed1c7b90b79877f32c8a011c06ff3"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Types_8h.html#a7b5ed1c7b90b79877f32c8a011c06ff3">kiwi::BuildOption</a> { <br />
 &#160;&#160;<b>none</b> = 0
 , <a class="el" href="Types_8h.html#a7b5ed1c7b90b79877f32c8a011c06ff3a9d4cda55511905f877949ea8055fc681">integrateAllomorph</a> = 1 &lt;&lt; 0
@@ -451,8 +452,8 @@ template&lt;typename _Ty &gt; </div>
 
 </div>
 </div>
-<a id="a5faf67ee26840604ea6a76541c8f0b20"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5faf67ee26840604ea6a76541c8f0b20">&#9670;&nbsp;</a></span>CondPolarity</h2>
+<a id="a7903fe33da04a788b0bb009094596894"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7903fe33da04a788b0bb009094596894">&#9670;&nbsp;</a></span>CondPolarity</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -461,7 +462,7 @@ template&lt;typename _Ty &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">enum <a class="el" href="Types_8h.html#a5faf67ee26840604ea6a76541c8f0b20">kiwi::CondPolarity</a> : char</td>
+          <td class="memname">enum <a class="el" href="Types_8h.html#a7903fe33da04a788b0bb009094596894">kiwi::CondPolarity</a> : uint8_t</td>
         </tr>
       </table>
   </td>
@@ -473,13 +474,13 @@ template&lt;typename _Ty &gt; </div>
 
 <p>선행 형태소의 양/음성 조건(모음 조화)과 관련된 열거형 </p>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a5faf67ee26840604ea6a76541c8f0b20a334c4a4c42fdb79d7ebc3e73b517e6f8"></a>none&#160;</td><td class="fielddoc"><p>조건이 설정되지 않음 </p>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a7903fe33da04a788b0bb009094596894a334c4a4c42fdb79d7ebc3e73b517e6f8"></a>none&#160;</td><td class="fielddoc"><p>조건이 설정되지 않음 </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a5faf67ee26840604ea6a76541c8f0b20a82082716189f80fd070b89ac716570ba"></a>positive&#160;</td><td class="fielddoc"><p>선행 형태소가 양성(ㅏ,ㅑ,ㅗ)인 경우만 등장 가능 </p>
+<tr><td class="fieldname"><a id="a7903fe33da04a788b0bb009094596894a82082716189f80fd070b89ac716570ba"></a>positive&#160;</td><td class="fielddoc"><p>선행 형태소가 양성(ㅏ,ㅑ,ㅗ)인 경우만 등장 가능 </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a5faf67ee26840604ea6a76541c8f0b20a228d6a97a9838dc800e58b3c74ba7b11"></a>negative&#160;</td><td class="fielddoc"><p>선행 형태소가 음성(그 외)인 경우만 등장 가능 </p>
+<tr><td class="fieldname"><a id="a7903fe33da04a788b0bb009094596894a228d6a97a9838dc800e58b3c74ba7b11"></a>negative&#160;</td><td class="fielddoc"><p>선행 형태소가 음성(그 외)인 경우만 등장 가능 </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a5faf67ee26840604ea6a76541c8f0b20a8f72c327aea57de5c5a3f9f21b56a233"></a>non_adj&#160;</td><td class="fielddoc"><p>선행 형태소가 형용사가 아닌 경우만 등장 가능 (모음조화와 관련없지만 효율성을 위해 여기에 삽입) </p>
+<tr><td class="fieldname"><a id="a7903fe33da04a788b0bb009094596894a8f72c327aea57de5c5a3f9f21b56a233"></a>non_adj&#160;</td><td class="fielddoc"><p>선행 형태소가 형용사가 아닌 경우만 등장 가능 (모음조화와 관련없지만 효율성을 위해 여기에 삽입) </p>
 </td></tr>
 </table>
 
