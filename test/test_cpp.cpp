@@ -985,6 +985,24 @@ TEST(KiwiCpp, ZCoda)
 	}
 }
 
+TEST(KiwiCpp, ZSiot)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	
+	for (auto s : {u"하굣길", u"만둣국", u"나뭇잎", u"세숫물", u"고춧가루", u"시곗바늘", u"사글셋방"})
+	{
+		auto resNone = kiwi.analyze(s, Match::allWithNormalizing);
+		auto resSplit = kiwi.analyze(s, Match::allWithNormalizing | Match::splitSaisiot);
+		auto resMerge = kiwi.analyze(s, Match::allWithNormalizing | Match::mergeSaisiot);
+		EXPECT_EQ(resSplit.first.size(), 3);
+		EXPECT_EQ(resSplit.first[0].tag, POSTag::nng);
+		EXPECT_EQ(resSplit.first[1].tag, POSTag::z_siot);
+		EXPECT_EQ(resSplit.first[2].tag, POSTag::nng);
+		EXPECT_EQ(resMerge.first.size(), 1);
+		EXPECT_EQ(resMerge.first[0].tag, POSTag::nng);
+	}
+}
+
 TEST(KiwiCpp, AnalyzeWithWordPosition)
 {
 	std::u16string testSentence = u"나 정말 배불렄ㅋㅋ"; 
