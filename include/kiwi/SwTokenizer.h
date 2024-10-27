@@ -2,7 +2,7 @@
  * @file SwTokenizer.h
  * @author bab2min (bab2min@gmail.com)
  * @brief Subword Tokenizer
- * @version 0.19.0
+ * @version 0.20.0
  * @date 2024-07-01
  *
  *
