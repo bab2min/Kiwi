@@ -1552,6 +1552,21 @@ TEST(KiwiCpp, JoinRestore)
 	}
 }
 
+TEST(KiwiCpp, JoinZSiot)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	for (auto c : { u8"하굣길", u8"만둣국", u8"나뭇잎", u8"세숫물", u8"고춧가루", u8"시곗바늘", u8"사글셋방" })
+	{
+		auto tokens = kiwi.analyze(c, Match::allWithNormalizing | Match::splitSaisiot).first;
+		auto joiner = kiwi.newJoiner();
+		for (auto& t : tokens)
+		{
+			joiner.add(t.str, t.tag, false);
+		}
+		EXPECT_EQ(joiner.getU8(), c);
+	}
+}
+
 TEST(KiwiCpp, NestedSentenceSplit)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
