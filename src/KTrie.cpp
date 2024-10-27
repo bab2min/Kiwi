@@ -158,19 +158,16 @@ namespace kiwi
 	};
 
 	template<bool typoTolerant>
-	bool getZCodaAppendable(
-		const Form* foundCand,
-		const Form* formBase
-	)
+	const Form& getForm(const Form* foundCand, const Form* formBase)
 	{
 		if (typoTolerant)
 		{
 			auto tCand = reinterpret_cast<const TypoForm*>(foundCand);
-			return tCand->form(formBase).zCodaAppendable;
+			return tCand->form(formBase);
 		}
 		else
 		{
-			return foundCand->zCodaAppendable;
+			return *foundCand;
 		}
 	}
 
@@ -227,23 +224,6 @@ namespace kiwi
 			}
 		}
 		return true;
-	}
-
-	template<bool typoTolerant>
-	size_t getFormLength(
-		const Form* form,
-		const Form* formBase
-	)
-	{
-		if (typoTolerant)
-		{
-			auto tCand = reinterpret_cast<const TypoForm*>(form);
-			return tCand->form(formBase).form.size();
-		}
-		else
-		{
-			return form->form.size();
-		}
 	}
 
 	inline void removeUnconnected(Vector<KGraphNode>& ret, const Vector<KGraphNode>& graph, const Vector<std::pair<uint32_t, uint32_t>>& endPosMap)
@@ -549,7 +529,7 @@ namespace kiwi
 			if (!cand) break;
 			else if (!trie.hasSubmatch(cand))
 			{
-				if (getFormLength<typoTolerant>(cand, formBase) <= 1) break;
+				if (getForm<typoTolerant>(cand, formBase).form.size() <= 1) break;
 				inserted = true;
 				if (!insertCandidates(candidates, cand, formBase, typoPtrs, str, nonSpaces, 0, boundary, continualTypoCost / 2)) break;
 			}
@@ -753,7 +733,7 @@ size_t kiwi::splitByTrie(
 		}
 	};
 
-	bool zCodaFollowable = false;
+	bool zCodaFollowable = false, zSiotFollowable = false;
 	const Form* const fallbackFormBegin = trie.value((size_t)POSTag::nng);
 	const Form* const fallbackFormEnd = trie.value((size_t)POSTag::max);
 	for (; n < str.size(); ++n)
@@ -1006,7 +986,12 @@ size_t kiwi::splitByTrie(
 				{
 					candidates.emplace_back(formBase + defaultTagSize + (c - 0x11A8) - 1, 0, nonSpaces.size() - 1);
 				}
+				else if (!!(matchOptions & (Match::splitSaisiot | Match::mergeSaisiot)) && zSiotFollowable && c == 0x11BA && n + 1 < str.size() && isHangulSyllable(str[n + 1]))
+				{
+					candidates.emplace_back(formBase + defaultTagSize + (0x11BA - 0x11A8) - 1, 0, nonSpaces.size() - 1);
+				}
 				zCodaFollowable = false;
+				zSiotFollowable = false;
 
 				// invalidate typo nodes
 				if (continualTypoTolerant)
@@ -1107,7 +1092,12 @@ size_t kiwi::splitByTrie(
 		{
 			candidates.emplace_back(formBase + defaultTagSize + (c - 0x11A8) - 1, 0, nonSpaces.size() - 1);
 		}
+		else if (!!(matchOptions & (Match::splitSaisiot | Match::mergeSaisiot)) && zSiotFollowable && c == 0x11BA && n + 1 < str.size() && isHangulSyllable(str[n + 1]))
+		{
+			candidates.emplace_back(formBase + defaultTagSize + (0x11BA - 0x11A8) - 1, 0, nonSpaces.size() - 1);
+		}
 		zCodaFollowable = false;
+		zSiotFollowable = false;
 
 		if (continualTypoTolerant && lastChrType == POSTag::max)
 		{
@@ -1128,7 +1118,8 @@ size_t kiwi::splitByTrie(
 			if (!cand) break;
 			else if (!trie.hasSubmatch(cand))
 			{
-				zCodaFollowable = zCodaFollowable || getZCodaAppendable<typoTolerant>(cand, formBase);
+				zCodaFollowable = zCodaFollowable || getForm<typoTolerant>(cand, formBase).zCodaAppendable;
+				zSiotFollowable = zSiotFollowable || getForm<typoTolerant>(cand, formBase).zSiotAppendable;
 				if (!insertCandidates(candidates, cand, formBase, typoPtrs, str, nonSpaces)) break;
 			}
 		}

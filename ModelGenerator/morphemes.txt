@@ -973,7 +973,7 @@
 밑	NNG	2972
 위기	NNG	2972
 삼	VV	2970
-로	XSM	2964
+로	XSM	2964	=으로/JKB
 실제로	MAG	2964	complex 실제/NNG 로/XSM 0223
 혹은	MAG	2962
 지니	VV	2958
@@ -2251,7 +2251,7 @@
 연장	NNG	1125
 끓이	VV	1124
 유엔	NNP	1124
-오랫동안	NNG	1123
+오랫동안	NNG	1123	complex 오래/NNG ᆺ/Z_SIOT 동안/NNG 021224
 니까	EF	1122	vocalic
 정서	NNG	1122
 지도자	NNG	1120
@@ -2367,7 +2367,7 @@
 스포츠	NNG	1056
 국어	NNG	1054
 아무개	NP	1054
-숫자	NNG	1053
+숫자	NNG	1053	complex 수/NNG ᆺ/Z_SIOT 자/NNB 010112
 으려고	EC	1052	non_vowel	==려고
 보유	NNG	1052
 정	NNG	1051
@@ -3558,7 +3558,7 @@
 응원	NNG	629
 착각	NNG	628
 엄청	MAG	628
-머릿속	NNG	628
+머릿속	NNG	628	complex 머리/NNG ᆺ/Z_SIOT 속/NNG 021223
 어라	EC	628
 국립	NNG	627
 보건	NNG	627
@@ -4707,7 +4707,7 @@
 스위스	NNP	421
 얼음	NNG	421
 조선일보	NNP	421
-바닷가	NNG	421
+바닷가	NNG	421	complex 바다/NNG ᆺ/Z_SIOT 가/NNG 021223
 협동	NNG	421
 고작	MAG	421
 지리	NNG	420
@@ -6018,7 +6018,7 @@
 꾀하	VV	292
 죽	NNG	292
 공작	NNG	292
-뱃속	NNG	292
+뱃속	NNG	292	complex 배/NNG ᆺ/Z_SIOT 속/NNG 010112
 탕	MAG	292
 농장	NNG	292
 맺히	VV	292
@@ -6150,7 +6150,7 @@
 한일	NNP	283
 바퀴	NNB	283
 밑바닥	NNG	283
-어젯밤	NNG	283
+어젯밤	NNG	283	complex 어제/NNG ᆺ/Z_SIOT 밤/NNG 021223
 클래식	NNG	283
 기뻐하	VV	283	complex 기쁘/VA 어/EC 하/VX 021223
 승려	NNG	283
@@ -6769,7 +6769,7 @@
 하부	NNG	246
 감독원	NNG	246
 재즈	NNG	246
-나뭇잎	NNG	246
+나뭇잎	NNG	246	complex 나무/NNG ᆺ/Z_SIOT 잎/NNG 021223
 불쾌	XR	246
 헌재	NNG	245
 연쇄	NNG	245
@@ -7711,7 +7711,7 @@
 반란	NNG	202
 용이	XR	202
 똘스또이	NNP	202	=톨스토이
-고춧가루	NNG	201
+고춧가루	NNG	201	complex 고추/NNG ᆺ/Z_SIOT 가루/NNG 021224
 치안	NNG	201
 내정	NNG	201
 베스트셀러	NNG	201
@@ -7827,7 +7827,7 @@
 골치	NNG	196
 요컨대	MAG	196
 화물	NNG	196
-바닷물	NNG	196
+바닷물	NNG	196	complex 바다/NNG ᆺ/Z_SIOT 물/NNG 021223
 기하학	NNG	196
 잔디	NNG	196
 국토부	NNG	196
@@ -8056,7 +8056,7 @@
 횡포	NNG	188
 원동력	NNG	188
 공판	NNG	188
-갯벌	NNG	188
+갯벌	NNG	188	complex 개/NNG ᆺ/Z_SIOT 벌/NNG 010112
 행세	NNG	188
 도처	NNG	188
 거점	NNG	188
@@ -10147,7 +10147,7 @@
 드시	VV	132
 습니다만은	EC	132	non_vowel	==ᆸ니다만은
 역임	NNG	132
-후춧가루	NNG	132
+후춧가루	NNG	132	complex 후추/NNG ᆺ/Z_SIOT 가루/NNG 021224
 두고두고	MAG	132
 별거	NNG	132
 만두	NNG	132
@@ -10266,7 +10266,7 @@
 옐친	NNP	131
 루카치	NNP	131
 상례	NNG	131
-노랫소리	NNG	131
+노랫소리	NNG	131	complex 노래/NNG ᆺ/Z_SIOT 소리/NNG 021224
 제인	NNP	131
 제우스	NNP	131
 합당	XR	131
@@ -10409,7 +10409,7 @@
 건설사	NNG	128
 요르단	NNP	128
 접전	NNG	128
-혼잣말	NNG	128
+혼잣말	NNG	128	complex 혼자/NNG ᆺ/Z_SIOT 말/NNG 021223
 스미스	NNP	128
 입단	NNG	128
 자재	NNG	128
@@ -11515,7 +11515,7 @@ LG전자	NNP	119
 뇌간	NNG	110
 선돌	NNP	110
 진아	NNP	110
-텃밭	NNG	109
+텃밭	NNG	109	complex 터/NNG ᆺ/Z_SIOT 밭/NNG 010112
 초록색	NNG	109
 주무시	VV	109
 이따	MAG	109
@@ -11525,7 +11525,7 @@ LG전자	NNP	119
 혼선	NNG	109
 기절	NNG	109
 성관계	NNG	109
-부잣집	NNG	109
+부잣집	NNG	109	complex 부자/NNG ᆺ/Z_SIOT 집/NNG 021223
 그러구	MAJ	109
 용병	NNG	109
 중증	NNG	109
@@ -11706,7 +11706,7 @@ LG전자	NNP	119
 파면	NNG	107
 염	NNG	107
 환히	MAG	107	complex 환/XR 히/XSM 0112	=훤히
-찻집	NNG	107
+찻집	NNG	107	complex 차/NNG ᆺ/Z_SIOT 집/NNG 010112
 밤나무	NNG	107
 핥	VV	107
 비집	VV-R	107
@@ -11728,7 +11728,7 @@ LG전자	NNP	119
 발각	NNG	106
 과반수	NNG	106
 샘물	NNG	106
-수돗물	NNG	106
+수돗물	NNG	106	complex 수도/NNG ᆺ/Z_SIOT 물/NNG 021223
 황소	NNG	106
 체득	NNG	106
 뚱뚱	MAG	106
@@ -14024,7 +14024,7 @@ LG화학	NNP	82
 온화	XR	81
 애틋	XR	81
 뻣뻣	XR	81
-라고요	EF	81complex 라고/EF 요/JX 0223
+라고요	EF	81	complex 라고/EF 요/JX 0223
 유창	XR	81
 생활양식	NNG	81
 당당	XR	81
@@ -14043,7 +14043,7 @@ LG화학	NNP	82
 포격	NNG	80
 황교안	NNP	80
 다라는	ETM	80
-깻잎	NNG	80
+깻잎	NNG	80	complex 깨/NNG ᆺ/Z_SIOT 잎/NNG 010112
 눈송이	NNG	80
 쓴맛	NNG	80
 이송	NNG	80
@@ -14471,7 +14471,7 @@ LG화학	NNP	82
 지회	NNG	77
 대동강	NNP	77
 각막	NNG	77
-콧등	NNG	77
+콧등	NNG	77	complex 코/NNG ᆺ/Z_SIOT 등/NNB 010112
 휴지통	NNG	77
 영화	NNP	77
 애국자	NNG	77
@@ -15463,7 +15463,7 @@ LG화학	NNP	82
 사상계	NNP	68
 특례	NNG	68
 폐교	NNG	68
-자릿수	NNG	68
+자릿수	NNG	68	complex 자리/NNG ᆺ/Z_SIOT 수/NNG 021223
 펭귄	NNG	68
 사기	NNP	68
 껄끄럽	VA-I	68
@@ -16167,7 +16167,7 @@ LG화학	NNP	82
 멥쌀	NNG	64
 적대	XR	64
 뉴런	NNG	64
-구둣발	NNG	64
+구둣발	NNG	64	complex 구두/NNG ᆺ/Z_SIOT 발/NNG 021223
 서후	NNP	64
 쇠똥구리	NNG	64
 주철이	NNP	64
@@ -16230,7 +16230,7 @@ LG화학	NNP	82
 탐내	VV	63
 연극인	NNG	63
 위	NNP	63
-바닷속	NNG	63
+바닷속	NNG	63	complex 바다/NNG ᆺ/Z_SIOT 속/NNG 021223
 해남	NNP	63
 명창	NNG	63
 편집국장	NNG	63
@@ -16291,7 +16291,7 @@ LG화학	NNP	82
 지렁이	NNG	63
 울긋불긋	MAG	63
 배당금	NNG	63
-찻잔	NNG	63
+찻잔	NNG	63	complex 차/NNG ᆺ/Z_SIOT 잔/NNG 010112
 갈무리	NNG	63
 동심	NNG	63
 남아	NNG	63
@@ -16444,7 +16444,7 @@ LG화학	NNP	82
 예루살렘	NNP	62
 생가	NNG	62
 연전	NNG	62
-우스갯소리	NNG	62
+우스갯소리	NNG	62	complex 우스개/NNG ᆺ/Z_SIOT 소리/NNG 032335
 상속세	NNG	62
 쇼팽	NNP	62
 연호	NNG	62
@@ -16497,7 +16497,7 @@ LG화학	NNP	82
 양편	NNG	62
 드높	VA	62
 지상전	NNG	62
-제삿날	NNG	62
+제삿날	NNG	62	complex 제사/NNG ᆺ/Z_SIOT 날/NNG 021223
 은행권	NNG	62
 정답	VA-I	62
 미래학	NNG	62
@@ -16778,7 +16778,7 @@ LG화학	NNP	82
 작품집	NNG	60
 다니엘	NNP	60
 취기	NNG	60
-빨랫줄	NNG	60
+빨랫줄	NNG	60	complex 빨래/NNG ᆺ/Z_SIOT 줄/NNG 021223
 나뒹굴	VV	60
 뜨락	NNG	60
 수출국	NNG	60
@@ -16908,7 +16908,7 @@ LG화학	NNP	82
 유실	NNG	59
 초선	NNG	59
 시험장	NNG	59
-마룻바닥	NNG	59
+마룻바닥	NNG	59	complex 마루/NNG ᆺ/Z_SIOT 바닥/NNG 021224
 일주	NNG	59
 우표	NNG	59
 강서구	NNP	59
@@ -17142,7 +17142,7 @@ LG화학	NNP	82
 한·일	NNP	58
 초겨울	NNG	58
 난색	NNG	58
-보랏빛	NNG	58
+보랏빛	NNG	58	complex 보라/NNG ᆺ/Z_SIOT 빛/NNG 021223
 병리학	NNG	58
 줄리엣	NNP	58
 악장	NNG	58
@@ -17250,7 +17250,7 @@ LG화학	NNP	82
 센카쿠	NNP	57
 댓가	NNG	57
 상술	NNG	57
-판잣집	NNG	57
+판잣집	NNG	57	complex 판자/NNG ᆺ/Z_SIOT 집/NNG 021223
 으란	ETM	57	non_vowel	==란
 마지않	VX	57
 뻘겋	VA-I	57	=빨갛
@@ -17679,7 +17679,7 @@ LG화학	NNP	82
 삼성증권	NNP	55
 폭발물	NNG	55
 상공인	NNG	55
-노랫말	NNG	55
+노랫말	NNG	55	complex 노래/NNG ᆺ/Z_SIOT 말/NNG 021223
 남몰래	MAG	55
 뒷돈	NNG	55
 하나	NNP	55
@@ -17866,7 +17866,8 @@ LG화학	NNP	82
 행선지	NNG	54
 고리	NNP	54
 아디다스	NNP	54
-지렛대	NNG	54
+지레	NNG	54
+지렛대	NNG	54	complex 지레/NNG ᆺ/Z_SIOT 대/NNB 021223
 포퓰리즘	NNG	54
 여자부	NNG	54
 애석	NNG	54
@@ -18098,7 +18099,7 @@ LG화학	NNP	82
 건널목	NNG	53
 손목시계	NNG	53
 근년	NNG	53
-담뱃갑	NNG	53
+담뱃갑	NNG	53	complex 담배/NNG ᆺ/Z_SIOT 갑/NNG 021223
 탁아	NNG	53
 대각선	NNG	53
 국수주의	NNG	53
@@ -18268,7 +18269,7 @@ LG화학	NNP	82
 실토	NNG	52
 운동원	NNG	52
 대리모	NNG	52
-고갯길	NNG	52
+고갯길	NNG	52	complex 고개/NNG ᆺ/Z_SIOT 길/NNG 021223
 부연	NNG	52
 중의	NNG	52
 한신	NNP	52
@@ -18303,7 +18304,7 @@ LG화학	NNP	82
 무술	NNG	52
 대번에	MAG	52
 방아쇠	NNG	52
-바닷바람	NNG	52
+바닷바람	NNG	52	complex 바다/NNG ᆺ/Z_SIOT 바람/NNG 021224
 빅딜	NNG	52
 혀	VV	52	=하
 젤	NNG	52
@@ -18317,7 +18318,7 @@ LG화학	NNP	82
 비탈지	VA	52	complex 비탈/NNG 지/VV 0223
 원저	NNG	52
 서북쪽	NNG	52
-이삿짐	NNG	52
+이삿짐	NNG	52	complex 이사/NNG ᆺ/Z_SIOT 짐/NNG 021223
 웃옷	NNG	52
 운세	NNG	52
 무력감	NNG	52
@@ -18502,7 +18503,7 @@ LG화학	NNP	82
 테	NNG	51
 사사	NNG	51
 기획실	NNG	51
-나룻배	NNG	51
+나룻배	NNG	51	complex 나루/NNG ᆺ/Z_SIOT 배/NNG 021223
 총성	NNG	51
 장길산	NNP	51
 침상	NNG	51
@@ -18518,7 +18519,7 @@ LG화학	NNP	82
 신진대사	NNG	51
 왕후	NNG	51
 강경	NNP	51
-치맛자락	NNG	51
+치맛자락	NNG	51	complex 치마/NNG ᆺ/Z_SIOT 자락/NNG 021224
 피부병	NNG	51
 좀체	MAG	51
 뒤따라오	VV	51	complex 뒤따르/VV 어/EC 오/VX 032334
@@ -18599,7 +18600,7 @@ LG화학	NNP	82
 아무래두	MAG	50	=아무래도
 근대사	NNG	50
 제패	NNG	50
-골칫거리	NNG	50
+골칫거리	NNG	50	complex 골치/NNG ᆺ/Z_SIOT 거리/NNG 021224
 유쾌	NNG	50
 덜덜	MAG	50
 비리	VA	50
@@ -18701,7 +18702,7 @@ AP통신	NNP	50
 리허설	NNG	50
 홍길동전	NNP	50
 북동부	NNG	50
-담뱃불	NNG	50
+담뱃불	NNG	50	complex 담배/NNG ᆺ/Z_SIOT 불/NNG 021223
 모터쇼	NNG	50
 경제특구	NNG	50
 난립	NNG	50
@@ -18710,7 +18711,7 @@ AP통신	NNP	50
 격앙	NNG	50
 악덕	NNG	50
 골잡이	NNG	50
-뱃길	NNG	50
+뱃길	NNG	50	complex 배/NNG ᆺ/Z_SIOT 길/NNG 010112
 반가움	NNG	50	complex 반갑/VA-I 음/ETN 0323
 지하도	NNG	50
 진수	NNG	50
@@ -18740,7 +18741,7 @@ AP통신	NNP	50
 상대국	NNG	50
 품속	NNG	50
 몰려나오	VV	50	complex 몰리/VV 어/EC 나오/VV 021224
-귓전	NNG	50
+귓전	NNG	50	complex 귀/NNG ᆺ/Z_SIOT 전/NNG 010112
 근속	NNG	50
 면도	NNG	50
 카타르시스	NNG	50
@@ -18782,7 +18783,7 @@ AP통신	NNP	50
 유클리드	NNP	50
 오누이	NNG	50
 시큰둥	XR	50
-외갓집	NNG	50
+외갓집	NNG	50	complex 외가/NNG ᆺ/Z_SIOT 집/NNG 021223
 솔깃	XR	50
 다차원	NNG	50
 난장이	NNG	50
@@ -19220,7 +19221,7 @@ AP통신	NNP	50
 조례안	NNG	48
 예배당	NNG	48
 장기수	NNG	48
-뱃전	NNG	48
+뱃전	NNG	48	complex 배/NNG ᆺ/Z_SIOT 전/NNG 010112
 노닐	VV	48
 득실	NNG	48
 구두닦이	NNG	48
@@ -19455,7 +19456,7 @@ AP통신	NNP	50
 안중	NNG	47
 럭키	NNP	47
 각시	NNG	47
-전깃불	NNG	47
+전깃불	NNG	47	complex 전기/NNG ᆺ/Z_SIOT 불/NNG 021223
 관세청	NNG	47
 군상	NNG	47
 생물종	NNG	47
@@ -19467,7 +19468,7 @@ AP통신	NNP	50
 색종이	NNG	47
 함흥	NNP	47
 양민	NNG	47
-탯줄	NNG	47
+탯줄	NNG	47	complex 태/NNG ᆺ/Z_SIOT 줄/NNG 010112
 땡볕	NNG	47
 군신	NNG	47
 혈기	NNG	47
@@ -19946,7 +19947,7 @@ AP통신	NNP	50
 부지기수	NNG	45
 이인영	NNP	45
 세계보건기구	NNP	45
-이야깃거리	NNG	45
+이야깃거리	NNG	45	complex 이야기/NNG ᆺ/Z_SIOT 거리/NNB 032335
 종정	NNG	45
 자꾸나	EF	45
 뒷발	NNG	45
@@ -20323,7 +20324,7 @@ AP통신	NNP	50
 산비탈	NNG	44
 산허리	NNG	44
 돌덩이	NNG	44
-전봇대	NNG	44
+전봇대	NNG	44	complex 전보/NNG ᆺ/Z_SIOT 대/NNB 021223
 부석사	NNP	44
 곱절	NNG	44
 절구	NNG	44
@@ -21033,7 +21034,7 @@ AP통신	NNP	50
 뻐근	XR	41
 출고	NNG	41
 입씨름	NNG	41
-뼛속	NNG	41
+뼛속	NNG	41	complex 뼈/NNG ᆺ/Z_SIOT 속/NNG 010112
 빠리	NNP	41
 목도	NNG	41
 석좌	NNG	41
@@ -21555,7 +21556,7 @@ AP통신	NNP	50
 포레스터	NNP	40
 동강	NNP	40
 머쓱	XR	40
-기왓장	NNG	40
+기왓장	NNG	40	complex 기와/NNG ᆺ/Z_SIOT 장/NNG 021223
 아태재단	NNP	40
 신경증	NNG	40
 향리	NNG	40
@@ -21749,7 +21750,7 @@ AP통신	NNP	50
 남한강	NNP	39
 도살	NNG	39
 낄낄거리	VV	39	complex 낄낄/MAG 거리/XSV 0224
-아랫입술	NNG	39
+아랫입술	NNG	39	complex 아래/NNG ᆺ/Z_SIOT 입술/NNG 021224
 분투	NNG	39
 포	NNP	39
 김주영	NNP	39
@@ -21956,7 +21957,7 @@ GS칼텍스	NNP	39
 여담	NNG	38
 모멸	NNG	38
 운신	NNG	38
-장밋빛	NNG	38
+장밋빛	NNG	38	complex 장미/NNG ᆺ/Z_SIOT 빛/NNG 021223
 대게	NNG	38
 이유서	NNG	38
 연배	NNG	38
@@ -22161,7 +22162,7 @@ GS칼텍스	NNP	39
 정우성	NNP	38
 세도	NNG	38
 대추나무	NNG	38
-찻길	NNG	38
+찻길	NNG	38	complex 차/NNG ᆺ/Z_SIOT 길/NNG 010112
 후식	NNG	38
 극락전	NNG	38
 목회자	NNG	38
@@ -22205,7 +22206,7 @@ GS칼텍스	NNP	39
 남극	NNP	38
 등성이	NNG	38
 생시	NNG	38
-텃새	NNG	38
+텃새	NNG	38	complex 터/NNB ᆺ/Z_SIOT 새/NNG 010112
 입신	NNG	38
 빡빡	XR	38
 이태현	NNP	38
@@ -22218,7 +22219,7 @@ GS칼텍스	NNP	39
 문희	NNP	38
 군요	EC	38	complex 군/EC 요/JX 0112
 가상현실	NNG	38
-뱃사람	NNG	38
+뱃사람	NNG	38	complex 배/NNP ᆺ/Z_SIOT 사람/NNG 010113
 완력	NNG	38
 걷어올리	VV	38	complex 걷/VV-R 어/EC 올리/VV 011224
 칙칙	XR	38
@@ -22492,7 +22493,7 @@ GS칼텍스	NNP	39
 단란	XR	37
 플랑드르	NNP	37
 풀숲	NNG	37
-잿더미	NNG	37
+잿더미	NNG	37	complex 재/NNG ᆺ/Z_SIOT 더미/NNG 010113
 뒷간	NNG	37
 개화기	NNG	37
 흡혈귀	NNG	37
@@ -22516,13 +22517,13 @@ GS칼텍스	NNP	39
 음침	XR	37
 저돌	XR	37
 갸륵	XR	37
-잿물	NNG	37
+잿물	NNG	37	complex 재/NNG ᆺ/Z_SIOT 물/NNG 010112
 꽃씨	NNG	37
 봄	NNP	37
 로구나	EC	37
 정인	NNP	37
 씩씩거리	VV	37	complex 씩씩/MAG 거리/XSV 0224
-바짓가랑이	NNG	37
+바짓가랑이	NNG	37	complex 바지/NNG ᆺ/Z_SIOT 가랑이/NNG 021225
 선연	XR	37
 귀머거리	NNG	37
 읍성	NNG	37
@@ -22654,7 +22655,7 @@ GS칼텍스	NNP	39
 자연사	NNG	36
 지법	NNG	36
 치료사	NNG	36
-먼젓번	NNG	36
+먼젓번	NNG	36	complex 먼저/NNG ᆺ/Z_SIOT 번/NNB 021223
 수레바퀴	NNG	36
 경영난	NNG	36
 사가	NNG	36
@@ -22827,7 +22828,7 @@ GS칼텍스	NNP	39
 간증	NNG	36
 마닐라	NNP	36
 또렷이	MAG	36	complex 또렷/XR 이/XSM 0223
-호숫가	NNG	36
+호숫가	NNG	36	complex 호수/NNG ᆺ/Z_SIOT 가/NNG 021223
 소렌스탐	NNP	36
 흘러오	VV	36	complex 흐르/VV 어/EC 오/VX 011223
 행궁	NNG	36
@@ -22895,17 +22896,17 @@ GS칼텍스	NNP	39
 노랑이	NNP	36
 후닥닥	MAG	36
 미세	XR	36
-귓바퀴	NNG	36
+귓바퀴	NNG	36	complex 귀/NNG ᆺ/Z_SIOT 바퀴/NNG 010113
 야트막	XR	36
 ᆯ락	EC	36	vocalic
 빳빳	XR	36
-자줏빛	NNG	36
+자줏빛	NNG	36	complex 자주/NNG ᆺ/Z_SIOT 빛/NNG 021223
 까마득히	MAG	36	complex 까마득/XR 히/XSM 0334
 태수	NNP	36
 지세	NNG	36
 쥐새끼	NNG	36
 쥑이	VV	36
-담뱃대	NNG	36
+담뱃대	NNG	36	complex 담배/NNG ᆺ/Z_SIOT 대/NNB 021223
 따르릉	MAG	36
 기흥성	NNP	36
 분급	NNG	36
@@ -23198,7 +23199,7 @@ GS칼텍스	NNP	39
 풍차	NNG	35
 활엽수	NNG	35
 꼬치꼬치	MAG	35
-번갯불	NNG	35
+번갯불	NNG	35	complex 번개/NNG ᆺ/Z_SIOT 불/NNG 021223
 보습	NNG	35
 빅터	NNP	35
 풀꽃	NNG	35
@@ -23458,7 +23459,7 @@ GS칼텍스	NNP	39
 홍명희	NNP	34
 브루스	NNP	34
 지단	NNP	34
-가짓수	NNG	34
+가짓수	NNG	34	complex 가지/NNG ᆺ/Z_SIOT 수/NNG 021223
 무기질	NNG	34
 주사위	NNG	34
 들러붙	VV	34
@@ -23554,7 +23555,7 @@ GS칼텍스	NNP	39
 스프레이	NNG	34
 극소	NNG	34
 흰자위	NNG	34
-보릿고개	NNG	34
+보릿고개	NNG	34	complex 보리/NNG ᆺ/Z_SIOT 고개/NNG 021224
 산타	NNP	34
 술회	NNG	34
 말론	NNP	34
@@ -23676,7 +23677,7 @@ GS칼텍스	NNP	39
 발한	NNG	34
 수용액	NNG	34
 만다린	NNP	34
-귓속	NNG	34
+귓속	NNG	34	complex 귀/NNG ᆺ/Z_SIOT 속/NNG 010112
 육이오	NNP	34
 부엌일	NNG	34
 삼각형	NNG	34
@@ -23935,7 +23936,7 @@ SK그룹	NNP	33
 북송	NNG	33
 사회사	NNG	33
 틀어쥐	VV	33
-반딧불	NNG	33
+반딧불	NNG	33	complex 반디/NNG ᆺ/Z_SIOT 불/NNG 021223
 마이니치신문	NNP	33
 크리스토퍼	NNP	33
 원세훈	NNP	33
@@ -24786,7 +24787,7 @@ SK그룹	NNP	33
 할매	NNG	31
 배상금	NNG	31
 영사관	NNG	31
-세숫대야	NNG	31
+세숫대야	NNG	31	complex 세수/NNG ᆺ/Z_SIOT 대야/NNG 021224
 장작불	NNG	31
 푸른빛	NNG	31
 헬렌	NNP	31
@@ -24913,7 +24914,7 @@ SK그룹	NNP	33
 오두막집	NNG	31
 반반	XR	31
 살의	NNG	31
-동짓날	NNG	31
+동짓날	NNG	31	complex 동지/NNG ᆺ/Z_SIOT 날/NNG 021223
 허무감	NNG	31
 고독감	NNG	31
 솟을대문	NNG	31
@@ -25231,7 +25232,7 @@ SK그룹	NNP	33
 앙심	NNG	30
 피아트	NNP	30
 대상국	NNG	30
-먹잇감	NNG	30
+먹잇감	NNG	30	complex 먹이/NNG ᆺ/Z_SIOT 감/NNG 021223
 김유정	NNP	30
 세출	NNG	30
 설상가상	NNG	30
@@ -25482,7 +25483,7 @@ SK그룹	NNP	33
 든데	EC	29
 이천만	NR	29
 이십만	NR	29
-얘깃거리	NNG	29
+얘깃거리	NNG	29	complex 얘기/NNG ᆺ/Z_SIOT 거리/NNB 021224	=이야깃거리
 서로서로	MAG	29
 실권	NNG	29
 연희	NNP	29
@@ -25752,8 +25753,8 @@ CJ그룹	NNP	29
 상수원	NNG	29
 뜀박질	NNG	29
 누각	NNG	29
-방앗간	NNG	29
-미숫가루	NNG	29
+방앗간	NNG	29	complex 방아/NNG ᆺ/Z_SIOT 간/NNB 021223
+미숫가루	NNG	29	complex 미수/NNG ᆺ/Z_SIOT 가루/NNG 021224
 토씨	NNG	29
 혼절	NNG	29
 전원주택	NNG	29
@@ -25885,7 +25886,7 @@ CJ그룹	NNP	29
 헌데	MAG	29
 차일	NNG	29
 공출	NNG	29
-갯바닥	NNG	29
+갯바닥	NNG	29	complex 개/NNG ᆺ/Z_SIOT 바닥/NNG 010113
 파라미터	NNG	29
 파피루스	NNG	29
 돌이	NNP	29
@@ -26316,7 +26317,7 @@ CJ그룹	NNP	29
 치마저고리	NNG	28
 라도	EF	28
 소달구지	NNG	28
-샛길	NNG	28
+샛길	NNG	28	complex 새/NNG ᆺ/Z_SIOT 길/NNG 010112
 일연	NNP	28
 헤로인	NNG	28
 향수	NNP	28
@@ -26364,7 +26365,7 @@ CJ그룹	NNP	29
 또아리	NNG	28
 끙	MAG	28
 쌍칼	NNG	28
-혼잣소리	NNG	28
+혼잣소리	NNG	28	complex 혼자/NNG ᆺ/Z_SIOT 소리/NNG 021224
 초막	NNG	28
 상쇠	NNG	28
 조원	NNG	28
@@ -26638,7 +26639,7 @@ CJ그룹	NNP	29
 얼간이	NNG	27
 북두칠성	NNG	27
 이형택	NNP	27
-뱃머리	NNG	27
+뱃머리	NNG	27	complex 배/NNG ᆺ/Z_SIOT 머리/NNG 010113
 현악기	NNG	27
 빌어먹	VV	27	complex 빌/VV 어/EC 먹/VX 011223
 일군	NNG	27
@@ -27224,7 +27225,7 @@ CJ그룹	NNP	29
 뒷심	NNG	26
 의성	NNP	26
 삼보	NNG	26
-서릿발	NNG	26
+서릿발	NNG	26	complex 서리/NNG ᆺ/Z_SIOT 발/NNG 021223
 흙바닥	NNG	26
 인내천	NNG	26
 궁녀	NNG	26
@@ -27292,7 +27293,7 @@ CJ그룹	NNP	29
 부랑자	NNG	26
 자양분	NNG	26
 벽두	NNG	26
-낚싯대	NNG	26
+낚싯대	NNG	26	complex 낚시/NNG ᆺ/Z_SIOT 대/NNB 021223
 유휴	NNG	26
 고환	NNG	26
 생모	NNG	26
@@ -27331,7 +27332,7 @@ CJ그룹	NNP	29
 일왕	NNG	26
 근신	NNG	26
 소수점	NNG	26
-텃세	NNG	26
+텃세	NNG	26	complex 터/NNG ᆺ/Z_SIOT 세/NNG 010112
 그로테스크	NNG	26
 수막	NNG	26
 공사채	NNG	26
@@ -27434,7 +27435,7 @@ CJ그룹	NNP	29
 천덕꾸러기	NNG	26
 수출상	NNG	26
 생명수	NNG	26
-잔칫집	NNG	26
+잔칫집	NNG	26	complex 잔치/NNG ᆺ/Z_SIOT 집/NNG 021223
 그믐	NNG	26
 하숙비	NNG	26
 주암	NNP	26
@@ -27678,7 +27679,7 @@ CJ그룹	NNP	29
 나인	NNG	25
 필기시험	NNG	25
 테드	NNP	25
-회삿돈	NNG	25
+회삿돈	NNG	25	complex 회사/NNG ᆺ/Z_SIOT 돈/NNG 021223
 카메룬	NNP	25
 농식품부	NNG	25
 과욕	NNG	25
@@ -28034,7 +28035,7 @@ CJ그룹	NNP	29
 옷본	NNG	25
 도리아	NNG	25
 바윗돌	NNG	25
-뼛가루	NNG	25
+뼛가루	NNG	25	complex 뼈/NNG ᆺ/Z_SIOT 가루/NNG 010113
 간이역	NNG	25
 직업윤리	NNG	25
 차주사	NNG	25
@@ -28201,7 +28202,7 @@ CJ그룹	NNP	29
 현미밥	NNG	24
 등치	NNG	24
 스카이	NNG	24
-담뱃값	NNG	24
+담뱃값	NNG	24	complex 담배/NNG ᆺ/Z_SIOT 값/NNG 021223
 입학금	NNG	24
 는다는데	EC	24	non_vowel	non_adj	==ᆫ다는데
 샤넬	NNP	24
@@ -28668,7 +28669,7 @@ LG유플러스	NNP	24
 쿼크	NNG	24
 힌두	NNG	24
 파리	XR	24
-어깻죽지	NNG	24
+어깻죽지	NNG	24	complex 어깨/NNG ᆺ/Z_SIOT 죽지/NNG 021224
 떠가	VV	24
 망망	XR	24
 벤야민	NNP	24
@@ -29032,7 +29033,7 @@ LG유플러스	NNP	24
 스노보드	NNG	23
 북한강	NNP	23
 햇발	NNG	23
-전셋값	NNG	23
+전셋값	NNG	23	complex 전세/NNG ᆺ/Z_SIOT 값/NNG 021223
 케이비	NNP	23
 그린	NNP	23
 인턴사원	NNG	23
@@ -29437,7 +29438,7 @@ LG유플러스	NNP	24
 ᆫ겨	EF	23	vocalic
 ᆫ댜	EF	23	vocalic
 득달같이	MAG	23
-모깃불	NNG	23
+모깃불	NNG	23	complex 모기/NNG ᆺ/Z_SIOT 불/NNG 021223
 낙화	NNG	23
 창작과비평	NNP	23
 병석	NNP	23
@@ -30120,7 +30121,7 @@ LG유플러스	NNP	24
 요물	NNG	22
 나약	XR	22
 구려	EC	22
-뱃사공	NNG	22
+뱃사공	NNG	22	complex 배/NNG ᆺ/Z_SIOT 사공/NNG 010113
 이글이글	MAG	22
 뻐꾹	MAG	22
 남존여비	NNG	22
@@ -30143,7 +30144,7 @@ LG유플러스	NNP	24
 명애	NNP	22
 강병	NNG	22
 전시과	NNG	22
-찻간	NNG	22
+찻간	NNG	22	complex 차/NNG ᆺ/Z_SIOT 간/NNB 010112
 무도회	NNG	22
 에테르	NNG	22
 아도	EF	22
@@ -30163,7 +30164,7 @@ LG유플러스	NNP	24
 곰보	NNG	22
 해매포구	NNP	22
 지라우	EF	22
-유릿조각	NNG	22
+유릿조각	NNG	22	complex 유리/NNG ᆺ/Z_SIOT 조각/NNG 021224
 금생	NNG	22
 행길	NNG	22
 꼭두새벽	NNG	22
@@ -31181,7 +31182,7 @@ LG유플러스	NNP	24
 가공식품	NNG	20
 원형질	NNG	20
 심청전	NNP	20
-콧잔등	NNG	20
+콧잔등	NNG	20	complex 코/NNG ᆺ/Z_SIOT 잔등/NNG 010113
 리조또	NNG	20
 스지	NNG	20
 잣가루	NNG	20
@@ -31545,7 +31546,7 @@ LG디스플레이	NNP	20
 장돌뱅이	NNG	20
 아이비엠	NNP	20
 동격	NNG	20
-날갯짓	NNG	20
+날갯짓	NNG	20	complex 날개/NNG ᆺ/Z_SIOT 짓/NNG 021223
 통설	NNG	20
 콘도미니엄	NNG	20
 부안군	NNP	20
@@ -31553,7 +31554,7 @@ LG디스플레이	NNP	20
 콘센트	NNG	20
 코네티컷	NNP	20
 군고구마	NNG	20
-잔칫날	NNG	20
+잔칫날	NNG	20	complex 잔치/NNG ᆺ/Z_SIOT 날/NNG 021223
 호봉	NNG	20
 시행자	NNG	20
 삼성의료원	NNP	20
@@ -31603,7 +31604,7 @@ LG디스플레이	NNP	20
 능금	NNG	20
 한길사	NNP	20
 말로	NNG	20
-낚싯줄	NNG	20
+낚싯줄	NNG	20	complex 낚시/NNG ᆺ/Z_SIOT 줄/NNG 021223
 남동	NNG	20
 영치	NNG	20
 주노	NNP	20
@@ -31722,7 +31723,7 @@ LG디스플레이	NNP	20
 감감	MAG	20
 게인	NNP	20
 초	NNP	20
-수돗가	NNG	20
+수돗가	NNG	20	complex 수도/NNG ᆺ/Z_SIOT 가/NNG 021223
 기든스	NNP	20
 계면쩍	VA	20
 알뜰히	MAG	20	complex 알뜰/XR 히/XSM 0223
@@ -31780,7 +31781,7 @@ LG디스플레이	NNP	20
 초조	XR	20
 파르스름	XR	20
 반가이	MAG	20	complex 반갑/VA-I 이/XSM 0223
-고깃배	NNG	20
+고깃배	NNG	20	complex 고기/NNG ᆺ/Z_SIOT 배/NNG 021223
 ᆫ다기에	EC	20	vocalic
 루즈	NNG	20
 목책	NNG	20
@@ -32037,10 +32038,10 @@ LG디스플레이	NNP	20
 마이크로소프트사	NNP	19
 흐음	IC	19
 유야무야	NNG	19
-처갓집	NNG	19
+처갓집	NNG	19	complex 처가/NNG ᆺ/Z_SIOT 집/NNG 021223
 해코지	NNG	19
 가구주	NNG	19
-허드렛일	NNG	19
+허드렛일	NNG	19	complex 허드레/NNG ᆺ/Z_SIOT 일/NNG 032334
 깜빡이	VV	19	complex 깜빡/MAG 이/XSV 0223
 친형	NNG	19
 쨍	MAG	19
@@ -32053,7 +32054,7 @@ LG디스플레이	NNP	20
 군바리	NNG	19
 격려금	NNG	19
 집권자	NNG	19
-고깃국	NNG	19
+고깃국	NNG	19	complex 고기/NNG ᆺ/Z_SIOT 국/NNG 021223
 흉칙	NNG	19
 교칙	NNG	19
 직사각형	NNG	19
@@ -32312,7 +32313,7 @@ SH공사	NNP	19
 아에프페	NNP	19
 장미란	NNP	19
 진노	NNG	19
-핏방울	NNG	19
+핏방울	NNG	19	complex 피/NNG ᆺ/Z_SIOT 방울/NNG 010113
 동성동본	NNG	19
 헬스케어	NNG	19
 라듐	NNG	19
@@ -32327,7 +32328,7 @@ SH공사	NNP	19
 머슴애	NNG	19
 농로	NNG	19
 폭스콘	NNP	19
-고갯마루	NNG	19
+고갯마루	NNG	19	complex 고개/NNG ᆺ/Z_SIOT 마루/NNG 021224
 면도기	NNG	19
 택리지	NNP	19
 격노	NNG	19
@@ -32340,7 +32341,7 @@ SH공사	NNP	19
 지회장	NNG	19
 축척	NNG	19
 투표일	NNG	19
-진돗개	NNG	19
+진돗개	NNG	19	complex 진도/NNG ᆺ/Z_SIOT 개/NNG 021223
 오현경	NNP	19
 안경테	NNG	19
 슬림	NNG	19
@@ -32465,7 +32466,7 @@ SH공사	NNP	19
 활동사진	NNG	19
 집적지	NNG	19
 최규선	NNP	19
-뼛조각	NNG	19
+뼛조각	NNG	19	complex 뼈/NNG ᆺ/Z_SIOT 조각/NNG 010113
 움베르토	NNP	19
 마그네틱	NNG	19
 시드	NNG	19
@@ -32654,7 +32655,7 @@ SH공사	NNP	19
 죽죽	MAG	19
 논둑길	NNG	19
 연통	NNG	19
-바짓단	NNG	19
+바짓단	NNG	19	complex 바지/NNG ᆺ/Z_SIOT 단/NNG 021223
 중심선	NNG	19
 권리자	NNG	19
 당행	NNG	19
@@ -32717,7 +32718,7 @@ SH공사	NNP	19
 장바닥	NNG	19
 급살	NNG	19
 날파리	NNG	19
-뱃가죽	NNG	19
+뱃가죽	NNG	19	complex 배/NNG ᆺ/Z_SIOT 가죽/NNG 010113
 연탄불	NNG	19
 졸작	NNG	19
 까까	NNG	19
@@ -32947,7 +32948,7 @@ SH공사	NNP	19
 짓무르	VV	18
 초경	NNG	18
 솜방망이	NNG	18
-김칫국물	NNG	18
+김칫국물	NNG	18	complex 김치/NNG ᆺ/Z_SIOT 국물/NNG 021224
 호호	IC	18
 군단장	NNG	18
 배선	NNG	18
@@ -33039,7 +33040,7 @@ SH공사	NNP	19
 허드슨	NNP	18
 맥	NNP	18
 인명사전	NNG	18
-종잇장	NNG	18
+종잇장	NNG	18	complex 종이/NNG ᆺ/Z_SIOT 장/NNG 021223
 지소연	NNP	18
 이외수	NNP	18
 김재철	NNP	18
@@ -33379,9 +33380,9 @@ SH공사	NNP	19
 하관	NNG	18
 맨틀	NNG	18
 텔레뱅킹	NNG	18
-장삿속	NNG	18
+장삿속	NNG	18	complex 장사/NNG ᆺ/Z_SIOT 속/NNG 021223
 무교동	NNP	18
-예삿일	NNG	18
+예삿일	NNG	18	complex 예사/NNG ᆺ/Z_SIOT 일/NNG 021223
 외손녀	NNG	18
 총무부	NNG	18
 계엄군	NNG	18
@@ -33547,7 +33548,7 @@ SH공사	NNP	19
 신산	NNG	18
 흰구름	NNG	18
 나지막이	MAG	18
-노랫가락	NNG	18
+노랫가락	NNG	18	complex 노래/NNG ᆺ/Z_SIOT 가락/NNG 021224
 매표원	NNG	18
 가증	XR	18
 비지땀	NNG	18
@@ -33617,7 +33618,7 @@ SH공사	NNP	19
 허약	XR	18
 관솔	NNG	18
 오붓	XR	18
-부챗살	NNG	18
+부챗살	NNG	18	complex 부채/NNG ᆺ/Z_SIOT 살/NNG 021223
 문예반	NNG	18
 휘	MAG	18
 빈뇨	NNG	18
@@ -33700,7 +33701,7 @@ SH공사	NNP	19
 시다이	NNG	18
 속적삼	NNG	18
 환난	NNG	18
-난롯가	NNG	18
+난롯가	NNG	18	complex 난로/NNG ᆺ/Z_SIOT 가/NNG 021223
 시찰구	NNG	18
 병섭이	NNP	18
 작은할머니	NNG	18
@@ -33917,7 +33918,7 @@ SH공사	NNP	19
 벙긋	MAG	17
 십시일반	NNG	17
 물리학과	NNG	17
-치맛바람	NNG	17
+치맛바람	NNG	17	complex 치마/NNG ᆺ/Z_SIOT 바람/NNG 021224
 분무기	NNG	17
 중앙공원	NNP	17
 후라이	NNG	17
@@ -34683,7 +34684,7 @@ SH공사	NNP	19
 씨근거리	VV	17
 이럭저럭	MAG	17
 등덜미	NNG	17
-담뱃가루	NNG	17
+담뱃가루	NNG	17	complex 담배/NNG ᆺ/Z_SIOT 가루/NNG 021224
 오죽이나	MAG	17
 사미	NNG	17
 시에미	NNG	17
@@ -34722,7 +34723,7 @@ SH공사	NNP	19
 하악	NNG	17
 선옥이	NNP	17
 안길	NNG	17
-객줏집	NNG	17
+객줏집	NNG	17	complex 객주/NNG ᆺ/Z_SIOT 집/NNG 021223
 쭈르르	MAG	17
 부엌데기	NNG	17
 악기점	NNG	17
@@ -34764,7 +34765,7 @@ SH공사	NNP	19
 지권련초	NNG	17
 엽연초	NNG	17
 죽바위	NNP	17
-초하룻날	NNG	17
+초하룻날	NNG	17	complex 초하루/NNG ᆺ/Z_SIOT 날/NNG 032334
 강신무	NNG	17
 가라사대	VV	17
 주관주의	NNG	17
@@ -35270,7 +35271,7 @@ SH공사	NNP	19
 투표용지	NNG	16
 으나마	EC	16	non_vowel	==나마
 피팅	NNG	16
-가운뎃손가락	NNG	16
+가운뎃손가락	NNG	16	complex 가운데/NNG ᆺ/Z_SIOT 손가락/NNG 032336
 과학실	NNG	16
 군번	NNG	16
 론칭	NNG	16
@@ -35284,7 +35285,7 @@ SH공사	NNP	19
 공론화위	NNG	16
 다홍치마	NNG	16
 광교산	NNP	16
-존댓말	NNG	16
+존댓말	NNG	16	complex 존대/NNG ᆺ/Z_SIOT 말/NNG 021223
 김정훈	NNP	16
 평화시장	NNP	16
 옥석	NNG	16
@@ -35354,7 +35355,7 @@ SH공사	NNP	19
 모잠비크	NNP	16
 마르크	NNP	16
 골리	VV	16
-고갯짓	NNG	16
+고갯짓	NNG	16	complex 고개/NNG ᆺ/Z_SIOT 짓/NNG 021223
 승우	NNP	16
 커튼콜	NNG	16
 출금	NNG	16
@@ -35401,7 +35402,7 @@ SH공사	NNP	19
 특별기	NNG	16
 마르코	NNP	16
 해풍	NNG	16
-구릿빛	NNG	16
+구릿빛	NNG	16	complex 구리/NNG ᆺ/Z_SIOT 빛/NNG 021223
 승하	NNG	16
 천주교도	NNG	16
 후불	NNG	16
@@ -35444,7 +35445,7 @@ SH공사	NNP	19
 선저우	NNP	16
 경애	NNG	16
 유니버스	NNG	16
-핏덩어리	NNG	16
+핏덩어리	NNG	16	complex 피/NNG ᆺ/Z_SIOT 덩어리/NNG 010114
 글로리아	NNP	16
 이율곡	NNP	16
 조각나	VV	16	complex 조각/NNG 나/VV 0223
@@ -35527,7 +35528,7 @@ SH공사	NNP	19
 카이사르	NNP	16
 는단다	EF	16	non_vowel	non_adj	==ᆫ단다
 밝기	NNG	16
-사잇돌	NNP	16
+사잇돌	NNP	16	complex 사이/NNG ᆺ/Z_SIOT 돌/NNG 021223
 수입금	NNG	16
 컴맹	NNG	16
 동성연애	NNG	16
@@ -35555,7 +35556,7 @@ SH공사	NNP	19
 술타령	NNG	16
 그쯤	NNG	16
 그루지야	NNP	16
-사잇길	NNG	16
+사잇길	NNG	16	complex 사이/NNG ᆺ/Z_SIOT 길/NNG 021223
 일테면	MAG	16
 통산성	NNG	16
 집산지	NNG	16
@@ -35592,7 +35593,7 @@ SH공사	NNP	19
 근소	XR	16
 국제무대	NNG	16
 농지세	NNG	16
-화젯거리	NNG	16
+화젯거리	NNG	16	complex 화제/NNG ᆺ/Z_SIOT 거리/NNG 021224
 새롬	NNP	16
 월초	NNG	16
 모터스	NNP	16
@@ -35659,7 +35660,7 @@ SH공사	NNP	19
 과	XR	16
 청과물	NNG	16
 머드	NNG	16
-수근	XR	16 =수군
+수근	XR	16	=수군
 수근거리	VV	16	complex 수근/XR 거리/XSV 0224
 곤	XR	16
 녹색평화당	NNP	16
@@ -35816,7 +35817,7 @@ SH공사	NNP	19
 귀울음	NNG	16
 알아먹	VV	16	complex 알/VV 어/EC 먹/VX 011223
 신비주의자	NNG	16
-핏덩이	NNG	16
+핏덩이	NNG	16	complex 피/NNG ᆺ/Z_SIOT 덩이/NNG 010113
 싸리문	NNG	16
 이딸리아	NNP	16
 어련히	MAG	16	complex 어련/XR 히/XSM 0223
@@ -35842,7 +35843,7 @@ SH공사	NNP	19
 등걸	NNG	16
 으며	EF	16	non_vowel	==며
 들입다	MAG	16
-부둣가	NNG	16
+부둣가	NNG	16	complex 부두/NNG ᆺ/Z_SIOT 가/NNG 021223
 는고	EF	16	non_adj	=는가
 오이다	EF	16	vocalic	==소이다
 첩첩	MAG	16
@@ -36194,7 +36195,7 @@ SH공사	NNP	19
 물심양면	NNG	15
 구기	NNG	15
 임수정	NNP	15
-부싯돌	NNG	15
+부싯돌	NNG	15	complex 부시/NNP ᆺ/Z_SIOT 돌/NNG 021223
 암거래	NNG	15
 리플리	NNP	15
 제시카	NNP	15
@@ -36417,7 +36418,7 @@ ING생명	NNP	15
 상조업체	NNG	15
 로널드	NNP	15
 열쇠고리	NNG	15
-고깃덩어리	NNG	15
+고깃덩어리	NNG	15	complex 고기/NNG ᆺ/Z_SIOT 덩어리/NNG 021225
 치어리더	NNG	15
 롯데홀딩스	NNP	15
 향년	NNG	15
@@ -36726,7 +36727,7 @@ LH공사	NNP	15
 한체대	NNP	15
 내치	NNG	15
 시찰단	NNG	15
-촛점	NNG	15
+촛점	NNG	15	complex 초/NNB ᆺ/Z_SIOT 점/NNG 010112
 문산	NNP	15
 매카시	NNP	15
 탈출증	NNG	15
@@ -36786,7 +36787,7 @@ LH공사	NNP	15
 홈스테이	NNG	15
 심방	NNG	15
 장마비	NNG	15
-사윗감	NNG	15
+사윗감	NNG	15	complex 사위/NNG ᆺ/Z_SIOT 감/NNG 021223
 천연색	NNG	15
 호암아트홀	NNP	15
 설빔	NNG	15
@@ -37002,8 +37003,8 @@ LH공사	NNP	15
 ᆫ다나	EF	15	vocalic
 매무새	NNG	15
 던걸요	EF	15	complex 던걸/EF 요/JX 0223
-뱃심	NNG	15
-조갯살	NNG	15
+뱃심	NNG	15	complex 배/NNG ᆺ/Z_SIOT 심/NNG 010112
+조갯살	NNG	15	complex 조개/NNG ᆺ/Z_SIOT 살/NNG 021223
 노릇	XR	15
 크래커	NNG	15
 묵	VX	15
@@ -37028,7 +37029,7 @@ LH공사	NNP	15
 샤쓰	NNG	15
 부갑상선	NNG	15
 공급액	NNG	15
-머릿돌	NNG	15
+머릿돌	NNG	15	complex 머리/NNG ᆺ/Z_SIOT 돌/NNG 021223
 사론	NNG	15
 실천가	NNG	15
 얼마든지	MAG	15
@@ -37101,7 +37102,7 @@ LH공사	NNP	15
 브라만	NNG	15
 콘스탄티노플	NNP	15
 간지럼	NNG	15
-가겟집	NNG	15
+가겟집	NNG	15	complex 가게/NNG ᆺ/Z_SIOT 집/NNG 021223
 넘겨짚	VV	15
 더냐고	EC	15
 저리로	MAG	15	complex 저리/MAG 로/XSM 0223
@@ -37117,7 +37118,7 @@ LH공사	NNP	15
 오라기	NNG	15
 지전	NNG	15
 밤새껏	MAG	15
-싱앗대	NNG	15
+싱앗대	NNG	15	complex 싱아/NNG ᆺ/Z_SIOT 대/NNB 021223
 보화	NNG	15
 씨아	NNG	15
 계급의식	NNG	15
@@ -37629,7 +37630,7 @@ LH공사	NNP	15
 구황	NNG	14
 르네	NNP	14
 속사포	NNG	14
-대폿집	NNG	14
+대폿집	NNG	14	complex 대포/NNG ᆺ/Z_SIOT 집/NNG 021223
 경성대	NNP	14
 해설가	NNG	14
 장원삼	NNP	14
@@ -37649,7 +37650,7 @@ LH공사	NNP	15
 총참모장	NNG	14
 동물학자	NNG	14
 시술법	NNG	14
-화롯불	NNG	14
+화롯불	NNG	14	complex 화로/NNG ᆺ/Z_SIOT 불/NNG 021223
 두산동아	NNP	14
 데이브	NNP	14
 나훈아	NNP	14
@@ -37806,7 +37807,7 @@ KB금융	NNP	14
 구호품	NNG	14
 뜀틀	NNG	14
 발트해	NNP	14
-담뱃재	NNG	14
+담뱃재	NNG	14	complex 담배/NNG ᆺ/Z_SIOT 재/NNG 021223
 미래에셋증권	NNP	14
 최태욱	NNP	14
 자유방임	NNG	14
@@ -37822,7 +37823,7 @@ KB금융	NNP	14
 학원가	NNG	14
 오삼바시	NNP	14
 김흥국	NNP	14
-뭉칫돈	NNG	14
+뭉칫돈	NNG	14	complex 뭉치/NNG ᆺ/Z_SIOT 돈/NNG 021223
 신재민	NNP	14
 육필	NNG	14
 이헌재	NNP	14
@@ -37848,7 +37849,7 @@ KB금융	NNP	14
 점용	NNG	14
 재택	NNG	14
 박기춘	NNP	14
-안갯속	NNG	14
+안갯속	NNG	14	complex 안개/NNG ᆺ/Z_SIOT 속/NNG 021223
 D사	NNG	14
 에콰도르	NNP	14
 윙	NNG	14
@@ -37890,7 +37891,7 @@ D사	NNG	14
 너덜	MAG	14
 너덜거리	VV	14	complex 너덜/MAG 거리/XSV 0224
 고쳐먹	VV	14	complex 고치/VV 어/EC 먹/VX 021223
-콧방귀	NNG	14
+콧방귀	NNG	14	complex 코/NNG ᆺ/Z_SIOT 방귀/NNG 010113
 수륙	NNG	14
 쌈밥	NNG	14
 경동시장	NNP	14
@@ -37927,7 +37928,7 @@ D사	NNG	14
 노역장	NNG	14
 성장위	NNG	14
 이방인	NNP	14
-뱃놀이	NNG	14
+뱃놀이	NNG	14	complex 배/NNG ᆺ/Z_SIOT 놀이/NNG 010113
 법망	NNG	14
 대부업	NNG	14
 말벌	NNG	14
@@ -38019,7 +38020,7 @@ D사	NNG	14
 기병	NNG	14
 판매고	NNG	14
 혈우병	NNG	14
-콧속	NNG	14
+콧속	NNG	14	complex 코/NNG ᆺ/Z_SIOT 속/NNG 010112
 톈궁	NNP	14
 냉각기	NNG	14
 하이쿠	NNG	14
@@ -38078,13 +38079,13 @@ D사	NNG	14
 벽사	NNG	14
 결항	NNG	14
 지시서	NNG	14
-바닷길	NNG	14
+바닷길	NNG	14	complex 바다/NNG ᆺ/Z_SIOT 길/NNG 021223
 일촌	NNG	14
 왕멍	NNP	14
 임부	NNG	14
 흐엉	NNP	14
 타스	NNP	14
-요릿집	NNG	14
+요릿집	NNG	14	complex 요리/NNG ᆺ/Z_SIOT 집/NNG 021223
 행선	NNG	14
 유기농법	NNG	14
 과총	NNP	14
@@ -38197,7 +38198,7 @@ D사	NNG	14
 은백색	NNG	14
 사서함	NNG	14
 침술	NNG	14
-배춧잎	NNG	14
+배춧잎	NNG	14	complex 배추/NNG ᆺ/Z_SIOT 잎/NNG 021223
 압축기	NNG	14
 한국정신문화연구원	NNP	14
 자리공	NNG	14
@@ -38333,7 +38334,7 @@ D사	NNG	14
 출판업자	NNG	14
 희비극	NNG	14
 곡산	NNP	14
-연둣빛	NNG	14
+연둣빛	NNG	14	complex 연두/NNG ᆺ/Z_SIOT 빛/NNG 021223
 선보	VV	14
 순	NNP	14
 특수학교	NNG	14
@@ -38524,7 +38525,7 @@ D사	NNG	14
 가오리연	NNG	14
 수암사	NNP	14
 부락민	NNG	14
-세숫물	NNG	14
+세숫물	NNG	14	complex 세수/NNG ᆺ/Z_SIOT 물/NNG 021223
 엇	EF	14
 톱날	NNG	14
 고누	NNG	14
@@ -38812,7 +38813,7 @@ X선	NNG	14
 떴다방	NNG	13
 초코파이	NNP	13
 빵꾸	NNG	13
-종갓집	NNG	13
+종갓집	NNG	13	complex 종가/NNG ᆺ/Z_SIOT 집/NNG 021223
 녜	EF	13
 뱀사골	NNP	13
 발발	MAG	13
@@ -38827,13 +38828,13 @@ X선	NNG	14
 파이팅	NNG	13
 상속자	NNG	13
 쇼	NNP	13
-뱃살	NNG	13
-순댓국	NNG	13
+뱃살	NNG	13	complex 배/NNG ᆺ/Z_SIOT 살/NNG 010112
+순댓국	NNG	13	complex 순대/NNG ᆺ/Z_SIOT 국/NNG 021223
 들여가	VV	13	complex 들이/VV 어/EC 가/VX 021223
 가람이	NNP	13
 곤지암	NNP	13
 조식	NNG	13
-잔칫상	NNG	13
+잔칫상	NNG	13	complex 잔치/NNG ᆺ/Z_SIOT 상/NNG 021223
 김수미	NNP	13
 부촌	NNG	13
 ᆯ러	EC	13	vocalic
@@ -39284,7 +39285,7 @@ LG아트센터	NNP	13
 유엔사	NNP	13
 라이더	NNG	13
 모피아	NNG	13
-샛별	NNG	13
+샛별	NNG	13	complex 새/NNG ᆺ/Z_SIOT 별/NNG 010112
 쪼그라들	VV	13
 나이스	NNG	13
 조립식	NNG	13
@@ -39500,7 +39501,7 @@ LG아트센터	NNP	13
 실내악단	NNG	13
 소매업자	NNG	13
 금산	NNG	13
-바닷모래	NNG	13
+바닷모래	NNG	13	complex 바다/NNG ᆺ/Z_SIOT 모래/NNG 021224
 피터스	NNP	13
 굴욕감	NNG	13
 용역비	NNG	13
@@ -39540,7 +39541,7 @@ LG아트센터	NNP	13
 혈맹	NNG	13
 전별금	NNG	13
 가렴주구	NNG	13
-농삿일	NNG	13
+농삿일	NNG	13	complex 농사/NNG ᆺ/Z_SIOT 일/NNG 021223
 금시초문	NNG	13
 하이젠베르크	NNP	13
 막새기와	NNG	13
@@ -40321,7 +40322,7 @@ NH농협은행	NNP	13
 조기	NP	12
 화기애애하	VA	12	complex 화기애애/XR 하/XSA 0445
 굴소스	NNG	12
-김칫국	NNG	12
+김칫국	NNG	12	complex 김치/NNG ᆺ/Z_SIOT 국/NNG 021223
 산뜻	MAG	12
 자그마하	VA	12	complex 자그마/XR 하/XSA 0334
 자잘하	VA	12	complex 자잘/XR 하/XSA 0223
@@ -40354,7 +40355,7 @@ NH농협은행	NNP	13
 일언지하	NNG	12
 홀가분하	VA	12	complex 홀가분/XR 하/XSA 0334
 미력	NNG	12
-머릿수	NNG	12
+머릿수	NNG	12	complex 머리/NNG ᆺ/Z_SIOT 수/NNG 021223
 골든타임	NNG	12
 오억	NR	12
 곡성	NNP	12
@@ -41421,7 +41422,7 @@ KB국민카드	NNP	12
 점액질	NNG	12
 청상과부	NNG	12
 와장창	MAG	12
-머릿기사	NNG	12
+머릿기사	NNG	12	complex 머리/NNG ᆺ/Z_SIOT 기사/NNG 021224
 헉헉대	VV	12	complex 헉헉/MAG 대/XSV 0223
 상기도	NNG	12
 볏	NNG	12
@@ -41474,7 +41475,7 @@ KB국민카드	NNP	12
 책머리	NNG	12
 스피노자	NNP	12
 지끈지끈	MAG	12
-전깃줄	NNG	12
+전깃줄	NNG	12	complex 전기/NNG ᆺ/Z_SIOT 줄/NNG 021223
 스포츠서울	NNP	12
 단학	NNG	12
 단주	NNG	12
@@ -41628,7 +41629,7 @@ KB국민카드	NNP	12
 불자동차	NNG	12
 누르스름	XR	12
 명치끝	NNG	12
-단춧구멍	NNG	12
+단춧구멍	NNG	12	complex 단추/NNG ᆺ/Z_SIOT 구멍/NNG 021224
 진탕	MAG	12
 진분홍	NNG	12
 리스트럭처링	NNG	12
@@ -41708,7 +41709,7 @@ KB국민카드	NNP	12
 우쭐거리	VV	12	complex 우쭐/MAG 거리/XSV 0224
 성숙	NNP	12
 말복	NNG	12
-화롯가	NNG	12
+화롯가	NNG	12	complex 화로/NNG ᆺ/Z_SIOT 가/NNG 021223
 성철이	NNP	12
 소정방	NNP	12
 수화제	NNG	12
@@ -41788,7 +41789,7 @@ KB국민카드	NNP	12
 잔월	NNG	12
 부월	NNG	12
 이잉	IC	12
-마룻장	NNG	12
+마룻장	NNG	12	complex 마루/NNG ᆺ/Z_SIOT 장/NNG 021223
 터수	NNG	12
 우로	NNG	12
 능구렁이	NNG	12
@@ -42431,7 +42432,7 @@ NG	NNP	12
 노구	NNG	11
 견책	NNG	11
 학교군	NNG	11
-주삿바늘	NNG	11
+주삿바늘	NNG	11	complex 주사/NNG ᆺ/Z_SIOT 바늘/NNG 021224
 우루무치	NNP	11
 자양동	NNP	11
 구상안	NNG	11
@@ -42465,7 +42466,7 @@ FC바르셀로나	NNP	11
 서바이벌	NNG	11
 지산	NNP	11
 완투	NNG	11
-장맛비	NNG	11
+장맛비	NNG	11	complex 장마/NNG ᆺ/Z_SIOT 비/NNG 021223
 민·관	NNG	11
 리언	NNP	11
 헤이워드	NNP	11
@@ -43711,7 +43712,7 @@ IMF	NNP	11
 길둥글	VA	11
 국화주	NNG	11
 간단명료	XR	11
-땟국	NNG	11
+땟국	NNG	11	complex 때/NNG ᆺ/Z_SIOT 국/NNG 010112
 세계상	NNG	11
 농고	NNG	11
 타당	NNG	11
@@ -43736,7 +43737,7 @@ IMF	NNP	11
 컴퍼스	NNG	11
 제일가	VV	11	complex 제일/MAG 가/VV 0223
 쇠파리	NNG	11
-남폿불	NNG	11
+남폿불	NNG	11	complex 남포/NNG ᆺ/Z_SIOT 불/NNG 021223
 라던	EC	11
 다마다요	EF	11	complex 다마다/EF 요/JX 0334
 송명애	NNP	11
@@ -43872,7 +43873,7 @@ IMF	NNP	11
 신역	NNG	11
 동극	NNG	11
 수지맞	VV	11	complex 수지/NNG 맞/VV 0223
-나잇살	NNG	11
+나잇살	NNG	11	complex 나이/NNG ᆺ/Z_SIOT 살/NNG 021223
 따듯	XR	11	=따뜻
 오강원	NNP	11
 대광	NNG	11
@@ -43969,7 +43970,7 @@ IMF	NNP	11
 전임지	NNG	11
 꽹매기	NNG	11
 비스코티	NNG	11
-담뱃가게	NNG	11
+담뱃가게	NNG	11	complex 담배/NNG ᆺ/Z_SIOT 가게/NNG 021224
 알렉쎄이	NNP	11
 헬프	NNG	11
 뚜	NNP	11
@@ -44044,7 +44045,7 @@ IMF	NNP	11
 태음력	NNG	11
 찬자	NNG	11
 셋골	NNP	11
-새텃말	NNP	11
+새텃말	NNP	11	complex 새터/NNP ᆺ/Z_SIOT 말/NNG 021223
 알곡	NNG	11
 양육자	NNG	11
 영부	NNG	11
@@ -44116,7 +44117,7 @@ IMF	NNP	11
 각루	NNG	11
 신당서	NNP	11
 앙련	NNG	11
-귓기둥	NNG	11
+귓기둥	NNG	11	complex 귀/NNG ᆺ/Z_SIOT 기둥/NNG 010113
 수다라장	NNP	11
 탈신	NNG	11
 포춘	NNP	11
@@ -44368,7 +44369,7 @@ IMF	NNP	11
 아이피	NNG	10
 으래	EF	10	non_vowel	==래
 엘이디	NNG	10
-세뱃돈	NNG	10
+세뱃돈	NNG	10	complex 세배/NNG ᆺ/Z_SIOT 돈/NNG 021223
 일박	NNG	10
 제육	NNG	10
 워너원	NNP	10
@@ -44627,7 +44628,7 @@ IMF	NNP	11
 양상문	NNP	10
 이졸데	NNP	10
 무주리조트	NNP	10
-열쇳말	NNG	10
+열쇳말	NNG	10	complex 열쇠/NNG ᆺ/Z_SIOT 말/NNG 021223
 제작국	NNG	10
 박수현	NNP	10
 개발업체	NNG	10
@@ -45308,7 +45309,7 @@ JP모건	NNP	10
 정한	NNG	10
 황병기	NNP	10
 조타수	NNG	10
-기삿거리	NNG	10
+기삿거리	NNG	10	complex 기사/NNG ᆺ/Z_SIOT 거리/NNG 021224
 유석	NNP	10
 무개차	NNG	10
 김진숙	NNP	10
@@ -45838,7 +45839,7 @@ JP모건	NNP	10
 속내의	NNG	10
 자연주의자	NNG	10
 큰마음	NNG	10
-찻값	NNG	10
+찻값	NNG	10	complex 차/NNG ᆺ/Z_SIOT 값/NNG 010112
 아서요	EC	10	complex 아서/EC 요/JX 0223
 제끼	VX	10
 정유진	NNP	10
@@ -45866,7 +45867,7 @@ JP모건	NNP	10
 명란젓	NNG	10
 오싹오싹	MAG	10
 전화비	NNG	10
-비눗물	NNG	10
+비눗물	NNG	10	complex 비누/NNG ᆺ/Z_SIOT 물/NNG 021223
 열위	NNG	10
 오버로크	NNG	10
 덧	NNG	10
@@ -46071,7 +46072,7 @@ JP모건	NNP	10
 전쟁놀이	NNG	10
 푸우	MAG	10
 창창	XR	10
-머릿결	NNG	10
+머릿결	NNG	10	complex 머리/NNG ᆺ/Z_SIOT 결/NNG 021223
 유물론자	NNG	10
 김학	NNP	10
 농구화	NNG	10
@@ -46080,7 +46081,7 @@ JP모건	NNP	10
 자주자주	MAG	10
 이상스레	MAG	10	complex 이상/NNG 스레/XSM 0224
 울바자	NNG	10
-쇳덩이	NNG	10
+쇳덩이	NNG	10	complex 쇠/NNG ᆺ/Z_SIOT 덩이/NNG 010113
 간난	NNP	10
 중대문	NNG	10
 비칠거리	VV	10
@@ -46109,7 +46110,7 @@ JP모건	NNP	10
 앙칼	NNG	10
 큰물	NNG	10
 ᆯ랍니다	EF	10	vocalic
-뱃바닥	NNG	10
+뱃바닥	NNG	10	complex 배/NNG ᆺ/Z_SIOT 바닥/NNG 010113
 쥐어지르	VV	10
 앙가슴	NNG	10
 찐드기	NNG	10
@@ -46135,7 +46136,7 @@ JP모건	NNP	10
 허위허위	MAG	10
 청루	NNG	10
 알음알이	NNG	10
-미싯가루	NNG	10
+미싯가루	NNG	10	complex 미시/NNG ᆺ/Z_SIOT 가루/NNG 021224	=미숫가루
 영마루	NNG	10
 취조실	NNG	10
 멫	MM	10
@@ -46153,7 +46154,7 @@ JP모건	NNP	10
 계교	NNG	10
 구녁	NNG	10
 여봐라	IC	10
-장삿길	NNG	10
+장삿길	NNG	10	complex 장사/NNG ᆺ/Z_SIOT 길/NNG 021223
 잡상	NNG	10
 큰길가	NNG	10
 첫아들	NNG	10
@@ -46305,7 +46306,7 @@ JP모건	NNP	10
 괴벽	NNG	10
 황채심	NNP	10
 쿨리	NNG	10
-날갯죽지	NNG	10
+날갯죽지	NNG	10	complex 날개/NNG ᆺ/Z_SIOT 죽지/NNG 021224
 널판	NNG	10
 덕원	NNP	10
 짐방	NNG	10
@@ -46585,7 +46586,7 @@ BBC	NNP	10
 밋밋하	VA	9	complex 밋밋/XR 하/XSA 0223
 에유	IC	9
 하우	IC	9
-고깃집	NNG	9
+고깃집	NNG	9	complex 고기/NNG ᆺ/Z_SIOT 집/NNG 021223
 자자	IC	9
 차우더	NNG	9
 요거트	NNG	9
@@ -46707,7 +46708,7 @@ BBC	NNP	10
 뜨개질	NNG	9
 인복	NNG	9
 꾸부리	VV	9
-쇳덩어리	NNG	9
+쇳덩어리	NNG	9	complex 쇠/NNG ᆺ/Z_SIOT 덩어리/NNG 010114
 보루	NNB	9
 ᆯ려다가	EC	9	vocalic	=려다가
 프라자	NNG	9
@@ -46814,7 +46815,7 @@ BBC	NNP	10
 개수대	NNG	9
 광어	NNG	9
 게살	NNG	9
-자릿세	NNG	9
+자릿세	NNG	9	complex 자리/NNG ᆺ/Z_SIOT 세/NNG 021223
 뭉게뭉게	MAG	9
 앤티크	NNG	9
 필링	NNG	9
@@ -46863,7 +46864,7 @@ BBC	NNP	10
 낙엽송	NNG	9
 상봉	NNP	9
 부머	NNG	9
-대푯값	NNG	9
+대푯값	NNG	9	complex 대표/NNG ᆺ/Z_SIOT 값/NNG 021223
 적재적소	NNG	9
 고위험군	NNG	9
 산학연	NNG	9
@@ -47290,7 +47291,7 @@ SK케미칼	NNP	9
 엄동	NNG	9
 아라뱃길	NNP	9
 김해을	NNP	9
-인삿말	NNG	9
+인삿말	NNG	9	complex 인사/NNG ᆺ/Z_SIOT 말/NNG 021223
 썸머	NNG	9
 지성	NNP	9
 한국교원단체총연합회	NNP	9
@@ -47371,7 +47372,7 @@ SK케미칼	NNP	9
 헤모글로빈	NNG	9
 지자체장	NNG	9
 자개	NNG	9
-우윳빛	NNG	9
+우윳빛	NNG	9	complex 우유/NNG ᆺ/Z_SIOT 빛/NNG 021223
 도란도란	MAG	9
 영안모자	NNP	9
 해외파	NNG	9
@@ -47427,7 +47428,7 @@ SK케미칼	NNP	9
 스노	NNP	9
 부유세	NNG	9
 한송이	NNP	9
-보릿자루	NNG	9
+보릿자루	NNG	9	complex 보리/NNG ᆺ/Z_SIOT 자루/NNG 021224
 이태란	NNP	9
 에드	NNP	9
 김창기	NNP	9
@@ -47567,7 +47568,7 @@ SK케미칼	NNP	9
 피터팬	NNP	9
 나폴리	NNP	9
 트레이싱	NNG	9
-고춧대	NNG	9
+고춧대	NNG	9	complex 고추/NNG ᆺ/Z_SIOT 대/NNB 021223
 당께	EF	9
 숭악	NNG	9
 도검	NNG	9
@@ -48285,7 +48286,7 @@ SK케미칼	NNP	9
 혜강	NNP	9
 제각기	NNG	9
 미노타우로스	NNP	9
-소맷자락	NNG	9
+소맷자락	NNG	9	complex 소매/NNG ᆺ/Z_SIOT 자락/NNG 021224
 파토스	NNG	9
 박상민	NNP	9
 오뇌	NNG	9
@@ -48322,7 +48323,7 @@ SK케미칼	NNP	9
 헝클어뜨리	VV	9	complex 헝클/VV 어/EC 뜨리/XSV 022335
 라든	EC	9
 북제주	NNP	9
-갯바위	NNG	9
+갯바위	NNG	9	complex 개/NNG ᆺ/Z_SIOT 바위/NNG 010113
 공탁	NNG	9
 예보채	NNG	9
 통절	XR	9
@@ -48345,7 +48346,7 @@ SK케미칼	NNP	9
 에쵸티	NNP	9
 정악	NNG	9
 이용후생	NNG	9
-황톳길	NNG	9
+황톳길	NNG	9	complex 황토/NNG ᆺ/Z_SIOT 길/NNG 021223
 스크럼	NNG	9
 한국일보사	NNP	9
 삼인칭	NNG	9
@@ -48359,7 +48360,7 @@ SK케미칼	NNP	9
 구취	NNG	9
 옥이	NNP	9
 삼존	NNG	9
-뱃고동	NNG	9
+뱃고동	NNG	9	complex 배/NNG ᆺ/Z_SIOT 고동/NNG 010113
 미싱사	NNG	9
 유석춘	NNP	9
 배타주의	NNG	9
@@ -48494,7 +48495,7 @@ SK케미칼	NNP	9
 에델바이스	NNP	9
 군졸	NNG	9
 럼	NNG	9
-김칫독	NNG	9
+김칫독	NNG	9	complex 김치/NNG ᆺ/Z_SIOT 독/NNG 021223
 도	JC	9
 현격	XR	9
 지어먹	VV	9	complex 짓/VV-I 어/EC 먹/VV 021223
@@ -48638,8 +48639,8 @@ ABC	NNP	9
 막역	XR	9
 육순	NNG	9
 시작종	NNG	9
-동짓달	NNG	9
-머릿살	NNG	9
+동짓달	NNG	9	complex 동지/NNG ᆺ/Z_SIOT 달/NNG 021223
+머릿살	NNG	9	complex 머리/NNG ᆺ/Z_SIOT 살/NNG 021223
 비척거리	VV	9
 대철이	NNP	9
 상기	MAG	9
@@ -48650,7 +48651,7 @@ ABC	NNP	9
 무진	NNG	9
 백중날	NNG	9
 ᆫ댔자	EC	9	vocalic
-소줏병	NNG	9
+소줏병	NNG	9	complex 소주/NNG ᆺ/Z_SIOT 병/NNG 021223
 설봉	NNP	9
 한담	NNG	9
 나라말	NNG	9
@@ -48678,7 +48679,7 @@ ABC	NNP	9
 중상류	NNG	9
 국제어	NNG	9
 동남향	NNG	9
-가운뎃귀	NNG	9
+가운뎃귀	NNG	9	complex 가운데/NNG ᆺ/Z_SIOT 귀/NNG 032334
 림프액	NNG	9
 고토	NNG	9
 칠하	VV	9	complex 칠/NNG 하/XSV 0112
@@ -48816,7 +48817,7 @@ ABC	NNP	9
 재인	NNG	9
 시운	NNG	9
 똥값	NNG	9
-대갓집	NNG	9
+대갓집	NNG	9	complex 대가/NNG ᆺ/Z_SIOT 집/NNG 021223
 신약	NNP	9
 행하	NNG	9
 정중부	NNP	9
@@ -48825,7 +48826,7 @@ ABC	NNP	9
 재크나이프	NNG	9
 그치	NP	9
 사대문	NNG	9
-뼛골	NNG	9
+뼛골	NNG	9	complex 뼈/NNG ᆺ/Z_SIOT 골/NNG 010112
 흔들의자	NNG	9
 압바	NNG	9
 오그라붙	VV	9
@@ -48887,7 +48888,7 @@ ABC	NNP	9
 선견지명	NNG	9
 이기죽거리	VV	9
 경오	NNG	9
-촛농	NNG	9
+촛농	NNG	9	complex 초/NNB ᆺ/Z_SIOT 농/NNG 010112
 야죠	EF	9
 다는데요	EF	9	complex 다는데/EF 요/JX 0334
 중앙지	NNG	9
@@ -48918,7 +48919,7 @@ ABC	NNP	9
 거리거리	NNG	9
 으니라고	EF	9	non_vowel	==니라고
 들	NNB	9
-갈빗대	NNG	9
+갈빗대	NNG	9	complex 갈비/NNG ᆺ/Z_SIOT 대/NNB 021223
 볼따구니	NNG	9
 부탁드리	VV	9	complex 부탁/NNG 드리/VV 0224
 후산부	NNG	9
@@ -48972,7 +48973,7 @@ ABC	NNP	9
 클리토리스	NNG	9
 몰리에르	NNP	9
 울며불며	MAG	9
-찻물	NNG	9
+찻물	NNG	9	complex 차/NNG ᆺ/Z_SIOT 물/NNG 010112
 올시다	EC	9
 원구단	NNP	9
 기집	NNG	9
@@ -48986,7 +48987,7 @@ ABC	NNP	9
 어뀫	VA	9
 내리쪼이	VV	9	complex 내리/MAG 쪼이/VV 0224
 꽁댕이배	NNG	9
-갯일	NNG	9
+갯일	NNG	9	complex 개/NNG ᆺ/Z_SIOT 일/NNG 010112
 뜀	NNG	9
 아푸	VA	9
 부지중	NNG	9
@@ -49140,7 +49141,7 @@ ABC	NNP	9
 풍흉	NNG	9
 의례복	NNG	9
 단령	NNG	9
-깻묵	NNG	9
+깻묵	NNG	9	complex 깨/NNG ᆺ/Z_SIOT 묵/NNG 010112
 입동	NNG	9
 초헌	NNG	9
 아헌	NNG	9
@@ -49628,7 +49629,7 @@ ABC	NNP	9
 영남대학교	NNP	8
 던지요	EF	8	complex 던지/EF 요/JX 0223
 세부	NNP	8
-시쳇말	NNG	8
+시쳇말	NNG	8	complex 시체/NNG ᆺ/Z_SIOT 말/NNG 021223
 분류학	NNG	8
 사대강	NNG	8
 퇴계원	NNP	8
@@ -51055,7 +51056,7 @@ T맵	NNP	8
 옐로우	NNG	8
 멀칭	NNG	8
 밭작물	NNG	8
-빨랫비누	NNG	8
+빨랫비누	NNG	8	complex 빨래/NNG ᆺ/Z_SIOT 비누/NNG 021224
 중고품	NNG	8
 초신성	NNG	8
 명철	XR	8
@@ -51177,7 +51178,7 @@ T맵	NNP	8
 안데를레흐트	NNP	8
 셔우드	NNP	8
 냉철히	MAG	8	complex 냉철/XR 히/XSM 0223
-쇳조각	NNG	8
+쇳조각	NNG	8	complex 쇠/NNG ᆺ/Z_SIOT 조각/NNG 010113
 림팩	NNP	8
 고창	NNG	8
 떼먹	VV	8
@@ -51525,7 +51526,7 @@ T맵	NNP	8
 대식가	NNG	8
 뒷중심	NNG	8
 시침핀	NNG	8
-허릿감	NNG	8
+허릿감	NNG	8	complex 허리/NNG ᆺ/Z_SIOT 감/NNG 021223
 드르르	MAG	8
 선염	NNG	8
 나사못	NNG	8
@@ -51594,7 +51595,7 @@ T맵	NNP	8
 후줄근히	MAG	8	complex 후줄근/XR 히/XSM 0334
 떠듬거리	VV	8
 렴	EC	8	vocalic
-햇솜	NNG	8
+햇솜	NNG	8	complex 해/NNG ᆺ/Z_SIOT 솜/NNG 010112
 마주하	VV	8	complex 마주/MAG 하/XSV 0223
 종다리	NNG	8
 YMCA	NNP	8
@@ -51932,7 +51933,7 @@ YMCA	NNP	8
 으나마나	EC	8	non_vowel	==나마나
 밑둥치	NNG	8
 누렁이	NNG	8
-바윗덩이	NNG	8
+바윗덩이	NNG	8	complex 바위/NNG ᆺ/Z_SIOT 덩이/NNG 021224
 탄하	VV	8
 번듯이	MAG	8	complex 번듯/XR 이/XSM 0223
 주둥아리	NNG	8
@@ -52243,7 +52244,7 @@ YMCA	NNP	8
 병철이	NNP	8
 조회단	NNG	8
 덕주골	NNP	8
-잿덩어리	NNG	8
+잿덩어리	NNG	8	complex 재/NNG ᆺ/Z_SIOT 덩어리/NNG 010114
 발가숭이	NNG	8
 능	ETM	8
 아야	JKV	8	non_vowel	0.85
@@ -52285,7 +52286,7 @@ YMCA	NNP	8
 좌단	NNG	8
 곤지	NNG	8
 직금	NNG	8
-메줏가루	NNG	8
+메줏가루	NNG	8	complex 메주/NNG ᆺ/Z_SIOT 가루/NNG 021224
 노동량	NNG	8
 안태	NNG	8
 소만	NNG	8
@@ -52304,7 +52305,7 @@ YMCA	NNP	8
 현묘	NNG	8
 골계	NNG	8
 민중사	NNG	8
-오랏줄	NNG	8
+오랏줄	NNG	8	complex 오라/NNG ᆺ/Z_SIOT 줄/NNG 021223
 을시구	EC	8
 강일순	NNP	8
 킨테	NNP	8
@@ -52810,7 +52811,7 @@ YMCA	NNP	8
 누누히	MAG	7	=누누이
 드라니까	EF	7
 휴학계	NNG	7
-종갓집	NNP	7
+종갓집	NNP	7	complex 종가/NNG ᆺ/Z_SIOT 집/NNG 021223
 추리닝	NNG	7
 ᆯ래나	EF	7	vocalic	=려나
 안압	NNG	7
@@ -52828,7 +52829,7 @@ YMCA	NNP	8
 값하	VV	7	complex 값/NNG 하/XSV 0112
 느긋하	VA	7	complex 느긋/XR 하/XSA 0223
 워낙이	MAG	7
-여윳돈	NNG	7
+여윳돈	NNG	7	complex 여유/NNG ᆺ/Z_SIOT 돈/NNG 021223
 아울렛	NNG	7
 썸	NNG	7
 영통	NNP	7
@@ -52966,7 +52967,7 @@ YMCA	NNP	8
 소원	NNP	7
 팝페라	NNG	7
 킹사이즈	NNG	7
-맥줏집	NNG	7
+맥줏집	NNG	7	complex 맥주/NNG ᆺ/Z_SIOT 집/NNG 021223
 떡하니	MAG	7
 머쓱하	VA	7	complex 머쓱/XR 하/XSA 0223
 야시장	NNG	7
@@ -52994,7 +52995,7 @@ YMCA	NNP	8
 이어	NNG	7
 썬	NNG	7
 곱하기	NNG	7	complex 곱하/VV 기/ETN 0223
-등굣길	NNG	7
+등굣길	NNG	7	complex 등교/NNG ᆺ/Z_SIOT 길/NNG 021223
 유학원	NNG	7
 옥스퍼드대학	NNP	7
 블러드문	NNG	7
@@ -53031,7 +53032,7 @@ YMCA	NNP	8
 마이스터고	NNG	7
 농산어촌	NNG	7
 알부자	NNG	7
-종잣돈	NNG	7
+종잣돈	NNG	7	complex 종자/NNG ᆺ/Z_SIOT 돈/NNG 021223
 다제	NNG	7
 마에스터	NNG	7
 요오드	NNG	7
@@ -53884,7 +53885,7 @@ SK에너지	NNP	7
 답사기	NNG	7
 파안대소	NNG	7
 꼼장어	NNG	7
-갯장어	NNG	7
+갯장어	NNG	7	complex 개/NNG ᆺ/Z_SIOT 장어/NNG 010113
 대치초교	NNP	7
 통학로	NNG	7
 타워팰리스	NNP	7
@@ -54380,7 +54381,7 @@ STX그룹	NNP	7
 안암병원	NNP	7
 정암	NNP	7
 만원사례	NNG	7
-요샛말	NNG	7
+요샛말	NNG	7	complex 요새/NNG ᆺ/Z_SIOT 말/NNG 021223
 강정마을회	NNP	7
 음력설	NNG	7
 허난설헌	NNP	7
@@ -54406,7 +54407,7 @@ STX그룹	NNP	7
 판페르시	NNP	7
 채용자	NNG	7
 가려보	VV	7	complex 가리/VV 어/EC 보/VX 021223
-찻잎	NNG	7
+찻잎	NNG	7	complex 차/NNG ᆺ/Z_SIOT 잎/NNG 010112
 내리꽂	VV	7	complex 내리/MAG 꽂/VV 0223
 미시건	NNP	7
 루이제	NNP	7
@@ -54497,7 +54498,7 @@ OK저축은행	NNP	7
 풍전등화	NNG	7
 세계로TV	NNP	7
 수병	NNG	7
-베갯잇	NNG	7
+베갯잇	NNG	7	complex 베개/NNG ᆺ/Z_SIOT 잇/NNG 021223
 부유물	NNG	7
 니캅	NNG	7
 쇠막대	NNG	7
@@ -54621,7 +54622,7 @@ OB맥주	NNP	7
 반영구	NNG	7
 세침	NNG	7
 임파선	NNG	7
-낚싯바늘	NNG	7
+낚싯바늘	NNG	7	complex 낚시/NNG ᆺ/Z_SIOT 바늘/NNG 021224
 조리기	NNG	7
 재민	NNP	7
 산매	NNG	7
@@ -54722,7 +54723,7 @@ OB맥주	NNP	7
 셀로판지	NNG	7
 광견병	NNG	7
 파이어	NNG	7
-제삿상	NNG	7
+제삿상	NNG	7	complex 제사/NNG ᆺ/Z_SIOT 상/NNG 021223
 위장염	NNG	7
 상강도	NNG	7
 분쇄기	NNG	7
@@ -54750,10 +54751,10 @@ OB맥주	NNP	7
 파두	NNG	7
 부들	NNG	7
 제출자	NNG	7
-개숫물	NNG	7
+개숫물	NNG	7	complex 개수/NNG ᆺ/Z_SIOT 물/NNG 021223
 서치	NNG	7
 평영	NNG	7
-골칫덩이	NNG	7
+골칫덩이	NNG	7	complex 골치/NNG ᆺ/Z_SIOT 덩이/NNG 021224
 은하단	NNG	7
 단말	NNG	7
 항산	NNG	7
@@ -54843,7 +54844,7 @@ OB맥주	NNP	7
 도도새	NNG	7
 브라보	NNG	7
 헹가래	NNG	7
-낙숫물	NNG	7
+낙숫물	NNG	7	complex 낙수/NNG ᆺ/Z_SIOT 물/NNG 021223
 천극	NNG	7
 이영도	NNP	7
 질화로	NNG	7
@@ -55150,7 +55151,7 @@ OB맥주	NNP	7
 민족중흥	NNG	7
 몽달귀신	NNG	7
 정동교회	NNP	7
-바닷빛	NNG	7
+바닷빛	NNG	7	complex 바다/NNG ᆺ/Z_SIOT 빛/NNG 021223
 싸인	NNP	7
 제비집	NNG	7
 노름빚	NNG	7
@@ -55174,7 +55175,7 @@ OB맥주	NNP	7
 게이샤	NNG	7
 슬링	NNG	7
 항균력	NNG	7
-바짓자락	NNG	7
+바짓자락	NNG	7	complex 바지/NNG ᆺ/Z_SIOT 자락/NNG 021224
 암장	NNG	7
 식모살이	NNG	7
 청풍	NNP	7
@@ -55285,7 +55286,7 @@ OB맥주	NNP	7
 산수유	NNG	7
 백설탕	NNG	7
 성형학	NNG	7
-콧방울	NNG	7
+콧방울	NNG	7	complex 코/NNG ᆺ/Z_SIOT 방울/NNG 010113
 로케이션	NNG	7
 나현희	NNP	7
 엄소용	NNP	7
@@ -55583,7 +55584,7 @@ OB맥주	NNP	7
 거피	NNG	7
 동부여	NNP	7
 건류	NNG	7
-보릿짚	NNG	7
+보릿짚	NNG	7	complex 보리/NNG ᆺ/Z_SIOT 짚/NNG 021223
 통과세	NNG	7
 광무제	NNP	7
 광천	NNP	7
@@ -55596,7 +55597,7 @@ OB맥주	NNP	7
 매음	NNG	7
 변한	NNP	7
 중경	NNG	7
-사잇소리	NNG	7
+사잇소리	NNG	7	complex 사이/NNG ᆺ/Z_SIOT 소리/NNG 021224
 산화철	NNG	7
 산기	NNG	7
 강희안	NNP	7
@@ -55721,10 +55722,10 @@ OB맥주	NNP	7
 깍	MAG	7
 먼빛	NNG	7
 따라서	VV	7	complex 따르/VV 어/EC 서/VV 021223
-수숫대	NNG	7
+수숫대	NNG	7	complex 수수/NNG ᆺ/Z_SIOT 대/NNB 021223
 울울	XR	7
 누나	EC	7
-비눗갑	NNG	7
+비눗갑	NNG	7	complex 비누/NNG ᆺ/Z_SIOT 갑/NNG 021223
 하늘가	NNG	7
 좋이	MAG	7	complex 좋/VA 이/XSM 0112
 입모습	NNG	7
@@ -55759,7 +55760,7 @@ OB맥주	NNP	7
 병나	VV	7
 거슴츠레	MAG	7
 두옥이	NNP	7
-전셋돈	NNG	7
+전셋돈	NNG	7	complex 전세/NNG ᆺ/Z_SIOT 돈/NNG 021223
 쨍그렁	MAG	7
 고량주	NNG	7
 컬컬	XR	7
@@ -55976,7 +55977,7 @@ OB맥주	NNP	7
 비루먹	VV	7
 부랑배	NNG	7
 전공비	NNG	7
-조릿대	NNG	7
+조릿대	NNG	7	complex 조리/NNG ᆺ/Z_SIOT 대/NNB 021223
 용왕석	NNP	7
 싸전	NNG	7
 툉일	NNG	7
@@ -56315,7 +56316,7 @@ OB맥주	NNP	7
 실거머리	NNG	7
 철둑길	NNG	7
 국섬	NNP	7
-나뭇짐	NNG	7
+나뭇짐	NNG	7	complex 나무/NNG ᆺ/Z_SIOT 짐/NNG 021223
 옥문	NNG	7
 정치	XR	7
 유미주의	NNG	7
@@ -57318,7 +57319,7 @@ address2	NNP	6
 미러리스	NNG	6
 옷핀	NNG	6
 루브르박물관	NNP	6
-머릿고기	NNG	6
+머릿고기	NNG	6	complex 머리/NNG ᆺ/Z_SIOT 고기/NNG 021224
 플레이스	NNP	6
 메세나	NNP	6
 봄가을	NNG	6
@@ -58030,7 +58031,7 @@ T모바일	NNP	6
 터보	NNG	6
 김자옥	NNP	6
 동경미술학교	NNP	6
-나뭇결	NNG	6
+나뭇결	NNG	6	complex 나무/NNG ᆺ/Z_SIOT 결/NNG 021223
 우키요에	NNG	6
 한국노동사회연구소	NNP	6
 바이든	NNP	6
@@ -58422,7 +58423,7 @@ IBK기업은행	NNP	6
 득점원	NNG	6
 김경숙	NNP	6
 윈드	NNG	6
-바닷말	NNG	6
+바닷말	NNG	6	complex 바다/NNG ᆺ/Z_SIOT 말/NNG 021223
 루이나이웨이	NNP	6
 노무라증권	NNP	6
 혜화역	NNP	6
@@ -59060,7 +59061,7 @@ ISL코리아	NNP	6
 완화법	NNG	6
 키스톤	NNG	6
 야구공	NNG	6
-핏속	NNG	6
+핏속	NNG	6	complex 피/NNG ᆺ/Z_SIOT 속/NNG 010112
 노스다코타	NNP	6
 대불	NNP	6
 순창군	NNP	6
@@ -59126,7 +59127,7 @@ ISL코리아	NNP	6
 광도	NNG	6
 와이퍼	NNG	6
 진시황릉	NNP	6
-옥수숫대	NNG	6
+옥수숫대	NNG	6	complex 옥수수/NNG ᆺ/Z_SIOT 대/NNG 032334
 벌과금	NNG	6
 은연	XR	6
 현중	NNP	6
@@ -59553,7 +59554,7 @@ ISL코리아	NNP	6
 인물성동	NNG	6
 하얀저고리	NNP	6
 완벽주의자	NNG	6
-흥밋거리	NNG	6
+흥밋거리	NNG	6	complex 흥미/NNG ᆺ/Z_SIOT 거리/NNG 021224
 백가쟁명	NNG	6
 목화씨	NNG	6
 공평히	MAG	6	complex 공평/NNG 히/XSM 0223
@@ -59621,7 +59622,7 @@ ISL코리아	NNP	6
 쟈니	NNP	6
 퓨리어스	NNG	6
 쑥대머리	NNG	6
-나뭇조각	NNG	6
+나뭇조각	NNG	6	complex 나무/NNG ᆺ/Z_SIOT 조각/NNG 021224
 박태희	NNP	6
 우주국	NNG	6
 연대표	NNG	6
@@ -59751,7 +59752,7 @@ ISL코리아	NNP	6
 유이민	NNG	6
 꽃비	NNG	6
 학질	NNG	6
-놀잇감	NNG	6
+놀잇감	NNG	6	complex 놀이/NNG ᆺ/Z_SIOT 감/NNG 021223
 어리랏다	EC	6
 굽이지	VV	6	complex 굽이/NNG 지/VV 0223
 석빙고	NNG	6
@@ -59766,7 +59767,7 @@ ISL코리아	NNP	6
 제마	NNP	6
 측은지심	NNG	6
 무망	XR	6
-둘쨋날	NNG	6
+둘쨋날	NNG	6	complex 둘째/NNG ᆺ/Z_SIOT 날/NNG 021223
 의약청	NNG	6
 웜	NNG	6
 병리사	NNG	6
@@ -59926,7 +59927,7 @@ ISL코리아	NNP	6
 쉬잇	IC	6
 베르겐	NNP	6
 ᆫ걸	EC	10	vocalic
-모랫바람	NNG	6
+모랫바람	NNG	6	complex 모래/NNG ᆺ/Z_SIOT 바람/NNG 021224
 자이살메르	NNP	6
 황막	XR	6
 작파	NNG	6
@@ -59935,7 +59936,7 @@ ISL코리아	NNP	6
 면요	EF	6	complex 면/EF 요/JX 0112
 전미례	NNP	6
 재복	NNG	6
-귓밥	NNG	6
+귓밥	NNG	6	complex 귀/NNG ᆺ/Z_SIOT 밥/NNG 010112
 선팅	NNG	6
 대하드라마	NNG	6
 현대물	NNG	6
@@ -59983,7 +59984,7 @@ ISL코리아	NNP	6
 백화주	NNG	6
 앉은뱅이책상	NNG	6
 발육기	NNG	6
-비눗방울	NNG	6
+비눗방울	NNG	6	complex 비누/NNG ᆺ/Z_SIOT 방울/NNG 021224
 분유통	NNG	6
 이해관계인	NNG	6
 인승	NNB	6
@@ -60257,7 +60258,7 @@ ISL코리아	NNP	6
 자하문	NNP	6
 피막	NNG	6
 이아	NNP	6
-혼잣속	NNG	6
+혼잣속	NNG	6	complex 혼자/NNG ᆺ/Z_SIOT 속/NNG 021223
 사내애	NNG	6
 한들거리	VV	6
 행려	NNG	6
@@ -60404,7 +60405,7 @@ ISL코리아	NNP	6
 수성암	NNG	6
 화강	NNG	6
 보어	NNG	6
-상앗대	NNG	6
+상앗대	NNG	6	complex 상아/NNG ᆺ/Z_SIOT 대/NNB 021223
 복신	NNP	6
 영고	NNG	6
 전연	NNG	6
@@ -60484,7 +60485,7 @@ ISL코리아	NNP	6
 버들가지	NNG	6
 바작바작	MAG	6
 으리요	EC	6	non_vowel	=리오/EF
-치맛귀	NNG	6
+치맛귀	NNG	6	complex 치마/NNG ᆺ/Z_SIOT 귀/NNG 021223
 낟가리	NNG	6
 가로질리	VV	6	complex 가로/MAG 질리/VV 0224
 열쩍	VA	6
@@ -60526,7 +60527,7 @@ ISL코리아	NNP	6
 각다귀	NNG	6
 곽리자고	NNP	6
 묵정밭	NNG	6
-노잣돈	NNG	6
+노잣돈	NNG	6	complex 노자/NNP ᆺ/Z_SIOT 돈/NNG 021223
 정치망	NNG	6
 번하	VA	6
 산머리	NNG	6
@@ -60548,7 +60549,7 @@ ISL코리아	NNP	6
 석만태	NNP	6
 존자	NNG	6
 이왕지사	NNG	6
-고깃덩이	NNG	6
+고깃덩이	NNG	6	complex 고기/NNG ᆺ/Z_SIOT 덩이/NNG 021224
 해연이	NNP	6
 문투	NNG	6
 철학관	NNG	6
@@ -60750,7 +60751,7 @@ ISL코리아	NNP	6
 붕	NNG	6
 지심	NNG	6
 사록	NNG	6
-샛문	NNG	6
+샛문	NNG	6	complex 새/NNG ᆺ/Z_SIOT 문/NNG 010112
 음전	NNG	6
 곁길	NNG	6
 스물스물	MAG	6
@@ -60899,7 +60900,7 @@ ISL코리아	NNP	6
 아슬하	VA	6
 썬탠	NNG	6
 잡도리	NNG	6
-고깃점	NNG	6
+고깃점	NNG	6	complex 고기/NNG ᆺ/Z_SIOT 점/NNG 021223
 혼몽	NNG	6
 연녹색	NNG	6
 나직나직	MAG	6
@@ -60946,7 +60947,7 @@ ISL코리아	NNP	6
 외고집	NNG	6
 도벌	NNG	6
 거수자	NNG	6
-뱃놈	NNG	6
+뱃놈	NNG	6	complex 배/NNG ᆺ/Z_SIOT 놈/NNB 010112
 오오냐	IC	6
 션생	NNG	6
 샤람	NNG	6
@@ -60972,7 +60973,7 @@ ISL코리아	NNP	6
 키엠	NNP	6
 그래그래	IC	6
 까이미아	NNP	6
-종잇조각	NNG	6
+종잇조각	NNG	6	complex 종이/NNG ᆺ/Z_SIOT 조각/NNG 021224
 분빠이	NNG	6
 최용구	NNP	6
 쎈티	NNB	6	=센티
@@ -61064,7 +61065,7 @@ ISL코리아	NNP	6
 탈기	NNG	6
 엄자릉	NNP	6
 급주	NNG	6
-귓결	NNG	6
+귓결	NNG	6	complex 귀/NNG ᆺ/Z_SIOT 결/NNG 010112
 어취	NNG	6
 모살	NNG	6
 갈숲	NNG	6
@@ -61114,7 +61115,7 @@ ISL코리아	NNP	6
 조몽구	NNP	6
 솨아	MAG	6
 투명지	NNG	6
-보릿가루	NNG	6
+보릿가루	NNG	6	complex 보리/NNG ᆺ/Z_SIOT 가루/NNG 021224
 이구아나	NNG	6
 풀이름	NNG	6
 결락	NNG	6
@@ -61220,7 +61221,7 @@ ISL코리아	NNP	6
 수궁	NNG	6
 흙	NNP	6
 안수길	NNP	6
-샛마	NNP	6
+샛마	NNP	6	complex 새/NNG ᆺ/Z_SIOT 마/NNG 010112
 귀봉이	NNP	6
 대곡	NNP	6
 점석	NNP	6
@@ -61251,7 +61252,7 @@ ISL코리아	NNP	6
 푸커커	MAG	6
 깽	MAG	6
 숨골	NNG	6
-바윗조각	NNG	6
+바윗조각	NNG	6	complex 바위/NNG ᆺ/Z_SIOT 조각/NNG 021224
 새김질	NNG	6
 쿨룩	MAG	6	=콜록
 도치	NNG	6
@@ -61285,7 +61286,7 @@ ISL코리아	NNP	6
 남안	NNG	6
 북안	NNG	6
 선바위	NNP	6
-멧토끼	NNG	6
+멧토끼	NNG	6	complex 메/NNG ᆺ/Z_SIOT 토끼/NNG 010113
 포란	NNG	6
 산앵도나무	NNG	6
 초막동	NNP	6
@@ -61627,7 +61628,7 @@ NBC	NNP	6
 심원사	NNP	6
 취두	NNG	6
 홍례문	NNP	6
-사잇담	NNG	6
+사잇담	NNG	6	complex 사이/NNG ᆺ/Z_SIOT 담/NNG 021223
 오위도총부	NNG	6
 후정	NNG	6
 장락문	NNP	6
@@ -62287,7 +62288,7 @@ address1	NNP	5
 벙벙하	VA	5	complex 벙벙/XR 하/XSA 0223
 컷트	NNG	5
 보관료	NNG	5
-귀갓길	NNG	5
+귀갓길	NNG	5	complex 귀가/NNG ᆺ/Z_SIOT 길/NNG 021223
 김희숙	NNP	5
 징짜	MAG	5
 꾸욱	MAG	5
@@ -62532,7 +62533,7 @@ address1	NNP	5
 느즈막히	MAG	5	=느지막이
 데릴사위	NNG	5
 아무튼지	MAG	5
-상갓집	NNG	5
+상갓집	NNG	5	complex 상가/NNG ᆺ/Z_SIOT 집/NNG 021223
 걸신	NNG	5
 장위	NNP	5
 와트	NNB	5
@@ -63167,7 +63168,7 @@ address1	NNP	5
 김영만	NNP	5
 인후두	NNG	5
 복구비	NNG	5
-쌈짓돈	NNG	5
+쌈짓돈	NNG	5	complex 쌈지/NNG ᆺ/Z_SIOT 돈/NNG 021223
 경징계	NNG	5
 우동수	NNP	5
 안양시장	NNG	5
@@ -63444,7 +63445,7 @@ KDB대우증권	NNP	5
 크라우드	NNG	5
 한국여성벤처협회	NNP	5
 한국벤처캐피탈협회	NNP	5
-철삿줄	NNG	5
+철삿줄	NNG	5	complex 철사/NNG ᆺ/Z_SIOT 줄/NNG 021223
 야전군	NNG	5
 프리덤가디언	NNG	5
 뱅크오브아메리카	NNP	5
@@ -63511,7 +63512,7 @@ KDB대우증권	NNP	5
 영등포점	NNG	5
 이스라엘제	NNG	5
 하굿둑	NNG	5
-골칫덩어리	NNG	5
+골칫덩어리	NNG	5	complex 골치/NNG ᆺ/Z_SIOT 덩어리/NNG 021225
 지석영	NNP	5
 김대진	NNP	5
 노브레싱	NNP	5
@@ -63620,7 +63621,7 @@ LA타임스	NNP	5
 토탈	NNP	5
 인창동	NNP	5
 개정법	NNG	5
-뱃멀미	NNG	5
+뱃멀미	NNG	5	complex 배/NNG ᆺ/Z_SIOT 멀미/NNG 010113
 충전식	NNG	5
 쉐라톤	NNP	5
 임성기	NNP	5
@@ -63722,7 +63723,7 @@ LA타임스	NNP	5
 굽이굽이	NNG	5
 마름모꼴	NNG	5
 인천대공원	NNP	5
-갯고랑	NNG	5
+갯고랑	NNG	5	complex 개/NNG ᆺ/Z_SIOT 고랑/NNG 010113
 낭림	NNP	5
 송민영	NNP	5
 교체설	NNG	5
@@ -64369,7 +64370,7 @@ LG하우시스	NNP	5
 대구공고	NNP	5
 조영제	NNG	5
 심산상	NNP	5
-담뱃세	NNG	5
+담뱃세	NNG	5	complex 담배/NNG ᆺ/Z_SIOT 세/NNG 021223
 청원생명	NNP	5
 벌크	NNG	5
 키르기스	NNP	5
@@ -64558,7 +64559,7 @@ CJ몰	NNP	5
 합력	NNG	5
 윤석	NNP	5
 켑코	NNP	5
-국숫집	NNG	5
+국숫집	NNG	5	complex 국수/NNG ᆺ/Z_SIOT 집/NNG 021223
 신창건설	NNP	5
 광고업체	NNG	5
 사이포프	NNP	5
@@ -65368,7 +65369,7 @@ SK바이오팜	NNP	5
 프리섹스	NNG	5
 마태	NNP	5
 홍준기	NNP	5
-문젯거리	NNG	5
+문젯거리	NNG	5	complex 문제/NNG ᆺ/Z_SIOT 거리/NNG 021224
 명성왕후	NNP	5
 김수로왕	NNP	5
 기름통	NNG	5
@@ -66167,7 +66168,7 @@ KBS	NNP	5
 만덕	NNG	5
 겹잎	NNG	5
 영정이	NNP	5
-갯수	NNG	5
+갯수	NNG	5	complex 개/NNG ᆺ/Z_SIOT 수/NNG 010112	=개수
 틱	NNG	5
 실험학교	NNG	5
 염출	NNG	5
@@ -66282,7 +66283,7 @@ KBS	NNP	5
 수정전	NNP	5
 주독	NNG	5
 줄리어드	NNP	5
-수숫단	NNG	5
+수숫단	NNG	5	complex 수수/NNG ᆺ/Z_SIOT 단/NNG 021223
 그루	NNG	5
 까무룩	MAG	5
 잔망	NNG	5
@@ -66445,7 +66446,7 @@ KBS	NNP	5
 끝점	NNG	5
 복사열	NNG	5
 륙색	NNG	5
-천릿길	NNG	5
+천릿길	NNG	5	complex 천/NR 리/NNB ᆺ/Z_SIOT 길/NNG 01121223
 원종	NNP	5
 북주기	NNG	5
 백운소설	NNP	5
@@ -66615,7 +66616,7 @@ KBS	NNP	5
 내둥	MAG	5
 허술히	MAG	5	complex 허술/XR 히/XSM 0223
 앙바틈	XR	5
-갯지렁이	NNG	5
+갯지렁이	NNG	5	complex 개/NNG ᆺ/Z_SIOT 지렁이/NNG 010114
 활등	NNG	5
 바수	VV	5
 스름스름	MAG	5
@@ -66731,7 +66732,7 @@ KBS	NNP	5
 후둘거리	VV	5	=후들거리
 성가족	NNG	5
 정순이	NNP	5
-나뭇단	NNG	5
+나뭇단	NNG	5	complex 나무/NNG ᆺ/Z_SIOT 단/NNG 021223
 펜치	NNG	5
 좁아터지	VA	5	complex 좁/VA-R 어/EC 터지/VX 011224
 향화	NNG	5
@@ -66766,7 +66767,7 @@ KBS	NNP	5
 망부	NNG	5
 타라	NNP	5
 파리버섯	NNG	5
-베갯머리	NNG	5
+베갯머리	NNG	5	complex 베개/NNG ᆺ/Z_SIOT 머리/NNG 021224
 네깐	MM	5
 열대여섯	NR	5
 자욱	NNG	5
@@ -66816,7 +66817,7 @@ KBS	NNP	5
 내리퍼붓	VV	5	complex 내리/MAG 퍼붓/VV-I 0224
 ᆫ다손	EC	5	vocalic
 지발	MAG	5
-제삿밥	NNG	5
+제삿밥	NNG	5	complex 제사/NNG ᆺ/Z_SIOT 밥/NNG 021223
 멈칫멈칫	MAG	5
 핏자욱	NNG	5
 브론슨	NNP	5
@@ -67030,7 +67031,7 @@ KBS	NNP	5
 축하객	NNG	5
 조위금	NNG	5
 아점심	NNG	5
-상둣도가	NNG	5
+상둣도가	NNG	5	complex 상두/NNG ᆺ/Z_SIOT 도가/NNG 021224
 먹성	NNG	5
 버선발	NNG	5
 오줌똥	NNG	5
@@ -67148,7 +67149,8 @@ KBS	NNP	5
 봉합선	NNG	5
 간짓대	NNG	5
 찰싹찰싹	MAG	5
-매갈잇간	NNG	5
+매갈이	NNG	5
+매갈잇간	NNG	5	complex 매갈이/NNG ᆺ/Z_SIOT 간/NNB 032334
 불목하니	NNG	5
 삼열이	NNP	5
 신주머니	NNG	5
@@ -67202,7 +67204,7 @@ KBS	NNP	5
 끼호떼	NNP	5
 만경창파	NNG	5
 대니	NNG	5
-순댓집	NNG	5
+순댓집	NNG	5	complex 순대/NNG ᆺ/Z_SIOT 집/NNG 021223
 당게	EF	5
 전변	NNG	5
 귀하	NNG	5
@@ -67288,7 +67290,7 @@ KBS	NNP	5
 사뿐	MAG	10
 조가리	NNG	5
 고옥	NNG	5
-사글셋방	NNG	5
+사글셋방	NNG	5	complex 사글세/NNG ᆺ/Z_SIOT 방/NNG 032334
 오오라	IC	5
 영월이	NNP	5
 고려자기	NNG	5
@@ -67354,7 +67356,7 @@ KBS	NNP	5
 천생	NNG	5
 히야	IC	5
 외꽃	NNG	5
-상툿고	NNG	5
+상툿고	NNG	5	complex 상투/NNG ᆺ/Z_SIOT 고/NNG 021223
 노구솥	NNG	5
 녹밧줄	NNG	5
 회술레	NNG	5
@@ -67440,7 +67442,7 @@ KBS	NNP	5
 정국이	NNP	5
 일기책	NNG	5
 꽤액	MAG	5
-황톳물	NNG	5
+황톳물	NNG	5	complex 황토/NNG ᆺ/Z_SIOT 물/NNG 021223
 모상	NNG	5
 이쁜이	NNP	5
 천하태평	NNG	5
@@ -67449,7 +67451,7 @@ KBS	NNP	5
 애햄	IC	5
 인수봉	NNP	5
 우물고누	NNG	5
-연자맷간	NNG	5
+연자맷간	NNG	5	complex 연자매/NNG ᆺ/Z_SIOT 간/NNB 032334
 총대장	NNG	5
 정윤이	NNP	5
 매	MAG	5
@@ -67559,7 +67561,7 @@ KBS	NNP	5
 흐리멍덩	XR	5
 박노수	NNP	5
 억만금	NNG	5
-갯골	NNP	5
+갯골	NNP	5	complex 개/NNG ᆺ/Z_SIOT 골/NNG 010112
 노획물	NNG	5
 새침떼기	NNG	5
 달렘	NNP	5
@@ -67708,7 +67710,7 @@ KBS	NNP	5
 봄보리	NNG	5
 봄갈이	NNG	5
 책력	NNG	5
-수릿날	NNG	5
+수릿날	NNG	5	complex 수리/NNG ᆺ/Z_SIOT 날/NNG 021223
 소서	NNG	5
 지방식	NNG	5
 생년	NNG	5
@@ -67799,7 +67801,7 @@ KBS	NNP	5
 용굴	NNP	5
 돌망치	NNG	5
 자르개	NNG	5
-머릿부분	NNG	5
+머릿부분	NNG	5	complex 머리/NNG ᆺ/Z_SIOT 부분/NNG 021224
 헤르더	NNP	5
 야콥슨	NNP	5
 진지왕	NNP	5
@@ -68067,7 +68069,7 @@ CNN	NNP	5
 유니언	NNG	5
 로물루스	NNP	5
 버기	NNG	5
-바큇살	NNG	5
+바큇살	NNG	5	complex 바퀴/NNG ᆺ/Z_SIOT 살/NNG 021223
 킨더후크	NNP	5
 캐러츠	NNG	5
 자기극	NNG	5
