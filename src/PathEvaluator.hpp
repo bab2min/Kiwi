@@ -119,6 +119,7 @@ namespace kiwi
 			bool openEnd,
 			bool splitComplex = false,
 			bool splitSaisiot = false,
+			bool mergeSaisiot = false,
 			const std::unordered_set<const Morpheme*>* blocklist = nullptr
 		);
 
@@ -136,6 +137,7 @@ namespace kiwi
 			const Vector<SpecialState>& prevSpStates,
 			bool splitComplex = false,
 			bool splitSaisiot = false,
+			bool mergeSaisiot = false,
 			const std::unordered_set<const Morpheme*>* blocklist = nullptr
 		);
 
@@ -525,7 +527,7 @@ namespace kiwi
 
 					// fill the rest information of resultOut
 					newPath.wid = lastSeqId;
-					if (curMorph->chunks.empty() || curMorph->complex)
+					if (curMorph->chunks.empty() || curMorph->complex || curMorph->saisiot)
 					{
 						newPath.combineSocket = curMorph->combineSocket;
 						newPath.ownFormId = ownFormId;
@@ -570,7 +572,7 @@ namespace kiwi
 
 				// fill the rest information of resultOut
 				newPath.wid = lastSeqId;
-				if (curMorph->chunks.empty() || curMorph->complex)
+				if (curMorph->chunks.empty() || curMorph->complex || curMorph->saisiot)
 				{
 					newPath.combineSocket = curMorph->combineSocket;
 					newPath.ownFormId = ownFormId;
@@ -622,7 +624,7 @@ namespace kiwi
 
 				// fill the rest information of resultOut
 				newPath.wid = lastSeqId;
-				if (curMorph->chunks.empty() || curMorph->complex)
+				if (curMorph->chunks.empty() || curMorph->complex || curMorph->saisiot)
 				{
 					newPath.combineSocket = curMorph->combineSocket;
 					newPath.ownFormId = ownFormId;
@@ -659,7 +661,7 @@ namespace kiwi
 
 		const Morpheme* lastMorph;
 		Wid firstWid;
-		if (curMorph->chunks.empty() || curMorph->complex)
+		if (curMorph->chunks.empty() || curMorph->complex || curMorph->saisiot)
 		{
 			lastMorph = curMorph->getCombined() ? curMorph->getCombined() : curMorph;
 			firstWid = curMorph->lmMorphemeId;
@@ -691,8 +693,10 @@ namespace kiwi
 		{
 			for (auto& prevPath : cache[prev - startNode])
 			{
-				// 사이시옷 뒤에 명사가 아닌 태그가 오는 경우 제외
-				if (prevPath.morpheme->tag == POSTag::z_siot && !isNNClass(curMorph->tag))
+				// 사이시옷 뒤에 명사가 아닌 태그가 오거나 공백이 있는 경우 제외
+				if (prevPath.morpheme->tag == POSTag::z_siot && (
+					!isNNClass(curMorph->tag) || prev->endPos < node->startPos
+					))
 				{
 					continue;
 				}
@@ -701,7 +705,7 @@ namespace kiwi
 				if (prevPath.combineSocket)
 				{
 					// merge <v> <chunk> with only the same socket
-					if (prevPath.combineSocket != curMorph->combineSocket || (curMorph->chunks.empty() || curMorph->complex))
+					if (prevPath.combineSocket != curMorph->combineSocket || (curMorph->chunks.empty() || curMorph->complex || curMorph->saisiot))
 					{
 						continue;
 					}
@@ -747,7 +751,7 @@ namespace kiwi
 				}
 
 				auto cLmState = prevPath.lmState;
-				if (curMorph->combineSocket && (curMorph->chunks.empty() || curMorph->complex))
+				if (curMorph->combineSocket && (curMorph->chunks.empty() || curMorph->complex || curMorph->saisiot))
 				{
 					// no-op
 				}
@@ -760,7 +764,7 @@ namespace kiwi
 					}
 					float ll = cLmState.next(langMdl, firstWid);
 					candScore += ll;
-					if (!(curMorph->chunks.empty() || curMorph->complex))
+					if (!(curMorph->chunks.empty() || curMorph->complex || curMorph->saisiot))
 					{
 						for (size_t i = 1; i < curMorph->chunks.size(); ++i)
 						{
@@ -833,6 +837,7 @@ namespace kiwi
 		const Vector<SpecialState>& prevSpStates,
 		bool splitComplex,
 		bool splitSaisiot,
+		bool mergeSaisiot,
 		const std::unordered_set<const Morpheme*>* blocklist
 	)
 	{
@@ -893,6 +898,11 @@ namespace kiwi
 				// 사이시옷(zSiot)을 위한 지름길
 				if (curMorph->tag == POSTag::z_siot)
 				{
+					if (!(splitSaisiot || mergeSaisiot))
+					{
+						continue;
+					}
+
 					for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
 					{
 						for (auto& p : cache[prev - startNode])
@@ -912,7 +922,7 @@ namespace kiwi
 				}
 
 				// if the morpheme has chunk set
-				if (!(curMorph->chunks.empty()|| curMorph->complex))
+				if (!(curMorph->chunks.empty() || curMorph->complex || curMorph->saisiot))
 				{
 					// '하다/하게/하지'가 '다/게/지'로 축약된 경우인데 앞에 공백이 있는 경우는 탐색후보에서 제외
 					if (node->prev && node[-(int)node->prev].endPos < node->startPos
@@ -1019,13 +1029,13 @@ namespace kiwi
 			float scoreDiff = cur->accScore - prev->accScore;
 			float typoCostDiff = cur->accTypoCost - prev->accTypoCost;
 			auto morpheme = cur->morpheme;
-			size_t numNewTokens = (morpheme->chunks.empty() || morpheme->complex) ? 1 : morpheme->chunks.size();
+			const size_t numNewTokens = (morpheme->chunks.empty() || morpheme->complex || morpheme->saisiot) ? 1 : morpheme->chunks.size();
 			auto& gNode = graph[csearcher(cur)];
 			scoreDiff += typoCostDiff * typoCostWeight;
 			scoreDiff /= numNewTokens;
 			typoCostDiff /= numNewTokens;
 
-			if (morpheme->chunks.empty() || morpheme->complex)
+			if (morpheme->chunks.empty() || morpheme->complex || morpheme->saisiot)
 			{
 				ret.emplace_back(
 					unifyMorpheme(morpheme),
@@ -1093,6 +1103,7 @@ namespace kiwi
 		bool openEnd,
 		bool splitComplex,
 		bool splitSaisiot,
+		bool mergeSaisiot,
 		const std::unordered_set<const Morpheme*>* blocklist
 	)
 	{
@@ -1148,24 +1159,24 @@ namespace kiwi
 			{
 				evalPath<LmState>(kw, startNode, node, topN, cache, 
 					ownFormList, i, ownFormId, node->form->candidate, 
-					false, uniqStates, splitComplex, splitSaisiot, blocklist);
+					false, uniqStates, splitComplex, splitSaisiot, mergeSaisiot, blocklist);
 				if (all_of(node->form->candidate.begin(), node->form->candidate.end(), [](const Morpheme* m)
 				{
-					return m->combineSocket || (!m->chunks.empty() && !m->complex);
+					return m->combineSocket || !(m->chunks.empty() || m->complex || m->saisiot);
 				}))
 				{
 					ownFormList.emplace_back(node->form->form);
 					ownFormId = ownFormList.size();
 					evalPath<LmState>(kw, startNode, node, topN, cache, 
 						ownFormList, i, ownFormId, unknownNodeLCands, 
-						true, uniqStates, splitComplex, splitSaisiot, blocklist);
+						true, uniqStates, splitComplex, splitSaisiot, mergeSaisiot, blocklist);
 				};
 			}
 			else
 			{
 				evalPath<LmState>(kw, startNode, node, topN, cache, 
 					ownFormList, i, ownFormId, unknownNodeCands, 
-					true, uniqStates, splitComplex, splitSaisiot, blocklist);
+					true, uniqStates, splitComplex, splitSaisiot, mergeSaisiot, blocklist);
 			}
 
 #ifdef DEBUG_PRINT
@@ -1186,13 +1197,14 @@ namespace kiwi
 			for (auto& p : cache[prev - startNode])
 			{
 				if (p.combineSocket) continue;
-				if (!p.morpheme->chunks.empty() && !p.morpheme->complex)
+				if (!(p.morpheme->chunks.empty() || p.morpheme->complex || p.morpheme->saisiot))
 				{
 					if (p.morpheme->chunks.size() <= (p.morpheme->combineSocket ? 2 : 1))
 					{
 						if (!FeatureTestor::isMatched(nullptr, p.morpheme->vowel)) continue;
 					}
 				}
+				if (p.morpheme->tag == POSTag::z_siot) continue;
 
 				float c = p.accScore + (openEnd ? 0 : p.lmState.next(kw->langMdl, eosId));
 				if (p.spState.singleQuote) c -= 2;
