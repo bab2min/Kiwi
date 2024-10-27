@@ -118,6 +118,7 @@ namespace kiwi
 			const size_t topN,
 			bool openEnd,
 			bool splitComplex = false,
+			bool splitSaisiot = false,
 			const std::unordered_set<const Morpheme*>* blocklist = nullptr
 		);
 
@@ -134,6 +135,7 @@ namespace kiwi
 			bool unknownForm,
 			const Vector<SpecialState>& prevSpStates,
 			bool splitComplex = false,
+			bool splitSaisiot = false,
 			const std::unordered_set<const Morpheme*>* blocklist = nullptr
 		);
 
@@ -689,6 +691,12 @@ namespace kiwi
 		{
 			for (auto& prevPath : cache[prev - startNode])
 			{
+				// 사이시옷 뒤에 명사가 아닌 태그가 오는 경우 제외
+				if (prevPath.morpheme->tag == POSTag::z_siot && !isNNClass(curMorph->tag))
+				{
+					continue;
+				}
+
 				float candScore = prevPath.accScore + additionalScore;
 				if (prevPath.combineSocket)
 				{
@@ -824,6 +832,7 @@ namespace kiwi
 		bool unknownForm,
 		const Vector<SpecialState>& prevSpStates,
 		bool splitComplex,
+		bool splitSaisiot,
 		const std::unordered_set<const Morpheme*>* blocklist
 	)
 	{
@@ -858,6 +867,7 @@ namespace kiwi
 			for (auto& curMorph : cands)
 			{
 				if (splitComplex && curMorph->getCombined()->complex) continue;
+				if (splitSaisiot && curMorph->getCombined()->saisiot) continue;
 				if (blocklist && blocklist->count(curMorph->getCombined())) continue;
 
 				// 덧붙은 받침(zCoda)을 위한 지름길
@@ -869,6 +879,26 @@ namespace kiwi
 						{
 							auto lastTag = kw->morphemes[p.wid].tag;
 							if (!isJClass(lastTag) && !isEClass(lastTag)) continue;
+							nCache.emplace_back(p);
+							auto& newPath = nCache.back();
+							newPath.accScore += curMorph->userScore * kw->typoCostWeight;
+							newPath.accTypoCost -= curMorph->userScore;
+							newPath.parent = &p;
+							newPath.morpheme = &kw->morphemes[curMorph->lmMorphemeId];
+							newPath.wid = curMorph->lmMorphemeId;
+						}
+					}
+					continue;
+				}
+				// 사이시옷(zSiot)을 위한 지름길
+				if (curMorph->tag == POSTag::z_siot)
+				{
+					for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
+					{
+						for (auto& p : cache[prev - startNode])
+						{
+							auto lastTag = kw->morphemes[p.wid].tag;
+							if (!isNNClass(lastTag)) continue;
 							nCache.emplace_back(p);
 							auto& newPath = nCache.back();
 							newPath.accScore += curMorph->userScore * kw->typoCostWeight;
@@ -1062,6 +1092,7 @@ namespace kiwi
 		const size_t topN,
 		bool openEnd,
 		bool splitComplex,
+		bool splitSaisiot,
 		const std::unordered_set<const Morpheme*>* blocklist
 	)
 	{
@@ -1115,7 +1146,9 @@ namespace kiwi
 
 			if (node->form)
 			{
-				evalPath<LmState>(kw, startNode, node, topN, cache, ownFormList, i, ownFormId, node->form->candidate, false, uniqStates, splitComplex, blocklist);
+				evalPath<LmState>(kw, startNode, node, topN, cache, 
+					ownFormList, i, ownFormId, node->form->candidate, 
+					false, uniqStates, splitComplex, splitSaisiot, blocklist);
 				if (all_of(node->form->candidate.begin(), node->form->candidate.end(), [](const Morpheme* m)
 				{
 					return m->combineSocket || (!m->chunks.empty() && !m->complex);
@@ -1123,12 +1156,16 @@ namespace kiwi
 				{
 					ownFormList.emplace_back(node->form->form);
 					ownFormId = ownFormList.size();
-					evalPath<LmState>(kw, startNode, node, topN, cache, ownFormList, i, ownFormId, unknownNodeLCands, true, uniqStates, splitComplex, blocklist);
+					evalPath<LmState>(kw, startNode, node, topN, cache, 
+						ownFormList, i, ownFormId, unknownNodeLCands, 
+						true, uniqStates, splitComplex, splitSaisiot, blocklist);
 				};
 			}
 			else
 			{
-				evalPath<LmState>(kw, startNode, node, topN, cache, ownFormList, i, ownFormId, unknownNodeCands, true, uniqStates, splitComplex, blocklist);
+				evalPath<LmState>(kw, startNode, node, topN, cache, 
+					ownFormList, i, ownFormId, unknownNodeCands, 
+					true, uniqStates, splitComplex, splitSaisiot, blocklist);
 			}
 
 #ifdef DEBUG_PRINT

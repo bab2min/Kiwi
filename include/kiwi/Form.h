@@ -109,6 +109,7 @@ namespace kiwi
 		/**< 선행형태소의 모음조화 조건 */
 		CondPolarity polar() const { return static_cast<CondPolarity>((vpPack >> 4) & 0x7); }
 
+		/**< 추가 분석이 가능한 형태소인지(파생어나 사이시옷이 포함된 합성명사 등) */
 		bool complex() const { return !!(vpPack & 0x80); }
 
 		void setVowel(CondVowel v)
@@ -141,8 +142,9 @@ namespace kiwi
 		const KString* kform = nullptr;
 		POSTag tag = POSTag::unknown;
 		CondVowel vowel : 4;
-		CondPolarity polar : 3;
+		CondPolarity polar : 2;
 		bool complex : 1;
+		bool saisiot : 1;
 		uint8_t senseId = 0;
 		uint8_t combineSocket = 0;
 		int32_t combined = 0;
@@ -205,7 +207,8 @@ namespace kiwi
 		CondVowel vowel = CondVowel::none;
 		CondPolarity polar = CondPolarity::none;
 		uint8_t formHash = 0;
-		uint8_t zCodaAppendable = 0;
+		uint8_t zCodaAppendable : 1;
+		uint8_t zSiotAppendable : 1;
 
 		Form();
 		~Form();
@@ -251,7 +254,7 @@ namespace kiwi
 	 * @param morphBase 형태소 배열의 시작 위치
 	 * @return 최적화된 형태 정보
 	 */
-	Form bake(const FormRaw& o, const Morpheme* morphBase, bool zCodaAppendable, const Vector<uint32_t>& additionalCands = {});
+	Form bake(const FormRaw& o, const Morpheme* morphBase, bool zCodaAppendable, bool zSiotAppendable, const Vector<uint32_t>& additionalCands = {});
 
 	/**
 	 * @brief 변경 가능한 형태소 정보를 bake하여 최적화한다.

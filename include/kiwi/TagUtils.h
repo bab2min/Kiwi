@@ -31,7 +31,12 @@ namespace kiwi
 	{
 		return POSTag::jks <= tag && tag <= POSTag::jc;
 	}
-	
+
+	inline bool isNNClass(POSTag tag)
+	{
+		return POSTag::nng <= tag && tag <= POSTag::nnb;
+	}
+
 	inline bool isSuffix(POSTag tag)
 	{
 		tag = clearIrregular(tag);

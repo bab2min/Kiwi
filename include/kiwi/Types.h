@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file Types.h
  * @author bab2min (bab2min@gmail.com)
  * @brief Kiwi C++ API에 쓰이는 주요 타입들을 모아놓은 헤더 파일
@@ -211,7 +211,7 @@ namespace kiwi
 		w_url, w_email, w_mention, w_hashtag, w_serial, w_emoji,
 		jks, jkc, jkg, jko, jkb, jkv, jkq, jx, jc,
 		ep, ef, ec, etn, etm,
-		z_coda,
+		z_coda, z_siot, 
 		user0, user1, user2, user3, user4,
 		p, /**< 분할된 동사/형용사를 나타내는데 사용됨 */
 		max, /**< POSTag의 총 개수를 나타내는 용도 */
@@ -275,7 +275,7 @@ namespace kiwi
 	 * @brief 선행 형태소의 양/음성 조건(모음 조화)과 관련된 열거형
 	 * 
 	 */
-	enum class CondPolarity : char
+	enum class CondPolarity : uint8_t
 	{
 		none, /**< 조건이 설정되지 않음 */
 		positive, /**< 선행 형태소가 양성(ㅏ,ㅑ,ㅗ)인 경우만 등장 가능 */

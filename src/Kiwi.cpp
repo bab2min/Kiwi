@@ -541,7 +541,12 @@ namespace kiwi
 	template<class TokenInfoIt>
 	TokenInfoIt joinAffixTokens(TokenInfoIt first, TokenInfoIt last, Match matchOptions)
 	{
-		if (!(matchOptions & (Match::joinNounPrefix | Match::joinNounSuffix | Match::joinVerbSuffix | Match::joinAdjSuffix | Match::joinAdvSuffix))) return last;
+		if (!(matchOptions & (Match::joinNounPrefix 
+							| Match::joinNounSuffix 
+							| Match::joinVerbSuffix 
+							| Match::joinAdjSuffix 
+							| Match::joinAdvSuffix 
+							| Match::mergeSaisiot))) return last;
 		if (std::distance(first, last) < 2) return last;
 
 		auto next = first;
@@ -554,7 +559,7 @@ namespace kiwi
 			// XPN + (NN. | SN) => (NN. | SN)
 			if (!!(matchOptions & Match::joinNounPrefix) 
 				&& current.tag == POSTag::xpn 
-				&& ((POSTag::nng <= nextToken.tag && nextToken.tag <= POSTag::nnb) || nextToken.tag == POSTag::sn)
+				&& (isNNClass(nextToken.tag) || nextToken.tag == POSTag::sn)
 			)
 			{
 				concatTokens(current, nextToken, nextToken.tag);
@@ -563,7 +568,7 @@ namespace kiwi
 			// (NN. | SN) + XSN => (NN. | SN)
 			else if (!!(matchOptions & Match::joinNounSuffix)
 				&& nextToken.tag == POSTag::xsn
-				&& ((POSTag::nng <= current.tag && current.tag <= POSTag::nnb) || current.tag == POSTag::sn)
+				&& (isNNClass(current.tag) || current.tag == POSTag::sn)
 			)
 			{
 				concatTokens(current, nextToken, current.tag);
@@ -572,7 +577,7 @@ namespace kiwi
 			// (NN. | XR) + XSV => VV
 			else if (!!(matchOptions & Match::joinVerbSuffix)
 				&& clearIrregular(nextToken.tag) == POSTag::xsv
-				&& ((POSTag::nng <= current.tag && current.tag <= POSTag::nnb) || current.tag == POSTag::xr)
+				&& (isNNClass(current.tag) || current.tag == POSTag::xr)
 			)
 			{
 				concatTokens(current, nextToken, setIrregular(POSTag::vv, isIrregular(nextToken.tag)));
@@ -581,7 +586,7 @@ namespace kiwi
 			// (NN. | XR) + XSA => VA
 			else if (!!(matchOptions & Match::joinAdjSuffix)
 				&& clearIrregular(nextToken.tag) == POSTag::xsa
-				&& ((POSTag::nng <= current.tag && current.tag <= POSTag::nnb) || current.tag == POSTag::xr)
+				&& (isNNClass(current.tag) || current.tag == POSTag::xr)
 			)
 			{
 				concatTokens(current, nextToken, setIrregular(POSTag::va, isIrregular(nextToken.tag)));
@@ -590,10 +595,22 @@ namespace kiwi
 			// (NN. | XR) + XSM => MAG
 			else if (!!(matchOptions & Match::joinAdvSuffix)
 				&& nextToken.tag == POSTag::xsm
-				&& ((POSTag::nng <= current.tag && current.tag <= POSTag::nnb) || current.tag == POSTag::xr)
+				&& (isNNClass(current.tag) || current.tag == POSTag::xr)
 				)
 			{
 				concatTokens(current, nextToken, POSTag::mag);
+				++next;
+			}
+			// NN. + Z_SIOT + NN. => NN
+			else if (!!(matchOptions & Match::mergeSaisiot)
+				&& nextToken.tag == POSTag::z_siot
+				&& isNNClass(current.tag)
+				&& next + 1 != last
+				&& isNNClass((next + 1)->tag))
+			{
+				current.str.back() += (0x11BA - 0x11A7);
+				concatTokens(current, *(next + 1), POSTag::nng);
+				++next;
 				++next;
 			}
 			else
@@ -1047,6 +1064,7 @@ namespace kiwi
 				topN,
 				false,
 				!!(matchOptions & Match::splitComplex),
+				!!(matchOptions & Match::splitSaisiot),
 				blocklist
 			);
 			insertPathIntoResults(ret, spStatesByRet, res, topN, matchOptions, integrateAllomorph, positionTable, wordPositions, pretokenizedGroup, nodeInWhichPretokenized);

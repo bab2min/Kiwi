@@ -622,6 +622,7 @@ namespace kiwi
 		if (tagStr == u"SH") return POSTag::sh;
 		if (tagStr == u"SN") return POSTag::sn;
 		if (tagStr == u"Z_CODA") return POSTag::z_coda;
+		if (tagStr == u"Z_SIOT") return POSTag::z_siot;
 		if (tagStr == u"V") return POSTag::p;
 		if (tagStr == u"A") return POSTag::p;
 		if (tagStr == u"^") return POSTag::unknown;
