@@ -231,7 +231,8 @@ https://github.com/bab2min/kiwi-gui 에서 다운받을 수 있습니다.
 <tr><td>W_MENTION</td><td>멘션(@abcd)<sup>*</sup></td></tr>
 <tr><td>W_SERIAL</td><td>일련번호(전화번호, 통장번호, IP주소 등)<sup>*</sup></td></tr>
 <tr><td>W_EMOJI</td><td>이모지<sup>*</sup></td></tr>
-<tr><th rowspan='2'>기타</th><td>Z_CODA</td><td>덧붙은 받침<sup>*</sup></td></tr>
+<tr><th rowspan='3'>기타</th><td>Z_CODA</td><td>덧붙은 받침<sup>*</sup></td></tr>
+<tr><td>Z_SIOT</td><td>사이시옷<sup>*</sup></td></tr>
 <tr><td>USER0~4</td><td>사용자 정의 태그<sup>*</sup></td></tr>
 </table>
 
