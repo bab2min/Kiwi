@@ -393,6 +393,7 @@ namespace kiwi
 		continualTypoSet,
 		basicTypoSetWithContinual,
 		lengtheningTypoSet,
+		basicTypoSetWithContinualAndLengthening,
 	};
 
 	/**

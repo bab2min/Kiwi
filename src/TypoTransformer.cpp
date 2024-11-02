@@ -662,6 +662,8 @@ namespace kiwi
 
 		static const TypoTransformer lengtheningTypoSet = TypoTransformer::fromLengtheningTypoCost(0.25f);
 
+		static const TypoTransformer basicTypoSetWithContinualAndLengthening = basicTypoSetWithContinual | lengtheningTypoSet;
+
 		switch (set)
 		{
 		case kiwi::DefaultTypoSet::withoutTypo:
@@ -674,6 +676,8 @@ namespace kiwi
 			return basicTypoSetWithContinual;
 		case kiwi::DefaultTypoSet::lengtheningTypoSet:
 			return lengtheningTypoSet;
+		case kiwi::DefaultTypoSet::basicTypoSetWithContinualAndLengthening:
+			return basicTypoSetWithContinualAndLengthening;
 		default:
 			throw invalid_argument{ "Invalid `DefaultTypoSet`" };
 		}
