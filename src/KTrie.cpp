@@ -1090,11 +1090,11 @@ size_t kiwi::splitByTrie(
 
 		if (!!(matchOptions & Match::zCoda) && zCodaFollowable && isHangulCoda(c) && (n + 1 >= str.size() || !isHangulSyllable(str[n + 1])))
 		{
-			candidates.emplace_back(formBase + defaultTagSize + (c - 0x11A8) - 1, 0, nonSpaces.size() - 1);
+			candidates.emplace_back(formBase + defaultTagSize + (c - 0x11A8) - 1, 0, (nonSpaces.size() - 1) * posMultiplier);
 		}
 		else if (!!(matchOptions & (Match::splitSaisiot | Match::mergeSaisiot)) && zSiotFollowable && c == 0x11BA && n + 1 < str.size() && isHangulSyllable(str[n + 1]))
 		{
-			candidates.emplace_back(formBase + defaultTagSize + (0x11BA - 0x11A8) - 1, 0, nonSpaces.size() - 1);
+			candidates.emplace_back(formBase + defaultTagSize + (0x11BA - 0x11A8) - 1, 0, (nonSpaces.size() - 1) * posMultiplier);
 		}
 		zCodaFollowable = false;
 		zSiotFollowable = false;
