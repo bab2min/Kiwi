@@ -905,6 +905,7 @@ namespace kiwi
 						morph.vowel = CondVowel::none;
 						morph.polar = CondPolarity::none;
 						morph.complex = 0;
+						morph.saisiot = 0;
 						morph.lmMorphemeId = getDefaultMorphemeId(s.tokenization[0].tag);
 						form.candidate[0] = &morph;
 					}
@@ -921,6 +922,7 @@ namespace kiwi
 				morph.vowel = CondVowel::none;
 				morph.polar = CondPolarity::none;
 				morph.complex = 0;
+				morph.saisiot = 0;
 				morph.chunks = FixedPairVector<const Morpheme*, std::pair<uint8_t, uint8_t>>{ s.tokenization.size() };
 				for (size_t i = 0; i < s.tokenization.size(); ++i)
 				{
@@ -949,6 +951,7 @@ namespace kiwi
 						cmorph.vowel = CondVowel::none;
 						cmorph.polar = CondPolarity::none;
 						cmorph.complex = 0;
+						cmorph.saisiot = 0;
 						cmorph.tag = t.tag;
 						cmorph.lmMorphemeId = getDefaultMorphemeId(t.tag);
 						foundMorph = &cmorph;

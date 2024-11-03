@@ -872,7 +872,6 @@ namespace kiwi
 			for (auto& curMorph : cands)
 			{
 				if (splitComplex && curMorph->getCombined()->complex) continue;
-				if (splitSaisiot && curMorph->getCombined()->saisiot) continue;
 				if (blocklist && blocklist->count(curMorph->getCombined())) continue;
 
 				// 덧붙은 받침(zCoda)을 위한 지름길
@@ -1007,7 +1006,8 @@ namespace kiwi
 		const Vector<U16StringView>& ownFormList,
 		float typoCostWeight,
 		const Morpheme* morphFirst,
-		size_t langVocabSize)
+		size_t langVocabSize,
+		bool splitSaisiot)
 	{
 		Vector<const WordLL<LmState>*> steps;
 		for (auto s = result->parent; s->parent; s = s->parent)
@@ -1029,13 +1029,32 @@ namespace kiwi
 			float scoreDiff = cur->accScore - prev->accScore;
 			float typoCostDiff = cur->accTypoCost - prev->accTypoCost;
 			auto morpheme = cur->morpheme;
-			const size_t numNewTokens = (morpheme->chunks.empty() || morpheme->complex || morpheme->saisiot) ? 1 : morpheme->chunks.size();
+			const size_t numNewTokens = (splitSaisiot && morpheme->saisiot) || !(morpheme->chunks.empty() || morpheme->complex || morpheme->saisiot) 
+				? morpheme->chunks.size() : 1;
 			auto& gNode = graph[csearcher(cur)];
 			scoreDiff += typoCostDiff * typoCostWeight;
 			scoreDiff /= numNewTokens;
 			typoCostDiff /= numNewTokens;
 
-			if (morpheme->chunks.empty() || morpheme->complex || morpheme->saisiot)
+			if (splitSaisiot && morpheme->saisiot)
+			{
+				for (size_t ch = 0; ch < numNewTokens; ++ch)
+				{
+					auto& p = morpheme->chunks.getSecond(ch);
+					ret.emplace_back(
+						unifyMorpheme(morpheme->chunks[ch]),
+						KString{},
+						gNode.startPos + p.first,
+						gNode.startPos + p.second,
+						scoreDiff,
+						typoCostDiff,
+						typoCostDiff ? gNode.typoFormId : 0,
+						&gNode - graph
+					);
+				}
+				ret.back().end = gNode.endPos;
+			}
+			else if (morpheme->chunks.empty() || morpheme->complex || morpheme->saisiot)
 			{
 				ret.emplace_back(
 					unifyMorpheme(morpheme),
@@ -1274,7 +1293,7 @@ namespace kiwi
 			{
 				auto tokens = generateTokenList(
 					&cand[i], csearcher, graph, ownFormList, kw->typoCostWeight,
-					kw->morphemes.data(), langVocabSize
+					kw->morphemes.data(), langVocabSize, splitSaisiot
 				);
 				ret.emplace_back(move(tokens), cand[i].accScore, uniqStates[cand[i].rootId], cand[i].spState);
 			}
