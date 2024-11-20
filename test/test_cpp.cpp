@@ -1609,3 +1609,16 @@ TEST(KiwiCpp, IssueP172_LengthError)
 	auto res = kiwi.analyze(text, Match::allWithNormalizing).first;
 	EXPECT_GT(res.size(), 0);
 }
+
+TEST(KiwiCpp, IssueP189)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	auto res = kiwi.analyze(u"담아 1팩 무료", Match::allWithNormalizing).first;
+
+	EXPECT_EQ(res.size(), 5);
+	EXPECT_EQ(res[0].str, u"담");
+	EXPECT_EQ(res[1].str, u"어");
+	EXPECT_EQ(res[2].str, u"1");
+	EXPECT_EQ(res[3].str, u"팩");
+	EXPECT_EQ(res[4].str, u"무료");
+}
