@@ -988,6 +988,12 @@ TEST(KiwiCpp, ZCoda)
 TEST(KiwiCpp, ZSiot)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
+
+	auto resSplit = kiwi.analyze(u"찰랑찰랑한 머릿결과 볼륨감", Match::allWithNormalizing | Match::splitSaisiot);
+	EXPECT_EQ(resSplit.first.size(), 8);
+	EXPECT_EQ(resSplit.first[3].str, u"머리");
+	EXPECT_EQ(resSplit.first[4].tag, POSTag::z_siot);
+	EXPECT_EQ(resSplit.first[5].str, u"결");
 	
 	for (auto s : {u"하굣길", u"만둣국", u"나뭇잎", u"세숫물", u"고춧가루", u"시곗바늘", u"사글셋방"})
 	{
@@ -1004,6 +1010,35 @@ TEST(KiwiCpp, ZSiot)
 	}
 
 	for (auto s : {u"발렛 파킹", u"미닛"})
+	{
+		auto resNone = kiwi.analyze(s, Match::allWithNormalizing);
+		auto resSplit = kiwi.analyze(s, Match::allWithNormalizing | Match::splitSaisiot);
+		auto resMerge = kiwi.analyze(s, Match::allWithNormalizing | Match::mergeSaisiot);
+		EXPECT_EQ(resNone.second, resSplit.second);
+		EXPECT_EQ(resNone.second, resMerge.second);
+		EXPECT_FALSE(std::any_of(resSplit.first.begin(), resSplit.first.end(), [](const TokenInfo& token) { return token.tag == POSTag::z_siot; }));
+	}
+}
+
+TEST(KiwiCpp, ZSiotWithTypo)
+{
+	Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 0, BuildOption::default_, }.build(getDefaultTypoSet(DefaultTypoSet::basicTypoSetWithContinual));
+
+	for (auto s : { u"하굣길", u"만둣국", u"나뭇잎", u"세숫물", u"고춧가루", u"시곗바늘", u"사글셋방" })
+	{
+		auto resNone = kiwi.analyze(s, Match::allWithNormalizing);
+		auto resSplit = kiwi.analyze(s, Match::allWithNormalizing | Match::splitSaisiot);
+		auto resMerge = kiwi.analyze(s, Match::allWithNormalizing | Match::mergeSaisiot);
+		EXPECT_FALSE(std::any_of(resNone.first.begin(), resNone.first.end(), [](const TokenInfo& token) { return token.tag == POSTag::z_siot; }));
+		EXPECT_EQ(resSplit.first.size(), 3);
+		EXPECT_EQ(resSplit.first[0].tag, POSTag::nng);
+		EXPECT_EQ(resSplit.first[1].tag, POSTag::z_siot);
+		EXPECT_EQ(resSplit.first[2].tag, POSTag::nng);
+		EXPECT_EQ(resMerge.first.size(), 1);
+		EXPECT_EQ(resMerge.first[0].tag, POSTag::nng);
+	}
+
+	for (auto s : { u"발렛 파킹", u"미닛" })
 	{
 		auto resNone = kiwi.analyze(s, Match::allWithNormalizing);
 		auto resSplit = kiwi.analyze(s, Match::allWithNormalizing | Match::splitSaisiot);
@@ -1608,4 +1643,17 @@ TEST(KiwiCpp, IssueP172_LengthError)
 	Kiwi& kiwi = reuseKiwiInstance();
 	auto res = kiwi.analyze(text, Match::allWithNormalizing).first;
 	EXPECT_GT(res.size(), 0);
+}
+
+TEST(KiwiCpp, IssueP189)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	auto res = kiwi.analyze(u"담아 1팩 무료", Match::allWithNormalizing).first;
+
+	EXPECT_EQ(res.size(), 5);
+	EXPECT_EQ(res[0].str, u"담");
+	EXPECT_EQ(res[1].str, u"어");
+	EXPECT_EQ(res[2].str, u"1");
+	EXPECT_EQ(res[3].str, u"팩");
+	EXPECT_EQ(res[4].str, u"무료");
 }
