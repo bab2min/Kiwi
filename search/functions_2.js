@@ -1,8 +1,8 @@
 var searchData=
 [
-  ['generate_449',['generate',['../classkiwi_1_1PreparedTypoTransformer.html#abbe0471e6bae7162d488bb3379f149de',1,'kiwi::PreparedTypoTransformer']]],
-  ['getcombined_450',['getCombined',['../structkiwi_1_1Morpheme.html#a39cc9841ade9b202bc59cfaf093dc8f5',1,'kiwi::Morpheme']]],
-  ['getdefaulttyposet_451',['getDefaultTypoSet',['../TypoTransformer_8h.html#a3f6cf2a4a5160c29e370436848db761b',1,'kiwi']]],
-  ['getform_452',['getForm',['../structkiwi_1_1Morpheme.html#a9cbef2b60afeb297583aa18614acdbea',1,'kiwi::Morpheme']]],
-  ['gettypoform_453',['getTypoForm',['../classkiwi_1_1Kiwi.html#aec622c9828a27aad2c12a021e1c8a577',1,'kiwi::Kiwi']]]
+  ['generate_0',['generate',['../classkiwi_1_1PreparedTypoTransformer.html#ad721dbdc05602d01815bdb3204d3f29c',1,'kiwi::PreparedTypoTransformer']]],
+  ['getcombined_1',['getCombined',['../structkiwi_1_1Morpheme.html#ae21d17b6ed4d44d041662dae8ef3282c',1,'kiwi::Morpheme']]],
+  ['getdefaulttyposet_2',['getDefaultTypoSet',['../TypoTransformer_8h.html#a9c6996f12769a9e6ae5cc8cb16c7e8bb',1,'kiwi']]],
+  ['getform_3',['getForm',['../structkiwi_1_1Morpheme.html#a407488702f65e624bddc05a586742976',1,'kiwi::Morpheme']]],
+  ['gettypoform_4',['getTypoForm',['../classkiwi_1_1Kiwi.html#aec622c9828a27aad2c12a021e1c8a577',1,'kiwi::Kiwi']]]
 ];
