@@ -1,5 +1,6 @@
 #include <kiwi/Dataset.h>
 #include <kiwi/SubstringExtractor.h>
+#include "FrozenTrie.hpp"
 #include "RaggedVector.hpp"
 
 using namespace kiwi;
