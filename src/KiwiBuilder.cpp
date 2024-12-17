@@ -2028,7 +2028,7 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 	// 오타 교정이 있는 경우 가능한 모든 오타에 대해 Trie 생성
 	else
 	{
-		using TypoInfo = tuple<uint32_t, float, CondVowel>;
+		using TypoInfo = tuple<uint32_t, float, uint16_t, CondVowel>;
 		UnorderedMap<KString, Vector<TypoInfo>> typoGroup;
 		auto ptypos = typos.prepare();
 		ret.continualTypoCost = ptypos.getContinualTypoCost();
@@ -2043,12 +2043,12 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 				for (auto t : ptypos._generate(f->form, typoCostThreshold))
 				{
 					if (t.leftCond != CondVowel::none && f->vowel != CondVowel::none && t.leftCond != f->vowel) continue;
-					typoGroup[removeSpace(t.str)].emplace_back(f - ret.forms.data(), t.cost, t.leftCond);
+					typoGroup[removeSpace(t.str)].emplace_back(f - ret.forms.data(), t.cost, f->numSpaces, t.leftCond);
 				}
 			}
 			else
 			{
-				typoGroup[removeSpace(f->form)].emplace_back(f - ret.forms.data(), 0, CondVowel::none);
+				typoGroup[removeSpace(f->form)].emplace_back(f - ret.forms.data(), 0, f->numSpaces, CondVowel::none);
 			}
 		}
 
@@ -2107,7 +2107,7 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 			estimatedNodeSize += f->first.size() - commonPrefix;
 			prevForm = &f->first;
 		}
-		ret.typoForms.emplace_back(0, 0, hash);
+		ret.typoForms.emplace_back(0, 0, 0, hash);
 		ret.typoPtrs.emplace_back(ret.typoPool.size());
 		formTrie.reserveMore(estimatedNodeSize);
 

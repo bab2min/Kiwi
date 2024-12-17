@@ -50,18 +50,21 @@ namespace kiwi
 		uint32_t start = 0;
 		uint32_t typoId = 0;
 		uint32_t end = 0; // only used in continual typo tolerant mode
+		uint32_t numSpaces = 0;
 
 		FormCandidate(const Form* _form = nullptr, 
 			float _cost = 0, 
 			uint32_t _start = 0, 
 			uint32_t _typoId = 0, 
 			uint32_t _end = 0, 
+			uint32_t _numSpaces = 0,
 			uint32_t = 0)
 			: form{ _form }, 
 			cost{ _cost }, 
 			start{ _start }, 
 			typoId{ _typoId }, 
-			end{ _end }
+			end{ _end },
+			numSpaces{ _numSpaces }
 		{}
 
 		size_t getStartPos(size_t ) const
@@ -86,7 +89,7 @@ namespace kiwi
 
 		size_t getFormSizeWithTypos(const size_t* typoPtrs) const
 		{
-			return typoPtrs[typoId + 1] - typoPtrs[typoId];
+			return typoPtrs[typoId + 1] - typoPtrs[typoId] + numSpaces;
 		}
 
 		bool operator==(const Form* f) const
@@ -100,7 +103,7 @@ namespace kiwi
 	{
 		const Form* form = nullptr;
 
-		FormCandidate(const Form* _form = nullptr, float = 0, uint32_t = 0, uint32_t = 0, uint32_t = 0, uint32_t = 0)
+		FormCandidate(const Form* _form = nullptr, float = 0, uint32_t = 0, uint32_t = 0, uint32_t = 0, uint32_t = 0, uint32_t = 0)
 			: form{ _form }
 		{}
 
@@ -146,8 +149,9 @@ namespace kiwi
 			uint32_t _start = 0,
 			uint32_t _typoId = 0,
 			uint32_t _end = 0,
+			uint32_t _numSpaces = 0,
 			uint32_t _lengthenedSize = 0)
-			: FormCandidate<typoTolerant, continualTypoTolerant, false>{ _form, _cost, _start, _typoId, _end, _lengthenedSize },
+			: FormCandidate<typoTolerant, continualTypoTolerant, false>{ _form, _cost, _start, _typoId, _end, _numSpaces, _lengthenedSize },
 			lengthenedSize{ _lengthenedSize }
 		{}
 
@@ -203,6 +207,7 @@ namespace kiwi
 						startPosition ? startPosition : ((nonSpaces.size() - typoFormSize) * posMultiplier), 
 						tCand->typoId, 
 						endPosition, 
+						tCand->numSpaces,
 						lengthenedSize);
 				}
 				if (tCand[0].hash() != tCand[1].hash()) break;

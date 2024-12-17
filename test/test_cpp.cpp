@@ -1657,3 +1657,18 @@ TEST(KiwiCpp, IssueP189)
 	EXPECT_EQ(res[3].str, u"팩");
 	EXPECT_EQ(res[4].str, u"무료");
 }
+
+TEST(KiwiCpp, Issue205)
+{
+	KiwiBuilder builder{ MODEL_PATH, 0, BuildOption::default_, };
+	builder.addWord(u"함박 스테이크");
+	auto kiwi1 = builder.build();
+	auto res1 = kiwi1.analyze(u"함박 스테이크를 먹었습니다", Match::allWithNormalizing).first;
+
+	EXPECT_EQ(res1[0].str, u"함박 스테이크");
+
+	auto kiwi2 = builder.build(DefaultTypoSet::basicTypoSetWithContinual);
+	auto res2 = kiwi2.analyze(u"함박 스테이크를 먹었습니다", Match::allWithNormalizing).first;
+
+	EXPECT_EQ(res2[0].str, u"함박 스테이크");
+}
