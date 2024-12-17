@@ -1,11 +1,14 @@
 #include <kiwi/Dataset.h>
+#include <kiwi/SubstringExtractor.h>
 #include "RaggedVector.hpp"
 
 using namespace kiwi;
 
-HSDataset::HSDataset(size_t _batchSize, size_t _causalContextSize, size_t _windowSize, size_t _workers, double _dropoutProb)
+HSDataset::HSDataset(size_t _batchSize, size_t _causalContextSize, size_t _windowSize, size_t _workers, 
+	double _dropoutProb, double _dropoutProbOnHistory)
 	: workers{ _workers ? make_unique<utils::ThreadPool>(_workers) : nullptr },
 	dropout{ {1 - _dropoutProb * 3, _dropoutProb, _dropoutProb, _dropoutProb} }, 
+	dropoutOnHistory{ _dropoutProbOnHistory },
 	locals( _workers ? workers->size() : 1),
 	batchSize{ _batchSize },
 	causalContextSize{ _causalContextSize },
@@ -149,8 +152,19 @@ size_t HSDataset::_next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode,
 				{
 					for (size_t j = 0; j < causalContextSize; ++j)
 					{
-						local.inData.emplace_back(i + j < causalContextSize ? 
-							nonVocab : tokenToVocab[tokens[i + j - causalContextSize]]);
+						if (i + j < causalContextSize)
+						{
+							local.inData.emplace_back(nonVocab);
+						}
+						else
+						{
+							auto t = tokens[i + j - causalContextSize];
+							if (dropoutOnHistory.p() > 0 && dropoutOnHistory(local.rng))
+							{
+								t = getDefaultMorphemeId((*morphemes)[t].tag);
+							}
+							local.inData.emplace_back(tokenToVocab[t]);
+						}
 					}
 				}
 				if (windowSize)
@@ -345,5 +359,32 @@ std::vector<uint32_t> HSDataset::getAugmentedSent(size_t idx)
 		}
 	}
 	ret.emplace_back(*sent.rbegin());
+	return ret;
+}
+
+std::vector<std::pair<std::vector<uint32_t>, size_t>> kiwi::HSDataset::extractPrefixes(size_t minCnt, size_t maxLength, size_t numWorkers) const
+{
+	using Pair = std::pair<std::vector<uint32_t>, size_t>;
+	std::vector<Pair> ret;
+	PrefixCounter counter{ maxLength, minCnt, numWorkers };
+	for (auto sent : sents.get())
+	{
+		counter.addArray(&*sent.begin(), &*sent.end());
+	}
+	auto trie = counter.count();
+	trie.traverse([&](size_t cnt, const std::vector<uint32_t>& prefix)
+	{
+		if (cnt < minCnt) return;
+		if (std::find_if(prefix.begin(), prefix.end(), [](uint32_t t) { return t < 2; }) != prefix.end())
+		{
+			return;
+		}
+		ret.emplace_back(prefix, cnt);
+	});
+
+	std::sort(ret.begin(), ret.end(), [](const Pair& a, const Pair& b)
+	{
+		return a.second > b.second;
+	});
 	return ret;
 }

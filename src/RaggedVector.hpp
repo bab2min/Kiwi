@@ -94,8 +94,8 @@ namespace kiwi
 
 		auto operator[](size_t idx) -> Range<decltype(data.begin())>
 		{
-			size_t b = idx < ptrs.size() ? ptrs[idx] : data.size();
-			size_t e = idx + 1 < ptrs.size() ? ptrs[idx + 1] : data.size();
+			const size_t b = idx < ptrs.size() ? ptrs[idx] : data.size();
+			const size_t e = idx + 1 < ptrs.size() ? ptrs[idx + 1] : data.size();
 			return { data.begin() + b, data.begin() + e };
 		}
 
@@ -142,30 +142,80 @@ namespace kiwi
 			return { *this, size() };
 		}
 
-		utils::MemoryObject toMemory() const
+		utils::MemoryObject to_memory() const
 		{
-			utils::MemoryOwner ret{ sizeof(size_t) * 2 + sizeof(ValueTy) * data.size() + sizeof(size_t) * ptrs.size() };
+			utils::MemoryOwner ret{ 4 + sizeof(uint64_t) * 2 + sizeof(ValueTy) * data.size() + sizeof(uint64_t) * ptrs.size() };
 			utils::omstream ostr{ (char*)ret.get(), (ptrdiff_t)ret.size()};
-			size_t s;
-			s = data.size();
-			ostr.write((const char*)&s, sizeof(size_t));
-			s = ptrs.size();
-			ostr.write((const char*)&s, sizeof(size_t));
-			ostr.write((const char*)data.data(), sizeof(ValueTy) * data.size());
-			ostr.write((const char*)ptrs.data(), sizeof(size_t) * ptrs.size());
+			write_to_memory(ostr);
 			return ret;
 		}
 
-		static RaggedVector fromMemory(std::istream& istr)
+		void write_to_memory(std::ostream& ostr) const
+		{
+			if (!ostr.write("KIRV", 4))
+			{
+				throw std::runtime_error("Failed to write RaggedVector memory object");
+			}
+			uint64_t s;
+			s = data.size();
+			if (!ostr.write((const char*)&s, sizeof(uint64_t)))
+			{
+				throw std::runtime_error("Failed to write RaggedVector memory object");
+			}
+
+			s = ptrs.size();
+			if (!ostr.write((const char*)&s, sizeof(uint64_t)))
+			{
+				throw std::runtime_error("Failed to write RaggedVector memory object");
+			}
+
+			if (!ostr.write((const char*)data.data(), sizeof(ValueTy) * data.size()))
+			{
+				throw std::runtime_error("Failed to write RaggedVector memory object");
+			}
+
+			if (!ostr.write((const char*)ptrs.data(), sizeof(uint64_t) * ptrs.size()))
+			{
+				throw std::runtime_error("Failed to write RaggedVector memory object");
+			}
+		}
+
+		static RaggedVector from_memory(std::istream& istr)
 		{
 			RaggedVector ret;
-			size_t s;
-			istr.read((char*)&s, sizeof(size_t));
+			char buf[4];
+			if (!istr.read(buf, 4))
+			{
+				throw std::runtime_error("Invalid RaggedVector memory object");
+			}
+
+			if (memcmp(buf, "KIRV", 4) != 0)
+			{
+				throw std::runtime_error("Invalid RaggedVector memory object");
+			}
+
+			uint64_t s;
+			if (!istr.read((char*)&s, sizeof(uint64_t)))
+			{
+				throw std::runtime_error("Invalid RaggedVector memory object");
+			}
 			ret.data.resize(s);
-			istr.read((char*)&s, sizeof(size_t));
+
+			if (!istr.read((char*)&s, sizeof(uint64_t)))
+			{
+				throw std::runtime_error("Invalid RaggedVector memory object");
+			}
 			ret.ptrs.resize(s);
-			istr.read((char*)ret.data.data(), sizeof(ValueTy) * ret.data.size());
-			istr.read((char*)ret.ptrs.data(), sizeof(size_t) * ret.ptrs.size());
+
+			if (!istr.read((char*)ret.data.data(), sizeof(ValueTy) * ret.data.size()))
+			{
+				throw std::runtime_error("Invalid RaggedVector memory object");
+			}
+
+			if (!istr.read((char*)ret.ptrs.data(), sizeof(uint64_t) * ret.ptrs.size()))
+			{
+				throw std::runtime_error("Invalid RaggedVector memory object");
+			}
 			return ret;
 		}
 	};

@@ -598,6 +598,7 @@ void KiwiBuilder::_addCorpusTo(
 		auto fields = split(wstr, u'\t');
 		if (fields.size() < 2) continue;
 
+		size_t mergedIndex = -1;
 		for (size_t i = 1; i < fields.size(); i += 2)
 		{
 			auto f = normalizeHangul(fields[i]);
@@ -616,6 +617,24 @@ void KiwiBuilder::_addCorpusTo(
 			{
 				cerr << "Unknown tags at line " << numLine << " :\t" << line << endl;
 				alreadyPrintError = true;
+			}
+
+			if (t == POSTag::z_siot || i == mergedIndex)
+			{
+				continue;
+			}
+
+			if (i + 6 < fields.size() && toPOSTag(fields[i + 3]) == POSTag::z_siot)
+			{
+				auto nf = f;
+				nf += normalizeHangul(fields[i + 2]);
+				nf += normalizeHangul(fields[i + 4]);
+				if (morphMap.count(make_tuple(nf, 0, POSTag::nng)))
+				{
+					f = nf;
+					t = POSTag::nng;
+					mergedIndex = i + 4;
+				}
 			}
 
 			if (f[0] == u'아' && fields[i + 1][0] == 'E')
@@ -2247,9 +2266,47 @@ vector<WordInfo> KiwiBuilder::extractAddWords(const U16MultipleReader& reader, s
 	return words;
 }
 
+void KiwiBuilder::convertHSData(
+	const vector<string>& inputPathes,
+	const string& outputPath,
+	const string& morphemeDefPath,
+	size_t morphemeDefMinCnt
+) const
+{
+	unique_ptr<KiwiBuilder> dummyBuilder;
+	const KiwiBuilder* srcBuilder = this;
+	MorphemeMap realMorph;
+	if (morphemeDefPath.empty())
+	{
+		realMorph = restoreMorphemeMap();
+	}
+	else
+	{
+		dummyBuilder = make_unique<KiwiBuilder>();
+		dummyBuilder->initMorphemes();
+		ifstream ifs;
+		realMorph = dummyBuilder->loadMorphemesFromTxt(openFile(ifs, morphemeDefPath), [&](POSTag tag, float cnt)
+		{
+			return cnt >= morphemeDefMinCnt;
+		});
+		srcBuilder = dummyBuilder.get();
+	}
+
+	RaggedVector<uint32_t> sents;
+	for (auto& path : inputPathes)
+	{
+		ifstream ifs;
+		srcBuilder->addCorpusTo(sents, openFile(ifs, path), realMorph);
+	}
+
+	ofstream ofs;
+	sents.write_to_memory(openFile(ofs, outputPath, ios_base::binary));
+}
+
 HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes, 
 	size_t batchSize, size_t causalContextSize, size_t windowSize, size_t numWorkers, 
 	double dropoutProb,
+	double dropoutProbOnHistory,
 	const TokenFilter& tokenFilter,
 	const TokenFilter& windowFilter,
 	double splitRatio,
@@ -2259,7 +2316,7 @@ HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes,
 	HSDataset* splitDataset
 ) const
 {
-	HSDataset dataset{ batchSize, causalContextSize, windowSize, numWorkers, dropoutProb };
+	HSDataset dataset{ batchSize, causalContextSize, windowSize, numWorkers, dropoutProb, dropoutProbOnHistory };
 	auto& sents = dataset.sents.get();
 	const KiwiBuilder* srcBuilder = this;
 	MorphemeMap realMorph;
@@ -2301,8 +2358,25 @@ HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes,
 
 	for (auto& path : inputPathes)
 	{
-		ifstream ifs;
-		srcBuilder->addCorpusTo(sents, openFile(ifs, path), realMorph, splitRatio, splitDataset ? &splitDataset->sents.get() : nullptr);
+		try
+		{
+			ifstream ifs;
+			auto cvtSents = RaggedVector<uint32_t>::from_memory(openFile(ifs, path, ios_base::binary));
+			if (splitRatio > 0)
+			{
+				throw invalid_argument("splitDataset cannot be used with binary input");
+			}
+			for (auto s : cvtSents)
+			{
+				sents.emplace_back();
+				sents.insert_data(s.begin(), s.end());
+			}
+		}
+		catch (const runtime_error&)
+		{
+			ifstream ifs;
+			srcBuilder->addCorpusTo(sents, openFile(ifs, path), realMorph, splitRatio, splitDataset ? &splitDataset->sents.get() : nullptr);
+		}
 	}
 	size_t tokenSize = sents.raw().empty() ? 0 : *max_element(sents.raw().begin(), sents.raw().end()) + 1;
 

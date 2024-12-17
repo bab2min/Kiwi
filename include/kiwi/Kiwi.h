@@ -799,11 +799,19 @@ namespace kiwi
 			return build(getDefaultTypoSet(typos), typoCostThreshold);
 		}
 
+		void convertHSData(
+			const std::vector<std::string>& inputPathes,
+			const std::string& outputPath,
+			const std::string& morphemeDefPath = {},
+			size_t morphemeDefMinCnt = 0
+		) const;
+
 		using TokenFilter = std::function<bool(const std::u16string&, POSTag)>;
 
 		HSDataset makeHSDataset(const std::vector<std::string>& inputPathes, 
 			size_t batchSize, size_t causalContextSize, size_t windowSize, size_t numWorkers, 
 			double dropoutProb = 0,
+			double dropoutProbOnHistory = 0,
 			const TokenFilter& tokenFilter = {},
 			const TokenFilter& windowFilter = {},
 			double splitRatio = 0,

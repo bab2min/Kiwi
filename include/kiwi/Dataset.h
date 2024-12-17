@@ -49,6 +49,7 @@ namespace kiwi
 		std::unique_ptr<utils::ThreadPool> workers;
 		std::shared_ptr<KiwiBuilder> dummyBuilder;
 		std::discrete_distribution<> dropout;
+		std::bernoulli_distribution dropoutOnHistory;
 		std::mt19937_64 rng;
 		Vector<ThreadLocal> locals;
 		Vector<size_t> shuffledIdx;
@@ -71,7 +72,7 @@ namespace kiwi
 		size_t _next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode, float& restLmOut, uint32_t& restLmCntOut);
 
 	public:
-		HSDataset(size_t _batchSize = 0, size_t _causalContextSize = 0, size_t _windowSize = 0, size_t _workers = 0, double _dropoutProb = 0);
+		HSDataset(size_t _batchSize = 0, size_t _causalContextSize = 0, size_t _windowSize = 0, size_t _workers = 0, double _dropoutProb = 0, double _dropoutProbOnHistory = 0);
 		~HSDataset();
 		HSDataset(const HSDataset&) = delete;
 		HSDataset(HSDataset&&) /*noexcept*/;
@@ -101,5 +102,7 @@ namespace kiwi
 
 		Range<Vector<uint32_t>::const_iterator> getSent(size_t idx) const;
 		std::vector<uint32_t> getAugmentedSent(size_t idx);
+
+		std::vector<std::pair<std::vector<uint32_t>, size_t>> extractPrefixes(size_t minCnt, size_t maxLength, size_t numWorkers = 1) const;
 	};
 }
