@@ -228,17 +228,18 @@ namespace kiwi
 		uint32_t formId = 0;
 		float scoreHash = 0;
 		uint32_t typoId = 0;
+		uint16_t numSpaces = 0;
 		CondVowel leftCond = CondVowel::none;
 
 		TypoForm() = default;
 
-		TypoForm(const std::tuple<uint32_t, float, CondVowel>& p)
-			: formId{ std::get<0>(p) }, scoreHash{ std::get<1>(p) }, leftCond{ std::get<2>(p) }
+		TypoForm(const std::tuple<uint32_t, float, uint16_t, CondVowel>& p)
+			: formId{ std::get<0>(p) }, scoreHash{ std::get<1>(p) }, numSpaces{ std::get<2>(p)}, leftCond{std::get<3>(p)}
 		{
 		}
 
-		TypoForm(uint32_t _formId, float _score = 0, bool _hash = 0, uint32_t _typoId = 0, CondVowel _leftCond = CondVowel::none)
-			: formId{ _formId }, scoreHash{ _hash ? -_score : _score }, typoId{ _typoId }, leftCond{ _leftCond }
+		TypoForm(uint32_t _formId, float _score = 0, bool _hash = 0, uint32_t _typoId = 0, uint16_t _numSpaces = 0, CondVowel _leftCond = CondVowel::none)
+			: formId{ _formId }, scoreHash{ _hash ? -_score : _score }, typoId{ _typoId }, numSpaces{ _numSpaces }, leftCond{ _leftCond }
 		{
 		}
 
