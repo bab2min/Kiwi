@@ -19,7 +19,6 @@ namespace kiwi
 	{
 		static constexpr size_t serialAlignment = 16;
 
-
 		using QCode = qe::QCode<0, 2, 8, 16>;
 
 		template<size_t bits>
@@ -98,11 +97,8 @@ namespace kiwi
 			std::unique_ptr<DiffType[]> all_value_data;
 			size_t num_non_leaf_nodes = 0;
 			DiffType* value_data = nullptr;
-			const float* ll_data = nullptr;
-			const float* gamma_data = nullptr;
 			const KeyType* htx_data = nullptr;
 			const void* extra_buf = nullptr;
-			Vector<float> restored_floats;
 			float unk_ll = 0;
 			ptrdiff_t bos_node_idx = 0;
 
@@ -193,7 +189,9 @@ namespace kiwi
 				}
 
 				// restore ll & gamma data
-				Vector<float> restored_leaf_ll;
+				Vector<float> restored_leaf_ll, restored_floats;
+				const float* ll_data = nullptr;
+				const float* gamma_data = nullptr;
 				const float* leaf_ll_data = nullptr;
 				if (quantized)
 				{
@@ -262,6 +260,8 @@ namespace kiwi
 						}
 						node.num_nexts = node_sizes[i];
 						node.next_offset = next_offset;
+						node.ll = ll_data[non_leaf_idx];
+						node.gamma = gamma_data[non_leaf_idx];
 						next_offset += node_sizes[i];
 						key_ranges.emplace_back(std::array<size_t, 3>{ non_leaf_idx, (size_t)node.next_offset, (size_t)(node.next_offset + node.num_nexts) });
 						non_leaf_idx++;
@@ -343,14 +343,14 @@ namespace kiwi
 						node->num_nexts, next, v
 						))
 					{
-						return gamma_data[node_idx] + getLL(node_idx + node->lower, next);
+						return node->gamma + getLL(node_idx + node->lower, next);
 					}
 				}
 
 				// non-leaf node
 				if (v > 0)
 				{
-					return ll_data[node_idx + v];
+					return node_data[node_idx + v].ll;
 				}
 				// leaf node
 				else
@@ -396,7 +396,7 @@ namespace kiwi
 							node->num_nexts, next, v
 							))
 						{
-							acc += gamma_data[node_idx];
+							acc += node->gamma;
 							node_idx += node->lower;
 							PREFETCH_T0(&key_data[node_data[node_idx].next_offset]);
 							continue;
@@ -407,7 +407,7 @@ namespace kiwi
 					if (v > 0)
 					{
 						node_idx += v;
-						return acc + ll_data[node_idx];
+						return acc + node_data[node_idx].ll;
 					}
 					// leaf node
 					else
@@ -456,16 +456,6 @@ namespace kiwi
 				return bos_node_idx;
 			}
 
-			const float* getLLBuf() const final
-			{
-				return ll_data;
-			}
-
-			const float* getGammaBuf() const final
-			{
-				return gamma_data;
-			}
-
 			const void* getExtraBuf() const final
 			{
 				return extra_buf;
@@ -479,11 +469,6 @@ namespace kiwi
 			size_t nonLeafNodeSize() const final
 			{
 				return num_non_leaf_nodes;
-			}
-
-			size_t llSize() const final
-			{
-				return gamma_data - ll_data;
 			}
 
 			std::vector<float> allNextLL(ptrdiff_t node_idx) const final
@@ -500,14 +485,14 @@ namespace kiwi
 					}
 					else
 					{
-						ret[keys[i]] = ll_data[node_idx + values[i]];
+						ret[keys[i]] = node_data[node_idx + values[i]].ll;
 					}
 				}
 
 				float acc = 0;
 				while (node->lower)
 				{
-					acc += gamma_data[node - &node_data[0]];
+					acc += node->gamma;
 					node += node->lower;
 					keys = &key_data[node->next_offset];
 					values = &value_data[node->next_offset];
@@ -520,7 +505,7 @@ namespace kiwi
 						}
 						else
 						{
-							ret[keys[i]] = acc + ll_data[node - &node_data[0] + values[i]];
+							ret[keys[i]] = acc + node[values[i]].ll;
 						}
 					}
 				}
@@ -550,7 +535,7 @@ namespace kiwi
 					}
 					else
 					{
-						ret[k] = ll_data[node_idx + v];
+						ret[k] = node_data[node_idx + v].ll;
 					}
 
 					if (htx_data)
@@ -590,7 +575,7 @@ namespace kiwi
 				float acc = 0;
 				while (node->lower)
 				{
-					acc += gamma_data[node - &node_data[0]];
+					acc += node->gamma;
 					node += node->lower;
 					keys = &key_data[node->next_offset];
 					values = &value_data[node->next_offset];
@@ -605,7 +590,7 @@ namespace kiwi
 						}
 						else
 						{
-							ret[k] = acc + ll_data[node - &node_data[0] + v];
+							ret[k] = acc + node[v].ll;
 						}
 
 						if (htx_data)
@@ -667,7 +652,7 @@ namespace kiwi
 					}
 					else
 					{
-						buf.emplace_back(ll_data[node_idx + values[i]], (KeyOut)keys[i]);
+						buf.emplace_back(node_data[node_idx + values[i]].ll, (KeyOut)keys[i]);
 					}
 				}
 				std::make_heap(buf.begin(), buf.end());
@@ -675,7 +660,7 @@ namespace kiwi
 				float acc = 0;
 				while (node->num_nexts < top_n && node->lower)
 				{
-					acc += gamma_data[node - &node_data[0]];
+					acc += node->gamma;
 					node += node->lower;
 					keys = &key_data[node->next_offset];
 					values = &value_data[node->next_offset];
@@ -687,7 +672,7 @@ namespace kiwi
 						}
 						else
 						{
-							buf.emplace_back(acc + ll_data[node - &node_data[0] + values[i]], (KeyOut)keys[i]);
+							buf.emplace_back(acc + node[values[i]].ll, (KeyOut)keys[i]);
 						}
 						std::push_heap(buf.begin(), buf.end());
 					}
