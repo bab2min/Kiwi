@@ -31,6 +31,7 @@ namespace kiwi
 			KeyType num_nexts = 0;
 			DiffType lower = 0;
 			uint32_t next_offset = 0;
+			float ll = 0, gamma = 0;
 		};
 
 		class KnLangModelBase
@@ -56,9 +57,6 @@ namespace kiwi
 			virtual ptrdiff_t getLowerNode(ptrdiff_t node_idx) const = 0;
 
 			virtual size_t nonLeafNodeSize() const = 0;
-			virtual size_t llSize() const = 0;
-			virtual const float* getLLBuf() const = 0;
-			virtual const float* getGammaBuf() const = 0;
 			virtual const void* getExtraBuf() const = 0;
 
 			static std::unique_ptr<KnLangModelBase> create(utils::MemoryObject&& mem, ArchType archType = ArchType::none);
