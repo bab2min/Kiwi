@@ -760,7 +760,7 @@ void KiwiBuilder::loadMorphBin(std::istream& is)
 	for (auto& form : forms)
 	{
 		const size_t idx = &form - &forms[0];
-		if (idx < defaultFormSize + 27) continue;
+		if (idx < defaultFormSize) continue;
 		formMap.emplace(form.form, idx);
 	}
 }
@@ -834,24 +834,10 @@ void KiwiBuilder::initMorphemes()
 	morphemes[defaultTagSize + 28].userScore = -1.5f;
 }
 
-KiwiBuilder::KiwiBuilder(const ModelBuildArgs& args)
+template<class VocabTy>
+unique_ptr<lm::KnLangModelBase> KiwiBuilder::buildKnLM(const ModelBuildArgs& args, size_t lmVocabSize, MorphemeMap& realMorph) const
 {
-	if (!(args.lmMinCnts.size() == 1 || args.lmMinCnts.size() == args.lmOrder))
-	{
-		throw invalid_argument{ "lmMinCnts should have 1 or lmOrder elements" };
-	}
-
-	archType = getSelectedArch(ArchType::default_);
-	initMorphemes();
-
-	ifstream ifs;
-	auto realMorph = loadMorphemesFromTxt(openFile(ifs, args.morphemeDef), [&](POSTag tag, float cnt)
-	{
-		return cnt >= args.minMorphCnt;
-	});
-	updateForms();
-
-	RaggedVector<utils::Vid> sents;
+	RaggedVector<VocabTy> sents;
 	for (auto& path : args.corpora)
 	{
 		ifstream ifs;
@@ -881,11 +867,7 @@ KiwiBuilder::KiwiBuilder(const ModelBuildArgs& args)
 		}
 	}
 	
-	size_t lmVocabSize = 0;
-	for (auto& p : realMorph) lmVocabSize = max(p.second.first, lmVocabSize);
-	lmVocabSize += 1;
-
-	Vector<utils::Vid> historyTx(lmVocabSize);
+	Vector<VocabTy> historyTx(lmVocabSize);
 	if (args.useLmTagHistory)
 	{
 		for (size_t i = 0; i < lmVocabSize; ++i)
@@ -894,24 +876,13 @@ KiwiBuilder::KiwiBuilder(const ModelBuildArgs& args)
 		}
 	}
 
-	vector<pair<uint16_t, uint16_t>> bigramList;
 	utils::ThreadPool pool;
-	if (args.numWorkers > 1)
+	if (args.numWorkers >= 1)
 	{
 		pool.~ThreadPool();
 		new (&pool) utils::ThreadPool{ args.numWorkers };
 	}
-	size_t lmMinCnt = *std::min(args.lmMinCnts.begin(), args.lmMinCnts.end());
-	auto cntNodes = utils::count(sents.begin(), sents.end(), lmMinCnt, 1, args.lmOrder, (args.numWorkers > 1 ? &pool : nullptr), &bigramList, args.useLmTagHistory ? &historyTx : nullptr);
-	// discount for bos node cnt
-	if (args.useLmTagHistory)
-	{
-		cntNodes.root().getNext(lmVocabSize)->val /= 2;
-	}
-	else
-	{
-		cntNodes.root().getNext(0)->val /= 2;
-	}
+	const size_t lmMinCnt = *std::min(args.lmMinCnts.begin(), args.lmMinCnts.end());
 	std::vector<size_t> minCnts;
 	if (args.lmMinCnts.size() == 1)
 	{
@@ -922,37 +893,84 @@ KiwiBuilder::KiwiBuilder(const ModelBuildArgs& args)
 	{
 		minCnts = args.lmMinCnts;
 	}
-	langMdl.knlm = lm::KnLangModelBase::create(lm::KnLangModelBase::build(
+
+	vector<pair<VocabTy, VocabTy>> bigramList;
+	auto cntNodes = utils::count(sents.begin(), sents.end(), lmMinCnt, 1, args.lmOrder, (args.numWorkers > 1 ? &pool : nullptr), &bigramList, args.useLmTagHistory ? &historyTx : nullptr);
+	// discount for bos node cnt
+	if (args.useLmTagHistory)
+	{
+		cntNodes.root().getNext(lmVocabSize)->val /= 2;
+	}
+	else
+	{
+		cntNodes.root().getNext(0)->val /= 2;
+	}
+
+	return lm::KnLangModelBase::create(lm::KnLangModelBase::build(
 		cntNodes, 
 		args.lmOrder, minCnts, 
 		2, 0, 1, 1e-5, 
 		args.quantizeLm ? 8 : 0,
-		args.compressLm,
+		sizeof(VocabTy) == 2 ? args.compressLm : false,
 		&bigramList, 
 		args.useLmTagHistory ? &historyTx : nullptr
 	), archType);
+}
+
+
+KiwiBuilder::KiwiBuilder(const ModelBuildArgs& args)
+{
+	if (!(args.lmMinCnts.size() == 1 || args.lmMinCnts.size() == args.lmOrder))
+	{
+		throw invalid_argument{ "lmMinCnts should have 1 or lmOrder elements" };
+	}
+
+	archType = getSelectedArch(ArchType::default_);
+	initMorphemes();
+
+	ifstream ifs;
+	auto realMorph = loadMorphemesFromTxt(openFile(ifs, args.morphemeDef), [&](POSTag tag, float cnt)
+	{
+		return cnt >= args.minMorphCnt;
+	});
+	updateForms();
+
+	size_t lmVocabSize = 0;
+	for (auto& p : realMorph) lmVocabSize = max(p.second.first, lmVocabSize);
+	lmVocabSize += 1;
+
+	if (lmVocabSize <= 0xFFFF)
+	{
+		langMdl.knlm = buildKnLM<uint16_t>(args, lmVocabSize, realMorph);
+	}
+	else
+	{
+		langMdl.knlm = buildKnLM<uint32_t>(args, lmVocabSize, realMorph);
+	}
 
 	updateMorphemes();
 }
 
+
 namespace kiwi
 {
+	template<class Vid>
 	class SBDataFeeder
 	{
-		const RaggedVector<utils::Vid>& sents;
+		const RaggedVector<Vid>& sents;
 		const lm::KnLangModelBase* lm = nullptr;
 		Vector<Vector<float>> lmBuf;
 		Vector<Vector<uint32_t>> nodeBuf;
 
 	public:
-		SBDataFeeder(const RaggedVector<utils::Vid>& _sents, const lm::KnLangModelBase* _lm, size_t numThreads = 1)
+		SBDataFeeder(const RaggedVector<Vid>& _sents, const lm::KnLangModelBase* _lm, size_t numThreads = 1)
 			: sents{ _sents }, lm{ _lm }, lmBuf(numThreads), nodeBuf(numThreads)
 		{
 		}
 
-		sb::FeedingData<utils::Vid> operator()(size_t i, size_t threadId = 0)
+		sb::FeedingData<Vid> operator()(size_t i, size_t threadId = 0)
 		{
-			sb::FeedingData<utils::Vid> ret;
+			sb::FeedingData<Vid> ret;
 			ret.len = sents[i].size();
 			if (lmBuf[threadId].size() < ret.len)
 			{
@@ -971,9 +989,11 @@ namespace kiwi
 KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 	: KiwiBuilder{ modelPath }
 {
+	using Vid = uint16_t;
+
 	auto realMorph = restoreMorphemeMap();
-	sb::SkipBigramTrainer<utils::Vid, 8> sbg;
-	RaggedVector<utils::Vid> sents;
+	sb::SkipBigramTrainer<Vid, 8> sbg;
+	RaggedVector<Vid> sents;
 	for (auto& path : args.corpora)
 	{
 		ifstream ifs;
@@ -1050,7 +1070,7 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 		return true;
 	};
 
-	sbg = sb::SkipBigramTrainer<utils::Vid, 8>{ sents, sbgTokenFilter, sbgPairFilter, 0, 150, 20, true, 0.333f, 1, args.sbgSize, langMdl.knlm->nonLeafNodeSize() };
+	sbg = sb::SkipBigramTrainer<Vid, 8>{ sents, sbgTokenFilter, sbgPairFilter, 0, 150, 20, true, 0.333f, 1, args.sbgSize, langMdl.knlm->nonLeafNodeSize() };
 	Vector<float> lmLogProbs;
 	Vector<uint32_t> baseNodes;
 	auto tc = sbg.newContext();
@@ -1088,7 +1108,7 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 
 	if (args.numWorkers <= 1)
 	{
-		sbg.train(SBDataFeeder{ sents, langMdl.knlm.get() }, [&](const sb::ObservingData& od)
+		sbg.train(SBDataFeeder<Vid>{ sents, langMdl.knlm.get() }, [&](const sb::ObservingData& od)
 		{
 			llCnt += od.cntRecent;
 			llMean += (od.llRecent - llMean * od.cntRecent) / llCnt;
@@ -1102,7 +1122,7 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 	}
 	else
 	{
-		sbg.trainMulti(args.numWorkers, SBDataFeeder{ sents, langMdl.knlm.get(), 8 }, [&](const sb::ObservingData& od)
+		sbg.trainMulti(args.numWorkers, SBDataFeeder<Vid>{ sents, langMdl.knlm.get(), 8 }, [&](const sb::ObservingData& od)
 		{
 			llCnt += od.cntRecent;
 			llMean += (od.llRecent - llMean * od.cntRecent) / llCnt;

@@ -15,8 +15,6 @@ namespace kiwi
 {
 	namespace lm
 	{
-		using Vid = uint16_t;
-
 		struct Header
 		{
 			uint64_t num_nodes, node_offset, key_offset, ll_offset, gamma_offset, qtable_offset, htx_offset;
@@ -61,12 +59,12 @@ namespace kiwi
 
 			static std::unique_ptr<KnLangModelBase> create(utils::MemoryObject&& mem, ArchType archType = ArchType::none);
 
-			template<class Trie, class HistoryTx = std::vector<Vid>>
+			template<class VocabTy, class Trie, class HistoryTx = std::vector<VocabTy>>
 			static utils::MemoryOwner build(Trie&& ngram_cf,
 				size_t order, const std::vector<size_t>& min_cf_by_order,
 				size_t unk_id, size_t bos_id, size_t eos_id,
 				float unigram_alpha, size_t quantize, bool compress,
-				const std::vector<std::pair<Vid, Vid>>* bigram_list = nullptr,
+				const std::vector<std::pair<VocabTy, VocabTy>>* bigram_list = nullptr,
 				const HistoryTx* history_transformer = nullptr,
 				const void* extra_buf = nullptr,
 				size_t extra_buf_size = 0

@@ -1088,11 +1088,11 @@ namespace kiwi
 			using type = utils::TrieNodeEx<Key, Value>;
 		};
 
-		template<class Trie, class HistoryTx>
+		template<class VocabTy, class Trie, class HistoryTx>
 		utils::MemoryOwner KnLangModelBase::build(Trie&& ngram_cf, 
 			size_t order, const std::vector<size_t>& min_cf_by_order, 
 			size_t unk_id, size_t bos_id, size_t eos_id, float unigram_alpha, size_t quantize, bool compress,
-			const std::vector<std::pair<Vid, Vid>>* bigram_list, const HistoryTx* history_transformer,
+			const std::vector<std::pair<VocabTy, VocabTy>>* bigram_list, const HistoryTx* history_transformer,
 			const void* extra_buf, size_t extra_buf_size
 		)
 		{

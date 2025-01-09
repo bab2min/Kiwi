@@ -384,7 +384,7 @@ namespace kiwi
 		utils::MemoryOwner mem;
 		{
 			auto trie = count();
-			mem = lm::KnLangModelBase::build(move(trie), prefixSize, minCfByOrder, unkTokenId, bosTokenId, eosTokenId, 
+			mem = lm::KnLangModelBase::build<uint32_t>(move(trie), prefixSize, minCfByOrder, unkTokenId, bosTokenId, eosTokenId, 
 				1e-5f, 0, false, nullptr, (const Vector<int>*)nullptr,
 				extraBuf.data(), extraBuf.size());
 		}

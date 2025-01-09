@@ -541,12 +541,34 @@ namespace kiwi
 		BuildOption options = BuildOption::none;
 		ArchType archType = ArchType::none;
 
+	public:
+		struct ModelBuildArgs
+		{
+			std::string morphemeDef;
+			std::vector<std::string> corpora;
+			size_t minMorphCnt = 10;
+			size_t lmOrder = 4;
+			std::vector<size_t> lmMinCnts = { 1 };
+			size_t numWorkers = 1;
+			size_t sbgSize = 1000000;
+			bool useLmTagHistory = true;
+			bool quantizeLm = true;
+			bool compressLm = true;
+			float dropoutSampling = 0.05f;
+			float dropoutProb = 0.15f;
+		};
+
+	private:
+		using MorphemeMap = UnorderedMap<std::tuple<KString, uint8_t, POSTag>, std::pair<size_t, size_t>>;
+
+		template<class VocabTy>
+		std::unique_ptr<lm::KnLangModelBase> buildKnLM(const ModelBuildArgs& args, size_t lmVocabSize, MorphemeMap& morphMap) const;
+
 		void loadMorphBin(std::istream& is);
 		void saveMorphBin(std::ostream& os) const;
 		FormRaw& addForm(const KString& form);
 		size_t addForm(Vector<FormRaw>& newForms, UnorderedMap<KString, size_t>& newFormMap, KString form) const;
 
-		using MorphemeMap = UnorderedMap<std::tuple<KString, uint8_t, POSTag>, std::pair<size_t, size_t>>;
 		
 		void initMorphemes();
 
