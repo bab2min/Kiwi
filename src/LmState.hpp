@@ -4,6 +4,7 @@
 #include <kiwi/ArchUtils.h>
 #include "Knlm.hpp"
 #include "SkipBigramModel.hpp"
+#include "PCLanguageModel.hpp"
 
 namespace kiwi
 {
@@ -27,13 +28,14 @@ namespace kiwi
 		}
 	};
 
-	template<ArchType _arch, class VocabTy>
+	template<ArchType _arch, class VocabTy, bool _transposed = false>
 	class KnLMState
 	{
 		friend struct Hash<KnLMState<_arch, VocabTy>>;
 		int32_t node = 0;
 	public:
 		static constexpr ArchType arch = _arch;
+		static constexpr bool transposed = _transposed;
 
 		KnLMState() = default;
 		KnLMState(const LangModel& lm) : node{ (int32_t)static_cast<const lm::KnLangModel<arch, VocabTy>&>(*lm.knlm).getBosNodeIdx() } {}
@@ -62,6 +64,7 @@ namespace kiwi
 		std::array<VocabTy, windowSize> history = { {0,} };
 	public:
 		static constexpr ArchType arch = _arch;
+		static constexpr bool transposed = false;
 
 		SbgState() = default;
 		SbgState(const LangModel& lm) : KnLMState<_arch, VocabTy>{ lm } {}
@@ -101,6 +104,32 @@ namespace kiwi
 		}
 	};
 
+	template<size_t windowSize, ArchType _arch, class VocabTy>
+	class PcLMState
+	{
+		friend struct Hash<PcLMState<windowSize, _arch, VocabTy>>;
+		int32_t node = 0;
+		uint32_t contextIdx = 0;
+		size_t historyPos = 0;
+		std::array<VocabTy, windowSize> history = { {0,} };
+	public:
+		static constexpr ArchType arch = _arch;
+
+		PcLMState() = default;
+		PcLMState(const LangModel& lm) {}
+
+		bool operator==(const PcLMState& other) const
+		{
+			return node == other.node && historyPos == other.historyPos && history == other.history;
+		}
+
+		float next(const LangModel& lm, VocabTy next)
+		{
+			auto& pclm = static_cast<const pclm::PCLanguageModel<arch, VocabTy, windowSize>&>(*lm.pclm);
+			return pclm.progress(node, contextIdx, next);
+		}
+	};
+
 	// hash for LmState
 	template<ArchType arch>
 	struct Hash<VoidState<arch>>
@@ -111,10 +140,10 @@ namespace kiwi
 		}
 	};
 	
-	template<ArchType arch, class VocabTy>
-	struct Hash<KnLMState<arch, VocabTy>>
+	template<ArchType arch, class VocabTy, bool transposed>
+	struct Hash<KnLMState<arch, VocabTy, transposed>>
 	{
-		size_t operator()(const KnLMState<arch, VocabTy>& state) const
+		size_t operator()(const KnLMState<arch, VocabTy, transposed>& state) const
 		{
 			std::hash<int32_t> hasher;
 			return hasher(state.node);
@@ -143,10 +172,22 @@ namespace kiwi
 		template<ArchType arch> using type = KnLMState<arch, VocabTy>;
 	};
 
+	template<class VocabTy>
+	struct WrappedKnLMTransposed
+	{
+		template<ArchType arch> using type = KnLMState<arch, VocabTy, true>;
+	};
+
 	template<size_t windowSize, class VocabTy>
 	struct WrappedSbg
 	{
 		template<ArchType arch> using type = SbgState<windowSize, arch, VocabTy>;
+	};
+
+	template<size_t windowSize, class VocabTy>
+	struct WrappedPcLM
+	{
+		template<ArchType arch> using type = PcLMState<windowSize, arch, VocabTy>;
 	};
 
 	template<class LmStateTy>

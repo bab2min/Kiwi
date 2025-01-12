@@ -111,7 +111,7 @@ kiwi_builder_h kiwi_builder_init(const char* model_path, int num_threads, int op
 	{
 		BuildOption buildOption = (BuildOption)(options & 0xFF);
 		bool useSBG = !!(options & KIWI_BUILD_MODEL_TYPE_SBG);
-		return (kiwi_builder_h)new KiwiBuilder{ model_path, (size_t)num_threads, buildOption, useSBG};
+		return (kiwi_builder_h)new KiwiBuilder{ model_path, (size_t)num_threads, buildOption, useSBG ? ModelType::sbg : ModelType::knlm };
 	}
 	catch (...)
 	{

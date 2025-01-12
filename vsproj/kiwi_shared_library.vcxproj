@@ -40,6 +40,7 @@
     <ClInclude Include="..\include\kiwi\Macro.h" />
     <ClInclude Include="..\include\kiwi\Mmap.h" />
     <ClInclude Include="..\include\kiwi\PatternMatcher.h" />
+    <ClInclude Include="..\include\kiwi\PCLanguageModel.h" />
     <ClInclude Include="..\include\kiwi\ScriptType.h" />
     <ClInclude Include="..\include\kiwi\SkipBigramModel.h" />
     <ClInclude Include="..\include\kiwi\SubstringExtractor.h" />
@@ -69,6 +70,7 @@
     <ClInclude Include="..\src\nuquant.hpp" />
     <ClInclude Include="..\src\PathEvaluator.hpp" />
     <ClInclude Include="..\src\pattern.hpp" />
+    <ClInclude Include="..\src\PCLanguageModel.hpp" />
     <ClInclude Include="..\src\RaggedVector.hpp" />
     <ClInclude Include="..\src\sais\fm_index.hpp" />
     <ClInclude Include="..\src\sais\mp_utils.hpp" />
@@ -120,7 +122,9 @@
     <ClCompile Include="..\src\FileUtils.cpp" />
     <ClCompile Include="..\src\Joiner.cpp" />
     <ClCompile Include="..\src\Knlm.cpp" />
+    <ClCompile Include="..\src\PCLanguageModel.cpp" />
     <ClCompile Include="..\src\search.cpp" />
+    <ClCompile Include="..\src\SkipBigramModel.cpp" />
     <ClCompile Include="..\src\SubstringExtractor.cpp" />
     <ClCompile Include="..\src\TagUtils.cpp" />
     <ClCompile Include="..\src\ScriptType.cpp" />
@@ -136,6 +140,13 @@
     <ClCompile Include="..\src\PatternMatcher.cpp" />
     <ClCompile Include="..\src\Utils.cpp" />
     <ClCompile Include="..\src\WordDetector.cpp" />
+    <ClCompile Include="..\third_party\streamvbyte\src\streamvbytedelta_decode.c" />
+    <ClCompile Include="..\third_party\streamvbyte\src\streamvbytedelta_encode.c" />
+    <ClCompile Include="..\third_party\streamvbyte\src\streamvbyte_0124_decode.c" />
+    <ClCompile Include="..\third_party\streamvbyte\src\streamvbyte_0124_encode.c" />
+    <ClCompile Include="..\third_party\streamvbyte\src\streamvbyte_decode.c" />
+    <ClCompile Include="..\third_party\streamvbyte\src\streamvbyte_encode.c" />
+    <ClCompile Include="..\third_party\streamvbyte\src\streamvbyte_zigzag.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F790BC37-2732-4ED1-9CA5-7248BED3588E}</ProjectGuid>
@@ -213,7 +224,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)..\third_party/json/include;$(ProjectDir)..\third_party/eigen;$(ProjectDir)..\third_party/variant/include;$(ProjectDir)..\third_party/cpuinfo/src;$(ProjectDir)..\third_party/cpuinfo/include;$(ProjectDir)..\third_party/mimalloc/include;$(ProjectDir)..\third_party/cpp-btree;$(ProjectDir)..\include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)..\third_party/json/include;$(ProjectDir)..\third_party/eigen;$(ProjectDir)..\third_party/variant/include;$(ProjectDir)..\third_party/cpuinfo/src;$(ProjectDir)..\third_party/cpuinfo/include;$(ProjectDir)..\third_party/mimalloc/include;$(ProjectDir)..\third_party/cpp-btree;$(ProjectDir)..\third_party/streamvbyte/include;$(ProjectDir)..\include\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <LinkIncremental>true</LinkIncremental>
@@ -225,7 +236,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir)..\third_party/json/include;$(ProjectDir)..\third_party/eigen;$(ProjectDir)..\third_party/variant/include;$(ProjectDir)..\third_party/cpuinfo/src;$(ProjectDir)..\third_party/cpuinfo/include;$(ProjectDir)..\third_party/mimalloc/include;$(ProjectDir)..\third_party/cpp-btree;$(ProjectDir)..\include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)..\third_party/json/include;$(ProjectDir)..\third_party/eigen;$(ProjectDir)..\third_party/variant/include;$(ProjectDir)..\third_party/cpuinfo/src;$(ProjectDir)..\third_party/cpuinfo/include;$(ProjectDir)..\third_party/mimalloc/include;$(ProjectDir)..\third_party/cpp-btree;$(ProjectDir)..\third_party/streamvbyte/include;$(ProjectDir)..\include\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <LinkIncremental>false</LinkIncremental>
@@ -251,7 +262,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>KIWI_ARCH_X86_64=1;KIWI_USE_MIMALLOC;_DEBUG;_CONSOLE;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>KIWI_ARCH_X86_64=1;__restrict__=__restrict;KIWI_USE_MIMALLOC;_DEBUG;_CONSOLE;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalOptions>/Qvec-report:1 /utf-8 /D _CRT_SECURE_NO_WARNINGS=1 /bigobj %(AdditionalOptions)</AdditionalOptions>
@@ -314,7 +325,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>KIWI_ARCH_X86_64=1;KIWI_USE_BTREE;KIWI_USE_MIMALLOC;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>KIWI_ARCH_X86_64=1;__restrict__=__restrict;KIWI_USE_BTREE;KIWI_USE_MIMALLOC;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <AdditionalOptions>/Qvec-report:1 /utf-8 /D _CRT_SECURE_NO_WARNINGS=1 /bigobj %(AdditionalOptions)</AdditionalOptions>

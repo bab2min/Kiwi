@@ -59,12 +59,17 @@ namespace kiwi
 		static tp::Table<FnFindBestPath, AvailableArch> lmKnLM_16{ FindBestPathGetter<WrappedKnLM<uint16_t>::type>{} };
 		static tp::Table<FnFindBestPath, AvailableArch> lmKnLM_32{ FindBestPathGetter<WrappedKnLM<uint32_t>::type>{} };
 		static tp::Table<FnFindBestPath, AvailableArch> lmKnLM_64{ FindBestPathGetter<WrappedKnLM<uint64_t>::type>{} };
+		static tp::Table<FnFindBestPath, AvailableArch> lmKnLMT_8{ FindBestPathGetter<WrappedKnLMTransposed<uint8_t>::type>{} };
+		static tp::Table<FnFindBestPath, AvailableArch> lmKnLMT_16{ FindBestPathGetter<WrappedKnLMTransposed<uint16_t>::type>{} };
+		static tp::Table<FnFindBestPath, AvailableArch> lmKnLMT_32{ FindBestPathGetter<WrappedKnLMTransposed<uint32_t>::type>{} };
 		static tp::Table<FnFindBestPath, AvailableArch> lmSbg_8{ FindBestPathGetter<WrappedSbg<8, uint8_t>::type>{} };
 		static tp::Table<FnFindBestPath, AvailableArch> lmSbg_16{ FindBestPathGetter<WrappedSbg<8, uint16_t>::type>{} };
 		static tp::Table<FnFindBestPath, AvailableArch> lmSbg_32{ FindBestPathGetter<WrappedSbg<8, uint32_t>::type>{} };
 		static tp::Table<FnFindBestPath, AvailableArch> lmSbg_64{ FindBestPathGetter<WrappedSbg<8, uint64_t>::type>{} };
+		static tp::Table<FnFindBestPath, AvailableArch> lmPcLM_16{ FindBestPathGetter<WrappedPcLM<8, uint16_t>::type>{} };
+		static tp::Table<FnFindBestPath, AvailableArch> lmPcLM_32{ FindBestPathGetter<WrappedPcLM<8, uint32_t>::type>{} };
 
-		if (langMdl.sbg)
+		if (langMdl.type == ModelType::sbg)
 		{
 			switch (langMdl.sbg->getHeader().keySize)
 			{
@@ -84,7 +89,7 @@ namespace kiwi
 				throw Exception{ "Wrong `lmKeySize`" };
 			}
 		}
-		else if(langMdl.knlm)
+		else if(langMdl.type == ModelType::knlm)
 		{
 			switch (langMdl.knlm->getHeader().key_size)
 			{
@@ -99,10 +104,44 @@ namespace kiwi
 				break;
 			case 8:
 				dfFindBestPath = (void*)lmKnLM_64[static_cast<std::ptrdiff_t>(selectedArch)];
+			default:
+				throw Exception{ "Wrong `lmKeySize`" };
+			}
+		}
+		else if (langMdl.type == ModelType::knlmTransposed)
+		{
+			switch (langMdl.knlm->getHeader().key_size)
+			{
+			case 1:
+				dfFindBestPath = (void*)lmKnLMT_8[static_cast<std::ptrdiff_t>(selectedArch)];
+				break;
+			case 2:
+				dfFindBestPath = (void*)lmKnLMT_16[static_cast<std::ptrdiff_t>(selectedArch)];
+				break;
+			case 4:
+				dfFindBestPath = (void*)lmKnLMT_32[static_cast<std::ptrdiff_t>(selectedArch)];
 				break;
 			default:
 				throw Exception{ "Wrong `lmKeySize`" };
 			}
+		}
+		else if (langMdl.type == ModelType::pclm)
+		{
+			switch (langMdl.pclm->getHeader().keySize)
+			{
+			case 2:
+				dfFindBestPath = (void*)lmPcLM_16[static_cast<std::ptrdiff_t>(selectedArch)];
+				break;
+			case 4:
+				dfFindBestPath = (void*)lmPcLM_32[static_cast<std::ptrdiff_t>(selectedArch)];
+				break;
+			default:
+				throw Exception{ "Wrong `lmKeySize`" };
+			}
+		}
+		else
+		{
+			throw Exception{ "Unsupported model type" };
 		}
 	}
 
@@ -651,7 +690,7 @@ namespace kiwi
 	inline void insertPathIntoResults(
 		vector<TokenResult>& ret, 
 		Vector<SpecialState>& spStatesByRet,
-		const Vector<PathEvaluator::ChunkResult>& pathes,
+		const Vector<BestPathFinder::ChunkResult>& pathes,
 		size_t topN, 
 		Match matchOptions,
 		bool integrateAllomorph,
@@ -677,7 +716,7 @@ namespace kiwi
 			Vector<uint8_t> selectedPathes(pathes.size());
 			for (size_t i = 0; i < ret.size(); ++i)
 			{
-				auto pred = [&](const PathEvaluator::ChunkResult& p)
+				auto pred = [&](const BestPathFinder::ChunkResult& p)
 				{
 					return p.prevState == spStatesByRet[i];
 				};
@@ -1059,7 +1098,7 @@ namespace kiwi
 			if (nodes.size() <= 2) continue;
 			findPretokenizedGroupOfNode(nodeInWhichPretokenized, nodes, pretokenizedPrev, pretokenizedFirst);
 
-			Vector<PathEvaluator::ChunkResult> res = (*reinterpret_cast<FnFindBestPath>(dfFindBestPath))(
+			Vector<BestPathFinder::ChunkResult> res = (*reinterpret_cast<FnFindBestPath>(dfFindBestPath))(
 				this,
 				spStatesByRet,
 				nodes.data(),

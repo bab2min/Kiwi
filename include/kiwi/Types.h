@@ -303,6 +303,15 @@ namespace kiwi
 		default_ = integrateAllomorph | loadDefaultDict | loadTypoDict | loadMultiDict,
 	};
 
+	enum class ModelType
+	{
+		none = 0, /**< Select default model */
+		knlm = 1, /**< Kneser-Ney Language Model */
+		sbg = 2, /**< Skip-Bigram Model */
+		pclm = 3, /**< Pre-computed Context Language Model */
+		knlmTransposed,
+	};
+
 	struct Morpheme;
 
 	/**

@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <string>
 #include <iostream>
+#include <fstream>
 
 #ifdef _WIN32
 #define NOMINMAX
@@ -260,6 +261,16 @@ namespace kiwi
 
 			const void* get() const { return obj->get(); }
 			size_t size() const { return obj->size(); }
+
+			void writeToFile(const std::string& filepath) const
+			{
+				std::ofstream ofs;
+				if (!openFile(ofs, filepath, std::ios_base::binary))
+				{
+					throw IOException{ "Cannot open file : " + filepath };
+				}
+				ofs.write((const char*)get(), size());
+			}
 		};
 
 		template<bool read, bool write>

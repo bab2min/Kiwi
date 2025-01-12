@@ -11,8 +11,20 @@
 using namespace std;
 using namespace kiwi;
 
+const char* modelTypeToStr(ModelType type)
+{
+	switch (type)
+	{
+	case ModelType::knlm: return "knlm";
+	case ModelType::knlmTransposed: return "knlm-transposed";
+	case ModelType::sbg: return "sbg";
+	case ModelType::pclm: return "pclm";
+	}
+	return "unknown";
+}
+
 int doEvaluate(const string& modelPath, const string& output, const vector<string>& input, 
-	bool normCoda, bool zCoda, bool multiDict, bool useSBG, 
+	bool normCoda, bool zCoda, bool multiDict, ModelType modelType, 
 	float typoCostWeight, bool bTypo, bool cTypo, bool lTypo,
 	int repeat)
 {
@@ -48,14 +60,18 @@ int doEvaluate(const string& modelPath, const string& output, const vector<strin
 			typo |= getDefaultTypoSet(DefaultTypoSet::lengtheningTypoSet);
 		}
 
-		Kiwi kw = KiwiBuilder{ modelPath, 1, option, useSBG }.build(
+		Kiwi kw = KiwiBuilder{ modelPath, 1, option, modelType }.build(
 			typo
 		);
 		if (typoCostWeight > 0) kw.setTypoCostWeight(typoCostWeight);
 		
 		cout << "Loading Time : " << timer.getElapsed() << " ms" << endl;
 		cout << "ArchType : " << archToStr(kw.archType()) << endl;
-		cout << "LM Size : " << (kw.getKnLM()->getMemory().size() / 1024. / 1024.) << " MB" << endl;
+		cout << "Model Type : " << modelTypeToStr(kw.modelType()) << endl;
+		if (kw.getKnLM())
+		{
+			cout << "LM Size : " << (kw.getKnLM()->getMemory().size() / 1024. / 1024.) << " MB" << endl;
+		}
 		cout << "Mem Usage : " << (tutils::getCurrentPhysicalMemoryUsage() / 1024.) << " MB\n" << endl;
 		
 		double avgMicro = 0, avgMacro = 0;
@@ -130,7 +146,7 @@ int main(int argc, const char* argv[])
 	SwitchArg noNormCoda{ "", "no-normcoda", "without normalizing coda", false };
 	SwitchArg noZCoda{ "", "no-zcoda", "without z-coda", false };
 	SwitchArg noMulti{ "", "no-multi", "turn off multi dict", false };
-	SwitchArg useSBG{ "", "sbg", "use SkipBigram", false };
+	ValueArg<string> modelType{ "t", "type", "model type", false, "knlm", "string" };
 	ValueArg<float> typoWeight{ "", "typo", "typo weight", false, 0.f, "float"};
 	SwitchArg bTypo{ "", "btypo", "make basic-typo-tolerant model", false };
 	SwitchArg cTypo{ "", "ctypo", "make continual-typo-tolerant model", false };
@@ -144,7 +160,7 @@ int main(int argc, const char* argv[])
 	cmd.add(noNormCoda);
 	cmd.add(noZCoda);
 	cmd.add(noMulti);
-	cmd.add(useSBG);
+	cmd.add(modelType);
 	cmd.add(typoWeight);
 	cmd.add(bTypo);
 	cmd.add(cTypo);
@@ -160,7 +176,32 @@ int main(int argc, const char* argv[])
 		cerr << "error: " << e.error() << " for arg " << e.argId() << endl;
 		return -1;
 	}
+	ModelType kiwiModelType = ModelType::none;
+	{
+		auto v = modelType.getValue();
+		if (v == "knlm")
+		{
+			kiwiModelType = ModelType::knlm;
+		}
+		else if (v == "sbg")
+		{
+			kiwiModelType = ModelType::sbg;
+		}
+		else if (v == "knlm-transposed")
+		{
+			kiwiModelType = ModelType::knlmTransposed;
+		}
+		else if (v == "pclm")
+		{
+			kiwiModelType = ModelType::pclm;
+		}
+		else
+		{
+			cerr << "Invalid model type" << endl;
+			return -1;
+		}
+	}
 	return doEvaluate(model, output, files.getValue(), 
-		!noNormCoda, !noZCoda, !noMulti, useSBG, typoWeight, bTypo, cTypo, lTypo, repeat);
+		!noNormCoda, !noZCoda, !noMulti, kiwiModelType, typoWeight, bTypo, cTypo, lTypo, repeat);
 }
 

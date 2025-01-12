@@ -1,6 +1,7 @@
 #pragma once
 #include <random>
 #include "Kiwi.h"
+#include "FrozenTrie.h"
 
 namespace kiwi
 {
@@ -30,7 +31,7 @@ namespace kiwi
 		struct ThreadLocal
 		{
 			std::mt19937_64 rng;
-			Vector<uint32_t> tokenBuf;
+			Vector<uint32_t> tokenBuf, contextualTokenBuf;
 			Vector<float> lmLProbsBuf;
 			Vector<uint32_t> outNgramNodeBuf;
 			Deque<int32_t> historyBuf;
@@ -58,6 +59,7 @@ namespace kiwi
 		Deque<OptionalFuture<size_t>> futures;
 		const Vector<MorphemeRaw>* morphemes = nullptr;
 		const Vector<FormRaw>* forms = nullptr;
+		utils::FrozenTrie<uint32_t, uint32_t> contextualMapper;
 		size_t knlmVocabSize = 0;
 		size_t batchSize = 0;
 		size_t causalContextSize = 0;
@@ -103,6 +105,6 @@ namespace kiwi
 		Range<Vector<uint32_t>::const_iterator> getSent(size_t idx) const;
 		std::vector<uint32_t> getAugmentedSent(size_t idx);
 
-		std::vector<std::pair<std::vector<uint32_t>, size_t>> extractPrefixes(size_t minCnt, size_t maxLength, size_t numWorkers = 1) const;
+		std::vector<std::pair<std::vector<uint32_t>, size_t>> extractPrefixes(size_t minCnt, size_t maxLength, size_t numWorkers = 1, bool exclusiveCnt = false) const;
 	};
 }

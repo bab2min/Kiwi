@@ -5,13 +5,22 @@
 #include "Trie.hpp"
 #include "Knlm.h"
 #include "SkipBigramModel.h"
+#include "PCLanguageModel.h"
 
 namespace kiwi
 {
 	struct LangModel
 	{
+		ModelType type;
 		std::shared_ptr<lm::KnLangModelBase> knlm;
 		std::shared_ptr<sb::SkipBigramModelBase> sbg;
+		std::shared_ptr<pclm::PCLanguageModelBase> pclm;
+
+		size_t vocabSize() const
+		{
+			if (knlm) return knlm->getHeader().vocab_size;
+			else return pclm->getHeader().vocabSize;
+		}
 	};
 
 	class LmObjectBase

@@ -436,7 +436,7 @@ TEST(KiwiCpp, HSDataset)
 	};
 
 	HSDataset trainset, devset;
-	trainset = kw.makeHSDataset(data, batchSize, 0, windowSize, 1, 0., 0., tokenFilter, {}, 0.1, false, {}, 0, &devset);
+	trainset = kw.makeHSDataset(data, batchSize, 0, windowSize, 1, 0., 0., tokenFilter, {}, 0.1, false, {}, 0, {}, &devset);
 	for (size_t i = 0; i < 2; ++i)
 	{
 		{
@@ -505,6 +505,7 @@ TEST(KiwiCpp, SentenceBoundaryErrors)
 		EXPECT_EQ(sentRanges.size(), 1);
 		if (sentRanges.size() > 1)
 		{
+			kiwi.splitIntoSents(str, Match::allWithNormalizing, &res);
 			for (auto& r : sentRanges)
 			{
 				std::cerr << std::string{ &str[r.first], r.second - r.first } << std::endl;
@@ -612,12 +613,14 @@ TEST(KiwiCpp, FalsePositiveSB)
 		u"도서전에서 관람객의 관심을 받을 것으로 예상되는 프로그램으로는 '인문학 아카데미'가 있어요. 이 프로그램에서는 유시민 전 의원, 광고인 박웅현 씨 등이 문화 역사 미학 등 다양한 분야에 대해 강의할 예정이다. 또한, '북 멘토 프로그램'도 이어져요. 이 프로그램에서는 각 분야 전문가들이 경험과 노하우를 전수해 주는 프로그램으로, 시 창작(이정록 시인), 번역(강주헌 번역가), 북 디자인(오진경 북디자이너) 등의 분야에서 멘토링이 이뤄져요.",
 	})
 	{
-		auto tokens = kiwi.analyze(str, 10, Match::allWithNormalizing)[0].first;
+		auto res = kiwi.analyze(str, 1, Match::allWithNormalizing);
+		auto tokens = res[0].first;
 		auto sbCount = std::count_if(tokens.begin(), tokens.end(), [](const TokenInfo& t)
 		{
 			return t.tag == POSTag::sb;
 		});
 		EXPECT_EQ(sbCount, 0);
+		kiwi.analyze(str, 10, Match::allWithNormalizing);
 	}
 }
 
@@ -911,12 +914,14 @@ TEST(KiwiCpp, AnalyzeWithLoadDefaultDict)
 
 TEST(KiwiCpp, AnalyzeSBG)
 {
-	Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 0, BuildOption::none, true }.build();
-	kiwi.analyze(TEST_SENT, Match::all);
+	Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 0, BuildOption::none, ModelType::knlm }.build();
+	Kiwi kiwiSbg = KiwiBuilder{ MODEL_PATH, 0, BuildOption::none, ModelType::sbg }.build();
+	kiwiSbg.analyze(TEST_SENT, Match::all);
 
-	auto tokens = kiwi.analyze(u"이 번호로 전화를 이따가 꼭 반드시 걸어.", kiwi::Match::allWithNormalizing).first;
-	EXPECT_EQ(tokens.size(), 11);
-	EXPECT_EQ(tokens[8].str, u"걸");
+	auto res = kiwi.analyze(u"이 번호로 전화를 이따가 꼭 반드시 걸어.", 3, kiwi::Match::allWithNormalizing);
+	auto resSbg = kiwiSbg.analyze(u"이 번호로 전화를 이따가 꼭 반드시 걸어.", 3, kiwi::Match::allWithNormalizing);
+	EXPECT_EQ(resSbg[0].first.size(), 11);
+	EXPECT_EQ(resSbg[0].first[8].str, u"걸");
 }
 
 TEST(KiwiCpp, AnalyzeMultithread)

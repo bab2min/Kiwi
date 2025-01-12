@@ -89,6 +89,7 @@ size_t HSDataset::_next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode,
 	{
 		auto& local = locals[localId];
 		auto& tokens = local.tokenBuf;
+		auto& contextualTokens = local.contextualTokenBuf;
 		tokens.reserve(sents.get()[shuffledIdx[sentFirst]].size());
 		for (size_t s = sentFirst; s < sentLast; ++s)
 		{
@@ -133,6 +134,53 @@ size_t HSDataset::_next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode,
 					history.back() = tokenToVocab[tokens[0]];
 				}
 			}
+
+			if (causalContextSize && contextualMapper.size())
+			{
+				auto* node = contextualMapper.root();
+				contextualTokens.clear();
+				contextualTokens.reserve(tokens.size());
+				for (size_t i = 0; i < tokens.size(); ++i)
+				{
+					const int32_t v = tokenToVocab[tokens[i]];
+					auto* next = node->template nextOpt<ArchType::balanced>(contextualMapper, v);
+					while (!next)
+					{
+						node = node->fail();
+						if (!node) break;
+						next = node->template nextOpt<ArchType::balanced>(contextualMapper, v);
+					}
+					if (next)
+					{
+						auto val = next->val(contextualMapper);
+						if (contextualMapper.hasMatch(val))
+						{
+							contextualTokens.emplace_back(val - 1);
+						}
+						else if (contextualMapper.hasSubmatch(val))
+						{
+							auto sub = next->fail();
+							for (; sub; sub = sub->fail())
+							{
+								val = sub->val(contextualMapper);
+								if (contextualMapper.hasMatch(val))
+								{
+									break;
+								}
+							}
+							if (sub) contextualTokens.emplace_back(val - 1);
+							else contextualTokens.emplace_back(nonVocab);
+						}
+						node = next;
+					}
+					else
+					{
+						contextualTokens.emplace_back(nonVocab);
+						node = contextualMapper.root();
+					}
+				}
+			}
+
 			for (size_t i = 1; i < tokens.size(); ++i)
 			{
 				int32_t v = tokenToVocab[tokens[i]];
@@ -156,6 +204,10 @@ size_t HSDataset::_next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode,
 						if (i + j < causalContextSize)
 						{
 							local.inData.emplace_back(nonVocab);
+						}
+						else if (contextualMapper.size())
+						{
+							local.inData.emplace_back(contextualTokens[i + j - causalContextSize]);
 						}
 						else
 						{
@@ -363,7 +415,7 @@ std::vector<uint32_t> HSDataset::getAugmentedSent(size_t idx)
 	return ret;
 }
 
-std::vector<std::pair<std::vector<uint32_t>, size_t>> kiwi::HSDataset::extractPrefixes(size_t minCnt, size_t maxLength, size_t numWorkers) const
+std::vector<std::pair<std::vector<uint32_t>, size_t>> kiwi::HSDataset::extractPrefixes(size_t minCnt, size_t maxLength, size_t numWorkers, bool exclusiveCnt) const
 {
 	using Pair = std::pair<std::vector<uint32_t>, size_t>;
 	std::vector<Pair> ret;
@@ -373,15 +425,58 @@ std::vector<std::pair<std::vector<uint32_t>, size_t>> kiwi::HSDataset::extractPr
 		counter.addArray(&*sent.begin(), &*sent.end());
 	}
 	auto trie = counter.count();
-	trie.traverse([&](size_t cnt, const std::vector<uint32_t>& prefix)
+	if (exclusiveCnt)
 	{
-		if (cnt < minCnt) return;
-		if (std::find_if(prefix.begin(), prefix.end(), [](uint32_t t) { return t < 2; }) != prefix.end())
+		Vector<UnorderedMap<Vector<uint32_t>, size_t>> cnts_by_length(maxLength);
+		trie.traverse([&](size_t cnt, const std::vector<uint32_t>& prefix)
 		{
-			return;
+			if (cnt < minCnt) return;
+			if (std::find_if(prefix.begin(), prefix.end(), [](uint32_t t) { return t < 2; }) != prefix.end())
+			{
+				return;
+			}
+			Vector<uint32_t> p(prefix.begin(), prefix.end());
+			cnts_by_length[p.size() - 1].emplace(move(p), cnt);
+		});
+
+		Vector<uint32_t> suffix;
+		suffix.reserve(maxLength);
+		for (size_t i = 1; i < maxLength; ++i)
+		{
+			for (auto& p : cnts_by_length[i])
+			{
+				suffix.clear();
+				suffix.insert(suffix.end(), p.first.begin() + 1, p.first.end());
+				auto it = cnts_by_length[i - 1].find(suffix);
+				if (it == cnts_by_length[i - 1].end() || it->second < p.second)
+				{
+					throw std::runtime_error("This should not happen");
+				}
+				it->second -= p.second;
+			}
 		}
-		ret.emplace_back(prefix, cnt);
-	});
+		
+		for (auto& cnts : cnts_by_length)
+		{
+			for (auto& p : cnts)
+			{
+				if (p.second < minCnt) continue;
+				ret.emplace_back(std::vector<uint32_t>{ p.first.begin(), p.first.end() }, p.second);
+			}
+		}
+	}
+	else
+	{
+		trie.traverse([&](size_t cnt, const std::vector<uint32_t>& prefix)
+		{
+			if (cnt < minCnt) return;
+			if (std::find_if(prefix.begin(), prefix.end(), [](uint32_t t) { return t < 2; }) != prefix.end())
+			{
+				return;
+			}
+			ret.emplace_back(prefix, cnt);
+		});
+	}
 
 	std::sort(ret.begin(), ret.end(), [](const Pair& a, const Pair& b)
 	{
