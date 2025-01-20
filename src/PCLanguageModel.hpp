@@ -9,7 +9,7 @@
 #include "ArchAvailable.h"
 #include "search.h"
 #include "streamvbyte.h"
-
+#include "SkipBigramModelImpl.hpp"
 
 namespace kiwi
 {
@@ -35,7 +35,14 @@ namespace kiwi
 			}
 		}
 
-		template<ArchType arch, class KeyType, size_t windowSize>
+		template<class Arr>
+		void logsoftmaxInplace(Arr& arr)
+		{
+			arr -= arr.maxCoeff();
+			arr -= std::log(arr.exp().sum());
+		}
+
+		template<ArchType arch, class KeyType, size_t windowSize, bool exclusive = false, bool useDistantTokens = false>
 		class PCLanguageModel : public PCLanguageModelBase
 		{
 			using MyNode = Node<KeyType, uint32_t>;
@@ -45,11 +52,14 @@ namespace kiwi
 			std::unique_ptr<int32_t[]> valueData;
 			std::unique_ptr<float[]> contextEmb;
 			std::unique_ptr<float[]> contextBias;
+			std::unique_ptr<float[]> contextValidTokenSum;
 			std::unique_ptr<float[]> contextConf;
 			std::unique_ptr<float[]> distantEmb;
 			std::unique_ptr<float[]> distantBias;
 			std::unique_ptr<float[]> distantConf;
+			std::unique_ptr<float[]> positionConf;
 			std::unique_ptr<float[]> outputEmb;
+			std::unique_ptr<uint8_t[]> distantMask;
 
 			MyNode* findLowerNode(MyNode* node, KeyType k) const
 			{
@@ -199,10 +209,15 @@ namespace kiwi
 				auto* eptr = ptr + header.embOffset;
 				contextEmb = make_unique<float[]>(header.contextSize * header.dim);
 				contextBias = make_unique<float[]>(header.contextSize);
+				contextValidTokenSum = make_unique<float[]>(header.contextSize);
 				contextConf = make_unique<float[]>(header.contextSize);
-				distantEmb = make_unique<float[]>(header.vocabSize * header.dim);
-				distantBias = make_unique<float[]>(header.vocabSize);
-				distantConf = make_unique<float[]>(header.vocabSize);
+				if (useDistantTokens)
+				{
+					distantEmb = make_unique<float[]>(header.vocabSize * header.dim);
+					distantBias = make_unique<float[]>(header.vocabSize);
+					distantConf = make_unique<float[]>(header.vocabSize);
+					positionConf = make_unique<float[]>(header.windowSize);
+				}
 				outputEmb = make_unique<float[]>(header.vocabSize * header.dim);
 
 				const uint16_t* contextEmbScale = reinterpret_cast<const uint16_t*>(eptr + header.contextSize * header.dim);
@@ -219,6 +234,11 @@ namespace kiwi
 				}
 				for (size_t i = 0; i < header.contextSize; ++i)
 				{
+					contextValidTokenSum[i] = half2float(*reinterpret_cast<const uint16_t*>(eptr));
+					eptr += sizeof(uint16_t);
+				}
+				for (size_t i = 0; i < header.contextSize; ++i)
+				{
 					contextConf[i] = half2float(*reinterpret_cast<const uint16_t*>(eptr));
 					eptr += sizeof(uint16_t);
 				}
@@ -226,18 +246,23 @@ namespace kiwi
 				const uint16_t* distantEmbScale = reinterpret_cast<const uint16_t*>(eptr + header.vocabSize * header.dim);
 				for (size_t i = 0; i < header.vocabSize; ++i)
 				{
-					dequantize(&distantEmb[i * header.dim], reinterpret_cast<const int8_t*>(eptr), header.dim, half2float(distantEmbScale[i]));
+					if (useDistantTokens) dequantize(&distantEmb[i * header.dim], reinterpret_cast<const int8_t*>(eptr), header.dim, half2float(distantEmbScale[i]));
 					eptr += header.dim;
 				}
 				eptr += header.vocabSize * sizeof(uint16_t);
 				for (size_t i = 0; i < header.vocabSize; ++i)
 				{
-					distantBias[i] = half2float(*reinterpret_cast<const uint16_t*>(eptr));
+					if (useDistantTokens) distantBias[i] = half2float(*reinterpret_cast<const uint16_t*>(eptr));
 					eptr += sizeof(uint16_t);
 				}
 				for (size_t i = 0; i < header.vocabSize; ++i)
 				{
-					distantConf[i] = half2float(*reinterpret_cast<const uint16_t*>(eptr));
+					if (useDistantTokens) distantConf[i] = half2float(*reinterpret_cast<const uint16_t*>(eptr));
+					eptr += sizeof(uint16_t);
+				}
+				for (size_t i = 0; i < header.windowSize; ++i)
+				{
+					if (useDistantTokens) positionConf[i] = half2float(*reinterpret_cast<const uint16_t*>(eptr));
 					eptr += sizeof(uint16_t);
 				}
 
@@ -246,6 +271,14 @@ namespace kiwi
 				{
 					dequantize(&outputEmb[i * header.dim], reinterpret_cast<const int8_t*>(eptr), header.dim, half2float(outputEmbScale[i]));
 					eptr += header.dim;
+				}
+				eptr += header.vocabSize * sizeof(uint16_t);
+
+				if (useDistantTokens)
+				{
+					const size_t compressedDistantMaskSize = (header.vocabSize + 7) / 8;
+					distantMask = make_unique<uint8_t[]>(compressedDistantMaskSize);
+					std::copy(eptr, eptr + compressedDistantMaskSize, distantMask.get());
 				}
 			}
 
@@ -303,13 +336,67 @@ namespace kiwi
 				}
 			}
 
-			float progress(int32_t& nodeIdx, uint32_t& contextIdx, KeyType next) const
+			inline bool distantTokenMask(uint32_t idx) const
+			{
+				if (useDistantTokens) return (distantMask[idx / 8] & (1 << (idx % 8))) != 0;
+				else return false;
+			}
+
+			float progress(int32_t& nodeIdx, 
+				uint32_t& contextIdx, 
+				size_t& historyPos, 
+				std::array<KeyType, windowSize + (exclusive ? 1 : 0)>& history, 
+				KeyType next) const
 			{
 				const auto& header = getHeader();
-				Eigen::Map<Eigen::VectorXf> contextVec{ &contextEmb[contextIdx * header.dim], header.dim };
-				Eigen::Map<Eigen::VectorXf> outputVec{ &outputEmb[next * header.dim], header.dim };
-				float ll = contextVec.dot(outputVec) - contextBias[contextIdx];
+				const bool validDistantToken = distantTokenMask(next);
+				float ll = 0;
+				
+				thread_local Eigen::MatrixXf mat;
+				mat.resize(header.dim, 1 + windowSize);
+				thread_local Eigen::VectorXf lls;
+				lls.resize(1 + windowSize);
+				if (useDistantTokens && validDistantToken)
+				{
+					lls[0] = contextConf[contextIdx];
+					lls.tail(windowSize) = Eigen::Map<Eigen::VectorXf>{ &positionConf[0], windowSize };
+					for (size_t i = 0; i < windowSize; ++i)
+					{
+						const auto historyToken = history[(historyPos + i) % windowSize];
+						lls[i + 1] += historyToken ? distantConf[historyToken] : -99999;
+					}
+					logsoftmaxInplace(lls.array());
+
+					mat.col(0) = Eigen::Map<Eigen::VectorXf>{ &contextEmb[contextIdx * header.dim], header.dim };
+					lls[0] -= contextBias[contextIdx];
+					for (size_t i = 0; i < windowSize; ++i)
+					{
+						const auto historyToken = history[(historyPos + i) % windowSize];
+						if (historyToken) mat.col(i + 1) = Eigen::Map<Eigen::VectorXf>{ &distantEmb[historyToken * header.dim], header.dim };
+						else mat.col(i + 1).setZero();
+						lls[i + 1] -= distantBias[historyToken];
+					}
+					lls.tail(windowSize).array() += contextValidTokenSum[contextIdx];
+					Eigen::Map<Eigen::VectorXf> outputVec{ &outputEmb[next * header.dim], header.dim };
+					lls += mat.transpose() * outputVec;
+					ll = sb::LogExpSum<arch>{}(lls.data(), std::integral_constant<size_t, windowSize>());
+				}
+				else
+				{
+					lls[0] = -contextBias[contextIdx];
+					mat.col(0) = Eigen::Map<Eigen::VectorXf>{ &contextEmb[contextIdx * header.dim], header.dim };
+					Eigen::Map<Eigen::VectorXf> outputVec{ &outputEmb[next * header.dim], header.dim };
+					lls.head(1) += mat.transpose() * outputVec;
+					ll = lls[0];
+				}
+
 				contextIdx = progressContextNode(nodeIdx, next);
+				if (history[windowSize])
+				{
+					history[historyPos] = history[windowSize];
+					historyPos = (historyPos + 1) % windowSize;
+				}
+				history[windowSize] = validDistantToken ? next : 0;
 				return ll;
 			}
 		};

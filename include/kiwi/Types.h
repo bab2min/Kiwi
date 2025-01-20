@@ -309,6 +309,7 @@ namespace kiwi
 		knlm = 1, /**< Kneser-Ney Language Model */
 		sbg = 2, /**< Skip-Bigram Model */
 		pclm = 3, /**< Pre-computed Context Language Model */
+		pclmLocal = 4, /**< Pre-computed Context Language Model (Only local context) */
 		knlmTransposed,
 	};
 

@@ -104,29 +104,58 @@ namespace kiwi
 		}
 	};
 
-	template<size_t windowSize, ArchType _arch, class VocabTy>
+	template<size_t windowSize, ArchType _arch, class VocabTy, bool exclusive, bool useDistantTokens>
 	class PcLMState
 	{
-		friend struct Hash<PcLMState<windowSize, _arch, VocabTy>>;
+		friend struct Hash<PcLMState<windowSize, _arch, VocabTy, exclusive, useDistantTokens>>;
+	protected:
 		int32_t node = 0;
 		uint32_t contextIdx = 0;
-		size_t historyPos = 0;
-		std::array<VocabTy, windowSize> history = { {0,} };
 	public:
 		static constexpr ArchType arch = _arch;
+		static constexpr bool transposed = true;
 
 		PcLMState() = default;
 		PcLMState(const LangModel& lm) {}
 
 		bool operator==(const PcLMState& other) const
 		{
-			return node == other.node && historyPos == other.historyPos && history == other.history;
+			return node == other.node;
 		}
 
 		float next(const LangModel& lm, VocabTy next)
 		{
-			auto& pclm = static_cast<const pclm::PCLanguageModel<arch, VocabTy, windowSize>&>(*lm.pclm);
-			return pclm.progress(node, contextIdx, next);
+			auto& pclm = static_cast<const pclm::PCLanguageModel<arch, VocabTy, windowSize, exclusive, useDistantTokens>&>(*lm.pclm);
+			size_t historyPos = 0;
+			std::array<VocabTy, windowSize + (exclusive ? 1 : 0)> history = { {0,} };
+			return pclm.progress(node, contextIdx, historyPos, history, next);
+		}
+	};
+
+	template<size_t windowSize, ArchType _arch, class VocabTy, bool exclusive>
+	class PcLMState<windowSize, _arch, VocabTy, exclusive, true> : public PcLMState<windowSize, _arch, VocabTy, exclusive, false>
+	{
+		static constexpr bool useDistantTokens = true;
+		friend struct Hash<PcLMState<windowSize, _arch, VocabTy, exclusive, useDistantTokens>>;
+	protected:
+		size_t historyPos = 0;
+		std::array<VocabTy, windowSize + (exclusive ? 1 : 0)> history = { {0,} };
+	public:
+		static constexpr ArchType arch = _arch;
+		static constexpr bool transposed = true;
+
+		PcLMState() = default;
+		PcLMState(const LangModel& lm) {}
+
+		bool operator==(const PcLMState& other) const
+		{
+			return PcLMState<windowSize, _arch, VocabTy, exclusive, false>::operator==(other) && historyPos == other.historyPos && history == other.history;
+		}
+
+		float next(const LangModel& lm, VocabTy next)
+		{
+			auto& pclm = static_cast<const pclm::PCLanguageModel<arch, VocabTy, windowSize, exclusive, useDistantTokens>&>(*lm.pclm);
+			return pclm.progress(node, contextIdx, historyPos, history, next);
 		}
 	};
 
@@ -184,10 +213,10 @@ namespace kiwi
 		template<ArchType arch> using type = SbgState<windowSize, arch, VocabTy>;
 	};
 
-	template<size_t windowSize, class VocabTy>
+	template<size_t windowSize, class VocabTy, bool exclusive, bool useDistantTokens>
 	struct WrappedPcLM
 	{
-		template<ArchType arch> using type = PcLMState<windowSize, arch, VocabTy>;
+		template<ArchType arch> using type = PcLMState<windowSize, arch, VocabTy, exclusive, useDistantTokens>;
 	};
 
 	template<class LmStateTy>

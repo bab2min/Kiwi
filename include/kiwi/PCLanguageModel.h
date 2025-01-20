@@ -45,8 +45,8 @@ namespace kiwi
 			virtual ~PCLanguageModelBase() {}
 			const Header& getHeader() const { return *reinterpret_cast<const Header*>(base.get()); }
 
-			static utils::MemoryObject build(const std::string& contextDefinition, const std::string& embedding);
-			static std::unique_ptr<PCLanguageModelBase> create(utils::MemoryObject&& mem, ArchType archType = ArchType::none);
+			static utils::MemoryObject build(const std::string& contextDefinition, const std::string& embedding, bool reorderContextIdx = true);
+			static std::unique_ptr<PCLanguageModelBase> create(utils::MemoryObject&& mem, ArchType archType = ArchType::none, bool useDistantTokens = false);
 		};
 	}
 }
