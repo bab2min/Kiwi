@@ -2349,7 +2349,7 @@ HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes,
 	HSDataset* splitDataset
 ) const
 {
-	HSDataset dataset{ batchSize, causalContextSize, windowSize, numWorkers, dropoutProb, dropoutProbOnHistory };
+	HSDataset dataset{ batchSize, causalContextSize, windowSize, true, numWorkers, dropoutProb, dropoutProbOnHistory };
 	auto& sents = dataset.sents.get();
 	const KiwiBuilder* srcBuilder = this;
 	MorphemeMap realMorph;
@@ -2382,7 +2382,7 @@ HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes,
 
 	if (splitDataset)
 	{
-		*splitDataset = HSDataset{ batchSize, causalContextSize, windowSize, numWorkers, dropoutProb };
+		*splitDataset = HSDataset{ batchSize, causalContextSize, windowSize, true, numWorkers, dropoutProb };
 		splitDataset->dummyBuilder = dataset.dummyBuilder;
 		splitDataset->knlm = knlm;
 		splitDataset->morphemes = &srcBuilder->morphemes;

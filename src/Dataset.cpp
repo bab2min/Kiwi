@@ -5,7 +5,9 @@
 
 using namespace kiwi;
 
-HSDataset::HSDataset(size_t _batchSize, size_t _causalContextSize, size_t _windowSize, size_t _workers, 
+HSDataset::HSDataset(size_t _batchSize, size_t _causalContextSize, 
+	size_t _windowSize, bool _exclusiveWindow, 
+	size_t _workers, 
 	double _dropoutProb, double _dropoutProbOnHistory)
 	: workers{ _workers ? make_unique<utils::ThreadPool>(_workers) : nullptr },
 	dropout{ {1 - _dropoutProb * 3, _dropoutProb, _dropoutProb, _dropoutProb} }, 
@@ -13,7 +15,8 @@ HSDataset::HSDataset(size_t _batchSize, size_t _causalContextSize, size_t _windo
 	locals( _workers ? workers->size() : 1),
 	batchSize{ _batchSize },
 	causalContextSize{ _causalContextSize },
-	windowSize{ _windowSize }
+	windowSize{ _windowSize },
+	exclusiveWindow{ _exclusiveWindow }
 {
 }
 
@@ -181,6 +184,7 @@ size_t HSDataset::_next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode,
 				}
 			}
 
+			int32_t lastV = nonVocab;
 			for (size_t i = 1; i < tokens.size(); ++i)
 			{
 				int32_t v = tokenToVocab[tokens[i]];
@@ -225,12 +229,33 @@ size_t HSDataset::_next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode,
 					if (windowTokenValidness[v])
 					{
 						std::copy(history.begin(), history.end(), std::back_inserter(local.inData));
-						history.pop_front();
-						history.push_back(v);
+						if (exclusiveWindow)
+						{
+							if (lastV != nonVocab)
+							{
+								history.pop_front();
+								history.push_back(lastV);
+							}
+							lastV = v;
+						}
+						else
+						{
+							history.pop_front();
+							history.push_back(v);
+						}
 					}
 					else
 					{
 						local.inData.resize(local.inData.size() + windowSize, -1);
+						if (exclusiveWindow)
+						{
+							if (lastV != nonVocab)
+							{
+								history.pop_front();
+								history.push_back(lastV);
+							}
+							lastV = nonVocab;
+						}
 					}
 				}
 

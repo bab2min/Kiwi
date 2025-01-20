@@ -64,6 +64,7 @@ namespace kiwi
 		size_t batchSize = 0;
 		size_t causalContextSize = 0;
 		size_t windowSize = 0;
+		bool exclusiveWindow = true;
 		size_t totalTokens = 0;
 		size_t passedSents = 0;
 		size_t passedWorkItems = 0;
@@ -74,7 +75,7 @@ namespace kiwi
 		size_t _next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode, float& restLmOut, uint32_t& restLmCntOut);
 
 	public:
-		HSDataset(size_t _batchSize = 0, size_t _causalContextSize = 0, size_t _windowSize = 0, size_t _workers = 0, double _dropoutProb = 0, double _dropoutProbOnHistory = 0);
+		HSDataset(size_t _batchSize = 0, size_t _causalContextSize = 0, size_t _windowSize = 0, bool _exclusiveWindow = true, size_t _workers = 0, double _dropoutProb = 0, double _dropoutProbOnHistory = 0);
 		~HSDataset();
 		HSDataset(const HSDataset&) = delete;
 		HSDataset(HSDataset&&) /*noexcept*/;
