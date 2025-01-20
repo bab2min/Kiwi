@@ -86,7 +86,7 @@ namespace kiwi
 		std::shared_ptr<cmb::CompiledRule> combiningRule;
 		std::unique_ptr<utils::ThreadPool> pool;
 		
-		inline const Morpheme* getDefaultMorpheme(POSTag tag) const;
+		const Morpheme* getDefaultMorpheme(POSTag tag) const;
 
 		template<class LmState>
 		cmb::AutoJoiner newJoinerImpl() const

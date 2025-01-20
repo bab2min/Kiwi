@@ -68,6 +68,7 @@
     <ClInclude Include="..\src\LimitedVector.hpp" />
     <ClInclude Include="..\src\LmState.hpp" />
     <ClInclude Include="..\src\nuquant.hpp" />
+    <ClInclude Include="..\src\PathEvaluator.h" />
     <ClInclude Include="..\src\PathEvaluator.hpp" />
     <ClInclude Include="..\src\pattern.hpp" />
     <ClInclude Include="..\src\PCLanguageModel.hpp" />
@@ -122,6 +123,9 @@
     <ClCompile Include="..\src\FileUtils.cpp" />
     <ClCompile Include="..\src\Joiner.cpp" />
     <ClCompile Include="..\src\Knlm.cpp" />
+    <ClCompile Include="..\src\PathEvaluator.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">EIGEN_VECTORIZE_AVX512;KIWI_ARCH_X86_64=1;__restrict__=__restrict;KIWI_USE_BTREE;KIWI_USE_MIMALLOC;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
     <ClCompile Include="..\src\PCLanguageModel.cpp" />
     <ClCompile Include="..\src\search.cpp" />
     <ClCompile Include="..\src\SkipBigramModel.cpp" />
