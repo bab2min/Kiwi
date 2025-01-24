@@ -4,16 +4,17 @@
 #include <kiwi/Utils.h>
 #include <kiwi/TemplateUtils.hpp>
 #include <kiwi/Form.h>
+#include <kiwi/LangModel.h>
 #include "ArchAvailable.h"
 #include "KTrie.h"
 #include "FeatureTestor.h"
 #include "FrozenTrie.hpp"
-#include "LmState.hpp"
 #include "StrUtils.h"
 #include "SortUtils.hpp"
 #include "serializer.hpp"
 #include "Joiner.hpp"
 #include "PathEvaluator.hpp"
+#include "Kiwi.hpp"
 
 using namespace std;
 
@@ -42,19 +43,19 @@ namespace kiwi
 	}
 
 	Kiwi::Kiwi(ArchType arch, 
-		LangModel _langMdl, 
+		const std::shared_ptr<lm::ILangModel> & _langMdl, 
 		bool typoTolerant, 
 		bool continualTypoTolerant, 
 		bool lengtheningTypoTolerant)
-		: langMdl(_langMdl)
+		: langMdl{ _langMdl }, selectedArch{ arch }
 	{
-		selectedArch = arch;
 		dfSplitByTrie = (void*)getSplitByTrieFn(selectedArch, 
 			typoTolerant, 
 			continualTypoTolerant, 
 			lengtheningTypoTolerant);
 		dfFindForm = (void*)getFindFormFn(selectedArch, typoTolerant);
-		dfFindBestPath = (void*)getFindBestPathFn(selectedArch, langMdl);
+		dfFindBestPath = langMdl ? langMdl->getFindBestPathFn() : nullptr;
+		dfNewJoiner = langMdl ? langMdl->getNewJoinerFn() : nullptr;
 	}
 
 	Kiwi::~Kiwi() = default;
@@ -1148,137 +1149,15 @@ namespace kiwi
 		return _asyncAnalyzeEcho(move(str), move(pretokenized), matchOptions, blocklist);
 	}
 
-	using FnNewAutoJoiner = cmb::AutoJoiner(Kiwi::*)() const;
-
-	template<template<ArchType> class LmState>
-	struct NewAutoJoinerGetter
-	{
-		template<std::ptrdiff_t i>
-		struct Wrapper
-		{
-			static constexpr FnNewAutoJoiner value = &Kiwi::newJoinerImpl<LmState<static_cast<ArchType>(i)>>;
-		};
-	};
-
 	cmb::AutoJoiner Kiwi::newJoiner(bool lmSearch) const
 	{
-		static tp::Table<FnNewAutoJoiner, AvailableArch> lmVoid{ NewAutoJoinerGetter<VoidState>{} };
-		static tp::Table<FnNewAutoJoiner, AvailableArch> lmKnLM_8{ NewAutoJoinerGetter<WrappedKnLM<uint8_t>::type>{} };
-		static tp::Table<FnNewAutoJoiner, AvailableArch> lmKnLM_16{ NewAutoJoinerGetter<WrappedKnLM<uint16_t>::type>{} };
-		static tp::Table<FnNewAutoJoiner, AvailableArch> lmKnLM_32{ NewAutoJoinerGetter<WrappedKnLM<uint32_t>::type>{} };
-		static tp::Table<FnNewAutoJoiner, AvailableArch> lmKnLM_64{ NewAutoJoinerGetter<WrappedKnLM<uint64_t>::type>{} };
-		static tp::Table<FnNewAutoJoiner, AvailableArch> lmSbg_8{ NewAutoJoinerGetter<WrappedSbg<8, uint8_t>::type>{} };
-		static tp::Table<FnNewAutoJoiner, AvailableArch> lmSbg_16{ NewAutoJoinerGetter<WrappedSbg<8, uint16_t>::type>{} };
-		static tp::Table<FnNewAutoJoiner, AvailableArch> lmSbg_32{ NewAutoJoinerGetter<WrappedSbg<8, uint32_t>::type>{} };
-		static tp::Table<FnNewAutoJoiner, AvailableArch> lmSbg_64{ NewAutoJoinerGetter<WrappedSbg<8, uint64_t>::type>{} };
-		
-		const auto archIdx = static_cast<std::ptrdiff_t>(selectedArch);
-
 		if (lmSearch)
 		{
-			size_t vocabTySize = langMdl.knlm->getHeader().key_size;
-			if (langMdl.sbg)
-			{
-				switch (vocabTySize)
-				{
-				case 1:
-					return (this->*lmSbg_8[archIdx])();
-				case 2:
-					return (this->*lmSbg_16[archIdx])();
-				case 4:
-					return (this->*lmSbg_32[archIdx])();
-				case 8:
-					return (this->*lmSbg_64[archIdx])();
-				default:
-					throw Exception{ "invalid `key_size`=" + to_string(vocabTySize)};
-				}
-			}
-			else
-			{
-				switch (vocabTySize)
-				{
-				case 1:
-					return (this->*lmKnLM_8[archIdx])();
-				case 2:
-					return (this->*lmKnLM_16[archIdx])();
-				case 4:
-					return (this->*lmKnLM_32[archIdx])();
-				case 8:
-					return (this->*lmKnLM_64[archIdx])();
-				default:
-					throw Exception{ "invalid `key_size`=" + to_string(vocabTySize) };
-				}
-			}
+			return (*reinterpret_cast<FnNewJoiner>(dfNewJoiner))(this);
 		}
 		else
 		{
-			return (this->*lmVoid[archIdx])();
-		}
-	}
-
-	using FnNewLmObject = std::unique_ptr<LmObjectBase>(*)(const LangModel&);
-
-	template<class Ty>
-	std::unique_ptr<LmObjectBase> makeNewLmObject(const LangModel& lm)
-	{
-		return make_unique<LmObject<Ty>>(lm);
-	}
-
-	template<template<ArchType> class LmState>
-	struct NewLmObjectGetter
-	{
-		template<std::ptrdiff_t i>
-		struct Wrapper
-		{
-			static constexpr FnNewLmObject value = makeNewLmObject<LmState<static_cast<ArchType>(i)>>;
-		};
-	};
-
-	std::unique_ptr<LmObjectBase> Kiwi::newLmObject() const
-	{
-		static tp::Table<FnNewLmObject, AvailableArch> lmKnLM_8{ NewLmObjectGetter<WrappedKnLM<uint8_t>::type>{} };
-		static tp::Table<FnNewLmObject, AvailableArch> lmKnLM_16{ NewLmObjectGetter<WrappedKnLM<uint16_t>::type>{} };
-		static tp::Table<FnNewLmObject, AvailableArch> lmKnLM_32{ NewLmObjectGetter<WrappedKnLM<uint32_t>::type>{} };
-		static tp::Table<FnNewLmObject, AvailableArch> lmKnLM_64{ NewLmObjectGetter<WrappedKnLM<uint64_t>::type>{} };
-		static tp::Table<FnNewLmObject, AvailableArch> lmSbg_8{ NewLmObjectGetter<WrappedSbg<8, uint8_t>::type>{} };
-		static tp::Table<FnNewLmObject, AvailableArch> lmSbg_16{ NewLmObjectGetter<WrappedSbg<8, uint16_t>::type>{} };
-		static tp::Table<FnNewLmObject, AvailableArch> lmSbg_32{ NewLmObjectGetter<WrappedSbg<8, uint32_t>::type>{} };
-		static tp::Table<FnNewLmObject, AvailableArch> lmSbg_64{ NewLmObjectGetter<WrappedSbg<8, uint64_t>::type>{} };
-
-		const auto archIdx = static_cast<std::ptrdiff_t>(selectedArch);
-
-		size_t vocabTySize = langMdl.knlm->getHeader().key_size;
-		if (langMdl.sbg)
-		{
-			switch (vocabTySize)
-			{
-			case 1:
-				return (lmSbg_8[archIdx])(langMdl);
-			case 2:
-				return (lmSbg_16[archIdx])(langMdl);
-			case 4:
-				return (lmSbg_32[archIdx])(langMdl);
-			case 8:
-				return (lmSbg_64[archIdx])(langMdl);
-			default:
-				throw Exception{ "invalid `key_size`=" + to_string(vocabTySize) };
-			}
-		}
-		else
-		{
-			switch (vocabTySize)
-			{
-			case 1:
-				return (lmKnLM_8[archIdx])(langMdl);
-			case 2:
-				return (lmKnLM_16[archIdx])(langMdl);
-			case 4:
-				return (lmKnLM_32[archIdx])(langMdl);
-			case 8:
-				return (lmKnLM_64[archIdx])(langMdl);
-			default:
-				throw Exception{ "invalid `key_size`=" + to_string(vocabTySize) };
-			}
+			return cmb::AutoJoiner{ *this, cmb::Candidate<lm::VoidState<ArchType::none>>{ *combiningRule, langMdl.get() }};
 		}
 	}
 

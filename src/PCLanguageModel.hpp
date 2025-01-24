@@ -13,37 +13,13 @@
 
 namespace kiwi
 {
-	namespace pclm
+	namespace lm
 	{
-		inline float half2float(uint16_t h)
-		{
-			union
-			{
-				uint32_t i;
-				float f;
-			} u;
-			u.i = (uint32_t)(h & 0x8000) << 16;
-			u.i |= ((uint32_t)(h & 0x7FFF) + 0x1C000) << 13;
-			return u.f;
-		}
-
-		inline void dequantize(float* out, const int8_t* ints, size_t n, float scale)
-		{
-			for (size_t i = 0; i < n; ++i)
-			{
-				out[i] = ints[i] * scale;
-			}
-		}
-
-		template<class Arr>
-		void logsoftmaxInplace(Arr& arr)
-		{
-			arr -= arr.maxCoeff();
-			arr -= std::log(arr.exp().sum());
-		}
+		template<size_t windowSize, ArchType _arch, class VocabTy, bool exclusive, bool useDistantTokens>
+		class PcLMState;
 
 		template<ArchType arch, class KeyType, size_t windowSize, bool exclusive = false, bool useDistantTokens = false>
-		class PCLanguageModel : public PCLanguageModelBase
+		class PcLangModel : public PcLangModelBase
 		{
 			using MyNode = Node<KeyType, uint32_t>;
 
@@ -115,172 +91,13 @@ namespace kiwi
 			}
 
 		public:
-			PCLanguageModel(utils::MemoryObject&& mem) : PCLanguageModelBase{ std::move(mem) }
-			{
-				auto* ptr = reinterpret_cast<const char*>(base.get());
-				auto& header = getHeader();
+			using VocabType = KeyType;
+			using LmStateType = PcLMState<windowSize, arch, VocabType, exclusive, useDistantTokens>;
 
-				Vector<uint32_t> nodeSizes(header.numNodes);
-				streamvbyte_decode_0124(reinterpret_cast<const uint8_t*>(ptr + header.nodeOffset), nodeSizes.data(), header.numNodes);
-				keyData = make_unique<KeyType[]>(header.numNodes - 1);
-				if (std::is_same<KeyType, uint32_t>::value)
-				{
-					streamvbyte_decode(reinterpret_cast<const uint8_t*>(ptr + header.keyOffset), (uint32_t*)keyData.get(), header.numNodes - 1);
-				}
-				else
-				{
-					Vector<uint32_t> tempKeyData(header.numNodes - 1);
-					streamvbyte_decode(reinterpret_cast<const uint8_t*>(ptr + header.keyOffset), tempKeyData.data(), header.numNodes - 1);
-					std::copy(tempKeyData.begin(), tempKeyData.end(), keyData.get());
-				}
-				Vector<uint32_t> values(header.numNodes);
-				streamvbyte_decode_0124(reinterpret_cast<const uint8_t*>(ptr + header.valueOffset), values.data(), header.numNodes);
+			PcLangModel(utils::MemoryObject&& mem);
 
-				size_t numNonLeafNodes = 0, numLeafNodes = 0;
-				for (size_t i = 0; i < header.numNodes; ++i)
-				{
-					if (nodeSizes[i]) numNonLeafNodes++;
-					else numLeafNodes++;
-				}
-
-				nodeData = make_unique<MyNode[]>(numNonLeafNodes);
-				valueData = make_unique<int32_t[]>(header.numNodes - 1);
-
-				size_t nonLeafIdx = 0, leafIdx = 0, nextOffset = 0;
-				Vector<std::array<size_t, 3>> keyRanges;
-				for (size_t i = 0; i < header.numNodes; ++i)
-				{
-					if (nodeSizes[i])
-					{
-						auto& node = nodeData[nonLeafIdx];
-						if (!keyRanges.empty())
-						{
-							auto& back = keyRanges.back();
-							valueData[back[1]] = nonLeafIdx - back[0];
-						}
-						node.value = values[i];
-						node.numNexts = nodeSizes[i];
-						node.nextOffset = nextOffset;
-						nextOffset += nodeSizes[i];
-						keyRanges.emplace_back(std::array<size_t, 3>{ nonLeafIdx, (size_t)node.nextOffset, (size_t)(node.nextOffset + node.numNexts) });
-						nonLeafIdx++;
-					}
-					else
-					{
-						auto& back = keyRanges.back();
-						valueData[back[1]] = -(int32_t)values[i];
-						back[1]++;
-						while (keyRanges.back()[1] == keyRanges.back()[2])
-						{
-							keyRanges.pop_back();
-							if (keyRanges.empty()) break;
-							keyRanges.back()[1]++;
-						}
-						leafIdx++;
-					}
-				}
-
-				Vector<uint8_t> tempBuf;
-				for (size_t i = 0; i < nonLeafIdx; ++i)
-				{
-					auto& node = nodeData[i];
-					nst::prepare<arch>(&keyData[node.nextOffset], &valueData[node.nextOffset], node.numNexts, tempBuf);
-				}
-
-				Deque<MyNode*> dq;
-				for (dq.emplace_back(&nodeData[0]); !dq.empty(); dq.pop_front())
-				{
-					auto p = dq.front();
-					for (size_t i = 0; i < p->numNexts; ++i)
-					{
-						auto k = keyData[p->nextOffset + i];
-						auto v = valueData[p->nextOffset + i];
-						if (v <= 0) continue;
-						auto* child = &p[v];
-						child->lower = findLowerNode(p, k) - child;
-						if (child->value == 0)
-						{
-							child->value = findLowerValue(p, k);
-						}
-						dq.emplace_back(child);
-					}
-				}
-
-				auto* eptr = ptr + header.embOffset;
-				contextEmb = make_unique<float[]>(header.contextSize * header.dim);
-				contextBias = make_unique<float[]>(header.contextSize);
-				contextValidTokenSum = make_unique<float[]>(header.contextSize);
-				contextConf = make_unique<float[]>(header.contextSize);
-				if (useDistantTokens)
-				{
-					distantEmb = make_unique<float[]>(header.vocabSize * header.dim);
-					distantBias = make_unique<float[]>(header.vocabSize);
-					distantConf = make_unique<float[]>(header.vocabSize);
-					positionConf = make_unique<float[]>(header.windowSize);
-				}
-				outputEmb = make_unique<float[]>(header.vocabSize * header.dim);
-
-				const uint16_t* contextEmbScale = reinterpret_cast<const uint16_t*>(eptr + header.contextSize * header.dim);
-				for (size_t i = 0; i < header.contextSize; ++i)
-				{
-					dequantize(&contextEmb[i * header.dim], reinterpret_cast<const int8_t*>(eptr), header.dim, half2float(contextEmbScale[i]));
-					eptr += header.dim;
-				}
-				eptr += header.contextSize * sizeof(uint16_t);
-				for (size_t i = 0; i < header.contextSize; ++i)
-				{
-					contextBias[i] = half2float(*reinterpret_cast<const uint16_t*>(eptr));
-					eptr += sizeof(uint16_t);
-				}
-				for (size_t i = 0; i < header.contextSize; ++i)
-				{
-					contextValidTokenSum[i] = half2float(*reinterpret_cast<const uint16_t*>(eptr));
-					eptr += sizeof(uint16_t);
-				}
-				for (size_t i = 0; i < header.contextSize; ++i)
-				{
-					contextConf[i] = half2float(*reinterpret_cast<const uint16_t*>(eptr));
-					eptr += sizeof(uint16_t);
-				}
-
-				const uint16_t* distantEmbScale = reinterpret_cast<const uint16_t*>(eptr + header.vocabSize * header.dim);
-				for (size_t i = 0; i < header.vocabSize; ++i)
-				{
-					if (useDistantTokens) dequantize(&distantEmb[i * header.dim], reinterpret_cast<const int8_t*>(eptr), header.dim, half2float(distantEmbScale[i]));
-					eptr += header.dim;
-				}
-				eptr += header.vocabSize * sizeof(uint16_t);
-				for (size_t i = 0; i < header.vocabSize; ++i)
-				{
-					if (useDistantTokens) distantBias[i] = half2float(*reinterpret_cast<const uint16_t*>(eptr));
-					eptr += sizeof(uint16_t);
-				}
-				for (size_t i = 0; i < header.vocabSize; ++i)
-				{
-					if (useDistantTokens) distantConf[i] = half2float(*reinterpret_cast<const uint16_t*>(eptr));
-					eptr += sizeof(uint16_t);
-				}
-				for (size_t i = 0; i < header.windowSize; ++i)
-				{
-					if (useDistantTokens) positionConf[i] = half2float(*reinterpret_cast<const uint16_t*>(eptr));
-					eptr += sizeof(uint16_t);
-				}
-
-				const uint16_t* outputEmbScale = reinterpret_cast<const uint16_t*>(eptr + header.vocabSize * header.dim);
-				for (size_t i = 0; i < header.vocabSize; ++i)
-				{
-					dequantize(&outputEmb[i * header.dim], reinterpret_cast<const int8_t*>(eptr), header.dim, half2float(outputEmbScale[i]));
-					eptr += header.dim;
-				}
-				eptr += header.vocabSize * sizeof(uint16_t);
-
-				if (useDistantTokens)
-				{
-					const size_t compressedDistantMaskSize = (header.vocabSize + 7) / 8;
-					distantMask = make_unique<uint8_t[]>(compressedDistantMaskSize);
-					std::copy(eptr, eptr + compressedDistantMaskSize, distantMask.get());
-				}
-			}
+			void* getFindBestPathFn() const override;
+			void* getNewJoinerFn() const override;
 
 			uint32_t progressContextNode(int32_t& nodeIdx, KeyType next) const
 			{
@@ -342,81 +159,90 @@ namespace kiwi
 				else return false;
 			}
 
-			float progress(int32_t& nodeIdx, 
-				uint32_t& contextIdx, 
-				size_t& historyPos, 
-				std::array<KeyType, windowSize + (exclusive ? 1 : 0)>& history, 
-				KeyType next) const
+			float progress(int32_t& nodeIdx,
+				uint32_t& contextIdx,
+				size_t& historyPos,
+				std::array<KeyType, windowSize + (exclusive ? 1 : 0)>& history,
+				KeyType next) const;
+
+		};
+
+		template<size_t windowSize, ArchType _arch, class VocabTy, bool exclusive, bool useDistantTokens>
+		struct PcLMState : public LmStateBase<PcLangModel<_arch, VocabTy, windowSize, exclusive, useDistantTokens>>
+		{
+			int32_t node = 0;
+			uint32_t contextIdx = 0;
+
+			static constexpr ArchType arch = _arch;
+			static constexpr bool transposed = true;
+
+			PcLMState() = default;
+			PcLMState(const ILangModel* lm) {}
+
+			bool operator==(const PcLMState& other) const
 			{
-				const auto& header = getHeader();
-				const bool validDistantToken = distantTokenMask(next);
-				float ll = 0;
-				
-				thread_local Eigen::MatrixXf mat;
-				mat.resize(header.dim, 1 + windowSize);
-				thread_local Eigen::VectorXf lls;
-				lls.resize(1 + windowSize);
-				if (useDistantTokens && validDistantToken)
-				{
-					lls[0] = contextConf[contextIdx];
-					lls.tail(windowSize) = Eigen::Map<Eigen::VectorXf>{ &positionConf[0], windowSize };
-					for (size_t i = 0; i < windowSize; ++i)
-					{
-						const auto historyToken = history[(historyPos + i) % windowSize];
-						lls[i + 1] += historyToken ? distantConf[historyToken] : -99999;
-					}
-					logsoftmaxInplace(lls.array());
+				return node == other.node;
+			}
 
-					mat.col(0) = Eigen::Map<Eigen::VectorXf>{ &contextEmb[contextIdx * header.dim], header.dim };
-					lls[0] -= contextBias[contextIdx];
-					for (size_t i = 0; i < windowSize; ++i)
-					{
-						const auto historyToken = history[(historyPos + i) % windowSize];
-						if (historyToken) mat.col(i + 1) = Eigen::Map<Eigen::VectorXf>{ &distantEmb[historyToken * header.dim], header.dim };
-						else mat.col(i + 1).setZero();
-						lls[i + 1] -= distantBias[historyToken];
-					}
-					lls.tail(windowSize).array() += contextValidTokenSum[contextIdx];
-					Eigen::Map<Eigen::VectorXf> outputVec{ &outputEmb[next * header.dim], header.dim };
-					lls += mat.transpose() * outputVec;
-					ll = sb::LogExpSum<arch>{}(lls.data(), std::integral_constant<size_t, windowSize>());
-				}
-				else
-				{
-					lls[0] = -contextBias[contextIdx];
-					mat.col(0) = Eigen::Map<Eigen::VectorXf>{ &contextEmb[contextIdx * header.dim], header.dim };
-					Eigen::Map<Eigen::VectorXf> outputVec{ &outputEmb[next * header.dim], header.dim };
-					lls.head(1) += mat.transpose() * outputVec;
-					ll = lls[0];
-				}
-
-				contextIdx = progressContextNode(nodeIdx, next);
-				if (history[windowSize])
-				{
-					history[historyPos] = history[windowSize];
-					historyPos = (historyPos + 1) % windowSize;
-				}
-				history[windowSize] = validDistantToken ? next : 0;
-				return ll;
+			float nextImpl(const PcLangModel<arch, VocabTy, windowSize, exclusive, useDistantTokens>* lm, VocabTy next)
+			{
+				size_t historyPos = 0;
+				std::array<VocabTy, windowSize + (exclusive ? 1 : 0)> history = { {0,} };
+				return lm->progress(node, contextIdx, historyPos, history, next);
 			}
 		};
 
-		static constexpr size_t serialAlignment = 16;
-
-		inline size_t alignedOffsetInc(size_t& offset, size_t inc, size_t alignment = serialAlignment)
+		template<size_t windowSize, ArchType _arch, class VocabTy, bool exclusive>
+		struct PcLMState<windowSize, _arch, VocabTy, exclusive, true> : public LmStateBase<PcLangModel<_arch, VocabTy, windowSize, exclusive, true>>
 		{
-			return offset = (offset + inc + alignment - 1) & ~(alignment - 1);
-		}
+			static constexpr bool useDistantTokens = true;
 
-		inline std::ostream& writePadding(std::ostream& os, size_t alignment = serialAlignment)
-		{
-			const size_t pos = os.tellp();
-			size_t pad = ((pos + alignment - 1) & ~(alignment - 1)) - pos;
-			for (size_t i = 0; i < pad; ++i)
+			int32_t node = 0;
+			uint32_t contextIdx = 0;
+			size_t historyPos = 0;
+			std::array<VocabTy, windowSize + (exclusive ? 1 : 0)> history = { {0,} };
+		
+			static constexpr ArchType arch = _arch;
+			static constexpr bool transposed = true;
+
+			PcLMState() = default;
+			PcLMState(const ILangModel* lm) {}
+
+			bool operator==(const PcLMState& other) const
 			{
-				os.put(0);
+				return node == other.node && historyPos == other.historyPos && history == other.history;
 			}
-			return os;
-		}
+
+			float nextImpl(const PcLangModel<arch, VocabTy, windowSize, exclusive, useDistantTokens>* lm, VocabTy next)
+			{
+				return lm->progress(node, contextIdx, historyPos, history, next);
+			}
+		};
 	}
+
+	template<size_t windowSize, ArchType arch, class VocabTy, bool exclusive>
+	struct Hash<lm::PcLMState<windowSize, arch, VocabTy, exclusive, false>>
+	{
+		size_t operator()(const lm::PcLMState<windowSize, arch, VocabTy, exclusive, false>& state) const
+		{
+			Hash<int32_t> hasher;
+			return hasher(state.node);
+		}
+	};
+
+	template<size_t windowSize, ArchType arch, class VocabTy, bool exclusive>
+	struct Hash<lm::PcLMState<windowSize, arch, VocabTy, exclusive, true>>
+	{
+		size_t operator()(const lm::PcLMState<windowSize, arch, VocabTy, exclusive, true>& state) const
+		{
+			Hash<int32_t> hasher;
+			std::hash<VocabTy> vocabHasher;
+			size_t ret = hasher(state.node);
+			for (size_t i = 0; i < state.history.size(); ++i)
+			{
+				ret = vocabHasher(state.history[i]) ^ ((ret << 3) | (ret >> (sizeof(size_t) * 8 - 3)));
+			}
+			return ret;
+		}
+	};
 }

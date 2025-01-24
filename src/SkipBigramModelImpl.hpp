@@ -6,7 +6,7 @@
 
 namespace kiwi
 {
-	namespace sb
+	namespace lm
 	{
 		template<ArchType archType>
 		struct LogExpSum

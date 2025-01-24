@@ -12,7 +12,7 @@
 
 namespace kiwi
 {
-	namespace sb
+	namespace lm
 	{
 		struct TrainContext
 		{
@@ -768,7 +768,7 @@ namespace kiwi
 
 			utils::MemoryOwner convertToModel(float trimThreshold = -15, bool quantize = true) const
 			{
-				Header header = { 0, };
+				SkipBigramModelHeader header = { 0, };
 				header.vocabSize = ptrs.size() - 1;
 				header.keySize = sizeof(VocabTy);
 				header.windowSize = windowSize;
@@ -821,7 +821,7 @@ namespace kiwi
 					mse = nuq::nuquant(compensationTable.data(), allCompensations, 256);
 					std::transform(compensationTable.begin(), compensationTable.end(), compensationTable.begin(), [](float f) { return -std::pow(f, 16.f); });
 
-					size_t totalModelSize = sizeof(Header);
+					size_t totalModelSize = sizeof(SkipBigramModelHeader);
 					totalModelSize += header.vocabSize * sizeof(VocabTy);
 					totalModelSize += finalVocabSize * sizeof(VocabTy);
 					totalModelSize += header.vocabSize * sizeof(uint8_t);
@@ -832,8 +832,8 @@ namespace kiwi
 
 					utils::MemoryOwner ret{ totalModelSize };
 					auto* ptr = reinterpret_cast<char*>(ret.get());
-					*reinterpret_cast<Header*>(ptr) = header;
-					auto* ks = reinterpret_cast<VocabTy*>(ptr += sizeof(Header));
+					*reinterpret_cast<SkipBigramModelHeader*>(ptr) = header;
+					auto* ks = reinterpret_cast<VocabTy*>(ptr += sizeof(SkipBigramModelHeader));
 					for (auto& v : compensations)
 					{
 						*ks++ = v.first.size();
@@ -870,7 +870,7 @@ namespace kiwi
 				}
 				else
 				{
-					size_t totalModelSize = sizeof(Header);
+					size_t totalModelSize = sizeof(SkipBigramModelHeader);
 					totalModelSize += header.vocabSize * sizeof(VocabTy);
 					totalModelSize += finalVocabSize * sizeof(VocabTy);
 					totalModelSize += header.vocabSize * sizeof(float);
@@ -879,8 +879,8 @@ namespace kiwi
 
 					utils::MemoryOwner ret{ totalModelSize };
 					auto* ptr = reinterpret_cast<char*>(ret.get());
-					*reinterpret_cast<Header*>(ptr) = header;
-					auto* ks = reinterpret_cast<VocabTy*>(ptr += sizeof(Header));
+					*reinterpret_cast<SkipBigramModelHeader*>(ptr) = header;
+					auto* ks = reinterpret_cast<VocabTy*>(ptr += sizeof(SkipBigramModelHeader));
 					for (auto& v : compensations)
 					{
 						*ks++ = v.first.size();

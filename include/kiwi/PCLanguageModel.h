@@ -9,12 +9,13 @@
 
 #include "ArchUtils.h"
 #include "Mmap.h"
+#include "LangModel.h"
 
 namespace kiwi
 {
-	namespace pclm
+	namespace lm
 	{
-		struct Header
+		struct PcLangModelHeader
 		{
 			uint64_t vocabSize, contextSize;
 			uint16_t dim;
@@ -33,20 +34,24 @@ namespace kiwi
 			uint32_t nextOffset = 0;
 		};
 
-		class PCLanguageModelBase
+		class PcLangModelBase : public ILangModel
 		{
 		protected:
 			utils::MemoryObject base;
 
-			PCLanguageModelBase(utils::MemoryObject&& mem) : base{ std::move(mem) }
+			PcLangModelBase(utils::MemoryObject&& mem) : base{ std::move(mem) }
 			{
 			}
 		public:
-			virtual ~PCLanguageModelBase() {}
-			const Header& getHeader() const { return *reinterpret_cast<const Header*>(base.get()); }
+			virtual ~PcLangModelBase() {}
+			size_t vocabSize() const override { return getHeader().vocabSize; }
+			ModelType getType() const override { return ModelType::pclm; }
+			size_t getMemorySize() const override { return base.size(); }
+
+			const PcLangModelHeader& getHeader() const { return *reinterpret_cast<const PcLangModelHeader*>(base.get()); }
 
 			static utils::MemoryObject build(const std::string& contextDefinition, const std::string& embedding, bool reorderContextIdx = true);
-			static std::unique_ptr<PCLanguageModelBase> create(utils::MemoryObject&& mem, ArchType archType = ArchType::none, bool useDistantTokens = false);
+			static std::unique_ptr<PcLangModelBase> create(utils::MemoryObject&& mem, ArchType archType = ArchType::none, bool useDistantTokens = false);
 		};
 	}
 }

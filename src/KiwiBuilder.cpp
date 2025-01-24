@@ -16,6 +16,7 @@
 #include "RaggedVector.hpp"
 #include "SkipBigramTrainer.hpp"
 #include "SkipBigramModel.hpp"
+#include "PCLanguageModel.hpp"
 #include "SortUtils.hpp"
 
 using namespace std;
@@ -740,7 +741,7 @@ void KiwiBuilder::updateForms()
 
 void KiwiBuilder::updateMorphemes(size_t vocabSize)
 {
-	if (vocabSize == 0) vocabSize = langMdl.vocabSize();
+	if (vocabSize == 0) vocabSize = langMdl->vocabSize();
 	for (auto& m : morphemes)
 	{
 		if (m.lmMorphemeId > 0) continue;
@@ -782,20 +783,17 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, size_t _numThreads, BuildOptio
 		loadMorphBin(iss);
 	}
 	
-	langMdl.type = modelType;
-	if (modelType == ModelType::knlm || modelType == ModelType::knlmTransposed || modelType == ModelType::sbg)
+	if (modelType == ModelType::knlm || modelType == ModelType::knlmTransposed)
 	{
-		langMdl.knlm = lm::KnLangModelBase::create(utils::MMap(modelPath + string{ "/sj.knlm" }), archType);
+		langMdl = lm::KnLangModelBase::create(utils::MMap(modelPath + string{ "/sj.knlm" }), archType, modelType == ModelType::knlmTransposed);
 	}
-
-	if (modelType == ModelType::sbg)
+	else if (modelType == ModelType::sbg)
 	{
-		langMdl.sbg = sb::SkipBigramModelBase::create(utils::MMap(modelPath + string{ "/skipbigram.mdl" }), archType);
+		langMdl = lm::SkipBigramModelBase::create(utils::MMap(modelPath + string{ "/sj.knlm" }), utils::MMap(modelPath + string{ "/skipbigram.mdl" }), archType);
 	}
-
-	if (modelType == ModelType::pclm)
+	else if (modelType == ModelType::pclm || modelType == ModelType::pclmLocal)
 	{
-		langMdl.pclm = pclm::PCLanguageModelBase::create(utils::MMap(modelPath + string{ "/pclm.mdl" }), archType, true);
+		langMdl = lm::PcLangModelBase::create(utils::MMap(modelPath + string{ "/pclm.mdl" }), archType, modelType == ModelType::pclm);
 	}
 	else if (modelType == ModelType::pclmLocal)
 	{
@@ -957,11 +955,11 @@ KiwiBuilder::KiwiBuilder(const ModelBuildArgs& args)
 
 	if (lmVocabSize <= 0xFFFF)
 	{
-		langMdl.knlm = buildKnLM<uint16_t>(args, lmVocabSize, realMorph);
+		langMdl = buildKnLM<uint16_t>(args, lmVocabSize, realMorph);
 	}
 	else
 	{
-		langMdl.knlm = buildKnLM<uint32_t>(args, lmVocabSize, realMorph);
+		langMdl = buildKnLM<uint32_t>(args, lmVocabSize, realMorph);
 	}
 
 	updateMorphemes();
@@ -984,9 +982,9 @@ namespace kiwi
 		{
 		}
 
-		sb::FeedingData<Vid> operator()(size_t i, size_t threadId = 0)
+		lm::FeedingData<Vid> operator()(size_t i, size_t threadId = 0)
 		{
-			sb::FeedingData<Vid> ret;
+			lm::FeedingData<Vid> ret;
 			ret.len = sents[i].size();
 			if (lmBuf[threadId].size() < ret.len)
 			{
@@ -1008,7 +1006,7 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 	using Vid = uint16_t;
 
 	auto realMorph = restoreMorphemeMap();
-	sb::SkipBigramTrainer<Vid, 8> sbg;
+	lm::SkipBigramTrainer<Vid, 8> sbg;
 	RaggedVector<Vid> sents;
 	for (auto& path : args.corpora)
 	{
@@ -1086,7 +1084,9 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 		return true;
 	};
 
-	sbg = sb::SkipBigramTrainer<Vid, 8>{ sents, sbgTokenFilter, sbgPairFilter, 0, 150, 20, true, 0.333f, 1, args.sbgSize, langMdl.knlm->nonLeafNodeSize() };
+	auto* knlm = dynamic_cast<lm::KnLangModelBase*>(langMdl.get());
+
+	sbg = lm::SkipBigramTrainer<Vid, 8>{ sents, sbgTokenFilter, sbgPairFilter, 0, 150, 20, true, 0.333f, 1, args.sbgSize, knlm->nonLeafNodeSize() };
 	Vector<float> lmLogProbs;
 	Vector<uint32_t> baseNodes;
 	auto tc = sbg.newContext();
@@ -1107,7 +1107,7 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 			lmLogProbs.resize(sent.size());
 			baseNodes.resize(sent.size());
 		}
-		langMdl.knlm->evaluate(sent.begin(), sent.end(), lmLogProbs.begin());
+		knlm->evaluate(sent.begin(), sent.end(), lmLogProbs.begin());
 		//float sum = sbg.evaluate(&sent[0], lmLogProbs.data(), sent.size());
 		float sum = accumulate(lmLogProbs.begin() + 1, lmLogProbs.begin() + sent.size(), 0.);
 		size_t cnt = sent.size() - 1;
@@ -1124,7 +1124,7 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 
 	if (args.numWorkers <= 1)
 	{
-		sbg.train(SBDataFeeder<Vid>{ sents, langMdl.knlm.get() }, [&](const sb::ObservingData& od)
+		sbg.train(SBDataFeeder<Vid>{ sents, knlm }, [&](const lm::ObservingData& od)
 		{
 			llCnt += od.cntRecent;
 			llMean += (od.llRecent - llMean * od.cntRecent) / llCnt;
@@ -1138,7 +1138,7 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 	}
 	else
 	{
-		sbg.trainMulti(args.numWorkers, SBDataFeeder<Vid>{ sents, langMdl.knlm.get(), 8 }, [&](const sb::ObservingData& od)
+		sbg.trainMulti(args.numWorkers, SBDataFeeder<Vid>{ sents, knlm, 8 }, [&](const lm::ObservingData& od)
 		{
 			llCnt += od.cntRecent;
 			llMean += (od.llRecent - llMean * od.cntRecent) / llCnt;
@@ -1167,7 +1167,7 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 			lmLogProbs.resize(sent.size());
 			baseNodes.resize(sent.size());
 		}
-		langMdl.knlm->evaluate(sent.begin(), sent.end(), lmLogProbs.begin(), baseNodes.begin());
+		knlm->evaluate(sent.begin(), sent.end(), lmLogProbs.begin(), baseNodes.begin());
 		float sum = sbg.evaluate(&sent[0], baseNodes.data(), lmLogProbs.data(), sent.size());
 		size_t cnt = sent.size() - 1;
 		llCnt += cnt;
@@ -1201,7 +1201,8 @@ void KiwiBuilder::saveModel(const string& modelPath) const
 		saveMorphBin(ofs);
 	}
 	{
-		auto mem = langMdl.knlm->getMemory();
+		auto* knlm = dynamic_cast<lm::KnLangModelBase*>(langMdl.get());
+		auto mem = knlm->getMemory();
 		ofstream ofs{ modelPath + "/sj.knlm", ios_base::binary };
 		ofs.write((const char*)mem.get(), mem.size());
 	}
@@ -2379,7 +2380,7 @@ HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes,
 		}
 	}
 
-	auto& knlm = srcBuilder->langMdl.knlm;
+	auto knlm = dynamic_pointer_cast<lm::KnLangModelBase>(langMdl);
 	dataset.knlm = knlm;
 	dataset.morphemes = &srcBuilder->morphemes;
 	dataset.forms = &srcBuilder->forms;

@@ -36,6 +36,7 @@
     <ClInclude Include="..\include\kiwi\Joiner.h" />
     <ClInclude Include="..\include\kiwi\Kiwi.h" />
     <ClInclude Include="..\include\kiwi\Knlm.h" />
+    <ClInclude Include="..\include\Kiwi\LangModel.h" />
     <ClInclude Include="..\include\kiwi\LmState.h" />
     <ClInclude Include="..\include\kiwi\Macro.h" />
     <ClInclude Include="..\include\kiwi\Mmap.h" />
@@ -55,6 +56,7 @@
     <ClInclude Include="..\include\kiwi\Utils.h" />
     <ClInclude Include="..\include\kiwi\WordDetector.h" />
     <ClInclude Include="..\src\ArchAvailable.h" />
+    <ClInclude Include="..\src\BestPathContainer.hpp" />
     <ClInclude Include="..\src\BitEncoder.hpp" />
     <ClInclude Include="..\src\bitset.hpp" />
     <ClInclude Include="..\src\Combiner.h" />
@@ -63,10 +65,10 @@
     <ClInclude Include="..\src\FeatureTestor.h" />
     <ClInclude Include="..\src\HSkipBigramTrainer.hpp" />
     <ClInclude Include="..\src\Joiner.hpp" />
+    <ClInclude Include="..\src\Kiwi.hpp" />
     <ClInclude Include="..\src\Knlm.hpp" />
     <ClInclude Include="..\src\KTrie.h" />
     <ClInclude Include="..\src\LimitedVector.hpp" />
-    <ClInclude Include="..\src\LmState.hpp" />
     <ClInclude Include="..\src\nuquant.hpp" />
     <ClInclude Include="..\src\PathEvaluator.h" />
     <ClInclude Include="..\src\PathEvaluator.hpp" />
@@ -123,9 +125,6 @@
     <ClCompile Include="..\src\FileUtils.cpp" />
     <ClCompile Include="..\src\Joiner.cpp" />
     <ClCompile Include="..\src\Knlm.cpp" />
-    <ClCompile Include="..\src\PathEvaluator.cpp">
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">EIGEN_VECTORIZE_AVX512;KIWI_ARCH_X86_64=1;__restrict__=__restrict;KIWI_USE_BTREE;KIWI_USE_MIMALLOC;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
     <ClCompile Include="..\src\PCLanguageModel.cpp" />
     <ClCompile Include="..\src\search.cpp" />
     <ClCompile Include="..\src\SkipBigramModel.cpp" />

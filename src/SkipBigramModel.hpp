@@ -5,15 +5,22 @@
 #include <kiwi/SkipBigramModel.h>
 #include <kiwi/ArchUtils.h>
 #include "ArchAvailable.h"
+#include "Knlm.hpp"
 #include "search.h"
 
 namespace kiwi
 {
-	namespace sb
+	namespace lm
 	{
+		template<size_t windowSize, ArchType _arch, class VocabTy>
+		class SbgState;
+
 		template<ArchType arch, class KeyType, size_t windowSize>
 		class SkipBigramModel : public SkipBigramModelBase
 		{
+			friend class SbgState<windowSize, arch, KeyType>;
+
+			KnLangModel<arch, KeyType> knlm;
 			std::unique_ptr<size_t[]> ptrs;
 			std::unique_ptr<float[]> restoredFloats;
 			std::unique_ptr<KeyType[]> keyData;
@@ -22,12 +29,19 @@ namespace kiwi
 			const float* compensations = nullptr;
 			float logWindowSize;
 		public:
-			SkipBigramModel(utils::MemoryObject&& mem) : SkipBigramModelBase{ std::move(mem) }
+			using VocabType = KeyType;
+			using LmStateType = SbgState<windowSize, arch, KeyType>;
+
+			size_t getMemorySize() const override { return base.size() + knlm.getMemorySize(); }
+			void* getFindBestPathFn() const override;
+			void* getNewJoinerFn() const override;
+
+			SkipBigramModel(utils::MemoryObject&& knlmMem, utils::MemoryObject&& sbgMem) : SkipBigramModelBase{ std::move(sbgMem) }, knlm{ std::move(knlmMem) }
 			{
 				auto* ptr = reinterpret_cast<const char*>(base.get());
 				auto& header = getHeader();
 
-				const KeyType* kSizes = reinterpret_cast<const KeyType*>(ptr += sizeof(Header));
+				const KeyType* kSizes = reinterpret_cast<const KeyType*>(ptr += sizeof(SkipBigramModelHeader));
 				ptrs = make_unique<size_t[]>(header.vocabSize + 1);
 				ptrs[0] = 0;
 				for (size_t i = 0; i < header.vocabSize; ++i)
@@ -97,5 +111,65 @@ namespace kiwi
 
 			float evaluate(const KeyType* history, size_t cnt, KeyType next, float base) const;
 		};
+
+		template<size_t windowSize, ArchType _arch, class VocabTy>
+		struct SbgState : public LmStateBase<SkipBigramModel<_arch, VocabTy, windowSize>>
+		{
+			KnLMState<_arch, VocabTy> knlm;
+			size_t historyPos = 0;
+			std::array<VocabTy, windowSize> history = { {0,} };
+
+			static constexpr ArchType arch = _arch;
+			static constexpr bool transposed = false;
+
+			SbgState() = default;
+			SbgState(const ILangModel* lm) : knlm{ &static_cast<const SkipBigramModel<_arch, VocabTy, windowSize>*>(lm)->knlm } {}
+
+			bool operator==(const SbgState& other) const
+			{
+				return knlm == other.knlm && historyPos == other.historyPos && history == other.history;
+			}
+
+			void getLastHistory(VocabTy* out, size_t n) const
+			{
+				for (size_t i = 0; i < n; ++i)
+				{
+					out[i] = history[(historyPos + windowSize + i - n) % windowSize];
+				}
+			}
+
+			float nextImpl(const SkipBigramModel<_arch, VocabTy, windowSize>* lm, VocabTy next)
+			{
+				float ll = lm->knlm.progress(knlm.node, next);
+				if (lm->isValidVocab(next))
+				{
+					if (ll > -13)
+					{
+						ll = lm->evaluate(history.data(), windowSize, next, ll);
+					}
+					history[historyPos] = next;
+					historyPos = (historyPos + 1) % windowSize;
+				}
+				return ll;
+			}
+		};
 	}
+
+
+	template<size_t windowSize, ArchType arch, class VocabTy>
+	struct Hash<lm::SbgState<windowSize, arch, VocabTy>>
+	{
+		size_t operator()(const lm::SbgState<windowSize, arch, VocabTy>& state) const
+		{
+			Hash<lm::KnLMState<arch, VocabTy>> hasher;
+			std::hash<VocabTy> vocabHasher;
+			size_t ret = hasher(state.knlm);
+			for (size_t i = 0; i < windowSize; ++i)
+			{
+				ret = vocabHasher(state.history[i]) ^ ((ret << 3) | (ret >> (sizeof(size_t) * 8 - 3)));
+			}
+			return ret;
+		}
+	};
+
 }

@@ -25,7 +25,7 @@
 #include "ThreadPool.h"
 #include "WordDetector.h"
 #include "TagUtils.h"
-#include "LmState.h"
+#include "LangModel.h"
 #include "Joiner.h"
 #include "TypoTransformer.h"
 
@@ -60,6 +60,7 @@ namespace kiwi
 		friend class KiwiBuilder;
 		friend struct BestPathFinder;
 		template<class LmState, class> friend struct PathEvaluator;
+		template<class LmState> friend struct MorphemeEvaluator;
 		friend class cmb::AutoJoiner;
 		template<template<ArchType> class LmState> friend struct NewAutoJoinerGetter;
 
@@ -82,22 +83,17 @@ namespace kiwi
 		Vector<size_t> typoPtrs;
 		Vector<TypoForm> typoForms;
 		utils::FrozenTrie<kchar_t, const Form*> formTrie;
-		LangModel langMdl;
+		std::shared_ptr<lm::ILangModel> langMdl;
 		std::shared_ptr<cmb::CompiledRule> combiningRule;
 		std::unique_ptr<utils::ThreadPool> pool;
 		
 		const Morpheme* getDefaultMorpheme(POSTag tag) const;
 
-		template<class LmState>
-		cmb::AutoJoiner newJoinerImpl() const
-		{
-			return cmb::AutoJoiner{ *this, cmb::Candidate<LmState>{ *combiningRule, langMdl } };
-		}
-
 		ArchType selectedArch = ArchType::none;
 		void* dfSplitByTrie = nullptr;
 		void* dfFindForm = nullptr;
 		void* dfFindBestPath = nullptr;
+		void* dfNewJoiner = nullptr;
 	
 	public:
 		enum class SpecialMorph {
@@ -130,7 +126,7 @@ namespace kiwi
 		 * kiwi::KiwiBuilder 를 통해 생성된 객체만이 형태소 분석에 사용할 수 있다.
 		 */
 		Kiwi(ArchType arch = ArchType::default_, 
-			LangModel _langMdl = {}, 
+			const std::shared_ptr<lm::ILangModel>& _langMdl = {}, 
 			bool typoTolerant = false, 
 			bool continualTypoTolerant = false, 
 			bool lengtheningTypoTolerant = false);
@@ -157,7 +153,7 @@ namespace kiwi
 
 		ArchType archType() const { return selectedArch; }
 
-		ModelType modelType() const { return langMdl.type; }
+		ModelType modelType() const { return langMdl ? langMdl->getType() : ModelType::none; }
 
 		/**
 		 * @brief 현재 Kiwi 객체가 오타 교정 기능이 켜진 상태로 생성되었는지 알려준다.
@@ -371,6 +367,10 @@ namespace kiwi
 			TokenResult* tokenizedResultOut = nullptr
 		) const;
 
+
+		template<class LmState>
+		cmb::AutoJoiner newJoinerImpl() const;
+
 		/**
 		 * @brief 형태소들을 결합하여 텍스트로 복원해주는 작업을 수행하는 AutoJoiner를 반환한다.
 		 * 
@@ -380,11 +380,6 @@ namespace kiwi
 		 * @sa kiwi::cmb::AutoJoiner
 		 */
 		cmb::AutoJoiner newJoiner(bool lmSearch = true) const;
-
-		/**
-		 * @brief Kiwi에 내장된 언어 모델에 접근할 수 있는 LmObject 객체를 생성한다.
-		 */
-		std::unique_ptr<LmObjectBase> newLmObject() const;
 
 		/**
 		 * @brief `TokenInfo::typoFormId`로부터 실제 오타 형태를 복원한다.
@@ -517,9 +512,9 @@ namespace kiwi
 			integrateAllomorph = v;
 		}
 
-		const lm::KnLangModelBase* getKnLM() const
+		const lm::ILangModel* getLangModel() const
 		{
-			return langMdl.knlm.get();
+			return langMdl.get();
 		}
 
 		void findMorpheme(std::vector<const Morpheme*>& out, const std::u16string& s, POSTag tag = POSTag::unknown) const;
@@ -536,7 +531,7 @@ namespace kiwi
 		Vector<FormRaw> forms;
 		Vector<MorphemeRaw> morphemes;
 		UnorderedMap<KString, size_t> formMap;
-		LangModel langMdl;
+		std::shared_ptr<lm::ILangModel> langMdl;
 		std::shared_ptr<cmb::CompiledRule> combiningRule;
 		WordDetector detector;
 
@@ -682,7 +677,7 @@ namespace kiwi
 		 */
 		bool ready() const
 		{
-			return !!langMdl.knlm;
+			return !!langMdl;
 		}
 
 		void saveModel(const std::string& modelPath) const;

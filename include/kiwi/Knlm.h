@@ -1,21 +1,12 @@
 ﻿#pragma once
 
-#include <array>
-#include <vector>
-#include <deque>
-#include <memory>
-#include <algorithm>
-#include <numeric>
-
-#include "Utils.h"
-#include "Mmap.h"
-#include "ArchUtils.h"
+#include "LangModel.h"
 
 namespace kiwi
 {
 	namespace lm
 	{
-		struct Header
+		struct KnLangModelHeader
 		{
 			uint64_t num_nodes, node_offset, key_offset, ll_offset, gamma_offset, qtable_offset, htx_offset;
 			uint64_t unk_id, bos_id, eos_id, vocab_size;
@@ -24,7 +15,7 @@ namespace kiwi
 		};
 
 		template<class KeyType, class DiffType = int32_t>
-		struct Node
+		struct KnLangModelNode
 		{
 			KeyType num_nexts = 0;
 			DiffType lower = 0;
@@ -32,7 +23,7 @@ namespace kiwi
 			float ll = 0, gamma = 0;
 		};
 
-		class KnLangModelBase
+		class KnLangModelBase : public ILangModel
 		{
 		protected:
 			utils::MemoryObject base;
@@ -50,14 +41,17 @@ namespace kiwi
 		public:
 
 			virtual ~KnLangModelBase() {}
-			const Header& getHeader() const { return *reinterpret_cast<const Header*>(base.get()); }
+			size_t vocabSize() const override { return getHeader().vocab_size; }
+			size_t getMemorySize() const override { return base.size(); }
+
+			const KnLangModelHeader& getHeader() const { return *reinterpret_cast<const KnLangModelHeader*>(base.get()); }
 
 			virtual ptrdiff_t getLowerNode(ptrdiff_t node_idx) const = 0;
 
 			virtual size_t nonLeafNodeSize() const = 0;
 			virtual const void* getExtraBuf() const = 0;
 
-			static std::unique_ptr<KnLangModelBase> create(utils::MemoryObject&& mem, ArchType archType = ArchType::none);
+			static std::unique_ptr<KnLangModelBase> create(utils::MemoryObject&& mem, ArchType archType = ArchType::none, bool transposed = false);
 
 			template<class VocabTy, class Trie, class HistoryTx = std::vector<VocabTy>>
 			static utils::MemoryOwner build(Trie&& ngram_cf,

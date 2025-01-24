@@ -2,7 +2,7 @@
 
 namespace kiwi
 {
-	namespace sb
+	namespace lm
 	{
 		template class SkipBigramModel<ArchType::none, uint8_t, 8>;
 		template class SkipBigramModel<ArchType::none, uint16_t, 8>;
