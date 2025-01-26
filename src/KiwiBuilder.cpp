@@ -795,10 +795,6 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, size_t _numThreads, BuildOptio
 	{
 		langMdl = lm::PcLangModelBase::create(utils::MMap(modelPath + string{ "/pclm.mdl" }), archType, modelType == ModelType::pclm);
 	}
-	else if (modelType == ModelType::pclmLocal)
-	{
-		langMdl.pclm = pclm::PCLanguageModelBase::create(utils::MMap(modelPath + string{ "/pclm.mdl" }), archType, false);
-	}
 
 	if (!!(options & BuildOption::loadDefaultDict))
 	{

@@ -4,12 +4,41 @@
 #include <kiwi/Utils.h>
 #include "../src/StrUtils.h"
 #include "Evaluator.h"
+#include "toolUtils.h"
 #include "LCS.hpp"
 
 using namespace std;
 using namespace kiwi;
 
-TokenInfo parseWordPOS(const u16string& str)
+unique_ptr<Evaluator> Evaluator::create(const std::string& evalType)
+{
+	if (evalType == "morph") return std::make_unique<MorphEvaluator>();
+	if (evalType == "disamb") return std::make_unique<DisambEvaluator>();
+	throw runtime_error{ "Unknown Evaluator Type" };
+}
+
+const char* modelTypeToStr(ModelType type)
+{
+	switch (type)
+	{
+	case ModelType::knlm: return "knlm";
+	case ModelType::knlmTransposed: return "knlm-transposed";
+	case ModelType::sbg: return "sbg";
+	case ModelType::pclm: return "pclm";
+	case ModelType::pclmLocal: return "pclm-local";
+	}
+	return "unknown";
+}
+
+inline ostream& operator<<(ostream& o, const kiwi::TokenInfo& t)
+{
+	o << utf16To8(t.str);
+	if (t.senseId) o << "__" << (int)t.senseId;
+	o << "/" << kiwi::tagToString(t.tag);
+	return o;
+}
+
+inline TokenInfo parseWordPOS(const u16string& str)
 {
 	auto p = str.rfind('/');
 	if (p == str.npos) return {};
@@ -36,13 +65,98 @@ TokenInfo parseWordPOS(const u16string& str)
 		tagStr.erase(tagStr.begin() + tagStr.find('-'), tagStr.end());
 	}
 	POSTag tag = toPOSTag(tagStr);
-	if (tag >= POSTag::max) throw runtime_error{ "Wrong Input '" + utf16To8(str.substr(p + 1)) + "'" };
+	if (clearIrregular(tag) >= POSTag::max) throw runtime_error{ "Wrong Input '" + utf16To8(str.substr(p + 1)) + "'" };
 	return { form, tag, 0, 0 };
 }
 
-Evaluator::Evaluator(const std::string& testSetFile, const Kiwi* _kw, Match _matchOption, size_t _topN)
-	: kw{ _kw }, matchOption{ _matchOption }, topN{ _topN }
+int Evaluator::operator()(const string& modelPath, 
+	const string& output, 
+	const vector<string>& input,
+	bool normCoda, bool zCoda, bool multiDict, ModelType modelType,
+	float typoCostWeight, bool bTypo, bool cTypo, bool lTypo,
+	int repeat)
 {
+	try
+	{
+		if (typoCostWeight > 0 && !bTypo && !cTypo && !lTypo)
+		{
+			bTypo = true;
+		}
+		else if (typoCostWeight == 0)
+		{
+			bTypo = false;
+			cTypo = false;
+			lTypo = false;
+		}
+
+		tutils::Timer timer;
+		auto option = (BuildOption::default_ & ~BuildOption::loadMultiDict) | (multiDict ? BuildOption::loadMultiDict : BuildOption::none);
+		auto typo = getDefaultTypoSet(DefaultTypoSet::withoutTypo);
+
+		if (bTypo)
+		{
+			typo |= getDefaultTypoSet(DefaultTypoSet::basicTypoSet);
+		}
+
+		if (cTypo)
+		{
+			typo |= getDefaultTypoSet(DefaultTypoSet::continualTypoSet);
+		}
+
+		if (lTypo)
+		{
+			typo |= getDefaultTypoSet(DefaultTypoSet::lengtheningTypoSet);
+		}
+
+		Kiwi kw = KiwiBuilder{ modelPath, 1, option, modelType }.build(
+			typo
+		);
+		if (typoCostWeight > 0) kw.setTypoCostWeight(typoCostWeight);
+
+		cout << "Loading Time : " << timer.getElapsed() << " ms" << endl;
+		cout << "ArchType : " << archToStr(kw.archType()) << endl;
+		cout << "Model Type : " << modelTypeToStr(kw.modelType()) << endl;
+		if (kw.getLangModel())
+		{
+			cout << "LM Size : " << (kw.getLangModel()->getMemorySize() / 1024. / 1024.) << " MB" << endl;
+		}
+		cout << "Mem Usage : " << (tutils::getCurrentPhysicalMemoryUsage() / 1024.) << " MB\n" << endl;
+
+		double avgMicro = 0, avgMacro = 0;
+		double cnt = 0;
+		for (auto& tf : input)
+		{
+			cout << "Test file: " << tf << endl;
+			try
+			{
+				auto result = eval(output, tf, kw, normCoda, zCoda, repeat);
+				avgMicro += result.first;
+				avgMacro += result.second;
+				++cnt;
+				cout << "================" << endl;
+			}
+			catch (const std::exception& e)
+			{
+				cerr << e.what() << endl;
+			}
+		}
+
+		cout << endl << "================" << endl;
+		cout << "Avg Score" << endl;
+		cout << avgMicro / cnt << ", " << avgMacro / cnt << endl;
+		cout << "================" << endl;
+		return 0;
+	}
+	catch (const exception& e)
+	{
+		cerr << e.what() << endl;
+		return -1;
+	}
+}
+
+auto MorphEvaluator::loadTestset(const string& testSetFile) const -> vector<TestResult>
+{
+	vector<TestResult> ret;
 	ifstream f{ testSetFile };
 	if (!f) throw std::ios_base::failure{ "Cannot open '" + testSetFile + "'" };
 	string line;
@@ -60,27 +174,19 @@ Evaluator::Evaluator(const std::string& testSetFile, const Kiwi* _kw, Match _mat
 		TestResult tr;
 		tr.q = fd[0].to_string();
 		for (auto& t : tokens) tr.a.emplace_back(parseWordPOS(t));
-		testsets.emplace_back(std::move(tr));
+		ret.emplace_back(std::move(tr));
 	}
+	return ret;
 }
 
-void Evaluator::run()
-{
-	for (auto& tr : testsets)
-	{
-		auto cands = kw->analyze(tr.q, topN, matchOption);
-		tr.r = cands[0].first;
-	}
-}
-
-Evaluator::Score Evaluator::evaluate()
+auto MorphEvaluator::computeScore(vector<TestResult>& preds, vector<TestResult>& errors) const -> Score
 {
 	errors.clear();
 
 	size_t totalCount = 0, microCorrect = 0, microCount = 0;
 	double totalScore = 0;
 
-	for (auto& tr : testsets)
+	for (auto& tr : preds)
 	{
 		if (tr.a != tr.r)
 		{
@@ -128,15 +234,31 @@ Evaluator::Score Evaluator::evaluate()
 	return ret;
 }
 
-ostream& operator<<(ostream& o, const kiwi::TokenInfo& t)
+auto DisambEvaluator::computeScore(vector<TestResult>& preds, vector<TestResult>& errors) const -> Score
 {
-	o << utf16To8(t.str);
-	if (t.senseId) o << "__" << (int)t.senseId;
-	o << "/" << kiwi::tagToString(t.tag);
-	return o;
+	errors.clear();
+	Score score;
+	for (auto& tr : preds)
+	{
+		bool correct = false;
+		for (auto& token : tr.result.first)
+		{
+			if (token.str == tr.target.str && 
+				clearIrregular(token.tag) == clearIrregular(tr.target.tag))
+			{
+				correct = true;
+				break;
+			}
+		}
+		if (correct) score.acc += 1;
+		else errors.emplace_back(tr);
+		score.totalCount++;
+	}
+	score.acc /= score.totalCount;
+	return score;
 }
 
-void Evaluator::TestResult::writeResult(ostream& out) const
+void MorphEvaluator::TestResult::writeResult(ostream& out) const
 {
 	out << utf16To8(q) << '\t' << score << endl;
 	for (auto& _r : da)
@@ -150,4 +272,115 @@ void Evaluator::TestResult::writeResult(ostream& out) const
 	}
 	out << endl;
 	out << endl;
+}
+
+pair<double, double> MorphEvaluator::eval(const string& output, const string& file, kiwi::Kiwi& kiwi, bool normCoda, bool zCoda, int repeat)
+{
+	const size_t topN = 1;
+	const Match matchOption = (normCoda ? Match::allWithNormalizing : Match::all) & ~(zCoda ? Match::none : Match::zCoda);
+	vector<TestResult> testsets = loadTestset(file), errors;
+	tutils::Timer total;
+	for (int i = 0; i < repeat; ++i)
+	{
+		for (auto& tr : testsets)
+		{
+			auto cands = kiwi.analyze(tr.q, topN, matchOption);
+			tr.r = cands[0].first;
+		}
+	}
+	double tm = total.getElapsed() / repeat;
+	auto score = computeScore(testsets, errors);
+
+	cout << score.micro << ", " << score.macro << endl;
+	cout << "Total (" << score.totalCount << " lines) Time : " << tm << " ms" << endl;
+	cout << "Time per Line : " << tm / score.totalCount << " ms" << endl;
+
+	if (!output.empty())
+	{
+		const size_t last_slash_idx = file.find_last_of("\\/");
+		string name;
+		if (last_slash_idx != file.npos) name = file.substr(last_slash_idx + 1);
+		else name = file;
+
+		ofstream out{ output + "/" + name };
+		out << score.micro << ", " << score.macro << endl;
+		out << "Total (" << score.totalCount << ") Time : " << tm << " ms" << endl;
+		out << "Time per Unit : " << tm / score.totalCount << " ms" << endl;
+		for (auto t : errors)
+		{
+			t.writeResult(out);
+		}
+	}
+	return make_pair(score.micro, score.macro);
+}
+
+auto DisambEvaluator::loadTestset(const string& testSetFile) const -> vector<TestResult>
+{
+	vector<TestResult> ret;
+	ifstream f{ testSetFile };
+	if (!f) throw std::ios_base::failure{ "Cannot open '" + testSetFile + "'" };
+	string line;
+	while (getline(f, line))
+	{
+		while (line.back() == '\n' || line.back() == '\r') line.pop_back();
+		auto wstr = utf8To16(line);
+		auto fd = split(wstr, u'\t');
+		if (fd.size() < 2) continue;
+		TestResult tr;
+		tr.target = parseWordPOS(fd[0].to_string());
+		tr.text = fd[1].to_string();
+		ret.emplace_back(move(tr));
+	}
+	return ret;
+}
+
+void DisambEvaluator::TestResult::writeResult(ostream& out) const
+{
+	out << target << '\t' << utf16To8(text) << '\t' << score << endl;
+	for (auto& _r : result.first)
+	{
+		out << _r << '\t';
+	}
+	out << endl;
+	out << endl;
+}
+
+pair<double, double> DisambEvaluator::eval(const string& output, const string& file, kiwi::Kiwi& kiwi, bool normCoda, bool zCoda, int repeat)
+{
+	const size_t topN = 1;
+	const Match matchOption = (normCoda ? Match::allWithNormalizing : Match::all) & ~(zCoda ? Match::none : Match::zCoda);
+	vector<TestResult> testsets = loadTestset(file), errors;
+	tutils::Timer total;
+	for (int i = 0; i < repeat; ++i)
+	{
+		for (auto& tr : testsets)
+		{
+			auto cands = kiwi.analyze(tr.text, topN, matchOption);
+			tr.result = cands[0];
+		}
+	}
+	double tm = total.getElapsed() / repeat;
+	auto score = computeScore(testsets, errors);
+
+	cout << score.acc << endl;
+	cout << "Total (" << score.totalCount << " lines) Time : " << tm << " ms" << endl;
+	cout << "Time per Line : " << tm / score.totalCount << " ms" << endl;
+
+	if (!output.empty())
+	{
+		const size_t last_slash_idx = file.find_last_of("\\/");
+		string name;
+		if (last_slash_idx != file.npos) name = file.substr(last_slash_idx + 1);
+		else name = file;
+
+		ofstream out{ output + "/" + name };
+		out << score.acc << endl;
+		out << "Total (" << score.totalCount << ") Time : " << tm << " ms" << endl;
+		out << "Time per Unit : " << tm / score.totalCount << " ms" << endl;
+		for (auto t : errors)
+		{
+			t.writeResult(out);
+		}
+	}
+	return make_pair(score.acc, score.acc);
 }

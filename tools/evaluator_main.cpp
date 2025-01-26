@@ -10,131 +10,6 @@
 
 using namespace std;
 using namespace kiwi;
-
-const char* modelTypeToStr(ModelType type)
-{
-	switch (type)
-	{
-	case ModelType::knlm: return "knlm";
-	case ModelType::knlmTransposed: return "knlm-transposed";
-	case ModelType::sbg: return "sbg";
-	case ModelType::pclm: return "pclm";
-	}
-	return "unknown";
-}
-
-int doEvaluate(const string& modelPath, const string& output, const vector<string>& input, 
-	bool normCoda, bool zCoda, bool multiDict, ModelType modelType, 
-	float typoCostWeight, bool bTypo, bool cTypo, bool lTypo,
-	int repeat)
-{
-	try
-	{
-		if (typoCostWeight > 0 && !bTypo && !cTypo && !lTypo)
-		{
-			bTypo = true;
-		}
-		else if (typoCostWeight == 0)
-		{
-			bTypo = false;
-			cTypo = false;
-			lTypo = false;
-		}
-
-		tutils::Timer timer;
-		auto option = (BuildOption::default_ & ~BuildOption::loadMultiDict) | (multiDict ? BuildOption::loadMultiDict : BuildOption::none);
-		auto typo = getDefaultTypoSet(DefaultTypoSet::withoutTypo);
-
-		if (bTypo)
-		{
-			typo |= getDefaultTypoSet(DefaultTypoSet::basicTypoSet);
-		}
-
-		if (cTypo)
-		{
-			typo |= getDefaultTypoSet(DefaultTypoSet::continualTypoSet);
-		}
-
-		if (lTypo)
-		{
-			typo |= getDefaultTypoSet(DefaultTypoSet::lengtheningTypoSet);
-		}
-
-		Kiwi kw = KiwiBuilder{ modelPath, 1, option, modelType }.build(
-			typo
-		);
-		if (typoCostWeight > 0) kw.setTypoCostWeight(typoCostWeight);
-		
-		cout << "Loading Time : " << timer.getElapsed() << " ms" << endl;
-		cout << "ArchType : " << archToStr(kw.archType()) << endl;
-		cout << "Model Type : " << modelTypeToStr(kw.modelType()) << endl;
-		if (kw.getKnLM())
-		{
-			cout << "LM Size : " << (kw.getKnLM()->getMemory().size() / 1024. / 1024.) << " MB" << endl;
-		}
-		cout << "Mem Usage : " << (tutils::getCurrentPhysicalMemoryUsage() / 1024.) << " MB\n" << endl;
-		
-		double avgMicro = 0, avgMacro = 0;
-		double cnt = 0;
-		for (auto& tf : input)
-		{
-			cout << "Test file: " << tf << endl;
-			try
-			{
-				Evaluator test{ tf, &kw, (normCoda ? Match::allWithNormalizing : Match::all) & ~(zCoda ? Match::none : Match::zCoda) };
-				tutils::Timer total;
-				for (int i = 0; i < repeat; ++i)
-				{
-					test.run();
-				}
-				double tm = total.getElapsed() / repeat;
-				auto result = test.evaluate();
-
-				cout << result.micro << ", " << result.macro << endl;
-				cout << "Total (" << result.totalCount << " lines) Time : " << tm << " ms" << endl;
-				cout << "Time per Line : " << tm / result.totalCount << " ms" << endl;
-
-				avgMicro += result.micro;
-				avgMacro += result.macro;
-				cnt++;
-
-				if (!output.empty())
-				{
-					const size_t last_slash_idx = tf.find_last_of("\\/");
-					string name;
-					if (last_slash_idx != tf.npos) name = tf.substr(last_slash_idx + 1);
-					else name = tf;
-
-					ofstream out{ output + "/" + name };
-					out << result.micro << ", " << result.macro << endl;
-					out << "Total (" << result.totalCount << ") Time : " << tm << " ms" << endl;
-					out << "Time per Unit : " << tm / result.totalCount << " ms" << endl;
-					for (auto t : test.getErrors())
-					{
-						t.writeResult(out);
-					}
-				}
-				cout << "================" << endl;
-			}
-			catch (const std::exception& e)
-			{
-				cerr << e.what() << endl;
-			}
-		}
-
-		cout << endl << "================" << endl;
-		cout << "Avg Score" << endl;
-		cout << avgMicro / cnt << ", " << avgMacro / cnt << endl;
-		cout << "================" << endl;
-		return 0;
-	}
-	catch (const exception& e)
-	{
-		cerr << e.what() << endl;
-		return -1;
-	}
-}
-
 using namespace TCLAP;
 
 int main(int argc, const char* argv[])
@@ -152,11 +27,10 @@ int main(int argc, const char* argv[])
 	SwitchArg cTypo{ "", "ctypo", "make continual-typo-tolerant model", false };
 	SwitchArg lTypo{ "", "ltypo", "make lengthening-typo-tolerant model", false };
 	ValueArg<int> repeat{ "", "repeat", "repeat evaluation for benchmark", false, 1, "int" };
-	UnlabeledMultiArg<string> files{ "files", "evaluation set files", true, "string" };
+	UnlabeledMultiArg<string> inputs{ "inputs", "evaluation set (--morph, --disamb)", false, "string" };
 
 	cmd.add(model);
 	cmd.add(output);
-	cmd.add(files);
 	cmd.add(noNormCoda);
 	cmd.add(noZCoda);
 	cmd.add(noMulti);
@@ -166,6 +40,7 @@ int main(int argc, const char* argv[])
 	cmd.add(cTypo);
 	cmd.add(lTypo);
 	cmd.add(repeat);
+	cmd.add(inputs);
 
 	try
 	{
@@ -195,13 +70,64 @@ int main(int argc, const char* argv[])
 		{
 			kiwiModelType = ModelType::pclm;
 		}
+		else if (v == "pclm-local")
+		{
+			kiwiModelType = ModelType::pclmLocal;
+		}
 		else
 		{
 			cerr << "Invalid model type" << endl;
 			return -1;
 		}
 	}
-	return doEvaluate(model, output, files.getValue(), 
-		!noNormCoda, !noZCoda, !noMulti, kiwiModelType, typoWeight, bTypo, cTypo, lTypo, repeat);
+	
+	vector<string> morphInputs, disambInputs;
+
+	string currentType = "";
+	for (auto& input : inputs.getValue())
+	{
+		if (input.size() > 2 && input[0] == '-' && input[1] == '-')
+		{
+			currentType = input;
+		}
+		else
+		{
+			if (currentType == "--morph")
+			{
+				morphInputs.emplace_back(input);
+			}
+			else if (currentType == "--disamb")
+			{
+				disambInputs.emplace_back(input);
+			}
+			else
+			{
+				cerr << "Unknown argument: " << input << endl;
+				return -1;
+			}
+		}
+	}
+
+	if (morphInputs.size())
+	{
+		auto evaluator = Evaluator::create("morph");
+		(*evaluator)(model, output, morphInputs,
+			!noNormCoda, !noZCoda, !noMulti,
+			kiwiModelType,
+			typoWeight, bTypo, cTypo, lTypo,
+			repeat);
+		cout << endl;
+	}
+
+	if (disambInputs.size())
+	{
+		auto evaluator = Evaluator::create("disamb");
+		(*evaluator)(model, output, disambInputs,
+			!noNormCoda, !noZCoda, !noMulti,
+			kiwiModelType,
+			typoWeight, bTypo, cTypo, lTypo,
+			repeat);
+		cout << endl;
+	}
 }
 

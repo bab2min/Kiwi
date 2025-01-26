@@ -28,7 +28,7 @@ int run(const string& modelPath, bool benchmark, const string& output, const str
 	{
 		tutils::Timer timer;
 		size_t lines = 0, bytes = 0;
-		Kiwi kw = KiwiBuilder{ modelPath, 1, BuildOption::default_, sbg }.build(typos > 0 ? DefaultTypoSet::basicTypoSet : DefaultTypoSet::withoutTypo);
+		Kiwi kw = KiwiBuilder{ modelPath, 1, BuildOption::default_, sbg ? ModelType::sbg : ModelType::knlm }.build(typos > 0 ? DefaultTypoSet::basicTypoSet : DefaultTypoSet::withoutTypo);
 
 		cout << "Kiwi v" << KIWI_VERSION_STRING << endl;
 		if (tolerance)
