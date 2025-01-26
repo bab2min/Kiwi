@@ -185,7 +185,7 @@ namespace kiwi
 
 					// fill the rest information of resultOut
 					newPath.wid = lastSeqId;
-					if (curMorph->chunks.empty() || curMorph->complex || curMorph->saisiot)
+					if (curMorph->isSingle())
 					{
 						newPath.combineSocket = curMorph->combineSocket;
 						newPath.ownFormId = ownFormId;
@@ -230,7 +230,7 @@ namespace kiwi
 
 				// fill the rest information of resultOut
 				newPath.wid = lastSeqId;
-				if (curMorph->chunks.empty() || curMorph->complex || curMorph->saisiot)
+				if (curMorph->isSingle())
 				{
 					newPath.combineSocket = curMorph->combineSocket;
 					newPath.ownFormId = ownFormId;
@@ -282,7 +282,7 @@ namespace kiwi
 
 				// fill the rest information of resultOut
 				newPath.wid = lastSeqId;
-				if (curMorph->chunks.empty() || curMorph->complex || curMorph->saisiot)
+				if (curMorph->isSingle())
 				{
 					newPath.combineSocket = curMorph->combineSocket;
 					newPath.ownFormId = ownFormId;

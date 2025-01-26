@@ -180,6 +180,111 @@ namespace kiwi
 			|| m == Kiwi::SpecialMorph::doubleQuoteOpen || m == Kiwi::SpecialMorph::doubleQuoteClose;
 	}
 
+
+	template<PathEvaluatingMode mode, class LmState>
+	inline void insertToPathContainer(
+		BestPathConatiner<mode, LmState>& bestPathCont,
+		const size_t topN,
+		const Vector<SpecialState>& prevSpStates,
+		const Morpheme* curMorph,
+		const Morpheme* morphBase,
+		LmState&& state,
+		const float score,
+		const KGraphNode* node,
+		const WordLL<LmState>& prevPath,
+		const RuleBasedScorer& ruleBasedScorer
+	)
+	{
+		const auto insert = [&](uint8_t rootId)
+		{
+			const auto* prevMorpheme = &morphBase[prevPath.wid];
+			auto spState = prevPath.spState;
+			if (rootId != commonRootId)
+			{
+				spState = prevSpStates[rootId];
+			}
+			const float candScoreWithRule = score + ruleBasedScorer(prevMorpheme, spState);
+
+			// update special state
+			if (ruleBasedScorer.curMorphSpecialType == Kiwi::SpecialMorph::singleQuoteOpen) spState.singleQuote = 1;
+			else if (ruleBasedScorer.curMorphSpecialType == Kiwi::SpecialMorph::singleQuoteClose) spState.singleQuote = 0;
+			else if (ruleBasedScorer.curMorphSpecialType == Kiwi::SpecialMorph::doubleQuoteOpen) spState.doubleQuote = 1;
+			else if (ruleBasedScorer.curMorphSpecialType == Kiwi::SpecialMorph::doubleQuoteClose) spState.doubleQuote = 0;
+			if (ruleBasedScorer.curMorphSbType)
+			{
+				spState.bulletHash = hashSbTypeOrder(ruleBasedScorer.curMorphSbType, ruleBasedScorer.curMorphSbOrder + 1);
+			}
+
+			PathHash<LmState> ph{ state, prevPath.rootId, spState };
+			bestPathCont.insert(ph, topN, rootId, curMorph, candScoreWithRule, prevPath.accTypoCost + node->typoCost, &prevPath, move(state), spState);
+		};
+
+		if ((ruleBasedScorer.curMorphSbType || isQuote(ruleBasedScorer.curMorphSpecialType)) && prevPath.rootId == commonRootId)
+		{
+			for (uint8_t rootId = 0; rootId < prevSpStates.size(); ++rootId)
+			{
+				insert(rootId);
+			}
+		}
+		else
+		{
+			insert(commonRootId);
+		}
+	}
+
+	class FormEvaluator
+	{
+		const kchar_t* leftFormFirst;
+		const kchar_t* leftFormLast;
+		bool leftFormEndswithSSC;
+		POSTag prevTag;
+
+	public:
+		template<class LmState>
+		FormEvaluator(const WordLL<LmState>& prevPath, 
+			const Vector<U16StringView>& ownFormList, 
+			const Morpheme* morphBase
+		)
+		{
+			if (prevPath.ownFormId)
+			{
+				leftFormFirst = ownFormList[prevPath.ownFormId - 1].data();
+				leftFormLast = leftFormFirst + ownFormList[0].size();
+			}
+			else if (morphBase[prevPath.wid].kform && !morphBase[prevPath.wid].kform->empty())
+			{
+				leftFormFirst = morphBase[prevPath.wid].kform->data();
+				leftFormLast = leftFormFirst + morphBase[prevPath.wid].kform->size();
+			}
+			else
+			{
+				leftFormFirst = prevPath.morpheme->getForm().data();
+				leftFormLast = leftFormFirst + prevPath.morpheme->getForm().size();
+			}
+			leftFormEndswithSSC = leftFormFirst < leftFormLast && identifySpecialChr(leftFormLast[-1]) == POSTag::ssc;
+			prevTag = prevPath.morpheme->tag;
+		}
+
+		bool operator()(const Morpheme* curMorph, const float ignoreCondScore, float& candScore) const
+		{
+			const CondVowel cvowel = curMorph->vowel;
+			const CondPolarity cpolar = curMorph->polar;
+			if (prevTag == POSTag::ssc || leftFormEndswithSSC)
+			{
+				// 이전 형태소가 닫는 괄호인 경우 좌측 결합조건을 적용하지 않음
+			}
+			else if (ignoreCondScore)
+			{
+				candScore += FeatureTestor::isMatched(leftFormFirst, leftFormLast, cvowel, cpolar) ? 0 : ignoreCondScore;
+			}
+			else
+			{
+				if (!FeatureTestor::isMatched(leftFormFirst, leftFormLast, cvowel, cpolar)) return false;
+			}
+			return true;
+		}
+	};
+
 	template<class LmState>
 	struct LmEvalData
 	{
@@ -305,7 +410,7 @@ namespace kiwi
 					}
 
 					// if the morpheme has chunk set
-					if (!(curMorph->chunks.empty() || curMorph->complex || curMorph->saisiot))
+					if (!curMorph->isSingle())
 					{
 						// '하다/하게/하지'가 '다/게/지'로 축약된 경우인데 앞에 공백이 있는 경우는 탐색후보에서 제외
 						if (node->prev && node[-(int)node->prev].endPos < node->startPos
@@ -390,8 +495,7 @@ namespace kiwi
 		) const
 		{
 			thread_local BestPathConatiner<mode, LmState> bestPathCont;
-			thread_local Vector<uint8_t> rootIds;
-
+			
 			const auto* langMdl = kw->getLangModel();
 			const Morpheme* morphBase = kw->morphemes.data();
 			const auto spacePenalty = kw->spacePenalty;
@@ -401,7 +505,7 @@ namespace kiwi
 
 			const Morpheme* lastMorph;
 			Wid firstWid;
-			if (curMorph->chunks.empty() || curMorph->complex || curMorph->saisiot)
+			if (curMorph->isSingle())
 			{
 				lastMorph = curMorph->getCombined() ? curMorph->getCombined() : curMorph;
 				firstWid = curMorph->lmMorphemeId;
@@ -445,7 +549,7 @@ namespace kiwi
 					if (prevPath.combineSocket)
 					{
 						// merge <v> <chunk> with only the same socket
-						if (prevPath.combineSocket != curMorph->combineSocket || (curMorph->chunks.empty() || curMorph->complex || curMorph->saisiot))
+						if (prevPath.combineSocket != curMorph->combineSocket || curMorph->isSingle())
 						{
 							continue;
 						}
@@ -457,41 +561,11 @@ namespace kiwi
 						firstWid = morphBase[prevPath.wid].getCombined()->lmMorphemeId;
 					}
 
-					const kchar_t* leftFormFirst, * leftFormLast;
-					if (prevPath.ownFormId)
-					{
-						leftFormFirst = ownFormList[prevPath.ownFormId - 1].data();
-						leftFormLast = leftFormFirst + ownFormList[0].size();
-					}
-					else if (morphBase[prevPath.wid].kform && !morphBase[prevPath.wid].kform->empty())
-					{
-						leftFormFirst = morphBase[prevPath.wid].kform->data();
-						leftFormLast = leftFormFirst + morphBase[prevPath.wid].kform->size();
-					}
-					else
-					{
-						leftFormFirst = prevPath.morpheme->getForm().data();
-						leftFormLast = leftFormFirst + prevPath.morpheme->getForm().size();
-					}
-
-					const CondVowel cvowel = curMorph->vowel;
-					const CondPolarity cpolar = curMorph->polar;
-					const bool leftFormEndswithSSC = leftFormFirst < leftFormLast && identifySpecialChr(leftFormLast[-1]) == POSTag::ssc;
-					if (prevPath.morpheme->tag == POSTag::ssc || leftFormEndswithSSC)
-					{
-						// 이전 형태소가 닫는 괄호인 경우 좌측 결합조건을 적용하지 않음
-					}
-					else if (ignoreCondScore)
-					{
-						candScore += FeatureTestor::isMatched(leftFormFirst, leftFormLast, cvowel, cpolar) ? 0 : ignoreCondScore;
-					}
-					else
-					{
-						if (!FeatureTestor::isMatched(leftFormFirst, leftFormLast, cvowel, cpolar)) continue;
-					}
+					FormEvaluator formEvaluator{ prevPath, ownFormList, morphBase };
+					if (!formEvaluator(curMorph, ignoreCondScore, candScore)) continue;
 
 					auto cLmState = prevPath.lmState;
-					if (curMorph->combineSocket && (curMorph->chunks.empty() || curMorph->complex || curMorph->saisiot))
+					if (curMorph->combineSocket && curMorph->isSingle())
 					{
 						// no-op
 					}
@@ -504,7 +578,7 @@ namespace kiwi
 						}
 						float ll = cLmState.next(langMdl, firstWid);
 						candScore += ll;
-						if (!(curMorph->chunks.empty() || curMorph->complex || curMorph->saisiot))
+						if (!curMorph->isSingle())
 						{
 							for (size_t i = 1; i < curMorph->chunks.size(); ++i)
 							{
@@ -520,41 +594,7 @@ namespace kiwi
 						}
 					}
 
-					if ((ruleBasedScorer.curMorphSbType || isQuote(ruleBasedScorer.curMorphSpecialType)) && prevPath.rootId == commonRootId)
-					{
-						rootIds.resize(prevSpStates.size());
-						iota(rootIds.begin(), rootIds.end(), 0);
-					}
-					else
-					{
-						rootIds.resize(1);
-						rootIds[0] = commonRootId;
-					}
-
-					for (auto rootId : rootIds)
-					{
-						const auto* prevMorpheme = &morphBase[prevPath.wid];
-						auto spState = prevPath.spState;
-						if (rootId != commonRootId)
-						{
-							spState = prevSpStates[rootId];
-						}
-						const float candScoreWithRule = candScore + ruleBasedScorer(prevMorpheme, spState);
-
-						// update special state
-						if (ruleBasedScorer.curMorphSpecialType == Kiwi::SpecialMorph::singleQuoteOpen) spState.singleQuote = 1;
-						else if (ruleBasedScorer.curMorphSpecialType == Kiwi::SpecialMorph::singleQuoteClose) spState.singleQuote = 0;
-						else if (ruleBasedScorer.curMorphSpecialType == Kiwi::SpecialMorph::doubleQuoteOpen) spState.doubleQuote = 1;
-						else if (ruleBasedScorer.curMorphSpecialType == Kiwi::SpecialMorph::doubleQuoteClose) spState.doubleQuote = 0;
-						if (ruleBasedScorer.curMorphSbType)
-						{
-							spState.bulletHash = hashSbTypeOrder(ruleBasedScorer.curMorphSbType, ruleBasedScorer.curMorphSbOrder + 1);
-						}
-
-						PathHash<LmState> ph{ cLmState, prevPath.rootId, spState };
-						bestPathCont.insert(ph, topN, rootId, curMorph, candScoreWithRule, prevPath.accTypoCost + node->typoCost, &prevPath, move(cLmState), spState);
-					}
-
+					insertToPathContainer(bestPathCont, topN, prevSpStates, curMorph, morphBase, move(cLmState), candScore, node, prevPath, ruleBasedScorer);
 				continueFor:;
 				}
 			}
@@ -574,7 +614,6 @@ namespace kiwi
 			const Vector<Vector<WordLL<LmState>>>& cache,
 			size_t ownFormId,
 			const Vector<const Morpheme*>& morphs,
-			const Vector<float>& morphScores,
 			const KGraphNode* node,
 			const KGraphNode* startNode,
 			const size_t topN,
@@ -585,7 +624,6 @@ namespace kiwi
 		) const
 		{
 			thread_local BestPathConatiner<mode, LmState> bestPathCont;
-			thread_local Vector<uint8_t> rootIds;
 			thread_local Vector<LmEvalData<LmState>> evalMatrix;
 			thread_local Vector<Wid> nextWids;
 
@@ -604,31 +642,13 @@ namespace kiwi
 				for (auto& prevPath : cache[prev - startNode])
 				{
 					++prevId;
-
-					const kchar_t* leftFormFirst, * leftFormLast;
-					if (prevPath.ownFormId)
-					{
-						leftFormFirst = ownForms[prevPath.ownFormId - 1].data();
-						leftFormLast = leftFormFirst + ownForms[0].size();
-					}
-					else if (morphBase[prevPath.wid].kform && !morphBase[prevPath.wid].kform->empty())
-					{
-						leftFormFirst = morphBase[prevPath.wid].kform->data();
-						leftFormLast = leftFormFirst + morphBase[prevPath.wid].kform->size();
-					}
-					else
-					{
-						leftFormFirst = prevPath.morpheme->getForm().data();
-						leftFormLast = leftFormFirst + prevPath.morpheme->getForm().size();
-					}
-					const bool leftFormEndswithSSC = leftFormFirst < leftFormLast && identifySpecialChr(leftFormLast[-1]) == POSTag::ssc;
-
+					FormEvaluator formEvaluator{ prevPath, ownForms, morphBase };
 					for (size_t curId = 0; curId < morphs.size(); ++curId)
 					{
 						const auto curMorph = morphs[curId];
-						float candScore = prevPath.accScore + curMorph->userScore + nodeLevelDiscount + morphScores[curId];
+						float candScore = prevPath.accScore + curMorph->userScore + nodeLevelDiscount;
 						Wid firstWid;
-						if (curMorph->chunks.empty() || curMorph->complex)
+						if (curMorph->isSingle())
 						{
 							firstWid = curMorph->lmMorphemeId;
 						}
@@ -640,7 +660,7 @@ namespace kiwi
 						if (prevPath.combineSocket)
 						{
 							// merge <v> <chunk> with only the same socket
-							if (prevPath.combineSocket != curMorph->combineSocket || (curMorph->chunks.empty() || curMorph->complex))
+							if (prevPath.combineSocket != curMorph->combineSocket || curMorph->isSingle())
 							{
 								goto invalidCandidate;
 							}
@@ -652,24 +672,10 @@ namespace kiwi
 							firstWid = morphBase[prevPath.wid].getCombined()->lmMorphemeId;
 						}
 
-						const CondVowel cvowel = curMorph->vowel;
-						const CondPolarity cpolar = curMorph->polar;
-
-						if (prevPath.morpheme->tag == POSTag::ssc || leftFormEndswithSSC)
-						{
-							// 이전 형태소가 닫는 괄호인 경우 좌측 결합조건을 적용하지 않음
-						}
-						else if (ignoreCondScore)
-						{
-							candScore += FeatureTestor::isMatched(leftFormFirst, leftFormLast, cvowel, cpolar) ? 0 : ignoreCondScore;
-						}
-						else
-						{
-							if (!FeatureTestor::isMatched(leftFormFirst, leftFormLast, cvowel, cpolar)) goto invalidCandidate;
-						}
+						if (!formEvaluator(curMorph, ignoreCondScore, candScore)) continue;
 
 						size_t length = 0;
-						if (curMorph->combineSocket && (curMorph->chunks.empty() || curMorph->complex))
+						if (curMorph->combineSocket && curMorph->isSingle())
 						{
 							// no op
 						}
@@ -680,7 +686,7 @@ namespace kiwi
 								goto invalidCandidate;
 							}
 
-							if (curMorph->chunks.empty() || curMorph->complex)
+							if (curMorph->isSingle())
 							{
 								length = 1;
 							}
@@ -737,7 +743,7 @@ namespace kiwi
 				bestPathCont.clear();
 
 				const Morpheme* lastMorph;
-				if (curMorph->chunks.empty() || curMorph->complex)
+				if (curMorph->isSingle())
 				{
 					lastMorph = curMorph->getCombined() ? curMorph->getCombined() : curMorph;
 				}
@@ -758,7 +764,7 @@ namespace kiwi
 				}
 
 				RuleBasedScorer ruleBasedScorer{ kw, curMorph, node };
-
+				const float morphScore = kw->tagScorer.evalLeftBoundary(hasLeftBoundary(node), curMorph->tag);
 				size_t prevId = -1;
 				for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
 				{
@@ -771,40 +777,7 @@ namespace kiwi
 							continue;
 						}
 
-						if ((ruleBasedScorer.curMorphSbType || isQuote(ruleBasedScorer.curMorphSpecialType)) && prevPath.rootId == commonRootId)
-						{
-							rootIds.resize(prevSpStates.size());
-							iota(rootIds.begin(), rootIds.end(), 0);
-						}
-						else
-						{
-							rootIds.resize(1);
-							rootIds[0] = commonRootId;
-						}
-
-						for (auto rootId : rootIds)
-						{
-							const auto* prevMorpheme = &morphBase[prevPath.wid];
-							auto spState = prevPath.spState;
-							if (rootId != commonRootId)
-							{
-								spState = prevSpStates[rootId];
-							}
-							const float candScoreWithRule = em.score + ruleBasedScorer(prevMorpheme, spState);
-
-							// update special state
-							if (ruleBasedScorer.curMorphSpecialType == Kiwi::SpecialMorph::singleQuoteOpen) spState.singleQuote = 1;
-							else if (ruleBasedScorer.curMorphSpecialType == Kiwi::SpecialMorph::singleQuoteClose) spState.singleQuote = 0;
-							else if (ruleBasedScorer.curMorphSpecialType == Kiwi::SpecialMorph::doubleQuoteOpen) spState.doubleQuote = 1;
-							else if (ruleBasedScorer.curMorphSpecialType == Kiwi::SpecialMorph::doubleQuoteClose) spState.doubleQuote = 0;
-							if (ruleBasedScorer.curMorphSbType)
-							{
-								spState.bulletHash = hashSbTypeOrder(ruleBasedScorer.curMorphSbType, ruleBasedScorer.curMorphSbOrder + 1);
-							}
-
-							PathHash<LmState> ph{ em.state, prevPath.rootId, spState };
-							bestPathCont.insert(ph, topN, rootId, curMorph, candScoreWithRule, prevPath.accTypoCost + node->typoCost, &prevPath, move(em.state), spState);
-						}
+						insertToPathContainer(bestPathCont, topN, prevSpStates, curMorph, morphBase, move(em.state), em.score, node, prevPath, ruleBasedScorer);
 					}
 				}
 
@@ -848,7 +821,6 @@ namespace kiwi
 		{
 			thread_local Vector<float> maxScores;
 			thread_local Vector<const Morpheme*> validMorphCands;
-			thread_local Vector<float> lbScores;
 			const size_t langVocabSize = kw->langMdl->vocabSize();
 			auto* const node = startNode + nodeIdx;
 			auto& nCache = cache[nodeIdx];
@@ -870,7 +842,6 @@ namespace kiwi
 			const Morpheme* zCodaMorph = nullptr;
 			const Morpheme* zSiotMorph = nullptr;
 			validMorphCands.clear();
-			lbScores.clear();
 			for (auto& curMorph : cands)
 			{
 				if (splitComplex && curMorph->getCombined()->complex) continue;
@@ -888,7 +859,7 @@ namespace kiwi
 					continue;
 				}
 
-				if (!curMorph->chunks.empty() && !curMorph->complex)
+				if (!curMorph->isSingle())
 				{
 					// '하다/하게/하지'가 '다/게/지'로 축약된 경우인데 앞에 공백이 있는 경우는 탐색후보에서 제외
 					if (node->prev && node[-(int)node->prev].endPos < node->startPos
@@ -903,7 +874,6 @@ namespace kiwi
 					}
 				}
 				validMorphCands.emplace_back(curMorph);
-				lbScores.emplace_back(kw->tagScorer.evalLeftBoundary(hasLeftBoundary(node), curMorph->tag));
 			}
 
 			for (bool ignoreCond : {false, true})
@@ -964,19 +934,19 @@ namespace kiwi
 				if (topN > 1)
 				{
 					me.eval<PathEvaluatingMode::topN>(nCache, kw, ownFormList, cache,
-						ownFormId, validMorphCands, lbScores,
+						ownFormId, validMorphCands,
 						node, startNode, topN, totalPrevPathes, ignoreCond ? -10 : 0, nodeLevelDiscount, prevSpStates);
 				}
 				else if (useContainerForSmall)
 				{
 					me.eval<PathEvaluatingMode::top1Small>(nCache, kw, ownFormList, cache,
-						ownFormId, validMorphCands, lbScores,
+						ownFormId, validMorphCands,
 						node, startNode, topN, totalPrevPathes, ignoreCond ? -10 : 0, nodeLevelDiscount, prevSpStates);
 				}
 				else
 				{
 					me.eval<PathEvaluatingMode::top1>(nCache, kw, ownFormList, cache,
-						ownFormId, validMorphCands, lbScores,
+						ownFormId, validMorphCands,
 						node, startNode, topN, totalPrevPathes, ignoreCond ? -10 : 0, nodeLevelDiscount, prevSpStates);
 				}
 				if (!nCache.empty()) break;
