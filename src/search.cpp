@@ -1,9 +1,11 @@
 
 #include <algorithm>
 #include <numeric>
+#include <limits>
 
 #include <kiwi/Types.h>
 #include <kiwi/BitUtils.h>
+#include <kiwi/TemplateUtils.hpp>
 
 #include "ArchAvailable.h"
 #include "search.h"
@@ -14,11 +16,22 @@
 	template bool detail::searchImpl<arch>(const uint32_t*, size_t, uint32_t, size_t&);\
 	template bool detail::searchImpl<arch>(const uint64_t*, size_t, uint64_t, size_t&);\
 	template bool detail::searchImpl<arch>(const char16_t*, size_t, char16_t, size_t&);\
+	template bool detail::searchKVImpl<arch>(const void*, size_t, uint8_t, uint32_t&);\
+	template bool detail::searchKVImpl<arch>(const void*, size_t, uint16_t, uint32_t&);\
+	template bool detail::searchKVImpl<arch>(const void*, size_t, uint32_t, uint32_t&);\
+	template bool detail::searchKVImpl<arch>(const void*, size_t, uint64_t, uint32_t&);\
+	template bool detail::searchKVImpl<arch>(const void*, size_t, char16_t, uint32_t&);\
+	template bool detail::searchKVImpl<arch>(const void*, size_t, uint8_t, uint64_t&);\
+	template bool detail::searchKVImpl<arch>(const void*, size_t, uint16_t, uint64_t&);\
+	template bool detail::searchKVImpl<arch>(const void*, size_t, uint32_t, uint64_t&);\
+	template bool detail::searchKVImpl<arch>(const void*, size_t, uint64_t, uint64_t&);\
+	template bool detail::searchKVImpl<arch>(const void*, size_t, char16_t, uint64_t&);\
 	template Vector<size_t> detail::reorderImpl<arch>(const uint8_t*, size_t);\
 	template Vector<size_t> detail::reorderImpl<arch>(const uint16_t*, size_t);\
 	template Vector<size_t> detail::reorderImpl<arch>(const uint32_t*, size_t);\
 	template Vector<size_t> detail::reorderImpl<arch>(const uint64_t*, size_t);\
-	template Vector<size_t> detail::reorderImpl<arch>(const char16_t*, size_t);
+	template Vector<size_t> detail::reorderImpl<arch>(const char16_t*, size_t);\
+	template size_t detail::getPacketSizeImpl<arch>();
 
 #if CPUINFO_ARCH_X86 || CPUINFO_ARCH_X86_64 || KIWI_ARCH_X86 || KIWI_ARCH_X86_64
 #include <immintrin.h>
@@ -149,12 +162,27 @@ namespace kiwi
 		template<ArchType arch, class IntTy>
 		bool detail::searchImpl(const IntTy* keys, size_t size, IntTy target, size_t& ret)
 		{
-			return OptimizedImpl<arch>::template search<IntTy>(keys, size, target, ret);
+			return OptimizedImpl<arch>::search(keys, size, target, ret);
+		
+		}
+
+		template<ArchType arch, class IntTy, class ValueTy>
+		bool detail::searchKVImpl(const void* kv, size_t size, IntTy target, ValueTy& ret)
+		{
+			return OptimizedImpl<arch>::searchKV(kv, size, target, ret);
+		}
+
+		template<ArchType arch>
+		size_t detail::getPacketSizeImpl()
+		{
+			return OptimizedImpl<arch>::packetSize;
 		}
 
 		template<>
 		struct OptimizedImpl<ArchType::none>
 		{
+			static constexpr size_t packetSize = 0;
+
 			template<class IntTy>
 			static Vector<size_t> reorder(const IntTy* keys, size_t size)
 			{
@@ -166,12 +194,28 @@ namespace kiwi
 			{
 				return bstSearch(keys, size, target, ret);
 			}
+
+			template<class IntTy, class ValueTy>
+			static bool searchKV(const void* kv, size_t size, IntTy target, ValueTy& ret)
+			{
+				size_t idx;
+				const IntTy* keys = reinterpret_cast<const IntTy*>(kv);
+				const ValueTy* values = reinterpret_cast<const ValueTy*>(keys + size);
+				if (search(keys, size, target, idx))
+				{
+					ret = values[idx];
+					return true;
+				}
+				else return false;
+			}
 		};
 		INSTANTIATE_IMPL(ArchType::none);
 
 		template<>
 		struct OptimizedImpl<ArchType::balanced>
 		{
+			static constexpr size_t packetSize = 0;
+
 			template<class IntTy>
 			static Vector<size_t> reorder(const IntTy* keys, size_t size)
 			{
@@ -197,26 +241,22 @@ namespace kiwi
 				ret = left1;
 				return true;
 			}
+
+			template<class IntTy, class ValueTy>
+			static bool searchKV(const void* kv, size_t size, IntTy target, ValueTy& ret)
+			{
+				size_t idx;
+				const IntTy* keys = reinterpret_cast<const IntTy*>(kv);
+				const ValueTy* values = reinterpret_cast<const ValueTy*>(keys + size);
+				if (search(keys, size, target, idx))
+				{
+					ret = values[idx];
+					return true;
+				}
+				else return false;
+			}
 		};
 		INSTANTIATE_IMPL(ArchType::balanced);
-
-		template<class IntTy>
-		struct SignedType { using type = IntTy; };
-
-		template<>
-		struct SignedType<uint8_t> { using type = int8_t; };
-
-		template<>
-		struct SignedType<uint16_t> { using type = int16_t; };
-
-		template<>
-		struct SignedType<uint32_t> { using type = int32_t; };
-
-		template<>
-		struct SignedType<uint64_t> { using type = int64_t; };
-
-		template<>
-		struct SignedType<char16_t> { using type = int16_t; };
 	}
 }
 
@@ -401,21 +441,83 @@ namespace kiwi
 			return false;
 		}
 
+		template<size_t n, class IntTy, class ValueTy>
+		ARCH_TARGET("sse2")
+		bool nstSearchKVSSE2(const uint8_t* kv, size_t size, IntTy target, ValueTy& ret)
+		{
+			size_t i = 0, r;
+
+			__m128i ptarget, pkey, peq, pgt;
+			switch (sizeof(IntTy))
+			{
+			case 1:
+				ptarget = _mm_set1_epi8(target);
+				break;
+			case 2:
+				ptarget = _mm_set1_epi16(target);
+				break;
+			case 4:
+				ptarget = _mm_set1_epi32(target);
+				break;
+			}
+
+			while (i < size)
+			{
+				pkey = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&kv[i * (sizeof(IntTy) + sizeof(ValueTy))]));
+				switch (sizeof(IntTy))
+				{
+				case 1:
+					peq = _mm_cmpeq_epi8(ptarget, pkey);
+					pgt = _mm_cmpgt_epi8(ptarget, pkey);
+					break;
+				case 2:
+					peq = _mm_cmpeq_epi16(ptarget, pkey);
+					pgt = _mm_cmpgt_epi16(ptarget, pkey);
+					break;
+				case 4:
+					peq = _mm_cmpeq_epi32(ptarget, pkey);
+					pgt = _mm_cmpgt_epi32(ptarget, pkey);
+					break;
+				}
+
+				if (testEq<IntTy>(peq, 0, size - i, r))
+				{
+					const size_t groupSize = std::min(n - 1, size - i);
+					const ValueTy* values = reinterpret_cast<const ValueTy*>(&kv[i * (sizeof(IntTy) + sizeof(ValueTy)) + groupSize * sizeof(IntTy)]);
+					ret = values[r];
+					return true;
+				}
+
+				r = utils::popcount((uint32_t)_mm_movemask_epi8(pgt)) / sizeof(IntTy);
+				i = i * n + (n - 1) * (r + 1);
+			}
+			return false;
+		}
+
 		template<>
 		struct OptimizedImpl<ArchType::sse2>
 		{
+			static constexpr size_t packetSize = 16;
+
 			template<class IntTy>
 			static Vector<size_t> reorder(const IntTy* keys, size_t size)
 			{
 				using SignedIntTy = typename SignedType<IntTy>::type;
-				return getNstOrder<16 / sizeof(IntTy) + 1>((const SignedIntTy*)keys, size, true);
+				return getNstOrder<packetSize / sizeof(IntTy) + 1>((const SignedIntTy*)keys, size, true);
 			}
 
 			template<class IntTy>
 			static bool search(const IntTy* keys, size_t size, IntTy target, size_t& ret)
 			{
 				using SignedIntTy = typename SignedType<IntTy>::type;
-				return nstSearchSSE2<16 / sizeof(IntTy) + 1>((const SignedIntTy*)keys, size, (SignedIntTy)target, ret);
+				return nstSearchSSE2<packetSize / sizeof(IntTy) + 1>((const SignedIntTy*)keys, size, (SignedIntTy)target, ret);
+			}
+
+			template<class IntTy, class ValueTy>
+			static bool searchKV(const void* kv, size_t size, IntTy target, ValueTy& ret)
+			{
+				using SignedIntTy = typename SignedType<IntTy>::type;
+				return nstSearchKVSSE2<packetSize / sizeof(IntTy) + 1>((const uint8_t*)kv, size, (SignedIntTy)target, ret);
 			}
 		};
 		INSTANTIATE_IMPL(ArchType::sse2);
@@ -642,6 +744,66 @@ namespace kiwi
 			return false;
 		}
 
+		template<size_t n, class IntTy, class ValueTy>
+		ARCH_TARGET("avx2")
+		bool nstSearchKVAVX2(const uint8_t* kv, size_t size, IntTy target, ValueTy& ret)
+		{
+			size_t i = 0, r;
+
+			__m256i ptarget, pkey, peq, pgt;
+			switch (sizeof(IntTy))
+			{
+			case 1:
+				ptarget = _mm256_set1_epi8(target);
+				break;
+			case 2:
+				ptarget = _mm256_set1_epi16(target);
+				break;
+			case 4:
+				ptarget = _mm256_set1_epi32(target);
+				break;
+			case 8:
+				ptarget = _mm256_set1_epi64x(target);
+				break;
+			}
+
+			while (i < size)
+			{
+				pkey = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&kv[i * (sizeof(IntTy) + sizeof(ValueTy))]));
+				switch (sizeof(IntTy))
+				{
+				case 1:
+					peq = _mm256_cmpeq_epi8(ptarget, pkey);
+					pgt = _mm256_cmpgt_epi8(ptarget, pkey);
+					break;
+				case 2:
+					peq = _mm256_cmpeq_epi16(ptarget, pkey);
+					pgt = _mm256_cmpgt_epi16(ptarget, pkey);
+					break;
+				case 4:
+					peq = _mm256_cmpeq_epi32(ptarget, pkey);
+					pgt = _mm256_cmpgt_epi32(ptarget, pkey);
+					break;
+				case 8:
+					peq = _mm256_cmpeq_epi64(ptarget, pkey);
+					pgt = _mm256_cmpgt_epi64(ptarget, pkey);
+					break;
+				}
+
+				if (testEq<IntTy>(peq, 0, size - i, r))
+				{
+					const size_t groupSize = std::min(n - 1, size - i);
+					const ValueTy* values = reinterpret_cast<const ValueTy*>(&kv[i * (sizeof(IntTy) + sizeof(ValueTy)) + groupSize * sizeof(IntTy)]);
+					ret = values[r];
+					return true;
+				}
+
+				r = utils::popcount((uint32_t)_mm256_movemask_epi8(pgt)) / sizeof(IntTy);
+				i = i * n + (n - 1) * (r + 1);
+			}
+			return false;
+		}
+
 		template<size_t n, class IntTy>
 		ARCH_TARGET("avx512bw")
 		bool nstSearchAVX512(const IntTy* keys, size_t size, IntTy target, size_t& ret)
@@ -832,21 +994,93 @@ namespace kiwi
 			return false;
 		}
 
+		template<size_t n, class IntTy, class ValueTy>
+		ARCH_TARGET("avx512bw")
+		bool nstSearchKVAVX512(const uint8_t* kv, size_t size, IntTy target, ValueTy& ret)
+		{
+			size_t i = 0, r;
+			const IntTy* keys;
+
+			__m512i ptarget, pkey;
+			uint64_t peq, pgt;
+			switch (sizeof(IntTy))
+			{
+			case 1:
+				ptarget = _mm512_set1_epi8(target);
+				break;
+			case 2:
+				ptarget = _mm512_set1_epi16(target);
+				break;
+			case 4:
+				ptarget = _mm512_set1_epi32(target);
+				break;
+			case 8:
+				ptarget = _mm512_set1_epi64(target);
+				break;
+			}
+
+			while (i < size)
+			{
+				keys = reinterpret_cast<const IntTy*>(&kv[i * (sizeof(IntTy) + sizeof(ValueTy))]);
+				pkey = _mm512_loadu_si512(reinterpret_cast<const __m512i*>(keys));
+				switch (sizeof(IntTy))
+				{
+				case 1:
+					peq = _mm512_cmpeq_epi8_mask(ptarget, pkey);
+					pgt = _mm512_cmpgt_epi8_mask(ptarget, pkey);
+					break;
+				case 2:
+					peq = _mm512_cmpeq_epi16_mask(ptarget, pkey);
+					pgt = _mm512_cmpgt_epi16_mask(ptarget, pkey);
+					break;
+				case 4:
+					peq = _mm512_cmpeq_epi32_mask(ptarget, pkey);
+					pgt = _mm512_cmpgt_epi32_mask(ptarget, pkey);
+					break;
+				case 8:
+					peq = _mm512_cmpeq_epi64_mask(ptarget, pkey);
+					pgt = _mm512_cmpgt_epi64_mask(ptarget, pkey);
+					break;
+				}
+
+				if (testEqMask(peq, 0, size - i, r))
+				{
+					const size_t groupSize = std::min(n - 1, size - i);
+					const ValueTy* values = reinterpret_cast<const ValueTy*>(&keys[groupSize]);
+					ret = values[r];
+					return true;
+				}
+
+				r = utils::popcount(pgt);
+				i = i * n + (n - 1) * (r + 1);
+			}
+			return false;
+		}
+
 		template<>
 		struct OptimizedImpl<ArchType::sse4_1>
 		{
+			static constexpr size_t packetSize = 16;
+
 			template<class IntTy>
 			static Vector<size_t> reorder(const IntTy* keys, size_t size)
 			{
 				using SignedIntTy = typename SignedType<IntTy>::type;
-				return getNstOrder<16 / sizeof(IntTy) + 1>((const SignedIntTy*)keys, size, true);
+				return getNstOrder<packetSize / sizeof(IntTy) + 1>((const SignedIntTy*)keys, size, true);
 			}
 
 			template<class IntTy>
 			static bool search(const IntTy* keys, size_t size, IntTy target, size_t& ret)
 			{
 				using SignedIntTy = typename SignedType<IntTy>::type;
-				return nstSearchSSE2<16 / sizeof(IntTy) + 1>((const SignedIntTy*)keys, size, (SignedIntTy)target, ret);
+				return nstSearchSSE2<packetSize / sizeof(IntTy) + 1>((const SignedIntTy*)keys, size, (SignedIntTy)target, ret);
+			}
+
+			template<class IntTy, class ValueTy>
+			static bool searchKV(const void* kv, size_t size, IntTy target, ValueTy& ret)
+			{
+				using SignedIntTy = typename SignedType<IntTy>::type;
+				return nstSearchKVSSE2<packetSize / sizeof(IntTy) + 1>((const uint8_t*)kv, size, (SignedIntTy)target, ret);
 			}
 		};
 		INSTANTIATE_IMPL(ArchType::sse4_1);
@@ -854,40 +1088,70 @@ namespace kiwi
 		template<>
 		struct OptimizedImpl<ArchType::avx2>
 		{
+			static constexpr size_t packetSize = 32;
+
 			template<class IntTy>
 			static Vector<size_t> reorder(const IntTy* keys, size_t size)
 			{
 				using SignedIntTy = typename SignedType<IntTy>::type;
-				return getNstOrder<32 / sizeof(IntTy) + 1>((const SignedIntTy*)keys, size, true);
+				return getNstOrder<packetSize / sizeof(IntTy) + 1>((const SignedIntTy*)keys, size, true);
 			}
 
 			template<class IntTy>
 			static bool search(const IntTy* keys, size_t size, IntTy target, size_t& ret)
 			{
 				using SignedIntTy = typename SignedType<IntTy>::type;
-				return nstSearchAVX2<32 / sizeof(IntTy) + 1>((const SignedIntTy*)keys, size, (SignedIntTy)target, ret);
+				return nstSearchAVX2<packetSize / sizeof(IntTy) + 1>((const SignedIntTy*)keys, size, (SignedIntTy)target, ret);
+			}
+
+			template<class IntTy, class ValueTy>
+			static bool searchKV(const void* kv, size_t size, IntTy target, ValueTy& ret)
+			{
+				using SignedIntTy = typename SignedType<IntTy>::type;
+				return nstSearchKVAVX2<packetSize / sizeof(IntTy) + 1>((const uint8_t*)kv, size, (SignedIntTy)target, ret);
 			}
 		};
 		INSTANTIATE_IMPL(ArchType::avx2);
 
 		template<>
+		struct OptimizedImpl<ArchType::avx_vnni> : public OptimizedImpl<ArchType::avx2>
+		{
+		};
+		INSTANTIATE_IMPL(ArchType::avx_vnni);
+
+		template<>
 		struct OptimizedImpl<ArchType::avx512bw>
 		{
+			static constexpr size_t packetSize = 64;
+
 			template<class IntTy>
 			static Vector<size_t> reorder(const IntTy* keys, size_t size)
 			{
 				using SignedIntTy = typename SignedType<IntTy>::type;
-				return getNstOrder<64 / sizeof(IntTy) + 1>((const SignedIntTy*)keys, size, true);
+				return getNstOrder<packetSize / sizeof(IntTy) + 1>((const SignedIntTy*)keys, size, true);
 			}
 
 			template<class IntTy>
 			static bool search(const IntTy* keys, size_t size, IntTy target, size_t& ret)
 			{
 				using SignedIntTy = typename SignedType<IntTy>::type;
-				return nstSearchAVX512<64 / sizeof(IntTy) + 1>((const SignedIntTy*)keys, size, (SignedIntTy)target, ret);
+				return nstSearchAVX512<packetSize / sizeof(IntTy) + 1>((const SignedIntTy*)keys, size, (SignedIntTy)target, ret);
+			}
+
+			template<class IntTy, class ValueTy>
+			static bool searchKV(const void* kv, size_t size, IntTy target, ValueTy& ret)
+			{
+				using SignedIntTy = typename SignedType<IntTy>::type;
+				return nstSearchKVAVX512<packetSize / sizeof(IntTy) + 1>((const uint8_t*)kv, size, (SignedIntTy)target, ret);
 			}
 		};
 		INSTANTIATE_IMPL(ArchType::avx512bw);
+
+		template<>
+		struct OptimizedImpl<ArchType::avx512vnni> : public OptimizedImpl<ArchType::avx512bw>
+		{
+		};
+		INSTANTIATE_IMPL(ArchType::avx512vnni);
 	}
 }
 #endif
@@ -1023,18 +1287,20 @@ namespace kiwi
 		template<>
 		struct OptimizedImpl<ArchType::neon>
 		{
+			static constexpr size_t packetSize = 16;
+
 			template<class IntTy>
 			static Vector<size_t> reorder(const IntTy* keys, size_t size)
 			{
 				using SignedIntTy = typename SignedType<IntTy>::type;
-				return getNstOrder<16 / sizeof(IntTy) + 1>((const SignedIntTy*)keys, size, true);
+				return getNstOrder<packetSize / sizeof(IntTy) + 1>((const SignedIntTy*)keys, size, true);
 			}
 
 			template<class IntTy>
 			static bool search(const IntTy* keys, size_t size, IntTy target, size_t& ret)
 			{
 				using SignedIntTy = typename SignedType<IntTy>::type;
-				return nstSearchNeon<16 / sizeof(IntTy) + 1>((const SignedIntTy*)keys, size, (SignedIntTy)target, ret);
+				return nstSearchNeon<packetSize / sizeof(IntTy) + 1>((const SignedIntTy*)keys, size, (SignedIntTy)target, ret);
 			}
 		};
 		INSTANTIATE_IMPL(ArchType::neon);

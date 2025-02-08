@@ -12,7 +12,9 @@ ArchType kiwi::getBestArch()
 #ifdef KIWI_USE_CPUINFO
 	cpuinfo_initialize();
 #if CPUINFO_ARCH_X86_64
+	if (cpuinfo_has_x86_avx512vnni()) return ArchType::avx512vnni;
 	if (cpuinfo_has_x86_avx512bw()) return ArchType::avx512bw;
+	if (cpuinfo_has_x86_avx_vnni_int8()) return ArchType::avx_vnni;
 	if (cpuinfo_has_x86_avx2()) return ArchType::avx2;
 	if (cpuinfo_has_x86_sse4_1()) return ArchType::sse4_1;
 #endif
@@ -24,7 +26,7 @@ ArchType kiwi::getBestArch()
 #endif
 #else
 #ifdef KIWI_ARCH_X86_64
-	return ArchType::avx512bw;
+	return ArchType::avx512vnni;
 #elif defined(__x86_64__) || defined(KIWI_ARCH_X86)
 	return ArchType::sse2;
 #elif defined(KIWI_ARCH_ARM64)
@@ -43,7 +45,9 @@ namespace kiwi
 		"sse2",
 		"sse4_1",
 		"avx2",
+		"avx_vnni",
 		"avx512bw",
+		"avx512vnni",
 		"neon",
 	};
 
@@ -51,7 +55,7 @@ namespace kiwi
 	{
 		if (arch <= ArchType::balanced) return arch;
 #if CPUINFO_ARCH_X86 || CPUINFO_ARCH_X86_64 || KIWI_ARCH_X86_64 || KIWI_ARCH_X86
-		if (ArchType::sse2 <= arch && arch <= ArchType::avx512bw && arch <= best)
+		if (ArchType::sse2 <= arch && arch <= ArchType::avx512vnni && arch <= best)
 		{
 			return arch;
 		}

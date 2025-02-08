@@ -20,8 +20,14 @@ namespace kiwi
 			template<ArchType arch, class IntTy>
 			bool searchImpl(const IntTy* keys, size_t size, IntTy target, size_t& ret);
 
+			template<ArchType arch, class IntTy, class ValueTy>
+			bool searchKVImpl(const void* keys, size_t size, IntTy target, ValueTy& ret);
+
 			template<ArchType arch, class IntTy>
 			Vector<size_t> reorderImpl(const IntTy* keys, size_t size);
+
+			template<ArchType arch>
+			size_t getPacketSizeImpl();
 		}
 
 		template<ArchType arch, class IntTy, class Value>
@@ -50,6 +56,37 @@ namespace kiwi
 			}
 		}
 
+		template<ArchType arch, class IntTy, class Value>
+		void prepareKV(void* dest, size_t size, Vector<uint8_t>& tempBuf)
+		{
+			const size_t packetSize = detail::getPacketSizeImpl<arch>() / sizeof(IntTy);
+			if (size <= 1 || packetSize <= 1) return;
+			auto order = detail::reorderImpl<arch>(reinterpret_cast<IntTy*>(dest), size);
+			if (order.empty()) return;
+
+			if (tempBuf.size() < (sizeof(IntTy) + sizeof(Value)) * size)
+			{
+				tempBuf.resize((sizeof(IntTy) + sizeof(Value)) * size);
+			}
+			std::memcpy(tempBuf.data(), dest, (sizeof(IntTy) + sizeof(Value)) * size);
+			auto tempKeys = (IntTy*)tempBuf.data();
+			auto tempValues = (Value*)(tempKeys + size);
+			for (size_t i = 0; i < size; i += packetSize)
+			{
+				const size_t groupSize = std::min(packetSize, size - i);
+				for (size_t j = 0; j < groupSize; ++j)
+				{
+					*reinterpret_cast<IntTy*>(dest) = tempKeys[order[i + j]];
+					dest = reinterpret_cast<uint8_t*>(dest) + sizeof(IntTy);
+				}
+				for (size_t j = 0; j < groupSize; ++j)
+				{
+					*reinterpret_cast<Value*>(dest) = tempValues[order[i + j]];
+					dest = reinterpret_cast<uint8_t*>(dest) + sizeof(Value);
+				}
+			}
+		}
+
 		template<ArchType arch, class IntTy, class Value, class Out>
 		bool search(const IntTy* keys, const Value* values, size_t size, IntTy target, Out& ret)
 		{
@@ -69,6 +106,18 @@ namespace kiwi
 			if (detail::searchImpl<arch>(keys, size, target, idx))
 			{
 				ret = idx;
+				return true;
+			}
+			else return false;
+		}
+
+		template<ArchType arch, class IntTy, class Value, class Out>
+		bool searchKV(const void* kv, size_t size, IntTy target, Out& ret)
+		{
+			typename UnsignedType<Out>::type out;
+			if (detail::searchKVImpl<arch>(kv, size, target, out))
+			{
+				ret = out;
 				return true;
 			}
 			else return false;
