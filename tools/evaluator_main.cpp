@@ -74,6 +74,14 @@ int main(int argc, const char* argv[])
 		{
 			kiwiModelType = ModelType::pclmLocal;
 		}
+		else if (v == "pclm-quant")
+		{
+			kiwiModelType = ModelType::pclmQuantized;
+		}
+		else if (v == "pclm-local-quant")
+		{
+			kiwiModelType = ModelType::pclmLocalQuantized;
+		}
 		else
 		{
 			cerr << "Invalid model type" << endl;

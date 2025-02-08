@@ -26,6 +26,8 @@ const char* modelTypeToStr(ModelType type)
 	case ModelType::sbg: return "sbg";
 	case ModelType::pclm: return "pclm";
 	case ModelType::pclmLocal: return "pclm-local";
+	case ModelType::pclmQuantized: return "pclm-quant";
+	case ModelType::pclmLocalQuantized: return "pclm-local-quant";
 	}
 	return "unknown";
 }
