@@ -37,21 +37,21 @@ namespace kiwi
 		class PcLangModelBase : public ILangModel
 		{
 		protected:
-			utils::MemoryObject base;
+			const size_t memorySize = 0;
+			PcLangModelHeader header;
 
-			PcLangModelBase(utils::MemoryObject&& mem) : base{ std::move(mem) }
+			PcLangModelBase(const utils::MemoryObject& mem) : memorySize{ mem.size() }, header{ *reinterpret_cast<const PcLangModelHeader*>(mem.get()) }
 			{
 			}
 		public:
 			virtual ~PcLangModelBase() {}
-			size_t vocabSize() const override { return getHeader().vocabSize; }
-			ModelType getType() const override { return ModelType::pclm; }
-			size_t getMemorySize() const override { return base.size(); }
+			size_t vocabSize() const override { return header.vocabSize; }
+			size_t getMemorySize() const override { return memorySize; }
 
-			const PcLangModelHeader& getHeader() const { return *reinterpret_cast<const PcLangModelHeader*>(base.get()); }
+			const PcLangModelHeader& getHeader() const { return header; }
 
 			static utils::MemoryObject build(const std::string& contextDefinition, const std::string& embedding, bool reorderContextIdx = true);
-			static std::unique_ptr<PcLangModelBase> create(utils::MemoryObject&& mem, ArchType archType = ArchType::none, bool useDistantTokens = false);
+			static std::unique_ptr<PcLangModelBase> create(utils::MemoryObject&& mem, ArchType archType = ArchType::none, bool useDistantTokens = false, bool quantized = true);
 		};
 	}
 }

@@ -6,11 +6,278 @@
 #include "PCLanguageModel.hpp"
 #include "StrUtils.h"
 #include "FrozenTrie.hpp"
+#include "qgemm.h"
 
 using namespace std;
 
 namespace kiwi
 {
+	template<size_t windowSize, ArchType arch, class VocabTy, bool quantized>
+	struct MorphemeEvaluator<lm::PcLMState<windowSize, arch, VocabTy, quantized>>
+	{
+		using LmState = lm::PcLMState<windowSize, arch, VocabTy, quantized>;
+
+		template<PathEvaluatingMode mode>
+		void eval(
+			Vector<WordLL<LmState>>& resultOut,
+			const Kiwi* kw,
+			const Vector<U16StringView>& ownForms,
+			const Vector<Vector<WordLL<LmState>>>& cache,
+			size_t ownFormId,
+			const Vector<const Morpheme*>& morphs,
+			const KGraphNode* node,
+			const KGraphNode* startNode,
+			const size_t topN,
+			const size_t totalPrevPathes,
+			const float ignoreCondScore,
+			const float nodeLevelDiscount,
+			const Vector<SpecialState>& prevSpStates
+		) const
+		{
+			thread_local BestPathConatiner<mode, LmState> bestPathCont;
+			thread_local Vector<const WordLL<LmState>*> regularPrevPathes;
+			thread_local Vector<pair<const KGraphNode*, const WordLL<LmState>*>> combiningPrevPathes;
+			thread_local Vector<const Morpheme*> regularMorphs, regularDistantMorphs, combiningLMorphs, combiningRMorphs;
+			thread_local Vector<LmState> prevLmStates, nextLmStates;
+			thread_local Vector<VocabTy> nextWids, nextDistantWids;
+			thread_local Vector<float> scores;
+
+			const auto* langMdl = static_cast<const lm::PcLangModel<arch, VocabTy, windowSize, quantized>*>(kw->getLangModel());
+			const Morpheme* morphBase = kw->morphemes.data();
+			const auto spacePenalty = kw->spacePenalty;
+			const bool allowedSpaceBetweenChunk = kw->spaceTolerance > 0;
+			const size_t langVocabSize = langMdl->vocabSize();
+
+			regularPrevPathes.clear();
+			combiningPrevPathes.clear();
+			regularMorphs.clear();
+			regularDistantMorphs.clear();
+			combiningLMorphs.clear();
+			combiningRMorphs.clear();
+			prevLmStates.clear();
+			nextWids.clear();
+			nextDistantWids.clear();
+
+			for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
+			{
+				for (auto& prevPath : cache[prev - startNode])
+				{
+					if (prevPath.combineSocket)
+					{
+						combiningPrevPathes.emplace_back(prev, &prevPath);
+						continue;
+					}
+					regularPrevPathes.emplace_back(&prevPath);
+					prevLmStates.emplace_back(prevPath.lmState);
+				}
+			}
+
+			for (auto& curMorph : morphs)
+			{
+				if (curMorph->combineSocket)
+				{
+					(curMorph->isSingle() ? combiningLMorphs : combiningRMorphs).emplace_back(curMorph);
+					continue;
+				}
+				Wid firstWid;
+				if (curMorph->isSingle())
+				{
+					firstWid = curMorph->lmMorphemeId;
+				}
+				else
+				{
+					firstWid = curMorph->chunks[0]->lmMorphemeId;
+				}
+
+				if (morphBase[firstWid].tag == POSTag::p)
+				{
+					continue;
+				}
+				if (windowSize > 0 && langMdl->distantTokenMask(firstWid))
+				{
+					regularDistantMorphs.emplace_back(curMorph);
+					nextDistantWids.emplace_back(firstWid);
+				}
+				else
+				{
+					regularMorphs.emplace_back(curMorph);
+					nextWids.emplace_back(firstWid);
+				}
+			}
+
+			if (windowSize > 0)
+			{
+				regularMorphs.insert(regularMorphs.end(), regularDistantMorphs.begin(), regularDistantMorphs.end());
+				nextWids.insert(nextWids.end(), nextDistantWids.begin(), nextDistantWids.end());
+			}
+
+			if (nextWids.size() > 0)
+			{
+				nextLmStates.resize(prevLmStates.size() * nextWids.size());
+				scores.resize(prevLmStates.size() * nextWids.size());
+				langMdl->progressMatrix<windowSize>(prevLmStates.data(), nextWids.data(), prevLmStates.size(), nextWids.size(), nextDistantWids.size(), nextLmStates.data(), scores.data());
+			}
+
+			for (size_t curId = 0; curId < regularMorphs.size(); ++curId)
+			{
+				const auto* curMorph = regularMorphs[curId];
+				bestPathCont.clear();
+
+				size_t length = 1;
+				const Morpheme* lastMorph;
+				if (curMorph->isSingle())
+				{
+					lastMorph = curMorph->getCombined() ? curMorph->getCombined() : curMorph;
+				}
+				// if the morpheme has chunk set
+				else
+				{
+					lastMorph = curMorph->chunks[curMorph->chunks.size() - 1];
+					length = curMorph->chunks.size();
+				}
+
+				Wid lastSeqId;
+				if (within(lastMorph, kw->morphemes.data() + langVocabSize, kw->morphemes.data() + kw->morphemes.size()))
+				{
+					lastSeqId = lastMorph - kw->morphemes.data();
+				}
+				else
+				{
+					lastSeqId = lastMorph->lmMorphemeId;
+				}
+
+				RuleBasedScorer ruleBasedScorer{ kw, curMorph, node };
+				const float morphScore = curMorph->userScore + nodeLevelDiscount + kw->tagScorer.evalLeftBoundary(hasLeftBoundary(node), curMorph->tag);
+				size_t prevId = -1;
+				for (auto* prevPath : regularPrevPathes)
+				{
+					++prevId;
+					auto& state = nextLmStates[prevId * regularMorphs.size() + curId];
+					auto score = prevPath->accScore + morphScore + scores[prevId * regularMorphs.size() + curId];
+
+					FormEvaluator formEvaluator{ *prevPath, ownForms, morphBase };
+					if (!formEvaluator(curMorph, ignoreCondScore, score)) continue;
+
+					for (size_t i = 1; i < length; ++i)
+					{
+						const auto wid = curMorph->chunks[i]->lmMorphemeId;
+						if (morphBase[wid].tag == POSTag::p)
+						{
+							goto continueFor;
+						}
+						score += state.next(langMdl, wid);
+					}
+
+					insertToPathContainer(bestPathCont, topN, prevSpStates, curMorph, morphBase, move(state), score, node, *prevPath, ruleBasedScorer);
+				continueFor:;
+				}
+
+				bestPathCont.writeTo(resultOut, curMorph, lastSeqId, ownFormId);
+			}
+
+			for (auto* curMorph : combiningLMorphs)
+			{
+				bestPathCont.clear();
+				const Morpheme* lastMorph;
+				if (curMorph->isSingle())
+				{
+					lastMorph = curMorph->getCombined() ? curMorph->getCombined() : curMorph;
+				}
+				// if the morpheme has chunk set
+				else
+				{
+					lastMorph = curMorph->chunks[curMorph->chunks.size() - 1];
+				}
+
+				Wid lastSeqId;
+				if (within(lastMorph, kw->morphemes.data() + langVocabSize, kw->morphemes.data() + kw->morphemes.size()))
+				{
+					lastSeqId = lastMorph - kw->morphemes.data();
+				}
+				else
+				{
+					lastSeqId = lastMorph->lmMorphemeId;
+				}
+				RuleBasedScorer ruleBasedScorer{ kw, curMorph, node };
+				const float morphScore = curMorph->userScore + nodeLevelDiscount + kw->tagScorer.evalLeftBoundary(hasLeftBoundary(node), curMorph->tag);
+				for (auto* prevPath : regularPrevPathes)
+				{
+					auto state = prevPath->lmState;
+					float score = prevPath->accScore + morphScore;
+
+					FormEvaluator formEvaluator{ *prevPath, ownForms, morphBase };
+					if (!formEvaluator(curMorph, ignoreCondScore, score)) continue;
+
+					insertToPathContainer(bestPathCont, topN, prevSpStates, curMorph, morphBase, move(state), score, node, *prevPath, ruleBasedScorer);
+				}
+				bestPathCont.writeTo(resultOut, curMorph, lastSeqId, ownFormId);
+			}
+
+			for (auto* curMorph : combiningRMorphs)
+			{
+				bestPathCont.clear();
+				size_t length = 1;
+				const Morpheme* lastMorph;
+				if (curMorph->isSingle())
+				{
+					lastMorph = curMorph->getCombined() ? curMorph->getCombined() : curMorph;
+				}
+				// if the morpheme has chunk set
+				else
+				{
+					lastMorph = curMorph->chunks[curMorph->chunks.size() - 1];
+					length = curMorph->chunks.size();
+				}
+
+				Wid lastSeqId;
+				if (within(lastMorph, kw->morphemes.data() + langVocabSize, kw->morphemes.data() + kw->morphemes.size()))
+				{
+					lastSeqId = lastMorph - kw->morphemes.data();
+				}
+				else
+				{
+					lastSeqId = lastMorph->lmMorphemeId;
+				}
+				
+				RuleBasedScorer ruleBasedScorer{ kw, curMorph, node };
+				const float morphScore = curMorph->userScore + nodeLevelDiscount + kw->tagScorer.evalLeftBoundary(hasLeftBoundary(node), curMorph->tag);
+				for (auto& p : combiningPrevPathes)
+				{
+					auto* prev = p.first;
+					auto* prevPath = p.second;
+					float score = prevPath->accScore + morphScore;
+					// merge <v> <chunk> with only the same socket
+					if (prevPath->combineSocket != curMorph->combineSocket || curMorph->isSingle())
+					{
+						continue;
+					}
+					if (prev->endPos < node->startPos)
+					{
+						if (allowedSpaceBetweenChunk) score -= spacePenalty;
+						else continue;
+					}
+					Wid firstWid = morphBase[prevPath->wid].getCombined()->lmMorphemeId;
+					auto state = prevPath->lmState;
+					score += state.next(langMdl, firstWid);
+
+					for (size_t i = 1; i < length; ++i)
+					{
+						const auto wid = curMorph->chunks[i]->lmMorphemeId;
+						if (morphBase[wid].tag == POSTag::p)
+						{
+							goto continueFor2;
+						}
+						score += state.next(langMdl, wid);
+					}
+
+					insertToPathContainer(bestPathCont, topN, prevSpStates, curMorph, morphBase, move(state), score, node, *prevPath, ruleBasedScorer);
+				continueFor2:;
+				}
+				bestPathCont.writeTo(resultOut, curMorph, lastSeqId, ownFormId);
+			}
+		}
+	};
+
 	namespace lm
 	{
 		inline float half2float(uint16_t h)
@@ -33,6 +300,14 @@ namespace kiwi
 			}
 		}
 
+		inline void addBias(uint8_t* out, const int8_t* ints, size_t n)
+		{
+			for (size_t i = 0; i < n; ++i)
+			{
+				out[i] = ints[i] + 128;
+			}
+		}
+
 		template<class Arr>
 		void logsoftmaxInplace(Arr& arr)
 		{
@@ -40,15 +315,15 @@ namespace kiwi
 			arr -= std::log(arr.exp().sum());
 		}
 
-		template<ArchType arch, class KeyType, size_t windowSize, bool exclusive, bool useDistantTokens>
-		PcLangModel<arch, KeyType, windowSize, exclusive, useDistantTokens>::PcLangModel(utils::MemoryObject&& mem) : PcLangModelBase{ std::move(mem) }
+		template<ArchType arch, class KeyType, size_t windowSize, bool quantized>
+		PcLangModel<arch, KeyType, windowSize, quantized>::PcLangModel(utils::MemoryObject&& mem) : PcLangModelBase{ mem }
 		{
-			auto* ptr = reinterpret_cast<const char*>(base.get());
-			auto& header = getHeader();
+			auto* ptr = reinterpret_cast<const char*>(mem.get());
 
 			Vector<uint32_t> nodeSizes(header.numNodes);
 			streamvbyte_decode_0124(reinterpret_cast<const uint8_t*>(ptr + header.nodeOffset), nodeSizes.data(), header.numNodes);
-			keyData = make_unique<KeyType[]>(header.numNodes - 1);
+			keyValueData = make_unique<uint8_t[]>((header.numNodes - 1) * (sizeof(KeyType) + sizeof(int32_t)));
+			auto keyData = make_unique<KeyType[]>(header.numNodes - 1);
 			if (std::is_same<KeyType, uint32_t>::value)
 			{
 				streamvbyte_decode(reinterpret_cast<const uint8_t*>(ptr + header.keyOffset), (uint32_t*)keyData.get(), header.numNodes - 1);
@@ -70,7 +345,7 @@ namespace kiwi
 			}
 
 			nodeData = make_unique<MyNode[]>(numNonLeafNodes);
-			valueData = make_unique<int32_t[]>(header.numNodes - 1);
+			auto valueData = make_unique<int32_t[]>(header.numNodes - 1);
 
 			size_t nonLeafIdx = 0, leafIdx = 0, nextOffset = 0;
 			Vector<std::array<size_t, 3>> keyRanges;
@@ -106,11 +381,31 @@ namespace kiwi
 				}
 			}
 
+			uint8_t* kvDataPtr = keyValueData.get();
+			nonLeafIdx = 0;
+			nextOffset = 0;
+			for (size_t i = 0; i < header.numNodes; ++i)
+			{
+				if (!nodeSizes[i]) continue;
+				auto& node = nodeData[nonLeafIdx];
+				memcpy(kvDataPtr, &keyData[nextOffset], node.numNexts * sizeof(KeyType));
+				kvDataPtr += node.numNexts * sizeof(KeyType);
+				memcpy(kvDataPtr, &valueData[nextOffset], node.numNexts * sizeof(int32_t));
+				kvDataPtr += node.numNexts * sizeof(int32_t);
+				nextOffset += node.numNexts;
+				nonLeafIdx++;
+			}
+
+			allRootValueData = make_unique<int32_t[]>(header.vocabSize);
+			for (size_t i = 0; i < nodeData[0].numNexts; ++i)
+			{
+				allRootValueData[keyData[i]] = valueData[i];
+			}
 			Vector<uint8_t> tempBuf;
 			for (size_t i = 0; i < nonLeafIdx; ++i)
 			{
 				auto& node = nodeData[i];
-				nst::prepare<arch>(&keyData[node.nextOffset], &valueData[node.nextOffset], node.numNexts, tempBuf);
+				nst::prepareKV<arch, KeyType, int32_t>(&keyValueData[node.nextOffset * (sizeof(KeyType) + sizeof(int32_t))], node.numNexts, tempBuf);
 			}
 
 			Deque<MyNode*> dq;
@@ -132,139 +427,637 @@ namespace kiwi
 				}
 			}
 
+			{
+				const size_t contextEmbSize = header.contextSize * contextEmbStride();
+				const size_t distantEmbSize = windowSize > 0 ? header.vocabSize * distantEmbStride() : 0;
+				const size_t outputEmbSize = header.vocabSize * outputEmbStride();
+				const size_t positionConfSize = windowSize > 0 ? (header.windowSize + 1) * sizeof(float) : 0;
+				const size_t distantMaskSize = windowSize > 0 ? (header.vocabSize + 7) / 8 : 0;
+
+				allEmbs = make_unique<uint8_t[]>(contextEmbSize + outputEmbSize + distantEmbSize + positionConfSize + distantMaskSize);
+				auto p = allEmbs.get();
+				contextEmbPtr = reinterpret_cast<uint8_t*>(p);
+				distantEmbPtr = windowSize > 0 ? reinterpret_cast<uint8_t*>(p += contextEmbSize) : nullptr;
+				outputEmbPtr = reinterpret_cast<uint8_t*>(p += distantEmbSize);
+				positionConfidPtr = windowSize > 0 ? reinterpret_cast<float*>(p += outputEmbSize) : nullptr;
+				distantMaskPtr = windowSize > 0 ? reinterpret_cast<const uint8_t*>(p += positionConfSize) : nullptr;
+			}
+			
 			auto* eptr = ptr + header.embOffset;
-			contextEmb = make_unique<float[]>(header.contextSize * header.dim);
-			contextBias = make_unique<float[]>(header.contextSize);
-			contextValidTokenSum = make_unique<float[]>(header.contextSize);
-			contextConf = make_unique<float[]>(header.contextSize);
-			if (useDistantTokens)
-			{
-				distantEmb = make_unique<float[]>(header.vocabSize * header.dim);
-				distantBias = make_unique<float[]>(header.vocabSize);
-				distantConf = make_unique<float[]>(header.vocabSize);
-				positionConf = make_unique<float[]>(header.windowSize);
-			}
-			outputEmb = make_unique<float[]>(header.vocabSize * header.dim);
-
-			const uint16_t* contextEmbScale = reinterpret_cast<const uint16_t*>(eptr + header.contextSize * header.dim);
+			auto* optr = const_cast<uint8_t*>(contextEmbPtr);
 			for (size_t i = 0; i < header.contextSize; ++i)
 			{
-				dequantize(&contextEmb[i * header.dim], reinterpret_cast<const int8_t*>(eptr), header.dim, half2float(contextEmbScale[i]));
-				eptr += header.dim;
-			}
-			eptr += header.contextSize * sizeof(uint16_t);
-			for (size_t i = 0; i < header.contextSize; ++i)
-			{
-				contextBias[i] = half2float(*reinterpret_cast<const uint16_t*>(eptr));
+				if (quantized)
+				{
+					addBias(optr, reinterpret_cast<const int8_t*>(eptr), header.dim);
+					optr += header.dim;
+					eptr += header.dim;
+					*reinterpret_cast<float*>(optr) = half2float(*reinterpret_cast<const uint16_t*>(eptr)); // scale
+					optr += sizeof(float);
+					eptr += sizeof(uint16_t);
+				}
+				else
+				{
+					const float scale = half2float(*reinterpret_cast<const uint16_t*>(eptr + header.dim));
+					dequantize(reinterpret_cast<float*>(optr), reinterpret_cast<const int8_t*>(eptr), header.dim, scale);
+					optr += header.dim * sizeof(float);
+					eptr += header.dim + sizeof(uint16_t);
+				}
+
+				*reinterpret_cast<float*>(optr) = -half2float(*reinterpret_cast<const uint16_t*>(eptr)); // bias
+				optr += sizeof(float);
 				eptr += sizeof(uint16_t);
-			}
-			for (size_t i = 0; i < header.contextSize; ++i)
-			{
-				contextValidTokenSum[i] = half2float(*reinterpret_cast<const uint16_t*>(eptr));
-				eptr += sizeof(uint16_t);
-			}
-			for (size_t i = 0; i < header.contextSize; ++i)
-			{
-				contextConf[i] = half2float(*reinterpret_cast<const uint16_t*>(eptr));
-				eptr += sizeof(uint16_t);
+				if (windowSize > 0)
+				{
+					*reinterpret_cast<float*>(optr) = half2float(*reinterpret_cast<const uint16_t*>(eptr)); // confidence
+					optr += sizeof(float);
+					eptr += sizeof(uint16_t);
+					*reinterpret_cast<float*>(optr) = half2float(*reinterpret_cast<const uint16_t*>(eptr)); // valid token sum
+					optr += sizeof(float);
+					eptr += sizeof(uint16_t);
+				}
+				else
+				{
+					eptr += sizeof(uint16_t) * 2;
+				}
 			}
 
-			const uint16_t* distantEmbScale = reinterpret_cast<const uint16_t*>(eptr + header.vocabSize * header.dim);
+			optr = const_cast<uint8_t*>(outputEmbPtr);
 			for (size_t i = 0; i < header.vocabSize; ++i)
 			{
-				if (useDistantTokens) dequantize(&distantEmb[i * header.dim], reinterpret_cast<const int8_t*>(eptr), header.dim, half2float(distantEmbScale[i]));
-				eptr += header.dim;
-			}
-			eptr += header.vocabSize * sizeof(uint16_t);
-			for (size_t i = 0; i < header.vocabSize; ++i)
-			{
-				if (useDistantTokens) distantBias[i] = half2float(*reinterpret_cast<const uint16_t*>(eptr));
-				eptr += sizeof(uint16_t);
-			}
-			for (size_t i = 0; i < header.vocabSize; ++i)
-			{
-				if (useDistantTokens) distantConf[i] = half2float(*reinterpret_cast<const uint16_t*>(eptr));
-				eptr += sizeof(uint16_t);
-			}
-			for (size_t i = 0; i < header.windowSize; ++i)
-			{
-				if (useDistantTokens) positionConf[i] = half2float(*reinterpret_cast<const uint16_t*>(eptr));
-				eptr += sizeof(uint16_t);
+				auto* qvals = reinterpret_cast<const int8_t*>(eptr);
+				if (quantized)
+				{
+					memcpy(optr, qvals, header.dim);
+					optr += header.dim;
+					eptr += header.dim;
+					*reinterpret_cast<float*>(optr) = half2float(*reinterpret_cast<const uint16_t*>(eptr));
+					optr += sizeof(float);
+					eptr += sizeof(uint16_t);
+					*reinterpret_cast<int32_t*>(optr) = accumulate(qvals, qvals + header.dim, 0) * 128;
+					optr += sizeof(int32_t);
+				}
+				else
+				{
+					const float scale = half2float(*reinterpret_cast<const uint16_t*>(eptr + header.dim));
+					dequantize(reinterpret_cast<float*>(optr), qvals, header.dim, scale);
+					optr += header.dim * sizeof(float);
+					eptr += header.dim + sizeof(uint16_t);
+				}
 			}
 
-			const uint16_t* outputEmbScale = reinterpret_cast<const uint16_t*>(eptr + header.vocabSize * header.dim);
-			for (size_t i = 0; i < header.vocabSize; ++i)
+			if (windowSize > 0)
 			{
-				dequantize(&outputEmb[i * header.dim], reinterpret_cast<const int8_t*>(eptr), header.dim, half2float(outputEmbScale[i]));
-				eptr += header.dim;
-			}
-			eptr += header.vocabSize * sizeof(uint16_t);
+				optr = const_cast<uint8_t*>(distantEmbPtr);
+				for (size_t i = 0; i < header.vocabSize; ++i)
+				{
+					if (quantized)
+					{
+						addBias(optr, reinterpret_cast<const int8_t*>(eptr), header.dim);
+						optr += header.dim;
+						eptr += header.dim;
+						*reinterpret_cast<float*>(optr) = half2float(*reinterpret_cast<const uint16_t*>(eptr)); // scale
+						optr += sizeof(float);
+						eptr += sizeof(uint16_t);
+					}
+					else
+					{
+						const float scale = half2float(*reinterpret_cast<const uint16_t*>(eptr + header.dim));
+						dequantize(reinterpret_cast<float*>(optr), reinterpret_cast<const int8_t*>(eptr), header.dim, scale);
+						optr += header.dim * sizeof(float);
+						eptr += header.dim + sizeof(uint16_t);
+					}
 
-			if (useDistantTokens)
-			{
+					*reinterpret_cast<float*>(optr) = -half2float(*reinterpret_cast<const uint16_t*>(eptr)); // bias
+					optr += sizeof(float);
+					eptr += sizeof(uint16_t);
+					*reinterpret_cast<float*>(optr) = half2float(*reinterpret_cast<const uint16_t*>(eptr)); // confidence
+					optr += sizeof(float);
+					eptr += sizeof(uint16_t);
+					if (quantized)
+					{
+						optr += sizeof(float);
+					}
+				}
+
+				const_cast<float*>(positionConfidPtr)[0] = 0;
+				for (size_t i = 0; i < header.windowSize; ++i)
+				{
+					const_cast<float*>(positionConfidPtr)[i + 1] = half2float(*reinterpret_cast<const uint16_t*>(eptr));
+					eptr += sizeof(uint16_t);
+				}
+
+				optr = const_cast<uint8_t*>(distantMaskPtr);
 				const size_t compressedDistantMaskSize = (header.vocabSize + 7) / 8;
-				distantMask = make_unique<uint8_t[]>(compressedDistantMaskSize);
-				std::copy(eptr, eptr + compressedDistantMaskSize, distantMask.get());
+				std::copy(eptr, eptr + compressedDistantMaskSize, optr);
 			}
 		}
 
-		template<ArchType arch, class KeyType, size_t windowSize, bool exclusive, bool useDistantTokens>
-		float PcLangModel<arch, KeyType, windowSize, exclusive, useDistantTokens>::progress(int32_t& nodeIdx,
+		template<ArchType arch, class KeyType, size_t windowSize, bool quantized>
+		float PcLangModel<arch, KeyType, windowSize, quantized>::progress(int32_t& nodeIdx,
 			uint32_t& contextIdx,
 			size_t& historyPos,
-			std::array<KeyType, windowSize + (exclusive ? 1 : 0)>& history,
+			std::array<KeyType, windowSize + 1>& history,
 			KeyType next) const
 		{
-			const auto& header = getHeader();
 			const bool validDistantToken = distantTokenMask(next);
 			float ll = 0;
 
-			thread_local Eigen::MatrixXf mat;
-			mat.resize(header.dim, 1 + windowSize);
-			thread_local Eigen::VectorXf lls;
-			lls.resize(1 + windowSize);
-			if (useDistantTokens && validDistantToken)
+			if (windowSize > 0 && validDistantToken)
 			{
-				lls[0] = contextConf[contextIdx];
-				lls.tail(windowSize) = Eigen::Map<Eigen::VectorXf>{ &positionConf[0], windowSize };
-				for (size_t i = 0; i < windowSize; ++i)
+				if constexpr (quantized)
 				{
-					const auto historyToken = history[(historyPos + i) % windowSize];
-					lls[i + 1] += historyToken ? distantConf[historyToken] : -99999;
-				}
-				logsoftmaxInplace(lls.array());
+					int32_t contextIdcs[1 + windowSize];
+					float lls[(1 + windowSize) * 2];
+					int32_t nextIdx[1] = { next };
 
-				mat.col(0) = Eigen::Map<Eigen::VectorXf>{ &contextEmb[contextIdx * header.dim], header.dim };
-				lls[0] -= contextBias[contextIdx];
-				for (size_t i = 0; i < windowSize; ++i)
-				{
-					const auto historyToken = history[(historyPos + i) % windowSize];
-					if (historyToken) mat.col(i + 1) = Eigen::Map<Eigen::VectorXf>{ &distantEmb[historyToken * header.dim], header.dim };
-					else mat.col(i + 1).setZero();
-					lls[i + 1] -= distantBias[historyToken];
+					copy(positionConfidPtr, positionConfidPtr + windowSize + 1, lls);
+					lls[0] += getContextConfid(contextIdx);
+					contextIdcs[0] = contextIdx;
+					for (size_t i = 0; i < windowSize; ++i)
+					{
+						const auto historyToken = history[(historyPos + i) % windowSize];
+						lls[i + 1] += historyToken ? getDistantConfid(historyToken) : -99999;
+						contextIdcs[i + 1] = (historyToken ? historyToken : 0) + header.contextSize;
+					}
+					LogSoftmax<arch>{}(lls, std::integral_constant<size_t, windowSize + 1>());
+
+					qgemm::scatteredGEMMBaseline<arch>(
+						1 + windowSize, 1, header.dim,
+						getContextQuantEmb(0), contextIdcs, contextEmbStride(),
+						getOutputQuantEmb(0), nextIdx, outputEmbStride(),
+						&lls[1 + windowSize], 1);
+
+					for (size_t i = 0; i < 1 + windowSize; ++i)
+					{
+						lls[i] += lls[i + 1 + windowSize];
+					}
+					lls[0] -= getContextValidTokenSum(contextIdx);
+					ll = LogSumExp<arch>{}(lls, std::integral_constant<size_t, windowSize + 1>());
+					ll += getContextValidTokenSum(contextIdx);
 				}
-				lls.tail(windowSize).array() += contextValidTokenSum[contextIdx];
-				Eigen::Map<Eigen::VectorXf> outputVec{ &outputEmb[next * header.dim], header.dim };
-				lls += mat.transpose() * outputVec;
-				ll = LogExpSum<arch>{}(lls.data(), std::integral_constant<size_t, windowSize>());
+				else
+				{
+					thread_local Eigen::MatrixXf mat;
+					mat.resize(header.dim, 1 + windowSize);
+					thread_local Eigen::VectorXf lls;
+					lls.resize(1 + windowSize);
+
+					lls = Eigen::Map<const Eigen::VectorXf>{ positionConfidPtr, windowSize + 1 };
+					lls[0] += getContextConfid(contextIdx);
+					for (size_t i = 0; i < windowSize; ++i)
+					{
+						const auto historyToken = history[(historyPos + i) % windowSize];
+						lls[i + 1] += historyToken ? getDistantConfid(historyToken) : -99999;
+					}
+					logsoftmaxInplace(lls.array());
+
+					mat.col(0) = Eigen::Map<const Eigen::VectorXf>{ getContextEmb(contextIdx), header.dim };
+					lls[0] += getContextBias(contextIdx);
+					for (size_t i = 0; i < windowSize; ++i)
+					{
+						const auto historyToken = history[(historyPos + i) % windowSize];
+						if (historyToken) mat.col(i + 1) = Eigen::Map<const Eigen::VectorXf>{ getDistantEmb(historyToken), header.dim };
+						else mat.col(i + 1).setZero();
+						lls[i + 1] += getDistantBias(historyToken);
+					}
+					lls.tail(windowSize).array() += getContextValidTokenSum(contextIdx);
+					Eigen::Map<const Eigen::VectorXf> outputVec{ getOutputEmb(next), header.dim };
+					lls += mat.transpose() * outputVec;
+					ll = LogSumExp<arch>{}(lls.data(), std::integral_constant<size_t, windowSize + 1>());
+				}
+			}
+			else 
+			{
+				if constexpr (quantized)
+				{
+					const auto* contextPtr = getContextQuantEmb(contextIdx);
+					const auto* outputPtr = getOutputQuantEmb(next);
+					int32_t acc = qgemm::dotprod<arch>(contextPtr, outputPtr, header.dim);
+					const float contextScale = *reinterpret_cast<const float*>(contextPtr + header.dim),
+						outputScale = *reinterpret_cast<const float*>(outputPtr + header.dim),
+						contextBias = *reinterpret_cast<const float*>(contextPtr + header.dim + sizeof(float));
+					const int32_t hsum = *reinterpret_cast<const int32_t*>(outputPtr + header.dim + sizeof(float));
+					acc -= hsum;
+					ll = acc * contextScale * outputScale + contextBias;
+				}
+				else
+				{
+					ll = getContextBias(contextIdx);
+					Eigen::Map<const Eigen::VectorXf> contextVec{ getContextEmb(contextIdx), header.dim };
+					Eigen::Map<const Eigen::VectorXf> outputVec{ getOutputEmb(next), header.dim };
+					ll += (contextVec.transpose() * outputVec)[0];
+				}
+			}
+			
+			contextIdx = progressContextNode(nodeIdx, next);
+			if (windowSize > 0)
+			{
+				if (history[windowSize])
+				{
+					history[historyPos] = history[windowSize];
+					historyPos = (historyPos + 1) % windowSize;
+				}
+				history[windowSize] = validDistantToken ? next : 0;
+			}
+			return ll;
+		}
+
+		// specialization for windowSize > 0
+		template<ArchType arch, class KeyType, size_t windowSize, bool quantized>
+		template<size_t _windowSize>
+		auto PcLangModel<arch, KeyType, windowSize, quantized>::nextState(
+			const typename std::enable_if<(_windowSize > 0), LmStateType>::type& state, KeyType next) const -> LmStateType
+		{
+			LmStateType ret = state;
+			ret.contextIdx = progressContextNode(ret.node, next);
+			if (ret.history[windowSize])
+			{
+				ret.history[ret.historyPos] = ret.history[windowSize];
+				ret.historyPos = (ret.historyPos + 1) % windowSize;
+			}
+			ret.history[windowSize] = distantTokenMask(next) ? next : 0;
+			return ret;
+		}
+
+		// specialization for windowSize == 0
+		template<ArchType arch, class KeyType, size_t windowSize, bool quantized>
+		template<size_t _windowSize>
+		auto PcLangModel<arch, KeyType, windowSize, quantized>::nextState(
+			const typename std::enable_if<_windowSize == 0, LmStateType>::type& state, KeyType next) const -> LmStateType
+		{
+			LmStateType ret = state;
+			ret.contextIdx = progressContextNode(ret.node, next);
+			return ret;
+		}
+
+		inline uint64_t mergePair(uint32_t a, uint32_t b)
+		{
+			return ((uint64_t)a << 32) | b;
+		}
+
+		inline pair<uint32_t, uint32_t> splitPair(uint64_t a)
+		{
+			return make_pair(a >> 32, a & 0xFFFFFFFF);
+		}
+
+		template<ArchType arch, class KeyType, size_t windowSize, bool quantized>
+		template<size_t _windowSize>
+		void PcLangModel<arch, KeyType, windowSize, quantized>::progressMatrix(
+			const typename std::enable_if<(_windowSize > 0), LmStateType>::type* prevStates, const KeyType* nextIds,
+			size_t prevStateSize, size_t nextIdSize, size_t numValidDistantTokens,
+			LmStateType* outStates, float* outScores) const
+		{
+			static constexpr size_t scoreBatchSize = 32;
+			thread_local Vector<uint64_t> contextIdcs, historyIdcs, nextIdcs;
+			thread_local Vector<uint32_t> inverseContextIdcs, inverseHistoryIdcs, inverseNextIdcs;
+			thread_local Vector<float> inputEmbBuf, outputEmbBuf, resultBuf, confidenceBuf;
+			thread_local Vector<float> scoreBuf;
+			thread_local Vector<int32_t> contextIdcs2, nextIdcs2;
+
+			contextIdcs.resize(prevStateSize);
+			historyIdcs.clear();
+			nextIdcs.resize(nextIdSize);
+			inverseContextIdcs.resize(prevStateSize);
+			inverseHistoryIdcs.clear();
+			inverseHistoryIdcs.resize(prevStateSize * windowSize, -1);
+			inverseNextIdcs.resize(nextIdSize);
+			if (quantized)
+			{
+				contextIdcs2.clear();
+				nextIdcs2.clear();
 			}
 			else
 			{
-				lls[0] = -contextBias[contextIdx];
-				mat.col(0) = Eigen::Map<Eigen::VectorXf>{ &contextEmb[contextIdx * header.dim], header.dim };
-				Eigen::Map<Eigen::VectorXf> outputVec{ &outputEmb[next * header.dim], header.dim };
-				lls.head(1) += mat.transpose() * outputVec;
-				ll = lls[0];
+				inputEmbBuf.resize(prevStateSize * header.dim);
+				outputEmbBuf.resize(nextIdSize * header.dim);
+			}
+			confidenceBuf.resize(prevStateSize * 2);
+			scoreBuf.resize(scoreBatchSize * (windowSize + 2));
+
+			const size_t numInvalidDistantTokens = nextIdSize - numValidDistantTokens;
+			for (size_t i = 0; i < nextIdSize; ++i)
+			{
+				nextIdcs[i] = mergePair(nextIds[i], i);
+			}
+			sort(nextIdcs.begin(), nextIdcs.begin() + numInvalidDistantTokens);
+			sort(nextIdcs.begin() + numInvalidDistantTokens, nextIdcs.end());
+			size_t uniqOutputSize = 0;
+			for (size_t i = 0; i < nextIdSize; ++i)
+			{
+				const auto nextId = splitPair(nextIdcs[i]).first;
+				const auto idx = splitPair(nextIdcs[i]).second;
+				if (i == 0 || nextId != splitPair(nextIdcs[i - 1]).first)
+				{
+					if (quantized)
+					{
+						nextIdcs2.emplace_back(nextId);
+					}
+					else
+					{
+						copy(getOutputEmb(nextId), getOutputEmb(nextId) + header.dim, &outputEmbBuf[uniqOutputSize * header.dim]);
+					}
+					uniqOutputSize++;
+				}
+				inverseNextIdcs[idx] = uniqOutputSize - 1;
+			}
+			resultBuf.resize(prevStateSize * uniqOutputSize);
+
+			for (size_t i = 0; i < prevStateSize; ++i)
+			{
+				contextIdcs[i] = mergePair(prevStates[i].contextIdx, i);
+			}
+			sort(contextIdcs.begin(), contextIdcs.end());
+			size_t uniqInputSize = 0;
+			for (size_t i = 0; i < prevStateSize; ++i)
+			{
+				const auto contextId = splitPair(contextIdcs[i]).first;
+				const auto idx = splitPair(contextIdcs[i]).second;
+				if (i == 0 || contextId != splitPair(contextIdcs[i - 1]).first)
+				{
+					if (quantized)
+					{
+						contextIdcs2.emplace_back(contextId);
+					}
+					else
+					{
+						copy(getContextEmb(contextId), getContextEmb(contextId) + header.dim, &inputEmbBuf[uniqInputSize * header.dim]);
+						fill(&resultBuf[uniqInputSize * uniqOutputSize], &resultBuf[(uniqInputSize + 1) * uniqOutputSize], getContextBias(contextId));
+					}
+					confidenceBuf[uniqInputSize * 2] = getContextConfid(contextId);
+					confidenceBuf[uniqInputSize * 2 + 1] = getContextValidTokenSum(contextId);
+					uniqInputSize++;
+				}
+				inverseContextIdcs[idx] = uniqInputSize - 1;
 			}
 
-			contextIdx = progressContextNode(nodeIdx, next);
-			if (history[windowSize])
+			size_t uniqHistorySize = 0;
+			if (prevStateSize <= 8) // use vector for small size
 			{
-				history[historyPos] = history[windowSize];
-				historyPos = (historyPos + 1) % windowSize;
+				for (size_t i = 0; i < prevStateSize; ++i)
+				{
+					for (size_t j = 0; j < windowSize; ++j)
+					{
+						const auto historyToken = prevStates[i].history[(j + prevStates[i].historyPos) % windowSize];
+						if (historyToken)
+						{
+							historyIdcs.emplace_back(mergePair(historyToken, i * windowSize + j));
+						}
+					}
+				}
+				sort(historyIdcs.begin(), historyIdcs.end());
+				uniqHistorySize = 0;
+				for (size_t i = 0; i < historyIdcs.size(); ++i)
+				{
+					const auto historyToken = splitPair(historyIdcs[i]).first;
+					const auto idx = splitPair(historyIdcs[i]).second;
+					if (i == 0 || historyToken != splitPair(historyIdcs[i - 1]).first)
+					{
+						uniqHistorySize++;
+					}
+					inverseHistoryIdcs[idx] = uniqHistorySize - 1;
+				}
+				inputEmbBuf.resize((uniqInputSize + uniqHistorySize) * header.dim);
+				confidenceBuf.resize(uniqInputSize * 2 + uniqHistorySize);
+				resultBuf.resize((uniqInputSize + uniqHistorySize) * uniqOutputSize);
+
+				uniqHistorySize = 0;
+				for (size_t i = 0; i < historyIdcs.size(); ++i)
+				{
+					const auto historyToken = splitPair(historyIdcs[i]).first;
+					const auto idx = splitPair(historyIdcs[i]).second;
+					if (i == 0 || historyToken != splitPair(historyIdcs[i - 1]).first)
+					{
+						if (quantized)
+						{
+							contextIdcs2.emplace_back(historyToken + header.contextSize);
+						}
+						else
+						{
+							copy(getDistantEmb(historyToken), getDistantEmb(historyToken) + header.dim, &inputEmbBuf[(uniqInputSize + uniqHistorySize) * header.dim]);
+							fill(&resultBuf[(uniqInputSize + uniqHistorySize) * uniqOutputSize], &resultBuf[(uniqInputSize + uniqHistorySize + 1) * uniqOutputSize], getDistantBias(historyToken));
+						}
+						confidenceBuf[uniqInputSize * 2 + uniqHistorySize] = getDistantConfid(historyToken);
+						uniqHistorySize++;
+					}
+				}
 			}
-			history[windowSize] = validDistantToken ? next : 0;
-			return ll;
+			else // use map for large size
+			{
+				thread_local UnorderedMap<uint32_t, uint32_t> historyMap;
+				thread_local Vector<uint32_t> uniqHistoryTokens;
+				historyMap.clear();
+				uniqHistoryTokens.clear();
+				for (size_t i = 0; i < prevStateSize; ++i)
+				{
+					for (size_t j = 0; j < windowSize; ++j)
+					{
+						const auto historyToken = prevStates[i].history[(j + prevStates[i].historyPos) % windowSize];
+						if (!historyToken) continue;
+						const auto idx = i * windowSize + j;
+						auto inserted = historyMap.emplace(historyToken, historyMap.size());
+						inverseHistoryIdcs[idx] = inserted.first->second;
+						if (inserted.second) uniqHistoryTokens.emplace_back(historyToken);
+					}
+				}
+				uniqHistorySize = historyMap.size();
+
+				inputEmbBuf.resize((uniqInputSize + uniqHistorySize)* header.dim);
+				confidenceBuf.resize(uniqInputSize * 2 + uniqHistorySize);
+				resultBuf.resize((uniqInputSize + uniqHistorySize)* uniqOutputSize);
+
+				for (size_t i = 0; i < uniqHistoryTokens.size(); ++i)
+				{
+					const auto historyToken = uniqHistoryTokens[i];
+					if (quantized)
+					{
+						contextIdcs2.emplace_back(historyToken + header.contextSize);
+					}
+					else
+					{
+						copy(getDistantEmb(historyToken), getDistantEmb(historyToken) + header.dim, &inputEmbBuf[(uniqInputSize + i) * header.dim]);
+						fill(&resultBuf[(uniqInputSize + i) * uniqOutputSize], &resultBuf[(uniqInputSize + i + 1) * uniqOutputSize], getDistantBias(historyToken));
+					}
+					confidenceBuf[uniqInputSize * 2 + i] = getDistantConfid(historyToken);
+				}
+			}
+
+			Eigen::Map<Eigen::MatrixXf> resultMap{ resultBuf.data(), (Eigen::Index)uniqOutputSize, (Eigen::Index)(uniqInputSize + uniqHistorySize) };
+
+			if constexpr (quantized)
+			{
+				qgemm::scatteredGEMMOpt<arch>(
+					uniqInputSize + uniqHistorySize, uniqOutputSize, header.dim,
+					getContextQuantEmb(0), contextIdcs2.data(), contextEmbStride(),
+					getOutputQuantEmb(0), nextIdcs2.data(), outputEmbStride(),
+					resultBuf.data(), uniqOutputSize);
+			}
+			else
+			{
+				Eigen::Map<Eigen::MatrixXf> inputMap{ inputEmbBuf.data(), header.dim, (Eigen::Index)(uniqInputSize + uniqHistorySize) };
+				Eigen::Map<Eigen::MatrixXf> outputMap{ outputEmbBuf.data(), header.dim, (Eigen::Index)uniqOutputSize };
+				resultMap += outputMap.transpose() * inputMap;
+			}
+			for (size_t i = 0; i < prevStateSize; ++i)
+			{
+				const auto state = prevStates[i];
+				for (size_t j = 0; j < numInvalidDistantTokens; ++j)
+				{
+					outScores[i * nextIdSize + j] = resultMap(inverseNextIdcs[j], inverseContextIdcs[i]);
+					outStates[i * nextIdSize + j] = nextState<_windowSize>(state, nextIds[j]);
+				}
+			}
+
+			auto* validTokenSumBuf = scoreBuf.data() + scoreBatchSize * (windowSize + 1);
+
+			for (size_t i = 0; i < prevStateSize * numValidDistantTokens; i += scoreBatchSize)
+			{
+				const size_t batchSize = std::min(scoreBatchSize, prevStateSize * numValidDistantTokens - i);
+				for (size_t j = 0; j < batchSize; ++j)
+				{
+					const auto pIdx = (i + j) / numValidDistantTokens;
+					const auto nIdx = (i + j) % numValidDistantTokens + numInvalidDistantTokens;
+					scoreBuf[j] = confidenceBuf[inverseContextIdcs[pIdx] * 2];
+					validTokenSumBuf[j] = confidenceBuf[inverseContextIdcs[pIdx] * 2 + 1];
+					for (size_t k = 0; k < windowSize; ++k)
+					{
+						const auto idx = inverseHistoryIdcs[pIdx * windowSize + k];
+						scoreBuf[j + (k + 1) * scoreBatchSize] = idx == -1 ? -99999 : confidenceBuf[uniqInputSize * 2 + idx];
+					}
+				}
+				Eigen::Map<Eigen::Array<float, -1, windowSize + 1>> scoreMap{ scoreBuf.data(), (Eigen::Index)scoreBatchSize, windowSize + 1 };
+				scoreMap.rowwise() += Eigen::Map<const Eigen::Array<float, 1, windowSize + 1>>{ positionConfidPtr, 1, windowSize + 1 };
+				LogSoftmaxTransposed<arch, windowSize + 1>{}(scoreBuf.data(), batchSize, scoreBatchSize);
+				scoreMap.rightCols<windowSize>().colwise() += Eigen::Map<Eigen::Array<float, scoreBatchSize, 1>>{ validTokenSumBuf, scoreBatchSize, 1 };
+				for (size_t j = 0; j < batchSize; ++j)
+				{
+					const auto pIdx = (i + j) / numValidDistantTokens;
+					const auto nIdx = (i + j) % numValidDistantTokens + numInvalidDistantTokens;
+					scoreBuf[j] += resultMap(inverseNextIdcs[nIdx], inverseContextIdcs[pIdx]);
+					for (size_t k = 0; k < windowSize; ++k)
+					{
+						const auto idx = inverseHistoryIdcs[pIdx * windowSize + k];
+						if (idx != -1)
+						{
+							scoreBuf[j + (k + 1) * scoreBatchSize] += resultMap(inverseNextIdcs[nIdx], uniqInputSize + idx);
+						}
+					}
+				}
+				LogSumExpTransposed<arch, windowSize + 1>{}(scoreBuf.data(), batchSize, scoreBatchSize);
+
+				for (size_t j = 0; j < batchSize; ++j)
+				{
+					const auto pIdx = (i + j) / numValidDistantTokens;
+					const auto nIdx = (i + j) % numValidDistantTokens + numInvalidDistantTokens;
+					outScores[pIdx * nextIdSize + nIdx] = scoreBuf[j];
+					outStates[pIdx * nextIdSize + nIdx] = nextState<windowSize>(prevStates[pIdx], nextIds[nIdx]);
+				}
+			}
+		}
+
+		template<ArchType arch, class KeyType, size_t windowSize, bool quantized>
+		template<size_t _windowSize>
+		void PcLangModel<arch, KeyType, windowSize, quantized>::progressMatrix(
+			const typename std::enable_if<_windowSize == 0, LmStateType>::type* prevStates, const KeyType* nextIds,
+			size_t prevStateSize, size_t nextIdSize, size_t numValidDistantTokens,
+			LmStateType* outStates, float* outScores) const
+		{
+			thread_local Vector<uint64_t> contextIdcs, nextIdcs;
+			thread_local Vector<uint32_t> inverseContextIdcs, inverseNextIdcs;
+			thread_local Vector<float> inputEmbBuf, outputEmbBuf, resultBuf;
+			thread_local Vector<int32_t> contextIdcs2, nextIdcs2;
+			
+			contextIdcs.resize(prevStateSize);
+			nextIdcs.resize(nextIdSize);
+			inverseContextIdcs.resize(prevStateSize);
+			inverseNextIdcs.resize(nextIdSize);
+			if (quantized)
+			{
+				contextIdcs2.clear();
+				nextIdcs2.clear();
+			}
+			else
+			{
+				inputEmbBuf.resize(prevStateSize * header.dim);
+				outputEmbBuf.resize(nextIdSize * header.dim);
+			}
+			
+			for (size_t i = 0; i < nextIdSize; ++i)
+			{
+				nextIdcs[i] = mergePair(nextIds[i], i);
+			}
+			sort(nextIdcs.begin(), nextIdcs.end());
+			size_t uniqOutputSize = 0;
+			for (size_t i = 0; i < nextIdSize; ++i)
+			{
+				const auto nextId = splitPair(nextIdcs[i]).first;
+				const auto idx = splitPair(nextIdcs[i]).second;
+				if (i == 0 || nextId != splitPair(nextIdcs[i - 1]).first)
+				{
+					if (quantized)
+					{
+						nextIdcs2.emplace_back(nextId);
+					}
+					else
+					{
+						copy(getOutputEmb(nextId), getOutputEmb(nextId) + header.dim, &outputEmbBuf[uniqOutputSize * header.dim]);
+					}
+					uniqOutputSize++;
+				}
+				inverseNextIdcs[idx] = uniqOutputSize - 1;
+			}
+			resultBuf.resize(max(prevStateSize * uniqOutputSize, (size_t)64));
+
+			for (size_t i = 0; i < prevStateSize; ++i)
+			{
+				contextIdcs[i] = mergePair(prevStates[i].contextIdx, i);
+			}
+			sort(contextIdcs.begin(), contextIdcs.end());
+			size_t uniqInputSize = 0;
+			for (size_t i = 0; i < prevStateSize; ++i)
+			{
+				const auto contextId = splitPair(contextIdcs[i]).first;
+				const auto idx = splitPair(contextIdcs[i]).second;
+				if (i == 0 || contextId != splitPair(contextIdcs[i - 1]).first)
+				{
+					if (quantized)
+					{
+						contextIdcs2.emplace_back(contextId);
+					}
+					else
+					{
+						copy(getContextEmb(contextId), getContextEmb(contextId) + header.dim, &inputEmbBuf[uniqInputSize * header.dim]);
+						fill(&resultBuf[uniqInputSize * uniqOutputSize], &resultBuf[(uniqInputSize + 1) * uniqOutputSize], getContextBias(contextId));
+					}
+					uniqInputSize++;
+				}
+				inverseContextIdcs[idx] = uniqInputSize - 1;
+			}
+
+			Eigen::Map<Eigen::MatrixXf> resultMap{ resultBuf.data(), (Eigen::Index)uniqOutputSize, (Eigen::Index)uniqInputSize };
+			if constexpr (quantized)
+			{
+				qgemm::scatteredGEMMOpt<arch>(
+					uniqInputSize, uniqOutputSize, header.dim,
+					getContextQuantEmb(0), contextIdcs2.data(), contextEmbStride(),
+					getOutputQuantEmb(0), nextIdcs2.data(), outputEmbStride(),
+					resultBuf.data(), uniqOutputSize);
+			}
+			else
+			{
+				Eigen::Map<Eigen::MatrixXf> inputMap{ inputEmbBuf.data(), header.dim, (Eigen::Index)uniqInputSize };
+				Eigen::Map<Eigen::MatrixXf> outputMap{ outputEmbBuf.data(), header.dim, (Eigen::Index)uniqOutputSize };
+				resultMap += outputMap.transpose() * inputMap;
+			}
+			for (size_t i = 0; i < prevStateSize; ++i)
+			{
+				const auto& state = prevStates[i];
+				for (size_t j = 0; j < nextIdSize; ++j)
+				{
+					outStates[i * nextIdSize + j] = nextState<_windowSize>(state, nextIds[j]);
+					outScores[i * nextIdSize + j] = resultMap(inverseNextIdcs[j], inverseContextIdcs[i]);
+				}
+			}
 		}
 
 		utils::MemoryObject PcLangModelBase::build(const string& contextDefinition, const string& embedding, bool reorderContextId)
@@ -498,85 +1291,107 @@ namespace kiwi
 			writePadding(ostr);
 			ostr.write((const char*)compressedValues.data(), compressedValues.size());
 			writePadding(ostr);
-			ostr.write((const char*)contextEmb.data(), contextEmb.size());
-			ostr.write((const char*)contextEmbScale.data(), contextEmbScale.size() * sizeof(uint16_t));
-			ostr.write((const char*)contextEmbBias.data(), contextEmbBias.size() * sizeof(uint16_t));
-			ostr.write((const char*)contextValidTokenSum.data(), contextValidTokenSum.size() * sizeof(uint16_t));
-			ostr.write((const char*)contextConfidence.data(), contextConfidence.size() * sizeof(uint16_t));
-			ostr.write((const char*)distantEmb.data(), distantEmb.size());
-			ostr.write((const char*)distantEmbScale.data(), distantEmbScale.size() * sizeof(uint16_t));
-			ostr.write((const char*)distantEmbBias.data(), distantEmbBias.size() * sizeof(uint16_t));
-			ostr.write((const char*)distantConfidence.data(), distantConfidence.size() * sizeof(uint16_t));
+
+			for (size_t i = 0; i < contextSize; ++i)
+			{
+				ostr.write((const char*)&contextEmb[i * dim], dim);
+				ostr.write((const char*)&contextEmbScale[i], sizeof(uint16_t));
+				ostr.write((const char*)&contextEmbBias[i], sizeof(uint16_t));
+				ostr.write((const char*)&contextConfidence[i], sizeof(uint16_t));
+				ostr.write((const char*)&contextValidTokenSum[i], sizeof(uint16_t));
+			}
+			for (size_t i = 0; i < outputSize; ++i)
+			{
+				ostr.write((const char*)&outputEmb[i * dim], dim);
+				ostr.write((const char*)&outputEmbScale[i], sizeof(uint16_t));
+			}
+			for (size_t i = 0; i < outputSize; ++i)
+			{
+				ostr.write((const char*)&distantEmb[i * dim], dim);
+				ostr.write((const char*)&distantEmbScale[i], sizeof(uint16_t));
+				ostr.write((const char*)&distantEmbBias[i], sizeof(uint16_t));
+				ostr.write((const char*)&distantConfidence[i], sizeof(uint16_t));
+			}
 			ostr.write((const char*)positionConfidence.data(), positionConfidence.size() * sizeof(uint16_t));
-			ostr.write((const char*)outputEmb.data(), outputEmb.size());
-			ostr.write((const char*)outputEmbScale.data(), outputEmbScale.size() * sizeof(uint16_t));
 			ostr.write((const char*)distantMask.data(), distantMask.size());
 			return mem;
 		}
 
-		template<ArchType arch, class KeyType, size_t windowSize, bool exclusive, bool useDistantTokens>
-		void* PcLangModel<arch, KeyType, windowSize, exclusive, useDistantTokens>::getFindBestPathFn() const
+		template<ArchType arch, class KeyType, size_t windowSize, bool quantized>
+		void* PcLangModel<arch, KeyType, windowSize, quantized>::getFindBestPathFn() const
 		{
-			return (void*)&BestPathFinder::findBestPath<PcLangModel<arch, KeyType, windowSize, exclusive, useDistantTokens>>;
+			return (void*)&BestPathFinder::findBestPath<PcLangModel<arch, KeyType, windowSize, quantized>>;
 		}
 
-		template<ArchType arch, class KeyType, size_t windowSize, bool exclusive, bool useDistantTokens>
-		void* PcLangModel<arch, KeyType, windowSize, exclusive, useDistantTokens>::getNewJoinerFn() const
+		template<ArchType arch, class KeyType, size_t windowSize, bool quantized>
+		void* PcLangModel<arch, KeyType, windowSize, quantized>::getNewJoinerFn() const
 		{
 			return (void*)&newJoinerWithKiwi<LmStateType>;
 		}
 
-		template<ArchType archType, class KeyTy, bool useDistantTokens>
+		template<ArchType archType, class KeyTy, bool useDistantTokens, bool quantized>
 		inline std::unique_ptr<PcLangModelBase> createOptimizedModelWithWindowSize(utils::MemoryObject&& mem)
 		{
 			auto& header = *reinterpret_cast<const PcLangModelHeader*>(mem.get());
+			if (!useDistantTokens)
+			{
+				return make_unique<PcLangModel<archType, KeyTy, 0, quantized>>(std::move(mem));
+			}
+
 			switch (header.windowSize)
 			{
-			case 4:
-				return make_unique<PcLangModel<archType, KeyTy, 4, true, useDistantTokens>>(std::move(mem));
 			case 7:
-				return make_unique<PcLangModel<archType, KeyTy, 7, true, useDistantTokens>>(std::move(mem));
-			case 8:
-				return make_unique<PcLangModel<archType, KeyTy, 8, false, useDistantTokens>>(std::move(mem));
+				return make_unique<PcLangModel<archType, KeyTy, 7, quantized>>(std::move(mem));
 			default:
 				throw std::runtime_error{ "Unsupported `window_size` : " + std::to_string((size_t)header.windowSize) };
 			};
 		}
 
-		template<ArchType archType, bool useDistantTokens>
+		template<ArchType archType, bool useDistantTokens, bool quantized>
 		std::unique_ptr<PcLangModelBase> createOptimizedModel(utils::MemoryObject&& mem)
 		{
 			auto& header = *reinterpret_cast<const PcLangModelHeader*>(mem.get());
 			switch (header.keySize)
 			{
-			case 1:
-				return createOptimizedModelWithWindowSize<archType, uint8_t, useDistantTokens>(std::move(mem));
 			case 2:
-				return createOptimizedModelWithWindowSize<archType, uint16_t, useDistantTokens>(std::move(mem));
+				return createOptimizedModelWithWindowSize<archType, uint16_t, useDistantTokens, quantized>(std::move(mem));
 			case 4:
-				return createOptimizedModelWithWindowSize<archType, uint32_t, useDistantTokens>(std::move(mem));
+				return createOptimizedModelWithWindowSize<archType, uint32_t, useDistantTokens, quantized>(std::move(mem));
 			default:
 				throw std::runtime_error{ "Unsupported `key_size` : " + std::to_string((size_t)header.keySize) };
 			}
 		}
 
-		using FnCreateOptimizedModel = decltype(&createOptimizedModel<ArchType::none, false>);
+		using FnCreateOptimizedModel = decltype(&createOptimizedModel<ArchType::none, false, false>);
 
-		template<bool useDistantTokens>
+		template<bool useDistantTokens, bool quantized>
 		struct CreateOptimizedModelGetter
 		{
 			template<std::ptrdiff_t i>
 			struct Wrapper
 			{
-				static constexpr FnCreateOptimizedModel value = &createOptimizedModel<static_cast<ArchType>(i), useDistantTokens>;
+				static constexpr FnCreateOptimizedModel value = &createOptimizedModel<static_cast<ArchType>(i), useDistantTokens, quantized>;
 			};
 		};
 
-		std::unique_ptr<PcLangModelBase> PcLangModelBase::create(utils::MemoryObject&& mem, ArchType archType, bool useDistantTokens)
+		std::unique_ptr<PcLangModelBase> PcLangModelBase::create(utils::MemoryObject&& mem, ArchType archType, bool useDistantTokens, bool quantized)
 		{
-			static tp::Table<FnCreateOptimizedModel, AvailableArch> tableWithoutDistantTokens{ CreateOptimizedModelGetter<false>{} },
-				tableWithDistantTokens{ CreateOptimizedModelGetter<true>{} };
-			auto fn = (useDistantTokens ? tableWithDistantTokens : tableWithoutDistantTokens)[static_cast<std::ptrdiff_t>(archType)];
+			static tp::Table<FnCreateOptimizedModel, AvailableArch> tables[] = {
+				CreateOptimizedModelGetter<false, false>{},
+				CreateOptimizedModelGetter<true, false>{},
+			};
+			static tp::Table<FnCreateOptimizedModel, QuantAvailableArch> quantTables[] = {
+				CreateOptimizedModelGetter<false, true>{},
+				CreateOptimizedModelGetter<true, true>{},
+			};
+
+			if (quantized)
+			{
+				auto fn = quantTables[useDistantTokens ? 1 : 0][static_cast<std::ptrdiff_t>(archType)];
+				if (fn) return (*fn)(std::move(mem));
+				std::cerr << "Quantization is not supported for " << archToStr(archType) << ". Fall back to non-quantized model." << std::endl;
+			}
+			auto fn = tables[useDistantTokens ? 1 : 0][static_cast<std::ptrdiff_t>(archType)];
 			if (!fn) throw std::runtime_error{ std::string{"Unsupported architecture : "} + archToStr(archType) };
 			return (*fn)(std::move(mem));
 		}

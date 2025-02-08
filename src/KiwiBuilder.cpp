@@ -791,9 +791,12 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, size_t _numThreads, BuildOptio
 	{
 		langMdl = lm::SkipBigramModelBase::create(utils::MMap(modelPath + string{ "/sj.knlm" }), utils::MMap(modelPath + string{ "/skipbigram.mdl" }), archType);
 	}
-	else if (modelType == ModelType::pclm || modelType == ModelType::pclmLocal)
+	else if (modelType == ModelType::pclm || modelType == ModelType::pclmLocal 
+		|| modelType == ModelType::pclmQuantized || modelType == ModelType::pclmLocalQuantized)
 	{
-		langMdl = lm::PcLangModelBase::create(utils::MMap(modelPath + string{ "/pclm.mdl" }), archType, modelType == ModelType::pclm);
+		langMdl = lm::PcLangModelBase::create(utils::MMap(modelPath + string{ "/pclm.mdl" }), archType, 
+			(modelType == ModelType::pclm || modelType == ModelType::pclmQuantized),
+			(modelType == ModelType::pclmQuantized || modelType == ModelType::pclmLocalQuantized));
 	}
 
 	if (!!(options & BuildOption::loadDefaultDict))

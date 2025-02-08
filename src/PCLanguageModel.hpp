@@ -15,43 +15,128 @@ namespace kiwi
 {
 	namespace lm
 	{
-		template<size_t windowSize, ArchType _arch, class VocabTy, bool exclusive, bool useDistantTokens>
+		template<size_t windowSize, ArchType _arch, class VocabTy, bool quantized>
 		class PcLMState;
 
-		template<ArchType arch, class KeyType, size_t windowSize, bool exclusive = false, bool useDistantTokens = false>
+		template<ArchType arch, class KeyType, size_t windowSize, bool quantized = true>
 		class PcLangModel : public PcLangModelBase
 		{
 			using MyNode = Node<KeyType, uint32_t>;
 
 			std::unique_ptr<MyNode[]> nodeData;
-			std::unique_ptr<KeyType[]> keyData;
-			std::unique_ptr<int32_t[]> valueData;
-			std::unique_ptr<float[]> contextEmb;
-			std::unique_ptr<float[]> contextBias;
-			std::unique_ptr<float[]> contextValidTokenSum;
-			std::unique_ptr<float[]> contextConf;
-			std::unique_ptr<float[]> distantEmb;
-			std::unique_ptr<float[]> distantBias;
-			std::unique_ptr<float[]> distantConf;
-			std::unique_ptr<float[]> positionConf;
-			std::unique_ptr<float[]> outputEmb;
-			std::unique_ptr<uint8_t[]> distantMask;
+			std::unique_ptr<uint8_t[]> keyValueData;
+			std::unique_ptr<int32_t[]> allRootValueData;
+			std::unique_ptr<uint8_t[]> allEmbs;
+			const uint8_t* contextEmbPtr = nullptr; // [numContexts, (dim + scale? + bias + confid + vts)]
+			const uint8_t* outputEmbPtr = nullptr; // [numOutputs, (dim + scale? + sum?)]
+			const uint8_t* distantEmbPtr = nullptr; // [numOutputs, (dim + scale? + bias + confid + pad?)]
+			const float* positionConfidPtr = nullptr;
+			const uint8_t* distantMaskPtr = nullptr;
+
+			inline size_t contextEmbStride() const
+			{
+				if (quantized) return header.dim + (windowSize > 0 ? 4 : 2) * sizeof(float);
+				else return (header.dim + (windowSize > 0 ? 3 : 1)) * sizeof(float);
+			}
+
+			inline size_t outputEmbStride() const
+			{
+				if (quantized) return header.dim + 2 * sizeof(float);
+				else return header.dim * sizeof(float);
+			}
+
+			inline size_t distantEmbStride() const
+			{
+				if (quantized) return header.dim + 4 * sizeof(float);
+				else return (header.dim + 2) * sizeof(float);
+			}
+
+			inline const float* getContextEmb(uint32_t idx) const
+			{
+				return reinterpret_cast<const float*>(contextEmbPtr + idx * contextEmbStride());
+			}
+
+			inline const uint8_t* getContextQuantEmb(uint32_t idx) const
+			{
+				return contextEmbPtr + idx * contextEmbStride();
+			}
+
+			inline float getContextBias(uint32_t idx) const
+			{
+				const size_t offset = quantized ?
+					(header.dim + sizeof(float))
+					: (header.dim * sizeof(float));
+				return *reinterpret_cast<const float*>(contextEmbPtr + idx * contextEmbStride() + offset);
+			}
+
+			inline float getContextConfid(uint32_t idx) const
+			{
+				if (windowSize == 0) return 0;
+				const size_t offset = quantized ?
+					(header.dim + 2 * sizeof(float))
+					: (header.dim + 1) * sizeof(float);
+				return *reinterpret_cast<const float*>(contextEmbPtr + idx * contextEmbStride() + offset);
+			}
+
+			inline float getContextValidTokenSum(uint32_t idx) const
+			{
+				if (windowSize == 0) return 0;
+				const size_t offset = quantized ?
+					(header.dim + 3 * sizeof(float))
+					: (header.dim + 2) * sizeof(float);
+				return *reinterpret_cast<const float*>(contextEmbPtr + idx * contextEmbStride() + offset);
+			}
+
+			inline const float* getOutputEmb(uint32_t idx) const
+			{
+				return reinterpret_cast<const float*>(outputEmbPtr + idx * outputEmbStride());
+			}
+
+			inline const int8_t* getOutputQuantEmb(uint32_t idx) const
+			{
+				return reinterpret_cast<const int8_t*>(outputEmbPtr + idx * outputEmbStride());
+			}
+
+			inline const float* getDistantEmb(uint32_t idx) const
+			{
+				return reinterpret_cast<const float*>(distantEmbPtr + idx * distantEmbStride());
+			}
+
+			inline const uint8_t* getDistantQuantEmb(uint32_t idx) const
+			{
+				return distantEmbPtr + idx * distantEmbStride();
+			}
+
+			inline float getDistantBias(uint32_t idx) const
+			{
+				if (windowSize == 0) return 0;
+				const size_t offset = quantized ?
+					(header.dim + sizeof(float))
+					: (header.dim * sizeof(float));
+				return *reinterpret_cast<const float*>(distantEmbPtr + idx * distantEmbStride() + offset);
+			}
+
+			inline float getDistantConfid(uint32_t idx) const
+			{
+				if (windowSize == 0) return 0;
+				const size_t offset = quantized ?
+					(header.dim + 2 * sizeof(float))
+					: (header.dim + 1) * sizeof(float);
+				return *reinterpret_cast<const float*>(distantEmbPtr + idx * distantEmbStride() + offset);
+			}
 
 			MyNode* findLowerNode(MyNode* node, KeyType k) const
 			{
 				while (node->lower)
 				{
 					auto* lowerNode = node + node->lower;
-					auto* keys = &keyData[lowerNode->nextOffset];
-					auto* values = &valueData[lowerNode->nextOffset];
+					auto* kvs = &keyValueData[lowerNode->nextOffset * (sizeof(KeyType) + sizeof(int32_t))];
 					int32_t found;
-					if (nst::search<arch>(
-						keys,
-						values,
+					if (nst::searchKV<arch, KeyType, int32_t>(
+						kvs,
 						lowerNode->numNexts,
 						k,
-						found
-					) && found >= 0)
+						found) && found >= 0)
 					{
 						return lowerNode + found;
 					}
@@ -65,16 +150,13 @@ namespace kiwi
 				while (node->lower)
 				{
 					auto* lowerNode = node + node->lower;
-					auto* keys = &keyData[lowerNode->nextOffset];
-					auto* values = &valueData[lowerNode->nextOffset];
+					auto* kvs = &keyValueData[lowerNode->nextOffset * (sizeof(KeyType) + sizeof(int32_t))];
 					int32_t found;
-					if (nst::search<arch>(
-						keys,
-						values,
+					if (nst::searchKV<arch, KeyType, int32_t>(
+						kvs,
 						lowerNode->numNexts,
 						k,
-						found
-					))
+						found))
 					{
 						if (found >= 0)
 						{
@@ -92,10 +174,23 @@ namespace kiwi
 
 		public:
 			using VocabType = KeyType;
-			using LmStateType = PcLMState<windowSize, arch, VocabType, exclusive, useDistantTokens>;
+			using LmStateType = PcLMState<windowSize, arch, VocabType, quantized>;
 
 			PcLangModel(utils::MemoryObject&& mem);
 
+			ModelType getType() const override 
+			{ 
+				if (quantized)
+				{
+					if (windowSize > 0) return ModelType::pclmQuantized;
+					else return ModelType::pclmLocalQuantized;
+				}
+				else
+				{
+					if (windowSize > 0) return ModelType::pclm;
+					else return ModelType::pclmLocal;
+				}
+			}
 			void* getFindBestPathFn() const override;
 			void* getNewJoinerFn() const override;
 
@@ -105,19 +200,29 @@ namespace kiwi
 				{
 					int32_t v;
 					auto* node = &nodeData[nodeIdx];
-					auto* keys = &keyData[node->nextOffset];
-					auto* values = &valueData[node->nextOffset];
-					PREFETCH_T0(node + node->lower);
-					if (!nst::search<arch>(
-						keys,
-						values,
-						node->numNexts, next, v
-					))
+					auto* kvs = &keyValueData[node->nextOffset * (sizeof(KeyType) + sizeof(int32_t))];
+					if (node != nodeData.get())
 					{
-						if (!node->lower) return 0;
-						nodeIdx += node->lower;
-						PREFETCH_T0(&keyData[nodeData[nodeIdx].nextOffset]);
-						continue;
+						//ScopedTimer<> timer(node->numNexts <= 16 ? 0 : node->numNexts <= 272 ? 1 : 2);
+						PREFETCH_T0(node + node->lower);
+						if (!nst::searchKV<arch, KeyType, int32_t>(
+							kvs,
+							node->numNexts, next, v
+						))
+						{
+							if (!node->lower) return 0;
+							nodeIdx += node->lower;
+							PREFETCH_T0(&keyValueData[nodeData[nodeIdx].nextOffset * (sizeof(KeyType) + sizeof(int32_t))]);
+							continue;
+						}
+					}
+					else
+					{
+						v = allRootValueData[next];
+						if (v == 0)
+						{
+							return 0;
+						}
 					}
 
 					// non-leaf node
@@ -132,17 +237,30 @@ namespace kiwi
 						while (node->lower)
 						{
 							node += node->lower;
+							auto* lkvs = &keyValueData[node->nextOffset * (sizeof(KeyType) + sizeof(int32_t))];
 							int32_t lv;
-							if (nst::search<arch>(
-								&keyData[node->nextOffset],
-								&valueData[node->nextOffset],
-								node->numNexts, next, lv
-							))
+							if (node != nodeData.get())
 							{
+								//ScopedTimer<> timer(node->numNexts <= 16 ? 0 : node->numNexts <= 272 ? 1 : 2);
+								if (nst::searchKV<arch, KeyType, int32_t>(
+									lkvs,
+									node->numNexts, next, lv
+								))
+								{
+									if (lv > 0)
+									{
+										node += lv;
+										nodeIdx = node - &nodeData[0];
+										return (uint32_t)-v;
+									}
+								}
+							}
+							else
+							{
+								lv = allRootValueData[next];
 								if (lv > 0)
 								{
-									node += lv;
-									nodeIdx = node - &nodeData[0];
+									nodeIdx = lv;
 									return (uint32_t)-v;
 								}
 							}
@@ -155,26 +273,80 @@ namespace kiwi
 
 			inline bool distantTokenMask(uint32_t idx) const
 			{
-				if (useDistantTokens) return (distantMask[idx / 8] & (1 << (idx % 8))) != 0;
+				if (windowSize > 0) return (distantMaskPtr[idx / 8] & (1 << (idx % 8))) != 0;
 				else return false;
 			}
 
 			float progress(int32_t& nodeIdx,
 				uint32_t& contextIdx,
 				size_t& historyPos,
-				std::array<KeyType, windowSize + (exclusive ? 1 : 0)>& history,
+				std::array<KeyType, windowSize + 1>& history,
 				KeyType next) const;
 
+			template<size_t _windowSize>
+			LmStateType nextState(const typename std::enable_if<(_windowSize > 0), LmStateType>::type& state, KeyType next) const;
+
+			template<size_t _windowSize>
+			LmStateType nextState(const typename std::enable_if<_windowSize == 0, LmStateType>::type& state, KeyType next) const;
+
+			/*
+			* 총 prevStateSize개의 상태와 nextIdSize개의 다음 토큰을 받아서, 각 상태별로 다음 토큰이 등장할 확률을 계산하고 새 상태를 반환한다.
+			* 새 상태값은 outStates에 저장되고, 각 상태별 확률값은 outScores에 저장된다.
+			* nextIdSize개의 다음 토큰 중 마지막 numValidDistantTokens개의 토큰은 유효한 distant 토큰으로 처리된다.
+			*/
+			template<size_t _windowSize>
+			void progressMatrix(const typename std::enable_if<(_windowSize > 0), LmStateType>::type* prevStates, const KeyType* nextIds,
+				size_t prevStateSize, size_t nextIdSize, size_t numValidDistantTokens,
+				LmStateType* outStates, float* outScores) const;
+
+			template<size_t _windowSize>
+			void progressMatrix(const typename std::enable_if<(_windowSize == 0), LmStateType>::type* prevStates, const KeyType* nextIds,
+				size_t prevStateSize, size_t nextIdSize, size_t numValidDistantTokens,
+				LmStateType* outStates, float* outScores) const;
 		};
 
-		template<size_t windowSize, ArchType _arch, class VocabTy, bool exclusive, bool useDistantTokens>
-		struct PcLMState : public LmStateBase<PcLangModel<_arch, VocabTy, windowSize, exclusive, useDistantTokens>>
+		template<size_t windowSize, ArchType _arch, class VocabTy, bool quantized>
+		struct PcLMState : public LmStateBase<PcLangModel<_arch, VocabTy, windowSize, quantized>>
+		{
+			int32_t node = 0;
+			uint32_t contextIdx = 0;
+			size_t historyPos = 0;
+			std::array<VocabTy, windowSize + 1> history = { {0,} };
+
+			static constexpr ArchType arch = _arch;
+			static constexpr bool transposed = true;
+
+			PcLMState() = default;
+			PcLMState(const ILangModel* lm) {}
+
+			bool operator==(const PcLMState& other) const
+			{
+				if (node != other.node) return false;
+				for (size_t i = windowSize / 2; i < windowSize; ++i)
+				{
+					if (history[(historyPos + i) % windowSize] != other.history[(other.historyPos + i) % windowSize])
+					{
+						return false;
+					}
+				}
+				return true;
+			}
+
+			float nextImpl(const PcLangModel<arch, VocabTy, windowSize, quantized>* lm, VocabTy next)
+			{
+				return lm->progress(node, contextIdx, historyPos, history, next);
+			}
+		};
+
+		template<ArchType _arch, class VocabTy, bool quantized>
+		struct PcLMState<0, _arch, VocabTy, quantized> : public LmStateBase<PcLangModel<_arch, VocabTy, 0, quantized>>
 		{
 			int32_t node = 0;
 			uint32_t contextIdx = 0;
 
 			static constexpr ArchType arch = _arch;
 			static constexpr bool transposed = true;
+			static constexpr size_t windowSize = 0;
 
 			PcLMState() = default;
 			PcLMState(const ILangModel* lm) {}
@@ -184,65 +356,39 @@ namespace kiwi
 				return node == other.node;
 			}
 
-			float nextImpl(const PcLangModel<arch, VocabTy, windowSize, exclusive, useDistantTokens>* lm, VocabTy next)
+			float nextImpl(const PcLangModel<arch, VocabTy, windowSize, quantized>* lm, VocabTy next)
 			{
 				size_t historyPos = 0;
-				std::array<VocabTy, windowSize + (exclusive ? 1 : 0)> history = { {0,} };
-				return lm->progress(node, contextIdx, historyPos, history, next);
-			}
-		};
-
-		template<size_t windowSize, ArchType _arch, class VocabTy, bool exclusive>
-		struct PcLMState<windowSize, _arch, VocabTy, exclusive, true> : public LmStateBase<PcLangModel<_arch, VocabTy, windowSize, exclusive, true>>
-		{
-			static constexpr bool useDistantTokens = true;
-
-			int32_t node = 0;
-			uint32_t contextIdx = 0;
-			size_t historyPos = 0;
-			std::array<VocabTy, windowSize + (exclusive ? 1 : 0)> history = { {0,} };
-		
-			static constexpr ArchType arch = _arch;
-			static constexpr bool transposed = true;
-
-			PcLMState() = default;
-			PcLMState(const ILangModel* lm) {}
-
-			bool operator==(const PcLMState& other) const
-			{
-				return node == other.node && historyPos == other.historyPos && history == other.history;
-			}
-
-			float nextImpl(const PcLangModel<arch, VocabTy, windowSize, exclusive, useDistantTokens>* lm, VocabTy next)
-			{
+				std::array<VocabTy, windowSize + 1> history = { {0,} };
 				return lm->progress(node, contextIdx, historyPos, history, next);
 			}
 		};
 	}
 
-	template<size_t windowSize, ArchType arch, class VocabTy, bool exclusive>
-	struct Hash<lm::PcLMState<windowSize, arch, VocabTy, exclusive, false>>
+	template<size_t windowSize, ArchType arch, class VocabTy, bool quantized>
+	struct Hash<lm::PcLMState<windowSize, arch, VocabTy, quantized>>
 	{
-		size_t operator()(const lm::PcLMState<windowSize, arch, VocabTy, exclusive, false>& state) const
-		{
-			Hash<int32_t> hasher;
-			return hasher(state.node);
-		}
-	};
-
-	template<size_t windowSize, ArchType arch, class VocabTy, bool exclusive>
-	struct Hash<lm::PcLMState<windowSize, arch, VocabTy, exclusive, true>>
-	{
-		size_t operator()(const lm::PcLMState<windowSize, arch, VocabTy, exclusive, true>& state) const
+		size_t operator()(const lm::PcLMState<windowSize, arch, VocabTy, quantized>& state) const
 		{
 			Hash<int32_t> hasher;
 			std::hash<VocabTy> vocabHasher;
 			size_t ret = hasher(state.node);
-			for (size_t i = 0; i < state.history.size(); ++i)
+			for (size_t i = windowSize / 2; i < windowSize; ++i)
 			{
-				ret = vocabHasher(state.history[i]) ^ ((ret << 3) | (ret >> (sizeof(size_t) * 8 - 3)));
+				const auto historyToken = state.history[(state.historyPos + i) % windowSize];
+				ret = vocabHasher(historyToken) ^ ((ret << 3) | (ret >> (sizeof(size_t) * 8 - 3)));
 			}
 			return ret;
+		}
+	};
+
+	template<ArchType arch, class VocabTy, bool quantized>
+	struct Hash<lm::PcLMState<0, arch, VocabTy, quantized>>
+	{
+		size_t operator()(const lm::PcLMState<0, arch, VocabTy, quantized>& state) const
+		{
+			Hash<int32_t> hasher;
+			return hasher(state.node);
 		}
 	};
 }

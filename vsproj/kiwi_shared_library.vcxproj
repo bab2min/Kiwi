@@ -74,6 +74,7 @@
     <ClInclude Include="..\src\PathEvaluator.hpp" />
     <ClInclude Include="..\src\pattern.hpp" />
     <ClInclude Include="..\src\PCLanguageModel.hpp" />
+    <ClInclude Include="..\src\qgemm.h" />
     <ClInclude Include="..\src\RaggedVector.hpp" />
     <ClInclude Include="..\src\sais\fm_index.hpp" />
     <ClInclude Include="..\src\sais\mp_utils.hpp" />
@@ -126,6 +127,7 @@
     <ClCompile Include="..\src\Joiner.cpp" />
     <ClCompile Include="..\src\Knlm.cpp" />
     <ClCompile Include="..\src\PCLanguageModel.cpp" />
+    <ClCompile Include="..\src\qgemm.cpp" />
     <ClCompile Include="..\src\search.cpp" />
     <ClCompile Include="..\src\SkipBigramModel.cpp" />
     <ClCompile Include="..\src\SubstringExtractor.cpp" />

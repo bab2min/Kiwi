@@ -310,6 +310,8 @@ namespace kiwi
 		sbg = 2, /**< Skip-Bigram Model */
 		pclm = 3, /**< Pre-computed Context Language Model */
 		pclmLocal = 4, /**< Pre-computed Context Language Model (Only local context) */
+		pclmQuantized = 5, /**< Pre-computed Context Language Model (quantized) */
+		pclmLocalQuantized = 6, /**< Pre-computed Context Language Model (Only local context, quantized) */
 		knlmTransposed,
 	};
 
