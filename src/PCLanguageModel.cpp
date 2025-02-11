@@ -12,6 +12,11 @@ using namespace std;
 
 namespace kiwi
 {
+	inline size_t padMultipleOf(size_t n, size_t multiple)
+	{
+		return (n + multiple - 1) / multiple * multiple;
+	}
+
 	template<size_t windowSize, ArchType arch, class VocabTy, bool quantized>
 	struct MorphemeEvaluator<lm::PcLMState<windowSize, arch, VocabTy, quantized>>
 	{
@@ -816,7 +821,7 @@ namespace kiwi
 				}
 				inputEmbBuf.resize((uniqInputSize + uniqHistorySize) * header.dim);
 				confidenceBuf.resize(uniqInputSize * 2 + uniqHistorySize);
-				resultBuf.resize((uniqInputSize + uniqHistorySize) * uniqOutputSize);
+				resultBuf.resize(padMultipleOf(uniqInputSize + uniqHistorySize, 8) * padMultipleOf(uniqOutputSize, 8));
 
 				uniqHistorySize = 0;
 				for (size_t i = 0; i < historyIdcs.size(); ++i)
@@ -861,7 +866,7 @@ namespace kiwi
 
 				inputEmbBuf.resize((uniqInputSize + uniqHistorySize)* header.dim);
 				confidenceBuf.resize(uniqInputSize * 2 + uniqHistorySize);
-				resultBuf.resize((uniqInputSize + uniqHistorySize)* uniqOutputSize);
+				resultBuf.resize(padMultipleOf(uniqInputSize + uniqHistorySize, 8) * padMultipleOf(uniqOutputSize, 8));
 
 				for (size_t i = 0; i < uniqHistoryTokens.size(); ++i)
 				{
@@ -1003,7 +1008,7 @@ namespace kiwi
 				}
 				inverseNextIdcs[idx] = uniqOutputSize - 1;
 			}
-			resultBuf.resize(max(prevStateSize * uniqOutputSize, (size_t)64));
+			resultBuf.resize(padMultipleOf(prevStateSize, 8) * padMultipleOf(uniqOutputSize, 8));
 
 			for (size_t i = 0; i < prevStateSize; ++i)
 			{
@@ -1057,7 +1062,7 @@ namespace kiwi
 			}
 		}
 
-		utils::MemoryObject PcLangModelBase::build(const string& contextDefinition, const string& embedding, bool reorderContextId)
+		utils::MemoryObject PcLangModelBase::build(const string& contextDefinition, const string& embedding, size_t maxContextLength, bool reorderContextId)
 		{
 			ifstream contextStr, embeddingStr;
 			if (!openFile(contextStr, contextDefinition))
@@ -1089,6 +1094,10 @@ namespace kiwi
 						auto id = stol(tokens[i].begin(), tokens[i].end());
 						if (id < 0) throw IOException{ "Invalid format : " + contextDefinition };
 						context.push_back(id);
+					}
+					if (context.size() > maxContextLength)
+					{
+						continue;
 					}
 					if (contextMap.size() < context.size()) contextMap.resize(context.size());
 					contextMap[context.size() - 1][context] = (uint32_t)clusterId;
