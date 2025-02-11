@@ -442,10 +442,16 @@ namespace kiwi
 				allEmbs = make_unique<uint8_t[]>(contextEmbSize + outputEmbSize + distantEmbSize + positionConfSize + distantMaskSize);
 				auto p = allEmbs.get();
 				contextEmbPtr = reinterpret_cast<uint8_t*>(p);
-				distantEmbPtr = windowSize > 0 ? reinterpret_cast<uint8_t*>(p += contextEmbSize) : nullptr;
+				distantEmbPtr = reinterpret_cast<uint8_t*>(p += contextEmbSize);
 				outputEmbPtr = reinterpret_cast<uint8_t*>(p += distantEmbSize);
-				positionConfidPtr = windowSize > 0 ? reinterpret_cast<float*>(p += outputEmbSize) : nullptr;
-				distantMaskPtr = windowSize > 0 ? reinterpret_cast<const uint8_t*>(p += positionConfSize) : nullptr;
+				positionConfidPtr = reinterpret_cast<float*>(p += outputEmbSize);
+				distantMaskPtr = reinterpret_cast<const uint8_t*>(p += positionConfSize);
+				if (windowSize == 0)
+				{
+					distantEmbPtr = nullptr;
+					positionConfidPtr = nullptr;
+					distantMaskPtr = nullptr;
+				}
 			}
 			
 			auto* eptr = ptr + header.embOffset;
