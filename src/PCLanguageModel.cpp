@@ -556,7 +556,6 @@ namespace kiwi
 		template<ArchType arch, class KeyType, size_t windowSize, bool quantized>
 		float PcLangModel<arch, KeyType, windowSize, quantized>::progress(int32_t& nodeIdx,
 			uint32_t& contextIdx,
-			size_t& historyPos,
 			std::array<KeyType, windowSize + 1>& history,
 			KeyType next) const
 		{
@@ -576,13 +575,13 @@ namespace kiwi
 					contextIdcs[0] = contextIdx;
 					for (size_t i = 0; i < windowSize; ++i)
 					{
-						const auto historyToken = history[(historyPos + i) % windowSize];
+						const auto historyToken = history[i];
 						lls[i + 1] += historyToken ? getDistantConfid(historyToken) : -99999;
 						contextIdcs[i + 1] = (historyToken ? historyToken : 0) + header.contextSize;
 					}
 					LogSoftmax<arch>{}(lls, std::integral_constant<size_t, windowSize + 1>());
 
-					qgemm::scatteredGEMMBaseline<arch>(
+					qgemm::scatteredGEMMOpt<arch>(
 						1 + windowSize, 1, header.dim,
 						getContextQuantEmb(0), contextIdcs, contextEmbStride(),
 						getOutputQuantEmb(0), nextIdx, outputEmbStride(),
@@ -607,7 +606,7 @@ namespace kiwi
 					lls[0] += getContextConfid(contextIdx);
 					for (size_t i = 0; i < windowSize; ++i)
 					{
-						const auto historyToken = history[(historyPos + i) % windowSize];
+						const auto historyToken = history[i];
 						lls[i + 1] += historyToken ? getDistantConfid(historyToken) : -99999;
 					}
 					logsoftmaxInplace(lls.array());
@@ -616,7 +615,7 @@ namespace kiwi
 					lls[0] += getContextBias(contextIdx);
 					for (size_t i = 0; i < windowSize; ++i)
 					{
-						const auto historyToken = history[(historyPos + i) % windowSize];
+						const auto historyToken = history[i];
 						if (historyToken) mat.col(i + 1) = Eigen::Map<const Eigen::VectorXf>{ getDistantEmb(historyToken), header.dim };
 						else mat.col(i + 1).setZero();
 						lls[i + 1] += getDistantBias(historyToken);
@@ -655,8 +654,7 @@ namespace kiwi
 			{
 				if (history[windowSize])
 				{
-					history[historyPos] = history[windowSize];
-					historyPos = (historyPos + 1) % windowSize;
+					memcpy(&history[0], &history[1], windowSize * sizeof(KeyType));
 				}
 				history[windowSize] = validDistantToken ? next : 0;
 			}
@@ -673,8 +671,7 @@ namespace kiwi
 			ret.contextIdx = progressContextNode(ret.node, next);
 			if (ret.history[windowSize])
 			{
-				ret.history[ret.historyPos] = ret.history[windowSize];
-				ret.historyPos = (ret.historyPos + 1) % windowSize;
+				memcpy(&ret.history[0], &ret.history[1], windowSize * sizeof(KeyType));
 			}
 			ret.history[windowSize] = distantTokenMask(next) ? next : 0;
 			return ret;
@@ -798,7 +795,7 @@ namespace kiwi
 				{
 					for (size_t j = 0; j < windowSize; ++j)
 					{
-						const auto historyToken = prevStates[i].history[(j + prevStates[i].historyPos) % windowSize];
+						const auto historyToken = prevStates[i].history[j];
 						if (historyToken)
 						{
 							historyIdcs.emplace_back(mergePair(historyToken, i * windowSize + j));
@@ -852,7 +849,7 @@ namespace kiwi
 				{
 					for (size_t j = 0; j < windowSize; ++j)
 					{
-						const auto historyToken = prevStates[i].history[(j + prevStates[i].historyPos) % windowSize];
+						const auto historyToken = prevStates[i].history[j];
 						if (!historyToken) continue;
 						const auto idx = i * windowSize + j;
 						auto inserted = historyMap.emplace(historyToken, historyMap.size());

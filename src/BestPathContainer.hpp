@@ -78,23 +78,8 @@ namespace kiwi
 	{
 		size_t operator()(const PathHash<LmState>& p) const
 		{
-			size_t ret = 0;
-			if (sizeof(PathHash<LmState>) % sizeof(size_t))
-			{
-				auto ptr = reinterpret_cast<const uint32_t*>(&p);
-				for (size_t i = 0; i < sizeof(PathHash<LmState>) / sizeof(uint32_t); ++i)
-				{
-					ret ^= ptr[i];
-				}
-			}
-			else
-			{
-				auto ptr = reinterpret_cast<const size_t*>(&p);
-				for (size_t i = 0; i < sizeof(PathHash<LmState>) / sizeof(size_t); ++i)
-				{
-					ret ^= ptr[i];
-				}
-			}
+			size_t ret = Hash<LmState>{}(p.lmState);
+			ret ^= *reinterpret_cast<const uint16_t*>(&p.rootId);
 			return ret;
 		}
 	};

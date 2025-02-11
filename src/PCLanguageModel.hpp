@@ -279,7 +279,6 @@ namespace kiwi
 
 			float progress(int32_t& nodeIdx,
 				uint32_t& contextIdx,
-				size_t& historyPos,
 				std::array<KeyType, windowSize + 1>& history,
 				KeyType next) const;
 
@@ -310,7 +309,6 @@ namespace kiwi
 		{
 			int32_t node = 0;
 			uint32_t contextIdx = 0;
-			size_t historyPos = 0;
 			std::array<VocabTy, windowSize + 1> history = { {0,} };
 
 			static constexpr ArchType arch = _arch;
@@ -321,20 +319,18 @@ namespace kiwi
 
 			bool operator==(const PcLMState& other) const
 			{
+				static constexpr size_t cmpStart = windowSize / 2;
 				if (node != other.node) return false;
-				for (size_t i = windowSize / 2; i < windowSize; ++i)
+				if (memcmp(&history[cmpStart], &other.history[cmpStart], (windowSize - cmpStart) * sizeof(VocabTy)))
 				{
-					if (history[(historyPos + i) % windowSize] != other.history[(other.historyPos + i) % windowSize])
-					{
 						return false;
 					}
-				}
 				return true;
 			}
 
 			float nextImpl(const PcLangModel<arch, VocabTy, windowSize, quantized>* lm, VocabTy next)
 			{
-				return lm->progress(node, contextIdx, historyPos, history, next);
+				return lm->progress(node, contextIdx, history, next);
 			}
 		};
 
@@ -358,9 +354,8 @@ namespace kiwi
 
 			float nextImpl(const PcLangModel<arch, VocabTy, windowSize, quantized>* lm, VocabTy next)
 			{
-				size_t historyPos = 0;
 				std::array<VocabTy, windowSize + 1> history = { {0,} };
-				return lm->progress(node, contextIdx, historyPos, history, next);
+				return lm->progress(node, contextIdx, history, next);
 			}
 		};
 	}
@@ -370,14 +365,10 @@ namespace kiwi
 	{
 		size_t operator()(const lm::PcLMState<windowSize, arch, VocabTy, quantized>& state) const
 		{
-			Hash<int32_t> hasher;
-			std::hash<VocabTy> vocabHasher;
-			size_t ret = hasher(state.node);
-			for (size_t i = windowSize / 2; i < windowSize; ++i)
-			{
-				const auto historyToken = state.history[(state.historyPos + i) % windowSize];
-				ret = vocabHasher(historyToken) ^ ((ret << 3) | (ret >> (sizeof(size_t) * 8 - 3)));
-			}
+			size_t ret = (uint32_t)(state.node * (size_t)2654435761);
+			static constexpr size_t cmpStart = windowSize - sizeof(size_t) / sizeof(VocabTy);
+			const auto h = *reinterpret_cast<const size_t*>(&state.history[cmpStart]);
+			ret = h ^ ((ret << 3) | (ret >> (sizeof(size_t) * 8 - 3)));
 			return ret;
 		}
 	};
@@ -387,8 +378,8 @@ namespace kiwi
 	{
 		size_t operator()(const lm::PcLMState<0, arch, VocabTy, quantized>& state) const
 		{
-			Hash<int32_t> hasher;
-			return hasher(state.node);
+			size_t ret = (uint32_t)(state.node * (size_t)2654435761);
+			return ret;
 		}
 	};
 }

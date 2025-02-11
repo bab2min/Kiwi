@@ -32,6 +32,32 @@ namespace kiwi
 		}
 	};
 
+	template<size_t windowSize, ArchType arch, class VocabTy>
+	struct Hash<PathHash<lm::SbgState<windowSize, arch, VocabTy>>>
+	{
+		size_t operator()(const PathHash<lm::SbgState<windowSize, arch, VocabTy>>& state) const
+		{
+			size_t ret = 0;
+			if (sizeof(state) % sizeof(size_t))
+			{
+				auto ptr = reinterpret_cast<const uint32_t*>(&state);
+				for (size_t i = 0; i < sizeof(state) / sizeof(uint32_t); ++i)
+				{
+					ret = ptr[i] ^ ((ret << 3) | (ret >> (sizeof(size_t) * 8 - 3)));
+				}
+			}
+			else
+			{
+				auto ptr = reinterpret_cast<const size_t*>(&state);
+				for (size_t i = 0; i < sizeof(state) / sizeof(size_t); ++i)
+				{
+					ret = ptr[i] ^ ((ret << 3) | (ret >> (sizeof(size_t) * 8 - 3)));
+				}
+			}
+			return ret;
+		}
+	};
+
 	namespace lm
 	{
 		template<ArchType arch, class KeyType, size_t windowSize>
