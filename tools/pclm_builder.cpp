@@ -9,13 +9,14 @@
 using namespace std;
 using namespace kiwi;
 
-int run(const std::string& morphemeDef, const std::string& contextDef, const std::string& embedding, size_t minCnt, const std::string& output, bool reorderContextIdx = true)
+int run(const std::string& morphemeDef, const std::string& contextDef, const std::string& embedding, 
+	size_t minCnt, size_t maxLength, const std::string& output, bool reorderContextIdx = true)
 {
 	try
 	{
 		tutils::Timer timer;
 		KiwiBuilder::buildMorphData(morphemeDef, output, minCnt);
-		auto ret = lm::PcLangModelBase::build(contextDef, embedding, reorderContextIdx);
+		auto ret = lm::PcLangModelBase::build(contextDef, embedding, maxLength, reorderContextIdx);
 		ret.writeToFile(output + "/pclm.mdl");
 		double tm = timer.getElapsed();
 		cout << "Total: " << tm << " ms " << endl;
@@ -40,6 +41,7 @@ int main(int argc, const char* argv[])
 	ValueArg<string> cdef{ "c", "context-def", "context definition", true, "", "string" };
 	ValueArg<string> emb{ "e", "emb", "embedding file", true, "", "string" };
 	ValueArg<size_t> minCnt{ "n", "min-cnt", "min count of morpheme", false, 10, "int" };
+	ValueArg<size_t> maxLength{ "l", "max-length", "max length of n-grams", false, (size_t)-1, "int"};
 	ValueArg<string> output{ "o", "output", "", true, "", "string" };
 	SwitchArg preserveContextIdx{ "p", "preserve-context-idx", "preserve context index", false };
 
@@ -47,6 +49,7 @@ int main(int argc, const char* argv[])
 	cmd.add(cdef);
 	cmd.add(emb);
 	cmd.add(minCnt);
+	cmd.add(maxLength);
 	cmd.add(output);
 	cmd.add(preserveContextIdx);
 
@@ -60,5 +63,5 @@ int main(int argc, const char* argv[])
 		return -1;
 	}
 
-	return run(mdef, cdef, emb, minCnt, output, !preserveContextIdx);
+	return run(mdef, cdef, emb, minCnt, maxLength, output, !preserveContextIdx);
 }
