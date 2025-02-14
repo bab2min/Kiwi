@@ -15,16 +15,17 @@ namespace kiwi
 {
 	namespace lm
 	{
-		template<size_t windowSize, ArchType _arch, class VocabTy, bool quantized>
+		template<size_t windowSize, ArchType _arch, class VocabTy, class VlVocabTy, bool quantized>
 		class PcLMState;
 
-		template<ArchType arch, class KeyType, size_t windowSize, bool quantized = true>
+		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized = true>
 		class PcLangModel : public PcLangModelBase
 		{
 			using MyNode = Node<KeyType, uint32_t>;
 
 			std::unique_ptr<MyNode[]> nodeData;
 			std::unique_ptr<uint8_t[]> keyValueData;
+			const uint8_t* alignedKeyValueData = nullptr;
 			std::unique_ptr<int32_t[]> allRootValueData;
 			std::unique_ptr<uint8_t[]> allEmbs;
 			const uint8_t* contextEmbPtr = nullptr; // [numContexts, (dim + scale? + bias + confid + vts)]
@@ -130,13 +131,12 @@ namespace kiwi
 				while (node->lower)
 				{
 					auto* lowerNode = node + node->lower;
-					auto* kvs = &keyValueData[lowerNode->nextOffset * (sizeof(KeyType) + sizeof(int32_t))];
+					auto* kvs = &alignedKeyValueData[lowerNode->nextOffset];
 					int32_t found;
-					if (nst::searchKV<arch, KeyType, int32_t>(
+					if ((found = nst::searchKV<arch, VlKeyType, int32_t, int32_t>(
 						kvs,
 						lowerNode->numNexts,
-						k,
-						found) && found >= 0)
+						k)) > 0)
 					{
 						return lowerNode + found;
 					}
@@ -150,13 +150,12 @@ namespace kiwi
 				while (node->lower)
 				{
 					auto* lowerNode = node + node->lower;
-					auto* kvs = &keyValueData[lowerNode->nextOffset * (sizeof(KeyType) + sizeof(int32_t))];
+					auto* kvs = &alignedKeyValueData[lowerNode->nextOffset];
 					int32_t found;
-					if (nst::searchKV<arch, KeyType, int32_t>(
+					if ((found = nst::searchKV<arch, VlKeyType, int32_t, int32_t>(
 						kvs,
 						lowerNode->numNexts,
-						k,
-						found))
+						k)) != 0)
 					{
 						if (found >= 0)
 						{
@@ -174,7 +173,7 @@ namespace kiwi
 
 		public:
 			using VocabType = KeyType;
-			using LmStateType = PcLMState<windowSize, arch, VocabType, quantized>;
+			using LmStateType = PcLMState<windowSize, arch, VocabType, VlKeyType, quantized>;
 
 			PcLangModel(utils::MemoryObject&& mem);
 
@@ -196,23 +195,42 @@ namespace kiwi
 
 			uint32_t progressContextNode(int32_t& nodeIdx, KeyType next) const
 			{
+				if (std::is_same<KeyType, VlKeyType>::value)
+				{
+					return progressContextNodeVl(nodeIdx, next);
+				}
+
+				static constexpr size_t tMax = (1 << 16) - (1 << 10) * 2;
+				if (next < tMax)
+				{
+					return progressContextNodeVl(nodeIdx, next);
+				}
+				next -= tMax;
+				const size_t high = next >> 10, low = next & 0x3FF;
+				progressContextNodeVl(nodeIdx, tMax + high);
+				return progressContextNodeVl(nodeIdx, tMax + (1 << 10) + low);
+			}
+
+			uint32_t progressContextNodeVl(int32_t& nodeIdx, VlKeyType next) const
+			{
+				static constexpr size_t N = 64 / sizeof(VlKeyType) + 1;
 				while (1)
 				{
 					int32_t v;
 					auto* node = &nodeData[nodeIdx];
-					auto* kvs = &keyValueData[node->nextOffset * (sizeof(KeyType) + sizeof(int32_t))];
+					auto* kvs = &alignedKeyValueData[node->nextOffset];
 					if (node != nodeData.get())
 					{
 						//ScopedTimer<> timer(node->numNexts <= 16 ? 0 : node->numNexts <= 272 ? 1 : 2);
 						PREFETCH_T0(node + node->lower);
-						if (!nst::searchKV<arch, KeyType, int32_t>(
+						if ((v = nst::searchKV<arch, VlKeyType, int32_t, int32_t>(
 							kvs,
-							node->numNexts, next, v
-						))
+							node->numNexts, next
+						)) == 0)
 						{
 							if (!node->lower) return 0;
 							nodeIdx += node->lower;
-							PREFETCH_T0(&keyValueData[nodeData[nodeIdx].nextOffset * (sizeof(KeyType) + sizeof(int32_t))]);
+							PREFETCH_T0(&alignedKeyValueData[nodeData[nodeIdx].nextOffset]);
 							continue;
 						}
 					}
@@ -237,15 +255,14 @@ namespace kiwi
 						while (node->lower)
 						{
 							node += node->lower;
-							auto* lkvs = &keyValueData[node->nextOffset * (sizeof(KeyType) + sizeof(int32_t))];
+							auto* lkvs = &alignedKeyValueData[node->nextOffset];
 							int32_t lv;
 							if (node != nodeData.get())
 							{
-								//ScopedTimer<> timer(node->numNexts <= 16 ? 0 : node->numNexts <= 272 ? 1 : 2);
-								if (nst::searchKV<arch, KeyType, int32_t>(
+								if ((lv = nst::searchKV<arch, VlKeyType, int32_t, int32_t>(
 									lkvs,
-									node->numNexts, next, lv
-								))
+									node->numNexts, next
+								)) != 0)
 								{
 									if (lv > 0)
 									{
@@ -304,8 +321,8 @@ namespace kiwi
 				LmStateType* outStates, float* outScores) const;
 		};
 
-		template<size_t windowSize, ArchType _arch, class VocabTy, bool quantized>
-		struct PcLMState : public LmStateBase<PcLangModel<_arch, VocabTy, windowSize, quantized>>
+		template<size_t windowSize, ArchType _arch, class VocabTy, class VlVocabTy, bool quantized>
+		struct PcLMState : public LmStateBase<PcLangModel<_arch, VocabTy, VlVocabTy, windowSize, quantized>>
 		{
 			int32_t node = 0;
 			uint32_t contextIdx = 0;
@@ -328,14 +345,14 @@ namespace kiwi
 				return true;
 			}
 
-			float nextImpl(const PcLangModel<arch, VocabTy, windowSize, quantized>* lm, VocabTy next)
+			float nextImpl(const PcLangModel<arch, VocabTy, VlVocabTy, windowSize, quantized>* lm, VocabTy next)
 			{
 				return lm->progress(node, contextIdx, history, next);
 			}
 		};
 
-		template<ArchType _arch, class VocabTy, bool quantized>
-		struct PcLMState<0, _arch, VocabTy, quantized> : public LmStateBase<PcLangModel<_arch, VocabTy, 0, quantized>>
+		template<ArchType _arch, class VocabTy, class VlVocabTy, bool quantized>
+		struct PcLMState<0, _arch, VocabTy, VlVocabTy, quantized> : public LmStateBase<PcLangModel<_arch, VocabTy, VlVocabTy, 0, quantized>>
 		{
 			int32_t node = 0;
 			uint32_t contextIdx = 0;
@@ -352,7 +369,7 @@ namespace kiwi
 				return node == other.node;
 			}
 
-			float nextImpl(const PcLangModel<arch, VocabTy, windowSize, quantized>* lm, VocabTy next)
+			float nextImpl(const PcLangModel<arch, VocabTy, VlVocabTy, windowSize, quantized>* lm, VocabTy next)
 			{
 				std::array<VocabTy, windowSize + 1> history = { {0,} };
 				return lm->progress(node, contextIdx, history, next);
@@ -360,10 +377,10 @@ namespace kiwi
 		};
 	}
 
-	template<size_t windowSize, ArchType arch, class VocabTy, bool quantized>
-	struct Hash<lm::PcLMState<windowSize, arch, VocabTy, quantized>>
+	template<size_t windowSize, ArchType arch, class VocabTy, class VlVocabTy, bool quantized>
+	struct Hash<lm::PcLMState<windowSize, arch, VocabTy, VlVocabTy, quantized>>
 	{
-		size_t operator()(const lm::PcLMState<windowSize, arch, VocabTy, quantized>& state) const
+		size_t operator()(const lm::PcLMState<windowSize, arch, VocabTy, VlVocabTy, quantized>& state) const
 		{
 			size_t ret = (uint32_t)(state.node * (size_t)2654435761);
 			static constexpr size_t cmpStart = windowSize - sizeof(size_t) / sizeof(VocabTy);
@@ -373,10 +390,10 @@ namespace kiwi
 		}
 	};
 
-	template<ArchType arch, class VocabTy, bool quantized>
-	struct Hash<lm::PcLMState<0, arch, VocabTy, quantized>>
+	template<ArchType arch, class VocabTy, class VlVocabTy, bool quantized>
+	struct Hash<lm::PcLMState<0, arch, VocabTy, VlVocabTy, quantized>>
 	{
-		size_t operator()(const lm::PcLMState<0, arch, VocabTy, quantized>& state) const
+		size_t operator()(const lm::PcLMState<0, arch, VocabTy, VlVocabTy, quantized>& state) const
 		{
 			size_t ret = (uint32_t)(state.node * (size_t)2654435761);
 			return ret;

@@ -17,10 +17,10 @@ namespace kiwi
 		return (n + multiple - 1) / multiple * multiple;
 	}
 
-	template<size_t windowSize, ArchType arch, class VocabTy, bool quantized>
-	struct MorphemeEvaluator<lm::PcLMState<windowSize, arch, VocabTy, quantized>>
+	template<size_t windowSize, ArchType arch, class VocabTy, class VlVocabTy, bool quantized>
+	struct MorphemeEvaluator<lm::PcLMState<windowSize, arch, VocabTy, VlVocabTy, quantized>>
 	{
-		using LmState = lm::PcLMState<windowSize, arch, VocabTy, quantized>;
+		using LmState = lm::PcLMState<windowSize, arch, VocabTy, VlVocabTy, quantized>;
 
 		template<PathEvaluatingMode mode>
 		void eval(
@@ -47,7 +47,7 @@ namespace kiwi
 			thread_local Vector<VocabTy> nextWids, nextDistantWids;
 			thread_local Vector<float> scores;
 
-			const auto* langMdl = static_cast<const lm::PcLangModel<arch, VocabTy, windowSize, quantized>*>(kw->getLangModel());
+			const auto* langMdl = static_cast<const lm::PcLangModel<arch, VocabTy, VlVocabTy, windowSize, quantized>*>(kw->getLangModel());
 			const Morpheme* morphBase = kw->morphemes.data();
 			const auto spacePenalty = kw->spacePenalty;
 			const bool allowedSpaceBetweenChunk = kw->spaceTolerance > 0;
@@ -320,16 +320,26 @@ namespace kiwi
 			arr -= std::log(arr.exp().sum());
 		}
 
-		template<ArchType arch, class KeyType, size_t windowSize, bool quantized>
-		PcLangModel<arch, KeyType, windowSize, quantized>::PcLangModel(utils::MemoryObject&& mem) : PcLangModelBase{ mem }
+		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
+		PcLangModel<arch, KeyType, VlKeyType, windowSize, quantized>::PcLangModel(utils::MemoryObject&& mem) : PcLangModelBase{ mem }
 		{
 			auto* ptr = reinterpret_cast<const char*>(mem.get());
 
 			Vector<uint32_t> nodeSizes(header.numNodes);
 			streamvbyte_decode_0124(reinterpret_cast<const uint8_t*>(ptr + header.nodeOffset), nodeSizes.data(), header.numNodes);
-			keyValueData = make_unique<uint8_t[]>((header.numNodes - 1) * (sizeof(KeyType) + sizeof(int32_t)));
-			auto keyData = make_unique<KeyType[]>(header.numNodes - 1);
-			if (std::is_same<KeyType, uint32_t>::value)
+
+			static constexpr size_t kvAlignment = ArchInfo<arch>::alignment;
+			size_t paddedKVSize = 0;
+			for (size_t i = 0; i < nodeSizes.size(); ++i)
+			{
+				if (!nodeSizes[i]) continue;
+				paddedKVSize += padMultipleOf(nodeSizes[i] * (sizeof(VlKeyType) + sizeof(int32_t)), kvAlignment);
+			}
+
+			keyValueData = make_unique<uint8_t[]>(paddedKVSize + kvAlignment);
+			alignedKeyValueData = reinterpret_cast<uint8_t*>(padMultipleOf(reinterpret_cast<size_t>(keyValueData.get()), kvAlignment));
+			auto keyData = make_unique<VlKeyType[]>(header.numNodes - 1);
+			if (std::is_same<VlKeyType, uint32_t>::value)
 			{
 				streamvbyte_decode(reinterpret_cast<const uint8_t*>(ptr + header.keyOffset), (uint32_t*)keyData.get(), header.numNodes - 1);
 			}
@@ -366,9 +376,8 @@ namespace kiwi
 					}
 					node.value = values[i];
 					node.numNexts = nodeSizes[i];
-					node.nextOffset = nextOffset;
+					keyRanges.emplace_back(std::array<size_t, 3>{ nonLeafIdx, (size_t)nextOffset, (size_t)(nextOffset + node.numNexts) });
 					nextOffset += nodeSizes[i];
-					keyRanges.emplace_back(std::array<size_t, 3>{ nonLeafIdx, (size_t)node.nextOffset, (size_t)(node.nextOffset + node.numNexts) });
 					nonLeafIdx++;
 				}
 				else
@@ -386,22 +395,23 @@ namespace kiwi
 				}
 			}
 
-			uint8_t* kvDataPtr = keyValueData.get();
+			uint8_t* kvDataPtr = const_cast<uint8_t*>(alignedKeyValueData);
 			nonLeafIdx = 0;
 			nextOffset = 0;
 			for (size_t i = 0; i < header.numNodes; ++i)
 			{
 				if (!nodeSizes[i]) continue;
 				auto& node = nodeData[nonLeafIdx];
-				memcpy(kvDataPtr, &keyData[nextOffset], node.numNexts * sizeof(KeyType));
-				kvDataPtr += node.numNexts * sizeof(KeyType);
-				memcpy(kvDataPtr, &valueData[nextOffset], node.numNexts * sizeof(int32_t));
-				kvDataPtr += node.numNexts * sizeof(int32_t);
+				node.nextOffset = (uint32_t)(kvDataPtr - alignedKeyValueData);
+				memcpy(kvDataPtr, &keyData[nextOffset], node.numNexts * sizeof(VlKeyType));
+				memcpy(kvDataPtr + node.numNexts * sizeof(VlKeyType), &valueData[nextOffset], node.numNexts * sizeof(int32_t));
+				kvDataPtr += node.numNexts * (sizeof(VlKeyType) + sizeof(int32_t));
 				nextOffset += node.numNexts;
 				nonLeafIdx++;
 			}
 
 			allRootValueData = make_unique<int32_t[]>(header.vocabSize);
+			memset(allRootValueData.get(), 0, sizeof(int32_t) * header.vocabSize);
 			for (size_t i = 0; i < nodeData[0].numNexts; ++i)
 			{
 				allRootValueData[keyData[i]] = valueData[i];
@@ -410,7 +420,7 @@ namespace kiwi
 			for (size_t i = 0; i < nonLeafIdx; ++i)
 			{
 				auto& node = nodeData[i];
-				nst::prepareKV<arch, KeyType, int32_t>(&keyValueData[node.nextOffset * (sizeof(KeyType) + sizeof(int32_t))], node.numNexts, tempBuf);
+				nst::prepareKV<arch, VlKeyType, int32_t>(const_cast<uint8_t*>(&alignedKeyValueData[node.nextOffset]), node.numNexts, tempBuf);
 			}
 
 			Deque<MyNode*> dq;
@@ -419,14 +429,13 @@ namespace kiwi
 				auto p = dq.front();
 				for (size_t i = 0; i < p->numNexts; ++i)
 				{
-					auto k = keyData[p->nextOffset + i];
-					auto v = valueData[p->nextOffset + i];
-					if (v <= 0) continue;
-					auto* child = &p[v];
-					child->lower = findLowerNode(p, k) - child;
+					auto kv = nst::extractKV<arch, VlKeyType, int32_t>(&alignedKeyValueData[p->nextOffset], p->numNexts, i);
+					if (kv.second <= 0) continue;
+					auto* child = &p[kv.second];
+					child->lower = findLowerNode(p, kv.first) - child;
 					if (child->value == 0)
 					{
-						child->value = findLowerValue(p, k);
+						child->value = findLowerValue(p, kv.first);
 					}
 					dq.emplace_back(child);
 				}
@@ -564,8 +573,8 @@ namespace kiwi
 			}
 		}
 
-		template<ArchType arch, class KeyType, size_t windowSize, bool quantized>
-		float PcLangModel<arch, KeyType, windowSize, quantized>::progress(int32_t& nodeIdx,
+		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
+		float PcLangModel<arch, KeyType, VlKeyType, windowSize, quantized>::progress(int32_t& nodeIdx,
 			uint32_t& contextIdx,
 			std::array<KeyType, windowSize + 1>& history,
 			KeyType next) const
@@ -673,9 +682,9 @@ namespace kiwi
 		}
 
 		// specialization for windowSize > 0
-		template<ArchType arch, class KeyType, size_t windowSize, bool quantized>
+		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
 		template<size_t _windowSize>
-		auto PcLangModel<arch, KeyType, windowSize, quantized>::nextState(
+		auto PcLangModel<arch, KeyType, VlKeyType, windowSize, quantized>::nextState(
 			const typename std::enable_if<(_windowSize > 0), LmStateType>::type& state, KeyType next) const -> LmStateType
 		{
 			LmStateType ret = state;
@@ -689,9 +698,9 @@ namespace kiwi
 		}
 
 		// specialization for windowSize == 0
-		template<ArchType arch, class KeyType, size_t windowSize, bool quantized>
+		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
 		template<size_t _windowSize>
-		auto PcLangModel<arch, KeyType, windowSize, quantized>::nextState(
+		auto PcLangModel<arch, KeyType, VlKeyType, windowSize, quantized>::nextState(
 			const typename std::enable_if<_windowSize == 0, LmStateType>::type& state, KeyType next) const -> LmStateType
 		{
 			LmStateType ret = state;
@@ -709,9 +718,9 @@ namespace kiwi
 			return make_pair(a >> 32, a & 0xFFFFFFFF);
 		}
 
-		template<ArchType arch, class KeyType, size_t windowSize, bool quantized>
+		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
 		template<size_t _windowSize>
-		void PcLangModel<arch, KeyType, windowSize, quantized>::progressMatrix(
+		void PcLangModel<arch, KeyType, VlKeyType, windowSize, quantized>::progressMatrix(
 			const typename std::enable_if<(_windowSize > 0), LmStateType>::type* prevStates, const KeyType* nextIds,
 			size_t prevStateSize, size_t nextIdSize, size_t numValidDistantTokens,
 			LmStateType* outStates, float* outScores) const
@@ -894,6 +903,9 @@ namespace kiwi
 
 			if constexpr (quantized)
 			{
+				//thread_local Map<pair<uint32_t, uint32_t>, size_t> shapeCnt;
+				//shapeCnt[make_pair(uniqInputSize + uniqHistorySize, uniqOutputSize)]++;
+				//ScopedTimer<> timer{ 0 };
 				qgemm::scatteredGEMMOpt<arch>(
 					uniqInputSize + uniqHistorySize, uniqOutputSize, header.dim,
 					getContextQuantEmb(0), contextIdcs2.data(), contextEmbStride(),
@@ -963,9 +975,9 @@ namespace kiwi
 			}
 		}
 
-		template<ArchType arch, class KeyType, size_t windowSize, bool quantized>
+		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
 		template<size_t _windowSize>
-		void PcLangModel<arch, KeyType, windowSize, quantized>::progressMatrix(
+		void PcLangModel<arch, KeyType, VlKeyType, windowSize, quantized>::progressMatrix(
 			const typename std::enable_if<_windowSize == 0, LmStateType>::type* prevStates, const KeyType* nextIds,
 			size_t prevStateSize, size_t nextIdSize, size_t numValidDistantTokens,
 			LmStateType* outStates, float* outScores) const
@@ -1076,7 +1088,8 @@ namespace kiwi
 				throw IOException{ "Cannot open file : " + contextDefinition };
 			}
 
-			uint32_t maxClusterId = 0;
+			uint32_t maxClusterId = 0, maxContextId = 0;
+			size_t keySize = 0;
 			using Node = utils::TrieNodeEx<uint32_t, uint32_t, utils::ConstAccess<Map<uint32_t, int32_t>>>;
 			utils::ContinuousTrie<Node> trie(1);
 			{
@@ -1100,6 +1113,7 @@ namespace kiwi
 						auto id = stol(tokens[i].begin(), tokens[i].end());
 						if (id < 0) throw IOException{ "Invalid format : " + contextDefinition };
 						context.push_back(id);
+						maxContextId = max(maxContextId, (uint32_t)id);
 					}
 					if (context.size() > maxContextLength)
 					{
@@ -1141,11 +1155,47 @@ namespace kiwi
 					}
 				}
 
+				if (maxContextId <= 0xFFFF)
+				{
+					keySize = 2;
+				}
+				else if (maxContextId <= 0xFFFFF)
+				{
+					keySize = 3; // variable length key
+				}
+				else
+				{
+					keySize = 4;
+				}
+
 				for (auto& c : contextMap)
 				{
 					for (auto& p : c)
 					{
-						trie.build(p.first.begin(), p.first.end(), p.second + 1);
+						if (keySize == 3)
+						{
+							static constexpr size_t tMax = (1 << 16) - (1 << 10) * 2;
+							context.clear();
+							for (auto id : p.first)
+							{
+								if (id < tMax)
+								{
+									context.emplace_back(id);
+								}
+								else
+								{
+									id -= tMax;
+									const size_t high = id >> 10, low = id & 0x3FF;
+									context.emplace_back(tMax + high);
+									context.emplace_back(tMax + (1 << 10) + low);
+								}
+							}
+							trie.build(context.begin(), context.end(), p.second + 1);
+						}
+						else
+						{
+							trie.build(p.first.begin(), p.first.end(), p.second + 1);
+						}
 					}
 				}
 			}
@@ -1278,7 +1328,7 @@ namespace kiwi
 			header.dim = dim;
 			header.contextSize = contextSize;
 			header.vocabSize = outputSize;
-			header.keySize = 4;
+			header.keySize = keySize;
 			header.windowSize = windowSize;
 			header.numNodes = nodeSizes.size();
 
@@ -1329,31 +1379,31 @@ namespace kiwi
 			return mem;
 		}
 
-		template<ArchType arch, class KeyType, size_t windowSize, bool quantized>
-		void* PcLangModel<arch, KeyType, windowSize, quantized>::getFindBestPathFn() const
+		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
+		void* PcLangModel<arch, KeyType, VlKeyType, windowSize, quantized>::getFindBestPathFn() const
 		{
-			return (void*)&BestPathFinder::findBestPath<PcLangModel<arch, KeyType, windowSize, quantized>>;
+			return (void*)&BestPathFinder::findBestPath<PcLangModel<arch, KeyType, VlKeyType, windowSize, quantized>>;
 		}
 
-		template<ArchType arch, class KeyType, size_t windowSize, bool quantized>
-		void* PcLangModel<arch, KeyType, windowSize, quantized>::getNewJoinerFn() const
+		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
+		void* PcLangModel<arch, KeyType, VlKeyType, windowSize, quantized>::getNewJoinerFn() const
 		{
 			return (void*)&newJoinerWithKiwi<LmStateType>;
 		}
 
-		template<ArchType archType, class KeyTy, bool useDistantTokens, bool quantized>
+		template<ArchType archType, class KeyTy, class VlKeyType, bool useDistantTokens, bool quantized>
 		inline std::unique_ptr<PcLangModelBase> createOptimizedModelWithWindowSize(utils::MemoryObject&& mem)
 		{
 			auto& header = *reinterpret_cast<const PcLangModelHeader*>(mem.get());
 			if (!useDistantTokens)
 			{
-				return make_unique<PcLangModel<archType, KeyTy, 0, quantized>>(std::move(mem));
+				return make_unique<PcLangModel<archType, KeyTy, VlKeyType, 0, quantized>>(std::move(mem));
 			}
 
 			switch (header.windowSize)
 			{
 			case 7:
-				return make_unique<PcLangModel<archType, KeyTy, 7, quantized>>(std::move(mem));
+				return make_unique<PcLangModel<archType, KeyTy, VlKeyType, 7, quantized>>(std::move(mem));
 			default:
 				throw std::runtime_error{ "Unsupported `window_size` : " + std::to_string((size_t)header.windowSize) };
 			};
@@ -1366,9 +1416,11 @@ namespace kiwi
 			switch (header.keySize)
 			{
 			case 2:
-				return createOptimizedModelWithWindowSize<archType, uint16_t, useDistantTokens, quantized>(std::move(mem));
+				return createOptimizedModelWithWindowSize<archType, uint16_t, uint16_t, useDistantTokens, quantized>(std::move(mem));
+			case 3:
+				return createOptimizedModelWithWindowSize<archType, uint32_t, uint16_t, useDistantTokens, quantized>(std::move(mem));
 			case 4:
-				return createOptimizedModelWithWindowSize<archType, uint32_t, useDistantTokens, quantized>(std::move(mem));
+				return createOptimizedModelWithWindowSize<archType, uint32_t, uint32_t, useDistantTokens, quantized>(std::move(mem));
 			default:
 				throw std::runtime_error{ "Unsupported `key_size` : " + std::to_string((size_t)header.keySize) };
 			}

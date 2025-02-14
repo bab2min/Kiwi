@@ -367,7 +367,7 @@ namespace kiwi
 			}
 		};
 
-		template<ArchType _arch, class VocabTy, bool _transposed = false>
+		template<ArchType _arch, class VocabTy, bool _transposed>
 		struct KnLMState : public LmStateBase<KnLangModel<_arch, VocabTy, _transposed>>
 		{
 			int32_t node = 0;

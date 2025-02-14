@@ -16,16 +16,16 @@
 	template bool detail::searchImpl<arch>(const uint32_t*, size_t, uint32_t, size_t&);\
 	template bool detail::searchImpl<arch>(const uint64_t*, size_t, uint64_t, size_t&);\
 	template bool detail::searchImpl<arch>(const char16_t*, size_t, char16_t, size_t&);\
-	template bool detail::searchKVImpl<arch>(const void*, size_t, uint8_t, uint32_t&);\
-	template bool detail::searchKVImpl<arch>(const void*, size_t, uint16_t, uint32_t&);\
-	template bool detail::searchKVImpl<arch>(const void*, size_t, uint32_t, uint32_t&);\
-	template bool detail::searchKVImpl<arch>(const void*, size_t, uint64_t, uint32_t&);\
-	template bool detail::searchKVImpl<arch>(const void*, size_t, char16_t, uint32_t&);\
-	template bool detail::searchKVImpl<arch>(const void*, size_t, uint8_t, uint64_t&);\
-	template bool detail::searchKVImpl<arch>(const void*, size_t, uint16_t, uint64_t&);\
-	template bool detail::searchKVImpl<arch>(const void*, size_t, uint32_t, uint64_t&);\
-	template bool detail::searchKVImpl<arch>(const void*, size_t, uint64_t, uint64_t&);\
-	template bool detail::searchKVImpl<arch>(const void*, size_t, char16_t, uint64_t&);\
+	template uint32_t detail::searchKVImpl<arch, uint8_t, uint32_t>(const void*, size_t, uint8_t);\
+	template uint32_t detail::searchKVImpl<arch, uint16_t, uint32_t>(const void*, size_t, uint16_t);\
+	template uint32_t detail::searchKVImpl<arch, uint32_t, uint32_t>(const void*, size_t, uint32_t);\
+	template uint32_t detail::searchKVImpl<arch, uint64_t, uint32_t>(const void*, size_t, uint64_t);\
+	template uint32_t detail::searchKVImpl<arch, char16_t, uint32_t>(const void*, size_t, char16_t);\
+	template uint64_t detail::searchKVImpl<arch, uint8_t, uint64_t>(const void*, size_t, uint8_t);\
+	template uint64_t detail::searchKVImpl<arch, uint16_t, uint64_t>(const void*, size_t, uint16_t);\
+	template uint64_t detail::searchKVImpl<arch, uint32_t, uint64_t>(const void*, size_t, uint32_t);\
+	template uint64_t detail::searchKVImpl<arch, uint64_t, uint64_t>(const void*, size_t, uint64_t);\
+	template uint64_t detail::searchKVImpl<arch, char16_t, uint64_t>(const void*, size_t, char16_t);\
 	template Vector<size_t> detail::reorderImpl<arch>(const uint8_t*, size_t);\
 	template Vector<size_t> detail::reorderImpl<arch>(const uint16_t*, size_t);\
 	template Vector<size_t> detail::reorderImpl<arch>(const uint32_t*, size_t);\
@@ -37,6 +37,14 @@
 #include <immintrin.h>
 #elif CPUINFO_ARCH_ARM || CPUINFO_ARCH_ARM64 || KIWI_ARCH_ARM64
 #include <arm_neon.h>
+#endif
+
+#if defined(_MSC_VER)
+#define FORCE_INLINE __forceinline
+#elif defined(__GNUC__)
+#define FORCE_INLINE __attribute__((always_inline))
+#else
+#define FORCE_INLINE inline
 #endif
 
 #ifdef __GNUC__
@@ -167,9 +175,9 @@ namespace kiwi
 		}
 
 		template<ArchType arch, class IntTy, class ValueTy>
-		bool detail::searchKVImpl(const void* kv, size_t size, IntTy target, ValueTy& ret)
+		ValueTy detail::searchKVImpl(const void* kv, size_t size, IntTy target)
 		{
-			return OptimizedImpl<arch>::searchKV(kv, size, target, ret);
+			return OptimizedImpl<arch>::searchKV<IntTy, ValueTy>(kv, size, target);
 		}
 
 		template<ArchType arch>
@@ -196,17 +204,16 @@ namespace kiwi
 			}
 
 			template<class IntTy, class ValueTy>
-			static bool searchKV(const void* kv, size_t size, IntTy target, ValueTy& ret)
+			static ValueTy searchKV(const void* kv, size_t size, IntTy target)
 			{
 				size_t idx;
 				const IntTy* keys = reinterpret_cast<const IntTy*>(kv);
 				const ValueTy* values = reinterpret_cast<const ValueTy*>(keys + size);
 				if (search(keys, size, target, idx))
 				{
-					ret = values[idx];
-					return true;
+					return values[idx];
 				}
-				else return false;
+				else return 0;
 			}
 		};
 		INSTANTIATE_IMPL(ArchType::none);
@@ -243,17 +250,16 @@ namespace kiwi
 			}
 
 			template<class IntTy, class ValueTy>
-			static bool searchKV(const void* kv, size_t size, IntTy target, ValueTy& ret)
+			static ValueTy searchKV(const void* kv, size_t size, IntTy target)
 			{
 				size_t idx;
 				const IntTy* keys = reinterpret_cast<const IntTy*>(kv);
 				const ValueTy* values = reinterpret_cast<const ValueTy*>(keys + size);
 				if (search(keys, size, target, idx))
 				{
-					ret = values[idx];
-					return true;
+					return values[idx];
 				}
-				else return false;
+				else return 0;
 			}
 		};
 		INSTANTIATE_IMPL(ArchType::balanced);
@@ -267,7 +273,7 @@ namespace kiwi
 	{
 		template<class IntTy>
 		ARCH_TARGET("sse2")
-		inline bool testEq(__m128i p, size_t offset, size_t size, size_t& ret)
+		FORCE_INLINE bool testEq(__m128i p, size_t offset, size_t size, size_t& ret)
 		{
 			uint32_t m = _mm_movemask_epi8(p);
 			uint32_t b = utils::countTrailingZeroes(m);
@@ -281,7 +287,7 @@ namespace kiwi
 
 		template<size_t n, class IntTy>
 		ARCH_TARGET("sse2")
-		bool nstSearchSSE2(const IntTy* keys, size_t size, IntTy target, size_t& ret)
+		FORCE_INLINE bool nstSearchSSE2(const IntTy* keys, size_t size, IntTy target, size_t& ret)
 		{
 			size_t i = 0, r;
 
@@ -443,7 +449,7 @@ namespace kiwi
 
 		template<size_t n, class IntTy, class ValueTy>
 		ARCH_TARGET("sse2")
-		bool nstSearchKVSSE2(const uint8_t* kv, size_t size, IntTy target, ValueTy& ret)
+		FORCE_INLINE ValueTy nstSearchKVSSE2(const uint8_t* kv, size_t size, IntTy target)
 		{
 			size_t i = 0, r;
 
@@ -459,6 +465,31 @@ namespace kiwi
 			case 4:
 				ptarget = _mm_set1_epi32(target);
 				break;
+			}
+
+			if (size < n)
+			{
+				pkey = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&kv[i * (sizeof(IntTy) + sizeof(ValueTy))]));
+				switch (sizeof(IntTy))
+				{
+				case 1:
+					peq = _mm_cmpeq_epi8(ptarget, pkey);
+					break;
+				case 2:
+					peq = _mm_cmpeq_epi16(ptarget, pkey);
+					break;
+				case 4:
+					peq = _mm_cmpeq_epi32(ptarget, pkey);
+					break;
+				}
+
+				if (testEq<IntTy>(peq, 0, size - i, r))
+				{
+					const size_t groupSize = std::min(n - 1, size - i);
+					const ValueTy* values = reinterpret_cast<const ValueTy*>(&kv[i * (sizeof(IntTy) + sizeof(ValueTy)) + groupSize * sizeof(IntTy)]);
+					return values[r];
+				}
+				return 0;
 			}
 
 			while (i < size)
@@ -484,14 +515,13 @@ namespace kiwi
 				{
 					const size_t groupSize = std::min(n - 1, size - i);
 					const ValueTy* values = reinterpret_cast<const ValueTy*>(&kv[i * (sizeof(IntTy) + sizeof(ValueTy)) + groupSize * sizeof(IntTy)]);
-					ret = values[r];
-					return true;
+					return values[r];
 				}
 
 				r = utils::popcount((uint32_t)_mm_movemask_epi8(pgt)) / sizeof(IntTy);
 				i = i * n + (n - 1) * (r + 1);
 			}
-			return false;
+			return 0;
 		}
 
 		template<>
@@ -514,10 +544,10 @@ namespace kiwi
 			}
 
 			template<class IntTy, class ValueTy>
-			static bool searchKV(const void* kv, size_t size, IntTy target, ValueTy& ret)
+			static ValueTy searchKV(const void* kv, size_t size, IntTy target)
 			{
 				using SignedIntTy = typename SignedType<IntTy>::type;
-				return nstSearchKVSSE2<packetSize / sizeof(IntTy) + 1>((const uint8_t*)kv, size, (SignedIntTy)target, ret);
+				return nstSearchKVSSE2<packetSize / sizeof(IntTy) + 1, SignedIntTy, ValueTy>((const uint8_t*)kv, size, target);
 			}
 		};
 		INSTANTIATE_IMPL(ArchType::sse2);
@@ -532,7 +562,7 @@ namespace kiwi
 	{
 		template<class IntTy>
 		ARCH_TARGET("avx2")
-		inline bool testEq(__m256i p, size_t offset, size_t size, size_t& ret)
+		FORCE_INLINE bool testEq(__m256i p, size_t offset, size_t size, size_t& ret)
 		{
 			uint32_t m = _mm256_movemask_epi8(p);
 			uint32_t b = utils::countTrailingZeroes(m);
@@ -544,7 +574,7 @@ namespace kiwi
 			return false;
 		}
 
-		inline bool testEqMask(uint64_t m, size_t offset, size_t size, size_t& ret)
+		FORCE_INLINE bool testEqMask(uint64_t m, size_t offset, size_t size, size_t& ret)
 		{
 			uint32_t b = utils::countTrailingZeroes(m);
 			if (m && (offset + b) < size)
@@ -557,7 +587,7 @@ namespace kiwi
 
 		template<size_t n, class IntTy>
 		ARCH_TARGET("avx2")
-		bool nstSearchAVX2(const IntTy* keys, size_t size, IntTy target, size_t& ret)
+		FORCE_INLINE bool nstSearchAVX2(const IntTy* keys, size_t size, IntTy target, size_t& ret)
 		{
 			size_t i = 0, r;
 
@@ -746,8 +776,13 @@ namespace kiwi
 
 		template<size_t n, class IntTy, class ValueTy>
 		ARCH_TARGET("avx2")
-		bool nstSearchKVAVX2(const uint8_t* kv, size_t size, IntTy target, ValueTy& ret)
+		FORCE_INLINE ValueTy nstSearchKVAVX2(const uint8_t* kv, size_t size, IntTy target)
 		{
+			if (size < (n + 1) / 2)
+			{
+				return nstSearchKVSSE2<(n + 1) / 2, IntTy, ValueTy>(kv, size, target);
+			}
+
 			size_t i = 0, r;
 
 			__m256i ptarget, pkey, peq, pgt;
@@ -765,6 +800,34 @@ namespace kiwi
 			case 8:
 				ptarget = _mm256_set1_epi64x(target);
 				break;
+			}
+
+			if (size < n)
+			{
+				pkey = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&kv[i * (sizeof(IntTy) + sizeof(ValueTy))]));
+				switch (sizeof(IntTy))
+				{
+				case 1:
+					peq = _mm256_cmpeq_epi8(ptarget, pkey);
+					break;
+				case 2:
+					peq = _mm256_cmpeq_epi16(ptarget, pkey);
+					break;
+				case 4:
+					peq = _mm256_cmpeq_epi32(ptarget, pkey);
+					break;
+				case 8:
+					peq = _mm256_cmpeq_epi64(ptarget, pkey);
+					break;
+				}
+
+				if (testEq<IntTy>(peq, 0, size - i, r))
+				{
+					const size_t groupSize = std::min(n - 1, size - i);
+					const ValueTy* values = reinterpret_cast<const ValueTy*>(&kv[i * (sizeof(IntTy) + sizeof(ValueTy)) + groupSize * sizeof(IntTy)]);
+					return values[r];
+				}
+				return 0;
 			}
 
 			while (i < size)
@@ -794,19 +857,18 @@ namespace kiwi
 				{
 					const size_t groupSize = std::min(n - 1, size - i);
 					const ValueTy* values = reinterpret_cast<const ValueTy*>(&kv[i * (sizeof(IntTy) + sizeof(ValueTy)) + groupSize * sizeof(IntTy)]);
-					ret = values[r];
-					return true;
+					return values[r];
 				}
 
 				r = utils::popcount((uint32_t)_mm256_movemask_epi8(pgt)) / sizeof(IntTy);
 				i = i * n + (n - 1) * (r + 1);
 			}
-			return false;
+			return 0;
 		}
 
 		template<size_t n, class IntTy>
 		ARCH_TARGET("avx512bw")
-		bool nstSearchAVX512(const IntTy* keys, size_t size, IntTy target, size_t& ret)
+		FORCE_INLINE bool nstSearchAVX512(const IntTy* keys, size_t size, IntTy target, size_t& ret)
 		{
 			size_t i = 0, r;
 
@@ -996,8 +1058,13 @@ namespace kiwi
 
 		template<size_t n, class IntTy, class ValueTy>
 		ARCH_TARGET("avx512bw")
-		bool nstSearchKVAVX512(const uint8_t* kv, size_t size, IntTy target, ValueTy& ret)
+		FORCE_INLINE ValueTy nstSearchKVAVX512(const uint8_t* kv, size_t size, IntTy target)
 		{
+			if (size < (n + 1) / 2)
+			{
+				return nstSearchKVAVX2<(n + 1) / 2, IntTy, ValueTy>(kv, size, target);
+			}
+
 			size_t i = 0, r;
 			const IntTy* keys;
 
@@ -1017,6 +1084,35 @@ namespace kiwi
 			case 8:
 				ptarget = _mm512_set1_epi64(target);
 				break;
+			}
+
+			if (size < n)
+			{
+				keys = reinterpret_cast<const IntTy*>(&kv[i * (sizeof(IntTy) + sizeof(ValueTy))]);
+				pkey = _mm512_loadu_si512(reinterpret_cast<const __m512i*>(keys));
+				switch (sizeof(IntTy))
+				{
+				case 1:
+					peq = _mm512_cmpeq_epi8_mask(ptarget, pkey);
+					break;
+				case 2:
+					peq = _mm512_cmpeq_epi16_mask(ptarget, pkey);
+					break;
+				case 4:
+					peq = _mm512_cmpeq_epi32_mask(ptarget, pkey);
+					break;
+				case 8:
+					peq = _mm512_cmpeq_epi64_mask(ptarget, pkey);
+					break;
+				}
+
+				if (testEqMask(peq, 0, size - i, r))
+				{
+					const size_t groupSize = std::min(n - 1, size - i);
+					const ValueTy* values = reinterpret_cast<const ValueTy*>(&keys[groupSize]);
+					return values[r];
+				}
+				return 0;
 			}
 
 			while (i < size)
@@ -1047,14 +1143,13 @@ namespace kiwi
 				{
 					const size_t groupSize = std::min(n - 1, size - i);
 					const ValueTy* values = reinterpret_cast<const ValueTy*>(&keys[groupSize]);
-					ret = values[r];
-					return true;
+					return values[r];
 				}
 
 				r = utils::popcount(pgt);
 				i = i * n + (n - 1) * (r + 1);
 			}
-			return false;
+			return 0;
 		}
 
 		template<>
@@ -1077,10 +1172,10 @@ namespace kiwi
 			}
 
 			template<class IntTy, class ValueTy>
-			static bool searchKV(const void* kv, size_t size, IntTy target, ValueTy& ret)
+			static ValueTy searchKV(const void* kv, size_t size, IntTy target)
 			{
 				using SignedIntTy = typename SignedType<IntTy>::type;
-				return nstSearchKVSSE2<packetSize / sizeof(IntTy) + 1>((const uint8_t*)kv, size, (SignedIntTy)target, ret);
+				return nstSearchKVSSE2<packetSize / sizeof(IntTy) + 1, SignedIntTy, ValueTy>((const uint8_t*)kv, size, target);
 			}
 		};
 		INSTANTIATE_IMPL(ArchType::sse4_1);
@@ -1105,10 +1200,10 @@ namespace kiwi
 			}
 
 			template<class IntTy, class ValueTy>
-			static bool searchKV(const void* kv, size_t size, IntTy target, ValueTy& ret)
+			static ValueTy searchKV(const void* kv, size_t size, IntTy target)
 			{
 				using SignedIntTy = typename SignedType<IntTy>::type;
-				return nstSearchKVAVX2<packetSize / sizeof(IntTy) + 1>((const uint8_t*)kv, size, (SignedIntTy)target, ret);
+				return nstSearchKVAVX2<packetSize / sizeof(IntTy) + 1, SignedIntTy, ValueTy>((const uint8_t*)kv, size, target);
 			}
 		};
 		INSTANTIATE_IMPL(ArchType::avx2);
@@ -1139,10 +1234,10 @@ namespace kiwi
 			}
 
 			template<class IntTy, class ValueTy>
-			static bool searchKV(const void* kv, size_t size, IntTy target, ValueTy& ret)
+			static ValueTy searchKV(const void* kv, size_t size, IntTy target)
 			{
 				using SignedIntTy = typename SignedType<IntTy>::type;
-				return nstSearchKVAVX512<packetSize / sizeof(IntTy) + 1>((const uint8_t*)kv, size, (SignedIntTy)target, ret);
+				return nstSearchKVAVX512<packetSize / sizeof(IntTy) + 1, SignedIntTy, ValueTy>((const uint8_t*)kv, size, target);
 			}
 		};
 		INSTANTIATE_IMPL(ArchType::avx512bw);

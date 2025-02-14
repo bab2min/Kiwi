@@ -21,7 +21,7 @@ namespace kiwi
 			bool searchImpl(const IntTy* keys, size_t size, IntTy target, size_t& ret);
 
 			template<ArchType arch, class IntTy, class ValueTy>
-			bool searchKVImpl(const void* keys, size_t size, IntTy target, ValueTy& ret);
+			ValueTy searchKVImpl(const void* keys, size_t size, IntTy target);
 
 			template<ArchType arch, class IntTy>
 			Vector<size_t> reorderImpl(const IntTy* keys, size_t size);
@@ -87,6 +87,25 @@ namespace kiwi
 			}
 		}
 
+		template<ArchType arch, class IntTy, class Value>
+		std::pair<IntTy, Value> extractKV(const void* kv, size_t totSize, size_t idx)
+		{
+			const size_t packetSize = detail::getPacketSizeImpl<arch>() / sizeof(IntTy);
+			if (packetSize <= 1)
+			{
+				const auto* key = reinterpret_cast<const IntTy*>(kv);
+				const auto* value = reinterpret_cast<const Value*>(key + totSize);
+				return std::make_pair(key[idx], value[idx]);
+			}
+
+			const size_t groupIdx = idx / packetSize;
+			const size_t groupOffset = idx % packetSize;
+			const auto* group = reinterpret_cast<const uint8_t*>(kv) + groupIdx * packetSize * (sizeof(IntTy) + sizeof(Value));
+			const auto* key = reinterpret_cast<const IntTy*>(group);
+			const auto* value = reinterpret_cast<const Value*>(key + std::min(packetSize, totSize - groupIdx * packetSize));
+			return std::make_pair(key[groupOffset], value[groupOffset]);
+		}
+
 		template<ArchType arch, class IntTy, class Value, class Out>
 		bool search(const IntTy* keys, const Value* values, size_t size, IntTy target, Out& ret)
 		{
@@ -112,15 +131,9 @@ namespace kiwi
 		}
 
 		template<ArchType arch, class IntTy, class Value, class Out>
-		bool searchKV(const void* kv, size_t size, IntTy target, Out& ret)
+		Out searchKV(const void* kv, size_t size, IntTy target)
 		{
-			typename UnsignedType<Out>::type out;
-			if (detail::searchKVImpl<arch>(kv, size, target, out))
-			{
-				ret = out;
-				return true;
-			}
-			else return false;
+			return detail::searchKVImpl<arch, IntTy, typename UnsignedType<Out>::type>(kv, size, target);
 		}
 	}
 }

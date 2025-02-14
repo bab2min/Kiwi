@@ -27,16 +27,7 @@ namespace kiwi
 	const char* archToStr(ArchType arch);
 
 	template<ArchType arch>
-	struct ArchInfo;
-
-	template<>
-	struct ArchInfo<ArchType::none>
-	{
-		static constexpr size_t alignment = 4;
-	};
-
-	template<>
-	struct ArchInfo<ArchType::balanced>
+	struct ArchInfo
 	{
 		static constexpr size_t alignment = 4;
 	};
