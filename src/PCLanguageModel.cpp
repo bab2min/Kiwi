@@ -1080,7 +1080,7 @@ namespace kiwi
 			}
 		}
 
-		utils::MemoryObject PcLangModelBase::build(const string& contextDefinition, const string& embedding, size_t maxContextLength, bool reorderContextId)
+		utils::MemoryObject PcLangModelBase::build(const string& contextDefinition, const string& embedding, size_t maxContextLength, bool useVLE, bool reorderContextId)
 		{
 			ifstream contextStr, embeddingStr;
 			if (!openFile(contextStr, contextDefinition))
@@ -1159,7 +1159,7 @@ namespace kiwi
 				{
 					keySize = 2;
 				}
-				else if (maxContextId <= 0xFFFFF)
+				else if (useVLE && maxContextId <= 0xFFFFF)
 				{
 					keySize = 3; // variable length key
 				}

@@ -50,7 +50,7 @@ namespace kiwi
 
 			const PcLangModelHeader& getHeader() const { return header; }
 
-			static utils::MemoryObject build(const std::string& contextDefinition, const std::string& embedding, size_t maxContextLength = -1, bool reorderContextIdx = true);
+			static utils::MemoryObject build(const std::string& contextDefinition, const std::string& embedding, size_t maxContextLength = -1, bool useVLE = true, bool reorderContextIdx = true);
 			static std::unique_ptr<PcLangModelBase> create(utils::MemoryObject&& mem, ArchType archType = ArchType::none, bool useDistantTokens = false, bool quantized = true);
 		};
 	}
