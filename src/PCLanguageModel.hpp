@@ -300,18 +300,30 @@ namespace kiwi
 				KeyType next) const;
 
 			template<size_t _windowSize>
-			LmStateType nextState(const typename std::enable_if<(_windowSize > 0), LmStateType>::type& state, KeyType next) const;
+			LmStateType nextState(const typename std::enable_if<(_windowSize > 0), LmStateType>::type& state, KeyType next, 
+				bool cacheIsValid, std::pair<int32_t, uint32_t>& cache) const;
 
 			template<size_t _windowSize>
-			LmStateType nextState(const typename std::enable_if<_windowSize == 0, LmStateType>::type& state, KeyType next) const;
+			LmStateType nextState(const typename std::enable_if<_windowSize == 0, LmStateType>::type& state, KeyType next, 
+				bool cacheIsValid, std::pair<int32_t, uint32_t>& cache) const;
 
 			/*
-			* ÃÑ prevStateSize°³ÀÇ »óÅÂ¿Í nextIdSize°³ÀÇ ´ÙÀ½ ÅäÅ«À» ¹Ş¾Æ¼­, °¢ »óÅÂº°·Î ´ÙÀ½ ÅäÅ«ÀÌ µîÀåÇÒ È®·üÀ» °è»êÇÏ°í »õ »óÅÂ¸¦ ¹İÈ¯ÇÑ´Ù.
-			* »õ »óÅÂ°ªÀº outStates¿¡ ÀúÀåµÇ°í, °¢ »óÅÂº° È®·ü°ªÀº outScores¿¡ ÀúÀåµÈ´Ù.
-			* nextIdSize°³ÀÇ ´ÙÀ½ ÅäÅ« Áß ¸¶Áö¸· numValidDistantTokens°³ÀÇ ÅäÅ«Àº À¯È¿ÇÑ distant ÅäÅ«À¸·Î Ã³¸®µÈ´Ù.
+			* ì´ prevStateSizeê°œì˜ ìƒíƒœì™€ nextIdSizeê°œì˜ ë‹¤ìŒ í† í°ì„ ë°›ì•„ì„œ, ê° ìƒíƒœë³„ë¡œ ë‹¤ìŒ í† í°ì´ ë“±ì¥í•  í™•ë¥ ì„ ê³„ì‚°í•˜ê³  ìƒˆ ìƒíƒœë¥¼ ë°˜í™˜í•œë‹¤.
+			* ìƒˆ ìƒíƒœê°’ì€ outStatesì— ì €ì¥ë˜ê³ , ê° ìƒíƒœë³„ í™•ë¥ ê°’ì€ outScoresì— ì €ì¥ëœë‹¤.
+			* nextIdSizeê°œì˜ ë‹¤ìŒ í† í° ì¤‘ ë§ˆì§€ë§‰ numValidDistantTokensê°œì˜ í† í°ì€ ìœ íš¨í•œ distant í† í°ìœ¼ë¡œ ì²˜ë¦¬ëœë‹¤.
 			*/
 			template<size_t _windowSize>
 			void progressMatrix(const typename std::enable_if<(_windowSize > 0), LmStateType>::type* prevStates, const KeyType* nextIds,
+				size_t prevStateSize, size_t nextIdSize, size_t numValidDistantTokens,
+				LmStateType* outStates, float* outScores) const;
+
+			struct TLSForProgressMatrix;
+
+			inline void progressMatrixWSort(TLSForProgressMatrix& tls, const LmStateType* prevStates, const KeyType* nextIds,
+				size_t prevStateSize, size_t nextIdSize, size_t numValidDistantTokens,
+				LmStateType* outStates, float* outScores) const;
+
+			inline void progressMatrixWOSort(TLSForProgressMatrix& tls, const LmStateType* prevStates, const KeyType* nextIds,
 				size_t prevStateSize, size_t nextIdSize, size_t numValidDistantTokens,
 				LmStateType* outStates, float* outScores) const;
 
@@ -325,14 +337,23 @@ namespace kiwi
 		struct PcLMState : public LmStateBase<PcLangModel<_arch, VocabTy, VlVocabTy, windowSize, quantized>>
 		{
 			int32_t node = 0;
-			uint32_t contextIdx = 0;
-			std::array<VocabTy, windowSize + 1> history = { {0,} };
+			uint32_t contextIdx;
+			std::array<VocabTy, windowSize + 1> history;
 
 			static constexpr ArchType arch = _arch;
 			static constexpr bool transposed = true;
 
-			PcLMState() = default;
-			PcLMState(const ILangModel* lm) {}
+			PcLMState() : contextIdx{ 0 }, history { { 0, } }
+			{
+			}
+
+			PcLMState(const ILangModel* lm) : contextIdx{ 0 }, history{ {0,} }
+			{
+			}
+
+			PcLMState(int32_t _node) : node{ _node } // partially initialized state
+			{
+			}
 
 			bool operator==(const PcLMState& other) const
 			{
@@ -355,14 +376,23 @@ namespace kiwi
 		struct PcLMState<0, _arch, VocabTy, VlVocabTy, quantized> : public LmStateBase<PcLangModel<_arch, VocabTy, VlVocabTy, 0, quantized>>
 		{
 			int32_t node = 0;
-			uint32_t contextIdx = 0;
+			uint32_t contextIdx;
 
 			static constexpr ArchType arch = _arch;
 			static constexpr bool transposed = true;
 			static constexpr size_t windowSize = 0;
 
-			PcLMState() = default;
-			PcLMState(const ILangModel* lm) {}
+			PcLMState() : contextIdx{ 0 }
+			{
+			}
+
+			PcLMState(const ILangModel* lm) : contextIdx{ 0 }
+			{
+			}
+			
+			PcLMState(int32_t _node) : node{ _node } // partially initialized state
+			{
+			}
 
 			bool operator==(const PcLMState& other) const
 			{

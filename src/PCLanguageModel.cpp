@@ -118,9 +118,19 @@ namespace kiwi
 
 			if (nextWids.size() > 0)
 			{
+				if (prevLmStates.size() == 1 && nextWids.size() == 1)
+				{
+					nextLmStates.resize(1);
+					scores.resize(1);
+					nextLmStates[0] = prevLmStates[0];
+					scores[0] = nextLmStates[0].next(langMdl, nextWids[0]);
+				}
+				else
+				{
 				nextLmStates.resize(prevLmStates.size() * nextWids.size());
 				scores.resize(prevLmStates.size() * nextWids.size());
 				langMdl->progressMatrix<windowSize>(prevLmStates.data(), nextWids.data(), prevLmStates.size(), nextWids.size(), nextDistantWids.size(), nextLmStates.data(), scores.data());
+				}
 			}
 
 			for (size_t curId = 0; curId < regularMorphs.size(); ++curId)
@@ -681,17 +691,45 @@ namespace kiwi
 			return ll;
 		}
 
+		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
+		struct PcLangModel<arch, KeyType, VlKeyType, windowSize, quantized>::TLSForProgressMatrix
+		{
+			Vector<pair<int32_t, uint32_t>> contextCache;
+			Vector<uint64_t> contextIdcs, historyIdcs, nextIdcs;
+			Vector<uint32_t> inverseContextIdcs, inverseHistoryIdcs, inverseNextIdcs;
+			Vector<float> resultBuf, confidenceBuf, scoreBuf;
+			UnorderedMap<uint32_t, uint32_t> historyMap;
+			Vector<uint32_t> uniqHistoryTokens;
+			Vector<float> inputEmbBuf, outputEmbBuf; // only for non-quantized
+			Vector<int32_t> contextIdcs2, nextIdcs2; // only for quantized
+		};
+
 		// specialization for windowSize > 0
 		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
 		template<size_t _windowSize>
-		auto PcLangModel<arch, KeyType, VlKeyType, windowSize, quantized>::nextState(
-			const typename std::enable_if<(_windowSize > 0), LmStateType>::type& state, KeyType next) const -> LmStateType
+		inline auto PcLangModel<arch, KeyType, VlKeyType, windowSize, quantized>::nextState(
+			const typename std::enable_if<(_windowSize > 0), LmStateType>::type& state, KeyType next, 
+			bool cacheIsValid, pair<int32_t, uint32_t>& cache) const -> LmStateType
 		{
-			LmStateType ret = state;
-			ret.contextIdx = progressContextNode(ret.node, next);
-			if (ret.history[windowSize])
+			LmStateType ret{ state.node }; // partially initialized
+			if (cacheIsValid)
 			{
-				memcpy(&ret.history[0], &ret.history[1], windowSize * sizeof(KeyType));
+				ret.node = cache.first;
+				ret.contextIdx = cache.second;
+			}
+			else
+			{
+			ret.contextIdx = progressContextNode(ret.node, next);
+				cache = std::make_pair(ret.node, ret.contextIdx);
+			}
+
+			if (state.history[windowSize])
+			{
+				memcpy(&ret.history[0], &state.history[1], windowSize * sizeof(KeyType));
+			}
+			else
+			{
+				memcpy(&ret.history[0], &state.history[0], windowSize * sizeof(KeyType));
 			}
 			ret.history[windowSize] = distantTokenMask(next) ? next : 0;
 			return ret;
@@ -700,11 +738,21 @@ namespace kiwi
 		// specialization for windowSize == 0
 		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
 		template<size_t _windowSize>
-		auto PcLangModel<arch, KeyType, VlKeyType, windowSize, quantized>::nextState(
-			const typename std::enable_if<_windowSize == 0, LmStateType>::type& state, KeyType next) const -> LmStateType
+		inline auto PcLangModel<arch, KeyType, VlKeyType, windowSize, quantized>::nextState(
+			const typename std::enable_if<_windowSize == 0, LmStateType>::type& state, KeyType next, 
+			bool cacheIsValid, pair<int32_t, uint32_t>& cache) const -> LmStateType
 		{
-			LmStateType ret = state;
+			LmStateType ret{ state.node }; // partially initialized
+			if (cacheIsValid)
+			{
+				ret.node = cache.first;
+				ret.contextIdx = cache.second;
+			}
+			else
+			{
 			ret.contextIdx = progressContextNode(ret.node, next);
+				cache = std::make_pair(ret.node, ret.contextIdx);
+			}
 			return ret;
 		}
 
@@ -719,93 +767,87 @@ namespace kiwi
 		}
 
 		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
-		template<size_t _windowSize>
-		void PcLangModel<arch, KeyType, VlKeyType, windowSize, quantized>::progressMatrix(
-			const typename std::enable_if<(_windowSize > 0), LmStateType>::type* prevStates, const KeyType* nextIds,
+		inline void PcLangModel<arch, KeyType, VlKeyType, windowSize, quantized>::progressMatrixWSort(
+			TLSForProgressMatrix& tls, const LmStateType* prevStates, const KeyType* nextIds,
 			size_t prevStateSize, size_t nextIdSize, size_t numValidDistantTokens,
 			LmStateType* outStates, float* outScores) const
 		{
 			static constexpr size_t scoreBatchSize = 32;
-			thread_local Vector<uint64_t> contextIdcs, historyIdcs, nextIdcs;
-			thread_local Vector<uint32_t> inverseContextIdcs, inverseHistoryIdcs, inverseNextIdcs;
-			thread_local Vector<float> inputEmbBuf, outputEmbBuf, resultBuf, confidenceBuf;
-			thread_local Vector<float> scoreBuf;
-			thread_local Vector<int32_t> contextIdcs2, nextIdcs2;
 
-			contextIdcs.resize(prevStateSize);
-			historyIdcs.clear();
-			nextIdcs.resize(nextIdSize);
-			inverseContextIdcs.resize(prevStateSize);
-			inverseHistoryIdcs.clear();
-			inverseHistoryIdcs.resize(prevStateSize * windowSize, -1);
-			inverseNextIdcs.resize(nextIdSize);
+			tls.contextIdcs.resize(prevStateSize);
+			tls.historyIdcs.clear();
+			tls.nextIdcs.resize(nextIdSize);
+			tls.inverseContextIdcs.resize(prevStateSize);
+			tls.inverseHistoryIdcs.clear();
+			tls.inverseHistoryIdcs.resize(prevStateSize * windowSize, -1);
+			tls.inverseNextIdcs.resize(nextIdSize);
 			if (quantized)
 			{
-				contextIdcs2.clear();
-				nextIdcs2.clear();
+				tls.contextIdcs2.clear();
+				tls.nextIdcs2.clear();
 			}
 			else
 			{
-				inputEmbBuf.resize(prevStateSize * header.dim);
-				outputEmbBuf.resize(nextIdSize * header.dim);
+				tls.inputEmbBuf.resize(prevStateSize * header.dim);
+				tls.outputEmbBuf.resize(nextIdSize * header.dim);
 			}
-			confidenceBuf.resize(prevStateSize * 2);
-			scoreBuf.resize(scoreBatchSize * (windowSize + 2));
+			tls.confidenceBuf.resize(prevStateSize * 2);
+			tls.scoreBuf.resize(scoreBatchSize * (windowSize + 2));
 
 			const size_t numInvalidDistantTokens = nextIdSize - numValidDistantTokens;
 			for (size_t i = 0; i < nextIdSize; ++i)
 			{
-				nextIdcs[i] = mergePair(nextIds[i], i);
+				tls.nextIdcs[i] = mergePair(nextIds[i], i);
 			}
-			sort(nextIdcs.begin(), nextIdcs.begin() + numInvalidDistantTokens);
-			sort(nextIdcs.begin() + numInvalidDistantTokens, nextIdcs.end());
+			sort(tls.nextIdcs.begin(), tls.nextIdcs.begin() + numInvalidDistantTokens);
+			sort(tls.nextIdcs.begin() + numInvalidDistantTokens, tls.nextIdcs.end());
 			size_t uniqOutputSize = 0;
 			for (size_t i = 0; i < nextIdSize; ++i)
 			{
-				const auto nextId = splitPair(nextIdcs[i]).first;
-				const auto idx = splitPair(nextIdcs[i]).second;
-				if (i == 0 || nextId != splitPair(nextIdcs[i - 1]).first)
+				const auto nextId = splitPair(tls.nextIdcs[i]).first;
+				const auto idx = splitPair(tls.nextIdcs[i]).second;
+				if (i == 0 || nextId != splitPair(tls.nextIdcs[i - 1]).first)
 				{
 					if (quantized)
 					{
-						nextIdcs2.emplace_back(nextId);
+						tls.nextIdcs2.emplace_back(nextId);
 					}
 					else
 					{
-						copy(getOutputEmb(nextId), getOutputEmb(nextId) + header.dim, &outputEmbBuf[uniqOutputSize * header.dim]);
+						copy(getOutputEmb(nextId), getOutputEmb(nextId) + header.dim, &tls.outputEmbBuf[uniqOutputSize * header.dim]);
 					}
 					uniqOutputSize++;
 				}
-				inverseNextIdcs[idx] = uniqOutputSize - 1;
+				tls.inverseNextIdcs[idx] = uniqOutputSize - 1;
 			}
-			resultBuf.resize(prevStateSize * uniqOutputSize);
+			tls.resultBuf.resize(prevStateSize * uniqOutputSize);
 
 			for (size_t i = 0; i < prevStateSize; ++i)
 			{
-				contextIdcs[i] = mergePair(prevStates[i].contextIdx, i);
+				tls.contextIdcs[i] = mergePair(prevStates[i].contextIdx, i);
 			}
-			sort(contextIdcs.begin(), contextIdcs.end());
+			sort(tls.contextIdcs.begin(), tls.contextIdcs.end());
 			size_t uniqInputSize = 0;
 			for (size_t i = 0; i < prevStateSize; ++i)
 			{
-				const auto contextId = splitPair(contextIdcs[i]).first;
-				const auto idx = splitPair(contextIdcs[i]).second;
-				if (i == 0 || contextId != splitPair(contextIdcs[i - 1]).first)
+				const auto contextId = splitPair(tls.contextIdcs[i]).first;
+				const auto idx = splitPair(tls.contextIdcs[i]).second;
+				if (i == 0 || contextId != splitPair(tls.contextIdcs[i - 1]).first)
 				{
 					if (quantized)
 					{
-						contextIdcs2.emplace_back(contextId);
+						tls.contextIdcs2.emplace_back(contextId);
 					}
 					else
 					{
-						copy(getContextEmb(contextId), getContextEmb(contextId) + header.dim, &inputEmbBuf[uniqInputSize * header.dim]);
-						fill(&resultBuf[uniqInputSize * uniqOutputSize], &resultBuf[(uniqInputSize + 1) * uniqOutputSize], getContextBias(contextId));
+						copy(getContextEmb(contextId), getContextEmb(contextId) + header.dim, &tls.inputEmbBuf[uniqInputSize * header.dim]);
+						fill(&tls.resultBuf[uniqInputSize * uniqOutputSize], &tls.resultBuf[(uniqInputSize + 1) * uniqOutputSize], getContextBias(contextId));
 					}
-					confidenceBuf[uniqInputSize * 2] = getContextConfid(contextId);
-					confidenceBuf[uniqInputSize * 2 + 1] = getContextValidTokenSum(contextId);
+					tls.confidenceBuf[uniqInputSize * 2] = getContextConfid(contextId);
+					tls.confidenceBuf[uniqInputSize * 2 + 1] = getContextValidTokenSum(contextId);
 					uniqInputSize++;
 				}
-				inverseContextIdcs[idx] = uniqInputSize - 1;
+				tls.inverseContextIdcs[idx] = uniqInputSize - 1;
 			}
 
 			size_t uniqHistorySize = 0;
@@ -818,53 +860,54 @@ namespace kiwi
 						const auto historyToken = prevStates[i].history[j];
 						if (historyToken)
 						{
-							historyIdcs.emplace_back(mergePair(historyToken, i * windowSize + j));
+							tls.historyIdcs.emplace_back(mergePair(historyToken, i * windowSize + j));
 						}
 					}
 				}
-				sort(historyIdcs.begin(), historyIdcs.end());
+				sort(tls.historyIdcs.begin(), tls.historyIdcs.end());
 				uniqHistorySize = 0;
-				for (size_t i = 0; i < historyIdcs.size(); ++i)
+				for (size_t i = 0; i < tls.historyIdcs.size(); ++i)
 				{
-					const auto historyToken = splitPair(historyIdcs[i]).first;
-					const auto idx = splitPair(historyIdcs[i]).second;
-					if (i == 0 || historyToken != splitPair(historyIdcs[i - 1]).first)
+					const auto historyToken = splitPair(tls.historyIdcs[i]).first;
+					const auto idx = splitPair(tls.historyIdcs[i]).second;
+					if (i == 0 || historyToken != splitPair(tls.historyIdcs[i - 1]).first)
 					{
 						uniqHistorySize++;
 					}
-					inverseHistoryIdcs[idx] = uniqHistorySize - 1;
+					tls.inverseHistoryIdcs[idx] = uniqHistorySize - 1;
 				}
-				inputEmbBuf.resize((uniqInputSize + uniqHistorySize) * header.dim);
-				confidenceBuf.resize(uniqInputSize * 2 + uniqHistorySize);
-				resultBuf.resize(padMultipleOf(uniqInputSize + uniqHistorySize, 8) * padMultipleOf(uniqOutputSize, 8));
+				if (!quantized)
+				{
+					tls.inputEmbBuf.resize((uniqInputSize + uniqHistorySize) * header.dim);
+				}
+				tls.confidenceBuf.resize(uniqInputSize * 2 + uniqHistorySize);
+				tls.resultBuf.resize(padMultipleOf(uniqInputSize + uniqHistorySize, 8) * padMultipleOf(uniqOutputSize, 8));
 
 				uniqHistorySize = 0;
-				for (size_t i = 0; i < historyIdcs.size(); ++i)
+				for (size_t i = 0; i < tls.historyIdcs.size(); ++i)
 				{
-					const auto historyToken = splitPair(historyIdcs[i]).first;
-					const auto idx = splitPair(historyIdcs[i]).second;
-					if (i == 0 || historyToken != splitPair(historyIdcs[i - 1]).first)
+					const auto historyToken = splitPair(tls.historyIdcs[i]).first;
+					const auto idx = splitPair(tls.historyIdcs[i]).second;
+					if (i == 0 || historyToken != splitPair(tls.historyIdcs[i - 1]).first)
 					{
 						if (quantized)
 						{
-							contextIdcs2.emplace_back(historyToken + header.contextSize);
+							tls.contextIdcs2.emplace_back(historyToken + header.contextSize);
 						}
 						else
 						{
-							copy(getDistantEmb(historyToken), getDistantEmb(historyToken) + header.dim, &inputEmbBuf[(uniqInputSize + uniqHistorySize) * header.dim]);
-							fill(&resultBuf[(uniqInputSize + uniqHistorySize) * uniqOutputSize], &resultBuf[(uniqInputSize + uniqHistorySize + 1) * uniqOutputSize], getDistantBias(historyToken));
+							copy(getDistantEmb(historyToken), getDistantEmb(historyToken) + header.dim, &tls.inputEmbBuf[(uniqInputSize + uniqHistorySize) * header.dim]);
+							fill(&tls.resultBuf[(uniqInputSize + uniqHistorySize) * uniqOutputSize], &tls.resultBuf[(uniqInputSize + uniqHistorySize + 1) * uniqOutputSize], getDistantBias(historyToken));
 						}
-						confidenceBuf[uniqInputSize * 2 + uniqHistorySize] = getDistantConfid(historyToken);
+						tls.confidenceBuf[uniqInputSize * 2 + uniqHistorySize] = getDistantConfid(historyToken);
 						uniqHistorySize++;
 					}
 				}
 			}
 			else // use map for large size
 			{
-				thread_local UnorderedMap<uint32_t, uint32_t> historyMap;
-				thread_local Vector<uint32_t> uniqHistoryTokens;
-				historyMap.clear();
-				uniqHistoryTokens.clear();
+				tls.historyMap.clear();
+				tls.uniqHistoryTokens.clear();
 				for (size_t i = 0; i < prevStateSize; ++i)
 				{
 					for (size_t j = 0; j < windowSize; ++j)
@@ -872,34 +915,35 @@ namespace kiwi
 						const auto historyToken = prevStates[i].history[j];
 						if (!historyToken) continue;
 						const auto idx = i * windowSize + j;
-						auto inserted = historyMap.emplace(historyToken, historyMap.size());
-						inverseHistoryIdcs[idx] = inserted.first->second;
-						if (inserted.second) uniqHistoryTokens.emplace_back(historyToken);
+						auto inserted = tls.historyMap.emplace(historyToken, tls.historyMap.size());
+						tls.inverseHistoryIdcs[idx] = inserted.first->second;
+						if (inserted.second) tls.uniqHistoryTokens.emplace_back(historyToken);
 					}
 				}
-				uniqHistorySize = historyMap.size();
-
-				inputEmbBuf.resize((uniqInputSize + uniqHistorySize)* header.dim);
-				confidenceBuf.resize(uniqInputSize * 2 + uniqHistorySize);
-				resultBuf.resize(padMultipleOf(uniqInputSize + uniqHistorySize, 8) * padMultipleOf(uniqOutputSize, 8));
-
-				for (size_t i = 0; i < uniqHistoryTokens.size(); ++i)
+				uniqHistorySize = tls.historyMap.size();
+				if (!quantized)
 				{
-					const auto historyToken = uniqHistoryTokens[i];
+					tls.inputEmbBuf.resize((uniqInputSize + uniqHistorySize) * header.dim);
+				}
+				tls.confidenceBuf.resize(uniqInputSize * 2 + uniqHistorySize);
+				tls.resultBuf.resize(padMultipleOf(uniqInputSize + uniqHistorySize, 8) * padMultipleOf(uniqOutputSize, 8));
+
+				for (size_t i = 0; i < tls.uniqHistoryTokens.size(); ++i)
+				{
+					const auto historyToken = tls.uniqHistoryTokens[i];
 					if (quantized)
 					{
-						contextIdcs2.emplace_back(historyToken + header.contextSize);
+						tls.contextIdcs2.emplace_back(historyToken + header.contextSize);
 					}
 					else
 					{
-						copy(getDistantEmb(historyToken), getDistantEmb(historyToken) + header.dim, &inputEmbBuf[(uniqInputSize + i) * header.dim]);
-						fill(&resultBuf[(uniqInputSize + i) * uniqOutputSize], &resultBuf[(uniqInputSize + i + 1) * uniqOutputSize], getDistantBias(historyToken));
+						copy(getDistantEmb(historyToken), getDistantEmb(historyToken) + header.dim, &tls.inputEmbBuf[(uniqInputSize + i) * header.dim]);
+						fill(&tls.resultBuf[(uniqInputSize + i) * uniqOutputSize], &tls.resultBuf[(uniqInputSize + i + 1) * uniqOutputSize], getDistantBias(historyToken));
 					}
-					confidenceBuf[uniqInputSize * 2 + i] = getDistantConfid(historyToken);
+					tls.confidenceBuf[uniqInputSize * 2 + i] = getDistantConfid(historyToken);
 				}
 			}
-
-			Eigen::Map<Eigen::MatrixXf> resultMap{ resultBuf.data(), (Eigen::Index)uniqOutputSize, (Eigen::Index)(uniqInputSize + uniqHistorySize) };
+			Eigen::Map<Eigen::MatrixXf> resultMap{ tls.resultBuf.data(), (Eigen::Index)uniqOutputSize, (Eigen::Index)(uniqInputSize + uniqHistorySize) };
 
 			if constexpr (quantized)
 			{
@@ -908,27 +952,201 @@ namespace kiwi
 				//ScopedTimer<> timer{ 0 };
 				qgemm::scatteredGEMMOpt<arch>(
 					uniqInputSize + uniqHistorySize, uniqOutputSize, header.dim,
-					getContextQuantEmb(0), contextIdcs2.data(), contextEmbStride(),
-					getOutputQuantEmb(0), nextIdcs2.data(), outputEmbStride(),
-					resultBuf.data(), uniqOutputSize);
+					getContextQuantEmb(0), tls.contextIdcs2.data(), contextEmbStride(),
+					getOutputQuantEmb(0), tls.nextIdcs2.data(), outputEmbStride(),
+					tls.resultBuf.data(), uniqOutputSize);
 			}
 			else
 			{
-				Eigen::Map<Eigen::MatrixXf> inputMap{ inputEmbBuf.data(), header.dim, (Eigen::Index)(uniqInputSize + uniqHistorySize) };
-				Eigen::Map<Eigen::MatrixXf> outputMap{ outputEmbBuf.data(), header.dim, (Eigen::Index)uniqOutputSize };
+				Eigen::Map<Eigen::MatrixXf> inputMap{ tls.inputEmbBuf.data(), header.dim, (Eigen::Index)(uniqInputSize + uniqHistorySize) };
+				Eigen::Map<Eigen::MatrixXf> outputMap{ tls.outputEmbBuf.data(), header.dim, (Eigen::Index)uniqOutputSize };
 				resultMap += outputMap.transpose() * inputMap;
 			}
+
+			pair<int32_t, uint32_t> contextCache;
+			for (size_t j = 0; j < nextIdSize; ++j)
+			{
 			for (size_t i = 0; i < prevStateSize; ++i)
 			{
-				const auto state = prevStates[i];
-				for (size_t j = 0; j < numInvalidDistantTokens; ++j)
-				{
-					outScores[i * nextIdSize + j] = resultMap(inverseNextIdcs[j], inverseContextIdcs[i]);
-					outStates[i * nextIdSize + j] = nextState<_windowSize>(state, nextIds[j]);
+					const auto& state = prevStates[i];
+					const bool cacheIsValid = i > 0 && state.node == prevStates[i - 1].node;
+					outStates[i * nextIdSize + j] = nextState<windowSize>(state, nextIds[j], cacheIsValid, contextCache);
 				}
 			}
 
-			auto* validTokenSumBuf = scoreBuf.data() + scoreBatchSize * (windowSize + 1);
+			for (size_t i = 0; i < prevStateSize; ++i)
+			{
+				const auto& state = prevStates[i];
+				const bool cacheIsValid = i > 0 && state.node == prevStates[i - 1].node;
+				for (size_t j = 0; j < numInvalidDistantTokens; ++j)
+				{
+					outScores[i * nextIdSize + j] = resultMap(tls.inverseNextIdcs[j], tls.inverseContextIdcs[i]);
+				}
+			}
+
+			auto* validTokenSumBuf = tls.scoreBuf.data() + scoreBatchSize * (windowSize + 1);
+			for (size_t i = 0; i < prevStateSize * numValidDistantTokens; i += scoreBatchSize)
+			{
+				const size_t batchSize = std::min(scoreBatchSize, prevStateSize * numValidDistantTokens - i);
+				for (size_t j = 0; j < batchSize; ++j)
+				{
+					const auto pIdx = (i + j) / numValidDistantTokens;
+					const auto nIdx = (i + j) % numValidDistantTokens + numInvalidDistantTokens;
+					tls.scoreBuf[j] = tls.confidenceBuf[tls.inverseContextIdcs[pIdx] * 2];
+					validTokenSumBuf[j] = tls.confidenceBuf[tls.inverseContextIdcs[pIdx] * 2 + 1];
+					for (size_t k = 0; k < windowSize; ++k)
+					{
+						const auto idx = tls.inverseHistoryIdcs[pIdx * windowSize + k];
+						tls.scoreBuf[j + (k + 1) * scoreBatchSize] = idx == -1 ? -99999 : tls.confidenceBuf[uniqInputSize * 2 + idx];
+					}
+				}
+				Eigen::Map<Eigen::Array<float, -1, windowSize + 1>> scoreMap{ tls.scoreBuf.data(), (Eigen::Index)scoreBatchSize, windowSize + 1 };
+				scoreMap.rowwise() += Eigen::Map<const Eigen::Array<float, 1, windowSize + 1>>{ positionConfidPtr, 1, windowSize + 1 };
+				LogSoftmaxTransposed<arch, windowSize + 1>{}(tls.scoreBuf.data(), batchSize, scoreBatchSize);
+				scoreMap.rightCols<windowSize>().colwise() += Eigen::Map<Eigen::Array<float, scoreBatchSize, 1>>{ validTokenSumBuf, scoreBatchSize, 1 };
+				for (size_t j = 0; j < batchSize; ++j)
+				{
+					const auto pIdx = (i + j) / numValidDistantTokens;
+					const auto nIdx = (i + j) % numValidDistantTokens + numInvalidDistantTokens;
+					tls.scoreBuf[j] += resultMap(tls.inverseNextIdcs[nIdx], tls.inverseContextIdcs[pIdx]);
+					for (size_t k = 0; k < windowSize; ++k)
+					{
+						const auto idx = tls.inverseHistoryIdcs[pIdx * windowSize + k];
+						if (idx != -1)
+						{
+							tls.scoreBuf[j + (k + 1) * scoreBatchSize] += resultMap(tls.inverseNextIdcs[nIdx], uniqInputSize + idx);
+						}
+					}
+				}
+				LogSumExpTransposed<arch, windowSize + 1>{}(tls.scoreBuf.data(), batchSize, scoreBatchSize);
+
+				for (size_t j = 0; j < batchSize; ++j)
+				{
+					const auto pIdx = (i + j) / numValidDistantTokens;
+					const auto nIdx = (i + j) % numValidDistantTokens + numInvalidDistantTokens;
+					const bool cacheIsValid = pIdx > 0 && prevStates[pIdx].node == prevStates[pIdx - 1].node;
+					outScores[pIdx * nextIdSize + nIdx] = tls.scoreBuf[j];
+				}
+			}
+		}
+
+		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
+		inline void PcLangModel<arch, KeyType, VlKeyType, windowSize, quantized>::progressMatrixWOSort(
+			TLSForProgressMatrix& tls, const LmStateType* prevStates, const KeyType* nextIds,
+			size_t prevStateSize, size_t nextIdSize, size_t numValidDistantTokens,
+			LmStateType* outStates, float* outScores) const
+		{
+			static constexpr size_t scoreBatchSize = 32;
+
+			if (quantized)
+			{
+				tls.contextIdcs2.clear();
+				tls.nextIdcs2.clear();
+				}
+			else
+			{
+				tls.inputEmbBuf.resize(prevStateSize * (1 + windowSize) * header.dim);
+				tls.outputEmbBuf.resize(nextIdSize * header.dim);
+			}
+			tls.confidenceBuf.resize(prevStateSize * (2 + windowSize));
+			tls.scoreBuf.resize(scoreBatchSize * (windowSize + 2));
+			tls.resultBuf.resize(padMultipleOf(prevStateSize * (1 + windowSize), 8) * padMultipleOf(nextIdSize, 8));
+
+			const size_t numInvalidDistantTokens = nextIdSize - numValidDistantTokens;
+			for (size_t i = 0; i < nextIdSize; ++i)
+			{
+				const auto nextId = nextIds[i];
+				if (quantized)
+				{
+					tls.nextIdcs2.emplace_back(nextId);
+				}
+				else
+				{
+					copy(getOutputEmb(nextId), getOutputEmb(nextId) + header.dim, &tls.outputEmbBuf[i * header.dim]);
+				}
+			}
+
+			for (size_t i = 0; i < prevStateSize; ++i)
+			{
+				const auto contextId = prevStates[i].contextIdx;
+				if (quantized)
+				{
+					tls.contextIdcs2.emplace_back(contextId);
+				}
+				else
+				{
+					copy(getContextEmb(contextId), getContextEmb(contextId) + header.dim, &tls.inputEmbBuf[i * header.dim]);
+					fill(&tls.resultBuf[i * nextIdSize], &tls.resultBuf[(i + 1) * nextIdSize], getContextBias(contextId));
+				}
+				tls.confidenceBuf[i * 2] = getContextConfid(contextId);
+				tls.confidenceBuf[i * 2 + 1] = getContextValidTokenSum(contextId);
+			}
+
+			size_t uniqHistorySize = 0;
+			tls.inverseHistoryIdcs.clear();
+			for (size_t i = 0; i < prevStateSize; ++i)
+			{
+				for (size_t j = 0; j < windowSize; ++j)
+				{
+					const auto historyToken = prevStates[i].history[j];
+					if (historyToken)
+					{
+						if (quantized)
+						{
+							tls.contextIdcs2.emplace_back(historyToken + header.contextSize);
+						}
+						else
+						{
+							copy(getDistantEmb(historyToken), getDistantEmb(historyToken) + header.dim, &tls.inputEmbBuf[(prevStateSize + uniqHistorySize) * header.dim]);
+							fill(&tls.resultBuf[(prevStateSize + uniqHistorySize) * nextIdSize], &tls.resultBuf[(prevStateSize + uniqHistorySize + 1) * nextIdSize], getDistantBias(historyToken));
+						}
+						tls.confidenceBuf[prevStateSize * 2 + uniqHistorySize] = getDistantConfid(historyToken);
+						uniqHistorySize++;
+					}
+					tls.inverseHistoryIdcs.emplace_back(historyToken ? uniqHistorySize - 1 : -1);
+					
+				}
+			}
+			
+			Eigen::Map<Eigen::MatrixXf> resultMap{ tls.resultBuf.data(), (Eigen::Index)nextIdSize, (Eigen::Index)(prevStateSize + uniqHistorySize) };
+
+			if constexpr (quantized)
+			{
+				qgemm::scatteredGEMMOpt<arch>(
+					prevStateSize + uniqHistorySize, nextIdSize, header.dim,
+					getContextQuantEmb(0), tls.contextIdcs2.data(), contextEmbStride(),
+					getOutputQuantEmb(0), tls.nextIdcs2.data(), outputEmbStride(),
+					tls.resultBuf.data(), nextIdSize);
+			}
+			else
+			{
+				Eigen::Map<Eigen::MatrixXf> inputMap{ tls.inputEmbBuf.data(), header.dim, (Eigen::Index)(prevStateSize + uniqHistorySize) };
+				Eigen::Map<Eigen::MatrixXf> outputMap{ tls.outputEmbBuf.data(), header.dim, (Eigen::Index)nextIdSize };
+				resultMap += outputMap.transpose() * inputMap;
+			}
+			
+			pair<int32_t, uint32_t> contextCache;
+			for (size_t j = 0; j < nextIdSize; ++j)
+			{
+				for (size_t i = 0; i < prevStateSize; ++i)
+				{
+					const auto& state = prevStates[i];
+					const bool cacheIsValid = i > 0 && state.node == prevStates[i - 1].node;
+					outStates[i * nextIdSize + j] = nextState<windowSize>(state, nextIds[j], cacheIsValid, contextCache);
+				}
+			}
+
+
+			for (size_t i = 0; i < prevStateSize; ++i)
+			{
+				const auto& state = prevStates[i];
+				for (size_t j = 0; j < numInvalidDistantTokens; ++j)
+				{
+					outScores[i * nextIdSize + j] = resultMap(j, i);
+				}
+			}
+
+			auto* validTokenSumBuf = tls.scoreBuf.data() + scoreBatchSize * (windowSize + 1);
 
 			for (size_t i = 0; i < prevStateSize * numValidDistantTokens; i += scoreBatchSize)
 			{
@@ -937,41 +1155,58 @@ namespace kiwi
 				{
 					const auto pIdx = (i + j) / numValidDistantTokens;
 					const auto nIdx = (i + j) % numValidDistantTokens + numInvalidDistantTokens;
-					scoreBuf[j] = confidenceBuf[inverseContextIdcs[pIdx] * 2];
-					validTokenSumBuf[j] = confidenceBuf[inverseContextIdcs[pIdx] * 2 + 1];
+					tls.scoreBuf[j] = tls.confidenceBuf[pIdx * 2];
+					validTokenSumBuf[j] = tls.confidenceBuf[pIdx * 2 + 1];
 					for (size_t k = 0; k < windowSize; ++k)
 					{
-						const auto idx = inverseHistoryIdcs[pIdx * windowSize + k];
-						scoreBuf[j + (k + 1) * scoreBatchSize] = idx == -1 ? -99999 : confidenceBuf[uniqInputSize * 2 + idx];
+						const auto idx = tls.inverseHistoryIdcs[pIdx * windowSize + k];
+						tls.scoreBuf[j + (k + 1) * scoreBatchSize] = idx == -1 ? -99999 : tls.confidenceBuf[prevStateSize * 2 + idx];
 					}
 				}
-				Eigen::Map<Eigen::Array<float, -1, windowSize + 1>> scoreMap{ scoreBuf.data(), (Eigen::Index)scoreBatchSize, windowSize + 1 };
+				Eigen::Map<Eigen::Array<float, -1, windowSize + 1>> scoreMap{ tls.scoreBuf.data(), (Eigen::Index)scoreBatchSize, windowSize + 1 };
 				scoreMap.rowwise() += Eigen::Map<const Eigen::Array<float, 1, windowSize + 1>>{ positionConfidPtr, 1, windowSize + 1 };
-				LogSoftmaxTransposed<arch, windowSize + 1>{}(scoreBuf.data(), batchSize, scoreBatchSize);
+				LogSoftmaxTransposed<arch, windowSize + 1>{}(tls.scoreBuf.data(), batchSize, scoreBatchSize);
 				scoreMap.rightCols<windowSize>().colwise() += Eigen::Map<Eigen::Array<float, scoreBatchSize, 1>>{ validTokenSumBuf, scoreBatchSize, 1 };
 				for (size_t j = 0; j < batchSize; ++j)
 				{
 					const auto pIdx = (i + j) / numValidDistantTokens;
 					const auto nIdx = (i + j) % numValidDistantTokens + numInvalidDistantTokens;
-					scoreBuf[j] += resultMap(inverseNextIdcs[nIdx], inverseContextIdcs[pIdx]);
+					tls.scoreBuf[j] += resultMap(nIdx, pIdx);
 					for (size_t k = 0; k < windowSize; ++k)
 					{
-						const auto idx = inverseHistoryIdcs[pIdx * windowSize + k];
+						const auto idx = tls.inverseHistoryIdcs[pIdx * windowSize + k];
 						if (idx != -1)
 						{
-							scoreBuf[j + (k + 1) * scoreBatchSize] += resultMap(inverseNextIdcs[nIdx], uniqInputSize + idx);
+							tls.scoreBuf[j + (k + 1) * scoreBatchSize] += resultMap(nIdx, prevStateSize + idx);
 						}
 					}
 				}
-				LogSumExpTransposed<arch, windowSize + 1>{}(scoreBuf.data(), batchSize, scoreBatchSize);
+				LogSumExpTransposed<arch, windowSize + 1>{}(tls.scoreBuf.data(), batchSize, scoreBatchSize);
 
 				for (size_t j = 0; j < batchSize; ++j)
 				{
 					const auto pIdx = (i + j) / numValidDistantTokens;
 					const auto nIdx = (i + j) % numValidDistantTokens + numInvalidDistantTokens;
-					outScores[pIdx * nextIdSize + nIdx] = scoreBuf[j];
-					outStates[pIdx * nextIdSize + nIdx] = nextState<windowSize>(prevStates[pIdx], nextIds[nIdx]);
+					outScores[pIdx * nextIdSize + nIdx] = tls.scoreBuf[j];
 				}
+			}
+		}
+
+		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
+		template<size_t _windowSize>
+		void PcLangModel<arch, KeyType, VlKeyType, windowSize, quantized>::progressMatrix(
+			const typename std::enable_if<(_windowSize > 0), LmStateType>::type* prevStates, const KeyType* nextIds,
+			size_t prevStateSize, size_t nextIdSize, size_t numValidDistantTokens,
+			LmStateType* outStates, float* outScores) const
+		{
+			thread_local TLSForProgressMatrix tls;
+			if (prevStateSize <= (quantized ? 16 : 8) && nextIdSize <= 16)
+			{
+				return progressMatrixWOSort(tls, prevStates, nextIds, prevStateSize, nextIdSize, numValidDistantTokens, outStates, outScores);
+			}
+			else
+			{
+				return progressMatrixWSort(tls, prevStates, nextIds, prevStateSize, nextIdSize, numValidDistantTokens, outStates, outScores);
 			}
 		}
 
@@ -1069,12 +1304,22 @@ namespace kiwi
 				Eigen::Map<Eigen::MatrixXf> outputMap{ outputEmbBuf.data(), header.dim, (Eigen::Index)uniqOutputSize };
 				resultMap += outputMap.transpose() * inputMap;
 			}
+
+			pair<int32_t, uint32_t> contextCache;
+			for (size_t j = 0; j < nextIdSize; ++j)
+			{
 			for (size_t i = 0; i < prevStateSize; ++i)
 			{
 				const auto& state = prevStates[i];
+					const bool cacheIsValid = i > 0 && state.node == prevStates[i - 1].node;
+					outStates[i * nextIdSize + j] = nextState<windowSize>(state, nextIds[j], cacheIsValid, contextCache);
+				}
+			}
+
+			for (size_t i = 0; i < prevStateSize; ++i)
+			{
 				for (size_t j = 0; j < nextIdSize; ++j)
 				{
-					outStates[i * nextIdSize + j] = nextState<_windowSize>(state, nextIds[j]);
 					outScores[i * nextIdSize + j] = resultMap(inverseNextIdcs[j], inverseContextIdcs[i]);
 				}
 			}
