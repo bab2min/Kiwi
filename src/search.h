@@ -28,6 +28,9 @@ namespace kiwi
 
 			template<ArchType arch>
 			size_t getPacketSizeImpl();
+
+			template<ArchType arch>
+			size_t findAllImpl(const uint8_t* arr, size_t size, uint8_t key);
 		}
 
 		template<ArchType arch, class IntTy, class Value>
@@ -134,6 +137,13 @@ namespace kiwi
 		Out searchKV(const void* kv, size_t size, IntTy target)
 		{
 			return detail::searchKVImpl<arch, IntTy, typename UnsignedType<Out>::type>(kv, size, target);
+		}
+
+		template<ArchType arch>
+		size_t findAll(const uint8_t* arr, size_t size, uint8_t key)
+		{
+			if (size == 0) return 0;
+			return detail::findAllImpl<arch>(arr, size, key);
 		}
 	}
 }

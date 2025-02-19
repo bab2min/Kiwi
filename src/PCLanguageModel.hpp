@@ -407,15 +407,23 @@ namespace kiwi
 		};
 	}
 
+	static constexpr size_t largePrime = sizeof(size_t) == 8 ? 2305843009213693951ll : 2654435761ll;
+
+	inline size_t rol(size_t x, size_t r)
+	{
+		return (x << r) | (x >> (sizeof(size_t) * 8 - r));
+	}
+
 	template<size_t windowSize, ArchType arch, class VocabTy, class VlVocabTy, bool quantized>
 	struct Hash<lm::PcLMState<windowSize, arch, VocabTy, VlVocabTy, quantized>>
 	{
 		size_t operator()(const lm::PcLMState<windowSize, arch, VocabTy, VlVocabTy, quantized>& state) const
 		{
-			size_t ret = (uint32_t)(state.node * (size_t)2654435761);
+			size_t ret = (state.node * largePrime) ^ rol(state.node, sizeof(size_t) * 4 + 1);
 			static constexpr size_t cmpStart = windowSize - sizeof(size_t) / sizeof(VocabTy);
-			const auto h = *reinterpret_cast<const size_t*>(&state.history[cmpStart]);
-			ret = h ^ ((ret << 3) | (ret >> (sizeof(size_t) * 8 - 3)));
+			size_t h = *reinterpret_cast<const size_t*>(&state.history[cmpStart]);
+			h = (h * largePrime) ^ rol(h, sizeof(size_t) * 4 - 1);
+			ret = h ^ rol(ret, 3);
 			return ret;
 		}
 	};
@@ -425,7 +433,7 @@ namespace kiwi
 	{
 		size_t operator()(const lm::PcLMState<0, arch, VocabTy, VlVocabTy, quantized>& state) const
 		{
-			size_t ret = (uint32_t)(state.node * (size_t)2654435761);
+			size_t ret = (state.node * largePrime) ^ rol(state.node, sizeof(size_t) * 4 + 1);
 			return ret;
 		}
 	};

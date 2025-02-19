@@ -73,8 +73,13 @@ namespace kiwi
 						continue;
 					}
 					regularPrevPathes.emplace_back(&prevPath);
-					prevLmStates.emplace_back(prevPath.lmState);
 				}
+			}
+
+			prevLmStates.resize(regularPrevPathes.size());
+			for (size_t i = 0; i < regularPrevPathes.size(); ++i)
+			{
+				prevLmStates[i] = regularPrevPathes[i]->lmState;
 			}
 
 			for (auto& curMorph : morphs)

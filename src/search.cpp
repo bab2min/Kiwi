@@ -31,7 +31,8 @@
 	template Vector<size_t> detail::reorderImpl<arch>(const uint32_t*, size_t);\
 	template Vector<size_t> detail::reorderImpl<arch>(const uint64_t*, size_t);\
 	template Vector<size_t> detail::reorderImpl<arch>(const char16_t*, size_t);\
-	template size_t detail::getPacketSizeImpl<arch>();
+	template size_t detail::getPacketSizeImpl<arch>();\
+	template size_t detail::findAllImpl<arch>(const uint8_t*, size_t, uint8_t);\
 
 #if CPUINFO_ARCH_X86 || CPUINFO_ARCH_X86_64 || KIWI_ARCH_X86 || KIWI_ARCH_X86_64
 #include <immintrin.h>
@@ -186,6 +187,12 @@ namespace kiwi
 			return OptimizedImpl<arch>::packetSize;
 		}
 
+		template<ArchType arch>
+		size_t detail::findAllImpl(const uint8_t* arr, size_t size, uint8_t key)
+		{
+			return OptimizedImpl<arch>::findAll(arr, size, key);
+		}
+
 		template<>
 		struct OptimizedImpl<ArchType::none>
 		{
@@ -214,6 +221,16 @@ namespace kiwi
 					return values[idx];
 				}
 				else return 0;
+			}
+
+			static size_t findAll(const uint8_t* arr, size_t size, uint8_t key)
+			{
+				size_t ret = 0;
+				for (size_t i = 0; i < size; ++i)
+				{
+					ret |= (size_t)(arr[i] == key) << i;
+				}
+				return ret;
 			}
 		};
 		INSTANTIATE_IMPL(ArchType::none);
@@ -260,6 +277,16 @@ namespace kiwi
 					return values[idx];
 				}
 				else return 0;
+			}
+
+			static size_t findAll(const uint8_t* arr, size_t size, uint8_t key)
+			{
+				size_t ret = 0;
+				for (size_t i = 0; i < size; ++i)
+				{
+					ret |= (size_t)(arr[i] == key) << i;
+				}
+				return ret;
 			}
 		};
 		INSTANTIATE_IMPL(ArchType::balanced);
@@ -524,6 +551,48 @@ namespace kiwi
 			return 0;
 		}
 
+		ARCH_TARGET("sse2")
+		inline size_t findAllSSE2(const uint8_t* arr, size_t size, uint8_t key)
+		{
+			__m128i pkey = _mm_set1_epi8(key);
+			if (size <= 16)
+			{
+				__m128i parr = _mm_loadu_si128(reinterpret_cast<const __m128i*>(arr));
+				__m128i pcmp = _mm_cmpeq_epi8(pkey, parr);
+				return (size_t)_mm_movemask_epi8(pcmp) & (((size_t)1 << size) - 1);
+			}
+			else if (size <= 32)
+			{
+				__m128i parr0 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(arr));
+				__m128i parr1 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(arr + 16));
+				__m128i pcmp0 = _mm_cmpeq_epi8(pkey, parr0);
+				__m128i pcmp1 = _mm_cmpeq_epi8(pkey, parr1);
+				return ((size_t)_mm_movemask_epi8(pcmp0) | ((size_t)_mm_movemask_epi8(pcmp1) << 16)) & (((size_t)1 << size) - 1);
+			}
+			else if (size <= 48)
+			{
+				__m128i parr0 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(arr));
+				__m128i parr1 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(arr + 16));
+				__m128i parr2 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(arr + 32));
+				__m128i pcmp0 = _mm_cmpeq_epi8(pkey, parr0);
+				__m128i pcmp1 = _mm_cmpeq_epi8(pkey, parr1);
+				__m128i pcmp2 = _mm_cmpeq_epi8(pkey, parr2);
+				return ((size_t)_mm_movemask_epi8(pcmp0) | ((size_t)_mm_movemask_epi8(pcmp1) << 16) | ((size_t)_mm_movemask_epi8(pcmp2) << 32)) & (((size_t)1 << size) - 1);
+			}
+			else
+			{
+				__m128i parr0 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(arr));
+				__m128i parr1 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(arr + 16));
+				__m128i parr2 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(arr + 32));
+				__m128i parr3 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(arr + 48));
+				__m128i pcmp0 = _mm_cmpeq_epi8(pkey, parr0);
+				__m128i pcmp1 = _mm_cmpeq_epi8(pkey, parr1);
+				__m128i pcmp2 = _mm_cmpeq_epi8(pkey, parr2);
+				__m128i pcmp3 = _mm_cmpeq_epi8(pkey, parr3);
+				return ((size_t)_mm_movemask_epi8(pcmp0) | ((size_t)_mm_movemask_epi8(pcmp1) << 16) | ((size_t)_mm_movemask_epi8(pcmp2) << 32) | ((size_t)_mm_movemask_epi8(pcmp3) << 48)) & (((size_t)1 << size) - 1);
+			}
+		}
+
 		template<>
 		struct OptimizedImpl<ArchType::sse2>
 		{
@@ -548,6 +617,11 @@ namespace kiwi
 			{
 				using SignedIntTy = typename SignedType<IntTy>::type;
 				return nstSearchKVSSE2<packetSize / sizeof(IntTy) + 1, SignedIntTy, ValueTy>((const uint8_t*)kv, size, target);
+			}
+
+			static size_t findAll(const uint8_t* arr, size_t size, uint8_t key)
+			{
+				return findAllSSE2(arr, size, key);
 			}
 		};
 		INSTANTIATE_IMPL(ArchType::sse2);
@@ -866,6 +940,27 @@ namespace kiwi
 			return 0;
 		}
 
+		ARCH_TARGET("avx2")
+		inline size_t findAllAVX2(const uint8_t* arr, size_t size, uint8_t key)
+		{
+			if (size <= 32)
+			{
+				__m256i pkey = _mm256_set1_epi8(key);
+				__m256i parr = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(arr));
+				__m256i pcmp = _mm256_cmpeq_epi8(pkey, parr);
+				return (size_t)_mm256_movemask_epi8(pcmp) & (((size_t)1 << size) - 1);
+			}
+			else
+			{
+				__m256i pkey = _mm256_set1_epi8(key);
+				__m256i parr0 = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(arr));
+				__m256i parr1 = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(arr + 32));
+				__m256i pcmp0 = _mm256_cmpeq_epi8(pkey, parr0);
+				__m256i pcmp1 = _mm256_cmpeq_epi8(pkey, parr1);
+				return ((size_t)_mm256_movemask_epi8(pcmp0) | ((size_t)_mm256_movemask_epi8(pcmp1) << 32)) & (((size_t)1 << size) - 1);
+			}
+		}
+
 		template<size_t n, class IntTy>
 		ARCH_TARGET("avx512bw")
 		FORCE_INLINE bool nstSearchAVX512(const IntTy* keys, size_t size, IntTy target, size_t& ret)
@@ -1152,6 +1247,15 @@ namespace kiwi
 			return 0;
 		}
 
+		ARCH_TARGET("avx512bw")
+		inline size_t findAllAVX512(const uint8_t* arr, size_t size, uint8_t key)
+		{
+			__m512i pkey = _mm512_set1_epi8(key);
+			__m512i parr = _mm512_loadu_si512(reinterpret_cast<const __m512i*>(arr));
+			__mmask64 pcmp = _mm512_cmpeq_epi8_mask(pkey, parr);
+			return (size_t)pcmp & (((size_t)1 << size) - 1);
+		}
+
 		template<>
 		struct OptimizedImpl<ArchType::sse4_1>
 		{
@@ -1176,6 +1280,11 @@ namespace kiwi
 			{
 				using SignedIntTy = typename SignedType<IntTy>::type;
 				return nstSearchKVSSE2<packetSize / sizeof(IntTy) + 1, SignedIntTy, ValueTy>((const uint8_t*)kv, size, target);
+			}
+
+			static size_t findAll(const uint8_t* arr, size_t size, uint8_t key)
+			{
+				return findAllSSE2(arr, size, key);
 			}
 		};
 		INSTANTIATE_IMPL(ArchType::sse4_1);
@@ -1204,6 +1313,11 @@ namespace kiwi
 			{
 				using SignedIntTy = typename SignedType<IntTy>::type;
 				return nstSearchKVAVX2<packetSize / sizeof(IntTy) + 1, SignedIntTy, ValueTy>((const uint8_t*)kv, size, target);
+			}
+
+			static size_t findAll(const uint8_t* arr, size_t size, uint8_t key)
+			{
+				return findAllAVX2(arr, size, key);
 			}
 		};
 		INSTANTIATE_IMPL(ArchType::avx2);
@@ -1238,6 +1352,11 @@ namespace kiwi
 			{
 				using SignedIntTy = typename SignedType<IntTy>::type;
 				return nstSearchKVAVX512<packetSize / sizeof(IntTy) + 1, SignedIntTy, ValueTy>((const uint8_t*)kv, size, target);
+			}
+
+			static size_t findAll(const uint8_t* arr, size_t size, uint8_t key)
+			{
+				return findAllAVX512(arr, size, key);
 			}
 		};
 		INSTANTIATE_IMPL(ArchType::avx512bw);

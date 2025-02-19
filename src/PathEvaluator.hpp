@@ -215,8 +215,7 @@ namespace kiwi
 				spState.bulletHash = hashSbTypeOrder(ruleBasedScorer.curMorphSbType, ruleBasedScorer.curMorphSbOrder + 1);
 			}
 
-			PathHash<LmState> ph{ state, prevPath.rootId, spState };
-			bestPathCont.insert(ph, topN, rootId, curMorph, candScoreWithRule, prevPath.accTypoCost + node->typoCost, &prevPath, move(state), spState);
+			bestPathCont.insert(topN, prevPath.rootId, rootId, curMorph, candScoreWithRule, prevPath.accTypoCost + node->typoCost, &prevPath, move(state), spState);
 		};
 
 		if ((ruleBasedScorer.curMorphSbType || isQuote(ruleBasedScorer.curMorphSpecialType)) && prevPath.rootId == commonRootId)
@@ -354,7 +353,6 @@ namespace kiwi
 			{
 				totalPrevPathes += cache[prev - startNode].size();
 			}
-			const bool useContainerForSmall = totalPrevPathes <= 48;
 
 			for (bool ignoreCond : {false, true})
 			{
@@ -430,9 +428,14 @@ namespace kiwi
 						evalSingleMorpheme<PathEvaluatingMode::topN>(nCache, node, ownFormId,
 							curMorph, ignoreCond ? -10 : 0, nodeLevelDiscount);
 					}
-					else if (useContainerForSmall)
+					else if (totalPrevPathes <= BestPathContainerTraits<PathEvaluatingMode::top1Small>::maxSize)
 					{
 						evalSingleMorpheme<PathEvaluatingMode::top1Small>(nCache, node, ownFormId,
+							curMorph, ignoreCond ? -10 : 0, nodeLevelDiscount);
+					}
+					else if (totalPrevPathes <= BestPathContainerTraits<PathEvaluatingMode::top1Medium>::maxSize)
+					{
+						evalSingleMorpheme<PathEvaluatingMode::top1Medium>(nCache, node, ownFormId,
 							curMorph, ignoreCond ? -10 : 0, nodeLevelDiscount);
 					}
 					else
@@ -928,7 +931,6 @@ namespace kiwi
 				{
 					totalPrevPathes += cache[prev - startNode].size();
 				}
-				const bool useContainerForSmall = totalPrevPathes <= 48;
 
 				MorphemeEvaluator<LmState> me;
 				if (topN > 1)
@@ -937,9 +939,15 @@ namespace kiwi
 						ownFormId, validMorphCands,
 						node, startNode, topN, totalPrevPathes, ignoreCond ? -10 : 0, nodeLevelDiscount, prevSpStates);
 				}
-				else if (useContainerForSmall)
+				else if (totalPrevPathes <= BestPathContainerTraits<PathEvaluatingMode::top1Small>::maxSize)
 				{
 					me.eval<PathEvaluatingMode::top1Small>(nCache, kw, ownFormList, cache,
+						ownFormId, validMorphCands,
+						node, startNode, topN, totalPrevPathes, ignoreCond ? -10 : 0, nodeLevelDiscount, prevSpStates);
+				}
+				else if (totalPrevPathes <= BestPathContainerTraits<PathEvaluatingMode::top1Medium>::maxSize)
+				{
+					me.eval<PathEvaluatingMode::top1Medium>(nCache, kw, ownFormList, cache,
 						ownFormId, validMorphCands,
 						node, startNode, topN, totalPrevPathes, ignoreCond ? -10 : 0, nodeLevelDiscount, prevSpStates);
 				}
