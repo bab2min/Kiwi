@@ -414,12 +414,21 @@ namespace kiwi
 		return (x << r) | (x >> (sizeof(size_t) * 8 - r));
 	}
 
+	template<>
+	struct Hash<uint32_t>
+	{
+		size_t operator()(uint32_t v) const
+		{
+			return ((size_t)v * largePrime) ^ rol((size_t)v, sizeof(size_t) * 4 + 1);
+		}
+	};
+
 	template<size_t windowSize, ArchType arch, class VocabTy, class VlVocabTy, bool quantized>
 	struct Hash<lm::PcLMState<windowSize, arch, VocabTy, VlVocabTy, quantized>>
 	{
 		size_t operator()(const lm::PcLMState<windowSize, arch, VocabTy, VlVocabTy, quantized>& state) const
 		{
-			size_t ret = (state.node * largePrime) ^ rol(state.node, sizeof(size_t) * 4 + 1);
+			size_t ret = Hash<uint32_t>{}(state.node);
 			static constexpr size_t cmpStart = windowSize - sizeof(size_t) / sizeof(VocabTy);
 			size_t h = *reinterpret_cast<const size_t*>(&state.history[cmpStart]);
 			h = (h * largePrime) ^ rol(h, sizeof(size_t) * 4 - 1);
@@ -433,7 +442,7 @@ namespace kiwi
 	{
 		size_t operator()(const lm::PcLMState<0, arch, VocabTy, VlVocabTy, quantized>& state) const
 		{
-			size_t ret = (state.node * largePrime) ^ rol(state.node, sizeof(size_t) * 4 + 1);
+			size_t ret = Hash<uint32_t>{}(state.node);
 			return ret;
 		}
 	};
