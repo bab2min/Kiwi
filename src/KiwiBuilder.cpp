@@ -772,6 +772,26 @@ void KiwiBuilder::saveMorphBin(std::ostream& os) const
 	serializer::writeMany(os, serializer::toKey("KIWI"), forms, morphemes);
 }
 
+ModelType KiwiBuilder::getModelType(const string& modelPath)
+{
+	if (isOpenable(modelPath + "/cong.mdl"))
+	{
+		return ModelType::congGlobal;
+	}
+	else if (isOpenable(modelPath + "/skipbigram.mdl"))
+	{
+		return ModelType::sbg;
+	}
+	else if (isOpenable(modelPath + "/sj.knlm"))
+	{
+		return ModelType::knlm;
+	}
+	else
+	{
+		return ModelType::none;
+	}
+}
+
 KiwiBuilder::KiwiBuilder(const string& modelPath, size_t _numThreads, BuildOption _options, ModelType _modelType)
 	: detector{ modelPath, _numThreads }, options{ _options }, modelType{ _modelType }, numThreads{ _numThreads ? _numThreads : thread::hardware_concurrency() }
 {
@@ -783,6 +803,15 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, size_t _numThreads, BuildOptio
 		loadMorphBin(iss);
 	}
 	
+	if (modelType == ModelType::none)
+	{
+		modelType = getModelType(modelPath);
+		if (modelType == ModelType::none)
+		{
+			throw runtime_error{ "Cannot find any valid model files in the given path" };
+		}
+	}
+
 	if (modelType == ModelType::knlm || modelType == ModelType::knlmTransposed)
 	{
 		langMdl = lm::KnLangModelBase::create(utils::MMap(modelPath + string{ "/sj.knlm" }), archType, modelType == ModelType::knlmTransposed);

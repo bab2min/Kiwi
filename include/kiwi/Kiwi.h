@@ -629,6 +629,12 @@ namespace kiwi
 		void addAllomorphsToRule();
 
 	public:
+
+		/**
+		 * @brief 주어진 모델 경로로부터 모델의 타입을 추정한다.
+		 */
+		static ModelType getModelType(const std::string& modelPath);
+
 		/**
 		 * @brief KiwiBuilder의 기본 생성자
 		 *
@@ -667,7 +673,7 @@ namespace kiwi
 		 * @param numThreads 모델 및 형태소 분석에 사용할 스레드 개수
 		 * @param options 생성 옵션. `kiwi::BuildOption`을 참조
 		 */
-		KiwiBuilder(const std::string& modelPath, size_t numThreads = 0, BuildOption options = BuildOption::default_, ModelType modelType = ModelType::knlm);
+		KiwiBuilder(const std::string& modelPath, size_t numThreads = 0, BuildOption options = BuildOption::default_, ModelType modelType = ModelType::none);
 
 		/**
 		 * @brief 현재 KiwiBuilder 객체가 유효한 분석 모델을 로딩한 상태인지 알려준다.
