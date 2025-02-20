@@ -41,7 +41,7 @@
     <ClInclude Include="..\include\kiwi\Macro.h" />
     <ClInclude Include="..\include\kiwi\Mmap.h" />
     <ClInclude Include="..\include\kiwi\PatternMatcher.h" />
-    <ClInclude Include="..\include\kiwi\PCLanguageModel.h" />
+    <ClInclude Include="..\include\kiwi\CoNgramModel.h" />
     <ClInclude Include="..\include\kiwi\ScriptType.h" />
     <ClInclude Include="..\include\kiwi\SkipBigramModel.h" />
     <ClInclude Include="..\include\kiwi\SubstringExtractor.h" />
@@ -73,7 +73,7 @@
     <ClInclude Include="..\src\PathEvaluator.h" />
     <ClInclude Include="..\src\PathEvaluator.hpp" />
     <ClInclude Include="..\src\pattern.hpp" />
-    <ClInclude Include="..\src\PCLanguageModel.hpp" />
+    <ClInclude Include="..\src\CoNgramModel.hpp" />
     <ClInclude Include="..\src\qgemm.h" />
     <ClInclude Include="..\src\RaggedVector.hpp" />
     <ClInclude Include="..\src\sais\fm_index.hpp" />
@@ -102,6 +102,14 @@
       <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AdvancedVectorExtensions512</EnableEnhancedInstructionSet>
       <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AdvancedVectorExtensions512</EnableEnhancedInstructionSet>
     </ClCompile>
+    <ClCompile Include="..\src\archImpl\avx512vnni.cpp">
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AdvancedVectorExtensions512</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AdvancedVectorExtensions512</EnableEnhancedInstructionSet>
+    </ClCompile>
+    <ClCompile Include="..\src\archImpl\avx_vnni.cpp">
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+    </ClCompile>
     <ClCompile Include="..\src\archImpl\neon.cpp">
       <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotSet</EnableEnhancedInstructionSet>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -126,7 +134,7 @@
     <ClCompile Include="..\src\FileUtils.cpp" />
     <ClCompile Include="..\src\Joiner.cpp" />
     <ClCompile Include="..\src\Knlm.cpp" />
-    <ClCompile Include="..\src\PCLanguageModel.cpp" />
+    <ClCompile Include="..\src\CoNgramModel.cpp" />
     <ClCompile Include="..\src\qgemm.cpp" />
     <ClCompile Include="..\src\search.cpp" />
     <ClCompile Include="..\src\SkipBigramModel.cpp" />

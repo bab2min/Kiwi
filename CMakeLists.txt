@@ -45,18 +45,21 @@ endif()
 set ( CORE_SRCS
   src/ArchUtils.cpp
   src/Combiner.cpp
+  src/CoNgramModel.cpp
+  src/Dataset.cpp
   src/Form.cpp
   src/FeatureTestor.cpp
   src/FileUtils.cpp
-  src/Dataset.cpp
   src/Joiner.cpp
   src/Kiwi.cpp
   src/KiwiBuilder.cpp
   src/Knlm.cpp
   src/KTrie.cpp
   src/PatternMatcher.cpp
+  src/qgemm.cpp
   src/search.cpp
   src/ScriptType.cpp
+  src/SkipBigramModel.cpp
   src/SubstringExtractor.cpp
   src/SwTokenizer.cpp
   src/TagUtils.cpp
@@ -84,6 +87,11 @@ include_directories( third_party/cpp-btree )
 include_directories( third_party/variant/include )
 include_directories( third_party/eigen )
 include_directories( third_party/json/include )
+include_directories( third_party/streamvbyte/include )
+add_subdirectory( third_party/streamvbyte )
+set ( STREAMBYTE_OBJECTS 
+  $<TARGET_OBJECTS:streamvbyte>
+)
 if(KIWI_USE_CPUINFO)
   message(STATUS "Use cpuinfo")
   include_directories( third_party/cpuinfo/include )
@@ -156,7 +164,9 @@ if (KIWI_CPU_ARCH MATCHES "x86_64")
     set( CORE_SRCS 
       ${CORE_SRCS}
       src/archImpl/avx2.cpp
+      src/archImpl/avx_vnni.cpp
       src/archImpl/avx512bw.cpp
+      src/archImpl/avx512vnni.cpp
     )
   endif()
   if(MSVC)
@@ -164,14 +174,18 @@ if (KIWI_CPU_ARCH MATCHES "x86_64")
     set_source_files_properties(src/archImpl/sse4_1.cpp PROPERTIES COMPILE_FLAGS "/arch:SSE2")
     if (KIWI_USE_CPUINFO)
       set_source_files_properties(src/archImpl/avx2.cpp PROPERTIES COMPILE_FLAGS "/arch:AVX2")
+      set_source_files_properties(src/archImpl/avx_vnni.cpp PROPERTIES COMPILE_FLAGS "/arch:AVX2")
       set_source_files_properties(src/archImpl/avx512bw.cpp PROPERTIES COMPILE_FLAGS "/arch:AVX512")
+      set_source_files_properties(src/archImpl/avx512vnni.cpp PROPERTIES COMPILE_FLAGS "/arch:AVX512")
     endif()
   else()
     set_source_files_properties(src/archImpl/sse2.cpp PROPERTIES COMPILE_FLAGS "-msse2")
     set_source_files_properties(src/archImpl/sse4_1.cpp PROPERTIES COMPILE_FLAGS "-msse2 -msse4.1")
     if (KIWI_USE_CPUINFO)
       set_source_files_properties(src/archImpl/avx2.cpp PROPERTIES COMPILE_FLAGS "-mavx -mavx2 -mfma")
+      set_source_files_properties(src/archImpl/avx_vnni.cpp PROPERTIES COMPILE_FLAGS "-mavx -mavx2 -mfma -mavxvnni")
       set_source_files_properties(src/archImpl/avx512bw.cpp PROPERTIES COMPILE_FLAGS "-mavx512f -mavx512bw")
+      set_source_files_properties(src/archImpl/avx512vnni.cpp PROPERTIES COMPILE_FLAGS "-mavx512f -mavx512bw -mavx512vnni")
     endif()
   endif()
 elseif (KIWI_CPU_ARCH MATCHES "arm64")
@@ -191,12 +205,14 @@ add_library( "${PROJECT_NAME}_static" STATIC
   ${CORE_SRCS}
   src/capi/kiwi_c.cpp
   ${CPUINFO_OBJECTS_STATIC}
+  ${STREAMBYTE_OBJECTS}
 )
 
 add_library( "${PROJECT_NAME}" SHARED
   ${CORE_SRCS}
   src/capi/kiwi_c.cpp
   ${CPUINFO_OBJECTS_SHARED}
+  ${STREAMBYTE_OBJECTS}
 )
 
 # Install the kiwi library as well as header files to (`include/kiwi` directory)

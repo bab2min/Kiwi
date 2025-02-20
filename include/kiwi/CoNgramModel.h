@@ -15,7 +15,7 @@ namespace kiwi
 {
 	namespace lm
 	{
-		struct PcLangModelHeader
+		struct CoNgramModelHeader
 		{
 			uint64_t vocabSize, contextSize;
 			uint16_t dim;
@@ -34,24 +34,24 @@ namespace kiwi
 			uint32_t nextOffset = 0;
 		};
 
-		class PcLangModelBase : public ILangModel
+		class CoNgramModelBase : public ILangModel
 		{
 		protected:
 			const size_t memorySize = 0;
-			PcLangModelHeader header;
+			CoNgramModelHeader header;
 
-			PcLangModelBase(const utils::MemoryObject& mem) : memorySize{ mem.size() }, header{ *reinterpret_cast<const PcLangModelHeader*>(mem.get()) }
+			CoNgramModelBase(const utils::MemoryObject& mem) : memorySize{ mem.size() }, header{ *reinterpret_cast<const CoNgramModelHeader*>(mem.get()) }
 			{
 			}
 		public:
-			virtual ~PcLangModelBase() {}
+			virtual ~CoNgramModelBase() {}
 			size_t vocabSize() const override { return header.vocabSize; }
 			size_t getMemorySize() const override { return memorySize; }
 
-			const PcLangModelHeader& getHeader() const { return header; }
+			const CoNgramModelHeader& getHeader() const { return header; }
 
 			static utils::MemoryObject build(const std::string& contextDefinition, const std::string& embedding, size_t maxContextLength = -1, bool useVLE = true, bool reorderContextIdx = true);
-			static std::unique_ptr<PcLangModelBase> create(utils::MemoryObject&& mem, ArchType archType = ArchType::none, bool useDistantTokens = false, bool quantized = true);
+			static std::unique_ptr<CoNgramModelBase> create(utils::MemoryObject&& mem, ArchType archType = ArchType::none, bool useDistantTokens = false, bool quantized = true);
 		};
 	}
 }

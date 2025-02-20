@@ -16,7 +16,7 @@
 #include "RaggedVector.hpp"
 #include "SkipBigramTrainer.hpp"
 #include "SkipBigramModel.hpp"
-#include "PCLanguageModel.hpp"
+#include "CoNgramModel.hpp"
 #include "SortUtils.hpp"
 
 using namespace std;
@@ -791,12 +791,11 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, size_t _numThreads, BuildOptio
 	{
 		langMdl = lm::SkipBigramModelBase::create(utils::MMap(modelPath + string{ "/sj.knlm" }), utils::MMap(modelPath + string{ "/skipbigram.mdl" }), archType);
 	}
-	else if (modelType == ModelType::pclm || modelType == ModelType::pclmLocal 
-		|| modelType == ModelType::pclmQuantized || modelType == ModelType::pclmLocalQuantized)
+	else if (ModelType::cong <= modelType && modelType <= ModelType::congGlobalFp32 )
 	{
-		langMdl = lm::PcLangModelBase::create(utils::MMap(modelPath + string{ "/pclm.mdl" }), archType, 
-			(modelType == ModelType::pclm || modelType == ModelType::pclmQuantized),
-			(modelType == ModelType::pclmQuantized || modelType == ModelType::pclmLocalQuantized));
+		langMdl = lm::CoNgramModelBase::create(utils::MMap(modelPath + string{ "/cong.mdl" }), archType, 
+			(modelType == ModelType::congGlobal || modelType == ModelType::congGlobalFp32),
+			(modelType == ModelType::cong || modelType == ModelType::congGlobal));
 	}
 
 	if (!!(options & BuildOption::loadDefaultDict))

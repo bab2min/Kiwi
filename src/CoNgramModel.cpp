@@ -3,7 +3,7 @@
 #include "PathEvaluator.hpp"
 #include "Joiner.hpp"
 #include "Kiwi.hpp"
-#include "PCLanguageModel.hpp"
+#include "CoNgramModel.hpp"
 #include "StrUtils.h"
 #include "FrozenTrie.hpp"
 #include "qgemm.h"
@@ -18,9 +18,9 @@ namespace kiwi
 	}
 
 	template<size_t windowSize, ArchType arch, class VocabTy, class VlVocabTy, bool quantized>
-	struct MorphemeEvaluator<lm::PcLMState<windowSize, arch, VocabTy, VlVocabTy, quantized>>
+	struct MorphemeEvaluator<lm::CoNgramState<windowSize, arch, VocabTy, VlVocabTy, quantized>>
 	{
-		using LmState = lm::PcLMState<windowSize, arch, VocabTy, VlVocabTy, quantized>;
+		using LmState = lm::CoNgramState<windowSize, arch, VocabTy, VlVocabTy, quantized>;
 
 		template<PathEvaluatingMode mode>
 		void eval(
@@ -47,7 +47,7 @@ namespace kiwi
 			thread_local Vector<VocabTy> nextWids, nextDistantWids;
 			thread_local Vector<float> scores;
 
-			const auto* langMdl = static_cast<const lm::PcLangModel<arch, VocabTy, VlVocabTy, windowSize, quantized>*>(kw->getLangModel());
+			const auto* langMdl = static_cast<const lm::CoNgramModel<arch, VocabTy, VlVocabTy, windowSize, quantized>*>(kw->getLangModel());
 			const Morpheme* morphBase = kw->morphemes.data();
 			const auto spacePenalty = kw->spacePenalty;
 			const bool allowedSpaceBetweenChunk = kw->spaceTolerance > 0;
@@ -132,9 +132,9 @@ namespace kiwi
 				}
 				else
 				{
-				nextLmStates.resize(prevLmStates.size() * nextWids.size());
-				scores.resize(prevLmStates.size() * nextWids.size());
-				langMdl->progressMatrix<windowSize>(prevLmStates.data(), nextWids.data(), prevLmStates.size(), nextWids.size(), nextDistantWids.size(), nextLmStates.data(), scores.data());
+					nextLmStates.resize(prevLmStates.size() * nextWids.size());
+					scores.resize(prevLmStates.size() * nextWids.size());
+					langMdl->progressMatrix<windowSize>(prevLmStates.data(), nextWids.data(), prevLmStates.size(), nextWids.size(), nextDistantWids.size(), nextLmStates.data(), scores.data());
 				}
 			}
 
@@ -336,7 +336,7 @@ namespace kiwi
 		}
 
 		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
-		PcLangModel<arch, KeyType, VlKeyType, windowSize, quantized>::PcLangModel(utils::MemoryObject&& mem) : PcLangModelBase{ mem }
+		CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::CoNgramModel(utils::MemoryObject&& mem) : CoNgramModelBase{ mem }
 		{
 			auto* ptr = reinterpret_cast<const char*>(mem.get());
 
@@ -589,7 +589,7 @@ namespace kiwi
 		}
 
 		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
-		float PcLangModel<arch, KeyType, VlKeyType, windowSize, quantized>::progress(int32_t& nodeIdx,
+		float CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::progress(int32_t& nodeIdx,
 			uint32_t& contextIdx,
 			std::array<KeyType, windowSize + 1>& history,
 			KeyType next) const
@@ -621,7 +621,6 @@ namespace kiwi
 						getContextQuantEmb(0), contextIdcs, contextEmbStride(),
 						getOutputQuantEmb(0), nextIdx, outputEmbStride(),
 						&lls[1 + windowSize], 1);
-
 					for (size_t i = 0; i < 1 + windowSize; ++i)
 					{
 						lls[i] += lls[i + 1 + windowSize];
@@ -667,6 +666,7 @@ namespace kiwi
 				{
 					const auto* contextPtr = getContextQuantEmb(contextIdx);
 					const auto* outputPtr = getOutputQuantEmb(next);
+
 					int32_t acc = qgemm::dotprod<arch>(contextPtr, outputPtr, header.dim);
 					const float contextScale = *reinterpret_cast<const float*>(contextPtr + header.dim),
 						outputScale = *reinterpret_cast<const float*>(outputPtr + header.dim),
@@ -697,7 +697,7 @@ namespace kiwi
 		}
 
 		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
-		struct PcLangModel<arch, KeyType, VlKeyType, windowSize, quantized>::TLSForProgressMatrix
+		struct CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::TLSForProgressMatrix
 		{
 			Vector<pair<int32_t, uint32_t>> contextCache;
 			Vector<uint64_t> contextIdcs, historyIdcs, nextIdcs;
@@ -712,7 +712,7 @@ namespace kiwi
 		// specialization for windowSize > 0
 		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
 		template<size_t _windowSize>
-		inline auto PcLangModel<arch, KeyType, VlKeyType, windowSize, quantized>::nextState(
+		inline auto CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::nextState(
 			const typename std::enable_if<(_windowSize > 0), LmStateType>::type& state, KeyType next, 
 			bool cacheIsValid, pair<int32_t, uint32_t>& cache) const -> LmStateType
 		{
@@ -724,7 +724,7 @@ namespace kiwi
 			}
 			else
 			{
-			ret.contextIdx = progressContextNode(ret.node, next);
+				ret.contextIdx = progressContextNode(ret.node, next);
 				cache = std::make_pair(ret.node, ret.contextIdx);
 			}
 
@@ -743,7 +743,7 @@ namespace kiwi
 		// specialization for windowSize == 0
 		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
 		template<size_t _windowSize>
-		inline auto PcLangModel<arch, KeyType, VlKeyType, windowSize, quantized>::nextState(
+		inline auto CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::nextState(
 			const typename std::enable_if<_windowSize == 0, LmStateType>::type& state, KeyType next, 
 			bool cacheIsValid, pair<int32_t, uint32_t>& cache) const -> LmStateType
 		{
@@ -755,7 +755,7 @@ namespace kiwi
 			}
 			else
 			{
-			ret.contextIdx = progressContextNode(ret.node, next);
+				ret.contextIdx = progressContextNode(ret.node, next);
 				cache = std::make_pair(ret.node, ret.contextIdx);
 			}
 			return ret;
@@ -772,7 +772,7 @@ namespace kiwi
 		}
 
 		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
-		inline void PcLangModel<arch, KeyType, VlKeyType, windowSize, quantized>::progressMatrixWSort(
+		inline void CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::progressMatrixWSort(
 			TLSForProgressMatrix& tls, const LmStateType* prevStates, const KeyType* nextIds,
 			size_t prevStateSize, size_t nextIdSize, size_t numValidDistantTokens,
 			LmStateType* outStates, float* outScores) const
@@ -948,13 +948,11 @@ namespace kiwi
 					tls.confidenceBuf[uniqInputSize * 2 + i] = getDistantConfid(historyToken);
 				}
 			}
+
 			Eigen::Map<Eigen::MatrixXf> resultMap{ tls.resultBuf.data(), (Eigen::Index)uniqOutputSize, (Eigen::Index)(uniqInputSize + uniqHistorySize) };
 
 			if constexpr (quantized)
 			{
-				//thread_local Map<pair<uint32_t, uint32_t>, size_t> shapeCnt;
-				//shapeCnt[make_pair(uniqInputSize + uniqHistorySize, uniqOutputSize)]++;
-				//ScopedTimer<> timer{ 0 };
 				qgemm::scatteredGEMMOpt<arch>(
 					uniqInputSize + uniqHistorySize, uniqOutputSize, header.dim,
 					getContextQuantEmb(0), tls.contextIdcs2.data(), contextEmbStride(),
@@ -971,8 +969,8 @@ namespace kiwi
 			pair<int32_t, uint32_t> contextCache;
 			for (size_t j = 0; j < nextIdSize; ++j)
 			{
-			for (size_t i = 0; i < prevStateSize; ++i)
-			{
+				for (size_t i = 0; i < prevStateSize; ++i)
+				{
 					const auto& state = prevStates[i];
 					const bool cacheIsValid = i > 0 && state.node == prevStates[i - 1].node;
 					outStates[i * nextIdSize + j] = nextState<windowSize>(state, nextIds[j], cacheIsValid, contextCache);
@@ -1036,7 +1034,7 @@ namespace kiwi
 		}
 
 		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
-		inline void PcLangModel<arch, KeyType, VlKeyType, windowSize, quantized>::progressMatrixWOSort(
+		inline void CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::progressMatrixWOSort(
 			TLSForProgressMatrix& tls, const LmStateType* prevStates, const KeyType* nextIds,
 			size_t prevStateSize, size_t nextIdSize, size_t numValidDistantTokens,
 			LmStateType* outStates, float* outScores) const
@@ -1047,7 +1045,7 @@ namespace kiwi
 			{
 				tls.contextIdcs2.clear();
 				tls.nextIdcs2.clear();
-				}
+			}
 			else
 			{
 				tls.inputEmbBuf.resize(prevStateSize * (1 + windowSize) * header.dim);
@@ -1199,7 +1197,7 @@ namespace kiwi
 
 		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
 		template<size_t _windowSize>
-		void PcLangModel<arch, KeyType, VlKeyType, windowSize, quantized>::progressMatrix(
+		void CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::progressMatrix(
 			const typename std::enable_if<(_windowSize > 0), LmStateType>::type* prevStates, const KeyType* nextIds,
 			size_t prevStateSize, size_t nextIdSize, size_t numValidDistantTokens,
 			LmStateType* outStates, float* outScores) const
@@ -1217,7 +1215,7 @@ namespace kiwi
 
 		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
 		template<size_t _windowSize>
-		void PcLangModel<arch, KeyType, VlKeyType, windowSize, quantized>::progressMatrix(
+		void CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::progressMatrix(
 			const typename std::enable_if<_windowSize == 0, LmStateType>::type* prevStates, const KeyType* nextIds,
 			size_t prevStateSize, size_t nextIdSize, size_t numValidDistantTokens,
 			LmStateType* outStates, float* outScores) const
@@ -1313,9 +1311,9 @@ namespace kiwi
 			pair<int32_t, uint32_t> contextCache;
 			for (size_t j = 0; j < nextIdSize; ++j)
 			{
-			for (size_t i = 0; i < prevStateSize; ++i)
-			{
-				const auto& state = prevStates[i];
+				for (size_t i = 0; i < prevStateSize; ++i)
+				{
+					const auto& state = prevStates[i];
 					const bool cacheIsValid = i > 0 && state.node == prevStates[i - 1].node;
 					outStates[i * nextIdSize + j] = nextState<windowSize>(state, nextIds[j], cacheIsValid, contextCache);
 				}
@@ -1330,7 +1328,7 @@ namespace kiwi
 			}
 		}
 
-		utils::MemoryObject PcLangModelBase::build(const string& contextDefinition, const string& embedding, size_t maxContextLength, bool useVLE, bool reorderContextId)
+		utils::MemoryObject CoNgramModelBase::build(const string& contextDefinition, const string& embedding, size_t maxContextLength, bool useVLE, bool reorderContextId)
 		{
 			ifstream contextStr, embeddingStr;
 			if (!openFile(contextStr, contextDefinition))
@@ -1573,8 +1571,8 @@ namespace kiwi
 				distantMask.resize(compressedDistantMaskSize);
 			}
 
-			PcLangModelHeader header;
-			memset(&header, 0, sizeof(PcLangModelHeader));
+			CoNgramModelHeader header;
+			memset(&header, 0, sizeof(CoNgramModelHeader));
 			header.dim = dim;
 			header.contextSize = contextSize;
 			header.vocabSize = outputSize;
@@ -1583,7 +1581,7 @@ namespace kiwi
 			header.numNodes = nodeSizes.size();
 
 			size_t finalSize = 0;
-			header.nodeOffset = alignedOffsetInc(finalSize, sizeof(PcLangModelHeader));
+			header.nodeOffset = alignedOffsetInc(finalSize, sizeof(CoNgramModelHeader));
 			header.keyOffset = alignedOffsetInc(finalSize, compressedNodeSizes.size());
 			header.valueOffset = alignedOffsetInc(finalSize, compressedKeys.size());
 			header.embOffset = alignedOffsetInc(finalSize, compressedValues.size());
@@ -1595,7 +1593,7 @@ namespace kiwi
 
 			utils::MemoryOwner mem{ finalSize };
 			utils::omstream ostr{ (char*)mem.get(), (std::ptrdiff_t)mem.size() };
-			ostr.write((const char*)&header, sizeof(PcLangModelHeader));
+			ostr.write((const char*)&header, sizeof(CoNgramModelHeader));
 			writePadding(ostr);
 			ostr.write((const char*)compressedNodeSizes.data(), compressedNodeSizes.size());
 			writePadding(ostr);
@@ -1630,39 +1628,39 @@ namespace kiwi
 		}
 
 		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
-		void* PcLangModel<arch, KeyType, VlKeyType, windowSize, quantized>::getFindBestPathFn() const
+		void* CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::getFindBestPathFn() const
 		{
-			return (void*)&BestPathFinder::findBestPath<PcLangModel<arch, KeyType, VlKeyType, windowSize, quantized>>;
+			return (void*)&BestPathFinder::findBestPath<CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>>;
 		}
 
 		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
-		void* PcLangModel<arch, KeyType, VlKeyType, windowSize, quantized>::getNewJoinerFn() const
+		void* CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::getNewJoinerFn() const
 		{
 			return (void*)&newJoinerWithKiwi<LmStateType>;
 		}
 
 		template<ArchType archType, class KeyTy, class VlKeyType, bool useDistantTokens, bool quantized>
-		inline std::unique_ptr<PcLangModelBase> createOptimizedModelWithWindowSize(utils::MemoryObject&& mem)
+		inline std::unique_ptr<CoNgramModelBase> createOptimizedModelWithWindowSize(utils::MemoryObject&& mem)
 		{
-			auto& header = *reinterpret_cast<const PcLangModelHeader*>(mem.get());
+			auto& header = *reinterpret_cast<const CoNgramModelHeader*>(mem.get());
 			if (!useDistantTokens)
 			{
-				return make_unique<PcLangModel<archType, KeyTy, VlKeyType, 0, quantized>>(std::move(mem));
+				return make_unique<CoNgramModel<archType, KeyTy, VlKeyType, 0, quantized>>(std::move(mem));
 			}
 
 			switch (header.windowSize)
 			{
 			case 7:
-				return make_unique<PcLangModel<archType, KeyTy, VlKeyType, 7, quantized>>(std::move(mem));
+				return make_unique<CoNgramModel<archType, KeyTy, VlKeyType, 7, quantized>>(std::move(mem));
 			default:
 				throw std::runtime_error{ "Unsupported `window_size` : " + std::to_string((size_t)header.windowSize) };
 			};
 		}
 
 		template<ArchType archType, bool useDistantTokens, bool quantized>
-		std::unique_ptr<PcLangModelBase> createOptimizedModel(utils::MemoryObject&& mem)
+		std::unique_ptr<CoNgramModelBase> createOptimizedModel(utils::MemoryObject&& mem)
 		{
-			auto& header = *reinterpret_cast<const PcLangModelHeader*>(mem.get());
+			auto& header = *reinterpret_cast<const CoNgramModelHeader*>(mem.get());
 			switch (header.keySize)
 			{
 			case 2:
@@ -1688,7 +1686,7 @@ namespace kiwi
 			};
 		};
 
-		std::unique_ptr<PcLangModelBase> PcLangModelBase::create(utils::MemoryObject&& mem, ArchType archType, bool useDistantTokens, bool quantized)
+		std::unique_ptr<CoNgramModelBase> CoNgramModelBase::create(utils::MemoryObject&& mem, ArchType archType, bool useDistantTokens, bool quantized)
 		{
 			static tp::Table<FnCreateOptimizedModel, AvailableArch> tables[] = {
 				CreateOptimizedModelGetter<false, false>{},

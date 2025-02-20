@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file Types.h
  * @author bab2min (bab2min@gmail.com)
  * @brief Kiwi C++ API에 쓰이는 주요 타입들을 모아놓은 헤더 파일
@@ -308,10 +308,10 @@ namespace kiwi
 		none = 0, /**< Select default model */
 		knlm = 1, /**< Kneser-Ney Language Model */
 		sbg = 2, /**< Skip-Bigram Model */
-		pclm = 3, /**< Pre-computed Context Language Model */
-		pclmLocal = 4, /**< Pre-computed Context Language Model (Only local context) */
-		pclmQuantized = 5, /**< Pre-computed Context Language Model (quantized) */
-		pclmLocalQuantized = 6, /**< Pre-computed Context Language Model (Only local context, quantized) */
+		cong = 3, /**< Contextual N-gram embedding Language Model (Only local context) */
+		congGlobal = 4, /**< Contextual N-gram embedding Language Model (local and global context) */
+		congFp32 = 5, /**< Contextual N-gram embedding Language Model (Only local context, non-quantized(slow) version) */
+		congGlobalFp32 = 6, /**< Contextual N-gram embedding Language Model (local and global context, non-quantized(slow) version) */
 		knlmTransposed,
 	};
 

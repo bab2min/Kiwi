@@ -66,21 +66,21 @@ int main(int argc, const char* argv[])
 		{
 			kiwiModelType = ModelType::knlmTransposed;
 		}
-		else if (v == "pclm")
+		else if (v == "cong")
 		{
-			kiwiModelType = ModelType::pclm;
+			kiwiModelType = ModelType::cong;
 		}
-		else if (v == "pclm-local")
+		else if (v == "cong-global")
 		{
-			kiwiModelType = ModelType::pclmLocal;
+			kiwiModelType = ModelType::congGlobal;
 		}
-		else if (v == "pclm-quant")
+		else if (v == "cong-fp32")
 		{
-			kiwiModelType = ModelType::pclmQuantized;
+			kiwiModelType = ModelType::congFp32;
 		}
-		else if (v == "pclm-local-quant")
+		else if (v == "cong-global-fp32")
 		{
-			kiwiModelType = ModelType::pclmLocalQuantized;
+			kiwiModelType = ModelType::congGlobalFp32;
 		}
 		else
 		{

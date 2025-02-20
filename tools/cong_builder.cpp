@@ -2,7 +2,7 @@
 #include <fstream>
 
 #include <kiwi/Kiwi.h>
-#include <kiwi/PCLanguageModel.h>
+#include <kiwi/CoNgramModel.h>
 #include <tclap/CmdLine.h>
 #include "toolUtils.h"
 
@@ -16,8 +16,8 @@ int run(const std::string& morphemeDef, const std::string& contextDef, const std
 	{
 		tutils::Timer timer;
 		KiwiBuilder::buildMorphData(morphemeDef, output, minCnt);
-		auto ret = lm::PcLangModelBase::build(contextDef, embedding, maxLength, useVLE, reorderContextIdx);
-		ret.writeToFile(output + "/pclm.mdl");
+		auto ret = lm::CoNgramModelBase::build(contextDef, embedding, maxLength, useVLE, reorderContextIdx);
+		ret.writeToFile(output + "/cong.mdl");
 		double tm = timer.getElapsed();
 		cout << "Total: " << tm << " ms " << endl;
 		return 0;

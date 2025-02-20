@@ -4,7 +4,7 @@
 
 #include <kiwi/Types.h>
 #include <kiwi/Utils.h>
-#include <kiwi/PCLanguageModel.h>
+#include <kiwi/CoNgramModel.h>
 #include <kiwi/ArchUtils.h>
 #include "ArchAvailable.h"
 #include "search.h"
@@ -16,10 +16,10 @@ namespace kiwi
 	namespace lm
 	{
 		template<size_t windowSize, ArchType _arch, class VocabTy, class VlVocabTy, bool quantized>
-		class PcLMState;
+		class CoNgramState;
 
 		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized = true>
-		class PcLangModel : public PcLangModelBase
+		class CoNgramModel : public CoNgramModelBase
 		{
 			using MyNode = Node<KeyType, uint32_t>;
 
@@ -173,21 +173,21 @@ namespace kiwi
 
 		public:
 			using VocabType = KeyType;
-			using LmStateType = PcLMState<windowSize, arch, VocabType, VlKeyType, quantized>;
+			using LmStateType = CoNgramState<windowSize, arch, VocabType, VlKeyType, quantized>;
 
-			PcLangModel(utils::MemoryObject&& mem);
+			CoNgramModel(utils::MemoryObject&& mem);
 
 			ModelType getType() const override 
 			{ 
 				if (quantized)
 				{
-					if (windowSize > 0) return ModelType::pclmQuantized;
-					else return ModelType::pclmLocalQuantized;
+					if (windowSize > 0) return ModelType::congGlobal;
+					else return ModelType::cong;
 				}
 				else
 				{
-					if (windowSize > 0) return ModelType::pclm;
-					else return ModelType::pclmLocal;
+					if (windowSize > 0) return ModelType::congGlobalFp32;
+					else return ModelType::congFp32;
 				}
 			}
 			void* getFindBestPathFn() const override;
@@ -221,7 +221,6 @@ namespace kiwi
 					auto* kvs = &alignedKeyValueData[node->nextOffset];
 					if (node != nodeData.get())
 					{
-						//ScopedTimer<> timer(node->numNexts <= 16 ? 0 : node->numNexts <= 272 ? 1 : 2);
 						PREFETCH_T0(node + node->lower);
 						if ((v = nst::searchKV<arch, VlKeyType, int32_t, int32_t>(
 							kvs,
@@ -334,7 +333,7 @@ namespace kiwi
 		};
 
 		template<size_t windowSize, ArchType _arch, class VocabTy, class VlVocabTy, bool quantized>
-		struct PcLMState : public LmStateBase<PcLangModel<_arch, VocabTy, VlVocabTy, windowSize, quantized>>
+		struct CoNgramState : public LmStateBase<CoNgramModel<_arch, VocabTy, VlVocabTy, windowSize, quantized>>
 		{
 			int32_t node = 0;
 			uint32_t contextIdx;
@@ -343,37 +342,37 @@ namespace kiwi
 			static constexpr ArchType arch = _arch;
 			static constexpr bool transposed = true;
 
-			PcLMState() : contextIdx{ 0 }, history { { 0, } }
+			CoNgramState() : contextIdx{ 0 }, history { { 0, } }
 			{
 			}
 
-			PcLMState(const ILangModel* lm) : contextIdx{ 0 }, history{ {0,} }
+			CoNgramState(const ILangModel* lm) : contextIdx{ 0 }, history{ {0,} }
 			{
 			}
 
-			PcLMState(int32_t _node) : node{ _node } // partially initialized state
+			CoNgramState(int32_t _node) : node{ _node } // partially initialized state
 			{
 			}
 
-			bool operator==(const PcLMState& other) const
+			bool operator==(const CoNgramState& other) const
 			{
 				static constexpr size_t cmpStart = windowSize / 2;
 				if (node != other.node) return false;
 				if (memcmp(&history[cmpStart], &other.history[cmpStart], (windowSize - cmpStart) * sizeof(VocabTy)))
 				{
-						return false;
-					}
+					return false;
+				}
 				return true;
 			}
 
-			float nextImpl(const PcLangModel<arch, VocabTy, VlVocabTy, windowSize, quantized>* lm, VocabTy next)
+			float nextImpl(const CoNgramModel<arch, VocabTy, VlVocabTy, windowSize, quantized>* lm, VocabTy next)
 			{
 				return lm->progress(node, contextIdx, history, next);
 			}
 		};
 
 		template<ArchType _arch, class VocabTy, class VlVocabTy, bool quantized>
-		struct PcLMState<0, _arch, VocabTy, VlVocabTy, quantized> : public LmStateBase<PcLangModel<_arch, VocabTy, VlVocabTy, 0, quantized>>
+		struct CoNgramState<0, _arch, VocabTy, VlVocabTy, quantized> : public LmStateBase<CoNgramModel<_arch, VocabTy, VlVocabTy, 0, quantized>>
 		{
 			int32_t node = 0;
 			uint32_t contextIdx;
@@ -382,24 +381,24 @@ namespace kiwi
 			static constexpr bool transposed = true;
 			static constexpr size_t windowSize = 0;
 
-			PcLMState() : contextIdx{ 0 }
+			CoNgramState() : contextIdx{ 0 }
 			{
 			}
 
-			PcLMState(const ILangModel* lm) : contextIdx{ 0 }
+			CoNgramState(const ILangModel* lm) : contextIdx{ 0 }
 			{
 			}
 			
-			PcLMState(int32_t _node) : node{ _node } // partially initialized state
+			CoNgramState(int32_t _node) : node{ _node } // partially initialized state
 			{
 			}
 
-			bool operator==(const PcLMState& other) const
+			bool operator==(const CoNgramState& other) const
 			{
 				return node == other.node;
 			}
 
-			float nextImpl(const PcLangModel<arch, VocabTy, VlVocabTy, windowSize, quantized>* lm, VocabTy next)
+			float nextImpl(const CoNgramModel<arch, VocabTy, VlVocabTy, windowSize, quantized>* lm, VocabTy next)
 			{
 				std::array<VocabTy, windowSize + 1> history = { {0,} };
 				return lm->progress(node, contextIdx, history, next);
@@ -424,9 +423,9 @@ namespace kiwi
 	};
 
 	template<size_t windowSize, ArchType arch, class VocabTy, class VlVocabTy, bool quantized>
-	struct Hash<lm::PcLMState<windowSize, arch, VocabTy, VlVocabTy, quantized>>
+	struct Hash<lm::CoNgramState<windowSize, arch, VocabTy, VlVocabTy, quantized>>
 	{
-		size_t operator()(const lm::PcLMState<windowSize, arch, VocabTy, VlVocabTy, quantized>& state) const
+		size_t operator()(const lm::CoNgramState<windowSize, arch, VocabTy, VlVocabTy, quantized>& state) const
 		{
 			size_t ret = Hash<uint32_t>{}(state.node);
 			static constexpr size_t cmpStart = windowSize - sizeof(size_t) / sizeof(VocabTy);
@@ -438,9 +437,9 @@ namespace kiwi
 	};
 
 	template<ArchType arch, class VocabTy, class VlVocabTy, bool quantized>
-	struct Hash<lm::PcLMState<0, arch, VocabTy, VlVocabTy, quantized>>
+	struct Hash<lm::CoNgramState<0, arch, VocabTy, VlVocabTy, quantized>>
 	{
-		size_t operator()(const lm::PcLMState<0, arch, VocabTy, VlVocabTy, quantized>& state) const
+		size_t operator()(const lm::CoNgramState<0, arch, VocabTy, VlVocabTy, quantized>& state) const
 		{
 			size_t ret = Hash<uint32_t>{}(state.node);
 			return ret;

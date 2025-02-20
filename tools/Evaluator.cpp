@@ -1,4 +1,4 @@
-﻿#include <fstream>
+#include <fstream>
 #include <iostream>
 
 #include <kiwi/Utils.h>
@@ -24,10 +24,10 @@ const char* modelTypeToStr(ModelType type)
 	case ModelType::knlm: return "knlm";
 	case ModelType::knlmTransposed: return "knlm-transposed";
 	case ModelType::sbg: return "sbg";
-	case ModelType::pclm: return "pclm";
-	case ModelType::pclmLocal: return "pclm-local";
-	case ModelType::pclmQuantized: return "pclm-quant";
-	case ModelType::pclmLocalQuantized: return "pclm-local-quant";
+	case ModelType::cong: return "cong";
+	case ModelType::congGlobal: return "cong-global";
+	case ModelType::congFp32: return "cong-fp32";
+	case ModelType::congGlobalFp32: return "cong-global-fp32";
 	}
 	return "unknown";
 }
