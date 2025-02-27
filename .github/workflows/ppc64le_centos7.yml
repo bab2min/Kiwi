@@ -32,7 +32,7 @@ jobs:
           cp -r build /artifacts/
           cp -r eval_results /artifacts/
     - name: Archive binaries
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Artifacts PPC64LE-Centos7
         path: |
