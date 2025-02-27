@@ -2126,7 +2126,7 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 			estimatedNodeSize += f->first.size() - commonPrefix;
 			prevForm = &f->first;
 		}
-		ret.typoForms.emplace_back(0, 0, 0, hash);
+		ret.typoForms.emplace_back(0, 0, hash);
 		ret.typoPtrs.emplace_back(ret.typoPool.size());
 		formTrie.reserveMore(estimatedNodeSize);
 
