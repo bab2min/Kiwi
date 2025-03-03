@@ -56,7 +56,6 @@ set ( CORE_SRCS
   src/Knlm.cpp
   src/KTrie.cpp
   src/PatternMatcher.cpp
-  src/qgemm.cpp
   src/search.cpp
   src/ScriptType.cpp
   src/SkipBigramModel.cpp

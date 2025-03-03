@@ -141,7 +141,6 @@
     <ClCompile Include="..\src\Joiner.cpp" />
     <ClCompile Include="..\src\Knlm.cpp" />
     <ClCompile Include="..\src\CoNgramModel.cpp" />
-    <ClCompile Include="..\src\qgemm.cpp" />
     <ClCompile Include="..\src\search.cpp" />
     <ClCompile Include="..\src\SkipBigramModel.cpp" />
     <ClCompile Include="..\src\SubstringExtractor.cpp" />
