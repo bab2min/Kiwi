@@ -2205,22 +2205,29 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 
 	ret.formTrie = freezeTrie(move(formTrie), archType);
 
-	for (auto& m : ret.morphemes)
+	ret.specialMorphIds = getSpecialMorphs();
+	return ret;
+}
+
+std::array<size_t, static_cast<size_t>(Kiwi::SpecialMorph::max)> KiwiBuilder::getSpecialMorphs() const
+{
+	std::array<size_t, static_cast<size_t>(Kiwi::SpecialMorph::max)> specialMorphIds = { {0,} };
+	for (auto& m : morphemes)
 	{
-		if (m.kform && *m.kform == u"'")
+		if (forms[m.kform].form == u"'")
 		{
-			if (m.tag == POSTag::sso) ret.specialMorphIds[static_cast<size_t>(Kiwi::SpecialMorph::singleQuoteOpen)] = &m - ret.morphemes.data();
-			else if (m.tag == POSTag::ssc) ret.specialMorphIds[static_cast<size_t>(Kiwi::SpecialMorph::singleQuoteClose)] = &m - ret.morphemes.data();
-			else if (m.tag == POSTag::ss) ret.specialMorphIds[static_cast<size_t>(Kiwi::SpecialMorph::singleQuoteNA)] = &m - ret.morphemes.data();
+			if (m.tag == POSTag::sso) specialMorphIds[static_cast<size_t>(Kiwi::SpecialMorph::singleQuoteOpen)] = &m - morphemes.data();
+			else if (m.tag == POSTag::ssc) specialMorphIds[static_cast<size_t>(Kiwi::SpecialMorph::singleQuoteClose)] = &m - morphemes.data();
+			else if (m.tag == POSTag::ss) specialMorphIds[static_cast<size_t>(Kiwi::SpecialMorph::singleQuoteNA)] = &m - morphemes.data();
 		}
-		else if (m.kform && *m.kform == u"\"")
+		else if (forms[m.kform].form == u"\"")
 		{
-			if (m.tag == POSTag::sso) ret.specialMorphIds[static_cast<size_t>(Kiwi::SpecialMorph::doubleQuoteOpen)] = &m - ret.morphemes.data();
-			else if (m.tag == POSTag::ssc) ret.specialMorphIds[static_cast<size_t>(Kiwi::SpecialMorph::doubleQuoteClose)] = &m - ret.morphemes.data();
-			else if (m.tag == POSTag::ss) ret.specialMorphIds[static_cast<size_t>(Kiwi::SpecialMorph::doubleQuoteNA)] = &m - ret.morphemes.data();
+			if (m.tag == POSTag::sso) specialMorphIds[static_cast<size_t>(Kiwi::SpecialMorph::doubleQuoteOpen)] = &m - morphemes.data();
+			else if (m.tag == POSTag::ssc) specialMorphIds[static_cast<size_t>(Kiwi::SpecialMorph::doubleQuoteClose)] = &m - morphemes.data();
+			else if (m.tag == POSTag::ss) specialMorphIds[static_cast<size_t>(Kiwi::SpecialMorph::doubleQuoteNA)] = &m - morphemes.data();
 		}
 	}
-	return ret;
+	return specialMorphIds;
 }
 
 vector<WordInfo> KiwiBuilder::extractWords(const U16MultipleReader& reader, size_t minCnt, size_t maxWordLen, float minScore, float posThreshold, bool lmFilter) const
@@ -2371,6 +2378,7 @@ HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes,
 	size_t batchSize, size_t causalContextSize, size_t windowSize, size_t numWorkers, 
 	double dropoutProb,
 	double dropoutProbOnHistory,
+	double nounAugmentingProb,
 	const TokenFilter& tokenFilter,
 	const TokenFilter& windowFilter,
 	double splitRatio,
@@ -2381,14 +2389,17 @@ HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes,
 	HSDataset* splitDataset
 ) const
 {
-	HSDataset dataset{ batchSize, causalContextSize, windowSize, true, numWorkers, dropoutProb, dropoutProbOnHistory };
+	HSDataset dataset{ batchSize, causalContextSize, windowSize, true, numWorkers, dropoutProb, dropoutProbOnHistory, nounAugmentingProb };
 	auto& sents = dataset.sents.get();
 	const KiwiBuilder* srcBuilder = this;
 	MorphemeMap realMorph;
 	size_t maxTokenId = 0;
+	shared_ptr<lm::KnLangModelBase> knlm;
+
 	if (morphemeDefPath.empty())
 	{
 		realMorph = restoreMorphemeMap(separateDefaultMorpheme);
+		knlm = dynamic_pointer_cast<lm::KnLangModelBase>(langMdl);
 	}
 	else
 	{
@@ -2407,18 +2418,19 @@ HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes,
 		}
 	}
 
-	auto knlm = dynamic_pointer_cast<lm::KnLangModelBase>(langMdl);
 	dataset.knlm = knlm;
 	dataset.morphemes = &srcBuilder->morphemes;
 	dataset.forms = &srcBuilder->forms;
+	dataset.specialMorphIds = getSpecialMorphs();
 
 	if (splitDataset)
 	{
 		*splitDataset = HSDataset{ batchSize, causalContextSize, windowSize, true, numWorkers, dropoutProb };
 		splitDataset->dummyBuilder = dataset.dummyBuilder;
 		splitDataset->knlm = knlm;
-		splitDataset->morphemes = &srcBuilder->morphemes;
-		splitDataset->forms = &srcBuilder->forms;
+		splitDataset->morphemes = dataset.morphemes;
+		splitDataset->forms = dataset.forms;
+		splitDataset->specialMorphIds = dataset.specialMorphIds;
 	}
 
 	for (auto& path : inputPathes)

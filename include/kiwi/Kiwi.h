@@ -628,6 +628,8 @@ namespace kiwi
 
 		void addAllomorphsToRule();
 
+		std::array<size_t, static_cast<size_t>(Kiwi::SpecialMorph::max)> getSpecialMorphs() const;
+
 	public:
 
 		/**
@@ -823,6 +825,7 @@ namespace kiwi
 			size_t batchSize, size_t causalContextSize, size_t windowSize, size_t numWorkers,
 			double dropoutProb = 0,
 			double dropoutProbOnHistory = 0,
+			double nounAugmentingProb = 0,
 			const TokenFilter& tokenFilter = {},
 			const TokenFilter& windowFilter = {},
 			double splitRatio = 0,

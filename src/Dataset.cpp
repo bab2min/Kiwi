@@ -5,13 +5,18 @@
 
 using namespace kiwi;
 
-HSDataset::HSDataset(size_t _batchSize, size_t _causalContextSize, 
-	size_t _windowSize, bool _exclusiveWindow, 
+HSDataset::HSDataset(size_t _batchSize, 
+	size_t _causalContextSize, 
+	size_t _windowSize, 
+	bool _exclusiveWindow, 
 	size_t _workers, 
-	double _dropoutProb, double _dropoutProbOnHistory)
+	double _dropoutProb, 
+	double _dropoutProbOnHistory,
+	double _nounAugmentingProb)
 	: workers{ _workers ? make_unique<utils::ThreadPool>(_workers) : nullptr },
-	dropout{ {1 - _dropoutProb * 3, _dropoutProb, _dropoutProb, _dropoutProb} }, 
+	dropout{ {1 - _dropoutProb, _dropoutProb / 3, _dropoutProb / 3, _dropoutProb / 6, _dropoutProb / 6} }, 
 	dropoutOnHistory{ _dropoutProbOnHistory },
+	nounAugmentor{ {1 - _nounAugmentingProb, _nounAugmentingProb / 9, _nounAugmentingProb / 9, _nounAugmentingProb / 9, _nounAugmentingProb / 3, _nounAugmentingProb / 3} },
 	locals( _workers ? workers->size() : 1),
 	batchSize{ _batchSize },
 	causalContextSize{ _causalContextSize },
@@ -101,20 +106,64 @@ size_t HSDataset::_next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode,
 			tokens.emplace_back(sent[0]);
 			for (auto p = sent.begin() + 1; p != sent.end() - 1; ++p)
 			{
-				auto t = *p;
-				switch (dropout(local.rng))
+				const auto t = *p;
+				const auto nounAugment = ((*morphemes)[t].tag == POSTag::nnp && !isSpecialClass((*morphemes)[*(p + 1)].tag)) ? nounAugmentor(local.rng) : 0;
+
+				switch (nounAugment)
 				{
-				case 0: // no dropout
-					tokens.emplace_back(t);
+				case 1: // circumfix with sso and ssc
+					tokens.emplace_back(getDefaultMorphemeId(POSTag::sso));
 					break;
-				case 1: // replacement
-					tokens.emplace_back(getDefaultMorphemeId((*morphemes)[t].tag));
+				case 2:
+					tokens.emplace_back(specialMorphIds[(size_t)Kiwi::SpecialMorph::singleQuoteOpen]);
 					break;
-				case 2: // deletion
+				case 3:
+					tokens.emplace_back(specialMorphIds[(size_t)Kiwi::SpecialMorph::doubleQuoteOpen]);
 					break;
-				case 3: // insertion
-					tokens.emplace_back(getDefaultMorphemeId((*morphemes)[t].tag));
-					tokens.emplace_back(t);
+				case 4: // circumfix with sw
+					tokens.emplace_back(getDefaultMorphemeId(POSTag::sw));
+					break;
+				case 5: // replace with w_hashtag
+					tokens.emplace_back(getDefaultMorphemeId(POSTag::w_hashtag));
+					break;
+				}
+
+				if (nounAugment != 5)
+				{
+					switch (dropout(local.rng))
+					{
+					case 0: // no dropout
+						tokens.emplace_back(t);
+						break;
+					case 1: // replacement
+						tokens.emplace_back(getDefaultMorphemeId((*morphemes)[t].tag));
+						break;
+					case 2: // deletion
+						break;
+					case 3: // insertion
+						tokens.emplace_back(getDefaultMorphemeId((*morphemes)[t].tag));
+						tokens.emplace_back(t);
+						break;
+					case 4: // insertion
+						tokens.emplace_back(t);
+						tokens.emplace_back(getDefaultMorphemeId((*morphemes)[t].tag));
+						break;
+					}
+				}
+
+				switch (nounAugment)
+				{
+				case 1: // circumfix with sso and ssc
+					tokens.emplace_back(getDefaultMorphemeId(POSTag::ssc));
+					break;
+				case 2:
+					tokens.emplace_back(specialMorphIds[(size_t)Kiwi::SpecialMorph::singleQuoteClose]);
+					break;
+				case 3:
+					tokens.emplace_back(specialMorphIds[(size_t)Kiwi::SpecialMorph::doubleQuoteClose]);
+					break;
+				case 4: // circumfix with sw
+					tokens.emplace_back(getDefaultMorphemeId(POSTag::sw));
 					break;
 				}
 			}
@@ -433,6 +482,10 @@ std::vector<uint32_t> HSDataset::getAugmentedSent(size_t idx)
 		case 3: // insertion
 			ret.emplace_back(getDefaultMorphemeId((*morphemes)[t].tag));
 			ret.emplace_back(t);
+			break;
+		case 4: // insertion
+			ret.emplace_back(t);
+			ret.emplace_back(getDefaultMorphemeId((*morphemes)[t].tag));
 			break;
 		}
 	}

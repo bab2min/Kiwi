@@ -51,6 +51,7 @@ namespace kiwi
 		std::shared_ptr<KiwiBuilder> dummyBuilder;
 		std::discrete_distribution<> dropout;
 		std::bernoulli_distribution dropoutOnHistory;
+		std::discrete_distribution<> nounAugmentor;
 		std::mt19937_64 rng;
 		Vector<ThreadLocal> locals;
 		Vector<size_t> shuffledIdx;
@@ -68,6 +69,7 @@ namespace kiwi
 		size_t totalTokens = 0;
 		size_t passedSents = 0;
 		size_t passedWorkItems = 0;
+		std::array<size_t, static_cast<size_t>(Kiwi::SpecialMorph::max)> specialMorphIds = { { 0, } };
 
 		size_t numValidTokensInSent(size_t sentId) const;
 
@@ -75,7 +77,14 @@ namespace kiwi
 		size_t _next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode, float& restLmOut, uint32_t& restLmCntOut);
 
 	public:
-		HSDataset(size_t _batchSize = 0, size_t _causalContextSize = 0, size_t _windowSize = 0, bool _exclusiveWindow = true, size_t _workers = 0, double _dropoutProb = 0, double _dropoutProbOnHistory = 0);
+		HSDataset(size_t _batchSize = 0, 
+			size_t _causalContextSize = 0, 
+			size_t _windowSize = 0, 
+			bool _exclusiveWindow = true, 
+			size_t _workers = 0, 
+			double _dropoutProb = 0, 
+			double _dropoutProbOnHistory = 0,
+			double _nounAugmentingProb = 0);
 		~HSDataset();
 		HSDataset(const HSDataset&) = delete;
 		HSDataset(HSDataset&&) /*noexcept*/;
