@@ -106,9 +106,6 @@ if(KIWI_USE_CPUINFO)
   set ( ADDITIONAL_FLAGS ${ADDITIONAL_FLAGS} "-DKIWI_USE_CPUINFO" )
 
   if(MSVC)
-    target_compile_options("clog" PUBLIC
-      /MT
-    )
     target_compile_options("cpuinfo" PUBLIC
       /MT
     )
@@ -118,11 +115,9 @@ if(KIWI_USE_CPUINFO)
   endif()
 
   set ( CPUINFO_OBJECTS_STATIC 
-    $<TARGET_OBJECTS:clog>
     $<TARGET_OBJECTS:cpuinfo_internals>
   )
   set ( CPUINFO_OBJECTS_SHARED 
-    $<TARGET_OBJECTS:clog>
     $<TARGET_OBJECTS:cpuinfo>
   )
 endif()
@@ -184,8 +179,8 @@ if (KIWI_CPU_ARCH MATCHES "x86_64")
     if (KIWI_USE_CPUINFO)
       set_source_files_properties(src/archImpl/avx2.cpp PROPERTIES COMPILE_FLAGS "-mavx -mavx2 -mfma")
       set_source_files_properties(src/archImpl/avx_vnni.cpp PROPERTIES COMPILE_FLAGS "-mavx -mavx2 -mfma -mavxvnni")
-      set_source_files_properties(src/archImpl/avx512bw.cpp PROPERTIES COMPILE_FLAGS "-mavx512f -mavx512bw")
-      set_source_files_properties(src/archImpl/avx512vnni.cpp PROPERTIES COMPILE_FLAGS "-mavx512f -mavx512bw -mavx512vnni")
+      set_source_files_properties(src/archImpl/avx512bw.cpp PROPERTIES COMPILE_FLAGS "-mavx -mavx2 -mfma -mavx512f -mavx512vl -mavx512dq -mavx512bw")
+      set_source_files_properties(src/archImpl/avx512vnni.cpp PROPERTIES COMPILE_FLAGS "-mavx -mavx2 -mfma -mavx512f -mavx512vl -mavx512dq -mavx512bw -mavx512vnni")
     endif()
   endif()
 elseif (KIWI_CPU_ARCH MATCHES "arm64")
