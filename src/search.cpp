@@ -178,7 +178,7 @@ namespace kiwi
 		template<ArchType arch, class IntTy, class ValueTy>
 		ValueTy detail::searchKVImpl(const void* kv, size_t size, IntTy target)
 		{
-			return OptimizedImpl<arch>::searchKV<IntTy, ValueTy>(kv, size, target);
+			return OptimizedImpl<arch>::template searchKV<IntTy, ValueTy>(kv, size, target);
 		}
 
 		template<ArchType arch>
@@ -300,7 +300,7 @@ namespace kiwi
 	{
 		template<class IntTy>
 		ARCH_TARGET("sse2")
-		FORCE_INLINE bool testEq(__m128i p, size_t offset, size_t size, size_t& ret)
+		inline bool testEq(__m128i p, size_t offset, size_t size, size_t& ret)
 		{
 			uint32_t m = _mm_movemask_epi8(p);
 			uint32_t b = utils::countTrailingZeroes(m);
@@ -314,7 +314,7 @@ namespace kiwi
 
 		template<size_t n, class IntTy>
 		ARCH_TARGET("sse2")
-		FORCE_INLINE bool nstSearchSSE2(const IntTy* keys, size_t size, IntTy target, size_t& ret)
+		inline bool nstSearchSSE2(const IntTy* keys, size_t size, IntTy target, size_t& ret)
 		{
 			size_t i = 0, r;
 
@@ -476,7 +476,7 @@ namespace kiwi
 
 		template<size_t n, class IntTy, class ValueTy>
 		ARCH_TARGET("sse2")
-		FORCE_INLINE ValueTy nstSearchKVSSE2(const uint8_t* kv, size_t size, IntTy target)
+		inline ValueTy nstSearchKVSSE2(const uint8_t* kv, size_t size, IntTy target)
 		{
 			size_t i = 0, r;
 
@@ -636,7 +636,7 @@ namespace kiwi
 	{
 		template<class IntTy>
 		ARCH_TARGET("avx2")
-		FORCE_INLINE bool testEq(__m256i p, size_t offset, size_t size, size_t& ret)
+		inline bool testEq(__m256i p, size_t offset, size_t size, size_t& ret)
 		{
 			uint32_t m = _mm256_movemask_epi8(p);
 			uint32_t b = utils::countTrailingZeroes(m);
@@ -648,7 +648,7 @@ namespace kiwi
 			return false;
 		}
 
-		FORCE_INLINE bool testEqMask(uint64_t m, size_t offset, size_t size, size_t& ret)
+		inline bool testEqMask(uint64_t m, size_t offset, size_t size, size_t& ret)
 		{
 			uint32_t b = utils::countTrailingZeroes(m);
 			if (m && (offset + b) < size)
@@ -661,7 +661,7 @@ namespace kiwi
 
 		template<size_t n, class IntTy>
 		ARCH_TARGET("avx2")
-		FORCE_INLINE bool nstSearchAVX2(const IntTy* keys, size_t size, IntTy target, size_t& ret)
+		inline bool nstSearchAVX2(const IntTy* keys, size_t size, IntTy target, size_t& ret)
 		{
 			size_t i = 0, r;
 
@@ -850,7 +850,7 @@ namespace kiwi
 
 		template<size_t n, class IntTy, class ValueTy>
 		ARCH_TARGET("avx2")
-		FORCE_INLINE ValueTy nstSearchKVAVX2(const uint8_t* kv, size_t size, IntTy target)
+		inline ValueTy nstSearchKVAVX2(const uint8_t* kv, size_t size, IntTy target)
 		{
 			if (size < (n + 1) / 2)
 			{
@@ -962,8 +962,8 @@ namespace kiwi
 		}
 
 		template<size_t n, class IntTy>
-		ARCH_TARGET("avx512bw")
-		FORCE_INLINE bool nstSearchAVX512(const IntTy* keys, size_t size, IntTy target, size_t& ret)
+		ARCH_TARGET("avx,avx2,avx512f,avx512bw,avx512dq")
+		inline bool nstSearchAVX512(const IntTy* keys, size_t size, IntTy target, size_t& ret)
 		{
 			size_t i = 0, r;
 
@@ -1152,8 +1152,8 @@ namespace kiwi
 		}
 
 		template<size_t n, class IntTy, class ValueTy>
-		ARCH_TARGET("avx512bw")
-		FORCE_INLINE ValueTy nstSearchKVAVX512(const uint8_t* kv, size_t size, IntTy target)
+		ARCH_TARGET("avx,avx2,avx512f,avx512bw,avx512dq")
+		inline ValueTy nstSearchKVAVX512(const uint8_t* kv, size_t size, IntTy target)
 		{
 			if (size < (n + 1) / 2)
 			{
@@ -1377,7 +1377,7 @@ namespace kiwi
 	{
 		template<size_t n>
 		ARCH_TARGET("arch=armv8-a")
-		bool nstSearchNeon(const int8_t* keys, size_t size, int8_t target, size_t& ret)
+		inline bool nstSearchNeon(const int8_t* keys, size_t size, int8_t target, size_t& ret)
 		{
 			size_t i = 0;
 
@@ -1410,7 +1410,7 @@ namespace kiwi
 
 		template<size_t n>
 		ARCH_TARGET("arch=armv8-a")
-		bool nstSearchNeon(const int16_t* keys, size_t size, int16_t target, size_t& ret)
+		inline bool nstSearchNeon(const int16_t* keys, size_t size, int16_t target, size_t& ret)
 		{
 			size_t i = 0;
 
@@ -1440,7 +1440,7 @@ namespace kiwi
 
 		template<size_t n>
 		ARCH_TARGET("arch=armv8-a")
-		bool nstSearchNeon(const int32_t* keys, size_t size, int32_t target, size_t& ret)
+		inline bool nstSearchNeon(const int32_t* keys, size_t size, int32_t target, size_t& ret)
 		{
 			size_t i = 0;
 
@@ -1470,7 +1470,7 @@ namespace kiwi
 
 		template<size_t n>
 		ARCH_TARGET("arch=armv8-a")
-		bool nstSearchNeon(const int64_t* keys, size_t size, int64_t target, size_t& ret)
+		inline bool nstSearchNeon(const int64_t* keys, size_t size, int64_t target, size_t& ret)
 		{
 			size_t i = 0;
 

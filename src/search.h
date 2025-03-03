@@ -1,4 +1,5 @@
 #pragma once
+#include <cstring>
 #include <kiwi/ArchUtils.h>
 #include <kiwi/Types.h>
 

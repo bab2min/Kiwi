@@ -640,6 +640,7 @@ namespace kiwi
 			nextWids.clear();
 
 			size_t prevId = -1;
+			size_t length;
 			for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
 			{
 				for (auto& prevPath : cache[prev - startNode])
@@ -677,7 +678,7 @@ namespace kiwi
 
 						if (!formEvaluator(curMorph, ignoreCondScore, candScore)) continue;
 
-						size_t length = 0;
+						length = 0;
 						if (curMorph->combineSocket && curMorph->isSingle())
 						{
 							// no op
@@ -935,25 +936,25 @@ namespace kiwi
 				MorphemeEvaluator<LmState> me;
 				if (topN > 1)
 				{
-					me.eval<PathEvaluatingMode::topN>(nCache, kw, ownFormList, cache,
+					me.template eval<PathEvaluatingMode::topN>(nCache, kw, ownFormList, cache,
 						ownFormId, validMorphCands,
 						node, startNode, topN, totalPrevPathes, ignoreCond ? -10 : 0, nodeLevelDiscount, prevSpStates);
 				}
 				else if (totalPrevPathes <= BestPathContainerTraits<PathEvaluatingMode::top1Small>::maxSize)
 				{
-					me.eval<PathEvaluatingMode::top1Small>(nCache, kw, ownFormList, cache,
+					me.template eval<PathEvaluatingMode::top1Small>(nCache, kw, ownFormList, cache,
 						ownFormId, validMorphCands,
 						node, startNode, topN, totalPrevPathes, ignoreCond ? -10 : 0, nodeLevelDiscount, prevSpStates);
 				}
 				else if (totalPrevPathes <= BestPathContainerTraits<PathEvaluatingMode::top1Medium>::maxSize)
 				{
-					me.eval<PathEvaluatingMode::top1Medium>(nCache, kw, ownFormList, cache,
+					me.template eval<PathEvaluatingMode::top1Medium>(nCache, kw, ownFormList, cache,
 						ownFormId, validMorphCands,
 						node, startNode, topN, totalPrevPathes, ignoreCond ? -10 : 0, nodeLevelDiscount, prevSpStates);
 				}
 				else
 				{
-					me.eval<PathEvaluatingMode::top1>(nCache, kw, ownFormList, cache,
+					me.template eval<PathEvaluatingMode::top1>(nCache, kw, ownFormList, cache,
 						ownFormId, validMorphCands,
 						node, startNode, topN, totalPrevPathes, ignoreCond ? -10 : 0, nodeLevelDiscount, prevSpStates);
 				}

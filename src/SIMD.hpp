@@ -11,6 +11,15 @@
     #define STRONG_INLINE inline
 #endif
 
+#if defined(_MSC_VER)
+#define FORCE_INLINE __forceinline
+#elif defined(__GNUC__)
+#define FORCE_INLINE __attribute__((always_inline))
+#else
+#define FORCE_INLINE inline
+#endif
+
+
 #include "ArchAvailable.h"
 
 namespace kiwi
@@ -370,9 +379,10 @@ namespace kiwi
 			{
 				return _mm_blendv_ps(b, a, mask);
 			}
+
             static STRONG_INLINE __m128i select(__m128i mask, __m128i a, __m128i b)
             {
-                return _mm_blendv_epi32(b, a, mask);
+                return _mm_castps_si128(_mm_blendv_ps(_mm_castsi128_ps(b), _mm_castsi128_ps(a), _mm_castsi128_ps(mask)));
             }
 
 			static STRONG_INLINE int32_t dotprod(const uint8_t* a, const int8_t* b, size_t size)
@@ -457,8 +467,14 @@ namespace kiwi
 			static STRONG_INLINE __m256 bor(__m256 a, __m256 b) { return _mm256_or_ps(a, b); }
 			static STRONG_INLINE __m256i bor(__m256i a, __m256i b) { return _mm256_or_si256(a, b); }
 
-            static STRONG_INLINE __m256 select(__m256 mask, __m256 a, __m256 b) { return _mm256_blendv_ps(b, a, mask); }
-            static STRONG_INLINE __m256i select(__m256i mask, __m256i a, __m256i b) { return _mm256_blendv_epi32(b, a, mask); }
+            static STRONG_INLINE __m256 select(__m256 mask, __m256 a, __m256 b) 
+            { 
+                return _mm256_blendv_ps(b, a, mask); 
+            }
+            static STRONG_INLINE __m256i select(__m256i mask, __m256i a, __m256i b) 
+            { 
+				return _mm256_castps_si256(_mm256_blendv_ps(_mm256_castsi256_ps(b), _mm256_castsi256_ps(a), _mm256_castsi256_ps(mask)));
+            }
 
 			static STRONG_INLINE __m256 cmp_eq(__m256 a, __m256 b) { return _mm256_cmp_ps(a, b, _CMP_EQ_OQ); }
 			static STRONG_INLINE __m256 cmp_le(__m256 a, __m256 b) { return _mm256_cmp_ps(a, b, _CMP_LE_OQ); }
@@ -793,6 +809,32 @@ namespace kiwi
             static STRONG_INLINE float32x4_t redmaxbf(float32x4_t a)
             {
                 return set1f(redmaxf(a));
+            }
+
+            static STRONG_INLINE int32_t dotprod(const uint8_t* a, const int8_t* b, size_t size)
+            {
+                int32x4_t pa, pb, sum = vdupq_n_s32(0);
+                for (size_t i = 0; i < size; i += 16)
+                {
+                    pa = vreinterpretq_s32_u32(vmovl_u16(vld1_u16(reinterpret_cast<const uint16_t*>(a + i))));
+                    pb = vreinterpretq_s32_s8(vld1_s8(reinterpret_cast<const int8_t*>(b + i)));
+                    sum = vpadalq_s16(sum, vmull_s8(vget_low_s8(vreinterpretq_s8_s32(pa)), vget_low_s8(pb)));
+                    sum = vpadalq_s16(sum, vmull_s8(vget_high_s8(vreinterpretq_s8_s32(pa)), vget_high_s8(pb)));
+                }
+                return vgetq_lane_s32(vpadd_s32(vpadd_s32(sum, sum), sum), 0);
+            }
+
+            static STRONG_INLINE int32_t dotprod(const int8_t* a, const int8_t* b, size_t size)
+            {
+                int32x4_t pa, pb, sum = vdupq_n_s32(0);
+                for (size_t i = 0; i < size; i += 16)
+                {
+                    pa = vreinterpretq_s32_s8(vld1q_s8(a + i));
+                    pb = vreinterpretq_s32_s8(vld1q_s8(b + i));
+                    sum = vpadalq_s16(sum, vmull_s8(vget_low_s8(pa), vget_low_s8(pb)));
+                    sum = vpadalq_s16(sum, vmull_s8(vget_high_s8(pa), vget_high_s8(pb)));
+                }
+                return vgetq_lane_s32(vpadd_s32(vpadd_s32(sum, sum), sum), 0);
             }
         };
 

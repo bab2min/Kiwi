@@ -7,6 +7,7 @@
 #include "StrUtils.h"
 #include "FrozenTrie.hpp"
 #include "qgemm.h"
+#include "gemm.h"
 
 using namespace std;
 
@@ -134,7 +135,7 @@ namespace kiwi
 				{
 					nextLmStates.resize(prevLmStates.size() * nextWids.size());
 					scores.resize(prevLmStates.size() * nextWids.size());
-					langMdl->progressMatrix<windowSize>(prevLmStates.data(), nextWids.data(), prevLmStates.size(), nextWids.size(), nextDistantWids.size(), nextLmStates.data(), scores.data());
+					langMdl->template progressMatrix<windowSize>(prevLmStates.data(), nextWids.data(), prevLmStates.size(), nextWids.size(), nextDistantWids.size(), nextLmStates.data(), scores.data());
 				}
 			}
 
@@ -326,13 +327,6 @@ namespace kiwi
 			{
 				out[i] = ints[i] + 128;
 			}
-		}
-
-		template<class Arr>
-		void logsoftmaxInplace(Arr& arr)
-		{
-			arr -= arr.maxCoeff();
-			arr -= std::log(arr.exp().sum());
 		}
 
 		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
@@ -603,9 +597,9 @@ namespace kiwi
 				{
 					int32_t contextIdcs[1 + windowSize];
 					float lls[(1 + windowSize) * 2];
-					int32_t nextIdx[1] = { next };
+					int32_t nextIdx[1] = { (int32_t)next };
 
-					copy(positionConfidPtr, positionConfidPtr + windowSize + 1, lls);
+					memcpy(lls, positionConfidPtr, (windowSize + 1) * sizeof(float));
 					lls[0] += getContextConfid(contextIdx);
 					contextIdcs[0] = contextIdx;
 					for (size_t i = 0; i < windowSize; ++i)
@@ -614,8 +608,7 @@ namespace kiwi
 						lls[i + 1] += historyToken ? getDistantConfid(historyToken) : -99999;
 						contextIdcs[i + 1] = (historyToken ? historyToken : 0) + header.contextSize;
 					}
-					LogSoftmax<arch>{}(lls, std::integral_constant<size_t, windowSize + 1>());
-
+					logSoftmax<arch>(lls, windowSize + 1);
 					qgemm::scatteredGEMMOpt<arch>(
 						1 + windowSize, 1, header.dim,
 						getContextQuantEmb(0), contextIdcs, contextEmbStride(),
@@ -626,7 +619,7 @@ namespace kiwi
 						lls[i] += lls[i + 1 + windowSize];
 					}
 					lls[0] -= getContextValidTokenSum(contextIdx);
-					ll = LogSumExp<arch>{}(lls, std::integral_constant<size_t, windowSize + 1>());
+					ll = logSumExp<arch>(lls, windowSize + 1);
 					ll += getContextValidTokenSum(contextIdx);
 				}
 				else
@@ -636,28 +629,32 @@ namespace kiwi
 					thread_local Eigen::VectorXf lls;
 					lls.resize(1 + windowSize);
 
-					lls = Eigen::Map<const Eigen::VectorXf>{ positionConfidPtr, windowSize + 1 };
+					memcpy(lls.data(), positionConfidPtr, (windowSize + 1) * sizeof(float));
 					lls[0] += getContextConfid(contextIdx);
 					for (size_t i = 0; i < windowSize; ++i)
 					{
 						const auto historyToken = history[i];
 						lls[i + 1] += historyToken ? getDistantConfid(historyToken) : -99999;
 					}
-					logsoftmaxInplace(lls.array());
+					logSoftmax<arch>(lls.data(), windowSize + 1);
 
-					mat.col(0) = Eigen::Map<const Eigen::VectorXf>{ getContextEmb(contextIdx), header.dim };
+					memcpy(mat.col(0).data(), getContextEmb(contextIdx), header.dim * sizeof(float));
 					lls[0] += getContextBias(contextIdx);
 					for (size_t i = 0; i < windowSize; ++i)
 					{
 						const auto historyToken = history[i];
-						if (historyToken) mat.col(i + 1) = Eigen::Map<const Eigen::VectorXf>{ getDistantEmb(historyToken), header.dim };
-						else mat.col(i + 1).setZero();
+						if (historyToken) memcpy(mat.col(i + 1).data(), getDistantEmb(historyToken), header.dim * sizeof(float));
+						else memset(mat.col(i + 1).data(), 0, header.dim * sizeof(float));
 						lls[i + 1] += getDistantBias(historyToken);
 					}
 					lls.tail(windowSize).array() += getContextValidTokenSum(contextIdx);
 					Eigen::Map<const Eigen::VectorXf> outputVec{ getOutputEmb(next), header.dim };
-					lls += mat.transpose() * outputVec;
-					ll = LogSumExp<arch>{}(lls.data(), std::integral_constant<size_t, windowSize + 1>());
+					gemm::template gemv<arch>(
+						mat.cols(), mat.rows(),
+						mat.data(), mat.colStride(),
+						outputVec.data(), lls.data()
+					);
+					ll = logSumExp<arch>(lls.data(), windowSize + 1);
 				}
 			}
 			else 
@@ -680,7 +677,11 @@ namespace kiwi
 					ll = getContextBias(contextIdx);
 					Eigen::Map<const Eigen::VectorXf> contextVec{ getContextEmb(contextIdx), header.dim };
 					Eigen::Map<const Eigen::VectorXf> outputVec{ getOutputEmb(next), header.dim };
-					ll += (contextVec.transpose() * outputVec)[0];
+					gemm::template gemv<arch>(
+						1, header.dim,
+						contextVec.data(), contextVec.colStride(),
+						outputVec.data(), &ll
+					);
 				}
 			}
 			
@@ -963,7 +964,12 @@ namespace kiwi
 			{
 				Eigen::Map<Eigen::MatrixXf> inputMap{ tls.inputEmbBuf.data(), header.dim, (Eigen::Index)(uniqInputSize + uniqHistorySize) };
 				Eigen::Map<Eigen::MatrixXf> outputMap{ tls.outputEmbBuf.data(), header.dim, (Eigen::Index)uniqOutputSize };
-				resultMap += outputMap.transpose() * inputMap;
+				gemm::template gemm<arch>(
+					outputMap.cols(), inputMap.cols(), inputMap.rows(),
+					outputMap.data(), outputMap.colStride(),
+					inputMap.data(), inputMap.colStride(),
+					resultMap.data(), resultMap.colStride()
+				);
 			}
 
 			pair<int32_t, uint32_t> contextCache;
@@ -1005,8 +1011,8 @@ namespace kiwi
 				}
 				Eigen::Map<Eigen::Array<float, -1, windowSize + 1>> scoreMap{ tls.scoreBuf.data(), (Eigen::Index)scoreBatchSize, windowSize + 1 };
 				scoreMap.rowwise() += Eigen::Map<const Eigen::Array<float, 1, windowSize + 1>>{ positionConfidPtr, 1, windowSize + 1 };
-				LogSoftmaxTransposed<arch, windowSize + 1>{}(tls.scoreBuf.data(), batchSize, scoreBatchSize);
-				scoreMap.rightCols<windowSize>().colwise() += Eigen::Map<Eigen::Array<float, scoreBatchSize, 1>>{ validTokenSumBuf, scoreBatchSize, 1 };
+				logSoftmaxTransposed<arch>(tls.scoreBuf.data(), windowSize + 1, batchSize, scoreBatchSize);
+				scoreMap.template rightCols<windowSize>().colwise() += Eigen::Map<Eigen::Array<float, scoreBatchSize, 1>>{ validTokenSumBuf, scoreBatchSize, 1 };
 				for (size_t j = 0; j < batchSize; ++j)
 				{
 					const auto pIdx = (i + j) / numValidDistantTokens;
@@ -1021,7 +1027,7 @@ namespace kiwi
 						}
 					}
 				}
-				LogSumExpTransposed<arch, windowSize + 1>{}(tls.scoreBuf.data(), batchSize, scoreBatchSize);
+				logSumExpTransposed<arch>(tls.scoreBuf.data(), windowSize + 1, batchSize, scoreBatchSize);
 
 				for (size_t j = 0; j < batchSize; ++j)
 				{
@@ -1125,7 +1131,12 @@ namespace kiwi
 			{
 				Eigen::Map<Eigen::MatrixXf> inputMap{ tls.inputEmbBuf.data(), header.dim, (Eigen::Index)(prevStateSize + uniqHistorySize) };
 				Eigen::Map<Eigen::MatrixXf> outputMap{ tls.outputEmbBuf.data(), header.dim, (Eigen::Index)nextIdSize };
-				resultMap += outputMap.transpose() * inputMap;
+				gemm::template gemm<arch>(
+					outputMap.cols(), inputMap.cols(), inputMap.rows(),
+					outputMap.data(), outputMap.colStride(),
+					inputMap.data(), inputMap.colStride(),
+					resultMap.data(), resultMap.colStride()
+				);
 			}
 			
 			pair<int32_t, uint32_t> contextCache;
@@ -1168,8 +1179,8 @@ namespace kiwi
 				}
 				Eigen::Map<Eigen::Array<float, -1, windowSize + 1>> scoreMap{ tls.scoreBuf.data(), (Eigen::Index)scoreBatchSize, windowSize + 1 };
 				scoreMap.rowwise() += Eigen::Map<const Eigen::Array<float, 1, windowSize + 1>>{ positionConfidPtr, 1, windowSize + 1 };
-				LogSoftmaxTransposed<arch, windowSize + 1>{}(tls.scoreBuf.data(), batchSize, scoreBatchSize);
-				scoreMap.rightCols<windowSize>().colwise() += Eigen::Map<Eigen::Array<float, scoreBatchSize, 1>>{ validTokenSumBuf, scoreBatchSize, 1 };
+				logSoftmaxTransposed<arch>(tls.scoreBuf.data(), windowSize + 1, batchSize, scoreBatchSize);
+				scoreMap.template rightCols<windowSize>().colwise() += Eigen::Map<Eigen::Array<float, scoreBatchSize, 1>>{ validTokenSumBuf, scoreBatchSize, 1 };
 				for (size_t j = 0; j < batchSize; ++j)
 				{
 					const auto pIdx = (i + j) / numValidDistantTokens;
@@ -1184,7 +1195,7 @@ namespace kiwi
 						}
 					}
 				}
-				LogSumExpTransposed<arch, windowSize + 1>{}(tls.scoreBuf.data(), batchSize, scoreBatchSize);
+				logSumExpTransposed<arch>(tls.scoreBuf.data(), windowSize + 1, batchSize, scoreBatchSize);
 
 				for (size_t j = 0; j < batchSize; ++j)
 				{
@@ -1305,7 +1316,12 @@ namespace kiwi
 			{
 				Eigen::Map<Eigen::MatrixXf> inputMap{ inputEmbBuf.data(), header.dim, (Eigen::Index)uniqInputSize };
 				Eigen::Map<Eigen::MatrixXf> outputMap{ outputEmbBuf.data(), header.dim, (Eigen::Index)uniqOutputSize };
-				resultMap += outputMap.transpose() * inputMap;
+				gemm::template gemm<arch>(
+					outputMap.cols(), inputMap.cols(), inputMap.rows(),
+					outputMap.data(), outputMap.colStride(),
+					inputMap.data(), inputMap.colStride(),
+					resultMap.data(), resultMap.colStride()
+				);
 			}
 
 			pair<int32_t, uint32_t> contextCache;
@@ -1326,6 +1342,23 @@ namespace kiwi
 					outScores[i * nextIdSize + j] = resultMap(inverseNextIdcs[j], inverseContextIdcs[i]);
 				}
 			}
+		}
+
+		static constexpr size_t serialAlignment = 16;
+		inline size_t alignedOffsetInc(size_t& offset, size_t inc, size_t alignment = serialAlignment)
+		{
+			return offset = (offset + inc + alignment - 1) & ~(alignment - 1);
+		}
+
+		inline std::ostream& writePadding(std::ostream& os, size_t alignment = serialAlignment)
+		{
+			const size_t pos = os.tellp();
+			size_t pad = ((pos + alignment - 1) & ~(alignment - 1)) - pos;
+			for (size_t i = 0; i < pad; ++i)
+			{
+				os.put(0);
+			}
+			return os;
 		}
 
 		utils::MemoryObject CoNgramModelBase::build(const string& contextDefinition, const string& embedding, size_t maxContextLength, bool useVLE, bool reorderContextId)

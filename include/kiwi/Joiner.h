@@ -137,6 +137,7 @@ namespace kiwi
 			{
 				this->~ErasedVector();
 				new (this) ErasedVector{ other };
+				return *this;
 			}
 
 			ErasedVector& operator=(ErasedVector&& other)

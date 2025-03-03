@@ -1,6 +1,7 @@
 #pragma once
 
 #include <kiwi/Types.h>
+#include <kiwi/BitUtils.h>
 
 namespace kiwi
 {
@@ -53,7 +54,7 @@ namespace kiwi
 
 		bool equalTo(const LmState& lmState, uint8_t prevRootId, SpecialState spState) const
 		{
-			return (this->prevRootId == prevRootId & this->spState == spState) && this->lmState == lmState;
+			return ((this->prevRootId == prevRootId) & (this->spState == spState)) && this->lmState == lmState;
 		}
 
 		bool operator==(const WordLL& o) const
@@ -165,10 +166,10 @@ namespace kiwi
 			const Morpheme* morph, float accScore, float accTypoCost, const WordLL<LmState>* parent, LmState&& lmState, SpecialState spState)
 		{
 			PathHash<LmState> ph{ lmState, prevRootId, spState };
-			auto inserted = bestPathIndex.emplace(ph, make_pair((uint32_t)bestPathValues.size(), 1));
+			auto inserted = bestPathIndex.emplace(ph, std::make_pair((uint32_t)bestPathValues.size(), 1));
 			if (inserted.second)
 			{
-				bestPathValues.emplace_back(morph, accScore, accTypoCost, parent, move(lmState), spState);
+				bestPathValues.emplace_back(morph, accScore, accTypoCost, parent, std::move(lmState), spState);
 				if (rootId != commonRootId) bestPathValues.back().rootId = rootId;
 				bestPathValues.resize(bestPathValues.size() + topN - 1);
 			}
@@ -176,21 +177,21 @@ namespace kiwi
 			{
 				auto bestPathFirst = bestPathValues.begin() + inserted.first->second.first;
 				auto bestPathLast = bestPathValues.begin() + inserted.first->second.first + inserted.first->second.second;
-				if (distance(bestPathFirst, bestPathLast) < topN)
+				if (std::distance(bestPathFirst, bestPathLast) < topN)
 				{
-					*bestPathLast = WordLL<LmState>{ morph, accScore, accTypoCost, parent, move(lmState), spState };
+					*bestPathLast = WordLL<LmState>{ morph, accScore, accTypoCost, parent, std::move(lmState), spState };
 					if (rootId != commonRootId) bestPathLast->rootId = rootId;
-					push_heap(bestPathFirst, bestPathLast + 1, WordLLGreater{});
+					std::push_heap(bestPathFirst, bestPathLast + 1, WordLLGreater{});
 					++inserted.first->second.second;
 				}
 				else
 				{
 					if (accScore > bestPathFirst->accScore)
 					{
-						pop_heap(bestPathFirst, bestPathLast, WordLLGreater{});
-						*(bestPathLast - 1) = WordLL<LmState>{ morph, accScore, accTypoCost, parent, move(lmState), spState };
+						std::pop_heap(bestPathFirst, bestPathLast, WordLLGreater{});
+						*(bestPathLast - 1) = WordLL<LmState>{ morph, accScore, accTypoCost, parent, std::move(lmState), spState };
 						if (rootId != commonRootId) (*(bestPathLast - 1)).rootId = rootId;
-						push_heap(bestPathFirst, bestPathLast, WordLLGreater{});
+						std::push_heap(bestPathFirst, bestPathLast, WordLLGreater{});
 					}
 				}
 			}
@@ -204,7 +205,7 @@ namespace kiwi
 				const auto size = p.second.second;
 				for (size_t i = 0; i < size; ++i)
 				{
-					resultOut.emplace_back(move(bestPathValues[index + i]));
+					resultOut.emplace_back(std::move(bestPathValues[index + i]));
 					auto& newPath = resultOut.back();
 
 					// fill the rest information of resultOut
@@ -232,7 +233,7 @@ namespace kiwi
 		inline void insert(size_t topN, uint8_t prevRootId, uint8_t rootId,
 			const Morpheme* morph, float accScore, float accTypoCost, const WordLL<LmState>* parent, LmState&& lmState, SpecialState spState)
 		{
-			WordLL<LmState> newPath{ morph, accScore, accTypoCost, parent, move(lmState), spState };
+			WordLL<LmState> newPath{ morph, accScore, accTypoCost, parent, std::move(lmState), spState };
 			newPath.prevRootId = prevRootId;
 			if (rootId != commonRootId) newPath.rootId = rootId;
 			auto inserted = bestPathes.emplace(newPath);
@@ -252,7 +253,7 @@ namespace kiwi
 		{
 			for (auto& p : bestPathes)
 			{
-				resultOut.emplace_back(move(p));
+				resultOut.emplace_back(std::move(p));
 				auto& newPath = resultOut.back();
 
 				// fill the rest information of resultOut
@@ -344,7 +345,7 @@ namespace kiwi
 				if (value.size() < hash.size())
 				{
 					hash[value.size()] = h;
-					value.emplace_back(morph, accScore, accTypoCost, parent, move(lmState), spState);
+					value.emplace_back(morph, accScore, accTypoCost, parent, std::move(lmState), spState);
 					value.back().prevRootId = prevRootId;
 					if (rootId != commonRootId) value.back().rootId = rootId;
 				}
@@ -363,7 +364,7 @@ namespace kiwi
 					target.accScore = accScore;
 					target.accTypoCost = accTypoCost;
 					target.parent = parent;
-					target.lmState = move(lmState);
+					target.lmState = std::move(lmState);
 					target.spState = spState;
 					target.rootId = parent ? parent->rootId : 0;
 					if (rootId != commonRootId) target.rootId = rootId;
@@ -377,7 +378,7 @@ namespace kiwi
 			static constexpr ArchType archType = LmState::arch;
 			if constexpr (archType != ArchType::none && archType != ArchType::balanced)
 			{
-				return insertOptimized<archType>(topN, prevRootId, rootId, morph, accScore, accTypoCost, parent, move(lmState), spState);
+				return insertOptimized<archType>(topN, prevRootId, rootId, morph, accScore, accTypoCost, parent, std::move(lmState), spState);
 			}
 
 			const size_t h = Hash<WordLL<LmState>>{}(lmState, prevRootId, spState);
@@ -386,7 +387,7 @@ namespace kiwi
 			auto& value = values[bucket];
 
 			const auto hashEnd = hash.begin() + value.size();
-			auto it = find(hash.begin(), hashEnd, (uint8_t)h);
+			auto it = std::find(hash.begin(), hashEnd, (uint8_t)h);
 			while (it != hashEnd)
 			{
 				if (value[it - hash.begin()].equalTo(lmState, prevRootId, spState))
@@ -394,7 +395,7 @@ namespace kiwi
 					break;
 				}
 				++it;
-				it = find(it, hashEnd, (uint8_t)h);
+				it = std::find(it, hashEnd, (uint8_t)h);
 			}
 
 			if (it == hashEnd)
@@ -402,7 +403,7 @@ namespace kiwi
 				if (value.size() < hash.size())
 				{
 					hash[value.size()] = h;
-					value.emplace_back(morph, accScore, accTypoCost, parent, move(lmState), spState);
+					value.emplace_back(morph, accScore, accTypoCost, parent, std::move(lmState), spState);
 					value.back().prevRootId = prevRootId;
 					if (rootId != commonRootId) value.back().rootId = rootId;
 				}
@@ -421,7 +422,7 @@ namespace kiwi
 					target.accScore = accScore;
 					target.accTypoCost = accTypoCost;
 					target.parent = parent;
-					target.lmState = move(lmState);
+					target.lmState = std::move(lmState);
 					target.spState = spState;
 					target.rootId = parent ? parent->rootId : 0;
 					if (rootId != commonRootId) target.rootId = rootId;
@@ -435,7 +436,7 @@ namespace kiwi
 			{
 				for (auto& p : v)
 				{
-					resultOut.emplace_back(move(p));
+					resultOut.emplace_back(std::move(p));
 					auto& newPath = resultOut.back();
 
 					// fill the rest information of resultOut

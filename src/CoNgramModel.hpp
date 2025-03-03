@@ -9,7 +9,7 @@
 #include "ArchAvailable.h"
 #include "search.h"
 #include "streamvbyte.h"
-#include "SkipBigramModelImpl.hpp"
+#include "MathFunc.h"
 
 namespace kiwi
 {
