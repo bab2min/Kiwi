@@ -198,12 +198,16 @@ namespace kiwi
 		};
 
 		template<>
-		struct LogSoftmaxTransposed<ArchType::none, 8> : public LogSoftmaxTransposed<ArchType::sse2, 8>
+		struct LogSoftmaxTransposed<ArchType::none, 8>
 		{
+			void operator()(float* arr, size_t batchSize, size_t stride)
+			{
+				throw std::runtime_error("Unsupported architecture");
+			}
 		};
 
 		template<>
-		struct LogSoftmaxTransposed<ArchType::balanced, 8> : public LogSoftmaxTransposed<ArchType::sse2, 8>
+		struct LogSoftmaxTransposed<ArchType::balanced, 8> : public LogSoftmaxTransposed<ArchType::none, 8>
 		{
 		};
 
@@ -271,12 +275,16 @@ namespace kiwi
 		};
 
 		template<>
-		struct LogSumExpTransposed<ArchType::none, 8> : public LogSumExpTransposed<ArchType::sse2, 8>
+		struct LogSumExpTransposed<ArchType::none, 8>
 		{
+			void operator()(float* arr, size_t batchSize, size_t stride)
+			{
+				throw std::runtime_error("Unsupported architecture");
+			}
 		};
 
 		template<>
-		struct LogSumExpTransposed<ArchType::balanced, 8> : public LogSumExpTransposed<ArchType::sse2, 8>
+		struct LogSumExpTransposed<ArchType::balanced, 8> : public LogSumExpTransposed<ArchType::none, 8>
 		{
 		};
 

@@ -1115,7 +1115,7 @@ namespace kiwi
 	}
 
 	template<class LangModel>
-	Vector<PathResult> BestPathFinder::findBestPath(const Kiwi* kw,
+	Vector<PathResult> BestPathFinder<LangModel>::findBestPath(const Kiwi* kw,
 		const Vector<SpecialState>& prevSpStates,
 		const KGraphNode* graph,
 		const size_t graphSize,

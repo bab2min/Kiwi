@@ -186,5 +186,7 @@ namespace kiwi
 			}
 			return scatteredGEMMBaseline<archType>(m, n, k, aBase, aIdx, aIdxScale, bBase, bIdx, bIdxScale, c, ldc);
 		}
+
+		// real implementations are in `archImpl/<name>.cpp`
 	}
 }

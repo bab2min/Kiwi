@@ -813,28 +813,32 @@ namespace kiwi
 
             static STRONG_INLINE int32_t dotprod(const uint8_t* a, const int8_t* b, size_t size)
             {
-                int32x4_t pa, pb, sum = vdupq_n_s32(0);
+                int32x4_t sum = vdupq_n_s32(0);
+				uint16x8_t pa;
+				int8x16_t pb;
                 for (size_t i = 0; i < size; i += 16)
                 {
-                    pa = vreinterpretq_s32_u32(vmovl_u16(vld1_u16(reinterpret_cast<const uint16_t*>(a + i))));
-                    pb = vreinterpretq_s32_s8(vld1_s8(reinterpret_cast<const int8_t*>(b + i)));
-                    sum = vpadalq_s16(sum, vmull_s8(vget_low_s8(vreinterpretq_s8_s32(pa)), vget_low_s8(pb)));
-                    sum = vpadalq_s16(sum, vmull_s8(vget_high_s8(vreinterpretq_s8_s32(pa)), vget_high_s8(pb)));
+					//
                 }
-                return vgetq_lane_s32(vpadd_s32(vpadd_s32(sum, sum), sum), 0);
+				sum = vpaddq_s32(sum, sum);
+				sum = vpaddq_s32(sum, sum);
+				return vgetq_lane_s32(sum, 0);
             }
 
             static STRONG_INLINE int32_t dotprod(const int8_t* a, const int8_t* b, size_t size)
             {
-                int32x4_t pa, pb, sum = vdupq_n_s32(0);
+                int32x4_t sum = vdupq_n_s32(0);
+				int8x16_t pa, pb;
                 for (size_t i = 0; i < size; i += 16)
                 {
-                    pa = vreinterpretq_s32_s8(vld1q_s8(a + i));
-                    pb = vreinterpretq_s32_s8(vld1q_s8(b + i));
-                    sum = vpadalq_s16(sum, vmull_s8(vget_low_s8(pa), vget_low_s8(pb)));
-                    sum = vpadalq_s16(sum, vmull_s8(vget_high_s8(pa), vget_high_s8(pb)));
+					pa = vld1q_s8(a + i);
+					pb = vld1q_s8(b + i);
+					sum = vpadalq_s16(sum, vmull_s8(vget_low_s8(pb), vget_low_s8(pa)));
+					sum = vpadalq_s16(sum, vmull_s8(vget_high_s8(pb), vget_high_s8(pa)));
                 }
-                return vgetq_lane_s32(vpadd_s32(vpadd_s32(sum, sum), sum), 0);
+                sum = vpaddq_s32(sum, sum);
+                sum = vpaddq_s32(sum, sum);
+                return vgetq_lane_s32(sum, 0);
             }
         };
 

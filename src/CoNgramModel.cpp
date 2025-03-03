@@ -1663,7 +1663,7 @@ namespace kiwi
 		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
 		void* CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::getFindBestPathFn() const
 		{
-			return (void*)&BestPathFinder::findBestPath<CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>>;
+			return (void*)&BestPathFinder<CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>>::findBestPath;
 		}
 
 		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>

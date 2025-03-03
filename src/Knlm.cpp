@@ -330,7 +330,7 @@ namespace kiwi
 		template<ArchType arch, class KeyType, bool transposed, class DiffType>
 		void* KnLangModel<arch, KeyType, transposed, DiffType>::getFindBestPathFn() const
 		{
-			return (void*)&BestPathFinder::findBestPath<KnLangModel<arch, KeyType, transposed, DiffType>>;
+			return (void*)&BestPathFinder<KnLangModel<arch, KeyType, transposed, DiffType>>::findBestPath;
 		}
 
 		template<ArchType arch, class KeyType, bool transposed, class DiffType>

@@ -58,7 +58,7 @@ namespace kiwi
 	class Kiwi
 	{
 		friend class KiwiBuilder;
-		friend struct BestPathFinder;
+		template<class LangModel> friend struct BestPathFinder;
 		template<class LmState, class> friend struct PathEvaluator;
 		template<class LmState> friend struct MorphemeEvaluator;
 		friend class cmb::AutoJoiner;

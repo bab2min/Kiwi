@@ -63,7 +63,7 @@ namespace kiwi
 		template<ArchType arch, class KeyType, size_t windowSize>
 		void* SkipBigramModel<arch, KeyType, windowSize>::getFindBestPathFn() const
 		{
-			return (void*)&BestPathFinder::findBestPath<SkipBigramModel<arch, KeyType, windowSize>>;
+			return (void*)&BestPathFinder<SkipBigramModel<arch, KeyType, windowSize>>::findBestPath;
 		}
 
 		template<ArchType arch, class KeyType, size_t windowSize>

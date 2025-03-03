@@ -83,9 +83,9 @@ namespace kiwi
 		}
 	};
 
+	template<class LangModel>
 	struct BestPathFinder
 	{
-		template<class LangModel>
 		static Vector<PathResult> findBestPath(const Kiwi* kw,
 			const Vector<SpecialState>& prevSpStates,
 			const KGraphNode* graph,
@@ -99,5 +99,5 @@ namespace kiwi
 		);
 	};
 
-	using FnFindBestPath = decltype(&BestPathFinder::findBestPath<void>);
+	using FnFindBestPath = decltype(&BestPathFinder<void>::findBestPath);
 }

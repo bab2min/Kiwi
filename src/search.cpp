@@ -1498,6 +1498,278 @@ namespace kiwi
 			return false;
 		}
 
+		template<size_t n, class ValueTy>
+		ARCH_TARGET("arch=armv8-a")
+		inline ValueTy nstSearchKVNeon(const uint8_t* kv, size_t size, int8_t target)
+		{
+			using IntTy = int8_t;
+			size_t i = 0;
+			int8x16_t ptarget = vdupq_n_s8(target), pkey;
+			uint8x16_t peq, pgt, pmasked;
+
+			static const uint8x16_t __attribute__((aligned(16))) mask = { 1, 2, 4, 8, 16, 32, 64, 128, 1, 2, 4, 8, 16, 32, 64, 128 };
+			
+			if (size < n)
+			{
+				pkey = vld1q_s8(reinterpret_cast<const int8_t*>(&kv[i * (sizeof(IntTy) + sizeof(ValueTy))]));
+				peq = vceqq_s8(ptarget, pkey);
+				pmasked = vandq_u8(peq, mask);
+				uint8_t mm0 = vaddv_u8(vget_low_u8(pmasked));
+				uint8_t mm1 = vaddv_u8(vget_high_u8(pmasked));
+				uint32_t mm = mm0 | ((uint32_t)mm1 << 8);
+				uint32_t r = utils::countTrailingZeroes(mm);
+				
+				if (mm && (i + r) < size)
+				{
+					const size_t groupSize = std::min(n - 1, size - i);
+					const ValueTy* values = reinterpret_cast<const ValueTy*>(&kv[i * (sizeof(IntTy) + sizeof(ValueTy)) + groupSize * sizeof(IntTy)]);
+					return values[r];
+				}
+				return 0;
+			}
+
+			while (i < size)
+			{
+				pkey = vld1q_s8(reinterpret_cast<const int8_t*>(&kv[i * (sizeof(IntTy) + sizeof(ValueTy))]));
+				peq = vceqq_s8(ptarget, pkey);
+				pgt = vcgtq_s8(ptarget, pkey);
+				pmasked = vandq_u8(peq, mask);
+				uint8_t mm0 = vaddv_u8(vget_low_u8(pmasked));
+				uint8_t mm1 = vaddv_u8(vget_high_u8(pmasked));
+				uint32_t mm = mm0 | ((uint32_t)mm1 << 8);
+				uint32_t r = utils::countTrailingZeroes(mm);
+
+				if (mm && (i + r) < size)
+				{
+					const size_t groupSize = std::min(n - 1, size - i);
+					const ValueTy* values = reinterpret_cast<const ValueTy*>(&kv[i * (sizeof(IntTy) + sizeof(ValueTy)) + groupSize * sizeof(IntTy)]);
+					return values[r];
+				}
+				r = vaddvq_u8(vandq_u8(pgt, vdupq_n_u8(1)));
+				i = i * n + (n - 1) * (r + 1);
+			}
+			return 0;
+		}
+
+		template<size_t n, class ValueTy>
+		ARCH_TARGET("arch=armv8-a")
+		inline ValueTy nstSearchKVNeon(const uint8_t* kv, size_t size, int16_t target)
+		{
+			using IntTy = int16_t;
+			size_t i = 0;
+			int16x8_t ptarget = vdupq_n_s16(target), pkey;
+			uint16x8_t peq, pgt;
+
+			static const uint16x8_t __attribute__((aligned(16))) mask = { 1, 2, 4, 8, 16, 32, 64, 128 };
+
+			if (size < n)
+			{
+				pkey = vld1q_s16(reinterpret_cast<const int16_t*>(&kv[i * (sizeof(IntTy) + sizeof(ValueTy))]));
+				peq = vceqq_s16(ptarget, pkey);
+				uint32_t mm = vaddvq_u16(vandq_u16(peq, mask));
+				uint32_t r = utils::countTrailingZeroes(mm);
+				if (mm && (i + r) < size)
+				{
+					const size_t groupSize = std::min(n - 1, size - i);
+					const ValueTy* values = reinterpret_cast<const ValueTy*>(&kv[i * (sizeof(IntTy) + sizeof(ValueTy)) + groupSize * sizeof(IntTy)]);
+					return values[r];
+				}
+				return 0;
+			}
+
+			while (i < size)
+			{
+				pkey = vld1q_s16(reinterpret_cast<const int16_t*>(&kv[i * (sizeof(IntTy) + sizeof(ValueTy))]));
+				peq = vceqq_s16(ptarget, pkey);
+				pgt = vcgtq_s16(ptarget, pkey);
+				uint32_t mm = vaddvq_u16(vandq_u16(peq, mask));
+				uint32_t r = utils::countTrailingZeroes(mm);
+				if (mm && (i + r) < size)
+				{
+					const size_t groupSize = std::min(n - 1, size - i);
+					const ValueTy* values = reinterpret_cast<const ValueTy*>(&kv[i * (sizeof(IntTy) + sizeof(ValueTy)) + groupSize * sizeof(IntTy)]);
+					return values[r];
+				}
+				r = vaddvq_u16(vandq_u16(pgt, vdupq_n_u16(1)));
+				i = i * n + (n - 1) * (r + 1);
+			}
+			return 0;
+		}
+
+		template<size_t n, class ValueTy>
+		ARCH_TARGET("arch=armv8-a")
+		inline ValueTy nstSearchKVNeon(const uint8_t* kv, size_t size, int32_t target)
+		{
+			using IntTy = int32_t;
+			size_t i = 0;
+			int32x4_t ptarget = vdupq_n_s32(target), pkey;
+			uint32x4_t peq, pgt;
+
+			static const uint32x4_t __attribute__((aligned(16))) mask = { 1, 2, 4, 8 };
+
+			if (size < n)
+			{
+				pkey = vld1q_s32(reinterpret_cast<const int32_t*>(&kv[i * (sizeof(IntTy) + sizeof(ValueTy))]));
+				peq = vceqq_s32(ptarget, pkey);
+				uint32_t mm = vaddvq_u32(vandq_u32(peq, mask));
+				uint32_t r = utils::countTrailingZeroes(mm);
+				if (mm && (i + r) < size)
+				{
+					const size_t groupSize = std::min(n - 1, size - i);
+					const ValueTy* values = reinterpret_cast<const ValueTy*>(&kv[i * (sizeof(IntTy) + sizeof(ValueTy)) + groupSize * sizeof(IntTy)]);
+					return values[r];
+				}
+				return 0;
+			}
+
+			while (i < size)
+			{
+				pkey = vld1q_s32(reinterpret_cast<const int32_t*>(&kv[i * (sizeof(IntTy) + sizeof(ValueTy))]));
+				peq = vceqq_s32(ptarget, pkey);
+				pgt = vcgtq_s32(ptarget, pkey);
+				uint32_t mm = vaddvq_u32(vandq_u32(peq, mask));
+				uint32_t r = utils::countTrailingZeroes(mm);
+				if (mm && (i + r) < size)
+				{
+					const size_t groupSize = std::min(n - 1, size - i);
+					const ValueTy* values = reinterpret_cast<const ValueTy*>(&kv[i * (sizeof(IntTy) + sizeof(ValueTy)) + groupSize * sizeof(IntTy)]);
+					return values[r];
+				}
+				r = vaddvq_u32(vandq_u32(pgt, vdupq_n_u32(1)));
+				i = i * n + (n - 1) * (r + 1);
+			}
+			return 0;
+		}
+
+		template<size_t n, class ValueTy>
+		ARCH_TARGET("arch=armv8-a")
+		inline ValueTy nstSearchKVNeon(const uint8_t* kv, size_t size, int64_t target)
+		{
+			using IntTy = int64_t;
+			size_t i = 0;
+			int64x2_t ptarget = vdupq_n_s64(target), pkey;
+			uint64x2_t peq, pgt;
+
+			static const uint64x2_t __attribute__((aligned(16))) mask = { 1, 2 };
+
+			if (size < n)
+			{
+				pkey = vld1q_s64(reinterpret_cast<const int64_t*>(&kv[i * (sizeof(IntTy) + sizeof(ValueTy))]));
+				peq = vceqq_s64(ptarget, pkey);
+				uint32_t mm = vaddvq_u64(vandq_u64(peq, mask));
+				uint32_t r = utils::countTrailingZeroes(mm);
+				if (mm && (i + r) < size)
+				{
+					const size_t groupSize = std::min(n - 1, size - i);
+					const ValueTy* values = reinterpret_cast<const ValueTy*>(&kv[i * (sizeof(IntTy) + sizeof(ValueTy)) + groupSize * sizeof(IntTy)]);
+					return values[r];
+				}
+				return 0;
+			}
+
+			while (i < size)
+			{
+				pkey = vld1q_s64(reinterpret_cast<const int64_t*>(&kv[i * (sizeof(IntTy) + sizeof(ValueTy))]));
+				peq = vceqq_s64(ptarget, pkey);
+				pgt = vcgtq_s64(ptarget, pkey);
+				uint32_t mm = vaddvq_u64(vandq_u64(peq, mask));
+				uint32_t r = utils::countTrailingZeroes(mm);
+				if (mm && (i + r) < size)
+				{
+					const size_t groupSize = std::min(n - 1, size - i);
+					const ValueTy* values = reinterpret_cast<const ValueTy*>(&kv[i * (sizeof(IntTy) + sizeof(ValueTy)) + groupSize * sizeof(IntTy)]);
+					return values[r];
+				}
+				r = vaddvq_u64(vandq_u64(pgt, vdupq_n_u64(1)));
+				i = i * n + (n - 1) * (r + 1);
+			}
+			return 0;
+		}
+
+		ARCH_TARGET("arch=armv8-a")
+		inline size_t findAllNeon(const uint8_t* arr, size_t size, uint8_t key)
+		{
+			int8x16_t pkey = vdupq_n_s8(key);
+			static const uint8x16_t __attribute__((aligned(16))) mask = { 1, 2, 4, 8, 16, 32, 64, 128, 1, 2, 4, 8, 16, 32, 64, 128 };
+			uint8x16_t pmasked;
+			if (size <= 16)
+			{
+				int8x16_t parr = vld1q_s8(reinterpret_cast<const int8_t*>(arr));
+				uint8x16_t pcmp = vceqq_s8(pkey, parr);
+				pmasked = vandq_u8(pcmp, mask);
+				uint8_t mm0 = vaddv_u8(vget_low_u8(pmasked));
+				uint8_t mm1 = vaddv_u8(vget_high_u8(pmasked));
+				return (mm0 | ((size_t)mm1 << 8)) & (((size_t)1 << size) - 1);
+			}
+			else if (size <= 32)
+			{
+				int8x16_t parr0 = vld1q_s8(reinterpret_cast<const int8_t*>(arr));
+				int8x16_t parr1 = vld1q_s8(reinterpret_cast<const int8_t*>(arr + 16));
+				uint8x16_t pcmp0 = vceqq_s8(pkey, parr0);
+				uint8x16_t pcmp1 = vceqq_s8(pkey, parr1);
+				pmasked = vandq_u8(pcmp0, mask);
+				uint8_t mm0 = vaddv_u8(vget_low_u8(pmasked));
+				uint8_t mm1 = vaddv_u8(vget_high_u8(pmasked));
+				size_t r0 = mm0 | ((size_t)mm1 << 8);
+				pmasked = vandq_u8(pcmp1, mask);
+				mm0 = vaddv_u8(vget_low_u8(pmasked));
+				mm1 = vaddv_u8(vget_high_u8(pmasked));
+				size_t r1 = mm0 | ((size_t)mm1 << 8);
+				return (r0 | (r1 << 16)) & (((size_t)1 << size) - 1);
+			}
+			else if (size <= 48)
+			{
+				int8x16_t parr0 = vld1q_s8(reinterpret_cast<const int8_t*>(arr));
+				int8x16_t parr1 = vld1q_s8(reinterpret_cast<const int8_t*>(arr + 16));
+				int8x16_t parr2 = vld1q_s8(reinterpret_cast<const int8_t*>(arr + 32));
+				uint8x16_t pcmp0 = vceqq_s8(pkey, parr0);
+				uint8x16_t pcmp1 = vceqq_s8(pkey, parr1);
+				uint8x16_t pcmp2 = vceqq_s8(pkey, parr2);
+				pmasked = vandq_u8(pcmp0, mask);
+				uint8_t mm0 = vaddv_u8(vget_low_u8(pmasked));
+				uint8_t mm1 = vaddv_u8(vget_high_u8(pmasked));
+				size_t r0 = mm0 | ((size_t)mm1 << 8);
+				pmasked = vandq_u8(pcmp1, mask);
+				mm0 = vaddv_u8(vget_low_u8(pmasked));
+				mm1 = vaddv_u8(vget_high_u8(pmasked));
+				size_t r1 = mm0 | ((size_t)mm1 << 8);
+				pmasked = vandq_u8(pcmp2, mask);
+				mm0 = vaddv_u8(vget_low_u8(pmasked));
+				mm1 = vaddv_u8(vget_high_u8(pmasked));
+				size_t r2 = mm0 | ((size_t)mm1 << 8);
+				return (r0 | (r1 << 16) | (r2 << 32)) & (((size_t)1 << size) - 1);
+			}
+			else
+			{
+				int8x16_t parr0 = vld1q_s8(reinterpret_cast<const int8_t*>(arr));
+				int8x16_t parr1 = vld1q_s8(reinterpret_cast<const int8_t*>(arr + 16));
+				int8x16_t parr2 = vld1q_s8(reinterpret_cast<const int8_t*>(arr + 32));
+				int8x16_t parr3 = vld1q_s8(reinterpret_cast<const int8_t*>(arr + 48));
+				uint8x16_t pcmp0 = vceqq_s8(pkey, parr0);
+				uint8x16_t pcmp1 = vceqq_s8(pkey, parr1);
+				uint8x16_t pcmp2 = vceqq_s8(pkey, parr2);
+				uint8x16_t pcmp3 = vceqq_s8(pkey, parr3);
+				pmasked = vandq_u8(pcmp0, mask);
+				uint8_t mm0 = vaddv_u8(vget_low_u8(pmasked));
+				uint8_t mm1 = vaddv_u8(vget_high_u8(pmasked));
+				size_t r0 = mm0 | ((size_t)mm1 << 8);
+				pmasked = vandq_u8(pcmp1, mask);
+				mm0 = vaddv_u8(vget_low_u8(pmasked));
+				mm1 = vaddv_u8(vget_high_u8(pmasked));
+				size_t r1 = mm0 | ((size_t)mm1 << 8);
+				pmasked = vandq_u8(pcmp2, mask);
+				mm0 = vaddv_u8(vget_low_u8(pmasked));
+				mm1 = vaddv_u8(vget_high_u8(pmasked));
+				size_t r2 = mm0 | ((size_t)mm1 << 8);
+				pmasked = vandq_u8(pcmp3, mask);
+				mm0 = vaddv_u8(vget_low_u8(pmasked));
+				mm1 = vaddv_u8(vget_high_u8(pmasked));
+				size_t r3 = mm0 | ((size_t)mm1 << 8);
+				return (r0 | (r1 << 16) | (r2 << 32) | (r3 << 48)) & (((size_t)1 << size) - 1);
+			}
+		}
+
+
 		template<>
 		struct OptimizedImpl<ArchType::neon>
 		{
@@ -1515,6 +1787,18 @@ namespace kiwi
 			{
 				using SignedIntTy = typename SignedType<IntTy>::type;
 				return nstSearchNeon<packetSize / sizeof(IntTy) + 1>((const SignedIntTy*)keys, size, (SignedIntTy)target, ret);
+			}
+
+			template<class IntTy, class ValueTy>
+			static ValueTy searchKV(const void* kv, size_t size, IntTy target)
+			{
+				using SignedIntTy = typename SignedType<IntTy>::type;
+				return nstSearchKVNeon<packetSize / sizeof(IntTy) + 1, ValueTy>((const uint8_t*)kv, size, (SignedIntTy)target);
+			}
+
+			static size_t findAll(const uint8_t* arr, size_t size, uint8_t key)
+			{
+				return findAllNeon(arr, size, key);
 			}
 		};
 		INSTANTIATE_IMPL(ArchType::neon);
