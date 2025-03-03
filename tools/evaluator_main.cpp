@@ -14,6 +14,8 @@ using namespace TCLAP;
 
 int main(int argc, const char* argv[])
 {
+	tutils::setUTF8Output();
+
 	CmdLine cmd{ "Kiwi evaluator" };
 
 	ValueArg<string> model{ "m", "model", "Kiwi model path", false, "models/base", "string" };
@@ -21,7 +23,7 @@ int main(int argc, const char* argv[])
 	SwitchArg noNormCoda{ "", "no-normcoda", "without normalizing coda", false };
 	SwitchArg noZCoda{ "", "no-zcoda", "without z-coda", false };
 	SwitchArg noMulti{ "", "no-multi", "turn off multi dict", false };
-	ValueArg<string> modelType{ "t", "type", "model type", false, "knlm", "string" };
+	ValueArg<string> modelType{ "t", "type", "model type", false, "none", "string" };
 	ValueArg<float> typoWeight{ "", "typo", "typo weight", false, 0.f, "float"};
 	SwitchArg bTypo{ "", "btypo", "make basic-typo-tolerant model", false };
 	SwitchArg cTypo{ "", "ctypo", "make continual-typo-tolerant model", false };
@@ -52,41 +54,14 @@ int main(int argc, const char* argv[])
 		return -1;
 	}
 	ModelType kiwiModelType = ModelType::none;
-	{
-		auto v = modelType.getValue();
-		if (v == "knlm")
+	try
 		{
-			kiwiModelType = ModelType::knlm;
+		kiwiModelType = tutils::parseModelType(modelType);
 		}
-		else if (v == "sbg")
+	catch (const exception& e)
 		{
-			kiwiModelType = ModelType::sbg;
-		}
-		else if (v == "knlm-transposed")
-		{
-			kiwiModelType = ModelType::knlmTransposed;
-		}
-		else if (v == "cong")
-		{
-			kiwiModelType = ModelType::cong;
-		}
-		else if (v == "cong-global")
-		{
-			kiwiModelType = ModelType::congGlobal;
-		}
-		else if (v == "cong-fp32")
-		{
-			kiwiModelType = ModelType::congFp32;
-		}
-		else if (v == "cong-global-fp32")
-		{
-			kiwiModelType = ModelType::congGlobalFp32;
-		}
-		else
-		{
-			cerr << "Invalid model type" << endl;
+		cerr << e.what() << endl;
 			return -1;
-		}
 	}
 	
 	vector<string> morphInputs, disambInputs;

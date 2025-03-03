@@ -102,4 +102,44 @@ namespace tutils
 	{
 	}
 #endif
+
+	inline kiwi::ModelType parseModelType(const std::string& v)
+	{
+		if (v == "none")
+		{
+			return kiwi::ModelType::none;
+		}
+		else if (v == "knlm")
+		{
+			return kiwi::ModelType::knlm;
+		}
+		else if (v == "sbg")
+		{
+			return kiwi::ModelType::sbg;
+		}
+		else if (v == "knlm-transposed")
+		{
+			return kiwi::ModelType::knlmTransposed;
+		}
+		else if (v == "cong")
+		{
+			return kiwi::ModelType::cong;
+		}
+		else if (v == "cong-global")
+		{
+			return kiwi::ModelType::congGlobal;
+		}
+		else if (v == "cong-fp32")
+		{
+			return kiwi::ModelType::congFp32;
+		}
+		else if (v == "cong-global-fp32")
+		{
+			return kiwi::ModelType::congGlobalFp32;
+		}
+		else
+		{
+			throw std::invalid_argument{ "Invalid model type" };
+		}
+	}
 }
