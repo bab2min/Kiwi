@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 
-project(kiwi VERSION 0.20.3 DESCRIPTION "Kiwi, Korean Intelligent Word Identifier")
+project(kiwi VERSION 0.20.4 DESCRIPTION "Kiwi, Korean Intelligent Word Identifier")
 
 set ( CMAKE_CXX_STANDARD 14 )
 set ( CMAKE_VERBOSE_MAKEFILE true )

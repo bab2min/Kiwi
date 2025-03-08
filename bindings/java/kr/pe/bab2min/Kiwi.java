@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Kiwi implements AutoCloseable  {
 	private long _inst;
-	final private static String _version = "0.20.3";
+	final private static String _version = "0.20.4";
 
 	public static class Match {
 		final static public int none = 0,
