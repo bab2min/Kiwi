@@ -187,6 +187,20 @@ TEST(KiwiCpp, SplitComplex)
 			EXPECT_EQ(res2.first[0].str, u"감사");
 		}
 	}
+	
+	{
+		auto testCases = {
+			u"집에 갔어요",
+			u"집에 가요",
+		};
+		for (auto s : testCases)
+		{
+			auto res1 = kiwi.analyze(s, Match::allWithNormalizing);
+			auto res2 = kiwi.analyze(s, Match::allWithNormalizing | Match::splitComplex);
+			EXPECT_EQ(res1.first[res1.first.size() - 1].str, u"어요");
+			EXPECT_EQ(res2.first[res2.first.size() - 1].str, u"요");
+		}
+	}
 }
 
 TEST(KiwiCpp, OldHangul)
