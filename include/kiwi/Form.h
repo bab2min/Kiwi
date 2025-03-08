@@ -166,6 +166,28 @@ namespace kiwi
 
 		/** 분할된 형태소의 경우 원형 형태소를 반환한다. 그 외에는 자기 자신을 반환한다. */
 		const Morpheme* getCombined() const { return this + combined; }
+
+		bool hasComplex() const
+		{
+			if (getCombined()->complex) return true;
+
+			for (auto c : chunks)
+			{
+				if (c->complex) return true;
+			}
+			return false;
+		}
+
+		template<class Container>
+		bool hasMorpheme(Container&& m) const
+		{
+			if (m.count(getCombined())) return true;
+			for (auto c : chunks)
+			{
+				if (m.count(c)) return true;
+			}
+			return false;
+		}
 	};
 
 	/**
