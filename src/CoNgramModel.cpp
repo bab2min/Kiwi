@@ -122,7 +122,7 @@ namespace kiwi
 				nextWids.insert(nextWids.end(), nextDistantWids.begin(), nextDistantWids.end());
 			}
 
-			if (nextWids.size() > 0)
+			if (prevLmStates.size() > 0 && nextWids.size() > 0)
 			{
 				if (prevLmStates.size() == 1 && nextWids.size() == 1)
 				{
@@ -278,6 +278,10 @@ namespace kiwi
 						else continue;
 					}
 					Wid firstWid = morphBase[prevPath->wid].getCombined()->lmMorphemeId;
+					
+					FormEvaluator formEvaluator{ *prevPath, ownForms, morphBase };
+					if (!formEvaluator(curMorph, ignoreCondScore, score)) continue;
+
 					auto state = prevPath->lmState;
 					score += state.next(langMdl, firstWid);
 
