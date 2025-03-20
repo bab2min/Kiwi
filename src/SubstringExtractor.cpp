@@ -266,6 +266,11 @@ namespace kiwi
 		_addArray(first, last);
 	}
 
+	void PrefixCounter::addArray(const int32_t* first, const int32_t* last)
+	{
+		_addArray(first, last);
+	}
+
 	void PrefixCounter::addArray(const uint64_t* first, const uint64_t* last)
 	{
 		_addArray(first, last);

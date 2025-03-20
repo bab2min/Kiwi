@@ -571,7 +571,8 @@ void KiwiBuilder::_addCorpusTo(
 	std::istream& is, 
 	MorphemeMap& morphMap,
 	double splitRatio,
-	RaggedVector<VocabTy>* splitOut
+	RaggedVector<VocabTy>* splitOut,
+	UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict
 ) const
 {
 	Vector<VocabTy> wids;
@@ -691,7 +692,15 @@ void KiwiBuilder::_addCorpusTo(
 
 			if (t < POSTag::p && t != POSTag::unknown)
 			{
+				if (oovDict && (t == POSTag::nng || t == POSTag::nnp))
+				{
+					auto oovId = oovDict->emplace(make_pair(f, t), oovDict->size()).first->second;
+					wids.emplace_back(-(ptrdiff_t)(oovId + 1));
+				}
+				else
+			{
 				wids.emplace_back(getDefaultMorphemeId(t));
+				}
 				continue;
 			}
 
@@ -700,19 +709,28 @@ void KiwiBuilder::_addCorpusTo(
 	}
 }
 
-void KiwiBuilder::addCorpusTo(RaggedVector<uint8_t>& out, std::istream& is, MorphemeMap& morphMap, double splitRatio, RaggedVector<uint8_t>* splitOut) const
+void KiwiBuilder::addCorpusTo(RaggedVector<uint8_t>& out, std::istream& is, MorphemeMap& morphMap, 
+	double splitRatio, RaggedVector<uint8_t>* splitOut, UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict) const
 {
-	return _addCorpusTo(out, is, morphMap, splitRatio, splitOut);
+	return _addCorpusTo(out, is, morphMap, splitRatio, splitOut, oovDict);
 }
 
-void KiwiBuilder::addCorpusTo(RaggedVector<uint16_t>& out, std::istream& is, MorphemeMap& morphMap, double splitRatio, RaggedVector<uint16_t>* splitOut) const
+void KiwiBuilder::addCorpusTo(RaggedVector<uint16_t>& out, std::istream& is, MorphemeMap& morphMap, 
+	double splitRatio, RaggedVector<uint16_t>* splitOut, UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict) const
 {
-	return _addCorpusTo(out, is, morphMap, splitRatio, splitOut);
+	return _addCorpusTo(out, is, morphMap, splitRatio, splitOut, oovDict);
 }
 
-void KiwiBuilder::addCorpusTo(RaggedVector<uint32_t>& out, std::istream& is, MorphemeMap& morphMap, double splitRatio, RaggedVector<uint32_t>* splitOut) const
+void KiwiBuilder::addCorpusTo(RaggedVector<uint32_t>& out, std::istream& is, MorphemeMap& morphMap, 
+	double splitRatio, RaggedVector<uint32_t>* splitOut, UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict) const
 {
-	return _addCorpusTo(out, is, morphMap, splitRatio, splitOut);
+	return _addCorpusTo(out, is, morphMap, splitRatio, splitOut, oovDict);
+}
+
+void KiwiBuilder::addCorpusTo(RaggedVector<int32_t>& out, std::istream& is, MorphemeMap& morphMap,
+	double splitRatio, RaggedVector<int32_t>* splitOut, UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict) const
+{
+	return _addCorpusTo(out, is, morphMap, splitRatio, splitOut, oovDict);
 }
 
 void KiwiBuilder::updateForms()
@@ -2341,7 +2359,8 @@ void KiwiBuilder::convertHSData(
 	const vector<string>& inputPathes,
 	const string& outputPath,
 	const string& morphemeDefPath,
-	size_t morphemeDefMinCnt
+	size_t morphemeDefMinCnt,
+	bool generateOovDict
 ) const
 {
 	unique_ptr<KiwiBuilder> dummyBuilder;
@@ -2363,15 +2382,33 @@ void KiwiBuilder::convertHSData(
 		srcBuilder = dummyBuilder.get();
 	}
 
-	RaggedVector<uint32_t> sents;
+	UnorderedMap<pair<KString, POSTag>, size_t> oovDict;
+	RaggedVector<int32_t> sents;
 	for (auto& path : inputPathes)
 	{
 		ifstream ifs;
-		srcBuilder->addCorpusTo(sents, openFile(ifs, path), realMorph);
+		srcBuilder->addCorpusTo(sents, openFile(ifs, path), realMorph, 0, nullptr, generateOovDict ? &oovDict: nullptr);
 	}
 
 	ofstream ofs;
 	sents.write_to_memory(openFile(ofs, outputPath, ios_base::binary));
+	if (generateOovDict)
+	{
+		Vector<pair<u16string, POSTag>> oovDictStr(oovDict.size());
+		for (auto& p : oovDict)
+		{
+			oovDictStr[p.second] = make_pair(joinHangul(p.first.first), p.first.second);
+		}
+
+		const uint32_t size = oovDictStr.size();
+		ofs.write((const char*)&size, sizeof(uint32_t));
+		for (auto& p : oovDictStr)
+		{
+			const uint32_t tagAndSize = (uint32_t)p.second | ((uint32_t)p.first.size() << 8);
+			ofs.write((const char*)&tagAndSize, sizeof(uint32_t));
+			ofs.write((const char*)p.first.data(), p.first.size() * sizeof(char16_t));
+		}
+	}
 }
 
 HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes, 
@@ -2379,6 +2416,7 @@ HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes,
 	double dropoutProb,
 	double dropoutProbOnHistory,
 	double nounAugmentingProb,
+	size_t generateUnlikelihoods,
 	const TokenFilter& tokenFilter,
 	const TokenFilter& windowFilter,
 	double splitRatio,
@@ -2389,20 +2427,32 @@ HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes,
 	HSDataset* splitDataset
 ) const
 {
-	HSDataset dataset{ batchSize, causalContextSize, windowSize, true, numWorkers, dropoutProb, dropoutProbOnHistory, nounAugmentingProb };
+	HSDataset dataset{ batchSize, causalContextSize, windowSize, true, numWorkers, dropoutProb, dropoutProbOnHistory, nounAugmentingProb, generateUnlikelihoods };
 	auto& sents = dataset.sents.get();
 	const KiwiBuilder* srcBuilder = this;
 	MorphemeMap realMorph;
 	size_t maxTokenId = 0;
 	shared_ptr<lm::KnLangModelBase> knlm;
 
+	const bool doesGenerateUnlikelihoods = generateUnlikelihoods != (size_t)-1;
+
 	if (morphemeDefPath.empty())
 	{
 		realMorph = restoreMorphemeMap(separateDefaultMorpheme);
-		knlm = dynamic_pointer_cast<lm::KnLangModelBase>(langMdl);
+		dataset.langModel = langMdl;
+		if (doesGenerateUnlikelihoods)
+		{
+			dataset.kiwiInst = make_unique<Kiwi>(build());
+			dataset.kiwiInst->setMaxUnkFormSize(2);
+		}
 	}
 	else
 	{
+		if (doesGenerateUnlikelihoods)
+		{
+			throw invalid_argument{ "cannot generate unlikelihoods with morpheme definition file" };
+		}
+
 		dataset.dummyBuilder = make_shared<KiwiBuilder>();
 		dataset.dummyBuilder->initMorphemes();
 		ifstream ifs;
@@ -2418,41 +2468,76 @@ HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes,
 		}
 	}
 
-	dataset.knlm = knlm;
 	dataset.morphemes = &srcBuilder->morphemes;
 	dataset.forms = &srcBuilder->forms;
 	dataset.specialMorphIds = getSpecialMorphs();
 
 	if (splitDataset)
 	{
-		*splitDataset = HSDataset{ batchSize, causalContextSize, windowSize, true, numWorkers, dropoutProb };
+		*splitDataset = HSDataset{ batchSize, causalContextSize, windowSize, true, numWorkers, dropoutProb, 0, 0, generateUnlikelihoods };
 		splitDataset->dummyBuilder = dataset.dummyBuilder;
-		splitDataset->knlm = knlm;
+		splitDataset->langModel = dataset.langModel;
+		splitDataset->kiwiInst = dataset.kiwiInst;
 		splitDataset->morphemes = dataset.morphemes;
 		splitDataset->forms = dataset.forms;
 		splitDataset->specialMorphIds = dataset.specialMorphIds;
 	}
 
+	UnorderedMap<pair<KString, POSTag>, size_t> oovDict;
 	for (auto& path : inputPathes)
 	{
 		try
 		{
 			ifstream ifs;
-			auto cvtSents = RaggedVector<uint32_t>::from_memory(openFile(ifs, path, ios_base::binary));
+			auto cvtSents = RaggedVector<int32_t>::from_memory(openFile(ifs, path, ios_base::binary));
+			uint32_t oovDictSize = 0;
+			Vector<int32_t> oovDictMap;
+			if (ifs.read((char*)&oovDictSize, sizeof(uint32_t)))
+			{
+				for (uint32_t i = 0; i < oovDictSize; ++i)
+				{
+					uint32_t tagAndSize = 0;
+					ifs.read((char*)&tagAndSize, sizeof(uint32_t));
+					u16string form(tagAndSize >> 8, 0);
+					ifs.read((char*)form.data(), form.size() * sizeof(char16_t));
+					const POSTag tag = (POSTag)(tagAndSize & 0xff);
+					if (doesGenerateUnlikelihoods)
+					{
+						KString kform = normalizeHangul(form);
+						const auto oovId = (int32_t)oovDict.emplace(make_pair(kform, tag), oovDict.size()).first->second;
+						oovDictMap.emplace_back(-oovId - 1);
+					}
+					else
+					{
+						oovDictMap.emplace_back(getDefaultMorphemeId(tag));
+					}
+				}
+			}
+
 			double splitCnt = 0;
 			for (auto s : cvtSents)
 			{
 				splitCnt += splitRatio;
 				auto& o = splitDataset && splitCnt >= 1 ? splitDataset->sents.get() : sents;
 				o.emplace_back();
+				if (oovDictMap.empty())
+				{
 				o.insert_data(s.begin(), s.end());
+				}
+				else
+				{
+					for (auto i : s)
+					{
+						o.add_data(i < 0 ? oovDictMap[-i - 1] : i);
+					}
+				}
 				splitCnt = fmod(splitCnt, 1.);
 			}
 		}
 		catch (const runtime_error&)
 		{
 			ifstream ifs;
-			srcBuilder->addCorpusTo(sents, openFile(ifs, path), realMorph, splitRatio, splitDataset ? &splitDataset->sents.get() : nullptr);
+			srcBuilder->addCorpusTo(sents, openFile(ifs, path), realMorph, splitRatio, splitDataset ? &splitDataset->sents.get() : nullptr, doesGenerateUnlikelihoods ? &oovDict : nullptr);
 		}
 	}
 	size_t tokenSize = sents.raw().empty() ? 0 : *max_element(sents.raw().begin(), sents.raw().end()) + 1;
@@ -2461,6 +2546,16 @@ HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes,
 	{
 		auto& sents = splitDataset->sents.get();
 		tokenSize = max(tokenSize, sents.raw().empty() ? (size_t)0 : *max_element(sents.raw().begin(), sents.raw().end()) + 1);
+	}
+
+	if (doesGenerateUnlikelihoods)
+	{
+		dataset.oovDict = make_unique<Vector<pair<u16string, POSTag>>>(oovDict.size());
+		for (auto& p : oovDict)
+		{
+			(*dataset.oovDict)[p.second] = make_pair(joinHangul(p.first.first), p.first.second);
+		}
+		if (splitDataset) splitDataset->oovDict = dataset.oovDict;
 	}
 
 	const size_t knlmVocabSize = knlm ? knlm->getHeader().vocab_size : maxTokenId;

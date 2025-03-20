@@ -577,11 +577,22 @@ namespace kiwi
 		MorphemeMap restoreMorphemeMap(bool separateDefaultMorpheme = false) const;
 
 		template<class VocabTy>
-		void _addCorpusTo(RaggedVector<VocabTy>& out, std::istream& is, MorphemeMap& morphMap, double splitRatio, RaggedVector<VocabTy>* splitOut) const;
+		void _addCorpusTo(RaggedVector<VocabTy>& out, std::istream& is, MorphemeMap& morphMap, 
+			double splitRatio, RaggedVector<VocabTy>* splitOut,
+			UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict = nullptr) const;
 
-		void addCorpusTo(RaggedVector<uint8_t>& out, std::istream& is, MorphemeMap& morphMap, double splitRatio = 0, RaggedVector<uint8_t>* splitOut = nullptr) const;
-		void addCorpusTo(RaggedVector<uint16_t>& out, std::istream& is, MorphemeMap& morphMap, double splitRatio = 0, RaggedVector<uint16_t>* splitOut = nullptr) const;
-		void addCorpusTo(RaggedVector<uint32_t>& out, std::istream& is, MorphemeMap& morphMap, double splitRatio = 0, RaggedVector<uint32_t>* splitOut = nullptr) const;
+		void addCorpusTo(RaggedVector<uint8_t>& out, std::istream& is, MorphemeMap& morphMap, 
+			double splitRatio = 0, RaggedVector<uint8_t>* splitOut = nullptr,
+			UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict = nullptr) const;
+		void addCorpusTo(RaggedVector<uint16_t>& out, std::istream& is, MorphemeMap& morphMap, 
+			double splitRatio = 0, RaggedVector<uint16_t>* splitOut = nullptr,
+			UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict = nullptr) const;
+		void addCorpusTo(RaggedVector<uint32_t>& out, std::istream& is, MorphemeMap& morphMap, 
+			double splitRatio = 0, RaggedVector<uint32_t>* splitOut = nullptr,
+			UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict = nullptr) const;
+		void addCorpusTo(RaggedVector<int32_t>& out, std::istream& is, MorphemeMap& morphMap,
+			double splitRatio = 0, RaggedVector<int32_t>* splitOut = nullptr,
+			UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict = nullptr) const;
 		void updateForms();
 		void updateMorphemes(size_t vocabSize = 0);
 
@@ -816,7 +827,8 @@ namespace kiwi
 			const std::vector<std::string>& inputPathes,
 			const std::string& outputPath,
 			const std::string& morphemeDefPath = {},
-			size_t morphemeDefMinCnt = 0
+			size_t morphemeDefMinCnt = 0,
+			bool generateOovDict = false
 		) const;
 
 		using TokenFilter = std::function<bool(const std::u16string&, POSTag)>;
@@ -826,6 +838,7 @@ namespace kiwi
 			double dropoutProb = 0,
 			double dropoutProbOnHistory = 0,
 			double nounAugmentingProb = 0,
+			size_t generateUnlikelihoods = -1,
 			const TokenFilter& tokenFilter = {},
 			const TokenFilter& windowFilter = {},
 			double splitRatio = 0,
