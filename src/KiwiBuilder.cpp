@@ -2432,7 +2432,6 @@ HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes,
 	const KiwiBuilder* srcBuilder = this;
 	MorphemeMap realMorph;
 	size_t maxTokenId = 0;
-	shared_ptr<lm::KnLangModelBase> knlm;
 
 	const bool doesGenerateUnlikelihoods = generateUnlikelihoods != (size_t)-1;
 
@@ -2558,7 +2557,7 @@ HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes,
 		if (splitDataset) splitDataset->oovDict = dataset.oovDict;
 	}
 
-	const size_t knlmVocabSize = knlm ? knlm->getHeader().vocab_size : maxTokenId;
+	const size_t knlmVocabSize = dataset.langModel ? dataset.langModel->vocabSize() : maxTokenId;
 	tokenSize = max(tokenSize, knlmVocabSize);
 	size_t filteredKnlmVocabSize = 0;
 	for (size_t i = 0; i < tokenSize; ++i)
