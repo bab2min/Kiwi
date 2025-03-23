@@ -58,7 +58,7 @@ namespace mp
 		ThreadPool(size_t threads = 0);
 		template<class F, class... Args>
 		auto runParallel(size_t workers, F&& f, Args&&... args)
-			-> std::vector<std::future<typename std::result_of<F(size_t, size_t, Barrier*, Args...)>::type>>;
+			-> std::vector<std::future<typename std::invoke_result<F, size_t, size_t, Barrier*, Args...>::type>>;
 		~ThreadPool();
 		size_t size() const { return workers.size(); }
 		size_t limitedSize() const { return std::min(size(), _limitedSize); };
@@ -106,9 +106,9 @@ namespace mp
 
 	template<class F, class... Args>
 	auto ThreadPool::runParallel(size_t workers, F&& f, Args&&... args)
-		-> std::vector<std::future<typename std::result_of<F(size_t, size_t, Barrier*, Args...)>::type>>
+		-> std::vector<std::future<typename std::invoke_result<F, size_t, size_t, Barrier*, Args...>::type>>
 	{
-		using return_type = typename std::result_of<F(size_t, size_t, Barrier*, Args...)>::type;
+		using return_type = typename std::invoke_result<F, size_t, size_t, Barrier*, Args...>::type;
 		std::vector<std::future<return_type>> ret;
 		{
 			auto b = std::make_shared<Barrier>(getBarrier(workers));
