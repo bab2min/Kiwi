@@ -65,10 +65,10 @@ namespace kiwi
 				const size_t microM = std::min(packM, m - mi);
 #define LOOP_BODY(mj) \
 					const int32_t aOffsets[4] = {\
-						mj * 4 < microM ? aIdx[0] * aIdxScale : 0,\
-						mj * 4 + 1 < microM ? aIdx[1] * aIdxScale : 0,\
-						mj * 4 + 2 < microM ? aIdx[2] * aIdxScale : 0,\
-						mj * 4 + 3 < microM ? aIdx[3] * aIdxScale : 0,\
+						mj * 4 < microM ? (int32_t)(aIdx[0] * aIdxScale) : 0,\
+						mj * 4 + 1 < microM ? (int32_t)(aIdx[1] * aIdxScale) : 0,\
+						mj * 4 + 2 < microM ? (int32_t)(aIdx[2] * aIdxScale) : 0,\
+						mj * 4 + 3 < microM ? (int32_t)(aIdx[3] * aIdxScale) : 0,\
 					};\
 					auto* aPtr = aBase;\
 					psum = pbSum;\
@@ -237,10 +237,10 @@ namespace kiwi
 			{
 				const size_t microM = std::min(packM, m - mi);
 				const int32_t aOffsets[4] = {
-					aIdx[0] * aIdxScale,
-					1 < microM ? aIdx[1] * aIdxScale : 0,
-					2 < microM ? aIdx[2] * aIdxScale : 0,
-					3 < microM ? aIdx[3] * aIdxScale : 0,
+					(int32_t)(aIdx[0] * aIdxScale),
+					1 < microM ? (int32_t)(aIdx[1] * aIdxScale) : 0,
+					2 < microM ? (int32_t)(aIdx[2] * aIdxScale) : 0,
+					3 < microM ? (int32_t)(aIdx[3] * aIdxScale) : 0,
 				};
 				auto* aPtr = aBase;
 				psum[0] = pbSum[0];
@@ -331,10 +331,10 @@ namespace kiwi
 			{
 				const size_t microM = std::min(packM, m - mi);
 				const int32_t aOffsets[4] = {
-					aIdx[0] * aIdxScale,
-					1 < microM ? aIdx[1] * aIdxScale : 0,
-					2 < microM ? aIdx[2] * aIdxScale : 0,
-					3 < microM ? aIdx[3] * aIdxScale : 0,
+					(int32_t)(aIdx[0] * aIdxScale),
+					1 < microM ? (int32_t)(aIdx[1] * aIdxScale) : 0,
+					2 < microM ? (int32_t)(aIdx[2] * aIdxScale) : 0,
+					3 < microM ? (int32_t)(aIdx[3] * aIdxScale) : 0,
 				};
 				auto* aPtr = aBase;
 				psum[0] = pbSum[0];
@@ -437,10 +437,10 @@ namespace kiwi
 			{
 				const size_t microM = std::min(packM, m - mi);
 				const int32_t aOffsets[4] = {
-					aIdx[0] * aIdxScale,
-					1 < microM ? aIdx[1] * aIdxScale : 0,
-					2 < microM ? aIdx[2] * aIdxScale : 0,
-					3 < microM ? aIdx[3] * aIdxScale : 0,
+					(int32_t)(aIdx[0] * aIdxScale),
+					1 < microM ? (int32_t)(aIdx[1] * aIdxScale) : 0,
+					2 < microM ? (int32_t)(aIdx[2] * aIdxScale) : 0,
+					3 < microM ? (int32_t)(aIdx[3] * aIdxScale) : 0,
 				};
 				auto* aPtr = aBase;
 				psum[0] = pbSum[0];

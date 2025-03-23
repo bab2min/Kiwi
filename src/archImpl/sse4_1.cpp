@@ -83,10 +83,10 @@ namespace kiwi
 			{
 				const size_t microM = std::min(packM, m - mi);
 				const int32_t aOffsets[4] = {
-					aIdx[0] * aIdxScale,
-					1 < microM ? aIdx[1] * aIdxScale : 0,
-					2 < microM ? aIdx[2] * aIdxScale : 0,
-					3 < microM ? aIdx[3] * aIdxScale : 0,
+					(int32_t)(aIdx[0] * aIdxScale),
+					1 < microM ? (int32_t)(aIdx[1] * aIdxScale) : 0,
+					2 < microM ? (int32_t)(aIdx[2] * aIdxScale) : 0,
+					3 < microM ? (int32_t)(aIdx[3] * aIdxScale) : 0,
 				};
 				auto* aPtr = aBase;
 				psum = pbSum;

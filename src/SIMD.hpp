@@ -571,7 +571,7 @@ namespace kiwi
                 // reduce sum of eight int32_t to one int32_t
                 __m256i sum = _mm256_hadd_epi32(acc, acc);
                 sum = _mm256_hadd_epi32(sum, sum);
-				return _mm256_cvtsi256_si32(sum) + _mm256_extract_epi32(sum, 4);
+				return _mm_cvtsi128_si32(_mm256_castsi256_si128(sum)) + _mm256_extract_epi32(sum, 4);
             }
         };
 

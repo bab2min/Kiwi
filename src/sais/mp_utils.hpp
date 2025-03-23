@@ -305,7 +305,7 @@ namespace mp
 	}
 
 	template<class Fn, class ...Args,
-		typename std::enable_if<!std::is_same<typename std::result_of<Fn(size_t, size_t, Barrier*)>::type, void>::value, int>::type = 0>
+		typename std::enable_if<!std::is_same<typename std::invoke_result<Fn, size_t, size_t, Barrier*>::type, void>::value, int>::type = 0>
 	inline auto runParallel(ThreadPool* pool, Fn&& func, Args&&... args) -> std::vector<decltype(func(0, 0, nullptr))>
 	{
 		static_assert(detail::AllOfType<std::tuple<Args...>, detail::IsRunParallelArg>::value, "`runParallel` receives arguments of wrong type.");
@@ -331,7 +331,7 @@ namespace mp
 	}
 
 	template<class Fn, class ...Args,
-		typename std::enable_if<std::is_same<typename std::result_of<Fn(size_t, size_t, Barrier*)>::type, void>::value, int>::type = 0>
+		typename std::enable_if<std::is_same<typename std::invoke_result<Fn, size_t, size_t, Barrier*>::type, void>::value, int>::type = 0>
 		inline void runParallel(ThreadPool* pool, Fn&& func, Args&&... args)
 	{
 		static_assert(detail::AllOfType<std::tuple<Args...>, detail::IsRunParallelArg>::value, "`runParallel` receives arguments of wrong type.");
@@ -360,7 +360,7 @@ namespace mp
 	}
 
 	template<class Fn, class ...Args,
-		typename std::enable_if<std::is_same<typename std::result_of<Fn(size_t, size_t, ptrdiff_t, ptrdiff_t, ptrdiff_t, Barrier*)>::type, void>::value, int>::type = 0>
+		typename std::enable_if<std::is_same<typename std::invoke_result<Fn, size_t, size_t, ptrdiff_t, ptrdiff_t, ptrdiff_t, Barrier*>::type, void>::value, int>::type = 0>
 		inline void forParallel(ThreadPool* pool, ptrdiff_t start, ptrdiff_t stop, ptrdiff_t step, Fn&& func, Args&&... args)
 	{
 		static_assert(detail::AllOfType<std::tuple<Args...>, detail::IsRunParallelArg>::value, "`forParallel` receives arguments of wrong type.");
