@@ -311,8 +311,7 @@ namespace kiwi
 			* 새 상태값은 outStates에 저장되고, 각 상태별 확률값은 outScores에 저장된다.
 			* nextIdSize개의 다음 토큰 중 마지막 numValidDistantTokens개의 토큰은 유효한 distant 토큰으로 처리된다.
 			*/
-			template<size_t _windowSize>
-			void progressMatrix(const typename std::enable_if<(_windowSize > 0), LmStateType>::type* prevStates, const KeyType* nextIds,
+			void progressMatrix(const LmStateType* prevStates, const KeyType* nextIds,
 				size_t prevStateSize, size_t nextIdSize, size_t numValidDistantTokens,
 				LmStateType* outStates, float* outScores) const;
 
@@ -326,8 +325,7 @@ namespace kiwi
 				size_t prevStateSize, size_t nextIdSize, size_t numValidDistantTokens,
 				LmStateType* outStates, float* outScores) const;
 
-			template<size_t _windowSize>
-			void progressMatrix(const typename std::enable_if<(_windowSize == 0), LmStateType>::type* prevStates, const KeyType* nextIds,
+			void progressMatrixNoWindow(const LmStateType* prevStates, const KeyType* nextIds,
 				size_t prevStateSize, size_t nextIdSize, size_t numValidDistantTokens,
 				LmStateType* outStates, float* outScores) const;
 		};

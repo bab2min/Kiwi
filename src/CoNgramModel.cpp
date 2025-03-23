@@ -135,7 +135,7 @@ namespace kiwi
 				{
 					nextLmStates.resize(prevLmStates.size() * nextWids.size());
 					scores.resize(prevLmStates.size() * nextWids.size());
-					langMdl->template progressMatrix<windowSize>(prevLmStates.data(), nextWids.data(), prevLmStates.size(), nextWids.size(), nextDistantWids.size(), nextLmStates.data(), scores.data());
+					langMdl->progressMatrix(prevLmStates.data(), nextWids.data(), prevLmStates.size(), nextWids.size(), nextDistantWids.size(), nextLmStates.data(), scores.data());
 				}
 			}
 
@@ -1211,11 +1211,12 @@ namespace kiwi
 		}
 
 		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
-		template<size_t _windowSize>
 		void CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::progressMatrix(
-			const typename std::enable_if<(_windowSize > 0), LmStateType>::type* prevStates, const KeyType* nextIds,
+			const LmStateType* prevStates, const KeyType* nextIds,
 			size_t prevStateSize, size_t nextIdSize, size_t numValidDistantTokens,
 			LmStateType* outStates, float* outScores) const
+		{
+			if constexpr (windowSize > 0)
 		{
 			thread_local TLSForProgressMatrix tls;
 			if (prevStateSize <= (quantized ? 16 : 8) && nextIdSize <= 16)
@@ -1225,13 +1226,17 @@ namespace kiwi
 			else
 			{
 				return progressMatrixWSort(tls, prevStates, nextIds, prevStateSize, nextIdSize, numValidDistantTokens, outStates, outScores);
+				}
+			}
+			else
+			{
+				return progressMatrixNoWindow(prevStates, nextIds, prevStateSize, nextIdSize, numValidDistantTokens, outStates, outScores);
 			}
 		}
 
 		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
-		template<size_t _windowSize>
-		void CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::progressMatrix(
-			const typename std::enable_if<_windowSize == 0, LmStateType>::type* prevStates, const KeyType* nextIds,
+		void CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::progressMatrixNoWindow(
+			const LmStateType* prevStates, const KeyType* nextIds,
 			size_t prevStateSize, size_t nextIdSize, size_t numValidDistantTokens,
 			LmStateType* outStates, float* outScores) const
 		{
