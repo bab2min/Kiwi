@@ -1,4 +1,4 @@
-#include <fstream>
+﻿#include <fstream>
 #include <iostream>
 
 #include <kiwi/Utils.h>
@@ -171,10 +171,10 @@ auto MorphEvaluator::loadTestset(const string& testSetFile) const -> vector<Test
 		vector<u16string> tokens;
 		for (size_t i = 1; i < fd.size(); ++i)
 		{
-			for (auto s : split(fd[i], u' ')) tokens.emplace_back(s.to_string());
+			for (auto s : split(fd[i], u' ')) tokens.emplace_back(s);
 		}
 		TestResult tr;
-		tr.q = fd[0].to_string();
+		tr.q = u16string{ fd[0] };
 		for (auto& t : tokens) tr.a.emplace_back(parseWordPOS(t));
 		ret.emplace_back(std::move(tr));
 	}
@@ -329,8 +329,8 @@ auto DisambEvaluator::loadTestset(const string& testSetFile) const -> vector<Tes
 		auto fd = split(wstr, u'\t');
 		if (fd.size() < 2) continue;
 		TestResult tr;
-		tr.target = parseWordPOS(fd[0].to_string());
-		tr.text = fd[1].to_string();
+		tr.target = parseWordPOS(u16string{ fd[0] });
+		tr.text = u16string{ fd[1] };
 		ret.emplace_back(move(tr));
 	}
 	return ret;
