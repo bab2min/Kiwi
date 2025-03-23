@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file Types.h
  * @author bab2min (bab2min@gmail.com)
  * @brief Kiwi C++ API에 쓰이는 주요 타입들을 모아놓은 헤더 파일
@@ -16,6 +16,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <string>
+#include <string_view>
 #include <memory>
 #include <type_traits>
 #include <functional>
@@ -62,16 +63,6 @@ inline Type operator^=(Type& a, Type b)\
 	return reinterpret_cast<Type&>(reinterpret_cast<typename std::underlying_type<Type>::type&>(a) ^= static_cast<typename std::underlying_type<Type>::type>(b));\
 }
 
-namespace nonstd
-{
-	namespace sv_lite
-	{
-		template<class CharT, class Traits> class basic_string_view;
-	}
-
-	using string_view = sv_lite::basic_string_view<char, std::char_traits<char>>;
-	using u16string_view = sv_lite::basic_string_view<char16_t, std::char_traits<char16_t>>;
-}
 
 namespace kiwi
 {
@@ -187,7 +178,7 @@ namespace kiwi
 	using KcScores = Vector<std::pair<KcVector, float>>;
 #endif
 
-	using U16StringView = nonstd::u16string_view;
+	using U16StringView = std::u16string_view;
 
 	/**
 	 * @brief 형태소 품사 태그와 관련된 열거형

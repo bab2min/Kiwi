@@ -213,11 +213,11 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 					if (cpolar != CondPolarity::none) throw FormatException{ "wrong line: " + line };
 					cpolar = CondPolarity::non_adj;
 				}
-				else if (f.starts_with(u"complex "))
+				else if (f.size() >= 8 && f.substr(0, 8) == u"complex ")
 				{
 					if (complex) throw FormatException{ "wrong line: " + line };
 					complex = true;
-					complexStr = f.substr(8).to_string();
+					complexStr = u16string{ f.substr(8) };
 				}
 				else if (f[0] == u'=')
 				{
@@ -1371,7 +1371,7 @@ pair<uint32_t, bool> KiwiBuilder::addWord(U16StringView newForm, POSTag tag, flo
 
 pair<uint32_t, bool> KiwiBuilder::addWord(const std::u16string& newForm, POSTag tag, float score, size_t origMorphemeId, size_t lmMorphemeId)
 {
-	return addWord(nonstd::to_string_view(newForm), tag, score, origMorphemeId, lmMorphemeId);
+	return addWord(toStringView(newForm), tag, score, origMorphemeId, lmMorphemeId);
 }
 
 void KiwiBuilder::addCombinedMorpheme(
@@ -1678,7 +1678,7 @@ pair<uint32_t, bool> KiwiBuilder::addWord(U16StringView form, POSTag tag, float 
 
 pair<uint32_t, bool> KiwiBuilder::addWord(const u16string& form, POSTag tag, float score)
 {
-	return addWord(nonstd::to_string_view(form), tag, score);
+	return addWord(toStringView(form), tag, score);
 }
 
 pair<uint32_t, bool> KiwiBuilder::addWord(const char16_t* form, POSTag tag, float score)
@@ -1716,7 +1716,7 @@ pair<uint32_t, bool> KiwiBuilder::addWord(U16StringView newForm, POSTag tag, flo
 
 pair<uint32_t, bool> KiwiBuilder::addWord(const u16string& newForm, POSTag tag, float score, const u16string& origForm)
 {
-	return addWord(nonstd::to_string_view(newForm), tag, score, origForm);
+	return addWord(toStringView(newForm), tag, score, origForm);
 }
 
 pair<uint32_t, bool> KiwiBuilder::addWord(const char16_t* newForm, POSTag tag, float score, const char16_t* origForm)
@@ -1780,7 +1780,7 @@ bool KiwiBuilder::addPreAnalyzedWord(U16StringView form, const vector<pair<U16, 
 
 bool KiwiBuilder::addPreAnalyzedWord(const u16string& form, const vector<pair<u16string, POSTag>>& analyzed, vector<pair<size_t, size_t>> positions, float score)
 {
-	return addPreAnalyzedWord(nonstd::to_string_view(form), analyzed, positions, score);
+	return addPreAnalyzedWord(toStringView(form), analyzed, positions, score);
 }
 
 bool KiwiBuilder::addPreAnalyzedWord(const char16_t* form, const vector<pair<const char16_t*, POSTag>>& analyzed, vector<pair<size_t, size_t>> positions, float score)
@@ -1798,7 +1798,7 @@ size_t KiwiBuilder::loadDictionary(const string& dictPath)
 	u16string wstr;
 	for (size_t lineNo = 1; getline(ifs, line); ++lineNo)
 	{
-		utf8To16(nonstd::to_string_view(line), wstr);
+		utf8To16(toStringView(line), wstr);
 		while (!wstr.empty() && kiwi::identifySpecialChr(wstr.back()) == POSTag::unknown) wstr.pop_back();
 		if (wstr.empty()) continue;
 		if (wstr[0] == u'#') continue;
@@ -1852,9 +1852,9 @@ size_t KiwiBuilder::loadDictionary(const string& dictPath)
 				auto suffix = fields[0].substr(0, fields[0].size() - 1);
 				addedCnt += addRule(morphemes[0].second, [&](const u16string& str)
 				{
-					auto strv = nonstd::to_string_view(str);
-					if (!strv.ends_with(suffix)) return str;
-					return strv.substr(0, strv.size() - suffix.size()).to_string() + morphemes[0].first.to_string();
+					auto strv = toStringView(str);
+					if (!(strv.size() >= suffix.size() && strv.substr(strv.size() - suffix.size()) == suffix)) return str;
+					return u16string{ strv.substr(0, strv.size() - suffix.size()) } + u16string{ morphemes[0].first };
 				}, score).size();
 			}
 			else

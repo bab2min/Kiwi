@@ -4,7 +4,6 @@
 #include <kiwi/Types.h>
 #include <kiwi/TemplateUtils.hpp>
 #include <kiwi/Joiner.h>
-#include "string_view.hpp"
 #include "bitset.hpp"
 
 namespace kiwi

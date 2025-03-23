@@ -789,8 +789,8 @@ void RuleSet::loadRules(istream& istr)
 		}
 		else if (fields.size() == 2)
 		{
-			lTag = fields[0].to_string();
-			rTag = fields[1].to_string();
+			lTag = fields[0];
+			rTag = fields[1];
 		}
 		else
 		{
@@ -807,13 +807,13 @@ void RuleSet::loadRules(istream& istr)
 					"+ignorercond",
 				};
 
-				transform(fields[3].begin(), fields[3].end(), const_cast<char*>(fields[3].begin()), static_cast<int(*)(int)>(tolower));
+				transform(fields[3].begin(), fields[3].end(), const_cast<char*>(fields[3].data()), static_cast<int(*)(int)>(tolower));
 				for (auto f : split(fields[3], ','))
 				{
 					size_t t = find(fs.begin(), fs.end(), f) - fs.begin();
 					if (t >= fs.size())
 					{
-						throw runtime_error{ "invalid feature value: " + f.to_string()};
+						throw runtime_error{ "invalid feature value: " + string{ f } };
 					}
 
 					switch (t)

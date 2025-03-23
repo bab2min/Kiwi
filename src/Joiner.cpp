@@ -162,7 +162,7 @@ namespace kiwi
 
 		void Joiner::add(const u16string& form, POSTag tag, Space space)
 		{
-			return add(nonstd::to_string_view(form), tag, space);
+			return add(toStringView(form), tag, space);
 		}
 
 		void Joiner::add(const char16_t* form, POSTag tag, Space space)
@@ -229,7 +229,7 @@ namespace kiwi
 
 		void AutoJoiner::add(const u16string& form, POSTag tag, bool inferRegularity, Space space)
 		{
-			return (*dfAdd2)(this, nonstd::to_string_view(form), tag, inferRegularity, space, candBuf.get<Candidate<lm::VoidState<ArchType::none>>>());
+			return (*dfAdd2)(this, toStringView(form), tag, inferRegularity, space, candBuf.get<Candidate<lm::VoidState<ArchType::none>>>());
 		}
 
 		void AutoJoiner::add(const char16_t* form, POSTag tag, bool inferRegularity, Space space)

@@ -576,7 +576,7 @@ namespace kiwi
 		};
 	};
 
-	inline void utf8To16IgnoringErrors(nonstd::string_view str, std::u16string& ret)
+	inline void utf8To16IgnoringErrors(std::string_view str, std::u16string& ret)
 	{
 		ret.clear();
 		for (auto it = str.begin(); it != str.end(); ++it)
@@ -675,7 +675,7 @@ namespace kiwi
 		}
 	}
 
-	inline std::u16string utf8To16IgnoringErrors(nonstd::string_view str)
+	inline std::u16string utf8To16IgnoringErrors(std::string_view str)
 	{
 		std::u16string ret;
 		utf8To16IgnoringErrors(str, ret);

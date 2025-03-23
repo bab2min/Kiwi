@@ -3,7 +3,7 @@
 #include <utility>
 #include <kiwi/Types.h>
 #include <kiwi/Utils.h>
-#include "string_view.hpp"
+#include <string_view>
 
 namespace kiwi
 {
@@ -76,7 +76,7 @@ namespace kiwi
 			size_t t = s.find(delim, p);
 			if (t == s.npos)
 			{
-				*(result++) = nonstd::basic_string_view<BaseChr>{ &s[e] , s.size() - e};
+				*(result++) = std::basic_string_view<BaseChr>{ &s[e] , s.size() - e};
 				return result;
 			}
 			else
@@ -91,28 +91,28 @@ namespace kiwi
 				}
 				else
 				{
-					*(result++) = nonstd::basic_string_view<BaseChr>{ &s[e] , t - e };
+					*(result++) = std::basic_string_view<BaseChr>{ &s[e] , t - e };
 					p = t + 1;
 					e = t + 1;
 				}
 			}
 		}
-		*(result++) = nonstd::basic_string_view<BaseChr>{ &s[e] , s.size() - e };
+		*(result++) = std::basic_string_view<BaseChr>{ &s[e] , s.size() - e };
 		return result;
 	}
 
 	template<class BaseChr, class Trait>
-	inline std::vector<nonstd::basic_string_view<BaseChr, Trait>> split(nonstd::basic_string_view<BaseChr, Trait> s, BaseChr delim, BaseChr delimEscape = 0)
+	inline std::vector<std::basic_string_view<BaseChr, Trait>> split(std::basic_string_view<BaseChr, Trait> s, BaseChr delim, BaseChr delimEscape = 0)
 	{
-		std::vector<nonstd::basic_string_view<BaseChr, Trait>> ret;
+		std::vector<std::basic_string_view<BaseChr, Trait>> ret;
 		split(s, delim, std::back_inserter(ret), -1, delimEscape);
 		return ret;
 	}
 
 	template<class BaseChr, class Trait, class Alloc>
-	inline std::vector<nonstd::basic_string_view<BaseChr, Trait>> split(const std::basic_string<BaseChr, Trait, Alloc>& s, BaseChr delim, BaseChr delimEscape = 0)
+	inline std::vector<std::basic_string_view<BaseChr, Trait>> split(const std::basic_string<BaseChr, Trait, Alloc>& s, BaseChr delim, BaseChr delimEscape = 0)
 	{
-		std::vector<nonstd::basic_string_view<BaseChr, Trait>> ret;
+		std::vector<std::basic_string_view<BaseChr, Trait>> ret;
 		split(s, delim, std::back_inserter(ret), -1, delimEscape);
 		return ret;
 	}
@@ -141,9 +141,9 @@ namespace kiwi
 
 	template<class BaseChr, class Trait, class Alloc = std::allocator<BaseChr>>
 	inline std::basic_string<BaseChr, Trait, Alloc> replace(
-		nonstd::basic_string_view<BaseChr, Trait> s, 
-		nonstd::basic_string_view<BaseChr, Trait> from, 
-		nonstd::basic_string_view<BaseChr, Trait> to)
+		std::basic_string_view<BaseChr, Trait> s, 
+		std::basic_string_view<BaseChr, Trait> from, 
+		std::basic_string_view<BaseChr, Trait> to)
 	{
 		std::basic_string<BaseChr, Trait, Alloc> ret;
 		ret.reserve(s.size());
@@ -153,15 +153,15 @@ namespace kiwi
 
 	template<class BaseChr, class Trait, size_t fromSize, size_t toSize, class Alloc = std::allocator<BaseChr>>
 	inline std::basic_string<BaseChr, Trait, Alloc> replace(
-		nonstd::basic_string_view<BaseChr, Trait> s,
+		std::basic_string_view<BaseChr, Trait> s,
 		const BaseChr(&from)[fromSize],
 		const BaseChr(&to)[toSize])
 	{
-		return replace(s, nonstd::basic_string_view<BaseChr, Trait>{ from, fromSize - 1 }, nonstd::basic_string_view<BaseChr, Trait>{ to, toSize - 1 });
+		return replace(s, std::basic_string_view<BaseChr, Trait>{ from, fromSize - 1 }, std::basic_string_view<BaseChr, Trait>{ to, toSize - 1 });
 	}
 	
 
-	inline void utf8To16(nonstd::string_view str, std::u16string& ret)
+	inline void utf8To16(std::string_view str, std::u16string& ret)
 	{
 		ret.clear();
 		for (auto it = str.begin(); it != str.end(); ++it)
@@ -224,7 +224,7 @@ namespace kiwi
 		}
 	}
 
-	inline std::u16string utf8To16(nonstd::string_view str)
+	inline std::u16string utf8To16(std::string_view str)
 	{
 		std::u16string ret;
 		utf8To16(str, ret);
@@ -232,7 +232,7 @@ namespace kiwi
 	}
 
 	template<class Ty, class Alloc>
-	inline std::u16string utf8To16(nonstd::string_view str, std::vector<Ty, Alloc>& bytePositions)
+	inline std::u16string utf8To16(std::string_view str, std::vector<Ty, Alloc>& bytePositions)
 	{
 		std::u16string ret;
 		bytePositions.clear();
@@ -302,7 +302,7 @@ namespace kiwi
 	}
 
 	template<class Ty, class Alloc>
-	inline std::u16string utf8To16ChrPoisition(nonstd::string_view str, std::vector<Ty, Alloc>& chrPositions)
+	inline std::u16string utf8To16ChrPoisition(std::string_view str, std::vector<Ty, Alloc>& chrPositions)
 	{
 		std::u16string ret;
 		size_t chrPosition = 0;
@@ -371,7 +371,7 @@ namespace kiwi
 		return ret;
 	}
 
-	inline std::string utf16To8(nonstd::u16string_view str)
+	inline std::string utf16To8(std::u16string_view str)
 	{
 		std::string ret;
 		for (auto it = str.begin(); it != str.end(); ++it)
@@ -417,7 +417,7 @@ namespace kiwi
 	}
 
 	template<class Ty, class Alloc>
-	inline std::string utf16To8(nonstd::u16string_view str, std::vector<Ty, Alloc>& positions)
+	inline std::string utf16To8(std::u16string_view str, std::vector<Ty, Alloc>& positions)
 	{
 		std::string ret;
 		positions.clear();
@@ -504,7 +504,7 @@ namespace kiwi
 		return normalizeHangul(hangul.begin(), hangul.end());
 	}
 
-	inline KString normalizeHangul(nonstd::u16string_view hangul)
+	inline KString normalizeHangul(std::u16string_view hangul)
 	{
 		return normalizeHangul(hangul.begin(), hangul.end());
 	}
@@ -553,7 +553,7 @@ namespace kiwi
 		return normalizeHangulWithPosition(hangul.begin(), hangul.end());
 	}
 
-	inline std::pair<KString, Vector<size_t>> normalizeHangulWithPosition(nonstd::u16string_view hangul)
+	inline std::pair<KString, Vector<size_t>> normalizeHangulWithPosition(std::u16string_view hangul)
 	{
 		return normalizeHangulWithPosition(hangul.begin(), hangul.end());
 	}
@@ -563,12 +563,12 @@ namespace kiwi
 		return normalizeHangul(utf8To16(hangul));
 	}
 
-	inline KString normalizeHangul(nonstd::string_view hangul)
+	inline KString normalizeHangul(std::string_view hangul)
 	{
 		return normalizeHangul(utf8To16(hangul));
 	}
 
-	inline POSTag toPOSTag(nonstd::u16string_view tagStr)
+	inline POSTag toPOSTag(std::u16string_view tagStr)
 	{
 		if (tagStr == u"NNG") return POSTag::nng;
 		if (tagStr == u"NNP") return POSTag::nnp;
@@ -744,5 +744,11 @@ namespace kiwi
 			|| (0x2F00 <= c && c <= 0x2FDF)
 			|| (0x2E80 <= c && c <= 0x2EFF)
 		;
+	}
+
+	template<class Chr, class Traits, class Alloc>
+	inline std::basic_string_view<Chr, Traits> toStringView(const std::basic_string<Chr, Traits, Alloc>& str)
+	{
+		return std::basic_string_view<Chr>{ str.data(), str.size() };
 	}
 }
