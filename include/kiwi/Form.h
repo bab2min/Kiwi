@@ -169,6 +169,29 @@ namespace kiwi
 
 		/** 현재 인스턴스가 단일 형태소인지 확인한다 */
 		bool isSingle() const { return chunks.empty() || complex || saisiot; }
+
+		bool hasComplex() const
+		{
+			if (getCombined()->complex) return true;
+
+			for (auto c : chunks)
+			{
+				if (c->complex) return true;
+			}
+			return false;
+		}
+
+		template<class Container>
+		bool hasMorpheme(Container&& m) const
+		{
+			if (m.count(getCombined())) return true;
+			for (auto c : chunks)
+			{
+				if (m.count(c)) return true;
+			}
+			return false;
+		}
+
 	};
 
 	/**

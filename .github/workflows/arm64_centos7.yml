@@ -14,7 +14,7 @@ jobs:
       with:
         submodules: true
         lfs: true
-    - uses: bab2min/run-on-arch-action@multiple-step
+    - uses: bab2min/run-on-arch-action@multiple-step-v2
       id: runcmd
       with:
         image: quay.io/pypa/manylinux2014_aarch64
@@ -44,7 +44,7 @@ jobs:
               KIWI_ARCH_TYPE=balanced ./build/kiwi-cli-* -m ./models/base -e -o test.out kowiki1000.txt
               KIWI_ARCH_TYPE=neon ./build/kiwi-cli-* -m ./models/base -e -o test.out kowiki1000.txt
     - name: Archive binaries
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Artifacts Arm64-Centos7
         path: |
