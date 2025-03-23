@@ -2,6 +2,7 @@
 #include <iostream>
 #include <unordered_set>
 #include <algorithm>
+#include <limits>
 
 #include <kiwi/Utils.h>
 #include <kiwi/TagUtils.h>
