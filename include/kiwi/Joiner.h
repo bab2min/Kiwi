@@ -82,7 +82,7 @@ namespace kiwi
 			static void destructImpl(ErasedVector* self)
 			{
 				auto* target = reinterpret_cast<Vector<T>*>(&self->vec);
-				target->~Vector<T>();
+				std::destroy_at(target);
 			}
 
 			template<class T>
