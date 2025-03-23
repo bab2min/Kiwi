@@ -50,7 +50,7 @@ constexpr std::vector<std::pair<Ty, Ty>> toPair(const ATy(&init)[n])
 
 Kiwi& reuseKiwiInstance()
 {
-	static Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 0, BuildOption::default_, }.build();
+	static Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 0, BuildOption::default_, ModelType::knlm }.build();
 	return kiwi;
 }
 
@@ -147,7 +147,7 @@ TEST(KiwiCpp, SingleConsonantMorpheme)
 
 TEST(KiwiCpp, SpecialTokenErrorOnContinualTypo)
 {
-	KiwiBuilder builder{ MODEL_PATH, 0, BuildOption::default_, };
+	KiwiBuilder builder{ MODEL_PATH, 0, BuildOption::default_, ModelType::knlm };
 	Kiwi typoKiwi = builder.build(DefaultTypoSet::continualTypoSet);
 	
 	auto res = typoKiwi.analyze(u"감사합니다 -친구들과", Match::allWithNormalizing).first;
@@ -368,7 +368,7 @@ TEST(KiwiCpp, TagRoundTrip)
 
 TEST(KiwiCpp, UserTag)
 {
-	KiwiBuilder kw{ MODEL_PATH, 0, BuildOption::default_, };
+	KiwiBuilder kw{ MODEL_PATH, 0, BuildOption::default_, ModelType::knlm, };
 	EXPECT_TRUE(kw.addWord(u"사용자태그", POSTag::user0).second);
 	EXPECT_TRUE(kw.addWord(u"이것도유저", POSTag::user1).second);
 	EXPECT_TRUE(kw.addWord(u"특수한표지", POSTag::user2).second);
@@ -436,7 +436,7 @@ TEST(KiwiCpp, HSDataset)
 	};
 
 	HSDataset trainset, devset;
-	trainset = kw.makeHSDataset(data, batchSize, 0, windowSize, 1, 0., 0., tokenFilter, {}, 0.1, false, {}, 0, {}, &devset);
+	trainset = kw.makeHSDataset(data, batchSize, 0, windowSize, 1, 0., 0., 0., false, tokenFilter, {}, 0.1, false, {}, 0, {}, &devset);
 	for (size_t i = 0; i < 2; ++i)
 	{
 		{
@@ -1196,7 +1196,7 @@ TEST(KiwiCpp, IssueP111_SentenceSplitError)
 	auto res = kiwi.splitIntoSents(text);
 	EXPECT_GT(res.size(), 1);
 
-	KiwiBuilder builder{ MODEL_PATH, 1 };
+	KiwiBuilder builder{ MODEL_PATH, 1, BuildOption::default_, ModelType::knlm };
 	EXPECT_TRUE(builder.addWord(u"모", POSTag::nng).second);
 	Kiwi kiwi2 = builder.build();
 	auto res2 = kiwi2.splitIntoSents(text);
@@ -1246,7 +1246,7 @@ TEST(KiwiCpp, AddRule)
 	auto ores = okiwi.analyze(u"했어요! 하잖아요! 할까요? 좋아요!", Match::allWithNormalizing);
 	
 	{
-		KiwiBuilder builder{ MODEL_PATH, 0, BuildOption::default_ & ~BuildOption::loadTypoDict };
+		KiwiBuilder builder{ MODEL_PATH, 0, BuildOption::default_ & ~BuildOption::loadTypoDict, ModelType::knlm };
 		auto inserted = builder.addRule(POSTag::ef, [](std::u16string input)
 		{
 			if (input.back() == u'요')
@@ -1263,7 +1263,7 @@ TEST(KiwiCpp, AddRule)
 	}
 
 	{
-		KiwiBuilder builder{ MODEL_PATH, 0, BuildOption::default_ & ~BuildOption::loadTypoDict };
+		KiwiBuilder builder{ MODEL_PATH, 0, BuildOption::default_ & ~BuildOption::loadTypoDict, ModelType::knlm };
 		auto inserted = builder.addRule(POSTag::ef, [](std::u16string input)
 		{
 			if (input.back() == u'요')
