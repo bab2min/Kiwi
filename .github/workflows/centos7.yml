@@ -44,7 +44,7 @@ jobs:
               ./build/kiwi-evaluator -m ./models/base eval_data/*.txt --sbg -o eval_results/
           - run: tar -zcvf arts.tgz build/*kiwi* build/test/*kiwi* eval_results/*.txt build/bindings/java/*.jar
     - name: Archive binaries
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Artifacts Centos7
         path: arts.tgz

@@ -145,7 +145,9 @@ include/kiwi/capi.h 를 참조하세요.
 https://github.com/bab2min/Kiwi/releases 에서 Windows, Linux, macOS 버전으로 컴파일된 Library 파일과 모델 파일을 다운로드 받을 수 있습니다.
 
 ### C# Wrapper
-https://github.com/bab2min/kiwi-gui
+https://github.com/bab2min/kiwi-gui 에서 공식 GUI 툴에 사용되는 C# Wrapper를 찾으실 수 있습니다. 
+
+또한 EX3님께서 기여해주신 wrapper인 [NetKiwi](https://github.com/EX3exp/NetKiwi)가 있습니다.
 
 ### Python3 Wrapper
 또한 Python3용 API인 Kiwipiepy가 제공됩니다. 이에 대해서는 https://github.com/bab2min/kiwipiepy 를 참조하시길 바랍니다.

@@ -18,7 +18,7 @@ jobs:
       uses: bruceadams/get-release@v1.3.2
       env:
         GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-    - uses: bab2min/run-on-arch-action@multiple-step
+    - uses: bab2min/run-on-arch-action@multiple-step-v2
       with:
         image: quay.io/pypa/manylinux2014_x86_64
         githubToken: ${{ github.token }}
@@ -200,7 +200,7 @@ jobs:
       with:
         submodules: true
         lfs: true
-    - uses: bab2min/run-on-arch-action@use-custom-image
+    - uses: bab2min/run-on-arch-action@multiple-step-v2
       id: runcmd
       with:
         image: quay.io/pypa/manylinux2014_${{ matrix.arch }}
@@ -209,20 +209,28 @@ jobs:
           mkdir -p "${PWD}/artifacts"
         dockerRunArgs: |
           --volume "${PWD}/artifacts:/artifacts"
-        run: |
-          yum install java-1.8.0-openjdk-devel -y
-          mkdir build && pushd build && cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_USE_MIMALLOC=0 -DKIWI_JAVA_BINDING=1 ..
-          make -j2 && popd
-          ./build/test/kiwi-test
-          mkdir eval_results && ./build/kiwi-evaluator -m ./models/base eval_data/*.txt -o eval_results/
-          cd build
-          mkdir include && mkdir lib && mkdir bin
-          mv libkiwi* lib/
-          mv kiwi-* bin/
-          mv test/kiwi-* bin/
-          cp -r ../include/kiwi include/
-          tar -zcvf /artifacts/asset.tgz include/ lib/ bin/
-          mv bindings/java/kiwi-java*.jar /artifacts/kiwi-java.jar
+        multipleRun: |
+          - name: Install dependencies
+            run: |
+              yum install java-1.8.0-openjdk-devel -y
+          - name: Build
+            run: |
+              mkdir build && pushd build && cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_USE_MIMALLOC=0 -DKIWI_JAVA_BINDING=1 ..
+              make -j2 && popd
+          - name: Test
+            run: |
+              ./build/test/kiwi-test
+              mkdir eval_results && ./build/kiwi-evaluator -m ./models/base eval_data/*.txt -o eval_results/
+          - name: Release
+            run: |
+              cd build
+              mkdir include && mkdir lib && mkdir bin
+              mv libkiwi* lib/
+              mv kiwi-* bin/
+              mv test/kiwi-* bin/
+              cp -r ../include/kiwi include/
+              tar -zcvf /artifacts/asset.tgz include/ lib/ bin/
+              mv bindings/java/kiwi-java*.jar /artifacts/kiwi-java.jar
     - name: Get release
       id: get_release
       uses: bruceadams/get-release@v1.2.2
