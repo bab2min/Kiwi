@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 
-project(kiwi VERSION 0.20.4 DESCRIPTION "Kiwi, Korean Intelligent Word Identifier")
+project(kiwi VERSION 0.21.0 DESCRIPTION "Kiwi, Korean Intelligent Word Identifier")
 
 set ( CMAKE_CXX_STANDARD 17 )
 set ( CMAKE_VERBOSE_MAKEFILE true )
@@ -83,7 +83,6 @@ endif()
 include_directories( include/ )
 include_directories( third_party/tclap/include )
 include_directories( third_party/cpp-btree )
-include_directories( third_party/variant/include )
 include_directories( third_party/eigen )
 include_directories( third_party/json/include )
 include_directories( third_party/streamvbyte/include )
@@ -158,11 +157,19 @@ if (KIWI_CPU_ARCH MATCHES "x86_64")
     set( CORE_SRCS 
       ${CORE_SRCS}
       src/archImpl/avx2.cpp
-      src/archImpl/avx_vnni.cpp
       src/archImpl/avx512bw.cpp
       src/archImpl/avx512vnni.cpp
     )
+    # If AVX-VNNI is supported (MSVC, GCC 11+ or Clang 11+)
+    set ( AVX_VNNI_SUPPORTED (MSVC OR (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 11) OR (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 11)))
+    if (AVX_VNNI_SUPPORTED)
+      set( CORE_SRCS 
+        ${CORE_SRCS}
+        src/archImpl/avx_vnni.cpp
+      )
+    endif()
   endif()
+
   if(MSVC)
     set_source_files_properties(src/archImpl/sse2.cpp PROPERTIES COMPILE_FLAGS "/arch:SSE2")
     set_source_files_properties(src/archImpl/sse4_1.cpp PROPERTIES COMPILE_FLAGS "/arch:SSE2")
@@ -177,9 +184,11 @@ if (KIWI_CPU_ARCH MATCHES "x86_64")
     set_source_files_properties(src/archImpl/sse4_1.cpp PROPERTIES COMPILE_FLAGS "-msse2 -msse4.1")
     if (KIWI_USE_CPUINFO)
       set_source_files_properties(src/archImpl/avx2.cpp PROPERTIES COMPILE_FLAGS "-mavx -mavx2 -mfma")
-      set_source_files_properties(src/archImpl/avx_vnni.cpp PROPERTIES COMPILE_FLAGS "-mavx -mavx2 -mfma -mavxvnni")
       set_source_files_properties(src/archImpl/avx512bw.cpp PROPERTIES COMPILE_FLAGS "-mavx -mavx2 -mfma -mavx512f -mavx512vl -mavx512dq -mavx512bw")
       set_source_files_properties(src/archImpl/avx512vnni.cpp PROPERTIES COMPILE_FLAGS "-mavx -mavx2 -mfma -mavx512f -mavx512vl -mavx512dq -mavx512bw -mavx512vnni")
+      if (AVX_VNNI_SUPPORTED)
+        set_source_files_properties(src/archImpl/avx_vnni.cpp PROPERTIES COMPILE_FLAGS "-mavx -mavx2 -mfma -mavxvnni")
+      endif()
     endif()
   endif()
 elseif (KIWI_CPU_ARCH MATCHES "arm64")

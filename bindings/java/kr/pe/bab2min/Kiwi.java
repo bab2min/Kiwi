@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Kiwi implements AutoCloseable  {
 	private long _inst;
-	final private static String _version = "0.20.4";
+	final private static String _version = "0.21.0";
 
 	public static class Match {
 		final static public int none = 0,
@@ -345,8 +345,8 @@ public class Kiwi implements AutoCloseable  {
 		this._inst = _inst;
 	}
 
-	public static Kiwi init(String modelPath, int numWorkers, int buildOptions, boolean useSBG) throws Exception {
-		try(KiwiBuilder b = new KiwiBuilder(modelPath, numWorkers, buildOptions, useSBG)) {
+	public static Kiwi init(String modelPath, int numWorkers, int buildOptions, int modelType) throws Exception {
+		try(KiwiBuilder b = new KiwiBuilder(modelPath, numWorkers, buildOptions, modelType)) {
 			return b.build();
 		}
 	}

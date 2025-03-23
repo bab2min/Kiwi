@@ -96,6 +96,23 @@ namespace jni
 	};
 
 	template<>
+	struct ValueBuilder<kiwi::ModelType> : public ValueBuilder<uint32_t>
+	{
+		using CppType = kiwi::ModelType;
+		using JniType = jint;
+
+		CppType fromJava(JNIEnv* env, JniType v)
+		{
+			return (CppType)v;
+		}
+
+		JniType toJava(JNIEnv* env, CppType v)
+		{
+			return (JniType)v;
+		}
+	};
+
+	template<>
 	struct ValueBuilder<kiwi::Match> : public ValueBuilder<uint32_t>
 	{
 		using CppType = kiwi::Match;
@@ -564,7 +581,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved)
 			.template method<&JTypoTransformer::scaleCost>("_scaleCost"),
 
 		jni::define<JKiwiBuilder>()
-			.template ctor<std::string, size_t, kiwi::BuildOption, bool>()
+			.template ctor<std::string, size_t, kiwi::BuildOption, kiwi::ModelType>()
 			.template method<&JKiwiBuilder::addWord>("addWord")
 			.template method<&JKiwiBuilder::addWord2>("addWord")
 			.template method<&JKiwiBuilder::addPreAnalyzedWord>("addPreAnalyzedWord")
