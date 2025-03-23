@@ -37,7 +37,7 @@ inline ostream& operator<<(ostream& ostr, const TokenInfo& token)
 
 bool printDiffTokens(ostream& ostr, const string& raw, const TokenInfo* a, size_t aSize, const TokenInfo* b, size_t bSize, bool ignoreTag = false, bool showSame = false)
 {
-	if (isEqual(a, aSize, b, bSize, ignoreTag) == showSame) return false;
+	if (isEqual(a, aSize, b, bSize, ignoreTag) != showSame) return false;
 	ostr << raw << '\t';
 	for (size_t i = 0; i < aSize; ++i)
 	{
