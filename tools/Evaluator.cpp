@@ -44,7 +44,7 @@ inline TokenInfo parseWordPOS(const u16string& str)
 {
 	auto p = str.rfind('/');
 	if (p == str.npos) return {};
-	u16string form = replace(nonstd::u16string_view(str.data(), p), u"_", u" ");
+	u16string form = replace(std::u16string_view(str.data(), p), u"_", u" ");
 	if (str[p + 1] == 'E')
 	{
 		if (form[0] == u'아' || form[0] == u'여') form[0] = u'어';

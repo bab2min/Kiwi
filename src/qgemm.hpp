@@ -1,4 +1,6 @@
 #pragma once
+#include <cstring>
+#include <kiwi/Types.h>
 #include "qgemm.h"
 #include "SIMD.hpp"
 

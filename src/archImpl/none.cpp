@@ -1,4 +1,4 @@
-#include "../SkipBigramModelImpl.hpp"
+#include "../MathFunc.hpp"
 #include "../gemm.h"
 
 #include <Eigen/Dense>
@@ -7,20 +7,10 @@ namespace kiwi
 {
 	namespace lm
 	{
-		template class SkipBigramModel<ArchType::none, uint8_t, 8>;
-		template class SkipBigramModel<ArchType::none, uint16_t, 8>;
-		template class SkipBigramModel<ArchType::none, uint32_t, 8>;
-		template class SkipBigramModel<ArchType::none, uint64_t, 8>;
-
 		template float logSumExp<ArchType::none>(const float* arr, size_t size);
 		template void logSumExpTransposed<ArchType::none>(float* arr, size_t size, size_t batchSize, size_t stride);
 		template void logSoftmax<ArchType::none>(float* arr, size_t size);
 		template void logSoftmaxTransposed<ArchType::none>(float* arr, size_t size, size_t batchSize, size_t stride);
-
-		template class SkipBigramModel<ArchType::balanced, uint8_t, 8>;
-		template class SkipBigramModel<ArchType::balanced, uint16_t, 8>;
-		template class SkipBigramModel<ArchType::balanced, uint32_t, 8>;
-		template class SkipBigramModel<ArchType::balanced, uint64_t, 8>;
 
 		template float logSumExp<ArchType::balanced>(const float* arr, size_t size);
 		template void logSumExpTransposed<ArchType::balanced>(float* arr, size_t size, size_t batchSize, size_t stride);

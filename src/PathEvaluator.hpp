@@ -358,8 +358,8 @@ namespace kiwi
 			{
 				for (auto& curMorph : cands)
 				{
-					if (splitComplex && curMorph->getCombined()->complex) continue;
-					if (blocklist && blocklist->count(curMorph->getCombined())) continue;
+					if (splitComplex && curMorph->hasComplex()) continue;
+					if (blocklist && curMorph->hasMorpheme(*blocklist)) continue;
 
 					// 덧붙은 받침(zCoda)을 위한 지름길
 					if (curMorph->tag == POSTag::z_coda)

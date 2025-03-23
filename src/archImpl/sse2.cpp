@@ -1,4 +1,4 @@
-#include "../SkipBigramModelImpl.hpp"
+#include "../MathFunc.hpp"
 #include "../gemm.h"
 
 #define Eigen EigenSSE2
@@ -8,11 +8,6 @@ namespace kiwi
 {
 	namespace lm
 	{
-		template class SkipBigramModel<ArchType::sse2, uint8_t, 8>;
-		template class SkipBigramModel<ArchType::sse2, uint16_t, 8>;
-		template class SkipBigramModel<ArchType::sse2, uint32_t, 8>;
-		template class SkipBigramModel<ArchType::sse2, uint64_t, 8>;
-
 		template float logSumExp<ArchType::sse2>(const float* arr, size_t size);
 		template void logSumExpTransposed<ArchType::sse2>(float* arr, size_t size, size_t batchSize, size_t stride);
 		template void logSoftmax<ArchType::sse2>(float* arr, size_t size);

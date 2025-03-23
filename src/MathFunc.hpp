@@ -1,5 +1,7 @@
 #pragma once
 #include <cmath>
+#include <algorithm>
+#include <stdexcept>
 #include "MathFunc.h"
 #include "SIMD.hpp"
 

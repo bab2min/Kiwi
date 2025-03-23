@@ -1,4 +1,4 @@
-#include "../SkipBigramModelImpl.hpp"
+#include "../MathFunc.hpp"
 #include "../qgemm.hpp"
 #include "../gemm.h"
 
@@ -27,11 +27,6 @@ namespace kiwi
 {
 	namespace lm
 	{
-		template class SkipBigramModel<ArchType::avx512bw, uint8_t, 8>;
-		template class SkipBigramModel<ArchType::avx512bw, uint16_t, 8>;
-		template class SkipBigramModel<ArchType::avx512bw, uint32_t, 8>;
-		template class SkipBigramModel<ArchType::avx512bw, uint64_t, 8>;
-
 		template<>
 		float logSumExp<ArchType::avx512bw>(const float* arr, size_t size)
 		{
