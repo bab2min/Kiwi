@@ -98,7 +98,7 @@ include_directories( third_party/eigen )
 include_directories( third_party/json/include )
 include_directories( third_party/streamvbyte/include )
 add_subdirectory( third_party/streamvbyte )
-set ( STREAMBYTE_OBJECTS 
+set ( STREAMVBYTE_OBJECTS 
   $<TARGET_OBJECTS:streamvbyte>
 )
 if(KIWI_USE_CPUINFO)
@@ -223,14 +223,14 @@ add_library( "${PROJECT_NAME}_static" STATIC
   ${CORE_SRCS}
   src/capi/kiwi_c.cpp
   ${CPUINFO_OBJECTS_STATIC}
-  ${STREAMBYTE_OBJECTS}
+  ${STREAMVBYTE_OBJECTS}
 )
 
 add_library( "${PROJECT_NAME}" SHARED
   ${CORE_SRCS}
   src/capi/kiwi_c.cpp
   ${CPUINFO_OBJECTS_SHARED}
-  ${STREAMBYTE_OBJECTS}
+  ${STREAMVBYTE_OBJECTS}
 )
 
 # Install the kiwi library as well as header files to (`include/kiwi` directory)
@@ -297,6 +297,9 @@ if(MSVC)
   else()
     message(STATUS "Use /MT at kiwi_static")
     target_compile_options("${PROJECT_NAME}_static" PUBLIC
+      /MT
+    )
+    target_compile_options("streamvbyte" PUBLIC
       /MT
     )
   endif()

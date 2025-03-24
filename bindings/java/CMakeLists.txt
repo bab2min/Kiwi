@@ -10,6 +10,7 @@ set(pkg_name "KiwiJava-${PROJECT_VERSION}")
 add_library (${pkg_name} SHARED kiwi_java.cpp
     $<TARGET_OBJECTS:${PROJECT_NAME}>
     $<TARGET_OBJECTS:cpuinfo>
+    $<TARGET_OBJECTS:streamvbyte>
 )
 if(UNIX AND NOT APPLE)
     target_link_libraries( ${pkg_name}
