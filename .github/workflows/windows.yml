@@ -35,8 +35,8 @@ jobs:
     - name: Run Evaluator
       run: |
         mkdir eval_results
-        .\build\Release\kiwi-evaluator.exe -m .\models\base (Get-ChildItem eval_data\*.txt | Select-Object -Expand FullName) -o eval_results\
-        .\build\Release\kiwi-evaluator.exe -m .\models\base --sbg (Get-ChildItem eval_data\*.txt | Select-Object -Expand FullName) -o eval_results\
+        .\build\Release\kiwi-evaluator.exe -m .\models\base -t knlm --morph (Get-ChildItem eval_data\*.txt | Select-Object -Expand FullName) -o eval_results\
+        .\build\Release\kiwi-evaluator.exe -m .\models\base -t sbg --morph (Get-ChildItem eval_data\*.txt | Select-Object -Expand FullName) -o eval_results\
     - name: Archive binaries
       uses: actions/upload-artifact@v4
       with:

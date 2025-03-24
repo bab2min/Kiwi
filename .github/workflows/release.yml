@@ -220,7 +220,7 @@ jobs:
           - name: Test
             run: |
               ./build/test/kiwi-test
-              mkdir eval_results && ./build/kiwi-evaluator -m ./models/base eval_data/*.txt -o eval_results/
+              mkdir eval_results && ./build/kiwi-evaluator -m ./models/base --morph eval_data/*.txt -o eval_results/
           - name: Release
             run: |
               cd build
