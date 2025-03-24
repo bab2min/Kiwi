@@ -10,10 +10,10 @@
     },
     "dependencies": {
         "kiwi-nlp": "file:../package",
-        "vite-plugin-static-copy": "^1.0.5"
+        "vite-plugin-static-copy": "^2.3.0"
     },
     "devDependencies": {
         "typescript": "^5.2.2",
-        "vite": "^5.4.8"
+        "vite": "^6.2.0"
     }
 }
