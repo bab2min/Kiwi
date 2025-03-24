@@ -1679,6 +1679,12 @@ TEST(KiwiCpp, IssueP189)
 
 TEST(KiwiCpp, Issue205)
 {
+	if (sizeof(void*) != 8) 
+	{
+		std::cerr << "This test is only available in 64-bit mode" << std::endl;
+		return;
+	}
+
 	KiwiBuilder builder{ MODEL_PATH, 0, BuildOption::default_, };
 	builder.addWord(u"함박 스테이크");
 	auto kiwi1 = builder.build();
