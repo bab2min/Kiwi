@@ -4,11 +4,11 @@
 #include <kiwi/Kiwi.h>
 #include <kiwi/Utils.h>
 #include <kiwi/Dataset.h>
+#include <kiwi/Knlm.h>
 #include "ArchAvailable.h"
 #include "KTrie.h"
 #include "StrUtils.h"
 #include "FrozenTrie.hpp"
-#include "Knlm.hpp"
 #include "serializer.hpp"
 #include "count.hpp"
 #include "FeatureTestor.h"
