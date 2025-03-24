@@ -14,7 +14,9 @@ namespace kiwi
 #if CPUINFO_ARCH_X86_64
 		static_cast<std::ptrdiff_t>(ArchType::avx512vnni),
 		static_cast<std::ptrdiff_t>(ArchType::avx512bw),
+#ifdef KIWI_AVX_VNNI_SUPPORTED
 		static_cast<std::ptrdiff_t>(ArchType::avx_vnni),
+#endif
 		static_cast<std::ptrdiff_t>(ArchType::avx2),
 		static_cast<std::ptrdiff_t>(ArchType::sse4_1),
 #endif
@@ -28,7 +30,9 @@ namespace kiwi
 #ifdef KIWI_ARCH_X86_64
 		static_cast<std::ptrdiff_t>(ArchType::avx512vnni),
 		static_cast<std::ptrdiff_t>(ArchType::avx512bw),
+#ifdef KIWI_AVX_VNNI_SUPPORTED
 		static_cast<std::ptrdiff_t>(ArchType::avx_vnni),
+#endif
 		static_cast<std::ptrdiff_t>(ArchType::avx2),
 		static_cast<std::ptrdiff_t>(ArchType::sse4_1),
 #endif
@@ -48,7 +52,9 @@ namespace kiwi
 #if CPUINFO_ARCH_X86_64
 		static_cast<std::ptrdiff_t>(ArchType::avx512vnni),
 		static_cast<std::ptrdiff_t>(ArchType::avx512bw),
+#ifdef KIWI_AVX_VNNI_SUPPORTED
 		static_cast<std::ptrdiff_t>(ArchType::avx_vnni),
+#endif
 		static_cast<std::ptrdiff_t>(ArchType::avx2),
 		static_cast<std::ptrdiff_t>(ArchType::sse4_1)
 #endif
@@ -59,7 +65,9 @@ namespace kiwi
 #ifdef KIWI_ARCH_X86_64
 		static_cast<std::ptrdiff_t>(ArchType::avx512vnni),
 		static_cast<std::ptrdiff_t>(ArchType::avx512bw),
+#ifdef KIWI_AVX_VNNI_SUPPORTED
 		static_cast<std::ptrdiff_t>(ArchType::avx_vnni),
+#endif
 		static_cast<std::ptrdiff_t>(ArchType::avx2),
 		static_cast<std::ptrdiff_t>(ArchType::sse4_1)
 #endif
