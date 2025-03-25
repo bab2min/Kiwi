@@ -29,10 +29,10 @@ namespace kiwi
 #else
 		template<typename K, typename V> using map = std::map<K, V>;
 #endif
-		using Vid = uint16_t;
-		using CTrieNode = TrieNodeEx<Vid, size_t, ConstAccess<map<Vid, int32_t>>>;
+		template<class VocabTy>
+		using CTrieNode = TrieNodeEx<VocabTy, size_t, ConstAccess<map<VocabTy, int32_t>>>;
 
-		static constexpr Vid non_vocab_id = (Vid)-1;
+		static constexpr size_t non_vocab_id = (size_t)-1;
 
 		template <typename _Iterator>
 		class StrideIter : public _Iterator
@@ -77,14 +77,15 @@ namespace kiwi
 		{
 			struct vvhash
 			{
-				size_t operator()(const std::pair<Vid, Vid>& k) const
+				template<class VocabTy>
+				size_t operator()(const std::pair<VocabTy, VocabTy>& k) const
 				{
-					return std::hash<Vid>{}(k.first) ^ std::hash<Vid>{}(k.second);
+					return std::hash<VocabTy>{}(k.first) ^ std::hash<VocabTy>{}(k.second);
 				}
 			};
 		}
 
-		template<typename _DocIter>
+		template<typename VocabTy, typename _DocIter>
 		void countUnigrams(std::vector<size_t>& unigramCf, std::vector<size_t>& unigramDf,
 			_DocIter docBegin, _DocIter docEnd
 		)
@@ -93,7 +94,7 @@ namespace kiwi
 			{
 				auto doc = *docIt;
 				if (!doc.size()) continue;
-				std::unordered_set<Vid> uniqs;
+				std::unordered_set<VocabTy> uniqs;
 				for (size_t i = 0; i < doc.size(); ++i)
 				{
 					if (doc[i] == non_vocab_id) continue;
@@ -110,24 +111,24 @@ namespace kiwi
 			}
 		}
 
-		template<typename _DocIter, typename _Freqs, typename _HistoryTx = std::vector<Vid>>
-		void countBigrams(map<std::pair<Vid, Vid>, size_t>& bigramCf,
-			map<std::pair<Vid, Vid>, size_t>& bigramDf,
+		template<typename _DocIter, typename _Freqs, typename VocabTy, typename _HistoryTx = std::vector<VocabTy>>
+		void countBigrams(map<std::pair<VocabTy, VocabTy>, size_t>& bigramCf,
+			map<std::pair<VocabTy, VocabTy>, size_t>& bigramDf,
 			_DocIter docBegin, _DocIter docEnd,
 			_Freqs&& vocabFreqs, _Freqs&& vocabDf,
 			size_t candMinCnt, size_t candMinDf,
 			const _HistoryTx* historyTransformer = nullptr
 		)
 		{
-			std::unordered_set<std::pair<Vid, Vid>, detail::vvhash> uniqBigram;
+			std::unordered_set<std::pair<VocabTy, VocabTy>, detail::vvhash> uniqBigram;
 			for (auto docIt = docBegin; docIt != docEnd; ++docIt)
 			{
 				auto doc = *docIt;
 				if (!doc.size()) continue;
-				Vid prevWord = doc[0];
+				VocabTy prevWord = doc[0];
 				for (size_t j = 1; j < doc.size(); ++j)
 				{
-					Vid curWord = doc[j];
+					VocabTy curWord = doc[j];
 					if (curWord != non_vocab_id && vocabFreqs[curWord] >= candMinCnt && vocabDf[curWord] >= candMinDf)
 					{
 						if (prevWord != non_vocab_id && vocabFreqs[prevWord] >= candMinCnt && vocabDf[prevWord] >= candMinDf)
@@ -144,8 +145,8 @@ namespace kiwi
 			}
 		}
 
-		template<bool _reverse, typename _DocIter, typename _Freqs, typename _BigramPairs, typename _HistoryTx = std::vector<Vid>>
-		void countNgrams(ContinuousTrie<CTrieNode>& dest,
+		template<bool _reverse, typename _DocIter, typename _Freqs, typename _BigramPairs, typename VocabTy, typename _HistoryTx = std::vector<VocabTy>>
+		void countNgrams(ContinuousTrie<CTrieNode<VocabTy>>& dest,
 			_DocIter docBegin, _DocIter docEnd,
 			_Freqs&& vocabFreqs, _Freqs&& vocabDf, _BigramPairs&& validPairs,
 			size_t candMinCnt, size_t candMinDf, size_t maxNgrams,
@@ -154,7 +155,7 @@ namespace kiwi
 		{
 			if (dest.empty())
 			{
-				dest = ContinuousTrie<CTrieNode>{ 1, 1024 };
+				dest = ContinuousTrie<CTrieNode<VocabTy>>{ 1, 1024 };
 			}
 			const auto& allocNode = [&]() { return dest.newNode(); };
 			const auto& historyTx = [&](size_t i) { return (*historyTransformer)[i]; };
@@ -165,7 +166,7 @@ namespace kiwi
 				if (!doc.size()) continue;
 				dest.reserveMore(doc.size() * maxNgrams * 2);
 				
-				Vid prevWord = _reverse ? *doc.rbegin() : *doc.begin();
+				VocabTy prevWord = _reverse ? *doc.rbegin() : *doc.begin();
 				size_t labelLen = 0;
 				auto node = &dest[0];
 				if (prevWord != non_vocab_id && vocabFreqs[prevWord] >= candMinCnt && vocabDf[prevWord] >= candMinDf)
@@ -175,7 +176,7 @@ namespace kiwi
 					labelLen = 1;
 				}
 
-				const auto func = [&](Vid curWord)
+				const auto func = [&](VocabTy curWord)
 				{
 					if (curWord != non_vocab_id && (vocabFreqs[curWord] < candMinCnt || vocabDf[curWord] < candMinDf))
 					{
@@ -239,19 +240,21 @@ namespace kiwi
 			}
 		}
 
-		inline void mergeNgramCounts(ContinuousTrie<CTrieNode>& dest, ContinuousTrie<CTrieNode>&& src)
+		template<class VocabTy>
+		inline void mergeNgramCounts(ContinuousTrie<CTrieNode<VocabTy>>& dest, ContinuousTrie<CTrieNode<VocabTy>>&& src)
 		{
 			if (src.empty()) return;
-			if (dest.empty()) dest = ContinuousTrie<CTrieNode>{ 1 };
+			if (dest.empty()) dest = ContinuousTrie<CTrieNode<VocabTy>>{ 1 };
 
-			std::vector<Vid> rkeys;
-			src.traverseWithKeys([&](const CTrieNode* node, const std::vector<Vid>& rkeys)
+			std::vector<VocabTy> rkeys;
+			src.traverseWithKeys([&](const CTrieNode<VocabTy>* node, const std::vector<VocabTy>& rkeys)
 			{
 				dest.build(rkeys.begin(), rkeys.end(), 0)->val += node->val;
 			}, rkeys);
 		}
 
-		inline float branchingEntropy(const CTrieNode* node, size_t minCnt)
+		template<class VocabTy>
+		inline float branchingEntropy(const CTrieNode<VocabTy>* node, size_t minCnt)
 		{
 			float entropy = 0;
 			size_t rest = node->val;
@@ -300,16 +303,16 @@ namespace kiwi
 			return std::move(data[0]);
 		}
 
-		template<typename _DocIter, typename _HistoryTx = std::vector<Vid>>
-		ContinuousTrie<CTrieNode> count(_DocIter docBegin, _DocIter docEnd,
+		template<typename _DocIter, typename VocabTy, typename _HistoryTx = std::vector<VocabTy>>
+		ContinuousTrie<CTrieNode<VocabTy>> count(_DocIter docBegin, _DocIter docEnd,
 			size_t minCf, size_t minDf, size_t maxNgrams,
-			ThreadPool* pool = nullptr, std::vector<std::pair<Vid, Vid>>* bigramList = nullptr,
+			ThreadPool* pool = nullptr, std::vector<std::pair<VocabTy, VocabTy>>* bigramList = nullptr,
 			const _HistoryTx* historyTransformer = nullptr
 		)
 		{
 			// counting unigrams & bigrams
 			std::vector<size_t> unigramCf, unigramDf;
-			map<std::pair<Vid, Vid>, size_t> bigramCf, bigramDf;
+			map<std::pair<VocabTy, VocabTy>, size_t> bigramCf, bigramDf;
 
 			if (pool && pool->size() > 1)
 			{
@@ -325,7 +328,7 @@ namespace kiwi
 				{
 					futures.emplace_back(pool->enqueue([&, docIt, stride](size_t tid)
 					{
-						countUnigrams(localdata[tid].first, localdata[tid].second,
+						countUnigrams<VocabTy>(localdata[tid].first, localdata[tid].second,
 							makeStrideIter(docIt, stride, docEnd),
 							makeStrideIter(docEnd, stride, docEnd)
 						);
@@ -351,7 +354,7 @@ namespace kiwi
 			}
 			else
 			{
-				countUnigrams(unigramCf, unigramDf, docBegin, docEnd);
+				countUnigrams<VocabTy>(unigramCf, unigramDf, docBegin, docEnd);
 			}
 
 			if (pool && pool->size() > 1)
@@ -402,7 +405,7 @@ namespace kiwi
 				}
 			}
 
-			ContinuousTrie<CTrieNode> trieNodes{ 1 };
+			ContinuousTrie<CTrieNode<VocabTy>> trieNodes{ 1 };
 			if (historyTransformer)
 			{
 				for (size_t i = 0; i < unigramCf.size(); ++i)
@@ -434,7 +437,7 @@ namespace kiwi
 			// counting ngrams
 			else
 			{
-				std::unordered_set<std::pair<Vid, Vid>, detail::vvhash> validPairs;
+				std::unordered_set<std::pair<VocabTy, VocabTy>, detail::vvhash> validPairs;
 				for (auto& p : bigramCf)
 				{
 					if (p.second >= minCf && bigramDf[p.first] >= minDf) validPairs.emplace(p.first);
@@ -442,7 +445,7 @@ namespace kiwi
 
 				if (pool && pool->size() > 1)
 				{
-					using LocalFw = ContinuousTrie<CTrieNode>;
+					using LocalFw = ContinuousTrie<CTrieNode<VocabTy>>;
 					std::vector<LocalFw> localdata(pool->size());
 					std::vector<std::future<void>> futures;
 					const size_t stride = pool->size() * 8;

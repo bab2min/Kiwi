@@ -1,10 +1,9 @@
 #pragma once
 
-#include <mapbox/variant.hpp>
+#include <variant>
 #include <kiwi/Types.h>
 #include <kiwi/TemplateUtils.hpp>
 #include <kiwi/Joiner.h>
-#include "string_view.hpp"
 #include "bitset.hpp"
 
 namespace kiwi
@@ -118,7 +117,7 @@ namespace kiwi
 			template<class... Args>
 			struct VariantFromTuple<std::tuple<Args...>>
 			{
-				using type = mapbox::util::variant<Args...>;
+				using type = std::variant<Args...>;
 			};
 		}
 

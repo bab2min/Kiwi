@@ -10,7 +10,9 @@ namespace kiwi
 		sse2,
 		sse4_1,
 		avx2,
+		avx_vnni,
 		avx512bw,
+		avx512vnni,
 		neon,
 		last = neon,
 	};
@@ -25,16 +27,7 @@ namespace kiwi
 	const char* archToStr(ArchType arch);
 
 	template<ArchType arch>
-	struct ArchInfo;
-
-	template<>
-	struct ArchInfo<ArchType::none>
-	{
-		static constexpr size_t alignment = 4;
-	};
-
-	template<>
-	struct ArchInfo<ArchType::balanced>
+	struct ArchInfo
 	{
 		static constexpr size_t alignment = 4;
 	};
@@ -58,7 +51,19 @@ namespace kiwi
 	};
 
 	template<>
+	struct ArchInfo<ArchType::avx_vnni>
+	{
+		static constexpr size_t alignment = 32;
+	};
+
+	template<>
 	struct ArchInfo<ArchType::avx512bw>
+	{
+		static constexpr size_t alignment = 64;
+	};
+
+	template<>
+	struct ArchInfo<ArchType::avx512vnni>
 	{
 		static constexpr size_t alignment = 64;
 	};

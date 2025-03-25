@@ -28,7 +28,7 @@ int run(const string& modelPath, bool benchmark, const string& output, const str
 	{
 		tutils::Timer timer;
 		size_t lines = 0, bytes = 0;
-		Kiwi kw = KiwiBuilder{ modelPath, 1, BuildOption::default_, sbg }.build(typos > 0 ? DefaultTypoSet::basicTypoSet : DefaultTypoSet::withoutTypo);
+		Kiwi kw = KiwiBuilder{ modelPath, 1, BuildOption::default_, sbg ? ModelType::sbg : ModelType::knlm }.build(typos > 0 ? DefaultTypoSet::basicTypoSet : DefaultTypoSet::withoutTypo);
 
 		cout << "Kiwi v" << KIWI_VERSION_STRING << endl;
 		if (tolerance)
@@ -46,7 +46,7 @@ int run(const string& modelPath, bool benchmark, const string& output, const str
 		{
 			cout << "Loading Time : " << timer.getElapsed() << " ms" << endl;
 			cout << "ArchType : " << archToStr(kw.archType()) << endl;
-			cout << "LM Size : " << (kw.getKnLM()->getMemory().size() / 1024. / 1024.) << " MB" << endl;
+			cout << "LM Size : " << (kw.getLangModel()->getMemorySize() / 1024. / 1024.) << " MB" << endl;
 			cout << "Mem Usage : " << (tutils::getCurrentPhysicalMemoryUsage() / 1024.) << " MB" << endl;
 			cout << "ModelType : " << (sbg ? "sbg" : "knlm") << endl;
 		}

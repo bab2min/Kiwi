@@ -1,12 +1,11 @@
 #pragma once
 #include "Types.h"
 #include "ArchUtils.h"
-#include "LmState.h"
+#include "LangModel.h"
 
 namespace kiwi
 {
 	class Kiwi;
-	template<ArchType arch> class VoidState;
 	struct Form;
 
 	namespace cmb
@@ -57,34 +56,114 @@ namespace kiwi
 			LmState lmState;
 			float score = 0;
 
-			Candidate(const CompiledRule& _cr, const LangModel& lm)
+			Candidate(const CompiledRule& _cr, const lm::ILangModel* lm)
 				: joiner{ _cr }, lmState{ lm }
 			{
 			}
 		};
 
 		template<ArchType arch>
-		struct Candidate<VoidState<arch>>
+		struct Candidate<lm::VoidState<arch>>
 		{
 			Joiner joiner;
 
-			Candidate(const CompiledRule& _cr, const LangModel& lm)
+			Candidate(const CompiledRule& _cr, const lm::ILangModel* lm)
 				: joiner{ _cr }
 			{
+			}
+		};
+
+		class ErasedVector
+		{
+			using FnDestruct = void(*)(ErasedVector*);
+			using FnCopyConstruct = void(*)(ErasedVector*, const ErasedVector&);
+
+			template<class T>
+			static void destructImpl(ErasedVector* self)
+			{
+				auto* target = reinterpret_cast<Vector<T>*>(&self->vec);
+				std::destroy_at(target);
+			}
+
+			template<class T>
+			static void copyConstructImpl(ErasedVector* self, const ErasedVector& other)
+			{
+				auto* target = reinterpret_cast<Vector<T>*>(&self->vec);
+				new (target) Vector<T>{ *reinterpret_cast<const Vector<T>*>(&other.vec) };
+			}
+
+			union
+			{
+				Vector<char> vec;
+			};
+			FnDestruct destruct = nullptr;
+			FnCopyConstruct copyConstruct = nullptr;
+		public:
+
+			template<class T>
+			ErasedVector(Vector<T>&& v)
+			{
+				auto* target = reinterpret_cast<Vector<T>*>(&vec);
+				new (target) Vector<T>{ move(v) };
+				destruct = &destructImpl<T>;
+				copyConstruct = &copyConstructImpl<T>;
+			}
+
+			~ErasedVector()
+			{
+				if (destruct)
+				{
+					(*destruct)(this);
+					destruct = nullptr;
+					copyConstruct = nullptr;
+				}
+			}
+
+			ErasedVector(const ErasedVector& other)
+				: destruct{ other.destruct }, copyConstruct{ other.copyConstruct }
+			{
+				if (!destruct) return;
+				(*copyConstruct)(this, other);
+			}
+
+			ErasedVector(ErasedVector&& other)
+			{
+				std::swap(vec, other.vec);
+				std::swap(destruct, other.destruct);
+				std::swap(copyConstruct, other.copyConstruct);
+			}
+
+			ErasedVector& operator=(const ErasedVector& other)
+			{
+				this->~ErasedVector();
+				new (this) ErasedVector{ other };
+				return *this;
+			}
+
+			ErasedVector& operator=(ErasedVector&& other)
+			{
+				std::swap(vec, other.vec);
+				std::swap(destruct, other.destruct);
+				std::swap(copyConstruct, other.copyConstruct);
+				return *this;
+			}
+
+			template<class T>
+			Vector<T>& get()
+			{
+				return *reinterpret_cast<Vector<T>*>(&vec);
+			}
+
+			template<class T>
+			const Vector<T>& get() const
+			{
+				return *reinterpret_cast<const Vector<T>*>(&vec);
 			}
 		};
 
 		class AutoJoiner
 		{
 			friend class kiwi::Kiwi;
-
-			struct AddVisitor;
-			struct AddVisitor2;
-			const Kiwi* kiwi = nullptr;
-			union
-			{
-				typename std::aligned_storage<sizeof(Vector<char>) + sizeof(int), alignof(Vector<char>)>::type candBuf;
-			};
 
 			template<class LmState>
 			explicit AutoJoiner(const Kiwi& kiwi, Candidate<LmState>&& state);
@@ -93,16 +172,27 @@ namespace kiwi
 			void foreachMorpheme(const Form* formHead, Func&& func) const;
 
 			template<class LmState>
-			void add(size_t morphemeId, Space space, Vector<Candidate<LmState>>& candidates);
+			void addImpl(size_t morphemeId, Space space, Vector<Candidate<LmState>>& candidates);
 
 			template<class LmState>
-			void add(U16StringView form, POSTag tag, bool inferRegularity, Space space, Vector<Candidate<LmState>>& candidates);
+			void addImpl2(U16StringView form, POSTag tag, bool inferRegularity, Space space, Vector<Candidate<LmState>>& candidates);
 
 			template<ArchType arch>
-			void addWithoutSearch(size_t morphemeId, Space space, Vector<Candidate<VoidState<arch>>>& candidates);
+			void addWithoutSearchImpl(size_t morphemeId, Space space, Vector<Candidate<lm::VoidState<arch>>>& candidates);
 
 			template<ArchType arch>
-			void addWithoutSearch(U16StringView form, POSTag tag, bool inferRegularity, Space space, Vector<Candidate<VoidState<arch>>>& candidates);
+			void addWithoutSearchImpl2(U16StringView form, POSTag tag, bool inferRegularity, Space space, Vector<Candidate<lm::VoidState<arch>>>& candidates);
+
+			template<class LmState>
+			struct Dispatcher;
+
+			using FnAdd = void(*)(AutoJoiner*, size_t, Space, Vector<Candidate<lm::VoidState<ArchType::none>>>&);
+			using FnAdd2 = void(*)(AutoJoiner*, U16StringView, POSTag, bool, Space, Vector<Candidate<lm::VoidState<ArchType::none>>>&);
+
+			const Kiwi* kiwi = nullptr;
+			FnAdd dfAdd = nullptr;
+			FnAdd2 dfAdd2 = nullptr;
+			ErasedVector candBuf;
 		public:
 
 			~AutoJoiner();

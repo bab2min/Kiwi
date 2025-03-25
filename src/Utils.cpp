@@ -6,12 +6,12 @@ namespace kiwi
 {
 	std::u16string utf8To16(const std::string & str)
 	{
-		return utf8To16(nonstd::to_string_view(str));
+		return utf8To16(toStringView(str));
 	}
 
 	std::u16string utf8To16(const std::string& str, std::vector<size_t>& bytePositions)
 	{
-		return utf8To16(nonstd::to_string_view(str), bytePositions);
+		return utf8To16(toStringView(str), bytePositions);
 	}
 
 	size_t utf8FromCode(std::string& ret, char32_t code)
@@ -54,7 +54,7 @@ namespace kiwi
 
 	std::string utf16To8(const std::u16string & str)
 	{
-		return utf16To8(nonstd::to_string_view(str));
+		return utf16To8(toStringView(str));
 	}
 
 	/**
@@ -292,7 +292,7 @@ namespace kiwi
 
 	POSTag toPOSTag(const std::u16string& tagStr)
 	{
-		return toPOSTag(nonstd::to_string_view(tagStr));
+		return toPOSTag(toStringView(tagStr));
 	}
 
 	const char* tagToString(POSTag t)

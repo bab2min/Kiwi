@@ -6,6 +6,7 @@
 #include <vector>
 #include <optional>
 #include <iostream>
+#include <cstdint>
 
 #include <jni.h>
 

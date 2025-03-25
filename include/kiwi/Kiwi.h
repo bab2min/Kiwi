@@ -25,7 +25,7 @@
 #include "ThreadPool.h"
 #include "WordDetector.h"
 #include "TagUtils.h"
-#include "LmState.h"
+#include "LangModel.h"
 #include "Joiner.h"
 #include "TypoTransformer.h"
 
@@ -58,7 +58,9 @@ namespace kiwi
 	class Kiwi
 	{
 		friend class KiwiBuilder;
-		friend class PathEvaluator;
+		template<class LangModel> friend struct BestPathFinder;
+		template<class LmState, class> friend struct PathEvaluator;
+		template<class LmState> friend struct MorphemeEvaluator;
 		friend class cmb::AutoJoiner;
 		template<template<ArchType> class LmState> friend struct NewAutoJoinerGetter;
 
@@ -81,22 +83,17 @@ namespace kiwi
 		Vector<size_t> typoPtrs;
 		Vector<TypoForm> typoForms;
 		utils::FrozenTrie<kchar_t, const Form*> formTrie;
-		LangModel langMdl;
+		std::shared_ptr<lm::ILangModel> langMdl;
 		std::shared_ptr<cmb::CompiledRule> combiningRule;
 		std::unique_ptr<utils::ThreadPool> pool;
 		
-		inline const Morpheme* getDefaultMorpheme(POSTag tag) const;
-
-		template<class LmState>
-		cmb::AutoJoiner newJoinerImpl() const
-		{
-			return cmb::AutoJoiner{ *this, cmb::Candidate<LmState>{ *combiningRule, langMdl } };
-		}
+		const Morpheme* getDefaultMorpheme(POSTag tag) const;
 
 		ArchType selectedArch = ArchType::none;
 		void* dfSplitByTrie = nullptr;
 		void* dfFindForm = nullptr;
 		void* dfFindBestPath = nullptr;
+		void* dfNewJoiner = nullptr;
 	
 	public:
 		enum class SpecialMorph {
@@ -129,7 +126,7 @@ namespace kiwi
 		 * kiwi::KiwiBuilder 를 통해 생성된 객체만이 형태소 분석에 사용할 수 있다.
 		 */
 		Kiwi(ArchType arch = ArchType::default_, 
-			LangModel _langMdl = {}, 
+			const std::shared_ptr<lm::ILangModel>& _langMdl = {}, 
 			bool typoTolerant = false, 
 			bool continualTypoTolerant = false, 
 			bool lengtheningTypoTolerant = false);
@@ -155,6 +152,8 @@ namespace kiwi
 		bool ready() const { return !forms.empty(); }
 
 		ArchType archType() const { return selectedArch; }
+
+		ModelType modelType() const { return langMdl ? langMdl->getType() : ModelType::none; }
 
 		/**
 		 * @brief 현재 Kiwi 객체가 오타 교정 기능이 켜진 상태로 생성되었는지 알려준다.
@@ -368,6 +367,10 @@ namespace kiwi
 			TokenResult* tokenizedResultOut = nullptr
 		) const;
 
+
+		template<class LmState>
+		cmb::AutoJoiner newJoinerImpl() const;
+
 		/**
 		 * @brief 형태소들을 결합하여 텍스트로 복원해주는 작업을 수행하는 AutoJoiner를 반환한다.
 		 * 
@@ -377,11 +380,6 @@ namespace kiwi
 		 * @sa kiwi::cmb::AutoJoiner
 		 */
 		cmb::AutoJoiner newJoiner(bool lmSearch = true) const;
-
-		/**
-		 * @brief Kiwi에 내장된 언어 모델에 접근할 수 있는 LmObject 객체를 생성한다.
-		 */
-		std::unique_ptr<LmObjectBase> newLmObject() const;
 
 		/**
 		 * @brief `TokenInfo::typoFormId`로부터 실제 오타 형태를 복원한다.
@@ -514,9 +512,9 @@ namespace kiwi
 			integrateAllomorph = v;
 		}
 
-		const lm::KnLangModelBase* getKnLM() const
+		const lm::ILangModel* getLangModel() const
 		{
-			return langMdl.knlm.get();
+			return langMdl.get();
 		}
 
 		void findMorpheme(std::vector<const Morpheme*>& out, const std::u16string& s, POSTag tag = POSTag::unknown) const;
@@ -533,20 +531,43 @@ namespace kiwi
 		Vector<FormRaw> forms;
 		Vector<MorphemeRaw> morphemes;
 		UnorderedMap<KString, size_t> formMap;
-		LangModel langMdl;
+		std::shared_ptr<lm::ILangModel> langMdl;
 		std::shared_ptr<cmb::CompiledRule> combiningRule;
 		WordDetector detector;
-		
+
 		size_t numThreads = 0;
 		BuildOption options = BuildOption::none;
+		ModelType modelType = ModelType::none;
 		ArchType archType = ArchType::none;
+
+	public:
+		struct ModelBuildArgs
+		{
+			std::string morphemeDef;
+			std::vector<std::string> corpora;
+			size_t minMorphCnt = 10;
+			size_t lmOrder = 4;
+			std::vector<size_t> lmMinCnts = { 1 };
+			size_t numWorkers = 1;
+			size_t sbgSize = 1000000;
+			bool useLmTagHistory = true;
+			bool quantizeLm = true;
+			bool compressLm = true;
+			float dropoutSampling = 0.05f;
+			float dropoutProb = 0.15f;
+		};
+
+	private:
+		using MorphemeMap = UnorderedMap<std::tuple<KString, uint8_t, POSTag>, std::pair<size_t, size_t>>;
+
+		template<class VocabTy>
+		std::unique_ptr<lm::KnLangModelBase> buildKnLM(const ModelBuildArgs& args, size_t lmVocabSize, MorphemeMap& morphMap) const;
 
 		void loadMorphBin(std::istream& is);
 		void saveMorphBin(std::ostream& os) const;
 		FormRaw& addForm(const KString& form);
 		size_t addForm(Vector<FormRaw>& newForms, UnorderedMap<KString, size_t>& newFormMap, KString form) const;
 
-		using MorphemeMap = UnorderedMap<std::tuple<KString, uint8_t, POSTag>, std::pair<size_t, size_t>>;
 		
 		void initMorphemes();
 
@@ -556,16 +577,27 @@ namespace kiwi
 		MorphemeMap restoreMorphemeMap(bool separateDefaultMorpheme = false) const;
 
 		template<class VocabTy>
-		void _addCorpusTo(RaggedVector<VocabTy>& out, std::istream& is, MorphemeMap& morphMap, double splitRatio, RaggedVector<VocabTy>* splitOut) const;
-		
-		void addCorpusTo(RaggedVector<uint8_t>& out, std::istream& is, MorphemeMap& morphMap, double splitRatio = 0, RaggedVector<uint8_t>* splitOut = nullptr) const;
-		void addCorpusTo(RaggedVector<uint16_t>& out, std::istream& is, MorphemeMap& morphMap, double splitRatio = 0, RaggedVector<uint16_t>* splitOut = nullptr) const;
-		void addCorpusTo(RaggedVector<uint32_t>& out, std::istream& is, MorphemeMap& morphMap, double splitRatio = 0, RaggedVector<uint32_t>* splitOut = nullptr) const;
+		void _addCorpusTo(RaggedVector<VocabTy>& out, std::istream& is, MorphemeMap& morphMap, 
+			double splitRatio, RaggedVector<VocabTy>* splitOut,
+			UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict = nullptr) const;
+
+		void addCorpusTo(RaggedVector<uint8_t>& out, std::istream& is, MorphemeMap& morphMap, 
+			double splitRatio = 0, RaggedVector<uint8_t>* splitOut = nullptr,
+			UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict = nullptr) const;
+		void addCorpusTo(RaggedVector<uint16_t>& out, std::istream& is, MorphemeMap& morphMap, 
+			double splitRatio = 0, RaggedVector<uint16_t>* splitOut = nullptr,
+			UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict = nullptr) const;
+		void addCorpusTo(RaggedVector<uint32_t>& out, std::istream& is, MorphemeMap& morphMap, 
+			double splitRatio = 0, RaggedVector<uint32_t>* splitOut = nullptr,
+			UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict = nullptr) const;
+		void addCorpusTo(RaggedVector<int32_t>& out, std::istream& is, MorphemeMap& morphMap,
+			double splitRatio = 0, RaggedVector<int32_t>* splitOut = nullptr,
+			UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict = nullptr) const;
 		void updateForms();
-		void updateMorphemes();
+		void updateMorphemes(size_t vocabSize = 0);
 
 		size_t findMorpheme(U16StringView form, POSTag tag) const;
-		
+
 		std::pair<uint32_t, bool> addWord(U16StringView newForm, POSTag tag, float score, size_t origMorphemeId, size_t lmMorphemeId);
 		std::pair<uint32_t, bool> addWord(const std::u16string& newForm, POSTag tag, float score, size_t origMorphemeId, size_t lmMorphemeId);
 		std::pair<uint32_t, bool> addWord(U16StringView form, POSTag tag = POSTag::nnp, float score = 0);
@@ -589,44 +621,36 @@ namespace kiwi
 		) const;
 
 		void addCombinedMorphemes(
-			Vector<FormRaw>& newForms, 
-			UnorderedMap<KString, size_t>& newFormMap, 
-			Vector<MorphemeRaw>& newMorphemes, 
-			UnorderedMap<size_t, Vector<uint32_t>>& newFormCands, 
-			size_t leftId, 
-			size_t rightId, 
+			Vector<FormRaw>& newForms,
+			UnorderedMap<KString, size_t>& newFormMap,
+			Vector<MorphemeRaw>& newMorphemes,
+			UnorderedMap<size_t, Vector<uint32_t>>& newFormCands,
+			size_t leftId,
+			size_t rightId,
 			size_t ruleId
 		) const;
 
 		void buildCombinedMorphemes(
-			Vector<FormRaw>& newForms, 
+			Vector<FormRaw>& newForms,
 			UnorderedMap<KString, size_t>& newFormMap,
-			Vector<MorphemeRaw>& newMorphemes, 
+			Vector<MorphemeRaw>& newMorphemes,
 			UnorderedMap<size_t, Vector<uint32_t>>& newFormCands
 		) const;
 
 		void addAllomorphsToRule();
 
+		std::array<size_t, static_cast<size_t>(Kiwi::SpecialMorph::max)> getSpecialMorphs() const;
+
 	public:
-		struct ModelBuildArgs 
-		{
-			std::string morphemeDef;
-			std::vector<std::string> corpora;
-			size_t minMorphCnt = 10;
-			size_t lmOrder = 4;
-			std::vector<size_t> lmMinCnts = { 1 };
-			size_t numWorkers = 1;
-			size_t sbgSize = 1000000;
-			bool useLmTagHistory = true;
-			bool quantizeLm = true;
-			bool compressLm = true;
-			float dropoutSampling = 0.05f;
-			float dropoutProb = 0.15f;
-		};
+
+		/**
+		 * @brief 주어진 모델 경로로부터 모델의 타입을 추정한다.
+		 */
+		static ModelType getModelType(const std::string& modelPath);
 
 		/**
 		 * @brief KiwiBuilder의 기본 생성자
-		 * 
+		 *
 		 * @note 이 생성자로 생성된 경우 `ready() == false`인 상태이므로 유효한 Kiwi 객체를 생성할 수 없다.
 		 */
 		KiwiBuilder();
@@ -643,9 +667,9 @@ namespace kiwi
 
 		/**
 		 * @brief KiwiBuilder를 raw 데이터로부터 생성한다.
-		 * 
-		 * 
-		 * @note 이 함수는 현재 내부적으로 기본 모델 구축에 쓰인다. 
+		 *
+		 *
+		 * @note 이 함수는 현재 내부적으로 기본 모델 구축에 쓰인다.
 		 * 추후 공개 데이터로도 쉽게 직접 모델을 구축할 수 있도록 개선된 API를 제공할 예정.
 		 */
 		KiwiBuilder(const ModelBuildArgs& args);
@@ -657,29 +681,29 @@ namespace kiwi
 
 		/**
 		 * @brief KiwiBuilder를 모델 파일로부터 생성한다.
-		 * 
+		 *
 		 * @param modelPath 모델이 위치한 경로
 		 * @param numThreads 모델 및 형태소 분석에 사용할 스레드 개수
 		 * @param options 생성 옵션. `kiwi::BuildOption`을 참조
 		 */
-		KiwiBuilder(const std::string& modelPath, size_t numThreads = 0, BuildOption options = BuildOption::default_, bool useSBG = false);
+		KiwiBuilder(const std::string& modelPath, size_t numThreads = 0, BuildOption options = BuildOption::default_, ModelType modelType = ModelType::none);
 
 		/**
 		 * @brief 현재 KiwiBuilder 객체가 유효한 분석 모델을 로딩한 상태인지 알려준다.
-		 * 
+		 *
 		 * @return 유효한 상태면 true를 반환한다. 기본 생성자로 생성한 경우 `ready() == false`이며,
 		 * 다른 생성자로 생성한 경우는 `ready() == true`이다.
 		 */
 		bool ready() const
 		{
-			return !!langMdl.knlm;
+			return !!langMdl;
 		}
 
 		void saveModel(const std::string& modelPath) const;
 
 		/**
 		 * @brief 사전에 새로운 형태소를 추가한다. 이미 동일한 형태소가 있는 경우는 무시된다.
-		 * 
+		 *
 		 * @param form 새로운 형태소의 형태
 		 * @param tag 품사 태그
 		 * @param score 페널티 점수. 이에 대한 자세한 설명은 하단의 note 참조.
@@ -687,7 +711,7 @@ namespace kiwi
 		 * @note 이 방법으로 추가된 형태소는 언어모델 탐색에서 어휘 사전 외 토큰(OOV 토큰)으로 처리된다.
 		 * 이 방법으로 추가된 형태소는 항상 분석 과정에서 최우선으로 탐색되지는 않으므로 최상의 결과를 위해서는 `score` 값을 조절할 필요가 있다.
 		 * `score` 값을 높게 설정할수록 다른 후보들과의 경쟁에서 이 형태소가 더 높은 점수를 받아 최종 분석 결과에 노출될 가능성이 높아진다.
-		 * 만약 이 방법으로 추가된 형태소가 원치 않는 상황에서 과도하게 출력되는 경우라면 `score`를 더 작은 값으로, 
+		 * 만약 이 방법으로 추가된 형태소가 원치 않는 상황에서 과도하게 출력되는 경우라면 `score`를 더 작은 값으로,
 		 * 반대로 원하는 상황에서도 출력되지 않는 경우라면 `score`를 더 큰 값으로 조절하는 게 좋다.
 		 */
 		std::pair<uint32_t, bool> addWord(const std::u16string& form, POSTag tag = POSTag::nnp, float score = 0);
@@ -716,26 +740,26 @@ namespace kiwi
 		 * @param score 페널티 점수. 이에 대한 자세한 설명은 하단의 `addWord`함수의 note 참조.
 		 * @exception kiwi::UnknownMorphemeException `analyzed`로 주어진 형태소 중 하나라도 존재하지 않는게 있는 경우 예외를 발생시킨다.
 		 * @return 형태소열을 추가하는데 성공했으면 true, 동일한 형태소열이 존재하여 추가에 실패한 경우 false를 반환한다.
-		 * @note 이 함수는 특정 문자열이 어떻게 분석되어야하는지 직접적으로 지정해줄 수 있다. 
-		 * 따라서 `addWord` 함수를 사용해도 오분석이 발생하는 경우, 이 함수를 통해 해당 사례들에 대해 정확한 분석 결과를 추가하면 원하는 분석 결과를 얻을 수 있다. 
+		 * @note 이 함수는 특정 문자열이 어떻게 분석되어야하는지 직접적으로 지정해줄 수 있다.
+		 * 따라서 `addWord` 함수를 사용해도 오분석이 발생하는 경우, 이 함수를 통해 해당 사례들에 대해 정확한 분석 결과를 추가하면 원하는 분석 결과를 얻을 수 있다.
 		 */
-		bool addPreAnalyzedWord(const std::u16string& form, 
-			const std::vector<std::pair<std::u16string, POSTag>>& analyzed, 
+		bool addPreAnalyzedWord(const std::u16string& form,
+			const std::vector<std::pair<std::u16string, POSTag>>& analyzed,
 			std::vector<std::pair<size_t, size_t>> positions = {},
 			float score = 0
 		);
-		bool addPreAnalyzedWord(const char16_t* form, 
-			const std::vector<std::pair<const char16_t*, POSTag>>& analyzed, 
+		bool addPreAnalyzedWord(const char16_t* form,
+			const std::vector<std::pair<const char16_t*, POSTag>>& analyzed,
 			std::vector<std::pair<size_t, size_t>> positions = {},
 			float score = 0
 		);
 
 		/**
 		 * @brief 규칙에 의해 변형된 형태소 목록을 생성하여 자동 추가한다.
-		 * 
-		 * @param tag 
-		 * @param repl 
-		 * @param score 
+		 *
+		 * @param tag
+		 * @param repl
+		 * @param score
 		 * @return 새로 추가된 변형된 형태소의 ID와 그 형태를 pair로 묶은 목록
 		 */
 		template<class Replacer>
@@ -770,24 +794,24 @@ namespace kiwi
 		}
 
 		/**
-		 * @brief 
-		 * 
-		 * @param dictPath 
-		 * @return  
+		 * @brief
+		 *
+		 * @param dictPath
+		 * @return
 		 */
 		size_t loadDictionary(const std::string& dictPath);
 
-		std::vector<WordInfo> extractWords(const U16MultipleReader& reader, 
+		std::vector<WordInfo> extractWords(const U16MultipleReader& reader,
 			size_t minCnt = 10, size_t maxWordLen = 10, float minScore = 0.25, float posThreshold = -3, bool lmFilter = true
 		) const;
 
-		std::vector<WordInfo> extractAddWords(const U16MultipleReader& reader, 
+		std::vector<WordInfo> extractAddWords(const U16MultipleReader& reader,
 			size_t minCnt = 10, size_t maxWordLen = 10, float minScore = 0.25, float posThreshold = -3, bool lmFilter = true
 		);
 
 		/**
 		 * @brief 현재 단어 및 사전 설정을 기반으로 Kiwi 객체를 생성한다.
-		 * 
+		 *
 		 * @param typos
 		 * @param typoCostThreshold
 		 * @return 형태소 분석 준비가 완료된 Kiwi의 객체.
@@ -803,22 +827,31 @@ namespace kiwi
 			const std::vector<std::string>& inputPathes,
 			const std::string& outputPath,
 			const std::string& morphemeDefPath = {},
-			size_t morphemeDefMinCnt = 0
+			size_t morphemeDefMinCnt = 0,
+			bool generateOovDict = false
 		) const;
 
 		using TokenFilter = std::function<bool(const std::u16string&, POSTag)>;
 
-		HSDataset makeHSDataset(const std::vector<std::string>& inputPathes, 
-			size_t batchSize, size_t causalContextSize, size_t windowSize, size_t numWorkers, 
+		HSDataset makeHSDataset(const std::vector<std::string>& inputPathes,
+			size_t batchSize, size_t causalContextSize, size_t windowSize, size_t numWorkers,
 			double dropoutProb = 0,
 			double dropoutProbOnHistory = 0,
+			double nounAugmentingProb = 0,
+			size_t generateUnlikelihoods = -1,
 			const TokenFilter& tokenFilter = {},
 			const TokenFilter& windowFilter = {},
 			double splitRatio = 0,
 			bool separateDefaultMorpheme = false,
 			const std::string& morphemeDefPath = {},
 			size_t morphemeDefMinCnt = 0,
+			const std::vector<std::pair<size_t, std::vector<uint32_t>>>& contextualMapper = {},
 			HSDataset* splitDataset = nullptr
 		) const;
+
+		BuildOption getOptions() const { return options; }
+		ModelType getModelType() const { return modelType; }
+
+		static void buildMorphData(const std::string& morphemeDefPath, const std::string& outputPath, size_t minCnt = 10);
 	};
 }

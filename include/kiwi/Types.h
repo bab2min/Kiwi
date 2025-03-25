@@ -16,6 +16,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <string>
+#include <string_view>
 #include <memory>
 #include <type_traits>
 #include <functional>
@@ -62,16 +63,6 @@ inline Type operator^=(Type& a, Type b)\
 	return reinterpret_cast<Type&>(reinterpret_cast<typename std::underlying_type<Type>::type&>(a) ^= static_cast<typename std::underlying_type<Type>::type>(b));\
 }
 
-namespace nonstd
-{
-	namespace sv_lite
-	{
-		template<class CharT, class Traits> class basic_string_view;
-	}
-
-	using string_view = sv_lite::basic_string_view<char, std::char_traits<char>>;
-	using u16string_view = sv_lite::basic_string_view<char16_t, std::char_traits<char16_t>>;
-}
 
 namespace kiwi
 {
@@ -187,7 +178,7 @@ namespace kiwi
 	using KcScores = Vector<std::pair<KcVector, float>>;
 #endif
 
-	using U16StringView = nonstd::u16string_view;
+	using U16StringView = std::u16string_view;
 
 	/**
 	 * @brief 형태소 품사 태그와 관련된 열거형
@@ -301,6 +292,18 @@ namespace kiwi
 		loadMultiDict = 1 << 3, /**< 복합명사 사전(multi.dict)의 로딩 여부를 설정한다. 복합명사 사전은 복합명사의 구성 형태소를 저장하고 있다. */
 
 		default_ = integrateAllomorph | loadDefaultDict | loadTypoDict | loadMultiDict,
+	};
+
+	enum class ModelType
+	{
+		none = 0, /**< Select default model */
+		knlm = 1, /**< Kneser-Ney Language Model */
+		sbg = 2, /**< Skip-Bigram Model */
+		cong = 3, /**< Contextual N-gram embedding Language Model (Only local context) */
+		congGlobal = 4, /**< Contextual N-gram embedding Language Model (local and global context) */
+		congFp32 = 5, /**< Contextual N-gram embedding Language Model (Only local context, non-quantized(slow) version) */
+		congGlobalFp32 = 6, /**< Contextual N-gram embedding Language Model (local and global context, non-quantized(slow) version) */
+		knlmTransposed,
 	};
 
 	struct Morpheme;

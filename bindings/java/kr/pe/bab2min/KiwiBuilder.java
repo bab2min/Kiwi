@@ -12,6 +12,14 @@ public class KiwiBuilder implements AutoCloseable  {
 		default_ = integrateAllomorph | loadDefaultDict | loadTypoDict | loadMultiDict;
 	}
 
+	public static class ModelType {
+		final static public int none = 0,
+		knlm = 1,
+		sbg = 2,
+		cong = 3,
+		congGlobal = 4;
+	}
+
 	public static class AnalyzedMorph {
 		public String form;
 		public byte tag = Kiwi.POSTag.nng;
@@ -113,20 +121,20 @@ public class KiwiBuilder implements AutoCloseable  {
 		this._inst = _inst;
 	}
 
-	public KiwiBuilder(String modelPath, int numWorkers, int buildOptions, boolean useSBG) {
-		ctor(modelPath, numWorkers, buildOptions, useSBG);
+	public KiwiBuilder(String modelPath, int numWorkers, int buildOptions, int modelType) {
+		ctor(modelPath, numWorkers, buildOptions, modelType);
 	}
 
 	public KiwiBuilder(String modelPath, int numWorkers, int buildOptions) {
-		ctor(modelPath, numWorkers, buildOptions, false);
+		ctor(modelPath, numWorkers, buildOptions, ModelType.none);
 	}
 
 	public KiwiBuilder(String modelPath, int numWorkers) {
-		ctor(modelPath, numWorkers, BuildOption.default_, false);
+		ctor(modelPath, numWorkers, BuildOption.default_, ModelType.none);
 	}
 
 	public KiwiBuilder(String modelPath) {
-		ctor(modelPath, 1, BuildOption.default_, false);
+		ctor(modelPath, 1, BuildOption.default_, ModelType.none);
 	}
 
 	protected void finalize() throws Exception {
@@ -137,7 +145,7 @@ public class KiwiBuilder implements AutoCloseable  {
 		return _inst != 0;
 	}
 
-	private native void ctor(String modelPath, int numWorkers, int buildOptions, boolean useSBG);
+	private native void ctor(String modelPath, int numWorkers, int buildOptions, int modelType);
 	
 	@Override
 	public native void close() throws Exception;

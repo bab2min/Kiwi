@@ -2,6 +2,7 @@
 #include <iostream>
 #include <unordered_set>
 #include <algorithm>
+#include <limits>
 
 #include <kiwi/Utils.h>
 #include <kiwi/TagUtils.h>
@@ -779,7 +780,7 @@ void RuleSet::loadRules(istream& istr)
 	while (getline(istr, line))
 	{
 		if (line[0] == '#') continue;
-		while (!line.empty() && line.back() < 0x80 && isSpace(line.back())) line.pop_back();
+		while (!line.empty() && ((uint8_t)line.back() < 0x80) && isSpace(line.back())) line.pop_back();
 		if (line.empty()) continue;
 
 		auto fields = split(line, '\t');
@@ -789,8 +790,8 @@ void RuleSet::loadRules(istream& istr)
 		}
 		else if (fields.size() == 2)
 		{
-			lTag = fields[0].to_string();
-			rTag = fields[1].to_string();
+			lTag = fields[0];
+			rTag = fields[1];
 		}
 		else
 		{
@@ -807,13 +808,13 @@ void RuleSet::loadRules(istream& istr)
 					"+ignorercond",
 				};
 
-				transform(fields[3].begin(), fields[3].end(), const_cast<char*>(fields[3].begin()), static_cast<int(*)(int)>(tolower));
+				transform(fields[3].begin(), fields[3].end(), const_cast<char*>(fields[3].data()), static_cast<int(*)(int)>(tolower));
 				for (auto f : split(fields[3], ','))
 				{
 					size_t t = find(fs.begin(), fs.end(), f) - fs.begin();
 					if (t >= fs.size())
 					{
-						throw runtime_error{ "invalid feature value: " + f.to_string()};
+						throw runtime_error{ "invalid feature value: " + string{ f } };
 					}
 
 					switch (t)
@@ -1115,7 +1116,7 @@ Vector<KString> CompiledRule::combineImpl(
 	auto it = findRule(leftTag, rightTag, cv, cp);
 	if (it != map.end())
 	{
-		for (auto& p : mapbox::util::apply_visitor(CombineVisitor{ leftForm, rightForm }, dfa[it->second]))
+		for (auto& p : visit(CombineVisitor{ leftForm, rightForm }, dfa[it->second]))
 		{
 			ret.emplace_back(move(p.str));
 		}
@@ -1131,7 +1132,7 @@ Vector<KString> CompiledRule::combineImpl(
 		it = findRule(leftTag, rightTag, cv, cp);
 		if (it != map.end())
 		{
-			for (auto& p : mapbox::util::apply_visitor(CombineVisitor{ leftForm, rightForm }, dfa[it->second]))
+			for (auto& p : visit(CombineVisitor{ leftForm, rightForm }, dfa[it->second]))
 			{
 				ret.emplace_back(move(p.str));
 			}
@@ -1161,7 +1162,7 @@ tuple<KString, size_t, size_t> CompiledRule::combineOneImpl(
 	auto it = findRule(leftTag, rightTag, cv, cp);
 	if (it != map.end())
 	{
-		for (auto& p : mapbox::util::apply_visitor(CombineVisitor{ leftForm, rightForm }, dfa[it->second]))
+		for (auto& p : visit(CombineVisitor{ leftForm, rightForm }, dfa[it->second]))
 		{
 			if(p.score >= 0) return make_tuple(p.str, p.leftEnd, p.rightBegin);
 			KString ret;
@@ -1181,7 +1182,7 @@ tuple<KString, size_t, size_t> CompiledRule::combineOneImpl(
 		it = findRule(leftTag, rightTag, cv, cp);
 		if (it != map.end())
 		{
-			for (auto& p : mapbox::util::apply_visitor(CombineVisitor{ leftForm, rightForm }, dfa[it->second]))
+			for (auto& p : visit(CombineVisitor{ leftForm, rightForm }, dfa[it->second]))
 			{
 				return make_tuple(p.str, p.leftEnd, p.rightBegin);
 			}
@@ -1210,13 +1211,13 @@ tuple<KString, size_t, size_t> CompiledRule::combineOneImpl(
 
 Vector<tuple<size_t, size_t, CondPolarity>> CompiledRule::testLeftPattern(U16StringView leftForm, size_t ruleId) const
 {
-	return mapbox::util::apply_visitor(SearchLeftVisitor{ leftForm, true }, dfa[ruleId]);
+	return visit(SearchLeftVisitor{ leftForm, true }, dfa[ruleId]);
 }
 
 
 Vector<tuple<size_t, size_t, CondPolarity>> CompiledRule::testRightPattern(U16StringView rightForm, size_t ruleId) const
 {
-	return mapbox::util::apply_visitor(SearchLeftVisitor{ rightForm, false }, dfaRight[ruleId]);
+	return visit(SearchLeftVisitor{ rightForm, false }, dfaRight[ruleId]);
 }
 
 vector<tuple<size_t, size_t, CondPolarity>> CompiledRule::testLeftPattern(U16StringView leftForm, POSTag leftTag, POSTag rightTag, CondVowel cv, CondPolarity cp) const
@@ -1231,7 +1232,7 @@ vector<tuple<size_t, size_t, CondPolarity>> CompiledRule::testLeftPattern(U16Str
 	auto it = findRule(leftTag, rightTag, cv, cp);
 	if (it == map.end()) return ret;
 
-	auto p = mapbox::util::apply_visitor(SearchLeftVisitor{ l, true }, dfa[it->second]);
+	auto p = visit(SearchLeftVisitor{ l, true }, dfa[it->second]);
 	ret.insert(ret.end(), p.begin(), p.end());
 	return ret;
 }
@@ -1270,7 +1271,7 @@ UnorderedMap<POSTag, Vector<size_t>> CompiledRule::getRuleIdsByRightTag() const
 
 Vector<Result> CompiledRule::combine(U16StringView leftForm, U16StringView rightForm, size_t ruleId) const
 {
-	return mapbox::util::apply_visitor(CombineVisitor{ leftForm, rightForm }, dfa[ruleId]);
+	return visit(CombineVisitor{ leftForm, rightForm }, dfa[ruleId]);
 }
 
 vector<u16string> CompiledRule::combine(U16StringView leftForm, POSTag leftTag, U16StringView rightForm, POSTag rightTag, CondVowel cv, CondPolarity cp) const

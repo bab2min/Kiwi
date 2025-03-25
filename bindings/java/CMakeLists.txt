@@ -9,8 +9,8 @@ set(CMAKE_JAVA_COMPILE_FLAGS -source 8 -target 8 -encoding utf-8)
 set(pkg_name "KiwiJava-${PROJECT_VERSION}")
 add_library (${pkg_name} SHARED kiwi_java.cpp
     $<TARGET_OBJECTS:${PROJECT_NAME}>
-    $<TARGET_OBJECTS:clog>
     $<TARGET_OBJECTS:cpuinfo>
+    $<TARGET_OBJECTS:streamvbyte>
 )
 if(UNIX AND NOT APPLE)
     target_link_libraries( ${pkg_name}

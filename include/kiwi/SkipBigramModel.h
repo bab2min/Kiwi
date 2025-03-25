@@ -1,26 +1,18 @@
 #pragma once
 
-#include <array>
-#include <vector>
-#include <deque>
-#include <memory>
-#include <algorithm>
-#include <numeric>
-
-#include "ArchUtils.h"
-#include "Mmap.h"
+#include "Knlm.h"
 
 namespace kiwi
 {
-	namespace sb
+	namespace lm
 	{
-		struct Header
+		struct SkipBigramModelHeader
 		{
 			uint64_t vocabSize;
 			uint8_t keySize, windowSize, compressed, quantize, _rsv[4];
 		};
 
-		class SkipBigramModelBase
+		class SkipBigramModelBase : public ILangModel
 		{
 		protected:
 			utils::MemoryObject base;
@@ -30,9 +22,12 @@ namespace kiwi
 			}
 		public:
 			virtual ~SkipBigramModelBase() {}
-			const Header& getHeader() const { return *reinterpret_cast<const Header*>(base.get()); }
+			size_t vocabSize() const override { return getHeader().vocabSize; }
+			ModelType getType() const override { return ModelType::sbg; }
 
-			static std::unique_ptr<SkipBigramModelBase> create(utils::MemoryObject&& mem, ArchType archType = ArchType::none);
+			const SkipBigramModelHeader& getHeader() const { return *reinterpret_cast<const SkipBigramModelHeader*>(base.get()); }
+
+			static std::unique_ptr<SkipBigramModelBase> create(utils::MemoryObject&& knlmMem, utils::MemoryObject&& sbgMem, ArchType archType = ArchType::none);
 		};
 	}
 }

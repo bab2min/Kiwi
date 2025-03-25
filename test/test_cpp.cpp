@@ -50,7 +50,7 @@ constexpr std::vector<std::pair<Ty, Ty>> toPair(const ATy(&init)[n])
 
 Kiwi& reuseKiwiInstance()
 {
-	static Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 0, BuildOption::default_, }.build();
+	static Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 0, BuildOption::default_, ModelType::knlm }.build();
 	return kiwi;
 }
 
@@ -147,7 +147,7 @@ TEST(KiwiCpp, SingleConsonantMorpheme)
 
 TEST(KiwiCpp, SpecialTokenErrorOnContinualTypo)
 {
-	KiwiBuilder builder{ MODEL_PATH, 0, BuildOption::default_, };
+	KiwiBuilder builder{ MODEL_PATH, 0, BuildOption::default_, ModelType::knlm };
 	Kiwi typoKiwi = builder.build(DefaultTypoSet::continualTypoSet);
 	
 	auto res = typoKiwi.analyze(u"감사합니다 -친구들과", Match::allWithNormalizing).first;
@@ -382,7 +382,7 @@ TEST(KiwiCpp, TagRoundTrip)
 
 TEST(KiwiCpp, UserTag)
 {
-	KiwiBuilder kw{ MODEL_PATH, 0, BuildOption::default_, };
+	KiwiBuilder kw{ MODEL_PATH, 0, BuildOption::default_, ModelType::knlm, };
 	EXPECT_TRUE(kw.addWord(u"사용자태그", POSTag::user0).second);
 	EXPECT_TRUE(kw.addWord(u"이것도유저", POSTag::user1).second);
 	EXPECT_TRUE(kw.addWord(u"특수한표지", POSTag::user2).second);
@@ -432,7 +432,7 @@ TEST(KiwiCpp, HSDataset)
 		{
 			size_t totalBatchCnt = 0, totalTokenCnt = 0, s;
 			dataset.reset();
-			while (s = dataset.next(in.data(), out.data(), lmLProbs.data(), outNgramBase.data(), restLm, restLmCnt))
+			while ((s = dataset.next(in.data(), out.data(), lmLProbs.data(), outNgramBase.data(), restLm, restLmCnt)))
 			{
 				EXPECT_LE(s, batchSize);
 				totalTokenCnt += s;
@@ -450,13 +450,13 @@ TEST(KiwiCpp, HSDataset)
 	};
 
 	HSDataset trainset, devset;
-	trainset = kw.makeHSDataset(data, batchSize, 0, windowSize, 1, 0., 0., tokenFilter, {}, 0.1, false, {}, 0, &devset);
+	trainset = kw.makeHSDataset(data, batchSize, 0, windowSize, 1, 0., 0., 0., false, tokenFilter, {}, 0.1, false, {}, 0, {}, &devset);
 	for (size_t i = 0; i < 2; ++i)
 	{
 		{
 			size_t totalBatchCnt = 0, totalTokenCnt = 0, s;
 			trainset.reset();
-			while (s = trainset.next(in.data(), out.data(), lmLProbs.data(), outNgramBase.data(), restLm, restLmCnt))
+			while ((s = trainset.next(in.data(), out.data(), lmLProbs.data(), outNgramBase.data(), restLm, restLmCnt)))
 			{
 				EXPECT_LE(s, batchSize);
 				totalTokenCnt += s;
@@ -468,7 +468,7 @@ TEST(KiwiCpp, HSDataset)
 		{
 			size_t totalBatchCnt = 0, totalTokenCnt = 0, s;
 			devset.reset();
-			while (s = devset.next(in.data(), out.data(), lmLProbs.data(), outNgramBase.data(), restLm, restLmCnt))
+			while ((s = devset.next(in.data(), out.data(), lmLProbs.data(), outNgramBase.data(), restLm, restLmCnt)))
 			{
 				EXPECT_LE(s, batchSize);
 				totalTokenCnt += s;
@@ -519,6 +519,7 @@ TEST(KiwiCpp, SentenceBoundaryErrors)
 		EXPECT_EQ(sentRanges.size(), 1);
 		if (sentRanges.size() > 1)
 		{
+			kiwi.splitIntoSents(str, Match::allWithNormalizing, &res);
 			for (auto& r : sentRanges)
 			{
 				std::cerr << std::string{ &str[r.first], r.second - r.first } << std::endl;
@@ -626,12 +627,14 @@ TEST(KiwiCpp, FalsePositiveSB)
 		u"도서전에서 관람객의 관심을 받을 것으로 예상되는 프로그램으로는 '인문학 아카데미'가 있어요. 이 프로그램에서는 유시민 전 의원, 광고인 박웅현 씨 등이 문화 역사 미학 등 다양한 분야에 대해 강의할 예정이다. 또한, '북 멘토 프로그램'도 이어져요. 이 프로그램에서는 각 분야 전문가들이 경험과 노하우를 전수해 주는 프로그램으로, 시 창작(이정록 시인), 번역(강주헌 번역가), 북 디자인(오진경 북디자이너) 등의 분야에서 멘토링이 이뤄져요.",
 	})
 	{
-		auto tokens = kiwi.analyze(str, 10, Match::allWithNormalizing)[0].first;
+		auto res = kiwi.analyze(str, 1, Match::allWithNormalizing);
+		auto tokens = res[0].first;
 		auto sbCount = std::count_if(tokens.begin(), tokens.end(), [](const TokenInfo& t)
 		{
 			return t.tag == POSTag::sb;
 		});
 		EXPECT_EQ(sbCount, 0);
+		kiwi.analyze(str, 10, Match::allWithNormalizing);
 	}
 }
 
@@ -925,12 +928,14 @@ TEST(KiwiCpp, AnalyzeWithLoadDefaultDict)
 
 TEST(KiwiCpp, AnalyzeSBG)
 {
-	Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 0, BuildOption::none, true }.build();
-	kiwi.analyze(TEST_SENT, Match::all);
+	Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 0, BuildOption::none, ModelType::knlm }.build();
+	Kiwi kiwiSbg = KiwiBuilder{ MODEL_PATH, 0, BuildOption::none, ModelType::sbg }.build();
+	kiwiSbg.analyze(TEST_SENT, Match::all);
 
-	auto tokens = kiwi.analyze(u"이 번호로 전화를 이따가 꼭 반드시 걸어.", kiwi::Match::allWithNormalizing).first;
-	EXPECT_EQ(tokens.size(), 11);
-	EXPECT_EQ(tokens[8].str, u"걸");
+	auto res = kiwi.analyze(u"이 번호로 전화를 이따가 꼭 반드시 걸어.", 3, kiwi::Match::allWithNormalizing);
+	auto resSbg = kiwiSbg.analyze(u"이 번호로 전화를 이따가 꼭 반드시 걸어.", 3, kiwi::Match::allWithNormalizing);
+	EXPECT_EQ(resSbg[0].first.size(), 11);
+	EXPECT_EQ(resSbg[0].first[8].str, u"걸");
 }
 
 TEST(KiwiCpp, AnalyzeMultithread)
@@ -1205,7 +1210,7 @@ TEST(KiwiCpp, IssueP111_SentenceSplitError)
 	auto res = kiwi.splitIntoSents(text);
 	EXPECT_GT(res.size(), 1);
 
-	KiwiBuilder builder{ MODEL_PATH, 1 };
+	KiwiBuilder builder{ MODEL_PATH, 1, BuildOption::default_, ModelType::knlm };
 	EXPECT_TRUE(builder.addWord(u"모", POSTag::nng).second);
 	Kiwi kiwi2 = builder.build();
 	auto res2 = kiwi2.splitIntoSents(text);
@@ -1255,7 +1260,7 @@ TEST(KiwiCpp, AddRule)
 	auto ores = okiwi.analyze(u"했어요! 하잖아요! 할까요? 좋아요!", Match::allWithNormalizing);
 	
 	{
-		KiwiBuilder builder{ MODEL_PATH, 0, BuildOption::default_ & ~BuildOption::loadTypoDict };
+		KiwiBuilder builder{ MODEL_PATH, 0, BuildOption::default_ & ~BuildOption::loadTypoDict, ModelType::knlm };
 		auto inserted = builder.addRule(POSTag::ef, [](std::u16string input)
 		{
 			if (input.back() == u'요')
@@ -1272,7 +1277,7 @@ TEST(KiwiCpp, AddRule)
 	}
 
 	{
-		KiwiBuilder builder{ MODEL_PATH, 0, BuildOption::default_ & ~BuildOption::loadTypoDict };
+		KiwiBuilder builder{ MODEL_PATH, 0, BuildOption::default_ & ~BuildOption::loadTypoDict, ModelType::knlm };
 		auto inserted = builder.addRule(POSTag::ef, [](std::u16string input)
 		{
 			if (input.back() == u'요')
@@ -1674,6 +1679,12 @@ TEST(KiwiCpp, IssueP189)
 
 TEST(KiwiCpp, Issue205)
 {
+	if (sizeof(void*) != 8) 
+	{
+		std::cerr << "This test is only available in 64-bit mode" << std::endl;
+		return;
+	}
+
 	KiwiBuilder builder{ MODEL_PATH, 0, BuildOption::default_, };
 	builder.addWord(u"함박 스테이크");
 	auto kiwi1 = builder.build();

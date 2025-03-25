@@ -4,305 +4,21 @@
 #include <kiwi/Utils.h>
 #include <kiwi/TemplateUtils.hpp>
 #include <kiwi/Form.h>
+#include <kiwi/LangModel.h>
 #include "ArchAvailable.h"
 #include "KTrie.h"
 #include "FeatureTestor.h"
 #include "FrozenTrie.hpp"
-#include "LmState.hpp"
 #include "StrUtils.h"
 #include "SortUtils.hpp"
 #include "LimitedVector.hpp"
+#include "PathEvaluator.h"
+#include "BestPathContainer.hpp"
 
 using namespace std;
 
 namespace kiwi
 {
-	struct SpecialState
-	{
-		uint8_t singleQuote : 1;
-		uint8_t doubleQuote : 1;
-		uint8_t bulletHash : 6;
-
-		SpecialState() : singleQuote{ 0 }, doubleQuote{ 0 }, bulletHash{ 0 }
-		{
-		}
-
-		operator uint8_t() const
-		{
-			return reinterpret_cast<const uint8_t&>(*this);
-		}
-
-		bool operator<(const SpecialState& o) const
-		{
-			return (uint8_t)(*this) < (uint8_t)o;
-		}
-
-		bool operator==(const SpecialState& o) const
-		{
-			return (uint8_t)(*this) == (uint8_t)o;
-		}
-	};
-
-	template<class LmState>
-	struct WordLL;
-
-	using Wid = uint32_t;
-
-	enum class PathEvaluatingMode
-	{
-		topN,
-		top1,
-		top1Small,
-	};
-
-	class PathEvaluator
-	{
-	public:
-		struct Result
-		{
-			const Morpheme* morph = nullptr;
-			KString str;
-			uint32_t begin = 0, end = 0;
-			float wordScore = 0, typoCost = 0;
-			uint32_t typoFormId = 0;
-			uint32_t nodeId = 0;
-
-			Result(const Morpheme* _morph = nullptr,
-				const KString& _str = {},
-				uint32_t _begin = 0,
-				uint32_t _end = 0,
-				float _wordScore = 0,
-				float _typoCost = 0,
-				uint32_t _typoFormId = 0,
-				uint32_t _nodeId = 0
-			)
-				: morph{ _morph }, str{ _str }, begin{ _begin }, end{ _end },
-				wordScore{ _wordScore }, typoCost{ _typoCost }, typoFormId{ _typoFormId }, nodeId{ _nodeId }
-			{
-			}
-
-			bool operator==(const Result& o) const
-			{
-				return morph == o.morph
-					&& str == o.str
-					&& begin == o.begin
-					&& end == o.end
-					&& wordScore == o.wordScore
-					&& typoCost == o.typoCost
-					&& typoFormId == o.typoFormId;
-			}
-		};
-		using Path = Vector<Result>;
-
-		struct ChunkResult
-		{
-			Path path;
-			float score = 0;
-			SpecialState prevState;
-			SpecialState curState;
-
-			ChunkResult(Path&& _path = {}, float _score = 0, SpecialState _prevState = {}, SpecialState _curState = {})
-				: path{ move(_path) }, score{ _score }, prevState{ _prevState }, curState{ _curState }
-			{}
-
-			ChunkResult(const Path& _path, float _score = 0, SpecialState _prevState = {}, SpecialState _curState = {})
-				: path{ _path }, score{ _score }, prevState{ _prevState }, curState{ _curState }
-			{}
-		};
-
-		template<class LmState>
-		static Vector<ChunkResult> findBestPath(const Kiwi* kw,
-			const Vector<SpecialState>& prevSpStates,
-			const KGraphNode* graph,
-			const size_t graphSize,
-			const size_t topN,
-			bool openEnd,
-			bool splitComplex = false,
-			bool splitSaisiot = false,
-			bool mergeSaisiot = false,
-			const std::unordered_set<const Morpheme*>* blocklist = nullptr
-		);
-
-		template<class LmState, class CandTy>
-		static void evalPath(const Kiwi* kw,
-			const KGraphNode* startNode,
-			const KGraphNode* node,
-			const size_t topN,
-			Vector<Vector<WordLL<LmState>>>& cache,
-			const Vector<U16StringView>& ownFormList,
-			size_t i,
-			size_t ownFormId,
-			CandTy&& cands,
-			bool unknownForm,
-			const Vector<SpecialState>& prevSpStates,
-			bool splitComplex = false,
-			bool splitSaisiot = false,
-			bool mergeSaisiot = false,
-			const std::unordered_set<const Morpheme*>* blocklist = nullptr
-		);
-
-		template<PathEvaluatingMode mode, class LmState>
-		static void evalSingleMorpheme(
-			Vector<WordLL<LmState>>& resultOut,
-			const Kiwi* kw,
-			const Vector<U16StringView>& ownForms,
-			const Vector<Vector<WordLL<LmState>>>& cache,
-			size_t ownFormId,
-			const Morpheme* curMorph,
-			const KGraphNode* node,
-			const KGraphNode* startNode,
-			const size_t topN,
-			const float ignoreCondScore,
-			const float nodeLevelDiscount,
-			const Vector<SpecialState>& prevSpStates
-		);
-	};
-
-	using FnFindBestPath = decltype(&PathEvaluator::findBestPath<KnLMState<ArchType::none, uint16_t>>);
-
-	template<template<ArchType> class LmState>
-	struct FindBestPathGetter
-	{
-		template<std::ptrdiff_t i>
-		struct Wrapper
-		{
-			static constexpr FnFindBestPath value = &PathEvaluator::findBestPath<LmState<static_cast<ArchType>(i)>>;
-		};
-	};
-
-	template<class LmState>
-	struct WordLL
-	{
-		const Morpheme* morpheme = nullptr;
-		float accScore = 0, accTypoCost = 0;
-		const WordLL* parent = nullptr;
-		LmState lmState;
-		Wid wid = 0;
-		uint16_t ownFormId = 0;
-		uint8_t combineSocket = 0;
-		uint8_t rootId = 0;
-		SpecialState spState;
-
-		WordLL() = default;
-
-		WordLL(const Morpheme* _morph, float _accScore, float _accTypoCost, const WordLL* _parent, LmState _lmState, SpecialState _spState)
-			: morpheme{ _morph },
-			accScore{ _accScore },
-			accTypoCost{ _accTypoCost },
-			parent{ _parent },
-			lmState{ _lmState },
-			spState{ _spState },
-			rootId{ parent ? parent->rootId : (uint8_t)0 }
-		{
-		}
-
-		const WordLL* root() const
-		{
-			if (parent) return parent->root();
-			else return this;
-		}
-	};
-
-	static constexpr uint8_t commonRootId = -1;
-
-	template<class LmState>
-	struct PathHash
-	{
-		LmState lmState;
-		uint8_t rootId, spState;
-
-		PathHash(LmState _lmState = {}, uint8_t _rootId = 0, SpecialState _spState = {})
-			: lmState{ _lmState }, rootId{ _rootId }, spState { _spState }
-		{
-		}
-
-		PathHash(const WordLL<LmState>& wordLl, const Morpheme* morphBase)
-			: PathHash{ wordLl.lmState, wordLl.rootId, wordLl.spState }
-		{
-		}
-
-		bool operator==(const PathHash& o) const
-		{
-			return lmState == o.lmState && rootId == o.rootId && spState == o.spState;
-		}
-	};
-
-	template<size_t windowSize, ArchType _arch, class VocabTy>
-	struct PathHash<SbgState<windowSize, _arch, VocabTy>>
-	{
-		using LmState = SbgState<windowSize, _arch, VocabTy>;
-
-		KnLMState<_arch, VocabTy> lmState;
-		array<VocabTy, 4> lastMorphemes;
-		uint8_t rootId, spState;
-
-		PathHash(LmState _lmState = {}, uint8_t _rootId = 0, SpecialState _spState = {})
-			: lmState{ _lmState }, rootId{ _rootId }, spState{ _spState }
-		{
-			_lmState.getLastHistory(lastMorphemes.data(), lastMorphemes.size());
-		}
-
-
-		PathHash(const WordLL<LmState>& wordLl, const Morpheme* morphBase)
-			: PathHash{ wordLl.lmState, wordLl.rootId, wordLl.spState }
-		{
-		}
-
-		bool operator==(const PathHash& o) const
-		{
-			return lmState == o.lmState && lastMorphemes == o.lastMorphemes && spState == o.spState;
-		}
-	};
-
-	template<class LmState>
-	struct Hash<PathHash<LmState>>
-	{
-		size_t operator()(const PathHash<LmState>& p) const
-		{
-			size_t ret = 0;
-			if (sizeof(PathHash<LmState>) % sizeof(size_t))
-			{
-				auto ptr = reinterpret_cast<const uint32_t*>(&p);
-				for (size_t i = 0; i < sizeof(PathHash<LmState>) / sizeof(uint32_t); ++i)
-				{
-					ret ^= ptr[i];
-				}
-			}
-			else
-			{
-				auto ptr = reinterpret_cast<const size_t*>(&p);
-				for (size_t i = 0; i < sizeof(PathHash<LmState>) / sizeof(size_t); ++i)
-				{
-					ret ^= ptr[i];
-				}
-			}
-			return ret;
-		}
-	};
-
-	struct WordLLGreater
-	{
-		template<class LmState>
-		bool operator()(const WordLL<LmState>& a, const WordLL<LmState>& b) const
-		{
-			return a.accScore > b.accScore;
-		}
-	};
-
-	template<class LmState>
-	inline std::ostream& printDebugPath(std::ostream& os, const WordLL<LmState>& src)
-	{
-		if (src.parent)
-		{
-			printDebugPath(os, *src.parent);
-		}
-		
-		if (src.morpheme) src.morpheme->print(os);
-		else os << "NULL";
-		os << " , ";
-		return os;
-	}
-
 	inline bool hasLeftBoundary(const KGraphNode* node)
 	{
 		// 시작 지점은 항상 왼쪽 경계로 처리
@@ -464,411 +180,672 @@ namespace kiwi
 			|| m == Kiwi::SpecialMorph::doubleQuoteOpen || m == Kiwi::SpecialMorph::doubleQuoteClose;
 	}
 
-	template<PathEvaluatingMode mode, class LmState>
-	class BestPathConatiner;
-
-	template<class LmState>
-	class BestPathConatiner<PathEvaluatingMode::topN, LmState>
-	{
-		// pair: [index, size]
-		UnorderedMap<PathHash<LmState>, pair<uint32_t, uint32_t>> bestPathIndex;
-		Vector<WordLL<LmState>> bestPathValues;
-	public:
-		inline void clear()
-		{
-			bestPathIndex.clear();
-			bestPathValues.clear();
-		}
-
-		inline void insert(const PathHash<LmState>& ph, size_t topN, uint8_t rootId, 
-			const Morpheme* morph, float accScore, float accTypoCost, const WordLL<LmState>* parent, LmState&& lmState, SpecialState spState)
-		{
-			auto inserted = bestPathIndex.emplace(ph, make_pair((uint32_t)bestPathValues.size(), 1));
-			if (inserted.second)
-			{
-				bestPathValues.emplace_back(morph, accScore, accTypoCost, parent, move(lmState), spState);
-				if (rootId != commonRootId) bestPathValues.back().rootId = rootId;
-				bestPathValues.resize(bestPathValues.size() + topN - 1);
-			}
-			else
-			{
-				auto bestPathFirst = bestPathValues.begin() + inserted.first->second.first;
-				auto bestPathLast = bestPathValues.begin() + inserted.first->second.first + inserted.first->second.second;
-				if (distance(bestPathFirst, bestPathLast) < topN)
-				{
-					*bestPathLast = WordLL<LmState>{ morph, accScore, accTypoCost, parent, move(lmState), spState };
-					if (rootId != commonRootId) bestPathLast->rootId = rootId;
-					push_heap(bestPathFirst, bestPathLast + 1, WordLLGreater{});
-					++inserted.first->second.second;
-				}
-				else
-				{
-					if (accScore > bestPathFirst->accScore)
-					{
-						pop_heap(bestPathFirst, bestPathLast, WordLLGreater{});
-						*(bestPathLast - 1) = WordLL<LmState>{ morph, accScore, accTypoCost, parent, move(lmState), spState };
-						if (rootId != commonRootId) (*(bestPathLast - 1)).rootId = rootId;
-						push_heap(bestPathFirst, bestPathLast, WordLLGreater{});
-					}
-				}
-			}
-		}
-
-		inline void writeTo(Vector<WordLL<LmState>>& resultOut, const Morpheme* curMorph, Wid lastSeqId, size_t ownFormId)
-		{
-			for (auto& p : bestPathIndex)
-			{
-				const auto index = p.second.first;
-				const auto size = p.second.second;
-				for (size_t i = 0; i < size; ++i)
-				{
-					resultOut.emplace_back(move(bestPathValues[index + i]));
-					auto& newPath = resultOut.back();
-
-					// fill the rest information of resultOut
-					newPath.wid = lastSeqId;
-					if (curMorph->chunks.empty() || curMorph->complex || curMorph->saisiot)
-					{
-						newPath.combineSocket = curMorph->combineSocket;
-						newPath.ownFormId = ownFormId;
-					}
-				}
-			}
-		}
-	};
-
-	template<class LmState>
-	class BestPathConatiner<PathEvaluatingMode::top1, LmState>
-	{
-		UnorderedMap<PathHash<LmState>, WordLL<LmState>> bestPathes;
-	public:
-		inline void clear()
-		{
-			bestPathes.clear();
-		}
-
-		inline void insert(const PathHash<LmState>& ph, size_t topN, uint8_t rootId, 
-			const Morpheme* morph, float accScore, float accTypoCost, const WordLL<LmState>* parent, LmState&& lmState, SpecialState spState)
-		{
-			WordLL<LmState> newPath{ morph, accScore, accTypoCost, parent, move(lmState), spState };
-			if (rootId != commonRootId) newPath.rootId = rootId;
-			auto inserted = bestPathes.emplace(ph, newPath);
-			if (!inserted.second)
-			{
-				auto& target = inserted.first->second;
-				if (accScore > target.accScore)
-				{
-					target = newPath;
-				}
-			}
-		}
-
-		inline void writeTo(Vector<WordLL<LmState>>& resultOut, const Morpheme* curMorph, Wid lastSeqId, size_t ownFormId)
-		{
-			for (auto& p : bestPathes)
-			{
-				resultOut.emplace_back(move(p.second));
-				auto& newPath = resultOut.back();
-
-				// fill the rest information of resultOut
-				newPath.wid = lastSeqId;
-				if (curMorph->chunks.empty() || curMorph->complex || curMorph->saisiot)
-				{
-					newPath.combineSocket = curMorph->combineSocket;
-					newPath.ownFormId = ownFormId;
-				}
-			}
-		}
-	};
-
-	template<class LmState>
-	class BestPathConatiner<PathEvaluatingMode::top1Small, LmState>
-	{
-		Vector<PathHash<LmState>> bestPathIndicesSmall;
-		Vector<WordLL<LmState>> bestPathValuesSmall;
-	public:
-
-		inline void clear()
-		{
-			bestPathIndicesSmall.clear();
-			bestPathValuesSmall.clear();
-		}
-
-		inline void insert(const PathHash<LmState>& ph, size_t topN, uint8_t rootId, 
-			const Morpheme* morph, float accScore, float accTypoCost, const WordLL<LmState>* parent, LmState&& lmState, SpecialState spState)
-		{
-			const auto it = find(bestPathIndicesSmall.begin(), bestPathIndicesSmall.end(), ph);
-			if (it == bestPathIndicesSmall.end())
-			{
-				bestPathIndicesSmall.push_back(ph);
-				bestPathValuesSmall.emplace_back(morph, accScore, accTypoCost, parent, move(lmState), spState);
-				if (rootId != commonRootId) bestPathValuesSmall.back().rootId = rootId;
-			}
-			else
-			{
-				auto& target = bestPathValuesSmall[it - bestPathIndicesSmall.begin()];
-				if (accScore > target.accScore)
-				{
-					target = WordLL<LmState>{ morph, accScore, accTypoCost, parent, move(lmState), spState };
-					if (rootId != commonRootId) target.rootId = rootId;
-				}
-			}
-		}
-
-		inline void writeTo(Vector<WordLL<LmState>>& resultOut, const Morpheme* curMorph, Wid lastSeqId, size_t ownFormId)
-		{
-			for (auto& p : bestPathValuesSmall)
-			{
-				resultOut.emplace_back(move(p));
-				auto& newPath = resultOut.back();
-
-				// fill the rest information of resultOut
-				newPath.wid = lastSeqId;
-				if (curMorph->chunks.empty() || curMorph->complex || curMorph->saisiot)
-				{
-					newPath.combineSocket = curMorph->combineSocket;
-					newPath.ownFormId = ownFormId;
-				}
-			}
-		}
-	};
 
 	template<PathEvaluatingMode mode, class LmState>
-	void PathEvaluator::evalSingleMorpheme(
-		Vector<WordLL<LmState>>& resultOut,
-		const Kiwi* kw,
-		const Vector<U16StringView>& ownForms,
-		const Vector<Vector<WordLL<LmState>>>& cache,
-		size_t ownFormId,
-		const Morpheme* curMorph,
-		const KGraphNode* node,
-		const KGraphNode* startNode,
+	inline void insertToPathContainer(
+		BestPathConatiner<mode, LmState>& bestPathCont,
 		const size_t topN,
-		const float ignoreCondScore,
-		const float nodeLevelDiscount,
-		const Vector<SpecialState>& prevSpStates
+		const Vector<SpecialState>& prevSpStates,
+		const Morpheme* curMorph,
+		const Morpheme* morphBase,
+		LmState&& state,
+		const float score,
+		const KGraphNode* node,
+		const WordLL<LmState>& prevPath,
+		const RuleBasedScorer& ruleBasedScorer
 	)
 	{
-		thread_local BestPathConatiner<mode, LmState> bestPathCont;
-		thread_local Vector<uint8_t> rootIds;
-
-		const LangModel& langMdl = kw->langMdl;
-		const Morpheme* morphBase = kw->morphemes.data();
-		const auto spacePenalty = kw->spacePenalty;
-		const bool allowedSpaceBetweenChunk = kw->spaceTolerance > 0;
-
-		const size_t langVocabSize = langMdl.knlm->getHeader().vocab_size;
-
-		const Morpheme* lastMorph;
-		Wid firstWid;
-		if (curMorph->chunks.empty() || curMorph->complex || curMorph->saisiot)
+		const auto insert = [&](uint8_t rootId)
 		{
-			lastMorph = curMorph->getCombined() ? curMorph->getCombined() : curMorph;
-			firstWid = curMorph->lmMorphemeId;
-		}
-		// if the morpheme has chunk set
-		else
-		{
-			lastMorph = curMorph->chunks[curMorph->chunks.size() - 1];
-			firstWid = curMorph->chunks[0]->lmMorphemeId;
-		}
-
-		Wid lastSeqId;
-		if (within(lastMorph, kw->morphemes.data() + langVocabSize, kw->morphemes.data() + kw->morphemes.size()))
-		{
-			lastSeqId = lastMorph - kw->morphemes.data();
-		}
-		else
-		{
-			lastSeqId = lastMorph->lmMorphemeId;
-		}
-
-
-		bestPathCont.clear();
-		const float additionalScore = curMorph->userScore + nodeLevelDiscount + kw->tagScorer.evalLeftBoundary(hasLeftBoundary(node), curMorph->tag);
-
-		RuleBasedScorer ruleBasedScorer{ kw, curMorph, node };
-
-		for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
-		{
-			for (auto& prevPath : cache[prev - startNode])
+			const auto* prevMorpheme = &morphBase[prevPath.wid];
+			auto spState = prevPath.spState;
+			if (rootId != commonRootId)
 			{
-				// 사이시옷 뒤에 명사가 아닌 태그가 오거나 공백이 있는 경우 제외
-				if (prevPath.morpheme->tag == POSTag::z_siot && (
-					!isNNClass(curMorph->tag) || prev->endPos < node->startPos
-					))
-				{
-					continue;
-				}
+				spState = prevSpStates[rootId];
+			}
+			const float candScoreWithRule = score + ruleBasedScorer(prevMorpheme, spState);
 
-				float candScore = prevPath.accScore + additionalScore;
-				if (prevPath.combineSocket)
+			// update special state
+			if (ruleBasedScorer.curMorphSpecialType == Kiwi::SpecialMorph::singleQuoteOpen) spState.singleQuote = 1;
+			else if (ruleBasedScorer.curMorphSpecialType == Kiwi::SpecialMorph::singleQuoteClose) spState.singleQuote = 0;
+			else if (ruleBasedScorer.curMorphSpecialType == Kiwi::SpecialMorph::doubleQuoteOpen) spState.doubleQuote = 1;
+			else if (ruleBasedScorer.curMorphSpecialType == Kiwi::SpecialMorph::doubleQuoteClose) spState.doubleQuote = 0;
+			if (ruleBasedScorer.curMorphSbType)
+			{
+				spState.bulletHash = hashSbTypeOrder(ruleBasedScorer.curMorphSbType, ruleBasedScorer.curMorphSbOrder + 1);
+			}
+
+			bestPathCont.insert(topN, prevPath.rootId, rootId, curMorph, candScoreWithRule, prevPath.accTypoCost + node->typoCost, &prevPath, move(state), spState);
+		};
+
+		if ((ruleBasedScorer.curMorphSbType || isQuote(ruleBasedScorer.curMorphSpecialType)) && prevPath.rootId == commonRootId)
+		{
+			for (uint8_t rootId = 0; rootId < prevSpStates.size(); ++rootId)
+			{
+				insert(rootId);
+			}
+		}
+		else
+		{
+			insert(commonRootId);
+		}
+	}
+
+	class FormEvaluator
+	{
+		const kchar_t* leftFormFirst;
+		const kchar_t* leftFormLast;
+		bool leftFormEndswithSSC;
+		POSTag prevTag;
+
+	public:
+		template<class LmState>
+		FormEvaluator(const WordLL<LmState>& prevPath, 
+			const Vector<U16StringView>& ownFormList, 
+			const Morpheme* morphBase
+		)
+		{
+			if (prevPath.ownFormId)
+			{
+				leftFormFirst = ownFormList[prevPath.ownFormId - 1].data();
+				leftFormLast = leftFormFirst + ownFormList[0].size();
+			}
+			else if (morphBase[prevPath.wid].kform && !morphBase[prevPath.wid].kform->empty())
+			{
+				leftFormFirst = morphBase[prevPath.wid].kform->data();
+				leftFormLast = leftFormFirst + morphBase[prevPath.wid].kform->size();
+			}
+			else
+			{
+				leftFormFirst = prevPath.morpheme->getForm().data();
+				leftFormLast = leftFormFirst + prevPath.morpheme->getForm().size();
+			}
+			leftFormEndswithSSC = leftFormFirst < leftFormLast && identifySpecialChr(leftFormLast[-1]) == POSTag::ssc;
+			prevTag = prevPath.morpheme->tag;
+		}
+
+		bool operator()(const Morpheme* curMorph, const float ignoreCondScore, float& candScore) const
+		{
+			const CondVowel cvowel = curMorph->vowel;
+			const CondPolarity cpolar = curMorph->polar;
+			if (prevTag == POSTag::ssc || leftFormEndswithSSC)
+			{
+				// 이전 형태소가 닫는 괄호인 경우 좌측 결합조건을 적용하지 않음
+			}
+			else if (ignoreCondScore)
+			{
+				candScore += FeatureTestor::isMatched(leftFormFirst, leftFormLast, cvowel, cpolar) ? 0 : ignoreCondScore;
+			}
+			else
+			{
+				if (!FeatureTestor::isMatched(leftFormFirst, leftFormLast, cvowel, cpolar)) return false;
+			}
+			return true;
+		}
+	};
+
+	template<class LmState>
+	struct LmEvalData
+	{
+		LmState state;
+		float score = 0;
+		uint32_t length = 0;
+	};
+
+	template<class LmState, class Enable = void>
+	struct PathEvaluator;
+
+	template<class LmState>
+	struct PathEvaluator<LmState, typename std::enable_if<!LmState::transposed>::type>
+	{
+		const Kiwi* kw;
+		const KGraphNode* startNode;
+		const size_t topN;
+		Vector<Vector<WordLL<LmState>>>& cache;
+		const Vector<U16StringView>& ownFormList;
+		const Vector<SpecialState>& prevSpStates;
+
+		PathEvaluator(const Kiwi* _kw, 
+			const KGraphNode* _startNode,  
+			size_t _topN, 
+			Vector<Vector<WordLL<LmState>>>& _cache, 
+			const Vector<U16StringView>& _ownFormList,
+			const Vector<SpecialState>& _prevSpStates
+		)
+			: kw{ _kw }, startNode{ _startNode }, topN{ _topN }, cache{ _cache }, ownFormList{ _ownFormList }, prevSpStates{ _prevSpStates }
+		{
+		}
+
+		template<class CandTy>
+		void operator()(
+			const size_t nodeIdx,
+			const size_t ownFormId,
+			CandTy&& cands,
+			bool unknownForm,
+			bool splitComplex = false,
+			bool splitSaisiot = false,
+			bool mergeSaisiot = false,
+			const std::unordered_set<const Morpheme*>* blocklist = nullptr
+			) const
+		{
+			const size_t langVocabSize = kw->langMdl->vocabSize();
+			auto* const node = startNode + nodeIdx;
+			auto& nCache = cache[nodeIdx];
+			Vector<WordLL<LmState>> refCache;
+
+			float whitespaceDiscount = 0;
+			if (node->uform.empty() && !node->form->form.empty() && node->spaceErrors)
+			{
+				whitespaceDiscount = -kw->spacePenalty * node->spaceErrors;
+			}
+			const float typoDiscount = -node->typoCost * kw->typoCostWeight;
+			float unknownFormDiscount = 0;
+			if (unknownForm)
+			{
+				size_t unknownLen = node->uform.empty() ? node->form->form.size() : node->uform.size();
+				unknownFormDiscount = -(unknownLen * kw->unkFormScoreScale + kw->unkFormScoreBias);
+			}
+
+			const float nodeLevelDiscount = whitespaceDiscount + typoDiscount + unknownFormDiscount;
+
+			size_t totalPrevPathes = 0;
+			for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
+			{
+				totalPrevPathes += cache[prev - startNode].size();
+			}
+
+			for (bool ignoreCond : {false, true})
+			{
+				for (auto& curMorph : cands)
 				{
-					// merge <v> <chunk> with only the same socket
-					if (prevPath.combineSocket != curMorph->combineSocket || (curMorph->chunks.empty() || curMorph->complex || curMorph->saisiot))
+					if (splitComplex && curMorph->hasComplex()) continue;
+					if (blocklist && curMorph->hasMorpheme(*blocklist)) continue;
+
+					// 덧붙은 받침(zCoda)을 위한 지름길
+					if (curMorph->tag == POSTag::z_coda)
+					{
+						for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
+						{
+							for (auto& p : cache[prev - startNode])
+							{
+								auto lastTag = kw->morphemes[p.wid].tag;
+								if (!isJClass(lastTag) && !isEClass(lastTag)) continue;
+								nCache.emplace_back(p);
+								auto& newPath = nCache.back();
+								newPath.accScore += curMorph->userScore * kw->typoCostWeight;
+								newPath.accTypoCost -= curMorph->userScore;
+								newPath.parent = &p;
+								newPath.morpheme = &kw->morphemes[curMorph->lmMorphemeId];
+								newPath.wid = curMorph->lmMorphemeId;
+							}
+						}
+						continue;
+					}
+					// 사이시옷(zSiot)을 위한 지름길
+					if (curMorph->tag == POSTag::z_siot)
+					{
+						if (!(splitSaisiot || mergeSaisiot))
+						{
+							continue;
+						}
+
+						for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
+						{
+							for (auto& p : cache[prev - startNode])
+							{
+								auto lastTag = kw->morphemes[p.wid].tag;
+								if (!isNNClass(lastTag)) continue;
+								nCache.emplace_back(p);
+								auto& newPath = nCache.back();
+								newPath.accScore += curMorph->userScore * kw->typoCostWeight;
+								newPath.accTypoCost -= curMorph->userScore;
+								newPath.parent = &p;
+								newPath.morpheme = &kw->morphemes[curMorph->lmMorphemeId];
+								newPath.wid = curMorph->lmMorphemeId;
+							}
+						}
+						continue;
+					}
+
+					// if the morpheme has chunk set
+					if (!curMorph->isSingle())
+					{
+						// '하다/하게/하지'가 '다/게/지'로 축약된 경우인데 앞에 공백이 있는 경우는 탐색후보에서 제외
+						if (node->prev && node[-(int)node->prev].endPos < node->startPos
+							&& curMorph->kform
+							&& curMorph->kform->size() == 1
+							&& ((*curMorph->kform)[0] == u'다' || (*curMorph->kform)[0] == u'게' || (*curMorph->kform)[0] == u'지')
+							&& curMorph->chunks[0]->kform
+							&& curMorph->chunks[0]->kform->size() == 1
+							&& (*curMorph->chunks[0]->kform)[0] == u'하')
+						{
+							continue;
+						}
+					}
+
+					if (topN > 1)
+					{
+						evalSingleMorpheme<PathEvaluatingMode::topN>(nCache, node, ownFormId,
+							curMorph, ignoreCond ? -10 : 0, nodeLevelDiscount);
+					}
+					else if (totalPrevPathes <= BestPathContainerTraits<PathEvaluatingMode::top1Small>::maxSize)
+					{
+						evalSingleMorpheme<PathEvaluatingMode::top1Small>(nCache, node, ownFormId,
+							curMorph, ignoreCond ? -10 : 0, nodeLevelDiscount);
+					}
+					else if (totalPrevPathes <= BestPathContainerTraits<PathEvaluatingMode::top1Medium>::maxSize)
+					{
+						evalSingleMorpheme<PathEvaluatingMode::top1Medium>(nCache, node, ownFormId,
+							curMorph, ignoreCond ? -10 : 0, nodeLevelDiscount);
+					}
+					else
+					{
+						evalSingleMorpheme<PathEvaluatingMode::top1>(nCache, node, ownFormId,
+							curMorph, ignoreCond ? -10 : 0, nodeLevelDiscount);
+					}
+
+				}
+				if (!nCache.empty()) break;
+			}
+
+			thread_local Vector<float> maxScores;
+			maxScores.clear();
+			maxScores.resize((1 + prevSpStates.size()) * topN, -INFINITY);
+
+			if (topN == 1)
+			{
+				for (auto& c : nCache)
+				{
+					if (c.morpheme->combineSocket) continue;
+					const auto rootId = c.rootId == commonRootId ? 0 : c.rootId + 1;
+					maxScores[rootId] = max(maxScores[rootId], c.accScore);
+				}
+			}
+			else
+			{
+				for (auto& c : nCache)
+				{
+					if (c.morpheme->combineSocket) continue;
+					const auto rootId = c.rootId == commonRootId ? 0 : c.rootId + 1;
+					if (c.accScore > maxScores[rootId * topN])
+					{
+						pop_heap(maxScores.begin() + rootId * topN, maxScores.begin() + (rootId + 1) * topN, greater<float>{});
+						maxScores[rootId * topN + topN - 1] = c.accScore;
+						push_heap(maxScores.begin() + rootId * topN, maxScores.begin() + (rootId + 1) * topN, greater<float>{});
+					}
+				}
+			}
+
+			size_t validCount = 0;
+			for (size_t i = 0; i < nCache.size(); ++i)
+			{
+				const auto rootId = nCache[i].rootId == commonRootId ? 0 : nCache[i].rootId + 1;
+				if (nCache[i].accScore + kw->cutOffThreshold < maxScores[rootId * topN]) continue;
+				if (validCount != i) nCache[validCount] = move(nCache[i]);
+				validCount++;
+			}
+			nCache.resize(validCount);
+		}
+
+		template<PathEvaluatingMode mode>
+		void evalSingleMorpheme(
+			Vector<WordLL<LmState>>& resultOut,
+			const KGraphNode* node,
+			const size_t ownFormId,
+			const Morpheme* curMorph,
+			const float ignoreCondScore,
+			const float nodeLevelDiscount
+		) const
+		{
+			thread_local BestPathConatiner<mode, LmState> bestPathCont;
+			
+			const auto* langMdl = kw->getLangModel();
+			const Morpheme* morphBase = kw->morphemes.data();
+			const auto spacePenalty = kw->spacePenalty;
+			const bool allowedSpaceBetweenChunk = kw->spaceTolerance > 0;
+
+			const size_t langVocabSize = langMdl->vocabSize();
+
+			const Morpheme* lastMorph;
+			Wid firstWid;
+			if (curMorph->isSingle())
+			{
+				lastMorph = curMorph->getCombined() ? curMorph->getCombined() : curMorph;
+				firstWid = curMorph->lmMorphemeId;
+			}
+			// if the morpheme has chunk set
+			else
+			{
+				lastMorph = curMorph->chunks[curMorph->chunks.size() - 1];
+				firstWid = curMorph->chunks[0]->lmMorphemeId;
+			}
+
+			Wid lastSeqId;
+			if (within(lastMorph, kw->morphemes.data() + langVocabSize, kw->morphemes.data() + kw->morphemes.size()))
+			{
+				lastSeqId = lastMorph - kw->morphemes.data();
+			}
+			else
+			{
+				lastSeqId = lastMorph->lmMorphemeId;
+			}
+
+
+			bestPathCont.clear();
+			const float additionalScore = curMorph->userScore + nodeLevelDiscount + kw->tagScorer.evalLeftBoundary(hasLeftBoundary(node), curMorph->tag);
+
+			RuleBasedScorer ruleBasedScorer{ kw, curMorph, node };
+
+			for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
+			{
+				for (auto& prevPath : cache[prev - startNode])
+				{
+					// 사이시옷 뒤에 명사가 아닌 태그가 오거나 공백이 있는 경우 제외
+					if (prevPath.morpheme->tag == POSTag::z_siot && (
+						!isNNClass(curMorph->tag) || prev->endPos < node->startPos
+						))
 					{
 						continue;
 					}
-					if (prev->endPos < node->startPos)
-					{
-						if (allowedSpaceBetweenChunk) candScore -= spacePenalty;
-						else continue;
-					}
-					firstWid = morphBase[prevPath.wid].getCombined()->lmMorphemeId;
-				}
 
-				const kchar_t* leftFormFirst, * leftFormLast;
-				if (prevPath.ownFormId)
-				{
-					leftFormFirst = ownForms[prevPath.ownFormId - 1].data();
-					leftFormLast = leftFormFirst + ownForms[0].size();
-				}
-				else if (morphBase[prevPath.wid].kform && !morphBase[prevPath.wid].kform->empty())
-				{
-					leftFormFirst = morphBase[prevPath.wid].kform->data();
-					leftFormLast = leftFormFirst + morphBase[prevPath.wid].kform->size();
-				}
-				else
-				{
-					leftFormFirst = prevPath.morpheme->getForm().data();
-					leftFormLast = leftFormFirst + prevPath.morpheme->getForm().size();
-				}
-
-				const CondVowel cvowel = curMorph->vowel;
-				const CondPolarity cpolar = curMorph->polar;
-				const bool leftFormEndswithSSC = leftFormFirst < leftFormLast && identifySpecialChr(leftFormLast[-1]) == POSTag::ssc;
-				if (prevPath.morpheme->tag == POSTag::ssc || leftFormEndswithSSC)
-				{
-					// 이전 형태소가 닫는 괄호인 경우 좌측 결합조건을 적용하지 않음
-				}
-				else if (ignoreCondScore)
-				{
-					candScore += FeatureTestor::isMatched(leftFormFirst, leftFormLast, cvowel, cpolar) ? 0 : ignoreCondScore;
-				}
-				else
-				{
-					if (!FeatureTestor::isMatched(leftFormFirst, leftFormLast, cvowel, cpolar)) continue;
-				}
-
-				auto cLmState = prevPath.lmState;
-				if (curMorph->combineSocket && (curMorph->chunks.empty() || curMorph->complex || curMorph->saisiot))
-				{
-					// no-op
-				}
-				else
-				{
-					if (morphBase[firstWid].tag == POSTag::p)
+					float candScore = prevPath.accScore + additionalScore;
+					if (prevPath.combineSocket)
 					{
-						// prohibit <v> without <chunk>
-						goto continueFor;
-					}
-					float ll = cLmState.next(langMdl, firstWid);
-					candScore += ll;
-					if (!(curMorph->chunks.empty() || curMorph->complex || curMorph->saisiot))
-					{
-						for (size_t i = 1; i < curMorph->chunks.size(); ++i)
+						// merge <v> <chunk> with only the same socket
+						if (prevPath.combineSocket != curMorph->combineSocket || curMorph->isSingle())
 						{
-							const auto wid = curMorph->chunks[i]->lmMorphemeId;
-							if (morphBase[wid].tag == POSTag::p)
+							continue;
+						}
+						if (prev->endPos < node->startPos)
+						{
+							if (allowedSpaceBetweenChunk) candScore -= spacePenalty;
+							else continue;
+						}
+						firstWid = morphBase[prevPath.wid].getCombined()->lmMorphemeId;
+					}
+
+					FormEvaluator formEvaluator{ prevPath, ownFormList, morphBase };
+					if (!formEvaluator(curMorph, ignoreCondScore, candScore)) continue;
+
+					auto cLmState = prevPath.lmState;
+					if (curMorph->combineSocket && curMorph->isSingle())
+					{
+						// no-op
+					}
+					else
+					{
+						if (morphBase[firstWid].tag == POSTag::p)
+						{
+							// prohibit <v> without <chunk>
+							goto continueFor;
+						}
+						float ll = cLmState.next(langMdl, firstWid);
+						candScore += ll;
+						if (!curMorph->isSingle())
+						{
+							for (size_t i = 1; i < curMorph->chunks.size(); ++i)
 							{
-								// prohibit <v> without <chunk>
-								goto continueFor;
+								const auto wid = curMorph->chunks[i]->lmMorphemeId;
+								if (morphBase[wid].tag == POSTag::p)
+								{
+									// prohibit <v> without <chunk>
+									goto continueFor;
+								}
+								ll = cLmState.next(langMdl, wid);
+								candScore += ll;
 							}
-							ll = cLmState.next(langMdl, wid);
-							candScore += ll;
 						}
 					}
+
+					insertToPathContainer(bestPathCont, topN, prevSpStates, curMorph, morphBase, move(cLmState), candScore, node, prevPath, ruleBasedScorer);
+				continueFor:;
+				}
+			}
+
+			bestPathCont.writeTo(resultOut, curMorph, lastSeqId, ownFormId);
+		}
+	};
+
+	template<class LmState>
+	struct MorphemeEvaluator
+	{
+		template<PathEvaluatingMode mode>
+		void eval(
+			Vector<WordLL<LmState>>& resultOut,
+			const Kiwi* kw,
+			const Vector<U16StringView>& ownForms,
+			const Vector<Vector<WordLL<LmState>>>& cache,
+			size_t ownFormId,
+			const Vector<const Morpheme*>& morphs,
+			const KGraphNode* node,
+			const KGraphNode* startNode,
+			const size_t topN,
+			const size_t totalPrevPathes,
+			const float ignoreCondScore,
+			const float nodeLevelDiscount,
+			const Vector<SpecialState>& prevSpStates
+		) const
+		{
+			thread_local BestPathConatiner<mode, LmState> bestPathCont;
+			thread_local Vector<LmEvalData<LmState>> evalMatrix;
+			thread_local Vector<Wid> nextWids;
+
+			const auto* langMdl = kw->getLangModel();
+			const Morpheme* morphBase = kw->morphemes.data();
+			const auto spacePenalty = kw->spacePenalty;
+			const bool allowedSpaceBetweenChunk = kw->spaceTolerance > 0;
+			const size_t langVocabSize = langMdl->vocabSize();
+
+			evalMatrix.resize(totalPrevPathes * morphs.size());
+			nextWids.clear();
+
+			size_t prevId = -1;
+			size_t length;
+			for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
+			{
+				for (auto& prevPath : cache[prev - startNode])
+				{
+					++prevId;
+					FormEvaluator formEvaluator{ prevPath, ownForms, morphBase };
+					for (size_t curId = 0; curId < morphs.size(); ++curId)
+					{
+						const auto curMorph = morphs[curId];
+						float candScore = prevPath.accScore + curMorph->userScore + nodeLevelDiscount;
+						Wid firstWid;
+						if (curMorph->isSingle())
+						{
+							firstWid = curMorph->lmMorphemeId;
+						}
+						else
+						{
+							firstWid = curMorph->chunks[0]->lmMorphemeId;
+						}
+
+						if (prevPath.combineSocket)
+						{
+							// merge <v> <chunk> with only the same socket
+							if (prevPath.combineSocket != curMorph->combineSocket || curMorph->isSingle())
+							{
+								goto invalidCandidate;
+							}
+							if (prev->endPos < node->startPos)
+							{
+								if (allowedSpaceBetweenChunk) candScore -= spacePenalty;
+								else goto invalidCandidate;
+							}
+							firstWid = morphBase[prevPath.wid].getCombined()->lmMorphemeId;
+						}
+
+						if (!formEvaluator(curMorph, ignoreCondScore, candScore)) continue;
+
+						length = 0;
+						if (curMorph->combineSocket && curMorph->isSingle())
+						{
+							// no op
+						}
+						else
+						{
+							if (morphBase[firstWid].tag == POSTag::p)
+							{
+								goto invalidCandidate;
+							}
+
+							if (curMorph->isSingle())
+							{
+								length = 1;
+							}
+							else
+							{
+								length = curMorph->chunks.size();
+								for (size_t i = 1; i < length; ++i)
+								{
+									const Wid wid = curMorph->chunks[i]->lmMorphemeId;
+									if (morphBase[wid].tag == POSTag::p)
+									{
+										goto invalidCandidate;
+									}
+								}
+							}
+						}
+						evalMatrix[prevId * morphs.size() + curId].state = prevPath.lmState;
+						evalMatrix[prevId * morphs.size() + curId].score = candScore;
+						evalMatrix[prevId * morphs.size() + curId].length = length;
+						if (length > 0) nextWids.emplace_back(firstWid);
+						if (length > 1)
+						{
+							for (size_t i = 1; i < length; ++i)
+							{
+								nextWids.emplace_back(curMorph->chunks[i]->lmMorphemeId);
+							}
+						}
+						continue;
+					invalidCandidate:
+						evalMatrix[prevId * morphs.size() + curId].score = -INFINITY;
+						evalMatrix[prevId * morphs.size() + curId].length = 0;
+					}
+				}
+			}
+
+			{
+				size_t widOffset = 0;
+				for (auto& e : evalMatrix)
+				{
+					//if (e.length == 0) continue;
+					float score = 0;
+					for (size_t i = 0; i < e.length; ++i)
+					{
+						score += e.state.next(langMdl, nextWids[widOffset + i]);
+					}
+					e.score += score;
+					widOffset += e.length;
+				}
+			}
+
+			for (size_t curId = 0; curId < morphs.size(); ++curId)
+			{
+				const auto curMorph = morphs[curId];
+				bestPathCont.clear();
+
+				const Morpheme* lastMorph;
+				if (curMorph->isSingle())
+				{
+					lastMorph = curMorph->getCombined() ? curMorph->getCombined() : curMorph;
+				}
+				// if the morpheme has chunk set
+				else
+				{
+					lastMorph = curMorph->chunks[curMorph->chunks.size() - 1];
 				}
 
-				if ((ruleBasedScorer.curMorphSbType || isQuote(ruleBasedScorer.curMorphSpecialType)) && prevPath.rootId == commonRootId)
+				Wid lastSeqId;
+				if (within(lastMorph, kw->morphemes.data() + langVocabSize, kw->morphemes.data() + kw->morphemes.size()))
 				{
-					rootIds.resize(prevSpStates.size());
-					iota(rootIds.begin(), rootIds.end(), 0);
+					lastSeqId = lastMorph - kw->morphemes.data();
 				}
 				else
 				{
-					rootIds.resize(1);
-					rootIds[0] = commonRootId;
+					lastSeqId = lastMorph->lmMorphemeId;
 				}
 
-				for (auto rootId : rootIds)
+				RuleBasedScorer ruleBasedScorer{ kw, curMorph, node };
+				const float morphScore = kw->tagScorer.evalLeftBoundary(hasLeftBoundary(node), curMorph->tag);
+				size_t prevId = -1;
+				for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
 				{
-					const auto* prevMorpheme = &morphBase[prevPath.wid];
-					auto spState = prevPath.spState;
-					if (rootId != commonRootId)
+					for (auto& prevPath : cache[prev - startNode])
 					{
-						spState = prevSpStates[rootId];
-					}
-					const float candScoreWithRule = candScore + ruleBasedScorer(prevMorpheme, spState);
+						++prevId;
+						auto& em = evalMatrix[prevId * morphs.size() + curId];
+						if (em.score < -99999)
+						{
+							continue;
+						}
 
-					// update special state
-					if (ruleBasedScorer.curMorphSpecialType == Kiwi::SpecialMorph::singleQuoteOpen) spState.singleQuote = 1;
-					else if (ruleBasedScorer.curMorphSpecialType == Kiwi::SpecialMorph::singleQuoteClose) spState.singleQuote = 0;
-					else if (ruleBasedScorer.curMorphSpecialType == Kiwi::SpecialMorph::doubleQuoteOpen) spState.doubleQuote = 1;
-					else if (ruleBasedScorer.curMorphSpecialType == Kiwi::SpecialMorph::doubleQuoteClose) spState.doubleQuote = 0;
-					if (ruleBasedScorer.curMorphSbType)
-					{
-						spState.bulletHash = hashSbTypeOrder(ruleBasedScorer.curMorphSbType, ruleBasedScorer.curMorphSbOrder + 1);
+						insertToPathContainer(bestPathCont, topN, prevSpStates, curMorph, morphBase, move(em.state), em.score, node, prevPath, ruleBasedScorer);
 					}
-
-					PathHash<LmState> ph{ cLmState, prevPath.rootId, spState };
-					bestPathCont.insert(ph, topN, rootId, curMorph, candScoreWithRule, prevPath.accTypoCost + node->typoCost, &prevPath, move(cLmState), spState);
 				}
 
-			continueFor:;
+				bestPathCont.writeTo(resultOut, curMorph, lastSeqId, ownFormId);
 			}
 		}
+	};
 
-		bestPathCont.writeTo(resultOut, curMorph, lastSeqId, ownFormId);
-		return;
-	}
-
-	template<class LmState, class CandTy>
-	void PathEvaluator::evalPath(const Kiwi* kw,
-		const KGraphNode* startNode,
-		const KGraphNode* node,
-		const size_t topN,
-		Vector<Vector<WordLL<LmState>>>& cache,
-		const Vector<U16StringView>& ownFormList,
-		size_t i,
-		size_t ownFormId,
-		CandTy&& cands,
-		bool unknownForm,
-		const Vector<SpecialState>& prevSpStates,
-		bool splitComplex,
-		bool splitSaisiot,
-		bool mergeSaisiot,
-		const std::unordered_set<const Morpheme*>* blocklist
-	)
+	template<class LmState>
+	struct PathEvaluator<LmState, typename enable_if<LmState::transposed>::type>
 	{
-		const size_t langVocabSize = kw->langMdl.knlm->getHeader().vocab_size;
-		auto& nCache = cache[i];
-		Vector<WordLL<LmState>> refCache;
+		const Kiwi* kw;
+		const KGraphNode* startNode;
+		const size_t topN;
+		Vector<Vector<WordLL<LmState>>>& cache;
+		const Vector<U16StringView>& ownFormList;
+		const Vector<SpecialState>& prevSpStates;
 
-		float whitespaceDiscount = 0;
-		if (node->uform.empty() && !node->form->form.empty() && node->spaceErrors)
+		PathEvaluator(const Kiwi* _kw,
+			const KGraphNode* _startNode,
+			size_t _topN,
+			Vector<Vector<WordLL<LmState>>>& _cache,
+			const Vector<U16StringView>& _ownFormList,
+			const Vector<SpecialState>& _prevSpStates
+		)
+			: kw{ _kw }, startNode{ _startNode }, topN{ _topN }, cache{ _cache }, ownFormList{ _ownFormList }, prevSpStates{ _prevSpStates }
 		{
-			whitespaceDiscount = -kw->spacePenalty * node->spaceErrors;
 		}
-		const float typoDiscount = -node->typoCost * kw->typoCostWeight;
-		float unknownFormDiscount = 0;
-		if (unknownForm)
-		{
-			size_t unknownLen = node->uform.empty() ? node->form->form.size() : node->uform.size();
-			unknownFormDiscount = -(unknownLen * kw->unkFormScoreScale + kw->unkFormScoreBias);
-		}
 
-		const float nodeLevelDiscount = whitespaceDiscount + typoDiscount + unknownFormDiscount;
-
-		size_t totalPrevPathes = 0;
-		for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
+		template<class CandTy>
+		void operator()(
+			const size_t nodeIdx,
+			const size_t ownFormId,
+			CandTy&& cands,
+			bool unknownForm,
+			bool splitComplex = false,
+			bool splitSaisiot = false,
+			bool mergeSaisiot = false,
+			const std::unordered_set<const Morpheme*>* blocklist = nullptr
+			) const
 		{
-			totalPrevPathes += cache[prev - startNode].size();
-		}
-		const bool useContainerForSmall = totalPrevPathes <= 48;
+			thread_local Vector<float> maxScores;
+			thread_local Vector<const Morpheme*> validMorphCands;
+			const size_t langVocabSize = kw->langMdl->vocabSize();
+			auto* const node = startNode + nodeIdx;
+			auto& nCache = cache[nodeIdx];
 
-		for (bool ignoreCond : {false, true})
-		{
+			float whitespaceDiscount = 0;
+			if (node->uform.empty() && !node->form->form.empty() && node->spaceErrors)
+			{
+				whitespaceDiscount = -kw->spacePenalty * node->spaceErrors;
+			}
+			const float typoDiscount = -node->typoCost * kw->typoCostWeight;
+			float unknownFormDiscount = 0;
+			if (unknownForm)
+			{
+				size_t unknownLen = node->uform.empty() ? node->form->form.size() : node->uform.size();
+				unknownFormDiscount = -(unknownLen * kw->unkFormScoreScale + kw->unkFormScoreBias);
+			}
+
+			const float nodeLevelDiscount = whitespaceDiscount + typoDiscount + unknownFormDiscount;
+			const Morpheme* zCodaMorph = nullptr;
+			const Morpheme* zSiotMorph = nullptr;
+			validMorphCands.clear();
 			for (auto& curMorph : cands)
 			{
 				if (splitComplex && curMorph->hasComplex()) continue;
@@ -877,51 +854,16 @@ namespace kiwi
 				// 덧붙은 받침(zCoda)을 위한 지름길
 				if (curMorph->tag == POSTag::z_coda)
 				{
-					for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
-					{
-						for (auto& p : cache[prev - startNode])
-						{
-							auto lastTag = kw->morphemes[p.wid].tag;
-							if (!isJClass(lastTag) && !isEClass(lastTag)) continue;
-							nCache.emplace_back(p);
-							auto& newPath = nCache.back();
-							newPath.accScore += curMorph->userScore * kw->typoCostWeight;
-							newPath.accTypoCost -= curMorph->userScore;
-							newPath.parent = &p;
-							newPath.morpheme = &kw->morphemes[curMorph->lmMorphemeId];
-							newPath.wid = curMorph->lmMorphemeId;
-						}
-					}
+					zCodaMorph = curMorph;
 					continue;
 				}
-				// 사이시옷(zSiot)을 위한 지름길
-				if (curMorph->tag == POSTag::z_siot)
+				else if (curMorph->tag == POSTag::z_siot)
 				{
-					if (!(splitSaisiot || mergeSaisiot))
-					{
-						continue;
-					}
-
-					for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
-					{
-						for (auto& p : cache[prev - startNode])
-						{
-							auto lastTag = kw->morphemes[p.wid].tag;
-							if (!isNNClass(lastTag)) continue;
-							nCache.emplace_back(p);
-							auto& newPath = nCache.back();
-							newPath.accScore += curMorph->userScore * kw->typoCostWeight;
-							newPath.accTypoCost -= curMorph->userScore;
-							newPath.parent = &p;
-							newPath.morpheme = &kw->morphemes[curMorph->lmMorphemeId];
-							newPath.wid = curMorph->lmMorphemeId;
-						}
-					}
+					zSiotMorph = curMorph;
 					continue;
 				}
 
-				// if the morpheme has chunk set
-				if (!(curMorph->chunks.empty() || curMorph->complex || curMorph->saisiot))
+				if (!curMorph->isSingle())
 				{
 					// '하다/하게/하지'가 '다/게/지'로 축약된 경우인데 앞에 공백이 있는 경우는 탐색후보에서 제외
 					if (node->prev && node[-(int)node->prev].endPos < node->startPos
@@ -935,72 +877,131 @@ namespace kiwi
 						continue;
 					}
 				}
+				validMorphCands.emplace_back(curMorph);
+			}
 
+			for (bool ignoreCond : {false, true})
+			{
+				// 덧붙은 받침(zCoda)을 위한 지름길
+				if (zCodaMorph)
+				{
+					for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
+					{
+						for (auto& p : cache[prev - startNode])
+						{
+							auto lastTag = kw->morphemes[p.wid].tag;
+							if (!isJClass(lastTag) && !isEClass(lastTag)) continue;
+							nCache.emplace_back(p);
+							auto& newPath = nCache.back();
+							newPath.accScore += zCodaMorph->userScore * kw->typoCostWeight;
+							newPath.accTypoCost -= zCodaMorph->userScore;
+							newPath.parent = &p;
+							newPath.morpheme = &kw->morphemes[zCodaMorph->lmMorphemeId];
+							newPath.wid = zCodaMorph->lmMorphemeId;
+						}
+					}
+					continue;
+				}
+				// 사이시옷(zSiot)을 위한 지름길
+				if (zSiotMorph)
+				{
+					if (!(splitSaisiot || mergeSaisiot))
+					{
+						continue;
+					}
+					for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
+					{
+						for (auto& p : cache[prev - startNode])
+						{
+							auto lastTag = kw->morphemes[p.wid].tag;
+							if (!isNNClass(lastTag)) continue;
+							nCache.emplace_back(p);
+							auto& newPath = nCache.back();
+							newPath.accScore += zSiotMorph->userScore * kw->typoCostWeight;
+							newPath.accTypoCost -= zSiotMorph->userScore;
+							newPath.parent = &p;
+							newPath.morpheme = &kw->morphemes[zSiotMorph->lmMorphemeId];
+							newPath.wid = zSiotMorph->lmMorphemeId;
+						}
+					}
+					continue;
+				}
+
+				size_t totalPrevPathes = 0;
+				for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
+				{
+					totalPrevPathes += cache[prev - startNode].size();
+				}
+
+				MorphemeEvaluator<LmState> me;
 				if (topN > 1)
 				{
-					evalSingleMorpheme<PathEvaluatingMode::topN>(nCache, kw, ownFormList, cache, 
-						ownFormId, curMorph, 
-						node, startNode, topN, ignoreCond ? -10 : 0, nodeLevelDiscount, prevSpStates);
+					me.template eval<PathEvaluatingMode::topN>(nCache, kw, ownFormList, cache,
+						ownFormId, validMorphCands,
+						node, startNode, topN, totalPrevPathes, ignoreCond ? -10 : 0, nodeLevelDiscount, prevSpStates);
 				}
-				else if (useContainerForSmall)
+				else if (totalPrevPathes <= BestPathContainerTraits<PathEvaluatingMode::top1Small>::maxSize)
 				{
-					evalSingleMorpheme<PathEvaluatingMode::top1Small>(nCache, kw, ownFormList, cache, 
-						ownFormId, curMorph, 
-						node, startNode, topN, ignoreCond ? -10 : 0, nodeLevelDiscount, prevSpStates);
+					me.template eval<PathEvaluatingMode::top1Small>(nCache, kw, ownFormList, cache,
+						ownFormId, validMorphCands,
+						node, startNode, topN, totalPrevPathes, ignoreCond ? -10 : 0, nodeLevelDiscount, prevSpStates);
+				}
+				else if (totalPrevPathes <= BestPathContainerTraits<PathEvaluatingMode::top1Medium>::maxSize)
+				{
+					me.template eval<PathEvaluatingMode::top1Medium>(nCache, kw, ownFormList, cache,
+						ownFormId, validMorphCands,
+						node, startNode, topN, totalPrevPathes, ignoreCond ? -10 : 0, nodeLevelDiscount, prevSpStates);
 				}
 				else
 				{
-					evalSingleMorpheme<PathEvaluatingMode::top1>(nCache, kw, ownFormList, cache,
-						ownFormId, curMorph,
-						node, startNode, topN, ignoreCond ? -10 : 0, nodeLevelDiscount, prevSpStates);
+					me.template eval<PathEvaluatingMode::top1>(nCache, kw, ownFormList, cache,
+						ownFormId, validMorphCands,
+						node, startNode, topN, totalPrevPathes, ignoreCond ? -10 : 0, nodeLevelDiscount, prevSpStates);
 				}
-				
+				if (!nCache.empty()) break;
 			}
-			if (!nCache.empty()) break;
-		}
 
-		thread_local Vector<float> maxScores;
-		maxScores.clear();
-		maxScores.resize((1 + prevSpStates.size()) * topN, -INFINITY);
+			maxScores.clear();
+			maxScores.resize((1 + prevSpStates.size()) * topN, -INFINITY);
 
-		if (topN == 1)
-		{
-			for (auto& c : nCache)
+			if (topN == 1)
 			{
-				if (c.morpheme->combineSocket) continue;
-				const auto rootId = c.rootId == commonRootId ? 0 : c.rootId + 1;
-				maxScores[rootId] = max(maxScores[rootId], c.accScore);
-			}
-		}
-		else
-		{
-			for (auto& c : nCache)
-			{
-				if (c.morpheme->combineSocket) continue;
-				const auto rootId = c.rootId == commonRootId ? 0 : c.rootId + 1;
-				if (c.accScore > maxScores[rootId * topN])
+				for (auto& c : nCache)
 				{
-					pop_heap(maxScores.begin() + rootId * topN, maxScores.begin() + (rootId + 1) * topN, greater<float>{});
-					maxScores[rootId * topN + topN - 1] = c.accScore;
-					push_heap(maxScores.begin() + rootId * topN, maxScores.begin() + (rootId + 1) * topN, greater<float>{});
+					if (c.morpheme->combineSocket) continue;
+					const auto rootId = c.rootId == commonRootId ? 0 : c.rootId + 1;
+					maxScores[rootId] = max(maxScores[rootId], c.accScore);
 				}
 			}
-		}
+			else
+			{
+				for (auto& c : nCache)
+				{
+					if (c.morpheme->combineSocket) continue;
+					const auto rootId = c.rootId == commonRootId ? 0 : c.rootId + 1;
+					if (c.accScore > maxScores[rootId * topN])
+					{
+						pop_heap(maxScores.begin() + rootId * topN, maxScores.begin() + (rootId + 1) * topN, greater<float>{});
+						maxScores[rootId * topN + topN - 1] = c.accScore;
+						push_heap(maxScores.begin() + rootId * topN, maxScores.begin() + (rootId + 1) * topN, greater<float>{});
+					}
+				}
+			}
 
-		size_t validCount = 0;
-		for (size_t i = 0; i < nCache.size(); ++i)
-		{
-			const auto rootId = nCache[i].rootId == commonRootId ? 0 : nCache[i].rootId + 1;
-			if (nCache[i].accScore + kw->cutOffThreshold < maxScores[rootId * topN]) continue;
-			if (validCount != i) nCache[validCount] = move(nCache[i]);
-			validCount++;
+			size_t validCount = 0;
+			for (size_t i = 0; i < nCache.size(); ++i)
+			{
+				const auto rootId = nCache[i].rootId == commonRootId ? 0 : nCache[i].rootId + 1;
+				if (nCache[i].accScore + kw->cutOffThreshold < maxScores[rootId * topN]) continue;
+				if (validCount != i) nCache[validCount] = move(nCache[i]);
+				validCount++;
+			}
+			nCache.resize(validCount);
 		}
-		nCache.resize(validCount);
-	}
-
+	};
 
 	template<class LmState>
-	inline PathEvaluator::Path generateTokenList(const WordLL<LmState>* result,
+	inline Path generateTokenList(const WordLL<LmState>* result,
 		const utils::ContainerSearcher<WordLL<LmState>>& csearcher,
 		const KGraphNode* graph,
 		const Vector<U16StringView>& ownFormList,
@@ -1021,7 +1022,7 @@ namespace kiwi
 			return morphFirst + morph->lmMorphemeId;
 		};
 
-		PathEvaluator::Path ret;
+		Path ret;
 		const WordLL<LmState>* prev = steps.back()->parent;
 		for (auto it = steps.rbegin(); it != steps.rend(); ++it)
 		{
@@ -1113,8 +1114,8 @@ namespace kiwi
 		return ret;
 	}
 
-	template<class LmState>
-	Vector<PathEvaluator::ChunkResult> PathEvaluator::findBestPath(const Kiwi* kw,
+	template<class LangModel>
+	Vector<PathResult> BestPathFinder<LangModel>::findBestPath(const Kiwi* kw,
 		const Vector<SpecialState>& prevSpStates,
 		const KGraphNode* graph,
 		const size_t graphSize,
@@ -1127,12 +1128,14 @@ namespace kiwi
 	)
 	{
 		static constexpr size_t eosId = 1;
+		using LmState = typename LangModel::LmStateType;
+		const auto* langMdl = kw->getLangModel();
 
 		Vector<Vector<WordLL<LmState>>> cache(graphSize);
 		Vector<U16StringView> ownFormList;
 		Vector<const Morpheme*> unknownNodeCands, unknownNodeLCands;
 
-		const size_t langVocabSize = kw->langMdl.knlm->getHeader().vocab_size;
+		const size_t langVocabSize = langMdl->vocabSize();
 
 		const KGraphNode* startNode = graph;
 		const KGraphNode* endNode = graph + graphSize - 1;
@@ -1150,7 +1153,7 @@ namespace kiwi
 		}
 
 		// start node
-		cache[0].emplace_back(&kw->morphemes[0], 0.f, 0.f, nullptr, LmState{ kw->langMdl }, SpecialState{});
+		cache[0].emplace_back(&kw->morphemes[0], 0.f, 0.f, nullptr, LmState{ langMdl }, SpecialState{});
 		cache[0].back().rootId = commonRootId;
 
 #ifdef DEBUG_PRINT
@@ -1163,6 +1166,9 @@ namespace kiwi
 		}
 #endif
 
+		PathEvaluator<LmState> evaluator{
+			kw, startNode, topN, cache, ownFormList, uniqStates,
+		};
 		// middle nodes
 		for (size_t i = 1; i < graphSize - 1; ++i)
 		{
@@ -1176,9 +1182,8 @@ namespace kiwi
 
 			if (node->form)
 			{
-				evalPath<LmState>(kw, startNode, node, topN, cache, 
-					ownFormList, i, ownFormId, node->form->candidate, 
-					false, uniqStates, splitComplex, splitSaisiot, mergeSaisiot, blocklist);
+				evaluator(i, ownFormId, node->form->candidate, 
+					false, splitComplex, splitSaisiot, mergeSaisiot, blocklist);
 				if (all_of(node->form->candidate.begin(), node->form->candidate.end(), [](const Morpheme* m)
 				{
 					return m->combineSocket || !(m->chunks.empty() || m->complex || m->saisiot);
@@ -1186,16 +1191,14 @@ namespace kiwi
 				{
 					ownFormList.emplace_back(node->form->form);
 					ownFormId = ownFormList.size();
-					evalPath<LmState>(kw, startNode, node, topN, cache, 
-						ownFormList, i, ownFormId, unknownNodeLCands, 
-						true, uniqStates, splitComplex, splitSaisiot, mergeSaisiot, blocklist);
+					evaluator(i, ownFormId, unknownNodeLCands, 
+						true, splitComplex, splitSaisiot, mergeSaisiot, blocklist);
 				};
 			}
 			else
 			{
-				evalPath<LmState>(kw, startNode, node, topN, cache, 
-					ownFormList, i, ownFormId, unknownNodeCands, 
-					true, uniqStates, splitComplex, splitSaisiot, mergeSaisiot, blocklist);
+				evaluator(i, ownFormId, unknownNodeCands, 
+					true, splitComplex, splitSaisiot, mergeSaisiot, blocklist);
 			}
 
 #ifdef DEBUG_PRINT
@@ -1225,7 +1228,7 @@ namespace kiwi
 				}
 				if (p.morpheme->tag == POSTag::z_siot) continue;
 
-				float c = p.accScore + (openEnd ? 0 : p.lmState.next(kw->langMdl, eosId));
+				float c = p.accScore + (openEnd ? 0 : p.lmState.next(langMdl, eosId));
 				if (p.spState.singleQuote) c -= 2;
 				if (p.spState.doubleQuote) c -= 2;
 				if (p.rootId == commonRootId)
@@ -1265,7 +1268,7 @@ namespace kiwi
 #endif
 
 		utils::ContainerSearcher<WordLL<LmState>> csearcher{ cache };
-		Vector<ChunkResult> ret;
+		Vector<PathResult> ret;
 		size_t numUniqRootIdAndSpState;
 		{
 			UnorderedSet<pair<uint8_t, uint8_t>> uniqRootIdAndSpState;
@@ -1298,7 +1301,7 @@ namespace kiwi
 				ret.emplace_back(move(tokens), cand[i].accScore, uniqStates[cand[i].rootId], cand[i].spState);
 			}
 		}
-		sort(ret.begin(), ret.end(), [](const ChunkResult& a, const ChunkResult& b)
+		sort(ret.begin(), ret.end(), [](const PathResult& a, const PathResult& b)
 		{
 			return a.score > b.score;
 		});

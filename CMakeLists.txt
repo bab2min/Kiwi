@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.12)
 
-project(kiwi VERSION 0.20.4 DESCRIPTION "Kiwi, Korean Intelligent Word Identifier")
+project(kiwi VERSION 0.21.0 DESCRIPTION "Kiwi, Korean Intelligent Word Identifier")
 
-set ( CMAKE_CXX_STANDARD 14 )
+set ( CMAKE_CXX_STANDARD 17 )
 set ( CMAKE_VERBOSE_MAKEFILE true )
 
 option(KIWI_USE_MIMALLOC  "Use mimalloc for faster memory allocation" ON)
@@ -38,6 +38,17 @@ if(NOT KIWI_CPU_ARCH)
   set(KIWI_CPU_ARCH "${KIWI_CPU_ARCH}" PARENT_SCOPE)
 endif()
 
+
+if (KIWI_USE_CPUINFO AND 
+  (MSVC OR 
+   ((CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang") AND CMAKE_CXX_COMPILER_VERSION GREATER_EQUAL 11)
+  )
+)
+  set ( AVX_VNNI_SUPPORTED ON )
+else()
+  set ( AVX_VNNI_SUPPORTED OFF )
+endif()
+
 if(APPLE)
   set(CMAKE_OSX_ARCHITECTURES "${KIWI_CPU_ARCH}")
 endif()
@@ -45,10 +56,11 @@ endif()
 set ( CORE_SRCS
   src/ArchUtils.cpp
   src/Combiner.cpp
+  src/CoNgramModel.cpp
+  src/Dataset.cpp
   src/Form.cpp
   src/FeatureTestor.cpp
   src/FileUtils.cpp
-  src/Dataset.cpp
   src/Joiner.cpp
   src/Kiwi.cpp
   src/KiwiBuilder.cpp
@@ -57,6 +69,7 @@ set ( CORE_SRCS
   src/PatternMatcher.cpp
   src/search.cpp
   src/ScriptType.cpp
+  src/SkipBigramModel.cpp
   src/SubstringExtractor.cpp
   src/SwTokenizer.cpp
   src/TagUtils.cpp
@@ -81,9 +94,13 @@ endif()
 include_directories( include/ )
 include_directories( third_party/tclap/include )
 include_directories( third_party/cpp-btree )
-include_directories( third_party/variant/include )
 include_directories( third_party/eigen )
 include_directories( third_party/json/include )
+include_directories( third_party/streamvbyte/include )
+add_subdirectory( third_party/streamvbyte )
+set ( STREAMVBYTE_OBJECTS 
+  $<TARGET_OBJECTS:streamvbyte>
+)
 if(KIWI_USE_CPUINFO)
   message(STATUS "Use cpuinfo")
   include_directories( third_party/cpuinfo/include )
@@ -98,9 +115,6 @@ if(KIWI_USE_CPUINFO)
   set ( ADDITIONAL_FLAGS ${ADDITIONAL_FLAGS} "-DKIWI_USE_CPUINFO" )
 
   if(MSVC)
-    target_compile_options("clog" PUBLIC
-      /MT
-    )
     target_compile_options("cpuinfo" PUBLIC
       /MT
     )
@@ -110,13 +124,16 @@ if(KIWI_USE_CPUINFO)
   endif()
 
   set ( CPUINFO_OBJECTS_STATIC 
-    $<TARGET_OBJECTS:clog>
     $<TARGET_OBJECTS:cpuinfo_internals>
   )
   set ( CPUINFO_OBJECTS_SHARED 
-    $<TARGET_OBJECTS:clog>
     $<TARGET_OBJECTS:cpuinfo>
   )
+endif()
+
+if (AVX_VNNI_SUPPORTED)
+  message(STATUS "AVX-VNNI is supported")
+  set ( ADDITIONAL_FLAGS ${ADDITIONAL_FLAGS} "-DKIWI_AVX_VNNI_SUPPORTED" )
 endif()
 
 if(MSVC)
@@ -143,6 +160,12 @@ else()
   set ( CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELEASE} -g3")
   set ( CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO}")
   set ( CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_EXE_LINKER_FLAGS_RELEASE}" )
+
+  if (APPLE)
+    set ( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wno-unqualified-std-cast-call" )
+    set ( CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wno-unqualified-std-cast-call" )
+    set ( CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -Wno-unqualified-std-cast-call" )
+  endif()
 endif()
 
 if (KIWI_CPU_ARCH MATCHES "x86_64")
@@ -157,21 +180,36 @@ if (KIWI_CPU_ARCH MATCHES "x86_64")
       ${CORE_SRCS}
       src/archImpl/avx2.cpp
       src/archImpl/avx512bw.cpp
+      src/archImpl/avx512vnni.cpp
     )
+    # If AVX-VNNI is supported (MSVC, GCC 11+ or Clang 11+)
+    if (AVX_VNNI_SUPPORTED)
+      set( CORE_SRCS 
+        ${CORE_SRCS}
+        src/archImpl/avx_vnni.cpp
+      )
+    endif()
   endif()
+
   if(MSVC)
     set_source_files_properties(src/archImpl/sse2.cpp PROPERTIES COMPILE_FLAGS "/arch:SSE2")
     set_source_files_properties(src/archImpl/sse4_1.cpp PROPERTIES COMPILE_FLAGS "/arch:SSE2")
     if (KIWI_USE_CPUINFO)
       set_source_files_properties(src/archImpl/avx2.cpp PROPERTIES COMPILE_FLAGS "/arch:AVX2")
+      set_source_files_properties(src/archImpl/avx_vnni.cpp PROPERTIES COMPILE_FLAGS "/arch:AVX2")
       set_source_files_properties(src/archImpl/avx512bw.cpp PROPERTIES COMPILE_FLAGS "/arch:AVX512")
+      set_source_files_properties(src/archImpl/avx512vnni.cpp PROPERTIES COMPILE_FLAGS "/arch:AVX512")
     endif()
   else()
     set_source_files_properties(src/archImpl/sse2.cpp PROPERTIES COMPILE_FLAGS "-msse2")
     set_source_files_properties(src/archImpl/sse4_1.cpp PROPERTIES COMPILE_FLAGS "-msse2 -msse4.1")
     if (KIWI_USE_CPUINFO)
       set_source_files_properties(src/archImpl/avx2.cpp PROPERTIES COMPILE_FLAGS "-mavx -mavx2 -mfma")
-      set_source_files_properties(src/archImpl/avx512bw.cpp PROPERTIES COMPILE_FLAGS "-mavx512f -mavx512bw")
+      set_source_files_properties(src/archImpl/avx512bw.cpp PROPERTIES COMPILE_FLAGS "-mavx -mavx2 -mfma -mavx512f -mavx512vl -mavx512dq -mavx512bw")
+      set_source_files_properties(src/archImpl/avx512vnni.cpp PROPERTIES COMPILE_FLAGS "-mavx -mavx2 -mfma -mavx512f -mavx512vl -mavx512dq -mavx512bw -mavx512vnni")
+      if (AVX_VNNI_SUPPORTED)
+        set_source_files_properties(src/archImpl/avx_vnni.cpp PROPERTIES COMPILE_FLAGS "-mavx -mavx2 -mfma -mavxvnni")
+      endif()
     endif()
   endif()
 elseif (KIWI_CPU_ARCH MATCHES "arm64")
@@ -191,12 +229,14 @@ add_library( "${PROJECT_NAME}_static" STATIC
   ${CORE_SRCS}
   src/capi/kiwi_c.cpp
   ${CPUINFO_OBJECTS_STATIC}
+  ${STREAMVBYTE_OBJECTS}
 )
 
 add_library( "${PROJECT_NAME}" SHARED
   ${CORE_SRCS}
   src/capi/kiwi_c.cpp
   ${CPUINFO_OBJECTS_SHARED}
+  ${STREAMVBYTE_OBJECTS}
 )
 
 # Install the kiwi library as well as header files to (`include/kiwi` directory)
@@ -263,6 +303,9 @@ if(MSVC)
   else()
     message(STATUS "Use /MT at kiwi_static")
     target_compile_options("${PROJECT_NAME}_static" PUBLIC
+      /MT
+    )
+    target_compile_options("streamvbyte" PUBLIC
       /MT
     )
   endif()

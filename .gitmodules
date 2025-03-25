@@ -15,12 +15,12 @@
 [submodule "third_party/cpuinfo"]
 	path = third_party/cpuinfo
 	url = https://github.com/pytorch/cpuinfo
-[submodule "third_party/variant"]
-	path = third_party/variant
-	url = https://github.com/mapbox/variant
 [submodule "third_party/eigen"]
 	path = third_party/eigen
 	url = https://gitlab.com/libeigen/eigen
 [submodule "third_party/json"]
 	path = third_party/json
 	url = https://github.com/nlohmann/json
+[submodule "third_party/streamvbyte"]
+	path = third_party/streamvbyte
+	url = https://github.com/fast-pack/streamvbyte

@@ -27,7 +27,7 @@ namespace kiwi
 
 			template<class F, class... Args>
 			auto enqueue(F&& f, Args&&... args)
-				->std::future<typename std::result_of<F(size_t, Args...)>::type>;
+				->std::future<typename std::invoke_result<F, size_t, Args...>::type>;
 
 			size_t size() const { return workers.size(); }
 			size_t numEnqueued() const { return tasks.size(); }
@@ -67,9 +67,9 @@ namespace kiwi
 
 		template<class F, class... Args>
 		auto ThreadPool::enqueue(F&& f, Args&&... args)
-			-> std::future<typename std::result_of<F(size_t, Args...)>::type>
+			-> std::future<typename std::invoke_result<F, size_t, Args...>::type>
 		{
-			using return_type = typename std::result_of<F(size_t, Args...)>::type;
+			using return_type = typename std::invoke_result<F, size_t, Args...>::type;
 
 			auto task = std::make_shared< std::packaged_task<return_type(size_t)> >(
 				std::bind(std::forward<F>(f), std::placeholders::_1, std::forward<Args>(args)...));

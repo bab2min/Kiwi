@@ -48,4 +48,19 @@ namespace kiwi
 		f.exceptions(exc);
 		return f;
 	}
+
+	bool isOpenable(const string& filePath)
+	{
+		ifstream ifs;
+		try
+		{
+			openFile(ifs, filePath);
+		}
+		catch (const IOException&)
+		{
+			return false;
+		}
+		return true;
+	}
+
 }

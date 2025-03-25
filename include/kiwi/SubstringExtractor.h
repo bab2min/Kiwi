@@ -39,6 +39,7 @@ namespace kiwi
 			);
 		void addArray(const uint16_t* first, const uint16_t* last);
 		void addArray(const uint32_t* first, const uint32_t* last);
+		void addArray(const int32_t* first, const int32_t* last);
 		void addArray(const uint64_t* first, const uint64_t* last);
 		utils::FrozenTrie<uint32_t, uint32_t> count() const;
 		std::unique_ptr<lm::KnLangModelBase> buildLM(

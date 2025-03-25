@@ -4,11 +4,11 @@
 #include <kiwi/Kiwi.h>
 #include <kiwi/Utils.h>
 #include <kiwi/Dataset.h>
+#include <kiwi/Knlm.h>
 #include "ArchAvailable.h"
 #include "KTrie.h"
 #include "StrUtils.h"
 #include "FrozenTrie.hpp"
-#include "Knlm.hpp"
 #include "serializer.hpp"
 #include "count.hpp"
 #include "FeatureTestor.h"
@@ -16,6 +16,7 @@
 #include "RaggedVector.hpp"
 #include "SkipBigramTrainer.hpp"
 #include "SkipBigramModel.hpp"
+#include "CoNgramModel.hpp"
 #include "SortUtils.hpp"
 
 using namespace std;
@@ -212,11 +213,11 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 					if (cpolar != CondPolarity::none) throw FormatException{ "wrong line: " + line };
 					cpolar = CondPolarity::non_adj;
 				}
-				else if (f.starts_with(u"complex "))
+				else if (f.size() >= 8 && f.substr(0, 8) == u"complex ")
 				{
 					if (complex) throw FormatException{ "wrong line: " + line };
 					complex = true;
-					complexStr = f.substr(8).to_string();
+					complexStr = u16string{ f.substr(8) };
 				}
 				else if (f[0] == u'=')
 				{
@@ -570,7 +571,8 @@ void KiwiBuilder::_addCorpusTo(
 	std::istream& is, 
 	MorphemeMap& morphMap,
 	double splitRatio,
-	RaggedVector<VocabTy>* splitOut
+	RaggedVector<VocabTy>* splitOut,
+	UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict
 ) const
 {
 	Vector<VocabTy> wids;
@@ -690,7 +692,15 @@ void KiwiBuilder::_addCorpusTo(
 
 			if (t < POSTag::p && t != POSTag::unknown)
 			{
+				if (oovDict && (t == POSTag::nng || t == POSTag::nnp))
+				{
+					auto oovId = oovDict->emplace(make_pair(f, t), oovDict->size()).first->second;
+					wids.emplace_back(-(ptrdiff_t)(oovId + 1));
+				}
+				else
+			{
 				wids.emplace_back(getDefaultMorphemeId(t));
+				}
 				continue;
 			}
 
@@ -699,19 +709,28 @@ void KiwiBuilder::_addCorpusTo(
 	}
 }
 
-void KiwiBuilder::addCorpusTo(RaggedVector<uint8_t>& out, std::istream& is, MorphemeMap& morphMap, double splitRatio, RaggedVector<uint8_t>* splitOut) const
+void KiwiBuilder::addCorpusTo(RaggedVector<uint8_t>& out, std::istream& is, MorphemeMap& morphMap, 
+	double splitRatio, RaggedVector<uint8_t>* splitOut, UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict) const
 {
-	return _addCorpusTo(out, is, morphMap, splitRatio, splitOut);
+	return _addCorpusTo(out, is, morphMap, splitRatio, splitOut, oovDict);
 }
 
-void KiwiBuilder::addCorpusTo(RaggedVector<uint16_t>& out, std::istream& is, MorphemeMap& morphMap, double splitRatio, RaggedVector<uint16_t>* splitOut) const
+void KiwiBuilder::addCorpusTo(RaggedVector<uint16_t>& out, std::istream& is, MorphemeMap& morphMap, 
+	double splitRatio, RaggedVector<uint16_t>* splitOut, UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict) const
 {
-	return _addCorpusTo(out, is, morphMap, splitRatio, splitOut);
+	return _addCorpusTo(out, is, morphMap, splitRatio, splitOut, oovDict);
 }
 
-void KiwiBuilder::addCorpusTo(RaggedVector<uint32_t>& out, std::istream& is, MorphemeMap& morphMap, double splitRatio, RaggedVector<uint32_t>* splitOut) const
+void KiwiBuilder::addCorpusTo(RaggedVector<uint32_t>& out, std::istream& is, MorphemeMap& morphMap, 
+	double splitRatio, RaggedVector<uint32_t>* splitOut, UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict) const
 {
-	return _addCorpusTo(out, is, morphMap, splitRatio, splitOut);
+	return _addCorpusTo(out, is, morphMap, splitRatio, splitOut, oovDict);
+}
+
+void KiwiBuilder::addCorpusTo(RaggedVector<int32_t>& out, std::istream& is, MorphemeMap& morphMap,
+	double splitRatio, RaggedVector<int32_t>* splitOut, UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict) const
+{
+	return _addCorpusTo(out, is, morphMap, splitRatio, splitOut, oovDict);
 }
 
 void KiwiBuilder::updateForms()
@@ -738,12 +757,13 @@ void KiwiBuilder::updateForms()
 	}
 }
 
-void KiwiBuilder::updateMorphemes()
+void KiwiBuilder::updateMorphemes(size_t vocabSize)
 {
+	if (vocabSize == 0) vocabSize = langMdl->vocabSize();
 	for (auto& m : morphemes)
 	{
 		if (m.lmMorphemeId > 0) continue;
-		if (m.tag == POSTag::p || (&m - morphemes.data() + m.combined) < langMdl.knlm->getHeader().vocab_size)
+		if (m.tag == POSTag::p || (&m - morphemes.data() + m.combined) < vocabSize)
 		{
 			m.lmMorphemeId = &m - morphemes.data();
 		}
@@ -760,7 +780,7 @@ void KiwiBuilder::loadMorphBin(std::istream& is)
 	for (auto& form : forms)
 	{
 		const size_t idx = &form - &forms[0];
-		if (idx < defaultFormSize + 27) continue;
+		if (idx < defaultFormSize) continue;
 		formMap.emplace(form.form, idx);
 	}
 }
@@ -770,8 +790,28 @@ void KiwiBuilder::saveMorphBin(std::ostream& os) const
 	serializer::writeMany(os, serializer::toKey("KIWI"), forms, morphemes);
 }
 
-KiwiBuilder::KiwiBuilder(const string& modelPath, size_t _numThreads, BuildOption _options, bool useSBG) 
-	: detector{ modelPath, _numThreads }, options{ _options }, numThreads{ _numThreads ? _numThreads : thread::hardware_concurrency() }
+ModelType KiwiBuilder::getModelType(const string& modelPath)
+{
+	if (isOpenable(modelPath + "/cong.mdl"))
+	{
+		return ModelType::congGlobal;
+	}
+	else if (isOpenable(modelPath + "/skipbigram.mdl"))
+	{
+		return ModelType::sbg;
+	}
+	else if (isOpenable(modelPath + "/sj.knlm"))
+	{
+		return ModelType::knlm;
+	}
+	else
+	{
+		return ModelType::none;
+	}
+}
+
+KiwiBuilder::KiwiBuilder(const string& modelPath, size_t _numThreads, BuildOption _options, ModelType _modelType)
+	: detector{ modelPath, _numThreads }, options{ _options }, modelType{ _modelType }, numThreads{ _numThreads ? _numThreads : thread::hardware_concurrency() }
 {
 	archType = getSelectedArch(ArchType::default_);
 
@@ -780,10 +820,29 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, size_t _numThreads, BuildOptio
 		utils::imstream iss{ mm };
 		loadMorphBin(iss);
 	}
-	langMdl.knlm = lm::KnLangModelBase::create(utils::MMap(modelPath + string{ "/sj.knlm" }), archType);
-	if (useSBG)
+	
+	if (modelType == ModelType::none)
 	{
-		langMdl.sbg = sb::SkipBigramModelBase::create(utils::MMap(modelPath + string{ "/skipbigram.mdl" }), archType);
+		modelType = getModelType(modelPath);
+		if (modelType == ModelType::none)
+		{
+			throw runtime_error{ "Cannot find any valid model files in the given path" };
+		}
+	}
+
+	if (modelType == ModelType::knlm || modelType == ModelType::knlmTransposed)
+	{
+		langMdl = lm::KnLangModelBase::create(utils::MMap(modelPath + string{ "/sj.knlm" }), archType, modelType == ModelType::knlmTransposed);
+	}
+	else if (modelType == ModelType::sbg)
+	{
+		langMdl = lm::SkipBigramModelBase::create(utils::MMap(modelPath + string{ "/sj.knlm" }), utils::MMap(modelPath + string{ "/skipbigram.mdl" }), archType);
+	}
+	else if (ModelType::cong <= modelType && modelType <= ModelType::congGlobalFp32 )
+	{
+		langMdl = lm::CoNgramModelBase::create(utils::MMap(modelPath + string{ "/cong.mdl" }), archType, 
+			(modelType == ModelType::congGlobal || modelType == ModelType::congGlobalFp32),
+			(modelType == ModelType::cong || modelType == ModelType::congGlobal));
 	}
 
 	if (!!(options & BuildOption::loadDefaultDict))
@@ -834,24 +893,10 @@ void KiwiBuilder::initMorphemes()
 	morphemes[defaultTagSize + 28].userScore = -1.5f;
 }
 
-KiwiBuilder::KiwiBuilder(const ModelBuildArgs& args)
+template<class VocabTy>
+unique_ptr<lm::KnLangModelBase> KiwiBuilder::buildKnLM(const ModelBuildArgs& args, size_t lmVocabSize, MorphemeMap& realMorph) const
 {
-	if (!(args.lmMinCnts.size() == 1 || args.lmMinCnts.size() == args.lmOrder))
-	{
-		throw invalid_argument{ "lmMinCnts should have 1 or lmOrder elements" };
-	}
-
-	archType = getSelectedArch(ArchType::default_);
-	initMorphemes();
-
-	ifstream ifs;
-	auto realMorph = loadMorphemesFromTxt(openFile(ifs, args.morphemeDef), [&](POSTag tag, float cnt)
-	{
-		return cnt >= args.minMorphCnt;
-	});
-	updateForms();
-
-	RaggedVector<utils::Vid> sents;
+	RaggedVector<VocabTy> sents;
 	for (auto& path : args.corpora)
 	{
 		ifstream ifs;
@@ -880,12 +925,8 @@ KiwiBuilder::KiwiBuilder(const ModelBuildArgs& args)
 			}
 		}
 	}
-	
-	size_t lmVocabSize = 0;
-	for (auto& p : realMorph) lmVocabSize = max(p.second.first, lmVocabSize);
-	lmVocabSize += 1;
 
-	Vector<utils::Vid> historyTx(lmVocabSize);
+	Vector<VocabTy> historyTx(lmVocabSize);
 	if (args.useLmTagHistory)
 	{
 		for (size_t i = 0; i < lmVocabSize; ++i)
@@ -894,24 +935,13 @@ KiwiBuilder::KiwiBuilder(const ModelBuildArgs& args)
 		}
 	}
 
-	vector<pair<uint16_t, uint16_t>> bigramList;
 	utils::ThreadPool pool;
-	if (args.numWorkers > 1)
+	if (args.numWorkers >= 1)
 	{
 		pool.~ThreadPool();
 		new (&pool) utils::ThreadPool{ args.numWorkers };
 	}
-	size_t lmMinCnt = *std::min(args.lmMinCnts.begin(), args.lmMinCnts.end());
-	auto cntNodes = utils::count(sents.begin(), sents.end(), lmMinCnt, 1, args.lmOrder, (args.numWorkers > 1 ? &pool : nullptr), &bigramList, args.useLmTagHistory ? &historyTx : nullptr);
-	// discount for bos node cnt
-	if (args.useLmTagHistory)
-	{
-		cntNodes.root().getNext(lmVocabSize)->val /= 2;
-	}
-	else
-	{
-		cntNodes.root().getNext(0)->val /= 2;
-	}
+	const size_t lmMinCnt = *std::min(args.lmMinCnts.begin(), args.lmMinCnts.end());
 	std::vector<size_t> minCnts;
 	if (args.lmMinCnts.size() == 1)
 	{
@@ -922,37 +952,84 @@ KiwiBuilder::KiwiBuilder(const ModelBuildArgs& args)
 	{
 		minCnts = args.lmMinCnts;
 	}
-	langMdl.knlm = lm::KnLangModelBase::create(lm::KnLangModelBase::build(
-		cntNodes, 
-		args.lmOrder, minCnts, 
-		2, 0, 1, 1e-5, 
+
+	vector<pair<VocabTy, VocabTy>> bigramList;
+	auto cntNodes = utils::count(sents.begin(), sents.end(), lmMinCnt, 1, args.lmOrder, (args.numWorkers > 1 ? &pool : nullptr), &bigramList, args.useLmTagHistory ? &historyTx : nullptr);
+	// discount for bos node cnt
+	if (args.useLmTagHistory)
+	{
+		cntNodes.root().getNext(lmVocabSize)->val /= 2;
+	}
+	else
+	{
+		cntNodes.root().getNext(0)->val /= 2;
+	}
+
+	return lm::KnLangModelBase::create(lm::KnLangModelBase::build(
+		cntNodes,
+		args.lmOrder, minCnts,
+		2, 0, 1, 1e-5,
 		args.quantizeLm ? 8 : 0,
-		args.compressLm,
-		&bigramList, 
+		sizeof(VocabTy) == 2 ? args.compressLm : false,
+		&bigramList,
 		args.useLmTagHistory ? &historyTx : nullptr
 	), archType);
+}
+
+
+KiwiBuilder::KiwiBuilder(const ModelBuildArgs& args)
+{
+	if (!(args.lmMinCnts.size() == 1 || args.lmMinCnts.size() == args.lmOrder))
+	{
+		throw invalid_argument{ "lmMinCnts should have 1 or lmOrder elements" };
+	}
+
+	archType = getSelectedArch(ArchType::default_);
+	initMorphemes();
+
+	ifstream ifs;
+	auto realMorph = loadMorphemesFromTxt(openFile(ifs, args.morphemeDef), [&](POSTag tag, float cnt)
+	{
+		return cnt >= args.minMorphCnt;
+	});
+	updateForms();
+
+	size_t lmVocabSize = 0;
+	for (auto& p : realMorph) lmVocabSize = max(p.second.first, lmVocabSize);
+	lmVocabSize += 1;
+
+	if (lmVocabSize <= 0xFFFF)
+	{
+		langMdl = buildKnLM<uint16_t>(args, lmVocabSize, realMorph);
+	}
+	else
+	{
+		langMdl = buildKnLM<uint32_t>(args, lmVocabSize, realMorph);
+	}
 
 	updateMorphemes();
 }
 
+
 namespace kiwi
 {
+	template<class Vid>
 	class SBDataFeeder
 	{
-		const RaggedVector<utils::Vid>& sents;
+		const RaggedVector<Vid>& sents;
 		const lm::KnLangModelBase* lm = nullptr;
 		Vector<Vector<float>> lmBuf;
 		Vector<Vector<uint32_t>> nodeBuf;
 
 	public:
-		SBDataFeeder(const RaggedVector<utils::Vid>& _sents, const lm::KnLangModelBase* _lm, size_t numThreads = 1)
+		SBDataFeeder(const RaggedVector<Vid>& _sents, const lm::KnLangModelBase* _lm, size_t numThreads = 1)
 			: sents{ _sents }, lm{ _lm }, lmBuf(numThreads), nodeBuf(numThreads)
 		{
 		}
 
-		sb::FeedingData<utils::Vid> operator()(size_t i, size_t threadId = 0)
+		lm::FeedingData<Vid> operator()(size_t i, size_t threadId = 0)
 		{
-			sb::FeedingData<utils::Vid> ret;
+			lm::FeedingData<Vid> ret;
 			ret.len = sents[i].size();
 			if (lmBuf[threadId].size() < ret.len)
 			{
@@ -971,9 +1048,11 @@ namespace kiwi
 KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 	: KiwiBuilder{ modelPath }
 {
+	using Vid = uint16_t;
+
 	auto realMorph = restoreMorphemeMap();
-	sb::SkipBigramTrainer<utils::Vid, 8> sbg;
-	RaggedVector<utils::Vid> sents;
+	lm::SkipBigramTrainer<Vid, 8> sbg;
+	RaggedVector<Vid> sents;
 	for (auto& path : args.corpora)
 	{
 		ifstream ifs;
@@ -1050,7 +1129,9 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 		return true;
 	};
 
-	sbg = sb::SkipBigramTrainer<utils::Vid, 8>{ sents, sbgTokenFilter, sbgPairFilter, 0, 150, 20, true, 0.333f, 1, args.sbgSize, langMdl.knlm->nonLeafNodeSize() };
+	auto* knlm = dynamic_cast<lm::KnLangModelBase*>(langMdl.get());
+
+	sbg = lm::SkipBigramTrainer<Vid, 8>{ sents, sbgTokenFilter, sbgPairFilter, 0, 150, 20, true, 0.333f, 1, args.sbgSize, knlm->nonLeafNodeSize() };
 	Vector<float> lmLogProbs;
 	Vector<uint32_t> baseNodes;
 	auto tc = sbg.newContext();
@@ -1071,7 +1152,7 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 			lmLogProbs.resize(sent.size());
 			baseNodes.resize(sent.size());
 		}
-		langMdl.knlm->evaluate(sent.begin(), sent.end(), lmLogProbs.begin());
+		knlm->evaluate(sent.begin(), sent.end(), lmLogProbs.begin());
 		//float sum = sbg.evaluate(&sent[0], lmLogProbs.data(), sent.size());
 		float sum = accumulate(lmLogProbs.begin() + 1, lmLogProbs.begin() + sent.size(), 0.);
 		size_t cnt = sent.size() - 1;
@@ -1088,7 +1169,7 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 
 	if (args.numWorkers <= 1)
 	{
-		sbg.train(SBDataFeeder{ sents, langMdl.knlm.get() }, [&](const sb::ObservingData& od)
+		sbg.train(SBDataFeeder<Vid>{ sents, knlm }, [&](const lm::ObservingData& od)
 		{
 			llCnt += od.cntRecent;
 			llMean += (od.llRecent - llMean * od.cntRecent) / llCnt;
@@ -1102,7 +1183,7 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 	}
 	else
 	{
-		sbg.trainMulti(args.numWorkers, SBDataFeeder{ sents, langMdl.knlm.get(), 8 }, [&](const sb::ObservingData& od)
+		sbg.trainMulti(args.numWorkers, SBDataFeeder<Vid>{ sents, knlm, 8 }, [&](const lm::ObservingData& od)
 		{
 			llCnt += od.cntRecent;
 			llMean += (od.llRecent - llMean * od.cntRecent) / llCnt;
@@ -1131,7 +1212,7 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 			lmLogProbs.resize(sent.size());
 			baseNodes.resize(sent.size());
 		}
-		langMdl.knlm->evaluate(sent.begin(), sent.end(), lmLogProbs.begin(), baseNodes.begin());
+		knlm->evaluate(sent.begin(), sent.end(), lmLogProbs.begin(), baseNodes.begin());
 		float sum = sbg.evaluate(&sent[0], baseNodes.data(), lmLogProbs.data(), sent.size());
 		size_t cnt = sent.size() - 1;
 		llCnt += cnt;
@@ -1165,7 +1246,8 @@ void KiwiBuilder::saveModel(const string& modelPath) const
 		saveMorphBin(ofs);
 	}
 	{
-		auto mem = langMdl.knlm->getMemory();
+		auto* knlm = dynamic_cast<lm::KnLangModelBase*>(langMdl.get());
+		auto mem = knlm->getMemory();
 		ofstream ofs{ modelPath + "/sj.knlm", ios_base::binary };
 		ofs.write((const char*)mem.get(), mem.size());
 	}
@@ -1289,7 +1371,7 @@ pair<uint32_t, bool> KiwiBuilder::addWord(U16StringView newForm, POSTag tag, flo
 
 pair<uint32_t, bool> KiwiBuilder::addWord(const std::u16string& newForm, POSTag tag, float score, size_t origMorphemeId, size_t lmMorphemeId)
 {
-	return addWord(nonstd::to_string_view(newForm), tag, score, origMorphemeId, lmMorphemeId);
+	return addWord(toStringView(newForm), tag, score, origMorphemeId, lmMorphemeId);
 }
 
 void KiwiBuilder::addCombinedMorpheme(
@@ -1596,7 +1678,7 @@ pair<uint32_t, bool> KiwiBuilder::addWord(U16StringView form, POSTag tag, float 
 
 pair<uint32_t, bool> KiwiBuilder::addWord(const u16string& form, POSTag tag, float score)
 {
-	return addWord(nonstd::to_string_view(form), tag, score);
+	return addWord(toStringView(form), tag, score);
 }
 
 pair<uint32_t, bool> KiwiBuilder::addWord(const char16_t* form, POSTag tag, float score)
@@ -1634,7 +1716,7 @@ pair<uint32_t, bool> KiwiBuilder::addWord(U16StringView newForm, POSTag tag, flo
 
 pair<uint32_t, bool> KiwiBuilder::addWord(const u16string& newForm, POSTag tag, float score, const u16string& origForm)
 {
-	return addWord(nonstd::to_string_view(newForm), tag, score, origForm);
+	return addWord(toStringView(newForm), tag, score, origForm);
 }
 
 pair<uint32_t, bool> KiwiBuilder::addWord(const char16_t* newForm, POSTag tag, float score, const char16_t* origForm)
@@ -1698,7 +1780,7 @@ bool KiwiBuilder::addPreAnalyzedWord(U16StringView form, const vector<pair<U16, 
 
 bool KiwiBuilder::addPreAnalyzedWord(const u16string& form, const vector<pair<u16string, POSTag>>& analyzed, vector<pair<size_t, size_t>> positions, float score)
 {
-	return addPreAnalyzedWord(nonstd::to_string_view(form), analyzed, positions, score);
+	return addPreAnalyzedWord(toStringView(form), analyzed, positions, score);
 }
 
 bool KiwiBuilder::addPreAnalyzedWord(const char16_t* form, const vector<pair<const char16_t*, POSTag>>& analyzed, vector<pair<size_t, size_t>> positions, float score)
@@ -1716,7 +1798,7 @@ size_t KiwiBuilder::loadDictionary(const string& dictPath)
 	u16string wstr;
 	for (size_t lineNo = 1; getline(ifs, line); ++lineNo)
 	{
-		utf8To16(nonstd::to_string_view(line), wstr);
+		utf8To16(toStringView(line), wstr);
 		while (!wstr.empty() && kiwi::identifySpecialChr(wstr.back()) == POSTag::unknown) wstr.pop_back();
 		if (wstr.empty()) continue;
 		if (wstr[0] == u'#') continue;
@@ -1770,9 +1852,9 @@ size_t KiwiBuilder::loadDictionary(const string& dictPath)
 				auto suffix = fields[0].substr(0, fields[0].size() - 1);
 				addedCnt += addRule(morphemes[0].second, [&](const u16string& str)
 				{
-					auto strv = nonstd::to_string_view(str);
-					if (!strv.ends_with(suffix)) return str;
-					return strv.substr(0, strv.size() - suffix.size()).to_string() + morphemes[0].first.to_string();
+					auto strv = toStringView(str);
+					if (!(strv.size() >= suffix.size() && strv.substr(strv.size() - suffix.size()) == suffix)) return str;
+					return u16string{ strv.substr(0, strv.size() - suffix.size()) } + u16string{ morphemes[0].first };
 				}, score).size();
 			}
 			else
@@ -2141,22 +2223,29 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 
 	ret.formTrie = freezeTrie(move(formTrie), archType);
 
-	for (auto& m : ret.morphemes)
+	ret.specialMorphIds = getSpecialMorphs();
+	return ret;
+}
+
+std::array<size_t, static_cast<size_t>(Kiwi::SpecialMorph::max)> KiwiBuilder::getSpecialMorphs() const
+{
+	std::array<size_t, static_cast<size_t>(Kiwi::SpecialMorph::max)> specialMorphIds = { {0,} };
+	for (auto& m : morphemes)
 	{
-		if (m.kform && *m.kform == u"'")
+		if (forms[m.kform].form == u"'")
 		{
-			if (m.tag == POSTag::sso) ret.specialMorphIds[static_cast<size_t>(Kiwi::SpecialMorph::singleQuoteOpen)] = &m - ret.morphemes.data();
-			else if (m.tag == POSTag::ssc) ret.specialMorphIds[static_cast<size_t>(Kiwi::SpecialMorph::singleQuoteClose)] = &m - ret.morphemes.data();
-			else if (m.tag == POSTag::ss) ret.specialMorphIds[static_cast<size_t>(Kiwi::SpecialMorph::singleQuoteNA)] = &m - ret.morphemes.data();
+			if (m.tag == POSTag::sso) specialMorphIds[static_cast<size_t>(Kiwi::SpecialMorph::singleQuoteOpen)] = &m - morphemes.data();
+			else if (m.tag == POSTag::ssc) specialMorphIds[static_cast<size_t>(Kiwi::SpecialMorph::singleQuoteClose)] = &m - morphemes.data();
+			else if (m.tag == POSTag::ss) specialMorphIds[static_cast<size_t>(Kiwi::SpecialMorph::singleQuoteNA)] = &m - morphemes.data();
 		}
-		else if (m.kform && *m.kform == u"\"")
+		else if (forms[m.kform].form == u"\"")
 		{
-			if (m.tag == POSTag::sso) ret.specialMorphIds[static_cast<size_t>(Kiwi::SpecialMorph::doubleQuoteOpen)] = &m - ret.morphemes.data();
-			else if (m.tag == POSTag::ssc) ret.specialMorphIds[static_cast<size_t>(Kiwi::SpecialMorph::doubleQuoteClose)] = &m - ret.morphemes.data();
-			else if (m.tag == POSTag::ss) ret.specialMorphIds[static_cast<size_t>(Kiwi::SpecialMorph::doubleQuoteNA)] = &m - ret.morphemes.data();
+			if (m.tag == POSTag::sso) specialMorphIds[static_cast<size_t>(Kiwi::SpecialMorph::doubleQuoteOpen)] = &m - morphemes.data();
+			else if (m.tag == POSTag::ssc) specialMorphIds[static_cast<size_t>(Kiwi::SpecialMorph::doubleQuoteClose)] = &m - morphemes.data();
+			else if (m.tag == POSTag::ss) specialMorphIds[static_cast<size_t>(Kiwi::SpecialMorph::doubleQuoteNA)] = &m - morphemes.data();
 		}
 	}
-	return ret;
+	return specialMorphIds;
 }
 
 vector<WordInfo> KiwiBuilder::extractWords(const U16MultipleReader& reader, size_t minCnt, size_t maxWordLen, float minScore, float posThreshold, bool lmFilter) const
@@ -2270,7 +2359,8 @@ void KiwiBuilder::convertHSData(
 	const vector<string>& inputPathes,
 	const string& outputPath,
 	const string& morphemeDefPath,
-	size_t morphemeDefMinCnt
+	size_t morphemeDefMinCnt,
+	bool generateOovDict
 ) const
 {
 	unique_ptr<KiwiBuilder> dummyBuilder;
@@ -2292,41 +2382,76 @@ void KiwiBuilder::convertHSData(
 		srcBuilder = dummyBuilder.get();
 	}
 
-	RaggedVector<uint32_t> sents;
+	UnorderedMap<pair<KString, POSTag>, size_t> oovDict;
+	RaggedVector<int32_t> sents;
 	for (auto& path : inputPathes)
 	{
 		ifstream ifs;
-		srcBuilder->addCorpusTo(sents, openFile(ifs, path), realMorph);
+		srcBuilder->addCorpusTo(sents, openFile(ifs, path), realMorph, 0, nullptr, generateOovDict ? &oovDict: nullptr);
 	}
 
 	ofstream ofs;
 	sents.write_to_memory(openFile(ofs, outputPath, ios_base::binary));
+	if (generateOovDict)
+	{
+		Vector<pair<u16string, POSTag>> oovDictStr(oovDict.size());
+		for (auto& p : oovDict)
+		{
+			oovDictStr[p.second] = make_pair(joinHangul(p.first.first), p.first.second);
+		}
+
+		const uint32_t size = oovDictStr.size();
+		ofs.write((const char*)&size, sizeof(uint32_t));
+		for (auto& p : oovDictStr)
+		{
+			const uint32_t tagAndSize = (uint32_t)p.second | ((uint32_t)p.first.size() << 8);
+			ofs.write((const char*)&tagAndSize, sizeof(uint32_t));
+			ofs.write((const char*)p.first.data(), p.first.size() * sizeof(char16_t));
+		}
+	}
 }
 
 HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes, 
 	size_t batchSize, size_t causalContextSize, size_t windowSize, size_t numWorkers, 
 	double dropoutProb,
 	double dropoutProbOnHistory,
+	double nounAugmentingProb,
+	size_t generateUnlikelihoods,
 	const TokenFilter& tokenFilter,
 	const TokenFilter& windowFilter,
 	double splitRatio,
 	bool separateDefaultMorpheme,
 	const string& morphemeDefPath,
 	size_t morphemeDefMinCnt,
+	const vector<pair<size_t, vector<uint32_t>>>& contextualMapper,
 	HSDataset* splitDataset
 ) const
 {
-	HSDataset dataset{ batchSize, causalContextSize, windowSize, numWorkers, dropoutProb, dropoutProbOnHistory };
+	HSDataset dataset{ batchSize, causalContextSize, windowSize, true, numWorkers, dropoutProb, dropoutProbOnHistory, nounAugmentingProb, generateUnlikelihoods };
 	auto& sents = dataset.sents.get();
 	const KiwiBuilder* srcBuilder = this;
 	MorphemeMap realMorph;
 	size_t maxTokenId = 0;
+
+	const bool doesGenerateUnlikelihoods = generateUnlikelihoods != (size_t)-1;
+
 	if (morphemeDefPath.empty())
 	{
 		realMorph = restoreMorphemeMap(separateDefaultMorpheme);
+		dataset.langModel = langMdl;
+		if (doesGenerateUnlikelihoods)
+		{
+			dataset.kiwiInst = make_unique<Kiwi>(build());
+			dataset.kiwiInst->setMaxUnkFormSize(2);
+		}
 	}
 	else
 	{
+		if (doesGenerateUnlikelihoods)
+		{
+			throw invalid_argument{ "cannot generate unlikelihoods with morpheme definition file" };
+		}
+
 		dataset.dummyBuilder = make_shared<KiwiBuilder>();
 		dataset.dummyBuilder->initMorphemes();
 		ifstream ifs;
@@ -2342,40 +2467,76 @@ HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes,
 		}
 	}
 
-	auto& knlm = srcBuilder->langMdl.knlm;
-	dataset.knlm = knlm;
 	dataset.morphemes = &srcBuilder->morphemes;
 	dataset.forms = &srcBuilder->forms;
+	dataset.specialMorphIds = getSpecialMorphs();
 
 	if (splitDataset)
 	{
-		*splitDataset = HSDataset{ batchSize, causalContextSize, windowSize, numWorkers, dropoutProb };
+		*splitDataset = HSDataset{ batchSize, causalContextSize, windowSize, true, numWorkers, dropoutProb, 0, 0, generateUnlikelihoods };
 		splitDataset->dummyBuilder = dataset.dummyBuilder;
-		splitDataset->knlm = knlm;
-		splitDataset->morphemes = &srcBuilder->morphemes;
-		splitDataset->forms = &srcBuilder->forms;
+		splitDataset->langModel = dataset.langModel;
+		splitDataset->kiwiInst = dataset.kiwiInst;
+		splitDataset->morphemes = dataset.morphemes;
+		splitDataset->forms = dataset.forms;
+		splitDataset->specialMorphIds = dataset.specialMorphIds;
 	}
 
+	UnorderedMap<pair<KString, POSTag>, size_t> oovDict;
 	for (auto& path : inputPathes)
 	{
 		try
 		{
 			ifstream ifs;
-			auto cvtSents = RaggedVector<uint32_t>::from_memory(openFile(ifs, path, ios_base::binary));
-			if (splitRatio > 0)
+			auto cvtSents = RaggedVector<int32_t>::from_memory(openFile(ifs, path, ios_base::binary));
+			uint32_t oovDictSize = 0;
+			Vector<int32_t> oovDictMap;
+			if (ifs.read((char*)&oovDictSize, sizeof(uint32_t)))
 			{
-				throw invalid_argument("splitDataset cannot be used with binary input");
+				for (uint32_t i = 0; i < oovDictSize; ++i)
+				{
+					uint32_t tagAndSize = 0;
+					ifs.read((char*)&tagAndSize, sizeof(uint32_t));
+					u16string form(tagAndSize >> 8, 0);
+					ifs.read((char*)form.data(), form.size() * sizeof(char16_t));
+					const POSTag tag = (POSTag)(tagAndSize & 0xff);
+					if (doesGenerateUnlikelihoods)
+					{
+						KString kform = normalizeHangul(form);
+						const auto oovId = (int32_t)oovDict.emplace(make_pair(kform, tag), oovDict.size()).first->second;
+						oovDictMap.emplace_back(-oovId - 1);
+					}
+					else
+					{
+						oovDictMap.emplace_back(getDefaultMorphemeId(tag));
+					}
+				}
 			}
+
+			double splitCnt = 0;
 			for (auto s : cvtSents)
 			{
-				sents.emplace_back();
-				sents.insert_data(s.begin(), s.end());
+				splitCnt += splitRatio;
+				auto& o = splitDataset && splitCnt >= 1 ? splitDataset->sents.get() : sents;
+				o.emplace_back();
+				if (oovDictMap.empty())
+				{
+				o.insert_data(s.begin(), s.end());
+				}
+				else
+				{
+					for (auto i : s)
+					{
+						o.add_data(i < 0 ? oovDictMap[-i - 1] : i);
+					}
+				}
+				splitCnt = fmod(splitCnt, 1.);
 			}
 		}
 		catch (const runtime_error&)
 		{
 			ifstream ifs;
-			srcBuilder->addCorpusTo(sents, openFile(ifs, path), realMorph, splitRatio, splitDataset ? &splitDataset->sents.get() : nullptr);
+			srcBuilder->addCorpusTo(sents, openFile(ifs, path), realMorph, splitRatio, splitDataset ? &splitDataset->sents.get() : nullptr, doesGenerateUnlikelihoods ? &oovDict : nullptr);
 		}
 	}
 	size_t tokenSize = sents.raw().empty() ? 0 : *max_element(sents.raw().begin(), sents.raw().end()) + 1;
@@ -2386,7 +2547,17 @@ HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes,
 		tokenSize = max(tokenSize, sents.raw().empty() ? (size_t)0 : *max_element(sents.raw().begin(), sents.raw().end()) + 1);
 	}
 
-	const size_t knlmVocabSize = knlm ? knlm->getHeader().vocab_size : maxTokenId;
+	if (doesGenerateUnlikelihoods)
+	{
+		dataset.oovDict = make_unique<Vector<pair<u16string, POSTag>>>(oovDict.size());
+		for (auto& p : oovDict)
+		{
+			(*dataset.oovDict)[p.second] = make_pair(joinHangul(p.first.first), p.first.second);
+		}
+		if (splitDataset) splitDataset->oovDict = dataset.oovDict;
+	}
+
+	const size_t knlmVocabSize = dataset.langModel ? dataset.langModel->vocabSize() : maxTokenId;
 	tokenSize = max(tokenSize, knlmVocabSize);
 	size_t filteredKnlmVocabSize = 0;
 	for (size_t i = 0; i < tokenSize; ++i)
@@ -2424,6 +2595,17 @@ HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes,
 		dataset.totalTokens += dataset.numValidTokensInSent(i) - 1;
 	}
 	
+	if (!contextualMapper.empty())
+	{
+		utils::ContinuousTrie<utils::TrieNodeEx<uint32_t, uint32_t>> cmTrie(1);
+		for (auto& p : contextualMapper)
+		{
+			cmTrie.build(p.second.begin(), p.second.end(), p.first + 1);
+		}
+		cmTrie.fillFail();
+		dataset.contextualMapper = utils::FrozenTrie<uint32_t, uint32_t>{ cmTrie, ArchTypeHolder<ArchType::balanced>{} };
+	}
+
 	if (splitDataset)
 	{
 		splitDataset->windowTokenValidness = dataset.windowTokenValidness;
@@ -2434,6 +2616,30 @@ HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes,
 		{
 			splitDataset->totalTokens += splitDataset->numValidTokensInSent(i) - 1;
 		}
+		
+		if (!contextualMapper.empty())
+		{
+			splitDataset->contextualMapper = dataset.contextualMapper;
+		}
 	}
 	return dataset;
+}
+
+void KiwiBuilder::buildMorphData(const string& morphemeDefPath, const string& outputPath, size_t minCnt)
+{
+	KiwiBuilder kb;
+	kb.initMorphemes();
+	ifstream ifs;
+	auto realMorph = kb.loadMorphemesFromTxt(openFile(ifs, morphemeDefPath), [&](POSTag tag, float cnt)
+	{
+		return cnt >= minCnt;
+	});
+
+	size_t lmVocabSize = 0;
+	for (auto& p : realMorph) lmVocabSize = max(p.second.first, lmVocabSize);
+	lmVocabSize += 1;
+	kb.updateForms();
+	kb.updateMorphemes(lmVocabSize);
+	ofstream ofs;
+	kb.saveMorphBin(openFile(ofs, outputPath + "/sj.morph", ios_base::binary));
 }

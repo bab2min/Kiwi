@@ -58,7 +58,7 @@ namespace mp
 		ThreadPool(size_t threads = 0);
 		template<class F, class... Args>
 		auto runParallel(size_t workers, F&& f, Args&&... args)
-			-> std::vector<std::future<typename std::result_of<F(size_t, size_t, Barrier*, Args...)>::type>>;
+			-> std::vector<std::future<typename std::invoke_result<F, size_t, size_t, Barrier*, Args...>::type>>;
 		~ThreadPool();
 		size_t size() const { return workers.size(); }
 		size_t limitedSize() const { return std::min(size(), _limitedSize); };
@@ -106,9 +106,9 @@ namespace mp
 
 	template<class F, class... Args>
 	auto ThreadPool::runParallel(size_t workers, F&& f, Args&&... args)
-		-> std::vector<std::future<typename std::result_of<F(size_t, size_t, Barrier*, Args...)>::type>>
+		-> std::vector<std::future<typename std::invoke_result<F, size_t, size_t, Barrier*, Args...>::type>>
 	{
-		using return_type = typename std::result_of<F(size_t, size_t, Barrier*, Args...)>::type;
+		using return_type = typename std::invoke_result<F, size_t, size_t, Barrier*, Args...>::type;
 		std::vector<std::future<return_type>> ret;
 		{
 			auto b = std::make_shared<Barrier>(getBarrier(workers));
@@ -305,7 +305,7 @@ namespace mp
 	}
 
 	template<class Fn, class ...Args,
-		typename std::enable_if<!std::is_same<typename std::result_of<Fn(size_t, size_t, Barrier*)>::type, void>::value, int>::type = 0>
+		typename std::enable_if<!std::is_same<typename std::invoke_result<Fn, size_t, size_t, Barrier*>::type, void>::value, int>::type = 0>
 	inline auto runParallel(ThreadPool* pool, Fn&& func, Args&&... args) -> std::vector<decltype(func(0, 0, nullptr))>
 	{
 		static_assert(detail::AllOfType<std::tuple<Args...>, detail::IsRunParallelArg>::value, "`runParallel` receives arguments of wrong type.");
@@ -331,7 +331,7 @@ namespace mp
 	}
 
 	template<class Fn, class ...Args,
-		typename std::enable_if<std::is_same<typename std::result_of<Fn(size_t, size_t, Barrier*)>::type, void>::value, int>::type = 0>
+		typename std::enable_if<std::is_same<typename std::invoke_result<Fn, size_t, size_t, Barrier*>::type, void>::value, int>::type = 0>
 		inline void runParallel(ThreadPool* pool, Fn&& func, Args&&... args)
 	{
 		static_assert(detail::AllOfType<std::tuple<Args...>, detail::IsRunParallelArg>::value, "`runParallel` receives arguments of wrong type.");
@@ -360,7 +360,7 @@ namespace mp
 	}
 
 	template<class Fn, class ...Args,
-		typename std::enable_if<std::is_same<typename std::result_of<Fn(size_t, size_t, ptrdiff_t, ptrdiff_t, ptrdiff_t, Barrier*)>::type, void>::value, int>::type = 0>
+		typename std::enable_if<std::is_same<typename std::invoke_result<Fn, size_t, size_t, ptrdiff_t, ptrdiff_t, ptrdiff_t, Barrier*>::type, void>::value, int>::type = 0>
 		inline void forParallel(ThreadPool* pool, ptrdiff_t start, ptrdiff_t stop, ptrdiff_t step, Fn&& func, Args&&... args)
 	{
 		static_assert(detail::AllOfType<std::tuple<Args...>, detail::IsRunParallelArg>::value, "`forParallel` receives arguments of wrong type.");
@@ -396,7 +396,7 @@ namespace mp
 		ThreadPool* pool;
 	public:
 		OverrideLimitedSize(ThreadPool* _pool, size_t newSize)
-			: pool{ _pool }, prevSize{ pool ? pool->limitedSize() : -1 }
+			: pool{ _pool }, prevSize{ _pool ? _pool->limitedSize() : -1 }
 		{
 			if (pool) pool->_limitedSize = newSize;
 		}

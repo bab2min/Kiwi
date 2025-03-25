@@ -56,7 +56,10 @@ namespace kiwi
 		};
 
 		template<class Ty>
-		struct SeqMax;
+		struct SeqMax
+		{
+			static constexpr std::ptrdiff_t value = 0;
+		};
 
 		template<std::ptrdiff_t i>
 		struct SeqMax<seq<i>>
@@ -130,7 +133,7 @@ namespace kiwi
 		template<class ValTy, class SeqTy>
 		class Table
 		{
-			ValTy table[SeqMax<SeqTy>::value + 1];
+			std::array<ValTy, SeqMax<SeqTy>::value + 1> table;
 
 			template<class ValGetter>
 			void set(seq<>)
@@ -153,9 +156,48 @@ namespace kiwi
 
 			constexpr ValTy operator[](std::ptrdiff_t idx) const
 			{
+				if (idx < 0 || (size_t)idx >= table.size()) return ValTy{};
 				return table[idx];
 			}
 		};
 	}
+
+
+	template<class IntTy>
+	struct SignedType { using type = IntTy; };
+
+	template<>
+	struct SignedType<uint8_t> { using type = int8_t; };
+
+	template<>
+	struct SignedType<uint16_t> { using type = int16_t; };
+
+	template<>
+	struct SignedType<uint32_t> { using type = int32_t; };
+
+	template<>
+	struct SignedType<uint64_t> { using type = int64_t; };
+
+	template<>
+	struct SignedType<char16_t> { using type = int16_t; };
+
+
+	template<class IntTy>
+	struct UnsignedType { using type = IntTy; };
+
+	template<>
+	struct UnsignedType<int8_t> { using type = uint8_t; };
+
+	template<>
+	struct UnsignedType<int16_t> { using type = uint16_t; };
+
+	template<>
+	struct UnsignedType<int32_t> { using type = uint32_t; };
+
+	template<>
+	struct UnsignedType<int64_t> { using type = uint64_t; };
+
+	template<>
+	struct UnsignedType<char16_t> { using type = uint16_t; };
 }
 
