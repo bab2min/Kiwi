@@ -85,10 +85,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a7c263e9bdd55d1c9ad3b78bf8caf7d4f" id="r_a7c263e9bdd55d1c9ad3b78bf8caf7d4f"><td class="memItemLeft" align="right" valign="top"><a id="a7c263e9bdd55d1c9ad3b78bf8caf7d4f" name="a7c263e9bdd55d1c9ad3b78bf8caf7d4f"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>ThreadPool</b> (size_t threads=0, size_t maxQueued=0)</td></tr>
 <tr class="separator:a7c263e9bdd55d1c9ad3b78bf8caf7d4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab29fbadc6ad5a1c471a3cafc4743ea77" id="r_ab29fbadc6ad5a1c471a3cafc4743ea77"><td class="memTemplParams" colspan="2"><a id="ab29fbadc6ad5a1c471a3cafc4743ea77" name="ab29fbadc6ad5a1c471a3cafc4743ea77"></a>
+<tr class="memitem:a4c38c5afcaf87ffb65f823a32ae17e82" id="r_a4c38c5afcaf87ffb65f823a32ae17e82"><td class="memTemplParams" colspan="2"><a id="a4c38c5afcaf87ffb65f823a32ae17e82" name="a4c38c5afcaf87ffb65f823a32ae17e82"></a>
 template&lt;class F , class... Args&gt; </td></tr>
-<tr class="memitem:ab29fbadc6ad5a1c471a3cafc4743ea77"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>enqueue</b> (F &amp;&amp;f, Args &amp;&amp;... args) -&gt; std::future&lt; typename std::result_of&lt; F(size_t, Args...)&gt;::type &gt;</td></tr>
-<tr class="separator:ab29fbadc6ad5a1c471a3cafc4743ea77"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4c38c5afcaf87ffb65f823a32ae17e82"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>enqueue</b> (F &amp;&amp;f, Args &amp;&amp;... args) -&gt; std::future&lt; typename std::invoke_result&lt; F, size_t, Args... &gt;::type &gt;</td></tr>
+<tr class="separator:a4c38c5afcaf87ffb65f823a32ae17e82"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa10fb78ebd24f06d3ad75de20ea045db" id="r_aa10fb78ebd24f06d3ad75de20ea045db"><td class="memItemLeft" align="right" valign="top"><a id="aa10fb78ebd24f06d3ad75de20ea045db" name="aa10fb78ebd24f06d3ad75de20ea045db"></a>
 size_t&#160;</td><td class="memItemRight" valign="bottom"><b>size</b> () const</td></tr>
 <tr class="separator:aa10fb78ebd24f06d3ad75de20ea045db"><td class="memSeparator" colspan="2">&#160;</td></tr>

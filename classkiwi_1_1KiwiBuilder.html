@@ -77,6 +77,7 @@ $(function() {
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="classkiwi_1_1KiwiBuilder-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">kiwi::KiwiBuilder Class Reference</div></div>
 </div><!--header-->
@@ -122,9 +123,9 @@ Public Member Functions</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><b>KiwiBuilder</b> (const std::string &amp;modelPath, const <a class="el" href="structkiwi_1_1KiwiBuilder_1_1ModelBuildArgs.html">ModelBuildArgs</a> &amp;args)</td></tr>
 <tr class="memdesc:aaf6cf74f8ba2b589a939932a6851e8d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">기본 모델로부터 확장 모델을 학습하여 생성한다. <br /></td></tr>
 <tr class="separator:aaf6cf74f8ba2b589a939932a6851e8d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae8471361c24666f050c1c8e68beea14a" id="r_ae8471361c24666f050c1c8e68beea14a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1KiwiBuilder.html#ae8471361c24666f050c1c8e68beea14a">KiwiBuilder</a> (const std::string &amp;modelPath, size_t numThreads=0, <a class="el" href="Types_8h.html#a7b5ed1c7b90b79877f32c8a011c06ff3">BuildOption</a> options=BuildOption::default_, bool useSBG=false)</td></tr>
-<tr class="memdesc:ae8471361c24666f050c1c8e68beea14a"><td class="mdescLeft">&#160;</td><td class="mdescRight">KiwiBuilder를 모델 파일로부터 생성한다.  <br /></td></tr>
-<tr class="separator:ae8471361c24666f050c1c8e68beea14a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a56a00f19e5315e5af6425d0d8649f6bb" id="r_a56a00f19e5315e5af6425d0d8649f6bb"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1KiwiBuilder.html#a56a00f19e5315e5af6425d0d8649f6bb">KiwiBuilder</a> (const std::string &amp;modelPath, size_t numThreads=0, <a class="el" href="Types_8h.html#a7b5ed1c7b90b79877f32c8a011c06ff3">BuildOption</a> options=BuildOption::default_, <a class="el" href="Types_8h.html#af7906391a8e367cab5296bac8d4caafa">ModelType</a> modelType=<a class="el" href="Types_8h.html#af7906391a8e367cab5296bac8d4caafaa334c4a4c42fdb79d7ebc3e73b517e6f8">ModelType::none</a>)</td></tr>
+<tr class="memdesc:a56a00f19e5315e5af6425d0d8649f6bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">KiwiBuilder를 모델 파일로부터 생성한다.  <br /></td></tr>
+<tr class="separator:a56a00f19e5315e5af6425d0d8649f6bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1f90bdbca2a4d4a7d5a9b8b2fb052cfd" id="r_a1f90bdbca2a4d4a7d5a9b8b2fb052cfd"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1KiwiBuilder.html#a1f90bdbca2a4d4a7d5a9b8b2fb052cfd">ready</a> () const</td></tr>
 <tr class="memdesc:a1f90bdbca2a4d4a7d5a9b8b2fb052cfd"><td class="mdescLeft">&#160;</td><td class="mdescRight">현재 <a class="el" href="classkiwi_1_1KiwiBuilder.html" title="형태소 분석에 사용될 사전을 관리하고, 사전을 바탕으로 실제 형태소 분석을 수행하는 Kiwi의 인스턴스를 생성하는 클래스.">KiwiBuilder</a> 객체가 유효한 분석 모델을 로딩한 상태인지 알려준다.  <br /></td></tr>
 <tr class="separator:a1f90bdbca2a4d4a7d5a9b8b2fb052cfd"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -167,12 +168,28 @@ std::vector&lt; <a class="el" href="structkiwi_1_1WordInfo.html">WordInfo</a> &g
 <tr class="memitem:ae2f54e76a62e3558f78705e949236d70" id="r_ae2f54e76a62e3558f78705e949236d70"><td class="memItemLeft" align="right" valign="top"><a id="ae2f54e76a62e3558f78705e949236d70" name="ae2f54e76a62e3558f78705e949236d70"></a>
 <a class="el" href="classkiwi_1_1Kiwi.html">Kiwi</a>&#160;</td><td class="memItemRight" valign="bottom"><b>build</b> (DefaultTypoSet typos, float typoCostThreshold=2.5f) const</td></tr>
 <tr class="separator:ae2f54e76a62e3558f78705e949236d70"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adf87edd8d7cf5b4dfdb103ceda3eabe0" id="r_adf87edd8d7cf5b4dfdb103ceda3eabe0"><td class="memItemLeft" align="right" valign="top"><a id="adf87edd8d7cf5b4dfdb103ceda3eabe0" name="adf87edd8d7cf5b4dfdb103ceda3eabe0"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>convertHSData</b> (const std::vector&lt; std::string &gt; &amp;inputPathes, const std::string &amp;outputPath, const std::string &amp;morphemeDefPath={}, size_t morphemeDefMinCnt=0) const</td></tr>
-<tr class="separator:adf87edd8d7cf5b4dfdb103ceda3eabe0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af7329fcb1068a9d14e06f697e8aab319" id="r_af7329fcb1068a9d14e06f697e8aab319"><td class="memItemLeft" align="right" valign="top"><a id="af7329fcb1068a9d14e06f697e8aab319" name="af7329fcb1068a9d14e06f697e8aab319"></a>
-<a class="el" href="classkiwi_1_1HSDataset.html">HSDataset</a>&#160;</td><td class="memItemRight" valign="bottom"><b>makeHSDataset</b> (const std::vector&lt; std::string &gt; &amp;inputPathes, size_t batchSize, size_t causalContextSize, size_t windowSize, size_t numWorkers, double dropoutProb=0, double dropoutProbOnHistory=0, const TokenFilter &amp;tokenFilter={}, const TokenFilter &amp;windowFilter={}, double splitRatio=0, bool separateDefaultMorpheme=false, const std::string &amp;morphemeDefPath={}, size_t morphemeDefMinCnt=0, <a class="el" href="classkiwi_1_1HSDataset.html">HSDataset</a> *splitDataset=nullptr) const</td></tr>
-<tr class="separator:af7329fcb1068a9d14e06f697e8aab319"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9640c63666a4673aa42370dd8396d370" id="r_a9640c63666a4673aa42370dd8396d370"><td class="memItemLeft" align="right" valign="top"><a id="a9640c63666a4673aa42370dd8396d370" name="a9640c63666a4673aa42370dd8396d370"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>convertHSData</b> (const std::vector&lt; std::string &gt; &amp;inputPathes, const std::string &amp;outputPath, const std::string &amp;morphemeDefPath={}, size_t morphemeDefMinCnt=0, bool generateOovDict=false) const</td></tr>
+<tr class="separator:a9640c63666a4673aa42370dd8396d370"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9f0c4e13561cdefa12938b1960299669" id="r_a9f0c4e13561cdefa12938b1960299669"><td class="memItemLeft" align="right" valign="top"><a id="a9f0c4e13561cdefa12938b1960299669" name="a9f0c4e13561cdefa12938b1960299669"></a>
+<a class="el" href="classkiwi_1_1HSDataset.html">HSDataset</a>&#160;</td><td class="memItemRight" valign="bottom"><b>makeHSDataset</b> (const std::vector&lt; std::string &gt; &amp;inputPathes, size_t batchSize, size_t causalContextSize, size_t windowSize, size_t numWorkers, double dropoutProb=0, double dropoutProbOnHistory=0, double nounAugmentingProb=0, size_t generateUnlikelihoods=-1, const TokenFilter &amp;tokenFilter={}, const TokenFilter &amp;windowFilter={}, double splitRatio=0, bool separateDefaultMorpheme=false, const std::string &amp;morphemeDefPath={}, size_t morphemeDefMinCnt=0, const std::vector&lt; std::pair&lt; size_t, std::vector&lt; uint32_t &gt; &gt; &gt; &amp;contextualMapper={}, <a class="el" href="classkiwi_1_1HSDataset.html">HSDataset</a> *splitDataset=nullptr) const</td></tr>
+<tr class="separator:a9f0c4e13561cdefa12938b1960299669"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a03bbda4731d4d0181be0bc560f219a1a" id="r_a03bbda4731d4d0181be0bc560f219a1a"><td class="memItemLeft" align="right" valign="top"><a id="a03bbda4731d4d0181be0bc560f219a1a" name="a03bbda4731d4d0181be0bc560f219a1a"></a>
+<a class="el" href="Types_8h.html#a7b5ed1c7b90b79877f32c8a011c06ff3">BuildOption</a>&#160;</td><td class="memItemRight" valign="bottom"><b>getOptions</b> () const</td></tr>
+<tr class="separator:a03bbda4731d4d0181be0bc560f219a1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5388e877c8345a312561c185fe3ebd20" id="r_a5388e877c8345a312561c185fe3ebd20"><td class="memItemLeft" align="right" valign="top"><a id="a5388e877c8345a312561c185fe3ebd20" name="a5388e877c8345a312561c185fe3ebd20"></a>
+<a class="el" href="Types_8h.html#af7906391a8e367cab5296bac8d4caafa">ModelType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>getModelType</b> () const</td></tr>
+<tr class="separator:a5388e877c8345a312561c185fe3ebd20"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:ae4f714077f202f4fda41d7b4b1b0b667" id="r_ae4f714077f202f4fda41d7b4b1b0b667"><td class="memItemLeft" align="right" valign="top"><a id="ae4f714077f202f4fda41d7b4b1b0b667" name="ae4f714077f202f4fda41d7b4b1b0b667"></a>
+static <a class="el" href="Types_8h.html#af7906391a8e367cab5296bac8d4caafa">ModelType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>getModelType</b> (const std::string &amp;modelPath)</td></tr>
+<tr class="memdesc:ae4f714077f202f4fda41d7b4b1b0b667"><td class="mdescLeft">&#160;</td><td class="mdescRight">주어진 모델 경로로부터 모델의 타입을 추정한다. <br /></td></tr>
+<tr class="separator:ae4f714077f202f4fda41d7b4b1b0b667"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af02912f81ac0715233f8cee6ee3f09e3" id="r_af02912f81ac0715233f8cee6ee3f09e3"><td class="memItemLeft" align="right" valign="top"><a id="af02912f81ac0715233f8cee6ee3f09e3" name="af02912f81ac0715233f8cee6ee3f09e3"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>buildMorphData</b> (const std::string &amp;morphemeDefPath, const std::string &amp;outputPath, size_t minCnt=10)</td></tr>
+<tr class="separator:af02912f81ac0715233f8cee6ee3f09e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>형태소 분석에 사용될 사전을 관리하고, 사전을 바탕으로 실제 형태소 분석을 수행하는 Kiwi의 인스턴스를 생성하는 클래스. </p>
@@ -218,8 +235,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>convertHSData</b> (co
 
 </div>
 </div>
-<a id="ae8471361c24666f050c1c8e68beea14a" name="ae8471361c24666f050c1c8e68beea14a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae8471361c24666f050c1c8e68beea14a">&#9670;&#160;</a></span>KiwiBuilder() <span class="overload">[3/3]</span></h2>
+<a id="a56a00f19e5315e5af6425d0d8649f6bb" name="a56a00f19e5315e5af6425d0d8649f6bb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a56a00f19e5315e5af6425d0d8649f6bb">&#9670;&#160;</a></span>KiwiBuilder() <span class="overload">[3/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -245,8 +262,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>convertHSData</b> (co
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>useSBG</em> = <code>false</code>&#160;</td>
+          <td class="paramtype"><a class="el" href="Types_8h.html#af7906391a8e367cab5296bac8d4caafa">ModelType</a>&#160;</td>
+          <td class="paramname"><em>modelType</em> = <code><a class="el" href="Types_8h.html#af7906391a8e367cab5296bac8d4caafaa334c4a4c42fdb79d7ebc3e73b517e6f8">ModelType::none</a></code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -547,8 +564,7 @@ template&lt;class Replacer &gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><br  />
- </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd></dd></dl>
 
 </div>
 </div>

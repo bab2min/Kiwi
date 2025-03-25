@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['max_0',['max',['../Types_8h.html#ac15313ea8fffc5cc54475e10264ddebba2ffe4e77325d9a7152f7086ea7aa5114',1,'kiwi']]]
+  ['knlm_0',['knlm',['../Types_8h.html#af7906391a8e367cab5296bac8d4caafaaac794a38581bb3bc7fb719e2b3331b8e',1,'kiwi']]]
 ];

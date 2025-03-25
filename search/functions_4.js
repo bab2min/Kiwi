@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['kiwi_0',['Kiwi',['../classkiwi_1_1Kiwi.html#ae7102d4533a34fe89cce17b1c93bdc07',1,'kiwi::Kiwi']]],
+  ['kiwi_0',['Kiwi',['../classkiwi_1_1Kiwi.html#a9fdcc70af2d0582e00313c0d92546aad',1,'kiwi::Kiwi']]],
   ['kiwi_5fanalyze_1',['kiwi_analyze',['../capi_8h.html#a8aa4a9b64c467c3bd335f284167a69bf',1,'capi.h']]],
   ['kiwi_5fanalyze_5fm_2',['kiwi_analyze_m',['../capi_8h.html#a9380188bd199dfbda8471c76104a8d87',1,'capi.h']]],
   ['kiwi_5fanalyze_5fmw_3',['kiwi_analyze_mw',['../capi_8h.html#adb8947c6dae2f7574bf585ae657f1f1b',1,'capi.h']]],
@@ -83,5 +83,5 @@ var searchData=
   ['kiwi_5fws_5fpos_5fscore_80',['kiwi_ws_pos_score',['../capi_8h.html#a25feabab022bf3be5fba1013bdbf851a',1,'capi.h']]],
   ['kiwi_5fws_5fscore_81',['kiwi_ws_score',['../capi_8h.html#a1a8749430c7b7ef9b196cb75c0ce355c',1,'capi.h']]],
   ['kiwi_5fws_5fsize_82',['kiwi_ws_size',['../capi_8h.html#a3421fe0f93fc5991dee5fbef4205a226',1,'capi.h']]],
-  ['kiwibuilder_83',['kiwibuilder',['../classkiwi_1_1KiwiBuilder.html#ae8471361c24666f050c1c8e68beea14a',1,'kiwi::KiwiBuilder::KiwiBuilder(const std::string &amp;modelPath, size_t numThreads=0, BuildOption options=BuildOption::default_, bool useSBG=false)'],['../classkiwi_1_1KiwiBuilder.html#aaf6cf74f8ba2b589a939932a6851e8d0',1,'kiwi::KiwiBuilder::KiwiBuilder(const std::string &amp;modelPath, const ModelBuildArgs &amp;args)'],['../classkiwi_1_1KiwiBuilder.html#a6338925fdfa3ac713fbd6a860866e7f7',1,'kiwi::KiwiBuilder::KiwiBuilder(const ModelBuildArgs &amp;args)'],['../classkiwi_1_1KiwiBuilder.html#a400409ef1f682bfbfe65706a0bc5285f',1,'kiwi::KiwiBuilder::KiwiBuilder()']]]
+  ['kiwibuilder_83',['kiwibuilder',['../classkiwi_1_1KiwiBuilder.html#a56a00f19e5315e5af6425d0d8649f6bb',1,'kiwi::KiwiBuilder::KiwiBuilder(const std::string &amp;modelPath, size_t numThreads=0, BuildOption options=BuildOption::default_, ModelType modelType=ModelType::none)'],['../classkiwi_1_1KiwiBuilder.html#aaf6cf74f8ba2b589a939932a6851e8d0',1,'kiwi::KiwiBuilder::KiwiBuilder(const std::string &amp;modelPath, const ModelBuildArgs &amp;args)'],['../classkiwi_1_1KiwiBuilder.html#a6338925fdfa3ac713fbd6a860866e7f7',1,'kiwi::KiwiBuilder::KiwiBuilder(const ModelBuildArgs &amp;args)'],['../classkiwi_1_1KiwiBuilder.html#a400409ef1f682bfbfe65706a0bc5285f',1,'kiwi::KiwiBuilder::KiwiBuilder()']]]
 ];

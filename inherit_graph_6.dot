@@ -5,5 +5,5 @@ digraph "Graphical Class Hierarchy"
   edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
   node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
   rankdir="LR";
-  Node0 [id="Node000000",label="kiwi::ArchInfo\< ArchType\l::balanced \>",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$structkiwi_1_1ArchInfo_3_01ArchType_1_1balanced_01_4.html",tooltip=" "];
+  Node0 [id="Node000000",label="kiwi::ArchInfo\< ArchType\l::avx512vnni \>",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$structkiwi_1_1ArchInfo_3_01ArchType_1_1avx512vnni_01_4.html",tooltip=" "];
 }

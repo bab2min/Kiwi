@@ -3,7 +3,7 @@ var searchData=
   ['cachestore_0',['CacheStore',['../structkiwi_1_1utils_1_1ContinuousTrie_1_1CacheStore.html',1,'kiwi::utils::ContinuousTrie']]],
   ['cachestore_3c_20cont_20_2a_20_3e_1',['CacheStore&lt; Cont * &gt;',['../structkiwi_1_1utils_1_1ContinuousTrie_1_1CacheStore_3_01Cont_01_5_01_4.html',1,'kiwi::utils::ContinuousTrie']]],
   ['candidate_2',['candidate',['../structkiwi_1_1cmb_1_1Candidate.html',1,'kiwi::cmb::Candidate&lt; LmState &gt;'],['../structkiwi_1_1NgramExtractor_1_1Candidate.html',1,'kiwi::NgramExtractor::Candidate'],['../structkiwi_1_1FormRaw.html#aaeb9a4a50365e34fd542d2ea07ded938',1,'kiwi::FormRaw::candidate']]],
-  ['candidate_3c_20voidstate_3c_20arch_20_3e_20_3e_3',['Candidate&lt; VoidState&lt; arch &gt; &gt;',['../structkiwi_1_1cmb_1_1Candidate_3_01VoidState_3_01arch_01_4_01_4.html',1,'kiwi::cmb']]],
+  ['candidate_3c_20lm_3a_3avoidstate_3c_20arch_20_3e_20_3e_3',['Candidate&lt; lm::VoidState&lt; arch &gt; &gt;',['../structkiwi_1_1cmb_1_1Candidate_3_01lm_1_1VoidState_3_01arch_01_4_01_4.html',1,'kiwi::cmb']]],
   ['capi_2eh_4',['capi.h',['../capi_8h.html',1,'']]],
   ['chr_5fposition_5',['chr_position',['../structkiwi__token__info__t.html#abe6f9a976243d5818a47e564a4e7fb2c',1,'kiwi_token_info_t']]],
   ['chunkpositions_6',['chunkPositions',['../structkiwi_1_1MorphemeRaw.html#a7d80c10abfd88e3401705944a38d1f4e',1,'kiwi::MorphemeRaw']]],
@@ -16,7 +16,13 @@ var searchData=
   ['concat_3c_20seq_3c_20_5fi1_2e_2e_2e_20_3e_2c_20seq_3c_20_5fi2_2e_2e_2e_20_3e_20_3e_13',['concat&lt; seq&lt; _i1... &gt;, seq&lt; _i2... &gt; &gt;',['../structkiwi_1_1tp_1_1concat_3_01seq_3_01__i1_8_8_8_01_4_00_01seq_3_01__i2_8_8_8_01_4_01_4.html',1,'kiwi::tp']]],
   ['condpolarity_14',['CondPolarity',['../Types_8h.html#a7903fe33da04a788b0bb009094596894',1,'kiwi']]],
   ['condvowel_15',['CondVowel',['../Types_8h.html#a11856481b15f24bf19cb647734ea1085',1,'kiwi']]],
-  ['constaccess_16',['ConstAccess',['../classkiwi_1_1utils_1_1ConstAccess.html',1,'kiwi::utils']]],
-  ['constaccess_3c_20std_3a_3aunordered_5fmap_3c_20_5fkey_2c_20int32_5ft_20_3e_20_3e_17',['ConstAccess&lt; std::unordered_map&lt; _Key, int32_t &gt; &gt;',['../classkiwi_1_1utils_1_1ConstAccess.html',1,'kiwi::utils']]],
-  ['continuoustrie_18',['ContinuousTrie',['../classkiwi_1_1utils_1_1ContinuousTrie.html',1,'kiwi::utils']]]
+  ['cong_16',['cong',['../Types_8h.html#af7906391a8e367cab5296bac8d4caafaa3de6a8f9608ddd4ba89f97b36d7587d6',1,'kiwi']]],
+  ['congfp32_17',['congFp32',['../Types_8h.html#af7906391a8e367cab5296bac8d4caafaad60d775d5dc985a13910f27ffc533519',1,'kiwi']]],
+  ['congglobal_18',['congGlobal',['../Types_8h.html#af7906391a8e367cab5296bac8d4caafaae3f0d49077d0c56e887f1ea94cb48c01',1,'kiwi']]],
+  ['congglobalfp32_19',['congGlobalFp32',['../Types_8h.html#af7906391a8e367cab5296bac8d4caafaab0c0607bc37511576e142197ccbab374',1,'kiwi']]],
+  ['congrammodelbase_20',['CoNgramModelBase',['../classkiwi_1_1lm_1_1CoNgramModelBase.html',1,'kiwi::lm']]],
+  ['congrammodelheader_21',['CoNgramModelHeader',['../structkiwi_1_1lm_1_1CoNgramModelHeader.html',1,'kiwi::lm']]],
+  ['constaccess_22',['ConstAccess',['../classkiwi_1_1utils_1_1ConstAccess.html',1,'kiwi::utils']]],
+  ['constaccess_3c_20std_3a_3aunordered_5fmap_3c_20_5fkey_2c_20int32_5ft_20_3e_20_3e_23',['ConstAccess&lt; std::unordered_map&lt; _Key, int32_t &gt; &gt;',['../classkiwi_1_1utils_1_1ConstAccess.html',1,'kiwi::utils']]],
+  ['continuoustrie_24',['ContinuousTrie',['../classkiwi_1_1utils_1_1ContinuousTrie.html',1,'kiwi::utils']]]
 ];

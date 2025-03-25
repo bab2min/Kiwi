@@ -5,5 +5,5 @@ digraph "Graphical Class Hierarchy"
   edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
   node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
   rankdir="LR";
-  Node0 [id="Node000000",label="kiwi::TokenInfo",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$structkiwi_1_1TokenInfo.html",tooltip="분석 완료된 각 형태소들의 정보를 담는 구조체"];
+  Node0 [id="Node000000",label="kiwi::SignedType\< uint64_t \>",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$structkiwi_1_1SignedType_3_01uint64__t_01_4.html",tooltip=" "];
 }

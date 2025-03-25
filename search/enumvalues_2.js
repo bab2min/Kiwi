@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['loaddefaultdict_0',['loadDefaultDict',['../Types_8h.html#a7b5ed1c7b90b79877f32c8a011c06ff3ac336925b8868bb0c4749738a647abf6b',1,'kiwi']]],
-  ['loadmultidict_1',['loadMultiDict',['../Types_8h.html#a7b5ed1c7b90b79877f32c8a011c06ff3a35c1071f1f1a9c497fa503f0ae028068',1,'kiwi']]],
-  ['loadtypodict_2',['loadTypoDict',['../Types_8h.html#a7b5ed1c7b90b79877f32c8a011c06ff3af29c7cef55d5f13ec9ad2a53a5d10096',1,'kiwi']]]
+  ['integrateallomorph_0',['integrateAllomorph',['../Types_8h.html#a7b5ed1c7b90b79877f32c8a011c06ff3a9d4cda55511905f877949ea8055fc681',1,'kiwi']]],
+  ['irregular_1',['irregular',['../Types_8h.html#ac15313ea8fffc5cc54475e10264ddebba39d3202ec495577fd03ee14c24767dd9',1,'kiwi']]]
 ];

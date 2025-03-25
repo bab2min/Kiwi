@@ -83,6 +83,11 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="dynheader">
+Inheritance diagram for kiwi::lm::KnLangModelBase:</div>
+<div class="dyncontent">
+<div class="center"><img src="classkiwi_1_1lm_1_1KnLangModelBase__inherit__graph.png" border="0" usemap="#akiwi_1_1lm_1_1KnLangModelBase_inherit__map" alt="Inheritance graph"/></div>
+<center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
+<div class="dynheader">
 Collaboration diagram for kiwi::lm::KnLangModelBase:</div>
 <div class="dyncontent">
 <div class="center"><img src="classkiwi_1_1lm_1_1KnLangModelBase__coll__graph.png" border="0" usemap="#akiwi_1_1lm_1_1KnLangModelBase_coll__map" alt="Collaboration graph"/></div>
@@ -90,9 +95,13 @@ Collaboration diagram for kiwi::lm::KnLangModelBase:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a2e97fc3bb117e960eb89d9abb144cefc" id="r_a2e97fc3bb117e960eb89d9abb144cefc"><td class="memItemLeft" align="right" valign="top"><a id="a2e97fc3bb117e960eb89d9abb144cefc" name="a2e97fc3bb117e960eb89d9abb144cefc"></a>
-const <a class="el" href="structkiwi_1_1lm_1_1Header.html">Header</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>getHeader</b> () const</td></tr>
-<tr class="separator:a2e97fc3bb117e960eb89d9abb144cefc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab2680dd0a197edb8cceac1992a679226" id="r_ab2680dd0a197edb8cceac1992a679226"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1lm_1_1KnLangModelBase.html#ab2680dd0a197edb8cceac1992a679226">vocabSize</a> () const override</td></tr>
+<tr class="separator:ab2680dd0a197edb8cceac1992a679226"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab24b8e9c2f352e90f6736e6c69225762" id="r_ab24b8e9c2f352e90f6736e6c69225762"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1lm_1_1KnLangModelBase.html#ab24b8e9c2f352e90f6736e6c69225762">getMemorySize</a> () const override</td></tr>
+<tr class="separator:ab24b8e9c2f352e90f6736e6c69225762"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a905086c32cd15b44573646c914d90f46" id="r_a905086c32cd15b44573646c914d90f46"><td class="memItemLeft" align="right" valign="top"><a id="a905086c32cd15b44573646c914d90f46" name="a905086c32cd15b44573646c914d90f46"></a>
+const <a class="el" href="structkiwi_1_1lm_1_1KnLangModelHeader.html">KnLangModelHeader</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>getHeader</b> () const</td></tr>
+<tr class="separator:a905086c32cd15b44573646c914d90f46"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af23c709e681dce6cf743235eac16f6d9" id="r_af23c709e681dce6cf743235eac16f6d9"><td class="memItemLeft" align="right" valign="top"><a id="af23c709e681dce6cf743235eac16f6d9" name="af23c709e681dce6cf743235eac16f6d9"></a>
 virtual ptrdiff_t&#160;</td><td class="memItemRight" valign="bottom"><b>getLowerNode</b> (ptrdiff_t node_idx) const =0</td></tr>
 <tr class="separator:af23c709e681dce6cf743235eac16f6d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -137,16 +146,26 @@ template&lt;class InTy &gt; </td></tr>
 template&lt;class PfTy , class SfTy , class OutTy &gt; </td></tr>
 <tr class="memitem:aa4b860b076dc6a1b12094c3fc87b2675"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>fillIn</b> (PfTy prefix_first, PfTy prefix_last, SfTy suffix_first, SfTy suffix_last, OutTy out_first, bool reduce=true) const</td></tr>
 <tr class="separator:aa4b860b076dc6a1b12094c3fc87b2675"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classkiwi_1_1lm_1_1ILangModel"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classkiwi_1_1lm_1_1ILangModel')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classkiwi_1_1lm_1_1ILangModel.html">kiwi::lm::ILangModel</a></td></tr>
+<tr class="memitem:a844eac63cf5db99fffcd0205be81831d inherit pub_methods_classkiwi_1_1lm_1_1ILangModel" id="r_a844eac63cf5db99fffcd0205be81831d"><td class="memItemLeft" align="right" valign="top">
+virtual <a class="el" href="Types_8h.html#af7906391a8e367cab5296bac8d4caafa">ModelType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>getType</b> () const =0</td></tr>
+<tr class="separator:a844eac63cf5db99fffcd0205be81831d inherit pub_methods_classkiwi_1_1lm_1_1ILangModel"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a53cda812084899da7c71deac9b73aee2 inherit pub_methods_classkiwi_1_1lm_1_1ILangModel" id="r_a53cda812084899da7c71deac9b73aee2"><td class="memItemLeft" align="right" valign="top">
+virtual void *&#160;</td><td class="memItemRight" valign="bottom"><b>getFindBestPathFn</b> () const =0</td></tr>
+<tr class="separator:a53cda812084899da7c71deac9b73aee2 inherit pub_methods_classkiwi_1_1lm_1_1ILangModel"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a307877d83707e66e4b02dac9484ecb69 inherit pub_methods_classkiwi_1_1lm_1_1ILangModel" id="r_a307877d83707e66e4b02dac9484ecb69"><td class="memItemLeft" align="right" valign="top">
+virtual void *&#160;</td><td class="memItemRight" valign="bottom"><b>getNewJoinerFn</b> () const =0</td></tr>
+<tr class="separator:a307877d83707e66e4b02dac9484ecb69 inherit pub_methods_classkiwi_1_1lm_1_1ILangModel"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:ac48aca78d8b4c2b5d118fa7f5870e7f5" id="r_ac48aca78d8b4c2b5d118fa7f5870e7f5"><td class="memItemLeft" align="right" valign="top"><a id="ac48aca78d8b4c2b5d118fa7f5870e7f5" name="ac48aca78d8b4c2b5d118fa7f5870e7f5"></a>
-static std::unique_ptr&lt; <a class="el" href="classkiwi_1_1lm_1_1KnLangModelBase.html">KnLangModelBase</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>create</b> (<a class="el" href="classkiwi_1_1utils_1_1MemoryObject.html">utils::MemoryObject</a> &amp;&amp;mem, ArchType archType=ArchType::none)</td></tr>
-<tr class="separator:ac48aca78d8b4c2b5d118fa7f5870e7f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af99f51ef5ed1c8ba65f4589cd7c9881d" id="r_af99f51ef5ed1c8ba65f4589cd7c9881d"><td class="memTemplParams" colspan="2"><a id="af99f51ef5ed1c8ba65f4589cd7c9881d" name="af99f51ef5ed1c8ba65f4589cd7c9881d"></a>
-template&lt;class Trie , class HistoryTx  = std::vector&lt;Vid&gt;&gt; </td></tr>
-<tr class="memitem:af99f51ef5ed1c8ba65f4589cd7c9881d"><td class="memTemplItemLeft" align="right" valign="top">static <a class="el" href="classkiwi_1_1utils_1_1MemoryOwner.html">utils::MemoryOwner</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><b>build</b> (Trie &amp;&amp;ngram_cf, size_t order, const std::vector&lt; size_t &gt; &amp;min_cf_by_order, size_t unk_id, size_t bos_id, size_t eos_id, float unigram_alpha, size_t quantize, bool compress, const std::vector&lt; std::pair&lt; Vid, Vid &gt; &gt; *bigram_list=nullptr, const HistoryTx *history_transformer=nullptr, const void *extra_buf=nullptr, size_t extra_buf_size=0)</td></tr>
-<tr class="separator:af99f51ef5ed1c8ba65f4589cd7c9881d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae66cb09dfd8e0e217741b5dcb790a385" id="r_ae66cb09dfd8e0e217741b5dcb790a385"><td class="memItemLeft" align="right" valign="top"><a id="ae66cb09dfd8e0e217741b5dcb790a385" name="ae66cb09dfd8e0e217741b5dcb790a385"></a>
+static std::unique_ptr&lt; <a class="el" href="classkiwi_1_1lm_1_1KnLangModelBase.html">KnLangModelBase</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>create</b> (<a class="el" href="classkiwi_1_1utils_1_1MemoryObject.html">utils::MemoryObject</a> &amp;&amp;mem, ArchType archType=ArchType::none, bool transposed=false)</td></tr>
+<tr class="separator:ae66cb09dfd8e0e217741b5dcb790a385"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0642deb2fa95884ee1b4e884b5dc814a" id="r_a0642deb2fa95884ee1b4e884b5dc814a"><td class="memTemplParams" colspan="2"><a id="a0642deb2fa95884ee1b4e884b5dc814a" name="a0642deb2fa95884ee1b4e884b5dc814a"></a>
+template&lt;class VocabTy , class Trie , class HistoryTx  = std::vector&lt;VocabTy&gt;&gt; </td></tr>
+<tr class="memitem:a0642deb2fa95884ee1b4e884b5dc814a"><td class="memTemplItemLeft" align="right" valign="top">static <a class="el" href="classkiwi_1_1utils_1_1MemoryOwner.html">utils::MemoryOwner</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><b>build</b> (Trie &amp;&amp;ngram_cf, size_t order, const std::vector&lt; size_t &gt; &amp;min_cf_by_order, size_t unk_id, size_t bos_id, size_t eos_id, float unigram_alpha, size_t quantize, bool compress, const std::vector&lt; std::pair&lt; VocabTy, VocabTy &gt; &gt; *bigram_list=nullptr, const HistoryTx *history_transformer=nullptr, const void *extra_buf=nullptr, size_t extra_buf_size=0)</td></tr>
+<tr class="separator:a0642deb2fa95884ee1b4e884b5dc814a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-methods" name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
@@ -172,6 +191,61 @@ Protected Attributes</h2></td></tr>
 <a class="el" href="classkiwi_1_1utils_1_1MemoryObject.html">utils::MemoryObject</a>&#160;</td><td class="memItemRight" valign="bottom"><b>base</b></td></tr>
 <tr class="separator:a01ca2f55f7801683c5140187cb586794"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="ab24b8e9c2f352e90f6736e6c69225762" name="ab24b8e9c2f352e90f6736e6c69225762"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab24b8e9c2f352e90f6736e6c69225762">&#9670;&#160;</a></span>getMemorySize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t kiwi::lm::KnLangModelBase::getMemorySize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implements <a class="el" href="classkiwi_1_1lm_1_1ILangModel.html">kiwi::lm::ILangModel</a>.</p>
+
+</div>
+</div>
+<a id="ab2680dd0a197edb8cceac1992a679226" name="ab2680dd0a197edb8cceac1992a679226"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab2680dd0a197edb8cceac1992a679226">&#9670;&#160;</a></span>vocabSize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t kiwi::lm::KnLangModelBase::vocabSize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implements <a class="el" href="classkiwi_1_1lm_1_1ILangModel.html">kiwi::lm::ILangModel</a>.</p>
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
 <li>include/kiwi/<b>Knlm.h</b></li>
 </ul>

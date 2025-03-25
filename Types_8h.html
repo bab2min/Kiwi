@@ -92,6 +92,7 @@ $(function() {
 <code>#include &lt;unordered_map&gt;</code><br />
 <code>#include &lt;unordered_set&gt;</code><br />
 <code>#include &lt;string&gt;</code><br />
+<code>#include &lt;string_view&gt;</code><br />
 <code>#include &lt;memory&gt;</code><br />
 <code>#include &lt;type_traits&gt;</code><br />
 <code>#include &lt;functional&gt;</code><br />
@@ -147,12 +148,6 @@ Macros</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr class="memitem:af2347aab8733ce0ba133f9831896cdb3" id="r_af2347aab8733ce0ba133f9831896cdb3"><td class="memItemLeft" align="right" valign="top"><a id="af2347aab8733ce0ba133f9831896cdb3" name="af2347aab8733ce0ba133f9831896cdb3"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>nonstd::string_view</b> = <a class="el" href="classnonstd_1_1sv__lite_1_1basic__string__view.html">sv_lite::basic_string_view</a>&lt; char, std::char_traits&lt; char &gt; &gt;</td></tr>
-<tr class="separator:af2347aab8733ce0ba133f9831896cdb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7106abe60276f87a4e0c66e20b358a25" id="r_a7106abe60276f87a4e0c66e20b358a25"><td class="memItemLeft" align="right" valign="top"><a id="a7106abe60276f87a4e0c66e20b358a25" name="a7106abe60276f87a4e0c66e20b358a25"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>nonstd::u16string_view</b> = <a class="el" href="classnonstd_1_1sv__lite_1_1basic__string__view.html">sv_lite::basic_string_view</a>&lt; char16_t, std::char_traits&lt; char16_t &gt; &gt;</td></tr>
-<tr class="separator:a7106abe60276f87a4e0c66e20b358a25"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1ec8eec78c8df123411e97bdcdd0705a" id="r_a1ec8eec78c8df123411e97bdcdd0705a"><td class="memItemLeft" align="right" valign="top"><a id="a1ec8eec78c8df123411e97bdcdd0705a" name="a1ec8eec78c8df123411e97bdcdd0705a"></a>
 typedef char16_t&#160;</td><td class="memItemRight" valign="bottom"><b>kiwi::kchar_t</b></td></tr>
 <tr class="separator:a1ec8eec78c8df123411e97bdcdd0705a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -188,9 +183,9 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>kiwi::KcVector</b> =
 <tr class="memitem:ac3e4f78d399b476f38f39f4003ad3e25" id="r_ac3e4f78d399b476f38f39f4003ad3e25"><td class="memItemLeft" align="right" valign="top"><a id="ac3e4f78d399b476f38f39f4003ad3e25" name="ac3e4f78d399b476f38f39f4003ad3e25"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>kiwi::KcScores</b> = <a class="el" href="Types_8h.html#a48d29484f2a48f6a4de60bbfd7746232">Vector</a>&lt; std::pair&lt; KcVector, float &gt; &gt;</td></tr>
 <tr class="separator:ac3e4f78d399b476f38f39f4003ad3e25"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a02f9d77f5483496cf6c5f49471a24fbe" id="r_a02f9d77f5483496cf6c5f49471a24fbe"><td class="memItemLeft" align="right" valign="top"><a id="a02f9d77f5483496cf6c5f49471a24fbe" name="a02f9d77f5483496cf6c5f49471a24fbe"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>kiwi::U16StringView</b> = <a class="el" href="classnonstd_1_1sv__lite_1_1basic__string__view.html">nonstd::u16string_view</a></td></tr>
-<tr class="separator:a02f9d77f5483496cf6c5f49471a24fbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7b95ff870be574d38671993871f2a01e" id="r_a7b95ff870be574d38671993871f2a01e"><td class="memItemLeft" align="right" valign="top"><a id="a7b95ff870be574d38671993871f2a01e" name="a7b95ff870be574d38671993871f2a01e"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>kiwi::U16StringView</b> = std::u16string_view</td></tr>
+<tr class="separator:a7b95ff870be574d38671993871f2a01e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa3333c7237f7db8aa0121560dbaa3ecb" id="r_aa3333c7237f7db8aa0121560dbaa3ecb"><td class="memItemLeft" align="right" valign="top"><a id="aa3333c7237f7db8aa0121560dbaa3ecb" name="aa3333c7237f7db8aa0121560dbaa3ecb"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>kiwi::TokenResult</b> = std::pair&lt; std::vector&lt; <a class="el" href="structkiwi_1_1TokenInfo.html">TokenInfo</a> &gt;, float &gt;</td></tr>
 <tr class="memdesc:aa3333c7237f7db8aa0121560dbaa3ecb"><td class="mdescLeft">&#160;</td><td class="mdescRight">분석 완료된 형태소의 목록(<code>std::vector&lt;<a class="el" href="structkiwi_1_1TokenInfo.html" title="분석 완료된 각 형태소들의 정보를 담는 구조체">TokenInfo</a>&gt;</code>)과 점수(<code>float</code>)의 pair 타입 <br /></td></tr>
@@ -332,6 +327,19 @@ Enumerations</h2></td></tr>
  }</td></tr>
 <tr class="memdesc:a7b5ed1c7b90b79877f32c8a011c06ff3"><td class="mdescLeft">&#160;</td><td class="mdescRight">KiwiBuilder 생성시 사용되는 비트 플래그  <a href="Types_8h.html#a7b5ed1c7b90b79877f32c8a011c06ff3">More...</a><br /></td></tr>
 <tr class="separator:a7b5ed1c7b90b79877f32c8a011c06ff3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af7906391a8e367cab5296bac8d4caafa" id="r_af7906391a8e367cab5296bac8d4caafa"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Types_8h.html#af7906391a8e367cab5296bac8d4caafa">kiwi::ModelType</a> { <br />
+&#160;&#160;<a class="el" href="Types_8h.html#af7906391a8e367cab5296bac8d4caafaa334c4a4c42fdb79d7ebc3e73b517e6f8">none</a> = 0
+, <a class="el" href="Types_8h.html#af7906391a8e367cab5296bac8d4caafaaac794a38581bb3bc7fb719e2b3331b8e">knlm</a> = 1
+, <a class="el" href="Types_8h.html#af7906391a8e367cab5296bac8d4caafaa037b02f21d877dfa5fc5bf220d47471b">sbg</a> = 2
+, <a class="el" href="Types_8h.html#af7906391a8e367cab5296bac8d4caafaa3de6a8f9608ddd4ba89f97b36d7587d6">cong</a> = 3
+, <br />
+&#160;&#160;<a class="el" href="Types_8h.html#af7906391a8e367cab5296bac8d4caafaae3f0d49077d0c56e887f1ea94cb48c01">congGlobal</a> = 4
+, <a class="el" href="Types_8h.html#af7906391a8e367cab5296bac8d4caafaad60d775d5dc985a13910f27ffc533519">congFp32</a> = 5
+, <a class="el" href="Types_8h.html#af7906391a8e367cab5296bac8d4caafaab0c0607bc37511576e142197ccbab374">congGlobalFp32</a> = 6
+, <b>knlmTransposed</b>
+<br />
+ }</td></tr>
+<tr class="separator:af7906391a8e367cab5296bac8d4caafa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
@@ -532,6 +540,44 @@ template&lt;typename _Ty &gt; </div>
 <tr><td class="fieldname"><a id="a11856481b15f24bf19cb647734ea1085a547d69d64835c70f869a0fe0120f6501" name="a11856481b15f24bf19cb647734ea1085a547d69d64835c70f869a0fe0120f6501"></a>non_vocalic_h&#160;</td><td class="fielddoc"><p><code>vocalic_h</code>의 부정 </p>
 </td></tr>
 <tr><td class="fieldname"><a id="a11856481b15f24bf19cb647734ea1085a1a65fd4015955dc79e66e177130c6797" name="a11856481b15f24bf19cb647734ea1085a1a65fd4015955dc79e66e177130c6797"></a>applosive&#160;</td><td class="fielddoc"><p>불파음 받침(ㄴㄹㅁㅇ을 제외한 모든 받침) </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a id="af7906391a8e367cab5296bac8d4caafa" name="af7906391a8e367cab5296bac8d4caafa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af7906391a8e367cab5296bac8d4caafa">&#9670;&#160;</a></span>ModelType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum class <a class="el" href="Types_8h.html#af7906391a8e367cab5296bac8d4caafa">kiwi::ModelType</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="af7906391a8e367cab5296bac8d4caafaa334c4a4c42fdb79d7ebc3e73b517e6f8" name="af7906391a8e367cab5296bac8d4caafaa334c4a4c42fdb79d7ebc3e73b517e6f8"></a>none&#160;</td><td class="fielddoc"><p>Select default model </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af7906391a8e367cab5296bac8d4caafaaac794a38581bb3bc7fb719e2b3331b8e" name="af7906391a8e367cab5296bac8d4caafaaac794a38581bb3bc7fb719e2b3331b8e"></a>knlm&#160;</td><td class="fielddoc"><p>Kneser-Ney Language Model </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af7906391a8e367cab5296bac8d4caafaa037b02f21d877dfa5fc5bf220d47471b" name="af7906391a8e367cab5296bac8d4caafaa037b02f21d877dfa5fc5bf220d47471b"></a>sbg&#160;</td><td class="fielddoc"><p>Skip-Bigram Model </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af7906391a8e367cab5296bac8d4caafaa3de6a8f9608ddd4ba89f97b36d7587d6" name="af7906391a8e367cab5296bac8d4caafaa3de6a8f9608ddd4ba89f97b36d7587d6"></a>cong&#160;</td><td class="fielddoc"><p>Contextual N-gram embedding Language Model (Only local context) </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af7906391a8e367cab5296bac8d4caafaae3f0d49077d0c56e887f1ea94cb48c01" name="af7906391a8e367cab5296bac8d4caafaae3f0d49077d0c56e887f1ea94cb48c01"></a>congGlobal&#160;</td><td class="fielddoc"><p>Contextual N-gram embedding Language Model (local and global context) </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af7906391a8e367cab5296bac8d4caafaad60d775d5dc985a13910f27ffc533519" name="af7906391a8e367cab5296bac8d4caafaad60d775d5dc985a13910f27ffc533519"></a>congFp32&#160;</td><td class="fielddoc"><p>Contextual N-gram embedding Language Model (Only local context, non-quantized(slow) version) </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af7906391a8e367cab5296bac8d4caafaab0c0607bc37511576e142197ccbab374" name="af7906391a8e367cab5296bac8d4caafaab0c0607bc37511576e142197ccbab374"></a>congGlobalFp32&#160;</td><td class="fielddoc"><p>Contextual N-gram embedding Language Model (local and global context, non-quantized(slow) version) </p>
 </td></tr>
 </table>
 

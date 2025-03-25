@@ -84,9 +84,9 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a9b897b59c7414145a32b39be5353b030" id="r_a9b897b59c7414145a32b39be5353b030"><td class="memItemLeft" align="right" valign="top"><a id="a9b897b59c7414145a32b39be5353b030" name="a9b897b59c7414145a32b39be5353b030"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>HSDataset</b> (size_t _batchSize=0, size_t _causalContextSize=0, size_t _windowSize=0, size_t _workers=0, double _dropoutProb=0, double _dropoutProbOnHistory=0)</td></tr>
-<tr class="separator:a9b897b59c7414145a32b39be5353b030"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a918e48527af9c56eebde53a51edc7ea5" id="r_a918e48527af9c56eebde53a51edc7ea5"><td class="memItemLeft" align="right" valign="top"><a id="a918e48527af9c56eebde53a51edc7ea5" name="a918e48527af9c56eebde53a51edc7ea5"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>HSDataset</b> (size_t _batchSize=0, size_t _causalContextSize=0, size_t _windowSize=0, bool _exclusiveWindow=true, size_t _workers=0, double _dropoutProb=0, double _dropoutProbOnHistory=0, double _nounAugmentingProb=0, size_t _generateUnlikelihoods=-1)</td></tr>
+<tr class="separator:a918e48527af9c56eebde53a51edc7ea5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac9e094faf90b850e17fcaa8fbdd41679" id="r_ac9e094faf90b850e17fcaa8fbdd41679"><td class="memItemLeft" align="right" valign="top"><a id="ac9e094faf90b850e17fcaa8fbdd41679" name="ac9e094faf90b850e17fcaa8fbdd41679"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>HSDataset</b> (const <a class="el" href="classkiwi_1_1HSDataset.html">HSDataset</a> &amp;)=delete</td></tr>
 <tr class="separator:ac9e094faf90b850e17fcaa8fbdd41679"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -108,6 +108,9 @@ size_t&#160;</td><td class="memItemRight" valign="bottom"><b>numSents</b> () con
 <tr class="memitem:abed11d8164d33d37935ab535028d9b60" id="r_abed11d8164d33d37935ab535028d9b60"><td class="memItemLeft" align="right" valign="top"><a id="abed11d8164d33d37935ab535028d9b60" name="abed11d8164d33d37935ab535028d9b60"></a>
 size_t&#160;</td><td class="memItemRight" valign="bottom"><b>numTokens</b> () const</td></tr>
 <tr class="separator:abed11d8164d33d37935ab535028d9b60"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0e111aceeaee213b3f1543b2dc6a190c" id="r_a0e111aceeaee213b3f1543b2dc6a190c"><td class="memItemLeft" align="right" valign="top"><a id="a0e111aceeaee213b3f1543b2dc6a190c" name="a0e111aceeaee213b3f1543b2dc6a190c"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>doesGenerateUnlikelihoods</b> () const</td></tr>
+<tr class="separator:a0e111aceeaee213b3f1543b2dc6a190c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa38f44f00a0ae191217b3c1814911598" id="r_aa38f44f00a0ae191217b3c1814911598"><td class="memItemLeft" align="right" valign="top"><a id="aa38f44f00a0ae191217b3c1814911598" name="aa38f44f00a0ae191217b3c1814911598"></a>
 size_t&#160;</td><td class="memItemRight" valign="bottom"><b>getBatchSize</b> () const</td></tr>
 <tr class="separator:aa38f44f00a0ae191217b3c1814911598"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -126,12 +129,12 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>seed</b> (size_t newS
 <tr class="memitem:a2a3d93263f4b1aaead2c88af9fc186ad" id="r_a2a3d93263f4b1aaead2c88af9fc186ad"><td class="memItemLeft" align="right" valign="top"><a id="a2a3d93263f4b1aaead2c88af9fc186ad" name="a2a3d93263f4b1aaead2c88af9fc186ad"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>reset</b> ()</td></tr>
 <tr class="separator:a2a3d93263f4b1aaead2c88af9fc186ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad511f6c04d5d9dfe4f98bce4fff3a8a5" id="r_ad511f6c04d5d9dfe4f98bce4fff3a8a5"><td class="memItemLeft" align="right" valign="top"><a id="ad511f6c04d5d9dfe4f98bce4fff3a8a5" name="ad511f6c04d5d9dfe4f98bce4fff3a8a5"></a>
-size_t&#160;</td><td class="memItemRight" valign="bottom"><b>next</b> (int32_t *in, int32_t *out, float *lmLProbs, uint32_t *outNgramNode, float &amp;restLmOut, uint32_t &amp;restLmCntOut)</td></tr>
-<tr class="separator:ad511f6c04d5d9dfe4f98bce4fff3a8a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa7ba9ca1e205173dfd18af551da8b3f2" id="r_aa7ba9ca1e205173dfd18af551da8b3f2"><td class="memItemLeft" align="right" valign="top"><a id="aa7ba9ca1e205173dfd18af551da8b3f2" name="aa7ba9ca1e205173dfd18af551da8b3f2"></a>
-size_t&#160;</td><td class="memItemRight" valign="bottom"><b>next</b> (int64_t *in, int64_t *out, float *lmLProbs, int64_t *outNgramNode, float &amp;restLmOut, uint32_t &amp;restLmCntOut)</td></tr>
-<tr class="separator:aa7ba9ca1e205173dfd18af551da8b3f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acb64d1cac2e2aa4992e75f94eaaf683c" id="r_acb64d1cac2e2aa4992e75f94eaaf683c"><td class="memItemLeft" align="right" valign="top"><a id="acb64d1cac2e2aa4992e75f94eaaf683c" name="acb64d1cac2e2aa4992e75f94eaaf683c"></a>
+size_t&#160;</td><td class="memItemRight" valign="bottom"><b>next</b> (int32_t *in, int32_t *out, float *lmLProbs, uint32_t *outNgramNode, float &amp;restLmOut, uint32_t &amp;restLmCntOut, int32_t *unlikelihoodIn=nullptr, int32_t *unlikelihoodOut=nullptr, size_t *unlikelihoodSize=nullptr)</td></tr>
+<tr class="separator:acb64d1cac2e2aa4992e75f94eaaf683c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a15705c81aed5fe8691e0c4d4ac9a93f0" id="r_a15705c81aed5fe8691e0c4d4ac9a93f0"><td class="memItemLeft" align="right" valign="top"><a id="a15705c81aed5fe8691e0c4d4ac9a93f0" name="a15705c81aed5fe8691e0c4d4ac9a93f0"></a>
+size_t&#160;</td><td class="memItemRight" valign="bottom"><b>next</b> (int64_t *in, int64_t *out, float *lmLProbs, int64_t *outNgramNode, float &amp;restLmOut, uint32_t &amp;restLmCntOut, int64_t *unlikelihoodIn=nullptr, int64_t *unlikelihoodOut=nullptr, size_t *unlikelihoodSize=nullptr)</td></tr>
+<tr class="separator:a15705c81aed5fe8691e0c4d4ac9a93f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5fd5e522fc71e02dd490846c4b6891bf" id="r_a5fd5e522fc71e02dd490846c4b6891bf"><td class="memItemLeft" align="right" valign="top"><a id="a5fd5e522fc71e02dd490846c4b6891bf" name="a5fd5e522fc71e02dd490846c4b6891bf"></a>
 size_t&#160;</td><td class="memItemRight" valign="bottom"><b>vocabSize</b> () const</td></tr>
 <tr class="separator:a5fd5e522fc71e02dd490846c4b6891bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -150,15 +153,15 @@ std::u16string&#160;</td><td class="memItemRight" valign="bottom"><b>vocabForm</
 <tr class="memitem:a5638ff27620d6cb7136527bedd7f19a1" id="r_a5638ff27620d6cb7136527bedd7f19a1"><td class="memItemLeft" align="right" valign="top"><a id="a5638ff27620d6cb7136527bedd7f19a1" name="a5638ff27620d6cb7136527bedd7f19a1"></a>
 std::vector&lt; size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>estimVocabFrequency</b> () const</td></tr>
 <tr class="separator:a5638ff27620d6cb7136527bedd7f19a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5e102c6dd04b48aa519aea1de6f15229" id="r_a5e102c6dd04b48aa519aea1de6f15229"><td class="memItemLeft" align="right" valign="top"><a id="a5e102c6dd04b48aa519aea1de6f15229" name="a5e102c6dd04b48aa519aea1de6f15229"></a>
-<a class="el" href="classkiwi_1_1Range.html">Range</a>&lt; <a class="el" href="Types_8h.html#a48d29484f2a48f6a4de60bbfd7746232">Vector</a>&lt; uint32_t &gt;::const_iterator &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getSent</b> (size_t idx) const</td></tr>
-<tr class="separator:a5e102c6dd04b48aa519aea1de6f15229"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a87eb104f3730ed31ca3fbf350c1b48f3" id="r_a87eb104f3730ed31ca3fbf350c1b48f3"><td class="memItemLeft" align="right" valign="top"><a id="a87eb104f3730ed31ca3fbf350c1b48f3" name="a87eb104f3730ed31ca3fbf350c1b48f3"></a>
+<a class="el" href="classkiwi_1_1Range.html">Range</a>&lt; <a class="el" href="Types_8h.html#a48d29484f2a48f6a4de60bbfd7746232">Vector</a>&lt; int32_t &gt;::const_iterator &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getSent</b> (size_t idx) const</td></tr>
+<tr class="separator:a87eb104f3730ed31ca3fbf350c1b48f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aac26bd504d16708856721a4f81e9757d" id="r_aac26bd504d16708856721a4f81e9757d"><td class="memItemLeft" align="right" valign="top"><a id="aac26bd504d16708856721a4f81e9757d" name="aac26bd504d16708856721a4f81e9757d"></a>
 std::vector&lt; uint32_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getAugmentedSent</b> (size_t idx)</td></tr>
 <tr class="separator:aac26bd504d16708856721a4f81e9757d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac2562aafaad5d3a2b301898b292c3412" id="r_ac2562aafaad5d3a2b301898b292c3412"><td class="memItemLeft" align="right" valign="top"><a id="ac2562aafaad5d3a2b301898b292c3412" name="ac2562aafaad5d3a2b301898b292c3412"></a>
-std::vector&lt; std::pair&lt; std::vector&lt; uint32_t &gt;, size_t &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>extractPrefixes</b> (size_t minCnt, size_t maxLength, size_t numWorkers=1) const</td></tr>
-<tr class="separator:ac2562aafaad5d3a2b301898b292c3412"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac90f7a621c5800b472475f7c26850f51" id="r_ac90f7a621c5800b472475f7c26850f51"><td class="memItemLeft" align="right" valign="top"><a id="ac90f7a621c5800b472475f7c26850f51" name="ac90f7a621c5800b472475f7c26850f51"></a>
+std::vector&lt; std::pair&lt; std::vector&lt; uint32_t &gt;, size_t &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>extractPrefixes</b> (size_t minCnt, size_t maxLength, size_t numWorkers=1, bool exclusiveCnt=false) const</td></tr>
+<tr class="separator:ac90f7a621c5800b472475f7c26850f51"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="friends" name="friends"></a>
 Friends</h2></td></tr>

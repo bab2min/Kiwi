@@ -7,11 +7,13 @@ digraph "kiwi::utils::detail::HasSubmatch&lt; Value, class &gt;"
   rankdir="LR";
   Node1 [id="Node000001",label="kiwi::utils::detail\l::HasSubmatch\< Value,\l class \>",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
   Node1 -> Node2 [id="edge1_Node000001_Node000002",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node2 [id="Node000002",label="kiwi::utils::FrozenTrie\l\< kchar_t, const kiwi\l::Form * \>",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",URL="$classkiwi_1_1utils_1_1FrozenTrie.html",tooltip=" "];
+  Node2 [id="Node000002",label="kiwi::utils::FrozenTrie\l\< uint32_t, uint32_t \>",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",URL="$classkiwi_1_1utils_1_1FrozenTrie.html",tooltip=" "];
   Node1 -> Node3 [id="edge2_Node000001_Node000003",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node3 [id="Node000003",label="kiwi::utils::FrozenTrie\l\< kchar_t, uint32_t \>",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",URL="$classkiwi_1_1utils_1_1FrozenTrie.html",tooltip=" "];
+  Node3 [id="Node000003",label="kiwi::utils::FrozenTrie\l\< kchar_t, const kiwi\l::Form * \>",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",URL="$classkiwi_1_1utils_1_1FrozenTrie.html",tooltip=" "];
   Node1 -> Node4 [id="edge3_Node000001_Node000004",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node4 [id="Node000004",label="kiwi::utils::FrozenTrie\l\< char16_t, size_t \>",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",URL="$classkiwi_1_1utils_1_1FrozenTrie.html",tooltip=" "];
+  Node4 [id="Node000004",label="kiwi::utils::FrozenTrie\l\< kchar_t, uint32_t \>",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",URL="$classkiwi_1_1utils_1_1FrozenTrie.html",tooltip=" "];
   Node1 -> Node5 [id="edge4_Node000001_Node000005",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node5 [id="Node000005",label="kiwi::utils::FrozenTrie\l\< _Key, _Value, _Diff,\l _HasSubmatch \>",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",URL="$classkiwi_1_1utils_1_1FrozenTrie.html",tooltip=" "];
+  Node5 [id="Node000005",label="kiwi::utils::FrozenTrie\l\< char16_t, size_t \>",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",URL="$classkiwi_1_1utils_1_1FrozenTrie.html",tooltip=" "];
+  Node1 -> Node6 [id="edge5_Node000001_Node000006",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node6 [id="Node000006",label="kiwi::utils::FrozenTrie\l\< _Key, _Value, _Diff,\l _HasSubmatch \>",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",URL="$classkiwi_1_1utils_1_1FrozenTrie.html",tooltip=" "];
 }

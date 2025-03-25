@@ -8,7 +8,8 @@ var searchData=
   ['memoryowner_5',['MemoryOwner',['../classkiwi_1_1utils_1_1MemoryOwner.html',1,'kiwi::utils']]],
   ['mmap_6',['MMap',['../classkiwi_1_1utils_1_1MMap.html',1,'kiwi::utils']]],
   ['modelbuildargs_7',['ModelBuildArgs',['../structkiwi_1_1KiwiBuilder_1_1ModelBuildArgs.html',1,'kiwi::KiwiBuilder']]],
-  ['morph_8',['morph',['../structkiwi_1_1TokenInfo.html#a8036684b6884ddf24d5f013d36cb6b0a',1,'kiwi::TokenInfo']]],
-  ['morpheme_9',['Morpheme',['../structkiwi_1_1Morpheme.html',1,'kiwi']]],
-  ['morphemeraw_10',['morphemeraw',['../structkiwi_1_1MorphemeRaw.html',1,'kiwi::MorphemeRaw'],['../structkiwi_1_1MorphemeRaw.html#adbfe0b0a46369012e8bccab4f0f70732',1,'kiwi::MorphemeRaw::MorphemeRaw()']]]
+  ['modeltype_8',['ModelType',['../Types_8h.html#af7906391a8e367cab5296bac8d4caafa',1,'kiwi']]],
+  ['morph_9',['morph',['../structkiwi_1_1TokenInfo.html#a8036684b6884ddf24d5f013d36cb6b0a',1,'kiwi::TokenInfo']]],
+  ['morpheme_10',['Morpheme',['../structkiwi_1_1Morpheme.html',1,'kiwi']]],
+  ['morphemeraw_11',['morphemeraw',['../structkiwi_1_1MorphemeRaw.html',1,'kiwi::MorphemeRaw'],['../structkiwi_1_1MorphemeRaw.html#adbfe0b0a46369012e8bccab4f0f70732',1,'kiwi::MorphemeRaw::MorphemeRaw()']]]
 ];

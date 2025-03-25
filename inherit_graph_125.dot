@@ -1,0 +1,21 @@
+digraph "Graphical Class Hierarchy"
+{
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
+  node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
+  rankdir="LR";
+  Node0 [id="Node000000",label="std::runtime_error",height=0.2,width=0.4,color="grey60", fillcolor="#E0E0E0", style="filled",tooltip=" "];
+  Node0 -> Node1 [id="edge23_Node000000_Node000001",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node1 [id="Node000001",label="kiwi::Exception",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$classkiwi_1_1Exception.html",tooltip=" "];
+  Node1 -> Node2 [id="edge24_Node000001_Node000002",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node2 [id="Node000002",label="kiwi::FormatException",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$classkiwi_1_1FormatException.html",tooltip=" "];
+  Node1 -> Node3 [id="edge25_Node000001_Node000003",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node3 [id="Node000003",label="kiwi::IOException",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$classkiwi_1_1IOException.html",tooltip=" "];
+  Node1 -> Node4 [id="edge26_Node000001_Node000004",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node4 [id="Node000004",label="kiwi::SwTokenizerException",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$classkiwi_1_1SwTokenizerException.html",tooltip=" "];
+  Node1 -> Node5 [id="edge27_Node000001_Node000005",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node5 [id="Node000005",label="kiwi::UnicodeException",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$classkiwi_1_1UnicodeException.html",tooltip=" "];
+  Node1 -> Node6 [id="edge28_Node000001_Node000006",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node6 [id="Node000006",label="kiwi::UnknownMorphemeException",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$classkiwi_1_1UnknownMorphemeException.html",tooltip=" "];
+}

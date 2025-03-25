@@ -104,9 +104,9 @@ Public Types</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ae7102d4533a34fe89cce17b1c93bdc07" id="r_ae7102d4533a34fe89cce17b1c93bdc07"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1Kiwi.html#ae7102d4533a34fe89cce17b1c93bdc07">Kiwi</a> (ArchType arch=ArchType::default_, <a class="el" href="structkiwi_1_1LangModel.html">LangModel</a> _langMdl={}, bool typoTolerant=false, bool continualTypoTolerant=false, bool lengtheningTypoTolerant=false)</td></tr>
-<tr class="memdesc:ae7102d4533a34fe89cce17b1c93bdc07"><td class="mdescLeft">&#160;</td><td class="mdescRight">빈 <a class="el" href="classkiwi_1_1Kiwi.html" title="실제 형태소 분석을 수행하는 클래스.">Kiwi</a> 객체를 생성한다.  <br /></td></tr>
-<tr class="separator:ae7102d4533a34fe89cce17b1c93bdc07"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9fdcc70af2d0582e00313c0d92546aad" id="r_a9fdcc70af2d0582e00313c0d92546aad"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1Kiwi.html#a9fdcc70af2d0582e00313c0d92546aad">Kiwi</a> (ArchType arch=ArchType::default_, const std::shared_ptr&lt; <a class="el" href="classkiwi_1_1lm_1_1ILangModel.html">lm::ILangModel</a> &gt; &amp;_langMdl={}, bool typoTolerant=false, bool continualTypoTolerant=false, bool lengtheningTypoTolerant=false)</td></tr>
+<tr class="memdesc:a9fdcc70af2d0582e00313c0d92546aad"><td class="mdescLeft">&#160;</td><td class="mdescRight">빈 <a class="el" href="classkiwi_1_1Kiwi.html" title="실제 형태소 분석을 수행하는 클래스.">Kiwi</a> 객체를 생성한다.  <br /></td></tr>
+<tr class="separator:a9fdcc70af2d0582e00313c0d92546aad"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a823fae39cb92135cf1507ddcea7d3004" id="r_a823fae39cb92135cf1507ddcea7d3004"><td class="memItemLeft" align="right" valign="top"><a id="a823fae39cb92135cf1507ddcea7d3004" name="a823fae39cb92135cf1507ddcea7d3004"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>Kiwi</b> (const <a class="el" href="classkiwi_1_1Kiwi.html">Kiwi</a> &amp;)=delete</td></tr>
 <tr class="separator:a823fae39cb92135cf1507ddcea7d3004"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -125,6 +125,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a9ef69ed82844eace895f941409f7d647" id="r_a9ef69ed82844eace895f941409f7d647"><td class="memItemLeft" align="right" valign="top"><a id="a9ef69ed82844eace895f941409f7d647" name="a9ef69ed82844eace895f941409f7d647"></a>
 ArchType&#160;</td><td class="memItemRight" valign="bottom"><b>archType</b> () const</td></tr>
 <tr class="separator:a9ef69ed82844eace895f941409f7d647"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a77791a574c22e10f06695de61eca0f05" id="r_a77791a574c22e10f06695de61eca0f05"><td class="memItemLeft" align="right" valign="top"><a id="a77791a574c22e10f06695de61eca0f05" name="a77791a574c22e10f06695de61eca0f05"></a>
+<a class="el" href="Types_8h.html#af7906391a8e367cab5296bac8d4caafa">ModelType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>modelType</b> () const</td></tr>
+<tr class="separator:a77791a574c22e10f06695de61eca0f05"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a56ef14c138b0a3aba65f14aa58153622" id="r_a56ef14c138b0a3aba65f14aa58153622"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1Kiwi.html#a56ef14c138b0a3aba65f14aa58153622">isTypoTolerant</a> () const</td></tr>
 <tr class="memdesc:a56ef14c138b0a3aba65f14aa58153622"><td class="mdescLeft">&#160;</td><td class="mdescRight">현재 <a class="el" href="classkiwi_1_1Kiwi.html" title="실제 형태소 분석을 수행하는 클래스.">Kiwi</a> 객체가 오타 교정 기능이 켜진 상태로 생성되었는지 알려준다.  <br /></td></tr>
 <tr class="separator:a56ef14c138b0a3aba65f14aa58153622"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -172,13 +175,13 @@ std::future&lt; std::pair&lt; <a class="el" href="Types_8h.html#aa3333c7237f7db8
 <tr class="separator:ace1635ac3c363b315a478ccdd04410c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a76e537a82d994765d0f4295f2d2ffc20" id="r_a76e537a82d994765d0f4295f2d2ffc20"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::pair&lt; size_t, size_t &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1Kiwi.html#a76e537a82d994765d0f4295f2d2ffc20">splitIntoSents</a> (const std::string &amp;str, Match matchOptions=Match::allWithNormalizing, <a class="el" href="Types_8h.html#aa3333c7237f7db8aa0121560dbaa3ecb">TokenResult</a> *tokenizedResultOut=nullptr) const</td></tr>
 <tr class="separator:a76e537a82d994765d0f4295f2d2ffc20"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a56f65418030b75c1aaf31282fe0a3ae4" id="r_a56f65418030b75c1aaf31282fe0a3ae4"><td class="memTemplParams" colspan="2"><a id="a56f65418030b75c1aaf31282fe0a3ae4" name="a56f65418030b75c1aaf31282fe0a3ae4"></a>
+template&lt;class LmState &gt; </td></tr>
+<tr class="memitem:a56f65418030b75c1aaf31282fe0a3ae4"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classkiwi_1_1cmb_1_1AutoJoiner.html">cmb::AutoJoiner</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><b>newJoinerImpl</b> () const</td></tr>
+<tr class="separator:a56f65418030b75c1aaf31282fe0a3ae4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a38266e3408b09fe2e924f5f04fd8f19d" id="r_a38266e3408b09fe2e924f5f04fd8f19d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classkiwi_1_1cmb_1_1AutoJoiner.html">cmb::AutoJoiner</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1Kiwi.html#a38266e3408b09fe2e924f5f04fd8f19d">newJoiner</a> (bool lmSearch=true) const</td></tr>
 <tr class="memdesc:a38266e3408b09fe2e924f5f04fd8f19d"><td class="mdescLeft">&#160;</td><td class="mdescRight">형태소들을 결합하여 텍스트로 복원해주는 작업을 수행하는 AutoJoiner를 반환한다.  <br /></td></tr>
 <tr class="separator:a38266e3408b09fe2e924f5f04fd8f19d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a204f431dda1cd832b765d5b0df0ba5a7" id="r_a204f431dda1cd832b765d5b0df0ba5a7"><td class="memItemLeft" align="right" valign="top"><a id="a204f431dda1cd832b765d5b0df0ba5a7" name="a204f431dda1cd832b765d5b0df0ba5a7"></a>
-std::unique_ptr&lt; <a class="el" href="classkiwi_1_1LmObjectBase.html">LmObjectBase</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>newLmObject</b> () const</td></tr>
-<tr class="memdesc:a204f431dda1cd832b765d5b0df0ba5a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Kiwi에 내장된 언어 모델에 접근할 수 있는 LmObject 객체를 생성한다. <br /></td></tr>
-<tr class="separator:a204f431dda1cd832b765d5b0df0ba5a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aec622c9828a27aad2c12a021e1c8a577" id="r_aec622c9828a27aad2c12a021e1c8a577"><td class="memItemLeft" align="right" valign="top">std::u16string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1Kiwi.html#aec622c9828a27aad2c12a021e1c8a577">getTypoForm</a> (size_t typoFormId) const</td></tr>
 <tr class="memdesc:aec622c9828a27aad2c12a021e1c8a577"><td class="mdescLeft">&#160;</td><td class="mdescRight"><code><a class="el" href="structkiwi_1_1TokenInfo.html#aa77262e269fb9873c00c6fc9ad410fbb">TokenInfo::typoFormId</a></code>로부터 실제 오타 형태를 복원한다.  <br /></td></tr>
 <tr class="separator:aec622c9828a27aad2c12a021e1c8a577"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -251,9 +254,9 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>getIntegrateAllomorph
 <tr class="memitem:a021798aff2842bb0b0cd17744e751e02" id="r_a021798aff2842bb0b0cd17744e751e02"><td class="memItemLeft" align="right" valign="top"><a id="a021798aff2842bb0b0cd17744e751e02" name="a021798aff2842bb0b0cd17744e751e02"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>setIntegrateAllomorph</b> (bool v)</td></tr>
 <tr class="separator:a021798aff2842bb0b0cd17744e751e02"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4db93227a9f6b049633a0ffe297a20ff" id="r_a4db93227a9f6b049633a0ffe297a20ff"><td class="memItemLeft" align="right" valign="top"><a id="a4db93227a9f6b049633a0ffe297a20ff" name="a4db93227a9f6b049633a0ffe297a20ff"></a>
-const <a class="el" href="classkiwi_1_1lm_1_1KnLangModelBase.html">lm::KnLangModelBase</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>getKnLM</b> () const</td></tr>
-<tr class="separator:a4db93227a9f6b049633a0ffe297a20ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a745dcb4e8f26724be90b528aa2f49e6a" id="r_a745dcb4e8f26724be90b528aa2f49e6a"><td class="memItemLeft" align="right" valign="top"><a id="a745dcb4e8f26724be90b528aa2f49e6a" name="a745dcb4e8f26724be90b528aa2f49e6a"></a>
+const <a class="el" href="classkiwi_1_1lm_1_1ILangModel.html">lm::ILangModel</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>getLangModel</b> () const</td></tr>
+<tr class="separator:a745dcb4e8f26724be90b528aa2f49e6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afa75421b03853bed13d3d58dc58ee710" id="r_afa75421b03853bed13d3d58dc58ee710"><td class="memItemLeft" align="right" valign="top"><a id="afa75421b03853bed13d3d58dc58ee710" name="afa75421b03853bed13d3d58dc58ee710"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>findMorpheme</b> (std::vector&lt; const <a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a> * &gt; &amp;out, const std::u16string &amp;s, <a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebb">POSTag</a> tag=<a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebbaad921d60486366258809553a3db49a4a">POSTag::unknown</a>) const</td></tr>
 <tr class="separator:afa75421b03853bed13d3d58dc58ee710"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -266,9 +269,18 @@ Friends</h2></td></tr>
 <tr class="memitem:ab2c33d7538f624b7652fb7fd9b898542" id="r_ab2c33d7538f624b7652fb7fd9b898542"><td class="memItemLeft" align="right" valign="top"><a id="ab2c33d7538f624b7652fb7fd9b898542" name="ab2c33d7538f624b7652fb7fd9b898542"></a>
 class&#160;</td><td class="memItemRight" valign="bottom"><b>KiwiBuilder</b></td></tr>
 <tr class="separator:ab2c33d7538f624b7652fb7fd9b898542"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad7bff33581f62813dbbc3013d41fd745" id="r_ad7bff33581f62813dbbc3013d41fd745"><td class="memItemLeft" align="right" valign="top"><a id="ad7bff33581f62813dbbc3013d41fd745" name="ad7bff33581f62813dbbc3013d41fd745"></a>
-class&#160;</td><td class="memItemRight" valign="bottom"><b>PathEvaluator</b></td></tr>
-<tr class="separator:ad7bff33581f62813dbbc3013d41fd745"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a064df85d8812696aaa3f8d2288f3e2b2" id="r_a064df85d8812696aaa3f8d2288f3e2b2"><td class="memTemplParams" colspan="2"><a id="a064df85d8812696aaa3f8d2288f3e2b2" name="a064df85d8812696aaa3f8d2288f3e2b2"></a>
+template&lt;class LangModel &gt; </td></tr>
+<tr class="memitem:a064df85d8812696aaa3f8d2288f3e2b2"><td class="memTemplItemLeft" align="right" valign="top">struct&#160;</td><td class="memTemplItemRight" valign="bottom"><b>BestPathFinder</b></td></tr>
+<tr class="separator:a064df85d8812696aaa3f8d2288f3e2b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aec558fb69e52dcc27c29621b53c2fb9f" id="r_aec558fb69e52dcc27c29621b53c2fb9f"><td class="memTemplParams" colspan="2"><a id="aec558fb69e52dcc27c29621b53c2fb9f" name="aec558fb69e52dcc27c29621b53c2fb9f"></a>
+template&lt;class LmState , class &gt; </td></tr>
+<tr class="memitem:aec558fb69e52dcc27c29621b53c2fb9f"><td class="memTemplItemLeft" align="right" valign="top">struct&#160;</td><td class="memTemplItemRight" valign="bottom"><b>PathEvaluator</b></td></tr>
+<tr class="separator:aec558fb69e52dcc27c29621b53c2fb9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aefcbacf8c8f949f1bb043813e098e185" id="r_aefcbacf8c8f949f1bb043813e098e185"><td class="memTemplParams" colspan="2"><a id="aefcbacf8c8f949f1bb043813e098e185" name="aefcbacf8c8f949f1bb043813e098e185"></a>
+template&lt;class LmState &gt; </td></tr>
+<tr class="memitem:aefcbacf8c8f949f1bb043813e098e185"><td class="memTemplItemLeft" align="right" valign="top">struct&#160;</td><td class="memTemplItemRight" valign="bottom"><b>MorphemeEvaluator</b></td></tr>
+<tr class="separator:aefcbacf8c8f949f1bb043813e098e185"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a00ae9d8c96c5f5b0f645e900713498a1" id="r_a00ae9d8c96c5f5b0f645e900713498a1"><td class="memItemLeft" align="right" valign="top"><a id="a00ae9d8c96c5f5b0f645e900713498a1" name="a00ae9d8c96c5f5b0f645e900713498a1"></a>
 class&#160;</td><td class="memItemRight" valign="bottom"><b>cmb::AutoJoiner</b></td></tr>
 <tr class="separator:a00ae9d8c96c5f5b0f645e900713498a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -280,8 +292,8 @@ template&lt;template&lt; ArchType &gt; class LmState&gt; </td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>실제 형태소 분석을 수행하는 클래스. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="ae7102d4533a34fe89cce17b1c93bdc07" name="ae7102d4533a34fe89cce17b1c93bdc07"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae7102d4533a34fe89cce17b1c93bdc07">&#9670;&#160;</a></span>Kiwi()</h2>
+<a id="a9fdcc70af2d0582e00313c0d92546aad" name="a9fdcc70af2d0582e00313c0d92546aad"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9fdcc70af2d0582e00313c0d92546aad">&#9670;&#160;</a></span>Kiwi()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -295,7 +307,7 @@ template&lt;template&lt; ArchType &gt; class LmState&gt; </td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="structkiwi_1_1LangModel.html">LangModel</a>&#160;</td>
+          <td class="paramtype">const std::shared_ptr&lt; <a class="el" href="classkiwi_1_1lm_1_1ILangModel.html">lm::ILangModel</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>_langMdl</em> = <code>{}</code>, </td>
         </tr>
         <tr>
