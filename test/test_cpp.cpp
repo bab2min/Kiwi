@@ -432,7 +432,7 @@ TEST(KiwiCpp, HSDataset)
 		{
 			size_t totalBatchCnt = 0, totalTokenCnt = 0, s;
 			dataset.reset();
-			while (s = dataset.next(in.data(), out.data(), lmLProbs.data(), outNgramBase.data(), restLm, restLmCnt))
+			while ((s = dataset.next(in.data(), out.data(), lmLProbs.data(), outNgramBase.data(), restLm, restLmCnt)))
 			{
 				EXPECT_LE(s, batchSize);
 				totalTokenCnt += s;
@@ -456,7 +456,7 @@ TEST(KiwiCpp, HSDataset)
 		{
 			size_t totalBatchCnt = 0, totalTokenCnt = 0, s;
 			trainset.reset();
-			while (s = trainset.next(in.data(), out.data(), lmLProbs.data(), outNgramBase.data(), restLm, restLmCnt))
+			while ((s = trainset.next(in.data(), out.data(), lmLProbs.data(), outNgramBase.data(), restLm, restLmCnt)))
 			{
 				EXPECT_LE(s, batchSize);
 				totalTokenCnt += s;
@@ -468,7 +468,7 @@ TEST(KiwiCpp, HSDataset)
 		{
 			size_t totalBatchCnt = 0, totalTokenCnt = 0, s;
 			devset.reset();
-			while (s = devset.next(in.data(), out.data(), lmLProbs.data(), outNgramBase.data(), restLm, restLmCnt))
+			while ((s = devset.next(in.data(), out.data(), lmLProbs.data(), outNgramBase.data(), restLm, restLmCnt)))
 			{
 				EXPECT_LE(s, batchSize);
 				totalTokenCnt += s;

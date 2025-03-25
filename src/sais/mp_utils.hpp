@@ -396,7 +396,7 @@ namespace mp
 		ThreadPool* pool;
 	public:
 		OverrideLimitedSize(ThreadPool* _pool, size_t newSize)
-			: pool{ _pool }, prevSize{ pool ? pool->limitedSize() : -1 }
+			: pool{ _pool }, prevSize{ _pool ? _pool->limitedSize() : -1 }
 		{
 			if (pool) pool->_limitedSize = newSize;
 		}

@@ -780,7 +780,7 @@ void RuleSet::loadRules(istream& istr)
 	while (getline(istr, line))
 	{
 		if (line[0] == '#') continue;
-		while (!line.empty() && line.back() < 0x80 && isSpace(line.back())) line.pop_back();
+		while (!line.empty() && ((uint8_t)line.back() < 0x80) && isSpace(line.back())) line.pop_back();
 		if (line.empty()) continue;
 
 		auto fields = split(line, '\t');
