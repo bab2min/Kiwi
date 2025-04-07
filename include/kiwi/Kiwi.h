@@ -12,6 +12,7 @@
 #include <iostream>
 #include <future>
 #include <string>
+#include <string_view>
 #include "Macro.h"
 #include "Types.h"
 #include "Form.h"
@@ -22,6 +23,7 @@
 #include "FrozenTrie.h"
 #include "Knlm.h"
 #include "SkipBigramModel.h"
+#include "CoNgramModel.h"
 #include "ThreadPool.h"
 #include "WordDetector.h"
 #include "TagUtils.h"
@@ -517,8 +519,17 @@ namespace kiwi
 			return langMdl.get();
 		}
 
-		void findMorpheme(std::vector<const Morpheme*>& out, const std::u16string& s, POSTag tag = POSTag::unknown) const;
-		std::vector<const Morpheme*> findMorpheme(const std::u16string& s, POSTag tag = POSTag::unknown) const;
+		const Morpheme* findMorpheme(const std::u16string_view& form, POSTag tag = POSTag::unknown) const;
+
+		size_t findMorphemeId(const std::u16string_view& form, POSTag tag = POSTag::unknown) const
+		{
+			const Morpheme* morph = findMorpheme(form, tag);
+			if (!morph) return -1;
+			return morphToId(morph);
+		}
+
+		void findMorphemes(std::vector<const Morpheme*>& out, const std::u16string_view& s, POSTag tag = POSTag::unknown) const;
+		std::vector<const Morpheme*> findMorphemes(const std::u16string_view& s, POSTag tag = POSTag::unknown) const;
 	};
 
 	/**

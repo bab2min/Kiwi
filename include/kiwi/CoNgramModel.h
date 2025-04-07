@@ -50,8 +50,25 @@ namespace kiwi
 
 			const CoNgramModelHeader& getHeader() const { return header; }
 
-			static utils::MemoryObject build(const std::string& contextDefinition, const std::string& embedding, size_t maxContextLength = -1, bool useVLE = true, bool reorderContextIdx = true);
-			static std::unique_ptr<CoNgramModelBase> create(utils::MemoryObject&& mem, ArchType archType = ArchType::none, bool useDistantTokens = false, bool quantized = true);
+			virtual size_t mostSimilarWords(uint32_t vocabId, size_t topN, std::pair<uint32_t, float>* output) const = 0;
+			virtual float wordSimilarity(uint32_t vocabId1, uint32_t vocabId2) const = 0;
+
+			virtual size_t mostSimilarContexts(uint32_t contextId, size_t topN, std::pair<uint32_t, float>* output) const = 0;
+			virtual float contextSimilarity(uint32_t contextId1, uint32_t contextId2) const = 0;
+
+			virtual size_t predictWordsFromContext(uint32_t contextId, size_t topN, std::pair<uint32_t, float>* output) const = 0;
+
+			virtual std::vector<std::vector<uint32_t>> getContextWordMap() const = 0;
+
+			static utils::MemoryObject build(const std::string& contextDefinition, const std::string& embedding, 
+				size_t maxContextLength = -1, 
+				bool useVLE = true, 
+				bool reorderContextIdx = true);
+
+			static std::unique_ptr<CoNgramModelBase> create(utils::MemoryObject&& mem, 
+				ArchType archType = ArchType::none, 
+				bool useDistantTokens = false, 
+				bool quantized = true);
 		};
 	}
 }
