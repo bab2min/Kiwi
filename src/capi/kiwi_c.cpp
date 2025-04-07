@@ -1278,7 +1278,7 @@ int kiwi_morphset_add(kiwi_morphset_h handle, const char* form, const char* tag)
 	try
 	{
 		POSTag ptag = tag ? parse_tag(tag) : POSTag::unknown;
-		auto found = handle->inst->findMorpheme(utf8To16(form), ptag);
+		auto found = handle->inst->findMorphemes(utf8To16(form), ptag);
 		handle->morphemes.insert(found.begin(), found.end());
 		return found.size();
 	}
@@ -1295,7 +1295,7 @@ int kiwi_morphset_add_w(kiwi_morphset_h handle, const kchar16_t* form, const cha
 	try
 	{
 		POSTag ptag = tag ? parse_tag(tag) : POSTag::unknown;
-		auto found = handle->inst->findMorpheme((const char16_t*)form, ptag);
+		auto found = handle->inst->findMorphemes((const char16_t*)form, ptag);
 		handle->morphemes.insert(found.begin(), found.end());
 		return found.size();
 	}

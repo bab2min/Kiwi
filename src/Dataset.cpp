@@ -114,7 +114,7 @@ bool HSDataset::tokenizeUnlikely(Vector<std::pair<int32_t, int32_t>>& out, int32
 	auto prefixForm = joinHangul((*forms)[(*morphemes)[prefix].kform].form);
 	auto suffixForm = joinHangul((*forms)[(*morphemes)[suffix].kform].form);
 	if (form.size() < 2) return false;
-	auto blocklist = kiwiInst->findMorpheme(form);
+	auto blocklist = kiwiInst->findMorphemes(form);
 	std::unordered_set<const Morpheme*> blockset(blocklist.begin(), blocklist.end());
 	
 	thread_local std::vector<PretokenizedSpan> pretokenized;

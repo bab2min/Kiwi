@@ -33,6 +33,8 @@ namespace kiwi
 			const uint8_t* distantEmbPtr = nullptr; // [numOutputs, (dim + scale? + bias + confid + pad?)]
 			const float* positionConfidPtr = nullptr;
 			const uint8_t* distantMaskPtr = nullptr;
+			const float* invNormContextPtr = nullptr;
+			const float* invNormOutputPtr = nullptr;
 
 			inline size_t contextEmbStride() const
 			{
@@ -171,6 +173,9 @@ namespace kiwi
 				return node->value;
 			}
 
+			template<class Out>
+			void visitContextNode(MyNode* node, Vector<VlKeyType>& prefix, Out&& out) const;
+
 		public:
 			using VocabType = KeyType;
 			using LmStateType = CoNgramState<windowSize, arch, VocabType, VlKeyType, quantized>;
@@ -192,6 +197,12 @@ namespace kiwi
 			}
 			void* getFindBestPathFn() const override;
 			void* getNewJoinerFn() const override;
+
+			size_t mostSimilarWords(uint32_t vocabId, size_t topN, std::pair<uint32_t, float>* output) const override;
+			float wordSimilarity(uint32_t vocabId1, uint32_t vocabId2) const override { return 0; } // not implemented yet
+			size_t mostSimilarContexts(uint32_t contextId, size_t topN, std::pair<uint32_t, float>* output) const override;
+			float contextSimilarity(uint32_t contextId1, uint32_t contextId2) const override { return 0; } // not implemented yet
+			std::vector<std::vector<uint32_t>> getContextWordMap() const override;
 
 			uint32_t progressContextNode(int32_t& nodeIdx, KeyType next) const
 			{
