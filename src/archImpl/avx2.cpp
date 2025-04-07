@@ -1,9 +1,5 @@
 #include "../MathFunc.hpp"
 #include "../qgemm.hpp"
-#include "../gemm.h"
-
-#define Eigen EigenAVX2
-#include <Eigen/Dense>
 
 namespace kiwi
 {
@@ -89,36 +85,41 @@ namespace kiwi
 			const int8_t* bBase, const int32_t* bIdx, size_t bIdxScale,
 			float* c, size_t ldc
 		);
-	}
 
-	namespace gemm
-	{
 		template<>
-		void gemm<ArchType::avx2>(
-			size_t m, size_t n, size_t k,
-			const float* aT, size_t strideA,
-			const float* b, size_t strideB,
-			float* c, size_t strideC
-		)
+		void gemvS8S8<ArchType::avx2>(size_t m, size_t k, const int8_t* a, const int8_t* b, size_t ldb, float* c)
 		{
-			Eigen::Map<const Eigen::MatrixXf, 0, Eigen::OuterStride<>> aMap(aT, k, m, Eigen::OuterStride<>(strideA));
-			Eigen::Map<const Eigen::MatrixXf, 0, Eigen::OuterStride<>> bMap(b, k, n, Eigen::OuterStride<>(strideB));
-			Eigen::Map<Eigen::MatrixXf, 0, Eigen::OuterStride<>> cMap(c, m, n, Eigen::OuterStride<>(strideC));
-			cMap.noalias() += aMap.transpose() * bMap;
+			return gemvS8S8_256(m, k, a, b, ldb, c);
 		}
 
 		template<>
-		void gemv<ArchType::avx2>(
+		void gemvU8U8<ArchType::avx2>(size_t m, size_t k, const uint8_t* a, const uint8_t* b, size_t ldb, float* c)
+		{
+			return gemvU8U8_256(m, k, a, b, ldb, c);
+		}
+
+		template<>
+		void invNormS8<ArchType::avx2>(
 			size_t m, size_t k,
-			const float* aT, size_t strideA,
-			const float* b,
-			float* c
+			const int8_t* a, size_t lda,
+			float* out
 		)
 		{
-			Eigen::Map<const Eigen::MatrixXf, 0, Eigen::OuterStride<>> aMap(aT, k, m, Eigen::OuterStride<>(strideA));
-			Eigen::Map<const Eigen::VectorXf> bMap(b, k);
-			Eigen::Map<Eigen::VectorXf> cMap(c, m);
-			cMap.noalias() += aMap.transpose() * bMap;
+			return invNormS8_256(m, k, a, lda, out);
+		}
+
+		template<>
+		void invNormU8<ArchType::avx2>(
+			size_t m, size_t k,
+			const uint8_t* a, size_t lda,
+			float* out
+		)
+		{
+			return invNormU8_256(m, k, a, lda, out);
 		}
 	}
 }
+
+#define Eigen EigenAVX2
+#define ARCH_TYPE ArchType::avx2
+#include "eigen_gemm.hpp"

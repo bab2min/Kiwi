@@ -452,5 +452,212 @@ namespace kiwi
 				c[ldc * 2 + 2] = (acc - hsum[2]) * contextScale[2] * outputScale[2] + contextBias[2];
 			}
 		}
+
+		inline void gemvS8S8_256(size_t m, size_t k, const int8_t* a, const int8_t* b, size_t ldb, float* c)
+		{
+			const __m256i pBias = _mm256_set1_epi8(128);
+			__m256i pa, pb[4], psum;
+			__m128i pr;
+			__m128 ps, paScale, pbScale;
+			float aScale = *reinterpret_cast<const float*>(a + k);
+			float bScale[4];
+			int32_t bSum[4];
+			paScale = _mm_set1_ps(aScale);
+
+			for (size_t mi = 0; mi < m; mi += 4)
+			{
+				auto* aPtr = a;
+				auto* bPtr = b + ldb * mi;
+				psum = _mm256_setzero_si256();
+				for (size_t j = 0; j < k; j += 32)
+				{
+					pack4x32to4x8x4(
+						bPtr,
+						bPtr + 1 * ldb,
+						bPtr + 2 * ldb,
+						bPtr + 3 * ldb,
+						pb[0], pb[1], pb[2], pb[3]
+					);
+					pa = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(aPtr));
+					pa = _mm256_add_epi8(pa, pBias);
+					psum = DPBUSD(psum, _mm256_shuffle_epi32(pa, 0x00), pb[0]);
+					psum = DPBUSD(psum, _mm256_shuffle_epi32(pa, 0x55), pb[1]);
+					psum = DPBUSD(psum, _mm256_shuffle_epi32(pa, 0xAA), pb[2]);
+					psum = DPBUSD(psum, _mm256_shuffle_epi32(pa, 0xFF), pb[3]);
+					aPtr += 32;
+					bPtr += 32;
+				}
+				for (size_t i = 0; i < 4; ++i)
+				{
+					bScale[i] = *reinterpret_cast<const float*>(bPtr + i * ldb);
+					bSum[i] = *reinterpret_cast<const int32_t*>(bPtr + i * ldb + 4);
+				}
+				pr = _mm_add_epi32(_mm256_castsi256_si128(psum), _mm256_extracti128_si256(psum, 1));
+				ps = _mm_cvtepi32_ps(_mm_sub_epi32(pr, _mm_loadu_si128(reinterpret_cast<const __m128i*>(bSum))));
+				pbScale = _mm_loadu_ps(bScale);
+				ps = _mm_mul_ps(_mm_mul_ps(ps, paScale), pbScale);
+				_mm_storeu_ps(c + mi, ps);
+			}
+		}
+
+		inline void gemvU8U8_256(size_t m, size_t k, const uint8_t* a, const uint8_t* b, size_t ldb, float* c)
+		{
+			const __m256i pBias = _mm256_set1_epi8(128), pOne = _mm256_set1_epi8(1);
+			__m256i pa, pb[4], psum, paSum;
+			__m128i pr;
+			__m128 ps, paScale, pbScale;
+			float aScale = *reinterpret_cast<const float*>(a + k);
+			float bScale[4];
+			int32_t aSum;
+			paScale = _mm_set1_ps(aScale);
+
+			psum = _mm256_setzero_si256();
+			for (size_t j = 0; j < k; j += 32)
+			{
+				pa = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(a + j));
+				psum = DPBUSD(psum, pOne, _mm256_sub_epi8(pa, pBias));
+			}
+			aSum = reduce_sum(psum) << 7;
+			paSum = _mm256_set1_epi32(-aSum / 2);
+
+			for (size_t mi = 0; mi < m; mi += 4)
+			{
+				auto* aPtr = a;
+				auto* bPtr = b + ldb * mi;
+				psum = paSum;
+				for (size_t j = 0; j < k; j += 32)
+				{
+					pack4x32to4x8x4(
+						bPtr,
+						bPtr + 1 * ldb,
+						bPtr + 2 * ldb,
+						bPtr + 3 * ldb,
+						pb[0], pb[1], pb[2], pb[3]
+					);
+					pa = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(aPtr));
+					pa = _mm256_sub_epi8(pa, pBias);
+					psum = DPBUSD(psum, pb[0], _mm256_shuffle_epi32(pa, 0x00));
+					psum = DPBUSD(psum, pb[1], _mm256_shuffle_epi32(pa, 0x55));
+					psum = DPBUSD(psum, pb[2], _mm256_shuffle_epi32(pa, 0xAA));
+					psum = DPBUSD(psum, pb[3], _mm256_shuffle_epi32(pa, 0xFF));
+					aPtr += 32;
+					bPtr += 32;
+				}
+				for (size_t i = 0; i < 4; ++i)
+				{
+					bScale[i] = *reinterpret_cast<const float*>(bPtr + i * ldb);
+				}
+				pr = _mm_add_epi32(_mm256_castsi256_si128(psum), _mm256_extracti128_si256(psum, 1));
+				ps = _mm_cvtepi32_ps(pr);
+				pbScale = _mm_loadu_ps(bScale);
+				ps = _mm_mul_ps(_mm_mul_ps(ps, paScale), pbScale);
+				_mm_storeu_ps(c + mi, ps);
+			}
+		}
+
+		inline void invNormS8_256(
+			size_t m, size_t k,
+			const int8_t* a, size_t lda,
+			float* out
+		)
+		{
+			const __m256i pBias = _mm256_set1_epi8(128);
+			__m256i pa[4], pb[4], psum;
+			__m128i pr;
+			__m128 ps, pScale;
+			float bScale[4];
+			int32_t bSum[4];
+
+			for (size_t mi = 0; mi < m; mi += 4)
+			{
+				auto* aPtr = a + lda * mi;
+				psum = _mm256_setzero_si256();
+				for (size_t j = 0; j < k; j += 32)
+				{
+					pack4x32to4x8x4(
+						aPtr,
+						aPtr + 1 * lda,
+						aPtr + 2 * lda,
+						aPtr + 3 * lda,
+						pb[0], pb[1], pb[2], pb[3]
+					);
+					pa[0] = _mm256_add_epi8(pb[0], pBias);
+					pa[1] = _mm256_add_epi8(pb[1], pBias);
+					pa[2] = _mm256_add_epi8(pb[2], pBias);
+					pa[3] = _mm256_add_epi8(pb[3], pBias);
+					psum = DPBUSD(psum, pa[0], pb[0]);
+					psum = DPBUSD(psum, pa[1], pb[1]);
+					psum = DPBUSD(psum, pa[2], pb[2]);
+					psum = DPBUSD(psum, pa[3], pb[3]);
+					aPtr += 32;
+				}
+				for (size_t i = 0; i < 4; ++i)
+				{
+					bScale[i] = *reinterpret_cast<const float*>(aPtr + i * lda);
+					bSum[i] = *reinterpret_cast<const int32_t*>(aPtr + i * lda + 4);
+				}
+				pr = _mm_add_epi32(_mm256_castsi256_si128(psum), _mm256_extracti128_si256(psum, 1));
+				ps = _mm_cvtepi32_ps(_mm_sub_epi32(pr, _mm_loadu_si128(reinterpret_cast<const __m128i*>(bSum))));
+				pScale = _mm_loadu_ps(bScale);
+				ps = _mm_mul_ps(_mm_mul_ps(ps, pScale), pScale);
+				ps = _mm_rsqrt_ps(ps);
+				_mm_storeu_ps(out + mi, ps);
+			}
+		}
+
+		inline void invNormU8_256(
+			size_t m, size_t k,
+			const uint8_t* a, size_t lda,
+			float* out
+		)
+		{
+			const __m256i pBias = _mm256_set1_epi8(128), pOne = _mm256_set1_epi8(1);
+			__m256i pa[4], pb[4], psum, pHSum;
+			__m128i pr, phr;
+			__m128 ps, pScale;
+			float aScale[4];
+
+			for (size_t mi = 0; mi < m; mi += 4)
+			{
+				auto* aPtr = a + lda * mi;
+				psum = _mm256_setzero_si256();
+				pHSum = _mm256_setzero_si256();
+				for (size_t j = 0; j < k; j += 32)
+				{
+					pack4x32to4x8x4(
+						aPtr,
+						aPtr + 1 * lda,
+						aPtr + 2 * lda,
+						aPtr + 3 * lda,
+						pa[0], pa[1], pa[2], pa[3]
+					);
+					pb[0] = _mm256_sub_epi8(pa[0], pBias);
+					pb[1] = _mm256_sub_epi8(pa[1], pBias);
+					pb[2] = _mm256_sub_epi8(pa[2], pBias);
+					pb[3] = _mm256_sub_epi8(pa[3], pBias);
+					psum = DPBUSD(psum, pa[0], pb[0]);
+					psum = DPBUSD(psum, pa[1], pb[1]);
+					psum = DPBUSD(psum, pa[2], pb[2]);
+					psum = DPBUSD(psum, pa[3], pb[3]);
+					pHSum = DPBUSD(pHSum, pOne, pb[0]);
+					pHSum = DPBUSD(pHSum, pOne, pb[1]);
+					pHSum = DPBUSD(pHSum, pOne, pb[2]);
+					pHSum = DPBUSD(pHSum, pOne, pb[3]);
+					aPtr += 32;
+				}
+				for (size_t i = 0; i < 4; ++i)
+				{
+					aScale[i] = *reinterpret_cast<const float*>(aPtr + i * lda);
+				}
+				pr = _mm_add_epi32(_mm256_castsi256_si128(psum), _mm256_extracti128_si256(psum, 1));
+				phr = _mm_add_epi32(_mm256_castsi256_si128(pHSum), _mm256_extracti128_si256(pHSum, 1));
+				phr = _mm_slli_epi32(phr, 7);
+				ps = _mm_cvtepi32_ps(_mm_sub_epi32(pr, phr));
+				pScale = _mm_loadu_ps(aScale);
+				ps = _mm_mul_ps(_mm_mul_ps(ps, pScale), pScale);
+				ps = _mm_rsqrt_ps(ps);
+				_mm_storeu_ps(out + mi, ps);
+			}
+		}
 	}
 }

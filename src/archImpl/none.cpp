@@ -1,7 +1,4 @@
 #include "../MathFunc.hpp"
-#include "../gemm.h"
-
-#include <Eigen/Dense>
 
 namespace kiwi
 {
@@ -18,22 +15,15 @@ namespace kiwi
 		template void logSoftmaxTransposed<ArchType::balanced>(float* arr, size_t size, size_t batchSize, size_t stride);
 	}
 
+}
+
+#define ARCH_TYPE ArchType::none
+#include "eigen_gemm.hpp"
+
+namespace kiwi
+{
 	namespace gemm
 	{
-		template<>
-		void gemm<ArchType::none>(
-			size_t m, size_t n, size_t k,
-			const float* aT, size_t strideA,
-			const float* b, size_t strideB,
-			float* c, size_t strideC
-		)
-		{
-			Eigen::Map<const Eigen::MatrixXf, 0, Eigen::OuterStride<>> aMap(aT, k, m, Eigen::OuterStride<>(strideA));
-			Eigen::Map<const Eigen::MatrixXf, 0, Eigen::OuterStride<>> bMap(b, k, n, Eigen::OuterStride<>(strideB));
-			Eigen::Map<Eigen::MatrixXf, 0, Eigen::OuterStride<>> cMap(c, m, n, Eigen::OuterStride<>(strideC));
-			cMap.noalias() += aMap.transpose() * bMap;
-		}
-
 		template<>
 		void gemm<ArchType::balanced>(
 			size_t m, size_t n, size_t k,
@@ -46,20 +36,6 @@ namespace kiwi
 		}
 
 		template<>
-		void gemv<ArchType::none>(
-			size_t m, size_t k,
-			const float* aT, size_t strideA,
-			const float* b,
-			float* c
-		)
-		{
-			Eigen::Map<const Eigen::MatrixXf, 0, Eigen::OuterStride<>> aMap(aT, k, m, Eigen::OuterStride<>(strideA));
-			Eigen::Map<const Eigen::VectorXf> bMap(b, k);
-			Eigen::Map<Eigen::VectorXf> cMap(c, m);
-			cMap.noalias() += aMap.transpose() * bMap;
-		}
-
-		template<>
 		void gemv<ArchType::balanced>(
 			size_t m, size_t k,
 			const float* aT, size_t strideA,
@@ -68,6 +44,27 @@ namespace kiwi
 		)
 		{
 			return gemv<ArchType::none>(m, k, aT, strideA, b, c);
+		}
+
+		template<>
+		void mul<ArchType::balanced>(
+			size_t n,
+			float a,
+			const float* b,
+			float* c
+		)
+		{
+			return mul<ArchType::none>(n, a, b, c);
+		}
+
+		template<>
+		void invNorm<ArchType::balanced>(
+			size_t m, size_t k,
+			const float* a, size_t lda,
+			float* out
+		)
+		{
+			return invNorm<ArchType::none>(m, k, a, lda, out);
 		}
 	}
 }

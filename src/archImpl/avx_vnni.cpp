@@ -71,6 +71,38 @@ namespace kiwi
 			const int8_t* bBase, const int32_t* bIdx, size_t bIdxScale,
 			float* c, size_t ldc
 		);
+
+		template<>
+		void gemvS8S8<ArchType::avx_vnni>(size_t m, size_t k, const int8_t* a, const int8_t* b, size_t ldb, float* c)
+		{
+			return gemvS8S8_256(m, k, a, b, ldb, c);
+		}
+
+		template<>
+		void gemvU8U8<ArchType::avx_vnni>(size_t m, size_t k, const uint8_t* a, const uint8_t* b, size_t ldb, float* c)
+		{
+			return gemvU8U8_256(m, k, a, b, ldb, c);
+		}
+
+		template<>
+		void invNormS8<ArchType::avx_vnni>(
+			size_t m, size_t k,
+			const int8_t* a, size_t lda,
+			float* out
+		)
+		{
+			return invNormS8_256(m, k, a, lda, out);
+		}
+
+		template<>
+		void invNormU8<ArchType::avx_vnni>(
+			size_t m, size_t k,
+			const uint8_t* a, size_t lda,
+			float* out
+		)
+		{
+			return invNormU8_256(m, k, a, lda, out);
+		}
 	}
 
 	namespace gemm
@@ -95,6 +127,27 @@ namespace kiwi
 		)
 		{
 			return gemv<ArchType::avx2>(m, k, aT, strideA, b, c);
+		}
+
+		template<>
+		void mul<ArchType::avx_vnni>(
+			size_t n,
+			float a,
+			const float* b,
+			float* c
+		)
+		{
+			return mul<ArchType::avx2>(n, a, b, c);
+		}
+
+		template<>
+		void invNorm<ArchType::avx_vnni>(
+			size_t m, size_t k,
+			const float* a, size_t lda,
+			float* out
+		)
+		{
+			return invNorm<ArchType::avx2>(m, k, a, lda, out);
 		}
 	}
 }

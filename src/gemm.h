@@ -20,5 +20,22 @@ namespace kiwi
 			const float* b,
 			float* c
 		);
+
+		// c *= (b * c)
+		template<ArchType archType>
+		void mul(
+			size_t n,
+			float a,
+			const float* b,
+			float* c
+		);
+
+		// out = 1 / |a|
+		template<ArchType archType>
+		void invNorm(
+			size_t m, size_t k,
+			const float* a, size_t lda,
+			float* out
+		);
 	}
 }
