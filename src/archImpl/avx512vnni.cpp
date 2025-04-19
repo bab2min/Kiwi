@@ -111,6 +111,12 @@ namespace kiwi
 		);
 
 		template<>
+		void gemv<ArchType::avx512vnni>(size_t m, size_t k, const uint8_t* a, const int8_t* b, size_t ldb, float* c)
+		{
+			return gemv_512(m, k, a, b, ldb, c);
+		}
+
+		template<>
 		void gemvS8S8<ArchType::avx512vnni>(size_t m, size_t k, const int8_t* a, const int8_t* b, size_t ldb, float* c)
 		{
 			return gemvS8S8_512(m, k, a, b, ldb, c);
@@ -120,6 +126,18 @@ namespace kiwi
 		void gemvU8U8<ArchType::avx512vnni>(size_t m, size_t k, const uint8_t* a, const uint8_t* b, size_t ldb, float* c)
 		{
 			return gemvU8U8_512(m, k, a, b, ldb, c);
+		}
+
+		template<>
+		float dotS8S8<ArchType::avx512vnni>(size_t k, const int8_t* a, const int8_t* b)
+		{
+			return dotS8S8_512(k, a, b);
+		}
+
+		template<>
+		float dotU8U8<ArchType::avx512vnni>(size_t k, const uint8_t* a, const uint8_t* b)
+		{
+			return dotU8U8_512(k, a, b);
 		}
 
 		template<>

@@ -670,6 +670,51 @@ namespace kiwi
 			}
 		}
 
+		inline void gemv_512(size_t m, size_t k, const uint8_t* a, const int8_t* b, size_t ldb, float* c)
+		{
+			__m512i pa, pb[4], psum;
+			__m128 ps, paScale, pbScale;
+			float aScale = *reinterpret_cast<const float*>(a + k);
+			float bScale[4];
+			int32_t bSum[4];
+			paScale = _mm_set1_ps(aScale);
+
+			for (size_t mi = 0; mi < m; mi += 4)
+			{
+				auto* aPtr = a;
+				auto* bPtr = b + ldb * mi;
+				psum = _mm512_setzero_si512();
+				for (size_t j = 0; j < k; j += 64)
+				{
+					pack4x64to4x16x4(
+						bPtr,
+						bPtr + 1 * ldb,
+						bPtr + 2 * ldb,
+						bPtr + 3 * ldb,
+						pb[0], pb[1], pb[2], pb[3]
+					);
+					pa = _mm512_loadu_si512(reinterpret_cast<const __m512i*>(aPtr));
+					psum = DPBUSD(psum, _mm512_shuffle_epi32(pa, _MM_PERM_AAAA), pb[0]);
+					psum = DPBUSD(psum, _mm512_shuffle_epi32(pa, _MM_PERM_BBBB), pb[1]);
+					psum = DPBUSD(psum, _mm512_shuffle_epi32(pa, _MM_PERM_CCCC), pb[2]);
+					psum = DPBUSD(psum, _mm512_shuffle_epi32(pa, _MM_PERM_DDDD), pb[3]);
+					aPtr += 64;
+					bPtr += 64;
+				}
+				for (size_t i = 0; i < 4; ++i)
+				{
+					bScale[i] = *reinterpret_cast<const float*>(bPtr + i * ldb);
+					bSum[i] = *reinterpret_cast<const int32_t*>(bPtr + i * ldb + 4);
+				}
+				psum = _mm512_add_epi32(psum, _mm512_alignr_epi32(psum, psum, 4));
+				psum = _mm512_add_epi32(psum, _mm512_alignr_epi32(psum, psum, 8));
+				ps = _mm_cvtepi32_ps(_mm_sub_epi32(_mm512_castsi512_si128(psum), _mm_loadu_si128(reinterpret_cast<const __m128i*>(bSum))));
+				pbScale = _mm_loadu_ps(bScale);
+				ps = _mm_mul_ps(_mm_mul_ps(ps, paScale), pbScale);
+				_mm_storeu_ps(c + mi, ps);
+			}
+		}
+
 		inline void gemvS8S8_512(size_t m, size_t k, const int8_t* a, const int8_t* b, size_t ldb, float* c)
 		{
 			const __m512i pBias = _mm512_set1_epi8(128);
@@ -770,6 +815,44 @@ namespace kiwi
 				ps = _mm_mul_ps(_mm_mul_ps(ps, paScale), pbScale);
 				_mm_storeu_ps(c + mi, ps);
 			}
+		}
+
+		inline float dotS8S8_512(size_t k, const int8_t* a, const int8_t* b)
+		{
+			const __m512i pBias = _mm512_set1_epi8(128);
+			__m512i pa, pb, psum;
+			float aScale = *reinterpret_cast<const float*>(a + k);
+			float bScale = *reinterpret_cast<const float*>(b + k);
+			int32_t bSum = *reinterpret_cast<const int32_t*>(b + k + 4);
+
+			psum = _mm512_setzero_si512();
+			for (size_t i = 0; i < k; i += 64)
+			{
+				pa = _mm512_loadu_si512(reinterpret_cast<const __m512i*>(a + i));
+				pb = _mm512_loadu_si512(reinterpret_cast<const __m512i*>(b + i));
+				pa = _mm512_add_epi8(pa, pBias);
+				psum = DPBUSD(psum, pa, pb);
+			}
+			return (_mm512_reduce_add_epi32(psum) - bSum) * aScale * bScale;
+		}
+
+		inline float dotU8U8_512(size_t k, const uint8_t* a, const uint8_t* b)
+		{
+			const __m512i pBias = _mm512_set1_epi8(128);
+			__m512i pa, pb, psum, pasum;
+			float aScale = *reinterpret_cast<const float*>(a + k);
+			float bScale = *reinterpret_cast<const float*>(b + k);
+			psum = _mm512_setzero_si512();
+			pasum = _mm512_setzero_si512();
+			for (size_t i = 0; i < k; i += 64)
+			{
+				pa = _mm512_loadu_si512(reinterpret_cast<const __m512i*>(a + i));
+				pa = _mm512_sub_epi8(pa, pBias);
+				pb = _mm512_loadu_si512(reinterpret_cast<const __m512i*>(b + i));
+				pasum = DPBUSD(pasum, pBias, pa);
+				psum = DPBUSD(psum, pb, pa);
+			}
+			return (_mm512_reduce_add_epi32(_mm512_sub_epi32(psum, pasum))) * aScale * bScale;
 		}
 
 		inline void invNormS8_512(

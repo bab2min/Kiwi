@@ -1720,7 +1720,7 @@ namespace kiwi
 		size_t CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::mostSimilarWords(uint32_t vocabId, size_t topN, pair<uint32_t, float>* output) const
 		{
 			thread_local Vector<float> resultBuf;
-			resultBuf.resize(header.vocabSize * 2);
+			resultBuf.resize(header.vocabSize * 2 + 8); // +8 for padding
 			float* scores = resultBuf.data() + header.vocabSize;
 
 			if constexpr (quantized)
@@ -1767,10 +1767,34 @@ namespace kiwi
 		}
 
 		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
+		float CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::wordSimilarity(uint32_t vocabId1, uint32_t vocabId2) const
+		{
+			float result = 0;
+			if constexpr (quantized)
+			{
+				result = qgemm::dotS8S8<arch>(
+					header.dim,
+					getOutputQuantEmb(vocabId1), getOutputQuantEmb(vocabId2)
+				);
+			}
+			else
+			{
+				gemm::template gemv<arch>(
+					1, header.dim,
+					getOutputEmb(vocabId1), outputEmbStride() / sizeof(float),
+					getOutputEmb(vocabId2),
+					&result
+				);
+			}
+			result *= invNormOutputPtr[vocabId1] * invNormOutputPtr[vocabId2];
+			return result;
+		}
+
+		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
 		size_t CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::mostSimilarContexts(uint32_t contextId, size_t topN, std::pair<uint32_t, float>* output) const
 		{
 			thread_local Vector<float> resultBuf;
-			resultBuf.resize(header.contextSize * 2);
+			resultBuf.resize(header.contextSize * 2 + 8); // +8 for padding
 			float* scores = resultBuf.data() + header.contextSize;
 
 			if constexpr (quantized)
@@ -1801,6 +1825,77 @@ namespace kiwi
 
 			topN = min(topN, (size_t)header.vocabSize);
 
+			// if topN is small enough, use partial_sort
+			if (topN <= 256)
+			{
+				partial_sort_copy(resultPaired, resultPaired + header.vocabSize, output, output + topN,
+					[](const pair<uint32_t, float>& a, const pair<uint32_t, float>& b) { return a.second > b.second; });
+			}
+			else
+			{
+				sort(resultPaired, resultPaired + header.vocabSize,
+					[](const pair<uint32_t, float>& a, const pair<uint32_t, float>& b) { return a.second > b.second; });
+				copy(resultPaired, resultPaired + topN, output);
+			}
+			return topN;
+		}
+
+		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
+		float CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::contextSimilarity(uint32_t contextId1, uint32_t contextId2) const
+		{
+			float result = 0;
+			if constexpr (quantized)
+			{
+				result = qgemm::dotU8U8<arch>(
+					header.dim,
+					getContextQuantEmb(contextId1), getContextQuantEmb(contextId2)
+				);
+			}
+			else
+			{
+				gemm::template gemv<arch>(
+					1, header.dim,
+					getContextEmb(contextId1), contextEmbStride() / sizeof(float),
+					getContextEmb(contextId2),
+					&result
+				);
+			}
+			result *= invNormContextPtr[contextId1] * invNormContextPtr[contextId2];
+			return result;
+		}
+
+		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
+		size_t CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::predictWordsFromContext(uint32_t contextId, size_t topN, std::pair<uint32_t, float>* output) const
+		{
+			thread_local Vector<float> resultBuf;
+			resultBuf.resize(header.vocabSize * 2 + 8); // +8 for padding
+			float* scores = resultBuf.data() + header.vocabSize;
+			if constexpr (quantized)
+			{
+				qgemm::gemv<arch>(
+					header.vocabSize, header.dim,
+					getContextQuantEmb(contextId),
+					getOutputQuantEmb(0), outputEmbStride(),
+					scores
+				);
+			}
+			else
+			{
+				gemm::template gemv<arch>(
+					header.vocabSize, header.dim,
+					getOutputEmb(0), outputEmbStride() / sizeof(float),
+					getContextEmb(contextId),
+					scores
+				);
+			}
+			const float bias = getContextBias(contextId);
+			pair<uint32_t, float>* resultPaired = reinterpret_cast<pair<uint32_t, float>*>(resultBuf.data());
+			for (size_t i = 0; i < header.vocabSize; ++i)
+			{
+				resultPaired[i] = make_pair((uint32_t)i, scores[i] + bias);
+			}
+
+			topN = min(topN, (size_t)header.vocabSize);
 			// if topN is small enough, use partial_sort
 			if (topN <= 256)
 			{

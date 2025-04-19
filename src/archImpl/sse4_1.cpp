@@ -146,6 +146,49 @@ namespace kiwi
 			return _mm_cvtsi128_si32(sum32);
 		}
 
+		inline void gemv_128(size_t m, size_t k, const uint8_t* a, const int8_t* b, size_t ldb, float* c)
+		{
+			__m128i pa, pb[4], psum;
+			__m128 ps, paScale, pbScale;
+			float aScale = *reinterpret_cast<const float*>(a + k);
+			float bScale[4];
+			int32_t bSum[4];
+			paScale = _mm_set1_ps(aScale);
+
+			for (size_t mi = 0; mi < m; mi += 4)
+			{
+				auto* aPtr = a;
+				auto* bPtr = b + ldb * mi;
+				psum = _mm_setzero_si128();
+				for (size_t j = 0; j < k; j += 16)
+				{
+					pack4x16to4x4x4(
+						bPtr,
+						bPtr + 1 * ldb,
+						bPtr + 2 * ldb,
+						bPtr + 3 * ldb,
+						pb[0], pb[1], pb[2], pb[3]
+					);
+					pa = _mm_loadu_si128(reinterpret_cast<const __m128i*>(aPtr));
+					psum = dpbusd(psum, _mm_shuffle_epi32(pa, 0x00), pb[0]);
+					psum = dpbusd(psum, _mm_shuffle_epi32(pa, 0x55), pb[1]);
+					psum = dpbusd(psum, _mm_shuffle_epi32(pa, 0xAA), pb[2]);
+					psum = dpbusd(psum, _mm_shuffle_epi32(pa, 0xFF), pb[3]);
+					aPtr += 16;
+					bPtr += 16;
+				}
+				for (size_t i = 0; i < 4; ++i)
+				{
+					bScale[i] = *reinterpret_cast<const float*>(bPtr + i * ldb);
+					bSum[i] = *reinterpret_cast<const int32_t*>(bPtr + i * ldb + 4);
+				}
+				ps = _mm_cvtepi32_ps(_mm_sub_epi32(psum, _mm_loadu_si128(reinterpret_cast<const __m128i*>(bSum))));
+				pbScale = _mm_loadu_ps(bScale);
+				ps = _mm_mul_ps(_mm_mul_ps(ps, paScale), pbScale);
+				_mm_storeu_ps(c + mi, ps);
+			}
+		}
+
 		inline void gemvS8S8_128(size_t m, size_t k, const int8_t* a, const int8_t* b, size_t ldb, float* c)
 		{
 			const __m128i pBias = _mm_set1_epi8(128);
@@ -242,6 +285,44 @@ namespace kiwi
 				ps = _mm_mul_ps(_mm_mul_ps(ps, paScale), pbScale);
 				_mm_storeu_ps(c + mi, ps);
 			}
+		}
+
+		inline float dotS8S8_128(size_t k, const int8_t* a, const int8_t* b)
+		{
+			const __m128i pBias = _mm_set1_epi8(128);
+			__m128i pa, pb, psum;
+			float aScale = *reinterpret_cast<const float*>(a + k);
+			float bScale = *reinterpret_cast<const float*>(b + k);
+			int32_t bSum = *reinterpret_cast<const int32_t*>(b + k + 4);
+
+			psum = _mm_setzero_si128();
+			for (size_t i = 0; i < k; i += 16)
+			{
+				pa = _mm_loadu_si128(reinterpret_cast<const __m128i*>(a + i));
+				pb = _mm_loadu_si128(reinterpret_cast<const __m128i*>(b + i));
+				pa = _mm_add_epi8(pa, pBias);
+				psum = dpbusd(psum, pa, pb);
+			}
+			return (reduce_sum(psum) - bSum) * aScale * bScale;
+		}
+
+		inline float dotU8U8_128(size_t k, const uint8_t* a, const uint8_t* b)
+		{
+			const __m128i pBias = _mm_set1_epi8(128);
+			__m128i pa, pb, psum, pasum;
+			float aScale = *reinterpret_cast<const float*>(a + k);
+			float bScale = *reinterpret_cast<const float*>(b + k);
+			psum = _mm_setzero_si128();
+			pasum = _mm_setzero_si128();
+			for (size_t i = 0; i < k; i += 16)
+			{
+				pa = _mm_loadu_si128(reinterpret_cast<const __m128i*>(a + i));
+				pa = _mm_sub_epi8(pa, pBias);
+				pb = _mm_loadu_si128(reinterpret_cast<const __m128i*>(b + i));
+				pasum = dpbusd(pasum, pBias, pa);
+				psum = dpbusd(psum, pb, pa);
+			}
+			return (reduce_sum(_mm_sub_epi32(psum, pasum))) * aScale * bScale;
 		}
 
 		inline void invNormS8_128(
@@ -345,6 +426,12 @@ namespace kiwi
 		}
 
 		template<>
+		void gemv<ArchType::sse4_1>(size_t m, size_t k, const uint8_t* a, const int8_t* b, size_t ldb, float* c)
+		{
+			return gemv_128(m, k, a, b, ldb, c);
+		}
+
+		template<>
 		void gemvS8S8<ArchType::sse4_1>(size_t m, size_t k, const int8_t* a, const int8_t* b, size_t ldb, float* c)
 		{
 			return gemvS8S8_128(m, k, a, b, ldb, c);
@@ -354,6 +441,18 @@ namespace kiwi
 		void gemvU8U8<ArchType::sse4_1>(size_t m, size_t k, const uint8_t* a, const uint8_t* b, size_t ldb, float* c)
 		{
 			return gemvU8U8_128(m, k, a, b, ldb, c);
+		}
+
+		template<>
+		float dotS8S8<ArchType::sse4_1>(size_t k, const int8_t* a, const int8_t* b)
+		{
+			return dotS8S8_128(k, a, b);
+		}
+
+		template<>
+		float dotU8U8<ArchType::sse4_1>(size_t k, const uint8_t* a, const uint8_t* b)
+		{
+			return dotU8U8_128(k, a, b);
 		}
 
 		template<>

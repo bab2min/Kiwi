@@ -453,6 +453,51 @@ namespace kiwi
 			}
 		}
 
+		inline void gemv_256(size_t m, size_t k, const uint8_t* a, const int8_t* b, size_t ldb, float* c)
+		{
+			__m256i pa, pb[4], psum;
+			__m128i pr;
+			__m128 ps, paScale, pbScale;
+			float aScale = *reinterpret_cast<const float*>(a + k);
+			float bScale[4];
+			int32_t bSum[4];
+			paScale = _mm_set1_ps(aScale);
+
+			for (size_t mi = 0; mi < m; mi += 4)
+			{
+				auto* aPtr = a;
+				auto* bPtr = b + ldb * mi;
+				psum = _mm256_setzero_si256();
+				for (size_t j = 0; j < k; j += 32)
+				{
+					pack4x32to4x8x4(
+						bPtr,
+						bPtr + 1 * ldb,
+						bPtr + 2 * ldb,
+						bPtr + 3 * ldb,
+						pb[0], pb[1], pb[2], pb[3]
+					);
+					pa = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(aPtr));
+					psum = DPBUSD(psum, _mm256_shuffle_epi32(pa, 0x00), pb[0]);
+					psum = DPBUSD(psum, _mm256_shuffle_epi32(pa, 0x55), pb[1]);
+					psum = DPBUSD(psum, _mm256_shuffle_epi32(pa, 0xAA), pb[2]);
+					psum = DPBUSD(psum, _mm256_shuffle_epi32(pa, 0xFF), pb[3]);
+					aPtr += 32;
+					bPtr += 32;
+				}
+				for (size_t i = 0; i < 4; ++i)
+				{
+					bScale[i] = *reinterpret_cast<const float*>(bPtr + i * ldb);
+					bSum[i] = *reinterpret_cast<const int32_t*>(bPtr + i * ldb + 4);
+				}
+				pr = _mm_add_epi32(_mm256_castsi256_si128(psum), _mm256_extracti128_si256(psum, 1));
+				ps = _mm_cvtepi32_ps(_mm_sub_epi32(pr, _mm_loadu_si128(reinterpret_cast<const __m128i*>(bSum))));
+				pbScale = _mm_loadu_ps(bScale);
+				ps = _mm_mul_ps(_mm_mul_ps(ps, paScale), pbScale);
+				_mm_storeu_ps(c + mi, ps);
+			}
+		}
+
 		inline void gemvS8S8_256(size_t m, size_t k, const int8_t* a, const int8_t* b, size_t ldb, float* c)
 		{
 			const __m256i pBias = _mm256_set1_epi8(128);
@@ -553,6 +598,44 @@ namespace kiwi
 				ps = _mm_mul_ps(_mm_mul_ps(ps, paScale), pbScale);
 				_mm_storeu_ps(c + mi, ps);
 			}
+		}
+
+		inline float dotS8S8_256(size_t k, const int8_t* a, const int8_t* b)
+		{
+			const __m256i pBias = _mm256_set1_epi8(128);
+			__m256i pa, pb, psum;
+			float aScale = *reinterpret_cast<const float*>(a + k);
+			float bScale = *reinterpret_cast<const float*>(b + k);
+			int32_t bSum = *reinterpret_cast<const int32_t*>(b + k + 4);
+
+			psum = _mm256_setzero_si256();
+			for (size_t i = 0; i < k; i += 32)
+			{
+				pa = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(a + i));
+				pb = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(b + i));
+				pa = _mm256_add_epi8(pa, pBias);
+				psum = DPBUSD(psum, pa, pb);
+			}
+			return (reduce_sum(psum) - bSum) * aScale * bScale;
+		}
+
+		inline float dotU8U8_256(size_t k, const uint8_t* a, const uint8_t* b)
+		{
+			const __m256i pBias = _mm256_set1_epi8(128);
+			__m256i pa, pb, psum, pasum;
+			float aScale = *reinterpret_cast<const float*>(a + k);
+			float bScale = *reinterpret_cast<const float*>(b + k);
+			psum = _mm256_setzero_si256();
+			pasum = _mm256_setzero_si256();
+			for (size_t i = 0; i < k; i += 32)
+			{
+				pa = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(a + i));
+				pa = _mm256_sub_epi8(pa, pBias);
+				pb = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(b + i));
+				pasum = DPBUSD(pasum, pBias, pa);
+				psum = DPBUSD(psum, pb, pa);
+			}
+			return (reduce_sum(_mm256_sub_epi32(psum, pasum))) * aScale * bScale;
 		}
 
 		inline void invNormS8_256(
