@@ -78,5 +78,16 @@ namespace kiwi
 			const uint8_t* a,
 			const uint8_t* b
 		);
+
+		template<ArchType archType>
+		float requantizePackedU4(
+			size_t n,
+			size_t qgroup,
+			const uint8_t* packedInput,
+			const uint8_t* localScale,
+			float globalScale,
+			bool toUint8,
+			uint8_t* out
+		);
 	}
 }

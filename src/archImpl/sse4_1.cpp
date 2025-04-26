@@ -474,6 +474,109 @@ namespace kiwi
 		{
 			return invNormU8_128(m, k, a, lda, out);
 		}
+
+		template<>
+		float requantizePackedU4<ArchType::sse4_1>(
+			size_t n,
+			size_t qgroup,
+			const uint8_t* packedInput,
+			const uint8_t* localScale,
+			float globalScale,
+			bool toUint8,
+			uint8_t* out
+		)
+		{
+			__m128i a, b, ls, lzp, lsa, lsb, lzpa, lzpb;
+			const __m128i shfIdx = _mm_set_epi8(
+				7, 7, 6, 6, 5, 5, 4, 4, 3, 3, 2, 2, 1, 1, 0, 0
+			), compressIdx = _mm_set_epi8(
+				14, 12, 10, 8, 6, 4, 2, 0, 14, 12, 10, 8, 6, 4, 2, 0
+			);
+			const __m128i upperMask = _mm_set1_epi8(0xF0),
+				lowerMask = _mm_set1_epi8(0x0F),
+				blendMask = _mm_set1_epi16(0xFF00);
+
+			const __m128i localScaleMask = _mm_set1_epi8(0x3F),
+				localZeroPointMask = _mm_set1_epi8(0xC0),
+				localScaleBias = _mm_set1_epi8(9),
+				localZeroPointBias = _mm_set1_epi8(6);
+
+			const __m128i roundBias = _mm_set1_epi16(4),
+				divideBy9 = _mm_set1_epi16(32768 / 9);
+
+			const __m128i uintBias = _mm_set1_epi8(128);
+
+			__m128i localScaleBroadcastor;
+			if (qgroup == 4)
+			{
+				localScaleBroadcastor = _mm_set_epi8(
+					3, 3, 3, 3, 2, 2, 2, 2,
+					1, 1, 1, 1, 0, 0, 0, 0
+				);
+			}
+			else if (qgroup == 8)
+			{
+				localScaleBroadcastor = _mm_set_epi8(
+					1, 1, 1, 1, 1, 1, 1, 1,
+					0, 0, 0, 0, 0, 0, 0, 0
+				);
+			}
+			else if (qgroup == 16)
+			{
+				localScaleBroadcastor = _mm_set_epi8(
+					0, 0, 0, 0, 0, 0, 0, 0,
+					0, 0, 0, 0, 0, 0, 0, 0
+				);
+			}
+			else
+			{
+				throw std::runtime_error("Unsupported qgroup");
+			}
+
+
+			for (size_t i = 0; i < n / 2; i += 8)
+			{
+				// unpack int4 to int8
+				a = _mm_set1_epi64x(*reinterpret_cast<const int64_t*>(packedInput + i));
+				a = _mm_shuffle_epi8(a, shfIdx);
+				b = _mm_srli_epi16(_mm_and_si128(a, upperMask), 4);
+				a = _mm_and_si128(a, lowerMask);
+				a = _mm_blendv_epi8(a, b, blendMask);
+
+				ls = _mm_set1_epi64x(*reinterpret_cast<const int64_t*>(localScale + i * 2 / qgroup));
+				lzp = _mm_add_epi8(_mm_srli_epi16(_mm_and_si128(ls, localZeroPointMask), 6), localZeroPointBias);
+				ls = _mm_add_epi8(_mm_and_si128(ls, localScaleMask), localScaleBias);
+				ls = _mm_shuffle_epi8(ls, localScaleBroadcastor);
+				lzp = _mm_shuffle_epi8(lzp, localScaleBroadcastor);
+
+				b = _mm_unpacklo_epi8(a, _mm_setzero_si128()); // 0, 1, 2, 3, 4, 5, 6, 7, 
+				a = _mm_unpackhi_epi8(a, _mm_setzero_si128()); // 8, 9, a, b, c, d, e, f,
+
+				lsb = _mm_unpacklo_epi8(ls, _mm_setzero_si128());
+				lsa = _mm_unpackhi_epi8(ls, _mm_setzero_si128());
+
+				lzpb = _mm_unpacklo_epi8(lzp, _mm_setzero_si128());
+				lzpa = _mm_unpackhi_epi8(lzp, _mm_setzero_si128());
+
+				b = _mm_mullo_epi16(_mm_sub_epi16(b, lzpb), lsb);
+				a = _mm_mullo_epi16(_mm_sub_epi16(a, lzpa), lsa);
+
+				b = _mm_add_epi16(b, _mm_sign_epi16(roundBias, b));
+				a = _mm_add_epi16(a, _mm_sign_epi16(roundBias, a));
+
+				b = _mm_mulhrs_epi16(b, divideBy9);
+				a = _mm_mulhrs_epi16(a, divideBy9);
+
+				b = _mm_shuffle_epi8(b, compressIdx);
+				a = _mm_shuffle_epi8(a, compressIdx);
+
+				a = _mm_unpacklo_epi64(b, a);
+				if (toUint8) a = _mm_add_epi8(a, uintBias);
+				_mm_storeu_si128(reinterpret_cast<__m128i*>(out + i * 2), a);
+			}
+
+			return globalScale / 8;
+		}
 	}
 }
 

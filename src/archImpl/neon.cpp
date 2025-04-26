@@ -21,6 +21,20 @@ namespace kiwi
 			const int8_t* bBase, const int32_t* bIdx, size_t bIdxScale,
 			float* c, size_t ldc
 		);
+
+		template<>
+		float requantizePackedU4<ArchType::sse2>(
+			size_t n,
+			size_t qgroup,
+			const uint8_t* packedInput,
+			const uint8_t* localScale,
+			float globalScale,
+			bool toUint8,
+			uint8_t* out
+		)
+		{
+			return requantizePackedU4<ArchType::none>(n, qgroup, packedInput, localScale, globalScale, toUint8, out);
+		}
 	}
 }
 

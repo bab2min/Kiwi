@@ -20,7 +20,7 @@ namespace kiwi
 			uint64_t vocabSize, contextSize;
 			uint16_t dim;
 			uint8_t contextType, outputType;
-			uint8_t keySize, windowSize, quantize, _reserved;
+			uint8_t keySize, windowSize, qbit, qgroup;
 			uint64_t numNodes;
 			uint64_t nodeOffset, keyOffset, valueOffset, embOffset;
 		};

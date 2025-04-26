@@ -135,6 +135,117 @@ namespace kiwi
 		{
 			return invNormU8_256(m, k, a, lda, out);
 		}
+
+		template<>
+		float requantizePackedU4<ArchType::avx2>(
+			size_t n,
+			size_t qgroup,
+			const uint8_t* packedInput,
+			const uint8_t* localScale,
+			float globalScale,
+			bool toUint8,
+			uint8_t* out
+		)
+		{
+			__m256i a, b, ls, lzp, lsa, lsb, lzpa, lzpb;
+			const __m256i shfIdx = _mm256_set_epi8(
+				15, 15, 14, 14, 13, 13, 12, 12, 11, 11, 10, 10, 9, 9, 8, 8,
+				7, 7, 6, 6, 5, 5, 4, 4, 3, 3, 2, 2, 1, 1, 0, 0
+			), compressIdx = _mm256_set_epi8(
+				14, 12, 10, 8, 6, 4, 2, 0, 14, 12, 10, 8, 6, 4, 2, 0,
+				14, 12, 10, 8, 6, 4, 2, 0, 14, 12, 10, 8, 6, 4, 2, 0
+			);
+			const __m256i upperMask = _mm256_set1_epi8(0xF0),
+				lowerMask = _mm256_set1_epi8(0x0F),
+				blendMask = _mm256_set1_epi16(0xFF00);
+
+			const __m256i localScaleMask = _mm256_set1_epi8(0x3F),
+				localZeroPointMask = _mm256_set1_epi8(0xC0),
+				localScaleBias = _mm256_set1_epi8(9),
+				localZeroPointBias = _mm256_set1_epi8(6);
+
+			const __m256i roundBias = _mm256_set1_epi16(4),
+				divideBy9 = _mm256_set1_epi16(32768 / 9);
+
+			const __m256i uintBias = _mm256_set1_epi8(128);
+
+			__m256i localScaleBroadcastor;
+			if (qgroup == 4)
+			{
+				localScaleBroadcastor = _mm256_set_epi8(
+					7, 7, 7, 7, 6, 6, 6, 6,
+					5, 5, 5, 5, 4, 4, 4, 4,
+					3, 3, 3, 3, 2, 2, 2, 2,
+					1, 1, 1, 1, 0, 0, 0, 0
+				);
+			}
+			else if (qgroup == 8)
+			{
+				localScaleBroadcastor = _mm256_set_epi8(
+					3, 3, 3, 3, 3, 3, 3, 3,
+					2, 2, 2, 2, 2, 2, 2, 2,
+					1, 1, 1, 1, 1, 1, 1, 1,
+					0, 0, 0, 0, 0, 0, 0, 0
+				);
+			}
+			else if (qgroup == 16)
+			{
+				localScaleBroadcastor = _mm256_set_epi8(
+					1, 1, 1, 1, 1, 1, 1, 1,
+					1, 1, 1, 1, 1, 1, 1, 1,
+					0, 0, 0, 0, 0, 0, 0, 0,
+					0, 0, 0, 0, 0, 0, 0, 0
+				);
+			}
+			else
+			{
+				throw std::runtime_error("Unsupported qgroup");
+			}
+
+
+			for (size_t i = 0; i < n / 2; i += 16)
+			{
+				// unpack int4 to int8
+				a = _mm256_broadcastsi128_si256(_mm_loadu_si128(reinterpret_cast<const __m128i*>(packedInput + i)));
+				a = _mm256_shuffle_epi8(a, shfIdx);
+				b = _mm256_srli_epi16(_mm256_and_si256(a, upperMask), 4);
+				a = _mm256_and_si256(a, lowerMask);
+				a = _mm256_blendv_epi8(a, b, blendMask);
+
+				ls = _mm256_broadcastsi128_si256(_mm_loadu_si128(reinterpret_cast<const __m128i*>(localScale + i * 2 / qgroup)));
+				lzp = _mm256_add_epi8(_mm256_srli_epi16(_mm256_and_si256(ls, localZeroPointMask), 6), localZeroPointBias);
+				ls = _mm256_add_epi8(_mm256_and_si256(ls, localScaleMask), localScaleBias);
+				ls = _mm256_shuffle_epi8(ls, localScaleBroadcastor);
+				lzp = _mm256_shuffle_epi8(lzp, localScaleBroadcastor);
+
+				b = _mm256_unpacklo_epi8(a, _mm256_setzero_si256()); // 0, 1, 2, 3, 4, 5, 6, 7, 
+				a = _mm256_unpackhi_epi8(a, _mm256_setzero_si256()); // 8, 9, a, b, c, d, e, f,
+
+				lsb = _mm256_unpacklo_epi8(ls, _mm256_setzero_si256());
+				lsa = _mm256_unpackhi_epi8(ls, _mm256_setzero_si256());
+
+				lzpb = _mm256_unpacklo_epi8(lzp, _mm256_setzero_si256());
+				lzpa = _mm256_unpackhi_epi8(lzp, _mm256_setzero_si256());
+
+				b = _mm256_mullo_epi16(_mm256_sub_epi16(b, lzpb), lsb);
+				a = _mm256_mullo_epi16(_mm256_sub_epi16(a, lzpa), lsa);
+
+				b = _mm256_add_epi16(b, _mm256_sign_epi16(roundBias, b));
+				a = _mm256_add_epi16(a, _mm256_sign_epi16(roundBias, a));
+
+				b = _mm256_mulhrs_epi16(b, divideBy9);
+				a = _mm256_mulhrs_epi16(a, divideBy9);
+
+				b = _mm256_shuffle_epi8(b, compressIdx);
+				a = _mm256_shuffle_epi8(a, compressIdx);
+
+				a = _mm256_unpacklo_epi64(b, a);
+				if (toUint8) a = _mm256_add_epi8(a, uintBias);
+				_mm256_storeu_si256(reinterpret_cast<__m256i*>(out + i * 2), a);
+			}
+
+			return globalScale / 8;
+		}
 	}
 }
 

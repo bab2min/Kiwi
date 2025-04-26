@@ -333,6 +333,58 @@ namespace kiwi
 			}
 		}
 
+		/**
+		* @brief Requantize packed `qbit` ints to int8 (or uint8), get the scale parameter in float
+				 and return the size of the packed data
+		*/
+		template<ArchType archType>
+		inline size_t requantizePackedInts(uint8_t* out, float& scale, const void* packed, size_t dim, size_t qbit, size_t qgroup, bool toUint8)
+		{
+			const uint8_t* uPacked = reinterpret_cast<const uint8_t*>(packed);
+			if (qbit == 8)
+			{
+				if (toUint8) addBias(out, reinterpret_cast<const int8_t*>(uPacked), dim);
+				else memcpy(out, uPacked, dim);
+				scale = half2float(*reinterpret_cast<const uint16_t*>(uPacked + dim));
+				return dim + sizeof(uint16_t);
+			}
+			else if (qbit == 4)
+			{
+				const size_t numQGroups = dim / qgroup;
+				float globalScale = half2float(*reinterpret_cast<const uint16_t*>(uPacked + dim / 2));
+				const uint8_t* localScale = uPacked + dim / 2 + sizeof(uint16_t);
+				scale = qgemm::requantizePackedU4<archType>(dim, qgroup, uPacked, localScale, globalScale, toUint8, out);
+				return dim / 2 + sizeof(uint16_t) + numQGroups * sizeof(uint8_t);
+			}
+			else
+			{
+				throw runtime_error{ "Unsupported qbit" };
+			}
+		}
+
+		/**
+		* @brief Dequantized packed `qbit` ints to float and return the size of the packed data
+		*/
+		template<ArchType archType>
+		inline size_t dequantizePackedInts(float* out, const void* packed, size_t dim, size_t qbit, size_t qgroup)
+		{
+			const uint8_t* uPacked = reinterpret_cast<const uint8_t*>(packed);
+			if (qbit == 8 && qgroup == 0)
+			{
+				dequantize(out, reinterpret_cast<const int8_t*>(uPacked), dim, half2float(*reinterpret_cast<const uint16_t*>(uPacked + dim)));
+				return dim + sizeof(uint16_t);
+			}
+			else
+			{
+				float scale;
+				int8_t* buf = reinterpret_cast<int8_t*>(out + dim) - dim;
+				const size_t size = requantizePackedInts<archType>(reinterpret_cast<uint8_t*>(buf),
+					scale, uPacked, dim, qbit, qgroup, false);
+				dequantize(out, buf, dim, scale);
+				return size;
+			}
+		}
+
 		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
 		CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::CoNgramModel(utils::MemoryObject&& mem) : CoNgramModelBase{ mem }
 		{
@@ -490,19 +542,16 @@ namespace kiwi
 			{
 				if (quantized)
 				{
-					addBias(optr, reinterpret_cast<const int8_t*>(eptr), header.dim);
+					float scale;
+					eptr += requantizePackedInts<arch>(optr, scale, eptr, header.dim, header.qbit, header.qgroup, true);
 					optr += header.dim;
-					eptr += header.dim;
-					*reinterpret_cast<float*>(optr) = half2float(*reinterpret_cast<const uint16_t*>(eptr)); // scale
+					*reinterpret_cast<float*>(optr) = scale;
 					optr += sizeof(float);
-					eptr += sizeof(uint16_t);
 				}
 				else
 				{
-					const float scale = half2float(*reinterpret_cast<const uint16_t*>(eptr + header.dim));
-					dequantize(reinterpret_cast<float*>(optr), reinterpret_cast<const int8_t*>(eptr), header.dim, scale);
+					eptr += dequantizePackedInts<arch>(reinterpret_cast<float*>(optr), eptr, header.dim, header.qbit, header.qgroup);
 					optr += header.dim * sizeof(float);
-					eptr += header.dim + sizeof(uint16_t);
 				}
 
 				*reinterpret_cast<float*>(optr) = -half2float(*reinterpret_cast<const uint16_t*>(eptr)); // bias
@@ -526,24 +575,21 @@ namespace kiwi
 			optr = const_cast<uint8_t*>(outputEmbPtr);
 			for (size_t i = 0; i < header.vocabSize; ++i)
 			{
-				auto* qvals = reinterpret_cast<const int8_t*>(eptr);
 				if (quantized)
 				{
-					memcpy(optr, qvals, header.dim);
+					float scale;
+					eptr += requantizePackedInts<arch>(optr, scale, eptr, header.dim, header.qbit, header.qgroup, false);
+					auto* qvals = reinterpret_cast<const int8_t*>(optr);
 					optr += header.dim;
-					eptr += header.dim;
-					*reinterpret_cast<float*>(optr) = half2float(*reinterpret_cast<const uint16_t*>(eptr));
+					*reinterpret_cast<float*>(optr) = scale;
 					optr += sizeof(float);
-					eptr += sizeof(uint16_t);
 					*reinterpret_cast<int32_t*>(optr) = accumulate(qvals, qvals + header.dim, 0) * 128;
 					optr += sizeof(int32_t);
 				}
 				else
 				{
-					const float scale = half2float(*reinterpret_cast<const uint16_t*>(eptr + header.dim));
-					dequantize(reinterpret_cast<float*>(optr), qvals, header.dim, scale);
+					eptr += dequantizePackedInts<arch>(reinterpret_cast<float*>(optr), eptr, header.dim, header.qbit, header.qgroup);
 					optr += header.dim * sizeof(float);
-					eptr += header.dim + sizeof(uint16_t);
 				}
 			}
 
@@ -581,19 +627,16 @@ namespace kiwi
 				{
 					if (quantized)
 					{
-						addBias(optr, reinterpret_cast<const int8_t*>(eptr), header.dim);
+						float scale;
+						eptr += requantizePackedInts<arch>(optr, scale, eptr, header.dim, header.qbit, header.qgroup, true);
 						optr += header.dim;
-						eptr += header.dim;
-						*reinterpret_cast<float*>(optr) = half2float(*reinterpret_cast<const uint16_t*>(eptr)); // scale
+						*reinterpret_cast<float*>(optr) = scale;
 						optr += sizeof(float);
-						eptr += sizeof(uint16_t);
 					}
 					else
 					{
-						const float scale = half2float(*reinterpret_cast<const uint16_t*>(eptr + header.dim));
-						dequantize(reinterpret_cast<float*>(optr), reinterpret_cast<const int8_t*>(eptr), header.dim, scale);
+						eptr += dequantizePackedInts<arch>(reinterpret_cast<float*>(optr), eptr, header.dim, header.qbit, header.qgroup);
 						optr += header.dim * sizeof(float);
-						eptr += header.dim + sizeof(uint16_t);
 					}
 
 					*reinterpret_cast<float*>(optr) = -half2float(*reinterpret_cast<const uint16_t*>(eptr)); // bias
@@ -1405,6 +1448,30 @@ namespace kiwi
 			return os;
 		}
 
+		inline std::ostream& writeIntsWithPacking(std::ostream& os, const int8_t* ints, size_t size, size_t bits)
+		{
+			thread_local Vector<char> buf;
+			if (bits == 8)
+			{
+				os.write(reinterpret_cast<const char*>(ints), size);
+			}
+			else if (bits == 4)
+			{
+				const uint8_t* uints = reinterpret_cast<const uint8_t*>(ints);
+				buf.resize(size / 2);
+				for (size_t i = 0; i < size; i += 2)
+				{
+					buf[i / 2] = (uints[i + 1] << 4) | (uints[i] & 0x0F);
+				}
+				os.write(buf.data(), size / 2);
+			}
+			else
+			{
+				throw runtime_error{ "Not implemented" };
+			}
+		}
+
+
 		utils::MemoryObject CoNgramModelBase::build(const string& contextDefinition, const string& embedding, size_t maxContextLength, bool useVLE, bool reorderContextId)
 		{
 			ifstream contextStr, embeddingStr;
@@ -1579,33 +1646,44 @@ namespace kiwi
 			const uint32_t contextSize = utils::read<uint32_t>(embeddingStr);
 			const uint32_t outputSize = utils::read<uint32_t>(embeddingStr);
 			const uint32_t windowSize = utils::read<uint32_t>(embeddingStr);
+			uint32_t qbit = utils::read<uint32_t>(embeddingStr);
+			const uint32_t qgroup = utils::read<uint32_t>(embeddingStr);
+			if (qgroup == 0) qbit = 8;
+
+			const uint32_t numQGroups = qgroup ? (dim / qgroup) : 0;
 
 			Vector<int8_t> contextEmb(dim * contextSize);
 			Vector<uint16_t> contextEmbScale(contextSize);
+			Vector<uint8_t> contextEmbLocalScale(qgroup ? (contextSize * numQGroups) : 0);
 			Vector<uint16_t> contextEmbBias(contextSize);
 			Vector<uint16_t> contextValidTokenSum(contextSize);
 			Vector<uint16_t> contextConfidence(contextSize);
 			Vector<int8_t> distantEmb(dim * outputSize);
 			Vector<uint16_t> distantEmbScale(outputSize);
+			Vector<uint8_t> distantEmbLocalScale(qgroup ? (outputSize * numQGroups) : 0);
 			Vector<uint16_t> distantEmbBias(outputSize);
 			Vector<uint16_t> distantConfidence(outputSize);
 			vector<uint16_t> positionConfidence(windowSize);
 			Vector<int8_t> outputEmb(dim * outputSize);
 			Vector<uint16_t> outputEmbScale(outputSize);
+			Vector<uint8_t> outputEmbLocalScale(qgroup ? (outputSize * numQGroups) : 0);
 			Vector<uint8_t> distantMask(outputSize);
 
 			embeddingStr.read((char*)contextEmb.data(), contextEmb.size());
 			embeddingStr.read((char*)contextEmbScale.data(), contextEmbScale.size() * sizeof(uint16_t));
+			if (qgroup) embeddingStr.read((char*)contextEmbLocalScale.data(), contextEmbLocalScale.size());
 			embeddingStr.read((char*)contextEmbBias.data(), contextEmbBias.size() * sizeof(uint16_t));
 			embeddingStr.read((char*)contextValidTokenSum.data(), contextValidTokenSum.size() * sizeof(uint16_t));
 			embeddingStr.read((char*)contextConfidence.data(), contextConfidence.size() * sizeof(uint16_t));
 			embeddingStr.read((char*)distantEmb.data(), distantEmb.size());
 			embeddingStr.read((char*)distantEmbScale.data(), distantEmbScale.size() * sizeof(uint16_t));
+			if (qgroup) embeddingStr.read((char*)distantEmbLocalScale.data(), distantEmbLocalScale.size());
 			embeddingStr.read((char*)distantEmbBias.data(), distantEmbBias.size() * sizeof(uint16_t));
 			embeddingStr.read((char*)distantConfidence.data(), distantConfidence.size() * sizeof(uint16_t));
 			embeddingStr.read((char*)positionConfidence.data(), positionConfidence.size() * sizeof(uint16_t));
 			embeddingStr.read((char*)outputEmb.data(), outputEmb.size());
 			embeddingStr.read((char*)outputEmbScale.data(), outputEmbScale.size() * sizeof(uint16_t));
+			if (qgroup) embeddingStr.read((char*)outputEmbLocalScale.data(), outputEmbLocalScale.size());
 			embeddingStr.read((char*)distantMask.data(), distantMask.size());
 
 			// remap context embedding
@@ -1613,6 +1691,7 @@ namespace kiwi
 			{
 				Vector<int8_t> newContextEmb(contextEmb.size());
 				Vector<uint16_t> newContextEmbScale(contextSize);
+				Vector<uint8_t> newContextEmbLocalScale(qgroup ? (contextSize * (dim / qgroup)) : 0);
 				Vector<uint16_t> newContextEmbBias(contextSize);
 				Vector<uint16_t> newContextValidTokenSum(contextSize);
 				for (size_t i = 0; i < contextSize; ++i)
@@ -1622,11 +1701,13 @@ namespace kiwi
 					auto dst = newContextEmb.data() + idx * dim;
 					copy(src, src + dim, dst);
 					newContextEmbScale[idx] = contextEmbScale[i];
+					if (qgroup) copy(contextEmbLocalScale.data() + i * numQGroups, contextEmbLocalScale.data() + (i + 1) * numQGroups, newContextEmbLocalScale.data() + idx * numQGroups);
 					newContextEmbBias[idx] = contextEmbBias[i];
 					newContextValidTokenSum[idx] = contextValidTokenSum[i];
 				}
 				contextEmb = move(newContextEmb);
 				contextEmbScale = move(newContextEmbScale);
+				if (qgroup) contextEmbLocalScale = move(newContextEmbLocalScale);
 				contextEmbBias = move(newContextEmbBias);
 				contextValidTokenSum = move(newContextValidTokenSum);
 			}
@@ -1655,6 +1736,8 @@ namespace kiwi
 			header.vocabSize = outputSize;
 			header.keySize = keySize;
 			header.windowSize = windowSize;
+			header.qbit = qbit;
+			header.qgroup = qgroup;
 			header.numNodes = nodeSizes.size();
 
 			size_t finalSize = 0;
@@ -1662,7 +1745,8 @@ namespace kiwi
 			header.keyOffset = alignedOffsetInc(finalSize, compressedNodeSizes.size());
 			header.valueOffset = alignedOffsetInc(finalSize, compressedKeys.size());
 			header.embOffset = alignedOffsetInc(finalSize, compressedValues.size());
-			finalSize += dim * (contextSize + outputSize * 2);
+			finalSize += padMultipleOf(dim * qbit / 8, 4) * (contextSize + outputSize * 2);
+			if (qgroup) finalSize += numQGroups * (contextSize + outputSize * 2);
 			finalSize += contextSize * sizeof(uint16_t) * 4;
 			finalSize += outputSize * sizeof(uint16_t) * 4;
 			finalSize += windowSize * sizeof(uint16_t);
@@ -1681,21 +1765,24 @@ namespace kiwi
 
 			for (size_t i = 0; i < contextSize; ++i)
 			{
-				ostr.write((const char*)&contextEmb[i * dim], dim);
+				writeIntsWithPacking(ostr, &contextEmb[i * dim], dim, header.qbit);
 				ostr.write((const char*)&contextEmbScale[i], sizeof(uint16_t));
+				if (qgroup) ostr.write((const char*)&contextEmbLocalScale[i * numQGroups], sizeof(uint8_t) * numQGroups);
 				ostr.write((const char*)&contextEmbBias[i], sizeof(uint16_t));
 				ostr.write((const char*)&contextConfidence[i], sizeof(uint16_t));
 				ostr.write((const char*)&contextValidTokenSum[i], sizeof(uint16_t));
 			}
 			for (size_t i = 0; i < outputSize; ++i)
 			{
-				ostr.write((const char*)&outputEmb[i * dim], dim);
+				writeIntsWithPacking(ostr, &outputEmb[i * dim], dim, header.qbit);
 				ostr.write((const char*)&outputEmbScale[i], sizeof(uint16_t));
+				if (qgroup) ostr.write((const char*)&outputEmbLocalScale[i * numQGroups], sizeof(uint8_t) * numQGroups);
 			}
 			for (size_t i = 0; i < outputSize; ++i)
 			{
-				ostr.write((const char*)&distantEmb[i * dim], dim);
+				writeIntsWithPacking(ostr, &distantEmb[i * dim], dim, header.qbit);
 				ostr.write((const char*)&distantEmbScale[i], sizeof(uint16_t));
+				if (qgroup) ostr.write((const char*)&distantEmbLocalScale[i * numQGroups], sizeof(uint8_t) * numQGroups);
 				ostr.write((const char*)&distantEmbBias[i], sizeof(uint16_t));
 				ostr.write((const char*)&distantConfidence[i], sizeof(uint16_t));
 			}

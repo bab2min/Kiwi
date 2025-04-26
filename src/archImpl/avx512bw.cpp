@@ -173,6 +173,20 @@ namespace kiwi
 		{
 			return invNormU8_512(m, k, a, lda, out);
 		}
+
+		template<>
+		float requantizePackedU4<ArchType::avx512bw>(
+			size_t n,
+			size_t qgroup,
+			const uint8_t* packedInput,
+			const uint8_t* localScale,
+			float globalScale,
+			bool toUint8,
+			uint8_t* out
+		)
+		{
+			return requantizePackedU4<ArchType::avx2>(n, qgroup, packedInput, localScale, globalScale, toUint8, out);
+		}
 	}
 }
 
