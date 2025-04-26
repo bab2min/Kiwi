@@ -296,13 +296,14 @@ namespace kiwi
 
 	enum class ModelType
 	{
-		none = 0, /**< Select default model */
-		knlm = 1, /**< Kneser-Ney Language Model */
-		sbg = 2, /**< Skip-Bigram Model */
-		cong = 3, /**< Contextual N-gram embedding Language Model (Only local context) */
-		congGlobal = 4, /**< Contextual N-gram embedding Language Model (local and global context) */
-		congFp32 = 5, /**< Contextual N-gram embedding Language Model (Only local context, non-quantized(slow) version) */
-		congGlobalFp32 = 6, /**< Contextual N-gram embedding Language Model (local and global context, non-quantized(slow) version) */
+		none = 0, /**< Select default (smallest one of available) model */
+		largest = 1, /**< Select default (largest one of available) model */
+		knlm = 2, /**< Kneser-Ney Language Model */
+		sbg = 3, /**< Skip-Bigram Model */
+		cong = 4, /**< Contextual N-gram embedding Language Model (Only local context) */
+		congGlobal = 5, /**< Contextual N-gram embedding Language Model (local and global context) */
+		congFp32 = 6, /**< Contextual N-gram embedding Language Model (Only local context, non-quantized(slow) version) */
+		congGlobalFp32 = 7, /**< Contextual N-gram embedding Language Model (local and global context, non-quantized(slow) version) */
 		knlmTransposed,
 	};
 

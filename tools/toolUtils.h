@@ -109,6 +109,10 @@ namespace tutils
 		{
 			return kiwi::ModelType::none;
 		}
+		else if (v == "largest")
+		{
+			return kiwi::ModelType::largest;
+		}
 		else if (v == "knlm")
 		{
 			return kiwi::ModelType::knlm;

@@ -809,15 +809,15 @@ void KiwiBuilder::saveMorphBin(std::ostream& os) const
 	serializer::writeMany(os, serializer::toKey("KIWI"), forms, morphemes);
 }
 
-ModelType KiwiBuilder::getModelType(const string& modelPath)
+ModelType KiwiBuilder::getModelType(const string& modelPath, bool largest)
 {
 	if (isOpenable(modelPath + "/cong.mdl"))
 	{
-		return ModelType::congGlobal;
+		return largest ? ModelType::congGlobal : ModelType::cong;
 	}
 	else if (isOpenable(modelPath + "/skipbigram.mdl"))
 	{
-		return ModelType::sbg;
+		return largest ? ModelType::sbg : ModelType::knlm;
 	}
 	else if (isOpenable(modelPath + "/sj.knlm"))
 	{
@@ -840,9 +840,9 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, size_t _numThreads, BuildOptio
 		loadMorphBin(iss);
 	}
 	
-	if (modelType == ModelType::none)
+	if (modelType == ModelType::none || modelType == ModelType::largest)
 	{
-		modelType = getModelType(modelPath);
+		modelType = getModelType(modelPath, modelType == ModelType::largest);
 		if (modelType == ModelType::none)
 		{
 			throw runtime_error{ "Cannot find any valid model files in the given path" };

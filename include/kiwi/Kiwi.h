@@ -662,7 +662,7 @@ namespace kiwi
 		/**
 		 * @brief 주어진 모델 경로로부터 모델의 타입을 추정한다.
 		 */
-		static ModelType getModelType(const std::string& modelPath);
+		static ModelType getModelType(const std::string& modelPath, bool largest = false);
 
 		/**
 		 * @brief KiwiBuilder의 기본 생성자
