@@ -120,6 +120,7 @@ pair<size_t, size_t> diffTokens(ostream& ostr, const string& raw, const TokenRes
 			if (isDiff) ++diff;
 			++total;
 		}
+		if (showSame) ostr << endl;
 	}
 	else
 	{
@@ -235,6 +236,8 @@ int main(int argc, const char* argv[])
 		ostr = ofstr.get();
 	}
 
+	cout << "Model A: " << modelA.getValue() << endl;
+	cout << "Model B: " << modelB.getValue() << endl;
 	for (auto& input : inputs)
 	{
 		cout << "input: " << input << " ";
