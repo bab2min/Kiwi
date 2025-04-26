@@ -590,20 +590,25 @@ namespace kiwi
 		template<class VocabTy>
 		void _addCorpusTo(RaggedVector<VocabTy>& out, std::istream& is, MorphemeMap& morphMap, 
 			double splitRatio, RaggedVector<VocabTy>* splitOut,
-			UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict = nullptr) const;
+			UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict = nullptr,
+			const UnorderedMap<std::pair<KString, POSTag>, std::pair<KString, POSTag>>* transform = nullptr) const;
 
 		void addCorpusTo(RaggedVector<uint8_t>& out, std::istream& is, MorphemeMap& morphMap, 
 			double splitRatio = 0, RaggedVector<uint8_t>* splitOut = nullptr,
-			UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict = nullptr) const;
+			UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict = nullptr,
+			const UnorderedMap<std::pair<KString, POSTag>, std::pair<KString, POSTag>>* transform = nullptr) const;
 		void addCorpusTo(RaggedVector<uint16_t>& out, std::istream& is, MorphemeMap& morphMap, 
 			double splitRatio = 0, RaggedVector<uint16_t>* splitOut = nullptr,
-			UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict = nullptr) const;
+			UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict = nullptr,
+			const UnorderedMap<std::pair<KString, POSTag>, std::pair<KString, POSTag>>* transform = nullptr) const;
 		void addCorpusTo(RaggedVector<uint32_t>& out, std::istream& is, MorphemeMap& morphMap, 
 			double splitRatio = 0, RaggedVector<uint32_t>* splitOut = nullptr,
-			UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict = nullptr) const;
+			UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict = nullptr,
+			const UnorderedMap<std::pair<KString, POSTag>, std::pair<KString, POSTag>>* transform = nullptr) const;
 		void addCorpusTo(RaggedVector<int32_t>& out, std::istream& is, MorphemeMap& morphMap,
 			double splitRatio = 0, RaggedVector<int32_t>* splitOut = nullptr,
-			UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict = nullptr) const;
+			UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict = nullptr,
+			const UnorderedMap<std::pair<KString, POSTag>, std::pair<KString, POSTag>>* transform = nullptr) const;
 		void updateForms();
 		void updateMorphemes(size_t vocabSize = 0);
 
@@ -839,7 +844,8 @@ namespace kiwi
 			const std::string& outputPath,
 			const std::string& morphemeDefPath = {},
 			size_t morphemeDefMinCnt = 0,
-			bool generateOovDict = false
+			bool generateOovDict = false,
+			const std::vector<std::pair<std::pair<std::string, POSTag>, std::pair<std::string, POSTag>>>* transform = nullptr
 		) const;
 
 		using TokenFilter = std::function<bool(const std::u16string&, POSTag)>;
@@ -857,7 +863,8 @@ namespace kiwi
 			const std::string& morphemeDefPath = {},
 			size_t morphemeDefMinCnt = 0,
 			const std::vector<std::pair<size_t, std::vector<uint32_t>>>& contextualMapper = {},
-			HSDataset* splitDataset = nullptr
+			HSDataset* splitDataset = nullptr,
+			const std::vector<std::pair<std::pair<std::string, POSTag>, std::pair<std::string, POSTag>>>* transform = nullptr
 		) const;
 
 		BuildOption getOptions() const { return options; }

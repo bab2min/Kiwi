@@ -144,7 +144,7 @@ bool HSDataset::tokenizeUnlikely(Vector<std::pair<int32_t, int32_t>>& out, int32
 	auto& tokens = res[validResIdx[(size_t)(r * (float)validResIdx.size())]].first;
 	for (size_t i = 1; i < tokens.size() - 1; ++i)
 	{
-		out.emplace_back(tokens[i].morph->lmMorphemeId, tokens[i].morph->lmMorphemeId);
+		out.emplace_back(tokens[i].morph->lmMorphemeId, i > 1 ? tokens[i].morph->lmMorphemeId : 0);
 	}
 	return true;
 }
