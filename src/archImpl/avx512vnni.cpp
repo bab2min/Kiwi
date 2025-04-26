@@ -160,7 +160,7 @@ namespace kiwi
 			return invNormU8_512(m, k, a, lda, out);
 		}
 
-		__m512i m512_sign_epi16(__m512i a, __m512i b)
+		/*inline __m512i m512_sign_epi16(__m512i a, __m512i b)
 		{
 			__mmask32 b_nonzero = _mm512_test_epi16_mask(b, b);
 			__mmask32 b_neg = _mm512_movepi16_mask(b);  // extract sign bits: b < 0
@@ -295,6 +295,20 @@ namespace kiwi
 			}
 
 			return globalScale / 8;
+		}*/
+
+		template<>
+		float requantizePackedU4<ArchType::avx512vnni>(
+			size_t n,
+			size_t qgroup,
+			const uint8_t* packedInput,
+			const uint8_t* localScale,
+			float globalScale,
+			bool toUint8,
+			uint8_t* out
+		)
+		{
+			return requantizePackedU4<ArchType::avx2>(n, qgroup, packedInput, localScale, globalScale, toUint8, out);
 		}
 	}
 
