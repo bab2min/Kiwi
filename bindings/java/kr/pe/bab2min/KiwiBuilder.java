@@ -14,10 +14,11 @@ public class KiwiBuilder implements AutoCloseable  {
 
 	public static class ModelType {
 		final static public int none = 0,
-		knlm = 1,
-		sbg = 2,
-		cong = 3,
-		congGlobal = 4;
+		largest = 1,
+		knlm = 2,
+		sbg = 3,
+		cong = 4,
+		congGlobal = 5;
 	}
 
 	public static class AnalyzedMorph {

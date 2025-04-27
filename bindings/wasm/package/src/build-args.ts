@@ -139,11 +139,15 @@ export interface BuildArgs {
      */
     preanalyzedWords?: PreanalyzedWord[];
     /**
-     * Specifies the language model to use for morphological analysis. Defaults to 'knlm'.
+     * Specifies the language model to use for morphological analysis. Defaults to 'none'.
+     * - `none`: Kiwi selects the model type automatically. If there are multiple models available, the fastest model is selected.
+     * - `largest`: Kiwi selects the model type automatically. If there are multiple models available, the largest model is selected.
      * - `knlm`: Fast and can model the relationships between morphemes within a short distance (usually two or three) with high accuracy. However, it has the limitation that it cannot take into account the relationships between morphemes over a long distance.
      * - `sbg`: Driven by internally calibrating the results of SkipBigram to the results of KNLM. At a processing time increase of about 30% compared to KNLM, it is able to model relationships between morphemes over large distances (up to 8 real morphemes) with moderate accuracy.
+     * - `cong`: (experimental) Contextual N-gram embedding Language Model.  It consists of lightweighted neural networks that can estimate the relationships between morphemes.
+     * - `cong-global`: (experimental) Contextual N-gram embedding Language Model. It consists of lightweighted neural networks that can estimate the relationships between morphemes over large distances (up to 7 real morphemes) with high accuracy.
      */
-    modelType?: 'knlm' | 'sbg';
+    modelType?: 'none' | 'largest' | 'knlm' | 'sbg' | 'cong' | 'cong-global';
     /**
      * The typo information to use for correction.
      * Can be one of the built in `none`, `basic`, `continual`, `basicWithContinual` typo sets, or a custom {@link TypoTransformer}.

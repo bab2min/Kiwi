@@ -179,7 +179,15 @@ json build(const json& args) {
 
     const std::string modelPath = buildArgs["modelPath"];
     const size_t numThreads = 0;
-    const bool useSBG = buildArgs.value("modelType", "knlm") == "sbg";
+    const auto modelTypeStr = buildArgs.value("modelType", "none");
+
+    const ModelType modelType = (modelTypeStr == "none") ? ModelType::none 
+        : (modelTypeStr == "largest") ? ModelType::largest
+        : (modelTypeStr == "knlm") ? ModelType::knlm
+        : (modelTypeStr == "sbg") ? ModelType::sbg
+        : (modelTypeStr == "cong") ? ModelType::cong
+        : (modelTypeStr == "cong-global") ? ModelType::congGlobal
+        : ModelType::none;
     
     BuildOption buildOptions = BuildOption::none;
     if (buildArgs.value("integrateAllomorph", true)) {
@@ -199,7 +207,7 @@ json build(const json& args) {
         modelPath,
         numThreads,
         buildOptions,
-        useSBG,
+        modelType,
     };
 
     const auto userDicts = buildArgs.value("userDicts", json::array());
