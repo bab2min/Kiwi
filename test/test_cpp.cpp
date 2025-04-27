@@ -480,6 +480,37 @@ TEST(KiwiCpp, HSDataset)
 	}
 }
 
+TEST(KiwiCpp, HSDatasetUnlikelihoods)
+{
+	KiwiBuilder kw{ CONG_MODEL_PATH, 0, BuildOption::default_, ModelType::cong };
+	std::vector<std::string> data;
+	data.emplace_back("./ModelGenerator/testHSDataset.txt");
+
+	static constexpr size_t batchSize = 32, windowSize = 8;
+
+	std::array<int32_t, batchSize* windowSize> in, unlikelihoodIn;
+	std::array<int32_t, batchSize> out, unlikelihoodOut;
+	std::array<float, batchSize> lmLProbs;
+	std::array<uint32_t, batchSize> outNgramBase;
+	float restLm;
+	uint32_t restLmCnt;
+
+	const size_t numWorkers = 4;
+	auto dataset = kw.makeHSDataset(data, batchSize, 0, windowSize, numWorkers, 0., 0.01, 0.12, true);
+	for (size_t i = 0; i < 2; ++i)
+	{
+		size_t totalBatchCnt = 0, totalTokenCnt = 0, s;
+		dataset.reset();
+		while (s = dataset.next(in.data(), out.data(), lmLProbs.data(), outNgramBase.data(), restLm, restLmCnt, unlikelihoodIn.data(), unlikelihoodOut.data()))
+		{
+			EXPECT_LE(s, batchSize);
+			totalTokenCnt += s;
+			totalBatchCnt++;
+		}
+		EXPECT_TRUE(std::max(dataset.numEstimBatches(), (size_t)numWorkers) - numWorkers <= totalBatchCnt && totalBatchCnt <= dataset.numEstimBatches() + numWorkers);
+	}
+}
+
 TEST(KiwiCpp, SentenceBoundaryErrors)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
@@ -936,6 +967,59 @@ TEST(KiwiCpp, AnalyzeSBG)
 	auto resSbg = kiwiSbg.analyze(u"이 번호로 전화를 이따가 꼭 반드시 걸어.", 3, kiwi::Match::allWithNormalizing);
 	EXPECT_EQ(resSbg[0].first.size(), 11);
 	EXPECT_EQ(resSbg[0].first[8].str, u"걸");
+}
+
+TEST(KiwiCpp, AnalyzeCong)
+{
+	Kiwi kiwi = KiwiBuilder{ CONG_MODEL_PATH, 0, BuildOption::none, ModelType::congGlobal }.build();
+	kiwi.analyze(TEST_SENT, Match::all);
+
+	auto res = kiwi.analyze(u"이 번호로 전화를 이따가 꼭 반드시 걸어.", 3, kiwi::Match::allWithNormalizing);
+	EXPECT_EQ(res[0].first.size(), 11);
+	EXPECT_EQ(res[0].first[8].str, u"걸");
+}
+
+TEST(KiwiCpp, CoNgramFunctions)
+{
+	Kiwi kiwiF = KiwiBuilder{ CONG_MODEL_PATH, 0, BuildOption::default_, ModelType::congGlobalFp32 }.build();
+	Kiwi kiwiQ = KiwiBuilder{ CONG_MODEL_PATH, 0, BuildOption::default_, ModelType::congGlobal }.build();
+	auto lmF = dynamic_cast<const lm::CoNgramModelBase*>(kiwiF.getLangModel());
+	auto lmQ = dynamic_cast<const lm::CoNgramModelBase*>(kiwiQ.getLangModel());
+
+	const size_t vocabId = kiwiF.findMorphemeId(u"언어", POSTag::nng);
+	const size_t candId = kiwiF.findMorphemeId(u"국어", POSTag::nng);
+	const uint32_t vocabs[3] = {
+		kiwiF.findMorphemeId(u"오늘", POSTag::mag),
+		kiwiF.findMorphemeId(u"점심", POSTag::nng),
+		kiwiF.findMorphemeId(u"은", POSTag::jx),
+	};
+	const uint32_t contextId = lmF->toContextId(&vocabs[0], 3);
+	const uint32_t bgContextId = lmF->toContextId(&vocabs[2], 1);
+	std::array<std::pair<uint32_t, float>, 10> resultF, resultQ;
+
+	auto contextMap = lmF->getContextWordMap();
+	EXPECT_EQ(lmF->mostSimilarWords(vocabId, resultF.size(), resultF.data()), resultF.size());
+	EXPECT_TRUE(std::any_of(resultF.begin(), resultF.end(), [&](const auto& p) { return p.first == candId; }));
+	float simF = lmF->wordSimilarity(vocabId, resultF[0].first);
+	EXPECT_FLOAT_EQ(simF, resultF[0].second);
+
+	EXPECT_EQ(lmQ->mostSimilarWords(vocabId, resultQ.size(), resultQ.data()), resultQ.size());
+	EXPECT_TRUE(std::any_of(resultQ.begin(), resultQ.end(), [&](const auto& p) { return p.first == candId; }));
+	float simQ = lmQ->wordSimilarity(vocabId, resultQ[0].first);
+	EXPECT_FLOAT_EQ(simQ, resultQ[0].second);
+
+	EXPECT_EQ(lmF->mostSimilarContexts(contextId, resultF.size(), resultF.data()), resultF.size());
+	simF = lmF->contextSimilarity(contextId, resultF[0].first);
+	EXPECT_FLOAT_EQ(simF, resultF[0].second);
+
+	EXPECT_EQ(lmQ->mostSimilarContexts(contextId, resultQ.size(), resultQ.data()), resultQ.size());
+	simQ = lmQ->contextSimilarity(contextId, resultQ[0].first);
+	EXPECT_FLOAT_EQ(simQ, resultQ[0].second);
+
+	EXPECT_EQ(lmF->predictWordsFromContextDiff(contextId, bgContextId, 0.5, resultF.size(), resultF.data()), resultF.size());
+
+	EXPECT_EQ(lmF->predictWordsFromContext(contextId, resultF.size(), resultF.data()), resultF.size());
+	EXPECT_EQ(lmQ->predictWordsFromContext(contextId, resultQ.size(), resultQ.data()), resultQ.size());
 }
 
 TEST(KiwiCpp, AnalyzeMultithread)
