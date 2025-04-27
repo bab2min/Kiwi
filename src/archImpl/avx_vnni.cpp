@@ -144,10 +144,11 @@ namespace kiwi
 			size_t m, size_t n, size_t k,
 			const float* aT, size_t strideA,
 			const float* b, size_t strideB,
-			float* c, size_t strideC
+			float* c, size_t strideC,
+			bool zeroMode
 		)
 		{
-			return gemm<ArchType::avx2>(m, n, k, aT, strideA, b, strideB, c, strideC);
+			return gemm<ArchType::avx2>(m, n, k, aT, strideA, b, strideB, c, strideC, zeroMode);
 		}
 
 		template<>
@@ -155,10 +156,11 @@ namespace kiwi
 			size_t m, size_t k,
 			const float* aT, size_t strideA,
 			const float* b,
-			float* c
+			float* c,
+			bool zeroMode
 		)
 		{
-			return gemv<ArchType::avx2>(m, k, aT, strideA, b, c);
+			return gemv<ArchType::avx2>(m, k, aT, strideA, b, c, zeroMode);
 		}
 
 		template<>

@@ -11,13 +11,15 @@ namespace kiwi
 			size_t m, size_t n, size_t k,
 			const float* aT, size_t strideA,
 			const float* b, size_t strideB,
-			float* c, size_t strideC
+			float* c, size_t strideC,
+			bool zeroMode
 		)
 		{
 			Eigen::Map<const Eigen::MatrixXf, 0, Eigen::OuterStride<>> aMap(aT, k, m, Eigen::OuterStride<>(strideA));
 			Eigen::Map<const Eigen::MatrixXf, 0, Eigen::OuterStride<>> bMap(b, k, n, Eigen::OuterStride<>(strideB));
 			Eigen::Map<Eigen::MatrixXf, 0, Eigen::OuterStride<>> cMap(c, m, n, Eigen::OuterStride<>(strideC));
-			cMap.noalias() += aMap.transpose() * bMap;
+			if (zeroMode) cMap.noalias() = aMap.transpose() * bMap;
+			else cMap.noalias() += aMap.transpose() * bMap;
 		}
 
 		template<>
@@ -25,13 +27,15 @@ namespace kiwi
 			size_t m, size_t k,
 			const float* aT, size_t strideA,
 			const float* b,
-			float* c
+			float* c,
+			bool zeroMode
 		)
 		{
 			Eigen::Map<const Eigen::MatrixXf, 0, Eigen::OuterStride<>> aMap(aT, k, m, Eigen::OuterStride<>(strideA));
 			Eigen::Map<const Eigen::VectorXf> bMap(b, k);
 			Eigen::Map<Eigen::VectorXf> cMap(c, m);
-			cMap.noalias() += aMap.transpose() * bMap;
+			if (zeroMode) cMap.noalias() = aMap.transpose() * bMap;
+			else cMap.noalias() += aMap.transpose() * bMap;
 		}
 
 		template<>

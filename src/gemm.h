@@ -10,7 +10,8 @@ namespace kiwi
 		void gemm(size_t m, size_t n, size_t k, 
 			const float* aT, size_t strideA,
 			const float* b, size_t strideB,
-			float* c, size_t strideC
+			float* c, size_t strideC, 
+			bool zeroMode = false
 		);
 
 		// c += a.transpose() * b
@@ -18,7 +19,8 @@ namespace kiwi
 		void gemv(size_t m, size_t k,
 			const float* aT, size_t strideA,
 			const float* b,
-			float* c
+			float* c,
+			bool zeroMode = false
 		);
 
 		// c *= (b * c)

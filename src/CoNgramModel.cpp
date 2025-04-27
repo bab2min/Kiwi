@@ -1824,7 +1824,7 @@ namespace kiwi
 					header.vocabSize, 1, header.dim,
 					getOutputEmb(0), outputEmbStride() / sizeof(float),
 					getOutputEmb(vocabId), outputEmbStride() / sizeof(float),
-					scores, 1
+					scores, 1, true
 				);
 			}
 			gemm::mul<arch>(header.vocabSize, invNormOutputPtr[vocabId], invNormOutputPtr, scores);
@@ -1870,7 +1870,7 @@ namespace kiwi
 					1, header.dim,
 					getOutputEmb(vocabId1), outputEmbStride() / sizeof(float),
 					getOutputEmb(vocabId2),
-					&result
+					&result, true
 				);
 			}
 			result *= invNormOutputPtr[vocabId1] * invNormOutputPtr[vocabId2];
@@ -1898,7 +1898,7 @@ namespace kiwi
 					header.contextSize, 1, header.dim,
 					getContextEmb(0), contextEmbStride() / sizeof(float),
 					getContextEmb(contextId), contextEmbStride() / sizeof(float),
-					scores, 1
+					scores, 1, true
 				);
 			}
 			gemm::mul<arch>(header.contextSize, invNormContextPtr[contextId], invNormContextPtr, scores);
@@ -1944,7 +1944,7 @@ namespace kiwi
 					1, header.dim,
 					getContextEmb(contextId1), contextEmbStride() / sizeof(float),
 					getContextEmb(contextId2),
-					&result
+					&result, true
 				);
 			}
 			result *= invNormContextPtr[contextId1] * invNormContextPtr[contextId2];
@@ -1972,7 +1972,7 @@ namespace kiwi
 					header.vocabSize, header.dim,
 					getOutputEmb(0), outputEmbStride() / sizeof(float),
 					getContextEmb(contextId),
-					scores
+					scores, true
 				);
 			}
 			const float bias = getContextBias(contextId);
@@ -2026,13 +2026,13 @@ namespace kiwi
 					header.vocabSize, header.dim,
 					getOutputEmb(0), outputEmbStride() / sizeof(float),
 					getContextEmb(contextId),
-					scores
+					scores, true
 				);
 				gemm::template gemv<arch>(
 					header.vocabSize, header.dim,
 					getOutputEmb(0), outputEmbStride() / sizeof(float),
 					getContextEmb(bgContextId),
-					resultBuf.data()
+					resultBuf.data(), true
 				);
 			}
 			const float bias = getContextBias(contextId) - getContextBias(bgContextId) * bgWeight;
