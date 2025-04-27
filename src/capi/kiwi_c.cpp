@@ -110,11 +110,12 @@ kiwi_builder_h kiwi_builder_init(const char* model_path, int num_threads, int op
 	try
 	{
 		BuildOption buildOption = (BuildOption)(options & 0xFF);
-		const auto mtMask = options & (KIWI_BUILD_MODEL_TYPE_KNLM | KIWI_BUILD_MODEL_TYPE_SBG | KIWI_BUILD_MODEL_TYPE_CONG | KIWI_BUILD_MODEL_TYPE_CONG_GLOBAL);
-		const ModelType modelType = mtMask == KIWI_BUILD_MODEL_TYPE_KNLM ? ModelType::knlm
-			: mtMask == KIWI_BUILD_MODEL_TYPE_SBG ? ModelType::sbg
-			: mtMask == KIWI_BUILD_MODEL_TYPE_CONG ? ModelType::cong
-			: mtMask == KIWI_BUILD_MODEL_TYPE_CONG_GLOBAL ? ModelType::congGlobal
+		const auto mtMask = options & (KIWI_BUILD_MODEL_TYPE_LARGEST | KIWI_BUILD_MODEL_TYPE_KNLM | KIWI_BUILD_MODEL_TYPE_SBG | KIWI_BUILD_MODEL_TYPE_CONG | KIWI_BUILD_MODEL_TYPE_CONG_GLOBAL);
+		const ModelType modelType = (mtMask == KIWI_BUILD_MODEL_TYPE_LARGEST) ? ModelType::largest
+			: (mtMask == KIWI_BUILD_MODEL_TYPE_KNLM) ? ModelType::knlm
+			: (mtMask == KIWI_BUILD_MODEL_TYPE_SBG) ? ModelType::sbg
+			: (mtMask == KIWI_BUILD_MODEL_TYPE_CONG) ? ModelType::cong
+			: (mtMask == KIWI_BUILD_MODEL_TYPE_CONG_GLOBAL) ? ModelType::congGlobal
 			: ModelType::none;
 		return (kiwi_builder_h)new KiwiBuilder{ model_path, (size_t)num_threads, buildOption, modelType };
 	}
