@@ -313,6 +313,7 @@ size_t HSDataset::_next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode,
 {
 	const auto& prepareNext = [&](size_t, size_t localId, size_t sentFirst, size_t sentLast)
 	{
+		auto knlm = std::dynamic_pointer_cast<lm::KnLangModelBase>(langModel);
 		auto& local = locals[localId];
 		auto& tokens = local.tokenBuf;
 		tokens.reserve(sents.get()[shuffledIdx[sentFirst]].size());
@@ -363,7 +364,7 @@ size_t HSDataset::_next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode,
 					switch (dropout(local.rng))
 					{
 					case 0: // no dropout
-						tokens.emplace_back(tWithOOV);
+						tokens.emplace_back(knlm ? t : tWithOOV);
 						break;
 					case 1: // replacement
 						tokens.emplace_back(getDefaultMorphemeId((*morphemes)[t].tag));
@@ -372,10 +373,10 @@ size_t HSDataset::_next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode,
 						break;
 					case 3: // insertion
 						tokens.emplace_back(getDefaultMorphemeId((*morphemes)[t].tag));
-						tokens.emplace_back(tWithOOV);
+						tokens.emplace_back(knlm ? t : tWithOOV);
 						break;
 					case 4: // insertion
-						tokens.emplace_back(tWithOOV);
+						tokens.emplace_back(knlm ? t : tWithOOV);
 						tokens.emplace_back(getDefaultMorphemeId((*morphemes)[t].tag));
 						break;
 					}
@@ -403,7 +404,7 @@ size_t HSDataset::_next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode,
 
 			local.lmLProbsBuf.resize(tokens.size());
 			local.outNgramNodeBuf.resize(tokens.size());
-			if (auto knlm = std::dynamic_pointer_cast<lm::KnLangModelBase>(langModel))
+			if (knlm)
 			{
 				knlm->evaluate(tokens.begin(), tokens.end(), local.lmLProbsBuf.begin(), local.outNgramNodeBuf.begin());
 			}
