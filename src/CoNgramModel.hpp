@@ -210,7 +210,7 @@ namespace kiwi
 
 			uint32_t progressContextNode(int32_t& nodeIdx, KeyType next) const
 			{
-				if (std::is_same<KeyType, VlKeyType>::value)
+				if constexpr (std::is_same_v<KeyType, VlKeyType>)
 				{
 					return progressContextNodeVl(nodeIdx, next);
 				}
