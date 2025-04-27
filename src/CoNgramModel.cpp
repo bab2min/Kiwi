@@ -1999,6 +1999,83 @@ namespace kiwi
 		}
 
 		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
+		size_t CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::predictWordsFromContextDiff(
+			uint32_t contextId, uint32_t bgContextId, float bgWeight, size_t topN, std::pair<uint32_t, float>* output) const
+		{
+			thread_local Vector<float> resultBuf;
+			resultBuf.resize(header.vocabSize * 2 + 8); // +8 for padding
+			float* scores = resultBuf.data() + header.vocabSize;
+			if constexpr (quantized)
+			{
+				qgemm::gemv<arch>(
+					header.vocabSize, header.dim,
+					getContextQuantEmb(contextId),
+					getOutputQuantEmb(0), outputEmbStride(),
+					scores
+				);
+				qgemm::gemv<arch>(
+					header.vocabSize, header.dim,
+					getContextQuantEmb(bgContextId),
+					getOutputQuantEmb(0), outputEmbStride(),
+					resultBuf.data()
+				);
+			}
+			else
+			{
+				gemm::template gemv<arch>(
+					header.vocabSize, header.dim,
+					getOutputEmb(0), outputEmbStride() / sizeof(float),
+					getContextEmb(contextId),
+					scores
+				);
+				gemm::template gemv<arch>(
+					header.vocabSize, header.dim,
+					getOutputEmb(0), outputEmbStride() / sizeof(float),
+					getContextEmb(bgContextId),
+					resultBuf.data()
+				);
+			}
+			const float bias = getContextBias(contextId) - getContextBias(bgContextId) * bgWeight;
+			for (size_t i = 0; i < header.vocabSize; ++i)
+			{
+				scores[i] = scores[i] - resultBuf[i] * bgWeight + bias;
+			}
+
+			pair<uint32_t, float>* resultPaired = reinterpret_cast<pair<uint32_t, float>*>(resultBuf.data());
+			for (size_t i = 0; i < header.vocabSize; ++i)
+			{
+				resultPaired[i] = make_pair((uint32_t)i, scores[i] + bias);
+			}
+
+			topN = min(topN, (size_t)header.vocabSize);
+			// if topN is small enough, use partial_sort
+			if (topN <= 256)
+			{
+				partial_sort_copy(resultPaired, resultPaired + header.vocabSize, output, output + topN,
+					[](const pair<uint32_t, float>& a, const pair<uint32_t, float>& b) { return a.second > b.second; });
+			}
+			else
+			{
+				sort(resultPaired, resultPaired + header.vocabSize,
+					[](const pair<uint32_t, float>& a, const pair<uint32_t, float>& b) { return a.second > b.second; });
+				copy(resultPaired, resultPaired + topN, output);
+			}
+			return topN;
+		}
+
+		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
+		uint32_t CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::toContextId(const uint32_t* vocabIds, size_t size) const
+		{
+			int32_t nodeIdx = 0;
+			uint32_t contextId;
+			for (size_t i = 0; i < size; ++i)
+			{
+				contextId = progressContextNode(nodeIdx, vocabIds[i]);
+			}
+			return contextId;
+		}
+
+		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
 		template<class Out>
 		void CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::visitContextNode(MyNode* node, Vector<VlKeyType>& prefix, Out&& out) const
 		{
@@ -2032,6 +2109,30 @@ namespace kiwi
 				out[buf.size() - 1].emplace(buf, contextId);
 			};
 
+			if (node == nodeData.get()) // root node
+			{
+				for (size_t i = 0; i < node->numNexts; ++i)
+				{
+					const int32_t k = i;
+					const auto v = allRootValueData[i];
+					prefix.emplace_back(k);
+					if (v > 0)
+					{
+						if (node[v].value)
+						{
+							insert(node[v].value);
+						}
+						visitContextNode(node + v, prefix, out);
+					}
+					else if (v < 0)
+					{
+						insert(-v);
+					}
+					prefix.pop_back();
+				}
+			}
+			else
+			{
 			for (size_t i = 0; i < node->numNexts; ++i)
 			{
 				auto [k, v] = nst::extractKV<arch, VlKeyType, int32_t>(&alignedKeyValueData[node->nextOffset], node->numNexts, i);
@@ -2049,6 +2150,7 @@ namespace kiwi
 					insert(-v);
 				}
 				prefix.pop_back();
+				}
 			}
 		}
 
@@ -2059,8 +2161,9 @@ namespace kiwi
 			Vector<VlKeyType> prefix;
 			visitContextNode(nodeData.get(), prefix, contextMap);
 
+			// remove redundant context
 			Vector<uint32_t> context;
-			for (size_t i = contextMap.size(); i-- > 0;) // remove redundant context
+			for (size_t i = contextMap.size(); i-- > 0;)
 			{
 				auto& c = contextMap[i];
 				for (auto it = c.begin(); it != c.end();)

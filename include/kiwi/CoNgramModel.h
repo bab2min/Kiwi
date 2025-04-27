@@ -57,7 +57,9 @@ namespace kiwi
 			virtual float contextSimilarity(uint32_t contextId1, uint32_t contextId2) const = 0;
 
 			virtual size_t predictWordsFromContext(uint32_t contextId, size_t topN, std::pair<uint32_t, float>* output) const = 0;
+			virtual size_t predictWordsFromContextDiff(uint32_t contextId, uint32_t bgContextId, float weight, size_t topN, std::pair<uint32_t, float>* output) const = 0;
 
+			virtual uint32_t toContextId(const uint32_t* vocabIds, size_t size) const = 0;
 			virtual std::vector<std::vector<uint32_t>> getContextWordMap() const = 0;
 
 			static utils::MemoryObject build(const std::string& contextDefinition, const std::string& embedding, 
