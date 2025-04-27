@@ -26,7 +26,7 @@ jobs:
         multipleRun: |
           - name: Install dependencies
             run: |
-            /opt/python/cp310-cp310/bin/pip install "cmake<4"
+              /opt/python/cp310-cp310/bin/pip install "cmake<4"
               yum install java-1.8.0-openjdk-devel -y
           - name: Build
             run: |
