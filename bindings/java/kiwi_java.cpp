@@ -273,7 +273,7 @@ public:
 	int add(const std::u16string& form, kiwi::POSTag tag)
 	{
 		if (!kiwiObj) return -1;
-		auto found = kiwiObj->findMorpheme(form, tag);
+		auto found = kiwiObj->findMorphemes(form, tag);
 		int added = 0;
 		for(auto& m : found) added += morphSet.emplace(m).second ? 1 : 0;
 		return added;

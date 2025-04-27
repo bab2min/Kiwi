@@ -47,7 +47,7 @@ inline std::unordered_set<const Morpheme*> parseMorphemeSet(const Kiwi& kiwi, co
             tag = toPOSTag(tagStr);
         }
 
-        auto matches = kiwi.findMorpheme(form, tag);
+        auto matches = kiwi.findMorphemes(form, tag);
         set.insert(matches.begin(), matches.end());
     }
 
