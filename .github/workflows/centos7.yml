@@ -22,7 +22,7 @@ jobs:
         multipleRun: |
           - name: Update CMake
             run: |
-              /opt/python/cp310-cp310/bin/pip install cmake
+              /opt/python/cp310-cp310/bin/pip install "cmake<4"
               yum install java-1.8.0-openjdk-devel.x86_64 -y
           - name: Configure Build
             run: mkdir build && cd build && /opt/python/cp310-cp310/bin/cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_JAVA_BINDING=1  ..

@@ -24,8 +24,9 @@ jobs:
         dockerRunArgs: |
           --volume "${PWD}/artifacts:/artifacts"
         run: |
+          /opt/python/cp310-cp310/bin/pip install "cmake<4"
           yum install java-1.8.0-openjdk-devel -y
-          mkdir build && pushd build && cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_USE_MIMALLOC=0 -DKIWI_JAVA_BINDING=1 ..
+          mkdir build && pushd build && /opt/python/cp310-cp310/bin/cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_USE_MIMALLOC=0 -DKIWI_JAVA_BINDING=1 ..
           make -j2 && popd
           ./build/test/kiwi-test
           mkdir eval_results && ./build/kiwi-evaluator -m ./models/base --morph eval_data/*.txt -t knlm -o eval_results/ && ./build/kiwi-evaluator -m ./models/base --morph eval_data/*.txt -t sbg -o eval_results/

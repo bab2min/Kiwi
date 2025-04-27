@@ -26,10 +26,11 @@ jobs:
         multipleRun: |
           - name: Install dependencies
             run: |
+            /opt/python/cp310-cp310/bin/pip install "cmake<4"
               yum install java-1.8.0-openjdk-devel -y
           - name: Build
             run: |
-              mkdir build && pushd build && cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_USE_MIMALLOC=0 -DKIWI_JAVA_BINDING=1 ..
+              mkdir build && pushd build && /opt/python/cp310-cp310/bin/cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_USE_MIMALLOC=0 -DKIWI_JAVA_BINDING=1 ..
               make -j2 && popd
           - name: Test
             run: |
