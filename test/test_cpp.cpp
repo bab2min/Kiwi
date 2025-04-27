@@ -981,6 +981,12 @@ TEST(KiwiCpp, AnalyzeCong)
 
 TEST(KiwiCpp, CoNgramFunctions)
 {
+	if (sizeof(void*) != 8)
+	{
+		std::cerr << "This test is only available in 64-bit mode" << std::endl;
+		return;
+	}
+
 	Kiwi kiwiF = KiwiBuilder{ CONG_MODEL_PATH, 0, BuildOption::default_, ModelType::congGlobalFp32 }.build();
 	Kiwi kiwiQ = KiwiBuilder{ CONG_MODEL_PATH, 0, BuildOption::default_, ModelType::congGlobal }.build();
 	auto lmF = dynamic_cast<const lm::CoNgramModelBase*>(kiwiF.getLangModel());
