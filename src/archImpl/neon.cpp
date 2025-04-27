@@ -23,7 +23,57 @@ namespace kiwi
 		);
 
 		template<>
-		float requantizePackedU4<ArchType::sse2>(
+		void gemv<ArchType::neon>(size_t m, size_t k, const uint8_t* a, const int8_t* b, size_t ldb, float* c)
+		{
+			throw std::runtime_error("Not implemented yet");
+		}
+
+		template<>
+		void gemvS8S8<ArchType::neon>(size_t m, size_t k, const int8_t* a, const int8_t* b, size_t ldb, float* c)
+		{
+			throw std::runtime_error("Not implemented yet");
+		}
+
+		template<>
+		void gemvU8U8<ArchType::neon>(size_t m, size_t k, const uint8_t* a, const uint8_t* b, size_t ldb, float* c)
+		{
+			throw std::runtime_error("Not implemented yet");
+		}
+
+		template<>
+		float dotS8S8<ArchType::neon>(size_t k, const int8_t* a, const int8_t* b)
+		{
+			throw std::runtime_error("Not implemented yet");
+		}
+
+		template<>
+		float dotU8U8<ArchType::neon>(size_t k, const uint8_t* a, const uint8_t* b)
+		{
+			throw std::runtime_error("Not implemented yet");
+		}
+
+		template<>
+		void invNormS8<ArchType::neon>(
+			size_t m, size_t k,
+			const int8_t* a, size_t lda,
+			float* out
+		)
+		{
+			throw std::runtime_error("Not implemented yet");
+		}
+
+		template<>
+		void invNormU8<ArchType::neon>(
+			size_t m, size_t k,
+			const uint8_t* a, size_t lda,
+			float* out
+		)
+		{
+			throw std::runtime_error("Not implemented yet");
+		}
+
+		template<>
+		float requantizePackedU4<ArchType::neon>(
 			size_t n,
 			size_t qgroup,
 			const uint8_t* packedInput,

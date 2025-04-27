@@ -995,9 +995,9 @@ TEST(KiwiCpp, CoNgramFunctions)
 	const size_t vocabId = kiwiF.findMorphemeId(u"언어", POSTag::nng);
 	const size_t candId = kiwiF.findMorphemeId(u"국어", POSTag::nng);
 	const uint32_t vocabs[3] = {
-		kiwiF.findMorphemeId(u"오늘", POSTag::mag),
-		kiwiF.findMorphemeId(u"점심", POSTag::nng),
-		kiwiF.findMorphemeId(u"은", POSTag::jx),
+		(uint32_t)kiwiF.findMorphemeId(u"오늘", POSTag::mag),
+		(uint32_t)kiwiF.findMorphemeId(u"점심", POSTag::nng),
+		(uint32_t)kiwiF.findMorphemeId(u"은", POSTag::jx),
 	};
 	const uint32_t contextId = lmF->toContextId(&vocabs[0], 3);
 	const uint32_t bgContextId = lmF->toContextId(&vocabs[2], 1);
