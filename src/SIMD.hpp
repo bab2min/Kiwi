@@ -279,8 +279,8 @@ namespace kiwi
             static STRONG_INLINE __m128 maddf(__m128 a, __m128 b, __m128 c) { return O::addf(O::mulf(a, b), c); }
 			static STRONG_INLINE __m128i set1i(int32_t a) { return _mm_set1_epi32(a); }
             static STRONG_INLINE __m128 set1f(float a) { return _mm_set1_ps(a); }
-            static STRONG_INLINE __m128 loadf(const float* a) { return _mm_load_ps(a); }
-            static STRONG_INLINE void storef(float* a, __m128 b) { return _mm_store_ps(a, b); }
+            static STRONG_INLINE __m128 loadf(const float* a) { return _mm_loadu_ps(a); }
+            static STRONG_INLINE void storef(float* a, __m128 b) { return _mm_storeu_ps(a, b); }
             static STRONG_INLINE __m128 maxf(__m128 a, __m128 b) { return _mm_max_ps(a, b); }
             static STRONG_INLINE __m128 minf(__m128 a, __m128 b) { return _mm_min_ps(a, b); }
 
@@ -427,8 +427,8 @@ namespace kiwi
             static STRONG_INLINE __m256 maddf(__m256 a, __m256 b, __m256 c) { return _mm256_fmadd_ps(a, b, c); }
 			static STRONG_INLINE __m256i set1i(int32_t a) { return _mm256_set1_epi32(a); }
             static STRONG_INLINE __m256 set1f(float a) { return _mm256_set1_ps(a); }
-            static STRONG_INLINE __m256 loadf(const float* a) { return _mm256_load_ps(a); }
-            static STRONG_INLINE void storef(float* a, __m256 b) { return _mm256_store_ps(a, b); }
+            static STRONG_INLINE __m256 loadf(const float* a) { return _mm256_loadu_ps(a); }
+            static STRONG_INLINE void storef(float* a, __m256 b) { return _mm256_storeu_ps(a, b); }
             static STRONG_INLINE __m256 maxf(__m256 a, __m256 b) { return _mm256_max_ps(a, b); }
             static STRONG_INLINE __m256 minf(__m256 a, __m256 b) { return _mm256_min_ps(a, b); }
             static STRONG_INLINE __m256 floorf(__m256 a) { return _mm256_floor_ps(a); }
@@ -629,8 +629,8 @@ namespace kiwi
             static STRONG_INLINE __m512 maddf(__m512 a, __m512 b, __m512 c) { return _mm512_fmadd_ps(a, b, c); }
 			static STRONG_INLINE __m512i set1i(int32_t a) { return _mm512_set1_epi32(a); }
             static STRONG_INLINE __m512 set1f(float a) { return _mm512_set1_ps(a); }
-            static STRONG_INLINE __m512 loadf(const float* a) { return _mm512_load_ps(a); }
-            static STRONG_INLINE void storef(float* a, __m512 b) { return _mm512_store_ps(a, b); }
+            static STRONG_INLINE __m512 loadf(const float* a) { return _mm512_loadu_ps(a); }
+            static STRONG_INLINE void storef(float* a, __m512 b) { return _mm512_storeu_ps(a, b); }
             static STRONG_INLINE __m512 maxf(__m512 a, __m512 b) { return _mm512_max_ps(a, b); }
             static STRONG_INLINE __m512 minf(__m512 a, __m512 b) { return _mm512_min_ps(a, b); }
             static STRONG_INLINE __m512 floorf(__m512 a) { return _mm512_floor_ps(a); }
