@@ -22,6 +22,8 @@ jobs:
     - name: Init
       run: |
         mkdir build
+    - name: Print CPU Info
+      run: bash -c "cat /proc/cpuinfo"
     - name: Build
       uses: lukka/run-cmake@v3
       with:

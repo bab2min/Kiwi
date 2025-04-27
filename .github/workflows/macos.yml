@@ -41,6 +41,8 @@ jobs:
         fi
     - name: Configure Build
       run: mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_JAVA_BINDING=1 ..
+    - name: Print CPU Info
+      run: cat /proc/cpuinfo
     - name: Build
       run: cd build && make -j2
     - name: Run Unit Test
