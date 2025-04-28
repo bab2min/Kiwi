@@ -781,6 +781,7 @@ namespace kiwi
             static STRONG_INLINE float32x4_t mulf(float32x4_t a, float32x4_t b) { return vmulq_f32(a, b); }
             static STRONG_INLINE float32x4_t divf(float32x4_t a, float32x4_t b) { return vdivq_f32(a, b); }
             static STRONG_INLINE float32x4_t maddf(float32x4_t a, float32x4_t b, float32x4_t c) { return addf(mulf(a, b), c); }
+            static STRONG_INLINE int32x4_t set1i(int32_t a) { return vdupq_n_s32(a); }
             static STRONG_INLINE float32x4_t set1f(float a) { return vdupq_n_f32(a); }
             static STRONG_INLINE float32x4_t loadf(const float* a) { return vld1q_f32(a); }
             static STRONG_INLINE void storef(float* a, float32x4_t b) { return vst1q_f32(a, b); }
@@ -790,8 +791,11 @@ namespace kiwi
             static STRONG_INLINE float32x4_t zerof() { return set1f(0.f); }
             static STRONG_INLINE float32x4_t negatef(float32x4_t a) { return subf(zerof(), a); }
             static STRONG_INLINE int32x4_t cast_to_int(float32x4_t a) { return vcvtq_s32_f32(a); }
+            static STRONG_INLINE float32x4_t cast_to_float(int32x4_t a) { return vcvtq_f32_s32(a); }
+            static STRONG_INLINE int32x4_t reinterpret_as_int(float32x4_t a) { return vreinterpretq_s32_f32(a); }
             static STRONG_INLINE float32x4_t reinterpret_as_float(int32x4_t a) { return vreinterpretq_f32_s32(a); }
             template<int bit> static STRONG_INLINE int32x4_t sll(int32x4_t a) { return vshlq_n_s32(a, bit); }
+            template<int bit> static STRONG_INLINE int32x4_t srl(int32x4_t a) { return vshrq_n_s32(a, bit); }
             static STRONG_INLINE float firstf(float32x4_t a) { return vgetq_lane_f32(a, 0); }
 
             static STRONG_INLINE float redsumf(float32x4_t a)
@@ -809,6 +813,44 @@ namespace kiwi
             static STRONG_INLINE float32x4_t redmaxbf(float32x4_t a)
             {
                 return set1f(redmaxf(a));
+            }
+
+			static STRONG_INLINE int32x4_t band(int32x4_t a, int32x4_t b) { return vandq_s32(a, b); }
+            static STRONG_INLINE float32x4_t band(float32x4_t a, float32x4_t b) { return reinterpret_as_float(band(reinterpret_as_int(a), reinterpret_as_int(b))); }
+
+			static STRONG_INLINE int32x4_t bor(int32x4_t a, int32x4_t b) { return vorrq_s32(a, b); }
+			static STRONG_INLINE float32x4_t bor(float32x4_t a, float32x4_t b) { return reinterpret_as_float(bor(reinterpret_as_int(a), reinterpret_as_int(b))); }
+
+			static STRONG_INLINE int32x4_t select(int32x4_t mask, int32x4_t a, int32x4_t b) 
+            {
+                return vbslq_s32(vreinterpretq_u32_s32(mask), a, b);
+            }
+            static STRONG_INLINE float32x4_t select(float32x4_t mask, float32x4_t a, float32x4_t b)
+            {
+                return vbslq_f32(vreinterpretq_u32_f32(mask), a, b);
+            }
+
+			static STRONG_INLINE float32x4_t cmp_eq(float32x4_t a, float32x4_t b) 
+            {
+                return vceqq_f32(a, b); // Compare equal
+            }
+
+            static STRONG_INLINE float32x4_t cmp_le(float32x4_t a, float32x4_t b) 
+            {
+                return vcleq_f32(a, b); // Compare less than or equal
+            }
+
+            static STRONG_INLINE float32x4_t cmp_lt(float32x4_t a, float32x4_t b) 
+            {
+                return vcltq_f32(a, b); // Compare less than
+            }
+
+            static STRONG_INLINE float32x4_t cmp_lt_or_nan(float32x4_t a, float32x4_t b) 
+            {
+                return vreinterpretq_f32_u32(vorrq_u32(
+                    vreinterpretq_u32_f32(vcltq_f32(a, b)), // Compare less than
+                    vreinterpretq_u32_f32(vceqq_f32(a, a)) // Check for NaN (a != a is true for NaN)
+                ));
             }
 
             static STRONG_INLINE int32_t dotprod(const uint8_t* a, const int8_t* b, size_t size)
