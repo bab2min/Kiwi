@@ -17,21 +17,6 @@ unique_ptr<Evaluator> Evaluator::create(const std::string& evalType)
 	throw runtime_error{ "Unknown Evaluator Type" };
 }
 
-const char* modelTypeToStr(ModelType type)
-{
-	switch (type)
-	{
-	case ModelType::knlm: return "knlm";
-	case ModelType::knlmTransposed: return "knlm-transposed";
-	case ModelType::sbg: return "sbg";
-	case ModelType::cong: return "cong";
-	case ModelType::congGlobal: return "cong-global";
-	case ModelType::congFp32: return "cong-fp32";
-	case ModelType::congGlobalFp32: return "cong-global-fp32";
-	}
-	return "unknown";
-}
-
 inline ostream& operator<<(ostream& o, const kiwi::TokenInfo& t)
 {
 	o << utf16To8(t.str);
@@ -117,7 +102,7 @@ int Evaluator::operator()(const string& modelPath,
 
 		cout << "Loading Time : " << timer.getElapsed() << " ms" << endl;
 		cout << "ArchType : " << archToStr(kw.archType()) << endl;
-		cout << "Model Type : " << modelTypeToStr(kw.modelType()) << endl;
+		cout << "Model Type : " << tutils::modelTypeToStr(kw.modelType()) << endl;
 		if (kw.getLangModel())
 		{
 			cout << "LM Size : " << (kw.getLangModel()->getMemorySize() / 1024. / 1024.) << " MB" << endl;

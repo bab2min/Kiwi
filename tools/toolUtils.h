@@ -146,4 +146,19 @@ namespace tutils
 			throw std::invalid_argument{ "Invalid model type" };
 		}
 	}
+
+	inline const char* modelTypeToStr(kiwi::ModelType type)
+	{
+		switch (type)
+		{
+		case kiwi::ModelType::knlm: return "knlm";
+		case kiwi::ModelType::knlmTransposed: return "knlm-transposed";
+		case kiwi::ModelType::sbg: return "sbg";
+		case kiwi::ModelType::cong: return "cong";
+		case kiwi::ModelType::congGlobal: return "cong-global";
+		case kiwi::ModelType::congFp32: return "cong-fp32";
+		case kiwi::ModelType::congGlobalFp32: return "cong-global-fp32";
+		}
+		return "unknown";
+	}
 }
