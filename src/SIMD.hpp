@@ -832,24 +832,24 @@ namespace kiwi
 
 			static STRONG_INLINE float32x4_t cmp_eq(float32x4_t a, float32x4_t b) 
             {
-                return vceqq_f32(a, b); // Compare equal
+                return vreinterpretq_f32_u32(vceqq_f32(a, b)); // Compare equal
             }
 
             static STRONG_INLINE float32x4_t cmp_le(float32x4_t a, float32x4_t b) 
             {
-                return vcleq_f32(a, b); // Compare less than or equal
+                return vreinterpretq_f32_u32(vcleq_f32(a, b)); // Compare less than or equal
             }
 
             static STRONG_INLINE float32x4_t cmp_lt(float32x4_t a, float32x4_t b) 
             {
-                return vcltq_f32(a, b); // Compare less than
+                return vreinterpretq_f32_u32(vcltq_f32(a, b)); // Compare less than
             }
 
             static STRONG_INLINE float32x4_t cmp_lt_or_nan(float32x4_t a, float32x4_t b) 
             {
                 return vreinterpretq_f32_u32(vorrq_u32(
-                    vreinterpretq_u32_f32(vcltq_f32(a, b)), // Compare less than
-                    vreinterpretq_u32_f32(vceqq_f32(a, a)) // Check for NaN (a != a is true for NaN)
+                    vcltq_f32(a, b), // Compare less than
+                    vceqq_f32(a, a) // Check for NaN (a != a is true for NaN)
                 ));
             }
 
