@@ -48,16 +48,6 @@ jobs:
           build\test\Release\*kiwi*
           eval_results\*.txt
           build\bindings\java\*.jar
-    - name: Run Unit Test
-      run: .\build\test\Release\kiwi-test.exe
-    - name: Run Java Unit Test
-      if: matrix.arch == 'x64'
-      run: |
-        cd bindings/java
-        curl -OL https://repo1.maven.org/maven2/junit/junit/4.13.2/junit-4.13.2.jar
-        curl -OL https://repo1.maven.org/maven2/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar
-        javac -cp "*;../../build/bindings/java/*;." -encoding utf-8 kr/pe/bab2min/KiwiTest.java
-        java -cp "*;../../build/bindings/java/*;." org.junit.runner.JUnitCore kr.pe.bab2min.KiwiTest
     - name: Run Benchmark
       run: |
         curl -OL https://latina.bab2min.pe.kr/_data/kowiki1000.txt
@@ -77,5 +67,34 @@ jobs:
           $env:KIWI_ARCH_TYPE = 'avx512bw'
           .\build\Release\kiwi-cli-*.exe -m .\models\base -e -o test.out kowiki1000.txt
         }
-        .\build\Release\kiwi-cli-*.exe -m .\models\base -e -o test.out --sbg kowiki1000.txt
+        .\build\Release\kiwi-cli-*.exe -m .\models\base -e -o test.out --largest kowiki1000.txt
         .\build\Release\kiwi-cli-*.exe -m .\models\base -e -o test.out --typos 6 kowiki1000.txt
+        if ( '${{ matrix.arch }}' -eq 'x64' )
+        {
+          $env:KIWI_ARCH_TYPE = 'sse2'
+          .\build\Release\kiwi-cli-*.exe -m .\models\cong\base -e -o test.out kowiki1000.txt
+          $env:KIWI_ARCH_TYPE = 'sse4_1'
+          .\build\Release\kiwi-cli-*.exe -m .\models\cong\base -e -o test.out kowiki1000.txt
+          $env:KIWI_ARCH_TYPE = 'avx2'
+          .\build\Release\kiwi-cli-*.exe -m .\models\cong\base -e -o test.out kowiki1000.txt
+          $env:KIWI_ARCH_TYPE = 'avx512vnni'
+          .\build\Release\kiwi-cli-*.exe -m .\models\cong\base -e -o test.out kowiki1000.txt
+          $env:KIWI_ARCH_TYPE = 'sse2'
+          .\build\Release\kiwi-cli-*.exe -m .\models\cong\base -e -o test.out --largest kowiki1000.txt
+          $env:KIWI_ARCH_TYPE = 'sse4_1'
+          .\build\Release\kiwi-cli-*.exe -m .\models\cong\base -e -o test.out --largest kowiki1000.txt
+          $env:KIWI_ARCH_TYPE = 'avx2'
+          .\build\Release\kiwi-cli-*.exe -m .\models\cong\base -e -o test.out --largest kowiki1000.txt
+          $env:KIWI_ARCH_TYPE = 'avx512vnni'
+          .\build\Release\kiwi-cli-*.exe -m .\models\cong\base -e -o test.out --largest kowiki1000.txt
+        }
+    - name: Run Unit Test
+      run: .\build\test\Release\kiwi-test.exe
+    - name: Run Java Unit Test
+      if: matrix.arch == 'x64'
+      run: |
+        cd bindings/java
+        curl -OL https://repo1.maven.org/maven2/junit/junit/4.13.2/junit-4.13.2.jar
+        curl -OL https://repo1.maven.org/maven2/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar
+        javac -cp "*;../../build/bindings/java/*;." -encoding utf-8 kr/pe/bab2min/KiwiTest.java
+        java -cp "*;../../build/bindings/java/*;." org.junit.runner.JUnitCore kr.pe.bab2min.KiwiTest
