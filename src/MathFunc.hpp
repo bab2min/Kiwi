@@ -12,7 +12,8 @@ namespace kiwi
 		template<ArchType archType, size_t size>
 		float logSumExpImpl(const float* arr)
 		{
-			simd::Operator<archType> op;
+			static constexpr ArchType bestArchType = simd::BestArchType<archType, size>::value;
+			simd::Operator<bestArchType> op;
 
 			auto pmax = op.loadf(arr);
 			for (size_t i = op.packetSize; i < size; i += op.packetSize)
@@ -63,7 +64,8 @@ namespace kiwi
 		template<ArchType archType, size_t size>
 		void logSoftmaxImpl(float* arr)
 		{
-			simd::Operator<archType> op;
+			static constexpr ArchType bestArchType = simd::BestArchType<archType, size>::value;
+			simd::Operator<bestArchType> op;
 
 			auto pmax = op.loadf(arr);
 			for (size_t i = op.packetSize; i < size; i += op.packetSize)

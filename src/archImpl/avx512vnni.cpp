@@ -2,29 +2,13 @@
 #include "../qgemm.hpp"
 #include "../gemm.h"
 
-#define DPBUSD _mm512_dpbusd_epi32
+#define USE_VNNI
 #include "avx512_qgemm.hpp"
 
 namespace kiwi
 {
 	namespace lm
 	{
-		template<>
-		float logSumExp<ArchType::avx512vnni>(const float* arr, size_t size)
-		{
-			if (size == 8) return LogSumExp<ArchType::avx2>()(arr, std::integral_constant<size_t, 8>());
-			if (size == 16) return LogSumExp<ArchType::avx512vnni>()(arr, std::integral_constant<size_t, 16>());
-			throw std::runtime_error("Unsupported size");
-		}
-
-		template<>
-		void logSoftmax<ArchType::avx512vnni>(float* arr, size_t size)
-		{
-			if (size == 8) return LogSoftmax<ArchType::avx2>()(arr, std::integral_constant<size_t, 8>());
-			if (size == 16) return LogSoftmax<ArchType::avx512vnni>()(arr, std::integral_constant<size_t, 16>());
-			throw std::runtime_error("Unsupported size");
-		}
-
 		template float logSumExp<ArchType::avx512vnni>(const float* arr, size_t size);
 		template void logSumExpTransposed<ArchType::avx512vnni>(float* arr, size_t size, size_t batchSize, size_t stride);
 		template void logSoftmax<ArchType::avx512vnni>(float* arr, size_t size);
@@ -43,7 +27,7 @@ namespace kiwi
 			float* c
 		)
 		{
-			return scatteredGEMV_512(m, k, aBase, aIdx, aIdxScale, b, c);
+			return detailVnni::scatteredGEMV_512(m, k, aBase, aIdx, aIdxScale, b, c);
 		}
 
 		template<>
@@ -54,7 +38,7 @@ namespace kiwi
 			float* c
 		)
 		{
-			return scatteredGEMV8x1_512(m, k, aBase, aIdx, aIdxScale, b, c);
+			return detailVnni::scatteredGEMV8x1_512(m, k, aBase, aIdx, aIdxScale, b, c);
 		}
 
 		template<>
@@ -65,7 +49,7 @@ namespace kiwi
 			float* c
 		)
 		{
-			return scatteredGEMV2_512(m, k, aBase, aIdx, aIdxScale, bBase, bIdx, bIdxScale, c);
+			return detailVnni::scatteredGEMV2_512(m, k, aBase, aIdx, aIdxScale, bBase, bIdx, bIdxScale, c);
 		}
 
 		template<>
@@ -76,7 +60,7 @@ namespace kiwi
 			float* c
 		)
 		{
-			return scatteredGEMV3_512(m, k, aBase, aIdx, aIdxScale, bBase, bIdx, bIdxScale, c);
+			return detailVnni::scatteredGEMV3_512(m, k, aBase, aIdx, aIdxScale, bBase, bIdx, bIdxScale, c);
 		}
 
 		template<>
@@ -87,7 +71,7 @@ namespace kiwi
 			float* c
 		)
 		{
-			return scatteredGEMV4_512(m, k, aBase, aIdx, aIdxScale, bBase, bIdx, bIdxScale, c);
+			return detailVnni::scatteredGEMV4_512(m, k, aBase, aIdx, aIdxScale, bBase, bIdx, bIdxScale, c);
 		}
 
 		template<>
@@ -99,7 +83,7 @@ namespace kiwi
 				const int8_t* bBase, const int32_t* bIdx, size_t bIdxScale,
 				float* c, size_t ldc)
 			{
-				return scatteredGEMMSmall_512<m, n>(m, n, k, aBase, aIdx, aIdxScale, bBase, bIdx, bIdxScale, c, ldc);
+				return detailVnni::scatteredGEMMSmall_512<m, n>(m, n, k, aBase, aIdx, aIdxScale, bBase, bIdx, bIdxScale, c, ldc);
 			}
 		};
 
@@ -113,31 +97,31 @@ namespace kiwi
 		template<>
 		void gemv<ArchType::avx512vnni>(size_t m, size_t k, const uint8_t* a, const int8_t* b, size_t ldb, float* c)
 		{
-			return gemv_512(m, k, a, b, ldb, c);
+			return detailVnni::gemv_512(m, k, a, b, ldb, c);
 		}
 
 		template<>
 		void gemvS8S8<ArchType::avx512vnni>(size_t m, size_t k, const int8_t* a, const int8_t* b, size_t ldb, float* c)
 		{
-			return gemvS8S8_512(m, k, a, b, ldb, c);
+			return detailVnni::gemvS8S8_512(m, k, a, b, ldb, c);
 		}
 
 		template<>
 		void gemvU8U8<ArchType::avx512vnni>(size_t m, size_t k, const uint8_t* a, const uint8_t* b, size_t ldb, float* c)
 		{
-			return gemvU8U8_512(m, k, a, b, ldb, c);
+			return detailVnni::gemvU8U8_512(m, k, a, b, ldb, c);
 		}
 
 		template<>
 		float dotS8S8<ArchType::avx512vnni>(size_t k, const int8_t* a, const int8_t* b)
 		{
-			return dotS8S8_512(k, a, b);
+			return detailVnni::dotS8S8_512(k, a, b);
 		}
 
 		template<>
 		float dotU8U8<ArchType::avx512vnni>(size_t k, const uint8_t* a, const uint8_t* b)
 		{
-			return dotU8U8_512(k, a, b);
+			return detailVnni::dotU8U8_512(k, a, b);
 		}
 
 		template<>
@@ -147,7 +131,7 @@ namespace kiwi
 			float* out
 		)
 		{
-			return invNormS8_512(m, k, a, lda, out);
+			return detailVnni::invNormS8_512(m, k, a, lda, out);
 		}
 
 		template<>
@@ -157,7 +141,7 @@ namespace kiwi
 			float* out
 		)
 		{
-			return invNormU8_512(m, k, a, lda, out);
+			return detailVnni::invNormU8_512(m, k, a, lda, out);
 		}
 
 		/*inline __m512i m512_sign_epi16(__m512i a, __m512i b)

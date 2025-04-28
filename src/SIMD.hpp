@@ -26,6 +26,12 @@ namespace kiwi
 {
     namespace simd
     {
+        template<ArchType arch, size_t size>
+        struct BestArchType
+        {
+			static constexpr ArchType value = arch;
+        };
+
         template<ArchType arch>
         struct PacketTrait;
 
@@ -256,6 +262,12 @@ namespace kiwi
 {
     namespace simd
     {
+        template<size_t size>
+        struct BestArchType<ArchType::sse2, size>
+        {
+			static constexpr ArchType value = ArchType::sse2;
+        };
+
         template<>
         struct PacketTrait<ArchType::sse2>
         {
@@ -263,6 +275,10 @@ namespace kiwi
             using IntPacket = __m128i;
             using FloatPacket = __m128;
         };
+
+        template<size_t size>
+		struct BestArchType<ArchType::sse4_1, size> : public BestArchType<ArchType::sse2, size>
+        {};
 
         template<>
         struct PacketTrait<ArchType::sse4_1> : public PacketTrait<ArchType::sse2>
@@ -409,6 +425,12 @@ namespace kiwi
 #endif
 
 #if defined(_MSC_VER) || defined(__AVX2__)
+        template<size_t size>
+        struct BestArchType<ArchType::avx2, size>
+        {
+            static constexpr ArchType value = size >= 8 ? ArchType::avx2 : ArchType::sse4_1;
+        };
+
         template<>
         struct PacketTrait<ArchType::avx2>
         {
@@ -580,6 +602,11 @@ namespace kiwi
 		{
 		};
 
+        template<size_t size>
+		struct BestArchType<ArchType::avx_vnni, size> : public BestArchType<ArchType::avx2, size>
+        {
+        };
+
         template<>
 		struct PacketTrait<ArchType::avx_vnni> : public PacketTrait<ArchType::avx2>
 		{
@@ -611,6 +638,12 @@ namespace kiwi
 #endif
 
 #if defined(_MSC_VER) || defined(__AVX512F__) || defined(__AVX512BW__)
+        template<size_t size>
+        struct BestArchType<ArchType::avx512bw, size>
+        {
+            static constexpr ArchType value = size >= 16 ? ArchType::avx512bw : ArchType::avx2;
+        };
+
         template<>
         struct PacketTrait<ArchType::avx512bw>
         {
@@ -729,6 +762,12 @@ namespace kiwi
 		struct Operator<ArchType::avx512bw> : public OperatorImpl<ArchType::avx512bw, Operator<ArchType::avx512bw>>
 		{
 		};
+        
+        template<size_t size>
+        struct BestArchType<ArchType::avx512vnni, size>
+        {
+            static constexpr ArchType value = size >= 16 ? ArchType::avx512vnni : ArchType::avx_vnni;
+        };
 
         template<>
 		struct PacketTrait<ArchType::avx512vnni> : public PacketTrait<ArchType::avx512bw>

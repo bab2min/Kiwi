@@ -1469,6 +1469,7 @@ namespace kiwi
 			{
 				throw runtime_error{ "Not implemented" };
 			}
+			return os;
 		}
 
 

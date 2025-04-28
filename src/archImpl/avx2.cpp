@@ -1,22 +1,6 @@
 #include "../MathFunc.hpp"
 #include "../qgemm.hpp"
 
-namespace kiwi
-{
-	namespace qgemm
-	{
-		// emulate _mm256_dpbusd_epi32 using AVX2
-		static FORCE_INLINE __m256i dpbusd(__m256i src, __m256i a, __m256i b)
-		{
-			__m256i one16 = _mm256_set1_epi16(1);
-			__m256i t0 = _mm256_maddubs_epi16(a, b);
-			__m256i t1 = _mm256_madd_epi16(t0, one16);
-			return _mm256_add_epi32(src, t1);
-		}
-	}
-}
-
-#define DPBUSD dpbusd
 #include "avx2_qgemm.hpp"
 
 namespace kiwi
@@ -41,7 +25,7 @@ namespace kiwi
 			float* c
 		)
 		{
-			return scatteredGEMV_256(m, k, aBase, aIdx, aIdxScale, b, c);
+			return detail::scatteredGEMV_256(m, k, aBase, aIdx, aIdxScale, b, c);
 		}
 
 		template<>
@@ -52,7 +36,7 @@ namespace kiwi
 			float* c
 		)
 		{
-			return scatteredGEMV8x1_256(m, k, aBase, aIdx, aIdxScale, b, c);
+			return detail::scatteredGEMV8x1_256(m, k, aBase, aIdx, aIdxScale, b, c);
 		}
 
 		template<>
@@ -63,7 +47,7 @@ namespace kiwi
 			float* c
 		)
 		{
-			return scatteredGEMV2_256(m, k, aBase, aIdx, aIdxScale, bBase, bIdx, bIdxScale, c);
+			return detail::scatteredGEMV2_256(m, k, aBase, aIdx, aIdxScale, bBase, bIdx, bIdxScale, c);
 		}
 
 		template<>
@@ -75,7 +59,7 @@ namespace kiwi
 				const int8_t* bBase, const int32_t* bIdx, size_t bIdxScale,
 				float* c, size_t ldc)
 			{
-				return scatteredGEMMSmall_256<m, n>(m, n, k, aBase, aIdx, aIdxScale, bBase, bIdx, bIdxScale, c, ldc);
+				return detail::scatteredGEMMSmall_256<m, n>(m, n, k, aBase, aIdx, aIdxScale, bBase, bIdx, bIdxScale, c, ldc);
 			}
 		};
 
@@ -89,31 +73,31 @@ namespace kiwi
 		template<>
 		void gemv<ArchType::avx2>(size_t m, size_t k, const uint8_t* a, const int8_t* b, size_t ldb, float* c)
 		{
-			return gemv_256(m, k, a, b, ldb, c);
+			return detail::gemv_256(m, k, a, b, ldb, c);
 		}
 
 		template<>
 		void gemvS8S8<ArchType::avx2>(size_t m, size_t k, const int8_t* a, const int8_t* b, size_t ldb, float* c)
 		{
-			return gemvS8S8_256(m, k, a, b, ldb, c);
+			return detail::gemvS8S8_256(m, k, a, b, ldb, c);
 		}
 
 		template<>
 		void gemvU8U8<ArchType::avx2>(size_t m, size_t k, const uint8_t* a, const uint8_t* b, size_t ldb, float* c)
 		{
-			return gemvU8U8_256(m, k, a, b, ldb, c);
+			return detail::gemvU8U8_256(m, k, a, b, ldb, c);
 		}
 
 		template<>
 		float dotS8S8<ArchType::avx2>(size_t k, const int8_t* a, const int8_t* b)
 		{
-			return dotS8S8_256(k, a, b);
+			return detail::dotS8S8_256(k, a, b);
 		}
 
 		template<>
 		float dotU8U8<ArchType::avx2>(size_t k, const uint8_t* a, const uint8_t* b)
 		{
-			return dotU8U8_256(k, a, b);
+			return detail::dotU8U8_256(k, a, b);
 		}
 
 		template<>
@@ -123,7 +107,7 @@ namespace kiwi
 			float* out
 		)
 		{
-			return invNormS8_256(m, k, a, lda, out);
+			return detail::invNormS8_256(m, k, a, lda, out);
 		}
 
 		template<>
@@ -133,7 +117,7 @@ namespace kiwi
 			float* out
 		)
 		{
-			return invNormU8_256(m, k, a, lda, out);
+			return detail::invNormU8_256(m, k, a, lda, out);
 		}
 
 		template<>

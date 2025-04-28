@@ -2,7 +2,7 @@
 #include "../qgemm.hpp"
 #include "../gemm.h"
 
-#define DPBUSD _mm256_dpbusd_epi32
+#define USE_VNNI
 #include "avx2_qgemm.hpp"
 
 namespace kiwi
@@ -27,7 +27,7 @@ namespace kiwi
 			float* c
 		)
 		{
-			return scatteredGEMV_256(m, k, aBase, aIdx, aIdxScale, b, c);
+			return detailVnni::scatteredGEMV_256(m, k, aBase, aIdx, aIdxScale, b, c);
 		}
 
 		template<>
@@ -38,7 +38,7 @@ namespace kiwi
 			float* c
 		)
 		{
-			return scatteredGEMV8x1_256(m, k, aBase, aIdx, aIdxScale, b, c);
+			return detailVnni::scatteredGEMV8x1_256(m, k, aBase, aIdx, aIdxScale, b, c);
 		}
 
 		template<>
@@ -49,7 +49,7 @@ namespace kiwi
 			float* c
 		)
 		{
-			return scatteredGEMV2_256(m, k, aBase, aIdx, aIdxScale, bBase, bIdx, bIdxScale, c);
+			return detailVnni::scatteredGEMV2_256(m, k, aBase, aIdx, aIdxScale, bBase, bIdx, bIdxScale, c);
 		}
 
 		template<>
@@ -61,7 +61,7 @@ namespace kiwi
 				const int8_t* bBase, const int32_t* bIdx, size_t bIdxScale,
 				float* c, size_t ldc)
 			{
-				return scatteredGEMMSmall_256<m, n>(m, n, k, aBase, aIdx, aIdxScale, bBase, bIdx, bIdxScale, c, ldc);
+				return detailVnni::scatteredGEMMSmall_256<m, n>(m, n, k, aBase, aIdx, aIdxScale, bBase, bIdx, bIdxScale, c, ldc);
 			}
 		};
 
@@ -75,31 +75,31 @@ namespace kiwi
 		template<>
 		void gemv<ArchType::avx_vnni>(size_t m, size_t k, const uint8_t* a, const int8_t* b, size_t ldb, float* c)
 		{
-			return gemv_256(m, k, a, b, ldb, c);
+			return detailVnni::gemv_256(m, k, a, b, ldb, c);
 		}
 
 		template<>
 		void gemvS8S8<ArchType::avx_vnni>(size_t m, size_t k, const int8_t* a, const int8_t* b, size_t ldb, float* c)
 		{
-			return gemvS8S8_256(m, k, a, b, ldb, c);
+			return detailVnni::gemvS8S8_256(m, k, a, b, ldb, c);
 		}
 
 		template<>
 		void gemvU8U8<ArchType::avx_vnni>(size_t m, size_t k, const uint8_t* a, const uint8_t* b, size_t ldb, float* c)
 		{
-			return gemvU8U8_256(m, k, a, b, ldb, c);
+			return detailVnni::gemvU8U8_256(m, k, a, b, ldb, c);
 		}
 
 		template<>
 		float dotS8S8<ArchType::avx_vnni>(size_t k, const int8_t* a, const int8_t* b)
 		{
-			return dotS8S8_256(k, a, b);
+			return detailVnni::dotS8S8_256(k, a, b);
 		}
 
 		template<>
 		float dotU8U8<ArchType::avx_vnni>(size_t k, const uint8_t* a, const uint8_t* b)
 		{
-			return dotU8U8_256(k, a, b);
+			return detailVnni::dotU8U8_256(k, a, b);
 		}
 
 		template<>
@@ -109,7 +109,7 @@ namespace kiwi
 			float* out
 		)
 		{
-			return invNormS8_256(m, k, a, lda, out);
+			return detailVnni::invNormS8_256(m, k, a, lda, out);
 		}
 
 		template<>
@@ -119,7 +119,7 @@ namespace kiwi
 			float* out
 		)
 		{
-			return invNormU8_256(m, k, a, lda, out);
+			return detailVnni::invNormU8_256(m, k, a, lda, out);
 		}
 
 		template<>
