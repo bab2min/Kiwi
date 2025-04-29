@@ -7,13 +7,15 @@ on:
 jobs:
   build-centos:
     name: Arm64-Centos7
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
 
     steps:
     - uses: actions/checkout@v3
       with:
         submodules: true
         lfs: true
+    - name: Print CPU Info
+      run: cat /proc/cpuinfo
     - uses: bab2min/run-on-arch-action@multiple-step-v2
       id: runcmd
       with:
