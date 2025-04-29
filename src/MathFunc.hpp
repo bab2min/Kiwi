@@ -204,9 +204,31 @@ namespace kiwi
 		template<>
 		struct LogSoftmaxTransposed<ArchType::none, 8>
 		{
+			void compute(float* arr, size_t stride)
+			{
+				float maxValue = -INFINITY;
+				for (size_t i = 0; i < 8; ++i)
+				{
+					maxValue = std::max(maxValue, arr[i * stride]);
+				}
+				float sum = 0;
+				for (size_t i = 0; i < 8; ++i)
+				{
+					sum += std::exp(arr[i * stride] - maxValue);
+				}
+				maxValue += std::log(sum);
+				for (size_t i = 0; i < 8; ++i)
+				{
+					arr[i * stride] -= maxValue;
+				}
+			}
+
 			void operator()(float* arr, size_t batchSize, size_t stride)
 			{
-				throw std::runtime_error("Unsupported architecture");
+				for (size_t i = 0; i < batchSize; ++i)
+				{
+					compute(arr + i, stride);
+				}
 			}
 		};
 
@@ -281,9 +303,27 @@ namespace kiwi
 		template<>
 		struct LogSumExpTransposed<ArchType::none, 8>
 		{
+			void compute(float* arr, size_t stride)
+			{
+				float maxValue = -INFINITY;
+				for (size_t i = 0; i < 8; ++i)
+				{
+					maxValue = std::max(maxValue, arr[i * stride]);
+				}
+				float sum = 0;
+				for (size_t i = 0; i < 8; ++i)
+				{
+					sum += std::exp(arr[i * stride] - maxValue);
+				}
+				*arr = std::log(sum) + maxValue;
+			}
+
 			void operator()(float* arr, size_t batchSize, size_t stride)
 			{
-				throw std::runtime_error("Unsupported architecture");
+				for (size_t i = 0; i < batchSize; ++i)
+				{
+					compute(arr + i, stride);
+				}
 			}
 		};
 
