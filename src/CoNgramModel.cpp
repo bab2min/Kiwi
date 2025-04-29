@@ -2263,7 +2263,7 @@ namespace kiwi
 			{
 				auto fn = quantTables[useDistantTokens ? 1 : 0][static_cast<ptrdiff_t>(archType)];
 				if (fn) return (*fn)(std::move(mem));
-				cerr << "Quantization is not supported for " << archToStr(archType) << ". Fall back to non-quantized model." << endl;
+				cerr << "Quantization is not supported for ArchType::" << archToStr(archType) << ". Fall back to non-quantized model." << endl;
 			}
 			auto fn = tables[useDistantTokens ? 1 : 0][static_cast<ptrdiff_t>(archType)];
 			if (!fn) throw runtime_error{ string{"Unsupported architecture : "} + archToStr(archType) };
