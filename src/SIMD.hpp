@@ -886,10 +886,7 @@ namespace kiwi
 
             static STRONG_INLINE float32x4_t cmp_lt_or_nan(float32x4_t a, float32x4_t b) 
             {
-                return vreinterpretq_f32_u32(vorrq_u32(
-                    vcltq_f32(a, b), // Compare less than
-                    vceqq_f32(a, a) // Check for NaN (a != a is true for NaN)
-                ));
+                return vreinterpretq_f32_u32(vmvnq_u32(vcleq_f32(b, a)));
             }
 
             static STRONG_INLINE int32_t dotprod(const uint8_t* a, const int8_t* b, size_t size)
