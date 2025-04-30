@@ -2010,15 +2010,15 @@ namespace kiwi
 			{
 				qgemm::gemv<arch>(
 					header.vocabSize, header.dim,
-					getContextQuantEmb(contextId),
-					getOutputQuantEmb(0), outputEmbStride(),
-					scores
-				);
-				qgemm::gemv<arch>(
-					header.vocabSize, header.dim,
 					getContextQuantEmb(bgContextId),
 					getOutputQuantEmb(0), outputEmbStride(),
 					resultBuf.data()
+				);
+				qgemm::gemv<arch>(
+					header.vocabSize, header.dim,
+					getContextQuantEmb(contextId),
+					getOutputQuantEmb(0), outputEmbStride(),
+					scores
 				);
 			}
 			else
@@ -2026,14 +2026,14 @@ namespace kiwi
 				gemm::template gemv<arch>(
 					header.vocabSize, header.dim,
 					getOutputEmb(0), outputEmbStride() / sizeof(float),
-					getContextEmb(contextId),
-					scores, true
+					getContextEmb(bgContextId),
+					resultBuf.data(), true
 				);
 				gemm::template gemv<arch>(
 					header.vocabSize, header.dim,
 					getOutputEmb(0), outputEmbStride() / sizeof(float),
-					getContextEmb(bgContextId),
-					resultBuf.data(), true
+					getContextEmb(contextId),
+					scores, true
 				);
 			}
 			const float bias = getContextBias(contextId) - getContextBias(bgContextId) * bgWeight;
@@ -2045,7 +2045,7 @@ namespace kiwi
 			pair<uint32_t, float>* resultPaired = reinterpret_cast<pair<uint32_t, float>*>(resultBuf.data());
 			for (size_t i = 0; i < header.vocabSize; ++i)
 			{
-				resultPaired[i] = make_pair((uint32_t)i, scores[i] + bias);
+				resultPaired[i] = make_pair((uint32_t)i, scores[i]);
 			}
 
 			topN = min(topN, (size_t)header.vocabSize);
