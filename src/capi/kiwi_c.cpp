@@ -668,8 +668,8 @@ kiwi_res_h kiwi_analyze_w(kiwi_h handle, const kchar16_t * text, int topN, int m
 	try
 	{
 		return new kiwi_res{ kiwi->analyze(
-			(const char16_t*)text, topN, (Match)matchOptions, 
-			blocklilst ? &blocklilst->morphemes : nullptr,
+			(const char16_t*)text, topN, 
+			AnalyzeOption{ (Match)matchOptions, blocklilst ? &blocklilst->morphemes : nullptr},
 			pretokenized ? *pretokenized : std::vector<PretokenizedSpan>{}
 		), {} };
 	}
@@ -687,8 +687,8 @@ kiwi_res_h kiwi_analyze(kiwi_h handle, const char * text, int topN, int matchOpt
 	try
 	{
 		return new kiwi_res{ kiwi->analyze(
-			text, topN, (Match)matchOptions, 
-			blocklilst ? &blocklilst->morphemes : nullptr,
+			text, topN, 
+			AnalyzeOption{ (Match)matchOptions, blocklilst ? &blocklilst->morphemes : nullptr },
 			pretokenized ? *pretokenized : std::vector<PretokenizedSpan>{}
 		),{} };
 	}
@@ -717,7 +717,7 @@ int kiwi_analyze_mw(kiwi_h handle, kiwi_reader_w_t reader, kiwi_receiver_t recei
 		{
 			auto result = new kiwi_res{ move(res), {} };
 			(*receiver)(receiver_idx++, result, userData);
-		}, (Match)matchOptions, blocklilst ? &blocklilst->morphemes : nullptr);
+		}, AnalyzeOption{ (Match)matchOptions, blocklilst ? &blocklilst->morphemes : nullptr });
 		return reader_idx;
 	}
 	catch (...)
@@ -745,7 +745,7 @@ int kiwi_analyze_m(kiwi_h handle, kiwi_reader_t reader, kiwi_receiver_t receiver
 		{
 			auto result = new kiwi_res{ move(res),{} };
 			(*receiver)(receiver_idx++, result, userData);
-		}, (Match)matchOptions, blocklilst ? &blocklilst->morphemes : nullptr);
+		}, AnalyzeOption{ (Match)matchOptions, blocklilst ? &blocklilst->morphemes : nullptr });
 		return reader_idx;
 	}
 	catch (...)

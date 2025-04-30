@@ -124,7 +124,7 @@ bool HSDataset::tokenizeUnlikely(Vector<std::pair<int32_t, int32_t>>& out, int32
 
 	form.insert(form.begin(), ' ');
 	form.push_back(' ');
-	auto res = kiwiInst->analyze(form, 8, Match::allWithNormalizing, &blockset, pretokenized);
+	auto res = kiwiInst->analyze(form, 8, AnalyzeOption{ Match::allWithNormalizing, &blockset }, pretokenized);
 	thread_local Vector<size_t> validResIdx;
 	validResIdx.clear();
 	for (size_t i = 0; i < res.size(); ++i)

@@ -53,6 +53,18 @@ namespace kiwi
 		return (uint32_t)clearIrregular(tag) + 1;
 	}
 
+	struct AnalyzeOption
+	{
+		Match match = Match::allWithNormalizing;
+		const std::unordered_set<const Morpheme*>* blocklist = nullptr;
+		bool openEnding = false;
+
+		AnalyzeOption() = default;
+		AnalyzeOption(Match m, const std::unordered_set<const Morpheme*>* bl = nullptr, bool oe = false)
+			: match{ m }, blocklist{ bl }, openEnding{ oe } 
+		{}
+	};
+
 	/**
 	 * @brief 실제 형태소 분석을 수행하는 클래스.
 	 * 
@@ -168,32 +180,30 @@ namespace kiwi
 		 * @brief 
 		 * 
 		 * @param str 
-		 * @param matchOptions 
+		 * @param option 
 		 * @return TokenResult 
 		 */
-		TokenResult analyze(const std::u16string& str, Match matchOptions, 
-			const std::unordered_set<const Morpheme*>* blocklist = nullptr,
+		TokenResult analyze(const std::u16string& str, AnalyzeOption option,
 			const std::vector<PretokenizedSpan>& pretokenized = {}
 		) const
 		{
-			return analyze(str, 1, matchOptions, blocklist, pretokenized)[0];
+			return analyze(str, 1, option, pretokenized)[0];
 		}
 
 		/**
 		 * @brief 
 		 * 
 		 * @param str 
-		 * @param matchOptions 
+		 * @param option 
 		 * @return TokenResult 
 		 */
-		TokenResult analyze(const std::string& str, Match matchOptions, 
-			const std::unordered_set<const Morpheme*>* blocklist = nullptr,
+		TokenResult analyze(const std::string& str, AnalyzeOption option, 
 			const std::vector<PretokenizedSpan>& pretokenized = {}
 		) const
 		{
 			std::vector<size_t> bytePositions;
 			auto u16str = utf8To16(str, bytePositions);
-			return analyze(u16str, matchOptions, blocklist, mapPretokenizedSpansToU16(pretokenized, bytePositions));
+			return analyze(u16str, option, mapPretokenizedSpansToU16(pretokenized, bytePositions));
 		}
 
 		/**
@@ -201,11 +211,10 @@ namespace kiwi
 		 * 
 		 * @param str 
 		 * @param topN 
-		 * @param matchOptions 
+		 * @param option 
 		 * @return std::vector<TokenResult> 
 		 */
-		std::vector<TokenResult> analyze(const std::u16string& str, size_t topN, Match matchOptions, 
-			const std::unordered_set<const Morpheme*>* blocklist = nullptr,
+		std::vector<TokenResult> analyze(const std::u16string& str, size_t topN, AnalyzeOption option,
 			const std::vector<PretokenizedSpan>& pretokenized = {}
 		) const;
 
@@ -214,16 +223,15 @@ namespace kiwi
 		 * 
 		 * @param str 
 		 * @param topN 
-		 * @param matchOptions 
+		 * @param option 
 		 * @return std::vector<TokenResult> 
 		 */
-		std::vector<TokenResult> analyze(const std::string& str, size_t topN, Match matchOptions, 
-			const std::unordered_set<const Morpheme*>* blocklist = nullptr,
+		std::vector<TokenResult> analyze(const std::string& str, size_t topN, AnalyzeOption option,
 			const std::vector<PretokenizedSpan>& pretokenized = {}) const
 		{
 			std::vector<size_t> bytePositions;
 			auto u16str = utf8To16(str, bytePositions);
-			return analyze(u16str, topN, matchOptions, blocklist, mapPretokenizedSpansToU16(pretokenized, bytePositions));
+			return analyze(u16str, topN, option, mapPretokenizedSpansToU16(pretokenized, bytePositions));
 		}
 
 		/**
@@ -231,50 +239,40 @@ namespace kiwi
 		 * 
 		 * @param str 
 		 * @param topN 
-		 * @param matchOptions 
+		 * @param option
 		 * @return std::future<std::vector<TokenResult>> 
 		 */
-		std::future<std::vector<TokenResult>> asyncAnalyze(const std::string& str, size_t topN, Match matchOptions, 
-			const std::unordered_set<const Morpheme*>* blocklist = nullptr,
+		std::future<std::vector<TokenResult>> asyncAnalyze(const std::string& str, size_t topN, AnalyzeOption option,
 			const std::vector<PretokenizedSpan>& pretokenized = {}
 		) const;
-		std::future<std::vector<TokenResult>> asyncAnalyze(std::string&& str, size_t topN, Match matchOptions, 
-			const std::unordered_set<const Morpheme*>* blocklist = nullptr,
+		std::future<std::vector<TokenResult>> asyncAnalyze(std::string&& str, size_t topN, AnalyzeOption option,
 			std::vector<PretokenizedSpan>&& pretokenized = {}
 		) const;
 
-		std::future<TokenResult> asyncAnalyze(const std::string& str, Match matchOptions, 
-			const std::unordered_set<const Morpheme*>* blocklist = nullptr,
+		std::future<TokenResult> asyncAnalyze(const std::string& str, AnalyzeOption option,
 			const std::vector<PretokenizedSpan>& pretokenized = {}
 		) const;
-		std::future<TokenResult> asyncAnalyze(std::string&& str, Match matchOptions, 
-			const std::unordered_set<const Morpheme*>* blocklist = nullptr,
+		std::future<TokenResult> asyncAnalyze(std::string&& str, AnalyzeOption option,
 			std::vector<PretokenizedSpan>&& pretokenized = {}
 		) const;
-		std::future<std::pair<TokenResult, std::string>> asyncAnalyzeEcho(std::string&& str, Match matchOptions, 
-			const std::unordered_set<const Morpheme*>* blocklist = nullptr,
+		std::future<std::pair<TokenResult, std::string>> asyncAnalyzeEcho(std::string&& str, AnalyzeOption option,
 			std::vector<PretokenizedSpan>&& pretokenized = {}
 		) const;
 
-		std::future<std::vector<TokenResult>> asyncAnalyze(const std::u16string& str, size_t topN, Match matchOptions, 
-			const std::unordered_set<const Morpheme*>* blocklist = nullptr,
+		std::future<std::vector<TokenResult>> asyncAnalyze(const std::u16string& str, size_t topN, AnalyzeOption option,
 			const std::vector<PretokenizedSpan>& pretokenized = {}
 		) const;
-		std::future<std::vector<TokenResult>> asyncAnalyze(std::u16string&& str, size_t topN, Match matchOptions, 
-			const std::unordered_set<const Morpheme*>* blocklist = nullptr,
+		std::future<std::vector<TokenResult>> asyncAnalyze(std::u16string&& str, size_t topN, AnalyzeOption option,
 			std::vector<PretokenizedSpan>&& pretokenized = {}
 		) const;
 
-		std::future<TokenResult> asyncAnalyze(const std::u16string& str, Match matchOptions, 
-			const std::unordered_set<const Morpheme*>* blocklist = nullptr,
+		std::future<TokenResult> asyncAnalyze(const std::u16string& str, AnalyzeOption option,
 			const std::vector<PretokenizedSpan>& pretokenized = {}
 		) const;
-		std::future<TokenResult> asyncAnalyze(std::u16string&& str, Match matchOptions, 
-			const std::unordered_set<const Morpheme*>* blocklist = nullptr,
+		std::future<TokenResult> asyncAnalyze(std::u16string&& str, AnalyzeOption option,
 			std::vector<PretokenizedSpan>&& pretokenized = {}
 		) const;
-		std::future<std::pair<TokenResult, std::u16string>> asyncAnalyzeEcho(std::u16string&& str, Match matchOptions, 
-			const std::unordered_set<const Morpheme*>* blocklist = nullptr,
+		std::future<std::pair<TokenResult, std::u16string>> asyncAnalyzeEcho(std::u16string&& str, AnalyzeOption option,
 			std::vector<PretokenizedSpan>&& pretokenized = {}
 		) const;
 
@@ -286,11 +284,11 @@ namespace kiwi
 		 * @param topN 
 		 * @param reader 
 		 * @param resultCallback 
-		 * @param matchOptions 
+		 * @param option 
 		 */
 		template<class ReaderCallback, class ResultCallback>
-		void analyze(size_t topN, ReaderCallback&& reader, ResultCallback&& resultCallback, Match matchOptions, 
-			const std::unordered_set<const Morpheme*>* blocklist = nullptr
+		void analyze(size_t topN, ReaderCallback&& reader, ResultCallback&& resultCallback, 
+			AnalyzeOption option
 		) const
 		{
 			if (pool)
@@ -307,7 +305,7 @@ namespace kiwi
 					}
 					futures.emplace_back(pool->enqueue([=, ustr = std::move(ustr)](size_t tid)
 					{
-						return analyze(ustr, topN, matchOptions, blocklist);
+						return analyze(ustr, topN, option, {});
 					}));
 				}
 
@@ -325,7 +323,7 @@ namespace kiwi
 						}
 						futures.emplace_back(pool->enqueue([=, ustr = std::move(ustr)](size_t tid)
 						{
-							return analyze(ustr, topN, matchOptions, blocklist);
+							return analyze(ustr, topN, option, {});
 						}));
 					}
 				}
@@ -336,7 +334,7 @@ namespace kiwi
 				{
 					auto ustr = reader();
 					if (ustr.empty()) break;
-					resultCallback(analyze(ustr, topN, matchOptions, blocklist));
+					resultCallback(analyze(ustr, topN, option));
 				}
 			}
 		}
