@@ -376,11 +376,11 @@ namespace kiwi
 		std::string ret;
 		for (auto it = str.begin(); it != str.end(); ++it)
 		{
-			size_t code = *it;
+			char16_t code = *it;
 			if (isHighSurrogate(code))
 			{
 				if (++it == str.end()) throw UnicodeException{ "unpaired surrogate" };
-				size_t code2 = *it;
+				char16_t code2 = *it;
 				if (!isLowSurrogate(code2)) throw UnicodeException{ "unpaired surrogate" };
 				code = mergeSurrogate(code, code2);
 			}

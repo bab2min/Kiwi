@@ -389,5 +389,7 @@ namespace kiwi
 	std::ifstream& openFile(std::ifstream& f, const std::string& filePath, std::ios_base::openmode mode = std::ios_base::in);
 	std::ofstream& openFile(std::ofstream& f, const std::string& filePath, std::ios_base::openmode mode = std::ios_base::out);
 	bool isOpenable(const std::string& filePath);
+
+	const char* modelTypeToStr(ModelType type);
 }
 

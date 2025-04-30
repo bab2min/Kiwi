@@ -48,7 +48,7 @@ int run(const string& modelPath, bool benchmark, const string& output, const str
 			cout << "ArchType : " << archToStr(kw.archType()) << endl;
 			cout << "LM Size : " << (kw.getLangModel()->getMemorySize() / 1024. / 1024.) << " MB" << endl;
 			cout << "Mem Usage : " << (tutils::getCurrentPhysicalMemoryUsage() / 1024.) << " MB" << endl;
-			cout << "ModelType : " << tutils::modelTypeToStr(kw.getLangModel()->getType()) << endl;
+			cout << "ModelType : " << modelTypeToStr(kw.getLangModel()->getType()) << endl;
 		}
 
 		ostream* out = &cout;

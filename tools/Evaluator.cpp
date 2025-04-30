@@ -102,7 +102,7 @@ int Evaluator::operator()(const string& modelPath,
 
 		cout << "Loading Time : " << timer.getElapsed() << " ms" << endl;
 		cout << "ArchType : " << archToStr(kw.archType()) << endl;
-		cout << "Model Type : " << tutils::modelTypeToStr(kw.modelType()) << endl;
+		cout << "Model Type : " << modelTypeToStr(kw.modelType()) << endl;
 		if (kw.getLangModel())
 		{
 			cout << "LM Size : " << (kw.getLangModel()->getMemorySize() / 1024. / 1024.) << " MB" << endl;
