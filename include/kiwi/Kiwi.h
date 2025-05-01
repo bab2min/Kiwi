@@ -559,6 +559,10 @@ namespace kiwi
 			std::vector<size_t> lmMinCnts = { 1 };
 			size_t numWorkers = 1;
 			size_t sbgSize = 1000000;
+			double sbgEpochs = 10;
+			size_t sbgEvalSetRatio = 20;
+			size_t sbgMinCount = 150;
+			size_t sbgMinCoCount = 20;
 			bool useLmTagHistory = true;
 			bool quantizeLm = true;
 			bool compressLm = true;

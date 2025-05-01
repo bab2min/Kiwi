@@ -1150,7 +1150,7 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 
 	auto* knlm = dynamic_cast<lm::KnLangModelBase*>(langMdl.get());
 
-	sbg = lm::SkipBigramTrainer<Vid, 8>{ sents, sbgTokenFilter, sbgPairFilter, 0, 150, 20, true, 0.333f, 1, args.sbgSize, knlm->nonLeafNodeSize() };
+	sbg = lm::SkipBigramTrainer<Vid, 8>{ sents, sbgTokenFilter, sbgPairFilter, 0, args.sbgMinCount, args.sbgMinCoCount, true, 0.333f, 1, args.sbgSize, knlm->nonLeafNodeSize() };
 	Vector<float> lmLogProbs;
 	Vector<uint32_t> baseNodes;
 	auto tc = sbg.newContext();
@@ -1163,7 +1163,7 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 		sampleIdcs.emplace_back(i);
 	}
 
-	for (size_t i = 0; i < sents.size(); i += 20)
+	for (size_t i = 0; i < sents.size(); i += args.sbgEvalSetRatio)
 	{
 		auto sent = sents[i];
 		if (lmLogProbs.size() < sent.size())
@@ -1183,8 +1183,7 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, const ModelBuildArgs& args)
 	llCnt = 0;
 	llMean = 0;
 	float lrStart = 1e-1;
-	size_t numEpochs = 10;
-	size_t totalSteps = sampleIdcs.size() * numEpochs;
+	size_t totalSteps = sampleIdcs.size() * args.sbgEpochs;
 
 	if (args.numWorkers <= 1)
 	{

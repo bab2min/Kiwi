@@ -74,6 +74,10 @@ int main(int argc, const char* argv[])
 	ValueArg<size_t> lmLastOrderMinCnt{ "", "last_min_cnt", "min count of the last order of LM", false, 2, "int" };
 	ValueArg<string> output{ "o", "output", "output model path", true, "", "string" };
 	ValueArg<size_t> sbgSize{ "", "sbg_size", "sbg size", false, 1000000, "int" };
+	ValueArg<double> sbgEpochs{ "", "sbg_epochs", "sbg epochs", false, 10, "double" };
+	ValueArg<size_t> sbgEvalSetRatio{ "", "sbg_eval_ratio", "", false, 20, "int" };
+	ValueArg<size_t> sbgMinCnt{ "", "sbg_min_cnt", "", false, 150, "int" };
+	ValueArg<size_t> sbgMinCoCnt{ "", "sbg_min_co_cnt", "", false, 20, "int" };
 	UnlabeledMultiArg<string> inputs{ "inputs", "input copora", true, "string" };
 
 	cmd.add(output);
@@ -89,6 +93,10 @@ int main(int argc, const char* argv[])
 	cmd.add(lmLastOrderMinCnt);
 	cmd.add(workers);
 	cmd.add(sbgSize);
+	cmd.add(sbgEpochs);
+	cmd.add(sbgEvalSetRatio);
+	cmd.add(sbgMinCnt);
+	cmd.add(sbgMinCoCnt);
 
 	try
 	{
@@ -109,6 +117,10 @@ int main(int argc, const char* argv[])
 	args.lmOrder = lmOrder;
 	args.numWorkers = workers;
 	args.sbgSize = sbgSize;
+	args.sbgEpochs = sbgEpochs;
+	args.sbgEvalSetRatio = sbgEvalSetRatio;
+	args.sbgMinCount = sbgMinCnt;
+	args.sbgMinCoCount = sbgMinCoCnt;
 
 	auto v = splitMultipleInts(lmMinCnt.getValue());
 	
