@@ -251,11 +251,11 @@ namespace kiwi
 						if (idx < segSize - 1)
 						{
 							onehot[idx] = 1;
-							gradSegment += (correctedBuf[idx] / max(denom[i + j], 1e-6f)) * (onehot - correctedBuf);
+							gradSegment += (correctedBuf[idx] / std::max(denom[i + j], 1e-6f)) * (onehot - correctedBuf);
 							onehot[idx] = 0;
 						}
 						onehot[segSize - 1] = 1;
-						gradSegment += (correctedBuf[segSize - 1] / max(denom[i + j], 1e-6f) * std::exp(lmLogProbs[i + j + wOffset])) * (onehot - correctedBuf);
+						gradSegment += (correctedBuf[segSize - 1] / std::max(denom[i + j], 1e-6f) * std::exp(lmLogProbs[i + j + wOffset])) * (onehot - correctedBuf);
 						onehot[segSize - 1] = 0;
 
 						if (baseSize)
