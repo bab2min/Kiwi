@@ -110,11 +110,12 @@ kiwi_builder_h kiwi_builder_init(const char* model_path, int num_threads, int op
 	try
 	{
 		BuildOption buildOption = (BuildOption)(options & 0xFF);
-		const auto mtMask = options & (KIWI_BUILD_MODEL_TYPE_KNLM | KIWI_BUILD_MODEL_TYPE_SBG | KIWI_BUILD_MODEL_TYPE_CONG | KIWI_BUILD_MODEL_TYPE_CONG_GLOBAL);
-		const ModelType modelType = mtMask == KIWI_BUILD_MODEL_TYPE_KNLM ? ModelType::knlm
-			: mtMask == KIWI_BUILD_MODEL_TYPE_SBG ? ModelType::sbg
-			: mtMask == KIWI_BUILD_MODEL_TYPE_CONG ? ModelType::cong
-			: mtMask == KIWI_BUILD_MODEL_TYPE_CONG_GLOBAL ? ModelType::congGlobal
+		const auto mtMask = options & (KIWI_BUILD_MODEL_TYPE_LARGEST | KIWI_BUILD_MODEL_TYPE_KNLM | KIWI_BUILD_MODEL_TYPE_SBG | KIWI_BUILD_MODEL_TYPE_CONG | KIWI_BUILD_MODEL_TYPE_CONG_GLOBAL);
+		const ModelType modelType = (mtMask == KIWI_BUILD_MODEL_TYPE_LARGEST) ? ModelType::largest
+			: (mtMask == KIWI_BUILD_MODEL_TYPE_KNLM) ? ModelType::knlm
+			: (mtMask == KIWI_BUILD_MODEL_TYPE_SBG) ? ModelType::sbg
+			: (mtMask == KIWI_BUILD_MODEL_TYPE_CONG) ? ModelType::cong
+			: (mtMask == KIWI_BUILD_MODEL_TYPE_CONG_GLOBAL) ? ModelType::congGlobal
 			: ModelType::none;
 		return (kiwi_builder_h)new KiwiBuilder{ model_path, (size_t)num_threads, buildOption, modelType };
 	}
@@ -667,8 +668,8 @@ kiwi_res_h kiwi_analyze_w(kiwi_h handle, const kchar16_t * text, int topN, int m
 	try
 	{
 		return new kiwi_res{ kiwi->analyze(
-			(const char16_t*)text, topN, (Match)matchOptions, 
-			blocklilst ? &blocklilst->morphemes : nullptr,
+			(const char16_t*)text, topN, 
+			AnalyzeOption{ (Match)matchOptions, blocklilst ? &blocklilst->morphemes : nullptr},
 			pretokenized ? *pretokenized : std::vector<PretokenizedSpan>{}
 		), {} };
 	}
@@ -686,8 +687,8 @@ kiwi_res_h kiwi_analyze(kiwi_h handle, const char * text, int topN, int matchOpt
 	try
 	{
 		return new kiwi_res{ kiwi->analyze(
-			text, topN, (Match)matchOptions, 
-			blocklilst ? &blocklilst->morphemes : nullptr,
+			text, topN, 
+			AnalyzeOption{ (Match)matchOptions, blocklilst ? &blocklilst->morphemes : nullptr },
 			pretokenized ? *pretokenized : std::vector<PretokenizedSpan>{}
 		),{} };
 	}
@@ -716,7 +717,7 @@ int kiwi_analyze_mw(kiwi_h handle, kiwi_reader_w_t reader, kiwi_receiver_t recei
 		{
 			auto result = new kiwi_res{ move(res), {} };
 			(*receiver)(receiver_idx++, result, userData);
-		}, (Match)matchOptions, blocklilst ? &blocklilst->morphemes : nullptr);
+		}, AnalyzeOption{ (Match)matchOptions, blocklilst ? &blocklilst->morphemes : nullptr });
 		return reader_idx;
 	}
 	catch (...)
@@ -744,7 +745,7 @@ int kiwi_analyze_m(kiwi_h handle, kiwi_reader_t reader, kiwi_receiver_t receiver
 		{
 			auto result = new kiwi_res{ move(res),{} };
 			(*receiver)(receiver_idx++, result, userData);
-		}, (Match)matchOptions, blocklilst ? &blocklilst->morphemes : nullptr);
+		}, AnalyzeOption{ (Match)matchOptions, blocklilst ? &blocklilst->morphemes : nullptr });
 		return reader_idx;
 	}
 	catch (...)
@@ -1278,7 +1279,7 @@ int kiwi_morphset_add(kiwi_morphset_h handle, const char* form, const char* tag)
 	try
 	{
 		POSTag ptag = tag ? parse_tag(tag) : POSTag::unknown;
-		auto found = handle->inst->findMorpheme(utf8To16(form), ptag);
+		auto found = handle->inst->findMorphemes(utf8To16(form), ptag);
 		handle->morphemes.insert(found.begin(), found.end());
 		return found.size();
 	}
@@ -1295,7 +1296,7 @@ int kiwi_morphset_add_w(kiwi_morphset_h handle, const kchar16_t* form, const cha
 	try
 	{
 		POSTag ptag = tag ? parse_tag(tag) : POSTag::unknown;
-		auto found = handle->inst->findMorpheme((const char16_t*)form, ptag);
+		auto found = handle->inst->findMorphemes((const char16_t*)form, ptag);
 		handle->morphemes.insert(found.begin(), found.end());
 		return found.size();
 	}

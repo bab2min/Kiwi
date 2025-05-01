@@ -22,6 +22,8 @@ jobs:
     - name: Init
       run: |
         mkdir build
+    - name: Print CPU Info
+      run: bash -c "cat /proc/cpuinfo"
     - name: Build
       uses: lukka/run-cmake@v3
       with:
@@ -37,6 +39,8 @@ jobs:
         mkdir eval_results
         .\build\Release\kiwi-evaluator.exe -m .\models\base -t knlm --morph (Get-ChildItem eval_data\*.txt | Select-Object -Expand FullName) -o eval_results\
         .\build\Release\kiwi-evaluator.exe -m .\models\base -t sbg --morph (Get-ChildItem eval_data\*.txt | Select-Object -Expand FullName) -o eval_results\
+        .\build\Release\kiwi-evaluator.exe -m .\models\cong\base -t cong --morph (Get-ChildItem eval_data\*.txt | Select-Object -Expand FullName) -o eval_results\
+        .\build\Release\kiwi-evaluator.exe -m .\models\cong\base -t cong-global --morph (Get-ChildItem eval_data\*.txt | Select-Object -Expand FullName) -o eval_results\
     - name: Archive binaries
       uses: actions/upload-artifact@v4
       with:
@@ -75,5 +79,24 @@ jobs:
           $env:KIWI_ARCH_TYPE = 'avx512bw'
           .\build\Release\kiwi-cli-*.exe -m .\models\base -e -o test.out kowiki1000.txt
         }
-        .\build\Release\kiwi-cli-*.exe -m .\models\base -e -o test.out --sbg kowiki1000.txt
+        .\build\Release\kiwi-cli-*.exe -m .\models\base -e -o test.out --largest kowiki1000.txt
         .\build\Release\kiwi-cli-*.exe -m .\models\base -e -o test.out --typos 6 kowiki1000.txt
+        if ( '${{ matrix.arch }}' -eq 'x64' )
+        {
+          $env:KIWI_ARCH_TYPE = 'sse2'
+          .\build\Release\kiwi-cli-*.exe -m .\models\cong\base -e -o test.out kowiki1000.txt
+          $env:KIWI_ARCH_TYPE = 'sse4_1'
+          .\build\Release\kiwi-cli-*.exe -m .\models\cong\base -e -o test.out kowiki1000.txt
+          $env:KIWI_ARCH_TYPE = 'avx2'
+          .\build\Release\kiwi-cli-*.exe -m .\models\cong\base -e -o test.out kowiki1000.txt
+          $env:KIWI_ARCH_TYPE = 'avx512vnni'
+          .\build\Release\kiwi-cli-*.exe -m .\models\cong\base -e -o test.out kowiki1000.txt
+          $env:KIWI_ARCH_TYPE = 'sse2'
+          .\build\Release\kiwi-cli-*.exe -m .\models\cong\base -e -o test.out --largest kowiki1000.txt
+          $env:KIWI_ARCH_TYPE = 'sse4_1'
+          .\build\Release\kiwi-cli-*.exe -m .\models\cong\base -e -o test.out --largest kowiki1000.txt
+          $env:KIWI_ARCH_TYPE = 'avx2'
+          .\build\Release\kiwi-cli-*.exe -m .\models\cong\base -e -o test.out --largest kowiki1000.txt
+          $env:KIWI_ARCH_TYPE = 'avx512vnni'
+          .\build\Release\kiwi-cli-*.exe -m .\models\cong\base -e -o test.out --largest kowiki1000.txt
+        }

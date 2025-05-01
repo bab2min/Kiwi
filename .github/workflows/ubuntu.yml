@@ -9,18 +9,10 @@ jobs:
     strategy:
       matrix:
         include:
-          - name: "Ubuntu 20.04 + gcc-10"
-            os: ubuntu-20.04
-            compiler: gcc
-            version: "10"
           - name: "Ubuntu 22.04 + gcc-11"
             os: ubuntu-22.04
             compiler: gcc
             version: "11"
-          - name: "Ubuntu 20.04 + clang-10"
-            os: ubuntu-20.04
-            compiler: clang
-            version: "10"
 
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.name }}
@@ -41,6 +33,8 @@ jobs:
         fi
     - name: Configure Build
       run: mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_JAVA_BINDING=1 ..
+    - name: Print CPU Info
+      run: cat /proc/cpuinfo
     - name: Build
       run: cd build && make -j2
     - name: Run Unit Test
@@ -62,6 +56,8 @@ jobs:
         mkdir eval_results
         ./build/kiwi-evaluator -m ./models/base --morph eval_data/*.txt -t knlm -o eval_results/
         ./build/kiwi-evaluator -m ./models/base --morph eval_data/*.txt -t sbg -o eval_results/
+        ./build/kiwi-evaluator -m ./models/cong/base --morph eval_data/*.txt -t cong -o eval_results/
+        ./build/kiwi-evaluator -m ./models/cong/base --morph eval_data/*.txt -t cong-global -o eval_results/
     - name: Run Benchmark
       run: |
         curl -OL https://latina.bab2min.pe.kr/_data/kowiki1000.txt
@@ -72,8 +68,16 @@ jobs:
         KIWI_ARCH_TYPE=sse4_1 ./build/kiwi-cli-* -m ./models/base -e -o test.out kowiki1000.txt
         KIWI_ARCH_TYPE=avx2 ./build/kiwi-cli-* -m ./models/base -e -o test.out kowiki1000.txt
         KIWI_ARCH_TYPE=avx512bw ./build/kiwi-cli-* -m ./models/base -e -o test.out kowiki1000.txt
-        KIWI_ARCH_TYPE=avx512bw ./build/kiwi-cli-* -m ./models/base -e -o test.out --sbg kowiki1000.txt
+        KIWI_ARCH_TYPE=avx512bw ./build/kiwi-cli-* -m ./models/base -e -o test.out --largest kowiki1000.txt
         KIWI_ARCH_TYPE=avx512bw ./build/kiwi-cli-* -m ./models/base -e -o test.out --typos 6 kowiki1000.txt
+        KIWI_ARCH_TYPE=sse2 ./build/kiwi-cli-* -m ./models/cong/base -e -o test.out kowiki1000.txt
+        KIWI_ARCH_TYPE=sse4_1 ./build/kiwi-cli-* -m ./models/cong/base -e -o test.out kowiki1000.txt
+        KIWI_ARCH_TYPE=avx2 ./build/kiwi-cli-* -m ./models/cong/base -e -o test.out kowiki1000.txt
+        KIWI_ARCH_TYPE=avx512vnni ./build/kiwi-cli-* -m ./models/cong/base -e -o test.out kowiki1000.txt
+        KIWI_ARCH_TYPE=sse2 ./build/kiwi-cli-* -m ./models/cong/base -e -o test.out --largest kowiki1000.txt
+        KIWI_ARCH_TYPE=sse4_1 ./build/kiwi-cli-* -m ./models/cong/base -e -o test.out --largest kowiki1000.txt
+        KIWI_ARCH_TYPE=avx2 ./build/kiwi-cli-* -m ./models/cong/base -e -o test.out --largest kowiki1000.txt
+        KIWI_ARCH_TYPE=avx512vnni ./build/kiwi-cli-* -m ./models/cong/base -e -o test.out --largest kowiki1000.txt
     - name: Archive binaries
       uses: actions/upload-artifact@v4
       with:

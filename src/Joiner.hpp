@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <kiwi/Joiner.h>
 #include <kiwi/Kiwi.h>
 #include <kiwi/LangModel.h>
@@ -11,6 +11,50 @@ namespace kiwi
 {
 	namespace cmb
 	{
+		inline const char16_t* reprFormForTag(POSTag tag)
+		{
+			switch (tag)
+			{
+			case POSTag::sf:
+				return u".";
+			case POSTag::sp:
+				return u",";
+			case POSTag::ss:
+				return u"'";
+			case POSTag::sso:
+				return u"(";
+			case POSTag::ssc:
+				return u")";
+			case POSTag::se:
+				return u"…";
+			case POSTag::so:
+				return u"-";
+			case POSTag::sw:
+				return u"^";
+			case POSTag::sb:
+				return u"(1)";
+			case POSTag::sl:
+				return u"A";
+			case POSTag::sh:
+				return u"漢";
+			case POSTag::sn:
+				return u"1";
+			case POSTag::w_url:
+				return u"http://ex.org";
+			case POSTag::w_email:
+				return u"ex@ex.org";
+			case POSTag::w_mention:
+				return u"@ex";
+			case POSTag::w_hashtag:
+				return u"#ex";
+			case POSTag::w_serial:
+				return u"1:2";
+			case POSTag::w_emoji:
+				return u"\U0001F600";
+			}
+			return u"";
+		}
+
 		template<class LmState>
 		void AutoJoiner::addImpl(size_t morphemeId, Space space, Vector<Candidate<LmState>>& candidates)
 		{
@@ -18,7 +62,14 @@ namespace kiwi
 			for (auto& cand : candidates)
 			{
 				cand.score += cand.lmState.next(kiwi->langMdl.get(), morph.lmMorphemeId);
-				cand.joiner.add(morph.getForm(), morph.tag, space);
+				if (morph.getForm().empty())
+				{
+					cand.joiner.add(reprFormForTag(morph.tag), morph.tag, space);
+				}
+				else
+				{
+					cand.joiner.add(morph.getForm(), morph.tag, space);
+				}
 			}
 
 			sort(candidates.begin(), candidates.end(), [](const cmb::Candidate<LmState>& a, const cmb::Candidate<LmState>& b)
@@ -199,7 +250,14 @@ namespace kiwi
 			auto& morph = kiwi->morphemes[morphemeId];
 			for (auto& cand : candidates)
 			{
-				cand.joiner.add(morph.getForm(), morph.tag, space);
+				if (morph.getForm().empty())
+				{
+					cand.joiner.add(reprFormForTag(morph.tag), morph.tag, space);
+				}
+				else
+				{
+					cand.joiner.add(morph.getForm(), morph.tag, space);
+				}
 			}
 		}
 

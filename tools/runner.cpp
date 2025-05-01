@@ -22,13 +22,13 @@ void printResult(Kiwi& kw, const string& line, int topn, bool score, ostream& ou
 	if (topn > 1) out << endl;
 }
 
-int run(const string& modelPath, bool benchmark, const string& output, const string& user, int topn, int tolerance, float typos, bool score, bool sbg, const vector<string>& input)
+int run(const string& modelPath, bool benchmark, const string& output, const string& user, int topn, int tolerance, float typos, bool score, bool largest, const vector<string>& input)
 {
 	try
 	{
 		tutils::Timer timer;
 		size_t lines = 0, bytes = 0;
-		Kiwi kw = KiwiBuilder{ modelPath, 1, BuildOption::default_, sbg ? ModelType::sbg : ModelType::knlm }.build(typos > 0 ? DefaultTypoSet::basicTypoSet : DefaultTypoSet::withoutTypo);
+		Kiwi kw = KiwiBuilder{ modelPath, 1, BuildOption::default_, largest ? ModelType::largest : ModelType::none }.build(typos > 0 ? DefaultTypoSet::basicTypoSet : DefaultTypoSet::withoutTypo);
 
 		cout << "Kiwi v" << KIWI_VERSION_STRING << endl;
 		if (tolerance)
@@ -48,7 +48,7 @@ int run(const string& modelPath, bool benchmark, const string& output, const str
 			cout << "ArchType : " << archToStr(kw.archType()) << endl;
 			cout << "LM Size : " << (kw.getLangModel()->getMemorySize() / 1024. / 1024.) << " MB" << endl;
 			cout << "Mem Usage : " << (tutils::getCurrentPhysicalMemoryUsage() / 1024.) << " MB" << endl;
-			cout << "ModelType : " << (sbg ? "sbg" : "knlm") << endl;
+			cout << "ModelType : " << modelTypeToStr(kw.getLangModel()->getType()) << endl;
 		}
 
 		ostream* out = &cout;
@@ -131,7 +131,7 @@ int main(int argc, const char* argv[])
 	ValueArg<int> topn{ "n", "topn", "top-n of result", false, 1, "int > 0" };
 	ValueArg<int> tolerance{ "t", "tolerance", "space tolerance of Kiwi", false, 0, "int >= 0" };
 	ValueArg<float> typos{ "", "typos", "typo cost weight", false, 0.f, "float >= 0" };
-	SwitchArg sbg{ "", "sbg", "use SkipBigram" };
+	SwitchArg largest{ "", "largest", "use largest model" };
 	SwitchArg score{ "s", "score", "print score together" };
 	UnlabeledMultiArg<string> files{ "inputs", "input files", false, "string" };
 
@@ -144,7 +144,7 @@ int main(int argc, const char* argv[])
 	cmd.add(score);
 	cmd.add(files);
 	cmd.add(typos);
-	cmd.add(sbg);
+	cmd.add(largest);
 
 	try
 	{
@@ -155,6 +155,6 @@ int main(int argc, const char* argv[])
 		cerr << "error: " << e.error() << " for arg " << e.argId() << endl;
 		return -1;
 	}
-	return run(model, benchmark, output, user, topn, tolerance, typos, score, sbg, files.getValue());
+	return run(model, benchmark, output, user, topn, tolerance, typos, score, largest, files.getValue());
 }
 

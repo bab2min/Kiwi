@@ -1,4 +1,4 @@
-#include <fstream>
+﻿#include <fstream>
 #include <random>
 
 #include <kiwi/Kiwi.h>
@@ -572,7 +572,8 @@ void KiwiBuilder::_addCorpusTo(
 	MorphemeMap& morphMap,
 	double splitRatio,
 	RaggedVector<VocabTy>* splitOut,
-	UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict
+	UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict,
+	const UnorderedMap<std::pair<KString, POSTag>, std::pair<KString, POSTag>>* transform
 ) const
 {
 	Vector<VocabTy> wids;
@@ -617,7 +618,7 @@ void KiwiBuilder::_addCorpusTo(
 			auto t = toPOSTag(fields[i + 1]);
 			if (t == POSTag::max && !alreadyPrintError)
 			{
-				cerr << "Unknown tags at line " << numLine << " :\t" << line << endl;
+				cerr << "Unknown tag(" << utf16To8(fields[i + 1]) << ") at line " << numLine << " :\t" << line << endl;
 				alreadyPrintError = true;
 			}
 
@@ -642,6 +643,16 @@ void KiwiBuilder::_addCorpusTo(
 			if (f[0] == u'아' && fields[i + 1][0] == 'E')
 			{
 				f[0] = u'어';
+			}
+
+			if (transform)
+			{
+				auto it = transform->find(make_pair(f, t));
+				if (it != transform->end())
+				{
+					f = it->second.first;
+					t = it->second.second;
+				}
 			}
 
 			auto it = morphMap.find(make_tuple(f, senseId, t));
@@ -710,27 +721,35 @@ void KiwiBuilder::_addCorpusTo(
 }
 
 void KiwiBuilder::addCorpusTo(RaggedVector<uint8_t>& out, std::istream& is, MorphemeMap& morphMap, 
-	double splitRatio, RaggedVector<uint8_t>* splitOut, UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict) const
+	double splitRatio, RaggedVector<uint8_t>* splitOut, 
+	UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict,
+	const UnorderedMap<std::pair<KString, POSTag>, std::pair<KString, POSTag>>* transform) const
 {
-	return _addCorpusTo(out, is, morphMap, splitRatio, splitOut, oovDict);
+	return _addCorpusTo(out, is, morphMap, splitRatio, splitOut, oovDict, transform);
 }
 
 void KiwiBuilder::addCorpusTo(RaggedVector<uint16_t>& out, std::istream& is, MorphemeMap& morphMap, 
-	double splitRatio, RaggedVector<uint16_t>* splitOut, UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict) const
+	double splitRatio, RaggedVector<uint16_t>* splitOut, 
+	UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict,
+	const UnorderedMap<std::pair<KString, POSTag>, std::pair<KString, POSTag>>* transform) const
 {
-	return _addCorpusTo(out, is, morphMap, splitRatio, splitOut, oovDict);
+	return _addCorpusTo(out, is, morphMap, splitRatio, splitOut, oovDict, transform);
 }
 
 void KiwiBuilder::addCorpusTo(RaggedVector<uint32_t>& out, std::istream& is, MorphemeMap& morphMap, 
-	double splitRatio, RaggedVector<uint32_t>* splitOut, UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict) const
+	double splitRatio, RaggedVector<uint32_t>* splitOut, 
+	UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict,
+	const UnorderedMap<std::pair<KString, POSTag>, std::pair<KString, POSTag>>* transform) const
 {
-	return _addCorpusTo(out, is, morphMap, splitRatio, splitOut, oovDict);
+	return _addCorpusTo(out, is, morphMap, splitRatio, splitOut, oovDict, transform);
 }
 
 void KiwiBuilder::addCorpusTo(RaggedVector<int32_t>& out, std::istream& is, MorphemeMap& morphMap,
-	double splitRatio, RaggedVector<int32_t>* splitOut, UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict) const
+	double splitRatio, RaggedVector<int32_t>* splitOut, 
+	UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict,
+	const UnorderedMap<std::pair<KString, POSTag>, std::pair<KString, POSTag>>* transform) const
 {
-	return _addCorpusTo(out, is, morphMap, splitRatio, splitOut, oovDict);
+	return _addCorpusTo(out, is, morphMap, splitRatio, splitOut, oovDict, transform);
 }
 
 void KiwiBuilder::updateForms()
@@ -790,15 +809,15 @@ void KiwiBuilder::saveMorphBin(std::ostream& os) const
 	serializer::writeMany(os, serializer::toKey("KIWI"), forms, morphemes);
 }
 
-ModelType KiwiBuilder::getModelType(const string& modelPath)
+ModelType KiwiBuilder::getModelType(const string& modelPath, bool largest)
 {
 	if (isOpenable(modelPath + "/cong.mdl"))
 	{
-		return ModelType::congGlobal;
+		return largest ? ModelType::congGlobal : ModelType::cong;
 	}
 	else if (isOpenable(modelPath + "/skipbigram.mdl"))
 	{
-		return ModelType::sbg;
+		return largest ? ModelType::sbg : ModelType::knlm;
 	}
 	else if (isOpenable(modelPath + "/sj.knlm"))
 	{
@@ -821,9 +840,9 @@ KiwiBuilder::KiwiBuilder(const string& modelPath, size_t _numThreads, BuildOptio
 		loadMorphBin(iss);
 	}
 	
-	if (modelType == ModelType::none)
+	if (modelType == ModelType::none || modelType == ModelType::largest)
 	{
-		modelType = getModelType(modelPath);
+		modelType = getModelType(modelPath, modelType == ModelType::largest);
 		if (modelType == ModelType::none)
 		{
 			throw runtime_error{ "Cannot find any valid model files in the given path" };
@@ -2360,7 +2379,8 @@ void KiwiBuilder::convertHSData(
 	const string& outputPath,
 	const string& morphemeDefPath,
 	size_t morphemeDefMinCnt,
-	bool generateOovDict
+	bool generateOovDict,
+	const vector<pair<pair<string, POSTag>, pair<string, POSTag>>>* transform
 ) const
 {
 	unique_ptr<KiwiBuilder> dummyBuilder;
@@ -2384,10 +2404,26 @@ void KiwiBuilder::convertHSData(
 
 	UnorderedMap<pair<KString, POSTag>, size_t> oovDict;
 	RaggedVector<int32_t> sents;
+	
+	UnorderedMap<pair<KString, POSTag>, pair<KString, POSTag>> transformMap;
+	if (transform)
+	{
+		for (auto& p : *transform)
+		{
+			transformMap.emplace(
+				make_pair(normalizeHangul(p.first.first), p.first.second),
+				make_pair(normalizeHangul(p.second.first), p.second.second)
+			);
+		}
+	}
+
 	for (auto& path : inputPathes)
 	{
 		ifstream ifs;
-		srcBuilder->addCorpusTo(sents, openFile(ifs, path), realMorph, 0, nullptr, generateOovDict ? &oovDict: nullptr);
+		srcBuilder->addCorpusTo(sents, openFile(ifs, path), realMorph, 0, nullptr, 
+			generateOovDict ? &oovDict: nullptr,
+			transform ? &transformMap : nullptr	
+		);
 	}
 
 	ofstream ofs;
@@ -2424,7 +2460,8 @@ HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes,
 	const string& morphemeDefPath,
 	size_t morphemeDefMinCnt,
 	const vector<pair<size_t, vector<uint32_t>>>& contextualMapper,
-	HSDataset* splitDataset
+	HSDataset* splitDataset,
+	const vector<pair<pair<string, POSTag>, pair<string, POSTag>>>* transform
 ) const
 {
 	HSDataset dataset{ batchSize, causalContextSize, windowSize, true, numWorkers, dropoutProb, dropoutProbOnHistory, nounAugmentingProb, generateUnlikelihoods };
@@ -2483,6 +2520,18 @@ HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes,
 	}
 
 	UnorderedMap<pair<KString, POSTag>, size_t> oovDict;
+	UnorderedMap<pair<KString, POSTag>, pair<KString, POSTag>> transformMap;
+	if (transform)
+	{
+		for (auto& p : *transform)
+		{
+			transformMap.emplace(
+				make_pair(normalizeHangul(p.first.first), p.first.second), 
+				make_pair(normalizeHangul(p.second.first), p.second.second)
+			);
+		}
+	}
+
 	for (auto& path : inputPathes)
 	{
 		try
@@ -2536,7 +2585,10 @@ HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes,
 		catch (const runtime_error&)
 		{
 			ifstream ifs;
-			srcBuilder->addCorpusTo(sents, openFile(ifs, path), realMorph, splitRatio, splitDataset ? &splitDataset->sents.get() : nullptr, doesGenerateUnlikelihoods ? &oovDict : nullptr);
+			srcBuilder->addCorpusTo(sents, openFile(ifs, path), realMorph, splitRatio, 
+				splitDataset ? &splitDataset->sents.get() : nullptr, 
+				doesGenerateUnlikelihoods ? &oovDict : nullptr,
+				transform ? &transformMap : nullptr);
 		}
 	}
 	size_t tokenSize = sents.raw().empty() ? 0 : *max_element(sents.raw().begin(), sents.raw().end()) + 1;

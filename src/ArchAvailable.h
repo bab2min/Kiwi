@@ -59,7 +59,7 @@ namespace kiwi
 		static_cast<std::ptrdiff_t>(ArchType::sse4_1)
 #endif
 #if CPUINFO_ARCH_ARM64
-		static_cast<std::ptrdiff_t>(ArchType::neon)
+		//static_cast<std::ptrdiff_t>(ArchType::neon)
 #endif
 #else
 #ifdef KIWI_ARCH_X86_64
@@ -72,7 +72,7 @@ namespace kiwi
 		static_cast<std::ptrdiff_t>(ArchType::sse4_1)
 #endif
 #ifdef KIWI_ARCH_ARM64
-		static_cast<std::ptrdiff_t>(ArchType::neon)
+		//static_cast<std::ptrdiff_t>(ArchType::neon)
 #endif
 #endif
 	>;

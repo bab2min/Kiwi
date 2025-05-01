@@ -58,6 +58,7 @@
     <ClInclude Include="..\src\ArchAvailable.h" />
     <ClInclude Include="..\src\archImpl\avx2_qgemm.hpp" />
     <ClInclude Include="..\src\archImpl\avx512_qgemm.hpp" />
+    <ClInclude Include="..\src\archImpl\eigen_gemm.hpp" />
     <ClInclude Include="..\src\BestPathContainer.hpp" />
     <ClInclude Include="..\src\BitEncoder.hpp" />
     <ClInclude Include="..\src\bitset.hpp" />
@@ -281,7 +282,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>KIWI_ARCH_X86_64=1;__restrict__=__restrict;KIWI_USE_MIMALLOC;_DEBUG;_CONSOLE;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>KIWI_ARCH_X86_64=1;KIWI_AVX_VNNI_SUPPORTED=1;__restrict__=__restrict;KIWI_USE_MIMALLOC;_DEBUG;_CONSOLE;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalOptions>/Qvec-report:1 /utf-8 /D _CRT_SECURE_NO_WARNINGS=1 /bigobj %(AdditionalOptions)</AdditionalOptions>

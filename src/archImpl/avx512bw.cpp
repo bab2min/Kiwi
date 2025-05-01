@@ -1,48 +1,12 @@
 #include "../MathFunc.hpp"
 #include "../qgemm.hpp"
-#include "../gemm.h"
 
-#define Eigen EigenAVX512
-#include <Eigen/Dense>
-
-namespace kiwi
-{
-	namespace qgemm
-	{
-		// emulate _mm512_dpbusd_epi32 using AVX512BW
-		static FORCE_INLINE __m512i dpbusd(__m512i src, __m512i a, __m512i b)
-		{
-			__m512i one16 = _mm512_set1_epi16(1);
-			__m512i t0 = _mm512_maddubs_epi16(a, b);
-			__m512i t1 = _mm512_madd_epi16(t0, one16);
-			return _mm512_add_epi32(src, t1);
-		}
-	}
-}
-
-#define DPBUSD dpbusd
 #include "avx512_qgemm.hpp"
 
 namespace kiwi
 {
 	namespace lm
 	{
-		template<>
-		float logSumExp<ArchType::avx512bw>(const float* arr, size_t size)
-		{
-			if (size == 8) return LogSumExp<ArchType::avx2>()(arr, std::integral_constant<size_t, 8>());
-			if (size == 16) return LogSumExp<ArchType::avx512bw>()(arr, std::integral_constant<size_t, 16>());
-			throw std::runtime_error("Unsupported size");
-		}
-
-		template<>
-		void logSoftmax<ArchType::avx512bw>(float* arr, size_t size)
-		{
-			if (size == 8) return LogSoftmax<ArchType::avx2>()(arr, std::integral_constant<size_t, 8>());
-			if (size == 16) return LogSoftmax<ArchType::avx512bw>()(arr, std::integral_constant<size_t, 16>());
-			throw std::runtime_error("Unsupported size");
-		}
-
 		template float logSumExp<ArchType::avx512bw>(const float* arr, size_t size);
 		template void logSumExpTransposed<ArchType::avx512bw>(float* arr, size_t size, size_t batchSize, size_t stride);
 		template void logSoftmax<ArchType::avx512bw>(float* arr, size_t size);
@@ -61,7 +25,7 @@ namespace kiwi
 			float* c
 		)
 		{
-			return scatteredGEMV_512(m, k, aBase, aIdx, aIdxScale, b, c);
+			return detail::scatteredGEMV_512(m, k, aBase, aIdx, aIdxScale, b, c);
 		}
 
 		template<>
@@ -72,7 +36,7 @@ namespace kiwi
 			float* c
 		)
 		{
-			return scatteredGEMV8x1_512(m, k, aBase, aIdx, aIdxScale, b, c);
+			return detail::scatteredGEMV8x1_512(m, k, aBase, aIdx, aIdxScale, b, c);
 		}
 
 		template<>
@@ -83,7 +47,7 @@ namespace kiwi
 			float* c
 		)
 		{
-			return scatteredGEMV2_512(m, k, aBase, aIdx, aIdxScale, bBase, bIdx, bIdxScale, c);
+			return detail::scatteredGEMV2_512(m, k, aBase, aIdx, aIdxScale, bBase, bIdx, bIdxScale, c);
 		}
 
 		template<>
@@ -94,7 +58,7 @@ namespace kiwi
 			float* c
 		)
 		{
-			return scatteredGEMV3_512(m, k, aBase, aIdx, aIdxScale, bBase, bIdx, bIdxScale, c);
+			return detail::scatteredGEMV3_512(m, k, aBase, aIdx, aIdxScale, bBase, bIdx, bIdxScale, c);
 		}
 
 		template<>
@@ -105,7 +69,7 @@ namespace kiwi
 			float* c
 		)
 		{
-			return scatteredGEMV4_512(m, k, aBase, aIdx, aIdxScale, bBase, bIdx, bIdxScale, c);
+			return detail::scatteredGEMV4_512(m, k, aBase, aIdx, aIdxScale, bBase, bIdx, bIdxScale, c);
 		}
 
 		template<>
@@ -117,7 +81,7 @@ namespace kiwi
 				const int8_t* bBase, const int32_t* bIdx, size_t bIdxScale,
 				float* c, size_t ldc)
 			{
-				return scatteredGEMMSmall_512<m, n>(m, n, k, aBase, aIdx, aIdxScale, bBase, bIdx, bIdxScale, c, ldc);
+				return detail::scatteredGEMMSmall_512<m, n>(m, n, k, aBase, aIdx, aIdxScale, bBase, bIdx, bIdxScale, c, ldc);
 			}
 		};
 
@@ -127,36 +91,73 @@ namespace kiwi
 			const int8_t* bBase, const int32_t* bIdx, size_t bIdxScale,
 			float* c, size_t ldc
 		);
-	}
 
-	namespace gemm
-	{
 		template<>
-		void gemm<ArchType::avx512bw>(
-			size_t m, size_t n, size_t k,
-			const float* aT, size_t strideA,
-			const float* b, size_t strideB,
-			float* c, size_t strideC
-		)
+		void gemv<ArchType::avx512bw>(size_t m, size_t k, const uint8_t* a, const int8_t* b, size_t ldb, float* c)
 		{
-			Eigen::Map<const Eigen::MatrixXf, 0, Eigen::OuterStride<>> aMap(aT, k, m, Eigen::OuterStride<>(strideA));
-			Eigen::Map<const Eigen::MatrixXf, 0, Eigen::OuterStride<>> bMap(b, k, n, Eigen::OuterStride<>(strideB));
-			Eigen::Map<Eigen::MatrixXf, 0, Eigen::OuterStride<>> cMap(c, m, n, Eigen::OuterStride<>(strideC));
-			cMap.noalias() += aMap.transpose() * bMap;
+			return detail::gemv_512(m, k, a, b, ldb, c);
 		}
 
 		template<>
-		void gemv<ArchType::avx512bw>(
+		void gemvS8S8<ArchType::avx512bw>(size_t m, size_t k, const int8_t* a, const int8_t* b, size_t ldb, float* c)
+		{
+			return detail::gemvS8S8_512(m, k, a, b, ldb, c);
+		}
+
+		template<>
+		void gemvU8U8<ArchType::avx512bw>(size_t m, size_t k, const uint8_t* a, const uint8_t* b, size_t ldb, float* c)
+		{
+			return detail::gemvU8U8_512(m, k, a, b, ldb, c);
+		}
+
+		template<>
+		float dotS8S8<ArchType::avx512bw>(size_t k, const int8_t* a, const int8_t* b)
+		{
+			return detail::dotS8S8_512(k, a, b);
+		}
+
+		template<>
+		float dotU8U8<ArchType::avx512bw>(size_t k, const uint8_t* a, const uint8_t* b)
+		{
+			return detail::dotU8U8_512(k, a, b);
+		}
+
+		template<>
+		void invNormS8<ArchType::avx512bw>(
 			size_t m, size_t k,
-			const float* aT, size_t strideA,
-			const float* b,
-			float* c
+			const int8_t* a, size_t lda,
+			float* out
 		)
 		{
-			Eigen::Map<const Eigen::MatrixXf, 0, Eigen::OuterStride<>> aMap(aT, k, m, Eigen::OuterStride<>(strideA));
-			Eigen::Map<const Eigen::VectorXf> bMap(b, k);
-			Eigen::Map<Eigen::VectorXf> cMap(c, m);
-			cMap.noalias() += aMap.transpose() * bMap;
+			return detail::invNormS8_512(m, k, a, lda, out);
+		}
+
+		template<>
+		void invNormU8<ArchType::avx512bw>(
+			size_t m, size_t k,
+			const uint8_t* a, size_t lda,
+			float* out
+		)
+		{
+			return detail::invNormU8_512(m, k, a, lda, out);
+		}
+
+		template<>
+		float requantizePackedU4<ArchType::avx512bw>(
+			size_t n,
+			size_t qgroup,
+			const uint8_t* packedInput,
+			const uint8_t* localScale,
+			float globalScale,
+			bool toUint8,
+			uint8_t* out
+		)
+		{
+			return requantizePackedU4<ArchType::avx2>(n, qgroup, packedInput, localScale, globalScale, toUint8, out);
 		}
 	}
 }
+
+#define Eigen EigenAVX512
+#define ARCH_TYPE ArchType::avx512bw
+#include "eigen_gemm.hpp"

@@ -333,6 +333,58 @@ namespace kiwi
 			}
 		}
 
+		/**
+		* @brief Requantize packed `qbit` ints to int8 (or uint8), get the scale parameter in float
+				 and return the size of the packed data
+		*/
+		template<ArchType archType>
+		inline size_t requantizePackedInts(uint8_t* out, float& scale, const void* packed, size_t dim, size_t qbit, size_t qgroup, bool toUint8)
+		{
+			const uint8_t* uPacked = reinterpret_cast<const uint8_t*>(packed);
+			if (qbit == 8)
+			{
+				if (toUint8) addBias(out, reinterpret_cast<const int8_t*>(uPacked), dim);
+				else memcpy(out, uPacked, dim);
+				scale = half2float(*reinterpret_cast<const uint16_t*>(uPacked + dim));
+				return dim + sizeof(uint16_t);
+			}
+			else if (qbit == 4)
+			{
+				const size_t numQGroups = dim / qgroup;
+				float globalScale = half2float(*reinterpret_cast<const uint16_t*>(uPacked + dim / 2));
+				const uint8_t* localScale = uPacked + dim / 2 + sizeof(uint16_t);
+				scale = qgemm::requantizePackedU4<archType>(dim, qgroup, uPacked, localScale, globalScale, toUint8, out);
+				return dim / 2 + sizeof(uint16_t) + numQGroups * sizeof(uint8_t);
+			}
+			else
+			{
+				throw runtime_error{ "Unsupported qbit" };
+			}
+		}
+
+		/**
+		* @brief Dequantized packed `qbit` ints to float and return the size of the packed data
+		*/
+		template<ArchType archType>
+		inline size_t dequantizePackedInts(float* out, const void* packed, size_t dim, size_t qbit, size_t qgroup)
+		{
+			const uint8_t* uPacked = reinterpret_cast<const uint8_t*>(packed);
+			if (qbit == 8 && qgroup == 0)
+			{
+				dequantize(out, reinterpret_cast<const int8_t*>(uPacked), dim, half2float(*reinterpret_cast<const uint16_t*>(uPacked + dim)));
+				return dim + sizeof(uint16_t);
+			}
+			else
+			{
+				float scale;
+				int8_t* buf = reinterpret_cast<int8_t*>(out + dim) - dim;
+				const size_t size = requantizePackedInts<archType>(reinterpret_cast<uint8_t*>(buf),
+					scale, uPacked, dim, qbit, qgroup, false);
+				dequantize(out, buf, dim, scale);
+				return size;
+			}
+		}
+
 		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
 		CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::CoNgramModel(utils::MemoryObject&& mem) : CoNgramModelBase{ mem }
 		{
@@ -455,18 +507,26 @@ namespace kiwi
 			}
 
 			{
-				const size_t contextEmbSize = header.contextSize * contextEmbStride();
-				const size_t distantEmbSize = windowSize > 0 ? header.vocabSize * distantEmbStride() : 0;
-				const size_t outputEmbSize = header.vocabSize * outputEmbStride();
-				const size_t positionConfSize = windowSize > 0 ? (header.windowSize + 1) * sizeof(float) : 0;
-				const size_t distantMaskSize = windowSize > 0 ? (header.vocabSize + 7) / 8 : 0;
+				static constexpr size_t alignment = 16;
+				const size_t contextEmbSize = padMultipleOf(header.contextSize * contextEmbStride(), alignment);
+				const size_t distantEmbSize = windowSize > 0 ? padMultipleOf(header.vocabSize * distantEmbStride(), alignment) : 0;
+				const size_t outputEmbSize = padMultipleOf(header.vocabSize * outputEmbStride(), alignment);
+				const size_t invNormContextSize = padMultipleOf(header.contextSize * sizeof(float), alignment);
+				const size_t invNormOutputSize = padMultipleOf(header.vocabSize * sizeof(float), alignment);
+				const size_t positionConfSize = windowSize > 0 ? padMultipleOf((header.windowSize + 1) * sizeof(float), alignment) : 0;
+				const size_t distantMaskSize = windowSize > 0 ? padMultipleOf((header.vocabSize + 7) / 8, alignment) : 0;
 
-				allEmbs = make_unique<uint8_t[]>(contextEmbSize + outputEmbSize + distantEmbSize + positionConfSize + distantMaskSize);
+				allEmbs = make_unique<uint8_t[]>(contextEmbSize + outputEmbSize + distantEmbSize
+					+ invNormContextSize + invNormOutputSize
+					+ positionConfSize + distantMaskSize
+				);
 				auto p = allEmbs.get();
 				contextEmbPtr = reinterpret_cast<uint8_t*>(p);
 				distantEmbPtr = reinterpret_cast<uint8_t*>(p += contextEmbSize);
 				outputEmbPtr = reinterpret_cast<uint8_t*>(p += distantEmbSize);
-				positionConfidPtr = reinterpret_cast<float*>(p += outputEmbSize);
+				invNormContextPtr = reinterpret_cast<float*>(p += outputEmbSize);
+				invNormOutputPtr = reinterpret_cast<float*>(p += invNormContextSize);
+				positionConfidPtr = reinterpret_cast<float*>(p += invNormOutputSize);
 				distantMaskPtr = reinterpret_cast<const uint8_t*>(p += positionConfSize);
 				if (windowSize == 0)
 				{
@@ -482,19 +542,16 @@ namespace kiwi
 			{
 				if (quantized)
 				{
-					addBias(optr, reinterpret_cast<const int8_t*>(eptr), header.dim);
+					float scale;
+					eptr += requantizePackedInts<arch>(optr, scale, eptr, header.dim, header.qbit, header.qgroup, true);
 					optr += header.dim;
-					eptr += header.dim;
-					*reinterpret_cast<float*>(optr) = half2float(*reinterpret_cast<const uint16_t*>(eptr)); // scale
+					*reinterpret_cast<float*>(optr) = scale;
 					optr += sizeof(float);
-					eptr += sizeof(uint16_t);
 				}
 				else
 				{
-					const float scale = half2float(*reinterpret_cast<const uint16_t*>(eptr + header.dim));
-					dequantize(reinterpret_cast<float*>(optr), reinterpret_cast<const int8_t*>(eptr), header.dim, scale);
+					eptr += dequantizePackedInts<arch>(reinterpret_cast<float*>(optr), eptr, header.dim, header.qbit, header.qgroup);
 					optr += header.dim * sizeof(float);
-					eptr += header.dim + sizeof(uint16_t);
 				}
 
 				*reinterpret_cast<float*>(optr) = -half2float(*reinterpret_cast<const uint16_t*>(eptr)); // bias
@@ -518,25 +575,49 @@ namespace kiwi
 			optr = const_cast<uint8_t*>(outputEmbPtr);
 			for (size_t i = 0; i < header.vocabSize; ++i)
 			{
-				auto* qvals = reinterpret_cast<const int8_t*>(eptr);
 				if (quantized)
 				{
-					memcpy(optr, qvals, header.dim);
+					float scale;
+					eptr += requantizePackedInts<arch>(optr, scale, eptr, header.dim, header.qbit, header.qgroup, false);
+					auto* qvals = reinterpret_cast<const int8_t*>(optr);
 					optr += header.dim;
-					eptr += header.dim;
-					*reinterpret_cast<float*>(optr) = half2float(*reinterpret_cast<const uint16_t*>(eptr));
+					*reinterpret_cast<float*>(optr) = scale;
 					optr += sizeof(float);
-					eptr += sizeof(uint16_t);
 					*reinterpret_cast<int32_t*>(optr) = accumulate(qvals, qvals + header.dim, 0) * 128;
 					optr += sizeof(int32_t);
 				}
 				else
 				{
-					const float scale = half2float(*reinterpret_cast<const uint16_t*>(eptr + header.dim));
-					dequantize(reinterpret_cast<float*>(optr), qvals, header.dim, scale);
+					eptr += dequantizePackedInts<arch>(reinterpret_cast<float*>(optr), eptr, header.dim, header.qbit, header.qgroup);
 					optr += header.dim * sizeof(float);
-					eptr += header.dim + sizeof(uint16_t);
 				}
+			}
+
+			if constexpr (quantized)
+			{
+				qgemm::invNormU8<arch>(
+					header.contextSize, header.dim,
+					getContextQuantEmb(0), contextEmbStride(),
+					const_cast<float*>(invNormContextPtr)
+				);
+				qgemm::invNormS8<arch>(
+					header.vocabSize, header.dim,
+					getOutputQuantEmb(0), outputEmbStride(),
+					const_cast<float*>(invNormOutputPtr)
+				);
+			}
+			else
+			{
+				gemm::invNorm<arch>(
+					header.contextSize, header.dim,
+					getContextEmb(0), contextEmbStride() / sizeof(float),
+					const_cast<float*>(invNormContextPtr)
+				);
+				gemm::invNorm<arch>(
+					header.vocabSize, header.dim,
+					getOutputEmb(0), outputEmbStride() / sizeof(float),
+					const_cast<float*>(invNormOutputPtr)
+				);
 			}
 
 			if (windowSize > 0)
@@ -546,19 +627,16 @@ namespace kiwi
 				{
 					if (quantized)
 					{
-						addBias(optr, reinterpret_cast<const int8_t*>(eptr), header.dim);
+						float scale;
+						eptr += requantizePackedInts<arch>(optr, scale, eptr, header.dim, header.qbit, header.qgroup, true);
 						optr += header.dim;
-						eptr += header.dim;
-						*reinterpret_cast<float*>(optr) = half2float(*reinterpret_cast<const uint16_t*>(eptr)); // scale
+						*reinterpret_cast<float*>(optr) = scale;
 						optr += sizeof(float);
-						eptr += sizeof(uint16_t);
 					}
 					else
 					{
-						const float scale = half2float(*reinterpret_cast<const uint16_t*>(eptr + header.dim));
-						dequantize(reinterpret_cast<float*>(optr), reinterpret_cast<const int8_t*>(eptr), header.dim, scale);
+						eptr += dequantizePackedInts<arch>(reinterpret_cast<float*>(optr), eptr, header.dim, header.qbit, header.qgroup);
 						optr += header.dim * sizeof(float);
-						eptr += header.dim + sizeof(uint16_t);
 					}
 
 					*reinterpret_cast<float*>(optr) = -half2float(*reinterpret_cast<const uint16_t*>(eptr)); // bias
@@ -1370,6 +1448,31 @@ namespace kiwi
 			return os;
 		}
 
+		inline std::ostream& writeIntsWithPacking(std::ostream& os, const int8_t* ints, size_t size, size_t bits)
+		{
+			thread_local Vector<char> buf;
+			if (bits == 8)
+			{
+				os.write(reinterpret_cast<const char*>(ints), size);
+			}
+			else if (bits == 4)
+			{
+				const uint8_t* uints = reinterpret_cast<const uint8_t*>(ints);
+				buf.resize(size / 2);
+				for (size_t i = 0; i < size; i += 2)
+				{
+					buf[i / 2] = (uints[i + 1] << 4) | (uints[i] & 0x0F);
+				}
+				os.write(buf.data(), size / 2);
+			}
+			else
+			{
+				throw runtime_error{ "Not implemented" };
+			}
+			return os;
+		}
+
+
 		utils::MemoryObject CoNgramModelBase::build(const string& contextDefinition, const string& embedding, size_t maxContextLength, bool useVLE, bool reorderContextId)
 		{
 			ifstream contextStr, embeddingStr;
@@ -1544,33 +1647,44 @@ namespace kiwi
 			const uint32_t contextSize = utils::read<uint32_t>(embeddingStr);
 			const uint32_t outputSize = utils::read<uint32_t>(embeddingStr);
 			const uint32_t windowSize = utils::read<uint32_t>(embeddingStr);
+			uint32_t qbit = utils::read<uint32_t>(embeddingStr);
+			const uint32_t qgroup = utils::read<uint32_t>(embeddingStr);
+			if (qgroup == 0) qbit = 8;
+
+			const uint32_t numQGroups = qgroup ? (dim / qgroup) : 0;
 
 			Vector<int8_t> contextEmb(dim * contextSize);
 			Vector<uint16_t> contextEmbScale(contextSize);
+			Vector<uint8_t> contextEmbLocalScale(qgroup ? (contextSize * numQGroups) : 0);
 			Vector<uint16_t> contextEmbBias(contextSize);
 			Vector<uint16_t> contextValidTokenSum(contextSize);
 			Vector<uint16_t> contextConfidence(contextSize);
 			Vector<int8_t> distantEmb(dim * outputSize);
 			Vector<uint16_t> distantEmbScale(outputSize);
+			Vector<uint8_t> distantEmbLocalScale(qgroup ? (outputSize * numQGroups) : 0);
 			Vector<uint16_t> distantEmbBias(outputSize);
 			Vector<uint16_t> distantConfidence(outputSize);
 			vector<uint16_t> positionConfidence(windowSize);
 			Vector<int8_t> outputEmb(dim * outputSize);
 			Vector<uint16_t> outputEmbScale(outputSize);
+			Vector<uint8_t> outputEmbLocalScale(qgroup ? (outputSize * numQGroups) : 0);
 			Vector<uint8_t> distantMask(outputSize);
 
 			embeddingStr.read((char*)contextEmb.data(), contextEmb.size());
 			embeddingStr.read((char*)contextEmbScale.data(), contextEmbScale.size() * sizeof(uint16_t));
+			if (qgroup) embeddingStr.read((char*)contextEmbLocalScale.data(), contextEmbLocalScale.size());
 			embeddingStr.read((char*)contextEmbBias.data(), contextEmbBias.size() * sizeof(uint16_t));
 			embeddingStr.read((char*)contextValidTokenSum.data(), contextValidTokenSum.size() * sizeof(uint16_t));
 			embeddingStr.read((char*)contextConfidence.data(), contextConfidence.size() * sizeof(uint16_t));
 			embeddingStr.read((char*)distantEmb.data(), distantEmb.size());
 			embeddingStr.read((char*)distantEmbScale.data(), distantEmbScale.size() * sizeof(uint16_t));
+			if (qgroup) embeddingStr.read((char*)distantEmbLocalScale.data(), distantEmbLocalScale.size());
 			embeddingStr.read((char*)distantEmbBias.data(), distantEmbBias.size() * sizeof(uint16_t));
 			embeddingStr.read((char*)distantConfidence.data(), distantConfidence.size() * sizeof(uint16_t));
 			embeddingStr.read((char*)positionConfidence.data(), positionConfidence.size() * sizeof(uint16_t));
 			embeddingStr.read((char*)outputEmb.data(), outputEmb.size());
 			embeddingStr.read((char*)outputEmbScale.data(), outputEmbScale.size() * sizeof(uint16_t));
+			if (qgroup) embeddingStr.read((char*)outputEmbLocalScale.data(), outputEmbLocalScale.size());
 			embeddingStr.read((char*)distantMask.data(), distantMask.size());
 
 			// remap context embedding
@@ -1578,6 +1692,7 @@ namespace kiwi
 			{
 				Vector<int8_t> newContextEmb(contextEmb.size());
 				Vector<uint16_t> newContextEmbScale(contextSize);
+				Vector<uint8_t> newContextEmbLocalScale(qgroup ? (contextSize * (dim / qgroup)) : 0);
 				Vector<uint16_t> newContextEmbBias(contextSize);
 				Vector<uint16_t> newContextValidTokenSum(contextSize);
 				for (size_t i = 0; i < contextSize; ++i)
@@ -1587,11 +1702,13 @@ namespace kiwi
 					auto dst = newContextEmb.data() + idx * dim;
 					copy(src, src + dim, dst);
 					newContextEmbScale[idx] = contextEmbScale[i];
+					if (qgroup) copy(contextEmbLocalScale.data() + i * numQGroups, contextEmbLocalScale.data() + (i + 1) * numQGroups, newContextEmbLocalScale.data() + idx * numQGroups);
 					newContextEmbBias[idx] = contextEmbBias[i];
 					newContextValidTokenSum[idx] = contextValidTokenSum[i];
 				}
 				contextEmb = move(newContextEmb);
 				contextEmbScale = move(newContextEmbScale);
+				if (qgroup) contextEmbLocalScale = move(newContextEmbLocalScale);
 				contextEmbBias = move(newContextEmbBias);
 				contextValidTokenSum = move(newContextValidTokenSum);
 			}
@@ -1620,6 +1737,8 @@ namespace kiwi
 			header.vocabSize = outputSize;
 			header.keySize = keySize;
 			header.windowSize = windowSize;
+			header.qbit = qbit;
+			header.qgroup = qgroup;
 			header.numNodes = nodeSizes.size();
 
 			size_t finalSize = 0;
@@ -1627,7 +1746,8 @@ namespace kiwi
 			header.keyOffset = alignedOffsetInc(finalSize, compressedNodeSizes.size());
 			header.valueOffset = alignedOffsetInc(finalSize, compressedKeys.size());
 			header.embOffset = alignedOffsetInc(finalSize, compressedValues.size());
-			finalSize += dim * (contextSize + outputSize * 2);
+			finalSize += padMultipleOf(dim * qbit / 8, 4) * (contextSize + outputSize * 2);
+			if (qgroup) finalSize += numQGroups * (contextSize + outputSize * 2);
 			finalSize += contextSize * sizeof(uint16_t) * 4;
 			finalSize += outputSize * sizeof(uint16_t) * 4;
 			finalSize += windowSize * sizeof(uint16_t);
@@ -1646,21 +1766,24 @@ namespace kiwi
 
 			for (size_t i = 0; i < contextSize; ++i)
 			{
-				ostr.write((const char*)&contextEmb[i * dim], dim);
+				writeIntsWithPacking(ostr, &contextEmb[i * dim], dim, header.qbit);
 				ostr.write((const char*)&contextEmbScale[i], sizeof(uint16_t));
+				if (qgroup) ostr.write((const char*)&contextEmbLocalScale[i * numQGroups], sizeof(uint8_t) * numQGroups);
 				ostr.write((const char*)&contextEmbBias[i], sizeof(uint16_t));
 				ostr.write((const char*)&contextConfidence[i], sizeof(uint16_t));
 				ostr.write((const char*)&contextValidTokenSum[i], sizeof(uint16_t));
 			}
 			for (size_t i = 0; i < outputSize; ++i)
 			{
-				ostr.write((const char*)&outputEmb[i * dim], dim);
+				writeIntsWithPacking(ostr, &outputEmb[i * dim], dim, header.qbit);
 				ostr.write((const char*)&outputEmbScale[i], sizeof(uint16_t));
+				if (qgroup) ostr.write((const char*)&outputEmbLocalScale[i * numQGroups], sizeof(uint8_t) * numQGroups);
 			}
 			for (size_t i = 0; i < outputSize; ++i)
 			{
-				ostr.write((const char*)&distantEmb[i * dim], dim);
+				writeIntsWithPacking(ostr, &distantEmb[i * dim], dim, header.qbit);
 				ostr.write((const char*)&distantEmbScale[i], sizeof(uint16_t));
+				if (qgroup) ostr.write((const char*)&distantEmbLocalScale[i * numQGroups], sizeof(uint8_t) * numQGroups);
 				ostr.write((const char*)&distantEmbBias[i], sizeof(uint16_t));
 				ostr.write((const char*)&distantConfidence[i], sizeof(uint16_t));
 			}
@@ -1681,8 +1804,405 @@ namespace kiwi
 			return (void*)&newJoinerWithKiwi<LmStateType>;
 		}
 
+		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
+		size_t CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::mostSimilarWords(uint32_t vocabId, size_t topN, pair<uint32_t, float>* output) const
+		{
+			thread_local Vector<float> resultBuf;
+			resultBuf.resize(header.vocabSize * 2 + 8); // +8 for padding
+			float* scores = resultBuf.data() + header.vocabSize;
+
+			if constexpr (quantized)
+			{
+				qgemm::gemvS8S8<arch>(
+					header.vocabSize, header.dim,
+					getOutputQuantEmb(vocabId), 
+					getOutputQuantEmb(0), outputEmbStride(),
+					scores);
+			}
+			else
+			{
+				gemm::template gemm<arch>(
+					header.vocabSize, 1, header.dim,
+					getOutputEmb(0), outputEmbStride() / sizeof(float),
+					getOutputEmb(vocabId), outputEmbStride() / sizeof(float),
+					scores, 1, true
+				);
+			}
+			gemm::mul<arch>(header.vocabSize, invNormOutputPtr[vocabId], invNormOutputPtr, scores);
+			scores[vocabId] = -99999.f; // remove self
+
+			pair<uint32_t, float>* resultPaired = reinterpret_cast<pair<uint32_t, float>*>(resultBuf.data());
+			for (size_t i = 0; i < header.vocabSize; ++i)
+			{
+				resultPaired[i] = make_pair((uint32_t)i, scores[i]);
+			}
+
+			topN = min(topN, (size_t)header.vocabSize);
+
+			// if topN is small enough, use partial_sort
+			if (topN <= 256)
+			{
+				partial_sort_copy(resultPaired, resultPaired + header.vocabSize, output, output + topN,
+					[](const pair<uint32_t, float>& a, const pair<uint32_t, float>& b) { return a.second > b.second; });
+			}
+			else
+			{
+				sort(resultPaired, resultPaired + header.vocabSize,
+					[](const pair<uint32_t, float>& a, const pair<uint32_t, float>& b) { return a.second > b.second; });
+				copy(resultPaired, resultPaired + topN, output);
+			}
+			return topN;
+		}
+
+		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
+		float CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::wordSimilarity(uint32_t vocabId1, uint32_t vocabId2) const
+		{
+			float result = 0;
+			if constexpr (quantized)
+			{
+				result = qgemm::dotS8S8<arch>(
+					header.dim,
+					getOutputQuantEmb(vocabId1), getOutputQuantEmb(vocabId2)
+				);
+			}
+			else
+			{
+				gemm::template gemv<arch>(
+					1, header.dim,
+					getOutputEmb(vocabId1), outputEmbStride() / sizeof(float),
+					getOutputEmb(vocabId2),
+					&result, true
+				);
+			}
+			result *= invNormOutputPtr[vocabId1] * invNormOutputPtr[vocabId2];
+			return result;
+		}
+
+		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
+		size_t CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::mostSimilarContexts(uint32_t contextId, size_t topN, std::pair<uint32_t, float>* output) const
+		{
+			thread_local Vector<float> resultBuf;
+			resultBuf.resize(header.contextSize * 2 + 8); // +8 for padding
+			float* scores = resultBuf.data() + header.contextSize;
+
+			if constexpr (quantized)
+			{
+				qgemm::gemvU8U8<arch>(
+					header.contextSize, header.dim,
+					getContextQuantEmb(contextId),
+					getContextQuantEmb(0), contextEmbStride(),
+					scores);
+			}
+			else
+			{
+				gemm::template gemm<arch>(
+					header.contextSize, 1, header.dim,
+					getContextEmb(0), contextEmbStride() / sizeof(float),
+					getContextEmb(contextId), contextEmbStride() / sizeof(float),
+					scores, 1, true
+				);
+			}
+			gemm::mul<arch>(header.contextSize, invNormContextPtr[contextId], invNormContextPtr, scores);
+			scores[contextId] = -99999.f; // remove self
+
+			pair<uint32_t, float>* resultPaired = reinterpret_cast<pair<uint32_t, float>*>(resultBuf.data());
+			for (size_t i = 0; i < header.vocabSize; ++i)
+			{
+				resultPaired[i] = make_pair((uint32_t)i, scores[i]);
+			}
+
+			topN = min(topN, (size_t)header.vocabSize);
+
+			// if topN is small enough, use partial_sort
+			if (topN <= 256)
+			{
+				partial_sort_copy(resultPaired, resultPaired + header.vocabSize, output, output + topN,
+					[](const pair<uint32_t, float>& a, const pair<uint32_t, float>& b) { return a.second > b.second; });
+			}
+			else
+			{
+				sort(resultPaired, resultPaired + header.vocabSize,
+					[](const pair<uint32_t, float>& a, const pair<uint32_t, float>& b) { return a.second > b.second; });
+				copy(resultPaired, resultPaired + topN, output);
+			}
+			return topN;
+		}
+
+		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
+		float CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::contextSimilarity(uint32_t contextId1, uint32_t contextId2) const
+		{
+			float result = 0;
+			if constexpr (quantized)
+			{
+				result = qgemm::dotU8U8<arch>(
+					header.dim,
+					getContextQuantEmb(contextId1), getContextQuantEmb(contextId2)
+				);
+			}
+			else
+			{
+				gemm::template gemv<arch>(
+					1, header.dim,
+					getContextEmb(contextId1), contextEmbStride() / sizeof(float),
+					getContextEmb(contextId2),
+					&result, true
+				);
+			}
+			result *= invNormContextPtr[contextId1] * invNormContextPtr[contextId2];
+			return result;
+		}
+
+		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
+		size_t CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::predictWordsFromContext(uint32_t contextId, size_t topN, std::pair<uint32_t, float>* output) const
+		{
+			thread_local Vector<float> resultBuf;
+			resultBuf.resize(header.vocabSize * 2 + 8); // +8 for padding
+			float* scores = resultBuf.data() + header.vocabSize;
+			if constexpr (quantized)
+			{
+				qgemm::gemv<arch>(
+					header.vocabSize, header.dim,
+					getContextQuantEmb(contextId),
+					getOutputQuantEmb(0), outputEmbStride(),
+					scores
+				);
+			}
+			else
+			{
+				gemm::template gemv<arch>(
+					header.vocabSize, header.dim,
+					getOutputEmb(0), outputEmbStride() / sizeof(float),
+					getContextEmb(contextId),
+					scores, true
+				);
+			}
+			const float bias = getContextBias(contextId);
+			pair<uint32_t, float>* resultPaired = reinterpret_cast<pair<uint32_t, float>*>(resultBuf.data());
+			for (size_t i = 0; i < header.vocabSize; ++i)
+			{
+				resultPaired[i] = make_pair((uint32_t)i, scores[i] + bias);
+			}
+
+			topN = min(topN, (size_t)header.vocabSize);
+			// if topN is small enough, use partial_sort
+			if (topN <= 256)
+			{
+				partial_sort_copy(resultPaired, resultPaired + header.vocabSize, output, output + topN,
+					[](const pair<uint32_t, float>& a, const pair<uint32_t, float>& b) { return a.second > b.second; });
+			}
+			else
+			{
+				sort(resultPaired, resultPaired + header.vocabSize,
+					[](const pair<uint32_t, float>& a, const pair<uint32_t, float>& b) { return a.second > b.second; });
+				copy(resultPaired, resultPaired + topN, output);
+			}
+			return topN;
+		}
+
+		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
+		size_t CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::predictWordsFromContextDiff(
+			uint32_t contextId, uint32_t bgContextId, float bgWeight, size_t topN, std::pair<uint32_t, float>* output) const
+		{
+			thread_local Vector<float> resultBuf;
+			resultBuf.resize(header.vocabSize * 2 + 8); // +8 for padding
+			float* scores = resultBuf.data() + header.vocabSize;
+			if constexpr (quantized)
+			{
+				qgemm::gemv<arch>(
+					header.vocabSize, header.dim,
+					getContextQuantEmb(bgContextId),
+					getOutputQuantEmb(0), outputEmbStride(),
+					resultBuf.data()
+				);
+				qgemm::gemv<arch>(
+					header.vocabSize, header.dim,
+					getContextQuantEmb(contextId),
+					getOutputQuantEmb(0), outputEmbStride(),
+					scores
+				);
+			}
+			else
+			{
+				gemm::template gemv<arch>(
+					header.vocabSize, header.dim,
+					getOutputEmb(0), outputEmbStride() / sizeof(float),
+					getContextEmb(bgContextId),
+					resultBuf.data(), true
+				);
+				gemm::template gemv<arch>(
+					header.vocabSize, header.dim,
+					getOutputEmb(0), outputEmbStride() / sizeof(float),
+					getContextEmb(contextId),
+					scores, true
+				);
+			}
+			const float bias = getContextBias(contextId) - getContextBias(bgContextId) * bgWeight;
+			for (size_t i = 0; i < header.vocabSize; ++i)
+			{
+				scores[i] = scores[i] - resultBuf[i] * bgWeight + bias;
+			}
+
+			pair<uint32_t, float>* resultPaired = reinterpret_cast<pair<uint32_t, float>*>(resultBuf.data());
+			for (size_t i = 0; i < header.vocabSize; ++i)
+			{
+				resultPaired[i] = make_pair((uint32_t)i, scores[i]);
+			}
+
+			topN = min(topN, (size_t)header.vocabSize);
+			// if topN is small enough, use partial_sort
+			if (topN <= 256)
+			{
+				partial_sort_copy(resultPaired, resultPaired + header.vocabSize, output, output + topN,
+					[](const pair<uint32_t, float>& a, const pair<uint32_t, float>& b) { return a.second > b.second; });
+			}
+			else
+			{
+				sort(resultPaired, resultPaired + header.vocabSize,
+					[](const pair<uint32_t, float>& a, const pair<uint32_t, float>& b) { return a.second > b.second; });
+				copy(resultPaired, resultPaired + topN, output);
+			}
+			return topN;
+		}
+
+		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
+		uint32_t CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::toContextId(const uint32_t* vocabIds, size_t size) const
+		{
+			int32_t nodeIdx = 0;
+			uint32_t contextId;
+			for (size_t i = 0; i < size; ++i)
+			{
+				contextId = progressContextNode(nodeIdx, vocabIds[i]);
+			}
+			return contextId;
+		}
+
+		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
+		template<class Out>
+		void CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::visitContextNode(MyNode* node, Vector<VlKeyType>& prefix, Out&& out) const
+		{
+			const auto insert = [&](uint32_t contextId)
+			{
+				thread_local Vector<uint32_t> buf;
+				buf.clear();
+				if constexpr (is_same_v<KeyType, VlKeyType>)
+				{
+					buf.insert(buf.end(), prefix.begin(), prefix.end());
+				}
+				else
+				{
+					static constexpr size_t tMax = (1 << 16) - (1 << 10) * 2;
+					for (size_t j = 0; j < prefix.size(); ++j)
+					{
+						if (j + 1 < prefix.size() && prefix[j] >= tMax && prefix[j + 1] >= tMax)
+						{
+							const size_t high = prefix[j] - tMax, low = prefix[j + 1] - tMax - (1 << 10);
+							buf.emplace_back((high << 10) | low);
+							++j;
+						}
+						else
+						{
+							buf.emplace_back(prefix[j]);
+						}
+					}
+				}
+
+				if (out.size() < buf.size()) out.resize(buf.size());
+				out[buf.size() - 1].emplace(buf, contextId);
+			};
+
+			if (node == nodeData.get()) // root node
+			{
+				for (size_t i = 0; i < node->numNexts; ++i)
+				{
+					const int32_t k = i;
+					const auto v = allRootValueData[i];
+					prefix.emplace_back(k);
+					if (v > 0)
+					{
+						if (node[v].value)
+						{
+							insert(node[v].value);
+						}
+						visitContextNode(node + v, prefix, out);
+					}
+					else if (v < 0)
+					{
+						insert(-v);
+					}
+					prefix.pop_back();
+				}
+			}
+			else
+			{
+			for (size_t i = 0; i < node->numNexts; ++i)
+			{
+				auto [k, v] = nst::extractKV<arch, VlKeyType, int32_t>(&alignedKeyValueData[node->nextOffset], node->numNexts, i);
+				prefix.emplace_back(k);
+				if (v > 0)
+				{
+					if (node[v].value)
+					{
+						insert(node[v].value);
+					}
+					visitContextNode(node + v, prefix, out);
+				}
+				else if (v < 0)
+				{
+					insert(-v);
+				}
+				prefix.pop_back();
+				}
+			}
+		}
+
+		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
+		vector<vector<uint32_t>> CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::getContextWordMap() const
+		{
+			Vector<UnorderedMap<Vector<uint32_t>, uint32_t>> contextMap;
+			Vector<VlKeyType> prefix;
+			visitContextNode(nodeData.get(), prefix, contextMap);
+
+			// remove redundant context
+			Vector<uint32_t> context;
+			for (size_t i = contextMap.size(); i-- > 0;)
+			{
+				auto& c = contextMap[i];
+				for (auto it = c.begin(); it != c.end();)
+				{
+					bool erase = false;
+					for (size_t j = i; j-- > 0; )
+					{
+						auto& c2 = contextMap[j];
+						context.clear();
+						context.insert(context.end(), it->first.end() - j - 1, it->first.end());
+						auto found = c2.find(context);
+						if (found != c2.end())
+						{
+							erase = found->second == it->second;
+							break;
+						}
+					}
+
+					if (erase) it = c.erase(it);
+					else ++it;
+				}
+			}
+
+			vector<vector<uint32_t>> contextWordMap(header.contextSize);
+			for (size_t i = 0; i < contextMap.size(); ++i)
+			{
+				for (auto& p : contextMap[i])
+				{
+					auto& target = contextWordMap[p.second];
+					if (!target.empty()) target.emplace_back(-1);
+					target.insert(target.end(), p.first.begin(), p.first.end());
+				}
+			}
+			return contextWordMap;
+		}
+
 		template<ArchType archType, class KeyTy, class VlKeyType, bool useDistantTokens, bool quantized>
-		inline std::unique_ptr<CoNgramModelBase> createOptimizedModelWithWindowSize(utils::MemoryObject&& mem)
+		inline unique_ptr<CoNgramModelBase> createOptimizedModelWithWindowSize(utils::MemoryObject&& mem)
 		{
 			auto& header = *reinterpret_cast<const CoNgramModelHeader*>(mem.get());
 			if (!useDistantTokens)
@@ -1695,12 +2215,12 @@ namespace kiwi
 			case 7:
 				return make_unique<CoNgramModel<archType, KeyTy, VlKeyType, 7, quantized>>(std::move(mem));
 			default:
-				throw std::runtime_error{ "Unsupported `window_size` : " + std::to_string((size_t)header.windowSize) };
+				throw runtime_error{ "Unsupported `window_size` : " + to_string((size_t)header.windowSize) };
 			};
 		}
 
 		template<ArchType archType, bool useDistantTokens, bool quantized>
-		std::unique_ptr<CoNgramModelBase> createOptimizedModel(utils::MemoryObject&& mem)
+		unique_ptr<CoNgramModelBase> createOptimizedModel(utils::MemoryObject&& mem)
 		{
 			auto& header = *reinterpret_cast<const CoNgramModelHeader*>(mem.get());
 			switch (header.keySize)
@@ -1712,7 +2232,7 @@ namespace kiwi
 			case 4:
 				return createOptimizedModelWithWindowSize<archType, uint32_t, uint32_t, useDistantTokens, quantized>(std::move(mem));
 			default:
-				throw std::runtime_error{ "Unsupported `key_size` : " + std::to_string((size_t)header.keySize) };
+				throw runtime_error{ "Unsupported `key_size` : " + to_string((size_t)header.keySize) };
 			}
 		}
 
@@ -1721,14 +2241,14 @@ namespace kiwi
 		template<bool useDistantTokens, bool quantized>
 		struct CreateOptimizedModelGetter
 		{
-			template<std::ptrdiff_t i>
+			template<ptrdiff_t i>
 			struct Wrapper
 			{
 				static constexpr FnCreateOptimizedModel value = &createOptimizedModel<static_cast<ArchType>(i), useDistantTokens, quantized>;
 			};
 		};
 
-		std::unique_ptr<CoNgramModelBase> CoNgramModelBase::create(utils::MemoryObject&& mem, ArchType archType, bool useDistantTokens, bool quantized)
+		unique_ptr<CoNgramModelBase> CoNgramModelBase::create(utils::MemoryObject&& mem, ArchType archType, bool useDistantTokens, bool quantized)
 		{
 			static tp::Table<FnCreateOptimizedModel, AvailableArch> tables[] = {
 				CreateOptimizedModelGetter<false, false>{},
@@ -1741,12 +2261,12 @@ namespace kiwi
 
 			if (quantized)
 			{
-				auto fn = quantTables[useDistantTokens ? 1 : 0][static_cast<std::ptrdiff_t>(archType)];
+				auto fn = quantTables[useDistantTokens ? 1 : 0][static_cast<ptrdiff_t>(archType)];
 				if (fn) return (*fn)(std::move(mem));
-				std::cerr << "Quantization is not supported for " << archToStr(archType) << ". Fall back to non-quantized model." << std::endl;
+				cerr << "Quantization is not supported for ArchType::" << archToStr(archType) << ". Fall back to non-quantized model." << endl;
 			}
-			auto fn = tables[useDistantTokens ? 1 : 0][static_cast<std::ptrdiff_t>(archType)];
-			if (!fn) throw std::runtime_error{ std::string{"Unsupported architecture : "} + archToStr(archType) };
+			auto fn = tables[useDistantTokens ? 1 : 0][static_cast<ptrdiff_t>(archType)];
+			if (!fn) throw runtime_error{ string{"Unsupported architecture : "} + archToStr(archType) };
 			return (*fn)(std::move(mem));
 		}
 	}

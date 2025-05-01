@@ -5,6 +5,7 @@
 #include <fstream>
 
 #define MODEL_PATH "./models/base"
+#define CONG_MODEL_PATH "./models/cong/base"
 #define KWORD u"킼윜"
 #define KWORD8 u8"킼윜"
 

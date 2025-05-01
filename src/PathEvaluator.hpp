@@ -1120,7 +1120,7 @@ namespace kiwi
 		const KGraphNode* graph,
 		const size_t graphSize,
 		const size_t topN,
-		bool openEnd,
+		bool openEnding,
 		bool splitComplex,
 		bool splitSaisiot,
 		bool mergeSaisiot,
@@ -1228,9 +1228,14 @@ namespace kiwi
 				}
 				if (p.morpheme->tag == POSTag::z_siot) continue;
 
-				float c = p.accScore + (openEnd ? 0 : p.lmState.next(langMdl, eosId));
-				if (p.spState.singleQuote) c -= 2;
-				if (p.spState.doubleQuote) c -= 2;
+				float c = p.accScore;
+				if (!openEnding)
+				{
+					c += p.lmState.next(langMdl, eosId);
+					if (p.spState.singleQuote) c -= 2;
+					if (p.spState.doubleQuote) c -= 2;
+				}
+
 				if (p.rootId == commonRootId)
 				{
 					for (size_t i = 0; i < uniqStates.size(); ++i)

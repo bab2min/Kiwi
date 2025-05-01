@@ -68,17 +68,17 @@ namespace kiwi
 	*/
 	POSTag identifySpecialChr(char32_t chr)
 	{
-		if (isSpace(chr)) return POSTag::unknown;
+		if (chr < 0x10000 && isSpace((char16_t)chr)) return POSTag::unknown;
 		if (0x2000 <= chr && chr <= 0x200F) return POSTag::unknown;
 
 		if ('0' <= chr && chr <= '9') return POSTag::sn;
 		if (('A' <= chr && chr <= 'Z') ||
 			('a' <= chr && chr <= 'z'))  return POSTag::sl;
 		if (0xAC00 <= chr && chr < 0xD7A4) return POSTag::max;
-		if (isOldHangulOnset(chr) 
-			|| isOldHangulVowel(chr) 
-			|| isOldHangulCoda(chr) 
-			|| isOldHangulToneMark(chr)
+		if (chr < 0x10000 && (isOldHangulOnset((char16_t)chr) 
+			|| isOldHangulVowel((char16_t)chr) 
+			|| isOldHangulCoda((char16_t)chr) 
+			|| isOldHangulToneMark((char16_t)chr))
 		) return POSTag::max;
 		switch (chr)
 		{
@@ -509,5 +509,22 @@ namespace kiwi
 			return u"ㄱㄲㄳㄴㄵㄶㄷㄹㄺㄻㄼㄽㄾㄿㅀㅁㅂㅄㅅㅆㅇㅈㅊㅋㅌㅍㅎ"[chr - 0x11A8];
 		}
 		return chr;
+	}
+
+	const char* modelTypeToStr(ModelType type)
+	{
+		switch (type)
+		{
+		case ModelType::none: return "none";
+		case ModelType::largest: return "largest";
+		case ModelType::knlm: return "knlm";
+		case ModelType::knlmTransposed: return "knlm-transposed";
+		case ModelType::sbg: return "sbg";
+		case ModelType::cong: return "cong";
+		case ModelType::congGlobal: return "cong-global";
+		case ModelType::congFp32: return "cong-fp32";
+		case ModelType::congGlobalFp32: return "cong-global-fp32";
+		}
+		return "unknown";
 	}
 }

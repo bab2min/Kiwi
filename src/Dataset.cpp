@@ -114,7 +114,7 @@ bool HSDataset::tokenizeUnlikely(Vector<std::pair<int32_t, int32_t>>& out, int32
 	auto prefixForm = joinHangul((*forms)[(*morphemes)[prefix].kform].form);
 	auto suffixForm = joinHangul((*forms)[(*morphemes)[suffix].kform].form);
 	if (form.size() < 2) return false;
-	auto blocklist = kiwiInst->findMorpheme(form);
+	auto blocklist = kiwiInst->findMorphemes(form);
 	std::unordered_set<const Morpheme*> blockset(blocklist.begin(), blocklist.end());
 	
 	thread_local std::vector<PretokenizedSpan> pretokenized;
@@ -124,7 +124,7 @@ bool HSDataset::tokenizeUnlikely(Vector<std::pair<int32_t, int32_t>>& out, int32
 
 	form.insert(form.begin(), ' ');
 	form.push_back(' ');
-	auto res = kiwiInst->analyze(form, 8, Match::allWithNormalizing, &blockset, pretokenized);
+	auto res = kiwiInst->analyze(form, 8, AnalyzeOption{ Match::allWithNormalizing, &blockset }, pretokenized);
 	thread_local Vector<size_t> validResIdx;
 	validResIdx.clear();
 	for (size_t i = 0; i < res.size(); ++i)
@@ -144,7 +144,7 @@ bool HSDataset::tokenizeUnlikely(Vector<std::pair<int32_t, int32_t>>& out, int32
 	auto& tokens = res[validResIdx[(size_t)(r * (float)validResIdx.size())]].first;
 	for (size_t i = 1; i < tokens.size() - 1; ++i)
 	{
-		out.emplace_back(tokens[i].morph->lmMorphemeId, tokens[i].morph->lmMorphemeId);
+		out.emplace_back(tokens[i].morph->lmMorphemeId, i > 1 ? tokens[i].morph->lmMorphemeId : 0);
 	}
 	return true;
 }
@@ -313,6 +313,7 @@ size_t HSDataset::_next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode,
 {
 	const auto& prepareNext = [&](size_t, size_t localId, size_t sentFirst, size_t sentLast)
 	{
+		auto knlm = std::dynamic_pointer_cast<lm::KnLangModelBase>(langModel);
 		auto& local = locals[localId];
 		auto& tokens = local.tokenBuf;
 		tokens.reserve(sents.get()[shuffledIdx[sentFirst]].size());
@@ -363,7 +364,7 @@ size_t HSDataset::_next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode,
 					switch (dropout(local.rng))
 					{
 					case 0: // no dropout
-						tokens.emplace_back(tWithOOV);
+						tokens.emplace_back(knlm ? t : tWithOOV);
 						break;
 					case 1: // replacement
 						tokens.emplace_back(getDefaultMorphemeId((*morphemes)[t].tag));
@@ -372,10 +373,10 @@ size_t HSDataset::_next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode,
 						break;
 					case 3: // insertion
 						tokens.emplace_back(getDefaultMorphemeId((*morphemes)[t].tag));
-						tokens.emplace_back(tWithOOV);
+						tokens.emplace_back(knlm ? t : tWithOOV);
 						break;
 					case 4: // insertion
-						tokens.emplace_back(tWithOOV);
+						tokens.emplace_back(knlm ? t : tWithOOV);
 						tokens.emplace_back(getDefaultMorphemeId((*morphemes)[t].tag));
 						break;
 					}
@@ -403,7 +404,7 @@ size_t HSDataset::_next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode,
 
 			local.lmLProbsBuf.resize(tokens.size());
 			local.outNgramNodeBuf.resize(tokens.size());
-			if (auto knlm = std::dynamic_pointer_cast<lm::KnLangModelBase>(langModel))
+			if (knlm)
 			{
 				knlm->evaluate(tokens.begin(), tokens.end(), local.lmLProbsBuf.begin(), local.outNgramNodeBuf.begin());
 			}

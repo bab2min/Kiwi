@@ -1,8 +1,5 @@
 #include "../MathFunc.hpp"
-#include "../gemm.h"
-
-#define Eigen EigenSSE2
-#include <Eigen/Dense>
+#include "../qgemm.h"
 
 namespace kiwi
 {
@@ -14,35 +11,24 @@ namespace kiwi
 		template void logSoftmaxTransposed<ArchType::sse2>(float* arr, size_t size, size_t batchSize, size_t stride);
 	}
 
-	namespace gemm
+	namespace qgemm
 	{
 		template<>
-		void gemm<ArchType::sse2>(
-			size_t m, size_t n, size_t k,
-			const float* aT, size_t strideA,
-			const float* b, size_t strideB,
-			float* c, size_t strideC
+		float requantizePackedU4<ArchType::sse2>(
+			size_t n,
+			size_t qgroup,
+			const uint8_t* packedInput,
+			const uint8_t* localScale,
+			float globalScale,
+			bool toUint8,
+			uint8_t* out
 		)
 		{
-			Eigen::Map<const Eigen::MatrixXf, 0, Eigen::OuterStride<>> aMap(aT, k, m, Eigen::OuterStride<>(strideA));
-			Eigen::Map<const Eigen::MatrixXf, 0, Eigen::OuterStride<>> bMap(b, k, n, Eigen::OuterStride<>(strideB));
-			Eigen::Map<Eigen::MatrixXf, 0, Eigen::OuterStride<>> cMap(c, m, n, Eigen::OuterStride<>(strideC));
-			cMap.noalias() += aMap.transpose() * bMap;
-		}
-
-		template<>
-		void gemv<ArchType::sse2>(
-			size_t m, size_t k,
-			const float* aT, size_t strideA,
-			const float* b,
-			float* c
-		)
-		{
-			Eigen::Map<const Eigen::MatrixXf, 0, Eigen::OuterStride<>> aMap(aT, k, m, Eigen::OuterStride<>(strideA));
-			Eigen::Map<const Eigen::VectorXf> bMap(b, k);
-			Eigen::Map<Eigen::VectorXf> cMap(c, m);
-			cMap.noalias() += aMap.transpose() * bMap;
+			return requantizePackedU4<ArchType::none>(n, qgroup, packedInput, localScale, globalScale, toUint8, out);
 		}
 	}
 }
 
+#define Eigen EigenSSE2
+#define ARCH_TYPE ArchType::sse2
+#include "eigen_gemm.hpp"

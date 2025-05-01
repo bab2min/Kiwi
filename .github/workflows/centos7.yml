@@ -14,6 +14,8 @@ jobs:
       with:
         submodules: true
         lfs: true
+    - name: Print CPU Info
+      run: cat /proc/cpuinfo
     - uses: bab2min/run-on-arch-action@multiple-step
       id: runcmd
       with:
@@ -22,7 +24,7 @@ jobs:
         multipleRun: |
           - name: Update CMake
             run: |
-              /opt/python/cp310-cp310/bin/pip install cmake
+              /opt/python/cp310-cp310/bin/pip install "cmake<4"
               yum install java-1.8.0-openjdk-devel.x86_64 -y
           - name: Configure Build
             run: mkdir build && cd build && /opt/python/cp310-cp310/bin/cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_JAVA_BINDING=1  ..
@@ -42,6 +44,8 @@ jobs:
               mkdir eval_results
               ./build/kiwi-evaluator -m ./models/base --morph eval_data/*.txt -t knlm -o eval_results/
               ./build/kiwi-evaluator -m ./models/base --morph eval_data/*.txt -t sbg -o eval_results/
+              ./build/kiwi-evaluator -m ./models/cong/base --morph eval_data/*.txt -t cong -o eval_results/
+              ./build/kiwi-evaluator -m ./models/cong/base --morph eval_data/*.txt -t cong-global -o eval_results/
           - run: tar -zcvf arts.tgz build/*kiwi* build/test/*kiwi* eval_results/*.txt build/bindings/java/*.jar
     - name: Archive binaries
       uses: actions/upload-artifact@v4

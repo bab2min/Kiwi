@@ -26,6 +26,12 @@ namespace kiwi
 {
     namespace simd
     {
+        template<ArchType arch, size_t size>
+        struct BestArchType
+        {
+			static constexpr ArchType value = arch;
+        };
+
         template<ArchType arch>
         struct PacketTrait;
 
@@ -256,6 +262,12 @@ namespace kiwi
 {
     namespace simd
     {
+        template<size_t size>
+        struct BestArchType<ArchType::sse2, size>
+        {
+			static constexpr ArchType value = ArchType::sse2;
+        };
+
         template<>
         struct PacketTrait<ArchType::sse2>
         {
@@ -263,6 +275,10 @@ namespace kiwi
             using IntPacket = __m128i;
             using FloatPacket = __m128;
         };
+
+        template<size_t size>
+		struct BestArchType<ArchType::sse4_1, size> : public BestArchType<ArchType::sse2, size>
+        {};
 
         template<>
         struct PacketTrait<ArchType::sse4_1> : public PacketTrait<ArchType::sse2>
@@ -279,8 +295,8 @@ namespace kiwi
             static STRONG_INLINE __m128 maddf(__m128 a, __m128 b, __m128 c) { return O::addf(O::mulf(a, b), c); }
 			static STRONG_INLINE __m128i set1i(int32_t a) { return _mm_set1_epi32(a); }
             static STRONG_INLINE __m128 set1f(float a) { return _mm_set1_ps(a); }
-            static STRONG_INLINE __m128 loadf(const float* a) { return _mm_load_ps(a); }
-            static STRONG_INLINE void storef(float* a, __m128 b) { return _mm_store_ps(a, b); }
+            static STRONG_INLINE __m128 loadf(const float* a) { return _mm_loadu_ps(a); }
+            static STRONG_INLINE void storef(float* a, __m128 b) { return _mm_storeu_ps(a, b); }
             static STRONG_INLINE __m128 maxf(__m128 a, __m128 b) { return _mm_max_ps(a, b); }
             static STRONG_INLINE __m128 minf(__m128 a, __m128 b) { return _mm_min_ps(a, b); }
 
@@ -409,6 +425,12 @@ namespace kiwi
 #endif
 
 #if defined(_MSC_VER) || defined(__AVX2__)
+        template<size_t size>
+        struct BestArchType<ArchType::avx2, size>
+        {
+            static constexpr ArchType value = size >= 8 ? ArchType::avx2 : ArchType::sse4_1;
+        };
+
         template<>
         struct PacketTrait<ArchType::avx2>
         {
@@ -427,8 +449,8 @@ namespace kiwi
             static STRONG_INLINE __m256 maddf(__m256 a, __m256 b, __m256 c) { return _mm256_fmadd_ps(a, b, c); }
 			static STRONG_INLINE __m256i set1i(int32_t a) { return _mm256_set1_epi32(a); }
             static STRONG_INLINE __m256 set1f(float a) { return _mm256_set1_ps(a); }
-            static STRONG_INLINE __m256 loadf(const float* a) { return _mm256_load_ps(a); }
-            static STRONG_INLINE void storef(float* a, __m256 b) { return _mm256_store_ps(a, b); }
+            static STRONG_INLINE __m256 loadf(const float* a) { return _mm256_loadu_ps(a); }
+            static STRONG_INLINE void storef(float* a, __m256 b) { return _mm256_storeu_ps(a, b); }
             static STRONG_INLINE __m256 maxf(__m256 a, __m256 b) { return _mm256_max_ps(a, b); }
             static STRONG_INLINE __m256 minf(__m256 a, __m256 b) { return _mm256_min_ps(a, b); }
             static STRONG_INLINE __m256 floorf(__m256 a) { return _mm256_floor_ps(a); }
@@ -580,6 +602,11 @@ namespace kiwi
 		{
 		};
 
+        template<size_t size>
+		struct BestArchType<ArchType::avx_vnni, size> : public BestArchType<ArchType::avx2, size>
+        {
+        };
+
         template<>
 		struct PacketTrait<ArchType::avx_vnni> : public PacketTrait<ArchType::avx2>
 		{
@@ -611,6 +638,12 @@ namespace kiwi
 #endif
 
 #if defined(_MSC_VER) || defined(__AVX512F__) || defined(__AVX512BW__)
+        template<size_t size>
+        struct BestArchType<ArchType::avx512bw, size>
+        {
+            static constexpr ArchType value = size >= 16 ? ArchType::avx512bw : ArchType::avx2;
+        };
+
         template<>
         struct PacketTrait<ArchType::avx512bw>
         {
@@ -629,8 +662,8 @@ namespace kiwi
             static STRONG_INLINE __m512 maddf(__m512 a, __m512 b, __m512 c) { return _mm512_fmadd_ps(a, b, c); }
 			static STRONG_INLINE __m512i set1i(int32_t a) { return _mm512_set1_epi32(a); }
             static STRONG_INLINE __m512 set1f(float a) { return _mm512_set1_ps(a); }
-            static STRONG_INLINE __m512 loadf(const float* a) { return _mm512_load_ps(a); }
-            static STRONG_INLINE void storef(float* a, __m512 b) { return _mm512_store_ps(a, b); }
+            static STRONG_INLINE __m512 loadf(const float* a) { return _mm512_loadu_ps(a); }
+            static STRONG_INLINE void storef(float* a, __m512 b) { return _mm512_storeu_ps(a, b); }
             static STRONG_INLINE __m512 maxf(__m512 a, __m512 b) { return _mm512_max_ps(a, b); }
             static STRONG_INLINE __m512 minf(__m512 a, __m512 b) { return _mm512_min_ps(a, b); }
             static STRONG_INLINE __m512 floorf(__m512 a) { return _mm512_floor_ps(a); }
@@ -729,6 +762,12 @@ namespace kiwi
 		struct Operator<ArchType::avx512bw> : public OperatorImpl<ArchType::avx512bw, Operator<ArchType::avx512bw>>
 		{
 		};
+        
+        template<size_t size>
+        struct BestArchType<ArchType::avx512vnni, size>
+        {
+            static constexpr ArchType value = size >= 16 ? ArchType::avx512vnni : ArchType::avx_vnni;
+        };
 
         template<>
 		struct PacketTrait<ArchType::avx512vnni> : public PacketTrait<ArchType::avx512bw>
@@ -781,6 +820,7 @@ namespace kiwi
             static STRONG_INLINE float32x4_t mulf(float32x4_t a, float32x4_t b) { return vmulq_f32(a, b); }
             static STRONG_INLINE float32x4_t divf(float32x4_t a, float32x4_t b) { return vdivq_f32(a, b); }
             static STRONG_INLINE float32x4_t maddf(float32x4_t a, float32x4_t b, float32x4_t c) { return addf(mulf(a, b), c); }
+            static STRONG_INLINE int32x4_t set1i(int32_t a) { return vdupq_n_s32(a); }
             static STRONG_INLINE float32x4_t set1f(float a) { return vdupq_n_f32(a); }
             static STRONG_INLINE float32x4_t loadf(const float* a) { return vld1q_f32(a); }
             static STRONG_INLINE void storef(float* a, float32x4_t b) { return vst1q_f32(a, b); }
@@ -790,8 +830,11 @@ namespace kiwi
             static STRONG_INLINE float32x4_t zerof() { return set1f(0.f); }
             static STRONG_INLINE float32x4_t negatef(float32x4_t a) { return subf(zerof(), a); }
             static STRONG_INLINE int32x4_t cast_to_int(float32x4_t a) { return vcvtq_s32_f32(a); }
+            static STRONG_INLINE float32x4_t cast_to_float(int32x4_t a) { return vcvtq_f32_s32(a); }
+            static STRONG_INLINE int32x4_t reinterpret_as_int(float32x4_t a) { return vreinterpretq_s32_f32(a); }
             static STRONG_INLINE float32x4_t reinterpret_as_float(int32x4_t a) { return vreinterpretq_f32_s32(a); }
             template<int bit> static STRONG_INLINE int32x4_t sll(int32x4_t a) { return vshlq_n_s32(a, bit); }
+            template<int bit> static STRONG_INLINE int32x4_t srl(int32x4_t a) { return vshrq_n_s32(a, bit); }
             static STRONG_INLINE float firstf(float32x4_t a) { return vgetq_lane_f32(a, 0); }
 
             static STRONG_INLINE float redsumf(float32x4_t a)
@@ -809,6 +852,41 @@ namespace kiwi
             static STRONG_INLINE float32x4_t redmaxbf(float32x4_t a)
             {
                 return set1f(redmaxf(a));
+            }
+
+			static STRONG_INLINE int32x4_t band(int32x4_t a, int32x4_t b) { return vandq_s32(a, b); }
+            static STRONG_INLINE float32x4_t band(float32x4_t a, float32x4_t b) { return reinterpret_as_float(band(reinterpret_as_int(a), reinterpret_as_int(b))); }
+
+			static STRONG_INLINE int32x4_t bor(int32x4_t a, int32x4_t b) { return vorrq_s32(a, b); }
+			static STRONG_INLINE float32x4_t bor(float32x4_t a, float32x4_t b) { return reinterpret_as_float(bor(reinterpret_as_int(a), reinterpret_as_int(b))); }
+
+			static STRONG_INLINE int32x4_t select(int32x4_t mask, int32x4_t a, int32x4_t b) 
+            {
+                return vbslq_s32(vreinterpretq_u32_s32(mask), a, b);
+            }
+            static STRONG_INLINE float32x4_t select(float32x4_t mask, float32x4_t a, float32x4_t b)
+            {
+                return vbslq_f32(vreinterpretq_u32_f32(mask), a, b);
+            }
+
+			static STRONG_INLINE float32x4_t cmp_eq(float32x4_t a, float32x4_t b) 
+            {
+                return vreinterpretq_f32_u32(vceqq_f32(a, b)); // Compare equal
+            }
+
+            static STRONG_INLINE float32x4_t cmp_le(float32x4_t a, float32x4_t b) 
+            {
+                return vreinterpretq_f32_u32(vcleq_f32(a, b)); // Compare less than or equal
+            }
+
+            static STRONG_INLINE float32x4_t cmp_lt(float32x4_t a, float32x4_t b) 
+            {
+                return vreinterpretq_f32_u32(vcltq_f32(a, b)); // Compare less than
+            }
+
+            static STRONG_INLINE float32x4_t cmp_lt_or_nan(float32x4_t a, float32x4_t b) 
+            {
+                return vreinterpretq_f32_u32(vmvnq_u32(vcleq_f32(b, a)));
             }
 
             static STRONG_INLINE int32_t dotprod(const uint8_t* a, const int8_t* b, size_t size)

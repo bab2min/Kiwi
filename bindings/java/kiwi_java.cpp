@@ -273,7 +273,7 @@ public:
 	int add(const std::u16string& form, kiwi::POSTag tag)
 	{
 		if (!kiwiObj) return -1;
-		auto found = kiwiObj->findMorpheme(form, tag);
+		auto found = kiwiObj->findMorphemes(form, tag);
 		int added = 0;
 		for(auto& m : found) added += morphSet.emplace(m).second ? 1 : 0;
 		return added;
@@ -368,7 +368,7 @@ public:
 		{
 			while (pretokenized.hasNext()) pretokenizedSpans.emplace_back(pretokenized.next());
 		}
-		return Kiwi::analyze(text, topN, matchOption, blocklist ? &blocklist->morphSet : nullptr, pretokenizedSpans);
+		return Kiwi::analyze(text, topN, kiwi::AnalyzeOption{ matchOption, blocklist ? &blocklist->morphSet : nullptr }, pretokenizedSpans);
 	}
 
 	JFutureTokenResult asyncAnalyze(jni::JRef<JKiwi> _ref, const std::u16string& text, uint64_t topN, kiwi::Match matchOption, JMorphemeSet* blocklist, jni::JIterator<kiwi::PretokenizedSpan> pretokenized) const
@@ -378,7 +378,7 @@ public:
 		{
 			while (pretokenized.hasNext()) pretokenizedSpans.emplace_back(pretokenized.next());
 		}
-		return { _ref, Kiwi::asyncAnalyze(text, topN, matchOption, blocklist ? &blocklist->morphSet : nullptr, pretokenizedSpans) };
+		return { _ref, Kiwi::asyncAnalyze(text, topN, kiwi::AnalyzeOption{ matchOption, blocklist ? &blocklist->morphSet : nullptr}, pretokenizedSpans) };
 	}
 
 	JMultipleTokenResult analyze2(jni::JRef<JKiwi> _ref, jni::JIterator<std::u16string> texts, uint64_t topN, kiwi::Match matchOption, JMorphemeSet* blocklist, jni::JIterator<jni::JIterator<kiwi::PretokenizedSpan>> pretokenized) const
@@ -484,8 +484,7 @@ bool JMultipleTokenResult::feed()
 	futures.emplace_back(static_cast<kiwi::Kiwi&>(dp.get()).asyncAnalyze(
 		texts.next(), 
 		topN, 
-		matchOption, 
-		blocklist ? &blocklist->morphSet : nullptr, 
+		kiwi::AnalyzeOption{ matchOption, blocklist ? &blocklist->morphSet : nullptr },
 		std::move(pretokenizedSpans)
 	));
 	return true;

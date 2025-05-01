@@ -1,7 +1,5 @@
 #include "../MathFunc.hpp"
-#include "../gemm.h"
-
-#include <Eigen/Dense>
+#include "../qgemm.h"
 
 namespace kiwi
 {
@@ -18,45 +16,81 @@ namespace kiwi
 		template void logSoftmaxTransposed<ArchType::balanced>(float* arr, size_t size, size_t batchSize, size_t stride);
 	}
 
-	namespace gemm
+	namespace qgemm
 	{
 		template<>
-		void gemm<ArchType::none>(
-			size_t m, size_t n, size_t k,
-			const float* aT, size_t strideA,
-			const float* b, size_t strideB,
-			float* c, size_t strideC
+		float requantizePackedU4<ArchType::none>(
+			size_t n,
+			size_t qgroup,
+			const uint8_t* packedInput,
+			const uint8_t* localScale,
+			float globalScale,
+			bool toUint8,
+			uint8_t* out
 		)
 		{
-			Eigen::Map<const Eigen::MatrixXf, 0, Eigen::OuterStride<>> aMap(aT, k, m, Eigen::OuterStride<>(strideA));
-			Eigen::Map<const Eigen::MatrixXf, 0, Eigen::OuterStride<>> bMap(b, k, n, Eigen::OuterStride<>(strideB));
-			Eigen::Map<Eigen::MatrixXf, 0, Eigen::OuterStride<>> cMap(c, m, n, Eigen::OuterStride<>(strideC));
-			cMap.noalias() += aMap.transpose() * bMap;
+			const int8_t zeropointBias = 6;
+			const uint8_t scaleBias = 9;
+			const int16_t scaleDivider = 9;
+			for (size_t i = 0; i < n / 2; ++i)
+			{
+				const uint8_t packed = packedInput[i];
+				int16_t lower = packed & 0x0F;
+				int16_t upper = (packed >> 4) & 0x0F;
+				uint8_t scale = localScale[(i * 2) / qgroup];
+				int16_t lzp = (scale >> 6) + zeropointBias;
+				scale = (scale & 0x3F) + scaleBias;
+				
+				lower = (lower - lzp) * scale;
+				lower += (lower >= 0) ? 4 : -4;
+				lower /= scaleDivider;
+				upper = (upper - lzp) * scale;
+				upper += (upper >= 0) ? 4 : -4;
+				upper /= scaleDivider;
+				if (toUint8)
+				{
+					lower += 128;
+					upper += 128;
+				}
+				out[i * 2] = static_cast<uint8_t>(lower);
+				out[i * 2 + 1] = static_cast<uint8_t>(upper);
+			}
+			return globalScale / 8;
 		}
 
+		template<>
+		float requantizePackedU4<ArchType::balanced>(
+			size_t n,
+			size_t qgroup,
+			const uint8_t* packedInput,
+			const uint8_t* localScale,
+			float globalScale,
+			bool toUint8,
+			uint8_t* out
+		)
+		{
+			return requantizePackedU4<ArchType::none>(n, qgroup, packedInput, localScale, globalScale, toUint8, out);
+		}
+	}
+}
+
+#define ARCH_TYPE ArchType::none
+#include "eigen_gemm.hpp"
+
+namespace kiwi
+{
+	namespace gemm
+	{
 		template<>
 		void gemm<ArchType::balanced>(
 			size_t m, size_t n, size_t k,
 			const float* aT, size_t strideA,
 			const float* b, size_t strideB,
-			float* c, size_t strideC
+			float* c, size_t strideC,
+			bool zeroMode
 		)
 		{
-			return gemm<ArchType::none>(m, n, k, aT, strideA, b, strideB, c, strideC);
-		}
-
-		template<>
-		void gemv<ArchType::none>(
-			size_t m, size_t k,
-			const float* aT, size_t strideA,
-			const float* b,
-			float* c
-		)
-		{
-			Eigen::Map<const Eigen::MatrixXf, 0, Eigen::OuterStride<>> aMap(aT, k, m, Eigen::OuterStride<>(strideA));
-			Eigen::Map<const Eigen::VectorXf> bMap(b, k);
-			Eigen::Map<Eigen::VectorXf> cMap(c, m);
-			cMap.noalias() += aMap.transpose() * bMap;
+			return gemm<ArchType::none>(m, n, k, aT, strideA, b, strideB, c, strideC, zeroMode);
 		}
 
 		template<>
@@ -64,10 +98,32 @@ namespace kiwi
 			size_t m, size_t k,
 			const float* aT, size_t strideA,
 			const float* b,
+			float* c,
+			bool zeroMode
+		)
+		{
+			return gemv<ArchType::none>(m, k, aT, strideA, b, c, zeroMode);
+		}
+
+		template<>
+		void mul<ArchType::balanced>(
+			size_t n,
+			float a,
+			const float* b,
 			float* c
 		)
 		{
-			return gemv<ArchType::none>(m, k, aT, strideA, b, c);
+			return mul<ArchType::none>(n, a, b, c);
+		}
+
+		template<>
+		void invNorm<ArchType::balanced>(
+			size_t m, size_t k,
+			const float* a, size_t lda,
+			float* out
+		)
+		{
+			return invNorm<ArchType::none>(m, k, a, lda, out);
 		}
 	}
 }
