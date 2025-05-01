@@ -66,7 +66,7 @@ jobs:
       matrix:
           arch: [x86_64, arm64]
     runs-on: ${{ matrix.arch == 'x86_64' && 'macos-13' || 'macos-14' }}
-    name: ${{ matrix.arch }}
+    name: macOS - ${{ matrix.arch }}
 
     steps:
     - uses: actions/checkout@v3
