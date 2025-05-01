@@ -333,7 +333,7 @@ json kiwiAnalyze(Kiwi& kiwi, const json& args) {
     const BlockListArg blockListArg(kiwi, args, 2);
     const auto pretokenized = parsePretokenizedArg(args, 3);
     
-    const TokenResult tokenResult = kiwi.analyze(str, (Match)matchOptions, blockListArg.setPtr(), pretokenized);
+    const TokenResult tokenResult = kiwi.analyze(str, AnalyzeOption{ matchOptions, blockListArg.setPtr() }, pretokenized);
 
     return serializeTokenResult(kiwi, tokenResult);
 }
@@ -345,7 +345,7 @@ json kiwiAnalyzeTopN(Kiwi& kiwi, const json& args) {
     const BlockListArg blockListArg(kiwi, args, 3);
     const auto pretokenized = parsePretokenizedArg(args, 4);
 
-    const std::vector<TokenResult> tokenResults = kiwi.analyze(str, topN, matchOptions, blockListArg.setPtr(), pretokenized);
+    const std::vector<TokenResult> tokenResults = kiwi.analyze(str, topN, AnalyzeOption{ matchOptions, blockListArg.setPtr() }, pretokenized);
 
     return serializeTokenResultVec(kiwi, tokenResults);
 }
@@ -356,7 +356,7 @@ json kiwiTokenize(Kiwi& kiwi, const json& args) {
     const BlockListArg blockListArg(kiwi, args, 2);
     const auto pretokenized = parsePretokenizedArg(args, 3);
     
-    const TokenResult tokenResult = kiwi.analyze(str, (Match)matchOptions, blockListArg.setPtr(), pretokenized);
+    const TokenResult tokenResult = kiwi.analyze(str, AnalyzeOption{ matchOptions, blockListArg.setPtr() }, pretokenized);
 
     return serializeTokenInfoVec(kiwi, tokenResult.first);
 }
@@ -368,7 +368,7 @@ json kiwiTokenizeTopN(Kiwi& kiwi, const json& args) {
     const BlockListArg blockListArg(kiwi, args, 3);
     const auto pretokenized = parsePretokenizedArg(args, 4);
 
-    const std::vector<TokenResult> tokenResults = kiwi.analyze(str, topN, matchOptions, blockListArg.setPtr(), pretokenized);
+    const std::vector<TokenResult> tokenResults = kiwi.analyze(str, topN, AnalyzeOption{ matchOptions, blockListArg.setPtr() }, pretokenized);
 
     json result = json::array();
     for (const TokenResult& tokenResult : tokenResults) {
