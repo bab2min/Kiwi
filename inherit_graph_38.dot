@@ -5,5 +5,13 @@ digraph "Graphical Class Hierarchy"
   edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
   node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
   rankdir="LR";
-  Node0 [id="Node000000",label="kiwi::lm::KnLangModelHeader",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$structkiwi_1_1lm_1_1KnLangModelHeader.html",tooltip=" "];
+  Node0 [id="Node000000",label="kiwi::lm::ILangModel",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$classkiwi_1_1lm_1_1ILangModel.html",tooltip=" "];
+  Node0 -> Node1 [id="edge4_Node000000_Node000001",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node1 [id="Node000001",label="kiwi::lm::CoNgramModelBase",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$classkiwi_1_1lm_1_1CoNgramModelBase.html",tooltip=" "];
+  Node0 -> Node2 [id="edge5_Node000000_Node000002",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node2 [id="Node000002",label="kiwi::lm::KnLangModelBase",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$classkiwi_1_1lm_1_1KnLangModelBase.html",tooltip=" "];
+  Node0 -> Node3 [id="edge6_Node000000_Node000003",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node3 [id="Node000003",label="kiwi::lm::SkipBigramModelBase",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$classkiwi_1_1lm_1_1SkipBigramModelBase.html",tooltip=" "];
+  Node0 -> Node4 [id="edge7_Node000000_Node000004",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node4 [id="Node000004",label="kiwi::lm::VoidLangModel\l\< arch \>",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$classkiwi_1_1lm_1_1VoidLangModel.html",tooltip=" "];
 }

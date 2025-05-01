@@ -79,7 +79,7 @@ $(function() {
 <a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="classkiwi_1_1lm_1_1CoNgramModelBase-members.html">List of all members</a>  </div>
-  <div class="headertitle"><div class="title">kiwi::lm::CoNgramModelBase Class Reference</div></div>
+  <div class="headertitle"><div class="title">kiwi::lm::CoNgramModelBase Class Reference<span class="mlabels"><span class="mlabel">abstract</span></span></div></div>
 </div><!--header-->
 <div class="contents">
 <div class="dynheader">
@@ -102,6 +102,30 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:af47f9567c3692e41761707695fbc03e4" id="r_af47f9567c3692e41761707695fbc03e4"><td class="memItemLeft" align="right" valign="top"><a id="af47f9567c3692e41761707695fbc03e4" name="af47f9567c3692e41761707695fbc03e4"></a>
 const <a class="el" href="structkiwi_1_1lm_1_1CoNgramModelHeader.html">CoNgramModelHeader</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>getHeader</b> () const</td></tr>
 <tr class="separator:af47f9567c3692e41761707695fbc03e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad1c984bb5e4012b89b1973845bbed349" id="r_ad1c984bb5e4012b89b1973845bbed349"><td class="memItemLeft" align="right" valign="top"><a id="ad1c984bb5e4012b89b1973845bbed349" name="ad1c984bb5e4012b89b1973845bbed349"></a>
+virtual size_t&#160;</td><td class="memItemRight" valign="bottom"><b>mostSimilarWords</b> (uint32_t vocabId, size_t topN, std::pair&lt; uint32_t, float &gt; *output) const =0</td></tr>
+<tr class="separator:ad1c984bb5e4012b89b1973845bbed349"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a99b9c15ac4d0625e5fbcd805ea1845fa" id="r_a99b9c15ac4d0625e5fbcd805ea1845fa"><td class="memItemLeft" align="right" valign="top"><a id="a99b9c15ac4d0625e5fbcd805ea1845fa" name="a99b9c15ac4d0625e5fbcd805ea1845fa"></a>
+virtual float&#160;</td><td class="memItemRight" valign="bottom"><b>wordSimilarity</b> (uint32_t vocabId1, uint32_t vocabId2) const =0</td></tr>
+<tr class="separator:a99b9c15ac4d0625e5fbcd805ea1845fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac94852f36b6f31809e4e84f5fdc92488" id="r_ac94852f36b6f31809e4e84f5fdc92488"><td class="memItemLeft" align="right" valign="top"><a id="ac94852f36b6f31809e4e84f5fdc92488" name="ac94852f36b6f31809e4e84f5fdc92488"></a>
+virtual size_t&#160;</td><td class="memItemRight" valign="bottom"><b>mostSimilarContexts</b> (uint32_t contextId, size_t topN, std::pair&lt; uint32_t, float &gt; *output) const =0</td></tr>
+<tr class="separator:ac94852f36b6f31809e4e84f5fdc92488"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a17798f27727c0073a75b15c886da89b3" id="r_a17798f27727c0073a75b15c886da89b3"><td class="memItemLeft" align="right" valign="top"><a id="a17798f27727c0073a75b15c886da89b3" name="a17798f27727c0073a75b15c886da89b3"></a>
+virtual float&#160;</td><td class="memItemRight" valign="bottom"><b>contextSimilarity</b> (uint32_t contextId1, uint32_t contextId2) const =0</td></tr>
+<tr class="separator:a17798f27727c0073a75b15c886da89b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abb4ac0fef2710e53805ca23be8c69fda" id="r_abb4ac0fef2710e53805ca23be8c69fda"><td class="memItemLeft" align="right" valign="top"><a id="abb4ac0fef2710e53805ca23be8c69fda" name="abb4ac0fef2710e53805ca23be8c69fda"></a>
+virtual size_t&#160;</td><td class="memItemRight" valign="bottom"><b>predictWordsFromContext</b> (uint32_t contextId, size_t topN, std::pair&lt; uint32_t, float &gt; *output) const =0</td></tr>
+<tr class="separator:abb4ac0fef2710e53805ca23be8c69fda"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a09a20e943f668e3df0c2bdf65149decb" id="r_a09a20e943f668e3df0c2bdf65149decb"><td class="memItemLeft" align="right" valign="top"><a id="a09a20e943f668e3df0c2bdf65149decb" name="a09a20e943f668e3df0c2bdf65149decb"></a>
+virtual size_t&#160;</td><td class="memItemRight" valign="bottom"><b>predictWordsFromContextDiff</b> (uint32_t contextId, uint32_t bgContextId, float weight, size_t topN, std::pair&lt; uint32_t, float &gt; *output) const =0</td></tr>
+<tr class="separator:a09a20e943f668e3df0c2bdf65149decb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a54329f21eb49c12bb3e1ff28eefd5aec" id="r_a54329f21eb49c12bb3e1ff28eefd5aec"><td class="memItemLeft" align="right" valign="top"><a id="a54329f21eb49c12bb3e1ff28eefd5aec" name="a54329f21eb49c12bb3e1ff28eefd5aec"></a>
+virtual uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>toContextId</b> (const uint32_t *vocabIds, size_t size) const =0</td></tr>
+<tr class="separator:a54329f21eb49c12bb3e1ff28eefd5aec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac10702cb7e99caa1b662774b44e340dc" id="r_ac10702cb7e99caa1b662774b44e340dc"><td class="memItemLeft" align="right" valign="top"><a id="ac10702cb7e99caa1b662774b44e340dc" name="ac10702cb7e99caa1b662774b44e340dc"></a>
+virtual std::vector&lt; std::vector&lt; uint32_t &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getContextWordMap</b> () const =0</td></tr>
+<tr class="separator:ac10702cb7e99caa1b662774b44e340dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classkiwi_1_1lm_1_1ILangModel"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classkiwi_1_1lm_1_1ILangModel')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classkiwi_1_1lm_1_1ILangModel.html">kiwi::lm::ILangModel</a></td></tr>
 <tr class="memitem:a844eac63cf5db99fffcd0205be81831d inherit pub_methods_classkiwi_1_1lm_1_1ILangModel" id="r_a844eac63cf5db99fffcd0205be81831d"><td class="memItemLeft" align="right" valign="top">
 virtual <a class="el" href="Types_8h.html#af7906391a8e367cab5296bac8d4caafa">ModelType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>getType</b> () const =0</td></tr>
