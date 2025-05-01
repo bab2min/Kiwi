@@ -48,29 +48,13 @@ Visual Studio 2019 이상을 사용하여 `Kiwi.sln` 파일을 실행하여 컴�
 이 레포지토리를 clone한 뒤 cmake>=3.12를 사용하여 컴파일합니다. 
 모델 파일은 용량이 큰 관계로 [Git LFS](https://git-lfs.github.com/)를 통해 공유됩니다. 따라서 `git clone`에 앞서 Git LFS가 설치되어있는지 확인해주세요.
 
-##### gcc >= 5.0 이상 혹은 다른 c++11 호환 컴파일러 사용가능 환경
+##### gcc >= 7 이상 혹은 기타 c++17 호환 컴파일러 사용가능 환경
 ```console
 $ git clone https://github.com/bab2min/Kiwi
 $ cd Kiwi
 $ git lfs pull
 $ git submodule sync
 $ git submodule update --init --recursive
-$ mkdir build && cd build
-$ cmake -DCMAKE_BUILD_TYPE=Release ../
-$ make
-$ make install
-$ ldconfig
-```
-
-##### gcc >= 4.8, < 5.0
-Centos5와 같이 gcc 4.8까지만 지원하는 환경에서는 googletest의 버전을 1.8.x로 낮춰야 컴파일 가능합니다.
-```console
-$ git clone https://github.com/bab2min/Kiwi
-$ cd Kiwi
-$ git lfs pull
-$ git submodule sync
-$ git submodule update --init --recursive
-$ cd third_party/googletest && git checkout v1.8.x && cd ../../
 $ mkdir build && cd build
 $ cmake -DCMAKE_BUILD_TYPE=Release ../
 $ make
@@ -80,7 +64,7 @@ $ ldconfig
 
 설치가 잘 됐는지 확인하기 위해서는 `kiwi-evaluator`를 실행해봅니다.
 ```console
-$ ./kiwi-evaluator --model ../models/base ../eval_data/* --sbg
+$ ./kiwi-evaluator --model ../models/base ../eval_data/* --largest
 Loading Time : 981.745 ms
 ArchType : avx2
 LM Size : 34.1853 MB
@@ -110,7 +94,7 @@ Avg Score
 
 0.13.0 버전부터 추가된 오타 교정 기능이 잘 작동하는지 확인하기 위해서는 다음과 같이 실행합니다.
 ```console
-$ ./kiwi-evaluator --model ../models/base ../eval_data/* --sbg --typo 6
+$ ./kiwi-evaluator --model ../models/base ../eval_data/* --largest --typo 6
 Loading Time : 9414.45 ms
 ArchType : avx2
 LM Size : 34.1853 MB
