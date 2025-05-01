@@ -64,11 +64,9 @@ jobs:
   build-macos:
     strategy:
       matrix:
-          os: [macos-13]
           arch: [x86_64, arm64]
-
-    runs-on: ${{ matrix.os }}
-    name: ${{ matrix.os }} - ${{ matrix.arch }}
+    runs-on: ${{ matrix.arch == 'x86_64' && 'macos-13' || 'macos-14' }}
+    name: ${{ matrix.arch }}
 
     steps:
     - uses: actions/checkout@v3
@@ -194,7 +192,7 @@ jobs:
       matrix:
         arch: [aarch64, ppc64le]
     name: Centos7-${{ matrix.arch }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.arch == 'aarch64' && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
     steps:
     - uses: actions/checkout@v3
       with:
