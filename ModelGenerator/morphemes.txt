@@ -10147,6 +10147,7 @@
 두고두고	MAG	1285
 별거	NNG	1513
 만두	NNG	4033
+만둣국	NNG	4033	complex 만두/NNG ᆺ/Z_SIOT 국/NNG 021223
 시월	NNG	612
 계파	NNG	413
 즙	NNG	2187
@@ -73458,7 +73459,7 @@ LG생활건강	NNP	116
 식민사관	NNP	84
 마르티네즈	NNP	84
 우주론	NNP	84
-시곗바늘	NNG	84
+시곗바늘	NNG	84	complex 시계/NNG ᆺ/Z_SIOT 바늘/NNG 021224
 걸쇠	NNG	84
 약취	NNG	84
 오사무	NNP	84
