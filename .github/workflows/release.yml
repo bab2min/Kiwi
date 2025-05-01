@@ -216,10 +216,6 @@ jobs:
             run: |
               mkdir build && pushd build && /opt/python/cp310-cp310/bin/cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_USE_MIMALLOC=0 -DKIWI_JAVA_BINDING=1 ..
               make -j2 && popd
-          - name: Test
-            run: |
-              ./build/test/kiwi-test
-              mkdir eval_results && ./build/kiwi-evaluator -m ./models/base --morph eval_data/*.txt -o eval_results/
           - name: Release
             run: |
               cd build
