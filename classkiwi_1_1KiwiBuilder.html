@@ -123,9 +123,9 @@ Public Member Functions</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><b>KiwiBuilder</b> (const std::string &amp;modelPath, const <a class="el" href="structkiwi_1_1KiwiBuilder_1_1ModelBuildArgs.html">ModelBuildArgs</a> &amp;args)</td></tr>
 <tr class="memdesc:aaf6cf74f8ba2b589a939932a6851e8d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">기본 모델로부터 확장 모델을 학습하여 생성한다. <br /></td></tr>
 <tr class="separator:aaf6cf74f8ba2b589a939932a6851e8d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a56a00f19e5315e5af6425d0d8649f6bb" id="r_a56a00f19e5315e5af6425d0d8649f6bb"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1KiwiBuilder.html#a56a00f19e5315e5af6425d0d8649f6bb">KiwiBuilder</a> (const std::string &amp;modelPath, size_t numThreads=0, <a class="el" href="Types_8h.html#a7b5ed1c7b90b79877f32c8a011c06ff3">BuildOption</a> options=BuildOption::default_, <a class="el" href="Types_8h.html#af7906391a8e367cab5296bac8d4caafa">ModelType</a> modelType=<a class="el" href="Types_8h.html#af7906391a8e367cab5296bac8d4caafaa334c4a4c42fdb79d7ebc3e73b517e6f8">ModelType::none</a>)</td></tr>
-<tr class="memdesc:a56a00f19e5315e5af6425d0d8649f6bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">KiwiBuilder를 모델 파일로부터 생성한다.  <br /></td></tr>
-<tr class="separator:a56a00f19e5315e5af6425d0d8649f6bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1e3567e7187a721b939fb082fa12d969" id="r_a1e3567e7187a721b939fb082fa12d969"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1KiwiBuilder.html#a1e3567e7187a721b939fb082fa12d969">KiwiBuilder</a> (const std::string &amp;modelPath, size_t numThreads=-1, <a class="el" href="Types_8h.html#a7b5ed1c7b90b79877f32c8a011c06ff3">BuildOption</a> options=BuildOption::default_, <a class="el" href="Types_8h.html#af7906391a8e367cab5296bac8d4caafa">ModelType</a> modelType=<a class="el" href="Types_8h.html#af7906391a8e367cab5296bac8d4caafaa334c4a4c42fdb79d7ebc3e73b517e6f8">ModelType::none</a>)</td></tr>
+<tr class="memdesc:a1e3567e7187a721b939fb082fa12d969"><td class="mdescLeft">&#160;</td><td class="mdescRight">KiwiBuilder를 모델 파일로부터 생성한다.  <br /></td></tr>
+<tr class="separator:a1e3567e7187a721b939fb082fa12d969"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1f90bdbca2a4d4a7d5a9b8b2fb052cfd" id="r_a1f90bdbca2a4d4a7d5a9b8b2fb052cfd"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1KiwiBuilder.html#a1f90bdbca2a4d4a7d5a9b8b2fb052cfd">ready</a> () const</td></tr>
 <tr class="memdesc:a1f90bdbca2a4d4a7d5a9b8b2fb052cfd"><td class="mdescLeft">&#160;</td><td class="mdescRight">현재 <a class="el" href="classkiwi_1_1KiwiBuilder.html" title="형태소 분석에 사용될 사전을 관리하고, 사전을 바탕으로 실제 형태소 분석을 수행하는 Kiwi의 인스턴스를 생성하는 클래스.">KiwiBuilder</a> 객체가 유효한 분석 모델을 로딩한 상태인지 알려준다.  <br /></td></tr>
 <tr class="separator:a1f90bdbca2a4d4a7d5a9b8b2fb052cfd"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -235,8 +235,8 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><b>buildMorphData
 
 </div>
 </div>
-<a id="a56a00f19e5315e5af6425d0d8649f6bb" name="a56a00f19e5315e5af6425d0d8649f6bb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a56a00f19e5315e5af6425d0d8649f6bb">&#9670;&#160;</a></span>KiwiBuilder() <span class="overload">[3/3]</span></h2>
+<a id="a1e3567e7187a721b939fb082fa12d969" name="a1e3567e7187a721b939fb082fa12d969"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1e3567e7187a721b939fb082fa12d969">&#9670;&#160;</a></span>KiwiBuilder() <span class="overload">[3/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -251,7 +251,7 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><b>buildMorphData
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>numThreads</em> = <code>0</code>, </td>
+          <td class="paramname"><em>numThreads</em> = <code>-1</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -277,7 +277,7 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><b>buildMorphData
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">modelPath</td><td>모델이 위치한 경로 </td></tr>
-    <tr><td class="paramname">numThreads</td><td>모델 및 형태소 분석에 사용할 스레드 개수 </td></tr>
+    <tr><td class="paramname">numThreads</td><td>모델 및 형태소 분석에 사용할 스레드 개수. 0일 경우 async를 지원하지 않는 단일 스레드에서 동작하며, 1 이상일 경우 지정한 개수만큼 worker 스레드를 생성하여 async가 지원된다. 기본값은 -1으로 이 경우 시스템의 CPU 코어 개수를 탐지하여 이 값을 numThreads값으로 설정한다. </td></tr>
     <tr><td class="paramname">options</td><td>생성 옵션. <code><a class="el" href="Types_8h.html#a7b5ed1c7b90b79877f32c8a011c06ff3" title="KiwiBuilder 생성시 사용되는 비트 플래그">kiwi::BuildOption</a></code>을 참조 </td></tr>
   </table>
   </dd>
