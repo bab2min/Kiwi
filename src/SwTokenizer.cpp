@@ -1474,7 +1474,9 @@ string SwTokenizer::decode(const uint32_t* ids, size_t length, bool ignoreErrors
 
 future<vector<uint32_t>> SwTokenizer::asyncEncode(const string& str) const
 {
-	return kiwi->getThreadPool()->enqueue([&](size_t, const string& str)
+	auto* pool = kiwi->getThreadPool();
+	if (!pool) throw SwTokenizerException{ "async mode is unavailable in `numThreads == 0`" };
+	return pool->enqueue([&](size_t, const string& str)
 	{
 		return encode(str);
 	}, str);
@@ -1482,7 +1484,9 @@ future<vector<uint32_t>> SwTokenizer::asyncEncode(const string& str) const
 
 future<pair<vector<uint32_t>, vector<pair<uint32_t, uint32_t>>>> SwTokenizer::asyncEncodeOffset(const string& str, bool offsetInChrLevel) const
 {
-	return kiwi->getThreadPool()->enqueue([&, offsetInChrLevel](size_t, const string& str)
+	auto* pool = kiwi->getThreadPool();
+	if (!pool) throw SwTokenizerException{ "async mode is unavailable in `numThreads == 0`" };
+	return pool->enqueue([&, offsetInChrLevel](size_t, const string& str)
 	{
 		vector<pair<uint32_t, uint32_t>> offset;
 		auto ids = encode(str, &offset, offsetInChrLevel);

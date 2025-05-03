@@ -42,8 +42,8 @@ namespace kiwi
 		static constexpr FromRawData fromRawDataTag = {};
 
 		WordDetector() = default;
-		WordDetector(const std::string& modelPath, size_t _numThreads = 0);
-		WordDetector(FromRawData, const std::string& modelPath, size_t _numThreads = 0);
+		WordDetector(const std::string& modelPath, size_t _numThreads = -1);
+		WordDetector(FromRawData, const std::string& modelPath, size_t _numThreads = -1);
 
 		bool ready() const
 		{

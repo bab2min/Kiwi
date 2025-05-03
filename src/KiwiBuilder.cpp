@@ -709,8 +709,8 @@ void KiwiBuilder::_addCorpusTo(
 					wids.emplace_back(-(ptrdiff_t)(oovId + 1));
 				}
 				else
-			{
-				wids.emplace_back(getDefaultMorphemeId(t));
+				{
+					wids.emplace_back(getDefaultMorphemeId(t));
 				}
 				continue;
 			}
@@ -830,7 +830,7 @@ ModelType KiwiBuilder::getModelType(const string& modelPath, bool largest)
 }
 
 KiwiBuilder::KiwiBuilder(const string& modelPath, size_t _numThreads, BuildOption _options, ModelType _modelType)
-	: detector{ modelPath, _numThreads }, options{ _options }, modelType{ _modelType }, numThreads{ _numThreads ? _numThreads : thread::hardware_concurrency() }
+	: detector{ modelPath, _numThreads }, options{ _options }, modelType{ _modelType }, numThreads{ _numThreads != (size_t)-1 ? _numThreads : thread::hardware_concurrency() }
 {
 	archType = getSelectedArch(ArchType::default_);
 
@@ -2035,7 +2035,7 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 	ret.morphemes.reserve(morphemes.size() + combinedMorphemes.size());
 	ret.combiningRule = combiningRule;
 	ret.integrateAllomorph = !!(options & BuildOption::integrateAllomorph);
-	if (numThreads > 1)
+	if (numThreads >= 1)
 	{
 		ret.pool = make_unique<utils::ThreadPool>(numThreads);
 	}
@@ -2424,7 +2424,7 @@ void KiwiBuilder::convertHSData(
 			transform ? &transformMap : nullptr	
 		);
 	}
-
+	
 	ofstream ofs;
 	sents.write_to_memory(openFile(ofs, outputPath, ios_base::binary));
 	if (generateOovDict)
@@ -2569,7 +2569,7 @@ HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes,
 				o.emplace_back();
 				if (oovDictMap.empty())
 				{
-				o.insert_data(s.begin(), s.end());
+					o.insert_data(s.begin(), s.end());
 				}
 				else
 				{

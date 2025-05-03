@@ -701,10 +701,12 @@ namespace kiwi
 		 * @brief KiwiBuilder를 모델 파일로부터 생성한다.
 		 *
 		 * @param modelPath 모델이 위치한 경로
-		 * @param numThreads 모델 및 형태소 분석에 사용할 스레드 개수
+		 * @param numThreads 모델 및 형태소 분석에 사용할 스레드 개수. 
+		 *                   0일 경우 async를 지원하지 않는 단일 스레드에서 동작하며, 1 이상일 경우 지정한 개수만큼 worker 스레드를 생성하여 async가 지원된다.
+		 *                   기본값은 -1으로 이 경우 시스템의 CPU 코어 개수를 탐지하여 이 값을 numThreads값으로 설정한다.
 		 * @param options 생성 옵션. `kiwi::BuildOption`을 참조
 		 */
-		KiwiBuilder(const std::string& modelPath, size_t numThreads = 0, BuildOption options = BuildOption::default_, ModelType modelType = ModelType::none);
+		KiwiBuilder(const std::string& modelPath, size_t numThreads = -1, BuildOption options = BuildOption::default_, ModelType modelType = ModelType::none);
 
 		/**
 		 * @brief 현재 KiwiBuilder 객체가 유효한 분석 모델을 로딩한 상태인지 알려준다.

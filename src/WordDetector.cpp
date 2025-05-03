@@ -151,7 +151,7 @@ struct WordDetector::Counter
 };
 
 WordDetector::WordDetector(const std::string& modelPath, size_t _numThreads)
-	: numThreads{ _numThreads ? _numThreads : std::thread::hardware_concurrency() }
+	: numThreads{ _numThreads != (size_t)-1 ? _numThreads : std::thread::hardware_concurrency()}
 {
 	{
 		ifstream ifs;
@@ -160,7 +160,7 @@ WordDetector::WordDetector(const std::string& modelPath, size_t _numThreads)
 }
 
 WordDetector::WordDetector(FromRawData, const std::string& modelPath, size_t _numThreads)
-	: numThreads{ _numThreads ? _numThreads : std::thread::hardware_concurrency() }
+	: numThreads{ _numThreads != (size_t)-1 ? _numThreads : std::thread::hardware_concurrency() }
 {
 	{
 		ifstream ifs;
