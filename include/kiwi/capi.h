@@ -177,7 +177,7 @@ DECL_DLL void kiwi_clear_error();
  * @brief Kiwi Builder를 생성합니다.
  * 
  * @param model_path 모델의 경로.
- * @param num_threads 사용할 스레드의 개수. 0으로 지정시 가용한 스레드 개수를 자동으로 판단합니다.
+ * @param num_threads 사용할 스레드의 개수. -1로 지정시 가용한 스레드 개수를 자동으로 판단합니다.
  * @param options 생성 옵션. KIWI_BUILD_* 열거형을 참조하십시오.
  * @return 성공 시 Kiwi Builder의 핸들을 반환합니다. 
  * 실패시 null를 반환하고 에러 메세지를 설정합니다. 
@@ -451,7 +451,7 @@ DECL_DLL int kiwi_typo_close(kiwi_typo_h handle);
  * @brief KiwiBuilder를 거치지 않고 바로 Kiwi instance를 생성합니다.
  * 
  * @param model_path 모델이 들어있는 디렉토리 경로 (e.g., ./models/base).
- * @param num_threads 사용할 쓰레드의 수 (0일 경우, 자동으로 설정).
+ * @param num_threads 사용할 쓰레드의 수 (-1일 경우, 자동으로 설정).
  * @param options 생성 옵션. KIWI_BUILD_* 참조.
  * @return Kiwi의 핸들.
  */

@@ -5,20 +5,20 @@
 
 kiwi_h reuse_kiwi_instance()
 {
-	static kiwi_h kw = kiwi_init(MODEL_PATH, 0, KIWI_BUILD_DEFAULT);
+	static kiwi_h kw = kiwi_init(MODEL_PATH, -1, KIWI_BUILD_DEFAULT);
 	return kw;
 }
 
 TEST(KiwiC, InitClose) 
 {
-	kiwi_h kw = kiwi_init(MODEL_PATH, 0, KIWI_BUILD_DEFAULT);
+	kiwi_h kw = kiwi_init(MODEL_PATH, -1, KIWI_BUILD_DEFAULT);
 	EXPECT_NE(kw, nullptr);
 	EXPECT_EQ(kiwi_close(kw), 0);
 }
 
 TEST(KiwiC, BuilderInitClose)
 {
-	kiwi_builder_h kb = kiwi_builder_init(MODEL_PATH, 0, KIWI_BUILD_DEFAULT);
+	kiwi_builder_h kb = kiwi_builder_init(MODEL_PATH, -1, KIWI_BUILD_DEFAULT);
 	EXPECT_NE(kb, nullptr);
 	kiwi_h kw = kiwi_builder_build(kb, nullptr, 0);
 	EXPECT_NE(kw, nullptr);
@@ -28,7 +28,7 @@ TEST(KiwiC, BuilderInitClose)
 
 TEST(KiwiC, BuilderAddWords)
 {
-	kiwi_builder_h kb = kiwi_builder_init(MODEL_PATH, 0, KIWI_BUILD_DEFAULT);
+	kiwi_builder_h kb = kiwi_builder_init(MODEL_PATH, -1, KIWI_BUILD_DEFAULT);
 	EXPECT_NE(kb, nullptr);
 	EXPECT_EQ(kiwi_builder_add_word(kb, KWORD8, "NNP", 0.0), 0);
 	kiwi_h kw = kiwi_builder_build(kb, nullptr, 0);
@@ -142,7 +142,7 @@ TEST(KiwiC, AddRule)
 	kiwi_res_h ores = kiwi_analyze(okw, u8"했어요! 하잖아요! 할까요? 좋아요!", 1, KIWI_MATCH_ALL_WITH_NORMALIZING, nullptr, nullptr);
 
 	{
-		kiwi_builder_h kb = kiwi_builder_init(MODEL_PATH, 0, KIWI_BUILD_DEFAULT & ~KIWI_BUILD_LOAD_TYPO_DICT);
+		kiwi_builder_h kb = kiwi_builder_init(MODEL_PATH, -1, KIWI_BUILD_DEFAULT & ~KIWI_BUILD_LOAD_TYPO_DICT);
 
 		EXPECT_GT(kiwi_builder_add_rule(kb, "ef", kb_replacer, nullptr, 0), 0);
 		
@@ -155,7 +155,7 @@ TEST(KiwiC, AddRule)
 	}
 
 	{
-		kiwi_builder_h kb = kiwi_builder_init(MODEL_PATH, 0, KIWI_BUILD_DEFAULT & ~KIWI_BUILD_LOAD_TYPO_DICT);
+		kiwi_builder_h kb = kiwi_builder_init(MODEL_PATH, -1, KIWI_BUILD_DEFAULT & ~KIWI_BUILD_LOAD_TYPO_DICT);
 
 		EXPECT_GT(kiwi_builder_add_rule(kb, "ef", kb_replacer, nullptr, -1), 0);
 
@@ -172,7 +172,7 @@ TEST(KiwiC, AddRule)
 
 TEST(KiwiC, AddPreAnalyzedWord)
 {
-	kiwi_builder_h kb = kiwi_builder_init(MODEL_PATH, 0, KIWI_BUILD_DEFAULT);
+	kiwi_builder_h kb = kiwi_builder_init(MODEL_PATH, -1, KIWI_BUILD_DEFAULT);
 	const char* morphs[] = {
 		u8"팅기", u8"었", u8"어",
 	};
@@ -250,7 +250,7 @@ TEST(KiwiC, Regularity)
 TEST(KiwiC, AnalyzeBasicTypoSet)
 {
 	kiwi_h okw = reuse_kiwi_instance(), typo_kw;
-	kiwi_builder_h builder = kiwi_builder_init(MODEL_PATH, 0, KIWI_BUILD_DEFAULT);
+	kiwi_builder_h builder = kiwi_builder_init(MODEL_PATH, -1, KIWI_BUILD_DEFAULT);
 	typo_kw = kiwi_builder_build(builder, kiwi_typo_get_default(KIWI_TYPO_BASIC_TYPO_SET), 2.5f);
 	kiwi_set_option_f(typo_kw, KIWI_TYPO_COST_WEIGHT, 5);
 
@@ -271,7 +271,7 @@ TEST(KiwiC, AnalyzeBasicTypoSet)
 TEST(KiwiC, CustomTypoSet)
 {
 	kiwi_h okw = reuse_kiwi_instance(), typo_kw;
-	kiwi_builder_h builder = kiwi_builder_init(MODEL_PATH, 0, KIWI_BUILD_DEFAULT);
+	kiwi_builder_h builder = kiwi_builder_init(MODEL_PATH, -1, KIWI_BUILD_DEFAULT);
 	kiwi_typo_h basic_typo = kiwi_typo_get_default(KIWI_TYPO_BASIC_TYPO_SET),
 		continual_typo = kiwi_typo_get_default(KIWI_TYPO_CONTINUAL_TYPO_SET),
 		lengthening_typo = kiwi_typo_get_default(KIWI_TYPO_LENGTHENING_TYPO_SET),
