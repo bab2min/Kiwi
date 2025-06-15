@@ -1,103 +1,103 @@
-네 동미덜으느 어띠 다 밉은양하냐? 	네/IC 동미__1/NNG 덜/XSN 으/JKG 느/NP 어띠__1/MAG 다/MAG 밉은양하__1/VA-I 냐/EF ?/SF	네 동무들은 어찌 다 밉살스럽냐? 	너/NP 의/JKG 동무/NNG 들/XSN 은/JX 어찌/MAG 다/MAG 밉살스럽/VA-I 냐/EF ?/SF
-붕어 홰가 화어 홰두 맛잇구 잉에두 홰를 맨들어 먹으무 맛이 잇습지.	붕어/NNG 홰/NNG 가/JKS 화어/NNG 홰/NNG 두/MM 맛/NNG 잇/VV-I 구/EC 잉에__2/NNG 두/MM 홰/NNG 를/JKO 맨들/VV 어/EC 먹/VV 으/EF 무/NNG 맛/NNG 이/JKS 잇/NNG 습지/NNG ./SF	붕어 회와 황어 회도 맛있고 잉어도 회를 만들어 먹으면 맛이 있지요.	붕어/NNG 회/NNG 와/JC 황어/NNP 회/NNG 도/JX 맛있/VA 고/EC 잉어/NNG 도/JX 회/NNG 를/JKO 만들/VV 어/EC 먹/VV 으면/EC 맛/NNG 이/JKS 있/VV 지요/EF ./SF
-내 애끼두 헴우 잘 쳇습구마. 	내/MM 애끼두/NNG 헴__6/NNG 우/NNG 잘/MAG 쳇습구마/NNG ./SF	내 동생도 헤엄을 잘 쳤습니다. 	내/MM 동생/NNG 도/JX 헤엄/NNG 을/JKO 잘/MAG 치/VV 었/EP 습니다/EF ./SF
-올채이 크무 메그락지 댑구마.	올채이__1/NNG 크무/NNG 메그락지__1/NNG 댑구마/NNG ./SF	올챙이가 크면 개구리가 됩니다.	올챙이/NNG 가/JKS 크/VA 면/EC 개구리/NNG 가/JKC 되/VV ᆸ니다/EF ./SF
-이 짐이사 개가웁구 기래니 내 들구 가갯소.	이/MM 짐/NNG 이/JKS 사/NR 개가웁__1/VA-I 구/EC 기래/NNG 이/VCP 니/EC 나/NP 의/JKG 들/VV 구/EC 가/VV 어/EC 개/VV 엇/EP 소/EC ./SF	이 짐이야 가볍고 그러니 내가 들고 가겠소.	이/MM 짐/NNG 이야/JX 가볍/VA-I 고/EC 그렇/VA-I 니/EC 나/NP 가/JKS 들/VV 고/EC 가/VV 겠/EP 소/EC ./SF
-가비 얼매나 섧은지 나날이 웁구마. 	가비__5/NNG 얼매__1/NNG 나/JX 섧/VA 은지/EC 나날이/MAG 웁구마/NNG ./SF	과부가 얼마나 설운지 나날이 웁니다. 	과부/NNG 가/JKC 얼마나/MAG 설/NNG 울/VV ᆫ지/EC 나날이/MAG 울/VV ᆸ니다/EF ./SF
-그거 어띃게 먹슴까?	그거/NP 어띃게__1/MAG 먹슴까/NNG ?/SF	그거 어찌 먹습니까?	그거/NP 어찌/MAG 먹/VV 습니까/EF ?/SF
-영게 옥시끼 많이 있소.	영게__1/NP 옥시끼__1/NNG 많이/MAG 있/VA 소/EC ./SF	여기 옥수수가 많이 있소.	여기/NP 옥수수/NNG 가/JKS 많이/MAG 있/VV 소/EC ./SF
-아덜이 디렵다 달아간다.	아__23/NNG 덜/XSN 이/JKS 디렵다__1/MAG 닫/VV-I 어/EC 가/VX ᆫ다/EF ./SF	아이들이 들입다 달려간다.	아이/NNG 들/XSN 이/JKS 들입다/MAG 달려가/VV ᆫ다/EF ./SF
-아덜으느 꼼치울래기하구 놀다 나니 저골고롬이 잘 떨어디대니우?	$$$ 아덜으느/NNG 꼼치울래기하구/NNG 놀/VV 다/EC 나/VX 니/EC 저/MM 골/VV 고/EC 롬/NNG 이/JKS 잘/MAG 떨어디대니우/NNG ?/SF	아이들은 숨바꼭질하고 놀다 보니 옷고름이 잘 떨어지지 않소?
-그 동미 간대사 나르 얼렛갯슴둥? 	그/MM 동미__1/NNG 간대사__1/MAG 나/NP 르/NNG 얼렛갯슴둥/NNG ?/SF	그 동무가 설마 나를 속였겠습니까? 	그/MM 동무/NNG 가/JKS 설마/MAG 나/NP 를/JKO 속이/VV 었/EP 겠/EP 습니까/EF ?/SF
-지끔꺼지두 샐르 짐스으 잡소.	지끔__2/NNG 꺼지/VV 두/JX 샐르/NNG 짐스__1/NNG 으/JKG 잡/VV-R 소/EC ./SF	지금까지도 올가미로 짐승을 잡소.	지금/NNG 까지/JX 도/JX 올가미/NNG 로/JKB 짐승/NNG 을/JKO 잡/VV-R 소/EC ./SF
-가꼴막에 낭그들이 가뜩하다.	가꼴막__1/NNG 에/JKB 낭그__1/NNG 들/XSN 이/JKS 가뜩/MAG 하/XSA 다/EF ./SF	언덕바지에 나무들이 가득하다.	언덕바지/NNG 에/JKB 나무/NNG 들/XSN 이/JKS 가득/MAG 하/XSA 다/EF ./SF
-뇰으 주무 달기 닭으덩때에서 네레와서 인차 먹습구마. 	뇰__1/NNG 으/JKG 주무/NNG 달/VV 기/ETN 닭으덩때__1/NNG 에서/JKB 네레/NNG 오/VV 어서/EC 인차/NNG 먹/VV 습/NNG 구마/EF ./SF	모이를 주면 닭이 홰에서 내려와서 이내 먹습니다. 	모이/NNG 를/JKO 주/VV 면/EC 닭/NNG 이/JKS 홰/NNG 에서/JKB 내려오/VV 어서/EC 이내/MAG 먹/VV 습니다/EF ./SF
-어제께 개굴에서 괴기잽이를 해 가미 놀앗습구마.	어제/MAG 께/JKB 개/NNG 굴/NNG 에서/JKB 괴기잽이__1/NNG 를/JKO 하/VV 어/EC 가미/NNG 놀/VV 엇/EF 습/NNG 구마/EF ./SF	어저께 개울에서 고기잡이를 해 가며 놀았습니다.	어저께/MAG 개울/NNG 에서/JKB 고기잡이/NNG 를/JKO 하/VV 어/EC 가/VX 며/EC 놀/VV 었/EP 습니다/EF ./SF
-할기 좋대니무 농새 잘 아이 뎁구마. 	$$$ 하/VV ᆯ/ETM 기/NNB 좋/VA 대/EF 니/MM 무/XPN 농/NNG 새/MM 잘/MAG 아이/IC 뎁구마/NNG ./SF	흙이 좋지 않으면 농사가 잘 안 됩니다. 
-저 동미느 제깍하무 다배집구마. 	저/MM 동미__1/NNG 느/NP 제깍하무__1/MAG 다/MAG 배/NNG 집/NNG 구마/EF ./SF	저 동무는 걸핏하면 자빠집니다.	저/NP 동무/NNG 는/JX 걸핏하면/MAG 자빠지/VV ᆸ니다/EF ./SF
-해르 바라본다구 하는 그 꽂이 바루 해가부리지.	해르/NNG 바라보/VV ᆫ다구/EC 하/VV 는/ETM 그/MM 꽂__1/NNG 이/JKS 바루/MAG 해가부리__1/NNG 이/VCP 지/EF ./SF	해를 바라본다고 하는 그 꽃이 바로 해바라기지.	해/NNG 를/JKO 바라보/VV ᆫ다고/EC 하/VV 는/ETM 그/MM 꽃/NNG 이/JKS 바로/MAG 해바라기/NNG 이/VCP 지/EF ./SF
-우리 집 도티느 너무 때부시해서 걷지르 못합구마. 	우리/NP 집/NNG 도티__1/NNG 느/NP 너무/MAG 때부시/NNG 하/XSA 어서/EC 걷지르/NNG 못/MAG 합/NNG 구마/EF ./SF	우리 집 돼지는 너무 살쪄서 걷지를 못합니다. 	우리/NP 집/NNG 돼지/NNG 는/JX 너무/MAG 살찌/VV 어서/EC 걷/VV-I 지/EC 를/JX 못하/VX ᆸ니다/EF ./SF
-아르 녚구레 끼구 있습더구마.	아__23/NNG 르/NNG 녚구레/NNG 끼/VV 구/EC 있/VX 습/NNG 더/MAG 구마/EF ./SF	아이를 옆구리에 끼고 있더군요.	아이/NNG 를/JKO 옆구리/NNG 에/JKB 끼/VV 고/EC 있/VX 더군요/EF ./SF
-명이 길댸닣구 따른 사름이 잇갯습지.	$$$ 명/NNG 이/JKS 길댸닣구/NNG 따르/VV ᆫ/ETM 사르/VV ᆷ/ETN 이/JKS 잇갯습/NNG 이/VCP 지/EF ./SF	명이 길지 않고 짧은 사람이 있겠지요.
-밭으르 나가 일으 하자무 헤미느 꼭 잇어야 합구마. 	밭/NNG 으르/VV 나가/VX 어/EC 일/NNG 으/JKG 하/VV 자/EC 무/NNG 헤미__2/NNG 느/NP 꼭/MAG 잇/VV-I 어야/EC 합/NNG 구마/EF ./SF	밭으로 나가 일을 하자면 호미는 꼭 있어야 합니다. 	밭/NNG 으로/JKB 나가/VV 어/EC 일/NNG 을/JKO 하/VV 자면/EC 호미/NNG 는/JX 꼭/MAG 있/VV 어야/EC 하/VX ᆸ니다/EF ./SF
-헤때기 아프무 약으 바르구야 그 벼이 떨어집지. 	헤때기__1/NNG 아프무/NNG 약/NNG 으/JKG 바르/VV 구/EC 야/JX 그/MM 벼이/NNG 떨/VV 어/EC 집/VV-R 지/EF ./SF	혀때기가 아프면 약을 발라야 그 병이 낫지요. 	혀때기/NNG 가/JKS 아프/VA 면/EC 약/NNG 을/JKO 바르/VV 어야/EC 그/MM 병/NNG 이/JKS 낫/VV-I 지요/EF ./SF
-어시게 불효햇다구 가깝은 친첵이 아들 빰나가지르 내갈겟습구마. 	어시__1/NNG 이/VCP 게/EC 불효/NNG 하/XSV 엇/EP 다구/EC 가깝/VA-I 은/ETM 친첵/NNP 이/JKS 아들/NNG 빰나가지__1/NNG 르/NNG 내가/VV ᆯ/ETM 겟/EP 습/NNG 구마/EF ./SF	어버이에게 불효했다고 가까운 친척이 아들 뺨따귀를 내갈겼습니다. 	어버이/NNG 에게/JKB 불효/NNG 하/XSV 었/EP 다고/EC 가깝/VA-I 은/ETM 친척/NNG 이/JKS 아들/NNG 뺨따귀/NNG 를/JKO 내/VV 어/EC 갈기/VV 었/EP 습니다/EF ./SF
-쌈우 하무 치우라 이게라구 말합지.	쌈/NNG 우/NNG 하/NNG 무/NNG 치우/VV 라/EC 이게__1/VV 라구/EF 말/NNG 합/NNG 지/EF ./SF	쌈을 하면 반드시 이기라고 말하지요.	쌈/NNG 을/JKO 하/VV 면/EC 반드시/MAG 이기/VV 라고/EC 말/NNG 하/XSV 지요/EF ./SF
-엊저낙에 웨삼춘댁 상새 낫다구 전홰 왓습구마.	$$$ 엊저낙/NNP 에/JKB 웨/NNP 삼춘/NNG 댁/XSN 상/NNG 새/MM 낫/VA-I 다구/EC 전/MM 홰/NNG 오/VV 엇/EP 습/NNG 구마/EF ./SF	엊저녁에 외삼촌댁 돌아가셨다고 전화가 왔습니다.
-우리 아들으느 핵교서 꼬래비만 함메.	우리/NP 아들/NNG 으/JKG 느/NP 핵교__1/NNG 서/JKB 꼬래비__1/NNG 만/JX 함/NNG 메/VV 어/EF ./SF	우리 아들은 학교에서 꼴찌만 하네.	우리/NP 아들/NNG 은/JX 학교/NNG 에서/JKB 꼴찌/NNG 만/JX 하/VV 네/EF ./SF
-아즈바니께 슈갑 빌게 디레라.	아즈바니께/NNG 슈갑__1/NNG 빌/VV 게/EC 디레/NNG 이/VCP 라/EF ./SF	고모부께 장갑 빌려 드려라.	고모부/NNG 께/JKB 장갑/NNG 빌리/VV 어/EC 드리/VX 어라/EF ./SF
-내게사 아들가 딸 둘 다 딱같은 자석입구마.	나/NP 에게/JKB 사/NR 아들/NNG 가/VV 어/EC 딸/NNG 둘/NR 다/MAG 딱같__1/VA 은/ETM 자석/NNG 입/VV-R 구마/EF ./SF	내게야 아들과 딸 둘 다 똑같은 자식입니다.	나/NP 에게/JKB 야/JX 아들/NNG 과/JC 딸/NNG 둘/NR 다/MAG 똑같/VA 은/ETM 자식/NNG 이/VCP ᆸ니다/EF ./SF
-도투 줴에다 굴에 옇어라.	도투__1/NNG 줴/NNG 에다/JKB 굴__10/NNG 에/JKB 옇__1/VV 어라/EF ./SF	돼지를 잡아다 우리에 넣어라.	돼지/NNG 를/JKO 잡/VV-R 어다/EC 우리/NNG 에/JKB 넣/VV 어라/EF ./SF
-자는 어째서 뜬뜬해서 저러고 있슴메?	자/VV 는/ETM 어째서/MAG 뜨/VV ᆫ/ETM 뜨/VV ᆫ/ETM 하/XSV 어서/EC 저러/VV 고/EC 있슴메/NNG ?/SF	쟤는 어째서 뚱해서 저러고 있는가?	쟤/NP 는/JX 어째서/MAG 뚱하/VA 어서/EC 저러/VV 고/EC 있/VX 는가/EF ?/SF
-호분차 먹기 슳에서 시걱때두 밥으 잘 아이 먹엇습구마. 	호분차__1/NNG 먹/VV 기/ETN 슳__1/VA 에서/JKB 시걱__1/NNG 때/NNG 두/JX 밥/NNG 으/NNG 잘/MAG 아이/NNG 먹/VV 엇/EP 습/NNG 구마/EF ./SF	혼자 먹기 싫어서 끼니때에도 밥을 잘 먹지 않았습니다. 	혼자/NNG 먹/VV 기/ETN 싫/VA 어서/EC 끼니/NNG 때/NNG 에/JKB 도/JX 밥/NNG 을/JKO 잘/MAG 먹/VV 지/EC 않/VX 었/EP 습니다/EF ./SF
-오쿠리메 댕기지 말구 가슴우 쭉 페구 댕게라.	오쿠리__1/VV 메/NNG 댕기__2/VV 지/EC 말/VX 구/EC 가슴/NNG 우/NNG 쭉/MAG 페구/NNG 댕게라/NNG ./SF	오그리며 다니지 말고 가슴을 쭉 펴고 다녀라.	오그리/VV 며/EC 다니/VV 지/EC 말/VX 고/EC 가슴/NNG 을/JKO 쭉/MAG 펴/VV 고/EC 다니/VV 어라/EF ./SF
-댜느 기애짓 아들 왜사춘이랍데.	$$$ 댜느/NNG 기애짓/NNG 아들/NNG 왜사춘이랍데/NNG ./SF	저 애는 기와집 아들 외사촌이라데.
-개 세띨르 물으 핧아 먹습구마. 	개/NNG 세띨르/NNG 물/NNG 으/JKG 핧아/NNG 먹/VV 습/NNG 구마/EF ./SF	개가 혀로 물을 핥아 먹습니다. 	개/NNG 가/JKS 혀/NNG 로/JKB 물/NNG 을/JKO 핥/VV 어/EC 먹/VV 습니다/EF ./SF
-도투 잡우무 념티르 나르 주우.	도투__1/NNG 잡/VV-R 우/EC 무/XPN 념티__1/NNG 르/NNG 나르/VV 주/VV 우/EF ./SF	돼지를 잡으면 염통을 나를 주오.	돼지/NNG 를/JKO 잡/VV-R 으면/EC 염통/NNG 을/JKO 나/NP 를/JKO 주/VV 오/EF ./SF
-우리 집으르 하냥 같이 가기오. 	우리/NP 집/NNG 으르/VV 하냥__3/MAG 같이/MAG 가/VV 기/ETN 이/VCP 오/EF ./SF	우리 집으로 꼭 같이 가세. 	우리/NP 집/NNG 으로/JKB 꼭/MAG 같이/MAG 가/VV 세/EF ./SF
-깔으 한 움쾜 줴 오오.	깔__3/NNG 으/JKG 한/MM 움쾜__1/NNB 줴/NNG 오오/IC ./SF	꼴을 한 움큼 쥐어 오오.	꼴/NNG 을/JKO 한/MM 움큼/NNB 쥐/VV 어/EC 오/VX 오/EF ./SF
-아이구! 발에서 발똥쿠린내 나니까데 싹 싳어라.	아이구/IC !/SF 발/NNG 에서/JKB 발똥쿠린내__1/NNG 나/VV 니까/EC 데/NNB 싹/MAG 싳/NNG 어라/EF ./SF	아이고! 발에서 고린내가 나니까 싹 씻어라.	아이고/IC !/SF 발/NNG 에서/JKB 고린내/NNG 가/JKS 나/VV 니까/EC 싹/MAG 씻/VV-R 어라/EF ./SF
-낭그르 불러뜨려서 지팽이를 맨들었수다레.	낭그__1/NNG 르/NNG 부르/VV 어/EC 뜨리/XSV 어서/EC 지/NP 팽이/NNG 를/JKO 맨들/VV 었/EP 수다/EF 레/NNG ./SF	나무를 부러뜨려서 지팡이를 만들었습니다.	나무/NNG 를/JKO 부러뜨리/VV 어서/EC 지팡이/NNG 를/JKO 만들/VV 었/EP 습니다/EF ./SF
-저낙 먹을 때 됏는데 웨아즈바이느 안즉 아이 왓슴둥?	저낙__1/NNG 먹/VV 을/ETM 때/NNG 되/VV 엇/EP 는데/EC 웨아즈바이__1/NNG 느/NP 안즉/MAG 아이/NNG 왓슴둥/NNG ?/SF	저녁 먹을 때 됐는데 외삼촌은 아직 안 왔습니까?	저녁/NNG 먹/VV 을/ETM 때/NNG 되/VV 었/EP 는데/EC 외삼촌/NNG 은/JX 아직/MAG 안/MAG 오/VV 었/EP 습니까/EF ?/SF
-둥굴소르 가대기에 메와서 밭으 갈앗습지. 	둥굴소__1/NNG 르/NNG 가/JKS 대기/NNG 에/JKB 메/NNG 오/VV 어서/EC 밭/NNG 으/JKG 갈/VV 엇/EF 습지/NNG ./SF	황소를 가대기에 메워서 밭을 갈았지요.	황소/NNG 를/JKO 가/VV 어/EC 대기/NNG 에/JKB 메우/VV 어서/EC 밭/NNG 을/JKO 갈/VV 었/EP 지요/EF ./SF
-댱기르 동생게 갲다 줘라.	댱기__1/NNG 르/NNG 동생/NNG 게/EC 갲다/NNG 주/VV 어라/EF ./SF	장구를 동생에게 갖다 줘라.	장구/NNG 를/JKO 동생/NNG 에게/JKB 갖/VV 다/EC 주/VX 어라/EF ./SF
-돈으 쪼꼼이라두 해잴하무 안 된다.	돈/NNG 으/JKG 쪼꼼__1/NNG 이/VCP 라두/EC 해잴하__1/VV 무/NNG 안/MAG 되/VV ᆫ다/EF ./SF	돈을 조금이라도 낭비하면 안 된다.	돈/NNG 을/JKO 조금/NNG 이/VCP 라도/EC 낭비/NNG 하/XSV 면/EC 안/MAG 되/VV ᆫ다/EF ./SF
-아덜이 헤태르 내밀메 웃구 그러무 어시느 귀엽다구 그 아르 안아 줍구마. 	아__23/NNG 덜/XSN 이/JKS 헤태__1/NNG 르/NNG 내밀/VV ᆯ/ETM 메/NNG 웃/VV-R 구/EC 그러/VV 어/EF 무/NNG 어시느/NNG 귀엽/VA-I 다구/EF 그/MM 아__23/NNG 르/NNG 안/VV 어/EC 줍/VV-I 구/EC 말/VX 어/EF ./SF	아이들이 혀를 내밀며 웃고 그러면 부모는 귀엽다고 그 아이를 안아 줍니다. 	아이/NNG 들/XSN 이/JKS 혀/NNG 를/JKO 내밀/VV 며/EC 웃/VV-R 고/EC 그러/VV 면/EC 부모/NNG 는/JX 귀엽/VA-I 다고/EC 그/MM 아이/NNG 를/JKO 안/VV 어/EC 주/VX ᆸ니다/EF ./SF
-우리 아느 새박부터 부지러이 배아리 들구 놀러 나갔소.	우리/NP 아느/NNP 새박__3/NNG 부터/JX 부지러이/NNP 배아리__2/NNG 들/VV 구/EC 놀/VV 러/EC 나가/VV 었/EP 소/EC ./SF	우리 애는 새벽부터 부지런히 팽이 들고 놀러 나갔소.	우리/NP 애/NNG 는/JX 새벽/NNG 부터/JX 부지런히/MAG 팽이/NNG 들/VV 고/EC 놀/VV 러/EC 나가/VV 었/EP 소/EC ./SF
-내 쓴 펜지에 홰답으 아이 주다 나니까데 서분합구마. 	나/NP 의/JKG 쓰/VV ᆫ/ETM 펜/NNG 지/NNG 에/JKB 홰답__1/NNG 으/JKG 아이/NNG 주/VV 다/EC 나/VX 니까/EC 데/NNB 서/NNG 분합/NNG 구마/EF ./SF	내가 쓴 편지에 회답을 주지 않다 보니까 서운합니다.	나/NP 가/JKS 쓰/VV ᆫ/ETM 편지/NNG 에/JKB 회답/NNG 을/JKO 주/VV 지/EC 않/VX 다/EC 보/VX 니까/EC 서운/XR 하/XSA ᆸ니다/EF ./SF
-소낙 소리 쎄기 나는 게 인차 비 오갯습구마.	소낙__1/NNG 소리/NNG 쎄/VA 기/ETN 나/VV 는/ETM 것/NNB 이/JKS 인차/NNG 비/NNG 오갯습구마/NNG ./SF	우레 소리 세게 나는 게 이내 비 오겠습니다.	우레/NNG 소리/NNG 세/VA 게/EC 나/VV 는/ETM 것/NNB 이/JKS 이내/MAG 비/NNG 오/VV 겠/EP 습니다/EF ./SF
-우춧한 사름이사 세사에 많갯습지. 	우춧/NNG 한/MM 사름__2/NNG 이/JKS 사/NR 세/NNB 사/NR 에/JKB 많갯/NNG 습지/NNG ./SF	어리석은 사람이야 세상에 많겠지요. 	어리석/VA 은/ETM 사람/NNG 이/VCP 야/EF 세상/NNG 에/JKB 많/VA 겠/EP 지요/EF ./SF
-밭에 무끼가 배채르 세이 싱것습구마. 	밭/NNG 에/JKB 무끼__1/NNG 가/JKS 배채__1/NNG 르/NNG 세이__3/MAG 싱/NNP 것/NNB 습/NNG 구마/EF ./SF	밭에 무와 배추를 많이 심었습니다.	밭/NNG 에/JKB 무/NNG 와/JC 배추/NNG 를/JKO 많이/MAG 심/VV 었/EP 습니다/EF ./SF
-승겁운가 짭운가 맛으 보오.	승/NNG 겁/NNG 운/NNG 가/XSN 짭/NNG 운/NNG 가/XSN 맛/NNG 으/JKG 보/VV 오/EF ./SF	싱거운가 짠가 맛을 보오.	싱겁/VA-I 은가/EF 짜/VA ᆫ가/EF 맛/NNG 을/JKO 보/VV 오/EF ./SF
-곤매시르 닦아 먹으무 과연 맛잇습지. 	곤매시__1/NNG 르/NNG 닦/VV 어/EC 먹/VV 으/EF 무/XPN 과연/MAG 맛/NNG 잇/VV-I 습지/NNG ./SF	호박을 볶아 먹으면 정말 맛있지요. 	호박/NNG 을/JKO 볶/VV 어/EC 먹/VV 으면/EC 정말/MAG 맛있/VA 지요/EF ./SF
-저 아느 제 어시 말으 통 듣댸이쿠 펀한 짓만 하구 댕긴다구 합구마.	$$$ 저/IC 아느/NNG 저/NP 의/JKG 어/IC 시/NNG 말/NNG 으/JKG 통/NNG 듣댸이쿠/NNG 펀/NNG 하/XSA ᆫ/ETM 짓/NNG 만/JX 하/VV 구/EC 댕기/VV ᆫ다구/EF 합/NNG 구마/EF ./SF	저 아이는 제 부모 말을 통 듣지 않고 멍청한 짓만 하고 다닌다고 합니다.
-핵교서 아덜 배와주는 선생님덜 보무 바쁜 가툴합구마.	$$$ 핵교/NNG 서/JKB 아/NNG 덜/XSN 배/NNG 와/JC 주/VV 는/ETM 선생/NNG 님/XSN 덜/XSN 보무/NNG 바쁘/VA ᆫ/ETM 가툴합구마/NNG ./SF	학교에서 아이들 가르치는 선생님들 보면 어려운 것 같습니다. 
-당신이 그래셔 나두 그 사람이 쇠겡이인 줄로만 알았습구마.	당신/NP 이/JKS 그렇/VA-I 어/EC 시/EP 어/EC 나/NP 두/JX 그/MM 사람/NNG 이/JKS 쇠겡이__1/NNG 이/VCP ᆫ/ETM 줄/NNB 로/JKB 만/JX 알/VV 었/EP 습/NNG 구마/EF ./SF	당신이 그래서 나도 그 사람이 소경인 줄로만 알았습니다.	당신/NP 이/JKS 그래서/MAJ 나/NP 도/JX 그/MM 사람/NNG 이/JKS 소경/NNG 이/VCP ᆫ/ETM 줄/NNB 로/JKB 만/JX 알/VV 었/EP 습니다/EF ./SF
-내 고향 경흥가 저짝 단천 말테 땁구마. 	나/NP 의/JKG 고향/NNG 경흥/NNP 가/NNG 저짝__1/NP 단/NNG 천/NNG 말테__1/NNG 땁구마/NNG ./SF	내 고향 경흥과 저쪽 단천 말투가 다릅니다. 	나/NP 의/JKG 고향/NNG 경흥/NNP 과/JC 저쪽/NP 단/NNG 천/NNG 말투/NNG 가/JKS 다르/VA ᆸ니다/EF ./SF
-일으 많이 하다 나니 오분몸이 다 아파서 못 살갯습구마.	일/NR 으/NNG 많이/MAG 하/VV 다/EC 나/VX 니/EC 오분몸__1/NNG 이/JKS 다/MAG 아프/VA 어서/EC 못/MAG 살/VV 개/VV 엇/EP 습/NNG 구마/EF ./SF	일을 많이 하다 보니 온몸이 다 아파서 못 살겠습니다.	일/NNG 을/JKO 많이/MAG 하/VV 다/EC 보/VX 니/EC 온몸/NNG 이/JKS 다/MAG 아프/VA 어서/EC 못/MAG 살/VV 겠/EP 습니다/EF ./SF
-아바이, 소곰쟁이 잡지 맙소.	아바이/NNP ,/SP 소곰쟁이__1/NNG 잡/VV-R 지/EC 맙소/NNG ./SF	아버지, 잠자리 잡지 마십시오.	아버지/NNG ,/SP 잠자리/NNG 잡/VV-R 지/EC 말/VX 시/EP ᆸ시오/EF ./SF
-영겔르 가찹이 오나라.	영겔르/NNP 가찹이__1/NNG 이/VCP 오/EC 나라/NNG ./SF	여기로 가까이 오너라.	여기/NP 로/JKB 가까이/MAG 오/VV 너라/EF ./SF
-배고푸무 부수깨서 다웅치 가졔가서 먹어라.	배고푸무/NNG 부수깨__1/NNG 서/NNG 다웅치__1/NNG 가졔/NNG 가/VV 어서/EC 먹/VV 어라/EF ./SF	배고프면 부엌에서 누룽지 가져가서 먹어라.	배고프/VA 면/EC 부엌/NNG 에서/JKB 누룽지/NNG 가져가/VV 어서/EC 먹/VV 어라/EF ./SF
-아 들어서무 입스레미르 합지.	아__23/NNG 들/VV 어서/EC 무/XPN 입스레미__1/NNG 르/NNG 합/NNG 지/EF ./SF	아이가 들어서면 입덧을 하지요.	아이/NNG 가/JKS 들어서/VV 면/EC 입덧/NNG 을/JKO 하/VV 지요/EF ./SF
-내 조꼼할 적에느 키 작앗습구마. 	나/NP 의/JKG 조꼼/NNG 하/VV ᆯ/ETM 적/NNB 에/JKB 느/NP 키/NNG 작앗습구마/NNG ./SF	내 조끄마할 적에는 키가 작았습니다.	나/NP 의/JKG 조끄마/NNG 하/VV ᆯ/ETM 적/NNB 에/JKB 는/JX 키/NNG 가/JKS 작/VA 었/EP 습니다/EF ./SF
-상년 동삼에 옝기르 바람에 싹 날기구 고사아 했습지.	상년/NNG 동/MM 삼/NR 에/JKB 옝기__1/NNG 르/NNG 바람/NNG 에/JKB 싹/MAG 날기__1/VV 구/EC 고사아/NNG 하/XSV 었/EP 습지/NNG ./SF	상년 겨울에 이엉을 바람에 싹 날리고 고생을 했지요.	상년/NNG 겨울/NNG 에/JKB 이엉/NNG 을/JKO 바람/NNG 에/JKB 싹/MAG 날리/VV 고/EC 고생/NNG 을/JKO 하/VV 었/EP 지요/EF ./SF
-내 아주바이느 젊어실 적에 고사아 많이 햇습구마. 	내/MM 아주바이__3/NNG 느/NP 젊/VA 어/EC 시/EP ᆯ/ETM 적/NNB 에/JKB 고사/NNG 아/NNG 많이/MAG 하/VV 엇/EP 습/NNG 구마/EF ./SF	내 형부는 젊었을 적에 고생을 많이 했습니다. 	나/NP 의/JKG 형부/NNG 는/JX 젊/VA 었/EP 을/ETM 적/NNB 에/JKB 고생/NNG 을/JKO 많이/MAG 하/VV 었/EP 습니다/EF ./SF
-하불에미나 하불애비나 살기느 바쁩지. 	하불에미__1/NNG 나/JC 하불애비/NNG 나/JC 살기느/NNG 바쁩/NNG 이/VCP 지/EF ./SF	홀어미나 홀아비나 살기는 힘들지요. 	홀/NNG 어미/NNG 나/JC 홀아비/NNG 나/JC 살/VV 기/ETN 는/JX 힘들/VA 지요/EF ./SF
-봄에 피는 꽂 중에서 하불에미고장으느 자디색이 납지.	봄/NNG 에/JKB 피/VV 는/ETM 꽂__1/NNG 중/NNB 에서/JKB 하불에미고장__1/NNG 으느/NNG 자디색__1/NNG 이/JKS 납/NNG 지/EF ./SF	봄에 피는 꽃 중에서 할미꽃은 자주색이 나지요.	봄/NNG 에/JKB 피/VV 는/ETM 꽃/NNG 중/NNB 에서/JKB 할미꽃/NNG 은/JX 자주색/NNG 이/JKS 나/VV 지요/EF ./SF
-우리 클아반으느 오래 앉앗습구마.	우리/NP 클아반__1/NNG 으느/NNG 오래/MAG 앉/VV 엇/EF 습/NNG 구마/EF ./SF	우리 할아버지는 오래 사셨습니다.	우리/NP 할아버지/NNG 는/JX 오래/MAG 사/VV 시/EP 었/EP 습니다/EF ./SF
-시금 아덜이사 우리 세는 멩실이 무시긴지 잘 모릅구마. 	시금__8/NNG 아__23/NNG 덜/XSN 이사/JX 우리/NP 세__21/VV 는/ETM 멩/NNG 실/NNG 이/JKS 무/XPN 시기/NNG 이/VCP ᆫ지/EC 잘/MAG 모릅구마/NNG ./SF	지금 아이들이야 우리가 쇠는 명절이 무엇인지 잘 모릅니다. 	지금/MAG 아이/NNG 들/XSN 이야/JX 우리/NP 가/JKS 쇠/VV 는/ETM 명절/NNG 이/JKS 무엇/NP 이/VCP ᆫ지/EC 잘/MAG 모르/VV ᆸ니다/EF ./SF
-식귀 여서히 살무 시끄럽어서 내느 아니 둏아합구마. 	식/NNG 귀/NNG 여서히__1/NNG 살/NNB 무/XPN 시끄럽/VA-I 어서/EC 내느/NNG 아니/IC 둏__1/VA 어/EC 합/NNG 구마/EF ./SF	식구가 여럿이 살면 시끄러워서 나는 안 좋아합니다.	식구/NNG 가/JKS 여럿/NNG 이/JKS 살/VV 면/EC 시끄럽/VA-I 어서/EC 나/NP 는/JX 안/MAG 좋아하/VV ᆸ니다/EF ./SF
-그 짓 녕감가 노친 모두 일없습더구마.	그/MM 짓/NNB 녕감__1/NNG 가/VV 노친/NNG 모두/MAG 일/NNG 없/VA 습/NNG 더/MAG 구마/EF ./SF	그 집 영감님과 노친 모두 괜찮으셨습니다.	그/MM 집/NNG 영감/NNG 님/XSN 과/JC 노친/NNG 모두/MAG 괜찮/VA 으시/EP 었/EP 습니다/EF ./SF
-시방으느 기름우 얻자구 해자부리두 많이 싱구오.	시방으느/NNG 기름/NNG 우/NNG 얻/VV-R 자구/EC 해자부리__1/NNG 두/JX 많이/MAG 싱구__1/VV 오/EF ./SF	시방은 기름을 얻자고 해바라기도 많이 심으오.	시방/NNG 은/JX 기름/NNG 을/JKO 얻/VV-R 자고/EC 해바라기/NNG 도/JX 많이/MAG 심으오/NNG ./SF
-붕혜가 저약에느 어디메 있니?	붕혜__1/NNG 가/JKS 저약__1/NNG 에/JKB 느/NP 어디메__1/NP 있/VV 니/EC ?/SF	부엉이가 저녁에는 어디 있니?	부엉이/NNG 가/JKS 저녁/NNG 에/JKB 는/JX 어디/NP 있/VV 니/EC ?/SF
-사름덜 다치니까데 뎡게 웅데이르 잘 메꿔라.	사름__2/NNG 덜/XSN 다치/VV 니까/EC 데/NNB 뎡게__1/NP 웅데이__3/NNG 르/NNG 잘/MAG 메꾸/VV 어라/EF ./SF	사람들이 다치니까 저기 웅덩이를 잘 메워라.	사람/NNG 들/XSN 이/JKS 다치/VV 니까/EC 저기/NP 웅덩이/NNG 를/JKO 잘/MAG 메우/VV 어라/EF ./SF
-그 무티를 가제와 놔라.	그/MM 무티__1/NNG 를/JKO 가제/NNG 와/JC 놓/VX 어라/EF ./SF	그 나무를 가져와 놓아라.	그/MM 나무/NNG 를/JKO 가져오/VV 어/EC 놓/VX 어라/EF ./SF
-정재시리서 가재미 굽어 먹었슴메.	정재시리__1/NNG 서/JKB 가/VV 재미/NNG 굽/VA-R 어/EC 먹었슴메/NNG ./SF	정주에서 가자미 구워 먹었소.	정주/NNP 에서/JKB 가자미/NNG 굽/VV-I 어/EC 먹/VV 었/EP 소/EC ./SF
-아가 오마니 우티 끝자라기르 잡구 있습메.	아__23/NNG 가/JKS 오마/NNP 이/VCP 니/EC 우티__1/NNG 끝자라기__1/NNG 르/NNG 잡/VV-R 구/EC 있/VX 습/NNG 메/NNG ./SF	아이가 어머니 옷 끝자락을 잡고 있네.	아이/NNG 가/JKS 어머니/NNG 옷/NNG 끝/NNG 자락/NNG 을/JKO 잡/VV-R 고/EC 있/VX 네/EF ./SF
-네 함벌로 말으 하무 내 가만히 아이 잇갯다.	네/IC 함벌로__1/MAG 말/NNG 으/JKG 하/IC 무/NNG 내/NNB 가만히/MAG 아이/NNG 잇/NNG 개/VV 엇/EP 다/EF ./SF	네가 함부로 말을 하면 내가 가만히 있지 않겠다.	너/NP 가/JKS 함부로/MAG 말/NNG 을/JKO 하/VV 면/EC 나/NP 가/JKS 가만히/MAG 있/VV 지/EC 않/VX 겠/EP 다/EF ./SF
-바쁘기 빳빳이 살구 기래다 나니 이래 나아 먹엇습구마. 	바쁘/VA 기/ETN 빳빳이__6/MAG 살/VV 구/EC 기래다/NNG 나/VV 니/EC 이렇/VA-I 어/EC 낫/VV-I 어/EC 먹/VV 엇/EP 습/NNG 구마/EF ./SF	힘들게 빠듯이 살고 그러나 보니 이리 나이를 먹었습니다. 	힘들/VA 게/EC 빠듯/XR 이/XSM 살/VV 고/EC 그러/VV 나/EC 보/VX 니/EC 이리/MAG 나이/NNG 를/JKO 먹/VV 었/EP 습니다/EF ./SF
-허더칸에 쟁기구 무슨 냉기구 다 딜에놓소.	허더칸__1/NNG 에/JKB 쟁기/NNG 구/NNG 무슨/MM 냉기__2/NNG 구/NNG 이/VCP 다/EF 딜/NNG 에/JKB 놓/VV 소/EC ./SF	헛간에 농기구고 무슨 나무고 다 들여놓소.	헛간/NNG 에/JKB 농기구/NNG 이/VCP 고/EC 무슨/MM 나무/NNG 이/VCP 고/EC 다/MAG 들여놓/VV 소/EC ./SF
-내 새끼소꾸락이 요즘 아풉구마.	나/NP 의/JKG 새끼소꾸락__1/NNG 이/JKS 요즘/NNG 아풉구마/NNG ./SF	내 새끼손가락이 요즘 아픕니다.	나/NP 의/JKG 새끼손가락/NNG 이/JKS 요즘/NNG 아프/VA ᆸ니다/EF ./SF
-우리 어마니 애끼 남편이무 아즈바니라 하오.	우리/NP 어마/NNG 이/VCP 니/EC 애끼__1/NNG 남편/NNG 이/JKS 무/XPN 아즈바니__3/NNG 이/VCP 라/EC 하/VV 오/EF ./SF	우리 어머니 아우의 남편이면 이모부라 하오.	우리/NP 어머니/NNG 아우/NNG 의/JKG 남편/NNG 이/VCP 면/EC 이모부/NNG 이/VCP 라/EC 하/VV 오/EF ./SF
-뽕여르매 열겟으무 따 오나라.	뽕여르매__1/NNG 열겟으무/NNG 따/VV 어/EC 오/VX 나라/NNG ./SF	오디가 열렸으면 따 오너라.	오디/NNP 가/JKS 열리/VV 었/EP 으면/EC 따/VV 어/EC 오/VV 너라/EF ./SF
-꼬부대기 심바람으 갓다 온나라.	꼬부대기__1/MAG 심바람__1/NNG 으/NNG 가/VV 엇/EP 다/EC 오/VV ᆫ/ETM 나라/NNG ./SF	부지런히 심부름을 갔다 오너라.	부지런히/MAG 심부름/NNG 을/JKO 가/VV 었/EP 다/EC 오/VV 너라/EF ./SF
-마른 검블으 모아셔 불으 지펬다.	마르/VV ᆫ/ETM 검블__1/NNG 으/NNG 모으/VV 어/EC 시/VA 어/EC 불/NNG 으/JKG 지펬/NNG 하/XSA 다/EF ./SF	마른 검불을 모아서 불을 지폈다.	마르/VV ᆫ/ETM 검불/NNG 을/JKO 모으/VV 어서/EC 불/NNG 을/JKO 지피/VV 었/EP 다/EF ./SF
-자식덜이 다 서방가구 시집가구 기래구 안까니두 상새 나서 없구 집에 내 하분자 잇으니 늘상 헝둥하오.	$$$ 자식/NNG 덜/XSN 이/JKS 다/MAG 서방/NNG 가구/NNG 시집/NNG 가구/NNG 기래구/NNG 안/MAG 깔/VV 니/EC 두/MM 상/NNG 새/NNG 나/VV 어서/EC 없/VA 구/EC 집/NNG 에/JKB 나/NP 의/JKG 하/NNG 분자/NNG 잇/NNG 으니/EC 늘상/MAG 헝둥/NNG 하/XSA 오/EF ./SF	자식들이 다 장가가고 시집가고 그리고 부인도 죽어서 없고 집에 내가 혼자 있으니 늘상 허전하오.
-그른 말 아이 씀다.	그른__1/MM 말/NNG 아이__12/MAG 쓰/VV ᆷ다/EF ./SF	그런 말 아니 씁니다.	그런/MM 말/NNG 아니/MAG 쓰/VV ᆸ니다/EF ./SF
-네 어드메르 가나?	네/IC 어드메르/NNP 가/VV 나/EF ?/SF	너 어디를 가니?	너/NP 어디/NP 를/JKO 가/VV 니/EF ?/SF
-장에 가서 염쉐르 싸 오너라.	장/NNG 에/JKB 가/VV 어서/EC 염쉐__1/NNG 르/NNG 싸__21/VV 오/VV 너라/EF ./SF	장에 가서 염소를 사 오너라.	장/NNG 에/JKB 가/VV 어서/EC 염소/NNG 를/JKO 사/VV 어/EC 오/VV 너라/EF ./SF
-어레실 적 일으 해상하무 즐겁습구마. 	어레/NNG 이/VCP 시/EP ᆯ/ETM 적/NNB 일/NNG 으/NNG 해상하__2/VV 무/NNG 즐겁/VA-I 습/NNG 구마/EF ./SF	어렸을 적 일을 회상하면 즐겁습니다.	어리/VA 었/EP 을/ETM 적/NNB 일/NNG 을/JKO 회상/NNG 하/XSV 면/EC 즐겁/VA-I 습니다/EF ./SF
-아덜으느 소압을 줏으러 산지슭을르 갔다.	아__23/NNG 덜/XSN 으/JKG 느/NP 소압__1/NNG 을/NNG 줏/VV-R 으러/EC 산지슭__1/NNG 을/JKO 르/NNG 가/VV 었/EP 다/EF ./SF	아이들은 솔가지를 주우러 산기슭으로 갔다.	아이/NNG 들/XSN 은/JX 솔가지/NNG 를/JKO 줍/VV-I 으러/EC 산기슭/NNG 으로/JKB 가/VV 었/EP 다/EF ./SF
-영게 옥시두 많이 있습구마.	영게__1/NP 옥시__1/NNG 두/JX 많이/MAG 있/VA 습/NNG 구마/EF ./SF	여기 옥수수도 많이 있습니다.	여기/NP 옥수수/NNG 도/JX 많이/MAG 있/VA 습니다/EF ./SF
-영게서 새채할 생각 말구 얼른 재비 집으르 가서 눕어 자오.	영게__1/NP 서/JKB 새채/NNG 하/XSV ᆯ/ETM 생각/NNG 말/VV 구/EC 얼른/MAG 재비/NNG 집으르/NNG 가/VV 어서/EC 눕/VV-I 어/EC 자/VV 오/EF ./SF	여기서 유숙할 생각 말고 얼른 자기 집으로 가서 누워 자오.	여기/NP 서/JKB 유숙/NNG 하/XSV ᆯ/ETM 생각/NNG 말/VV 고/EC 얼른/MAG 자기/NP 집/NNG 으로/JKB 가/VV 어서/EC 눕/VV-I 어/EC 자/VV 오/EF ./SF
-그 담엔 제 쌀이 나오게끔 돼구 게 나간 건 나백게 나간단 말이오.	그/MM 담/NNG 에/JKB ᆫ/JX 저/NP 의/JKG 쌀/NNG 이/JKS 나오/VV 게끔/EC 돼__1/VV 구/EC 게__6/NNG 나가/VV ᆫ/ETM 거/NNB ᆫ/JX 나백게__1/NNG 나가/VV ᆫ단/ETM 말/NNG 이/VCP 오/EF ./SF	그 다음엔 제 쌀이 나오게끔 되고 겨가 나간 것은 쌀겨가 나간단 말이오.	그/MM 다음/NNG 에/JKB ᆫ/JX 저/NP 의/JKG 쌀/NNG 이/JKS 나오/VV 게끔/EC 되/VV 고/EC 겨/NNG 가/JKS 나가/VV ᆫ/ETM 것/NNB 은/JX 쌀겨/NNG 가/JKS 나가/VV ᆫ단/ETM 말/NNG 이/VCP 오/EF ./SF
-가매뜨베르 생질르 잘 닦아라.	가매뜨베__1/NNG 르/NNG 생/NNG 질/XSN 르/NNG 잘/MAG 닦/VV 어라/EF ./SF	솥뚜껑을 행주로 잘 닦아라.	솥뚜껑/NNG 을/JKO 행주/NNG 로/JKB 잘/MAG 닦/VV 어라/EF ./SF
-솔냉기처리 상낭구두 오래 사는 냉기입구마.	솔냉기__1/NNG 처리/NNG 상낭구__1/NNG 두/JX 오래/MAG 사/VV 는/ETM 냉기__2/NNG 입구/NNG 마/NNG ./SF	소나무처럼 향나무도 오래 사는 나무입니다.	소나무/NNG 처럼/JKB 향나무/NNG 도/JX 오래/MAG 사/VV 는/ETM 나무/NNG 이/VCP ᆸ니다/EF ./SF
-도독 한 놈은 경찰덜게 붙들기우구 둘은 달아낫습구마.	도독__12/NNG 한/MM 놈/NNB 은/JX 경찰/NNG 덜/MAG 하/XSA 게/EC 붙들기우__1/VV 구/EC 둘/NR 은/JX 달아나/VV 엇/EP 습/NNG 구마/EF ./SF	도둑 한 놈은 경찰들에게 붙들리고 둘은 달아났습니다.	도둑/NNG 한/MM 놈/NNB 은/JX 경찰/NNG 들/XSN 에게/JKB 붙들리/VV 고/EC 둘/NR 은/JX 달아나/VV 었/EP 습니다/EF ./SF
-모딘 낭기 많다 나니 땔낭그 걱정이사 없엇습구마.	모디/NNP ᆫ/JX 낭기__1/NNG 많/VA 다/EC 나/VX 니/EC 땔낭그__1/NNG 걱정/NNG 이사/JX 없/VA 엇/EP 습/NNG 구마/EF ./SF	굵은 나무가 많다 보니 땔나무 걱정이야 없었습니다.	굵/VA 은/ETM 나무/NNG 가/JKS 많/VA 다/EC 보/VX 니/EC 땔나무/NNG 걱정/NNG 이야/JX 없/VA 었/EP 습니다/EF ./SF
-사등이에 뻬가 탁 부러뎃단 말이오.	사등이__1/NNG 에/JKB 뻬/NNG 가/JKS 탁/MAG 부러/MAG 데/VV 엇/EP 단/ETM 말/NNG 이/VCP 오/EF ./SF	등에 뼈가 탁 부러졌다는 말이오.	등/NNG 에/JKB 뼈/NNG 가/JKS 탁/MAG 부러지/VV 었/EP 다는/ETM 말/NNG 이/VCP 오/EF ./SF
-세때기에 쓸이 돋으무 통세 나서 임셕으 먹지 못하오. 	세때기__1/NNG 에/JKB 쓰/VV ᆯ/ETM 이/MM 돋으무/NNG 통/NNG 세/MM 나/VX 어서/EC 임셕으/NNG 먹/VV 지/EC 못하/VX 오/EF ./SF	혀때기에 혓바늘이 돋으면 통세가 있어서 음식을 먹지 못하오. 	혀때기/NNG 에/JKB 혓바늘/NNG 이/JKS 돋/VV-R 으면/EC 통/MAG 세/NNG 가/JKS 있/VV 어서/EC 음식/NNG 을/JKO 먹/VV 지/EC 못하/VX 오/EF ./SF
-야 웨컬아배 올해 야든이 넘었는데 정정합메다.	야/IC 웨컬아배__1/NNG 올해/NNG 야/IC 이/VCP 든/EC 이/NR 넘/VV 었/EP 는데/EC 정정/NNG 합/NNG 메/VV 다/EF ./SF	얘 외할아버지 올해 여든이 넘었는데 정정합니다.	얘/NP 외할아버지/NNG 올해/NNG 여든/NR 이/JKS 넘/VV 었/EP 는데/EC 정정/XR 하/XSA ᆸ니다/EF ./SF
+네 동미덜으느 어띠 다 밉은양하냐? 	너/NP 의/JKG 동미__1/NNG 덜/XSN 으느/JX 어띠__1/MAG 다/MAG 밉은양하__1/VA-I 냐/EF ?/SF	네 동무들은 어찌 다 밉살스럽냐?
+붕어 홰가 화어 홰두 맛잇구 잉에두 홰를 맨들어 먹으무 맛이 잇습지.	붕어/NNG 홰/NNG 가/JKS 화어/NNG 홰/NNG 두/JC 맛있/VA 구/EC 잉에__2/NNG 두/JC 홰/NNG 를/JKO 맨들/VV 어/EC 먹/VV 으무/EC 맛/NNG 이/JKS 있/VV 습지/EF ./SF	붕어 회와 황어 회도 맛있고 잉어도 회를 만들어 먹으면 맛이 있지요.
+내 애끼두 헴우 잘 쳇습구마. 	나/NP 의/JKG 애끼/NNG 도/JX 헴__6/NNG 우/JKO 잘/MAG 치/VV 엇/EP 습구마/EF ./SF	내 동생도 헤엄을 잘 쳤습니다.
+올채이 크무 메그락지 댑구마.	올채이__1/NNG 이/JKS 크/VV 무/EC 메그락지__1/NNG 이/JKC 대__22/VV ᆸ구마/EF ./SF	올챙이가 크면 개구리가 됩니다.
+이 짐이사 개가웁구 기래니 내 들구 가갯소.	이/MM 짐/NNG 이사/JX 개가웁__1/VA-I 구/EC 기렇/VA-I 어/EC 나/NP 이/JKS 들/VV 구/EC 가/VV 갯/EP 소/EC ./SF	이 짐이야 가볍고 그러니 내가 들고 가겠소.
+가비 얼매나 섧은지 나날이 웁구마. 	가비__5/NNG 얼매나__1/MAG 섧/VA 은지/EC 나날이/MAG 울/VV ᆸ구마/EF ./SF	과부가 얼마나 설운지 나날이 웁니다.
+그거 어띃게 먹슴까?	그거/NP 어띃게__1/MAG 먹/VV 슴까/EF ?/SF	그거 어찌 먹습니까?	그거/NP 어찌/MAG 먹/VV 습니까/EF ?/SF
+영게 옥시끼 많이 있소.	영게__1/NP 옥시끼__1/NNG 이/JKS 많이/MAG 있/VA 소/EC ./SF	여기 옥수수가 많이 있소.	여기/NP 옥수수/NNG 가/JKS 많이/MAG 있/VV 소/EC ./SF
+아덜이 디렵다 달아간다.	아__23/NNG 덜/XSN 이/JKS 디렵다__1/MAG 달아가/VV ᆫ다/EF ./SF	아이들이 들입다 달려간다.
+아덜으느 꼼치울래기하구 놀다 나니 저골고롬이 잘 떨어디대니우?	아__23/NNG 덜/XSN 으느/JX 꼼치울래기/NNG 하/XSV 구/EC 놀/VV 다/EC 나/VX 니/EC 저골고롬/NNG 이/JKS 잘/MAG 떨어디/VV 디/EC 애니__1/VA 우/EF ?/SF	아이들은 숨바꼭질하고 놀다 보니 옷고름이 잘 떨어지지 않소?
+그 동미 간대사 나르 얼렛갯슴둥? 	그/MM 동미__1/NNG 간대사__1/MAG 나/NP 르/JKO 얼리__9/VV 엇/EP 갯/EP 슴둥/EF ?/SF	그 동무가 설마 나를 속였겠습니까?
+지끔꺼지두 샐르 짐스으 잡소.	지끔__2/NNG 꺼지/JX 두/JX 새__26/NNG ᆯ르/JKB 짐스__1/NNG 으/JKO 잡/VV-R 소/EC ./SF	지금까지도 올가미로 짐승을 잡소.
+가꼴막에 낭그들이 가뜩하다.	가꼴막__1/NNG 에/JKB 낭그__1/NNG 들/XSN 이/JKS 가뜩/MAG 하/XSA 다/EF ./SF	언덕바지에 나무들이 가득하다.
+뇰으 주무 달기 닭으덩때에서 네레와서 인차 먹습구마. 	뇰__1/NNG 으/JKO 주/VV 무/EC 달기__1/NNG 이/JKS 닭으덩때__1/NNG 에서/JKB 네리/VV 어/EC 오/VX 어서/EC 인차/MAG 먹/VV 습구마/EF ./SF	모이를 주면 닭이 홰에서 내려와서 이내 먹습니다.
+어제께 개굴에서 괴기잽이를 해 가미 놀앗습구마.	어제께/MAG 개굴/NNG 에서/JKB 괴기잽이__1/NNG 를/JKO 하/VV 어/EC 가/VX 미/EC 놀/VV 엇/EP 습구마/EF ./SF	어저께 개울에서 고기잡이를 해 가며 놀았습니다.
+할기 좋대니무 농새 잘 아이 뎁구마. 	할기__2/NNG 이/JKS 좋/VA 디/EC 애니__1/VA 무/EC 농새/NNG 이/JKS 잘/MAG 아이__12/MAG 데__5/VV ᆸ구마/EF ./SF	흙이 좋지 않으면 농사가 잘 안 됩니다.
+저 동미느 제깍하무 다배집구마. 	저/MM 동미__1/NNG 느/JX 제깍하무__1/MAG 다배지__3/VV ᆸ구마/EF ./SF	저 동무는 걸핏하면 자빠집니다.
+해르 바라본다구 하는 그 꽂이 바루 해가부리지.	해/NNG 르/JKO 바라보/VV ᆫ다구/EC 하/VV 는/ETM 그/MM 꽂__1/NNG 이/JKS 바루/MAG 해가부리__1/NNG 이/VCP 지/EF ./SF	해를 바라본다고 하는 그 꽃이 바로 해바라기지.
+우리 집 도티느 너무 때부시해서 걷지르 못합구마. 	우리/NP 집/NNG 도티__1/NNG 느/JX 너무/MAG 때부시하__1/VA 어서/EC 걷/VV-I 지/EC 르/JX 못하/VX ᆸ구마/EF ./SF	우리 집 돼지는 너무 살쪄서 걷지를 못합니다.
+아르 녚구레 끼구 있습더구마.	아__23/NNG 르/JKO 녚구리/NNG 에/JKB 끼/VV 구/EC 있/VX 습더구마/EF ./SF	아이를 옆구리에 끼고 있더군요.
+명이 길댸닣구 따른 사름이 잇갯습지.	명/NNG 이/JKS 길/VA 디/EC 애니__1/VA ᇂ구/EC 따르__1/VA ᆫ/ETM 사름__2/NNG 이/JKS 있/VA 갯/EP 습지/EF ./SF	명이 길지 않고 짧은 사람이 있겠지요.
+밭으르 나가 일으 하자무 헤미느 꼭 잇어야 합구마. 	밭/NNG 으르/JKB 나가/VV 어/EC 일/NNG 으/JKO 하/VV 자무/EC 헤미__2/NNG 느/JX 꼭/MAG 있/VV 어야/EC 하/NNG ᆸ구마/EF ./SF	밭으로 나가 일을 하자면 호미는 꼭 있어야 합니다.
+헤때기 아프무 약으 바르구야 그 벼이 떨어집지. 	헤때기__1/NNG 이/JKS 아프/VA 무/EC 약/NNG 으/JKO 바르/VV 구야/EC 그/MM 벼/NNG 이/JKS 떨어지/VV ᆸ지/EF ./SF	혀때기가 아프면 약을 발라야 그 병이 낫지요.
+어시게 불효햇다구 가깝은 친첵이 아들 빰나가지르 내갈겟습구마. 	어시__1/NNG 이게/JKB 불효/NNG 하/XSV 엇/EP 다구/EC 가깝/VA-I 은/ETM 친척/NNG 이/JKS 아들/NNG 빰나가지__1/NNG 르/JKO 내갈기/VV 엇/EP 습구마/EF ./SF	어버이에게 불효했다고 가까운 친척이 아들 뺨따귀를 내갈겼습니다.
+쌈우 하무 치우라 이게라구 말합지.	쌈/NNG 우/JKO 하/VV 무/EC 치우__12/VV 라/EC 이게__1/VV 라구/EC 말/NNG 하/XSV ᆸ지/EF ./SF	쌈을 하면 반드시 이기라고 말하지요.
+엊저낙에 웨삼춘댁 상새 낫다구 전홰 왓습구마.	엊저냑/NNG 에/JKB 웨삼춘/NNG 댁/XSN 상새__1/NNG 나/VV 엇/EP 다구/EC 전화/NNG 이/JKS 오/VV 엇/EP 습구마/EF ./SF	엊저녁에 외삼촌댁 돌아가셨다고 전화가 왔습니다.
+우리 아들으느 핵교서 꼬래비만 함메.	우리/NP 아들/NNG 으느/JX 핵교__1/NNG 서/JKB 꼬래비__1/NNG 만/JX 하/VV ᆷ메/EF ./SF	우리 아들은 학교에서 꼴찌만 하네.
+아즈바니께 슈갑 빌게 디레라.	아즈바니__6/NNG 께/JKB 슈갑__1/NNG 빌기__1/VV 어/EC 디리__5/VX 어라/EF ./SF	고모부께 장갑 빌려 드려라.
+내게사 아들가 딸 둘 다 딱같은 자석입구마.	나/NP 에게/JKB 사/JX 아들/NNG 가/JC 딸/NNG 둘/NR 다/MAG 딱같__1/VA 은/ETM 자석/NNG 이/VCP ᆸ구마/EF ./SF	내게야 아들과 딸 둘 다 똑같은 자식입니다.
+도투 줴에다 굴에 옇어라.	도투__1/NNG 우/JKO 줴__1/VV 어다/EC 굴__10/NNG 에/JKB 옇__1/VV 어라/EF ./SF	돼지를 잡아다 우리에 넣어라.
+자는 어째서 뜬뜬해서 저러고 있슴메?	자/NP 는/JX 어째서/MAG 뜬뜬하__8/VA 어서/EC 저러/VV 고/EC 있/VX 슴메/EF ?/SF	쟤는 어째서 뚱해서 저러고 있는가?
+호분차 먹기 슳에서 시걱때두 밥으 잘 아이 먹엇습구마. 	호분차__1/NNG 먹/VV 기/ETN 슳__1/VA 어서/JKB 시걱__1/NNG 때/NNG 에/JKB 두/JX 밥/NNG 으/JKO 잘/MAG 아이__12/MAG 먹/VV 었/EP 습구마/EF ./SF	혼자 먹기 싫어서 끼니때에도 밥을 잘 먹지 않았습니다.
+오쿠리메 댕기지 말구 가슴우 쭉 페구 댕게라.	오쿠리__1/VV 메/EC 댕기__2/VV 지/EC 말/VX 구/EC 가슴/NNG 우/JKO 쭉/MAG 페__3/VV 구/EC 댕기__2/VV 어라/EF ./SF	오그리며 다니지 말고 가슴을 쭉 펴고 다녀라.
+댜느 기애짓 아들 왜사춘이랍데.	댜/NP 느/JX 기애__4/NNG 집/NNG 아들/NNG 왜사춘__1/NNG 이/VCP 랍데/EF ./SF	저 애는 기와집 아들 외사촌이라데.
+개 세띨르 물으 핥아 먹습구마. 	개/NNG 이/JKS 세띠__1/NNG ᆯ르/JKB 물/NNG 으/JKO 핥/VV 어/EC 먹/VV 습구마/EF ./SF	개가 혀로 물을 핥아 먹습니다.
+도투 잡우무 념티르 나르 주우.	도투__1/NNG 우/JKO 잡/VV-R 우무/EC 념티__1/NNG 르/JKO 나/NP 르/JKO 주/VV 우/EF ./SF	돼지를 잡으면 염통을 나를 주오.
+우리 집으르 하냥 같이 가기오. 	우리/NP 집/NNG 으르/VV 하냥__3/MAG 같이/MAG 가/VV 기오/EF ./SF	우리 집으로 꼭 같이 가세.
+깔으 한 움쾜 줴 오오.	깔__3/NNG 으/JKO 한/MM 움쾜__1/NNB 줴/VV 어/EC 오/VX 오/EF ./SF	꼴을 한 움큼 쥐어 오오.
+아이구! 발에서 발똥쿠린내 나니까데 싹 싳어라.	아이구/IC !/SF 발/NNG 에서/JKB 발똥쿠린내__1/NNG 나/VV 니까데/EC 싹/MAG 싳__1/VV 어라/EF ./SF	아이고! 발에서 고린내가 나니까 싹 씻어라.
+낭그르 불러뜨려서 지팽이를 맨들었수다레.	낭그__1/NNG 르/JKO 불러뜨리__1/VV 어서/EC 지팡이/NNG 를/JKO 맨들/VV 엇/EP 수다레/EF ./SF	나무를 부러뜨려서 지팡이를 만들었습니다.
+저낙 먹을 때 됏는데 웨아즈바이느 안즉 아이 왓슴둥?	저낙__1/NNG 먹/VV 을/ETM 때/NNG 되/VV 엇/EP 는데/EC 웨아즈바이__1/NNG 느/JX 안즉__1/MAG 아이__12/MAG 오/VV 엇/EP 슴둥/EF ?/SF	저녁 먹을 때 됐는데 외삼촌은 아직 안 왔습니까?
+둥굴소르 가대기에 메와서 밭으 갈앗습지. 	둥굴소__1/NNG 르/JKO 가대기/NNG 에/JKB 메우/VV 어서/EC 밭/NNG 으/JKO 갈/VV 었/EF 습지/EF ./SF	황소를 가대기에 메워서 밭을 갈았지요.
+댱기르 동생게 갲다 줘라.	댱기__1/NNG 르/JKO 동생/NNG 게/JKB 갲/VV 다/EC 주/VV 어라/EF ./SF	장구를 동생에게 갖다 줘라.
+돈으 쪼꼼이라두 해잴하무 안 된다.	돈/NNG 으/JKO 쪼꼼__1/NNG 이/VCP 라두/EC 해잴하__1/VV 무/EC 안/MAG 되/VV ᆫ다/EF ./SF	돈을 조금이라도 낭비하면 안 된다.
+아덜이 헤태르 내밀메 웃구 그러무 어시느 귀엽다구 그 아르 안아 줍구마. 	아__23/NNG 덜/XSN 이/JKS 헤태__1/NNG 르/JKO 내밀/VV 메/EC 웃/VV-R 구/EC 그러/VV 무/EC 어시__1/NNG 느/JX 귀엽/VA-I 다구/EC 그/MM 아__23/NNG 르/JKO 안/VV 어/EC 주/VX ᆸ구마/EF ./SF	아이들이 혀를 내밀며 웃고 그러면 부모는 귀엽다고 그 아이를 안아 줍니다.
+우리 아느 새박부터 부지러이 배아리 들구 놀러 나갔소.	우리/NP 아__23/NNG 느/JX 새박__3/NNG 부터/JX 부지러이__1/MAG 배아리__2/NNG 들/VV 구/EC 놀/VV 러/EC 나가/VV 엇/EP 소/EF ./SF	우리 애는 새벽부터 부지런히 팽이 들고 놀러 나갔소.
+내 쓴 펜지에 홰답으 아이 주다 나니까데 서분합구마. 	나/NP 이/JKS 쓰/VV ᆫ/ETM 펜지__1/NNG 에/JKB 홰답__1/NNG 으/JKO 아이__12/MAG 주/VV 다/EC 나/VX 니까데/EC 서분하__2/VV ᆸ구마/EF ./SF	내가 쓴 편지에 회답을 주지 않다 보니까 서운합니다.
+소낙 소리 쎄기 나는 게 인차 비 오갯습구마.	소낙__1/NNG 소리/NNG 쎄/VA 기/EC 나/VV 는/ETM 것/NNB 이/JKS 인차/MAG 비/NNG 오/VV 갯/EP 습구마/EF ./SF	우레 소리 세게 나는 게 이내 비 오겠습니다.
+우춧한 사름이사 세사에 많갯습지. 	우춧하__1/VA ᆫ/ETM 사름__2/NNG 이사/JX 세상/NNG 에/JKB 많/VA 갯/EP 습지/EF ./SF	어리석은 사람이야 세상에 많겠지요.
+밭에 무끼가 배채르 세이 싱것습구마. 	밭/NNG 에/JKB 무끼__1/NNG 가/JC 배채__1/NNG 르/JKO 세이__3/MAG 싱그__1/VV 엇/EP 습구마/EF ./SF	밭에 무와 배추를 많이 심었습니다.
+승겁운가 짭운가 맛으 보오.	승겁__1/VA 은가/EC 짭__1/VA 은가/EC 맛/NNG 으/JKO 보/VV 오/EF ./SF	싱거운가 짠가 맛을 보오.
+곤매시르 닦아 먹으무 과연 맛잇습지. 	곤매시__1/NNG 르/JKO 닦/VV 어/EC 먹/VV 으무/EC 과연/MAG 맛잇/VA-R 습지/EF ./SF	호박을 볶아 먹으면 정말 맛있지요.
+저 아느 제 어시 말으 통 듣댸이쿠 펀한 짓만 하구 댕긴다구 합구마.	저/MM 아__23/NNG 느/JX 저/NP 의/JKG 어시__1/NNG 말/NNG 으/JKO 통/MAG 듣/VV-I 디/EC 애이__1/VA 쿠/EC 펀하__1/VA ᆫ/ETM 짓/NNG 만/JX 하/VV 구/EC 댕기/VV ᆫ다구/EF 하/VV ᆸ구마/EF ./SF	저 아이는 제 부모 말을 통 듣지 않고 멍청한 짓만 하고 다닌다고 합니다.
+핵교서 아덜 배와주는 선생님덜 보무 바쁜 가툴합구마.	핵교/NNG 서/JKB 아__23/NNG 덜/XSN 배와주__1/VV 는/ETM 선생/NNG 님/XSN 덜/XSN 보/VV 무/EC 바쁘__7/VA ᆫ/ETM 가툴하__1/VA ᆸ구마/EF ./SF	학교에서 아이들 가르치는 선생님들 보면 어려운 것 같습니다. 
+당신이 그래셔 나두 그 사람이 쇠겡이인 줄로만 알았습구마.	당신/NP 이/JKS 그렇/VA-I 어셔/EC 나/NP 두/JX 그/MM 사람/NNG 이/JKS 쇠겡이__1/NNG 이/VCP ᆫ/ETM 줄/NNB 로/JKB 만/JX 알/VV 엇/EP 습구마/EF ./SF	당신이 그래서 나도 그 사람이 소경인 줄로만 알았습니다.
+내 고향 경흥가 저짝 단천 말테 땁구마. 	나/NP 의/JKG 고향/NNG 경흥/NNP 가/JC 저짝__1/NP 단천/NP 말테__1/NNG 이/JKS 따__17/VA ᆸ구마/EF ./SF	내 고향 경흥과 저쪽 단천 말투가 다릅니다.
+일으 많이 하다 나니 오분몸이 다 아파서 못 살갯습구마.	일/NNG 으/JKO 많이/MAG 하/VV 다/EC 나/VX 니/EC 오분몸__1/NNG 이/JKS 다/MAG 아프/VA 어서/EC 못/MAG 살/VV 갯/EP 습구마/EF ./SF	일을 많이 하다 보니 온몸이 다 아파서 못 살겠습니다.
+아바이, 소곰쟁이 잡지 맙소.	아바이/NNP ,/SP 소곰쟁이__1/NNG 잡/VV-R 지/EC 말/VX ᆸ소/EF ./SF	아버지, 잠자리 잡지 마십시오.
+영겔르 가찹이 오나라.	영게__1/NP ᆯ르/JKB 가찹이__2/MAG 오/VV 나라/EF ./SF	여기로 가까이 오너라.
+배고푸무 부수깨서 다웅치 가졔가서 먹어라.	배고푸__1/VA 무/EC 부수깨__1/NNG 에서/JKB 다웅치__1/NNG 가지/VV 어/EC 가/VX 어서/EC 먹/VV 어라/EF ./SF	배고프면 부엌에서 누룽지 가져가서 먹어라.
+아 들어서무 입스레미르 합지.	아__23/NNG 들어서/VV 무/EC 입스레미__1/NNG 르/JKO 하/VV ᆸ지/EF ./SF	아이가 들어서면 입덧을 하지요.
+내 조꼼할 적에느 키 작앗습구마. 	나/NP 이/JKS 조꼼/NNG 하/XSV ᆯ/ETM 적/NNB 에/JKB 느/JX 키/NNG 이/JKS 작/VA 엇/EP 습구마/EF ./SF	내 조끄마할 적에는 키가 작았습니다.
+상년 동삼에 옝기르 바람에 싹 날기구 고사아 했습지.	상년/NNG 동삼/NNG 에/JKB 옝기__1/NNG 르/JKO 바람/NNG 에/JKB 싹/MAG 날기__1/VV 구/EC 고상__1/NNG 으/JKO 하/XSV 엇/EP 습지/EF ./SF	상년 겨울에 이엉을 바람에 싹 날리고 고생을 했지요.
+내 아주바이느 젊어실 적에 고사아 많이 햇습구마. 	나/NP 의/JKG 아주바이__3/NNG 느/JX 젊/VA 엇/EP ᆯ/ETM 적/NNB 에/JKB 고상__1/NNG 으/JKO 많이/MAG 하/VV 엇/EP 습구마/EF ./SF	내 형부는 젊었을 적에 고생을 많이 했습니다.
+하불에미나 하불애비나 살기느 바쁩지. 	하불에미__1/NNG 나/JC 하불애비/NNG 나/JC 살/VV 기/ETN 느/JX 바쁘__7/VA ᆸ지/EF ./SF	홀어미나 홀아비나 살기는 힘들지요.
+봄에 피는 꽂 중에서 하불에미고장으느 자디색이 납지.	봄/NNG 에/JKB 피/VV 는/ETM 꽂__1/NNG 중/NNB 에서/JKB 하불에미고장__1/NNG 으느/JX 자디색__1/NNG 이/JKS 나/VV ᆸ지/EF ./SF	봄에 피는 꽃 중에서 할미꽃은 자주색이 나지요.
+우리 클아반으느 오래 앉앗습구마.	우리/NP 클아반__1/NNG 으느/JX 오래/MAG 앉/VV 엇/EF 습구마/EF ./SF	우리 할아버지는 오래 사셨습니다.
+시금 아덜이사 우리 세는 멩실이 무시긴지 잘 모릅구마. 	시금__8/NNG 아__23/NNG 덜/XSN 이사/JX 우리/NP 세__21/VV 는/ETM 멩실/NNG 이/JKS 무시기/NP 이/VCP ᆫ지/EC 잘/MAG 모르/VV ᆸ구마/EF ./SF	지금 아이들이야 우리가 쇠는 명절이 무엇인지 잘 모릅니다.
+식귀 여서히 살무 시끄럽어서 내느 아니 둏아합구마. 	식귀__1/NNG 이/JKS 여서히__1/NNG 이/JKS 살/VV 무/EC 시끄럽/VA-I 어서/EC 내/NP 느/JX 아니/MAG 둏__1/VA 어/EC 하/NNG ᆸ구마/EF ./SF	식구가 여럿이 살면 시끄러워서 나는 안 좋아합니다.
+그 짓 녕감가 노친 모두 일없습더구마.	그/MM 집/NNG 녕감__1/NNG 가/JC 노친/NNG 모두/MAG 일/NNG 없/VA 습더구마/EF ./SF	그 집 영감님과 노친 모두 괜찮으셨습니다.
+시방으느 기름우 얻자구 해자부리두 많이 싱구오.	시방/NNG 으느/JX 기름/NNG 우/JKO 얻/VV-R 자구/EC 해자부리__1/NNG 두/JX 많이/MAG 싱구__1/VV 오/EF ./SF	시방은 기름을 얻자고 해바라기도 많이 심으오.
+붕혜가 저약에느 어디메 있니?	붕혜__1/NNG 가/JKS 저약__1/NNG 에/JKB 느/JX 어디메__1/NP 있/VV 니/EF ?/SF	부엉이가 저녁에는 어디 있니?
+사름덜 다치니까데 뎡게 웅데이르 잘 메꿔라.	사름__2/NNG 덜/XSN 다치/VV 니까데/EC 뎡게__1/NP 웅데이__3/NNG 르/JKO 잘/MAG 메꾸/VV 어라/EF ./SF	사람들이 다치니까 저기 웅덩이를 잘 메워라.
+그 무티를 가제와 놔라.	그/MM 무티__1/NNG 를/JKO 가지/VV 어/EC 오/VX 어/EC 놓/VX 어라/EF ./SF	그 나무를 가져와 놓아라.
+정재시리서 가재미 굽어 먹었슴메.	정재시리__1/NNG 서/JKB 가재미/NNG 굽/VA-R 어/EC 먹/VV 었/EP 슴메/EF ./SF	정주에서 가자미 구워 먹었소.
+아가 오마니 우티 끝자라기르 잡구 있습메.	아__23/NNG 가/JKS 오마니__1/NNG 우티__1/NNG 끝자라기__1/NNG 르/JKO 잡/VV-R 구/EC 있/VX 습메/EF ./SF	아이가 어머니 옷 끝자락을 잡고 있네.
+네 함벌로 말으 하무 내 가만히 아이 잇갯다.	너/NP 이/JKS 함벌로__1/MAG 말/NNG 으/JKO 하/VV 무/EC 나/NP 이/JKS 가만히/MAG 아이/MAG 있/VV 갯/EP 다/EF ./SF	네가 함부로 말을 하면 내가 가만히 있지 않겠다.
+바쁘기 빳빳이 살구 기래다 나니 이래 나아 먹엇습구마. 	바쁘__7/VA 기/EC 빳빳이__6/MAG 살/VV 구/EC 기렇/VA-I 어다/EC 나/VX 니/EC 이렇/VA-I 어/EC 나이/NNG 으/JKO 먹/VV 엇/EP 습구마/EF ./SF	힘들게 빠듯이 살고 그러다 보니 이리 나이를 먹었습니다.
+허더칸에 쟁기구 무슨 냉기구 다 딜에놓소.	허더칸__1/NNG 에/JKB 쟁기/NNG 이/VCP 구/EC 무슨/MM 냉기__2/NNG 이/VCP 구/EC 다/MAG 딜이__1/VV 어/EC 놓/VV 소/EF ./SF	헛간에 농기구고 무슨 나무고 다 들여놓소.
+내 새끼소꾸락이 요즘 아풉구마.	나/NP 의/JKG 새끼소꾸락__1/NNG 이/JKS 요즘/NNG 아프/VA ᆸ구마/EF ./SF	내 새끼손가락이 요즘 아픕니다.
+우리 어마니 애끼 남편이무 아즈바니라 하오.	우리/NP 어마니/NNG 애끼__1/NNG 남편/NNG 이/VCP 무/EC 아즈바니__3/NNG 이/VCP 라/EC 하/VV 오/EF ./SF	우리 어머니 아우의 남편이면 이모부라 하오.
+뽕여르매 열겟으무 따 오나라.	뽕여르매__1/NNG 열기__1/VV 엇/EP 으무/EC 따/VV 어/EC 오/VX 나라/EF ./SF	오디가 열렸으면 따 오너라.
+꼬부대기 심바람으 갓다 온나라.	꼬부대기__1/MAG 심바람__1/NNG 으/JKO 가/VV 엇/EP 다/EC 오/VV ᆫ나라/EF ./SF	부지런히 심부름을 갔다 오너라.
+마른 검블으 모아셔 불으 지펬다.	마르/VV ᆫ/ETM 검블__1/NNG 으/JKO 모으/VV 어셔/EC 불/NNG 으/JKO 지피/VV 었/EP 다/EF ./SF	마른 검불을 모아서 불을 지폈다.
+자식덜이 다 서방가구 시집가구 기래구 안까니두 상새 나서 없구 집에 내 하분자 잇으니 늘상 헝둥하오.	자식/NNG 덜/XSN 이/JKS 다/MAG 서방/NNG 가/XSV 구/EC 시집/NNG 가/XSV 구/EC 기렇/VA-I 어구/EC 안까니__1/NNG 두/JX 상/NNG 새/NNG 나/VV 어서/EC 없/VA 구/EC 집/NNG 에/JKB 나/NP 의/JKG 하/NNG 분자/NNG 잇/NNG 으니/EC 늘상/MAG 헝둥/NNG 하/XSA 오/EF ./SF	자식들이 다 장가가고 시집가고 그리고 부인도 죽어서 없고 집에 내가 혼자 있으니 늘상 허전하오.
+그른 말 아이 씀다.	그른__1/MM 말/NNG 아이__12/MAG 쓰/VV ᆷ다/EF ./SF	그런 말 아니 씁니다.
+네 어드메르 가나?	너/NP 이/JKS 어드메/NP 르/JKO 가/VV 나/EF ?/SF	너 어디를 가니?
+장에 가서 염쉐르 싸 오너라.	장/NNG 에/JKB 가/VV 어서/EC 염쉐__1/NNG 르/NNG 싸__21/VV 오/VV 너라/EF ./SF	장에 가서 염소를 사 오너라.
+어레실 적 일으 해상하무 즐겁습구마. 	어리/VA 엇/EP ᆯ/ETM 적/NNB 일/NNG 으/JKO 해상하__2/VV 무/EC 즐겁/VA-I 습구마/EF ./SF	어렸을 적 일을 회상하면 즐겁습니다.
+아덜으느 소압을 줏으러 산지슭을르 갔다.	아__23/NNG 덜/XSN 으느/JX 소압__1/NNG 을/JKO 줏/VV-R 으러/EC 산지슭__1/NNG 을르/JKB 가/VV 었/EP 다/EF ./SF	아이들은 솔가지를 주우러 산기슭으로 갔다.
+영게 옥시두 많이 있습구마.	영게__1/NP 옥시__1/NNG 두/JX 많이/MAG 있/VA 습구마/EF ./SF	여기 옥수수도 많이 있습니다.
+영게서 새채할 생각 말구 얼른 재비 집으르 가서 눕어 자오.	영게__1/NP 서/JKB 새채하__1/VV ᆯ/ETM 생각/NNG 말/VV 구/EC 얼른/MAG 재비__4/MAG 집/NNG 으르/JKB 가/VV 어서/EC 눕/VV-I 어/EC 자/VV 오/EF ./SF	여기서 유숙할 생각 말고 얼른 자기 집으로 가서 누워 자오.
+그 담엔 제 쌀이 나오게끔 돼구 게 나간 건 나백게 나간단 말이오.	그/MM 담/NNG 에/JKB ᆫ/JX 저/NP 의/JKG 쌀/NNG 이/JKS 나오/VV 게끔/EC 돼__1/VV 구/EC 게__6/NNG 이/JKS 나가/VV ᆫ/ETM 거/NNB ᆫ/JX 나백게__1/NNG 이/JKS 나가/VV ᆫ단/ETM 말/NNG 이/VCP 오/EF ./SF	그 다음엔 제 쌀이 나오게끔 되고 겨가 나간 것은 쌀겨가 나간단 말이오.
+가매뜨베르 생질르 잘 닦아라.	가매뜨베__1/NNG 르/JKO 생지__2/NNG ᆯ르/JKB 잘/MAG 닦/VV 어라/EF ./SF	솥뚜껑을 행주로 잘 닦아라.
+솔냉기처리 상낭구두 오래 사는 냉기입구마.	솔냉기__1/NNG 처르__1/JKB 상낭구__1/NNG 두/JX 오래/MAG 사/VV 는/ETM 냉기__2/NNG 이/VCP ᆸ구마/EF ./SF	소나무처럼 향나무도 오래 사는 나무입니다.
+도독 한 놈은 경찰덜게 붙들기우구 둘은 달아낫습구마.	도독__12/NNG 한/MM 놈/NNB 은/JX 경찰/NNG 덜/XSN 게/JKB 붙들기우__1/VV 구/EC 둘/NR 은/JX 달아나/VV 엇/EP 습구마/EF ./SF	도둑 한 놈은 경찰들에게 붙들리고 둘은 달아났습니다.
+모딘 낭기 많다 나니 땔낭그 걱정이사 없엇습구마.	모디__3/VA ᆫ/JX 낭기__1/NNG 이/JKS 많/VA 다/EC 나/VX 니/EC 땔낭그__1/NNG 걱정/NNG 이사/JX 없/VA 엇/EP 습구마/EF ./SF	굵은 나무가 많다 보니 땔나무 걱정이야 없었습니다.
+사등이에 뻬가 탁 부러뎃단 말이오.	사등이__1/NNG 에/JKB 뻬__1/NNG 가/JKS 탁/MAG 부러디__1/VV 엇/EP 단/ETM 말/NNG 이/VCP 오/EF ./SF	등에 뼈가 탁 부러졌다는 말이오.
+세때기에 쓸이 돋으무 통세 나서 임셕으 먹지 못하오. 	세때기__1/NNG 에/JKB 쓸/NNG 이/JKS 돋/VV-R 으무/EC 통세/NNG 나/VV 어서/EC 임석__4/NNG 으/JKO 먹/VV 지/EC 못하/VX 오/EF ./SF	혀때기에 혓바늘이 돋으면 통세가 있어서 음식을 먹지 못하오.
+야 웨컬아배 올해 야든이 넘었는데 정정합메다.	야/NP 웨컬아배__1/NNG 올해/NNG 야든__1/NR 이/JKS 넘/VV 었/EP 는데/EC 정정/NNG 하/XSA ᆸ메다/EF ./SF	얘 외할아버지 올해 여든이 넘었는데 정정합니다.
 내기 심심하다 나이 자주루 하페미르 합지.	내기/NNG 심심/XR 하/XSA 다/EC 나이/NNG 자주/MAG 루/NNG 하페미__1/NNG 르/NNG 합/NNG 지/EF ./SF	얘기가 심심하다 보니 자주 하품을 하지요.	얘기/NNG 가/JKS 심심/XR 하/XSA 다/EC 보/VX 니/EC 자주/MAG 하품/NNG 을/JKO 하/VV 지요/EF ./SF
 우리 동네에 입따개 한내 잇는데 마음이 곱은 사름입구마.	우리/NP 동네/NNG 에/JKB 입따개__1/NNG 한내__2/NR 잇/VV-I 는데/EC 마음/NNG 이/JKS 곱/VA-I 은/ETM 사르/VV ᆷ/ETN 입/NNG 구마/EF ./SF	우리 동네에 언청이 하나가 있는데 마음이 고운 사랍입니다.	우리/NP 동네/NNG 에/JKB 언청이/NNG 하나/NR 가/JKS 있/VV 는데/EC 마음/NNG 이/JKS 곱/VA-I 은/ETM 사랍/NNG 이/VCP ᆸ니다/EF ./SF
 어마네, 왜큰아매 오셋습구마.	어/IC 말/VV 네/EC ,/SP 왜/MAG 크/VA ᆫ/ETM 아매/MAG 오셋습구마/NNG ./SF	어머니, 외할머니 오셨습니다.	어머니/NNG ,/SP 외할머니/NNG 오/VV 시/EP 었/EP 습니다/EF ./SF
