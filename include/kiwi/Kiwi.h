@@ -60,10 +60,17 @@ namespace kiwi
 		Match match = Match::allWithNormalizing;
 		const std::unordered_set<const Morpheme*>* blocklist = nullptr;
 		bool openEnding = false;
+		Dialect allowedDialects = Dialect::standard;
+		float dialectPenalty = 0.0f;
 
 		AnalyzeOption() = default;
-		AnalyzeOption(Match m, const std::unordered_set<const Morpheme*>* bl = nullptr, bool oe = false)
-			: match{ m }, blocklist{ bl }, openEnding{ oe } 
+		AnalyzeOption(Match m, 
+			const std::unordered_set<const Morpheme*>* bl = nullptr, 
+			bool oe = false,
+			Dialect ad = Dialect::standard,
+			float dp = 0.0f
+			)
+			: match{ m }, blocklist{ bl }, openEnding{ oe }, allowedDialects{ ad }, dialectPenalty{ dp }
 		{}
 	};
 

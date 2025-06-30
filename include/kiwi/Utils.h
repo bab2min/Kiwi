@@ -428,5 +428,9 @@ namespace kiwi
 	}
 
 	const char* modelTypeToStr(ModelType type);
+
+	Dialect toDialect(std::string_view str);
+	const char* dialectToStr(Dialect dialect);
+	Dialect parseDialects(std::string_view str);
 }
 

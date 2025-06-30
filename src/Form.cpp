@@ -33,7 +33,7 @@ namespace kiwi
 		setComplex(_complex);
 	}
 
-	DEFINE_SERIALIZER_OUTSIDE(MorphemeRaw, kform, tag, vpPack, senseId, combineSocket, combined, userScore, chunks, chunkPositions, lmMorphemeId, /*origMorphemeId,*/ groupId);
+	DEFINE_SERIALIZER_OUTSIDE(MorphemeRaw, kform, tag, vpPack, senseId, combineSocket, combined, userScore, chunks, chunkPositions, lmMorphemeId, groupId, dialect, _reserved);
 
 	Morpheme::Morpheme() = default;
 
@@ -135,6 +135,7 @@ namespace kiwi
 		ret.complex = o.complex() && !hasSaisiot;
 		ret.saisiot = o.complex() && hasSaisiot;
 
+		ret.dialect = o.dialect;
 		return ret;
 	}
 
