@@ -95,7 +95,8 @@ namespace kiwi
 			bool splitComplex = false,
 			bool splitSaisiot = false,
 			bool mergeSaisiot = false,
-			const std::unordered_set<const Morpheme*>* blocklist = nullptr
+			const std::unordered_set<const Morpheme*>* blocklist = nullptr,
+			Dialect allowedDialects = Dialect::standard
 		);
 	};
 

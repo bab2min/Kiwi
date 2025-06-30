@@ -728,6 +728,7 @@ namespace kiwi
 				token.typoFormId = s.typoFormId;
 				token.senseId = s.morph->senseId;
 				updateTokenInfoScript(token);
+				token.dialect = s.morph->dialect;
 				auto ptId = nodeInWhichPretokenized[s.nodeId] + 1;
 				if (ptId)
 				{
@@ -1020,7 +1021,8 @@ namespace kiwi
 				!!(option.match & Match::splitComplex),
 				!!(option.match & Match::splitSaisiot),
 				!!(option.match & Match::mergeSaisiot),
-				option.blocklist
+				option.blocklist,
+				option.allowedDialects
 			);
 			insertPathIntoResults(ret, spStatesByRet, res, topN, option.match, integrateAllomorph, positionTable, wordPositions, pretokenizedGroup, nodeInWhichPretokenized);
 		}

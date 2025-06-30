@@ -1,5 +1,6 @@
 ﻿#include <fstream>
 #include <random>
+#include <charconv>
 
 #include <kiwi/Kiwi.h>
 #include <kiwi/Utils.h>
@@ -57,6 +58,7 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 		int addAlias = 0;
 		size_t origMorphId = 0;
 		size_t groupPriority = 0;
+		Dialect dialect = Dialect::standard;
 		size_t origMorphSenseCnt = 1;
 
 		LongTail(const KString& _form = {},
@@ -72,11 +74,13 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 			const KString& _groupForm = {},
 			int _addAlias = 0,
 			size_t _origMorphId = 0,
-			size_t _groupPriority = 0
+			size_t _groupPriority = 0,
+			Dialect _dialect = Dialect::standard
 		) :
 			form{ _form }, weight{ _weight }, tag{ _tag }, origTag{ _origTag }, cvowel{ _cvowel }, cpolar{ _cpolar }, complex{ _complex }, 
 			senseId{ _senseId }, origSenseId{ _origSenseId },
-			origForm{ _origForm }, groupForm{ _groupForm }, addAlias{ _addAlias }, origMorphId{ _origMorphId }, groupPriority{ _groupPriority }
+			origForm{ _origForm }, groupForm{ _groupForm }, addAlias{ _addAlias }, origMorphId{ _origMorphId }, groupPriority{ _groupPriority },
+			dialect{ _dialect }
 		{
 		}
 	};
@@ -92,7 +96,9 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 	morphMap.emplace(make_tuple(u"\x11BA", undefSenseId, POSTag::z_siot), make_pair(defaultTagSize + 28, defaultTagSize + 28));
 	morphSenseMap.emplace(make_pair(u"\x11BA", POSTag::z_siot), Vector<uint8_t>{ undefSenseId });
 
-	const auto& insertMorph = [&](KString&& form, float score, POSTag tag, CondVowel cvowel, CondPolarity cpolar, bool complex, uint8_t senseId, size_t origMorphemeId = 0, size_t groupId = 0)
+	const auto& insertMorph = [&](KString&& form, float score, POSTag tag, CondVowel cvowel, CondPolarity cpolar, 
+		bool complex, uint8_t senseId, Dialect dialect,
+		size_t origMorphemeId = 0, size_t groupId = 0)
 	{
 		auto& fm = addForm(form);
 		bool unified = false;
@@ -140,6 +146,7 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 			morphemes.back().lmMorphemeId = origMorphemeId;
 			morphemes.back().groupId = groupId;
 			morphemes.back().senseId = senseId;
+			morphemes.back().dialect = dialect;
 			return mid;
 		}
 	};
@@ -157,14 +164,14 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 		}
 
 		auto form = normalizeHangul(fields[0]);
-		auto tag = toPOSTag(fields[1]);
+		const auto tag = toPOSTag(fields[1]);
 		if (clearIrregular(tag) >= POSTag::p || clearIrregular(tag) == POSTag::unknown)
 		{
 			cerr << "Wrong tag at line: " + line << endl;
 			continue;
 		}
 
-		float morphWeight = stof(fields[2].begin(), fields[2].end());
+		const float morphWeight = stof(fields[2].begin(), fields[2].end());
 		float altWeight = 0;
 
 		CondVowel cvowel = CondVowel::none;
@@ -172,9 +179,11 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 		bool complex = false;
 		KString origMorphemeOfAlias, groupForm = form;
 		POSTag origTag = tag;
+		uint8_t origSenseId = undefSenseId;
 		int addAlias = 0;
 		size_t groupPriority = 0;
 		Vector<uint8_t> senseIds;
+		Dialect dialect = Dialect::standard;
 		u16string complexStr;
 		if (fields.size() > 3)
 		{
@@ -224,7 +233,16 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 					if (!origMorphemeOfAlias.empty()) throw FormatException{ "wrong line: " + line };
 					if (f[1] == u'=')
 					{
-						origMorphemeOfAlias = normalizeHangul(f.substr(2));
+						if (f.find(u"__") == f.npos)
+						{
+							origMorphemeOfAlias = normalizeHangul(f.substr(2));
+						}
+						else
+						{
+							origMorphemeOfAlias = normalizeHangul(f.substr(2, f.find(u"__") - 2));
+							const auto s = f.substr(f.find(u"__") + 2);
+							origSenseId = stol(s.begin(), s.end());
+						}
 						groupForm = origMorphemeOfAlias;
 						addAlias = 2; // ==의 경우 alias에 추가하고, score까지 동일하게 통일
 					}
@@ -280,6 +298,10 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 				{
 					senseIds.emplace_back(stol(f.begin() + 1, f.end()));
 				}
+				else if (f[0] == '<' && f[f.size() - 1] == '>')
+				{
+					dialect = parseDialects(utf16To8(f.substr(1, f.size() - 2)));
+				}
 				else
 				{
 					throw FormatException{ "wrong line: " + line };
@@ -303,15 +325,15 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 				if (form != groupForm)
 				{
 					longTails.emplace_back(form, 0, tag, POSTag::unknown, cvowel, cpolar, complex, 
-						senseId, undefSenseId, u"", groupForm, 0, 0, groupPriority);
+						senseId, origSenseId, u"", groupForm, 0, 0, groupPriority, dialect);
 				}
 
-				insertMorph(move(form), morphWeight, tag, cvowel, cpolar, complex, senseId);
+				insertMorph(move(form), morphWeight, tag, cvowel, cpolar, complex, senseId, dialect);
 			}
 			else
 			{
 				longTails.emplace_back(form, altWeight < 0 ? altWeight : morphWeight, tag, origTag, cvowel, cpolar, complex, 
-					senseId, undefSenseId, origMorphemeOfAlias, groupForm, addAlias, 0, groupPriority);
+					senseId, origSenseId, origMorphemeOfAlias, groupForm, addAlias, 0, groupPriority, dialect);
 				longTailWeights[tag] += morphWeight;
 			}
 		}
@@ -408,6 +430,7 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 					p.cpolar, 
 					p.complex, 
 					p.senseId,
+					p.dialect,
 					getDefaultMorphemeId(p.tag), 
 					groupId
 				);
@@ -430,7 +453,7 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 					{
 						senseId = morphemes[p.origMorphId + i].senseId;
 					}
-					insertMorph(move(p.form), score, p.tag, p.cvowel, p.cpolar, p.complex, senseId, p.origMorphId + i, groupId);
+					insertMorph(move(p.form), score, p.tag, p.cvowel, p.cpolar, p.complex, senseId, p.dialect, p.origMorphId + i, groupId);
 				}
 			}
 			else
@@ -1435,7 +1458,7 @@ pair<uint32_t, bool> KiwiBuilder::addWord(U16StringView newForm, POSTag tag, flo
 		}
 	}
 
-	size_t newMorphId = morphemes.size();
+	const size_t newMorphId = morphemes.size();
 	f.candidate.emplace_back(newMorphId);
 	morphemes.emplace_back(tag);
 	auto& newMorph = morphemes.back();
@@ -1476,7 +1499,7 @@ void KiwiBuilder::addCombinedMorpheme(
 	auto vowel = r.vowel;
 	auto polar = r.polar;
 
-	size_t newId = morphemes.size() + newMorphemes.size();
+	const size_t newId = morphemes.size() + newMorphemes.size();
 	newMorphemes.emplace_back(POSTag::unknown);
 	auto& newMorph = newMorphemes.back();
 	newMorph.lmMorphemeId = newId;
@@ -1524,7 +1547,28 @@ void KiwiBuilder::addCombinedMorpheme(
 	{
 		newMorph.setPolar(polar);
 	}
-	size_t fid = addForm(newForms, newFormMap, r.str);
+
+	// left, right 중 하나라도 사투리이면 새 형태소도 사투리로 설정
+	const auto lDialect = getMorph(leftId).dialect,
+		rDialect = getMorph(rightId).dialect;
+	if (lDialect != Dialect::standard ||
+		rDialect != Dialect::standard)
+	{
+		if (lDialect == Dialect::standard)
+		{
+			newMorph.dialect = rDialect;
+		}
+		else if (rDialect == Dialect::standard)
+		{
+			newMorph.dialect = lDialect;
+		}
+		else
+		{
+			newMorph.dialect = lDialect & rDialect;
+		}
+	}
+
+	const size_t fid = addForm(newForms, newFormMap, r.str);
 	newFormCands[fid].emplace_back(newId);
 	newMorph.kform = fid;
 }
@@ -1600,7 +1644,7 @@ void KiwiBuilder::buildCombinedMorphemes(
 			auto& morph = getMorph(i);
 			auto tag = morph.tag;
 			auto& form = getForm(morph.kform).form;
-
+			
 			if (clearIrregular(tag) > POSTag::pa) continue;
 			if (morph.combined) continue;
 
@@ -1662,9 +1706,9 @@ void KiwiBuilder::buildCombinedMorphemes(
 					break;
 				}
 
-				auto& ids = ruleLeftIds[make_tuple(partialTag, cmb::CompiledRule::toFeature(vowel, polar))];
+				const auto& ids = ruleLeftIds[make_tuple(partialTag, cmb::CompiledRule::toFeature(vowel, polar))];
 				Vector<uint8_t> partialFormInserted(form.size());
-				auto cform = form;
+				const auto cform = form;
 
 				for (auto id : ids)
 				{
@@ -1687,8 +1731,8 @@ void KiwiBuilder::buildCombinedMorphemes(
 						);
 						if (inserted.second)
 						{
-							size_t fid = addForm(newForms, newFormMap, get<0>(inserted.first->first));
-							size_t newId = morphemes.size() + newMorphemes.size();
+							const size_t fid = addForm(newForms, newFormMap, get<0>(inserted.first->first));
+							const size_t newId = morphemes.size() + newMorphemes.size();
 							inserted.first->second = newId;
 							newMorphemes.emplace_back(partialTag);
 							auto& newMorph = newMorphemes.back();
@@ -1699,14 +1743,15 @@ void KiwiBuilder::buildCombinedMorphemes(
 
 						if (!partialFormInserted[startPos])
 						{
-							size_t fid = addForm(newForms, newFormMap, cform.substr(0, startPos));
-							ptrdiff_t newId = (ptrdiff_t)(morphemes.size() + newMorphemes.size());
+							const size_t fid = addForm(newForms, newFormMap, cform.substr(0, startPos));
+							const ptrdiff_t newId = (ptrdiff_t)(morphemes.size() + newMorphemes.size());
 							newMorphemes.emplace_back(POSTag::p);
 							auto& newMorph = newMorphemes.back();
 							newMorph.kform = fid;
 							newMorph.lmMorphemeId = newId;
 							newMorph.combineSocket = getMorph(inserted.first->second).combineSocket;
 							newMorph.combined = (ptrdiff_t)i - newId;
+							newMorph.dialect = morph.dialect;
 							newFormCands[fid].emplace_back(newId);
 							partialFormInserted[startPos] = 1;
 						}
@@ -1719,15 +1764,15 @@ void KiwiBuilder::buildCombinedMorphemes(
 			newMorphemes[p.second - morphemes.size()].tag = POSTag::p;
 		}
 
-		size_t updated = morphemes.size() + newMorphemes.size();
+		const size_t updated = morphemes.size() + newMorphemes.size();
 
 		// 규칙에 의한 결합 연산 수행 후 형태소 목록에 삽입
 		for (size_t ruleId = 0; ruleId < min(combiningLeftCands.size(), combiningRightCands.size()); ++ruleId)
 		{
-			auto& ls = combiningLeftCands[ruleId];
-			auto lmid = lower_bound(ls.begin(), ls.end(), combiningUpdateIdx);
-			auto& rs = combiningRightCands[ruleId];
-			auto rmid = lower_bound(rs.begin(), rs.end(), combiningUpdateIdx);
+			const auto& ls = combiningLeftCands[ruleId];
+			const auto lmid = lower_bound(ls.begin(), ls.end(), combiningUpdateIdx);
+			const auto& rs = combiningRightCands[ruleId];
+			const auto rmid = lower_bound(rs.begin(), rs.end(), combiningUpdateIdx);
 			for (auto lit = lmid; lit != ls.end(); ++lit)
 			{
 				for (auto rit = rs.begin(); rit != rmid; ++rit)

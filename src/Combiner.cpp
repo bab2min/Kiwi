@@ -155,6 +155,27 @@ namespace kiwi
 		}
 	}
 
+	inline Vector<Dialect> getSubDialectset(Dialect dialect)
+	{
+		Vector<Dialect> ret;
+		if (dialect == Dialect::standard)
+		{
+			ret.emplace_back(Dialect::standard);
+		}
+		else
+		{
+			for (size_t i = 1; i < (size_t)Dialect::lastPlus1; i <<= 1)
+			{
+				const auto d = (Dialect)i;
+				if (!!(dialect & d))
+				{
+					ret.emplace_back(d);
+				}
+			}
+		}
+		return ret;
+	}
+
 	template<class Ty, class It>
 	inline void inplaceUnion(Vector<Ty>& dest, It first, It last)
 	{
@@ -711,7 +732,8 @@ MultiRuleDFAErased RuleSet::buildRightPattern(const Vector<Rule>& rules)
 
 void RuleSet::addRule(const string& lTag, const string& rTag,
 	const KString& lPat, const KString& rPat, const vector<ReplString>& results,
-	CondVowel leftVowel, CondPolarity leftPolar, bool ignoreRCond
+	CondVowel leftVowel, CondPolarity leftPolar, bool ignoreRCond,
+	Dialect dialect
 )
 {
 	auto lTags = getSubTagset(lTag);
@@ -754,11 +776,11 @@ void RuleSet::addRule(const string& lTag, const string& rTag,
 	{
 		for (auto r : rTags)
 		{
-			for (auto f1 : getSubFeatset(leftVowel)) for (auto f2 : getSubFeatset(leftPolar))
+			for (auto f1 : getSubFeatset(leftVowel)) for (auto f2 : getSubFeatset(leftPolar)) for (auto subDialect : getSubDialectset(dialect))
 			{
+				auto& target = ruleset[RuleCategory{ l, r, (uint8_t)(f1 | f2), subDialect }];
 				if (broadcastableVowel)
 				{
-					auto& target = ruleset[make_tuple(l, r, f1 | f2)];
 					for (size_t i = 0; i < 19; ++i)
 					{
 						target.emplace_back(ruleId + i);
@@ -766,7 +788,7 @@ void RuleSet::addRule(const string& lTag, const string& rTag,
 				}
 				else
 				{
-					ruleset[make_tuple(l, r, f1 | f2)].emplace_back(ruleId);
+					target.emplace_back(ruleId);
 				}
 			}
 		}
@@ -775,8 +797,11 @@ void RuleSet::addRule(const string& lTag, const string& rTag,
 
 void RuleSet::loadRules(istream& istr)
 {
+	using namespace std::literals;
+
 	string line;
 	string lTag, rTag;
+	Dialect dialect = Dialect::standard;
 	while (getline(istr, line))
 	{
 		if (line[0] == '#') continue;
@@ -788,10 +813,15 @@ void RuleSet::loadRules(istream& istr)
 		{
 			throw runtime_error{ "wrong line: " + line };
 		}
-		else if (fields.size() == 2)
+		else if (fields.size() == 2 
+			|| (fields.size() == 3 && fields[2].front() == '<' && fields[2].back() == '>'))
 		{
 			lTag = fields[0];
 			rTag = fields[1];
+			if (fields.size() == 3)
+			{
+				dialect = parseDialects(fields[2].substr(1, fields[2].size() - 2));
+			}
 		}
 		else
 		{
@@ -800,12 +830,12 @@ void RuleSet::loadRules(istream& istr)
 			bool ignoreRCond = false;
 			if (fields.size() >= 4)
 			{
-				static array<const char*, 5> fs = {
-					"+positive",
-					"-positive",
-					"+coda",
-					"-coda",
-					"+ignorercond",
+				static array<string_view, 5> fs = {
+					"+positive"sv,
+					"-positive"sv,
+					"+coda"sv,
+					"-coda"sv,
+					"+ignorercond"sv,
 				};
 
 				transform(fields[3].begin(), fields[3].end(), const_cast<char*>(fields[3].data()), static_cast<int(*)(int)>(tolower));
@@ -851,7 +881,8 @@ void RuleSet::loadRules(istream& istr)
 				repl,
 				cv, 
 				cp,
-				ignoreRCond
+				ignoreRCond,
+				dialect
 			);
 		}
 	}
@@ -1096,9 +1127,9 @@ uint8_t CompiledRule::toFeature(CondVowel cv, CondPolarity cp)
 	return feat;
 }
 
-auto CompiledRule::findRule(POSTag leftTag, POSTag rightTag, CondVowel cv, CondPolarity cp) const -> decltype(map.end())
+auto CompiledRule::findRule(POSTag leftTag, POSTag rightTag, CondVowel cv, CondPolarity cp, Dialect dialect) const -> decltype(map.end())
 {
-	return map.find(make_tuple(leftTag, rightTag, toFeature(cv, cp)));
+	return map.find(RuleCategory{ leftTag, rightTag, toFeature(cv, cp), dialect });
 }
 
 Vector<KString> CompiledRule::combineImpl(
@@ -1242,7 +1273,7 @@ UnorderedMap<tuple<POSTag, uint8_t>, Vector<size_t>> CompiledRule::getRuleIdsByL
 	UnorderedMap<tuple<POSTag, uint8_t>, Vector<size_t>> ret;
 	for (auto& p : map)
 	{
-		ret[make_tuple(get<0>(p.first), get<2>(p.first))].emplace_back(p.second);
+		ret[make_tuple(p.first.leftTag, p.first.feature)].emplace_back(p.second);
 	}
 
 	for (auto& r : ret)
@@ -1258,7 +1289,7 @@ UnorderedMap<POSTag, Vector<size_t>> CompiledRule::getRuleIdsByRightTag() const
 	UnorderedMap<POSTag, Vector<size_t>> ret;
 	for (auto& p : map)
 	{
-		ret[get<1>(p.first)].emplace_back(p.second);
+		ret[p.first.rightTag].emplace_back(p.second);
 	}
 
 	for (auto& r : ret)

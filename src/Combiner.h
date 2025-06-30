@@ -39,7 +39,8 @@ namespace kiwi
 				CondPolarity _leftPolar = CondPolarity::none,
 				bool _ignoreRCond = false
 			) : repl{ _repl }, leftVowel{ _leftVowel }, leftPolarity{ _leftPolar }, ignoreRCond{ _ignoreRCond }
-			{}
+			{
+			}
 		};
 
 		struct Result
@@ -59,11 +60,51 @@ namespace kiwi
 				CondPolarity _polar = CondPolarity::none,
 				bool _ignoreRCond = false,
 				float _score = 0
-			) : str{ _str }, leftEnd{ _leftEnd }, rightBegin{ _rightBegin }, vowel{ _vowel }, polar{ _polar }, ignoreRCond{ _ignoreRCond }, score{_score}
+			) : str{ _str }, leftEnd{ _leftEnd }, rightBegin{ _rightBegin }, vowel{ _vowel }, polar{ _polar }, ignoreRCond{ _ignoreRCond }, score{ _score }
 			{
 			}
 		};
 
+		struct RuleCategory
+		{
+			POSTag leftTag;
+			POSTag rightTag;
+			uint8_t feature; // CondVowel + CondPolarity
+			Dialect dialect;
+
+			bool operator==(const RuleCategory& o) const
+			{
+				return leftTag == o.leftTag &&
+					rightTag == o.rightTag &&
+					feature == o.feature &&
+					dialect == o.dialect;
+			}
+
+			bool operator!=(const RuleCategory& o) const
+			{
+				return !operator==(o);
+			}
+		};
+	}
+
+	template<>
+	struct Hash<cmb::RuleCategory>
+	{
+		size_t operator()(const cmb::RuleCategory& v) const
+		{
+			size_t ret = Hash<POSTag>{}(v.leftTag);
+			ret = (ret << 2) | (ret >> (sizeof(size_t) * 8 - 2));
+			ret ^= Hash<POSTag>{}(v.rightTag);
+			ret = (ret << 2) | (ret >> (sizeof(size_t) * 8 - 2));
+			ret ^= Hash<uint8_t>{}(v.feature);
+			ret = (ret << 2) | (ret >> (sizeof(size_t) * 8 - 2));
+			ret ^= Hash<Dialect>{}(v.dialect);
+			return ret;
+		};
+	};
+
+	namespace cmb
+	{
 		template<class NodeSizeTy, class GroupSizeTy>
 		class MultiRuleDFA
 		{
@@ -200,12 +241,13 @@ namespace kiwi
 			};
 
 			Vector<MultiRuleDFAErased> dfa, dfaRight;
-			UnorderedMap<std::tuple<POSTag, POSTag, uint8_t>, size_t> map;
+			UnorderedMap<RuleCategory, size_t> map;
 			Vector<Allomorph> allomorphData;
 			UnorderedMap<std::pair<KString, POSTag>, std::pair<size_t, size_t>> allomorphPtrMap;
 
 			auto findRule(POSTag leftTag, POSTag rightTag,
-				CondVowel cv = CondVowel::none, CondPolarity cp = CondPolarity::none
+				CondVowel cv = CondVowel::none, CondPolarity cp = CondPolarity::none,
+				Dialect dialect = Dialect::standard
 			) const -> decltype(map.end());
 
 			Vector<KString> combineImpl(
@@ -305,7 +347,7 @@ namespace kiwi
 				}
 			};
 
-			UnorderedMap<std::tuple<POSTag, POSTag, uint8_t>, Vector<size_t>> ruleset;
+			UnorderedMap<RuleCategory, Vector<size_t>> ruleset;
 			Vector<Rule> rules;
 
 			static Vector<char16_t> getVocabList(const Vector<Pattern::Node>& nodes);
@@ -341,7 +383,8 @@ namespace kiwi
 
 			void addRule(const std::string& lTag, const std::string& rTag,
 				const KString& lPat, const KString& rPat, const std::vector<ReplString>& results,
-				CondVowel leftVowel, CondPolarity leftPolar, bool ignoreRCond
+				CondVowel leftVowel, CondPolarity leftPolar, bool ignoreRCond,
+				Dialect dialect = Dialect::standard
 			);
 			
 			void loadRules(std::istream& istr);

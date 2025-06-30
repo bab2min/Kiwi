@@ -325,7 +325,8 @@ namespace kiwi
 			bool splitComplex = false,
 			bool splitSaisiot = false,
 			bool mergeSaisiot = false,
-			const std::unordered_set<const Morpheme*>* blocklist = nullptr
+			const std::unordered_set<const Morpheme*>* blocklist = nullptr,
+			Dialect allowedDialect = Dialect::standard
 			) const
 		{
 			const size_t langVocabSize = kw->langMdl->vocabSize();
@@ -360,6 +361,7 @@ namespace kiwi
 				{
 					if (splitComplex && curMorph->hasComplex()) continue;
 					if (blocklist && curMorph->hasMorpheme(*blocklist)) continue;
+					if (curMorph->dialect != Dialect::standard && !(curMorph->dialect & allowedDialect)) continue;
 
 					// 덧붙은 받침(zCoda)을 위한 지름길
 					if (curMorph->tag == POSTag::z_coda)
@@ -820,7 +822,8 @@ namespace kiwi
 			bool splitComplex = false,
 			bool splitSaisiot = false,
 			bool mergeSaisiot = false,
-			const std::unordered_set<const Morpheme*>* blocklist = nullptr
+			const std::unordered_set<const Morpheme*>* blocklist = nullptr,
+			Dialect allowedDialect = Dialect::standard
 			) const
 		{
 			thread_local Vector<float> maxScores;
@@ -850,6 +853,7 @@ namespace kiwi
 			{
 				if (splitComplex && curMorph->hasComplex()) continue;
 				if (blocklist && curMorph->hasMorpheme(*blocklist)) continue;
+				if (curMorph->dialect != Dialect::standard && !(curMorph->dialect & allowedDialect)) continue;
 
 				// 덧붙은 받침(zCoda)을 위한 지름길
 				if (curMorph->tag == POSTag::z_coda)
@@ -1124,7 +1128,8 @@ namespace kiwi
 		bool splitComplex,
 		bool splitSaisiot,
 		bool mergeSaisiot,
-		const std::unordered_set<const Morpheme*>* blocklist
+		const std::unordered_set<const Morpheme*>* blocklist,
+		Dialect allowedDialects
 	)
 	{
 		static constexpr size_t eosId = 1;
@@ -1183,7 +1188,7 @@ namespace kiwi
 			if (node->form)
 			{
 				evaluator(i, ownFormId, node->form->candidate, 
-					false, splitComplex, splitSaisiot, mergeSaisiot, blocklist);
+					false, splitComplex, splitSaisiot, mergeSaisiot, blocklist, allowedDialects);
 				if (all_of(node->form->candidate.begin(), node->form->candidate.end(), [](const Morpheme* m)
 				{
 					return m->combineSocket || !(m->chunks.empty() || m->complex || m->saisiot);
@@ -1192,13 +1197,13 @@ namespace kiwi
 					ownFormList.emplace_back(node->form->form);
 					ownFormId = ownFormList.size();
 					evaluator(i, ownFormId, unknownNodeLCands, 
-						true, splitComplex, splitSaisiot, mergeSaisiot, blocklist);
+						true, splitComplex, splitSaisiot, mergeSaisiot, blocklist, allowedDialects);
 				};
 			}
 			else
 			{
 				evaluator(i, ownFormId, unknownNodeCands, 
-					true, splitComplex, splitSaisiot, mergeSaisiot, blocklist);
+					true, splitComplex, splitSaisiot, mergeSaisiot, blocklist, allowedDialects);
 			}
 
 #ifdef DEBUG_PRINT
