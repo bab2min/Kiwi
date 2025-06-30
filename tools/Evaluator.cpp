@@ -29,7 +29,12 @@ inline TokenInfo parseWordPOS(const u16string& str)
 {
 	auto p = str.rfind('/');
 	if (p == str.npos) return {};
-	u16string form = replace(std::u16string_view(str.data(), p), u"_", u" ");
+	u16string form;
+	auto f = str.rfind(u"__", p);
+	if (f != str.npos) form = str.substr(0, f);
+	else form = str.substr(0, p);
+
+	form = replace(u16string_view{ form.data(), form.size() }, u"_", u" ");
 	if (str[p + 1] == 'E')
 	{
 		if (form[0] == u'아' || form[0] == u'여') form[0] = u'어';
@@ -154,10 +159,7 @@ auto MorphEvaluator::loadTestset(const string& testSetFile) const -> vector<Test
 		auto fd = split(wstr, u'\t');
 		if (fd.size() < 2) continue;
 		vector<u16string> tokens;
-		for (size_t i = 1; i < fd.size(); ++i)
-		{
-			for (auto s : split(fd[i], u' ')) tokens.emplace_back(s);
-		}
+		for (auto s : split(fd[1], u' ')) tokens.emplace_back(s);
 		TestResult tr;
 		tr.q = u16string{ fd[0] };
 		for (auto& t : tokens) tr.a.emplace_back(parseWordPOS(t));
