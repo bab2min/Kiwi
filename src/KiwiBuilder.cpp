@@ -2039,6 +2039,12 @@ namespace kiwi
 		return CondPolarity::none;
 	}
 
+	inline Dialect reduceDialect(Dialect d, const Morpheme* m)
+	{
+		if (d == Dialect::standard || m->dialect == Dialect::standard) return Dialect::standard;
+		return d | m->dialect;
+	}
+
 	inline bool isZCodaAppendable(
 		const KString& form,
 		const Vector<uint32_t>& candidate,
@@ -2218,6 +2224,8 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 		{
 			f.polar = accumulate(f.candidate.begin(), f.candidate.end(), f.candidate[0]->polar, reducePolar);
 		}
+
+		f.dialect = accumulate(f.candidate.begin(), f.candidate.end(), f.candidate[0]->dialect, reduceDialect);
 		sortedForms.emplace_back(&f);
 	}
 

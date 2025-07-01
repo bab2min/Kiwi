@@ -238,6 +238,7 @@ namespace kiwi
 		uint8_t formHash = 0;
 		uint8_t zCodaAppendable : 1;
 		uint8_t zSiotAppendable : 1;
+		Dialect dialect = Dialect::standard;
 
 		Form();
 		~Form();

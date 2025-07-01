@@ -1000,6 +1000,7 @@ namespace kiwi
 				U16StringView{ normalizedStr.data() + splitEnd, normalizedStr.size() - splitEnd },
 				splitEnd,
 				option.match,
+				option.allowedDialects,
 				maxUnkFormSize,
 				spaceTolerance,
 				continualTypoCost,
