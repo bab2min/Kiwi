@@ -320,6 +320,7 @@ namespace kiwi
 		hamgyeong = 1 << 7, /**< 함경 방언 */
 		pyeongan = 1 << 8, /**< 평안 방언 */
 		lastPlus1,
+		all = lastPlus1 * 2 - 3,
 	};
 	
 

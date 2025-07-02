@@ -34,7 +34,7 @@ namespace kiwi
 		const Morpheme* morph = nullptr;
 		KString str;
 		uint32_t begin = 0, end = 0;
-		float wordScore = 0, typoCost = 0;
+		float wordScore = 0, typoCost = 0, dialectCost = 0;
 		uint32_t typoFormId = 0;
 		uint32_t nodeId = 0;
 
@@ -44,11 +44,13 @@ namespace kiwi
 			uint32_t _end = 0,
 			float _wordScore = 0,
 			float _typoCost = 0,
+			float _dialectCost = 0,
 			uint32_t _typoFormId = 0,
 			uint32_t _nodeId = 0
 		)
 			: morph{ _morph }, str{ _str }, begin{ _begin }, end{ _end },
-			wordScore{ _wordScore }, typoCost{ _typoCost }, typoFormId{ _typoFormId }, nodeId{ _nodeId }
+			wordScore{ _wordScore }, typoCost{ _typoCost }, dialectCost{ _dialectCost },
+			typoFormId{ _typoFormId }, nodeId{ _nodeId }
 		{
 		}
 
@@ -60,6 +62,7 @@ namespace kiwi
 				&& end == o.end
 				&& wordScore == o.wordScore
 				&& typoCost == o.typoCost
+				&& dialectCost == o.dialectCost
 				&& typoFormId == o.typoFormId;
 		}
 	};
@@ -96,7 +99,8 @@ namespace kiwi
 			bool splitSaisiot = false,
 			bool mergeSaisiot = false,
 			const std::unordered_set<const Morpheme*>* blocklist = nullptr,
-			Dialect allowedDialects = Dialect::standard
+			Dialect allowedDialects = Dialect::standard,
+			float dialectCost = 0.f
 		);
 	};
 

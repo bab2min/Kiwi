@@ -1023,7 +1023,8 @@ namespace kiwi
 				!!(option.match & Match::splitSaisiot),
 				!!(option.match & Match::mergeSaisiot),
 				option.blocklist,
-				option.allowedDialects
+				option.allowedDialects,
+				option.dialectCost
 			);
 			insertPathIntoResults(ret, spStatesByRet, res, topN, option.match, integrateAllomorph, positionTable, wordPositions, pretokenizedGroup, nodeInWhichPretokenized);
 		}

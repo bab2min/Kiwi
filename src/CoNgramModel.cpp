@@ -37,6 +37,7 @@ namespace kiwi
 			const size_t totalPrevPathes,
 			const float ignoreCondScore,
 			const float nodeLevelDiscount,
+			const float dialectCost,
 			const Vector<SpecialState>& prevSpStates
 		) const
 		{
@@ -189,7 +190,8 @@ namespace kiwi
 						score += state.next(langMdl, wid);
 					}
 
-					insertToPathContainer(bestPathCont, topN, prevSpStates, curMorph, morphBase, move(state), score, node, *prevPath, ruleBasedScorer);
+					insertToPathContainer(bestPathCont, topN, prevSpStates, curMorph, morphBase, 
+						move(state), score, node, *prevPath, ruleBasedScorer, dialectCost);
 				continueFor:;
 				}
 
@@ -229,7 +231,8 @@ namespace kiwi
 					FormEvaluator formEvaluator{ *prevPath, ownForms, morphBase };
 					if (!formEvaluator(curMorph, ignoreCondScore, score)) continue;
 
-					insertToPathContainer(bestPathCont, topN, prevSpStates, curMorph, morphBase, move(state), score, node, *prevPath, ruleBasedScorer);
+					insertToPathContainer(bestPathCont, topN, prevSpStates, curMorph, morphBase, 
+						move(state), score, node, *prevPath, ruleBasedScorer, dialectCost);
 				}
 				bestPathCont.writeTo(resultOut, curMorph, lastSeqId, ownFormId);
 			}
@@ -295,7 +298,8 @@ namespace kiwi
 						score += state.next(langMdl, wid);
 					}
 
-					insertToPathContainer(bestPathCont, topN, prevSpStates, curMorph, morphBase, move(state), score, node, *prevPath, ruleBasedScorer);
+					insertToPathContainer(bestPathCont, topN, prevSpStates, curMorph, morphBase, 
+						move(state), score, node, *prevPath, ruleBasedScorer, dialectCost);
 				continueFor2:;
 				}
 				bestPathCont.writeTo(resultOut, curMorph, lastSeqId, ownFormId);

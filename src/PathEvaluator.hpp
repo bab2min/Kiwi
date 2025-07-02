@@ -192,7 +192,8 @@ namespace kiwi
 		const float score,
 		const KGraphNode* node,
 		const WordLL<LmState>& prevPath,
-		const RuleBasedScorer& ruleBasedScorer
+		const RuleBasedScorer& ruleBasedScorer,
+		const float dialectCost
 	)
 	{
 		const auto insert = [&](uint8_t rootId)
@@ -215,7 +216,12 @@ namespace kiwi
 				spState.bulletHash = hashSbTypeOrder(ruleBasedScorer.curMorphSbType, ruleBasedScorer.curMorphSbOrder + 1);
 			}
 
-			bestPathCont.insert(topN, prevPath.rootId, rootId, curMorph, candScoreWithRule, prevPath.accTypoCost + node->typoCost, &prevPath, move(state), spState);
+			const float curDialectCost = curMorph->dialect == Dialect::standard ? 0.f : dialectCost;
+			bestPathCont.insert(topN, prevPath.rootId, rootId, curMorph, 
+				candScoreWithRule - curDialectCost,
+				prevPath.accTypoCost + node->typoCost, 
+				prevPath.accDialectCost + curDialectCost,
+				&prevPath, move(state), spState);
 		};
 
 		if ((ruleBasedScorer.curMorphSbType || isQuote(ruleBasedScorer.curMorphSpecialType)) && prevPath.rootId == commonRootId)
@@ -326,7 +332,8 @@ namespace kiwi
 			bool splitSaisiot = false,
 			bool mergeSaisiot = false,
 			const std::unordered_set<const Morpheme*>* blocklist = nullptr,
-			Dialect allowedDialect = Dialect::standard
+			Dialect allowedDialect = Dialect::standard,
+			float dialectCost = 0.f
 			) const
 		{
 			const size_t langVocabSize = kw->langMdl->vocabSize();
@@ -428,22 +435,22 @@ namespace kiwi
 					if (topN > 1)
 					{
 						evalSingleMorpheme<PathEvaluatingMode::topN>(nCache, node, ownFormId,
-							curMorph, ignoreCond ? -10 : 0, nodeLevelDiscount);
+							curMorph, ignoreCond ? -10 : 0, nodeLevelDiscount, dialectCost);
 					}
 					else if (totalPrevPathes <= BestPathContainerTraits<PathEvaluatingMode::top1Small>::maxSize)
 					{
 						evalSingleMorpheme<PathEvaluatingMode::top1Small>(nCache, node, ownFormId,
-							curMorph, ignoreCond ? -10 : 0, nodeLevelDiscount);
+							curMorph, ignoreCond ? -10 : 0, nodeLevelDiscount, dialectCost);
 					}
 					else if (totalPrevPathes <= BestPathContainerTraits<PathEvaluatingMode::top1Medium>::maxSize)
 					{
 						evalSingleMorpheme<PathEvaluatingMode::top1Medium>(nCache, node, ownFormId,
-							curMorph, ignoreCond ? -10 : 0, nodeLevelDiscount);
+							curMorph, ignoreCond ? -10 : 0, nodeLevelDiscount, dialectCost);
 					}
 					else
 					{
 						evalSingleMorpheme<PathEvaluatingMode::top1>(nCache, node, ownFormId,
-							curMorph, ignoreCond ? -10 : 0, nodeLevelDiscount);
+							curMorph, ignoreCond ? -10 : 0, nodeLevelDiscount, dialectCost);
 					}
 
 				}
@@ -496,7 +503,8 @@ namespace kiwi
 			const size_t ownFormId,
 			const Morpheme* curMorph,
 			const float ignoreCondScore,
-			const float nodeLevelDiscount
+			const float nodeLevelDiscount,
+			const float dialectCost
 		) const
 		{
 			thread_local BestPathConatiner<mode, LmState> bestPathCont;
@@ -599,7 +607,8 @@ namespace kiwi
 						}
 					}
 
-					insertToPathContainer(bestPathCont, topN, prevSpStates, curMorph, morphBase, move(cLmState), candScore, node, prevPath, ruleBasedScorer);
+					insertToPathContainer(bestPathCont, topN, prevSpStates, curMorph, morphBase, 
+						move(cLmState), candScore, node, prevPath, ruleBasedScorer, dialectCost);
 				continueFor:;
 				}
 			}
@@ -625,6 +634,7 @@ namespace kiwi
 			const size_t totalPrevPathes,
 			const float ignoreCondScore,
 			const float nodeLevelDiscount,
+			const float dialectCost,
 			const Vector<SpecialState>& prevSpStates
 		) const
 		{
@@ -783,7 +793,8 @@ namespace kiwi
 							continue;
 						}
 
-						insertToPathContainer(bestPathCont, topN, prevSpStates, curMorph, morphBase, move(em.state), em.score, node, prevPath, ruleBasedScorer);
+						insertToPathContainer(bestPathCont, topN, prevSpStates, curMorph, morphBase, 
+							move(em.state), em.score, node, prevPath, ruleBasedScorer, dialectCost);
 					}
 				}
 
@@ -823,7 +834,8 @@ namespace kiwi
 			bool splitSaisiot = false,
 			bool mergeSaisiot = false,
 			const std::unordered_set<const Morpheme*>* blocklist = nullptr,
-			Dialect allowedDialect = Dialect::standard
+			Dialect allowedDialect = Dialect::standard,
+			float dialectCost = 0.f
 			) const
 		{
 			thread_local Vector<float> maxScores;
@@ -942,25 +954,25 @@ namespace kiwi
 				{
 					me.template eval<PathEvaluatingMode::topN>(nCache, kw, ownFormList, cache,
 						ownFormId, validMorphCands,
-						node, startNode, topN, totalPrevPathes, ignoreCond ? -10 : 0, nodeLevelDiscount, prevSpStates);
+						node, startNode, topN, totalPrevPathes, ignoreCond ? -10 : 0, nodeLevelDiscount, dialectCost, prevSpStates);
 				}
 				else if (totalPrevPathes <= BestPathContainerTraits<PathEvaluatingMode::top1Small>::maxSize)
 				{
 					me.template eval<PathEvaluatingMode::top1Small>(nCache, kw, ownFormList, cache,
 						ownFormId, validMorphCands,
-						node, startNode, topN, totalPrevPathes, ignoreCond ? -10 : 0, nodeLevelDiscount, prevSpStates);
+						node, startNode, topN, totalPrevPathes, ignoreCond ? -10 : 0, nodeLevelDiscount, dialectCost, prevSpStates);
 				}
 				else if (totalPrevPathes <= BestPathContainerTraits<PathEvaluatingMode::top1Medium>::maxSize)
 				{
 					me.template eval<PathEvaluatingMode::top1Medium>(nCache, kw, ownFormList, cache,
 						ownFormId, validMorphCands,
-						node, startNode, topN, totalPrevPathes, ignoreCond ? -10 : 0, nodeLevelDiscount, prevSpStates);
+						node, startNode, topN, totalPrevPathes, ignoreCond ? -10 : 0, nodeLevelDiscount, dialectCost, prevSpStates);
 				}
 				else
 				{
 					me.template eval<PathEvaluatingMode::top1>(nCache, kw, ownFormList, cache,
 						ownFormId, validMorphCands,
-						node, startNode, topN, totalPrevPathes, ignoreCond ? -10 : 0, nodeLevelDiscount, prevSpStates);
+						node, startNode, topN, totalPrevPathes, ignoreCond ? -10 : 0, nodeLevelDiscount, dialectCost, prevSpStates);
 				}
 				if (!nCache.empty()) break;
 			}
@@ -1033,6 +1045,7 @@ namespace kiwi
 			auto cur = *it;
 			float scoreDiff = cur->accScore - prev->accScore;
 			float typoCostDiff = cur->accTypoCost - prev->accTypoCost;
+			float dialectCostDiff = cur->accDialectCost - prev->accDialectCost;
 			auto morpheme = cur->morpheme;
 			const size_t numNewTokens = (splitSaisiot && morpheme->saisiot) || !(morpheme->chunks.empty() || morpheme->complex || morpheme->saisiot) 
 				? morpheme->chunks.size() : 1;
@@ -1040,6 +1053,7 @@ namespace kiwi
 			scoreDiff += typoCostDiff * typoCostWeight;
 			scoreDiff /= numNewTokens;
 			typoCostDiff /= numNewTokens;
+			dialectCostDiff /= numNewTokens;
 
 			if (splitSaisiot && morpheme->saisiot)
 			{
@@ -1053,6 +1067,7 @@ namespace kiwi
 						gNode.startPos + p.second,
 						scoreDiff,
 						typoCostDiff,
+						dialectCostDiff,
 						typoCostDiff ? gNode.typoFormId : 0,
 						&gNode - graph
 					);
@@ -1068,6 +1083,7 @@ namespace kiwi
 					gNode.endPos,
 					scoreDiff,
 					typoCostDiff,
+					dialectCostDiff,
 					typoCostDiff ? gNode.typoFormId : 0,
 					&gNode - graph
 				);
@@ -1078,6 +1094,7 @@ namespace kiwi
 				ret.back().end = gNode.startPos + morpheme->chunks.getSecond(0).second;
 				ret.back().wordScore = scoreDiff;
 				ret.back().typoCost = typoCostDiff;
+				ret.back().dialectCost = dialectCostDiff;
 				ret.back().typoFormId = typoCostDiff ? gNode.typoFormId : 0;
 				for (size_t ch = 1; ch < numNewTokens; ++ch)
 				{
@@ -1089,6 +1106,7 @@ namespace kiwi
 						gNode.startPos + p.second,
 						scoreDiff,
 						typoCostDiff,
+						dialectCostDiff,
 						typoCostDiff ? gNode.typoFormId : 0,
 						&gNode - graph
 					);
@@ -1107,6 +1125,7 @@ namespace kiwi
 						gNode.startPos + p.second,
 						scoreDiff,
 						typoCostDiff,
+						dialectCostDiff,
 						typoCostDiff ? gNode.typoFormId : 0,
 						&gNode - graph
 					);
@@ -1129,7 +1148,8 @@ namespace kiwi
 		bool splitSaisiot,
 		bool mergeSaisiot,
 		const std::unordered_set<const Morpheme*>* blocklist,
-		Dialect allowedDialects
+		Dialect allowedDialects,
+		float dialectCost
 	)
 	{
 		static constexpr size_t eosId = 1;
@@ -1158,7 +1178,7 @@ namespace kiwi
 		}
 
 		// start node
-		cache[0].emplace_back(&kw->morphemes[0], 0.f, 0.f, nullptr, LmState{ langMdl }, SpecialState{});
+		cache[0].emplace_back(&kw->morphemes[0], 0.f, 0.f, 0.f, nullptr, LmState{ langMdl }, SpecialState{});
 		cache[0].back().rootId = commonRootId;
 
 #ifdef DEBUG_PRINT
@@ -1188,7 +1208,7 @@ namespace kiwi
 			if (node->form)
 			{
 				evaluator(i, ownFormId, node->form->candidate, 
-					false, splitComplex, splitSaisiot, mergeSaisiot, blocklist, allowedDialects);
+					false, splitComplex, splitSaisiot, mergeSaisiot, blocklist, allowedDialects, dialectCost);
 				if (all_of(node->form->candidate.begin(), node->form->candidate.end(), [](const Morpheme* m)
 				{
 					return m->combineSocket || !(m->chunks.empty() || m->complex || m->saisiot);
@@ -1197,13 +1217,13 @@ namespace kiwi
 					ownFormList.emplace_back(node->form->form);
 					ownFormId = ownFormList.size();
 					evaluator(i, ownFormId, unknownNodeLCands, 
-						true, splitComplex, splitSaisiot, mergeSaisiot, blocklist, allowedDialects);
+						true, splitComplex, splitSaisiot, mergeSaisiot, blocklist, allowedDialects, dialectCost);
 				};
 			}
 			else
 			{
 				evaluator(i, ownFormId, unknownNodeCands, 
-					true, splitComplex, splitSaisiot, mergeSaisiot, blocklist, allowedDialects);
+					true, splitComplex, splitSaisiot, mergeSaisiot, blocklist, allowedDialects, dialectCost);
 			}
 
 #ifdef DEBUG_PRINT
@@ -1245,13 +1265,13 @@ namespace kiwi
 				{
 					for (size_t i = 0; i < uniqStates.size(); ++i)
 					{
-						cand.emplace_back(nullptr, c, p.accTypoCost, &p, p.lmState, uniqStates[i]);
+						cand.emplace_back(nullptr, c, p.accTypoCost, p.accDialectCost, &p, p.lmState, uniqStates[i]);
 						cand.back().rootId = i;
 					}
 				}
 				else
 				{
-					cand.emplace_back(nullptr, c, p.accTypoCost, &p, p.lmState, p.spState);
+					cand.emplace_back(nullptr, c, p.accTypoCost, p.accDialectCost, &p, p.lmState, p.spState);
 				}
 			}
 		}
