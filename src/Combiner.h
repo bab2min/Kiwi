@@ -30,15 +30,18 @@ namespace kiwi
 		struct Replacement
 		{
 			Vector<ReplString> repl;
+			Dialect dialect;
 			CondVowel leftVowel;
 			CondPolarity leftPolarity;
 			bool ignoreRCond;
 
 			Replacement(Vector<ReplString> _repl = {},
+				Dialect _dialect = Dialect::standard,
 				CondVowel _leftVowel = CondVowel::none,
 				CondPolarity _leftPolar = CondPolarity::none,
 				bool _ignoreRCond = false
-			) : repl{ _repl }, leftVowel{ _leftVowel }, leftPolarity{ _leftPolar }, ignoreRCond{ _ignoreRCond }
+			) : repl{ _repl }, dialect{ _dialect }, 
+				leftVowel{_leftVowel}, leftPolarity{_leftPolar}, ignoreRCond{_ignoreRCond}
 			{
 			}
 		};
@@ -48,6 +51,7 @@ namespace kiwi
 			KString str;
 			size_t leftEnd;
 			size_t rightBegin;
+			Dialect dialect;
 			CondVowel vowel;
 			CondPolarity polar;
 			bool ignoreRCond;
@@ -56,11 +60,13 @@ namespace kiwi
 			Result(const KString& _str = {},
 				size_t _leftEnd = 0,
 				size_t _rightBegin = 0,
+				Dialect _dialect = Dialect::standard,
 				CondVowel _vowel = CondVowel::none,
 				CondPolarity _polar = CondPolarity::none,
 				bool _ignoreRCond = false,
 				float _score = 0
-			) : str{ _str }, leftEnd{ _leftEnd }, rightBegin{ _rightBegin }, vowel{ _vowel }, polar{ _polar }, ignoreRCond{ _ignoreRCond }, score{ _score }
+			) : str{ _str }, leftEnd{ _leftEnd }, rightBegin{ _rightBegin }, dialect{ _dialect }, 
+				vowel{ _vowel }, polar{ _polar }, ignoreRCond{ _ignoreRCond }, score{ _score }
 			{
 			}
 		};
@@ -338,11 +344,12 @@ namespace kiwi
 				Rule(const KString& _left = {},
 					const KString& _right = {},
 					const Vector<ReplString>& _results = {},
+					Dialect _dialect = Dialect::standard,
 					CondVowel _leftVowel = CondVowel::none,
 					CondPolarity _leftPolar = CondPolarity::none,
 					bool _ignoreRCond = false
 				)
-					: left{ _left }, right { _right }, repl{ _results, _leftVowel, _leftPolar, _ignoreRCond }
+					: left{ _left }, right { _right }, repl{ _results, _dialect, _leftVowel, _leftPolar, _ignoreRCond }
 				{
 				}
 			};

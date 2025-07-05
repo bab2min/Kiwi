@@ -1551,22 +1551,8 @@ void KiwiBuilder::addCombinedMorpheme(
 	// left, right 중 하나라도 사투리이면 새 형태소도 사투리로 설정
 	const auto lDialect = getMorph(leftId).dialect,
 		rDialect = getMorph(rightId).dialect;
-	if (lDialect != Dialect::standard ||
-		rDialect != Dialect::standard)
-	{
-		if (lDialect == Dialect::standard)
-		{
-			newMorph.dialect = rDialect;
-		}
-		else if (rDialect == Dialect::standard)
-		{
-			newMorph.dialect = lDialect;
-		}
-		else
-		{
-			newMorph.dialect = lDialect & rDialect;
-		}
-	}
+	newMorph.dialect = dialectAnd(lDialect, rDialect);
+	newMorph.dialect = dialectAnd(newMorph.dialect, r.dialect);
 
 	const size_t fid = addForm(newForms, newFormMap, r.str);
 	newFormCands[fid].emplace_back(newId);

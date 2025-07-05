@@ -432,5 +432,12 @@ namespace kiwi
 	Dialect toDialect(std::string_view str);
 	const char* dialectToStr(Dialect dialect);
 	Dialect parseDialects(std::string_view str);
+
+	inline Dialect dialectAnd(Dialect a, Dialect b)
+	{
+		if (a == Dialect::standard) return b;
+		if (b == Dialect::standard) return a;
+		return a & b;
+	}
 }
 

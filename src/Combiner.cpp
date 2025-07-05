@@ -754,7 +754,7 @@ void RuleSet::addRule(const string& lTag, const string& rTag,
 		broadcastableVowel = true;
 	}
 
-	size_t ruleId = rules.size();
+	const size_t ruleId = rules.size();
 	if (broadcastableVowel)
 	{
 		auto bPat = lPat;
@@ -764,12 +764,13 @@ void RuleSet::addRule(const string& lTag, const string& rTag,
 		{
 			bPat[0] = joinOnsetVowel(onset, lPatVowel);
 			for (size_t n = 0; n < results.size(); ++n) bResults[n].str[0] = joinOnsetVowel(onset, resultsVowel[n]);
-			rules.emplace_back(bPat, rPat, bResults, leftVowel, leftPolar, ignoreRCond);
+			rules.emplace_back(bPat, rPat, bResults, dialect, leftVowel, leftPolar, ignoreRCond);
 		}
 	}
 	else
 	{
-		rules.emplace_back(lPat, rPat, Vector<ReplString>{ results.begin(), results.end() }, leftVowel, leftPolar, ignoreRCond);
+		rules.emplace_back(lPat, rPat, Vector<ReplString>{ results.begin(), results.end() }, 
+			dialect, leftVowel, leftPolar, ignoreRCond);
 	}
 
 	for (auto l : lTags)
@@ -821,6 +822,10 @@ void RuleSet::loadRules(istream& istr)
 			if (fields.size() == 3)
 			{
 				dialect = parseDialects(fields[2].substr(1, fields[2].size() - 2));
+			}
+			else
+			{
+				dialect = Dialect::standard;
 			}
 		}
 		else
@@ -989,6 +994,7 @@ Vector<Result> MultiRuleDFA<NodeSizeTy, GroupSizeTy>::combine(U16StringView left
 			move(t),
 			leftEnd,
 			rightBegin,
+			finish[finishGroup[nidx]].dialect,
 			finish[finishGroup[nidx]].leftVowel,
 			finish[finishGroup[nidx]].leftPolarity,
 			finish[finishGroup[nidx]].ignoreRCond,
