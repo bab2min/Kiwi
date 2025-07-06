@@ -439,5 +439,11 @@ namespace kiwi
 		if (b == Dialect::standard) return a;
 		return a & b;
 	}
+
+	inline bool dialectHasIntersection(Dialect a, Dialect b)
+	{
+		if (a == Dialect::standard || b == Dialect::standard) return true;
+		return (a & b) != Dialect::standard;
+	}
 }
 

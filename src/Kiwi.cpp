@@ -1161,7 +1161,7 @@ namespace kiwi
 		return joinHangul(typoPool.begin() + p[0], typoPool.begin() + p[1]);
 	}
 
-	void Kiwi::findMorphemes(vector<const Morpheme*>& ret, const u16string_view& s, POSTag tag) const
+	void Kiwi::findMorphemes(vector<const Morpheme*>& ret, const u16string_view& s, POSTag tag, uint8_t senseId) const
 	{
 		auto normalized = normalizeHangul(s);
 		auto form = (*reinterpret_cast<FnFindForm>(dfFindForm))(formTrie, forms.data(), normalized);
@@ -1171,13 +1171,15 @@ namespace kiwi
 		{
 			if (c->combineSocket
 				|| (tag != POSTag::unknown
-					&& clearIrregular(c->tag) != tag))
+					&& clearIrregular(c->tag) != tag)
+				|| (senseId != (uint8_t)-1
+					&& c->senseId == senseId))
 				continue;
 			ret.emplace_back(c);
 		}
 	}
 
-	const Morpheme* Kiwi::findMorpheme(const u16string_view& s, POSTag tag) const
+	const Morpheme* Kiwi::findMorpheme(const u16string_view& s, POSTag tag, uint8_t senseId) const
 	{
 		auto normalized = normalizeHangul(s);
 		auto form = (*reinterpret_cast<FnFindForm>(dfFindForm))(formTrie, forms.data(), normalized);
@@ -1187,17 +1189,19 @@ namespace kiwi
 		{
 			if (c->combineSocket
 				|| (tag != POSTag::unknown
-					&& clearIrregular(c->tag) != tag))
+					&& clearIrregular(c->tag) != tag)
+				|| (senseId != (uint8_t)-1
+					&& c->senseId != senseId))
 				continue;
 			return c;
 		}
 		return nullptr;
 	}
 
-	vector<const Morpheme*> Kiwi::findMorphemes(const u16string_view& s, POSTag tag) const
+	vector<const Morpheme*> Kiwi::findMorphemes(const u16string_view& s, POSTag tag, uint8_t senseId) const
 	{
 		vector<const Morpheme*> ret;
-		findMorphemes(ret, s, tag);
+		findMorphemes(ret, s, tag, senseId);
 		return ret;
 	}
 }
