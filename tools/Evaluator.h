@@ -3,7 +3,8 @@
 
 class Evaluator
 {
-	virtual std::pair<double, double> eval(const std::string& output, const std::string& file, kiwi::Kiwi& kiwi, bool normCoda, bool zCoda, int repeat) = 0;
+	virtual std::pair<double, double> eval(const std::string& output, const std::string& file, kiwi::Kiwi& kiwi, 
+		bool normCoda, bool zCoda, kiwi::Dialect allowedDialect, int repeat) = 0;
 public:
 
 	virtual ~Evaluator() = default;
@@ -15,6 +16,7 @@ public:
 		const std::vector<std::string>& input,
 		bool normCoda, bool zCoda, bool multiDict, kiwi::ModelType modelType,
 		float typoCostWeight, bool bTypo, bool cTypo, bool lTypo,
+		kiwi::Dialect allowedDialect,
 		int repeat);
 };
 
@@ -39,7 +41,8 @@ class MorphEvaluator : public Evaluator
 		size_t totalCount = 0;
 	};
 
-	std::pair<double, double> eval(const std::string& output, const std::string& file, kiwi::Kiwi& kiwi, bool normCoda, bool zCoda, int repeat) override;
+	std::pair<double, double> eval(const std::string& output, const std::string& file, kiwi::Kiwi& kiwi, 
+		bool normCoda, bool zCoda, kiwi::Dialect allowedDialect, int repeat) override;
 
 	std::vector<TestResult> loadTestset(const std::string& file) const;
 	Score computeScore(std::vector<TestResult>& preds, std::vector<TestResult>& errors) const;
@@ -62,7 +65,8 @@ class DisambEvaluator : public Evaluator
 		size_t totalCount = 0;
 	};
 
-	std::pair<double, double> eval(const std::string& output, const std::string& file, kiwi::Kiwi& kiwi, bool normCoda, bool zCoda, int repeat) override;
+	std::pair<double, double> eval(const std::string& output, const std::string& file, kiwi::Kiwi& kiwi, 
+		bool normCoda, bool zCoda, kiwi::Dialect allowedDialect, int repeat) override;
 
 	std::vector<TestResult> loadTestset(const std::string& file) const;
 	Score computeScore(std::vector<TestResult>& preds, std::vector<TestResult>& errors) const;

@@ -66,6 +66,7 @@ int Evaluator::operator()(const string& modelPath,
 	const vector<string>& input,
 	bool normCoda, bool zCoda, bool multiDict, ModelType modelType,
 	float typoCostWeight, bool bTypo, bool cTypo, bool lTypo,
+	Dialect allowedDialect,
 	int repeat)
 {
 	try
@@ -121,7 +122,7 @@ int Evaluator::operator()(const string& modelPath,
 			cout << "Test file: " << tf << endl;
 			try
 			{
-				auto result = eval(output, tf, kw, normCoda, zCoda, repeat);
+				auto result = eval(output, tf, kw, normCoda, zCoda, allowedDialect, repeat);
 				avgMicro += result.first;
 				avgMacro += result.second;
 				++cnt;
@@ -263,17 +264,19 @@ void MorphEvaluator::TestResult::writeResult(ostream& out) const
 	out << endl;
 }
 
-pair<double, double> MorphEvaluator::eval(const string& output, const string& file, kiwi::Kiwi& kiwi, bool normCoda, bool zCoda, int repeat)
+pair<double, double> MorphEvaluator::eval(const string& output, const string& file, kiwi::Kiwi& kiwi, bool normCoda, bool zCoda, Dialect allowedDialect, int repeat)
 {
 	const size_t topN = 1;
-	const Match matchOption = (normCoda ? Match::allWithNormalizing : Match::all) & ~(zCoda ? Match::none : Match::zCoda);
+	AnalyzeOption option;
+	option.match = (normCoda ? Match::allWithNormalizing : Match::all) & ~(zCoda ? Match::none : Match::zCoda);
+	option.allowedDialects = allowedDialect;
 	vector<TestResult> testsets = loadTestset(file), errors;
 	tutils::Timer total;
 	for (int i = 0; i < repeat; ++i)
 	{
 		for (auto& tr : testsets)
 		{
-			auto cands = kiwi.analyze(tr.q, topN, matchOption);
+			auto cands = kiwi.analyze(tr.q, topN, option);
 			tr.r = cands[0].first;
 		}
 	}
@@ -334,17 +337,19 @@ void DisambEvaluator::TestResult::writeResult(ostream& out) const
 	out << endl;
 }
 
-pair<double, double> DisambEvaluator::eval(const string& output, const string& file, kiwi::Kiwi& kiwi, bool normCoda, bool zCoda, int repeat)
+pair<double, double> DisambEvaluator::eval(const string& output, const string& file, kiwi::Kiwi& kiwi, bool normCoda, bool zCoda, Dialect allowedDialect, int repeat)
 {
 	const size_t topN = 1;
-	const Match matchOption = (normCoda ? Match::allWithNormalizing : Match::all) & ~(zCoda ? Match::none : Match::zCoda);
+	AnalyzeOption option;
+	option.match = (normCoda ? Match::allWithNormalizing : Match::all) & ~(zCoda ? Match::none : Match::zCoda);
+	option.allowedDialects = allowedDialect;
 	vector<TestResult> testsets = loadTestset(file), errors;
 	tutils::Timer total;
 	for (int i = 0; i < repeat; ++i)
 	{
 		for (auto& tr : testsets)
 		{
-			auto cands = kiwi.analyze(tr.text, topN, matchOption);
+			auto cands = kiwi.analyze(tr.text, topN, option);
 			tr.result = cands[0];
 		}
 	}
