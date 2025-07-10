@@ -38,7 +38,6 @@ KiwiBuilder& KiwiBuilder::operator=(KiwiBuilder&&) = default;
 namespace kiwi
 {
 	static constexpr size_t defaultFormSize = defaultTagSize + 26;
-	static constexpr uint8_t undefSenseId = ((uint8_t)-1);
 }
 
 template<class Fn>
@@ -1825,9 +1824,9 @@ size_t KiwiBuilder::findMorpheme(U16StringView form, POSTag tag, uint8_t senseId
 	return -1;
 }
 
-pair<uint32_t, bool> KiwiBuilder::addWord(U16StringView newForm, MorphemeDef def, float score, U16StringView origForm)
+pair<uint32_t, bool> KiwiBuilder::addWord(U16StringView newForm, MorphemeDef def, float score, U16StringView origForm, uint8_t origSenseId)
 {
-	size_t origMorphemeId = findMorpheme(origForm, def.tag);
+	size_t origMorphemeId = findMorpheme(origForm, def.tag, origSenseId);
 
 	if (origMorphemeId == -1)
 	{
@@ -1942,6 +1941,7 @@ size_t KiwiBuilder::loadDictionaryFromStream(std::istream& is)
 		while (!fields[0].empty() && fields[0][0] == ' ') fields[0] = fields[0].substr(1);
 
 		float score = 0.f;
+		uint8_t senseId = 0;
 		Dialect dialect = Dialect::standard;
 		if (fieldSize > 2) score = stof(fields[2].begin(), fields[2].end());
 
@@ -1952,6 +1952,15 @@ size_t KiwiBuilder::loadDictionaryFromStream(std::istream& is)
 			else if (f[0] == u'<' && f[f.size() - 1] == u'>')
 			{
 				dialect = parseDialects(utf16To8(f.substr(1, f.size() - 2)));
+			}
+			else if (f[0] == '.')
+			{
+				auto v = stol(f.begin() + 1, f.end());
+				if (v < 0 || v >= 256)
+				{
+					throw FormatException("[loadUserDictionary] Wrong sense ID '" + utf16To8(f) + "' at line " + to_string(lineNo));
+				}
+				senseId = (uint8_t)v;
 			}
 			else
 			{
@@ -2016,13 +2025,17 @@ size_t KiwiBuilder::loadDictionaryFromStream(std::istream& is)
 			{
 				if (morphemes.size() > 1)
 				{
+					if (senseId != 0)
+					{
+						throw FormatException("[loadUserDictionary] Sense ID cannot be used with PreAnalyzedWord '" + utf16To8(fields[1]) + "' at line " + to_string(lineNo));
+					}
 					addedCnt += addPreAnalyzedWord(fields[0], morphemes, {}, score, dialect) ? 1 : 0;
 				}
 				else
 				{
 					addedCnt += addWord(fields[0], 
-						MorphemeDef{ get<1>(morphemes[0]), 0, dialect }, 
-						score, replace(get<0>(morphemes[0]), u"++", u"+")).second;
+						MorphemeDef{ get<1>(morphemes[0]), senseId, dialect }, 
+						score, replace(get<0>(morphemes[0]), u"++", u"+"), get<2>(morphemes[0])).second;
 				}
 			}
 		}
@@ -2034,7 +2047,7 @@ size_t KiwiBuilder::loadDictionaryFromStream(std::istream& is)
 				throw FormatException("[loadUserDictionary] Unknown Tag '" + utf16To8(fields[1]) + "' at line " + to_string(lineNo));
 			}
 			addedCnt += addWord(fields[0], 
-				MorphemeDef{ pos, 0, dialect }, 
+				MorphemeDef{ pos, senseId, dialect }, 
 				score
 			).second;
 		}

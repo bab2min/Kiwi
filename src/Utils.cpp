@@ -563,7 +563,7 @@ namespace kiwi
 		if (str == u8"pa") return Dialect::pyeongan;
 		if (str == u8"평안") return Dialect::pyeongan;
 		
-		return Dialect::standard; // default to standard dialect
+		throw std::invalid_argument{ "Unknown dialect: " + std::string{ str } };
 	}
 
 	const char* dialectToStr(Dialect dialect)

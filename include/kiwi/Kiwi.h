@@ -86,6 +86,8 @@ namespace kiwi
 		{}
 	};
 
+	static constexpr uint8_t undefSenseId = (uint8_t)-1;
+
 	/**
 	 * @brief 실제 형태소 분석을 수행하는 클래스.
 	 * 
@@ -542,20 +544,20 @@ namespace kiwi
 		* @brief 형태소 사전에서 주어진 형태소를 찾는다.
 		* @param form 형태소의 형태
 		* @param tag 형태소의 품사 태그. POSTag::unknown을 지정하면 품사 태그를 무시하고 검색한다.
-		* @param senseId 형태소의 의미 번호. -1을 지정하면 의미 번호를 무시하고 검색한다.
+		* @param senseId 형태소의 의미 번호. `undefSenseId`을 지정하면 의미 번호를 무시하고 검색한다.
 		* @return 주어진 형태소를 찾은 경우 해당 형태소의 포인터를 반환하고, 찾지 못한 경우 nullptr를 반환한다.
 		*/
-		const Morpheme* findMorpheme(const std::u16string_view& form, POSTag tag = POSTag::unknown, uint8_t senseId = -1) const;
+		const Morpheme* findMorpheme(const std::u16string_view& form, POSTag tag = POSTag::unknown, uint8_t senseId = undefSenseId) const;
 
-		size_t findMorphemeId(const std::u16string_view& form, POSTag tag = POSTag::unknown, uint8_t senseId = -1) const
+		size_t findMorphemeId(const std::u16string_view& form, POSTag tag = POSTag::unknown, uint8_t senseId = undefSenseId) const
 		{
 			const Morpheme* morph = findMorpheme(form, tag, senseId);
 			if (!morph) return -1;
 			return morphToId(morph);
 		}
 
-		void findMorphemes(std::vector<const Morpheme*>& out, const std::u16string_view& s, POSTag tag = POSTag::unknown, uint8_t senseId = -1) const;
-		std::vector<const Morpheme*> findMorphemes(const std::u16string_view& s, POSTag tag = POSTag::unknown, uint8_t senseId = -1) const;
+		void findMorphemes(std::vector<const Morpheme*>& out, const std::u16string_view& s, POSTag tag = POSTag::unknown, uint8_t senseId = undefSenseId) const;
+		std::vector<const Morpheme*> findMorphemes(const std::u16string_view& s, POSTag tag = POSTag::unknown, uint8_t senseId = undefSenseId) const;
 	};
 
 	/**
@@ -648,7 +650,7 @@ namespace kiwi
 		void updateForms();
 		void updateMorphemes(size_t vocabSize = 0);
 
-		size_t findMorpheme(U16StringView form, POSTag tag, uint8_t senseId = -1) const;
+		size_t findMorpheme(U16StringView form, POSTag tag, uint8_t senseId = undefSenseId) const;
 
 		std::pair<uint32_t, bool> addWord(U16StringView newForm, MorphemeDef def,
 			float score, size_t origMorphemeId, size_t lmMorphemeId);
@@ -657,7 +659,7 @@ namespace kiwi
 		std::pair<uint32_t, bool> addWord(U16StringView form, MorphemeDef def = POSTag::nnp,
 			float score = 0);
 		std::pair<uint32_t, bool> addWord(U16StringView newForm, MorphemeDef def,
-			float score, U16StringView origForm);
+			float score, U16StringView origForm, uint8_t origSenseId = undefSenseId);
 
 		template<class U16>
 		bool addPreAnalyzedWord(U16StringView form,
