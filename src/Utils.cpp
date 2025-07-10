@@ -587,6 +587,7 @@ namespace kiwi
 	Dialect parseDialects(std::string_view str)
 	{
 		Dialect ret = Dialect::standard;
+		if (str == "all") return Dialect::all;
 		for (auto& item : split(str, ','))
 		{
 			ret |= toDialect(item);
