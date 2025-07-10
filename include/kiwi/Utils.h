@@ -138,10 +138,29 @@ namespace kiwi
 		for (; first != last; ++first)
 		{
 			auto c = *first;
-			if (isHangulCoda(c) && !ret.empty() && isHangulSyllable(ret.back()))
+			if (!ret.empty() && isHangulSyllable(ret.back()))
 			{
-				if ((ret.back() - 0xAC00) % 28) ret.push_back(c);
-				else ret.back() += c - 0x11A7;
+				const bool alreadyHasCoda = (ret.back() - 0xAC00) % 28;
+				if (alreadyHasCoda)
+				{
+					ret.push_back(c);
+				}
+				else if (isHangulCoda(c))
+				{
+					ret.back() += c - 0x11A7;
+				}
+				else if (isOldHangulCoda(c))
+				{
+					const auto onset = (ret.back() - 0xAC00) / 28 / 21;
+					const auto vowel = (ret.back() - 0xAC00) / 28 % 21;
+					ret.back() = 0x1100 + onset;
+					ret.push_back(0x1161 + vowel);
+					ret.push_back(c);
+				}
+				else
+				{
+					ret.push_back(c);
+				}
 			}
 			else
 			{
@@ -161,16 +180,34 @@ namespace kiwi
 		for (; first != last; ++first)
 		{
 			auto c = *first;
-			if (isHangulCoda(c) && !ret.empty() && isHangulSyllable(ret.back()))
+			positionOut.emplace_back(ret.size());
+			if (!ret.empty() && isHangulSyllable(ret.back()))
 			{
-				if ((ret.back() - 0xAC00) % 28) ret.push_back(c);
-				else ret.back() += c - 0x11A7;
-				positionOut.emplace_back(ret.size() - 1);
+				const bool alreadyHasCoda = (ret.back() - 0xAC00) % 28;
+				if (alreadyHasCoda)
+				{
+					ret.push_back(c);
+				}
+				else if (isHangulCoda(c))
+				{
+					ret.back() += c - 0x11A7;
+				}
+				else if (isOldHangulCoda(c))
+				{
+					const auto onset = (ret.back() - 0xAC00) / 28 / 21;
+					const auto vowel = (ret.back() - 0xAC00) / 28 % 21;
+					ret.back() = 0x1100 + onset;
+					ret.push_back(0x1161 + vowel);
+					ret.push_back(c);
+				}
+				else
+				{
+					ret.push_back(c);
+				}	
 			}
 			else
 			{
 				ret.push_back(c);
-				positionOut.emplace_back(ret.size() - 1);
 			}
 		}
 		return ret;
