@@ -319,7 +319,7 @@ namespace kiwi
 		hwanghae = 1 << 6, /**< 황해 방언 */
 		hamgyeong = 1 << 7, /**< 함경 방언 */
 		pyeongan = 1 << 8, /**< 평안 방언 */
-		old = 1 << 9, /**< 옛말 */
+		archaic = 1 << 9, /**< 옛말 */
 		lastPlus1,
 		all = lastPlus1 * 2 - 3,
 	};

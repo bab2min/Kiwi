@@ -562,8 +562,8 @@ namespace kiwi
 		if (str == u8"pyeongan") return Dialect::pyeongan;
 		if (str == u8"pa") return Dialect::pyeongan;
 		if (str == u8"평안") return Dialect::pyeongan;
-		if (str == u8"old") return Dialect::old;
-		if (str == u8"옛말") return Dialect::old;
+		if (str == u8"archaic") return Dialect::archaic;
+		if (str == u8"옛말") return Dialect::archaic;
 
 		throw std::invalid_argument{ "Unknown dialect: " + std::string{ str } };
 	}
@@ -582,7 +582,7 @@ namespace kiwi
 		case Dialect::hwanghae: return "hwanghae";
 		case Dialect::hamgyeong: return "hamgyeong";
 		case Dialect::pyeongan: return "pyeongan";
-		case Dialect::old: return "old";
+		case Dialect::archaic: return "archaic";
 		}
 		return "unknown";
 	}
