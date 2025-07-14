@@ -1589,10 +1589,19 @@ void KiwiBuilder::addCombinedMorphemes(
 		else return newForms[id - forms.size()];
 	};
 
+	{
 	const auto& leftMorph = getMorph(leftId);
 	const auto& leftForm = getForm(leftMorph.kform).form;
 	const auto& rightMorph = getMorph(rightId);
 	const auto& rightForm = getForm(rightMorph.kform).form;
+
+		if (leftMorph.tag == POSTag::unknown && 
+			find(leftMorph.chunks.begin(), leftMorph.chunks.end(), rightId) != leftMorph.chunks.end())
+		{
+			// rightId가 이미 leftId의 chunk에 포함되어 있는 경우
+			// 재귀적 생성을 방지하기 위해 탈출한다.
+			return;
+		}
 
 	auto res = combiningRule->combine(leftForm, rightForm, ruleId);
 	for (auto& r : res)
@@ -1607,6 +1616,35 @@ void KiwiBuilder::addCombinedMorphemes(
 			continue;
 		}
 		addCombinedMorpheme(newForms, newFormMap, newMorphemes, newFormCands, leftId, rightId, r);
+		}
+	}
+
+	{
+		const auto& leftMorph = getMorph(leftId);
+		const auto& leftForm = getForm(leftMorph.kform).form;
+		const auto& rightMorph = getMorph(rightId);
+		const auto& rightForm = getForm(rightMorph.kform).form;
+
+		if (isEClass(leftMorph.tag) && leftForm[0] == u'어')
+		{
+			KString positiveLeftForm = leftForm;
+			positiveLeftForm[0] = u'아';
+
+			auto res = combiningRule->combine(positiveLeftForm, rightForm, ruleId);
+			for (auto& r : res)
+			{
+				if (!r.ignoreRCond && !FeatureTestor::isMatched(&positiveLeftForm, rightMorph.vowel()))
+				{
+					continue;
+				}
+				if (!dialectHasIntersection(r.dialect, leftMorph.dialect) ||
+					!dialectHasIntersection(r.dialect, rightMorph.dialect))
+				{
+					continue;
+				}
+				addCombinedMorpheme(newForms, newFormMap, newMorphemes, newFormCands, leftId, rightId, r);
+			}
+		}
 	}
 }
 
