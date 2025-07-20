@@ -1,4 +1,4 @@
-#include <kiwi/Types.h>
+﻿#include <kiwi/Types.h>
 #include "FeatureTestor.h"
 
 using namespace kiwi;
@@ -39,15 +39,19 @@ bool FeatureTestor::isMatched(const kchar_t* begin, const kchar_t* end, CondVowe
 	{
 	case CondVowel::vocalic_h:
 		if (end[-1] == u'\u11C2') return true;
+		[[fallthrough]];
 	case CondVowel::vocalic:
 		if (end[-1] == u'\u11AF') return true;
+		[[fallthrough]];
 	case CondVowel::vowel:
 		if (u'\u11A8' <= end[-1] && end[-1] <= u'\u11C2') return false;
 		return true;
 	case CondVowel::non_vocalic_h:
 		if (end[-1] == u'\u11C2') return false;
+		[[fallthrough]];
 	case CondVowel::non_vocalic:
 		if (end[-1] == u'\u11AF') return false;
+		[[fallthrough]];
 	case CondVowel::non_vowel:
 		if (u'\uAC00' <= end[-1] && end[-1] <= u'\uD7A4') return false;
 		return true;
@@ -62,10 +66,13 @@ bool FeatureTestor::isMatched(const kchar_t* begin, const kchar_t* end, CondPola
 	if (begin == end) return true;
 	for (auto it = end - 1; it >= begin; --it)
 	{
-		if (u'\u11A8' <= *it && *it <= u'\u11C2') continue;
-		if (!(u'\uAC00' <= *it && *it <= u'\uD7A4')) break;
-		int v = ((*it - u'\uAC00') / 28) % 21;
-		if (v == 0 || v == 2 || v == 8) return polar == CondPolarity::positive;
+		// 0(ㅏ), 2(ㅑ), 8(ㅗ), 12(ㅛ) and (ᆞ) are positive vowels
+		const auto c = *it;
+		if (0x11A8 <= c && c <= 0x11C2) continue;
+		if (c == 0x1161 || c == 0x1163 || c == 0x1169 || c == 0x116D || c == 0x119E) return polar == CondPolarity::positive;
+		if (!(0xAC00 <= c && c <= 0xD7A4)) break;
+		const int v = ((c -0xAC00) / 28) % 21;
+		if (v == 0 || v == 2 || v == 8 || v == 12) return polar == CondPolarity::positive;
 		if (v == 18 && it == end - 1) continue;
 		return polar == CondPolarity::negative;
 	}
@@ -78,10 +85,13 @@ bool FeatureTestor::isMatchedApprox(const kchar_t* begin, const kchar_t* end, Co
 	if (begin == end) return true;
 	for (auto it = end - 1; it >= begin; --it)
 	{
-		if (u'\u11A8' <= *it && *it <= u'\u11C2') continue;
-		if (!(u'\uAC00' <= *it && *it <= u'\uD7A4')) break;
-		int v = ((*it - u'\uAC00') / 28) % 21;
-		if (v == 0 || v == 2 || v == 8) return polar == CondPolarity::positive;
+		// 0(ㅏ), 2(ㅑ), 8(ㅗ), 12(ㅛ) and (ᆞ) are positive vowels
+		const auto c = *it;
+		if (0x11A8 <= c && c <= 0x11C2) continue;
+		if (c == 0x1161 || c == 0x1163 || c == 0x1169 || c == 0x116D || c == 0x119E) return polar == CondPolarity::positive;
+		if (!(0xAC00 <= c && c <= 0xD7A4)) break;
+		const int v = ((c - 0xAC00) / 28) % 21;
+		if (v == 0 || v == 2 || v == 8 || v == 12) return polar == CondPolarity::positive;
 		if (v == 18) return true;
 		return polar == CondPolarity::negative;
 	}
