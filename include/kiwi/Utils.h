@@ -477,6 +477,13 @@ namespace kiwi
 		return a & b;
 	}
 
+	inline Dialect dialectOr(Dialect a, Dialect b)
+	{
+		if (a == Dialect::standard) return a;
+		if (b == Dialect::standard) return b;
+		return a | b;
+	}
+
 	inline bool dialectHasIntersection(Dialect a, Dialect b)
 	{
 		if (a == Dialect::standard || b == Dialect::standard) return true;

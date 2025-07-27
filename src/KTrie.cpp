@@ -202,7 +202,8 @@ namespace kiwi
 				auto cand = &tCand->form(formBase);
 				if (FeatureTestor::isMatched(&str[0], &str[nonSpaces[nonSpaces.size() - typoFormSize]], tCand->leftCond)
 					&& FeatureTestor::isMatchedApprox(&str[0], &str[nonSpaces[nonSpaces.size() - typoFormSize]], cand->vowel, cand->polar)
-					&& (cand->dialect == Dialect::standard || !!(cand->dialect & allowedDialect)))
+					&& (cand->dialect == Dialect::standard || !!(cand->dialect & allowedDialect))
+					&& (tCand->dialect == Dialect::standard || !!(tCand->dialect & allowedDialect)))
 				{
 					candidates.emplace_back(cand, 
 						tCand->score() + cost, 

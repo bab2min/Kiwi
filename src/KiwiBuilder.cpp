@@ -2338,8 +2338,9 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 	// 오타 교정이 있는 경우 가능한 모든 오타에 대해 Trie 생성
 	else
 	{
-		using TypoInfo = tuple<uint32_t, float, uint16_t, CondVowel>;
+		using TypoInfo = tuple<uint32_t, float, uint16_t, CondVowel, Dialect>;
 		UnorderedMap<KString, Vector<TypoInfo>> typoGroup;
+		using TypoGroupPtr = decltype(typoGroup)::pointer;
 		auto ptypos = typos.prepare();
 		ret.continualTypoCost = ptypos.getContinualTypoCost();
 		ret.lengtheningTypoCost = ptypos.getLengtheningTypoCost();
@@ -2353,16 +2354,16 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 				for (auto t : ptypos._generate(f->form, typoCostThreshold))
 				{
 					if (t.leftCond != CondVowel::none && f->vowel != CondVowel::none && t.leftCond != f->vowel) continue;
-					typoGroup[removeSpace(t.str)].emplace_back(f - ret.forms.data(), t.cost, f->numSpaces, t.leftCond);
+					typoGroup[removeSpace(t.str)].emplace_back(f - ret.forms.data(), t.cost, f->numSpaces, t.leftCond, t.dialect);
 				}
 			}
 			else
 			{
-				typoGroup[removeSpace(f->form)].emplace_back(f - ret.forms.data(), 0, f->numSpaces, CondVowel::none);
+				typoGroup[removeSpace(f->form)].emplace_back(f - ret.forms.data(), 0, f->numSpaces, CondVowel::none, Dialect::standard);
 			}
 		}
 
-		Vector<decltype(typoGroup)::pointer> typoGroupSorted;
+		Vector<TypoGroupPtr> typoGroupSorted;
 		size_t totTfSize = 0;
 		for (auto& v : typoGroup)
 		{
@@ -2376,7 +2377,7 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 			totTfSize += v.second.size();
 		}
 
-		sort(typoGroupSorted.begin(), typoGroupSorted.end(), [](decltype(typoGroup)::pointer a, decltype(typoGroup)::pointer b)
+		sort(typoGroupSorted.begin(), typoGroupSorted.end(), [](TypoGroupPtr a, TypoGroupPtr b)
 			{
 				return a->first < b->first;
 			});
