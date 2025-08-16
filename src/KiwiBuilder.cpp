@@ -91,11 +91,14 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 	UnorderedMap<pair<KString, POSTag>, Vector<uint8_t>> morphSenseMap;
 	UnorderedMap<pair<KString, POSTag>, size_t> groupMap;
 
+	Vector<string> formatErrors;
+
 	// add Z_SIOT to morphMap
 	morphMap.emplace(make_tuple(u"\x11BA", undefSenseId, POSTag::z_siot), make_pair(defaultTagSize + 28, defaultTagSize + 28));
 	morphSenseMap.emplace(make_pair(u"\x11BA", POSTag::z_siot), Vector<uint8_t>{ undefSenseId });
 
-	const auto& insertMorph = [&](KString&& form, float score, POSTag tag, CondVowel cvowel, CondPolarity cpolar, 
+	static constexpr size_t failed = -1;
+	const auto& insertMorph = [&](KString form, float score, POSTag tag, CondVowel cvowel, CondPolarity cpolar, 
 		bool complex, uint8_t senseId, Dialect dialect,
 		size_t origMorphemeId = 0, size_t groupId = 0)
 	{
@@ -110,8 +113,10 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 		auto it = morphMap.find(make_tuple(form, senseId, tag));
 		if (it != morphMap.end())
 		{
+			if (unified)
+		{
 			// 어/아 통합 대상이면서 어xx 형태소와 아xx 형태소 모두 OOV로 취급받는 경우
-			if (it->second.first == origMorphemeId && unified)
+				if (it->second.first == origMorphemeId)
 			{
 				auto& unifiedForm = forms[formMap.find(form)->second];
 				size_t unifiedId = it->second.first;
@@ -129,9 +134,11 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 			else
 			{
 				fm.candidate.emplace_back(it->second.first);
-			}
-			if (!unified) morphemes[it->second.first].kform = &fm - &forms[0];
 			return it->second.first;
+				}
+			}
+			formatErrors.emplace_back("duplicate morpheme: " + utf16To8(joinHangul(form)) + "/" + tagToString(tag));
+			return failed;
 		}
 		else
 		{
@@ -159,7 +166,8 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 		auto fields = split(wstr, u'\t');
 		if (fields.size() < 3)
 		{
-			throw FormatException{ "wrong line: " + line };
+			formatErrors.emplace_back("wrong line: " + line);
+			continue;
 		}
 
 		auto form = normalizeHangul(fields[0]);
@@ -191,7 +199,11 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 				auto& f = fields[i];
 				if (f == u"vowel")
 				{
-					if (cvowel != CondVowel::none) throw FormatException{ "wrong line: " + line };
+					if (cvowel != CondVowel::none)
+					{
+						formatErrors.emplace_back("wrong line: " + line);
+						goto endOfLoop;
+					}
 					cvowel = CondVowel::vowel;
 					if (i + 1 < fields.size())
 					{
@@ -200,7 +212,11 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 				}
 				else if (f == u"non_vowel")
 				{
-					if (cvowel != CondVowel::none) throw FormatException{ "wrong line: " + line };
+					if (cvowel != CondVowel::none)
+					{
+						formatErrors.emplace_back("wrong line: " + line);
+						goto endOfLoop;
+					}
 					cvowel = CondVowel::non_vowel;
 					if (i + 1 < fields.size())
 					{
@@ -209,7 +225,11 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 				}
 				else if (f == u"vocalic")
 				{
-					if (cvowel != CondVowel::none) throw FormatException{ "wrong line: " + line };
+					if (cvowel != CondVowel::none)
+					{
+						formatErrors.emplace_back("wrong line: " + line);
+						goto endOfLoop;
+					}
 					cvowel = CondVowel::vocalic;
 					if (i + 1 < fields.size())
 					{
@@ -218,18 +238,30 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 				}
 				else if (f == u"non_adj")
 				{
-					if (cpolar != CondPolarity::none) throw FormatException{ "wrong line: " + line };
+					if (cpolar != CondPolarity::none)
+					{
+						formatErrors.emplace_back("wrong line: " + line);
+						goto endOfLoop;
+					}
 					cpolar = CondPolarity::non_adj;
 				}
 				else if (f.size() >= 8 && f.substr(0, 8) == u"complex ")
 				{
-					if (complex) throw FormatException{ "wrong line: " + line };
+					if (complex)
+					{
+						formatErrors.emplace_back("wrong line: " + line);
+						goto endOfLoop;
+					}
 					complex = true;
 					complexStr = u16string{ f.substr(8) };
 				}
 				else if (f[0] == u'=')
 				{
-					if (!origMorphemeOfAlias.empty()) throw FormatException{ "wrong line: " + line };
+					if (!origMorphemeOfAlias.empty())
+					{
+						formatErrors.emplace_back("wrong line: " + line);
+						goto endOfLoop;
+					}
 					if (f[1] == u'=')
 					{
 						if (f.find(u"__") == f.npos)
@@ -262,7 +294,11 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 				}
 				else if (f[0] == u'~')
 				{
-					if (!origMorphemeOfAlias.empty()) throw FormatException{ "wrong line: " + line };
+					if (!origMorphemeOfAlias.empty())
+					{
+						formatErrors.emplace_back("wrong line: " + line);
+						goto endOfLoop;
+					}
 					if (f.find('/') == f.npos)
 					{
 						origMorphemeOfAlias = normalizeHangul(f.substr(1));
@@ -277,7 +313,11 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 				}
 				else if (f[0] == u'-')
 				{
-					if (altWeight < 0) throw FormatException{ "wrong line: " + line };
+					if (altWeight < 0)
+					{
+						formatErrors.emplace_back("wrong line: " + line);
+						goto endOfLoop;
+					}
 					altWeight = stof(f.begin(), f.end());
 				}
 				else if (f[0] == '>')
@@ -303,7 +343,8 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 				}
 				else
 				{
-					throw FormatException{ "wrong line: " + line };
+					formatErrors.emplace_back("wrong line: " + line);
+					goto endOfLoop;
 				}
 			}
 		}
@@ -312,7 +353,11 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 
 		if (complex)
 		{
-			if (senseIds.size() > 1) throw FormatException{ "wrong line: " + line };
+			if (senseIds.size() > 1)
+			{
+				formatErrors.emplace_back("complex morpheme cannot have multiple senses: " + line);
+				goto endOfLoop;
+			}
 			complexChunks.emplace(make_tuple(form, senseIds[0], tag), move(complexStr));
 		}
 
@@ -327,7 +372,10 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 						senseId, origSenseId, u"", groupForm, 0, 0, groupPriority, dialect);
 				}
 
-				insertMorph(move(form), morphWeight, tag, cvowel, cpolar, complex, senseId, dialect);
+				if (insertMorph(form, morphWeight, tag, cvowel, cpolar, complex, senseId, dialect) == failed)
+				{
+					goto endOfLoop;
+				}
 			}
 			else
 			{
@@ -336,7 +384,7 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 				longTailWeights[tag] += morphWeight;
 			}
 		}
-		
+	endOfLoop:;
 	}
 
 	for (LongTail& p : longTails)
@@ -355,7 +403,8 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 			auto it2 = morphSenseMap.find(make_pair(p.origForm, setIrregular(p.origTag)));
 			if (it != morphSenseMap.end() && it2 != morphSenseMap.end())
 			{
-				throw FormatException{ "ambiguous base morpheme: " + utf16To8(p.origForm) + "/" + tagToString(clearIrregular(p.origTag)) };
+				formatErrors.emplace_back("ambiguous base morpheme: " + utf16To8(p.origForm) + "/" + tagToString(clearIrregular(p.origTag)));
+				continue;
 			}
 			it = (it == morphSenseMap.end()) ? it2 : it;
 			if (it == morphSenseMap.end() || it->second.empty())
@@ -374,18 +423,21 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 		
 		if (it != morphMap.end() && it2 != morphMap.end())
 		{
-			throw FormatException{ "ambiguous base morpheme: " + utf16To8(p.origForm) + "/" + tagToString(clearIrregular(p.origTag)) };
+			formatErrors.emplace_back("ambiguous base morpheme: " + utf16To8(p.origForm) + "/" + tagToString(clearIrregular(p.origTag)));
+			continue;
 		}
 		it = (it == morphMap.end()) ? it2 : it;
 		if (it == morphMap.end())
 		{
 			if (p.origSenseId != undefSenseId)
 			{
-				throw FormatException{ "cannot find base morpheme: " + utf16To8(p.origForm) + "__" + to_string(p.origSenseId) + "/" + tagToString(p.origTag)};
+				formatErrors.emplace_back("cannot find base morpheme: " + utf16To8(p.origForm) + "__" + to_string(p.origSenseId) + "/" + tagToString(p.origTag));
+				continue;
 			}
 			else
 			{
-				throw FormatException{ "cannot find base morpheme: " + utf16To8(p.origForm) + "/" + tagToString(p.origTag) };
+				formatErrors.emplace_back("cannot find base morpheme: " + utf16To8(p.origForm) + "/" + tagToString(p.origTag));
+				continue;
 			}
 		}
 		p.origMorphId = it->second.first;
@@ -398,7 +450,7 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 
 	for (LongTail& p : longTails)
 	{
-		auto git = groupMap.find(make_pair(p.groupForm, p.tag));
+		const auto git = groupMap.find(make_pair(p.groupForm, p.tag));
 		size_t groupId = (git != groupMap.end()) ? git->second : 0;
 		if (groupId)
 		{
@@ -422,7 +474,7 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 			// groupId 삽입용이 아닌 long tail에 대해서
 			if (p.origTag != POSTag::unknown)
 			{
-				size_t mid = insertMorph(move(p.form), 
+				const size_t mid = insertMorph(p.form, 
 					p.weight < 0 ? p.weight : log(p.weight / longTailWeights[p.tag]), 
 					p.tag, 
 					p.cvowel, 
@@ -433,6 +485,10 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 					getDefaultMorphemeId(p.tag), 
 					groupId
 				);
+				if (mid == failed)
+				{
+					continue;
+				}
 				longTailMap.emplace(make_pair(forms[morphemes[mid].kform].form, p.tag), mid);
 			}
 		}
@@ -442,7 +498,7 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 			{
 				for (size_t i = 0; i < p.origMorphSenseCnt; ++i)
 				{
-					float normalized = p.weight / morphemes[p.origMorphId].userScore;
+					const float normalized = p.weight / morphemes[p.origMorphId].userScore;
 					float score = log(normalized);
 					if (p.addAlias > 1) score = 0;
 					else if (p.weight < 0) score = p.weight;
@@ -452,7 +508,10 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 					{
 						senseId = morphemes[p.origMorphId + i].senseId;
 					}
-					insertMorph(move(p.form), score, p.tag, p.cvowel, p.cpolar, p.complex, senseId, p.dialect, p.origMorphId + i, groupId);
+					if (insertMorph(p.form, score, p.tag, p.cvowel, p.cpolar, p.complex, senseId, p.dialect, p.origMorphId + i, groupId) == failed)
+					{
+						continue;
+					}
 				}
 			}
 			else
@@ -471,14 +530,19 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 
 		if (fd.back().size() != (fd.size() - 1) * 2)
 		{
-			throw FormatException{ "wrong position information : " + utf16To8(fd[0]) + " " + utf16To8(fd.back())};
+			formatErrors.emplace_back("wrong position information : " + utf16To8(it->second));
+			continue;
 		}
 		auto posMap = normalizeHangulWithPosition(joinHangul(get<0>(it->first))).second;
 		for (size_t i = 0; i < fd.size() - 1; ++i)
 		{
 			auto f = split(fd[i], u'/');
-			if (f.size() != 2) throw FormatException{ "wrong format of morpheme : " + utf16To8(fd[i]) };
-			uint8_t senseId = undefSenseId;
+			if (f.size() != 2)
+			{
+				formatErrors.emplace_back("wrong format of morpheme : " + utf16To8(fd[i]));
+				goto endOfLoop2;
+			}
+			uint8_t senseId = 0;//undefSenseId;
 			if (f[0].find(u"__") != f[0].npos)
 			{
 				auto p = f[0].find(u"__");
@@ -488,13 +552,15 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 			}
 			auto norm = normalizeHangul(f[0]);
 			auto tag = toPOSTag(f[1]);
+			if (tag == POSTag::z_siot) senseId = undefSenseId;
 
 			if (senseId == undefSenseId)
 			{
 				auto it = morphSenseMap.find(make_pair(norm, tag));
 				if (it == morphSenseMap.end() || it->second.empty())
 				{
-					throw FormatException{ "cannot find morpheme : " + utf16To8(fd[i]) };
+					formatErrors.emplace_back("cannot find morpheme : " + utf16To8(fd[i]));
+					goto endOfLoop2;
 				}
 
 				if (it->second.size() == 1)
@@ -503,14 +569,16 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 				}
 				else
 				{
-					throw FormatException{ "ambiguous morpheme : " + utf16To8(fd[i]) };
+					formatErrors.emplace_back("ambiguous morpheme : " + utf16To8(fd[i]));
+					goto endOfLoop2;
 				}
 			}
 
 			auto it = morphMap.find(make_tuple(norm, senseId, tag));
 			if (it == morphMap.end())
 			{
-				throw FormatException{ "cannot find morpheme : " + utf16To8(fd[i]) };
+				formatErrors.emplace_back("cannot find morpheme : " + utf16To8(fd[i]));
+				goto endOfLoop2;
 			}
 			size_t lmId = it->second.first;
 			if (!morphemes[lmId].kform)
@@ -518,7 +586,8 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 				auto it = longTailMap.find(make_pair(norm, tag));
 				if (it == longTailMap.end())
 				{
-					throw FormatException{ "cannot find morpheme : " + utf16To8(fd[i]) };
+					formatErrors.emplace_back("cannot find morpheme : " + utf16To8(fd[i]));
+					goto endOfLoop2;
 				}
 				lmId = it->second;
 			}
@@ -528,6 +597,17 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 			size_t end = fd.back()[i * 2 + 1] - u'0';
 			morph.chunkPositions.emplace_back(posMap[start], posMap[end] - posMap[start]);
 		}
+	endOfLoop2:;
+	}
+
+	if (!formatErrors.empty())
+	{
+		string errMsg = "Format errors found:\n";
+		for (const auto& e : formatErrors)
+		{
+			errMsg += e + "\n";
+		}
+		throw FormatException{ std::move(errMsg) };
 	}
 
 	for (auto& m : morphemes)
