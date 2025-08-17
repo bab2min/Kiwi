@@ -65,7 +65,8 @@ namespace kiwi
 			static utils::MemoryObject build(const std::string& contextDefinition, const std::string& embedding, 
 				size_t maxContextLength = -1, 
 				bool useVLE = true, 
-				bool reorderContextIdx = true);
+				bool reorderContextIdx = true,
+				const std::vector<size_t>* selectedEmbIdx = nullptr);
 
 			static std::unique_ptr<CoNgramModelBase> create(utils::MemoryObject&& mem, 
 				ArchType archType = ArchType::none, 

@@ -1476,13 +1476,53 @@ namespace kiwi
 			return os;
 		}
 
+		template<class Ty, class Alloc1, class Alloc2>
+		inline void inplaceIndex2D(vector<Ty, Alloc1>& arr, size_t width, const vector<size_t, Alloc2>& idx)
+		{
+			vector<Ty, Alloc1> newArr(idx.size() * width);
+			if (width == 1)
+			{
+				for (size_t i = 0; i < idx.size(); ++i)
+				{
+					if (idx[i] == (size_t)-1) continue;
+					newArr[i] = arr[idx[i]];
+				}
+			}
+			else
+			{
+				for (size_t i = 0; i < idx.size(); ++i)
+				{
+					if (idx[i] == (size_t)-1) continue;
+					copy(arr.begin() + idx[i] * width, arr.begin() + (idx[i] + 1) * width, newArr.begin() + i * width);
+				}
+			}
+			arr.swap(newArr);
+		}
 
-		utils::MemoryObject CoNgramModelBase::build(const string& contextDefinition, const string& embedding, size_t maxContextLength, bool useVLE, bool reorderContextId)
+		utils::MemoryObject CoNgramModelBase::build(const string& contextDefinition, const string& embedding, 
+			size_t maxContextLength, bool useVLE, bool reorderContextId,
+			const vector<size_t>* selectedEmbIdx)
 		{
 			ifstream contextStr, embeddingStr;
 			if (!openFile(contextStr, contextDefinition))
 			{
 				throw IOException{ "Cannot open file : " + contextDefinition };
+			}
+
+			static constexpr size_t removedId = (size_t)-1;
+			Vector<size_t> reverseSelectedEmbIdx;
+			if (selectedEmbIdx)
+			{
+				for (size_t i = 0; i < selectedEmbIdx->size(); ++i)
+				{
+					const auto v = (*selectedEmbIdx)[i];
+					if (v == removedId) continue;
+					if (reverseSelectedEmbIdx.size() <= v)
+					{
+						reverseSelectedEmbIdx.resize(v + 1, removedId);
+					}
+					reverseSelectedEmbIdx[v] = i;
+				}
 			}
 
 			uint32_t maxClusterId = 0, maxContextId = 0;
@@ -1509,8 +1549,13 @@ namespace kiwi
 					{
 						auto id = stol(tokens[i].begin(), tokens[i].end());
 						if (id < 0) throw IOException{ "Invalid format : " + contextDefinition };
+
+						if (selectedEmbIdx)
+						{
+							id = reverseSelectedEmbIdx[id];
+						}
 						context.push_back(id);
-						maxContextId = max(maxContextId, (uint32_t)id);
+						if(id != (long)removedId) maxContextId = max(maxContextId, (uint32_t)id);
 					}
 					if (context.size() > maxContextLength)
 					{
@@ -1527,6 +1572,12 @@ namespace kiwi
 					for (auto it = c.begin(); it != c.end();)
 					{
 						bool erase = false;
+						if (find(it->first.begin(), it->first.end(), (uint32_t)removedId) != it->first.end())
+						{
+							erase = true;
+						}
+						else
+						{
 						for (size_t j = i; j-- > 0; )
 						{
 							auto& c2 = contextMap[j];
@@ -1537,6 +1588,7 @@ namespace kiwi
 							{
 								erase = found->second == it->second;
 								break;
+								}
 							}
 						}
 
@@ -1717,10 +1769,24 @@ namespace kiwi
 				contextValidTokenSum = move(newContextValidTokenSum);
 			}
 
-			// compress distantMask into bits
-			const size_t compressedDistantMaskSize = (outputSize + 7) / 8;
+			if (selectedEmbIdx)
 			{
-				for (size_t i = 0; i < outputSize; ++i)
+				inplaceIndex2D(distantEmb, dim, *selectedEmbIdx);
+				inplaceIndex2D(distantEmbScale, 1, *selectedEmbIdx);
+				if (qgroup) inplaceIndex2D(distantEmbLocalScale, numQGroups, *selectedEmbIdx);
+				inplaceIndex2D(distantEmbBias, 1, *selectedEmbIdx);
+				inplaceIndex2D(distantConfidence, 1, *selectedEmbIdx);
+				inplaceIndex2D(outputEmb, dim, *selectedEmbIdx);
+				inplaceIndex2D(outputEmbScale, 1, *selectedEmbIdx);
+				if (qgroup) inplaceIndex2D(outputEmbLocalScale, numQGroups, *selectedEmbIdx);
+				inplaceIndex2D(distantMask, 1, *selectedEmbIdx);
+			}
+
+			// compress distantMask into bits
+			const size_t selectedOutputSize = distantMask.size();
+			const size_t compressedDistantMaskSize = (selectedOutputSize + 7) / 8;
+			{
+				for (size_t i = 0; i < selectedOutputSize; ++i)
 				{
 					if (i % 8 == 0)
 					{
@@ -1738,7 +1804,7 @@ namespace kiwi
 			memset(&header, 0, sizeof(CoNgramModelHeader));
 			header.dim = dim;
 			header.contextSize = contextSize;
-			header.vocabSize = outputSize;
+			header.vocabSize = selectedOutputSize;
 			header.keySize = keySize;
 			header.windowSize = windowSize;
 			header.qbit = qbit;
@@ -1750,10 +1816,10 @@ namespace kiwi
 			header.keyOffset = alignedOffsetInc(finalSize, compressedNodeSizes.size());
 			header.valueOffset = alignedOffsetInc(finalSize, compressedKeys.size());
 			header.embOffset = alignedOffsetInc(finalSize, compressedValues.size());
-			finalSize += padMultipleOf(dim * qbit / 8, 4) * (contextSize + outputSize * 2);
-			if (qgroup) finalSize += numQGroups * (contextSize + outputSize * 2);
+			finalSize += padMultipleOf(dim * qbit / 8, 4) * (contextSize + selectedOutputSize * 2);
+			if (qgroup) finalSize += numQGroups * (contextSize + selectedOutputSize * 2);
 			finalSize += contextSize * sizeof(uint16_t) * 4;
-			finalSize += outputSize * sizeof(uint16_t) * 4;
+			finalSize += selectedOutputSize * sizeof(uint16_t) * 4;
 			finalSize += windowSize * sizeof(uint16_t);
 			finalSize += compressedDistantMaskSize;
 
@@ -1777,13 +1843,13 @@ namespace kiwi
 				ostr.write((const char*)&contextConfidence[i], sizeof(uint16_t));
 				ostr.write((const char*)&contextValidTokenSum[i], sizeof(uint16_t));
 			}
-			for (size_t i = 0; i < outputSize; ++i)
+			for (size_t i = 0; i < selectedOutputSize; ++i)
 			{
 				writeIntsWithPacking(ostr, &outputEmb[i * dim], dim, header.qbit);
 				ostr.write((const char*)&outputEmbScale[i], sizeof(uint16_t));
 				if (qgroup) ostr.write((const char*)&outputEmbLocalScale[i * numQGroups], sizeof(uint8_t) * numQGroups);
 			}
-			for (size_t i = 0; i < outputSize; ++i)
+			for (size_t i = 0; i < selectedOutputSize; ++i)
 			{
 				writeIntsWithPacking(ostr, &distantEmb[i * dim], dim, header.qbit);
 				ostr.write((const char*)&distantEmbScale[i], sizeof(uint16_t));

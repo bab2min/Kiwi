@@ -941,6 +941,10 @@ namespace kiwi
 		BuildOption getOptions() const { return options; }
 		ModelType getModelType() const { return modelType; }
 
-		static void buildMorphData(const std::string& morphemeDefPath, const std::string& outputPath, size_t minCnt = 10);
+		static void buildMorphData(const std::string& morphemeDefPath, const std::string& outputPath, 
+			size_t minCnt = 10,
+			std::vector<size_t>* vocabMapOut = nullptr,
+			const std::string& origMorphemeDefPath = "");
+		void writeMorphemeDef(const std::string& morphemeDefPath) const;
 	};
 }

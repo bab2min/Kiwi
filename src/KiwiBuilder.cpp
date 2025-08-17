@@ -114,27 +114,27 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 		if (it != morphMap.end())
 		{
 			if (unified)
-		{
-			// 어/아 통합 대상이면서 어xx 형태소와 아xx 형태소 모두 OOV로 취급받는 경우
+			{
+				// 어/아 통합 대상이면서 어xx 형태소와 아xx 형태소 모두 OOV로 취급받는 경우
 				if (it->second.first == origMorphemeId)
-			{
-				auto& unifiedForm = forms[formMap.find(form)->second];
-				size_t unifiedId = it->second.first;
-				for (auto i : unifiedForm.candidate)
 				{
-					if (morphemes[i].tag == tag)
+					auto& unifiedForm = forms[formMap.find(form)->second];
+					size_t unifiedId = it->second.first;
+					for (auto i : unifiedForm.candidate)
 					{
-						unifiedId = i;
-						break;
+						if (morphemes[i].tag == tag)
+						{
+							unifiedId = i;
+							break;
+						}
 					}
+					fm.candidate.emplace_back(unifiedId);
+					return unifiedId;
 				}
-				fm.candidate.emplace_back(unifiedId);
-				return unifiedId;
-			}
-			else
-			{
-				fm.candidate.emplace_back(it->second.first);
-			return it->second.first;
+				else
+				{
+					fm.candidate.emplace_back(it->second.first);
+					return it->second.first;
 				}
 			}
 			formatErrors.emplace_back("duplicate morpheme: " + utf16To8(joinHangul(form)) + "/" + tagToString(tag));
@@ -1674,13 +1674,13 @@ void KiwiBuilder::addCombinedMorphemes(
 	const auto rightMorph = getMorph(rightId);
 	const auto rightForm = getForm(rightMorph.kform).form;
 
-		if (leftMorph.tag == POSTag::unknown && 
-			find(leftMorph.chunks.begin(), leftMorph.chunks.end(), rightId) != leftMorph.chunks.end())
-		{
-			// rightId가 이미 leftId의 chunk에 포함되어 있는 경우
-			// 재귀적 생성을 방지하기 위해 탈출한다.
-			return;
-		}
+	if (leftMorph.tag == POSTag::unknown && 
+		find(leftMorph.chunks.begin(), leftMorph.chunks.end(), rightId) != leftMorph.chunks.end())
+	{
+		// rightId가 이미 leftId의 chunk에 포함되어 있는 경우
+		// 재귀적 생성을 방지하기 위해 탈출한다.
+		return;
+	}
 
 	auto res = combiningRule->combine(leftForm, rightForm, ruleId);
 	for (auto& r : res)
@@ -1695,25 +1695,25 @@ void KiwiBuilder::addCombinedMorphemes(
 			continue;
 		}
 		addCombinedMorpheme(newForms, newFormMap, newMorphemes, newFormCands, leftId, rightId, r);
-		}
+	}
 
-		if (isEClass(leftMorph.tag) && leftForm[0] == u'어')
-		{
+	if (isEClass(leftMorph.tag) && leftForm[0] == u'어')
+	{
 		leftForm[0] = u'아';
 
 		auto res = combiningRule->combine(leftForm, rightForm, ruleId);
-			for (auto& r : res)
-			{
+		for (auto& r : res)
+		{
 			if (!r.ignoreRCond && !FeatureTestor::isMatched(&leftForm, rightMorph.vowel()))
-				{
-					continue;
-				}
-				if (!dialectHasIntersection(r.dialect, leftMorph.dialect) ||
-					!dialectHasIntersection(r.dialect, rightMorph.dialect))
-				{
-					continue;
-				}
-				addCombinedMorpheme(newForms, newFormMap, newMorphemes, newFormCands, leftId, rightId, r);
+			{
+				continue;
+			}
+			if (!dialectHasIntersection(r.dialect, leftMorph.dialect) ||
+				!dialectHasIntersection(r.dialect, rightMorph.dialect))
+			{
+				continue;
+			}
+			addCombinedMorpheme(newForms, newFormMap, newMorphemes, newFormCands, leftId, rightId, r);
 		}
 	}
 }
@@ -2449,18 +2449,18 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 		{
 			typoGroupSorted.emplace_back(&v);
 			sort(v.second.begin(), v.second.end(), [](const TypoInfo& a, const TypoInfo& b)
-				{
-					if (get<1>(a) < get<1>(b)) return true;
-					if (get<1>(a) > get<1>(b)) return false;
-					return get<0>(a) < get<0>(b);
-				});
+			{
+				if (get<1>(a) < get<1>(b)) return true;
+				if (get<1>(a) > get<1>(b)) return false;
+				return get<0>(a) < get<0>(b);
+			});
 			totTfSize += v.second.size();
 		}
 
 		sort(typoGroupSorted.begin(), typoGroupSorted.end(), [](TypoGroupPtr a, TypoGroupPtr b)
-			{
-				return a->first < b->first;
-			});
+		{
+			return a->first < b->first;
+		});
 
 		ret.typoForms.reserve(totTfSize + 1);
 		
@@ -2948,7 +2948,8 @@ HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes,
 	return dataset;
 }
 
-void KiwiBuilder::buildMorphData(const string& morphemeDefPath, const string& outputPath, size_t minCnt)
+void KiwiBuilder::buildMorphData(const string& morphemeDefPath, const string& outputPath, size_t minCnt,
+	vector<size_t>* vocabMapOut, const string& origMorphemeDefPath)
 {
 	KiwiBuilder kb;
 	kb.initMorphemes();
@@ -2957,12 +2958,65 @@ void KiwiBuilder::buildMorphData(const string& morphemeDefPath, const string& ou
 	{
 		return cnt >= minCnt;
 	});
+	ifs.close();
 
 	size_t lmVocabSize = 0;
 	for (auto& p : realMorph) lmVocabSize = max(p.second.first, lmVocabSize);
 	lmVocabSize += 1;
+
+	if (vocabMapOut)
+	{
+		vocabMapOut->clear();
+		vocabMapOut->resize(lmVocabSize, -1);
+		ifstream ifs;
+		openFile(ifs, origMorphemeDefPath);
+		string line;
+		for (size_t idx = 0; getline(ifs, line); ++idx)
+		{
+			if (idx < defaultFormSize + 3)
+			{
+				(*vocabMapOut)[idx] = idx;
+				continue;
+			}
+			auto fields = split(line, '\t');
+			if (fields.size() < 2) throw runtime_error("invalid morpheme definition file: " + origMorphemeDefPath);
+			const KString form = normalizeHangul(fields[0]);
+			const POSTag tag = toPOSTag(utf8To16(fields[1]));
+			uint8_t senseId = 0;
+			for (size_t i = 2; i < fields.size(); ++i)
+			{
+				const auto f = fields[i];
+				if (f[0] == '.')
+				{
+					senseId = stol(f.begin() + 1, f.end());
+				}
+			}
+
+			const auto it = realMorph.find(make_tuple(form, senseId, tag));
+			if (it == realMorph.end())
+			{
+				continue;
+			}
+			(*vocabMapOut)[it->second.first] = idx;
+		}
+	}
+
 	kb.updateForms();
 	kb.updateMorphemes(lmVocabSize);
 	ofstream ofs;
 	kb.saveMorphBin(openFile(ofs, outputPath + "/sj.morph", ios_base::binary));
+}
+
+void KiwiBuilder::writeMorphemeDef(const string& morphemeDefPath) const
+{
+	ofstream ofs;
+	openFile(ofs, morphemeDefPath);
+	const size_t vocabSize = min(langMdl->vocabSize(), morphemes.size());
+	for (size_t i = 0; i < vocabSize; ++i)
+	{
+		auto& morph = morphemes[i];
+		auto& form = forms[morph.kform];
+		auto u8form = utf16To8(joinHangul(form.form));
+		ofs << u8form << '\t' << tagToString(morph.tag) << '\t' << 99999 << '\t' << '.' << (int)morph.senseId << endl;
+	}
 }
