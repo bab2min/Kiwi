@@ -57,13 +57,13 @@ int main(int argc, const char* argv[])
 	}
 	ModelType kiwiModelType = ModelType::none;
 	try
-		{
+	{
 		kiwiModelType = tutils::parseModelType(modelType);
-		}
+	}
 	catch (const exception& e)
-		{
+	{
 		cerr << e.what() << endl;
-			return -1;
+		return -1;
 	}
 	
 	vector<string> morphInputs, disambInputs;

@@ -1578,12 +1578,6 @@ void KiwiBuilder::addCombinedMorpheme(
 		else return newMorphemes[id - morphemes.size()];
 	};
 
-	const auto& getForm = [&](size_t id) -> const FormRaw&
-	{
-		if (id < forms.size()) return forms[id];
-		else return newForms[id - forms.size()];
-	};
-
 	auto vowel = r.vowel;
 	auto polar = r.polar;
 

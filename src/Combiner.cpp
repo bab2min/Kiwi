@@ -748,7 +748,10 @@ void RuleSet::addRule(const string& lTag, const string& rTag,
 		lPatVowel = lPat[0] - u'ㅏ';
 		for (auto& r : results)
 		{
-			if (!isHangulVowel(r.str[0])) throw runtime_error{ "invalid Hangul composition: left=" + utf16To8(joinHangul(lPat)) + ", result=" + utf16To8(joinHangul(r.str)) };
+			if (!isHangulVowel(r.str[0]))
+			{
+				throw runtime_error{ "invalid Hangul composition: left=" + utf16To8(joinHangul(lPat)) + ", result=" + utf16To8(joinHangul(r.str)) };
+			}
 			resultsVowel.emplace_back(r.str[0] - u'ㅏ');
 		}
 		broadcastableVowel = true;
