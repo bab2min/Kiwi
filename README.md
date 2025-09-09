@@ -139,6 +139,12 @@ https://github.com/bab2min/kiwi-gui 에서 공식 GUI 툴에 사용되는 C# Wra
 ### Java Wrapper
 Java 1.8 이상에서 사용 가능한 KiwiJava가 Java binding으로 제공됩니다. 이에 대해서는 [bindings/java](bindings/java)를 참조하시길 바랍니다.
 
+### Android Library
+Android NDK를 통해 Android 앱에서 사용할 수 있는 AAR 라이브러리가 제공됩니다. GitHub Releases에서 `kiwi-android-VERSION.aar` 파일을 다운로드하여 Android 프로젝트에 추가하면 됩니다. 
+- **최소 요구사항**: Android API Level 21+, ARM64 아키텍처
+- **사용법**: [bindings/android](bindings/android)의 README 참조
+- **패키지**: AAR 형태로 제공되어 Gradle 프로젝트에 쉽게 통합 가능
+
 ### R Wrapper
 [mrchypark](https://github.com/mrchypark)님께서 기여해주신 R언어용 wrapper인 [elbird](https://mrchypark.github.io/elbird/)가 있습니다.
 
