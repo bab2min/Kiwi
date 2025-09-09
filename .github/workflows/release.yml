@@ -276,7 +276,10 @@ jobs:
               -DANDROID_ABI=arm64-v8a \
               -DANDROID_NATIVE_API_LEVEL=21 \
               -DANDROID_STL=c++_static \
+              -DANDROID=1 \
+              -DKIWI_CPU_ARCH=arm64 \
               -DKIWI_USE_MIMALLOC=0 \
+              -DKIWI_USE_CPUINFO=0 \
               -DKIWI_BUILD_CLI=0 \
               -DKIWI_BUILD_EVALUATOR=0 \
               -DKIWI_BUILD_MODEL_BUILDER=0 \
@@ -289,9 +292,16 @@ jobs:
       run: |
         mkdir result
         cd result
-        mkdir include && mkdir lib && mkdir bin
-        mv ../build/libkiwi* lib/ || true
+        mkdir include && mkdir lib
+        # Copy library files if they exist
+        find ../build -name "libkiwi*" -exec cp {} lib/ \;
+        # Copy header files
         cp -r ../include/kiwi include/
+        # List what we're packaging for debugging
+        echo "Contents of lib directory:"
+        ls -la lib/
+        echo "Contents of include directory:"
+        ls -la include/
         tar -zcvf ../asset.tgz include/ lib/
     - name: Upload Android ARM64 release binary
       uses: actions/upload-release-asset@v1.0.2

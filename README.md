@@ -39,7 +39,7 @@ Kiwi는 빠른 속도와 범용적인 성능을 지향하는 한국어 형태소
 ### C++
 
 #### 컴파일된 바이너리 다운로드
-https://github.com/bab2min/Kiwi/releases 에서 Windows, Linux, macOS 버전으로 컴파일된 Library 파일과 모델 파일을 다운로드 받을 수 있습니다.
+https://github.com/bab2min/Kiwi/releases 에서 Windows, Linux, macOS, Android 버전으로 컴파일된 Library 파일과 모델 파일을 다운로드 받을 수 있습니다.
 
 #### Windows
 Visual Studio 2019 이상을 사용하여 `Kiwi.sln` 파일을 실행하여 컴파일할 수 있습니다.
@@ -126,7 +126,7 @@ Avg Score
 include/kiwi/capi.h 를 참조하세요.
 
 #### 컴파일된 바이너리 다운로드
-https://github.com/bab2min/Kiwi/releases 에서 Windows, Linux, macOS 버전으로 컴파일된 Library 파일과 모델 파일을 다운로드 받을 수 있습니다.
+https://github.com/bab2min/Kiwi/releases 에서 Windows, Linux, macOS, Android 버전으로 컴파일된 Library 파일과 모델 파일을 다운로드 받을 수 있습니다.
 
 ### C# Wrapper
 https://github.com/bab2min/kiwi-gui 에서 공식 GUI 툴에 사용되는 C# Wrapper를 찾으실 수 있습니다. 
