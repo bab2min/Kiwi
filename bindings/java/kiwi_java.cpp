@@ -789,7 +789,7 @@ public:
 	}
 };
 
-jni::Module gModule{ JNI_VERSION_1_8 };
+jni::Module gModule{ JNI_VERSION_1_6 };
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved)
 {
