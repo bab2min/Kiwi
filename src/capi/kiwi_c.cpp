@@ -172,6 +172,67 @@ kiwi_builder_h kiwi_builder_init_stream(kiwi_stream_provider_t stream_provider, 
 	}
 }
 
+kiwi_builder_h kiwi_builder_init_chunked_stream(kiwi_chunked_stream_provider_t chunked_stream_provider, void* user_data, int num_threads, int options)
+{
+	try
+	{
+		BuildOption buildOption = (BuildOption)(options & 0xFF);
+		const auto mtMask = options & (KIWI_BUILD_MODEL_TYPE_LARGEST | KIWI_BUILD_MODEL_TYPE_KNLM | KIWI_BUILD_MODEL_TYPE_SBG | KIWI_BUILD_MODEL_TYPE_CONG | KIWI_BUILD_MODEL_TYPE_CONG_GLOBAL);
+		const ModelType modelType = (mtMask == KIWI_BUILD_MODEL_TYPE_LARGEST) ? ModelType::largest
+			: (mtMask == KIWI_BUILD_MODEL_TYPE_KNLM) ? ModelType::knlm
+			: (mtMask == KIWI_BUILD_MODEL_TYPE_SBG) ? ModelType::sbg
+			: (mtMask == KIWI_BUILD_MODEL_TYPE_CONG) ? ModelType::cong
+			: (mtMask == KIWI_BUILD_MODEL_TYPE_CONG_GLOBAL) ? ModelType::congGlobal
+			: ModelType::none;
+		
+		// Create C++ StreamProvider that wraps the C chunked callback
+		KiwiBuilder::StreamProvider cppStreamProvider = [chunked_stream_provider, user_data](const std::string& filename) -> std::unique_ptr<std::istream>
+		{
+			// First call to get file size
+			int fileSize = chunked_stream_provider(filename.c_str(), 0, nullptr, 0, user_data);
+			if (fileSize < 0) 
+			{
+				return nullptr; // Error occurred
+			}
+			
+			// Read file in chunks and build complete buffer
+			std::vector<char> buffer;
+			buffer.reserve(fileSize);
+			
+			const int CHUNK_SIZE = 8192; // 8KB chunks
+			int totalBytesRead = 0;
+			
+			while (totalBytesRead < fileSize)
+			{
+				int remainingBytes = fileSize - totalBytesRead;
+				int chunkSize = std::min(CHUNK_SIZE, remainingBytes);
+				
+				std::vector<char> chunk(chunkSize);
+				int bytesRead = chunked_stream_provider(filename.c_str(), totalBytesRead, chunk.data(), chunkSize, user_data);
+				
+				if (bytesRead <= 0)
+				{
+					return nullptr; // Error or EOF
+				}
+				
+				buffer.insert(buffer.end(), chunk.begin(), chunk.begin() + bytesRead);
+				totalBytesRead += bytesRead;
+			}
+			
+			// Create stringstream from buffer
+			std::string fileData(buffer.begin(), buffer.end());
+			return std::make_unique<std::istringstream>(std::move(fileData));
+		};
+		
+		return (kiwi_builder_h)new KiwiBuilder{ cppStreamProvider, (size_t)num_threads, buildOption, modelType };
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return nullptr;
+	}
+}
+
 int kiwi_builder_close(kiwi_builder_h handle)
 {
 	if (!handle) return KIWIERR_INVALID_HANDLE;

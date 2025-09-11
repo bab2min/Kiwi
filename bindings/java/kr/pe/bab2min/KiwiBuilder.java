@@ -140,7 +140,7 @@ public class KiwiBuilder implements AutoCloseable  {
 	}
 
 	public KiwiBuilder(StreamProvider streamProvider, int numWorkers, int buildOptions, int modelType) {
-		ctorStream(streamProvider, numWorkers, buildOptions, modelType);
+		ctor(streamProvider, numWorkers, buildOptions, modelType);
 	}
 
 	public KiwiBuilder(String modelPath, int numWorkers, int buildOptions) {
@@ -148,7 +148,7 @@ public class KiwiBuilder implements AutoCloseable  {
 	}
 
 	public KiwiBuilder(StreamProvider streamProvider, int numWorkers, int buildOptions) {
-		ctorStream(streamProvider, numWorkers, buildOptions, ModelType.none);
+		ctor(streamProvider, numWorkers, buildOptions, ModelType.none);
 	}
 
 	public KiwiBuilder(String modelPath, int numWorkers) {
@@ -156,7 +156,7 @@ public class KiwiBuilder implements AutoCloseable  {
 	}
 
 	public KiwiBuilder(StreamProvider streamProvider, int numWorkers) {
-		ctorStream(streamProvider, numWorkers, BuildOption.default_, ModelType.none);
+		ctor(streamProvider, numWorkers, BuildOption.default_, ModelType.none);
 	}
 
 	public KiwiBuilder(String modelPath) {
@@ -164,7 +164,7 @@ public class KiwiBuilder implements AutoCloseable  {
 	}
 
 	public KiwiBuilder(StreamProvider streamProvider) {
-		ctorStream(streamProvider, 1, BuildOption.default_, ModelType.none);
+		ctor(streamProvider, 1, BuildOption.default_, ModelType.none);
 	}
 
 	protected void finalize() throws Exception {
@@ -176,7 +176,7 @@ public class KiwiBuilder implements AutoCloseable  {
 	}
 
 	private native void ctor(String modelPath, int numWorkers, int buildOptions, int modelType);
-	private native void ctorStream(StreamProvider streamProvider, int numWorkers, int buildOptions, int modelType);
+	private native void ctor(StreamProvider streamProvider, int numWorkers, int buildOptions, int modelType);
 	
 	@Override
 	public native void close() throws Exception;

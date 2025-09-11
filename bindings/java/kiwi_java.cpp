@@ -259,11 +259,6 @@ namespace jni
 	};
 
 	// Forward declaration for StreamProvider interface
-	template<>
-	struct JClassName<jobject>
-	{
-		static constexpr auto value = std::string_view{ "kr/pe/bab2min/KiwiBuilder$StreamProvider" };
-	};
 }
 
 class JKiwi;
@@ -712,7 +707,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved)
 
 		jni::define<JKiwiBuilder>()
 			.template ctor<std::string, size_t, kiwi::BuildOption, kiwi::ModelType>()
-			.template ctor<jobject, size_t, kiwi::BuildOption, kiwi::ModelType>("ctorStream")
+			.template ctor<jobject, size_t, kiwi::BuildOption, kiwi::ModelType>()
 			.template method<&JKiwiBuilder::addWord>("addWord")
 			.template method<&JKiwiBuilder::addWord2>("addWord")
 			.template method<&JKiwiBuilder::addPreAnalyzedWord>("addPreAnalyzedWord")

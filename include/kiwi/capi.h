@@ -86,6 +86,18 @@ typedef int(*kiwi_reader_w_t)(int, kchar16_t*, void*);
  */
 typedef int(*kiwi_stream_provider_t)(const char* filename, char* buffer, void* user_data);
 
+/**
+ * @brief 청크 단위로 파일 데이터를 제공하는 향상된 콜백 함수 타입
+ *
+ * @param filename 읽을 파일의 이름입니다.
+ * @param offset 읽기 시작할 위치입니다.
+ * @param buffer 데이터를 저장할 버퍼입니다. null인 경우 파일 크기만 반환합니다.
+ * @param buffer_size 읽을 데이터 크기입니다.
+ * @param user_data 사용자가 제공한 추가 데이터입니다.
+ * @return buffer가 null인 경우 파일 크기를 반환합니다. 그렇지 않으면 실제로 읽은 바이트 수를 반환합니다. 실패 시 음수, EOF 시 0을 반환합니다.
+ */
+typedef int(*kiwi_chunked_stream_provider_t)(const char* filename, int offset, char* buffer, int buffer_size, void* user_data);
+
 typedef int(*kiwi_receiver_t)(int, kiwi_res_h, void*);
 
 /**
@@ -213,6 +225,24 @@ DECL_DLL kiwi_builder_h kiwi_builder_init(const char* model_path, int num_thread
  * @see kiwi_builder_close, kiwi_stream_provider_t
  */
 DECL_DLL kiwi_builder_h kiwi_builder_init_stream(kiwi_stream_provider_t stream_provider, void* user_data, int num_threads, int options);
+
+/**
+ * @brief 청크 스트림 제공자를 사용하여 Kiwi Builder를 생성합니다.
+ * 
+ * @param chunked_stream_provider 파일명과 위치를 받아 해당 파일의 데이터를 청크 단위로 제공하는 콜백 함수.
+ * @param user_data chunked_stream_provider 호출시 전달될 사용자 데이터.
+ * @param num_threads 사용할 스레드의 개수. -1로 지정시 가용한 스레드 개수를 자동으로 판단합니다.
+ * @param options 생성 옵션. KIWI_BUILD_* 열거형을 참조하십시오.
+ * @return 성공 시 Kiwi Builder의 핸들을 반환합니다. 
+ * 실패시 null를 반환하고 에러 메세지를 설정합니다. 
+ * 에러 메세지는 kiwi_error()를 통해 확인할 수 있습니다.
+ * 
+ * @note 이 방식으로 생성된 KiwiBuilder는 WordDetector가 초기화되지 않으므로 
+ *       kiwi_builder_extract_words 등의 함수를 사용할 수 없습니다.
+ * 
+ * @see kiwi_builder_close, kiwi_chunked_stream_provider_t
+ */
+DECL_DLL kiwi_builder_h kiwi_builder_init_chunked_stream(kiwi_chunked_stream_provider_t chunked_stream_provider, void* user_data, int num_threads, int options);
 
 /**
  * @brief 사용이 끝난 KiwiBuilder를 해제합니다.
