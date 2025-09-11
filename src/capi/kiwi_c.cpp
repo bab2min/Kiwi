@@ -1,6 +1,7 @@
 #include <cmath>
 #include <memory>
 #include <fstream>
+#include <sstream>
 #include <kiwi/Kiwi.h>
 #include <kiwi/SwTokenizer.h>
 #include <kiwi/capi.h>
@@ -118,6 +119,51 @@ kiwi_builder_h kiwi_builder_init(const char* model_path, int num_threads, int op
 			: (mtMask == KIWI_BUILD_MODEL_TYPE_CONG_GLOBAL) ? ModelType::congGlobal
 			: ModelType::none;
 		return (kiwi_builder_h)new KiwiBuilder{ model_path, (size_t)num_threads, buildOption, modelType };
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return nullptr;
+	}
+}
+
+kiwi_builder_h kiwi_builder_init_stream(kiwi_stream_provider_t stream_provider, void* user_data, int num_threads, int options)
+{
+	try
+	{
+		BuildOption buildOption = (BuildOption)(options & 0xFF);
+		const auto mtMask = options & (KIWI_BUILD_MODEL_TYPE_LARGEST | KIWI_BUILD_MODEL_TYPE_KNLM | KIWI_BUILD_MODEL_TYPE_SBG | KIWI_BUILD_MODEL_TYPE_CONG | KIWI_BUILD_MODEL_TYPE_CONG_GLOBAL);
+		const ModelType modelType = (mtMask == KIWI_BUILD_MODEL_TYPE_LARGEST) ? ModelType::largest
+			: (mtMask == KIWI_BUILD_MODEL_TYPE_KNLM) ? ModelType::knlm
+			: (mtMask == KIWI_BUILD_MODEL_TYPE_SBG) ? ModelType::sbg
+			: (mtMask == KIWI_BUILD_MODEL_TYPE_CONG) ? ModelType::cong
+			: (mtMask == KIWI_BUILD_MODEL_TYPE_CONG_GLOBAL) ? ModelType::congGlobal
+			: ModelType::none;
+		
+		// Create C++ StreamProvider that wraps the C callback
+		KiwiBuilder::StreamProvider cppStreamProvider = [stream_provider, user_data](const std::string& filename) -> std::unique_ptr<std::istream>
+		{
+			// First call to get file size
+			int fileSize = stream_provider(filename.c_str(), nullptr, user_data);
+			if (fileSize < 0) 
+			{
+				return nullptr; // Error occurred
+			}
+			
+			// Second call to get actual data  
+			std::unique_ptr<char[]> buffer(new char[fileSize]);
+			int bytesRead = stream_provider(filename.c_str(), buffer.get(), user_data);
+			if (bytesRead != fileSize)
+			{
+				return nullptr; // Error occurred
+			}
+			
+			// Create stringstream from buffer
+			std::string fileData(buffer.get(), fileSize);
+			return std::make_unique<std::istringstream>(std::move(fileData));
+		};
+		
+		return (kiwi_builder_h)new KiwiBuilder{ cppStreamProvider, (size_t)num_threads, buildOption, modelType };
 	}
 	catch (...)
 	{

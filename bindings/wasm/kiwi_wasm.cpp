@@ -1,6 +1,7 @@
 #include <kiwi/Kiwi.h>
 
 #include <map>
+#include <sstream>
 #include <nlohmann/json.hpp>
 
 #include <emscripten.h>
@@ -215,6 +216,197 @@ json build(const json& args) {
         const std::string path = pathJson;
         builder.loadDictionary(path);
     }
+
+    const auto userWords = buildArgs.value("userWords", json::array());
+    for (const auto& word : userWords) {
+        const std::string word8 = word["word"];
+        const std::u16string word16 = utf8To16(word8);
+
+        const std::string tag8 = word.value("tag", "NNG");
+        const std::u16string tag16 = utf8To16(tag8);
+        const POSTag tag = toPOSTag(tag16);
+
+        const float score = word.value("score", 0.0f);
+
+        if (word.contains("origWord")) {
+            const std::string origWord8 = word["origWord"];
+            const std::u16string origWord16 = utf8To16(origWord8);
+
+            builder.addWord(word16, tag, score, origWord16);
+        } else {
+            builder.addWord(word16, tag, score);
+        }
+    }
+
+    const auto preanalyzedWords = buildArgs.value("preanalyzedWords", json::array());
+    for (const auto& preanalyzedWord : preanalyzedWords) {
+        const std::string form8 = preanalyzedWord["form"];
+        const std::u16string form = utf8To16(form8);
+        const float score = preanalyzedWord.value("score", 0.0f);
+
+        std::vector<std::pair<std::u16string, POSTag>> analyzed;
+        std::vector<std::pair<size_t, size_t>> positions;
+
+        for (const auto& analyzedToken : preanalyzedWord["analyzed"]) {
+            const std::string form8 = analyzedToken["form"];
+            const std::u16string form = utf8To16(form8);
+
+            const std::string tag8 = analyzedToken["tag"];
+            const std::u16string tag16 = utf8To16(tag8);
+            const POSTag tag = toPOSTag(tag16);
+
+            analyzed.push_back({ form, tag });
+
+            if (analyzedToken.contains("start") && analyzedToken.contains("end")) {
+                const size_t start = analyzedToken["start"];
+                const size_t end = analyzedToken["end"];
+                positions.push_back({ start, end });
+            }
+        }
+
+        builder.addPreAnalyzedWord(form, analyzed, positions, score);
+    }
+
+    const auto typos = buildArgs.value("typos", json(nullptr));
+    const float typoCostThreshold = buildArgs.value("typoCostThreshold", 2.5f);
+
+    if (typos.is_null()) {
+        instances.emplace(id, builder.build(DefaultTypoSet::withoutTypo, typoCostThreshold));
+    } else if (typos.is_string()) {
+        DefaultTypoSet typoSet = DefaultTypoSet::withoutTypo;
+        const std::string typosStr = typos.get<std::string>();
+
+        if (typosStr == "basic") {
+            typoSet = DefaultTypoSet::basicTypoSet;
+        } else if (typosStr == "continual") {
+            typoSet = DefaultTypoSet::continualTypoSet;
+        } else if (typosStr == "basicWithContinual") {
+            typoSet = DefaultTypoSet::basicTypoSetWithContinual;
+        }
+
+        instances.emplace(id, builder.build(typoSet, typoCostThreshold));
+    } else {
+        TypoTransformer typoTransformer;
+
+        for (const auto& def : typos.value("defs", json::array())) {
+            const float cost = def.value("cost", 1.0f);
+            
+            CondVowel condVowel = CondVowel::none;
+            const std::string condVowelStr = def.value("condVowel", "none");
+
+            if (condVowelStr == "any") {
+                condVowel = CondVowel::any;
+            } else if (condVowelStr == "vowel") {
+                condVowel = CondVowel::vowel;
+            } else if (condVowelStr == "applosive") {
+                condVowel = CondVowel::applosive;
+            }
+
+            for (const auto& orig8 : def["orig"]) {
+                const auto orig16 = utf8To16(orig8);
+                for (const auto& error8 : def["error"]) {
+                    typoTransformer.addTypo(orig16, utf8To16(error8), cost, condVowel);
+                }
+            }
+        }
+
+        const float continualTypoCost = typos.value("continualTypoCost", 1.0f);
+        typoTransformer.setContinualTypoCost(continualTypoCost);
+
+        instances.emplace(id, builder.build(typoTransformer, typoCostThreshold));
+    }
+
+    return id;
+}
+
+json buildWithStreamProvider(const json& args) {
+    const int id = nextInstanceId();
+
+    const json buildArgs = args[0];
+    
+    // Extract JavaScript callback function name or ID
+    std::string streamProviderCallbackName = buildArgs["streamProviderCallback"];
+
+    const size_t numThreads = 0;
+    const auto modelTypeStr = buildArgs.value("modelType", "none");
+
+    const ModelType modelType = (modelTypeStr == "none") ? ModelType::none 
+        : (modelTypeStr == "largest") ? ModelType::largest
+        : (modelTypeStr == "knlm") ? ModelType::knlm
+        : (modelTypeStr == "sbg") ? ModelType::sbg
+        : (modelTypeStr == "cong") ? ModelType::cong
+        : (modelTypeStr == "cong-global") ? ModelType::congGlobal
+        : ModelType::none;
+    
+    BuildOption buildOptions = BuildOption::none;
+    if (buildArgs.value("integrateAllomorph", true)) {
+        buildOptions |= BuildOption::integrateAllomorph;
+    }
+    if (buildArgs.value("loadDefaultDict", true)) {
+        buildOptions |= BuildOption::loadDefaultDict;
+    }
+    if (buildArgs.value("loadTypoDict", true)) {
+        buildOptions |= BuildOption::loadTypoDict;
+    }
+    if (buildArgs.value("loadMultiDict", true)) {
+        buildOptions |= BuildOption::loadMultiDict;
+    }
+
+    // Create StreamProvider that calls JavaScript function
+    KiwiBuilder::StreamProvider streamProvider = [streamProviderCallbackName](const std::string& filename) -> std::unique_ptr<std::istream>
+    {
+        try
+        {
+            // Call JavaScript function by name
+            emscripten::val jsFunction = emscripten::val::global(streamProviderCallbackName.c_str());
+            if (jsFunction.isUndefined())
+            {
+                return nullptr;
+            }
+            
+            emscripten::val result = jsFunction(filename);
+            if (result.isNull() || result.isUndefined())
+            {
+                return nullptr;
+            }
+            
+            // Convert result to vector<char>
+            std::vector<char> buffer;
+            if (result.hasOwnProperty("length"))
+            {
+                const int length = result["length"].as<int>();
+                buffer.resize(length);
+                
+                for (int i = 0; i < length; ++i)
+                {
+                    buffer[i] = result[i].as<unsigned char>();
+                }
+            }
+            else if (result.typeOf().as<std::string>() == "string")
+            {
+                std::string str = result.as<std::string>();
+                buffer.assign(str.begin(), str.end());
+            }
+            else
+            {
+                return nullptr;
+            }
+            
+            std::string data(buffer.begin(), buffer.end());
+            return std::make_unique<std::istringstream>(std::move(data));
+        }
+        catch (...)
+        {
+            return nullptr;
+        }
+    };
+
+    KiwiBuilder builder = KiwiBuilder{
+        streamProvider,
+        numThreads,
+        buildOptions,
+        modelType,
+    };
 
     const auto userWords = buildArgs.value("userWords", json::array());
     for (const auto& word : userWords) {
@@ -533,6 +725,7 @@ using InstanceApiMethod = json(*)(Kiwi&, const json&);
 std::map<std::string, ApiMethod> apiMethods = {
     { "version", version },
     { "build", build },
+    { "buildWithStreamProvider", buildWithStreamProvider },
 };
 
 std::map<std::string, InstanceApiMethod> instanceApiMethods = {

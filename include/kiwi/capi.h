@@ -76,6 +76,15 @@ user_data: user_data from kiwi_extract~, kiwi_perform, kiwi_analyze_m functions.
 typedef int(*kiwi_reader_t)(int, char*, void*);
 typedef int(*kiwi_reader_w_t)(int, kchar16_t*, void*);
 
+/**
+ * @brief 스트림 제공자를 위한 콜백 함수 타입. StreamProvider 기능을 C API에서 사용하기 위한 것입니다.
+ * 
+ * @param filename 읽어들일 파일의 이름
+ * @param buffer 파일 데이터가 저장될 버퍼. null인 경우 파일 크기를 반환해야 합니다.
+ * @param user_data 사용자 데이터
+ * @return buffer가 null인 경우 파일 크기를 반환합니다. 그렇지 않으면 실제로 읽은 바이트 수를 반환합니다. 실패 시 음수를 반환합니다.
+ */
+typedef int(*kiwi_stream_provider_t)(const char* filename, char* buffer, void* user_data);
 
 typedef int(*kiwi_receiver_t)(int, kiwi_res_h, void*);
 
@@ -186,6 +195,24 @@ DECL_DLL void kiwi_clear_error();
  * @see kiwi_builder_close
  */
 DECL_DLL kiwi_builder_h kiwi_builder_init(const char* model_path, int num_threads, int options);
+
+/**
+ * @brief 스트림 제공자를 사용하여 Kiwi Builder를 생성합니다.
+ * 
+ * @param stream_provider 파일명을 받아 해당 파일의 데이터를 제공하는 콜백 함수.
+ * @param user_data stream_provider 호출시 전달될 사용자 데이터.
+ * @param num_threads 사용할 스레드의 개수. -1로 지정시 가용한 스레드 개수를 자동으로 판단합니다.
+ * @param options 생성 옵션. KIWI_BUILD_* 열거형을 참조하십시오.
+ * @return 성공 시 Kiwi Builder의 핸들을 반환합니다. 
+ * 실패시 null를 반환하고 에러 메세지를 설정합니다. 
+ * 에러 메세지는 kiwi_error()를 통해 확인할 수 있습니다.
+ * 
+ * @note 이 방식으로 생성된 KiwiBuilder는 WordDetector가 초기화되지 않으므로 
+ *       kiwi_builder_extract_words 등의 함수를 사용할 수 없습니다.
+ * 
+ * @see kiwi_builder_close, kiwi_stream_provider_t
+ */
+DECL_DLL kiwi_builder_h kiwi_builder_init_stream(kiwi_stream_provider_t stream_provider, void* user_data, int num_threads, int options);
 
 /**
  * @brief 사용이 끝난 KiwiBuilder를 해제합니다.
