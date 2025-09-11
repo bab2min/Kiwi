@@ -11,6 +11,8 @@
 
 #include <iostream>
 #include <future>
+#include <functional>
+#include <memory>
 #include <string>
 #include <string_view>
 #include "Macro.h"
@@ -570,6 +572,12 @@ namespace kiwi
 			float dropoutProb = 0.15f;
 		};
 
+		/**
+		 * @brief 모델 파일을 읽기 위한 스트림 제공자 함수 타입.
+		 * 파일명을 입력받아 해당 파일의 내용을 읽을 수 있는 스트림을 반환한다.
+		 */
+		using StreamProvider = std::function<std::unique_ptr<std::istream>(const std::string& filename)>;
+
 	private:
 		using MorphemeMap = UnorderedMap<std::tuple<KString, uint8_t, POSTag>, std::pair<size_t, size_t>>;
 
@@ -698,6 +706,18 @@ namespace kiwi
 		KiwiBuilder(const std::string& modelPath, const ModelBuildArgs& args);
 
 		/**
+		 * @brief KiwiBuilder를 스트림 제공자를 통해 모델 파일로부터 생성한다.
+		 *
+		 * @param streamProvider 파일명을 받아 해당 모델 파일의 스트림을 반환하는 함수 객체.
+		 *                       이를 통해 파일 시스템 외에도 바이트 배열, 리소스 등 다양한 소스에서 모델을 읽을 수 있다.
+		 * @param numThreads 모델 및 형태소 분석에 사용할 스레드 개수. 
+		 *                   0일 경우 async를 지원하지 않는 단일 스레드에서 동작하며, 1 이상일 경우 지정한 개수만큼 worker 스레드를 생성하여 async가 지원된다.
+		 *                   기본값은 -1으로 이 경우 시스템의 CPU 코어 개수를 탐지하여 이 값을 numThreads값으로 설정한다.
+		 * @param options 생성 옵션. `kiwi::BuildOption`을 참조
+		 */
+		KiwiBuilder(StreamProvider streamProvider, size_t numThreads = -1, BuildOption options = BuildOption::default_, ModelType modelType = ModelType::none);
+
+		/**
 		 * @brief KiwiBuilder를 모델 파일로부터 생성한다.
 		 *
 		 * @param modelPath 모델이 위치한 경로
@@ -820,6 +840,14 @@ namespace kiwi
 		 * @return
 		 */
 		size_t loadDictionary(const std::string& dictPath);
+
+		/**
+		 * @brief 스트림에서 사용자 사전을 로딩한다.
+		 *
+		 * @param is 사전 파일 내용을 담은 입력 스트림
+		 * @return 추가된 단어의 개수
+		 */
+		size_t loadDictionaryFromStream(std::istream& is);
 
 		std::vector<WordInfo> extractWords(const U16MultipleReader& reader,
 			size_t minCnt = 10, size_t maxWordLen = 10, float minScore = 0.25, float posThreshold = -3, bool lmFilter = true

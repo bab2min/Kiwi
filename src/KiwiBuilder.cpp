@@ -829,61 +829,185 @@ ModelType KiwiBuilder::getModelType(const string& modelPath, bool largest)
 	}
 }
 
-KiwiBuilder::KiwiBuilder(const string& modelPath, size_t _numThreads, BuildOption _options, ModelType _modelType)
-	: detector{ modelPath, _numThreads }, options{ _options }, modelType{ _modelType }, numThreads{ _numThreads != (size_t)-1 ? _numThreads : thread::hardware_concurrency() }
+// Internal helper function to create a stream from various sources
+namespace 
+{
+	/**
+	 * @brief Helper function to get ModelType by checking available streams
+	 */
+	ModelType getModelTypeFromProvider(const KiwiBuilder::StreamProvider& provider, bool largest)
+	{
+		// Check for different model files by trying to create streams
+		try {
+			if (auto stream = provider("cong.mdl")) {
+				return largest ? ModelType::congGlobal : ModelType::cong;
+			}
+		} catch (...) {}
+		
+		try {
+			if (auto stream = provider("skipbigram.mdl")) {
+				return largest ? ModelType::sbg : ModelType::knlm;
+			}
+		} catch (...) {}
+		
+		try {
+			if (auto stream = provider("sj.knlm")) {
+				return ModelType::knlm;
+			}
+		} catch (...) {}
+		
+		return ModelType::none;
+	}
+}
+
+KiwiBuilder::KiwiBuilder(StreamProvider streamProvider, size_t _numThreads, BuildOption _options, ModelType _modelType)
+	: options{ _options }, modelType{ _modelType }, numThreads{ _numThreads != (size_t)-1 ? _numThreads : thread::hardware_concurrency() }
 {
 	archType = getSelectedArch(ArchType::default_);
 
+	// Load morphology data
 	{
-		utils::MMap mm{ modelPath + "/sj.morph" };
-		utils::imstream iss{ mm };
-		loadMorphBin(iss);
+		auto stream = streamProvider("sj.morph");
+		if (!stream) {
+			throw runtime_error{ "Cannot open morphology file 'sj.morph'" };
+		}
+		loadMorphBin(*stream);
 	}
 	
+	// Determine model type if not specified
 	if (modelType == ModelType::none || modelType == ModelType::largest)
 	{
-		modelType = getModelType(modelPath, modelType == ModelType::largest);
+		modelType = getModelTypeFromProvider(streamProvider, modelType == ModelType::largest);
 		if (modelType == ModelType::none)
 		{
-			throw runtime_error{ "Cannot find any valid model files in the given path" };
+			throw runtime_error{ "Cannot find any valid model files from stream provider" };
 		}
 	}
 
+	// Load language model based on type
 	if (modelType == ModelType::knlm || modelType == ModelType::knlmTransposed)
 	{
-		langMdl = lm::KnLangModelBase::create(utils::MMap(modelPath + string{ "/sj.knlm" }), archType, modelType == ModelType::knlmTransposed);
+		auto stream = streamProvider("sj.knlm");
+		if (!stream) {
+			throw runtime_error{ "Cannot open language model file 'sj.knlm'" };
+		}
+		
+		// Read the stream into memory for MMap compatibility
+		stream->seekg(0, std::ios::end);
+		size_t size = stream->tellg();
+		stream->seekg(0, std::ios::beg);
+		
+		auto memoryOwner = std::make_shared<utils::MemoryOwner>(size);
+		stream->read(static_cast<char*>(memoryOwner->get()), size);
+		
+		utils::MemoryObject memObj(*memoryOwner);
+		langMdl = lm::KnLangModelBase::create(memObj, archType, modelType == ModelType::knlmTransposed);
 	}
 	else if (modelType == ModelType::sbg)
 	{
-		langMdl = lm::SkipBigramModelBase::create(utils::MMap(modelPath + string{ "/sj.knlm" }), utils::MMap(modelPath + string{ "/skipbigram.mdl" }), archType);
+		// Load both sj.knlm and skipbigram.mdl
+		auto knlmStream = streamProvider("sj.knlm");
+		auto sbgStream = streamProvider("skipbigram.mdl");
+		if (!knlmStream || !sbgStream) {
+			throw runtime_error{ "Cannot open required files for skipbigram model" };
+		}
+		
+		// Read knlm stream into memory
+		knlmStream->seekg(0, std::ios::end);
+		size_t knlmSize = knlmStream->tellg();
+		knlmStream->seekg(0, std::ios::beg);
+		
+		auto knlmMemoryOwner = std::make_shared<utils::MemoryOwner>(knlmSize);
+		knlmStream->read(static_cast<char*>(knlmMemoryOwner->get()), knlmSize);
+		utils::MemoryObject knlmObj(*knlmMemoryOwner);
+		
+		// Read sbg stream into memory
+		sbgStream->seekg(0, std::ios::end);
+		size_t sbgSize = sbgStream->tellg();
+		sbgStream->seekg(0, std::ios::beg);
+		
+		auto sbgMemoryOwner = std::make_shared<utils::MemoryOwner>(sbgSize);
+		sbgStream->read(static_cast<char*>(sbgMemoryOwner->get()), sbgSize);
+		utils::MemoryObject sbgObj(*sbgMemoryOwner);
+		
+		langMdl = lm::SkipBigramModelBase::create(knlmObj, sbgObj, archType);
 	}
 	else if (ModelType::cong <= modelType && modelType <= ModelType::congGlobalFp32 )
 	{
-		langMdl = lm::CoNgramModelBase::create(utils::MMap(modelPath + string{ "/cong.mdl" }), archType, 
+		auto stream = streamProvider("cong.mdl");
+		if (!stream) {
+			throw runtime_error{ "Cannot open ConG model file 'cong.mdl'" };
+		}
+		
+		// Read the stream into memory for MMap compatibility
+		stream->seekg(0, std::ios::end);
+		size_t size = stream->tellg();
+		stream->seekg(0, std::ios::beg);
+		
+		auto memoryOwner = std::make_shared<utils::MemoryOwner>(size);
+		stream->read(static_cast<char*>(memoryOwner->get()), size);
+		
+		utils::MemoryObject memObj(*memoryOwner);
+		langMdl = lm::CoNgramModelBase::create(memObj, archType, 
 			(modelType == ModelType::congGlobal || modelType == ModelType::congGlobalFp32),
 			(modelType == ModelType::cong || modelType == ModelType::congGlobal));
 	}
 
+	// Load dictionaries if requested
 	if (!!(options & BuildOption::loadDefaultDict))
 	{
-		loadDictionary(modelPath + "/default.dict");
+		try {
+			auto stream = streamProvider("default.dict");
+			if (stream) {
+				loadDictionaryFromStream(*stream);
+			}
+		} catch (...) {
+			// Dictionary loading is optional, so we don't fail if file doesn't exist
+		}
 	}
 
 	if (!!(options & BuildOption::loadTypoDict))
 	{
-		loadDictionary(modelPath + "/typo.dict");
+		try {
+			auto stream = streamProvider("typo.dict");
+			if (stream) {
+				loadDictionaryFromStream(*stream);
+			}
+		} catch (...) {
+			// Dictionary loading is optional
+		}
 	}
 
 	if (!!(options & BuildOption::loadMultiDict))
 	{
-		loadDictionary(modelPath + "/multi.dict");
+		try {
+			auto stream = streamProvider("multi.dict");
+			if (stream) {
+				loadDictionaryFromStream(*stream);
+			}
+		} catch (...) {
+			// Dictionary loading is optional
+		}
 	}
 
+	// Load combining rules
 	{
-		ifstream ifs;
-		combiningRule = make_shared<cmb::CompiledRule>(cmb::RuleSet{ openFile(ifs, modelPath + string{ "/combiningRule.txt" }) }.compile());
-		addAllomorphsToRule();
+		auto stream = streamProvider("combiningRule.txt");
+		if (stream) {
+			combiningRule = make_shared<cmb::CompiledRule>(cmb::RuleSet{ *stream }.compile());
+			addAllomorphsToRule();
+		} else {
+			// Create empty combining rule if file doesn't exist
+			combiningRule = make_shared<cmb::CompiledRule>();
+		}
 	}
+}
+
+KiwiBuilder::KiwiBuilder(const string& modelPath, size_t _numThreads, BuildOption _options, ModelType _modelType)
+	: KiwiBuilder(utils::makeFilesystemProvider(modelPath), _numThreads, _options, _modelType)
+{
+	// Initialize WordDetector separately for filesystem-based constructor
+	detector = WordDetector{ modelPath, _numThreads };
 }
 
 void KiwiBuilder::initMorphemes()
@@ -1895,6 +2019,93 @@ size_t KiwiBuilder::loadDictionary(const string& dictPath)
 				throw FormatException("[loadUserDictionary] Unknown Tag '" + utf16To8(fields[1]) + "' at line " + to_string(lineNo));
 			}
 			addedCnt += addWord(fields[0], pos, score).second ? 1 : 0;
+		}
+	}
+	return addedCnt;
+}
+
+size_t KiwiBuilder::loadDictionaryFromStream(std::istream& is)
+{
+	size_t addedCnt = 0;
+	string line;
+	array<U16StringView, 3> fields;
+	u16string wstr;
+	for (size_t lineNo = 1; getline(is, line); ++lineNo)
+	{
+		utf8To16(toStringView(line), wstr);
+		while (!wstr.empty() && kiwi::identifySpecialChr(wstr.back()) == POSTag::unknown) wstr.pop_back();
+		if (wstr.empty()) continue;
+		if (wstr[0] == u'#') continue;
+		size_t fieldSize = split(wstr, u'\t', fields.begin(), 2) - fields.begin();
+		if (fieldSize < 2)
+		{
+			throw FormatException("[loadUserDictionary] Wrong dictionary format at line " + to_string(lineNo) + " : " + line);
+		}
+
+		while (!fields[0].empty() && fields[0][0] == ' ') fields[0] = fields[0].substr(1);
+
+		float score = 0.f;
+		if (fieldSize > 2) score = stof(fields[2].begin(), fields[2].end());
+
+		if (fields[1].find(u'/') != fields[1].npos)
+		{
+			vector<pair<U16StringView, POSTag>> morphemes;
+
+			for (auto& m : split(fields[1], u'+', u'+'))
+			{
+				size_t b = 0, e = m.size();
+				while (b < e && m[e - 1] == ' ') --e;
+				while (b < e && m[b] == ' ') ++b;
+				m = m.substr(b, e - b);
+
+				size_t p = m.rfind(u'/');
+				if (p == m.npos)
+				{
+					throw FormatException("[loadUserDictionary] Wrong dictionary format at line " + to_string(lineNo) + " : " + line);
+				}
+				auto pos = toPOSTag(m.substr(p + 1));
+				if (pos == POSTag::max)
+				{
+					throw FormatException("[loadUserDictionary] Unknown Tag '" + utf16To8(fields[1]) + "' at line " + to_string(lineNo));
+				}
+				morphemes.emplace_back(m.substr(0, p), pos);
+			}
+
+			if (fields[0].back() == u'*')
+			{
+				if (morphemes.size() != 1)
+				{
+					throw FormatException("[loadUserDictionary] Replace rule cannot have 2 or more forms '" + utf16To8(fields[1]) + "' at line " + to_string(lineNo));
+				}
+
+				auto suffix = fields[0].substr(0, fields[0].size() - 1);
+				addedCnt += addRule(morphemes[0].second, [&](const u16string& str)
+				{
+					auto strv = toStringView(str);
+					if (!(strv.size() >= suffix.size() && strv.substr(strv.size() - suffix.size()) == suffix)) return str;
+					return u16string{ strv.substr(0, strv.size() - suffix.size()) } + u16string{ morphemes[0].first };
+				}, score).size();
+			}
+			else
+			{
+				if (morphemes.size() > 1)
+				{
+					addedCnt += addPreAnalyzedWord(fields[0], morphemes, {}, score) ? 1 : 0;
+				}
+				else
+				{
+					addedCnt += addWord(fields[0], morphemes[0].second, score, replace(morphemes[0].first, u"++", u"+")).second;
+				}
+			}
+		}
+		else
+		{
+			auto pos = toPOSTag(fields[1]);
+			if (pos == POSTag::max)
+			{
+				throw FormatException("[loadUserDictionary] Unknown Tag '" + utf16To8(fields[1]) + "' at line " + to_string(lineNo));
+			}
+			addedCnt += addWord(fields[0], pos, score).second;
 		}
 	}
 	return addedCnt;

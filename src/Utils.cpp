@@ -1,5 +1,7 @@
 ﻿#include <cassert>
+#include <fstream>
 #include <kiwi/Utils.h>
+#include <kiwi/Mmap.h>
 #include "StrUtils.h"
 
 namespace kiwi
@@ -526,5 +528,36 @@ namespace kiwi
 		case ModelType::congGlobalFp32: return "cong-global-fp32";
 		}
 		return "unknown";
+	}
+
+	namespace utils
+	{
+		std::function<std::unique_ptr<std::istream>(const std::string&)> makeFilesystemProvider(const std::string& modelPath)
+		{
+			return [modelPath](const std::string& filename) -> std::unique_ptr<std::istream> {
+				std::string fullPath = modelPath + "/" + filename;
+				auto stream = std::make_unique<std::ifstream>(fullPath, std::ios::binary);
+				if (!stream->is_open()) {
+					throw std::ios_base::failure("Cannot open file: " + fullPath);
+				}
+				return std::move(stream);
+			};
+		}
+
+		std::function<std::unique_ptr<std::istream>(const std::string&)> makeMemoryProvider(const std::unordered_map<std::string, std::vector<char>>& fileData)
+		{
+			// Copy the fileData to ensure it stays alive for the lifetime of the provider
+			auto sharedData = std::make_shared<std::unordered_map<std::string, std::vector<char>>>(fileData);
+			
+			return [sharedData](const std::string& filename) -> std::unique_ptr<std::istream> {
+				auto it = sharedData->find(filename);
+				if (it == sharedData->end()) {
+					throw std::ios_base::failure("Cannot find file in memory: " + filename);
+				}
+				
+				const auto& data = it->second;
+				return std::make_unique<utils::imstream>(data.data(), data.size());
+			};
+		}
 	}
 }
