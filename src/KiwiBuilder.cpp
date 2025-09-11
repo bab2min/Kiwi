@@ -863,6 +863,10 @@ namespace
 KiwiBuilder::KiwiBuilder(StreamProvider streamProvider, size_t _numThreads, BuildOption _options, ModelType _modelType)
 	: options{ _options }, modelType{ _modelType }, numThreads{ _numThreads != (size_t)-1 ? _numThreads : thread::hardware_concurrency() }
 {
+	// Note: WordDetector is not initialized when using StreamProvider constructor
+	// This means extractWords() and extractAddWords() methods will not be available
+	// To use these methods, use the filesystem-based constructor instead
+	
 	archType = getSelectedArch(ArchType::default_);
 
 	// Load morphology data

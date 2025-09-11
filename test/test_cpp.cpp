@@ -2,6 +2,9 @@
 #include <kiwi/Kiwi.h>
 #include <kiwi/Dataset.h>
 #include <kiwi/SubstringExtractor.h>
+#include <unordered_map>
+#include <vector>
+#include <sstream>
 #include "common.h"
 
 class TestInitializer
@@ -1786,4 +1789,74 @@ TEST(KiwiCpp, Issue205)
 	auto res2 = kiwi2.analyze(u"함박 스테이크를 먹었습니다", Match::allWithNormalizing).first;
 
 	EXPECT_EQ(res2[0].str, u"함박 스테이크");
+}
+
+TEST(KiwiCpp, StreamProvider)
+{
+	// Test the new StreamProvider interface for flexible model loading
+	
+	// Test 1: Verify the filesystem provider works (backward compatibility)
+	{
+		auto filesystemProvider = utils::makeFilesystemProvider(MODEL_PATH);
+		
+		// Test that we can create streams for required files
+		try {
+			auto morphStream = filesystemProvider("sj.morph");
+			EXPECT_TRUE(morphStream != nullptr);
+			EXPECT_TRUE(morphStream->good());
+		} catch (const std::exception& e) {
+			FAIL() << "Failed to create stream for sj.morph: " << e.what();
+		}
+	}
+	
+	// Test 2: Test memory provider with dummy data
+	{
+		std::unordered_map<std::string, std::vector<char>> memoryFiles;
+		
+		// Create dummy model files that won't cause crashes but demonstrate the interface
+		std::string dummyMorph = "KIWI"; // Minimal header for morph file
+		std::string dummyDict = "테스트\tnnp\t1.0\n"; // Simple dictionary entry
+		std::string dummyRule = "# Simple rule\n"; // Simple rule file
+		
+		memoryFiles["sj.morph"] = std::vector<char>(dummyMorph.begin(), dummyMorph.end());
+		memoryFiles["default.dict"] = std::vector<char>(dummyDict.begin(), dummyDict.end());
+		memoryFiles["combiningRule.txt"] = std::vector<char>(dummyRule.begin(), dummyRule.end());
+		
+		auto memoryProvider = utils::makeMemoryProvider(memoryFiles);
+		
+		// Test that we can create streams from memory
+		auto morphStream = memoryProvider("sj.morph");
+		EXPECT_TRUE(morphStream != nullptr);
+		EXPECT_TRUE(morphStream->good());
+		
+		// Test reading content
+		std::string content;
+		*morphStream >> content;
+		EXPECT_EQ(content, "KIWI");
+		
+		auto dictStream = memoryProvider("default.dict");
+		EXPECT_TRUE(dictStream != nullptr);
+		
+		std::string line;
+		std::getline(*dictStream, line);
+		EXPECT_TRUE(line.find("테스트") != std::string::npos);
+		
+		// Test non-existent file throws exception
+		EXPECT_THROW(memoryProvider("nonexistent.file"), std::ios_base::failure);
+	}
+	
+	// Test 3: Test custom provider
+	{
+		auto customProvider = [](const std::string& filename) -> std::unique_ptr<std::istream> {
+			std::string content = "custom_content_for_" + filename;
+			return std::make_unique<std::stringstream>(content);
+		};
+		
+		auto stream = customProvider("any_filename");
+		EXPECT_TRUE(stream != nullptr);
+		
+		std::string content;
+		*stream >> content;
+		EXPECT_EQ(content, "custom_content_for_any_filename");
+	}
 }
