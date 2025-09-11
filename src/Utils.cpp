@@ -559,5 +559,17 @@ namespace kiwi
 				return std::make_unique<utils::imstream>(data.data(), data.size());
 			};
 		}
+
+		utils::MemoryObject createMemoryObjectFromStream(std::istream& stream)
+		{
+			stream.seekg(0, std::ios::end);
+			size_t size = stream.tellg();
+			stream.seekg(0, std::ios::beg);
+			
+			auto memoryOwner = std::make_shared<utils::MemoryOwner>(size);
+			stream.read(static_cast<char*>(memoryOwner->get()), size);
+			
+			return utils::MemoryObject(std::move(*memoryOwner));
+		}
 	}
 }

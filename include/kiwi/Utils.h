@@ -10,6 +10,10 @@
 
 namespace kiwi
 {
+	namespace utils
+	{
+		class MemoryObject; // Forward declaration
+	}
 	template<typename T, typename... Args,
 		typename std::enable_if<!std::is_array<T>::value, int>::type = 0
 	>
@@ -413,6 +417,14 @@ namespace kiwi
 		 * @return StreamProvider 파일명을 받아 해당 메모리 데이터의 스트림을 반환하는 함수 객체
 		 */
 		std::function<std::unique_ptr<std::istream>(const std::string&)> makeMemoryProvider(const std::unordered_map<std::string, std::vector<char>>& fileData);
+
+		/**
+		 * @brief 스트림에서 MemoryObject를 생성한다.
+		 *
+		 * @param stream 읽어올 스트림
+		 * @return MemoryObject 스트림 내용을 담은 메모리 객체
+		 */
+		utils::MemoryObject createMemoryObjectFromStream(std::istream& stream);
 	}
 
 	const char* modelTypeToStr(ModelType type);

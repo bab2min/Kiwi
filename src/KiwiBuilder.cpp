@@ -863,9 +863,8 @@ namespace
 KiwiBuilder::KiwiBuilder(StreamProvider streamProvider, size_t _numThreads, BuildOption _options, ModelType _modelType)
 	: options{ _options }, modelType{ _modelType }, numThreads{ _numThreads != (size_t)-1 ? _numThreads : thread::hardware_concurrency() }
 {
-	// Note: WordDetector is not initialized when using StreamProvider constructor
-	// This means extractWords() and extractAddWords() methods will not be available
-	// To use these methods, use the filesystem-based constructor instead
+	// Initialize WordDetector with StreamProvider
+	detector = WordDetector{ streamProvider, _numThreads };
 	
 	archType = getSelectedArch(ArchType::default_);
 
@@ -897,14 +896,7 @@ KiwiBuilder::KiwiBuilder(StreamProvider streamProvider, size_t _numThreads, Buil
 		}
 		
 		// Read the stream into memory for MMap compatibility
-		stream->seekg(0, std::ios::end);
-		size_t size = stream->tellg();
-		stream->seekg(0, std::ios::beg);
-		
-		auto memoryOwner = std::make_shared<utils::MemoryOwner>(size);
-		stream->read(static_cast<char*>(memoryOwner->get()), size);
-		
-		utils::MemoryObject memObj(*memoryOwner);
+		utils::MemoryObject memObj = utils::createMemoryObjectFromStream(*stream);
 		langMdl = lm::KnLangModelBase::create(memObj, archType, modelType == ModelType::knlmTransposed);
 	}
 	else if (modelType == ModelType::sbg)
@@ -917,22 +909,10 @@ KiwiBuilder::KiwiBuilder(StreamProvider streamProvider, size_t _numThreads, Buil
 		}
 		
 		// Read knlm stream into memory
-		knlmStream->seekg(0, std::ios::end);
-		size_t knlmSize = knlmStream->tellg();
-		knlmStream->seekg(0, std::ios::beg);
-		
-		auto knlmMemoryOwner = std::make_shared<utils::MemoryOwner>(knlmSize);
-		knlmStream->read(static_cast<char*>(knlmMemoryOwner->get()), knlmSize);
-		utils::MemoryObject knlmObj(*knlmMemoryOwner);
+		utils::MemoryObject knlmObj = utils::createMemoryObjectFromStream(*knlmStream);
 		
 		// Read sbg stream into memory
-		sbgStream->seekg(0, std::ios::end);
-		size_t sbgSize = sbgStream->tellg();
-		sbgStream->seekg(0, std::ios::beg);
-		
-		auto sbgMemoryOwner = std::make_shared<utils::MemoryOwner>(sbgSize);
-		sbgStream->read(static_cast<char*>(sbgMemoryOwner->get()), sbgSize);
-		utils::MemoryObject sbgObj(*sbgMemoryOwner);
+		utils::MemoryObject sbgObj = utils::createMemoryObjectFromStream(*sbgStream);
 		
 		langMdl = lm::SkipBigramModelBase::create(knlmObj, sbgObj, archType);
 	}
@@ -944,14 +924,7 @@ KiwiBuilder::KiwiBuilder(StreamProvider streamProvider, size_t _numThreads, Buil
 		}
 		
 		// Read the stream into memory for MMap compatibility
-		stream->seekg(0, std::ios::end);
-		size_t size = stream->tellg();
-		stream->seekg(0, std::ios::beg);
-		
-		auto memoryOwner = std::make_shared<utils::MemoryOwner>(size);
-		stream->read(static_cast<char*>(memoryOwner->get()), size);
-		
-		utils::MemoryObject memObj(*memoryOwner);
+		utils::MemoryObject memObj = utils::createMemoryObjectFromStream(*stream);
 		langMdl = lm::CoNgramModelBase::create(memObj, archType, 
 			(modelType == ModelType::congGlobal || modelType == ModelType::congGlobalFp32),
 			(modelType == ModelType::cong || modelType == ModelType::congGlobal));
@@ -1001,8 +974,7 @@ KiwiBuilder::KiwiBuilder(StreamProvider streamProvider, size_t _numThreads, Buil
 			combiningRule = make_shared<cmb::CompiledRule>(cmb::RuleSet{ *stream }.compile());
 			addAllomorphsToRule();
 		} else {
-			// Create empty combining rule if file doesn't exist
-			combiningRule = make_shared<cmb::CompiledRule>();
+			throw runtime_error{ "Cannot open required file: combiningRule.txt" };
 		}
 	}
 }
@@ -1936,96 +1908,9 @@ bool KiwiBuilder::addPreAnalyzedWord(const char16_t* form, const vector<pair<con
 
 size_t KiwiBuilder::loadDictionary(const string& dictPath)
 {
-	size_t addedCnt = 0;
 	ifstream ifs;
 	openFile(ifs, dictPath);
-	string line;
-	array<U16StringView, 3> fields;
-	u16string wstr;
-	for (size_t lineNo = 1; getline(ifs, line); ++lineNo)
-	{
-		utf8To16(toStringView(line), wstr);
-		while (!wstr.empty() && kiwi::identifySpecialChr(wstr.back()) == POSTag::unknown) wstr.pop_back();
-		if (wstr.empty()) continue;
-		if (wstr[0] == u'#') continue;
-		size_t fieldSize = split(wstr, u'\t', fields.begin(), 2) - fields.begin();
-		if (fieldSize < 2)
-		{
-			throw FormatException("[loadUserDictionary] Wrong dictionary format at line " + to_string(lineNo) + " : " + line);
-		}
-
-		while (!fields[0].empty() && fields[0][0] == ' ') fields[0] = fields[0].substr(1);
-
-		float score = 0.f;
-		if (fieldSize > 2) score = stof(fields[2].begin(), fields[2].end());
-
-		if (fields[1].find(u'/') != fields[1].npos)
-		{
-			vector<pair<U16StringView, POSTag>> morphemes;
-
-			for (auto& m : split(fields[1], u'+', u'+'))
-			{
-				size_t b = 0, e = m.size();
-				while (b < e && m[e - 1] == ' ') --e;
-				while (b < e && m[b] == ' ') ++b;
-				m = m.substr(b, e - b);
-
-				size_t p = m.rfind(u'/');
-				if (p == m.npos)
-				{
-					throw FormatException("[loadUserDictionary] Wrong dictionary format at line " + to_string(lineNo) + " : " + line);
-				}
-				auto pos = toPOSTag(m.substr(p + 1));
-				if (pos == POSTag::max)
-				{
-					throw FormatException("[loadUserDictionary] Unknown Tag '" + utf16To8(fields[1]) + "' at line " + to_string(lineNo));
-				}
-				morphemes.emplace_back(m.substr(0, p), pos);
-			}
-
-			if (fields[0].empty())
-			{
-				throw FormatException("[loadUserDictionary] Wrong dictionary format at line " + to_string(lineNo) + " : " + line);
-			}
-
-			if (fields[0].back() == '$')
-			{
-				if (morphemes.size() > 1)
-				{
-					throw FormatException("[loadUserDictionary] Replace rule cannot have 2 or more forms '" + utf16To8(fields[1]) + "' at line " + to_string(lineNo));
-				}
-
-				auto suffix = fields[0].substr(0, fields[0].size() - 1);
-				addedCnt += addRule(morphemes[0].second, [&](const u16string& str)
-				{
-					auto strv = toStringView(str);
-					if (!(strv.size() >= suffix.size() && strv.substr(strv.size() - suffix.size()) == suffix)) return str;
-					return u16string{ strv.substr(0, strv.size() - suffix.size()) } + u16string{ morphemes[0].first };
-				}, score).size();
-			}
-			else
-			{
-				if (morphemes.size() > 1)
-				{
-					addedCnt += addPreAnalyzedWord(fields[0], morphemes, {}, score) ? 1 : 0;
-				}
-				else
-				{
-					addedCnt += addWord(fields[0], morphemes[0].second, score, replace(morphemes[0].first, u"++", u"+")).second;
-				}
-			}
-		}
-		else
-		{
-			auto pos = toPOSTag(fields[1]);
-			if (pos == POSTag::max)
-			{
-				throw FormatException("[loadUserDictionary] Unknown Tag '" + utf16To8(fields[1]) + "' at line " + to_string(lineNo));
-			}
-			addedCnt += addWord(fields[0], pos, score).second ? 1 : 0;
-		}
-	}
-	return addedCnt;
+	return loadDictionaryFromStream(ifs);
 }
 
 size_t KiwiBuilder::loadDictionaryFromStream(std::istream& is)
