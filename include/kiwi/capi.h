@@ -11,6 +11,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <stddef.h>
 #include "Macro.h"
 
 #define KIWIERR_FAIL -1
@@ -238,7 +239,7 @@ DECL_DLL kiwi_builder_h kiwi_builder_init(const char* model_path, int num_thread
  * 
  * @see kiwi_builder_close, kiwi_stream_object_t
  */
-DECL_DLL kiwi_builder_h kiwi_builder_init_stream(kiwi_stream_object_t* (*stream_object)(const char* filename), int num_threads, int options);
+DECL_DLL kiwi_builder_h kiwi_builder_init_stream(kiwi_stream_object_t (*stream_object_factory)(const char* filename), int num_threads, int options);
 
 /**
  * @brief 사용이 끝난 KiwiBuilder를 해제합니다.

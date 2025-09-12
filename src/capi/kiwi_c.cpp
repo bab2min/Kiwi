@@ -135,18 +135,18 @@ class CStreamAdapter : public std::istream {
 private:
     class CStreamBuf : public std::streambuf {
     private:
-        kiwi_stream_object_t* stream_obj;
+        kiwi_stream_object_t stream_obj;
         std::vector<char> buffer;
         static const size_t BUFFER_SIZE = 8192;
         
     public:
-        CStreamBuf(kiwi_stream_object_t* obj) : stream_obj(obj), buffer(BUFFER_SIZE) {
+        CStreamBuf(const kiwi_stream_object_t& obj) : stream_obj(obj), buffer(BUFFER_SIZE) {
             setg(buffer.data(), buffer.data(), buffer.data());
         }
         
         ~CStreamBuf() {
-            if (stream_obj && stream_obj->close) {
-                stream_obj->close(stream_obj->user_data);
+            if (stream_obj.close) {
+                stream_obj.close(stream_obj.user_data);
             }
         }
         
@@ -156,11 +156,11 @@ private:
                 return traits_type::to_int_type(*gptr());
             }
             
-            if (!stream_obj || !stream_obj->read) {
+            if (!stream_obj.read) {
                 return traits_type::eof();
             }
             
-            size_t bytes_read = stream_obj->read(stream_obj->user_data, buffer.data(), BUFFER_SIZE);
+            size_t bytes_read = stream_obj.read(stream_obj.user_data, buffer.data(), BUFFER_SIZE);
             if (bytes_read == 0) {
                 return traits_type::eof();
             }
@@ -170,7 +170,7 @@ private:
         }
         
         pos_type seekoff(off_type off, std::ios_base::seekdir way, std::ios_base::openmode) override {
-            if (!stream_obj || !stream_obj->seek) {
+            if (!stream_obj.seek) {
                 return pos_type(-1);
             }
             
@@ -182,7 +182,7 @@ private:
                 default: return pos_type(-1);
             }
             
-            long long new_pos = stream_obj->seek(stream_obj->user_data, off, whence);
+            long long new_pos = stream_obj.seek(stream_obj.user_data, off, whence);
             if (new_pos == -1) {
                 return pos_type(-1);
             }
@@ -200,10 +200,10 @@ private:
     CStreamBuf buf;
     
 public:
-    CStreamAdapter(kiwi_stream_object_t* obj) : std::istream(&buf), buf(obj) {}
+    CStreamAdapter(const kiwi_stream_object_t& obj) : std::istream(&buf), buf(obj) {}
 };
 
-kiwi_builder_h kiwi_builder_init_stream(kiwi_stream_object_t* (*stream_object_factory)(const char* filename), int num_threads, int options)
+kiwi_builder_h kiwi_builder_init_stream(kiwi_stream_object_t (*stream_object_factory)(const char* filename), int num_threads, int options)
 {
 	try
 	{
@@ -219,9 +219,9 @@ kiwi_builder_h kiwi_builder_init_stream(kiwi_stream_object_t* (*stream_object_fa
 		// Create C++ StreamProvider that uses the stream object factory
 		KiwiBuilder::StreamProvider cppStreamProvider = [stream_object_factory](const std::string& filename) -> std::unique_ptr<std::istream>
 		{
-			kiwi_stream_object_t* stream_obj = stream_object_factory(filename.c_str());
-			if (!stream_obj) {
-				return nullptr;
+			kiwi_stream_object_t stream_obj = stream_object_factory(filename.c_str());
+			if (!stream_obj.read) {
+				return nullptr; // Invalid stream object (missing required read function)
 			}
 			
 			return std::make_unique<CStreamAdapter>(stream_obj);

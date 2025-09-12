@@ -64,7 +64,7 @@ typedef struct {
 } kiwi_stream_object_t;
 
 kiwi_builder_h kiwi_builder_init_stream(
-    kiwi_stream_object_t* (*stream_object_factory)(const char* filename), 
+    kiwi_stream_object_t (*stream_object_factory)(const char* filename), 
     int num_threads, 
     int options
 );
@@ -100,15 +100,15 @@ void memory_close(void* user_data) {
     free(user_data);
 }
 
-kiwi_stream_object_t* create_stream(const char* filename) {
+kiwi_stream_object_t create_stream(const char* filename) {
     // Load file data (implementation specific)
     memory_stream_t* mem_stream = load_file_data(filename);
     
-    kiwi_stream_object_t* stream_obj = malloc(sizeof(kiwi_stream_object_t));
-    stream_obj->read = memory_read;
-    stream_obj->seek = memory_seek;
-    stream_obj->close = memory_close;
-    stream_obj->user_data = mem_stream;
+    kiwi_stream_object_t stream_obj = {0};
+    stream_obj.read = memory_read;
+    stream_obj.seek = memory_seek;
+    stream_obj.close = memory_close;
+    stream_obj.user_data = mem_stream;
     
     return stream_obj;
 }
