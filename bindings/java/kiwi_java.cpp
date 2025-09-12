@@ -547,6 +547,125 @@ public:
 	}
 
 private:
+	// Custom istream implementation that reads from Java InputStream on-demand
+	class JavaStreamAdapter : public std::istream {
+	private:
+		class JavaStreamBuf : public std::streambuf {
+		private:
+			JavaVM* jvm;
+			jobject inputStreamGlobalRef;
+			jmethodID readMethod;
+			jmethodID closeMethod;
+			std::vector<char> buffer;
+			static constexpr const size_t buffer_size = 8192;
+			bool closed;
+			
+		public:
+			JavaStreamBuf(JavaVM* vm, jobject inputStream) 
+				: jvm(vm), inputStreamGlobalRef(nullptr), readMethod(nullptr), closeMethod(nullptr), 
+				  buffer(buffer_size), closed(false) {
+				
+				JNIEnv* env = nullptr;
+				if (jvm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_8) == JNI_OK) {
+					inputStreamGlobalRef = env->NewGlobalRef(inputStream);
+					
+					jclass inputStreamClass = env->FindClass("java/io/InputStream");
+					readMethod = env->GetMethodID(inputStreamClass, "read", "([B)I");
+					closeMethod = env->GetMethodID(inputStreamClass, "close", "()V");
+				}
+				
+				setg(buffer.data(), buffer.data(), buffer.data());
+			}
+			
+			~JavaStreamBuf() {
+				if (!closed && inputStreamGlobalRef && closeMethod) {
+					JNIEnv* env = nullptr;
+					bool shouldDetach = false;
+					
+					jint getEnvResult = jvm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_8);
+					if (getEnvResult == JNI_EDETACHED) {
+						if (jvm->AttachCurrentThread(reinterpret_cast<void**>(&env), nullptr) == JNI_OK) {
+							shouldDetach = true;
+						}
+					}
+					
+					if (env) {
+						env->CallVoidMethod(inputStreamGlobalRef, closeMethod);
+						env->DeleteGlobalRef(inputStreamGlobalRef);
+						if (shouldDetach) jvm->DetachCurrentThread();
+					}
+				}
+			}
+			
+		protected:
+			int underflow() override {
+				if (gptr() < egptr()) {
+					return traits_type::to_int_type(*gptr());
+				}
+				
+				if (closed || !inputStreamGlobalRef || !readMethod) {
+					return traits_type::eof();
+				}
+				
+				JNIEnv* env = nullptr;
+				bool shouldDetach = false;
+				
+				jint getEnvResult = jvm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_8);
+				if (getEnvResult == JNI_EDETACHED) {
+					if (jvm->AttachCurrentThread(reinterpret_cast<void**>(&env), nullptr) != JNI_OK) {
+						return traits_type::eof();
+					}
+					shouldDetach = true;
+				}
+				else if (getEnvResult != JNI_OK) {
+					return traits_type::eof();
+				}
+				
+				try {
+					jbyteArray byteArray = env->NewByteArray(buffer_size);
+					jint bytesRead = env->CallIntMethod(inputStreamGlobalRef, readMethod, byteArray);
+					
+					if (bytesRead <= 0 || env->ExceptionCheck()) {
+						if (env->ExceptionCheck()) env->ExceptionClear();
+						env->DeleteLocalRef(byteArray);
+						if (shouldDetach) jvm->DetachCurrentThread();
+						return traits_type::eof();
+					}
+					
+					jbyte* bytes = env->GetByteArrayElements(byteArray, nullptr);
+					std::copy(reinterpret_cast<char*>(bytes), 
+							  reinterpret_cast<char*>(bytes + bytesRead), 
+							  buffer.data());
+					env->ReleaseByteArrayElements(byteArray, bytes, JNI_ABORT);
+					env->DeleteLocalRef(byteArray);
+					
+					if (shouldDetach) jvm->DetachCurrentThread();
+					
+					setg(buffer.data(), buffer.data(), buffer.data() + bytesRead);
+					return traits_type::to_int_type(*gptr());
+				}
+				catch (...) {
+					if (shouldDetach) jvm->DetachCurrentThread();
+					return traits_type::eof();
+				}
+			}
+			
+			// Java InputStream doesn't support random access, so seeking fails
+			pos_type seekoff(off_type, std::ios_base::seekdir, std::ios_base::openmode) override {
+				return pos_type(-1);
+			}
+			
+			pos_type seekpos(pos_type, std::ios_base::openmode) override {
+				return pos_type(-1);
+			}
+		};
+		
+		JavaStreamBuf buf;
+		
+	public:
+		JavaStreamAdapter(JavaVM* jvm, jobject inputStream) : std::istream(&buf), buf(jvm, inputStream) {}
+	};
+
 	kiwi::KiwiBuilder::StreamProvider createStreamProviderWrapper(jni::JRef<JStreamProvider> streamProvider)
 	{
 		JNIEnv* env = getCurrentEnv();
@@ -592,37 +711,12 @@ private:
 					return nullptr;
 				}
 				
-				// Read the InputStream into a byte array
-				jclass inputStreamClass = env->FindClass("java/io/InputStream");
-				jmethodID availableMethod = env->GetMethodID(inputStreamClass, "available", "()I");
-				jmethodID readMethod = env->GetMethodID(inputStreamClass, "read", "([B)I");
-				jmethodID closeMethod = env->GetMethodID(inputStreamClass, "close", "()V");
-				
-				jint available = env->CallIntMethod(inputStream, availableMethod);
-				if (available <= 0) available = 1024 * 1024; // Default to 1MB if available() returns 0
-				
-				jbyteArray byteArray = env->NewByteArray(available);
-				std::vector<char> buffer;
-				
-				int totalRead = 0;
-				while (true)
-				{
-					jint bytesRead = env->CallIntMethod(inputStream, readMethod, byteArray);
-					if (bytesRead <= 0) break;
-					
-					jbyte* bytes = env->GetByteArrayElements(byteArray, nullptr);
-					buffer.insert(buffer.end(), reinterpret_cast<char*>(bytes), reinterpret_cast<char*>(bytes + bytesRead));
-					env->ReleaseByteArrayElements(byteArray, bytes, JNI_ABORT);
-					totalRead += bytesRead;
-				}
-				
-				env->CallVoidMethod(inputStream, closeMethod);
+				// Create streaming adapter that reads on-demand
+				auto adapter = std::make_unique<JavaStreamAdapter>(jvm, inputStream);
 				
 				if (shouldDetach) jvm->DetachCurrentThread();
 				
-				// Create string stream from buffer
-				std::string data(buffer.begin(), buffer.end());
-				return std::make_unique<std::istringstream>(std::move(data));
+				return std::move(adapter);
 			}
 			catch (...)
 			{
