@@ -52,11 +52,20 @@ kiwi::KiwiBuilder builder(streamProvider, 4, kiwi::BuildOption::default_);
 ```c
 #include <kiwi/capi.h>
 
-typedef int(*kiwi_stream_provider_t)(const char* filename, char* buffer, void* user_data);
+typedef size_t(*kiwi_stream_read_func)(void* user_data, char* buffer, size_t length);
+typedef long long(*kiwi_stream_seek_func)(void* user_data, long long offset, int whence);
+typedef void(*kiwi_stream_close_func)(void* user_data);
+
+typedef struct {
+    kiwi_stream_read_func  read;
+    kiwi_stream_seek_func  seek;
+    kiwi_stream_close_func close;
+    void* user_data;
+} kiwi_stream_object_t;
 
 kiwi_builder_h kiwi_builder_init_stream(
-    kiwi_stream_provider_t stream_provider, 
-    void* user_data, 
+    kiwi_stream_object_t* (*stream_object_factory)(const char* filename), 
+    const char* filename,
     int num_threads, 
     int options
 );
@@ -65,24 +74,51 @@ kiwi_builder_h kiwi_builder_init_stream(
 ### Usage Example
 
 ```c
-// StreamProvider implementation
-int my_stream_provider(const char* filename, char* buffer, void* user_data) {
-    // When buffer is NULL, return file size
-    if (buffer == NULL) {
-        // Calculate and return file size
-        return get_file_size(filename);
-    }
+// Stream implementation
+typedef struct {
+    const char* data;
+    size_t size;
+    size_t position;
+} memory_stream_t;
+
+size_t memory_read(void* user_data, char* buffer, size_t length) {
+    memory_stream_t* stream = (memory_stream_t*)user_data;
+    size_t available = stream->size - stream->position;
+    size_t to_read = (length < available) ? length : available;
     
-    // Copy file data to buffer
-    // Return actual bytes copied, or -1 on error
-    return copy_file_data(filename, buffer);
+    memcpy(buffer, stream->data + stream->position, to_read);
+    stream->position += to_read;
+    return to_read;
+}
+
+long long memory_seek(void* user_data, long long offset, int whence) {
+    memory_stream_t* stream = (memory_stream_t*)user_data;
+    // Implement seeking logic
+    return new_position;
+}
+
+void memory_close(void* user_data) {
+    free(user_data);
+}
+
+kiwi_stream_object_t* create_stream(const char* filename) {
+    // Load file data (implementation specific)
+    memory_stream_t* mem_stream = load_file_data(filename);
+    
+    kiwi_stream_object_t* stream_obj = malloc(sizeof(kiwi_stream_object_t));
+    stream_obj->read = memory_read;
+    stream_obj->seek = memory_seek;
+    stream_obj->close = memory_close;
+    stream_obj->user_data = mem_stream;
+    
+    return stream_obj;
 }
 
 // Create KiwiBuilder
 kiwi_builder_h builder = kiwi_builder_init_stream(
-    my_stream_provider, 
-    NULL,  // user_data
-    4,     // num_threads
+    create_stream,
+    "config.txt",  // base filename
+    4,             // num_threads
     KIWI_BUILD_DEFAULT
 );
 

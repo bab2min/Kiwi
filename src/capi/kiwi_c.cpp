@@ -2,6 +2,9 @@
 #include <memory>
 #include <fstream>
 #include <sstream>
+#include <iostream>
+#include <streambuf>
+#include <vector>
 #include <kiwi/Kiwi.h>
 #include <kiwi/SwTokenizer.h>
 #include <kiwi/capi.h>
@@ -127,52 +130,80 @@ kiwi_builder_h kiwi_builder_init(const char* model_path, int num_threads, int op
 	}
 }
 
-kiwi_builder_h kiwi_builder_init_stream(kiwi_stream_provider_t stream_provider, void* user_data, int num_threads, int options)
-{
-	try
-	{
-		BuildOption buildOption = (BuildOption)(options & 0xFF);
-		const auto mtMask = options & (KIWI_BUILD_MODEL_TYPE_LARGEST | KIWI_BUILD_MODEL_TYPE_KNLM | KIWI_BUILD_MODEL_TYPE_SBG | KIWI_BUILD_MODEL_TYPE_CONG | KIWI_BUILD_MODEL_TYPE_CONG_GLOBAL);
-		const ModelType modelType = (mtMask == KIWI_BUILD_MODEL_TYPE_LARGEST) ? ModelType::largest
-			: (mtMask == KIWI_BUILD_MODEL_TYPE_KNLM) ? ModelType::knlm
-			: (mtMask == KIWI_BUILD_MODEL_TYPE_SBG) ? ModelType::sbg
-			: (mtMask == KIWI_BUILD_MODEL_TYPE_CONG) ? ModelType::cong
-			: (mtMask == KIWI_BUILD_MODEL_TYPE_CONG_GLOBAL) ? ModelType::congGlobal
-			: ModelType::none;
-		
-		// Create C++ StreamProvider that wraps the C callback
-		KiwiBuilder::StreamProvider cppStreamProvider = [stream_provider, user_data](const std::string& filename) -> std::unique_ptr<std::istream>
-		{
-			// First call to get file size
-			int fileSize = stream_provider(filename.c_str(), nullptr, user_data);
-			if (fileSize < 0) 
-			{
-				return nullptr; // Error occurred
-			}
-			
-			// Second call to get actual data  
-			std::unique_ptr<char[]> buffer(new char[fileSize]);
-			int bytesRead = stream_provider(filename.c_str(), buffer.get(), user_data);
-			if (bytesRead != fileSize)
-			{
-				return nullptr; // Error occurred
-			}
-			
-			// Create stringstream from buffer
-			std::string fileData(buffer.get(), fileSize);
-			return std::make_unique<std::istringstream>(std::move(fileData));
-		};
-		
-		return (kiwi_builder_h)new KiwiBuilder{ cppStreamProvider, (size_t)num_threads, buildOption, modelType };
-	}
-	catch (...)
-	{
-		currentError = current_exception();
-		return nullptr;
-	}
-}
+// Custom istream implementation that uses the kiwi_stream_object_t
+class CStreamAdapter : public std::istream {
+private:
+    class CStreamBuf : public std::streambuf {
+    private:
+        kiwi_stream_object_t* stream_obj;
+        std::vector<char> buffer;
+        static const size_t BUFFER_SIZE = 8192;
+        
+    public:
+        CStreamBuf(kiwi_stream_object_t* obj) : stream_obj(obj), buffer(BUFFER_SIZE) {
+            setg(buffer.data(), buffer.data(), buffer.data());
+        }
+        
+        ~CStreamBuf() {
+            if (stream_obj && stream_obj->close) {
+                stream_obj->close(stream_obj->user_data);
+            }
+        }
+        
+    protected:
+        int underflow() override {
+            if (gptr() < egptr()) {
+                return traits_type::to_int_type(*gptr());
+            }
+            
+            if (!stream_obj || !stream_obj->read) {
+                return traits_type::eof();
+            }
+            
+            size_t bytes_read = stream_obj->read(stream_obj->user_data, buffer.data(), BUFFER_SIZE);
+            if (bytes_read == 0) {
+                return traits_type::eof();
+            }
+            
+            setg(buffer.data(), buffer.data(), buffer.data() + bytes_read);
+            return traits_type::to_int_type(*gptr());
+        }
+        
+        pos_type seekoff(off_type off, std::ios_base::seekdir way, std::ios_base::openmode) override {
+            if (!stream_obj || !stream_obj->seek) {
+                return pos_type(-1);
+            }
+            
+            int whence;
+            switch (way) {
+                case std::ios_base::beg: whence = 0; break; // SEEK_SET
+                case std::ios_base::cur: whence = 1; break; // SEEK_CUR
+                case std::ios_base::end: whence = 2; break; // SEEK_END
+                default: return pos_type(-1);
+            }
+            
+            long long new_pos = stream_obj->seek(stream_obj->user_data, off, whence);
+            if (new_pos == -1) {
+                return pos_type(-1);
+            }
+            
+            // Reset buffer after seek
+            setg(buffer.data(), buffer.data(), buffer.data());
+            return pos_type(new_pos);
+        }
+        
+        pos_type seekpos(pos_type sp, std::ios_base::openmode which) override {
+            return seekoff(sp, std::ios_base::beg, which);
+        }
+    };
+    
+    CStreamBuf buf;
+    
+public:
+    CStreamAdapter(kiwi_stream_object_t* obj) : std::istream(&buf), buf(obj) {}
+};
 
-kiwi_builder_h kiwi_builder_init_chunked_stream(kiwi_chunked_stream_provider_t chunked_stream_provider, void* user_data, int num_threads, int options)
+kiwi_builder_h kiwi_builder_init_stream(kiwi_stream_object_t* (*stream_object_factory)(const char* filename), const char* filename, int num_threads, int options)
 {
 	try
 	{
@@ -185,43 +216,15 @@ kiwi_builder_h kiwi_builder_init_chunked_stream(kiwi_chunked_stream_provider_t c
 			: (mtMask == KIWI_BUILD_MODEL_TYPE_CONG_GLOBAL) ? ModelType::congGlobal
 			: ModelType::none;
 		
-		// Create C++ StreamProvider that wraps the C chunked callback
-		KiwiBuilder::StreamProvider cppStreamProvider = [chunked_stream_provider, user_data](const std::string& filename) -> std::unique_ptr<std::istream>
+		// Create C++ StreamProvider that uses the stream object factory
+		KiwiBuilder::StreamProvider cppStreamProvider = [stream_object_factory](const std::string& filename) -> std::unique_ptr<std::istream>
 		{
-			// First call to get file size
-			int fileSize = chunked_stream_provider(filename.c_str(), 0, nullptr, 0, user_data);
-			if (fileSize < 0) 
-			{
-				return nullptr; // Error occurred
+			kiwi_stream_object_t* stream_obj = stream_object_factory(filename.c_str());
+			if (!stream_obj) {
+				return nullptr;
 			}
 			
-			// Read file in chunks and build complete buffer
-			std::vector<char> buffer;
-			buffer.reserve(fileSize);
-			
-			const int CHUNK_SIZE = 8192; // 8KB chunks
-			int totalBytesRead = 0;
-			
-			while (totalBytesRead < fileSize)
-			{
-				int remainingBytes = fileSize - totalBytesRead;
-				int chunkSize = std::min(CHUNK_SIZE, remainingBytes);
-				
-				std::vector<char> chunk(chunkSize);
-				int bytesRead = chunked_stream_provider(filename.c_str(), totalBytesRead, chunk.data(), chunkSize, user_data);
-				
-				if (bytesRead <= 0)
-				{
-					return nullptr; // Error or EOF
-				}
-				
-				buffer.insert(buffer.end(), chunk.begin(), chunk.begin() + bytesRead);
-				totalBytesRead += bytesRead;
-			}
-			
-			// Create stringstream from buffer
-			std::string fileData(buffer.begin(), buffer.end());
-			return std::make_unique<std::istringstream>(std::move(fileData));
+			return std::make_unique<CStreamAdapter>(stream_obj);
 		};
 		
 		return (kiwi_builder_h)new KiwiBuilder{ cppStreamProvider, (size_t)num_threads, buildOption, modelType };
