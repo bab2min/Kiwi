@@ -1,9 +1,10 @@
 #define _JNI_INT64_TO_INT
 #include "JniUtils.hpp"
+#include <chrono>
+#include <sstream>
 
 #include <kiwi/Kiwi.h>
 #include <kiwi/Joiner.h>
-#include <sstream>
 
 struct Sentence
 {
@@ -257,8 +258,6 @@ namespace jni
 	struct ValueBuilder<kiwi::PretokenizedSpan> : public ValueBuilder<decltype(gClsPretokenizedSpan)>
 	{
 	};
-
-	// Forward declaration for StreamProvider interface
 }
 
 class JKiwi;
@@ -524,6 +523,12 @@ public:
 	}
 };
 
+class JStreamProvider : jni::JObject<JStreamProvider>
+{
+public:
+	static constexpr std::string_view className = "kr/pe/bab2min/Kiwi$StreamProvider";
+};
+
 class JKiwiBuilder : public kiwi::KiwiBuilder, jni::JObject<JKiwiBuilder>
 {
 private:
@@ -536,13 +541,13 @@ public:
 	using kiwi::KiwiBuilder::KiwiBuilder;
 
 	// Custom constructor for StreamProvider
-	JKiwiBuilder(jobject streamProvider, size_t numThreads, kiwi::BuildOption options, kiwi::ModelType modelType)
+	JKiwiBuilder(jni::JRef<JStreamProvider> streamProvider, size_t numThreads, kiwi::BuildOption options, kiwi::ModelType modelType)
 		: KiwiBuilder(createStreamProviderWrapper(streamProvider), numThreads, options, modelType)
 	{
 	}
 
 private:
-	kiwi::KiwiBuilder::StreamProvider createStreamProviderWrapper(jobject streamProvider)
+	kiwi::KiwiBuilder::StreamProvider createStreamProviderWrapper(jni::JRef<JStreamProvider> streamProvider)
 	{
 		JNIEnv* env = getCurrentEnv();
 		jvm = getJVM();
@@ -571,7 +576,7 @@ private:
 			try
 			{
 				// Get StreamProvider.provide method
-				jclass streamProviderClass = env->FindClass("kr/pe/bab2min/KiwiBuilder$StreamProvider");
+				jclass streamProviderClass = JObject<JStreamProvider>::jClass;
 				jmethodID provideMethod = env->GetMethodID(streamProviderClass, "provide", "(Ljava/lang/String;)Ljava/io/InputStream;");
 				
 				// Convert filename to Java string
@@ -707,7 +712,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved)
 
 		jni::define<JKiwiBuilder>()
 			.template ctor<std::string, size_t, kiwi::BuildOption, kiwi::ModelType>()
-			.template ctor<jobject, size_t, kiwi::BuildOption, kiwi::ModelType>()
+			.template ctor<jni::JRef<JStreamProvider>, size_t, kiwi::BuildOption, kiwi::ModelType>()
 			.template method<&JKiwiBuilder::addWord>("addWord")
 			.template method<&JKiwiBuilder::addWord2>("addWord")
 			.template method<&JKiwiBuilder::addPreAnalyzedWord>("addPreAnalyzedWord")
@@ -733,6 +738,8 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved)
 			.template method<&JKiwi::asyncAnalyze>("asyncAnalyze")
 			.template method<&JKiwi::splitIntoSents>("splitIntoSents")
 			.template method<&JKiwi::join>("join"),
+
+		jni::define<JStreamProvider>(),
 
 		gClsTokenInfo,
 		gClsTokenResult,

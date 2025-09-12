@@ -206,6 +206,12 @@ namespace jni
 		using CppType = void;
 		using JniType = void;
 		static constexpr auto typeStr = "V"sv;
+
+		template<class ... Args>
+		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
+		{
+			return env->CallVoidMethod(obj, methodID, std::forward<Args>(args)...);
+		}
 	};
 
 	template<>
@@ -223,6 +229,12 @@ namespace jni
 		JniType toJava(JNIEnv* env, CppType v)
 		{
 			return v;
+		}
+
+		template<class ... Args>
+		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
+		{
+			return env->CallByteMethod(obj, methodID, std::forward<Args>(args)...);
 		}
 	};
 
@@ -242,6 +254,12 @@ namespace jni
 		{
 			return v;
 		}
+
+		template<class ... Args>
+		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
+		{
+			return env->CallByteMethod(obj, methodID, std::forward<Args>(args)...);
+		}
 	};
 
 	template<>
@@ -259,6 +277,12 @@ namespace jni
 		JniType toJava(JNIEnv* env, CppType v)
 		{
 			return v;
+		}
+
+		template<class ... Args>
+		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
+		{
+			return env->CallShortMethod(obj, methodID, std::forward<Args>(args)...);
 		}
 	};
 
@@ -278,6 +302,12 @@ namespace jni
 		{
 			return v;
 		}
+
+		template<class ... Args>
+		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
+		{
+			return env->CallShortMethod(obj, methodID, std::forward<Args>(args)...);
+		}
 	};
 
 	template<>
@@ -296,6 +326,12 @@ namespace jni
 		{
 			return v;
 		}
+
+		template<class ... Args>
+		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
+		{
+			return env->CallIntMethod(obj, methodID, std::forward<Args>(args)...);
+		}
 	};
 
 	template<>
@@ -313,6 +349,12 @@ namespace jni
 		JniType toJava(JNIEnv* env, CppType v)
 		{
 			return v;
+		}
+
+		template<class ... Args>
+		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
+		{
+			return env->CallIntMethod(obj, methodID, std::forward<Args>(args)...);
 		}
 	};
 
@@ -333,6 +375,12 @@ namespace jni
 		{
 			return v;
 		}
+
+		template<class ... Args>
+		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
+		{
+			return env->CallIntMethod(obj, methodID, std::forward<Args>(args)...);
+		}
 	};
 
 	template<>
@@ -350,6 +398,12 @@ namespace jni
 		JniType toJava(JNIEnv* env, CppType v)
 		{
 			return v;
+		}
+
+		template<class ... Args>
+		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
+		{
+			return env->CallIntMethod(obj, methodID, std::forward<Args>(args)...);
 		}
 	};
 
@@ -370,6 +424,12 @@ namespace jni
 		{
 			return v;
 		}
+
+		template<class ... Args>
+		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
+		{
+			return env->CallIntMethod(obj, methodID, std::forward<Args>(args)...);
+		}
 	};
 
 	template<>
@@ -387,6 +447,12 @@ namespace jni
 		JniType toJava(JNIEnv* env, CppType v)
 		{
 			return v;
+		}
+
+		template<class ... Args>
+		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
+		{
+			return env->CallIntMethod(obj, methodID, std::forward<Args>(args)...);
 		}
 	};
 #endif
@@ -407,6 +473,12 @@ namespace jni
 		{
 			return v;
 		}
+
+		template<class ... Args>
+		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
+		{
+			return env->CallLongMethod(obj, methodID, std::forward<Args>(args)...);
+		}
 	};
 
 	template<>
@@ -424,6 +496,12 @@ namespace jni
 		JniType toJava(JNIEnv* env, CppType v)
 		{
 			return v;
+		}
+
+		template<class ... Args>
+		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
+		{
+			return env->CallLongMethod(obj, methodID, std::forward<Args>(args)...);
 		}
 	};
 #ifdef __APPLE__
@@ -443,6 +521,12 @@ namespace jni
 		{
 			return v;
 		}
+
+		template<class ... Args>
+		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
+		{
+			return env->CallLongMethod(obj, methodID, std::forward<Args>(args)...);
+		}
 	};
 
 	template<>
@@ -460,6 +544,12 @@ namespace jni
 		JniType toJava(JNIEnv* env, CppType v)
 		{
 			return v;
+		}
+
+		template<class ... Args>
+		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
+		{
+			return env->CallLongMethod(obj, methodID, std::forward<Args>(args)...);
 		}
 	};
 #endif
@@ -481,6 +571,12 @@ namespace jni
 		{
 			return v ? -1 : 0;
 		}
+
+		template<class ... Args>
+		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
+		{
+			return !!env->CallBooleanMethod(obj, methodID, std::forward<Args>(args)...);
+		}
 	};
 
 	template<>
@@ -498,6 +594,12 @@ namespace jni
 		JniType toJava(JNIEnv* env, CppType v)
 		{
 			return v;
+		}
+
+		template<class ... Args>
+		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
+		{
+			return env->CallCharMethod(obj, methodID, std::forward<Args>(args)...);
 		}
 	};
 
@@ -517,6 +619,12 @@ namespace jni
 		{
 			return v;
 		}
+
+		template<class ... Args>
+		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
+		{
+			return env->CallFloatMethod(obj, methodID, std::forward<Args>(args)...);
+		}
 	};
 
 	template<>
@@ -534,6 +642,12 @@ namespace jni
 		JniType toJava(JNIEnv* env, CppType v)
 		{
 			return v;
+		}
+
+		template<class ... Args>
+		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
+		{
+			return env->CallDoubleMethod(obj, methodID, std::forward<Args>(args)...);
 		}
 	};
 
@@ -564,6 +678,12 @@ namespace jni
 		{
 			return env->NewStringUTF(v.c_str());
 		}
+
+		template<class ... Args>
+		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
+		{
+			return fromJava(env, (JniType)env->CallObjectMethod(obj, methodID, std::forward<Args>(args)...));
+		}
 	};
 
 	template<>
@@ -592,6 +712,12 @@ namespace jni
 		JniType toJava(JNIEnv* env, const CppType& v)
 		{
 			return env->NewString((const jchar*)v.data(), v.size());
+		}
+
+		template<class ... Args>
+		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
+		{
+			return fromJava(env, (JniType)env->CallObjectMethod(obj, methodID, std::forward<Args>(args)...));
 		}
 	};
 
@@ -622,6 +748,12 @@ namespace jni
 			if (!ret) throw std::runtime_error{ std::string{ jclassName<Ty> } + ": failed to construct object." };
 			return ret;
 		}
+
+		template<class ... Args>
+		CppType& callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
+		{
+			return fromJava(env, (JniType)env->CallObjectMethod(obj, methodID, std::forward<Args>(args)...));
+		}
 	};
 
 	template<class Ty>
@@ -649,6 +781,12 @@ namespace jni
 			if (!ret) throw std::runtime_error{ std::string{ jclassName<Ty> } + ": failed to construct object." };
 			return ret;
 		}
+
+		template<class ... Args>
+		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
+		{
+			return fromJava(env, (JniType)env->CallObjectMethod(obj, methodID, std::forward<Args>(args)...));
+		}
 	};
 
 	template<class Ty>
@@ -665,6 +803,12 @@ namespace jni
 			auto ptr = (Ty*)env->GetLongField(v, JObject<Ty>::jInstField);
 			if (!ptr) throw std::runtime_error{ "Object is already closed or not initialized." };
 			return ptr;
+		}
+
+		template<class ... Args>
+		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
+		{
+			return fromJava(env, (JniType)env->CallObjectMethod(obj, methodID, std::forward<Args>(args)...));
 		}
 	};
 
@@ -683,6 +827,12 @@ namespace jni
 		JniType toJava(JNIEnv* env, CppType&& v)
 		{
 			return (jobject)v;
+		}
+
+		template<class ... Args>
+		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
+		{
+			return fromJava(env, (JniType)env->CallObjectMethod(obj, methodID, std::forward<Args>(args)...));
 		}
 	};
 
@@ -720,6 +870,12 @@ namespace jni
 			}
 			return arr;
 		}
+
+		template<class ... Args>
+		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
+		{
+			return fromJava(env, (JniType)env->CallObjectMethod(obj, methodID, std::forward<Args>(args)...));
+		}
 	};
 
 	template<class Ty>
@@ -753,6 +909,12 @@ namespace jni
 				env->SetObjectArrayElement(arr, i, vb.toJava(env, (*v)[i]));
 			}
 			return arr;
+		}
+
+		template<class ... Args>
+		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
+		{
+			return fromJava(env, (JniType)env->CallObjectMethod(obj, methodID, std::forward<Args>(args)...));
 		}
 	};
 
@@ -834,6 +996,12 @@ namespace jni
 				return arr;
 			}
 		}
+
+		template<class ... Args>
+		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
+		{
+			return fromJava(env, (JniType)env->CallObjectMethod(obj, methodID, std::forward<Args>(args)...));
+		}
 	};
 
 	template<>
@@ -862,6 +1030,12 @@ namespace jni
 			auto ptr = env->GetCharArrayElements(arr, nullptr);
 			std::copy(v.begin(), v.end(), ptr);
 			return arr;
+		}
+
+		template<class ... Args>
+		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
+		{
+			return fromJava(env, (JniType)env->CallObjectMethod(obj, methodID, std::forward<Args>(args)...));
 		}
 	};
 
@@ -910,6 +1084,12 @@ namespace jni
 				return arr;
 			}
 		}
+
+		template<class ... Args>
+		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
+		{
+			return fromJava(env, (JniType)env->CallObjectMethod(obj, methodID, std::forward<Args>(args)...));
+		}
 	};
 
 	template<class Ty>
@@ -929,17 +1109,24 @@ namespace jni
 			if (!env->IsInstanceOf(v, JIteratorBase::jClass)) throw std::runtime_error{ ""/*StringConcat_v<svNotInstanceOf, typeStr, svNullTerm>.data()*/};
 			return CppType{ env, v };
 		}
+
+		template<class ... Args>
+		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
+		{
+			return fromJava(env, (JniType)env->CallObjectMethod(obj, methodID, std::forward<Args>(args)...));
+		}
 	};
 
 	template<class Ty>
 	bool JIterator<Ty>::hasNext()
 	{
-		return env->CallBooleanMethod(inst, jHasNext);
+		return ValueBuilder<bool>{}.callMethod(env, inst, jHasNext);
 	}
 
 	template<class Ty>
 	Ty JIterator<Ty>::next()
 	{
+		// Iterator::next() always returns Object, so we need to use CallObjectMethod
 		auto ret = env->CallObjectMethod(inst, jNext);
 		return ValueBuilder<Ty>{}.fromJava(env, ret);
 	}
