@@ -809,63 +809,33 @@ void KiwiBuilder::saveMorphBin(std::ostream& os) const
 	serializer::writeMany(os, serializer::toKey("KIWI"), forms, morphemes);
 }
 
-ModelType KiwiBuilder::getModelType(const string& modelPath, bool largest)
+ModelType KiwiBuilder::getModelType(const KiwiBuilder::StreamProvider& provider, bool largest)
 {
-	if (isOpenable(modelPath + "/cong.mdl"))
-	{
-		return largest ? ModelType::congGlobal : ModelType::cong;
-	}
-	else if (isOpenable(modelPath + "/skipbigram.mdl"))
-	{
-		return largest ? ModelType::sbg : ModelType::knlm;
-	}
-	else if (isOpenable(modelPath + "/sj.knlm"))
-	{
-		return ModelType::knlm;
-	}
-	else
-	{
-		return ModelType::none;
-	}
-}
-
-// Internal helper function to create a stream from various sources
-namespace 
-{
-	/**
-	 * @brief Helper function to get ModelType by checking available streams
-	 */
-	ModelType getModelTypeFromProvider(const KiwiBuilder::StreamProvider& provider, bool largest)
-	{
-		// Check for different model files by trying to create streams
-		try {
-			if (auto stream = provider("cong.mdl")) {
-				return largest ? ModelType::congGlobal : ModelType::cong;
-			}
-		} catch (...) {}
-		
-		try {
-			if (auto stream = provider("skipbigram.mdl")) {
-				return largest ? ModelType::sbg : ModelType::knlm;
-			}
-		} catch (...) {}
-		
-		try {
-			if (auto stream = provider("sj.knlm")) {
-				return ModelType::knlm;
-			}
-		} catch (...) {}
-		
-		return ModelType::none;
-	}
+	// Check for different model files by trying to create streams
+	try {
+		if (auto stream = provider("cong.mdl")) {
+			return largest ? ModelType::congGlobal : ModelType::cong;
+		}
+	} catch (...) {}
+	
+	try {
+		if (auto stream = provider("skipbigram.mdl")) {
+			return largest ? ModelType::sbg : ModelType::knlm;
+		}
+	} catch (...) {}
+	
+	try {
+		if (auto stream = provider("sj.knlm")) {
+			return ModelType::knlm;
+		}
+	} catch (...) {}
+	
+	return ModelType::none;
 }
 
 KiwiBuilder::KiwiBuilder(StreamProvider streamProvider, size_t _numThreads, BuildOption _options, ModelType _modelType)
-	: options{ _options }, modelType{ _modelType }, numThreads{ _numThreads != (size_t)-1 ? _numThreads : thread::hardware_concurrency() }
-{
-	// Initialize WordDetector with StreamProvider
-	detector = WordDetector{ streamProvider, _numThreads };
-	
+	: detector{ streamProvider, _numThreads }, options{ _options }, modelType{ _modelType }, numThreads{ _numThreads != (size_t)-1 ? _numThreads : thread::hardware_concurrency() }
+{	
 	archType = getSelectedArch(ArchType::default_);
 
 	// Load morphology data
@@ -880,7 +850,7 @@ KiwiBuilder::KiwiBuilder(StreamProvider streamProvider, size_t _numThreads, Buil
 	// Determine model type if not specified
 	if (modelType == ModelType::none || modelType == ModelType::largest)
 	{
-		modelType = getModelTypeFromProvider(streamProvider, modelType == ModelType::largest);
+		modelType = getModelType(streamProvider, modelType == ModelType::largest);
 		if (modelType == ModelType::none)
 		{
 			throw runtime_error{ "Cannot find any valid model files from stream provider" };
@@ -895,9 +865,10 @@ KiwiBuilder::KiwiBuilder(StreamProvider streamProvider, size_t _numThreads, Buil
 			throw runtime_error{ "Cannot open language model file 'sj.knlm'" };
 		}
 		
-		// Read the stream into memory for MMap compatibility
-		utils::MemoryObject memObj = utils::createMemoryObjectFromStream(*stream);
-		langMdl = lm::KnLangModelBase::create(memObj, archType, modelType == ModelType::knlmTransposed);
+		langMdl = lm::KnLangModelBase::create(
+			utils::createMemoryObjectFromStream(*stream), 
+			archType, 
+			modelType == ModelType::knlmTransposed);
 	}
 	else if (modelType == ModelType::sbg)
 	{
@@ -908,13 +879,10 @@ KiwiBuilder::KiwiBuilder(StreamProvider streamProvider, size_t _numThreads, Buil
 			throw runtime_error{ "Cannot open required files for skipbigram model" };
 		}
 		
-		// Read knlm stream into memory
-		utils::MemoryObject knlmObj = utils::createMemoryObjectFromStream(*knlmStream);
-		
-		// Read sbg stream into memory
-		utils::MemoryObject sbgObj = utils::createMemoryObjectFromStream(*sbgStream);
-		
-		langMdl = lm::SkipBigramModelBase::create(knlmObj, sbgObj, archType);
+		langMdl = lm::SkipBigramModelBase::create(
+			utils::createMemoryObjectFromStream(*knlmStream), 
+			utils::createMemoryObjectFromStream(*sbgStream), 
+			archType);
 	}
 	else if (ModelType::cong <= modelType && modelType <= ModelType::congGlobalFp32 )
 	{
@@ -923,9 +891,8 @@ KiwiBuilder::KiwiBuilder(StreamProvider streamProvider, size_t _numThreads, Buil
 			throw runtime_error{ "Cannot open ConG model file 'cong.mdl'" };
 		}
 		
-		// Read the stream into memory for MMap compatibility
-		utils::MemoryObject memObj = utils::createMemoryObjectFromStream(*stream);
-		langMdl = lm::CoNgramModelBase::create(memObj, archType, 
+		langMdl = lm::CoNgramModelBase::create(utils::createMemoryObjectFromStream(*stream), 
+			archType, 
 			(modelType == ModelType::congGlobal || modelType == ModelType::congGlobalFp32),
 			(modelType == ModelType::cong || modelType == ModelType::congGlobal));
 	}
@@ -933,37 +900,31 @@ KiwiBuilder::KiwiBuilder(StreamProvider streamProvider, size_t _numThreads, Buil
 	// Load dictionaries if requested
 	if (!!(options & BuildOption::loadDefaultDict))
 	{
-		try {
-			auto stream = streamProvider("default.dict");
-			if (stream) {
-				loadDictionaryFromStream(*stream);
-			}
-		} catch (...) {
-			// Dictionary loading is optional, so we don't fail if file doesn't exist
+		auto stream = streamProvider("default.dict");
+		if (stream) {
+			loadDictionaryFromStream(*stream);
+		} else {
+			throw runtime_error{ "Cannot open required file: default.dict" };
 		}
 	}
 
 	if (!!(options & BuildOption::loadTypoDict))
 	{
-		try {
-			auto stream = streamProvider("typo.dict");
-			if (stream) {
-				loadDictionaryFromStream(*stream);
-			}
-		} catch (...) {
-			// Dictionary loading is optional
+		auto stream = streamProvider("typo.dict");
+		if (stream) {
+			loadDictionaryFromStream(*stream);
+		} else {
+			throw runtime_error{ "Cannot open required file: typo.dict" };
 		}
 	}
 
 	if (!!(options & BuildOption::loadMultiDict))
 	{
-		try {
-			auto stream = streamProvider("multi.dict");
-			if (stream) {
-				loadDictionaryFromStream(*stream);
-			}
-		} catch (...) {
-			// Dictionary loading is optional
+		auto stream = streamProvider("multi.dict");
+		if (stream) {
+			loadDictionaryFromStream(*stream);
+		} else {
+			throw runtime_error{ "Cannot open required file: multi.dict" };
 		}
 	}
 
@@ -982,8 +943,6 @@ KiwiBuilder::KiwiBuilder(StreamProvider streamProvider, size_t _numThreads, Buil
 KiwiBuilder::KiwiBuilder(const string& modelPath, size_t _numThreads, BuildOption _options, ModelType _modelType)
 	: KiwiBuilder(utils::makeFilesystemProvider(modelPath), _numThreads, _options, _modelType)
 {
-	// Initialize WordDetector separately for filesystem-based constructor
-	detector = WordDetector{ modelPath, _numThreads };
 }
 
 void KiwiBuilder::initMorphemes()

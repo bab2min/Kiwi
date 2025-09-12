@@ -137,10 +137,10 @@ private:
     private:
         kiwi_stream_object_t stream_obj;
         std::vector<char> buffer;
-        static const size_t BUFFER_SIZE = 8192;
+        static constexpr const size_t buffer_size = 8192;
         
     public:
-        CStreamBuf(const kiwi_stream_object_t& obj) : stream_obj(obj), buffer(BUFFER_SIZE) {
+        CStreamBuf(const kiwi_stream_object_t& obj) : stream_obj(obj), buffer(buffer_size) {
             setg(buffer.data(), buffer.data(), buffer.data());
         }
         
@@ -160,7 +160,7 @@ private:
                 return traits_type::eof();
             }
             
-            size_t bytes_read = stream_obj.read(stream_obj.user_data, buffer.data(), BUFFER_SIZE);
+            size_t bytes_read = stream_obj.read(stream_obj.user_data, buffer.data(), buffer_size);
             if (bytes_read == 0) {
                 return traits_type::eof();
             }
