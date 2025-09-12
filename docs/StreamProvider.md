@@ -65,7 +65,6 @@ typedef struct {
 
 kiwi_builder_h kiwi_builder_init_stream(
     kiwi_stream_object_t* (*stream_object_factory)(const char* filename), 
-    const char* filename,
     int num_threads, 
     int options
 );
@@ -117,7 +116,6 @@ kiwi_stream_object_t* create_stream(const char* filename) {
 // Create KiwiBuilder
 kiwi_builder_h builder = kiwi_builder_init_stream(
     create_stream,
-    "config.txt",  // base filename
     4,             // num_threads
     KIWI_BUILD_DEFAULT
 );

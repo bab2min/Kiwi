@@ -203,7 +203,7 @@ public:
     CStreamAdapter(kiwi_stream_object_t* obj) : std::istream(&buf), buf(obj) {}
 };
 
-kiwi_builder_h kiwi_builder_init_stream(kiwi_stream_object_t* (*stream_object_factory)(const char* filename), const char* filename, int num_threads, int options)
+kiwi_builder_h kiwi_builder_init_stream(kiwi_stream_object_t* (*stream_object_factory)(const char* filename), int num_threads, int options)
 {
 	try
 	{

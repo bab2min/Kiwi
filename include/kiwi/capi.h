@@ -227,7 +227,6 @@ DECL_DLL kiwi_builder_h kiwi_builder_init(const char* model_path, int num_thread
  * @brief 스트림 객체를 사용하여 Kiwi Builder를 생성합니다.
  * 
  * @param stream_object 파일명을 받아 해당 파일의 데이터를 제공하는 스트림 객체 생성 함수.
- * @param filename 읽어들일 파일의 이름
  * @param num_threads 사용할 스레드의 개수. -1로 지정시 가용한 스레드 개수를 자동으로 판단합니다.
  * @param options 생성 옵션. KIWI_BUILD_* 열거형을 참조하십시오.
  * @return 성공 시 Kiwi Builder의 핸들을 반환합니다. 
@@ -239,7 +238,7 @@ DECL_DLL kiwi_builder_h kiwi_builder_init(const char* model_path, int num_thread
  * 
  * @see kiwi_builder_close, kiwi_stream_object_t
  */
-DECL_DLL kiwi_builder_h kiwi_builder_init_stream(kiwi_stream_object_t* (*stream_object)(const char* filename), const char* filename, int num_threads, int options);
+DECL_DLL kiwi_builder_h kiwi_builder_init_stream(kiwi_stream_object_t* (*stream_object)(const char* filename), int num_threads, int options);
 
 /**
  * @brief 사용이 끝난 KiwiBuilder를 해제합니다.
