@@ -1919,9 +1919,14 @@ size_t KiwiBuilder::loadDictionaryFromStream(std::istream& is)
 				morphemes.emplace_back(m.substr(0, p), pos);
 			}
 
-			if (fields[0].back() == u'*')
+			if (fields[0].empty())
 			{
-				if (morphemes.size() != 1)
+				throw FormatException("[loadUserDictionary] Wrong dictionary format at line " + to_string(lineNo) + " : " + line);
+			}
+
+			if (fields[0].back() == '$')
+			{
+				if (morphemes.size() > 1)
 				{
 					throw FormatException("[loadUserDictionary] Replace rule cannot have 2 or more forms '" + utf16To8(fields[1]) + "' at line " + to_string(lineNo));
 				}
