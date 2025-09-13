@@ -172,6 +172,16 @@ WordDetector::WordDetector(FromRawData, const std::string& modelPath, size_t _nu
 	}
 }
 
+WordDetector::WordDetector(const std::function<std::unique_ptr<std::istream>(const std::string&)>& streamProvider, size_t _numThreads)
+	: numThreads{ _numThreads != (size_t)-1 ? _numThreads : std::thread::hardware_concurrency() }
+{
+	auto stream = streamProvider("extract.mdl");
+	if (!stream) {
+		throw Exception{ "Cannot open extract.mdl for WordDetector" };
+	}
+	serializer::readMany(*stream, posScore, nounTailScore);
+}
+
 void WordDetector::saveModel(const std::string& modelPath) const
 {
 	{

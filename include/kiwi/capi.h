@@ -11,6 +11,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <stddef.h>
 #include "Macro.h"
 
 #define KIWIERR_FAIL -1
@@ -76,6 +77,42 @@ user_data: user_data from kiwi_extract~, kiwi_perform, kiwi_analyze_m functions.
 typedef int(*kiwi_reader_t)(int, char*, void*);
 typedef int(*kiwi_reader_w_t)(int, kchar16_t*, void*);
 
+/**
+ * @brief 스트림에서 데이터를 읽는 콜백 함수 타입
+ * 
+ * @param user_data 사용자 정의 데이터
+ * @param buffer 읽은 데이터를 저장할 버퍼
+ * @param length 읽을 데이터의 크기
+ * @return 실제로 읽은 바이트 수. EOF 시 0, 오류 시 음수를 반환합니다.
+ */
+typedef size_t(*kiwi_stream_read_func)(void* user_data, char* buffer, size_t length);
+
+/**
+ * @brief 스트림에서 위치를 이동하는 콜백 함수 타입
+ * 
+ * @param user_data 사용자 정의 데이터
+ * @param offset 이동할 오프셋
+ * @param whence 기준점 (SEEK_SET=0, SEEK_CUR=1, SEEK_END=2)
+ * @return 새로운 위치. 오류 시 -1을 반환합니다.
+ */
+typedef long long(*kiwi_stream_seek_func)(void* user_data, long long offset, int whence);
+
+/**
+ * @brief 스트림을 닫는 콜백 함수 타입
+ * 
+ * @param user_data 사용자 정의 데이터
+ */
+typedef void(*kiwi_stream_close_func)(void* user_data);
+
+/**
+ * @brief 범용 입력 스트림을 나타내는 구조체
+ */
+typedef struct {
+    kiwi_stream_read_func  read;   /**< 데이터 읽기 함수 */
+    kiwi_stream_seek_func  seek;   /**< 위치 이동 함수 */
+    kiwi_stream_close_func close;  /**< 스트림 닫기 함수 */
+    void* user_data;               /**< 사용자 정의 데이터 */
+} kiwi_stream_object_t;
 
 typedef int(*kiwi_receiver_t)(int, kiwi_res_h, void*);
 
@@ -186,6 +223,23 @@ DECL_DLL void kiwi_clear_error();
  * @see kiwi_builder_close
  */
 DECL_DLL kiwi_builder_h kiwi_builder_init(const char* model_path, int num_threads, int options);
+
+/**
+ * @brief 스트림 객체를 사용하여 Kiwi Builder를 생성합니다.
+ * 
+ * @param stream_object 파일명을 받아 해당 파일의 데이터를 제공하는 스트림 객체 생성 함수.
+ * @param num_threads 사용할 스레드의 개수. -1로 지정시 가용한 스레드 개수를 자동으로 판단합니다.
+ * @param options 생성 옵션. KIWI_BUILD_* 열거형을 참조하십시오.
+ * @return 성공 시 Kiwi Builder의 핸들을 반환합니다. 
+ * 실패시 null를 반환하고 에러 메세지를 설정합니다. 
+ * 에러 메세지는 kiwi_error()를 통해 확인할 수 있습니다.
+ * 
+ * @note 이 방식으로 생성된 KiwiBuilder는 WordDetector가 초기화되지 않으므로 
+ *       kiwi_builder_extract_words 등의 함수를 사용할 수 없습니다.
+ * 
+ * @see kiwi_builder_close, kiwi_stream_object_t
+ */
+DECL_DLL kiwi_builder_h kiwi_builder_init_stream(kiwi_stream_object_t (*stream_object_factory)(const char* filename), int num_threads, int options);
 
 /**
  * @brief 사용이 끝난 KiwiBuilder를 해제합니다.

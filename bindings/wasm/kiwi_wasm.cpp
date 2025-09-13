@@ -1,6 +1,7 @@
 #include <kiwi/Kiwi.h>
 
 #include <map>
+#include <sstream>
 #include <nlohmann/json.hpp>
 
 #include <emscripten.h>
@@ -177,7 +178,6 @@ json build(const json& args) {
 
     const json buildArgs = args[0];
 
-    const std::string modelPath = buildArgs["modelPath"];
     const size_t numThreads = 0;
     const auto modelTypeStr = buildArgs.value("modelType", "none");
 
@@ -203,12 +203,79 @@ json build(const json& args) {
         buildOptions |= BuildOption::loadMultiDict;
     }
 
-    KiwiBuilder builder = KiwiBuilder{
-        modelPath,
-        numThreads,
-        buildOptions,
-        modelType,
-    };
+    KiwiBuilder builder = [&]() {
+        // Check if streamProvider is available, if so use it
+        if (buildArgs.contains("streamProvider")) {
+            std::string streamProviderCallbackName = buildArgs["streamProvider"];
+            
+            // Create StreamProvider that calls JavaScript function
+            KiwiBuilder::StreamProvider streamProvider = [streamProviderCallbackName](const std::string& filename) -> std::unique_ptr<std::istream>
+            {
+                try
+                {
+                    // Call JavaScript function by name
+                    emscripten::val jsFunction = emscripten::val::global(streamProviderCallbackName.c_str());
+                    if (jsFunction.isUndefined())
+                    {
+                        return nullptr;
+                    }
+                    
+                    emscripten::val result = jsFunction(filename);
+                    if (result.isNull() || result.isUndefined())
+                    {
+                        return nullptr;
+                    }
+                    
+                    // Convert result to vector<char>
+                    std::vector<char> buffer;
+                    if (result.hasOwnProperty("length"))
+                    {
+                        const int length = result["length"].as<int>();
+                        buffer.resize(length);
+                        
+                        for (int i = 0; i < length; ++i)
+                        {
+                            buffer[i] = result[i].as<unsigned char>();
+                        }
+                    }
+                    else if (result.typeOf().as<std::string>() == "string")
+                    {
+                        std::string str = result.as<std::string>();
+                        buffer.assign(str.begin(), str.end());
+                    }
+                    else
+                    {
+                        return nullptr;
+                    }
+                    
+                    std::string data(buffer.begin(), buffer.end());
+                    return std::make_unique<std::istringstream>(std::move(data));
+                }
+                catch (...)
+                {
+                    return nullptr;
+                }
+            };
+
+            return KiwiBuilder{
+                streamProvider,
+                numThreads,
+                buildOptions,
+                modelType,
+            };
+        }
+        else
+        {
+            // Use traditional modelPath approach
+            const std::string modelPath = buildArgs["modelPath"];
+            return KiwiBuilder{
+                modelPath,
+                numThreads,
+                buildOptions,
+                modelType,
+            };
+        }
+    }();
 
     const auto userDicts = buildArgs.value("userDicts", json::array());
     for (const auto& pathJson : userDicts) {
@@ -317,7 +384,6 @@ json build(const json& args) {
 
     return id;
 }
-
 
 json kiwiReady(Kiwi& kiwi, const json& args) {
     return kiwi.ready();

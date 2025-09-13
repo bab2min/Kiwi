@@ -1,6 +1,10 @@
 #include <cmath>
 #include <memory>
 #include <fstream>
+#include <sstream>
+#include <iostream>
+#include <streambuf>
+#include <vector>
 #include <kiwi/Kiwi.h>
 #include <kiwi/SwTokenizer.h>
 #include <kiwi/capi.h>
@@ -118,6 +122,112 @@ kiwi_builder_h kiwi_builder_init(const char* model_path, int num_threads, int op
 			: (mtMask == KIWI_BUILD_MODEL_TYPE_CONG_GLOBAL) ? ModelType::congGlobal
 			: ModelType::none;
 		return (kiwi_builder_h)new KiwiBuilder{ model_path, (size_t)num_threads, buildOption, modelType };
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return nullptr;
+	}
+}
+
+// Custom istream implementation that uses the kiwi_stream_object_t
+class CStreamAdapter : public std::istream {
+private:
+    class CStreamBuf : public std::streambuf {
+    private:
+        kiwi_stream_object_t stream_obj;
+        std::vector<char> buffer;
+        static constexpr const size_t buffer_size = 8192;
+        
+    public:
+        CStreamBuf(const kiwi_stream_object_t& obj) : stream_obj(obj), buffer(buffer_size) {
+            setg(buffer.data(), buffer.data(), buffer.data());
+        }
+        
+        ~CStreamBuf() {
+            if (stream_obj.close) {
+                stream_obj.close(stream_obj.user_data);
+            }
+        }
+        
+    protected:
+        int underflow() override {
+            if (gptr() < egptr()) {
+                return traits_type::to_int_type(*gptr());
+            }
+            
+            if (!stream_obj.read) {
+                return traits_type::eof();
+            }
+            
+            size_t bytes_read = stream_obj.read(stream_obj.user_data, buffer.data(), buffer_size);
+            if (bytes_read == 0) {
+                return traits_type::eof();
+            }
+            
+            setg(buffer.data(), buffer.data(), buffer.data() + bytes_read);
+            return traits_type::to_int_type(*gptr());
+        }
+        
+        pos_type seekoff(off_type off, std::ios_base::seekdir way, std::ios_base::openmode) override {
+            if (!stream_obj.seek) {
+                return pos_type(-1);
+            }
+            
+            int whence;
+            switch (way) {
+                case std::ios_base::beg: whence = 0; break; // SEEK_SET
+                case std::ios_base::cur: whence = 1; break; // SEEK_CUR
+                case std::ios_base::end: whence = 2; break; // SEEK_END
+                default: return pos_type(-1);
+            }
+            
+            long long new_pos = stream_obj.seek(stream_obj.user_data, off, whence);
+            if (new_pos == -1) {
+                return pos_type(-1);
+            }
+            
+            // Reset buffer after seek
+            setg(buffer.data(), buffer.data(), buffer.data());
+            return pos_type(new_pos);
+        }
+        
+        pos_type seekpos(pos_type sp, std::ios_base::openmode which) override {
+            return seekoff(sp, std::ios_base::beg, which);
+        }
+    };
+    
+    CStreamBuf buf;
+    
+public:
+    CStreamAdapter(const kiwi_stream_object_t& obj) : std::istream(&buf), buf(obj) {}
+};
+
+kiwi_builder_h kiwi_builder_init_stream(kiwi_stream_object_t (*stream_object_factory)(const char* filename), int num_threads, int options)
+{
+	try
+	{
+		BuildOption buildOption = (BuildOption)(options & 0xFF);
+		const auto mtMask = options & (KIWI_BUILD_MODEL_TYPE_LARGEST | KIWI_BUILD_MODEL_TYPE_KNLM | KIWI_BUILD_MODEL_TYPE_SBG | KIWI_BUILD_MODEL_TYPE_CONG | KIWI_BUILD_MODEL_TYPE_CONG_GLOBAL);
+		const ModelType modelType = (mtMask == KIWI_BUILD_MODEL_TYPE_LARGEST) ? ModelType::largest
+			: (mtMask == KIWI_BUILD_MODEL_TYPE_KNLM) ? ModelType::knlm
+			: (mtMask == KIWI_BUILD_MODEL_TYPE_SBG) ? ModelType::sbg
+			: (mtMask == KIWI_BUILD_MODEL_TYPE_CONG) ? ModelType::cong
+			: (mtMask == KIWI_BUILD_MODEL_TYPE_CONG_GLOBAL) ? ModelType::congGlobal
+			: ModelType::none;
+		
+		// Create C++ StreamProvider that uses the stream object factory
+		KiwiBuilder::StreamProvider cppStreamProvider = [stream_object_factory](const std::string& filename) -> std::unique_ptr<std::istream>
+		{
+			kiwi_stream_object_t stream_obj = stream_object_factory(filename.c_str());
+			if (!stream_obj.read) {
+				return nullptr; // Invalid stream object (missing required read function)
+			}
+			
+			return std::make_unique<CStreamAdapter>(stream_obj);
+		};
+		
+		return (kiwi_builder_h)new KiwiBuilder{ cppStreamProvider, (size_t)num_threads, buildOption, modelType };
 	}
 	catch (...)
 	{

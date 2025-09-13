@@ -1,7 +1,20 @@
 package kr.pe.bab2min;
 
+import java.io.InputStream;
+
 public class KiwiBuilder implements AutoCloseable  {
 	private long _inst;
+
+	@FunctionalInterface
+	public interface StreamProvider {
+		/**
+		 * Provides an InputStream for the specified model file.
+		 * 
+		 * @param filename The name of the model file to read
+		 * @return InputStream containing the file data, or null if the file cannot be provided
+		 */
+		InputStream provide(String filename);
+	}
 
 	public static class BuildOption	{
 		final static public int none = 0,
@@ -126,16 +139,32 @@ public class KiwiBuilder implements AutoCloseable  {
 		ctor(modelPath, numWorkers, buildOptions, modelType);
 	}
 
+	public KiwiBuilder(StreamProvider streamProvider, int numWorkers, int buildOptions, int modelType) {
+		ctor(streamProvider, numWorkers, buildOptions, modelType);
+	}
+
 	public KiwiBuilder(String modelPath, int numWorkers, int buildOptions) {
 		ctor(modelPath, numWorkers, buildOptions, ModelType.none);
+	}
+
+	public KiwiBuilder(StreamProvider streamProvider, int numWorkers, int buildOptions) {
+		ctor(streamProvider, numWorkers, buildOptions, ModelType.none);
 	}
 
 	public KiwiBuilder(String modelPath, int numWorkers) {
 		ctor(modelPath, numWorkers, BuildOption.default_, ModelType.none);
 	}
 
+	public KiwiBuilder(StreamProvider streamProvider, int numWorkers) {
+		ctor(streamProvider, numWorkers, BuildOption.default_, ModelType.none);
+	}
+
 	public KiwiBuilder(String modelPath) {
 		ctor(modelPath, 1, BuildOption.default_, ModelType.none);
+	}
+
+	public KiwiBuilder(StreamProvider streamProvider) {
+		ctor(streamProvider, 1, BuildOption.default_, ModelType.none);
 	}
 
 	protected void finalize() throws Exception {
@@ -147,6 +176,7 @@ public class KiwiBuilder implements AutoCloseable  {
 	}
 
 	private native void ctor(String modelPath, int numWorkers, int buildOptions, int modelType);
+	private native void ctor(StreamProvider streamProvider, int numWorkers, int buildOptions, int modelType);
 	
 	@Override
 	public native void close() throws Exception;

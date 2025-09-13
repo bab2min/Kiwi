@@ -3,10 +3,17 @@
 #include <string>
 #include <memory>
 #include <array>
+#include <functional>
+#include <unordered_map>
+#include <vector>
 #include "Types.h"
 
 namespace kiwi
 {
+	namespace utils
+	{
+		class MemoryObject; // Forward declaration
+	}
 	template<typename T, typename... Args,
 		typename std::enable_if<!std::is_array<T>::value, int>::type = 0
 	>
@@ -389,6 +396,36 @@ namespace kiwi
 	std::ifstream& openFile(std::ifstream& f, const std::string& filePath, std::ios_base::openmode mode = std::ios_base::in);
 	std::ofstream& openFile(std::ofstream& f, const std::string& filePath, std::ios_base::openmode mode = std::ios_base::out);
 	bool isOpenable(const std::string& filePath);
+
+	// Forward declaration for StreamProvider (defined in Kiwi.h)
+	class KiwiBuilder;
+
+	namespace utils
+	{
+		/**
+		 * @brief 파일 시스템에서 모델을 읽어오는 스트림 제공자를 생성한다.
+		 *
+		 * @param modelPath 모델이 위치한 기본 경로
+		 * @return StreamProvider 파일명을 받아 해당 경로의 파일 스트림을 반환하는 함수 객체
+		 */
+		std::function<std::unique_ptr<std::istream>(const std::string&)> makeFilesystemProvider(const std::string& modelPath);
+
+		/**
+		 * @brief 메모리의 바이트 배열에서 모델을 읽어오는 스트림 제공자를 생성한다.
+		 *
+		 * @param fileData 파일명을 키로 하고 파일 내용을 값으로 하는 맵
+		 * @return StreamProvider 파일명을 받아 해당 메모리 데이터의 스트림을 반환하는 함수 객체
+		 */
+		std::function<std::unique_ptr<std::istream>(const std::string&)> makeMemoryProvider(const std::unordered_map<std::string, std::vector<char>>& fileData);
+
+		/**
+		 * @brief 스트림에서 MemoryObject를 생성한다.
+		 *
+		 * @param stream 읽어올 스트림
+		 * @return MemoryObject 스트림 내용을 담은 메모리 객체
+		 */
+		utils::MemoryObject createMemoryObjectFromStream(std::istream& stream);
+	}
 
 	const char* modelTypeToStr(ModelType type);
 }

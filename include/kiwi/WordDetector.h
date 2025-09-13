@@ -44,6 +44,7 @@ namespace kiwi
 		WordDetector() = default;
 		WordDetector(const std::string& modelPath, size_t _numThreads = -1);
 		WordDetector(FromRawData, const std::string& modelPath, size_t _numThreads = -1);
+		WordDetector(const std::function<std::unique_ptr<std::istream>(const std::string&)>& streamProvider, size_t _numThreads = -1);
 
 		bool ready() const
 		{
