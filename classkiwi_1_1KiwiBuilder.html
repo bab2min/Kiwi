@@ -95,6 +95,10 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-types" name="pub-types"></a>
 Public Types</h2></td></tr>
+<tr class="memitem:a946324534fe14756b3ed1b5248933e27" id="r_a946324534fe14756b3ed1b5248933e27"><td class="memItemLeft" align="right" valign="top"><a id="a946324534fe14756b3ed1b5248933e27" name="a946324534fe14756b3ed1b5248933e27"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>StreamProvider</b> = std::function&lt; std::unique_ptr&lt; std::istream &gt;(const std::string &amp;filename)&gt;</td></tr>
+<tr class="memdesc:a946324534fe14756b3ed1b5248933e27"><td class="mdescLeft">&#160;</td><td class="mdescRight">모델 파일을 읽기 위한 스트림 제공자 함수 타입. 파일명을 입력받아 해당 파일의 내용을 읽을 수 있는 스트림을 반환한다. <br /></td></tr>
+<tr class="separator:a946324534fe14756b3ed1b5248933e27"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a60fb0879c729eee28fa03233dec6fb7b" id="r_a60fb0879c729eee28fa03233dec6fb7b"><td class="memItemLeft" align="right" valign="top"><a id="a60fb0879c729eee28fa03233dec6fb7b" name="a60fb0879c729eee28fa03233dec6fb7b"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>TokenFilter</b> = std::function&lt; bool(const std::u16string &amp;, <a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebb">POSTag</a>)&gt;</td></tr>
 <tr class="separator:a60fb0879c729eee28fa03233dec6fb7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -123,6 +127,9 @@ Public Member Functions</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><b>KiwiBuilder</b> (const std::string &amp;modelPath, const <a class="el" href="structkiwi_1_1KiwiBuilder_1_1ModelBuildArgs.html">ModelBuildArgs</a> &amp;args)</td></tr>
 <tr class="memdesc:aaf6cf74f8ba2b589a939932a6851e8d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">기본 모델로부터 확장 모델을 학습하여 생성한다. <br /></td></tr>
 <tr class="separator:aaf6cf74f8ba2b589a939932a6851e8d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a81c7b3b2a1f8ef992b34ec7dcad45ace" id="r_a81c7b3b2a1f8ef992b34ec7dcad45ace"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1KiwiBuilder.html#a81c7b3b2a1f8ef992b34ec7dcad45ace">KiwiBuilder</a> (<a class="el" href="classkiwi_1_1KiwiBuilder.html#a946324534fe14756b3ed1b5248933e27">StreamProvider</a> streamProvider, size_t numThreads=-1, <a class="el" href="Types_8h.html#a7b5ed1c7b90b79877f32c8a011c06ff3">BuildOption</a> options=BuildOption::default_, <a class="el" href="Types_8h.html#af7906391a8e367cab5296bac8d4caafa">ModelType</a> modelType=<a class="el" href="Types_8h.html#af7906391a8e367cab5296bac8d4caafaa334c4a4c42fdb79d7ebc3e73b517e6f8">ModelType::none</a>)</td></tr>
+<tr class="memdesc:a81c7b3b2a1f8ef992b34ec7dcad45ace"><td class="mdescLeft">&#160;</td><td class="mdescRight">KiwiBuilder를 스트림 제공자를 통해 모델 파일로부터 생성한다.  <br /></td></tr>
+<tr class="separator:a81c7b3b2a1f8ef992b34ec7dcad45ace"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1e3567e7187a721b939fb082fa12d969" id="r_a1e3567e7187a721b939fb082fa12d969"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1KiwiBuilder.html#a1e3567e7187a721b939fb082fa12d969">KiwiBuilder</a> (const std::string &amp;modelPath, size_t numThreads=-1, <a class="el" href="Types_8h.html#a7b5ed1c7b90b79877f32c8a011c06ff3">BuildOption</a> options=BuildOption::default_, <a class="el" href="Types_8h.html#af7906391a8e367cab5296bac8d4caafa">ModelType</a> modelType=<a class="el" href="Types_8h.html#af7906391a8e367cab5296bac8d4caafaa334c4a4c42fdb79d7ebc3e73b517e6f8">ModelType::none</a>)</td></tr>
 <tr class="memdesc:a1e3567e7187a721b939fb082fa12d969"><td class="mdescLeft">&#160;</td><td class="mdescRight">KiwiBuilder를 모델 파일로부터 생성한다.  <br /></td></tr>
 <tr class="separator:a1e3567e7187a721b939fb082fa12d969"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -156,6 +163,9 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>addPreAnalyzedWord</b
 <tr class="separator:a7b9b1c07b9c4ce3c6307c90391475647"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1c34aeb8fac1f3b324e0de63d45f4eea" id="r_a1c34aeb8fac1f3b324e0de63d45f4eea"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1KiwiBuilder.html#a1c34aeb8fac1f3b324e0de63d45f4eea">loadDictionary</a> (const std::string &amp;dictPath)</td></tr>
 <tr class="separator:a1c34aeb8fac1f3b324e0de63d45f4eea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab4398b5d5831953f67f0e5b9199f54ae" id="r_ab4398b5d5831953f67f0e5b9199f54ae"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1KiwiBuilder.html#ab4398b5d5831953f67f0e5b9199f54ae">loadDictionaryFromStream</a> (std::istream &amp;is)</td></tr>
+<tr class="memdesc:ab4398b5d5831953f67f0e5b9199f54ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">스트림에서 사용자 사전을 로딩한다.  <br /></td></tr>
+<tr class="separator:ab4398b5d5831953f67f0e5b9199f54ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a060b9766033c8a5dc8dbd3bbc9318368" id="r_a060b9766033c8a5dc8dbd3bbc9318368"><td class="memItemLeft" align="right" valign="top"><a id="a060b9766033c8a5dc8dbd3bbc9318368" name="a060b9766033c8a5dc8dbd3bbc9318368"></a>
 std::vector&lt; <a class="el" href="structkiwi_1_1WordInfo.html">WordInfo</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>extractWords</b> (const U16MultipleReader &amp;reader, size_t minCnt=10, size_t maxWordLen=10, float minScore=0.25, float posThreshold=-3, bool lmFilter=true) const</td></tr>
 <tr class="separator:a060b9766033c8a5dc8dbd3bbc9318368"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -183,10 +193,10 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>convertHSData</b> (co
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:abb50f3e8a1120bcba58a6ee5749732b2" id="r_abb50f3e8a1120bcba58a6ee5749732b2"><td class="memItemLeft" align="right" valign="top"><a id="abb50f3e8a1120bcba58a6ee5749732b2" name="abb50f3e8a1120bcba58a6ee5749732b2"></a>
-static <a class="el" href="Types_8h.html#af7906391a8e367cab5296bac8d4caafa">ModelType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>getModelType</b> (const std::string &amp;modelPath, bool <a class="el" href="Types_8h.html#af7906391a8e367cab5296bac8d4caafaaf39ed5b6d0275dcbc4a2f5de624d95ae">largest</a>=false)</td></tr>
-<tr class="memdesc:abb50f3e8a1120bcba58a6ee5749732b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">주어진 모델 경로로부터 모델의 타입을 추정한다. <br /></td></tr>
-<tr class="separator:abb50f3e8a1120bcba58a6ee5749732b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa58260b9f8c1087f854cb3bb953bd3ba" id="r_aa58260b9f8c1087f854cb3bb953bd3ba"><td class="memItemLeft" align="right" valign="top"><a id="aa58260b9f8c1087f854cb3bb953bd3ba" name="aa58260b9f8c1087f854cb3bb953bd3ba"></a>
+static <a class="el" href="Types_8h.html#af7906391a8e367cab5296bac8d4caafa">ModelType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>getModelType</b> (const <a class="el" href="classkiwi_1_1KiwiBuilder.html#a946324534fe14756b3ed1b5248933e27">StreamProvider</a> &amp;provider, bool <a class="el" href="Types_8h.html#af7906391a8e367cab5296bac8d4caafaaf39ed5b6d0275dcbc4a2f5de624d95ae">largest</a>=false)</td></tr>
+<tr class="memdesc:aa58260b9f8c1087f854cb3bb953bd3ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">주어진 모델 경로로부터 모델의 타입을 추정한다. <br /></td></tr>
+<tr class="separator:aa58260b9f8c1087f854cb3bb953bd3ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af02912f81ac0715233f8cee6ee3f09e3" id="r_af02912f81ac0715233f8cee6ee3f09e3"><td class="memItemLeft" align="right" valign="top"><a id="af02912f81ac0715233f8cee6ee3f09e3" name="af02912f81ac0715233f8cee6ee3f09e3"></a>
 static void&#160;</td><td class="memItemRight" valign="bottom"><b>buildMorphData</b> (const std::string &amp;morphemeDefPath, const std::string &amp;outputPath, size_t minCnt=10)</td></tr>
 <tr class="separator:af02912f81ac0715233f8cee6ee3f09e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -195,7 +205,7 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><b>buildMorphData
 <div class="textblock"><p>형태소 분석에 사용될 사전을 관리하고, 사전을 바탕으로 실제 형태소 분석을 수행하는 Kiwi의 인스턴스를 생성하는 클래스. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a400409ef1f682bfbfe65706a0bc5285f" name="a400409ef1f682bfbfe65706a0bc5285f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a400409ef1f682bfbfe65706a0bc5285f">&#9670;&#160;</a></span>KiwiBuilder() <span class="overload">[1/3]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a400409ef1f682bfbfe65706a0bc5285f">&#9670;&#160;</a></span>KiwiBuilder() <span class="overload">[1/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -215,7 +225,7 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><b>buildMorphData
 </div>
 </div>
 <a id="a6338925fdfa3ac713fbd6a860866e7f7" name="a6338925fdfa3ac713fbd6a860866e7f7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6338925fdfa3ac713fbd6a860866e7f7">&#9670;&#160;</a></span>KiwiBuilder() <span class="overload">[2/3]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a6338925fdfa3ac713fbd6a860866e7f7">&#9670;&#160;</a></span>KiwiBuilder() <span class="overload">[2/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -235,8 +245,59 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><b>buildMorphData
 
 </div>
 </div>
+<a id="a81c7b3b2a1f8ef992b34ec7dcad45ace" name="a81c7b3b2a1f8ef992b34ec7dcad45ace"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a81c7b3b2a1f8ef992b34ec7dcad45ace">&#9670;&#160;</a></span>KiwiBuilder() <span class="overload">[3/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">kiwi::KiwiBuilder::KiwiBuilder </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classkiwi_1_1KiwiBuilder.html#a946324534fe14756b3ed1b5248933e27">StreamProvider</a>&#160;</td>
+          <td class="paramname"><em>streamProvider</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>numThreads</em> = <code>-1</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="Types_8h.html#a7b5ed1c7b90b79877f32c8a011c06ff3">BuildOption</a>&#160;</td>
+          <td class="paramname"><em>options</em> = <code>BuildOption::default_</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="Types_8h.html#af7906391a8e367cab5296bac8d4caafa">ModelType</a>&#160;</td>
+          <td class="paramname"><em>modelType</em> = <code><a class="el" href="Types_8h.html#af7906391a8e367cab5296bac8d4caafaa334c4a4c42fdb79d7ebc3e73b517e6f8">ModelType::none</a></code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>KiwiBuilder를 스트림 제공자를 통해 모델 파일로부터 생성한다. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">streamProvider</td><td>파일명을 받아 해당 모델 파일의 스트림을 반환하는 함수 객체. 이를 통해 파일 시스템 외에도 바이트 배열, 리소스 등 다양한 소스에서 모델을 읽을 수 있다. </td></tr>
+    <tr><td class="paramname">numThreads</td><td>모델 및 형태소 분석에 사용할 스레드 개수. 0일 경우 async를 지원하지 않는 단일 스레드에서 동작하며, 1 이상일 경우 지정한 개수만큼 worker 스레드를 생성하여 async가 지원된다. 기본값은 -1으로 이 경우 시스템의 CPU 코어 개수를 탐지하여 이 값을 numThreads값으로 설정한다. </td></tr>
+    <tr><td class="paramname">options</td><td>생성 옵션. <code><a class="el" href="Types_8h.html#a7b5ed1c7b90b79877f32c8a011c06ff3" title="KiwiBuilder 생성시 사용되는 비트 플래그">kiwi::BuildOption</a></code>을 참조 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>이 생성자로 생성된 KiwiBuilder는 WordDetector가 초기화되지 않으므로 extractWords(), extractAddWords() 메서드를 사용할 수 없다. 해당 기능이 필요한 경우 파일 시스템 기반 생성자를 사용해야 한다. </dd></dl>
+
+</div>
+</div>
 <a id="a1e3567e7187a721b939fb082fa12d969" name="a1e3567e7187a721b939fb082fa12d969"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1e3567e7187a721b939fb082fa12d969">&#9670;&#160;</a></span>KiwiBuilder() <span class="overload">[3/3]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a1e3567e7187a721b939fb082fa12d969">&#9670;&#160;</a></span>KiwiBuilder() <span class="overload">[4/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -565,6 +626,33 @@ template&lt;class Replacer &gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd></dd></dl>
+
+</div>
+</div>
+<a id="ab4398b5d5831953f67f0e5b9199f54ae" name="ab4398b5d5831953f67f0e5b9199f54ae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab4398b5d5831953f67f0e5b9199f54ae">&#9670;&#160;</a></span>loadDictionaryFromStream()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t kiwi::KiwiBuilder::loadDictionaryFromStream </td>
+          <td>(</td>
+          <td class="paramtype">std::istream &amp;&#160;</td>
+          <td class="paramname"><em>is</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>스트림에서 사용자 사전을 로딩한다. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">is</td><td>사전 파일 내용을 담은 입력 스트림 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>추가된 단어의 개수 </dd></dl>
 
 </div>
 </div>

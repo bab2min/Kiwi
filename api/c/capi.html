@@ -65,6 +65,9 @@
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv418kiwi_swtokenizer_h"><code class="docutils literal notranslate"><span class="pre">kiwi_swtokenizer_h</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv413kiwi_reader_t"><code class="docutils literal notranslate"><span class="pre">kiwi_reader_t</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv415kiwi_reader_w_t"><code class="docutils literal notranslate"><span class="pre">kiwi_reader_w_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv421kiwi_stream_read_func"><code class="docutils literal notranslate"><span class="pre">kiwi_stream_read_func</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv421kiwi_stream_seek_func"><code class="docutils literal notranslate"><span class="pre">kiwi_stream_seek_func</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv422kiwi_stream_close_func"><code class="docutils literal notranslate"><span class="pre">kiwi_stream_close_func</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv415kiwi_receiver_t"><code class="docutils literal notranslate"><span class="pre">kiwi_receiver_t</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv423kiwi_builder_replacer_t"><code class="docutils literal notranslate"><span class="pre">kiwi_builder_replacer_t</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv4N19PhonyNameDueToError30KIWI_BUILD_INTEGRATE_ALLOMORPHE"><code class="docutils literal notranslate"><span class="pre">KIWI_BUILD_INTEGRATE_ALLOMORPH</span></code></a></li>
@@ -116,6 +119,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv410kiwi_errorv"><code class="docutils literal notranslate"><span class="pre">kiwi_error()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv416kiwi_clear_errorv"><code class="docutils literal notranslate"><span class="pre">kiwi_clear_error()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv417kiwi_builder_initPKcii"><code class="docutils literal notranslate"><span class="pre">kiwi_builder_init()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv424kiwi_builder_init_streamPF20kiwi_stream_object_tPKcEii"><code class="docutils literal notranslate"><span class="pre">kiwi_builder_init_stream()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv418kiwi_builder_close14kiwi_builder_h"><code class="docutils literal notranslate"><span class="pre">kiwi_builder_close()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv421kiwi_builder_add_word14kiwi_builder_hPKcPKcf"><code class="docutils literal notranslate"><span class="pre">kiwi_builder_add_word()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv427kiwi_builder_add_alias_word14kiwi_builder_hPKcPKcfPKc"><code class="docutils literal notranslate"><span class="pre">kiwi_builder_add_alias_word()</span></code></a></li>
@@ -208,6 +212,13 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17kiwi_token_info_t12typo_form_idE"><code class="docutils literal notranslate"><span class="pre">typo_form_id</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17kiwi_token_info_t12paired_tokenE"><code class="docutils literal notranslate"><span class="pre">paired_token</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17kiwi_token_info_t17sub_sent_positionE"><code class="docutils literal notranslate"><span class="pre">sub_sent_position</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv420kiwi_stream_object_t"><code class="docutils literal notranslate"><span class="pre">kiwi_stream_object_t</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N20kiwi_stream_object_t4readE"><code class="docutils literal notranslate"><span class="pre">read</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N20kiwi_stream_object_t4seekE"><code class="docutils literal notranslate"><span class="pre">seek</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N20kiwi_stream_object_t5closeE"><code class="docutils literal notranslate"><span class="pre">close</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N20kiwi_stream_object_t9user_dataE"><code class="docutils literal notranslate"><span class="pre">user_data</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -358,6 +369,57 @@
 <dt class="sig sig-object cpp" id="_CPPv415kiwi_reader_w_t">
 <span id="_CPPv315kiwi_reader_w_t"></span><span id="_CPPv215kiwi_reader_w_t"></span><span id="kiwi_reader_w_t"></span><span class="target" id="capi_8h_1a22102ab59ebd9887afc343a8e2ff1337"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_reader_w_t</span></span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49kchar16_t" title="kchar16_t"><span class="n"><span class="pre">kchar16_t</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv415kiwi_reader_w_t" title="Link to this definition"></a><br /></dt>
 <dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv421kiwi_stream_read_func">
+<span id="_CPPv321kiwi_stream_read_func"></span><span id="_CPPv221kiwi_stream_read_func"></span><span id="kiwi_stream_read_func"></span><span class="target" id="capi_8h_1a470ccbf8940f0a3c5ada05a27f44fdd0"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_stream_read_func</span></span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">user_data</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">buffer</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n"><span class="pre">length</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv421kiwi_stream_read_func" title="Link to this definition"></a><br /></dt>
+<dd><p>스트림에서 데이터를 읽는 콜백 함수 타입 </p>
+<dl class="field-list simple">
+<dt class="field-odd">Param user_data<span class="colon">:</span></dt>
+<dd class="field-odd"><p>사용자 정의 데이터 </p>
+</dd>
+<dt class="field-even">Param buffer<span class="colon">:</span></dt>
+<dd class="field-even"><p>읽은 데이터를 저장할 버퍼 </p>
+</dd>
+<dt class="field-odd">Param length<span class="colon">:</span></dt>
+<dd class="field-odd"><p>읽을 데이터의 크기 </p>
+</dd>
+<dt class="field-even">Return<span class="colon">:</span></dt>
+<dd class="field-even"><p>실제로 읽은 바이트 수. EOF 시 0, 오류 시 음수를 반환합니다. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv421kiwi_stream_seek_func">
+<span id="_CPPv321kiwi_stream_seek_func"></span><span id="_CPPv221kiwi_stream_seek_func"></span><span id="kiwi_stream_seek_func"></span><span class="target" id="capi_8h_1a2f1adb2728853ce58549d22483f002cf"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_stream_seek_func</span></span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">user_data</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="n"><span class="pre">offset</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">whence</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv421kiwi_stream_seek_func" title="Link to this definition"></a><br /></dt>
+<dd><p>스트림에서 위치를 이동하는 콜백 함수 타입 </p>
+<dl class="field-list simple">
+<dt class="field-odd">Param user_data<span class="colon">:</span></dt>
+<dd class="field-odd"><p>사용자 정의 데이터 </p>
+</dd>
+<dt class="field-even">Param offset<span class="colon">:</span></dt>
+<dd class="field-even"><p>이동할 오프셋 </p>
+</dd>
+<dt class="field-odd">Param whence<span class="colon">:</span></dt>
+<dd class="field-odd"><p>기준점 (SEEK_SET=0, SEEK_CUR=1, SEEK_END=2) </p>
+</dd>
+<dt class="field-even">Return<span class="colon">:</span></dt>
+<dd class="field-even"><p>새로운 위치. 오류 시 -1을 반환합니다. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv422kiwi_stream_close_func">
+<span id="_CPPv322kiwi_stream_close_func"></span><span id="_CPPv222kiwi_stream_close_func"></span><span id="kiwi_stream_close_func"></span><span class="target" id="capi_8h_1a064b95f93cab4fdd8949d179dccdd7b7"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_stream_close_func</span></span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">user_data</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv422kiwi_stream_close_func" title="Link to this definition"></a><br /></dt>
+<dd><p>스트림을 닫는 콜백 함수 타입 </p>
+<dl class="field-list simple">
+<dt class="field-odd">Param user_data<span class="colon">:</span></dt>
+<dd class="field-odd"><p>사용자 정의 데이터 </p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="cpp type">
 <dt class="sig sig-object cpp" id="_CPPv415kiwi_receiver_t">
@@ -694,6 +756,33 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>model_path</strong> – 모델의 경로. </p></li>
+<li><p><strong>num_threads</strong> – 사용할 스레드의 개수. -1로 지정시 가용한 스레드 개수를 자동으로 판단합니다. </p></li>
+<li><p><strong>options</strong> – 생성 옵션. KIWI_BUILD_* 열거형을 참조하십시오. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>성공 시 Kiwi Builder의 핸들을 반환합니다. 실패시 null를 반환하고 에러 메세지를 설정합니다. 에러 메세지는 <a class="reference internal" href="#capi_8h_1ab7a5eb15b5dbff0adf75235ed8ed131b"><span class="std std-ref">kiwi_error()</span></a>를 통해 확인할 수 있습니다.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv424kiwi_builder_init_streamPF20kiwi_stream_object_tPKcEii">
+<span id="_CPPv324kiwi_builder_init_streamPF20kiwi_stream_object_tPKcEii"></span><span id="_CPPv224kiwi_builder_init_streamPF20kiwi_stream_object_tPKcEii"></span><span class="target" id="capi_8h_1a2a951e93eef8d95d9e3115f280d40980"></span><a class="reference internal" href="#_CPPv414kiwi_builder_h" title="kiwi_builder_h"><span class="n"><span class="pre">kiwi_builder_h</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_builder_init_stream</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv420kiwi_stream_object_t" title="kiwi_stream_object_t"><span class="n"><span class="pre">kiwi_stream_object_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">stream_object_factory</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">)</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_threads</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">options</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv424kiwi_builder_init_streamPF20kiwi_stream_object_tPKcEii" title="Link to this definition"></a><br /></dt>
+<dd><p>스트림 객체를 사용하여 Kiwi Builder를 생성합니다. </p>
+<p><div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#capi_8h_1a8ee24152f80c94f558f3ca9f5760d54d"><span class="std std-ref">kiwi_builder_close</span></a>, <a class="reference internal" href="#structkiwi__stream__object__t"><span class="std std-ref">kiwi_stream_object_t</span></a></p>
+</div>
+</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>이 방식으로 생성된 KiwiBuilder는 WordDetector가 초기화되지 않으므로 kiwi_builder_extract_words 등의 함수를 사용할 수 없습니다.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stream_object</strong> – 파일명을 받아 해당 파일의 데이터를 제공하는 스트림 객체 생성 함수. </p></li>
 <li><p><strong>num_threads</strong> – 사용할 스레드의 개수. -1로 지정시 가용한 스레드 개수를 자동으로 판단합니다. </p></li>
 <li><p><strong>options</strong> – 생성 옵션. KIWI_BUILD_* 열거형을 참조하십시오. </p></li>
 </ul>
@@ -2268,6 +2357,41 @@
 <dt class="sig sig-object cpp" id="_CPPv4N17kiwi_token_info_t17sub_sent_positionE">
 <span id="_CPPv3N17kiwi_token_info_t17sub_sent_positionE"></span><span id="_CPPv2N17kiwi_token_info_t17sub_sent_positionE"></span><span id="kiwi_token_info_t::sub_sent_position__uint32_t"></span><span class="target" id="structkiwi__token__info__t_1a091b9092a427c8d36947b83ed6b58897"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sub_sent_position</span></span></span><a class="headerlink" href="#_CPPv4N17kiwi_token_info_t17sub_sent_positionE" title="Link to this definition"></a><br /></dt>
 <dd><p>인용부호나 괄호로 둘러싸인 하위 문장의 번호. 1부터 시작. 0인 경우 하위 문장이 아님을 뜻함 </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv420kiwi_stream_object_t">
+<span id="_CPPv320kiwi_stream_object_t"></span><span id="_CPPv220kiwi_stream_object_t"></span><span id="kiwi_stream_object_t"></span><span class="target" id="structkiwi__stream__object__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_stream_object_t</span></span></span><a class="headerlink" href="#_CPPv420kiwi_stream_object_t" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;capi.h&gt;</em></div>
+<p>범용 입력 스트림을 나타내는 구조체 </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N20kiwi_stream_object_t4readE">
+<span id="_CPPv3N20kiwi_stream_object_t4readE"></span><span id="_CPPv2N20kiwi_stream_object_t4readE"></span><span id="kiwi_stream_object_t::read__kiwi_stream_read_func"></span><span class="target" id="structkiwi__stream__object__t_1a93c8dc0ebb59bd0a11b938dc3bf88c35"></span><a class="reference internal" href="#_CPPv421kiwi_stream_read_func" title="kiwi_stream_read_func"><span class="n"><span class="pre">kiwi_stream_read_func</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">read</span></span></span><a class="headerlink" href="#_CPPv4N20kiwi_stream_object_t4readE" title="Link to this definition"></a><br /></dt>
+<dd><p>데이터 읽기 함수 </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N20kiwi_stream_object_t4seekE">
+<span id="_CPPv3N20kiwi_stream_object_t4seekE"></span><span id="_CPPv2N20kiwi_stream_object_t4seekE"></span><span id="kiwi_stream_object_t::seek__kiwi_stream_seek_func"></span><span class="target" id="structkiwi__stream__object__t_1aaf89407160be30a7fe32c0b5ee1959d1"></span><a class="reference internal" href="#_CPPv421kiwi_stream_seek_func" title="kiwi_stream_seek_func"><span class="n"><span class="pre">kiwi_stream_seek_func</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">seek</span></span></span><a class="headerlink" href="#_CPPv4N20kiwi_stream_object_t4seekE" title="Link to this definition"></a><br /></dt>
+<dd><p>위치 이동 함수 </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N20kiwi_stream_object_t5closeE">
+<span id="_CPPv3N20kiwi_stream_object_t5closeE"></span><span id="_CPPv2N20kiwi_stream_object_t5closeE"></span><span id="kiwi_stream_object_t::close__kiwi_stream_close_func"></span><span class="target" id="structkiwi__stream__object__t_1aef415d58898ed6297d2ed404282888fd"></span><a class="reference internal" href="#_CPPv422kiwi_stream_close_func" title="kiwi_stream_close_func"><span class="n"><span class="pre">kiwi_stream_close_func</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">close</span></span></span><a class="headerlink" href="#_CPPv4N20kiwi_stream_object_t5closeE" title="Link to this definition"></a><br /></dt>
+<dd><p>스트림 닫기 함수 </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N20kiwi_stream_object_t9user_dataE">
+<span id="_CPPv3N20kiwi_stream_object_t9user_dataE"></span><span id="_CPPv2N20kiwi_stream_object_t9user_dataE"></span><span id="kiwi_stream_object_t::user_data__voidP"></span><span class="target" id="structkiwi__stream__object__t_1afb53c1d39c5657e476b809cf83af89a9"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">user_data</span></span></span><a class="headerlink" href="#_CPPv4N20kiwi_stream_object_t9user_dataE" title="Link to this definition"></a><br /></dt>
+<dd><p>사용자 정의 데이터 </p>
 </dd></dl>
 
 </div>

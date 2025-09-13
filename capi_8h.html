@@ -86,6 +86,7 @@ $(function() {
 <p>Kiwi C API를 담고 있는 헤더 파일  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;stdint.h&gt;</code><br />
+<code>#include &lt;stddef.h&gt;</code><br />
 <code>#include &quot;Macro.h&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for capi.h:</div>
@@ -96,6 +97,9 @@ Include dependency graph for capi.h:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi__token__info__t.html">kiwi_token_info_t</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi__stream__object__t.html">kiwi_stream_object_t</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">범용 입력 스트림을 나타내는 구조체  <a href="structkiwi__stream__object__t.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
@@ -154,6 +158,15 @@ typedef struct kiwi_swtokenizer *&#160;</td><td class="memItemRight" valign="bot
 <tr class="memitem:a22102ab59ebd9887afc343a8e2ff1337" id="r_a22102ab59ebd9887afc343a8e2ff1337"><td class="memItemLeft" align="right" valign="top"><a id="a22102ab59ebd9887afc343a8e2ff1337" name="a22102ab59ebd9887afc343a8e2ff1337"></a>
 typedef int(*&#160;</td><td class="memItemRight" valign="bottom"><b>kiwi_reader_w_t</b>) (int, kchar16_t *, void *)</td></tr>
 <tr class="separator:a22102ab59ebd9887afc343a8e2ff1337"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a470ccbf8940f0a3c5ada05a27f44fdd0" id="r_a470ccbf8940f0a3c5ada05a27f44fdd0"><td class="memItemLeft" align="right" valign="top">typedef size_t(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a470ccbf8940f0a3c5ada05a27f44fdd0">kiwi_stream_read_func</a>) (void *user_data, char *buffer, size_t length)</td></tr>
+<tr class="memdesc:a470ccbf8940f0a3c5ada05a27f44fdd0"><td class="mdescLeft">&#160;</td><td class="mdescRight">스트림에서 데이터를 읽는 콜백 함수 타입  <br /></td></tr>
+<tr class="separator:a470ccbf8940f0a3c5ada05a27f44fdd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2f1adb2728853ce58549d22483f002cf" id="r_a2f1adb2728853ce58549d22483f002cf"><td class="memItemLeft" align="right" valign="top">typedef long long(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a2f1adb2728853ce58549d22483f002cf">kiwi_stream_seek_func</a>) (void *user_data, long long offset, int whence)</td></tr>
+<tr class="memdesc:a2f1adb2728853ce58549d22483f002cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">스트림에서 위치를 이동하는 콜백 함수 타입  <br /></td></tr>
+<tr class="separator:a2f1adb2728853ce58549d22483f002cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a064b95f93cab4fdd8949d179dccdd7b7" id="r_a064b95f93cab4fdd8949d179dccdd7b7"><td class="memItemLeft" align="right" valign="top">typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a064b95f93cab4fdd8949d179dccdd7b7">kiwi_stream_close_func</a>) (void *user_data)</td></tr>
+<tr class="memdesc:a064b95f93cab4fdd8949d179dccdd7b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">스트림을 닫는 콜백 함수 타입  <br /></td></tr>
+<tr class="separator:a064b95f93cab4fdd8949d179dccdd7b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a28e0130cf12ad92f6602562dab086494" id="r_a28e0130cf12ad92f6602562dab086494"><td class="memItemLeft" align="right" valign="top"><a id="a28e0130cf12ad92f6602562dab086494" name="a28e0130cf12ad92f6602562dab086494"></a>
 typedef int(*&#160;</td><td class="memItemRight" valign="bottom"><b>kiwi_receiver_t</b>) (int, kiwi_res_h, void *)</td></tr>
 <tr class="separator:a28e0130cf12ad92f6602562dab086494"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -249,6 +262,9 @@ Functions</h2></td></tr>
 <tr class="memitem:afab914642519cf01fb15017989045cbf" id="r_afab914642519cf01fb15017989045cbf"><td class="memItemLeft" align="right" valign="top">kiwi_builder_h&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#afab914642519cf01fb15017989045cbf">kiwi_builder_init</a> (const char *model_path, int num_threads, int options)</td></tr>
 <tr class="memdesc:afab914642519cf01fb15017989045cbf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Kiwi Builder를 생성합니다.  <br /></td></tr>
 <tr class="separator:afab914642519cf01fb15017989045cbf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2a951e93eef8d95d9e3115f280d40980" id="r_a2a951e93eef8d95d9e3115f280d40980"><td class="memItemLeft" align="right" valign="top">kiwi_builder_h&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a2a951e93eef8d95d9e3115f280d40980">kiwi_builder_init_stream</a> (<a class="el" href="structkiwi__stream__object__t.html">kiwi_stream_object_t</a>(*stream_object_factory)(const char *filename), int num_threads, int options)</td></tr>
+<tr class="memdesc:a2a951e93eef8d95d9e3115f280d40980"><td class="mdescLeft">&#160;</td><td class="mdescRight">스트림 객체를 사용하여 Kiwi Builder를 생성합니다.  <br /></td></tr>
+<tr class="separator:a2a951e93eef8d95d9e3115f280d40980"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8ee24152f80c94f558f3ca9f5760d54d" id="r_a8ee24152f80c94f558f3ca9f5760d54d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a8ee24152f80c94f558f3ca9f5760d54d">kiwi_builder_close</a> (kiwi_builder_h handle)</td></tr>
 <tr class="memdesc:a8ee24152f80c94f558f3ca9f5760d54d"><td class="mdescLeft">&#160;</td><td class="mdescRight">사용이 끝난 KiwiBuilder를 해제합니다.  <br /></td></tr>
 <tr class="separator:a8ee24152f80c94f558f3ca9f5760d54d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -522,6 +538,78 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>int 두번째 인자가 null인 경우 읽어들일 버퍼의 크기를 반환합니다. </dd></dl>
+
+</div>
+</div>
+<a id="a064b95f93cab4fdd8949d179dccdd7b7" name="a064b95f93cab4fdd8949d179dccdd7b7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a064b95f93cab4fdd8949d179dccdd7b7">&#9670;&#160;</a></span>kiwi_stream_close_func</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef void(* kiwi_stream_close_func) (void *user_data)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>스트림을 닫는 콜백 함수 타입 </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">user_data</td><td>사용자 정의 데이터 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a470ccbf8940f0a3c5ada05a27f44fdd0" name="a470ccbf8940f0a3c5ada05a27f44fdd0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a470ccbf8940f0a3c5ada05a27f44fdd0">&#9670;&#160;</a></span>kiwi_stream_read_func</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef size_t(* kiwi_stream_read_func) (void *user_data, char *buffer, size_t length)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>스트림에서 데이터를 읽는 콜백 함수 타입 </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">user_data</td><td>사용자 정의 데이터 </td></tr>
+    <tr><td class="paramname">buffer</td><td>읽은 데이터를 저장할 버퍼 </td></tr>
+    <tr><td class="paramname">length</td><td>읽을 데이터의 크기 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>실제로 읽은 바이트 수. EOF 시 0, 오류 시 음수를 반환합니다. </dd></dl>
+
+</div>
+</div>
+<a id="a2f1adb2728853ce58549d22483f002cf" name="a2f1adb2728853ce58549d22483f002cf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2f1adb2728853ce58549d22483f002cf">&#9670;&#160;</a></span>kiwi_stream_seek_func</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef long long(* kiwi_stream_seek_func) (void *user_data, long long offset, int whence)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>스트림에서 위치를 이동하는 콜백 함수 타입 </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">user_data</td><td>사용자 정의 데이터 </td></tr>
+    <tr><td class="paramname">offset</td><td>이동할 오프셋 </td></tr>
+    <tr><td class="paramname">whence</td><td>기준점 (SEEK_SET=0, SEEK_CUR=1, SEEK_END=2) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>새로운 위치. 오류 시 -1을 반환합니다. </dd></dl>
 
 </div>
 </div>
@@ -1450,6 +1538,53 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>성공 시 Kiwi Builder의 핸들을 반환합니다. 실패시 null를 반환하고 에러 메세지를 설정합니다. 에러 메세지는 <a class="el" href="capi_8h.html#ab7a5eb15b5dbff0adf75235ed8ed131b" title="현재 스레드에서 발생한 에러 메세지를 반환합니다. 발생한 에러가 없을 경우 null를 반환합니다.">kiwi_error()</a>를 통해 확인할 수 있습니다.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="capi_8h.html#a8ee24152f80c94f558f3ca9f5760d54d" title="사용이 끝난 KiwiBuilder를 해제합니다.">kiwi_builder_close</a> </dd></dl>
+
+</div>
+</div>
+<a id="a2a951e93eef8d95d9e3115f280d40980" name="a2a951e93eef8d95d9e3115f280d40980"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2a951e93eef8d95d9e3115f280d40980">&#9670;&#160;</a></span>kiwi_builder_init_stream()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">kiwi_builder_h kiwi_builder_init_stream </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structkiwi__stream__object__t.html">kiwi_stream_object_t</a>(*)(const char *filename)&#160;</td>
+          <td class="paramname"><em>stream_object_factory</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>num_threads</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>options</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>스트림 객체를 사용하여 Kiwi Builder를 생성합니다. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">stream_object</td><td>파일명을 받아 해당 파일의 데이터를 제공하는 스트림 객체 생성 함수. </td></tr>
+    <tr><td class="paramname">num_threads</td><td>사용할 스레드의 개수. -1로 지정시 가용한 스레드 개수를 자동으로 판단합니다. </td></tr>
+    <tr><td class="paramname">options</td><td>생성 옵션. KIWI_BUILD_* 열거형을 참조하십시오. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>성공 시 Kiwi Builder의 핸들을 반환합니다. 실패시 null를 반환하고 에러 메세지를 설정합니다. 에러 메세지는 <a class="el" href="capi_8h.html#ab7a5eb15b5dbff0adf75235ed8ed131b" title="현재 스레드에서 발생한 에러 메세지를 반환합니다. 발생한 에러가 없을 경우 null를 반환합니다.">kiwi_error()</a>를 통해 확인할 수 있습니다.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>이 방식으로 생성된 KiwiBuilder는 WordDetector가 초기화되지 않으므로 kiwi_builder_extract_words 등의 함수를 사용할 수 없습니다.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="capi_8h.html#a8ee24152f80c94f558f3ca9f5760d54d" title="사용이 끝난 KiwiBuilder를 해제합니다.">kiwi_builder_close</a>, <a class="el" href="structkiwi__stream__object__t.html" title="범용 입력 스트림을 나타내는 구조체">kiwi_stream_object_t</a> </dd></dl>
 
 </div>
 </div>

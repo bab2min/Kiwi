@@ -12,5 +12,6 @@ var searchData=
   ['unsignedtype_3c_20int32_5ft_20_3e_9',['UnsignedType&lt; int32_t &gt;',['../structkiwi_1_1UnsignedType_3_01int32__t_01_4.html',1,'kiwi']]],
   ['unsignedtype_3c_20int64_5ft_20_3e_10',['UnsignedType&lt; int64_t &gt;',['../structkiwi_1_1UnsignedType_3_01int64__t_01_4.html',1,'kiwi']]],
   ['unsignedtype_3c_20int8_5ft_20_3e_11',['UnsignedType&lt; int8_t &gt;',['../structkiwi_1_1UnsignedType_3_01int8__t_01_4.html',1,'kiwi']]],
-  ['update_12',['update',['../classkiwi_1_1TypoTransformer.html#aec265fa45cb5c91e14d640a8ac4fc1d7',1,'kiwi::TypoTransformer']]]
+  ['update_12',['update',['../classkiwi_1_1TypoTransformer.html#aec265fa45cb5c91e14d640a8ac4fc1d7',1,'kiwi::TypoTransformer']]],
+  ['user_5fdata_13',['user_data',['../structkiwi__stream__object__t.html#afb53c1d39c5657e476b809cf83af89a9',1,'kiwi_stream_object_t']]]
 ];

@@ -10,6 +10,7 @@ var searchData=
   ['lmstatebase_3c_20voidlangmodel_3c_20arch_20_3e_20_3e_7',['LmStateBase&lt; VoidLangModel&lt; arch &gt; &gt;',['../structkiwi_1_1lm_1_1LmStateBase.html',1,'kiwi::lm']]],
   ['loaddefaultdict_8',['loadDefaultDict',['../Types_8h.html#a7b5ed1c7b90b79877f32c8a011c06ff3ac336925b8868bb0c4749738a647abf6b',1,'kiwi']]],
   ['loaddictionary_9',['loadDictionary',['../classkiwi_1_1KiwiBuilder.html#a1c34aeb8fac1f3b324e0de63d45f4eea',1,'kiwi::KiwiBuilder']]],
-  ['loadmultidict_10',['loadMultiDict',['../Types_8h.html#a7b5ed1c7b90b79877f32c8a011c06ff3a35c1071f1f1a9c497fa503f0ae028068',1,'kiwi']]],
-  ['loadtypodict_11',['loadTypoDict',['../Types_8h.html#a7b5ed1c7b90b79877f32c8a011c06ff3af29c7cef55d5f13ec9ad2a53a5d10096',1,'kiwi']]]
+  ['loaddictionaryfromstream_10',['loadDictionaryFromStream',['../classkiwi_1_1KiwiBuilder.html#ab4398b5d5831953f67f0e5b9199f54ae',1,'kiwi::KiwiBuilder']]],
+  ['loadmultidict_11',['loadMultiDict',['../Types_8h.html#a7b5ed1c7b90b79877f32c8a011c06ff3a35c1071f1f1a9c497fa503f0ae028068',1,'kiwi']]],
+  ['loadtypodict_12',['loadTypoDict',['../Types_8h.html#a7b5ed1c7b90b79877f32c8a011c06ff3af29c7cef55d5f13ec9ad2a53a5d10096',1,'kiwi']]]
 ];
