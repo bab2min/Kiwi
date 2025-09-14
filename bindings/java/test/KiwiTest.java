@@ -1,4 +1,4 @@
-package kr.pe.bab2min;
+package test;
 
 import java.util.Arrays;
 import java.util.concurrent.Future;
@@ -8,6 +8,9 @@ import org.junit.Test;
 import kr.pe.bab2min.KiwiBuilder.TypoTransformer;
 
 import static org.junit.Assert.*;
+
+import kr.pe.bab2min.Kiwi;
+import kr.pe.bab2min.KiwiBuilder;
 
 public class KiwiTest {
 

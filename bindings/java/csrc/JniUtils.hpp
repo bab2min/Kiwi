@@ -67,16 +67,22 @@ namespace jni
 	};
 
 	template<class Ty>
-	class JObject
+	class JPureObject
 	{
 	public:
 		static jclass jClass;
+	};
+
+	template<class Ty>
+	class JObject : public JPureObject<Ty>
+	{
+	public:
 		static jfieldID jInstField;
 		static jmethodID jInitMethod;
 	};
 	
 	template<class Ty>
-	jclass JObject<Ty>::jClass = nullptr;
+	jclass JPureObject<Ty>::jClass = nullptr;
 
 	template<class Ty>
 	jfieldID JObject<Ty>::jInstField = nullptr;
@@ -97,6 +103,8 @@ namespace jni
 
 		JRef(const JRef&) = default;
 		JRef(JRef&&) = default;
+
+		JNIEnv* getEnv() const { return env; }
 
 		Ty& get();
 		const Ty& get() const;
@@ -129,14 +137,32 @@ namespace jni
 			this->inst = this->env->NewGlobalRef(this->inst);
 		}
 
-		JUniqueGlobalRef(const JUniqueGlobalRef&) = delete;
+		JUniqueGlobalRef(const JUniqueGlobalRef& ref)
+			: JRef<Ty>{ ref }
+		{
+			this->inst = this->env->NewGlobalRef(this->inst);
+		}
+
 		JUniqueGlobalRef(JUniqueGlobalRef&& o)
 		{
 			std::swap(this->env, o.env);
 			std::swap(this->inst, o.inst);
 		}
 
-		JUniqueGlobalRef& operator=(const JUniqueGlobalRef&) = delete;
+		JUniqueGlobalRef& operator=(const JUniqueGlobalRef& o)
+		{
+			if (this != &o)
+			{
+				if (this->env && this->inst)
+				{
+					this->env->DeleteGlobalRef(this->inst);
+				}
+				this->env = o.env;
+				this->inst = this->env->NewGlobalRef(o.inst);
+			}
+			return *this;
+		}
+
 		JUniqueGlobalRef& operator=(JUniqueGlobalRef&& o)
 		{
 			std::swap(this->env, o.env);
@@ -813,7 +839,7 @@ namespace jni
 	};
 
 	template<class Ty>
-	struct ValueBuilder<JRef<Ty>, std::enable_if_t<std::is_base_of_v<JObject<Ty>, Ty>>>
+	struct ValueBuilder<JRef<Ty>, std::enable_if_t<std::is_base_of_v<JPureObject<Ty>, Ty>>>
 	{
 		using CppType = JRef<Ty>;
 		using JniType = jobject;
@@ -1577,7 +1603,7 @@ namespace jni
 		std::vector<const char*> methodNames;
 
 		using Class = Ty;
-		static_assert(std::is_base_of_v<JObject<Class>, Class>, "Only JObject has its ClassDefinition.");
+		static_assert(std::is_base_of_v<JPureObject<Class>, Class>, "Only JObject has its ClassDefinition.");
 
 		inline static std::array<JNINativeMethod, sizeof...(methods)> methodDefs{ ((JNINativeMethod)methods)... };
 
@@ -1815,37 +1841,40 @@ namespace jni
 
 			if constexpr (IsClassDefinition<DefTy>::value)
 			{
-				auto cls = JObject<typename DefTy::Class>::jClass 
+				auto cls = JPureObject<typename DefTy::Class>::jClass 
 					= (jclass)env->NewGlobalRef(env->FindClass(jclassName<typename DefTy::Class>.data()));
 				if (!cls) return false;
 
-				JObject<typename DefTy::Class>::jInstField = env->GetFieldID(cls, "_inst", "J");
-				if (!JObject<typename DefTy::Class>::jInstField)
+				if constexpr (std::is_base_of_v<JObject<typename DefTy::Class>, typename DefTy::Class>)
 				{
-					std::cerr << jclassName<typename DefTy::Class> << " has no `_inst` field." << std::endl;
-					return false;
-				}
-
-				JObject<typename DefTy::Class>::jInitMethod = env->GetMethodID(cls, "<init>", "(J)V");
-				if (!JObject<typename DefTy::Class>::jInitMethod)
-				{
-					std::cerr << jclassName<typename DefTy::Class> << " has no constructor with a long argument" << std::endl;
-					return false;
-				}
-
-				auto defs = (JNINativeMethod*)def.methodDefs.data();
-				auto size = def.methodDefs.size();
-
-				size_t m = 0;
-				for (size_t i = 0; i < size; ++i)
-				{
-					if (!defs[i].name)
+					JObject<typename DefTy::Class>::jInstField = env->GetFieldID(cls, "_inst", "J");
+					if (!JObject<typename DefTy::Class>::jInstField)
 					{
-						defs[i].name = (char*)def.methodNames[m++];
+						std::cerr << jclassName<typename DefTy::Class> << " has no `_inst` field." << std::endl;
+						return false;
 					}
-				}
 
-				if (env->RegisterNatives(cls, defs, size) != JNI_OK) return false;
+					JObject<typename DefTy::Class>::jInitMethod = env->GetMethodID(cls, "<init>", "(J)V");
+					if (!JObject<typename DefTy::Class>::jInitMethod)
+					{
+						std::cerr << jclassName<typename DefTy::Class> << " has no constructor with a long argument" << std::endl;
+						return false;
+					}
+
+					auto defs = (JNINativeMethod*)def.methodDefs.data();
+					auto size = def.methodDefs.size();
+
+					size_t m = 0;
+					for (size_t i = 0; i < size; ++i)
+					{
+						if (!defs[i].name)
+						{
+							defs[i].name = (char*)def.methodNames[m++];
+						}
+					}
+
+					if (env->RegisterNatives(cls, defs, size) != JNI_OK) return false;
+				}
 
 				addedClasses.emplace_back(jclassName<typename DefTy::Class>.data());
 				return true;

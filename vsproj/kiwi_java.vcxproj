@@ -232,13 +232,13 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\bindings\java\kiwi_java.cpp">
+    <ClCompile Include="..\bindings\java\csrc\kiwi_java.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Disabled</Optimization>
       <InlineFunctionExpansion Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Disabled</InlineFunctionExpansion>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\bindings\java\JniUtils.hpp" />
+    <ClInclude Include="..\bindings\java\csrc\JniUtils.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -14,7 +14,6 @@ option(KIWI_BUILD_EVALUATOR  "Build Evaluator" ON)
 option(KIWI_BUILD_MODEL_BUILDER  "Build Model Builder" ON)
 option(KIWI_BUILD_TEST  "Build Test sets" ON)
 option(KIWI_JAVA_BINDING  "Build Java binding" OFF)
-option(KIWI_ANDROID_BINDING  "Build Android binding" OFF)
 set(KIWI_CPU_ARCH "" CACHE STRING "Set architecture type for macOS")
 
 if (NOT CMAKE_BUILD_TYPE)
@@ -31,11 +30,11 @@ if(NOT KIWI_CPU_ARCH)
   if (EMSCRIPTEN)
     set(KIWI_CPU_ARCH "wasm")
   elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)|(amd64)|(AMD64)"
-      OR ${ANDROID_ABI} STREQUAL "x86_64")
+      OR "${ANDROID_ABI}" STREQUAL "x86_64")
     set(KIWI_CPU_ARCH "x86_64")
   elseif (HOST_ARCHITECTURE MATCHES "^arm64" 
       OR CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm|aarch64)" 
-      OR ${ANDROID_ABI} STREQUAL "arm64-v8a")
+      OR "${ANDROID_ABI}" STREQUAL "arm64-v8a")
     set(KIWI_CPU_ARCH "arm64")
   else()
     set(KIWI_CPU_ARCH "other")
@@ -370,8 +369,4 @@ endif()
 
 if(EMSCRIPTEN)
   add_subdirectory( bindings/wasm )
-endif()
-
-if(KIWI_ANDROID_BINDING)
-  add_subdirectory( bindings/android/src/main/cpp )
 endif()

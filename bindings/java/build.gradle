@@ -27,7 +27,7 @@ android {
 
         externalNativeBuild {
             cmake {
-                arguments '-DKIWI_BUILD_DYNAMIC=OFF', '-DKIWI_USE_MIMALLOC=OFF', '-DKIWI_USE_CPUINFO=OFF', '-DKIWI_BUILD_CLI=OFF', '-DKIWI_BUILD_EVALUATOR=OFF', '-DKIWI_BUILD_MODEL_BUILDER=OFF', '-DKIWI_BUILD_TEST=OFF', '-DKIWI_ANDROID_BINDING=ON'
+                arguments '-DKIWI_BUILD_DYNAMIC=OFF', '-DKIWI_USE_MIMALLOC=OFF', '-DKIWI_USE_CPUINFO=OFF', '-DKIWI_BUILD_CLI=OFF', '-DKIWI_BUILD_EVALUATOR=OFF', '-DKIWI_BUILD_MODEL_BUILDER=OFF', '-DKIWI_BUILD_TEST=OFF', '-DKIWI_JAVA_BINDING=ON'
             }
         }
     }
@@ -53,7 +53,7 @@ android {
 
     sourceSets {
         main {
-            java.srcDirs = ['src/main/java']
+            java.srcDirs = ['src']
             jni.srcDirs = []
             jniLibs.srcDirs = []
         }
