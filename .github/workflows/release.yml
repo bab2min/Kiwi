@@ -79,7 +79,9 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
     - name: Configure Build
-      run: mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_DEPLOYMENT_TARGET=10.14 -DKIWI_CPU_ARCH=${{ matrix.arch }} -DKIWI_JAVA_BINDING=1 ..
+      run: | 
+        mkdir build && cd build
+        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_DEPLOYMENT_TARGET=10.14 -DKIWI_CPU_ARCH=${{ matrix.arch }} -DKIWI_JAVA_BINDING=1 ..
     - name: Build
       run: cd build && make -j2
     - run: |
@@ -127,7 +129,7 @@ jobs:
   build-windows:
     strategy:
       matrix:
-        os: [windows-2019]
+        os: [windows-2022]
         arch: [Win32, x64]
 
     runs-on: ${{ matrix.os }}
