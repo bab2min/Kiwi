@@ -31,7 +31,7 @@ jobs:
         cmakeBuildType: Release
         buildWithCMake: true
         #cmakeGenerator: VS16Win${{ matrix.arch }}
-        cmakeAppendedArgs: -G"Visual Studio 16 2019" -A${{ matrix.arch }} -DKIWI_JAVA_BINDING=1
+        cmakeAppendedArgs: -G"Visual Studio 17 2022" -A${{ matrix.arch }} -DKIWI_JAVA_BINDING=1
         buildWithCMakeArgs: --config Release
         buildDirectory: build
     - name: Run Evaluator
