@@ -70,7 +70,7 @@ public class Kiwi implements AutoCloseable  {
 		pvi = (byte)(pv | irregular),
 		pai = (byte)(pa | irregular);
 
-		static String toString(byte tag) {
+		public static String toString(byte tag) {
 			switch(tag) {
 				case unknown: return "UNK";
 				case nng: return "NNG";
@@ -433,19 +433,32 @@ public class Kiwi implements AutoCloseable  {
 	}
 
 	public static void loadLibrary() throws SecurityException, UnsatisfiedLinkError, NullPointerException {
+		boolean isAndroid;
 		try {
-			System.loadLibrary("KiwiJava-" + _version);
+			Class.forName("android.os.Build");
+			isAndroid = true;
+		} catch (ClassNotFoundException e) {
+			isAndroid = false;
+		}
+
+		if (isAndroid) {
+			System.loadLibrary("KiwiJava");
+			return;
+		}
+
+		try {
+			System.loadLibrary("KiwiJava");
 		} catch (UnsatisfiedLinkError e) {
 			InputStream in = null;
 			String foundName = null;
-			for (String name : new String[]{"KiwiJava-" + _version + ".dll", "libKiwiJava-" + _version + ".so", "libKiwiJava-" + _version + ".dylib"}) {
+			for (String name : new String[]{"KiwiJava.dll", "libKiwiJava.so", "libKiwiJava.dylib"}) {
 				in = Kiwi.class.getResourceAsStream("/" + name);
 				if (in != null) {
 					foundName = name;
 					break;
 				}
 			}
-			if (in == null) throw new UnsatisfiedLinkError("Cannot find a library named KiwiJava-" + _version);
+			if (in == null) throw new UnsatisfiedLinkError("Cannot find a library named KiwiJava");
 			byte[] buffer = new byte[4096];
 			int read = -1;
 			try {
