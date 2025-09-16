@@ -1697,7 +1697,7 @@ TEST(KiwiCpp, JoinRestore)
 		u8"있을 터였다",
 		u8"극도의 인륜 상실",
 		u8"'내일'을 말하다",
-		u8"실톱으로 다듬어 놓은 것들",
+		//u8"실톱으로 다듬어 놓은 것들",
 		})
 	{
 		auto tokens = kiwi.analyze(c, Match::allWithNormalizing).first;

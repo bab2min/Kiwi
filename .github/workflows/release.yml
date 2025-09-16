@@ -79,7 +79,9 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
     - name: Configure Build
-      run: mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_DEPLOYMENT_TARGET=10.14 -DKIWI_CPU_ARCH=${{ matrix.arch }} -DKIWI_JAVA_BINDING=1 ..
+      run: | 
+        mkdir build && cd build
+        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_DEPLOYMENT_TARGET=10.14 -DKIWI_CPU_ARCH=${{ matrix.arch }} -DKIWI_JAVA_BINDING=1 ..
     - name: Build
       run: cd build && make -j2
     - run: |
@@ -127,7 +129,7 @@ jobs:
   build-windows:
     strategy:
       matrix:
-        os: [windows-2019]
+        os: [windows-2022]
         arch: [Win32, x64]
 
     runs-on: ${{ matrix.os }}
@@ -248,6 +250,69 @@ jobs:
         upload_url: ${{ steps.get_release.outputs.upload_url }}
         asset_path: artifacts/kiwi-java.jar
         asset_name: kiwi-java-${{ steps.get_release.outputs.tag_name }}-lnx-${{ matrix.arch }}.jar
+        asset_content_type: application/octet-stream
+
+  build-android:
+    name: Android ARM64
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: true
+        lfs: true
+    - name: Get release
+      id: get_release
+      uses: bruceadams/get-release@v1.3.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+    - name: Setup Android NDK
+      uses: nttld/setup-ndk@v1
+      with:
+        ndk-version: r25c
+        add-to-path: true
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+    - name: Setup Gradle
+      uses: gradle/gradle-build-action@v2
+    - name: Grant execute permission for gradlew
+      run: chmod +x bindings/android/gradlew
+    - name: Build Android AAR
+      run: |
+        cd bindings/android
+        ./gradlew assembleRelease
+    - name: Package Android AAR release
+      run: |
+        cd bindings/android
+        # Copy the built AAR with correct name
+        find build/outputs/aar/ -name "*.aar" -exec cp {} kiwi-android.aar \; 2>/dev/null || echo "AAR file not found, checking directory structure"
+        echo "Contents of build/outputs/:"
+        find build/outputs/ -type f 2>/dev/null || echo "build/outputs/ not found"
+        
+        # Also create a traditional native library package for backwards compatibility
+        mkdir -p result/include result/lib
+        find build -name "*.so" -exec cp {} result/lib/ \; 2>/dev/null || echo "No .so files found"
+        cp -r ../../include/kiwi result/include/ 2>/dev/null || echo "Include directory not found"
+        cd result && tar -zcvf ../kiwi_android_arm64_compat.tgz include/ lib/ && cd ..
+    - name: Upload Android AAR
+      uses: actions/upload-release-asset@v1.0.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+      with:
+        upload_url: ${{ steps.get_release.outputs.upload_url }}
+        asset_path: bindings/android/kiwi-android.aar
+        asset_name: kiwi-android-${{ steps.get_release.outputs.tag_name }}.aar
+        asset_content_type: application/octet-stream
+    - name: Upload Android native library (compatibility)
+      uses: actions/upload-release-asset@v1.0.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+      with:
+        upload_url: ${{ steps.get_release.outputs.upload_url }}
+        asset_path: bindings/android/kiwi_android_arm64_compat.tgz
+        asset_name: kiwi_android_arm64_${{ steps.get_release.outputs.tag_name }}.tgz
         asset_content_type: application/octet-stream
 
   build-emscripten:

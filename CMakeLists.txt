@@ -8,6 +8,7 @@ set ( CMAKE_VERBOSE_MAKEFILE true )
 option(KIWI_USE_MIMALLOC  "Use mimalloc for faster memory allocation" ON)
 option(KIWI_USE_CPUINFO  "Use cpuinfo for dynamic CPU dispatching" ON)
 option(KIWI_STATIC_WITHOUT_MT  "Use /MT Option in building kiwi_static" OFF)
+option(KIWI_BUILD_DYNAMIC  "Build dynamic library" ON)
 option(KIWI_BUILD_CLI  "Build CLI tool" ON)
 option(KIWI_BUILD_EVALUATOR  "Build Evaluator" ON)
 option(KIWI_BUILD_MODEL_BUILDER  "Build Model Builder" ON)
@@ -28,9 +29,12 @@ endif()
 if(NOT KIWI_CPU_ARCH)
   if (EMSCRIPTEN)
     set(KIWI_CPU_ARCH "wasm")
-  elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)|(amd64)|(AMD64)")
+  elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)|(amd64)|(AMD64)"
+      OR "${ANDROID_ABI}" STREQUAL "x86_64")
     set(KIWI_CPU_ARCH "x86_64")
-  elseif (HOST_ARCHITECTURE MATCHES "^arm64" OR CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm|aarch64)")
+  elseif (HOST_ARCHITECTURE MATCHES "^arm64" 
+      OR CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm|aarch64)" 
+      OR "${ANDROID_ABI}" STREQUAL "arm64-v8a")
     set(KIWI_CPU_ARCH "arm64")
   else()
     set(KIWI_CPU_ARCH "other")
@@ -147,7 +151,9 @@ if(MSVC)
   set ( CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO}")
   set ( CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_EXE_LINKER_FLAGS_RELEASE}" )
 else()
-  link_libraries ( pthread )
+  if(NOT ANDROID)
+    link_libraries ( pthread )
+  endif()
 
   set ( CMAKE_C_FLAGS_DEBUG "-DDEBUG -DC_FLAGS -g3 -O0" )
   set ( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}" )
@@ -157,7 +163,7 @@ else()
   set ( CMAKE_CXX_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}" )
   set ( CMAKE_EXE_LINKER_FLAGS_RELEASE "-DRELEASE -DLINKER_FLAGS" )
 
-  set ( CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELEASE} -g3")
+  set ( CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELEASE} -g")
   set ( CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO}")
   set ( CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_EXE_LINKER_FLAGS_RELEASE}" )
 
@@ -218,7 +224,7 @@ elseif (KIWI_CPU_ARCH MATCHES "arm64")
     ${CORE_SRCS}
     src/archImpl/neon.cpp
   )
-  set_source_files_properties(src/archImpl/neon.cpp PROPERTIES COMPILE_FLAGS "-march=armv8-a")
+  set_source_files_properties(src/archImpl/neon.cpp PROPERTIES COMPILE_FLAGS "-march=armv8-a -DKIWI_ARCH_ARM64=1")
 elseif (KIWI_CPU_ARCH MATCHES "wasm")
   message("Compiling for wasm")
 else()
@@ -232,27 +238,30 @@ add_library( "${PROJECT_NAME}_static" STATIC
   ${STREAMVBYTE_OBJECTS}
 )
 
-add_library( "${PROJECT_NAME}" SHARED
-  ${CORE_SRCS}
-  src/capi/kiwi_c.cpp
-  ${CPUINFO_OBJECTS_SHARED}
-  ${STREAMVBYTE_OBJECTS}
-)
+install(TARGETS ${PROJECT_NAME}_static PUBLIC_HEADER DESTINATION include/kiwi)
 
 # Install the kiwi library as well as header files to (`include/kiwi` directory)
 # so that a user can use it in their own projects that are not cmake projects.
 file(GLOB KIWI_INCLUDE_FILES "include/kiwi/*.h" "include/kiwi/*.hpp")
-set_target_properties("${PROJECT_NAME}" PROPERTIES
-    VERSION ${PROJECT_VERSION}
-    SOVERSION ${PROJECT_VERSION_MAJOR}
-    PUBLIC_HEADER "${KIWI_INCLUDE_FILES}"
-)
 
-install(TARGETS ${PROJECT_NAME}_static PUBLIC_HEADER DESTINATION include/kiwi)
-install(TARGETS ${PROJECT_NAME} PUBLIC_HEADER DESTINATION include/kiwi)
+if(KIWI_BUILD_DYNAMIC)
+  add_library( "${PROJECT_NAME}" SHARED
+    ${CORE_SRCS}
+    src/capi/kiwi_c.cpp
+    ${CPUINFO_OBJECTS_SHARED}
+    ${STREAMVBYTE_OBJECTS}
+  )
+  set_target_properties("${PROJECT_NAME}" PROPERTIES
+      VERSION ${PROJECT_VERSION}
+      SOVERSION ${PROJECT_VERSION_MAJOR}
+      PUBLIC_HEADER "${KIWI_INCLUDE_FILES}"
+  )
+
+  install(TARGETS ${PROJECT_NAME} PUBLIC_HEADER DESTINATION include/kiwi)
+  target_compile_options("${PROJECT_NAME}" PRIVATE "${ADDITIONAL_FLAGS}")
+endif()
 
 target_compile_options("${PROJECT_NAME}_static" PRIVATE "${ADDITIONAL_FLAGS}")
-target_compile_options("${PROJECT_NAME}" PRIVATE "${ADDITIONAL_FLAGS}")
 
 #target_link_libraries("${PROJECT_NAME}_static" cpuinfo_internals)
 #target_link_libraries("${PROJECT_NAME}" cpuinfo)
@@ -310,12 +319,14 @@ if(MSVC)
     )
   endif()
 
-  target_compile_options("${PROJECT_NAME}" PUBLIC
-    /MT
-  )
+  if(KIWI_BUILD_DYNAMIC)
+    target_compile_options("${PROJECT_NAME}" PUBLIC
+      /MT
+    )
+  endif()
 endif()
 
-if(UNIX AND NOT APPLE)
+if(UNIX AND NOT APPLE AND NOT ANDROID)
   target_link_libraries( "${PROJECT_NAME}_static"
     rt
   )
@@ -333,9 +344,11 @@ if(UNIX AND NOT APPLE)
   endif()
 endif()
 
-target_compile_definitions("${PROJECT_NAME}"
-  PUBLIC DLL_EXPORT=1
-)
+if(KIWI_BUILD_DYNAMIC)
+  target_compile_definitions("${PROJECT_NAME}"
+    PUBLIC DLL_EXPORT=1
+  )
+endif()
 
 if(KIWI_BUILD_TEST)
   add_subdirectory( third_party/googletest )

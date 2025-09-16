@@ -523,18 +523,14 @@ public:
 	}
 };
 
-class JStreamProvider : jni::JObject<JStreamProvider>
+class JStreamProvider : jni::JPureObject<JStreamProvider>
 {
 public:
-	static constexpr std::string_view className = "kr/pe/bab2min/Kiwi$StreamProvider";
+	static constexpr std::string_view className = "kr/pe/bab2min/KiwiBuilder$StreamProvider";
 };
 
 class JKiwiBuilder : public kiwi::KiwiBuilder, jni::JObject<JKiwiBuilder>
 {
-private:
-	JavaVM* jvm = nullptr;
-	jobject streamProviderGlobalRef = nullptr;
-
 public:
 	static constexpr std::string_view className = "kr/pe/bab2min/KiwiBuilder";
 
@@ -552,48 +548,31 @@ private:
 	private:
 		class JavaStreamBuf : public std::streambuf {
 		private:
-			JavaVM* jvm;
-			jobject inputStreamGlobalRef;
-			jmethodID readMethod;
-			jmethodID closeMethod;
+			JNIEnv* env = nullptr;
+			jobject inputStreamGlobalRef = nullptr;
+			jmethodID readMethod = nullptr;
+			jmethodID closeMethod = nullptr;
 			std::vector<char> buffer;
 			static constexpr const size_t buffer_size = 8192;
-			bool closed;
 			
 		public:
-			JavaStreamBuf(JavaVM* vm, jobject inputStream) 
-				: jvm(vm), inputStreamGlobalRef(nullptr), readMethod(nullptr), closeMethod(nullptr), 
-				  buffer(buffer_size), closed(false) {
+			JavaStreamBuf(JNIEnv* _env, jobject inputStream) 
+				: env(_env), buffer(buffer_size) {
+
+				inputStreamGlobalRef = env->NewGlobalRef(inputStream);
 				
-				JNIEnv* env = nullptr;
-				if (jvm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_8) == JNI_OK) {
-					inputStreamGlobalRef = env->NewGlobalRef(inputStream);
-					
-					jclass inputStreamClass = env->FindClass("java/io/InputStream");
-					readMethod = env->GetMethodID(inputStreamClass, "read", "([B)I");
-					closeMethod = env->GetMethodID(inputStreamClass, "close", "()V");
-				}
-				
+				jclass inputStreamClass = env->FindClass("java/io/InputStream");
+				readMethod = env->GetMethodID(inputStreamClass, "read", "([B)I");
+				closeMethod = env->GetMethodID(inputStreamClass, "close", "()V");
 				setg(buffer.data(), buffer.data(), buffer.data());
 			}
 			
 			~JavaStreamBuf() {
-				if (!closed && inputStreamGlobalRef && closeMethod) {
-					JNIEnv* env = nullptr;
-					bool shouldDetach = false;
+				if (inputStreamGlobalRef && closeMethod) {
+					env->CallVoidMethod(inputStreamGlobalRef, closeMethod);
+					env->DeleteGlobalRef(inputStreamGlobalRef);
 					
-					jint getEnvResult = jvm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_8);
-					if (getEnvResult == JNI_EDETACHED) {
-						if (jvm->AttachCurrentThread(reinterpret_cast<void**>(&env), nullptr) == JNI_OK) {
-							shouldDetach = true;
-						}
-					}
-					
-					if (env) {
-						env->CallVoidMethod(inputStreamGlobalRef, closeMethod);
-						env->DeleteGlobalRef(inputStreamGlobalRef);
-						if (shouldDetach) jvm->DetachCurrentThread();
-					}
+					inputStreamGlobalRef = nullptr;
 				}
 			}
 			
@@ -603,21 +582,7 @@ private:
 					return traits_type::to_int_type(*gptr());
 				}
 				
-				if (closed || !inputStreamGlobalRef || !readMethod) {
-					return traits_type::eof();
-				}
-				
-				JNIEnv* env = nullptr;
-				bool shouldDetach = false;
-				
-				jint getEnvResult = jvm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_8);
-				if (getEnvResult == JNI_EDETACHED) {
-					if (jvm->AttachCurrentThread(reinterpret_cast<void**>(&env), nullptr) != JNI_OK) {
-						return traits_type::eof();
-					}
-					shouldDetach = true;
-				}
-				else if (getEnvResult != JNI_OK) {
+				if (!inputStreamGlobalRef || !readMethod) {
 					return traits_type::eof();
 				}
 				
@@ -628,7 +593,6 @@ private:
 					if (bytesRead <= 0 || env->ExceptionCheck()) {
 						if (env->ExceptionCheck()) env->ExceptionClear();
 						env->DeleteLocalRef(byteArray);
-						if (shouldDetach) jvm->DetachCurrentThread();
 						return traits_type::eof();
 					}
 					
@@ -638,14 +602,11 @@ private:
 							  buffer.data());
 					env->ReleaseByteArrayElements(byteArray, bytes, JNI_ABORT);
 					env->DeleteLocalRef(byteArray);
-					
-					if (shouldDetach) jvm->DetachCurrentThread();
-					
+										
 					setg(buffer.data(), buffer.data(), buffer.data() + bytesRead);
 					return traits_type::to_int_type(*gptr());
 				}
 				catch (...) {
-					if (shouldDetach) jvm->DetachCurrentThread();
 					return traits_type::eof();
 				}
 			}
@@ -663,37 +624,16 @@ private:
 		JavaStreamBuf buf;
 		
 	public:
-		JavaStreamAdapter(JavaVM* jvm, jobject inputStream) : std::istream(&buf), buf(jvm, inputStream) {}
+		JavaStreamAdapter(JNIEnv* env, jobject inputStream) : std::istream(&buf), buf(env, inputStream) {}
 	};
 
 	kiwi::KiwiBuilder::StreamProvider createStreamProviderWrapper(jni::JRef<JStreamProvider> streamProvider)
 	{
-		JNIEnv* env = getCurrentEnv();
-		jvm = getJVM();
-		streamProviderGlobalRef = env->NewGlobalRef(streamProvider);
-		
-		return [this](const std::string& filename) -> std::unique_ptr<std::istream>
+		return [this, provider = jni::JUniqueGlobalRef<JStreamProvider>(streamProvider)](const std::string& filename) -> std::unique_ptr<std::istream>
 		{
-			JNIEnv* env = nullptr;
-			bool shouldDetach = false;
-			
-			// Get JNIEnv for current thread
-			jint getEnvResult = jvm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_8);
-			if (getEnvResult == JNI_EDETACHED)
-			{
-				if (jvm->AttachCurrentThread(reinterpret_cast<void**>(&env), nullptr) != JNI_OK)
-				{
-					return nullptr;
-				}
-				shouldDetach = true;
-			}
-			else if (getEnvResult != JNI_OK)
-			{
-				return nullptr;
-			}
-			
 			try
 			{
+				JNIEnv* env = provider.getEnv();
 				// Get StreamProvider.provide method
 				jclass streamProviderClass = JObject<JStreamProvider>::jClass;
 				jmethodID provideMethod = env->GetMethodID(streamProviderClass, "provide", "(Ljava/lang/String;)Ljava/io/InputStream;");
@@ -702,57 +642,25 @@ private:
 				jstring jFilename = env->NewStringUTF(filename.c_str());
 				
 				// Call provide method
-				jobject inputStream = env->CallObjectMethod(streamProviderGlobalRef, provideMethod, jFilename);
+				jobject inputStream = env->CallObjectMethod(provider, provideMethod, jFilename);
 				
 				if (!inputStream || env->ExceptionCheck())
 				{
 					if (env->ExceptionCheck()) env->ExceptionClear();
-					if (shouldDetach) jvm->DetachCurrentThread();
 					return nullptr;
 				}
 				
 				// Create streaming adapter that reads on-demand
-				auto adapter = std::make_unique<JavaStreamAdapter>(jvm, inputStream);
-				
-				if (shouldDetach) jvm->DetachCurrentThread();
-				
-				return std::move(adapter);
+				return std::make_unique<JavaStreamAdapter>(env, inputStream);
 			}
 			catch (...)
 			{
-				if (shouldDetach) jvm->DetachCurrentThread();
 				return nullptr;
 			}
 		};
 	}
 	
-	JNIEnv* getCurrentEnv()
-	{
-		JNIEnv* env = nullptr;
-		JavaVM* vm = getJVM();
-		vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_8);
-		return env;
-	}
-	
-	JavaVM* getJVM()
-	{
-		// This should be set by the JNI framework - we'll access it via the module
-		JavaVM* vm = nullptr;
-		jsize vmCount;
-		JNI_GetCreatedJavaVMs(&vm, 1, &vmCount);
-		return vm;
-	}
-
 public:
-	~JKiwiBuilder()
-	{
-		if (streamProviderGlobalRef)
-		{
-			JNIEnv* env = getCurrentEnv();
-			if (env) env->DeleteGlobalRef(streamProviderGlobalRef);
-		}
-	}
-
 	bool addWord(const std::u16string& form, kiwi::POSTag tag, float score)
 	{
 		return KiwiBuilder::addWord(form, tag, score).second;
@@ -789,7 +697,7 @@ public:
 	}
 };
 
-jni::Module gModule{ JNI_VERSION_1_8 };
+jni::Module gModule{ JNI_VERSION_1_6 };
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved)
 {

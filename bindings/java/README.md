@@ -90,4 +90,94 @@ public class KiwiExample {
 
 ```
 
-자세한 예시는 [kr/pe/bab2min/](kr/pe/bab2min/) 내의 Kiwi.java, KiwiBuilder.java 및 KiwiTest.java 파일을 참조해주세요.
+자세한 예시는 [src/kr/pe/bab2min/](src/kr/pe/bab2min/) 내의 Kiwi.java, KiwiBuilder.java 및 [test/](test/) 내의 KiwiTest.java 파일을 참조해주세요.
+
+## Android에서 사용하기
+
+### 1. AAR 파일 사용
+
+GitHub Releases에서 `kiwi-android-VERSION.aar` 파일을 다운로드하고 프로젝트에 추가:
+
+1. 다운로드한 AAR 파일을 `app/libs/` 폴더에 복사
+2. `app/build.gradle`에 다음 추가:
+
+```gradle
+android {
+    ...
+}
+
+dependencies {
+    implementation files('libs/kiwi-android-VERSION.aar')
+    ...
+}
+```
+
+### 2. 소스에서 빌드
+
+이 디렉토리에서 직접 빌드할 수도 있습니다:
+
+```bash
+cd bindings/java
+./gradlew assembleRelease
+```
+
+빌드된 AAR 파일은 `build/outputs/aar/` 디렉토리에 생성됩니다.
+
+## 사용 방법
+```kotlin
+package example
+
+import android.os.Bundle
+import android.util.Log
+import androidx.activity.ComponentActivity
+
+import kr.pe.bab2min.Kiwi
+import kr.pe.bab2min.KiwiBuilder
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        try {
+            // 모델 파일을 assets 내의 kiwi_model/ 폴더에 넣었다고 가정
+            val streamProvider = KiwiBuilder.StreamProvider { filename ->
+                try {
+                    // assets 내의 kiwi_model/ 폴더 내의 파일을 연다.
+                    assets.open("kiwi_model/$filename")
+                } catch (e: Exception) {
+                    null // 파일이 없으면 null 반환
+                }
+            }
+
+            val kiwi = KiwiBuilder(streamProvider).build()
+            val res = kiwi.tokenize("안드로이드에서도 Kiwi를!", Kiwi.Match.allWithNormalizing)
+            for (token in res) {
+                Log.d("Kiwi", "${token.form} / ${Kiwi.POSTag.toString(token.tag)}")
+            }
+            /* 다음과 같이 출력됨
+            안드로이드 / NNG
+            에서 / JKB
+            도 / JX
+            Kiwi / SL
+            를 / JKO
+            ! / SF
+            */
+        } catch (e: Exception) {
+            Log.e("Kiwi", "Error", e)
+        }
+    }
+}
+```
+
+## 요구사항
+
+- Android API Level 21+ (Android 5.0)
+- ARM64-v8a 아키텍처
+- Java 8+
+
+## 모델 파일
+
+모델 파일은 별도로 다운로드해야 합니다:
+1. GitHub Releases에서 `kiwi_model_VERSION_base.tgz` 다운로드
+2. 압축 해제 후 Android 앱의 assets 폴더에 복사
+3. 런타임에 내부 저장소로 복사한 뒤 파일 경로로 접근하거나 KiwiBuilder.StreamProvider를 사용하여 assets에서 직접 읽도록 설정

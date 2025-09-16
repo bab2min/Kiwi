@@ -563,13 +563,33 @@ namespace kiwi
 		utils::MemoryObject createMemoryObjectFromStream(std::istream& stream)
 		{
 			stream.seekg(0, std::ios::end);
-			size_t size = stream.tellg();
-			stream.seekg(0, std::ios::beg);
-			
-			auto memoryOwner = std::make_shared<utils::MemoryOwner>(size);
-			stream.read(static_cast<char*>(memoryOwner->get()), size);
-			
-			return utils::MemoryObject(std::move(*memoryOwner));
+			if (stream) // seekable stream
+			{
+				size_t size = stream.tellg();
+				stream.seekg(0, std::ios::beg);
+				
+				auto memoryOwner = std::make_shared<utils::MemoryOwner>(size);
+				stream.read(static_cast<char*>(memoryOwner->get()), size);
+				
+				return utils::MemoryObject(std::move(*memoryOwner));
+			}
+			else // non-seekable stream
+			{
+				stream.clear();
+				std::vector<char> buffer;
+				static constexpr size_t chunkSize = 4096;
+				char chunk[chunkSize];
+				while (stream)
+				{
+					stream.read(chunk, chunkSize);
+					buffer.insert(buffer.end(), chunk, chunk + stream.gcount());
+				}
+				
+				auto memoryOwner = std::make_shared<utils::MemoryOwner>(buffer.size());
+				std::memcpy(memoryOwner->get(), buffer.data(), buffer.size());
+				
+				return utils::MemoryObject(std::move(*memoryOwner));
+			}
 		}
 	}
 }

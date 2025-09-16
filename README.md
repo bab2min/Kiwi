@@ -39,7 +39,7 @@ Kiwi는 빠른 속도와 범용적인 성능을 지향하는 한국어 형태소
 ### C++
 
 #### 컴파일된 바이너리 다운로드
-https://github.com/bab2min/Kiwi/releases 에서 Windows, Linux, macOS 버전으로 컴파일된 Library 파일과 모델 파일을 다운로드 받을 수 있습니다.
+https://github.com/bab2min/Kiwi/releases 에서 Windows, Linux, macOS, Android 버전으로 컴파일된 Library 파일과 모델 파일을 다운로드 받을 수 있습니다.
 
 #### Windows
 Visual Studio 2019 이상을 사용하여 `Kiwi.sln` 파일을 실행하여 컴파일할 수 있습니다.
@@ -126,7 +126,7 @@ Avg Score
 include/kiwi/capi.h 를 참조하세요.
 
 #### 컴파일된 바이너리 다운로드
-https://github.com/bab2min/Kiwi/releases 에서 Windows, Linux, macOS 버전으로 컴파일된 Library 파일과 모델 파일을 다운로드 받을 수 있습니다.
+https://github.com/bab2min/Kiwi/releases 에서 Windows, Linux, macOS, Android 버전으로 컴파일된 Library 파일과 모델 파일을 다운로드 받을 수 있습니다.
 
 ### C# Wrapper
 https://github.com/bab2min/kiwi-gui 에서 공식 GUI 툴에 사용되는 C# Wrapper를 찾으실 수 있습니다. 
@@ -138,6 +138,12 @@ https://github.com/bab2min/kiwi-gui 에서 공식 GUI 툴에 사용되는 C# Wra
 
 ### Java Wrapper
 Java 1.8 이상에서 사용 가능한 KiwiJava가 Java binding으로 제공됩니다. 이에 대해서는 [bindings/java](bindings/java)를 참조하시길 바랍니다.
+
+### Android Library
+Android NDK를 통해 Android 앱에서 사용할 수 있는 AAR 라이브러리가 제공됩니다. GitHub Releases에서 `kiwi-android-VERSION.aar` 파일을 다운로드하여 Android 프로젝트에 추가하면 됩니다. 
+- **최소 요구사항**: Android API Level 21+, ARM64 아키텍처
+- **사용법**: [bindings/android](bindings/android)의 README 참조
+- **패키지**: AAR 형태로 제공되어 Gradle 프로젝트에 쉽게 통합 가능
 
 ### R Wrapper
 [mrchypark](https://github.com/mrchypark)님께서 기여해주신 R언어용 wrapper인 [elbird](https://mrchypark.github.io/elbird/)가 있습니다.
