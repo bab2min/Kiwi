@@ -1569,7 +1569,8 @@ void KiwiBuilder::addCombinedMorpheme(
 	UnorderedMap<size_t, Vector<uint32_t>>& newFormCands,
 	size_t leftId,
 	size_t rightId,
-	const cmb::Result& r
+	const cmb::Result& r,
+	Map<int, int>* ruleProfilingCnt
 ) const
 {
 	const auto& getMorph = [&](size_t id) -> const MorphemeRaw&
@@ -1639,6 +1640,11 @@ void KiwiBuilder::addCombinedMorpheme(
 	const size_t fid = addForm(newForms, newFormMap, r.str);
 	newFormCands[fid].emplace_back(newId);
 	newMorph.kform = fid;
+
+	if (ruleProfilingCnt)
+	{
+		(*ruleProfilingCnt)[r.ruleLineNo]++;
+	}
 }
 
 void KiwiBuilder::addCombinedMorphemes(
@@ -1648,7 +1654,8 @@ void KiwiBuilder::addCombinedMorphemes(
 	UnorderedMap<size_t, Vector<uint32_t>>& newFormCands,
 	size_t leftId, 
 	size_t rightId, 
-	size_t ruleId
+	size_t ruleId,
+	Map<int, int>* ruleProfilingCnt
 ) const
 {
 	const auto& getMorph = [&](size_t id) -> const MorphemeRaw&
@@ -1688,7 +1695,7 @@ void KiwiBuilder::addCombinedMorphemes(
 		{
 			continue;
 		}
-		addCombinedMorpheme(newForms, newFormMap, newMorphemes, newFormCands, leftId, rightId, r);
+		addCombinedMorpheme(newForms, newFormMap, newMorphemes, newFormCands, leftId, rightId, r, ruleProfilingCnt);
 	}
 
 	if (isEClass(leftMorph.tag) && leftForm[0] == u'어')
@@ -1707,7 +1714,7 @@ void KiwiBuilder::addCombinedMorphemes(
 			{
 				continue;
 			}
-			addCombinedMorpheme(newForms, newFormMap, newMorphemes, newFormCands, leftId, rightId, r);
+			addCombinedMorpheme(newForms, newFormMap, newMorphemes, newFormCands, leftId, rightId, r, ruleProfilingCnt);
 		}
 	}
 }
@@ -1716,7 +1723,8 @@ void KiwiBuilder::buildCombinedMorphemes(
 	Vector<FormRaw>& newForms, 
 	UnorderedMap<KString, size_t>& newFormMap,
 	Vector<MorphemeRaw>& newMorphemes, 
-	UnorderedMap<size_t, Vector<uint32_t>>& newFormCands
+	UnorderedMap<size_t, Vector<uint32_t>>& newFormCands,
+	Map<int, int>* ruleProfilingCnt
 ) const
 {
 	const auto& getMorph = [&](size_t id) -> const MorphemeRaw&
@@ -1878,7 +1886,7 @@ void KiwiBuilder::buildCombinedMorphemes(
 			{
 				for (auto rit = rs.begin(); rit != rmid; ++rit)
 				{
-					addCombinedMorphemes(newForms, newFormMap, newMorphemes, newFormCands, *lit, *rit, ruleId);
+					addCombinedMorphemes(newForms, newFormMap, newMorphemes, newFormCands, *lit, *rit, ruleId, ruleProfilingCnt);
 				}
 			}
 
@@ -1886,7 +1894,7 @@ void KiwiBuilder::buildCombinedMorphemes(
 			{
 				for (auto rit = rmid; rit != rs.end(); ++rit)
 				{
-					addCombinedMorphemes(newForms, newFormMap, newMorphemes, newFormCands, *lit, *rit, ruleId);
+					addCombinedMorphemes(newForms, newFormMap, newMorphemes, newFormCands, *lit, *rit, ruleId, ruleProfilingCnt);
 				}
 			}
 		}
@@ -2292,7 +2300,19 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 	UnorderedMap<KString, size_t> newFormMap;
 	UnorderedMap<size_t, Vector<uint32_t>> newFormCands;
 
-	buildCombinedMorphemes(combinedForms, newFormMap, combinedMorphemes, newFormCands);
+	Map<int, int> ruleProfilingCnt;
+	buildCombinedMorphemes(combinedForms, newFormMap, combinedMorphemes, newFormCands, &ruleProfilingCnt);
+
+	Vector<std::pair<int, float>> ruleProfilingPercent;
+	int totalCnt = accumulate(ruleProfilingCnt.begin(), ruleProfilingCnt.end(), 0, [](int a, const pair<int, int>& b) { return a + b.second; });
+	for (auto& p : ruleProfilingCnt)
+	{
+		ruleProfilingPercent.emplace_back(p.first, (float)p.second * 100.f / (float)totalCnt);
+	}
+	sort(ruleProfilingPercent.begin(), ruleProfilingPercent.end(), [](const pair<int, float>& a, const pair<int, float>& b)
+	{
+		return a.second > b.second;
+	});
 
 	ret.forms.reserve(forms.size() + combinedForms.size() + 1);
 	ret.morphemes.reserve(morphemes.size() + combinedMorphemes.size());

@@ -732,7 +732,7 @@ MultiRuleDFAErased RuleSet::buildRightPattern(const Vector<Rule>& rules)
 
 void RuleSet::addRule(const string& lTag, const string& rTag,
 	const KString& lPat, const KString& rPat, const vector<ReplString>& results,
-	CondVowel leftVowel, CondPolarity leftPolar, bool ignoreRCond,
+	CondVowel leftVowel, CondPolarity leftPolar, bool ignoreRCond, int lineNo,
 	Dialect dialect
 )
 {
@@ -767,13 +767,13 @@ void RuleSet::addRule(const string& lTag, const string& rTag,
 		{
 			bPat[0] = joinOnsetVowel(onset, lPatVowel);
 			for (size_t n = 0; n < results.size(); ++n) bResults[n].str[0] = joinOnsetVowel(onset, resultsVowel[n]);
-			rules.emplace_back(bPat, rPat, bResults, dialect, leftVowel, leftPolar, ignoreRCond);
+			rules.emplace_back(bPat, rPat, bResults, dialect, leftVowel, leftPolar, ignoreRCond, lineNo);
 		}
 	}
 	else
 	{
 		rules.emplace_back(lPat, rPat, Vector<ReplString>{ results.begin(), results.end() }, 
-			dialect, leftVowel, leftPolar, ignoreRCond);
+			dialect, leftVowel, leftPolar, ignoreRCond, lineNo);
 	}
 
 	for (auto l : lTags)
@@ -803,11 +803,13 @@ void RuleSet::loadRules(istream& istr)
 {
 	using namespace std::literals;
 
+	int lineNo = 0;
 	string line;
 	string lTag, rTag;
 	Dialect dialect = Dialect::standard;
 	while (getline(istr, line))
 	{
+		++lineNo;
 		if (line[0] == '#') continue;
 		while (!line.empty() && ((uint8_t)line.back() < 0x80) && isSpace(line.back())) line.pop_back();
 		if (line.empty()) continue;
@@ -890,6 +892,7 @@ void RuleSet::loadRules(istream& istr)
 				cv, 
 				cp,
 				ignoreRCond,
+				lineNo,
 				dialect
 			);
 		}
@@ -1001,6 +1004,7 @@ Vector<Result> MultiRuleDFA<NodeSizeTy, GroupSizeTy>::combine(U16StringView left
 			finish[finishGroup[nidx]].leftVowel,
 			finish[finishGroup[nidx]].leftPolarity,
 			finish[finishGroup[nidx]].ignoreRCond,
+			finish[finishGroup[nidx]].ruleLineNo,
 			r.score
 		);
 	}

@@ -573,6 +573,7 @@ namespace kiwi
 		std::shared_ptr<lm::ILangModel> langMdl;
 		std::shared_ptr<cmb::CompiledRule> combiningRule;
 		WordDetector detector;
+		Map<int, int> ruleProfilingCnt;
 
 		size_t numThreads = 0;
 		BuildOption options = BuildOption::none;
@@ -675,7 +676,8 @@ namespace kiwi
 			UnorderedMap<size_t, Vector<uint32_t>>& newFormCands,
 			size_t leftId,
 			size_t rightId,
-			const cmb::Result& r
+			const cmb::Result& r,
+			Map<int, int>* ruleProfilingCnt = nullptr
 		) const;
 
 		void addCombinedMorphemes(
@@ -685,14 +687,16 @@ namespace kiwi
 			UnorderedMap<size_t, Vector<uint32_t>>& newFormCands,
 			size_t leftId,
 			size_t rightId,
-			size_t ruleId
+			size_t ruleId,
+			Map<int, int>* ruleProfilingCnt = nullptr
 		) const;
 
 		void buildCombinedMorphemes(
 			Vector<FormRaw>& newForms,
 			UnorderedMap<KString, size_t>& newFormMap,
 			Vector<MorphemeRaw>& newMorphemes,
-			UnorderedMap<size_t, Vector<uint32_t>>& newFormCands
+			UnorderedMap<size_t, Vector<uint32_t>>& newFormCands,
+			Map<int, int>* ruleProfilingCnt = nullptr
 		) const;
 
 		void addAllomorphsToRule();

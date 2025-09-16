@@ -34,14 +34,17 @@ namespace kiwi
 			CondVowel leftVowel;
 			CondPolarity leftPolarity;
 			bool ignoreRCond;
+			int ruleLineNo;
 
 			Replacement(Vector<ReplString> _repl = {},
 				Dialect _dialect = Dialect::standard,
 				CondVowel _leftVowel = CondVowel::none,
 				CondPolarity _leftPolar = CondPolarity::none,
-				bool _ignoreRCond = false
-			) : repl{ _repl }, dialect{ _dialect }, 
-				leftVowel{_leftVowel}, leftPolarity{_leftPolar}, ignoreRCond{_ignoreRCond}
+				bool _ignoreRCond = false,
+				int _ruleLineNo = 0
+			) : repl{ _repl }, dialect{ _dialect },
+				leftVowel{ _leftVowel }, leftPolarity{ _leftPolar }, ignoreRCond{ _ignoreRCond },
+				ruleLineNo{ _ruleLineNo }
 			{
 			}
 		};
@@ -55,6 +58,7 @@ namespace kiwi
 			CondVowel vowel;
 			CondPolarity polar;
 			bool ignoreRCond;
+			int ruleLineNo;
 			float score;
 
 			Result(const KString& _str = {},
@@ -64,9 +68,10 @@ namespace kiwi
 				CondVowel _vowel = CondVowel::none,
 				CondPolarity _polar = CondPolarity::none,
 				bool _ignoreRCond = false,
+				int _ruleLineNo = 0,
 				float _score = 0
-			) : str{ _str }, leftEnd{ _leftEnd }, rightBegin{ _rightBegin }, dialect{ _dialect }, 
-				vowel{ _vowel }, polar{ _polar }, ignoreRCond{ _ignoreRCond }, score{ _score }
+			) : str{ _str }, leftEnd{ _leftEnd }, rightBegin{ _rightBegin }, dialect{ _dialect },
+				vowel{ _vowel }, polar{ _polar }, ignoreRCond{ _ignoreRCond }, ruleLineNo{ _ruleLineNo }, score{ _score }
 			{
 			}
 		};
@@ -347,9 +352,10 @@ namespace kiwi
 					Dialect _dialect = Dialect::standard,
 					CondVowel _leftVowel = CondVowel::none,
 					CondPolarity _leftPolar = CondPolarity::none,
-					bool _ignoreRCond = false
+					bool _ignoreRCond = false,
+					int _lineNo = 0
 				)
-					: left{ _left }, right { _right }, repl{ _results, _dialect, _leftVowel, _leftPolar, _ignoreRCond }
+					: left{ _left }, right{ _right }, repl{ _results, _dialect, _leftVowel, _leftPolar, _ignoreRCond, _lineNo }
 				{
 				}
 			};
@@ -390,7 +396,7 @@ namespace kiwi
 
 			void addRule(const std::string& lTag, const std::string& rTag,
 				const KString& lPat, const KString& rPat, const std::vector<ReplString>& results,
-				CondVowel leftVowel, CondPolarity leftPolar, bool ignoreRCond,
+				CondVowel leftVowel, CondPolarity leftPolar, bool ignoreRCond, int lineNo,
 				Dialect dialect = Dialect::standard
 			);
 			
