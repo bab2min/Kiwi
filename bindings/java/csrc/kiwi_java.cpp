@@ -650,7 +650,7 @@ private:
 		{
 			try
 			{
-				JNIEnv* env = provider.getEnv();
+				JNIEnv* env = jni::threadLocalEnv;
 				// Get StreamProvider.provide method
 				jclass streamProviderClass = JObject<JStreamProvider>::jClass;
 				jmethodID provideMethod = env->GetMethodID(streamProviderClass, "provide", "(Ljava/lang/String;)Ljava/io/InputStream;");
