@@ -86,24 +86,32 @@ public class KiwiBuilder implements AutoCloseable  {
 		@Override
 		public native void close() throws Exception;
 		public native TypoTransformer copy();
-		public native void _addTypo(String orig, String error, float cost, byte convVowel);
+		public native void _addTypo(String orig, String error, float cost, byte convVowel, short dialect);
 		public native void _update(TypoTransformer src);
 		public native void _scaleCost(float scale);
 		public native void _setContinualTypoCost(float cost);
 		public native void _setLengtheningTypoCost(float cost);
 
+		public TypoTransformer addTypo(String orig, String error, float cost, byte convVowel, short dialect) {
+			_addTypo(orig, error, cost, convVowel, dialect);
+			return this;
+		}
+
 		public TypoTransformer addTypo(String orig, String error, float cost, byte convVowel) {
-			_addTypo(orig, error, cost, convVowel);
+			return addTypo(orig, error, cost, convVowel, (short)0);
+		}
+
+		public TypoTransformer addTypo(String[] orig, String[] error, float cost, byte convVowel, short dialect) {
+			for (int i = 0; i < orig.length; ++i) {
+				for (int j = 0; j < error.length; ++j) {
+					_addTypo(orig[i], error[j], cost, convVowel, dialect);
+				}
+			}
 			return this;
 		}
 
 		public TypoTransformer addTypo(String[] orig, String[] error, float cost, byte convVowel) {
-			for (int i = 0; i < orig.length; ++i) {
-				for (int j = 0; j < error.length; ++j) {
-					_addTypo(orig[i], error[j], cost, convVowel);
-				}
-			}
-			return this;
+			return addTypo(orig, error, cost, convVowel, (short)0);
 		}
 
 		// Set continual typo cost (inplace)
