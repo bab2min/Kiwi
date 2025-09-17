@@ -14,6 +14,7 @@ option(KIWI_BUILD_EVALUATOR  "Build Evaluator" ON)
 option(KIWI_BUILD_MODEL_BUILDER  "Build Model Builder" ON)
 option(KIWI_BUILD_TEST  "Build Test sets" ON)
 option(KIWI_JAVA_BINDING  "Build Java binding" OFF)
+option(KIWI_IOS_BINDING  "Build iOS binding" OFF)
 set(KIWI_CPU_ARCH "" CACHE STRING "Set architecture type for macOS")
 
 if (NOT CMAKE_BUILD_TYPE)
@@ -365,6 +366,10 @@ endif()
 
 if(KIWI_JAVA_BINDING)
   add_subdirectory( bindings/java )
+endif()
+
+if(KIWI_IOS_BINDING)
+  add_subdirectory( bindings/ios )
 endif()
 
 if(EMSCRIPTEN)
