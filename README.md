@@ -142,8 +142,16 @@ Java 1.8 이상에서 사용 가능한 KiwiJava가 Java binding으로 제공됩�
 ### Android Library
 Android NDK를 통해 Android 앱에서 사용할 수 있는 AAR 라이브러리가 제공됩니다. GitHub Releases에서 `kiwi-android-VERSION.aar` 파일을 다운로드하여 Android 프로젝트에 추가하면 됩니다. 
 - **최소 요구사항**: Android API Level 21+, ARM64 아키텍처
-- **사용법**: [bindings/android](bindings/android)의 README 참조
+- **사용법**: [bindings/java](bindings/java)의 README의 "Android에서 사용하기" 섹션 참조
 - **패키지**: AAR 형태로 제공되어 Gradle 프로젝트에 쉽게 통합 가능
+
+### iOS Library (개발 예정)
+iOS 지원은 현재 개발 계획에 포함되어 있으며, 차기 개발 목표로 설정되어 있습니다.
+- **계획된 기능**: Swift/Objective-C 바인딩을 통한 iOS 앱 지원
+- **예상 형태**: CocoaPods 또는 Swift Package Manager를 통한 배포
+- **개발 일정**: 구체적인 일정은 아직 미정이며, 개발 진행 상황은 GitHub Issues를 통해 공유될 예정입니다
+- **자세한 정보**: [bindings/ios](bindings/ios)의 README 참조
+- **기여 환영**: iOS 개발에 경험이 있으신 분들의 기여와 피드백을 환영합니다
 
 ### R Wrapper
 [mrchypark](https://github.com/mrchypark)님께서 기여해주신 R언어용 wrapper인 [elbird](https://mrchypark.github.io/elbird/)가 있습니다.
