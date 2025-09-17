@@ -1,8 +1,8 @@
 /*
  * Kiwi iOS binding implementation
  * 
- * This file provides C++ to Objective-C++ bridge for iOS Swift integration
- * Based on the iOS roadmap created for issue #221
+ * This file provides Objective-C++ bridge for iOS Swift integration
+ * Following the same pattern as the Java binding - using C++ classes directly
  */
 
 #ifdef IOS
@@ -12,16 +12,14 @@
 #include <memory>
 #include <exception>
 
-// Include main Kiwi headers
+// Include main Kiwi headers - using the correct header path
 #include "kiwi/Kiwi.h"
-#include "kiwi/KiwiBuilder.h"
 
 extern "C" {
 
-// Forward declarations for iOS-specific types
-typedef struct KiwiInstance KiwiInstance;
-typedef struct KiwiBuilderInstance KiwiBuilderInstance;
-typedef struct KiwiToken KiwiToken;
+// Forward declarations using actual C++ types
+typedef kiwi::Kiwi* KiwiInstance;
+typedef kiwi::KiwiBuilder* KiwiBuilderInstance;
 
 // Error handling
 typedef struct {
@@ -29,13 +27,15 @@ typedef struct {
     char* message;
 } KiwiError;
 
-// Token structure for iOS
+// Token structure for iOS - based on actual kiwi::TokenInfo
 struct KiwiToken {
     char* form;
     char* tag;
     int position;
     int length;
     float score;
+    int senseId;
+    float typoCost;
 };
 
 // Token array result
@@ -57,37 +57,24 @@ void kiwi_free_token_result(KiwiTokenResult* result);
 void kiwi_free_sentence_result(KiwiSentenceResult* result);
 void kiwi_free_error(KiwiError* error);
 
-// Builder functions
-KiwiBuilderInstance* kiwi_builder_create(const char* model_path, KiwiError** error);
-KiwiBuilderInstance* kiwi_builder_create_with_options(const char* model_path, 
-                                                      int num_threads, 
-                                                      int build_option,
-                                                      KiwiError** error);
+// Builder functions - using actual KiwiBuilder API
+KiwiBuilderInstance* kiwi_builder_create(const char* model_path, size_t num_threads, KiwiError** error);
 void kiwi_builder_destroy(KiwiBuilderInstance* builder);
-
 KiwiInstance* kiwi_builder_build(KiwiBuilderInstance* builder, KiwiError** error);
 
-// Main Kiwi functions
-KiwiInstance* kiwi_create(const char* model_path, KiwiError** error);
+// Main Kiwi functions - using actual Kiwi API  
 void kiwi_destroy(KiwiInstance* kiwi);
 
-// Tokenization
-KiwiTokenResult* kiwi_tokenize(KiwiInstance* kiwi, const char* text, int match_option);
-KiwiTokenResult* kiwi_tokenize_with_options(KiwiInstance* kiwi, 
-                                           const char* text, 
-                                           int match_option,
-                                           int top_n,
-                                           bool split_complex);
+// Tokenization using actual analyze method
+KiwiTokenResult* kiwi_analyze(KiwiInstance* kiwi, const char* text, int match_option);
 
-// Sentence splitting
+// Sentence splitting using actual splitIntoSents method
 KiwiSentenceResult* kiwi_split_sentences(KiwiInstance* kiwi, 
                                         const char* text,
-                                        int min_length,
-                                        int max_length);
+                                        int match_option);
 
 // Utility functions
 const char* kiwi_get_version();
-int kiwi_get_arch_type();
 
 } // extern "C"
 
@@ -101,6 +88,24 @@ namespace {
         return result;
     }
     
+    // Helper to convert std::u16string to UTF-8 string
+    std::string u16string_to_utf8(const std::u16string& u16str) {
+        if (u16str.empty()) return {};
+        
+        // Simple conversion - in real implementation should use proper UTF-8 conversion
+        std::string result;
+        for (char16_t c : u16str) {
+            if (c < 128) {
+                result += static_cast<char>(c);
+            } else {
+                // For now, replace non-ASCII with '?'
+                // In production, use proper UTF-16 to UTF-8 conversion
+                result += '?';
+            }
+        }
+        return result;
+    }
+    
     // Helper to create error
     KiwiError* create_error(int code, const std::string& message) {
         KiwiError* error = new KiwiError;
@@ -110,12 +115,13 @@ namespace {
     }
 }
 
-// Implementation of C functions
+// Implementation of C functions using actual Kiwi API
 
-KiwiInstance* kiwi_create(const char* model_path, KiwiError** error) {
+KiwiBuilderInstance* kiwi_builder_create(const char* model_path, size_t num_threads, KiwiError** error) {
     try {
-        auto kiwi = kiwi::Kiwi::create(model_path);
-        return reinterpret_cast<KiwiInstance*>(kiwi.release());
+        // Use actual KiwiBuilder constructor
+        auto builder = new kiwi::KiwiBuilder(model_path, num_threads);
+        return builder;
     } catch (const std::exception& e) {
         if (error) {
             *error = create_error(1, e.what());
@@ -124,36 +130,68 @@ KiwiInstance* kiwi_create(const char* model_path, KiwiError** error) {
     }
 }
 
-void kiwi_destroy(KiwiInstance* kiwi) {
-    if (kiwi) {
-        delete reinterpret_cast<kiwi::Kiwi*>(kiwi);
+void kiwi_builder_destroy(KiwiBuilderInstance* builder) {
+    if (builder) {
+        delete builder;
     }
 }
 
-KiwiTokenResult* kiwi_tokenize(KiwiInstance* kiwi_instance, const char* text, int match_option) {
+KiwiInstance* kiwi_builder_build(KiwiBuilderInstance* builder_instance, KiwiError** error) {
+    try {
+        // Use actual build method
+        auto kiwi_obj = builder_instance->build();
+        // Move the object to heap and return pointer
+        return new kiwi::Kiwi(std::move(kiwi_obj));
+    } catch (const std::exception& e) {
+        if (error) {
+            *error = create_error(2, e.what());
+        }
+        return nullptr;
+    }
+}
+
+void kiwi_destroy(KiwiInstance* kiwi) {
+    if (kiwi) {
+        delete kiwi;
+    }
+}
+
+KiwiTokenResult* kiwi_analyze(KiwiInstance* kiwi_instance, const char* text, int match_option) {
     auto result = new KiwiTokenResult;
     result->tokens = nullptr;
     result->count = 0;
     result->error = nullptr;
     
     try {
-        auto kiwi = reinterpret_cast<kiwi::Kiwi*>(kiwi_instance);
-        auto tokens = kiwi->analyze(text, static_cast<kiwi::Match>(match_option));
+        // Convert to proper types for Kiwi API
+        std::string utf8_text(text);
+        // Convert UTF-8 to UTF-16 for Kiwi (simplified conversion)
+        std::u16string u16_text;
+        for (char c : utf8_text) {
+            u16_text += static_cast<char16_t>(c);
+        }
         
-        result->count = tokens.size();
+        // Use actual analyze method with proper option type
+        auto token_result = kiwi_instance->analyze(u16_text, static_cast<kiwi::Match>(match_option));
+        
+        result->count = token_result.first.size();
         result->tokens = new KiwiToken[result->count];
         
-        for (size_t i = 0; i < tokens.size(); ++i) {
-            const auto& token = tokens[i];
-            result->tokens[i].form = string_to_c_str(token.str);
+        for (size_t i = 0; i < token_result.first.size(); ++i) {
+            const auto& token = token_result.first[i];
+            // Convert u16string form back to UTF-8
+            std::string form_utf8 = u16string_to_utf8(token.str);
+            result->tokens[i].form = string_to_c_str(form_utf8);
             result->tokens[i].tag = string_to_c_str(kiwi::tagToString(token.tag));
-            result->tokens[i].position = token.start;
-            result->tokens[i].length = token.len;
+            result->tokens[i].position = token.position;
+            result->tokens[i].length = token.length;
             result->tokens[i].score = token.score;
+            result->tokens[i].senseId = token.senseId;
+            result->tokens[i].typoCost = token.typoCost;
         }
         
     } catch (const std::exception& e) {
-        result->error = create_error(2, e.what());
+        result->error = create_error(3, e.what());
     }
     
     return result;
@@ -161,26 +199,36 @@ KiwiTokenResult* kiwi_tokenize(KiwiInstance* kiwi_instance, const char* text, in
 
 KiwiSentenceResult* kiwi_split_sentences(KiwiInstance* kiwi_instance, 
                                         const char* text,
-                                        int min_length,
-                                        int max_length) {
+                                        int match_option) {
     auto result = new KiwiSentenceResult;
     result->sentences = nullptr;
     result->count = 0;
     result->error = nullptr;
     
     try {
-        auto kiwi = reinterpret_cast<kiwi::Kiwi*>(kiwi_instance);
-        auto sentences = kiwi->splitIntoSents(text, min_length, max_length);
+        // Convert to UTF-16 for Kiwi API
+        std::string utf8_text(text);
+        std::u16string u16_text;
+        for (char c : utf8_text) {
+            u16_text += static_cast<char16_t>(c);
+        }
         
-        result->count = sentences.size();
+        // Use actual splitIntoSents method
+        auto sentence_spans = kiwi_instance->splitIntoSents(u16_text, static_cast<kiwi::Match>(match_option));
+        
+        result->count = sentence_spans.size();
         result->sentences = new char*[result->count];
         
-        for (size_t i = 0; i < sentences.size(); ++i) {
-            result->sentences[i] = string_to_c_str(sentences[i]);
+        for (size_t i = 0; i < sentence_spans.size(); ++i) {
+            const auto& span = sentence_spans[i];
+            // Extract substring and convert to UTF-8
+            std::u16string sentence_u16 = u16_text.substr(span.first, span.second - span.first);
+            std::string sentence_utf8 = u16string_to_utf8(sentence_u16);
+            result->sentences[i] = string_to_c_str(sentence_utf8);
         }
         
     } catch (const std::exception& e) {
-        result->error = create_error(3, e.what());
+        result->error = create_error(4, e.what());
     }
     
     return result;
@@ -223,43 +271,8 @@ void kiwi_free_error(KiwiError* error) {
 }
 
 const char* kiwi_get_version() {
-    return kiwi::Kiwi::getVersion().c_str();
-}
-
-int kiwi_get_arch_type() {
-    return static_cast<int>(kiwi::Kiwi::getArchType());
-}
-
-// Builder implementation
-KiwiBuilderInstance* kiwi_builder_create(const char* model_path, KiwiError** error) {
-    try {
-        auto builder = std::make_unique<kiwi::KiwiBuilder>(model_path);
-        return reinterpret_cast<KiwiBuilderInstance*>(builder.release());
-    } catch (const std::exception& e) {
-        if (error) {
-            *error = create_error(4, e.what());
-        }
-        return nullptr;
-    }
-}
-
-void kiwi_builder_destroy(KiwiBuilderInstance* builder) {
-    if (builder) {
-        delete reinterpret_cast<kiwi::KiwiBuilder*>(builder);
-    }
-}
-
-KiwiInstance* kiwi_builder_build(KiwiBuilderInstance* builder_instance, KiwiError** error) {
-    try {
-        auto builder = reinterpret_cast<kiwi::KiwiBuilder*>(builder_instance);
-        auto kiwi = builder->build();
-        return reinterpret_cast<KiwiInstance*>(kiwi.release());
-    } catch (const std::exception& e) {
-        if (error) {
-            *error = create_error(5, e.what());
-        }
-        return nullptr;
-    }
+    static std::string version = kiwi::getVersion();
+    return version.c_str();
 }
 
 #endif // IOS

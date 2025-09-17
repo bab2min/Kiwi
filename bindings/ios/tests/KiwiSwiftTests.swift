@@ -1,7 +1,7 @@
 /*
  * KiwiSwiftTests - Unit tests for iOS binding
  * 
- * These tests demonstrate the API usage as proposed in the iOS roadmap
+ * Updated to test the corrected API
  */
 
 import XCTest
@@ -22,34 +22,47 @@ class KiwiSwiftTests: XCTestCase {
     }
     
     func testKiwiInitialization() throws {
-        // Test that we can initialize Kiwi with a model path
-        // This test would fail without actual model files, so we'll test the API structure
-        
+        // Test that we can initialize Kiwi with KiwiBuilder
         XCTAssertNoThrow({
-            // let testKiwi = try Kiwi(modelPath: "valid/model/path")
+            // let builder = try KiwiBuilder(modelPath: "valid/model/path", numThreads: 1)
+            // let testKiwi = try builder.build()
             // XCTAssertNotNil(testKiwi)
         })
     }
     
-    func testTokenization() throws {
-        // Test the tokenization API structure
+    func testAnalysis() throws {
+        // Test the analysis API structure (renamed from tokenization)
         guard let kiwi = kiwi else {
             // Skip if kiwi is not initialized (no model files)
             throw XCTSkip("Kiwi not initialized - model files not available")
         }
         
         let text = "안녕하세요!"
-        let tokens = try kiwi.tokenize(text, options: .normalizeAll)
+        let tokens = try kiwi.analyze(text, options: .allWithNormalizing)
         
         XCTAssertGreaterThan(tokens.count, 0)
         
-        // Check token structure
+        // Check token structure including new fields
         for token in tokens {
             XCTAssertFalse(token.form.isEmpty)
             XCTAssertFalse(token.tag.isEmpty)
             XCTAssertGreaterThanOrEqual(token.position, 0)
             XCTAssertGreaterThan(token.length, 0)
+            XCTAssertGreaterThanOrEqual(token.senseId, 0)
+            XCTAssertGreaterThanOrEqual(token.typoCost, 0)
         }
+    }
+    
+    func testTokenizationCompatibility() throws {
+        // Test that tokenize still works (compatibility method)
+        guard let kiwi = kiwi else {
+            throw XCTSkip("Kiwi not initialized - model files not available")
+        }
+        
+        let text = "형태소 분석 테스트"
+        let tokens = try kiwi.tokenize(text, options: .allWithNormalizing)
+        
+        XCTAssertGreaterThan(tokens.count, 0)
     }
     
     func testSentenceSplitting() throws {
@@ -58,7 +71,7 @@ class KiwiSwiftTests: XCTestCase {
         }
         
         let text = "첫 번째 문장입니다. 두 번째 문장입니다. 세 번째 문장입니다."
-        let sentences = try kiwi.splitSentences(text)
+        let sentences = try kiwi.splitSentences(text, options: .allWithNormalizing)
         
         XCTAssertEqual(sentences.count, 3)
         XCTAssertEqual(sentences[0], "첫 번째 문장입니다.")
@@ -66,15 +79,36 @@ class KiwiSwiftTests: XCTestCase {
         XCTAssertEqual(sentences[2], "세 번째 문장입니다.")
     }
     
-    func testAsyncTokenization() throws {
+    func testAsyncAnalysis() throws {
         guard let kiwi = kiwi else {
             throw XCTSkip("Kiwi not initialized - model files not available")
         }
         
-        let expectation = XCTestExpectation(description: "Async tokenization")
+        let expectation = XCTestExpectation(description: "Async analysis")
         let text = "비동기 처리 테스트입니다."
         
-        kiwi.tokenize(text, options: .normalizeAll) { result in
+        kiwi.analyze(text, options: .allWithNormalizing) { result in
+            switch result {
+            case .success(let tokens):
+                XCTAssertGreaterThan(tokens.count, 0)
+            case .failure(let error):
+                XCTFail("Analysis failed: \(error)")
+            }
+            expectation.fulfill()
+        }
+        
+        wait(for: [expectation], timeout: 5.0)
+    }
+    
+    func testAsyncTokenizationCompatibility() throws {
+        guard let kiwi = kiwi else {
+            throw XCTSkip("Kiwi not initialized - model files not available")
+        }
+        
+        let expectation = XCTestExpectation(description: "Async tokenization compatibility")
+        let text = "비동기 호환성 테스트"
+        
+        kiwi.tokenize(text, options: .allWithNormalizing) { result in
             switch result {
             case .success(let tokens):
                 XCTAssertGreaterThan(tokens.count, 0)
@@ -89,20 +123,17 @@ class KiwiSwiftTests: XCTestCase {
     
     func testMatchOptions() throws {
         // Test that match options work as expected
-        let options1: MatchOptions = .normalizeAll
-        let options2: MatchOptions = [.normalizeAll, .joinNoun]
+        let options1: MatchOptions = .allWithNormalizing
+        let options2: MatchOptions = [.allWithNormalizing, .joinNoun]
         
         XCTAssertEqual(options1.rawValue, 1)
         XCTAssertEqual(options2.rawValue, 9) // 1 + 8
     }
     
-    func testVersionAndArchType() throws {
-        // Test utility methods
+    func testVersion() throws {
+        // Test version utility method
         let version = Kiwi.version
-        let archType = Kiwi.archType
-        
         XCTAssertFalse(version.isEmpty)
-        XCTAssertGreaterThanOrEqual(archType, 0)
     }
     
     func testBundleModelInitialization() throws {
@@ -118,16 +149,16 @@ class KiwiSwiftTests: XCTestCase {
     }
     
     func testErrorHandling() throws {
-        // Test error handling
-        XCTAssertThrowsError(try Kiwi(modelPath: "/invalid/path")) { error in
+        // Test error handling with KiwiBuilder
+        XCTAssertThrowsError(try KiwiBuilder(modelPath: "/invalid/path", numThreads: 1)) { error in
             XCTAssertTrue(error is KiwiError)
         }
     }
     
     func testKiwiBuilder() throws {
-        // Test KiwiBuilder API
+        // Test KiwiBuilder API with correct parameters
         XCTAssertNoThrow({
-            // let builder = try KiwiBuilder(modelPath: "valid/model/path")
+            // let builder = try KiwiBuilder(modelPath: "valid/model/path", numThreads: 1)
             // let kiwi = try builder.build()
             // XCTAssertNotNil(kiwi)
         })

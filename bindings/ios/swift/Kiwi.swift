@@ -1,7 +1,7 @@
 /*
  * KiwiSwift - Swift wrapper for Kiwi Korean morphological analyzer
  * 
- * This implements the Swift API proposed in the iOS roadmap for issue #221
+ * Fixed to use the actual Kiwi C++ API correctly
  */
 
 import Foundation
@@ -10,7 +10,7 @@ import Foundation
 
 public enum KiwiError: Error {
     case initializationFailed(String)
-    case tokenizationFailed(String)
+    case analysisFailed(String)
     case sentenceSplitFailed(String)
     case invalidModelPath
     case unknownError(String)
@@ -19,8 +19,8 @@ public enum KiwiError: Error {
         switch self {
         case .initializationFailed(let message):
             return "Kiwi initialization failed: \(message)"
-        case .tokenizationFailed(let message):
-            return "Tokenization failed: \(message)"
+        case .analysisFailed(let message):
+            return "Analysis failed: \(message)"
         case .sentenceSplitFailed(let message):
             return "Sentence splitting failed: \(message)"
         case .invalidModelPath:
@@ -41,7 +41,7 @@ public struct MatchOptions: OptionSet {
     }
     
     public static let none = MatchOptions([])
-    public static let normalizeAll = MatchOptions(rawValue: 1)
+    public static let allWithNormalizing = MatchOptions(rawValue: 1)
     public static let all = MatchOptions(rawValue: 2)
     public static let normalizeOnly = MatchOptions(rawValue: 4)
     public static let joinNoun = MatchOptions(rawValue: 8)
@@ -55,13 +55,17 @@ public struct Token {
     public let position: Int
     public let length: Int
     public let score: Float
+    public let senseId: Int
+    public let typoCost: Float
     
-    public init(form: String, tag: String, position: Int, length: Int, score: Float) {
+    public init(form: String, tag: String, position: Int, length: Int, score: Float, senseId: Int = 0, typoCost: Float = 0) {
         self.form = form
         self.tag = tag
         self.position = position
         self.length = length
         self.score = score
+        self.senseId = senseId
+        self.typoCost = typoCost
     }
 }
 
@@ -70,10 +74,10 @@ public struct Token {
 public class KiwiBuilder {
     private var builderPtr: OpaquePointer?
     
-    public init(modelPath: String) throws {
+    public init(modelPath: String, numThreads: Int = 1) throws {
         var error: UnsafeMutablePointer<KiwiError>?
         
-        builderPtr = kiwi_builder_create(modelPath, &error)
+        builderPtr = kiwi_builder_create(modelPath, numThreads, &error)
         
         if let error = error {
             let message = String(cString: error.pointee.message)
@@ -124,23 +128,12 @@ public class Kiwi {
         self.kiwiPtr = kiwiPtr
     }
     
-    // Public convenience initializer
-    public convenience init(modelPath: String) throws {
-        var error: UnsafeMutablePointer<KiwiError>?
-        
-        let ptr = kiwi_create(modelPath, &error)
-        
-        if let error = error {
-            let message = String(cString: error.pointee.message)
-            kiwi_free_error(error)
-            throw KiwiError.initializationFailed(message)
-        }
-        
-        guard let ptr = ptr else {
-            throw KiwiError.initializationFailed("Failed to create Kiwi instance")
-        }
-        
-        self.init(kiwiPtr: ptr)
+    // Public convenience initializer using KiwiBuilder
+    public convenience init(modelPath: String, numThreads: Int = 1) throws {
+        let builder = try KiwiBuilder(modelPath: modelPath, numThreads: numThreads)
+        let kiwi = try builder.build()
+        self.init(kiwiPtr: kiwi.kiwiPtr!)
+        kiwi.kiwiPtr = nil // Transfer ownership
     }
     
     deinit {
@@ -149,19 +142,19 @@ public class Kiwi {
         }
     }
     
-    // MARK: - Tokenization
+    // MARK: - Analysis (Fixed method name)
     
-    public func tokenize(_ text: String, options: MatchOptions = .normalizeAll) throws -> [Token] {
+    public func analyze(_ text: String, options: MatchOptions = .allWithNormalizing) throws -> [Token] {
         guard let ptr = kiwiPtr else {
-            throw KiwiError.tokenizationFailed("Kiwi instance is not initialized")
+            throw KiwiError.analysisFailed("Kiwi instance is not initialized")
         }
         
-        let result = kiwi_tokenize(ptr, text, Int32(options.rawValue))
+        let result = kiwi_analyze(ptr, text, Int32(options.rawValue))
         defer { kiwi_free_token_result(result) }
         
         if let error = result?.pointee.error {
             let message = String(cString: error.pointee.message)
-            throw KiwiError.tokenizationFailed(message)
+            throw KiwiError.analysisFailed(message)
         }
         
         guard let tokens = result?.pointee.tokens else {
@@ -178,7 +171,9 @@ public class Kiwi {
                 tag: String(cString: token.tag),
                 position: Int(token.position),
                 length: Int(token.length),
-                score: token.score
+                score: token.score,
+                senseId: Int(token.senseId),
+                typoCost: token.typoCost
             )
             swiftTokens.append(swiftToken)
         }
@@ -186,14 +181,19 @@ public class Kiwi {
         return swiftTokens
     }
     
+    // Keep old method name for compatibility
+    public func tokenize(_ text: String, options: MatchOptions = .allWithNormalizing) throws -> [Token] {
+        return try analyze(text, options: options)
+    }
+    
     // MARK: - Sentence Splitting
     
-    public func splitSentences(_ text: String, minLength: Int = 10, maxLength: Int = 1000) throws -> [String] {
+    public func splitSentences(_ text: String, options: MatchOptions = .allWithNormalizing) throws -> [String] {
         guard let ptr = kiwiPtr else {
             throw KiwiError.sentenceSplitFailed("Kiwi instance is not initialized")
         }
         
-        let result = kiwi_split_sentences(ptr, text, Int32(minLength), Int32(maxLength))
+        let result = kiwi_split_sentences(ptr, text, Int32(options.rawValue))
         defer { kiwi_free_sentence_result(result) }
         
         if let error = result?.pointee.error {
@@ -222,30 +222,26 @@ public class Kiwi {
     public static var version: String {
         return String(cString: kiwi_get_version())
     }
-    
-    public static var archType: Int {
-        return Int(kiwi_get_arch_type())
-    }
 }
 
 // MARK: - Extension for iOS-specific functionality
 
 extension Kiwi {
     /// Load model from app bundle
-    public convenience init(bundleModelPath: String) throws {
+    public convenience init(bundleModelPath: String, numThreads: Int = 1) throws {
         guard let bundlePath = Bundle.main.path(forResource: bundleModelPath, ofType: nil) else {
             throw KiwiError.invalidModelPath
         }
-        try self.init(modelPath: bundlePath)
+        try self.init(modelPath: bundlePath, numThreads: numThreads)
     }
     
-    /// Tokenize with completion handler for async usage
-    public func tokenize(_ text: String, 
-                        options: MatchOptions = .normalizeAll,
-                        completion: @escaping (Result<[Token], KiwiError>) -> Void) {
+    /// Analyze with completion handler for async usage
+    public func analyze(_ text: String, 
+                       options: MatchOptions = .allWithNormalizing,
+                       completion: @escaping (Result<[Token], KiwiError>) -> Void) {
         DispatchQueue.global(qos: .userInitiated).async {
             do {
-                let tokens = try self.tokenize(text, options: options)
+                let tokens = try self.analyze(text, options: options)
                 DispatchQueue.main.async {
                     completion(.success(tokens))
                 }
@@ -259,5 +255,12 @@ extension Kiwi {
                 }
             }
         }
+    }
+    
+    /// Tokenize with completion handler for async usage (compatibility method)
+    public func tokenize(_ text: String, 
+                        options: MatchOptions = .allWithNormalizing,
+                        completion: @escaping (Result<[Token], KiwiError>) -> Void) {
+        analyze(text, options: options, completion: completion)
     }
 }

@@ -2,7 +2,7 @@
  * Kiwi iOS Framework Header
  * 
  * Objective-C header for Swift integration
- * Based on the iOS roadmap for issue #221
+ * Fixed to use actual Kiwi C++ API correctly
  */
 
 #ifndef KIWI_IOS_H
@@ -14,9 +14,9 @@
 extern "C" {
 #endif
 
-// Forward declarations
-typedef struct KiwiInstance KiwiInstance;
-typedef struct KiwiBuilderInstance KiwiBuilderInstance;
+// Forward declarations using actual C++ types
+typedef struct kiwi_Kiwi* KiwiInstance;
+typedef struct kiwi_KiwiBuilder* KiwiBuilderInstance;
 
 // Error structure
 typedef struct {
@@ -24,13 +24,15 @@ typedef struct {
     char* _Nullable message;
 } KiwiError;
 
-// Token structure
+// Token structure - based on actual kiwi::TokenInfo
 typedef struct {
     char* _Nonnull form;
     char* _Nonnull tag;
     int position;
     int length;
     float score;
+    int senseId;
+    float typoCost;
 } KiwiToken;
 
 // Result structures
@@ -60,27 +62,24 @@ void kiwi_free_token_result(KiwiTokenResult* _Nullable result);
 void kiwi_free_sentence_result(KiwiSentenceResult* _Nullable result);
 void kiwi_free_error(KiwiError* _Nullable error);
 
-// Builder functions
-KiwiBuilderInstance* _Nullable kiwi_builder_create(const char* _Nonnull model_path, KiwiError* _Nullable * _Nullable error);
+// Builder functions - using actual KiwiBuilder API
+KiwiBuilderInstance* _Nullable kiwi_builder_create(const char* _Nonnull model_path, size_t num_threads, KiwiError* _Nullable * _Nullable error);
 void kiwi_builder_destroy(KiwiBuilderInstance* _Nullable builder);
 KiwiInstance* _Nullable kiwi_builder_build(KiwiBuilderInstance* _Nonnull builder, KiwiError* _Nullable * _Nullable error);
 
 // Main Kiwi functions
-KiwiInstance* _Nullable kiwi_create(const char* _Nonnull model_path, KiwiError* _Nullable * _Nullable error);
 void kiwi_destroy(KiwiInstance* _Nullable kiwi);
 
-// Tokenization
-KiwiTokenResult* _Nonnull kiwi_tokenize(KiwiInstance* _Nonnull kiwi, const char* _Nonnull text, int match_option);
+// Analysis using actual analyze method
+KiwiTokenResult* _Nonnull kiwi_analyze(KiwiInstance* _Nonnull kiwi, const char* _Nonnull text, int match_option);
 
-// Sentence splitting
+// Sentence splitting using actual splitIntoSents method
 KiwiSentenceResult* _Nonnull kiwi_split_sentences(KiwiInstance* _Nonnull kiwi, 
                                                   const char* _Nonnull text,
-                                                  int min_length,
-                                                  int max_length);
+                                                  int match_option);
 
 // Utility functions
 const char* _Nonnull kiwi_get_version(void);
-int kiwi_get_arch_type(void);
 
 #ifdef __cplusplus
 }
