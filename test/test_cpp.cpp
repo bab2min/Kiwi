@@ -430,7 +430,7 @@ TEST(KiwiCpp, HSDataset)
 	for (size_t w : {0, 1, 2, 4})
 	{
 		//std::cout << w << std::endl;
-		auto dataset = kw.makeHSDataset(data, batchSize, 0, windowSize, w, 0., 0.);
+		auto dataset = kw.makeHSDataset(data, batchSize, 0, windowSize, w);
 		for (size_t i = 0; i < 2; ++i)
 		{
 			size_t totalBatchCnt = 0, totalTokenCnt = 0, s;
@@ -453,7 +453,7 @@ TEST(KiwiCpp, HSDataset)
 	};
 
 	HSDataset trainset, devset;
-	trainset = kw.makeHSDataset(data, batchSize, 0, windowSize, 1, 0., 0., 0., false, tokenFilter, {}, 0.1, false, {}, 0, {}, &devset);
+	trainset = kw.makeHSDataset(data, batchSize, 0, windowSize, 1, {}, tokenFilter, {}, 0.1, false, {}, 0, {}, &devset);
 	for (size_t i = 0; i < 2; ++i)
 	{
 		{
@@ -499,7 +499,7 @@ TEST(KiwiCpp, HSDatasetUnlikelihoods)
 	uint32_t restLmCnt;
 
 	const size_t numWorkers = 4;
-	auto dataset = kw.makeHSDataset(data, batchSize, 0, windowSize, numWorkers, 0., 0.01, 0.12, true);
+	auto dataset = kw.makeHSDataset(data, batchSize, 0, windowSize, numWorkers, HSDatasetOption{ 0., 0.01, 0.12, 0.05, 0.05, 999999 });
 	for (size_t i = 0; i < 2; ++i)
 	{
 		size_t totalBatchCnt = 0, totalTokenCnt = 0, s;
@@ -510,7 +510,7 @@ TEST(KiwiCpp, HSDatasetUnlikelihoods)
 			totalTokenCnt += s;
 			totalBatchCnt++;
 		}
-		EXPECT_TRUE(std::max(dataset.numEstimBatches(), (size_t)numWorkers) - numWorkers <= totalBatchCnt && totalBatchCnt <= dataset.numEstimBatches() + numWorkers);
+		EXPECT_TRUE((std::max(dataset.numEstimBatches(), (size_t)numWorkers) - numWorkers) * 0.9 <= totalBatchCnt && totalBatchCnt <= (dataset.numEstimBatches() + numWorkers) * 1.1);
 	}
 }
 

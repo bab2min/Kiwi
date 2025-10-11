@@ -41,6 +41,16 @@ namespace kiwi
 	struct WordInfo;
 	class HSDataset;
 
+	struct HSDatasetOption
+	{
+		double dropoutProb = 0;
+		double dropoutProbOnHistory = 0;
+		double nounAugmentingProb = 0;
+		double emojiAugmentingProb = 0;
+		double sbAugmentingProb = 0;
+		size_t generateUnlikelihoods = (size_t)-1;
+	};
+
 	namespace cmb
 	{ 
 		class CompiledRule; 
@@ -938,10 +948,7 @@ namespace kiwi
 
 		HSDataset makeHSDataset(const std::vector<std::string>& inputPathes,
 			size_t batchSize, size_t causalContextSize, size_t windowSize, size_t numWorkers,
-			double dropoutProb = 0,
-			double dropoutProbOnHistory = 0,
-			double nounAugmentingProb = 0,
-			size_t generateUnlikelihoods = -1,
+			HSDatasetOption option = {},
 			const TokenFilter& tokenFilter = {},
 			const TokenFilter& windowFilter = {},
 			double splitRatio = 0,

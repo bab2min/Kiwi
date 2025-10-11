@@ -56,6 +56,8 @@ namespace kiwi
 		std::discrete_distribution<> dropout;
 		float dropoutProbOnHistory = 0;
 		std::discrete_distribution<> nounAugmentor;
+		std::discrete_distribution<> emojiAugmentor;
+		std::discrete_distribution<> sbAugmentor;
 		std::mt19937_64 rng;
 		Vector<ThreadLocal> locals;
 		Vector<size_t> shuffledIdx;
@@ -63,6 +65,7 @@ namespace kiwi
 		
 		Vector<uint8_t> windowTokenValidness;
 		Deque<OptionalFuture<size_t>> futures;
+		Vector<uint32_t> sbTokenIds;
 		const Vector<MorphemeRaw>* morphemes = nullptr;
 		const Vector<FormRaw>* forms = nullptr;
 		utils::FrozenTrie<uint32_t, uint32_t> contextualMapper;
@@ -84,6 +87,8 @@ namespace kiwi
 
 		bool tokenizeUnlikely(Vector<std::pair<int32_t, int32_t>>& out, int32_t prefix, int32_t target, int32_t suffix, std::mt19937_64& rng) const;
 
+		void fillSbTokenIds();
+
 		template<class InTy, class OutTy, class LmTy, class NgramTy, class UlInTy, class UlOutTy>
 		size_t _next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode, float& restLmOut, uint32_t& restLmCntOut, 
 			UlInTy unlikelihoodIn, UlOutTy unlikelihoodOut, size_t* unlikelihoodSize);
@@ -94,10 +99,8 @@ namespace kiwi
 			size_t _windowSize = 0, 
 			bool _exclusiveWindow = true, 
 			size_t _workers = 0, 
-			double _dropoutProb = 0, 
-			double _dropoutProbOnHistory = 0,
-			double _nounAugmentingProb = 0,
-			size_t _generateUnlikelihoods = -1);
+			HSDatasetOption option = {}
+		);
 		~HSDataset();
 		HSDataset(const HSDataset&) = delete;
 		HSDataset(HSDataset&&) /*noexcept*/;

@@ -10,27 +10,36 @@ HSDataset::HSDataset(size_t _batchSize,
 	size_t _windowSize, 
 	bool _exclusiveWindow, 
 	size_t _workers, 
-	double _dropoutProb, 
-	double _dropoutProbOnHistory,
-	double _nounAugmentingProb,
-	size_t _generateUnlikelihoods)
+	HSDatasetOption option)
 	: workers{ _workers ? make_unique<utils::ThreadPool>(_workers) : nullptr },
-	dropout{ {1 - _dropoutProb, _dropoutProb / 3, _dropoutProb / 3, _dropoutProb / 6, _dropoutProb / 6} }, 
-	dropoutProbOnHistory{ (float)_dropoutProbOnHistory },
+	dropout{ {1 - option.dropoutProb, option.dropoutProb / 3, option.dropoutProb / 3, option.dropoutProb / 6, option.dropoutProb / 6} },
+	dropoutProbOnHistory{ (float)option.dropoutProbOnHistory },
 	nounAugmentor{ {
-			1 - _nounAugmentingProb, 
-			_nounAugmentingProb / 12, 
-			_nounAugmentingProb / 12, 
-			_nounAugmentingProb / 12, 
-			_nounAugmentingProb / 4, 
-			_nounAugmentingProb / 4, 
-			_nounAugmentingProb / 4} },
+			1 - option.nounAugmentingProb,
+			option.nounAugmentingProb / 12,
+			option.nounAugmentingProb / 12,
+			option.nounAugmentingProb / 12,
+			option.nounAugmentingProb / 4,
+			option.nounAugmentingProb / 4,
+			option.nounAugmentingProb / 4} },
+	emojiAugmentor{ {
+			1 - option.emojiAugmentingProb,
+			option.emojiAugmentingProb / 4,
+			option.emojiAugmentingProb / 4,
+			option.emojiAugmentingProb / 4,
+			option.emojiAugmentingProb / 4} },
+	sbAugmentor{ {
+			1 - option.sbAugmentingProb,
+			option.sbAugmentingProb / 4,
+			option.sbAugmentingProb / 4,
+			option.sbAugmentingProb / 4,
+			option.sbAugmentingProb / 4} },
 	locals( _workers ? workers->size() : 1),
 	batchSize{ _batchSize },
 	causalContextSize{ _causalContextSize },
 	windowSize{ _windowSize },
 	exclusiveWindow{ _exclusiveWindow },
-	generateUnlikelihoods{ _generateUnlikelihoods }
+	generateUnlikelihoods{ option.generateUnlikelihoods }
 {
 }
 
@@ -124,7 +133,7 @@ bool HSDataset::tokenizeUnlikely(Vector<std::pair<int32_t, int32_t>>& out, int32
 
 	form.insert(form.begin(), ' ');
 	form.push_back(' ');
-	auto res = kiwiInst->analyze(form, 8, AnalyzeOption{ Match::allWithNormalizing, &blockset }, pretokenized);
+	auto res = kiwiInst->analyze(form, 8, AnalyzeOption{ Match::allWithNormalizing, &blockset, false, Dialect::all, }, pretokenized);
 	thread_local Vector<size_t> validResIdx;
 	validResIdx.clear();
 	for (size_t i = 0; i < res.size(); ++i)
@@ -307,6 +316,21 @@ void HSDataset::prepareInOutData(Deque<int32_t>& inData, Deque<int32_t>& outData
 	}
 }
 
+void HSDataset::fillSbTokenIds()
+{
+	if (!sbTokenIds.empty()) return;
+
+	for (auto& m : *morphemes)
+	{
+		if (m.tag != POSTag::sb || m.senseId == 0) continue;
+		if (m.senseId > sbTokenIds.size())
+		{
+			sbTokenIds.resize(m.senseId, 0);
+		}
+		sbTokenIds[m.senseId - 1] = m.lmMorphemeId;
+	}
+}
+
 template<class InTy, class OutTy, class LmTy, class NgramTy, class UlInTy, class UlOutTy>
 size_t HSDataset::_next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode, float& restLmOut, uint32_t& restLmCntOut, 
 	UlInTy unlikelihoodIn, UlOutTy unlikelihoodOut, size_t* unlikelihoodSize)
@@ -336,6 +360,20 @@ size_t HSDataset::_next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode,
 					t1 = getDefaultMorphemeId((*oovDict)[-t1 - 1].second);
 				}
 				const auto nounAugment = ((*morphemes)[t].tag == POSTag::nnp && !isSpecialClass((*morphemes)[t1].tag)) ? nounAugmentor(local.rng) : 0;
+				const auto emojiAugment = 
+					((*morphemes)[t].tag == POSTag::nnp && isJClass((*morphemes)[t1].tag)) ? emojiAugmentor(local.rng) :
+					(((*morphemes)[t].tag == POSTag::ef && (*morphemes)[t1].tag == POSTag::sf) ? emojiAugmentor(local.rng) + 5 : 0);
+				const auto sbAugment =
+					(((*morphemes)[t].tag == POSTag::nng || (*morphemes)[t].tag == POSTag::nnp) 
+						&& (*morphemes)[t1].tag == (*morphemes)[t].tag 
+						&& (*morphemes)[tokens.back()].tag != POSTag::sb) ? sbAugmentor(local.rng) : 0;
+				size_t sbToken = 0;
+
+				if (sbAugment)
+				{
+					sbToken = (size_t)(std::generate_canonical<float, 32>(local.rng) * (float)(sbTokenIds.size() - 1));
+					tokens.emplace_back(sbTokenIds[sbToken]);
+				}
 
 				switch (nounAugment)
 				{
@@ -396,6 +434,40 @@ size_t HSDataset::_next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode,
 				case 4: // circumfix with sw
 					tokens.emplace_back(getDefaultMorphemeId(POSTag::sw));
 					break;
+				}
+
+				if (emojiAugment > 0 && emojiAugment < 5)
+				{
+					for (int i = 0; i < emojiAugment; ++i)
+					{
+						tokens.emplace_back(getDefaultMorphemeId(POSTag::w_emoji));
+					}
+				}
+				else if (emojiAugment > 5)
+				{
+					for (int i = 5; i < emojiAugment; ++i)
+					{
+						tokens.emplace_back(getDefaultMorphemeId(POSTag::w_emoji));
+					}
+					++p; // skip the following punctuation
+				}
+
+				if (sbAugment)
+				{
+					switch (sbAugment)
+					{
+					case 1:
+						tokens.emplace_back(getDefaultMorphemeId(POSTag::sp));
+						break;
+					case 2:
+						tokens.emplace_back(getDefaultMorphemeId(POSTag::nnp));
+						break;
+					case 3:
+						tokens.emplace_back(getDefaultMorphemeId(POSTag::nnp));
+						tokens.emplace_back(getDefaultMorphemeId(POSTag::sp));
+						break;
+					}
+					tokens.emplace_back(sbTokenIds[sbToken + 1]);
 				}
 			}
 			tokens.emplace_back(sent[sent.size() - 1]);
@@ -471,6 +543,8 @@ size_t HSDataset::_next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode,
 		}
 		return localId;
 	};
+
+	fillSbTokenIds();
 
 	size_t localId;
 	if (workers)
