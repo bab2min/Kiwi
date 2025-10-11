@@ -935,27 +935,32 @@ ModelType KiwiBuilder::getModelType(const KiwiBuilder::StreamProvider& provider,
 	return ModelType::none;
 }
 
-KiwiBuilder::KiwiBuilder(StreamProvider streamProvider, size_t _numThreads, BuildOption _options, ModelType _modelType)
-	: detector{ streamProvider, _numThreads }, options{ _options }, modelType{ _modelType }, numThreads{ _numThreads != (size_t)-1 ? _numThreads : thread::hardware_concurrency() }
-{	
+KiwiBuilder::KiwiBuilder(StreamProvider streamProvider, size_t _numThreads, BuildOption _options, ModelType _modelType, Dialect _enabledDialects)
+	: detector{ streamProvider, _numThreads }, 
+	options{ _options }, 
+	modelType{ _modelType }, 
+	enabledDialects{ _enabledDialects },
+	numThreads{ _numThreads != (size_t)-1 ? _numThreads : thread::hardware_concurrency() }
+{
 	archType = getSelectedArch(ArchType::default_);
 
 	// Load morphology data
 	{
 		auto stream = streamProvider("sj.morph");
-		if (!stream) {
-			throw runtime_error{ "Cannot open morphology file 'sj.morph'" };
+		if (!stream) 
+		{
+			throw IOException{ "Cannot open morphology file 'sj.morph'" };
 		}
 		loadMorphBin(*stream);
 	}
-	
+
 	// Determine model type if not specified
 	if (modelType == ModelType::none || modelType == ModelType::largest)
 	{
 		modelType = getModelType(streamProvider, modelType == ModelType::largest);
 		if (modelType == ModelType::none)
 		{
-			throw runtime_error{ "Cannot find any valid model files from stream provider" };
+			throw IOException{ "Cannot find any valid model files from stream provider" };
 		}
 	}
 
@@ -963,13 +968,14 @@ KiwiBuilder::KiwiBuilder(StreamProvider streamProvider, size_t _numThreads, Buil
 	if (modelType == ModelType::knlm || modelType == ModelType::knlmTransposed)
 	{
 		auto stream = streamProvider("sj.knlm");
-		if (!stream) {
-			throw runtime_error{ "Cannot open language model file 'sj.knlm'" };
+		if (!stream) 
+		{
+			throw IOException{ "Cannot open language model file 'sj.knlm'" };
 		}
-		
+
 		langMdl = lm::KnLangModelBase::create(
-			utils::createMemoryObjectFromStream(*stream), 
-			archType, 
+			utils::createMemoryObjectFromStream(*stream),
+			archType,
 			modelType == ModelType::knlmTransposed);
 	}
 	else if (modelType == ModelType::sbg)
@@ -977,78 +983,92 @@ KiwiBuilder::KiwiBuilder(StreamProvider streamProvider, size_t _numThreads, Buil
 		// Load both sj.knlm and skipbigram.mdl
 		auto knlmStream = streamProvider("sj.knlm");
 		auto sbgStream = streamProvider("skipbigram.mdl");
-		if (!knlmStream || !sbgStream) {
-			throw runtime_error{ "Cannot open required files for skipbigram model" };
+		if (!knlmStream || !sbgStream) 
+		{
+			throw IOException{ "Cannot open required files for skipbigram model" };
 		}
-		
+
 		langMdl = lm::SkipBigramModelBase::create(
-			utils::createMemoryObjectFromStream(*knlmStream), 
-			utils::createMemoryObjectFromStream(*sbgStream), 
+			utils::createMemoryObjectFromStream(*knlmStream),
+			utils::createMemoryObjectFromStream(*sbgStream),
 			archType);
 	}
-	else if (ModelType::cong <= modelType && modelType <= ModelType::congGlobalFp32 )
+	else if (ModelType::cong <= modelType && modelType <= ModelType::congGlobalFp32)
 	{
 		auto stream = streamProvider("cong.mdl");
-		if (!stream) {
-			throw runtime_error{ "Cannot open ConG model file 'cong.mdl'" };
+		if (!stream) 
+		{
+			throw IOException{ "Cannot open ConG model file 'cong.mdl'" };
 		}
-		
-		langMdl = lm::CoNgramModelBase::create(utils::createMemoryObjectFromStream(*stream), 
-			archType, 
+
+		langMdl = lm::CoNgramModelBase::create(utils::createMemoryObjectFromStream(*stream),
+			archType,
 			(modelType == ModelType::congGlobal || modelType == ModelType::congGlobalFp32),
 			(modelType == ModelType::cong || modelType == ModelType::congGlobal));
 	}
 
-	if (auto stream = streamProvider("dialect.dict")) 
+	if (auto stream = streamProvider("dialect.dict"))
 	{
 		loadDictionaryFromStream(*stream);
-	} 
+	}
 
 	// Load dictionaries if requested
 	if (!!(options & BuildOption::loadDefaultDict))
 	{
 		auto stream = streamProvider("default.dict");
-		if (stream) {
+		if (stream) 
+		{
 			loadDictionaryFromStream(*stream);
-		} else {
-			throw runtime_error{ "Cannot open required file: default.dict" };
+		} 
+		else 
+		{
+			throw IOException{ "Cannot open required file: default.dict" };
 		}
 	}
 
 	if (!!(options & BuildOption::loadTypoDict))
 	{
 		auto stream = streamProvider("typo.dict");
-		if (stream) {
+		if (stream) 
+		{
 			loadDictionaryFromStream(*stream);
-		} else {
-			throw runtime_error{ "Cannot open required file: typo.dict" };
+		} 
+		else 
+		{
+			throw IOException{ "Cannot open required file: typo.dict" };
 		}
 	}
 
 	if (!!(options & BuildOption::loadMultiDict))
 	{
 		auto stream = streamProvider("multi.dict");
-		if (stream) {
+		if (stream) 
+		{
 			loadDictionaryFromStream(*stream);
-		} else {
-			throw runtime_error{ "Cannot open required file: multi.dict" };
+		} 
+		else 
+		{
+			throw IOException{ "Cannot open required file: multi.dict" };
 		}
 	}
 
 	// Load combining rules
 	{
 		auto stream = streamProvider("combiningRule.txt");
-		if (stream) {
-			combiningRule = make_shared<cmb::CompiledRule>(cmb::RuleSet{ *stream }.compile());
+		if (stream) 
+		{
+			combiningRule = make_shared<cmb::CompiledRule>(cmb::RuleSet{ *stream, enabledDialects }.compile());
 			addAllomorphsToRule();
-		} else {
-			throw runtime_error{ "Cannot open required file: combiningRule.txt" };
+		} 
+		else 
+		{
+			throw IOException{ "Cannot open required file: combiningRule.txt" };
 		}
 	}
 }
 
-KiwiBuilder::KiwiBuilder(const string& modelPath, size_t _numThreads, BuildOption _options, ModelType _modelType)
-	: KiwiBuilder(utils::makeFilesystemProvider(modelPath), _numThreads, _options, _modelType)
+KiwiBuilder::KiwiBuilder(const string& modelPath, size_t _numThreads, BuildOption _options, ModelType _modelType, Dialect _enabledDialects)
+	: KiwiBuilder(utils::makeFilesystemProvider(modelPath), _numThreads, _options, _modelType, _enabledDialects)
 {
 }
 
@@ -1757,6 +1777,11 @@ void KiwiBuilder::buildCombinedMorphemes(
 			if (clearIrregular(tag) > POSTag::pa) continue;
 			if (morph.combined) continue;
 
+			if (morph.dialect != Dialect::standard && !(enabledDialects & morph.dialect))
+			{
+				continue;
+			}
+
 			// tag == POSTag::unknown는 이미 결합된 형태소라는 뜻
 			if (tag == POSTag::unknown)
 			{
@@ -2078,6 +2103,11 @@ size_t KiwiBuilder::loadDictionaryFromStream(std::istream& is)
 			}
 		}
 
+		if (dialect != Dialect::standard && !(enabledDialects & dialect))
+		{
+			continue;
+		}
+
 		if (fields[1].find(u'/') != fields[1].npos)
 		{
 			vector<tuple<U16StringView, POSTag, uint8_t>> morphemes;
@@ -2394,6 +2424,10 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 		}
 
 		f.dialect = accumulate(f.candidate.begin(), f.candidate.end(), f.candidate[0]->dialect, reduceDialect);
+		if (f.dialect != Dialect::standard && !(enabledDialects & f.dialect))
+		{
+			continue;
+		}
 		sortedForms.emplace_back(&f);
 	}
 

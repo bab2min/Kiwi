@@ -101,7 +101,7 @@ int Evaluator::operator()(const string& modelPath,
 			typo |= getDefaultTypoSet(DefaultTypoSet::lengtheningTypoSet);
 		}
 
-		Kiwi kw = KiwiBuilder{ modelPath, 1, option, modelType }.build(
+		Kiwi kw = KiwiBuilder{ modelPath, 1, option, modelType, allowedDialect }.build(
 			typo
 		);
 		if (typoCostWeight > 0) kw.setTypoCostWeight(typoCostWeight);

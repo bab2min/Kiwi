@@ -799,7 +799,7 @@ void RuleSet::addRule(const string& lTag, const string& rTag,
 	}
 }
 
-void RuleSet::loadRules(istream& istr)
+void RuleSet::loadRules(istream& istr, Dialect enabledDialects)
 {
 	using namespace std::literals;
 
@@ -883,6 +883,11 @@ void RuleSet::loadRules(istream& istr)
 			for (auto r : split(normalizedResult, u','))
 			{
 				repl.emplace_back(parseReplString(KString{ r.begin(), r.end() }));
+			}
+
+			if (dialect != Dialect::standard && !(enabledDialects & dialect))
+			{
+				continue;
 			}
 
 			addRule(lTag, rTag,

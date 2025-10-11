@@ -389,9 +389,9 @@ namespace kiwi
 			RuleSet& operator=(const RuleSet&);
 			RuleSet& operator=(RuleSet&&);
 
-			explicit RuleSet(std::istream& ruleFile)
+			explicit RuleSet(std::istream& ruleFile, Dialect enabledDialects = Dialect::standard)
 			{
-				loadRules(ruleFile);
+				loadRules(ruleFile, enabledDialects);
 			}
 
 			void addRule(const std::string& lTag, const std::string& rTag,
@@ -400,7 +400,7 @@ namespace kiwi
 				Dialect dialect = Dialect::standard
 			);
 			
-			void loadRules(std::istream& istr);
+			void loadRules(std::istream& istr, Dialect enabledDialects = Dialect::standard);
 
 			CompiledRule compile() const;
 		};

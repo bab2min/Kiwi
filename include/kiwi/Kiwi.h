@@ -68,7 +68,7 @@ namespace kiwi
 			const std::unordered_set<const Morpheme*>* bl = nullptr, 
 			bool oe = false,
 			Dialect ad = Dialect::standard,
-			float dc = 0.f
+			float dc = 3.f
 			)
 			: match{ m }, blocklist{ bl }, openEnding{ oe }, allowedDialects{ ad }, dialectCost{ dc }
 		{}
@@ -578,6 +578,7 @@ namespace kiwi
 		size_t numThreads = 0;
 		BuildOption options = BuildOption::none;
 		ModelType modelType = ModelType::none;
+		Dialect enabledDialects = Dialect::standard;
 		ArchType archType = ArchType::none;
 
 	public:
@@ -750,10 +751,14 @@ namespace kiwi
 		 *                   0일 경우 async를 지원하지 않는 단일 스레드에서 동작하며, 1 이상일 경우 지정한 개수만큼 worker 스레드를 생성하여 async가 지원된다.
 		 *                   기본값은 -1으로 이 경우 시스템의 CPU 코어 개수를 탐지하여 이 값을 numThreads값으로 설정한다.
 		 * @param options 생성 옵션. `kiwi::BuildOption`을 참조
-		 * @note 이 생성자로 생성된 KiwiBuilder는 WordDetector가 초기화되지 않으므로 extractWords(), extractAddWords() 메서드를 사용할 수 없다.
-		 *       해당 기능이 필요한 경우 파일 시스템 기반 생성자를 사용해야 한다.
+		 * @param modelType 모델의 타입. ModelType::none으로 지정한 경우 streamProvider를 통해 모델 파일을 읽어 모델의 타입을 추정한다.
+		 * @param enabledDialects 활성화할 방언. 기본값은 Dialect::standard로 표준어만 활성화한다.
 		 */
-		KiwiBuilder(StreamProvider streamProvider, size_t numThreads = -1, BuildOption options = BuildOption::default_, ModelType modelType = ModelType::none);
+		KiwiBuilder(StreamProvider streamProvider, 
+			size_t numThreads = -1, 
+			BuildOption options = BuildOption::default_, 
+			ModelType modelType = ModelType::none,
+			Dialect enabledDialects = Dialect::standard);
 
 		/**
 		 * @brief KiwiBuilder를 모델 파일로부터 생성한다.
@@ -763,8 +768,14 @@ namespace kiwi
 		 *                   0일 경우 async를 지원하지 않는 단일 스레드에서 동작하며, 1 이상일 경우 지정한 개수만큼 worker 스레드를 생성하여 async가 지원된다.
 		 *                   기본값은 -1으로 이 경우 시스템의 CPU 코어 개수를 탐지하여 이 값을 numThreads값으로 설정한다.
 		 * @param options 생성 옵션. `kiwi::BuildOption`을 참조
+		 * @param modelType 모델의 타입. ModelType::none으로 지정한 경우 modelPath로부터 모델의 타입을 추정한다.
+		 * @param enabledDialects 활성화할 방언. 기본값은 Dialect::standard로 표준어만 활성화한다.
 		 */
-		KiwiBuilder(const std::string& modelPath, size_t numThreads = -1, BuildOption options = BuildOption::default_, ModelType modelType = ModelType::none);
+		KiwiBuilder(const std::string& modelPath, 
+			size_t numThreads = -1, 
+			BuildOption options = BuildOption::default_, 
+			ModelType modelType = ModelType::none,
+			Dialect enabledDialects = Dialect::standard);
 
 		/**
 		 * @brief 현재 KiwiBuilder 객체가 유효한 분석 모델을 로딩한 상태인지 알려준다.
