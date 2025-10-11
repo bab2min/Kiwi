@@ -366,7 +366,7 @@ size_t HSDataset::_next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode,
 				const auto sbAugment =
 					(((*morphemes)[t].tag == POSTag::nng || (*morphemes)[t].tag == POSTag::nnp) 
 						&& (*morphemes)[t1].tag == (*morphemes)[t].tag 
-						&& (*morphemes)[tokens.back()].tag != POSTag::sb) ? sbAugmentor(local.rng) : 0;
+						&& (tokens.back() < 0 || (*morphemes)[tokens.back()].tag != POSTag::sb)) ? sbAugmentor(local.rng) : 0;
 				size_t sbToken = 0;
 
 				if (sbAugment)
