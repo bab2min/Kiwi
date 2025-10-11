@@ -180,33 +180,37 @@ namespace kiwi
 		for (; first != last; ++first)
 		{
 			auto c = *first;
-			positionOut.emplace_back(ret.size());
 			if (!ret.empty() && isHangulSyllable(ret.back()))
 			{
 				const bool alreadyHasCoda = (ret.back() - 0xAC00) % 28;
 				if (alreadyHasCoda)
 				{
+					positionOut.emplace_back(ret.size());
 					ret.push_back(c);
 				}
 				else if (isHangulCoda(c))
 				{
+					positionOut.emplace_back(ret.size() - 1);
 					ret.back() += c - 0x11A7;
 				}
 				else if (isOldHangulCoda(c))
 				{
 					const auto onset = (ret.back() - 0xAC00) / 28 / 21;
 					const auto vowel = (ret.back() - 0xAC00) / 28 % 21;
+					positionOut.emplace_back(ret.size() - 1);
 					ret.back() = 0x1100 + onset;
 					ret.push_back(0x1161 + vowel);
 					ret.push_back(c);
 				}
 				else
 				{
+					positionOut.emplace_back(ret.size());
 					ret.push_back(c);
 				}	
 			}
 			else
 			{
+				positionOut.emplace_back(ret.size());
 				ret.push_back(c);
 			}
 		}
