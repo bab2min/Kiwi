@@ -1441,13 +1441,13 @@ TEST(KiwiCpp, JoinAffix)
 TEST(KiwiCpp, CompatibleJamo)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
-	auto res1 = kiwi.analyze(u"이긴다. 이김. 이길것.", Match::none).first;
+	auto res1 = kiwi.analyze(u"미룬다. 미룸. 미룰것.", Match::none).first;
 	EXPECT_EQ(res1.size(), 10);
 	EXPECT_EQ(res1[1].str, u"ᆫ다");
 	EXPECT_EQ(res1[4].str, u"ᆷ");
 	EXPECT_EQ(res1[7].str, u"ᆯ");
 
-	auto res2 = kiwi.analyze(u"이긴다. 이김. 이길것.", Match::compatibleJamo).first;
+	auto res2 = kiwi.analyze(u"미룬다. 미룸. 미룰것.", Match::compatibleJamo).first;
 	EXPECT_EQ(res2.size(), 10);
 	EXPECT_EQ(res2[1].str, u"ㄴ다");
 	EXPECT_EQ(res2[4].str, u"ㅁ");
