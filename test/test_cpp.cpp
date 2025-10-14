@@ -1390,24 +1390,24 @@ TEST(KiwiCpp, AddRule)
 TEST(KiwiCpp, AddPreAnalyzedWord)
 {
 	Kiwi& okiwi = reuseKiwiInstance();
-	auto ores = okiwi.analyze("팅겼어...", Match::allWithNormalizing);
+	auto ores = okiwi.analyze("뜅겼어...", Match::allWithNormalizing);
 
 	KiwiBuilder builder{ MODEL_PATH };
-	std::vector<std::pair<const char16_t*, POSTag>> analyzed;
-	analyzed.emplace_back(u"팅기", POSTag::vv);
-	analyzed.emplace_back(u"었", POSTag::ep);
-	analyzed.emplace_back(u"어", POSTag::ef);
+	std::vector<std::tuple<const char16_t*, POSTag, uint8_t>> analyzed;
+	analyzed.emplace_back(u"뜅기", POSTag::vv, undefSenseId);
+	analyzed.emplace_back(u"었", POSTag::ep, undefSenseId);
+	analyzed.emplace_back(u"어", POSTag::ef, undefSenseId);
 	
-	EXPECT_THROW(builder.addPreAnalyzedWord(u"팅겼어", analyzed), UnknownMorphemeException);
+	EXPECT_THROW(builder.addPreAnalyzedWord(u"뜅겼어", analyzed), UnknownMorphemeException);
 
-	builder.addWord(u"팅기", POSTag::vv);
-	builder.addPreAnalyzedWord(u"팅겼어", analyzed);
+	builder.addWord(u"뜅기", POSTag::vv, 0, u"튕기");
+	builder.addPreAnalyzedWord(u"뜅겼어", analyzed);
 	
 	Kiwi kiwi = builder.build();
-	auto res = kiwi.analyze("팅겼어...", Match::allWithNormalizing);
+	auto res = kiwi.analyze("뜅겼어...", Match::allWithNormalizing);
 	
 	ASSERT_GE(res.first.size(), 4);
-	EXPECT_EQ(res.first[0].str, u"팅기");
+	EXPECT_EQ(res.first[0].str, u"뜅기");
 	EXPECT_EQ(res.first[0].tag, POSTag::vv);
 	EXPECT_EQ(res.first[1].str, u"었");
 	EXPECT_EQ(res.first[1].tag, POSTag::ep);

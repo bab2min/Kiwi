@@ -174,22 +174,22 @@ TEST(KiwiC, AddPreAnalyzedWord)
 {
 	kiwi_builder_h kb = kiwi_builder_init(MODEL_PATH, -1, KIWI_BUILD_DEFAULT);
 	const char* morphs[] = {
-		u8"팅기", u8"었", u8"어",
+		u8"뜅기", u8"었", u8"어",
 	};
 	const char* pos[] = {
 		"vv", "ep", "ef",
 	};
 
-	EXPECT_NE(kiwi_builder_add_pre_analyzed_word(kb, u8"팅겼어", 3, morphs, pos, 0, nullptr), 0);
+	EXPECT_NE(kiwi_builder_add_pre_analyzed_word(kb, u8"뜅겼어", 3, morphs, pos, 0, nullptr), 0);
 
-	kiwi_builder_add_alias_word(kb, u8"팅기", "vv", -1, u8"튕기");
-	EXPECT_EQ(kiwi_builder_add_pre_analyzed_word(kb, u8"팅겼어", 3, morphs, pos, 0, nullptr), 0);
+	kiwi_builder_add_alias_word(kb, u8"뜅기", "vv", -1, u8"튕기");
+	EXPECT_EQ(kiwi_builder_add_pre_analyzed_word(kb, u8"뜅겼어", 3, morphs, pos, 0, nullptr), 0);
 
 	kiwi_h kw = kiwi_builder_build(kb, nullptr, 0);
-	kiwi_res_h res = kiwi_analyze(kw, u8"팅겼어...", 1, KIWI_MATCH_ALL_WITH_NORMALIZING, nullptr, nullptr);
+	kiwi_res_h res = kiwi_analyze(kw, u8"뜅겼어...", 1, KIWI_MATCH_ALL_WITH_NORMALIZING, nullptr);
 	
 	ASSERT_GE(kiwi_res_word_num(res, 0), 4);
-	EXPECT_STREQ(kiwi_res_form(res, 0, 0), u8"팅기");
+	EXPECT_STREQ(kiwi_res_form(res, 0, 0), u8"뜅기");
 	EXPECT_STREQ(kiwi_res_tag(res, 0, 0), "VV");
 	EXPECT_STREQ(kiwi_res_form(res, 0, 1), u8"었");
 	EXPECT_STREQ(kiwi_res_tag(res, 0, 1), "EP");
