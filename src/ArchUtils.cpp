@@ -14,7 +14,9 @@ ArchType kiwi::getBestArch()
 #if CPUINFO_ARCH_X86_64
 	if (cpuinfo_has_x86_avx512vnni()) return ArchType::avx512vnni;
 	if (cpuinfo_has_x86_avx512bw()) return ArchType::avx512bw;
+#ifdef KIWI_AVX_VNNI_SUPPORTED
 	if (cpuinfo_has_x86_avx_vnni_int8()) return ArchType::avx_vnni;
+#endif
 	if (cpuinfo_has_x86_avx2()) return ArchType::avx2;
 	if (cpuinfo_has_x86_sse4_1()) return ArchType::sse4_1;
 #endif
@@ -54,6 +56,13 @@ namespace kiwi
 	static ArchType testArchSet(ArchType arch, ArchType best)
 	{
 		if (arch <= ArchType::balanced) return arch;
+#if !defined(KIWI_AVX_VNNI_SUPPORTED)
+		if (arch == ArchType::avx_vnni && best >= ArchType::avx_vnni)
+		{
+			std::fprintf(stderr, "This binary isn't built with AVX VNNI support. ArchType::avx2 will be used instead.\n");
+			return ArchType::avx2;
+		}
+#endif
 #if CPUINFO_ARCH_X86 || CPUINFO_ARCH_X86_64 || KIWI_ARCH_X86_64 || KIWI_ARCH_X86
 		if (ArchType::sse2 <= arch && arch <= ArchType::avx512vnni && arch <= best)
 		{
