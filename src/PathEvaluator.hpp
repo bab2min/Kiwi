@@ -327,7 +327,7 @@ namespace kiwi
 			const size_t nodeIdx,
 			const size_t ownFormId,
 			CandTy&& cands,
-			bool unknownForm,
+			float unkFormDiscount,
 			bool splitComplex = false,
 			bool splitSaisiot = false,
 			bool mergeSaisiot = false,
@@ -347,14 +347,7 @@ namespace kiwi
 				whitespaceDiscount = -kw->spacePenalty * node->spaceErrors;
 			}
 			const float typoDiscount = -node->typoCost * kw->typoCostWeight;
-			float unknownFormDiscount = 0;
-			if (unknownForm)
-			{
-				size_t unknownLen = node->uform.empty() ? node->form->form.size() : node->uform.size();
-				unknownFormDiscount = -(unknownLen * kw->unkFormScoreScale + kw->unkFormScoreBias);
-			}
-
-			const float nodeLevelDiscount = whitespaceDiscount + typoDiscount + unknownFormDiscount;
+			const float nodeLevelDiscount = whitespaceDiscount + typoDiscount + unkFormDiscount;
 
 			size_t totalPrevPathes = 0;
 			for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
@@ -829,7 +822,7 @@ namespace kiwi
 			const size_t nodeIdx,
 			const size_t ownFormId,
 			CandTy&& cands,
-			bool unknownForm,
+			float unkFormDiscount,
 			bool splitComplex = false,
 			bool splitSaisiot = false,
 			bool mergeSaisiot = false,
@@ -850,14 +843,7 @@ namespace kiwi
 				whitespaceDiscount = -kw->spacePenalty * node->spaceErrors;
 			}
 			const float typoDiscount = -node->typoCost * kw->typoCostWeight;
-			float unknownFormDiscount = 0;
-			if (unknownForm)
-			{
-				size_t unknownLen = node->uform.empty() ? node->form->form.size() : node->uform.size();
-				unknownFormDiscount = -(unknownLen * kw->unkFormScoreScale + kw->unkFormScoreBias);
-			}
-
-			const float nodeLevelDiscount = whitespaceDiscount + typoDiscount + unknownFormDiscount;
+			const float nodeLevelDiscount = whitespaceDiscount + typoDiscount + unkFormDiscount;
 			const Morpheme* zCodaMorph = nullptr;
 			const Morpheme* zSiotMorph = nullptr;
 			validMorphCands.clear();
@@ -1131,6 +1117,41 @@ namespace kiwi
 		return ret;
 	}
 
+	struct UnkFormScorer
+	{
+		float unkFormScoreScale;
+		float unkFormScoreBias;
+		UnkFormScorer(float scale, float bias)
+			: unkFormScoreScale{ scale }, unkFormScoreBias{ bias }
+		{
+		}
+
+		float operator()(const U16StringView& form) const
+		{
+			float penalty = 0;
+			if (form.size() > 0)
+			{
+				char32_t chrs[2] = { 0,0 };
+				for (size_t i = 0, j = 0; i < form.size() && j < 2; ++j)
+				{ 
+					if (isHighSurrogate(form[i]))
+					{
+						chrs[j] = mergeSurrogate(form[i], form[i + 1]);
+						i += 2;
+					}
+					else
+					{
+						chrs[j] = form[i];
+						++i;
+					}
+				}
+				if (isEmoji(chrs[0], chrs[1])) penalty = -10;
+			}
+
+			return penalty - (form.size() * unkFormScoreScale + unkFormScoreBias);
+		}
+	};
+
 	template<class LangModel>
 	Vector<PathResult> BestPathFinder<LangModel>::findBestPath(const Kiwi* kw,
 		const Vector<SpecialState>& prevSpStates,
@@ -1188,6 +1209,9 @@ namespace kiwi
 		PathEvaluator<LmState> evaluator{
 			kw, startNode, topN, cache, ownFormList, uniqStates,
 		};
+		
+		UnkFormScorer unkFormScorer{ kw->unkFormScoreScale, kw->unkFormScoreBias };
+
 		// middle nodes
 		for (size_t i = 1; i < graphSize - 1; ++i)
 		{
@@ -1202,7 +1226,7 @@ namespace kiwi
 			if (node->form)
 			{
 				evaluator(i, ownFormId, node->form->candidate, 
-					false, splitComplex, splitSaisiot, mergeSaisiot, blocklist, allowedDialects, dialectCost);
+					0.f, splitComplex, splitSaisiot, mergeSaisiot, blocklist, allowedDialects, dialectCost);
 				if (all_of(node->form->candidate.begin(), node->form->candidate.end(), [](const Morpheme* m)
 				{
 					return m->combineSocket || !(m->chunks.empty() || m->complex || m->saisiot);
@@ -1210,14 +1234,16 @@ namespace kiwi
 				{
 					ownFormList.emplace_back(node->form->form);
 					ownFormId = ownFormList.size();
+					const float unkScore = unkFormScorer(node->form->form);
 					evaluator(i, ownFormId, unknownNodeLCands, 
-						true, splitComplex, splitSaisiot, mergeSaisiot, blocklist, allowedDialects, dialectCost);
+						unkScore, splitComplex, splitSaisiot, mergeSaisiot, blocklist, allowedDialects, dialectCost);
 				};
 			}
 			else
 			{
+				const float unkScore = unkFormScorer(node->uform);
 				evaluator(i, ownFormId, unknownNodeCands, 
-					true, splitComplex, splitSaisiot, mergeSaisiot, blocklist, allowedDialects, dialectCost);
+					unkScore, splitComplex, splitSaisiot, mergeSaisiot, blocklist, allowedDialects, dialectCost);
 			}
 
 #ifdef DEBUG_PRINT
