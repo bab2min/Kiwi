@@ -98,26 +98,26 @@
 나도 돈에 한번 안 깝체고 살아 봤이머 좋겠다.	나/NP 도/JX 돈/NNG 에/JKB 한/MM 번/NNB 안/MAG 깝체__1/VV 고/EC 살/VV 어/EC 보/VX 었/EP 이머/EC 좋/VA 겠/EP 다/EF ./SF	나도 돈에 한번 안 쪼들리고 살아 봤으면 좋겠다.
 잘몬한 사람이 데시 썽을 내모 데나?	잘몬__1/NNG 하/XSV ᆫ/ETM 사람/NNG 이/JKS 데시__3/MAG 썽__1/NNG 을/JKO 내/VV 모/EC 데__5/VV 나/EC ?/SF	잘못한 사람이 도리어 성을 내면 되니?
 비가 안 와 가 논이 배짝 말랐네.	비/NNG 가/JKS 안/MAG 오/VV 어가/EC 논/NNG 이/JKS 배짝__2/MAG 마르/VV 었/EP 네/EF ./SF	비가 안 와 가지고 논이 바짝 말랐네.
-그놈이 얼매나 말을 안 듣고 고랑때를 믹이는지 골치가 아푸다.	그놈/NP 이/JKS 얼매나__1/MAG 말/NNG 을/JKO 안/MAG 듣/VV-I 고/EC 고랑때__1/NNG 를/JKO 믹이__1/VV 는지/EC 골치/NNG 가/JKS 아푸/VA 다/EF ./SF	그놈이 얼마나 말을 안 듣고 골탕을 먹이는지 골치가 아프다.	그놈/NP 이/JKS 얼마나/MAG 말/NNG 을/JKO 안/MAG 듣/VV-I 고/EC 골탕/NNG 을/JKO 먹이/VV 는지/EC 골치/NNG 가/JKS 아프/VA 다/EF ./SF
-두 손을 게드랑에 찌고 버팅기고 서 있니더.	두/MM 손/NNG 을/JKO 게드랑__1/NNG 에/JKB 찌__12/VV 고/EC 버팅기__1/VV 고/EC 서/VV 어/EC 있/VX 니/EC 더/MAG ./SF	두 손을 겨드랑에 끼고 버티고 서 있습니다.	두/MM 손/NNG 을/JKO 겨드랑/NNG 에/JKB 끼/VV 고/EC 버티/VV 고/EC 서/VV 어/EC 있/VX 습니다/EF ./SF
-가슬에 기염을 따서 항아리에 여서 저울 내내 삭화요.	가슬__1/NNG 에/JKB 기염__3/NNG 을/JKO 따/VV 어서/EC 항아리/NNG 에/JKB 이/VV 어서/EC 저울__4/NNG 내내/MAG 삭/MAG 화/NNG 요/JX ./SF	가을에 고욤을 따서 항아리에 넣어서 겨울 내내 삭혀요.	가을/NNG 에/JKB 고욤/NNG 을/JKO 따/VV 어서/EC 항아리/NNG 에/JKB 넣/VV 어서/EC 겨울/NNG 내내/MAG 삭히/VV 어요/EF ./SF
-야야, 내일은 칩다 캉께네 옷을 땁뚜시리 챙기 입고 가거라.	야야/IC ,/SP 내일/NNG 은/JX 칩__1/VA-I 다/EC 카/VV ᆼ께/EC 너/NP 의/JKG 옷/NNG 을/JKO 땁뚜시리__1/MAG 챙기/VV 입/VV-R 고/EC 가/VV 거라/EF ./SF	얘야, 내일은 춥다고 하니까 옷을 따뜻이 챙겨 입고 가거라.	얘/NP 야/JKV ,/SP 내일/NNG 은/JX 춥/VA-I 다고/EC 하/VV 니까/EC 옷/NNG 을/JKO 따뜻이/MAG 챙기/VV 어/EC 입/VV-R 고/EC 가/VV 거라/EF ./SF
-동네 얼라들이 빵께살이를 한다고 정신이 없다.	동네/NNG 얼라__1/NNG 들/XSN 이/JKS 빵께살이__1/NNG 를/JKO 하/VV ᆫ다고/EC 정신/NNG 이/JKS 없/VA 다/EF ./SF	동네 어린아이들이 소꿉놀이를 한다고 정신이 없다.	동네/NNG 어린아이/NNG 들/XSN 이/JKS 소꿉놀이/NNG 를/JKO 하/VV ᆫ다고/EC 정신/NNG 이/JKS 없/VA 다/EF ./SF
-개구영바치를 줏어다 키았다.	개구영바치__1/NNG 를/JKO 줏/VV-R 어다/EC 키았다/NNG ./SF	개구멍받이를 주워다 키웠다.	개구멍/NNG 받/VV-R 이/ETN 를/JKO 줍/VV-I 어다/EC 키우/VV 었/EP 다/EF ./SF
-옷감이 꼭 세터리맨치로 까실까실하네예.	옷감/NNG 이/JKS 꼭/MAG 세터리__1/NNG 맨/MM 치/NNB 로/JKB 까실까실하__3/VA 네/EF 예/JX ./SF	옷감이 꼭 쇠털처럼 까슬까슬하네요.	옷감/NNG 이/JKS 꼭/MAG 쇠/NNG 털/NNG 처럼/JKB 까슬까슬/MAG 하/XSA 네요/EF ./SF
-덜 익은 애애초는 새그랍다.	덜/MAG 익/VV 은/ETM 애애초__1/NNG 는/JX 새그랍__2/VA 다/EF ./SF	덜 익은 자두는 시다.	덜/MAG 익/VV 은/ETM 자두/NNG 는/JX 시/VA 다/EF ./SF
-솥뜨벵이가 깨지서 솥을 몬 쓰게 생깄네.	솥뜨벵이__1/NNG 가/XSN 깨지/VV 서/EC 솥/NNG 을/JKO 몬__3/MAG 쓰/VV 게/EC 생깄네/NNG ./SF	솥뚜껑이 깨져서 솥을 못 쓰게 생겼네.	솥/NNG 뚜껑/NNG 이/JKS 깨지/VV 어서/EC 솥/NNG 을/JKO 못/MAG 쓰/VV 게/EC 생기/VV 었/EP 네/EF ./SF
-집 안에 밥 짓는 냄새가 상그리하다.	집/NNG 안/NNG 에/JKB 밥/NNG 짓/VV-I 는/ETM 냄새/NNG 가/JKS 상그리하__1/VA 다/EF ./SF	집 안에 밥 짓는 냄새가 향긋하다.	집/NNG 안/NNG 에/JKB 밥/NNG 짓/VV-I 는/ETM 냄새/NNG 가/JKS 향긋/XR 하/XSA 다/EF ./SF
-껌은 내일 다시 씹그러 벼르빡에 붙여 두어래이.	껌/NNG 은/JX 내일/NNG 다시/MAG 씹/VV-R 그러/VV 어/EC 벼르빡__1/NNG 에/JKB 붙이/VV 어/EC 두/VX 어/EF 래/EF 이/MM ./SF	껌은 내일 다시 씹게 벽에 붙여 두어라.	껌/NNG 은/JX 내일/NNG 다시/MAG 씹/VV-R 게/EC 벽/NNG 에/JKB 붙이/VV 어/EC 두/VX 어라/EF ./SF
-어릴 적에 동네 아들하고 꼬랑대기잡기로 마이 하고 놀았제.	어리/VA ᆯ/ETM 적/NNB 에/JKB 동네/NNG 아__23/NNG 들/XSN 하고/JKB 꼬랑대기잡기__1/NNG 로/JKB 마이__1/MAG 하/VV 고/EC 놀/VV 었/EP 제/EF ./SF	어릴 적에 동네 아이들하고 꼬리잡기를 많이 하고 놀았지.	어리/VA ᆯ/ETM 적/NNB 에/JKB 동네/NNG 아이/NNG 들/XSN 하고/JKB 꼬리/NNG 잡/VV-R 기/ETN 를/JKO 많이/MAG 하/VV 고/EC 놀/VV 었/EP 지/EF ./SF
-메칠 잠을 잘 몬 자서 그런지 얼굴이 꺼치리하다.	메칠__1/NNG 잠/NNG 을/JKO 잘/MAG 몬__3/MAG 자/VV 어서/EC 그렇/VA-I ᆫ지/EC 얼굴/NNG 이/JKS 꺼치리하__1/VA 다/EF ./SF	며칠 잠을 잘 못 자서 그런지 얼굴이 꺼칠하다.	며칠/NNG 잠/NNG 을/JKO 잘/MAG 못/MAG 자/VV 어서/EC 그렇/VA-I ᆫ지/EC 얼굴/NNG 이/JKS 꺼칠/XR 하/XSA 다/EF ./SF
-급한 대로 바닥에다가 글씨로 싰다.	급하/VA ᆫ/ETM 대로/NNB 바닥/NNG 에다가/JKB 글씨/NNG 로/JKB 싰/NNG 이/VCP 다/EF ./SF	급한 대로 바닥에다가 글씨를 썼다.	급하/VA ᆫ/ETM 대로/NNB 바닥/NNG 에다가/JKB 글씨/NNG 를/JKO 쓰/VV 었/EP 다/EF ./SF
-논일 매제기 잘하고 온나.	논/NNG 일/NNG 매제기__1/NNG 잘/MAG 하/XSV 고/EC 오/VV ᆫ나/EF ./SF	논일 마무리 잘하고 오너라.	논/NNG 일/NNG 마무리/NNG 잘/MAG 하/XSV 고/EC 오/VV 너라/EF ./SF
-가시나로 우예 냄비처매만 입히가 키우노?	가시나/NNG 로/JKB 우예__1/MAG 냄비처매__1/NNG 만/JX 입히/VV 가/JKS 키우/VV 노/EF ?/SF	계집애를 어찌 홑치마만 입혀서 키우니?	계집애/NNG 를/JKO 어찌/MAG 홑/NNG 치마/NNG 만/JX 입히/VV 어서/EC 키우/VV 니/EF ?/SF
-노리에 펜하기 살라 카모 젊을 때 아금바리기 살림을 해야 덴다. 	노리__10/NNG 에/JKB 펜하__1/VA 기/ETN 사/VV ᆯ라/EC 카/VV 모/EC 젊/VA 을/ETM 때/NNG 아금바리__1/VA-R 기/ETN 살림/NNG 을/JKO 하/VV 어야/EC 데/VV ᆫ다/EF ./SF	노래에 편하게 살려고 하면 젊을 때 아금받게 살림을 해야 된다.	노래/NNG 에/JKB 편하/VA 게/EC 살/VV 려고/EC 하/VX 면/EC 젊/VA 을/ETM 때/NNG 아금받/VA-R 게/EC 살림/NNG 을/JKO 하/VV 어야/EC 되/VV ᆫ다/EF ./SF
-더부에 메칠 동안 씨달키더마 몰골이 억수로 안 좋네.	더부__2/NNG 에/JKB 메칠__1/NNG 동안/NNG 씨달키__1/VV 더/MAG 마/MAG 몰골/NNG 이/JKS 억수로__1/MAG 안/MAG 좋/VA 네/EF ./SF	더위에 며칠 동안 시달리더니 몰골이 대단히 안 좋네.	더위/NNG 에/JKB 며칠/NNG 동안/NNG 시달리/VV 더니/EC 몰골/NNG 이/JKS 대단히/MAG 안/MAG 좋/VA 네/EF ./SF
-요 앞에 가서 생갱 좀 사 온나.	요/MM 앞/NNG 에/JKB 가/VV 어서/EC 생갱__1/NNG 좀/MAG 사/VV 어/EC 오/VX ᆫ나/EF ./SF	요 앞에 가서 생강 좀 사 오너라.	요/MM 앞/NNG 에/JKB 가/VV 어서/EC 생강/NNG 좀/MAG 사/VV 어/EC 오/VV 너라/EF ./SF
-야가 키는 쪼맨해도 다구지서 넘한테 몸삼은 안 진다. 	야/NP 가/JKS 키/NNG 는/JX 쪼매/NNG ᆫ/JX 하/VX 어도/EC 다/MAG 구/MM 지서/NNG 넘__2/NNG 한테/JKB 몸삼__1/NNG 은/JX 안/MAG 지/VV ᆫ다/EF ./SF	얘가 키는 조그마해도 다부져서 남한테 몸싸움은 안 진다. 	얘/NP 가/JKS 키/NNG 는/JX 조그마/XR 하/XSA 어도/EC 다부지/VA 어서/EC 남/NNG 한테/JKB 몸싸움/NNG 은/JX 안/MAG 지/VV ᆫ다/EF ./SF
+그놈이 얼매나 말을 안 듣고 고랑때를 믹이는지 골치가 아푸다.	그놈/NP 이/JKS 얼매나__1/MAG 말/NNG 을/JKO 안/MAG 듣/VV-I 고/EC 고랑때__1/NNG 를/JKO 믹이__1/VV 는지/EC 골치/NNG 가/JKS 아푸/VA 다/EF ./SF	그놈이 얼마나 말을 안 듣고 골탕을 먹이는지 골치가 아프다.
+두 손을 게드랑에 찌고 버팅기고 서 있니더.	두/MM 손/NNG 을/JKO 게드랑__1/NNG 에/JKB 찌__12/VV 고/EC 버팅기__1/VV 고/EC 서/VV 어/EC 있/VX 니더/EF ./SF	두 손을 겨드랑에 끼고 버티고 서 있습니다.
+가슬에 기염을 따서 항아리에 여서 저울 내내 삭화요.	가슬__1/NNG 에/JKB 기염__3/NNG 을/JKO 따/VV 어서/EC 항아리/NNG 에/JKB 이/VV 어서/EC 저울__4/NNG 내내/MAG 삭후__1/VV 어요/EF ./SF	가을에 고욤을 따서 항아리에 넣어서 겨울 내내 삭혀요.
+야야, 내일은 칩다 캉께네 옷을 땁뚜시리 챙기 입고 가거라.	야/NP 야/JKV ,/SP 내일/NNG 은/JX 칩__1/VA-I 다고/EC 하/VV ᆼ께네/EC 옷/NNG 을/JKO 땁뚜시리__1/MAG 챙기/VV 어/EC 입/VV-R 고/EC 가/VV 거라/EF ./SF	얘야, 내일은 춥다고 하니까 옷을 따뜻이 챙겨 입고 가거라.
+동네 얼라들이 빵께살이를 한다고 정신이 없다.	동네/NNG 얼라__1/NNG 들/XSN 이/JKS 빵께살이__1/NNG 를/JKO 하/VV ᆫ다고/EC 정신/NNG 이/JKS 없/VA 다/EF ./SF	동네 어린아이들이 소꿉놀이를 한다고 정신이 없다.
+개구영바치를 줏어다 키았다.	개구영바치__1/NNG 를/JKO 줏/VV-R 어다/EC 키우/VV 었/EP 다/EF ./SF	개구멍받이를 주워다 키웠다.
+옷감이 꼭 세터리맨치로 까실까실하네예.	옷감/NNG 이/JKS 꼭/MAG 세터리__1/NNG 맨치로/JKB 까실까실/MAG 하/XSA 네/EF 예/JX ./SF	옷감이 꼭 쇠털처럼 까슬까슬하네요.
+덜 익은 애애초는 새그랍다.	덜/MAG 익/VV 은/ETM 애애초__1/NNG 는/JX 새그랍__2/VA 다/EF ./SF	덜 익은 자두는 시다.
+솥뜨벵이가 깨지서 솥을 몬 쓰게 생깄네.	솥뜨벵이__1/NNG 가/JKS 깨지/VV 어서/EC 솥/NNG 을/JKO 몬__3/MAG 쓰/VV 게/EC 생기/VV 었/EP 네/EF ./SF	솥뚜껑이 깨져서 솥을 못 쓰게 생겼네.
+집 안에 밥 짓는 냄새가 상그리하다.	집/NNG 안/NNG 에/JKB 밥/NNG 짓/VV-I 는/ETM 냄새/NNG 가/JKS 상그리/XR 하/XSA 다/EF ./SF	집 안에 밥 짓는 냄새가 향긋하다.
+껌은 내일 다시 씹그러 벼르빡에 붙여 두어래이.	껌/NNG 은/JX 내일/NNG 다시/MAG 씹/VV-R 그러/EC 벼르빡__1/NNG 에/JKB 붙이/VV 어/EC 두/VX 어래이/EF ./SF	껌은 내일 다시 씹게 벽에 붙여 두어라.
+어릴 적에 동네 아들하고 꼬랑대기잡기로 마이 하고 놀았제.	어리/VA ᆯ/ETM 적/NNB 에/JKB 동네/NNG 아__23/NNG 들/XSN 하고/JKB 꼬랑대기잡기__1/NNG 로/JKO 마이__1/MAG 하/VV 고/EC 놀/VV 었/EP 제/EF ./SF	어릴 적에 동네 아이들하고 꼬리잡기를 많이 하고 놀았지.
+메칠 잠을 잘 몬 자서 그런지 얼굴이 꺼치리하다.	메칠__1/NNG 잠/NNG 을/JKO 잘/MAG 몬__3/MAG 자/VV 어서/EC 그렇/VA-I ᆫ지/EC 얼굴/NNG 이/JKS 꺼치리하__1/VA 다/EF ./SF	며칠 잠을 잘 못 자서 그런지 얼굴이 꺼칠하다.
+급한 대로 바닥에다가 글씨로 싰다.	급하/VA ᆫ/ETM 대로/NNB 바닥/NNG 에다가/JKB 글씨/NNG 로/JKO 시__4/VV 었/EP 다/EF ./SF	급한 대로 바닥에다가 글씨를 썼다.
+논일 매제기 잘하고 온나.	논/NNG 일/NNG 매제기__1/NNG 잘/MAG 하/XSV 고/EC 오/VV ᆫ나/EF ./SF	논일 마무리 잘하고 오너라.
+가시나로 우예 냄비처매만 입히가 키우노?	가시나/NNG 로/JKO 우예__1/MAG 냄비처매__1/NNG 만/JX 입히/VV 어가/EC 키우/VV 노/EF ?/SF	계집애를 어찌 홑치마만 입혀서 키우니?
+노리에 펜하기 살라 카모 젊을 때 아금바리기 살림을 해야 덴다. 	노리__10/NNG 에/JKB 펜하__1/VA 기/EC 살/VV ᆯ라고/EC 하/VV 모/EC 젊/VA 을/ETM 때/NNG 아금바리__1/VA-R 기/EC 살림/NNG 을/JKO 하/VV 어야/EC 데__4/VV ᆫ다/EF ./SF	노래에 편하게 살려고 하면 젊을 때 아금받게 살림을 해야 된다.
+더부에 메칠 동안 씨달키더마 몰골이 억수로 안 좋네.	더부__2/NNG 에/JKB 메칠__1/NNG 동안/NNG 씨달키__1/VV 더마/EC 몰골/NNG 이/JKS 억수로__1/MAG 안/MAG 좋/VA 네/EF ./SF	더위에 며칠 동안 시달리더니 몰골이 대단히 안 좋네.
+요 앞에 가서 생갱 좀 사 온나.	요/MM 앞/NNG 에/JKB 가/VV 어서/EC 생갱__1/NNG 좀/MAG 사/VV 어/EC 오/VX ᆫ나/EF ./SF	요 앞에 가서 생강 좀 사 오너라.
+야가 키는 쪼맨해도 다구지서 넘한테 몸삼은 안 진다. 	야/NP 가/JKS 키/NNG 는/JX 쪼맨하__1/VA 어도/EC 다구지__1/VA 어서/EC 넘__2/NNG 한테/JKB 몸삼__1/NNG 은/JX 안/MAG 지/VV ᆫ다/EF ./SF	얘가 키는 조그마해도 다부져서 남한테 몸싸움은 안 진다.
 고방 앞에 서 있이모 일꾼들이 나락섬을 딜놓을 때 걸거칭께네 한젙으로 비끼서라. 	고방/NNG 앞/NNG 에/JKB 서/VV 어/EC 있/VX 이모/NNG 일/NNG 꾼/XSN 들/XSN 이/JKS 나락섬__1/NNG 을/JKO 딜/NNG 놓/VV 을/ETM 때/NNG 걸거칭께네/NNG 한젙__1/NNG 으로/JKB 비끼서__1/VV 라/EF ./SF	고방 앞에 서 있으면 일꾼들이 볏섬을 들여놓을 때 거치적거리니까 한옆으로 비켜서라.	고방/NNG 앞/NNG 에/JKB 서/VV 어/EC 있/VX 으면/EC 일/NNG 꾼/XSN 들/XSN 이/JKS 볏섬/NNG 을/JKO 들여놓/VV 을/ETM 때/NNG 거치/NNG 적/XSN 거리/NNG 이/VCP 니까/EC 한/MM 옆/NNG 으로/JKB 비켜서/VV 어라/EF ./SF
 마리가 삐그덕거리이 틈에다 보적을 찡가라.	마리__3/NNG 가/JKS 삐그덕/MAG 거리/XSV 이/EC 틈/NNG 에다/JKB 보적__1/NNG 을/JKO 찡/MAG 가/VV 어라/EF ./SF	마루가 삐그덕거리니 틈에다 빔을 끼워라.	마루/NNG 가/JKS 삐그덕/MAG 거리/XSV 니/EC 틈/NNG 에다/JKB 빔/NNP 을/JKO 끼우/VV 어라/EF ./SF
 양말도 다 집고 한 째기밖에 안 남았다.	양말/NNG 도/JX 다/MAG 집__5/VV-I 고/EC 한/MM 째기__1/NNG 밖에/JX 안/MAG 남/VV 었/EP 다/EF ./SF	양말도 다 깁고 한 짝밖에 안 남았다.	양말/NNG 도/JX 다/MAG 깁/VV-I 고/EC 한/MM 짝/NNG 밖에/JX 안/MAG 남/VV 었/EP 다/EF ./SF

@@ -98,26 +98,26 @@
 흔떡가래는 쌀을 빻아다가 시루에 쪄 가주구서, 손이루 주물러서 기다랗게 빼넌 거유.	흔떡가래__1/NNG 는/JX 쌀/NNG 을/JKO 빻/VV 어다가/EC 시루/NNG 에/JKB 찌/VV 어/EC 가주/VX 구서/EC ,/SP 손/NNG 이루/JKB 주무르/VV 어서/EC 기다랗/VA-I 게/EC 빼/VV 넌/ETM 거/NNB 이/VCP 유/EF ./SF	가래떡은 쌀을 빻아다가 시루에 쪄 가지고서, 손으로 주물러서 기다랗게 빼는 거예요.
 잰작 밥을 줬어야지, 애들이 배들이 고프니께 울잖어.	잰작__1/MAG 밥/NNG 을/JKO 주/VV 었/EP 어야지/EC ,/SP 애/NNG 들/XSN 이/JKS 배/NNG 들/XSN 이/JKS 고프/VA 니께/EC 울/VV 잖어/EF ./SF	진작 밥을 줬어야지, 애들이 배들이 고프니까 울잖아.
 걔는 나잇갑을 못허니 참 걱정이유.	걔/NP 는/JX 나잇갑__1/NNG 을/JKO 못/MAG 허/VV 니/EC 참/MAG 걱정/NNG 이/VCP 유/EF ./SF	걔는 나잇값을 못하니 참 걱정이에요.
-그 사람은 얌잔해서 일을 꼼꼼허게 잘 마무리해유.	그/MM 사람/NNG 은/JX 얌잔/NNG 하/VV 어서/EC 일/NNG 을/JKO 꼼꼼/MAG 허/XSA 게/EC 잘/MAG 마무리/NNG 하/XSV 어유/EF ./SF	그 사람은 얌전해서 일을 꼼꼼하게 잘 마무리해요.	그/MM 사람/NNG 은/JX 얌전/NNG 하/XSA 어서/EC 일/NNG 을/JKO 꼼꼼/MAG 하/XSA 게/EC 잘/MAG 마무리/NNG 하/XSV 어요/EF ./SF
-시동생들 공부 갈키느라구 참이 농사두 했어유.	시동생/NNG 들/XSN 공부/NNG 갈키__1/VV 느라구/EC 참이__1/NNG 농사/NNG 두/JX 하/VV 었/EP 어유/EF ./SF	시동생들 공부 가르치느라고 참외 농사도 했어요.	시동생/NNG 들/XSN 공부/NNG 가르치/VV 느라고/EC 참외/NNG 농사/NNG 도/JX 하/VV 었/EP 어요/EF ./SF
-새닥이 가져온 빛이 참 곱네유.	새닥__1/NNG 이/JKS 가져오/VV ᆫ/ETM 빛__8/NNG 이/JKS 참/MAG 곱/VA-I 네/EF 유/EF ./SF	새댁이 가져온 빗이 참 곱네요.	새댁/NNG 이/JKS 가져오/VV ᆫ/ETM 빗/NNG 이/JKS 참/MAG 곱/VA-I 네요/EF ./SF
-어떻게 생긴지두 물르고 그냥 신부를 얻은 겨.	어떻게/MAG 생기/VV ᆫ지/EC 두/JX 물르__4/VV 고/EC 그냥/MAG 신부/NNG 를/JKO 얻/VV-R 은/ETM 기__76/NNB 이/VCP 여/EF ./SF	어떻게 생긴지도 모르고 그냥 신부를 얻은 거야.	어떻게/MAG 생기/VV ᆫ지/EC 도/JX 모르/VV 고/EC 그냥/MAG 신부/NNG 를/JKO 얻/VV-R 은/ETM 거/NNB 이/VCP 야/EF ./SF
-씨를 뿌리는 우묵하게 파인 데를 밧골이라구 해유.	씨/NNG 를/JKO 뿌리/VV 는/ETM 우묵/MAG 하/XSA 게/EC 파이/VV ᆫ/ETM 데/NNB 를/JKO 밧골__1/NNG 이/VCP 라구/EC 하/VV 어유/EF ./SF	씨를 뿌리는 우묵하게 파인 데를 밭고랑이라고 해요.	씨/NNG 를/JKO 뿌리/VV 는/ETM 우묵/MAG 하/XSA 게/EC 파이/VV ᆫ/ETM 데/NNB 를/JKO 밭고랑/NNG 이/VCP 라고/EC 하/VV 어요/EF ./SF
-배깥이 나갔드니 속소리바람이 훅 하고 불대유.	배깥__1/NNG 이/JKS 나가/VV 었/EP 드니/EC 속소리바람__1/NNG 이/JKS 훅/MAG 하/VV 고/EC 불/VV 대유/EF ./SF	바깥에 나갔더니 회오리바람이 훅 하고 불대요.	바깥/NNG 에/JKB 나가/VV 었/EP 더니/EC 회오리바람/NNG 이/JKS 훅/MAG 하/VV 고/EC 불/VV 대요/EF ./SF
-예전이는 고드래미를 따서 먹기도 하고 그랬유.	예전/NNG 이/JKS 는/JX 고드래미__2/NNG 르/NNG ᆯ/JKO 따/VV 어서/EC 먹/VV 기/ETN 도/JX 하/VX 고/EC 그렇/VA-I 었/EP 유/EF ./SF	예전에는 고드름을 따서 먹기고 하고 그랬어요.	예전/NNG 에/JKB 는/JX 고드름/NNG 을/JKO 따/VV 어서/EC 먹/VV 기/ETN 이/VCP 고/EC 하/VV 고/EC 그렇/VA-I 었/EP 어요/EF ./SF
-오늘 안으로 벳단을 져다가 논 가생이에 배겨 놔야 햐.	$$$ 오늘/NNG 안/NNG 으로/JKB 베/VV 엇/EP 단/ETM 을/JKO 지/VV 어다가/EC 논/NNG 가생/NNP 이/XSN 에/JKB 배기/VV 어/EC 놓/VX 어야/EC 햐/IC ./SF	오늘 안으로 볏단을 져다가 논가에 부려 놔야 해.
-평생 농사만 졌는디 인제는 지긋덥구 짜증이 나.	평생/NNG 농사/NNG 만/JX 지/VV 었/EP 는디/EC 인제/NNG 는/JX 지긋덥__1/VA 구/EC 짜증/NNG 이/JKS 나/VV 어/EF ./SF	평생 농사만 졌는데 인제는 지긋지긋하고 짜증이 나.	평생/NNG 농사/NNG 만/JX 지/VV 었/EP 는데/EC 인제/NNG 는/JX 지긋지긋/MAG 하/XSA 고/EC 짜증/NNG 이/JKS 나/VV 어/EF ./SF
-마당이다 곡식을 널고는 고몰개루 넓게 펴는 거유.	마당/NNG 이/VCP 다/EF 곡식/NNG 을/JKO 널/VV 고/EC 는/JX 고몰개__1/NNG 루/JKB 넓/VA 게/EC 펴/VV 는/ETM 거/NNB 이/VCP 유/EF ./SF	마당에다 곡식을 널고는 고무래로 넓게 펴는 거예요.	마당/NNG 에다/JKB 곡식/NNG 을/JKO 널/VV 고/EC 는/JX 고무래/NNG 로/JKB 넓/VA 게/EC 펴/VV 는/ETM 거/NNB 이/VCP 예요/EF ./SF
-가을거시는 엔날이는 베를 손이루 베서 널었다가, 걷어서 볏가리를 쌓았유.	가을거시__1/NNG 는/JX 엔/NNG 날/NNG 이/VCP 는/ETM 베__6/NNG 를/JKO 손/NNG 이루/JKB 베/VV 어서/EC 널/VV 었/EP 다가/EC ,/SP 걷/VV-R 어서/EC 볏/NNG 가리/VV 를/JKO 쌓/VV 었/EP 유/EF ./SF	가을걷이는 옛날에는 벼를 손으로 베서 널었다가, 걷어서 볏가리를 쌓았어요.	가을걷이/NNG 는/JX 옛날/NNG 에/JKB 는/JX 벼/NNG 를/JKO 손/NNG 으로/JKB 베/VV 어서/EC 널/VV 었/EP 다가/EC ,/SP 걷/VV-R 어서/EC 볏가리/NNG 를/JKO 쌓/VV 었/EP 어요/EF ./SF
-마침 방앗간집에서 돼지를 잡었다길래 괴기 한 근 사다 끓이 먹었지.	마침/MAG 방앗간/NNG 집/NNG 에서/JKB 돼지/NNG 를/JKO 잡/VV-R 었/EP 다/EF 길래/EC 괴기__6/NNG 한/MM 근/NNB 사/VV 다/EC 끓이/VV 먹/VV 었/EP 지/EF ./SF	마침 방앗간집에서 돼지를 잡았다길래 고기 한 근 사다가 끓여 먹었지.	마침/MAG 방앗간/NNG 집/NNG 에서/JKB 돼지/NNG 를/JKO 잡/VV-R 었/EP 다/EF 길래/EC 고기/NNG 한/MM 근/NNB 사/VV 다가/EC 끓이/VV 어/EC 먹/VV 었/EP 지/EF ./SF
-왜 저누리가 빨리 안 온댜?	왜/MAG 저누리__1/NNG 가/JKS 빨리/MAG 안/MAG 오/VV ᆫ댜/EF ?/SF	왜 곁두리가 빨리 안 온대?	왜/MAG 곁두리/NNP 가/JKS 빨리/MAG 안/MAG 오/VV ᆫ대/EF ?/SF
-부엌이서 쓰는 고무래는 붝고무래지유.	부엌/NNG 이서/JKB 쓰/VV 는/ETM 고무래/NNP 는/JX 붝고무래__1/NNG 이/VCP 지유/EF ./SF	부엌에서 쓰는 고무래는 불고무래지요.	부엌/NNG 에서/JKB 쓰/VV 는/ETM 고무래/NNG 는/JX 불/NNG 고무래/NNG 이/VCP 지요/EF ./SF
-기을에는 한가하니께 들어앉어서 두부두 해 먹구 그러잖아유.	기을__1/NNG 에/JKB 는/JX 한가하/VA 니께/EC 들어앉/VV 어서/EC 두부/NNG 두/MM 해/NNG 먹/VV 구/EC 그러/VV 지/EC 않/VX 어유/EF ./SF	겨울에는 한가하니까 들어앉아서 두부도 해 먹고 그러잖아요.	겨울/NNG 에/JKB 는/JX 한가하/VA 니까/EC 들어앉/VV 어서/EC 두부/NNG 도/JX 하/VV 어/EC 먹/VX 고/EC 그러/VV 잖아요/EF ./SF
-엔날이는 일할 적이 고등아하구 감자 늫구 조려 가는 게 큰 반찬이었유.	엔/NNG 날/NNG 이/JKS 는/JX 일/NNG 하/XSV ᆯ/ETM 적/NNB 이/JKS 고등아__1/NNG 하구/JC 감자/NNG 늫__1/VV 구/EC 조리/VV 어/EC 가/VX 는/ETM 것/NNB 이/JKS 크/VA ᆫ/ETM 반찬/NNG 이/VCP 었/EP 유/EF ./SF	옛날에는 일할 적에 고등어하고 감자 넣고 조려 가는 게 큰 반찬이었어요.	옛날/NNG 에/JKB 는/JX 일/NNG 하/XSV ᆯ/ETM 적/NNB 에/JKB 고등어/NNG 하고/JC 감자/NNG 넣/VV 고/EC 조리/VV 어/EC 가/VX 는/ETM 것/NNB 이/JKS 크/VA ᆫ/ETM 반찬/NNG 이/VCP 었/EP 어요/EF ./SF
-저 게으름디는 일은 안 허구 맨날 놀기만 해유.	저/MM 게으름디__1/NNG 는/JX 일/NNG 은/JX 안/MAG 허/VV 구/EC 맨날/MAG 놀/VV 기/ETN 만/JX 하/VX 어유/EF ./SF	저 게으름쟁이는 일은 안 하고 맨날 놀기만 해요.	저/MM 게으름/NNG 쟁이/XSN 는/JX 일/NNG 은/JX 안/MAG 하/VV 고/EC 맨날/MAG 놀/VV 기/ETN 만/JX 하/VX 어요/EF ./SF
-너는 나라미 끄티매기를 잘 잡아야 햐.	너/NP 는/JX 나라미__4/NNG 끄티매기__2/NNG 를/JKO 잘/MAG 잡/VV-R 어야/EC 햐/IC ./SF	너는 줄 끝을 잘 잡아야 해.	너/NP 는/JX 줄/NNG 끝/NNG 을/JKO 잘/MAG 잡/VV-R 어야/EC 하/VX 어/EF ./SF
-너 똑바루 안 허면 엄마한티 혼꾸녕날 줄 알어.	너/NP 똑바루__1/MAG 안/MAG 허/VV 면/EC 엄마/NNG 한티/JKB 혼꾸녕/NNG 나/VV ᆯ/ETM 줄/NNB 알/VV 어/EF ./SF	너 똑바로 안 하면 엄마한테 혼꾸멍날 줄 알아.	너/NP 똑바로/MAG 안/MAG 하/VV 면/EC 엄마/NNG 한테/JKB 혼꾸멍/NNG 나/VV ᆯ/ETM 줄/NNB 알/VV 어/EF ./SF
-올봄엔 동네 노인덜이 차럴 대절해서 남해안으루 귀경 간디여.	올/MM 봄/NNG 에/JKB ᆫ/JX 동네/NNG 노인/NNG 덜/XSN 이/JKS 차럴/NNG 대절/NNG 하/XSV 어서/EC 남해안/NNP 으루/JKB 귀경__7/NNG 가/VV ᆫ/ETM 디/NNB 여/JKV ./SF	올봄에는 동네 노인들이 차를 대절해서 남해안으로 구경 간대.	올/MM 봄/NNG 에/JKB 는/JX 동네/NNG 노인/NNG 들/XSN 이/JKS 차/NNG 를/JKO 대절/NNG 하/XSV 어서/EC 남해안/NNP 으로/JKB 구경/NNG 가/VV ᆫ대/EF ./SF
+그 사람은 얌잔해서 일을 꼼꼼허게 잘 마무리해유.	그/MM 사람/NNG 은/JX 얌잔/NNG 하/VV 어서/EC 일/NNG 을/JKO 꼼꼼/MAG 허/XSA 게/EC 잘/MAG 마무리/NNG 하/XSV 어유/EF ./SF	그 사람은 얌전해서 일을 꼼꼼하게 잘 마무리해요.
+시동생들 공부 갈키느라구 참이 농사두 했어유.	시동생/NNG 들/XSN 공부/NNG 갈키__1/VV 느라구/EC 참이__1/NNG 농사/NNG 두/JX 하/VV 었/EP 어유/EF ./SF	시동생들 공부 가르치느라고 참외 농사도 했어요.
+새닥이 가져온 빛이 참 곱네유.	새닥__1/NNG 이/JKS 가져오/VV ᆫ/ETM 빛__8/NNG 이/JKS 참/MAG 곱/VA-I 네유/EF ./SF	새댁이 가져온 빗이 참 곱네요.
+어떻게 생긴지두 물르고 그냥 신부를 얻은 겨.	어떻게/MAG 생기/VV ᆫ지/EC 두/JX 물르__4/VV 고/EC 그냥/MAG 신부/NNG 를/JKO 얻/VV-R 은/ETM 기__76/NNB 이/VCP 여/EF ./SF	어떻게 생긴지도 모르고 그냥 신부를 얻은 거야.
+씨를 뿌리는 우묵하게 파인 데를 밧골이라구 해유.	씨/NNG 를/JKO 뿌리/VV 는/ETM 우묵/MAG 하/XSA 게/EC 파이/VV ᆫ/ETM 데/NNB 를/JKO 밧골__1/NNG 이/VCP 라구/EC 하/VV 어유/EF ./SF	씨를 뿌리는 우묵하게 파인 데를 밭고랑이라고 해요.
+배깥이 나갔드니 속소리바람이 훅 하고 불대유.	배깥__1/NNG 이/JKB 나가/VV 었/EP 드니/EC 속소리바람__1/NNG 이/JKS 훅/MAG 하/VV 고/EC 불/VV 대유/EF ./SF	바깥에 나갔더니 회오리바람이 훅 하고 불대요.
+예전이는 고드래미를 따서 먹기도 하고 그랬유.	예전/NNG 이/JKS 는/JX 고드래미__2/NNG 를/JKO 따/VV 어서/EC 먹/VV 기/ETN 도/JX 하/VX 고/EC 그렇/VA-I 었/EP 유/EF ./SF	예전에는 고드름을 따서 먹기고 하고 그랬어요.
+오늘 안으로 벳단을 져다가 논 가생이에 배겨 놔야 햐.	오늘/NNG 안/NNG 으로/JKB 벳단__1/NNG 을/JKO 지/VV 어다가/EC 논/NNG 가생이__2/NNG 에/JKB 배기__6/VV 어/EC 놓/VX 어야/EC 하/VV 어/EF ./SF	오늘 안으로 볏단을 져다가 논가에 부려 놔야 해.
+평생 농사만 졌는디 인제는 지긋덥구 짜증이 나.	평생/NNG 농사/NNG 만/JX 지/VV 었/EP 는디/EC 인제/NNG 는/JX 지긋덥__1/VA 구/EC 짜증/NNG 이/JKS 나/VV 어/EF ./SF	평생 농사만 졌는데 인제는 지긋지긋하고 짜증이 나.
+마당이다 곡식을 널고는 고몰개루 넓게 펴는 거유.	마당/NNG 이다/JKB 곡식/NNG 을/JKO 널/VV 고/EC 는/JX 고몰개__1/NNG 루/JKB 넓/VA 게/EC 펴/VV 는/ETM 거/NNB 이/VCP 유/EF ./SF	마당에다 곡식을 널고는 고무래로 넓게 펴는 거예요.
+가을거시는 엣날이는 베를 손이루 베서 널었다가, 걷어서 볏가리를 쌓았유.	가을거시__1/NNG 는/JX 엣날__1/NNG 이/JKB 는/JX 베__6/NNG 를/JKO 손/NNG 이루/JKB 베/VV 어서/EC 널/VV 었/EP 다가/EC ,/SP 걷/VV-R 어서/EC 볏가리/NNG 를/JKO 쌓/VV 었/EP 유/EF ./SF	가을걷이는 옛날에는 벼를 손으로 베서 널었다가, 걷어서 볏가리를 쌓았어요.
+마침 방앗간집에서 돼지를 잡었다길래 괴기 한 근 사다 끓이 먹었지.	마침/MAG 방앗간/NNG 집/NNG 에서/JKB 돼지/NNG 를/JKO 잡/VV-R 었/EP 다/EF 길래/EC 괴기__6/NNG 한/MM 근/NNB 사/VV 다/EC 끓이/VV 어/EC 먹/VV 었/EP 지/EF ./SF	마침 방앗간집에서 돼지를 잡았다길래 고기 한 근 사다가 끓여 먹었지.
+왜 저누리가 빨리 안 온댜?	왜/MAG 저누리__1/NNG 가/JKS 빨리/MAG 안/MAG 오/VV ᆫ댜/EF ?/SF	왜 곁두리가 빨리 안 온대?
+부엌이서 쓰는 고무래는 붝고무래지유.	부엌/NNG 이서/JKB 쓰/VV 는/ETM 고무래/NNG 는/JX 붝고무래__1/NNG 이/VCP 지유/EF ./SF	부엌에서 쓰는 고무래는 불고무래지요.
+기을에는 한가하니께 들어앉어서 두부두 해 먹구 그러잖아유.	기을__1/NNG 에/JKB 는/JX 한가하/VA 니께/EC 들어앉/VV 어서/EC 두부/NNG 두/JX 하/VV 어/EC 먹/VV 구/EC 그러/VV 잖아유/EF ./SF	겨울에는 한가하니까 들어앉아서 두부도 해 먹고 그러잖아요.
+엣날이는 일할 적이 고등아하구 감자 늫구 조려 가는 게 큰 반찬이었유.	엣날__1/NNG 이/JKB 는/JX 일/NNG 하/XSV ᆯ/ETM 적/NNB 이/JKB 고등아__1/NNG 하구/JC 감자/NNG 늫__1/VV 구/EC 조리/VV 어/EC 가/VX 는/ETM 것/NNB 이/JKS 크/VA ᆫ/ETM 반찬/NNG 이/VCP 었/EP 유/EF ./SF	옛날에는 일할 적에 고등어하고 감자 넣고 조려 가는 게 큰 반찬이었어요.
+저 게으름디는 일은 안 허구 맨날 놀기만 해유.	저/MM 게으름디__1/NNG 는/JX 일/NNG 은/JX 안/MAG 허/VV 구/EC 맨날/MAG 놀/VV 기/ETN 만/JX 하/VX 어유/EF ./SF	저 게으름쟁이는 일은 안 하고 맨날 놀기만 해요.
+너는 나라미 끄티매기를 잘 잡아야 햐.	너/NP 는/JX 나라미__4/NNG 끄티매기__2/NNG 를/JKO 잘/MAG 잡/VV-R 어야/EC 하/VV 어/EF ./SF	너는 줄 끝을 잘 잡아야 해.
+너 똑바루 안 허면 엄마한티 혼꾸녕날 줄 알어.	너/NP 똑바루__1/MAG 안/MAG 허/VV 면/EC 엄마/NNG 한티/JKB 혼꾸녕/NNG 나/VV ᆯ/ETM 줄/NNB 알/VV 어/EF ./SF	너 똑바로 안 하면 엄마한테 혼꾸멍날 줄 알아.
+올봄엔 동네 노인덜이 차럴 대절해서 남해안으루 귀경 간디여.	올/MM 봄/NNG 에/JKB ᆫ/JX 동네/NNG 노인/NNG 덜/XSN 이/JKS 차/NNG 럴/JKO 대절/NNG 하/XSV 어서/EC 남해안/NNP 으루/JKB 귀경__7/NNG 가/VV ᆫ디/EF 여/JX ./SF	올봄에는 동네 노인들이 차를 대절해서 남해안으로 구경 간대.
 그전에는 지붕에서 노내각시가 마이 니리왔지.	그/MM 전/NNG 에/JKB 는/JX 지붕/NNG 에서/JKB 노내각시__1/NNG 가/JKS 마이__1/MAG 니리/NNG 오/VV 었/EP 지/EF ./SF	그전에는 지붕에서 노래기가 많이 내려왔지.	그/MM 전/NNG 에/JKB 는/JX 지붕/NNG 에서/JKB 노래/NNG 기/XSN 가/JKS 많이/MAG 내려오/VV 었/EP 지/EF ./SF
 저 꼼꼼쟁이 양반은 돈 한 푼 쓸 줄을 몰러유.	저/MM 꼼꼼쟁이__2/NNG 양반/NNG 은/JX 돈/NNG 한/MM 푼/NNB 쓰/VV ᆯ/ETM 줄/NNG 을/JKO 몰/VV 러/EC 유/EF ./SF	저 구두쇠 양반은 돈 한 푼 쓸 줄을 몰라요.	저/MM 구두쇠/NNG 양반/NNG 은/JX 돈/NNG 한/MM 푼/NNB 쓰/VV ᆯ/ETM 줄/NNB 을/JKO 모르/VV 어요/EF ./SF
 멫 번이나 이사를 대니느라구 우리 집 살림살이가 다 망가졌지유.	멫__1/NR 번/NNB 이나/JX 이사/NNG 를/JKO 대니__1/VV 느라구/EC 우리/NP 집/NNG 살림살이/NNG 가/JKS 다/MAG 망가지/VV 었/EP 지유/EF ./SF	몇 번이나 이사를 다니느라고 우리 집 살림살이가 다 망가졌지요.	몇/NR 번/NNB 이나/JX 이사/NNG 를/JKO 다니/VV 느라고/EC 우리/NP 집/NNG 살림살이/NNG 가/JKS 다/MAG 망가지/VV 었/EP 지요/EF ./SF

@@ -98,8 +98,8 @@
 아가 놀래서나리 묵던 것얼 꼴뚝 넘겼다.	아__23/NNG 가/JKS 놀래/VV 어서나리/EC 묵__4/VV 던/ETM 것/NNB 얼/JKO 꼴뚝__1/MAG 넘기/VV 었/EP 다/EF ./SF	아이가 놀래서 먹던 것을 꼴깍 넘겼다.
 코찔찔이가 그 길자럴 어찌 알갔니?	코찔찔이__1/NNG 가/JKS 그/MM 길자__1/NNG 럴/JKO 어찌/MAG 알/VV 갔/EP 니/EF ?/SF	코흘리개가 그 글자를 어찌 알겠니?
 바즈래기 넣구 뜨더국 낋여 줄게.	바즈래기__1/NNG 넣/VV 구/EC 뜨더국/NNG 낋이__1/VV 어/EC 주/VX ᆯ게/EF ./SF	바지락 넣고 수제비 끓여 줄게.
-불얼 오래 피웠드니 피겁다.	불어/NNP ᆯ/JKO 오래/MAG 피우/VV 었/EP 드니/EC 피겁__1/VA-R 다/EF ./SF	불을 오래 피웠더니 냅다.	불/NNG 을/JKO 오래/MAG 피우/VV 었/EP 더니/EC 냅다/MAG ./SF
-구뚜막에 노그제럴 잘 닦아 놓으러마.	구뚜막/NNP 에/JKB 노그제__1/NNG 럴/NNP 잘/MAG 닦/VV 어/EC 놓/VX 으러/EC 마/EF ./SF	부뚜막에 가마솥을 잘 닦아 놓으려무나.	부뚜막/NNG 에/JKB 가마솥/NNG 을/JKO 잘/MAG 닦/VV 어/EC 놓/VX 으려/EC 물/VV 나/EF ./SF
-서두르디 말구 노낭 오나라.	서두르/VV 디/EC 말/VV 구/EC 노낭__1/MAG 오나라/NNP ./SF	서두르지 말고 천천히 오너라.	서두르/VV 지/EC 말/VX 고/EC 천천히/MAG 오/VV 너라/EF ./SF
-여기서는 다 품깝 받는다고 해.	여기/NP 서/JKB 는/JX 다/MAG 품깝__1/NNG 받/VV-R 는다고/EC 하/VV 어/EF ./SF	여기서는 다 품값 받는다고 해.	여기/NP 서/JKB 는/JX 다/MAG 품값/NNG 받/VV-R 는다고/EC 하/VV 어/EF ./SF
-사가 사구 서파 잘 챙겨 오나라.	사/NR 가/JKS 사/NR 구/NR 서파__4/NNG 잘/MAG 챙기/VV 어/EC 오/NR 나라/NNG ./SF	사과 사고 거스름 잘 챙겨 오너라.	사과/NNG 사/VV 고/EC 거스르/VV ᆷ/ETN 잘/MAG 챙기/VV 어/EC 오/VV 너라/EF ./SF
+불얼 오래 피웠드니 피겁다.	불/NNG 얼/JKO 오래/MAG 피우/VV 었/EP 드니/EC 피겁__1/VA-R 다/EF ./SF	불을 오래 피웠더니 냅다.
+구뚜막에 노그제럴 잘 닦아 놓으러마.	구뚜막__1/NNG 에/JKB 노그제__1/NNG 럴/JKO 잘/MAG 닦/VV 어/EC 놓/VX 으러마/EF ./SF	부뚜막에 가마솥을 잘 닦아 놓으려무나.
+서두르디 말구 노낭 오나라.	서두르/VV 디/EC 말/VV 구/EC 노낭__1/MAG 오/VV 나라/EF ./SF	서두르지 말고 천천히 오너라.
+여기서는 다 품깝 받는다고 해.	여기/NP 서/JKB 는/JX 다/MAG 품깝__1/NNG 받/VV-R 는다고/EC 하/VV 어/EF ./SF	여기서는 다 품값 받는다고 해.
+사가 사구 서파 잘 챙겨 오나라.	사가__15/NNG 사/VV 구/EC 서파__4/NNG 잘/MAG 챙기/VV 어/EC 오/VV 나라/EF ./SF	사과 사고 거스름 잘 챙겨 오너라.

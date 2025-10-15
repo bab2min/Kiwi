@@ -98,26 +98,26 @@
 뒈야지궤기 ᄉᆞᆱ아난 국물에 둥갈둥갈 떠 잇는 지름 걷어 뒁 ᄆᆞᆷ 넣어 불라. 	뒈야지궤기__1/NNG ᄉᆞᆱ/VV 아나/EP ᆫ/ETM 국물/NNG 에/JKB 둥갈둥갈__1/MAG 뜨/VV 어/EC 잇__7/VV-R 는/ETM 지름__4/NNG 걷/VV-R 어/EC 두/VX 엉/EC ᄆᆞᆷ/NNG 넣/VV 어/EC 불__11/VX 라/EF ./SF	돼지고기를 삶았던 국물에 둥둥 떠 있는 기름을 걷어 두고 모자반을 넣어라.
 온 사름이 요남은은 넘어라.	온/MM 사름__2/NNG 이/VCP 요남은__1/XR 은/JX 넘/VV 어라/EF ./SF	온 사람이 여남은은 넘더라.
 허벅지에 듼그르 큰 거 잇어.	허벅지/NNG 에/JKB 듼그르__1/NNG 크/VA ᆫ/ETM 거/NNB 잇__7/VV-R 어/EF ./SF	허벅지에 화상 큰 거 있어.
-도껭이주제가 가고 나난 호꼼 시언하다.	도껭이주제__1/NNG 가/NNG 가/VV 고/EC 나/NNG 나/NNG ᆫ/JX 호꼼__3/MAG 시언하__1/VA 다/EF ./SF	회오리바람이 가고 나니 조금 시원하다.	회오리바람/NNG 이/JKS 가/VV 고/EC 나/VX 니/EC 조금/MAG 시원/XR 하/XSA 다/EF ./SF
-허영ᄒᆞ게 정갱이가 낀 거 보난 오줌항 헤난 건 셍이여.	$$$ 허영ᄒᆞ게/NNP 정갱이/NNG 가/JKS 끼/VV ᆫ/ETM 거/NNB 보/VV 나/EC ᆫ/JX 오줌/NNG 항/NNG 헤난/NNG 이/VCP 건/EC 셍/NNG 이/VCP 여/EF ./SF	허옇게 버캐가 낀 것을 보니 오줌 항아리 했던 것인 모양이다.
-쳇날은 젯 안 물린다.	쳇날__1/NNG 은/JX 젯__1/NNG 안/MAG 물리/VV ᆫ다/EF ./SF	첫날은 젖 안 물린다.	첫날/NNG 은/JX 젖/NNG 안/MAG 물리/VV ᆫ다/EF ./SF
-잔칠 넴기젠 하민 도감이 ᄒᆞᆫ 끼에 궤기를 얼마썩 쓸 건지 잘 여산하여사주.	잔치/NNG ᆯ/JKO 넴기__1/VV 제/EC ᆫ/JX 하/VV 민/NNG 도감/NNG 이/JKS ᄒᆞᆫ/NNG 끼/NNG 에/JKB 궤기__2/NNG 를/JKO 얼마/NNG 썩/MAG 쓰/VV ᆯ/ETM 거/NNB 이/VCP ᆫ지/EC 잘/MAG 여산/NNP 하/XSV 어/EC 사주/NNG ./SF	잔치를 넘기려고 하면 도감이 한 끼에 고기를 얼마씩 쓸 건지 잘 계획해야지.	잔치/NNG 를/JKO 넘기/VV 려고/EC 하/VX 면/EC 도감/NNG 이/JKS 한/MM 끼/NNG 에/JKB 고기/NNG 를/JKO 얼마/NNG 씩/XSN 쓰/VV ᆯ/ETM 거/NNB 이/VCP ᆫ지/EC 잘/MAG 계획/NNG 하/XSV 어야지/EF ./SF
-몸이 나랏나랏하연 정신이 엇다.	몸/NNG 이/JKS 나랏/NNG 나랏/NNG 하/VV 어/EC ᆫ/Z_CODA 정신/NNG 이/JKS 엇__2/VA 다/EF ./SF	몸이 나른해서 정신이 없다.	몸/NNG 이/JKS 나른/XR 하/XSA 어서/EC 정신/NNG 이/JKS 없/VA 다/EF ./SF
-아미영 헤도 오널은 못 갈 거 닮수다.	아미영__1/MAG 헤/VV 어도/EC 오널__1/NNG 은/JX 못/MAG 가/VV ᆯ/ETM 거/NNB 닮/VV 수다/EF ./SF	아무리 해도 오늘은 못 갈 것 같아요.	아무리/MAG 하/VV 어도/EC 오늘/NNG 은/JX 못/MAG 가/VV ᆯ/ETM 것/NNB 같/VA 어요/EF ./SF
-가이만 똘라 불지 말앙 사이좋게 놀라.	가이/NNP 만/JX 또/MAG ᆯ라/EC 불__11/VX 지/EC 말/VX 어/EC ᆼ/Z_CODA 사이좋/VA 게/EC 놀/VV 라/EF ./SF	걔만 따돌려 버리지 말고 사이좋게 놀아라.	걔/NP 만/JX 따돌리/VV 어/EC 버리/VX 지/EC 말/VX 고/EC 사이좋/VA 게/EC 놀/VV 어라/EF ./SF
-우리 메누리 고멩딸이옌 친정에서 일 ᄒᆞ나도 안 시겨난 셍이라.	우리/NP 메누리__1/NNG 고멩딸__1/NNG 이/JKS 예/NNG ᆫ/ETM 친정/NNG 에서/JKB 일/MM ᄒᆞ나/NNG 도/JX 안/MAG 시겨/NNG 나/VV ᆫ/ETM 셍__2/NNB 이/VCP 라/EF ./SF	우리 며느리 고명딸이라고 친정에서 일 하나도 안 시켰던 모양이야.	우리/NP 며느리/NNG 고명딸/NNG 이/VCP 라고/EC 친정/NNG 에서/JKB 일/NNG 하나/NR 도/JX 안/MAG 시키/VV 었/EP 던/ETM 모양/NNG 이/VCP 야/EF ./SF
-남방에 닮은 건 가운디 돌 박아진 뱅잇혹을 쳐사 뒈는 거라.	남방에__1/NNG 닮/VV 은/ETM 거/NNB ᆫ/JX 가우/NNP 이/VCP ᆫ디/EC 돌/NNG 박/VV 어/EC 지/VX ᆫ/ETM 뱅잇혹__1/NNG 을/JKO 치/VV 어/EC 사/NR 뒈__2/NNB 는/ETM 거/NNB 이/VCP 라/EF ./SF	나무절구 같은 것은 가운데 돌이 박힌 방아확을 쳐야 되는 거야.	나무/NNG 절구/NNG 같/VA 은/ETM 것/NNB 은/JX 가운데/NNG 돌/NNG 이/JKS 박히/VV ᆫ/ETM 방아/NNG 확/NNG 을/JKO 치/VV 어야/EC 되/VV 는/ETM 거/NNB 이/VCP 야/EF ./SF
-나이가 들어시난 밧일도 이제 에잉간하민 그만ᄒᆞᆸ서.	나이/NNG 가/JKS 들/VV 어/EC 시/NNG 난/NNG 밧__2/NNG 일/NNG 도/JX 이제/MAG 에잉간하__1/VA 민/NNG 그만/MAG ᄒᆞᆸ/NNG 서/VV 어/EF ./SF	나이가 들었으니 밭일도 이제 어지간하면 그만하세요.	나이/NNG 가/JKS 들/VV 었/EP 으니/EC 밭일/NNG 도/JX 이제/MAG 어지간/XR 하/XSA 면/EC 그만/MAG 하/VV 세요/EF ./SF
-어멍 죽으민 아덜 상제는 머귀낭 몽뎅이를 헷덴 헙디다.	어멍__1/NNG 죽/VV 으/EC 민/NNG 아덜__1/NNG 상제/NNG 는/JX 머귀낭__1/NNG 몽뎅이/NNG 를/JKO 헷덴/NNG 허/VV ᆸ디다/EF ./SF	어머니 죽으면 아들 상제는 머귀나무 막대기를 했다고 합디다.	어머니/NNG 죽/VV 으면/EC 아들/NNG 상제/NNG 는/JX 머귀/NNG 나무/NNG 막대기/NNG 를/JKO 하/VV 었/EP 다고/EC 하/VV ᆸ디다/EF ./SF
-베가 골락하연 잘 못 걸으키여.	베__7/NNG 가/JKS 골락하__1/VV 여/EC ᆫ/JX 잘/MAG 못/MAG 걷/VV-I 으/EF 키/NNG 이/VCP 여/EF ./SF	배가 곯아서 잘 못 걷겠다.	배/NNG 가/JKS 곯/VV 어서/EC 잘/MAG 못/MAG 걷/VV-I 겠/EP 다/EF ./SF
-집 짓을 때 퉤기 얽어놩 양착으로 개벡하영 그 우틔 종이 부쪄사지.	집/NNG 짓/VV-I 을/ETM 때/NNG 퉤기__1/NNG 얽/VV 어/EC 놓/VX 어/EC ᆼ/Z_CODA 양착__3/NNG 으로/JKB 개벡하__1/VV 여/EC ᆼ/Z_CODA 그/MM 우틔/NNG 종/NNG 이/JKS 부쪄사/NNG 이/VCP 지/EF ./SF	집 지을 때 외 얽어놓고 양쪽으로 새벽하고 그 위에 종이를 붙여야지.	집/NNG 짓/VV-I 을/ETM 때/NNG 외/NNB 얽/VV 어/EC 놓/VX 고/EC 양쪽/NNG 으로/JKB 새벽/NNG 하/VV 고/EC 그/MM 위/NNG 에/JKB 종이/NNG 를/JKO 붙이/VV 어야지/EF ./SF
-이제 곧 정월이난 오널 장은 막 부끌 거주. 	이제/MAG 곧/MAG 정월/NNG 이나/JC ᆫ/Z_CODA 오널__1/NNG 장/NNG 은/JX 막__21/MAG 부끌/NNG 거주/NNG ./SF	이제 곧 정월이니까 오늘 장은 아주 붐빌 것이다.	이제/MAG 곧/MAG 정월/NNG 이/VCP 니까/EC 오늘/MAG 장/NNG 은/JX 아주/MAG 붐비/VV ᆯ/ETM 것/NNB 이/VCP 다/EF ./SF
-돈을 엇이대기지 말앙 모아사 집도 사곡 땅도 사곡 헐 거 아니라.	돈/NNG 을/JKO 엇이대기__1/VV 지/EC 말/VX 어/EC ᆼ/Z_CODA 모으/VV 어/EC 사/NR 집/NNB 도/JX 사/NR 곡/NNG 땅/NNG 도/JX 사/NR 곡/NNG 허/VV ᆯ/ETM 거/NNB 아니/VCN 라/EF ./SF	돈을 낭비하지 말고 모아야 집도 사고 땅도 사고 할 게 아니냐.	돈/NNG 을/JKO 낭비/NNG 하/XSV 지/EC 말/VX 고/EC 모으/VV 어야/EC 집/NNG 도/JX 사/VV 고/EC 땅/NNG 도/JX 사/VV 고/EC 하/VV ᆯ/ETM 것/NNB 이/JKC 아니/VCN 냐/EF ./SF
-쪼끼차기는 이젠 잘 아이 차주.	쪼끼차기__1/NNG 는/JX 이제/NNG ᆫ/JX 잘/MAG 아이__12/MAG 차주/NNG ./SF	제기차기는 이젠 잘 아니 차지.	제기차기/NNG 는/JX 이제/NNG ᆫ/JX 잘/MAG 아니/MAG 차지/NNG ./SF
-떡 먹으크넨 들으곤데 어디 십디가 ᄒᆞ멍 어가라 먹엇주.	떡/NNG 먹으크넨/NNG 듣/VV-I 으고/EC 이/VCP ᆫ데/EC 어디/NP 십/NR 디/NNG 가/JKS ᄒᆞ멍/NNG 어가라__1/MAG 먹/VV 엇/EP 주/NNG ./SF	떡 먹겠냐고 묻기에 어디 있냐고 하면서 곧 먹었지.	떡/NNG 먹/VV 겠/EP 냐고/EC 묻/VV-I 기/ETN 에/JKB 어디/NP 있/VA 냐고/EC 하/VV 면서/EC 곧/MAG 먹/VV 었/EP 지/EF ./SF
-아이고, 가렛좆둥이 몽글앙 안 뒈키여.	아이고/IC ,/SP 가렛좆둥이__1/NNG 몽/NNP 글/NNG 앙/MAG 안/MAG 뒈__2/NNB 키/NNG 이/VCP 여/EF ./SF	아이고, 맷수쇠 몽그라져서 안 되겠다.	아이고/IC ,/SP 맷수쇠/NNP 몽/NNP 그라/VV 지/VX 어서/EC 안/MAG 되/VV 겠/EP 다/EF ./SF
-미깡낭 가지에 미깡이 자락 욜안 거들거들.	$$$ 미/NNG 깡/NNG 낭/NNG 가지/NNG 에/JKB 미/NNG 깡/NNG 이/JKS 자락/NNG 욜/NNG 안/MAG 거들/VV ᆯ/ETM 거/NNB 들/XSN ./SF	밀감나무 가지에 밀감이 잔뜩 열어서 열매가 흔들흔들.
-막 급허게 오단 보난 사나의상제신딘 인사도 못 헹 와졋저.	막__21/MAG 급허게/NNG 오/NR 단/NNG 보/VV 나/EC ᆫ/JX 사나의상제__1/NNG 이/VCP 시/EP ᆫ디/EC ᆫ/JX 인사/NNG 도/JX 못/MAG 헹/NNP 와졋저/NNG ./SF	아주 급하게 오다 보니 바깥상제에게는 인사도 못 하고 왔다.	아주/MAG 급하/VA 게/EC 오/VV 다/EC 보/VX 니/EC 바깥/NNG 상제/NNG 에게/JKB 는/JX 인사/NNG 도/JX 못/MAG 하/VV 고/EC 오/VX 었/EP 다/EF ./SF
+도껭이주제가 가고 나난 호꼼 시언하다.	도껭이주제__1/NNG 가/JKS 가/VV 고/EC 나/VX 난__13/EC 호꼼__3/MAG 시언하__1/VA 다/EF ./SF	회오리바람이 가고 나니 조금 시원하다.
+허영ᄒᆞ게 정갱이가 낀 거 보난 오줌항 헤난 건 셍이여.	허영ᄒᆞ__3/VA 게/EC 정갱이__2/NNG 가/JKS 끼/VV ᆫ/ETM 거/NNB 보/VV 난__13/EC 오줌/NNG 항__5/NNG ᄒᆞ/VV 어나/EP ᆫ/ETM 거/NNB 이/VCP ᆫ/ETM 셍__2/NNB 이/VCP 여/EF ./SF	허옇게 버캐가 낀 것을 보니 오줌 항아리 했던 것인 모양이다.
+쳇날은 젯 안 물린다.	쳇날__1/NNG 은/JX 젯__1/NNG 안/MAG 물리/VV ᆫ다/EF ./SF	첫날은 젖 안 물린다.
+잔칠 넴기젠 하민 도감이 ᄒᆞᆫ 끼에 궤기를 얼마썩 쓸 건지 잘 여산하여사주.	잔치/NNG ᆯ/JKO 넴기__1/VV 젠/EC 하/VX 민/EC 도감/NNG 이/JKS ᄒᆞᆫ/MM 끼/NNG 에/JKB 궤기__2/NNG 를/JKO 얼마/NNG 썩__7/XSN 쓰/VV ᆯ/ETM 거/NNB 이/VCP ᆫ지/EC 잘/MAG 여산__3/NNG 하/XSV 어사/EC 주/EF ./SF	잔치를 넘기려고 하면 도감이 한 끼에 고기를 얼마씩 쓸 건지 잘 계획해야지.
+몸이 나랏나랏하연 정신이 엇다.	몸/NNG 이/JKS 나랏나랏__1/MAG 하/XSV 언/EC 정신/NNG 이/JKS 엇__2/VA 다/EF ./SF	몸이 나른해서 정신이 없다.
+아미영 헤도 오널은 못 갈 거 닮수다.	아미영__1/MAG ᄒᆞ/VV 어도/EC 오널__1/NNG 은/JX 못/MAG 가/VV ᆯ/ETM 거/NNB 닮/VV 수다/EF ./SF	아무리 해도 오늘은 못 갈 것 같아요.
+가이만 똘라 불지 말앙 사이좋게 놀라.	가이/NNP 만/JX 똘르__1/VV 어/EC 불__11/VX 지/EC 말/VX 엉/EC 사이좋/VA 게/EC 놀/VV 라/EF ./SF	걔만 따돌려 버리지 말고 사이좋게 놀아라.
+우리 메누리 고멩딸이옌 친정에서 일 ᄒᆞ나도 안 시겨난 셍이라.	우리/NP 메누리__1/NNG 고멩딸__1/NNG 이/VCP 엔/EC 친정/NNG 에서/JKB 일/MM ᄒᆞ나/NR 도/JX 안/MAG 시기__2/VV 어나/EP ᆫ/ETM 셍__2/NNB 이/VCP 라/EF ./SF	우리 며느리 고명딸이라고 친정에서 일 하나도 안 시켰던 모양이야.
+남방에 닮은 건 가운디 돌 박아진 뱅잇혹을 쳐사 뒈는 거라.	남방에__1/NNG 닮/VV 은/ETM 거/NNB ᆫ/JX 가운디__1/NNG 돌/NNG 박/VV 어/EC 지/VX ᆫ/ETM 뱅잇혹__1/NNG 을/JKO 치/VV 어사/EC 뒈__3/VV 는/ETM 거/NNB 이/VCP 라/EF ./SF	나무절구 같은 것은 가운데 돌이 박힌 방아확을 쳐야 되는 거야.
+나이가 들어시난 밧일도 이제 에잉간하민 그만ᄒᆞᆸ서.	나이/NNG 가/JKS 들/VV 엇/EP 으난/EC 밧__2/NNG 일/NNG 도/JX 이제/MAG 에잉간하__1/VA 민/EC 그만/MAG ᄒᆞ/VV ᆸ서/EF ./SF	나이가 들었으니 밭일도 이제 어지간하면 그만하세요.
+어멍 죽으민 아덜 상제는 머귀낭 몽뎅이를 헷덴 헙디다.	어멍__1/NNG 죽/VV 으민/EC 아덜__1/NNG 상제/NNG 는/JX 머귀낭__1/NNG 몽뎅이/NNG 를/JKO ᄒᆞ/XSV 엇/EP 덴/EC 허/VV ᆸ디다/EF ./SF	어머니 죽으면 아들 상제는 머귀나무 막대기를 했다고 합디다.
+베가 골락하연 잘 못 걸으키여.	베__7/NNG 가/JKS 골락하__1/VV 언/EC 잘/MAG 못/MAG 걷/VV-I 으크/EP 어/EF ./SF	배가 곯아서 잘 못 걷겠다.
+집 짓을 때 퉤기 얽어놩 양착으로 개벡하영 그 우틔 종이 부쪄사지.	집/NNG 짓/VV-I 을/ETM 때/NNG 퉤기__1/NNG 얽/VV 어/EC 놓/VX 엉/EC 양착__3/NNG 으로/JKB 개벡하__1/VV 엉/EC 그/MM 우틔/NNG 종이/NNG 부찌__1/VV 어사지/EF ./SF	집 지을 때 외 얽어놓고 양쪽으로 새벽하고 그 위에 종이를 붙여야지.
+이제 곧 정월이난 오널 장은 막 부끌 거주. 	이제/MAG 곧/MAG 정월/NNG 이/VCP 난/EC 오널__1/NNG 장/NNG 은/JX 막__21/MAG 부끄__4/VV ᆯ/ETM 거/NNB 이/VCP 주/EF ./SF	이제 곧 정월이니까 오늘 장은 아주 붐빌 것이다.
+돈을 엇이대기지 말앙 모아사 집도 사곡 땅도 사곡 헐 거 아니라.	돈/NNG 을/JKO 엇이대기__1/VV 지/EC 말/VX 엉/EC 모으/VV 어사/EC 집/NNG 도/JX 사/VV 곡/EC 땅/NNG 도/JX 사/VV 곡/EC 허/VV ᆯ/ETM 거/NNB 아니/VCN 라/EF ./SF	돈을 낭비하지 말고 모아야 집도 사고 땅도 사고 할 게 아니냐.
+쪼끼차기는 이젠 잘 아이 차주.	쪼끼차기__1/NNG 는/JX 이제/NNG ᆫ/JX 잘/MAG 아이__12/MAG 차/VV 주/EF ./SF	제기차기는 이젠 잘 아니 차지.
+떡 먹으크넨 들으곤데 어디 십디가 ᄒᆞ멍 어가라 먹엇주.	떡/NNG 먹/VV 으크/EP 넨/EC 듣__11/VV-I 으곤데/EC 어디/NP 십/NR 디/NNG 가/JKS ᄒᆞ/VV 멍/EC 어가라__1/MAG 먹/VV 엇/EP 주/EF ./SF	떡 먹겠냐고 묻기에 어디 있냐고 하면서 곧 먹었지.
+아이고, 가렛좆둥이 몽글앙 안 뒈키여.	아이고/IC ,/SP 가렛좆둥이__1/NNG 몽글__4/VV 엉/EC 안/MAG 뒈__3/VV 으크/EP 어/EF ./SF	아이고, 맷수쇠 몽그라져서 안 되겠다.
+미깡낭 가지에 미깡이 자락 욜안 거들거들.	미깡낭__1/NNG 가지/NNG 에/JKB 미깡__1/NNG 이/JKS 자락__14/MAG 욜__1/VV 언/EC 거들거들__2/MAG ./SF	밀감나무 가지에 밀감이 잔뜩 열어서 열매가 흔들흔들.
+막 급허게 오단 보난 사나의상제신딘 인사도 못 헹 와졋저.	막__21/MAG 급허게/NNG 오/VV 단/EC 보/VX 난/EC 사나의상제__1/NNG 신디/JKB ᆫ/JX 인사/NNG 도/JX 못/MAG ᄒᆞ/VV 엉/EC 오/VV 어/EC 지/VX 엇/EP 저/EF ./SF	아주 급하게 오다 보니 바깥상제에게는 인사도 못 하고 왔다.
 솟덕에 솟을 앚졍 밥을 헤 나민 솟강알에 거멩이가 안 셍길 수가 엇어.	솟덕__1/NNG 에/JKB 솟__2/NNG 을/JKO 앚졍/NNG 밥/NNG 을/JKO 헤/MAG 나미/NNP ᆫ/JX 솟강알__1/NNG 에/JKB 거멩이__1/NNG 가/NNG 안/MAG 셍/NNG 길/VA ᆯ/ETM 수/NNB 가/JKS 엇__2/VA 어/EF ./SF	봇돌에 솥을 안쳐서 밥을 하고 나면 아궁이에 검댕이 안 생길 수가 없어.	봇/NNG 돌/NNG 에/JKB 솥/NNG 을/JKO 안치/VV 어서/EC 밥/NNG 을/JKO 하/VV 고/EC 나/VX 면/EC 아궁이/NNG 에/JKB 검댕/NNG 이/JKS 안/MAG 생기/VV ᆯ/ETM 수/NNB 가/JKS 없/VA 어/EF ./SF
 좁은 목에 사름들이 메와들멍 떠들고 햇주게.	좁/VA-R 은/ETM 목/NNG 에/JKB 사름__2/NNG 들/XSN 이/JKS 메와들__1/VV 멍/MAG 떠들/VV 고/EC 하/VX 엇/EP 주/VX 게/EF ./SF	좁은 목에 사람들이 모여들며 떠들고 했습니다.	좁/VA-R 은/ETM 목/NNG 에/JKB 사람/NNG 들/XSN 이/JKS 모여들/VV 며/EC 떠들/VV 고/EC 하/VV 었/EP 습니다/EF ./SF
 ᄉᆞ답 널어 논 거 쏘나기에 발락 젖엇수다. 	ᄉᆞ답/NNG 널/VV 어/EC 놀/VV ᆫ/ETM 거/NNB 쏘나기__1/NNG 에/JKB 발락__3/MAG 젖/VV 엇/EP 수다/EF ./SF	세답 널어 놓은 거 소나기에 흠뻑 젖었어요. 	세/MM 답/NNG 널/VV 어/EC 놓/VX 은/ETM 거/NNB 소나기/NNG 에/JKB 흠뻑/MAG 젖/VV 었/EP 어요/EF ./SF
