@@ -2768,10 +2768,7 @@ void KiwiBuilder::convertHSData(
 
 HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes, 
 	size_t batchSize, size_t causalContextSize, size_t windowSize, size_t numWorkers, 
-	double dropoutProb,
-	double dropoutProbOnHistory,
-	double nounAugmentingProb,
-	size_t generateUnlikelihoods,
+	HSDatasetOption option,
 	const TokenFilter& tokenFilter,
 	const TokenFilter& windowFilter,
 	double splitRatio,
@@ -2783,13 +2780,13 @@ HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes,
 	const vector<pair<pair<string, POSTag>, pair<string, POSTag>>>* transform
 ) const
 {
-	HSDataset dataset{ batchSize, causalContextSize, windowSize, true, numWorkers, dropoutProb, dropoutProbOnHistory, nounAugmentingProb, generateUnlikelihoods };
+	HSDataset dataset{ batchSize, causalContextSize, windowSize, true, numWorkers, option };
 	auto& sents = dataset.sents.get();
 	const KiwiBuilder* srcBuilder = this;
 	MorphemeMap realMorph;
 	size_t maxTokenId = 0;
 
-	const bool doesGenerateUnlikelihoods = generateUnlikelihoods != (size_t)-1;
+	const bool doesGenerateUnlikelihoods = option.generateUnlikelihoods != (size_t)-1;
 
 	if (morphemeDefPath.empty())
 	{
@@ -2829,7 +2826,12 @@ HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes,
 
 	if (splitDataset)
 	{
-		*splitDataset = HSDataset{ batchSize, causalContextSize, windowSize, true, numWorkers, dropoutProb, 0, 0, generateUnlikelihoods };
+		HSDatasetOption optionForSplit = option;
+		optionForSplit.dropoutProbOnHistory = 0;
+		optionForSplit.nounAugmentingProb = 0;
+		optionForSplit.emojiAugmentingProb = 0;
+		optionForSplit.sbAugmentingProb = 0;
+		*splitDataset = HSDataset{ batchSize, causalContextSize, windowSize, true, numWorkers, optionForSplit };
 		splitDataset->dummyBuilder = dataset.dummyBuilder;
 		splitDataset->langModel = dataset.langModel;
 		splitDataset->kiwiInst = dataset.kiwiInst;

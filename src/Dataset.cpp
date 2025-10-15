@@ -340,6 +340,7 @@ size_t HSDataset::_next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode,
 		auto knlm = std::dynamic_pointer_cast<lm::KnLangModelBase>(langModel);
 		auto& local = locals[localId];
 		auto& tokens = local.tokenBuf;
+		const auto& morphs = *morphemes;
 		tokens.reserve(sents.get()[shuffledIdx[sentFirst]].size());
 		for (size_t s = sentFirst; s < sentLast; ++s)
 		{
@@ -359,14 +360,15 @@ size_t HSDataset::_next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode,
 				{
 					t1 = getDefaultMorphemeId((*oovDict)[-t1 - 1].second);
 				}
-				const auto nounAugment = ((*morphemes)[t].tag == POSTag::nnp && !isSpecialClass((*morphemes)[t1].tag)) ? nounAugmentor(local.rng) : 0;
+				const auto nounAugment = (morphs[t].tag == POSTag::nnp && !isSpecialClass(morphs[t1].tag)) ? nounAugmentor(local.rng) : 0;
 				const auto emojiAugment = 
-					((*morphemes)[t].tag == POSTag::nnp && isJClass((*morphemes)[t1].tag)) ? emojiAugmentor(local.rng) :
-					(((*morphemes)[t].tag == POSTag::ef && (*morphemes)[t1].tag == POSTag::sf) ? emojiAugmentor(local.rng) + 5 : 0);
+					(morphs[t].tag == POSTag::nnp && isJClass(morphs[t1].tag)) ? emojiAugmentor(local.rng) :
+					((morphs[t].tag == POSTag::ef && morphs[t1].tag == POSTag::sf) ? emojiAugmentor(local.rng) + 5 : 0);
+				const bool isBOS = (tokens.size() == 1 && tokens[0] == 0);
 				const auto sbAugment =
-					(((*morphemes)[t].tag == POSTag::nng || (*morphemes)[t].tag == POSTag::nnp) 
-						&& (*morphemes)[t1].tag == (*morphemes)[t].tag 
-						&& (tokens.back() < 0 || (*morphemes)[tokens.back()].tag != POSTag::sb)) ? sbAugmentor(local.rng) : 0;
+					(((tokens.size() > 1 && (morphs[t].tag == POSTag::nng || morphs[t].tag == POSTag::nnp) && morphs[t1].tag == morphs[t].tag)
+						|| isBOS
+					 ) && (tokens.back() < 0 || morphs[tokens.back()].tag != POSTag::sb)) ? sbAugmentor(local.rng) : 0;
 				size_t sbToken = 0;
 
 				if (sbAugment)
@@ -405,17 +407,17 @@ size_t HSDataset::_next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode,
 						tokens.emplace_back(knlm ? t : tWithOOV);
 						break;
 					case 1: // replacement
-						tokens.emplace_back(getDefaultMorphemeId((*morphemes)[t].tag));
+						tokens.emplace_back(getDefaultMorphemeId(morphs[t].tag));
 						break;
 					case 2: // deletion
 						break;
 					case 3: // insertion
-						tokens.emplace_back(getDefaultMorphemeId((*morphemes)[t].tag));
+						tokens.emplace_back(getDefaultMorphemeId(morphs[t].tag));
 						tokens.emplace_back(knlm ? t : tWithOOV);
 						break;
 					case 4: // insertion
 						tokens.emplace_back(knlm ? t : tWithOOV);
-						tokens.emplace_back(getDefaultMorphemeId((*morphemes)[t].tag));
+						tokens.emplace_back(getDefaultMorphemeId(morphs[t].tag));
 						break;
 					}
 				}
@@ -452,7 +454,7 @@ size_t HSDataset::_next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode,
 					++p; // skip the following punctuation
 				}
 
-				if (sbAugment)
+				if (sbAugment && !isBOS)
 				{
 					switch (sbAugment)
 					{
