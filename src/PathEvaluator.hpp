@@ -916,15 +916,10 @@ namespace kiwi
 							newPath.wid = zCodaMorph->lmMorphemeId;
 						}
 					}
-					continue;
 				}
 				// 사이시옷(zSiot)을 위한 지름길
-				if (zSiotMorph)
+				if (zSiotMorph && (splitSaisiot || mergeSaisiot))
 				{
-					if (!(splitSaisiot || mergeSaisiot))
-					{
-						continue;
-					}
 					for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
 					{
 						for (auto& p : cache[prev - startNode])
@@ -940,7 +935,6 @@ namespace kiwi
 							newPath.wid = zSiotMorph->lmMorphemeId;
 						}
 					}
-					continue;
 				}
 
 				size_t totalPrevPathes = 0;
