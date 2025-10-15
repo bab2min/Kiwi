@@ -109,7 +109,7 @@ void kiwi_clear_error()
 	currentError = {};
 }
 
-kiwi_builder_h kiwi_builder_init(const char* model_path, int num_threads, int options)
+kiwi_builder_h kiwi_builder_init(const char* model_path, int num_threads, int options, int enabled_dialects)
 {
 	try
 	{
@@ -121,7 +121,7 @@ kiwi_builder_h kiwi_builder_init(const char* model_path, int num_threads, int op
 			: (mtMask == KIWI_BUILD_MODEL_TYPE_CONG) ? ModelType::cong
 			: (mtMask == KIWI_BUILD_MODEL_TYPE_CONG_GLOBAL) ? ModelType::congGlobal
 			: ModelType::none;
-		return (kiwi_builder_h)new KiwiBuilder{ model_path, (size_t)num_threads, buildOption, modelType };
+		return (kiwi_builder_h)new KiwiBuilder{ model_path, (size_t)num_threads, buildOption, modelType, (Dialect)enabled_dialects };
 	}
 	catch (...)
 	{
@@ -203,7 +203,7 @@ public:
     CStreamAdapter(const kiwi_stream_object_t& obj) : std::istream(&buf), buf(obj) {}
 };
 
-kiwi_builder_h kiwi_builder_init_stream(kiwi_stream_object_t (*stream_object_factory)(const char* filename), int num_threads, int options)
+kiwi_builder_h kiwi_builder_init_stream(kiwi_stream_object_t (*stream_object_factory)(const char* filename), int num_threads, int options, int enabled_dialects)
 {
 	try
 	{
@@ -227,7 +227,7 @@ kiwi_builder_h kiwi_builder_init_stream(kiwi_stream_object_t (*stream_object_fac
 			return std::make_unique<CStreamAdapter>(stream_obj);
 		};
 		
-		return (kiwi_builder_h)new KiwiBuilder{ cppStreamProvider, (size_t)num_threads, buildOption, modelType };
+		return (kiwi_builder_h)new KiwiBuilder{ cppStreamProvider, (size_t)num_threads, buildOption, modelType, (Dialect)enabled_dialects};
 	}
 	catch (...)
 	{
@@ -294,13 +294,12 @@ int kiwi_builder_add_pre_analyzed_word(kiwi_builder_h handle, const char* form, 
 		{
 			throw invalid_argument{ "`size` must be positive integer." };
 		}
-		vector<pair<u16string, POSTag>> analyzed(size);
+		vector<tuple<u16string, POSTag, uint8_t>> analyzed(size);
 		vector<pair<size_t, size_t>> p_positions;
 
 		for (int i = 0; i < size; ++i)
 		{
-			analyzed[i].first = utf8To16(analyzed_morphs[i]);
-			analyzed[i].second = parse_tag(analyzed_pos[i]);
+			analyzed[i] = make_tuple(utf8To16(analyzed_morphs[i]), parse_tag(analyzed_pos[i]), undefSenseId);
 		}
 
 		if (positions)
@@ -771,15 +770,26 @@ kiwi_morphset_h kiwi_new_morphset(kiwi_h handle)
 	}
 }
 
-kiwi_res_h kiwi_analyze_w(kiwi_h handle, const kchar16_t * text, int topN, int matchOptions, kiwi_morphset_h blocklilst, kiwi_pretokenized_h pretokenized)
+inline AnalyzeOption toAnalyzeOption(kiwi_analyze_option_t option)
+{
+	return AnalyzeOption{
+		(Match)option.match_options,
+		option.blocklist ? &option.blocklist->morphemes : nullptr,
+		!!option.open_ending,
+		(Dialect)option.allowed_dialects,
+		option.dialect_cost
+	};
+}
+
+kiwi_res_h kiwi_analyze_w(kiwi_h handle, const kchar16_t * text, int top_n, kiwi_analyze_option_t option, kiwi_pretokenized_h pretokenized)
 {
 	if (!handle) return nullptr;
 	Kiwi* kiwi = (Kiwi*)handle;
 	try
 	{
 		return new kiwi_res{ kiwi->analyze(
-			(const char16_t*)text, topN, 
-			AnalyzeOption{ (Match)matchOptions, blocklilst ? &blocklilst->morphemes : nullptr},
+			(const char16_t*)text, top_n, 
+			toAnalyzeOption(option),
 			pretokenized ? *pretokenized : std::vector<PretokenizedSpan>{}
 		), {} };
 	}
@@ -790,15 +800,15 @@ kiwi_res_h kiwi_analyze_w(kiwi_h handle, const kchar16_t * text, int topN, int m
 	}
 }
 
-kiwi_res_h kiwi_analyze(kiwi_h handle, const char * text, int topN, int matchOptions, kiwi_morphset_h blocklilst, kiwi_pretokenized_h pretokenized)
+kiwi_res_h kiwi_analyze(kiwi_h handle, const char* text, int top_n, kiwi_analyze_option_t option, kiwi_pretokenized_h pretokenized)
 {
 	if (!handle) return nullptr;
 	Kiwi* kiwi = (Kiwi*)handle;
 	try
 	{
 		return new kiwi_res{ kiwi->analyze(
-			text, topN, 
-			AnalyzeOption{ (Match)matchOptions, blocklilst ? &blocklilst->morphemes : nullptr },
+			text, top_n, 
+			toAnalyzeOption(option),
 			pretokenized ? *pretokenized : std::vector<PretokenizedSpan>{}
 		),{} };
 	}
@@ -809,14 +819,14 @@ kiwi_res_h kiwi_analyze(kiwi_h handle, const char * text, int topN, int matchOpt
 	}
 }
 
-int kiwi_analyze_mw(kiwi_h handle, kiwi_reader_w_t reader, kiwi_receiver_t receiver, void * userData, int topN, int matchOptions, kiwi_morphset_h blocklilst)
+int kiwi_analyze_mw(kiwi_h handle, kiwi_reader_w_t reader, kiwi_receiver_t receiver, void * userData, int top_n, kiwi_analyze_option_t option)
 {
 	if (!handle) return KIWIERR_INVALID_HANDLE;
 	Kiwi* kiwi = (Kiwi*)handle;
 	try
 	{
 		int reader_idx = 0, receiver_idx = 0;
-		kiwi->analyze(topN, [&]() -> u16string
+		kiwi->analyze(top_n, [&]() -> u16string
 		{
 			u16string buf;
 			buf.resize((*reader)(reader_idx, nullptr, userData));
@@ -827,7 +837,7 @@ int kiwi_analyze_mw(kiwi_h handle, kiwi_reader_w_t reader, kiwi_receiver_t recei
 		{
 			auto result = new kiwi_res{ move(res), {} };
 			(*receiver)(receiver_idx++, result, userData);
-		}, AnalyzeOption{ (Match)matchOptions, blocklilst ? &blocklilst->morphemes : nullptr });
+		}, toAnalyzeOption(option));
 		return reader_idx;
 	}
 	catch (...)
@@ -837,14 +847,14 @@ int kiwi_analyze_mw(kiwi_h handle, kiwi_reader_w_t reader, kiwi_receiver_t recei
 	}
 }
 
-int kiwi_analyze_m(kiwi_h handle, kiwi_reader_t reader, kiwi_receiver_t receiver, void * userData, int topN, int matchOptions, kiwi_morphset_h blocklilst)
+int kiwi_analyze_m(kiwi_h handle, kiwi_reader_t reader, kiwi_receiver_t receiver, void * userData, int top_n, kiwi_analyze_option_t option)
 {
 	if (!handle) return KIWIERR_INVALID_HANDLE;
 	Kiwi* kiwi = (Kiwi*)handle;
 	try
 	{
 		int reader_idx = 0, receiver_idx = 0;
-		kiwi->analyze(topN, [&]() -> u16string
+		kiwi->analyze(top_n, [&]() -> u16string
 		{
 			string buf;
 			buf.resize((*reader)(reader_idx, nullptr, userData));
@@ -855,7 +865,7 @@ int kiwi_analyze_m(kiwi_h handle, kiwi_reader_t reader, kiwi_receiver_t receiver
 		{
 			auto result = new kiwi_res{ move(res),{} };
 			(*receiver)(receiver_idx++, result, userData);
-		}, AnalyzeOption{ (Match)matchOptions, blocklilst ? &blocklilst->morphemes : nullptr });
+		}, toAnalyzeOption(option));
 		return reader_idx;
 	}
 	catch (...)
