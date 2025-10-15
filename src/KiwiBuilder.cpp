@@ -172,7 +172,7 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 
 		auto form = normalizeHangul(fields[0]);
 		const auto tag = toPOSTag(fields[1]);
-		if (clearIrregular(tag) >= POSTag::p || clearIrregular(tag) == POSTag::unknown)
+		if (clearIrregular(tag) >= POSTag::p)
 		{
 			cerr << "Wrong tag at line: " + line << endl;
 			continue;
@@ -359,11 +359,20 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 				goto endOfLoop;
 			}
 			complexChunks.emplace(make_tuple(form, senseIds[0], tag), move(complexStr));
+			if (tag == POSTag::unknown) complex = false; // UNK인 경우 complex 속성 무시
+		}
+		else
+		{
+			if (tag == POSTag::unknown)
+			{
+				formatErrors.emplace_back("UNK is only for complex morphemes: " + line);
+				goto endOfLoop;
+			}
 		}
 
 		for (auto senseId : senseIds)
 		{
-			if (filter(tag, morphWeight) && origMorphemeOfAlias.empty())
+			if (filter(tag, morphWeight) && origMorphemeOfAlias.empty() && tag != POSTag::unknown)
 			{
 				// groupId 삽입용 long tail에 대해서
 				if (form != groupForm)
@@ -421,6 +430,7 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 		auto it = isIrregular(p.origTag) ? morphMap.end() : morphMap.find(make_tuple(p.origForm, origSenseId, clearIrregular(p.origTag)));
 		auto it2 = morphMap.find(make_tuple(p.origForm, origSenseId, setIrregular(p.origTag)));
 		
+		p.origMorphId = -1; // to indicate not found
 		if (it != morphMap.end() && it2 != morphMap.end())
 		{
 			formatErrors.emplace_back("ambiguous base morpheme: " + utf16To8(p.origForm) + "/" + tagToString(clearIrregular(p.origTag)));
@@ -450,6 +460,8 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 
 	for (LongTail& p : longTails)
 	{
+		if (p.origMorphId == -1) continue; // not found
+
 		const auto git = groupMap.find(make_pair(p.groupForm, p.tag));
 		size_t groupId = (git != groupMap.end()) ? git->second : 0;
 		if (groupId)
@@ -472,7 +484,7 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 		if (p.origForm.empty())
 		{
 			// groupId 삽입용이 아닌 long tail에 대해서
-			if (p.origTag != POSTag::unknown)
+			if (p.origTag != POSTag::unknown || p.tag == POSTag::unknown)
 			{
 				const size_t mid = insertMorph(p.form, 
 					p.weight < 0 ? p.weight : log(p.weight / longTailWeights[p.tag]), 
@@ -526,6 +538,10 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 	{
 		auto it = complexChunks.find(make_tuple(forms[morph.kform].form, morph.senseId, morph.tag));
 		if (it == complexChunks.end()) continue;
+		if (morph.tag == POSTag::unknown)
+		{
+			morph.lmMorphemeId = (uint32_t)(&morph - morphemes.data());
+		}
 		auto fd = split(it->second, u' ');
 
 		if (fd.back().size() != (fd.size() - 1) * 2)
@@ -559,7 +575,7 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 				auto it = morphSenseMap.find(make_pair(norm, tag));
 				if (it == morphSenseMap.end() || it->second.empty())
 				{
-					formatErrors.emplace_back("cannot find morpheme : " + utf16To8(fd[i]));
+					formatErrors.emplace_back("cannot find morpheme: " + utf16To8(fd[i]));
 					goto endOfLoop2;
 				}
 
@@ -569,7 +585,7 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 				}
 				else
 				{
-					formatErrors.emplace_back("ambiguous morpheme : " + utf16To8(fd[i]));
+					formatErrors.emplace_back("ambiguous morpheme: " + utf16To8(fd[i]));
 					goto endOfLoop2;
 				}
 			}
@@ -577,7 +593,7 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 			auto it = morphMap.find(make_tuple(norm, senseId, tag));
 			if (it == morphMap.end())
 			{
-				formatErrors.emplace_back("cannot find morpheme : " + utf16To8(fd[i]));
+				formatErrors.emplace_back("cannot find morpheme: " + utf16To8(fd[i]));
 				goto endOfLoop2;
 			}
 			size_t lmId = it->second.first;
@@ -586,7 +602,7 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 				auto it = longTailMap.find(make_pair(norm, tag));
 				if (it == longTailMap.end())
 				{
-					formatErrors.emplace_back("cannot find morpheme : " + utf16To8(fd[i]));
+					formatErrors.emplace_back("cannot find morpheme: " + utf16To8(fd[i]));
 					goto endOfLoop2;
 				}
 				lmId = it->second;
