@@ -606,7 +606,7 @@ namespace kiwi
 				std::string fullPath = modelPath + "/" + filename;
 				auto stream = std::make_unique<std::ifstream>(fullPath, std::ios::binary);
 				if (!stream->is_open()) {
-					throw std::ios_base::failure("Cannot open file: " + fullPath);
+					return nullptr;
 				}
 				return std::move(stream);
 			};
@@ -620,7 +620,7 @@ namespace kiwi
 			return [sharedData](const std::string& filename) -> std::unique_ptr<std::istream> {
 				auto it = sharedData->find(filename);
 				if (it == sharedData->end()) {
-					throw std::ios_base::failure("Cannot find file in memory: " + filename);
+					return nullptr;
 				}
 				
 				const auto& data = it->second;

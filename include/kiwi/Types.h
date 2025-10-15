@@ -21,6 +21,7 @@
 #include <type_traits>
 #include <functional>
 #include <stdexcept>
+#include <iostream>
 
 #ifdef KIWI_USE_MIMALLOC
 #include <mimalloc.h>
@@ -78,6 +79,12 @@ namespace kiwi
 	{
 	public:
 		using Exception::Exception;
+	};
+
+	class SerializationException : public std::ios_base::failure
+	{
+	public:
+		using std::ios_base::failure::failure;
 	};
 
 	class FormatException : public Exception
