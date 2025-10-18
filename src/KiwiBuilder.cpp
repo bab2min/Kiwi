@@ -1619,7 +1619,7 @@ void KiwiBuilder::addCombinedMorpheme(
 	auto polar = r.polar;
 
 	const size_t newId = morphemes.size() + newMorphemes.size();
-	newMorphemes.emplace_back(POSTag::unknown);
+	newMorphemes.emplace_back(r.additionalFeature);
 	auto& newMorph = newMorphemes.back();
 	newMorph.lmMorphemeId = newId;
 	if (getMorph(leftId).chunks.empty() || getMorph(leftId).complex())
@@ -1711,7 +1711,7 @@ void KiwiBuilder::addCombinedMorphemes(
 	const auto rightMorph = getMorph(rightId);
 	const auto rightForm = getForm(rightMorph.kform).form;
 
-	if (leftMorph.tag == POSTag::unknown && 
+	if ((leftMorph.tag == POSTag::unknown || leftMorph.tag == POSTag::unknown_feat_ha) && 
 		find(leftMorph.chunks.begin(), leftMorph.chunks.end(), rightId) != leftMorph.chunks.end())
 	{
 		// rightId가 이미 leftId의 chunk에 포함되어 있는 경우
@@ -1731,6 +1731,13 @@ void KiwiBuilder::addCombinedMorphemes(
 		{
 			continue;
 		}
+
+		// trim leading space
+		if (!r.str.empty() && r.str[0] == u' ')
+		{
+			r.str.erase(0, 1);
+		}
+
 		addCombinedMorpheme(newForms, newFormMap, newMorphemes, newFormCands, leftId, rightId, r, ruleProfilingCnt);
 	}
 
@@ -1750,6 +1757,13 @@ void KiwiBuilder::addCombinedMorphemes(
 			{
 				continue;
 			}
+
+			// trim leading space
+			if (!r.str.empty() && r.str[0] == u' ')
+			{
+				r.str.erase(0, 1);
+			}
+
 			addCombinedMorpheme(newForms, newFormMap, newMorphemes, newFormCands, leftId, rightId, r, ruleProfilingCnt);
 		}
 	}
@@ -1788,9 +1802,11 @@ void KiwiBuilder::buildCombinedMorphemes(
 		{
 			auto& morph = getMorph(i);
 			auto tag = morph.tag;
+			bool alreadyCombined = false;
+			size_t additionalFeature = 0;
 			auto& form = getForm(morph.kform).form;
 			
-			if (clearIrregular(tag) > POSTag::pa) continue;
+			if (clearIrregular(tag) > POSTag::pa && tag < POSTag::unknown_feat_ha) continue;
 			if (morph.combined) continue;
 
 			if (morph.dialect != Dialect::standard && !(enabledDialects & morph.dialect))
@@ -1799,15 +1815,17 @@ void KiwiBuilder::buildCombinedMorphemes(
 			}
 
 			// tag == POSTag::unknown는 이미 결합된 형태소라는 뜻
-			if (tag == POSTag::unknown)
+			if (tag == POSTag::unknown || tag == POSTag::unknown_feat_ha)
 			{
 				if (morph.chunks.empty()) continue;
+				alreadyCombined = true;
+				additionalFeature = cmb::additionalFeatureToMask(tag);
 				tag = getMorph(morph.chunks.back()).tag;
 			}
 
 			for (size_t feat = 0; feat < 4; ++feat)
 			{
-				for (auto id : ruleLeftIds[make_tuple(tag, feat)])
+				for (auto id : ruleLeftIds[make_tuple(tag, feat | additionalFeature)])
 				{
 					auto res = combiningRule->testLeftPattern(form, id);
 					if (res.empty()) continue;
@@ -1832,7 +1850,7 @@ void KiwiBuilder::buildCombinedMorphemes(
 				combiningRightCands[id].emplace_back(i);
 			}
 
-			if (tag == POSTag::vv || tag == POSTag::va || tag == POSTag::vvi || tag == POSTag::vai)
+			if (!alreadyCombined && (tag == POSTag::vv || tag == POSTag::va || tag == POSTag::vvi || tag == POSTag::vai))
 			{
 				CondVowel vowel = CondVowel::none;
 				CondPolarity polar = FeatureTestor::isMatched(&form, CondPolarity::positive) ? CondPolarity::positive : CondPolarity::negative;
@@ -1940,6 +1958,15 @@ void KiwiBuilder::buildCombinedMorphemes(
 			}
 		}
 		combiningUpdateIdx = updated;
+	}
+
+	// erase additional features
+	for (auto& m : newMorphemes)
+	{
+		if (m.tag == POSTag::unknown_feat_ha)
+		{
+			m.tag = POSTag::unknown;
+		}
 	}
 }
 
@@ -2331,6 +2358,7 @@ namespace kiwi
 			{
 				return false;
 			}
+			[[fallthrough]];
 		default:
 			return true;
 		}

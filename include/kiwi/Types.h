@@ -216,6 +216,7 @@ namespace kiwi
 		pv = p,
 		pa = p + 1,
 		irregular = 0x80, /**< 불규칙 활용을 하는 동/형용사를 나타내는데 사용됨 */
+		unknown_feat_ha = 0xFF,
 
 		vvi = vv | irregular,
 		vai = va | irregular,
