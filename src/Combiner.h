@@ -14,15 +14,34 @@ namespace kiwi
 
 	namespace cmb
 	{
+		inline size_t additionalFeatureToMask(POSTag additionalFeature)
+		{
+			switch (additionalFeature)
+			{
+			case POSTag::unknown_feat_ha:
+				return 0x80;
+			}
+			return 0;
+		}
+
 		struct ReplString
 		{
 			KString str;
 			size_t leftEnd;
 			size_t rightBegin;
 			float score;
+			POSTag additionalFeature;
 
-			ReplString(const KString& _str = {}, size_t _leftEnd = -1, size_t _rightBegin = 0, float _score = 0)
-				: str{ _str }, leftEnd{ std::min(_leftEnd, str.size()) }, rightBegin{ _rightBegin }, score{ _score }
+			ReplString(const KString& _str = {}, 
+				size_t _leftEnd = -1, 
+				size_t _rightBegin = 0, 
+				float _score = 0, 
+				POSTag _additionalFeature = POSTag::unknown)
+				: str{ _str }, 
+				leftEnd{ std::min(_leftEnd, str.size()) }, 
+				rightBegin{ _rightBegin }, 
+				score{ _score }, 
+				additionalFeature{ _additionalFeature }
 			{
 			}
 		};
@@ -60,6 +79,7 @@ namespace kiwi
 			bool ignoreRCond;
 			int ruleLineNo;
 			float score;
+			POSTag additionalFeature;
 
 			Result(const KString& _str = {},
 				size_t _leftEnd = 0,
@@ -69,9 +89,11 @@ namespace kiwi
 				CondPolarity _polar = CondPolarity::none,
 				bool _ignoreRCond = false,
 				int _ruleLineNo = 0,
-				float _score = 0
+				float _score = 0,
+				POSTag _additionalFeature = POSTag::unknown
 			) : str{ _str }, leftEnd{ _leftEnd }, rightBegin{ _rightBegin }, dialect{ _dialect },
-				vowel{ _vowel }, polar{ _polar }, ignoreRCond{ _ignoreRCond }, ruleLineNo{ _ruleLineNo }, score{ _score }
+				vowel{ _vowel }, polar{ _polar }, ignoreRCond{ _ignoreRCond }, ruleLineNo{ _ruleLineNo }, score{ _score },
+				additionalFeature{ _additionalFeature }
 			{
 			}
 		};

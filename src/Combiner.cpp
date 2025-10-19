@@ -54,73 +54,103 @@ namespace kiwi
 		return set.negation;
 	}
 
-	inline Vector<POSTag> getSubTagset(const string& prefix)
+	inline Vector<pair<POSTag, uint8_t>> getSubTagset(const string& prefix)
 	{
-		Vector<POSTag> ret;
+		Vector<pair<POSTag, uint8_t>> ret;
 		for (auto pf : split(prefix, ','))
 		{
-			if (pf == "P")
+			uint8_t additionalFeature = 0;
+			auto chunks = split(pf, '+');
+			if (chunks.size() == 1)
 			{
-				ret.emplace_back(POSTag::pv);
-				ret.emplace_back(POSTag::pa);
-				ret.emplace_back(POSTag::pvi);
-				ret.emplace_back(POSTag::pai);
 			}
-			else if (pf == "PV")
+			else if (chunks.size() == 2)
 			{
-				ret.emplace_back(POSTag::pv);
-				ret.emplace_back(POSTag::pvi);
-			}
-			else if (pf == "PA")
-			{
-				ret.emplace_back(POSTag::pa);
-				ret.emplace_back(POSTag::pai);
-			}
-			else if (pf == "PV-I")
-			{
-				ret.emplace_back(POSTag::pvi);
-			}
-			else if (pf == "PA-I")
-			{
-				ret.emplace_back(POSTag::pai);
-			}
-			else if (pf == "PR")
-			{
-				ret.emplace_back(POSTag::pv);
-				ret.emplace_back(POSTag::pa);
-			}
-			else if (pf == "PI")
-			{
-				ret.emplace_back(POSTag::pvi);
-				ret.emplace_back(POSTag::pai);
-			}
-			else if (pf == "VV-R")
-			{
-				ret.emplace_back(POSTag::vv);
-			}
-			else if (pf == "VA-R")
-			{
-				ret.emplace_back(POSTag::va);
-			}
-			else if (pf == "VX-R")
-			{
-				ret.emplace_back(POSTag::vx);
+				pf = chunks[0];
+				if (chunks[1] == "ha")
+				{
+					additionalFeature = additionalFeatureToMask(POSTag::unknown_feat_ha);
+				}
+				else
+				{
+					throw runtime_error{ "unsupported additional feature in rule: " + string{ chunks[1] } };
+				}
 			}
 			else
 			{
+				throw runtime_error{ "invalid POS tag in rule: " + string{ pf } };
+			}
+
+			if (pf == "P")
+			{
+				ret.emplace_back(POSTag::pv, additionalFeature);
+				ret.emplace_back(POSTag::pa, additionalFeature);
+				ret.emplace_back(POSTag::pvi, additionalFeature);
+				ret.emplace_back(POSTag::pai, additionalFeature);
+			}
+			else if (pf == "PV")
+			{
+				ret.emplace_back(POSTag::pv, additionalFeature);
+				ret.emplace_back(POSTag::pvi, additionalFeature);
+			}
+			else if (pf == "PA")
+			{
+				ret.emplace_back(POSTag::pa, additionalFeature);
+				ret.emplace_back(POSTag::pai, additionalFeature);
+			}
+			else if (pf == "PV-I")
+			{
+				ret.emplace_back(POSTag::pvi, additionalFeature);
+			}
+			else if (pf == "PA-I")
+			{
+				ret.emplace_back(POSTag::pai, additionalFeature);
+			}
+			else if (pf == "PR")
+			{
+				ret.emplace_back(POSTag::pv, additionalFeature);
+				ret.emplace_back(POSTag::pa, additionalFeature);
+			}
+			else if (pf == "PI")
+			{
+				ret.emplace_back(POSTag::pvi, additionalFeature);
+				ret.emplace_back(POSTag::pai, additionalFeature);
+			}
+			else if (pf == "VV-R")
+			{
+				ret.emplace_back(POSTag::vv, additionalFeature);
+			}
+			else if (pf == "VA-R")
+			{
+				ret.emplace_back(POSTag::va, additionalFeature);
+			}
+			else if (pf == "VX-R")
+			{
+				ret.emplace_back(POSTag::vx, additionalFeature);
+			}
+			else
+			{
+				bool inserted = false;
 				for (auto i = POSTag::nng; i < POSTag::p; i = (POSTag)((size_t)i + 1))
 				{
 					if (strncmp(tagToString(i), pf.data(), pf.size()) == 0)
 					{
-						ret.emplace_back(i);
+						ret.emplace_back(i, additionalFeature);
+						inserted = true;
 					}
 				}
 				for (auto i : { POSTag::vvi, POSTag::vai, POSTag::vxi, POSTag::xsai })
 				{
 					if (strncmp(tagToString(i), pf.data(), pf.size()) == 0)
 					{
-						ret.emplace_back(i);
+						ret.emplace_back(i, additionalFeature);
+						inserted = true;
 					}
+				}
+
+				if (!inserted)
+				{
+					throw runtime_error{ "unsupported POS tag in rule: " + string{ pf } };
 				}
 			}
 		}
@@ -191,6 +221,9 @@ namespace kiwi
 		size_t leftEnd = -1, rightBegin = 0;
 		size_t target = 0;
 		float score = 0;
+		POSTag parsedAdditionalFeature = POSTag::unknown;
+		size_t pos;
+		KString additionalFeature;
 		for (size_t i = 0; i < str.size(); ++i)
 		{
 			if (escape)
@@ -206,6 +239,7 @@ namespace kiwi
 				case '(':
 				case ')':
 				case '\\':
+				case '+':
 				case '-':
 					str[target++] = str[i];
 					break;
@@ -228,6 +262,19 @@ namespace kiwi
 				case ')':
 					leftEnd = target;
 					break;
+				case '+':
+					pos = str.find('-', i + 1);
+					if (pos == KString::npos)
+					{
+						additionalFeature = str.substr(i + 1);
+						i = str.size();
+					}
+					else
+					{
+						additionalFeature = str.substr(i + 1, pos - (i + 1));
+						i = pos - 1;
+					}
+					break;
 				case '-':
 					score = stof(str.begin() + i, str.end());
 					i = str.size();
@@ -237,8 +284,21 @@ namespace kiwi
 				}
 			}
 		}
+
+		if (additionalFeature.empty())
+		{
+			// no op
+		}
+		else if (additionalFeature == u"ha")
+		{
+			parsedAdditionalFeature = POSTag::unknown_feat_ha;
+		}
+		else
+		{
+			throw runtime_error{ "unsupported additional feature in replacement string: " + utf16To8(additionalFeature) };
+		}
 		str.erase(str.begin() + target, str.end());
-		return { move(str), leftEnd, rightBegin, score };
+		return { move(str), leftEnd, rightBegin, score, parsedAdditionalFeature };
 	}
 }
 
@@ -780,9 +840,14 @@ void RuleSet::addRule(const string& lTag, const string& rTag,
 	{
 		for (auto r : rTags)
 		{
+			if (r.second)
+			{
+				throw runtime_error{ "right tag with additional feature is not supported in rule: line " + to_string(lineNo) };
+			}
+
 			for (auto f1 : getSubFeatset(leftVowel)) for (auto f2 : getSubFeatset(leftPolar)) for (auto subDialect : getSubDialectset(dialect))
 			{
-				auto& target = ruleset[RuleCategory{ l, r, (uint8_t)(f1 | f2), subDialect }];
+				auto& target = ruleset[RuleCategory{ l.first, r.first, (uint8_t)(f1 | f2 | l.second), subDialect }];
 				if (broadcastableVowel)
 				{
 					for (size_t i = 0; i < 19; ++i)
@@ -1010,7 +1075,8 @@ Vector<Result> MultiRuleDFA<NodeSizeTy, GroupSizeTy>::combine(U16StringView left
 			finish[finishGroup[nidx]].leftPolarity,
 			finish[finishGroup[nidx]].ignoreRCond,
 			finish[finishGroup[nidx]].ruleLineNo,
-			r.score
+			r.score,
+			r.additionalFeature
 		);
 	}
 
@@ -1262,7 +1328,6 @@ Vector<tuple<size_t, size_t, CondPolarity>> CompiledRule::testLeftPattern(U16Str
 {
 	return visit(SearchLeftVisitor{ leftForm, true }, dfa[ruleId]);
 }
-
 
 Vector<tuple<size_t, size_t, CondPolarity>> CompiledRule::testRightPattern(U16StringView rightForm, size_t ruleId) const
 {
