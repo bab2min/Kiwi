@@ -690,14 +690,80 @@ void KiwiBuilder::_addCorpusTo(
 	MorphemeMap& morphMap,
 	double splitRatio,
 	RaggedVector<VocabTy>* splitOut,
-	UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict,
-	const UnorderedMap<std::pair<KString, POSTag>, std::pair<KString, POSTag>>* transform
+	UnorderedMap<pair<KString, POSTag>, size_t>* oovDict,
+	const UnorderedMap<pair<KString, POSTag>, Vector<pair<KString, POSTag>>>* transform
 ) const
 {
 	Vector<VocabTy> wids;
 	double splitCnt = 0;
 	size_t numLine = 0;
 	string line;
+
+	const auto insertWord = [&](const KString& form, POSTag tag, int senseId)
+	{
+		auto it = morphMap.find(make_tuple(form, senseId, tag));
+		if (it != morphMap.end())
+		{
+			auto& morph = morphemes[it->second.first];
+			if ((morph.chunks.empty() || morph.complex()) && !morph.combineSocket)
+			{
+				if (it->second.first != it->second.second
+					&& it->second.first < defaultFormSize + 3
+					&& morphemes[it->second.second].complex()
+					)
+				{
+					auto& decomposed = morphemes[it->second.second].chunks;
+					for (auto wid : decomposed)
+					{
+						wids.emplace_back(morphemes[wid].lmMorphemeId ? morphemes[wid].lmMorphemeId : wid);
+					}
+				}
+				else
+				{
+					wids.emplace_back(it->second.first);
+				}
+				return;
+			}
+		}
+
+		if (tag == POSTag::ss && form.size() == 1)
+		{
+			auto nt = identifySpecialChr(form[0]);
+			if (nt == POSTag::sso || nt == POSTag::ssc)
+			{
+				wids.emplace_back(getDefaultMorphemeId(nt));
+				return;
+			}
+		}
+
+		if (senseId)
+		{
+			it = morphMap.find(make_tuple(form, undefSenseId, tag));
+			if (it != morphMap.end())
+			{
+				cerr << "Wrong senseId for '" << utf16To8(joinHangul(form)) << "' at line " << numLine << " :\t" << line << endl;
+				wids.emplace_back(it->second.first);
+				return;
+			}
+		}
+
+		if (tag < POSTag::p && tag != POSTag::unknown)
+		{
+			if (oovDict && (tag == POSTag::nng || tag == POSTag::nnp))
+			{
+				auto oovId = oovDict->emplace(make_pair(form, tag), oovDict->size()).first->second;
+				wids.emplace_back(-(ptrdiff_t)(oovId + 1));
+			}
+			else
+			{
+				wids.emplace_back(getDefaultMorphemeId(tag));
+			}
+			return;
+		}
+
+		wids.emplace_back(getDefaultMorphemeId(POSTag::nng));
+	};
+
 	while (getline(is, line))
 	{
 		bool alreadyPrintError = false;
@@ -768,104 +834,47 @@ void KiwiBuilder::_addCorpusTo(
 				auto it = transform->find(make_pair(f, t));
 				if (it != transform->end())
 				{
-					f = it->second.first;
-					t = it->second.second;
-				}
-			}
-
-			auto it = morphMap.find(make_tuple(f, senseId, t));
-			if (it != morphMap.end())
-			{
-				auto& morph = morphemes[it->second.first];
-				if ((morph.chunks.empty() || morph.complex()) && !morph.combineSocket)
-				{
-					if (it->second.first != it->second.second
-						&& it->second.first < defaultFormSize + 3
-						&& morphemes[it->second.second].complex()
-						)
+					for (auto& p : it->second)
 					{
-						auto& decomposed = morphemes[it->second.second].chunks;
-						for (auto wid : decomposed)
-						{
-							wids.emplace_back(morphemes[wid].lmMorphemeId ? morphemes[wid].lmMorphemeId : wid);
-						}
-					}
-					else
-					{
-						wids.emplace_back(it->second.first);
+						insertWord(p.first, p.second, senseId);
 					}
 					continue;
 				}
 			}
-
-			if (t == POSTag::ss && f.size() == 1)
-			{
-				auto nt = identifySpecialChr(f[0]);
-				if (nt == POSTag::sso || nt == POSTag::ssc)
-				{
-					wids.emplace_back(getDefaultMorphemeId(nt));
-					continue;
-				}
-			}
-
-			if (senseId)
-			{
-				it = morphMap.find(make_tuple(f, undefSenseId, t));
-				if (it != morphMap.end())
-				{
-					cerr << "Wrong senseId for '" << utf16To8(joinHangul(f)) << "' at line " << numLine << " :\t" << line << endl;
-					wids.emplace_back(it->second.first);
-					continue;
-				}
-			}
-
-			if (t < POSTag::p && t != POSTag::unknown)
-			{
-				if (oovDict && (t == POSTag::nng || t == POSTag::nnp))
-				{
-					auto oovId = oovDict->emplace(make_pair(f, t), oovDict->size()).first->second;
-					wids.emplace_back(-(ptrdiff_t)(oovId + 1));
-				}
-				else
-				{
-					wids.emplace_back(getDefaultMorphemeId(t));
-				}
-				continue;
-			}
-
-			wids.emplace_back(getDefaultMorphemeId(POSTag::nng));
+			
+			insertWord(f, t, senseId);
 		}
 	}
 }
 
 void KiwiBuilder::addCorpusTo(RaggedVector<uint8_t>& out, std::istream& is, MorphemeMap& morphMap, 
 	double splitRatio, RaggedVector<uint8_t>* splitOut, 
-	UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict,
-	const UnorderedMap<std::pair<KString, POSTag>, std::pair<KString, POSTag>>* transform) const
+	UnorderedMap<pair<KString, POSTag>, size_t>* oovDict,
+	const UnorderedMap<pair<KString, POSTag>, Vector<pair<KString, POSTag>>>* transform) const
 {
 	return _addCorpusTo(out, is, morphMap, splitRatio, splitOut, oovDict, transform);
 }
 
 void KiwiBuilder::addCorpusTo(RaggedVector<uint16_t>& out, std::istream& is, MorphemeMap& morphMap, 
 	double splitRatio, RaggedVector<uint16_t>* splitOut, 
-	UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict,
-	const UnorderedMap<std::pair<KString, POSTag>, std::pair<KString, POSTag>>* transform) const
+	UnorderedMap<pair<KString, POSTag>, size_t>* oovDict,
+	const UnorderedMap<pair<KString, POSTag>, Vector<pair<KString, POSTag>>>* transform) const
 {
 	return _addCorpusTo(out, is, morphMap, splitRatio, splitOut, oovDict, transform);
 }
 
 void KiwiBuilder::addCorpusTo(RaggedVector<uint32_t>& out, std::istream& is, MorphemeMap& morphMap, 
 	double splitRatio, RaggedVector<uint32_t>* splitOut, 
-	UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict,
-	const UnorderedMap<std::pair<KString, POSTag>, std::pair<KString, POSTag>>* transform) const
+	UnorderedMap<pair<KString, POSTag>, size_t>* oovDict,
+	const UnorderedMap<pair<KString, POSTag>, Vector<pair<KString, POSTag>>>* transform) const
 {
 	return _addCorpusTo(out, is, morphMap, splitRatio, splitOut, oovDict, transform);
 }
 
 void KiwiBuilder::addCorpusTo(RaggedVector<int32_t>& out, std::istream& is, MorphemeMap& morphMap,
 	double splitRatio, RaggedVector<int32_t>* splitOut, 
-	UnorderedMap<std::pair<KString, POSTag>, size_t>* oovDict,
-	const UnorderedMap<std::pair<KString, POSTag>, std::pair<KString, POSTag>>* transform) const
+	UnorderedMap<pair<KString, POSTag>, size_t>* oovDict,
+	const UnorderedMap<pair<KString, POSTag>, Vector<pair<KString, POSTag>>>* transform) const
 {
 	return _addCorpusTo(out, is, morphMap, splitRatio, splitOut, oovDict, transform);
 }
@@ -2377,7 +2386,7 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 	Map<int, int> ruleProfilingCnt;
 	buildCombinedMorphemes(combinedForms, newFormMap, combinedMorphemes, newFormCands, &ruleProfilingCnt);
 
-	Vector<std::pair<int, float>> ruleProfilingPercent;
+	Vector<pair<int, float>> ruleProfilingPercent;
 	int totalCnt = accumulate(ruleProfilingCnt.begin(), ruleProfilingCnt.end(), 0, [](int a, const pair<int, int>& b) { return a + b.second; });
 	for (auto& p : ruleProfilingCnt)
 	{
@@ -2743,7 +2752,7 @@ void KiwiBuilder::convertHSData(
 	const string& morphemeDefPath,
 	size_t morphemeDefMinCnt,
 	bool generateOovDict,
-	const vector<pair<pair<string, POSTag>, pair<string, POSTag>>>* transform
+	const vector<pair<pair<string, POSTag>, vector<pair<string, POSTag>>>>* transform
 ) const
 {
 	unique_ptr<KiwiBuilder> dummyBuilder;
@@ -2768,14 +2777,20 @@ void KiwiBuilder::convertHSData(
 	UnorderedMap<pair<KString, POSTag>, size_t> oovDict;
 	RaggedVector<int32_t> sents;
 	
-	UnorderedMap<pair<KString, POSTag>, pair<KString, POSTag>> transformMap;
+	UnorderedMap<pair<KString, POSTag>, Vector<pair<KString, POSTag>>> transformMap;
 	if (transform)
 	{
 		for (auto& p : *transform)
 		{
+			Vector<pair<KString, POSTag>> list;
+			for (auto& to : p.second)
+			{
+				list.emplace_back(normalizeHangul(to.first), to.second);
+			}
+
 			transformMap.emplace(
 				make_pair(normalizeHangul(p.first.first), p.first.second),
-				make_pair(normalizeHangul(p.second.first), p.second.second)
+				move(list)
 			);
 		}
 	}
@@ -2821,7 +2836,7 @@ HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes,
 	size_t morphemeDefMinCnt,
 	const vector<pair<size_t, vector<uint32_t>>>& contextualMapper,
 	HSDataset* splitDataset,
-	const vector<pair<pair<string, POSTag>, pair<string, POSTag>>>* transform
+	const vector<pair<pair<string, POSTag>, vector<pair<string, POSTag>>>>* transform
 ) const
 {
 	HSDataset dataset{ batchSize, causalContextSize, windowSize, true, numWorkers, option };
@@ -2885,14 +2900,20 @@ HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes,
 	}
 
 	UnorderedMap<pair<KString, POSTag>, size_t> oovDict;
-	UnorderedMap<pair<KString, POSTag>, pair<KString, POSTag>> transformMap;
+	UnorderedMap<pair<KString, POSTag>, Vector<pair<KString, POSTag>>> transformMap;
 	if (transform)
 	{
 		for (auto& p : *transform)
 		{
+			Vector<pair<KString, POSTag>> list;
+			for (auto& to : p.second)
+			{
+				list.emplace_back(normalizeHangul(to.first), to.second);
+			}
+
 			transformMap.emplace(
-				make_pair(normalizeHangul(p.first.first), p.first.second), 
-				make_pair(normalizeHangul(p.second.first), p.second.second)
+				make_pair(normalizeHangul(p.first.first), p.first.second),
+				std::move(list)
 			);
 		}
 	}
