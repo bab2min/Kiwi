@@ -1152,9 +1152,29 @@ namespace kiwi
 		}
 	};
 
+	inline bool isDisconnected(const KGraphNode* graph, size_t graphSize, Vector<uint8_t>& reachable, size_t scanStart)
+	{
+		if (reachable[scanStart - 1]) return false;
+
+		fill(reachable.begin() + scanStart, reachable.end(), 0);
+		for (size_t i = scanStart; i < graphSize; ++i)
+		{
+			for (auto prev = graph[i].getPrev(); prev; prev = prev->getSibling())
+			{
+				if (reachable[prev - graph])
+				{
+					reachable[i] = 1;
+					break;
+				}
+			}
+		}
+		return reachable[graphSize - 1] == 0;
+	}
+
 	template<class LangModel>
 	Vector<PathResult> BestPathFinder<LangModel>::findBestPath(const Kiwi* kw,
 		const Vector<SpecialState>& prevSpStates,
+		const KString& normForm,
 		const KGraphNode* graph,
 		const size_t graphSize,
 		const size_t topN,
@@ -1172,6 +1192,7 @@ namespace kiwi
 		const auto* langMdl = kw->getLangModel();
 
 		Vector<Vector<WordLL<LmState>>> cache(graphSize);
+		Vector<uint8_t> reachable(graphSize, 0);
 		Vector<U16StringView> ownFormList;
 		Vector<const Morpheme*> unknownNodeCands, unknownNodeLCands;
 
@@ -1195,6 +1216,7 @@ namespace kiwi
 		// start node
 		cache[0].emplace_back(&kw->morphemes[0], 0.f, 0.f, 0.f, nullptr, LmState{ langMdl }, SpecialState{});
 		cache[0].back().rootId = commonRootId;
+		reachable[0] = 1;
 
 #ifdef DEBUG_PRINT
 		cerr << "Token[" << 0 << "]" << endl;
@@ -1238,6 +1260,19 @@ namespace kiwi
 					evaluator(i, ownFormId, unknownNodeLCands, 
 						unkScore, splitComplex, splitSaisiot, mergeSaisiot, blocklist, allowedDialects, dialectCost);
 				};
+
+				reachable[i] = any_of(cache[i].begin(), cache[i].end(),
+					[](const auto& p) { return !p.combineSocket; }) ? 1 : 0;
+
+				if (isDisconnected(graph, graphSize, reachable, i + 1))
+				{
+					ownFormList.emplace_back(normForm.substr(node->startPos, node->endPos - node->startPos));
+					ownFormId = ownFormList.size();
+
+					const float unkScore = unkFormScorer(ownFormList.back());
+					evaluator(i, ownFormId, unknownNodeCands,
+						unkScore, splitComplex, splitSaisiot, mergeSaisiot, blocklist, allowedDialects, dialectCost);
+				}
 			}
 			else
 			{

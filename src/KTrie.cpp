@@ -721,7 +721,7 @@ size_t kiwi::splitByTrie(
 		}
 		else if (out.size() > 1 && !specialMatched)
 		{
-			size_t lastPos = out.back().endPos;
+			const size_t lastPos = out.back().endPos;
 			if (lastPos < unkFormEndPos && !isHangulCoda(str[nonSpaces[lastPos]]))
 			{
 				appendNewNode(out, endPosMap, 

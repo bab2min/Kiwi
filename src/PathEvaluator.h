@@ -91,6 +91,7 @@ namespace kiwi
 	{
 		static Vector<PathResult> findBestPath(const Kiwi* kw,
 			const Vector<SpecialState>& prevSpStates,
+			const KString& normForm,
 			const KGraphNode* graph,
 			const size_t graphSize,
 			const size_t topN,

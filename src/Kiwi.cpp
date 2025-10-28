@@ -1015,6 +1015,7 @@ namespace kiwi
 			Vector<PathResult> res = (*reinterpret_cast<FnFindBestPath>(dfFindBestPath))(
 				this,
 				spStatesByRet,
+				normalizedStr,
 				nodes.data(),
 				nodes.size(),
 				topN,
