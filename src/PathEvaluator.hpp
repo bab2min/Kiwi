@@ -666,6 +666,14 @@ namespace kiwi
 							firstWid = curMorph->chunks[0]->lmMorphemeId;
 						}
 
+						// 사이시옷 뒤에 명사가 아닌 태그가 오거나 공백이 있는 경우 제외
+						if (prevPath.morpheme->tag == POSTag::z_siot && (
+							!isNNClass(curMorph->tag) || prev->endPos < node->startPos
+							))
+						{
+							goto invalidCandidate;
+						}
+
 						if (prevPath.combineSocket)
 						{
 							// merge <v> <chunk> with only the same socket

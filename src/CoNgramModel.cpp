@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include <fstream>
 #include "PathEvaluator.hpp"
 #include "Joiner.hpp"
@@ -42,7 +42,7 @@ namespace kiwi
 		) const
 		{
 			thread_local BestPathConatiner<mode, LmState> bestPathCont;
-			thread_local Vector<const WordLL<LmState>*> regularPrevPathes;
+			thread_local Vector<pair<const KGraphNode*, const WordLL<LmState>*>> regularPrevPathes;
 			thread_local Vector<pair<const KGraphNode*, const WordLL<LmState>*>> combiningPrevPathes;
 			thread_local Vector<const Morpheme*> regularMorphs, regularDistantMorphs, combiningLMorphs, combiningRMorphs;
 			thread_local Vector<LmState> prevLmStates, nextLmStates;
@@ -74,14 +74,14 @@ namespace kiwi
 						combiningPrevPathes.emplace_back(prev, &prevPath);
 						continue;
 					}
-					regularPrevPathes.emplace_back(&prevPath);
+					regularPrevPathes.emplace_back(prev, &prevPath);
 				}
 			}
 
 			prevLmStates.resize(regularPrevPathes.size());
 			for (size_t i = 0; i < regularPrevPathes.size(); ++i)
 			{
-				prevLmStates[i] = regularPrevPathes[i]->lmState;
+				prevLmStates[i] = regularPrevPathes[i].second->lmState;
 			}
 
 			for (auto& curMorph : morphs)
@@ -171,7 +171,7 @@ namespace kiwi
 				RuleBasedScorer ruleBasedScorer{ kw, curMorph, node };
 				const float morphScore = curMorph->userScore + nodeLevelDiscount + kw->tagScorer.evalLeftBoundary(hasLeftBoundary(node), curMorph->tag);
 				size_t prevId = -1;
-				for (auto* prevPath : regularPrevPathes)
+				for (auto [prev, prevPath] : regularPrevPathes)
 				{
 					++prevId;
 					auto& state = nextLmStates[prevId * regularMorphs.size() + curId];
@@ -179,6 +179,14 @@ namespace kiwi
 
 					FormEvaluator formEvaluator{ *prevPath, ownForms, morphBase };
 					if (!formEvaluator(curMorph, ignoreCondScore, score)) continue;
+
+					// 사이시옷 뒤에 명사가 아닌 태그가 오거나 공백이 있는 경우 제외
+					if (prevPath->morpheme->tag == POSTag::z_siot && (
+						!isNNClass(curMorph->tag) || prev->endPos < node->startPos
+						))
+					{
+						continue;
+					}
 
 					for (size_t i = 1; i < length; ++i)
 					{
@@ -223,7 +231,7 @@ namespace kiwi
 				}
 				RuleBasedScorer ruleBasedScorer{ kw, curMorph, node };
 				const float morphScore = curMorph->userScore + nodeLevelDiscount + kw->tagScorer.evalLeftBoundary(hasLeftBoundary(node), curMorph->tag);
-				for (auto* prevPath : regularPrevPathes)
+				for (auto [prev, prevPath] : regularPrevPathes)
 				{
 					auto state = prevPath->lmState;
 					float score = prevPath->accScore + morphScore;
@@ -519,7 +527,7 @@ namespace kiwi
 				const size_t invNormOutputSize = padMultipleOf(header.vocabSize * sizeof(float), alignment);
 				const size_t positionConfSize = windowSize > 0 ? padMultipleOf((header.windowSize + 1) * sizeof(float), alignment) : 0;
 				const size_t distantMaskSize = windowSize > 0 ? padMultipleOf((header.vocabSize + 7) / 8, alignment) : 0;
-
+				
 				allEmbs = make_unique<uint8_t[]>(contextEmbSize + outputEmbSize + distantEmbSize
 					+ invNormContextSize + invNormOutputSize
 					+ positionConfSize + distantMaskSize
@@ -1299,15 +1307,15 @@ namespace kiwi
 			LmStateType* outStates, float* outScores) const
 		{
 			if constexpr (windowSize > 0)
-		{
-			thread_local TLSForProgressMatrix tls;
-			if (prevStateSize <= (quantized ? 16 : 8) && nextIdSize <= 16)
 			{
-				return progressMatrixWOSort(tls, prevStates, nextIds, prevStateSize, nextIdSize, numValidDistantTokens, outStates, outScores);
-			}
-			else
-			{
-				return progressMatrixWSort(tls, prevStates, nextIds, prevStateSize, nextIdSize, numValidDistantTokens, outStates, outScores);
+				thread_local TLSForProgressMatrix tls;
+				if (prevStateSize <= (quantized ? 16 : 8) && nextIdSize <= 16)
+				{
+					return progressMatrixWOSort(tls, prevStates, nextIds, prevStateSize, nextIdSize, numValidDistantTokens, outStates, outScores);
+				}
+				else
+				{
+					return progressMatrixWSort(tls, prevStates, nextIds, prevStateSize, nextIdSize, numValidDistantTokens, outStates, outScores);
 				}
 			}
 			else
@@ -1547,6 +1555,11 @@ namespace kiwi
 					context.clear();
 					for (size_t i = 1; i < tokens.size(); ++i)
 					{
+						if (!tokens[i].empty() && tokens[i][0] == '#')
+						{
+							// # for comment
+							break;
+						}
 						auto id = stol(tokens[i].begin(), tokens[i].end());
 						if (id < 0) throw IOException{ "Invalid format : " + contextDefinition };
 
@@ -1578,16 +1591,16 @@ namespace kiwi
 						}
 						else
 						{
-						for (size_t j = i; j-- > 0; )
-						{
-							auto& c2 = contextMap[j];
-							context.clear();
-							context.insert(context.end(), it->first.end() - j - 1, it->first.end());
-							auto found = c2.find(context);
-							if (found != c2.end())
+							for (size_t j = i; j-- > 0; )
 							{
-								erase = found->second == it->second;
-								break;
+								auto& c2 = contextMap[j];
+								context.clear();
+								context.insert(context.end(), it->first.end() - j - 1, it->first.end());
+								auto found = c2.find(context);
+								if (found != c2.end())
+								{
+									erase = found->second == it->second;
+									break;
 								}
 							}
 						}
@@ -2204,23 +2217,23 @@ namespace kiwi
 			}
 			else
 			{
-			for (size_t i = 0; i < node->numNexts; ++i)
-			{
-				auto [k, v] = nst::extractKV<arch, VlKeyType, int32_t>(&alignedKeyValueData[node->nextOffset], node->numNexts, i);
-				prefix.emplace_back(k);
-				if (v > 0)
+				for (size_t i = 0; i < node->numNexts; ++i)
 				{
-					if (node[v].value)
+					auto [k, v] = nst::extractKV<arch, VlKeyType, int32_t>(&alignedKeyValueData[node->nextOffset], node->numNexts, i);
+					prefix.emplace_back(k);
+					if (v > 0)
 					{
-						insert(node[v].value);
+						if (node[v].value)
+						{
+							insert(node[v].value);
+						}
+						visitContextNode(node + v, prefix, out);
 					}
-					visitContextNode(node + v, prefix, out);
-				}
-				else if (v < 0)
-				{
-					insert(-v);
-				}
-				prefix.pop_back();
+					else if (v < 0)
+					{
+						insert(-v);
+					}
+					prefix.pop_back();
 				}
 			}
 		}
