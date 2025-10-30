@@ -175,7 +175,8 @@ namespace kiwi
 				{
 					++prevId;
 					auto& state = nextLmStates[prevId * regularMorphs.size() + curId];
-					auto score = prevPath->accScore + morphScore + scores[prevId * regularMorphs.size() + curId];
+					float score = prevPath->accScore + morphScore + scores[prevId * regularMorphs.size() + curId];
+					const float firstChunkScore = morphScore + scores[prevId * regularMorphs.size() + curId];
 
 					FormEvaluator formEvaluator{ *prevPath, ownForms, morphBase };
 					if (!formEvaluator(curMorph, ignoreCondScore, score)) continue;
@@ -199,7 +200,7 @@ namespace kiwi
 					}
 
 					insertToPathContainer(bestPathCont, topN, prevSpStates, curMorph, morphBase, 
-						move(state), score, node, *prevPath, ruleBasedScorer, dialectCost);
+						move(state), score, firstChunkScore, node, *prevPath, ruleBasedScorer, dialectCost);
 				continueFor:;
 				}
 
@@ -235,12 +236,13 @@ namespace kiwi
 				{
 					auto state = prevPath->lmState;
 					float score = prevPath->accScore + morphScore;
+					const float firstChunkScore = morphScore;
 
 					FormEvaluator formEvaluator{ *prevPath, ownForms, morphBase };
 					if (!formEvaluator(curMorph, ignoreCondScore, score)) continue;
 
 					insertToPathContainer(bestPathCont, topN, prevSpStates, curMorph, morphBase, 
-						move(state), score, node, *prevPath, ruleBasedScorer, dialectCost);
+						move(state), score, firstChunkScore, node, *prevPath, ruleBasedScorer, dialectCost);
 				}
 				bestPathCont.writeTo(resultOut, curMorph, lastSeqId, ownFormId);
 			}
@@ -278,6 +280,7 @@ namespace kiwi
 					auto* prev = p.first;
 					auto* prevPath = p.second;
 					float score = prevPath->accScore + morphScore;
+					float firstChunkScore = 0;
 					// merge <v> <chunk> with only the same socket
 					if (prevPath->combineSocket != curMorph->combineSocket || curMorph->isSingle())
 					{
@@ -294,7 +297,8 @@ namespace kiwi
 					if (!formEvaluator(curMorph, ignoreCondScore, score)) continue;
 
 					auto state = prevPath->lmState;
-					score += state.next(langMdl, firstWid);
+					score += (firstChunkScore = state.next(langMdl, firstWid));
+					firstChunkScore += morphScore;
 
 					for (size_t i = 1; i < length; ++i)
 					{
@@ -307,7 +311,7 @@ namespace kiwi
 					}
 
 					insertToPathContainer(bestPathCont, topN, prevSpStates, curMorph, morphBase, 
-						move(state), score, node, *prevPath, ruleBasedScorer, dialectCost);
+						move(state), score, firstChunkScore, node, *prevPath, ruleBasedScorer, dialectCost);
 				continueFor2:;
 				}
 				bestPathCont.writeTo(resultOut, curMorph, lastSeqId, ownFormId);

@@ -190,6 +190,7 @@ namespace kiwi
 		const Morpheme* morphBase,
 		LmState&& state,
 		const float score,
+		const float firstChunkScore,
 		const KGraphNode* node,
 		const WordLL<LmState>& prevPath,
 		const RuleBasedScorer& ruleBasedScorer,
@@ -204,7 +205,9 @@ namespace kiwi
 			{
 				spState = prevSpStates[rootId];
 			}
-			const float candScoreWithRule = score + ruleBasedScorer(prevMorpheme, spState);
+			const float ruleScore = ruleBasedScorer(prevMorpheme, spState);
+			const float candScoreWithRule = score + ruleScore;
+			const float firstChunkScoreWithRule = firstChunkScore + ruleScore;
 
 			// update special state
 			if (ruleBasedScorer.curMorphSpecialType == Kiwi::SpecialMorph::singleQuoteOpen) spState.singleQuote = 1;
@@ -219,6 +222,7 @@ namespace kiwi
 			const float curDialectCost = curMorph->dialect == Dialect::standard ? 0.f : dialectCost;
 			bestPathCont.insert(topN, prevPath.rootId, rootId, curMorph, 
 				candScoreWithRule - curDialectCost,
+				firstChunkScoreWithRule - curDialectCost,
 				prevPath.accTypoCost + node->typoCost, 
 				prevPath.accDialectCost + curDialectCost,
 				&prevPath, move(state), spState);
@@ -294,7 +298,7 @@ namespace kiwi
 	struct LmEvalData
 	{
 		LmState state;
-		float score = 0;
+		float score = 0, firstChunkScore = 0;
 		uint32_t length = 0;
 	};
 
@@ -552,6 +556,7 @@ namespace kiwi
 					}
 
 					float candScore = prevPath.accScore + additionalScore;
+					float firstChunkScore = additionalScore;
 					if (prevPath.combineSocket)
 					{
 						// merge <v> <chunk> with only the same socket
@@ -584,6 +589,7 @@ namespace kiwi
 						}
 						float ll = cLmState.next(langMdl, firstWid);
 						candScore += ll;
+						firstChunkScore += ll;
 						if (!curMorph->isSingle())
 						{
 							for (size_t i = 1; i < curMorph->chunks.size(); ++i)
@@ -601,7 +607,7 @@ namespace kiwi
 					}
 
 					insertToPathContainer(bestPathCont, topN, prevSpStates, curMorph, morphBase, 
-						move(cLmState), candScore, node, prevPath, ruleBasedScorer, dialectCost);
+						move(cLmState), candScore, firstChunkScore, node, prevPath, ruleBasedScorer, dialectCost);
 				continueFor:;
 				}
 			}
@@ -656,6 +662,7 @@ namespace kiwi
 					{
 						const auto curMorph = morphs[curId];
 						float candScore = prevPath.accScore + curMorph->userScore + nodeLevelDiscount;
+						float firstChunkScore = curMorph->userScore + nodeLevelDiscount;
 						Wid firstWid;
 						if (curMorph->isSingle())
 						{
@@ -722,6 +729,7 @@ namespace kiwi
 						}
 						evalMatrix[prevId * morphs.size() + curId].state = prevPath.lmState;
 						evalMatrix[prevId * morphs.size() + curId].score = candScore;
+						evalMatrix[prevId * morphs.size() + curId].firstChunkScore = firstChunkScore;
 						evalMatrix[prevId * morphs.size() + curId].length = length;
 						if (length > 0) nextWids.emplace_back(firstWid);
 						if (length > 1)
@@ -745,7 +753,9 @@ namespace kiwi
 				{
 					//if (e.length == 0) continue;
 					float score = 0;
-					for (size_t i = 0; i < e.length; ++i)
+					score += e.state.next(langMdl, nextWids[widOffset]);
+					e.firstChunkScore += score;
+					for (size_t i = 1; i < e.length; ++i)
 					{
 						score += e.state.next(langMdl, nextWids[widOffset + i]);
 					}
@@ -795,7 +805,7 @@ namespace kiwi
 						}
 
 						insertToPathContainer(bestPathCont, topN, prevSpStates, curMorph, morphBase, 
-							move(em.state), em.score, node, prevPath, ruleBasedScorer, dialectCost);
+							move(em.state), em.score, em.firstChunkScore, node, prevPath, ruleBasedScorer, dialectCost);
 					}
 				}
 
@@ -1031,15 +1041,15 @@ namespace kiwi
 		for (auto it = steps.rbegin(); it != steps.rend(); ++it)
 		{
 			auto cur = *it;
-			float scoreDiff = cur->accScore - prev->accScore;
+			const float scoreDiff = cur->accScore - prev->accScore;
 			float typoCostDiff = cur->accTypoCost - prev->accTypoCost;
 			float dialectCostDiff = cur->accDialectCost - prev->accDialectCost;
 			auto morpheme = cur->morpheme;
 			const size_t numNewTokens = (splitSaisiot && morpheme->saisiot) || !(morpheme->chunks.empty() || morpheme->complex || morpheme->saisiot) 
 				? morpheme->chunks.size() : 1;
 			auto& gNode = graph[csearcher(cur)];
-			scoreDiff += typoCostDiff * typoCostWeight;
-			scoreDiff /= numNewTokens;
+			const float firstScore = cur->firstChunkScore + typoCostDiff * typoCostWeight; // typoCost는 첫번째 토큰이 전부 받았었으므로
+			const float restScores = numNewTokens > 1 ? (scoreDiff - cur->firstChunkScore) / (numNewTokens - 1) : 0;
 			typoCostDiff /= numNewTokens;
 			dialectCostDiff /= numNewTokens;
 
@@ -1053,7 +1063,7 @@ namespace kiwi
 						KString{},
 						gNode.startPos + p.first,
 						gNode.startPos + p.second,
-						scoreDiff,
+						ch == 0 ? firstScore : restScores,
 						typoCostDiff,
 						dialectCostDiff,
 						typoCostDiff ? gNode.typoFormId : 0,
@@ -1069,7 +1079,7 @@ namespace kiwi
 					cur->ownFormId ? KString{ ownFormList[cur->ownFormId - 1].data(), ownFormList[cur->ownFormId - 1].size() } : KString{},
 					gNode.startPos,
 					gNode.endPos,
-					scoreDiff,
+					firstScore,
 					typoCostDiff,
 					dialectCostDiff,
 					typoCostDiff ? gNode.typoFormId : 0,
@@ -1080,7 +1090,7 @@ namespace kiwi
 			{
 				ret.back().morph = ret.back().morph->getCombined();
 				ret.back().end = gNode.startPos + morpheme->chunks.getSecond(0).second;
-				ret.back().wordScore = scoreDiff;
+				ret.back().wordScore = firstScore;
 				ret.back().typoCost = typoCostDiff;
 				ret.back().dialectCost = dialectCostDiff;
 				ret.back().typoFormId = typoCostDiff ? gNode.typoFormId : 0;
@@ -1092,7 +1102,7 @@ namespace kiwi
 						KString{},
 						gNode.startPos + p.first,
 						gNode.startPos + p.second,
-						scoreDiff,
+						restScores,
 						typoCostDiff,
 						dialectCostDiff,
 						typoCostDiff ? gNode.typoFormId : 0,
@@ -1111,7 +1121,7 @@ namespace kiwi
 						KString{},
 						gNode.startPos + p.first,
 						gNode.startPos + p.second,
-						scoreDiff,
+						ch == 0 ? firstScore : restScores,
 						typoCostDiff,
 						dialectCostDiff,
 						typoCostDiff ? gNode.typoFormId : 0,
@@ -1222,7 +1232,7 @@ namespace kiwi
 		}
 
 		// start node
-		cache[0].emplace_back(&kw->morphemes[0], 0.f, 0.f, 0.f, nullptr, LmState{ langMdl }, SpecialState{});
+		cache[0].emplace_back(&kw->morphemes[0], 0.f, 0.f, 0.f, 0.f, nullptr, LmState{ langMdl }, SpecialState{});
 		cache[0].back().rootId = commonRootId;
 		reachable[0] = 1;
 
@@ -1317,9 +1327,10 @@ namespace kiwi
 				if (p.morpheme->tag == POSTag::z_siot) continue;
 
 				float c = p.accScore;
+				float firstChunkScore = 0;
 				if (!openEnding)
 				{
-					c += p.lmState.next(langMdl, eosId);
+					c += (firstChunkScore = p.lmState.next(langMdl, eosId));
 					if (p.spState.singleQuote) c -= 2;
 					if (p.spState.doubleQuote) c -= 2;
 				}
@@ -1328,13 +1339,13 @@ namespace kiwi
 				{
 					for (size_t i = 0; i < uniqStates.size(); ++i)
 					{
-						cand.emplace_back(nullptr, c, p.accTypoCost, p.accDialectCost, &p, p.lmState, uniqStates[i]);
+						cand.emplace_back(nullptr, c, firstChunkScore, p.accTypoCost, p.accDialectCost, &p, p.lmState, uniqStates[i]);
 						cand.back().rootId = i;
 					}
 				}
 				else
 				{
-					cand.emplace_back(nullptr, c, p.accTypoCost, p.accDialectCost, &p, p.lmState, p.spState);
+					cand.emplace_back(nullptr, c, firstChunkScore, p.accTypoCost, p.accDialectCost, &p, p.lmState, p.spState);
 				}
 			}
 		}
