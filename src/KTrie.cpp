@@ -223,7 +223,7 @@ namespace kiwi
 
 			while (1)
 			{
-				if (FeatureTestor::isMatchedApprox(&str[0], &str[nonSpaces[nonSpaces.size() - foundCand->form.size()]], foundCand->vowel, foundCand->polar)
+				if (FeatureTestor::isMatchedApprox(&str[0], &str[nonSpaces[nonSpaces.size() + foundCand->numSpaces - foundCand->form.size()]], foundCand->vowel, foundCand->polar)
 					&& (foundCand->dialect == Dialect::standard || !!(foundCand->dialect & allowedDialect)))
 				{
 					candidates.emplace_back(foundCand);
