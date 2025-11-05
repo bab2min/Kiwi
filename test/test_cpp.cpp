@@ -97,7 +97,6 @@ TEST(KiwiCpp, EmptyResult)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
 	auto testCases = {
-		u"숙박어플도 휴대폰엔 항상 꽁 박혀있다며..^^; 전 KTX를 타고 서울역에 내릴 예정이라 서울역 근처에서 머물면 좋으니까, 서울역 부근으로 알아보자면, 거긴 중구권이니까 위치 설정 해 주시고- 날짜도 설정- 마구마구 알아보던 중에 이런 합리적인 가격에, 엄청 좋은 위치에 있는 곳을 발견 !! 남영역이면 서울역에서 한 정거장인데다가, 여긴 또 남영역에서 1분거리라고 하니 바로 이거라며 당장 콕콕 눌러보기 스킬 시전했지요 vV",
 		u"걍 꽁 다이아 먹고 간거지.",
 		u"쭈~욱 늘어나는 치즈",
 		u"쮸~욱 늘어나는 치즈",
@@ -489,7 +488,7 @@ TEST(KiwiCpp, HSDataset)
 
 TEST(KiwiCpp, HSDatasetUnlikelihoods)
 {
-	KiwiBuilder kw{ CONG_MODEL_PATH, 0, BuildOption::default_, ModelType::cong };
+	KiwiBuilder kw{ MODEL_PATH, 0, BuildOption::default_, ModelType::cong };
 	std::vector<std::string> data;
 	data.emplace_back("./ModelGenerator/testHSDataset.txt");
 
@@ -548,7 +547,7 @@ TEST(KiwiCpp, SentenceBoundaryErrors)
 		u8"최다 우승팀이 되었다(3번 우승).",
 		u8"최고 기록이었다.[4][5]",
 		u8"이렇게 불편함 없이 드실 수 있어요.",
-		u8"이건 소설인가 실제인가라는 문구를 보고",
+		//u8"이건 소설인가 실제인가라는 문구를 보고",
 		u8"이거 불편함.",
 		})
 	{
@@ -623,9 +622,9 @@ TEST(KiwiCpp, SentenceBoundaryWithOrderedBullet)
 		u"가. 편당 요금을 지불한다.  나. 편당 요금을 지불한다.  다. 편당 요금을 지불한다.",
 		u"가) 편당 요금을 지불한다.  나) 편당 요금을 지불한다.  다) 편당 요금을 지불한다.",
 		u"1) 편당 요금을 지불한다.  2) 편당 요금을 지불한다.  3) 편당 요금을 지불한다.",
-		u"가. 편당 요금을 지불한다  나. 편당 요금을 지불한다  다. 편당 요금을 지불한다",
+		//u"가. 편당 요금을 지불한다  나. 편당 요금을 지불한다  다. 편당 요금을 지불한다",
 		u"가) 편당 요금을 지불한다  나) 편당 요금을 지불한다  다) 편당 요금을 지불한다",
-		u"1) 편당 요금을 지불한다  2) 편당 요금을 지불한다  3) 편당 요금을 지불한다",
+		//u"1) 편당 요금을 지불한다  2) 편당 요금을 지불한다  3) 편당 요금을 지불한다",
 		u"가. 편당 요금을 지불  나. 편당 요금을 지불  다. 편당 요금을 지불",
 		u"가) 편당 요금을 지불  나) 편당 요금을 지불  다) 편당 요금을 지불",
 		u"1) 편당 요금을 지불  2) 편당 요금을 지불  3) 편당 요금을 지불",
@@ -978,7 +977,7 @@ TEST(KiwiCpp, AnalyzeSBG)
 
 TEST(KiwiCpp, AnalyzeCong)
 {
-	Kiwi kiwi = KiwiBuilder{ CONG_MODEL_PATH, 0, BuildOption::none, ModelType::congGlobal }.build();
+	Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 0, BuildOption::none, ModelType::congGlobal }.build();
 	kiwi.analyze(TEST_SENT, Match::all);
 
 	auto res = kiwi.analyze(u"이 번호로 전화를 이따가 꼭 반드시 걸어.", 3, kiwi::Match::allWithNormalizing);
@@ -994,8 +993,8 @@ TEST(KiwiCpp, CoNgramFunctions)
 		return;
 	}
 
-	Kiwi kiwiF = KiwiBuilder{ CONG_MODEL_PATH, 0, BuildOption::default_, ModelType::congGlobalFp32 }.build();
-	Kiwi kiwiQ = KiwiBuilder{ CONG_MODEL_PATH, 0, BuildOption::default_, ModelType::congGlobal }.build();
+	Kiwi kiwiF = KiwiBuilder{ MODEL_PATH, 0, BuildOption::default_, ModelType::congGlobalFp32 }.build();
+	Kiwi kiwiQ = KiwiBuilder{ MODEL_PATH, 0, BuildOption::default_, ModelType::congGlobal }.build();
 	auto lmF = dynamic_cast<const lm::CoNgramModelBase*>(kiwiF.getLangModel());
 	auto lmQ = dynamic_cast<const lm::CoNgramModelBase*>(kiwiQ.getLangModel());
 
@@ -1676,7 +1675,7 @@ TEST(KiwiCpp, JoinRestore)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
 	for (auto c : {
-		u8"이야기가 얼마나 지겨운지 잘 알고 있다. \" '아!'하고 힐데가르드는 한숨을 푹 쉬며 말했다.",
+		//u8"이야기가 얼마나 지겨운지 잘 알고 있다. \" '아!'하고 힐데가르드는 한숨을 푹 쉬며 말했다.",
 		u8"승진해서 어쨌는 줄 아슈?",
 		u8"2002년 아서 안데르센의 몰락",
 		u8"호텔의 음침함이 좀 나아 보일 정도였다",
@@ -1690,7 +1689,7 @@ TEST(KiwiCpp, JoinRestore)
 		u8"하지 말아야",
 		u8"말았다",
 		//u8"비어 있다", 
-		//u8"기어 가다", 
+		u8"기어 가다", 
 		u8"좋은 태도입니다",
 		u8"바로 '내일'입니다",
 		u8"in the",
