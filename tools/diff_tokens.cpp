@@ -2,6 +2,7 @@
 #include <fstream>
 
 #include <kiwi/Kiwi.h>
+#include <kiwi/TypoTransformer.h>
 #include <tclap/CmdLine.h>
 
 #include "toolUtils.h"
@@ -10,13 +11,54 @@ using namespace std;
 using namespace kiwi;
 using namespace TCLAP;
 
-Kiwi loadKiwiFromArg(const string& model, const string& modelType, size_t numThreads = 2)
+Kiwi loadKiwiFromArg(const string& model, const string& modelType, 
+	size_t numThreads = 2,
+	bool normCoda = true,
+	bool zCoda = true,
+	bool loadMultiDict = true,
+	float typoCostWeight = 0.f,
+	bool bTypo = false,
+	bool cTypo = false,
+	bool lTypo = false,
+	Dialect allowedDialects = Dialect::standard)
 {
 	ModelType kiwiModelType = tutils::parseModelType(modelType);
 	BuildOption opt = BuildOption::default_;
-	opt &= ~BuildOption::loadMultiDict;
-	KiwiBuilder builder{ model, numThreads < 2 ? 2 : numThreads, opt, kiwiModelType };
-	return builder.build();
+
+	if (!loadMultiDict) opt &= ~BuildOption::loadMultiDict;
+	KiwiBuilder builder{ model, numThreads < 2 ? 2 : numThreads, opt, kiwiModelType, allowedDialects };
+
+	if (typoCostWeight > 0 && !bTypo && !cTypo && !lTypo)
+	{
+		bTypo = true;
+	}
+	else if (typoCostWeight == 0)
+	{
+		bTypo = false;
+		cTypo = false;
+		lTypo = false;
+	}
+
+	auto typo = getDefaultTypoSet(DefaultTypoSet::withoutTypo);
+
+	if (bTypo)
+	{
+		typo |= getDefaultTypoSet(DefaultTypoSet::basicTypoSet);
+	}
+
+	if (cTypo)
+	{
+		typo |= getDefaultTypoSet(DefaultTypoSet::continualTypoSet);
+	}
+
+	if (lTypo)
+	{
+		typo |= getDefaultTypoSet(DefaultTypoSet::lengtheningTypoSet);
+	}
+
+	auto kiwi =  builder.build(typo);
+	kiwi.setTypoCostWeight(typoCostWeight);
+	return kiwi;
 }
 
 inline bool isEqual(const TokenInfo* a, size_t aSize, const TokenInfo* b, size_t bSize, bool ignoreTag = false)
@@ -32,7 +74,13 @@ inline bool isEqual(const TokenInfo* a, size_t aSize, const TokenInfo* b, size_t
 
 inline ostream& operator<<(ostream& ostr, const TokenInfo& token)
 {
-	return ostr << utf16To8(token.str) << '/' << tagToString(token.tag);
+	ostr << utf16To8(token.str);
+	if (token.senseId && !isSpecialClass(token.tag))
+	{
+		ostr << "__" << (int)token.senseId;
+	}
+	ostr << '/' << tagToString(token.tag);
+	return ostr;
 }
 
 bool printDiffTokens(ostream& ostr, const string& raw, const TokenInfo* a, size_t aSize, const TokenInfo* b, size_t bSize, bool ignoreTag = false, bool showSame = false)
@@ -131,7 +179,11 @@ pair<size_t, size_t> diffTokens(ostream& ostr, const string& raw, const TokenRes
 	return { diff, total };
 }
 
-pair<size_t, size_t> diffInputs(Kiwi& kiwiA, Kiwi& kiwiB, const string& inputs, ostream& ostr, bool sentenceLevel, bool ignoreTag = false, bool showSame = false)
+pair<size_t, size_t> diffInputs(Kiwi& kiwiA, Kiwi& kiwiB, const string& inputs, ostream& ostr, bool sentenceLevel, 
+	bool ignoreTag = false, bool showSame = false,
+	Dialect allowedDialects = Dialect::standard,
+	float dialectCost = 6.f
+	)
 {
 	ifstream ifs{ inputs };
 	if (!ifs)
@@ -144,6 +196,8 @@ pair<size_t, size_t> diffInputs(Kiwi& kiwiA, Kiwi& kiwiB, const string& inputs, 
 	auto* poolA = kiwiA.getThreadPool();
 	auto* poolB = kiwiB.getThreadPool();
 	size_t diff = 0, total = 0;
+
+	AnalyzeOption option{ Match::allWithNormalizing, nullptr, false, allowedDialects, dialectCost };
 
 	while (getline(ifs, line))
 	{
@@ -161,8 +215,8 @@ pair<size_t, size_t> diffInputs(Kiwi& kiwiA, Kiwi& kiwiB, const string& inputs, 
 
 		futures.emplace_back(
 			line,
-			poolA->enqueue([&, line](size_t tid) { return kiwiA.analyze(line, Match::allWithNormalizing);}),
-			poolB->enqueue([&, line](size_t tid) { return kiwiB.analyze(line, Match::allWithNormalizing);})
+			poolA->enqueue([&, line](size_t tid) { return kiwiA.analyze(line, option);}),
+			poolB->enqueue([&, line](size_t tid) { return kiwiB.analyze(line, option);})
 		);
 	}
 
@@ -202,6 +256,8 @@ int main(int argc, const char* argv[])
 	SwitchArg bTypo{ "", "btypo", "make basic-typo-tolerant model", false };
 	SwitchArg cTypo{ "", "ctypo", "make continual-typo-tolerant model", false };
 	SwitchArg lTypo{ "", "ltypo", "make lengthening-typo-tolerant model", false };
+	ValueArg<string> dialect{ "d", "dialect", "allowed dialect", false, "standard", "string" };
+	ValueArg<float> dialectCost{ "", "dialect-cost", "dialect cost", false, 6.f, "float" };
 	UnlabeledMultiArg<string> inputs{ "inputs", "targets", false, "string" };
 
 	cmd.add(modelA);
@@ -214,6 +270,15 @@ int main(int argc, const char* argv[])
 	cmd.add(sentence);
 	cmd.add(ignoreTag);
 	cmd.add(showSame);
+	cmd.add(noNormCoda);
+	cmd.add(noZCoda);
+	cmd.add(noMulti);
+	cmd.add(typoWeight);
+	cmd.add(bTypo);
+	cmd.add(cTypo);
+	cmd.add(lTypo);
+	cmd.add(dialect);
+	cmd.add(dialectCost);
 
 	try
 	{
@@ -225,8 +290,27 @@ int main(int argc, const char* argv[])
 		return -1;
 	}
 	
-	Kiwi kiwiA = loadKiwiFromArg(modelA, modelAType, numThreads);
-	Kiwi kiwiB = loadKiwiFromArg(modelB, modelBType, numThreads);
+	Dialect parsedDialect = parseDialects(dialect.getValue());
+
+	Kiwi kiwiA = loadKiwiFromArg(modelA, modelAType, numThreads,
+		!noNormCoda,
+		!noZCoda,
+		!noMulti,
+		typoWeight,
+		bTypo,
+		cTypo,
+		lTypo,
+		parsedDialect);
+
+	Kiwi kiwiB = loadKiwiFromArg(modelB, modelBType, numThreads,
+		!noNormCoda,
+		!noZCoda,
+		!noMulti,
+		typoWeight,
+		bTypo,
+		cTypo,
+		lTypo,
+		parsedDialect);
 
 	unique_ptr<ofstream> ofstr;
 	ostream* ostr = &cout;
@@ -242,7 +326,7 @@ int main(int argc, const char* argv[])
 	{
 		cout << "input: " << input << " ";
 		cout.flush();
-		auto p = diffInputs(kiwiA, kiwiB, input, *ostr, sentence, ignoreTag, showSame);
+		auto p = diffInputs(kiwiA, kiwiB, input, *ostr, sentence, ignoreTag, showSame, parsedDialect, dialectCost);
 		cout << "(diff: " << p.first << " / " << p.second << ")" << endl;
 	}
 }

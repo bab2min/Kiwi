@@ -1,6 +1,9 @@
 #pragma once
 
 #include <chrono>
+#include <string>
+#include <vector>
+#include <string_view>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -146,4 +149,56 @@ namespace tutils
 			throw std::invalid_argument{ "Invalid model type" };
 		}
 	}
+
+
+	template<class BaseStr, class BaseChr, class OutIterator>
+	OutIterator split(BaseStr&& s, BaseChr delim, OutIterator result, size_t maxSplit = -1, BaseChr delimEscape = 0)
+	{
+		size_t p = 0, e = 0;
+		for (size_t i = 0; i < maxSplit; ++i)
+		{
+			size_t t = s.find(delim, p);
+			if (t == s.npos)
+			{
+				*(result++) = std::basic_string_view<BaseChr>{ &s[e] , s.size() - e };
+				return result;
+			}
+			else
+			{
+				if (delimEscape && delimEscape != delim && t > 0 && s[t - 1] == delimEscape)
+				{
+					p = t + 1;
+				}
+				else if (delimEscape && delimEscape == delim && t < s.size() - 1 && s[t + 1] == delimEscape)
+				{
+					p = t + 2;
+				}
+				else
+				{
+					*(result++) = std::basic_string_view<BaseChr>{ &s[e] , t - e };
+					p = t + 1;
+					e = t + 1;
+				}
+			}
+		}
+		*(result++) = std::basic_string_view<BaseChr>{ &s[e] , s.size() - e };
+		return result;
+	}
+
+	template<class BaseChr, class Trait>
+	inline std::vector<std::basic_string_view<BaseChr, Trait>> split(std::basic_string_view<BaseChr, Trait> s, BaseChr delim, BaseChr delimEscape = 0)
+	{
+		std::vector<std::basic_string_view<BaseChr, Trait>> ret;
+		split(s, delim, std::back_inserter(ret), -1, delimEscape);
+		return ret;
+	}
+
+	template<class BaseChr, class Trait, class Alloc>
+	inline std::vector<std::basic_string_view<BaseChr, Trait>> split(const std::basic_string<BaseChr, Trait, Alloc>& s, BaseChr delim, BaseChr delimEscape = 0)
+	{
+		std::vector<std::basic_string_view<BaseChr, Trait>> ret;
+		split(s, delim, std::back_inserter(ret), -1, delimEscape);
+		return ret;
+	}
+
 }

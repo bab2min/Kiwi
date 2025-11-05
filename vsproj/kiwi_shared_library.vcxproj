@@ -96,7 +96,6 @@
     <ClInclude Include="..\src\SkipBigramTrainer.hpp" />
     <ClInclude Include="..\src\SkipBigramModel.hpp" />
     <ClInclude Include="..\src\SortUtils.hpp" />
-    <ClInclude Include="..\src\string_view.hpp" />
     <ClInclude Include="..\src\StrUtils.h" />
     <ClInclude Include="..\src\UnicodeCase.h" />
   </ItemGroup>
