@@ -35,6 +35,7 @@ namespace kiwi
 	std::string utf8FromCode(char32_t code);
 	size_t utf8FromCode(std::string& ret, char32_t code);
 	std::string utf16To8(const std::u16string& str);
+	KString normalizeHangul(const std::u16string& hangul);
 
 	inline bool isWebTag(POSTag t)
 	{

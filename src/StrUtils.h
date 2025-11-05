@@ -506,11 +506,6 @@ namespace kiwi
 		return ret;
 	}
 
-	inline KString normalizeHangul(const std::u16string& hangul)
-	{
-		return normalizeHangul(hangul.begin(), hangul.end());
-	}
-
 	inline KString normalizeHangul(std::u16string_view hangul)
 	{
 		return normalizeHangul(hangul.begin(), hangul.end());

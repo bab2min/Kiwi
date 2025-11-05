@@ -59,6 +59,11 @@ namespace kiwi
 		return utf16To8(toStringView(str));
 	}
 
+	KString normalizeHangul(const std::u16string& hangul)
+	{
+		return normalizeHangul(hangul.begin(), hangul.end());
+	}
+
 	/**
 	* 문자의 타입을 변별한다. 타입에 따라 다음 값을 반환한다.
 	* 
