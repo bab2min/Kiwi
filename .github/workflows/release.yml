@@ -65,7 +65,7 @@ jobs:
     strategy:
       matrix:
           arch: [x86_64, arm64]
-    runs-on: ${{ matrix.arch == 'x86_64' && 'macos-13' || 'macos-14' }}
+    runs-on: macos-15
     name: macOS - ${{ matrix.arch }}
 
     steps:
@@ -114,7 +114,7 @@ jobs:
         asset_name: kiwi-java-${{ steps.get_release.outputs.tag_name }}-mac-${{ matrix.arch }}.jar
         asset_content_type: application/octet-stream
     - if: matrix.arch == 'arm64'
-      run: tar -zcvf model.tgz models/base/sj.* models/base/extract.mdl models/base/*.dict models/base/combiningRule.txt models/base/skipbigram.mdl
+      run: tar -zcvf model.tgz models/cong/base/sj.* models/cong/base/extract.mdl models/cong/base/*.dict models/cong/base/combiningRule.txt models/cong/base/*.mdl
     - name: Upload release binary
       if: matrix.arch == 'arm64'
       uses: actions/upload-release-asset@v1.0.2
