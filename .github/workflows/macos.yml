@@ -15,7 +15,7 @@ jobs:
             compiler: xcode
             version: "16.0"
           - name: "macOS 15 + Xcode 16.0"
-            os: macos-15
+            os: macos-15-intel
             arch: x86_64
             compiler: xcode
             version: "16.0"
