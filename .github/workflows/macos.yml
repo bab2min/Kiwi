@@ -72,12 +72,12 @@ jobs:
           KIWI_ARCH_TYPE=sse2 ./build/kiwi-cli-* -m ./models/cong/base -e -o test.out kowiki1000.txt
           KIWI_ARCH_TYPE=sse4_1 ./build/kiwi-cli-* -m ./models/cong/base -e -o test.out kowiki1000.txt
           KIWI_ARCH_TYPE=avx2 ./build/kiwi-cli-* -m ./models/cong/base -e -o test.out kowiki1000.txt
-          KIWI_ARCH_TYPE=sse2 ./build/kiwi-cli-* -m ./models/cong/base -e -o test.out --model-type=largest kowiki1000.txt
-          KIWI_ARCH_TYPE=sse4_1 ./build/kiwi-cli-* -m ./models/cong/base -e -o test.out --model-type=largest kowiki1000.txt
-          KIWI_ARCH_TYPE=avx2 ./build/kiwi-cli-* -m ./models/cong/base -e -o test.out --model-type=largest kowiki1000.txt
+          KIWI_ARCH_TYPE=sse2 ./build/kiwi-cli-* -m ./models/cong/base -e -o test.out --model-type largest kowiki1000.txt
+          KIWI_ARCH_TYPE=sse4_1 ./build/kiwi-cli-* -m ./models/cong/base -e -o test.out --model-type largest kowiki1000.txt
+          KIWI_ARCH_TYPE=avx2 ./build/kiwi-cli-* -m ./models/cong/base -e -o test.out --model-type largest kowiki1000.txt
         else
           KIWI_ARCH_TYPE=neon ./build/kiwi-cli-* -m ./models/cong/base -e -o test.out kowiki1000.txt
-          KIWI_ARCH_TYPE=neon ./build/kiwi-cli-* -m ./models/cong/base -e -o test.out --model-type=largest kowiki1000.txt
+          KIWI_ARCH_TYPE=neon ./build/kiwi-cli-* -m ./models/cong/base -e -o test.out --model-type largest kowiki1000.txt
           KIWI_ARCH_TYPE=neon ./build/kiwi-cli-* -m ./models/cong/base -e -o test.out --typos 6 kowiki1000.txt
         fi
     - name: Archive binaries
