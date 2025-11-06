@@ -355,10 +355,10 @@ TEST(KiwiCpp, Pretokenized)
 		res = kiwi.analyze(str, Match::allWithNormalizing, pretokenized).first;
 		EXPECT_EQ(res[2].tag, POSTag::jks);
 		EXPECT_EQ(res[2].morph, ref[2].morph);
-		EXPECT_EQ(res[2].score, ref[2].score);
+		EXPECT_FLOAT_EQ(res[2].score, ref[2].score);
 		EXPECT_EQ(res[5].tag, POSTag::jkb);
 		EXPECT_EQ(res[5].morph, ref[5].morph);
-		EXPECT_EQ(res[5].score, ref[5].score);
+		EXPECT_FLOAT_EQ(res[5].score, ref[5].score);
 	}
 
 	{
