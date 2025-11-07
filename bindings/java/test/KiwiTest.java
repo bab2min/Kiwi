@@ -14,7 +14,7 @@ import kr.pe.bab2min.KiwiBuilder;
 
 public class KiwiTest {
 
-	private static String modelPath = "../../models/base";
+	private static String modelPath = "../../models/cong/base";
 	private static Kiwi reusableInst = null;
 
 	Kiwi getReusableKiwi() throws Exception {

@@ -29,7 +29,7 @@ jobs:
           mkdir build && pushd build && /opt/python/cp310-cp310/bin/cmake -DCMAKE_BUILD_TYPE=Release -DKIWI_USE_MIMALLOC=0 -DKIWI_JAVA_BINDING=1 ..
           make -j2 && popd
           ./build/test/kiwi-test
-          mkdir eval_results && ./build/kiwi-evaluator -m ./models/base --morph eval_data/*.txt -t knlm -o eval_results/ && ./build/kiwi-evaluator -m ./models/base --morph eval_data/*.txt -t sbg -o eval_results/
+          mkdir eval_results && ./build/kiwi-evaluator -m ./models/cong/base --morph eval_data/*.txt -t knlm -o eval_results/ && ./build/kiwi-evaluator -m ./models/cong/base --morph eval_data/*.txt -t sbg -o eval_results/
           cp -r build /artifacts/
           cp -r eval_results /artifacts/
     - name: Archive binaries

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file Form.h
  * @author bab2min (bab2min@gmail.com)
  * @brief 형태 및 형태소에 관한 정보를 담는 구조체들이 선언된 헤더
@@ -87,6 +87,8 @@ namespace kiwi
 		   그룹 인덱스가 동일한 형태소만 선택된다.
 		 */
 		uint32_t groupId = 0;
+		Dialect dialect = Dialect::standard; /**< 형태소의 방언 정보. 기본값은 표준어. */
+		uint16_t _reserved = 0; /**< 패딩을 위한 필드. */
 
 		MorphemeRaw();
 		~MorphemeRaw();
@@ -151,6 +153,7 @@ namespace kiwi
 		FixedPairVector<const Morpheme*, std::pair<uint8_t, uint8_t>> chunks;
 		float userScore = 0;
 		uint32_t lmMorphemeId = 0, origMorphemeId = 0;
+		Dialect dialect = Dialect::standard;
 
 		Morpheme();
 		~Morpheme();
@@ -223,7 +226,7 @@ namespace kiwi
 	 * @brief 형태에 관한 모든 정보를 담는 구조체
 	 * 
 	 * @note 이 구조체는 변경 불가능한 상태로 사용된다. 인덱스는 모두 포인터로, std::vector는 FixedVector로 변경되어 수정이 불가능한 대신
-	 * 각 값에 효율적으로 빠르게 접근 가능하다. `kiwi::Kiwi` 내 실제 형태소 분석 단계에 쓰인다.
+	 * 각 값에 효율적으로 빠르게 접근 가능하다. `kiwi::Kiwi` 내에서 실제 형태소 분석 단계에 쓰인다.
 	 */
 	struct Form
 	{
@@ -235,6 +238,7 @@ namespace kiwi
 		uint8_t formHash = 0;
 		uint8_t zCodaAppendable : 1;
 		uint8_t zSiotAppendable : 1;
+		Dialect dialect = Dialect::standard;
 
 		Form();
 		~Form();
@@ -256,16 +260,30 @@ namespace kiwi
 		uint32_t typoId = 0;
 		uint16_t numSpaces = 0;
 		CondVowel leftCond = CondVowel::none;
+		Dialect dialect = Dialect::standard;
 
 		TypoForm() = default;
 
-		TypoForm(const std::tuple<uint32_t, float, uint16_t, CondVowel>& p)
-			: formId{ std::get<0>(p) }, scoreHash{ std::get<1>(p) }, numSpaces{ std::get<2>(p)}, leftCond{std::get<3>(p)}
+		TypoForm(const std::tuple<uint32_t, float, uint16_t, CondVowel, Dialect>& p)
+			: formId{ std::get<0>(p) }, 
+			scoreHash{ std::get<1>(p) }, 
+			numSpaces{ std::get<2>(p) }, 
+			leftCond{ std::get<3>(p) }, 
+			dialect{ std::get<4>(p) }
 		{
 		}
 
-		TypoForm(uint32_t _formId, float _score = 0, bool _hash = 0, uint32_t _typoId = 0, uint16_t _numSpaces = 0, CondVowel _leftCond = CondVowel::none)
-			: formId{ _formId }, scoreHash{ _hash ? -_score : _score }, typoId{ _typoId }, numSpaces{ _numSpaces }, leftCond{ _leftCond }
+		TypoForm(uint32_t _formId, float _score = 0, bool _hash = 0, 
+			uint32_t _typoId = 0, 
+			uint16_t _numSpaces = 0, 
+			CondVowel _leftCond = CondVowel::none,
+			Dialect _dialect = Dialect::standard
+			)
+			: formId{ _formId }, scoreHash{ _hash ? -_score : _score }, 
+			typoId{ _typoId }, 
+			numSpaces{ _numSpaces }, 
+			leftCond{ _leftCond }, 
+			dialect{ _dialect }
 		{
 		}
 

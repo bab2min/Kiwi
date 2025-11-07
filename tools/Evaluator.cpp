@@ -29,7 +29,12 @@ inline TokenInfo parseWordPOS(const u16string& str)
 {
 	auto p = str.rfind('/');
 	if (p == str.npos) return {};
-	u16string form = replace(std::u16string_view(str.data(), p), u"_", u" ");
+	u16string form;
+	auto f = str.rfind(u"__", p);
+	if (f != str.npos) form = str.substr(0, f);
+	else form = str.substr(0, p);
+
+	form = replace(u16string_view{ form.data(), form.size() }, u"_", u" ");
 	if (str[p + 1] == 'E')
 	{
 		if (form[0] == u'아' || form[0] == u'여') form[0] = u'어';
@@ -61,6 +66,7 @@ int Evaluator::operator()(const string& modelPath,
 	const vector<string>& input,
 	bool normCoda, bool zCoda, bool multiDict, ModelType modelType,
 	float typoCostWeight, bool bTypo, bool cTypo, bool lTypo,
+	Dialect allowedDialect,
 	int repeat)
 {
 	try
@@ -95,7 +101,7 @@ int Evaluator::operator()(const string& modelPath,
 			typo |= getDefaultTypoSet(DefaultTypoSet::lengtheningTypoSet);
 		}
 
-		Kiwi kw = KiwiBuilder{ modelPath, 1, option, modelType }.build(
+		Kiwi kw = KiwiBuilder{ modelPath, 1, option, modelType, allowedDialect }.build(
 			typo
 		);
 		if (typoCostWeight > 0) kw.setTypoCostWeight(typoCostWeight);
@@ -116,7 +122,7 @@ int Evaluator::operator()(const string& modelPath,
 			cout << "Test file: " << tf << endl;
 			try
 			{
-				auto result = eval(output, tf, kw, normCoda, zCoda, repeat);
+				auto result = eval(output, tf, kw, normCoda, zCoda, allowedDialect, repeat);
 				avgMicro += result.first;
 				avgMacro += result.second;
 				++cnt;
@@ -154,10 +160,7 @@ auto MorphEvaluator::loadTestset(const string& testSetFile) const -> vector<Test
 		auto fd = split(wstr, u'\t');
 		if (fd.size() < 2) continue;
 		vector<u16string> tokens;
-		for (size_t i = 1; i < fd.size(); ++i)
-		{
-			for (auto s : split(fd[i], u' ')) tokens.emplace_back(s);
-		}
+		for (auto s : split(fd[1], u' ')) tokens.emplace_back(s);
 		TestResult tr;
 		tr.q = u16string{ fd[0] };
 		for (auto& t : tokens) tr.a.emplace_back(parseWordPOS(t));
@@ -261,17 +264,19 @@ void MorphEvaluator::TestResult::writeResult(ostream& out) const
 	out << endl;
 }
 
-pair<double, double> MorphEvaluator::eval(const string& output, const string& file, kiwi::Kiwi& kiwi, bool normCoda, bool zCoda, int repeat)
+pair<double, double> MorphEvaluator::eval(const string& output, const string& file, kiwi::Kiwi& kiwi, bool normCoda, bool zCoda, Dialect allowedDialect, int repeat)
 {
 	const size_t topN = 1;
-	const Match matchOption = (normCoda ? Match::allWithNormalizing : Match::all) & ~(zCoda ? Match::none : Match::zCoda);
+	AnalyzeOption option;
+	option.match = (normCoda ? Match::allWithNormalizing : Match::all) & ~(zCoda ? Match::none : Match::zCoda);
+	option.allowedDialects = allowedDialect;
 	vector<TestResult> testsets = loadTestset(file), errors;
 	tutils::Timer total;
 	for (int i = 0; i < repeat; ++i)
 	{
 		for (auto& tr : testsets)
 		{
-			auto cands = kiwi.analyze(tr.q, topN, matchOption);
+			auto cands = kiwi.analyze(tr.q, topN, option);
 			tr.r = cands[0].first;
 		}
 	}
@@ -332,17 +337,19 @@ void DisambEvaluator::TestResult::writeResult(ostream& out) const
 	out << endl;
 }
 
-pair<double, double> DisambEvaluator::eval(const string& output, const string& file, kiwi::Kiwi& kiwi, bool normCoda, bool zCoda, int repeat)
+pair<double, double> DisambEvaluator::eval(const string& output, const string& file, kiwi::Kiwi& kiwi, bool normCoda, bool zCoda, Dialect allowedDialect, int repeat)
 {
 	const size_t topN = 1;
-	const Match matchOption = (normCoda ? Match::allWithNormalizing : Match::all) & ~(zCoda ? Match::none : Match::zCoda);
+	AnalyzeOption option;
+	option.match = (normCoda ? Match::allWithNormalizing : Match::all) & ~(zCoda ? Match::none : Match::zCoda);
+	option.allowedDialects = allowedDialect;
 	vector<TestResult> testsets = loadTestset(file), errors;
 	tutils::Timer total;
 	for (int i = 0; i < repeat; ++i)
 	{
 		for (auto& tr : testsets)
 		{
-			auto cands = kiwi.analyze(tr.text, topN, matchOption);
+			auto cands = kiwi.analyze(tr.text, topN, option);
 			tr.result = cands[0];
 		}
 	}

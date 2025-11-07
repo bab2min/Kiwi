@@ -663,6 +663,11 @@ namespace kiwi
 		ARCH_TARGET("avx2")
 		inline bool nstSearchAVX2(const IntTy* keys, size_t size, IntTy target, size_t& ret)
 		{
+			if (size < (n + 1) / 2)
+			{
+				return nstSearchSSE2<(n + 1) / 2, IntTy>(keys, size, target, ret);
+			}
+
 			size_t i = 0, r;
 
 			__m256i ptarget, pkey, peq, pgt;
@@ -965,6 +970,11 @@ namespace kiwi
 		ARCH_TARGET("avx,avx2,avx512f,avx512bw,avx512dq")
 		inline bool nstSearchAVX512(const IntTy* keys, size_t size, IntTy target, size_t& ret)
 		{
+			if (size < (n + 1) / 2)
+			{
+				return nstSearchAVX2<(n + 1) / 2, IntTy>(keys, size, target, ret);
+			}
+
 			size_t i = 0, r;
 
 			__m512i ptarget, pkey;

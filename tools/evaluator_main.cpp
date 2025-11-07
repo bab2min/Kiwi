@@ -28,6 +28,7 @@ int main(int argc, const char* argv[])
 	SwitchArg bTypo{ "", "btypo", "make basic-typo-tolerant model", false };
 	SwitchArg cTypo{ "", "ctypo", "make continual-typo-tolerant model", false };
 	SwitchArg lTypo{ "", "ltypo", "make lengthening-typo-tolerant model", false };
+	ValueArg<string> dialect{ "d", "dialect", "allowed dialect", false, "standard", "string" };
 	ValueArg<int> repeat{ "", "repeat", "repeat evaluation for benchmark", false, 1, "int" };
 	UnlabeledMultiArg<string> inputs{ "inputs", "evaluation set (--morph, --disamb)", false, "string" };
 
@@ -41,6 +42,7 @@ int main(int argc, const char* argv[])
 	cmd.add(bTypo);
 	cmd.add(cTypo);
 	cmd.add(lTypo);
+	cmd.add(dialect);
 	cmd.add(repeat);
 	cmd.add(inputs);
 
@@ -55,13 +57,13 @@ int main(int argc, const char* argv[])
 	}
 	ModelType kiwiModelType = ModelType::none;
 	try
-		{
+	{
 		kiwiModelType = tutils::parseModelType(modelType);
-		}
+	}
 	catch (const exception& e)
-		{
+	{
 		cerr << e.what() << endl;
-			return -1;
+		return -1;
 	}
 	
 	vector<string> morphInputs, disambInputs;
@@ -91,6 +93,8 @@ int main(int argc, const char* argv[])
 		}
 	}
 
+	Dialect allowedDialect = parseDialects(dialect.getValue());
+
 	if (morphInputs.size())
 	{
 		auto evaluator = Evaluator::create("morph");
@@ -98,6 +102,7 @@ int main(int argc, const char* argv[])
 			!noNormCoda, !noZCoda, !noMulti,
 			kiwiModelType,
 			typoWeight, bTypo, cTypo, lTypo,
+			allowedDialect,
 			repeat);
 		cout << endl;
 	}
@@ -109,6 +114,7 @@ int main(int argc, const char* argv[])
 			!noNormCoda, !noZCoda, !noMulti,
 			kiwiModelType,
 			typoWeight, bTypo, cTypo, lTypo,
+			allowedDialect,
 			repeat);
 		cout << endl;
 	}

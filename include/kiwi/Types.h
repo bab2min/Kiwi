@@ -21,6 +21,7 @@
 #include <type_traits>
 #include <functional>
 #include <stdexcept>
+#include <iostream>
 
 #ifdef KIWI_USE_MIMALLOC
 #include <mimalloc.h>
@@ -78,6 +79,12 @@ namespace kiwi
 	{
 	public:
 		using Exception::Exception;
+	};
+
+	class SerializationException : public std::ios_base::failure
+	{
+	public:
+		using std::ios_base::failure::failure;
 	};
 
 	class FormatException : public Exception
@@ -209,6 +216,7 @@ namespace kiwi
 		pv = p,
 		pa = p + 1,
 		irregular = 0x80, /**< 불규칙 활용을 하는 동/형용사를 나타내는데 사용됨 */
+		unknown_feat_ha = 0xFF,
 
 		vvi = vv | irregular,
 		vai = va | irregular,
@@ -307,6 +315,24 @@ namespace kiwi
 		knlmTransposed,
 	};
 
+	enum class Dialect : uint16_t
+	{
+		standard = 0, /**< 표준어 */
+		gyeonggi = 1 << 0, /**< 경기 방언 */
+		chungcheong = 1 << 1, /**< 충청 방언 */
+		gangwon = 1 << 2, /**< 강원 방언 */
+		gyeongsang = 1 << 3, /**< 경상 방언 */
+		jeolla = 1 << 4, /**< 전라 방언 */
+		jeju = 1 << 5, /**< 제주 방언 */
+		hwanghae = 1 << 6, /**< 황해 방언 */
+		hamgyeong = 1 << 7, /**< 함경 방언 */
+		pyeongan = 1 << 8, /**< 평안 방언 */
+		archaic = 1 << 9, /**< 옛말 */
+		lastPlus1,
+		all = lastPlus1 * 2 - 3,
+	};
+	
+
 	struct Morpheme;
 
 	/**
@@ -331,6 +357,7 @@ namespace kiwi
 		uint32_t typoFormId = 0; /**< 교정 전 오타의 형태에 대한 정보 (typoCost가 0인 경우 PreTokenizedSpan의 ID값) */
 		uint32_t pairedToken = -1; /**< SSO, SSC 태그에 속하는 형태소의 경우 쌍을 이루는 반대쪽 형태소의 위치(-1인 경우 해당하는 형태소가 없는 것을 뜻함) */
 		uint32_t subSentPosition = 0; /**< 인용부호나 괄호로 둘러싸인 하위 문장의 번호. 1부터 시작. 0인 경우 하위 문장이 아님을 뜻함 */
+		Dialect dialect = Dialect::standard; /**< 방언 정보 */
 		const Morpheme* morph = nullptr; /**< 기타 형태소 정보에 대한 포인터 (OOV인 경우 nullptr) */
 
 		TokenInfo() = default;
@@ -417,6 +444,15 @@ namespace kiwi
 		}
 	};
 
+	template<>
+	struct Hash<Dialect>
+	{
+		size_t operator()(Dialect v) const
+		{
+			return std::hash<uint16_t>{}(static_cast<uint16_t>(v));
+		}
+	};
+
 	template<class Ty, class Alloc>
 	struct Hash<std::vector<Ty, Alloc>>
 	{
@@ -494,3 +530,4 @@ namespace std
 }
 
 KIWI_DEFINE_ENUM_FLAG_OPERATORS(kiwi::BuildOption);
+KIWI_DEFINE_ENUM_FLAG_OPERATORS(kiwi::Dialect);

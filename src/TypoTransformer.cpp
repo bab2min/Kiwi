@@ -49,24 +49,22 @@ void TypoCandidates<u16wrap>::insertSinglePath(It first, It last)
 
 template<bool u16wrap>
 template<class It>
-void TypoCandidates<u16wrap>::addBranch(It first, It last, float _cost, CondVowel _leftCond)
+void TypoCandidates<u16wrap>::addBranch(It first, It last, float _cost, CondVowel _leftCond, Dialect _dialect)
 {
 	strPool.insert(strPool.end(), first, last);
 	strPtrs.emplace_back(strPool.size());
-	cost.emplace_back(_cost);
-	leftCond.emplace_back(_leftCond);
+	candidates.emplace_back(_cost, _leftCond, _dialect);
 }
 
 template<bool u16wrap>
 template<class It1, class It2, class It3>
-void TypoCandidates<u16wrap>::addBranch(It1 first1, It1 last1, It2 first2, It2 last2, It3 first3, It3 last3, float _cost, CondVowel _leftCond)
+void TypoCandidates<u16wrap>::addBranch(It1 first1, It1 last1, It2 first2, It2 last2, It3 first3, It3 last3, float _cost, CondVowel _leftCond, Dialect _dialect)
 {
 	strPool.insert(strPool.end(), first1, last1);
 	strPool.insert(strPool.end(), first2, last2);
 	strPool.insert(strPool.end(), first3, last3);
 	strPtrs.emplace_back(strPool.size());
-	cost.emplace_back(_cost);
-	leftCond.emplace_back(_leftCond);
+	candidates.emplace_back(_cost, _leftCond, _dialect);
 }
 
 template<bool u16wrap>
@@ -163,10 +161,16 @@ bool TypoIterator<u16wrap>::valid() const
 {
 	if (cands->branchPtrs.size() <= 1) return true;
 	float cost = 0;
+	Dialect dialect = Dialect::standard;
 	for (size_t i = 0; i < digit.size(); ++i)
 	{
 		size_t s = cands->branchPtrs[i] + digit[i];
-		cost += cands->cost[s - i];
+		cost += get<float>(cands->candidates[s - i]);
+		if (dialectHasIntersection(dialect, get<Dialect>(cands->candidates[s - i])))
+		{
+			dialect = dialectAnd(dialect, get<Dialect>(cands->candidates[s - i]));
+		}
+		else return false; // dialect mismatch
 	}
 	return cost <= cands->costThreshold;
 }
@@ -177,19 +181,21 @@ auto TypoIterator<u16wrap>::operator*() const -> value_type
 	KString ret;
 	float cost = 0;
 	CondVowel leftCond = CondVowel::none;
+	Dialect dialect = Dialect::standard;
 	if (cands->branchPtrs.size() > 1)
 	{
 		for (size_t i = 0; i < digit.size(); ++i)
 		{
 			ret.insert(ret.end(), cands->strPool.begin() + cands->strPtrs[cands->branchPtrs[i]], cands->strPool.begin() + cands->strPtrs[cands->branchPtrs[i] + 1]);
 			size_t s = cands->branchPtrs[i] + digit[i];
-			cost += cands->cost[s - i];
-			if (!i) leftCond = cands->leftCond[s - i];
+			cost += get<float>(cands->candidates[s - i]);
+			if (!i) leftCond = get<CondVowel>(cands->candidates[s - i]);
+			dialect = dialectAnd(dialect, get<Dialect>(cands->candidates[s - i]));
 			ret.insert(ret.end(), cands->strPool.begin() + cands->strPtrs[s + 1], cands->strPool.begin() + cands->strPtrs[s + 2]);
 		}
 	}
 	ret.insert(ret.end(), cands->strPool.begin() + cands->strPtrs[cands->branchPtrs.back()], cands->strPool.begin() + cands->strPtrs[cands->branchPtrs.back() + 1]);
-	return { detail::ToU16<u16wrap>{}(move(ret)), cost, leftCond };
+	return { detail::ToU16<u16wrap>{}(move(ret)), cost, leftCond, dialect };
 }
 
 template<bool u16wrap>
@@ -214,13 +220,13 @@ TypoTransformer::TypoTransformer(TypoTransformer&&) noexcept = default;
 TypoTransformer& TypoTransformer::operator=(const TypoTransformer&) = default;
 TypoTransformer& TypoTransformer::operator=(TypoTransformer&&) = default;
 
-void TypoTransformer::addTypoWithCond(const KString& orig, const KString& error, float cost, CondVowel leftCond)
+void TypoTransformer::addTypoWithCond(const KString& orig, const KString& error, float cost, CondVowel leftCond, Dialect dialect)
 {
 	if (orig == error) return;
 
 	if (leftCond == CondVowel::none || leftCond == CondVowel::vowel || leftCond == CondVowel::any)
 	{
-		auto inserted = typos.emplace(make_tuple(orig, error, leftCond), cost);
+		auto inserted = typos.emplace(make_tuple(orig, error, leftCond, dialect), cost);
 		if (!inserted.second)
 		{
 			inserted.first->second = isfinite(cost) ? min(inserted.first->second, cost) : cost;
@@ -235,7 +241,7 @@ void TypoTransformer::addTypoWithCond(const KString& orig, const KString& error,
 			o += orig;
 			if (c) e.push_back(c);
 			e += error;
-			auto inserted = typos.emplace(make_tuple(o, e, c ? CondVowel::none : leftCond), cost);
+			auto inserted = typos.emplace(make_tuple(o, e, c ? CondVowel::none : leftCond, dialect), cost);
 			if (!inserted.second)
 			{
 				inserted.first->second = isfinite(cost) ? min(inserted.first->second, cost) : cost;
@@ -248,7 +254,7 @@ void TypoTransformer::addTypoWithCond(const KString& orig, const KString& error,
 	}
 }
 
-void TypoTransformer::addTypoNormalized(const KString& orig, const KString& error, float cost, CondVowel leftCond)
+void TypoTransformer::addTypoNormalized(const KString& orig, const KString& error, float cost, CondVowel leftCond, Dialect dialect)
 {
 	if (isHangulOnset(orig.back()) != isHangulOnset(error.back()))
 		throw invalid_argument{ "`orig` and `error` are both onset or not. But `orig`=" + utf16To8(orig) + ", `error`=" + utf16To8(error) };
@@ -262,7 +268,7 @@ void TypoTransformer::addTypoNormalized(const KString& orig, const KString& erro
 		{
 			tOrig.back() = joinOnsetVowel(orig.back() - u'ᄀ', i);
 			tError.back() = joinOnsetVowel(error.back() - u'ᄀ', i);
-			addTypoWithCond(tOrig, tError, cost, leftCond);
+			addTypoWithCond(tOrig, tError, cost, leftCond, dialect);
 		}
 	}
 	else if (isHangulVowel(orig[0]))
@@ -272,18 +278,18 @@ void TypoTransformer::addTypoNormalized(const KString& orig, const KString& erro
 		{
 			tOrig[0] = joinOnsetVowel(i, orig[0] - u'ㅏ');
 			tError[0] = joinOnsetVowel(i, error[0] - u'ㅏ');
-			addTypoWithCond(tOrig, tError, cost, leftCond);
+			addTypoWithCond(tOrig, tError, cost, leftCond, dialect);
 		}
 	}
 	else
 	{
-		addTypoWithCond(orig, error, cost, leftCond);
+		addTypoWithCond(orig, error, cost, leftCond, dialect);
 	}
 }
 
-void TypoTransformer::addTypo(const u16string& orig, const u16string& error, float cost, CondVowel leftCond)
+void TypoTransformer::addTypo(const u16string& orig, const u16string& error, float cost, CondVowel leftCond, Dialect dialect)
 {
-	return addTypoNormalized(normalizeHangul(orig), normalizeHangul(error), cost, leftCond);
+	return addTypoNormalized(normalizeHangul(orig), normalizeHangul(error), cost, leftCond, dialect);
 }
 
 bool TypoTransformer::isContinualTypoEnabled() const
@@ -312,6 +318,19 @@ TypoTransformer TypoTransformer::copyWithNewLengtheningTypoCost(float threshold)
 {
 	TypoTransformer ret = *this;
 	ret.lengtheningTypoThreshold = threshold;
+	return ret;
+}
+
+TypoTransformer TypoTransformer::copyWithDialectOverriding(Dialect dialect) const
+{
+	TypoTransformer ret;
+	for (auto& p : typos)
+	{
+		auto newKey = make_tuple(get<0>(p.first), get<1>(p.first), get<2>(p.first), dialect);
+		ret.typos.emplace(newKey, p.second);
+	}
+	ret.continualTypoThreshold = continualTypoThreshold;
+	ret.lengtheningTypoThreshold = lengtheningTypoThreshold;
 	return ret;
 }
 
@@ -353,9 +372,12 @@ namespace kiwi
 			uint32_t begin, end;
 			float cost;
 			CondVowel leftCond;
+			Dialect dialect;
 
-			ReplInfo(uint32_t _begin = 0, uint32_t _end = 0, float _cost = 0, CondVowel _leftCond = CondVowel::none)
-				: begin{ _begin }, end{ _end }, cost{ _cost }, leftCond{ _leftCond }
+			ReplInfo(uint32_t _begin = 0, uint32_t _end = 0, float _cost = 0, 
+				CondVowel _leftCond = CondVowel::none,
+				Dialect _dialect = Dialect::standard)
+				: begin{ _begin }, end{ _end }, cost{ _cost }, leftCond{ _leftCond }, dialect{ _dialect }
 			{}
 		};
 
@@ -370,7 +392,7 @@ namespace kiwi
 			patTrie.build(&c, &c + 1, 0);
 		}
 
-		void addTypo(const KString& orig, const KString& error, float cost, CondVowel leftCond = CondVowel::none)
+		void addTypo(const KString& orig, const KString& error, float cost, CondVowel leftCond = CondVowel::none, Dialect dialect = Dialect::standard)
 		{
 			if (orig == error) return;
 
@@ -384,14 +406,23 @@ namespace kiwi
 			{
 				if (p.leftCond == leftCond && strPool.substr(p.begin, p.end - p.begin) == error)
 				{
-					p.cost = isfinite(cost) ? min(p.cost, cost) : cost;
-					updated = true;
-					break;
+					if (p.dialect == dialect)
+					{
+						p.cost = isfinite(cost) ? min(p.cost, cost) : cost;
+						updated = true;
+						break;
+					}
+					else if (p.cost == cost)
+					{
+						p.dialect = dialectOr(p.dialect, dialect);
+						updated = true;
+						break;
+					}
 				}
 			}
 			if (!updated)
 			{
-				replacements[replIdx].emplace_back(strPool.size(), strPool.size() + error.size(), cost, leftCond);
+				replacements[replIdx].emplace_back(strPool.size(), strPool.size() + error.size(), cost, leftCond, dialect);
 				strPool += error;
 			}
 		}
@@ -406,7 +437,7 @@ PreparedTypoTransformer::PreparedTypoTransformer(const TypoTransformer& tt)
 	IntermediateTypoTransformer itt;
 	for (auto& t : tt.typos)
 	{
-		itt.addTypo(get<0>(t.first), get<1>(t.first), t.second, get<2>(t.first));
+		itt.addTypo(get<0>(t.first), get<1>(t.first), t.second, get<2>(t.first), get<3>(t.first));
 	}
 	strPool = std::move(itt.strPool);
 
@@ -420,7 +451,7 @@ PreparedTypoTransformer::PreparedTypoTransformer(const TypoTransformer& tt)
 		patData.emplace_back(replacements.data() + replacements.size(), rs.size());
 		for (auto& r : rs)
 		{
-			replacements.emplace_back(strPool.data() + r.begin, r.end - r.begin, r.cost, r.leftCond);
+			replacements.emplace_back(strPool.data() + r.begin, r.end - r.begin, r.cost, r.leftCond, r.dialect);
 		}
 	}
 	
@@ -454,7 +485,7 @@ TypoCandidates<u16wrap> PreparedTypoTransformer::_generate(const KString& orig, 
 		size_t totStartPos = matches[0].first - matches[0].second.patLength;
 		size_t totEndPos = matches.back().first;
 		ret.insertSinglePath(orig.begin() + last, orig.begin() + totStartPos);
-		ret.addBranch(orig.begin() + totStartPos, orig.begin() + totEndPos, 0.f, CondVowel::none);
+		ret.addBranch(orig.begin() + totStartPos, orig.begin() + totEndPos, 0.f, CondVowel::none, Dialect::standard);
 		for (auto& m : matches)
 		{
 			size_t e = m.first;
@@ -478,7 +509,8 @@ TypoCandidates<u16wrap> PreparedTypoTransformer::_generate(const KString& orig, 
 					repl.str, repl.str + repl.length,
 					orig.begin() + e, orig.begin() + totEndPos,
 					repl.cost,
-					laxedCond
+					laxedCond,
+					repl.dialect
 				);
 			}
 		}
@@ -664,6 +696,12 @@ namespace kiwi
 
 		static const TypoTransformer basicTypoSetWithContinualAndLengthening = basicTypoSetWithContinual | lengtheningTypoSet;
 
+		static const TypoTransformer dialect = TypoTransformer{
+			TypoDef{ {u"ㅚ"}, {u"ㅞ"}, 0.5f, CondVowel::none },
+			TypoDef{ {u"ᆻ"}, {u"ᆺ"}, 0.5f, CondVowel::none },
+			TypoDef{ {u"ㅐ", u"ㅔ"}, {u"ㅐ", u"ㅔ"}, 1.f, CondVowel::none },
+		}.copyWithDialectOverriding(Dialect::jeju);
+
 		switch (set)
 		{
 		case kiwi::DefaultTypoSet::withoutTypo:
@@ -678,6 +716,8 @@ namespace kiwi
 			return lengtheningTypoSet;
 		case kiwi::DefaultTypoSet::basicTypoSetWithContinualAndLengthening:
 			return basicTypoSetWithContinualAndLengthening;
+		case kiwi::DefaultTypoSet::dialect:
+			return dialect;
 		default:
 			throw invalid_argument{ "Invalid `DefaultTypoSet`" };
 		}

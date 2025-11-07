@@ -8,9 +8,14 @@
 using namespace std;
 using namespace kiwi;
 
-void printResult(Kiwi& kw, const string& line, int topn, bool score, ostream& out)
+void printResult(Kiwi& kw, 
+	const string& line, 
+	int topn, 
+	bool score, 
+	AnalyzeOption option,
+	ostream& out)
 {
-	for (auto& result : kw.analyze(line, topn, Match::allWithNormalizing))
+	for (auto& result : kw.analyze(line, topn, option))
 	{
 		for (auto& t : result.first)
 		{
@@ -22,13 +27,54 @@ void printResult(Kiwi& kw, const string& line, int topn, bool score, ostream& ou
 	if (topn > 1) out << endl;
 }
 
-int run(const string& modelPath, bool benchmark, const string& output, const string& user, int topn, int tolerance, float typos, bool score, bool largest, const vector<string>& input)
+int run(const string& modelPath, bool benchmark, const string& output, const string& user, int topn, int tolerance, 
+	float typoCostWeight,
+	bool bTypo,
+	bool cTypo,
+	bool lTypo,
+	Dialect allowedDialects,
+	float dialectCost,
+	bool score, 
+	ModelType modelType, 
+	const vector<string>& input)
 {
 	try
 	{
 		tutils::Timer timer;
 		size_t lines = 0, bytes = 0;
-		Kiwi kw = KiwiBuilder{ modelPath, 1, BuildOption::default_, largest ? ModelType::largest : ModelType::none }.build(typos > 0 ? DefaultTypoSet::basicTypoSet : DefaultTypoSet::withoutTypo);
+
+		if (typoCostWeight > 0 && !bTypo && !cTypo && !lTypo)
+		{
+			bTypo = true;
+		}
+		else if (typoCostWeight == 0)
+		{
+			bTypo = false;
+			cTypo = false;
+			lTypo = false;
+		}
+
+		auto typo = getDefaultTypoSet(DefaultTypoSet::withoutTypo);
+
+		if (bTypo)
+		{
+			typo |= getDefaultTypoSet(DefaultTypoSet::basicTypoSet);
+		}
+
+		if (cTypo)
+		{
+			typo |= getDefaultTypoSet(DefaultTypoSet::continualTypoSet);
+		}
+
+		if (lTypo)
+		{
+			typo |= getDefaultTypoSet(DefaultTypoSet::lengtheningTypoSet);
+		}
+
+
+		Kiwi kw = KiwiBuilder{ modelPath, 1, BuildOption::default_, modelType }.build(typo);
+
+		AnalyzeOption option{ Match::allWithNormalizing, nullptr, false, allowedDialects, dialectCost };
 
 		cout << "Kiwi v" << KIWI_VERSION_STRING << endl;
 		if (tolerance)
@@ -36,10 +82,10 @@ int run(const string& modelPath, bool benchmark, const string& output, const str
 			kw.setSpaceTolerance(tolerance);
 			cout << "SpaceTolerance: " << tolerance << endl;
 		}
-		if (typos > 0)
+		if (typoCostWeight > 0)
 		{
-			kw.setTypoCostWeight(typos);
-			cout << "Typo Correction Cost Weight: " << typos << endl;
+			kw.setTypoCostWeight(typoCostWeight);
+			cout << "Typo Correction Cost Weight: " << typoCostWeight << endl;
 		}
 
 		if (benchmark)
@@ -65,14 +111,14 @@ int run(const string& modelPath, bool benchmark, const string& output, const str
 #ifdef _WIN32
 			for (wstring line; (cout << ">> ").flush(), getline(wcin, line);)
 			{
-				printResult(kw, utf16To8((const char16_t*)line.c_str()), topn, score, *out);
+				printResult(kw, utf16To8((const char16_t*)line.c_str()), topn, score, option, *out);
 				++lines;
 				bytes += line.size();
 			}
 #else
 			for (string line; (cout << ">> ").flush(), getline(cin, line);)
 			{
-				printResult(kw, line, topn, score, *out);
+				printResult(kw, line, topn, score, option, *out);
 				++lines;
 				bytes += line.size();
 			}
@@ -91,7 +137,7 @@ int run(const string& modelPath, bool benchmark, const string& output, const str
 
 				for (string line; getline(in, line);)
 				{
-					printResult(kw, line, topn, score, *out);
+					printResult(kw, line, topn, score, option, *out);
 					++lines;
 					bytes += line.size();
 				}
@@ -125,26 +171,36 @@ int main(int argc, const char* argv[])
 	CmdLine cmd{ "Kiwi CLI", ' ', KIWI_VERSION_STRING};
 
 	ValueArg<string> model{ "m", "model", "Kiwi model path", true, "", "string" };
+	ValueArg<string> modelType{ "", "model-type", "Model Type", false, "none", "string" };
 	SwitchArg benchmark{ "e", "benchmark", "benchmark performance" };
 	ValueArg<string> output{ "o", "output", "output file path", false, "", "string" };
 	ValueArg<string> user{ "u", "user", "user dictionary path", false, "", "string" };
 	ValueArg<int> topn{ "n", "topn", "top-n of result", false, 1, "int > 0" };
 	ValueArg<int> tolerance{ "t", "tolerance", "space tolerance of Kiwi", false, 0, "int >= 0" };
-	ValueArg<float> typos{ "", "typos", "typo cost weight", false, 0.f, "float >= 0" };
-	SwitchArg largest{ "", "largest", "use largest model" };
+	ValueArg<float> typoWeight{ "", "typo", "typo weight", false, 0.f, "float" };
+	SwitchArg bTypo{ "", "btypo", "make basic-typo-tolerant model", false };
+	SwitchArg cTypo{ "", "ctypo", "make continual-typo-tolerant model", false };
+	SwitchArg lTypo{ "", "ltypo", "make lengthening-typo-tolerant model", false };
+	ValueArg<string> dialect{ "d", "dialect", "allowed dialect", false, "standard", "string" };
+	ValueArg<float> dialectCost{ "", "dialect-cost", "dialect cost", false, 6.f, "float" };
 	SwitchArg score{ "s", "score", "print score together" };
 	UnlabeledMultiArg<string> files{ "inputs", "input files", false, "string" };
 
 	cmd.add(model);
+	cmd.add(modelType);
 	cmd.add(benchmark);
 	cmd.add(output);
 	cmd.add(user);
 	cmd.add(topn);
 	cmd.add(tolerance);
+	cmd.add(typoWeight);
+	cmd.add(bTypo);
+	cmd.add(cTypo);
+	cmd.add(lTypo);
+	cmd.add(dialect);
+	cmd.add(dialectCost);
 	cmd.add(score);
 	cmd.add(files);
-	cmd.add(typos);
-	cmd.add(largest);
 
 	try
 	{
@@ -155,6 +211,19 @@ int main(int argc, const char* argv[])
 		cerr << "error: " << e.error() << " for arg " << e.argId() << endl;
 		return -1;
 	}
-	return run(model, benchmark, output, user, topn, tolerance, typos, score, largest, files.getValue());
+
+	Dialect parsedDialect = parseDialects(dialect.getValue());
+	ModelType kiwiModelType = tutils::parseModelType(modelType);
+
+	return run(model, benchmark, output, user, topn, tolerance, 
+		typoWeight, 
+		bTypo,
+		cTypo,
+		lTypo,
+		parsedDialect,
+		dialectCost,
+		score, 
+		kiwiModelType, 
+		files.getValue());
 }
 

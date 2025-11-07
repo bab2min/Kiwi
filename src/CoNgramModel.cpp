@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include <fstream>
 #include "PathEvaluator.hpp"
 #include "Joiner.hpp"
@@ -37,11 +37,12 @@ namespace kiwi
 			const size_t totalPrevPathes,
 			const float ignoreCondScore,
 			const float nodeLevelDiscount,
+			const float dialectCost,
 			const Vector<SpecialState>& prevSpStates
 		) const
 		{
 			thread_local BestPathConatiner<mode, LmState> bestPathCont;
-			thread_local Vector<const WordLL<LmState>*> regularPrevPathes;
+			thread_local Vector<pair<const KGraphNode*, const WordLL<LmState>*>> regularPrevPathes;
 			thread_local Vector<pair<const KGraphNode*, const WordLL<LmState>*>> combiningPrevPathes;
 			thread_local Vector<const Morpheme*> regularMorphs, regularDistantMorphs, combiningLMorphs, combiningRMorphs;
 			thread_local Vector<LmState> prevLmStates, nextLmStates;
@@ -73,14 +74,14 @@ namespace kiwi
 						combiningPrevPathes.emplace_back(prev, &prevPath);
 						continue;
 					}
-					regularPrevPathes.emplace_back(&prevPath);
+					regularPrevPathes.emplace_back(prev, &prevPath);
 				}
 			}
 
 			prevLmStates.resize(regularPrevPathes.size());
 			for (size_t i = 0; i < regularPrevPathes.size(); ++i)
 			{
-				prevLmStates[i] = regularPrevPathes[i]->lmState;
+				prevLmStates[i] = regularPrevPathes[i].second->lmState;
 			}
 
 			for (auto& curMorph : morphs)
@@ -170,14 +171,23 @@ namespace kiwi
 				RuleBasedScorer ruleBasedScorer{ kw, curMorph, node };
 				const float morphScore = curMorph->userScore + nodeLevelDiscount + kw->tagScorer.evalLeftBoundary(hasLeftBoundary(node), curMorph->tag);
 				size_t prevId = -1;
-				for (auto* prevPath : regularPrevPathes)
+				for (auto [prev, prevPath] : regularPrevPathes)
 				{
 					++prevId;
 					auto& state = nextLmStates[prevId * regularMorphs.size() + curId];
-					auto score = prevPath->accScore + morphScore + scores[prevId * regularMorphs.size() + curId];
+					float score = prevPath->accScore + morphScore + scores[prevId * regularMorphs.size() + curId];
+					const float firstChunkScore = morphScore + scores[prevId * regularMorphs.size() + curId];
 
 					FormEvaluator formEvaluator{ *prevPath, ownForms, morphBase };
 					if (!formEvaluator(curMorph, ignoreCondScore, score)) continue;
+
+					// 사이시옷 뒤에 명사가 아닌 태그가 오거나 공백이 있는 경우 제외
+					if (prevPath->morpheme->tag == POSTag::z_siot && (
+						!isNNClass(curMorph->tag) || prev->endPos < node->startPos
+						))
+					{
+						continue;
+					}
 
 					for (size_t i = 1; i < length; ++i)
 					{
@@ -189,7 +199,8 @@ namespace kiwi
 						score += state.next(langMdl, wid);
 					}
 
-					insertToPathContainer(bestPathCont, topN, prevSpStates, curMorph, morphBase, move(state), score, node, *prevPath, ruleBasedScorer);
+					insertToPathContainer(bestPathCont, topN, prevSpStates, curMorph, morphBase, 
+						move(state), score, firstChunkScore, node, *prevPath, ruleBasedScorer, dialectCost);
 				continueFor:;
 				}
 
@@ -221,15 +232,17 @@ namespace kiwi
 				}
 				RuleBasedScorer ruleBasedScorer{ kw, curMorph, node };
 				const float morphScore = curMorph->userScore + nodeLevelDiscount + kw->tagScorer.evalLeftBoundary(hasLeftBoundary(node), curMorph->tag);
-				for (auto* prevPath : regularPrevPathes)
+				for (auto [prev, prevPath] : regularPrevPathes)
 				{
 					auto state = prevPath->lmState;
 					float score = prevPath->accScore + morphScore;
+					const float firstChunkScore = morphScore;
 
 					FormEvaluator formEvaluator{ *prevPath, ownForms, morphBase };
 					if (!formEvaluator(curMorph, ignoreCondScore, score)) continue;
 
-					insertToPathContainer(bestPathCont, topN, prevSpStates, curMorph, morphBase, move(state), score, node, *prevPath, ruleBasedScorer);
+					insertToPathContainer(bestPathCont, topN, prevSpStates, curMorph, morphBase, 
+						move(state), score, firstChunkScore, node, *prevPath, ruleBasedScorer, dialectCost);
 				}
 				bestPathCont.writeTo(resultOut, curMorph, lastSeqId, ownFormId);
 			}
@@ -267,6 +280,7 @@ namespace kiwi
 					auto* prev = p.first;
 					auto* prevPath = p.second;
 					float score = prevPath->accScore + morphScore;
+					float firstChunkScore = 0;
 					// merge <v> <chunk> with only the same socket
 					if (prevPath->combineSocket != curMorph->combineSocket || curMorph->isSingle())
 					{
@@ -283,7 +297,8 @@ namespace kiwi
 					if (!formEvaluator(curMorph, ignoreCondScore, score)) continue;
 
 					auto state = prevPath->lmState;
-					score += state.next(langMdl, firstWid);
+					score += (firstChunkScore = state.next(langMdl, firstWid));
+					firstChunkScore += morphScore;
 
 					for (size_t i = 1; i < length; ++i)
 					{
@@ -295,7 +310,8 @@ namespace kiwi
 						score += state.next(langMdl, wid);
 					}
 
-					insertToPathContainer(bestPathCont, topN, prevSpStates, curMorph, morphBase, move(state), score, node, *prevPath, ruleBasedScorer);
+					insertToPathContainer(bestPathCont, topN, prevSpStates, curMorph, morphBase, 
+						move(state), score, firstChunkScore, node, *prevPath, ruleBasedScorer, dialectCost);
 				continueFor2:;
 				}
 				bestPathCont.writeTo(resultOut, curMorph, lastSeqId, ownFormId);
@@ -515,7 +531,7 @@ namespace kiwi
 				const size_t invNormOutputSize = padMultipleOf(header.vocabSize * sizeof(float), alignment);
 				const size_t positionConfSize = windowSize > 0 ? padMultipleOf((header.windowSize + 1) * sizeof(float), alignment) : 0;
 				const size_t distantMaskSize = windowSize > 0 ? padMultipleOf((header.vocabSize + 7) / 8, alignment) : 0;
-
+				
 				allEmbs = make_unique<uint8_t[]>(contextEmbSize + outputEmbSize + distantEmbSize
 					+ invNormContextSize + invNormOutputSize
 					+ positionConfSize + distantMaskSize
@@ -1295,15 +1311,15 @@ namespace kiwi
 			LmStateType* outStates, float* outScores) const
 		{
 			if constexpr (windowSize > 0)
-		{
-			thread_local TLSForProgressMatrix tls;
-			if (prevStateSize <= (quantized ? 16 : 8) && nextIdSize <= 16)
 			{
-				return progressMatrixWOSort(tls, prevStates, nextIds, prevStateSize, nextIdSize, numValidDistantTokens, outStates, outScores);
-			}
-			else
-			{
-				return progressMatrixWSort(tls, prevStates, nextIds, prevStateSize, nextIdSize, numValidDistantTokens, outStates, outScores);
+				thread_local TLSForProgressMatrix tls;
+				if (prevStateSize <= (quantized ? 16 : 8) && nextIdSize <= 16)
+				{
+					return progressMatrixWOSort(tls, prevStates, nextIds, prevStateSize, nextIdSize, numValidDistantTokens, outStates, outScores);
+				}
+				else
+				{
+					return progressMatrixWSort(tls, prevStates, nextIds, prevStateSize, nextIdSize, numValidDistantTokens, outStates, outScores);
 				}
 			}
 			else
@@ -1472,13 +1488,53 @@ namespace kiwi
 			return os;
 		}
 
+		template<class Ty, class Alloc1, class Alloc2>
+		inline void inplaceIndex2D(vector<Ty, Alloc1>& arr, size_t width, const vector<size_t, Alloc2>& idx)
+		{
+			vector<Ty, Alloc1> newArr(idx.size() * width);
+			if (width == 1)
+			{
+				for (size_t i = 0; i < idx.size(); ++i)
+				{
+					if (idx[i] == (size_t)-1) continue;
+					newArr[i] = arr[idx[i]];
+				}
+			}
+			else
+			{
+				for (size_t i = 0; i < idx.size(); ++i)
+				{
+					if (idx[i] == (size_t)-1) continue;
+					copy(arr.begin() + idx[i] * width, arr.begin() + (idx[i] + 1) * width, newArr.begin() + i * width);
+				}
+			}
+			arr.swap(newArr);
+		}
 
-		utils::MemoryObject CoNgramModelBase::build(const string& contextDefinition, const string& embedding, size_t maxContextLength, bool useVLE, bool reorderContextId)
+		utils::MemoryObject CoNgramModelBase::build(const string& contextDefinition, const string& embedding, 
+			size_t maxContextLength, bool useVLE, bool reorderContextId,
+			const vector<size_t>* selectedEmbIdx)
 		{
 			ifstream contextStr, embeddingStr;
 			if (!openFile(contextStr, contextDefinition))
 			{
 				throw IOException{ "Cannot open file : " + contextDefinition };
+			}
+
+			static constexpr size_t removedId = (size_t)-1;
+			Vector<size_t> reverseSelectedEmbIdx;
+			if (selectedEmbIdx)
+			{
+				for (size_t i = 0; i < selectedEmbIdx->size(); ++i)
+				{
+					const auto v = (*selectedEmbIdx)[i];
+					if (v == removedId) continue;
+					if (reverseSelectedEmbIdx.size() <= v)
+					{
+						reverseSelectedEmbIdx.resize(v + 1, removedId);
+					}
+					reverseSelectedEmbIdx[v] = i;
+				}
 			}
 
 			uint32_t maxClusterId = 0, maxContextId = 0;
@@ -1503,10 +1559,20 @@ namespace kiwi
 					context.clear();
 					for (size_t i = 1; i < tokens.size(); ++i)
 					{
+						if (!tokens[i].empty() && tokens[i][0] == '#')
+						{
+							// # for comment
+							break;
+						}
 						auto id = stol(tokens[i].begin(), tokens[i].end());
 						if (id < 0) throw IOException{ "Invalid format : " + contextDefinition };
+
+						if (selectedEmbIdx)
+						{
+							id = reverseSelectedEmbIdx[id];
+						}
 						context.push_back(id);
-						maxContextId = max(maxContextId, (uint32_t)id);
+						if(id != (long)removedId) maxContextId = max(maxContextId, (uint32_t)id);
 					}
 					if (context.size() > maxContextLength)
 					{
@@ -1523,16 +1589,23 @@ namespace kiwi
 					for (auto it = c.begin(); it != c.end();)
 					{
 						bool erase = false;
-						for (size_t j = i; j-- > 0; )
+						if (find(it->first.begin(), it->first.end(), (uint32_t)removedId) != it->first.end())
 						{
-							auto& c2 = contextMap[j];
-							context.clear();
-							context.insert(context.end(), it->first.end() - j - 1, it->first.end());
-							auto found = c2.find(context);
-							if (found != c2.end())
+							erase = true;
+						}
+						else
+						{
+							for (size_t j = i; j-- > 0; )
 							{
-								erase = found->second == it->second;
-								break;
+								auto& c2 = contextMap[j];
+								context.clear();
+								context.insert(context.end(), it->first.end() - j - 1, it->first.end());
+								auto found = c2.find(context);
+								if (found != c2.end())
+								{
+									erase = found->second == it->second;
+									break;
+								}
 							}
 						}
 
@@ -1713,10 +1786,24 @@ namespace kiwi
 				contextValidTokenSum = move(newContextValidTokenSum);
 			}
 
-			// compress distantMask into bits
-			const size_t compressedDistantMaskSize = (outputSize + 7) / 8;
+			if (selectedEmbIdx)
 			{
-				for (size_t i = 0; i < outputSize; ++i)
+				inplaceIndex2D(distantEmb, dim, *selectedEmbIdx);
+				inplaceIndex2D(distantEmbScale, 1, *selectedEmbIdx);
+				if (qgroup) inplaceIndex2D(distantEmbLocalScale, numQGroups, *selectedEmbIdx);
+				inplaceIndex2D(distantEmbBias, 1, *selectedEmbIdx);
+				inplaceIndex2D(distantConfidence, 1, *selectedEmbIdx);
+				inplaceIndex2D(outputEmb, dim, *selectedEmbIdx);
+				inplaceIndex2D(outputEmbScale, 1, *selectedEmbIdx);
+				if (qgroup) inplaceIndex2D(outputEmbLocalScale, numQGroups, *selectedEmbIdx);
+				inplaceIndex2D(distantMask, 1, *selectedEmbIdx);
+			}
+
+			// compress distantMask into bits
+			const size_t selectedOutputSize = distantMask.size();
+			const size_t compressedDistantMaskSize = (selectedOutputSize + 7) / 8;
+			{
+				for (size_t i = 0; i < selectedOutputSize; ++i)
 				{
 					if (i % 8 == 0)
 					{
@@ -1734,7 +1821,7 @@ namespace kiwi
 			memset(&header, 0, sizeof(CoNgramModelHeader));
 			header.dim = dim;
 			header.contextSize = contextSize;
-			header.vocabSize = outputSize;
+			header.vocabSize = selectedOutputSize;
 			header.keySize = keySize;
 			header.windowSize = windowSize;
 			header.qbit = qbit;
@@ -1746,10 +1833,10 @@ namespace kiwi
 			header.keyOffset = alignedOffsetInc(finalSize, compressedNodeSizes.size());
 			header.valueOffset = alignedOffsetInc(finalSize, compressedKeys.size());
 			header.embOffset = alignedOffsetInc(finalSize, compressedValues.size());
-			finalSize += padMultipleOf(dim * qbit / 8, 4) * (contextSize + outputSize * 2);
-			if (qgroup) finalSize += numQGroups * (contextSize + outputSize * 2);
+			finalSize += padMultipleOf(dim * qbit / 8, 4) * (contextSize + selectedOutputSize * 2);
+			if (qgroup) finalSize += numQGroups * (contextSize + selectedOutputSize * 2);
 			finalSize += contextSize * sizeof(uint16_t) * 4;
-			finalSize += outputSize * sizeof(uint16_t) * 4;
+			finalSize += selectedOutputSize * sizeof(uint16_t) * 4;
 			finalSize += windowSize * sizeof(uint16_t);
 			finalSize += compressedDistantMaskSize;
 
@@ -1773,13 +1860,13 @@ namespace kiwi
 				ostr.write((const char*)&contextConfidence[i], sizeof(uint16_t));
 				ostr.write((const char*)&contextValidTokenSum[i], sizeof(uint16_t));
 			}
-			for (size_t i = 0; i < outputSize; ++i)
+			for (size_t i = 0; i < selectedOutputSize; ++i)
 			{
 				writeIntsWithPacking(ostr, &outputEmb[i * dim], dim, header.qbit);
 				ostr.write((const char*)&outputEmbScale[i], sizeof(uint16_t));
 				if (qgroup) ostr.write((const char*)&outputEmbLocalScale[i * numQGroups], sizeof(uint8_t) * numQGroups);
 			}
-			for (size_t i = 0; i < outputSize; ++i)
+			for (size_t i = 0; i < selectedOutputSize; ++i)
 			{
 				writeIntsWithPacking(ostr, &distantEmb[i * dim], dim, header.qbit);
 				ostr.write((const char*)&distantEmbScale[i], sizeof(uint16_t));
@@ -2134,23 +2221,23 @@ namespace kiwi
 			}
 			else
 			{
-			for (size_t i = 0; i < node->numNexts; ++i)
-			{
-				auto [k, v] = nst::extractKV<arch, VlKeyType, int32_t>(&alignedKeyValueData[node->nextOffset], node->numNexts, i);
-				prefix.emplace_back(k);
-				if (v > 0)
+				for (size_t i = 0; i < node->numNexts; ++i)
 				{
-					if (node[v].value)
+					auto [k, v] = nst::extractKV<arch, VlKeyType, int32_t>(&alignedKeyValueData[node->nextOffset], node->numNexts, i);
+					prefix.emplace_back(k);
+					if (v > 0)
 					{
-						insert(node[v].value);
+						if (node[v].value)
+						{
+							insert(node[v].value);
+						}
+						visitContextNode(node + v, prefix, out);
 					}
-					visitContextNode(node + v, prefix, out);
-				}
-				else if (v < 0)
-				{
-					insert(-v);
-				}
-				prefix.pop_back();
+					else if (v < 0)
+					{
+						insert(-v);
+					}
+					prefix.pop_back();
 				}
 			}
 		}

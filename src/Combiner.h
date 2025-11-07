@@ -14,15 +14,34 @@ namespace kiwi
 
 	namespace cmb
 	{
+		inline size_t additionalFeatureToMask(POSTag additionalFeature)
+		{
+			switch (additionalFeature)
+			{
+			case POSTag::unknown_feat_ha:
+				return 0x80;
+			}
+			return 0;
+		}
+
 		struct ReplString
 		{
 			KString str;
 			size_t leftEnd;
 			size_t rightBegin;
 			float score;
+			POSTag additionalFeature;
 
-			ReplString(const KString& _str = {}, size_t _leftEnd = -1, size_t _rightBegin = 0, float _score = 0)
-				: str{ _str }, leftEnd{ std::min(_leftEnd, str.size()) }, rightBegin{ _rightBegin }, score{ _score }
+			ReplString(const KString& _str = {}, 
+				size_t _leftEnd = -1, 
+				size_t _rightBegin = 0, 
+				float _score = 0, 
+				POSTag _additionalFeature = POSTag::unknown)
+				: str{ _str }, 
+				leftEnd{ std::min(_leftEnd, str.size()) }, 
+				rightBegin{ _rightBegin }, 
+				score{ _score }, 
+				additionalFeature{ _additionalFeature }
 			{
 			}
 		};
@@ -30,16 +49,23 @@ namespace kiwi
 		struct Replacement
 		{
 			Vector<ReplString> repl;
+			Dialect dialect;
 			CondVowel leftVowel;
 			CondPolarity leftPolarity;
 			bool ignoreRCond;
+			int ruleLineNo;
 
 			Replacement(Vector<ReplString> _repl = {},
+				Dialect _dialect = Dialect::standard,
 				CondVowel _leftVowel = CondVowel::none,
 				CondPolarity _leftPolar = CondPolarity::none,
-				bool _ignoreRCond = false
-			) : repl{ _repl }, leftVowel{ _leftVowel }, leftPolarity{ _leftPolar }, ignoreRCond{ _ignoreRCond }
-			{}
+				bool _ignoreRCond = false,
+				int _ruleLineNo = 0
+			) : repl{ _repl }, dialect{ _dialect },
+				leftVowel{ _leftVowel }, leftPolarity{ _leftPolar }, ignoreRCond{ _ignoreRCond },
+				ruleLineNo{ _ruleLineNo }
+			{
+			}
 		};
 
 		struct Result
@@ -47,23 +73,71 @@ namespace kiwi
 			KString str;
 			size_t leftEnd;
 			size_t rightBegin;
+			Dialect dialect;
 			CondVowel vowel;
 			CondPolarity polar;
 			bool ignoreRCond;
+			int ruleLineNo;
 			float score;
+			POSTag additionalFeature;
 
 			Result(const KString& _str = {},
 				size_t _leftEnd = 0,
 				size_t _rightBegin = 0,
+				Dialect _dialect = Dialect::standard,
 				CondVowel _vowel = CondVowel::none,
 				CondPolarity _polar = CondPolarity::none,
 				bool _ignoreRCond = false,
-				float _score = 0
-			) : str{ _str }, leftEnd{ _leftEnd }, rightBegin{ _rightBegin }, vowel{ _vowel }, polar{ _polar }, ignoreRCond{ _ignoreRCond }, score{_score}
+				int _ruleLineNo = 0,
+				float _score = 0,
+				POSTag _additionalFeature = POSTag::unknown
+			) : str{ _str }, leftEnd{ _leftEnd }, rightBegin{ _rightBegin }, dialect{ _dialect },
+				vowel{ _vowel }, polar{ _polar }, ignoreRCond{ _ignoreRCond }, ruleLineNo{ _ruleLineNo }, score{ _score },
+				additionalFeature{ _additionalFeature }
 			{
 			}
 		};
 
+		struct RuleCategory
+		{
+			POSTag leftTag;
+			POSTag rightTag;
+			uint8_t feature; // CondVowel + CondPolarity
+			Dialect dialect;
+
+			bool operator==(const RuleCategory& o) const
+			{
+				return leftTag == o.leftTag &&
+					rightTag == o.rightTag &&
+					feature == o.feature &&
+					dialect == o.dialect;
+			}
+
+			bool operator!=(const RuleCategory& o) const
+			{
+				return !operator==(o);
+			}
+		};
+	}
+
+	template<>
+	struct Hash<cmb::RuleCategory>
+	{
+		size_t operator()(const cmb::RuleCategory& v) const
+		{
+			size_t ret = Hash<POSTag>{}(v.leftTag);
+			ret = (ret << 2) | (ret >> (sizeof(size_t) * 8 - 2));
+			ret ^= Hash<POSTag>{}(v.rightTag);
+			ret = (ret << 2) | (ret >> (sizeof(size_t) * 8 - 2));
+			ret ^= Hash<uint8_t>{}(v.feature);
+			ret = (ret << 2) | (ret >> (sizeof(size_t) * 8 - 2));
+			ret ^= Hash<Dialect>{}(v.dialect);
+			return ret;
+		};
+	};
+
+	namespace cmb
+	{
 		template<class NodeSizeTy, class GroupSizeTy>
 		class MultiRuleDFA
 		{
@@ -200,12 +274,13 @@ namespace kiwi
 			};
 
 			Vector<MultiRuleDFAErased> dfa, dfaRight;
-			UnorderedMap<std::tuple<POSTag, POSTag, uint8_t>, size_t> map;
+			UnorderedMap<RuleCategory, size_t> map;
 			Vector<Allomorph> allomorphData;
 			UnorderedMap<std::pair<KString, POSTag>, std::pair<size_t, size_t>> allomorphPtrMap;
 
 			auto findRule(POSTag leftTag, POSTag rightTag,
-				CondVowel cv = CondVowel::none, CondPolarity cp = CondPolarity::none
+				CondVowel cv = CondVowel::none, CondPolarity cp = CondPolarity::none,
+				Dialect dialect = Dialect::standard
 			) const -> decltype(map.end());
 
 			Vector<KString> combineImpl(
@@ -296,16 +371,18 @@ namespace kiwi
 				Rule(const KString& _left = {},
 					const KString& _right = {},
 					const Vector<ReplString>& _results = {},
+					Dialect _dialect = Dialect::standard,
 					CondVowel _leftVowel = CondVowel::none,
 					CondPolarity _leftPolar = CondPolarity::none,
-					bool _ignoreRCond = false
+					bool _ignoreRCond = false,
+					int _lineNo = 0
 				)
-					: left{ _left }, right { _right }, repl{ _results, _leftVowel, _leftPolar, _ignoreRCond }
+					: left{ _left }, right{ _right }, repl{ _results, _dialect, _leftVowel, _leftPolar, _ignoreRCond, _lineNo }
 				{
 				}
 			};
 
-			UnorderedMap<std::tuple<POSTag, POSTag, uint8_t>, Vector<size_t>> ruleset;
+			UnorderedMap<RuleCategory, Vector<size_t>> ruleset;
 			Vector<Rule> rules;
 
 			static Vector<char16_t> getVocabList(const Vector<Pattern::Node>& nodes);
@@ -334,17 +411,18 @@ namespace kiwi
 			RuleSet& operator=(const RuleSet&);
 			RuleSet& operator=(RuleSet&&);
 
-			explicit RuleSet(std::istream& ruleFile)
+			explicit RuleSet(std::istream& ruleFile, Dialect enabledDialects = Dialect::standard)
 			{
-				loadRules(ruleFile);
+				loadRules(ruleFile, enabledDialects);
 			}
 
 			void addRule(const std::string& lTag, const std::string& rTag,
 				const KString& lPat, const KString& rPat, const std::vector<ReplString>& results,
-				CondVowel leftVowel, CondPolarity leftPolar, bool ignoreRCond
+				CondVowel leftVowel, CondPolarity leftPolar, bool ignoreRCond, int lineNo,
+				Dialect dialect = Dialect::standard
 			);
 			
-			void loadRules(std::istream& istr);
+			void loadRules(std::istream& istr, Dialect enabledDialects = Dialect::standard);
 
 			CompiledRule compile() const;
 		};

@@ -95,6 +95,7 @@ namespace kiwi
 		U16StringView str, 
 		size_t startOffset,
 		Match matchOptions, 
+		Dialect allowedDialect,
 		size_t maxUnkFormSize, 
 		size_t spaceTolerance,
 		float continualTypoCost,

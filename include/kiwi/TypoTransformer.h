@@ -24,22 +24,21 @@ namespace kiwi
 	{
 		friend class TypoTransformer;
 		friend class PreparedTypoTransformer;
-		template<bool u> friend class TypoIterator;
+		template<bool> friend class TypoIterator;
 
 		KString strPool;
 		Vector<size_t> strPtrs, branchPtrs;
-		Vector<float> cost;
-		Vector<CondVowel> leftCond;
+		Vector<std::tuple<float, CondVowel, Dialect>> candidates; // (cost, leftCond, dialect)
 		float costThreshold = 0;
 
 		template<class It>
 		void insertSinglePath(It first, It last);
 
 		template<class It>
-		void addBranch(It first, It last, float _cost, CondVowel _leftCond);
+		void addBranch(It first, It last, float _cost, CondVowel _leftCond, Dialect _dialect);
 
 		template<class It1, class It2, class It3>
-		void addBranch(It1 first1, It1 last1, It2 first2, It2 last2, It3 first3, It3 last3, float _cost, CondVowel _leftCond);
+		void addBranch(It1 first1, It1 last1, It2 first2, It2 last2, It3 first3, It3 last3, float _cost, CondVowel _leftCond, Dialect _dialect);
 
 		void finishBranch();
 	public:
@@ -83,9 +82,14 @@ namespace kiwi
 			StrType str;
 			float cost;
 			CondVowel leftCond;
+			Dialect dialect;
 
-			RetType(const StrType& _str = {}, float _cost = 0, CondVowel _leftCond = CondVowel::none)
-				: str{ _str }, cost{ _cost }, leftCond{ _leftCond }
+			RetType(const StrType& _str = {}, 
+				float _cost = 0, 
+				CondVowel _leftCond = CondVowel::none, 
+				Dialect _dialect = Dialect::standard
+			)
+				: str{ _str }, cost{ _cost }, leftCond{ _leftCond }, dialect{ _dialect }
 			{}
 		};
 
@@ -136,9 +140,12 @@ namespace kiwi
 			uint32_t length;
 			float cost;
 			CondVowel leftCond;
+			Dialect dialect;
 
-			ReplInfo(const char16_t* _str = nullptr, uint32_t _length = 0, float _cost = 0, CondVowel _leftCond = CondVowel::none)
-				: str{ _str }, length{ _length }, cost{ _cost }, leftCond{ _leftCond }
+			ReplInfo(const char16_t* _str = nullptr, uint32_t _length = 0, float _cost = 0, 
+				CondVowel _leftCond = CondVowel::none,
+				Dialect _dialect = Dialect::standard)
+				: str{ _str }, length{ _length }, cost{ _cost }, leftCond{ _leftCond }, dialect{ _dialect }
 			{}
 		};
 
@@ -223,10 +230,10 @@ namespace kiwi
 		float continualTypoThreshold = INFINITY;
 		float lengtheningTypoThreshold = INFINITY;
 
-		UnorderedMap<std::tuple<KString, KString, CondVowel>, float> typos;
+		UnorderedMap<std::tuple<KString, KString, CondVowel, Dialect>, float> typos;
 
-		void addTypoWithCond(const KString& orig, const KString& error, float cost, CondVowel leftCond = CondVowel::none);
-		void addTypoNormalized(const KString& orig, const KString& error, float cost = 1, CondVowel leftCond = CondVowel::none);
+		void addTypoWithCond(const KString& orig, const KString& error, float cost, CondVowel leftCond = CondVowel::none, Dialect dialect = Dialect::standard);
+		void addTypoNormalized(const KString& orig, const KString& error, float cost = 1, CondVowel leftCond = CondVowel::none, Dialect dialect = Dialect::standard);
 
 	public:
 		using TypoDef = std::tuple<std::initializer_list<const char16_t*>, std::initializer_list<const char16_t*>, float, CondVowel>;
@@ -256,12 +263,13 @@ namespace kiwi
 		* @param error 오류 문자열
 		* @param cost 오류 문자열로 변환하는데 드는 비용. 이 값을 무한대로 설정하면 해당 오타가 비활성화됩니다.
 		* @param leftCond 원본 문자열이 오류 문자열로 변환될 때 요구되는 왼쪽 모음의 조건
+		* @param dialect 원본 문자열이 오류 문자열로 변환 가능한 방언. 기본값은 표준어입니다.
 		* 
 		* @note orig, error는 모두 완전한 음절이거나 모음이거나 초성이어야 합니다. 그렇지 않은 경우 invalid_argument 예외가 발생합니다.
 		*		addTypo(u"ㅐ", u"ㅔ")는 비용 1을 들여 ㅐ를 ㅔ로 바꾸는 변환을 새로 정의합니다. 
 		*		addTypo(u"ㅐ", u"에")는 실패하고 예외를 발생시킵니다.
 		*/
-		void addTypo(const std::u16string& orig, const std::u16string& error, float cost = 1, CondVowel leftCond = CondVowel::none);
+		void addTypo(const std::u16string& orig, const std::u16string& error, float cost = 1, CondVowel leftCond = CondVowel::none, Dialect dialect = Dialect::standard);
 
 		TypoTransformer& addTypos(std::initializer_list<TypoDef> lst)
 		{
@@ -278,7 +286,7 @@ namespace kiwi
 			return *this;
 		}
 
-		const UnorderedMap<std::tuple<KString, KString, CondVowel>, float>& getTypos() const
+		const UnorderedMap<std::tuple<KString, KString, CondVowel, Dialect>, float>& getTypos() const
 		{
 			return typos;
 		}
@@ -332,6 +340,8 @@ namespace kiwi
 		}
 
 		TypoTransformer copyWithNewLengtheningTypoCost(float threshold) const;
+
+		TypoTransformer copyWithDialectOverriding(Dialect dialect) const;
 
 		/**
 		* @brief 다른 TypoTransformer의 오타를 현재 TypoTransformer에 추가합니다.
@@ -394,6 +404,7 @@ namespace kiwi
 		basicTypoSetWithContinual,
 		lengtheningTypoSet,
 		basicTypoSetWithContinualAndLengthening,
+		dialect,
 	};
 
 	/**

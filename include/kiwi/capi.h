@@ -56,6 +56,7 @@ typedef struct {
 	uint32_t typo_form_id; /**< 교정 전 오타의 형태에 대한 정보 (typoCost가 0인 경우 의미 없음) */
 	uint32_t paired_token; /**< SSO, SSC 태그에 속하는 형태소의 경우 쌍을 이루는 반대쪽 형태소의 위치(-1인 경우 해당하는 형태소가 없는 것을 뜻함) */
 	uint32_t sub_sent_position; /**< 인용부호나 괄호로 둘러싸인 하위 문장의 번호. 1부터 시작. 0인 경우 하위 문장이 아님을 뜻함 */
+	uint16_t dialect; /**< 방언 정보 */
 } kiwi_token_info_t;
 
 /*
@@ -185,6 +186,22 @@ enum
 	KIWI_MATCH_ALL_WITH_NORMALIZING = KIWI_MATCH_ALL | KIWI_MATCH_NORMALIZE_CODA,
 };
 
+enum
+{
+	KIWI_DIALECT_STANDARD = 0,
+	KIWI_DIALECT_GYEONGGI = 1 << 0,
+	KIWI_DIALECT_CHUNGCHEONG = 1 << 1,
+	KIWI_DIALECT_GANGWON = 1 << 2,
+	KIWI_DIALECT_GYEONGSANG = 1 << 3,
+	KIWI_DIALECT_JEOLLA = 1 << 4,
+	KIWI_DIALECT_JEJU = 1 << 5,
+	KIWI_DIALECT_HWANGHAE = 1 << 6,
+	KIWI_DIALECT_HAMGYEONG = 1 << 7,
+	KIWI_DIALECT_PYEONGAN = 1 << 8,
+	KIWI_DIALECT_ARCHAIC = 1 << 9,
+	KIWI_DIALECT_ALL = KIWI_DIALECT_ARCHAIC * 2 - 1,
+};
+
 #ifdef __cplusplus  
 extern "C" {
 #endif 
@@ -216,13 +233,14 @@ DECL_DLL void kiwi_clear_error();
  * @param model_path 모델의 경로.
  * @param num_threads 사용할 스레드의 개수. -1로 지정시 가용한 스레드 개수를 자동으로 판단합니다.
  * @param options 생성 옵션. KIWI_BUILD_* 열거형을 참조하십시오.
+ * @param enabled_dialects 활성화할 방언. KIWI_DIALECT_* 열거형을 참조하십시오.
  * @return 성공 시 Kiwi Builder의 핸들을 반환합니다. 
  * 실패시 null를 반환하고 에러 메세지를 설정합니다. 
  * 에러 메세지는 kiwi_error()를 통해 확인할 수 있습니다.
  * 
  * @see kiwi_builder_close
  */
-DECL_DLL kiwi_builder_h kiwi_builder_init(const char* model_path, int num_threads, int options);
+DECL_DLL kiwi_builder_h kiwi_builder_init(const char* model_path, int num_threads, int options, int enabled_dialects);
 
 /**
  * @brief 스트림 객체를 사용하여 Kiwi Builder를 생성합니다.
@@ -230,16 +248,14 @@ DECL_DLL kiwi_builder_h kiwi_builder_init(const char* model_path, int num_thread
  * @param stream_object 파일명을 받아 해당 파일의 데이터를 제공하는 스트림 객체 생성 함수.
  * @param num_threads 사용할 스레드의 개수. -1로 지정시 가용한 스레드 개수를 자동으로 판단합니다.
  * @param options 생성 옵션. KIWI_BUILD_* 열거형을 참조하십시오.
+ * @param enabled_dialects 활성화할 방언. KIWI_DIALECT_* 열거형을 참조하십시오.
  * @return 성공 시 Kiwi Builder의 핸들을 반환합니다. 
  * 실패시 null를 반환하고 에러 메세지를 설정합니다. 
  * 에러 메세지는 kiwi_error()를 통해 확인할 수 있습니다.
  * 
- * @note 이 방식으로 생성된 KiwiBuilder는 WordDetector가 초기화되지 않으므로 
- *       kiwi_builder_extract_words 등의 함수를 사용할 수 없습니다.
- * 
  * @see kiwi_builder_close, kiwi_stream_object_t
  */
-DECL_DLL kiwi_builder_h kiwi_builder_init_stream(kiwi_stream_object_t (*stream_object_factory)(const char* filename), int num_threads, int options);
+DECL_DLL kiwi_builder_h kiwi_builder_init_stream(kiwi_stream_object_t (*stream_object_factory)(const char* filename), int num_threads, int options, int enabled_dialects);
 
 /**
  * @brief 사용이 끝난 KiwiBuilder를 해제합니다.
@@ -569,20 +585,27 @@ DECL_DLL float kiwi_get_option_f(kiwi_h handle, int option);
  */
 DECL_DLL kiwi_morphset_h kiwi_new_morphset(kiwi_h handle);
 
+typedef struct {
+	int match_options; /**< KIWI_MATCH_* 열거형 참고. 기본값은 KIWI_MATCH_ALL_WITH_NORMALIZING 입니다. */
+	kiwi_morphset_h blocklist; /**< 분석 후보 탐색 과정에서 blocklist에 포함된 형태소들은 배제됩니다. null 입력 시에는 blocklist를 사용하지 않습니다. */
+	int open_ending; /**< 마지막 형태소 다음 문장을 종결하지 않고 열린 상태로 끝낼지를 설정니다. 기본값은 0으로 마지막 형태소 다음 바로 문장을 종결합니다. */
+	int allowed_dialects; /**< KIWI_DIALECT_* 열거형 참고 */
+	float dialect_cost; /**< 방언 형태소에 추가되는 비용. 기본값은 3 */
+} kiwi_analyze_option_t;
+
 /**
  * @brief 텍스트를 분석해 형태소 결과를 반환합니다.
  *
  * @param handle Kiwi.
  * @param text 분석할 텍스트 (utf-16).
  * @param top_n 반환할 결과물.
- * @param match_options KIWI_MATCH_ALL 등 KIWI_MATCH_* 열거형 참고.
- * @param blocklist 분석 후보 탐색 과정에서 blocklist에 포함된 형태소들은 배제됩니다. null 입력 시에는 blocklist를 사용하지 않습니다.
+ * @param option 분석 옵션. kiwi_analyze_option_t 참고.
  * @param pretokenized 입력 텍스트 중 특정 영역의 분석 방법을 강제로 지정합니다. null 입력 시에는 pretokenization을 사용하지 않습니다.
  * @return 형태소 분석 결과의 핸들. kiwi_res_* 함수를 통해 값에 접근가능합니다. 이 핸들은 사용 후 kiwi_res_close를 사용해 반드시 해제되어야 합니다.
  * 
  * @see kiwi_analyze
  */
-DECL_DLL kiwi_res_h kiwi_analyze_w(kiwi_h handle, const kchar16_t* text, int top_n, int match_options, kiwi_morphset_h blocklist, kiwi_pretokenized_h pretokenized);
+DECL_DLL kiwi_res_h kiwi_analyze_w(kiwi_h handle, const kchar16_t* text, int top_n, kiwi_analyze_option_t option, kiwi_pretokenized_h pretokenized);
 
 /**
  * @brief 텍스트를 분석해 형태소 결과를 반환합니다.
@@ -590,14 +613,13 @@ DECL_DLL kiwi_res_h kiwi_analyze_w(kiwi_h handle, const kchar16_t* text, int top
  * @param handle Kiwi.
  * @param text 분석할 텍스트 (utf-8).
  * @param top_n 반환할 결과물.
- * @param match_options KIWI_MATCH_ALL 등 KIWI_MATCH_* 열거형 참고.
- * @param blocklist 분석 후보 탐색 과정에서 blocklist에 포함된 형태소들은 배제됩니다. null 입력 시에는 blocklist를 사용하지 않습니다.
+ * @param option 분석 옵션. kiwi_analyze_option_t 참고.
  * @param pretokenized 입력 텍스트 중 특정 영역의 분석 방법을 강제로 지정합니다. null 입력 시에는 pretokenization을 사용하지 않습니다.
  * @return 형태소 분석 결과의 핸들. kiwi_res_* 함수를 통해 값에 접근가능합니다. 이 핸들은 사용 후 kiwi_res_close를 사용해 반드시 해제되어야 합니다.
  * 
  * @see kiwi_analyze_w
  */
-DECL_DLL kiwi_res_h kiwi_analyze(kiwi_h handle, const char* text, int top_n, int match_options, kiwi_morphset_h blocklist, kiwi_pretokenized_h pretokenized);
+DECL_DLL kiwi_res_h kiwi_analyze(kiwi_h handle, const char* text, int top_n, kiwi_analyze_option_t option, kiwi_pretokenized_h pretokenized);
 
 /**
  * @brief 
@@ -607,10 +629,10 @@ DECL_DLL kiwi_res_h kiwi_analyze(kiwi_h handle, const char* text, int top_n, int
  * @param receiver 
  * @param user_data 
  * @param top_n 
- * @param match_options 
+ * @param option 분석 옵션. kiwi_analyze_option_t 참고.
  * @return  
  */
-DECL_DLL int kiwi_analyze_mw(kiwi_h handle, kiwi_reader_w_t reader, kiwi_receiver_t receiver, void* user_data, int top_n, int match_options, kiwi_morphset_h blocklist);
+DECL_DLL int kiwi_analyze_mw(kiwi_h handle, kiwi_reader_w_t reader, kiwi_receiver_t receiver, void* user_data, int top_n, kiwi_analyze_option_t option);
 
 /**
  * @brief 
@@ -620,10 +642,10 @@ DECL_DLL int kiwi_analyze_mw(kiwi_h handle, kiwi_reader_w_t reader, kiwi_receive
  * @param receiver 
  * @param user_data 
  * @param top_n 
- * @param match_options 
+ * @param option 분석 옵션. kiwi_analyze_option_t 참고.
  * @return  
  */
-DECL_DLL int kiwi_analyze_m(kiwi_h handle, kiwi_reader_t reader, kiwi_receiver_t receiver, void* user_data, int top_n, int match_options, kiwi_morphset_h blocklist);
+DECL_DLL int kiwi_analyze_m(kiwi_h handle, kiwi_reader_t reader, kiwi_receiver_t receiver, void* user_data, int top_n, kiwi_analyze_option_t option);
 
 /**
  * @brief 텍스트를 문장 단위로 분할합니다.

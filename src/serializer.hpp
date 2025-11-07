@@ -112,11 +112,6 @@ namespace kiwi
 			}
 		};
 
-		class SerializationException : public std::ios_base::failure
-		{
-			using std::ios_base::failure::failure;
-		};
-
 		template<typename Ty>
 		struct is_key : public std::false_type
 		{

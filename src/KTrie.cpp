@@ -183,6 +183,7 @@ namespace kiwi
 		const size_t* typoPtrs,
 		U16StringView str,
 		const Vector<uint32_t>& nonSpaces,
+		Dialect allowedDialect,
 		uint32_t startPosition = 0,
 		uint32_t endPosition = 0,
 		float cost = 0,
@@ -200,7 +201,9 @@ namespace kiwi
 				const auto typoFormSize = typoPtrs[tCand->typoId + 1] - typoPtrs[tCand->typoId] + lengthenedSize;
 				auto cand = &tCand->form(formBase);
 				if (FeatureTestor::isMatched(&str[0], &str[nonSpaces[nonSpaces.size() - typoFormSize]], tCand->leftCond)
-					&& FeatureTestor::isMatchedApprox(&str[0], &str[nonSpaces[nonSpaces.size() - typoFormSize]], cand->vowel, cand->polar))
+					&& FeatureTestor::isMatchedApprox(&str[0], &str[nonSpaces[nonSpaces.size() - typoFormSize]], cand->vowel, cand->polar)
+					&& (cand->dialect == Dialect::standard || !!(cand->dialect & allowedDialect))
+					&& (tCand->dialect == Dialect::standard || !!(tCand->dialect & allowedDialect)))
 				{
 					candidates.emplace_back(cand, 
 						tCand->score() + cost, 
@@ -220,7 +223,8 @@ namespace kiwi
 
 			while (1)
 			{
-				if (FeatureTestor::isMatchedApprox(&str[0], &str[nonSpaces[nonSpaces.size() - foundCand->form.size()]], foundCand->vowel, foundCand->polar))
+				if (FeatureTestor::isMatchedApprox(&str[0], &str[nonSpaces[nonSpaces.size() + foundCand->numSpaces - foundCand->form.size()]], foundCand->vowel, foundCand->polar)
+					&& (foundCand->dialect == Dialect::standard || !!(foundCand->dialect & allowedDialect)))
 				{
 					candidates.emplace_back(foundCand);
 				}
@@ -506,7 +510,8 @@ namespace kiwi
 		const utils::FrozenTrie<kchar_t, const Form*>& trie,
 		U16StringView str,
 		const Vector<uint32_t>& nonSpaces,
-		const utils::FrozenTrie<kchar_t, const Form*>::Node* curNode
+		const utils::FrozenTrie<kchar_t, const Form*>::Node* curNode,
+		Dialect allowedDialect
 	)
 	{
 		if (!continualTypoTolerant) return;
@@ -536,7 +541,7 @@ namespace kiwi
 			{
 				if (getForm<typoTolerant>(cand, formBase).form.size() <= 1) break;
 				inserted = true;
-				if (!insertCandidates(candidates, cand, formBase, typoPtrs, str, nonSpaces, 0, boundary, continualTypoCost / 2)) break;
+				if (!insertCandidates(candidates, cand, formBase, typoPtrs, str, nonSpaces, allowedDialect, 0, boundary, continualTypoCost / 2)) break;
 			}
 		}
 
@@ -572,6 +577,7 @@ size_t kiwi::splitByTrie(
 	U16StringView str,
 	size_t startOffset,
 	Match matchOptions, 
+	Dialect allowedDialect,
 	size_t maxUnkFormSize, 
 	size_t spaceTolerance,
 	float continualTypoCost,
@@ -715,7 +721,7 @@ size_t kiwi::splitByTrie(
 		}
 		else if (out.size() > 1 && !specialMatched)
 		{
-			size_t lastPos = out.back().endPos;
+			const size_t lastPos = out.back().endPos;
 			if (lastPos < unkFormEndPos && !isHangulCoda(str[nonSpaces[lastPos]]))
 			{
 				appendNewNode(out, endPosMap, 
@@ -841,7 +847,7 @@ size_t kiwi::splitByTrie(
 						if (!cand) break;
 						else if (!trie.hasSubmatch(cand))
 						{
-							if (!insertCandidates(candidates, cand, formBase, typoPtrs, str, nonSpaces)) break;
+							if (!insertCandidates(candidates, cand, formBase, typoPtrs, str, nonSpaces, allowedDialect)) break;
 						}
 					}
 				continuePatternFor:;
@@ -1098,11 +1104,11 @@ size_t kiwi::splitByTrie(
 		if (continualTypoTolerant && lastChrType == POSTag::max)
 		{
 			insertContinualTypoNode<arch>(candidates, continualTypoRightNodes, ContinualIeungDecomposer{}, 
-				continualTypoCost, c, formBase, typoPtrs, trie, str, nonSpaces, curNodeForTypo);
+				continualTypoCost, c, formBase, typoPtrs, trie, str, nonSpaces, curNodeForTypo, allowedDialect);
 			insertContinualTypoNode<arch>(candidates, continualTypoRightNodes, ContinualHieutDecomposer{},
-				continualTypoCost, c, formBase, typoPtrs, trie, str, nonSpaces, curNodeForTypo);
+				continualTypoCost, c, formBase, typoPtrs, trie, str, nonSpaces, curNodeForTypo, allowedDialect);
 			insertContinualTypoNode<arch>(candidates, continualTypoRightNodes, ContinualCodaDecomposer{}, 
-				continualTypoCost, c, formBase, typoPtrs, trie, str, nonSpaces, curNodeForTypo);
+				continualTypoCost, c, formBase, typoPtrs, trie, str, nonSpaces, curNodeForTypo, allowedDialect);
 		}
 
 		// from this, curNode has the exact next node
@@ -1116,7 +1122,7 @@ size_t kiwi::splitByTrie(
 			{
 				zCodaFollowable = zCodaFollowable || getForm<typoTolerant>(cand, formBase).zCodaAppendable;
 				zSiotFollowable = zSiotFollowable || getForm<typoTolerant>(cand, formBase).zSiotAppendable;
-				if (!insertCandidates(candidates, cand, formBase, typoPtrs, str, nonSpaces)) break;
+				if (!insertCandidates(candidates, cand, formBase, typoPtrs, str, nonSpaces, allowedDialect)) break;
 			}
 		}
 
@@ -1127,7 +1133,7 @@ size_t kiwi::splitByTrie(
 				const Form* cand = rn.second->val(trie);
 				if (cand && !trie.hasSubmatch(cand))
 				{
-					if (!insertCandidates(candidates, cand, formBase, typoPtrs, str, nonSpaces, rn.first, 0, continualTypoCost / 2)) break;
+					if (!insertCandidates(candidates, cand, formBase, typoPtrs, str, nonSpaces, allowedDialect, rn.first, 0, continualTypoCost / 2)) break;
 				}
 			}
 		}
@@ -1139,7 +1145,7 @@ size_t kiwi::splitByTrie(
 				const Form* cand = node.second->val(trie);
 				if (cand && !trie.hasSubmatch(cand))
 				{
-					insertCandidates(candidates, cand, formBase, typoPtrs, str, nonSpaces, 0, 0, lengtheningTypoCost * (3 + node.first), node.first);
+					insertCandidates(candidates, cand, formBase, typoPtrs, str, nonSpaces, allowedDialect, 0, 0, lengtheningTypoCost * (3 + node.first), node.first);
 				}
 			}
 		}
@@ -1178,7 +1184,7 @@ size_t kiwi::splitByTrie(
 		if (curNode->val(trie) && !trie.hasSubmatch(curNode->val(trie)))
 		{
 			const Form* cand = curNode->val(trie);
-			if (!insertCandidates(candidates, cand, formBase, typoPtrs, str, nonSpaces)) break;
+			if (!insertCandidates(candidates, cand, formBase, typoPtrs, str, nonSpaces, allowedDialect)) break;
 		}
 		curNode = curNode->fail();
 	}

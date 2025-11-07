@@ -38,6 +38,7 @@ namespace kiwi
 		{
 		case '-':
 			sign = true;
+			[[fallthrough]];
 		case '+':
 			++begin;
 			break;
@@ -484,12 +485,18 @@ namespace kiwi
 		for (; first != last; ++first)
 		{
 			char16_t c = *first;
-			if (c == 0xB42C) c = 0xB410;
-			if (0xAC00 <= c && c < 0xD7A4)
+			if (c == 0xB42C) c = 0xB410; // '됬'을 '됐'으로 강제교정
+			if (isHangulSyllable(c))
 			{
 				int coda = (c - 0xAC00) % 28;
 				ret.push_back(c - coda);
 				if (coda) ret.push_back(coda + 0x11A7);
+			}
+			else if (!ret.empty() && isHangulOnset(ret.back())
+				&& 0x1161 <= c && c < 0x1176)
+			{
+				// 첫가끝 초성 + 중성 중 현대한글 음절로 가능한 것은 결합
+				ret.back() = (char16_t)(0xAC00 + ((ret.back() - 0x1100) * 21 * 28) + ((c - 0x1161) * 28));
 			}
 			else
 			{
@@ -497,11 +504,6 @@ namespace kiwi
 			}
 		}
 		return ret;
-	}
-
-	inline KString normalizeHangul(const std::u16string& hangul)
-	{
-		return normalizeHangul(hangul.begin(), hangul.end());
 	}
 
 	inline KString normalizeHangul(std::u16string_view hangul)

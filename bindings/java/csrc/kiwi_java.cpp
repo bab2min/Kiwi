@@ -183,6 +183,23 @@ namespace jni
 	};
 
 	template<>
+	struct ValueBuilder<kiwi::Dialect> : public ValueBuilder<uint16_t>
+	{
+		using CppType = kiwi::Dialect;
+		using JniType = jshort;
+
+		CppType fromJava(JNIEnv* env, JniType v)
+		{
+			return (CppType)v;
+		}
+
+		JniType toJava(JNIEnv* env, CppType v)
+		{
+			return (JniType)v;
+		}
+	};
+
+	template<>
 	struct JClassName<kiwi::TokenResult>
 	{
 		static constexpr auto value = std::string_view{ "kr/pe/bab2min/Kiwi$TokenResult" };
@@ -633,7 +650,7 @@ private:
 		{
 			try
 			{
-				JNIEnv* env = provider.getEnv();
+				JNIEnv* env = jni::threadLocalEnv;
 				// Get StreamProvider.provide method
 				jclass streamProviderClass = JObject<JStreamProvider>::jClass;
 				jmethodID provideMethod = env->GetMethodID(streamProviderClass, "provide", "(Ljava/lang/String;)Ljava/io/InputStream;");
@@ -673,11 +690,11 @@ public:
 
 	bool addPreAnalyzedWord(const std::u16string& form, std::vector<AnalyzedMorph>&& analyzed, float score)
 	{
-		std::vector<std::pair<std::u16string, kiwi::POSTag>> morphs;
+		std::vector<std::tuple<std::u16string, kiwi::POSTag, uint8_t>> morphs;
 		std::vector<std::pair<size_t, size_t>> positions;
 		for (auto& i : analyzed)
 		{
-			morphs.emplace_back(std::move(i.form), std::move(i.tag));
+			morphs.emplace_back(std::move(i.form), std::move(i.tag), kiwi::undefSenseId);
 			if (i.start >= 0 && i.end >= 0) positions.emplace_back(i.start, i.end);
 		}
 		if (positions.size() < morphs.size()) positions.clear();

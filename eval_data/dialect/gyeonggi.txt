@@ -1,0 +1,37 @@
+바구니에 개나리꼿을 잔뜩 담어 놨어요.	바구니/NNG 에/JKB 개나리/NNG 꼿__1/NNG 을/JKO 잔뜩/MAG 담/VV 어/EC 놓/VX 었/EP 어요/EF ./SF	바구니에 개나리꽃을 잔뜩 담아 놨어요.
+새용에 밥을 지어 먹었다.	새용__1/NNG 에/JKB 밥/NNG 을/JKO 짓/VV-I 어/EC 먹/VV 었/EP 다/EF ./SF	새옹에 밥을 지어 먹었다.
+냄에 물건을 훔쳐서 달아나구 했지.	냄__3/NNG 에/JKG 물건/NNG 을/JKO 훔치/VV 어서/EC 달아나/VV 구/EC 하/VV 었/EP 지/EF ./SF	남의 물건을 훔쳐서 달아나고 했지.
+아주 옛날에는 사람의 힘으로다 절굿괭이로 절구질을 해서 쌀을 맨들었지.	아주/MAG 옛날/NNG 에/JKB 는/JX 사람/NNG 의/JKG 힘/NNG 으로다/JKB 절굿괭이__1/NNG 로/JKB 절구/NNG 질/XSN 을/JKO 하/VV 어서/EC 쌀/NNG 을/JKO 맨들__3/VV 었/EP 지/EF ./SF	아주 옛날에는 사람의 힘으로 절굿공이로 절구질을 해서 쌀을 만들었지.
+그 아이는 날 때부터 귀먹추다.	그/MM 아이/NNG 는/JX 나/VV ᆯ/ETM 때/NNG 부터/JX 귀먹추__1/NNG 이/VCP 다/EF ./SF	그 아이는 날 때부터 귀머거리다.
+아이 온몸이 죄다 헐어 혼디 투성이야.	아이/NNG 온몸/NNG 이/JKS 죄다/MAG 헐/VV 어/EC 혼디__1/NNG 투성이/XSN 이/VCP 야/EF ./SF	아이 온몸이 죄다 헐어 헌데 투성이야.
+성허구 아오가 비샛하게 생겼구나.	성__5/NNG 허구/JC 아오__1/NNG 가/JKS 비샛하__1/VA 게/EC 생기/VV 었/EP 구나/EF ./SF	형하고 아우가 비슷하게 생겼구나.
+결혼 첫날에 배깥에서 문을 뚫어서 보는 것도 있었지요.	결혼/NNG 첫날/NNG 에/JKB 배깥__1/NNG 에서/JKB 문/NNG 을/JKO 뚫/VV 어서/EC 보/VV 는/ETM 것/NNB 도/JX 있/VV 었/EP 지요/EF ./SF	결혼 첫날 바깥에서 문을 뚫어서 보는 것도 있었지요.
+산에 가도토리 주우러 간다.	산/NNG 에/JKB 가도토리__1/NNG 줍/VV-I 으러/EC 가/VV ᆫ다/EF ./SF	산에 상수리 주우러 간다.
+논에 가서 박고둥을 많이 잡았다.	논/NNG 에/JKB 가/VV 어서/EC 박고둥__1/NNG 을/NNG 많이/MAG 잡/VV-R 었/EP 다/EF ./SF	논에 가서 우렁이를 많이 잡았다.
+가꺼운 데는 죄 해 가서 낭구를 할 거도 웂구.	가꺼운/NNG 데/NNB 는/JX 죄/MAG 하/VV 어/EC 가/VX 어서/EC 낭구__1/NNG 를/JKO 하/VV ᆯ/ETM 거/NNB 도/JX 웂__1/VA 구/EF ./SF	가까운 데는 죄 해 가서 나무를 할 것도 없고.
+김치는 새우로 맨들은 젖에다가 담근 게 맛있지요.	김치/NNG 는/JX 새우/NNG 로/JKB 맨들__3/VV 은/ETM 젖__4/NNG 에다가/JKB 담그/VV ᆫ/ETM 것/NNB 이/JKS 맛있/VA 지요/EF ./SF	김치는 새우로 만든 젓에다가 담근 게 맛있지요.
+깎이비얄이 너마 가팔라서 오르기가 힘들다.	깎이비얄__1/NNG 이/JKS 너마__1/MAG 가파르/VA 어서/EC 오르/VV 기/ETN 가/JKS 힘들/VA 다/EF ./SF	비탈이 너무 가팔라서 오르기가 힘들다.
+정월에는 집집마다 힌떡을 만들어 먹었어요.	정월/NNG 에/JKB 는/JX 집집/NNG 마다/JX 힌떡__1/NNG 을/JKO 만들/VV 어/EC 먹/VV 었/EP 어요/EF ./SF	정월에는 집집마다 가래떡을 만들어 먹었어요.
+애를 사정없이 줘패선 안 되지.	애/NNG 를/JKO 사정없이/MAG 줘패__1/VV 서/EC ᆫ/JX 안/MAG 되/VV 지/EF ./SF	애를 사정없이 쥐어패선 안 되지.
+벌에 물려서 벌따구가 부었다.	벌/NNG 에/JKB 물리/VV 어서/EC 벌따구__1/NNG 가/JKS 붓/VV-I 었/EP 다/EF ./SF	벌에 물려서 볼때기가 부었다.
+자기보다두 더 나으면 낫지 들하진 않거든.	자기/NP 보다/JKB 두/JX 더/MAG 낫/VV-I 으면/EC 낫/VV-I 지/EC 들하__1/VA 지/EC ᆫ/JX 않/VX 거든/EF ./SF	자기보다도 더 나으면 낫지 덜하진 않거든.
+그게 인제 봇줄을 이렇게 해서 몽지를 소 목에 걸구 대니죠.	그것/NP 이/JKS 인제/MAG 봇/NNG 줄/NNG 을/JKO 이렇/VA-I 게/EC 하/VV 어서/EC 몽지__1/NNG 를/JKO 소/NNG 목/NNG 에/JKB 걸/VV 구/EC 대니__1/VV 죠/EF ./SF	그게 이제 봇줄을 이렇게 해서 멍에를 소 목에 걸고 다니죠.
+암소가 암청을 내게 대문 교배를 해서 새끼를 낳지.	암소/NNG 가/JKS 암청__1/NNG 을/NNG 내/VV 게/EC 대__22/VV 문/EC 교배/NNG 를/JKO 하/VV 어서/EC 새끼/NNG 를/JKO 낳/VV 지/EF ./SF	암소가 암내를 내게 되면 교배를 해서 새끼를 낳지.
+산에서 솔가래를 긁어모아 불을 땐다.	산/NNG 에서/JKB 솔가래__1/NNG 를/JKO 긁어모으/VV 어/EC 불/NNG 을/JKO 때/VV ᆫ다/EF ./SF	산에서 솔가리를 긁어모아 불을 땐다.
+옛날에는 가마섯에다 밥할 때 애호박을 같이 쪄 갖구두 먹었어요.	옛날/NNG 에/JKB 는/JX 가마섯__1/NNG 에다/JKB 밥/NNG 하/XSV ᆯ/ETM 때/NNG 애호박/NNG 을/JKO 같이/MAG 찌/VV 어/EC 갖/VX 구/EC 두/JX 먹/VV 었/EP 어요/EF ./SF	옛날에는 가마솥에다 밥할 때 애호박을 같이 쪄 갖고도 먹었어요.
+하도 정신이 웂어서 집만 쌓아 두구 송태이는 하나두 안 엮어 놓은 거야.	하도/MAG 정신/NNG 이/JKS 웂__1/VA 어서/EC 집__19/NNG 만/JX 쌓/VV 어/EC 두/VX 구/EC 송태이__1/NNG 는/JX 하나/NR 두/JX 안/MAG 엮/VV 어/EC 놓/VX 은/ETM 거/NNB 이/VCP 야/EF ./SF	하도 정신이 없어서 짚만 쌓아 두고 멱둥구미는 하나도 안 엮어 놓은 거야.
+갈쿠로다 낙엽 떨어진 걸 긁어다 아공지에 때고 그랬지요.	갈쿠__2/NNG 로다/JKB 낙엽/NNG 떨어지/VV ᆫ/ETM 거/NNB ᆯ/JKO 긁/VV 어다/EC 아공지__1/NNG 에/JKB 때/VV 고/EC 그렇/VA-I 었/EP 지요/EF ./SF	갈퀴로다 낙엽 떨어진 걸 긁어다 아궁이에 때고 그랬지요.
+다듬이돌에 명지 놓구 한참 두드리믄 명지가 뜨끈뜨끈허지.	다듬이돌__1/NNG 에/JKB 명지__1/NNG 놓/VX 구/EC 한참/NNG 두드리/VV 믄/EC 명지__1/NNG 가/JKS 뜨끈뜨끈/MAG 허/XSA 지/EF ./SF	다듬잇돌에 명주 놓고 한참 두드리면 명주가 뜨끈뜨끈하지.
+이 대레미는 전기를 많이 먹지.	이/MM 대레미__1/NNG 는/JX 전기/NNG 를/JKO 많이/MAG 먹/VV 지/EF ./SF	이 다리미는 전기를 많이 먹지.
+물가에 옛날에는 깔땅이 많었는데, 요새는 하나두 웂어요.	물가/NNG 에/JKB 옛날/NNG 에/JKB 는/JX 깔땅__1/NNG 이/JKS 많/VA 었/EP 는데/EC ,/SP 요새/NNG 는/JX 하나/NR 두/JX 웂__1/VA 어요/EF ./SF	물가에 옛날에는 갈대가 많았는데, 요새는 하나도 없어요.
+낭구꾼이니 잿갓에 낭구하러 갔지.	낭구꾼__1/NNG 이/VCP 니/EC 잿갓__1/NNG 에/JKB 낭구하__1/VV 러/EC 가/VV 었/EP 지/EF ./SF	나무꾼이니 산에 나무하러 갔지.
+감기가 오려나 자꾸 재치기가 나온다.	감기/NNG 가/JKS 오/VV 려나/EC 자꾸/MAG 재치기__4/NNG 가/JKS 나오/VV ᆫ다/EF ./SF	감기가 오려나 자꾸 재채기가 나온다.
+아주머이들이 보구니 들고 가서 나물 많이 뜯어 왔지요.	아주머이__1/NNG 들/XSN 이/JKS 보구니__1/NNG 들/VV 고/EC 가/VV 어서/EC 나물/NNG 많이/MAG 뜯/VV-R 어/EC 오/VX 었/EP 지요/EF ./SF	아주머니들이 바구니 들고 가서 나물 많이 뜯어 왔지요.
+넘의 머리를 왜 헤틀어 놓니?	넘__2/NNG 의/JKG 머리/NNG 를/JKO 왜/MAG 헤틀__1/VV 어/EC 놓/VX 니/EC ?/SF	남의 머리를 왜 헝클어 놓니?
+봄에는 아주머이들이 보그니 들고 나물 뜯으러 갔었어요.	봄/NNG 에/JKB 는/JX 아주머이__1/NNG 들/XSN 이/JKS 보그니__1/NNG 들/VV 고/EC 나물/NNG 뜯/VV-R 으러/EC 가/VV 었었/EP 어요/EF ./SF	봄에는 아주머니들이 바구니 들고 나물 뜯으러 갔었어요.
+불젓갈은 뜨거니깐 조심해라.	불젓갈__1/NNG 은/JX 뜨겁/VA-I 으니까/EC 조심/NNG 하/XSV 어라/EF ./SF	부젓가락은 뜨거우니까 조심해라.
+불뚜개루 벙갱이 재 좀 퍼라.	불뚜개__1/NNG 루/JKB 벙갱이__1/NNG 재/NNG 좀/MAG 푸/VV 어라/EF ./SF	부삽으로 아궁이 재 좀 퍼라.
+아침복새를 받으문 창문이 벌겋게 보여요.	아침복새__1/NNG 를/JKO 받/VV-R 으문/EC 창문/NNG 이/JKS 벌겋/VA-I 게/EC 보이/VV 어요/EF ./SF	아침노을을 받으면 창문이 벌겋게 보여요.
+벅에 불을 때서 소죽을 쒀 멕여요.	벅__4/NNG 에/JKB 불/NNG 을/JKO 때/VV 어서/EC 소/NNG 죽/NNG 을/JKO 쑤/VV 어/EC 멕이/VV 어요/EF ./SF	아궁이에 불을 때서 소죽을 쒀 먹여요.
+아궁이에 불을 땔 때는 부지깨이가 필요하다.	아궁이/NNG 에/JKB 불/NNG 을/JKO 때/VV ᆯ/ETM 때/NNG 는/JX 부지깨이__1/NNG 가/JKS 필요/NNG 하/XSA 다/EF ./SF	아궁이에 불을 땔 때는 부지깽이가 필요하다.
+그래도 이거를 다가 해결해 주구 가야 핼 텐데.	그래도/MAJ 이거/NP 를/JKO 다가__11/MAG 해결/NNG 하/XSV 어/EC 주/VX 구/EC 가/VV 어야/EC 하/VX ᆯ/ETM 터/NNB 이/VCP ᆫ데/EF ./SF	그래도 이거를 얼른 해결해 주고 가야 할 텐데.

@@ -94,17 +94,14 @@ namespace jni
 	class JRef
 	{
 	protected:
-		JNIEnv* env;
 		jobject inst;
 	public:
-		JRef(JNIEnv* _env = nullptr, jobject _inst = nullptr)
-			: env{ _env }, inst{ _inst }
+		JRef(jobject _inst = nullptr)
+			: inst{_inst}
 		{}
 
 		JRef(const JRef&) = default;
 		JRef(JRef&&) = default;
-
-		JNIEnv* getEnv() const { return env; }
 
 		Ty& get();
 		const Ty& get() const;
@@ -124,6 +121,8 @@ namespace jni
 		}
 	};
 
+	static thread_local JNIEnv* threadLocalEnv = nullptr;
+
 	template<class Ty>
 	class JUniqueGlobalRef : public JRef<Ty>
 	{
@@ -134,18 +133,17 @@ namespace jni
 		JUniqueGlobalRef(JRef<Ty> ref)
 			: JRef<Ty>{ ref }
 		{
-			this->inst = this->env->NewGlobalRef(this->inst);
+			this->inst = threadLocalEnv->NewGlobalRef(this->inst);
 		}
 
 		JUniqueGlobalRef(const JUniqueGlobalRef& ref)
 			: JRef<Ty>{ ref }
 		{
-			this->inst = this->env->NewGlobalRef(this->inst);
+			this->inst = threadLocalEnv->NewGlobalRef(this->inst);
 		}
 
 		JUniqueGlobalRef(JUniqueGlobalRef&& o)
 		{
-			std::swap(this->env, o.env);
 			std::swap(this->inst, o.inst);
 		}
 
@@ -153,29 +151,29 @@ namespace jni
 		{
 			if (this != &o)
 			{
-				if (this->env && this->inst)
-				{
-					this->env->DeleteGlobalRef(this->inst);
-				}
-				this->env = o.env;
-				this->inst = this->env->NewGlobalRef(o.inst);
+				close(threadLocalEnv);
+				this->inst = threadLocalEnv->NewGlobalRef(o.inst);
 			}
 			return *this;
 		}
 
 		JUniqueGlobalRef& operator=(JUniqueGlobalRef&& o)
 		{
-			std::swap(this->env, o.env);
 			std::swap(this->inst, o.inst);
 			return *this;
 		}
 
 		~JUniqueGlobalRef()
 		{
-			if (this->env && this->inst)
+			close(threadLocalEnv);
+		}
+
+	private:
+		void close(JNIEnv* env)
+		{
+			if (this->inst)
 			{
-				this->env->DeleteGlobalRef(this->inst);
-				this->env = nullptr;
+				env->DeleteGlobalRef(this->inst);
 				this->inst = nullptr;
 			}
 		}
@@ -188,8 +186,8 @@ namespace jni
 		static inline jmethodID jHasNext;
 		static inline jmethodID jNext;
 
-		JIteratorBase(JNIEnv* _env, jobject _inst)
-			: JUniqueGlobalRef{ JRef{ _env, _inst } }
+		JIteratorBase(jobject _inst)
+			: JUniqueGlobalRef{ JRef{ _inst } }
 		{}
 	};
 
@@ -236,7 +234,13 @@ namespace jni
 		template<class ... Args>
 		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
 		{
-			return env->CallVoidMethod(obj, methodID, std::forward<Args>(args)...);
+			env->CallVoidMethod(obj, methodID, std::forward<Args>(args)...);
+			if (env->ExceptionCheck())
+			{
+				env->ExceptionDescribe();
+				env->ExceptionClear();
+				throw std::runtime_error{ "Java exception occurred." };
+			}
 		}
 	};
 
@@ -260,7 +264,14 @@ namespace jni
 		template<class ... Args>
 		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
 		{
-			return env->CallByteMethod(obj, methodID, std::forward<Args>(args)...);
+			auto ret = env->CallByteMethod(obj, methodID, std::forward<Args>(args)...);
+			if (env->ExceptionCheck())
+			{
+				env->ExceptionDescribe();
+				env->ExceptionClear();
+				throw std::runtime_error{ "Java exception occurred." };
+			}
+			return ret;
 		}
 	};
 
@@ -284,7 +295,14 @@ namespace jni
 		template<class ... Args>
 		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
 		{
-			return env->CallByteMethod(obj, methodID, std::forward<Args>(args)...);
+			auto ret = env->CallByteMethod(obj, methodID, std::forward<Args>(args)...);
+			if (env->ExceptionCheck())
+			{
+				env->ExceptionDescribe();
+				env->ExceptionClear();
+				throw std::runtime_error{ "Java exception occurred." };
+			}
+			return ret;
 		}
 	};
 
@@ -308,7 +326,14 @@ namespace jni
 		template<class ... Args>
 		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
 		{
-			return env->CallShortMethod(obj, methodID, std::forward<Args>(args)...);
+			auto ret = env->CallShortMethod(obj, methodID, std::forward<Args>(args)...);
+			if (env->ExceptionCheck())
+			{
+				env->ExceptionDescribe();
+				env->ExceptionClear();
+				throw std::runtime_error{ "Java exception occurred." };
+			}
+			return ret;
 		}
 	};
 
@@ -332,7 +357,14 @@ namespace jni
 		template<class ... Args>
 		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
 		{
-			return env->CallShortMethod(obj, methodID, std::forward<Args>(args)...);
+			auto ret = env->CallShortMethod(obj, methodID, std::forward<Args>(args)...);
+			if (env->ExceptionCheck())
+			{
+				env->ExceptionDescribe();
+				env->ExceptionClear();
+				throw std::runtime_error{ "Java exception occurred." };
+			}
+			return ret;
 		}
 	};
 
@@ -356,7 +388,14 @@ namespace jni
 		template<class ... Args>
 		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
 		{
-			return env->CallIntMethod(obj, methodID, std::forward<Args>(args)...);
+			auto ret = env->CallIntMethod(obj, methodID, std::forward<Args>(args)...);
+			if (env->ExceptionCheck())
+			{
+				env->ExceptionDescribe();
+				env->ExceptionClear();
+				throw std::runtime_error{ "Java exception occurred." };
+			}
+			return ret;
 		}
 	};
 
@@ -380,7 +419,14 @@ namespace jni
 		template<class ... Args>
 		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
 		{
-			return env->CallIntMethod(obj, methodID, std::forward<Args>(args)...);
+			auto ret = env->CallIntMethod(obj, methodID, std::forward<Args>(args)...);
+			if (env->ExceptionCheck())
+			{
+				env->ExceptionDescribe();
+				env->ExceptionClear();
+				throw std::runtime_error{ "Java exception occurred." };
+			}
+			return ret;
 		}
 	};
 
@@ -405,7 +451,14 @@ namespace jni
 		template<class ... Args>
 		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
 		{
-			return env->CallIntMethod(obj, methodID, std::forward<Args>(args)...);
+			auto ret = env->CallIntMethod(obj, methodID, std::forward<Args>(args)...);
+			if (env->ExceptionCheck())
+			{
+				env->ExceptionDescribe();
+				env->ExceptionClear();
+				throw std::runtime_error{ "Java exception occurred." };
+			}
+			return ret;
 		}
 	};
 
@@ -429,7 +482,14 @@ namespace jni
 		template<class ... Args>
 		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
 		{
-			return env->CallIntMethod(obj, methodID, std::forward<Args>(args)...);
+			auto ret = env->CallIntMethod(obj, methodID, std::forward<Args>(args)...);
+			if (env->ExceptionCheck())
+			{
+				env->ExceptionDescribe();
+				env->ExceptionClear();
+				throw std::runtime_error{ "Java exception occurred." };
+			}
+			return ret;
 		}
 	};
 
@@ -454,7 +514,14 @@ namespace jni
 		template<class ... Args>
 		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
 		{
-			return env->CallIntMethod(obj, methodID, std::forward<Args>(args)...);
+			auto ret = env->CallIntMethod(obj, methodID, std::forward<Args>(args)...);
+			if (env->ExceptionCheck())
+			{
+				env->ExceptionDescribe();
+				env->ExceptionClear();
+				throw std::runtime_error{ "Java exception occurred." };
+			}
+			return ret;
 		}
 	};
 
@@ -478,7 +545,14 @@ namespace jni
 		template<class ... Args>
 		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
 		{
-			return env->CallIntMethod(obj, methodID, std::forward<Args>(args)...);
+			auto ret = env->CallIntMethod(obj, methodID, std::forward<Args>(args)...);
+			if (env->ExceptionCheck())
+			{
+				env->ExceptionDescribe();
+				env->ExceptionClear();
+				throw std::runtime_error{ "Java exception occurred." };
+			}
+			return ret;
 		}
 	};
 #endif
@@ -503,7 +577,14 @@ namespace jni
 		template<class ... Args>
 		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
 		{
-			return env->CallLongMethod(obj, methodID, std::forward<Args>(args)...);
+			auto ret = env->CallLongMethod(obj, methodID, std::forward<Args>(args)...);
+			if (env->ExceptionCheck())
+			{
+				env->ExceptionDescribe();
+				env->ExceptionClear();
+				throw std::runtime_error{ "Java exception occurred." };
+			}
+			return ret;
 		}
 	};
 
@@ -527,7 +608,14 @@ namespace jni
 		template<class ... Args>
 		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
 		{
-			return env->CallLongMethod(obj, methodID, std::forward<Args>(args)...);
+			auto ret = env->CallLongMethod(obj, methodID, std::forward<Args>(args)...);
+			if (env->ExceptionCheck())
+			{
+				env->ExceptionDescribe();
+				env->ExceptionClear();
+				throw std::runtime_error{ "Java exception occurred." };
+			}
+			return ret;
 		}
 	};
 #ifdef __APPLE__
@@ -551,7 +639,14 @@ namespace jni
 		template<class ... Args>
 		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
 		{
-			return env->CallLongMethod(obj, methodID, std::forward<Args>(args)...);
+			auto ret = env->CallLongMethod(obj, methodID, std::forward<Args>(args)...);
+			if (env->ExceptionCheck())
+			{
+				env->ExceptionDescribe();
+				env->ExceptionClear();
+				throw std::runtime_error{ "Java exception occurred." };
+			}
+			return ret;
 		}
 	};
 
@@ -575,7 +670,14 @@ namespace jni
 		template<class ... Args>
 		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
 		{
-			return env->CallLongMethod(obj, methodID, std::forward<Args>(args)...);
+			auto ret = env->CallLongMethod(obj, methodID, std::forward<Args>(args)...);
+			if (env->ExceptionCheck())
+			{
+				env->ExceptionDescribe();
+				env->ExceptionClear();
+				throw std::runtime_error{ "Java exception occurred." };
+			}
+			return ret;
 		}
 	};
 #endif
@@ -601,7 +703,14 @@ namespace jni
 		template<class ... Args>
 		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
 		{
-			return !!env->CallBooleanMethod(obj, methodID, std::forward<Args>(args)...);
+			auto ret = env->CallBooleanMethod(obj, methodID, std::forward<Args>(args)...);
+			if (env->ExceptionCheck())
+			{
+				env->ExceptionDescribe();
+				env->ExceptionClear();
+				throw std::runtime_error{ "Java exception occurred." };
+			}
+			return !!ret;
 		}
 	};
 
@@ -625,7 +734,14 @@ namespace jni
 		template<class ... Args>
 		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
 		{
-			return env->CallCharMethod(obj, methodID, std::forward<Args>(args)...);
+			auto ret = env->CallCharMethod(obj, methodID, std::forward<Args>(args)...);
+			if (env->ExceptionCheck())
+			{
+				env->ExceptionDescribe();
+				env->ExceptionClear();
+				throw std::runtime_error{ "Java exception occurred." };
+			}
+			return ret;
 		}
 	};
 
@@ -649,7 +765,14 @@ namespace jni
 		template<class ... Args>
 		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
 		{
-			return env->CallFloatMethod(obj, methodID, std::forward<Args>(args)...);
+			auto ret = env->CallFloatMethod(obj, methodID, std::forward<Args>(args)...);
+			if (env->ExceptionCheck())
+			{
+				env->ExceptionDescribe();
+				env->ExceptionClear();
+				throw std::runtime_error{ "Java exception occurred." };
+			}
+			return ret;
 		}
 	};
 
@@ -673,7 +796,14 @@ namespace jni
 		template<class ... Args>
 		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
 		{
-			return env->CallDoubleMethod(obj, methodID, std::forward<Args>(args)...);
+			auto ret = env->CallDoubleMethod(obj, methodID, std::forward<Args>(args)...);
+			if (env->ExceptionCheck())
+			{
+				env->ExceptionDescribe();
+				env->ExceptionClear();
+				throw std::runtime_error{ "Java exception occurred." };
+			}
+			return ret;
 		}
 	};
 
@@ -708,7 +838,14 @@ namespace jni
 		template<class ... Args>
 		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
 		{
-			return fromJava(env, (JniType)env->CallObjectMethod(obj, methodID, std::forward<Args>(args)...));
+			auto ret = (JniType)env->CallObjectMethod(obj, methodID, std::forward<Args>(args)...);
+			if (env->ExceptionCheck())
+			{
+				env->ExceptionDescribe();
+				env->ExceptionClear();
+				throw std::runtime_error{ "Java exception occurred." };
+			}
+			return fromJava(env, ret);
 		}
 	};
 
@@ -743,7 +880,14 @@ namespace jni
 		template<class ... Args>
 		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
 		{
-			return fromJava(env, (JniType)env->CallObjectMethod(obj, methodID, std::forward<Args>(args)...));
+			auto ret = (JniType)env->CallObjectMethod(obj, methodID, std::forward<Args>(args)...);
+			if (env->ExceptionCheck())
+			{
+				env->ExceptionDescribe();
+				env->ExceptionClear();
+				throw std::runtime_error{ "Java exception occurred." };
+			}
+			return fromJava(env, ret);
 		}
 	};
 
@@ -778,7 +922,14 @@ namespace jni
 		template<class ... Args>
 		CppType& callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
 		{
-			return fromJava(env, (JniType)env->CallObjectMethod(obj, methodID, std::forward<Args>(args)...));
+			auto ret = (JniType)env->CallObjectMethod(obj, methodID, std::forward<Args>(args)...);
+			if (env->ExceptionCheck())
+			{
+				env->ExceptionDescribe();
+				env->ExceptionClear();
+				throw std::runtime_error{ "Java exception occurred." };
+			}
+			return fromJava(env, ret);
 		}
 	};
 
@@ -811,7 +962,14 @@ namespace jni
 		template<class ... Args>
 		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
 		{
-			return fromJava(env, (JniType)env->CallObjectMethod(obj, methodID, std::forward<Args>(args)...));
+			auto ret = (JniType)env->CallObjectMethod(obj, methodID, std::forward<Args>(args)...);
+			if (env->ExceptionCheck())
+			{
+				env->ExceptionDescribe();
+				env->ExceptionClear();
+				throw std::runtime_error{ "Java exception occurred." };
+			}
+			return fromJava(env, ret);
 		}
 	};
 
@@ -834,7 +992,14 @@ namespace jni
 		template<class ... Args>
 		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
 		{
-			return fromJava(env, (JniType)env->CallObjectMethod(obj, methodID, std::forward<Args>(args)...));
+			auto ret = (JniType)env->CallObjectMethod(obj, methodID, std::forward<Args>(args)...);
+			if (env->ExceptionCheck())
+			{
+				env->ExceptionDescribe();
+				env->ExceptionClear();
+				throw std::runtime_error{ "Java exception occurred." };
+			}
+			return fromJava(env, ret);
 		}
 	};
 
@@ -847,7 +1012,7 @@ namespace jni
 
 		CppType fromJava(JNIEnv* env, JniType v)
 		{
-			return CppType{ env, v };
+			return CppType{ v };
 		}
 
 		JniType toJava(JNIEnv* env, CppType&& v)
@@ -858,7 +1023,14 @@ namespace jni
 		template<class ... Args>
 		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
 		{
-			return fromJava(env, (JniType)env->CallObjectMethod(obj, methodID, std::forward<Args>(args)...));
+			auto ret = (JniType)env->CallObjectMethod(obj, methodID, std::forward<Args>(args)...);
+			if (env->ExceptionCheck())
+			{
+				env->ExceptionDescribe();
+				env->ExceptionClear();
+				throw std::runtime_error{ "Java exception occurred." };
+			}
+			return fromJava(env, ret);
 		}
 	};
 
@@ -900,7 +1072,14 @@ namespace jni
 		template<class ... Args>
 		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
 		{
-			return fromJava(env, (JniType)env->CallObjectMethod(obj, methodID, std::forward<Args>(args)...));
+			auto ret = (JniType)env->CallObjectMethod(obj, methodID, std::forward<Args>(args)...);
+			if (env->ExceptionCheck())
+			{
+				env->ExceptionDescribe();
+				env->ExceptionClear();
+				throw std::runtime_error{ "Java exception occurred." };
+			}
+			return fromJava(env, ret);
 		}
 	};
 
@@ -940,7 +1119,14 @@ namespace jni
 		template<class ... Args>
 		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
 		{
-			return fromJava(env, (JniType)env->CallObjectMethod(obj, methodID, std::forward<Args>(args)...));
+			auto ret = (JniType)env->CallObjectMethod(obj, methodID, std::forward<Args>(args)...);
+			if (env->ExceptionCheck())
+			{
+				env->ExceptionDescribe();
+				env->ExceptionClear();
+				throw std::runtime_error{ "Java exception occurred." };
+			}
+			return fromJava(env, ret);
 		}
 	};
 
@@ -1026,7 +1212,14 @@ namespace jni
 		template<class ... Args>
 		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
 		{
-			return fromJava(env, (JniType)env->CallObjectMethod(obj, methodID, std::forward<Args>(args)...));
+			auto ret = (JniType)env->CallObjectMethod(obj, methodID, std::forward<Args>(args)...);
+			if (env->ExceptionCheck())
+			{
+				env->ExceptionDescribe();
+				env->ExceptionClear();
+				throw std::runtime_error{ "Java exception occurred." };
+			}
+			return fromJava(env, ret);
 		}
 	};
 
@@ -1061,7 +1254,14 @@ namespace jni
 		template<class ... Args>
 		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
 		{
-			return fromJava(env, (JniType)env->CallObjectMethod(obj, methodID, std::forward<Args>(args)...));
+			auto ret = (JniType)env->CallObjectMethod(obj, methodID, std::forward<Args>(args)...);
+			if (env->ExceptionCheck())
+			{
+				env->ExceptionDescribe();
+				env->ExceptionClear();
+				throw std::runtime_error{ "Java exception occurred." };
+			}
+			return fromJava(env, ret);
 		}
 	};
 
@@ -1114,7 +1314,14 @@ namespace jni
 		template<class ... Args>
 		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
 		{
-			return fromJava(env, (JniType)env->CallObjectMethod(obj, methodID, std::forward<Args>(args)...));
+			auto ret = (JniType)env->CallObjectMethod(obj, methodID, std::forward<Args>(args)...);
+			if (env->ExceptionCheck())
+			{
+				env->ExceptionDescribe();
+				env->ExceptionClear();
+				throw std::runtime_error{ "Java exception occurred." };
+			}
+			return fromJava(env, ret);
 		}
 	};
 
@@ -1129,44 +1336,57 @@ namespace jni
 		{
 			if (!v)
 			{
-				return CppType{ env, v };
+				return CppType{ v };
 			}
 			// The following line crashes clang compiler. I don't know why, but it's not necessary. So I commented it out.
 			if (!env->IsInstanceOf(v, JIteratorBase::jClass)) throw std::runtime_error{ ""/*StringConcat_v<svNotInstanceOf, typeStr, svNullTerm>.data()*/};
-			return CppType{ env, v };
+			return CppType{ v };
 		}
 
 		template<class ... Args>
 		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
 		{
-			return fromJava(env, (JniType)env->CallObjectMethod(obj, methodID, std::forward<Args>(args)...));
+			auto ret = (JniType)env->CallObjectMethod(obj, methodID, std::forward<Args>(args)...);
+			if (env->ExceptionCheck())
+			{
+				env->ExceptionDescribe();
+				env->ExceptionClear();
+				throw std::runtime_error{ "Java exception occurred." };
+			}
+			return fromJava(env, ret);
 		}
 	};
 
 	template<class Ty>
 	bool JIterator<Ty>::hasNext()
 	{
-		return ValueBuilder<bool>{}.callMethod(env, inst, jHasNext);
+		return ValueBuilder<bool>{}.callMethod(threadLocalEnv, inst, jHasNext);
 	}
 
 	template<class Ty>
 	Ty JIterator<Ty>::next()
 	{
 		// Iterator::next() always returns Object, so we need to use CallObjectMethod
-		auto ret = env->CallObjectMethod(inst, jNext);
-		return ValueBuilder<Ty>{}.fromJava(env, ret);
+		auto ret = threadLocalEnv->CallObjectMethod(inst, jNext);
+		if (threadLocalEnv->ExceptionCheck())
+		{
+			threadLocalEnv->ExceptionDescribe();
+			threadLocalEnv->ExceptionClear();
+			throw std::runtime_error{ "Java exception occurred." };
+		}
+		return ValueBuilder<Ty>{}.fromJava(threadLocalEnv, ret);
 	}
 
 	template<class Ty>
 	Ty& JRef<Ty>::get()
 	{
-		return ValueBuilder<Ty>{}.fromJava(env, inst);
+		return ValueBuilder<Ty>{}.fromJava(threadLocalEnv, inst);
 	}
 
 	template<class Ty>
 	const Ty& JRef<Ty>::get() const
 	{
-		return ValueBuilder<Ty>{}.fromJava(env, inst);
+		return ValueBuilder<Ty>{}.fromJava(threadLocalEnv, inst);
 	}
 
 	template<class Ty>
@@ -1249,6 +1469,7 @@ namespace jni
 				{
 					return handleExc(env, [&]() -> ToJniType<R>
 					{
+						threadLocalEnv = env;
 						if constexpr (std::is_same_v<R, void>)
 						{
 							(*func)(ValueBuilder<remove_cvref_t<Ts>>{}.fromJava(env, args)...);
@@ -1291,6 +1512,7 @@ namespace jni
 				{
 					return handleExc(env, [&]() -> ToJniType<R>
 					{
+						threadLocalEnv = env;
 						auto ptr = (ClassType*)env->GetLongField(obj, JObject<ClassType>::jInstField);
 						if (!ptr) throw std::runtime_error{ "Object is already closed or not initialized." };
 						
@@ -1336,6 +1558,7 @@ namespace jni
 				{
 					return handleExc(env, [&]() -> ToJniType<R>
 					{
+						threadLocalEnv = env;
 						auto ptr = (ClassType*)env->GetLongField(obj, JObject<ClassType>::jInstField);
 						if (!ptr) throw std::runtime_error{ "Object is already closed or not initialized." };
 
@@ -1378,6 +1601,7 @@ namespace jni
 				{
 					return handleExc(env, [&]() -> ToJniType<R>
 					{
+						threadLocalEnv = env;
 						if constexpr (std::is_same_v<R, void>)
 						{
 							(*func)(obj, ValueBuilder<remove_cvref_t<Ts>>{}.fromJava(env, args)...);
@@ -1420,16 +1644,17 @@ namespace jni
 				{
 					return handleExc(env, [&]() -> ToJniType<R>
 					{
+						threadLocalEnv = env;
 						auto ptr = (ClassType*)env->GetLongField(obj, JObject<ClassType>::jInstField);
 						if (!ptr) throw std::runtime_error{ "Object is already closed or not initialized." };
 
 						if constexpr (std::is_same_v<R, void>)
 						{
-							(ptr->*func)(JRef<C>{env, obj}, ValueBuilder<remove_cvref_t<Ts>>{}.fromJava(env, args)...);
+							(ptr->*func)(JRef<C>{obj}, ValueBuilder<remove_cvref_t<Ts>>{}.fromJava(env, args)...);
 						}
 						else
 						{
-							auto ret = (ptr->*func)(JRef<C>{env, obj}, ValueBuilder<remove_cvref_t<Ts>>{}.fromJava(env, args)...);
+							auto ret = (ptr->*func)(JRef<C>{obj}, ValueBuilder<remove_cvref_t<Ts>>{}.fromJava(env, args)...);
 							return ValueBuilder<R>{}.toJava(env, std::move(ret));
 						}
 					});
@@ -1465,16 +1690,17 @@ namespace jni
 				{
 					return handleExc(env, [&]() -> ToJniType<R>
 					{
+						threadLocalEnv = env;
 						auto ptr = (ClassType*)env->GetLongField(obj, JObject<ClassType>::jInstField);
 						if (!ptr) throw std::runtime_error{ "Object is already closed or not initialized." };
 
 						if constexpr (std::is_same_v<R, void>)
 						{
-							(ptr->*func)(JRef<C>{env, obj}, ValueBuilder<remove_cvref_t<Ts>>{}.fromJava(env, args)...);
+							(ptr->*func)(JRef<C>{obj}, ValueBuilder<remove_cvref_t<Ts>>{}.fromJava(env, args)...);
 						}
 						else
 						{
-							auto ret = (ptr->*func)(JRef<C>{env, obj}, ValueBuilder<remove_cvref_t<Ts>>{}.fromJava(env, args)...);
+							auto ret = (ptr->*func)(JRef<C>{obj}, ValueBuilder<remove_cvref_t<Ts>>{}.fromJava(env, args)...);
 							return ValueBuilder<R>{}.toJava(env, std::move(ret));
 						}
 					});
@@ -1552,6 +1778,7 @@ namespace jni
 		{
 			return handleExc(env, [&]()
 			{
+				threadLocalEnv = env;
 				auto ptr = new Ty(ValueBuilder<Args>{}.fromJava(env, args)...);
 				env->SetLongField(obj, JObject<Ty>::jInstField, (jlong)ptr);
 				return;
@@ -1574,6 +1801,7 @@ namespace jni
 				auto ptr = (Ty*)env->GetLongField(obj, JObject<Ty>::jInstField);
 				if (ptr)
 				{
+					threadLocalEnv = env;
 					delete ptr;
 					env->SetLongField(obj, JObject<Ty>::jInstField, 0);
 				}
