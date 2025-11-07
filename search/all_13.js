@@ -1,10 +1,22 @@
 var searchData=
 [
-  ['vector_0',['Vector',['../Types_8h.html#a48d29484f2a48f6a4de60bbfd7746232',1,'kiwi']]],
-  ['vocalic_1',['vocalic',['../Types_8h.html#a11856481b15f24bf19cb647734ea1085ae0f179bce9cffadffe0d89748fc964b5',1,'kiwi']]],
-  ['vocalic_5fh_2',['vocalic_h',['../Types_8h.html#a11856481b15f24bf19cb647734ea1085af54eb722f1fe5293d0f94d938e011e1f',1,'kiwi']]],
-  ['voidlangmodel_3',['VoidLangModel',['../classkiwi_1_1lm_1_1VoidLangModel.html',1,'kiwi::lm']]],
-  ['voidstate_4',['VoidState',['../structkiwi_1_1lm_1_1VoidState.html',1,'kiwi::lm']]],
-  ['vowel_5',['vowel',['../structkiwi_1_1MorphemeRaw.html#ace3917dd7cfdf3035a2aa108a0296005',1,'kiwi::MorphemeRaw::vowel()'],['../Types_8h.html#a11856481b15f24bf19cb647734ea1085afb4ee69c5a35ca74a417d6a047332d6b',1,'vowelkiwi']]],
-  ['vppack_6',['vpPack',['../structkiwi_1_1MorphemeRaw.html#adf7d523968d409122cc3c0e3578d831a',1,'kiwi::MorphemeRaw']]]
+  ['table_0',['Table',['../classkiwi_1_1tp_1_1Table.html',1,'kiwi::tp']]],
+  ['tag_1',['tag',['../structkiwi_1_1TokenInfo.html#a45967e9870d0b947d30e7ad8fece4898',1,'kiwi::TokenInfo::tag'],['../structkiwi_1_1MorphemeRaw.html#a5234f7084311dc2f6e1951bb141be9f7',1,'kiwi::MorphemeRaw::tag'],['../structkiwi__token__info__t.html#a2f8255848916bffeba1eaabdc3dae17e',1,'kiwi_token_info_t::tag']]],
+  ['tagsequencescorer_2',['TagSequenceScorer',['../classkiwi_1_1TagSequenceScorer.html',1,'kiwi']]],
+  ['threadpool_3',['ThreadPool',['../classkiwi_1_1utils_1_1ThreadPool.html',1,'kiwi::utils']]],
+  ['tokeninfo_4',['TokenInfo',['../structkiwi_1_1TokenInfo.html',1,'kiwi']]],
+  ['tokenresult_5',['TokenResult',['../Types_8h.html#aa3333c7237f7db8aa0121560dbaa3ecb',1,'kiwi']]],
+  ['trieiterator_6',['TrieIterator',['../classkiwi_1_1utils_1_1TrieIterator.html',1,'kiwi::utils']]],
+  ['trienode_7',['TrieNode',['../structkiwi_1_1utils_1_1TrieNode.html',1,'kiwi::utils']]],
+  ['trienodeex_8',['TrieNodeEx',['../structkiwi_1_1utils_1_1TrieNodeEx.html',1,'kiwi::utils']]],
+  ['types_2eh_9',['Types.h',['../Types_8h.html',1,'']]],
+  ['typo_5fcost_10',['typo_cost',['../structkiwi__token__info__t.html#ae4a0a293df8c1fabb3cc131a21590e73',1,'kiwi_token_info_t']]],
+  ['typo_5fform_5fid_11',['typo_form_id',['../structkiwi__token__info__t.html#abd087ff84894fd3e786670f0a4caf3b0',1,'kiwi_token_info_t']]],
+  ['typocandidates_12',['TypoCandidates',['../classkiwi_1_1TypoCandidates.html',1,'kiwi']]],
+  ['typocost_13',['typoCost',['../structkiwi_1_1TokenInfo.html#a665bcabafa2c41815d0a5ad51a27e833',1,'kiwi::TokenInfo']]],
+  ['typoform_14',['TypoForm',['../structkiwi_1_1TypoForm.html',1,'kiwi']]],
+  ['typoformid_15',['typoFormId',['../structkiwi_1_1TokenInfo.html#aa77262e269fb9873c00c6fc9ad410fbb',1,'kiwi::TokenInfo']]],
+  ['typoiterator_16',['TypoIterator',['../classkiwi_1_1TypoIterator.html',1,'kiwi']]],
+  ['typotransformer_17',['TypoTransformer',['../classkiwi_1_1TypoTransformer.html',1,'kiwi']]],
+  ['typotransformer_2eh_18',['TypoTransformer.h',['../TypoTransformer_8h.html',1,'']]]
 ];

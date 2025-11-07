@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['vocalic_0',['vocalic',['../Types_8h.html#a11856481b15f24bf19cb647734ea1085ae0f179bce9cffadffe0d89748fc964b5',1,'kiwi']]],
-  ['vocalic_5fh_1',['vocalic_h',['../Types_8h.html#a11856481b15f24bf19cb647734ea1085af54eb722f1fe5293d0f94d938e011e1f',1,'kiwi']]],
-  ['vowel_2',['vowel',['../Types_8h.html#a11856481b15f24bf19cb647734ea1085afb4ee69c5a35ca74a417d6a047332d6b',1,'kiwi']]]
+  ['p_0',['p',['../Types_8h.html#ac15313ea8fffc5cc54475e10264ddebba83878c91171338902e0fe0fb97a8c47a',1,'kiwi']]],
+  ['positive_1',['positive',['../Types_8h.html#a7903fe33da04a788b0bb009094596894a82082716189f80fd070b89ac716570ba',1,'kiwi']]],
+  ['pyeongan_2',['pyeongan',['../Types_8h.html#aa9fc09d985bc896c97e2e0f5cd41c96fa70ae9293d75de22420b33b203fd70671',1,'kiwi']]]
 ];

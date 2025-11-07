@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['groupid_0',['groupId',['../structkiwi_1_1MorphemeRaw.html#a79a39a11768abac9b1dcf72ebb06b5d2',1,'kiwi::MorphemeRaw']]]
+  ['blocklist_0',['blocklist',['../structkiwi__analyze__option__t.html#a7545bb4c1ba5b61b5c49605f09e85acc',1,'kiwi_analyze_option_t']]]
 ];

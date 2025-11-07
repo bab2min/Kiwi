@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['form_0',['form',['../structkiwi_1_1FormRaw.html#aa541ea8bad70b8fb69223d34f9ae3e24',1,'kiwi::FormRaw']]]
+  ['allowed_5fdialects_0',['allowed_dialects',['../structkiwi__analyze__option__t.html#a4389c96c9daa55675092ec7daed1ba84',1,'kiwi_analyze_option_t']]]
 ];

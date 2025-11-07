@@ -101,6 +101,8 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi__stream__object__t.html">kiwi_stream_object_t</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">범용 입력 스트림을 나타내는 구조체  <a href="structkiwi__stream__object__t.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi__analyze__option__t.html">kiwi_analyze_option_t</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
@@ -237,6 +239,24 @@ Enumerations</h2></td></tr>
  }</td></tr>
 <tr class="separator:abc6126af1d45847bc59afa0aa3216b04"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adc29c2ff13d900c2f185ee95427fb06c" id="r_adc29c2ff13d900c2f185ee95427fb06c"><td class="memItemLeft" align="right" valign="top"><a id="adc29c2ff13d900c2f185ee95427fb06c" name="adc29c2ff13d900c2f185ee95427fb06c"></a>enum &#160;</td><td class="memItemRight" valign="bottom">{ <br />
+&#160;&#160;<b>KIWI_DIALECT_STANDARD</b> = 0
+, <b>KIWI_DIALECT_GYEONGGI</b> = 1 &lt;&lt; 0
+, <b>KIWI_DIALECT_CHUNGCHEONG</b> = 1 &lt;&lt; 1
+, <b>KIWI_DIALECT_GANGWON</b> = 1 &lt;&lt; 2
+, <br />
+&#160;&#160;<b>KIWI_DIALECT_GYEONGSANG</b> = 1 &lt;&lt; 3
+, <b>KIWI_DIALECT_JEOLLA</b> = 1 &lt;&lt; 4
+, <b>KIWI_DIALECT_JEJU</b> = 1 &lt;&lt; 5
+, <b>KIWI_DIALECT_HWANGHAE</b> = 1 &lt;&lt; 6
+, <br />
+&#160;&#160;<b>KIWI_DIALECT_HAMGYEONG</b> = 1 &lt;&lt; 7
+, <b>KIWI_DIALECT_PYEONGAN</b> = 1 &lt;&lt; 8
+, <b>KIWI_DIALECT_ARCHAIC</b> = 1 &lt;&lt; 9
+, <b>KIWI_DIALECT_ALL</b> = KIWI_DIALECT_ARCHAIC * 2 - 1
+<br />
+ }</td></tr>
+<tr class="separator:adc29c2ff13d900c2f185ee95427fb06c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a61dadd085c1777f559549e05962b2c9e" id="r_a61dadd085c1777f559549e05962b2c9e"><td class="memItemLeft" align="right" valign="top"><a id="a61dadd085c1777f559549e05962b2c9e" name="a61dadd085c1777f559549e05962b2c9e"></a>enum &#160;</td><td class="memItemRight" valign="bottom">{ <br />
 &#160;&#160;<b>KIWI_TYPO_WITHOUT_TYPO</b> = 0
 , <b>KIWI_TYPO_BASIC_TYPO_SET</b> = 1
 , <b>KIWI_TYPO_CONTINUAL_TYPO_SET</b> = 2
@@ -246,7 +266,7 @@ Enumerations</h2></td></tr>
 , <b>KIWI_TYPO_BASIC_TYPO_SET_WITH_CONTINUAL_AND_LENGTHENING</b> = 5
 <br />
  }</td></tr>
-<tr class="separator:adc29c2ff13d900c2f185ee95427fb06c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:a61dadd085c1777f559549e05962b2c9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
@@ -259,12 +279,12 @@ Functions</h2></td></tr>
 <tr class="memitem:aa3f32e4c147a58e5952676f03712e39c" id="r_aa3f32e4c147a58e5952676f03712e39c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#aa3f32e4c147a58e5952676f03712e39c">kiwi_clear_error</a> ()</td></tr>
 <tr class="memdesc:aa3f32e4c147a58e5952676f03712e39c"><td class="mdescLeft">&#160;</td><td class="mdescRight">현재 스레드의 에러 메세지를 초기화합니다.  <br /></td></tr>
 <tr class="separator:aa3f32e4c147a58e5952676f03712e39c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afab914642519cf01fb15017989045cbf" id="r_afab914642519cf01fb15017989045cbf"><td class="memItemLeft" align="right" valign="top">kiwi_builder_h&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#afab914642519cf01fb15017989045cbf">kiwi_builder_init</a> (const char *model_path, int num_threads, int options)</td></tr>
-<tr class="memdesc:afab914642519cf01fb15017989045cbf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Kiwi Builder를 생성합니다.  <br /></td></tr>
-<tr class="separator:afab914642519cf01fb15017989045cbf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2a951e93eef8d95d9e3115f280d40980" id="r_a2a951e93eef8d95d9e3115f280d40980"><td class="memItemLeft" align="right" valign="top">kiwi_builder_h&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a2a951e93eef8d95d9e3115f280d40980">kiwi_builder_init_stream</a> (<a class="el" href="structkiwi__stream__object__t.html">kiwi_stream_object_t</a>(*stream_object_factory)(const char *filename), int num_threads, int options)</td></tr>
-<tr class="memdesc:a2a951e93eef8d95d9e3115f280d40980"><td class="mdescLeft">&#160;</td><td class="mdescRight">스트림 객체를 사용하여 Kiwi Builder를 생성합니다.  <br /></td></tr>
-<tr class="separator:a2a951e93eef8d95d9e3115f280d40980"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab8191e326adc1b196d035943a1d83ee5" id="r_ab8191e326adc1b196d035943a1d83ee5"><td class="memItemLeft" align="right" valign="top">kiwi_builder_h&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#ab8191e326adc1b196d035943a1d83ee5">kiwi_builder_init</a> (const char *model_path, int num_threads, int options, int enabled_dialects)</td></tr>
+<tr class="memdesc:ab8191e326adc1b196d035943a1d83ee5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Kiwi Builder를 생성합니다.  <br /></td></tr>
+<tr class="separator:ab8191e326adc1b196d035943a1d83ee5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0af28ceb3ba377ee99df91aa5fcb38ab" id="r_a0af28ceb3ba377ee99df91aa5fcb38ab"><td class="memItemLeft" align="right" valign="top">kiwi_builder_h&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a0af28ceb3ba377ee99df91aa5fcb38ab">kiwi_builder_init_stream</a> (<a class="el" href="structkiwi__stream__object__t.html">kiwi_stream_object_t</a>(*stream_object_factory)(const char *filename), int num_threads, int options, int enabled_dialects)</td></tr>
+<tr class="memdesc:a0af28ceb3ba377ee99df91aa5fcb38ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">스트림 객체를 사용하여 Kiwi Builder를 생성합니다.  <br /></td></tr>
+<tr class="separator:a0af28ceb3ba377ee99df91aa5fcb38ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8ee24152f80c94f558f3ca9f5760d54d" id="r_a8ee24152f80c94f558f3ca9f5760d54d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a8ee24152f80c94f558f3ca9f5760d54d">kiwi_builder_close</a> (kiwi_builder_h handle)</td></tr>
 <tr class="memdesc:a8ee24152f80c94f558f3ca9f5760d54d"><td class="mdescLeft">&#160;</td><td class="mdescRight">사용이 끝난 KiwiBuilder를 해제합니다.  <br /></td></tr>
 <tr class="separator:a8ee24152f80c94f558f3ca9f5760d54d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -342,16 +362,16 @@ Functions</h2></td></tr>
 <tr class="memitem:a83723c23552d362ce7870842e24fc60d" id="r_a83723c23552d362ce7870842e24fc60d"><td class="memItemLeft" align="right" valign="top">kiwi_morphset_h&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a83723c23552d362ce7870842e24fc60d">kiwi_new_morphset</a> (kiwi_h handle)</td></tr>
 <tr class="memdesc:a83723c23552d362ce7870842e24fc60d"><td class="mdescLeft">&#160;</td><td class="mdescRight">새 형태소집합을 생성합니다. 형태소집합은 kiwi_analyze 함수의 blocklist 등으로 사용될 수 있습니다.  <br /></td></tr>
 <tr class="separator:a83723c23552d362ce7870842e24fc60d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abadc88617cb96793c7a61778443ee5ed" id="r_abadc88617cb96793c7a61778443ee5ed"><td class="memItemLeft" align="right" valign="top">kiwi_res_h&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#abadc88617cb96793c7a61778443ee5ed">kiwi_analyze_w</a> (kiwi_h handle, const kchar16_t *text, int top_n, int match_options, kiwi_morphset_h blocklist, kiwi_pretokenized_h pretokenized)</td></tr>
-<tr class="memdesc:abadc88617cb96793c7a61778443ee5ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">텍스트를 분석해 형태소 결과를 반환합니다.  <br /></td></tr>
-<tr class="separator:abadc88617cb96793c7a61778443ee5ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8aa4a9b64c467c3bd335f284167a69bf" id="r_a8aa4a9b64c467c3bd335f284167a69bf"><td class="memItemLeft" align="right" valign="top">kiwi_res_h&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a8aa4a9b64c467c3bd335f284167a69bf">kiwi_analyze</a> (kiwi_h handle, const char *text, int top_n, int match_options, kiwi_morphset_h blocklist, kiwi_pretokenized_h pretokenized)</td></tr>
-<tr class="memdesc:a8aa4a9b64c467c3bd335f284167a69bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">텍스트를 분석해 형태소 결과를 반환합니다.  <br /></td></tr>
-<tr class="separator:a8aa4a9b64c467c3bd335f284167a69bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adb8947c6dae2f7574bf585ae657f1f1b" id="r_adb8947c6dae2f7574bf585ae657f1f1b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#adb8947c6dae2f7574bf585ae657f1f1b">kiwi_analyze_mw</a> (kiwi_h handle, kiwi_reader_w_t reader, kiwi_receiver_t receiver, void *user_data, int top_n, int match_options, kiwi_morphset_h blocklist)</td></tr>
-<tr class="separator:adb8947c6dae2f7574bf585ae657f1f1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9380188bd199dfbda8471c76104a8d87" id="r_a9380188bd199dfbda8471c76104a8d87"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a9380188bd199dfbda8471c76104a8d87">kiwi_analyze_m</a> (kiwi_h handle, <a class="el" href="capi_8h.html#a1b38cdecc30ec0b3f84086a18ca06512">kiwi_reader_t</a> reader, kiwi_receiver_t receiver, void *user_data, int top_n, int match_options, kiwi_morphset_h blocklist)</td></tr>
-<tr class="separator:a9380188bd199dfbda8471c76104a8d87"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0ad3f70820cb40816cd34cae0db1015e" id="r_a0ad3f70820cb40816cd34cae0db1015e"><td class="memItemLeft" align="right" valign="top">kiwi_res_h&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a0ad3f70820cb40816cd34cae0db1015e">kiwi_analyze_w</a> (kiwi_h handle, const kchar16_t *text, int top_n, <a class="el" href="structkiwi__analyze__option__t.html">kiwi_analyze_option_t</a> option, kiwi_pretokenized_h pretokenized)</td></tr>
+<tr class="memdesc:a0ad3f70820cb40816cd34cae0db1015e"><td class="mdescLeft">&#160;</td><td class="mdescRight">텍스트를 분석해 형태소 결과를 반환합니다.  <br /></td></tr>
+<tr class="separator:a0ad3f70820cb40816cd34cae0db1015e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a373e08c509390311a3dba9f1101693ed" id="r_a373e08c509390311a3dba9f1101693ed"><td class="memItemLeft" align="right" valign="top">kiwi_res_h&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a373e08c509390311a3dba9f1101693ed">kiwi_analyze</a> (kiwi_h handle, const char *text, int top_n, <a class="el" href="structkiwi__analyze__option__t.html">kiwi_analyze_option_t</a> option, kiwi_pretokenized_h pretokenized)</td></tr>
+<tr class="memdesc:a373e08c509390311a3dba9f1101693ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">텍스트를 분석해 형태소 결과를 반환합니다.  <br /></td></tr>
+<tr class="separator:a373e08c509390311a3dba9f1101693ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a76969dbf62281fba964d761bbeb124d6" id="r_a76969dbf62281fba964d761bbeb124d6"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a76969dbf62281fba964d761bbeb124d6">kiwi_analyze_mw</a> (kiwi_h handle, kiwi_reader_w_t reader, kiwi_receiver_t receiver, void *user_data, int top_n, <a class="el" href="structkiwi__analyze__option__t.html">kiwi_analyze_option_t</a> option)</td></tr>
+<tr class="separator:a76969dbf62281fba964d761bbeb124d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7bd4bede355c2b3c000c951f774e9c26" id="r_a7bd4bede355c2b3c000c951f774e9c26"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a7bd4bede355c2b3c000c951f774e9c26">kiwi_analyze_m</a> (kiwi_h handle, <a class="el" href="capi_8h.html#a1b38cdecc30ec0b3f84086a18ca06512">kiwi_reader_t</a> reader, kiwi_receiver_t receiver, void *user_data, int top_n, <a class="el" href="structkiwi__analyze__option__t.html">kiwi_analyze_option_t</a> option)</td></tr>
+<tr class="separator:a7bd4bede355c2b3c000c951f774e9c26"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac9abe9c18c92b2a1c19d831c4e0a01f3" id="r_ac9abe9c18c92b2a1c19d831c4e0a01f3"><td class="memItemLeft" align="right" valign="top">kiwi_ss_h&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#ac9abe9c18c92b2a1c19d831c4e0a01f3">kiwi_split_into_sents_w</a> (kiwi_h handle, const kchar16_t *text, int match_options, kiwi_res_h *tokenized_res)</td></tr>
 <tr class="memdesc:ac9abe9c18c92b2a1c19d831c4e0a01f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">텍스트를 문장 단위로 분할합니다.  <br /></td></tr>
 <tr class="separator:ac9abe9c18c92b2a1c19d831c4e0a01f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -614,8 +634,8 @@ Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a8aa4a9b64c467c3bd335f284167a69bf" name="a8aa4a9b64c467c3bd335f284167a69bf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8aa4a9b64c467c3bd335f284167a69bf">&#9670;&#160;</a></span>kiwi_analyze()</h2>
+<a id="a373e08c509390311a3dba9f1101693ed" name="a373e08c509390311a3dba9f1101693ed"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a373e08c509390311a3dba9f1101693ed">&#9670;&#160;</a></span>kiwi_analyze()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -641,14 +661,8 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>match_options</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">kiwi_morphset_h&#160;</td>
-          <td class="paramname"><em>blocklist</em>, </td>
+          <td class="paramtype"><a class="el" href="structkiwi__analyze__option__t.html">kiwi_analyze_option_t</a>&#160;</td>
+          <td class="paramname"><em>option</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -670,19 +684,18 @@ Functions</h2></td></tr>
     <tr><td class="paramname">handle</td><td>Kiwi. </td></tr>
     <tr><td class="paramname">text</td><td>분석할 텍스트 (utf-8). </td></tr>
     <tr><td class="paramname">top_n</td><td>반환할 결과물. </td></tr>
-    <tr><td class="paramname">match_options</td><td>KIWI_MATCH_ALL 등 KIWI_MATCH_* 열거형 참고. </td></tr>
-    <tr><td class="paramname">blocklist</td><td>분석 후보 탐색 과정에서 blocklist에 포함된 형태소들은 배제됩니다. null 입력 시에는 blocklist를 사용하지 않습니다. </td></tr>
+    <tr><td class="paramname">option</td><td>분석 옵션. <a class="el" href="structkiwi__analyze__option__t.html">kiwi_analyze_option_t</a> 참고. </td></tr>
     <tr><td class="paramname">pretokenized</td><td>입력 텍스트 중 특정 영역의 분석 방법을 강제로 지정합니다. null 입력 시에는 pretokenization을 사용하지 않습니다. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>형태소 분석 결과의 핸들. kiwi_res_* 함수를 통해 값에 접근가능합니다. 이 핸들은 사용 후 kiwi_res_close를 사용해 반드시 해제되어야 합니다.</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="capi_8h.html#abadc88617cb96793c7a61778443ee5ed" title="텍스트를 분석해 형태소 결과를 반환합니다.">kiwi_analyze_w</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="capi_8h.html#a0ad3f70820cb40816cd34cae0db1015e" title="텍스트를 분석해 형태소 결과를 반환합니다.">kiwi_analyze_w</a> </dd></dl>
 
 </div>
 </div>
-<a id="a9380188bd199dfbda8471c76104a8d87" name="a9380188bd199dfbda8471c76104a8d87"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9380188bd199dfbda8471c76104a8d87">&#9670;&#160;</a></span>kiwi_analyze_m()</h2>
+<a id="a7bd4bede355c2b3c000c951f774e9c26" name="a7bd4bede355c2b3c000c951f774e9c26"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7bd4bede355c2b3c000c951f774e9c26">&#9670;&#160;</a></span>kiwi_analyze_m()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -720,14 +733,8 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>match_options</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">kiwi_morphset_h&#160;</td>
-          <td class="paramname"><em>blocklist</em>&#160;</td>
+          <td class="paramtype"><a class="el" href="structkiwi__analyze__option__t.html">kiwi_analyze_option_t</a>&#160;</td>
+          <td class="paramname"><em>option</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -743,7 +750,7 @@ Functions</h2></td></tr>
     <tr><td class="paramname">receiver</td><td></td></tr>
     <tr><td class="paramname">user_data</td><td></td></tr>
     <tr><td class="paramname">top_n</td><td></td></tr>
-    <tr><td class="paramname">match_options</td><td></td></tr>
+    <tr><td class="paramname">option</td><td>분석 옵션. <a class="el" href="structkiwi__analyze__option__t.html">kiwi_analyze_option_t</a> 참고. </td></tr>
   </table>
   </dd>
 </dl>
@@ -752,8 +759,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="adb8947c6dae2f7574bf585ae657f1f1b" name="adb8947c6dae2f7574bf585ae657f1f1b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adb8947c6dae2f7574bf585ae657f1f1b">&#9670;&#160;</a></span>kiwi_analyze_mw()</h2>
+<a id="a76969dbf62281fba964d761bbeb124d6" name="a76969dbf62281fba964d761bbeb124d6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a76969dbf62281fba964d761bbeb124d6">&#9670;&#160;</a></span>kiwi_analyze_mw()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -791,14 +798,8 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>match_options</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">kiwi_morphset_h&#160;</td>
-          <td class="paramname"><em>blocklist</em>&#160;</td>
+          <td class="paramtype"><a class="el" href="structkiwi__analyze__option__t.html">kiwi_analyze_option_t</a>&#160;</td>
+          <td class="paramname"><em>option</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -814,7 +815,7 @@ Functions</h2></td></tr>
     <tr><td class="paramname">receiver</td><td></td></tr>
     <tr><td class="paramname">user_data</td><td></td></tr>
     <tr><td class="paramname">top_n</td><td></td></tr>
-    <tr><td class="paramname">match_options</td><td></td></tr>
+    <tr><td class="paramname">option</td><td>분석 옵션. <a class="el" href="structkiwi__analyze__option__t.html">kiwi_analyze_option_t</a> 참고. </td></tr>
   </table>
   </dd>
 </dl>
@@ -823,8 +824,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="abadc88617cb96793c7a61778443ee5ed" name="abadc88617cb96793c7a61778443ee5ed"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abadc88617cb96793c7a61778443ee5ed">&#9670;&#160;</a></span>kiwi_analyze_w()</h2>
+<a id="a0ad3f70820cb40816cd34cae0db1015e" name="a0ad3f70820cb40816cd34cae0db1015e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0ad3f70820cb40816cd34cae0db1015e">&#9670;&#160;</a></span>kiwi_analyze_w()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -850,14 +851,8 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>match_options</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">kiwi_morphset_h&#160;</td>
-          <td class="paramname"><em>blocklist</em>, </td>
+          <td class="paramtype"><a class="el" href="structkiwi__analyze__option__t.html">kiwi_analyze_option_t</a>&#160;</td>
+          <td class="paramname"><em>option</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -879,14 +874,13 @@ Functions</h2></td></tr>
     <tr><td class="paramname">handle</td><td>Kiwi. </td></tr>
     <tr><td class="paramname">text</td><td>분석할 텍스트 (utf-16). </td></tr>
     <tr><td class="paramname">top_n</td><td>반환할 결과물. </td></tr>
-    <tr><td class="paramname">match_options</td><td>KIWI_MATCH_ALL 등 KIWI_MATCH_* 열거형 참고. </td></tr>
-    <tr><td class="paramname">blocklist</td><td>분석 후보 탐색 과정에서 blocklist에 포함된 형태소들은 배제됩니다. null 입력 시에는 blocklist를 사용하지 않습니다. </td></tr>
+    <tr><td class="paramname">option</td><td>분석 옵션. <a class="el" href="structkiwi__analyze__option__t.html">kiwi_analyze_option_t</a> 참고. </td></tr>
     <tr><td class="paramname">pretokenized</td><td>입력 텍스트 중 특정 영역의 분석 방법을 강제로 지정합니다. null 입력 시에는 pretokenization을 사용하지 않습니다. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>형태소 분석 결과의 핸들. kiwi_res_* 함수를 통해 값에 접근가능합니다. 이 핸들은 사용 후 kiwi_res_close를 사용해 반드시 해제되어야 합니다.</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="capi_8h.html#a8aa4a9b64c467c3bd335f284167a69bf" title="텍스트를 분석해 형태소 결과를 반환합니다.">kiwi_analyze</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="capi_8h.html#a373e08c509390311a3dba9f1101693ed" title="텍스트를 분석해 형태소 결과를 반환합니다.">kiwi_analyze</a> </dd></dl>
 
 </div>
 </div>
@@ -1495,8 +1489,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="afab914642519cf01fb15017989045cbf" name="afab914642519cf01fb15017989045cbf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afab914642519cf01fb15017989045cbf">&#9670;&#160;</a></span>kiwi_builder_init()</h2>
+<a id="ab8191e326adc1b196d035943a1d83ee5" name="ab8191e326adc1b196d035943a1d83ee5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab8191e326adc1b196d035943a1d83ee5">&#9670;&#160;</a></span>kiwi_builder_init()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1517,7 +1511,13 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>options</em>&#160;</td>
+          <td class="paramname"><em>options</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>enabled_dialects</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1533,6 +1533,7 @@ Functions</h2></td></tr>
     <tr><td class="paramname">model_path</td><td>모델의 경로. </td></tr>
     <tr><td class="paramname">num_threads</td><td>사용할 스레드의 개수. -1로 지정시 가용한 스레드 개수를 자동으로 판단합니다. </td></tr>
     <tr><td class="paramname">options</td><td>생성 옵션. KIWI_BUILD_* 열거형을 참조하십시오. </td></tr>
+    <tr><td class="paramname">enabled_dialects</td><td>활성화할 방언. KIWI_DIALECT_* 열거형을 참조하십시오. </td></tr>
   </table>
   </dd>
 </dl>
@@ -1541,8 +1542,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a2a951e93eef8d95d9e3115f280d40980" name="a2a951e93eef8d95d9e3115f280d40980"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2a951e93eef8d95d9e3115f280d40980">&#9670;&#160;</a></span>kiwi_builder_init_stream()</h2>
+<a id="a0af28ceb3ba377ee99df91aa5fcb38ab" name="a0af28ceb3ba377ee99df91aa5fcb38ab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0af28ceb3ba377ee99df91aa5fcb38ab">&#9670;&#160;</a></span>kiwi_builder_init_stream()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1563,7 +1564,13 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>options</em>&#160;</td>
+          <td class="paramname"><em>options</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>enabled_dialects</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1579,11 +1586,11 @@ Functions</h2></td></tr>
     <tr><td class="paramname">stream_object</td><td>파일명을 받아 해당 파일의 데이터를 제공하는 스트림 객체 생성 함수. </td></tr>
     <tr><td class="paramname">num_threads</td><td>사용할 스레드의 개수. -1로 지정시 가용한 스레드 개수를 자동으로 판단합니다. </td></tr>
     <tr><td class="paramname">options</td><td>생성 옵션. KIWI_BUILD_* 열거형을 참조하십시오. </td></tr>
+    <tr><td class="paramname">enabled_dialects</td><td>활성화할 방언. KIWI_DIALECT_* 열거형을 참조하십시오. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>성공 시 Kiwi Builder의 핸들을 반환합니다. 실패시 null를 반환하고 에러 메세지를 설정합니다. 에러 메세지는 <a class="el" href="capi_8h.html#ab7a5eb15b5dbff0adf75235ed8ed131b" title="현재 스레드에서 발생한 에러 메세지를 반환합니다. 발생한 에러가 없을 경우 null를 반환합니다.">kiwi_error()</a>를 통해 확인할 수 있습니다.</dd></dl>
-<dl class="section note"><dt>Note</dt><dd>이 방식으로 생성된 KiwiBuilder는 WordDetector가 초기화되지 않으므로 kiwi_builder_extract_words 등의 함수를 사용할 수 없습니다.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="capi_8h.html#a8ee24152f80c94f558f3ca9f5760d54d" title="사용이 끝난 KiwiBuilder를 해제합니다.">kiwi_builder_close</a>, <a class="el" href="structkiwi__stream__object__t.html" title="범용 입력 스트림을 나타내는 구조체">kiwi_stream_object_t</a> </dd></dl>
 
 </div>
@@ -2215,7 +2222,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>성공 시 새 구간의 id, 실패시 음수를 반환합니다.</dd></dl>
 <dl class="section note"><dt>Note</dt><dd>begin, end로 지정하는 시작/끝 지점의 단위는 이 객체가 kiwi_analyze에 사용되는지, kiwi_analyze_w에 사용되는지에 따라 달라집니다. kiwi_analyze에 사용되는 경우 utf-8 문자열의 바이트 단위에 따라 시작/끝 지점이 처리되고, kiwi_analyze_w에 사용되는 경우 utf-16 문자열의 글자 단위에 따라 시작/끝 지점이 처리됩니다.</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="capi_8h.html#a8aa4a9b64c467c3bd335f284167a69bf" title="텍스트를 분석해 형태소 결과를 반환합니다.">kiwi_analyze</a>, <a class="el" href="capi_8h.html#abadc88617cb96793c7a61778443ee5ed" title="텍스트를 분석해 형태소 결과를 반환합니다.">kiwi_analyze_w</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="capi_8h.html#a373e08c509390311a3dba9f1101693ed" title="텍스트를 분석해 형태소 결과를 반환합니다.">kiwi_analyze</a>, <a class="el" href="capi_8h.html#a0ad3f70820cb40816cd34cae0db1015e" title="텍스트를 분석해 형태소 결과를 반환합니다.">kiwi_analyze_w</a> </dd></dl>
 
 </div>
 </div>

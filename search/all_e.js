@@ -1,14 +1,13 @@
 var searchData=
 [
-  ['p_0',['p',['../Types_8h.html#ac15313ea8fffc5cc54475e10264ddebba83878c91171338902e0fe0fb97a8c47a',1,'kiwi']]],
-  ['paired_5ftoken_1',['paired_token',['../structkiwi__token__info__t.html#a5f9c5c35bf58d11cc9b3b9271cf5bc42',1,'kiwi_token_info_t']]],
-  ['pairedtoken_2',['pairedToken',['../structkiwi_1_1TokenInfo.html#a85cdd9227a90c95fb2bd301dff853c42',1,'kiwi::TokenInfo']]],
-  ['polar_3',['polar',['../structkiwi_1_1MorphemeRaw.html#af8ab4fe2721f278e00f241201b0a3c5a',1,'kiwi::MorphemeRaw']]],
-  ['position_4',['position',['../structkiwi_1_1TokenInfo.html#a8c93fe8051a065bc6a0e0a8ea84981b0',1,'kiwi::TokenInfo']]],
-  ['positive_5',['positive',['../Types_8h.html#a7903fe33da04a788b0bb009094596894a82082716189f80fd070b89ac716570ba',1,'kiwi']]],
-  ['postag_6',['POSTag',['../Types_8h.html#ac15313ea8fffc5cc54475e10264ddebb',1,'kiwi']]],
-  ['prefixcounter_7',['PrefixCounter',['../classkiwi_1_1PrefixCounter.html',1,'kiwi']]],
-  ['prepare_8',['prepare',['../classkiwi_1_1TypoTransformer.html#afe3425d49368c8b7f17dabd9cbfdada5',1,'kiwi::TypoTransformer']]],
-  ['preparedtypotransformer_9',['PreparedTypoTransformer',['../classkiwi_1_1PreparedTypoTransformer.html',1,'kiwi']]],
-  ['pretokenizedspan_10',['PretokenizedSpan',['../structkiwi_1_1PretokenizedSpan.html',1,'kiwi']]]
+  ['negative_0',['negative',['../Types_8h.html#a7903fe33da04a788b0bb009094596894a228d6a97a9838dc800e58b3c74ba7b11',1,'kiwi']]],
+  ['newjoiner_1',['newJoiner',['../classkiwi_1_1Kiwi.html#a38266e3408b09fe2e924f5f04fd8f19d',1,'kiwi::Kiwi']]],
+  ['ngramextractor_2',['NgramExtractor',['../classkiwi_1_1NgramExtractor.html',1,'kiwi']]],
+  ['node_3',['node',['../structkiwi_1_1lm_1_1Node.html',1,'kiwi::lm::Node&lt; KeyType, ValueType, DiffType &gt;'],['../structkiwi_1_1utils_1_1FrozenTrie_1_1Node.html',1,'kiwi::utils::FrozenTrie&lt; _Key, _Value, _Diff, _HasSubmatch &gt;::Node']]],
+  ['nodetoval_4',['NodeToVal',['../structkiwi_1_1utils_1_1detail_1_1NodeToVal.html',1,'kiwi::utils::detail']]],
+  ['non_5fadj_5',['non_adj',['../Types_8h.html#a7903fe33da04a788b0bb009094596894a8f72c327aea57de5c5a3f9f21b56a233',1,'kiwi']]],
+  ['non_5fvocalic_6',['non_vocalic',['../Types_8h.html#a11856481b15f24bf19cb647734ea1085a2d6fc377a92748a81f519882e20a2a53',1,'kiwi']]],
+  ['non_5fvocalic_5fh_7',['non_vocalic_h',['../Types_8h.html#a11856481b15f24bf19cb647734ea1085a547d69d64835c70f869a0fe0120f6501',1,'kiwi']]],
+  ['non_5fvowel_8',['non_vowel',['../Types_8h.html#a11856481b15f24bf19cb647734ea1085a76dde0fd73c7fdd6674bc90b0bd53b35',1,'kiwi']]],
+  ['none_9',['none',['../Types_8h.html#a11856481b15f24bf19cb647734ea1085a334c4a4c42fdb79d7ebc3e73b517e6f8',1,'nonekiwi'],['../Types_8h.html#a7903fe33da04a788b0bb009094596894a334c4a4c42fdb79d7ebc3e73b517e6f8',1,'nonekiwi'],['../Types_8h.html#af7906391a8e367cab5296bac8d4caafaa334c4a4c42fdb79d7ebc3e73b517e6f8',1,'nonekiwi']]]
 ];

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['postag_0',['POSTag',['../Types_8h.html#ac15313ea8fffc5cc54475e10264ddebb',1,'kiwi']]]
+  ['modeltype_0',['ModelType',['../Types_8h.html#af7906391a8e367cab5296bac8d4caafa',1,'kiwi']]]
 ];

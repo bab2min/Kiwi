@@ -97,6 +97,7 @@ $(function() {
 <code>#include &lt;type_traits&gt;</code><br />
 <code>#include &lt;functional&gt;</code><br />
 <code>#include &lt;stdexcept&gt;</code><br />
+<code>#include &lt;iostream&gt;</code><br />
 <code>#include &quot;TemplateUtils.hpp&quot;</code><br />
 <code>#include &quot;ScriptType.h&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
@@ -115,6 +116,8 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1Exception.html">kiwi::Exception</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1IOException.html">kiwi::IOException</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1SerializationException.html">kiwi::SerializationException</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1FormatException.html">kiwi::FormatException</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -138,6 +141,8 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi_1_1Hash_3_01CondVowel_01_4.html">kiwi::Hash&lt; CondVowel &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi_1_1Hash_3_01CondPolarity_01_4.html">kiwi::Hash&lt; CondPolarity &gt;</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi_1_1Hash_3_01Dialect_01_4.html">kiwi::Hash&lt; Dialect &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
@@ -281,11 +286,12 @@ Enumerations</h2></td></tr>
 , <b>pa</b> = p + 1
 , <br />
 &#160;&#160;<a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebba39d3202ec495577fd03ee14c24767dd9">irregular</a> = 0x80
+, <b>unknown_feat_ha</b> = 0xFF
 , <b>vvi</b> = vv | irregular
 , <b>vai</b> = va | irregular
-, <b>vxi</b> = vx | irregular
 , <br />
-&#160;&#160;<b>xsai</b> = xsa | irregular
+&#160;&#160;<b>vxi</b> = vx | irregular
+, <b>xsai</b> = xsa | irregular
 , <b>pvi</b> = pv | irregular
 , <b>pai</b> = pa | irregular
 <br />
@@ -342,6 +348,26 @@ Enumerations</h2></td></tr>
 <br />
  }</td></tr>
 <tr class="separator:af7906391a8e367cab5296bac8d4caafa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa9fc09d985bc896c97e2e0f5cd41c96f" id="r_aa9fc09d985bc896c97e2e0f5cd41c96f"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Types_8h.html#aa9fc09d985bc896c97e2e0f5cd41c96f">kiwi::Dialect</a> : uint16_t { <br />
+&#160;&#160;<a class="el" href="Types_8h.html#aa9fc09d985bc896c97e2e0f5cd41c96fac00f0c4675b91fb8b918e4079a0b1bac">standard</a> = 0
+, <a class="el" href="Types_8h.html#aa9fc09d985bc896c97e2e0f5cd41c96fa84c0e232e583410d3c16e081f1df9668">gyeonggi</a> = 1 &lt;&lt; 0
+, <a class="el" href="Types_8h.html#aa9fc09d985bc896c97e2e0f5cd41c96fa45c4b45068512daa5805d5672bbaeff9">chungcheong</a> = 1 &lt;&lt; 1
+, <a class="el" href="Types_8h.html#aa9fc09d985bc896c97e2e0f5cd41c96faf54ccc6de001fe54a7e9f5472b7b1132">gangwon</a> = 1 &lt;&lt; 2
+, <br />
+&#160;&#160;<a class="el" href="Types_8h.html#aa9fc09d985bc896c97e2e0f5cd41c96fa7ca8deade90717ea30fd8c03a6e072b2">gyeongsang</a> = 1 &lt;&lt; 3
+, <a class="el" href="Types_8h.html#aa9fc09d985bc896c97e2e0f5cd41c96faf38b501b734bd70dd0563c827f5642c1">jeolla</a> = 1 &lt;&lt; 4
+, <a class="el" href="Types_8h.html#aa9fc09d985bc896c97e2e0f5cd41c96fa899b662493af42f8254d35c19e10dcb0">jeju</a> = 1 &lt;&lt; 5
+, <a class="el" href="Types_8h.html#aa9fc09d985bc896c97e2e0f5cd41c96fa6ddc4246547f25bf759da7b1aac21e2d">hwanghae</a> = 1 &lt;&lt; 6
+, <br />
+&#160;&#160;<a class="el" href="Types_8h.html#aa9fc09d985bc896c97e2e0f5cd41c96fa9346ee5f29422c399c053d2899fee5f8">hamgyeong</a> = 1 &lt;&lt; 7
+, <a class="el" href="Types_8h.html#aa9fc09d985bc896c97e2e0f5cd41c96fa70ae9293d75de22420b33b203fd70671">pyeongan</a> = 1 &lt;&lt; 8
+, <a class="el" href="Types_8h.html#aa9fc09d985bc896c97e2e0f5cd41c96faa8a913fc16b969d03964dfdb314006d7">archaic</a> = 1 &lt;&lt; 9
+, <b>lastPlus1</b>
+, <br />
+&#160;&#160;<b>all</b> = lastPlus1 * 2 - 3
+<br />
+ }</td></tr>
+<tr class="separator:aa9fc09d985bc896c97e2e0f5cd41c96f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
@@ -363,6 +389,9 @@ constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>kiwi::areTa
 <tr class="memitem:af4b8acd88168d9af1f3682ca96728809" id="r_af4b8acd88168d9af1f3682ca96728809"><td class="memItemLeft" align="right" valign="top"><a id="af4b8acd88168d9af1f3682ca96728809" name="af4b8acd88168d9af1f3682ca96728809"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>KIWI_DEFINE_ENUM_FLAG_OPERATORS</b> (<a class="el" href="Types_8h.html#a7b5ed1c7b90b79877f32c8a011c06ff3">kiwi::BuildOption</a>)</td></tr>
 <tr class="separator:af4b8acd88168d9af1f3682ca96728809"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9bc14d2b862c63b36cf282ed08025f07" id="r_a9bc14d2b862c63b36cf282ed08025f07"><td class="memItemLeft" align="right" valign="top"><a id="a9bc14d2b862c63b36cf282ed08025f07" name="a9bc14d2b862c63b36cf282ed08025f07"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>KIWI_DEFINE_ENUM_FLAG_OPERATORS</b> (<a class="el" href="Types_8h.html#aa9fc09d985bc896c97e2e0f5cd41c96f">kiwi::Dialect</a>)</td></tr>
+<tr class="separator:a9bc14d2b862c63b36cf282ed08025f07"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
@@ -542,6 +571,52 @@ template&lt;typename _Ty &gt; </div>
 <tr><td class="fieldname"><a id="a11856481b15f24bf19cb647734ea1085a547d69d64835c70f869a0fe0120f6501" name="a11856481b15f24bf19cb647734ea1085a547d69d64835c70f869a0fe0120f6501"></a>non_vocalic_h&#160;</td><td class="fielddoc"><p><code>vocalic_h</code>의 부정 </p>
 </td></tr>
 <tr><td class="fieldname"><a id="a11856481b15f24bf19cb647734ea1085a1a65fd4015955dc79e66e177130c6797" name="a11856481b15f24bf19cb647734ea1085a1a65fd4015955dc79e66e177130c6797"></a>applosive&#160;</td><td class="fielddoc"><p>불파음 받침(ㄴㄹㅁㅇ을 제외한 모든 받침) </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a id="aa9fc09d985bc896c97e2e0f5cd41c96f" name="aa9fc09d985bc896c97e2e0f5cd41c96f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa9fc09d985bc896c97e2e0f5cd41c96f">&#9670;&#160;</a></span>Dialect</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum class <a class="el" href="Types_8h.html#aa9fc09d985bc896c97e2e0f5cd41c96f">kiwi::Dialect</a> : uint16_t</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="aa9fc09d985bc896c97e2e0f5cd41c96fac00f0c4675b91fb8b918e4079a0b1bac" name="aa9fc09d985bc896c97e2e0f5cd41c96fac00f0c4675b91fb8b918e4079a0b1bac"></a>standard&#160;</td><td class="fielddoc"><p>표준어 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aa9fc09d985bc896c97e2e0f5cd41c96fa84c0e232e583410d3c16e081f1df9668" name="aa9fc09d985bc896c97e2e0f5cd41c96fa84c0e232e583410d3c16e081f1df9668"></a>gyeonggi&#160;</td><td class="fielddoc"><p>경기 방언 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aa9fc09d985bc896c97e2e0f5cd41c96fa45c4b45068512daa5805d5672bbaeff9" name="aa9fc09d985bc896c97e2e0f5cd41c96fa45c4b45068512daa5805d5672bbaeff9"></a>chungcheong&#160;</td><td class="fielddoc"><p>충청 방언 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aa9fc09d985bc896c97e2e0f5cd41c96faf54ccc6de001fe54a7e9f5472b7b1132" name="aa9fc09d985bc896c97e2e0f5cd41c96faf54ccc6de001fe54a7e9f5472b7b1132"></a>gangwon&#160;</td><td class="fielddoc"><p>강원 방언 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aa9fc09d985bc896c97e2e0f5cd41c96fa7ca8deade90717ea30fd8c03a6e072b2" name="aa9fc09d985bc896c97e2e0f5cd41c96fa7ca8deade90717ea30fd8c03a6e072b2"></a>gyeongsang&#160;</td><td class="fielddoc"><p>경상 방언 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aa9fc09d985bc896c97e2e0f5cd41c96faf38b501b734bd70dd0563c827f5642c1" name="aa9fc09d985bc896c97e2e0f5cd41c96faf38b501b734bd70dd0563c827f5642c1"></a>jeolla&#160;</td><td class="fielddoc"><p>전라 방언 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aa9fc09d985bc896c97e2e0f5cd41c96fa899b662493af42f8254d35c19e10dcb0" name="aa9fc09d985bc896c97e2e0f5cd41c96fa899b662493af42f8254d35c19e10dcb0"></a>jeju&#160;</td><td class="fielddoc"><p>제주 방언 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aa9fc09d985bc896c97e2e0f5cd41c96fa6ddc4246547f25bf759da7b1aac21e2d" name="aa9fc09d985bc896c97e2e0f5cd41c96fa6ddc4246547f25bf759da7b1aac21e2d"></a>hwanghae&#160;</td><td class="fielddoc"><p>황해 방언 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aa9fc09d985bc896c97e2e0f5cd41c96fa9346ee5f29422c399c053d2899fee5f8" name="aa9fc09d985bc896c97e2e0f5cd41c96fa9346ee5f29422c399c053d2899fee5f8"></a>hamgyeong&#160;</td><td class="fielddoc"><p>함경 방언 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aa9fc09d985bc896c97e2e0f5cd41c96fa70ae9293d75de22420b33b203fd70671" name="aa9fc09d985bc896c97e2e0f5cd41c96fa70ae9293d75de22420b33b203fd70671"></a>pyeongan&#160;</td><td class="fielddoc"><p>평안 방언 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aa9fc09d985bc896c97e2e0f5cd41c96faa8a913fc16b969d03964dfdb314006d7" name="aa9fc09d985bc896c97e2e0f5cd41c96faa8a913fc16b969d03964dfdb314006d7"></a>archaic&#160;</td><td class="fielddoc"><p>옛말 </p>
 </td></tr>
 </table>
 

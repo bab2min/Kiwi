@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['word_5fposition_0',['word_position',['../structkiwi__token__info__t.html#ab5b6ded81235f760816348be905d8b28',1,'kiwi_token_info_t']]],
-  ['wordposition_1',['wordPosition',['../structkiwi_1_1TokenInfo.html#a9729fcc663ca3040215d945a120478ed',1,'kiwi::TokenInfo']]]
+  ['read_0',['read',['../structkiwi__stream__object__t.html#a93c8dc0ebb59bd0a11b938dc3bf88c35',1,'kiwi_stream_object_t']]]
 ];

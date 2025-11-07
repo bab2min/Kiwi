@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['newjoiner_0',['newJoiner',['../classkiwi_1_1Kiwi.html#a38266e3408b09fe2e924f5f04fd8f19d',1,'kiwi::Kiwi']]]
+  ['morphemeraw_0',['MorphemeRaw',['../structkiwi_1_1MorphemeRaw.html#adbfe0b0a46369012e8bccab4f0f70732',1,'kiwi::MorphemeRaw']]]
 ];

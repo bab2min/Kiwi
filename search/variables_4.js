@@ -1,7 +1,5 @@
 var searchData=
 [
-  ['length_0',['length',['../structkiwi__token__info__t.html#a6c22f2650a9fba79ede097a4a45790e5',1,'kiwi_token_info_t::length'],['../structkiwi_1_1TokenInfo.html#a66fb9fa90738360f753f93a568b254b8',1,'kiwi::TokenInfo::length']]],
-  ['line_5fnumber_1',['line_number',['../structkiwi__token__info__t.html#a3bd64985decbd817cbb73fb0b7435cdb',1,'kiwi_token_info_t']]],
-  ['linenumber_2',['lineNumber',['../structkiwi_1_1TokenInfo.html#ad4b895d72300bd9682e82db3400e19f3',1,'kiwi::TokenInfo']]],
-  ['lmmorphemeid_3',['lmMorphemeId',['../structkiwi_1_1MorphemeRaw.html#a41db424d4bb673194931d6d3f96b8482',1,'kiwi::MorphemeRaw']]]
+  ['dialect_0',['dialect',['../structkiwi__token__info__t.html#a38c5e9dd3d12bbd0a5b43007c0f34b5b',1,'kiwi_token_info_t::dialect'],['../structkiwi_1_1MorphemeRaw.html#af0b51849544597d47508a10bc9c77353',1,'kiwi::MorphemeRaw::dialect'],['../structkiwi_1_1TokenInfo.html#a1d18dde6a171a7697466657173f80cee',1,'kiwi::TokenInfo::dialect']]],
+  ['dialect_5fcost_1',['dialect_cost',['../structkiwi__analyze__option__t.html#a442f1413f29ba5f25f88ab1d887e3a6e',1,'kiwi_analyze_option_t']]]
 ];

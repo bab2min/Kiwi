@@ -1,8 +1,6 @@
 var searchData=
 [
-  ['raggedvector_0',['RaggedVector',['../classkiwi_1_1RaggedVector.html',1,'kiwi']]],
-  ['range_1',['Range',['../classkiwi_1_1Range.html',1,'kiwi']]],
-  ['read_2',['read',['../structkiwi__stream__object__t.html#a93c8dc0ebb59bd0a11b938dc3bf88c35',1,'kiwi_stream_object_t']]],
-  ['ready_3',['ready',['../classkiwi_1_1Kiwi.html#a278af7fd34a725f39b2fcfd528d34b6e',1,'kiwi::Kiwi::ready()'],['../classkiwi_1_1KiwiBuilder.html#a1f90bdbca2a4d4a7d5a9b8b2fb052cfd',1,'kiwi::KiwiBuilder::ready()']]],
-  ['rettype_4',['RetType',['../structkiwi_1_1TypoIterator_1_1RetType.html',1,'kiwi::TypoIterator']]]
+  ['omstream_0',['omstream',['../classkiwi_1_1utils_1_1omstream.html',1,'kiwi::utils']]],
+  ['open_5fending_1',['open_ending',['../structkiwi__analyze__option__t.html#a96db1c1cb46fd8401115adbf34356791',1,'kiwi_analyze_option_t']]],
+  ['optionalfuture_2',['OptionalFuture',['../classkiwi_1_1OptionalFuture.html',1,'kiwi']]]
 ];

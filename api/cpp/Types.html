@@ -52,6 +52,7 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Types.h</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#c.KIWI_DEFINE_ENUM_FLAG_OPERATORS"><code class="docutils literal notranslate"><span class="pre">KIWI_DEFINE_ENUM_FLAG_OPERATORS</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv431KIWI_DEFINE_ENUM_FLAG_OPERATORSN4kiwi11BuildOptionE"><code class="docutils literal notranslate"><span class="pre">KIWI_DEFINE_ENUM_FLAG_OPERATORS()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv431KIWI_DEFINE_ENUM_FLAG_OPERATORSN4kiwi7DialectE"><code class="docutils literal notranslate"><span class="pre">KIWI_DEFINE_ENUM_FLAG_OPERATORS()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv44kiwi"><code class="docutils literal notranslate"><span class="pre">kiwi</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N4kiwi7kchar_tE"><code class="docutils literal notranslate"><span class="pre">kchar_t</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0EN4kiwi6VectorE"><code class="docutils literal notranslate"><span class="pre">Vector</span></code></a></li>
@@ -72,6 +73,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N4kiwi12CondPolarityE"><code class="docutils literal notranslate"><span class="pre">CondPolarity</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N4kiwi11BuildOptionE"><code class="docutils literal notranslate"><span class="pre">BuildOption</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N4kiwi9ModelTypeE"><code class="docutils literal notranslate"><span class="pre">ModelType</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N4kiwi7DialectE"><code class="docutils literal notranslate"><span class="pre">Dialect</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N4kiwi11isIrregularE6POSTag"><code class="docutils literal notranslate"><span class="pre">isIrregular()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N4kiwi12setIrregularE6POSTag"><code class="docutils literal notranslate"><span class="pre">setIrregular()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N4kiwi14clearIrregularE6POSTag"><code class="docutils literal notranslate"><span class="pre">clearIrregular()</span></code></a></li>
@@ -84,9 +86,11 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0EN4kiwi4HashE"><code class="docutils literal notranslate"><span class="pre">kiwi::Hash</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4IEN4kiwi4HashI12CondPolarityEE"><code class="docutils literal notranslate"><span class="pre">kiwi::Hash&lt;</span> <span class="pre">CondPolarity</span> <span class="pre">&gt;</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4IEN4kiwi4HashI9CondVowelEE"><code class="docutils literal notranslate"><span class="pre">kiwi::Hash&lt;</span> <span class="pre">CondVowel</span> <span class="pre">&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4IEN4kiwi4HashI7DialectEE"><code class="docutils literal notranslate"><span class="pre">kiwi::Hash&lt;</span> <span class="pre">Dialect</span> <span class="pre">&gt;</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4IEN4kiwi4HashI6POSTagEE"><code class="docutils literal notranslate"><span class="pre">kiwi::Hash&lt;</span> <span class="pre">POSTag</span> <span class="pre">&gt;</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N4kiwi11IOExceptionE"><code class="docutils literal notranslate"><span class="pre">kiwi::IOException</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N4kiwi16PretokenizedSpanE"><code class="docutils literal notranslate"><span class="pre">kiwi::PretokenizedSpan</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N4kiwi22SerializationExceptionE"><code class="docutils literal notranslate"><span class="pre">kiwi::SerializationException</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N4kiwi20SwTokenizerExceptionE"><code class="docutils literal notranslate"><span class="pre">kiwi::SwTokenizerException</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N4kiwi9TokenInfoE"><code class="docutils literal notranslate"><span class="pre">kiwi::TokenInfo</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N4kiwi16UnicodeExceptionE"><code class="docutils literal notranslate"><span class="pre">kiwi::UnicodeException</span></code></a></li>
@@ -149,6 +153,11 @@
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv431KIWI_DEFINE_ENUM_FLAG_OPERATORSN4kiwi11BuildOptionE">
 <span id="_CPPv331KIWI_DEFINE_ENUM_FLAG_OPERATORSN4kiwi11BuildOptionE"></span><span id="_CPPv231KIWI_DEFINE_ENUM_FLAG_OPERATORSN4kiwi11BuildOptionE"></span><span id="KIWI_DEFINE_ENUM_FLAG_OPERATORS__kiwi::BuildOption"></span><span class="target" id="Types_8h_1af4b8acd88168d9af1f3682ca96728809"></span><span class="sig-name descname"><span class="n"><span class="pre">KIWI_DEFINE_ENUM_FLAG_OPERATORS</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Form.html#_CPPv44kiwi" title="kiwi"><span class="n"><span class="pre">kiwi</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4kiwi11BuildOptionE" title="kiwi::BuildOption"><span class="n"><span class="pre">BuildOption</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv431KIWI_DEFINE_ENUM_FLAG_OPERATORSN4kiwi11BuildOptionE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv431KIWI_DEFINE_ENUM_FLAG_OPERATORSN4kiwi7DialectE">
+<span id="_CPPv331KIWI_DEFINE_ENUM_FLAG_OPERATORSN4kiwi7DialectE"></span><span id="_CPPv231KIWI_DEFINE_ENUM_FLAG_OPERATORSN4kiwi7DialectE"></span><span id="KIWI_DEFINE_ENUM_FLAG_OPERATORS__kiwi::Dialect"></span><span class="target" id="Types_8h_1a9bc14d2b862c63b36cf282ed08025f07"></span><span class="sig-name descname"><span class="n"><span class="pre">KIWI_DEFINE_ENUM_FLAG_OPERATORS</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Form.html#_CPPv44kiwi" title="kiwi"><span class="n"><span class="pre">kiwi</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4kiwi7DialectE" title="kiwi::Dialect"><span class="n"><span class="pre">Dialect</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv431KIWI_DEFINE_ENUM_FLAG_OPERATORSN4kiwi7DialectE" title="Link to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 </div>
@@ -595,6 +604,11 @@
 </dd></dl>
 
 <dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi6POSTag15unknown_feat_haE">
+<span id="_CPPv3N4kiwi6POSTag15unknown_feat_haE"></span><span id="_CPPv2N4kiwi6POSTag15unknown_feat_haE"></span><span class="target" id="Types_8h_1ac15313ea8fffc5cc54475e10264ddebba0d37db718d9202bce2ca2afbc9f19b11"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">unknown_feat_ha</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi6POSTag15unknown_feat_haE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
 <dt class="sig sig-object cpp" id="_CPPv4N4kiwi6POSTag3vviE">
 <span id="_CPPv3N4kiwi6POSTag3vviE"></span><span id="_CPPv2N4kiwi6POSTag3vviE"></span><span class="target" id="Types_8h_1ac15313ea8fffc5cc54475e10264ddebba5b5c1a2a15c0c1e40a5ebde6b29db07a"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">vvi</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi6POSTag3vviE" title="Link to this definition"></a><br /></dt>
 <dd></dd></dl>
@@ -823,6 +837,88 @@
 
 </dd></dl>
 
+<dl class="cpp enum-class">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi7DialectE">
+<span id="_CPPv3N4kiwi7DialectE"></span><span id="_CPPv2N4kiwi7DialectE"></span><span class="target" id="Types_8h_1aa9fc09d985bc896c97e2e0f5cd41c96f"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Dialect</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">uint16_t</span></span><a class="headerlink" href="#_CPPv4N4kiwi7DialectE" title="Link to this definition"></a><br /></dt>
+<dd><p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi7Dialect8standardE">
+<span id="_CPPv3N4kiwi7Dialect8standardE"></span><span id="_CPPv2N4kiwi7Dialect8standardE"></span><span class="target" id="Types_8h_1aa9fc09d985bc896c97e2e0f5cd41c96fac00f0c4675b91fb8b918e4079a0b1bac"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">standard</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi7Dialect8standardE" title="Link to this definition"></a><br /></dt>
+<dd><p>표준어 </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi7Dialect8gyeonggiE">
+<span id="_CPPv3N4kiwi7Dialect8gyeonggiE"></span><span id="_CPPv2N4kiwi7Dialect8gyeonggiE"></span><span class="target" id="Types_8h_1aa9fc09d985bc896c97e2e0f5cd41c96fa84c0e232e583410d3c16e081f1df9668"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">gyeonggi</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi7Dialect8gyeonggiE" title="Link to this definition"></a><br /></dt>
+<dd><p>경기 방언 </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi7Dialect11chungcheongE">
+<span id="_CPPv3N4kiwi7Dialect11chungcheongE"></span><span id="_CPPv2N4kiwi7Dialect11chungcheongE"></span><span class="target" id="Types_8h_1aa9fc09d985bc896c97e2e0f5cd41c96fa45c4b45068512daa5805d5672bbaeff9"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">chungcheong</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi7Dialect11chungcheongE" title="Link to this definition"></a><br /></dt>
+<dd><p>충청 방언 </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi7Dialect7gangwonE">
+<span id="_CPPv3N4kiwi7Dialect7gangwonE"></span><span id="_CPPv2N4kiwi7Dialect7gangwonE"></span><span class="target" id="Types_8h_1aa9fc09d985bc896c97e2e0f5cd41c96faf54ccc6de001fe54a7e9f5472b7b1132"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">gangwon</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi7Dialect7gangwonE" title="Link to this definition"></a><br /></dt>
+<dd><p>강원 방언 </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi7Dialect10gyeongsangE">
+<span id="_CPPv3N4kiwi7Dialect10gyeongsangE"></span><span id="_CPPv2N4kiwi7Dialect10gyeongsangE"></span><span class="target" id="Types_8h_1aa9fc09d985bc896c97e2e0f5cd41c96fa7ca8deade90717ea30fd8c03a6e072b2"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">gyeongsang</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi7Dialect10gyeongsangE" title="Link to this definition"></a><br /></dt>
+<dd><p>경상 방언 </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi7Dialect6jeollaE">
+<span id="_CPPv3N4kiwi7Dialect6jeollaE"></span><span id="_CPPv2N4kiwi7Dialect6jeollaE"></span><span class="target" id="Types_8h_1aa9fc09d985bc896c97e2e0f5cd41c96faf38b501b734bd70dd0563c827f5642c1"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">jeolla</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi7Dialect6jeollaE" title="Link to this definition"></a><br /></dt>
+<dd><p>전라 방언 </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi7Dialect4jejuE">
+<span id="_CPPv3N4kiwi7Dialect4jejuE"></span><span id="_CPPv2N4kiwi7Dialect4jejuE"></span><span class="target" id="Types_8h_1aa9fc09d985bc896c97e2e0f5cd41c96fa899b662493af42f8254d35c19e10dcb0"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">jeju</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi7Dialect4jejuE" title="Link to this definition"></a><br /></dt>
+<dd><p>제주 방언 </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi7Dialect8hwanghaeE">
+<span id="_CPPv3N4kiwi7Dialect8hwanghaeE"></span><span id="_CPPv2N4kiwi7Dialect8hwanghaeE"></span><span class="target" id="Types_8h_1aa9fc09d985bc896c97e2e0f5cd41c96fa6ddc4246547f25bf759da7b1aac21e2d"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hwanghae</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi7Dialect8hwanghaeE" title="Link to this definition"></a><br /></dt>
+<dd><p>황해 방언 </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi7Dialect9hamgyeongE">
+<span id="_CPPv3N4kiwi7Dialect9hamgyeongE"></span><span id="_CPPv2N4kiwi7Dialect9hamgyeongE"></span><span class="target" id="Types_8h_1aa9fc09d985bc896c97e2e0f5cd41c96fa9346ee5f29422c399c053d2899fee5f8"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hamgyeong</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi7Dialect9hamgyeongE" title="Link to this definition"></a><br /></dt>
+<dd><p>함경 방언 </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi7Dialect8pyeonganE">
+<span id="_CPPv3N4kiwi7Dialect8pyeonganE"></span><span id="_CPPv2N4kiwi7Dialect8pyeonganE"></span><span class="target" id="Types_8h_1aa9fc09d985bc896c97e2e0f5cd41c96fa70ae9293d75de22420b33b203fd70671"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pyeongan</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi7Dialect8pyeonganE" title="Link to this definition"></a><br /></dt>
+<dd><p>평안 방언 </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi7Dialect7archaicE">
+<span id="_CPPv3N4kiwi7Dialect7archaicE"></span><span id="_CPPv2N4kiwi7Dialect7archaicE"></span><span class="target" id="Types_8h_1aa9fc09d985bc896c97e2e0f5cd41c96faa8a913fc16b969d03964dfdb314006d7"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">archaic</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi7Dialect7archaicE" title="Link to this definition"></a><br /></dt>
+<dd><p>옛말 </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi7Dialect9lastPlus1E">
+<span id="_CPPv3N4kiwi7Dialect9lastPlus1E"></span><span id="_CPPv2N4kiwi7Dialect9lastPlus1E"></span><span class="target" id="Types_8h_1aa9fc09d985bc896c97e2e0f5cd41c96fa622f48af58d10a134caafc19b70b54b3"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">lastPlus1</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi7Dialect9lastPlus1E" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi7Dialect3allE">
+<span id="_CPPv3N4kiwi7Dialect3allE"></span><span id="_CPPv2N4kiwi7Dialect3allE"></span><span class="target" id="Types_8h_1aa9fc09d985bc896c97e2e0f5cd41c96faa181a603769c1f98ad927e7367c7aa51"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">all</span></span></span><a class="headerlink" href="#_CPPv4N4kiwi7Dialect3allE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
@@ -952,6 +1048,19 @@
 </dd></dl>
 
 <dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4IEN4kiwi4HashI7DialectEE">
+<span id="_CPPv3IEN4kiwi4HashI7DialectEE"></span><span id="_CPPv2IEN4kiwi4HashI7DialectEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structkiwi_1_1Hash_3_01Dialect_01_4"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Hash</span></span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N4kiwi7DialectE" title="kiwi::Dialect"><span class="n"><span class="pre">Dialect</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4IEN4kiwi4HashI7DialectEE" title="Link to this definition"></a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4kiwi4HashI7DialectEclE7Dialect">
+<span id="_CPPv3NK4kiwi4HashI7DialectEclE7Dialect"></span><span id="_CPPv2NK4kiwi4HashI7DialectEclE7Dialect"></span><span id="kiwi::Hash:Dialect:::call-operator__DialectC"></span><span class="target" id="structkiwi_1_1Hash_3_01Dialect_01_4_1aabb8a297fc4e53976ee7edb0cafb642c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">()</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N4kiwi7DialectE" title="kiwi::Dialect"><span class="n"><span class="pre">Dialect</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">v</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4kiwi4HashI7DialectEclE7Dialect" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv4IEN4kiwi4HashI6POSTagEE">
 <span id="_CPPv3IEN4kiwi4HashI6POSTagEE"></span><span id="_CPPv2IEN4kiwi4HashI6POSTagEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structkiwi_1_1Hash_3_01POSTag_01_4"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Hash</span></span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N4kiwi6POSTagE" title="kiwi::POSTag"><span class="n"><span class="pre">POSTag</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4IEN4kiwi4HashI6POSTagEE" title="Link to this definition"></a><br /></dt>
 <dd><div class="breathe-sectiondef docutils container">
@@ -999,6 +1108,11 @@
 
 </div>
 </dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi22SerializationExceptionE">
+<span id="_CPPv3N4kiwi22SerializationExceptionE"></span><span id="_CPPv2N4kiwi22SerializationExceptionE"></span><span id="kiwi::SerializationException"></span><span class="target" id="classkiwi_1_1SerializationException"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SerializationException</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ios_base</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">failure</span></span><a class="headerlink" href="#_CPPv4N4kiwi22SerializationExceptionE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
 
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N4kiwi20SwTokenizerExceptionE">
@@ -1097,7 +1211,7 @@
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp">
-<span class="target" id="structkiwi_1_1TokenInfo_1acac2e2c9223da00d3ff4a53661c06cb8"></span><span class="sig-name descname"><span class="pre">union</span> <span class="pre">kiwi::TokenInfo</span></span></dt>
+<span class="target" id="structkiwi_1_1TokenInfo_1aedf1e5b47b7a71416172fee8023d96d3"></span><span class="sig-name descname"><span class="pre">union</span> <span class="pre">kiwi::TokenInfo</span></span></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
@@ -1128,6 +1242,12 @@
 <dt class="sig sig-object cpp" id="_CPPv4N4kiwi9TokenInfo15subSentPositionE">
 <span id="_CPPv3N4kiwi9TokenInfo15subSentPositionE"></span><span id="_CPPv2N4kiwi9TokenInfo15subSentPositionE"></span><span id="kiwi::TokenInfo::subSentPosition__uint32_t"></span><span class="target" id="structkiwi_1_1TokenInfo_1a3854dee1149cee2d42e421e4bedc6a2c"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">subSentPosition</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N4kiwi9TokenInfo15subSentPositionE" title="Link to this definition"></a><br /></dt>
 <dd><p>인용부호나 괄호로 둘러싸인 하위 문장의 번호. 1부터 시작. 0인 경우 하위 문장이 아님을 뜻함 </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4kiwi9TokenInfo7dialectE">
+<span id="_CPPv3N4kiwi9TokenInfo7dialectE"></span><span id="_CPPv2N4kiwi9TokenInfo7dialectE"></span><span id="kiwi::TokenInfo::dialect__Dialect"></span><span class="target" id="structkiwi_1_1TokenInfo_1a1d18dde6a171a7697466657173f80cee"></span><a class="reference internal" href="#_CPPv4N4kiwi7DialectE" title="kiwi::Dialect"><span class="n"><span class="pre">Dialect</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dialect</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N4kiwi7DialectE" title="kiwi::Dialect"><span class="n"><span class="pre">Dialect</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4kiwi7Dialect8standardE" title="kiwi::Dialect::standard"><span class="n"><span class="pre">standard</span></span></a><a class="headerlink" href="#_CPPv4N4kiwi9TokenInfo7dialectE" title="Link to this definition"></a><br /></dt>
+<dd><p>방언 정보 </p>
 </dd></dl>
 
 <dl class="cpp var">

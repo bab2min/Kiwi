@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['knlm_0',['knlm',['../Types_8h.html#af7906391a8e367cab5296bac8d4caafaaac794a38581bb3bc7fb719e2b3331b8e',1,'kiwi']]]
+  ['hamgyeong_0',['hamgyeong',['../Types_8h.html#aa9fc09d985bc896c97e2e0f5cd41c96fa9346ee5f29422c399c053d2899fee5f8',1,'kiwi']]],
+  ['hwanghae_1',['hwanghae',['../Types_8h.html#aa9fc09d985bc896c97e2e0f5cd41c96fa6ddc4246547f25bf759da7b1aac21e2d',1,'kiwi']]]
 ];

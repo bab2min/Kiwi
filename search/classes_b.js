@@ -8,5 +8,6 @@ var searchData=
   ['mmap_5',['MMap',['../classkiwi_1_1utils_1_1MMap.html',1,'kiwi::utils']]],
   ['modelbuildargs_6',['ModelBuildArgs',['../structkiwi_1_1KiwiBuilder_1_1ModelBuildArgs.html',1,'kiwi::KiwiBuilder']]],
   ['morpheme_7',['Morpheme',['../structkiwi_1_1Morpheme.html',1,'kiwi']]],
-  ['morphemeraw_8',['MorphemeRaw',['../structkiwi_1_1MorphemeRaw.html',1,'kiwi']]]
+  ['morphemedef_8',['MorphemeDef',['../structkiwi_1_1MorphemeDef.html',1,'kiwi']]],
+  ['morphemeraw_9',['MorphemeRaw',['../structkiwi_1_1MorphemeRaw.html',1,'kiwi']]]
 ];

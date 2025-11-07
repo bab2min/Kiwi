@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['modeltype_0',['ModelType',['../Types_8h.html#af7906391a8e367cab5296bac8d4caafa',1,'kiwi']]]
+  ['dialect_0',['Dialect',['../Types_8h.html#aa9fc09d985bc896c97e2e0f5cd41c96f',1,'kiwi']]]
 ];

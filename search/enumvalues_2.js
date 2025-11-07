@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['integrateallomorph_0',['integrateAllomorph',['../Types_8h.html#a7b5ed1c7b90b79877f32c8a011c06ff3a9d4cda55511905f877949ea8055fc681',1,'kiwi']]],
-  ['irregular_1',['irregular',['../Types_8h.html#ac15313ea8fffc5cc54475e10264ddebba39d3202ec495577fd03ee14c24767dd9',1,'kiwi']]]
+  ['gangwon_0',['gangwon',['../Types_8h.html#aa9fc09d985bc896c97e2e0f5cd41c96faf54ccc6de001fe54a7e9f5472b7b1132',1,'kiwi']]],
+  ['gyeonggi_1',['gyeonggi',['../Types_8h.html#aa9fc09d985bc896c97e2e0f5cd41c96fa84c0e232e583410d3c16e081f1df9668',1,'kiwi']]],
+  ['gyeongsang_2',['gyeongsang',['../Types_8h.html#aa9fc09d985bc896c97e2e0f5cd41c96fa7ca8deade90717ea30fd8c03a6e072b2',1,'kiwi']]]
 ];

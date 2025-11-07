@@ -37,12 +37,13 @@ digraph "include/kiwi/Kiwi.h"
   Node8 -> Node4 [id="edge17_Node000008_Node000004",color="steelblue1",style="solid",tooltip=" "];
   Node8 -> Node15 [id="edge18_Node000008_Node000015",color="steelblue1",style="solid",tooltip=" "];
   Node15 [id="Node000015",label="stdexcept",height=0.2,width=0.4,color="grey60", fillcolor="#E0E0E0", style="filled",tooltip=" "];
-  Node1 -> Node16 [id="edge19_Node000001_Node000016",color="steelblue1",style="solid",tooltip=" "];
+  Node8 -> Node2 [id="edge19_Node000008_Node000002",color="steelblue1",style="solid",tooltip=" "];
+  Node1 -> Node16 [id="edge20_Node000001_Node000016",color="steelblue1",style="solid",tooltip=" "];
   Node16 [id="Node000016",label="Form.h",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$Form_8h.html",tooltip="형태 및 형태소에 관한 정보를 담는 구조체들이 선언된 헤더"];
-  Node16 -> Node17 [id="edge20_Node000016_Node000017",color="steelblue1",style="solid",tooltip=" "];
+  Node16 -> Node17 [id="edge21_Node000016_Node000017",color="steelblue1",style="solid",tooltip=" "];
   Node17 [id="Node000017",label="cmath",height=0.2,width=0.4,color="grey60", fillcolor="#E0E0E0", style="filled",tooltip=" "];
-  Node16 -> Node8 [id="edge21_Node000016_Node000008",color="steelblue1",style="solid",tooltip=" "];
-  Node1 -> Node18 [id="edge22_Node000001_Node000018",color="steelblue1",style="solid",tooltip=" "];
+  Node16 -> Node8 [id="edge22_Node000016_Node000008",color="steelblue1",style="solid",tooltip=" "];
+  Node1 -> Node18 [id="edge23_Node000001_Node000018",color="steelblue1",style="solid",tooltip=" "];
   Node18 [id="Node000018",label="TypoTransformer.h",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$TypoTransformer_8h.html",tooltip="오타 교정에 사용되는 TypoTransformer 및 관련 클래스들을 정의합니다."];
-  Node18 -> Node8 [id="edge23_Node000018_Node000008",color="steelblue1",style="solid",tooltip=" "];
+  Node18 -> Node8 [id="edge24_Node000018_Node000008",color="steelblue1",style="solid",tooltip=" "];
 }
