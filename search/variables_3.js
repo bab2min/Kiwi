@@ -6,5 +6,6 @@ var searchData=
   ['chunks_3',['chunks',['../structkiwi_1_1MorphemeRaw.html#a4c309ab23a3cd1457af0101201439704',1,'kiwi::MorphemeRaw']]],
   ['close_4',['close',['../structkiwi__stream__object__t.html#aef415d58898ed6297d2ed404282888fd',1,'kiwi_stream_object_t']]],
   ['combined_5',['combined',['../structkiwi_1_1MorphemeRaw.html#a613da3b0ee678935b86b3671fcd20e45',1,'kiwi::MorphemeRaw']]],
-  ['combinesocket_6',['combineSocket',['../structkiwi_1_1MorphemeRaw.html#a82c6720fbccbbad4b200c565f7380f37',1,'kiwi::MorphemeRaw']]]
+  ['combinesocket_6',['combineSocket',['../structkiwi_1_1MorphemeRaw.html#a82c6720fbccbbad4b200c565f7380f37',1,'kiwi::MorphemeRaw']]],
+  ['cut_5foff_5fthreshold_7',['cut_off_threshold',['../structkiwi__config__t.html#a26a2c225b9a9e746a0ba728b78386528',1,'kiwi_config_t']]]
 ];

@@ -2,7 +2,7 @@ var searchData=
 [
   ['cachestore_0',['CacheStore',['../structkiwi_1_1utils_1_1ContinuousTrie_1_1CacheStore.html',1,'kiwi::utils::ContinuousTrie']]],
   ['cachestore_3c_20cont_20_2a_20_3e_1',['CacheStore&lt; Cont * &gt;',['../structkiwi_1_1utils_1_1ContinuousTrie_1_1CacheStore_3_01Cont_01_5_01_4.html',1,'kiwi::utils::ContinuousTrie']]],
-  ['candidate_2',['candidate',['../structkiwi_1_1cmb_1_1Candidate.html',1,'kiwi::cmb::Candidate&lt; LmState &gt;'],['../structkiwi_1_1NgramExtractor_1_1Candidate.html',1,'kiwi::NgramExtractor::Candidate'],['../structkiwi_1_1FormRaw.html#aaeb9a4a50365e34fd542d2ea07ded938',1,'kiwi::FormRaw::candidate']]],
+  ['candidate_2',['candidate',['../structkiwi_1_1FormRaw.html#aaeb9a4a50365e34fd542d2ea07ded938',1,'kiwi::FormRaw::candidate'],['../structkiwi_1_1NgramExtractor_1_1Candidate.html',1,'kiwi::NgramExtractor::Candidate'],['../structkiwi_1_1cmb_1_1Candidate.html',1,'kiwi::cmb::Candidate&lt; LmState &gt;']]],
   ['candidate_3c_20lm_3a_3avoidstate_3c_20arch_20_3e_20_3e_3',['Candidate&lt; lm::VoidState&lt; arch &gt; &gt;',['../structkiwi_1_1cmb_1_1Candidate_3_01lm_1_1VoidState_3_01arch_01_4_01_4.html',1,'kiwi::cmb']]],
   ['capi_2eh_4',['capi.h',['../capi_8h.html',1,'']]],
   ['chr_5fposition_5',['chr_position',['../structkiwi__token__info__t.html#abe6f9a976243d5818a47e564a4e7fb2c',1,'kiwi_token_info_t']]],
@@ -26,5 +26,6 @@ var searchData=
   ['congrammodelheader_23',['CoNgramModelHeader',['../structkiwi_1_1lm_1_1CoNgramModelHeader.html',1,'kiwi::lm']]],
   ['constaccess_24',['ConstAccess',['../classkiwi_1_1utils_1_1ConstAccess.html',1,'kiwi::utils']]],
   ['constaccess_3c_20std_3a_3aunordered_5fmap_3c_20_5fkey_2c_20int32_5ft_20_3e_20_3e_25',['ConstAccess&lt; std::unordered_map&lt; _Key, int32_t &gt; &gt;',['../classkiwi_1_1utils_1_1ConstAccess.html',1,'kiwi::utils']]],
-  ['continuoustrie_26',['ContinuousTrie',['../classkiwi_1_1utils_1_1ContinuousTrie.html',1,'kiwi::utils']]]
+  ['continuoustrie_26',['ContinuousTrie',['../classkiwi_1_1utils_1_1ContinuousTrie.html',1,'kiwi::utils']]],
+  ['cut_5foff_5fthreshold_27',['cut_off_threshold',['../structkiwi__config__t.html#a26a2c225b9a9e746a0ba728b78386528',1,'kiwi_config_t']]]
 ];

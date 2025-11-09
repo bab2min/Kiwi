@@ -98,6 +98,8 @@ Include dependency graph for capi.h:</div>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi__token__info__t.html">kiwi_token_info_t</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi__config__t.html">kiwi_config_t</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi__stream__object__t.html">kiwi_stream_object_t</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">범용 입력 스트림을 나타내는 구조체  <a href="structkiwi__stream__object__t.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -196,21 +198,9 @@ Enumerations</h2></td></tr>
  }</td></tr>
 <tr class="separator:a06fc87d81c62e9abb8790b6e5713c55b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adf764cbdea00d65edcd07bb9953ad2b7" id="r_adf764cbdea00d65edcd07bb9953ad2b7"><td class="memItemLeft" align="right" valign="top"><a id="adf764cbdea00d65edcd07bb9953ad2b7" name="adf764cbdea00d65edcd07bb9953ad2b7"></a>enum &#160;</td><td class="memItemRight" valign="bottom">{ <b>KIWI_NUM_THREADS</b> = 0x8001
-, <b>KIWI_MAX_UNK_FORM_SIZE</b> = 0x8002
-, <b>KIWI_SPACE_TOLERANCE</b> = 0x8003
  }</td></tr>
 <tr class="separator:adf764cbdea00d65edcd07bb9953ad2b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a99fb83031ce9923c84392b4e92f956b5" id="r_a99fb83031ce9923c84392b4e92f956b5"><td class="memItemLeft" align="right" valign="top"><a id="a99fb83031ce9923c84392b4e92f956b5" name="a99fb83031ce9923c84392b4e92f956b5"></a>enum &#160;</td><td class="memItemRight" valign="bottom">{ <br />
-&#160;&#160;<b>KIWI_CUT_OFF_THRESHOLD</b> = 0x9001
-, <b>KIWI_UNK_FORM_SCORE_SCALE</b> = 0x9002
-, <b>KIWI_UNK_FORM_SCORE_BIAS</b> = 0x9003
-, <b>KIWI_SPACE_PENALTY</b> = 0x9004
-, <br />
-&#160;&#160;<b>KIWI_TYPO_COST_WEIGHT</b> = 0x9005
-<br />
- }</td></tr>
-<tr class="separator:a99fb83031ce9923c84392b4e92f956b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abc6126af1d45847bc59afa0aa3216b04" id="r_abc6126af1d45847bc59afa0aa3216b04"><td class="memItemLeft" align="right" valign="top"><a id="abc6126af1d45847bc59afa0aa3216b04" name="abc6126af1d45847bc59afa0aa3216b04"></a>enum &#160;</td><td class="memItemRight" valign="bottom">{ <br />
 &#160;&#160;<b>KIWI_MATCH_URL</b> = 1
 , <b>KIWI_MATCH_EMAIL</b> = 2
 , <b>KIWI_MATCH_HASHTAG</b> = 4
@@ -237,8 +227,8 @@ Enumerations</h2></td></tr>
 , <b>KIWI_MATCH_ALL_WITH_NORMALIZING</b> = KIWI_MATCH_ALL | KIWI_MATCH_NORMALIZE_CODA
 <br />
  }</td></tr>
-<tr class="separator:abc6126af1d45847bc59afa0aa3216b04"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adc29c2ff13d900c2f185ee95427fb06c" id="r_adc29c2ff13d900c2f185ee95427fb06c"><td class="memItemLeft" align="right" valign="top"><a id="adc29c2ff13d900c2f185ee95427fb06c" name="adc29c2ff13d900c2f185ee95427fb06c"></a>enum &#160;</td><td class="memItemRight" valign="bottom">{ <br />
+<tr class="separator:a99fb83031ce9923c84392b4e92f956b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abc6126af1d45847bc59afa0aa3216b04" id="r_abc6126af1d45847bc59afa0aa3216b04"><td class="memItemLeft" align="right" valign="top"><a id="abc6126af1d45847bc59afa0aa3216b04" name="abc6126af1d45847bc59afa0aa3216b04"></a>enum &#160;</td><td class="memItemRight" valign="bottom">{ <br />
 &#160;&#160;<b>KIWI_DIALECT_STANDARD</b> = 0
 , <b>KIWI_DIALECT_GYEONGGI</b> = 1 &lt;&lt; 0
 , <b>KIWI_DIALECT_CHUNGCHEONG</b> = 1 &lt;&lt; 1
@@ -255,8 +245,8 @@ Enumerations</h2></td></tr>
 , <b>KIWI_DIALECT_ALL</b> = KIWI_DIALECT_ARCHAIC * 2 - 1
 <br />
  }</td></tr>
-<tr class="separator:adc29c2ff13d900c2f185ee95427fb06c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a61dadd085c1777f559549e05962b2c9e" id="r_a61dadd085c1777f559549e05962b2c9e"><td class="memItemLeft" align="right" valign="top"><a id="a61dadd085c1777f559549e05962b2c9e" name="a61dadd085c1777f559549e05962b2c9e"></a>enum &#160;</td><td class="memItemRight" valign="bottom">{ <br />
+<tr class="separator:abc6126af1d45847bc59afa0aa3216b04"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adc29c2ff13d900c2f185ee95427fb06c" id="r_adc29c2ff13d900c2f185ee95427fb06c"><td class="memItemLeft" align="right" valign="top"><a id="adc29c2ff13d900c2f185ee95427fb06c" name="adc29c2ff13d900c2f185ee95427fb06c"></a>enum &#160;</td><td class="memItemRight" valign="bottom">{ <br />
 &#160;&#160;<b>KIWI_TYPO_WITHOUT_TYPO</b> = 0
 , <b>KIWI_TYPO_BASIC_TYPO_SET</b> = 1
 , <b>KIWI_TYPO_CONTINUAL_TYPO_SET</b> = 2
@@ -266,7 +256,7 @@ Enumerations</h2></td></tr>
 , <b>KIWI_TYPO_BASIC_TYPO_SET_WITH_CONTINUAL_AND_LENGTHENING</b> = 5
 <br />
  }</td></tr>
-<tr class="separator:a61dadd085c1777f559549e05962b2c9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:adc29c2ff13d900c2f185ee95427fb06c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
@@ -347,6 +337,12 @@ Functions</h2></td></tr>
 <tr class="memitem:ae460a36b48337e45ce07cd4143d1e3d6" id="r_ae460a36b48337e45ce07cd4143d1e3d6"><td class="memItemLeft" align="right" valign="top">kiwi_h&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#ae460a36b48337e45ce07cd4143d1e3d6">kiwi_init</a> (const char *model_path, int num_threads, int options)</td></tr>
 <tr class="memdesc:ae460a36b48337e45ce07cd4143d1e3d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">KiwiBuilder를 거치지 않고 바로 Kiwi instance를 생성합니다.  <br /></td></tr>
 <tr class="separator:ae460a36b48337e45ce07cd4143d1e3d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1376c3a4f09414b853a2503ddff72d76" id="r_a1376c3a4f09414b853a2503ddff72d76"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a1376c3a4f09414b853a2503ddff72d76">kiwi_set_global_config</a> (kiwi_h handle, <a class="el" href="structkiwi__config__t.html">kiwi_config_t</a> config)</td></tr>
+<tr class="memdesc:a1376c3a4f09414b853a2503ddff72d76"><td class="mdescLeft">&#160;</td><td class="mdescRight">글로벌 설정 값을 변경합니다.  <br /></td></tr>
+<tr class="separator:a1376c3a4f09414b853a2503ddff72d76"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a279c6bcb047daea17ebfb9de7219356c" id="r_a279c6bcb047daea17ebfb9de7219356c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structkiwi__config__t.html">kiwi_config_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a279c6bcb047daea17ebfb9de7219356c">kiwi_get_global_config</a> (kiwi_h handle)</td></tr>
+<tr class="memdesc:a279c6bcb047daea17ebfb9de7219356c"><td class="mdescLeft">&#160;</td><td class="mdescRight">글로벌 설정 값을 반환합니다.  <br /></td></tr>
+<tr class="separator:a279c6bcb047daea17ebfb9de7219356c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7e836be806c4f2cdf7698849b72dd247" id="r_a7e836be806c4f2cdf7698849b72dd247"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a7e836be806c4f2cdf7698849b72dd247">kiwi_set_option</a> (kiwi_h handle, int option, int value)</td></tr>
 <tr class="memdesc:a7e836be806c4f2cdf7698849b72dd247"><td class="mdescLeft">&#160;</td><td class="mdescRight">int 타입 옵션의 값을 변경합니다.  <br /></td></tr>
 <tr class="separator:a7e836be806c4f2cdf7698849b72dd247"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1701,6 +1697,33 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a279c6bcb047daea17ebfb9de7219356c" name="a279c6bcb047daea17ebfb9de7219356c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a279c6bcb047daea17ebfb9de7219356c">&#9670;&#160;</a></span>kiwi_get_global_config()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structkiwi__config__t.html">kiwi_config_t</a> kiwi_get_global_config </td>
+          <td>(</td>
+          <td class="paramtype">kiwi_h&#160;</td>
+          <td class="paramname"><em>handle</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>글로벌 설정 값을 반환합니다. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">handle</td><td>Kiwi. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>현재 설정 값들. </dd></dl>
+
+</div>
+</div>
 <a id="ab35bce02d300b0e753d3f9cb81ca879f" name="ab35bce02d300b0e753d3f9cb81ca879f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab35bce02d300b0e753d3f9cb81ca879f">&#9670;&#160;</a></span>kiwi_get_option()</h2>
 
@@ -3032,6 +3055,43 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>성공 시 0 이상의 값, 실패 시 음수를 반환합니다. </dd></dl>
+
+</div>
+</div>
+<a id="a1376c3a4f09414b853a2503ddff72d76" name="a1376c3a4f09414b853a2503ddff72d76"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1376c3a4f09414b853a2503ddff72d76">&#9670;&#160;</a></span>kiwi_set_global_config()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void kiwi_set_global_config </td>
+          <td>(</td>
+          <td class="paramtype">kiwi_h&#160;</td>
+          <td class="paramname"><em>handle</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structkiwi__config__t.html">kiwi_config_t</a>&#160;</td>
+          <td class="paramname"><em>config</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>글로벌 설정 값을 변경합니다. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">handle</td><td>Kiwi. </td></tr>
+    <tr><td class="paramname">config</td><td>변경할 설정 값들. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
