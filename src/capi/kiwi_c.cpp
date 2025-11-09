@@ -34,7 +34,7 @@ struct kiwi_ws : public pair<vector<WordInfo>, ResultBuffer>
 
 struct kiwi_ss : public vector<pair<size_t, size_t>>
 {
-	kiwi_ss(vector<pair<size_t, size_t>>&& o) : vector{ move(o) }
+	kiwi_ss(vector<pair<size_t, size_t>>&& o) : vector{ std::move(o) }
 	{
 	}
 };
@@ -73,7 +73,7 @@ struct kiwi_swtokenizer
 	string cachedText;
 
 	kiwi_swtokenizer(SwTokenizer&& _tokenizer)
-		: tokenizer{move(_tokenizer)}
+		: tokenizer{ std::move(_tokenizer) }
 	{}
 };
 
@@ -380,7 +380,7 @@ kiwi_ws_h kiwi_builder_extract_words(kiwi_builder_h handle, kiwi_reader_t reader
 			};
 		}, minCnt, maxWordLen, minScore, posThreshold);
 
-		return new kiwi_ws{ move(res), {} };
+		return new kiwi_ws{ std::move(res), {} };
 	}
 	catch (...)
 	{
@@ -409,7 +409,7 @@ kiwi_ws_h kiwi_builder_extract_add_words(kiwi_builder_h handle, kiwi_reader_t re
 				return utf8To16(buf);
 			};
 		}, minCnt, maxWordLen, minScore, posThreshold);
-		return new kiwi_ws{ move(res), {} };
+		return new kiwi_ws{ std::move(res), {} };
 	}
 	catch (...)
 	{
@@ -439,7 +439,7 @@ kiwi_ws_h kiwi_builder_extract_words_w(kiwi_builder_h handle, kiwi_reader_w_t re
 			};
 		}, minCnt, maxWordLen, minScore, posThreshold);
 
-		return new kiwi_ws{ move(res), {} };
+		return new kiwi_ws{ std::move(res), {} };
 	}
 	catch (...)
 	{
@@ -468,7 +468,7 @@ kiwi_ws_h kiwi_builder_extract_add_words_w(kiwi_builder_h handle, kiwi_reader_w_
 				return buf;
 			};
 		}, minCnt, maxWordLen, minScore, posThreshold);
-		return new kiwi_ws{ move(res), {} };
+		return new kiwi_ws{ std::move(res), {} };
 	}
 	catch (...)
 	{
@@ -667,7 +667,7 @@ void kiwi_set_global_config(kiwi_h handle, kiwi_config_t config)
 	try
 	{
 		KiwiConfig kconfig{
-			config.integrate_allomorph,
+			!!config.integrate_allomorph,
 			config.cut_off_threshold,
 			config.unk_form_score_scale,
 			config.unk_form_score_bias,
@@ -843,7 +843,7 @@ int kiwi_analyze_mw(kiwi_h handle, kiwi_reader_w_t reader, kiwi_receiver_t recei
 			return buf;
 		}, [&](vector<TokenResult>&& res)
 		{
-			auto result = new kiwi_res{ move(res), {} };
+			auto result = new kiwi_res{ std::move(res), {} };
 			(*receiver)(receiver_idx++, result, userData);
 		}, toAnalyzeOption(option));
 		return reader_idx;
@@ -871,7 +871,7 @@ int kiwi_analyze_m(kiwi_h handle, kiwi_reader_t reader, kiwi_receiver_t receiver
 			return utf8To16(buf);
 		}, [&](vector<TokenResult>&& res)
 		{
-			auto result = new kiwi_res{ move(res),{} };
+			auto result = new kiwi_res{ std::move(res),{} };
 			(*receiver)(receiver_idx++, result, userData);
 		}, toAnalyzeOption(option));
 		return reader_idx;
@@ -892,8 +892,8 @@ kiwi_ss_h kiwi_split_into_sents_w(kiwi_h handle, const kchar16_t* text, int matc
 		vector<TokenResult> tokenized;
 		if (tokenized_res) tokenized.resize(1);
 		auto sent_ranges = kiwi->splitIntoSents((const char16_t*)text, (Match)matchOptions, tokenized_res ? tokenized.data() : nullptr);
-		if (tokenized_res) *tokenized_res = new kiwi_res{ move(tokenized), {} };
-		return new kiwi_ss{ move(sent_ranges) };
+		if (tokenized_res) *tokenized_res = new kiwi_res{ std::move(tokenized), {} };
+		return new kiwi_ss{ std::move(sent_ranges) };
 	}
 	catch (...)
 	{
@@ -911,8 +911,8 @@ kiwi_ss_h kiwi_split_into_sents(kiwi_h handle, const char* text, int matchOption
 		vector<TokenResult> tokenized;
 		if (tokenized_res) tokenized.resize(1);
 		auto sent_ranges = kiwi->splitIntoSents(text, (Match)matchOptions, tokenized_res ? tokenized.data() : nullptr);
-		if (tokenized_res) *tokenized_res = new kiwi_res{ move(tokenized), {} };
-		return new kiwi_ss{ move(sent_ranges) };
+		if (tokenized_res) *tokenized_res = new kiwi_res{ std::move(tokenized), {} };
+		return new kiwi_ss{ std::move(sent_ranges) };
 	}
 	catch (...)
 	{
@@ -1479,15 +1479,15 @@ int kiwi_swt_encode(kiwi_swtokenizer_h handle, const char* text, int text_size, 
 		{
 			tokenIds = handle->tokenizer.encode(str, &offset);
 			handle->encodeLastText = strHash;
-			handle->cachedTokenIds = move(tokenIds);
-			handle->cachedOffset = move(offset);
+			handle->cachedTokenIds = std::move(tokenIds);
+			handle->cachedOffset = std::move(offset);
 			return handle->cachedTokenIds.size();
 		}
 
 		if (handle->encodeLastText == strHash)
 		{
-			tokenIds = move(handle->cachedTokenIds);
-			offset = move(handle->cachedOffset);
+			tokenIds = std::move(handle->cachedTokenIds);
+			offset = std::move(handle->cachedOffset);
 			handle->encodeLastText = 0;
 		}
 		else
@@ -1527,13 +1527,13 @@ int kiwi_swt_decode(kiwi_swtokenizer_h handle, const int* token_ids, int token_s
 		{
 			decoded = handle->tokenizer.decode((const uint32_t*)token_ids, token_size);
 			handle->decodeLastTokenIds = hash;
-			handle->cachedText = move(decoded);
+			handle->cachedText = std::move(decoded);
 			return handle->cachedText.size();
 		}
 
 		if (handle->decodeLastTokenIds == hash)
 		{
-			decoded = move(handle->cachedText);
+			decoded = std::move(handle->cachedText);
 			handle->decodeLastTokenIds = 0;
 		}
 		else
