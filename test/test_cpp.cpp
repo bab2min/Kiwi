@@ -1804,6 +1804,27 @@ TEST(KiwiCpp, Issue205)
 	EXPECT_EQ(res2[0].str, u"함박 스테이크");
 }
 
+TEST(KiwiCpp, Dialect)
+{
+	Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 0, BuildOption::default_, ModelType::none, Dialect::chungcheong }.build();
+
+	auto res = kiwi.analyze(u"남자 손금은 오약손으루 보는 겨.", AnalyzeOption{ Match::allWithNormalizing, nullptr, false, Dialect::all, 6.f }).first;
+	EXPECT_EQ(res.size(), 11);
+	EXPECT_EQ(res[0].str, u"남자");
+	EXPECT_EQ(res[1].str, u"손금");
+	EXPECT_EQ(res[2].str, u"은");
+	EXPECT_EQ(res[3].str, u"오약손");
+	EXPECT_TRUE(!!(res[3].dialect & Dialect::chungcheong));
+	EXPECT_EQ(res[4].str, u"으루");
+	EXPECT_EQ(res[5].str, u"보");
+	EXPECT_EQ(res[6].str, u"는");
+	EXPECT_EQ(res[7].str, u"기");
+	EXPECT_TRUE(!!(res[7].dialect & Dialect::chungcheong));
+	EXPECT_EQ(res[8].str, u"이");
+	EXPECT_EQ(res[9].str, u"어");
+	EXPECT_EQ(res[10].str, u".");
+}
+
 TEST(KiwiCpp, StreamProvider)
 {
 	// Test the new StreamProvider interface for flexible model loading
