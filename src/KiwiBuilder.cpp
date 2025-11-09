@@ -2376,7 +2376,8 @@ namespace kiwi
 
 Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) const
 {
-	Kiwi ret{ archType, langMdl, !typos.empty(), typos.isContinualTypoEnabled(), typos.isLengtheningTypoEnabled()};
+	Kiwi ret{ archType, langMdl, !typos.empty(), typos.isContinualTypoEnabled(), typos.isLengtheningTypoEnabled() };
+	ret.enabledDialects = enabledDialects;
 
 	Vector<FormRaw> combinedForms;
 	Vector<MorphemeRaw> combinedMorphemes;
@@ -2400,7 +2401,7 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 	ret.forms.reserve(forms.size() + combinedForms.size() + 1);
 	ret.morphemes.reserve(morphemes.size() + combinedMorphemes.size());
 	ret.combiningRule = combiningRule;
-	ret.integrateAllomorph = !!(options & BuildOption::integrateAllomorph);
+	ret.globalConfig.integrateAllomorph = !!(options & BuildOption::integrateAllomorph);
 	if (numThreads >= 1)
 	{
 		ret.pool = make_unique<utils::ThreadPool>(numThreads);
@@ -2854,7 +2855,9 @@ HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes,
 		if (doesGenerateUnlikelihoods)
 		{
 			dataset.kiwiInst = make_unique<Kiwi>(build());
-			dataset.kiwiInst->setMaxUnkFormSize(2);
+			auto config = dataset.kiwiInst->getGlobalConfig();
+			config.maxUnkFormSize = 2;
+			dataset.kiwiInst->setGlobalConfig(config);
 		}
 	}
 	else

@@ -90,6 +90,7 @@ namespace kiwi
 	struct BestPathFinder
 	{
 		static Vector<PathResult> findBestPath(const Kiwi* kw,
+			const KiwiConfig& config,
 			const Vector<SpecialState>& prevSpStates,
 			const KString& normForm,
 			const KGraphNode* graph,
