@@ -700,16 +700,20 @@ TEST(KiwiCpp, SpaceTolerant)
 	auto tokens = kiwi.analyze(str, Match::all).first;
 	EXPECT_GE(tokens.size(), 11);
 
-	kiwi.setSpaceTolerance(1);
-	kiwi.setSpacePenalty(3);
+	auto config = kiwi.getGlobalConfig();
+	config.spacePenalty = 3;
+	config.spaceTolerance = 1;
+	kiwi.setGlobalConfig(config);
 	tokens = kiwi.analyze(str, Match::all).first;
 	EXPECT_LE(tokens.size(), 11);
 
-	kiwi.setSpaceTolerance(2);
+	config.spaceTolerance = 2;
+	kiwi.setGlobalConfig(config);
 	tokens = kiwi.analyze(str, Match::all).first;
 	EXPECT_EQ(tokens.size(), 8);
 
-	kiwi.setSpaceTolerance(3);
+	config.spaceTolerance = 3;
+	kiwi.setGlobalConfig(config);
 	tokens = kiwi.analyze(str, Match::all).first;
 	EXPECT_EQ(tokens.size(), 5);
 
@@ -718,8 +722,9 @@ TEST(KiwiCpp, SpaceTolerant)
 		kiwi.analyze(u"띄     어 쓰 기", Match::all).second
 	);
 
-	kiwi.setSpaceTolerance(0);
-	kiwi.setSpacePenalty(8);
+	config.spaceTolerance = 0;
+	config.spacePenalty = 7;
+	kiwi.setGlobalConfig(config);
 }
 
 TEST(KiwiCpp, MultiWordDictionary)
@@ -771,7 +776,9 @@ TEST(KiwiCpp, WordsWithSpaces)
 	EXPECT_EQ(res1.second, res2.second);
 	EXPECT_EQ(res1.second, res3.second);
 
-	kiwi.setSpaceTolerance(1);
+	auto config = kiwi.getGlobalConfig();
+	config.spaceTolerance = 1;
+	kiwi.setGlobalConfig(config);
 	res1 = kiwi.analyze(u"대학생 선교회", Match::all);
 	res2 = kiwi.analyze(u"대학생선교회", Match::all);
 	res3 = kiwi.analyze(u"대학생 \t 선교회", Match::all);
@@ -817,7 +824,9 @@ TEST(KiwiCpp, WordsWithSpaces)
 	EXPECT_EQ(res1.second, res4.second);
 	EXPECT_EQ(res1.second, res5.second);
 
-	kiwi.setSpaceTolerance(1);
+	config = kiwi.getGlobalConfig();
+	config.spaceTolerance = 1;
+	kiwi.setGlobalConfig(config);
 	res2 = kiwi.analyze(u"농협용인육 가공 공장", Match::all);
 	res3 = kiwi.analyze(u"농협용 인육 가공 공장", Match::all);
 	res4 = kiwi.analyze(u"농협용 인육 가공공장", Match::all);
@@ -825,7 +834,8 @@ TEST(KiwiCpp, WordsWithSpaces)
 	EXPECT_NE(res3.first[0].str, u"농협 용인 육가공 공장");
 	EXPECT_NE(res4.first[0].str, u"농협 용인 육가공 공장");
 
-	kiwi.setSpaceTolerance(2);
+	config.spaceTolerance = 2;
+	kiwi.setGlobalConfig(config);
 	res3 = kiwi.analyze(u"농협용 인육 가공 공장", Match::all);
 	res4 = kiwi.analyze(u"농협용 인육 가공공장", Match::all);
 	EXPECT_EQ(res3.first[0].str, u"농협 용인 육가공 공장");
@@ -1093,7 +1103,7 @@ TEST(KiwiCpp, ZCoda)
 			auto res1 = kiwi.analyze(s.first, Match::allWithNormalizing);
 			auto res2 = kiwi.analyze(s.second, Match::allWithNormalizing);
 			auto res3 = kiwi.analyze(s.second, Match::allWithNormalizing & ~Match::zCoda);
-			EXPECT_GE(res1.second - kiwi.getTypoCostWeight(), res2.second);
+			EXPECT_GE(res1.second - kiwi.getGlobalConfig().typoCostWeight, res2.second);
 			EXPECT_GT(res2.second, res3.second);
 			EXPECT_EQ(res2.first[res2.first.size() - 2].tag, POSTag::z_coda);
 		}
