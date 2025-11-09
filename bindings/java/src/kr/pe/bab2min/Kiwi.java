@@ -12,7 +12,6 @@ import java.util.concurrent.TimeUnit;
 
 public class Kiwi implements AutoCloseable  {
 	private long _inst;
-	final private static String _version = "0.21.0";
 
 	public static class Match {
 		final static public int none = 0,
@@ -148,6 +147,47 @@ public class Kiwi implements AutoCloseable  {
 		insert_space = 2;
 	}
 
+	public static class Dialect {
+		final public static short standard = 0,
+		gyeonggi = 1 << 0,
+		chungcheong = 1 << 1,
+		gangwon = 1 << 2,
+		gyeongsang = 1 << 3,
+		jeolla = 1 << 4,
+		jeju = 1 << 5,
+		hwanghae = 1 << 6,
+		hamgyeong = 1 << 7,
+		pyeongan = 1 << 8,
+		archaic = 1 << 9,
+		all = (1 << 10) - 1;
+	}
+
+	public static class AnalyzeOption {
+		public int match;
+		public MorphemeSet blocklist;
+		public short allowedDialects;
+		public float dialectCost;
+
+		public AnalyzeOption(int match, MorphemeSet blocklist, short allowedDialects, float dialectCost) {
+			this.match = match;
+			this.blocklist = blocklist;
+			this.allowedDialects = allowedDialects;
+			this.dialectCost = dialectCost;
+		}
+
+		public AnalyzeOption(int match, MorphemeSet blocklist) {
+			this(match, blocklist, Dialect.standard, 0.0f);
+		}
+
+		public AnalyzeOption(int match) {
+			this(match, null, Dialect.standard, 0.0f);
+		}
+
+		public AnalyzeOption() {
+			this(Match.allWithNormalizing, null, Dialect.standard, 0.0f);
+		}
+	}
+
 	public static class Token {
 		public String form;
 		public int position;
@@ -162,6 +202,7 @@ public class Kiwi implements AutoCloseable  {
 		public int typoFormId;
 		public int pairedToken;
 		public int subSentPosition;
+		public short dialect;
 
 		public String toString() {
 			return String.format("Token(form=%s, tag=%s, position=%d, length=%d)", form, POSTag.toString(tag), position, length);
@@ -345,6 +386,12 @@ public class Kiwi implements AutoCloseable  {
 		this._inst = _inst;
 	}
 
+	public static Kiwi init(String modelPath, int numWorkers, int buildOptions, int modelType, short enabledDialects) throws Exception {
+		try(KiwiBuilder b = new KiwiBuilder(modelPath, numWorkers, buildOptions, modelType, enabledDialects)) {
+			return b.build();
+		}
+	}
+
 	public static Kiwi init(String modelPath, int numWorkers, int buildOptions, int modelType) throws Exception {
 		try(KiwiBuilder b = new KiwiBuilder(modelPath, numWorkers, buildOptions, modelType)) {
 			return b.build();
@@ -380,48 +427,44 @@ public class Kiwi implements AutoCloseable  {
 		return _inst != 0;
 	}
 
-	public native TokenResult[] analyze(String text, int topN, int matchOption, MorphemeSet blocklist, Iterator<PretokenizedSpan> pretokenized);
-	public native FutureTokenResult asyncAnalyze(String text, int topN, int matchOption, MorphemeSet blocklist, Iterator<PretokenizedSpan> pretokenized);
-	public native MultipleTokenResult analyze(Iterator<String> texts, int topN, int matchOption, MorphemeSet blocklist, Iterator<Iterator<PretokenizedSpan>> pretokenized);
+	public native TokenResult[] analyze(String text, int topN, int matchOption, MorphemeSet blocklist, short allowedDialects, float dialectCost, Iterator<PretokenizedSpan> pretokenized);
+	public native FutureTokenResult asyncAnalyze(String text, int topN, int matchOption, MorphemeSet blocklist, short allowedDialects, float dialectCost, Iterator<PretokenizedSpan> pretokenized);
+	public native MultipleTokenResult analyze(Iterator<String> texts, int topN, int matchOption, MorphemeSet blocklist, short allowedDialects, float dialectCost, Iterator<Iterator<PretokenizedSpan>> pretokenized);
 	public native Sentence[] splitIntoSents(String text, int matchOption, boolean returnTokens);
 	public native String join(JoinableToken[] tokens);
 
 	public static native String getVersion();
 
-	public TokenResult[] analyze(String text, int topN, int matchOption, MorphemeSet blocklist) {
-		return analyze(text, topN, matchOption, blocklist, null);
+	public TokenResult[] analyze(String text, int topN, AnalyzeOption option, Iterator<PretokenizedSpan> pretokenized) {
+		return analyze(text, topN, option.match, option.blocklist, option.allowedDialects, option.dialectCost, pretokenized);
 	}
 
-	public TokenResult[] analyze(String text, int topN, int matchOption) {
-		return analyze(text, topN, matchOption, null);
+	public TokenResult[] analyze(String text, int topN, AnalyzeOption option) {
+		return analyze(text, topN, option, null);
 	}
 
-	public FutureTokenResult asyncAnalyze(String text, int topN, int matchOption, MorphemeSet blocklist) {
-		return asyncAnalyze(text, topN, matchOption, blocklist, null);
+	public FutureTokenResult asyncAnalyze(String text, int topN, AnalyzeOption option, Iterator<PretokenizedSpan> pretokenized) {
+		return asyncAnalyze(text, topN, option.match, option.blocklist, option.allowedDialects, option.dialectCost, pretokenized);
 	}
 
-	public FutureTokenResult asyncAnalyze(String text, int topN, int matchOption) {
-		return asyncAnalyze(text, topN, matchOption, null);
+	public FutureTokenResult asyncAnalyze(String text, int topN, AnalyzeOption option) {
+		return asyncAnalyze(text, topN, option, null);
 	}
 
-	public MultipleTokenResult analyze(Iterator<String> texts, int topN, int matchOption, MorphemeSet blocklist) {
-		return analyze(texts, topN, matchOption, blocklist, null);
+	public MultipleTokenResult analyze(Iterator<String> texts, int topN, AnalyzeOption option, Iterator<Iterator<PretokenizedSpan>> pretokenized) {
+		return analyze(texts, topN, option.match, option.blocklist, option.allowedDialects, option.dialectCost, pretokenized);
 	}
 
-	public MultipleTokenResult analyze(Iterator<String> texts, int topN, int matchOption) {
-		return analyze(texts, topN, matchOption, null);
+	public MultipleTokenResult analyze(Iterator<String> texts, int topN, AnalyzeOption option) {
+		return analyze(texts, topN, option, null);
 	}
 
-	public Token[] tokenize(String text, int matchOption, MorphemeSet blocklist, Iterator<PretokenizedSpan> pretokenized) {
-		return analyze(text, 1, matchOption, blocklist, pretokenized)[0].tokens;
+	public Token[] tokenize(String text, AnalyzeOption option, Iterator<PretokenizedSpan> pretokenized) {
+		return analyze(text, 1, option, pretokenized)[0].tokens;
 	}
 
-	public Token[] tokenize(String text, int matchOption, MorphemeSet blocklist) {
-		return analyze(text, 1, matchOption, blocklist)[0].tokens;
-	}
-
-	public Token[] tokenize(String text, int matchOption) {
-		return analyze(text, 1, matchOption)[0].tokens;
+	public Token[] tokenize(String text, AnalyzeOption option) {
+		return analyze(text, 1, option)[0].tokens;
 	}
 
 	public Sentence[] splitIntoSents(String text, int matchOption) {
@@ -496,7 +539,7 @@ public class Kiwi implements AutoCloseable  {
 		try(Scanner input = new Scanner(System.in)) {
 			System.out.print(">> ");
 			while (input.hasNext()) {
-				Token[] tokens = kiwi.tokenize(input.nextLine(), Match.allWithNormalizing);
+				Token[] tokens = kiwi.tokenize(input.nextLine(), new AnalyzeOption(Match.allWithNormalizing));
 				System.out.println(Arrays.deepToString(tokens));
 				System.out.print(">> ");
 			}

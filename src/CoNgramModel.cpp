@@ -27,6 +27,7 @@ namespace kiwi
 		void eval(
 			Vector<WordLL<LmState>>& resultOut,
 			const Kiwi* kw,
+			const KiwiConfig& config,
 			const Vector<U16StringView>& ownForms,
 			const Vector<Vector<WordLL<LmState>>>& cache,
 			size_t ownFormId,
@@ -51,8 +52,8 @@ namespace kiwi
 
 			const auto* langMdl = static_cast<const lm::CoNgramModel<arch, VocabTy, VlVocabTy, windowSize, quantized>*>(kw->getLangModel());
 			const Morpheme* morphBase = kw->morphemes.data();
-			const auto spacePenalty = kw->spacePenalty;
-			const bool allowedSpaceBetweenChunk = kw->spaceTolerance > 0;
+			const auto spacePenalty = config.spacePenalty;
+			const bool allowedSpaceBetweenChunk = config.spaceTolerance > 0;
 			const size_t langVocabSize = langMdl->vocabSize();
 
 			regularPrevPathes.clear();

@@ -59,6 +59,17 @@ typedef struct {
 	uint16_t dialect; /**< 방언 정보 */
 } kiwi_token_info_t;
 
+typedef struct {
+	uint8_t integrate_allomorph; /**< 이형태 형태소의 통합 여부 */
+	float cut_off_threshold; /**< 분석 과정에서 이 값보다 더 크게 차이가 나는 후보들은 제거합니다. */
+	float unk_form_score_scale; /**< 미등재 형태 추출 시 사용하는 기울기 값 */
+	float unk_form_score_bias; /**< 미등재 형태 추출 시 사용하는 편향 값 */
+	float space_penalty; /**< 공백 패널티 */
+	float typo_cost_weight; /**< 오타 비용의 가중치 */
+	uint32_t max_unk_form_size; /**< 미등재 형태의 최대 크기 */
+	uint32_t space_tolerance; /**< 공백 허용치 */
+} kiwi_config_t;
+
 /*
 int (*kiwi_reader_t)(int id, char* buffer, void* user_data)
 id: id number of line to be read. if id == 0, kiwi_reader should roll back file and read lines from the beginning
@@ -147,17 +158,6 @@ enum
 enum
 {
 	KIWI_NUM_THREADS = 0x8001,
-	KIWI_MAX_UNK_FORM_SIZE = 0x8002,
-	KIWI_SPACE_TOLERANCE = 0x8003,
-};
-
-enum
-{
-	KIWI_CUT_OFF_THRESHOLD = 0x9001,
-	KIWI_UNK_FORM_SCORE_SCALE = 0x9002,
-	KIWI_UNK_FORM_SCORE_BIAS = 0x9003,
-	KIWI_SPACE_PENALTY = 0x9004,
-	KIWI_TYPO_COST_WEIGHT = 0x9005,
 };
 
 enum
@@ -526,6 +526,22 @@ DECL_DLL int kiwi_typo_close(kiwi_typo_h handle);
  * @return Kiwi의 핸들.
  */
 DECL_DLL kiwi_h kiwi_init(const char* model_path, int num_threads, int options);
+
+/**
+ * @brief 글로벌 설정 값을 변경합니다.
+ * 
+ * @param handle Kiwi.
+ * @param config 변경할 설정 값들.
+ */
+DECL_DLL void kiwi_set_global_config(kiwi_h handle, kiwi_config_t config);
+
+/**
+ * @brief 글로벌 설정 값을 반환합니다.
+ * 
+ * @param handle Kiwi.
+ * @return 현재 설정 값들.
+ */
+DECL_DLL kiwi_config_t kiwi_get_global_config(kiwi_h handle);
 
 /**
  * @brief int 타입 옵션의 값을 변경합니다.

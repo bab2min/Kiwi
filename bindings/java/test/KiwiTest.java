@@ -10,6 +10,7 @@ import kr.pe.bab2min.KiwiBuilder.TypoTransformer;
 import static org.junit.Assert.*;
 
 import kr.pe.bab2min.Kiwi;
+import kr.pe.bab2min.Kiwi.AnalyzeOption;
 import kr.pe.bab2min.KiwiBuilder;
 
 public class KiwiTest {
@@ -34,7 +35,7 @@ public class KiwiTest {
 	public void testInit() throws Exception {
 		System.gc();
 		Kiwi kiwi = Kiwi.init(modelPath);
-		System.out.println(Arrays.deepToString(kiwi.tokenize("자바에서도 Kiwi를!", Kiwi.Match.allWithNormalizing)));
+		System.out.println(Arrays.deepToString(kiwi.tokenize("자바에서도 Kiwi를!", new AnalyzeOption(Kiwi.Match.allWithNormalizing))));
 	}
 
 	@Test
@@ -76,14 +77,14 @@ public class KiwiTest {
 		Kiwi.FutureTokenResult[] futures = new Kiwi.FutureTokenResult[texts.length];
 
 		for(int i = 0; i < texts.length; ++i) {
-			futures[i] = kiwi.asyncAnalyze(texts[i], 1, Kiwi.Match.allWithNormalizing);
+			futures[i] = kiwi.asyncAnalyze(texts[i], 1, new AnalyzeOption(Kiwi.Match.allWithNormalizing));
 		}
 		
 		for(Kiwi.FutureTokenResult future : futures) {
 			System.out.println(Arrays.deepToString(future.get()[0].tokens));
 		}
 
-		Kiwi.MultipleTokenResult results = kiwi.analyze(Arrays.stream(texts).iterator(), 1, Kiwi.Match.allWithNormalizing);
+		Kiwi.MultipleTokenResult results = kiwi.analyze(Arrays.stream(texts).iterator(), 1, new AnalyzeOption(Kiwi.Match.allWithNormalizing));
 		while(results.hasNext()) {
 			Kiwi.TokenResult[] result = results.next();
 			System.out.println(Arrays.deepToString(result[0].tokens));
@@ -97,7 +98,7 @@ public class KiwiTest {
 		assertEquals(builder.addWord("키위자바", Kiwi.POSTag.nnp, 0.f), true);
 		assertEquals(builder.addWord("좌봐", Kiwi.POSTag.nnp, 0.f, "자바"), true);
 		Kiwi kiwi = builder.build();
-		Kiwi.Token[] tokens = kiwi.tokenize("좌봐에서도 키위자바를!", Kiwi.Match.allWithNormalizing);
+		Kiwi.Token[] tokens = kiwi.tokenize("좌봐에서도 키위자바를!", new AnalyzeOption(Kiwi.Match.allWithNormalizing));
 		assertEquals(tokens[0].form, "좌봐");
 		assertEquals(tokens[3].form, "키위자바");
 	}
@@ -113,7 +114,7 @@ public class KiwiTest {
 		};
 		assertEquals(builder.addPreAnalyzedWord("넘해", morphs, 0.f), true);
 		Kiwi kiwi = builder.build();
-		Kiwi.Token[] tokens = kiwi.tokenize("그건좀넘해", Kiwi.Match.allWithNormalizing);
+		Kiwi.Token[] tokens = kiwi.tokenize("그건좀넘해", new AnalyzeOption(Kiwi.Match.allWithNormalizing));
 		System.out.println(Arrays.deepToString(tokens));
 	}
 	
@@ -122,7 +123,7 @@ public class KiwiTest {
 		System.gc();
 		KiwiBuilder builder = new KiwiBuilder(modelPath);
 		Kiwi kiwi = builder.build(KiwiBuilder.basicTypoSet);
-		Kiwi.Token[] tokens = kiwi.tokenize("나 죰 도와죠.", Kiwi.Match.allWithNormalizing);
+		Kiwi.Token[] tokens = kiwi.tokenize("나 죰 도와죠.", new AnalyzeOption(Kiwi.Match.allWithNormalizing));
 		System.out.println(Arrays.deepToString(tokens));
 		assertEquals(tokens[1].form, "좀");
 		assertEquals(tokens[4].form, "주");
@@ -134,28 +135,28 @@ public class KiwiTest {
 		System.gc();
 		KiwiBuilder builder = new KiwiBuilder(modelPath);
 		Kiwi kiwi = builder.build(KiwiBuilder.continualTypoSet);
-		
-		Kiwi.Token[] tokens = kiwi.tokenize("프로그래미", Kiwi.Match.allWithNormalizing);
+
+		Kiwi.Token[] tokens = kiwi.tokenize("프로그래미", new AnalyzeOption(Kiwi.Match.allWithNormalizing));
 		System.out.println(Arrays.deepToString(tokens));
 		assertEquals(tokens[0].form, "프로그램");
 		assertEquals(tokens[1].form, "이");
 
-		tokens = kiwi.tokenize("프로그래믈", Kiwi.Match.allWithNormalizing);
+		tokens = kiwi.tokenize("프로그래믈", new AnalyzeOption(Kiwi.Match.allWithNormalizing));
 		System.out.println(Arrays.deepToString(tokens));
 		assertEquals(tokens[0].form, "프로그램");
 		assertEquals(tokens[1].form, "을");
 
-		tokens = kiwi.tokenize("오늘사무시레서", Kiwi.Match.allWithNormalizing);
+		tokens = kiwi.tokenize("오늘사무시레서", new AnalyzeOption(Kiwi.Match.allWithNormalizing));
 		System.out.println(Arrays.deepToString(tokens));
 		assertEquals(tokens[1].form, "사무실");
 		assertEquals(tokens[2].form, "에서");
 
-		tokens = kiwi.tokenize("법원이 기가캤다.", Kiwi.Match.allWithNormalizing);
+		tokens = kiwi.tokenize("법원이 기가캤다.", new AnalyzeOption(Kiwi.Match.allWithNormalizing));
 		System.out.println(Arrays.deepToString(tokens));
 		assertEquals(tokens[2].form, "기각");
 		assertEquals(tokens[3].form, "하");
 
-		tokens = kiwi.tokenize("하나도 업써.", Kiwi.Match.allWithNormalizing);
+		tokens = kiwi.tokenize("하나도 업써.", new AnalyzeOption(Kiwi.Match.allWithNormalizing));
 		System.out.println(Arrays.deepToString(tokens));
 		assertEquals(tokens[2].form, "없");
 		assertEquals(tokens[3].form, "어");
@@ -170,17 +171,17 @@ public class KiwiTest {
 									.update(KiwiBuilder.lengtheningTypoSet);
 		Kiwi kiwi = builder.build(typoSet);
 		
-		Kiwi.Token[] tokens = kiwi.tokenize("프로그래미", Kiwi.Match.allWithNormalizing);
+		Kiwi.Token[] tokens = kiwi.tokenize("프로그래미", new AnalyzeOption(Kiwi.Match.allWithNormalizing));
 		System.out.println(Arrays.deepToString(tokens));
 		assertEquals(tokens[0].form, "프로그램");
 		assertEquals(tokens[1].form, "이");
 
-		tokens = kiwi.tokenize("지인짜?", Kiwi.Match.allWithNormalizing);
+		tokens = kiwi.tokenize("지인짜?", new AnalyzeOption(Kiwi.Match.allWithNormalizing));
 		System.out.println(Arrays.deepToString(tokens));
 		assertEquals(tokens[0].form, "진짜");
 		assertEquals(tokens[1].form, "?");
 
-		tokens = kiwi.tokenize("맗은 물", Kiwi.Match.allWithNormalizing);
+		tokens = kiwi.tokenize("맗은 물", new AnalyzeOption(Kiwi.Match.allWithNormalizing));
 		System.out.println(Arrays.deepToString(tokens));
 		assertEquals(tokens[0].form, "맑");
 	}
@@ -189,13 +190,13 @@ public class KiwiTest {
 	public void testBlocklist() throws Exception {
 		System.gc();
 		Kiwi kiwi = getReusableKiwi();
-		Kiwi.Token[] tokens = kiwi.tokenize("좋아하다.", Kiwi.Match.allWithNormalizing);
+		Kiwi.Token[] tokens = kiwi.tokenize("좋아하다.", new AnalyzeOption(Kiwi.Match.allWithNormalizing));
 		System.out.println(Arrays.deepToString(tokens));
 		assertEquals(tokens[0].form, "좋아하");
 		
 		Kiwi.MorphemeSet morphSet = kiwi.newMorphemeSet();
 		assertTrue(morphSet.add("좋아하") > 0);
-		tokens = kiwi.tokenize("좋아하다.", Kiwi.Match.allWithNormalizing, morphSet);
+		tokens = kiwi.tokenize("좋아하다.", new AnalyzeOption(Kiwi.Match.allWithNormalizing, morphSet));
 		System.out.println(Arrays.deepToString(tokens));
 		assertEquals(tokens[0].form, "좋");
 	}
@@ -210,7 +211,7 @@ public class KiwiTest {
 			new Kiwi.PretokenizedSpan(11, 16),
 			new Kiwi.PretokenizedSpan(34, 39),
 		};
-		Kiwi.Token[] tokens = kiwi.tokenize(str, Kiwi.Match.allWithNormalizing, null, Arrays.stream(pretokenized).iterator());
+		Kiwi.Token[] tokens = kiwi.tokenize(str, new AnalyzeOption(Kiwi.Match.allWithNormalizing), Arrays.stream(pretokenized).iterator());
 		assertEquals(tokens[1].form, "패트와 매트");
 		assertEquals(tokens[3].form, "2017년");
 		assertEquals(tokens[13].form, "2016년");
@@ -220,7 +221,7 @@ public class KiwiTest {
 			new Kiwi.PretokenizedSpan(30, 32),
 			new Kiwi.PretokenizedSpan(21, 24,  new Kiwi.BasicToken[]{ new Kiwi.BasicToken("개봉하", 0, 3, Kiwi.POSTag.vv), new Kiwi.BasicToken("었", 2, 3, Kiwi.POSTag.ep) }),
 		};
-		tokens = kiwi.tokenize(str, Kiwi.Match.allWithNormalizing, null, Arrays.stream(pretokenized).iterator());
+		tokens = kiwi.tokenize(str, new AnalyzeOption(Kiwi.Match.allWithNormalizing), Arrays.stream(pretokenized).iterator());
 		
 		assertEquals(tokens[7].form, "개봉하");
 		assertEquals(tokens[7].tag, Kiwi.POSTag.vv);
@@ -263,12 +264,24 @@ public class KiwiTest {
 	public void testJoin() throws Exception {
 		System.gc();
 		String text = "맞혔습니까";
-		Kiwi.Token[] tokens = getReusableKiwi().tokenize(text, Kiwi.Match.allWithNormalizing);
+		Kiwi.Token[] tokens = getReusableKiwi().tokenize(text, new AnalyzeOption(Kiwi.Match.allWithNormalizing));
 		Kiwi.JoinableToken[] jtokens = new Kiwi.JoinableToken[tokens.length];
 		for(int i = 0; i < tokens.length; ++i) {
 			jtokens[i] = new Kiwi.JoinableToken(tokens[i]);
 		}
 		String restored = getReusableKiwi().join(jtokens);
 		assertEquals(text, restored);
+	}
+
+	@Test
+	public void testDialect() throws Exception {
+		System.gc();
+		Kiwi kiwi = Kiwi.init(modelPath, 1, KiwiBuilder.BuildOption.default_, KiwiBuilder.ModelType.none, Kiwi.Dialect.chungcheong);
+		Kiwi.Token[] tokens = kiwi.tokenize("남자 손금은 오약손으루 보는 겨.", new AnalyzeOption(Kiwi.Match.allWithNormalizing, null, Kiwi.Dialect.chungcheong, 6.f));
+		System.out.println(Arrays.deepToString(tokens));
+		assertEquals(tokens[3].form, "오약손");
+		assertTrue((tokens[3].dialect & Kiwi.Dialect.chungcheong) != 0);
+		assertEquals(tokens[7].form, "기");
+		assertTrue((tokens[7].dialect & Kiwi.Dialect.chungcheong) != 0);
 	}
 }

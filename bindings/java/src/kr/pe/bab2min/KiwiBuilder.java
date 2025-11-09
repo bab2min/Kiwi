@@ -143,36 +143,44 @@ public class KiwiBuilder implements AutoCloseable  {
 		this._inst = _inst;
 	}
 
+	public KiwiBuilder(String modelPath, int numWorkers, int buildOptions, int modelType, short enabledDialects) {
+		ctor(modelPath, numWorkers, buildOptions, modelType, enabledDialects);
+	}
+
+	public KiwiBuilder(StreamProvider streamProvider, int numWorkers, int buildOptions, int modelType, short enabledDialects) {
+		ctor(streamProvider, numWorkers, buildOptions, modelType, enabledDialects);
+	}
+
 	public KiwiBuilder(String modelPath, int numWorkers, int buildOptions, int modelType) {
-		ctor(modelPath, numWorkers, buildOptions, modelType);
+		ctor(modelPath, numWorkers, buildOptions, modelType, Kiwi.Dialect.standard);
 	}
 
 	public KiwiBuilder(StreamProvider streamProvider, int numWorkers, int buildOptions, int modelType) {
-		ctor(streamProvider, numWorkers, buildOptions, modelType);
+		ctor(streamProvider, numWorkers, buildOptions, modelType, Kiwi.Dialect.standard);
 	}
 
 	public KiwiBuilder(String modelPath, int numWorkers, int buildOptions) {
-		ctor(modelPath, numWorkers, buildOptions, ModelType.none);
+		ctor(modelPath, numWorkers, buildOptions, ModelType.none, Kiwi.Dialect.standard);
 	}
 
 	public KiwiBuilder(StreamProvider streamProvider, int numWorkers, int buildOptions) {
-		ctor(streamProvider, numWorkers, buildOptions, ModelType.none);
+		ctor(streamProvider, numWorkers, buildOptions, ModelType.none, Kiwi.Dialect.standard);
 	}
 
 	public KiwiBuilder(String modelPath, int numWorkers) {
-		ctor(modelPath, numWorkers, BuildOption.default_, ModelType.none);
+		ctor(modelPath, numWorkers, BuildOption.default_, ModelType.none, Kiwi.Dialect.standard);
 	}
 
 	public KiwiBuilder(StreamProvider streamProvider, int numWorkers) {
-		ctor(streamProvider, numWorkers, BuildOption.default_, ModelType.none);
+		ctor(streamProvider, numWorkers, BuildOption.default_, ModelType.none, Kiwi.Dialect.standard);
 	}
 
 	public KiwiBuilder(String modelPath) {
-		ctor(modelPath, 1, BuildOption.default_, ModelType.none);
+		ctor(modelPath, 1, BuildOption.default_, ModelType.none, Kiwi.Dialect.standard);
 	}
 
 	public KiwiBuilder(StreamProvider streamProvider) {
-		ctor(streamProvider, 1, BuildOption.default_, ModelType.none);
+		ctor(streamProvider, 1, BuildOption.default_, ModelType.none, Kiwi.Dialect.standard);
 	}
 
 	protected void finalize() throws Exception {
@@ -183,9 +191,9 @@ public class KiwiBuilder implements AutoCloseable  {
 		return _inst != 0;
 	}
 
-	private native void ctor(String modelPath, int numWorkers, int buildOptions, int modelType);
-	private native void ctor(StreamProvider streamProvider, int numWorkers, int buildOptions, int modelType);
-	
+	private native void ctor(String modelPath, int numWorkers, int buildOptions, int modelType, short enabledDialects);
+	private native void ctor(StreamProvider streamProvider, int numWorkers, int buildOptions, int modelType, short enabledDialects);
+
 	@Override
 	public native void close() throws Exception;
 	

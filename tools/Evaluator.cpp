@@ -104,7 +104,12 @@ int Evaluator::operator()(const string& modelPath,
 		Kiwi kw = KiwiBuilder{ modelPath, 1, option, modelType, allowedDialect }.build(
 			typo
 		);
-		if (typoCostWeight > 0) kw.setTypoCostWeight(typoCostWeight);
+		if (typoCostWeight > 0)
+		{
+			auto config = kw.getGlobalConfig();
+			config.typoCostWeight = typoCostWeight;
+			kw.setGlobalConfig(config);
+		}
 
 		cout << "Loading Time : " << timer.getElapsed() << " ms" << endl;
 		cout << "ArchType : " << archToStr(kw.archType()) << endl;

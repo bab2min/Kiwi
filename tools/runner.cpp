@@ -79,12 +79,16 @@ int run(const string& modelPath, bool benchmark, const string& output, const str
 		cout << "Kiwi v" << KIWI_VERSION_STRING << endl;
 		if (tolerance)
 		{
-			kw.setSpaceTolerance(tolerance);
+			auto config = kw.getGlobalConfig();
+			config.spaceTolerance = tolerance;
+			kw.setGlobalConfig(config);
 			cout << "SpaceTolerance: " << tolerance << endl;
 		}
 		if (typoCostWeight > 0)
 		{
-			kw.setTypoCostWeight(typoCostWeight);
+			auto config = kw.getGlobalConfig();
+			config.typoCostWeight = typoCostWeight;
+			kw.setGlobalConfig(config);
 			cout << "Typo Correction Cost Weight: " << typoCostWeight << endl;
 		}
 

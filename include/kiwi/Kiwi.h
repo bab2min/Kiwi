@@ -15,6 +15,7 @@
 #include <memory>
 #include <string>
 #include <string_view>
+#include <optional>
 #include "Macro.h"
 #include "Types.h"
 #include "Form.h"
@@ -98,6 +99,20 @@ namespace kiwi
 
 	static constexpr uint8_t undefSenseId = (uint8_t)-1;
 
+	struct KiwiConfig
+	{
+		bool integrateAllomorph = true;
+		float cutOffThreshold = 8;
+		float unkFormScoreScale = 5;
+		float unkFormScoreBias = 5;
+		float spacePenalty = 7;
+		float typoCostWeight = 6;
+		uint32_t maxUnkFormSize = 6;
+		uint32_t spaceTolerance = 0;
+
+		void validate() const;
+	};
+
 	/**
 	 * @brief 실제 형태소 분석을 수행하는 클래스.
 	 * 
@@ -111,18 +126,13 @@ namespace kiwi
 		friend class cmb::AutoJoiner;
 		template<template<ArchType> class LmState> friend struct NewAutoJoinerGetter;
 
-		bool integrateAllomorph = true;
-		float cutOffThreshold = 8;
-		float unkFormScoreScale = 5;
-		float unkFormScoreBias = 5;
-		float spacePenalty = 7;
-		float typoCostWeight = 6;
+		KiwiConfig globalConfig;
+
 		float continualTypoCost = INFINITY;
 		float lengtheningTypoCost = INFINITY;
-		size_t maxUnkFormSize = 6;
-		size_t spaceTolerance = 0;
 
 		TagSequenceScorer tagScorer;
+		Dialect enabledDialects = Dialect::standard;
 
 		Vector<Form> forms;
 		Vector<Morpheme> morphemes;
@@ -157,10 +167,10 @@ namespace kiwi
 		std::array<size_t, static_cast<size_t>(SpecialMorph::max)> specialMorphIds = { { 0, } };
 
 		template<class Str, class Pretokenized, class ...Rest>
-		auto _asyncAnalyze(Str&& str, Pretokenized&& pt, Rest&&... args) const;
+		auto _asyncAnalyze(Str&& str, Pretokenized&& pt, const std::optional<KiwiConfig>& overrideConfig, Rest&&... args) const;
 
 		template<class Str, class Pretokenized, class ...Rest>
-		auto _asyncAnalyzeEcho(Str&& str, Pretokenized&& pt, Rest&&... args) const;
+		auto _asyncAnalyzeEcho(Str&& str, Pretokenized&& pt, const std::optional<KiwiConfig>& overrideConfig, Rest&&... args) const;
 
 		static std::vector<PretokenizedSpan> mapPretokenizedSpansToU16(const std::vector<PretokenizedSpan>& orig, const std::vector<size_t>& bytePositions);
 
@@ -217,7 +227,8 @@ namespace kiwi
 		 * @return TokenResult 
 		 */
 		TokenResult analyze(const std::u16string& str, AnalyzeOption option,
-			const std::vector<PretokenizedSpan>& pretokenized = {}
+			const std::vector<PretokenizedSpan>& pretokenized = {},
+			const std::optional<KiwiConfig>& overrideConfig = {}
 		) const
 		{
 			return analyze(str, 1, option, pretokenized)[0];
@@ -231,7 +242,8 @@ namespace kiwi
 		 * @return TokenResult 
 		 */
 		TokenResult analyze(const std::string& str, AnalyzeOption option, 
-			const std::vector<PretokenizedSpan>& pretokenized = {}
+			const std::vector<PretokenizedSpan>& pretokenized = {},
+			const std::optional<KiwiConfig>& overrideConfig = {}
 		) const
 		{
 			std::vector<size_t> bytePositions;
@@ -248,7 +260,8 @@ namespace kiwi
 		 * @return std::vector<TokenResult> 
 		 */
 		std::vector<TokenResult> analyze(const std::u16string& str, size_t topN, AnalyzeOption option,
-			const std::vector<PretokenizedSpan>& pretokenized = {}
+			const std::vector<PretokenizedSpan>& pretokenized = {},
+			const std::optional<KiwiConfig>& overrideConfig = {}
 		) const;
 
 		/**
@@ -260,7 +273,9 @@ namespace kiwi
 		 * @return std::vector<TokenResult> 
 		 */
 		std::vector<TokenResult> analyze(const std::string& str, size_t topN, AnalyzeOption option,
-			const std::vector<PretokenizedSpan>& pretokenized = {}) const
+			const std::vector<PretokenizedSpan>& pretokenized = {},
+			const std::optional<KiwiConfig>& overrideConfig = {}
+		) const
 		{
 			std::vector<size_t> bytePositions;
 			auto u16str = utf8To16(str, bytePositions);
@@ -276,37 +291,47 @@ namespace kiwi
 		 * @return std::future<std::vector<TokenResult>> 
 		 */
 		std::future<std::vector<TokenResult>> asyncAnalyze(const std::string& str, size_t topN, AnalyzeOption option,
-			const std::vector<PretokenizedSpan>& pretokenized = {}
+			const std::vector<PretokenizedSpan>& pretokenized = {},
+			const std::optional<KiwiConfig>& overrideConfig = {}
 		) const;
 		std::future<std::vector<TokenResult>> asyncAnalyze(std::string&& str, size_t topN, AnalyzeOption option,
-			std::vector<PretokenizedSpan>&& pretokenized = {}
+			std::vector<PretokenizedSpan>&& pretokenized = {},
+			const std::optional<KiwiConfig>& overrideConfig = {}
 		) const;
 
 		std::future<TokenResult> asyncAnalyze(const std::string& str, AnalyzeOption option,
-			const std::vector<PretokenizedSpan>& pretokenized = {}
+			const std::vector<PretokenizedSpan>& pretokenized = {},
+			const std::optional<KiwiConfig>& overrideConfig = {}
 		) const;
 		std::future<TokenResult> asyncAnalyze(std::string&& str, AnalyzeOption option,
-			std::vector<PretokenizedSpan>&& pretokenized = {}
+			std::vector<PretokenizedSpan>&& pretokenized = {},
+			const std::optional<KiwiConfig>& overrideConfig = {}
 		) const;
 		std::future<std::pair<TokenResult, std::string>> asyncAnalyzeEcho(std::string&& str, AnalyzeOption option,
-			std::vector<PretokenizedSpan>&& pretokenized = {}
+			std::vector<PretokenizedSpan>&& pretokenized = {},
+			const std::optional<KiwiConfig>& overrideConfig = {}
 		) const;
 
 		std::future<std::vector<TokenResult>> asyncAnalyze(const std::u16string& str, size_t topN, AnalyzeOption option,
-			const std::vector<PretokenizedSpan>& pretokenized = {}
+			const std::vector<PretokenizedSpan>& pretokenized = {},
+			const std::optional<KiwiConfig>& overrideConfig = {}
 		) const;
 		std::future<std::vector<TokenResult>> asyncAnalyze(std::u16string&& str, size_t topN, AnalyzeOption option,
-			std::vector<PretokenizedSpan>&& pretokenized = {}
+			std::vector<PretokenizedSpan>&& pretokenized = {},
+			const std::optional<KiwiConfig>& overrideConfig = {}
 		) const;
 
 		std::future<TokenResult> asyncAnalyze(const std::u16string& str, AnalyzeOption option,
-			const std::vector<PretokenizedSpan>& pretokenized = {}
+			const std::vector<PretokenizedSpan>& pretokenized = {},
+			const std::optional<KiwiConfig>& overrideConfig = {}
 		) const;
 		std::future<TokenResult> asyncAnalyze(std::u16string&& str, AnalyzeOption option,
-			std::vector<PretokenizedSpan>&& pretokenized = {}
+			std::vector<PretokenizedSpan>&& pretokenized = {},
+			const std::optional<KiwiConfig>& overrideConfig = {}
 		) const;
 		std::future<std::pair<TokenResult, std::u16string>> asyncAnalyzeEcho(std::u16string&& str, AnalyzeOption option,
-			std::vector<PretokenizedSpan>&& pretokenized = {}
+			std::vector<PretokenizedSpan>&& pretokenized = {},
+			const std::optional<KiwiConfig>& overrideConfig = {}
 		) const;
 
 		/**
@@ -321,11 +346,12 @@ namespace kiwi
 		 */
 		template<class ReaderCallback, class ResultCallback>
 		void analyze(size_t topN, ReaderCallback&& reader, ResultCallback&& resultCallback, 
-			AnalyzeOption option
+			AnalyzeOption option, const std::optional<KiwiConfig>& overrideConfig = {}
 		) const
 		{
 			if (pool)
 			{
+				auto config = overrideConfig.value_or(globalConfig);
 				bool stop = false;
 				std::deque<std::future<std::vector<TokenResult>>> futures;
 				for (size_t i = 0; i < pool->size() * 2; ++i)
@@ -336,9 +362,9 @@ namespace kiwi
 						stop = true;
 						break;
 					}
-					futures.emplace_back(pool->enqueue([=, ustr = std::move(ustr)](size_t tid)
+					futures.emplace_back(pool->enqueue([=, ustr = std::move(ustr), &config](size_t tid)
 					{
-						return analyze(ustr, topN, option, {});
+						return analyze(ustr, topN, option, {}, config);
 					}));
 				}
 
@@ -354,9 +380,9 @@ namespace kiwi
 							stop = true;
 							continue;
 						}
-						futures.emplace_back(pool->enqueue([=, ustr = std::move(ustr)](size_t tid)
+						futures.emplace_back(pool->enqueue([=, ustr = std::move(ustr), &config](size_t tid)
 						{
-							return analyze(ustr, topN, option, {});
+							return analyze(ustr, topN, option, {}, config);
 						}));
 					}
 				}
@@ -367,7 +393,7 @@ namespace kiwi
 				{
 					auto ustr = reader();
 					if (ustr.empty()) break;
-					resultCallback(analyze(ustr, topN, option));
+					resultCallback(analyze(ustr, topN, option, {}, overrideConfig));
 				}
 			}
 		}
@@ -460,89 +486,15 @@ namespace kiwi
 			return pool.get();
 		}
 
-		float getCutOffThreshold() const
+		const KiwiConfig& getGlobalConfig() const
 		{
-			return cutOffThreshold;
+			return globalConfig;
 		}
 
-		void setCutOffThreshold(float v)
+		void setGlobalConfig(const KiwiConfig& config)
 		{
-			if (v < 0) throw std::invalid_argument{ "`v` must >= 0" };
-			cutOffThreshold = v;
-		}
-
-		float getUnkScoreBias() const
-		{
-			return unkFormScoreBias;
-		}
-
-		void setUnkScoreBias(float v)
-		{
-			if (v < 0) throw std::invalid_argument{ "`v` must >= 0" };
-			unkFormScoreBias = v;
-		}
-
-		float getUnkScoreScale() const
-		{
-			return unkFormScoreScale;
-		}
-
-		void setUnkScoreScale(float v)
-		{
-			if (v < 0) throw std::invalid_argument{ "`v` must >= 0" };
-			unkFormScoreScale = v;
-		}
-
-		size_t getMaxUnkFormSize() const
-		{
-			return maxUnkFormSize;
-		}
-
-		void setMaxUnkFormSize(size_t v)
-		{
-			maxUnkFormSize = v;
-		}
-
-		size_t getSpaceTolerance() const
-		{
-			return spaceTolerance;
-		}
-
-		void setSpaceTolerance(size_t v)
-		{
-			spaceTolerance = v;
-		}
-
-		float getSpacePenalty() const
-		{
-			return spacePenalty;
-		}
-
-		void setSpacePenalty(float v)
-		{
-			if (v < 0) throw std::invalid_argument{ "`v` must >= 0" };
-			spacePenalty = v;
-		}
-
-		float getTypoCostWeight() const
-		{
-			return typoCostWeight;
-		}
-
-		void setTypoCostWeight(float v)
-		{
-			if (v < 0) throw std::invalid_argument{ "`v` must >= 0" };
-			typoCostWeight = v;
-		}
-
-		bool getIntegrateAllomorph() const
-		{
-			return integrateAllomorph;
-		}
-
-		void setIntegrateAllomorph(bool v)
-		{
-			integrateAllomorph = v;
+			config.validate();
+			globalConfig = config;
 		}
 
 		const lm::ILangModel* getLangModel() const

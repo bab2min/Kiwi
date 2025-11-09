@@ -37,7 +37,7 @@ int main(int argc, const char* argv[])
 {
 	tutils::setUTF8Output();
 
-	CmdLine cmd{ "Kiwi CoNgram Builder", ' ', "0.21.0" };
+	CmdLine cmd{ "Kiwi CoNgram Builder", ' ', KIWI_VERSION_STRING };
 
 	ValueArg<string> mdef{ "m", "morpheme-def", "morpheme definition", true, "", "string" };
 	ValueArg<string> cdef{ "c", "context-def", "context definition", true, "", "string" };

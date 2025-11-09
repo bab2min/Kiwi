@@ -57,7 +57,9 @@ Kiwi loadKiwiFromArg(const string& model, const string& modelType,
 	}
 
 	auto kiwi =  builder.build(typo);
-	kiwi.setTypoCostWeight(typoCostWeight);
+	auto config = kiwi.getGlobalConfig();
+	config.typoCostWeight = typoCostWeight;
+	kiwi.setGlobalConfig(config);
 	return kiwi;
 }
 

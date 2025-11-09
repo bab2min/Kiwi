@@ -77,14 +77,22 @@ TEST(KiwiTypo, Builder)
 	tt.addTypo(u"ㅔ", u"ㅐ");
 	Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 0, BuildOption::default_, }.build(tt);
 
+	auto config = kiwi.getGlobalConfig();
 	TokenResult ret;
-	kiwi.setTypoCostWeight(0);
+	config.typoCostWeight = 1e-9;
+	kiwi.setGlobalConfig(config);
 	ret = kiwi.analyze(u"문화제 보호", Match::allWithNormalizing);
-	kiwi.setTypoCostWeight(2);
+	
+	config.typoCostWeight = 2;
+	kiwi.setGlobalConfig(config);
 	ret = kiwi.analyze(u"문화제 보호", Match::allWithNormalizing);
-	kiwi.setTypoCostWeight(4);
+	
+	config.typoCostWeight = 4;
+	kiwi.setGlobalConfig(config);
 	ret = kiwi.analyze(u"문화제 보호", Match::allWithNormalizing);
-	kiwi.setTypoCostWeight(6);
+
+	config.typoCostWeight = 6;
+	kiwi.setGlobalConfig(config);
 	ret = kiwi.analyze(u"문화제 보호", Match::allWithNormalizing);
 }
 
@@ -94,7 +102,9 @@ TEST(KiwiTypo, AnalyzeBasicTypoSet)
 	Kiwi kiwi = builder.build();
 
 	Kiwi typoKiwi = builder.build(DefaultTypoSet::basicTypoSet);
-	typoKiwi.setTypoCostWeight(5);
+	auto config = typoKiwi.getGlobalConfig();
+	config.typoCostWeight = 5;
+	typoKiwi.setGlobalConfig(config);
 
 	TokenResult o = kiwi.analyze(u"외않됀데?", Match::allWithNormalizing);
 	TokenResult c = typoKiwi.analyze(u"외않됀데?", Match::allWithNormalizing);
@@ -209,7 +219,7 @@ TEST(KiwiTypo, LengtheningTypoSet)
 {
 	KiwiBuilder builder{ MODEL_PATH, 0, BuildOption::default_, };
 	Kiwi typoKiwi = builder.build(DefaultTypoSet::lengtheningTypoSet);
-	const float typoCost = typoKiwi.getTypoCostWeight() * 0.25f;
+	const float typoCost = typoKiwi.getGlobalConfig().typoCostWeight * 0.25f;
 
 	auto ref = typoKiwi.analyze(u"진짜?", Match::allWithNormalizing);
 	auto res = typoKiwi.analyze(u"지인짜?", Match::allWithNormalizing);

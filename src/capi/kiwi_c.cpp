@@ -34,7 +34,7 @@ struct kiwi_ws : public pair<vector<WordInfo>, ResultBuffer>
 
 struct kiwi_ss : public vector<pair<size_t, size_t>>
 {
-	kiwi_ss(vector<pair<size_t, size_t>>&& o) : vector{ move(o) }
+	kiwi_ss(vector<pair<size_t, size_t>>&& o) : vector{ std::move(o) }
 	{
 	}
 };
@@ -73,7 +73,7 @@ struct kiwi_swtokenizer
 	string cachedText;
 
 	kiwi_swtokenizer(SwTokenizer&& _tokenizer)
-		: tokenizer{move(_tokenizer)}
+		: tokenizer{ std::move(_tokenizer) }
 	{}
 };
 
@@ -380,7 +380,7 @@ kiwi_ws_h kiwi_builder_extract_words(kiwi_builder_h handle, kiwi_reader_t reader
 			};
 		}, minCnt, maxWordLen, minScore, posThreshold);
 
-		return new kiwi_ws{ move(res), {} };
+		return new kiwi_ws{ std::move(res), {} };
 	}
 	catch (...)
 	{
@@ -409,7 +409,7 @@ kiwi_ws_h kiwi_builder_extract_add_words(kiwi_builder_h handle, kiwi_reader_t re
 				return utf8To16(buf);
 			};
 		}, minCnt, maxWordLen, minScore, posThreshold);
-		return new kiwi_ws{ move(res), {} };
+		return new kiwi_ws{ std::move(res), {} };
 	}
 	catch (...)
 	{
@@ -439,7 +439,7 @@ kiwi_ws_h kiwi_builder_extract_words_w(kiwi_builder_h handle, kiwi_reader_w_t re
 			};
 		}, minCnt, maxWordLen, minScore, posThreshold);
 
-		return new kiwi_ws{ move(res), {} };
+		return new kiwi_ws{ std::move(res), {} };
 	}
 	catch (...)
 	{
@@ -468,7 +468,7 @@ kiwi_ws_h kiwi_builder_extract_add_words_w(kiwi_builder_h handle, kiwi_reader_w_
 				return buf;
 			};
 		}, minCnt, maxWordLen, minScore, posThreshold);
-		return new kiwi_ws{ move(res), {} };
+		return new kiwi_ws{ std::move(res), {} };
 	}
 	catch (...)
 	{
@@ -660,23 +660,62 @@ kiwi_h kiwi_init(const char * modelPath, int num_threads, int options)
 	}
 }
 
+void kiwi_set_global_config(kiwi_h handle, kiwi_config_t config)
+{
+	if (!handle) return;
+	Kiwi* kiwi = (Kiwi*)handle;
+	try
+	{
+		KiwiConfig kconfig{
+			!!config.integrate_allomorph,
+			config.cut_off_threshold,
+			config.unk_form_score_scale,
+			config.unk_form_score_bias,
+			config.space_penalty,
+			config.typo_cost_weight,
+			config.max_unk_form_size,
+			config.space_tolerance,
+		};
+		kiwi->setGlobalConfig(kconfig);
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+	}
+}
+
+kiwi_config_t kiwi_get_global_config(kiwi_h handle)
+{
+	kiwi_config_t config{};
+	if (!handle) return config;
+	Kiwi* kiwi = (Kiwi*)handle;
+	try
+	{
+		KiwiConfig kconfig = kiwi->getGlobalConfig();
+		config.integrate_allomorph = kconfig.integrateAllomorph;
+		config.cut_off_threshold = kconfig.cutOffThreshold;
+		config.unk_form_score_scale = kconfig.unkFormScoreScale;
+		config.unk_form_score_bias = kconfig.unkFormScoreBias;
+		config.space_penalty = kconfig.spacePenalty;
+		config.typo_cost_weight = kconfig.typoCostWeight;
+		config.max_unk_form_size = kconfig.maxUnkFormSize;
+		config.space_tolerance = kconfig.spaceTolerance;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+	}
+	return config;
+}
+
 void kiwi_set_option(kiwi_h handle, int option, int value)
 {
 	if (!handle) return;
 	Kiwi* kiwi = (Kiwi*)handle;
 	switch (option)
 	{
-	case KIWI_BUILD_INTEGRATE_ALLOMORPH:
-		kiwi->setIntegrateAllomorph(!!value);
-		break;
 	case KIWI_NUM_THREADS:
 		currentError = make_exception_ptr(runtime_error{ "Cannot modify the number of threads." });
-		break;
-	case KIWI_MAX_UNK_FORM_SIZE:
-		kiwi->setMaxUnkFormSize(value);
-		break;
-	case KIWI_SPACE_TOLERANCE:
-		kiwi->setSpaceTolerance(value);
 		break;
 	default:
 		currentError = make_exception_ptr(invalid_argument{ "Invalid option value: " + to_string(option)});
@@ -690,14 +729,8 @@ int kiwi_get_option(kiwi_h handle, int option)
 	Kiwi* kiwi = (Kiwi*)handle;
 	switch (option)
 	{
-	case KIWI_BUILD_INTEGRATE_ALLOMORPH:
-		return kiwi->getIntegrateAllomorph() ? 1 : 0;
 	case KIWI_NUM_THREADS:
 		return kiwi->getNumThreads();
-	case KIWI_MAX_UNK_FORM_SIZE:
-		return kiwi->getMaxUnkFormSize();
-	case KIWI_SPACE_TOLERANCE:
-		return kiwi->getSpaceTolerance();
 	default:
 		currentError = make_exception_ptr(invalid_argument{ "Invalid option value: " + to_string(option) });
 		break;
@@ -711,21 +744,6 @@ void kiwi_set_option_f(kiwi_h handle, int option, float value)
 	Kiwi* kiwi = (Kiwi*)handle;
 	switch (option)
 	{
-	case KIWI_CUT_OFF_THRESHOLD:
-		kiwi->setCutOffThreshold(value);
-		break;
-	case KIWI_UNK_FORM_SCORE_SCALE:
-		kiwi->setUnkScoreScale(value);
-		break;
-	case KIWI_UNK_FORM_SCORE_BIAS:
-		kiwi->setUnkScoreBias(value);
-		break;
-	case KIWI_SPACE_PENALTY:
-		kiwi->setSpacePenalty(value);
-		break;
-	case KIWI_TYPO_COST_WEIGHT:
-		kiwi->setTypoCostWeight(value);
-		break;
 	default:
 		currentError = make_exception_ptr(invalid_argument{ "Invalid option value: " + to_string(option) });
 		break;
@@ -738,16 +756,6 @@ float kiwi_get_option_f(kiwi_h handle, int option)
 	Kiwi* kiwi = (Kiwi*)handle;
 	switch (option)
 	{
-	case KIWI_CUT_OFF_THRESHOLD:
-		return kiwi->getCutOffThreshold();
-	case KIWI_UNK_FORM_SCORE_SCALE:
-		return kiwi->getUnkScoreScale();
-	case KIWI_UNK_FORM_SCORE_BIAS:
-		return kiwi->getUnkScoreBias();
-	case KIWI_SPACE_PENALTY:
-		return kiwi->getSpacePenalty();
-	case KIWI_TYPO_COST_WEIGHT:
-		return kiwi->getTypoCostWeight();
 	default:
 		currentError = make_exception_ptr(invalid_argument{ "Invalid option value: " + to_string(option) });
 		break;
@@ -835,7 +843,7 @@ int kiwi_analyze_mw(kiwi_h handle, kiwi_reader_w_t reader, kiwi_receiver_t recei
 			return buf;
 		}, [&](vector<TokenResult>&& res)
 		{
-			auto result = new kiwi_res{ move(res), {} };
+			auto result = new kiwi_res{ std::move(res), {} };
 			(*receiver)(receiver_idx++, result, userData);
 		}, toAnalyzeOption(option));
 		return reader_idx;
@@ -863,7 +871,7 @@ int kiwi_analyze_m(kiwi_h handle, kiwi_reader_t reader, kiwi_receiver_t receiver
 			return utf8To16(buf);
 		}, [&](vector<TokenResult>&& res)
 		{
-			auto result = new kiwi_res{ move(res),{} };
+			auto result = new kiwi_res{ std::move(res),{} };
 			(*receiver)(receiver_idx++, result, userData);
 		}, toAnalyzeOption(option));
 		return reader_idx;
@@ -884,8 +892,8 @@ kiwi_ss_h kiwi_split_into_sents_w(kiwi_h handle, const kchar16_t* text, int matc
 		vector<TokenResult> tokenized;
 		if (tokenized_res) tokenized.resize(1);
 		auto sent_ranges = kiwi->splitIntoSents((const char16_t*)text, (Match)matchOptions, tokenized_res ? tokenized.data() : nullptr);
-		if (tokenized_res) *tokenized_res = new kiwi_res{ move(tokenized), {} };
-		return new kiwi_ss{ move(sent_ranges) };
+		if (tokenized_res) *tokenized_res = new kiwi_res{ std::move(tokenized), {} };
+		return new kiwi_ss{ std::move(sent_ranges) };
 	}
 	catch (...)
 	{
@@ -903,8 +911,8 @@ kiwi_ss_h kiwi_split_into_sents(kiwi_h handle, const char* text, int matchOption
 		vector<TokenResult> tokenized;
 		if (tokenized_res) tokenized.resize(1);
 		auto sent_ranges = kiwi->splitIntoSents(text, (Match)matchOptions, tokenized_res ? tokenized.data() : nullptr);
-		if (tokenized_res) *tokenized_res = new kiwi_res{ move(tokenized), {} };
-		return new kiwi_ss{ move(sent_ranges) };
+		if (tokenized_res) *tokenized_res = new kiwi_res{ std::move(tokenized), {} };
+		return new kiwi_ss{ std::move(sent_ranges) };
 	}
 	catch (...)
 	{
@@ -1471,15 +1479,15 @@ int kiwi_swt_encode(kiwi_swtokenizer_h handle, const char* text, int text_size, 
 		{
 			tokenIds = handle->tokenizer.encode(str, &offset);
 			handle->encodeLastText = strHash;
-			handle->cachedTokenIds = move(tokenIds);
-			handle->cachedOffset = move(offset);
+			handle->cachedTokenIds = std::move(tokenIds);
+			handle->cachedOffset = std::move(offset);
 			return handle->cachedTokenIds.size();
 		}
 
 		if (handle->encodeLastText == strHash)
 		{
-			tokenIds = move(handle->cachedTokenIds);
-			offset = move(handle->cachedOffset);
+			tokenIds = std::move(handle->cachedTokenIds);
+			offset = std::move(handle->cachedOffset);
 			handle->encodeLastText = 0;
 		}
 		else
@@ -1519,13 +1527,13 @@ int kiwi_swt_decode(kiwi_swtokenizer_h handle, const int* token_ids, int token_s
 		{
 			decoded = handle->tokenizer.decode((const uint32_t*)token_ids, token_size);
 			handle->decodeLastTokenIds = hash;
-			handle->cachedText = move(decoded);
+			handle->cachedText = std::move(decoded);
 			return handle->cachedText.size();
 		}
 
 		if (handle->decodeLastTokenIds == hash)
 		{
-			decoded = move(handle->cachedText);
+			decoded = std::move(handle->cachedText);
 			handle->decodeLastTokenIds = 0;
 		}
 		else
