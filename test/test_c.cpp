@@ -257,7 +257,9 @@ TEST(KiwiC, AnalyzeBasicTypoSet)
 	kiwi_h okw = reuse_kiwi_instance(), typo_kw;
 	kiwi_builder_h builder = kiwi_builder_init(MODEL_PATH, -1, KIWI_BUILD_DEFAULT, KIWI_DIALECT_STANDARD);
 	typo_kw = kiwi_builder_build(builder, kiwi_typo_get_default(KIWI_TYPO_BASIC_TYPO_SET), 2.5f);
-	kiwi_set_option_f(typo_kw, KIWI_TYPO_COST_WEIGHT, 5);
+	kiwi_config_t config = kiwi_get_global_config(typo_kw);
+	config.typo_cost_weight = 5;
+	kiwi_set_global_config(typo_kw, config);
 
 	kiwi_analyze_option_t option = { KIWI_MATCH_ALL_WITH_NORMALIZING, };
 	kiwi_res_h o, c;
@@ -288,7 +290,9 @@ TEST(KiwiC, CustomTypoSet)
 	kiwi_typo_update(custom_typo, lengthening_typo);
 
 	typo_kw = kiwi_builder_build(builder, custom_typo, 2.5f);
-	kiwi_set_option_f(typo_kw, KIWI_TYPO_COST_WEIGHT, 5);
+	kiwi_config_t config = kiwi_get_global_config(typo_kw);
+	config.typo_cost_weight = 5;
+	kiwi_set_global_config(typo_kw, config);
 
 	kiwi_analyze_option_t option = { KIWI_MATCH_ALL_WITH_NORMALIZING, };
 	kiwi_res_h o, c;
