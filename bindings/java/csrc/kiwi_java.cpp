@@ -42,7 +42,8 @@ static auto gClsTokenInfo = jni::DataClassDefinition<kiwi::TokenInfo>()
 	.template property<&kiwi::TokenInfo::typoCost>("typoCost")
 	.template property<&kiwi::TokenInfo::typoFormId>("typoFormId")
 	.template property<&kiwi::TokenInfo::pairedToken>("pairedToken")
-	.template property<&kiwi::TokenInfo::subSentPosition>("subSentPosition");
+	.template property<&kiwi::TokenInfo::subSentPosition>("subSentPosition")
+	.template property<&kiwi::TokenInfo::dialect>("dialect");
 
 static auto gClsTokenResult = jni::DataClassDefinition<kiwi::TokenResult>()
 	.template property<&kiwi::TokenResult::first>("tokens")
@@ -310,6 +311,8 @@ public:
 	size_t topN;
 	kiwi::Match matchOption;
 	JMorphemeSet* blocklist;
+	kiwi::Dialect allowedDialects;
+	float dialectCost;
 	jni::JIterator<jni::JIterator<kiwi::PretokenizedSpan>> pretokenized;
 
 	JMultipleTokenResult(jni::JUniqueGlobalRef<JKiwi>&& _dp,
@@ -317,6 +320,8 @@ public:
 		size_t _topN,
 		kiwi::Match _matchOption,
 		JMorphemeSet* _blocklist,
+		kiwi::Dialect _allowedDialects,
+		float _dialectCost,
 		jni::JIterator<jni::JIterator<kiwi::PretokenizedSpan>> _pretokenized
 	);
 	JMultipleTokenResult(JMultipleTokenResult&&) = default;
@@ -380,30 +385,40 @@ public:
 		return KIWI_VERSION_STRING;
 	}
 
-	auto analyze(const std::u16string& text, uint64_t topN, kiwi::Match matchOption, JMorphemeSet* blocklist, jni::JIterator<kiwi::PretokenizedSpan> pretokenized) const
+	auto analyze(const std::u16string& text, uint64_t topN, 
+		kiwi::Match matchOption, JMorphemeSet* blocklist, kiwi::Dialect allowedDialects, float dialectCost,
+		jni::JIterator<kiwi::PretokenizedSpan> pretokenized) const
 	{
 		std::vector<kiwi::PretokenizedSpan> pretokenizedSpans;
 		if (pretokenized)
 		{
 			while (pretokenized.hasNext()) pretokenizedSpans.emplace_back(pretokenized.next());
 		}
-		return Kiwi::analyze(text, topN, kiwi::AnalyzeOption{ matchOption, blocklist ? &blocklist->morphSet : nullptr }, pretokenizedSpans);
+		return Kiwi::analyze(text, topN, 
+			kiwi::AnalyzeOption{ matchOption, blocklist ? &blocklist->morphSet : nullptr, false, allowedDialects, dialectCost }, 
+			pretokenizedSpans);
 	}
 
-	JFutureTokenResult asyncAnalyze(jni::JRef<JKiwi> _ref, const std::u16string& text, uint64_t topN, kiwi::Match matchOption, JMorphemeSet* blocklist, jni::JIterator<kiwi::PretokenizedSpan> pretokenized) const
+	JFutureTokenResult asyncAnalyze(jni::JRef<JKiwi> _ref, const std::u16string& text, uint64_t topN, 
+		kiwi::Match matchOption, JMorphemeSet* blocklist, kiwi::Dialect allowedDialects, float dialectCost,
+		jni::JIterator<kiwi::PretokenizedSpan> pretokenized) const
 	{
 		std::vector<kiwi::PretokenizedSpan> pretokenizedSpans;
 		if (pretokenized)
 		{
 			while (pretokenized.hasNext()) pretokenizedSpans.emplace_back(pretokenized.next());
 		}
-		return { _ref, Kiwi::asyncAnalyze(text, topN, kiwi::AnalyzeOption{ matchOption, blocklist ? &blocklist->morphSet : nullptr}, pretokenizedSpans) };
+		return { _ref, Kiwi::asyncAnalyze(text, topN, 
+			kiwi::AnalyzeOption{ matchOption, blocklist ? &blocklist->morphSet : nullptr, false, allowedDialects, dialectCost }, 
+			pretokenizedSpans) };
 	}
 
-	JMultipleTokenResult analyze2(jni::JRef<JKiwi> _ref, jni::JIterator<std::u16string> texts, uint64_t topN, kiwi::Match matchOption, JMorphemeSet* blocklist, jni::JIterator<jni::JIterator<kiwi::PretokenizedSpan>> pretokenized) const
+	JMultipleTokenResult analyze2(jni::JRef<JKiwi> _ref, jni::JIterator<std::u16string> texts, uint64_t topN, 
+		kiwi::Match matchOption, JMorphemeSet* blocklist, kiwi::Dialect allowedDialects, float dialectCost,
+		jni::JIterator<jni::JIterator<kiwi::PretokenizedSpan>> pretokenized) const
 	{
 		if (!texts) throw std::bad_optional_access{};
-		return { _ref, std::move(texts), (size_t)topN, matchOption, blocklist, std::move(pretokenized) };
+		return { _ref, std::move(texts), (size_t)topN, matchOption, blocklist, allowedDialects, dialectCost, std::move(pretokenized) };
 	}
 
 	std::vector<Sentence> splitIntoSents(const std::u16string& text, kiwi::Match matchOption, bool returnTokens) const
@@ -469,6 +484,8 @@ JMultipleTokenResult::JMultipleTokenResult(jni::JUniqueGlobalRef<JKiwi>&& _dp,
 	size_t _topN,
 	kiwi::Match _matchOption,
 	JMorphemeSet* _blocklist,
+	kiwi::Dialect _allowedDialects,
+	float _dialectCost,
 	jni::JIterator<jni::JIterator<kiwi::PretokenizedSpan>> _pretokenized
 )
 	: dp{ std::move(_dp) },
@@ -476,6 +493,8 @@ JMultipleTokenResult::JMultipleTokenResult(jni::JUniqueGlobalRef<JKiwi>&& _dp,
 	topN{ _topN },
 	matchOption{ _matchOption },
 	blocklist{ _blocklist },
+	allowedDialects{ _allowedDialects },
+	dialectCost{ _dialectCost },
 	pretokenized{ std::move(_pretokenized) }
 {
 	for (size_t i = 0; i < dp->getThreadPool()->size(); ++i)
@@ -503,7 +522,7 @@ bool JMultipleTokenResult::feed()
 	futures.emplace_back(static_cast<kiwi::Kiwi&>(dp.get()).asyncAnalyze(
 		texts.next(), 
 		topN, 
-		kiwi::AnalyzeOption{ matchOption, blocklist ? &blocklist->morphSet : nullptr },
+		kiwi::AnalyzeOption{ matchOption, blocklist ? &blocklist->morphSet : nullptr, false, allowedDialects, dialectCost },
 		std::move(pretokenizedSpans)
 	));
 	return true;
@@ -554,8 +573,8 @@ public:
 	using kiwi::KiwiBuilder::KiwiBuilder;
 
 	// Custom constructor for StreamProvider
-	JKiwiBuilder(jni::JRef<JStreamProvider> streamProvider, size_t numThreads, kiwi::BuildOption options, kiwi::ModelType modelType)
-		: KiwiBuilder(createStreamProviderWrapper(streamProvider), numThreads, options, modelType)
+	JKiwiBuilder(jni::JRef<JStreamProvider> streamProvider, size_t numThreads, kiwi::BuildOption options, kiwi::ModelType modelType, kiwi::Dialect enabledDialects)
+		: KiwiBuilder(createStreamProviderWrapper(streamProvider), numThreads, options, modelType, enabledDialects)
 	{
 	}
 
@@ -730,8 +749,8 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved)
 			.template method<&JTypoTransformer::scaleCost>("_scaleCost"),
 
 		jni::define<JKiwiBuilder>()
-			.template ctor<std::string, size_t, kiwi::BuildOption, kiwi::ModelType>()
-			.template ctor<jni::JRef<JStreamProvider>, size_t, kiwi::BuildOption, kiwi::ModelType>()
+			.template ctor<std::string, size_t, kiwi::BuildOption, kiwi::ModelType, kiwi::Dialect>()
+			.template ctor<jni::JRef<JStreamProvider>, size_t, kiwi::BuildOption, kiwi::ModelType, kiwi::Dialect>()
 			.template method<&JKiwiBuilder::addWord>("addWord")
 			.template method<&JKiwiBuilder::addWord2>("addWord")
 			.template method<&JKiwiBuilder::addPreAnalyzedWord>("addPreAnalyzedWord")
