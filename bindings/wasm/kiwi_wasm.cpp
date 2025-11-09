@@ -48,7 +48,12 @@ inline std::unordered_set<const Morpheme*> parseMorphemeSet(const Kiwi& kiwi, co
             tag = toPOSTag(tagStr);
         }
 
-        auto matches = kiwi.findMorphemes(form, tag);
+        uint8_t senseId = undefSenseId;
+        if (morph.contains("senseId")) {
+            senseId = morph["senseId"];
+        }
+
+        auto matches = kiwi.findMorphemes(form, tag, senseId);
         set.insert(matches.begin(), matches.end());
     }
 
@@ -142,6 +147,9 @@ inline json serializeTokenInfo(const Kiwi& kiwi, const TokenInfo& tokenInfo) {
         { "pairedToken", tokenInfo.pairedToken },
         { "subSentPosition", tokenInfo.subSentPosition },
         { "morphId", kiwi.morphToId(tokenInfo.morph) },
+        { "senseId", tokenInfo.senseId },
+        { "script", static_cast<uint8_t>(tokenInfo.script) },
+        { "dialect", static_cast<uint16_t>(tokenInfo.dialect) },
     };
 }
 
@@ -202,6 +210,7 @@ json build(const json& args) {
     if (buildArgs.value("loadMultiDict", true)) {
         buildOptions |= BuildOption::loadMultiDict;
     }
+    auto enabledDialects = buildArgs.value("enabledDialects", "standard");
 
     KiwiBuilder builder = [&]() {
         // Check if streamProvider is available, if so use it
@@ -262,6 +271,7 @@ json build(const json& args) {
                 numThreads,
                 buildOptions,
                 modelType,
+                parseDialects(enabledDialects),
             };
         }
         else
@@ -273,6 +283,7 @@ json build(const json& args) {
                 numThreads,
                 buildOptions,
                 modelType,
+                parseDialects(enabledDialects),
             };
         }
     }();
@@ -310,7 +321,7 @@ json build(const json& args) {
         const std::u16string form = utf8To16(form8);
         const float score = preanalyzedWord.value("score", 0.0f);
 
-        std::vector<std::pair<std::u16string, POSTag>> analyzed;
+        std::vector<std::tuple<std::u16string, POSTag, uint8_t>> analyzed;
         std::vector<std::pair<size_t, size_t>> positions;
 
         for (const auto& analyzedToken : preanalyzedWord["analyzed"]) {
@@ -321,12 +332,13 @@ json build(const json& args) {
             const std::u16string tag16 = utf8To16(tag8);
             const POSTag tag = toPOSTag(tag16);
 
-            analyzed.push_back({ form, tag });
+            const uint8_t senseId = analyzedToken.value("senseId", undefSenseId);
+            analyzed.emplace_back(form, tag, senseId);
 
             if (analyzedToken.contains("start") && analyzedToken.contains("end")) {
                 const size_t start = analyzedToken["start"];
                 const size_t end = analyzedToken["end"];
-                positions.push_back({ start, end });
+                positions.emplace_back(start, end);
             }
         }
 
@@ -398,8 +410,10 @@ json kiwiAnalyze(Kiwi& kiwi, const json& args) {
     const Match matchOptions = getAtOrDefault(args, 1, Match::allWithNormalizing);
     const BlockListArg blockListArg(kiwi, args, 2);
     const auto pretokenized = parsePretokenizedArg(args, 3);
+    const auto allowedDialects = parseDialects(getAtOrDefault(args, 4, std::string{ "standard" }));
+    const auto dialectCost = getAtOrDefault(args, 5, 3.0f);
     
-    const TokenResult tokenResult = kiwi.analyze(str, AnalyzeOption{ matchOptions, blockListArg.setPtr() }, pretokenized);
+    const TokenResult tokenResult = kiwi.analyze(str, AnalyzeOption{ matchOptions, blockListArg.setPtr(), false, allowedDialects, dialectCost }, pretokenized);
 
     return serializeTokenResult(kiwi, tokenResult);
 }
@@ -410,8 +424,10 @@ json kiwiAnalyzeTopN(Kiwi& kiwi, const json& args) {
     const Match matchOptions = getAtOrDefault(args, 2, Match::allWithNormalizing);
     const BlockListArg blockListArg(kiwi, args, 3);
     const auto pretokenized = parsePretokenizedArg(args, 4);
+    const auto allowedDialects = parseDialects(getAtOrDefault(args, 4, std::string{ "standard" }));
+    const auto dialectCost = getAtOrDefault(args, 5, 3.0f);
 
-    const std::vector<TokenResult> tokenResults = kiwi.analyze(str, topN, AnalyzeOption{ matchOptions, blockListArg.setPtr() }, pretokenized);
+    const std::vector<TokenResult> tokenResults = kiwi.analyze(str, topN, AnalyzeOption{ matchOptions, blockListArg.setPtr(), false, allowedDialects, dialectCost }, pretokenized);
 
     return serializeTokenResultVec(kiwi, tokenResults);
 }
@@ -421,8 +437,10 @@ json kiwiTokenize(Kiwi& kiwi, const json& args) {
     const Match matchOptions = getAtOrDefault(args, 1, Match::allWithNormalizing);
     const BlockListArg blockListArg(kiwi, args, 2);
     const auto pretokenized = parsePretokenizedArg(args, 3);
+    const auto allowedDialects = parseDialects(getAtOrDefault(args, 4, std::string{ "standard" }));
+    const auto dialectCost = getAtOrDefault(args, 5, 3.0f);
     
-    const TokenResult tokenResult = kiwi.analyze(str, AnalyzeOption{ matchOptions, blockListArg.setPtr() }, pretokenized);
+    const TokenResult tokenResult = kiwi.analyze(str, AnalyzeOption{ matchOptions, blockListArg.setPtr(), false, allowedDialects, dialectCost }, pretokenized);
 
     return serializeTokenInfoVec(kiwi, tokenResult.first);
 }
@@ -433,8 +451,10 @@ json kiwiTokenizeTopN(Kiwi& kiwi, const json& args) {
     const Match matchOptions = getAtOrDefault(args, 2, Match::allWithNormalizing);
     const BlockListArg blockListArg(kiwi, args, 3);
     const auto pretokenized = parsePretokenizedArg(args, 4);
+    const auto allowedDialects = parseDialects(getAtOrDefault(args, 5, std::string{ "standard" }));
+    const auto dialectCost = getAtOrDefault(args, 6, 3.0f);
 
-    const std::vector<TokenResult> tokenResults = kiwi.analyze(str, topN, AnalyzeOption{ matchOptions, blockListArg.setPtr() }, pretokenized);
+    const std::vector<TokenResult> tokenResults = kiwi.analyze(str, topN, AnalyzeOption{ matchOptions, blockListArg.setPtr(), false, allowedDialects, dialectCost }, pretokenized);
 
     json result = json::array();
     for (const TokenResult& tokenResult : tokenResults) {
@@ -503,75 +523,31 @@ json kiwiJoinSent(Kiwi& kiwi, const json& args) {
     };
 }
 
-json kiwiGetCutOffThreshold(Kiwi& kiwi, const json& args) {
-    return kiwi.getCutOffThreshold();
+json kiwiGetGlobalConfig(Kiwi& kiwi, const json& args) {
+    json obj = json::object();
+    auto config = kiwi.getGlobalConfig();
+    obj["integrateAllomorph"] = config.integrateAllomorph;
+    obj["cutOffThreshold"] = config.cutOffThreshold;
+    obj["unkFormScoreScale"] = config.unkFormScoreScale;
+    obj["unkFormScoreBias"] = config.unkFormScoreBias;
+    obj["spacePenalty"] = config.spacePenalty;
+    obj["typoCostWeight"] = config.typoCostWeight;
+    obj["maxUnkFormSize"] = config.maxUnkFormSize;
+    obj["spaceTolerance"] = config.spaceTolerance;
+    return obj;
 }
 
-json kiwiSetCutOffThreshold(Kiwi& kiwi, const json& args) {
-    kiwi.setCutOffThreshold(args[0]);
-    return nullptr;
-}
-
-json kiwiGetUnkScoreBias(Kiwi& kiwi, const json& args) {
-    return kiwi.getUnkScoreBias();
-}
-
-json kiwiSetUnkScoreBias(Kiwi& kiwi, const json& args) {
-    kiwi.setUnkScoreBias(args[0]);
-    return nullptr;
-}
-
-json kiwiGetUnkScoreScale(Kiwi& kiwi, const json& args) {
-    return kiwi.getUnkScoreScale();
-}
-
-json kiwiSetUnkScoreScale(Kiwi& kiwi, const json& args) {
-    kiwi.setUnkScoreScale(args[0]);
-    return nullptr;
-}
-
-json kiwiGetMaxUnkFormSize(Kiwi& kiwi, const json& args) {
-    return kiwi.getMaxUnkFormSize();
-}
-
-json kiwiSetMaxUnkFormSize(Kiwi& kiwi, const json& args) {
-    kiwi.setMaxUnkFormSize(args[0]);
-    return nullptr;
-}
-
-json kiwiGetSpaceTolerance(Kiwi& kiwi, const json& args) {
-    return kiwi.getSpaceTolerance();
-}
-
-json kiwiSetSpaceTolerance(Kiwi& kiwi, const json& args) {
-    kiwi.setSpaceTolerance(args[0]);
-    return nullptr;
-}
-
-json kiwiGetSpacePenalty(Kiwi& kiwi, const json& args) {
-    return kiwi.getSpacePenalty();
-}
-
-json kiwiSetSpacePenalty(Kiwi& kiwi, const json& args) {
-    kiwi.setSpacePenalty(args[0]);
-    return nullptr;
-}
-
-json kiwiGetTypoCostWeight(Kiwi& kiwi, const json& args) {
-    return kiwi.getTypoCostWeight();
-}
-
-json kiwiSetTypoCostWeight(Kiwi& kiwi, const json& args) {
-    kiwi.setTypoCostWeight(args[0]);
-    return nullptr;
-}
-
-json kiwiGetIntegrateAllomorph(Kiwi& kiwi, const json& args) {
-    return kiwi.getIntegrateAllomorph();
-}
-
-json kiwiSetIntegrateAllomorph(Kiwi& kiwi, const json& args) {
-    kiwi.setIntegrateAllomorph(args[0]);
+json kiwiSetGlobalConfig(Kiwi& kiwi, const json& args) {
+    KiwiConfig config;
+    if (args.contains("integrateAllomorph")) config.integrateAllomorph = args["integrateAllomorph"];
+    if (args.contains("cutOffThreshold")) config.cutOffThreshold = args["cutOffThreshold"];
+    if (args.contains("unkFormScoreScale")) config.unkFormScoreScale = args["unkFormScoreScale"];
+    if (args.contains("unkFormScoreBias")) config.unkFormScoreBias = args["unkFormScoreBias"];
+    if (args.contains("spacePenalty")) config.spacePenalty = args["spacePenalty"];
+    if (args.contains("typoCostWeight")) config.typoCostWeight = args["typoCostWeight"];
+    if (args.contains("maxUnkFormSize")) config.maxUnkFormSize = args["maxUnkFormSize"];
+    if (args.contains("spaceTolerance")) config.spaceTolerance = args["spaceTolerance"];
+    kiwi.setGlobalConfig(config);
     return nullptr;
 }
 
@@ -610,22 +586,8 @@ std::map<std::string, InstanceApiMethod> instanceApiMethods = {
     { "tokenizeTopN", kiwiTokenizeTopN},
     { "splitIntoSents", kiwiSplitIntoSents },
     { "joinSent", kiwiJoinSent },
-    { "getCutOffThreshold", kiwiGetCutOffThreshold },
-    { "setCutOffThreshold", kiwiSetCutOffThreshold },
-    { "getUnkScoreBias", kiwiGetUnkScoreBias },
-    { "setUnkScoreBias", kiwiSetUnkScoreBias },
-    { "getUnkScoreScale", kiwiGetUnkScoreScale },
-    { "setUnkScoreScale", kiwiSetUnkScoreScale },
-    { "getMaxUnkFormSize", kiwiGetMaxUnkFormSize },
-    { "setMaxUnkFormSize", kiwiSetMaxUnkFormSize },
-    { "getSpaceTolerance", kiwiGetSpaceTolerance },
-    { "setSpaceTolerance", kiwiSetSpaceTolerance },
-    { "getSpacePenalty", kiwiGetSpacePenalty },
-    { "setSpacePenalty", kiwiSetSpacePenalty },
-    { "getTypoCostWeight", kiwiGetTypoCostWeight },
-    { "setTypoCostWeight", kiwiSetTypoCostWeight },
-    { "getIntegrateAllomorph", kiwiGetIntegrateAllomorph },
-    { "setIntegrateAllomorph", kiwiSetIntegrateAllomorph },
+    { "getGlobalConfig", kiwiGetGlobalConfig },
+    { "setGlobalConfig", kiwiSetGlobalConfig },
     { "createMorphemeSet", kiwiCreateMorphemeSet },
     { "destroyMorphemeSet", kiwiDestroyMorphemeSet },
 };

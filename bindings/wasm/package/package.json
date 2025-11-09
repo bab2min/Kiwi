@@ -1,6 +1,6 @@
 {
     "name": "kiwi-nlp",
-    "version": "0.21.0",
+    "version": "0.22.0",
     "description": "Kiwi, Korean Intelligent Word Identifier",
     "repository": {
         "type": "git",
