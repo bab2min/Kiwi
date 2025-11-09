@@ -265,6 +265,13 @@ namespace kiwi
 				leftFormFirst = morphBase[prevPath.wid].kform->data();
 				leftFormLast = leftFormFirst + morphBase[prevPath.wid].kform->size();
 			}
+			else if (prevPath.morpheme->tag == POSTag::unknown && !prevPath.morpheme->chunks.empty())
+			{
+				// pretokenized morpheme이 이전 형태소인 경우
+				const auto* lastMorph = prevPath.morpheme->chunks[prevPath.morpheme->chunks.size() - 1];
+				leftFormFirst = lastMorph->getForm().data();
+				leftFormLast = leftFormFirst + lastMorph->getForm().size();
+			}
 			else
 			{
 				leftFormFirst = prevPath.morpheme->getForm().data();
@@ -1262,6 +1269,12 @@ namespace kiwi
 		for (size_t i = 1; i < graphSize - 1; ++i)
 		{
 			auto* node = &graph[i];
+			const bool isPretokenizedNode = (
+				node->form 
+				&& node->form->candidate.size() == 1 
+				&& node->form->candidate[0]->tag == POSTag::unknown 
+				&& !node->form->candidate[0]->chunks.empty()
+			);
 			size_t ownFormId = 0;
 			if (!node->uform.empty())
 			{
@@ -1273,7 +1286,8 @@ namespace kiwi
 			{
 				evaluator(i, ownFormId, node->form->candidate, 
 					0.f, splitComplex, splitSaisiot, mergeSaisiot, blocklist, allowedDialects, dialectCost);
-				if (all_of(node->form->candidate.begin(), node->form->candidate.end(), [](const Morpheme* m)
+				if (!isPretokenizedNode
+					&& all_of(node->form->candidate.begin(), node->form->candidate.end(), [](const Morpheme* m)
 				{
 					return m->combineSocket || !(m->chunks.empty() || m->complex || m->saisiot);
 				}))
