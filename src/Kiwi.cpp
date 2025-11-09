@@ -1217,8 +1217,8 @@ namespace kiwi
 			if (c->combineSocket
 				|| (tag != POSTag::unknown
 					&& clearIrregular(c->tag) != tag)
-				|| (senseId != (uint8_t)-1
-					&& c->senseId == senseId))
+				|| (senseId != undefSenseId
+					&& c->senseId != senseId))
 				continue;
 			ret.emplace_back(c);
 		}
