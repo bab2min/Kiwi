@@ -5,6 +5,7 @@
 ## 방언 목록
 * chungcheong: 충청, 충남, 충북
 * gangwon: 강원
+* gyeonggi: 경기
 * gyeongsang: 경상, 경북, 경남
 * hamgyeong: 함경, 함남, 함북
 * hwanghae: 황해
