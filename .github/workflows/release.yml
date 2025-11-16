@@ -154,7 +154,7 @@ jobs:
         cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
         cmakeBuildType: Release
         buildWithCMake: true
-        cmakeAppendedArgs: -G"Visual Studio 16 2019" -A${{ matrix.arch }} -DKIWI_JAVA_BINDING=1
+        cmakeAppendedArgs: -G"Visual Studio 17 2022" -A${{ matrix.arch }} -DKIWI_JAVA_BINDING=1
         buildWithCMakeArgs: --config Release
         buildDirectory: build
     - run: |
@@ -278,14 +278,15 @@ jobs:
     - name: Setup Gradle
       uses: gradle/gradle-build-action@v2
     - name: Grant execute permission for gradlew
-      run: chmod +x bindings/android/gradlew
+      run: |
+        chmod +x bindings/java/gradlew
     - name: Build Android AAR
       run: |
-        cd bindings/android
+        cd bindings/java
         ./gradlew assembleRelease
     - name: Package Android AAR release
       run: |
-        cd bindings/android
+        cd bindings/java
         # Copy the built AAR with correct name
         find build/outputs/aar/ -name "*.aar" -exec cp {} kiwi-android.aar \; 2>/dev/null || echo "AAR file not found, checking directory structure"
         echo "Contents of build/outputs/:"
@@ -302,7 +303,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       with:
         upload_url: ${{ steps.get_release.outputs.upload_url }}
-        asset_path: bindings/android/kiwi-android.aar
+        asset_path: bindings/java/kiwi-android.aar
         asset_name: kiwi-android-${{ steps.get_release.outputs.tag_name }}.aar
         asset_content_type: application/octet-stream
     - name: Upload Android native library (compatibility)
@@ -311,7 +312,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       with:
         upload_url: ${{ steps.get_release.outputs.upload_url }}
-        asset_path: bindings/android/kiwi_android_arm64_compat.tgz
+        asset_path: bindings/java/kiwi_android_arm64_compat.tgz
         asset_name: kiwi_android_arm64_${{ steps.get_release.outputs.tag_name }}.tgz
         asset_content_type: application/octet-stream
 
