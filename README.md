@@ -235,13 +235,6 @@ https://github.com/bab2min/kiwi-gui 에서 다운받을 수 있습니다.
 
 ## 성능
 
-<table>
-<tr><th>모델(파일 크기)</th> <th>웹</th> <th>정제된 웹</th> <th>신문기사</th> <th>문학작품</th> </tr>
-<tr><th>소형(15.9MB)</th> <td>86.85</td> <td>93.58</td> <td>89.73</td> <td>95.19</td></tr>
-<tr><th>중형(39.9MB)</th> <td>87.09</td> <td>94.12</td> <td>91.23</td> <td>96.73</td></tr>
-<tr><th>대형(90.4MB)</th> <td>86.99</td> <td>93.47</td> <td>92.37</td> <td>97.68</td></tr>
-</table>
-
 **결과 예시**
 ```text
 프랑스의 세계적인 의상 디자이너 엠마누엘 웅가로가 실내 장식용 직물 디자이너로 나섰다.
