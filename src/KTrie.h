@@ -110,12 +110,22 @@ namespace kiwi
 		const Form* formData,
 		const KString& str
 	);
+
+	template<ArchType arch, bool typoTolerant>
+	std::pair<const Form*, size_t> findFormWithPrefix(
+		const utils::FrozenTrie<kchar_t, const Form*>& trie,
+		const Form* formData,
+		const KString& prefix
+	);
 	
 	using FnSplitByTrie = decltype(&splitByTrie<ArchType::default_>);
 	FnSplitByTrie getSplitByTrieFn(ArchType arch, bool typoTolerant, bool continualTypoTolerant, bool lengtheningTypoTolerant);
 
 	using FnFindForm = decltype(&findForm<ArchType::default_, false>);
 	FnFindForm getFindFormFn(ArchType arch, bool typoTolerant);
+
+	using FnFindFormWithPrefix = decltype(&findFormWithPrefix<ArchType::default_, false>);
+	FnFindFormWithPrefix getFindFormWithPrefixFn(ArchType arch, bool typoTolerant);
 
 	struct KTrie : public utils::TrieNode<char16_t, const Form*, utils::ConstAccess<map<char16_t, int32_t>>, KTrie>
 	{

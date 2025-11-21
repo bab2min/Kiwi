@@ -2,8 +2,8 @@
  * @file capi.h
  * @author bab2min (bab2min@gmail.com)
  * @brief Kiwi C API를 담고 있는 헤더 파일
- * @version 0.20.0
- * @date 2024-07-01
+ * @version 0.22.1
+ * @date 2025-11-21
  * 
  * 
  */
@@ -58,6 +58,15 @@ typedef struct {
 	uint32_t sub_sent_position; /**< 인용부호나 괄호로 둘러싸인 하위 문장의 번호. 1부터 시작. 0인 경우 하위 문장이 아님을 뜻함 */
 	uint16_t dialect; /**< 방언 정보 */
 } kiwi_token_info_t;
+
+typedef struct {
+	uint8_t tag; /**< 품사 태그 */
+	uint8_t sense_id; /**< 의미 번호 */
+	float user_score; /**< 사용자 정의 점수 */
+	uint32_t lm_morpheme_id; /**< 언어모델 형태소 ID */
+	uint32_t orig_morpheme_id; /**< 원래 형태소 ID */
+	uint16_t dialect; /**< 방언 정보 */
+} kiwi_morpheme_t;
 
 typedef struct {
 	uint8_t integrate_allomorph; /**< 이형태 형태소의 통합 여부 */
@@ -544,13 +553,10 @@ DECL_DLL void kiwi_set_global_config(kiwi_h handle, kiwi_config_t config);
 DECL_DLL kiwi_config_t kiwi_get_global_config(kiwi_h handle);
 
 /**
- * @brief int 타입 옵션의 값을 변경합니다.
+ * @brief int 타입 옵션의 값을 변경합니다. (deprecated)
+ * kiwi_set_global_config 사용을 권장합니다.
  * 
- * @param handle Kiwi.
- * @param option {KIWI_BUILD_INTEGRATE_ALLOMORPH, KIWI_MAX_UNK_FORM_SIZE, KIWI_SPACE_TOLERANCE}.
- * @param value 옵션의 설정값
- * 
- * @see kiwi_get_option, kiwi_set_option_f
+ * @see kiwi_set_global_config, kiwi_get_option, kiwi_set_option_f
  */
 DECL_DLL void kiwi_set_option(kiwi_h handle, int option, int value);
 
@@ -558,38 +564,28 @@ DECL_DLL void kiwi_set_option(kiwi_h handle, int option, int value);
  * @brief int 타입 옵션의 값을 반환합니다.
  * 
  * @param handle  Kiwi.
- * @param option {KIWI_BUILD_INTEGRATE_ALLOMORPH, KIWI_NUM_THREADS, KIWI_MAX_UNK_FORM_SIZE, KIWI_SPACE_TOLERANCE}.
+ * @param option {KIWI_NUM_THREADS}.
  * @return 해당 옵션의 값을 반환합니다.
  *
- * - KIWI_BUILD_INTEGRATE_ALLOMORPH: 이형태 통합 기능 사용 유무 (0 혹은 1)
- * - KIWI_NUM_THREADS: 사용중인 쓰레드 수 (1 이상의 정수)
- * - KIWI_MAX_UNK_FORM_SIZE: 추출 가능한 사전 미등재 형태의 최대 길이 (0 이상의 정수)
- * - KIWI_SPACE_TOLERANCE: 무시할 수 있는 공백의 최대 개수 (0 이상의 정수)
+ * - 나머지 설정 값들은 kiwi_get_global_config를 사용하십시오.
+ * 
+ * @see kiwi_get_global_config
  */
 DECL_DLL int kiwi_get_option(kiwi_h handle, int option);
 
 /**
- * @brief float 타입 옵션의 값을 변경합니다.
- *
- * @param handle Kiwi.
- * @param option {KIWI_CUT_OFF_THRESHOLD, KIWI_UNK_FORM_SCORE_SCALE, KIWI_UNK_FORM_SCORE_BIAS, KIWI_SPACE_PENALTY}.
- * @param value 옵션의 설정값
+ * @brief float 타입 옵션의 값을 변경합니다. (deprecated)
+ * kiwi_set_global_config 사용을 권장합니다.
  * 
- * @see kiwi_get_option_f, kiwi_set_option
+ * @see kiwi_set_global_config, kiwi_get_option_f, kiwi_set_option
  */
 DECL_DLL void kiwi_set_option_f(kiwi_h handle, int option, float value);
 
 /**
- * @brief float 타입 옵션의 값을 반환합니다.
- *
- * @param handle  Kiwi.
- * @param option {KIWI_CUT_OFF_THRESHOLD, KIWI_UNK_FORM_SCORE_SCALE, KIWI_UNK_FORM_SCORE_BIAS, KIWI_SPACE_PENALTY}.
- * @return 해당 옵션의 값을 반환합니다.
- *
- * - KIWI_CUT_OFF_THRESHOLD: 분석 과정에서 이 값보다 더 크게 차이가 나는 후보들은 제거합니다.
- * - KIWI_UNK_FORM_SCORE_SCALE: 미등재 형태 추출 시 사용하는 기울기 값
- * - KIWI_UNK_FORM_SCORE_BIAS: 미등재 형태 추출 시 사용하는 편차 값
- * - KIWI_SPACE_PENALTY: 무시하는 공백 1개당 발생하는 언어 점수 페널티 값
+ * @brief float 타입 옵션의 값을 반환합니다. (deprecated)
+ * kiwi_get_global_config 사용을 권장합니다.
+ * 
+ * @see kiwi_get_global_config, kiwi_set_option_f, kiwi_get_option
  */
 DECL_DLL float kiwi_get_option_f(kiwi_h handle, int option);
 
@@ -711,6 +707,15 @@ DECL_DLL kiwi_joiner_h kiwi_new_joiner(kiwi_h handle, int lm_search);
 DECL_DLL int kiwi_close(kiwi_h handle);
 
 /**
+ * @brief 품사 태그 ID를 문자열로 변환합니다.
+ * 
+ * @param handle Kiwi 핸들
+ * @param tag_id 품사 태그 ID
+ * @return UTF-8로 인코딩된 품사 태그 문자열. 실패 시 null을 반환합니다. 이 포인터는 Kiwi API가 관리하므로 별도로 해제할 필요가 없습니다.
+ */
+DECL_DLL const char* kiwi_tag_to_string(kiwi_h handle, uint8_t pos_tag);
+
+/**
  * @brief 분석 결과 내에 포함된 리스트의 개수를 반환합니다.
  * 
  * @param result 분석 결과의 핸들
@@ -745,6 +750,17 @@ DECL_DLL int kiwi_res_word_num(kiwi_res_h result, int index);
  * @return 형태소 정보가 담긴 `kiwi_token_info_t`에 대한 포인터를 반환합니다. 실패 시 null을 반환합니다. 이 포인터는 Kiwi API가 관리하므로 별도로 해제할 필요가 없습니다.
  */
 DECL_DLL const kiwi_token_info_t* kiwi_res_token_info(kiwi_res_h result, int index, int num);
+
+/**
+ * @brief index번째 분석 결과의 num번째 형태소의 ID를 반환합니다.
+ * 
+ * @param result 분석 결과의 핸들
+ * @param index `0` 이상 `kiwi_res_size(result)` 미만의 정수
+ * @param num `0` 이상 `kiwi_res_word_num(result, index)` 미만의 정수
+ * @param kiwi_handle Kiwi 핸들
+ * @return 형태소 ID. 실패 시 음수를 반환합니다.
+ */
+DECL_DLL int kiwi_res_morpheme_id(kiwi_res_h result, int index, int num, kiwi_h kiwi_handle);
 
 /**
  * @brief index번째 분석 결과의 num번째 형태소의 형태를 반환합니다.
@@ -856,6 +872,155 @@ DECL_DLL float kiwi_res_typo_cost(kiwi_res_h result, int index, int num);
  */
 DECL_DLL int kiwi_res_close(kiwi_res_h result);
 
+/**
+ * @brief 모델 사전에서 조건에 맞는 형태소를 찾아 그 ID를 조회합니다.
+ * 
+ * @param handle Kiwi.
+ * @param form 형태소의 형태. 주어진 형태와 정확히 일치하는 형태소만 검색합니다.
+ * @param tag 형태소의 품사 태그. null일 경우 모든 태그를 대상으로 검색합니다.
+ * @param sense_id 형태소의 의미 ID. -1일 경우 모든 의미 ID를 대상으로 검색합니다.
+ * @param morph_ids 형태소 ID를 저장할 배열의 시작 포인터.
+ * @param max_count morph_ids 배열의 크기.
+ * 
+ * @return 조회된 형태소 ID의 개수. 최대 max_count개까지 반환됩니다. 실패 시 음수를 반환합니다.
+ */
+
+DECL_DLL int kiwi_find_morphemes(kiwi_h handle, const char* form, const char* tag, int sense_id, unsigned int* morph_ids, int max_count);
+
+/**
+ * @brief 모델 사전에서 조건에 맞는 형태소를 찾아 그 ID를 조회합니다.
+ * 
+ * @param handle Kiwi.
+ * @param form_prefix 형태소의 형태 접두사. 주어진 접두사로 시작하는 모든 형태소를 검색합니다.
+ * @param tag 형태소의 품사 태그. null일 경우 모든 태그를 대상으로 검색합니다.
+ * @param sense_id 형태소의 의미 ID. -1일 경우 모든 의미 ID를 대상으로 검색합니다.
+ * @param morph_ids 형태소 ID를 저장할 배열의 시작 포인터.
+ * @param max_count morph_ids 배열의 크기.
+ * 
+ * @return 조회된 형태소 ID의 개수. 최대 max_count개까지 반환됩니다. 실패 시 음수를 반환합니다.
+ */
+DECL_DLL int kiwi_find_morphemes_with_prefix(kiwi_h handle, const char* form_prefix, const char* tag, int sense_id, unsigned int* morph_ids, int max_count);
+
+/**
+ * @brief 형태소 ID로부터 형태소 정보를 조회합니다.
+ * 
+ * @param handle Kiwi.
+ * @param morph_id 형태소 ID.
+ * @return 형태소 정보가 담긴 kiwi_morpheme_t 구조체. 실패 시 0으로 채워진 구조체를 반환하고 오류를 설정합니다.
+ */
+DECL_DLL kiwi_morpheme_t kiwi_get_morpheme_info(kiwi_h handle, unsigned int morph_id);
+
+/**
+ * @brief 형태소 ID로부터 형태소의 형태(UTF-8)를 조회합니다.
+ * 
+ * @param handle Kiwi.
+ * @param morph_id 형태소 ID.
+ * @return UTF-8으로 인코딩된 형태소 문자열. 실패 시 null을 반환합니다.
+ * @note 반환된 문자열은 kiwi_free_morpheme_form으로 반드시 해제되어야 합니다.
+ */
+DECL_DLL const char* kiwi_get_morpheme_form(kiwi_h handle, unsigned int morph_id);
+
+/**
+ * @brief kiwi_get_morpheme_form으로 얻은 문자열을 해제합니다.
+ * 
+ * @param form kiwi_get_morpheme_form으로 얻은 형태소 문자열.
+ * @return 성공 시 0을 반환합니다. 실패 시 0이 아닌 값을 반환합니다.
+ * 
+ */
+DECL_DLL int kiwi_free_morpheme_form(const char* form);
+
+typedef struct {
+	uint32_t id;
+	float score;
+} kiwi_similarity_pair_t;
+
+/**
+ * @brief 주어진 형태소와 가장 유사한 단어들을 반환합니다.
+ * 
+ * @param handle Kiwi.
+ * @param morph_id 형태소 ID.
+ * @param output 유사한 단어들을 저장할 배열의 시작 포인터.
+ * @param top_n output 배열의 크기.
+ * @return 실제로 저장된 유사한 단어의 개수. 실패 시 음수를 반환합니다.
+ */
+
+DECL_DLL int kiwi_cong_most_similar_words(kiwi_h handle, unsigned int morph_id, kiwi_similarity_pair_t* output, int top_n);
+
+/**
+ * @brief 두 형태소 간의 유사도를 반환합니다.
+ * 
+ * @param handle Kiwi.
+ * @param morph_id1 형태소 ID 1.
+ * @param morph_id2 형태소 ID 2.
+ * @return 두 형태소 간의 유사도. 실패 시 NaN을 반환합니다.
+ */
+DECL_DLL float kiwi_cong_similarity(kiwi_h handle, unsigned int morph_id1, unsigned int morph_id2);
+
+/**
+ * @brief 주어진 문맥과 가장 유사한 문맥들을 반환합니다.
+ * 
+ * @param handle Kiwi.
+ * @param context_id 문맥 ID.
+ * @param output 유사한 문맥들을 저장할 배열의 시작 포인터.
+ * @param top_n output 배열의 크기.
+ * @return 실제로 저장된 유사한 문맥의 개수. 실패 시 음수를 반환합니다.
+ */
+DECL_DLL int kiwi_cong_most_similar_contexts(kiwi_h handle, unsigned int context_id, kiwi_similarity_pair_t* output, int top_n);
+
+/**
+ * @brief 두 문맥 간의 유사도를 반환합니다.
+ * 
+ * @param handle Kiwi.
+ * @param context_id1 문맥 ID 1.
+ * @param context_id2 문맥 ID 2.
+ * @return 두 문맥 간의 유사도. 실패 시 NaN을 반환합니다.
+ */
+DECL_DLL float kiwi_cong_context_similarity(kiwi_h handle, unsigned int context_id1, unsigned int context_id2);
+
+/**
+ * @brief 주어진 문맥으로부터 예측되는 다음 단어들을 반환합니다.
+ * 
+ * @param handle Kiwi.
+ * @param context_id 문맥 ID.
+ * @param output 예측된 단어들을 저장할 배열의 시작 포인터.
+ * @param top_n output 배열의 크기.
+ * @return 실제로 저장된 예측된 단어의 개수. 실패 시 음수를 반환합니다.
+ */
+DECL_DLL int kiwi_cong_predict_words_from_context(kiwi_h handle, unsigned int context_id, kiwi_similarity_pair_t* output, int top_n);
+
+/**
+ * @brief 두 문맥의 차이로부터 예측되는 다음 단어들을 반환합니다.
+ * 
+ * @param handle Kiwi.
+ * @param context_id 문맥 ID.
+ * @param bg_context_id 배경 문맥 ID.
+ * @param weight 배경 문맥의 가중치.
+ * @param output 예측된 단어들을 저장할 배열의 시작 포인터.
+ * @param top_n output 배열의 크기.
+ * @return 실제로 저장된 예측된 단어의 개수. 실패 시 음수를 반환합니다.
+ */
+DECL_DLL int kiwi_cong_predict_words_from_context_diff(kiwi_h handle, unsigned int context_id, unsigned int bg_context_id, float weight, kiwi_similarity_pair_t* output, int top_n);
+
+/**
+ * @brief 주어진 형태소 배열로부터 문맥 ID를 생성합니다.
+ * 
+ * @param handle Kiwi.
+ * @param morph_ids 형태소 ID 배열의 시작 포인터.
+ * @param size morph_ids 배열의 크기.
+ * @return 생성된 문맥 ID. 실패 시 0을 반환합니다.
+ */
+DECL_DLL unsigned int kiwi_cong_to_context_id(kiwi_h handle, const unsigned int* morph_ids, int size);
+
+/**
+ * @brief 문맥을 구성하고 있는 형태소 배열을 조회합니다.
+ * 
+ * @param handle Kiwi.
+ * @param context_id 문맥 ID.
+ * @param morph_ids 형태소 ID를 저장할 배열의 시작 포인터.
+ * @param max_size morph_ids 배열의 크기.
+ * @return 조회된 형태소 ID의 개수. 최대 max_size개까지 반환됩니다. 실패 시 음수를 반환합니다.
+ */
+DECL_DLL int kiwi_cong_from_context_id(kiwi_h handle, unsigned int context_id, unsigned int* morph_ids, int max_size);
 
 /**
  * @brief 
@@ -970,6 +1135,7 @@ DECL_DLL int kiwi_joiner_add(kiwi_joiner_h handle, const char* form, const char*
  *
  * @param handle Joiner 객체의 핸들
  * @return 성공시 UTF-8로 인코딩된 텍스트의 포인터를 반환합니다. 실패시 null을 반환합니다.
+ * @note 반환된 포인터는 kiwi_joiner_close가 호출될 때까지 유효하며 별도로 해제할 필요가 없습니다.
  */
 DECL_DLL const char* kiwi_joiner_get(kiwi_joiner_h handle);
 
@@ -978,6 +1144,7 @@ DECL_DLL const char* kiwi_joiner_get(kiwi_joiner_h handle);
  *
  * @param handle Joiner 객체의 핸들
  * @return 성공시 UTF-16로 인코딩된 텍스트의 포인터를 반환합니다. 실패시 null을 반환합니다.
+ * @note 반환된 포인터는 kiwi_joiner_close가 호출될 때까지 유효하며 별도로 해제할 필요가 없습니다.
  */
 DECL_DLL const kchar16_t* kiwi_joiner_get_w(kiwi_joiner_h handle);
 

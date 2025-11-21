@@ -952,6 +952,11 @@ int kiwi_close(kiwi_h handle)
 	}
 }
 
+const char* kiwi_tag_to_string(kiwi_h handle, uint8_t pos_tag)
+{
+	return tagToString((POSTag)pos_tag);
+}
+
 int kiwi_res_size(kiwi_res_h result)
 {
 	if (!result) return KIWIERR_INVALID_HANDLE;
@@ -1008,6 +1013,21 @@ const kiwi_token_info_t* kiwi_res_token_info(kiwi_res_h result, int index, int n
 	{
 		currentError = current_exception();
 		return nullptr;
+	}
+}
+
+int kiwi_res_morpheme_id(kiwi_res_h result, int index, int num, kiwi_h kiwi_handle)
+{
+	try
+	{
+		if (!result || !kiwi_handle) return KIWIERR_INVALID_HANDLE;
+		if (index < 0 || index >= result->first.size() || num < 0 || num >= result->first[index].first.size()) return KIWIERR_INVALID_INDEX;
+		return ((Kiwi*)kiwi_handle)->morphToId(result->first[index].first[num].morph);
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return KIWIERR_FAIL;
 	}
 }
 
@@ -1169,6 +1189,255 @@ int kiwi_res_close(kiwi_res_h result)
 	{
 		delete result;
 		return 0;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return KIWIERR_FAIL;
+	}
+}
+
+int kiwi_find_morphemes(kiwi_h handle, const char* form, const char* tag, int sense_id, unsigned int* morph_ids, int max_count)
+{
+	if (!handle) return KIWIERR_INVALID_HANDLE;
+	try
+	{
+		Kiwi* kiwi = (Kiwi*)handle;
+		auto ret = kiwi->findMorphemes(utf8To16(form), tag ? parse_tag(tag) : POSTag::unknown, (uint8_t)sense_id);
+		max_count = min((int)ret.size(), max_count);
+		for (int i = 0; i < max_count; ++i)
+		{
+			morph_ids[i] = kiwi->morphToId(ret[i]);
+		}
+		return max_count;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return KIWIERR_FAIL;
+	}
+}
+
+int kiwi_find_morphemes_with_prefix(kiwi_h handle, const char* form_prefix, const char* tag, int sense_id, unsigned int* morph_ids, int max_count)
+{
+	if (!handle) return KIWIERR_INVALID_HANDLE;
+	try
+	{
+		Kiwi* kiwi = (Kiwi*)handle;
+		auto ret = kiwi->findMorphemesWithPrefix(max_count, utf8To16(form_prefix), tag ? parse_tag(tag) : POSTag::unknown, (uint8_t)sense_id);
+		max_count = min((int)ret.size(), max_count);
+		for (int i = 0; i < max_count; ++i)
+		{
+			morph_ids[i] = kiwi->morphToId(ret[i]);
+		}
+		return max_count;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return KIWIERR_FAIL;
+	}
+}
+
+kiwi_morpheme_t kiwi_get_morpheme_info(kiwi_h handle, unsigned int morph_id)
+{
+	kiwi_morpheme_t info{ 0, };
+	if (!handle) return info;
+	try
+	{
+		auto* morpheme = ((Kiwi*)handle)->idToMorph(morph_id);
+		if (!morpheme) return info;
+		info.tag = (uint8_t)morpheme->tag;
+		info.sense_id = morpheme->senseId;
+		info.user_score = morpheme->userScore;
+		info.lm_morpheme_id = morpheme->lmMorphemeId;
+		info.orig_morpheme_id = morpheme->origMorphemeId;
+		info.dialect = (uint16_t)morpheme->dialect;
+		return info;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return info;
+	}
+}
+
+const char* kiwi_get_morpheme_form(kiwi_h handle, unsigned int morph_id)
+{
+	if (!handle) return nullptr;
+	try
+	{
+		auto* morpheme = ((Kiwi*)handle)->idToMorph(morph_id);
+		if (!morpheme) return nullptr;
+		auto form = utf16To8(joinHangul(morpheme->getForm()));
+		auto* buf = new char[form.size() + 1];
+		strncpy(buf, form.c_str(), form.size() + 1);
+		return buf;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return nullptr;
+	}
+}
+
+int kiwi_free_morpheme_form(const char* form)
+{
+	try
+	{
+		delete[] form;
+		return 0;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return KIWIERR_FAIL;
+	}
+}
+
+int kiwi_cong_most_similar_words(kiwi_h handle, unsigned int morph_id, kiwi_similarity_pair_t* output, int top_n)
+{
+	if (!handle) return KIWIERR_INVALID_HANDLE;
+	try
+	{
+		Kiwi* kiwi = (Kiwi*)handle;
+		auto cong = dynamic_cast<const lm::CoNgramModelBase*>(kiwi->getLangModel());
+		if (!cong) throw invalid_argument{ "The given kiwi object does not have CoNgram language model." };
+		size_t cnt = cong->mostSimilarWords(morph_id, top_n, (pair<uint32_t, float>*)output);
+		return (int)cnt;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return KIWIERR_FAIL;
+	}
+}
+
+float kiwi_cong_similarity(kiwi_h handle, unsigned int morph_id1, unsigned int morph_id2)
+{
+	if (!handle) return NAN;
+	try
+	{
+		Kiwi* kiwi = (Kiwi*)handle;
+		auto cong = dynamic_cast<const lm::CoNgramModelBase*>(kiwi->getLangModel());
+		if (!cong) throw invalid_argument{ "The given kiwi object does not have CoNgram language model." };
+		return cong->wordSimilarity(morph_id1, morph_id2);
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return NAN;
+	}
+}
+
+int kiwi_cong_most_similar_contexts(kiwi_h handle, unsigned int context_id, kiwi_similarity_pair_t* output, int top_n)
+{
+	if (!handle) return KIWIERR_INVALID_HANDLE;
+	try
+	{
+		Kiwi* kiwi = (Kiwi*)handle;
+		auto cong = dynamic_cast<const lm::CoNgramModelBase*>(kiwi->getLangModel());
+		if (!cong) throw invalid_argument{ "The given kiwi object does not have CoNgram language model." };
+		size_t cnt = cong->mostSimilarContexts(context_id, top_n, (pair<uint32_t, float>*)output);
+		return (int)cnt;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return KIWIERR_FAIL;
+	}
+}
+
+float kiwi_cong_context_similarity(kiwi_h handle, unsigned int context_id1, unsigned int context_id2)
+{
+	if (!handle) return NAN;
+	try
+	{
+		Kiwi* kiwi = (Kiwi*)handle;
+		auto cong = dynamic_cast<const lm::CoNgramModelBase*>(kiwi->getLangModel());
+		if (!cong) throw invalid_argument{ "The given kiwi object does not have CoNgram language model." };
+		return cong->contextSimilarity(context_id1, context_id2);
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return NAN;
+	}
+}
+
+int kiwi_cong_predict_words_from_context(kiwi_h handle, unsigned int context_id, kiwi_similarity_pair_t* output, int top_n)
+{
+	if (!handle) return KIWIERR_INVALID_HANDLE;
+	try
+	{
+		Kiwi* kiwi = (Kiwi*)handle;
+		auto cong = dynamic_cast<const lm::CoNgramModelBase*>(kiwi->getLangModel());
+		if (!cong) throw invalid_argument{ "The given kiwi object does not have CoNgram language model." };
+		size_t cnt = cong->predictWordsFromContext(context_id, top_n, (pair<uint32_t, float>*)output);
+		return (int)cnt;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return KIWIERR_FAIL;
+	}
+}
+
+int kiwi_cong_predict_words_from_context_diff(kiwi_h handle, unsigned int context_id, unsigned int bg_context_id, float weight, kiwi_similarity_pair_t* output, int top_n)
+{
+	if (!handle) return KIWIERR_INVALID_HANDLE;
+	try
+	{
+		Kiwi* kiwi = (Kiwi*)handle;
+		auto cong = dynamic_cast<const lm::CoNgramModelBase*>(kiwi->getLangModel());
+		if (!cong) throw invalid_argument{ "The given kiwi object does not have CoNgram language model." };
+		size_t cnt = cong->predictWordsFromContextDiff(context_id, bg_context_id, weight, top_n, (pair<uint32_t, float>*)output);
+		return (int)cnt;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return KIWIERR_FAIL;
+	}
+}
+
+unsigned int kiwi_cong_to_context_id(kiwi_h handle, const unsigned int* morph_ids, int size)
+{
+	if (!handle) return 0;
+	try
+	{
+		Kiwi* kiwi = (Kiwi*)handle;
+		auto cong = dynamic_cast<const lm::CoNgramModelBase*>(kiwi->getLangModel());
+		if (!cong) throw invalid_argument{ "The given kiwi object does not have CoNgram language model." };
+		return cong->toContextId(morph_ids, size);
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return 0;
+	}
+}
+
+int kiwi_cong_from_context_id(kiwi_h handle, unsigned int context_id, unsigned int* morph_ids, int max_size)
+{
+	if (!handle) return KIWIERR_INVALID_HANDLE;
+	try
+	{
+		Kiwi* kiwi = (Kiwi*)handle;
+		auto cong = dynamic_cast<const lm::CoNgramModelBase*>(kiwi->getLangModel());
+		if (!cong) throw invalid_argument{ "The given kiwi object does not have CoNgram language model." };
+		auto& vec = cong->getContextWordMapCached();
+		if ((size_t)context_id >= vec.size())
+		{
+			throw out_of_range{ "Invalid context ID." };
+		}
+
+		max_size = min((int)vec[context_id].size(), max_size);
+		for (int i = 0; i < max_size; ++i)
+		{
+			morph_ids[i] = vec[context_id][i];
+		}
+		return max_size;
 	}
 	catch (...)
 	{

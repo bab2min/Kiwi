@@ -39,6 +39,7 @@ namespace kiwi
 		protected:
 			const size_t memorySize = 0;
 			CoNgramModelHeader header;
+			mutable std::vector<std::vector<uint32_t>> contextWordMapCache;
 
 			CoNgramModelBase(const utils::MemoryObject& mem) : memorySize{ mem.size() }, header{ *reinterpret_cast<const CoNgramModelHeader*>(mem.get()) }
 			{
@@ -61,6 +62,15 @@ namespace kiwi
 
 			virtual uint32_t toContextId(const uint32_t* vocabIds, size_t size) const = 0;
 			virtual std::vector<std::vector<uint32_t>> getContextWordMap() const = 0;
+
+			const std::vector<std::vector<uint32_t>>& getContextWordMapCached() const
+			{
+				if (contextWordMapCache.empty())
+				{
+					contextWordMapCache = getContextWordMap();
+				}
+				return contextWordMapCache;
+			}
 
 			static utils::MemoryObject build(const std::string& contextDefinition, const std::string& embedding, 
 				size_t maxContextLength = -1, 

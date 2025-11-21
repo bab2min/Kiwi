@@ -54,6 +54,7 @@ namespace kiwi
 			continualTypoTolerant, 
 			lengtheningTypoTolerant);
 		dfFindForm = (void*)getFindFormFn(selectedArch, typoTolerant);
+		dfFindFormWithPrefix = (void*)getFindFormWithPrefixFn(selectedArch, typoTolerant);
 		dfFindBestPath = langMdl ? langMdl->getFindBestPathFn() : nullptr;
 		dfNewJoiner = langMdl ? langMdl->getNewJoinerFn() : nullptr;
 	}
@@ -1206,7 +1207,7 @@ namespace kiwi
 		return joinHangul(typoPool.begin() + p[0], typoPool.begin() + p[1]);
 	}
 
-	void Kiwi::findMorphemes(vector<const Morpheme*>& ret, const u16string_view& s, POSTag tag, uint8_t senseId) const
+	void Kiwi::findMorphemes(vector<const Morpheme*>& ret, u16string_view s, POSTag tag, uint8_t senseId) const
 	{
 		auto normalized = normalizeHangul(s);
 		auto form = (*reinterpret_cast<FnFindForm>(dfFindForm))(formTrie, forms.data(), normalized);
@@ -1224,7 +1225,7 @@ namespace kiwi
 		}
 	}
 
-	const Morpheme* Kiwi::findMorpheme(const u16string_view& s, POSTag tag, uint8_t senseId) const
+	const Morpheme* Kiwi::findMorpheme(u16string_view s, POSTag tag, uint8_t senseId) const
 	{
 		auto normalized = normalizeHangul(s);
 		auto form = (*reinterpret_cast<FnFindForm>(dfFindForm))(formTrie, forms.data(), normalized);
@@ -1243,10 +1244,50 @@ namespace kiwi
 		return nullptr;
 	}
 
-	vector<const Morpheme*> Kiwi::findMorphemes(const u16string_view& s, POSTag tag, uint8_t senseId) const
+	vector<const Morpheme*> Kiwi::findMorphemes(u16string_view s, POSTag tag, uint8_t senseId) const
 	{
 		vector<const Morpheme*> ret;
 		findMorphemes(ret, s, tag, senseId);
+		return ret;
+	}
+
+	size_t Kiwi::findMorphemesWithPrefix(const Morpheme** out, size_t size, u16string_view s, POSTag tag, uint8_t senseId) const
+	{
+		auto normalized = normalizeHangul(s);
+		auto [form, matchPrefixLen] = (*reinterpret_cast<FnFindFormWithPrefix>(dfFindFormWithPrefix))(formTrie, forms.data(), normalized);
+		
+		tag = clearIrregular(tag);
+		size_t cnt = 0;
+		for (; form; ++form)
+		{
+			for (auto c : form->candidate)
+			{
+				if (c->combineSocket
+					|| (tag != POSTag::unknown
+						&& clearIrregular(c->tag) != tag)
+					|| (senseId != undefSenseId
+						&& c->senseId != senseId))
+					continue;
+				if (cnt < size)
+				{
+					out[cnt++] = c;
+				}
+				else
+				{
+					break;
+				}
+			}
+
+			if (cnt >= size) break;
+		}
+		return cnt;
+	}
+
+	vector<const Morpheme*> Kiwi::findMorphemesWithPrefix(size_t size, u16string_view s, POSTag tag, uint8_t senseId) const
+	{
+		vector<const Morpheme*> ret(size);
+		size_t cnt = findMorphemesWithPrefix(ret.data(), size, s, tag, senseId);
+		ret.resize(cnt);
 		return ret;
 	}
 }

@@ -415,6 +415,23 @@ TEST(KiwiCpp, STagPrefix)
 	EXPECT_EQ(res[5].str, u"`");
 }
 
+TEST(KiwiCpp, FindMorphemesWithPrefix)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	auto morphemes = kiwi.findMorphemesWithPrefix(10, u"키");
+	EXPECT_GT(morphemes.size(), 0);
+	EXPECT_TRUE(u"키" <= morphemes[0]->getForm());
+	EXPECT_TRUE(morphemes[0]->getForm() <= morphemes[1]->getForm());
+	EXPECT_TRUE(morphemes[1]->getForm() <= morphemes[2]->getForm());
+	EXPECT_TRUE(morphemes[2]->getForm() <= morphemes[3]->getForm());
+
+	morphemes = kiwi.findMorphemesWithPrefix(10, u"키윜");
+	EXPECT_GT(morphemes.size(), 0);
+
+	morphemes = kiwi.findMorphemesWithPrefix(10, u"");
+	EXPECT_GT(morphemes.size(), 0);
+}
+
 TEST(KiwiCpp, HSDataset)
 {
 	KiwiBuilder kw{ MODEL_PATH, 0, BuildOption::default_, };

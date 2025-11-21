@@ -1230,6 +1230,37 @@ const Form* kiwi::findForm(
 	return ret;
 }
 
+template<ArchType arch, bool typoTolerant>
+pair<const Form*, size_t> kiwi::findFormWithPrefix(
+	const utils::FrozenTrie<kchar_t, const Form*>& trie,
+	const Form* formData,
+	const KString& prefix
+)
+{
+	auto* node = trie.root();
+	size_t matchedPrefixLen = 0;
+	for (auto c : prefix)
+	{
+		auto nnode = node->template nextOpt<arch>(trie, c);
+		if (!nnode) break;
+		++matchedPrefixLen;
+		node = nnode;
+	}
+
+	while (!trie.hasMatch(node->val(trie)))
+	{
+		node = trie.firstChild(node);
+		if (!node) return make_pair<const Form*, size_t>(nullptr, 0);
+	}
+
+	auto ret = node->val(trie);
+	if (typoTolerant)
+	{
+		ret = &reinterpret_cast<const TypoForm*>(ret)->form(formData);
+	}
+	return make_pair(ret, matchedPrefixLen);
+}
+
 namespace kiwi
 {
 	template<bool typoTolerant, bool continualTypoTolerant, bool lengtheningTypoTolerant>
@@ -1281,6 +1312,29 @@ FnFindForm kiwi::getFindFormFn(ArchType arch, bool typoTolerant)
 	static std::array<tp::Table<FnFindForm, AvailableArch>, 2> table{ 
 		FindFormGetter<false>{},
 		FindFormGetter<true>{},
+	};
+
+	return table[typoTolerant ? 1 : 0][static_cast<std::ptrdiff_t>(arch)];
+}
+
+namespace kiwi
+{
+	template<bool typoTolerant>
+	struct FindFormWithPrefixGetter
+	{
+		template<std::ptrdiff_t i>
+		struct Wrapper
+		{
+			static constexpr FnFindFormWithPrefix value = &findFormWithPrefix<static_cast<ArchType>(i), typoTolerant>;
+		};
+	};
+}
+
+FnFindFormWithPrefix kiwi::getFindFormWithPrefixFn(ArchType arch, bool typoTolerant)
+{
+	static std::array<tp::Table<FnFindFormWithPrefix, AvailableArch>, 2> table{
+		FindFormWithPrefixGetter<false>{},
+		FindFormWithPrefixGetter<true>{},
 	};
 
 	return table[typoTolerant ? 1 : 0][static_cast<std::ptrdiff_t>(arch)];
