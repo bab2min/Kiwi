@@ -456,9 +456,9 @@ TEST(KiwiC, FindMorphemesWithPrefix)
 		kiwi_get_morpheme_form(kiwi, morphmes[3]),
 	};
 	EXPECT_LE(std::string{ u8"키" }, forms[0]);
-	EXPECT_LE(forms[0], forms[1]);
-	EXPECT_LE(forms[1], forms[2]);
-	EXPECT_LE(forms[2], forms[3]);
+	EXPECT_LE(std::string{ forms[0] }, forms[1]);
+	EXPECT_LE(std::string{ forms[1] }, forms[2]);
+	EXPECT_LE(std::string{ forms[2] }, forms[3]);
 
 	EXPECT_EQ(kiwi_free_morpheme_form(forms[0]), 0);
 	EXPECT_EQ(kiwi_free_morpheme_form(forms[1]), 0);
