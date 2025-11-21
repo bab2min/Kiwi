@@ -1,7 +1,7 @@
 var searchData=
 [
   ['table_0',['Table',['../classkiwi_1_1tp_1_1Table.html',1,'kiwi::tp']]],
-  ['tag_1',['tag',['../structkiwi_1_1TokenInfo.html#a45967e9870d0b947d30e7ad8fece4898',1,'kiwi::TokenInfo::tag'],['../structkiwi_1_1MorphemeRaw.html#a5234f7084311dc2f6e1951bb141be9f7',1,'kiwi::MorphemeRaw::tag'],['../structkiwi__token__info__t.html#a2f8255848916bffeba1eaabdc3dae17e',1,'kiwi_token_info_t::tag']]],
+  ['tag_1',['tag',['../structkiwi_1_1TokenInfo.html#a45967e9870d0b947d30e7ad8fece4898',1,'kiwi::TokenInfo::tag'],['../structkiwi_1_1MorphemeRaw.html#a5234f7084311dc2f6e1951bb141be9f7',1,'kiwi::MorphemeRaw::tag'],['../structkiwi__morpheme__t.html#ad262639bed4d05c27052eae1fdd75068',1,'kiwi_morpheme_t::tag'],['../structkiwi__token__info__t.html#a2f8255848916bffeba1eaabdc3dae17e',1,'kiwi_token_info_t::tag']]],
   ['tagsequencescorer_2',['TagSequenceScorer',['../classkiwi_1_1TagSequenceScorer.html',1,'kiwi']]],
   ['threadpool_3',['ThreadPool',['../classkiwi_1_1utils_1_1ThreadPool.html',1,'kiwi::utils']]],
   ['tokeninfo_4',['TokenInfo',['../structkiwi_1_1TokenInfo.html',1,'kiwi']]],

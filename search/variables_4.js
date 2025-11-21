@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['dialect_0',['dialect',['../structkiwi__token__info__t.html#a38c5e9dd3d12bbd0a5b43007c0f34b5b',1,'kiwi_token_info_t::dialect'],['../structkiwi_1_1MorphemeRaw.html#af0b51849544597d47508a10bc9c77353',1,'kiwi::MorphemeRaw::dialect'],['../structkiwi_1_1TokenInfo.html#a1d18dde6a171a7697466657173f80cee',1,'kiwi::TokenInfo::dialect']]],
+  ['dialect_0',['dialect',['../structkiwi__token__info__t.html#a38c5e9dd3d12bbd0a5b43007c0f34b5b',1,'kiwi_token_info_t::dialect'],['../structkiwi__morpheme__t.html#af9b79b9e8ba34304796c058ece0048ec',1,'kiwi_morpheme_t::dialect'],['../structkiwi_1_1MorphemeRaw.html#af0b51849544597d47508a10bc9c77353',1,'kiwi::MorphemeRaw::dialect'],['../structkiwi_1_1TokenInfo.html#a1d18dde6a171a7697466657173f80cee',1,'kiwi::TokenInfo::dialect']]],
   ['dialect_5fcost_1',['dialect_cost',['../structkiwi__analyze__option__t.html#a442f1413f29ba5f25f88ab1d887e3a6e',1,'kiwi_analyze_option_t']]]
 ];
