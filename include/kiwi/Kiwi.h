@@ -2,8 +2,8 @@
  * @file Kiwi.h
  * @author bab2min (bab2min@gmail.com)
  * @brief Kiwi C++ API를 담고 있는 헤더 파일
- * @version 0.20.0
- * @date 2024-07-01
+ * @version 0.22.1
+ * @date 2025-11-21
  * 
  * 
  */
@@ -149,6 +149,7 @@ namespace kiwi
 		ArchType selectedArch = ArchType::none;
 		void* dfSplitByTrie = nullptr;
 		void* dfFindForm = nullptr;
+		void* dfFindFormWithPrefix = nullptr;
 		void* dfFindBestPath = nullptr;
 		void* dfNewJoiner = nullptr;
 	
@@ -509,17 +510,20 @@ namespace kiwi
 		* @param senseId 형태소의 의미 번호. `undefSenseId`을 지정하면 의미 번호를 무시하고 검색한다.
 		* @return 주어진 형태소를 찾은 경우 해당 형태소의 포인터를 반환하고, 찾지 못한 경우 nullptr를 반환한다.
 		*/
-		const Morpheme* findMorpheme(const std::u16string_view& form, POSTag tag = POSTag::unknown, uint8_t senseId = undefSenseId) const;
+		const Morpheme* findMorpheme(std::u16string_view form, POSTag tag = POSTag::unknown, uint8_t senseId = undefSenseId) const;
 
-		size_t findMorphemeId(const std::u16string_view& form, POSTag tag = POSTag::unknown, uint8_t senseId = undefSenseId) const
+		size_t findMorphemeId(std::u16string_view form, POSTag tag = POSTag::unknown, uint8_t senseId = undefSenseId) const
 		{
 			const Morpheme* morph = findMorpheme(form, tag, senseId);
 			if (!morph) return -1;
 			return morphToId(morph);
 		}
 
-		void findMorphemes(std::vector<const Morpheme*>& out, const std::u16string_view& s, POSTag tag = POSTag::unknown, uint8_t senseId = undefSenseId) const;
-		std::vector<const Morpheme*> findMorphemes(const std::u16string_view& s, POSTag tag = POSTag::unknown, uint8_t senseId = undefSenseId) const;
+		void findMorphemes(std::vector<const Morpheme*>& ret, std::u16string_view s, POSTag tag = POSTag::unknown, uint8_t senseId = undefSenseId) const;
+		std::vector<const Morpheme*> findMorphemes(std::u16string_view s, POSTag tag = POSTag::unknown, uint8_t senseId = undefSenseId) const;
+
+		size_t findMorphemesWithPrefix(const Morpheme** out, size_t size, std::u16string_view s, POSTag tag = POSTag::unknown, uint8_t senseId = undefSenseId) const;
+		std::vector<const Morpheme*> findMorphemesWithPrefix(size_t size, std::u16string_view s, POSTag tag = POSTag::unknown, uint8_t senseId = undefSenseId) const;
 	};
 
 	/**

@@ -144,6 +144,16 @@ namespace kiwi
 				std::vector<Key> prefix;
 				traverse(std::forward<Fn>(visitor), root(), prefix, maxDepth);
 			}
+
+			const Node* firstChild(const Node* node) const
+			{
+				if (node->numNexts == 0) return nullptr;
+				auto* keys = &nextKeys[node->nextOffset];
+				auto* diffs = &nextDiffs[node->nextOffset];
+				auto* first = std::min_element(keys, keys + node->numNexts);
+				
+				return node + diffs[first - keys];
+			}
 		};
 	}
 }
