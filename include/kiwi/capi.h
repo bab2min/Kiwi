@@ -934,21 +934,6 @@ typedef struct {
 	float score;
 } kiwi_similarity_pair_t;
 
-
-/*
-			virtual size_t mostSimilarWords(uint32_t vocabId, size_t topN, std::pair<uint32_t, float>* output) const = 0;
-			virtual float wordSimilarity(uint32_t vocabId1, uint32_t vocabId2) const = 0;
-
-			virtual size_t mostSimilarContexts(uint32_t contextId, size_t topN, std::pair<uint32_t, float>* output) const = 0;
-			virtual float contextSimilarity(uint32_t contextId1, uint32_t contextId2) const = 0;
-
-			virtual size_t predictWordsFromContext(uint32_t contextId, size_t topN, std::pair<uint32_t, float>* output) const = 0;
-			virtual size_t predictWordsFromContextDiff(uint32_t contextId, uint32_t bgContextId, float weight, size_t topN, std::pair<uint32_t, float>* output) const = 0;
-
-			virtual uint32_t toContextId(const uint32_t* vocabIds, size_t size) const = 0;
-			virtual std::vector<std::vector<uint32_t>> getContextWordMap() const = 0;
-*/
-
 /**
  * @brief 주어진 형태소와 가장 유사한 단어들을 반환합니다.
  * 
