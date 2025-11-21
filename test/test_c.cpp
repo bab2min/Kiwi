@@ -442,3 +442,32 @@ TEST(KiwiC, ScriptName)
 	EXPECT_STREQ(kiwi_get_script_name(1), "Latin");
 	EXPECT_STREQ(kiwi_get_script_name(30), "Hangul");
 }
+
+TEST(KiwiC, FindMorphemesWithPrefix)
+{
+	kiwi_h kiwi = reuse_kiwi_instance();
+	unsigned int morphmes[10];
+	int ret = kiwi_find_morphemes_with_prefix(kiwi, u8"키", nullptr, -1, morphmes, 10);
+	EXPECT_GT(ret, 0);
+	const char* forms[4] = {
+		kiwi_get_morpheme_form(kiwi, morphmes[0]),
+		kiwi_get_morpheme_form(kiwi, morphmes[1]),
+		kiwi_get_morpheme_form(kiwi, morphmes[2]),
+		kiwi_get_morpheme_form(kiwi, morphmes[3]),
+	};
+	EXPECT_LE(std::string{ u8"키" }, forms[0]);
+	EXPECT_LE(forms[0], forms[1]);
+	EXPECT_LE(forms[1], forms[2]);
+	EXPECT_LE(forms[2], forms[3]);
+
+	EXPECT_EQ(kiwi_free_morpheme_form(forms[0]), 0);
+	EXPECT_EQ(kiwi_free_morpheme_form(forms[1]), 0);
+	EXPECT_EQ(kiwi_free_morpheme_form(forms[2]), 0);
+	EXPECT_EQ(kiwi_free_morpheme_form(forms[3]), 0);
+
+	ret = kiwi_find_morphemes_with_prefix(kiwi, u8"키윜", nullptr, -1, morphmes, 10);
+	EXPECT_GT(ret, 0);
+
+	ret = kiwi_find_morphemes_with_prefix(kiwi, u8"", nullptr, -1, morphmes, 10);
+	EXPECT_GT(ret, 0);
+}
