@@ -911,6 +911,16 @@ DECL_DLL int kiwi_find_morphemes_with_prefix(kiwi_h handle, const char* form_pre
 DECL_DLL kiwi_morpheme_t kiwi_get_morpheme_info(kiwi_h handle, unsigned int morph_id);
 
 /**
+ * @brief 형태소 ID로부터 형태소의 형태(UTF-16)를 조회합니다.
+ *
+ * @param handle Kiwi.
+ * @param morph_id 형태소 ID.
+ * @return UTF-16으로 인코딩된 형태소 문자열. 실패 시 null을 반환합니다.
+ * @note 반환된 문자열은 kiwi_free_morpheme_form으로 반드시 해제되어야 합니다.
+ */
+DECL_DLL const kchar16_t* kiwi_get_morpheme_form_w(kiwi_h handle, unsigned int morph_id);
+
+/**
  * @brief 형태소 ID로부터 형태소의 형태(UTF-8)를 조회합니다.
  * 
  * @param handle Kiwi.

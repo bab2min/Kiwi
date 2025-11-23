@@ -1262,6 +1262,25 @@ kiwi_morpheme_t kiwi_get_morpheme_info(kiwi_h handle, unsigned int morph_id)
 	}
 }
 
+const kchar16_t* kiwi_get_morpheme_form_w(kiwi_h handle, unsigned int morph_id)
+{
+	if (!handle) return nullptr;
+	try
+	{
+		auto* morpheme = ((Kiwi*)handle)->idToMorph(morph_id);
+		if (!morpheme) return nullptr;
+		auto form = joinHangul(morpheme->getForm());
+		auto* buf = new kchar16_t[form.size() + 1];
+		wcsncpy((wchar_t*)buf, (const wchar_t*)form.c_str(), form.size() + 1);
+		return buf;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return nullptr;
+	}
+}
+
 const char* kiwi_get_morpheme_form(kiwi_h handle, unsigned int morph_id)
 {
 	if (!handle) return nullptr;
