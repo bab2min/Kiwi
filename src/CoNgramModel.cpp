@@ -1895,6 +1895,8 @@ namespace kiwi
 		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
 		size_t CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::mostSimilarWords(uint32_t vocabId, size_t topN, pair<uint32_t, float>* output) const
 		{
+			if (vocabId >= header.vocabSize) return 0;
+
 			thread_local Vector<float> resultBuf;
 			resultBuf.resize(header.vocabSize * 2 + 8); // +8 for padding
 			float* scores = resultBuf.data() + header.vocabSize;
@@ -1945,6 +1947,8 @@ namespace kiwi
 		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
 		float CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::wordSimilarity(uint32_t vocabId1, uint32_t vocabId2) const
 		{
+			if (vocabId1 >= header.vocabSize || vocabId2 >= header.vocabSize) return NAN;
+
 			float result = 0;
 			if constexpr (quantized)
 			{
@@ -1969,6 +1973,8 @@ namespace kiwi
 		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
 		size_t CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::mostSimilarContexts(uint32_t contextId, size_t topN, std::pair<uint32_t, float>* output) const
 		{
+			if (contextId >= header.contextSize) return 0;
+
 			thread_local Vector<float> resultBuf;
 			resultBuf.resize(header.contextSize * 2 + 8); // +8 for padding
 			float* scores = resultBuf.data() + header.contextSize;
@@ -2019,6 +2025,8 @@ namespace kiwi
 		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
 		float CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::contextSimilarity(uint32_t contextId1, uint32_t contextId2) const
 		{
+			if (contextId1 >= header.contextSize || contextId2 >= header.contextSize) return NAN;
+
 			float result = 0;
 			if constexpr (quantized)
 			{
@@ -2043,6 +2051,8 @@ namespace kiwi
 		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
 		size_t CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::predictWordsFromContext(uint32_t contextId, size_t topN, std::pair<uint32_t, float>* output) const
 		{
+			if (contextId >= header.contextSize) return 0;
+
 			thread_local Vector<float> resultBuf;
 			resultBuf.resize(header.vocabSize * 2 + 8); // +8 for padding
 			float* scores = resultBuf.data() + header.vocabSize;
@@ -2091,6 +2101,8 @@ namespace kiwi
 		size_t CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::predictWordsFromContextDiff(
 			uint32_t contextId, uint32_t bgContextId, float bgWeight, size_t topN, std::pair<uint32_t, float>* output) const
 		{
+			if (contextId >= header.contextSize || bgContextId >= header.contextSize) return 0;
+
 			thread_local Vector<float> resultBuf;
 			resultBuf.resize(header.vocabSize * 2 + 8); // +8 for padding
 			float* scores = resultBuf.data() + header.vocabSize;
