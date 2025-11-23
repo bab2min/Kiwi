@@ -444,6 +444,9 @@ Functions</h2></td></tr>
 <tr class="memitem:ab301b450d37f36050effa6951d8d5403" id="r_ab301b450d37f36050effa6951d8d5403"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structkiwi__morpheme__t.html">kiwi_morpheme_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#ab301b450d37f36050effa6951d8d5403">kiwi_get_morpheme_info</a> (kiwi_h handle, unsigned int morph_id)</td></tr>
 <tr class="memdesc:ab301b450d37f36050effa6951d8d5403"><td class="mdescLeft">&#160;</td><td class="mdescRight">형태소 ID로부터 형태소 정보를 조회합니다.  <br /></td></tr>
 <tr class="separator:ab301b450d37f36050effa6951d8d5403"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a03ee523a2bb3e299fc9377556c9c03b4" id="r_a03ee523a2bb3e299fc9377556c9c03b4"><td class="memItemLeft" align="right" valign="top">const kchar16_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a03ee523a2bb3e299fc9377556c9c03b4">kiwi_get_morpheme_form_w</a> (kiwi_h handle, unsigned int morph_id)</td></tr>
+<tr class="memdesc:a03ee523a2bb3e299fc9377556c9c03b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">형태소 ID로부터 형태소의 형태(UTF-16)를 조회합니다.  <br /></td></tr>
+<tr class="separator:a03ee523a2bb3e299fc9377556c9c03b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a88cafb7d75b3159ef5de7f5188226591" id="r_a88cafb7d75b3159ef5de7f5188226591"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="capi_8h.html#a88cafb7d75b3159ef5de7f5188226591">kiwi_get_morpheme_form</a> (kiwi_h handle, unsigned int morph_id)</td></tr>
 <tr class="memdesc:a88cafb7d75b3159ef5de7f5188226591"><td class="mdescLeft">&#160;</td><td class="mdescRight">형태소 ID로부터 형태소의 형태(UTF-8)를 조회합니다.  <br /></td></tr>
 <tr class="separator:a88cafb7d75b3159ef5de7f5188226591"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -2376,6 +2379,45 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>UTF-8으로 인코딩된 형태소 문자열. 실패 시 null을 반환합니다. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>반환된 문자열은 kiwi_free_morpheme_form으로 반드시 해제되어야 합니다. </dd></dl>
+
+</div>
+</div>
+<a id="a03ee523a2bb3e299fc9377556c9c03b4" name="a03ee523a2bb3e299fc9377556c9c03b4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a03ee523a2bb3e299fc9377556c9c03b4">&#9670;&#160;</a></span>kiwi_get_morpheme_form_w()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const kchar16_t * kiwi_get_morpheme_form_w </td>
+          <td>(</td>
+          <td class="paramtype">kiwi_h&#160;</td>
+          <td class="paramname"><em>handle</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>morph_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>형태소 ID로부터 형태소의 형태(UTF-16)를 조회합니다. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">handle</td><td>Kiwi. </td></tr>
+    <tr><td class="paramname">morph_id</td><td>형태소 ID. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>UTF-16으로 인코딩된 형태소 문자열. 실패 시 null을 반환합니다. </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>반환된 문자열은 kiwi_free_morpheme_form으로 반드시 해제되어야 합니다. </dd></dl>
 
 </div>

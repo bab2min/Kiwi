@@ -182,6 +182,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv419kiwi_find_morphemes6kiwi_hPKcPKciPji"><code class="docutils literal notranslate"><span class="pre">kiwi_find_morphemes()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv431kiwi_find_morphemes_with_prefix6kiwi_hPKcPKciPji"><code class="docutils literal notranslate"><span class="pre">kiwi_find_morphemes_with_prefix()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv422kiwi_get_morpheme_info6kiwi_hj"><code class="docutils literal notranslate"><span class="pre">kiwi_get_morpheme_info()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv424kiwi_get_morpheme_form_w6kiwi_hj"><code class="docutils literal notranslate"><span class="pre">kiwi_get_morpheme_form_w()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv422kiwi_get_morpheme_form6kiwi_hj"><code class="docutils literal notranslate"><span class="pre">kiwi_get_morpheme_form()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv423kiwi_free_morpheme_formPKc"><code class="docutils literal notranslate"><span class="pre">kiwi_free_morpheme_form()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv428kiwi_cong_most_similar_words6kiwi_hjP22kiwi_similarity_pair_ti"><code class="docutils literal notranslate"><span class="pre">kiwi_cong_most_similar_words()</span></code></a></li>
@@ -1911,6 +1912,27 @@
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>형태소 정보가 담긴 <a class="reference internal" href="#structkiwi__morpheme__t"><span class="std std-ref">kiwi_morpheme_t</span></a> 구조체. 실패 시 0으로 채워진 구조체를 반환하고 오류를 설정합니다. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv424kiwi_get_morpheme_form_w6kiwi_hj">
+<span id="_CPPv324kiwi_get_morpheme_form_w6kiwi_hj"></span><span id="_CPPv224kiwi_get_morpheme_form_w6kiwi_hj"></span><span id="kiwi_get_morpheme_form_w__kiwi_h.unsigned-i"></span><span class="target" id="capi_8h_1a03ee523a2bb3e299fc9377556c9c03b4"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49kchar16_t" title="kchar16_t"><span class="n"><span class="pre">kchar16_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_get_morpheme_form_w</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv46kiwi_h" title="kiwi_h"><span class="n"><span class="pre">kiwi_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">morph_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv424kiwi_get_morpheme_form_w6kiwi_hj" title="Link to this definition"></a><br /></dt>
+<dd><p>형태소 ID로부터 형태소의 형태(UTF-16)를 조회합니다. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>반환된 문자열은 kiwi_free_morpheme_form으로 반드시 해제되어야 합니다. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>handle</strong> – Kiwi. </p></li>
+<li><p><strong>morph_id</strong> – 형태소 ID. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>UTF-16으로 인코딩된 형태소 문자열. 실패 시 null을 반환합니다. </p>
 </dd>
 </dl>
 </dd></dl>
