@@ -1234,6 +1234,8 @@ namespace kiwi
 		for (auto c : form->candidate)
 		{
 			if (c->combineSocket
+				|| c->tag == POSTag::unknown
+				|| c->tag == POSTag::p
 				|| (tag != POSTag::unknown
 					&& clearIrregular(c->tag) != tag)
 				|| (senseId != (uint8_t)-1
@@ -1263,6 +1265,8 @@ namespace kiwi
 			for (auto c : form->candidate)
 			{
 				if (c->combineSocket
+					|| c->tag == POSTag::unknown
+					|| c->tag == POSTag::p
 					|| (tag != POSTag::unknown
 						&& clearIrregular(c->tag) != tag)
 					|| (senseId != undefSenseId
