@@ -1304,7 +1304,7 @@ namespace kiwi
 
 				if (isDisconnected(graph, graphSize, reachable, i + 1))
 				{
-					ownFormList.emplace_back(normForm.substr(node->startPos, node->endPos - node->startPos));
+					ownFormList.emplace_back(U16StringView{ normForm }.substr(node->startPos, node->endPos - node->startPos));
 					ownFormId = ownFormList.size();
 
 					const float unkScore = unkFormScorer(ownFormList.back());
