@@ -1911,3 +1911,11 @@ TEST(KiwiCpp, StreamProvider)
 		EXPECT_EQ(content, "custom_content_for_any_filename");
 	}
 }
+
+TEST(KiwiCpp, Issue231)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	auto tokens = kiwi.analyze(u"숫", Match::allWithNormalizing).first;
+	EXPECT_EQ(tokens.size(), 1);
+	EXPECT_EQ(tokens[0].str, u"숫");
+}
