@@ -1,4 +1,15 @@
-﻿#pragma once
+/**
+ * @file Utils.h
+ * @author bab2min (bab2min@gmail.com)
+ * @brief 유틸리티 함수 및 헬퍼 함수 모음
+ * @version 0.22.1
+ * @date 2025-11-21
+ * 
+ * UTF-8/UTF-16 인코딩 변환, 한글 처리, 품사 태그 변환 등
+ * 다양한 유틸리티 함수들을 제공합니다.
+ */
+
+#pragma once
 #include <iostream>
 #include <string>
 #include <memory>
@@ -30,25 +41,88 @@ namespace kiwi
 		return std::unique_ptr<T>(new typename std::remove_extent<T>::type[size]);
 	}
 
+	/**
+	 * @brief UTF-8 문자열을 UTF-16 문자열로 변환합니다.
+	 * @param str UTF-8 문자열
+	 * @return 변환된 UTF-16 문자열
+	 */
 	std::u16string utf8To16(const std::string& str);
+	
+	/**
+	 * @brief UTF-8 문자열을 UTF-16으로 변환하고 바이트 위치를 추적합니다.
+	 * @param str UTF-8 문자열
+	 * @param bytePositions UTF-8 바이트 위치를 저장할 벡터
+	 * @return 변환된 UTF-16 문자열
+	 */
 	std::u16string utf8To16(const std::string& str, std::vector<size_t>& bytePositions);
+	
+	/**
+	 * @brief 유니코드 코드포인트를 UTF-8 문자열로 변환합니다.
+	 * @param code 유니코드 코드포인트
+	 * @return UTF-8 문자열
+	 */
 	std::string utf8FromCode(char32_t code);
+	
 	size_t utf8FromCode(std::string& ret, char32_t code);
+	
+	/**
+	 * @brief UTF-16 문자열을 UTF-8 문자열로 변환합니다.
+	 * @param str UTF-16 문자열
+	 * @return 변환된 UTF-8 문자열
+	 */
 	std::string utf16To8(const std::u16string& str);
+	
+	/**
+	 * @brief 한글 문자열을 정규화합니다.
+	 * @param hangul 한글 문자열
+	 * @return 정규화된 한글 문자열
+	 */
 	KString normalizeHangul(const std::u16string& hangul);
 
+	/**
+	 * @brief 품사 태그가 웹 관련 태그인지 확인합니다.
+	 * @param t 품사 태그
+	 * @return 웹 태그(URL, 해시태그, 멘션, 이모지)이면 true
+	 */
 	inline bool isWebTag(POSTag t)
 	{
 		return POSTag::w_url <= t && t <= POSTag::w_emoji;
 	}
 
+	/**
+	 * @brief 문자열을 품사 태그로 변환합니다.
+	 * @param tagStr 품사 태그 문자열
+	 * @return 품사 태그 열거형
+	 */
 	POSTag toPOSTag(const std::u16string& tagStr);
+	
+	/**
+	 * @brief 품사 태그를 문자열로 변환합니다.
+	 * @param t 품사 태그
+	 * @return 품사 태그 문자열
+	 */
 	const char* tagToString(POSTag t);
+	
+	/**
+	 * @brief 품사 태그를 한글 문자열로 변환합니다.
+	 * @param t 품사 태그
+	 * @return 품사 태그 한글 문자열
+	 */
 	const kchar_t* tagToKString(POSTag t);
 	
 	const char* tagRToString(char16_t form, POSTag t);
 	const kchar_t* tagRToKString(char16_t form, POSTag t);
 
+	/**
+	 * @brief 값이 범위 내에 있는지 확인합니다.
+	 * @tparam A 값의 타입
+	 * @tparam B 하한의 타입
+	 * @tparam C 상한의 타입
+	 * @param value 확인할 값
+	 * @param lower 하한 (포함)
+	 * @param upper 상한 (미포함)
+	 * @return lower <= value < upper이면 true
+	 */
 	template<class A, class B, class C>
 	inline bool within(A value, B lower, C upper)
 	{
@@ -61,41 +135,82 @@ namespace kiwi
 		return cont.data() <= value && value < cont.data() + cont.size();
 	}
 
+	/**
+	 * @brief 문자가 한글 음절인지 확인합니다.
+	 * @param chr 확인할 문자
+	 * @return 한글 음절 (가-힣) 범위이면 true
+	 */
 	inline bool isHangulSyllable(char16_t chr)
 	{
 		return within(chr, 0xAC00, 0xD7A4);
 	}
 
+	/**
+	 * @brief 문자가 한글 초성인지 확인합니다.
+	 * @param chr 확인할 문자
+	 * @return 한글 초성이면 true
+	 */
 	inline bool isHangulOnset(char16_t chr)
 	{
 		return within(chr, 0x1100, 0x1100 + 19);
 	}
 
+	/**
+	 * @brief 문자가 한글 종성인지 확인합니다.
+	 * @param chr 확인할 문자
+	 * @return 한글 종성이면 true
+	 */
 	inline bool isHangulCoda(char16_t chr)
 	{
 		return within(chr, 0x11A8, 0x11A8 + 27);
 	}
 
+	/**
+	 * @brief 문자가 한글 모음인지 확인합니다.
+	 * @param chr 확인할 문자
+	 * @return 한글 모음이면 true
+	 */
 	inline bool isHangulVowel(char16_t chr)
 	{
 		return within(chr, 0x314F, 0x3164);
 	}
 
+	/**
+	 * @brief 초성과 중성을 결합하여 한글 음절을 만듭니다.
+	 * @param onset 초성 인덱스
+	 * @param vowel 중성 인덱스
+	 * @return 결합된 한글 음절
+	 */
 	inline char16_t joinOnsetVowel(size_t onset, size_t vowel)
 	{
 		return 0xAC00 + (char16_t)((onset * 21 + vowel) * 28);
 	}
 
+	/**
+	 * @brief 한글 음절에서 중성을 추출합니다.
+	 * @param chr 한글 음절
+	 * @return 중성 인덱스
+	 */
 	inline int extractVowel(char16_t chr)
 	{
 		return ((chr - 0xAC00) / 28) % 21;
 	}
 
+	/**
+	 * @brief 문자가 옛한글 초성인지 확인합니다.
+	 * @param chr 확인할 문자
+	 * @return 옛한글 초성이면 true
+	 */
 	inline bool isOldHangulOnset(char16_t chr)
 	{
 		return within(chr, 0x1100, 0x1160) || within(chr, 0xA960, 0xA980);
 	}
 
+	/**
+	 * @brief 문자가 옛한글 모음인지 확인합니다.
+	 * @param chr 확인할 문자
+	 * @return 옛한글 모음이면 true
+	 */
 	inline bool isOldHangulVowel(char16_t chr)
 	{
 		return within(chr, 0x1160, 0x11A8) || within(chr, 0xD7B0, 0xD7CB);

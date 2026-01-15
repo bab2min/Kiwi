@@ -1,4 +1,15 @@
-﻿#pragma once
+/**
+ * @file Mmap.h
+ * @author bab2min (bab2min@gmail.com)
+ * @brief 메모리 맵 파일 입출력 클래스
+ * @version 0.22.1
+ * @date 2025-11-21
+ * 
+ * 대용량 파일을 메모리에 매핑하여 효율적으로 읽고 쓰는 기능을 제공합니다.
+ * 언어 모델, 사전 데이터 등을 빠르게 로드하는 데 사용됩니다.
+ */
+
+#pragma once
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -12,6 +23,9 @@ namespace kiwi
 	{
 		namespace detail
 		{
+			/**
+			 * @brief Windows 핸들을 자동으로 관리하는 RAII 가드
+			 */
 			class HandleGuard
 			{
 				HANDLE handle = nullptr;
