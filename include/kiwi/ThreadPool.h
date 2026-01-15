@@ -1,4 +1,18 @@
-﻿#pragma once
+/**
+ * @file ThreadPool.h
+ * @author bab2min (bab2min@gmail.com)
+ * @brief 간단한 C++11 Thread Pool 구현
+ * @version 0.22.1
+ * @date 2025-11-21
+ * 
+ * A simple C++11 Thread Pool implementation(https://github.com/progschj/ThreadPool)
+ * modified by bab2min to have additional parameter threadId
+ * 
+ * 멀티스레딩을 위한 작업 큐와 워커 스레드 풀을 제공합니다.
+ * 형태소 분석, 단어 추출 등의 병렬 처리에 사용됩니다.
+ */
+
+#pragma once
 
 /*
 A simple C++11 Thread Pool implementation(https://github.com/progschj/ThreadPool)
@@ -19,18 +33,53 @@ namespace kiwi
 {
 	namespace utils
 	{
+		/**
+		 * @brief 작업을 병렬로 처리하는 스레드 풀
+		 * 
+		 * 고정된 수의 워커 스레드를 생성하고,
+		 * 작업을 큐에 넣어 스레드들이 병렬로 처리하도록 합니다.
+		 */
 		class ThreadPool
 		{
 		public:
+			/**
+			 * @brief ThreadPool 생성자
+			 * @param threads 워커 스레드의 개수 (0이면 스레드 없이 직렬 처리)
+			 * @param maxQueued 최대 큐 크기 (0이면 무제한)
+			 */
 			ThreadPool(size_t threads = 0, size_t maxQueued = 0);
 			~ThreadPool();
 
+			/**
+			 * @brief 작업을 큐에 추가합니다.
+			 * 
+			 * 작업 함수는 첫 번째 인자로 스레드 ID를 받습니다.
+			 * 
+			 * @tparam F 함수 타입
+			 * @tparam Args 인자 타입들
+			 * @param f 실행할 함수
+			 * @param args 함수에 전달할 인자들
+			 * @return 작업 결과를 받을 수 있는 future
+			 */
 			template<class F, class... Args>
 			auto enqueue(F&& f, Args&&... args)
 				->std::future<typename std::invoke_result<F, size_t, Args...>::type>;
 
+			/**
+			 * @brief 스레드 풀의 크기를 반환합니다.
+			 * @return 워커 스레드의 개수
+			 */
 			size_t size() const { return workers.size(); }
+			
+			/**
+			 * @brief 큐에 있는 작업의 개수를 반환합니다.
+			 * @return 대기 중인 작업 개수
+			 */
 			size_t numEnqueued() const { return tasks.size(); }
+			
+			/**
+			 * @brief 모든 작업이 완료될 때까지 기다립니다.
+			 */
 			void joinAll();
 		private:
 			std::vector<std::thread> workers;
