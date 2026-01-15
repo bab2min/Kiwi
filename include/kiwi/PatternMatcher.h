@@ -1,3 +1,14 @@
+/**
+ * @file PatternMatcher.h
+ * @author bab2min (bab2min@gmail.com)
+ * @brief 텍스트 패턴 매칭 및 매칭 옵션 정의
+ * @version 0.22.1
+ * @date 2025-11-21
+ * 
+ * URL, 이메일, 해시태그, 멘션 등의 특수 패턴을 인식하고
+ * 형태소 분석 시 적용할 옵션들을 정의합니다.
+ */
+
 #pragma once
 
 #include <vector>
@@ -7,6 +18,11 @@
 
 namespace kiwi
 {
+	/**
+	 * @brief 형태소 분석 시 패턴 매칭 및 처리 옵션
+	 * 
+	 * 비트 플래그로 사용되어 여러 옵션을 조합할 수 있습니다.
+	 */
 	enum class Match : size_t
 	{
 		none = 0,
@@ -27,12 +43,20 @@ namespace kiwi
 		compatibleJamo = 1 << 24, /**< 출력시 한글 첫가끝 자모를 호환가능한 자모로 변환한다. */
 		splitSaisiot = 1 << 25, /**< 사이시옷이 포함된 합성명사를 분리하여 매칭한다. */
 		mergeSaisiot = 1 << 26, /**< 사이시옷이 포함된 것으로 추정되는 명사를 결합하여 매칭한다. */
-		joinVSuffix = joinVerbSuffix | joinAdjSuffix,
-		joinAffix = joinNounPrefix | joinNounSuffix | joinVerbSuffix | joinAdjSuffix | joinAdvSuffix,
-		all = url | email | hashtag | mention | serial | emoji | zCoda,
-		allWithNormalizing = all | normalizeCoda,
+		joinVSuffix = joinVerbSuffix | joinAdjSuffix, /**< 용언 파생접미사 결합 */
+		joinAffix = joinNounPrefix | joinNounSuffix | joinVerbSuffix | joinAdjSuffix | joinAdvSuffix, /**< 모든 접사 결합 */
+		all = url | email | hashtag | mention | serial | emoji | zCoda, /**< 모든 웹 패턴 매칭 */
+		allWithNormalizing = all | normalizeCoda, /**< 모든 패턴과 정규화 */
 	};
 
+	/**
+	 * @brief 텍스트 패턴을 매칭합니다.
+	 * @param left 왼쪽 문자 (문맥)
+	 * @param first 텍스트 시작 포인터
+	 * @param last 텍스트 끝 포인터
+	 * @param matchOptions 매칭 옵션
+	 * @return (매칭된 길이, 품사 태그) 쌍
+	 */
 	std::pair<size_t, kiwi::POSTag> matchPattern(char16_t left, const char16_t* first, const char16_t* last, Match matchOptions);
 }
 
