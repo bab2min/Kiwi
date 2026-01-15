@@ -37,19 +37,16 @@ namespace kiwi
 		{
 		public:
 			virtual ~ILangModel() = default;
-			
 			/**
 			 * @brief 언어 모델의 타입을 반환합니다.
 			 * @return 언어 모델 타입 (none, knlm, skipbigram 등)
 			 */
 			virtual ModelType getType() const = 0;
-			
 			/**
 			 * @brief 언어 모델의 어휘 크기를 반환합니다.
 			 * @return 어휘(vocabulary)에 포함된 형태소의 개수
 			 */
 			virtual size_t vocabSize() const = 0;
-			
 			/**
 			 * @brief 언어 모델이 사용하는 메모리 크기를 반환합니다.
 			 * @return 메모리 사용량 (바이트 단위)
@@ -61,7 +58,6 @@ namespace kiwi
 			 * @return 최적 경로 탐색에 사용되는 함수 포인터
 			 */
 			virtual void* getFindBestPathFn() const = 0;
-			
 			/**
 			 * @brief 새로운 Joiner 생성 함수 포인터를 반환합니다.
 			 * @return Joiner 생성에 사용되는 함수 포인터

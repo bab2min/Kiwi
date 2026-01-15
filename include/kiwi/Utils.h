@@ -25,7 +25,6 @@ namespace kiwi
 	{
 		class MemoryObject; // Forward declaration
 	}
-	
 	template<typename T, typename... Args,
 		typename std::enable_if<!std::is_array<T>::value, int>::type = 0
 	>
