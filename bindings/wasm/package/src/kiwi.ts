@@ -91,6 +91,9 @@ export enum Match {
     splitComplex = 1 << 22,
     zCoda = 1 << 23,
     compatibleJamo = 1 << 24,
+    splitSaisiot = 1 << 25,
+    mergeSaisiot = 1 << 26,
+    joinYo = 1 << 27,
     joinVSuffix = joinVerbSuffix | joinAdjSuffix,
     joinAffix = joinNounPrefix |
         joinNounSuffix |

@@ -1468,6 +1468,62 @@ TEST(KiwiCpp, JoinAffix)
 	EXPECT_EQ(res5.first[5].str, u"배송되");
 }
 
+TEST(KiwiCpp, JoinYo)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	// Test EC + 요/JX
+	auto sample1 = u"밥을 먹고요";
+	auto res1_without = kiwi.analyze(sample1, Match::none).first;
+	auto res1_with = kiwi.analyze(sample1, Match::joinYo).first;
+	
+	// Without joinYo: should have separate 고/EC and 요/JX
+	bool found_separate = false;
+	for (size_t i = 0; i + 1 < res1_without.size(); ++i) {
+		if (res1_without[i].str == u"고" && res1_without[i].tag == POSTag::ec &&
+			res1_without[i + 1].str == u"요" && res1_without[i + 1].tag == POSTag::jx) {
+			found_separate = true;
+			break;
+		}
+	}
+	EXPECT_TRUE(found_separate);
+	
+	// With joinYo: should have merged 고요/EC
+	bool found_merged = false;
+	for (auto& token : res1_with) {
+		if (token.str == u"고요" && token.tag == POSTag::ec) {
+			found_merged = true;
+			break;
+		}
+	}
+	EXPECT_TRUE(found_merged);
+	
+	// Test EF + 요/JX
+	auto sample2 = u"좋네요";
+	auto res2_without = kiwi.analyze(sample2, Match::none).first;
+	auto res2_with = kiwi.analyze(sample2, Match::joinYo).first;
+	
+	// Without joinYo: should have separate 네/EF and 요/JX
+	found_separate = false;
+	for (size_t i = 0; i + 1 < res2_without.size(); ++i) {
+		if (res2_without[i].str == u"네" && res2_without[i].tag == POSTag::ef &&
+			res2_without[i + 1].str == u"요" && res2_without[i + 1].tag == POSTag::jx) {
+			found_separate = true;
+			break;
+		}
+	}
+	EXPECT_TRUE(found_separate);
+	
+	// With joinYo: should have merged 네요/EF
+	found_merged = false;
+	for (auto& token : res2_with) {
+		if (token.str == u"네요" && token.tag == POSTag::ef) {
+			found_merged = true;
+			break;
+		}
+	}
+	EXPECT_TRUE(found_merged);
+}
+
 TEST(KiwiCpp, CompatibleJamo)
 {
 	Kiwi& kiwi = reuseKiwiInstance();

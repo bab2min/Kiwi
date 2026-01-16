@@ -499,7 +499,8 @@ namespace kiwi
 							| Match::joinVerbSuffix 
 							| Match::joinAdjSuffix 
 							| Match::joinAdvSuffix 
-							| Match::mergeSaisiot))) return last;
+							| Match::mergeSaisiot
+							| Match::joinYo))) return last;
 		if (std::distance(first, last) < 2) return last;
 
 		auto next = first;
@@ -564,6 +565,15 @@ namespace kiwi
 				current.str.back() += (0x11BA - 0x11A7);
 				concatTokens(current, *(next + 1), POSTag::nng);
 				++next;
+				++next;
+			}
+			// (EC | EF) + JX(요) => (EC | EF)
+			else if (!!(matchOptions & Match::joinYo)
+				&& nextToken.tag == POSTag::jx
+				&& nextToken.morph && *nextToken.morph->kform == u"요"
+				&& (current.tag == POSTag::ec || current.tag == POSTag::ef))
+			{
+				concatTokens(current, nextToken, current.tag);
 				++next;
 			}
 			else
