@@ -136,4 +136,81 @@ namespace kiwi
 
 		std::vector<std::pair<std::vector<uint32_t>, size_t>> extractPrefixes(size_t minCnt, size_t maxLength, size_t numWorkers = 1, bool exclusiveCnt = false) const;
 	};
+
+	class ChrTokenizer
+	{
+	public:
+
+		enum class Token : int32_t
+		{
+			bos = 0,
+			eos = 0,
+			sf, sp, ss, sso, ssc, se, so, sw, sh,
+			hangulSyllableStart,
+			hangulCodaStart = hangulSyllableStart + 399,
+			asciiStart = hangulCodaStart + 27,
+			max = asciiStart + 94,
+		};
+		size_t encodeOne(char32_t ch) const;
+		size_t encode(std::string_view text, int32_t* outBuf, size_t bufSize) const;
+		std::u16string decode(const int32_t* tokenBuf, size_t tokenCnt) const;
+		size_t vocabSize() const { return static_cast<size_t>(Token::max); }
+	};
+
+	class ChrDataset
+	{
+		static constexpr int32_t nonVocab = -1;
+
+		HiddenMember<RaggedVector<int32_t>, sizeof(Vector<size_t>) * 2> sents;
+		Vector<float> sentWeights, sentSampled;
+		Vector<uint32_t> shuffledIdcs;
+		Vector<uint32_t> nonLabelPrefixSizes;
+		double totalWeight = 0.;
+		size_t totalSampled = 0;
+		std::unique_ptr<utils::ThreadPool> workers;
+		float prefixDropoutProb = 0.f;
+		std::mt19937_64 rng;
+		utils::FrozenTrie<uint32_t, uint32_t> contextualMapper;
+		size_t batchSize = 0;
+		size_t causalContextSize = 0;
+		size_t windowSize = 0;
+		size_t currentSeed = 0;
+		size_t consumedSents = 0;
+		bool sampleWithoutWeights = false;
+
+		template<class InTy, class OutTy>
+		size_t _next(InTy in, OutTy out);
+
+	public:
+		ChrDataset(size_t _batchSize = 0,
+			size_t _causalContextSize = 0,
+			size_t _windowSize = 0,
+			float _prefixDropoutProb = 0.f,
+			bool _sampleWithoutWeights = false,
+			const std::vector<std::pair<size_t, std::vector<uint32_t>>>& contextualMapper = {}
+		);
+		~ChrDataset();
+		ChrDataset(const ChrDataset&) = delete;
+		ChrDataset(ChrDataset&&) /*noexcept*/;
+		ChrDataset& operator=(const ChrDataset&) = delete;
+		ChrDataset& operator=(ChrDataset&&) /*noexcept*/;
+
+		void addSentence(std::string_view sentence, float weight = 1.f, std::string_view nonLabelPrefix = {});
+
+		size_t numSents() const;
+		
+		double getTotalWeight() const { return totalWeight; }
+		size_t getBatchSize() const { return batchSize; }
+		size_t getCausalContextSize() const { return causalContextSize; }
+		size_t getWindowSize() const { return windowSize; }
+		size_t vocabSize() const { return ChrTokenizer{}.vocabSize(); }
+		std::vector<float> getVocabProbs(double epsilon = 0.1) const;
+
+		void seed(size_t newSeed);
+		void reset();
+		size_t next(int32_t* in, int32_t* out);
+		size_t next(int64_t* in, int64_t* out);
+
+		std::vector<std::pair<std::vector<uint32_t>, double>> extractPrefixes(float resolution, float minWeight, size_t maxLength, size_t numWorkers = 1, bool exclusiveCnt = false) const;
+	};
 }
