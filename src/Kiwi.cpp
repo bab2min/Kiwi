@@ -500,7 +500,7 @@ namespace kiwi
 							| Match::joinAdjSuffix 
 							| Match::joinAdvSuffix 
 							| Match::mergeSaisiot
-							| Match::joinYo))) return last;
+							| Match::joinParticleYo))) return last;
 		if (std::distance(first, last) < 2) return last;
 
 		auto next = first;
@@ -568,7 +568,7 @@ namespace kiwi
 				++next;
 			}
 			// (EC | EF) + JX(요) => (EC | EF)
-			else if (!!(matchOptions & Match::joinYo)
+			else if (!!(matchOptions & Match::joinParticleYo)
 				&& nextToken.tag == POSTag::jx
 				&& nextToken.morph && *nextToken.morph->kform == u"요"
 				&& (current.tag == POSTag::ec || current.tag == POSTag::ef))

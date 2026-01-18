@@ -27,7 +27,7 @@ namespace kiwi
 		compatibleJamo = 1 << 24, /**< 출력시 한글 첫가끝 자모를 호환가능한 자모로 변환한다. */
 		splitSaisiot = 1 << 25, /**< 사이시옷이 포함된 합성명사를 분리하여 매칭한다. */
 		mergeSaisiot = 1 << 26, /**< 사이시옷이 포함된 것으로 추정되는 명사를 결합하여 매칭한다. */
-		joinYo = 1 << 27, /**< 어미(EC/EF)와 조사 "요/JX"를 통합하여 매칭한다 (예: 고/EC + 요/JX => 고요/EC) */
+		joinParticleYo = 1 << 27, /**< 어미(EC/EF)와 조사 "요/JX"를 통합하여 매칭한다 (예: 고/EC + 요/JX => 고요/EC) */
 		joinVSuffix = joinVerbSuffix | joinAdjSuffix,
 		joinAffix = joinNounPrefix | joinNounSuffix | joinVerbSuffix | joinAdjSuffix | joinAdvSuffix,
 		all = url | email | hashtag | mention | serial | emoji | zCoda,
