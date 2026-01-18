@@ -13,11 +13,6 @@ using namespace std;
 
 namespace kiwi
 {
-	inline size_t padMultipleOf(size_t n, size_t multiple)
-	{
-		return (n + multiple - 1) / multiple * multiple;
-	}
-
 	template<size_t windowSize, ArchType arch, class VocabTy, class VlVocabTy, bool quantized>
 	struct MorphemeEvaluator<lm::CoNgramState<windowSize, arch, VocabTy, VlVocabTy, quantized>>
 	{
@@ -322,6 +317,29 @@ namespace kiwi
 
 	namespace lm
 	{
+		static constexpr size_t serialAlignment = 16;
+
+		inline size_t padMultipleOf(size_t n, size_t multiple = serialAlignment)
+		{
+			return (n + multiple - 1) / multiple * multiple;
+		}
+
+		inline size_t alignedOffsetInc(size_t& offset, size_t inc, size_t alignment = serialAlignment)
+		{
+			return offset = (offset + inc + alignment - 1) & ~(alignment - 1);
+		}
+
+		inline std::ostream& writePadding(std::ostream& os, size_t alignment = serialAlignment)
+		{
+			const size_t pos = os.tellp();
+			size_t pad = ((pos + alignment - 1) & ~(alignment - 1)) - pos;
+			for (size_t i = 0; i < pad; ++i)
+			{
+				os.put(0);
+			}
+			return os;
+		}
+
 		inline float half2float(uint16_t h)
 		{
 			union
@@ -406,9 +424,15 @@ namespace kiwi
 		CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::CoNgramModel(utils::MemoryObject&& mem) : CoNgramModelBase{ mem }
 		{
 			auto* ptr = reinterpret_cast<const char*>(mem.get());
-
-			Vector<uint32_t> nodeSizes(header.numNodes);
-			streamvbyte_decode_0124(reinterpret_cast<const uint8_t*>(ptr + header.nodeOffset), nodeSizes.data(), header.numNodes);
+			Vector<conditional_t<sizeof(VlKeyType) == 1, uint8_t, uint32_t>> nodeSizes(header.numNodes);
+			if constexpr (sizeof(VlKeyType) == 1)
+			{
+				memcpy(nodeSizes.data(), ptr + header.nodeOffset, header.numNodes);
+			}
+			else
+			{
+				streamvbyte_decode_0124(reinterpret_cast<const uint8_t*>(ptr + header.nodeOffset), nodeSizes.data(), header.numNodes);
+			}
 
 			static constexpr size_t kvAlignment = ArchInfo<arch>::alignment;
 			size_t paddedKVSize = 0;
@@ -421,18 +445,36 @@ namespace kiwi
 			keyValueData = make_unique<uint8_t[]>(paddedKVSize + kvAlignment);
 			alignedKeyValueData = reinterpret_cast<uint8_t*>(padMultipleOf(reinterpret_cast<size_t>(keyValueData.get()), kvAlignment));
 			auto keyData = make_unique<VlKeyType[]>(header.numNodes - 1);
-			if (std::is_same<VlKeyType, uint32_t>::value)
+			if constexpr (sizeof(VlKeyType) == 4)
 			{
 				streamvbyte_decode(reinterpret_cast<const uint8_t*>(ptr + header.keyOffset), (uint32_t*)keyData.get(), header.numNodes - 1);
+			}
+			else if constexpr (sizeof(VlKeyType) == 1)
+			{
+				memcpy(keyData.get(), ptr + header.keyOffset, header.numNodes - 1);
 			}
 			else
 			{
 				Vector<uint32_t> tempKeyData(header.numNodes - 1);
 				streamvbyte_decode(reinterpret_cast<const uint8_t*>(ptr + header.keyOffset), tempKeyData.data(), header.numNodes - 1);
-				std::copy(tempKeyData.begin(), tempKeyData.end(), keyData.get());
+				copy(tempKeyData.begin(), tempKeyData.end(), keyData.get());
 			}
 			Vector<uint32_t> values(header.numNodes);
-			streamvbyte_decode_0124(reinterpret_cast<const uint8_t*>(ptr + header.valueOffset), values.data(), header.numNodes);
+			size_t readSize = streamvbyte_decode_0124(reinterpret_cast<const uint8_t*>(ptr + header.valueOffset), values.data(), header.numNodes);
+
+			// If trie frequency is stored, read and pack it into the higher 8 bits of values.
+			// Be aware that the frequency value is clamped to 127,
+			// and the original value of nodes is stored in the only lower 24 bits.
+			if (header.flags & header.hasTrieFrequency)
+			{
+				readSize = padMultipleOf(readSize);
+				const uint8_t* freqValuePtr = reinterpret_cast<const uint8_t*>(ptr + header.valueOffset + readSize);
+				for (size_t i = 0; i < header.numNodes; ++i)
+				{
+					const uint32_t f = min(freqValuePtr[i], (uint8_t)127);
+					values[i] = (values[i] & 0x00FFFFFF) | (f << 24);
+				}
+			}
 
 			size_t numNonLeafNodes = 0, numLeafNodes = 0;
 			for (size_t i = 0; i < header.numNodes; ++i)
@@ -505,10 +547,15 @@ namespace kiwi
 				nst::prepareKV<arch, VlKeyType, int32_t>(const_cast<uint8_t*>(&alignedKeyValueData[node.nextOffset]), node.numNexts, tempBuf);
 			}
 
-			Deque<MyNode*> dq;
-			for (dq.emplace_back(&nodeData[0]); !dq.empty(); dq.pop_front())
+			Deque<pair<MyNode*, size_t>> dq; // node pointer and depth
+			for (dq.emplace_back(&nodeData[0], 0); !dq.empty(); dq.pop_front())
 			{
-				auto p = dq.front();
+				auto [p, depth] = dq.front();
+				if constexpr (HasDepthField<MyNode>::value)
+				{
+					p->depth = (uint16_t)depth;
+				}
+
 				for (size_t i = 0; i < p->numNexts; ++i)
 				{
 					auto kv = nst::extractKV<arch, VlKeyType, int32_t>(&alignedKeyValueData[p->nextOffset], p->numNexts, i);
@@ -519,7 +566,7 @@ namespace kiwi
 					{
 						child->value = findLowerValue(p, kv.first);
 					}
-					dq.emplace_back(child);
+					dq.emplace_back(child, depth + (isSecondSurrogate(kv.first) ? 0 : 1));
 				}
 			}
 
@@ -532,10 +579,16 @@ namespace kiwi
 				const size_t invNormOutputSize = padMultipleOf(header.vocabSize * sizeof(float), alignment);
 				const size_t positionConfSize = windowSize > 0 ? padMultipleOf((header.windowSize + 1) * sizeof(float), alignment) : 0;
 				const size_t distantMaskSize = windowSize > 0 ? padMultipleOf((header.vocabSize + 7) / 8, alignment) : 0;
+				const size_t outputEmbBiasSize = (header.flags & header.hasOutputEmbBias) ? padMultipleOf(sizeof(float) * header.vocabSize, alignment) : 0;
+				const size_t invertedContextVocabSize = (header.flags & header.hasReorderedVocab) ? padMultipleOf(header.vocabSize * sizeof(KeyType), alignment) : 0;
+				const size_t trieFrequencySize = (header.flags & header.hasTrieFrequency) ? padMultipleOf(header.numNodes, alignment) : 0;
 				
 				allEmbs = make_unique<uint8_t[]>(contextEmbSize + outputEmbSize + distantEmbSize
 					+ invNormContextSize + invNormOutputSize
 					+ positionConfSize + distantMaskSize
+					+ outputEmbBiasSize
+					+ invertedContextVocabSize
+					+ trieFrequencySize
 				);
 				auto p = allEmbs.get();
 				contextEmbPtr = reinterpret_cast<uint8_t*>(p);
@@ -545,11 +598,20 @@ namespace kiwi
 				invNormOutputPtr = reinterpret_cast<float*>(p += invNormContextSize);
 				positionConfidPtr = reinterpret_cast<float*>(p += invNormOutputSize);
 				distantMaskPtr = reinterpret_cast<const uint8_t*>(p += positionConfSize);
-				if (windowSize == 0)
+				if constexpr (windowSize == 0)
 				{
 					distantEmbPtr = nullptr;
 					positionConfidPtr = nullptr;
 					distantMaskPtr = nullptr;
+				}
+
+				if (header.flags & header.hasOutputEmbBias)
+				{
+					outputEmbBiasPtr = reinterpret_cast<const float*>(p += distantMaskSize);
+				}
+				if (header.flags & header.hasReorderedVocab)
+				{
+					invertedContextVocabPtr = reinterpret_cast<const KeyType*>(p += outputEmbBiasSize);
 				}
 			}
 			
@@ -557,7 +619,7 @@ namespace kiwi
 			auto* optr = const_cast<uint8_t*>(contextEmbPtr);
 			for (size_t i = 0; i < header.contextSize; ++i)
 			{
-				if (quantized)
+				if constexpr (quantized)
 				{
 					float scale;
 					eptr += requantizePackedInts<arch>(optr, scale, eptr, header.dim, header.qbit, header.qgroup, true);
@@ -574,7 +636,7 @@ namespace kiwi
 				*reinterpret_cast<float*>(optr) = -half2float(*reinterpret_cast<const uint16_t*>(eptr)); // bias
 				optr += sizeof(float);
 				eptr += sizeof(uint16_t);
-				if (windowSize > 0)
+				if constexpr (windowSize > 0)
 				{
 					*reinterpret_cast<float*>(optr) = half2float(*reinterpret_cast<const uint16_t*>(eptr)); // confidence
 					optr += sizeof(float);
@@ -583,7 +645,7 @@ namespace kiwi
 					optr += sizeof(float);
 					eptr += sizeof(uint16_t);
 				}
-				else
+				else if (header.windowSize > 0)
 				{
 					eptr += sizeof(uint16_t) * 2;
 				}
@@ -592,7 +654,7 @@ namespace kiwi
 			optr = const_cast<uint8_t*>(outputEmbPtr);
 			for (size_t i = 0; i < header.vocabSize; ++i)
 			{
-				if (quantized)
+				if constexpr (quantized)
 				{
 					float scale;
 					eptr += requantizePackedInts<arch>(optr, scale, eptr, header.dim, header.qbit, header.qgroup, false);
@@ -637,7 +699,7 @@ namespace kiwi
 				);
 			}
 
-			if (windowSize > 0)
+			if constexpr (windowSize > 0)
 			{
 				optr = const_cast<uint8_t*>(distantEmbPtr);
 				for (size_t i = 0; i < header.vocabSize; ++i)
@@ -677,17 +739,34 @@ namespace kiwi
 
 				optr = const_cast<uint8_t*>(distantMaskPtr);
 				const size_t compressedDistantMaskSize = (header.vocabSize + 7) / 8;
-				std::copy(eptr, eptr + compressedDistantMaskSize, optr);
+				copy(eptr, eptr + compressedDistantMaskSize, optr);
+			}
+
+			if (header.flags & header.hasOutputEmbBias)
+			{
+				const float minVal = half2float(*(const uint16_t*)(eptr + header.vocabSize));
+				for (size_t i = 0; i < header.vocabSize; ++i)
+				{
+					const uint8_t q = *eptr++;
+					const_cast<float*>(outputEmbBiasPtr)[i] = (float)q * (-minVal) / 255.f + minVal;
+				}
+				eptr += sizeof(uint16_t);
+			}
+
+			if (header.flags & header.hasReorderedVocab)
+			{
+				memcpy(const_cast<KeyType*>(invertedContextVocabPtr), eptr, header.vocabSize * sizeof(KeyType));
 			}
 		}
 
 		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
 		float CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::progress(int32_t& nodeIdx,
 			uint32_t& contextIdx,
-			std::array<KeyType, windowSize + 1>& history,
+			array<KeyType, windowSize + 1>& history,
 			KeyType next) const
 		{
 			const bool validDistantToken = distantTokenMask(next);
+			const uint32_t unpackedContextId = unpackContextId(contextIdx);
 			float ll = 0;
 
 			if (windowSize > 0 && validDistantToken)
@@ -699,8 +778,8 @@ namespace kiwi
 					int32_t nextIdx[1] = { (int32_t)next };
 
 					memcpy(lls, positionConfidPtr, (windowSize + 1) * sizeof(float));
-					lls[0] += getContextConfid(contextIdx);
-					contextIdcs[0] = contextIdx;
+					lls[0] += getContextConfid(unpackedContextId);
+					contextIdcs[0] = unpackedContextId;
 					for (size_t i = 0; i < windowSize; ++i)
 					{
 						const auto historyToken = history[i];
@@ -717,9 +796,9 @@ namespace kiwi
 					{
 						lls[i] += lls[i + 1 + windowSize];
 					}
-					lls[0] -= getContextValidTokenSum(contextIdx);
+					lls[0] -= getContextValidTokenSum(unpackedContextId);
 					ll = logSumExp<arch>(lls, windowSize + 1);
-					ll += getContextValidTokenSum(contextIdx);
+					ll += getContextValidTokenSum(unpackedContextId);
 				}
 				else
 				{
@@ -729,7 +808,7 @@ namespace kiwi
 					lls.resize(1 + windowSize);
 
 					memcpy(lls.data(), positionConfidPtr, (windowSize + 1) * sizeof(float));
-					lls[0] += getContextConfid(contextIdx);
+					lls[0] += getContextConfid(unpackedContextId);
 					for (size_t i = 0; i < windowSize; ++i)
 					{
 						const auto historyToken = history[i];
@@ -737,8 +816,9 @@ namespace kiwi
 					}
 					logSoftmax<arch>(lls.data(), windowSize + 1);
 
-					memcpy(mat.col(0).data(), getContextEmb(contextIdx), header.dim * sizeof(float));
-					lls[0] += getContextBias(contextIdx);
+					memcpy(mat.col(0).data(), getContextEmb(unpackedContextId), header.dim * sizeof(float));
+					lls[0] += getContextBias(unpackedContextId);
+					if (outputEmbBiasPtr) lls[0] += outputEmbBiasPtr[next];
 					for (size_t i = 0; i < windowSize; ++i)
 					{
 						const auto historyToken = history[i];
@@ -746,7 +826,7 @@ namespace kiwi
 						else memset(mat.col(i + 1).data(), 0, header.dim * sizeof(float));
 						lls[i + 1] += getDistantBias(historyToken);
 					}
-					lls.tail(windowSize).array() += getContextValidTokenSum(contextIdx);
+					lls.tail(windowSize).array() += getContextValidTokenSum(unpackedContextId);
 					Eigen::Map<const Eigen::VectorXf> outputVec{ getOutputEmb(next), header.dim };
 					gemm::template gemv<arch>(
 						mat.cols(), mat.rows(),
@@ -760,9 +840,8 @@ namespace kiwi
 			{
 				if constexpr (quantized)
 				{
-					const auto* contextPtr = getContextQuantEmb(contextIdx);
+					const auto* contextPtr = getContextQuantEmb(unpackedContextId);
 					const auto* outputPtr = getOutputQuantEmb(next);
-
 					int32_t acc = qgemm::dotprod<arch>(contextPtr, outputPtr, header.dim);
 					const float contextScale = *reinterpret_cast<const float*>(contextPtr + header.dim),
 						outputScale = *reinterpret_cast<const float*>(outputPtr + header.dim),
@@ -770,11 +849,13 @@ namespace kiwi
 					const int32_t hsum = *reinterpret_cast<const int32_t*>(outputPtr + header.dim + sizeof(float));
 					acc -= hsum;
 					ll = acc * contextScale * outputScale + contextBias;
+					if (outputEmbBiasPtr) ll += outputEmbBiasPtr[next];
 				}
 				else
 				{
-					ll = getContextBias(contextIdx);
-					Eigen::Map<const Eigen::VectorXf> contextVec{ getContextEmb(contextIdx), header.dim };
+					ll = getContextBias(unpackedContextId);
+					if (outputEmbBiasPtr) ll += outputEmbBiasPtr[next];
+					Eigen::Map<const Eigen::VectorXf> contextVec{ getContextEmb(unpackedContextId), header.dim };
 					Eigen::Map<const Eigen::VectorXf> outputVec{ getOutputEmb(next), header.dim };
 					gemm::template gemv<arch>(
 						1, header.dim,
@@ -794,6 +875,32 @@ namespace kiwi
 				history[windowSize] = validDistantToken ? next : 0;
 			}
 			return ll;
+		}
+
+		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
+		float CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::progressOneStep(int32_t& nodeIdx, uint32_t& contextIdx, uint32_t next) const
+		{
+			array<KeyType, windowSize + 1> dummyHistory{ 0, };
+			return progress(nodeIdx, contextIdx, dummyHistory, next);
+		}
+
+		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
+		float CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::getContextFrequency(uint32_t contextId) const
+		{
+			return unpackTrieFrequency(contextId);
+		}
+
+		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
+		size_t CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::getNodeDepth(uint32_t nodeId) const
+		{
+			if constexpr (HasDepthField<MyNode>::value)
+			{
+				return nodeData[unpackContextId(nodeId)].depth;
+			}
+			else
+			{
+				return -1;
+			}
 		}
 
 		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
@@ -824,7 +931,7 @@ namespace kiwi
 			}
 			else
 			{
-				ret.contextIdx = progressContextNode(ret.node, next);
+				ret.contextIdx = unpackContextId(progressContextNode(ret.node, next));
 				cache = std::make_pair(ret.node, ret.contextIdx);
 			}
 
@@ -855,7 +962,7 @@ namespace kiwi
 			}
 			else
 			{
-				ret.contextIdx = progressContextNode(ret.node, next);
+				ret.contextIdx = unpackContextId(progressContextNode(ret.node, next));
 				cache = std::make_pair(ret.node, ret.contextIdx);
 			}
 			return ret;
@@ -1448,23 +1555,6 @@ namespace kiwi
 			}
 		}
 
-		static constexpr size_t serialAlignment = 16;
-		inline size_t alignedOffsetInc(size_t& offset, size_t inc, size_t alignment = serialAlignment)
-		{
-			return offset = (offset + inc + alignment - 1) & ~(alignment - 1);
-		}
-
-		inline std::ostream& writePadding(std::ostream& os, size_t alignment = serialAlignment)
-		{
-			const size_t pos = os.tellp();
-			size_t pad = ((pos + alignment - 1) & ~(alignment - 1)) - pos;
-			for (size_t i = 0; i < pad; ++i)
-			{
-				os.put(0);
-			}
-			return os;
-		}
-
 		inline std::ostream& writeIntsWithPacking(std::ostream& os, const int8_t* ints, size_t size, size_t bits)
 		{
 			thread_local Vector<char> buf;
@@ -1727,6 +1817,18 @@ namespace kiwi
 
 			const uint32_t numQGroups = qgroup ? (dim / qgroup) : 0;
 
+			cerr << "dim: " << dim << endl;
+			cerr << "contextSize: " << contextSize << endl;
+			cerr << "outputSize: " << outputSize << endl;
+			cerr << "windowSize: " << windowSize << endl;
+			cerr << "maxContextLength: " << maxContextLength << endl;
+			cerr << "keySize: " << keySize << endl;
+			cerr << "maxContextId: " << maxContextId << endl;
+			cerr << "maxClusterId: " << maxClusterId << endl;
+			cerr << "qbit: " << qbit << endl;
+			cerr << "qgroup: " << qgroup << endl;
+			cerr << "numQGroups: " << numQGroups << endl;
+
 			Vector<int8_t> contextEmb(dim * contextSize);
 			Vector<uint16_t> contextEmbScale(contextSize);
 			Vector<uint8_t> contextEmbLocalScale(qgroup ? (contextSize * numQGroups) : 0);
@@ -1823,6 +1925,7 @@ namespace kiwi
 			header.dim = dim;
 			header.contextSize = contextSize;
 			header.vocabSize = selectedOutputSize;
+			header.flags = 0;
 			header.keySize = keySize;
 			header.windowSize = windowSize;
 			header.qbit = qbit;
@@ -1877,6 +1980,361 @@ namespace kiwi
 			}
 			ostr.write((const char*)positionConfidence.data(), positionConfidence.size() * sizeof(uint16_t));
 			ostr.write((const char*)distantMask.data(), distantMask.size());
+			return mem;
+		}
+
+		struct ContextFreqPair
+		{
+			uint32_t clusterId;
+			uint8_t quantizedFreq;
+
+			ContextFreqPair(uint32_t cId = 0, uint8_t qf = 0) : clusterId{ cId }, quantizedFreq{ qf } {}
+
+			bool operator<(const ContextFreqPair& other) const
+			{
+				if (clusterId != other.clusterId)
+				{
+					return clusterId < other.clusterId;
+				}
+				return quantizedFreq < other.quantizedFreq;
+			}
+
+			bool operator==(const ContextFreqPair& other) const
+			{
+				return clusterId == other.clusterId && quantizedFreq == other.quantizedFreq;
+			}
+
+			bool operator!=(const ContextFreqPair& other) const
+			{
+				return !(*this == other);
+			}
+
+			bool operator!() const
+			{
+				return clusterId == 0 && quantizedFreq == 0;
+			}
+		};
+
+		utils::MemoryObject CoNgramModelBase::buildChrModel(
+			const string& contextDefinition, 
+			const string& embedding,
+			size_t maxContextLength,
+			bool reorderContextIdx,
+			bool eraseRedundantContexts
+		)
+		{
+			ifstream contextStr, embeddingStr;
+			if (!openFile(contextStr, contextDefinition))
+			{
+				throw IOException{ "Cannot open file : " + contextDefinition };
+			}
+
+			static constexpr size_t keySize = 1;
+			Vector<uint32_t> vocabFreqs;
+			Vector<uint16_t> orderedVocabIds, invertedOrderedVocabIds;
+			uint32_t maxClusterId = 0, maxContextId = 0;
+			using Node = utils::TrieNodeEx<uint32_t, ContextFreqPair, utils::ConstAccess<Map<uint32_t, int32_t>>>;
+			utils::ContinuousTrie<Node> trie(1);
+			{
+				Vector<UnorderedMap<Vector<uint32_t>, ContextFreqPair>> contextMap;
+				UnorderedMap<Vector<uint32_t>, ContextFreqPair> erasedContexts;
+				Vector<uint32_t> context;
+				uint8_t quantizedFreq = 0;
+				string line;
+				while (getline(contextStr, line))
+				{
+					auto tokens = split(line, '\t');
+					if (tokens.size() <= 1)
+					{
+						throw IOException{ "Invalid format : " + contextDefinition };
+					}
+
+					auto clusterId = stol(tokens[0].begin(), tokens[0].end());
+					if (clusterId < 0) throw IOException{ "Invalid format : " + contextDefinition };
+					context.clear();
+					for (size_t i = 1; i < tokens.size(); ++i)
+					{
+						if (!tokens[i].empty() && tokens[i][0] == '#')
+						{
+							// # for frequency weight
+							const float freq = stof(tokens[i].begin() + 1, tokens[i].end());
+							quantizedFreq = quantizeFrequencyScale(freq);
+							break;
+						}
+						auto id = stol(tokens[i].begin(), tokens[i].end());
+						if (id < 0) throw IOException{ "Invalid format : " + contextDefinition };
+
+						context.push_back(id);
+						if (vocabFreqs.size() <= (size_t)id)
+						{
+							vocabFreqs.resize(id + 1, 0);
+						}
+						vocabFreqs[id]++;
+						maxContextId = max(maxContextId, (uint32_t)id);
+					}
+					if (context.size() > maxContextLength)
+					{
+						continue;
+					}
+					if (contextMap.size() < context.size()) contextMap.resize(context.size());
+					contextMap[context.size() - 1][context] = ContextFreqPair{ (uint32_t)clusterId, quantizedFreq };
+					maxClusterId = max(maxClusterId, (uint32_t)(clusterId + 1));
+				}
+
+				if (eraseRedundantContexts)
+				{
+					for (size_t i = contextMap.size(); i-- > 0;) // remove redundant context
+					{
+						auto& c = contextMap[i];
+						for (auto it = c.begin(); it != c.end();)
+						{
+							bool erase = false;
+							for (size_t j = i; j-- > 0; )
+							{
+								auto& c2 = contextMap[j];
+								context.clear();
+								context.insert(context.end(), it->first.end() - j - 1, it->first.end());
+								auto found = c2.find(context);
+								if (found != c2.end())
+								{
+									erase = found->second.clusterId == it->second.clusterId;
+									break;
+								}
+							}
+
+							if (erase)
+							{
+								erasedContexts.emplace(it->first, it->second);
+								it = c.erase(it);
+							}
+							else ++it;
+						}
+					}
+				}
+
+				vocabFreqs[0] = -1; // make sure that BOS/EOS is first
+				orderedVocabIds.resize(vocabFreqs.size());
+				invertedOrderedVocabIds.resize(vocabFreqs.size());
+				iota(orderedVocabIds.begin(), orderedVocabIds.end(), 0);
+				sort(orderedVocabIds.begin(), orderedVocabIds.end(), [&](uint16_t a, uint16_t b) { return vocabFreqs[a] > vocabFreqs[b]; });
+
+				for (size_t i = 0; i < orderedVocabIds.size(); ++i)
+				{
+					invertedOrderedVocabIds[orderedVocabIds[i]] = (uint32_t)i;
+				}
+
+				static constexpr size_t tMax = (1 << 8) - (1 << 5) * 2, vlBitSize = 5, vlBitMask = (1 << vlBitSize) - 1;
+				for (auto& c : contextMap)
+				{
+					for (auto& p : c)
+					{
+						context.clear();
+						for (auto id : p.first)
+						{
+							id = invertedOrderedVocabIds[id];
+							if (id < tMax)
+							{
+								context.emplace_back(id);
+							}
+							else
+							{
+								id -= tMax;
+								const size_t high = id >> vlBitSize, low = id & vlBitMask;
+								context.emplace_back(tMax + high);
+								context.emplace_back(tMax + (1 << vlBitSize) + low);
+							}
+						}
+						trie.build(context.begin(), context.end(), ContextFreqPair(p.second.clusterId + 1, p.second.quantizedFreq));
+					}
+				}
+			}
+
+			Vector<uint8_t> nodeSizes;
+			nodeSizes.reserve(trie.size());
+			Vector<uint8_t> keys;
+			keys.reserve(trie.size());
+			Vector<uint32_t> values;
+			values.reserve(trie.size());
+			Vector<uint8_t> freqValues;
+			freqValues.reserve(trie.size());
+			Vector<uint32_t> valueNewIdx(maxClusterId + 1);
+			{
+				Vector<size_t> valueCnts(valueNewIdx.size());
+				Vector<uint32_t> valueArgsorted(valueNewIdx.size());
+				Vector<uint32_t> rkeys;
+				trie.traverseWithKeys([&](const Node* node, const Vector<uint32_t>& rkeys)
+				{
+					nodeSizes.emplace_back(node->next.size());
+					for (auto& p : node->next)
+					{
+						keys.emplace_back(p.first);
+					}
+					values.emplace_back(node->val.clusterId);
+					freqValues.emplace_back(node->val.quantizedFreq);
+					valueCnts[node->val.clusterId]++;
+				}, rkeys);
+
+				valueCnts[0] = -1;
+
+				// remap value idx by frequency
+				if (reorderContextIdx)
+				{
+					iota(valueArgsorted.begin(), valueArgsorted.end(), 0);
+					sort(valueArgsorted.begin(), valueArgsorted.end(), [&](uint32_t a, uint32_t b) { return valueCnts[a] > valueCnts[b]; });
+					for (size_t i = 0; i < valueArgsorted.size(); ++i)
+					{
+						valueNewIdx[valueArgsorted[i]] = (uint32_t)i;
+					}
+					for (auto& v : values) v = valueNewIdx[v];
+				}
+			}
+
+			assert(nodeSizes.size() - 1 == keys.size());
+
+			if (*max_element(values.begin(), values.end()) > 0xFFFFFF)
+			{
+				throw IOException{ "maxclusterId exceeds 24 bits" };
+			}
+
+			Vector<uint8_t> compressedValues(streamvbyte_max_compressedbytes(values.size()));
+			compressedValues.resize(streamvbyte_encode_0124(values.data(), values.size(), compressedValues.data()));
+
+			if (!openFile(embeddingStr, embedding, ios_base::binary))
+			{
+				throw IOException{ "Cannot open file : " + embedding };
+			}
+			const uint32_t dim = utils::read<uint32_t>(embeddingStr);
+			const uint32_t contextSize = utils::read<uint32_t>(embeddingStr);
+			const uint32_t outputSize = utils::read<uint32_t>(embeddingStr);
+			const uint32_t windowSize = utils::read<uint32_t>(embeddingStr);
+			uint32_t qbit = utils::read<uint32_t>(embeddingStr);
+			const uint32_t qgroup = utils::read<uint32_t>(embeddingStr);
+			if (qgroup == 0) qbit = 8;
+
+			const uint32_t numQGroups = qgroup ? (dim / qgroup) : 0;
+
+			cerr << "dim: " << dim << endl;
+			cerr << "contextSize: " << contextSize << endl;
+			cerr << "outputSize: " << outputSize << endl;
+			cerr << "windowSize: " << windowSize << endl;
+			cerr << "maxContextLength: " << maxContextLength << endl;
+			cerr << "keySize: " << keySize << endl;
+			cerr << "maxContextId: " << maxContextId << endl;
+			cerr << "maxClusterId: " << maxClusterId << endl;
+			cerr << "qbit: " << qbit << endl;
+			cerr << "qgroup: " << qgroup << endl;
+			cerr << "numQGroups: " << numQGroups << endl;
+
+			if (windowSize != 0)
+			{
+				throw IOException{ "Chr model must have windowSize = 0" };
+			}
+
+			Vector<int8_t> contextEmb(dim * contextSize);
+			Vector<uint16_t> contextEmbScale(contextSize);
+			Vector<uint8_t> contextEmbLocalScale(qgroup ? (contextSize * numQGroups) : 0);
+			Vector<uint16_t> contextEmbBias(contextSize);
+			Vector<int8_t> outputEmb(dim * outputSize);
+			Vector<uint16_t> outputEmbScale(outputSize);
+			Vector<uint8_t> outputEmbLocalScale(qgroup ? (outputSize * numQGroups) : 0);
+			Vector<uint8_t> outputEmbBias(outputSize);
+			Vector<uint16_t> outputEmbBiasMinMax(2);
+
+			embeddingStr.read((char*)contextEmb.data(), contextEmb.size());
+			embeddingStr.read((char*)contextEmbScale.data(), contextEmbScale.size() * sizeof(uint16_t));
+			if (qgroup) embeddingStr.read((char*)contextEmbLocalScale.data(), contextEmbLocalScale.size());
+			embeddingStr.read((char*)contextEmbBias.data(), contextEmbBias.size() * sizeof(uint16_t));
+			embeddingStr.read((char*)outputEmb.data(), outputEmb.size());
+			embeddingStr.read((char*)outputEmbScale.data(), outputEmbScale.size() * sizeof(uint16_t));
+			if (qgroup) embeddingStr.read((char*)outputEmbLocalScale.data(), outputEmbLocalScale.size());
+			embeddingStr.read((char*)outputEmbBias.data(), outputEmbBias.size() * sizeof(uint8_t));
+			embeddingStr.read((char*)outputEmbBiasMinMax.data(), outputEmbBiasMinMax.size() * sizeof(uint16_t));
+
+			if (!outputEmbBiasMinMax[1] == 0)
+			{
+				throw IOException{ "outputEmbBiasMax of ChrModel must be 0" };
+			}
+
+			// remap context embedding
+			if (reorderContextIdx)
+			{
+				Vector<int8_t> newContextEmb(contextEmb.size());
+				Vector<uint16_t> newContextEmbScale(contextSize);
+				Vector<uint8_t> newContextEmbLocalScale(qgroup ? (contextSize * (dim / qgroup)) : 0);
+				Vector<uint16_t> newContextEmbBias(contextSize);
+				for (size_t i = 0; i < contextSize; ++i)
+				{
+					auto idx = valueNewIdx[i];
+					auto src = contextEmb.data() + i * dim;
+					auto dst = newContextEmb.data() + idx * dim;
+					copy(src, src + dim, dst);
+					newContextEmbScale[idx] = contextEmbScale[i];
+					if (qgroup) copy(contextEmbLocalScale.data() + i * numQGroups, contextEmbLocalScale.data() + (i + 1) * numQGroups, newContextEmbLocalScale.data() + idx * numQGroups);
+					newContextEmbBias[idx] = contextEmbBias[i];
+				}
+				contextEmb = move(newContextEmb);
+				contextEmbScale = move(newContextEmbScale);
+				if (qgroup) contextEmbLocalScale = move(newContextEmbLocalScale);
+				contextEmbBias = move(newContextEmbBias);
+			}
+
+			CoNgramModelHeader header;
+			memset(&header, 0, sizeof(CoNgramModelHeader));
+			header.dim = dim;
+			header.contextSize = contextSize;
+			header.vocabSize = outputSize;
+			header.flags = header.hasOutputEmbBias | header.hasReorderedVocab | header.hasTrieFrequency;
+			header.keySize = keySize;
+			header.windowSize = windowSize;
+			header.qbit = qbit;
+			header.qgroup = qgroup;
+			header.numNodes = nodeSizes.size();
+
+			size_t finalSize = 0;
+			header.nodeOffset = alignedOffsetInc(finalSize, sizeof(CoNgramModelHeader));
+			header.keyOffset = alignedOffsetInc(finalSize, nodeSizes.size());
+			header.valueOffset = alignedOffsetInc(finalSize, keys.size());
+			alignedOffsetInc(finalSize, compressedValues.size());
+			header.embOffset = alignedOffsetInc(finalSize, freqValues.size());
+			finalSize += padMultipleOf(dim * qbit / 8, 4) * (contextSize + outputSize);
+			if (qgroup) finalSize += numQGroups * (contextSize + outputSize);
+			finalSize += contextSize * sizeof(uint16_t) * 2;
+			finalSize += outputSize * sizeof(uint16_t) * 1;
+			finalSize += outputSize * sizeof(uint8_t); // outputEmbBias
+			finalSize += sizeof(uint16_t); // outputEmbBiasMin
+			finalSize += outputSize * sizeof(uint16_t); // vocabulary
+
+			cerr << "Final model size: " << (finalSize / 1024.) << " KB" << endl;
+
+			utils::MemoryOwner mem{ finalSize };
+			utils::omstream ostr{ (char*)mem.get(), (std::ptrdiff_t)mem.size() };
+			ostr.write((const char*)&header, sizeof(CoNgramModelHeader));
+			writePadding(ostr);
+			ostr.write((const char*)nodeSizes.data(), nodeSizes.size());
+			writePadding(ostr);
+			ostr.write((const char*)keys.data(), keys.size());
+			writePadding(ostr);
+			ostr.write((const char*)compressedValues.data(), compressedValues.size());
+			writePadding(ostr);
+			ostr.write((const char*)freqValues.data(), freqValues.size());
+			writePadding(ostr);
+
+			for (size_t i = 0; i < contextSize; ++i)
+			{
+				writeIntsWithPacking(ostr, &contextEmb[i * dim], dim, header.qbit);
+				ostr.write((const char*)&contextEmbScale[i], sizeof(uint16_t));
+				if (qgroup) ostr.write((const char*)&contextEmbLocalScale[i * numQGroups], sizeof(uint8_t) * numQGroups);
+				ostr.write((const char*)&contextEmbBias[i], sizeof(uint16_t));
+			}
+			for (size_t i = 0; i < outputSize; ++i)
+			{
+				writeIntsWithPacking(ostr, &outputEmb[i * dim], dim, header.qbit);
+				ostr.write((const char*)&outputEmbScale[i], sizeof(uint16_t));
+				if (qgroup) ostr.write((const char*)&outputEmbLocalScale[i * numQGroups], sizeof(uint8_t) * numQGroups);
+			}
+			ostr.write((const char*)outputEmbBias.data(), outputEmbBias.size() * sizeof(uint8_t));
+			ostr.write((const char*)&outputEmbBiasMinMax[0], sizeof(uint16_t));
+			ostr.write((const char*)invertedOrderedVocabIds.data(), invertedOrderedVocabIds.size() * sizeof(uint16_t));
 			return mem;
 		}
 
@@ -1973,6 +2431,7 @@ namespace kiwi
 		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
 		size_t CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::mostSimilarContexts(uint32_t contextId, size_t topN, std::pair<uint32_t, float>* output) const
 		{
+			contextId = unpackContextId(contextId);
 			if (contextId >= header.contextSize) return 0;
 
 			thread_local Vector<float> resultBuf;
@@ -2025,6 +2484,8 @@ namespace kiwi
 		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
 		float CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::contextSimilarity(uint32_t contextId1, uint32_t contextId2) const
 		{
+			contextId1 = unpackContextId(contextId1);
+			contextId2 = unpackContextId(contextId2);
 			if (contextId1 >= header.contextSize || contextId2 >= header.contextSize) return NAN;
 
 			float result = 0;
@@ -2051,6 +2512,7 @@ namespace kiwi
 		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
 		size_t CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::predictWordsFromContext(uint32_t contextId, size_t topN, std::pair<uint32_t, float>* output) const
 		{
+			contextId = unpackContextId(contextId);
 			if (contextId >= header.contextSize) return 0;
 
 			thread_local Vector<float> resultBuf;
@@ -2101,6 +2563,8 @@ namespace kiwi
 		size_t CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::predictWordsFromContextDiff(
 			uint32_t contextId, uint32_t bgContextId, float bgWeight, size_t topN, std::pair<uint32_t, float>* output) const
 		{
+			contextId = unpackContextId(contextId);
+			bgContextId = unpackContextId(bgContextId);
 			if (contextId >= header.contextSize || bgContextId >= header.contextSize) return 0;
 
 			thread_local Vector<float> resultBuf;
@@ -2219,9 +2683,9 @@ namespace kiwi
 					prefix.emplace_back(k);
 					if (v > 0)
 					{
-						if (node[v].value)
+						if (auto nodeValue = node[v].value)
 						{
-							insert(node[v].value);
+							insert(nodeValue);
 						}
 						visitContextNode(node + v, prefix, out);
 					}
@@ -2240,9 +2704,9 @@ namespace kiwi
 					prefix.emplace_back(k);
 					if (v > 0)
 					{
-						if (node[v].value)
+						if (auto nodeValue = node[v].value)
 						{
-							insert(node[v].value);
+							insert(nodeValue);
 						}
 						visitContextNode(node + v, prefix, out);
 					}
@@ -2325,6 +2789,8 @@ namespace kiwi
 			auto& header = *reinterpret_cast<const CoNgramModelHeader*>(mem.get());
 			switch (header.keySize)
 			{
+			case 1: // only for ChrModel
+				return createOptimizedModelWithWindowSize<archType, uint16_t, uint8_t, false, quantized>(std::move(mem));
 			case 2:
 				return createOptimizedModelWithWindowSize<archType, uint16_t, uint16_t, useDistantTokens, quantized>(std::move(mem));
 			case 3:

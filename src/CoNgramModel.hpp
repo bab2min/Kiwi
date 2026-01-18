@@ -15,6 +15,29 @@ namespace kiwi
 {
 	namespace lm
 	{
+		/*
+		* quantize frequency scale
+		*
+		* values <= 16 are linearly mapped
+		* values > 16 are mapped logarithmically:
+		*/
+		inline uint8_t quantizeFrequencyScale(float freq)
+		{
+			if (freq <= 0) return 0;
+			if (freq <= 16) return (uint8_t)freq;
+			const float logFreq = log2f(freq);
+			const float rounded = round(logFreq * 8) - 16;
+			if (rounded >= 255) return 255;
+			return (uint8_t)rounded;
+		}
+
+		inline float dequantizeFrequencyScale(uint8_t qfreq)
+		{
+			if (qfreq <= 16) return (float)qfreq;
+			const float logFreq = ((float)qfreq + 16) / 8.0f;
+			return powf(2.0f, logFreq);
+		}
+
 		template<size_t windowSize, ArchType _arch, class VocabTy, class VlVocabTy, bool quantized>
 		class CoNgramState;
 
@@ -33,8 +56,34 @@ namespace kiwi
 			const uint8_t* distantEmbPtr = nullptr; // [numOutputs, (dim + scale? + bias + confid + pad?)]
 			const float* positionConfidPtr = nullptr;
 			const uint8_t* distantMaskPtr = nullptr;
+			const float* outputEmbBiasPtr = nullptr;
+			const KeyType* invertedContextVocabPtr = nullptr;
 			const float* invNormContextPtr = nullptr;
 			const float* invNormOutputPtr = nullptr;
+
+			inline uint32_t unpackContextId(uint32_t v) const
+			{
+				if (header.flags & header.hasTrieFrequency)
+				{
+					return v & 0x00FFFFFF;
+				}
+				else
+				{
+					return v;
+				}
+			}
+
+			inline float unpackTrieFrequency(uint32_t v) const
+			{
+				if (header.flags & header.hasTrieFrequency)
+				{
+					return dequantizeFrequencyScale(v >> 24);
+				}
+				else
+				{
+					return 0.f;
+				}
+			}
 
 			inline size_t contextEmbStride() const
 			{
@@ -204,26 +253,52 @@ namespace kiwi
 			float contextSimilarity(uint32_t contextId1, uint32_t contextId2) const override;
 			size_t predictWordsFromContext(uint32_t contextId, size_t topN, std::pair<uint32_t, float>* output) const override;
 			size_t predictWordsFromContextDiff(uint32_t contextId, uint32_t bgContextId, float weight, size_t topN, std::pair<uint32_t, float>* output) const override;
+			
+			float progressOneStep(int32_t& nodeIdx, uint32_t& contextIdx, uint32_t next) const override;
+			float getContextFrequency(uint32_t contextId) const override;
+			size_t getNodeDepth(uint32_t nodeId) const override;
 
 			uint32_t toContextId(const uint32_t* vocabIds, size_t size) const override;
 			std::vector<std::vector<uint32_t>> getContextWordMap() const override;
 
 			uint32_t progressContextNode(int32_t& nodeIdx, KeyType next) const
 			{
+				if (invertedContextVocabPtr)
+				{
+					next = invertedContextVocabPtr[next];
+				}
+
 				if constexpr (std::is_same_v<KeyType, VlKeyType>)
 				{
 					return progressContextNodeVl(nodeIdx, next);
 				}
 
-				static constexpr size_t tMax = (1 << 16) - (1 << 10) * 2;
+				static constexpr size_t keyWidth = sizeof(VlKeyType) * 8,
+					surrogateBitWidth = keyWidth == 16 ? 10 : 5,
+					surrogateBitMask = (1 << surrogateBitWidth) - 1;
+				static constexpr size_t tMax = (1 << keyWidth) - (1 << surrogateBitWidth) * 2;
 				if (next < tMax)
 				{
 					return progressContextNodeVl(nodeIdx, next);
 				}
 				next -= tMax;
-				const size_t high = next >> 10, low = next & 0x3FF;
+				const size_t high = next >> surrogateBitWidth, low = next & surrogateBitMask;
 				progressContextNodeVl(nodeIdx, tMax + high);
-				return progressContextNodeVl(nodeIdx, tMax + (1 << 10) + low);
+				return progressContextNodeVl(nodeIdx, tMax + (1 << surrogateBitWidth) + low);
+			}
+
+			bool isSecondSurrogate(VlKeyType k) const
+			{
+				if constexpr (std::is_same_v<KeyType, VlKeyType>)
+				{
+					return false;
+				}
+
+				static constexpr size_t keyWidth = sizeof(VlKeyType) * 8,
+					surrogateBitWidth = keyWidth == 16 ? 10 : 5,
+					surrogateBitMask = (1 << surrogateBitWidth) - 1;
+				static constexpr size_t tMax = (1 << keyWidth) - (1 << surrogateBitWidth) * 2;
+				return k >= tMax + (1 << surrogateBitWidth);
 			}
 
 			uint32_t progressContextNodeVl(int32_t& nodeIdx, VlKeyType next) const

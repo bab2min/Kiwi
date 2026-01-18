@@ -17,9 +17,16 @@ namespace kiwi
 	{
 		struct CoNgramModelHeader
 		{
+			enum
+			{
+				hasOutputEmbBias = 1 << 0,
+				hasReorderedVocab = 1 << 1,
+				hasTrieFrequency = 1 << 2,
+			};
+
 			uint64_t vocabSize, contextSize;
 			uint16_t dim;
-			uint8_t contextType, outputType;
+			uint16_t flags;
 			uint8_t keySize, windowSize, qbit, qgroup;
 			uint64_t numNodes;
 			uint64_t nodeOffset, keyOffset, valueOffset, embOffset;
@@ -33,6 +40,27 @@ namespace kiwi
 			DiffType lower = 0;
 			uint32_t nextOffset = 0;
 		};
+
+		template<>
+		struct Node<uint16_t, uint32_t, int32_t>
+		{
+			uint16_t numNexts = 0;
+			uint16_t depth = 0;
+			uint32_t value = 0;
+			int32_t lower = 0;
+			uint32_t nextOffset = 0;
+		};
+
+		template<class T>
+		struct HasDepthField : public std::false_type
+		{
+		};
+
+		template<>
+		struct HasDepthField<Node<uint16_t, uint32_t, int32_t>> : public std::true_type
+		{
+		};
+		
 
 		class CoNgramModelBase : public ILangModel
 		{
@@ -61,7 +89,11 @@ namespace kiwi
 			virtual size_t predictWordsFromContextDiff(uint32_t contextId, uint32_t bgContextId, float weight, size_t topN, std::pair<uint32_t, float>* output) const = 0;
 
 			virtual uint32_t toContextId(const uint32_t* vocabIds, size_t size) const = 0;
+			virtual float getContextFrequency(uint32_t contextId) const = 0;
+			virtual size_t getNodeDepth(uint32_t nodeId) const = 0;
+
 			virtual std::vector<std::vector<uint32_t>> getContextWordMap() const = 0;
+			virtual float progressOneStep(int32_t& nodeIdx, uint32_t& contextIdx, uint32_t next) const = 0;
 
 			const std::vector<std::vector<uint32_t>>& getContextWordMapCached() const
 			{
@@ -77,6 +109,9 @@ namespace kiwi
 				bool useVLE = true, 
 				bool reorderContextIdx = true,
 				const std::vector<size_t>* selectedEmbIdx = nullptr);
+
+			static utils::MemoryObject buildChrModel(const std::string& contextDefinition, const std::string& embedding,
+				size_t maxContextLength = -1, bool reorderContextIdx = true, bool eraseRedundantContexts = false);
 
 			static std::unique_ptr<CoNgramModelBase> create(utils::MemoryObject&& mem, 
 				ArchType archType = ArchType::none, 
