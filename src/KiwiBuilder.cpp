@@ -1090,6 +1090,14 @@ KiwiBuilder::KiwiBuilder(StreamProvider streamProvider, size_t _numThreads, Buil
 			throw IOException{ "Cannot open required file: combiningRule.txt" };
 		}
 	}
+
+	if (auto stream = streamProvider("nounchr.mdl"))
+	{
+		nounChrMdl = lm::CoNgramModelBase::create(utils::createMemoryObjectFromStream(*stream),
+			archType,
+			false,
+			(modelType == ModelType::cong || modelType == ModelType::congGlobal));
+	}
 }
 
 KiwiBuilder::KiwiBuilder(const string& modelPath, size_t _numThreads, BuildOption _options, ModelType _modelType, Dialect _enabledDialects)
@@ -2378,6 +2386,7 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 {
 	Kiwi ret{ archType, langMdl, !typos.empty(), typos.isContinualTypoEnabled(), typos.isLengtheningTypoEnabled() };
 	ret.enabledDialects = enabledDialects;
+	ret.nounChrMdl = nounChrMdl;
 
 	Vector<FormRaw> combinedForms;
 	Vector<MorphemeRaw> combinedMorphemes;

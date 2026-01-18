@@ -141,6 +141,7 @@ namespace kiwi
 		Vector<TypoForm> typoForms;
 		utils::FrozenTrie<kchar_t, const Form*> formTrie;
 		std::shared_ptr<lm::ILangModel> langMdl;
+		std::shared_ptr<lm::CoNgramModelBase> nounChrMdl;
 		std::shared_ptr<cmb::CompiledRule> combiningRule;
 		std::unique_ptr<utils::ThreadPool> pool;
 		
@@ -537,6 +538,7 @@ namespace kiwi
 		Vector<MorphemeRaw> morphemes;
 		UnorderedMap<KString, size_t> formMap;
 		std::shared_ptr<lm::ILangModel> langMdl;
+		std::shared_ptr<lm::CoNgramModelBase> nounChrMdl;
 		std::shared_ptr<cmb::CompiledRule> combiningRule;
 		WordDetector detector;
 		Map<int, int> ruleProfilingCnt;

@@ -96,6 +96,7 @@ namespace kiwi
 			const KGraphNode* graph,
 			const size_t graphSize,
 			const size_t topN,
+			const size_t oovScoringType,
 			bool openEnding,
 			bool splitComplex = false,
 			bool splitSaisiot = false,

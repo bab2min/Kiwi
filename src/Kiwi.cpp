@@ -1058,6 +1058,7 @@ namespace kiwi
 				nodes.data(),
 				nodes.size(),
 				topN,
+				(size_t)(option.match & Match::oovMask),
 				option.openEnding && splitEnd == normalizedStr.size(),
 				!!(option.match & Match::splitComplex),
 				!!(option.match & Match::splitSaisiot),

@@ -5,6 +5,7 @@
 #include <kiwi/TemplateUtils.hpp>
 #include <kiwi/Form.h>
 #include <kiwi/LangModel.h>
+#include <kiwi/Dataset.h>
 #include "ArchAvailable.h"
 #include "KTrie.h"
 #include "FeatureTestor.h"
@@ -1149,14 +1150,22 @@ namespace kiwi
 
 	struct UnkFormScorer
 	{
-		float unkFormScoreScale;
-		float unkFormScoreBias;
-		UnkFormScorer(float scale, float bias)
-			: unkFormScoreScale{ scale }, unkFormScoreBias{ bias }
+		lm::CoNgramModelBase* chrModel = nullptr;
+		float unkFormScoreScale = 0;
+		float unkFormScoreBias = 0;
+		int32_t bosNodeIdx = 0;
+		uint32_t bosContextIdx = 0;
+
+		UnkFormScorer(lm::CoNgramModelBase* _chrModel, float scale, float bias)
+			: chrModel{ _chrModel }, unkFormScoreScale { scale }, unkFormScoreBias{ bias }
 		{
+			if (chrModel)
+			{
+				chrModel->progressOneStep(bosNodeIdx, bosContextIdx, 0); // BOS
+			}
 		}
 
-		float operator()(const U16StringView& form) const
+		float ruleBasedScore(const U16StringView& form) const
 		{
 			float penalty = 0;
 			if (form.size() > 0)
@@ -1179,6 +1188,33 @@ namespace kiwi
 			}
 
 			return penalty - (form.size() * unkFormScoreScale + unkFormScoreBias);
+		}
+
+		float modelBasedScore(const U16StringView& form) const
+		{
+			int32_t nodeIdx = bosNodeIdx;
+			uint32_t contextIdx = bosContextIdx;
+			ChrTokenizer tokenizer;
+			float score = 0;
+			for (char16_t c : form)
+			{
+				size_t token = tokenizer.encodeOne(c);
+				score += chrModel->progressOneStep(nodeIdx, contextIdx, token);
+			}
+			score += chrModel->progressOneStep(nodeIdx, contextIdx, 0); // EOS
+			return score;
+		}
+
+		float operator()(const U16StringView& form) const
+		{
+			if (chrModel)
+			{
+				return modelBasedScore(form);
+			}
+			else
+			{
+				return ruleBasedScore(form);
+			}
 		}
 	};
 
@@ -1209,6 +1245,7 @@ namespace kiwi
 		const KGraphNode* graph,
 		const size_t graphSize,
 		const size_t topN,
+		const size_t oovScoringType,
 		bool openEnding,
 		bool splitComplex,
 		bool splitSaisiot,
@@ -1263,7 +1300,11 @@ namespace kiwi
 			kw, config, startNode, topN, cache, ownFormList, uniqStates,
 		};
 		
-		UnkFormScorer unkFormScorer{ config.unkFormScoreScale, config.unkFormScoreBias };
+		UnkFormScorer unkFormScorer{ 
+			oovScoringType >= (size_t)Match::oovChrModel ? kw->nounChrMdl.get() : nullptr, 
+			config.unkFormScoreScale, 
+			config.unkFormScoreBias
+		};
 
 		// middle nodes
 		for (size_t i = 1; i < graphSize - 1; ++i)
