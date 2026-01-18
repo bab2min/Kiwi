@@ -1,4 +1,6 @@
-﻿#include <fstream>
+﻿#include <string>
+#include <regex>
+#include <fstream>
 #include <iostream>
 
 #include <kiwi/Utils.h>
@@ -14,6 +16,7 @@ unique_ptr<Evaluator> Evaluator::create(const std::string& evalType)
 {
 	if (evalType == "morph") return std::make_unique<MorphEvaluator>();
 	if (evalType == "disamb") return std::make_unique<DisambEvaluator>();
+	if (evalType == "noun") return std::make_unique<NounEvaluator>();
 	throw runtime_error{ "Unknown Evaluator Type" };
 }
 
@@ -61,12 +64,31 @@ inline TokenInfo parseWordPOS(const u16string& str)
 	return { form, tag, 0, 0 };
 }
 
+inline string oovScoringTypeToStr(Match t)
+{
+	switch (t)
+	{
+	case Match::oovRuleOnly:
+		return "rule";
+	case Match::oovChrModel:
+		return "chr";
+	case Match::oovChrFreqModel:
+		return "chrFreq";
+	case Match::oovChrFreqBranchModel:
+		return "chrFreqBranch";
+	default:
+		return "none";
+	}
+}
+
 int Evaluator::operator()(const string& modelPath, 
 	const string& output, 
 	const vector<string>& input,
-	bool normCoda, bool zCoda, bool multiDict, ModelType modelType,
+	bool normCoda, bool zCoda, bool defaultDict, bool multiDict, ModelType modelType,
 	float typoCostWeight, bool bTypo, bool cTypo, bool lTypo,
 	Dialect allowedDialect,
+	Match oovScoringType,
+	float unkFormScoreScale, float unkFormScoreBias,
 	int repeat)
 {
 	try
@@ -83,7 +105,9 @@ int Evaluator::operator()(const string& modelPath,
 		}
 
 		tutils::Timer timer;
-		auto option = (BuildOption::default_ & ~BuildOption::loadMultiDict) | (multiDict ? BuildOption::loadMultiDict : BuildOption::none);
+		auto option = (BuildOption::default_ & ~BuildOption::loadDefaultDict & ~BuildOption::loadMultiDict) 
+			| (defaultDict ? BuildOption::loadDefaultDict : BuildOption::none)
+			| (multiDict ? BuildOption::loadMultiDict : BuildOption::none);
 		auto typo = getDefaultTypoSet(DefaultTypoSet::withoutTypo);
 
 		if (bTypo)
@@ -101,6 +125,11 @@ int Evaluator::operator()(const string& modelPath,
 			typo |= getDefaultTypoSet(DefaultTypoSet::lengtheningTypoSet);
 		}
 
+		if (allowedDialect != Dialect::standard)
+		{
+			typo |= getDefaultTypoSet(DefaultTypoSet::dialect);
+		}
+
 		Kiwi kw = KiwiBuilder{ modelPath, 1, option, modelType, allowedDialect }.build(
 			typo
 		);
@@ -111,6 +140,19 @@ int Evaluator::operator()(const string& modelPath,
 			kw.setGlobalConfig(config);
 		}
 
+		if (isfinite(unkFormScoreScale))
+		{
+			auto config = kw.getGlobalConfig();
+			config.unkFormScoreScale = unkFormScoreScale;
+			kw.setGlobalConfig(config);
+		}
+		if (isfinite(unkFormScoreBias))
+		{
+			auto config = kw.getGlobalConfig();
+			config.unkFormScoreBias = unkFormScoreBias;
+			kw.setGlobalConfig(config);
+		}
+
 		cout << "Loading Time : " << timer.getElapsed() << " ms" << endl;
 		cout << "ArchType : " << archToStr(kw.archType()) << endl;
 		cout << "Model Type : " << modelTypeToStr(kw.modelType()) << endl;
@@ -118,16 +160,21 @@ int Evaluator::operator()(const string& modelPath,
 		{
 			cout << "LM Size : " << (kw.getLangModel()->getMemorySize() / 1024. / 1024.) << " MB" << endl;
 		}
+		cout << "OOV Scoring : " << oovScoringTypeToStr(oovScoringType) << endl;
 		cout << "Mem Usage : " << (tutils::getCurrentPhysicalMemoryUsage() / 1024.) << " MB\n" << endl;
 
 		double avgMicro = 0, avgMacro = 0;
 		double cnt = 0;
+		AnalyzeOption analyzeOption;
+		analyzeOption.match = (normCoda ? Match::allWithNormalizing : Match::all) & ~(zCoda ? Match::none : Match::zCoda);
+		analyzeOption.match |= oovScoringType;
+		analyzeOption.allowedDialects = allowedDialect;
 		for (auto& tf : input)
 		{
 			cout << "Test file: " << tf << endl;
 			try
 			{
-				auto result = eval(output, tf, kw, normCoda, zCoda, allowedDialect, repeat);
+				auto result = eval(output, tf, kw, analyzeOption, repeat);
 				avgMicro += result.first;
 				avgMacro += result.second;
 				++cnt;
@@ -229,30 +276,6 @@ auto MorphEvaluator::computeScore(vector<TestResult>& preds, vector<TestResult>&
 	return ret;
 }
 
-auto DisambEvaluator::computeScore(vector<TestResult>& preds, vector<TestResult>& errors) const -> Score
-{
-	errors.clear();
-	Score score;
-	for (auto& tr : preds)
-	{
-		bool correct = false;
-		for (auto& token : tr.result.first)
-		{
-			if (token.str == tr.target.str && 
-				clearIrregular(token.tag) == clearIrregular(tr.target.tag))
-			{
-				correct = true;
-				break;
-			}
-		}
-		if (correct) score.acc += 1;
-		else errors.emplace_back(tr);
-		score.totalCount++;
-	}
-	score.acc /= score.totalCount;
-	return score;
-}
-
 void MorphEvaluator::TestResult::writeResult(ostream& out) const
 {
 	out << utf16To8(q) << '\t' << score << endl;
@@ -269,12 +292,9 @@ void MorphEvaluator::TestResult::writeResult(ostream& out) const
 	out << endl;
 }
 
-pair<double, double> MorphEvaluator::eval(const string& output, const string& file, kiwi::Kiwi& kiwi, bool normCoda, bool zCoda, Dialect allowedDialect, int repeat)
+pair<double, double> MorphEvaluator::eval(const string& output, const string& file, Kiwi& kiwi, AnalyzeOption option, int repeat)
 {
 	const size_t topN = 1;
-	AnalyzeOption option;
-	option.match = (normCoda ? Match::allWithNormalizing : Match::all) & ~(zCoda ? Match::none : Match::zCoda);
-	option.allowedDialects = allowedDialect;
 	vector<TestResult> testsets = loadTestset(file), errors;
 	tutils::Timer total;
 	for (int i = 0; i < repeat; ++i)
@@ -331,6 +351,30 @@ auto DisambEvaluator::loadTestset(const string& testSetFile) const -> vector<Tes
 	return ret;
 }
 
+auto DisambEvaluator::computeScore(vector<TestResult>& preds, vector<TestResult>& errors) const -> Score
+{
+	errors.clear();
+	Score score;
+	for (auto& tr : preds)
+	{
+		bool correct = false;
+		for (auto& token : tr.result.first)
+		{
+			if (token.str == tr.target.str &&
+				clearIrregular(token.tag) == clearIrregular(tr.target.tag))
+			{
+				correct = true;
+				break;
+			}
+		}
+		if (correct) score.acc += 1;
+		else errors.emplace_back(tr);
+		score.totalCount++;
+	}
+	score.acc /= score.totalCount;
+	return score;
+}
+
 void DisambEvaluator::TestResult::writeResult(ostream& out) const
 {
 	out << target << '\t' << utf16To8(text) << '\t' << score << endl;
@@ -342,12 +386,9 @@ void DisambEvaluator::TestResult::writeResult(ostream& out) const
 	out << endl;
 }
 
-pair<double, double> DisambEvaluator::eval(const string& output, const string& file, kiwi::Kiwi& kiwi, bool normCoda, bool zCoda, Dialect allowedDialect, int repeat)
+pair<double, double> DisambEvaluator::eval(const string& output, const string& file, Kiwi& kiwi, AnalyzeOption option, int repeat)
 {
 	const size_t topN = 1;
-	AnalyzeOption option;
-	option.match = (normCoda ? Match::allWithNormalizing : Match::all) & ~(zCoda ? Match::none : Match::zCoda);
-	option.allowedDialects = allowedDialect;
 	vector<TestResult> testsets = loadTestset(file), errors;
 	tutils::Timer total;
 	for (int i = 0; i < repeat; ++i)
@@ -382,4 +423,156 @@ pair<double, double> DisambEvaluator::eval(const string& output, const string& f
 		}
 	}
 	return make_pair(score.acc, score.acc);
+}
+
+auto NounEvaluator::loadTestset(const string& testSetFile) const -> vector<TestResult>
+{
+	vector<TestResult> ret;
+	ifstream f{ testSetFile };
+	if (!f) throw std::ios_base::failure{ "Cannot open '" + testSetFile + "'" };
+	string line;
+	
+	regex nounTagPattern{ "<n(?:\\s+e=\"([^\"]+)\")?>(.+?)</n>" };
+
+	while (getline(f, line))
+	{
+		while (line.back() == '\n' || line.back() == '\r') line.pop_back();
+		TestResult tr;
+		smatch matches;
+		auto searchStart = line.cbegin();
+		string inputText;
+		while (regex_search(searchStart, line.cend(), matches, nounTagPattern))
+		{
+			inputText.insert(inputText.end(), searchStart, matches[0].first);
+			const u16string nounStr = utf8To16(matches[2].str());
+			const string labelStr = matches[1].str();
+			tr.golds.emplace_back(nounStr, labelStr);
+			inputText.insert(inputText.end(), matches[2].first, matches[2].second);
+			searchStart = matches[0].second;
+		}
+		inputText.insert(inputText.end(), searchStart, line.cend());
+		tr.text = utf8To16(inputText);
+		ret.emplace_back(std::move(tr));
+	}
+	return ret;
+}
+
+auto NounEvaluator::computeScore(vector<TestResult>& preds, vector<TestResult>& errors) const -> Score
+{
+	errors.clear();
+	size_t totalCorrect = 0, totalLabeledCorrect = 0, totalGolds = 0, totalLabeledGolds = 0, totalPreds = 0;
+	size_t totalCorrectChr = 0, totalPredsChr = 0, totalGoldsChr = 0;
+	for (auto& tr : preds)
+	{
+		std::unordered_set<u16string> predSet;
+		for (auto& token : tr.result.first)
+		{
+			if (token.tag == POSTag::nng || token.tag == POSTag::nnp || token.tag == POSTag::nnb)
+			{
+				predSet.insert(token.str);
+				tr.numPredsChr += token.str.size();
+			}
+		}
+		tr.numPreds = predSet.size();
+		for (auto& g : tr.golds)
+		{
+			if (predSet.find(g.first) != predSet.end())
+			{
+				tr.correct += 1;
+				tr.correctChr += g.first.size();
+				if (!g.second.empty())
+				{
+					tr.labeledCorrect += 1;
+				}
+			}
+			if (!g.second.empty()) totalLabeledGolds++;
+			totalGoldsChr += g.first.size();
+		}
+		totalGolds += tr.golds.size();
+		totalPreds += tr.numPreds;
+		totalCorrect += tr.correct;
+		totalLabeledCorrect += tr.labeledCorrect;
+		totalPredsChr += tr.numPredsChr;
+		totalCorrectChr += tr.correctChr;
+		if (tr.correct < tr.golds.size()) errors.emplace_back(tr);
+	}
+	Score score;
+	score.precision = (totalPreds == 0) ? 0 : (double)totalCorrect / totalPreds;
+	score.recall = (totalGolds == 0) ? 0 : (double)totalCorrect / totalGolds;
+	score.labeledRecall = (totalLabeledGolds == 0) ? 0 : (double)totalLabeledCorrect / totalLabeledGolds;
+	score.f1 = 2 * score.precision * score.recall / max(score.precision + score.recall, 1.);
+
+	score.precisionChr = (totalPredsChr == 0) ? 0 : (double)totalCorrectChr / totalPredsChr;
+	score.recallChr = (totalGoldsChr == 0) ? 0 : (double)totalCorrectChr / totalGoldsChr;
+	score.f1Chr = 2 * score.precisionChr * score.recallChr / max(score.precisionChr + score.recallChr, 1.);
+	score.totalCount = preds.size();
+	return score;
+}
+
+void NounEvaluator::TestResult::writeResult(ostream& out) const
+{
+	float precision = (numPreds == 0) ? 0 : (double)correct / numPreds;
+	float recall = (golds.size() == 0) ? 0 : (double)correct / golds.size();
+	float f1 = 2 * precision * recall / max(precision + recall, 1e-10f);
+	size_t labeledGolds = 0;
+	for (auto& g : golds)
+	{
+		if (!g.second.empty()) labeledGolds++;
+	}
+	float labeledRecall = (labeledGolds == 0) ? 0 : (double)labeledCorrect / labeledGolds;
+	out << utf16To8(text) << '\t' << labeledRecall << '\t' << precision << '\t' << recall << '\t' << f1 << endl;
+	out << "Golds:" << '\t';
+	for (auto& _r : golds)
+	{
+		out << utf16To8(_r.first) << ( _r.second.empty() ? "" : ("/" + _r.second) ) << '\t';
+	}
+	out << endl;
+	for (auto& _r : result.first)
+	{
+		out << _r << '\t';
+	}
+	out << endl;
+	out << endl;
+}
+
+std::pair<double, double> NounEvaluator::eval(const std::string& output, const std::string& file, kiwi::Kiwi& kiwi, kiwi::AnalyzeOption option, int repeat)
+{
+	vector<TestResult> testsets = loadTestset(file), errors;
+	tutils::Timer total;
+	for (int i = 0; i < repeat; ++i)
+	{
+		for (auto& tr : testsets)
+		{
+			auto cands = kiwi.analyze(tr.text, option);
+			tr.result = cands;
+		}
+	}
+	double tm = total.getElapsed() / repeat;
+	auto score = computeScore(testsets, errors);
+
+	cout << "Labeled Recall: " << score.labeledRecall << endl;
+	cout << "(Morph Level) Precision: " << score.precision << ", Recall: " << score.recall << ", F1: " << score.f1 << endl;
+	cout << "(Chr Level) Precision: " << score.precisionChr << ", Recall: " << score.recallChr << ", F1: " << score.f1Chr << endl;
+	cout << "Total (" << score.totalCount << " lines) Time : " << tm << " ms" << endl;
+	cout << "Time per Line : " << tm / score.totalCount << " ms" << endl;
+
+	if (!output.empty())
+	{
+		const size_t last_slash_idx = file.find_last_of("\\/");
+		string name;
+		if (last_slash_idx != file.npos) name = file.substr(last_slash_idx + 1);
+		else name = file;
+
+		ofstream out{ output + "/" + name };
+		out << "Labeled Recall: " << score.labeledRecall << endl;
+		out << "(Morph Level) Precision: " << score.precision << ", Recall: " << score.recall << ", F1: " << score.f1 << endl;
+		out << "(Chr Level) Precision: " << score.precisionChr << ", Recall: " << score.recallChr << ", F1: " << score.f1Chr << endl;
+		out << "Total (" << score.totalCount << ") Time : " << tm << " ms" << endl;
+		out << "Time per Unit : " << tm / score.totalCount << " ms" << endl;
+		for (auto t : errors)
+		{
+			t.writeResult(out);
+		}
+	}
+	return make_pair(score.labeledRecall, score.f1);
 }
