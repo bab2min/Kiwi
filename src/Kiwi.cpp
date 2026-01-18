@@ -728,6 +728,10 @@ namespace kiwi
 				token.typoCost = s.typoCost;
 				token.typoFormId = s.typoFormId;
 				token.senseId = s.morph->senseId;
+				if ((s.morph->tag == POSTag::nng || s.morph->tag == POSTag::nnp) && !s.str.empty())
+				{
+					token.senseId = -1; // OOV인 경우에는 senseId를 -1로 설정
+				}
 				updateTokenInfoScript(token);
 				token.dialect = s.morph->dialect;
 				auto ptId = nodeInWhichPretokenized[s.nodeId] + 1;
