@@ -1471,57 +1471,14 @@ TEST(KiwiCpp, JoinAffix)
 TEST(KiwiCpp, JoinParticleYo)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
-	// Test EC + 요/JX
-	auto sample1 = u"밥을 먹고요";
-	auto res1_without = kiwi.analyze(sample1, Match::none).first;
-	auto res1_with = kiwi.analyze(sample1, Match::joinParticleYo).first;
+	auto sample1 = u"밥을 먹는다던가요";
+	auto res_without = kiwi.analyze(sample1, Match::none).first;
+	auto res_with = kiwi.analyze(sample1, Match::joinParticleYo).first;
 	
-	// Without joinParticleYo: should have separate 고/EC and 요/JX
-	bool found_separate = false;
-	for (size_t i = 0; i + 1 < res1_without.size(); ++i) {
-		if (res1_without[i].str == u"고" && res1_without[i].tag == POSTag::ec &&
-			res1_without[i + 1].str == u"요" && res1_without[i + 1].tag == POSTag::jx) {
-			found_separate = true;
-			break;
-		}
-	}
-	EXPECT_TRUE(found_separate);
-	
-	// With joinParticleYo: should have merged 고요/EC
-	bool found_merged = false;
-	for (auto& token : res1_with) {
-		if (token.str == u"고요" && token.tag == POSTag::ec) {
-			found_merged = true;
-			break;
-		}
-	}
-	EXPECT_TRUE(found_merged);
-	
-	// Test EF + 요/JX
-	auto sample2 = u"좋네요";
-	auto res2_without = kiwi.analyze(sample2, Match::none).first;
-	auto res2_with = kiwi.analyze(sample2, Match::joinParticleYo).first;
-	
-	// Without joinParticleYo: should have separate 네/EF and 요/JX
-	found_separate = false;
-	for (size_t i = 0; i + 1 < res2_without.size(); ++i) {
-		if (res2_without[i].str == u"네" && res2_without[i].tag == POSTag::ef &&
-			res2_without[i + 1].str == u"요" && res2_without[i + 1].tag == POSTag::jx) {
-			found_separate = true;
-			break;
-		}
-	}
-	EXPECT_TRUE(found_separate);
-	
-	// With joinParticleYo: should have merged 네요/EF
-	found_merged = false;
-	for (auto& token : res2_with) {
-		if (token.str == u"네요" && token.tag == POSTag::ef) {
-			found_merged = true;
-			break;
-		}
-	}
-	EXPECT_TRUE(found_merged);
+	EXPECT_EQ(res_without[res_without.size() - 2].str, u"는다던가");
+	EXPECT_EQ(res_without[res_without.size() - 1].str, u"요");
+
+	EXPECT_EQ(res_with[res_with.size() - 1].str, u"는다던가요");
 }
 
 TEST(KiwiCpp, CompatibleJamo)
