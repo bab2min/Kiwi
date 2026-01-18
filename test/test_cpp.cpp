@@ -1468,6 +1468,19 @@ TEST(KiwiCpp, JoinAffix)
 	EXPECT_EQ(res5.first[5].str, u"배송되");
 }
 
+TEST(KiwiCpp, JoinParticleYo)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	auto sample1 = u"밥을 먹는다던가요";
+	auto res_without = kiwi.analyze(sample1, Match::none).first;
+	auto res_with = kiwi.analyze(sample1, Match::joinParticleYo).first;
+	
+	EXPECT_EQ(res_without[res_without.size() - 2].str, u"는다던가");
+	EXPECT_EQ(res_without[res_without.size() - 1].str, u"요");
+
+	EXPECT_EQ(res_with[res_with.size() - 1].str, u"는다던가요");
+}
+
 TEST(KiwiCpp, CompatibleJamo)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
