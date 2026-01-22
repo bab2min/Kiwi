@@ -19,7 +19,11 @@ let package = Package(
         .target(
             name: "CKiwi",
             dependencies: [],
-            path: "Sources/CKiwi"
+            path: "Sources/CKiwi",
+            linkerSettings: [
+                .linkedLibrary("c++"),
+                .linkedLibrary("z"),
+            ]
         ),
         .target(
             name: "Kiwi",

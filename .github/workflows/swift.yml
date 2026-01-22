@@ -32,15 +32,38 @@ jobs:
     - name: Swift Version
       run: swift --version
     
+    - name: Build C++ Library
+      run: |
+        mkdir build && cd build
+        cmake -DCMAKE_BUILD_TYPE=Release \
+          -DKIWI_BUILD_DYNAMIC=OFF \
+          -DKIWI_BUILD_CLI=OFF \
+          -DKIWI_BUILD_EVALUATOR=OFF \
+          -DKIWI_BUILD_MODEL_BUILDER=OFF \
+          -DKIWI_BUILD_TEST=OFF \
+          -DKIWI_JAVA_BINDING=OFF \
+          -DKIWI_USE_MIMALLOC=ON \
+          ..
+        make -j$(sysctl -n hw.ncpu)
+    
+    - name: Verify Static Library
+      run: |
+        if [ ! -f build/libkiwi_static.a ]; then
+          echo "Error: libkiwi_static.a not found"
+          exit 1
+        fi
+        file build/libkiwi_static.a
+        ls -lh build/libkiwi_static.a
+    
     - name: Build Swift Package
       run: |
         cd bindings/swift
-        swift build -v
+        swift build -v -Xlinker -L../../build -Xlinker -lkiwi_static
     
     - name: Run Swift Tests
       run: |
         cd bindings/swift
-        swift test -v
+        swift test -v -Xlinker -L../../build -Xlinker -lkiwi_static
     
     - name: Check Swift Package
       run: |
