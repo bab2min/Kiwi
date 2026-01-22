@@ -26,10 +26,8 @@ jobs:
         submodules: true
         lfs: true
     
-    - name: Setup Swift
-      uses: swift-actions/setup-swift@v2
-      with:
-        swift-version: "5.9"
+    - name: Select Xcode
+      run: sudo xcode-select -switch /Applications/Xcode.app
     
     - name: Swift Version
       run: swift --version
@@ -107,7 +105,7 @@ jobs:
     - name: Setup Swift
       uses: swift-actions/setup-swift@v2
       with:
-        swift-version: "5.9"
+        swift-version: "5.10"
     
     - name: Check Package Format
       run: |
