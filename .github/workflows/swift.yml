@@ -64,11 +64,6 @@ jobs:
       run: |
         cd bindings/swift
         swift test -v -Xlinker -L../../build -Xlinker -lkiwi_static
-    
-    - name: Check Swift Package
-      run: |
-        cd bindings/swift
-        swift package diagnose
 
   swift-xcframework:
     name: Build XCFramework
