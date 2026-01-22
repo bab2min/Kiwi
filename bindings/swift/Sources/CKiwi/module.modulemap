@@ -1,0 +1,5 @@
+module CKiwi {
+    header "include/capi.h"
+    header "include/Macro.h"
+    export *
+}
