@@ -964,14 +964,24 @@ namespace kiwi
 			throw invalid_argument{ "`cutOffThreshold` should be >= 0." };
 		}
 
-		if (unkFormScoreScale < 0)
+		if (oovRuleScale < 0)
 		{
-			throw invalid_argument{ "`unkFormScoreScale` should be >= 0." };
+			throw invalid_argument{ "`oovRuleScale` should be >= 0." };
 		}
 
-		if (unkFormScoreBias < 0)
+		if (oovGlobalWeight <= 0)
 		{
-			throw invalid_argument{ "`unkFormScoreBias` should be >= 0." };
+			throw invalid_argument{ "`oovGlobalWeight` should be > 0." };
+		}
+
+		if (oovLocalWeight <= 0)
+		{
+			throw invalid_argument{ "`oovLocalWeight` should be > 0." };
+		}
+
+		if (oovGlobalMinFreq <= 0)
+		{
+			throw invalid_argument{ "`oovGlobalMinFreq` should be >= 0." };
 		}
 
 		if (spacePenalty <= 0)

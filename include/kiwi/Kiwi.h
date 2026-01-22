@@ -103,8 +103,12 @@ namespace kiwi
 	{
 		bool integrateAllomorph = true;
 		float cutOffThreshold = 8;
-		float unkFormScoreScale = 5;
-		float unkFormScoreBias = 5;
+		float oovRuleScale = 3;
+		float oovRuleBias = 3;
+		float oovChrBias = -3;
+		float oovGlobalWeight = 60;
+		float oovLocalWeight = 3;
+		float oovGlobalMinFreq = 4;
 		float spacePenalty = 7;
 		float typoCostWeight = 6;
 		uint32_t maxUnkFormSize = 6;
