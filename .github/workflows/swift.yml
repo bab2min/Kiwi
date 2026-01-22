@@ -1,0 +1,116 @@
+name: Swift Bindings
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'bindings/swift/**'
+      - 'include/kiwi/capi.h'
+      - 'include/kiwi/Macro.h'
+      - '.github/workflows/swift.yml'
+  push:
+    branches: [ main ]
+    paths:
+      - 'bindings/swift/**'
+      - 'include/kiwi/capi.h'
+      - 'include/kiwi/Macro.h'
+
+jobs:
+  swift-build-test:
+    name: Swift Build and Test
+    runs-on: macos-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: true
+        lfs: true
+    
+    - name: Setup Swift
+      uses: swift-actions/setup-swift@v2
+      with:
+        swift-version: "5.9"
+    
+    - name: Swift Version
+      run: swift --version
+    
+    - name: Build Swift Package
+      run: |
+        cd bindings/swift
+        swift build -v
+    
+    - name: Run Swift Tests
+      run: |
+        cd bindings/swift
+        swift test -v
+    
+    - name: Check Swift Package
+      run: |
+        cd bindings/swift
+        swift package diagnose
+
+  swift-xcframework:
+    name: Build XCFramework
+    runs-on: macos-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: true
+        lfs: true
+    
+    - name: Setup Xcode
+      run: sudo xcode-select -switch /Applications/Xcode.app
+    
+    - name: Build C++ Library
+      run: |
+        mkdir build && cd build
+        cmake -DCMAKE_BUILD_TYPE=Release \
+          -DKIWI_BUILD_DYNAMIC=OFF \
+          -DKIWI_BUILD_CLI=OFF \
+          -DKIWI_BUILD_EVALUATOR=OFF \
+          -DKIWI_BUILD_MODEL_BUILDER=OFF \
+          -DKIWI_BUILD_TEST=OFF \
+          -DKIWI_JAVA_BINDING=OFF \
+          -DKIWI_USE_MIMALLOC=ON \
+          ..
+        make -j$(sysctl -n hw.ncpu)
+    
+    - name: Verify Static Library
+      run: |
+        if [ ! -f build/libkiwi_static.a ]; then
+          echo "Error: libkiwi_static.a not found"
+          exit 1
+        fi
+        file build/libkiwi_static.a
+    
+    - name: Archive Library
+      uses: actions/upload-artifact@v4
+      with:
+        name: libkiwi-static-macos
+        path: |
+          build/libkiwi_static.a
+          include/kiwi/capi.h
+          include/kiwi/Macro.h
+
+  swift-linux-check:
+    name: Swift Linux Compatibility Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: true
+        lfs: true
+    
+    - name: Setup Swift
+      uses: swift-actions/setup-swift@v2
+      with:
+        swift-version: "5.9"
+    
+    - name: Check Package Format
+      run: |
+        cd bindings/swift
+        swift package diagnose || true
+        echo "Note: Linux build may not work without modifications, but checking package structure"

@@ -149,6 +149,12 @@ Android NDK를 통해 Android 앱에서 사용할 수 있는 AAR 라이브러리
 - **사용법**: [bindings/java](bindings/java)의 README 참조
 - **패키지**: AAR 형태로 제공되어 Gradle 프로젝트에 쉽게 통합 가능
 
+### Swift Wrapper
+iOS 12.0 이상 및 macOS 10.14 이상에서 사용 가능한 Swift binding이 제공됩니다. Swift Package Manager를 통해 쉽게 통합할 수 있습니다.
+- **최소 요구사항**: iOS 12.0+ / macOS 10.14+, Swift 5.7+
+- **사용법**: [bindings/swift](bindings/swift)의 README 참조
+- **설치**: Swift Package Manager 지원
+
 ### R Wrapper
 [mrchypark](https://github.com/mrchypark)님께서 기여해주신 R언어용 wrapper인 [elbird](https://mrchypark.github.io/elbird/)가 있습니다.
 
