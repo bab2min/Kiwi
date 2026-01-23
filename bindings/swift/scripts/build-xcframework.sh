@@ -64,6 +64,7 @@ build_platform() {
     cp "$PROJECT_ROOT/include/kiwi/Macro.h" "$FRAMEWORK_DIR/Headers/"
     
     # Create module map
+    mkdir -p "$FRAMEWORK_DIR/Modules"
     cat > "$FRAMEWORK_DIR/Modules/module.modulemap" << EOF
 framework module Kiwi {
     umbrella header "capi.h"
@@ -94,11 +95,23 @@ xcodebuild -create-xcframework \
 
 echo "✓ XCFramework created at $XCFRAMEWORK_DIR/Kiwi.xcframework"
 
-# Calculate checksum for Swift Package Manager
+# Create zip file for distribution
+echo "Creating zip archive..."
 cd "$XCFRAMEWORK_DIR"
+zip -r -y Kiwi.xcframework.zip Kiwi.xcframework
+
+# Calculate checksum for Swift Package Manager
 CHECKSUM=$(swift package compute-checksum Kiwi.xcframework.zip 2>/dev/null || echo "N/A")
 echo "Checksum: $CHECKSUM"
 
 echo ""
 echo "Build complete!"
 echo "XCFramework location: $XCFRAMEWORK_DIR/Kiwi.xcframework"
+echo "Zip archive: $XCFRAMEWORK_DIR/Kiwi.xcframework.zip"
+echo ""
+echo "To use with Swift Package Manager binaryTarget:"
+echo "  .binaryTarget("
+echo "      name: \"CKiwi\","
+echo "      url: \"<RELEASE_URL>/Kiwi.xcframework.zip\","
+echo "      checksum: \"$CHECKSUM\""
+echo "  )"

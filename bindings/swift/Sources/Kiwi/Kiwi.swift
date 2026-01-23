@@ -131,20 +131,22 @@ public final class Kiwi {
         var sentences: [Sentence] = []
         sentences.reserveCapacity(Int(sentenceCount))
         
+        let textUtf8Count = text.utf8.count
         for i in 0..<sentenceCount {
             let start = kiwi_ss_begin_position(result, i)
             let end = kiwi_ss_end_position(result, i)
-            
-            if start >= 0 && end >= start {
+
+            // Validate bounds before indexing
+            if start >= 0 && end >= start && Int(end) <= textUtf8Count {
                 let startIdx = text.utf8.index(text.utf8.startIndex, offsetBy: Int(start))
                 let endIdx = text.utf8.index(text.utf8.startIndex, offsetBy: Int(end))
-                let sentenceText = String(text[startIdx..<endIdx])
-                
-                sentences.append(Sentence(
-                    text: sentenceText,
-                    start: Int(start),
-                    length: Int(end - start)
-                ))
+                if let sentenceText = String(text.utf8[startIdx..<endIdx]) {
+                    sentences.append(Sentence(
+                        text: sentenceText,
+                        start: Int(start),
+                        length: Int(end - start)
+                    ))
+                }
             }
         }
         
@@ -154,15 +156,21 @@ public final class Kiwi {
     /// Create a new Joiner for combining morphemes into text
     /// - Parameter useLMSearch: Use language model search for optimal POS selection (default: true)
     /// - Returns: A new Joiner instance
-    public func createJoiner(useLMSearch: Bool = true) -> Joiner {
+    /// - Throws: KiwiError if creation fails
+    public func createJoiner(useLMSearch: Bool = true) throws -> Joiner {
         guard let handle = wrapper?.handle else {
-            fatalError("Invalid Kiwi handle")
+            throw KiwiError.invalidHandle
         }
-        
+
         guard let joinerHandle = kiwi_new_joiner(handle, useLMSearch ? 1 : 0) else {
-            fatalError("Failed to create joiner")
+            if let errorMsg = kiwi_error() {
+                let error = String(cString: errorMsg)
+                kiwi_clear_error()
+                throw KiwiError.operationFailed(error)
+            }
+            throw KiwiError.operationFailed("Failed to create joiner")
         }
-        
+
         return Joiner(handle: joinerHandle)
     }
     

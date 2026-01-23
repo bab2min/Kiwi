@@ -5,86 +5,86 @@ public enum POSTag: UInt8, CaseIterable, Codable {
     case unknown = 0
     
     // Nouns
-    case nng = 1      // General Noun
-    case nnp = 2      // Proper Noun
-    case nnb = 3      // Bound Noun
+    case nng = 1
+    case nnp = 2
+    case nnb = 3
     
     // Verbs
-    case vv = 4       // Verb
-    case va = 5       // Adjective
+    case vv = 4
+    case va = 5
     
     // Adverbs
-    case mag = 6      // General Adverb
+    case mag = 6
     
     // Numerals
-    case nr = 7       // Numeral
-    case np = 8       // Pronoun
+    case nr = 7
+    case np = 8
     
     // Auxiliary
-    case vx = 9       // Auxiliary Verb/Adjective
+    case vx = 9
     
     // Determiners
-    case mm = 10      // Determiner
-    case maj = 11     // Conjunctive Adverb
+    case mm = 10
+    case maj = 11
     
     // Interjections
-    case ic = 12      // Interjection
+    case ic = 12
     
     // Prefixes/Suffixes
-    case xpn = 13     // Noun Prefix
-    case xsn = 14     // Noun Suffix
-    case xsv = 15     // Verb Suffix
-    case xsa = 16     // Adjective Suffix
-    case xsm = 17     // Modifier Suffix
-    case xr = 18      // Root
+    case xpn = 13
+    case xsn = 14
+    case xsv = 15
+    case xsa = 16
+    case xsm = 17
+    case xr = 18
     
     // Copulas
-    case vcp = 19     // Positive Copula
-    case vcn = 20     // Negative Copula
+    case vcp = 19
+    case vcn = 20
     
     // Symbols
-    case sf = 21      // Final Punctuation (. ! ?)
-    case sp = 22      // Pause Punctuation (, · … :)
-    case ss = 23      // Quote/Bracket
-    case sso = 24     // Opening Quote/Bracket
-    case ssc = 25     // Closing Quote/Bracket
-    case se = 26      // Ellipsis
-    case so = 27      // Other Symbol
-    case sw = 28      // Other Symbol
-    case sb = 29      // Other Symbol
-    case sl = 30      // Foreign Language
-    case sh = 31      // Chinese Character
-    case sn = 32      // Number
+    case sf = 21
+    case sp = 22
+    case ss = 23
+    case sso = 24
+    case ssc = 25
+    case se = 26
+    case so = 27
+    case sw = 28
+    case sb = 29
+    case sl = 30
+    case sh = 31
+    case sn = 32
     
     // Web entities
-    case w_url = 33   // URL
-    case w_email = 34 // Email
-    case w_mention = 35 // Mention (@username)
-    case w_hashtag = 36 // Hashtag (#tag)
-    case w_serial = 37  // Serial Number
-    case w_emoji = 38   // Emoji
+    case w_url = 33
+    case w_email = 34
+    case w_mention = 35
+    case w_hashtag = 36
+    case w_serial = 37
+    case w_emoji = 38
     
     // Particles
-    case jks = 39     // Subject Particle
-    case jkc = 40     // Complement Particle
-    case jkg = 41     // Adnominal Particle
-    case jko = 42     // Object Particle
-    case jkb = 43     // Adverbial Particle
-    case jkv = 44     // Vocative Particle
-    case jkq = 45     // Quotative Particle
-    case jx = 46      // Auxiliary Particle
-    case jc = 47      // Conjunctive Particle
+    case jks = 39
+    case jkc = 40
+    case jkg = 41
+    case jko = 42
+    case jkb = 43
+    case jkv = 44
+    case jkq = 45
+    case jx = 46
+    case jc = 47
     
     // Endings
-    case ep = 48      // Prefinal Ending
-    case ef = 49      // Final Ending
-    case ec = 50      // Conjunctive Ending
-    case etn = 51     // Nominalizing Ending
-    case etm = 52     // Adnominalizing Ending
+    case ep = 48
+    case ef = 49
+    case ec = 50
+    case etn = 51
+    case etm = 52
     
     // Special
-    case z_coda = 53  // Coda
-    case z_siot = 54  // Siot
+    case z_coda = 53
+    case z_siot = 54
     
     // User defined
     case user0 = 55
@@ -93,9 +93,12 @@ public enum POSTag: UInt8, CaseIterable, Codable {
     case user3 = 58
     case user4 = 59
     
-    // Special predicate
-    case p = 60
-    
+    // Irregular conjugation tags (base tag | 0x80)
+    case vvi = 132
+    case vai = 133
+    case vxi = 137
+    case xsai = 144
+
     /// String representation of the POS tag
     public var description: String {
         switch self {
@@ -159,7 +162,10 @@ public enum POSTag: UInt8, CaseIterable, Codable {
         case .user2: return "USER2"
         case .user3: return "USER3"
         case .user4: return "USER4"
-        case .p: return "P"
+        case .vvi: return "VV-I"
+        case .vai: return "VA-I"
+        case .vxi: return "VX-I"
+        case .xsai: return "XSA-I"
         }
     }
     
@@ -170,19 +176,19 @@ public enum POSTag: UInt8, CaseIterable, Codable {
         case "NNG": self = .nng
         case "NNP": self = .nnp
         case "NNB": self = .nnb
-        case "VV": self = .vv
-        case "VA": self = .va
+        case "VV", "VV-R": self = .vv
+        case "VA", "VA-R": self = .va
         case "MAG": self = .mag
         case "NR": self = .nr
         case "NP": self = .np
-        case "VX": self = .vx
+        case "VX", "VX-R": self = .vx
         case "MM": self = .mm
         case "MAJ": self = .maj
         case "IC": self = .ic
         case "XPN": self = .xpn
         case "XSN": self = .xsn
-        case "XSV": self = .xsv
-        case "XSA": self = .xsa
+        case "XSV", "XSV-R": self = .xsv
+        case "XSA", "XSA-R": self = .xsa
         case "XSM": self = .xsm
         case "XR": self = .xr
         case "VCP": self = .vcp
@@ -226,7 +232,34 @@ public enum POSTag: UInt8, CaseIterable, Codable {
         case "USER2": self = .user2
         case "USER3": self = .user3
         case "USER4": self = .user4
-        case "P": self = .p
+        case "VV-I", "VVI": self = .vvi
+        case "VA-I", "VAI": self = .vai
+        case "VX-I", "VXI": self = .vxi
+        case "XSA-I", "XSAI": self = .xsai
+        default: return nil
+        }
+    }
+
+    /// Whether this tag represents an irregular conjugation
+    public var isIrregular: Bool {
+        return rawValue & 0x80 != 0
+    }
+
+    /// Returns the base tag without the irregular flag
+    public var baseTag: POSTag {
+        if isIrregular {
+            return POSTag(rawValue: rawValue & 0x7F) ?? self
+        }
+        return self
+    }
+
+    /// Returns the irregular version of this tag (for VV, VA, VX, XSA, P, PA)
+    public var irregularTag: POSTag? {
+        switch self {
+        case .vv: return .vvi
+        case .va: return .vai
+        case .vx: return .vxi
+        case .xsa: return .xsai
         default: return nil
         }
     }

@@ -119,7 +119,8 @@ final class KiwiTests: XCTestCase {
         // First result should have tokens
         if let firstResult = results.first {
             XCTAssertFalse(firstResult.tokens.isEmpty, "Result should have tokens")
-            XCTAssertGreaterThan(firstResult.score, 0, "Result should have positive score")
+            // Score is log probability, so it can be negative
+            XCTAssertFalse(firstResult.score.isNaN, "Result score should not be NaN")
         }
     }
     
@@ -161,7 +162,7 @@ final class KiwiTests: XCTestCase {
         let kiwi = try builder.build()
         
         // Test joiner
-        let joiner = kiwi.createJoiner()
+        let joiner = try kiwi.createJoiner()
         try joiner.add(form: "형태소", tag: .nng)
         try joiner.add(form: "분석", tag: .nng)
         

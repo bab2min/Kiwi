@@ -69,46 +69,95 @@ jobs:
     name: Build XCFramework
     runs-on: macos-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    
+
     steps:
     - uses: actions/checkout@v3
       with:
         submodules: true
         lfs: true
-    
+
     - name: Setup Xcode
       run: sudo xcode-select -switch /Applications/Xcode.app
-    
-    - name: Build C++ Library
+
+    - name: Build XCFramework
       run: |
-        mkdir build && cd build
-        cmake -DCMAKE_BUILD_TYPE=Release \
-          -DKIWI_BUILD_DYNAMIC=OFF \
-          -DKIWI_BUILD_CLI=OFF \
-          -DKIWI_BUILD_EVALUATOR=OFF \
-          -DKIWI_BUILD_MODEL_BUILDER=OFF \
-          -DKIWI_BUILD_TEST=OFF \
-          -DKIWI_JAVA_BINDING=OFF \
-          -DKIWI_USE_MIMALLOC=ON \
-          ..
-        make -j$(sysctl -n hw.ncpu)
-    
-    - name: Verify Static Library
+        chmod +x bindings/swift/scripts/build-xcframework.sh
+        bindings/swift/scripts/build-xcframework.sh
+
+    - name: Verify XCFramework
       run: |
-        if [ ! -f build/libkiwi_static.a ]; then
-          echo "Error: libkiwi_static.a not found"
+        if [ ! -d bindings/swift/xcframework/Kiwi.xcframework ]; then
+          echo "Error: Kiwi.xcframework not found"
           exit 1
         fi
-        file build/libkiwi_static.a
-    
-    - name: Archive Library
+        if [ ! -f bindings/swift/xcframework/Kiwi.xcframework.zip ]; then
+          echo "Error: Kiwi.xcframework.zip not found"
+          exit 1
+        fi
+        ls -lh bindings/swift/xcframework/
+
+    - name: Calculate Checksum
+      run: |
+        cd bindings/swift/xcframework
+        swift package compute-checksum Kiwi.xcframework.zip > checksum.txt
+        echo "Checksum: $(cat checksum.txt)"
+
+    - name: Archive XCFramework
       uses: actions/upload-artifact@v4
       with:
-        name: libkiwi-static-macos
+        name: Kiwi-xcframework
         path: |
-          build/libkiwi_static.a
-          include/kiwi/capi.h
-          include/kiwi/Macro.h
+          bindings/swift/xcframework/Kiwi.xcframework.zip
+          bindings/swift/xcframework/checksum.txt
+
+  swift-release:
+    name: Release XCFramework
+    runs-on: macos-latest
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: true
+        lfs: true
+
+    - name: Setup Xcode
+      run: sudo xcode-select -switch /Applications/Xcode.app
+
+    - name: Build XCFramework
+      run: |
+        chmod +x bindings/swift/scripts/build-xcframework.sh
+        bindings/swift/scripts/build-xcframework.sh
+
+    - name: Calculate Checksum
+      id: checksum
+      run: |
+        cd bindings/swift/xcframework
+        CHECKSUM=$(swift package compute-checksum Kiwi.xcframework.zip)
+        echo "checksum=$CHECKSUM" >> $GITHUB_OUTPUT
+        echo "Checksum: $CHECKSUM"
+
+    - name: Upload to Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          bindings/swift/xcframework/Kiwi.xcframework.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Output SPM Configuration
+      run: |
+        TAG=${GITHUB_REF#refs/tags/}
+        echo ""
+        echo "=== Swift Package Manager Configuration ==="
+        echo ""
+        echo "Add this to your Package.swift:"
+        echo ""
+        echo ".binaryTarget("
+        echo "    name: \"CKiwi\","
+        echo "    url: \"https://github.com/${{ github.repository }}/releases/download/$TAG/Kiwi.xcframework.zip\","
+        echo "    checksum: \"${{ steps.checksum.outputs.checksum }}\""
+        echo ")"
 
   swift-linux-check:
     name: Swift Linux Compatibility Check
