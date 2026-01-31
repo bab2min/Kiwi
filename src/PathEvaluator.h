@@ -1,5 +1,6 @@
 #pragma once
 #include <kiwi/Kiwi.h>
+#include "UnkFormScorer.h"
 
 namespace kiwi
 {
@@ -103,7 +104,8 @@ namespace kiwi
 			bool mergeSaisiot = false,
 			const std::unordered_set<const Morpheme*>* blocklist = nullptr,
 			Dialect allowedDialects = Dialect::standard,
-			float dialectCost = 0.f
+			float dialectCost = 0.f,
+			const sais::FmIndex<char16_t>* fmIndex = nullptr
 		);
 	};
 

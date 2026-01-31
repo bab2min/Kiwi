@@ -60,6 +60,7 @@ namespace kiwi
 			const KeyType* invertedContextVocabPtr = nullptr;
 			const float* invNormContextPtr = nullptr;
 			const float* invNormOutputPtr = nullptr;
+			const float* contextEmbEntropyPtr = nullptr;
 
 			inline uint32_t unpackContextId(uint32_t v) const
 			{
@@ -256,6 +257,7 @@ namespace kiwi
 			
 			float progressOneStep(int32_t& nodeIdx, uint32_t& contextIdx, uint32_t next) const override;
 			float getContextFrequency(uint32_t contextId) const override;
+			float getContextEntropy(uint32_t contextId) const override;
 			size_t getNodeDepth(uint32_t nodeId) const override;
 
 			uint32_t toContextId(const uint32_t* vocabIds, size_t size) const override;
@@ -276,7 +278,7 @@ namespace kiwi
 				static constexpr size_t keyWidth = sizeof(VlKeyType) * 8,
 					surrogateBitWidth = keyWidth == 16 ? 10 : 5,
 					surrogateBitMask = (1 << surrogateBitWidth) - 1;
-				static constexpr size_t tMax = (1 << keyWidth) - (1 << surrogateBitWidth) * 2;
+				static constexpr size_t tMax = ((size_t)1 << keyWidth) - ((size_t)1 << surrogateBitWidth) * 2;
 				if (next < tMax)
 				{
 					return progressContextNodeVl(nodeIdx, next);
@@ -297,7 +299,7 @@ namespace kiwi
 				static constexpr size_t keyWidth = sizeof(VlKeyType) * 8,
 					surrogateBitWidth = keyWidth == 16 ? 10 : 5,
 					surrogateBitMask = (1 << surrogateBitWidth) - 1;
-				static constexpr size_t tMax = (1 << keyWidth) - (1 << surrogateBitWidth) * 2;
+				static constexpr size_t tMax = ((size_t)1 << keyWidth) - ((size_t)1 << surrogateBitWidth) * 2;
 				return k >= tMax + (1 << surrogateBitWidth);
 			}
 

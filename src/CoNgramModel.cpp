@@ -581,14 +581,14 @@ namespace kiwi
 				const size_t distantMaskSize = windowSize > 0 ? padMultipleOf((header.vocabSize + 7) / 8, alignment) : 0;
 				const size_t outputEmbBiasSize = (header.flags & header.hasOutputEmbBias) ? padMultipleOf(sizeof(float) * header.vocabSize, alignment) : 0;
 				const size_t invertedContextVocabSize = (header.flags & header.hasReorderedVocab) ? padMultipleOf(header.vocabSize * sizeof(KeyType), alignment) : 0;
-				const size_t trieFrequencySize = (header.flags & header.hasTrieFrequency) ? padMultipleOf(header.numNodes, alignment) : 0;
+				const size_t contextEmbEntropySize = (header.flags & header.hasTrieFrequency) ? padMultipleOf(header.contextSize * sizeof(float), alignment) : 0;
 				
 				allEmbs = make_unique<uint8_t[]>(contextEmbSize + outputEmbSize + distantEmbSize
 					+ invNormContextSize + invNormOutputSize
 					+ positionConfSize + distantMaskSize
 					+ outputEmbBiasSize
 					+ invertedContextVocabSize
-					+ trieFrequencySize
+					+ contextEmbEntropySize
 				);
 				auto p = allEmbs.get();
 				contextEmbPtr = reinterpret_cast<uint8_t*>(p);
@@ -612,6 +612,10 @@ namespace kiwi
 				if (header.flags & header.hasReorderedVocab)
 				{
 					invertedContextVocabPtr = reinterpret_cast<const KeyType*>(p += outputEmbBiasSize);
+				}
+				if (header.flags & header.hasTrieFrequency)
+				{
+					contextEmbEntropyPtr = reinterpret_cast<const float*>(p += invertedContextVocabSize);
 				}
 			}
 			
@@ -756,6 +760,16 @@ namespace kiwi
 			if (header.flags & header.hasReorderedVocab)
 			{
 				memcpy(const_cast<KeyType*>(invertedContextVocabPtr), eptr, header.vocabSize * sizeof(KeyType));
+				eptr += header.vocabSize * sizeof(KeyType);
+			}
+
+			if (header.flags & header.hasTrieFrequency)
+			{
+				for (size_t i = 0; i < header.contextSize; ++i)
+				{
+					const_cast<float*>(contextEmbEntropyPtr)[i] = half2float(*reinterpret_cast<const uint16_t*>(eptr));
+					eptr += sizeof(uint16_t);
+				}
 			}
 		}
 
@@ -888,6 +902,19 @@ namespace kiwi
 		float CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::getContextFrequency(uint32_t contextId) const
 		{
 			return unpackTrieFrequency(contextId);
+		}
+
+		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
+		float CoNgramModel<arch, KeyType, VlKeyType, windowSize, quantized>::getContextEntropy(uint32_t contextId) const
+		{
+			if (header.flags & header.hasTrieFrequency)
+			{
+				return contextEmbEntropyPtr[unpackContextId(contextId)];
+			}
+			else
+			{
+				return NAN;
+			}
 		}
 
 		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
@@ -2239,6 +2266,7 @@ namespace kiwi
 			Vector<uint8_t> outputEmbLocalScale(qgroup ? (outputSize * numQGroups) : 0);
 			Vector<uint8_t> outputEmbBias(outputSize);
 			Vector<uint16_t> outputEmbBiasMinMax(2);
+			Vector<uint16_t> contextEmbEntropy(contextSize);
 
 			embeddingStr.read((char*)contextEmb.data(), contextEmb.size());
 			embeddingStr.read((char*)contextEmbScale.data(), contextEmbScale.size() * sizeof(uint16_t));
@@ -2249,6 +2277,7 @@ namespace kiwi
 			if (qgroup) embeddingStr.read((char*)outputEmbLocalScale.data(), outputEmbLocalScale.size());
 			embeddingStr.read((char*)outputEmbBias.data(), outputEmbBias.size() * sizeof(uint8_t));
 			embeddingStr.read((char*)outputEmbBiasMinMax.data(), outputEmbBiasMinMax.size() * sizeof(uint16_t));
+			embeddingStr.read((char*)contextEmbEntropy.data(), contextEmbEntropy.size() * sizeof(uint16_t));
 
 			if (!outputEmbBiasMinMax[1] == 0)
 			{
@@ -2262,6 +2291,7 @@ namespace kiwi
 				Vector<uint16_t> newContextEmbScale(contextSize);
 				Vector<uint8_t> newContextEmbLocalScale(qgroup ? (contextSize * (dim / qgroup)) : 0);
 				Vector<uint16_t> newContextEmbBias(contextSize);
+				Vector<uint16_t> newContextEmbEntropy(contextSize);
 				for (size_t i = 0; i < contextSize; ++i)
 				{
 					auto idx = valueNewIdx[i];
@@ -2271,11 +2301,13 @@ namespace kiwi
 					newContextEmbScale[idx] = contextEmbScale[i];
 					if (qgroup) copy(contextEmbLocalScale.data() + i * numQGroups, contextEmbLocalScale.data() + (i + 1) * numQGroups, newContextEmbLocalScale.data() + idx * numQGroups);
 					newContextEmbBias[idx] = contextEmbBias[i];
+					newContextEmbEntropy[idx] = contextEmbEntropy[i];
 				}
 				contextEmb = move(newContextEmb);
 				contextEmbScale = move(newContextEmbScale);
 				if (qgroup) contextEmbLocalScale = move(newContextEmbLocalScale);
 				contextEmbBias = move(newContextEmbBias);
+				contextEmbEntropy = move(newContextEmbEntropy);
 			}
 
 			CoNgramModelHeader header;
@@ -2303,6 +2335,7 @@ namespace kiwi
 			finalSize += outputSize * sizeof(uint8_t); // outputEmbBias
 			finalSize += sizeof(uint16_t); // outputEmbBiasMin
 			finalSize += outputSize * sizeof(uint16_t); // vocabulary
+			finalSize += contextSize * sizeof(uint16_t); // contextEmbEntropy
 
 			cerr << "Final model size: " << (finalSize / 1024.) << " KB" << endl;
 
@@ -2335,6 +2368,7 @@ namespace kiwi
 			ostr.write((const char*)outputEmbBias.data(), outputEmbBias.size() * sizeof(uint8_t));
 			ostr.write((const char*)&outputEmbBiasMinMax[0], sizeof(uint16_t));
 			ostr.write((const char*)invertedOrderedVocabIds.data(), invertedOrderedVocabIds.size() * sizeof(uint16_t));
+			ostr.write((const char*)contextEmbEntropy.data(), contextEmbEntropy.size() * sizeof(uint16_t));
 			return mem;
 		}
 

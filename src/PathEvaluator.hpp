@@ -13,6 +13,7 @@
 #include "StrUtils.h"
 #include "SortUtils.hpp"
 #include "LimitedVector.hpp"
+#include "UnkFormScorer.h"
 #include "PathEvaluator.h"
 #include "BestPathContainer.hpp"
 
@@ -1148,76 +1149,6 @@ namespace kiwi
 		return ret;
 	}
 
-	struct UnkFormScorer
-	{
-		lm::CoNgramModelBase* chrModel = nullptr;
-		float unkFormScoreScale = 0;
-		float unkFormScoreBias = 0;
-		int32_t bosNodeIdx = 0;
-		uint32_t bosContextIdx = 0;
-
-		UnkFormScorer(lm::CoNgramModelBase* _chrModel, float scale, float bias)
-			: chrModel{ _chrModel }, unkFormScoreScale { scale }, unkFormScoreBias{ bias }
-		{
-			if (chrModel)
-			{
-				chrModel->progressOneStep(bosNodeIdx, bosContextIdx, 0); // BOS
-			}
-		}
-
-		float ruleBasedScore(const U16StringView& form) const
-		{
-			float penalty = 0;
-			if (form.size() > 0)
-			{
-				char32_t chrs[2] = { 0,0 };
-				for (size_t i = 0, j = 0; i < form.size() && j < 2; ++j)
-				{ 
-					if (isHighSurrogate(form[i]))
-					{
-						chrs[j] = mergeSurrogate(form[i], form[i + 1]);
-						i += 2;
-					}
-					else
-					{
-						chrs[j] = form[i];
-						++i;
-					}
-				}
-				if (isEmoji(chrs[0], chrs[1])) penalty = -10;
-			}
-
-			return penalty - (form.size() * unkFormScoreScale + unkFormScoreBias);
-		}
-
-		float modelBasedScore(const U16StringView& form) const
-		{
-			int32_t nodeIdx = bosNodeIdx;
-			uint32_t contextIdx = bosContextIdx;
-			ChrTokenizer tokenizer;
-			float score = 0;
-			for (char16_t c : form)
-			{
-				size_t token = tokenizer.encodeOne(c);
-				score += chrModel->progressOneStep(nodeIdx, contextIdx, token);
-			}
-			score += chrModel->progressOneStep(nodeIdx, contextIdx, 0); // EOS
-			return score;
-		}
-
-		float operator()(const U16StringView& form) const
-		{
-			if (chrModel)
-			{
-				return modelBasedScore(form);
-			}
-			else
-			{
-				return ruleBasedScore(form);
-			}
-		}
-	};
-
 	inline bool isDisconnected(const KGraphNode* graph, size_t graphSize, Vector<uint8_t>& reachable, size_t scanStart)
 	{
 		if (reachable[scanStart - 1]) return false;
@@ -1252,7 +1183,8 @@ namespace kiwi
 		bool mergeSaisiot,
 		const std::unordered_set<const Morpheme*>* blocklist,
 		Dialect allowedDialects,
-		float dialectCost
+		float dialectCost,
+		const sais::FmIndex<char16_t>* fmIndex
 	)
 	{
 		static constexpr size_t eosId = 1;
@@ -1301,9 +1233,15 @@ namespace kiwi
 		};
 		
 		UnkFormScorer unkFormScorer{ 
+			config.oovRuleScale, 
+			config.oovRuleBias,
 			oovScoringType >= (size_t)Match::oovChrModel ? kw->nounChrMdl.get() : nullptr, 
-			config.unkFormScoreScale, 
-			config.unkFormScoreBias
+			config.oovChrBias,
+			fmIndex,
+			config.oovGlobalWeight,
+			config.oovLocalWeight,
+			config.oovGlobalMinFreq,
+			oovScoringType >= (size_t)Match::oovChrFreqBranchModel
 		};
 
 		// middle nodes

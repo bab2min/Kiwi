@@ -15,6 +15,7 @@
 #include "Joiner.hpp"
 #include "PathEvaluator.hpp"
 #include "Kiwi.hpp"
+#include "sais/fm_index.hpp"
 
 using namespace std;
 
@@ -1018,6 +1019,11 @@ namespace kiwi
 
 		if (!!(option.match & Match::normalizeCoda)) normalizeCoda(normalizedStr.begin(), normalizedStr.end());
 
+		if ((option.match & Match::oovMask) >= Match::oovChrModel && !nounChrMdl)
+		{
+			throw invalid_argument{ "`oovChrModel` option is set but the character-level noun model is not loaded." };
+		}
+
 		makePretokenizedSpanGroup(
 			pretokenizedGroup, 
 			pretokenized, 
@@ -1033,6 +1039,37 @@ namespace kiwi
 		wordPositions.clear();
 		getWordPositions(wordPositions, str.begin(), str.end());
 		
+		sais::FmIndex<char16_t> fmIndex;
+		if ((option.match & Match::oovMask) >= Match::oovChrFreqModel)
+		{
+			thread_local Vector<char16_t> reversedStr;
+			reversedStr.clear();
+			reversedStr.reserve(normalizedStr.size() + 1);
+			reversedStr.push_back(0); // sentinel
+			for (auto it = normalizedStr.rbegin(); it != normalizedStr.rend(); ++it)
+			{
+				auto c = *it;
+				const POSTag chrType = identifySpecialChr(c);
+				switch (chrType)
+				{
+				case POSTag::unknown:
+				case POSTag::sf:
+				case POSTag::sp:
+				case POSTag::ss:
+				case POSTag::sso:
+				case POSTag::ssc:
+				case POSTag::se:
+				case POSTag::so:
+				case POSTag::sw:
+				case POSTag::sb:
+					c = u' ';
+					break;
+				}
+				reversedStr.emplace_back(c);
+			}
+			fmIndex = sais::FmIndex<char16_t>{ reversedStr.data(), reversedStr.size() };
+		}
+
 		vector<TokenResult> ret;
 		Vector<SpecialState> spStatesByRet;
 		thread_local Vector<KGraphNode> nodes;
@@ -1079,7 +1116,8 @@ namespace kiwi
 				!!(option.match & Match::mergeSaisiot),
 				option.blocklist,
 				option.allowedDialects,
-				option.dialectCost
+				option.dialectCost,
+				(option.match & Match::oovMask) >= Match::oovChrFreqModel ? &fmIndex : nullptr
 			);
 			insertPathIntoResults(ret, spStatesByRet, res, topN, option.match, config.integrateAllomorph, positionTable, wordPositions, pretokenizedGroup, nodeInWhichPretokenized);
 		}

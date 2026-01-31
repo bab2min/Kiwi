@@ -90,6 +90,7 @@ namespace kiwi
 
 			virtual uint32_t toContextId(const uint32_t* vocabIds, size_t size) const = 0;
 			virtual float getContextFrequency(uint32_t contextId) const = 0;
+			virtual float getContextEntropy(uint32_t contextId) const = 0;
 			virtual size_t getNodeDepth(uint32_t nodeId) const = 0;
 
 			virtual std::vector<std::vector<uint32_t>> getContextWordMap() const = 0;
