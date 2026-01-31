@@ -79,6 +79,7 @@ set ( CORE_SRCS
   src/TagUtils.cpp
   src/TypoTransformer.cpp
   src/UnicodeCase.cpp
+  src/UnkFormScorer.cpp
   src/Utils.cpp
   src/WordDetector.cpp
   src/archImpl/none.cpp
