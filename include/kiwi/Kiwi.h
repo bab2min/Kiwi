@@ -106,7 +106,7 @@ namespace kiwi
 		float oovRuleScale = 3;
 		float oovRuleBias = 3;
 		float oovChrBias = -3;
-		float oovGlobalWeight = 60;
+		float oovGlobalWeight = 75;
 		float oovLocalWeight = 3;
 		float oovGlobalMinFreq = 4;
 		float spacePenalty = 7;
