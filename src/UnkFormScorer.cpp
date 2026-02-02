@@ -1,19 +1,19 @@
 #include <kiwi/Dataset.h>
 #include "UnkFormScorer.h"
-#include "sais/fm_index.hpp"
+#include "SubstringCounter.hpp"
 
 using namespace std;
 using namespace kiwi;
 
 UnkFormScorer::UnkFormScorer(float scale, float bias,
 	const lm::CoNgramModelBase* _chrModel, float _chrBias,
-	const sais::FmIndex<char16_t>* _fmIndex,
+	const SubstringCounter* _substringCounter,
 	float _globalWeight,
 	float _localWeight,
 	float _globalMinFreq,
 	bool _useChrFreqBranchModel)
-	: chrModel{ _chrModel }, fmIndex{ _fmIndex }, 
-	oovRuleScale{ scale }, oovRuleBias{ bias }, 
+	: chrModel{ _chrModel }, substringCounter{ _substringCounter },
+	oovRuleScale{ scale }, oovRuleBias{ bias },
 	chrBias{ _chrBias },
 	globalWeight{ _globalWeight }, localWeight{ _localWeight },
 	globalMinFreq{ _globalMinFreq },
@@ -73,7 +73,7 @@ float UnkFormScorer::chrFreqBasedScore(const U16StringView& form) const
 	ChrTokenizer tokenizer;
 	float score = 0;
 
-	pair<size_t, size_t> fmRange;
+	uint32_t rollingHash = 0;
 	for (size_t i = 0; i < form.size(); ++i)
 	{
 		const auto c = form[i];
@@ -84,17 +84,18 @@ float UnkFormScorer::chrFreqBasedScore(const U16StringView& form) const
 		const float lprob = chrModel->progressOneStep(nodeIdx, contextIdx, token);
 		if (i == 0)
 		{
-			fmRange = fmIndex->initRange(c);
+			rollingHash = SubstringCounter::initHash(c);
 			score += lprob;
 		}
 		else
 		{
-			const float localContextFreq = fmRange.second - fmRange.first - 1;
-			fmRange = fmIndex->nextRange(fmRange, c);
+			const float localContextFreq = (float)substringCounter->count(rollingHash, form.data(), i) - 1;
+			rollingHash = SubstringCounter::extendHash(rollingHash, c);
 			if (localContextFreq > 0)
 			{
+				const float curFreq = (float)substringCounter->count(rollingHash, form.data(), i + 1) - 1;
 				const float localContextFreqSat = tanhf(localContextFreq / localWeight) * localWeight;
-				const float localFreq = (float)(fmRange.second - fmRange.first - 1) * (localContextFreqSat / localContextFreq);
+				const float localFreq = curFreq * (localContextFreqSat / localContextFreq);
 				const float globalFreq = globalContextFreqSat * expf(lprob);
 				const float mixedProb = logf((localFreq + globalFreq) / (localContextFreqSat + globalContextFreqSat));
 				score += mixedProb;
@@ -118,8 +119,9 @@ float UnkFormScorer::chrFreqBranchBasedScore(const U16StringView& form) const
 	ChrTokenizer tokenizer;
 	float score = 0;
 
+	array<char16_t, 33> buf;
 	Vector<pair<char16_t, float>> nextChrs;
-	pair<size_t, size_t> fmRange;
+	uint32_t rollingHash = 0;
 	for (size_t i = 0; i < form.size(); ++i)
 	{
 		const auto c = form[i];
@@ -131,27 +133,44 @@ float UnkFormScorer::chrFreqBranchBasedScore(const U16StringView& form) const
 		const float branchEntropy = chrModel->getContextEntropy(contextIdx);
 		if (i == 0)
 		{
-			fmRange = fmIndex->initRange(c);
+			rollingHash = SubstringCounter::initHash(c);
+			// enumerate next characters
+			buf[0] = c;
 			nextChrs.clear();
-			fmIndex->enumNextChr(fmRange, [&](char16_t nextChr, size_t cnt)
+			for (char16_t nextChr : substringCounter->getUniqueChars())
 			{
-				nextChrs.emplace_back(nextChr, (float)cnt);
-			});
+				buf[1] = nextChr;
+				auto h = SubstringCounter::extendHash(rollingHash, nextChr);
+				auto cnt = substringCounter->count(h, buf.data(), 2);
+				if (cnt > 0)
+				{
+					nextChrs.emplace_back(nextChr, (float)cnt);
+				}
+			}
 			score += lprob;
 		}
 		else
 		{
-			const float localContextFreq = fmRange.second - fmRange.first - 1;
-			fmRange = fmIndex->nextRange(fmRange, c);
+			const float localContextFreq = (float)substringCounter->count(rollingHash, form.data(), i) - 1;
+			rollingHash = SubstringCounter::extendHash(rollingHash, c);
 			if (localContextFreq > 0)
 			{
+				// enumerate next characters
+				memcpy(buf.data(), form.data(), (i + 1) * sizeof(char16_t));
 				nextChrs.clear();
-				fmIndex->enumNextChr(fmRange, [&](char16_t nextChr, size_t cnt)
+				for (char16_t nextChr : substringCounter->getUniqueChars())
 				{
-					nextChrs.emplace_back(nextChr, (float)cnt);
-				});
+					buf[i + 1] = nextChr;
+					auto h = SubstringCounter::extendHash(rollingHash, nextChr);
+					auto cnt = substringCounter->count(h, buf.data(), i + 2);
+					if (cnt > 0)
+					{
+						nextChrs.emplace_back(nextChr, (float)cnt);
+					}
+				}
+				const float curFreq = (float)substringCounter->count(rollingHash, form.data(), i + 1) - 1;
 				const float localContextFreqSat = tanhf(localContextFreq / localWeight) * localWeight;
-				const float localFreq = (float)(fmRange.second - fmRange.first - 1) * (localContextFreqSat / localContextFreq);
+				const float localFreq = curFreq * (localContextFreqSat / localContextFreq);
 				const float globalFreq = globalContextFreqSat * expf(lprob);
 				const float mixedProb = logf((localFreq + globalFreq) / (localContextFreqSat + globalContextFreqSat));
 				score += mixedProb;

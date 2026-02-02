@@ -1,18 +1,14 @@
 #pragma once
 #include <kiwi/CoNgramModel.h>
 
-namespace sais
-{
-	template<typename T>
-	class FmIndex;
-}
-
 namespace kiwi
 {
+	class SubstringCounter;
+
 	class UnkFormScorer
 	{
 		const lm::CoNgramModelBase* chrModel = nullptr;
-		const sais::FmIndex<char16_t>* fmIndex = nullptr;
+		const SubstringCounter* substringCounter = nullptr;
 		float oovRuleScale = 0;
 		float oovRuleBias = 0;
 		float chrBias = 0;
@@ -26,7 +22,7 @@ namespace kiwi
 	public:
 		UnkFormScorer(float scale, float bias,
 			const lm::CoNgramModelBase* _chrModel, float _chrBias,
-			const sais::FmIndex<char16_t>* _fmIndex,
+			const SubstringCounter* _substringCounter,
 			float _globalWeight = 60.f,
 			float _localWeight = 3.f,
 			float _globalMinFreq = 4.f,
@@ -42,7 +38,7 @@ namespace kiwi
 
 		float operator()(const U16StringView& form) const
 		{
-			if (chrModel && fmIndex)
+			if (chrModel && substringCounter)
 			{
 				if (useChrFreqBranchModel)
 				{

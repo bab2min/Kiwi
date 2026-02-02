@@ -1184,7 +1184,7 @@ namespace kiwi
 		const std::unordered_set<const Morpheme*>* blocklist,
 		Dialect allowedDialects,
 		float dialectCost,
-		const sais::FmIndex<char16_t>* fmIndex
+		const SubstringCounter* substringCounter
 	)
 	{
 		static constexpr size_t eosId = 1;
@@ -1237,7 +1237,7 @@ namespace kiwi
 			config.oovRuleBias,
 			oovScoringType >= (size_t)Match::oovChrModel ? kw->nounChrMdl.get() : nullptr, 
 			config.oovChrBias,
-			fmIndex,
+			substringCounter,
 			config.oovGlobalWeight,
 			config.oovLocalWeight,
 			config.oovGlobalMinFreq,

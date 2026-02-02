@@ -105,7 +105,7 @@ namespace kiwi
 			const std::unordered_set<const Morpheme*>* blocklist = nullptr,
 			Dialect allowedDialects = Dialect::standard,
 			float dialectCost = 0.f,
-			const sais::FmIndex<char16_t>* fmIndex = nullptr
+			const SubstringCounter* substringCounter = nullptr
 		);
 	};
 

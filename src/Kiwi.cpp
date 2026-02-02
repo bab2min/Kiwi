@@ -15,7 +15,7 @@
 #include "Joiner.hpp"
 #include "PathEvaluator.hpp"
 #include "Kiwi.hpp"
-#include "sais/fm_index.hpp"
+#include "SubstringCounter.hpp"
 
 using namespace std;
 
@@ -1039,16 +1039,15 @@ namespace kiwi
 		wordPositions.clear();
 		getWordPositions(wordPositions, str.begin(), str.end());
 		
-		sais::FmIndex<char16_t> fmIndex;
+		SubstringCounter substringCounter;
 		if ((option.match & Match::oovMask) >= Match::oovChrFreqModel)
 		{
-			thread_local Vector<char16_t> reversedStr;
-			reversedStr.clear();
-			reversedStr.reserve(normalizedStr.size() + 1);
-			reversedStr.push_back(0); // sentinel
-			for (auto it = normalizedStr.rbegin(); it != normalizedStr.rend(); ++it)
+			thread_local Vector<char16_t> filteredStr;
+			filteredStr.clear();
+			filteredStr.reserve(normalizedStr.size());
+			for (size_t i = 0; i < normalizedStr.size(); ++i)
 			{
-				auto c = *it;
+				auto c = normalizedStr[i];
 				const POSTag chrType = identifySpecialChr(c);
 				switch (chrType)
 				{
@@ -1065,9 +1064,9 @@ namespace kiwi
 					c = u' ';
 					break;
 				}
-				reversedStr.emplace_back(c);
+				filteredStr.emplace_back(c);
 			}
-			fmIndex = sais::FmIndex<char16_t>{ reversedStr.data(), reversedStr.size() };
+			substringCounter = SubstringCounter{ filteredStr.data(), filteredStr.size() };
 		}
 
 		vector<TokenResult> ret;
@@ -1117,7 +1116,7 @@ namespace kiwi
 				option.blocklist,
 				option.allowedDialects,
 				option.dialectCost,
-				(option.match & Match::oovMask) >= Match::oovChrFreqModel ? &fmIndex : nullptr
+				(option.match & Match::oovMask) >= Match::oovChrFreqModel ? &substringCounter : nullptr
 			);
 			insertPathIntoResults(ret, spStatesByRet, res, topN, option.match, config.integrateAllomorph, positionTable, wordPositions, pretokenizedGroup, nodeInWhichPretokenized);
 		}
