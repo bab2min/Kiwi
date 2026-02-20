@@ -158,6 +158,12 @@ Android NDK를 통해 Android 앱에서 사용할 수 있는 AAR 라이브러리
 ### Web Assembly (Javascript/Typescript)
 [RicBent](https://github.com/RicBent)님께서 기여해주신 Web Assembly binding이 있습니다. 이에 대해서는 [bindings/wasm](bindings/wasm)를 참조하시길 바랍니다.
 
+### Rust Wrapper
+[JAICHANGPARK](https://github.com/JAICHANGPARK)님께서 개발하신 Rust용 wrapper인 [kiwi-rs](https://github.com/JAICHANGPARK/kiwi-rs)가 있습니다.
+
+### Flutter Wrapper
+[JAICHANGPARK](https://github.com/JAICHANGPARK)님께서 개발하신 Rust용 wrapper인 [flutter_kiwi_nlp](https://github.com/JAICHANGPARK/flutter_kiwi_nlp)가 있습니다. 
+
 ### 응용 프로그램
 Kiwi는 C# 기반의 GUI 형태로도 제공됩니다.
 형태소 분석기는 사용해야하지만 별도의 프로그래밍 지식이 없는 경우 이 프로그램을 사용하시면 됩니다.
