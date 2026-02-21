@@ -87,6 +87,11 @@
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv4N19PhonyNameDueToError18KIWI_MATCH_HASHTAGE"><code class="docutils literal notranslate"><span class="pre">KIWI_MATCH_HASHTAG</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv4N19PhonyNameDueToError18KIWI_MATCH_MENTIONE"><code class="docutils literal notranslate"><span class="pre">KIWI_MATCH_MENTION</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv4N19PhonyNameDueToError17KIWI_MATCH_SERIALE"><code class="docutils literal notranslate"><span class="pre">KIWI_MATCH_SERIAL</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv4N19PhonyNameDueToError24KIWI_MATCH_OOV_RULE_ONLYE"><code class="docutils literal notranslate"><span class="pre">KIWI_MATCH_OOV_RULE_ONLY</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv4N19PhonyNameDueToError24KIWI_MATCH_OOV_CHR_MODELE"><code class="docutils literal notranslate"><span class="pre">KIWI_MATCH_OOV_CHR_MODEL</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv4N19PhonyNameDueToError29KIWI_MATCH_OOV_CHR_FREQ_MODELE"><code class="docutils literal notranslate"><span class="pre">KIWI_MATCH_OOV_CHR_FREQ_MODEL</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv4N19PhonyNameDueToError36KIWI_MATCH_OOV_CHR_FREQ_BRANCH_MODELE"><code class="docutils literal notranslate"><span class="pre">KIWI_MATCH_OOV_CHR_FREQ_BRANCH_MODEL</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv4N19PhonyNameDueToError19KIWI_MATCH_OOV_MASKE"><code class="docutils literal notranslate"><span class="pre">KIWI_MATCH_OOV_MASK</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv4N19PhonyNameDueToError25KIWI_MATCH_NORMALIZE_CODAE"><code class="docutils literal notranslate"><span class="pre">KIWI_MATCH_NORMALIZE_CODA</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv4N19PhonyNameDueToError27KIWI_MATCH_JOIN_NOUN_PREFIXE"><code class="docutils literal notranslate"><span class="pre">KIWI_MATCH_JOIN_NOUN_PREFIX</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv4N19PhonyNameDueToError27KIWI_MATCH_JOIN_NOUN_SUFFIXE"><code class="docutils literal notranslate"><span class="pre">KIWI_MATCH_JOIN_NOUN_SUFFIX</span></code></a></li>
@@ -250,11 +255,16 @@
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv413kiwi_config_t"><code class="docutils literal notranslate"><span class="pre">kiwi_config_t</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N13kiwi_config_t19integrate_allomorphE"><code class="docutils literal notranslate"><span class="pre">integrate_allomorph</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N13kiwi_config_t17cut_off_thresholdE"><code class="docutils literal notranslate"><span class="pre">cut_off_threshold</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N13kiwi_config_t20unk_form_score_scaleE"><code class="docutils literal notranslate"><span class="pre">unk_form_score_scale</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N13kiwi_config_t19unk_form_score_biasE"><code class="docutils literal notranslate"><span class="pre">unk_form_score_bias</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N13kiwi_config_t14oov_rule_scaleE"><code class="docutils literal notranslate"><span class="pre">oov_rule_scale</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N13kiwi_config_t13oov_rule_biasE"><code class="docutils literal notranslate"><span class="pre">oov_rule_bias</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N13kiwi_config_t12oov_chr_biasE"><code class="docutils literal notranslate"><span class="pre">oov_chr_bias</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N13kiwi_config_t17oov_global_weightE"><code class="docutils literal notranslate"><span class="pre">oov_global_weight</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N13kiwi_config_t16oov_local_weightE"><code class="docutils literal notranslate"><span class="pre">oov_local_weight</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N13kiwi_config_t19oov_global_min_freqE"><code class="docutils literal notranslate"><span class="pre">oov_global_min_freq</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N13kiwi_config_t13space_penaltyE"><code class="docutils literal notranslate"><span class="pre">space_penalty</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N13kiwi_config_t16typo_cost_weightE"><code class="docutils literal notranslate"><span class="pre">typo_cost_weight</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N13kiwi_config_t17max_unk_form_sizeE"><code class="docutils literal notranslate"><span class="pre">max_unk_form_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N13kiwi_config_t37max_unk_form_size_followed_by_j_classE"><code class="docutils literal notranslate"><span class="pre">max_unk_form_size_followed_by_j_class</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N13kiwi_config_t15space_toleranceE"><code class="docutils literal notranslate"><span class="pre">space_tolerance</span></code></a></li>
 </ul>
 </li>
@@ -608,6 +618,31 @@
 <dl class="cpp enumerator">
 <dt class="sig sig-object cpp" id="_CPPv4N19PhonyNameDueToError17KIWI_MATCH_SERIALE">
 <span id="_CPPv3N19PhonyNameDueToError17KIWI_MATCH_SERIALE"></span><span id="_CPPv2N19PhonyNameDueToError17KIWI_MATCH_SERIALE"></span><span class="target" id="capi_8h_1a99fb83031ce9923c84392b4e92f956b5ab2df261f2833254175658b0122621af4"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">KIWI_MATCH_SERIAL</span></span></span><a class="headerlink" href="#_CPPv4N19PhonyNameDueToError17KIWI_MATCH_SERIALE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N19PhonyNameDueToError24KIWI_MATCH_OOV_RULE_ONLYE">
+<span id="_CPPv3N19PhonyNameDueToError24KIWI_MATCH_OOV_RULE_ONLYE"></span><span id="_CPPv2N19PhonyNameDueToError24KIWI_MATCH_OOV_RULE_ONLYE"></span><span class="target" id="capi_8h_1a99fb83031ce9923c84392b4e92f956b5aa90d3eb5a8729d185b15240b150277f8"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">KIWI_MATCH_OOV_RULE_ONLY</span></span></span><a class="headerlink" href="#_CPPv4N19PhonyNameDueToError24KIWI_MATCH_OOV_RULE_ONLYE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N19PhonyNameDueToError24KIWI_MATCH_OOV_CHR_MODELE">
+<span id="_CPPv3N19PhonyNameDueToError24KIWI_MATCH_OOV_CHR_MODELE"></span><span id="_CPPv2N19PhonyNameDueToError24KIWI_MATCH_OOV_CHR_MODELE"></span><span class="target" id="capi_8h_1a99fb83031ce9923c84392b4e92f956b5aece82b383ad45d862d90e14dda2c526f"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">KIWI_MATCH_OOV_CHR_MODEL</span></span></span><a class="headerlink" href="#_CPPv4N19PhonyNameDueToError24KIWI_MATCH_OOV_CHR_MODELE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N19PhonyNameDueToError29KIWI_MATCH_OOV_CHR_FREQ_MODELE">
+<span id="_CPPv3N19PhonyNameDueToError29KIWI_MATCH_OOV_CHR_FREQ_MODELE"></span><span id="_CPPv2N19PhonyNameDueToError29KIWI_MATCH_OOV_CHR_FREQ_MODELE"></span><span class="target" id="capi_8h_1a99fb83031ce9923c84392b4e92f956b5aea30e8ef6387ea2bd9941b9a09b7f9c6"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">KIWI_MATCH_OOV_CHR_FREQ_MODEL</span></span></span><a class="headerlink" href="#_CPPv4N19PhonyNameDueToError29KIWI_MATCH_OOV_CHR_FREQ_MODELE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N19PhonyNameDueToError36KIWI_MATCH_OOV_CHR_FREQ_BRANCH_MODELE">
+<span id="_CPPv3N19PhonyNameDueToError36KIWI_MATCH_OOV_CHR_FREQ_BRANCH_MODELE"></span><span id="_CPPv2N19PhonyNameDueToError36KIWI_MATCH_OOV_CHR_FREQ_BRANCH_MODELE"></span><span class="target" id="capi_8h_1a99fb83031ce9923c84392b4e92f956b5ad14ec56eb7b04f813b7aecac3c17d030"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">KIWI_MATCH_OOV_CHR_FREQ_BRANCH_MODEL</span></span></span><a class="headerlink" href="#_CPPv4N19PhonyNameDueToError36KIWI_MATCH_OOV_CHR_FREQ_BRANCH_MODELE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N19PhonyNameDueToError19KIWI_MATCH_OOV_MASKE">
+<span id="_CPPv3N19PhonyNameDueToError19KIWI_MATCH_OOV_MASKE"></span><span id="_CPPv2N19PhonyNameDueToError19KIWI_MATCH_OOV_MASKE"></span><span class="target" id="capi_8h_1a99fb83031ce9923c84392b4e92f956b5a1edaf06ea797b797585ba200c00743ad"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">KIWI_MATCH_OOV_MASK</span></span></span><a class="headerlink" href="#_CPPv4N19PhonyNameDueToError19KIWI_MATCH_OOV_MASKE" title="Link to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp enumerator">
@@ -2817,15 +2852,39 @@
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N13kiwi_config_t20unk_form_score_scaleE">
-<span id="_CPPv3N13kiwi_config_t20unk_form_score_scaleE"></span><span id="_CPPv2N13kiwi_config_t20unk_form_score_scaleE"></span><span id="kiwi_config_t::unk_form_score_scale__float"></span><span class="target" id="structkiwi__config__t_1a0ea83b001876361dcf7bff4290e3caf7"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">unk_form_score_scale</span></span></span><a class="headerlink" href="#_CPPv4N13kiwi_config_t20unk_form_score_scaleE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N13kiwi_config_t14oov_rule_scaleE">
+<span id="_CPPv3N13kiwi_config_t14oov_rule_scaleE"></span><span id="_CPPv2N13kiwi_config_t14oov_rule_scaleE"></span><span id="kiwi_config_t::oov_rule_scale__float"></span><span class="target" id="structkiwi__config__t_1a0406e3b8444093dae09f0f033de19f92"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">oov_rule_scale</span></span></span><a class="headerlink" href="#_CPPv4N13kiwi_config_t14oov_rule_scaleE" title="Link to this definition"></a><br /></dt>
 <dd><p>미등재 형태 추출 시 사용하는 기울기 값 </p>
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N13kiwi_config_t19unk_form_score_biasE">
-<span id="_CPPv3N13kiwi_config_t19unk_form_score_biasE"></span><span id="_CPPv2N13kiwi_config_t19unk_form_score_biasE"></span><span id="kiwi_config_t::unk_form_score_bias__float"></span><span class="target" id="structkiwi__config__t_1af2614b86d398407832969c3b5c1bdeab"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">unk_form_score_bias</span></span></span><a class="headerlink" href="#_CPPv4N13kiwi_config_t19unk_form_score_biasE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N13kiwi_config_t13oov_rule_biasE">
+<span id="_CPPv3N13kiwi_config_t13oov_rule_biasE"></span><span id="_CPPv2N13kiwi_config_t13oov_rule_biasE"></span><span id="kiwi_config_t::oov_rule_bias__float"></span><span class="target" id="structkiwi__config__t_1a09379e359cbe1da5aa0218c9473dc990"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">oov_rule_bias</span></span></span><a class="headerlink" href="#_CPPv4N13kiwi_config_t13oov_rule_biasE" title="Link to this definition"></a><br /></dt>
 <dd><p>미등재 형태 추출 시 사용하는 편향 값 </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13kiwi_config_t12oov_chr_biasE">
+<span id="_CPPv3N13kiwi_config_t12oov_chr_biasE"></span><span id="_CPPv2N13kiwi_config_t12oov_chr_biasE"></span><span id="kiwi_config_t::oov_chr_bias__float"></span><span class="target" id="structkiwi__config__t_1a94d57e0517dd738758229d98b87ecf05"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">oov_chr_bias</span></span></span><a class="headerlink" href="#_CPPv4N13kiwi_config_t12oov_chr_biasE" title="Link to this definition"></a><br /></dt>
+<dd><p>미등재 형태 추출 시 사용하는 문자 기반 점수의 편향 값 </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13kiwi_config_t17oov_global_weightE">
+<span id="_CPPv3N13kiwi_config_t17oov_global_weightE"></span><span id="_CPPv2N13kiwi_config_t17oov_global_weightE"></span><span id="kiwi_config_t::oov_global_weight__float"></span><span class="target" id="structkiwi__config__t_1abe61ea65918cad405c254c1c5aadc8f5"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">oov_global_weight</span></span></span><a class="headerlink" href="#_CPPv4N13kiwi_config_t17oov_global_weightE" title="Link to this definition"></a><br /></dt>
+<dd><p>미등재 형태 추출 시 사용하는 전역 빈도 가중치 </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13kiwi_config_t16oov_local_weightE">
+<span id="_CPPv3N13kiwi_config_t16oov_local_weightE"></span><span id="_CPPv2N13kiwi_config_t16oov_local_weightE"></span><span id="kiwi_config_t::oov_local_weight__float"></span><span class="target" id="structkiwi__config__t_1a9982c5bd503796502c23d5242adbe18e"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">oov_local_weight</span></span></span><a class="headerlink" href="#_CPPv4N13kiwi_config_t16oov_local_weightE" title="Link to this definition"></a><br /></dt>
+<dd><p>미등재 형태 추출 시 사용하는 국부 빈도 가중치 </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13kiwi_config_t19oov_global_min_freqE">
+<span id="_CPPv3N13kiwi_config_t19oov_global_min_freqE"></span><span id="_CPPv2N13kiwi_config_t19oov_global_min_freqE"></span><span id="kiwi_config_t::oov_global_min_freq__float"></span><span class="target" id="structkiwi__config__t_1ad7bf85db6dd2af78e54770570299d9f2"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">oov_global_min_freq</span></span></span><a class="headerlink" href="#_CPPv4N13kiwi_config_t19oov_global_min_freqE" title="Link to this definition"></a><br /></dt>
+<dd><p>미등재 형태 추출 시 사용하는 전역 최소 빈도 </p>
 </dd></dl>
 
 <dl class="cpp var">
@@ -2844,6 +2903,12 @@
 <dt class="sig sig-object cpp" id="_CPPv4N13kiwi_config_t17max_unk_form_sizeE">
 <span id="_CPPv3N13kiwi_config_t17max_unk_form_sizeE"></span><span id="_CPPv2N13kiwi_config_t17max_unk_form_sizeE"></span><span id="kiwi_config_t::max_unk_form_size__uint32_t"></span><span class="target" id="structkiwi__config__t_1a446253936b9fe0c526eede46fc5feecd"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">max_unk_form_size</span></span></span><a class="headerlink" href="#_CPPv4N13kiwi_config_t17max_unk_form_sizeE" title="Link to this definition"></a><br /></dt>
 <dd><p>미등재 형태의 최대 크기 </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13kiwi_config_t37max_unk_form_size_followed_by_j_classE">
+<span id="_CPPv3N13kiwi_config_t37max_unk_form_size_followed_by_j_classE"></span><span id="_CPPv2N13kiwi_config_t37max_unk_form_size_followed_by_j_classE"></span><span id="kiwi_config_t::max_unk_form_size_followed_by_j_class__uint32_t"></span><span class="target" id="structkiwi__config__t_1a060ab46c293b6df3eb9e9e1a775ebb41"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">max_unk_form_size_followed_by_j_class</span></span></span><a class="headerlink" href="#_CPPv4N13kiwi_config_t37max_unk_form_size_followed_by_j_classE" title="Link to this definition"></a><br /></dt>
+<dd><p>(조사가 뒤따르는 경우) 미등재 형태의 최대 크기 </p>
 </dd></dl>
 
 <dl class="cpp var">

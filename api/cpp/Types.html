@@ -1152,6 +1152,11 @@
 <span id="_CPPv3NK4kiwi9TokenInfo6endPosEv"></span><span id="_CPPv2NK4kiwi9TokenInfo6endPosEv"></span><span id="kiwi::TokenInfo::endPosC"></span><span class="target" id="structkiwi_1_1TokenInfo_1aaffb271fb8b23d7dbcccf7ccba023c70"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">endPos</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4kiwi9TokenInfo6endPosEv" title="Link to this definition"></a><br /></dt>
 <dd></dd></dl>
 
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4kiwi9TokenInfo5isOOVEv">
+<span id="_CPPv3NK4kiwi9TokenInfo5isOOVEv"></span><span id="_CPPv2NK4kiwi9TokenInfo5isOOVEv"></span><span id="kiwi::TokenInfo::isOOVC"></span><span class="target" id="structkiwi_1_1TokenInfo_1a81b5b3d8cf0c24cf2b8a38ccba20686b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">isOOV</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4kiwi9TokenInfo5isOOVEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
 </div>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
@@ -1200,7 +1205,7 @@
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N4kiwi9TokenInfo7senseIdE">
 <span id="_CPPv3N4kiwi9TokenInfo7senseIdE"></span><span id="_CPPv2N4kiwi9TokenInfo7senseIdE"></span><span id="kiwi::TokenInfo::senseId__uint8_t"></span><span class="target" id="structkiwi_1_1TokenInfo_1ab7e062c457af1a22400689cdcfb66f72"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">senseId</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N4kiwi9TokenInfo7senseIdE" title="Link to this definition"></a><br /></dt>
-<dd><p>의미 번호 </p>
+<dd><p>의미 번호 (OOV인 경우 -1) </p>
 </dd></dl>
 
 <dl class="cpp var">
@@ -1211,7 +1216,7 @@
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp">
-<span class="target" id="structkiwi_1_1TokenInfo_1acac2e2c9223da00d3ff4a53661c06cb8"></span><span class="sig-name descname"><span class="pre">union</span> <span class="pre">kiwi::TokenInfo</span></span></dt>
+<span class="target" id="structkiwi_1_1TokenInfo_1aedf1e5b47b7a71416172fee8023d96d3"></span><span class="sig-name descname"><span class="pre">union</span> <span class="pre">kiwi::TokenInfo</span></span></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
@@ -1253,7 +1258,7 @@
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N4kiwi9TokenInfo5morphE">
 <span id="_CPPv3N4kiwi9TokenInfo5morphE"></span><span id="_CPPv2N4kiwi9TokenInfo5morphE"></span><span id="kiwi::TokenInfo::morph__MorphemeCP"></span><span class="target" id="structkiwi_1_1TokenInfo_1a8036684b6884ddf24d5f013d36cb6b0a"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="Form.html#_CPPv4N4kiwi8MorphemeE" title="kiwi::Morpheme"><span class="n"><span class="pre">Morpheme</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">morph</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><a class="headerlink" href="#_CPPv4N4kiwi9TokenInfo5morphE" title="Link to this definition"></a><br /></dt>
-<dd><p>기타 형태소 정보에 대한 포인터 (OOV인 경우 nullptr) </p>
+<dd><p>기타 형태소 정보에 대한 포인터 </p>
 </dd></dl>
 
 </div>

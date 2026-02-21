@@ -123,9 +123,21 @@ virtual size_t&#160;</td><td class="memItemRight" valign="bottom"><b>predictWord
 <tr class="memitem:a54329f21eb49c12bb3e1ff28eefd5aec" id="r_a54329f21eb49c12bb3e1ff28eefd5aec"><td class="memItemLeft" align="right" valign="top"><a id="a54329f21eb49c12bb3e1ff28eefd5aec" name="a54329f21eb49c12bb3e1ff28eefd5aec"></a>
 virtual uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>toContextId</b> (const uint32_t *vocabIds, size_t size) const =0</td></tr>
 <tr class="separator:a54329f21eb49c12bb3e1ff28eefd5aec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aed50978c88396c3de1d44619010f1dca" id="r_aed50978c88396c3de1d44619010f1dca"><td class="memItemLeft" align="right" valign="top"><a id="aed50978c88396c3de1d44619010f1dca" name="aed50978c88396c3de1d44619010f1dca"></a>
+virtual float&#160;</td><td class="memItemRight" valign="bottom"><b>getContextFrequency</b> (uint32_t contextId) const =0</td></tr>
+<tr class="separator:aed50978c88396c3de1d44619010f1dca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1e25dcfbda02988750f7cf2d196ee89a" id="r_a1e25dcfbda02988750f7cf2d196ee89a"><td class="memItemLeft" align="right" valign="top"><a id="a1e25dcfbda02988750f7cf2d196ee89a" name="a1e25dcfbda02988750f7cf2d196ee89a"></a>
+virtual float&#160;</td><td class="memItemRight" valign="bottom"><b>getContextEntropy</b> (uint32_t contextId) const =0</td></tr>
+<tr class="separator:a1e25dcfbda02988750f7cf2d196ee89a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a358378ca5333de825526d3e80913deda" id="r_a358378ca5333de825526d3e80913deda"><td class="memItemLeft" align="right" valign="top"><a id="a358378ca5333de825526d3e80913deda" name="a358378ca5333de825526d3e80913deda"></a>
+virtual size_t&#160;</td><td class="memItemRight" valign="bottom"><b>getNodeDepth</b> (uint32_t nodeId) const =0</td></tr>
+<tr class="separator:a358378ca5333de825526d3e80913deda"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac10702cb7e99caa1b662774b44e340dc" id="r_ac10702cb7e99caa1b662774b44e340dc"><td class="memItemLeft" align="right" valign="top"><a id="ac10702cb7e99caa1b662774b44e340dc" name="ac10702cb7e99caa1b662774b44e340dc"></a>
 virtual std::vector&lt; std::vector&lt; uint32_t &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getContextWordMap</b> () const =0</td></tr>
 <tr class="separator:ac10702cb7e99caa1b662774b44e340dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8409fa10703434c7148228fd5c0c5ee6" id="r_a8409fa10703434c7148228fd5c0c5ee6"><td class="memItemLeft" align="right" valign="top"><a id="a8409fa10703434c7148228fd5c0c5ee6" name="a8409fa10703434c7148228fd5c0c5ee6"></a>
+virtual float&#160;</td><td class="memItemRight" valign="bottom"><b>progressOneStep</b> (int32_t &amp;nodeIdx, uint32_t &amp;contextIdx, uint32_t next) const =0</td></tr>
+<tr class="separator:a8409fa10703434c7148228fd5c0c5ee6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8a3f5ba0dd9fbc0f692626d09b640b05" id="r_a8a3f5ba0dd9fbc0f692626d09b640b05"><td class="memItemLeft" align="right" valign="top"><a id="a8a3f5ba0dd9fbc0f692626d09b640b05" name="a8a3f5ba0dd9fbc0f692626d09b640b05"></a>
 const std::vector&lt; std::vector&lt; uint32_t &gt; &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>getContextWordMapCached</b> () const</td></tr>
 <tr class="separator:a8a3f5ba0dd9fbc0f692626d09b640b05"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -145,6 +157,9 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a79b1a577204c888bb87ada8515dacabc" id="r_a79b1a577204c888bb87ada8515dacabc"><td class="memItemLeft" align="right" valign="top"><a id="a79b1a577204c888bb87ada8515dacabc" name="a79b1a577204c888bb87ada8515dacabc"></a>
 static <a class="el" href="classkiwi_1_1utils_1_1MemoryObject.html">utils::MemoryObject</a>&#160;</td><td class="memItemRight" valign="bottom"><b>build</b> (const std::string &amp;contextDefinition, const std::string &amp;embedding, size_t maxContextLength=-1, bool useVLE=true, bool reorderContextIdx=true, const std::vector&lt; size_t &gt; *selectedEmbIdx=nullptr)</td></tr>
 <tr class="separator:a79b1a577204c888bb87ada8515dacabc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb4577f54d6543df00b9ae1159a83e0b" id="r_adb4577f54d6543df00b9ae1159a83e0b"><td class="memItemLeft" align="right" valign="top"><a id="adb4577f54d6543df00b9ae1159a83e0b" name="adb4577f54d6543df00b9ae1159a83e0b"></a>
+static <a class="el" href="classkiwi_1_1utils_1_1MemoryObject.html">utils::MemoryObject</a>&#160;</td><td class="memItemRight" valign="bottom"><b>buildChrModel</b> (const std::string &amp;contextDefinition, const std::string &amp;embedding, size_t maxContextLength=-1, bool reorderContextIdx=true, bool eraseRedundantContexts=false)</td></tr>
+<tr class="separator:adb4577f54d6543df00b9ae1159a83e0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a194d627e304644b700532ef62347804a" id="r_a194d627e304644b700532ef62347804a"><td class="memItemLeft" align="right" valign="top"><a id="a194d627e304644b700532ef62347804a" name="a194d627e304644b700532ef62347804a"></a>
 static std::unique_ptr&lt; <a class="el" href="classkiwi_1_1lm_1_1CoNgramModelBase.html">CoNgramModelBase</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>create</b> (<a class="el" href="classkiwi_1_1utils_1_1MemoryObject.html">utils::MemoryObject</a> &amp;&amp;mem, ArchType archType=ArchType::none, bool useDistantTokens=false, bool quantized=true)</td></tr>
 <tr class="separator:a194d627e304644b700532ef62347804a"><td class="memSeparator" colspan="2">&#160;</td></tr>

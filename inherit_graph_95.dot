@@ -5,5 +5,5 @@ digraph "Graphical Class Hierarchy"
   edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
   node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
   rankdir="LR";
-  Node0 [id="Node000000",label="kiwi::TypoIterator\l\< u16wrap \>::RetType",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$structkiwi_1_1TypoIterator_1_1RetType.html",tooltip=" "];
+  Node0 [id="Node000000",label="kiwi::TypoCandidates\l\< u16wrap \>",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$classkiwi_1_1TypoCandidates.html",tooltip=" "];
 }
