@@ -5,6 +5,7 @@
 #include <kiwi/TemplateUtils.hpp>
 #include <kiwi/Form.h>
 #include <kiwi/LangModel.h>
+#include <kiwi/Dataset.h>
 #include "ArchAvailable.h"
 #include "KTrie.h"
 #include "FeatureTestor.h"
@@ -12,6 +13,7 @@
 #include "StrUtils.h"
 #include "SortUtils.hpp"
 #include "LimitedVector.hpp"
+#include "UnkFormScorer.h"
 #include "PathEvaluator.h"
 #include "BestPathContainer.hpp"
 
@@ -258,7 +260,7 @@ namespace kiwi
 			if (prevPath.ownFormId)
 			{
 				leftFormFirst = ownFormList[prevPath.ownFormId - 1].data();
-				leftFormLast = leftFormFirst + ownFormList[0].size();
+				leftFormLast = leftFormFirst + ownFormList[prevPath.ownFormId - 1].size();
 			}
 			else if (morphBase[prevPath.wid].kform && !morphBase[prevPath.wid].kform->empty())
 			{
@@ -1147,41 +1149,6 @@ namespace kiwi
 		return ret;
 	}
 
-	struct UnkFormScorer
-	{
-		float unkFormScoreScale;
-		float unkFormScoreBias;
-		UnkFormScorer(float scale, float bias)
-			: unkFormScoreScale{ scale }, unkFormScoreBias{ bias }
-		{
-		}
-
-		float operator()(const U16StringView& form) const
-		{
-			float penalty = 0;
-			if (form.size() > 0)
-			{
-				char32_t chrs[2] = { 0,0 };
-				for (size_t i = 0, j = 0; i < form.size() && j < 2; ++j)
-				{ 
-					if (isHighSurrogate(form[i]))
-					{
-						chrs[j] = mergeSurrogate(form[i], form[i + 1]);
-						i += 2;
-					}
-					else
-					{
-						chrs[j] = form[i];
-						++i;
-					}
-				}
-				if (isEmoji(chrs[0], chrs[1])) penalty = -10;
-			}
-
-			return penalty - (form.size() * unkFormScoreScale + unkFormScoreBias);
-		}
-	};
-
 	inline bool isDisconnected(const KGraphNode* graph, size_t graphSize, Vector<uint8_t>& reachable, size_t scanStart)
 	{
 		if (reachable[scanStart - 1]) return false;
@@ -1209,13 +1176,15 @@ namespace kiwi
 		const KGraphNode* graph,
 		const size_t graphSize,
 		const size_t topN,
+		const size_t oovScoringType,
 		bool openEnding,
 		bool splitComplex,
 		bool splitSaisiot,
 		bool mergeSaisiot,
 		const std::unordered_set<const Morpheme*>* blocklist,
 		Dialect allowedDialects,
-		float dialectCost
+		float dialectCost,
+		const SubstringCounter* substringCounter
 	)
 	{
 		static constexpr size_t eosId = 1;
@@ -1263,7 +1232,17 @@ namespace kiwi
 			kw, config, startNode, topN, cache, ownFormList, uniqStates,
 		};
 		
-		UnkFormScorer unkFormScorer{ config.unkFormScoreScale, config.unkFormScoreBias };
+		UnkFormScorer unkFormScorer{ 
+			config.oovRuleScale, 
+			config.oovRuleBias,
+			oovScoringType >= (size_t)Match::oovChrModel ? kw->nounChrMdl.get() : nullptr,
+			config.oovChrBias,
+			substringCounter,
+			config.oovGlobalWeight,
+			config.oovLocalWeight,
+			config.oovGlobalMinFreq,
+			oovScoringType >= (size_t)Match::oovChrFreqBranchModel
+		};
 
 		// middle nodes
 		for (size_t i = 1; i < graphSize - 1; ++i)
@@ -1286,7 +1265,7 @@ namespace kiwi
 			{
 				evaluator(i, ownFormId, node->form->candidate, 
 					0.f, splitComplex, splitSaisiot, mergeSaisiot, blocklist, allowedDialects, dialectCost);
-				if (!isPretokenizedNode
+				if (!isPretokenizedNode && node->typoCost == 0 && node->typoFormId == 0
 					&& all_of(node->form->candidate.begin(), node->form->candidate.end(), [](const Morpheme* m)
 				{
 					return m->combineSocket || !(m->chunks.empty() || m->complex || m->saisiot);

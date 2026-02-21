@@ -15,6 +15,7 @@
 #include "Joiner.hpp"
 #include "PathEvaluator.hpp"
 #include "Kiwi.hpp"
+#include "SubstringCounter.hpp"
 
 using namespace std;
 
@@ -738,6 +739,10 @@ namespace kiwi
 				token.typoCost = s.typoCost;
 				token.typoFormId = s.typoFormId;
 				token.senseId = s.morph->senseId;
+				if ((s.morph->tag == POSTag::nng || s.morph->tag == POSTag::nnp) && !s.str.empty())
+				{
+					token.senseId = -1; // OOV인 경우에는 senseId를 -1로 설정
+				}
 				updateTokenInfoScript(token);
 				token.dialect = s.morph->dialect;
 				auto ptId = nodeInWhichPretokenized[s.nodeId] + 1;
@@ -970,14 +975,24 @@ namespace kiwi
 			throw invalid_argument{ "`cutOffThreshold` should be >= 0." };
 		}
 
-		if (unkFormScoreScale < 0)
+		if (oovRuleScale < 0)
 		{
-			throw invalid_argument{ "`unkFormScoreScale` should be >= 0." };
+			throw invalid_argument{ "`oovRuleScale` should be >= 0." };
 		}
 
-		if (unkFormScoreBias < 0)
+		if (oovGlobalWeight <= 0)
 		{
-			throw invalid_argument{ "`unkFormScoreBias` should be >= 0." };
+			throw invalid_argument{ "`oovGlobalWeight` should be > 0." };
+		}
+
+		if (oovLocalWeight <= 0)
+		{
+			throw invalid_argument{ "`oovLocalWeight` should be > 0." };
+		}
+
+		if (oovGlobalMinFreq <= 0)
+		{
+			throw invalid_argument{ "`oovGlobalMinFreq` should be >= 0." };
 		}
 
 		if (spacePenalty <= 0)
@@ -1014,6 +1029,11 @@ namespace kiwi
 
 		if (!!(option.match & Match::normalizeCoda)) normalizeCoda(normalizedStr.begin(), normalizedStr.end());
 
+		if ((option.match & Match::oovMask) >= Match::oovChrModel && !nounChrMdl)
+		{
+			throw invalid_argument{ "`oovChrModel` option is set but the character-level noun model is not loaded." };
+		}
+
 		makePretokenizedSpanGroup(
 			pretokenizedGroup, 
 			pretokenized, 
@@ -1029,6 +1049,36 @@ namespace kiwi
 		wordPositions.clear();
 		getWordPositions(wordPositions, str.begin(), str.end());
 		
+		SubstringCounter substringCounter;
+		if ((option.match & Match::oovMask) >= Match::oovChrFreqModel)
+		{
+			thread_local Vector<char16_t> filteredStr;
+			filteredStr.clear();
+			filteredStr.reserve(normalizedStr.size());
+			for (size_t i = 0; i < normalizedStr.size(); ++i)
+			{
+				auto c = normalizedStr[i];
+				const POSTag chrType = identifySpecialChr(c);
+				switch (chrType)
+				{
+				case POSTag::unknown:
+				case POSTag::sf:
+				case POSTag::sp:
+				case POSTag::ss:
+				case POSTag::sso:
+				case POSTag::ssc:
+				case POSTag::se:
+				case POSTag::so:
+				case POSTag::sw:
+				case POSTag::sb:
+					c = u' ';
+					break;
+				}
+				filteredStr.emplace_back(c);
+			}
+			substringCounter = SubstringCounter{ filteredStr.data(), filteredStr.size() };
+		}
+
 		vector<TokenResult> ret;
 		Vector<SpecialState> spStatesByRet;
 		thread_local Vector<KGraphNode> nodes;
@@ -1050,6 +1100,7 @@ namespace kiwi
 				option.match,
 				option.allowedDialects,
 				config.maxUnkFormSize,
+				config.maxUnkFormSizeFollowedByJClass,
 				config.spaceTolerance,
 				continualTypoCost,
 				lengtheningTypoCost,
@@ -1068,13 +1119,15 @@ namespace kiwi
 				nodes.data(),
 				nodes.size(),
 				topN,
+				(size_t)(option.match & Match::oovMask),
 				option.openEnding && splitEnd == normalizedStr.size(),
 				!!(option.match & Match::splitComplex),
 				!!(option.match & Match::splitSaisiot),
 				!!(option.match & Match::mergeSaisiot),
 				option.blocklist,
 				option.allowedDialects,
-				option.dialectCost
+				option.dialectCost,
+				(option.match & Match::oovMask) >= Match::oovChrFreqModel ? &substringCounter : nullptr
 			);
 			insertPathIntoResults(ret, spStatesByRet, res, topN, option.match, config.integrateAllomorph, positionTable, wordPositions, pretokenizedGroup, nodeInWhichPretokenized);
 		}

@@ -579,6 +579,7 @@ size_t kiwi::splitByTrie(
 	Match matchOptions, 
 	Dialect allowedDialect,
 	size_t maxUnkFormSize, 
+	size_t maxUnkFormSizeFollowedByJClass,
 	size_t spaceTolerance,
 	float continualTypoCost,
 	float lengtheningTypoCost,
@@ -670,7 +671,8 @@ size_t kiwi::splitByTrie(
 					}
 
 					const size_t newNodeLength = nBegin - lastSpecialEndPos;
-					if (maxUnkFormSize && newNodeLength <= maxUnkFormSize)
+					const size_t lengthLimit = cand.form->hasJClass ? maxUnkFormSizeFollowedByJClass : maxUnkFormSize;
+					if (newNodeLength <= lengthLimit)
 					{
 						appendNewNode(out, endPosMap, 
 							lastSpecialEndPos * posMultiplier, nBegin * posMultiplier, 

@@ -2,6 +2,7 @@
 #include <kiwi/SubstringExtractor.h>
 #include "FrozenTrie.hpp"
 #include "RaggedVector.hpp"
+#include "StrUtils.h"
 
 using namespace kiwi;
 
@@ -43,9 +44,7 @@ HSDataset::HSDataset(size_t _batchSize,
 {
 }
 
-HSDataset::~HSDataset()
-{
-}
+HSDataset::~HSDataset() = default;
 
 HSDataset::HSDataset(HSDataset&& o) /*noexcept*/ = default;
 
@@ -793,6 +792,455 @@ std::vector<std::pair<std::vector<uint32_t>, size_t>> HSDataset::extractPrefixes
 				return;
 			}
 			ret.emplace_back(prefix, cnt);
+		});
+	}
+
+	std::sort(ret.begin(), ret.end(), [](const Pair& a, const Pair& b)
+	{
+		return a.second > b.second;
+	});
+	return ret;
+}
+
+size_t ChrTokenizer::encodeOne(char32_t c) const
+{
+	if (isHangulSyllable(c))
+	{
+		int32_t i = (c - 0xAC00) / 28;
+		return (int32_t)Token::hangulSyllableStart + i;
+	}
+	else if (isHangulCoda(c))
+	{
+		int32_t i = c - 0x11A8;
+		return (int32_t)Token::hangulCodaStart + i;
+	}
+	else if (0x21 <= c && c < 0x7F)
+	{
+		return (int32_t)Token::asciiStart + (c - 0x21);
+	}
+	else
+	{
+		const POSTag type = identifySpecialChr(c);
+		switch (type)
+		{
+		case POSTag::sf:
+			return (int32_t)Token::sf;
+		case POSTag::sp:
+			return (int32_t)Token::sp;
+		case POSTag::ss:
+			return (int32_t)Token::ss;
+		case POSTag::sso:
+			return (int32_t)Token::sso;
+		case POSTag::ssc:
+			return (int32_t)Token::ssc;
+		case POSTag::se:
+			return (int32_t)Token::se;
+		case POSTag::so:
+			return (int32_t)Token::so;
+		case POSTag::sh:
+			return (int32_t)Token::sh;
+		default:
+			return (int32_t)Token::sw;
+		}
+	}
+	return 0;
+}
+
+size_t ChrTokenizer::encode(std::string_view text, int32_t* outBuf, size_t bufSize) const
+{
+	size_t written = 0;
+	const auto normalizedText = normalizeHangul(utf8To16(text));
+	for (auto c : normalizedText)
+	{
+		if (written >= bufSize) break;
+
+		outBuf[written++] = encodeOne(c);
+	}
+	return written;
+}
+
+std::u16string ChrTokenizer::decode(const int32_t* tokenBuf, size_t tokenCnt) const
+{
+	KString result;
+	for (size_t i = 0; i < tokenCnt; ++i)
+	{
+		int32_t t = tokenBuf[i];
+		if (Token::hangulSyllableStart <= (Token)t && (Token)t < Token::hangulCodaStart)
+		{
+			char16_t c = 0xAC00 + (uint16_t)(t - (int32_t)Token::hangulSyllableStart) * 28;
+			result.push_back(c);
+		}
+		else if (Token::hangulCodaStart <= (Token)t && (Token)t < Token::asciiStart)
+		{
+			char16_t c = 0x11A8 + (uint16_t)(t - (int32_t)Token::hangulCodaStart);
+			result.push_back(c);
+		}
+		else if (Token::asciiStart <= (Token)t && (Token)t < Token::max)
+		{
+			char16_t c = 0x21 + (uint16_t)(t - (int32_t)Token::asciiStart);
+			result.push_back(c);
+		}
+		else
+		{
+			switch ((Token)t)
+			{
+			case Token::sf:
+				result.push_back(u'.');
+				break;
+			case Token::sp:
+				result.push_back(u',');
+				break;
+			case Token::ss:
+				result.push_back(u'"');
+				break;
+			case Token::sso:
+				result.push_back(u'(');
+				break;
+			case Token::ssc:
+				result.push_back(u')');
+				break;
+			case Token::se:
+				result.push_back(u'\u2026');
+				break;
+			case Token::so:
+				result.push_back(u'\u223c');
+				break;
+			case Token::sh:
+				result.push_back(u'漢');
+				break;
+			case Token::sw:
+				result.push_back(u'※');
+				break;
+			default:
+				break;
+			}
+		}
+	}
+	return joinHangul(result);
+}
+
+ChrDataset::ChrDataset(size_t _batchSize, size_t _causalContextSize, size_t _windowSize, float _prefixDropoutProb, bool _sampleWithoutWeights,
+	const std::vector<std::pair<size_t, std::vector<uint32_t>>>& _contextualMapper
+	)
+	: batchSize(_batchSize), causalContextSize(_causalContextSize), windowSize(_windowSize), prefixDropoutProb(_prefixDropoutProb), sampleWithoutWeights(_sampleWithoutWeights)
+{
+	rng.seed(currentSeed);
+
+	if (!_contextualMapper.empty())
+	{
+		utils::ContinuousTrie<utils::TrieNodeEx<uint32_t, uint32_t>> cmTrie(1);
+		for (auto& p : _contextualMapper)
+		{
+			cmTrie.build(p.second.begin(), p.second.end(), p.first + 1);
+		}
+		cmTrie.fillFail();
+		contextualMapper = utils::FrozenTrie<uint32_t, uint32_t>{ cmTrie, ArchTypeHolder<ArchType::balanced>{} };
+	}
+}
+
+ChrDataset::~ChrDataset() = default;
+
+ChrDataset::ChrDataset(ChrDataset&&) = default;
+
+ChrDataset& ChrDataset::operator=(ChrDataset&&) = default;
+
+
+void ChrDataset::addSentence(std::string_view sentence, float weight, std::string_view nonLabelPrefix)
+{
+	ChrTokenizer tokenizer;
+	thread_local Vector<int32_t> tokenBuf;
+	tokenBuf.resize(sentence.size() + nonLabelPrefix.size());
+	std::string joined;
+	joined += nonLabelPrefix;
+	joined += sentence;
+	const size_t prefixSize = tokenizer.encode(nonLabelPrefix, tokenBuf.data(), tokenBuf.size());
+	const size_t tokenCnt = tokenizer.encode(joined, tokenBuf.data(), tokenBuf.size());
+	auto& sents = this->sents.get();
+	sents.emplace_back();
+	sents.insert_data(tokenBuf.begin(), tokenBuf.begin() + tokenCnt);
+	sentWeights.emplace_back(weight);
+	nonLabelPrefixSizes.emplace_back(prefixSize);
+	totalWeight += weight;
+}
+
+size_t ChrDataset::numSents() const
+{
+	return sents.get().size();
+}
+
+void ChrDataset::seed(size_t newSeed)
+{
+	currentSeed = newSeed;
+	rng.seed(newSeed);
+}
+
+void ChrDataset::reset()
+{
+	seed(currentSeed);
+	sentSampled.clear();
+	shuffledIdcs.clear();
+	totalSampled = 0;
+	consumedSents = 0;
+}
+
+class InputTokenMapper
+{
+	const utils::FrozenTrie<uint32_t, uint32_t>& cmTrie;
+	const utils::FrozenTrie<uint32_t, uint32_t>::Node* node = nullptr;
+public:
+	InputTokenMapper(const utils::FrozenTrie<uint32_t, uint32_t>& trie)
+		: cmTrie{ trie }
+	{
+		if (!cmTrie.empty())
+		{
+			node = cmTrie.root();
+		}
+	}
+
+	int32_t operator()(int32_t inputToken)
+	{
+		if (cmTrie.empty() || inputToken == 0)
+		{
+			return inputToken;
+		}
+		
+		auto* next = node->template nextOpt<ArchType::balanced>(cmTrie, inputToken);
+		while (!next)
+		{
+			node = node->fail();
+			if (!node) break;
+			next = node->template nextOpt<ArchType::balanced>(cmTrie, inputToken);
+		}
+
+		if (next)
+		{
+			node = next;
+			auto val = next->val(cmTrie);
+			if (cmTrie.hasMatch(val))
+			{
+				return val - 1;
+			}
+			else if (cmTrie.hasSubmatch(val))
+			{
+				auto sub = next->fail();
+				for (; sub; sub = sub->fail())
+				{
+					val = sub->val(cmTrie);
+					if (cmTrie.hasMatch(val))
+					{
+						break;
+					}
+				}
+				if (sub) return val - 1;
+				else return -1;
+			}
+		}
+		else
+		{
+			node = cmTrie.root();
+			return -1;
+		}
+	}
+};
+
+template<class InTy, class OutTy>
+size_t ChrDataset::_next(InTy in, OutTy out)
+{
+	if (sentSampled.size() != sentWeights.size())
+	{
+		sentSampled.resize(sentWeights.size());
+	}
+
+	if (sampleWithoutWeights)
+	{
+		if (shuffledIdcs.size() != sentWeights.size())
+		{
+			shuffledIdcs.resize(sentWeights.size());
+			std::iota(shuffledIdcs.begin(), shuffledIdcs.end(), 0);
+			std::shuffle(shuffledIdcs.begin(), shuffledIdcs.end(), rng);
+			consumedSents = 0;
+		}
+	}
+	else
+	{
+		if (totalSampled <= 0)
+		{
+			shuffledIdcs.resize(sentWeights.size());
+			std::iota(shuffledIdcs.begin(), shuffledIdcs.end(), 0);
+		}
+		else
+		{
+			shuffledIdcs.clear();
+			const float totalWeight = this->totalWeight,
+				totalSampled = this->totalSampled;
+			for (size_t i = 0; i < sentWeights.size(); ++i)
+			{
+				const float w = sentWeights[i] / totalWeight;
+				const float s = sentSampled[i] / totalSampled;
+				if (s < w)
+				{
+					shuffledIdcs.emplace_back(i);
+				}
+			}
+		}
+		std::shuffle(shuffledIdcs.begin(), shuffledIdcs.end(), rng);
+	}
+	
+	auto& sents = this->sents.get();
+	size_t b;
+	for (b = 0; b < batchSize; ++b)
+	{
+		if (sampleWithoutWeights && b + consumedSents >= shuffledIdcs.size())
+		{
+			break;
+		}
+
+		const size_t i = sampleWithoutWeights ? shuffledIdcs[b + consumedSents] : shuffledIdcs[b % shuffledIdcs.size()];
+		sentSampled[i] += 1.f;
+		totalSampled += 1;
+
+		size_t start = 0;
+		if (prefixDropoutProb > 0 && std::generate_canonical<float, 32>(rng) < prefixDropoutProb)
+		{
+			start = (size_t)((std::max(sents[i].size(), (size_t)2) - 2) * std::generate_canonical<float, 32>(rng));
+		}
+		const size_t nonLabelPrefixSize = nonLabelPrefixSizes[i];
+		const size_t end = std::min(sents[i].size() + 1, causalContextSize);
+
+		InputTokenMapper tokenMapper{ contextualMapper };
+		for (size_t j = start; j < end; ++j)
+		{
+			const auto inputToken = j > 0 ? sents[i][j - 1] : 0;
+			*in = tokenMapper(inputToken);
+			++in;
+			*out = j < nonLabelPrefixSize ? nonVocab : (j < sents[i].size() ? sents[i][j] : 0);
+			++out;
+		}
+		for (size_t j = end - start; j < causalContextSize; ++j)
+		{
+			*in = nonVocab;
+			++in;
+			*out = nonVocab;
+			++out;
+		}
+	}
+	if (sampleWithoutWeights)
+	{
+		consumedSents += b;
+	}
+	return b;
+}
+
+size_t ChrDataset::next(int32_t* in, int32_t* out)
+{
+	return _next(in, out);
+}
+
+size_t ChrDataset::next(int64_t* in, int64_t* out)
+{
+	return _next(in, out);
+}
+
+std::vector<float> ChrDataset::getVocabProbs(double epsilon) const
+{
+	Vector<double> weights(vocabSize(), epsilon);
+	
+	for (size_t i = 0; i < sentWeights.size(); ++i)
+	{
+		auto sent = sents.get()[i];
+		for (auto token : sent)
+		{
+			auto v = token;
+			if (v < 0 || v >= vocabSize())
+			{
+				continue;
+			}
+			weights[v] += sentWeights[i];
+		}
+		weights[0] += sentWeights[i]; // for EOS
+	}
+
+	const double totalWeight = std::accumulate(weights.begin(), weights.end(), 0.0);
+	std::vector<float> probs(vocabSize());
+	for (size_t i = 0; i < vocabSize(); ++i)
+	{
+		probs[i] = (float)(weights[i] / totalWeight);
+	}
+	return probs;
+}
+
+std::vector<std::pair<std::vector<uint32_t>, double>> ChrDataset::extractPrefixes(
+	float resolution, float minWeight,
+	size_t maxLength, size_t numWorkers, bool exclusiveCnt) const
+{
+	using Pair = std::pair<std::vector<uint32_t>, double>;
+	std::vector<Pair> ret;
+	const size_t minCnt = (size_t)ceil(minWeight / resolution);
+	PrefixCounter counter{ maxLength, minCnt, numWorkers };
+	Vector<int32_t> tokenBuf;
+	for (size_t i = 0; i < sents.get().size(); ++i)
+	{
+		const auto sent = sents.get()[i];
+		tokenBuf.clear();
+		tokenBuf.emplace_back(0);
+		tokenBuf.insert(tokenBuf.end(), sent.begin(), sent.end());
+		const size_t n = (size_t)ceil(sentWeights[i] / resolution);
+		for (size_t j = 0; j < n; ++j)
+		{
+			counter.addArray(tokenBuf.data(), tokenBuf.data() + tokenBuf.size());
+		}
+	}
+	auto trie = counter.count();
+	if (exclusiveCnt)
+	{
+		Vector<UnorderedMap<Vector<uint32_t>, size_t>> cnts_by_length(maxLength);
+		trie.traverse([&](size_t cnt, const std::vector<uint32_t>& prefix)
+		{
+			if (cnt < minCnt) return;
+			if (std::find_if(prefix.begin() + 1, prefix.end(), [](uint32_t t) { return t == 0; }) != prefix.end())
+			{
+				return;
+			}
+			Vector<uint32_t> p(prefix.begin(), prefix.end());
+			cnts_by_length[p.size() - 1].emplace(move(p), cnt);
+		});
+
+		Vector<uint32_t> suffix;
+		suffix.reserve(maxLength);
+		for (size_t i = 1; i < maxLength; ++i)
+		{
+			for (auto& p : cnts_by_length[i])
+			{
+				suffix.clear();
+				suffix.insert(suffix.end(), p.first.begin() + 1, p.first.end());
+				auto it = cnts_by_length[i - 1].find(suffix);
+				if (it == cnts_by_length[i - 1].end() || it->second < p.second)
+				{
+					throw std::runtime_error("This should not happen");
+				}
+				it->second -= p.second;
+			}
+		}
+
+		for (auto& cnts : cnts_by_length)
+		{
+			for (auto& p : cnts)
+			{
+				if (p.second < minCnt) continue;
+				ret.emplace_back(std::vector<uint32_t>{ p.first.begin(), p.first.end() }, (double)p.second * resolution);
+			}
+		}
+	}
+	else
+	{
+		trie.traverse([&](size_t cnt, const std::vector<uint32_t>& prefix)
+		{
+			if (cnt < minCnt) return;
+			if (std::find_if(prefix.begin() + 1, prefix.end(), [](uint32_t t) { return t == 0; }) != prefix.end())
+			{
+				return;
+			}
+			ret.emplace_back(prefix, (double)cnt * resolution);
 		});
 	}
 

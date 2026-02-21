@@ -669,11 +669,16 @@ void kiwi_set_global_config(kiwi_h handle, kiwi_config_t config)
 		KiwiConfig kconfig{
 			!!config.integrate_allomorph,
 			config.cut_off_threshold,
-			config.unk_form_score_scale,
-			config.unk_form_score_bias,
+			config.oov_rule_scale,
+			config.oov_rule_bias,
+			config.oov_chr_bias,
+			config.oov_global_weight,
+			config.oov_local_weight,
+			config.oov_global_min_freq,
 			config.space_penalty,
 			config.typo_cost_weight,
 			config.max_unk_form_size,
+			config.max_unk_form_size_followed_by_j_class,
 			config.space_tolerance,
 		};
 		kiwi->setGlobalConfig(kconfig);
@@ -694,11 +699,16 @@ kiwi_config_t kiwi_get_global_config(kiwi_h handle)
 		KiwiConfig kconfig = kiwi->getGlobalConfig();
 		config.integrate_allomorph = kconfig.integrateAllomorph;
 		config.cut_off_threshold = kconfig.cutOffThreshold;
-		config.unk_form_score_scale = kconfig.unkFormScoreScale;
-		config.unk_form_score_bias = kconfig.unkFormScoreBias;
+		config.oov_rule_scale = kconfig.oovRuleScale;
+		config.oov_rule_bias = kconfig.oovRuleBias;
+		config.oov_chr_bias = kconfig.oovChrBias;
+		config.oov_global_weight = kconfig.oovGlobalWeight;
+		config.oov_local_weight = kconfig.oovLocalWeight;
+		config.oov_global_min_freq = kconfig.oovGlobalMinFreq;
 		config.space_penalty = kconfig.spacePenalty;
 		config.typo_cost_weight = kconfig.typoCostWeight;
 		config.max_unk_form_size = kconfig.maxUnkFormSize;
+		config.max_unk_form_size_followed_by_j_class = kconfig.maxUnkFormSizeFollowedByJClass;
 		config.space_tolerance = kconfig.spaceTolerance;
 	}
 	catch (...)

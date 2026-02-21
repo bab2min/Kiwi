@@ -228,5 +228,14 @@ namespace sais
 			});
 			return std::accumulate(numSuffices.begin(), numSuffices.end(), (size_t)0);
 		}
+
+		template<class Fn>
+		size_t enumNextChr(const std::pair<size_t, size_t>& range, Fn&& fn) const
+		{
+			return waveletTree.enumerate(range.first, range.second, [&](ChrTy c, size_t cl, size_t cr)
+			{
+				return fn(c, cr - cl);
+			});
+		}
 	};
 }

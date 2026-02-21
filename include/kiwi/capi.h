@@ -71,11 +71,16 @@ typedef struct {
 typedef struct {
 	uint8_t integrate_allomorph; /**< 이형태 형태소의 통합 여부 */
 	float cut_off_threshold; /**< 분석 과정에서 이 값보다 더 크게 차이가 나는 후보들은 제거합니다. */
-	float unk_form_score_scale; /**< 미등재 형태 추출 시 사용하는 기울기 값 */
-	float unk_form_score_bias; /**< 미등재 형태 추출 시 사용하는 편향 값 */
+	float oov_rule_scale; /**< 미등재 형태 추출 시 사용하는 기울기 값 */
+	float oov_rule_bias; /**< 미등재 형태 추출 시 사용하는 편향 값 */
+	float oov_chr_bias; /**< 미등재 형태 추출 시 사용하는 문자 기반 점수의 편향 값 */
+	float oov_global_weight; /**< 미등재 형태 추출 시 사용하는 전역 빈도 가중치 */
+	float oov_local_weight; /**< 미등재 형태 추출 시 사용하는 국부 빈도 가중치 */
+	float oov_global_min_freq; /**< 미등재 형태 추출 시 사용하는 전역 최소 빈도 */
 	float space_penalty; /**< 공백 패널티 */
 	float typo_cost_weight; /**< 오타 비용의 가중치 */
 	uint32_t max_unk_form_size; /**< 미등재 형태의 최대 크기 */
+	uint32_t max_unk_form_size_followed_by_j_class; /**< (조사가 뒤따르는 경우) 미등재 형태의 최대 크기 */
 	uint32_t space_tolerance; /**< 공백 허용치 */
 } kiwi_config_t;
 
@@ -176,6 +181,12 @@ enum
 	KIWI_MATCH_HASHTAG = 4,
 	KIWI_MATCH_MENTION = 8,
 	KIWI_MATCH_SERIAL = 16,
+
+	KIWI_MATCH_OOV_RULE_ONLY = 0 << 8,
+	KIWI_MATCH_OOV_CHR_MODEL = 1 << 8,
+	KIWI_MATCH_OOV_CHR_FREQ_MODEL = 2 << 8,
+	KIWI_MATCH_OOV_CHR_FREQ_BRANCH_MODEL = 3 << 8,
+	KIWI_MATCH_OOV_MASK = 3 << 8,
 
 	KIWI_MATCH_NORMALIZE_CODA = 1 << 16,
 	KIWI_MATCH_JOIN_NOUN_PREFIX = 1 << 17,

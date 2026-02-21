@@ -1,5 +1,6 @@
 #pragma once
 #include <kiwi/Kiwi.h>
+#include "UnkFormScorer.h"
 
 namespace kiwi
 {
@@ -96,13 +97,15 @@ namespace kiwi
 			const KGraphNode* graph,
 			const size_t graphSize,
 			const size_t topN,
+			const size_t oovScoringType,
 			bool openEnding,
 			bool splitComplex = false,
 			bool splitSaisiot = false,
 			bool mergeSaisiot = false,
 			const std::unordered_set<const Morpheme*>* blocklist = nullptr,
 			Dialect allowedDialects = Dialect::standard,
-			float dialectCost = 0.f
+			float dialectCost = 0.f,
+			const SubstringCounter* substringCounter = nullptr
 		);
 	};
 

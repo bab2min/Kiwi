@@ -103,11 +103,16 @@ namespace kiwi
 	{
 		bool integrateAllomorph = true;
 		float cutOffThreshold = 8;
-		float unkFormScoreScale = 5;
-		float unkFormScoreBias = 5;
+		float oovRuleScale = 3;
+		float oovRuleBias = 3;
+		float oovChrBias = -3;
+		float oovGlobalWeight = 35;
+		float oovLocalWeight = 3;
+		float oovGlobalMinFreq = 4;
 		float spacePenalty = 7;
 		float typoCostWeight = 6;
 		uint32_t maxUnkFormSize = 6;
+		uint32_t maxUnkFormSizeFollowedByJClass = -1;
 		uint32_t spaceTolerance = 0;
 
 		void validate() const;
@@ -141,6 +146,7 @@ namespace kiwi
 		Vector<TypoForm> typoForms;
 		utils::FrozenTrie<kchar_t, const Form*> formTrie;
 		std::shared_ptr<lm::ILangModel> langMdl;
+		std::shared_ptr<lm::CoNgramModelBase> nounChrMdl;
 		std::shared_ptr<cmb::CompiledRule> combiningRule;
 		std::unique_ptr<utils::ThreadPool> pool;
 		
@@ -232,7 +238,7 @@ namespace kiwi
 			const std::optional<KiwiConfig>& overrideConfig = {}
 		) const
 		{
-			return analyze(str, 1, option, pretokenized)[0];
+			return analyze(str, 1, option, pretokenized, overrideConfig)[0];
 		}
 
 		/**
@@ -249,7 +255,7 @@ namespace kiwi
 		{
 			std::vector<size_t> bytePositions;
 			auto u16str = utf8To16(str, bytePositions);
-			return analyze(u16str, option, mapPretokenizedSpansToU16(pretokenized, bytePositions));
+			return analyze(u16str, option, mapPretokenizedSpansToU16(pretokenized, bytePositions), overrideConfig);
 		}
 
 		/**
@@ -280,7 +286,7 @@ namespace kiwi
 		{
 			std::vector<size_t> bytePositions;
 			auto u16str = utf8To16(str, bytePositions);
-			return analyze(u16str, topN, option, mapPretokenizedSpansToU16(pretokenized, bytePositions));
+			return analyze(u16str, topN, option, mapPretokenizedSpansToU16(pretokenized, bytePositions), overrideConfig);
 		}
 
 		/**
@@ -537,6 +543,7 @@ namespace kiwi
 		Vector<MorphemeRaw> morphemes;
 		UnorderedMap<KString, size_t> formMap;
 		std::shared_ptr<lm::ILangModel> langMdl;
+		std::shared_ptr<lm::CoNgramModelBase> nounChrMdl;
 		std::shared_ptr<cmb::CompiledRule> combiningRule;
 		WordDetector detector;
 		Map<int, int> ruleProfilingCnt;

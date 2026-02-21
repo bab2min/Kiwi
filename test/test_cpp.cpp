@@ -57,6 +57,120 @@ Kiwi& reuseKiwiInstance()
 	return kiwi;
 }
 
+TEST(KiwiCPP, ChrTokenizer)
+{
+	ChrTokenizer tokenizer;
+	const std::string_view s = u8"안녕하세요.오늘날씨가참좋네요!Adx9810::~";
+
+	Vector<int32_t> encodedBuf(s.size());
+	encodedBuf.erase(encodedBuf.begin() + tokenizer.encode(s, encodedBuf.data(), encodedBuf.size()), encodedBuf.end());
+	EXPECT_TRUE(std::all_of(encodedBuf.begin(), encodedBuf.end(), [&](int32_t t) { return t < tokenizer.vocabSize(); }));
+
+	std::string decoded = utf16To8(tokenizer.decode(encodedBuf.data(), encodedBuf.size()));
+	EXPECT_EQ(s, decoded);
+}
+
+TEST(KiwiCPP, ChrModel)
+{
+	ChrTokenizer tokenizer;
+	Kiwi& kiwi = reuseKiwiInstance();
+
+	auto streamProvider = utils::makeFilesystemProvider(MODEL_PATH);
+	auto stream = streamProvider("nounchr.mdl");
+
+	auto chrModel = lm::CoNgramModelBase::create(utils::createMemoryObjectFromStream(*stream),
+		kiwi.archType(),
+		false,
+		true
+	);
+
+	EXPECT_EQ(chrModel->vocabSize(), tokenizer.vocabSize());
+
+	std::array<int32_t, 256> buf = { 0, };
+	for (auto str : { 
+		"한국어",
+		"됐습니다.",
+		"AS365버전",
+		"형태",
+		"형태를",
+		"바다를",
+		"샤를",
+		"카를",
+		"아를",
+		"자갈을",
+		"생선마을",
+		"북구을",
+		"분당을",
+		"사람을",
+		"도서관을",
+		"이민철",
+		"김민철",
+		"황보민수",
+		"남궁민수",
+		})
+	{
+		size_t size = tokenizer.encode(str, buf.data(), buf.size());
+		buf[size++] = 0;
+		float accScore = 0;
+		int32_t nodeIdx = 0;
+		uint32_t contextIdx = 0;
+		chrModel->progressOneStep(nodeIdx, contextIdx, 0);
+		for (size_t i = 0; i < size; ++i)
+		{
+			const size_t depth = chrModel->getNodeDepth(nodeIdx);
+			const float score = chrModel->progressOneStep(nodeIdx, contextIdx, buf[i]);
+			const float freq = chrModel->getContextFrequency(contextIdx);
+			const float entropy = chrModel->getContextEntropy(contextIdx);
+			auto tokenStr = utf16To8(tokenizer.decode(&buf[i], 1));
+			std::cerr << "  Token: " << tokenStr << "(" << buf[i] << ") Score: " << score << " Depth: " << depth << " Freq: " << freq << " Entropy: " << entropy << std::endl;
+			EXPECT_LT(score, 0.01);
+			accScore += score;
+		}
+		std::cerr << "AccScore for \"" << str << "\": " << accScore << " AvgScore: " << (accScore / (size - 1)) << std::endl;
+		EXPECT_LT(accScore, 0);
+	}
+}
+
+TEST(KiwiCPP, ChrDataset)
+{
+	constexpr size_t batchSize = 64, contextSize = 8, sentSize = 1000;
+	ChrDataset dataset{ batchSize, contextSize, 0, 0.f };
+	double totalWeight = 0.f;
+	for (size_t i = 0; i < sentSize; ++i)
+	{
+		const float weight = 1.f / (i + 2.f);
+		dataset.addSentence(std::to_string(i), weight, "0");
+		totalWeight += weight;
+	}
+
+	auto vocabProbs = dataset.getVocabProbs();
+	EXPECT_EQ(vocabProbs.size(), dataset.vocabSize());
+
+	std::array<int32_t, batchSize* contextSize> inBuf, outBuf;
+	ChrTokenizer tokenizer;
+
+	Vector<size_t> cnts(sentSize);
+	size_t totalSampled = 0;
+	for (size_t b = 0; b < 10000; ++b)
+	{
+		const size_t n = dataset.next(inBuf.data(), outBuf.data());
+		for (size_t i = 0; i < n; ++i)
+		{
+			const auto decoded = tokenizer.decode(&inBuf[i * contextSize + 1], contextSize - 1);
+			const size_t v = std::stoi(utf16To8(decoded));
+			cnts[v] += 1;
+			totalSampled += 1;
+		}
+	}
+
+	for (size_t i = 0; i < sentSize; ++i)
+	{
+		const float expectedProb = (float)((1.f / (i + 2.f)) / totalWeight);
+		const float actualProb = (float)(cnts[i] / (double)totalSampled);
+		EXPECT_NEAR(expectedProb, actualProb, expectedProb * 0.1f) << " for sentence " << i;
+	}
+}
+
 TEST(KiwiCpp, ExtractSubstrings)
 {
 	const std::u16string s = u"자, 너 오늘 하루 뭐 했니? "
@@ -1117,9 +1231,9 @@ TEST(KiwiCpp, ZCoda)
 		};
 		for (auto s : testCases)
 		{
-			auto res1 = kiwi.analyze(s.first, Match::allWithNormalizing);
-			auto res2 = kiwi.analyze(s.second, Match::allWithNormalizing);
-			auto res3 = kiwi.analyze(s.second, Match::allWithNormalizing & ~Match::zCoda);
+			auto res1 = kiwi.analyze(s.first, Match::allWithNormalizing | Match::oovChrFreqModel);
+			auto res2 = kiwi.analyze(s.second, Match::allWithNormalizing | Match::oovChrFreqModel);
+			auto res3 = kiwi.analyze(s.second, (Match::allWithNormalizing | Match::oovChrFreqModel) & ~Match::zCoda);
 			EXPECT_GE(res1.second - kiwi.getGlobalConfig().typoCostWeight, res2.second);
 			EXPECT_GT(res2.second, res3.second);
 			EXPECT_EQ(res2.first[res2.first.size() - 2].tag, POSTag::z_coda);
@@ -1130,8 +1244,9 @@ TEST(KiwiCpp, ZCoda)
 TEST(KiwiCpp, ZSiot)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
-
-	auto resSplit = kiwi.analyze(u"찰랑찰랑한 머릿결과 볼륨감", Match::allWithNormalizing | Match::splitSaisiot);
+	KiwiConfig config = kiwi.getGlobalConfig();
+	config.oovRuleScale = 6;
+	auto resSplit = kiwi.analyze(u"찰랑찰랑한 머릿결과 볼륨감", Match::allWithNormalizing | Match::splitSaisiot, {}, config);
 	EXPECT_EQ(resSplit.first.size(), 8);
 	EXPECT_EQ(resSplit.first[3].str, u"머리");
 	EXPECT_EQ(resSplit.first[4].tag, POSTag::z_siot);
@@ -1139,9 +1254,9 @@ TEST(KiwiCpp, ZSiot)
 	
 	for (auto s : {u"하굣길", u"만둣국", u"나뭇잎", u"세숫물", u"고춧가루", u"시곗바늘", u"사글셋방"})
 	{
-		auto resNone = kiwi.analyze(s, Match::allWithNormalizing);
-		auto resSplit = kiwi.analyze(s, Match::allWithNormalizing | Match::splitSaisiot);
-		auto resMerge = kiwi.analyze(s, Match::allWithNormalizing | Match::mergeSaisiot);
+		auto resNone = kiwi.analyze(s, Match::allWithNormalizing, {}, config);
+		auto resSplit = kiwi.analyze(s, Match::allWithNormalizing | Match::splitSaisiot, {}, config);
+		auto resMerge = kiwi.analyze(s, Match::allWithNormalizing | Match::mergeSaisiot, {}, config);
 		EXPECT_FALSE(std::any_of(resNone.first.begin(), resNone.first.end(), [](const TokenInfo& token) { return token.tag == POSTag::z_siot; }));
 		EXPECT_EQ(resSplit.first.size(), 3);
 		EXPECT_EQ(resSplit.first[0].tag, POSTag::nng);
@@ -1153,9 +1268,9 @@ TEST(KiwiCpp, ZSiot)
 
 	for (auto s : {u"발렛 파킹", u"미닛"})
 	{
-		auto resNone = kiwi.analyze(s, Match::allWithNormalizing);
-		auto resSplit = kiwi.analyze(s, Match::allWithNormalizing | Match::splitSaisiot);
-		auto resMerge = kiwi.analyze(s, Match::allWithNormalizing | Match::mergeSaisiot);
+		auto resNone = kiwi.analyze(s, Match::allWithNormalizing, {}, config);
+		auto resSplit = kiwi.analyze(s, Match::allWithNormalizing | Match::splitSaisiot, {}, config);
+		auto resMerge = kiwi.analyze(s, Match::allWithNormalizing | Match::mergeSaisiot, {}, config);
 		EXPECT_EQ(resNone.second, resSplit.second);
 		EXPECT_EQ(resNone.second, resMerge.second);
 		EXPECT_FALSE(std::any_of(resSplit.first.begin(), resSplit.first.end(), [](const TokenInfo& token) { return token.tag == POSTag::z_siot; }));
@@ -1165,12 +1280,13 @@ TEST(KiwiCpp, ZSiot)
 TEST(KiwiCpp, ZSiotWithTypo)
 {
 	Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 0, BuildOption::default_, }.build(getDefaultTypoSet(DefaultTypoSet::basicTypoSetWithContinual));
-
+	KiwiConfig config = kiwi.getGlobalConfig();
+	config.oovRuleScale = 6;
 	for (auto s : { u"하굣길", u"만둣국", u"나뭇잎", u"세숫물", u"고춧가루", u"시곗바늘", u"사글셋방" })
 	{
-		auto resNone = kiwi.analyze(s, Match::allWithNormalizing);
-		auto resSplit = kiwi.analyze(s, Match::allWithNormalizing | Match::splitSaisiot);
-		auto resMerge = kiwi.analyze(s, Match::allWithNormalizing | Match::mergeSaisiot);
+		auto resNone = kiwi.analyze(s, Match::allWithNormalizing, {}, config);
+		auto resSplit = kiwi.analyze(s, Match::allWithNormalizing | Match::splitSaisiot, {}, config);
+		auto resMerge = kiwi.analyze(s, Match::allWithNormalizing | Match::mergeSaisiot, {}, config);
 		EXPECT_FALSE(std::any_of(resNone.first.begin(), resNone.first.end(), [](const TokenInfo& token) { return token.tag == POSTag::z_siot; }));
 		EXPECT_EQ(resSplit.first.size(), 3);
 		EXPECT_EQ(resSplit.first[0].tag, POSTag::nng);
@@ -1182,9 +1298,9 @@ TEST(KiwiCpp, ZSiotWithTypo)
 
 	for (auto s : { u"발렛 파킹", u"미닛" })
 	{
-		auto resNone = kiwi.analyze(s, Match::allWithNormalizing);
-		auto resSplit = kiwi.analyze(s, Match::allWithNormalizing | Match::splitSaisiot);
-		auto resMerge = kiwi.analyze(s, Match::allWithNormalizing | Match::mergeSaisiot);
+		auto resNone = kiwi.analyze(s, Match::allWithNormalizing, {}, config);
+		auto resSplit = kiwi.analyze(s, Match::allWithNormalizing | Match::splitSaisiot, {}, config);
+		auto resMerge = kiwi.analyze(s, Match::allWithNormalizing | Match::mergeSaisiot, {}, config);
 		EXPECT_EQ(resNone.second, resSplit.second);
 		EXPECT_EQ(resNone.second, resMerge.second);
 		EXPECT_FALSE(std::any_of(resSplit.first.begin(), resSplit.first.end(), [](const TokenInfo& token) { return token.tag == POSTag::z_siot; }));

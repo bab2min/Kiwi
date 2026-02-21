@@ -149,6 +149,7 @@
     <ClCompile Include="..\src\SwTokenizer.cpp" />
     <ClCompile Include="..\src\TypoTransformer.cpp" />
     <ClCompile Include="..\src\UnicodeCase.cpp" />
+    <ClCompile Include="..\src\UnkFormScorer.cpp" />
     <ClCompile Include="..\third_party\mimalloc\src\static.c" />
     <ClCompile Include="..\src\Form.cpp" />
     <ClCompile Include="..\src\FeatureTestor.cpp" />

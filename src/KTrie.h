@@ -97,6 +97,7 @@ namespace kiwi
 		Match matchOptions, 
 		Dialect allowedDialect,
 		size_t maxUnkFormSize, 
+		size_t maxUnkFormSizeFollowedByJClass,
 		size_t spaceTolerance,
 		float continualTypoCost,
 		float lengtheningTypoCost,

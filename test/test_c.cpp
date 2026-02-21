@@ -261,7 +261,7 @@ TEST(KiwiC, AnalyzeBasicTypoSet)
 	config.typo_cost_weight = 5;
 	kiwi_set_global_config(typo_kw, config);
 
-	kiwi_analyze_option_t option = { KIWI_MATCH_ALL_WITH_NORMALIZING, };
+	kiwi_analyze_option_t option = { KIWI_MATCH_ALL_WITH_NORMALIZING | KIWI_MATCH_OOV_CHR_FREQ_MODEL, };
 	kiwi_res_h o, c;
 	for (const char* s : { u8"외않됀데?", u8"나 죰 도와죠.", u8"잘했따", u8"외구거 공부", u8"맗은 믈을 마셧다!" })
 	{
@@ -294,7 +294,7 @@ TEST(KiwiC, CustomTypoSet)
 	config.typo_cost_weight = 5;
 	kiwi_set_global_config(typo_kw, config);
 
-	kiwi_analyze_option_t option = { KIWI_MATCH_ALL_WITH_NORMALIZING, };
+	kiwi_analyze_option_t option = { KIWI_MATCH_ALL_WITH_NORMALIZING | KIWI_MATCH_OOV_CHR_FREQ_MODEL, };
 	kiwi_res_h o, c;
 	for (const char* s : { u8"외않됀데?", u8"나 죰 도와죠.", u8"자알했따", u8"외구거 공부", u8"맗은 믈을 마셧다!" })
 	{

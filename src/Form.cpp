@@ -106,6 +106,7 @@ namespace kiwi
 		}
 		ret.zCodaAppendable = zCodaAppendable ? 1 : 0;
 		ret.zSiotAppendable = zSiotAppendable ? 1 : 0;
+		ret.hasJClass = 0;
 		return ret;
 	}
 

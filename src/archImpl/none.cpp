@@ -42,10 +42,10 @@ namespace kiwi
 				scale = (scale & 0x3F) + scaleBias;
 				
 				lower = (lower - lzp) * scale;
-				lower += (lower >= 0) ? 4 : -4;
+				lower += (lower >= 0) ? 4 : -4; // for round up
 				lower /= scaleDivider;
 				upper = (upper - lzp) * scale;
-				upper += (upper >= 0) ? 4 : -4;
+				upper += (upper >= 0) ? 4 : -4; // for round up
 				upper /= scaleDivider;
 				if (toUint8)
 				{

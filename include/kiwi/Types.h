@@ -349,7 +349,7 @@ namespace kiwi
 		uint16_t length = 0; /**< 길이(UTF16 문자 기준) */
 		POSTag tag = POSTag::unknown; /**< 품사 태그 */
 		union {
-			uint8_t senseId = 0; /**< 의미 번호 */
+			uint8_t senseId = 0; /**< 의미 번호 (OOV인 경우 -1)*/
 			ScriptType script; /**< 유니코드 영역에 기반한 문자 타입 */
 		};
 		float score = 0; /**< 해당 형태소의 언어모델 점수 */
@@ -358,7 +358,7 @@ namespace kiwi
 		uint32_t pairedToken = -1; /**< SSO, SSC 태그에 속하는 형태소의 경우 쌍을 이루는 반대쪽 형태소의 위치(-1인 경우 해당하는 형태소가 없는 것을 뜻함) */
 		uint32_t subSentPosition = 0; /**< 인용부호나 괄호로 둘러싸인 하위 문장의 번호. 1부터 시작. 0인 경우 하위 문장이 아님을 뜻함 */
 		Dialect dialect = Dialect::standard; /**< 방언 정보 */
-		const Morpheme* morph = nullptr; /**< 기타 형태소 정보에 대한 포인터 (OOV인 경우 nullptr) */
+		const Morpheme* morph = nullptr; /**< 기타 형태소 정보에 대한 포인터 */
 
 		TokenInfo() = default;
 
@@ -384,6 +384,8 @@ namespace kiwi
 		}
 
 		uint32_t endPos() const { return position + length; }
+
+		bool isOOV() const { return senseId == (uint8_t)(-1); }
 	};
 
 	struct BasicToken
