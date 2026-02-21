@@ -57,6 +57,120 @@ Kiwi& reuseKiwiInstance()
 	return kiwi;
 }
 
+TEST(KiwiCPP, ChrTokenizer)
+{
+	ChrTokenizer tokenizer;
+	const std::string_view s = u8"안녕하세요.오늘날씨가참좋네요!Adx9810::~";
+
+	Vector<int32_t> encodedBuf(s.size());
+	encodedBuf.erase(encodedBuf.begin() + tokenizer.encode(s, encodedBuf.data(), encodedBuf.size()), encodedBuf.end());
+	EXPECT_TRUE(std::all_of(encodedBuf.begin(), encodedBuf.end(), [&](int32_t t) { return t < tokenizer.vocabSize(); }));
+
+	std::string decoded = utf16To8(tokenizer.decode(encodedBuf.data(), encodedBuf.size()));
+	EXPECT_EQ(s, decoded);
+}
+
+TEST(KiwiCPP, ChrModel)
+{
+	ChrTokenizer tokenizer;
+	Kiwi& kiwi = reuseKiwiInstance();
+
+	auto streamProvider = utils::makeFilesystemProvider(MODEL_PATH);
+	auto stream = streamProvider("nounchr.mdl");
+
+	auto chrModel = lm::CoNgramModelBase::create(utils::createMemoryObjectFromStream(*stream),
+		kiwi.archType(),
+		false,
+		true
+	);
+
+	EXPECT_EQ(chrModel->vocabSize(), tokenizer.vocabSize());
+
+	std::array<int32_t, 256> buf = { 0, };
+	for (auto str : { 
+		"한국어",
+		"됐습니다.",
+		"AS365버전",
+		"형태",
+		"형태를",
+		"바다를",
+		"샤를",
+		"카를",
+		"아를",
+		"자갈을",
+		"생선마을",
+		"북구을",
+		"분당을",
+		"사람을",
+		"도서관을",
+		"이민철",
+		"김민철",
+		"황보민수",
+		"남궁민수",
+		})
+	{
+		size_t size = tokenizer.encode(str, buf.data(), buf.size());
+		buf[size++] = 0;
+		float accScore = 0;
+		int32_t nodeIdx = 0;
+		uint32_t contextIdx = 0;
+		chrModel->progressOneStep(nodeIdx, contextIdx, 0);
+		for (size_t i = 0; i < size; ++i)
+		{
+			const size_t depth = chrModel->getNodeDepth(nodeIdx);
+			const float score = chrModel->progressOneStep(nodeIdx, contextIdx, buf[i]);
+			const float freq = chrModel->getContextFrequency(contextIdx);
+			const float entropy = chrModel->getContextEntropy(contextIdx);
+			auto tokenStr = utf16To8(tokenizer.decode(&buf[i], 1));
+			std::cerr << "  Token: " << tokenStr << "(" << buf[i] << ") Score: " << score << " Depth: " << depth << " Freq: " << freq << " Entropy: " << entropy << std::endl;
+			EXPECT_LT(score, 0.01);
+			accScore += score;
+		}
+		std::cerr << "AccScore for \"" << str << "\": " << accScore << " AvgScore: " << (accScore / (size - 1)) << std::endl;
+		EXPECT_LT(accScore, 0);
+	}
+}
+
+TEST(KiwiCPP, ChrDataset)
+{
+	constexpr size_t batchSize = 64, contextSize = 8, sentSize = 1000;
+	ChrDataset dataset{ batchSize, contextSize, 0, 0.f };
+	double totalWeight = 0.f;
+	for (size_t i = 0; i < sentSize; ++i)
+	{
+		const float weight = 1.f / (i + 2.f);
+		dataset.addSentence(std::to_string(i), weight, "0");
+		totalWeight += weight;
+	}
+
+	auto vocabProbs = dataset.getVocabProbs();
+	EXPECT_EQ(vocabProbs.size(), dataset.vocabSize());
+
+	std::array<int32_t, batchSize* contextSize> inBuf, outBuf;
+	ChrTokenizer tokenizer;
+
+	Vector<size_t> cnts(sentSize);
+	size_t totalSampled = 0;
+	for (size_t b = 0; b < 10000; ++b)
+	{
+		const size_t n = dataset.next(inBuf.data(), outBuf.data());
+		for (size_t i = 0; i < n; ++i)
+		{
+			const auto decoded = tokenizer.decode(&inBuf[i * contextSize + 1], contextSize - 1);
+			const size_t v = std::stoi(utf16To8(decoded));
+			cnts[v] += 1;
+			totalSampled += 1;
+		}
+	}
+
+	for (size_t i = 0; i < sentSize; ++i)
+	{
+		const float expectedProb = (float)((1.f / (i + 2.f)) / totalWeight);
+		const float actualProb = (float)(cnts[i] / (double)totalSampled);
+		EXPECT_NEAR(expectedProb, actualProb, expectedProb * 0.1f) << " for sentence " << i;
+	}
+}
+
 TEST(KiwiCpp, ExtractSubstrings)
 {
 	const std::u16string s = u"자, 너 오늘 하루 뭐 했니? "
