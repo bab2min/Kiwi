@@ -7,6 +7,8 @@
 #include <bitset>
 #include <vector>
 
+#include <kiwi/Types.h>
+
 namespace kiwi
 {
 	class SubstringCounter
@@ -19,10 +21,10 @@ namespace kiwi
 			uint16_t count = 0;
 		};
 
-		std::vector<Entry> table;
+		Vector<Entry> table;
 		uint32_t mask = 0;
 		size_t entryCount = 0;
-		std::vector<char16_t> chars;
+		Vector<char16_t> chars;
 
 		static constexpr uint32_t kPrime = 0x01000193;
 		static constexpr uint32_t kOffset = 0x811c9dc5;
@@ -31,7 +33,7 @@ namespace kiwi
 		{
 			size_t newSize = table.size() * 2;
 			uint32_t newMask = (uint32_t)(newSize - 1);
-			std::vector<Entry> newTable(newSize);
+			Vector<Entry> newTable(newSize);
 			for (auto& e : table)
 			{
 				if (!e.ptr) continue;
@@ -148,7 +150,7 @@ namespace kiwi
 			}
 		}
 
-		const std::vector<char16_t>& getUniqueChars() const
+		const Vector<char16_t>& getUniqueChars() const
 		{
 			return chars;
 		}
