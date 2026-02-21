@@ -1231,9 +1231,9 @@ TEST(KiwiCpp, ZCoda)
 		};
 		for (auto s : testCases)
 		{
-			auto res1 = kiwi.analyze(s.first, Match::allWithNormalizing);
-			auto res2 = kiwi.analyze(s.second, Match::allWithNormalizing);
-			auto res3 = kiwi.analyze(s.second, Match::allWithNormalizing & ~Match::zCoda);
+			auto res1 = kiwi.analyze(s.first, Match::allWithNormalizing | Match::oovChrFreqModel);
+			auto res2 = kiwi.analyze(s.second, Match::allWithNormalizing | Match::oovChrFreqModel);
+			auto res3 = kiwi.analyze(s.second, (Match::allWithNormalizing | Match::oovChrFreqModel) & ~Match::zCoda);
 			EXPECT_GE(res1.second - kiwi.getGlobalConfig().typoCostWeight, res2.second);
 			EXPECT_GT(res2.second, res3.second);
 			EXPECT_EQ(res2.first[res2.first.size() - 2].tag, POSTag::z_coda);
