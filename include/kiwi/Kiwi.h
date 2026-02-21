@@ -238,7 +238,7 @@ namespace kiwi
 			const std::optional<KiwiConfig>& overrideConfig = {}
 		) const
 		{
-			return analyze(str, 1, option, pretokenized)[0];
+			return analyze(str, 1, option, pretokenized, overrideConfig)[0];
 		}
 
 		/**
@@ -255,7 +255,7 @@ namespace kiwi
 		{
 			std::vector<size_t> bytePositions;
 			auto u16str = utf8To16(str, bytePositions);
-			return analyze(u16str, option, mapPretokenizedSpansToU16(pretokenized, bytePositions));
+			return analyze(u16str, option, mapPretokenizedSpansToU16(pretokenized, bytePositions), overrideConfig);
 		}
 
 		/**
@@ -286,7 +286,7 @@ namespace kiwi
 		{
 			std::vector<size_t> bytePositions;
 			auto u16str = utf8To16(str, bytePositions);
-			return analyze(u16str, topN, option, mapPretokenizedSpansToU16(pretokenized, bytePositions));
+			return analyze(u16str, topN, option, mapPretokenizedSpansToU16(pretokenized, bytePositions), overrideConfig);
 		}
 
 		/**
