@@ -1090,6 +1090,7 @@ namespace kiwi
 				option.match,
 				option.allowedDialects,
 				config.maxUnkFormSize,
+				config.maxUnkFormSizeFollowedByJClass,
 				config.spaceTolerance,
 				continualTypoCost,
 				lengtheningTypoCost,

@@ -113,6 +113,8 @@ float UnkFormScorer::chrFreqBasedScore(const U16StringView& form) const
 
 float UnkFormScorer::chrFreqBranchBasedScore(const U16StringView& form) const
 {
+	return chrFreqBasedScore(form);
+	
 	// not implemented yet
 	int32_t nodeIdx = bosNodeIdx;
 	uint32_t contextIdx = bosContextIdx;

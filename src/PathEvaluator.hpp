@@ -260,7 +260,7 @@ namespace kiwi
 			if (prevPath.ownFormId)
 			{
 				leftFormFirst = ownFormList[prevPath.ownFormId - 1].data();
-				leftFormLast = leftFormFirst + ownFormList[0].size();
+				leftFormLast = leftFormFirst + ownFormList[prevPath.ownFormId - 1].size();
 			}
 			else if (morphBase[prevPath.wid].kform && !morphBase[prevPath.wid].kform->empty())
 			{
@@ -1235,7 +1235,7 @@ namespace kiwi
 		UnkFormScorer unkFormScorer{ 
 			config.oovRuleScale, 
 			config.oovRuleBias,
-			oovScoringType >= (size_t)Match::oovChrModel ? kw->nounChrMdl.get() : nullptr, 
+			oovScoringType >= (size_t)Match::oovChrModel ? kw->nounChrMdl.get() : nullptr,
 			config.oovChrBias,
 			substringCounter,
 			config.oovGlobalWeight,
@@ -1265,7 +1265,7 @@ namespace kiwi
 			{
 				evaluator(i, ownFormId, node->form->candidate, 
 					0.f, splitComplex, splitSaisiot, mergeSaisiot, blocklist, allowedDialects, dialectCost);
-				if (!isPretokenizedNode
+				if (!isPretokenizedNode && node->typoCost == 0 && node->typoFormId == 0
 					&& all_of(node->form->candidate.begin(), node->form->candidate.end(), [](const Morpheme* m)
 				{
 					return m->combineSocket || !(m->chunks.empty() || m->complex || m->saisiot);

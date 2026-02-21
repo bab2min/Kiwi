@@ -106,12 +106,13 @@ namespace kiwi
 		float oovRuleScale = 3;
 		float oovRuleBias = 3;
 		float oovChrBias = -3;
-		float oovGlobalWeight = 75;
+		float oovGlobalWeight = 35;
 		float oovLocalWeight = 3;
 		float oovGlobalMinFreq = 4;
 		float spacePenalty = 7;
 		float typoCostWeight = 6;
 		uint32_t maxUnkFormSize = 6;
+		uint32_t maxUnkFormSizeFollowedByJClass = -1;
 		uint32_t spaceTolerance = 0;
 
 		void validate() const;
