@@ -143,13 +143,20 @@ int Evaluator::operator()(const string& modelPath,
 		if (isfinite(unkFormScoreScale))
 		{
 			auto config = kw.getGlobalConfig();
-			config.unkFormScoreScale = unkFormScoreScale;
+			config.oovRuleScale = unkFormScoreScale;
 			kw.setGlobalConfig(config);
 		}
 		if (isfinite(unkFormScoreBias))
 		{
 			auto config = kw.getGlobalConfig();
-			config.unkFormScoreBias = unkFormScoreBias;
+			if (oovScoringType == Match::oovRuleOnly)
+			{
+				config.oovRuleBias = unkFormScoreBias;
+			}
+			else
+			{
+				config.oovChrBias = unkFormScoreBias;
+			}
 			kw.setGlobalConfig(config);
 		}
 
@@ -446,7 +453,8 @@ auto NounEvaluator::loadTestset(const string& testSetFile) const -> vector<TestR
 			inputText.insert(inputText.end(), searchStart, matches[0].first);
 			const u16string nounStr = utf8To16(matches[2].str());
 			const string labelStr = matches[1].str();
-			tr.golds.emplace_back(nounStr, labelStr);
+			++tr.golds[nounStr].first;
+			tr.golds[nounStr].second = labelStr;
 			inputText.insert(inputText.end(), matches[2].first, matches[2].second);
 			searchStart = matches[0].second;
 		}
@@ -464,31 +472,34 @@ auto NounEvaluator::computeScore(vector<TestResult>& preds, vector<TestResult>& 
 	size_t totalCorrectChr = 0, totalPredsChr = 0, totalGoldsChr = 0;
 	for (auto& tr : preds)
 	{
-		std::unordered_set<u16string> predSet;
+		std::unordered_map<u16string, size_t> predCnt;
 		for (auto& token : tr.result.first)
 		{
 			if (token.tag == POSTag::nng || token.tag == POSTag::nnp || token.tag == POSTag::nnb)
 			{
-				predSet.insert(token.str);
+				++predCnt[token.str];
 				tr.numPredsChr += token.str.size();
+				++tr.numPreds;
 			}
 		}
-		tr.numPreds = predSet.size();
-		for (auto& g : tr.golds)
+		for (auto& [g, info] : tr.golds)
 		{
-			if (predSet.find(g.first) != predSet.end())
+			auto [cnt, label] = info;
+			auto it = predCnt.find(g);
+			if (it != predCnt.end())
 			{
-				tr.correct += 1;
-				tr.correctChr += g.first.size();
-				if (!g.second.empty())
+				size_t matchCnt = min(it->second, cnt);
+				tr.correct += matchCnt;
+				tr.correctChr += g.size() * matchCnt;
+				if (!label.empty())
 				{
-					tr.labeledCorrect += 1;
+					tr.labeledCorrect += matchCnt;
 				}
 			}
-			if (!g.second.empty()) totalLabeledGolds++;
-			totalGoldsChr += g.first.size();
+			if (!label.empty()) totalLabeledGolds += cnt;
+			totalGolds += cnt;
+			totalGoldsChr += g.size() * cnt;
 		}
-		totalGolds += tr.golds.size();
 		totalPreds += tr.numPreds;
 		totalCorrect += tr.correct;
 		totalLabeledCorrect += tr.labeledCorrect;
@@ -515,21 +526,23 @@ void NounEvaluator::TestResult::writeResult(ostream& out) const
 	float recall = (golds.size() == 0) ? 0 : (double)correct / golds.size();
 	float f1 = 2 * precision * recall / max(precision + recall, 1e-10f);
 	size_t labeledGolds = 0;
-	for (auto& g : golds)
+	for (auto& [g, info] : golds)
 	{
-		if (!g.second.empty()) labeledGolds++;
+		auto [cnt, label] = info;
+		if (!label.empty()) labeledGolds++;
 	}
 	float labeledRecall = (labeledGolds == 0) ? 0 : (double)labeledCorrect / labeledGolds;
 	out << utf16To8(text) << '\t' << labeledRecall << '\t' << precision << '\t' << recall << '\t' << f1 << endl;
 	out << "Golds:" << '\t';
-	for (auto& _r : golds)
+	for (auto& [g, info] : golds)
 	{
-		out << utf16To8(_r.first) << ( _r.second.empty() ? "" : ("/" + _r.second) ) << '\t';
+		auto [cnt, label] = info;
+		out << utf16To8(g) << (label.empty() ? "" : ("/" + label) ) << '\t';
 	}
 	out << endl;
-	for (auto& _r : result.first)
+	for (auto& r : result.first)
 	{
-		out << _r << '\t';
+		out << r << '\t';
 	}
 	out << endl;
 	out << endl;
@@ -574,5 +587,5 @@ std::pair<double, double> NounEvaluator::eval(const std::string& output, const s
 			t.writeResult(out);
 		}
 	}
-	return make_pair(score.labeledRecall, score.f1);
+	return make_pair(score.labeledRecall, score.f1Chr);
 }

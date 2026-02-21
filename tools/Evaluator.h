@@ -79,7 +79,7 @@ class NounEvaluator : public Evaluator
 	struct TestResult
 	{
 		std::u16string text;
-		std::vector<std::pair<std::u16string, std::string>> golds;
+		std::unordered_map<std::u16string, std::pair<size_t, std::string>> golds;
 		kiwi::TokenResult result;
 		size_t correct = 0, labeledCorrect = 0, numPreds = 0;
 		size_t correctChr = 0, numPredsChr = 0;
