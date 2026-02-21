@@ -80,6 +80,7 @@ typedef struct {
 	float space_penalty; /**< 공백 패널티 */
 	float typo_cost_weight; /**< 오타 비용의 가중치 */
 	uint32_t max_unk_form_size; /**< 미등재 형태의 최대 크기 */
+	uint32_t max_unk_form_size_followed_by_j_class; /**< (조사가 뒤따르는 경우) 미등재 형태의 최대 크기 */
 	uint32_t space_tolerance; /**< 공백 허용치 */
 } kiwi_config_t;
 
@@ -180,6 +181,12 @@ enum
 	KIWI_MATCH_HASHTAG = 4,
 	KIWI_MATCH_MENTION = 8,
 	KIWI_MATCH_SERIAL = 16,
+
+	KIWI_MATCH_OOV_RULE_ONLY = 0 << 8,
+	KIWI_MATCH_OOV_CHR_MODEL = 1 << 8,
+	KIWI_MATCH_OOV_CHR_FREQ_MODEL = 2 << 8,
+	KIWI_MATCH_OOV_CHR_FREQ_BRANCH_MODEL = 3 << 8,
+	KIWI_MATCH_OOV_MASK = 3 << 8,
 
 	KIWI_MATCH_NORMALIZE_CODA = 1 << 16,
 	KIWI_MATCH_JOIN_NOUN_PREFIX = 1 << 17,

@@ -678,6 +678,7 @@ void kiwi_set_global_config(kiwi_h handle, kiwi_config_t config)
 			config.space_penalty,
 			config.typo_cost_weight,
 			config.max_unk_form_size,
+			config.max_unk_form_size_followed_by_j_class,
 			config.space_tolerance,
 		};
 		kiwi->setGlobalConfig(kconfig);
@@ -707,6 +708,7 @@ kiwi_config_t kiwi_get_global_config(kiwi_h handle)
 		config.space_penalty = kconfig.spacePenalty;
 		config.typo_cost_weight = kconfig.typoCostWeight;
 		config.max_unk_form_size = kconfig.maxUnkFormSize;
+		config.max_unk_form_size_followed_by_j_class = kconfig.maxUnkFormSizeFollowedByJClass;
 		config.space_tolerance = kconfig.spaceTolerance;
 	}
 	catch (...)
