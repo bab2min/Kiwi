@@ -1244,8 +1244,9 @@ TEST(KiwiCpp, ZCoda)
 TEST(KiwiCpp, ZSiot)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
-
-	auto resSplit = kiwi.analyze(u"찰랑찰랑한 머릿결과 볼륨감", Match::allWithNormalizing | Match::splitSaisiot);
+	KiwiConfig config = kiwi.getGlobalConfig();
+	config.oovRuleScale = 6;
+	auto resSplit = kiwi.analyze(u"찰랑찰랑한 머릿결과 볼륨감", Match::allWithNormalizing | Match::splitSaisiot, {}, config);
 	EXPECT_EQ(resSplit.first.size(), 8);
 	EXPECT_EQ(resSplit.first[3].str, u"머리");
 	EXPECT_EQ(resSplit.first[4].tag, POSTag::z_siot);
@@ -1253,9 +1254,9 @@ TEST(KiwiCpp, ZSiot)
 	
 	for (auto s : {u"하굣길", u"만둣국", u"나뭇잎", u"세숫물", u"고춧가루", u"시곗바늘", u"사글셋방"})
 	{
-		auto resNone = kiwi.analyze(s, Match::allWithNormalizing);
-		auto resSplit = kiwi.analyze(s, Match::allWithNormalizing | Match::splitSaisiot);
-		auto resMerge = kiwi.analyze(s, Match::allWithNormalizing | Match::mergeSaisiot);
+		auto resNone = kiwi.analyze(s, Match::allWithNormalizing, {}, config);
+		auto resSplit = kiwi.analyze(s, Match::allWithNormalizing | Match::splitSaisiot, {}, config);
+		auto resMerge = kiwi.analyze(s, Match::allWithNormalizing | Match::mergeSaisiot, {}, config);
 		EXPECT_FALSE(std::any_of(resNone.first.begin(), resNone.first.end(), [](const TokenInfo& token) { return token.tag == POSTag::z_siot; }));
 		EXPECT_EQ(resSplit.first.size(), 3);
 		EXPECT_EQ(resSplit.first[0].tag, POSTag::nng);
@@ -1267,9 +1268,9 @@ TEST(KiwiCpp, ZSiot)
 
 	for (auto s : {u"발렛 파킹", u"미닛"})
 	{
-		auto resNone = kiwi.analyze(s, Match::allWithNormalizing);
-		auto resSplit = kiwi.analyze(s, Match::allWithNormalizing | Match::splitSaisiot);
-		auto resMerge = kiwi.analyze(s, Match::allWithNormalizing | Match::mergeSaisiot);
+		auto resNone = kiwi.analyze(s, Match::allWithNormalizing, {}, config);
+		auto resSplit = kiwi.analyze(s, Match::allWithNormalizing | Match::splitSaisiot, {}, config);
+		auto resMerge = kiwi.analyze(s, Match::allWithNormalizing | Match::mergeSaisiot, {}, config);
 		EXPECT_EQ(resNone.second, resSplit.second);
 		EXPECT_EQ(resNone.second, resMerge.second);
 		EXPECT_FALSE(std::any_of(resSplit.first.begin(), resSplit.first.end(), [](const TokenInfo& token) { return token.tag == POSTag::z_siot; }));
@@ -1279,12 +1280,13 @@ TEST(KiwiCpp, ZSiot)
 TEST(KiwiCpp, ZSiotWithTypo)
 {
 	Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 0, BuildOption::default_, }.build(getDefaultTypoSet(DefaultTypoSet::basicTypoSetWithContinual));
-
+	KiwiConfig config = kiwi.getGlobalConfig();
+	config.oovRuleScale = 6;
 	for (auto s : { u"하굣길", u"만둣국", u"나뭇잎", u"세숫물", u"고춧가루", u"시곗바늘", u"사글셋방" })
 	{
-		auto resNone = kiwi.analyze(s, Match::allWithNormalizing);
-		auto resSplit = kiwi.analyze(s, Match::allWithNormalizing | Match::splitSaisiot);
-		auto resMerge = kiwi.analyze(s, Match::allWithNormalizing | Match::mergeSaisiot);
+		auto resNone = kiwi.analyze(s, Match::allWithNormalizing, {}, config);
+		auto resSplit = kiwi.analyze(s, Match::allWithNormalizing | Match::splitSaisiot, {}, config);
+		auto resMerge = kiwi.analyze(s, Match::allWithNormalizing | Match::mergeSaisiot, {}, config);
 		EXPECT_FALSE(std::any_of(resNone.first.begin(), resNone.first.end(), [](const TokenInfo& token) { return token.tag == POSTag::z_siot; }));
 		EXPECT_EQ(resSplit.first.size(), 3);
 		EXPECT_EQ(resSplit.first[0].tag, POSTag::nng);
@@ -1296,9 +1298,9 @@ TEST(KiwiCpp, ZSiotWithTypo)
 
 	for (auto s : { u"발렛 파킹", u"미닛" })
 	{
-		auto resNone = kiwi.analyze(s, Match::allWithNormalizing);
-		auto resSplit = kiwi.analyze(s, Match::allWithNormalizing | Match::splitSaisiot);
-		auto resMerge = kiwi.analyze(s, Match::allWithNormalizing | Match::mergeSaisiot);
+		auto resNone = kiwi.analyze(s, Match::allWithNormalizing, {}, config);
+		auto resSplit = kiwi.analyze(s, Match::allWithNormalizing | Match::splitSaisiot, {}, config);
+		auto resMerge = kiwi.analyze(s, Match::allWithNormalizing | Match::mergeSaisiot, {}, config);
 		EXPECT_EQ(resNone.second, resSplit.second);
 		EXPECT_EQ(resNone.second, resMerge.second);
 		EXPECT_FALSE(std::any_of(resSplit.first.begin(), resSplit.first.end(), [](const TokenInfo& token) { return token.tag == POSTag::z_siot; }));
