@@ -6,7 +6,7 @@ set -e
 # and combines them into a single XCFramework
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 SWIFT_DIR="$PROJECT_ROOT/bindings/swift"
 BUILD_DIR="$SWIFT_DIR/build"
 XCFRAMEWORK_DIR="$SWIFT_DIR/xcframework"
