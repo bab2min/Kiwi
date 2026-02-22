@@ -278,7 +278,7 @@ namespace kiwi
 				static constexpr size_t keyWidth = sizeof(VlKeyType) * 8,
 					surrogateBitWidth = keyWidth == 16 ? 10 : 5,
 					surrogateBitMask = (1 << surrogateBitWidth) - 1;
-				static constexpr size_t tMax = ((size_t)1 << keyWidth) - ((size_t)1 << surrogateBitWidth) * 2;
+				static constexpr size_t tMax = (keyWidth >= sizeof(size_t) * 8) ? (size_t)-1 - (((size_t)1 << surrogateBitWidth) * 2 - 1) : (((size_t)1 << keyWidth) - ((size_t)1 << surrogateBitWidth) * 2);
 				if (next < tMax)
 				{
 					return progressContextNodeVl(nodeIdx, next);
@@ -299,7 +299,7 @@ namespace kiwi
 				static constexpr size_t keyWidth = sizeof(VlKeyType) * 8,
 					surrogateBitWidth = keyWidth == 16 ? 10 : 5,
 					surrogateBitMask = (1 << surrogateBitWidth) - 1;
-				static constexpr size_t tMax = ((size_t)1 << keyWidth) - ((size_t)1 << surrogateBitWidth) * 2;
+				static constexpr size_t tMax = (keyWidth >= sizeof(size_t) * 8) ? (size_t)-1 - (((size_t)1 << surrogateBitWidth) * 2 - 1) : (((size_t)1 << keyWidth) - ((size_t)1 << surrogateBitWidth) * 2);
 				return k >= tMax + (1 << surrogateBitWidth);
 			}
 
