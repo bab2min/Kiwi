@@ -150,7 +150,7 @@ Android NDK를 통해 Android 앱에서 사용할 수 있는 AAR 라이브러리
 - **패키지**: AAR 형태로 제공되어 Gradle 프로젝트에 쉽게 통합 가능
 
 ### Swift Wrapper
-iOS 12.0 이상 및 macOS 10.14 이상에서 사용 가능한 Swift binding이 제공됩니다. Swift Package Manager를 통해 쉽게 통합할 수 있습니다.
+iOS 12.0 이상 및 macOS 10.14 이상에서 사용 가능한 Swift binding이 제공 예정입니다. 조금만 기다려주세요.
 - **최소 요구사항**: iOS 12.0+ / macOS 10.14+, Swift 5.7+
 - **사용법**: [bindings/swift](bindings/swift)의 README 참조
 - **설치**: Swift Package Manager 지원
