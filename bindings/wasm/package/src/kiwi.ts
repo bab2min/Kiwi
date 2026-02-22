@@ -154,6 +154,25 @@ export interface PretokenizedSpan {
 }
 
 /**
+ * Describes global configuration for Kiwi.
+ */
+export interface KiwiConfig {
+    integrateAllomorph?: boolean;
+    cutOffThreshold?: number;
+    oovRuleScale?: number;
+    oovRuleBias?: number;
+    oovChrBias?: number;
+    oovGlobalWeight?: number;
+    oovLocalWeight?: number;
+    oovGlobalMinFreq?: number;
+    spacePenalty?: number;
+    typoCostWeight?: number;
+    maxUnkFormSize?: number;
+    maxUnkFormSizeFollowedByJClass?: number;
+    spaceTolerance?: number;
+}
+
+/**
  * Interface that performs the actual morphological analysis.
  * Cannot be constructed directly, use {@link KiwiBuilder} to create a new instance.
  */
@@ -252,22 +271,10 @@ export interface Kiwi {
         lmSearch?: boolean,
         withRanges?: boolean
     ) => SentenceJoinResult;
-    getCutOffThreshold: () => number;
-    setCutOffThreshold: (v: number) => void;
-    getUnkScoreBias: () => number;
-    setUnkScoreBias: (v: number) => void;
-    getUnkScoreScale: () => number;
-    setUnkScoreScale: (v: number) => void;
-    getMaxUnkFormSize: () => number;
-    setMaxUnkFormSize: (v: number) => void;
-    getSpaceTolerance: () => number;
-    setSpaceTolerance: (v: number) => void;
-    getSpacePenalty: () => number;
-    setSpacePenalty: (v: number) => void;
-    getTypoCostWeight: () => number;
-    setTypoCostWeight: (v: number) => void;
-    getIntegrateAllomorphic: () => boolean;
-    setIntegrateAllomorphic: (v: boolean) => void;
+    
+    getGlobalConfig: () => KiwiConfig;
+    setGlobalConfig: (config: KiwiConfig) => void;
+
     /**
      * Creates a reusable morpheme set from a list of morphemes. This is intended to be used as the `blockList` parameter for the analyse and tokenize methods.
      * NOTE: The morpheme set must be destroyed using `destroyMorphemeSet` when it is no longer needed. Otherwise, it will cause a memory leak.
@@ -282,6 +289,7 @@ export interface Kiwi {
      */
     destroyMorphemeSet: (id: MorphemeSet) => void;
 }
+
 
 /**
  * Interface that performs the actual morphological analysis.

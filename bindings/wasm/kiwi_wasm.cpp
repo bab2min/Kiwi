@@ -528,25 +528,36 @@ json kiwiGetGlobalConfig(Kiwi& kiwi, const json& args) {
     auto config = kiwi.getGlobalConfig();
     obj["integrateAllomorph"] = config.integrateAllomorph;
     obj["cutOffThreshold"] = config.cutOffThreshold;
-    obj["unkFormScoreScale"] = config.unkFormScoreScale;
-    obj["unkFormScoreBias"] = config.unkFormScoreBias;
+    obj["oovRuleScale"] = config.oovRuleScale;
+    obj["oovRuleBias"] = config.oovRuleBias;
+    obj["oovChrBias"] = config.oovChrBias;
+    obj["oovGlobalWeight"] = config.oovGlobalWeight;
+    obj["oovLocalWeight"] = config.oovLocalWeight;
+    obj["oovGlobalMinFreq"] = config.oovGlobalMinFreq;
     obj["spacePenalty"] = config.spacePenalty;
     obj["typoCostWeight"] = config.typoCostWeight;
     obj["maxUnkFormSize"] = config.maxUnkFormSize;
+    obj["maxUnkFormSizeFollowedByJClass"] = config.maxUnkFormSizeFollowedByJClass;
     obj["spaceTolerance"] = config.spaceTolerance;
     return obj;
 }
 
 json kiwiSetGlobalConfig(Kiwi& kiwi, const json& args) {
-    KiwiConfig config;
-    if (args.contains("integrateAllomorph")) config.integrateAllomorph = args["integrateAllomorph"];
-    if (args.contains("cutOffThreshold")) config.cutOffThreshold = args["cutOffThreshold"];
-    if (args.contains("unkFormScoreScale")) config.unkFormScoreScale = args["unkFormScoreScale"];
-    if (args.contains("unkFormScoreBias")) config.unkFormScoreBias = args["unkFormScoreBias"];
-    if (args.contains("spacePenalty")) config.spacePenalty = args["spacePenalty"];
-    if (args.contains("typoCostWeight")) config.typoCostWeight = args["typoCostWeight"];
-    if (args.contains("maxUnkFormSize")) config.maxUnkFormSize = args["maxUnkFormSize"];
-    if (args.contains("spaceTolerance")) config.spaceTolerance = args["spaceTolerance"];
+    auto config = kiwi.getGlobalConfig();
+    const json& configArg = args[0];
+    if (configArg.contains("integrateAllomorph")) config.integrateAllomorph = configArg["integrateAllomorph"];
+    if (configArg.contains("cutOffThreshold")) config.cutOffThreshold = configArg["cutOffThreshold"];
+    if (configArg.contains("oovRuleScale")) config.oovRuleScale = configArg["oovRuleScale"];
+    if (configArg.contains("oovRuleBias")) config.oovRuleBias = configArg["oovRuleBias"];
+    if (configArg.contains("oovChrBias")) config.oovChrBias = configArg["oovChrBias"];
+    if (configArg.contains("oovGlobalWeight")) config.oovGlobalWeight = configArg["oovGlobalWeight"];
+    if (configArg.contains("oovLocalWeight")) config.oovLocalWeight = configArg["oovLocalWeight"];
+    if (configArg.contains("oovGlobalMinFreq")) config.oovGlobalMinFreq = configArg["oovGlobalMinFreq"];
+    if (configArg.contains("spacePenalty")) config.spacePenalty = configArg["spacePenalty"];
+    if (configArg.contains("typoCostWeight")) config.typoCostWeight = configArg["typoCostWeight"];
+    if (configArg.contains("maxUnkFormSize")) config.maxUnkFormSize = configArg["maxUnkFormSize"];
+    if (configArg.contains("maxUnkFormSizeFollowedByJClass")) config.maxUnkFormSizeFollowedByJClass = configArg["maxUnkFormSizeFollowedByJClass"];
+    if (configArg.contains("spaceTolerance")) config.spaceTolerance = configArg["spaceTolerance"];
     kiwi.setGlobalConfig(config);
     return nullptr;
 }

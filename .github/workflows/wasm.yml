@@ -1,0 +1,50 @@
+name: WASM Bindings
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'bindings/wasm/**'
+      - 'src/**'
+      - 'include/**'
+      - 'CMakeLists.txt'
+      - '.github/workflows/wasm.yml'
+  push:
+    branches: [ main ]
+    paths:
+      - 'bindings/wasm/**'
+      - 'src/**'
+      - 'include/**'
+      - 'CMakeLists.txt'
+      - '.github/workflows/wasm.yml'
+
+jobs:
+  wasm-build-test:
+    name: WASM Build and Test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: true
+        lfs: true
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+        
+    - name: Setup Emscripten
+      uses: mymindstorm/setup-emsdk@v14
+      with:
+        version: '3.1.64' # Latest stable or specific version
+        
+    - name: Build WASM
+      run: |
+        chmod +x bindings/wasm/build.sh
+        bindings/wasm/build.sh
+        
+    - name: Run WASM Unit Test
+      run: |
+        cd bindings/wasm/package
+        npm run test
