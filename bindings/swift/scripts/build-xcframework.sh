@@ -57,7 +57,14 @@ build_platform() {
     mkdir -p "$FRAMEWORK_DIR/Headers"
     
     # Copy library
-    cp Release/libkiwi_static.a "$FRAMEWORK_DIR/Kiwi"
+    # Use find to locate the library because Xcode puts it in different places 
+    # depending on the platform (e.g., Release-iphoneos, Release-iphonesimulator, Release)
+    local LIB_FILE=$(find . -name "libkiwi_static.a" | grep "Release" | head -n 1)
+    if [ -z "$LIB_FILE" ]; then
+        echo "Error: libkiwi_static.a not found in $PLATFORM_BUILD_DIR"
+        exit 1
+    fi
+    cp "$LIB_FILE" "$FRAMEWORK_DIR/Kiwi"
     
     # Copy headers
     cp "$PROJECT_ROOT/include/kiwi/capi.h" "$FRAMEWORK_DIR/Headers/"
