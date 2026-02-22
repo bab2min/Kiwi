@@ -22,11 +22,15 @@
     },
     "homepage": "https://lab.bab2min.pe.kr/kiwi",
     "devDependencies": {
+        "@types/node": "^20.0.0",
         "typedoc": "^0.26.2",
-        "typescript": "^5.4.5"
+        "typescript": "^5.4.5",
+        "undici-types": "^7.22.0",
+        "vitest": "^1.6.0"
     },
     "scripts": {
         "build": "tsc",
-        "doc": "typedoc --out doc src"
+        "doc": "typedoc --out doc src",
+        "test": "vitest run"
     }
 }
