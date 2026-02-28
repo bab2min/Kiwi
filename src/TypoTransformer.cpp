@@ -3,6 +3,7 @@
 #include <kiwi/Utils.h>
 #include "StrUtils.h"
 #include "FrozenTrie.hpp"
+#include "FeatureTestor.h"
 
 using namespace std;
 using namespace kiwi;
@@ -431,13 +432,19 @@ namespace kiwi
 
 PreparedTypoTransformer::PreparedTypoTransformer() = default;
 
-PreparedTypoTransformer::PreparedTypoTransformer(const TypoTransformer& tt)
+PreparedTypoTransformer::PreparedTypoTransformer(const TypoTransformer& tt, bool inverse)
 	: continualTypoThreshold{ tt.continualTypoThreshold }, lengtheningTypoThreshold{ tt.lengtheningTypoThreshold }
 {
 	IntermediateTypoTransformer itt;
 	for (auto& t : tt.typos)
 	{
-		itt.addTypo(get<0>(t.first), get<1>(t.first), t.second, get<2>(t.first), get<3>(t.first));
+		itt.addTypo(
+			inverse ? get<1>(t.first) : get<0>(t.first), 
+			inverse ? get<0>(t.first) : get<1>(t.first), 
+			t.second, 
+			get<2>(t.first), 
+			get<3>(t.first)
+		);
 	}
 	strPool = std::move(itt.strPool);
 
@@ -445,20 +452,25 @@ PreparedTypoTransformer::PreparedTypoTransformer(const TypoTransformer& tt)
 	for (auto& rs : itt.replacements) tot += rs.size();
 	replacements.reserve(tot);
 	
-	Vector<std::pair<const ReplInfo*, uint32_t>> patData;
+	Vector<pair<const ReplInfo*, uint32_t>> patData;
 	for (auto& rs : itt.replacements)
 	{
 		patData.emplace_back(replacements.data() + replacements.size(), rs.size());
 		for (auto& r : rs)
 		{
-			replacements.emplace_back(strPool.data() + r.begin, r.end - r.begin, r.cost, r.leftCond, r.dialect);
+			auto rBegin = r.begin;
+			if (inverse && r.leftCond == CondVowel::applosive && strPool[rBegin] == 0)
+			{
+				rBegin++;
+			}
+			replacements.emplace_back(strPool.data() + rBegin, r.end - rBegin, r.cost, r.leftCond, r.dialect);
 		}
 	}
 	
 	patTrie = decltype(patTrie){ itt.patTrie, ArchTypeHolder<ArchType::none>{}, [&](const IntermediateTypoTransformer::TrieNode& o) -> PatInfo
 		{
 			uint32_t depth = o.depth;
-			if (o.val && patData[o.val - 1].first->leftCond == CondVowel::applosive)
+			if (!inverse && o.val && patData[o.val - 1].first->leftCond == CondVowel::applosive)
 			{
 				depth--;
 			}
@@ -569,6 +581,173 @@ TypoCandidates<true> PreparedTypoTransformer::generate(const u16string& orig, fl
 	return _generate<true>(normalizeHangul(orig), costThreshold);
 }
 
+/*
+다음과 같은 오타 규칙이 있을때
+* ㄷ이 -> 지
+'구지'라는 입력에 대한 Char DAG는 아래처럼 구축된다.
+
+Idx    0     1           2
+BOS -> 구 -> 지       -> EOS
+		  -> ㄷ -> 이 -> EOS
+*/
+
+template<class Alloc, class... Args>
+inline bool appendNewNode(vector<TypoGraphNode, Alloc>& nodes, Vector<pair<size_t, size_t>>& endPosMap, size_t endPosMapOffset, U16StringView form, size_t startPos, size_t endPos, Args&&... args)
+{
+	static constexpr size_t npos = -1;
+
+	if (endPosMap[startPos - endPosMapOffset].first == npos)
+	{
+		return false;
+	}
+
+	size_t newId = nodes.size();
+	nodes.emplace_back(form, endPos, forward<Args>(args)...);
+	TypoGraphNode& nnode = nodes.back();
+
+	nnode.prevOffset = newId - endPosMap[startPos - endPosMapOffset].first;
+	if (nnode.endPos >= endPosMap.size() + endPosMapOffset) return true;
+
+	if (endPosMap[nnode.endPos - endPosMapOffset].first == npos)
+	{
+		endPosMap[nnode.endPos - endPosMapOffset].first = newId;
+	}
+	else
+	{
+		nodes[endPosMap[nnode.endPos - endPosMapOffset].second].siblingOffset = newId - endPosMap[nnode.endPos - endPosMapOffset].second;
+	}
+	endPosMap[nnode.endPos - endPosMapOffset].second = newId;
+	return true;
+}
+
+template<class Alloc>
+size_t PreparedTypoTransformer::generateGraph(U16StringView str, vector<TypoGraphNode, Alloc>& graphOut) const
+{
+	static constexpr size_t npos = -1;
+	using MatchInfo = pair<size_t, PatInfo>; // (endPos, patternInfo)
+	thread_local Vector<MatchInfo> matches;
+	thread_local Vector<size_t> breakPoints;
+	thread_local Vector<pair<size_t, size_t>> endPosMap; // (first position, last position)
+	endPosMap.clear();
+	endPosMap.emplace_back(0, 0);
+
+	size_t last = 0;
+	graphOut.clear();
+	graphOut.emplace_back(U16StringView{ str.data(), 0 }, 0);
+
+	const auto& insertBranch = [&]()
+	{
+		const size_t totStartPos = matches[0].first - matches[0].second.patLength;
+		const size_t totEndPos = matches.back().first;
+
+		const auto v = endPosMap.back();
+		endPosMap.clear();
+		endPosMap.resize(totEndPos - last + 1, make_pair(npos, npos));
+		endPosMap[0] = v;
+		
+		breakPoints.clear();
+		breakPoints.emplace_back(totStartPos);
+		for (auto& m : matches)
+		{
+			const size_t e = m.first;
+			const size_t s = e - m.second.patLength;
+			breakPoints.emplace_back(e);
+		}
+		breakPoints.emplace_back(totEndPos);
+		sort(breakPoints.begin(), breakPoints.end());
+		breakPoints.erase(unique(breakPoints.begin(), breakPoints.end()), breakPoints.end());
+
+		sort(matches.begin(), matches.end(), [](const MatchInfo& a, const MatchInfo& b)
+			{
+				return a.first - a.second.patLength < b.first - b.second.patLength;
+			}
+		);
+
+		if (last < totStartPos)
+		{
+			appendNewNode(graphOut, endPosMap, last, U16StringView{ str.data() + last, totStartPos - last }, last, totStartPos);
+		}
+		for (size_t i = 1; i < breakPoints.size(); ++i)
+		{
+			appendNewNode(graphOut, endPosMap, last, U16StringView{ str.data() + breakPoints[i - 1], breakPoints[i] - breakPoints[i - 1] }, breakPoints[i - 1], breakPoints[i]);
+		}
+
+		for (auto& m : matches)
+		{
+			const size_t e = m.first;
+			const size_t s = e - m.second.patLength;
+
+			for (size_t j = 0; j < m.second.size; ++j)
+			{
+				auto& repl = m.second.repl[j];
+				if (repl.leftCond == CondVowel::vowel)
+				{
+					if (s == 0 || !isHangulSyllable(str[s - 1])) continue;
+				}
+				else if (repl.leftCond == CondVowel::any)
+				{
+					if (s == 0) continue;
+				}
+				else
+				{
+					if (!FeatureTestor::isMatched(str.data(), str.data() + s, repl.leftCond)) continue;
+				}
+				appendNewNode(graphOut, endPosMap, last, U16StringView{ repl.str, repl.length }, s, e, repl.cost);
+			}
+		}
+		last = totEndPos;
+		matches.clear();
+	};
+
+	auto node = patTrie.root()->nextOpt<ArchType::none>(patTrie, 0);
+	for (size_t i = 0; i < str.size(); ++i)
+	{
+		auto nnode = node->nextOpt<ArchType::none>(patTrie, str[i]);
+		while (!nnode)
+		{
+			node = node->fail();
+			if (node)
+			{
+				nnode = node->nextOpt<ArchType::none>(patTrie, str[i]);
+			}
+			else
+			{
+				node = patTrie.root();
+				break;
+			}
+		}
+		if (!nnode) continue;
+		node = nnode;
+
+		auto& v = node->val(patTrie);
+		if (patTrie.isNull(v)) continue;
+
+		const size_t endPos = i + 1;
+		const size_t startPos = endPos - v.patLength;
+		if (!matches.empty() && matches.back().first < startPos)
+		{
+			insertBranch();
+		}
+		for (auto sub = node; sub; sub = sub->fail())
+		{
+			auto& sv = sub->val(patTrie);
+			if (patTrie.isNull(sv)) break;
+			if (patTrie.hasSubmatch(sv)) continue;
+			matches.emplace_back(endPos, sv);
+		}
+	}
+	if (!matches.empty())
+	{
+		insertBranch();
+	}
+	const auto v = endPosMap.back();
+	endPosMap.clear();
+	endPosMap.resize(1);
+	endPosMap[0] = v;
+	appendNewNode(graphOut, endPosMap, last, U16StringView{ str.data() + last, str.size() - last }, last, str.size());
+	return graphOut.size();
+}
+
 namespace kiwi
 {
 	template class TypoCandidates<true>;
@@ -579,6 +758,10 @@ namespace kiwi
 	template TypoCandidates<true> PreparedTypoTransformer::_generate<true>(const KString&, float) const;
 	template TypoCandidates<false> PreparedTypoTransformer::_generate<false>(const KString&, float) const;
 
+	template size_t PreparedTypoTransformer::generateGraph<allocator<TypoGraphNode>>(U16StringView, vector<TypoGraphNode, allocator<TypoGraphNode>>&) const;
+#ifdef KIWI_USE_MIMALLOC
+	template size_t PreparedTypoTransformer::generateGraph<mi_stl_allocator<TypoGraphNode>>(U16StringView, vector<TypoGraphNode, mi_stl_allocator<TypoGraphNode>>&) const;
+#endif
 
 	const TypoTransformer& getDefaultTypoSet(DefaultTypoSet set)
 	{

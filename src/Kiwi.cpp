@@ -1102,6 +1102,8 @@ namespace kiwi
 				config.maxUnkFormSize,
 				config.maxUnkFormSizeFollowedByJClass,
 				config.spaceTolerance,
+				option.typoTransformer,
+				option.typoThreshold,
 				continualTypoCost,
 				lengtheningTypoCost,
 				pretokenizedFirst,

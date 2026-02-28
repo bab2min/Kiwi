@@ -127,6 +127,32 @@ namespace kiwi
 	class KiwiBuilder;
 	class TypoTransformer;
 
+	struct TypoGraphNode
+	{
+		U16StringView form;
+		uint32_t endPos = 0;
+		float typoCost = 0;
+		uint32_t prevOffset = 0;
+		uint32_t siblingOffset = 0;
+
+		TypoGraphNode(U16StringView _form = {}, uint32_t _endPos = 0, float _typoCost = 0, uint32_t _prevOffset = 0, uint32_t _siblingOffset = 0)
+			: form{ _form }, endPos{ _endPos }, typoCost{ _typoCost }, prevOffset{ _prevOffset }, siblingOffset{ _siblingOffset }
+		{
+		}
+
+		const TypoGraphNode* getPrev() const
+		{
+			if (!prevOffset) return nullptr;
+			return this - prevOffset;
+		}
+
+		const TypoGraphNode* getSibling() const
+		{
+			if (!siblingOffset) return nullptr;
+			return this + siblingOffset;
+		}
+	};
+
 	/**
 	* @brief 오타 생성 및 교정 준비가 완료된 오타 생성기. kiwi::TypoTransformer::prepare()로부터 생성됩니다.
 	*/
@@ -191,12 +217,14 @@ namespace kiwi
 
 	public:
 		PreparedTypoTransformer();
-		PreparedTypoTransformer(const TypoTransformer& tt);
+		PreparedTypoTransformer(const TypoTransformer& tt, bool inverse = false);
 		~PreparedTypoTransformer();
 		PreparedTypoTransformer(const PreparedTypoTransformer&) = delete;
 		PreparedTypoTransformer(PreparedTypoTransformer&&) noexcept;
 		PreparedTypoTransformer& operator=(const PreparedTypoTransformer&) = delete;
 		PreparedTypoTransformer& operator=(PreparedTypoTransformer&&);
+
+		static PreparedTypoTransformer makeInverse(const TypoTransformer& tt);
 
 		bool ready() const { return !replacements.empty(); }
 		
@@ -217,6 +245,9 @@ namespace kiwi
 		* @param costThreshold 생성할 오타 후보의 비용 상한
 		*/
 		TypoCandidates<true> generate(const std::u16string& orig, float costThreshold = 2.5f) const;
+
+		template<class Alloc>
+		size_t generateGraph(U16StringView normalizedStr, std::vector<TypoGraphNode, Alloc>& graphOut) const;
 	};
 
 	/**
@@ -389,10 +420,12 @@ namespace kiwi
 		/**
 		* @brief 현재 TypoTransformer를 사용하여 PreparedTypoTransformer를 생성합니다. 
 		*		PreparedTypoTransformer는 실제로 오타를 생성하거나 kiwi::KiwiBuilder에 전달되어 오타 교정에 사용될 수 있습니다.
+		* 
+		* @param inverse false일 경우 원본을 오타로 변환하는 변환기를, true일 경우 오타를 원본으로 변환하는 변환기를 생성합니다. 기본값은 false입니다.
 		*/
-		PreparedTypoTransformer prepare() const
+		PreparedTypoTransformer prepare(bool inverse = false) const
 		{
-			return { *this };
+			return { *this, inverse };
 		}
 	};
 

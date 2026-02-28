@@ -564,6 +564,27 @@ inline bool isDiscontinuous(POSTag prevTag, POSTag curTag, ScriptType prevScript
 	return prevTag != curTag;
 }
 
+template<ArchType arch>
+size_t splitByTrieUsingTypo(
+	Vector<KGraphNode>& ret,
+	const Form* formBase,
+	const size_t* typoPtrs,
+	const utils::FrozenTrie<kchar_t, const Form*>& trie,
+	U16StringView str,
+	size_t startOffset,
+	Match matchOptions,
+	Dialect allowedDialect,
+	size_t maxUnkFormSize,
+	size_t maxUnkFormSizeFollowedByJClass,
+	size_t spaceTolerance,
+	const PreparedTypoTransformer* typoTransformer,
+	float typoThreshold,
+	const PretokenizedSpanGroup::Span*& pretokenizedFirst,
+	const PretokenizedSpanGroup::Span* pretokenizedLast
+)
+{
+}
+
 template<ArchType arch, 
 	bool typoTolerant, 
 	bool continualTypoTolerant,
@@ -581,12 +602,15 @@ size_t kiwi::splitByTrie(
 	size_t maxUnkFormSize, 
 	size_t maxUnkFormSizeFollowedByJClass,
 	size_t spaceTolerance,
+	const PreparedTypoTransformer* typoTransformer,
+	float typoThreshold,
 	float continualTypoCost,
 	float lengtheningTypoCost,
 	const PretokenizedSpanGroup::Span*& pretokenizedFirst,
 	const PretokenizedSpanGroup::Span* pretokenizedLast
 )
 {
+	if (typoTransformer) return splitByTrieUsingTypo<arch>(ret, formBase, typoPtrs, trie, str, startOffset, matchOptions, allowedDialect, maxUnkFormSize, maxUnkFormSizeFollowedByJClass, spaceTolerance, typoTransformer, typoThreshold, pretokenizedFirst, pretokenizedLast);
 	/*
 	* posMultiplier는 연철 교정 모드(continualTypoTolerant)에서 사용된다.
 	* 이 경우 음절 경계로 분할되는 형태소들은 모두 4의 배수로 인덱싱되고
@@ -988,11 +1012,11 @@ size_t kiwi::splitByTrie(
 				
 				if (!!(matchOptions & Match::zCoda) && zCodaFollowable && isHangulCoda(c) && (n + 1 >= str.size() || !isHangulSyllable(str[n + 1])))
 				{
-					candidates.emplace_back(formBase + defaultTagSize + (c - 0x11A8) - 1, 0, nonSpaces.size() - 1);
+					candidates.emplace_back(formBase + defaultTagSize + (c - 0x11A8) - 1, 0, (nonSpaces.size() - 1) * posMultiplier);
 				}
 				else if (!!(matchOptions & (Match::splitSaisiot | Match::mergeSaisiot)) && zSiotFollowable && c == 0x11BA && n + 1 < str.size() && isHangulSyllable(str[n + 1]))
 				{
-					candidates.emplace_back(formBase + defaultTagSize + (0x11BA - 0x11A8) - 1, 0, nonSpaces.size() - 1);
+					candidates.emplace_back(formBase + defaultTagSize + (0x11BA - 0x11A8) - 1, 0, (nonSpaces.size() - 1) * posMultiplier);
 				}
 				zCodaFollowable = false;
 				zSiotFollowable = false;
