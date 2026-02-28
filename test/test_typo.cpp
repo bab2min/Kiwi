@@ -5,6 +5,27 @@
 
 using namespace kiwi;
 
+TEST(KiwiTypo, GenerateGraph)
+{
+	TypoTransformer tt;
+	tt.addTypo(u"ㅐ", u"ㅚ");
+	tt.addTypo(u"레", u"뢰");
+	tt.addTypo(u"뢨", u"룄");
+	auto ptt = tt.prepare(true);
+
+	std::vector<TypoGraphNode> graph;
+	std::u16string nstr;
+	normalizeHangul(nstr, std::u16string_view{ u"그럼 내괴다룄네" });
+	auto size = ptt.generateGraph(nstr, graph);
+	EXPECT_EQ(size, 11);
+
+	ptt = getDefaultTypoSet(DefaultTypoSet::basicTypoSet).prepare(true);
+	nstr.clear();
+	normalizeHangul(nstr, std::u16string_view{ u"앗뿔싸 그럼 오늘부터 다시 열심히 해보자꾸나." });
+	size = ptt.generateGraph(nstr, graph);
+	EXPECT_GT(size, 0);
+}
+
 TEST(KiwiTypo, Generate)
 {
 	TypoTransformer tt;
