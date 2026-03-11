@@ -87,6 +87,21 @@ namespace kiwi
 			)
 			: match{ m }, blocklist{ bl }, openEnding{ oe }, allowedDialects{ ad }, dialectCost{ dc }, typoTransformer{ tt }, typoThreshold{ tth }
 		{}
+
+		AnalyzeOption withMatch(Match m) const
+		{
+			AnalyzeOption copy = *this;
+			copy.match = m;
+			return copy;
+		}
+
+		AnalyzeOption withTypoTransformer(const PreparedTypoTransformer* tt, float typoThreshold = 2.5f) const
+		{
+			AnalyzeOption copy = *this;
+			copy.typoTransformer = tt;
+			copy.typoThreshold = typoThreshold;
+			return copy;
+		}
 	};
 
 	struct MorphemeDef
