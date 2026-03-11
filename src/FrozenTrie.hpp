@@ -136,6 +136,7 @@ namespace kiwi
 					auto v = nextDiffs[p->nextOffset + i];
 					if (v <= 0) continue;
 					auto* child = &p[v];
+					child->depth = p->depth + 1;
 					child->lower = p->template findFail<archType>(*this, k) - child;
 					dq.emplace_back(child);
 				}

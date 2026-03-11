@@ -77,6 +77,7 @@ namespace kiwi
 			struct Node
 			{
 				Key numNexts = 0;
+				uint16_t depth = 0;
 				Diff lower = 0;
 				uint32_t nextOffset = 0;
 
