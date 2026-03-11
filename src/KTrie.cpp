@@ -668,8 +668,9 @@ struct SearchState : public LengtheningTypoNodes<lengtheningTypoTolerant>
 	float accumulatedCost;
 	uint32_t minFormLen;
 	int32_t startPosOffset;
+	uint32_t specialStartNsPos;
 	uint32_t unkFormStartNsPos;
-	char16_t lastChr;
+	char32_t lastChr;
 	uint16_t startContinualTypoIdx;
 
 	SearchState(
@@ -677,8 +678,9 @@ struct SearchState : public LengtheningTypoNodes<lengtheningTypoTolerant>
 		float _accumulatedCost = 0,
 		uint32_t _minFormLen = 0,
 		int32_t _startPosOffset = 0,
+		uint32_t _specialStartNsPos = 0,
 		uint32_t _unkFormStartPos = 0,
-		char16_t _lastChr = 0,
+		char32_t _lastChr = 0,
 		uint16_t _startContinualTypoIdx = 0
 		)
 		:
@@ -686,6 +688,7 @@ struct SearchState : public LengtheningTypoNodes<lengtheningTypoTolerant>
 		accumulatedCost{ _accumulatedCost },
 		minFormLen{ _minFormLen },
 		startPosOffset{ _startPosOffset },
+		specialStartNsPos{ _specialStartNsPos },
 		unkFormStartNsPos{ _unkFormStartPos },
 		lastChr{ _lastChr },
 		startContinualTypoIdx{ _startContinualTypoIdx }
@@ -809,7 +812,7 @@ public:
 			}
 			
 			if (c32 >= 0x10000) ++n;
-
+			lastChrType = chrType;
 		}
 
 		for (size_t i = 0; i < n; ++i)
@@ -960,7 +963,8 @@ public:
 		const TypoGraphNode& prevTypoNode,
 		const TypoGraphNode& typoNode,
 		const SearchState<lengtheningTypoTolerant>& state,
-		Vector<SearchState<lengtheningTypoTolerant>>& curStates
+		Vector<SearchState<lengtheningTypoTolerant>>& curStates,
+		size_t startOffset
 	)
 	{
 		const Form* const fallbackFormBegin = trie.value((size_t)POSTag::nng);
@@ -975,9 +979,10 @@ public:
 			return;
 		}
 		auto& candidates = reinterpret_cast<Vector<FormCandidate2<lengtheningTypoTolerant>>&>(_candidates);
-		POSTag lastChrType = POSTag::unknown;
-		ScriptType lastScriptType = ScriptType::unknown;
-		size_t specialStartPos = 0;
+		char32_t prevChr = state.lastChr;
+		POSTag lastChrType = prevChr ? identifySpecialChr(prevChr) : POSTag::unknown;
+		ScriptType lastScriptType = prevChr ? chr2ScriptType(prevChr) : ScriptType::unknown;
+		size_t specialStartNsPos = state.specialStartNsPos;
 		size_t unkFormStartNsPos = state.unkFormStartNsPos;
 
 		size_t minFormLen = state.minFormLen;
@@ -988,7 +993,6 @@ public:
 		}
 
 		auto lengtheningTypoNodes = state.getLengtheningTypoNodes();
-		char16_t prevChr = state.lastChr;
 		auto* curNode = state.node;
 		for (size_t j = 0; j < typoNode.form.size(); ++j)
 		{
@@ -1024,23 +1028,25 @@ public:
 						{
 							insertUnkForm(
 								unkFormStartNsPos,
-								posToNs[typoNode.endPos + specialStartPos - typoNode.form.size()],
+								specialStartNsPos,
 								false);
+							auto str = rawStr.substr(nsToPos[specialStartNsPos], (typoNode.endPos + j - typoNode.form.size()) - nsToPos[specialStartNsPos]);
+							while (!str.empty() && isSpace(str.back())) str = str.substr(0, str.size() - 1);
 							if (appendNewNode(out, endPosMap,
-								posToNs[typoNode.endPos + specialStartPos - typoNode.form.size()] << posMultiplierBit,
+								specialStartNsPos << posMultiplierBit,
 								(posToNs[typoNode.endPos + j - 1 - typoNode.form.size()] + 1) << posMultiplierBit,
-								typoNode.form.substr(specialStartPos, j - specialStartPos)))
+								str))
 							{
 								out.back().form = trie.value((size_t)lastChrType);
 							}
 						}
 					}
-					unkFormStartNsPos = posToNs[typoNode.endPos + specialStartPos - typoNode.form.size()];
-					specialStartPos = j;
+					unkFormStartNsPos = specialStartNsPos;
+					specialStartNsPos = posToNs[typoNode.endPos + j - typoNode.form.size()];
 				}
 				else if (chrType == POSTag::max)
 				{
-					unkFormStartNsPos = posToNs[typoNode.endPos + specialStartPos - typoNode.form.size()];
+					unkFormStartNsPos = specialStartNsPos;
 				}
 
 				lastChrType = isInPattern ? POSTag::unknown : chrType;
@@ -1098,21 +1104,21 @@ public:
 				}
 			}
 			if (typoNode.typoCost == 0 && nextPretokenizedPattern != lastPretokenizedPattern
-				&& nextPretokenizedPattern->begin == typoNode.endPos + j - typoNode.form.size())
+				&& nextPretokenizedPattern->begin - startOffset == typoNode.endPos + j - typoNode.form.size())
 			{
 				insertUnkForm(
 					unkFormStartNsPos,
-					posToNs[nextPretokenizedPattern->begin],
+					posToNs[nextPretokenizedPattern->begin - startOffset],
 					false);
 				if (appendNewNode(out, endPosMap,
-					posToNs[nextPretokenizedPattern->begin] << posMultiplierBit,
-					(posToNs[nextPretokenizedPattern->end - 1] + 1) << posMultiplierBit,
+					posToNs[nextPretokenizedPattern->begin - startOffset] << posMultiplierBit,
+					(posToNs[nextPretokenizedPattern->end - startOffset - 1] + 1) << posMultiplierBit,
 					nextPretokenizedPattern->form
 				))
 				{
 					if (within(nextPretokenizedPattern->form, fallbackFormBegin, fallbackFormEnd))
 					{
-						out.back().uform = rawStr.substr(nextPretokenizedPattern->begin, nextPretokenizedPattern->end - nextPretokenizedPattern->begin);
+						out.back().uform = rawStr.substr(nextPretokenizedPattern->begin - startOffset, nextPretokenizedPattern->end - nextPretokenizedPattern->begin);
 					}
 				}
 				
@@ -1124,13 +1130,13 @@ public:
 				{
 					lengtheningTypoNodes.clear();
 				}
-				specialStartPos = j + 1;
-				unkFormStartNsPos = posToNs[typoNode.endPos + j + 1 - typoNode.form.size()];
+				specialStartNsPos = unkFormStartNsPos = posToNs[typoNode.endPos + j + 1 - typoNode.form.size()];
 				continue;
 			}
 			if (c32 >= 0x10000)
 			{
 				++j;
+				prevChr = c32;
 				continue;
 			}
 
@@ -1188,8 +1194,8 @@ public:
 					lengtheningTypoNodes[outputIdx++] = node;
 				}
 				lengtheningTypoNodes.erase(lengtheningTypoNodes.begin() + outputIdx, lengtheningTypoNodes.end());
-				prevChr = c;
 			}
+			prevChr = c32;
 
 			if (minFormLen > 0 || typoNode.typoCost > 0) ++minFormLen;
 			auto* nextNode = curNode->template nextOpt<arch>(trie, c);
@@ -1263,16 +1269,18 @@ public:
 			{
 				insertUnkForm(
 					unkFormStartNsPos,
-					posToNs[typoNode.endPos + specialStartPos - typoNode.form.size()],
+					specialStartNsPos,
 					false);
+				auto str = rawStr.substr(nsToPos[specialStartNsPos], typoNode.endPos - nsToPos[specialStartNsPos]);
+				while (!str.empty() && isSpace(str.back())) str = str.substr(0, str.size() - 1);
 				if (appendNewNode(out, endPosMap,
-					posToNs[typoNode.endPos + specialStartPos - typoNode.form.size()] << posMultiplierBit,
+					specialStartNsPos << posMultiplierBit,
 					(posToNs[typoNode.endPos - 1] + 1) << posMultiplierBit,
-					typoNode.form.substr(specialStartPos)))
+					str))
 				{
 					out.back().form = trie.value((size_t)lastChrType);
 				}
-				unkFormStartNsPos = posToNs[typoNode.endPos + specialStartPos - typoNode.form.size()];
+				unkFormStartNsPos = specialStartNsPos;
 			}
 		}
 
@@ -1293,7 +1301,7 @@ public:
 			}
 			else
 			{
-				curStates.emplace_back(curNode, typoCost, minFormLen, startPosOffset, unkFormStartNsPos, prevChr, typoNode.continualTypoIdx ? typoNode.continualTypoIdx : state.startContinualTypoIdx);
+				curStates.emplace_back(curNode, typoCost, minFormLen, startPosOffset, specialStartNsPos, unkFormStartNsPos, prevChr, typoNode.continualTypoIdx ? typoNode.continualTypoIdx : state.startContinualTypoIdx);
 			}
 			if constexpr (lengtheningTypoTolerant)
 			{
@@ -1303,7 +1311,7 @@ public:
 	}
 
 	template<ArchType arch, bool lengtheningTypoTolerant>
-	void search(const utils::FrozenTrie<kchar_t, const Form*>& trie)
+	void search(const utils::FrozenTrie<kchar_t, const Form*>& trie, size_t startOffset)
 	{
 		const size_t totEndPos = nsToPos.back() + 1;
 		auto& searchStates = reinterpret_cast<Vector<Vector<SearchState<lengtheningTypoTolerant>>>&>(_searchStates);
@@ -1318,7 +1326,7 @@ public:
 				const auto& prevStates = searchStates[prev - typoGraph.data()];
 				for (auto& state : prevStates)
 				{
-					progressNode<arch, lengtheningTypoTolerant>(trie, *prev, typoNode, state, curStates);
+					progressNode<arch, lengtheningTypoTolerant>(trie, *prev, typoNode, state, curStates, startOffset);
 				}
 			}
 
@@ -1396,11 +1404,11 @@ size_t splitByTrieUsingTypo(
 	splitter.buildTypoGraph(str.substr(0, stopPos), typoTransformer);
 	if (isfinite(splitter.lengtheningTypoCost))
 	{
-		splitter.search<arch, true>(trie);
+		splitter.search<arch, true>(trie, startOffset);
 	}
 	else
 	{
-		splitter.search<arch, false>(trie);
+		splitter.search<arch, false>(trie, startOffset);
 	}
 	splitter.writeResult(ret, startOffset, stopPos);
 	return stopPos + startOffset;
