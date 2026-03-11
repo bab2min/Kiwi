@@ -134,6 +134,7 @@ namespace kiwi
 		float typoCost = 0;
 		uint32_t prevOffset = 0;
 		uint32_t siblingOffset = 0;
+		uint8_t continualTypoIdx = 0;
 
 		TypoGraphNode(U16StringView _form = {}, uint32_t _endPos = 0, float _typoCost = 0, uint32_t _prevOffset = 0, uint32_t _siblingOffset = 0)
 			: form{ _form }, endPos{ _endPos }, typoCost{ _typoCost }, prevOffset{ _prevOffset }, siblingOffset{ _siblingOffset }
@@ -224,8 +225,6 @@ namespace kiwi
 		PreparedTypoTransformer& operator=(const PreparedTypoTransformer&) = delete;
 		PreparedTypoTransformer& operator=(PreparedTypoTransformer&&);
 
-		static PreparedTypoTransformer makeInverse(const TypoTransformer& tt);
-
 		bool ready() const { return !replacements.empty(); }
 		
 		float getContinualTypoCost() const
@@ -247,7 +246,9 @@ namespace kiwi
 		TypoCandidates<true> generate(const std::u16string& orig, float costThreshold = 2.5f) const;
 
 		template<class Alloc>
-		size_t generateGraph(U16StringView normalizedStr, std::vector<TypoGraphNode, Alloc>& graphOut) const;
+		size_t generateGraph(U16StringView normalizedStr, std::vector<TypoGraphNode, Alloc>& graphOut, 
+			const std::pair<uint32_t, uint32_t>* pretokenizedFirst = nullptr,
+			const std::pair<uint32_t, uint32_t>* pretokenizedLast = nullptr) const;
 	};
 
 	/**
