@@ -1201,4 +1201,33 @@ namespace kiwi
 		}
 	}
 
+	const PreparedTypoTransformer* getDefaultPreparedTypoSet(DefaultTypoSet set)
+	{
+		static const auto defaultTypoSet = getDefaultTypoSet(DefaultTypoSet::basicTypoSet).prepare(true);
+		static const auto defaultTypoSetWithContinual = getDefaultTypoSet(DefaultTypoSet::basicTypoSetWithContinual).prepare(true);
+		static const auto defaultTypoSetWithContinualAndLengthening = getDefaultTypoSet(DefaultTypoSet::basicTypoSetWithContinualAndLengthening).prepare(true);
+		static const auto continualTypoSet = getDefaultTypoSet(DefaultTypoSet::continualTypoSet).prepare(true);
+		static const auto lengtheningTypoSet = getDefaultTypoSet(DefaultTypoSet::lengtheningTypoSet).prepare(true);
+		static const auto dialect = getDefaultTypoSet(DefaultTypoSet::dialect).prepare(true);
+		switch (set)
+		{
+		case kiwi::DefaultTypoSet::withoutTypo:
+			return nullptr;
+		case kiwi::DefaultTypoSet::basicTypoSet:
+			return &defaultTypoSet;
+		case kiwi::DefaultTypoSet::continualTypoSet:
+			return &continualTypoSet;
+		case kiwi::DefaultTypoSet::basicTypoSetWithContinual:
+			return &defaultTypoSetWithContinual;
+		case kiwi::DefaultTypoSet::lengtheningTypoSet:
+			return &lengtheningTypoSet;
+		case kiwi::DefaultTypoSet::basicTypoSetWithContinualAndLengthening:
+			return &defaultTypoSetWithContinualAndLengthening;
+		case kiwi::DefaultTypoSet::dialect:
+			return &dialect;
+		default:
+			throw invalid_argument{ "Invalid `DefaultTypoSet`" };
+		}
+	}
+
 }

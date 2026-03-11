@@ -447,4 +447,6 @@ namespace kiwi
 	* @param set 사용할 기본 내장 오타 생성기의 종류
 	*/
 	const TypoTransformer& getDefaultTypoSet(DefaultTypoSet set);
+
+	const PreparedTypoTransformer* getDefaultPreparedTypoSet(DefaultTypoSet set);
 }
