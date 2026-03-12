@@ -1279,19 +1279,19 @@ TEST(KiwiCpp, AnalyzeError01)
 TEST(KiwiCpp, NormalizeCoda) 
 { 
 	Kiwi& kiwi = reuseKiwiInstance(); 
-	TokenResult res = kiwi.analyze(u"키윜ㅋㅋ", Match::allWithNormalizing); 
+	TokenResult res = kiwi.analyze(u"키윜ㅋㅋ", Match::allWithNormalizing | Match::oovChrModel); 
 	EXPECT_EQ(res.first.back().str, std::u16string{ u"ㅋㅋㅋ" });
-	res = kiwi.analyze(u"키윟ㅎ", Match::allWithNormalizing);
+	res = kiwi.analyze(u"키윟ㅎ", Match::allWithNormalizing | Match::oovChrModel);
 	EXPECT_EQ(res.first.back().str, std::u16string{ u"ㅎㅎ" });
-	res = kiwi.analyze(u"키윅ㄱ", Match::allWithNormalizing);
+	res = kiwi.analyze(u"키윅ㄱ", Match::allWithNormalizing | Match::oovChrModel);
 	EXPECT_EQ(res.first.back().str, std::u16string{ u"ㄱㄱ" });
-	res = kiwi.analyze(u"키윈ㄴㄴ", Match::allWithNormalizing);
+	res = kiwi.analyze(u"키윈ㄴㄴ", Match::allWithNormalizing | Match::oovChrModel);
 	EXPECT_EQ(res.first.back().str, std::u16string{ u"ㄴㄴㄴ" });
-	res = kiwi.analyze(u"키윊ㅎㅎ", Match::allWithNormalizing);
+	res = kiwi.analyze(u"키윊ㅎㅎ", Match::allWithNormalizing | Match::oovChrModel);
 	EXPECT_EQ(res.first.back().str, std::u16string{ u"ㅎㅎ" });
-	res = kiwi.analyze(u"키윍ㄱㄱ", Match::allWithNormalizing);
+	res = kiwi.analyze(u"키윍ㄱㄱ", Match::allWithNormalizing | Match::oovChrModel);
 	EXPECT_EQ(res.first.back().str, std::u16string{u"ㄱㄱ"});
-} 
+}
 
 TEST(KiwiCpp, ZCoda)
 {
