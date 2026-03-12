@@ -821,6 +821,7 @@ size_t PreparedTypoTransformer::generateGraph(U16StringView str,
 	thread_local Vector<MatchInfo> matches;
 	thread_local Vector<size_t> breakPoints;
 	thread_local Vector<pair<uint32_t, uint32_t>> endPosMap; // (first position, last position)
+	thread_local UnorderedMap<char16_t, pair<size_t, size_t>> continualTypoIdxMap;
 	matches.clear();
 	endPosMap.clear();
 	endPosMap.emplace_back(0, 0);
@@ -871,6 +872,7 @@ size_t PreparedTypoTransformer::generateGraph(U16StringView str,
 			auto [endPos, patInfo] = m;
 			const size_t e = endPos;
 			const size_t s = e - patInfo.patLength;
+			continualTypoIdxMap.clear();
 			size_t continualTypoIdx = 0;
 
 			for (size_t j = 0; j < patInfo.size; ++j)
@@ -887,11 +889,31 @@ size_t PreparedTypoTransformer::generateGraph(U16StringView str,
 				else if (repl.leftCond == CondVowel::continual)
 				{
 					if (s == 0 || !isHangulSyllable(str[s - 1])) continue;
-					if (appendNewNode(tempGraph, endPosMap, last, U16StringView{ repl.str, 1 }, s, -1, repl.cost / 2))
+					const auto [it, inserted] = continualTypoIdxMap.emplace(*repl.str, make_pair(continualTypoIdxMap.size() + 1, 0));
+					auto& [continualTypoIdx, continualTypoNodeIdx] = it->second;
+					if (inserted)
 					{
-						tempGraph.back().endPos = e;
-						tempGraph.back().continualTypoIdx = ++continualTypoIdx;
-						appendNewNode(tempGraph, endPosMap, last, U16StringView{ repl.str + 1, 1 }, -1, e, repl.cost / 2);
+						if (appendNewNode(tempGraph, endPosMap, last, U16StringView{ repl.str, 1 }, s, -1, repl.cost / 2))
+						{
+							tempGraph.back().endPos = e;
+							tempGraph.back().continualTypoIdx = continualTypoIdx;
+							continualTypoNodeIdx = tempGraph.size() - 1;
+							if (appendNewNode(tempGraph, endPosMap, last, U16StringView{ repl.str + 1, 1 }, -1, e, repl.cost / 2))
+							{
+								tempGraph.back().prevOffset = continualTypoNodeIdx;
+							}
+						}
+						else
+						{
+							continualTypoIdxMap.erase(it);
+						}
+					}
+					else
+					{
+						if (appendNewNode(tempGraph, endPosMap, last, U16StringView{ repl.str + 1, 1 }, -1, e, repl.cost / 2))
+						{
+							tempGraph.back().prevOffset = continualTypoNodeIdx;
+						}
 					}
 					continue;
 				}

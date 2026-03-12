@@ -670,6 +670,7 @@ struct SearchState : public LengtheningTypoNodes<lengtheningTypoTolerant>
 	int32_t startPosOffset;
 	uint32_t specialStartNsPos;
 	uint32_t unkFormStartNsPos;
+	uint32_t lastSpaceBoundaryNsPos;
 	char32_t lastChr;
 	uint16_t startContinualTypoIdx;
 
@@ -680,6 +681,7 @@ struct SearchState : public LengtheningTypoNodes<lengtheningTypoTolerant>
 		int32_t _startPosOffset = 0,
 		uint32_t _specialStartNsPos = 0,
 		uint32_t _unkFormStartPos = 0,
+		uint32_t _lastSpaceBoundaryNsPos = 0,
 		char32_t _lastChr = 0,
 		uint16_t _startContinualTypoIdx = 0
 		)
@@ -690,6 +692,7 @@ struct SearchState : public LengtheningTypoNodes<lengtheningTypoTolerant>
 		startPosOffset{ _startPosOffset },
 		specialStartNsPos{ _specialStartNsPos },
 		unkFormStartNsPos{ _unkFormStartPos },
+		lastSpaceBoundaryNsPos{ _lastSpaceBoundaryNsPos },
 		lastChr{ _lastChr },
 		startContinualTypoIdx{ _startContinualTypoIdx }
 	{
@@ -867,7 +870,7 @@ public:
 		const auto scanStart = max(endPosMap[multipliedEndPos].first, (uint32_t)1), scanEnd = endPosMap[multipliedEndPos].second;
 		return any_of(out.begin() + scanStart, out.begin() + scanEnd, [&](const KGraphNode& g)
 		{
-			const size_t startPos = g.endPos - (g.uform.empty() ? g.form->sizeWithoutSpace() : g.uform.size()) << posMultiplierBit;
+			const size_t startPos = g.endPos - ((g.uform.empty() ? g.form->sizeWithoutSpace() : g.uform.size()) << posMultiplierBit);
 			return g.endPos == multipliedEndPos && startPos == multipliedStartPos;
 		});
 	}
@@ -886,7 +889,7 @@ public:
 		return make_pair(zCodaFollowable, zSiotFollowable);
 	}
 
-	void insertUnkForm(size_t startPos, size_t endPos, bool hasJClass, bool insertAlways = false)
+	void insertUnkForm(size_t startPos, size_t endPos, bool hasJClass)
 	{
 		if (startPos >= endPos
 			|| hasFormAlready(startPos << posMultiplierBit, endPos << posMultiplierBit))
@@ -910,7 +913,7 @@ public:
 
 		const size_t newNodeLength = endPos - startPos;
 		const size_t lengthLimit = hasJClass ? maxUnkFormSizeFollowedByJClass : maxUnkFormSize;
-		if (insertAlways || newNodeLength <= lengthLimit)
+		if (newNodeLength <= lengthLimit)
 		{
 			auto str = rawStr.substr(nsToPos[startPos], nsToPos[endPos - 1] + 1 - nsToPos[startPos]);
 			while (!str.empty() && isSpace(str.back())) str = str.substr(0, str.size() - 1);
@@ -922,7 +925,7 @@ public:
 
 	template<bool lengtheningTypoTolerant>
 	void flushCandidates(size_t endPosition, ptrdiff_t startPosOffset, 
-		size_t unkFormStartNsPos, float typoCost,
+		size_t unkFormStartNsPos, size_t lastSpaceBoundaryNsPos, float typoCost,
 		uint8_t startContinualTypoIdx, uint8_t endContinualTypoIdx)
 	{
 		auto& candidates = reinterpret_cast<Vector<FormCandidate2<lengtheningTypoTolerant>>&>(_candidates);
@@ -937,7 +940,13 @@ public:
 			if (startContinualTypoIdx == 0
 				&& !isHangulCoda(cand.form->form[0]))
 			{
-				insertUnkForm(unkFormStartNsPos, nBegin, cand.form->hasJClass);
+				const bool isSTag = cand.form->form.size() == 1 &&
+					identifySpecialChr(cand.form->form[0]) >= POSTag::sf && identifySpecialChr(cand.form->form[0]) <= POSTag::sw;
+				if (lastSpaceBoundaryNsPos < nBegin)
+				{
+					insertUnkForm(lastSpaceBoundaryNsPos, nBegin, cand.form->hasJClass || isSTag);
+				}
+				insertUnkForm(unkFormStartNsPos, nBegin, cand.form->hasJClass || isSTag);
 			}
 
 			size_t spaceErrors = 0;
@@ -984,6 +993,7 @@ public:
 		ScriptType lastScriptType = prevChr ? chr2ScriptType(prevChr) : ScriptType::unknown;
 		size_t specialStartNsPos = state.specialStartNsPos;
 		size_t unkFormStartNsPos = state.unkFormStartNsPos;
+		size_t lastSpaceBoundaryNsPos = state.lastSpaceBoundaryNsPos;
 
 		size_t minFormLen = state.minFormLen;
 		int32_t startPosOffset = state.startPosOffset;
@@ -1026,10 +1036,17 @@ public:
 					{
 						if (lastChrType != POSTag::ss) // ss 태그는 morpheme 내에 등록된 후보에서 직접 탐색하도록 한다
 						{
+							if (lastSpaceBoundaryNsPos < unkFormStartNsPos)
+							{
+								insertUnkForm(
+									lastSpaceBoundaryNsPos, 
+									specialStartNsPos, 
+									POSTag::sf <= lastChrType && lastChrType <= POSTag::sw);
+							}
 							insertUnkForm(
 								unkFormStartNsPos,
 								specialStartNsPos,
-								false);
+								POSTag::sf <= lastChrType && lastChrType <= POSTag::sw);
 							auto str = rawStr.substr(nsToPos[specialStartNsPos], (typoNode.endPos + j - typoNode.form.size()) - nsToPos[specialStartNsPos]);
 							while (!str.empty() && isSpace(str.back())) str = str.substr(0, str.size() - 1);
 							if (appendNewNode(out, endPosMap,
@@ -1043,6 +1060,10 @@ public:
 					}
 					unkFormStartNsPos = specialStartNsPos;
 					specialStartNsPos = posToNs[typoNode.endPos + j - typoNode.form.size()];
+					if (POSTag::sf <= lastChrType && lastChrType <= POSTag::sw)
+					{
+						lastSpaceBoundaryNsPos = specialStartNsPos;
+					}
 				}
 				else if (chrType == POSTag::max)
 				{
@@ -1060,11 +1081,18 @@ public:
 					// 공백 문자
 					if (chrType == POSTag::unknown)
 					{
+						if (lastSpaceBoundaryNsPos < unkFormStartNsPos)
+						{
+							insertUnkForm(
+								lastSpaceBoundaryNsPos,
+								posToNs[typoNode.endPos + j + 1 - typoNode.form.size()],
+								true);
+						}
 						insertUnkForm(
 							unkFormStartNsPos,
 							posToNs[typoNode.endPos + j + 1 - typoNode.form.size()],
-							false, true);
-						unkFormStartNsPos = posToNs[typoNode.endPos + j + 1 - typoNode.form.size()];
+							true);
+						lastSpaceBoundaryNsPos = unkFormStartNsPos = posToNs[typoNode.endPos + j + 1 - typoNode.form.size()];
 						continue;
 					}
 
@@ -1088,10 +1116,17 @@ public:
 				{
 					const auto [matchedEnd, matchedLength, matchedType] = *nextMatchedPattern;
 					const auto matchedStart = matchedEnd - matchedLength;
+					if (lastSpaceBoundaryNsPos < unkFormStartNsPos)
+					{
+						insertUnkForm(
+							lastSpaceBoundaryNsPos,
+							posToNs[matchedStart],
+							POSTag::w_url <= matchedType && matchedType <= POSTag::w_emoji);
+					}
 					insertUnkForm(
 						unkFormStartNsPos,
 						posToNs[matchedStart],
-						false);
+						POSTag::w_url <= matchedType && matchedType <= POSTag::w_emoji);
 					if (appendNewNode(out, endPosMap,
 						posToNs[matchedStart] << posMultiplierBit,
 						(posToNs[matchedEnd - 1] + 1) << posMultiplierBit,
@@ -1106,6 +1141,13 @@ public:
 			if (typoNode.typoCost == 0 && nextPretokenizedPattern != lastPretokenizedPattern
 				&& nextPretokenizedPattern->begin - startOffset == typoNode.endPos + j - typoNode.form.size())
 			{
+				if (lastSpaceBoundaryNsPos < unkFormStartNsPos)
+				{
+					insertUnkForm(
+						lastSpaceBoundaryNsPos,
+						posToNs[nextPretokenizedPattern->begin - startOffset],
+						false);
+				}
 				insertUnkForm(
 					unkFormStartNsPos,
 					posToNs[nextPretokenizedPattern->begin - startOffset],
@@ -1130,7 +1172,7 @@ public:
 				{
 					lengtheningTypoNodes.clear();
 				}
-				specialStartNsPos = unkFormStartNsPos = posToNs[typoNode.endPos + j + 1 - typoNode.form.size()];
+				specialStartNsPos = unkFormStartNsPos = lastSpaceBoundaryNsPos = posToNs[typoNode.endPos + j + 1 - typoNode.form.size()];
 				continue;
 			}
 			if (c32 >= 0x10000)
@@ -1261,16 +1303,25 @@ public:
 			}
 
 			const size_t endPos = typoNode.endPos + j + 1 - typoNode.form.size();
-			flushCandidates<lengtheningTypoTolerant>(posToNs[endPos - 1] + 1, startPosOffset, unkFormStartNsPos, typoCost, state.startContinualTypoIdx, typoNode.continualTypoIdx);
+			flushCandidates<lengtheningTypoTolerant>(posToNs[endPos - 1] + 1, 
+				startPosOffset, unkFormStartNsPos, lastSpaceBoundaryNsPos, 
+				typoCost, state.startContinualTypoIdx, typoNode.continualTypoIdx);
 		}
 		if (typoCost == 0 && lastChrType != POSTag::max && lastChrType != POSTag::unknown)
 		{
 			if (lastChrType != POSTag::ss) // ss 태그는 morpheme 내에 등록된 후보에서 직접 탐색하도록 한다
 			{
+				if (lastSpaceBoundaryNsPos < unkFormStartNsPos)
+				{
+					insertUnkForm(
+						lastSpaceBoundaryNsPos,
+						specialStartNsPos,
+						POSTag::sf <= lastChrType && lastChrType <= POSTag::sw);
+				}
 				insertUnkForm(
 					unkFormStartNsPos,
 					specialStartNsPos,
-					false);
+					POSTag::sf <= lastChrType && lastChrType <= POSTag::sw);
 				auto str = rawStr.substr(nsToPos[specialStartNsPos], typoNode.endPos - nsToPos[specialStartNsPos]);
 				while (!str.empty() && isSpace(str.back())) str = str.substr(0, str.size() - 1);
 				if (appendNewNode(out, endPosMap,
@@ -1281,6 +1332,10 @@ public:
 					out.back().form = trie.value((size_t)lastChrType);
 				}
 				unkFormStartNsPos = specialStartNsPos;
+				if (POSTag::sf <= lastChrType && lastChrType <= POSTag::sw)
+				{
+					lastSpaceBoundaryNsPos = posToNs[typoNode.endPos - 1] + 1;
+				}
 			}
 		}
 
@@ -1301,7 +1356,9 @@ public:
 			}
 			else
 			{
-				curStates.emplace_back(curNode, typoCost, minFormLen, startPosOffset, specialStartNsPos, unkFormStartNsPos, prevChr, typoNode.continualTypoIdx ? typoNode.continualTypoIdx : state.startContinualTypoIdx);
+				curStates.emplace_back(curNode, typoCost, minFormLen, startPosOffset, 
+					specialStartNsPos, unkFormStartNsPos, lastSpaceBoundaryNsPos,
+					prevChr, typoNode.continualTypoIdx ? typoNode.continualTypoIdx : state.startContinualTypoIdx);
 			}
 			if constexpr (lengtheningTypoTolerant)
 			{
@@ -1335,8 +1392,13 @@ public:
 				// this is end of input node with no typo
 				for (auto& state : curStates)
 				{
+					if (state.lastSpaceBoundaryNsPos < state.unkFormStartNsPos)
+					{
+						insertUnkForm(state.lastSpaceBoundaryNsPos,
+							posToNs[totEndPos - 1] + 1, true);
+					}
 					insertUnkForm(state.unkFormStartNsPos, 
-						posToNs[totEndPos - 1] + 1, false, true);
+						posToNs[totEndPos - 1] + 1, true);
 				}
 			}
 		}
