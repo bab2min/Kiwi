@@ -62,6 +62,7 @@ int main(int argc, const char* argv[])
 	ValueArg<string> oovScoring{ "x", "oov-scoring", "OOV scoring method (none, rule, chr, chrfreq, chrfreqbranch)", false, "rule", "string" };
 	ValueArg<float> unkFormScoreScale{ "", "unk-form-scale", "unknown form score scaling factor (NaN for default)", false, std::numeric_limits<float>::quiet_NaN(), "float" };
 	ValueArg<float> unkFormScoreBias{ "", "unk-form-bias", "unknown form score bias (NaN for default)", false, std::numeric_limits<float>::quiet_NaN(), "float" };
+	SwitchArg oldSplitter{ "", "old-splitter", "use old splitter (for ablation)", false };
 	UnlabeledMultiArg<string> inputs{ "inputs", "evaluation set (--morph, --disamb, --noun)", false, "string" };
 
 	cmd.add(model);
@@ -80,6 +81,7 @@ int main(int argc, const char* argv[])
 	cmd.add(oovScoring);
 	cmd.add(unkFormScoreScale);
 	cmd.add(unkFormScoreBias);
+	cmd.add(oldSplitter);
 	cmd.add(inputs);
 
 	try
@@ -156,6 +158,7 @@ int main(int argc, const char* argv[])
 			allowedDialect,
 			oovScoringType,
 			unkFormScoreScale, unkFormScoreBias,
+			oldSplitter,
 			repeat);
 		cout << endl;
 	}
@@ -170,6 +173,7 @@ int main(int argc, const char* argv[])
 			allowedDialect,
 			oovScoringType,
 			unkFormScoreScale, unkFormScoreBias,
+			oldSplitter,
 			repeat);
 		cout << endl;
 	}
@@ -184,6 +188,7 @@ int main(int argc, const char* argv[])
 			allowedDialect,
 			oovScoringType,
 			unkFormScoreScale, unkFormScoreBias,
+			oldSplitter,
 			repeat);
 		cout << endl;
 	}

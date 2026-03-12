@@ -89,6 +89,7 @@ int Evaluator::operator()(const string& modelPath,
 	Dialect allowedDialect,
 	Match oovScoringType,
 	float unkFormScoreScale, float unkFormScoreBias,
+	bool oldSplitter,
 	int repeat)
 {
 	try
@@ -108,31 +109,50 @@ int Evaluator::operator()(const string& modelPath,
 		auto option = (BuildOption::default_ & ~BuildOption::loadDefaultDict & ~BuildOption::loadMultiDict) 
 			| (defaultDict ? BuildOption::loadDefaultDict : BuildOption::none)
 			| (multiDict ? BuildOption::loadMultiDict : BuildOption::none);
+		PreparedTypoTransformer ptt;
 		auto typo = getDefaultTypoSet(DefaultTypoSet::withoutTypo);
 
+		string typoStr = "";
 		if (bTypo)
 		{
 			typo |= getDefaultTypoSet(DefaultTypoSet::basicTypoSet);
+			typoStr += "basic";
 		}
 
 		if (cTypo)
 		{
 			typo |= getDefaultTypoSet(DefaultTypoSet::continualTypoSet);
+			if (!typoStr.empty()) typoStr += "+";
+			typoStr += "continual";
 		}
 
 		if (lTypo)
 		{
 			typo |= getDefaultTypoSet(DefaultTypoSet::lengtheningTypoSet);
+			if (!typoStr.empty()) typoStr += "+";
+			typoStr += "lengthening";
 		}
 
 		if (allowedDialect != Dialect::standard)
 		{
 			typo |= getDefaultTypoSet(DefaultTypoSet::dialect);
+			if (!typoStr.empty()) typoStr += "+";
+			typoStr += "dialect";
+		}
+		Kiwi kw;
+
+		if (oldSplitter)
+		{
+			kw = KiwiBuilder{ modelPath, 1, option, modelType, allowedDialect }.build(
+				typo
+			);
+		}
+		else
+		{
+			kw = KiwiBuilder{ modelPath, 0, option, modelType, allowedDialect }.build();
+			ptt = typo.prepare(true);
 		}
 
-		Kiwi kw = KiwiBuilder{ modelPath, 1, option, modelType, allowedDialect }.build(
-			typo
-		);
 		if (typoCostWeight > 0)
 		{
 			auto config = kw.getGlobalConfig();
@@ -168,6 +188,7 @@ int Evaluator::operator()(const string& modelPath,
 			cout << "LM Size : " << (kw.getLangModel()->getMemorySize() / 1024. / 1024.) << " MB" << endl;
 		}
 		cout << "OOV Scoring : " << oovScoringTypeToStr(oovScoringType) << endl;
+		cout << "Typo Correction: " << (typoStr.empty() ? "none" : typoStr) << endl;
 		cout << "Mem Usage : " << (tutils::getCurrentPhysicalMemoryUsage() / 1024.) << " MB\n" << endl;
 
 		double avgMicro = 0, avgMacro = 0;
@@ -176,6 +197,15 @@ int Evaluator::operator()(const string& modelPath,
 		analyzeOption.match = (normCoda ? Match::allWithNormalizing : Match::all) & ~(zCoda ? Match::none : Match::zCoda);
 		analyzeOption.match |= oovScoringType;
 		analyzeOption.allowedDialects = allowedDialect;
+		if (oldSplitter)
+		{
+			analyzeOption.match |= Match::useOldSplitter;
+		}
+		else
+		{
+			analyzeOption.typoTransformer = &ptt;
+		}
+
 		for (auto& tf : input)
 		{
 			cout << "Test file: " << tf << endl;

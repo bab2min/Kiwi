@@ -19,6 +19,7 @@ public:
 		kiwi::Dialect allowedDialect,
 		kiwi::Match oovScoringType,
 		float unkFormScoreScale, float unkFormScoreBias,
+		bool oldSplitter,
 		int repeat);
 };
 
