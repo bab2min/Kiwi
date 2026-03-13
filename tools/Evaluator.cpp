@@ -149,7 +149,7 @@ int Evaluator::operator()(const string& modelPath,
 		}
 		else
 		{
-			kw = KiwiBuilder{ modelPath, 0, option, modelType, allowedDialect }.build();
+			kw = KiwiBuilder{ modelPath, 1, option, modelType, allowedDialect }.build();
 			ptt = typo.prepare(true);
 		}
 
