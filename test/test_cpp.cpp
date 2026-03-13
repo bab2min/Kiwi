@@ -279,6 +279,21 @@ TEST(KiwiCpp, SpecialTokenErrorOnContinualTypo)
 	EXPECT_EQ(res[3].tag, POSTag::so);
 }
 
+TEST(KiwiCpp, MultiWordTypo)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	AnalyzeOption option = Match::allWithNormalizing;
+	auto res = kiwi.analyze(u"존 F. 케네디 주니어", option).first;
+	EXPECT_EQ(res[0].str, u"존 F. 케네디 주니어");
+	res = kiwi.analyze(u"존 F. 캐네디 주니어", option).first;
+	EXPECT_NE(res[0].str, u"존 F. 케네디 주니어");
+	option.typoTransformer = getDefaultPreparedTypoSet(DefaultTypoSet::basicTypoSet);
+	res = kiwi.analyze(u"존 F. 캐네디 주니어", option).first;
+	EXPECT_EQ(res[0].str, u"존 F. 케네디 주니어");
+	res = kiwi.analyze(u"존F.캐네디주니어", option).first;
+	EXPECT_EQ(res[0].str, u"존 F. 케네디 주니어");
+}
+
 TEST(KiwiCpp, SplitComplex)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
