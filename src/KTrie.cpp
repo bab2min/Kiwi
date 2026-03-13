@@ -1051,7 +1051,7 @@ public:
 							while (!str.empty() && isSpace(str.back())) str = str.substr(0, str.size() - 1);
 							if (appendNewNode(out, endPosMap,
 								specialStartNsPos << posMultiplierBit,
-								(posToNs[typoNode.endPos + j - 1 - typoNode.form.size()] + 1) << posMultiplierBit,
+								(posToNs[typoNode.endPos + j - typoNode.form.size()]) << posMultiplierBit,
 								str))
 							{
 								out.back().form = trie.value((size_t)lastChrType);
@@ -1092,7 +1092,8 @@ public:
 							unkFormStartNsPos,
 							posToNs[typoNode.endPos + j + 1 - typoNode.form.size()],
 							true);
-						lastSpaceBoundaryNsPos = unkFormStartNsPos = posToNs[typoNode.endPos + j + 1 - typoNode.form.size()];
+						lastSpaceBoundaryNsPos = specialStartNsPos = unkFormStartNsPos = posToNs[typoNode.endPos + j + 1 - typoNode.form.size()];
+						prevChr = c32;
 						continue;
 					}
 
@@ -1106,6 +1107,15 @@ public:
 					{
 						candidates.emplace_back(formBase + defaultTagSize + (0x11BA - 0x11A8) - 1);
 					}
+				}
+			}
+			else
+			{
+				if (isSpace(c32))
+				{
+					lastSpaceBoundaryNsPos = specialStartNsPos = unkFormStartNsPos = posToNs[typoNode.endPos + j + 1 - typoNode.form.size()];
+					prevChr = c32;
+					continue;
 				}
 			}
 
@@ -1129,7 +1139,7 @@ public:
 						POSTag::w_url <= matchedType && matchedType <= POSTag::w_emoji);
 					if (appendNewNode(out, endPosMap,
 						posToNs[matchedStart] << posMultiplierBit,
-						(posToNs[matchedEnd - 1] + 1) << posMultiplierBit,
+						(posToNs[matchedEnd]) << posMultiplierBit,
 						rawStr.substr(matchedStart, matchedEnd - matchedStart)
 					))
 					{
@@ -1154,7 +1164,7 @@ public:
 					false);
 				if (appendNewNode(out, endPosMap,
 					posToNs[nextPretokenizedPattern->begin - startOffset] << posMultiplierBit,
-					(posToNs[nextPretokenizedPattern->end - startOffset - 1] + 1) << posMultiplierBit,
+					(posToNs[nextPretokenizedPattern->end - startOffset]) << posMultiplierBit,
 					nextPretokenizedPattern->form
 				))
 				{
@@ -1303,7 +1313,7 @@ public:
 			}
 
 			const size_t endPos = typoNode.endPos + j + 1 - typoNode.form.size();
-			flushCandidates<lengtheningTypoTolerant>(posToNs[endPos - 1] + 1, 
+			flushCandidates<lengtheningTypoTolerant>(posToNs[endPos], 
 				startPosOffset, unkFormStartNsPos, lastSpaceBoundaryNsPos, 
 				typoCost, state.startContinualTypoIdx, typoNode.continualTypoIdx);
 		}
@@ -1326,7 +1336,7 @@ public:
 				while (!str.empty() && isSpace(str.back())) str = str.substr(0, str.size() - 1);
 				if (appendNewNode(out, endPosMap,
 					specialStartNsPos << posMultiplierBit,
-					(posToNs[typoNode.endPos - 1] + 1) << posMultiplierBit,
+					(posToNs[typoNode.endPos]) << posMultiplierBit,
 					str))
 				{
 					out.back().form = trie.value((size_t)lastChrType);
@@ -1334,7 +1344,7 @@ public:
 				unkFormStartNsPos = specialStartNsPos;
 				if (POSTag::sf <= lastChrType && lastChrType <= POSTag::sw)
 				{
-					lastSpaceBoundaryNsPos = posToNs[typoNode.endPos - 1] + 1;
+					lastSpaceBoundaryNsPos = posToNs[typoNode.endPos];
 				}
 			}
 		}
@@ -1350,7 +1360,11 @@ public:
 				if (!curStates.empty()) return;
 				if constexpr (lengtheningTypoTolerant) lengtheningTypoNodes.clear();
 			}
-			if (typoCost > 0 && curNode->depth < minFormLen && !lengtheningTypoTolerant)
+
+			size_t numLengtheningTypoNodes = 0;
+			if constexpr (lengtheningTypoTolerant) numLengtheningTypoNodes = lengtheningTypoNodes.size();
+
+			if (typoCost > 0 && curNode->depth < minFormLen && numLengtheningTypoNodes == 0)
 			{
 				// early pruning
 			}
@@ -1359,10 +1373,10 @@ public:
 				curStates.emplace_back(curNode, typoCost, minFormLen, startPosOffset, 
 					specialStartNsPos, unkFormStartNsPos, lastSpaceBoundaryNsPos,
 					prevChr, typoNode.continualTypoIdx ? typoNode.continualTypoIdx : state.startContinualTypoIdx);
-			}
-			if constexpr (lengtheningTypoTolerant)
-			{
-				curStates.back().lengtheningTypoNodes = std::move(lengtheningTypoNodes);
+				if constexpr (lengtheningTypoTolerant)
+				{
+					curStates.back().lengtheningTypoNodes = std::move(lengtheningTypoNodes);
+				}
 			}
 		}
 	}
@@ -1395,10 +1409,10 @@ public:
 					if (state.lastSpaceBoundaryNsPos < state.unkFormStartNsPos)
 					{
 						insertUnkForm(state.lastSpaceBoundaryNsPos,
-							posToNs[totEndPos - 1] + 1, true);
+							posToNs[totEndPos], true);
 					}
 					insertUnkForm(state.unkFormStartNsPos, 
-						posToNs[totEndPos - 1] + 1, true);
+						posToNs[totEndPos], true);
 				}
 			}
 		}
