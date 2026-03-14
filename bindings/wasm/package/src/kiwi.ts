@@ -1,4 +1,5 @@
 import { AsyncMethods } from './util.js';
+import { TypoTransformer } from './build-args.js';
 
 /**
  * Describes a single morpheme in the input string of the morphological analysis.
@@ -82,6 +83,11 @@ export enum Match {
     mention = 1 << 3,
     serial = 1 << 4,
     emoji = 1 << 5,
+    oovRuleOnly = 0 << 8,
+    oovChrModel = 1 << 8,
+    oovChrFreqModel = 2 << 8,
+    oovChrFreqBranchModel = 3 << 8,
+    oovMask = 3 << 8,
     normalizeCoda = 1 << 16,
     joinNounPrefix = 1 << 17,
     joinNounSuffix = 1 << 18,
@@ -199,7 +205,9 @@ export interface Kiwi {
         str: string,
         matchOptions?: Match,
         blockList?: Morph[] | MorphemeSet,
-        pretokenized?: PretokenizedSpan[]
+        pretokenized?: PretokenizedSpan[],
+        typos?: 'none' | 'basic' | 'continual' | 'basicWithContinual' | TypoTransformer,
+        typoCostThreshold?: number
     ) => TokenResult;
     /**
      * Performs morphological analysis. Returns multiple list of tokens along with an analysis score. Use `tokenizeTopN` if the result scores are not needed. Use `analyze` if you need only one result.
@@ -215,7 +223,9 @@ export interface Kiwi {
         n: number,
         matchOptions?: Match,
         blockList?: Morph[] | MorphemeSet,
-        pretokenized?: PretokenizedSpan[]
+        pretokenized?: PretokenizedSpan[],
+        typos?: 'none' | 'basic' | 'continual' | 'basicWithContinual' | TypoTransformer,
+        typoCostThreshold?: number
     ) => TokenResult[];
     /**
      * Performs morphological analysis. Returns a single list of tokens. Use `analyze` if the result score is needed. Use `tokenizeTopN` if you need multiple results.
@@ -229,7 +239,9 @@ export interface Kiwi {
         str: string,
         matchOptions?: Match,
         blockList?: Morph[] | MorphemeSet,
-        pretokenized?: PretokenizedSpan[]
+        pretokenized?: PretokenizedSpan[],
+        typos?: 'none' | 'basic' | 'continual' | 'basicWithContinual' | TypoTransformer,
+        typoCostThreshold?: number
     ) => TokenInfo[];
     /**
      * Performs morphological analysis. Returns multiple lists of tokens. Use `analyzeTopN` if the result scores are needed. Use `tokenize` if you need only one result.
@@ -245,7 +257,9 @@ export interface Kiwi {
         n: number,
         matchOptions?: Match,
         blockList?: Morph[] | MorphemeSet,
-        pretokenized?: PretokenizedSpan[]
+        pretokenized?: PretokenizedSpan[],
+        typos?: 'none' | 'basic' | 'continual' | 'basicWithContinual' | TypoTransformer,
+        typoCostThreshold?: number
     ) => TokenInfo[][];
     /**
      * Returns the input text split into sentences. This method uses stemming internally during the sentence splitting process, so it can also be used to get stemming results simultaneously with sentence splitting.

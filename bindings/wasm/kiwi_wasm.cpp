@@ -22,6 +22,8 @@ int nextInstanceId() {
 
 static std::map<int, std::unordered_set<const Morpheme*>> morphemeSets;
 
+static std::map<std::string, PreparedTypoTransformer> preparedTypoCache;
+
 int nextMorphemeSetId() {
     static int id = 0;
     return id++;
@@ -129,6 +131,70 @@ std::vector<PretokenizedSpan> parsePretokenizedArg(const json& args, size_t inde
     }
 
     return spans;
+}
+
+
+const PreparedTypoTransformer* parseTypoArg(const json& args, size_t index, float& typoCostThreshold) {
+    if (args.size() <= index) return nullptr;
+    const auto& typoArg = args.at(index);
+    if (typoArg.is_null()) return nullptr;
+
+    typoCostThreshold = getAtOrDefault(args, index + 1, 2.5f);
+
+    std::string cacheKey;
+    if (typoArg.is_string()) {
+        cacheKey = typoArg.get<std::string>();
+        if (cacheKey == "none") return nullptr;
+    } else {
+        cacheKey = typoArg.dump();
+    }
+
+    auto it = preparedTypoCache.find(cacheKey);
+    if (it != preparedTypoCache.end()) {
+        return &it->second;
+    }
+
+    if (typoArg.is_string()) {
+        const std::string typosStr = typoArg.get<std::string>();
+        DefaultTypoSet typoSet = DefaultTypoSet::withoutTypo;
+        if (typosStr == "basic") {
+            typoSet = DefaultTypoSet::basicTypoSet;
+        } else if (typosStr == "continual") {
+            typoSet = DefaultTypoSet::continualTypoSet;
+        } else if (typosStr == "basicWithContinual") {
+            typoSet = DefaultTypoSet::basicTypoSetWithContinual;
+        }
+        return getDefaultPreparedTypoSet(typoSet);
+    } else {
+        TypoTransformer typoTransformer;
+        for (const auto& def : typoArg.value("defs", json::array())) {
+            const float cost = def.value("cost", 1.0f);
+
+            CondVowel condVowel = CondVowel::none;
+            const std::string condVowelStr = def.value("condition", "none");
+
+            if (condVowelStr == "any") {
+                condVowel = CondVowel::any;
+            } else if (condVowelStr == "vowel") {
+                condVowel = CondVowel::vowel;
+            } else if (condVowelStr == "applosive") {
+                condVowel = CondVowel::applosive;
+            }
+
+            for (const auto& orig8 : def["orig"]) {
+                const auto orig16 = utf8To16(orig8);
+                for (const auto& error8 : def["error"]) {
+                    typoTransformer.addTypo(orig16, utf8To16(error8), cost, condVowel);
+                }
+            }
+        }
+
+        const float continualTypoCost = typoArg.value("continualTypoCost", 1.0f);
+        typoTransformer.setContinualTypoCost(continualTypoCost);
+
+        auto [insertIt, _] = preparedTypoCache.emplace(cacheKey, typoTransformer.prepare());
+        return &insertIt->second;
+    }
 }
 
 
@@ -345,54 +411,7 @@ json build(const json& args) {
         builder.addPreAnalyzedWord(form, analyzed, positions, score);
     }
 
-    const auto typos = buildArgs.value("typos", json(nullptr));
-    const float typoCostThreshold = buildArgs.value("typoCostThreshold", 2.5f);
-
-    if (typos.is_null()) {
-        instances.emplace(id, builder.build(DefaultTypoSet::withoutTypo, typoCostThreshold));
-    } else if (typos.is_string()) {
-        DefaultTypoSet typoSet = DefaultTypoSet::withoutTypo;
-        const std::string typosStr = typos.get<std::string>();
-
-        if (typosStr == "basic") {
-            typoSet = DefaultTypoSet::basicTypoSet;
-        } else if (typosStr == "continual") {
-            typoSet = DefaultTypoSet::continualTypoSet;
-        } else if (typosStr == "basicWithContinual") {
-            typoSet = DefaultTypoSet::basicTypoSetWithContinual;
-        }
-
-        instances.emplace(id, builder.build(typoSet, typoCostThreshold));
-    } else {
-        TypoTransformer typoTransformer;
-
-        for (const auto& def : typos.value("defs", json::array())) {
-            const float cost = def.value("cost", 1.0f);
-            
-            CondVowel condVowel = CondVowel::none;
-            const std::string condVowelStr = def.value("condVowel", "none");
-
-            if (condVowelStr == "any") {
-                condVowel = CondVowel::any;
-            } else if (condVowelStr == "vowel") {
-                condVowel = CondVowel::vowel;
-            } else if (condVowelStr == "applosive") {
-                condVowel = CondVowel::applosive;
-            }
-
-            for (const auto& orig8 : def["orig"]) {
-                const auto orig16 = utf8To16(orig8);
-                for (const auto& error8 : def["error"]) {
-                    typoTransformer.addTypo(orig16, utf8To16(error8), cost, condVowel);
-                }
-            }
-        }
-
-        const float continualTypoCost = typos.value("continualTypoCost", 1.0f);
-        typoTransformer.setContinualTypoCost(continualTypoCost);
-
-        instances.emplace(id, builder.build(typoTransformer, typoCostThreshold));
-    }
+    instances.emplace(id, builder.build());
 
     return id;
 }
@@ -410,10 +429,15 @@ json kiwiAnalyze(Kiwi& kiwi, const json& args) {
     const Match matchOptions = getAtOrDefault(args, 1, Match::allWithNormalizing);
     const BlockListArg blockListArg(kiwi, args, 2);
     const auto pretokenized = parsePretokenizedArg(args, 3);
-    const auto allowedDialects = parseDialects(getAtOrDefault(args, 4, std::string{ "standard" }));
-    const auto dialectCost = getAtOrDefault(args, 5, 3.0f);
-    
-    const TokenResult tokenResult = kiwi.analyze(str, AnalyzeOption{ matchOptions, blockListArg.setPtr(), false, allowedDialects, dialectCost }, pretokenized);
+    float typoCostThreshold = 2.5f;
+    const auto* typoTransformer = parseTypoArg(args, 4, typoCostThreshold);
+    const auto allowedDialects = parseDialects(getAtOrDefault(args, 6, std::string{ "standard" }));
+    const auto dialectCost = getAtOrDefault(args, 7, 3.0f);
+
+    AnalyzeOption opt{ matchOptions, blockListArg.setPtr(), false, allowedDialects, dialectCost };
+    opt.typoTransformer = typoTransformer;
+    opt.typoThreshold = typoCostThreshold;
+    const TokenResult tokenResult = kiwi.analyze(str, opt, pretokenized);
 
     return serializeTokenResult(kiwi, tokenResult);
 }
@@ -424,10 +448,15 @@ json kiwiAnalyzeTopN(Kiwi& kiwi, const json& args) {
     const Match matchOptions = getAtOrDefault(args, 2, Match::allWithNormalizing);
     const BlockListArg blockListArg(kiwi, args, 3);
     const auto pretokenized = parsePretokenizedArg(args, 4);
-    const auto allowedDialects = parseDialects(getAtOrDefault(args, 4, std::string{ "standard" }));
-    const auto dialectCost = getAtOrDefault(args, 5, 3.0f);
+    float typoCostThreshold = 2.5f;
+    const auto* typoTransformer = parseTypoArg(args, 5, typoCostThreshold);
+    const auto allowedDialects = parseDialects(getAtOrDefault(args, 7, std::string{ "standard" }));
+    const auto dialectCost = getAtOrDefault(args, 8, 3.0f);
 
-    const std::vector<TokenResult> tokenResults = kiwi.analyze(str, topN, AnalyzeOption{ matchOptions, blockListArg.setPtr(), false, allowedDialects, dialectCost }, pretokenized);
+    AnalyzeOption opt{ matchOptions, blockListArg.setPtr(), false, allowedDialects, dialectCost };
+    opt.typoTransformer = typoTransformer;
+    opt.typoThreshold = typoCostThreshold;
+    const std::vector<TokenResult> tokenResults = kiwi.analyze(str, topN, opt, pretokenized);
 
     return serializeTokenResultVec(kiwi, tokenResults);
 }
@@ -437,10 +466,15 @@ json kiwiTokenize(Kiwi& kiwi, const json& args) {
     const Match matchOptions = getAtOrDefault(args, 1, Match::allWithNormalizing);
     const BlockListArg blockListArg(kiwi, args, 2);
     const auto pretokenized = parsePretokenizedArg(args, 3);
-    const auto allowedDialects = parseDialects(getAtOrDefault(args, 4, std::string{ "standard" }));
-    const auto dialectCost = getAtOrDefault(args, 5, 3.0f);
-    
-    const TokenResult tokenResult = kiwi.analyze(str, AnalyzeOption{ matchOptions, blockListArg.setPtr(), false, allowedDialects, dialectCost }, pretokenized);
+    float typoCostThreshold = 2.5f;
+    const auto* typoTransformer = parseTypoArg(args, 4, typoCostThreshold);
+    const auto allowedDialects = parseDialects(getAtOrDefault(args, 6, std::string{ "standard" }));
+    const auto dialectCost = getAtOrDefault(args, 7, 3.0f);
+
+    AnalyzeOption opt{ matchOptions, blockListArg.setPtr(), false, allowedDialects, dialectCost };
+    opt.typoTransformer = typoTransformer;
+    opt.typoThreshold = typoCostThreshold;
+    const TokenResult tokenResult = kiwi.analyze(str, opt, pretokenized);
 
     return serializeTokenInfoVec(kiwi, tokenResult.first);
 }
@@ -451,10 +485,15 @@ json kiwiTokenizeTopN(Kiwi& kiwi, const json& args) {
     const Match matchOptions = getAtOrDefault(args, 2, Match::allWithNormalizing);
     const BlockListArg blockListArg(kiwi, args, 3);
     const auto pretokenized = parsePretokenizedArg(args, 4);
-    const auto allowedDialects = parseDialects(getAtOrDefault(args, 5, std::string{ "standard" }));
-    const auto dialectCost = getAtOrDefault(args, 6, 3.0f);
+    float typoCostThreshold = 2.5f;
+    const auto* typoTransformer = parseTypoArg(args, 5, typoCostThreshold);
+    const auto allowedDialects = parseDialects(getAtOrDefault(args, 7, std::string{ "standard" }));
+    const auto dialectCost = getAtOrDefault(args, 8, 3.0f);
 
-    const std::vector<TokenResult> tokenResults = kiwi.analyze(str, topN, AnalyzeOption{ matchOptions, blockListArg.setPtr(), false, allowedDialects, dialectCost }, pretokenized);
+    AnalyzeOption opt{ matchOptions, blockListArg.setPtr(), false, allowedDialects, dialectCost };
+    opt.typoTransformer = typoTransformer;
+    opt.typoThreshold = typoCostThreshold;
+    const std::vector<TokenResult> tokenResults = kiwi.analyze(str, topN, opt, pretokenized);
 
     json result = json::array();
     for (const TokenResult& tokenResult : tokenResults) {
