@@ -720,16 +720,10 @@ public:
 		return KiwiBuilder::addPreAnalyzedWord(form, morphs, positions, score);
 	}
 
-	JKiwi build(JTypoTransformer* typos, float typoCostThreshold) const
+	JKiwi build(JTypoTransformer*, float) const
 	{
-		if (typos) 
-		{
-			return KiwiBuilder::build(*typos, typoCostThreshold);
-		}
-		else
-		{
-			return KiwiBuilder::build();
-		}
+		// build 시에 TypoTransformer를 사용하는 옵션은 이제 더 이상 지원되지 않음. 향후 제거 예정.
+		return KiwiBuilder::build();
 	}
 };
 

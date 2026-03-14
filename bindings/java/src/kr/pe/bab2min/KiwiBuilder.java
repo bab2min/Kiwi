@@ -208,7 +208,7 @@ public class KiwiBuilder implements AutoCloseable  {
 	}
 
 	public Kiwi build(TypoTransformer typos) {
-		return build(typos, 2.5f);
+		return build(null, 0);
 	}
 
 	static {
