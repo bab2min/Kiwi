@@ -192,7 +192,7 @@ const PreparedTypoTransformer* parseTypoArg(const json& args, size_t index, floa
         const float continualTypoCost = typoArg.value("continualTypoCost", 1.0f);
         typoTransformer.setContinualTypoCost(continualTypoCost);
 
-        auto [insertIt, _] = preparedTypoCache.emplace(cacheKey, typoTransformer.prepare());
+        auto [insertIt, _] = preparedTypoCache.emplace(cacheKey, typoTransformer.prepare(true));
         return &insertIt->second;
     }
 }

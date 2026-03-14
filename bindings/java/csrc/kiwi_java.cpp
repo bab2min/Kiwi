@@ -575,7 +575,7 @@ public:
 
 	JPreparedTypoTransformer prepare() const
 	{
-		return TypoTransformer::prepare();
+		return TypoTransformer::prepare(true);
 	}
 };
 
