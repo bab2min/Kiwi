@@ -21,6 +21,11 @@ public class Kiwi implements AutoCloseable  {
 		mention = 1 << 3,
 		serial = 1 << 4,
 		emoji = 1 << 5,
+		oovRuleOnly = 0 << 8,
+		oovChrModel = 1 << 8,
+		oovChrFreqModel = 2 << 8,
+		oovChrFreqBranchModel = 3 << 8,
+		oovMask = 3 << 8,
 		normalizeCoda = 1 << 16,
 		joinNounPrefix = 1 << 17,
 		joinNounSuffix = 1 << 18,
@@ -168,12 +173,20 @@ public class Kiwi implements AutoCloseable  {
 		public MorphemeSet blocklist;
 		public short allowedDialects;
 		public float dialectCost;
+		public KiwiBuilder.PreparedTypoTransformer typoTransformer;
+		public float typoThreshold;
 
-		public AnalyzeOption(int match, MorphemeSet blocklist, short allowedDialects, float dialectCost) {
+		public AnalyzeOption(int match, MorphemeSet blocklist, short allowedDialects, float dialectCost, KiwiBuilder.PreparedTypoTransformer typoTransformer, float typoThreshold) {
 			this.match = match;
 			this.blocklist = blocklist;
 			this.allowedDialects = allowedDialects;
 			this.dialectCost = dialectCost;
+			this.typoTransformer = typoTransformer;
+			this.typoThreshold = typoThreshold;
+		}
+
+		public AnalyzeOption(int match, MorphemeSet blocklist, short allowedDialects, float dialectCost) {
+			this(match, blocklist, allowedDialects, dialectCost, null, 2.5f);
 		}
 
 		public AnalyzeOption(int match, MorphemeSet blocklist) {
@@ -428,16 +441,16 @@ public class Kiwi implements AutoCloseable  {
 		return _inst != 0;
 	}
 
-	public native TokenResult[] analyze(String text, int topN, int matchOption, MorphemeSet blocklist, short allowedDialects, float dialectCost, Iterator<PretokenizedSpan> pretokenized);
-	public native FutureTokenResult asyncAnalyze(String text, int topN, int matchOption, MorphemeSet blocklist, short allowedDialects, float dialectCost, Iterator<PretokenizedSpan> pretokenized);
-	public native MultipleTokenResult analyze(Iterator<String> texts, int topN, int matchOption, MorphemeSet blocklist, short allowedDialects, float dialectCost, Iterator<Iterator<PretokenizedSpan>> pretokenized);
+	public native TokenResult[] analyze(String text, int topN, int matchOption, MorphemeSet blocklist, short allowedDialects, float dialectCost, KiwiBuilder.PreparedTypoTransformer typoTransformer, float typoThreshold, Iterator<PretokenizedSpan> pretokenized);
+	public native FutureTokenResult asyncAnalyze(String text, int topN, int matchOption, MorphemeSet blocklist, short allowedDialects, float dialectCost, KiwiBuilder.PreparedTypoTransformer typoTransformer, float typoThreshold, Iterator<PretokenizedSpan> pretokenized);
+	public native MultipleTokenResult analyze(Iterator<String> texts, int topN, int matchOption, MorphemeSet blocklist, short allowedDialects, float dialectCost, KiwiBuilder.PreparedTypoTransformer typoTransformer, float typoThreshold, Iterator<Iterator<PretokenizedSpan>> pretokenized);
 	public native Sentence[] splitIntoSents(String text, int matchOption, boolean returnTokens);
 	public native String join(JoinableToken[] tokens);
 
 	public static native String getVersion();
 
 	public TokenResult[] analyze(String text, int topN, AnalyzeOption option, Iterator<PretokenizedSpan> pretokenized) {
-		return analyze(text, topN, option.match, option.blocklist, option.allowedDialects, option.dialectCost, pretokenized);
+		return analyze(text, topN, option.match, option.blocklist, option.allowedDialects, option.dialectCost, option.typoTransformer, option.typoThreshold, pretokenized);
 	}
 
 	public TokenResult[] analyze(String text, int topN, AnalyzeOption option) {
@@ -445,7 +458,7 @@ public class Kiwi implements AutoCloseable  {
 	}
 
 	public FutureTokenResult asyncAnalyze(String text, int topN, AnalyzeOption option, Iterator<PretokenizedSpan> pretokenized) {
-		return asyncAnalyze(text, topN, option.match, option.blocklist, option.allowedDialects, option.dialectCost, pretokenized);
+		return asyncAnalyze(text, topN, option.match, option.blocklist, option.allowedDialects, option.dialectCost, option.typoTransformer, option.typoThreshold, pretokenized);
 	}
 
 	public FutureTokenResult asyncAnalyze(String text, int topN, AnalyzeOption option) {
@@ -453,7 +466,7 @@ public class Kiwi implements AutoCloseable  {
 	}
 
 	public MultipleTokenResult analyze(Iterator<String> texts, int topN, AnalyzeOption option, Iterator<Iterator<PretokenizedSpan>> pretokenized) {
-		return analyze(texts, topN, option.match, option.blocklist, option.allowedDialects, option.dialectCost, pretokenized);
+		return analyze(texts, topN, option.match, option.blocklist, option.allowedDialects, option.dialectCost, option.typoTransformer, option.typoThreshold, pretokenized);
 	}
 
 	public MultipleTokenResult analyze(Iterator<String> texts, int topN, AnalyzeOption option) {

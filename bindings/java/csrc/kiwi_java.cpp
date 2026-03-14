@@ -278,6 +278,17 @@ namespace jni
 	};
 }
 
+class JPreparedTypoTransformer : public kiwi::PreparedTypoTransformer, jni::JObject<JPreparedTypoTransformer>
+{
+public:
+	static constexpr std::string_view className = "kr/pe/bab2min/KiwiBuilder$PreparedTypoTransformer";
+
+	JPreparedTypoTransformer() : PreparedTypoTransformer{} {}
+	JPreparedTypoTransformer(kiwi::PreparedTypoTransformer&& inst) : PreparedTypoTransformer{ std::move(inst) } {}
+	JPreparedTypoTransformer(JPreparedTypoTransformer&&) = default;
+	JPreparedTypoTransformer& operator=(JPreparedTypoTransformer&&) = default;
+};
+
 class JKiwi;
 
 class JMorphemeSet : jni::JObject<JMorphemeSet>
@@ -322,8 +333,7 @@ public:
 		JMorphemeSet* _blocklist,
 		kiwi::Dialect _allowedDialects,
 		float _dialectCost,
-		jni::JIterator<jni::JIterator<kiwi::PretokenizedSpan>> _pretokenized
-	);
+		jni::JIterator<jni::JIterator<kiwi::PretokenizedSpan>> _pretokenized);
 	JMultipleTokenResult(JMultipleTokenResult&&) = default;
 	JMultipleTokenResult& operator=(JMultipleTokenResult&&) = default;
 
@@ -385,8 +395,9 @@ public:
 		return KIWI_VERSION_STRING;
 	}
 
-	auto analyze(const std::u16string& text, uint64_t topN, 
+	auto analyze(const std::u16string& text, uint64_t topN,
 		kiwi::Match matchOption, JMorphemeSet* blocklist, kiwi::Dialect allowedDialects, float dialectCost,
+		JPreparedTypoTransformer* typoTransformer, float typoThreshold,
 		jni::JIterator<kiwi::PretokenizedSpan> pretokenized) const
 	{
 		std::vector<kiwi::PretokenizedSpan> pretokenizedSpans;
@@ -394,13 +405,15 @@ public:
 		{
 			while (pretokenized.hasNext()) pretokenizedSpans.emplace_back(pretokenized.next());
 		}
-		return Kiwi::analyze(text, topN, 
-			kiwi::AnalyzeOption{ matchOption, blocklist ? &blocklist->morphSet : nullptr, false, allowedDialects, dialectCost }, 
-			pretokenizedSpans);
+		kiwi::AnalyzeOption opt{ matchOption, blocklist ? &blocklist->morphSet : nullptr, false, allowedDialects, dialectCost };
+		opt.typoTransformer = typoTransformer;
+		opt.typoThreshold = typoThreshold;
+		return Kiwi::analyze(text, topN, opt, pretokenizedSpans);
 	}
 
-	JFutureTokenResult asyncAnalyze(jni::JRef<JKiwi> _ref, const std::u16string& text, uint64_t topN, 
+	JFutureTokenResult asyncAnalyze(jni::JRef<JKiwi> _ref, const std::u16string& text, uint64_t topN,
 		kiwi::Match matchOption, JMorphemeSet* blocklist, kiwi::Dialect allowedDialects, float dialectCost,
+		JPreparedTypoTransformer* typoTransformer, float typoThreshold,
 		jni::JIterator<kiwi::PretokenizedSpan> pretokenized) const
 	{
 		std::vector<kiwi::PretokenizedSpan> pretokenizedSpans;
@@ -408,13 +421,15 @@ public:
 		{
 			while (pretokenized.hasNext()) pretokenizedSpans.emplace_back(pretokenized.next());
 		}
-		return { _ref, Kiwi::asyncAnalyze(text, topN, 
-			kiwi::AnalyzeOption{ matchOption, blocklist ? &blocklist->morphSet : nullptr, false, allowedDialects, dialectCost }, 
-			pretokenizedSpans) };
+		kiwi::AnalyzeOption opt{ matchOption, blocklist ? &blocklist->morphSet : nullptr, false, allowedDialects, dialectCost };
+		opt.typoTransformer = typoTransformer;
+		opt.typoThreshold = typoThreshold;
+		return { _ref, Kiwi::asyncAnalyze(text, topN, opt, pretokenizedSpans) };
 	}
 
-	JMultipleTokenResult analyze2(jni::JRef<JKiwi> _ref, jni::JIterator<std::u16string> texts, uint64_t topN, 
+	JMultipleTokenResult analyze2(jni::JRef<JKiwi> _ref, jni::JIterator<std::u16string> texts, uint64_t topN,
 		kiwi::Match matchOption, JMorphemeSet* blocklist, kiwi::Dialect allowedDialects, float dialectCost,
+		JPreparedTypoTransformer* typoTransformer, float typoThreshold,
 		jni::JIterator<jni::JIterator<kiwi::PretokenizedSpan>> pretokenized) const
 	{
 		if (!texts) throw std::bad_optional_access{};
@@ -556,6 +571,11 @@ public:
 	void update(const JTypoTransformer& o)
 	{
 		TypoTransformer::update(o);
+	}
+
+	JPreparedTypoTransformer prepare() const
+	{
+		return TypoTransformer::prepare();
 	}
 };
 
@@ -720,9 +740,8 @@ public:
 		return KiwiBuilder::addPreAnalyzedWord(form, morphs, positions, score);
 	}
 
-	JKiwi build(JTypoTransformer*, float) const
+	JKiwi build() const
 	{
-		// build 시에 TypoTransformer를 사용하는 옵션은 이제 더 이상 지원되지 않음. 향후 제거 예정.
 		return KiwiBuilder::build();
 	}
 };
@@ -733,6 +752,8 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved)
 {
 	return gModule.load(vm,
 
+		jni::define<JPreparedTypoTransformer>(),
+
 		jni::define<JTypoTransformer>()
 			.template ctor<>()
 			.template method<&JTypoTransformer::addTypo>("_addTypo")
@@ -740,7 +761,8 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved)
 			.template method<&JTypoTransformer::setLengtheningTypoCost>("_setLengtheningTypoCost")
 			.template method<&JTypoTransformer::copy>("copy")
 			.template method<&JTypoTransformer::update>("_update")
-			.template method<&JTypoTransformer::scaleCost>("_scaleCost"),
+			.template method<&JTypoTransformer::scaleCost>("_scaleCost")
+			.template method<&JTypoTransformer::prepare>("prepare"),
 
 		jni::define<JKiwiBuilder>()
 			.template ctor<std::string, size_t, kiwi::BuildOption, kiwi::ModelType, kiwi::Dialect>()

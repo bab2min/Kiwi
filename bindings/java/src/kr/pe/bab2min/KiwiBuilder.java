@@ -137,6 +137,27 @@ public class KiwiBuilder implements AutoCloseable  {
 			_scaleCost(scale);
 			return this;
 		}
+
+		public native PreparedTypoTransformer prepare();
+	}
+
+	public static class PreparedTypoTransformer implements AutoCloseable {
+		private long _inst;
+
+		public PreparedTypoTransformer(long _inst) {
+			this._inst = _inst;
+		}
+
+		protected void finalize() throws Exception {
+			close();
+		}
+
+		public boolean isAlive() {
+			return _inst != 0;
+		}
+
+		@Override
+		public native void close() throws Exception;
 	}
 
 	public KiwiBuilder(long _inst) {
@@ -197,19 +218,11 @@ public class KiwiBuilder implements AutoCloseable  {
 	@Override
 	public native void close() throws Exception;
 	
-	public native Kiwi build(TypoTransformer typos, float typoCostThreshold);
+	public native Kiwi build();
 	public native boolean addWord(String form, byte tag, float score);
 	public native boolean addWord(String form, byte tag, float score, String origForm);
 	public native boolean addPreAnalyzedWord(String form, AnalyzedMorph[] analyzed, float score);
 	public native int loadDictionary(String path);
-
-	public Kiwi build() {
-		return build(null, 0);
-	}
-
-	public Kiwi build(TypoTransformer typos) {
-		return build(null, 0);
-	}
 
 	static {
 		Kiwi.loadLibrary();

@@ -6,6 +6,7 @@ import java.util.concurrent.Future;
 import org.junit.Test;
 
 import kr.pe.bab2min.KiwiBuilder.TypoTransformer;
+import kr.pe.bab2min.KiwiBuilder.PreparedTypoTransformer;
 
 import static org.junit.Assert.*;
 
@@ -122,8 +123,10 @@ public class KiwiTest {
 	public void testTypos() throws Exception {
 		System.gc();
 		KiwiBuilder builder = new KiwiBuilder(modelPath);
-		Kiwi kiwi = builder.build(KiwiBuilder.basicTypoSet);
-		Kiwi.Token[] tokens = kiwi.tokenize("나 죰 도와죠.", new AnalyzeOption(Kiwi.Match.allWithNormalizing));
+		Kiwi kiwi = builder.build();
+		PreparedTypoTransformer preparedTypo = KiwiBuilder.basicTypoSet.prepare();
+		AnalyzeOption option = new AnalyzeOption(Kiwi.Match.allWithNormalizing, null, Kiwi.Dialect.standard, 0.0f, preparedTypo, 2.5f);
+		Kiwi.Token[] tokens = kiwi.tokenize("나 죰 도와죠.", option);
 		System.out.println(Arrays.deepToString(tokens));
 		assertEquals(tokens[1].form, "좀");
 		assertEquals(tokens[4].form, "주");
@@ -134,29 +137,31 @@ public class KiwiTest {
 	public void testContinualTypos() throws Exception {
 		System.gc();
 		KiwiBuilder builder = new KiwiBuilder(modelPath);
-		Kiwi kiwi = builder.build(KiwiBuilder.continualTypoSet);
+		Kiwi kiwi = builder.build();
+		PreparedTypoTransformer preparedTypo = KiwiBuilder.continualTypoSet.prepare();
+		AnalyzeOption option = new AnalyzeOption(Kiwi.Match.allWithNormalizing, null, Kiwi.Dialect.standard, 0.0f, preparedTypo, 2.5f);
 
-		Kiwi.Token[] tokens = kiwi.tokenize("프로그래미", new AnalyzeOption(Kiwi.Match.allWithNormalizing));
+		Kiwi.Token[] tokens = kiwi.tokenize("프로그래미", option);
 		System.out.println(Arrays.deepToString(tokens));
 		assertEquals(tokens[0].form, "프로그램");
 		assertEquals(tokens[1].form, "이");
 
-		tokens = kiwi.tokenize("프로그래믈", new AnalyzeOption(Kiwi.Match.allWithNormalizing));
+		tokens = kiwi.tokenize("프로그래믈", option);
 		System.out.println(Arrays.deepToString(tokens));
 		assertEquals(tokens[0].form, "프로그램");
 		assertEquals(tokens[1].form, "을");
 
-		tokens = kiwi.tokenize("오늘사무시레서", new AnalyzeOption(Kiwi.Match.allWithNormalizing));
+		tokens = kiwi.tokenize("오늘사무시레서", option);
 		System.out.println(Arrays.deepToString(tokens));
 		assertEquals(tokens[1].form, "사무실");
 		assertEquals(tokens[2].form, "에서");
 
-		tokens = kiwi.tokenize("법원이 기가캤다.", new AnalyzeOption(Kiwi.Match.allWithNormalizing));
+		tokens = kiwi.tokenize("법원이 기가캤다.", option);
 		System.out.println(Arrays.deepToString(tokens));
 		assertEquals(tokens[2].form, "기각");
 		assertEquals(tokens[3].form, "하");
 
-		tokens = kiwi.tokenize("하나도 업써.", new AnalyzeOption(Kiwi.Match.allWithNormalizing));
+		tokens = kiwi.tokenize("하나도 업써.", option);
 		System.out.println(Arrays.deepToString(tokens));
 		assertEquals(tokens[2].form, "없");
 		assertEquals(tokens[3].form, "어");
@@ -169,19 +174,21 @@ public class KiwiTest {
 		TypoTransformer typoSet = KiwiBuilder.basicTypoSet.copy()
 									.update(KiwiBuilder.continualTypoSet)
 									.update(KiwiBuilder.lengtheningTypoSet);
-		Kiwi kiwi = builder.build(typoSet);
-		
-		Kiwi.Token[] tokens = kiwi.tokenize("프로그래미", new AnalyzeOption(Kiwi.Match.allWithNormalizing));
+		Kiwi kiwi = builder.build();
+		PreparedTypoTransformer preparedTypo = typoSet.prepare();
+		AnalyzeOption option = new AnalyzeOption(Kiwi.Match.allWithNormalizing, null, Kiwi.Dialect.standard, 0.0f, preparedTypo, 2.5f);
+
+		Kiwi.Token[] tokens = kiwi.tokenize("프로그래미", option);
 		System.out.println(Arrays.deepToString(tokens));
 		assertEquals(tokens[0].form, "프로그램");
 		assertEquals(tokens[1].form, "이");
 
-		tokens = kiwi.tokenize("지인짜?", new AnalyzeOption(Kiwi.Match.allWithNormalizing));
+		tokens = kiwi.tokenize("지인짜?", option);
 		System.out.println(Arrays.deepToString(tokens));
 		assertEquals(tokens[0].form, "진짜");
 		assertEquals(tokens[1].form, "?");
 
-		tokens = kiwi.tokenize("맗은 물", new AnalyzeOption(Kiwi.Match.allWithNormalizing));
+		tokens = kiwi.tokenize("맗은 물", option);
 		System.out.println(Arrays.deepToString(tokens));
 		assertEquals(tokens[0].form, "맑");
 	}
