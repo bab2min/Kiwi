@@ -240,12 +240,10 @@ namespace kiwi
 	inline void removeUnconnected(Vector<KGraphNode>& ret, const Vector<KGraphNode>& graph, const Vector<std::pair<uint32_t, uint32_t>>& endPosMap)
 	{
 		thread_local Vector<uint8_t> connectedList;
-		thread_local Vector<uint16_t> newIndexDiff;
 		thread_local Deque<uint32_t> updateList;
+		thread_local Vector<size_t> sortedIndices;
 		connectedList.clear();
 		connectedList.resize(graph.size());
-		newIndexDiff.clear();
-		newIndexDiff.resize(graph.size());
 		updateList.clear();
 		updateList.emplace_back(graph.size() - 1);
 		connectedList[graph.size() - 1] = 1;
@@ -265,28 +263,37 @@ namespace kiwi
 			}
 		}
 
-		size_t connectedCnt = accumulate(connectedList.begin(), connectedList.end(), 0);
-		newIndexDiff[0] = connectedList[0];
-		for (size_t i = 1; i < graph.size(); ++i)
-		{
-			newIndexDiff[i] = newIndexDiff[i - 1] + connectedList[i];
-		}
+		sortedIndices.resize(graph.size() * 2);
+		iota(sortedIndices.begin(), sortedIndices.begin() + graph.size(), 0);
+		stable_sort(sortedIndices.begin(), sortedIndices.begin() + graph.size(), [&](size_t a, size_t b)
+		{ 
+			if (connectedList[a] != connectedList[b]) return connectedList[a] > connectedList[b];
+			return graph[a].endPos < graph[b].endPos; 
+		});
+		size_t* invertedIndices = sortedIndices.data() + graph.size();
 		for (size_t i = 0; i < graph.size(); ++i)
 		{
-			newIndexDiff[i] = i + 1 - newIndexDiff[i];
+			invertedIndices[sortedIndices[i]] = i;
 		}
 
+		const size_t connectedCnt = accumulate(connectedList.begin(), connectedList.end(), 0);
 		ret.reserve(connectedCnt);
-		for (size_t i = 0; i < graph.size(); ++i)
+		for (size_t i = 0; i < connectedCnt; ++i)
 		{
-			if (!connectedList[i]) continue;
-			ret.emplace_back(graph[i]);
+			const auto idx = sortedIndices[i];
+			ret.emplace_back(graph[idx]);
 			auto& newNode = ret.back();
-			if (newNode.prev) newNode.prev -= newIndexDiff[i] - newIndexDiff[i - newNode.prev];
+			if (newNode.prev)
+			{
+				const auto newAbsolutePrev = invertedIndices[idx - newNode.prev];
+				newNode.prev = i - newAbsolutePrev;
+			}
+
 			if (newNode.sibling)
 			{
-				if (connectedList[i + newNode.sibling]) newNode.sibling -= newIndexDiff[i + newNode.sibling] - newIndexDiff[i];
-				else newNode.sibling = 0;
+				const auto newAbsoluteSibling = invertedIndices[idx + newNode.sibling];
+				if (newAbsoluteSibling >= connectedCnt) newNode.sibling = 0;
+				else newNode.sibling = newAbsoluteSibling - i;
 			}
 		}
 	}
@@ -724,7 +731,6 @@ public:
 
 	U16StringView rawStr;
 	size_t posMultiplierBit = 0;
-	float continualTypoCost = 0;
 	float lengtheningTypoCost = 0;
 	Vector<tuple<size_t, uint32_t, POSTag>>::const_iterator nextMatchedPattern;
 
@@ -841,23 +847,36 @@ public:
 		return n;
 	}
 
+	size_t log2Ceil(size_t n)
+	{
+		if (n <= 1) return 0;
+		size_t log = 0;
+		n--;
+		while (n > 0)
+		{
+			n >>= 1;
+			log++;
+		}
+		return log;
+	}
+
 	void buildTypoGraph(
 		U16StringView str,
 		const PreparedTypoTransformer* typoTransformer
 	)
 	{
 		rawStr = str;
+		size_t maxContinualTypoIdx = 0;
 		if (typoTransformer)
 		{
-			typoTransformer->generateGraph(str, typoGraph, pretokenizedSpans.data(), pretokenizedSpans.data() + pretokenizedSpans.size());
+			typoTransformer->generateGraph(str, typoGraph, allowedDialect, pretokenizedSpans.data(), pretokenizedSpans.data() + pretokenizedSpans.size(), &maxContinualTypoIdx);
 		}
 		else
 		{
 			typoGraph.emplace_back(str.substr(0, 0), 0);
 			typoGraph.emplace_back(str, str.size(), 0, 1);
 		}
-		posMultiplierBit = typoTransformer && isfinite(typoTransformer->getContinualTypoCost()) ? 3 : 0;
-		continualTypoCost = typoTransformer ? typoTransformer->getContinualTypoCost() : INFINITY;
+		posMultiplierBit = log2Ceil(maxContinualTypoIdx);
 		lengtheningTypoCost = typoTransformer ? typoTransformer->getLengtheningTypoCost() : INFINITY;
 
 		endPosMap.resize((nsToPos.size() << posMultiplierBit) + 1, make_pair(-1, -1));
@@ -979,10 +998,7 @@ public:
 		const Form* const fallbackFormBegin = trie.value((size_t)POSTag::nng);
 		const Form* const fallbackFormEnd = trie.value((size_t)POSTag::max);
 
-		float typoCost = state.accumulatedCost;
-		typoCost += (typoNode.typoCost * (
-			typoNode.continualTypoIdx || prevTypoNode.continualTypoIdx ? continualTypoCost : 1.f
-		));
+		float typoCost = state.accumulatedCost + typoNode.typoCost;
 		if (typoCost > typoThreshold)
 		{
 			return;
@@ -1417,7 +1433,7 @@ public:
 			}
 		}
 		appendNewNode(out, endPosMap, (nsToPos.size() << posMultiplierBit), (nsToPos.size() << posMultiplierBit) + 1, nullptr);
-		out.back().endPos = nsToPos.size();
+		out.back().endPos = nsToPos.size() << posMultiplierBit;
 		searchStates.clear();
 	}
 

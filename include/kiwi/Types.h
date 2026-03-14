@@ -269,6 +269,7 @@ namespace kiwi
 		non_vocalic_h, /**< `vocalic_h`의 부정 */
 		applosive, /**< 오타 교정용: 불파음 받침(ㄴㄹㅁㅇ을 제외한 모든 받침) */
 		continual, /**< 오타 교정용: 연철 환경임을 표시 */
+		boundary, /**< 오타 교정용: 형태소 경계임을 표시 */
 	};
 
 	/**

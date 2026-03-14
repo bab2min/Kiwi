@@ -135,6 +135,7 @@ namespace kiwi
 		uint32_t prevOffset = 0;
 		uint32_t siblingOffset = 0;
 		uint8_t continualTypoIdx = 0;
+		Dialect dialect = Dialect::standard;
 
 		TypoGraphNode(U16StringView _form = {}, uint32_t _endPos = 0, float _typoCost = 0, uint32_t _prevOffset = 0, uint32_t _siblingOffset = 0)
 			: form{ _form }, endPos{ _endPos }, typoCost{ _typoCost }, prevOffset{ _prevOffset }, siblingOffset{ _siblingOffset }
@@ -247,8 +248,10 @@ namespace kiwi
 
 		template<class Alloc>
 		size_t generateGraph(U16StringView normalizedStr, std::vector<TypoGraphNode, Alloc>& graphOut, 
+			Dialect allowedDialect = Dialect::standard,
 			const std::pair<uint32_t, uint32_t>* pretokenizedFirst = nullptr,
-			const std::pair<uint32_t, uint32_t>* pretokenizedLast = nullptr) const;
+			const std::pair<uint32_t, uint32_t>* pretokenizedLast = nullptr,
+			size_t* maxContinualTypoIdxOut = nullptr) const;
 	};
 
 	/**
