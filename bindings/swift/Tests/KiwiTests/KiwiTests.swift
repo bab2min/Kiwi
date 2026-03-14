@@ -170,6 +170,94 @@ final class KiwiTests: XCTestCase {
         XCTAssertFalse(joined.isEmpty, "Joined text should not be empty")
     }
     
-    // Note: Integration tests that require model files are not included
-    // as they would require access to actual Kiwi model files
+    // MARK: - Typo Correction Tests
+
+    func testBasicTypoCorrection() throws {
+        let modelPath = "../../models/cong/base"
+
+        guard FileManager.default.fileExists(atPath: modelPath) else {
+            print("Model not found, skipping test")
+            return
+        }
+
+        let builder = try KiwiBuilder(modelPath: modelPath, numThreads: 1)
+        let kiwi = try builder.build()
+
+        // Prepare basic typo transformer
+        let typoTransformer = try TypoTransformer.default(.basicTypoSet)
+        let preparedTypo = try typoTransformer.prepare()
+
+        // Without typo correction: '죰' remains as-is
+        let tokensNoTypo = try kiwi.tokenize("나 죰 도와죠.")
+        let formsNoTypo = tokensNoTypo.map { $0.form }
+        XCTAssertTrue(formsNoTypo.contains("죰"), "Without typo correction, '죰' should remain")
+
+        // With typo correction: '죰' → '좀'
+        let tokensWithTypo = try kiwi.tokenize("나 죰 도와죠.", typoTransformer: preparedTypo)
+        let formsWithTypo = tokensWithTypo.map { $0.form }
+        XCTAssertTrue(formsWithTypo.contains("좀"), "With typo correction, '죰' should become '좀'")
+    }
+
+    func testContinualTypoCorrection() throws {
+        let modelPath = "../../models/cong/base"
+
+        guard FileManager.default.fileExists(atPath: modelPath) else {
+            print("Model not found, skipping test")
+            return
+        }
+
+        let builder = try KiwiBuilder(modelPath: modelPath, numThreads: 1)
+        let kiwi = try builder.build()
+
+        let typoTransformer = try TypoTransformer.default(.continualTypoSet)
+        let preparedTypo = try typoTransformer.prepare()
+
+        let tokens = try kiwi.tokenize("프로그래미", typoTransformer: preparedTypo)
+        XCTAssertEqual(tokens[0].form, "프로그램")
+        XCTAssertEqual(tokens[1].form, "이")
+    }
+
+    func testTypoCorrectionViaAnalyze() throws {
+        let modelPath = "../../models/cong/base"
+
+        guard FileManager.default.fileExists(atPath: modelPath) else {
+            print("Model not found, skipping test")
+            return
+        }
+
+        let builder = try KiwiBuilder(modelPath: modelPath, numThreads: 1)
+        let kiwi = try builder.build()
+
+        let typoTransformer = try TypoTransformer.default(.basicTypoSet)
+        let preparedTypo = try typoTransformer.prepare()
+
+        let results = try kiwi.analyze("나 죰 도와죠.", topN: 1, typoTransformer: preparedTypo)
+        XCTAssertFalse(results.isEmpty)
+        let forms = results[0].tokens.map { $0.form }
+        XCTAssertTrue(forms.contains("좀"))
+    }
+
+    func testBasicWithContinualTypoCorrection() throws {
+        let modelPath = "../../models/cong/base"
+
+        guard FileManager.default.fileExists(atPath: modelPath) else {
+            print("Model not found, skipping test")
+            return
+        }
+
+        let builder = try KiwiBuilder(modelPath: modelPath, numThreads: 1)
+        let kiwi = try builder.build()
+
+        let typoTransformer = try TypoTransformer.default(.basicTypoSetWithContinual)
+        let preparedTypo = try typoTransformer.prepare()
+
+        // continual typo: '프로그래미' → '프로그램' + '이'
+        let tokens1 = try kiwi.tokenize("프로그래미", typoTransformer: preparedTypo)
+        XCTAssertEqual(tokens1[0].form, "프로그램")
+
+        // basic typo: '죰' → '좀'
+        let tokens2 = try kiwi.tokenize("나 죰 도와죠.", typoTransformer: preparedTypo)
+        let forms = tokens2.map { $0.form }
+        XCTAssertTrue(forms.contains("좀"))
+    }
 }

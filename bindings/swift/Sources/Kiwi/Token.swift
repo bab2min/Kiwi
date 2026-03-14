@@ -27,9 +27,12 @@ public struct Token: Codable {
     /// Line number
     public let lineNumber: Int
     
+    /// Sense ID
+    public let senseId: Int
+
     /// Typo cost (0 if not corrected)
     public let typoCost: Float
-    
+
     /// Paired token index for SSO/SSC tags (-1 if none)
     public let pairedToken: Int
     
@@ -48,6 +51,7 @@ public struct Token: Codable {
         self.wordPosition = Int(tokenInfo.word_position)
         self.sentencePosition = Int(tokenInfo.sent_position)
         self.lineNumber = Int(tokenInfo.line_number)
+        self.senseId = Int(tokenInfo.sense_id)
         self.typoCost = tokenInfo.typo_cost
         self.pairedToken = Int(tokenInfo.paired_token)
         self.subSentencePosition = Int(tokenInfo.sub_sent_position)
@@ -63,6 +67,7 @@ public struct Token: Codable {
         wordPosition: Int = 0,
         sentencePosition: Int = 0,
         lineNumber: Int = 0,
+        senseId: Int = 0,
         typoCost: Float = 0.0,
         pairedToken: Int = -1,
         subSentencePosition: Int = 0,
@@ -76,6 +81,7 @@ public struct Token: Codable {
         self.wordPosition = wordPosition
         self.sentencePosition = sentencePosition
         self.lineNumber = lineNumber
+        self.senseId = senseId
         self.typoCost = typoCost
         self.pairedToken = pairedToken
         self.subSentencePosition = subSentencePosition
