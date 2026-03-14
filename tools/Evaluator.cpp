@@ -64,23 +64,6 @@ inline TokenInfo parseWordPOS(const u16string& str)
 	return { form, tag, 0, 0 };
 }
 
-inline string oovScoringTypeToStr(Match t)
-{
-	switch (t)
-	{
-	case Match::oovRuleOnly:
-		return "rule";
-	case Match::oovChrModel:
-		return "chr";
-	case Match::oovChrFreqModel:
-		return "chrFreq";
-	case Match::oovChrFreqBranchModel:
-		return "chrFreqBranch";
-	default:
-		return "none";
-	}
-}
-
 int Evaluator::operator()(const string& modelPath, 
 	const string& output, 
 	const vector<string>& input,
@@ -187,7 +170,7 @@ int Evaluator::operator()(const string& modelPath,
 		{
 			cout << "LM Size : " << (kw.getLangModel()->getMemorySize() / 1024. / 1024.) << " MB" << endl;
 		}
-		cout << "OOV Scoring : " << oovScoringTypeToStr(oovScoringType) << endl;
+		cout << "OOV Scoring : " << tutils::oovScoringTypeToStr(oovScoringType) << endl;
 		cout << "Typo Correction: " << (typoStr.empty() ? "none" : typoStr) << endl;
 		cout << "Mem Usage : " << (tutils::getCurrentPhysicalMemoryUsage() / 1024.) << " MB\n" << endl;
 

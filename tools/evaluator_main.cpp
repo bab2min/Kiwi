@@ -12,34 +12,6 @@ using namespace std;
 using namespace kiwi;
 using namespace TCLAP;
 
-inline Match parseOOVScoring(const std::string& str)
-{
-	if (str == "none")
-	{
-		return Match::oovRuleOnly;
-	}
-	else if (str == "rule")
-	{
-		return Match::oovRuleOnly;
-	}
-	else if (str == "chr")
-	{
-		return Match::oovChrModel;
-	}
-	else if (str == "chrfreq")
-	{
-		return Match::oovChrFreqModel;
-	}
-	else if (str == "chrfreqbranch")
-	{
-		return Match::oovChrFreqBranchModel;
-	}
-	else
-	{
-		throw runtime_error{ "Unknown OOV scoring method: " + str };
-	}
-}
-
 int main(int argc, const char* argv[])
 {
 	tutils::setUTF8Output();
@@ -107,7 +79,7 @@ int main(int argc, const char* argv[])
 	Match oovScoringType = Match::oovRuleOnly;
 	try
 	{
-		oovScoringType = parseOOVScoring(oovScoring.getValue());
+		oovScoringType = tutils::parseOOVScoring(oovScoring.getValue());
 	}
 	catch (const exception& e)
 	{

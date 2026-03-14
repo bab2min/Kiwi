@@ -150,6 +150,50 @@ namespace tutils
 		}
 	}
 
+	inline kiwi::Match parseOOVScoring(const std::string& str)
+	{
+		if (str == "none")
+		{
+			return kiwi::Match::oovRuleOnly;
+		}
+		else if (str == "rule")
+		{
+			return kiwi::Match::oovRuleOnly;
+		}
+		else if (str == "chr")
+		{
+			return kiwi::Match::oovChrModel;
+		}
+		else if (str == "chrfreq")
+		{
+			return kiwi::Match::oovChrFreqModel;
+		}
+		else if (str == "chrfreqbranch")
+		{
+			return kiwi::Match::oovChrFreqBranchModel;
+		}
+		else
+		{
+			throw std::runtime_error{ "Unknown OOV scoring method: " + str };
+		}
+	}
+
+	inline std::string oovScoringTypeToStr(kiwi::Match t)
+	{
+		switch (t)
+		{
+		case kiwi::Match::oovRuleOnly:
+			return "rule";
+		case kiwi::Match::oovChrModel:
+			return "chr";
+		case kiwi::Match::oovChrFreqModel:
+			return "chrFreq";
+		case kiwi::Match::oovChrFreqBranchModel:
+			return "chrFreqBranch";
+		default:
+			return "none";
+		}
+	}
 
 	template<class BaseStr, class BaseChr, class OutIterator>
 	OutIterator split(BaseStr&& s, BaseChr delim, OutIterator result, size_t maxSplit = -1, BaseChr delimEscape = 0)
