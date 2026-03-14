@@ -8,7 +8,7 @@ var searchData=
   ['positive_5',['positive',['../Types_8h.html#a7903fe33da04a788b0bb009094596894a82082716189f80fd070b89ac716570ba',1,'kiwi']]],
   ['postag_6',['POSTag',['../Types_8h.html#ac15313ea8fffc5cc54475e10264ddebb',1,'kiwi']]],
   ['prefixcounter_7',['PrefixCounter',['../classkiwi_1_1PrefixCounter.html',1,'kiwi']]],
-  ['prepare_8',['prepare',['../classkiwi_1_1TypoTransformer.html#afe3425d49368c8b7f17dabd9cbfdada5',1,'kiwi::TypoTransformer']]],
+  ['prepare_8',['prepare',['../classkiwi_1_1TypoTransformer.html#a4a7593c898a441e339c539185177ced0',1,'kiwi::TypoTransformer']]],
   ['preparedtypotransformer_9',['PreparedTypoTransformer',['../classkiwi_1_1PreparedTypoTransformer.html',1,'kiwi']]],
   ['pretokenizedspan_10',['PretokenizedSpan',['../structkiwi_1_1PretokenizedSpan.html',1,'kiwi']]],
   ['pyeongan_11',['pyeongan',['../Types_8h.html#aa9fc09d985bc896c97e2e0f5cd41c96fa70ae9293d75de22420b33b203fd70671',1,'kiwi']]]

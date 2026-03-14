@@ -82,16 +82,16 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>오타 생성 및 교정 준비가 완료된 오타 생성기. <a class="el" href="classkiwi_1_1TypoTransformer.html#afe3425d49368c8b7f17dabd9cbfdada5" title="현재 TypoTransformer를 사용하여 PreparedTypoTransformer를 생성합니다. PreparedTypoTransformer는 실제로 오타를 생성하거나 kiwi:...">kiwi::TypoTransformer::prepare()</a>로부터 생성됩니다.  
+<p>오타 생성 및 교정 준비가 완료된 오타 생성기. <a class="el" href="classkiwi_1_1TypoTransformer.html#a4a7593c898a441e339c539185177ced0" title="현재 TypoTransformer를 사용하여 PreparedTypoTransformer를 생성합니다. PreparedTypoTransformer는 실제로 오타를 생성하거나 kiwi:...">kiwi::TypoTransformer::prepare()</a>로부터 생성됩니다.  
  <a href="classkiwi_1_1PreparedTypoTransformer.html#details">More...</a></p>
 
 <p><code>#include &lt;TypoTransformer.h&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:acadb3de36b321e651a4c95c991cc53c7" id="r_acadb3de36b321e651a4c95c991cc53c7"><td class="memItemLeft" align="right" valign="top"><a id="acadb3de36b321e651a4c95c991cc53c7" name="acadb3de36b321e651a4c95c991cc53c7"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>PreparedTypoTransformer</b> (const <a class="el" href="classkiwi_1_1TypoTransformer.html">TypoTransformer</a> &amp;tt)</td></tr>
-<tr class="separator:acadb3de36b321e651a4c95c991cc53c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a87d7d583f5252738eeb31667a891612b" id="r_a87d7d583f5252738eeb31667a891612b"><td class="memItemLeft" align="right" valign="top"><a id="a87d7d583f5252738eeb31667a891612b" name="a87d7d583f5252738eeb31667a891612b"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>PreparedTypoTransformer</b> (const <a class="el" href="classkiwi_1_1TypoTransformer.html">TypoTransformer</a> &amp;tt, bool inverse=false)</td></tr>
+<tr class="separator:a87d7d583f5252738eeb31667a891612b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acf9c74cbbe7963bbdf24f95365a33ee0" id="r_acf9c74cbbe7963bbdf24f95365a33ee0"><td class="memItemLeft" align="right" valign="top"><a id="acf9c74cbbe7963bbdf24f95365a33ee0" name="acf9c74cbbe7963bbdf24f95365a33ee0"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>PreparedTypoTransformer</b> (const <a class="el" href="classkiwi_1_1PreparedTypoTransformer.html">PreparedTypoTransformer</a> &amp;)=delete</td></tr>
 <tr class="separator:acf9c74cbbe7963bbdf24f95365a33ee0"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -116,6 +116,10 @@ float&#160;</td><td class="memItemRight" valign="bottom"><b>getLengtheningTypoCo
 <tr class="memitem:ad721dbdc05602d01815bdb3204d3f29c" id="r_ad721dbdc05602d01815bdb3204d3f29c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classkiwi_1_1TypoCandidates.html">TypoCandidates</a>&lt; true &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1PreparedTypoTransformer.html#ad721dbdc05602d01815bdb3204d3f29c">generate</a> (const std::u16string &amp;orig, float costThreshold=2.5f) const</td></tr>
 <tr class="memdesc:ad721dbdc05602d01815bdb3204d3f29c"><td class="mdescLeft">&#160;</td><td class="mdescRight">주어진 문자열에 대해 오타 후보를 생성합니다.  <br /></td></tr>
 <tr class="separator:ad721dbdc05602d01815bdb3204d3f29c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a567fda34c91d57e10835c4f340ff8066" id="r_a567fda34c91d57e10835c4f340ff8066"><td class="memTemplParams" colspan="2"><a id="a567fda34c91d57e10835c4f340ff8066" name="a567fda34c91d57e10835c4f340ff8066"></a>
+template&lt;class Alloc &gt; </td></tr>
+<tr class="memitem:a567fda34c91d57e10835c4f340ff8066"><td class="memTemplItemLeft" align="right" valign="top">size_t&#160;</td><td class="memTemplItemRight" valign="bottom"><b>generateGraph</b> (U16StringView normalizedStr, std::vector&lt; <a class="el" href="structkiwi_1_1TypoGraphNode.html">TypoGraphNode</a>, Alloc &gt; &amp;graphOut, const std::pair&lt; uint32_t, uint32_t &gt; *pretokenizedFirst=nullptr, const std::pair&lt; uint32_t, uint32_t &gt; *pretokenizedLast=nullptr) const</td></tr>
+<tr class="separator:a567fda34c91d57e10835c4f340ff8066"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="friends" name="friends"></a>
 Friends</h2></td></tr>
@@ -124,7 +128,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>KiwiBuilder</b></td>
 <tr class="separator:ab2c33d7538f624b7652fb7fd9b898542"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>오타 생성 및 교정 준비가 완료된 오타 생성기. <a class="el" href="classkiwi_1_1TypoTransformer.html#afe3425d49368c8b7f17dabd9cbfdada5" title="현재 TypoTransformer를 사용하여 PreparedTypoTransformer를 생성합니다. PreparedTypoTransformer는 실제로 오타를 생성하거나 kiwi:...">kiwi::TypoTransformer::prepare()</a>로부터 생성됩니다. </p>
+<div class="textblock"><p>오타 생성 및 교정 준비가 완료된 오타 생성기. <a class="el" href="classkiwi_1_1TypoTransformer.html#a4a7593c898a441e339c539185177ced0" title="현재 TypoTransformer를 사용하여 PreparedTypoTransformer를 생성합니다. PreparedTypoTransformer는 실제로 오타를 생성하거나 kiwi:...">kiwi::TypoTransformer::prepare()</a>로부터 생성됩니다. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="ad721dbdc05602d01815bdb3204d3f29c" name="ad721dbdc05602d01815bdb3204d3f29c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad721dbdc05602d01815bdb3204d3f29c">&#9670;&#160;</a></span>generate()</h2>

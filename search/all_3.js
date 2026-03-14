@@ -28,6 +28,7 @@ var searchData=
   ['congrammodelheader_25',['CoNgramModelHeader',['../structkiwi_1_1lm_1_1CoNgramModelHeader.html',1,'kiwi::lm']]],
   ['constaccess_26',['ConstAccess',['../classkiwi_1_1utils_1_1ConstAccess.html',1,'kiwi::utils']]],
   ['constaccess_3c_20std_3a_3aunordered_5fmap_3c_20_5fkey_2c_20int32_5ft_20_3e_20_3e_27',['ConstAccess&lt; std::unordered_map&lt; _Key, int32_t &gt; &gt;',['../classkiwi_1_1utils_1_1ConstAccess.html',1,'kiwi::utils']]],
-  ['continuoustrie_28',['ContinuousTrie',['../classkiwi_1_1utils_1_1ContinuousTrie.html',1,'kiwi::utils']]],
-  ['cut_5foff_5fthreshold_29',['cut_off_threshold',['../structkiwi__config__t.html#a26a2c225b9a9e746a0ba728b78386528',1,'kiwi_config_t']]]
+  ['continual_28',['continual',['../Types_8h.html#a11856481b15f24bf19cb647734ea1085a7129b7cbc85892b6cd1e877181759b76',1,'kiwi']]],
+  ['continuoustrie_29',['ContinuousTrie',['../classkiwi_1_1utils_1_1ContinuousTrie.html',1,'kiwi::utils']]],
+  ['cut_5foff_5fthreshold_30',['cut_off_threshold',['../structkiwi__config__t.html#a26a2c225b9a9e746a0ba728b78386528',1,'kiwi_config_t']]]
 ];

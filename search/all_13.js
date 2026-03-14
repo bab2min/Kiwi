@@ -13,11 +13,14 @@ var searchData=
   ['typo_5fcost_10',['typo_cost',['../structkiwi__token__info__t.html#ae4a0a293df8c1fabb3cc131a21590e73',1,'kiwi_token_info_t']]],
   ['typo_5fcost_5fweight_11',['typo_cost_weight',['../structkiwi__config__t.html#a88e551f32c3b0352054542051f796a7e',1,'kiwi_config_t']]],
   ['typo_5fform_5fid_12',['typo_form_id',['../structkiwi__token__info__t.html#abd087ff84894fd3e786670f0a4caf3b0',1,'kiwi_token_info_t']]],
-  ['typocandidates_13',['TypoCandidates',['../classkiwi_1_1TypoCandidates.html',1,'kiwi']]],
-  ['typocost_14',['typoCost',['../structkiwi_1_1TokenInfo.html#a665bcabafa2c41815d0a5ad51a27e833',1,'kiwi::TokenInfo']]],
-  ['typoform_15',['TypoForm',['../structkiwi_1_1TypoForm.html',1,'kiwi']]],
-  ['typoformid_16',['typoFormId',['../structkiwi_1_1TokenInfo.html#aa77262e269fb9873c00c6fc9ad410fbb',1,'kiwi::TokenInfo']]],
-  ['typoiterator_17',['TypoIterator',['../classkiwi_1_1TypoIterator.html',1,'kiwi']]],
-  ['typotransformer_18',['TypoTransformer',['../classkiwi_1_1TypoTransformer.html',1,'kiwi']]],
-  ['typotransformer_2eh_19',['TypoTransformer.h',['../TypoTransformer_8h.html',1,'']]]
+  ['typo_5fthreshold_13',['typo_threshold',['../structkiwi__analyze__option__t.html#a291e401a8555622307bd7e7b71d4b468',1,'kiwi_analyze_option_t']]],
+  ['typo_5ftransformer_14',['typo_transformer',['../structkiwi__analyze__option__t.html#ae3b9cad120d22039562539ce52de5ca9',1,'kiwi_analyze_option_t']]],
+  ['typocandidates_15',['TypoCandidates',['../classkiwi_1_1TypoCandidates.html',1,'kiwi']]],
+  ['typocost_16',['typoCost',['../structkiwi_1_1TokenInfo.html#a665bcabafa2c41815d0a5ad51a27e833',1,'kiwi::TokenInfo']]],
+  ['typoform_17',['TypoForm',['../structkiwi_1_1TypoForm.html',1,'kiwi']]],
+  ['typoformid_18',['typoFormId',['../structkiwi_1_1TokenInfo.html#aa77262e269fb9873c00c6fc9ad410fbb',1,'kiwi::TokenInfo']]],
+  ['typographnode_19',['TypoGraphNode',['../structkiwi_1_1TypoGraphNode.html',1,'kiwi']]],
+  ['typoiterator_20',['TypoIterator',['../classkiwi_1_1TypoIterator.html',1,'kiwi']]],
+  ['typotransformer_21',['TypoTransformer',['../classkiwi_1_1TypoTransformer.html',1,'kiwi']]],
+  ['typotransformer_2eh_22',['TypoTransformer.h',['../TypoTransformer_8h.html',1,'']]]
 ];

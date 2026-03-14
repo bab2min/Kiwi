@@ -88,6 +88,10 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a4389c96c9daa55675092ec7daed1ba84"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a442f1413f29ba5f25f88ab1d887e3a6e" id="r_a442f1413f29ba5f25f88ab1d887e3a6e"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi__analyze__option__t.html#a442f1413f29ba5f25f88ab1d887e3a6e">dialect_cost</a></td></tr>
 <tr class="separator:a442f1413f29ba5f25f88ab1d887e3a6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae3b9cad120d22039562539ce52de5ca9" id="r_ae3b9cad120d22039562539ce52de5ca9"><td class="memItemLeft" align="right" valign="top">kiwi_prepared_typo_h&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi__analyze__option__t.html#ae3b9cad120d22039562539ce52de5ca9">typo_transformer</a></td></tr>
+<tr class="separator:ae3b9cad120d22039562539ce52de5ca9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a291e401a8555622307bd7e7b71d4b468" id="r_a291e401a8555622307bd7e7b71d4b468"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi__analyze__option__t.html#a291e401a8555622307bd7e7b71d4b468">typo_threshold</a></td></tr>
+<tr class="separator:a291e401a8555622307bd7e7b71d4b468"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Member Data Documentation</h2>
 <a id="a4389c96c9daa55675092ec7daed1ba84" name="a4389c96c9daa55675092ec7daed1ba84"></a>
@@ -162,6 +166,36 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>마지막 형태소 다음 문장을 종결하지 않고 열린 상태로 끝낼지를 설정니다. 기본값은 0으로 마지막 형태소 다음 바로 문장을 종결합니다. </p>
+
+</div>
+</div>
+<a id="a291e401a8555622307bd7e7b71d4b468" name="a291e401a8555622307bd7e7b71d4b468"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a291e401a8555622307bd7e7b71d4b468">&#9670;&#160;</a></span>typo_threshold</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float kiwi_analyze_option_t::typo_threshold</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>오타 교정 비용 임계값. 기본값은 2.5 </p>
+
+</div>
+</div>
+<a id="ae3b9cad120d22039562539ce52de5ca9" name="ae3b9cad120d22039562539ce52de5ca9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae3b9cad120d22039562539ce52de5ca9">&#9670;&#160;</a></span>typo_transformer</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">kiwi_prepared_typo_h kiwi_analyze_option_t::typo_transformer</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>분석 시 사용할 오타 교정기. null인 경우 사용하지 않습니다. </p>
 
 </div>
 </div>

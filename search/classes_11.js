@@ -9,6 +9,7 @@ var searchData=
   ['trienodeex_6',['TrieNodeEx',['../structkiwi_1_1utils_1_1TrieNodeEx.html',1,'kiwi::utils']]],
   ['typocandidates_7',['TypoCandidates',['../classkiwi_1_1TypoCandidates.html',1,'kiwi']]],
   ['typoform_8',['TypoForm',['../structkiwi_1_1TypoForm.html',1,'kiwi']]],
-  ['typoiterator_9',['TypoIterator',['../classkiwi_1_1TypoIterator.html',1,'kiwi']]],
-  ['typotransformer_10',['TypoTransformer',['../classkiwi_1_1TypoTransformer.html',1,'kiwi']]]
+  ['typographnode_9',['TypoGraphNode',['../structkiwi_1_1TypoGraphNode.html',1,'kiwi']]],
+  ['typoiterator_10',['TypoIterator',['../classkiwi_1_1TypoIterator.html',1,'kiwi']]],
+  ['typotransformer_11',['TypoTransformer',['../classkiwi_1_1TypoTransformer.html',1,'kiwi']]]
 ];

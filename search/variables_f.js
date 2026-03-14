@@ -4,6 +4,8 @@ var searchData=
   ['typo_5fcost_1',['typo_cost',['../structkiwi__token__info__t.html#ae4a0a293df8c1fabb3cc131a21590e73',1,'kiwi_token_info_t']]],
   ['typo_5fcost_5fweight_2',['typo_cost_weight',['../structkiwi__config__t.html#a88e551f32c3b0352054542051f796a7e',1,'kiwi_config_t']]],
   ['typo_5fform_5fid_3',['typo_form_id',['../structkiwi__token__info__t.html#abd087ff84894fd3e786670f0a4caf3b0',1,'kiwi_token_info_t']]],
-  ['typocost_4',['typoCost',['../structkiwi_1_1TokenInfo.html#a665bcabafa2c41815d0a5ad51a27e833',1,'kiwi::TokenInfo']]],
-  ['typoformid_5',['typoFormId',['../structkiwi_1_1TokenInfo.html#aa77262e269fb9873c00c6fc9ad410fbb',1,'kiwi::TokenInfo']]]
+  ['typo_5fthreshold_4',['typo_threshold',['../structkiwi__analyze__option__t.html#a291e401a8555622307bd7e7b71d4b468',1,'kiwi_analyze_option_t']]],
+  ['typo_5ftransformer_5',['typo_transformer',['../structkiwi__analyze__option__t.html#ae3b9cad120d22039562539ce52de5ca9',1,'kiwi_analyze_option_t']]],
+  ['typocost_6',['typoCost',['../structkiwi_1_1TokenInfo.html#a665bcabafa2c41815d0a5ad51a27e833',1,'kiwi::TokenInfo']]],
+  ['typoformid_7',['typoFormId',['../structkiwi_1_1TokenInfo.html#aa77262e269fb9873c00c6fc9ad410fbb',1,'kiwi::TokenInfo']]]
 ];
