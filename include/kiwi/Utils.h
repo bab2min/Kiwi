@@ -131,6 +131,39 @@ namespace kiwi
 		return os << utf16To8({ str.begin(), str.end() });
 	}
 
+	template<class Str, class It>
+	inline void normalizeHangul(Str& ret, It first, It last)
+	{
+		ret.reserve((size_t)(std::distance(first, last) * 1.5));
+		for (; first != last; ++first)
+		{
+			char16_t c = *first;
+			if (c == 0xB42C) c = 0xB410; // '됬'을 '됐'으로 강제교정
+			if (isHangulSyllable(c))
+			{
+				int coda = (c - 0xAC00) % 28;
+				ret.push_back(c - coda);
+				if (coda) ret.push_back(coda + 0x11A7);
+			}
+			else if (!ret.empty() && isHangulOnset(ret.back())
+				&& 0x1161 <= c && c < 0x1176)
+			{
+				// 첫가끝 초성 + 중성 중 현대한글 음절로 가능한 것은 결합
+				ret.back() = (char16_t)(0xAC00 + ((ret.back() - 0x1100) * 21 * 28) + ((c - 0x1161) * 28));
+			}
+			else
+			{
+				ret.push_back(c);
+			}
+		}
+	}
+
+	template<class Str>
+	inline void normalizeHangul(Str& ret, std::u16string_view sv)
+	{
+		normalizeHangul(ret, sv.begin(), sv.end());
+	}
+
 	template<class It>
 	inline std::u16string joinHangul(It first, It last)
 	{

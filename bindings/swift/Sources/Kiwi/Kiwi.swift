@@ -22,23 +22,29 @@ public final class Kiwi {
     ///   - text: Text to analyze
     ///   - topN: Number of top results to return (default: 1)
     ///   - options: Match options (default: .allWithNormalizing)
+    ///   - typoTransformer: Optional prepared typo transformer for typo correction
+    ///   - typoThreshold: Typo cost threshold (default: 2.5)
     /// - Returns: Array of token result candidates
     /// - Throws: KiwiError if analysis fails
     public func analyze(
         _ text: String,
         topN: Int = 1,
-        options: MatchOptions = .allWithNormalizing
+        options: MatchOptions = .allWithNormalizing,
+        typoTransformer: PreparedTypoTransformer? = nil,
+        typoThreshold: Float = 2.5
     ) throws -> [TokenResult] {
         guard let handle = wrapper?.handle else {
             throw KiwiError.invalidHandle
         }
-        
+
         var analyzeOption = kiwi_analyze_option_t()
         analyzeOption.match_options = options.rawValue
         analyzeOption.blocklist = nil
         analyzeOption.open_ending = 0
         analyzeOption.allowed_dialects = 0
         analyzeOption.dialect_cost = 3.0
+        analyzeOption.typo_transformer = typoTransformer?.handle
+        analyzeOption.typo_threshold = typoThreshold
         
         guard let result = kiwi_analyze(handle, text, Int32(topN), analyzeOption, nil) else {
             if let errorMsg = kiwi_error() {
@@ -88,13 +94,17 @@ public final class Kiwi {
     /// - Parameters:
     ///   - text: Text to tokenize
     ///   - options: Match options (default: .allWithNormalizing)
+    ///   - typoTransformer: Optional prepared typo transformer for typo correction
+    ///   - typoThreshold: Typo cost threshold (default: 2.5)
     /// - Returns: Array of tokens
     /// - Throws: KiwiError if tokenization fails
     public func tokenize(
         _ text: String,
-        options: MatchOptions = .allWithNormalizing
+        options: MatchOptions = .allWithNormalizing,
+        typoTransformer: PreparedTypoTransformer? = nil,
+        typoThreshold: Float = 2.5
     ) throws -> [Token] {
-        let results = try analyze(text, topN: 1, options: options)
+        let results = try analyze(text, topN: 1, options: options, typoTransformer: typoTransformer, typoThreshold: typoThreshold)
         return results.first?.tokens ?? []
     }
     

@@ -64,23 +64,6 @@ inline TokenInfo parseWordPOS(const u16string& str)
 	return { form, tag, 0, 0 };
 }
 
-inline string oovScoringTypeToStr(Match t)
-{
-	switch (t)
-	{
-	case Match::oovRuleOnly:
-		return "rule";
-	case Match::oovChrModel:
-		return "chr";
-	case Match::oovChrFreqModel:
-		return "chrFreq";
-	case Match::oovChrFreqBranchModel:
-		return "chrFreqBranch";
-	default:
-		return "none";
-	}
-}
-
 int Evaluator::operator()(const string& modelPath, 
 	const string& output, 
 	const vector<string>& input,
@@ -89,6 +72,7 @@ int Evaluator::operator()(const string& modelPath,
 	Dialect allowedDialect,
 	Match oovScoringType,
 	float unkFormScoreScale, float unkFormScoreBias,
+	bool oldSplitter,
 	int repeat)
 {
 	try
@@ -108,31 +92,50 @@ int Evaluator::operator()(const string& modelPath,
 		auto option = (BuildOption::default_ & ~BuildOption::loadDefaultDict & ~BuildOption::loadMultiDict) 
 			| (defaultDict ? BuildOption::loadDefaultDict : BuildOption::none)
 			| (multiDict ? BuildOption::loadMultiDict : BuildOption::none);
+		PreparedTypoTransformer ptt;
 		auto typo = getDefaultTypoSet(DefaultTypoSet::withoutTypo);
 
+		string typoStr = "";
 		if (bTypo)
 		{
 			typo |= getDefaultTypoSet(DefaultTypoSet::basicTypoSet);
+			typoStr += "basic";
 		}
 
 		if (cTypo)
 		{
 			typo |= getDefaultTypoSet(DefaultTypoSet::continualTypoSet);
+			if (!typoStr.empty()) typoStr += "+";
+			typoStr += "continual";
 		}
 
 		if (lTypo)
 		{
 			typo |= getDefaultTypoSet(DefaultTypoSet::lengtheningTypoSet);
+			if (!typoStr.empty()) typoStr += "+";
+			typoStr += "lengthening";
 		}
 
 		if (allowedDialect != Dialect::standard)
 		{
 			typo |= getDefaultTypoSet(DefaultTypoSet::dialect);
+			if (!typoStr.empty()) typoStr += "+";
+			typoStr += "dialect";
+		}
+		Kiwi kw;
+
+		if (oldSplitter)
+		{
+			kw = KiwiBuilder{ modelPath, 1, option, modelType, allowedDialect }.build(
+				typo
+			);
+		}
+		else
+		{
+			kw = KiwiBuilder{ modelPath, 1, option, modelType, allowedDialect }.build();
+			ptt = typo.prepare(true);
 		}
 
-		Kiwi kw = KiwiBuilder{ modelPath, 1, option, modelType, allowedDialect }.build(
-			typo
-		);
 		if (typoCostWeight > 0)
 		{
 			auto config = kw.getGlobalConfig();
@@ -167,7 +170,8 @@ int Evaluator::operator()(const string& modelPath,
 		{
 			cout << "LM Size : " << (kw.getLangModel()->getMemorySize() / 1024. / 1024.) << " MB" << endl;
 		}
-		cout << "OOV Scoring : " << oovScoringTypeToStr(oovScoringType) << endl;
+		cout << "OOV Scoring : " << tutils::oovScoringTypeToStr(oovScoringType) << endl;
+		cout << "Typo Correction: " << (typoStr.empty() ? "none" : typoStr) << endl;
 		cout << "Mem Usage : " << (tutils::getCurrentPhysicalMemoryUsage() / 1024.) << " MB\n" << endl;
 
 		double avgMicro = 0, avgMacro = 0;
@@ -176,6 +180,15 @@ int Evaluator::operator()(const string& modelPath,
 		analyzeOption.match = (normCoda ? Match::allWithNormalizing : Match::all) & ~(zCoda ? Match::none : Match::zCoda);
 		analyzeOption.match |= oovScoringType;
 		analyzeOption.allowedDialects = allowedDialect;
+		if (oldSplitter)
+		{
+			analyzeOption.match |= Match::useOldSplitter;
+		}
+		else
+		{
+			analyzeOption.typoTransformer = &ptt;
+		}
+
 		for (auto& tf : input)
 		{
 			cout << "Test file: " << tf << endl;
@@ -482,6 +495,7 @@ auto NounEvaluator::computeScore(vector<TestResult>& preds, vector<TestResult>& 
 				++tr.numPreds;
 			}
 		}
+		size_t numCurrentGoldLabels = 0;
 		for (auto& [g, info] : tr.golds)
 		{
 			auto [cnt, label] = info;
@@ -496,7 +510,11 @@ auto NounEvaluator::computeScore(vector<TestResult>& preds, vector<TestResult>& 
 					tr.labeledCorrect += matchCnt;
 				}
 			}
-			if (!label.empty()) totalLabeledGolds += cnt;
+			if (!label.empty())
+			{
+				totalLabeledGolds += cnt;
+				numCurrentGoldLabels += cnt;
+			}
 			totalGolds += cnt;
 			totalGoldsChr += g.size() * cnt;
 		}
@@ -505,7 +523,7 @@ auto NounEvaluator::computeScore(vector<TestResult>& preds, vector<TestResult>& 
 		totalLabeledCorrect += tr.labeledCorrect;
 		totalPredsChr += tr.numPredsChr;
 		totalCorrectChr += tr.correctChr;
-		if (tr.correct < tr.golds.size()) errors.emplace_back(tr);
+		if (tr.labeledCorrect < numCurrentGoldLabels) errors.emplace_back(tr);
 	}
 	Score score;
 	score.precision = (totalPreds == 0) ? 0 : (double)totalCorrect / totalPreds;
@@ -522,15 +540,18 @@ auto NounEvaluator::computeScore(vector<TestResult>& preds, vector<TestResult>& 
 
 void NounEvaluator::TestResult::writeResult(ostream& out) const
 {
-	float precision = (numPreds == 0) ? 0 : (double)correct / numPreds;
-	float recall = (golds.size() == 0) ? 0 : (double)correct / golds.size();
-	float f1 = 2 * precision * recall / max(precision + recall, 1e-10f);
+	size_t totalGolds = 0;
 	size_t labeledGolds = 0;
 	for (auto& [g, info] : golds)
 	{
 		auto [cnt, label] = info;
-		if (!label.empty()) labeledGolds++;
+		if (!label.empty()) labeledGolds += cnt;
+		totalGolds += cnt;
 	}
+
+	float precision = (numPreds == 0) ? 0 : (double)correct / numPreds;
+	float recall = (totalGolds == 0) ? 0 : (double)correct / totalGolds;
+	float f1 = 2 * precision * recall / max(precision + recall, 1e-10f);
 	float labeledRecall = (labeledGolds == 0) ? 0 : (double)labeledCorrect / labeledGolds;
 	out << utf16To8(text) << '\t' << labeledRecall << '\t' << precision << '\t' << recall << '\t' << f1 << endl;
 	out << "Golds:" << '\t';

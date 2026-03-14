@@ -86,9 +86,38 @@ public final class TypoTransformer {
         return TypoTransformer(handle: newHandle, shouldClose: true)
     }
     
+    /// Prepare the typo transformer for use in analysis
+    /// - Returns: A PreparedTypoTransformer ready for use
+    /// - Throws: KiwiError if preparation fails
+    public func prepare() throws -> PreparedTypoTransformer {
+        guard let preparedHandle = kiwi_typo_prepare(handle) else {
+            if let errorMsg = kiwi_error() {
+                let error = String(cString: errorMsg)
+                kiwi_clear_error()
+                throw KiwiError.operationFailed(error)
+            }
+            throw KiwiError.operationFailed("Failed to prepare typo transformer")
+        }
+
+        return PreparedTypoTransformer(handle: preparedHandle)
+    }
+
     deinit {
         if shouldClose {
             kiwi_typo_close(handle)
         }
+    }
+}
+
+/// Prepared typo transformer for use in analysis
+public final class PreparedTypoTransformer {
+    internal let handle: kiwi_prepared_typo_h
+
+    internal init(handle: kiwi_prepared_typo_h) {
+        self.handle = handle
+    }
+
+    deinit {
+        kiwi_prepared_typo_close(handle)
     }
 }

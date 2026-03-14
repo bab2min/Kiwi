@@ -5,6 +5,27 @@
 
 using namespace kiwi;
 
+TEST(KiwiTypo, GenerateGraph)
+{
+	TypoTransformer tt;
+	tt.addTypo(u"ㅐ", u"ㅚ");
+	tt.addTypo(u"레", u"뢰");
+	tt.addTypo(u"뢨", u"룄");
+	auto ptt = tt.prepare(true);
+
+	std::vector<TypoGraphNode> graph;
+	std::u16string nstr;
+	normalizeHangul(nstr, std::u16string_view{ u"그럼 내괴다룄네" });
+	auto size = ptt.generateGraph(nstr, graph);
+	EXPECT_EQ(size, 11);
+
+	ptt = getDefaultTypoSet(DefaultTypoSet::basicTypoSet).prepare(true);
+	nstr.clear();
+	normalizeHangul(nstr, std::u16string_view{ u"앗뿔싸 그럼 오늘부터 다시 열심히 해보자꾸나." });
+	size = ptt.generateGraph(nstr, graph);
+	EXPECT_GT(size, 0);
+}
+
 TEST(KiwiTypo, Generate)
 {
 	TypoTransformer tt;
@@ -13,14 +34,14 @@ TEST(KiwiTypo, Generate)
 	tt.addTypo(u"사에", u"사레");
 	auto ptt = tt.prepare();
 	UnorderedMap<std::u16string, float> typos;
-	
+
 	typos.clear();
 	for (auto e : ptt.generate(u"%없어"))
 	{
 		typos.emplace(e.str, e.cost);
 	}
 	EXPECT_EQ(typos.size(), 1);
-	
+
 	typos.clear();
 	for (auto e : ptt.generate(u"개가납네", 2))
 	{
@@ -56,7 +77,7 @@ TEST(KiwiTypo, Generate)
 TEST(KiwiTypo, BasicTypoSet)
 {
 	auto ptt = getDefaultTypoSet(DefaultTypoSet::basicTypoSet).prepare();
-	
+
 	for (auto t : ptt.generate(u"의"))
 	{
 	}
@@ -75,25 +96,31 @@ TEST(KiwiTypo, Builder)
 	TypoTransformer tt;
 	tt.addTypo(u"ㅐ", u"ㅔ");
 	tt.addTypo(u"ㅔ", u"ㅐ");
-	Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 0, BuildOption::default_, }.build(tt);
+	auto ptt = tt.prepare(true);
+
+	Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 0, BuildOption::default_, }.build();
+
+	AnalyzeOption option;
+	option.match = Match::allWithNormalizing;
+	option.typoTransformer = &ptt;
 
 	auto config = kiwi.getGlobalConfig();
 	TokenResult ret;
 	config.typoCostWeight = 1e-9;
 	kiwi.setGlobalConfig(config);
-	ret = kiwi.analyze(u"문화제 보호", Match::allWithNormalizing);
-	
+	ret = kiwi.analyze(u"문화제 보호", option);
+
 	config.typoCostWeight = 2;
 	kiwi.setGlobalConfig(config);
-	ret = kiwi.analyze(u"문화제 보호", Match::allWithNormalizing);
-	
+	ret = kiwi.analyze(u"문화제 보호", option);
+
 	config.typoCostWeight = 4;
 	kiwi.setGlobalConfig(config);
-	ret = kiwi.analyze(u"문화제 보호", Match::allWithNormalizing);
+	ret = kiwi.analyze(u"문화제 보호", option);
 
 	config.typoCostWeight = 6;
 	kiwi.setGlobalConfig(config);
-	ret = kiwi.analyze(u"문화제 보호", Match::allWithNormalizing);
+	ret = kiwi.analyze(u"문화제 보호", option);
 }
 
 TEST(KiwiTypo, AnalyzeBasicTypoSet)
@@ -101,73 +128,83 @@ TEST(KiwiTypo, AnalyzeBasicTypoSet)
 	KiwiBuilder builder{ MODEL_PATH, 0, BuildOption::default_, };
 	Kiwi kiwi = builder.build();
 
-	Kiwi typoKiwi = builder.build(DefaultTypoSet::basicTypoSet);
-	auto config = typoKiwi.getGlobalConfig();
+	auto ptt = getDefaultTypoSet(DefaultTypoSet::basicTypoSet).prepare(true);
+
+	AnalyzeOption option;
+	option.match = Match::allWithNormalizing | Match::oovChrFreqModel;
+	option.typoTransformer = &ptt;
+
+	auto config = kiwi.getGlobalConfig();
 	config.typoCostWeight = 5;
-	typoKiwi.setGlobalConfig(config);
+	kiwi.setGlobalConfig(config);
 
 	TokenResult o = kiwi.analyze(u"외않됀데?", Match::allWithNormalizing | Match::oovChrFreqModel);
-	TokenResult c = typoKiwi.analyze(u"외않됀데?", Match::allWithNormalizing | Match::oovChrFreqModel);
+	TokenResult c = kiwi.analyze(u"외않됀데?", option);
 	EXPECT_TRUE(o.second < c.second);
 
 	o = kiwi.analyze(u"나 죰 도와죠.", Match::allWithNormalizing | Match::oovChrFreqModel);
-	c = typoKiwi.analyze(u"나 죰 도와죠.", Match::allWithNormalizing | Match::oovChrFreqModel);
+	c = kiwi.analyze(u"나 죰 도와죠.", option);
 	EXPECT_TRUE(o.second < c.second);
 
 	o = kiwi.analyze(u"잘했따", Match::allWithNormalizing | Match::oovChrFreqModel);
-	c = typoKiwi.analyze(u"잘했따", Match::allWithNormalizing | Match::oovChrFreqModel);
+	c = kiwi.analyze(u"잘했따", option);
 	EXPECT_TRUE(o.second < c.second);
 
 	o = kiwi.analyze(u"외구거 공부", Match::allWithNormalizing | Match::oovChrFreqModel);
-	c = typoKiwi.analyze(u"외구거 공부", Match::allWithNormalizing | Match::oovChrFreqModel);
+	c = kiwi.analyze(u"외구거 공부", option);
 	EXPECT_TRUE(o.second < c.second);
 
 	o = kiwi.analyze(u"맗은 믈을 마셧다!", Match::allWithNormalizing | Match::oovChrFreqModel);
-	c = typoKiwi.analyze(u"맗은 믈을 마셧다!", Match::allWithNormalizing | Match::oovChrFreqModel);
+	c = kiwi.analyze(u"맗은 믈을 마셧다!", option);
 	EXPECT_TRUE(o.second < c.second);
 
 	o = kiwi.analyze(u"Wertheimer)가 자신의 논문 <운동지각에 관한 실험연구>(Experimental studies on the perception of movement)을 통해 일상적인 지각 현상에 대한 새로운 시각을 제시한 시기이다.",
-		Match::allWithNormalizing);
-	c = typoKiwi.analyze(u"Wertheimer)가 자신의 논문 <운동지각에 관한 실험연구>(Experimental studies on the perception of movement)을 통해 일상적인 지각 현상에 대한 새로운 시각을 제시한 시기이다.",
-		Match::allWithNormalizing);
+		Match::allWithNormalizing | Match::oovChrFreqModel);
+	c = kiwi.analyze(u"Wertheimer)가 자신의 논문 <운동지각에 관한 실험연구>(Experimental studies on the perception of movement)을 통해 일상적인 지각 현상에 대한 새로운 시각을 제시한 시기이다.",
+		option);
 }
 
 TEST(KiwiTypo, ContinualTypoSet)
 {
 	KiwiBuilder builder{ MODEL_PATH, 0, BuildOption::default_, };
-	Kiwi typoKiwi = builder.build(DefaultTypoSet::continualTypoSet);
+	Kiwi kiwi = builder.build();
 
-	auto res = typoKiwi.analyze(u"프로그래미", Match::allWithNormalizing).first;
+	auto ptt = getDefaultTypoSet(DefaultTypoSet::continualTypoSet).prepare(true);
+
+	AnalyzeOption option{ Match::allWithNormalizing };
+	option.typoTransformer = &ptt;
+
+	auto res = kiwi.analyze(u"프로그래미", option).first;
 	EXPECT_EQ(res.size(), 2);
 	EXPECT_EQ(res[0].str, u"프로그램");
 	EXPECT_EQ(res[1].str, u"이");
 
-	res = typoKiwi.analyze(u"프로그래믈", Match::allWithNormalizing).first;
+	res = kiwi.analyze(u"프로그래믈", option).first;
 	EXPECT_EQ(res.size(), 2);
 	EXPECT_EQ(res[0].str, u"프로그램");
 	EXPECT_EQ(res[1].str, u"을");
 
-	res = typoKiwi.analyze(u"오늘사무시레서", Match::allWithNormalizing).first;
+	res = kiwi.analyze(u"오늘사무시레서", option).first;
 	EXPECT_EQ(res.size(), 3);
 	EXPECT_EQ(res[1].str, u"사무실");
 	EXPECT_EQ(res[2].str, u"에서");
 
-	res = typoKiwi.analyze(u"법원이 기가캤다.", Match::allWithNormalizing).first;
+	res = kiwi.analyze(u"법원이 기가캤다.", option).first;
 	EXPECT_EQ(res.size(), 7);
 	EXPECT_EQ(res[2].str, u"기각");
 	EXPECT_EQ(res[3].str, u"하");
 
-	res = typoKiwi.analyze(u"하나도 업써.", Match::allWithNormalizing).first;
+	res = kiwi.analyze(u"하나도 업써.", option).first;
 	EXPECT_EQ(res.size(), 5);
 	EXPECT_EQ(res[2].str, u"없");
 	EXPECT_EQ(res[3].str, u"어");
 
-	res = typoKiwi.analyze(u"말근 하늘", Match::allWithNormalizing).first;
+	res = kiwi.analyze(u"말근 하늘", option).first;
 	EXPECT_EQ(res.size(), 3);
 	EXPECT_EQ(res[0].str, u"맑");
 	EXPECT_EQ(res[1].str, u"은");
 
-	res = typoKiwi.analyze(u"아주 만타.", Match::allWithNormalizing).first;
+	res = kiwi.analyze(u"아주 만타.", option).first;
 	EXPECT_EQ(res.size(), 4);
 	EXPECT_EQ(res[1].str, u"많");
 	EXPECT_EQ(res[2].str, u"다");
@@ -177,35 +214,42 @@ TEST(KiwiTypo, ContinualTypoSet)
 TEST(KiwiTypo, BasicTypoSetWithContinual)
 {
 	KiwiBuilder builder{ MODEL_PATH, 0, BuildOption::default_, };
-	Kiwi typoKiwi = builder.build(DefaultTypoSet::basicTypoSetWithContinual);
-	KiwiConfig config = typoKiwi.getGlobalConfig();
+	Kiwi kiwi = builder.build();
 
-	auto res = typoKiwi.analyze(u"프로그레믈", Match::allWithNormalizing | Match::oovChrFreqModel, {}, config).first;
+	auto ptt = getDefaultTypoSet(DefaultTypoSet::basicTypoSetWithContinual).prepare(true);
+
+	AnalyzeOption option;
+	option.match = Match::allWithNormalizing | Match::oovChrFreqModel;
+	option.typoTransformer = &ptt;
+
+	auto config = kiwi.getGlobalConfig();
+
+	auto res = kiwi.analyze(u"프로그레믈", option, {}, config).first;
 	EXPECT_EQ(res.size(), 2);
 	EXPECT_EQ(res[0].str, u"프로그램");
 	if (res.size() > 1) EXPECT_EQ(res[1].str, u"을");
 
-	res = typoKiwi.analyze(u"오늘사므시레서", Match::allWithNormalizing | Match::oovChrFreqModel, {}, config).first;
+	res = kiwi.analyze(u"오늘사므시레서", option, {}, config).first;
 	EXPECT_EQ(res.size(), 3);
 	if (res.size() > 1) EXPECT_EQ(res[1].str, u"사무실");
 	if (res.size() > 2) EXPECT_EQ(res[2].str, u"에서");
 
-	res = typoKiwi.analyze(u"버붠이 기가캤다.", Match::allWithNormalizing | Match::oovChrFreqModel, {}, config).first;
+	res = kiwi.analyze(u"버붠이 기가캤다.", option, {}, config).first;
 	EXPECT_EQ(res.size(), 7);
 	if (res.size() > 2) EXPECT_EQ(res[2].str, u"기각");
 	if (res.size() > 3) EXPECT_EQ(res[3].str, u"하");
 
-	res = typoKiwi.analyze(u"하나도 업써.", Match::allWithNormalizing | Match::oovChrFreqModel, {}, config).first;
+	res = kiwi.analyze(u"하나도 업써.", option, {}, config).first;
 	EXPECT_EQ(res.size(), 5);
 	if (res.size() > 2) EXPECT_EQ(res[2].str, u"없");
 	if (res.size() > 3) EXPECT_EQ(res[3].str, u"어");
 
-	res = typoKiwi.analyze(u"말근 하늘", Match::allWithNormalizing | Match::oovChrFreqModel, {}, config).first;
+	res = kiwi.analyze(u"말근 하늘", option, {}, config).first;
 	EXPECT_EQ(res.size(), 3);
 	EXPECT_EQ(res[0].str, u"맑");
 	if (res.size() > 1) EXPECT_EQ(res[1].str, u"은");
 
-	res = typoKiwi.analyze(u"아주 만타.", Match::allWithNormalizing | Match::oovChrFreqModel, {}, config).first;
+	res = kiwi.analyze(u"아주 만타.", option, {}, config).first;
 	EXPECT_EQ(res.size(), 4);
 	if (res.size() > 1) EXPECT_EQ(res[1].str, u"많");
 	if (res.size() > 2) EXPECT_EQ(res[2].str, u"다");
@@ -214,33 +258,40 @@ TEST(KiwiTypo, BasicTypoSetWithContinual)
 TEST(KiwiTypo, LengtheningTypoSet)
 {
 	KiwiBuilder builder{ MODEL_PATH, 0, BuildOption::default_, };
-	Kiwi typoKiwi = builder.build(DefaultTypoSet::lengtheningTypoSet);
-	const float typoCost = typoKiwi.getGlobalConfig().typoCostWeight * 0.25f;
+	Kiwi kiwi = builder.build();
 
-	auto ref = typoKiwi.analyze(u"진짜?", Match::allWithNormalizing);
-	auto res = typoKiwi.analyze(u"지인짜?", Match::allWithNormalizing);
+	auto ptt = getDefaultTypoSet(DefaultTypoSet::lengtheningTypoSet).prepare(true);
+
+	AnalyzeOption option;
+	option.match = Match::allWithNormalizing;
+	option.typoTransformer = &ptt;
+
+	const float typoCost = kiwi.getGlobalConfig().typoCostWeight * 0.25f;
+
+	auto ref = kiwi.analyze(u"진짜?", option);
+	auto res = kiwi.analyze(u"지인짜?", option);
 	EXPECT_FLOAT_EQ(ref.second - 4 * typoCost, res.second);
 	EXPECT_EQ(res.first.size(), 2);
 	EXPECT_EQ(res.first[0].str, u"진짜");
 	EXPECT_EQ(res.first[1].str, u"?");
 
-	res = typoKiwi.analyze(u"지인짜아?", Match::allWithNormalizing);
+	res = kiwi.analyze(u"지인짜아?", option);
 	EXPECT_FLOAT_EQ(ref.second - 5 * typoCost, res.second);
 	EXPECT_EQ(res.first.size(), 2);
 	EXPECT_EQ(res.first[0].str, u"진짜");
 	EXPECT_EQ(res.first[1].str, u"?");
 
-	res = typoKiwi.analyze(u"그으으래?", Match::allWithNormalizing);
+	res = kiwi.analyze(u"그으으래?", option);
 	EXPECT_EQ(res.first.size(), 2);
 	EXPECT_EQ(res.first[0].str, u"그래");
 	EXPECT_EQ(res.first[1].str, u"?");
 
-	res = typoKiwi.analyze(u"그으으으으래?", Match::allWithNormalizing);
+	res = kiwi.analyze(u"그으으으으래?", option);
 	EXPECT_EQ(res.first.size(), 2);
 	EXPECT_EQ(res.first[0].str, u"그래");
 	EXPECT_EQ(res.first[1].str, u"?");
 
-	res = typoKiwi.analyze(u"학교오를 가야아해", Match::allWithNormalizing);
+	res = kiwi.analyze(u"학교오를 가야아해", option);
 	EXPECT_EQ(res.first.size(), 6);
 	EXPECT_EQ(res.first[0].str, u"학교");
 	EXPECT_EQ(res.first[1].str, u"를");

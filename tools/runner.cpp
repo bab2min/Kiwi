@@ -36,6 +36,7 @@ int run(const string& modelPath, bool benchmark, const string& output, const str
 	float dialectCost,
 	bool score, 
 	ModelType modelType, 
+	Match oovScoringType,
 	const vector<string>& input)
 {
 	try
@@ -56,25 +57,33 @@ int run(const string& modelPath, bool benchmark, const string& output, const str
 
 		auto typo = getDefaultTypoSet(DefaultTypoSet::withoutTypo);
 
+		string typoStr = "";
 		if (bTypo)
 		{
 			typo |= getDefaultTypoSet(DefaultTypoSet::basicTypoSet);
+			typoStr += "basic";
 		}
 
 		if (cTypo)
 		{
 			typo |= getDefaultTypoSet(DefaultTypoSet::continualTypoSet);
+			if (!typoStr.empty()) typoStr += "+";
+			typoStr += "continual";
 		}
 
 		if (lTypo)
 		{
 			typo |= getDefaultTypoSet(DefaultTypoSet::lengtheningTypoSet);
+			if (!typoStr.empty()) typoStr += "+";
+			typoStr += "lengthening";
 		}
 
 
-		Kiwi kw = KiwiBuilder{ modelPath, 1, BuildOption::default_, modelType }.build(typo);
+		Kiwi kw = KiwiBuilder{ modelPath, 1, BuildOption::default_, modelType }.build();
+		auto ptt = typo.prepare(true);
 
-		AnalyzeOption option{ Match::allWithNormalizing, nullptr, false, allowedDialects, dialectCost };
+		AnalyzeOption option{ Match::allWithNormalizing | oovScoringType, nullptr, false, allowedDialects, dialectCost };
+		option.typoTransformer = &ptt;
 
 		cout << "Kiwi v" << KIWI_VERSION_STRING << endl;
 		if (tolerance)
@@ -99,6 +108,8 @@ int run(const string& modelPath, bool benchmark, const string& output, const str
 			cout << "LM Size : " << (kw.getLangModel()->getMemorySize() / 1024. / 1024.) << " MB" << endl;
 			cout << "Mem Usage : " << (tutils::getCurrentPhysicalMemoryUsage() / 1024.) << " MB" << endl;
 			cout << "ModelType : " << modelTypeToStr(kw.getLangModel()->getType()) << endl;
+			cout << "OOV Scoring : " << tutils::oovScoringTypeToStr(oovScoringType) << endl;
+			cout << "Typo Correction: " << (typoStr.empty() ? "none" : typoStr) << endl;
 		}
 
 		ostream* out = &cout;
@@ -187,6 +198,7 @@ int main(int argc, const char* argv[])
 	SwitchArg lTypo{ "", "ltypo", "make lengthening-typo-tolerant model", false };
 	ValueArg<string> dialect{ "d", "dialect", "allowed dialect", false, "standard", "string" };
 	ValueArg<float> dialectCost{ "", "dialect-cost", "dialect cost", false, 6.f, "float" };
+	ValueArg<string> oovScoring{ "x", "oov-scoring", "OOV scoring method (none, rule, chr, chrfreq, chrfreqbranch)", false, "rule", "string" };
 	SwitchArg score{ "s", "score", "print score together" };
 	UnlabeledMultiArg<string> files{ "inputs", "input files", false, "string" };
 
@@ -203,6 +215,7 @@ int main(int argc, const char* argv[])
 	cmd.add(lTypo);
 	cmd.add(dialect);
 	cmd.add(dialectCost);
+	cmd.add(oovScoring);
 	cmd.add(score);
 	cmd.add(files);
 
@@ -217,7 +230,27 @@ int main(int argc, const char* argv[])
 	}
 
 	Dialect parsedDialect = parseDialects(dialect.getValue());
-	ModelType kiwiModelType = tutils::parseModelType(modelType);
+	ModelType kiwiModelType = ModelType::none;
+	try
+	{
+		kiwiModelType = tutils::parseModelType(modelType);
+	}
+	catch (const exception& e)
+	{
+		cerr << e.what() << endl;
+		return -1;
+	}
+
+	Match oovScoringType = Match::oovRuleOnly;
+	try
+	{
+		oovScoringType = tutils::parseOOVScoring(oovScoring.getValue());
+	}
+	catch (const exception& e)
+	{
+		cerr << e.what() << endl;
+		return -1;
+	}
 
 	return run(model, benchmark, output, user, topn, tolerance, 
 		typoWeight, 
@@ -228,6 +261,7 @@ int main(int argc, const char* argv[])
 		dialectCost,
 		score, 
 		kiwiModelType, 
+		oovScoringType,
 		files.getValue());
 }
 

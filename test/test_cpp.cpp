@@ -57,7 +57,7 @@ Kiwi& reuseKiwiInstance()
 	return kiwi;
 }
 
-TEST(KiwiCPP, ChrTokenizer)
+TEST(KiwiCpp, ChrTokenizer)
 {
 	ChrTokenizer tokenizer;
 	const std::string_view s = u8"안녕하세요.오늘날씨가참좋네요!Adx9810::~";
@@ -70,7 +70,7 @@ TEST(KiwiCPP, ChrTokenizer)
 	EXPECT_EQ(s, decoded);
 }
 
-TEST(KiwiCPP, ChrModel)
+TEST(KiwiCpp, ChrModel)
 {
 	ChrTokenizer tokenizer;
 	Kiwi& kiwi = reuseKiwiInstance();
@@ -131,7 +131,7 @@ TEST(KiwiCPP, ChrModel)
 	}
 }
 
-TEST(KiwiCPP, ChrDataset)
+TEST(KiwiCpp, ChrDataset)
 {
 	constexpr size_t batchSize = 64, contextSize = 8, sentSize = 1000;
 	ChrDataset dataset{ batchSize, contextSize, 0, 0.f };
@@ -268,13 +268,30 @@ TEST(KiwiCpp, SingleConsonantMorpheme)
 TEST(KiwiCpp, SpecialTokenErrorOnContinualTypo)
 {
 	KiwiBuilder builder{ MODEL_PATH, 0, BuildOption::default_, ModelType::none };
-	Kiwi typoKiwi = builder.build(DefaultTypoSet::continualTypoSet);
+	Kiwi typoKiwi = builder.build();
+	AnalyzeOption option = Match::allWithNormalizing;
+	option.typoTransformer = getDefaultPreparedTypoSet(DefaultTypoSet::continualTypoSet);
 	
-	auto res = typoKiwi.analyze(u"감사합니다 -친구들과", Match::allWithNormalizing).first;
+	auto res = typoKiwi.analyze(u"감사합니다 -친구들과", option).first;
 	EXPECT_EQ(res[0].str, u"감사");
 	EXPECT_EQ(res[1].str, u"하");
 	EXPECT_EQ(res[3].str, u"-");
 	EXPECT_EQ(res[3].tag, POSTag::so);
+}
+
+TEST(KiwiCpp, MultiWordTypo)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	AnalyzeOption option = Match::allWithNormalizing;
+	auto res = kiwi.analyze(u"존 F. 케네디 주니어", option).first;
+	EXPECT_EQ(res[0].str, u"존 F. 케네디 주니어");
+	res = kiwi.analyze(u"존 F. 캐네디 주니어", option).first;
+	EXPECT_NE(res[0].str, u"존 F. 케네디 주니어");
+	option.typoTransformer = getDefaultPreparedTypoSet(DefaultTypoSet::basicTypoSet);
+	res = kiwi.analyze(u"존 F. 캐네디 주니어", option).first;
+	EXPECT_EQ(res[0].str, u"존 F. 케네디 주니어");
+	res = kiwi.analyze(u"존F.캐네디주니어", option).first;
+	EXPECT_EQ(res[0].str, u"존 F. 케네디 주니어");
 }
 
 TEST(KiwiCpp, SplitComplex)
@@ -422,7 +439,8 @@ TEST(KiwiCpp, Pretokenized)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
 	auto str = u"드디어패트와 매트가 2017년에 국내 개봉했다. 패트와매트는 2016년...";
-	
+	AnalyzeOption option = Match::allWithNormalizing;
+
 	std::vector<TokenInfo> res;
 	{
 		std::vector<PretokenizedSpan> pretokenized = {
@@ -431,7 +449,7 @@ TEST(KiwiCpp, Pretokenized)
 			PretokenizedSpan{ 34, 39, {} },
 		};
 
-		res = kiwi.analyze(str, Match::allWithNormalizing, pretokenized).first;
+		res = kiwi.analyze(str, option, pretokenized).first;
 		EXPECT_EQ(res[1].str, u"패트와 매트");
 		EXPECT_EQ(res[3].str, u"2017년");
 		EXPECT_EQ(res[13].str, u"2016년");
@@ -444,7 +462,7 @@ TEST(KiwiCpp, Pretokenized)
 			PretokenizedSpan{ 21, 24, { BasicToken{ u"개봉하", 0, 3, POSTag::vv }, BasicToken{ u"었", 2, 3, POSTag::ep } }},
 		};
 
-		res = kiwi.analyze(str, Match::allWithNormalizing, pretokenized).first;
+		res = kiwi.analyze(str, option, pretokenized).first;
 		EXPECT_EQ(res[7].str, u"개봉하");
 		EXPECT_EQ(res[7].tag, POSTag::vv);
 		EXPECT_EQ(res[7].position, 21);
@@ -465,8 +483,8 @@ TEST(KiwiCpp, Pretokenized)
 			PretokenizedSpan{ 16, 17, { BasicToken{ u"에", 0, 1, POSTag::jkb } } },
 		};
 
-		auto ref = kiwi.analyze(str, Match::allWithNormalizing).first;
-		res = kiwi.analyze(str, Match::allWithNormalizing, pretokenized).first;
+		auto ref = kiwi.analyze(str, option).first;
+		res = kiwi.analyze(str, option, pretokenized).first;
 		EXPECT_EQ(res[2].tag, POSTag::jks);
 		EXPECT_EQ(res[2].morph, ref[2].morph);
 		EXPECT_FLOAT_EQ(res[2].score, ref[2].score);
@@ -481,8 +499,80 @@ TEST(KiwiCpp, Pretokenized)
 			PretokenizedSpan{ 3, 4, { BasicToken{ u"걷", 0, 1, POSTag::vv } } },
 		};
 
-		auto ref = kiwi.analyze(str2, Match::allWithNormalizing).first;
-		res = kiwi.analyze(str2, Match::allWithNormalizing, pretokenized).first;
+		auto ref = kiwi.analyze(str2, option).first;
+		res = kiwi.analyze(str2, option, pretokenized).first;
+		EXPECT_EQ(res[2].tag, POSTag::vvi);
+		EXPECT_EQ(res[2].morph, ref[2].morph);
+	}
+}
+
+TEST(KiwiCpp, PretokenizedWithTypo)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	auto str = u"드디어패트와 매트가 2017년에 국내 개봉했다. 패트와매트는 2016년...";
+	AnalyzeOption option = Match::allWithNormalizing;
+	option.typoTransformer = getDefaultPreparedTypoSet(DefaultTypoSet::basicTypoSetWithContinualAndLengthening);
+
+	std::vector<TokenInfo> res;
+	{
+		std::vector<PretokenizedSpan> pretokenized = {
+			PretokenizedSpan{ 3, 9, {} },
+			PretokenizedSpan{ 11, 16, {} },
+			PretokenizedSpan{ 34, 39, {} },
+		};
+
+		res = kiwi.analyze(str, option, pretokenized).first;
+		EXPECT_EQ(res[1].str, u"패트와 매트");
+		EXPECT_EQ(res[3].str, u"2017년");
+		EXPECT_EQ(res[13].str, u"2016년");
+	}
+
+	{
+		std::vector<PretokenizedSpan> pretokenized = {
+			PretokenizedSpan{ 27, 29, { BasicToken{ u"페트", 0, 2, POSTag::nnb } } },
+			PretokenizedSpan{ 30, 32, {} },
+			PretokenizedSpan{ 21, 24, { BasicToken{ u"개봉하", 0, 3, POSTag::vv }, BasicToken{ u"었", 2, 3, POSTag::ep } }},
+		};
+
+		res = kiwi.analyze(str, option, pretokenized).first;
+		EXPECT_EQ(res[7].str, u"개봉하");
+		EXPECT_EQ(res[7].tag, POSTag::vv);
+		EXPECT_EQ(res[7].position, 21);
+		EXPECT_EQ(res[7].length, 3);
+		EXPECT_EQ(res[8].str, u"었");
+		EXPECT_EQ(res[8].tag, POSTag::ep);
+		EXPECT_EQ(res[8].position, 23);
+		EXPECT_EQ(res[8].length, 1);
+		EXPECT_EQ(res[11].str, u"페트");
+		EXPECT_EQ(res[11].tag, POSTag::nnb);
+		EXPECT_EQ(res[13].str, u"매트");
+		EXPECT_EQ(res[13].tag, POSTag::nng);
+	}
+
+	{
+		std::vector<PretokenizedSpan> pretokenized = {
+			PretokenizedSpan{ 9, 10, { BasicToken{ u"가", 0, 1, POSTag::jks } } },
+			PretokenizedSpan{ 16, 17, { BasicToken{ u"에", 0, 1, POSTag::jkb } } },
+		};
+
+		auto ref = kiwi.analyze(str, option).first;
+		res = kiwi.analyze(str, option, pretokenized).first;
+		EXPECT_EQ(res[2].tag, POSTag::jks);
+		EXPECT_EQ(res[2].morph, ref[2].morph);
+		EXPECT_FLOAT_EQ(res[2].score, ref[2].score);
+		EXPECT_EQ(res[5].tag, POSTag::jkb);
+		EXPECT_EQ(res[5].morph, ref[5].morph);
+		EXPECT_FLOAT_EQ(res[5].score, ref[5].score);
+	}
+
+	{
+		auto str2 = u"길을 걷다";
+		std::vector<PretokenizedSpan> pretokenized = {
+			PretokenizedSpan{ 3, 4, { BasicToken{ u"걷", 0, 1, POSTag::vv } } },
+		};
+
+		auto ref = kiwi.analyze(str2, option).first;
+		res = kiwi.analyze(str2, option, pretokenized).first;
 		EXPECT_EQ(res[2].tag, POSTag::vvi);
 		EXPECT_EQ(res[2].morph, ref[2].morph);
 	}
@@ -1204,19 +1294,19 @@ TEST(KiwiCpp, AnalyzeError01)
 TEST(KiwiCpp, NormalizeCoda) 
 { 
 	Kiwi& kiwi = reuseKiwiInstance(); 
-	TokenResult res = kiwi.analyze(u"키윜ㅋㅋ", Match::allWithNormalizing); 
+	TokenResult res = kiwi.analyze(u"키윜ㅋㅋ", Match::allWithNormalizing | Match::oovChrModel); 
 	EXPECT_EQ(res.first.back().str, std::u16string{ u"ㅋㅋㅋ" });
-	res = kiwi.analyze(u"키윟ㅎ", Match::allWithNormalizing);
+	res = kiwi.analyze(u"키윟ㅎ", Match::allWithNormalizing | Match::oovChrModel);
 	EXPECT_EQ(res.first.back().str, std::u16string{ u"ㅎㅎ" });
-	res = kiwi.analyze(u"키윅ㄱ", Match::allWithNormalizing);
+	res = kiwi.analyze(u"키윅ㄱ", Match::allWithNormalizing | Match::oovChrModel);
 	EXPECT_EQ(res.first.back().str, std::u16string{ u"ㄱㄱ" });
-	res = kiwi.analyze(u"키윈ㄴㄴ", Match::allWithNormalizing);
+	res = kiwi.analyze(u"키윈ㄴㄴ", Match::allWithNormalizing | Match::oovChrModel);
 	EXPECT_EQ(res.first.back().str, std::u16string{ u"ㄴㄴㄴ" });
-	res = kiwi.analyze(u"키윊ㅎㅎ", Match::allWithNormalizing);
+	res = kiwi.analyze(u"키윊ㅎㅎ", Match::allWithNormalizing | Match::oovChrModel);
 	EXPECT_EQ(res.first.back().str, std::u16string{ u"ㅎㅎ" });
-	res = kiwi.analyze(u"키윍ㄱㄱ", Match::allWithNormalizing);
+	res = kiwi.analyze(u"키윍ㄱㄱ", Match::allWithNormalizing | Match::oovChrModel);
 	EXPECT_EQ(res.first.back().str, std::u16string{u"ㄱㄱ"});
-} 
+}
 
 TEST(KiwiCpp, ZCoda)
 {
@@ -1279,14 +1369,16 @@ TEST(KiwiCpp, ZSiot)
 
 TEST(KiwiCpp, ZSiotWithTypo)
 {
-	Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 0, BuildOption::default_, }.build(getDefaultTypoSet(DefaultTypoSet::basicTypoSetWithContinual));
+	Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 0, BuildOption::default_, }.build();
+	AnalyzeOption option;
+	option.typoTransformer = getDefaultPreparedTypoSet(DefaultTypoSet::basicTypoSetWithContinual);
 	KiwiConfig config = kiwi.getGlobalConfig();
 	config.oovRuleScale = 6;
 	for (auto s : { u"하굣길", u"만둣국", u"나뭇잎", u"세숫물", u"고춧가루", u"시곗바늘", u"사글셋방" })
 	{
-		auto resNone = kiwi.analyze(s, Match::allWithNormalizing, {}, config);
-		auto resSplit = kiwi.analyze(s, Match::allWithNormalizing | Match::splitSaisiot, {}, config);
-		auto resMerge = kiwi.analyze(s, Match::allWithNormalizing | Match::mergeSaisiot, {}, config);
+		auto resNone = kiwi.analyze(s, option.withMatch(Match::allWithNormalizing), {}, config);
+		auto resSplit = kiwi.analyze(s, option.withMatch(Match::allWithNormalizing | Match::splitSaisiot), {}, config);
+		auto resMerge = kiwi.analyze(s, option.withMatch(Match::allWithNormalizing | Match::mergeSaisiot), {}, config);
 		EXPECT_FALSE(std::any_of(resNone.first.begin(), resNone.first.end(), [](const TokenInfo& token) { return token.tag == POSTag::z_siot; }));
 		EXPECT_EQ(resSplit.first.size(), 3);
 		EXPECT_EQ(resSplit.first[0].tag, POSTag::nng);
@@ -1298,9 +1390,9 @@ TEST(KiwiCpp, ZSiotWithTypo)
 
 	for (auto s : { u"발렛 파킹", u"미닛" })
 	{
-		auto resNone = kiwi.analyze(s, Match::allWithNormalizing, {}, config);
-		auto resSplit = kiwi.analyze(s, Match::allWithNormalizing | Match::splitSaisiot, {}, config);
-		auto resMerge = kiwi.analyze(s, Match::allWithNormalizing | Match::mergeSaisiot, {}, config);
+		auto resNone = kiwi.analyze(s, option.withMatch(Match::allWithNormalizing), {}, config);
+		auto resSplit = kiwi.analyze(s, option.withMatch(Match::allWithNormalizing | Match::splitSaisiot), {}, config);
+		auto resMerge = kiwi.analyze(s, option.withMatch(Match::allWithNormalizing | Match::mergeSaisiot), {}, config);
 		EXPECT_EQ(resNone.second, resSplit.second);
 		EXPECT_EQ(resNone.second, resMerge.second);
 		EXPECT_FALSE(std::any_of(resSplit.first.begin(), resSplit.first.end(), [](const TokenInfo& token) { return token.tag == POSTag::z_siot; }));
@@ -1944,8 +2036,10 @@ TEST(KiwiCpp, Issue205)
 
 	EXPECT_EQ(res1[0].str, u"함박 스테이크");
 
-	auto kiwi2 = builder.build(DefaultTypoSet::basicTypoSetWithContinual);
-	auto res2 = kiwi2.analyze(u"함박 스테이크를 먹었습니다", Match::allWithNormalizing).first;
+	auto kiwi2 = builder.build();
+	AnalyzeOption option = Match::allWithNormalizing;
+	option.typoTransformer = getDefaultPreparedTypoSet(DefaultTypoSet::basicTypoSetWithContinual);
+	auto res2 = kiwi2.analyze(u"함박 스테이크를 먹었습니다", option).first;
 
 	EXPECT_EQ(res2[0].str, u"함박 스테이크");
 }

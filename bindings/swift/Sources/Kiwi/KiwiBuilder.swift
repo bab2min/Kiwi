@@ -146,22 +146,15 @@ public final class KiwiBuilder {
     }
     
     /// Build a Kiwi instance
-    /// - Parameters:
-    ///   - typoTransformer: Optional typo transformer
-    ///   - typoCostThreshold: Threshold for typo cost (default: 2.5)
     /// - Returns: A new Kiwi instance
     /// - Throws: KiwiError if build fails
-    public func build(
-        typoTransformer: TypoTransformer? = nil,
-        typoCostThreshold: Float = 2.5
-    ) throws -> Kiwi {
+    public func build() throws -> Kiwi {
         guard let handle = wrapper?.handle else {
             throw KiwiError.invalidHandle
         }
-        
-        let typoHandle = typoTransformer?.handle
-        let kiwiHandle = kiwi_builder_build(handle, typoHandle, typoCostThreshold)
-        
+
+        let kiwiHandle = kiwi_builder_build(handle, nil, 0)
+
         guard let kiwiHandle = kiwiHandle else {
             if let errorMsg = kiwi_error() {
                 let error = String(cString: errorMsg)
@@ -170,7 +163,7 @@ public final class KiwiBuilder {
             }
             throw KiwiError.operationFailed("Failed to build Kiwi")
         }
-        
+
         return Kiwi(handle: kiwiHandle)
     }
 }

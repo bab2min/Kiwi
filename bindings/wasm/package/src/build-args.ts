@@ -148,14 +148,4 @@ export interface BuildArgs {
      * - `cong-global`: (experimental) Contextual N-gram embedding Language Model. It consists of lightweighted neural networks that can estimate the relationships between morphemes over large distances (up to 7 real morphemes) with high accuracy.
      */
     modelType?: 'none' | 'largest' | 'knlm' | 'sbg' | 'cong' | 'cong-global';
-    /**
-     * The typo information to use for correction.
-     * Can be one of the built in `none`, `basic`, `continual`, `basicWithContinual` typo sets, or a custom {@link TypoTransformer}.
-     * Defaults to `none`, which disables typo correction.
-     */
-    typos?: 'none' | 'basic' | 'continual' | 'basicWithContinual' | TypoTransformer;
-    /**
-     * The maximum typo cost to consider when correcting typos. Typos beyond this cost will not be explored. Defaults to 2.5.
-     */
-    typoCostThreshold?: number;
 };

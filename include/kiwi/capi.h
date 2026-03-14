@@ -35,6 +35,7 @@ typedef struct kiwi_joiner* kiwi_joiner_h;
 typedef struct kiwi_typo* kiwi_typo_h;
 typedef struct kiwi_morphset* kiwi_morphset_h;
 typedef struct kiwi_pretokenized* kiwi_pretokenized_h;
+typedef struct kiwi_prepared_typo* kiwi_prepared_typo_h;
 typedef unsigned short kchar16_t;
 
 typedef struct kiwi_swtokenizer* kiwi_swtokenizer_h;
@@ -176,11 +177,12 @@ enum
 
 enum
 {
-	KIWI_MATCH_URL = 1,
-	KIWI_MATCH_EMAIL = 2,
-	KIWI_MATCH_HASHTAG = 4,
-	KIWI_MATCH_MENTION = 8,
-	KIWI_MATCH_SERIAL = 16,
+	KIWI_MATCH_URL = 1 << 0,
+	KIWI_MATCH_EMAIL = 1 << 1,
+	KIWI_MATCH_HASHTAG = 1 << 2,
+	KIWI_MATCH_MENTION = 1 << 3,
+	KIWI_MATCH_SERIAL = 1 << 4,
+	KIWI_MATCH_EMOJI = 1 << 5,
 
 	KIWI_MATCH_OOV_RULE_ONLY = 0 << 8,
 	KIWI_MATCH_OOV_CHR_MODEL = 1 << 8,
@@ -202,8 +204,9 @@ enum
 	KIWI_MATCH_SPLIT_SAISIOT = 1 << 25,
 	KIWI_MATCH_MERGE_SAISIOT = 1 << 26,
 	KIWI_MATCH_JOIN_PARTICLE_YO = 1 << 27,
+	KIWI_MATCH_USE_OLD_SPLITTER = 1 << 30,
 
-	KIWI_MATCH_ALL = KIWI_MATCH_URL | KIWI_MATCH_EMAIL | KIWI_MATCH_HASHTAG | KIWI_MATCH_MENTION | KIWI_MATCH_SERIAL | KIWI_MATCH_Z_CODA,
+	KIWI_MATCH_ALL = KIWI_MATCH_URL | KIWI_MATCH_EMAIL | KIWI_MATCH_HASHTAG | KIWI_MATCH_MENTION | KIWI_MATCH_SERIAL | KIWI_MATCH_EMOJI | KIWI_MATCH_Z_CODA,
 	KIWI_MATCH_ALL_WITH_NORMALIZING = KIWI_MATCH_ALL | KIWI_MATCH_NORMALIZE_CODA,
 };
 
@@ -318,6 +321,33 @@ DECL_DLL int kiwi_builder_add_word(kiwi_builder_h handle, const char* word, cons
  * 만약 orig_word에 pos 태그를 가진 원본 형태소가 존재하지 않는 경우 이 함수는 실패합니다.
  */
 DECL_DLL int kiwi_builder_add_alias_word(kiwi_builder_h handle, const char* alias, const char* pos, float score, const char* orig_word);
+
+/**
+ * @brief 사용자 형태소를 추가합니다. 의미 번호와 방언 정보를 지정할 수 있습니다.
+ *
+ * @param handle KiwiBuilder의 핸들.
+ * @param word 추가할 형태소 (utf-8).
+ * @param pos 품사 태그 (kiwi#POSTag).
+ * @param sense_id 의미 번호.
+ * @param dialect 방언 정보. KIWI_DIALECT_* 열거형을 참조하십시오.
+ * @param score 점수.
+ * @return 성공 시 0를 반환합니다.
+ */
+DECL_DLL int kiwi_builder_add_word_with_def(kiwi_builder_h handle, const char* word, const char* pos, int sense_id, int dialect, float score);
+
+/**
+ * @brief 원본 형태소를 기반으로하는 새 형태소를 추가합니다. 의미 번호와 방언 정보를 지정할 수 있습니다.
+ *
+ * @param handle KiwiBuilder의 핸들.
+ * @param alias 새 형태소 (utf-8)
+ * @param pos 품사 태그 (kiwi#POSTag).
+ * @param sense_id 의미 번호.
+ * @param dialect 방언 정보. KIWI_DIALECT_* 열거형을 참조하십시오.
+ * @param score 점수.
+ * @param orig_word 원 형태소 (utf-8)
+ * @return 성공 시 0를 반환합니다.
+ */
+DECL_DLL int kiwi_builder_add_alias_word_with_def(kiwi_builder_h handle, const char* alias, const char* pos, int sense_id, int dialect, float score, const char* orig_word);
 
 /**
  * @brief 기분석 형태소열을 추가합니다.
@@ -458,6 +488,7 @@ enum
 	KIWI_TYPO_BASIC_TYPO_SET_WITH_CONTINUAL = 3,
 	KIWI_TYPO_LENGTHENING_TYPO_SET = 4,
 	KIWI_TYPO_BASIC_TYPO_SET_WITH_CONTINUAL_AND_LENGTHENING = 5,
+	KIWI_TYPO_DIALECT = 6,
 };
 
 /**
@@ -539,14 +570,33 @@ DECL_DLL int kiwi_typo_set_lengthening_typo_cost(kiwi_typo_h handle, float thres
 DECL_DLL int kiwi_typo_close(kiwi_typo_h handle);
 
 /**
+ * @brief 오타 교정기로부터 준비된 오타 교정기를 생성합니다.
+ *
+ * @param handle 오타 교정기의 핸들
+ * @return 성공 시 준비된 오타 교정기의 핸들을 반환합니다. 실패 시 null를 반환하고 에러 메세지를 설정합니다.
+ *
+ * @note 생성된 핸들은 kiwi_prepared_typo_close를 통해 반드시 해제되어야 합니다.
+ */
+DECL_DLL kiwi_prepared_typo_h kiwi_typo_prepare(kiwi_typo_h handle);
+
+/**
+ * @brief 사용이 끝난 준비된 오타 교정기를 해제합니다.
+ *
+ * @param handle 준비된 오타 교정기의 핸들
+ * @return 성공 시 0를 반환합니다. 실패 시 음수를 반환하고 에러 메세지를 설정합니다.
+ */
+DECL_DLL int kiwi_prepared_typo_close(kiwi_prepared_typo_h handle);
+
+/**
  * @brief KiwiBuilder를 거치지 않고 바로 Kiwi instance를 생성합니다.
  * 
  * @param model_path 모델이 들어있는 디렉토리 경로 (e.g., ./models/base).
  * @param num_threads 사용할 쓰레드의 수 (-1일 경우, 자동으로 설정).
  * @param options 생성 옵션. KIWI_BUILD_* 참조.
+ * @param enabled_dialects 활성화할 방언. KIWI_DIALECT_* 열거형을 참조하십시오.
  * @return Kiwi의 핸들.
  */
-DECL_DLL kiwi_h kiwi_init(const char* model_path, int num_threads, int options);
+DECL_DLL kiwi_h kiwi_init(const char* model_path, int num_threads, int options, int enabled_dialects);
 
 /**
  * @brief 글로벌 설정 값을 변경합니다.
@@ -615,6 +665,8 @@ typedef struct {
 	int open_ending; /**< 마지막 형태소 다음 문장을 종결하지 않고 열린 상태로 끝낼지를 설정니다. 기본값은 0으로 마지막 형태소 다음 바로 문장을 종결합니다. */
 	int allowed_dialects; /**< KIWI_DIALECT_* 열거형 참고 */
 	float dialect_cost; /**< 방언 형태소에 추가되는 비용. 기본값은 3 */
+	kiwi_prepared_typo_h typo_transformer; /**< 분석 시 사용할 오타 교정기. null인 경우 사용하지 않습니다. */
+	float typo_threshold; /**< 오타 교정 비용 임계값. 기본값은 2.5 */
 } kiwi_analyze_option_t;
 
 /**

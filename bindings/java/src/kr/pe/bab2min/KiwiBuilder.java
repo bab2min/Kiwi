@@ -59,7 +59,8 @@ public class KiwiBuilder implements AutoCloseable  {
 		final static public byte none = 0,
 		any = 1,
 		vowel = 2,
-		applosive = 8;
+		applosive = 8,
+		continual = 9;
 	}
 
 	public static class TypoTransformer implements AutoCloseable {
@@ -137,6 +138,27 @@ public class KiwiBuilder implements AutoCloseable  {
 			_scaleCost(scale);
 			return this;
 		}
+
+		public native PreparedTypoTransformer prepare();
+	}
+
+	public static class PreparedTypoTransformer implements AutoCloseable {
+		private long _inst;
+
+		public PreparedTypoTransformer(long _inst) {
+			this._inst = _inst;
+		}
+
+		protected void finalize() throws Exception {
+			close();
+		}
+
+		public boolean isAlive() {
+			return _inst != 0;
+		}
+
+		@Override
+		public native void close() throws Exception;
 	}
 
 	public KiwiBuilder(long _inst) {
@@ -197,19 +219,11 @@ public class KiwiBuilder implements AutoCloseable  {
 	@Override
 	public native void close() throws Exception;
 	
-	public native Kiwi build(TypoTransformer typos, float typoCostThreshold);
+	public native Kiwi build();
 	public native boolean addWord(String form, byte tag, float score);
 	public native boolean addWord(String form, byte tag, float score, String origForm);
 	public native boolean addPreAnalyzedWord(String form, AnalyzedMorph[] analyzed, float score);
 	public native int loadDictionary(String path);
-
-	public Kiwi build() {
-		return build(null, 0);
-	}
-
-	public Kiwi build(TypoTransformer typos) {
-		return build(typos, 2.5f);
-	}
 
 	static {
 		Kiwi.loadLibrary();
@@ -317,9 +331,49 @@ public class KiwiBuilder implements AutoCloseable  {
 		.addTypo(new String[]{"ᆴ"}, new String[]{"ᆯᇀ"}, 1e-12f, CondVowel.none)
 		.addTypo(new String[]{"ᆵ"}, new String[]{"ᆯᇁ"}, 1e-12f, CondVowel.none)
 		.addTypo(new String[]{"ᆶ"}, new String[]{"ᆯᇂ"}, 1e-12f, CondVowel.none)
-		.addTypo(new String[]{"ᆹ"}, new String[]{"ᆸᆺ", "ᆸᆻ"}, 1e-12f, CondVowel.none);
+		.addTypo(new String[]{"ᆹ"}, new String[]{"ᆸᆺ", "ᆸᆻ"}, 1e-12f, CondVowel.none)
+
+		.addTypo(new String[]{"ᆨᄋ"}, new String[]{"ᄀ"}, 1.f, CondVowel.continual)
+		.addTypo(new String[]{"ᆩᄋ", "ᆨᄀ"}, new String[]{"ᄁ", "ᆨᄀ"}, 1.f, CondVowel.continual)
+		.addTypo(new String[]{"ᆪᄋ", "ᆪᄒ"}, new String[]{"ᆨᄉ", "ᆨᄊ"}, 1.f, CondVowel.continual)
+		.addTypo(new String[]{"ᆫᄋ", "ᆫᄒ"}, new String[]{"ᄂ"}, 1.f, CondVowel.continual)
+		.addTypo(new String[]{"ᆬᄋ", "ᆫᄌ"}, new String[]{"ᆬᄋ", "ᆫᄌ"}, 1.f, CondVowel.continual)
+		.addTypo(new String[]{"ᆭᄋ"}, new String[]{"ᆫᄒ", "ᄂ"}, 1.f, CondVowel.continual)
+		.addTypo(new String[]{"ᆭᄀ"}, new String[]{"ᆫᄏ"}, 1.f, CondVowel.continual)
+		.addTypo(new String[]{"ᆭᄃ"}, new String[]{"ᆫᄐ"}, 1.f, CondVowel.continual)
+		.addTypo(new String[]{"ᆭᄇ"}, new String[]{"ᆫᄑ"}, 1.f, CondVowel.continual)
+		.addTypo(new String[]{"ᆭᄉ"}, new String[]{"ᆫᄉ"}, 1.f, CondVowel.continual)
+		.addTypo(new String[]{"ᆭᄌ"}, new String[]{"ᆫᄎ"}, 1.f, CondVowel.continual)
+		.addTypo(new String[]{"ᆮᄋ"}, new String[]{"ᄃ"}, 1.f, CondVowel.continual)
+		.addTypo(new String[]{"ᆯᄋ", "ᆯᄒ"}, new String[]{"ᄅ"}, 1.f, CondVowel.continual)
+		.addTypo(new String[]{"ᆰᄋ"}, new String[]{"ᆯᄀ"}, 1.f, CondVowel.continual)
+		.addTypo(new String[]{"ᆰᄀ"}, new String[]{"ᆯᄁ"}, 1.f, CondVowel.continual)
+		.addTypo(new String[]{"ᆰᄒ"}, new String[]{"ᆯᄏ"}, 1.f, CondVowel.continual)
+		.addTypo(new String[]{"ᆱᄋ", "ᆱᄒ"}, new String[]{"ᆯᄆ"}, 1.f, CondVowel.continual)
+		.addTypo(new String[]{"ᆲᄋ"}, new String[]{"ᆯᄇ"}, 1.f, CondVowel.continual)
+		.addTypo(new String[]{"ᆲᄇ"}, new String[]{"ᆯᄈ"}, 1.f, CondVowel.continual)
+		.addTypo(new String[]{"ᆲᄒ"}, new String[]{"ᆯᄑ"}, 1.f, CondVowel.continual)
+		.addTypo(new String[]{"ᆳᄋ"}, new String[]{"ᆯᄉ"}, 1.f, CondVowel.continual)
+		.addTypo(new String[]{"ᆳᄉ"}, new String[]{"ᆯᄊ"}, 1.f, CondVowel.continual)
+		.addTypo(new String[]{"ᆴᄋ", "ᆴᄐ", "ᆴᄒ"}, new String[]{"ᆯᄐ"}, 1.f, CondVowel.continual)
+		.addTypo(new String[]{"ᆵᄋ", "ᆵᄑ", "ᆵᄒ"}, new String[]{"ᆯᄑ"}, 1.f, CondVowel.continual)
+		.addTypo(new String[]{"ᆶᄉ"}, new String[]{"ᆯᄉ"}, 1.f, CondVowel.continual)
+		.addTypo(new String[]{"ᆶᄋ", "ᆶᄒ"}, new String[]{"ᆯᄒ"}, 1.f, CondVowel.continual)
+		.addTypo(new String[]{"ᆷᄋ", "ᆷᄒ"}, new String[]{"ᄆ"}, 1.f, CondVowel.continual)
+		.addTypo(new String[]{"ᆸᄋ"}, new String[]{"ᄇ"}, 1.f, CondVowel.continual)
+		.addTypo(new String[]{"ᆸᄇ"}, new String[]{"ᄈ"}, 1.f, CondVowel.continual)
+		.addTypo(new String[]{"ᆹᄋ", "ᆹᄒ"}, new String[]{"ᆸᄉ", "ᆸᄊ"}, 1.f, CondVowel.continual)
+		.addTypo(new String[]{"ᆺᄋ"}, new String[]{"ᄉ"}, 1.f, CondVowel.continual)
+		.addTypo(new String[]{"ᆻᄋ", "ᆺᄉ"}, new String[]{"ᄊ", "ᆺᄉ"}, 1.f, CondVowel.continual)
+		.addTypo(new String[]{"ᆽᄋ"}, new String[]{"ᄌ"}, 1.f, CondVowel.continual)
+		.addTypo(new String[]{"ᆽᄌ"}, new String[]{"ᄍ"}, 1.f, CondVowel.continual)
+		.addTypo(new String[]{"ᆾᄋ", "ᆾᄒ", "ᆽᄒ", "ᇂᄌ", "ᇂᄎ"}, new String[]{"ᄎ"}, 1.f, CondVowel.continual)
+		.addTypo(new String[]{"ᆿᄋ", "ᆿᄒ", "ᆨᄒ", "ᇂᄀ", "ᇂᄏ"}, new String[]{"ᄏ"}, 1.f, CondVowel.continual)
+		.addTypo(new String[]{"ᇀᄋ", "ᇀᄒ", "ᆮᄒ", "ᇂᄃ", "ᇂᄐ"}, new String[]{"ᄐ"}, 1.f, CondVowel.continual)
+		.addTypo(new String[]{"ᇁᄋ", "ᇁᄒ", "ᆸᄒ", "ᇂᄇ", "ᇂᄑ"}, new String[]{"ᄑ"}, 1.f, CondVowel.continual)
+		.addTypo(new String[]{"ᇂᄋ"}, new String[]{"ᄒ"}, 1.f, CondVowel.continual);
 
 	final public static TypoTransformer basicTypoSetWithContinual = basicTypoSet.copy().update(continualTypoSet);
 
-	final public static TypoTransformer lengtheningTypoSet = new TypoTransformer().setLengtheningTypoCost(0.5f);
+	final public static TypoTransformer lengtheningTypoSet = new TypoTransformer().setLengtheningTypoCost(0.25f);
 }

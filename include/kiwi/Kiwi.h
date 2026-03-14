@@ -73,16 +73,35 @@ namespace kiwi
 		bool openEnding = false;
 		Dialect allowedDialects = Dialect::standard;
 		float dialectCost = 3.f;
+		const PreparedTypoTransformer* typoTransformer = nullptr;
+		float typoThreshold = 2.5f;
 
 		AnalyzeOption() = default;
 		AnalyzeOption(Match m, 
 			const std::unordered_set<const Morpheme*>* bl = nullptr, 
 			bool oe = false,
 			Dialect ad = Dialect::standard,
-			float dc = 3.f
+			float dc = 3.f,
+			const PreparedTypoTransformer* tt = nullptr,
+			float tth = 2.5f
 			)
-			: match{ m }, blocklist{ bl }, openEnding{ oe }, allowedDialects{ ad }, dialectCost{ dc }
+			: match{ m }, blocklist{ bl }, openEnding{ oe }, allowedDialects{ ad }, dialectCost{ dc }, typoTransformer{ tt }, typoThreshold{ tth }
 		{}
+
+		AnalyzeOption withMatch(Match m) const
+		{
+			AnalyzeOption copy = *this;
+			copy.match = m;
+			return copy;
+		}
+
+		AnalyzeOption withTypoTransformer(const PreparedTypoTransformer* tt, float typoThreshold = 2.5f) const
+		{
+			AnalyzeOption copy = *this;
+			copy.typoTransformer = tt;
+			copy.typoThreshold = typoThreshold;
+			return copy;
+		}
 	};
 
 	struct MorphemeDef

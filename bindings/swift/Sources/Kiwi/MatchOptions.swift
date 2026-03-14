@@ -22,7 +22,25 @@ public struct MatchOptions: OptionSet, Codable {
     
     /// Match serial numbers
     public static let serial = MatchOptions(rawValue: 1 << 4)
-    
+
+    /// Match emoji
+    public static let emoji = MatchOptions(rawValue: 1 << 5)
+
+    /// OOV: use rule-based matching only
+    public static let oovRuleOnly = MatchOptions(rawValue: 0 << 8)
+
+    /// OOV: use character model
+    public static let oovChrModel = MatchOptions(rawValue: 1 << 8)
+
+    /// OOV: use character frequency model
+    public static let oovChrFreqModel = MatchOptions(rawValue: 2 << 8)
+
+    /// OOV: use character frequency and branch model
+    public static let oovChrFreqBranchModel = MatchOptions(rawValue: 3 << 8)
+
+    /// OOV option mask
+    public static let oovMask = MatchOptions(rawValue: 3 << 8)
+
     /// Normalize coda
     public static let normalizeCoda = MatchOptions(rawValue: 1 << 16)
     
@@ -61,9 +79,12 @@ public struct MatchOptions: OptionSet, Codable {
     
     /// Merge saisiot
     public static let mergeSaisiot = MatchOptions(rawValue: 1 << 26)
-    
+
+    /// Join particle yo
+    public static let joinParticleYo = MatchOptions(rawValue: 1 << 27)
+
     /// All basic matching options
-    public static let all: MatchOptions = [.url, .email, .hashtag, .mention, .serial, .zCoda]
+    public static let all: MatchOptions = [.url, .email, .hashtag, .mention, .serial, .emoji, .zCoda]
     
     /// All matching options with normalization
     public static let allWithNormalizing: MatchOptions = [.all, .normalizeCoda]
