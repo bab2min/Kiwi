@@ -36,7 +36,7 @@ namespace kiwi
 		mergeSaisiot = 1 << 26, /**< 사이시옷이 포함된 것으로 추정되는 명사를 결합하여 매칭한다. */
 		joinParticleYo = 1 << 27, /**< 어미(EC/EF)와 조사 "요/JX"를 통합하여 매칭한다 (예: 고/EC + 요/JX => 고요/EC) */
 
-		useOldSplitter = 1 << 31,
+		useOldSplitter = 1 << 30,
 
 		joinVSuffix = joinVerbSuffix | joinAdjSuffix,
 		joinAffix = joinNounPrefix | joinNounSuffix | joinVerbSuffix | joinAdjSuffix | joinAdvSuffix,

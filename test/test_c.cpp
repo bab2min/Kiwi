@@ -5,13 +5,13 @@
 
 kiwi_h reuse_kiwi_instance()
 {
-	static kiwi_h kw = kiwi_init(MODEL_PATH, -1, KIWI_BUILD_DEFAULT);
+	static kiwi_h kw = kiwi_init(MODEL_PATH, -1, KIWI_BUILD_DEFAULT, 0);
 	return kw;
 }
 
 TEST(KiwiC, InitClose) 
 {
-	kiwi_h kw = kiwi_init(MODEL_PATH, -1, KIWI_BUILD_DEFAULT);
+	kiwi_h kw = kiwi_init(MODEL_PATH, -1, KIWI_BUILD_DEFAULT, 0);
 	EXPECT_NE(kw, nullptr);
 	EXPECT_EQ(kiwi_close(kw), 0);
 }
@@ -63,7 +63,7 @@ int mt_receiver(int idx, kiwi_res_h res, void* user)
 TEST(KiwiC, AnalyzeMultithread)
 {
 	auto data = loadTestCorpus();
-	kiwi_h kw = kiwi_init(MODEL_PATH, 2, KIWI_BUILD_DEFAULT);
+	kiwi_h kw = kiwi_init(MODEL_PATH, 2, KIWI_BUILD_DEFAULT, 0);
 	EXPECT_NE(kw, nullptr);
 	kiwi_analyze_option_t option = { KIWI_MATCH_ALL, };
 	EXPECT_EQ(kiwi_analyze_m(kw, mt_reader, mt_receiver, &data, 1, option), data.size());
@@ -256,12 +256,16 @@ TEST(KiwiC, AnalyzeBasicTypoSet)
 {
 	kiwi_h okw = reuse_kiwi_instance(), typo_kw;
 	kiwi_builder_h builder = kiwi_builder_init(MODEL_PATH, -1, KIWI_BUILD_DEFAULT, KIWI_DIALECT_STANDARD);
-	typo_kw = kiwi_builder_build(builder, kiwi_typo_get_default(KIWI_TYPO_BASIC_TYPO_SET), 2.5f);
+	typo_kw = kiwi_builder_build(builder, nullptr, 0);
 	kiwi_config_t config = kiwi_get_global_config(typo_kw);
 	config.typo_cost_weight = 5;
 	kiwi_set_global_config(typo_kw, config);
 
+	kiwi_prepared_typo_h ptt = kiwi_typo_prepare(kiwi_typo_get_default(KIWI_TYPO_BASIC_TYPO_SET));
+
 	kiwi_analyze_option_t option = { KIWI_MATCH_ALL_WITH_NORMALIZING | KIWI_MATCH_OOV_CHR_FREQ_MODEL, };
+	option.typo_transformer = ptt;
+	option.typo_threshold = 2.5;
 	kiwi_res_h o, c;
 	for (const char* s : { u8"외않됀데?", u8"나 죰 도와죠.", u8"잘했따", u8"외구거 공부", u8"맗은 믈을 마셧다!" })
 	{
@@ -272,6 +276,7 @@ TEST(KiwiC, AnalyzeBasicTypoSet)
 		EXPECT_EQ(kiwi_res_close(c), 0);
 	}
 
+	EXPECT_EQ(kiwi_prepared_typo_close(ptt), 0);
 	EXPECT_EQ(kiwi_builder_close(builder), 0);
 	EXPECT_EQ(kiwi_close(typo_kw), 0);
 }
@@ -289,12 +294,16 @@ TEST(KiwiC, CustomTypoSet)
 	kiwi_typo_update(custom_typo, continual_typo);
 	kiwi_typo_update(custom_typo, lengthening_typo);
 
-	typo_kw = kiwi_builder_build(builder, custom_typo, 2.5f);
+	kiwi_prepared_typo_h ptt = kiwi_typo_prepare(custom_typo);
+
+	typo_kw = kiwi_builder_build(builder, nullptr, 0);
 	kiwi_config_t config = kiwi_get_global_config(typo_kw);
 	config.typo_cost_weight = 5;
 	kiwi_set_global_config(typo_kw, config);
 
 	kiwi_analyze_option_t option = { KIWI_MATCH_ALL_WITH_NORMALIZING | KIWI_MATCH_OOV_CHR_FREQ_MODEL, };
+	option.typo_transformer = ptt;
+	option.typo_threshold = 2.5;
 	kiwi_res_h o, c;
 	for (const char* s : { u8"외않됀데?", u8"나 죰 도와죠.", u8"자알했따", u8"외구거 공부", u8"맗은 믈을 마셧다!" })
 	{
@@ -305,6 +314,7 @@ TEST(KiwiC, CustomTypoSet)
 		EXPECT_EQ(kiwi_res_close(c), 0);
 	}
 
+	EXPECT_EQ(kiwi_prepared_typo_close(ptt), 0);
 	EXPECT_EQ(kiwi_typo_close(custom_typo), 0);
 	EXPECT_EQ(kiwi_builder_close(builder), 0);
 	EXPECT_EQ(kiwi_close(typo_kw), 0);
