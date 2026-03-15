@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['allowed_5fdialects_0',['allowed_dialects',['../structkiwi__analyze__option__t.html#a4389c96c9daa55675092ec7daed1ba84',1,'kiwi_analyze_option_t']]]
+  ['allowed_5fdialects_0',['allowed_dialects',['../structkiwi__analyze__option__t.html#a4389c96c9daa55675092ec7daed1ba84',1,'kiwi_analyze_option_t']]],
+  ['alloweddialects_1',['allowedDialects',['../structkiwi_1_1AnalyzeOption.html#a117301ac02bb66be971350e2af2db4b6',1,'kiwi::AnalyzeOption']]]
 ];

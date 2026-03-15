@@ -21,6 +21,7 @@ var searchData=
   ['typoformid_18',['typoFormId',['../structkiwi_1_1TokenInfo.html#aa77262e269fb9873c00c6fc9ad410fbb',1,'kiwi::TokenInfo']]],
   ['typographnode_19',['TypoGraphNode',['../structkiwi_1_1TypoGraphNode.html',1,'kiwi']]],
   ['typoiterator_20',['TypoIterator',['../classkiwi_1_1TypoIterator.html',1,'kiwi']]],
-  ['typotransformer_21',['TypoTransformer',['../classkiwi_1_1TypoTransformer.html',1,'kiwi']]],
-  ['typotransformer_2eh_22',['TypoTransformer.h',['../TypoTransformer_8h.html',1,'']]]
+  ['typothreshold_21',['typoThreshold',['../structkiwi_1_1AnalyzeOption.html#a223d854412aa158c13f89d644cdac93e',1,'kiwi::AnalyzeOption']]],
+  ['typotransformer_22',['typotransformer',['../classkiwi_1_1TypoTransformer.html',1,'kiwi::TypoTransformer'],['../structkiwi_1_1AnalyzeOption.html#ac2a938812be1a29bd06eb9b0fbcbad24',1,'kiwi::AnalyzeOption::typoTransformer']]],
+  ['typotransformer_2eh_23',['TypoTransformer.h',['../TypoTransformer_8h.html',1,'']]]
 ];

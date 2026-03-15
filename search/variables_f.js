@@ -7,5 +7,7 @@ var searchData=
   ['typo_5fthreshold_4',['typo_threshold',['../structkiwi__analyze__option__t.html#a291e401a8555622307bd7e7b71d4b468',1,'kiwi_analyze_option_t']]],
   ['typo_5ftransformer_5',['typo_transformer',['../structkiwi__analyze__option__t.html#ae3b9cad120d22039562539ce52de5ca9',1,'kiwi_analyze_option_t']]],
   ['typocost_6',['typoCost',['../structkiwi_1_1TokenInfo.html#a665bcabafa2c41815d0a5ad51a27e833',1,'kiwi::TokenInfo']]],
-  ['typoformid_7',['typoFormId',['../structkiwi_1_1TokenInfo.html#aa77262e269fb9873c00c6fc9ad410fbb',1,'kiwi::TokenInfo']]]
+  ['typoformid_7',['typoFormId',['../structkiwi_1_1TokenInfo.html#aa77262e269fb9873c00c6fc9ad410fbb',1,'kiwi::TokenInfo']]],
+  ['typothreshold_8',['typoThreshold',['../structkiwi_1_1AnalyzeOption.html#a223d854412aa158c13f89d644cdac93e',1,'kiwi::AnalyzeOption']]],
+  ['typotransformer_9',['typoTransformer',['../structkiwi_1_1AnalyzeOption.html#ac2a938812be1a29bd06eb9b0fbcbad24',1,'kiwi::AnalyzeOption']]]
 ];

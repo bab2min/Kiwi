@@ -95,31 +95,38 @@ Public Member Functions</h2></td></tr>
 <a class="el" href="structkiwi_1_1AnalyzeOption.html">AnalyzeOption</a>&#160;</td><td class="memItemRight" valign="bottom"><b>withMatch</b> (Match m) const</td></tr>
 <tr class="separator:a4ad02668590b1ef29aaaf57961d70b6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a18d653ad057fc821376184b1b967456b" id="r_a18d653ad057fc821376184b1b967456b"><td class="memItemLeft" align="right" valign="top"><a id="a18d653ad057fc821376184b1b967456b" name="a18d653ad057fc821376184b1b967456b"></a>
-<a class="el" href="structkiwi_1_1AnalyzeOption.html">AnalyzeOption</a>&#160;</td><td class="memItemRight" valign="bottom"><b>withTypoTransformer</b> (const <a class="el" href="classkiwi_1_1PreparedTypoTransformer.html">PreparedTypoTransformer</a> *tt, float typoThreshold=2.5f) const</td></tr>
+<a class="el" href="structkiwi_1_1AnalyzeOption.html">AnalyzeOption</a>&#160;</td><td class="memItemRight" valign="bottom"><b>withTypoTransformer</b> (const <a class="el" href="classkiwi_1_1PreparedTypoTransformer.html">PreparedTypoTransformer</a> *tt, float <a class="el" href="structkiwi_1_1AnalyzeOption.html#a223d854412aa158c13f89d644cdac93e">typoThreshold</a>=2.5f) const</td></tr>
 <tr class="separator:a18d653ad057fc821376184b1b967456b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a55c90d58b6b006a3d1025dc114125f8a" id="r_a55c90d58b6b006a3d1025dc114125f8a"><td class="memItemLeft" align="right" valign="top"><a id="a55c90d58b6b006a3d1025dc114125f8a" name="a55c90d58b6b006a3d1025dc114125f8a"></a>
 Match&#160;</td><td class="memItemRight" valign="bottom"><b>match</b> = Match::allWithNormalizing</td></tr>
+<tr class="memdesc:a55c90d58b6b006a3d1025dc114125f8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">형태소 분석 시 매칭 옵션 <br /></td></tr>
 <tr class="separator:a55c90d58b6b006a3d1025dc114125f8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a96bedb93d33f622da1e0c59bbf7b4658" id="r_a96bedb93d33f622da1e0c59bbf7b4658"><td class="memItemLeft" align="right" valign="top"><a id="a96bedb93d33f622da1e0c59bbf7b4658" name="a96bedb93d33f622da1e0c59bbf7b4658"></a>
 const std::unordered_set&lt; const <a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a> * &gt; *&#160;</td><td class="memItemRight" valign="bottom"><b>blocklist</b> = nullptr</td></tr>
+<tr class="memdesc:a96bedb93d33f622da1e0c59bbf7b4658"><td class="mdescLeft">&#160;</td><td class="mdescRight">분석 결과에서 제외할 형태소 목록 <br /></td></tr>
 <tr class="separator:a96bedb93d33f622da1e0c59bbf7b4658"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8add5330640fc3d955095b2424e0d01e" id="r_a8add5330640fc3d955095b2424e0d01e"><td class="memItemLeft" align="right" valign="top"><a id="a8add5330640fc3d955095b2424e0d01e" name="a8add5330640fc3d955095b2424e0d01e"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>openEnding</b> = false</td></tr>
+<tr class="memdesc:a8add5330640fc3d955095b2424e0d01e"><td class="mdescLeft">&#160;</td><td class="mdescRight">열린 결말 허용 여부 <br /></td></tr>
 <tr class="separator:a8add5330640fc3d955095b2424e0d01e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a117301ac02bb66be971350e2af2db4b6" id="r_a117301ac02bb66be971350e2af2db4b6"><td class="memItemLeft" align="right" valign="top"><a id="a117301ac02bb66be971350e2af2db4b6" name="a117301ac02bb66be971350e2af2db4b6"></a>
 <a class="el" href="Types_8h.html#aa9fc09d985bc896c97e2e0f5cd41c96f">Dialect</a>&#160;</td><td class="memItemRight" valign="bottom"><b>allowedDialects</b> = <a class="el" href="Types_8h.html#aa9fc09d985bc896c97e2e0f5cd41c96fac00f0c4675b91fb8b918e4079a0b1bac">Dialect::standard</a></td></tr>
+<tr class="memdesc:a117301ac02bb66be971350e2af2db4b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">분석에 허용할 방언을 설정한다. 기본값은 표준어만 허용하는 <code><a class="el" href="Types_8h.html#aa9fc09d985bc896c97e2e0f5cd41c96fac00f0c4675b91fb8b918e4079a0b1bac">Dialect::standard</a></code>이다. 여러 방언을 허용하려면 비트 OR 연산자로 조합해서 설정할 수 있다. <br /></td></tr>
 <tr class="separator:a117301ac02bb66be971350e2af2db4b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2beec81d572c9d66a59ae6da686a92de" id="r_a2beec81d572c9d66a59ae6da686a92de"><td class="memItemLeft" align="right" valign="top"><a id="a2beec81d572c9d66a59ae6da686a92de" name="a2beec81d572c9d66a59ae6da686a92de"></a>
 float&#160;</td><td class="memItemRight" valign="bottom"><b>dialectCost</b> = 3.f</td></tr>
+<tr class="memdesc:a2beec81d572c9d66a59ae6da686a92de"><td class="mdescLeft">&#160;</td><td class="mdescRight">방언에 적용할 페널티 비용. <br /></td></tr>
 <tr class="separator:a2beec81d572c9d66a59ae6da686a92de"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac2a938812be1a29bd06eb9b0fbcbad24" id="r_ac2a938812be1a29bd06eb9b0fbcbad24"><td class="memItemLeft" align="right" valign="top"><a id="ac2a938812be1a29bd06eb9b0fbcbad24" name="ac2a938812be1a29bd06eb9b0fbcbad24"></a>
 const <a class="el" href="classkiwi_1_1PreparedTypoTransformer.html">PreparedTypoTransformer</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>typoTransformer</b> = nullptr</td></tr>
+<tr class="memdesc:ac2a938812be1a29bd06eb9b0fbcbad24"><td class="mdescLeft">&#160;</td><td class="mdescRight">오타 교정에 사용할 <a class="el" href="classkiwi_1_1PreparedTypoTransformer.html" title="오타 생성 및 교정 준비가 완료된 오타 생성기. kiwi::TypoTransformer::prepare()로부터 생성됩니다.">PreparedTypoTransformer</a> 객체 이 객체는 TypoTransformer::prepare(true)로 생성되어야 한다. allowedDialects에 방언을 포함하고 있고, typoTransformer가 nullptr인 경우 자동으로 getDefaultPreparedTypoSet(DefaultTypoSet::dialect)에서 생성된 PreparedTypoTransformer가 사용된다. <br /></td></tr>
 <tr class="separator:ac2a938812be1a29bd06eb9b0fbcbad24"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a223d854412aa158c13f89d644cdac93e" id="r_a223d854412aa158c13f89d644cdac93e"><td class="memItemLeft" align="right" valign="top"><a id="a223d854412aa158c13f89d644cdac93e" name="a223d854412aa158c13f89d644cdac93e"></a>
 float&#160;</td><td class="memItemRight" valign="bottom"><b>typoThreshold</b> = 2.5f</td></tr>
+<tr class="memdesc:a223d854412aa158c13f89d644cdac93e"><td class="mdescLeft">&#160;</td><td class="mdescRight">오타 교정 시 허용할 최대 비용 임계값 <br /></td></tr>
 <tr class="separator:a223d854412aa158c13f89d644cdac93e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <hr/>The documentation for this struct was generated from the following file:<ul>
