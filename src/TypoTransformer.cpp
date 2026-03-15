@@ -225,7 +225,7 @@ void TypoTransformer::addTypoWithCond(const KString& orig, const KString& error,
 {
 	if (orig == error) return;
 
-	if (leftCond == CondVowel::none || leftCond == CondVowel::vowel || leftCond == CondVowel::any || leftCond == CondVowel::continual)
+	if (leftCond == CondVowel::none || leftCond == CondVowel::vowel || leftCond == CondVowel::any || leftCond == CondVowel::continual || leftCond == CondVowel::boundary)
 	{
 		auto inserted = typos.emplace(make_tuple(orig, error, leftCond, dialect), cost);
 		if (!inserted.second)
@@ -810,8 +810,10 @@ struct ContinualCodaDecomposer
 template<class Alloc>
 size_t PreparedTypoTransformer::generateGraph(U16StringView str, 
 	vector<TypoGraphNode, Alloc>& graphOut,
+	Dialect allowedDialect,
 	const pair<uint32_t, uint32_t>* pretokenizedFirst,
-	const pair<uint32_t, uint32_t>* pretokenizedLast
+	const pair<uint32_t, uint32_t>* pretokenizedLast,
+	size_t* maxContinualTypoIdxOut
 ) const
 {
 	const bool continualTypoEnabled = isfinite(continualTypoThreshold);
@@ -829,7 +831,7 @@ size_t PreparedTypoTransformer::generateGraph(U16StringView str,
 	size_t last = 0;
 	tempGraph.clear();
 	tempGraph.emplace_back(U16StringView{ str.data(), 0 }, 0);
-
+	
 	const auto& insertBranch = [&]()
 	{
 		const size_t totStartPos = get<size_t>(matches[0]) - get<PatInfo>(matches[0]).patLength;
@@ -873,11 +875,12 @@ size_t PreparedTypoTransformer::generateGraph(U16StringView str,
 			const size_t e = endPos;
 			const size_t s = e - patInfo.patLength;
 			continualTypoIdxMap.clear();
-			size_t continualTypoIdx = 0;
 
 			for (size_t j = 0; j < patInfo.size; ++j)
 			{
 				auto& repl = patInfo.repl[j];
+				if (repl.dialect != Dialect::standard && !(allowedDialect & repl.dialect)) continue;
+				
 				if (repl.leftCond == CondVowel::vowel)
 				{
 					if (s == 0 || !isHangulSyllable(str[s - 1])) continue;
@@ -886,21 +889,25 @@ size_t PreparedTypoTransformer::generateGraph(U16StringView str,
 				{
 					if (s == 0) continue;
 				}
-				else if (repl.leftCond == CondVowel::continual)
+				else if (repl.leftCond == CondVowel::continual || repl.leftCond == CondVowel::boundary)
 				{
-					if (s == 0 || !isHangulSyllable(str[s - 1])) continue;
+					if (repl.leftCond == CondVowel::continual && (s == 0 || !isHangulSyllable(str[s - 1]))) continue;
+					if (repl.leftCond == CondVowel::continual && !isfinite(continualTypoThreshold)) continue;
+					const float scale = repl.leftCond == CondVowel::continual ? continualTypoThreshold : 1.f;
 					const auto [it, inserted] = continualTypoIdxMap.emplace(*repl.str, make_pair(continualTypoIdxMap.size() + 1, 0));
 					auto& [continualTypoIdx, continualTypoNodeIdx] = it->second;
 					if (inserted)
 					{
-						if (appendNewNode(tempGraph, endPosMap, last, U16StringView{ repl.str, 1 }, s, -1, repl.cost / 2))
+						if (appendNewNode(tempGraph, endPosMap, last, U16StringView{ repl.str, 1 }, s, -1, repl.cost * scale / 2))
 						{
 							tempGraph.back().endPos = e;
 							tempGraph.back().continualTypoIdx = continualTypoIdx;
+							tempGraph.back().dialect = repl.dialect;
 							continualTypoNodeIdx = tempGraph.size() - 1;
-							if (appendNewNode(tempGraph, endPosMap, last, U16StringView{ repl.str + 1, 1 }, -1, e, repl.cost / 2))
+							if (appendNewNode(tempGraph, endPosMap, last, U16StringView{ repl.str + 1, repl.length - 1 }, -1, e, repl.cost * scale / 2))
 							{
 								tempGraph.back().prevOffset = continualTypoNodeIdx;
+								tempGraph.back().dialect = repl.dialect;
 							}
 						}
 						else
@@ -910,9 +917,10 @@ size_t PreparedTypoTransformer::generateGraph(U16StringView str,
 					}
 					else
 					{
-						if (appendNewNode(tempGraph, endPosMap, last, U16StringView{ repl.str + 1, 1 }, -1, e, repl.cost / 2))
+						if (appendNewNode(tempGraph, endPosMap, last, U16StringView{ repl.str + 1, repl.length - 1 }, -1, e, repl.cost * scale / 2))
 						{
 							tempGraph.back().prevOffset = continualTypoNodeIdx;
+							tempGraph.back().dialect = repl.dialect;
 						}
 					}
 					continue;
@@ -921,7 +929,14 @@ size_t PreparedTypoTransformer::generateGraph(U16StringView str,
 				{
 					if (!FeatureTestor::isMatched(str.data(), str.data() + s, repl.leftCond)) continue;
 				}
-				appendNewNode(tempGraph, endPosMap, last, U16StringView{ repl.str, repl.length }, s, e, repl.cost);
+				if (appendNewNode(tempGraph, endPosMap, last, U16StringView{ repl.str, repl.length }, s, e, repl.cost))
+				{
+					tempGraph.back().dialect = repl.dialect;
+				}
+			}
+			if (maxContinualTypoIdxOut)
+			{
+				*maxContinualTypoIdxOut = max(*maxContinualTypoIdxOut, continualTypoIdxMap.size() + 1);
 			}
 		}
 		last = totEndPos;
@@ -1034,10 +1049,10 @@ namespace kiwi
 	template TypoCandidates<false> PreparedTypoTransformer::_generate<false>(const KString&, float) const;
 
 	template size_t PreparedTypoTransformer::generateGraph<allocator<TypoGraphNode>>(
-		U16StringView, vector<TypoGraphNode, allocator<TypoGraphNode>>&, const pair<uint32_t, uint32_t>*, const pair<uint32_t, uint32_t>*) const;
+		U16StringView, vector<TypoGraphNode, allocator<TypoGraphNode>>&, Dialect, const pair<uint32_t, uint32_t>*, const pair<uint32_t, uint32_t>*, size_t*) const;
 #ifdef KIWI_USE_MIMALLOC
 	template size_t PreparedTypoTransformer::generateGraph<mi_stl_allocator<TypoGraphNode>>(
-		U16StringView, vector<TypoGraphNode, mi_stl_allocator<TypoGraphNode>>&, const pair<uint32_t, uint32_t>*, const pair<uint32_t, uint32_t>*) const;
+		U16StringView, vector<TypoGraphNode, mi_stl_allocator<TypoGraphNode>>&, Dialect, const pair<uint32_t, uint32_t>*, const pair<uint32_t, uint32_t>*, size_t*) const;
 #endif
 
 	const TypoTransformer& getDefaultTypoSet(DefaultTypoSet set)
@@ -1200,7 +1215,22 @@ namespace kiwi
 			TypoDef{ {u"ㅚ"}, {u"ㅞ"}, 0.5f, CondVowel::none },
 			TypoDef{ {u"ᆻ"}, {u"ᆺ"}, 0.5f, CondVowel::none },
 			TypoDef{ {u"ㅐ", u"ㅔ"}, {u"ㅐ", u"ㅔ"}, 1.f, CondVowel::none },
-		}.copyWithDialectOverriding(Dialect::jeju);
+		}.copyWithDialectOverriding(Dialect::jeju) | TypoTransformer{
+			TypoDef{ {u"ㅣ이"}, {u"ㅣ"}, 0.2f, CondVowel::boundary },
+			TypoDef{ {u"ㅏ이", u"ㅐ이"}, {u"ㅐ"}, 0.2f, CondVowel::boundary },
+			TypoDef{ {u"ㅓ이", u"ㅔ이"}, {u"ㅔ"}, 0.2f, CondVowel::boundary },
+			TypoDef{ {u"ㅘ이"}, {u"ㅙ"}, 0.2f, CondVowel::boundary },
+			TypoDef{ {u"ㅚ이"}, {u"ㅚ"}, 0.2f, CondVowel::boundary },
+			TypoDef{ {u"ㅝ이"}, {u"ㅞ"}, 0.2f, CondVowel::boundary },
+			TypoDef{ {u"ㅟ이"}, {u"ㅟ"}, 0.2f, CondVowel::boundary },
+			TypoDef{ {u"ㅜ우"}, {u"ㅜ"}, 0.2f, CondVowel::boundary },
+			TypoDef{ {u"ㅠ우"}, {u"ㅠ"}, 0.2f, CondVowel::boundary },
+		}.copyWithDialectOverriding(Dialect::hamgyeong) | TypoTransformer{
+			TypoDef{ {u"ㅣ어"}, {u"ㅔ"}, 0.25f, CondVowel::boundary },
+			TypoDef{ {u"ㅣ어"}, {u"ㅖ"}, 0.5f, CondVowel::boundary },
+		}.copyWithDialectOverriding(Dialect::hamgyeong | Dialect::gyeongsang | Dialect::gangwon) | TypoTransformer{
+			TypoDef{ {u"ㅣ었"}, {u"ㅣᆻ"}, 0.25f, CondVowel::boundary },
+		}.copyWithDialectOverriding(Dialect::gyeongsang);
 
 		switch (set)
 		{

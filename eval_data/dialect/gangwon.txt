@@ -17,13 +17,13 @@
 말 안 듣구 나가 놀다가 넘어졌다니 그것 아주 싸고지다.	말/NNG 안/MAG 듣/VV-I 구/EC 나가/VV 어/EC 놀/VV 다가/EC 넘어지/VV 었/EP 다니/EC 그것/NP 아주/MAG 싸고지__1/NNG 이/VCP 다/EF ./SF	말 안 듣고 나가 놀다가 넘어졌다니 그것 아주 쌤통이다.
 자는 어렜을 적부터 대두 쫄라 대는 버릇이 있었아.	자/NP 는/JX 어리/VA 었/EP 을/ETM 적/NNB 부터/JX 대두__9/MAG 쪼르/VV 어/EC 대/VX 는/ETM 버릇/NNG 이/JKS 있/VV 었/EP 아/EF ./SF	쟤는 어렸을 적부터 되우 졸라 대는 버릇이 있었어.
 초저욹이래두 바람이 차니까 옷으 뜨시게 입구 나가라.	초저욹__1/NNG 이/VCP 래두/EC 바람/NNG 이/JKS 차/VA 니까/EC 옷/NNG 으/JKO 뜨시__1/VA 게/EC 입/VV-R 구/EC 나가/VV 라/EF ./SF	초겨울이라도 바람이 차니까 옷을 따뜻하게 입고 나가라.
-책상 모새이에 부닺헤서 멍당구가 시퍼렇게 들었아.	책상/NNG 모새이__1/NNG 에/JKB 부닺히/VV 어서/EC 멍당구__1/NNG 가/NNG 시퍼렇/VA-I 게/EC 들/VV 었/EP 아/EF ./SF	책상 모서리에 부딪혀서 멍이 시퍼렇게 들었어.
+책상 모새이에 부닺헤서 멍당구가 시퍼렇게 들었아.	책상/NNG 모새이__1/NNG 에/JKB 부닺히/VV 어서/EC 멍당구__1/NNG 가/JKS 시퍼렇/VA-I 게/EC 들/VV 었/EP 아/EF ./SF	책상 모서리에 부딪혀서 멍이 시퍼렇게 들었어.
 올해는 가믐더우 땜에 나락이 쨀고 그래서 걱정이래. 	올해/NNG 는/JX 가믐더우__1/NNG 땜/NNB 에/JKB 나락__2/NNG 이/MM 쨀__1/VA 고/EC 그래서/MAJ 걱정/NNG 이/VCP 래/EF ./SF	올해는 가뭄더위 땜에 벼가 잘고 그래서 걱정이래.
 버점은 허옇기 일어나는 것도 있고 자꾸 번지 나가는 것도 있어여.	버점__1/NNG 은/JX 허옇/VA-I 기/ETN 일어나/VV 는/ETM 것/NNB 도/JX 있/VA 고/EC 자꾸/MAG 번지/VV 어/EC 나가/VX 는/ETM 것/NNB 도/JX 있/VA 어여/EF ./SF	버짐은 허옇게 일어나는 것도 있고 자꾸 번져 나가는 것도 있어요.
 우산 없이 길으 가다가 소나기르 좔락 다 맞았다.	우산/NNG 없이/MAG 길/NNG 으/JKO 가/VV 다가/EC 소나기/NNG 르/JKO 좔락__1/MAG 다/MAG 맞/VV 었/EP 다/EF ./SF	우산 없이 길을 가다가 소나기를 쫄딱 다 맞았다.
 콩국시가 아주 걸찌한 기 맛이 참 고만이네.	콩국시__1/NNG 가/JKS 아주/MAG 걸찌/XR 하/XSA ᆫ/ETM 기__76/NNB 이/JKS 맛/NNG 이/JKS 참/MAG 고만/MAG 이/VCP 네/EF ./SF	콩국수가 아주 걸쭉한 게 맛이 참 고만이네.
 가서 쇠궁이에 여물 좀 줘라. 	가/VV 어서/EC 쇠궁이__1/NNG 에/JKB 여물/NNG 좀/MAG 주/VV 어라/EF ./SF	가서 소구유에 여물 좀 줘라.
-구리가 궁게이로 드가 뿠어.	구렁이/NNG 가/JKS 궁게이__1/NNG 로/XSM 드가/VV 어/EC 뿌/VX 었/EP 어/EF ./SF	구렁이가 구멍으로 들어가 버렸어.
+구리가 궁게이로 드가 뿠어.	구리__14/NNG 가/JKS 궁게이__1/NNG 로/XSM 드가/VV 어/EC 뿌/VX 었/EP 어/EF ./SF	구렁이가 구멍으로 들어가 버렸어.
 엉차 내가 다 할 일이잖소.	엉차__1/MAG 나/NP 가/JKS 다/MAG 하/VV ᆯ/ETM 일/NNG 이/VCP 잖소/EF ./SF	어차피 내가 다 할 일이잖소.
 어제 자에 갔더거 어릴 적 친구르 맞주이했잖소.	어제/MAG 자__53/NNG 에/JKB 가/VV 었/EP 더거/EC 어리/VA ᆯ/ETM 적/NNB 친구/NNG 르/JKO 맞주이하/VV 었/EP 잖소/EF ./SF	어제 장에 갔다가 어릴 적 친구와 마주쳤잖소.
 떡으 할라모 실그가 있어야 하잖소.	떡/NNG 으/JKO 하/VV ᆯ라모/EC 실그__1/NNG 가/JKS 있/VV 어야/EC 하/VX 잖소/EF ./SF	떡을 하려면 시루가 있어야 하잖소.

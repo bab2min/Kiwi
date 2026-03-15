@@ -122,16 +122,16 @@ namespace kiwi
 	{
 		bool integrateAllomorph = true;
 		float cutOffThreshold = 8;
-		float oovRuleScale = 3;
-		float oovRuleBias = 3;
-		float oovChrBias = -3;
+		float oovRuleScale = 4;
+		float oovRuleBias = 4;
+		float oovChrBias = 0;
 		float oovGlobalWeight = 35;
 		float oovLocalWeight = 3;
 		float oovGlobalMinFreq = 4;
 		float spacePenalty = 7;
 		float typoCostWeight = 6;
 		uint32_t maxUnkFormSize = 6;
-		uint32_t maxUnkFormSizeFollowedByJClass = -1;
+		uint32_t maxUnkFormSizeFollowedByJClass = (uint32_t)-1;
 		uint32_t spaceTolerance = 0;
 
 		void validate() const;
