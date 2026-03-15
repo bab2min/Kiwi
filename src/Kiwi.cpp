@@ -1034,6 +1034,12 @@ namespace kiwi
 			throw invalid_argument{ "`oovChrModel` option is set but the character-level noun model is not loaded." };
 		}
 
+		if (option.allowedDialects != Dialect::standard && option.typoTransformer == nullptr)
+		{
+			option.typoTransformer = getDefaultPreparedTypoSet(DefaultTypoSet::dialect);
+			option.typoThreshold = 2.5f;
+		}
+
 		makePretokenizedSpanGroup(
 			pretokenizedGroup, 
 			pretokenized, 
