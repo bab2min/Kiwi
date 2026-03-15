@@ -904,7 +904,7 @@ size_t PreparedTypoTransformer::generateGraph(U16StringView str,
 							tempGraph.back().continualTypoIdx = continualTypoIdx;
 							tempGraph.back().dialect = repl.dialect;
 							continualTypoNodeIdx = tempGraph.size() - 1;
-							if (appendNewNode(tempGraph, endPosMap, last, U16StringView{ repl.str + 1, 1 }, -1, e, repl.cost * scale / 2))
+							if (appendNewNode(tempGraph, endPosMap, last, U16StringView{ repl.str + 1, repl.length - 1 }, -1, e, repl.cost * scale / 2))
 							{
 								tempGraph.back().prevOffset = continualTypoNodeIdx;
 								tempGraph.back().dialect = repl.dialect;
@@ -917,7 +917,7 @@ size_t PreparedTypoTransformer::generateGraph(U16StringView str,
 					}
 					else
 					{
-						if (appendNewNode(tempGraph, endPosMap, last, U16StringView{ repl.str + 1, 1 }, -1, e, repl.cost * scale / 2))
+						if (appendNewNode(tempGraph, endPosMap, last, U16StringView{ repl.str + 1, repl.length - 1 }, -1, e, repl.cost * scale / 2))
 						{
 							tempGraph.back().prevOffset = continualTypoNodeIdx;
 							tempGraph.back().dialect = repl.dialect;
@@ -1225,8 +1225,12 @@ namespace kiwi
 			TypoDef{ {u"ㅟ이"}, {u"ㅟ"}, 0.2f, CondVowel::boundary },
 			TypoDef{ {u"ㅜ우"}, {u"ㅜ"}, 0.2f, CondVowel::boundary },
 			TypoDef{ {u"ㅠ우"}, {u"ㅠ"}, 0.2f, CondVowel::boundary },
-			TypoDef{ {u"ㅣ어"}, {u"ㅔ"}, 0.2f, CondVowel::boundary },
-		}.copyWithDialectOverriding(Dialect::hamgyeong);
+		}.copyWithDialectOverriding(Dialect::hamgyeong) | TypoTransformer{
+			TypoDef{ {u"ㅣ어"}, {u"ㅔ"}, 0.25f, CondVowel::boundary },
+			TypoDef{ {u"ㅣ어"}, {u"ㅖ"}, 0.5f, CondVowel::boundary },
+		}.copyWithDialectOverriding(Dialect::hamgyeong | Dialect::gyeongsang | Dialect::gangwon) | TypoTransformer{
+			TypoDef{ {u"ㅣ었"}, {u"ㅣᆻ"}, 0.25f, CondVowel::boundary },
+		}.copyWithDialectOverriding(Dialect::gyeongsang);
 
 		switch (set)
 		{
