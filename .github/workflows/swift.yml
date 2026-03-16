@@ -14,6 +14,8 @@ on:
       - 'bindings/swift/**'
       - 'include/kiwi/capi.h'
       - 'include/kiwi/Macro.h'
+    tags:
+      - 'v*'
 
 jobs:
   swift-build-test:
