@@ -319,20 +319,28 @@ jobs:
   build-emscripten:
     name: Emscripten
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
     - uses: actions/checkout@v3
       with:
         submodules: true
         lfs: true
     - uses: mymindstorm/setup-emsdk@v14
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        registry-url: 'https://registry.npmjs.org'
     - name: Build
       run: |
         cd bindings/wasm
         ./build.sh
-    - uses: JS-DevTools/npm-publish@v3
-      with:
-        token: ${{ secrets.NPM_TOKEN }}
-        package: bindings/wasm/package
+    - name: Publish to npm
+      run: |
+        npm install -g npm@latest
+        cd bindings/wasm/package
+        npm publish --provenance --access public
     - name: Build documenation
       run: |
         cd bindings/wasm/package

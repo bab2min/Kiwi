@@ -21,6 +21,10 @@
         "url": "https://github.com/bab2min/Kiwi/issues"
     },
     "homepage": "https://lab.bab2min.pe.kr/kiwi",
+    "publishConfig": {
+        "provenance": true,
+        "access": "public"
+    },
     "devDependencies": {
         "@types/node": "^20.0.0",
         "typedoc": "^0.26.2",
