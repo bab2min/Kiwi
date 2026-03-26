@@ -3,7 +3,11 @@
 #include <cstring>
 
 #ifdef USE_VNNI
+#ifdef _MSC_VER
+#define DPBUSD _mm256_dpbusd_avx_epi32
+#else
 #define DPBUSD _mm256_dpbusd_epi32
+#endif
 #define DETAIL detailVnni
 #else
 #define DPBUSD emulated_dpbusd
