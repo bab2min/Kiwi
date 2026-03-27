@@ -622,7 +622,11 @@ namespace kiwi
                 {
                     pa = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&a[i]));
                     pb = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&b[i]));
+#ifdef _MSC_VER
+                    acc = _mm256_dpbusd_avx_epi32(acc, pa, pb);
+#else
                     acc = _mm256_dpbusd_epi32(acc, pa, pb);
+#endif
                 }
 				// reduce sum of eight int32_t to one int32_t
 				__m256i sum = _mm256_hadd_epi32(acc, acc);

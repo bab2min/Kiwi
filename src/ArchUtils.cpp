@@ -15,7 +15,7 @@ ArchType kiwi::getBestArch()
 	if (cpuinfo_has_x86_avx512vnni()) return ArchType::avx512vnni;
 	if (cpuinfo_has_x86_avx512bw()) return ArchType::avx512bw;
 #ifdef KIWI_AVX_VNNI_SUPPORTED
-	if (cpuinfo_has_x86_avx_vnni_int8()) return ArchType::avx_vnni;
+	if (cpuinfo_has_x86_avxvnni()) return ArchType::avx_vnni;
 #endif
 	if (cpuinfo_has_x86_avx2()) return ArchType::avx2;
 	if (cpuinfo_has_x86_sse4_1()) return ArchType::sse4_1;
