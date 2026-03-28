@@ -1,5 +1,6 @@
-﻿#include <iostream>
+#include <iostream>
 #include <fstream>
+#include <cstring>
 #include "PathEvaluator.hpp"
 #include "Joiner.hpp"
 #include "Kiwi.hpp"
@@ -13,6 +14,18 @@ using namespace std;
 
 namespace kiwi
 {
+	static inline void convertQuantContextU8ToS8(const uint8_t* src, size_t dim, int8_t* dst)
+	{
+		// Quantized context embedding layout: [dim bytes of quantized values][float scale]
+		for (size_t i = 0; i < dim; ++i) dst[i] = static_cast<int8_t>(src[i] ^ 0x80);
+		std::memcpy(dst + dim, src + dim, sizeof(float));
+	}
+
+	static constexpr inline size_t quantContextStride(size_t dim)
+	{
+		return dim + sizeof(float);
+	}
+
 	template<size_t windowSize, ArchType arch, class VocabTy, class VlVocabTy, bool quantized>
 	struct MorphemeEvaluator<lm::CoNgramState<windowSize, arch, VocabTy, VlVocabTy, quantized>>
 	{
@@ -2554,9 +2567,15 @@ namespace kiwi
 			float* scores = resultBuf.data() + header.vocabSize;
 			if constexpr (quantized)
 			{
-				qgemm::gemv<arch>(
+				const size_t qStride = quantContextStride(header.dim);
+				thread_local Vector<int8_t> ctxS8Buf;
+				ctxS8Buf.resize(qStride);
+				auto* ctxS8 = ctxS8Buf.data();
+				convertQuantContextU8ToS8(getContextQuantEmb(contextId), header.dim, ctxS8);
+
+				qgemm::gemvS8S8<arch>(
 					header.vocabSize, header.dim,
-					getContextQuantEmb(contextId),
+					ctxS8,
 					getOutputQuantEmb(0), outputEmbStride(),
 					scores
 				);
@@ -2606,15 +2625,23 @@ namespace kiwi
 			float* scores = resultBuf.data() + header.vocabSize;
 			if constexpr (quantized)
 			{
-				qgemm::gemv<arch>(
+				const size_t qStride = quantContextStride(header.dim);
+				thread_local Vector<int8_t> ctxS8Buf;
+				ctxS8Buf.resize(qStride * 2);
+				auto* bgCtxS8 = ctxS8Buf.data();
+				auto* ctxS8 = bgCtxS8 + qStride;
+				convertQuantContextU8ToS8(getContextQuantEmb(bgContextId), header.dim, bgCtxS8);
+				convertQuantContextU8ToS8(getContextQuantEmb(contextId), header.dim, ctxS8);
+
+				qgemm::gemvS8S8<arch>(
 					header.vocabSize, header.dim,
-					getContextQuantEmb(bgContextId),
+					bgCtxS8,
 					getOutputQuantEmb(0), outputEmbStride(),
 					resultBuf.data()
 				);
-				qgemm::gemv<arch>(
+				qgemm::gemvS8S8<arch>(
 					header.vocabSize, header.dim,
-					getContextQuantEmb(contextId),
+					ctxS8,
 					getOutputQuantEmb(0), outputEmbStride(),
 					scores
 				);
