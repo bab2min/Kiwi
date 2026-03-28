@@ -51,9 +51,7 @@ namespace kiwi
 			const uint8_t* alignedKeyValueData = nullptr;
 			std::unique_ptr<int32_t[]> allRootValueData;
 			std::unique_ptr<uint8_t[]> allEmbs;
-			std::unique_ptr<int8_t[]> contextEmbsS8;
-			const uint8_t* contextEmbPtr = nullptr; // [numContexts, (dim + scale? + bias + confid + vts)]
-			const int8_t* contextEmbS8Ptr = nullptr; // [numContexts, (dim + scale)] for NEON quantized gemvS8S8
+			const uint8_t* contextEmbPtr = nullptr; // [numContexts, (dim + scale? + bias + confid + vts)] (quantized NEON: dim stores S8 values)
 			const uint8_t* outputEmbPtr = nullptr; // [numOutputs, (dim + scale? + sum?)]
 			const uint8_t* distantEmbPtr = nullptr; // [numOutputs, (dim + scale? + bias + confid + pad?)]
 			const float* positionConfidPtr = nullptr;
@@ -118,7 +116,7 @@ namespace kiwi
 
 			inline const int8_t* getContextQuantEmbS8(size_t idx) const
 			{
-				return contextEmbS8Ptr + idx * (header.dim + sizeof(float));
+				return reinterpret_cast<const int8_t*>(contextEmbPtr + idx * contextEmbStride());
 			}
 
 			inline float getContextBias(uint32_t idx) const

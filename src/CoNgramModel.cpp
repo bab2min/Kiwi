@@ -628,7 +628,8 @@ namespace kiwi
 				if constexpr (quantized)
 				{
 					float scale;
-					eptr += requantizePackedInts<arch>(optr, scale, eptr, header.dim, header.qbit, header.qgroup, true);
+					const bool toUint8 = arch != ArchType::neon;
+					eptr += requantizePackedInts<arch>(optr, scale, eptr, header.dim, header.qbit, header.qgroup, toUint8);
 					optr += header.dim;
 					*reinterpret_cast<float*>(optr) = scale;
 					optr += sizeof(float);
@@ -680,11 +681,22 @@ namespace kiwi
 
 			if constexpr (quantized)
 			{
-				qgemm::invNormU8<arch>(
-					header.contextSize, header.dim,
-					getContextQuantEmb(0), contextEmbStride(),
-					const_cast<float*>(invNormContextPtr)
-				);
+				if constexpr (arch == ArchType::neon)
+				{
+					qgemm::invNormS8<arch>(
+						header.contextSize, header.dim,
+						getContextQuantEmbS8(0), contextEmbStride(),
+						const_cast<float*>(invNormContextPtr)
+					);
+				}
+				else
+				{
+					qgemm::invNormU8<arch>(
+						header.contextSize, header.dim,
+						getContextQuantEmb(0), contextEmbStride(),
+						const_cast<float*>(invNormContextPtr)
+					);
+				}
 				qgemm::invNormS8<arch>(
 					header.vocabSize, header.dim,
 					getOutputQuantEmb(0), outputEmbStride(),
@@ -774,24 +786,6 @@ namespace kiwi
 				}
 			}
 
-			if constexpr (quantized && arch == ArchType::neon)
-			{
-				const size_t s8Stride = header.dim + sizeof(float);
-				if (s8Stride == 0 || header.contextSize > std::numeric_limits<size_t>::max() / s8Stride)
-				{
-					throw std::runtime_error{ "Too large context embedding size" };
-				}
-				contextEmbsS8 = std::make_unique<int8_t[]>(header.contextSize * s8Stride);
-				auto* dst = contextEmbsS8.get();
-				for (size_t i = 0; i < header.contextSize; ++i)
-				{
-					const auto* src = getContextQuantEmb(i);
-					for (size_t j = 0; j < header.dim; ++j) dst[j] = static_cast<int8_t>(src[j] ^ 0x80);
-					std::memcpy(dst + header.dim, src + header.dim, sizeof(float));
-					dst += s8Stride;
-				}
-				contextEmbS8Ptr = contextEmbsS8.get();
-			}
 		}
 
 		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized>
@@ -877,12 +871,26 @@ namespace kiwi
 				{
 					const auto* contextPtr = getContextQuantEmb(unpackedContextId);
 					const auto* outputPtr = getOutputQuantEmb(next);
-					int32_t acc = qgemm::dotprod<arch>(contextPtr, outputPtr, header.dim);
-					const float contextScale = *reinterpret_cast<const float*>(contextPtr + header.dim),
-						outputScale = *reinterpret_cast<const float*>(outputPtr + header.dim),
+					int32_t acc;
+					float contextScale;
+					float outputScale = *reinterpret_cast<const float*>(outputPtr + header.dim);
+					float contextBias;
+					if constexpr (arch == ArchType::neon)
+					{
+						const auto* contextPtrS8 = getContextQuantEmbS8(unpackedContextId);
+						const auto* contextRaw = reinterpret_cast<const uint8_t*>(contextPtrS8);
+						acc = static_cast<int32_t>(qgemm::dotS8S8<arch>(header.dim, contextPtrS8, outputPtr));
+						contextScale = *reinterpret_cast<const float*>(contextRaw + header.dim);
+						contextBias = *reinterpret_cast<const float*>(contextRaw + header.dim + sizeof(float));
+					}
+					else
+					{
+						acc = qgemm::dotprod<arch>(contextPtr, outputPtr, header.dim);
+						contextScale = *reinterpret_cast<const float*>(contextPtr + header.dim);
 						contextBias = *reinterpret_cast<const float*>(contextPtr + header.dim + sizeof(float));
-					const int32_t hsum = *reinterpret_cast<const int32_t*>(outputPtr + header.dim + sizeof(float));
-					acc -= hsum;
+						const int32_t hsum = *reinterpret_cast<const int32_t*>(outputPtr + header.dim + sizeof(float));
+						acc -= hsum;
+					}
 					ll = acc * contextScale * outputScale + contextBias;
 					if (outputEmbBiasPtr) ll += outputEmbBiasPtr[next];
 				}
@@ -2495,11 +2503,24 @@ namespace kiwi
 
 			if constexpr (quantized)
 			{
-				qgemm::gemvU8U8<arch>(
-					header.contextSize, header.dim,
-					getContextQuantEmb(contextId),
-					getContextQuantEmb(0), contextEmbStride(),
-					scores);
+				if constexpr (arch == ArchType::neon)
+				{
+					qgemm::gemvS8S8<arch>(
+						header.contextSize, header.dim,
+						getContextQuantEmbS8(contextId),
+						getContextQuantEmbS8(0), contextEmbStride(),
+						scores
+					);
+				}
+				else
+				{
+					qgemm::gemvU8U8<arch>(
+						header.contextSize, header.dim,
+						getContextQuantEmb(contextId),
+						getContextQuantEmb(0), contextEmbStride(),
+						scores
+					);
+				}
 			}
 			else
 			{
@@ -2546,10 +2567,20 @@ namespace kiwi
 			float result = 0;
 			if constexpr (quantized)
 			{
-				result = qgemm::dotU8U8<arch>(
-					header.dim,
-					getContextQuantEmb(contextId1), getContextQuantEmb(contextId2)
-				);
+				if constexpr (arch == ArchType::neon)
+				{
+					result = qgemm::dotS8S8<arch>(
+						header.dim,
+						getContextQuantEmbS8(contextId1), getContextQuantEmbS8(contextId2)
+					);
+				}
+				else
+				{
+					result = qgemm::dotU8U8<arch>(
+						header.dim,
+						getContextQuantEmb(contextId1), getContextQuantEmb(contextId2)
+					);
+				}
 			}
 			else
 			{
