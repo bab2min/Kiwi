@@ -61,12 +61,23 @@ namespace kiwi
 				{
 					const auto* aPtr = aBuffer + i * (k + 8);
 					const auto* bPtr = bBuffer + j * (k + 8);
-					int32_t acc = op.dotprod(aPtr, bPtr, k);
-					const float contextScale = *reinterpret_cast<const float*>(aPtr + k),
-						outputScale = *reinterpret_cast<const float*>(bPtr + k),
+					float contextBias;
+					if constexpr (archType == ArchType::neon)
+					{
+						const auto* aPtrS8 = reinterpret_cast<const int8_t*>(aPtr);
+						const float score = dotS8S8<archType>(k, aPtrS8, bPtr);
 						contextBias = *reinterpret_cast<const float*>(aPtr + k + 4);
-					const int32_t hsum = *reinterpret_cast<const int32_t*>(bPtr + k + 4);
-					c[i * ldc + j] = (acc - hsum) * contextScale * outputScale + contextBias;
+						c[i * ldc + j] = score + contextBias;
+					}
+					else
+					{
+						const int32_t acc = op.dotprod(aPtr, bPtr, k);
+						const float contextScale = *reinterpret_cast<const float*>(aPtr + k);
+						const float outputScale = *reinterpret_cast<const float*>(bPtr + k);
+						contextBias = *reinterpret_cast<const float*>(aPtr + k + 4);
+						const int32_t hsum = *reinterpret_cast<const int32_t*>(bPtr + k + 4);
+						c[i * ldc + j] = (acc - hsum) * contextScale * outputScale + contextBias;
+					}
 				}
 			}
 		}
