@@ -111,12 +111,12 @@ namespace kiwi
 				return reinterpret_cast<const float*>(contextEmbPtr + idx * contextEmbStride());
 			}
 
-			inline const uint8_t* getContextQuantEmb(uint32_t idx) const
+			inline const uint8_t* getContextQuantEmb(size_t idx) const
 			{
 				return contextEmbPtr + idx * contextEmbStride();
 			}
 
-			inline const int8_t* getContextQuantEmbS8(uint32_t idx) const
+			inline const int8_t* getContextQuantEmbS8(size_t idx) const
 			{
 				return contextEmbS8Ptr + idx * (header.dim + sizeof(float));
 			}

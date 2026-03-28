@@ -777,7 +777,7 @@ namespace kiwi
 			if constexpr (quantized && arch == ArchType::neon)
 			{
 				const size_t s8Stride = header.dim + sizeof(float);
-				if (header.contextSize > std::numeric_limits<size_t>::max() / s8Stride)
+				if (s8Stride == 0 || header.contextSize > std::numeric_limits<size_t>::max() / s8Stride)
 				{
 					throw std::runtime_error{ "Too large context embedding size" };
 				}
@@ -785,7 +785,7 @@ namespace kiwi
 				auto* dst = contextEmbsS8.get();
 				for (size_t i = 0; i < header.contextSize; ++i)
 				{
-					const auto* src = getContextQuantEmb((uint32_t)i);
+					const auto* src = getContextQuantEmb(i);
 					for (size_t j = 0; j < header.dim; ++j) dst[j] = static_cast<int8_t>(src[j] ^ 0x80);
 					std::memcpy(dst + header.dim, src + header.dim, sizeof(float));
 					dst += s8Stride;
