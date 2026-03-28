@@ -816,11 +816,22 @@ namespace kiwi
 						contextIdcs[i + 1] = (historyToken ? historyToken : 0) + header.contextSize;
 					}
 					logSoftmax<arch>(lls, windowSize + 1);
-					qgemm::scatteredGEMMOpt<arch>(
-						1 + windowSize, 1, header.dim,
-						getContextQuantEmb(0), contextIdcs, contextEmbStride(),
-						getOutputQuantEmb(0), nextIdx, outputEmbStride(),
-						&lls[1 + windowSize], 1);
+					if constexpr (arch == ArchType::neon)
+					{
+						qgemm::scatteredGEMMOpt<arch>(
+							1 + windowSize, 1, header.dim,
+							reinterpret_cast<const uint8_t*>(getContextQuantEmbS8(0)), contextIdcs, contextEmbStride(),
+							getOutputQuantEmb(0), nextIdx, outputEmbStride(),
+							&lls[1 + windowSize], 1);
+					}
+					else
+					{
+						qgemm::scatteredGEMMOpt<arch>(
+							1 + windowSize, 1, header.dim,
+							getContextQuantEmb(0), contextIdcs, contextEmbStride(),
+							getOutputQuantEmb(0), nextIdx, outputEmbStride(),
+							&lls[1 + windowSize], 1);
+					}
 					for (size_t i = 0; i < 1 + windowSize; ++i)
 					{
 						lls[i] += lls[i + 1 + windowSize];
@@ -1214,11 +1225,22 @@ namespace kiwi
 
 			if constexpr (quantized)
 			{
-				qgemm::scatteredGEMMOpt<arch>(
-					uniqInputSize + uniqHistorySize, uniqOutputSize, header.dim,
-					getContextQuantEmb(0), tls.contextIdcs2.data(), contextEmbStride(),
-					getOutputQuantEmb(0), tls.nextIdcs2.data(), outputEmbStride(),
-					tls.resultBuf.data(), uniqOutputSize);
+				if constexpr (arch == ArchType::neon)
+				{
+					qgemm::scatteredGEMMOpt<arch>(
+						uniqInputSize + uniqHistorySize, uniqOutputSize, header.dim,
+						reinterpret_cast<const uint8_t*>(getContextQuantEmbS8(0)), tls.contextIdcs2.data(), contextEmbStride(),
+						getOutputQuantEmb(0), tls.nextIdcs2.data(), outputEmbStride(),
+						tls.resultBuf.data(), uniqOutputSize);
+				}
+				else
+				{
+					qgemm::scatteredGEMMOpt<arch>(
+						uniqInputSize + uniqHistorySize, uniqOutputSize, header.dim,
+						getContextQuantEmb(0), tls.contextIdcs2.data(), contextEmbStride(),
+						getOutputQuantEmb(0), tls.nextIdcs2.data(), outputEmbStride(),
+						tls.resultBuf.data(), uniqOutputSize);
+				}
 			}
 			else
 			{
@@ -1381,11 +1403,22 @@ namespace kiwi
 
 			if constexpr (quantized)
 			{
-				qgemm::scatteredGEMMOpt<arch>(
-					prevStateSize + uniqHistorySize, nextIdSize, header.dim,
-					getContextQuantEmb(0), tls.contextIdcs2.data(), contextEmbStride(),
-					getOutputQuantEmb(0), tls.nextIdcs2.data(), outputEmbStride(),
-					tls.resultBuf.data(), nextIdSize);
+				if constexpr (arch == ArchType::neon)
+				{
+					qgemm::scatteredGEMMOpt<arch>(
+						prevStateSize + uniqHistorySize, nextIdSize, header.dim,
+						reinterpret_cast<const uint8_t*>(getContextQuantEmbS8(0)), tls.contextIdcs2.data(), contextEmbStride(),
+						getOutputQuantEmb(0), tls.nextIdcs2.data(), outputEmbStride(),
+						tls.resultBuf.data(), nextIdSize);
+				}
+				else
+				{
+					qgemm::scatteredGEMMOpt<arch>(
+						prevStateSize + uniqHistorySize, nextIdSize, header.dim,
+						getContextQuantEmb(0), tls.contextIdcs2.data(), contextEmbStride(),
+						getOutputQuantEmb(0), tls.nextIdcs2.data(), outputEmbStride(),
+						tls.resultBuf.data(), nextIdSize);
+				}
 			}
 			else
 			{
@@ -1571,11 +1604,22 @@ namespace kiwi
 			Eigen::Map<Eigen::MatrixXf> resultMap{ resultBuf.data(), (Eigen::Index)uniqOutputSize, (Eigen::Index)uniqInputSize };
 			if constexpr (quantized)
 			{
-				qgemm::scatteredGEMMOpt<arch>(
-					uniqInputSize, uniqOutputSize, header.dim,
-					getContextQuantEmb(0), contextIdcs2.data(), contextEmbStride(),
-					getOutputQuantEmb(0), nextIdcs2.data(), outputEmbStride(),
-					resultBuf.data(), uniqOutputSize);
+				if constexpr (arch == ArchType::neon)
+				{
+					qgemm::scatteredGEMMOpt<arch>(
+						uniqInputSize, uniqOutputSize, header.dim,
+						reinterpret_cast<const uint8_t*>(getContextQuantEmbS8(0)), contextIdcs2.data(), contextEmbStride(),
+						getOutputQuantEmb(0), nextIdcs2.data(), outputEmbStride(),
+						resultBuf.data(), uniqOutputSize);
+				}
+				else
+				{
+					qgemm::scatteredGEMMOpt<arch>(
+						uniqInputSize, uniqOutputSize, header.dim,
+						getContextQuantEmb(0), contextIdcs2.data(), contextEmbStride(),
+						getOutputQuantEmb(0), nextIdcs2.data(), outputEmbStride(),
+						resultBuf.data(), uniqOutputSize);
+				}
 			}
 			else
 			{
