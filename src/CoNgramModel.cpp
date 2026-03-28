@@ -871,27 +871,25 @@ namespace kiwi
 				{
 					const auto* contextPtr = getContextQuantEmb(unpackedContextId);
 					const auto* outputPtr = getOutputQuantEmb(next);
-					int32_t acc;
-					float contextScale;
-					float outputScale = *reinterpret_cast<const float*>(outputPtr + header.dim);
 					float contextBias;
 					if constexpr (arch == ArchType::neon)
 					{
 						const auto* contextPtrS8 = getContextQuantEmbS8(unpackedContextId);
 						const auto* contextRaw = reinterpret_cast<const uint8_t*>(contextPtrS8);
-						acc = static_cast<int32_t>(qgemm::dotS8S8<arch>(header.dim, contextPtrS8, outputPtr));
-						contextScale = *reinterpret_cast<const float*>(contextRaw + header.dim);
+						const float score = qgemm::dotS8S8<arch>(header.dim, contextPtrS8, outputPtr);
 						contextBias = *reinterpret_cast<const float*>(contextRaw + header.dim + sizeof(float));
+						ll = score + contextBias;
 					}
 					else
 					{
-						acc = qgemm::dotprod<arch>(contextPtr, outputPtr, header.dim);
-						contextScale = *reinterpret_cast<const float*>(contextPtr + header.dim);
+						int32_t acc = qgemm::dotprod<arch>(contextPtr, outputPtr, header.dim);
+						const float contextScale = *reinterpret_cast<const float*>(contextPtr + header.dim);
+						const float outputScale = *reinterpret_cast<const float*>(outputPtr + header.dim);
 						contextBias = *reinterpret_cast<const float*>(contextPtr + header.dim + sizeof(float));
 						const int32_t hsum = *reinterpret_cast<const int32_t*>(outputPtr + header.dim + sizeof(float));
 						acc -= hsum;
+						ll = acc * contextScale * outputScale + contextBias;
 					}
-					ll = acc * contextScale * outputScale + contextBias;
 					if (outputEmbBiasPtr) ll += outputEmbBiasPtr[next];
 				}
 				else
