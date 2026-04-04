@@ -11,7 +11,7 @@ digraph "include/kiwi/Types.h"
   Node3 [id="Node000003",label="include/kiwi/Kiwi.h",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$Kiwi_8h.html",tooltip="Kiwi C++ API를 담고 있는 헤더 파일"];
   Node1 -> Node3 [id="edge3_Node000001_Node000003",dir="back",color="steelblue1",style="solid",tooltip=" "];
   Node1 -> Node4 [id="edge4_Node000001_Node000004",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node4 [id="Node000004",label="include/kiwi/SwTokenizer.h",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$SwTokenizer_8h.html",tooltip="Subword Tokenizer."];
+  Node4 [id="Node000004",label="include/kiwi/SwTokenizer.h",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$SwTokenizer_8h.html",tooltip="형태소 기반의 Subword Tokenizer의 인터페이스를 담고 있는 헤더 파일"];
   Node1 -> Node5 [id="edge5_Node000001_Node000005",dir="back",color="steelblue1",style="solid",tooltip=" "];
   Node5 [id="Node000005",label="include/kiwi/TypoTransformer.h",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$TypoTransformer_8h.html",tooltip="오타 교정에 사용되는 TypoTransformer 및 관련 클래스들을 정의합니다."];
   Node5 -> Node3 [id="edge6_Node000005_Node000003",dir="back",color="steelblue1",style="solid",tooltip=" "];
