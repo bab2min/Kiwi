@@ -22,17 +22,17 @@ TestInitializer _global_initializer;
 
 using namespace kiwi;
 
-inline testing::AssertionResult testTokenization(Kiwi& kiwi, const std::u16string& s)
+inline testing::AssertionResult testTokenization(Kiwi& kiwi, const std::u16string& s, AnalyzeOption option)
 {
-	auto tokens = kiwi.analyze(s, Match::all).first;
-	if (tokens.empty()) return testing::AssertionFailure() << "kiwi.analyze(" << testing::PrintToString(s) << ") yields an empty result.";
+	auto tokens = kiwi.analyze(s, option).first;
+	if (tokens.empty()) return testing::AssertionFailure() << "kiwi.analyze(" << utf16To8(s) << ") yields an empty result.";
 	if (tokens.back().position + tokens.back().length == s.size())
 	{
 		return testing::AssertionSuccess();
 	}
 	else
 	{
-		return testing::AssertionFailure() << "the result of kiwi.analyze(" << testing::PrintToString(s) << ") ends at " << (tokens.back().position + tokens.back().length);
+		return testing::AssertionFailure() << "the result of kiwi.analyze(" << utf16To8(s) << ") ends at " << (tokens.back().position + tokens.back().length);
 	}
 }
 
@@ -237,7 +237,17 @@ TEST(KiwiCpp, EmptyResult)
 	};
 	for (auto s : testCases)
 	{
-		EXPECT_TRUE(testTokenization(kiwi, s));
+		EXPECT_TRUE(testTokenization(kiwi, s, Match::all));
+	}
+
+	AnalyzeOption option = Match::allWithNormalizing | Match::oovChrFreqModel | Match::mergeSaisiot;
+	option.typoTransformer = getDefaultPreparedTypoSet(DefaultTypoSet::basicTypoSetWithContinualAndLengthening);
+	auto testCases2 = {
+		u"해물톳짜장 나왔습니당 쫄깃한 면발 위에 듬뿍 얹어진 톳 그 위에 방풍나물 마라도 짜장면 맛집 인정!",
+	};
+	for (auto s : testCases2)
+	{
+		EXPECT_TRUE(testTokenization(kiwi, s, option));
 	}
 }
 
