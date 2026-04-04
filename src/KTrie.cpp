@@ -900,7 +900,7 @@ public:
 		return any_of(out.begin() + scanStart, out.begin() + scanEnd, [&](const KGraphNode& g)
 		{
 			const size_t startPos = g.endPos - ((g.uform.empty() ? g.form->sizeWithoutSpace() : g.uform.size()) << posMultiplierBit);
-			return g.endPos == multipliedEndPos && startPos == multipliedStartPos && g.typoCost == 0;
+			return g.endPos == multipliedEndPos && startPos == multipliedStartPos && g.typoCost == 0 && (!g.form || g.form->hasAnyFullMorphemes);
 		});
 	}
 

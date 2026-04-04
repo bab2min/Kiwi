@@ -106,7 +106,9 @@ namespace kiwi
 		}
 		ret.zCodaAppendable = zCodaAppendable ? 1 : 0;
 		ret.zSiotAppendable = zSiotAppendable ? 1 : 0;
+		// 다음 값들은 KiwiBuilder::build에서 채워 넣는다
 		ret.hasJClass = 0;
+		ret.hasAnyFullMorphemes = 0;
 		return ret;
 	}
 

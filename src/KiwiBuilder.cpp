@@ -2491,6 +2491,12 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 			return isJClass(m->tag) || m->tag == POSTag::ec || m->tag == POSTag::ef;
 		});
 
+		f.hasAnyFullMorphemes = any_of(f.candidate.begin(), f.candidate.end(), [&](const Morpheme* m)
+		{
+			const auto tag = clearIrregular(m->tag);
+			return m->dialect == Dialect::standard && tag != POSTag::unknown && tag != POSTag::pa && tag != POSTag::pv;
+		});
+
 		f.dialect = accumulate(f.candidate.begin(), f.candidate.end(), f.candidate[0]->dialect, reduceDialect);
 		if (f.dialect != Dialect::standard && !(enabledDialects & f.dialect))
 		{

@@ -239,7 +239,8 @@ namespace kiwi
 		uint8_t zCodaAppendable : 1;
 		uint8_t zSiotAppendable : 1;
 		uint8_t hasJClass : 1;
-		uint8_t _reserved : 5;
+		uint8_t hasAnyFullMorphemes : 1;
+		uint8_t _reserved : 4;
 		Dialect dialect = Dialect::standard;
 
 		Form();
