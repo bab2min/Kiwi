@@ -94,6 +94,7 @@ float UnkFormScorer::chrFreqBasedScore(const U16StringView& form) const
 			if (localContextFreq > 0)
 			{
 				const float curFreq = (float)substringCounter->count(rollingHash, form.data(), i + 1) - 1;
+				if (curFreq < 0) return -99999.f; // should not happen, but just in case
 				const float localContextFreqSat = tanhf(localContextFreq / localWeight) * localWeight;
 				const float localFreq = curFreq * (localContextFreqSat / localContextFreq);
 				const float globalFreq = globalContextFreqSat * expf(lprob);
