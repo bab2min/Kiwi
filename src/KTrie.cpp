@@ -775,6 +775,7 @@ public:
 		nextPretokenizedPattern = pretokenizedFirst;
 		lastPretokenizedPattern = pretokenizedLast;
 		size_t n = 0;
+		size_t continuousNonSpaceCount = 0;
 		POSTag lastChrType = POSTag::unknown;
 		for (; n < str.size(); ++n)
 		{
@@ -807,15 +808,24 @@ public:
 			}
 
 			const POSTag chrType = identifySpecialChr(c32);
+			if (chrType == POSTag::unknown)
+			{
+				continuousNonSpaceCount = 0;
+			}
+			else
+			{
+				continuousNonSpaceCount++;
+			}
+
 			// 문장 종결 지점이 나타나거나 Graph가 너무 길어지면 공백 문자에서 중단
-			if (chrType == POSTag::unknown && ((lastChrType == POSTag::sf && n >= 4) || n > 4096))
+			if (chrType == POSTag::unknown && n >= (lastChrType == POSTag::sf ? 4 : 4096))
 			{
 				if (!isSpace(str[n - 3]) && !isSpace(str[n - 2]))
 				{
 					break;
 				}
 			}
-			else if (n >= 8192)
+			else if (continuousNonSpaceCount >= 1024)
 			{
 				break;
 			}
