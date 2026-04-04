@@ -90,7 +90,7 @@ namespace kiwi
 		Kiwi::SpecialMorph curMorphSpecialType;
 		size_t curMorphSbType;
 		int curMorphSbOrder;
-		bool vowelE, infJ, badPairOfL, positiveE, contractableE;
+		bool vowelE, infJ, badPairOfL, positiveE, contractableE, snEndswithPoint;
 		CondPolarity condP;
 
 		RuleBasedScorer(const Kiwi* kw, const Morpheme* curMorph, const KGraphNode* node)
@@ -103,6 +103,7 @@ namespace kiwi
 			badPairOfL{ isBadPairOfVerbL(curMorph) },
 			positiveE{ isEClass(curMorph->tag) && node->form && node->form->form[0] == u'아' },
 			contractableE{ isEClass(curMorph->tag) && curMorph->kform && !curMorph->kform->empty() && (*curMorph->kform)[0] == u'어' },
+			snEndswithPoint{ curMorph->tag == POSTag::sn && !node->uform.empty() && node->uform.back() == u'.'},
 			condP{ curMorph->polar }
 		{
 		}
@@ -170,6 +171,12 @@ namespace kiwi
 			if (curMorphSbType && prevSpState.bulletHash == hashSbTypeOrder(curMorphSbType, curMorphSbOrder))
 			{
 				accScore += 3;
+			}
+
+			// discount for SN ending with point at beginning of sentence
+			if (snEndswithPoint && prevMorpheme->tag == POSTag::unknown)
+			{
+				accScore -= 5;
 			}
 
 			return accScore;
