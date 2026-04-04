@@ -1245,6 +1245,7 @@ public:
 				};
 
 				const size_t prevLengtheningSize = lengtheningTypoNodes.size();
+				static constexpr size_t maxLengtheningSize = 8;
 				if (prevChr && isHangulSyllable(prevChr) &&
 					(u'아' <= c && c < u'자') && lengtheningVowelTable[extractVowel(prevChr)] == extractVowel(c))
 				{
@@ -1252,7 +1253,10 @@ public:
 					for (size_t i = 0; i < prevLengtheningSize; ++i)
 					{
 						auto& node = lengtheningTypoNodes[i];
-						lengtheningTypoNodes.emplace_back(node.first + 1, node.second);
+						if (node.first < maxLengtheningSize)
+						{
+							lengtheningTypoNodes.emplace_back(node.first + 1, node.second);
+						}
 					}
 				}
 
