@@ -2142,3 +2142,19 @@ TEST(KiwiCpp, Issue231)
 	EXPECT_EQ(tokens.size(), 1);
 	EXPECT_EQ(tokens[0].str, u"숫");
 }
+
+TEST(KiwiCpp, Issue246)
+{
+	auto& kiwi = reuseKiwiInstance();
+	for (auto s : {
+		u"1. 분석",
+		u"1. 해야 하는 일",
+		u"1. 해야 하는 업무",
+		u"1. 수학적 증명",
+		u"1. Dataset"
+	})
+	{
+		auto res = kiwi.analyze(s, 5, Match::allWithNormalizing);
+		EXPECT_EQ(res[0].first[0].tag, POSTag::sb) << " for input: " << utf16To8(s);
+	}
+}
