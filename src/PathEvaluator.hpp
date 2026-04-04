@@ -174,7 +174,7 @@ namespace kiwi
 			}
 
 			// discount for SN ending with point at beginning of sentence
-			if (snEndswithPoint && prevMorpheme->tag == POSTag::unknown)
+			if (snEndswithPoint && (prevMorpheme->tag == POSTag::unknown || prevMorpheme->tag == POSTag::ef || prevMorpheme->tag == POSTag::sf))
 			{
 				accScore -= 5;
 			}
