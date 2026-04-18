@@ -201,6 +201,7 @@ namespace kiwi
 		const float score,
 		const float firstChunkScore,
 		const KGraphNode* node,
+		const WordLL<LmState>* base,
 		const WordLL<LmState>& prevPath,
 		const RuleBasedScorer& ruleBasedScorer,
 		const float dialectCost
@@ -232,9 +233,7 @@ namespace kiwi
 			bestPathCont.insert(topN, prevPath.rootId, rootId, curMorph, 
 				candScoreWithRule - curDialectCost,
 				firstChunkScoreWithRule - curDialectCost,
-				prevPath.accTypoCost + node->typoCost, 
-				prevPath.accDialectCost + curDialectCost,
-				&prevPath, move(state), spState);
+				base, &prevPath - base, move(state), spState);
 		};
 
 		if ((ruleBasedScorer.curMorphSbType || isQuote(ruleBasedScorer.curMorphSpecialType)) && prevPath.rootId == commonRootId)
@@ -328,19 +327,22 @@ namespace kiwi
 		const KiwiConfig& config;
 		const KGraphNode* startNode;
 		const size_t topN;
-		Vector<Vector<WordLL<LmState>>>& cache;
+		Vector<WordLL<LmState>>& pathes;
+		Vector<size_t>& pathIndices;
 		const Vector<U16StringView>& ownFormList;
 		const Vector<SpecialState>& prevSpStates;
 
-		PathEvaluator(const Kiwi* _kw, 
+		PathEvaluator(const Kiwi* _kw,
 			const KiwiConfig& _config,
-			const KGraphNode* _startNode,  
-			size_t _topN, 
-			Vector<Vector<WordLL<LmState>>>& _cache, 
+			const KGraphNode* _startNode,
+			size_t _topN,
+			Vector<WordLL<LmState>>& _pathes,
+			Vector<size_t>& _pathIndices,
 			const Vector<U16StringView>& _ownFormList,
 			const Vector<SpecialState>& _prevSpStates
 		)
-			: kw{ _kw }, config{ _config }, startNode{_startNode}, topN{_topN}, cache{_cache}, ownFormList{_ownFormList}, prevSpStates{_prevSpStates}
+			: kw{ _kw }, config{ _config }, startNode{ _startNode }, topN{ _topN },
+			pathes{ _pathes }, pathIndices{ _pathIndices }, ownFormList{ _ownFormList }, prevSpStates{ _prevSpStates }
 		{
 		}
 
@@ -360,9 +362,8 @@ namespace kiwi
 		{
 			const size_t langVocabSize = kw->langMdl->vocabSize();
 			auto* const node = startNode + nodeIdx;
-			auto& nCache = cache[nodeIdx];
-			Vector<WordLL<LmState>> refCache;
-
+			const size_t prevPathSize = pathes.size();
+			
 			float whitespaceDiscount = 0;
 			if (node->uform.empty() && !node->form->form.empty() && node->spaceErrors)
 			{
@@ -374,7 +375,7 @@ namespace kiwi
 			size_t totalPrevPathes = 0;
 			for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
 			{
-				totalPrevPathes += cache[prev - startNode].size();
+				totalPrevPathes += pathIndices[prev - startNode + 1] - pathIndices[prev - startNode];
 			}
 
 			for (bool ignoreCond : {false, true})
@@ -390,15 +391,14 @@ namespace kiwi
 					{
 						for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
 						{
-							for (auto& p : cache[prev - startNode])
+							for (size_t p = pathIndices[prev - startNode]; p < pathIndices[prev - startNode + 1]; ++p)
 							{
-								auto lastTag = kw->morphemes[p.wid].tag;
+								auto lastTag = kw->morphemes[pathes[p].wid].tag;
 								if (!isJClass(lastTag) && !isEClass(lastTag)) continue;
-								nCache.emplace_back(p);
-								auto& newPath = nCache.back();
+								pathes.emplace_back(pathes[p]);
+								auto& newPath = pathes.back();
 								newPath.accScore += curMorph->userScore * config.typoCostWeight;
-								newPath.accTypoCost -= curMorph->userScore;
-								newPath.parent = &p;
+								newPath.parent = p;
 								newPath.morpheme = &kw->morphemes[curMorph->lmMorphemeId];
 								newPath.wid = curMorph->lmMorphemeId;
 							}
@@ -415,15 +415,14 @@ namespace kiwi
 
 						for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
 						{
-							for (auto& p : cache[prev - startNode])
+							for (size_t p = pathIndices[prev - startNode]; p < pathIndices[prev - startNode + 1]; ++p)
 							{
-								auto lastTag = kw->morphemes[p.wid].tag;
+								auto lastTag = kw->morphemes[pathes[p].wid].tag;
 								if (!isNNClass(lastTag)) continue;
-								nCache.emplace_back(p);
-								auto& newPath = nCache.back();
+								pathes.emplace_back(pathes[p]);
+								auto& newPath = pathes.back();
 								newPath.accScore += curMorph->userScore * config.typoCostWeight;
-								newPath.accTypoCost -= curMorph->userScore;
-								newPath.parent = &p;
+								newPath.parent = p;
 								newPath.morpheme = &kw->morphemes[curMorph->lmMorphemeId];
 								newPath.wid = curMorph->lmMorphemeId;
 							}
@@ -449,27 +448,27 @@ namespace kiwi
 
 					if (topN > 1)
 					{
-						evalSingleMorpheme<PathEvaluatingMode::topN>(nCache, node, ownFormId,
+						evalSingleMorpheme<PathEvaluatingMode::topN>(pathes, node, ownFormId,
 							curMorph, ignoreCond ? -10 : 0, nodeLevelDiscount, dialectCost);
 					}
 					else if (totalPrevPathes <= BestPathContainerTraits<PathEvaluatingMode::top1Small>::maxSize)
 					{
-						evalSingleMorpheme<PathEvaluatingMode::top1Small>(nCache, node, ownFormId,
+						evalSingleMorpheme<PathEvaluatingMode::top1Small>(pathes, node, ownFormId,
 							curMorph, ignoreCond ? -10 : 0, nodeLevelDiscount, dialectCost);
 					}
 					else if (totalPrevPathes <= BestPathContainerTraits<PathEvaluatingMode::top1Medium>::maxSize)
 					{
-						evalSingleMorpheme<PathEvaluatingMode::top1Medium>(nCache, node, ownFormId,
+						evalSingleMorpheme<PathEvaluatingMode::top1Medium>(pathes, node, ownFormId,
 							curMorph, ignoreCond ? -10 : 0, nodeLevelDiscount, dialectCost);
 					}
 					else
 					{
-						evalSingleMorpheme<PathEvaluatingMode::top1>(nCache, node, ownFormId,
+						evalSingleMorpheme<PathEvaluatingMode::top1>(pathes, node, ownFormId,
 							curMorph, ignoreCond ? -10 : 0, nodeLevelDiscount, dialectCost);
 					}
 
 				}
-				if (!nCache.empty()) break;
+				if (pathes.size() > prevPathSize) break;
 			}
 
 			thread_local Vector<float> maxScores;
@@ -478,8 +477,9 @@ namespace kiwi
 
 			if (topN == 1)
 			{
-				for (auto& c : nCache)
+				for (size_t p = prevPathSize; p < pathes.size(); ++p)
 				{
+					auto& c = pathes[p];
 					if (c.morpheme->combineSocket) continue;
 					const auto rootId = c.rootId == commonRootId ? 0 : c.rootId + 1;
 					maxScores[rootId] = max(maxScores[rootId], c.accScore);
@@ -487,8 +487,9 @@ namespace kiwi
 			}
 			else
 			{
-				for (auto& c : nCache)
+				for (size_t p = prevPathSize; p < pathes.size(); ++p)
 				{
+					auto& c = pathes[p];
 					if (c.morpheme->combineSocket) continue;
 					const auto rootId = c.rootId == commonRootId ? 0 : c.rootId + 1;
 					if (c.accScore > maxScores[rootId * topN])
@@ -500,15 +501,17 @@ namespace kiwi
 				}
 			}
 
-			size_t validCount = 0;
-			for (size_t i = 0; i < nCache.size(); ++i)
+			size_t validPosition = prevPathSize;
+			for (size_t p = prevPathSize; p < pathes.size(); ++p)
 			{
-				const auto rootId = nCache[i].rootId == commonRootId ? 0 : nCache[i].rootId + 1;
-				if (nCache[i].accScore + config.cutOffThreshold < maxScores[rootId * topN]) continue;
-				if (validCount != i) nCache[validCount] = move(nCache[i]);
-				validCount++;
+				auto& c = pathes[p];
+				const auto rootId = c.rootId == commonRootId ? 0 : c.rootId + 1;
+				if (c.accScore + config.cutOffThreshold < maxScores[rootId * topN]) continue;
+				if (validPosition != p) pathes[validPosition] = move(c);
+				validPosition++;
 			}
-			nCache.resize(validCount);
+			pathes.resize(validPosition);
+			pathIndices[nodeIdx + 1] = pathes.size();
 		}
 
 		template<PathEvaluatingMode mode>
@@ -563,8 +566,9 @@ namespace kiwi
 
 			for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
 			{
-				for (auto& prevPath : cache[prev - startNode])
+				for (size_t p = pathIndices[prev - startNode]; p < pathIndices[prev - startNode + 1]; ++p)
 				{
+					auto& prevPath = pathes[p];
 					// 사이시옷 뒤에 명사가 아닌 태그가 오거나 공백이 있는 경우 제외
 					if (prevPath.morpheme->tag == POSTag::z_siot && (
 						!isNNClass(curMorph->tag) || prev->endPos < node->startPos
@@ -625,7 +629,7 @@ namespace kiwi
 					}
 
 					insertToPathContainer(bestPathCont, topN, prevSpStates, curMorph, morphBase, 
-						move(cLmState), candScore, firstChunkScore, node, prevPath, ruleBasedScorer, dialectCost);
+						move(cLmState), candScore, firstChunkScore, node, pathes.data(), prevPath, ruleBasedScorer, dialectCost);
 				continueFor:;
 				}
 			}
@@ -643,7 +647,8 @@ namespace kiwi
 			const Kiwi* kw,
 			const KiwiConfig& config,
 			const Vector<U16StringView>& ownForms,
-			const Vector<Vector<WordLL<LmState>>>& cache,
+			const Vector<WordLL<LmState>>& pathes,
+			const Vector<size_t>& pathIndices,
 			size_t ownFormId,
 			const Vector<const Morpheme*>& morphs,
 			const KGraphNode* node,
@@ -673,8 +678,9 @@ namespace kiwi
 			size_t length;
 			for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
 			{
-				for (auto& prevPath : cache[prev - startNode])
+				for (size_t p = pathIndices[prev - startNode]; p < pathIndices[prev - startNode + 1]; ++p)
 				{
+					auto& prevPath = pathes[p];
 					++prevId;
 					FormEvaluator formEvaluator{ prevPath, ownForms, morphBase };
 					for (size_t curId = 0; curId < morphs.size(); ++curId)
@@ -814,8 +820,9 @@ namespace kiwi
 				size_t prevId = -1;
 				for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
 				{
-					for (auto& prevPath : cache[prev - startNode])
+					for (size_t p = pathIndices[prev - startNode]; p < pathIndices[prev - startNode + 1]; ++p)
 					{
+						auto& prevPath = pathes[p];
 						++prevId;
 						auto& em = evalMatrix[prevId * morphs.size() + curId];
 						if (em.score < -99999)
@@ -824,7 +831,7 @@ namespace kiwi
 						}
 
 						insertToPathContainer(bestPathCont, topN, prevSpStates, curMorph, morphBase, 
-							move(em.state), em.score, em.firstChunkScore, node, prevPath, ruleBasedScorer, dialectCost);
+							move(em.state), em.score, em.firstChunkScore, node, pathes.data(), prevPath, ruleBasedScorer, dialectCost);
 					}
 				}
 
@@ -840,7 +847,8 @@ namespace kiwi
 		const KiwiConfig& config;
 		const KGraphNode* startNode;
 		const size_t topN;
-		Vector<Vector<WordLL<LmState>>>& cache;
+		Vector<WordLL<LmState>>& pathes;
+		Vector<size_t>& pathIndices;
 		const Vector<U16StringView>& ownFormList;
 		const Vector<SpecialState>& prevSpStates;
 
@@ -848,11 +856,13 @@ namespace kiwi
 			const KiwiConfig& _config,
 			const KGraphNode* _startNode,
 			size_t _topN,
-			Vector<Vector<WordLL<LmState>>>& _cache,
+			Vector<WordLL<LmState>>& _pathes,
+			Vector<size_t>& _pathIndices,
 			const Vector<U16StringView>& _ownFormList,
 			const Vector<SpecialState>& _prevSpStates
 		)
-			: kw{ _kw }, config{ _config }, startNode{_startNode}, topN{_topN}, cache{_cache}, ownFormList{_ownFormList}, prevSpStates{_prevSpStates}
+			: kw{ _kw }, config{ _config }, startNode{ _startNode }, topN{ _topN }, 
+			pathes{ _pathes }, pathIndices{ _pathIndices }, ownFormList{ _ownFormList }, prevSpStates{ _prevSpStates }
 		{
 		}
 
@@ -874,7 +884,7 @@ namespace kiwi
 			thread_local Vector<const Morpheme*> validMorphCands;
 			const size_t langVocabSize = kw->langMdl->vocabSize();
 			auto* const node = startNode + nodeIdx;
-			auto& nCache = cache[nodeIdx];
+			const size_t prevPathSize = pathes.size();
 
 			float whitespaceDiscount = 0;
 			if (node->uform.empty() && !node->form->form.empty() && node->spaceErrors)
@@ -928,15 +938,14 @@ namespace kiwi
 				{
 					for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
 					{
-						for (auto& p : cache[prev - startNode])
+						for (size_t p = pathIndices[prev - startNode]; p < pathIndices[prev - startNode + 1]; ++p)
 						{
-							auto lastTag = kw->morphemes[p.wid].tag;
+							auto lastTag = kw->morphemes[pathes[p].wid].tag;
 							if (!isJClass(lastTag) && !isEClass(lastTag)) continue;
-							nCache.emplace_back(p);
-							auto& newPath = nCache.back();
+							pathes.emplace_back(pathes[p]);
+							auto& newPath = pathes.back();
 							newPath.accScore += zCodaMorph->userScore * config.typoCostWeight;
-							newPath.accTypoCost -= zCodaMorph->userScore;
-							newPath.parent = &p;
+							newPath.parent = p;
 							newPath.morpheme = &kw->morphemes[zCodaMorph->lmMorphemeId];
 							newPath.wid = zCodaMorph->lmMorphemeId;
 						}
@@ -947,15 +956,14 @@ namespace kiwi
 				{
 					for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
 					{
-						for (auto& p : cache[prev - startNode])
+						for (size_t p = pathIndices[prev - startNode]; p < pathIndices[prev - startNode + 1]; ++p)
 						{
-							auto lastTag = kw->morphemes[p.wid].tag;
+							auto lastTag = kw->morphemes[pathes[p].wid].tag;
 							if (!isNNClass(lastTag)) continue;
-							nCache.emplace_back(p);
-							auto& newPath = nCache.back();
+							pathes.emplace_back(pathes[p]);
+							auto& newPath = pathes.back();
 							newPath.accScore += zSiotMorph->userScore * config.typoCostWeight;
-							newPath.accTypoCost -= zSiotMorph->userScore;
-							newPath.parent = &p;
+							newPath.parent = p;
 							newPath.morpheme = &kw->morphemes[zSiotMorph->lmMorphemeId];
 							newPath.wid = zSiotMorph->lmMorphemeId;
 						}
@@ -965,35 +973,35 @@ namespace kiwi
 				size_t totalPrevPathes = 0;
 				for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
 				{
-					totalPrevPathes += cache[prev - startNode].size();
+					totalPrevPathes += pathIndices[prev - startNode + 1] - pathIndices[prev - startNode];
 				}
 
 				MorphemeEvaluator<LmState> me;
 				if (topN > 1)
 				{
-					me.template eval<PathEvaluatingMode::topN>(nCache, kw, config, ownFormList, cache,
+					me.template eval<PathEvaluatingMode::topN>(pathes, kw, config, ownFormList, pathes, pathIndices,
 						ownFormId, validMorphCands,
 						node, startNode, topN, totalPrevPathes, ignoreCond ? -10 : 0, nodeLevelDiscount, dialectCost, prevSpStates);
 				}
 				else if (totalPrevPathes <= BestPathContainerTraits<PathEvaluatingMode::top1Small>::maxSize)
 				{
-					me.template eval<PathEvaluatingMode::top1Small>(nCache, kw, config, ownFormList, cache,
+					me.template eval<PathEvaluatingMode::top1Small>(pathes, kw, config, ownFormList, pathes, pathIndices,
 						ownFormId, validMorphCands,
 						node, startNode, topN, totalPrevPathes, ignoreCond ? -10 : 0, nodeLevelDiscount, dialectCost, prevSpStates);
 				}
 				else if (totalPrevPathes <= BestPathContainerTraits<PathEvaluatingMode::top1Medium>::maxSize)
 				{
-					me.template eval<PathEvaluatingMode::top1Medium>(nCache, kw, config, ownFormList, cache,
+					me.template eval<PathEvaluatingMode::top1Medium>(pathes, kw, config, ownFormList, pathes, pathIndices,
 						ownFormId, validMorphCands,
 						node, startNode, topN, totalPrevPathes, ignoreCond ? -10 : 0, nodeLevelDiscount, dialectCost, prevSpStates);
 				}
 				else
 				{
-					me.template eval<PathEvaluatingMode::top1>(nCache, kw, config, ownFormList, cache,
+					me.template eval<PathEvaluatingMode::top1>(pathes, kw, config, ownFormList, pathes, pathIndices,
 						ownFormId, validMorphCands,
 						node, startNode, topN, totalPrevPathes, ignoreCond ? -10 : 0, nodeLevelDiscount, dialectCost, prevSpStates);
 				}
-				if (!nCache.empty()) break;
+				if (pathes.size() > prevPathSize) break;
 			}
 
 			maxScores.clear();
@@ -1001,8 +1009,9 @@ namespace kiwi
 
 			if (topN == 1)
 			{
-				for (auto& c : nCache)
+				for (size_t p = prevPathSize; p < pathes.size(); ++p)
 				{
+					auto& c = pathes[p];
 					if (c.morpheme->combineSocket) continue;
 					const auto rootId = c.rootId == commonRootId ? 0 : c.rootId + 1;
 					maxScores[rootId] = max(maxScores[rootId], c.accScore);
@@ -1010,8 +1019,9 @@ namespace kiwi
 			}
 			else
 			{
-				for (auto& c : nCache)
+				for (size_t p = prevPathSize; p < pathes.size(); ++p)
 				{
+					auto& c = pathes[p];
 					if (c.morpheme->combineSocket) continue;
 					const auto rootId = c.rootId == commonRootId ? 0 : c.rootId + 1;
 					if (c.accScore > maxScores[rootId * topN])
@@ -1023,32 +1033,36 @@ namespace kiwi
 				}
 			}
 
-			size_t validCount = 0;
-			for (size_t i = 0; i < nCache.size(); ++i)
+			size_t validPosition = prevPathSize;
+			for (size_t p = prevPathSize; p < pathes.size(); ++p)
 			{
-				const auto rootId = nCache[i].rootId == commonRootId ? 0 : nCache[i].rootId + 1;
-				if (nCache[i].accScore + config.cutOffThreshold < maxScores[rootId * topN]) continue;
-				if (validCount != i) nCache[validCount] = move(nCache[i]);
-				validCount++;
+				auto& c = pathes[p];
+				const auto rootId = c.rootId == commonRootId ? 0 : c.rootId + 1;
+				if (c.accScore + config.cutOffThreshold < maxScores[rootId * topN]) continue;
+				if (validPosition != p) pathes[validPosition] = move(c);
+				validPosition++;
 			}
-			nCache.resize(validCount);
+			pathes.resize(validPosition);
+			pathIndices[nodeIdx + 1] = pathes.size();
 		}
 	};
 
 	template<class LmState>
-	inline Path generateTokenList(const WordLL<LmState>* result,
-		const utils::ContainerSearcher<WordLL<LmState>>& csearcher,
+	inline Path generateTokenList(const WordLL<LmState>* base,
+		size_t resultIdx,
+		const utils::ContainerSearcher& csearcher,
 		const KGraphNode* graph,
 		const Vector<U16StringView>& ownFormList,
 		float typoCostWeight,
+		float dialectCost,
 		const Morpheme* morphFirst,
 		size_t langVocabSize,
 		bool splitSaisiot)
 	{
 		Vector<const WordLL<LmState>*> steps;
-		for (auto s = result->parent; s->parent; s = s->parent)
+		for (auto s = base[resultIdx].parent; s > 0; s = base[s].parent)
 		{
-			steps.emplace_back(s);
+			steps.emplace_back(&base[s]);
 		}
 
 		const auto unifyMorpheme = [&](const Morpheme* morph)
@@ -1058,17 +1072,23 @@ namespace kiwi
 		};
 
 		Path ret;
-		const WordLL<LmState>* prev = steps.back()->parent;
+		const WordLL<LmState>* prev = base;
 		for (auto it = steps.rbegin(); it != steps.rend(); ++it)
 		{
 			auto cur = *it;
+			auto& gNode = graph[csearcher(cur - base)];
+
 			const float scoreDiff = cur->accScore - prev->accScore;
-			float typoCostDiff = cur->accTypoCost - prev->accTypoCost;
-			float dialectCostDiff = cur->accDialectCost - prev->accDialectCost;
+			float typoCostDiff = gNode.typoCost;
+			if (cur->morpheme->tag == POSTag::z_coda || cur->morpheme->tag == POSTag::z_siot)
+			{
+				typoCostDiff -= cur->morpheme->userScore;
+			}
+			float dialectCostDiff = cur->morpheme->dialect == Dialect::standard ? 0 : dialectCost;
 			auto morpheme = cur->morpheme;
 			const size_t numNewTokens = (splitSaisiot && morpheme->saisiot) || !(morpheme->chunks.empty() || morpheme->complex || morpheme->saisiot) 
 				? morpheme->chunks.size() : 1;
-			auto& gNode = graph[csearcher(cur)];
+			
 			const float firstScore = cur->firstChunkScore + typoCostDiff * typoCostWeight; // typoCost는 첫번째 토큰이 전부 받았었으므로
 			const float restScores = numNewTokens > 1 ? (scoreDiff - cur->firstChunkScore) / (numNewTokens - 1) : 0;
 			typoCostDiff /= numNewTokens;
@@ -1198,7 +1218,11 @@ namespace kiwi
 		using LmState = typename LangModel::LmStateType;
 		const auto* langMdl = kw->getLangModel();
 
-		Vector<Vector<WordLL<LmState>>> cache(graphSize);
+		thread_local Vector<WordLL<LmState>> pathes;
+		thread_local Vector<size_t> pathIndices;
+		pathes.clear();
+		pathIndices.clear();
+		pathIndices.resize(graphSize + 1, 0);
 		Vector<uint8_t> reachable(graphSize, 0);
 		Vector<U16StringView> ownFormList;
 		Vector<const Morpheme*> unknownNodeCands, unknownNodeLCands;
@@ -1221,14 +1245,15 @@ namespace kiwi
 		}
 
 		// start node
-		cache[0].emplace_back(&kw->morphemes[0], 0.f, 0.f, 0.f, 0.f, nullptr, LmState{ langMdl }, SpecialState{});
-		cache[0].back().rootId = commonRootId;
+		pathes.emplace_back(&kw->morphemes[0], 0.f, 0.f, 0, LmState{ langMdl }, SpecialState{}, commonRootId);
+		pathIndices[1] = 1;
 		reachable[0] = 1;
 
 #ifdef DEBUG_PRINT
 		cerr << "Token[" << 0 << "]" << endl;
-		for (auto& tt : cache[0])
+		for (size_t p = pathIndices[0]; p < pathIndices[1]; ++p)
 		{
+			auto& tt = pathes[p];
 			cerr << "(" << tt.accScore << "):\t";
 			printDebugPath(cerr, tt);
 			cerr << endl;
@@ -1236,7 +1261,7 @@ namespace kiwi
 #endif
 
 		PathEvaluator<LmState> evaluator{
-			kw, config, startNode, topN, cache, ownFormList, uniqStates,
+			kw, config, startNode, topN, pathes, pathIndices, ownFormList, uniqStates,
 		};
 		
 		UnkFormScorer unkFormScorer{ 
@@ -1285,7 +1310,7 @@ namespace kiwi
 						unkScore, splitComplex, splitSaisiot, mergeSaisiot, blocklist, allowedDialects, dialectCost);
 				};
 
-				reachable[i] = any_of(cache[i].begin(), cache[i].end(),
+				reachable[i] = any_of(pathes.begin() + pathIndices[i], pathes.begin() + pathIndices[i + 1],
 					[](const auto& p) { return !p.combineSocket; }) ? 1 : 0;
 
 				if (isDisconnected(graph, graphSize, reachable, i + 1))
@@ -1307,8 +1332,9 @@ namespace kiwi
 
 #ifdef DEBUG_PRINT
 			cerr << "Token[" << i << "]" << endl;
-			for (auto& tt : cache[i])
+			for (size_t p = pathIndices[i]; p < pathIndices[i + 1]; ++p)
 			{
+				auto& tt = pathes[p];
 				cerr << "(" << tt.accScore << "):\t";
 				printDebugPath(cerr, tt);
 				cerr << endl;
@@ -1317,11 +1343,11 @@ namespace kiwi
 		}
 
 		// end node		
-		auto& cand = cache.back();
 		for (auto prev = endNode->getPrev(); prev; prev = prev->getSibling())
 		{
-			for (auto& p : cache[prev - startNode])
+			for (size_t pidx = pathIndices[prev - startNode]; pidx < pathIndices[prev - startNode + 1]; ++pidx)
 			{
+				auto& p = pathes[pidx];
 				if (p.combineSocket) continue;
 				if (!(p.morpheme->chunks.empty() || p.morpheme->complex || p.morpheme->saisiot))
 				{
@@ -1345,18 +1371,21 @@ namespace kiwi
 				{
 					for (size_t i = 0; i < uniqStates.size(); ++i)
 					{
-						cand.emplace_back(nullptr, c, firstChunkScore, p.accTypoCost, p.accDialectCost, &p, p.lmState, uniqStates[i]);
-						cand.back().rootId = i;
+						pathes.emplace_back(nullptr, c, firstChunkScore, pidx, p.lmState, uniqStates[i], i);
 					}
 				}
 				else
 				{
-					cand.emplace_back(nullptr, c, firstChunkScore, p.accTypoCost, p.accDialectCost, &p, p.lmState, p.spState);
+					pathes.emplace_back(nullptr, c, firstChunkScore, pidx, p.lmState, p.spState, p.rootId);
 				}
 			}
 		}
+		pathIndices[graphSize] = pathes.size();
 
-		sort(cand.begin(), cand.end(),
+			}
+		}
+
+		sort(pathes.begin() + pathIndices[graphSize - 1], pathes.begin() + pathIndices[graphSize],
 			[](const WordLL<LmState>& a, const WordLL<LmState>& b)
 			{
 				if (a.rootId < b.rootId) return true;
@@ -1369,21 +1398,23 @@ namespace kiwi
 
 #ifdef DEBUG_PRINT
 		cerr << "Token[last]" << endl;
-		for (auto& tt : cache.back())
+		for (size_t p = pathIndices[graphSize - 1]; p < pathIndices[graphSize]; ++p)
 		{
+			auto& tt = pathes[p];
 			cerr << "(" << tt.accScore << "):\t";
 			printDebugPath(cerr, tt);
 			cerr << endl;
 		}
 #endif
 
-		utils::ContainerSearcher<WordLL<LmState>> csearcher{ cache };
+		utils::ContainerSearcher csearcher{ pathIndices };
 		Vector<PathResult> ret;
 		size_t numUniqRootIdAndSpState;
 		{
 			UnorderedSet<pair<uint8_t, uint8_t>> uniqRootIdAndSpState;
-			for (auto& c : cand)
+			for (size_t p = pathIndices[graphSize - 1]; p < pathIndices[graphSize]; ++p)
 			{
+				auto& c = pathes[p];
 				uniqRootIdAndSpState.emplace(c.rootId, (uint8_t)c.spState);
 			}
 			numUniqRootIdAndSpState = uniqRootIdAndSpState.size();
@@ -1392,23 +1423,24 @@ namespace kiwi
 		const size_t numCandsPerRootIdAndSpState = (size_t)std::ceil(topN * 2 / (double)numUniqRootIdAndSpState);
 		size_t startIdx = 0;
 		pair<uint8_t, uint8_t> prevRootIdAndSpState;
-		if (!cand.empty()) prevRootIdAndSpState = make_pair(cand[0].rootId, (uint8_t)cand[0].spState);
-		for (size_t i = 0; i < cand.size(); ++i)
+		if (pathIndices[graphSize - 1] < pathIndices[graphSize]) prevRootIdAndSpState = make_pair(pathes[pathIndices[graphSize - 1]].rootId, (uint8_t)pathes[pathIndices[graphSize - 1]].spState);
+		for (size_t p = pathIndices[graphSize - 1]; p < pathIndices[graphSize]; ++p)
 		{
-			auto curRootIdAndSpState = make_pair(cand[i].rootId, (uint8_t)cand[i].spState);
+			auto& c = pathes[p];
+			auto curRootIdAndSpState = make_pair(c.rootId, (uint8_t)c.spState);
 			if (prevRootIdAndSpState != curRootIdAndSpState)
 			{
-				startIdx = i;
+				startIdx = p - pathIndices[graphSize - 1];
 				prevRootIdAndSpState = curRootIdAndSpState;
 			}
 
-			if (i - startIdx < numCandsPerRootIdAndSpState)
+			if ((p - pathIndices[graphSize - 1]) - startIdx < numCandsPerRootIdAndSpState)
 			{
 				auto tokens = generateTokenList(
-					&cand[i], csearcher, graph, ownFormList, config.typoCostWeight,
+					pathes.data(), p, csearcher, graph, ownFormList, config.typoCostWeight, dialectCost,
 					kw->morphemes.data(), langVocabSize, splitSaisiot
 				);
-				ret.emplace_back(move(tokens), cand[i].accScore, uniqStates[cand[i].rootId], cand[i].spState);
+				ret.emplace_back(move(tokens), c.accScore, uniqStates[c.rootId], c.spState);
 			}
 		}
 		sort(ret.begin(), ret.end(), [](const PathResult& a, const PathResult& b)

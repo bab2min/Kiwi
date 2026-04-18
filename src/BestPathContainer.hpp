@@ -25,33 +25,33 @@ namespace kiwi
 		uint8_t prevRootId = 0;
 		SpecialState spState;
 		uint8_t rootId = 0;
+		uint8_t oovFlag = 0;
 
-		const Morpheme* morpheme = nullptr;
-		float accScore = 0, firstChunkScore = 0, accTypoCost = 0, accDialectCost = 0;
-		const WordLL* parent = nullptr;
+		float accScore = 0, firstChunkScore = 0;
+		uint32_t parent = 0;
 		Wid wid = 0;
 		uint16_t ownFormId = 0;
 		uint8_t combineSocket = 0;
+		const Morpheme* morpheme = nullptr;
 
 		WordLL() = default;
 
-		WordLL(const Morpheme* _morph, float _accScore, float _firstChunkScore, float _accTypoCost, float _accDialectCost,
-			const WordLL* _parent, LmState _lmState, SpecialState _spState)
+		WordLL(const Morpheme* _morph, float _accScore, float _firstChunkScore,
+			uint32_t _parent, LmState _lmState, SpecialState _spState, uint8_t _rootId, uint8_t _oovFlag = 0)
 			: morpheme{ _morph },
 			accScore{ _accScore },
 			firstChunkScore{ _firstChunkScore },
-			accTypoCost{ _accTypoCost },
-			accDialectCost{ _accDialectCost },
 			parent{ _parent },
 			lmState{ _lmState },
 			spState{ _spState },
-			rootId{ _parent ? _parent->rootId : (uint8_t)0 }
+			rootId{ _rootId },
+			oovFlag{ _oovFlag }
 		{
 		}
 
-		const WordLL* root() const
+		const WordLL* root(const WordLL* base) const
 		{
-			if (parent) return parent->root();
+			if (parent) return base[parent].root(base);
 			else return this;
 		}
 
@@ -166,15 +166,17 @@ namespace kiwi
 		}
 
 		inline void insert(size_t topN, uint8_t prevRootId, uint8_t rootId,
-			const Morpheme* morph, float accScore, float firstChunkScore, float accTypoCost, float accDialectCost,
-			const WordLL<LmState>* parent, LmState&& lmState, SpecialState spState)
+			const Morpheme* morph, float accScore, float firstChunkScore, 
+			const WordLL<LmState>* base, uint32_t parent, LmState&& lmState, SpecialState spState)
 		{
 			PathHash<LmState> ph{ lmState, prevRootId, spState };
 			auto inserted = bestPathIndex.emplace(ph, std::make_pair((uint32_t)bestPathValues.size(), 1));
 			if (inserted.second)
 			{
-				bestPathValues.emplace_back(morph, accScore, firstChunkScore, accTypoCost, accDialectCost,
-					parent, std::move(lmState), spState);
+				bestPathValues.emplace_back(morph, accScore, firstChunkScore, 
+					parent, std::move(lmState), spState, 
+					parent ? base[parent].rootId : (uint8_t)0, 
+					parent ? base[parent].oovFlag : (uint8_t)0);
 				if (rootId != commonRootId) bestPathValues.back().rootId = rootId;
 				bestPathValues.resize(bestPathValues.size() + topN - 1);
 			}
@@ -184,8 +186,10 @@ namespace kiwi
 				auto bestPathLast = bestPathValues.begin() + inserted.first->second.first + inserted.first->second.second;
 				if (std::distance(bestPathFirst, bestPathLast) < topN)
 				{
-					*bestPathLast = WordLL<LmState>{ morph, accScore, firstChunkScore, accTypoCost, accDialectCost,
-						parent, std::move(lmState), spState };
+					*bestPathLast = WordLL<LmState>{ morph, accScore, firstChunkScore, 
+						parent, std::move(lmState), spState, 
+						parent ? base[parent].rootId : (uint8_t)0,
+						parent ? base[parent].oovFlag : (uint8_t)0 };
 					if (rootId != commonRootId) bestPathLast->rootId = rootId;
 					std::push_heap(bestPathFirst, bestPathLast + 1, WordLLGreater{});
 					++inserted.first->second.second;
@@ -195,8 +199,10 @@ namespace kiwi
 					if (accScore > bestPathFirst->accScore)
 					{
 						std::pop_heap(bestPathFirst, bestPathLast, WordLLGreater{});
-						*(bestPathLast - 1) = WordLL<LmState>{ morph, accScore, firstChunkScore, accTypoCost, accDialectCost,
-							parent, std::move(lmState), spState };
+						*(bestPathLast - 1) = WordLL<LmState>{ morph, accScore, firstChunkScore, 
+							parent, std::move(lmState), spState, 
+							parent ? base[parent].rootId : (uint8_t)0,
+							parent ? base[parent].oovFlag : (uint8_t)0 };
 						if (rootId != commonRootId) (*(bestPathLast - 1)).rootId = rootId;
 						std::push_heap(bestPathFirst, bestPathLast, WordLLGreater{});
 					}
@@ -238,11 +244,13 @@ namespace kiwi
 		}
 
 		inline void insert(size_t topN, uint8_t prevRootId, uint8_t rootId,
-			const Morpheme* morph, float accScore, float firstChunkScore, float accTypoCost, float accDialectCost,
-			const WordLL<LmState>* parent, LmState&& lmState, SpecialState spState)
+			const Morpheme* morph, float accScore, float firstChunkScore,
+			const WordLL<LmState>* base, uint32_t parent, LmState&& lmState, SpecialState spState)
 		{
-			WordLL<LmState> newPath{ morph, accScore, firstChunkScore, accTypoCost, accDialectCost,
-				parent, std::move(lmState), spState };
+			WordLL<LmState> newPath{ morph, accScore, firstChunkScore, 
+				parent, std::move(lmState), spState, 
+				parent ? base[parent].rootId : (uint8_t)0, 
+				parent ? base[parent].oovFlag : (uint8_t)0 };
 			newPath.prevRootId = prevRootId;
 			if (rootId != commonRootId) newPath.rootId = rootId;
 			auto inserted = bestPathes.emplace(newPath);
@@ -315,8 +323,8 @@ namespace kiwi
 
 		template<ArchType archType>
 		inline void insertOptimized(size_t topN, uint8_t prevRootId, uint8_t rootId,
-			const Morpheme* morph, float accScore, float firstChunkScore, float accTypoCost, float accDialectCost,
-			const WordLL<LmState>* parent, LmState&& lmState, SpecialState spState)
+			const Morpheme* morph, float accScore, float firstChunkScore,
+			const WordLL<LmState>* base, uint32_t parent, LmState&& lmState, SpecialState spState)
 		{
 			static constexpr size_t numBits = sizeof(size_t) * 8;
 			const size_t h = Hash<WordLL<LmState>>{}(lmState, prevRootId, spState);
@@ -355,8 +363,10 @@ namespace kiwi
 				if (value.size() < hash.size())
 				{
 					hash[value.size()] = h;
-					value.emplace_back(morph, accScore, firstChunkScore, accTypoCost, accDialectCost,
-						parent, std::move(lmState), spState);
+					value.emplace_back(morph, accScore, firstChunkScore, 
+						parent, std::move(lmState), spState,
+						parent ? base[parent].rootId : (uint8_t)0,
+						parent ? base[parent].oovFlag : (uint8_t)0);
 					value.back().prevRootId = prevRootId;
 					if (rootId != commonRootId) value.back().rootId = rootId;
 				}
@@ -374,26 +384,25 @@ namespace kiwi
 					target.morpheme = morph;
 					target.accScore = accScore;
 					target.firstChunkScore = firstChunkScore;
-					target.accTypoCost = accTypoCost;
-					target.accDialectCost = accDialectCost;
 					target.parent = parent;
 					target.lmState = std::move(lmState);
 					target.spState = spState;
-					target.rootId = parent ? parent->rootId : 0;
+					target.rootId = parent ? base[parent].rootId : 0;
 					if (rootId != commonRootId) target.rootId = rootId;
+					target.oovFlag = parent ? base[parent].oovFlag : 0;
 				}
 			}
 		}
 
 		inline void insert(size_t topN, uint8_t prevRootId, uint8_t rootId,
-			const Morpheme* morph, float accScore, float firstChunkScore, float accTypoCost, float accDialectCost,
-			const WordLL<LmState>* parent, LmState&& lmState, SpecialState spState)
+			const Morpheme* morph, float accScore, float firstChunkScore, 
+			const WordLL<LmState>* base, uint32_t parent, LmState&& lmState, SpecialState spState)
 		{
 			static constexpr ArchType archType = LmState::arch;
 			if constexpr (archType != ArchType::none && archType != ArchType::balanced)
 			{
-				return insertOptimized<archType>(topN, prevRootId, rootId, morph, accScore, firstChunkScore, accTypoCost, accDialectCost,
-					parent, std::move(lmState), spState);
+				return insertOptimized<archType>(topN, prevRootId, rootId, morph, accScore, firstChunkScore, 
+					base, parent, std::move(lmState), spState);
 			}
 
 			const size_t h = Hash<WordLL<LmState>>{}(lmState, prevRootId, spState);
@@ -418,8 +427,10 @@ namespace kiwi
 				if (value.size() < hash.size())
 				{
 					hash[value.size()] = h;
-					value.emplace_back(morph, accScore, firstChunkScore, accTypoCost, accDialectCost,
-						parent, std::move(lmState), spState);
+					value.emplace_back(morph, accScore, firstChunkScore, 
+						parent, std::move(lmState), spState, 
+						parent ? base[parent].rootId : (uint8_t)0,
+						parent ? base[parent].oovFlag : (uint8_t)0);
 					value.back().prevRootId = prevRootId;
 					if (rootId != commonRootId) value.back().rootId = rootId;
 				}
@@ -437,13 +448,12 @@ namespace kiwi
 					target.morpheme = morph;
 					target.accScore = accScore;
 					target.firstChunkScore = firstChunkScore;
-					target.accTypoCost = accTypoCost;
-					target.accDialectCost = accDialectCost;
 					target.parent = parent;
 					target.lmState = std::move(lmState);
 					target.spState = spState;
-					target.rootId = parent ? parent->rootId : 0;
+					target.rootId = parent ? base[parent].rootId : 0;
 					if (rootId != commonRootId) target.rootId = rootId;
+					target.oovFlag = parent ? base[parent].oovFlag : 0;
 				}
 			}
 		}

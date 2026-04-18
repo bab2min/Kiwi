@@ -260,27 +260,20 @@ namespace kiwi
 			}
 		}
 
-		template<class Ty>
 		class ContainerSearcher
 		{
-			std::vector<const Ty*> data;
-			std::vector<size_t> idx;
+			const size_t* idcs;
+			const size_t size;
 		public:
-			template<class AllocA, class AllocB>
-			ContainerSearcher(const std::vector<std::vector<Ty, AllocB>, AllocA>& v)
-				: data(v.size()), idx(v.size())
+			template<class Alloc>
+			ContainerSearcher(const std::vector<size_t, Alloc>& _idcs)
+				: idcs(_idcs.data()), size(_idcs.size())
 			{
-				for (size_t i = 0; i < v.size(); ++i)
-				{
-					data[i] = v[i].data();
-				}
-
-				sortWriteIdx(data.begin(), data.end(), idx.begin());
 			}
 
-			size_t operator()(const Ty* v) const
+			size_t operator()(size_t v) const
 			{
-				return idx[(std::upper_bound(data.begin(), data.end(), v) - data.begin()) - 1];
+				return std::upper_bound(idcs, idcs + size, v) - idcs - 1;
 			}
 		};
 	}
