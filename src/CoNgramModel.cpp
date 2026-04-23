@@ -15,18 +15,20 @@ using namespace std;
 
 namespace kiwi
 {
-	template<size_t windowSize, ArchType arch, class VocabTy, class VlVocabTy, bool quantized>
-	struct MorphemeEvaluator<lm::CoNgramState<windowSize, arch, VocabTy, VlVocabTy, quantized>>
+	template<size_t windowSize, ArchType arch, class VocabTy, class VlVocabTy, bool quantized, bool _hasOOVCounter>
+	struct MorphemeEvaluator<WordLL<lm::CoNgramState<windowSize, arch, VocabTy, VlVocabTy, quantized>, _hasOOVCounter>>
 	{
+		static constexpr bool hasOOVCounter = _hasOOVCounter;
 		using LmState = lm::CoNgramState<windowSize, arch, VocabTy, VlVocabTy, quantized>;
+		using WordLLTy = WordLL<LmState, hasOOVCounter>;
 
 		template<PathEvaluatingMode mode>
 		void eval(
-			Vector<WordLL<LmState>>& resultOut,
+			Vector<WordLLTy>& resultOut,
 			const Kiwi* kw,
 			const KiwiConfig& config,
 			const Vector<U16StringView>& ownForms,
-			const Vector<WordLL<LmState>>& pathes,
+			const Vector<WordLLTy>& pathes,
 			const Vector<size_t>& pathIndices,
 			size_t ownFormId,
 			const Vector<const Morpheme*>& morphs,
@@ -40,7 +42,7 @@ namespace kiwi
 			const Vector<SpecialState>& prevSpStates
 		) const
 		{
-			thread_local BestPathConatiner<mode, LmState> bestPathCont;
+			thread_local BestPathConatiner<mode, WordLLTy> bestPathCont;
 			thread_local Vector<pair<const KGraphNode*, size_t>> regularPrevPathes;
 			thread_local Vector<pair<const KGraphNode*, size_t>> combiningPrevPathes;
 			thread_local Vector<const Morpheme*> regularMorphs, regularDistantMorphs, combiningLMorphs, combiningRMorphs;

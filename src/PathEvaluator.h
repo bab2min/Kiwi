@@ -90,7 +90,28 @@ namespace kiwi
 	template<class LangModel>
 	struct BestPathFinder
 	{
-		static Vector<PathResult> findBestPath(const Kiwi* kw,
+		template<bool useOOVGlobalConsistency>
+		static Vector<PathResult> findBestPathDispatched(
+			const Kiwi* kw,
+			const KiwiConfig& config,
+			const Vector<SpecialState>& prevSpStates,
+			const KString& normForm,
+			const KGraphNode* graph,
+			const size_t graphSize,
+			const size_t topN,
+			const size_t oovScoringType,
+			bool openEnding,
+			bool splitComplex = false,
+			bool splitSaisiot = false,
+			bool mergeSaisiot = false,
+			const std::unordered_set<const Morpheme*>* blocklist = nullptr,
+			Dialect allowedDialects = Dialect::standard,
+			float dialectCost = 0.f,
+			const SubstringCounter* substringCounter = nullptr
+		);
+
+		static Vector<PathResult> findBestPath(
+			const Kiwi* kw,
 			const KiwiConfig& config,
 			const Vector<SpecialState>& prevSpStates,
 			const KString& normForm,

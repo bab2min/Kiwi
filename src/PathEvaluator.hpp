@@ -190,19 +190,19 @@ namespace kiwi
 	}
 
 
-	template<PathEvaluatingMode mode, class LmState>
+	template<PathEvaluatingMode mode, class WordLL>
 	inline void insertToPathContainer(
-		BestPathConatiner<mode, LmState>& bestPathCont,
+		BestPathConatiner<mode, WordLL>& bestPathCont,
 		const size_t topN,
 		const Vector<SpecialState>& prevSpStates,
 		const Morpheme* curMorph,
 		const Morpheme* morphBase,
-		LmState&& state,
+		typename WordLL::LmState&& state,
 		const float score,
 		const float firstChunkScore,
 		const KGraphNode* node,
-		const WordLL<LmState>* base,
-		const WordLL<LmState>& prevPath,
+		const WordLL* base,
+		const WordLL& prevPath,
 		const RuleBasedScorer& ruleBasedScorer,
 		const float dialectCost
 	)
@@ -257,8 +257,8 @@ namespace kiwi
 		POSTag prevTag;
 
 	public:
-		template<class LmState>
-		FormEvaluator(const WordLL<LmState>& prevPath, 
+		template<class WordLL>
+		FormEvaluator(const WordLL& prevPath, 
 			const Vector<U16StringView>& ownFormList, 
 			const Morpheme* morphBase
 		)
@@ -317,17 +317,17 @@ namespace kiwi
 		uint32_t length = 0;
 	};
 
-	template<class LmState, class Enable = void>
+	template<class WordLL, class Enable = void>
 	struct PathEvaluator;
 
-	template<class LmState>
-	struct PathEvaluator<LmState, typename std::enable_if<!LmState::transposed>::type>
+	template<class WordLL>
+	struct PathEvaluator<WordLL, typename std::enable_if<!WordLL::LmState::transposed>::type>
 	{
 		const Kiwi* kw;
 		const KiwiConfig& config;
 		const KGraphNode* startNode;
 		const size_t topN;
-		Vector<WordLL<LmState>>& pathes;
+		Vector<WordLL>& pathes;
 		Vector<size_t>& pathIndices;
 		const Vector<U16StringView>& ownFormList;
 		const Vector<SpecialState>& prevSpStates;
@@ -336,7 +336,7 @@ namespace kiwi
 			const KiwiConfig& _config,
 			const KGraphNode* _startNode,
 			size_t _topN,
-			Vector<WordLL<LmState>>& _pathes,
+			Vector<WordLL>& _pathes,
 			Vector<size_t>& _pathIndices,
 			const Vector<U16StringView>& _ownFormList,
 			const Vector<SpecialState>& _prevSpStates
@@ -516,7 +516,7 @@ namespace kiwi
 
 		template<PathEvaluatingMode mode>
 		void evalSingleMorpheme(
-			Vector<WordLL<LmState>>& resultOut,
+			Vector<WordLL>& resultOut,
 			const KGraphNode* node,
 			const size_t ownFormId,
 			const Morpheme* curMorph,
@@ -525,7 +525,7 @@ namespace kiwi
 			const float dialectCost
 		) const
 		{
-			thread_local BestPathConatiner<mode, LmState> bestPathCont;
+			thread_local BestPathConatiner<mode, WordLL> bestPathCont;
 			
 			const auto* langMdl = kw->getLangModel();
 			const Morpheme* morphBase = kw->morphemes.data();
@@ -638,16 +638,16 @@ namespace kiwi
 		}
 	};
 
-	template<class LmState>
+	template<class WordLL>
 	struct MorphemeEvaluator
 	{
 		template<PathEvaluatingMode mode>
 		void eval(
-			Vector<WordLL<LmState>>& resultOut,
+			Vector<WordLL>& resultOut,
 			const Kiwi* kw,
 			const KiwiConfig& config,
 			const Vector<U16StringView>& ownForms,
-			const Vector<WordLL<LmState>>& pathes,
+			const Vector<WordLL>& pathes,
 			const Vector<size_t>& pathIndices,
 			size_t ownFormId,
 			const Vector<const Morpheme*>& morphs,
@@ -661,8 +661,8 @@ namespace kiwi
 			const Vector<SpecialState>& prevSpStates
 		) const
 		{
-			thread_local BestPathConatiner<mode, LmState> bestPathCont;
-			thread_local Vector<LmEvalData<LmState>> evalMatrix;
+			thread_local BestPathConatiner<mode, WordLL> bestPathCont;
+			thread_local Vector<LmEvalData<typename WordLL::LmState>> evalMatrix;
 			thread_local Vector<Wid> nextWids;
 
 			const auto* langMdl = kw->getLangModel();
@@ -840,14 +840,14 @@ namespace kiwi
 		}
 	};
 
-	template<class LmState>
-	struct PathEvaluator<LmState, typename enable_if<LmState::transposed>::type>
+	template<class WordLL>
+	struct PathEvaluator<WordLL, typename enable_if<WordLL::LmState::transposed>::type>
 	{
 		const Kiwi* kw;
 		const KiwiConfig& config;
 		const KGraphNode* startNode;
 		const size_t topN;
-		Vector<WordLL<LmState>>& pathes;
+		Vector<WordLL>& pathes;
 		Vector<size_t>& pathIndices;
 		const Vector<U16StringView>& ownFormList;
 		const Vector<SpecialState>& prevSpStates;
@@ -856,7 +856,7 @@ namespace kiwi
 			const KiwiConfig& _config,
 			const KGraphNode* _startNode,
 			size_t _topN,
-			Vector<WordLL<LmState>>& _pathes,
+			Vector<WordLL>& _pathes,
 			Vector<size_t>& _pathIndices,
 			const Vector<U16StringView>& _ownFormList,
 			const Vector<SpecialState>& _prevSpStates
@@ -976,7 +976,7 @@ namespace kiwi
 					totalPrevPathes += pathIndices[prev - startNode + 1] - pathIndices[prev - startNode];
 				}
 
-				MorphemeEvaluator<LmState> me;
+				MorphemeEvaluator<WordLL> me;
 				if (topN > 1)
 				{
 					me.template eval<PathEvaluatingMode::topN>(pathes, kw, config, ownFormList, pathes, pathIndices,
@@ -1047,8 +1047,8 @@ namespace kiwi
 		}
 	};
 
-	template<class LmState>
-	inline Path generateTokenList(const WordLL<LmState>* base,
+	template<class WordLL>
+	inline Path generateTokenList(const WordLL* base,
 		size_t resultIdx,
 		const utils::ContainerSearcher& csearcher,
 		const KGraphNode* graph,
@@ -1059,7 +1059,7 @@ namespace kiwi
 		size_t langVocabSize,
 		bool splitSaisiot)
 	{
-		Vector<const WordLL<LmState>*> steps;
+		Vector<const WordLL*> steps;
 		for (auto s = base[resultIdx].parent; s > 0; s = base[s].parent)
 		{
 			steps.emplace_back(&base[s]);
@@ -1072,7 +1072,7 @@ namespace kiwi
 		};
 
 		Path ret;
-		const WordLL<LmState>* prev = base;
+		const WordLL* prev = base;
 		for (auto it = steps.rbegin(); it != steps.rend(); ++it)
 		{
 			auto cur = *it;
@@ -1196,7 +1196,9 @@ namespace kiwi
 	}
 
 	template<class LangModel>
-	Vector<PathResult> BestPathFinder<LangModel>::findBestPath(const Kiwi* kw,
+	template<bool useOOVGlobalConsistency>
+	Vector<PathResult> BestPathFinder<LangModel>::findBestPathDispatched(
+		const Kiwi* kw,
 		const KiwiConfig& config,
 		const Vector<SpecialState>& prevSpStates,
 		const KString& normForm,
@@ -1216,13 +1218,15 @@ namespace kiwi
 	{
 		static constexpr size_t eosId = 1;
 		using LmState = typename LangModel::LmStateType;
+		using WordLLTy = WordLL<LmState, useOOVGlobalConsistency>;
 		const auto* langMdl = kw->getLangModel();
 
-		thread_local Vector<WordLL<LmState>> pathes;
+		thread_local Vector<WordLLTy> pathes;
 		thread_local Vector<size_t> pathIndices;
 		pathes.clear();
 		pathIndices.clear();
 		pathIndices.resize(graphSize + 1, 0);
+		thread_local UnorderedMap<uint32_t, uint32_t> oovGlobalCntArenaMap[2];
 		Vector<uint8_t> reachable(graphSize, 0);
 		Vector<U16StringView> ownFormList;
 		Vector<const Morpheme*> unknownNodeCands, unknownNodeLCands;
@@ -1260,7 +1264,7 @@ namespace kiwi
 		}
 #endif
 
-		PathEvaluator<LmState> evaluator{
+		PathEvaluator<WordLLTy> evaluator{
 			kw, config, startNode, topN, pathes, pathIndices, ownFormList, uniqStates,
 		};
 		
@@ -1386,7 +1390,7 @@ namespace kiwi
 		}
 
 		sort(pathes.begin() + pathIndices[graphSize - 1], pathes.begin() + pathIndices[graphSize],
-			[](const WordLL<LmState>& a, const WordLL<LmState>& b)
+			[](const WordLLTy& a, const WordLLTy& b)
 			{
 				if (a.rootId < b.rootId) return true;
 				if (a.rootId > b.rootId) return false;
@@ -1449,4 +1453,38 @@ namespace kiwi
 		});
 		return ret;
 	}
+
+	template<class LangModel>
+	Vector<PathResult> BestPathFinder<LangModel>::findBestPath(const Kiwi* kw,
+		const KiwiConfig& config,
+		const Vector<SpecialState>& prevSpStates,
+		const KString& normForm,
+		const KGraphNode* graph,
+		const size_t graphSize,
+		const size_t topN,
+		const size_t oovScoringType,
+		bool openEnding,
+		bool splitComplex,
+		bool splitSaisiot,
+		bool mergeSaisiot,
+		const std::unordered_set<const Morpheme*>* blocklist,
+		Dialect allowedDialects,
+		float dialectCost,
+		const SubstringCounter* substringCounter
+	)
+	{
+		if (oovGlobalMap)
+		{
+			return findBestPathDispatched<true>(kw, config, prevSpStates, normForm, graph, graphSize, topN, oovScoringType,
+				openEnding, splitComplex, splitSaisiot, mergeSaisiot,
+				blocklist, allowedDialects, dialectCost, substringCounter);
+		}
+		else
+		{
+			return findBestPathDispatched<false>(kw, config, prevSpStates, normForm, graph, graphSize, topN, oovScoringType,
+				openEnding, splitComplex, splitSaisiot, mergeSaisiot,
+				blocklist, allowedDialects, dialectCost, substringCounter);
+		}
+	}
+
 }
