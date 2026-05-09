@@ -1028,6 +1028,9 @@ namespace kiwi
 		}
 	}
 
+	std::ostream* logStream = &std::cerr;
+	int doLogging = 0;
+
 	vector<TokenResult> Kiwi::analyze(const u16string& str, size_t topN, AnalyzeOption option,
 		const vector<PretokenizedSpan>& pretokenized,
 		const optional<KiwiConfig>& overrideConfig
@@ -1118,7 +1121,7 @@ namespace kiwi
 		chrono::steady_clock::time_point startTime;
 		while (splitEnd < normalizedStr.size())
 		{
-			if (logStream)
+			if (doLogging)
 			{
 				startTime = chrono::steady_clock::now();
 			}
@@ -1144,7 +1147,7 @@ namespace kiwi
 				pretokenizedLast
 			);
 
-			if (logStream)
+			if (doLogging)
 			{
 				auto input = utf16To8(joinHangul(normalizedStr.substr(splitEnd, newSplitEnd - splitEnd)));
 				*logStream << "Input: " << input << "\nNodes: " << nodes.size() << endl;
@@ -1179,7 +1182,7 @@ namespace kiwi
 			insertPathIntoResults(ret, spStatesByRet, oovTotalCnt,
 				res, topN, option.match, config.integrateAllomorph, 
 				positionTable, wordPositions, pretokenizedGroup, nodeInWhichPretokenized);
-			if (logStream)
+			if (doLogging)
 			{
 				auto duration = chrono::duration_cast<chrono::milliseconds>(chrono::steady_clock::now() - startTime).count();
 				*logStream << "Time: " << duration << "ms\n" << endl;

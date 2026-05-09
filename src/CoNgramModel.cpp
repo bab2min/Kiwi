@@ -15,12 +15,12 @@ using namespace std;
 
 namespace kiwi
 {
-	template<size_t windowSize, ArchType arch, class VocabTy, class VlVocabTy, bool quantized, bool _hasOOVCounter>
-	struct MorphemeEvaluator<WordLL<lm::CoNgramState<windowSize, arch, VocabTy, VlVocabTy, quantized>, _hasOOVCounter>>
+	template<size_t windowSize, ArchType arch, class VocabTy, class VlVocabTy, bool quantized, bool _hasOovCounter>
+	struct MorphemeEvaluator<WordLL<lm::CoNgramState<windowSize, arch, VocabTy, VlVocabTy, quantized>, _hasOovCounter>>
 	{
-		static constexpr bool hasOOVCounter = _hasOOVCounter;
+		static constexpr bool hasOovCounter = _hasOovCounter;
 		using LmState = lm::CoNgramState<windowSize, arch, VocabTy, VlVocabTy, quantized>;
-		using WordLLTy = WordLL<LmState, hasOOVCounter>;
+		using WordLLTy = WordLL<LmState, hasOovCounter>;
 
 		template<PathEvaluatingMode mode>
 		void eval(

@@ -275,7 +275,8 @@ namespace kiwi
 		void updatePrefixCnts(
 			Vector<WordLL>& pathes,
 			Vector<size_t>& pathIndices,
-			size_t nodeIdx);
+			size_t nodeIdx,
+			const Vector<uint32_t>& currentOovNodeIdcs);
 
 		void findOovNodes(
 			size_t nodeIdx,

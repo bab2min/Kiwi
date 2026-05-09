@@ -1438,13 +1438,25 @@ namespace kiwi
 	void BestPathFinder<LangModel>::updatePrefixCnts(
 		Vector<WordLL>& pathes,
 		Vector<size_t>& pathIndices,
-		size_t nodeIdx)
+		size_t nodeIdx,
+		const Vector<uint32_t>& currentOovNodeIdcs)
 	{
 		auto it = oovPrefixLists->find(OovOrForm{ graph[nodeIdx].form});
 		if (it == oovPrefixLists->end()) return;
 
 		thread_local UnorderedMap<uint32_t, uint32_t> arenaMap;
+		thread_local Vector<uint32_t> includedOovIdcs;
 		arenaMap.clear();
+		includedOovIdcs.clear();
+		for (auto nodeIdx : currentOovNodeIdcs)
+		{
+			auto it = oovTotalMap->find(graph[nodeIdx].uform);
+			if (it != oovTotalMap->end())
+			{
+				includedOovIdcs.emplace_back(it->second);
+			}
+		}
+
 		for (size_t p = pathIndices[nodeIdx]; p < pathIndices[nodeIdx + 1]; ++p)
 		{
 			auto& path = pathes[p];
@@ -1467,6 +1479,11 @@ namespace kiwi
 					arenaSize * 2);
 				for (size_t oovIdx : it->second)
 				{
+					if (find(includedOovIdcs.begin(), includedOovIdcs.end(), oovIdx) != includedOovIdcs.end())
+					{
+						continue;
+					}
+
 					auto& cnt = (*oovTotalCnt)[newArenaPtr + sizeof(uint16_t) + oovIdx * 2 + 1];
 					uint8_t positiveCnt = (*oovTotalCnt)[newArenaPtr + sizeof(uint16_t) + oovIdx * 2] & 0x0F,
 						negativeCnt = ((*oovTotalCnt)[newArenaPtr + sizeof(uint16_t) + oovIdx * 2] & 0xF0) >> 4;
@@ -1612,7 +1629,7 @@ namespace kiwi
 			oovScoringType >= (size_t)Match::oovChrFreqBranchModel
 		};
 
-		std::array<uint32_t, sizeof(uint8_t) * 8> prevOovIdcs = {0,};
+		std::array<uint32_t, sizeof(uint16_t) * 8> prevOovIdcs = {0,};
 		size_t prevOovPtrStart = 0, prevOovPtrEnd = 0;
 		// middle nodes
 		for (size_t i = 1; i < graphSize - 1; ++i)
@@ -1670,10 +1687,7 @@ namespace kiwi
 				{
 					// Oov 노드가 없는 경우에만 접두사 빈도 업데이트
 					// Oov 노드가 있는 경우에는 updateOovTotalMap에서 빈도 업데이트
-					if (currentOovNodeIdcs.empty())
-					{
-						updatePrefixCnts(pathes, pathIndices, i);
-					}
+					updatePrefixCnts(pathes, pathIndices, i, currentOovNodeIdcs);
 				}
 
 				reachable[i] = any_of(pathes.begin() + pathIndices[i], pathes.begin() + pathIndices[i + 1],
@@ -1699,7 +1713,7 @@ namespace kiwi
 				);
 				if constexpr (useOovTotalConsistency)
 				{
-					const uint8_t bit = (uint8_t)(1 << prevOovPtrEnd);
+					const uint16_t bit = (uint16_t)(1 << prevOovPtrEnd);
 					for (size_t p = pathIndices[i]; p < pathIndices[i + 1]; ++p)
 					{
 						auto& c = pathes[p];
@@ -1717,6 +1731,11 @@ namespace kiwi
 					}
 					prevOovIdcs[prevOovPtrEnd] = i;
 					prevOovPtrEnd = (prevOovPtrEnd + 1) % prevOovIdcs.size();
+					if (prevOovPtrEnd == prevOovPtrStart)
+					{
+						// 최대 N개의 최근 Oov노드 정보만 유지할 수 있음. 오버플로우 시 가장 오래된 Oov노드 정보 제거
+						prevOovPtrStart = (prevOovPtrStart + 1) % prevOovIdcs.size();
+					}
 					oovUpdated = true;
 				}
 			}
@@ -1728,7 +1747,7 @@ namespace kiwi
 					// 이전 Oov 노드와 겹치지 않는 경우 flag를 clear
 					const size_t lastOovPtr = (prevOovPtrEnd + prevOovIdcs.size() - 1) % prevOovIdcs.size();
 					const auto lastOovIdx = prevOovIdcs[lastOovPtr];
-					const uint8_t bit = (uint8_t)(1 << lastOovPtr);
+					const uint16_t bit = (uint16_t)(1 << lastOovPtr);
 					for (size_t p = pathIndices[i]; p < pathIndices[i + 1]; ++p)
 					{
 						bool overlap = false;
