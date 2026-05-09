@@ -39,7 +39,9 @@ namespace kiwi
 			const float ignoreCondScore,
 			const float nodeLevelDiscount,
 			const float dialectCost,
-			const Vector<SpecialState>& prevSpStates
+			const Vector<PackedState>& prevSpStates,
+			const OovUnigramScorer& oovUnigramScorer,
+			uint32_t nodeIdx = -1
 		) const
 		{
 			thread_local BestPathConatiner<mode, WordLLTy> bestPathCont;
@@ -66,6 +68,8 @@ namespace kiwi
 			nextWids.clear();
 			nextDistantWids.clear();
 
+			UnorderedMap<uint32_t, float> oovTotalScoreMap;
+
 			for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
 			{
 				for (size_t p = pathIndices[prev - startNode]; p < pathIndices[prev - startNode + 1]; ++p)
@@ -77,6 +81,11 @@ namespace kiwi
 						continue;
 					}
 					regularPrevPathes.emplace_back(prev, p);
+
+					if (hasOovCounter && !oovUnigramScorer.empty() && !oovTotalScoreMap.count(prevPath.oovCntArenaPtr))
+					{
+						oovTotalScoreMap[prevPath.oovCntArenaPtr] = oovUnigramScorer.score(prevPath.oovCntArenaPtr, nodeIdx);
+					}
 				}
 			}
 
@@ -180,6 +189,11 @@ namespace kiwi
 					auto& state = nextLmStates[prevId * regularMorphs.size() + curId];
 					float score = prevPath.accScore + morphScore + scores[prevId * regularMorphs.size() + curId];
 					const float firstChunkScore = morphScore + scores[prevId * regularMorphs.size() + curId];
+					
+					if (hasOovCounter && !oovUnigramScorer.empty())
+					{
+						score += oovTotalScoreMap[prevPath.oovCntArenaPtr];
+					}
 
 					FormEvaluator formEvaluator{ prevPath, ownForms, morphBase };
 					if (!formEvaluator(curMorph, ignoreCondScore, score)) continue;

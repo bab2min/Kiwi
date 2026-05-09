@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <bitset>
 #include <vector>
+#include <limits>
 
 #include <kiwi/Types.h>
 
@@ -71,7 +72,10 @@ namespace kiwi
 				if (e.hash == hash && e.length == length &&
 					std::memcmp(e.ptr, ptr, length * sizeof(char16_t)) == 0)
 				{
-					++e.count;
+					if (e.count < std::numeric_limits<decltype(e.count)>::max())
+					{
+						++e.count;
+					}
 					return;
 				}
 				slot = (slot + 1) & mask;
@@ -150,6 +154,11 @@ namespace kiwi
 			}
 		}
 
+		size_t count(U16StringView str) const
+		{
+			return count(hash(str), str.data(), str.size());
+		}
+
 		const Vector<char16_t>& getUniqueChars() const
 		{
 			return chars;
@@ -163,6 +172,22 @@ namespace kiwi
 		static uint32_t extendHash(uint32_t prev, char16_t c)
 		{
 			return prev * kPrime + (uint32_t)c;
+		}
+
+		static uint32_t hash(const char16_t* data, size_t len)
+		{
+			if (len == 0) return kOffset;
+			uint32_t h = initHash(data[0]);
+			for (size_t i = 1; i < len; ++i)
+			{
+				h = extendHash(h, data[i]);
+			}
+			return h;
+		}
+
+		static uint32_t hash(U16StringView str)
+		{
+			return hash(str.data(), str.size());
 		}
 	};
 }

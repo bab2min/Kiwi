@@ -15,11 +15,11 @@ namespace kiwi
 		top1,
 	};
 
-	template<class _LmState, bool _hasOOVCounter = false>
+	template<class _LmState, bool _hasOovCounter = false>
 	struct WordLL
 	{
 		using LmState = _LmState;
-		static constexpr bool hasOOVCounter = _hasOOVCounter;
+		static constexpr bool hasOovCounter = _hasOovCounter;
 
 		LmState lmState;
 		
@@ -33,14 +33,17 @@ namespace kiwi
 		uint8_t rootId = 0;
 		uint8_t oovFlag = 0;
 
-		std::conditional_t<hasOOVCounter, uint32_t, uint8_t> oovCounterPtr = 0;
+		std::conditional_t<hasOovCounter, uint32_t, uint8_t> oovCntArenaPtr = 0;
 
 		const Morpheme* morpheme = nullptr;
 
 		WordLL() = default;
 
 		WordLL(const Morpheme* _morph, float _accScore, float _firstChunkScore,
-			uint32_t _parent, LmState _lmState, SpecialState _spState, uint8_t _rootId, uint8_t _oovFlag = 0)
+			uint32_t _parent, LmState _lmState, SpecialState _spState, uint8_t _rootId, 
+			uint8_t _oovFlag = 0,
+			uint32_t _oovCntArenaPtr = 0
+			)
 			: morpheme{ _morph },
 			accScore{ _accScore },
 			firstChunkScore{ _firstChunkScore },
@@ -48,7 +51,8 @@ namespace kiwi
 			lmState{ _lmState },
 			spState{ _spState },
 			rootId{ _rootId },
-			oovFlag{ _oovFlag }
+			oovFlag{ _oovFlag },
+			oovCntArenaPtr{ (decltype(oovCntArenaPtr))_oovCntArenaPtr }
 		{
 		}
 
@@ -131,15 +135,20 @@ namespace kiwi
 		}
 	};
 
-	template<class WordLL>
-	inline std::ostream& printDebugPath(std::ostream& os, const WordLL& src)
+	template<class Vector, class FormVector>
+	inline std::ostream& printDebugPath(std::ostream& os, Vector&& pathes, size_t pathIdx, FormVector&& ownFormList)
 	{
-		if (src.parent)
+		auto& path = pathes[pathIdx];
+		if (path.parent != pathIdx)
 		{
-			printDebugPath(os, *src.parent);
+			printDebugPath(os, pathes, path.parent, ownFormList);
 		}
 
-		if (src.morpheme) src.morpheme->print(os);
+		if (path.morpheme)
+		{
+			if (path.ownFormId) os << utf16To8(joinHangul(ownFormList[path.ownFormId - 1].begin(), ownFormList[path.ownFormId - 1].end()));
+			path.morpheme->print(os);
+		}
 		else os << "NULL";
 		os << " , ";
 		return os;
@@ -180,7 +189,8 @@ namespace kiwi
 				bestPathValues.emplace_back(morph, accScore, firstChunkScore, 
 					parent, std::move(lmState), spState, 
 					parent ? base[parent].rootId : (uint8_t)0, 
-					parent ? base[parent].oovFlag : (uint8_t)0);
+					parent ? base[parent].oovFlag : (uint8_t)0,
+					parent ? base[parent].oovCntArenaPtr : (uint32_t)0);
 				if (rootId != commonRootId) bestPathValues.back().rootId = rootId;
 				bestPathValues.resize(bestPathValues.size() + topN - 1);
 			}
@@ -193,7 +203,9 @@ namespace kiwi
 					*bestPathLast = WordLL{ morph, accScore, firstChunkScore, 
 						parent, std::move(lmState), spState, 
 						parent ? base[parent].rootId : (uint8_t)0,
-						parent ? base[parent].oovFlag : (uint8_t)0 };
+						parent ? base[parent].oovFlag : (uint8_t)0,
+						parent ? base[parent].oovCntArenaPtr : (uint32_t)0
+					};
 					if (rootId != commonRootId) bestPathLast->rootId = rootId;
 					std::push_heap(bestPathFirst, bestPathLast + 1, WordLLGreater{});
 					++inserted.first->second.second;
@@ -206,7 +218,9 @@ namespace kiwi
 						*(bestPathLast - 1) = WordLL{ morph, accScore, firstChunkScore, 
 							parent, std::move(lmState), spState, 
 							parent ? base[parent].rootId : (uint8_t)0,
-							parent ? base[parent].oovFlag : (uint8_t)0 };
+							parent ? base[parent].oovFlag : (uint8_t)0,
+							parent ? base[parent].oovCntArenaPtr : (uint32_t)0
+						};
 						if (rootId != commonRootId) (*(bestPathLast - 1)).rootId = rootId;
 						std::push_heap(bestPathFirst, bestPathLast, WordLLGreater{});
 					}
@@ -255,7 +269,9 @@ namespace kiwi
 			WordLL newPath{ morph, accScore, firstChunkScore, 
 				parent, std::move(lmState), spState, 
 				parent ? base[parent].rootId : (uint8_t)0, 
-				parent ? base[parent].oovFlag : (uint8_t)0 };
+				parent ? base[parent].oovFlag : (uint8_t)0,
+				parent ? base[parent].oovCntArenaPtr : (uint32_t)0
+			};
 			newPath.prevRootId = prevRootId;
 			if (rootId != commonRootId) newPath.rootId = rootId;
 			auto inserted = bestPathes.emplace(newPath);
@@ -372,7 +388,9 @@ namespace kiwi
 					value.emplace_back(morph, accScore, firstChunkScore, 
 						parent, std::move(lmState), spState,
 						parent ? base[parent].rootId : (uint8_t)0,
-						parent ? base[parent].oovFlag : (uint8_t)0);
+						parent ? base[parent].oovFlag : (uint8_t)0,
+						parent ? base[parent].oovCntArenaPtr : (uint32_t)0
+					);
 					value.back().prevRootId = prevRootId;
 					if (rootId != commonRootId) value.back().rootId = rootId;
 				}
@@ -396,6 +414,7 @@ namespace kiwi
 					target.rootId = parent ? base[parent].rootId : 0;
 					if (rootId != commonRootId) target.rootId = rootId;
 					target.oovFlag = parent ? base[parent].oovFlag : 0;
+					target.oovCntArenaPtr = parent ? base[parent].oovCntArenaPtr : 0;
 				}
 			}
 		}
@@ -436,7 +455,9 @@ namespace kiwi
 					value.emplace_back(morph, accScore, firstChunkScore, 
 						parent, std::move(lmState), spState, 
 						parent ? base[parent].rootId : (uint8_t)0,
-						parent ? base[parent].oovFlag : (uint8_t)0);
+						parent ? base[parent].oovFlag : (uint8_t)0,
+						parent ? base[parent].oovCntArenaPtr : (uint32_t)0
+					);
 					value.back().prevRootId = prevRootId;
 					if (rootId != commonRootId) value.back().rootId = rootId;
 				}
@@ -460,6 +481,7 @@ namespace kiwi
 					target.rootId = parent ? base[parent].rootId : 0;
 					if (rootId != commonRootId) target.rootId = rootId;
 					target.oovFlag = parent ? base[parent].oovFlag : 0;
+					target.oovCntArenaPtr = parent ? base[parent].oovCntArenaPtr : 0;
 				}
 			}
 		}
