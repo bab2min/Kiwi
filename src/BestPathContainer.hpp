@@ -5,9 +5,6 @@
 
 namespace kiwi
 {
-	template<class LmState>
-	struct WordLL;
-
 	using Wid = uint32_t;
 
 	enum class PathEvaluatingMode
@@ -18,40 +15,50 @@ namespace kiwi
 		top1,
 	};
 
-	template<class LmState>
+	template<class _LmState, bool _hasOovCounter = false>
 	struct WordLL
 	{
+		using LmState = _LmState;
+		static constexpr bool hasOovCounter = _hasOovCounter;
+
 		LmState lmState;
+		
+		float accScore = 0, firstChunkScore = 0;
+		uint32_t parent = 0;
+		Wid wid = 0;
+		uint16_t ownFormId = 0;
+		uint8_t combineSocket = 0;
 		uint8_t prevRootId = 0;
 		SpecialState spState;
 		uint8_t rootId = 0;
 
+		std::conditional_t<hasOovCounter, uint16_t, uint8_t> oovFlag = 0;
+		std::conditional_t<hasOovCounter, uint32_t, uint8_t> oovCntArenaPtr = 0;
+
 		const Morpheme* morpheme = nullptr;
-		float accScore = 0, firstChunkScore = 0, accTypoCost = 0, accDialectCost = 0;
-		const WordLL* parent = nullptr;
-		Wid wid = 0;
-		uint16_t ownFormId = 0;
-		uint8_t combineSocket = 0;
 
 		WordLL() = default;
 
-		WordLL(const Morpheme* _morph, float _accScore, float _firstChunkScore, float _accTypoCost, float _accDialectCost,
-			const WordLL* _parent, LmState _lmState, SpecialState _spState)
+		WordLL(const Morpheme* _morph, float _accScore, float _firstChunkScore,
+			uint32_t _parent, LmState _lmState, SpecialState _spState, uint8_t _rootId, 
+			uint16_t _oovFlag = 0,
+			uint32_t _oovCntArenaPtr = 0
+			)
 			: morpheme{ _morph },
 			accScore{ _accScore },
 			firstChunkScore{ _firstChunkScore },
-			accTypoCost{ _accTypoCost },
-			accDialectCost{ _accDialectCost },
 			parent{ _parent },
 			lmState{ _lmState },
 			spState{ _spState },
-			rootId{ _parent ? _parent->rootId : (uint8_t)0 }
+			rootId{ _rootId },
+			oovFlag{ (decltype(oovFlag))_oovFlag },
+			oovCntArenaPtr{ (decltype(oovCntArenaPtr))_oovCntArenaPtr }
 		{
 		}
 
-		const WordLL* root() const
+		const WordLL* root(const WordLL* base) const
 		{
-			if (parent) return parent->root();
+			if (parent) return base[parent].root(base);
 			else return this;
 		}
 
@@ -66,10 +73,10 @@ namespace kiwi
 		}
 	};
 
-	template<class LmState>
-	struct Hash<WordLL<LmState>>
+	template<class LmState, bool useOOVGlobalConsistency>
+	struct Hash<WordLL<LmState, useOOVGlobalConsistency>>
 	{
-		size_t operator()(const WordLL<LmState>& p) const
+		size_t operator()(const WordLL<LmState, useOOVGlobalConsistency>& p) const
 		{
 			size_t ret = Hash<LmState>{}(p.lmState);
 			ret = *reinterpret_cast<const uint16_t*>(&p.prevRootId) ^ ((ret << 3) | (ret >> (sizeof(size_t) * 8 - 3)));
@@ -121,28 +128,33 @@ namespace kiwi
 
 	struct WordLLGreater
 	{
-		template<class LmState>
-		bool operator()(const WordLL<LmState>& a, const WordLL<LmState>& b) const
+		template<class WordLL>
+		bool operator()(const WordLL& a, const WordLL& b) const
 		{
 			return a.accScore > b.accScore;
 		}
 	};
 
-	template<class LmState>
-	inline std::ostream& printDebugPath(std::ostream& os, const WordLL<LmState>& src)
+	template<class Vector, class FormVector>
+	inline std::ostream& printDebugPath(std::ostream& os, Vector&& pathes, size_t pathIdx, FormVector&& ownFormList)
 	{
-		if (src.parent)
+		auto& path = pathes[pathIdx];
+		if (path.parent != pathIdx)
 		{
-			printDebugPath(os, *src.parent);
+			printDebugPath(os, pathes, path.parent, ownFormList);
 		}
 
-		if (src.morpheme) src.morpheme->print(os);
+		if (path.morpheme)
+		{
+			if (path.ownFormId) os << utf16To8(joinHangul(ownFormList[path.ownFormId - 1].begin(), ownFormList[path.ownFormId - 1].end()));
+			path.morpheme->print(os);
+		}
 		else os << "NULL";
 		os << " , ";
 		return os;
 	}
 
-	template<PathEvaluatingMode mode, class LmState>
+	template<PathEvaluatingMode mode, class WordLL>
 	class BestPathConatiner;
 
 	template<PathEvaluatingMode mode>
@@ -151,12 +163,13 @@ namespace kiwi
 		static constexpr size_t maxSize = -1;
 	};
 
-	template<class LmState>
-	class BestPathConatiner<PathEvaluatingMode::topN, LmState>
+	template<class WordLL>
+	class BestPathConatiner<PathEvaluatingMode::topN, WordLL>
 	{
+		using LmState = typename WordLL::LmState;
 		// pair: [index, size]
 		UnorderedMap<PathHash<LmState>, std::pair<uint32_t, uint32_t>> bestPathIndex;
-		Vector<WordLL<LmState>> bestPathValues;
+		Vector<WordLL> bestPathValues;
 	public:
 
 		inline void clear()
@@ -166,15 +179,18 @@ namespace kiwi
 		}
 
 		inline void insert(size_t topN, uint8_t prevRootId, uint8_t rootId,
-			const Morpheme* morph, float accScore, float firstChunkScore, float accTypoCost, float accDialectCost,
-			const WordLL<LmState>* parent, LmState&& lmState, SpecialState spState)
+			const Morpheme* morph, float accScore, float firstChunkScore, 
+			const WordLL* base, uint32_t parent, LmState&& lmState, SpecialState spState)
 		{
 			PathHash<LmState> ph{ lmState, prevRootId, spState };
 			auto inserted = bestPathIndex.emplace(ph, std::make_pair((uint32_t)bestPathValues.size(), 1));
 			if (inserted.second)
 			{
-				bestPathValues.emplace_back(morph, accScore, firstChunkScore, accTypoCost, accDialectCost,
-					parent, std::move(lmState), spState);
+				bestPathValues.emplace_back(morph, accScore, firstChunkScore, 
+					parent, std::move(lmState), spState, 
+					parent ? base[parent].rootId : (uint8_t)0, 
+					(uint16_t)(parent ? base[parent].oovFlag : 0),
+					parent ? base[parent].oovCntArenaPtr : (uint32_t)0);
 				if (rootId != commonRootId) bestPathValues.back().rootId = rootId;
 				bestPathValues.resize(bestPathValues.size() + topN - 1);
 			}
@@ -184,8 +200,12 @@ namespace kiwi
 				auto bestPathLast = bestPathValues.begin() + inserted.first->second.first + inserted.first->second.second;
 				if (std::distance(bestPathFirst, bestPathLast) < topN)
 				{
-					*bestPathLast = WordLL<LmState>{ morph, accScore, firstChunkScore, accTypoCost, accDialectCost,
-						parent, std::move(lmState), spState };
+					*bestPathLast = WordLL{ morph, accScore, firstChunkScore, 
+						parent, std::move(lmState), spState, 
+						parent ? base[parent].rootId : (uint8_t)0,
+						(uint16_t)(parent ? base[parent].oovFlag : 0),
+						parent ? base[parent].oovCntArenaPtr : (uint32_t)0
+					};
 					if (rootId != commonRootId) bestPathLast->rootId = rootId;
 					std::push_heap(bestPathFirst, bestPathLast + 1, WordLLGreater{});
 					++inserted.first->second.second;
@@ -195,8 +215,12 @@ namespace kiwi
 					if (accScore > bestPathFirst->accScore)
 					{
 						std::pop_heap(bestPathFirst, bestPathLast, WordLLGreater{});
-						*(bestPathLast - 1) = WordLL<LmState>{ morph, accScore, firstChunkScore, accTypoCost, accDialectCost,
-							parent, std::move(lmState), spState };
+						*(bestPathLast - 1) = WordLL{ morph, accScore, firstChunkScore, 
+							parent, std::move(lmState), spState, 
+							parent ? base[parent].rootId : (uint8_t)0,
+							(uint16_t)(parent ? base[parent].oovFlag : 0),
+							parent ? base[parent].oovCntArenaPtr : (uint32_t)0
+						};
 						if (rootId != commonRootId) (*(bestPathLast - 1)).rootId = rootId;
 						std::push_heap(bestPathFirst, bestPathLast, WordLLGreater{});
 					}
@@ -204,7 +228,7 @@ namespace kiwi
 			}
 		}
 
-		inline void writeTo(Vector<WordLL<LmState>>& resultOut, const Morpheme* curMorph, Wid lastSeqId, size_t ownFormId)
+		inline void writeTo(Vector<WordLL>& resultOut, const Morpheme* curMorph, Wid lastSeqId, size_t ownFormId)
 		{
 			for (auto& p : bestPathIndex)
 			{
@@ -227,10 +251,11 @@ namespace kiwi
 		}
 	};
 
-	template<class LmState>
-	class BestPathConatiner<PathEvaluatingMode::top1, LmState>
+	template<class WordLL>
+	class BestPathConatiner<PathEvaluatingMode::top1, WordLL>
 	{
-		UnorderedSet<WordLL<LmState>> bestPathes;
+		using LmState = typename WordLL::LmState;
+		UnorderedSet<WordLL> bestPathes;
 	public:
 		inline void clear()
 		{
@@ -238,11 +263,15 @@ namespace kiwi
 		}
 
 		inline void insert(size_t topN, uint8_t prevRootId, uint8_t rootId,
-			const Morpheme* morph, float accScore, float firstChunkScore, float accTypoCost, float accDialectCost,
-			const WordLL<LmState>* parent, LmState&& lmState, SpecialState spState)
+			const Morpheme* morph, float accScore, float firstChunkScore,
+			const WordLL* base, uint32_t parent, LmState&& lmState, SpecialState spState)
 		{
-			WordLL<LmState> newPath{ morph, accScore, firstChunkScore, accTypoCost, accDialectCost,
-				parent, std::move(lmState), spState };
+			WordLL newPath{ morph, accScore, firstChunkScore, 
+				parent, std::move(lmState), spState, 
+				parent ? base[parent].rootId : (uint8_t)0, 
+				(uint16_t)(parent ? base[parent].oovFlag : 0),
+				parent ? base[parent].oovCntArenaPtr : (uint32_t)0
+			};
 			newPath.prevRootId = prevRootId;
 			if (rootId != commonRootId) newPath.rootId = rootId;
 			auto inserted = bestPathes.emplace(newPath);
@@ -250,7 +279,7 @@ namespace kiwi
 			{
 				// this is dangerous, but we can update the key safely
 				// because an equality between the two objects is guaranteed
-				auto& target = const_cast<WordLL<LmState>&>(*inserted.first);
+				auto& target = const_cast<WordLL&>(*inserted.first);
 				if (accScore > target.accScore)
 				{
 					target = newPath;
@@ -258,7 +287,7 @@ namespace kiwi
 			}
 		}
 
-		inline void writeTo(Vector<WordLL<LmState>>& resultOut, const Morpheme* curMorph, Wid lastSeqId, size_t ownFormId)
+		inline void writeTo(Vector<WordLL>& resultOut, const Morpheme* curMorph, Wid lastSeqId, size_t ownFormId)
 		{
 			for (auto& p : bestPathes)
 			{
@@ -288,13 +317,14 @@ namespace kiwi
 		static constexpr size_t maxSize = BestPathContainerTraits<PathEvaluatingMode::top1Small>::maxSize * 4;
 	};
 
-	template<class LmState, size_t bucketBits>
+	template<class WordLL, size_t bucketBits>
 	class BucketedHashContainer
 	{
+		using LmState = typename WordLL::LmState;
 		static constexpr size_t bucketSize = 1 << bucketBits;
 
 		std::array<std::array<uint8_t, BestPathContainerTraits<PathEvaluatingMode::top1Small>::maxSize>, bucketSize> hashes;
-		std::array<Vector<WordLL<LmState>>, bucketSize> values;
+		std::array<Vector<WordLL>, bucketSize> values;
 
 	public:
 		BucketedHashContainer()
@@ -315,11 +345,11 @@ namespace kiwi
 
 		template<ArchType archType>
 		inline void insertOptimized(size_t topN, uint8_t prevRootId, uint8_t rootId,
-			const Morpheme* morph, float accScore, float firstChunkScore, float accTypoCost, float accDialectCost,
-			const WordLL<LmState>* parent, LmState&& lmState, SpecialState spState)
+			const Morpheme* morph, float accScore, float firstChunkScore,
+			const WordLL* base, uint32_t parent, LmState&& lmState, SpecialState spState)
 		{
 			static constexpr size_t numBits = sizeof(size_t) * 8;
-			const size_t h = Hash<WordLL<LmState>>{}(lmState, prevRootId, spState);
+			const size_t h = Hash<WordLL>{}(lmState, prevRootId, spState);
 			const size_t bucket = (h >> 8) & (bucketSize - 1);
 			auto& hash = hashes[bucket];
 			auto& value = values[bucket];
@@ -355,8 +385,12 @@ namespace kiwi
 				if (value.size() < hash.size())
 				{
 					hash[value.size()] = h;
-					value.emplace_back(morph, accScore, firstChunkScore, accTypoCost, accDialectCost,
-						parent, std::move(lmState), spState);
+					value.emplace_back(morph, accScore, firstChunkScore, 
+						parent, std::move(lmState), spState,
+						parent ? base[parent].rootId : (uint8_t)0,
+						(uint16_t)(parent ? base[parent].oovFlag : 0),
+						parent ? base[parent].oovCntArenaPtr : (uint32_t)0
+					);
 					value.back().prevRootId = prevRootId;
 					if (rootId != commonRootId) value.back().rootId = rootId;
 				}
@@ -374,29 +408,29 @@ namespace kiwi
 					target.morpheme = morph;
 					target.accScore = accScore;
 					target.firstChunkScore = firstChunkScore;
-					target.accTypoCost = accTypoCost;
-					target.accDialectCost = accDialectCost;
 					target.parent = parent;
 					target.lmState = std::move(lmState);
 					target.spState = spState;
-					target.rootId = parent ? parent->rootId : 0;
+					target.rootId = parent ? base[parent].rootId : 0;
 					if (rootId != commonRootId) target.rootId = rootId;
+					target.oovFlag = parent ? base[parent].oovFlag : 0;
+					target.oovCntArenaPtr = parent ? base[parent].oovCntArenaPtr : 0;
 				}
 			}
 		}
 
 		inline void insert(size_t topN, uint8_t prevRootId, uint8_t rootId,
-			const Morpheme* morph, float accScore, float firstChunkScore, float accTypoCost, float accDialectCost,
-			const WordLL<LmState>* parent, LmState&& lmState, SpecialState spState)
+			const Morpheme* morph, float accScore, float firstChunkScore, 
+			const WordLL* base, uint32_t parent, LmState&& lmState, SpecialState spState)
 		{
 			static constexpr ArchType archType = LmState::arch;
 			if constexpr (archType != ArchType::none && archType != ArchType::balanced)
 			{
-				return insertOptimized<archType>(topN, prevRootId, rootId, morph, accScore, firstChunkScore, accTypoCost, accDialectCost,
-					parent, std::move(lmState), spState);
+				return insertOptimized<archType>(topN, prevRootId, rootId, morph, accScore, firstChunkScore, 
+					base, parent, std::move(lmState), spState);
 			}
 
-			const size_t h = Hash<WordLL<LmState>>{}(lmState, prevRootId, spState);
+			const size_t h = Hash<WordLL>{}(lmState, prevRootId, spState);
 			const size_t bucket = (h >> 8) & (bucketSize - 1);
 			auto& hash = hashes[bucket];
 			auto& value = values[bucket];
@@ -418,8 +452,12 @@ namespace kiwi
 				if (value.size() < hash.size())
 				{
 					hash[value.size()] = h;
-					value.emplace_back(morph, accScore, firstChunkScore, accTypoCost, accDialectCost,
-						parent, std::move(lmState), spState);
+					value.emplace_back(morph, accScore, firstChunkScore, 
+						parent, std::move(lmState), spState, 
+						parent ? base[parent].rootId : (uint8_t)0,
+						(uint16_t)(parent ? base[parent].oovFlag : 0),
+						parent ? base[parent].oovCntArenaPtr : (uint32_t)0
+					);
 					value.back().prevRootId = prevRootId;
 					if (rootId != commonRootId) value.back().rootId = rootId;
 				}
@@ -437,18 +475,18 @@ namespace kiwi
 					target.morpheme = morph;
 					target.accScore = accScore;
 					target.firstChunkScore = firstChunkScore;
-					target.accTypoCost = accTypoCost;
-					target.accDialectCost = accDialectCost;
 					target.parent = parent;
 					target.lmState = std::move(lmState);
 					target.spState = spState;
-					target.rootId = parent ? parent->rootId : 0;
+					target.rootId = parent ? base[parent].rootId : 0;
 					if (rootId != commonRootId) target.rootId = rootId;
+					target.oovFlag = parent ? base[parent].oovFlag : 0;
+					target.oovCntArenaPtr = parent ? base[parent].oovCntArenaPtr : 0;
 				}
 			}
 		}
 
-		inline void writeTo(Vector<WordLL<LmState>>& resultOut, const Morpheme* curMorph, Wid lastSeqId, size_t ownFormId)
+		inline void writeTo(Vector<WordLL>& resultOut, const Morpheme* curMorph, Wid lastSeqId, size_t ownFormId)
 		{
 			for (auto& v : values)
 			{
@@ -470,15 +508,15 @@ namespace kiwi
 	};
 
 
-	template<class LmState>
-	class alignas(BestPathContainerTraits<PathEvaluatingMode::top1Small>::maxSize) BestPathConatiner<PathEvaluatingMode::top1Small, LmState>
-		: public BucketedHashContainer<LmState, 0>
+	template<class WordLL>
+	class alignas(BestPathContainerTraits<PathEvaluatingMode::top1Small>::maxSize) BestPathConatiner<PathEvaluatingMode::top1Small, WordLL>
+		: public BucketedHashContainer<WordLL, 0>
 	{
 	};
 
-	template<class LmState>
-	class alignas(BestPathContainerTraits<PathEvaluatingMode::top1Small>::maxSize) BestPathConatiner<PathEvaluatingMode::top1Medium, LmState>
-		: public BucketedHashContainer<LmState, 2>
+	template<class WordLL>
+	class alignas(BestPathContainerTraits<PathEvaluatingMode::top1Small>::maxSize) BestPathConatiner<PathEvaluatingMode::top1Medium, WordLL>
+		: public BucketedHashContainer<WordLL, 2>
 	{
 	};
 }

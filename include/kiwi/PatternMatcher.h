@@ -22,7 +22,8 @@ namespace kiwi
 		oovChrFreqModel = 2 << 8, /**< 사전에 없는 단어에 대해 문자 빈도 기반 OOV 모델을 사용하여 매칭한다 */
 		oovChrFreqBranchModel = 3 << 8, /**< 사전에 없는 단어에 대해 문자 빈도 및 브랜치 기반 OOV 모델을 사용하여 매칭한다 */
 		oovMask = 3 << 8, /**< OOV 옵션들에 대한 마스크 */
-		
+		oovTotalConsistency = 1 << 10, /**< */
+
 		normalizeCoda = 1 << 16, /**< 초성체가 앞 어절의 받침에 따라붙은 경우를 정규화하여 매칭한다 */
 		joinNounPrefix = 1 << 17, /**< 체언접두사(XPN)를 분리하지 않고 합쳐서 매칭한다 */
 		joinNounSuffix = 1 << 18, /**< 명사파생접미사(XSN)를 분리하지 않고 합쳐서 매칭한다 */

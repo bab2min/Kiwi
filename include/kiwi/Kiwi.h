@@ -162,6 +162,8 @@ namespace kiwi
 		uint32_t maxUnkFormSize = 6;
 		uint32_t maxUnkFormSizeFollowedByJClass = (uint32_t)-1;
 		uint32_t spaceTolerance = 0;
+		float oovCutOffThreshold = 5;
+		float oovTotalSmoothness = 0.1f;
 
 		void validate() const;
 	};
@@ -174,7 +176,7 @@ namespace kiwi
 	{
 		friend class KiwiBuilder;
 		template<class LangModel> friend struct BestPathFinder;
-		template<class LmState, class> friend struct PathEvaluator;
+		template<class WordLL, class> friend struct PathEvaluator;
 		template<class LmState> friend struct MorphemeEvaluator;
 		friend class cmb::AutoJoiner;
 		template<template<ArchType> class LmState> friend struct NewAutoJoinerGetter;

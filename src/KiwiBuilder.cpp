@@ -2468,6 +2468,7 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 	for (size_t i = 0; i < defaultFormSize; ++i)
 	{
 		formTrie[i + 1].val = &ret.forms[i];
+		ret.forms[i].hasAnyFullMorphemes = true;
 	}
 
 	Vector<const Form*> sortedForms;

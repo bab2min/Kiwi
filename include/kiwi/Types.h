@@ -31,23 +31,23 @@
 #include "ScriptType.h"
 
 #define KIWI_DEFINE_ENUM_FLAG_OPERATORS(Type) \
-inline Type operator~(Type a)\
+inline constexpr Type operator~(Type a)\
 {\
 	return static_cast<Type>(~static_cast<typename std::underlying_type<Type>::type>(a));\
 }\
-inline bool operator!(Type a)\
+inline constexpr bool operator!(Type a)\
 {\
 	return a == static_cast<Type>(0);\
 }\
-inline Type operator|(Type a, Type b)\
+inline constexpr Type operator|(Type a, Type b)\
 {\
 	return static_cast<Type>(static_cast<typename std::underlying_type<Type>::type>(a) | static_cast<typename std::underlying_type<Type>::type>(b));\
 }\
-inline Type operator&(Type a, Type b)\
+inline constexpr Type operator&(Type a, Type b)\
 {\
 	return static_cast<Type>(static_cast<typename std::underlying_type<Type>::type>(a) & static_cast<typename std::underlying_type<Type>::type>(b));\
 }\
-inline Type operator^(Type a, Type b)\
+inline constexpr Type operator^(Type a, Type b)\
 {\
 	return static_cast<Type>(static_cast<typename std::underlying_type<Type>::type>(a) ^ static_cast<typename std::underlying_type<Type>::type>(b));\
 }\

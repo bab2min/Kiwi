@@ -36,7 +36,7 @@ jobs:
     - name: Print CPU Info
       run: cat /proc/cpuinfo
     - name: Build
-      run: cd build && make -j2
+      run: cd build && make -j1
     - name: Run Unit Test
       run: ./build/test/kiwi-test
     - name: Run Unit Test in Debug mode

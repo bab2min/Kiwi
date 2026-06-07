@@ -15,18 +15,21 @@ using namespace std;
 
 namespace kiwi
 {
-	template<size_t windowSize, ArchType arch, class VocabTy, class VlVocabTy, bool quantized>
-	struct MorphemeEvaluator<lm::CoNgramState<windowSize, arch, VocabTy, VlVocabTy, quantized>>
+	template<size_t windowSize, ArchType arch, class VocabTy, class VlVocabTy, bool quantized, bool _hasOovCounter>
+	struct MorphemeEvaluator<WordLL<lm::CoNgramState<windowSize, arch, VocabTy, VlVocabTy, quantized>, _hasOovCounter>>
 	{
+		static constexpr bool hasOovCounter = _hasOovCounter;
 		using LmState = lm::CoNgramState<windowSize, arch, VocabTy, VlVocabTy, quantized>;
+		using WordLLTy = WordLL<LmState, hasOovCounter>;
 
 		template<PathEvaluatingMode mode>
 		void eval(
-			Vector<WordLL<LmState>>& resultOut,
+			Vector<WordLLTy>& resultOut,
 			const Kiwi* kw,
 			const KiwiConfig& config,
 			const Vector<U16StringView>& ownForms,
-			const Vector<Vector<WordLL<LmState>>>& cache,
+			const Vector<WordLLTy>& pathes,
+			const Vector<size_t>& pathIndices,
 			size_t ownFormId,
 			const Vector<const Morpheme*>& morphs,
 			const KGraphNode* node,
@@ -36,12 +39,14 @@ namespace kiwi
 			const float ignoreCondScore,
 			const float nodeLevelDiscount,
 			const float dialectCost,
-			const Vector<SpecialState>& prevSpStates
+			const Vector<PackedState>& prevSpStates,
+			const OovUnigramScorer& oovUnigramScorer,
+			uint32_t nodeIdx = -1
 		) const
 		{
-			thread_local BestPathConatiner<mode, LmState> bestPathCont;
-			thread_local Vector<pair<const KGraphNode*, const WordLL<LmState>*>> regularPrevPathes;
-			thread_local Vector<pair<const KGraphNode*, const WordLL<LmState>*>> combiningPrevPathes;
+			thread_local BestPathConatiner<mode, WordLLTy> bestPathCont;
+			thread_local Vector<pair<const KGraphNode*, size_t>> regularPrevPathes;
+			thread_local Vector<pair<const KGraphNode*, size_t>> combiningPrevPathes;
 			thread_local Vector<const Morpheme*> regularMorphs, regularDistantMorphs, combiningLMorphs, combiningRMorphs;
 			thread_local Vector<LmState> prevLmStates, nextLmStates;
 			thread_local Vector<VocabTy> nextWids, nextDistantWids;
@@ -63,23 +68,31 @@ namespace kiwi
 			nextWids.clear();
 			nextDistantWids.clear();
 
+			UnorderedMap<uint32_t, float> oovTotalScoreMap;
+
 			for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
 			{
-				for (auto& prevPath : cache[prev - startNode])
+				for (size_t p = pathIndices[prev - startNode]; p < pathIndices[prev - startNode + 1]; ++p)
 				{
+					auto& prevPath = pathes[p];
 					if (prevPath.combineSocket)
 					{
-						combiningPrevPathes.emplace_back(prev, &prevPath);
+						combiningPrevPathes.emplace_back(prev, p);
 						continue;
 					}
-					regularPrevPathes.emplace_back(prev, &prevPath);
+					regularPrevPathes.emplace_back(prev, p);
+
+					if (hasOovCounter && !oovUnigramScorer.empty() && !oovTotalScoreMap.count(prevPath.oovCntArenaPtr))
+					{
+						oovTotalScoreMap[prevPath.oovCntArenaPtr] = oovUnigramScorer.score(prevPath.oovCntArenaPtr, nodeIdx);
+					}
 				}
 			}
 
 			prevLmStates.resize(regularPrevPathes.size());
 			for (size_t i = 0; i < regularPrevPathes.size(); ++i)
 			{
-				prevLmStates[i] = regularPrevPathes[i].second->lmState;
+				prevLmStates[i] = pathes[regularPrevPathes[i].second].lmState;
 			}
 
 			for (auto& curMorph : morphs)
@@ -169,18 +182,24 @@ namespace kiwi
 				RuleBasedScorer ruleBasedScorer{ kw, curMorph, node };
 				const float morphScore = curMorph->userScore + nodeLevelDiscount + kw->tagScorer.evalLeftBoundary(hasLeftBoundary(node), curMorph->tag);
 				size_t prevId = -1;
-				for (auto [prev, prevPath] : regularPrevPathes)
+				for (auto [prev, p] : regularPrevPathes)
 				{
+					auto& prevPath = pathes[p];
 					++prevId;
 					auto& state = nextLmStates[prevId * regularMorphs.size() + curId];
-					float score = prevPath->accScore + morphScore + scores[prevId * regularMorphs.size() + curId];
+					float score = prevPath.accScore + morphScore + scores[prevId * regularMorphs.size() + curId];
 					const float firstChunkScore = morphScore + scores[prevId * regularMorphs.size() + curId];
+					
+					if (hasOovCounter && !oovUnigramScorer.empty())
+					{
+						score += oovTotalScoreMap[prevPath.oovCntArenaPtr];
+					}
 
-					FormEvaluator formEvaluator{ *prevPath, ownForms, morphBase };
+					FormEvaluator formEvaluator{ prevPath, ownForms, morphBase };
 					if (!formEvaluator(curMorph, ignoreCondScore, score)) continue;
 
 					// 사이시옷 뒤에 명사가 아닌 태그가 오거나 공백이 있는 경우 제외
-					if (prevPath->morpheme->tag == POSTag::z_siot && (
+					if (prevPath.morpheme->tag == POSTag::z_siot && (
 						!isNNClass(curMorph->tag) || prev->endPos < node->startPos
 						))
 					{
@@ -198,7 +217,7 @@ namespace kiwi
 					}
 
 					insertToPathContainer(bestPathCont, topN, prevSpStates, curMorph, morphBase, 
-						move(state), score, firstChunkScore, node, *prevPath, ruleBasedScorer, dialectCost);
+						move(state), score, firstChunkScore, node, pathes.data(), prevPath, ruleBasedScorer, dialectCost);
 				continueFor:;
 				}
 
@@ -230,17 +249,18 @@ namespace kiwi
 				}
 				RuleBasedScorer ruleBasedScorer{ kw, curMorph, node };
 				const float morphScore = curMorph->userScore + nodeLevelDiscount + kw->tagScorer.evalLeftBoundary(hasLeftBoundary(node), curMorph->tag);
-				for (auto [prev, prevPath] : regularPrevPathes)
+				for (auto [prev, p] : regularPrevPathes)
 				{
-					auto state = prevPath->lmState;
-					float score = prevPath->accScore + morphScore;
+					auto& prevPath = pathes[p];
+					auto state = prevPath.lmState;
+					float score = prevPath.accScore + morphScore;
 					const float firstChunkScore = morphScore;
 
-					FormEvaluator formEvaluator{ *prevPath, ownForms, morphBase };
+					FormEvaluator formEvaluator{ prevPath, ownForms, morphBase };
 					if (!formEvaluator(curMorph, ignoreCondScore, score)) continue;
 
 					insertToPathContainer(bestPathCont, topN, prevSpStates, curMorph, morphBase, 
-						move(state), score, firstChunkScore, node, *prevPath, ruleBasedScorer, dialectCost);
+						move(state), score, firstChunkScore, node, pathes.data(), prevPath, ruleBasedScorer, dialectCost);
 				}
 				bestPathCont.writeTo(resultOut, curMorph, lastSeqId, ownFormId);
 			}
@@ -276,11 +296,11 @@ namespace kiwi
 				for (auto& p : combiningPrevPathes)
 				{
 					auto* prev = p.first;
-					auto* prevPath = p.second;
-					float score = prevPath->accScore + morphScore;
+					auto& prevPath = pathes[p.second];
+					float score = prevPath.accScore + morphScore;
 					float firstChunkScore = 0;
 					// merge <v> <chunk> with only the same socket
-					if (prevPath->combineSocket != curMorph->combineSocket || curMorph->isSingle())
+					if (prevPath.combineSocket != curMorph->combineSocket || curMorph->isSingle())
 					{
 						continue;
 					}
@@ -289,12 +309,12 @@ namespace kiwi
 						if (allowedSpaceBetweenChunk) score -= spacePenalty;
 						else continue;
 					}
-					Wid firstWid = morphBase[prevPath->wid].getCombined()->lmMorphemeId;
+					Wid firstWid = morphBase[prevPath.wid].getCombined()->lmMorphemeId;
 					
-					FormEvaluator formEvaluator{ *prevPath, ownForms, morphBase };
+					FormEvaluator formEvaluator{ prevPath, ownForms, morphBase };
 					if (!formEvaluator(curMorph, ignoreCondScore, score)) continue;
 
-					auto state = prevPath->lmState;
+					auto state = prevPath.lmState;
 					score += (firstChunkScore = state.next(langMdl, firstWid));
 					firstChunkScore += morphScore;
 
@@ -309,7 +329,7 @@ namespace kiwi
 					}
 
 					insertToPathContainer(bestPathCont, topN, prevSpStates, curMorph, morphBase, 
-						move(state), score, firstChunkScore, node, *prevPath, ruleBasedScorer, dialectCost);
+						move(state), score, firstChunkScore, node, pathes.data(), prevPath, ruleBasedScorer, dialectCost);
 				continueFor2:;
 				}
 				bestPathCont.writeTo(resultOut, curMorph, lastSeqId, ownFormId);

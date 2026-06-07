@@ -15,7 +15,6 @@
 #include "Joiner.hpp"
 #include "PathEvaluator.hpp"
 #include "Kiwi.hpp"
-#include "SubstringCounter.hpp"
 
 using namespace std;
 
@@ -614,7 +613,8 @@ namespace kiwi
 
 	inline void insertPathIntoResults(
 		vector<TokenResult>& ret, 
-		Vector<SpecialState>& spStatesByRet,
+		Vector<PackedState>& spStatesByRet,
+		Vector<uint8_t>& oovTotalCnt,
 		const Vector<PathResult>& pathes,
 		size_t topN, 
 		Match matchOptions,
@@ -627,6 +627,15 @@ namespace kiwi
 	{
 		Vector<size_t> parentMap;
 
+		uint32_t oovCntArenaMinPtr = -1;
+		if (!!(matchOptions & Match::oovTotalConsistency))
+		{
+			for (auto& p : pathes)
+			{
+				oovCntArenaMinPtr = min(oovCntArenaMinPtr, p.curState.oovCntArenaPtr());
+			}
+		}
+
 		if (ret.empty())
 		{
 			const size_t n = min(pathes.size(), topN * 2);
@@ -637,7 +646,7 @@ namespace kiwi
 		}
 		else
 		{
-			UnorderedMap<uint8_t, uint32_t> prevParents;
+			UnorderedMap<PackedState, uint32_t> prevParents;
 			Vector<uint8_t> selectedPathes(pathes.size());
 			for (size_t i = 0; i < ret.size(); ++i)
 			{
@@ -678,7 +687,7 @@ namespace kiwi
 			}
 		}
 
-		UnorderedMap<uint8_t, uint32_t> spStateCnt;
+		UnorderedMap<PackedState, uint32_t> spStateCnt;
 		size_t validTarget = 0;
 		for (size_t i = 0; i < ret.size(); ++i)
 		{
@@ -766,7 +775,7 @@ namespace kiwi
 		sort(idx.begin(), idx.end(), [&](size_t a, size_t b) { return ret[a].second > ret[b].second; });
 		
 		Vector<TokenResult> sortedRet;
-		Vector<SpecialState> sortedSpStatesByRet;
+		Vector<PackedState> sortedSpStatesByRet;
 		const size_t maxCands = min(topN * 2, validTarget);
 		for (size_t i = 0; i < maxCands; ++i)
 		{
@@ -778,8 +787,16 @@ namespace kiwi
 		for (size_t i = 0; i < maxCands; ++i)
 		{
 			ret.emplace_back(move(sortedRet[i]));
-			spStatesByRet.emplace_back(sortedSpStatesByRet[i]);
+			if (!!(matchOptions & Match::oovTotalConsistency))
+			{
+				spStatesByRet.emplace_back(sortedSpStatesByRet[i].specialState(), sortedSpStatesByRet[i].oovCntArenaPtr() - oovCntArenaMinPtr);
+			}
+			else
+			{
+				spStatesByRet.emplace_back(sortedSpStatesByRet[i]);
+			}
 		}
+		if (!!(matchOptions & Match::oovTotalConsistency)) oovTotalCnt.erase(oovTotalCnt.begin(), oovTotalCnt.begin() + oovCntArenaMinPtr);
 	}
 
 	inline void makePretokenizedSpanGroup(
@@ -1011,6 +1028,9 @@ namespace kiwi
 		}
 	}
 
+	std::ostream* logStream = &std::cerr;
+	int doLogging = 0;
+
 	vector<TokenResult> Kiwi::analyze(const u16string& str, size_t topN, AnalyzeOption option,
 		const vector<PretokenizedSpan>& pretokenized,
 		const optional<KiwiConfig>& overrideConfig
@@ -1056,7 +1076,7 @@ namespace kiwi
 		getWordPositions(wordPositions, str.begin(), str.end());
 		
 		SubstringCounter substringCounter;
-		if ((option.match & Match::oovMask) >= Match::oovChrFreqModel)
+		if ((option.match & Match::oovMask) >= Match::oovChrFreqModel || !!(option.match & Match::oovTotalConsistency))
 		{
 			thread_local Vector<char16_t> filteredStr;
 			filteredStr.clear();
@@ -1086,17 +1106,28 @@ namespace kiwi
 		}
 
 		vector<TokenResult> ret;
-		Vector<SpecialState> spStatesByRet;
+		Vector<PackedState> spStatesByRet;
 		thread_local Vector<KGraphNode> nodes;
 		thread_local Vector<uint32_t> nodeInWhichPretokenized;
+		thread_local UnorderedMap<U16StringView, size_t> oovTotalMap;
+		thread_local UnorderedMap<OovOrForm,Vector<uint16_t>> oovPrefixLists;
+		thread_local Vector<uint8_t> oovTotalCnt;
+		oovTotalMap.clear();
+		oovPrefixLists.clear();
+		oovTotalCnt.clear();
 		const auto* pretokenizedFirst = pretokenizedGroup.spans.data();
 		const auto* pretokenizedLast = pretokenizedFirst + pretokenizedGroup.spans.size();
 		size_t splitEnd = 0;
+		chrono::steady_clock::time_point startTime;
 		while (splitEnd < normalizedStr.size())
 		{
+			if (doLogging)
+			{
+				startTime = chrono::steady_clock::now();
+			}
 			nodes.clear();
 			auto* pretokenizedPrev = pretokenizedFirst;
-			splitEnd = (*reinterpret_cast<FnSplitByTrie>(dfSplitByTrie))(
+			const size_t newSplitEnd = (*reinterpret_cast<FnSplitByTrie>(dfSplitByTrie))(
 				nodes,
 				forms.data(),
 				typoPtrs.data(),
@@ -1116,10 +1147,17 @@ namespace kiwi
 				pretokenizedLast
 			);
 
+			if (doLogging)
+			{
+				auto input = utf16To8(joinHangul(normalizedStr.substr(splitEnd, newSplitEnd - splitEnd)));
+				*logStream << "Input: " << input << "\nNodes: " << nodes.size() << endl;
+			}
+			splitEnd = newSplitEnd;
+
 			if (nodes.size() <= 2) continue;
 			findPretokenizedGroupOfNode(nodeInWhichPretokenized, nodes, pretokenizedPrev, pretokenizedFirst);
 
-			Vector<PathResult> res = (*reinterpret_cast<FnFindBestPath>(dfFindBestPath))(
+			Vector<PathResult> res = (*reinterpret_cast<FnFindBestPath>(dfFindBestPath))(FindBestPathArgs{
 				this,
 				config,
 				spStatesByRet,
@@ -1128,6 +1166,10 @@ namespace kiwi
 				nodes.size(),
 				topN,
 				(size_t)(option.match & Match::oovMask),
+				!!(option.match & Match::oovTotalConsistency) ? &oovTotalMap : nullptr,
+				!!(option.match & Match::oovTotalConsistency) ? &oovTotalCnt : nullptr,
+				!!(option.match & Match::oovTotalConsistency) ? &oovPrefixLists : nullptr,
+				!!(option.match & Match::oovTotalConsistency) ? &ret : nullptr,
 				option.openEnding && splitEnd == normalizedStr.size(),
 				!!(option.match & Match::splitComplex),
 				!!(option.match & Match::splitSaisiot),
@@ -1136,8 +1178,15 @@ namespace kiwi
 				option.allowedDialects,
 				option.dialectCost,
 				(option.match & Match::oovMask) >= Match::oovChrFreqModel ? &substringCounter : nullptr
-			);
-			insertPathIntoResults(ret, spStatesByRet, res, topN, option.match, config.integrateAllomorph, positionTable, wordPositions, pretokenizedGroup, nodeInWhichPretokenized);
+			});
+			insertPathIntoResults(ret, spStatesByRet, oovTotalCnt,
+				res, topN, option.match, config.integrateAllomorph, 
+				positionTable, wordPositions, pretokenizedGroup, nodeInWhichPretokenized);
+			if (doLogging)
+			{
+				auto duration = chrono::duration_cast<chrono::milliseconds>(chrono::steady_clock::now() - startTime).count();
+				*logStream << "Time: " << duration << "ms\n" << endl;
+			}
 		}
 
 		sort(ret.begin(), ret.end(), [](const TokenResult& a, const TokenResult& b)
