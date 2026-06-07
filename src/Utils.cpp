@@ -609,7 +609,11 @@ namespace kiwi
 		{
 			return [modelPath](const std::string& filename) -> std::unique_ptr<std::istream> {
 				std::string fullPath = modelPath + "/" + filename;
+#if defined(_WIN32) || defined(_WIN64)
+				auto stream = std::make_unique<std::ifstream>((const wchar_t*)utf8To16(fullPath).c_str(), std::ios::binary);
+#else
 				auto stream = std::make_unique<std::ifstream>(fullPath, std::ios::binary);
+#endif
 				if (!stream->is_open()) {
 					return nullptr;
 				}
