@@ -6,6 +6,7 @@
         "type": "git",
         "url": "git+https://github.com/bab2min/Kiwi.git"
     },
+    "type": "module",
     "main": "dist/index.js",
     "files": [
         "dist"
