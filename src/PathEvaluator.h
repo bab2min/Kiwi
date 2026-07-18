@@ -43,6 +43,7 @@ namespace kiwi
 		float wordScore = 0, typoCost = 0, dialectCost = 0;
 		uint32_t typoFormId = 0;
 		uint32_t nodeId = 0;
+		bool hasInferredSurfaceBoundary = false;
 
 		PathNode(const Morpheme* _morph = nullptr,
 			const KString& _str = {},
@@ -52,11 +53,13 @@ namespace kiwi
 			float _typoCost = 0,
 			float _dialectCost = 0,
 			uint32_t _typoFormId = 0,
-			uint32_t _nodeId = 0
+			uint32_t _nodeId = 0,
+			bool _hasInferredSurfaceBoundary = false
 		)
 			: morph{ _morph }, str{ _str }, begin{ _begin }, end{ _end },
 			wordScore{ _wordScore }, typoCost{ _typoCost }, dialectCost{ _dialectCost },
-			typoFormId{ _typoFormId }, nodeId{ _nodeId }
+			typoFormId{ _typoFormId }, nodeId{ _nodeId },
+			hasInferredSurfaceBoundary{ _hasInferredSurfaceBoundary }
 		{
 		}
 

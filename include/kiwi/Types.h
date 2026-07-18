@@ -360,6 +360,7 @@ namespace kiwi
 		uint32_t pairedToken = -1; /**< SSO, SSC 태그에 속하는 형태소의 경우 쌍을 이루는 반대쪽 형태소의 위치(-1인 경우 해당하는 형태소가 없는 것을 뜻함) */
 		uint32_t subSentPosition = 0; /**< 인용부호나 괄호로 둘러싸인 하위 문장의 번호. 1부터 시작. 0인 경우 하위 문장이 아님을 뜻함 */
 		Dialect dialect = Dialect::standard; /**< 방언 정보 */
+		bool isSurfaceFormStart = false; /**< Match::surfaceForm 사용 시 이 Token이 새로운 원문 표면형에서 시작하는지 여부 */
 		const Morpheme* morph = nullptr; /**< 기타 형태소 정보에 대한 포인터 */
 
 		TokenInfo() = default;

@@ -619,6 +619,8 @@ namespace kiwi
 		size_t topN, 
 		Match matchOptions,
 		bool integrateAllomorph,
+		bool trackSurfaceForm,
+		const KString& normalizedStr,
 		const Vector<uint32_t>& positionTable,
 		const Vector<uint16_t>& wordPositions,
 		const PretokenizedSpanGroup& pretokenizedGroup,
@@ -689,6 +691,21 @@ namespace kiwi
 
 		UnorderedMap<PackedState, uint32_t> spStateCnt;
 		size_t validTarget = 0;
+		KString normalizedSourceForm, normalizedAnalyzedForm;
+		auto matchesSourceSpan = [&](uint32_t begin, uint32_t end, U16StringView analyzedForm)
+		{
+			// 사이시옷처럼 인공적으로 만든 chunk는 원문 밖이나 역순 span을
+			// 가질 수 있다. 비교할 원문이 없으므로 불일치로 처리한다.
+			if (begin > end || end > normalizedStr.size()) return false;
+			// 위치 보존 정규화는 NFC 받침과 NFD 초중성을 서로 다른 내부
+			// 형태로 남길 수 있으므로 양쪽을 같은 정규형으로 맞춰 비교한다.
+			normalizedSourceForm.clear();
+			normalizeHangul(normalizedSourceForm,
+				normalizedStr.begin() + begin, normalizedStr.begin() + end);
+			normalizedAnalyzedForm.clear();
+			normalizeHangul(normalizedAnalyzedForm, analyzedForm.begin(), analyzedForm.end());
+			return normalizedSourceForm == normalizedAnalyzedForm;
+		};
 		for (size_t i = 0; i < ret.size(); ++i)
 		{
 			if (parentMap[i] < pathes.size() && spStateCnt[pathes[parentMap[i]].curState] < topN)
@@ -704,9 +721,27 @@ namespace kiwi
 			auto& rarr = ret[validTarget].first;
 
 			const KString* prevMorph = nullptr;
+			uint32_t prevNodeId = 0;
+			bool hasPreviousToken = false;
+			u16string previousJoined;
+			uint32_t previousBegin = 0, previousEnd = 0;
 			for (auto& s : r.path)
 			{
 				if (!s.str.empty() && s.str[0] == ' ') continue;
+
+				// 표면형 추적은 just_split처럼 원문 복원이 필요한 경우에만 수행한다.
+				// 일반 분석에서는 비싼 원문 대조와 Token 메타데이터 생성을 생략한다.
+				bool startsNewSurfaceForm = false;
+				if (trackSurfaceForm)
+				{
+					// graph node가 바뀌거나 한 node가 여러 chunk를 내면 새 표면형을
+					// 우선 시도하고, 아래의 원문 대조로 축약 경계만 취소한다.
+					startsNewSurfaceForm = !hasPreviousToken
+						|| s.nodeId != prevNodeId
+						|| s.hasInferredSurfaceBoundary;
+					prevNodeId = s.nodeId;
+				}
+
 				u16string joined;
 				do
 				{
@@ -731,14 +766,36 @@ namespace kiwi
 					}
 					joined = joinHangul(s.str.empty() ? *s.morph->kform : s.str);
 				} while (0);
-				
-				if (!!(matchOptions & Match::compatibleJamo))
+
+				// '했'의 하/VV+었/EP처럼 양쪽 분석형이 각자 원문 span에 존재하지
+				// 않으면 두 형태소는 하나의 축약 표면형을 공유한다.
+				bool shouldMergeWithPreviousSurface = false;
+				if (trackSurfaceForm
+					&& s.hasInferredSurfaceBoundary
+					&& hasPreviousToken)
+				{
+					shouldMergeWithPreviousSurface = !matchesSourceSpan(
+						previousBegin, previousEnd, previousJoined
+					) && !matchesSourceSpan(s.begin, s.end, joined);
+				}
+
+				if (!trackSurfaceForm && !!(matchOptions & Match::compatibleJamo))
 				{
 					toCompatibleJamo(joined);
 				}
-
 				rarr.emplace_back(joined, s.morph->tag);
 				auto& token = rarr.back();
+				if (trackSurfaceForm)
+				{
+					previousJoined = move(joined);
+					previousBegin = s.begin;
+					previousEnd = s.end;
+					if (!!(matchOptions & Match::compatibleJamo))
+					{
+						toCompatibleJamo(token.str);
+					}
+					token.isSurfaceFormStart = startsNewSurfaceForm && !shouldMergeWithPreviousSurface;
+				}
 				token.morph = within(s.morph, pretokenizedGroup.morphemes) ? nullptr : s.morph;
 				size_t beginPos = (upper_bound(positionTable.begin(), positionTable.end(), s.begin) - positionTable.begin()) - 1;
 				size_t endPos = lower_bound(positionTable.begin(), positionTable.end(), s.end) - positionTable.begin();
@@ -763,6 +820,7 @@ namespace kiwi
 				// Token의 시작위치(position)을 이용해 Token이 포함된 어절번호(wordPosition)를 얻음
 				token.wordPosition = wordPositions[token.position];
 				prevMorph = s.morph->kform;
+				if (trackSurfaceForm) hasPreviousToken = true;
 			}
 			rarr.erase(joinAffixTokens(rarr.begin(), rarr.end(), matchOptions), rarr.end());
 			ret[validTarget].second += r.score;
@@ -1041,6 +1099,8 @@ namespace kiwi
 		thread_local PretokenizedSpanGroup pretokenizedGroup;
 
 		KiwiConfig config = overrideConfig.value_or(globalConfig);
+		const bool trackSurfaceForm = !!(option.match & Match::surfaceForm);
+		const Match matchOptions = option.match & ~Match::surfaceForm;
 
 		normalizedStr.clear();
 		positionTable.clear();
@@ -1134,7 +1194,7 @@ namespace kiwi
 				formTrie,
 				U16StringView{ normalizedStr.data() + splitEnd, normalizedStr.size() - splitEnd },
 				splitEnd,
-				option.match,
+				matchOptions,
 				option.allowedDialects,
 				config.maxUnkFormSize,
 				config.maxUnkFormSizeFollowedByJClass,
@@ -1180,8 +1240,8 @@ namespace kiwi
 				(option.match & Match::oovMask) >= Match::oovChrFreqModel ? &substringCounter : nullptr
 			});
 			insertPathIntoResults(ret, spStatesByRet, oovTotalCnt,
-				res, topN, option.match, config.integrateAllomorph, 
-				positionTable, wordPositions, pretokenizedGroup, nodeInWhichPretokenized);
+				res, topN, matchOptions, config.integrateAllomorph, trackSurfaceForm,
+				normalizedStr, positionTable, wordPositions, pretokenizedGroup, nodeInWhichPretokenized);
 			if (doLogging)
 			{
 				auto duration = chrono::duration_cast<chrono::milliseconds>(chrono::steady_clock::now() - startTime).count();

@@ -1130,7 +1130,8 @@ namespace kiwi
 						typoCostDiff,
 						dialectCostDiff,
 						typoCostDiff ? gNode.typoFormId : 0,
-						&gNode - graph
+						&gNode - graph,
+						ch > 0
 					);
 				}
 				ret.back().end = gNode.endPos;
@@ -1169,7 +1170,8 @@ namespace kiwi
 						typoCostDiff,
 						dialectCostDiff,
 						typoCostDiff ? gNode.typoFormId : 0,
-						&gNode - graph
+						&gNode - graph,
+						true
 					);
 				}
 				ret.back().end = gNode.endPos;
@@ -1188,7 +1190,8 @@ namespace kiwi
 						typoCostDiff,
 						dialectCostDiff,
 						typoCostDiff ? gNode.typoFormId : 0,
-						&gNode - graph
+						&gNode - graph,
+						ch > 0
 					);
 				}
 				ret.back().end = gNode.endPos;

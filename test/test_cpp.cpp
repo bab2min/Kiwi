@@ -517,6 +517,46 @@ TEST(KiwiCpp, Pretokenized)
 	}
 }
 
+TEST(KiwiCpp, SurfaceFormBoundaries)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+
+	auto expectBoundaries = [&](const std::u16string& text,
+		const std::vector<bool>& expected,
+		Match match = Match::allWithNormalizing)
+	{
+		auto tokens = kiwi.analyze(text, match | Match::surfaceForm).first;
+		ASSERT_EQ(tokens.size(), expected.size()) << " for input: " << utf16To8(text);
+		for (size_t i = 0; i < tokens.size(); ++i)
+		{
+			EXPECT_EQ(tokens[i].isSurfaceFormStart, expected[i])
+				<< " at token " << i << " for input: " << utf16To8(text);
+		}
+	};
+
+	expectBoundaries(u"했다", { true, false, true });
+	expectBoundaries(u"하였다", { true, true, true });
+	expectBoundaries(u"귀여워요", { true, false });
+	expectBoundaries(u"걸어", { true, true });
+
+	expectBoundaries(u"시곗바늘", { true, false, true },
+		Match::allWithNormalizing | Match::splitSaisiot);
+	expectBoundaries(u"공부하다", { true, true },
+		Match::allWithNormalizing | Match::joinAffix);
+}
+
+TEST(KiwiCpp, SurfaceFormTrackingCanBeDisabled)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+
+	auto tokens = kiwi.analyze(u"했다", Match::allWithNormalizing).first;
+	ASSERT_EQ(tokens.size(), 3u);
+	for (const auto& token : tokens)
+	{
+		EXPECT_FALSE(token.isSurfaceFormStart);
+	}
+}
+
 TEST(KiwiCpp, PretokenizedWithTypo)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
