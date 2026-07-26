@@ -4215,6 +4215,23 @@ namespace kiwi
         return &TypeRecords[index];
     }
 
+    bool isUnicodeLetter(char32_t c)
+    {
+        // _PyUnicode_IsAlpha: all Unicode general-category L code points.
+        return gettyperecord(c)->flags & 0x0001;
+    }
+
+    bool isUnicodeNumber(char32_t c)
+    {
+        // _PyUnicode_IsNumeric: Unicode general categories Nd, Nl, and No.
+        return gettyperecord(c)->flags & 0x0800;
+    }
+
+    bool isUnicodeSpace(char32_t c)
+    {
+        return gettyperecord(c)->flags & 0x0020;
+    }
+
     char32_t toUpper(char32_t ch)
     {
         const TypeRecord* ctype = gettyperecord(ch);
