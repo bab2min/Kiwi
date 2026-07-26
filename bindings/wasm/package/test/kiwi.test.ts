@@ -3,7 +3,9 @@ import { KiwiBuilder } from '../src/index.js';
 import { Kiwi, Match } from '../src/kiwi.js';
 import * as fs from 'fs';
 import * as path from 'path';
+import { fileURLToPath } from 'url';
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = path.resolve(__dirname, '../../../../');
 const WASM_PATH = path.resolve(PROJECT_ROOT, 'bindings/wasm/build/bindings/wasm/kiwi-wasm.wasm');
 const MODEL_DIR = path.resolve(PROJECT_ROOT, 'models/cong/base');
