@@ -1,4 +1,5 @@
 #include <kiwi/BpeTokenizer.h>
+#include <kiwi/ThreadPool.h>
 #include <kiwi/Utils.h>
 #include "StrUtils.h"
 #include "UnicodeCase.h"
@@ -156,16 +157,104 @@ namespace kiwi
 
 	static vector<string> extractChunks(const string& str, bool addPrefixSpace)
 	{
-		string workStr = str;
+		const string* workStr = &str;
+		string prefixedStr;
 		if (addPrefixSpace && !str.empty() && str[0] != ' ')
-			workStr = " " + str;
+		{
+			prefixedStr.reserve(str.size() + 1);
+			prefixedStr = " ";
+			prefixedStr += str;
+			workStr = &prefixedStr;
+		}
 
-		auto spans = extractChunkSpans(workStr);
+		auto spans = extractChunkSpans(*workStr);
 		vector<string> ret;
 		ret.reserve(spans.size());
 		for (auto& span : spans)
-			ret.push_back(workStr.substr(span.first, span.second));
+			ret.push_back(workStr->substr(span.first, span.second));
 		return ret;
+	}
+
+	using WordCounts = unordered_map<string, size_t>;
+
+	static size_t getWorkerCount(size_t configuredThreads, size_t batchSize)
+	{
+		size_t workerCount = configuredThreads;
+		if (!workerCount)
+			workerCount = thread::hardware_concurrency();
+		if (!workerCount)
+			workerCount = 1;
+		return min(workerCount, batchSize);
+	}
+
+	static size_t addSentencesImpl(
+		WordCounts& wordCounts,
+		size_t& sentenceCount,
+		const BpeTrainerConfig& config,
+		const function<string()>& feeder)
+	{
+		size_t totalCount = 0;
+		vector<string> batch;
+		batch.reserve(config.batchSize);
+		const size_t maxWorkerCount = getWorkerCount(config.numThreads, numeric_limits<size_t>::max());
+		unique_ptr<utils::ThreadPool> pool;
+		if (maxWorkerCount > 1)
+			pool = make_unique<utils::ThreadPool>(maxWorkerCount);
+
+		while (true)
+		{
+			batch.clear();
+			for (size_t i = 0; i < config.batchSize; ++i)
+			{
+				string sentence = feeder();
+				if (sentence.empty()) break;
+				batch.emplace_back(move(sentence));
+			}
+			if (batch.empty()) break;
+
+			const size_t workerCount = min(maxWorkerCount, batch.size());
+			vector<WordCounts> localCounts(workerCount);
+			auto processRange = [&](size_t workerIndex)
+			{
+				const size_t begin = batch.size() * workerIndex / workerCount;
+				const size_t end = batch.size() * (workerIndex + 1) / workerCount;
+				auto& counts = localCounts[workerIndex];
+				for (size_t i = begin; i < end; ++i)
+				{
+					auto chunks = extractChunks(batch[i], config.addPrefixSpace);
+					for (auto& chunk : chunks)
+						++counts[move(chunk)];
+				}
+			};
+
+			if (workerCount == 1)
+			{
+				processRange(0);
+			}
+			else
+			{
+				vector<future<void>> futures;
+				futures.reserve(workerCount);
+				for (size_t workerIndex = 0; workerIndex < workerCount; ++workerIndex)
+				{
+					futures.emplace_back(pool->enqueue([&, workerIndex](size_t)
+					{
+						processRange(workerIndex);
+					}));
+				}
+				for (auto& future : futures)
+					future.get();
+			}
+
+			for (auto& counts : localCounts)
+			{
+				for (auto& [chunk, count] : counts)
+					wordCounts[move(chunk)] += count;
+			}
+			totalCount += batch.size();
+			sentenceCount += batch.size();
+		}
+		return totalCount;
 	}
 
 	static vector<uint32_t> buildByteToCharPos(const string& str)
@@ -580,52 +669,23 @@ namespace kiwi
 			throw invalid_argument("BpeTokenizerTrainer::vocabSize must be zero or at least 256");
 		if (!config.maxTokenLength)
 			throw invalid_argument("BpeTokenizerTrainer::maxTokenLength must be positive");
+		if (!config.batchSize)
+			throw invalid_argument("BpeTokenizerTrainer::batchSize must be positive");
 	}
 
 
 	size_t BpeTokenizerTrainer::addSentences(const std::function<std::string()>& feeder)
 	{
-		size_t count = 0;
-		while (true)
-		{
-			string s = feeder();
-			if (s.empty()) break;
-			count++;
-			sentenceCount++;
-			if (config.addPrefixSpace && (s.empty() || s[0] != ' '))
-			{
-				s = " " + s;
-			}
-			auto chunks = extractChunks(s, config.addPrefixSpace);
-			for (auto& chunk : chunks)
-			{
-				wordCounts[chunk]++;
-			}
-		}
-		return count;
+		return addSentencesImpl(wordCounts, sentenceCount, config, feeder);
 	}
 
 	size_t BpeTokenizerTrainer::addSentences(const std::function<std::u16string()>& feeder)
 	{
-		size_t count = 0;
-		while (true)
+		return addSentencesImpl(wordCounts, sentenceCount, config, [&]()
 		{
 			u16string u16 = feeder();
-			if (u16.empty()) break;
-			string s = utf16To8(u16);
-			count++;
-			sentenceCount++;
-			if (config.addPrefixSpace && (s.empty() || s[0] != ' '))
-			{
-				s = " " + s;
-			}
-			auto chunks = extractChunks(s, config.addPrefixSpace);
-			for (auto& chunk : chunks)
-			{
-				wordCounts[chunk]++;
-			}
-		}
-		return count;
+			return u16.empty() ? string{} : utf16To8(u16);
+		});
 	}
 
 	BpeTokenizer BpeTokenizerTrainer::build() const

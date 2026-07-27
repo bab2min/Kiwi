@@ -55,6 +55,10 @@ namespace kiwi
 		// A value of numeric_limits<size_t>::max() means no length limit.
 		size_t maxTokenLength = std::numeric_limits<size_t>::max();
 		bool addPrefixSpace = false;
+		// Zero selects std::thread::hardware_concurrency().
+		size_t numThreads = 0;
+		// Limits how many input sentences are retained while collecting chunks.
+		size_t batchSize = 1024;
 	};
 
 	class BpeTokenizerTrainer
