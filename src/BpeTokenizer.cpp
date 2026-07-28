@@ -5,6 +5,7 @@
 #include "UnicodeCase.h"
 
 #include <algorithm>
+#include <cassert>
 #include <queue>
 #include <set>
 #include <cctype>
@@ -17,6 +18,189 @@ using namespace std;
 
 namespace kiwi
 {
+	// -------------------------------------------------------------------------
+	// StringArena
+	//
+	// Bump-pointer allocator for interning short UTF-8 strings.  Strings are
+	// written sequentially into a single vector<char>; no per-string heap
+	// allocation.  Callers address strings via packed uint64_t handles rather
+	// than raw pointers, so vector reallocation on grow does not invalidate
+	// any stored references.
+	// -------------------------------------------------------------------------
+	class StringArena
+	{
+		vector<char> data;
+
+	public:
+		// For largeCounter=false: stores with NUL terminator, returns uint32_t offset.
+		// Arena size is limited to 4 GB.
+		uint32_t intern(string_view sv)
+		{
+			assert(!sv.empty());
+			assert(data.size() + sv.size() + 1 <= UINT32_MAX && "StringArena exceeds 4 GB");
+			const uint32_t offset = static_cast<uint32_t>(data.size());
+			data.insert(data.end(), sv.begin(), sv.end());
+			data.push_back('\0');
+			return offset;
+		}
+
+		const char* ptr(uint32_t offset) const { return data.data() + offset; }
+
+		// For largeCounter=true: stores without NUL, returns packed handle.
+		//   bits [63:24] = byte offset (40 bits, up to ~1 TB)
+		//   bits [23: 0] = length      (24 bits, up to 16 MB)
+		uint64_t internPacked(string_view sv)
+		{
+			assert(!sv.empty() && sv.size() <= 0xFFFFFF);
+			const uint64_t offset = static_cast<uint64_t>(data.size());
+			assert(offset <= 0xFFFFFFFFFFull && "StringArena offset overflow (> 1 TB)");
+			data.insert(data.end(), sv.begin(), sv.end());
+			return (offset << 24) | static_cast<uint64_t>(sv.size());
+		}
+
+		string_view view(uint64_t packed) const
+		{
+			return { data.data() + (packed >> 24), packed & 0xFFFFFF };
+		}
+
+		// Resets content but keeps allocated capacity for reuse across batches.
+		void clear() { data.clear(); }
+	};
+
+	// -------------------------------------------------------------------------
+	// WordCountMap<largeCounter>  –  open-addressing hash map.
+	//
+	// largeCounter=false: 8-byte slots  {uint32_t offset, uint32_t count}
+	//   Key = NUL-terminated string at arena[offset].  Sentinel: offset==UINT32_MAX.
+	//   Arena size limit: 4 GB.  Count limit: ~4 billion.
+	//
+	// largeCounter=true: 16-byte slots  {uint64_t packed, uint64_t count}
+	//   Key = packed handle (bits[63:24]=offset 40b, bits[23:0]=length 24b).
+	//   No NUL in arena.  Sentinel: packed==0 (BPE chunks are never empty).
+	//   Arena size limit: ~1 TB.  Count limit: ~1.8e19.
+	// -------------------------------------------------------------------------
+	template<bool largeCounter>
+	class WordCountMap
+	{
+		using KeyT   = conditional_t<largeCounter, uint64_t, uint32_t>;
+		using CountT = conditional_t<largeCounter, uint64_t, uint32_t>;
+		struct Slot { KeyT key; CountT count; }; // 8B or 16B
+		static constexpr KeyT emptyKey = largeCounter ? KeyT(0) : KeyT(UINT32_MAX);
+
+		vector<Slot> slots;
+		size_t used = 0;
+		StringArena* arena = nullptr;
+
+		static size_t fnv1a(string_view sv) noexcept
+		{
+			size_t h = 14695981039346656037ull;
+			for (unsigned char c : sv) h = (h ^ c) * 1099511628211ull;
+			return h;
+		}
+
+		string_view slotView(const Slot& s) const
+		{
+			if constexpr (largeCounter)
+				return arena->view(s.key);
+			else
+			{
+				const char* p = arena->ptr(s.key);
+				return { p, strlen(p) };
+			}
+		}
+
+		void grow()
+		{
+			const size_t newCap = slots.empty() ? 64 : slots.size() * 2;
+			vector<Slot> newSlots(newCap, Slot{ emptyKey, 0 });
+			const size_t mask = newCap - 1;
+			for (auto& s : slots)
+			{
+				if (s.key == emptyKey) continue;
+				size_t idx = fnv1a(slotView(s)) & mask;
+				while (newSlots[idx].key != emptyKey) idx = (idx + 1) & mask;
+				newSlots[idx] = s;
+			}
+			slots = move(newSlots);
+		}
+
+	public:
+		explicit WordCountMap(StringArena* a) : arena(a) {}
+
+		void add(string_view sv, size_t delta = 1)
+		{
+			if (used * 5 >= slots.size() * 3) grow(); // 60% load factor
+
+			const size_t mask = slots.size() - 1;
+			size_t idx = fnv1a(sv) & mask;
+			while (slots[idx].key != emptyKey)
+			{
+				if (slotView(slots[idx]) == sv)
+				{
+					slots[idx].count += static_cast<CountT>(delta);
+					return;
+				}
+				idx = (idx + 1) & mask;
+			}
+			if constexpr (largeCounter)
+				slots[idx] = { arena->internPacked(sv), static_cast<CountT>(delta) };
+			else
+				slots[idx] = { arena->intern(sv), static_cast<CountT>(delta) };
+			++used;
+		}
+
+		void clear()
+		{
+			fill(slots.begin(), slots.end(), Slot{ emptyKey, 0 });
+			used = 0;
+		}
+
+		size_t size() const { return used; }
+
+		// Callback: f(string_view, size_t count)
+		template<class F>
+		void forEach(F&& f) const
+		{
+			for (auto& s : slots)
+				if (s.key != emptyKey) f(slotView(s), static_cast<size_t>(s.count));
+		}
+	};
+
+	// -------------------------------------------------------------------------
+	// WordCounts  –  arena + map kept together.
+	// arena must be declared before map so the pointer passed to map is valid.
+	// -------------------------------------------------------------------------
+	template<bool largeCounter>
+	struct WordCountsT
+	{
+		StringArena arena;
+		WordCountMap<largeCounter> map;
+
+		WordCountsT() : map(&arena) {}
+
+		void add(string_view sv, size_t delta = 1) { map.add(sv, delta); }
+		void clear()                               { arena.clear(); map.clear(); }
+		size_t size() const                        { return map.size(); }
+
+		// Callback: f(string_view sv, size_t count)
+		template<class F> void forEach(F&& f) const { map.forEach(forward<F>(f)); }
+	};
+
+	// BpeTokenizerTrainer::Impl  –  virtual interface.
+	// Concrete type is BpeTokenizerTrainerImpl<largeCounter> defined below,
+	// after the UTF-8 / chunk-extraction helpers it depends on.
+	struct BpeTokenizerTrainer::Impl
+	{
+		virtual ~Impl() = default;
+		virtual size_t addSentences(size_t& sentenceCount, const BpeTrainerConfig& config,
+		                            const function<string()>& feeder) = 0;
+		virtual BpeTokenizer build(const BpeTrainerConfig& config) const = 0;
+	};
+
+	// =========================================================================
+	// UTF-8 helpers and chunk extraction (unchanged)
+	// =========================================================================
+
 	struct Utf8Codepoint
 	{
 		char32_t value;
@@ -76,15 +260,15 @@ namespace kiwi
 			{
 				string lowerStr;
 				for (size_t k = i; k < i + 4 && k < n; ++k) lowerStr.push_back(tolower((unsigned char)str[k]));
-				
-				if (lowerStr.substr(0, 2) == "'s" || lowerStr.substr(0, 2) == "'t" || 
+
+				if (lowerStr.substr(0, 2) == "'s" || lowerStr.substr(0, 2) == "'t" ||
 					lowerStr.substr(0, 2) == "'m" || lowerStr.substr(0, 2) == "'d")
 				{
 					i += 2;
 					chunks.push_back({start, i - start});
 					continue;
 				}
-				else if (lowerStr.substr(0, 3) == "'re" || lowerStr.substr(0, 3) == "'ve" || 
+				else if (lowerStr.substr(0, 3) == "'re" || lowerStr.substr(0, 3) == "'ve" ||
 						 lowerStr.substr(0, 3) == "'ll")
 				{
 					i += 3;
@@ -103,14 +287,14 @@ namespace kiwi
 					lastSpace = j;
 					j += codepointAt(j).size;
 				}
-				
+
 				if (j == n)
 				{
 					chunks.push_back({start, j - start});
 					i = j;
 					continue;
 				}
-				
+
 				if (str[lastSpace] == ' ')
 				{
 					if (j - i > 1)
@@ -149,113 +333,251 @@ namespace kiwi
 					while (i < n && isOther(i)) i += codepointAt(i).size;
 				}
 			}
-			
+
 			chunks.push_back({start, i - start});
 		}
 		return chunks;
 	}
 
-	static vector<string> extractChunks(const string& str, bool addPrefixSpace)
+	static size_t getWorkerCount(size_t configuredThreads)
 	{
-		const string* workStr = &str;
-		string prefixedStr;
-		if (addPrefixSpace && !str.empty() && str[0] != ' ')
+		size_t n = configuredThreads;
+		if (!n) n = thread::hardware_concurrency();
+		if (!n) n = 1;
+		return n;
+	}
+
+	// Concrete Impl templated on largeCounter.
+	// All hot-path code (chunk extraction, counting, merging) lives here and
+	// operates directly on WordCountsT<LC> — no virtual dispatch in tight loops.
+	template<bool largeCounter>
+	struct BpeTokenizerTrainerImpl final : BpeTokenizerTrainer::Impl
+	{
+		WordCountsT<largeCounter> wordCounts;
+
+		// ---- chunk extraction --------------------------------------------------
+
+		static void addChunksTo(const string& str, bool addPrefixSpace,
+		                        WordCountsT<largeCounter>& wc)
 		{
-			prefixedStr.reserve(str.size() + 1);
-			prefixedStr = " ";
-			prefixedStr += str;
-			workStr = &prefixedStr;
+			string prefixedStr;
+			const string* workStr = &str;
+			if (addPrefixSpace && !str.empty() && str[0] != ' ')
+			{
+				prefixedStr.reserve(str.size() + 1);
+				prefixedStr = " ";
+				prefixedStr += str;
+				workStr = &prefixedStr;
+			}
+			for (auto& span : extractChunkSpans(*workStr))
+				wc.add(string_view(workStr->data() + span.first, span.second));
 		}
 
-		auto spans = extractChunkSpans(*workStr);
-		vector<string> ret;
-		ret.reserve(spans.size());
-		for (auto& span : spans)
-			ret.push_back(workStr->substr(span.first, span.second));
-		return ret;
-	}
+		// ---- addSentences ------------------------------------------------------
 
-	using WordCounts = unordered_map<string, size_t>;
-
-	static size_t getWorkerCount(size_t configuredThreads, size_t batchSize)
-	{
-		size_t workerCount = configuredThreads;
-		if (!workerCount)
-			workerCount = thread::hardware_concurrency();
-		if (!workerCount)
-			workerCount = 1;
-		return min(workerCount, batchSize);
-	}
-
-	static size_t addSentencesImpl(
-		WordCounts& wordCounts,
-		size_t& sentenceCount,
-		const BpeTrainerConfig& config,
-		const function<string()>& feeder)
-	{
-		size_t totalCount = 0;
-		vector<string> batch;
-		batch.reserve(config.batchSize);
-		const size_t maxWorkerCount = getWorkerCount(config.numThreads, numeric_limits<size_t>::max());
-		unique_ptr<utils::ThreadPool> pool;
-		if (maxWorkerCount > 1)
-			pool = make_unique<utils::ThreadPool>(maxWorkerCount);
-
-		while (true)
+		size_t addSentences(size_t& sentenceCount, const BpeTrainerConfig& config,
+		                    const function<string()>& feeder) override
 		{
-			batch.clear();
-			for (size_t i = 0; i < config.batchSize; ++i)
-			{
-				string sentence = feeder();
-				if (sentence.empty()) break;
-				batch.emplace_back(move(sentence));
-			}
-			if (batch.empty()) break;
+			size_t totalCount = 0;
+			vector<string> batch;
+			batch.reserve(config.batchSize);
+			const size_t maxWorkerCount = getWorkerCount(config.numThreads);
+			unique_ptr<utils::ThreadPool> pool;
+			if (maxWorkerCount > 1)
+				pool = make_unique<utils::ThreadPool>(maxWorkerCount);
 
-			const size_t workerCount = min(maxWorkerCount, batch.size());
-			vector<WordCounts> localCounts(workerCount);
-			auto processRange = [&](size_t workerIndex)
+			// Per-worker accumulators: allocated once, reused across batches.
+			vector<WordCountsT<largeCounter>> localCounts(maxWorkerCount);
+
+			while (true)
 			{
-				const size_t begin = batch.size() * workerIndex / workerCount;
-				const size_t end = batch.size() * (workerIndex + 1) / workerCount;
-				auto& counts = localCounts[workerIndex];
-				for (size_t i = begin; i < end; ++i)
+				batch.clear();
+				for (size_t i = 0; i < config.batchSize; ++i)
 				{
-					auto chunks = extractChunks(batch[i], config.addPrefixSpace);
-					for (auto& chunk : chunks)
-						++counts[move(chunk)];
+					string sentence = feeder();
+					if (sentence.empty()) break;
+					batch.emplace_back(move(sentence));
 				}
+				if (batch.empty()) break;
+
+				const size_t workerCount = min(maxWorkerCount, batch.size());
+				for (size_t i = 0; i < workerCount; ++i) localCounts[i].clear();
+
+				auto processRange = [&](size_t workerIndex)
+				{
+					const size_t begin = batch.size() * workerIndex / workerCount;
+					const size_t end   = batch.size() * (workerIndex + 1) / workerCount;
+					for (size_t i = begin; i < end; ++i)
+						addChunksTo(batch[i], config.addPrefixSpace, localCounts[workerIndex]);
+				};
+
+				if (workerCount == 1)
+				{
+					processRange(0);
+				}
+				else
+				{
+					vector<future<void>> futures;
+					futures.reserve(workerCount);
+					for (size_t wi = 0; wi < workerCount; ++wi)
+						futures.emplace_back(pool->enqueue([&, wi](size_t) { processRange(wi); }));
+					for (auto& f : futures) f.get();
+				}
+
+				for (size_t i = 0; i < workerCount; ++i)
+					localCounts[i].forEach([&](string_view sv, size_t count)
+					{
+						wordCounts.add(sv, count);
+					});
+
+				totalCount    += batch.size();
+				sentenceCount += batch.size();
+			}
+			return totalCount;
+		}
+
+		// ---- build -------------------------------------------------------------
+
+		BpeTokenizer build(const BpeTrainerConfig& config) const override
+		{
+			vector<string> vocab;
+			vocab.reserve(min(config.vocabSize, (size_t)256));
+			unordered_map<string, uint32_t> vocabToId;
+
+			for (int i = 0; i < 256; ++i)
+			{
+				string s(1, (char)(unsigned char)i);
+				vocab.push_back(s);
+				vocabToId[s] = (uint32_t)i;
+			}
+
+			struct Word { vector<uint32_t> tokens; size_t count; };
+
+			vector<Word> words;
+			words.reserve(wordCounts.size());
+			wordCounts.forEach([&](string_view sv, size_t count)
+			{
+				Word w;
+				w.count = count;
+				w.tokens.reserve(sv.size());
+				for (unsigned char c : sv)
+					w.tokens.push_back((uint32_t)c);
+				words.push_back(move(w));
+			});
+
+			unordered_map<uint64_t, size_t> pairCounts;
+			unordered_map<uint32_t, vector<size_t>> tokenToWords;
+
+			auto makeKey = [](uint32_t a, uint32_t b) -> uint64_t {
+				return ((uint64_t)a << 32) | (uint64_t)b;
 			};
 
-			if (workerCount == 1)
+			for (size_t wIdx = 0; wIdx < words.size(); ++wIdx)
 			{
-				processRange(0);
-			}
-			else
-			{
-				vector<future<void>> futures;
-				futures.reserve(workerCount);
-				for (size_t workerIndex = 0; workerIndex < workerCount; ++workerIndex)
+				const auto& w = words[wIdx];
+				for (size_t i = 0; i < w.tokens.size(); ++i)
 				{
-					futures.emplace_back(pool->enqueue([&, workerIndex](size_t)
-					{
-						processRange(workerIndex);
-					}));
+					tokenToWords[w.tokens[i]].push_back(wIdx);
+					if (i + 1 < w.tokens.size())
+						pairCounts[makeKey(w.tokens[i], w.tokens[i + 1])] += w.count;
 				}
-				for (auto& future : futures)
-					future.get();
 			}
 
-			for (auto& counts : localCounts)
+			for (auto& kv : tokenToWords)
 			{
-				for (auto& [chunk, count] : counts)
-					wordCounts[move(chunk)] += count;
+				auto& vec = kv.second;
+				sort(vec.begin(), vec.end());
+				vec.erase(unique(vec.begin(), vec.end()), vec.end());
 			}
-			totalCount += batch.size();
-			sentenceCount += batch.size();
+
+			priority_queue<pair<size_t, uint64_t>> maxHeap;
+			for (const auto& kv : pairCounts)
+				if (kv.second >= config.minPairFrequency)
+					maxHeap.push({ kv.second, kv.first });
+
+			unordered_map<uint64_t, MergeRule> merges;
+			size_t targetVocabSize = config.vocabSize > 0 ? config.vocabSize : (size_t)-1;
+
+			while (vocab.size() < targetVocabSize && !maxHeap.empty())
+			{
+				auto [count, key] = maxHeap.top();
+				maxHeap.pop();
+
+				auto itCount = pairCounts.find(key);
+				if (itCount == pairCounts.end() || itCount->second != count || count < config.minPairFrequency)
+					continue;
+
+				uint32_t id1 = (uint32_t)(key >> 32);
+				uint32_t id2 = (uint32_t)(key & 0xFFFFFFFF);
+
+				if (vocab[id1].size() + vocab[id2].size() > config.maxTokenLength)
+				{
+					pairCounts[key] = 0;
+					continue;
+				}
+
+				uint32_t newId = (uint32_t)vocab.size();
+				string newStr = vocab[id1] + vocab[id2];
+				vocab.push_back(newStr);
+				vocabToId[newStr] = newId;
+				merges[key] = { (uint32_t)merges.size(), newId };
+
+				auto itWords = tokenToWords.find(id1);
+				if (itWords == tokenToWords.end()) continue;
+
+				// Copy before iterating: tokenToWords[newId].push_back() below can
+				// trigger a rehash and invalidate itWords->second.
+				const vector<size_t> candidateWords = itWords->second;
+				for (size_t wIdx : candidateWords)
+				{
+					auto& w = words[wIdx];
+					if (w.tokens.size() < 2) continue;
+
+					bool hasPair = false;
+					for (size_t i = 0; i + 1 < w.tokens.size(); ++i)
+						if (w.tokens[i] == id1 && w.tokens[i + 1] == id2) { hasPair = true; break; }
+					if (!hasPair) continue;
+
+					for (size_t i = 0; i + 1 < w.tokens.size(); ++i)
+					{
+						const uint64_t pKey = makeKey(w.tokens[i], w.tokens[i + 1]);
+						auto& pc = pairCounts[pKey];
+						pc -= w.count;
+						if (pc >= config.minPairFrequency)
+							maxHeap.push({ pc, pKey });
+					}
+
+					vector<uint32_t> newTokens;
+					newTokens.reserve(w.tokens.size());
+					for (size_t i = 0; i < w.tokens.size(); )
+					{
+						if (i + 1 < w.tokens.size() && w.tokens[i] == id1 && w.tokens[i + 1] == id2)
+						{ newTokens.push_back(newId); i += 2; }
+						else
+						{ newTokens.push_back(w.tokens[i]); ++i; }
+					}
+					w.tokens = move(newTokens);
+
+					for (size_t j = 0; j + 1 < w.tokens.size(); ++j)
+					{
+						const uint64_t pKey = makeKey(w.tokens[j], w.tokens[j + 1]);
+						auto& pc = pairCounts[pKey];
+						pc += w.count;
+						if (pc >= config.minPairFrequency)
+							maxHeap.push({ pc, pKey });
+					}
+
+					tokenToWords[newId].push_back(wIdx);
+				}
+			}
+
+			return BpeTokenizer(move(vocab), move(merges), config.addPrefixSpace);
 		}
-		return totalCount;
-	}
+	};
+
+	// =========================================================================
+	// BpeTokenizer  (unchanged)
+	// =========================================================================
 
 	static vector<uint32_t> buildByteToCharPos(const string& str)
 	{
@@ -410,15 +732,15 @@ namespace kiwi
 				if (offset)
 				{
 					uint32_t sStart = prependedSpace ? (tok.start > 0 ? tok.start - 1 : 0) : tok.start;
-					uint32_t sEnd = prependedSpace ? (tok.end > 0 ? tok.end - 1 : 0) : tok.end;
+					uint32_t sEnd   = prependedSpace ? (tok.end   > 0 ? tok.end   - 1 : 0) : tok.end;
 
 					if (sStart > str.size()) sStart = (uint32_t)str.size();
-					if (sEnd > str.size()) sEnd = (uint32_t)str.size();
+					if (sEnd   > str.size()) sEnd   = (uint32_t)str.size();
 
 					if (offsetInChrLevel)
 					{
 						uint32_t cStart = byteToCharPos[sStart];
-						uint32_t cEnd = byteToCharPos[sEnd];
+						uint32_t cEnd   = byteToCharPos[sEnd];
 						offset->emplace_back(cStart, cEnd);
 					}
 					else
@@ -662,6 +984,10 @@ namespace kiwi
 		return BpeTokenizer(move(vocab), move(merges), addPrefixSpace);
 	}
 
+	// =========================================================================
+	// BpeTokenizerTrainer
+	// =========================================================================
+
 	BpeTokenizerTrainer::BpeTokenizerTrainer(const BpeTrainerConfig& config)
 		: config(config)
 	{
@@ -671,17 +997,22 @@ namespace kiwi
 			throw invalid_argument("BpeTokenizerTrainer::maxTokenLength must be positive");
 		if (!config.batchSize)
 			throw invalid_argument("BpeTokenizerTrainer::batchSize must be positive");
+		if (config.largeCounter)
+			impl = make_unique<BpeTokenizerTrainerImpl<true>>();
+		else
+			impl = make_unique<BpeTokenizerTrainerImpl<false>>();
 	}
 
+	BpeTokenizerTrainer::~BpeTokenizerTrainer() = default;
 
 	size_t BpeTokenizerTrainer::addSentences(const std::function<std::string()>& feeder)
 	{
-		return addSentencesImpl(wordCounts, sentenceCount, config, feeder);
+		return impl->addSentences(sentenceCount, config, feeder);
 	}
 
 	size_t BpeTokenizerTrainer::addSentences(const std::function<std::u16string()>& feeder)
 	{
-		return addSentencesImpl(wordCounts, sentenceCount, config, [&]()
+		return impl->addSentences(sentenceCount, config, [&]()
 		{
 			u16string u16 = feeder();
 			return u16.empty() ? string{} : utf16To8(u16);
@@ -690,173 +1021,6 @@ namespace kiwi
 
 	BpeTokenizer BpeTokenizerTrainer::build() const
 	{
-		vector<string> vocab;
-		vocab.reserve(min(config.vocabSize, (size_t)256));
-		unordered_map<string, uint32_t> vocabToId;
-
-		for (int i = 0; i < 256; ++i)
-		{
-			string s(1, (char)(unsigned char)i);
-			vocab.push_back(s);
-			vocabToId[s] = (uint32_t)i;
-		}
-
-		struct Word
-		{
-			vector<uint32_t> tokens;
-			size_t count;
-		};
-
-		vector<Word> words;
-		words.reserve(wordCounts.size());
-
-		for (const auto& kv : wordCounts)
-		{
-			Word w;
-			w.count = kv.second;
-			w.tokens.reserve(kv.first.size());
-			for (unsigned char c : kv.first)
-			{
-				w.tokens.push_back((uint32_t)c);
-			}
-			words.push_back(move(w));
-		}
-
-		unordered_map<uint64_t, size_t> pairCounts;
-		unordered_map<uint32_t, vector<size_t>> tokenToWords;
-
-		auto makeKey = [](uint32_t a, uint32_t b) -> uint64_t {
-			return ((uint64_t)a << 32) | (uint64_t)b;
-		};
-
-		for (size_t wIdx = 0; wIdx < words.size(); ++wIdx)
-		{
-			const auto& w = words[wIdx];
-			for (size_t i = 0; i < w.tokens.size(); ++i)
-			{
-				tokenToWords[w.tokens[i]].push_back(wIdx);
-				if (i + 1 < w.tokens.size())
-				{
-					uint64_t key = makeKey(w.tokens[i], w.tokens[i + 1]);
-					pairCounts[key] += w.count;
-				}
-			}
-		}
-
-		for (auto& kv : tokenToWords)
-		{
-			auto& vec = kv.second;
-			sort(vec.begin(), vec.end());
-			vec.erase(unique(vec.begin(), vec.end()), vec.end());
-		}
-
-		priority_queue<pair<size_t, uint64_t>> maxHeap;
-		for (const auto& kv : pairCounts)
-		{
-			if (kv.second >= config.minPairFrequency)
-			{
-				maxHeap.push({ kv.second, kv.first });
-			}
-		}
-
-		unordered_map<uint64_t, MergeRule> merges;
-		size_t targetVocabSize = config.vocabSize > 0 ? config.vocabSize : (size_t)-1;
-
-		while (vocab.size() < targetVocabSize && !maxHeap.empty())
-		{
-			auto top = maxHeap.top();
-			maxHeap.pop();
-
-			size_t count = top.first;
-			uint64_t key = top.second;
-
-			auto itCount = pairCounts.find(key);
-			if (itCount == pairCounts.end() || itCount->second != count || count < config.minPairFrequency)
-			{
-				continue;
-			}
-
-			uint32_t id1 = (uint32_t)(key >> 32);
-			uint32_t id2 = (uint32_t)(key & 0xFFFFFFFF);
-
-			size_t mergedLen = vocab[id1].size() + vocab[id2].size();
-			if (mergedLen > config.maxTokenLength)
-			{
-				pairCounts[key] = 0;
-				continue;
-			}
-
-			uint32_t newId = (uint32_t)vocab.size();
-			string newStr = vocab[id1] + vocab[id2];
-			vocab.push_back(newStr);
-			vocabToId[newStr] = newId;
-
-			uint32_t rank = (uint32_t)merges.size();
-			merges[key] = { rank, newId };
-
-			auto itWords = tokenToWords.find(id1);
-			if (itWords == tokenToWords.end()) continue;
-
-			vector<size_t> candidateWords = itWords->second;
-			for (size_t wIdx : candidateWords)
-			{
-				auto& w = words[wIdx];
-				if (w.tokens.size() < 2) continue;
-
-				bool hasPair = false;
-				for (size_t i = 0; i + 1 < w.tokens.size(); ++i)
-				{
-					if (w.tokens[i] == id1 && w.tokens[i + 1] == id2)
-					{
-						hasPair = true;
-						break;
-					}
-				}
-				if (!hasPair) continue;
-
-				for (size_t i = 0; i + 1 < w.tokens.size(); ++i)
-				{
-					uint64_t pKey = makeKey(w.tokens[i], w.tokens[i + 1]);
-					auto& pairCount = pairCounts[pKey];
-					pairCount -= w.count;
-					if (pairCount >= config.minPairFrequency)
-					{
-						maxHeap.push({ pairCount, pKey });
-					}
-				}
-
-				vector<uint32_t> newTokens;
-				newTokens.reserve(w.tokens.size());
-				size_t i = 0;
-				while (i < w.tokens.size())
-				{
-					if (i + 1 < w.tokens.size() && w.tokens[i] == id1 && w.tokens[i + 1] == id2)
-					{
-						newTokens.push_back(newId);
-						i += 2;
-					}
-					else
-					{
-						newTokens.push_back(w.tokens[i]);
-						i++;
-					}
-				}
-				w.tokens = move(newTokens);
-
-				for (size_t j = 0; j + 1 < w.tokens.size(); ++j)
-				{
-					uint64_t pKey = makeKey(w.tokens[j], w.tokens[j + 1]);
-					pairCounts[pKey] += w.count;
-					if (pairCounts[pKey] >= config.minPairFrequency)
-					{
-						maxHeap.push({ pairCounts[pKey], pKey });
-					}
-				}
-
-				tokenToWords[newId].push_back(wIdx);
-			}
-		}
-
-		return BpeTokenizer(move(vocab), move(merges), config.addPrefixSpace);
+		return impl->build(config);
 	}
 }

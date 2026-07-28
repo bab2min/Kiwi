@@ -59,16 +59,24 @@ namespace kiwi
 		size_t numThreads = 0;
 		// Limits how many input sentences are retained while collecting chunks.
 		size_t batchSize = 1024;
+		// Use 64-bit per-chunk counters (16-byte slots) instead of the default
+		// 32-bit counters (8-byte slots).  Enable when a single chunk may appear
+		// more than ~4 billion times across the entire corpus.
+		bool largeCounter = false;
 	};
 
 	class BpeTokenizerTrainer
 	{
 		BpeTrainerConfig config;
-		std::unordered_map<std::string, size_t> wordCounts;
 		size_t sentenceCount = 0;
+		struct Impl;
+		std::unique_ptr<Impl> impl;
+
+		template<bool> friend struct BpeTokenizerTrainerImpl;
 
 	public:
 		BpeTokenizerTrainer(const BpeTrainerConfig& config);
+		~BpeTokenizerTrainer();
 
 		size_t addSentences(const std::function<std::string()>& feeder);
 		size_t addSentences(const std::function<std::u16string()>& feeder);
