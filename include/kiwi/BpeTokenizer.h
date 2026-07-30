@@ -61,7 +61,9 @@ namespace kiwi
 		size_t batchSize = 1024;
 		// Use 64-bit per-chunk counters (16-byte slots) instead of the default
 		// 32-bit counters (8-byte slots).  Enable when a single chunk may appear
-		// more than ~4 billion times across the entire corpus.
+		// more than ~4 billion times across the entire corpus, or when the total
+		// size of the distinct chunks exceeds 4 GB.  Exceeding either limit with
+		// largeCounter=false makes addSentences throw rather than wrap silently.
 		bool largeCounter = false;
 	};
 
@@ -78,6 +80,11 @@ namespace kiwi
 		BpeTokenizerTrainer(const BpeTrainerConfig& config);
 		~BpeTokenizerTrainer();
 
+		// Consumes sentences from `feeder` until it returns an empty string, which is
+		// the end-of-input sentinel; `feeder` is not called again afterwards.  A blank
+		// line in the middle of a corpus therefore terminates collection, so callers
+		// must filter empty lines out themselves.  Returns the number of sentences
+		// consumed (excluding the terminating sentinel).
 		size_t addSentences(const std::function<std::string()>& feeder);
 		size_t addSentences(const std::function<std::u16string()>& feeder);
 
