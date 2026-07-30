@@ -233,9 +233,19 @@ namespace kiwi
 	{
 		virtual ~Impl() = default;
 		virtual size_t addSentences(size_t& sentenceCount, const BpeTrainerConfig& config,
+		                            const BpeTokenizerTrainerEventCallback& callback,
 		                            const function<string()>& feeder) = 0;
-		virtual BpeTokenizer build(const BpeTrainerConfig& config) const = 0;
+		virtual BpeTokenizer build(const BpeTrainerConfig& config,
+		                           const BpeTokenizerTrainerEventCallback& callback) const = 0;
 	};
+
+	// Progress reporting is opt-in; skip the std::function indirection entirely when
+	// no callback was installed.
+	static inline void emitEvent(const BpeTokenizerTrainerEventCallback& callback,
+	                             BpeTokenizerTrainerEvent event, size_t current, size_t total)
+	{
+		if (callback) callback(event, current, total);
+	}
 
 	// =========================================================================
 	// UTF-8 helpers and chunk extraction (unchanged)
@@ -427,8 +437,11 @@ namespace kiwi
 		// ---- addSentences ------------------------------------------------------
 
 		size_t addSentences(size_t& sentenceCount, const BpeTrainerConfig& config,
+		                    const BpeTokenizerTrainerEventCallback& callback,
 		                    const function<string()>& feeder) override
 		{
+			emitEvent(callback, BpeTokenizerTrainerEvent::pretokenizeBegin, 0, 0);
+
 			size_t totalCount = 0;
 			vector<string> batch;
 			batch.reserve(config.batchSize);
@@ -507,15 +520,24 @@ namespace kiwi
 
 				totalCount    += batch.size();
 				sentenceCount += batch.size();
+
+				// One event per batch: the feeder gives no length, so the count is all
+				// that can be reported and the batch is the natural granularity.
+				emitEvent(callback, BpeTokenizerTrainerEvent::pretokenizeProgress, totalCount, 0);
 			}
+
+			emitEvent(callback, BpeTokenizerTrainerEvent::pretokenizeEnd, totalCount, totalCount);
 			return totalCount;
 		}
 
 		// ---- build -------------------------------------------------------------
 
-		BpeTokenizer build(const BpeTrainerConfig& config) const override
+		BpeTokenizer build(const BpeTrainerConfig& config,
+		                   const BpeTokenizerTrainerEventCallback& callback) const override
 		{
 			const size_t targetVocabSize = config.vocabSize > 0 ? config.vocabSize : (size_t)-1;
+			// Zero when unbounded: the callback contract uses it for "indeterminate".
+			const size_t reportedTotal = config.vocabSize;
 
 			vector<string> vocab;
 			// vocabSize is validated to be zero or >= 256; cap the up-front reservation
@@ -589,11 +611,13 @@ namespace kiwi
 
 			priority_queue<pair<size_t, uint64_t>> maxHeap;
 			for (auto& kv : pairCounts)
+			{
 				if (kv.second.count >= config.minPairFrequency)
 				{
 					kv.second.pushed = kv.second.count;
 					maxHeap.push({ kv.second.count, kv.first });
 				}
+			}
 
 			unordered_map<uint64_t, MergeRule> merges;
 			// Pairs rejected by maxTokenLength.  Kept in a separate set rather than
@@ -601,6 +625,15 @@ namespace kiwi
 			// counter would wrap around on the next decrement and flood the heap with
 			// astronomically large phantom counts.
 			unordered_set<uint64_t> blockedPairs;
+
+			// Throttle to ~1000 progress events over the whole run: the loop pops a few
+			// hundred thousand times, and most iterations discard a stale heap entry
+			// without producing a merge at all.
+			const size_t progressStep = reportedTotal > 256 + 1000
+				? (reportedTotal - 256) / 1000 : 1;
+			size_t nextProgressAt = vocab.size() + progressStep;
+
+			emitEvent(callback, BpeTokenizerTrainerEvent::mergeBegin, vocab.size(), reportedTotal);
 
 			while (vocab.size() < targetVocabSize && !maxHeap.empty())
 			{
@@ -768,7 +801,15 @@ namespace kiwi
 						maxHeap.push({ rs.count, key });
 					}
 				}
+
+				if (vocab.size() >= nextProgressAt)
+				{
+					emitEvent(callback, BpeTokenizerTrainerEvent::mergeProgress, vocab.size(), reportedTotal);
+					nextProgressAt = vocab.size() + progressStep;
+				}
 			}
+
+			emitEvent(callback, BpeTokenizerTrainerEvent::mergeEnd, vocab.size(), vocab.size());
 
 			return BpeTokenizer(move(vocab), move(merges), config.addPrefixSpace);
 		}
@@ -1187,8 +1228,8 @@ namespace kiwi
 	// BpeTokenizerTrainer
 	// =========================================================================
 
-	BpeTokenizerTrainer::BpeTokenizerTrainer(const BpeTrainerConfig& config)
-		: config(config)
+	BpeTokenizerTrainer::BpeTokenizerTrainer(const BpeTrainerConfig& config, BpeTokenizerTrainerEventCallback callback)
+		: config(config), callback(move(callback))
 	{
 		if (config.vocabSize && config.vocabSize < 256)
 			throw invalid_argument("BpeTokenizerTrainer::vocabSize must be zero or at least 256");
@@ -1206,12 +1247,12 @@ namespace kiwi
 
 	size_t BpeTokenizerTrainer::addSentences(const std::function<std::string()>& feeder)
 	{
-		return impl->addSentences(sentenceCount, config, feeder);
+		return impl->addSentences(sentenceCount, config, callback, feeder);
 	}
 
 	size_t BpeTokenizerTrainer::addSentences(const std::function<std::u16string()>& feeder)
 	{
-		return impl->addSentences(sentenceCount, config, [&]()
+		return impl->addSentences(sentenceCount, config, callback, [&]()
 		{
 			u16string u16 = feeder();
 			return u16.empty() ? string{} : utf16To8(u16);
@@ -1220,6 +1261,6 @@ namespace kiwi
 
 	BpeTokenizer BpeTokenizerTrainer::build() const
 	{
-		return impl->build(config);
+		return impl->build(config, callback);
 	}
 }

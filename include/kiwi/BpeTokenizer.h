@@ -67,9 +67,40 @@ namespace kiwi
 		bool largeCounter = false;
 	};
 
+	enum class BpeTokenizerTrainerEvent
+	{
+		pretokenizeBegin,
+		pretokenizeProgress,
+		pretokenizeEnd,
+		mergeBegin,
+		mergeProgress,
+		mergeEnd,
+	};
+
+	// Called as (event, current, total).  `total` is zero when it cannot be known
+	// in advance, so a consumer must treat zero as "indeterminate" rather than
+	// dividing by it.
+	//
+	//   pretokenize*  emitted by addSentences, one `pretokenizeProgress` per batch.
+	//                 `current` counts the sentences consumed so far by this call;
+	//                 `total` is always zero, since the feeder announces no length.
+	//   merge*        emitted by build().  `current` is the vocabulary size, which
+	//                 starts at 256 (the byte alphabet), and `total` is the
+	//                 configured vocabSize, or zero when it is unbounded.
+	//                 `mergeProgress` is throttled to roughly 1000 events.
+	//
+	// Both `*End` events report `current == total` with the value actually reached,
+	// which may fall short of the configured target if the corpus runs out of
+	// mergeable pairs first.
+	//
+	// The callback always runs on the thread that called addSentences/build, never
+	// on a worker.  An exception thrown from it propagates out of that call.
+	using BpeTokenizerTrainerEventCallback = std::function<void(BpeTokenizerTrainerEvent, size_t, size_t)>;
+
 	class BpeTokenizerTrainer
 	{
 		BpeTrainerConfig config;
+		BpeTokenizerTrainerEventCallback callback;
 		size_t sentenceCount = 0;
 		struct Impl;
 		std::unique_ptr<Impl> impl;
@@ -77,7 +108,7 @@ namespace kiwi
 		template<bool> friend struct BpeTokenizerTrainerImpl;
 
 	public:
-		BpeTokenizerTrainer(const BpeTrainerConfig& config);
+		BpeTokenizerTrainer(const BpeTrainerConfig& config, BpeTokenizerTrainerEventCallback callback = {});
 		~BpeTokenizerTrainer();
 
 		// Consumes sentences from `feeder` until it returns an empty string, which is
