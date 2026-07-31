@@ -552,7 +552,14 @@ namespace kiwi
 				vocab.push_back(move(s));
 			}
 
-			struct Word { vector<uint32_t> tokens; size_t count; };
+			// `mask` folds the word's token ids into 64 buckets, one bit each.  A clear
+			// bit proves the token is absent; a set bit only suggests it may be present.
+			// That one-sided guarantee is enough to reject a candidate word without
+			// touching its token array, which is where most of the merge loop went: 84%
+			// of candidate visits scanned a word that did not contain id2 at all.
+			auto tokenBit = [](uint32_t t) -> uint64_t { return 1ull << (t & 63); };
+
+			struct Word { vector<uint32_t> tokens; size_t count; uint64_t mask; };
 
 			vector<Word> words;
 			words.reserve(wordCounts.size());
@@ -560,9 +567,13 @@ namespace kiwi
 			{
 				Word w;
 				w.count = count;
+				w.mask = 0;
 				w.tokens.reserve(sv.size());
 				for (unsigned char c : sv)
+				{
 					w.tokens.push_back((uint32_t)c);
+					w.mask |= tokenBit((uint32_t)c);
+				}
 				words.push_back(move(w));
 			});
 			if (words.size() > numeric_limits<uint32_t>::max())
@@ -625,13 +636,6 @@ namespace kiwi
 			// counter would wrap around on the next decrement and flood the heap with
 			// astronomically large phantom counts.
 			unordered_set<uint64_t> blockedPairs;
-
-			// Throttle to ~1000 progress events over the whole run: the loop pops a few
-			// hundred thousand times, and most iterations discard a stale heap entry
-			// without producing a merge at all.
-			const size_t progressStep = reportedTotal > 256 + 1000
-				? (reportedTotal - 256) / 1000 : 1;
-			size_t nextProgressAt = vocab.size() + progressStep;
 
 			emitEvent(callback, BpeTokenizerTrainerEvent::mergeBegin, vocab.size(), reportedTotal);
 
@@ -698,6 +702,7 @@ namespace kiwi
 					vocabToId.emplace(newStr, newId);
 					vocab.push_back(move(newStr));
 					tokenToWords.resize(vocab.size());
+					emitEvent(callback, BpeTokenizerTrainerEvent::mergeProgress, vocab.size(), reportedTotal);
 				}
 				merges.emplace(key, MergeRule{ (uint32_t)merges.size(), newId });
 
@@ -710,6 +715,8 @@ namespace kiwi
 				// it, so the lists only ever grew.  On a 5 MB corpus that left 97.6% of
 				// the 58M candidate visits scanning words that could not match.  The
 				// write cursor trails the read cursor, so this is allocation-free.
+				const uint64_t bit1 = tokenBit(id1), needMask = bit1 | tokenBit(id2);
+
 				auto& candidates = tokenToWords[id1];
 				const size_t candidateCount = candidates.size();
 				size_t keptCount = 0;
@@ -717,6 +724,16 @@ namespace kiwi
 				{
 					const uint32_t wIdx = candidates[k];
 					auto& w = words[wIdx];
+
+					if ((w.mask & needMask) != needMask)
+					{
+						// At least one of the two tokens is provably absent, so the pair
+						// cannot occur.  The entry is still kept whenever id1's bit is
+						// set, because a set bit does not prove id1 is really there —
+						// dropping on it would break the superset invariant.
+						if (w.mask & bit1) candidates[keptCount++] = wIdx;
+						continue;
+					}
 
 					// One scan answers both questions: does the pair occur here, and is
 					// id1 still present at all (i.e. is this entry worth keeping)?
@@ -749,16 +766,24 @@ namespace kiwi
 					}
 
 					// ...rewrite the word in place (the result is never longer, so the
-					// write cursor always trails the read cursor)...
+					// write cursor always trails the read cursor), rebuilding the mask
+					// from scratch as the tokens are written out: the merge introduces
+					// newId and may retire id1 or id2, and an OR-only update could never
+					// clear a bit...
 					size_t out = 0;
+					uint64_t newMask = 0;
 					for (size_t i = 0; i < w.tokens.size(); )
 					{
+						uint32_t t;
 						if (i + 1 < w.tokens.size() && w.tokens[i] == id1 && w.tokens[i + 1] == id2)
-						{ w.tokens[out++] = newId; i += 2; }
+						{ t = newId; i += 2; }
 						else
-						{ w.tokens[out++] = w.tokens[i]; ++i; }
+						{ t = w.tokens[i]; ++i; }
+						w.tokens[out++] = t;
+						newMask |= tokenBit(t);
 					}
 					w.tokens.resize(out);
+					w.mask = newMask;
 
 					// ...and re-deposit every pair of the new sequence.
 					for (size_t j = 0; j + 1 < w.tokens.size(); ++j)
@@ -779,8 +804,9 @@ namespace kiwi
 					}
 
 					// Keep the entry only while id1 actually survives in the rewritten
-					// word; every occurrence is usually consumed by the merge.
-					if (find(w.tokens.begin(), w.tokens.end(), id1) != w.tokens.end())
+					// word; every occurrence is usually consumed by the merge, and the
+					// mask settles that common case without a scan.
+					if ((w.mask & bit1) && find(w.tokens.begin(), w.tokens.end(), id1) != w.tokens.end())
 						candidates[keptCount++] = wIdx;
 
 					tokenToWords[newId].push_back(wIdx);
@@ -800,12 +826,6 @@ namespace kiwi
 						rs.pushed = rs.count;
 						maxHeap.push({ rs.count, key });
 					}
-				}
-
-				if (vocab.size() >= nextProgressAt)
-				{
-					emitEvent(callback, BpeTokenizerTrainerEvent::mergeProgress, vocab.size(), reportedTotal);
-					nextProgressAt = vocab.size() + progressStep;
 				}
 			}
 
