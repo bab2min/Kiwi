@@ -391,6 +391,69 @@ TEST(KiwiCpp, ChineseVsEmoji)
 	EXPECT_EQ(res[3].tag, POSTag::w_emoji);
 }
 
+TEST(KiwiCpp, NonBmpBoundaries)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	AnalyzeOption typoOption = Match::allWithNormalizing;
+	typoOption.typoTransformer = getDefaultPreparedTypoSet(DefaultTypoSet::basicTypoSetWithContinualAndLengthening);
+	for (auto& [str, specialForm, specialTag] : {
+		std::tuple{ std::u16string{ u"랠프𐐷에머슨" }, std::u16string{ u"𐐷" }, POSTag::sw },
+		std::tuple{ std::u16string{ u"랠프😀에머슨" }, std::u16string{ u"😀" }, POSTag::w_emoji },
+		std::tuple{ std::u16string{ u"랠프👍🏽에머슨" }, std::u16string{ u"👍🏽" }, POSTag::w_emoji },
+	})
+	{
+		for (auto option : { AnalyzeOption{ Match::allWithNormalizing }, typoOption })
+		{
+			auto res = kiwi.analyze(str, option).first;
+			ASSERT_EQ(res.size(), 3);
+			EXPECT_EQ(res[0].str, u"랠프");
+			EXPECT_EQ(res[0].position, 0);
+			EXPECT_EQ(res[0].length, 2);
+			EXPECT_EQ(res[1].str, specialForm);
+			EXPECT_EQ(res[1].tag, specialTag);
+			EXPECT_EQ(res[1].position, 2);
+			EXPECT_EQ(res[1].length, specialForm.size());
+			EXPECT_EQ(res[2].str, u"에머슨");
+			EXPECT_EQ(res[2].position, 2 + specialForm.size());
+			EXPECT_EQ(res[2].length, 3);
+		}
+	}
+	for (auto option : { AnalyzeOption{ Match::allWithNormalizing }, typoOption })
+	{
+		auto res = kiwi.analyze(u"😀랠프", option).first;
+		ASSERT_EQ(res.size(), 2);
+		EXPECT_EQ(res[0].str, u"😀");
+		EXPECT_EQ(res[0].tag, POSTag::w_emoji);
+		EXPECT_EQ(res[1].str, u"랠프");
+		EXPECT_EQ(res[1].tag, POSTag::nnp);
+	}
+
+	const std::vector<std::u16string> userWords = {
+		std::u16string{ u"가𐐷나" },
+		std::u16string{ u"가😀나" },
+		std::u16string{ u"랠프👍🏽에머슨" },
+		std::u16string{ u"가👨‍👩‍👧‍👦나" },
+	};
+	KiwiBuilder builder{ MODEL_PATH, 0, BuildOption::default_ };
+	for (auto& str : userWords)
+	{
+		EXPECT_TRUE(builder.addWord(str, POSTag::nnp, 20).second);
+	}
+	auto userWordKiwi = builder.build();
+	for (auto& str : userWords)
+	{
+		for (auto option : { AnalyzeOption{ Match::allWithNormalizing }, typoOption })
+		{
+			auto res = userWordKiwi.analyze(str, option).first;
+			ASSERT_EQ(res.size(), 1);
+			EXPECT_EQ(res[0].str, str);
+			EXPECT_EQ(res[0].tag, POSTag::nnp);
+			EXPECT_EQ(res[0].position, 0);
+			EXPECT_EQ(res[0].length, str.size());
+		}
+	}
+}
+
 TEST(KiwiCpp, Script)
 {
 	Kiwi& kiwi = reuseKiwiInstance();

@@ -732,7 +732,6 @@ public:
 	U16StringView rawStr;
 	size_t posMultiplierBit = 0;
 	float lengtheningTypoCost = 0;
-	Vector<tuple<size_t, uint32_t, POSTag>>::const_iterator nextMatchedPattern;
 
 	void init(
 		const Form* formBase,
@@ -853,7 +852,6 @@ public:
 		}
 		posToNs.emplace_back(nsToPos.size());
 		sort(matchedPatterns.begin(), matchedPatterns.end());
-		nextMatchedPattern = matchedPatterns.begin();
 		return n;
 	}
 
@@ -1039,10 +1037,15 @@ public:
 				c32 = mergeSurrogate(c32, typoNode.form[j + 1]);
 			}
 
+			auto matchedPattern = matchedPatterns.cend();
+			bool isInPattern = false;
 			if (typoCost == 0)
 			{
-				const bool isInPattern = nextMatchedPattern != matchedPatterns.end() &&
-					(typoNode.endPos + j - typoNode.form.size()) >= get<0>(*nextMatchedPattern) - get<1>(*nextMatchedPattern);
+				const size_t currentPos = typoNode.endPos + j - typoNode.form.size();
+				matchedPattern = upper_bound(matchedPatterns.cbegin(), matchedPatterns.cend(), currentPos,
+					[](size_t pos, const auto& pattern) { return pos < get<0>(pattern); });
+				isInPattern = matchedPattern != matchedPatterns.cend() &&
+					currentPos >= get<0>(*matchedPattern) - get<1>(*matchedPattern);
 
 				POSTag chrType = identifySpecialChr(c32);
 				ScriptType scriptType = chr2ScriptType(c32);
@@ -1104,8 +1107,8 @@ public:
 				}
 				else
 				{
-					// 공백 문자
-					if (chrType == POSTag::unknown)
+					// 공백 및 경계로 취급하는 문자
+					if (chrType == POSTag::unknown && !isInPattern)
 					{
 						if (lastSpaceBoundaryNsPos < unkFormStartNsPos)
 						{
@@ -1145,12 +1148,12 @@ public:
 				}
 			}
 
-			if (typoNode.typoCost == 0 && nextMatchedPattern != matchedPatterns.end())
+			if (typoNode.typoCost == 0 && matchedPattern != matchedPatterns.cend())
 			{
 				const auto currentEnd = typoNode.endPos + j + (c32 >= 0x10000 ? 2 : 1) - typoNode.form.size();
-				while (nextMatchedPattern != matchedPatterns.end() && get<0>(*nextMatchedPattern) == currentEnd)
+				while (matchedPattern != matchedPatterns.cend() && get<0>(*matchedPattern) == currentEnd)
 				{
-					const auto [matchedEnd, matchedLength, matchedType] = *nextMatchedPattern;
+					const auto [matchedEnd, matchedLength, matchedType] = *matchedPattern;
 					const auto matchedStart = matchedEnd - matchedLength;
 					if (lastSpaceBoundaryNsPos < unkFormStartNsPos)
 					{
@@ -1171,7 +1174,8 @@ public:
 					{
 						out.back().form = trie.value((size_t)matchedType);
 					}
-					++nextMatchedPattern;
+					lastSpaceBoundaryNsPos = specialStartNsPos = unkFormStartNsPos = posToNs[matchedEnd];
+					++matchedPattern;
 				}
 			}
 			if (typoNode.typoCost == 0 && nextPretokenizedPattern != lastPretokenizedPattern
@@ -1211,13 +1215,7 @@ public:
 				specialStartNsPos = unkFormStartNsPos = lastSpaceBoundaryNsPos = posToNs[typoNode.endPos + j + 1 - typoNode.form.size()];
 				continue;
 			}
-			if (c32 >= 0x10000)
-			{
-				++j;
-				prevChr = c32;
-				continue;
-			}
-
+			const size_t codeUnitSize = c32 >= 0x10000 ? 2 : 1;
 			if constexpr (lengtheningTypoTolerant)
 			{
 				static uint8_t lengtheningVowelTable[] = {
@@ -1264,7 +1262,10 @@ public:
 				for (size_t i = 0; i < prevLengtheningSize; ++i)
 				{
 					auto& node = lengtheningTypoNodes[i];
-					node.second = node.second->template nextOpt<arch>(trie, c);
+					for (size_t k = 0; k < codeUnitSize && node.second; ++k)
+					{
+						node.second = node.second->template nextOpt<arch>(trie, typoNode.form[j + k]);
+					}
 					if (!node.second) continue;
 					if (find(lengtheningTypoNodes.begin(), lengtheningTypoNodes.begin() + outputIdx, node) != lengtheningTypoNodes.begin() + outputIdx) continue;
 					lengtheningTypoNodes[outputIdx++] = node;
@@ -1277,70 +1278,76 @@ public:
 				}
 				lengtheningTypoNodes.erase(lengtheningTypoNodes.begin() + outputIdx, lengtheningTypoNodes.end());
 			}
-			prevChr = c32;
+			prevChr = isInPattern ? 0 : c32;
 
-			if (minFormLen > 0 || typoNode.typoCost > 0) ++minFormLen;
-			auto* nextNode = curNode->template nextOpt<arch>(trie, c);
-			while (!nextNode)
+			for (size_t k = 0; k < codeUnitSize; ++k)
 			{
-				curNode = curNode->fail();
-				if (!curNode) break;
-				nextNode = curNode->template nextOpt<arch>(trie, c);
-			}
-			if (nextNode)
-			{
-				curNode = nextNode;
-				// 오타가 있는 경우 전체 형태가 포함된 후보만 탐색.
-				if (typoNode.typoCost == 0 || j == typoNode.form.size() - 1)
+				if (minFormLen > 0 || typoNode.typoCost > 0) ++minFormLen;
+				const char16_t trieChr = typoNode.form[j + k];
+				auto* nextNode = curNode->template nextOpt<arch>(trie, trieChr);
+				while (!nextNode)
 				{
-					if (typoCost > 0 && curNode->depth < minFormLen)
+					curNode = curNode->fail();
+					if (!curNode) break;
+					nextNode = curNode->template nextOpt<arch>(trie, trieChr);
+				}
+				if (nextNode)
+				{
+					curNode = nextNode;
+					const bool isLastCodeUnit = k + 1 == codeUnitSize;
+					// 오타가 있는 경우 전체 형태가 포함된 후보만 탐색.
+					if (isLastCodeUnit && (typoNode.typoCost == 0 || j + codeUnitSize == typoNode.form.size()))
 					{
-						// early pruning
-					}
-					else
-					{
-						for (auto submatcher = curNode; submatcher; submatcher = submatcher->fail())
+						if (typoCost > 0 && curNode->depth < minFormLen)
 						{
-							const Form* cand = submatcher->val(trie);
-							if (!cand) break;
-							else if (!trie.hasSubmatch(cand))
+							// early pruning
+						}
+						else
+						{
+							for (auto submatcher = curNode; submatcher; submatcher = submatcher->fail())
 							{
-								if (cand->form.size() < minFormLen) break;
-								candidates.emplace_back(cand);
+								const Form* cand = submatcher->val(trie);
+								if (!cand) break;
+								else if (!trie.hasSubmatch(cand))
+								{
+									if (cand->form.size() < minFormLen) break;
+									candidates.emplace_back(cand);
+								}
+							}
+						}
+
+						if constexpr (lengtheningTypoTolerant)
+						{
+							for (auto [lengtheningSize, node] : lengtheningTypoNodes)
+							{
+								const Form* cand = node->val(trie);
+								if (cand && !trie.hasSubmatch(cand))
+								{
+									if (cand->form.size() < minFormLen) continue;
+									candidates.emplace_back(cand, lengtheningSize);
+								}
 							}
 						}
 					}
-
-					if constexpr (lengtheningTypoTolerant)
-					{
-						for (auto [lengtheningSize, node] : lengtheningTypoNodes)
-						{
-							const Form* cand = node->val(trie);
-							if (cand && !trie.hasSubmatch(cand))
-							{
-								if (cand->form.size() < minFormLen) continue;
-								candidates.emplace_back(cand, lengtheningSize);
-							}
-						}
-					}
-				}
-			}
-			else
-			{
-				if constexpr (lengtheningTypoTolerant)
-				{
-					lengtheningTypoNodes.clear();
-				}
-
-				if (typoCost == 0)
-				{
-					curNode = trie.root();
 				}
 				else
 				{
-					return;
+					if constexpr (lengtheningTypoTolerant)
+					{
+						lengtheningTypoNodes.clear();
+					}
+
+					if (typoCost == 0)
+					{
+						curNode = trie.root();
+					}
+					else
+					{
+						return;
+					}
 				}
 			}
+			j += codeUnitSize - 1;
 
 			const size_t endPos = typoNode.endPos + j + 1 - typoNode.form.size();
 			flushCandidates<lengtheningTypoTolerant>(posToNs[endPos], 
