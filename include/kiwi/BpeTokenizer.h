@@ -65,6 +65,16 @@ namespace kiwi
 		// A value of numeric_limits<size_t>::max() means no length limit.
 		size_t maxTokenLength = std::numeric_limits<size_t>::max();
 		bool addPrefixSpace = false;
+		// Caps how many consecutive digits may share one chunk, so that long digit runs
+		// do not spend vocabulary slots on specific numbers ("2019", "100000").  Only
+		// digits count toward the limit, not the space a chunk may start with, so
+		// " 12345" with a cap of 3 becomes " 123" + "45".  Zero means no limit.
+		//
+		// This needs no counterpart at encode time: no training chunk ever holds more
+		// than this many digits, so no merge rule can produce a longer digit token.
+		// Note that the cap bounds token length but not where an unseen number is cut,
+		// which is decided by merge ranks — "1234" may come out as "12"+"34" there.
+		size_t maxDigitLength = 0;
 		PretokenizeOption pretokenizeOption = PretokenizeOption::none;
 		// -1 selects std::thread::hardware_concurrency(), 0 disables threading, and any positive value is the number of threads to use.
 		size_t numThreads = 0;

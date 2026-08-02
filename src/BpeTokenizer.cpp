@@ -387,6 +387,7 @@ namespace kiwi
 	static void extractChunkSpans(
 		vector<pair<size_t, size_t>>& chunksOut,
 		const string& str,
+		size_t maxDigitLength = 0,
 		PretokenizeOption pretokenizeOption = PretokenizeOption::none,
 		const Kiwi* kiwi = nullptr
 	)
@@ -494,12 +495,19 @@ namespace kiwi
 				const ChrClass cls = classifyCodepoint(cp.value);
 				if (cls != ChrClass::space)
 				{
+					// The digit cap counts digits only, so the optional space consumed
+					// above does not eat into it: " 12345" with a cap of 3 yields
+					// " 123" + "45".
+					const size_t maxRun = (cls == ChrClass::number && maxDigitLength)
+						? maxDigitLength : numeric_limits<size_t>::max();
+					size_t runLength = 1;
 					i += cp.size;
-					while (i < n)
+					while (i < n && runLength < maxRun)
 					{
 						const auto next = decodeUtf8Codepoint(str, i);
 						if (classifyCodepoint(next.value) != cls) break;
 						i += next.size;
+						++runLength;
 					}
 				}
 			}
@@ -518,8 +526,9 @@ namespace kiwi
 
 		// ---- chunk extraction --------------------------------------------------
 
-		static void addChunksTo(const string& str, 
+		static void addChunksTo(const string& str,
 								bool addPrefixSpace,
+								size_t maxDigitLength,
 								PretokenizeOption pretokenizeOption,
 								const Kiwi* kiwi,
 		                        WordCountMap<largeCounter>& wc)
@@ -533,7 +542,7 @@ namespace kiwi
 				workStr = &prefixBuf;
 			}
 			thread_local vector<pair<size_t, size_t>> spanBuf;
-			extractChunkSpans(spanBuf, *workStr, pretokenizeOption, kiwi);
+			extractChunkSpans(spanBuf, *workStr, maxDigitLength, pretokenizeOption, kiwi);
 			for (auto& span : spanBuf)
 				wc.add(string_view(workStr->data() + span.first, span.second));
 		}
@@ -591,7 +600,7 @@ namespace kiwi
 					const size_t begin = workerCount > 0 ? batch.size() * workerIndex / workerCount : 0;
 					const size_t end   = workerCount > 0 ? batch.size() * (workerIndex + 1) / workerCount : batch.size();
 					for (size_t i = begin; i < end; ++i)
-						addChunksTo(batch[i], config.addPrefixSpace, config.pretokenizeOption, kiwi, targetCounts);
+						addChunksTo(batch[i], config.addPrefixSpace, config.maxDigitLength, config.pretokenizeOption, kiwi, targetCounts);
 				};
 
 				if (workerCount == 0)
