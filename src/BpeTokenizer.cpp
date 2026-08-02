@@ -203,9 +203,13 @@ namespace kiwi
 			}
 			checkCounterRoom(0, delta);
 			if constexpr (largeCounter)
+			{
 				slots[idx] = { arena.internPacked(sv), static_cast<CountT>(delta) };
+			}
 			else
+			{
 				slots[idx] = { arena.intern(sv), static_cast<CountT>(delta) };
+			}
 			++used;
 		}
 
@@ -224,7 +228,9 @@ namespace kiwi
 		void forEach(F&& f) const
 		{
 			for (auto& s : slots)
+			{
 				if (s.key != emptyKey) f(slotView(s), static_cast<size_t>(s.count));
+			}
 		}
 	};
 
@@ -262,7 +268,7 @@ namespace kiwi
 
 	// Invalid UTF-8 bytes are kept as individual non-letter/non-number bytes so
 	// byte-level tokenization remains lossless for arbitrary std::string input.
-	static Utf8Codepoint decodeUtf8Codepoint(const string& str, size_t pos)
+	static Utf8Codepoint decodeUtf8Codepoint(string_view str, size_t pos)
 	{
 		const auto byte = static_cast<unsigned char>(str[pos]);
 		if (byte < 0x80) return { byte, 1 };
@@ -286,6 +292,68 @@ namespace kiwi
 		return { code, length };
 	}
 
+	// -------------------------------------------------------------------------
+	// 첫가끝 (conjoining jamo)
+	//
+	// The modern Hangul syllable block decomposes algorithmically into a lead
+	// (초성), a vowel (중성) and an optional tail (종성) drawn from the conjoining
+	// jamo block, which is what lets an unseen syllable fall back to jamo instead
+	// of to raw bytes.
+	// -------------------------------------------------------------------------
+	static constexpr char32_t hangulSyllableFirst = 0xAC00;
+	static constexpr char32_t hangulSyllableLast  = 0xD7A3;
+	static constexpr char32_t hangulLeadFirst  = 0x1100;  // U+1100..U+1112
+	static constexpr char32_t hangulVowelFirst = 0x1161;  // U+1161..U+1175
+	static constexpr char32_t hangulTailFirst  = 0x11A8;  // U+11A8..U+11C2
+	static constexpr size_t hangulLeadCount  = 19;
+	static constexpr size_t hangulVowelCount = 21;
+	static constexpr size_t hangulTailCount  = 27;
+	// The syllable index encodes "no tail" as 0, so the stride is one more than the
+	// number of tails that actually exist.
+	static constexpr size_t hangulTailStride = hangulTailCount + 1;
+
+	// Bytes a syllable's 초성 and 중성 occupy once decomposed, i.e. how far into the
+	// decomposed syllable the 중성/종성 seam sits.
+	static constexpr size_t hangulOnsetNucleusBytes = 6;
+
+	// Rewrites every modern Hangul syllable in `str` as its conjoining jamo, copying
+	// everything else — including invalid UTF-8 — through byte for byte.
+	//
+	// `offsets`, when given, receives one entry per input byte plus a terminator, each
+	// holding the output position that byte moved to.  Bytes inside a character all map
+	// to that character's start, which is enough: every position ever looked up — a
+	// chunk edge or a morpheme boundary — is a character boundary.
+	static void decomposeHangul(string_view str, string& out, vector<uint32_t>* offsets = nullptr)
+	{
+		out.clear();
+		out.reserve(str.size() * 2);
+		if (offsets)
+		{
+			offsets->clear();
+			offsets->reserve(str.size() + 1);
+		}
+		size_t i = 0;
+		while (i < str.size())
+		{
+			const auto cp = decodeUtf8Codepoint(str, i);
+			if (offsets) offsets->insert(offsets->end(), cp.size, (uint32_t)out.size());
+			if (hangulSyllableFirst <= cp.value && cp.value <= hangulSyllableLast)
+			{
+				const size_t index = (size_t)(cp.value - hangulSyllableFirst);
+				const size_t tail = index % hangulTailStride;
+				utf8FromCode(out, hangulLeadFirst + (char32_t)(index / (hangulVowelCount * hangulTailStride)));
+				utf8FromCode(out, hangulVowelFirst + (char32_t)(index / hangulTailStride % hangulVowelCount));
+				if (tail) utf8FromCode(out, hangulTailFirst + (char32_t)(tail - 1));
+			}
+			else
+			{
+				out.append(str.data() + i, cp.size);
+			}
+			i += cp.size;
+		}
+		if (offsets) offsets->push_back((uint32_t)out.size());
+	}
+
 	enum class ChrClass : uint8_t { letter, number, space, other };
 
 	static ChrClass classifyCodepoint(char32_t c)
@@ -296,12 +364,16 @@ namespace kiwi
 		return ChrClass::other;
 	}
 
-	inline bool isPretokenizingBoundary(PretokenizeOption option, POSTag prev, POSTag cur)
+	inline bool isPretokenizingBoundary(PretokenizeOption option, POSTag prev, POSTag cur, char16_t curStr)
 	{
+		if (curStr == u'요' && cur == POSTag::jx)
+		{
+			if (isEClass(prev)) return false;
+		}
+
 		if (!!(option & PretokenizeOption::jClass))
 		{
-			if ((isJClass(cur) && !(isJClass(prev) || isEClass(prev)))
-				|| (isJClass(prev) && !(isJClass(cur) || isEClass(cur))))
+			if (isJClass(cur) != isJClass(prev))
 			{
 				return true;
 			}
@@ -309,10 +381,10 @@ namespace kiwi
 
 		if (!!(option & PretokenizeOption::eClass))
 		{
-			if ((isEClass(cur) && !(isJClass(prev) || isEClass(prev) 
+			if ((isEClass(cur) && !(isEClass(prev) 
 				|| (!!(option & PretokenizeOption::vcp) && prev == POSTag::vcp) 
 				|| (!!(option & PretokenizeOption::xsv) && (clearIrregular(prev) == POSTag::xsv || clearIrregular(prev) == POSTag::xsa))))
-				|| (isEClass(prev) && !(isJClass(cur) || isEClass(cur))))
+				|| (isEClass(prev) && !(isEClass(cur))))
 			{
 				return true;
 			}
@@ -336,14 +408,32 @@ namespace kiwi
 		return false;
 	}
 
+	inline char16_t extractHangulCoda(char16_t c)
+	{
+		if (!(0xAC00 <= c && c < 0xD7A4)) return 0;
+		const auto coda = (c - 0xAC00) % 28;
+		return coda ? (char16_t)(0x11A7 + coda) : 0;
+	}
+
+	// Boundaries come out in the coordinates the chunks will be cut in: byte positions
+	// of `str` normally, positions in the decomposed text when useJamoAlphabet is on.
+	// `jamoOffsets` is the map decomposeHangul produced for `str`, and is unused (and
+	// may be empty) otherwise.
 	static void collectMorphemeBoundaries(
 		vector<size_t>& boundariesOut,
 		const string& str,
 		PretokenizeOption pretokenizeOption,
+		bool useJamoAlphabet,
+		const vector<uint32_t>& jamoOffsets,
 		const Kiwi& kiwi
 	)
 	{
 		boundariesOut.clear();
+
+		auto mapOffset = [&](size_t p) -> size_t
+		{
+			return useJamoAlphabet ? (size_t)jamoOffsets[p] : p;
+		};
 
 		thread_local vector<size_t> bytePositions;
 		thread_local u16string u16str;
@@ -368,47 +458,89 @@ namespace kiwi
 			return;
 		}
 
+		const TokenInfo* prevToken = nullptr;
 		POSTag prevTag = POSTag::unknown;
 		size_t prevEnd = 0;
 		for (auto& token : res.first)
 		{
-			const bool split = isPretokenizingBoundary(pretokenizeOption, prevTag, token.tag);
+			const bool split = isPretokenizingBoundary(pretokenizeOption, prevTag, token.tag, token.str.empty() ? 0 : token.str[0]);
 
 			if (split)
 			{
-				const auto v = bytePositions[prevEnd];
+				const size_t codaOrigin = bytePositions[token.position];
+				const bool splittableCoda = useJamoAlphabet
+					&& (!token.str.empty() && isHangulCoda(token.str[0]))
+					&& (extractHangulCoda(u16str[token.position]) == token.str[0])
+					&& (prevToken && !prevToken->str.empty())
+					&& (prevToken->str.back() != u16str[token.position]);
+				const size_t v = splittableCoda
+					? (size_t)jamoOffsets[codaOrigin] + hangulOnsetNucleusBytes
+					: mapOffset(bytePositions[prevEnd]);
+
+				// '가능하답니다'와 같은 패턴에서는 prevEnd의 순서가 역전되어 나타날 수 있기 때문에
+				// 항상 boundariesOut이 단조증가하도록 보장하는 게 필요하다.
+				while (!boundariesOut.empty() && boundariesOut.back() > v) boundariesOut.pop_back();
 				if (boundariesOut.empty() || boundariesOut.back() != v) boundariesOut.emplace_back(v);
 			}
+			prevToken = &token;
 			prevTag = token.tag;
 			prevEnd = token.endPos();
 		}
 	}
 
-	static void extractChunkSpans(
+	// Returns the text the spans index into: `str` itself, or `jamoBuf` holding its
+	// decomposition when useJamoAlphabet is on.  The scanner below always walks the
+	// original — character classification, the digit cap and Kiwi all need syllables —
+	// and only the emitted spans are translated, which is what lets a boundary land
+	// inside a syllable without any of them knowing.
+	static const string* extractChunkSpans(
 		vector<pair<size_t, size_t>>& chunksOut,
+		string& jamoBuf,
 		const string& str,
 		size_t maxDigitLength = 0,
+		bool useJamoAlphabet = false,
 		PretokenizeOption pretokenizeOption = PretokenizeOption::none,
 		const Kiwi* kiwi = nullptr
 	)
 	{
 		chunksOut.clear();
-		if (str.empty()) return;
+		if (str.empty())
+		{
+			jamoBuf.clear();
+			return &str;
+		}
+
+		thread_local vector<uint32_t> jamoOffsets;
+		if (useJamoAlphabet) decomposeHangul(str, jamoBuf, &jamoOffsets);
+		else jamoOffsets.clear();
+		const string* const text = useJamoAlphabet ? &jamoBuf : &str;
+
+		auto mapOffset = [&](size_t p) -> size_t
+		{
+			return useJamoAlphabet ? (size_t)jamoOffsets[p] : p;
+		};
 
 		thread_local vector<size_t> boundaries;
 		boundaries.clear();
 		if (kiwi && pretokenizeOption != PretokenizeOption::none)
 		{
-			collectMorphemeBoundaries(boundaries, str, pretokenizeOption, *kiwi);
+			collectMorphemeBoundaries(boundaries, str, pretokenizeOption, useJamoAlphabet, jamoOffsets, *kiwi);
 		}
 
 		// Chunks are produced left to right and never overlap, so a single cursor
 		// walks the boundary list once for the whole string.  A boundary sitting
 		// exactly on a chunk edge is skipped rather than emitting an empty chunk.
+		//
+		// Both loops test against the running `start` rather than only against `end`.
+		// collectMorphemeBoundaries already hands the list over non-decreasing, but a
+		// boundary that slipped behind would otherwise underflow `b - start` into a
+		// span of roughly 2^64 bytes and read far outside the text, so the cheap test
+		// stays as a backstop against silent memory corruption.
 		size_t boundaryCursor = 0;
-		auto emitChunk = [&](size_t start, size_t length)
+		auto emitChunk = [&](size_t startOrig, size_t length)
 		{
-			const size_t end = start + length;
+			size_t start = mapOffset(startOrig);
+			const size_t end = mapOffset(startOrig + length);
 			while (boundaryCursor < boundaries.size() && boundaries[boundaryCursor] <= start) ++boundaryCursor;
 			while (boundaryCursor < boundaries.size() && boundaries[boundaryCursor] < end)
 			{
@@ -514,6 +646,7 @@ namespace kiwi
 
 			emitChunk(start, i - start);
 		}
+		return text;
 	}
 
 	// Concrete Impl templated on largeCounter.
@@ -529,6 +662,7 @@ namespace kiwi
 		static void addChunksTo(const string& str,
 								bool addPrefixSpace,
 								size_t maxDigitLength,
+								bool useJamoAlphabet,
 								PretokenizeOption pretokenizeOption,
 								const Kiwi* kiwi,
 		                        WordCountMap<largeCounter>& wc)
@@ -542,9 +676,13 @@ namespace kiwi
 				workStr = &prefixBuf;
 			}
 			thread_local vector<pair<size_t, size_t>> spanBuf;
-			extractChunkSpans(spanBuf, *workStr, maxDigitLength, pretokenizeOption, kiwi);
+			thread_local string jamoBuf;
+			// The spans come back indexed into whichever text they were cut from, so the
+			// jamo case needs no branch here.
+			const string* text = extractChunkSpans(spanBuf, jamoBuf, *workStr,
+				maxDigitLength, useJamoAlphabet, pretokenizeOption, kiwi);
 			for (auto& span : spanBuf)
-				wc.add(string_view(workStr->data() + span.first, span.second));
+				wc.add(string_view(text->data() + span.first, span.second));
 		}
 
 		// ---- addSentences ------------------------------------------------------
@@ -600,7 +738,7 @@ namespace kiwi
 					const size_t begin = workerCount > 0 ? batch.size() * workerIndex / workerCount : 0;
 					const size_t end   = workerCount > 0 ? batch.size() * (workerIndex + 1) / workerCount : batch.size();
 					for (size_t i = begin; i < end; ++i)
-						addChunksTo(batch[i], config.addPrefixSpace, config.maxDigitLength, config.pretokenizeOption, kiwi, targetCounts);
+						addChunksTo(batch[i], config.addPrefixSpace, config.maxDigitLength, config.useJamoAlphabet, config.pretokenizeOption, kiwi, targetCounts);
 				};
 
 				if (workerCount == 0)
@@ -704,6 +842,94 @@ namespace kiwi
 				return ((uint64_t)a << 32) | (uint64_t)b;
 			};
 
+			unordered_map<uint64_t, MergeRule> merges;
+
+			// ---- additional alphabet ------------------------------------------------
+			// Pin each configured string by giving it a chain of merges that occupy the
+			// lowest ranks, one link per byte after the first.  Since the learned merges
+			// keep numbering from merges.size(), every pinned link outranks all of them,
+			// so encode() rebuilds the string from its bytes before anything else can cut
+			// across it.  The intermediate tokens this leaves behind (the proper prefixes
+			// of an entry) are shared: two entries agreeing on their first bytes pay for
+			// that prefix once.
+			//
+			// useJamoAlphabet appends the conjoining jamo to whatever the caller pinned,
+			// which is the half of that option that makes the other half work: the chunks
+			// arrive already decomposed, so pinning the jamo is what keeps an unseen
+			// syllable falling back to jamo rather than to its bytes.
+			vector<string> pinnedAlphabet = config.additionalAlphabet;
+			if (config.useJamoAlphabet)
+			{
+				for (size_t i = 0; i < hangulLeadCount; ++i)  pinnedAlphabet.emplace_back(utf8FromCode(hangulLeadFirst + (char32_t)i));
+				for (size_t i = 0; i < hangulVowelCount; ++i) pinnedAlphabet.emplace_back(utf8FromCode(hangulVowelFirst + (char32_t)i));
+				for (size_t i = 0; i < hangulTailCount; ++i)  pinnedAlphabet.emplace_back(utf8FromCode(hangulTailFirst + (char32_t)i));
+			}
+
+			for (const auto& entry : pinnedAlphabet)
+			{
+				// A single byte is in the alphabet already, so there is nothing to pin.
+				uint32_t cur = (uint32_t)(unsigned char)entry[0];
+				for (size_t i = 1; i < entry.size(); ++i)
+				{
+					const uint64_t key = makeKey(cur, (uint32_t)(unsigned char)entry[i]);
+					const auto itMerge = merges.find(key);
+					if (itMerge != merges.end())
+					{
+						cur = itMerge->second.newId;
+						continue;
+					}
+
+					string prefix = entry.substr(0, i + 1);
+					uint32_t newId = (uint32_t)vocab.size();
+					vocabToId.emplace(prefix, newId);
+					vocab.push_back(move(prefix));
+					merges.emplace(key, MergeRule{ (uint32_t)merges.size(), newId });
+					cur = newId;
+				}
+			}
+
+			if (!merges.empty())
+			{
+				// Rewrite the words exactly the way encode() will read them: take the
+				// lowest applicable rank, apply every occurrence of it left to right,
+				// repeat.  Matching that order is what keeps training and encoding from
+				// disagreeing when two pinned entries overlap.
+				for (auto& w : words)
+				{
+					auto& tokens = w.tokens;
+					while (tokens.size() >= 2)
+					{
+						uint32_t bestRank = numeric_limits<uint32_t>::max();
+						for (size_t i = 0; i + 1 < tokens.size(); ++i)
+						{
+							const auto it = merges.find(makeKey(tokens[i], tokens[i + 1]));
+							if (it != merges.end() && it->second.rank < bestRank) bestRank = it->second.rank;
+						}
+						if (bestRank == numeric_limits<uint32_t>::max()) break;
+
+						size_t out = 0;
+						for (size_t i = 0; i < tokens.size(); )
+						{
+							if (i + 1 < tokens.size())
+							{
+								const auto it = merges.find(makeKey(tokens[i], tokens[i + 1]));
+								if (it != merges.end() && it->second.rank == bestRank)
+								{
+									tokens[out++] = it->second.newId;
+									i += 2;
+									continue;
+								}
+							}
+							tokens[out++] = tokens[i++];
+						}
+						tokens.resize(out);
+					}
+
+					w.mask = 0;
+					for (uint32_t t : tokens) w.mask |= tokenBit(t);
+				}
+			}
+
 			// `pushed` is the value of this pair's single authoritative heap entry, and
 			// is always >= `count`.  Tracking it turns the heap into a lazy decrease-key
 			// structure: a pair is pushed only when its count rises above the entry it
@@ -719,19 +945,21 @@ namespace kiwi
 
 			// tokenToWords[t] = indices of the words that contain token t, ascending
 			// and deduplicated.  Indexed directly by token id (ids are dense), and
-			// filled in two passes so that each of the 256 byte-token lists is
-			// allocated at exactly its final size: pushing one entry per occurrence
-			// and deduplicating afterwards peaked at roughly 4x this footprint.
+			// filled in two passes so that each initial token's list is allocated at
+			// exactly its final size: pushing one entry per occurrence and deduplicating
+			// afterwards peaked at roughly 4x this footprint.  The scratch arrays are
+			// sized by the vocabulary rather than by 256, since a pinned alphabet entry
+			// puts ids above the byte range into the words before this runs.
 			vector<vector<uint32_t>> tokenToWords(vocab.size());
 			{
-				array<bool, 256> seen{};
-				array<uint32_t, 256> distinctCount{};
+				vector<char> seen(vocab.size(), 0);
+				vector<uint32_t> distinctCount(vocab.size(), 0);
 				for (const auto& w : words)
 				{
 					for (uint32_t t : w.tokens) if (!seen[t]) { seen[t] = true; ++distinctCount[t]; }
 					for (uint32_t t : w.tokens) seen[t] = false;
 				}
-				for (size_t t = 0; t < 256; ++t) tokenToWords[t].reserve(distinctCount[t]);
+				for (size_t t = 0; t < vocab.size(); ++t) tokenToWords[t].reserve(distinctCount[t]);
 				for (size_t wIdx = 0; wIdx < words.size(); ++wIdx)
 				{
 					const auto& w = words[wIdx];
@@ -751,7 +979,6 @@ namespace kiwi
 				}
 			}
 
-			unordered_map<uint64_t, MergeRule> merges;
 			// Pairs rejected by maxTokenLength.  Kept in a separate set rather than
 			// zeroing pairCounts: the pair is still adjacent inside words, so a zeroed
 			// counter would wrap around on the next decrement and flood the heap with
@@ -1038,7 +1265,10 @@ namespace kiwi
 		if (workStr.empty()) return;
 
 		vector<pair<size_t, size_t>> spans;
-		extractChunkSpans(spans, workStr);
+		// Encoding stays byte-level: it neither decomposes nor pre-tokenizes with Kiwi,
+		// so the scratch buffer is left empty and the spans index into workStr.
+		string jamoScratch;
+		extractChunkSpans(spans, jamoScratch, workStr);
 
 		struct TokenSpan
 		{
@@ -1379,6 +1609,9 @@ namespace kiwi
 			throw invalid_argument("BpeTokenizerTrainer::maxTokenLength must be positive");
 		if (!config.batchSize)
 			throw invalid_argument("BpeTokenizerTrainer::batchSize must be positive");
+		for (const auto& entry : config.additionalAlphabet)
+			if (entry.empty())
+				throw invalid_argument("BpeTokenizerTrainer::additionalAlphabet must not contain an empty string");
 
 		if (config.pretokenizeOption != PretokenizeOption::none && !kiwi)
 			throw invalid_argument("BpeTokenizerTrainer::pre-tokenization requires a valid Kiwi instance");

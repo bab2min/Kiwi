@@ -75,6 +75,27 @@ namespace kiwi
 		// Note that the cap bounds token length but not where an unseen number is cut,
 		// which is decided by merge ranks — "1234" may come out as "12"+"34" there.
 		size_t maxDigitLength = 0;
+		// Byte strings pinned into the initial alphabet.  Each one is made reachable by
+		// merge rules holding the lowest ranks, so it is rebuilt from its bytes before
+		// any learned merge applies and can never come out split — which is what keeps
+		// a multi-byte character such as a Hangul jamo atomic.
+		//
+		// An entry of n bytes also pins one token per proper prefix, but prefixes are
+		// shared between entries: the 51 compatibility jamo cost 2 extra tokens between
+		// them.  Every pinned token counts toward vocabSize, and the order of this list
+		// decides the ranks the pinned merges get.
+		std::vector<std::string> additionalAlphabet;
+		// Trains on Hangul decomposed into 첫가끝 conjoining jamo: once the chunks are
+		// pre-tokenized, every modern syllable (U+AC00..U+D7A3) is rewritten as its
+		// 초성/중성/종성 before being counted, and all 67 conjoining jamo are pinned into
+		// the initial alphabet the way additionalAlphabet entries are.  An unseen
+		// syllable then falls back to jamo instead of to raw bytes.  Costs 71 tokens
+		// (67 jamo plus the four two-byte prefixes they share).
+		//
+		// This changes what the model is trained on, so it is NOT self-contained the way
+		// maxDigitLength is: the caller must apply the same decomposition before encode()
+		// and recompose after decode(), since neither does it.
+		bool useJamoAlphabet = false;
 		PretokenizeOption pretokenizeOption = PretokenizeOption::none;
 		// -1 selects std::thread::hardware_concurrency(), 0 disables threading, and any positive value is the number of threads to use.
 		size_t numThreads = 0;
