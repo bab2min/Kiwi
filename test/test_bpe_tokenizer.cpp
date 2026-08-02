@@ -186,6 +186,254 @@ TEST(BpeTokenizerTest, PretokenizeSplitsAtEndOfMorphemeRun)
 	EXPECT_FALSE(jSplit.count(u8"책을"));
 }
 
+namespace
+{
+	// Longest run of consecutive ASCII digits anywhere in `s`.
+	size_t longestDigitRun(const std::string& s)
+	{
+		size_t best = 0, cur = 0;
+		for (char c : s)
+		{
+			cur = ('0' <= c && c <= '9') ? cur + 1 : 0;
+			best = std::max(best, cur);
+		}
+		return best;
+	}
+}
+
+TEST(BpeTokenizerTest, CapsDigitRunsAtMaxDigitLength)
+{
+	BpeTrainerConfig config;
+	config.vocabSize = 400;
+	config.minPairFrequency = 2;
+
+	const std::vector<std::string> sentences(8, "12345 67890");
+
+	// Without a cap, each whole digit run becomes a token of its own.
+	const auto plain = trainVocab(config, nullptr, sentences);
+	EXPECT_TRUE(plain.count("12345"));
+	EXPECT_TRUE(plain.count(" 67890"));
+
+	config.maxDigitLength = 3;
+	const auto capped = trainVocab(config, nullptr, sentences);
+	EXPECT_TRUE(capped.count("123"));
+	EXPECT_TRUE(capped.count("45"));
+	EXPECT_TRUE(capped.count(" 678")); // 선행 공백은 자릿수에 포함되지 않음
+	EXPECT_TRUE(capped.count("90"));
+
+	// The cap holds for the whole vocabulary, not just the tokens checked above.
+	for (const auto& token : capped)
+		EXPECT_LE(longestDigitRun(token), config.maxDigitLength) << "token: " << token;
+}
+
+// A pinned alphabet entry must be rebuilt from its bytes before any learned merge
+// applies, so it can never be encoded as a split-up byte sequence.
+TEST(BpeTokenizerTest, PinsAdditionalAlphabet)
+{
+	BpeTrainerConfig config;
+	config.vocabSize = 400;
+	config.minPairFrequency = 2;
+	config.additionalAlphabet = { u8"ㄱ", u8"ㄲ", u8"ㅏ" };
+
+	// The jamo appear once each, far below minPairFrequency, so nothing here would be
+	// learned from the corpus: only the pinning can keep them whole.
+	std::vector<std::string> sentences(8, u8"가나다 라마바");
+	sentences.push_back(u8"ㄱㄲㅏ");
+
+	BpeTokenizerTrainer trainer(config);
+	size_t idx = 0;
+	trainer.addSentences([&]() -> std::string
+	{
+		return idx < sentences.size() ? sentences[idx++] : std::string{};
+	});
+	BpeTokenizer tokenizer = trainer.build();
+
+	const auto& vocab = tokenizer.getVocab();
+	std::set<std::string> vocabSet(vocab.begin(), vocab.end());
+	for (const auto& entry : config.additionalAlphabet)
+		EXPECT_TRUE(vocabSet.count(entry)) << "missing pinned entry: " << entry;
+
+	// "ㄱ"(E3 84 B1) and "ㄲ"(E3 84 B2) share the intermediate token E3 84; "ㅏ"(E3 85 8F)
+	// brings its own.  Pinning the three therefore costs five tokens, not six.
+	const std::string prefix8384 = { (char)0xE3, (char)0x84 };
+	const std::string prefix8385 = { (char)0xE3, (char)0x85 };
+	EXPECT_TRUE(vocabSet.count(prefix8384));
+	EXPECT_TRUE(vocabSet.count(prefix8385));
+
+	// Sized so that the merge loop has no room left, the vocabulary is exactly the
+	// byte alphabet plus those five.
+	BpeTrainerConfig exactConfig = config;
+	exactConfig.vocabSize = 261;
+	BpeTokenizerTrainer exactTrainer(exactConfig);
+	idx = 0;
+	exactTrainer.addSentences([&]() -> std::string
+	{
+		return idx < sentences.size() ? sentences[idx++] : std::string{};
+	});
+	EXPECT_EQ(exactTrainer.build().getVocab().size(), 261u);
+
+	// Each jamo encodes to exactly one id, and round-trips.
+	for (const auto& entry : config.additionalAlphabet)
+	{
+		const auto ids = tokenizer.encode(entry);
+		EXPECT_EQ(ids.size(), 1u) << "entry was split: " << entry;
+		EXPECT_EQ(tokenizer.decode(ids), entry);
+	}
+
+	// Pinned merges live in the saved merge list, so a reloaded model behaves the same.
+	std::stringstream buffer;
+	tokenizer.save(buffer);
+	buffer.seekg(0);
+	BpeTokenizer reloaded = BpeTokenizer::load(buffer);
+	EXPECT_EQ(reloaded.encode(u8"ㄱㄲㅏ"), tokenizer.encode(u8"ㄱㄲㅏ"));
+	EXPECT_EQ(reloaded.encode(u8"ㄱㄲㅏ").size(), 3u);
+}
+
+// useJamoAlphabet trains on decomposed Hangul and pins the conjoining jamo, so an
+// unseen syllable falls back to jamo instead of to raw bytes.
+TEST(BpeTokenizerTest, UseJamoAlphabetDecomposesAndPinsJamo)
+{
+	BpeTrainerConfig config;
+	config.vocabSize = 500;
+	config.minPairFrequency = 2;
+	config.useJamoAlphabet = true;
+
+	const std::vector<std::string> sentences(8, u8"한글 자모 학습");
+	const auto vocab = trainVocab(config, nullptr, sentences);
+
+	// All 67 conjoining jamo are present, whether or not the corpus used them.
+	size_t jamoPresent = 0;
+	std::vector<std::pair<char32_t, size_t>> ranges = { {0x1100, 19}, {0x1161, 21}, {0x11A8, 27} };
+	for (const auto& r : ranges)
+		for (size_t i = 0; i < r.second; ++i)
+			if (vocab.count(utf8FromCode(r.first + (char32_t)i))) ++jamoPresent;
+	EXPECT_EQ(jamoPresent, 67u);
+
+	// Nothing is counted in precomposed form any more, so no token may hold a whole
+	// syllable.  The byte alphabet still carries EA..ED on their own, which is why this
+	// decodes rather than just scanning for lead bytes.
+	auto holdsPrecomposedSyllable = [](const std::string& t)
+	{
+		for (size_t i = 0; i + 2 < t.size(); ++i)
+		{
+			const auto b0 = (unsigned char)t[i], b1 = (unsigned char)t[i + 1], b2 = (unsigned char)t[i + 2];
+			if (b0 < 0xEA || b0 > 0xED) continue;
+			if ((b1 & 0xC0) != 0x80 || (b2 & 0xC0) != 0x80) continue;
+			const char32_t c = ((char32_t)(b0 & 0x0F) << 12) | ((char32_t)(b1 & 0x3F) << 6) | (b2 & 0x3F);
+			if (0xAC00 <= c && c <= 0xD7A3) return true;
+		}
+		return false;
+	};
+	for (const auto& token : vocab)
+		EXPECT_FALSE(holdsPrecomposedSyllable(token)) << "token holds a precomposed syllable: " << token;
+
+	// "학" decomposes to U+1112 U+1161 U+11A8, and each of those is its own token, so
+	// the syllable is reachable as three ids even though it was never seen as bytes.
+	EXPECT_TRUE(vocab.count(utf8FromCode(0x1112)));
+	EXPECT_TRUE(vocab.count(utf8FromCode(0x1161)));
+	EXPECT_TRUE(vocab.count(utf8FromCode(0x11A8)));
+
+	// Sized so the merge loop has no room: the byte alphabet plus 67 jamo and the four
+	// two-byte prefixes (E1 84/85/86/87) they share.
+	BpeTrainerConfig exactConfig = config;
+	exactConfig.vocabSize = 256 + 71;
+	EXPECT_EQ(trainVocab(exactConfig, nullptr, sentences).size(), 256u + 71u);
+}
+
+// With jamo the boundary can fall inside a syllable, which byte spans cannot express:
+// an ending that is nothing but a coda (ᆫ of "그건", ᆯ of "할") separates from its stem.
+TEST(BpeTokenizerTest, SplitsCodaMorphemeUnderJamoAlphabet)
+{
+	Kiwi kiwi = KiwiBuilder(MODEL_PATH).build();
+
+	auto jamo = [](std::initializer_list<char32_t> codes)
+	{
+		std::string s;
+		for (auto c : codes) s += utf8FromCode(c);
+		return s;
+	};
+	const std::string geugeo  = jamo({ 0x1100, 0x1173, 0x1100, 0x1165 });          // 그거
+	const std::string geugeon = jamo({ 0x1100, 0x1173, 0x1100, 0x1165, 0x11AB });  // 그건
+	const std::string ha      = jamo({ 0x1112, 0x1161 });                          // 하
+	const std::string hal     = jamo({ 0x1112, 0x1161, 0x11AF });                  // 할
+
+	BpeTrainerConfig config;
+	config.vocabSize = 1000;
+	config.minPairFrequency = 2;
+	config.useJamoAlphabet = true;
+
+	const std::vector<std::string> sentences(8, u8"그건 할 일");
+
+	// Decomposition alone changes nothing about where the eojeol is cut.
+	const auto plain = trainVocab(config, nullptr, sentences);
+	EXPECT_TRUE(plain.count(geugeon));
+	EXPECT_TRUE(plain.count(" " + hal));
+
+	// 그건 = 그거/NP + ᆫ/JX, 할 = 하/VV + ᆯ/ETM: both seams sit inside a syllable.
+	config.pretokenizeOption = PretokenizeOption::jClass | PretokenizeOption::eClass;
+	const auto split = trainVocab(config, &kiwi, sentences);
+	EXPECT_FALSE(split.count(geugeon));
+	EXPECT_TRUE(split.count(geugeo));
+	EXPECT_FALSE(split.count(" " + hal));
+	EXPECT_TRUE(split.count(" " + ha));
+
+	// The same corpus without jamo cannot express either seam, so both stay whole.
+	BpeTrainerConfig byteConfig = config;
+	byteConfig.useJamoAlphabet = false;
+	const auto byteSplit = trainVocab(byteConfig, &kiwi, sentences);
+	EXPECT_TRUE(byteSplit.count(u8"그건"));
+	EXPECT_TRUE(byteSplit.count(u8" 할"));
+}
+
+// A contraction makes two morphemes share a syllable, so the coda boundary — placed
+// from the current token's own position — lands behind one placed from the previous
+// token's end.  The boundaries feed a left-to-right cursor, and an out-of-order one
+// used to underflow the span length and read far outside the text.
+TEST(BpeTokenizerTest, KeepsBoundariesOrderedAcrossContractedSyllables)
+{
+	Kiwi kiwi = KiwiBuilder(MODEL_PATH).build();
+
+	auto jamo = [](std::initializer_list<char32_t> codes)
+	{
+		std::string s;
+		for (auto c : codes) s += utf8FromCode(c);
+		return s;
+	};
+
+	BpeTrainerConfig config;
+	config.vocabSize = 1000;
+	config.minPairFrequency = 2;
+	config.useJamoAlphabet = true;
+	config.pretokenizeOption = PretokenizeOption::all;
+
+	// 합니다 = 하/VV(p,1) + ᆸ니다/EF(p,3): 하's end names the far side of 합 while the
+	// seam belongs before its ᆸ.  Z_CODA in "…엄" reaches the same shape from an
+	// ending run instead.
+	const std::vector<std::string> sentences(8, u8"이렇게 합니다 그러엄");
+	const auto vocab = trainVocab(config, &kiwi, sentences);
+
+	// 합 is cut open: 하 keeps the stem chunk and ᆸ leads the ending, so no token may
+	// hold 합 whole, and none may hold ᆸ alone as the tail of a longer chunk either.
+	const std::string ha  = jamo({ 0x1112, 0x1161 });          // 하
+	const std::string hap = jamo({ 0x1112, 0x1161, 0x11B8 });  // 합
+	EXPECT_TRUE(vocab.count(" " + ha));
+	EXPECT_FALSE(vocab.count(" " + hap));
+	EXPECT_TRUE(vocab.count(jamo({ 0x11B8, 0x1102, 0x1175, 0x1103, 0x1161 }))); // ᆸ니다
+
+	// Every chunk that reached the counter was a real substring, so decoding the whole
+	// vocabulary must stay within the corpus alphabet rather than showing wild bytes.
+	for (const auto& token : vocab)
+		EXPECT_LE(token.size(), (size_t)64) << "implausibly long token, span arithmetic slipped";
+}
+
+TEST(BpeTokenizerTest, RejectsEmptyAdditionalAlphabetEntry)
+{
+	BpeTrainerConfig config;
+	config.vocabSize = 300;
+	config.additionalAlphabet = { "" };
+	EXPECT_THROW(BpeTokenizerTrainer{ config }, std::invalid_argument);
+}
+
 TEST(BpeTokenizerTest, RetainsPairsWhoseFrequencyDecreases)
 {
 	BpeTrainerConfig config;
