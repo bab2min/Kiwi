@@ -1,10 +1,13 @@
 #include <gtest/gtest.h>
 #include <kiwi/BpeTokenizer.h>
+#include <kiwi/Kiwi.h>
 #include <vector>
 #include <string>
 #include <set>
 #include <sstream>
+#include <tuple>
 #include <iostream>
+#include "common.h"
 
 using namespace kiwi;
 
@@ -106,6 +109,81 @@ TEST(BpeTokenizerTest, U16FeederTest)
 	std::string testStr = u8"테스트 문장입니다.";
 	auto ids = tokenizer.encode(testStr);
 	EXPECT_EQ(tokenizer.decode(ids), " " + testStr); // addPrefixSpace prepends space
+}
+
+namespace
+{
+	std::set<std::string> trainVocab(const BpeTrainerConfig& config, const Kiwi* kiwi,
+		const std::vector<std::string>& sentences)
+	{
+		BpeTokenizerTrainer trainer(config, kiwi);
+		size_t idx = 0;
+		trainer.addSentences([&]() -> std::string
+		{
+			return idx < sentences.size() ? sentences[idx++] : std::string{};
+		});
+		auto vocab = trainer.build().getVocab();
+		return std::set<std::string>(vocab.begin(), vocab.end());
+	}
+}
+
+// The morpheme-aware pre-tokenizer must cut the stem/ending seam, so no merge may
+// ever span it — while a run of consecutive endings stays in one chunk.
+TEST(BpeTokenizerTest, PretokenizeSplitsAtMorphemeBoundary)
+{
+	Kiwi kiwi = KiwiBuilder(MODEL_PATH).build();
+
+	BpeTrainerConfig config;
+	config.vocabSize = 400;
+	config.minPairFrequency = 2;
+
+	// Only the first eojeol starts a chunk on its own; the rest keep the space that
+	// precedes them, hence the leading blanks in the expected tokens below.
+	const std::vector<std::string> sentences(8, u8"사람이 사람을 먹었다 먹겠다");
+
+	// Baseline: without pre-tokenization, whole eojeols are merged.
+	const auto plain = trainVocab(config, nullptr, sentences);
+	EXPECT_TRUE(plain.count(u8"사람이"));
+	EXPECT_TRUE(plain.count(u8" 사람을"));
+	EXPECT_TRUE(plain.count(u8" 먹었다"));
+
+	// 조사만 분리
+	config.pretokenizeOption = PretokenizeOption::jClass;
+	const auto jSplit = trainVocab(config, &kiwi, sentences);
+	EXPECT_TRUE(jSplit.count(u8"사람"));
+	EXPECT_FALSE(jSplit.count(u8"사람이"));
+	EXPECT_FALSE(jSplit.count(u8" 사람을"));
+	EXPECT_TRUE(jSplit.count(u8" 먹었다")); // 어미는 분리하지 않음
+
+	// 어미만 분리
+	config.pretokenizeOption = PretokenizeOption::eClass;
+	const auto eSplit = trainVocab(config, &kiwi, sentences);
+	EXPECT_FALSE(eSplit.count(u8" 먹었다"));
+	EXPECT_FALSE(eSplit.count(u8" 먹겠다"));
+	EXPECT_TRUE(eSplit.count(u8"었다")); // 연속한 어미는 한 덩어리로 유지
+	EXPECT_TRUE(eSplit.count(u8"겠다"));
+	EXPECT_TRUE(eSplit.count(u8"사람이")); // 조사는 분리하지 않음
+}
+
+// Where an eojeol continues past its ending, the end of the run is a boundary too.
+TEST(BpeTokenizerTest, PretokenizeSplitsAtEndOfMorphemeRun)
+{
+	Kiwi kiwi = KiwiBuilder(MODEL_PATH).build();
+
+	BpeTrainerConfig config;
+	config.vocabSize = 400;
+	config.minPairFrequency = 2;
+
+	const std::vector<std::string> sentences(8, u8"책을읽다");
+
+	const auto plain = trainVocab(config, nullptr, sentences);
+	EXPECT_TRUE(plain.count(u8"책을읽다"));
+
+	config.pretokenizeOption = PretokenizeOption::jClass;
+	const auto jSplit = trainVocab(config, &kiwi, sentences);
+	EXPECT_TRUE(jSplit.count(u8"읽다"));  // 조사 뒤가 다음 청크로 넘어감
+	EXPECT_FALSE(jSplit.count(u8"을읽")); // 조사와 뒤따르는 어간이 붙지 않음
+	EXPECT_FALSE(jSplit.count(u8"책을"));
 }
 
 TEST(BpeTokenizerTest, RetainsPairsWhoseFrequencyDecreases)
@@ -349,3 +427,88 @@ TEST(BpeTokenizerTest, PreTokenizationIsLosslessForAwkwardInputs)
 		EXPECT_EQ(tokenizer.decode(tokenizer.encode(input)), input) << "input=[" << input << "]";
 }
 
+TEST(BpeTokenizerTest, ReportsProgressThroughEventCallback)
+{
+	using Event = BpeTokenizerTrainerEvent;
+	std::vector<std::tuple<Event, size_t, size_t>> events;
+
+	BpeTrainerConfig config;
+	config.vocabSize = 400;
+	config.minPairFrequency = 2;
+	config.batchSize = 4;
+
+	BpeTokenizerTrainer trainer(config, nullptr, [&](Event event, size_t current, size_t total)
+	{
+		events.emplace_back(event, current, total);
+	});
+
+	const std::vector<std::string> sentences = {
+		"low low low low low", "lower lower lower", "newest newest newest newest",
+		"widest widest widest", "안녕하세요 안녕하세요 안녕하세요", "감사합니다 감사합니다",
+		"hello world hello world", "abc123 abc123 abc123", "테스트 테스트 테스트",
+		"low newest widest lower",
+	};
+	size_t index = 0;
+	trainer.addSentences([&]() -> std::string
+	{
+		return index < sentences.size() ? sentences[index++] : std::string{};
+	});
+
+	// addSentences emits begin, one progress per batch (10 sentences / 4), then end.
+	ASSERT_EQ(events.size(), 5u);
+	EXPECT_EQ(events[0], std::make_tuple(Event::pretokenizeBegin, 0u, 0u));
+	EXPECT_EQ(events[1], std::make_tuple(Event::pretokenizeProgress, 4u, 0u));
+	EXPECT_EQ(events[2], std::make_tuple(Event::pretokenizeProgress, 8u, 0u));
+	EXPECT_EQ(events[3], std::make_tuple(Event::pretokenizeProgress, 10u, 0u));
+	EXPECT_EQ(events[4], std::make_tuple(Event::pretokenizeEnd, 10u, 10u));
+
+	events.clear();
+	auto tokenizer = trainer.build();
+
+	ASSERT_GE(events.size(), 2u);
+	EXPECT_EQ(std::get<0>(events.front()), Event::mergeBegin);
+	EXPECT_EQ(std::get<1>(events.front()), 256u);          // the byte alphabet
+	EXPECT_EQ(std::get<0>(events.back()), Event::mergeEnd);
+	EXPECT_EQ(std::get<1>(events.back()), tokenizer.getVocab().size());
+	EXPECT_EQ(std::get<2>(events.back()), tokenizer.getVocab().size());
+
+	size_t previous = 0;
+	for (size_t i = 0; i + 1 < events.size(); ++i)
+	{
+		if (i) EXPECT_EQ(std::get<0>(events[i]), Event::mergeProgress);
+		EXPECT_EQ(std::get<2>(events[i]), config.vocabSize);   // total is the target
+		EXPECT_GE(std::get<1>(events[i]), previous);           // current never regresses
+		EXPECT_LE(std::get<1>(events[i]), config.vocabSize);
+		previous = std::get<1>(events[i]);
+	}
+}
+
+TEST(BpeTokenizerTest, ReportsIndeterminateTotalWhenVocabSizeIsUnbounded)
+{
+	using Event = BpeTokenizerTrainerEvent;
+	std::vector<std::tuple<Event, size_t, size_t>> events;
+
+	BpeTrainerConfig config;
+	config.vocabSize = 0;               // unbounded: merge until pairs run out
+	config.minPairFrequency = 2;
+
+	BpeTokenizerTrainer trainer(config, nullptr, [&](Event event, size_t current, size_t total)
+	{
+		events.emplace_back(event, current, total);
+	});
+
+	const std::vector<std::string> sentences = { "low lower newest widest", "low lower newest widest" };
+	size_t index = 0;
+	trainer.addSentences([&]() -> std::string
+	{
+		return index < sentences.size() ? sentences[index++] : std::string{};
+	});
+	events.clear();
+	auto tokenizer = trainer.build();
+
+	ASSERT_GE(events.size(), 2u);
+	EXPECT_EQ(std::get<0>(events.front()), Event::mergeBegin);
+	EXPECT_EQ(std::get<2>(events.front()), 0u);   // zero means "indeterminate"
+	EXPECT_EQ(std::get<0>(events.back()), Event::mergeEnd);
+	EXPECT_EQ(std::get<1>(events.back()), tokenizer.getVocab().size());
+}
