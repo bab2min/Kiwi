@@ -1,4 +1,6 @@
 #include <kiwi/BpeTokenizer.h>
+#include <kiwi/Kiwi.h>
+#include <kiwi/TagUtils.h>
 #include <kiwi/ThreadPool.h>
 #include <kiwi/Utils.h>
 #include "StrUtils.h"
@@ -233,6 +235,7 @@ namespace kiwi
 	{
 		virtual ~Impl() = default;
 		virtual size_t addSentences(size_t& sentenceCount, const BpeTrainerConfig& config,
+									const Kiwi* kiwi,
 		                            const BpeTokenizerTrainerEventCallback& callback,
 		                            const function<string()>& feeder) = 0;
 		virtual BpeTokenizer build(const BpeTrainerConfig& config,
@@ -293,13 +296,127 @@ namespace kiwi
 		return ChrClass::other;
 	}
 
-	// Writes the chunk spans of `str` into `chunks`.  The caller owns the buffer so
-	// that hot loops can reuse a single allocation across sentences.  Each byte
-	// position is UTF-8 decoded exactly once.
-	static void extractChunkSpans(const string& str, vector<pair<size_t, size_t>>& chunks)
+	inline bool isPretokenizingBoundary(PretokenizeOption option, POSTag prev, POSTag cur)
 	{
-		chunks.clear();
+		if (!!(option & PretokenizeOption::jClass))
+		{
+			if ((isJClass(cur) && !(isJClass(prev) || isEClass(prev)))
+				|| (isJClass(prev) && !(isJClass(cur) || isEClass(cur))))
+			{
+				return true;
+			}
+		}
+
+		if (!!(option & PretokenizeOption::eClass))
+		{
+			if ((isEClass(cur) && !(isJClass(prev) || isEClass(prev) 
+				|| (!!(option & PretokenizeOption::vcp) && prev == POSTag::vcp) 
+				|| (!!(option & PretokenizeOption::xsv) && (clearIrregular(prev) == POSTag::xsv || clearIrregular(prev) == POSTag::xsa))))
+				|| (isEClass(prev) && !(isJClass(cur) || isEClass(cur))))
+			{
+				return true;
+			}
+		}
+
+		if (!!(option & PretokenizeOption::vcp))
+		{
+			if (cur == POSTag::vcp)
+			{
+				return true;
+			}
+		}
+
+		if (!!(option & PretokenizeOption::xsv))
+		{
+			if (clearIrregular(cur) == POSTag::xsv || clearIrregular(cur) == POSTag::xsa)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	static void collectMorphemeBoundaries(
+		vector<size_t>& boundariesOut,
+		const string& str,
+		PretokenizeOption pretokenizeOption,
+		const Kiwi& kiwi
+	)
+	{
+		boundariesOut.clear();
+
+		thread_local vector<size_t> bytePositions;
+		thread_local u16string u16str;
+		try
+		{
+			u16str = utf8To16(str, bytePositions);
+		}
+		catch (const UnicodeException&)
+		{
+			return;
+		}
+		if (u16str.empty()) return;
+		bytePositions.emplace_back(str.size());
+
+		TokenResult res;
+		try
+		{
+			res = kiwi.analyze(u16str, AnalyzeOption{});
+		}
+		catch (const Exception&)
+		{
+			return;
+		}
+
+		POSTag prevTag = POSTag::unknown;
+		size_t prevEnd = 0;
+		for (auto& token : res.first)
+		{
+			const bool split = isPretokenizingBoundary(pretokenizeOption, prevTag, token.tag);
+
+			if (split)
+			{
+				const auto v = bytePositions[prevEnd];
+				if (boundariesOut.empty() || boundariesOut.back() != v) boundariesOut.emplace_back(v);
+			}
+			prevTag = token.tag;
+			prevEnd = token.endPos();
+		}
+	}
+
+	static void extractChunkSpans(
+		vector<pair<size_t, size_t>>& chunksOut,
+		const string& str,
+		PretokenizeOption pretokenizeOption = PretokenizeOption::none,
+		const Kiwi* kiwi = nullptr
+	)
+	{
+		chunksOut.clear();
 		if (str.empty()) return;
+
+		thread_local vector<size_t> boundaries;
+		boundaries.clear();
+		if (kiwi && pretokenizeOption != PretokenizeOption::none)
+		{
+			collectMorphemeBoundaries(boundaries, str, pretokenizeOption, *kiwi);
+		}
+
+		// Chunks are produced left to right and never overlap, so a single cursor
+		// walks the boundary list once for the whole string.  A boundary sitting
+		// exactly on a chunk edge is skipped rather than emitting an empty chunk.
+		size_t boundaryCursor = 0;
+		auto emitChunk = [&](size_t start, size_t length)
+		{
+			const size_t end = start + length;
+			while (boundaryCursor < boundaries.size() && boundaries[boundaryCursor] <= start) ++boundaryCursor;
+			while (boundaryCursor < boundaries.size() && boundaries[boundaryCursor] < end)
+			{
+				chunksOut.emplace_back(start, boundaries[boundaryCursor] - start);
+				start = boundaries[boundaryCursor];
+				++boundaryCursor;
+			}
+			chunksOut.emplace_back(start, end - start);
+		};
 
 		const size_t n = str.size();
 		size_t i = 0;
@@ -317,13 +434,13 @@ namespace kiwi
 				if (c1 == 's' || c1 == 't' || c1 == 'm' || c1 == 'd')
 				{
 					i += 2;
-					chunks.push_back({ start, i - start });
+					emitChunk(start, i - start);
 					continue;
 				}
 				else if ((c1 == 'r' && c2 == 'e') || (c1 == 'v' && c2 == 'e') || (c1 == 'l' && c2 == 'l'))
 				{
 					i += 3;
-					chunks.push_back({ start, i - start });
+					emitChunk(start, i - start);
 					continue;
 				}
 			}
@@ -343,7 +460,7 @@ namespace kiwi
 
 				if (j == n)
 				{
-					chunks.push_back({ start, j - start });
+					emitChunk(start, j - start);
 					i = j;
 					continue;
 				}
@@ -352,14 +469,14 @@ namespace kiwi
 				{
 					if (j - i > 1)
 					{
-						chunks.push_back({ start, (j - 1) - start });
+						emitChunk(start, (j - 1) - start);
 						i = j - 1;
 						continue;
 					}
 				}
 				else
 				{
-					chunks.push_back({ start, j - start });
+					emitChunk(start, j - start);
 					i = j;
 					continue;
 				}
@@ -387,23 +504,8 @@ namespace kiwi
 				}
 			}
 
-			chunks.push_back({ start, i - start });
+			emitChunk(start, i - start);
 		}
-	}
-
-	static vector<pair<size_t, size_t>> extractChunkSpans(const string& str)
-	{
-		vector<pair<size_t, size_t>> chunks;
-		extractChunkSpans(str, chunks);
-		return chunks;
-	}
-
-	static size_t getWorkerCount(size_t configuredThreads)
-	{
-		size_t n = configuredThreads;
-		if (!n) n = thread::hardware_concurrency();
-		if (!n) n = 1;
-		return n;
 	}
 
 	// Concrete Impl templated on largeCounter.
@@ -416,20 +518,22 @@ namespace kiwi
 
 		// ---- chunk extraction --------------------------------------------------
 
-		// `prefixBuf` and `spanBuf` are caller-owned scratch buffers, reused across
-		// sentences so that the per-sentence path performs no heap allocation.
-		static void addChunksTo(const string& str, bool addPrefixSpace,
-		                        WordCountMap<largeCounter>& wc,
-		                        string& prefixBuf, vector<pair<size_t, size_t>>& spanBuf)
+		static void addChunksTo(const string& str, 
+								bool addPrefixSpace,
+								PretokenizeOption pretokenizeOption,
+								const Kiwi* kiwi,
+		                        WordCountMap<largeCounter>& wc)
 		{
 			const string* workStr = &str;
 			if (addPrefixSpace && !str.empty() && str[0] != ' ')
 			{
+				thread_local string prefixBuf;
 				prefixBuf.assign(1, ' ');
 				prefixBuf += str;
 				workStr = &prefixBuf;
 			}
-			extractChunkSpans(*workStr, spanBuf);
+			thread_local vector<pair<size_t, size_t>> spanBuf;
+			extractChunkSpans(spanBuf, *workStr, pretokenizeOption, kiwi);
 			for (auto& span : spanBuf)
 				wc.add(string_view(workStr->data() + span.first, span.second));
 		}
@@ -437,6 +541,7 @@ namespace kiwi
 		// ---- addSentences ------------------------------------------------------
 
 		size_t addSentences(size_t& sentenceCount, const BpeTrainerConfig& config,
+							const Kiwi* kiwi,
 		                    const BpeTokenizerTrainerEventCallback& callback,
 		                    const function<string()>& feeder) override
 		{
@@ -445,10 +550,12 @@ namespace kiwi
 			size_t totalCount = 0;
 			vector<string> batch;
 			batch.reserve(config.batchSize);
-			const size_t maxWorkerCount = getWorkerCount(config.numThreads);
+			const size_t maxWorkerCount = config.numThreads == (size_t)-1 ? thread::hardware_concurrency() : config.numThreads;
 			unique_ptr<utils::ThreadPool> pool;
-			if (maxWorkerCount > 1)
+			if (maxWorkerCount > 0)
+			{
 				pool = make_unique<utils::ThreadPool>(maxWorkerCount);
+			}
 
 			// Per-worker accumulators: allocated once, reused across batches.
 			vector<WordCountMap<largeCounter>> localCounts(maxWorkerCount);
@@ -479,26 +586,29 @@ namespace kiwi
 				// holding their whole retained table until addSentences returns.
 				for (auto& lc : localCounts) lc.clear();
 
-				auto processRange = [&](size_t workerIndex)
+				auto processRange = [&](size_t workerIndex, WordCountMap<largeCounter>& targetCounts)
 				{
-					const size_t begin = batch.size() * workerIndex / workerCount;
-					const size_t end   = batch.size() * (workerIndex + 1) / workerCount;
-					string prefixBuf;
-					vector<pair<size_t, size_t>> spanBuf;
+					const size_t begin = workerCount > 0 ? batch.size() * workerIndex / workerCount : 0;
+					const size_t end   = workerCount > 0 ? batch.size() * (workerIndex + 1) / workerCount : batch.size();
 					for (size_t i = begin; i < end; ++i)
-						addChunksTo(batch[i], config.addPrefixSpace, localCounts[workerIndex], prefixBuf, spanBuf);
+						addChunksTo(batch[i], config.addPrefixSpace, config.pretokenizeOption, kiwi, targetCounts);
 				};
 
-				if (workerCount == 1)
+				if (workerCount == 0)
 				{
-					processRange(0);
+					processRange(0, wordCounts);
 				}
 				else
 				{
 					vector<future<void>> futures;
 					futures.reserve(workerCount);
 					for (size_t wi = 0; wi < workerCount; ++wi)
-						futures.emplace_back(pool->enqueue([&, wi](size_t) { processRange(wi); }));
+					{
+						futures.emplace_back(pool->enqueue([&, wi](size_t) 
+						{ 
+							processRange(wi, localCounts[wi]); 
+						}));
+					}
 
 					// Wait for every worker before rethrowing.  Bailing out on the first
 					// exception would destroy the remaining futures while their tasks are
@@ -510,13 +620,15 @@ namespace kiwi
 						catch (...) { if (!firstError) firstError = current_exception(); }
 					}
 					if (firstError) rethrow_exception(firstError);
-				}
 
-				for (size_t i = 0; i < workerCount; ++i)
-					localCounts[i].forEach([&](string_view sv, size_t count)
+					for (size_t i = 0; i < workerCount; ++i)
 					{
-						wordCounts.add(sv, count);
-					});
+						localCounts[i].forEach([&](string_view sv, size_t count)
+						{
+							wordCounts.add(sv, count);
+						});
+					}
+				}
 
 				totalCount    += batch.size();
 				sentenceCount += batch.size();
@@ -559,7 +671,7 @@ namespace kiwi
 			// of candidate visits scanned a word that did not contain id2 at all.
 			auto tokenBit = [](uint32_t t) -> uint64_t { return 1ull << (t & 63); };
 
-			struct Word { vector<uint32_t> tokens; size_t count; uint64_t mask; };
+			struct Word { vector<uint32_t> tokens; size_t count = 0; uint64_t mask = 0; };
 
 			vector<Word> words;
 			words.reserve(wordCounts.size());
@@ -916,7 +1028,8 @@ namespace kiwi
 
 		if (workStr.empty()) return;
 
-		auto spans = extractChunkSpans(workStr);
+		vector<pair<size_t, size_t>> spans;
+		extractChunkSpans(spans, workStr);
 
 		struct TokenSpan
 		{
@@ -1248,8 +1361,8 @@ namespace kiwi
 	// BpeTokenizerTrainer
 	// =========================================================================
 
-	BpeTokenizerTrainer::BpeTokenizerTrainer(const BpeTrainerConfig& config, BpeTokenizerTrainerEventCallback callback)
-		: config(config), callback(move(callback))
+	BpeTokenizerTrainer::BpeTokenizerTrainer(const BpeTrainerConfig& config, const Kiwi* kiwi, BpeTokenizerTrainerEventCallback callback)
+		: config(config), kiwi(kiwi), callback(move(callback))
 	{
 		if (config.vocabSize && config.vocabSize < 256)
 			throw invalid_argument("BpeTokenizerTrainer::vocabSize must be zero or at least 256");
@@ -1257,6 +1370,10 @@ namespace kiwi
 			throw invalid_argument("BpeTokenizerTrainer::maxTokenLength must be positive");
 		if (!config.batchSize)
 			throw invalid_argument("BpeTokenizerTrainer::batchSize must be positive");
+
+		if (config.pretokenizeOption != PretokenizeOption::none && !kiwi)
+			throw invalid_argument("BpeTokenizerTrainer::pre-tokenization requires a valid Kiwi instance");
+
 		if (config.largeCounter)
 			impl = make_unique<BpeTokenizerTrainerImpl<true>>();
 		else
@@ -1267,12 +1384,12 @@ namespace kiwi
 
 	size_t BpeTokenizerTrainer::addSentences(const std::function<std::string()>& feeder)
 	{
-		return impl->addSentences(sentenceCount, config, callback, feeder);
+		return impl->addSentences(sentenceCount, config, kiwi, callback, feeder);
 	}
 
 	size_t BpeTokenizerTrainer::addSentences(const std::function<std::u16string()>& feeder)
 	{
-		return impl->addSentences(sentenceCount, config, callback, [&]()
+		return impl->addSentences(sentenceCount, config, kiwi, callback, [&]()
 		{
 			u16string u16 = feeder();
 			return u16.empty() ? string{} : utf16To8(u16);

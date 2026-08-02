@@ -48,6 +48,16 @@ namespace kiwi
 		static BpeTokenizer load(std::istream& istr);
 	};
 
+	enum class PretokenizeOption : uint8_t
+	{
+		none = 0,
+		jClass = 1 << 0,
+		eClass = 1 << 1,
+		vcp = 1 << 2,
+		xsv = 1 << 3,
+		all = jClass | eClass | vcp | xsv,
+	};
+
 	struct BpeTrainerConfig
 	{
 		size_t vocabSize = 0;
@@ -55,7 +65,8 @@ namespace kiwi
 		// A value of numeric_limits<size_t>::max() means no length limit.
 		size_t maxTokenLength = std::numeric_limits<size_t>::max();
 		bool addPrefixSpace = false;
-		// Zero selects std::thread::hardware_concurrency().
+		PretokenizeOption pretokenizeOption = PretokenizeOption::none;
+		// -1 selects std::thread::hardware_concurrency(), 0 disables threading, and any positive value is the number of threads to use.
 		size_t numThreads = 0;
 		// Limits how many input sentences are retained while collecting chunks.
 		size_t batchSize = 1024;
@@ -100,6 +111,7 @@ namespace kiwi
 	class BpeTokenizerTrainer
 	{
 		BpeTrainerConfig config;
+		const Kiwi* kiwi = nullptr;
 		BpeTokenizerTrainerEventCallback callback;
 		size_t sentenceCount = 0;
 		struct Impl;
@@ -108,7 +120,7 @@ namespace kiwi
 		template<bool> friend struct BpeTokenizerTrainerImpl;
 
 	public:
-		BpeTokenizerTrainer(const BpeTrainerConfig& config, BpeTokenizerTrainerEventCallback callback = {});
+		BpeTokenizerTrainer(const BpeTrainerConfig& config, const Kiwi* kiwi = nullptr, BpeTokenizerTrainerEventCallback callback = {});
 		~BpeTokenizerTrainer();
 
 		// Consumes sentences from `feeder` until it returns an empty string, which is
@@ -122,3 +134,5 @@ namespace kiwi
 		BpeTokenizer build() const;
 	};
 }
+
+KIWI_DEFINE_ENUM_FLAG_OPERATORS(kiwi::PretokenizeOption);
