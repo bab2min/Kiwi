@@ -696,16 +696,25 @@ namespace kiwi
 
 			size_t totalCount = 0;
 			vector<string> batch;
-			batch.reserve(config.batchSize);
 			const size_t maxWorkerCount = config.numThreads == (size_t)-1 ? thread::hardware_concurrency() : config.numThreads;
+
+			// Per-worker accumulators: allocated once, reused across batches.
+			vector<WordCountMap<largeCounter>> localCounts(maxWorkerCount);
+			deque<future<void>> futures;
+
+			auto processRange = [&](vector<string>&& data, WordCountMap<largeCounter>& targetCounts)
+			{
+				for (auto& s : data)
+				{
+					addChunksTo(s, config.addPrefixSpace, config.maxDigitLength, config.useJamoAlphabet, config.pretokenizeOption, kiwi, targetCounts);
+				}
+			};
+
 			unique_ptr<utils::ThreadPool> pool;
 			if (maxWorkerCount > 0)
 			{
 				pool = make_unique<utils::ThreadPool>(maxWorkerCount);
 			}
-
-			// Per-worker accumulators: allocated once, reused across batches.
-			vector<WordCountMap<largeCounter>> localCounts(maxWorkerCount);
 
 			// `feeder` signals end of input by returning an empty string.  Track that
 			// explicitly so it is never called again afterwards: the previous shape of
@@ -715,6 +724,7 @@ namespace kiwi
 			while (!eof)
 			{
 				batch.clear();
+				batch.reserve(config.batchSize);
 				for (size_t i = 0; i < config.batchSize; ++i)
 				{
 					string sentence = feeder();
@@ -727,62 +737,50 @@ namespace kiwi
 				}
 				if (batch.empty()) break;
 
-				const size_t workerCount = min(maxWorkerCount, batch.size());
-				// Clear every accumulator, not just the ones about to be used: a batch
-				// smaller than the previous one would otherwise leave the tail workers
-				// holding their whole retained table until addSentences returns.
-				for (auto& lc : localCounts) lc.clear();
+				totalCount += batch.size();
+				sentenceCount += batch.size();
 
-				auto processRange = [&](size_t workerIndex, WordCountMap<largeCounter>& targetCounts)
+				if (!pool)
 				{
-					const size_t begin = workerCount > 0 ? batch.size() * workerIndex / workerCount : 0;
-					const size_t end   = workerCount > 0 ? batch.size() * (workerIndex + 1) / workerCount : batch.size();
-					for (size_t i = begin; i < end; ++i)
-						addChunksTo(batch[i], config.addPrefixSpace, config.maxDigitLength, config.useJamoAlphabet, config.pretokenizeOption, kiwi, targetCounts);
-				};
-
-				if (workerCount == 0)
-				{
-					processRange(0, wordCounts);
+					processRange(move(batch), wordCounts);
 				}
 				else
 				{
-					vector<future<void>> futures;
-					futures.reserve(workerCount);
-					for (size_t wi = 0; wi < workerCount; ++wi)
+					while (futures.size() >= pool->size() * 4)
 					{
-						futures.emplace_back(pool->enqueue([&, wi](size_t) 
-						{ 
-							processRange(wi, localCounts[wi]); 
-						}));
+						auto f = move(futures.front());
+						f.get();
+						futures.pop_front();
 					}
 
-					// Wait for every worker before rethrowing.  Bailing out on the first
-					// exception would destroy the remaining futures while their tasks are
-					// still running against this frame's `batch` and `localCounts`.
-					exception_ptr firstError;
-					for (auto& f : futures)
+				  	futures.emplace_back(pool->enqueue([&, batch = move(batch)](size_t tid) mutable
 					{
-						try { f.get(); }
-						catch (...) { if (!firstError) firstError = current_exception(); }
-					}
-					if (firstError) rethrow_exception(firstError);
-
-					for (size_t i = 0; i < workerCount; ++i)
-					{
-						localCounts[i].forEach([&](string_view sv, size_t count)
-						{
-							wordCounts.add(sv, count);
-						});
-					}
+						processRange(move(batch), localCounts[tid]);
+					}));
 				}
-
-				totalCount    += batch.size();
-				sentenceCount += batch.size();
 
 				// One event per batch: the feeder gives no length, so the count is all
 				// that can be reported and the batch is the natural granularity.
 				emitEvent(callback, BpeTokenizerTrainerEvent::pretokenizeProgress, totalCount, 0);
+			}
+
+			if (pool)
+			{
+				while (!futures.empty())
+				{
+					auto f = move(futures.front());
+					f.get();
+					futures.pop_front();
+				}
+
+				for (auto& localCount : localCounts)
+				{
+					localCount.forEach([&](string_view sv, size_t count)
+					{
+						wordCounts.add(sv, count);
+					});
+					localCount = WordCountMap<largeCounter>{};
+				}
 			}
 
 			emitEvent(callback, BpeTokenizerTrainerEvent::pretokenizeEnd, totalCount, totalCount);

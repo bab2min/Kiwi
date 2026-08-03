@@ -100,7 +100,7 @@ namespace kiwi
 		// -1 selects std::thread::hardware_concurrency(), 0 disables threading, and any positive value is the number of threads to use.
 		size_t numThreads = 0;
 		// Limits how many input sentences are retained while collecting chunks.
-		size_t batchSize = 1024;
+		size_t batchSize = 64;
 		// Use 64-bit per-chunk counters (16-byte slots) instead of the default
 		// 32-bit counters (8-byte slots).  Enable when a single chunk may appear
 		// more than ~4 billion times across the entire corpus, or when the total
