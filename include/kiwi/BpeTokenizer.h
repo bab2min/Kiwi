@@ -62,8 +62,14 @@ namespace kiwi
 	{
 		size_t vocabSize = 0;
 		size_t minPairFrequency = 5;
-		// A value of numeric_limits<size_t>::max() means no length limit.
-		size_t maxTokenLength = std::numeric_limits<size_t>::max();
+		// Backstop against long non-repetitive junk — base64 blobs, hashes, URL tails —
+		// that no other rule catches.  Counted in BYTES, so what it allows depends on the
+		// script: 64 is 64 Latin characters, about 21 Hangul syllables, and about 8 once
+		// useJamoAlphabet decomposes them (a syllable averages 7.3 bytes as jamo).  Held
+		// deliberately loose; repetitive runs are maxRepeatLength's job, and tightening
+		// this far enough to shape the vocabulary costs more than it saves.  A value of
+		// numeric_limits<size_t>::max() means no length limit.
+		size_t maxTokenLength = 64;
 		bool addPrefixSpace = false;
 		// Caps how many consecutive digits may share one chunk, so that long digit runs
 		// do not spend vocabulary slots on specific numbers ("2019", "100000").  Only
@@ -74,7 +80,22 @@ namespace kiwi
 		// than this many digits, so no merge rule can produce a longer digit token.
 		// Note that the cap bounds token length but not where an unseen number is cut,
 		// which is decided by merge ranks — "1234" may come out as "12"+"34" there.
-		size_t maxDigitLength = 0;
+		size_t maxDigitLength = 3;
+		// Caps how many times one character may repeat inside a chunk, so a separator
+		// line cannot spend vocabulary slots on itself.  BPE ranks merges by how often a
+		// pair is adjacent, not by how often a token is used, and a run of n identical
+		// characters contributes n-1 to its own pair count — a "================" seen
+		// five times looks like a pair seen seventy-five, which is enough to merge it all
+		// the way in.  Four merges get there, since each one doubles the run.
+		//
+		// Counted in CODEPOINTS, not bytes, so a multi-byte character is capped at the
+		// same count as an ASCII one: "ㅋ" and "😀" run out after eight just as "=" does.
+		// Only a character repeating against itself counts, so "===---" stays whole while
+		// "=========" is cut.  Applies to letters, digits and symbols alike; where both
+		// this and maxDigitLength are set, whichever runs out first ends the chunk.
+		// Whitespace runs are chunked separately and are not affected.  Zero means no
+		// limit — note this is the one cap here that defaults to on.
+		size_t maxRepeatLength = 8;
 		// Byte strings pinned into the initial alphabet.  Each one is made reachable by
 		// merge rules holding the lowest ranks, so it is rebuilt from its bytes before
 		// any learned merge applies and can never come out split — which is what keeps

@@ -498,6 +498,7 @@ namespace kiwi
 		string& jamoBuf,
 		const string& str,
 		size_t maxDigitLength = 0,
+		size_t maxRepeatLength = 0,
 		bool useJamoAlphabet = false,
 		PretokenizeOption pretokenizeOption = PretokenizeOption::none,
 		const Kiwi* kiwi = nullptr
@@ -633,11 +634,26 @@ namespace kiwi
 					const size_t maxRun = (cls == ChrClass::number && maxDigitLength)
 						? maxDigitLength : numeric_limits<size_t>::max();
 					size_t runLength = 1;
+					// The repeat cap counts one character against itself rather than the
+					// whole run, so "===---" stays whole while "=========" is cut.  Both
+					// caps are live at once; whichever runs out first ends the chunk.
+					char32_t repeatedCp = cp.value;
+					size_t repeatLength = 1;
 					i += cp.size;
 					while (i < n && runLength < maxRun)
 					{
 						const auto next = decodeUtf8Codepoint(str, i);
 						if (classifyCodepoint(next.value) != cls) break;
+						if (next.value == repeatedCp)
+						{
+							if (maxRepeatLength && repeatLength >= maxRepeatLength) break;
+							++repeatLength;
+						}
+						else
+						{
+							repeatedCp = next.value;
+							repeatLength = 1;
+						}
 						i += next.size;
 						++runLength;
 					}
@@ -662,6 +678,7 @@ namespace kiwi
 		static void addChunksTo(const string& str,
 								bool addPrefixSpace,
 								size_t maxDigitLength,
+								size_t maxRepeatLength,
 								bool useJamoAlphabet,
 								PretokenizeOption pretokenizeOption,
 								const Kiwi* kiwi,
@@ -680,7 +697,7 @@ namespace kiwi
 			// The spans come back indexed into whichever text they were cut from, so the
 			// jamo case needs no branch here.
 			const string* text = extractChunkSpans(spanBuf, jamoBuf, *workStr,
-				maxDigitLength, useJamoAlphabet, pretokenizeOption, kiwi);
+				maxDigitLength, maxRepeatLength, useJamoAlphabet, pretokenizeOption, kiwi);
 			for (auto& span : spanBuf)
 				wc.add(string_view(text->data() + span.first, span.second));
 		}
@@ -706,7 +723,7 @@ namespace kiwi
 			{
 				for (auto& s : data)
 				{
-					addChunksTo(s, config.addPrefixSpace, config.maxDigitLength, config.useJamoAlphabet, config.pretokenizeOption, kiwi, targetCounts);
+					addChunksTo(s, config.addPrefixSpace, config.maxDigitLength, config.maxRepeatLength, config.useJamoAlphabet, config.pretokenizeOption, kiwi, targetCounts);
 				}
 			};
 
