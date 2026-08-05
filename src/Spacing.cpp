@@ -102,6 +102,20 @@ namespace kiwi
 			}
 		}
 
+		u16string stripSpaces(const u16string& str)
+		{
+			size_t b = 0, e = str.size();
+			while (b < e && isSpace(str[b])) ++b;
+			while (e > b && isSpace(str[e - 1])) --e;
+			return str.substr(b, e - b);
+		}
+
+		inline bool endsWithAlphaNumeric(const u16string& str)
+		{
+			if (str.empty()) return false;
+			const char16_t c = str.back();
+			return (u'0' <= c && c <= u'9') || (u'A' <= c && c <= u'Z') || (u'a' <= c && c <= u'z');
+		}
 	}
 
 	u16string Kiwi::space(const u16string& str, bool resetWhitespace) const
@@ -167,4 +181,54 @@ namespace kiwi
 		return utf16To8(space(utf8To16(str), resetWhitespace));
 	}
 
+	u16string Kiwi::glue(const vector<u16string>& textChunks,
+		const vector<bool>& insertNewLines,
+		vector<bool>* spaceInsertionsOut) const
+	{
+		if (spaceInsertionsOut) spaceInsertionsOut->clear();
+		if (textChunks.empty()) return {};
+
+		vector<u16string> chunks;
+		chunks.reserve(textChunks.size());
+		for (auto& c : textChunks) chunks.emplace_back(stripSpaces(c));
+
+		// kiwipiepy가 사용하는 Match.ALL과 동일하다. (C++의 Match::all과 달리 zCoda를 포함하지 않는다)
+		const AnalyzeOption option{ Match::url | Match::email | Match::hashtag
+			| Match::mention | Match::serial | Match::emoji };
+
+		u16string ret = chunks[0];
+		for (size_t i = 0; i + 1 < chunks.size(); ++i)
+		{
+			// kiwipiepy와 동일하게 insertNewLines가 먼저 소진되면 결합을 중단한다.
+			if (!insertNewLines.empty() && i >= insertNewLines.size()) break;
+
+			u16string withSpace = chunks[i];
+			withSpace.push_back(u' ');
+			withSpace += chunks[i + 1];
+			const u16string withoutSpace = chunks[i] + chunks[i + 1];
+
+			const float scoreWithSpace = analyze(withSpace, option).second;
+			const float scoreWithoutSpace = analyze(withoutSpace, option).second;
+
+			const bool insertSpace = scoreWithSpace >= scoreWithoutSpace || endsWithAlphaNumeric(chunks[i]);
+			if (insertSpace)
+			{
+				const bool newLine = !insertNewLines.empty() && insertNewLines[i];
+				ret.push_back(newLine ? u'\n' : u' ');
+			}
+			if (spaceInsertionsOut) spaceInsertionsOut->emplace_back(insertSpace);
+			ret += chunks[i + 1];
+		}
+		return ret;
+	}
+
+	string Kiwi::glue(const vector<string>& textChunks,
+		const vector<bool>& insertNewLines,
+		vector<bool>* spaceInsertionsOut) const
+	{
+		vector<u16string> u16chunks;
+		u16chunks.reserve(textChunks.size());
+		for (auto& c : textChunks) u16chunks.emplace_back(utf8To16(c));
+		return utf16To8(glue(u16chunks, insertNewLines, spaceInsertionsOut));
+	}
 }
