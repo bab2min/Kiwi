@@ -562,6 +562,30 @@ json kiwiJoinSent(Kiwi& kiwi, const json& args) {
     };
 }
 
+json kiwiSpace(Kiwi& kiwi, const json& args) {
+    const std::string text = args[0];
+    const bool resetWhitespace = getAtOrDefault(args, 1, false);
+
+    return kiwi.space(text, resetWhitespace);
+}
+
+json kiwiGlue(Kiwi& kiwi, const json& args) {
+    const std::vector<std::string> chunks = args[0];
+
+    std::vector<bool> insertNewLines;
+    if (args.size() > 1 && !args.at(1).is_null()) {
+        insertNewLines = args.at(1).get<std::vector<bool>>();
+    }
+
+    std::vector<bool> spaceInsertions;
+    const std::string text = kiwi.glue(chunks, insertNewLines, &spaceInsertions);
+
+    return {
+        { "text", text },
+        { "spaceInsertions", spaceInsertions },
+    };
+}
+
 json kiwiGetGlobalConfig(Kiwi& kiwi, const json& args) {
     json obj = json::object();
     auto config = kiwi.getGlobalConfig();
@@ -636,6 +660,8 @@ std::map<std::string, InstanceApiMethod> instanceApiMethods = {
     { "tokenizeTopN", kiwiTokenizeTopN},
     { "splitIntoSents", kiwiSplitIntoSents },
     { "joinSent", kiwiJoinSent },
+    { "space", kiwiSpace },
+    { "glue", kiwiGlue },
     { "getGlobalConfig", kiwiGetGlobalConfig },
     { "setGlobalConfig", kiwiSetGlobalConfig },
     { "createMorphemeSet", kiwiCreateMorphemeSet },

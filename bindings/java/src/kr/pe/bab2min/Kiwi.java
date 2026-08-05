@@ -293,6 +293,16 @@ public class Kiwi implements AutoCloseable  {
 		}
 	}
 
+	public static class GlueResult {
+		public String text;
+		/** 조각 사이마다 공백이 삽입되었는지 여부. 길이는 chunks.length - 1이다. */
+		public byte[] spaceInsertions;
+
+		public String toString() {
+			return String.format("GlueResult(text=%s, spaceInsertions=%s)", text, Arrays.toString(spaceInsertions));
+		}
+	}
+
 	public static class JoinableToken {
 		public String form;
 		public byte tag;
@@ -436,6 +446,31 @@ public class Kiwi implements AutoCloseable  {
 
 	@Override
 	public native void close() throws Exception;
+
+	/** 입력 텍스트의 띄어쓰기를 교정하여 반환한다. */
+	public native String space(String text, boolean resetWhitespace);
+
+	/** 입력 텍스트의 띄어쓰기를 교정하여 반환한다. */
+	public String space(String text) {
+		return space(text, false);
+	}
+
+	private native GlueResult _glue(String[] chunks, byte[] insertNewLines);
+
+	/**
+	 * 여러 텍스트 조각을 문맥에 맞춰 공백을 넣어가며 결합한다.
+	 * @param chunks 결합할 텍스트 조각들. 각 조각의 앞뒤 공백은 제거된다.
+	 * @param insertNewLines 조각 사이에 공백 대신 줄바꿈을 삽입할지 여부(0 또는 1).
+	 *        null이거나 비어있는 경우 공백만을 사용한다.
+	 */
+	public GlueResult glue(String[] chunks, byte[] insertNewLines) {
+		return _glue(chunks, insertNewLines == null ? new byte[0] : insertNewLines);
+	}
+
+	/** 여러 텍스트 조각을 문맥에 맞춰 공백을 넣어가며 결합한다. */
+	public GlueResult glue(String[] chunks) {
+		return _glue(chunks, new byte[0]);
+	}
 
 	public boolean isAlive() {
 		return _inst != 0;

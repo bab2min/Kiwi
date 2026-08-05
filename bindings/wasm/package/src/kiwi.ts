@@ -146,6 +146,13 @@ export interface SentenceJoinResult {
     ranges: SentenceSpan[] | null;
 }
 
+export interface GlueResult {
+    /** The joined text. */
+    text: string;
+    /** Whether a space was inserted between each pair of chunks. Its length is `chunks.length - 1`. */
+    spaceInsertions: boolean[];
+}
+
 export type MorphemeSet = number;
 
 export interface PretokenizedToken extends Morph {
@@ -285,7 +292,27 @@ export interface Kiwi {
         lmSearch?: boolean,
         withRanges?: boolean
     ) => SentenceJoinResult;
-    
+    /**
+     * Corrects the spacing of the input text.
+     * @param str String to correct
+     * @param resetWhitespace If `true`, parts that are already spaced are joined as well. If `false`, the correction mainly separates words that are stuck together.
+     * @returns The text with corrected spacing.
+     */
+    space: (
+        str: string,
+        resetWhitespace?: boolean
+    ) => string;
+    /**
+     * Joins text chunks into a single text, inserting a space between them where the context calls for it.
+     * @param chunks Text chunks to join. Leading and trailing whitespace of each chunk is removed.
+     * @param insertNewLines Whether a newline is inserted instead of a space between each pair of chunks. Its length must be at least `chunks.length - 1`.
+     * @returns A `GlueResult` object.
+     */
+    glue: (
+        chunks: string[],
+        insertNewLines?: boolean[]
+    ) => GlueResult;
+
     getGlobalConfig: () => KiwiConfig;
     setGlobalConfig: (config: KiwiConfig) => void;
 
