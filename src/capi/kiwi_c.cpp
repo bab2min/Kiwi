@@ -1023,6 +1023,82 @@ DECL_DLL kiwi_joiner_h kiwi_new_joiner(kiwi_h handle, int lm_search)
 	}
 }
 
+namespace
+{
+	const char* allocCStr(const string& str)
+	{
+		auto* buf = new char[str.size() + 1];
+		memcpy(buf, str.data(), str.size());
+		buf[str.size()] = 0;
+		return buf;
+	}
+}
+
+const char* kiwi_space(kiwi_h handle, const char* text, int reset_whitespace)
+{
+	if (!handle || !text) return nullptr;
+	Kiwi* kiwi = (Kiwi*)handle;
+	try
+	{
+		return allocCStr(kiwi->space(text, !!reset_whitespace));
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return nullptr;
+	}
+}
+
+const char* kiwi_glue(kiwi_h handle, const char** chunks, int chunk_size, const char* insert_new_lines, char* space_insertions)
+{
+	if (!handle || !chunks || chunk_size < 0) return nullptr;
+	Kiwi* kiwi = (Kiwi*)handle;
+	try
+	{
+		vector<string> textChunks;
+		textChunks.reserve(chunk_size);
+		for (int i = 0; i < chunk_size; ++i)
+		{
+			if (!chunks[i]) return nullptr;
+			textChunks.emplace_back(chunks[i]);
+		}
+
+		vector<bool> newLines;
+		if (insert_new_lines && chunk_size > 1)
+		{
+			newLines.reserve(chunk_size - 1);
+			for (int i = 0; i + 1 < chunk_size; ++i) newLines.emplace_back(!!insert_new_lines[i]);
+		}
+
+		vector<bool> inserted;
+		const string ret = kiwi->glue(textChunks, newLines, space_insertions ? &inserted : nullptr);
+		if (space_insertions)
+		{
+			for (size_t i = 0; i < inserted.size(); ++i) space_insertions[i] = inserted[i] ? 1 : 0;
+		}
+		return allocCStr(ret);
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return nullptr;
+	}
+}
+
+int kiwi_free_string(const char* str)
+{
+	try
+	{
+		delete[] str;
+		return 0;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return KIWIERR_FAIL;
+	}
+}
+
 int kiwi_close(kiwi_h handle)
 {
 	if (!handle) return KIWIERR_INVALID_HANDLE;
