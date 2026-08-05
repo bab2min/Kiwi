@@ -502,6 +502,23 @@ TEST(KiwiCpp, Glue)
 	EXPECT_EQ(kiwi.glue(std::vector<std::string>{ u8"한국어", u8"형태소분석기" }), u8"한국어 형태소분석기");
 }
 
+TEST(KiwiCpp, GlueMultiThreaded)
+{
+	// 스레드풀이 있는 경우 후보들이 병렬로 분석되지만 결과는 순차 실행과 동일해야 한다.
+	Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 2, BuildOption::default_, ModelType::none }.build();
+	using Chunks = std::vector<std::u16string>;
+	std::vector<bool> spaceInsertions;
+
+	EXPECT_EQ(kiwi.glue(Chunks{ u"그러나  알고보니 그 봉", u"지 안에 있던 것은 바로", u"레몬이었던 것이다." },
+		{}, &spaceInsertions), u"그러나  알고보니 그 봉지 안에 있던 것은 바로 레몬이었던 것이다.");
+	EXPECT_EQ(spaceInsertions, std::vector<bool>({ false, true }));
+
+	EXPECT_EQ(kiwi.glue(Chunks{ u"오늘은 날씨가", u"참 좋아서", u"산책을 나갔다",
+		u"가는 길에", u"친구를 만났고", u"함께 커피를 마셨다" }, {}, &spaceInsertions),
+		u"오늘은 날씨가 참 좋아서 산책을 나갔다 가는 길에 친구를 만났고 함께 커피를 마셨다");
+	EXPECT_EQ(spaceInsertions, std::vector<bool>({ true, true, true, true, true }));
+}
+
 TEST(KiwiCpp, Pretokenized)
 {
 	Kiwi& kiwi = reuseKiwiInstance();

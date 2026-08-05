@@ -196,21 +196,62 @@ namespace kiwi
 		const AnalyzeOption option{ Match::url | Match::email | Match::hashtag
 			| Match::mention | Match::serial | Match::emoji };
 
+		// reader가 반환하는 빈 문자열은 스트림의 끝을 뜻하므로, 양쪽 조각이 모두 비어 후보가
+		// 빈 문자열이 되는 경우에는 스트림에 넣지 않고 아래에서 따로 채운다.
+		const size_t numCandidates = (chunks.size() - 1) * 2;
+		auto isEmptyCandidate = [&](size_t idx)
+		{
+			return idx % 2 == 1 && chunks[idx / 2].empty() && chunks[idx / 2 + 1].empty();
+		};
+
+		size_t readIdx = 0;
+		auto reader = [&]() -> u16string
+		{
+			while (readIdx < numCandidates)
+			{
+				const size_t idx = readIdx++;
+				if (isEmptyCandidate(idx)) continue;
+				u16string cand = chunks[idx / 2];
+				if (idx % 2 == 0) cand.push_back(u' ');
+				cand += chunks[idx / 2 + 1];
+				return cand;
+			}
+			return {};
+		};
+
+		vector<float> analyzed;
+		analyzed.reserve(numCandidates);
+		auto resultCallback = [&](const vector<TokenResult>& res)
+		{
+			analyzed.emplace_back(res[0].second);
+		};
+		analyze(1, reader, resultCallback, option);
+
+		float emptyScore = 0;
+		bool emptyScoreReady = false;
+		vector<float> scores(numCandidates, 0.f);
+		for (size_t idx = 0, k = 0; idx < numCandidates; ++idx)
+		{
+			if (!isEmptyCandidate(idx))
+			{
+				scores[idx] = analyzed[k++];
+				continue;
+			}
+			if (!emptyScoreReady)
+			{
+				emptyScore = analyze(u16string{}, option).second;
+				emptyScoreReady = true;
+			}
+			scores[idx] = emptyScore;
+		}
+
 		u16string ret = chunks[0];
 		for (size_t i = 0; i + 1 < chunks.size(); ++i)
 		{
 			// kiwipiepy와 동일하게 insertNewLines가 먼저 소진되면 결합을 중단한다.
 			if (!insertNewLines.empty() && i >= insertNewLines.size()) break;
 
-			u16string withSpace = chunks[i];
-			withSpace.push_back(u' ');
-			withSpace += chunks[i + 1];
-			const u16string withoutSpace = chunks[i] + chunks[i + 1];
-
-			const float scoreWithSpace = analyze(withSpace, option).second;
-			const float scoreWithoutSpace = analyze(withoutSpace, option).second;
-
-			const bool insertSpace = scoreWithSpace >= scoreWithoutSpace || endsWithAlphaNumeric(chunks[i]);
+			const bool insertSpace = scores[i * 2] >= scores[i * 2 + 1] || endsWithAlphaNumeric(chunks[i]);
 			if (insertSpace)
 			{
 				const bool newLine = !insertNewLines.empty() && insertNewLines[i];
