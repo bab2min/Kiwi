@@ -143,6 +143,7 @@
     <ClCompile Include="..\src\CoNgramModel.cpp" />
     <ClCompile Include="..\src\search.cpp" />
     <ClCompile Include="..\src\SkipBigramModel.cpp" />
+    <ClCompile Include="..\src\Spacing.cpp" />
     <ClCompile Include="..\src\SubstringExtractor.cpp" />
     <ClCompile Include="..\src\TagUtils.cpp" />
     <ClCompile Include="..\src\ScriptType.cpp" />

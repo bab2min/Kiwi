@@ -483,6 +483,66 @@ namespace kiwi
 			TokenResult* tokenizedResultOut = nullptr
 		) const;
 
+		/**
+		 * @brief 입력 텍스트의 띄어쓰기를 교정하여 반환한다.
+		 *
+		 * @param str 띄어쓰기를 교정할 텍스트
+		 * @param resetWhitespace true인 경우 이미 띄어쓰기된 부분을 붙이는 교정도 적극적으로 수행한다.
+		 * false인 경우 붙어 있는 단어를 띄어쓰는 교정 위주로 수행한다.
+		 * @return 띄어쓰기가 교정된 텍스트
+		 *
+		 * @note 이 기능은 형태소 분석에 기반하므로 형태소 중간에 공백이 삽입된 경우 결과가 부정확할 수 있다.
+		 * 이 경우 `KiwiConfig::spaceTolerance`를 조절하여 형태소 내 공백을 무시하거나,
+		 * `resetWhitespace`를 true로 설정하면 결과를 개선할 수 있다.
+		 */
+		std::u16string space(const std::u16string& str, bool resetWhitespace = false) const;
+
+		/**
+		 * @brief 입력 텍스트의 띄어쓰기를 교정하여 반환한다. (UTF-8 버전)
+		 *
+		 * @param str 띄어쓰기를 교정할 텍스트
+		 * @param resetWhitespace true인 경우 이미 띄어쓰기된 부분을 붙이는 교정도 적극적으로 수행한다.
+		 * @return 띄어쓰기가 교정된 텍스트
+		 *
+		 * @sa `kiwi::Kiwi::space`
+		 */
+		std::string space(const std::string& str, bool resetWhitespace = false) const;
+
+		/**
+		 * @brief 여러 텍스트 조각을 하나로 합치되, 문맥을 고려해 적절한 공백을 사이에 삽입한다.
+		 *
+		 * @param textChunks 합칠 텍스트 조각들의 목록. 각 조각의 앞뒤 공백은 제거된다.
+		 * @param insertNewLines 조각 사이에 공백 대신 줄바꿈을 삽입할지 여부.
+		 * 비어있는 경우 줄바꿈을 사용하지 않고 공백만을 사용한다.
+		 * 비어있지 않으면서 크기가 `textChunks.size() - 1`보다 작은 경우, 값이 모자라는 지점에서
+		 * 결합을 중단하므로 그 뒤의 조각들은 결과에 포함되지 않는다.
+		 * @param spaceInsertionsOut nullptr이 아닌 경우 조각 사이마다 공백이 삽입되었는지 여부를 기록한다.
+		 * 기록되는 원소의 개수는 결합이 중단되지 않은 경우 `textChunks.size() - 1`이다.
+		 * @return 조각들이 합쳐진 텍스트
+		 *
+		 * @note 공백 삽입 여부는 공백을 넣은 경우와 넣지 않은 경우를 각각 분석하여
+		 * 언어 모델 점수가 더 높은 쪽을 선택하는 방식으로 결정된다.
+		 */
+		std::u16string glue(const std::vector<std::u16string>& textChunks,
+			const std::vector<bool>& insertNewLines = {},
+			std::vector<bool>* spaceInsertionsOut = nullptr
+		) const;
+
+		/**
+		 * @brief 여러 텍스트 조각을 하나로 합치되, 문맥을 고려해 적절한 공백을 사이에 삽입한다. (UTF-8 버전)
+		 *
+		 * @param textChunks 합칠 텍스트 조각들의 목록. 각 조각의 앞뒤 공백은 제거된다.
+		 * @param insertNewLines 조각 사이에 공백 대신 줄바꿈을 삽입할지 여부.
+		 * @param spaceInsertionsOut nullptr이 아닌 경우 조각 사이마다 공백이 삽입되었는지 여부를 기록한다.
+		 * @return 조각들이 합쳐진 텍스트
+		 *
+		 * @sa `kiwi::Kiwi::glue`
+		 */
+		std::string glue(const std::vector<std::string>& textChunks,
+			const std::vector<bool>& insertNewLines = {},
+			std::vector<bool>* spaceInsertionsOut = nullptr
+		) const;
+
 
 		template<class LmState>
 		cmb::AutoJoiner newJoinerImpl() const;
