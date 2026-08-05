@@ -1083,6 +1083,59 @@ namespace jni
 		}
 	};
 
+	// std::u16string은 jclassName을 갖지 않으므로 위의 일반 배열 구현을 쓸 수 없다.
+	template<>
+	struct ValueBuilder<std::vector<std::u16string>>
+	{
+		using CppType = std::vector<std::u16string>;
+		using JniType = jobjectArray;
+		static constexpr auto typeStr = "[Ljava/lang/String;"sv;
+
+		CppType fromJava(JNIEnv* env, JniType v)
+		{
+			if (!v) return {};
+			const size_t len = env->GetArrayLength(v);
+			ValueBuilder<std::u16string> vb;
+			CppType ret;
+			ret.reserve(len);
+			for (size_t i = 0; i < len; ++i)
+			{
+				auto* e = env->GetObjectArrayElement(v, i);
+				ret.emplace_back(vb.fromJava(env, (jstring)e));
+				env->DeleteLocalRef(e);
+			}
+			return ret;
+		}
+
+		JniType toJava(JNIEnv* env, const CppType& v)
+		{
+			auto* cls = env->FindClass("java/lang/String");
+			auto* arr = env->NewObjectArray(v.size(), cls, nullptr);
+			ValueBuilder<std::u16string> vb;
+			for (size_t i = 0; i < v.size(); ++i)
+			{
+				auto* s = vb.toJava(env, v[i]);
+				env->SetObjectArrayElement(arr, i, s);
+				env->DeleteLocalRef(s);
+			}
+			env->DeleteLocalRef(cls);
+			return arr;
+		}
+
+		template<class ... Args>
+		CppType callMethod(JNIEnv* env, jobject obj, jmethodID methodID, Args&&... args)
+		{
+			auto ret = (JniType)env->CallObjectMethod(obj, methodID, std::forward<Args>(args)...);
+			if (env->ExceptionCheck())
+			{
+				env->ExceptionDescribe();
+				env->ExceptionClear();
+				throw std::runtime_error{ "Java exception occurred." };
+			}
+			return fromJava(env, ret);
+		}
+	};
+
 	template<class Ty>
 	struct ValueBuilder<std::optional<std::vector<Ty>>, std::enable_if_t<!std::is_integral_v<Ty> && !std::is_floating_point_v<Ty>>>
 	{
@@ -1184,6 +1237,7 @@ namespace jni
 				auto arr = env->NewByteArray(v.size());
 				auto ptr = env->GetByteArrayElements(arr, nullptr);
 				std::copy(v.begin(), v.end(), ptr);
+				env->ReleaseByteArrayElements(arr, ptr, 0);
 				return arr;
 			}
 			else if constexpr (sizeof(Ty) == 2)
@@ -1191,6 +1245,7 @@ namespace jni
 				auto arr = env->NewShortArray(v.size());
 				auto ptr = env->GetShortArrayElements(arr, nullptr);
 				std::copy(v.begin(), v.end(), ptr);
+				env->ReleaseShortArrayElements(arr, ptr, 0);
 				return arr;
 			}
 			else if constexpr (sizeof(Ty) == 4)
@@ -1198,6 +1253,7 @@ namespace jni
 				auto arr = env->NewIntArray(v.size());
 				auto ptr = env->GetIntArrayElements(arr, nullptr);
 				std::copy(v.begin(), v.end(), ptr);
+				env->ReleaseIntArrayElements(arr, ptr, 0);
 				return arr;
 			}
 			else if constexpr (sizeof(Ty) == 8)
@@ -1205,6 +1261,7 @@ namespace jni
 				auto arr = env->NewLongArray(v.size());
 				auto ptr = env->GetLongArrayElements(arr, nullptr);
 				std::copy(v.begin(), v.end(), ptr);
+				env->ReleaseLongArrayElements(arr, ptr, 0);
 				return arr;
 			}
 		}
