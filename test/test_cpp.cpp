@@ -446,6 +446,26 @@ TEST(KiwiCpp, EmptyToken)
 	}
 }
 
+TEST(KiwiCpp, Space)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+
+	EXPECT_EQ(kiwi.space(u"띄어쓰기없이작성된텍스트네이걸교정해줘"),
+		u"띄어쓰기 없이 작성된 텍스트네 이걸 교정해 줘");
+	EXPECT_EQ(kiwi.space(u"그러나  알고보니 그 봉지 안에"), u"그러나  알고 보니 그 봉지 안에");
+	EXPECT_EQ(kiwi.space(u"이건그렇게하지않으면안돼"), u"이건 그렇게 하지 않으면 안 돼");
+	EXPECT_EQ(kiwi.space(u"2020년에는1개의사과를먹었다"), u"2020년에는 1개의 사과를 먹었다");
+
+	EXPECT_EQ(kiwi.space(u"띄 어 쓰 기 문 제 가 있 습 니 다"), u"띄어 쓰기 문 제가 있 습 니 다");
+	EXPECT_EQ(kiwi.space(u"띄 어 쓰 기 문 제 가 있 습 니 다", true), u"띄어쓰기 문제가 있습니다");
+
+	EXPECT_EQ(kiwi.space(u""), u"");
+	EXPECT_EQ(kiwi.space(u"   "), u"   ");
+
+	EXPECT_EQ(kiwi.space(u8"자세한건https://kiwipiepy.readthedocs.io를보세요"),
+		u8"자세한 건 https://kiwipiepy.readthedocs.io를 보세요");
+}
+
 TEST(KiwiCpp, Pretokenized)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
