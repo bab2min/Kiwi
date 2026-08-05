@@ -131,4 +131,26 @@ describe('Kiwi WASM', () => {
         // Restore
         kiwi.setGlobalConfig({ cutOffThreshold: originalThreshold });
     });
+
+    it('should correct spacing', async () => {
+        if (!kiwi) return;
+
+        expect(kiwi.space('띄어쓰기없이작성된텍스트네이걸교정해줘'))
+            .toBe('띄어쓰기 없이 작성된 텍스트네 이걸 교정해 줘');
+        expect(kiwi.space('띄 어 쓰 기 문 제 가 있 습 니 다', true))
+            .toBe('띄어쓰기 문제가 있습니다');
+    });
+
+    it('should glue text chunks', async () => {
+        if (!kiwi) return;
+
+        const chunks = ['그러나  알고보니 그 봉', '지 안에 있던 것은 바로', '레몬이었던 것이다.'];
+
+        const result = kiwi.glue(chunks);
+        expect(result.text).toBe('그러나  알고보니 그 봉지 안에 있던 것은 바로 레몬이었던 것이다.');
+        expect(result.spaceInsertions).toEqual([false, true]);
+
+        const withNewLines = kiwi.glue(chunks, [true, true]);
+        expect(withNewLines.text).toBe('그러나  알고보니 그 봉지 안에 있던 것은 바로\n레몬이었던 것이다.');
+    });
 });
