@@ -100,7 +100,7 @@ namespace kiwi
 
 		string_view viewPacked(uint64_t packed) const
 		{
-			return { data.data() + (packed >> 24), packed & 0xFFFFFF };
+			return { data.data() + (packed >> 24), (size_t)(packed & 0xFFFFFF) };
 		}
 
 		// Resets content but keeps allocated capacity for reuse across batches.
