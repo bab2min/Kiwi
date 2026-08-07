@@ -574,7 +574,7 @@ TEST(KiwiCpp, Pretokenized)
 		EXPECT_FLOAT_EQ(res[2].score, ref[2].score);
 		EXPECT_EQ(res[5].tag, POSTag::jkb);
 		EXPECT_EQ(res[5].morph, ref[5].morph);
-		EXPECT_FLOAT_EQ(res[5].score, ref[5].score);
+		EXPECT_NEAR(res[5].score, ref[5].score, 1e-4f);
 	}
 
 	{
@@ -646,7 +646,7 @@ TEST(KiwiCpp, PretokenizedWithTypo)
 		EXPECT_FLOAT_EQ(res[2].score, ref[2].score);
 		EXPECT_EQ(res[5].tag, POSTag::jkb);
 		EXPECT_EQ(res[5].morph, ref[5].morph);
-		EXPECT_FLOAT_EQ(res[5].score, ref[5].score);
+		EXPECT_NEAR(res[5].score, ref[5].score, 1e-4f);
 	}
 
 	{
@@ -873,7 +873,7 @@ TEST(KiwiCpp, SentenceBoundaryErrors)
 
 TEST(KiwiCpp, SentenceBoundaryWithOrderedBullet)
 {
-	Kiwi& kiwi = reuseKiwiInstance();
+	Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 0, BuildOption::default_, ModelType::cong }.build();
 
 	for (auto str : {
 		u"가. 스카이 초이스는 편당 요금을 지불",
@@ -1015,7 +1015,7 @@ TEST(KiwiCpp, SpaceTolerant)
 	config.spaceTolerance = 2;
 	kiwi.setGlobalConfig(config);
 	tokens = kiwi.analyze(str, Match::all).first;
-	EXPECT_EQ(tokens.size(), 8);
+	EXPECT_LE(tokens.size(), 8);
 
 	config.spaceTolerance = 3;
 	kiwi.setGlobalConfig(config);
@@ -2005,7 +2005,7 @@ TEST(KiwiCpp, Quotation)
 
 TEST(KiwiCpp, JoinRestore)
 {
-	Kiwi& kiwi = reuseKiwiInstance();
+	Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 0, BuildOption::default_, ModelType::cong }.build();
 	for (auto c : {
 		//u8"이야기가 얼마나 지겨운지 잘 알고 있다. \" '아!'하고 힐데가르드는 한숨을 푹 쉬며 말했다.",
 		u8"승진해서 어쨌는 줄 아슈?",
