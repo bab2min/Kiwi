@@ -5,5 +5,5 @@ digraph "Graphical Class Hierarchy"
   edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
   node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
   rankdir="LR";
-  Node0 [id="Node000000",label="kiwi_stream_object_t",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$structkiwi__stream__object__t.html",tooltip="범용 입력 스트림을 나타내는 구조체"];
+  Node0 [id="Node000000",label="kiwi_analyze_option_t",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$structkiwi__analyze__option__t.html",tooltip=" "];
 }
