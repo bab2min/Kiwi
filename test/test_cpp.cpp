@@ -448,7 +448,7 @@ TEST(KiwiCpp, EmptyToken)
 
 TEST(KiwiCpp, Space)
 {
-	Kiwi& kiwi = reuseKiwiInstance();
+	Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 0, BuildOption::default_, ModelType::cong }.build();
 
 	EXPECT_EQ(kiwi.space(u"띄어쓰기없이작성된텍스트네이걸교정해줘"),
 		u"띄어쓰기 없이 작성된 텍스트네 이걸 교정해 줘");
@@ -505,7 +505,7 @@ TEST(KiwiCpp, Glue)
 TEST(KiwiCpp, GlueMultiThreaded)
 {
 	// 스레드풀이 있는 경우 후보들이 병렬로 분석되지만 결과는 순차 실행과 동일해야 한다.
-	Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 2, BuildOption::default_, ModelType::none }.build();
+	Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 2, BuildOption::default_, ModelType::cong }.build();
 	using Chunks = std::vector<std::u16string>;
 	std::vector<bool> spaceInsertions;
 
