@@ -871,7 +871,7 @@ namespace kiwi
 						uint32_t bestRank = (uint32_t)-1;
 						for (size_t i = 0; i + 1 < tokens.size(); ++i)
 						{
-							const auto it = merges.find(makeKey(tokens[i], tokens[i + 1]));
+							const unordered_map<uint64_t, MergeRule>::const_iterator it = merges.find(makeKey(tokens[i], tokens[i + 1]));
 							if (it != merges.end() && it->second.rank < bestRank) bestRank = it->second.rank;
 						}
 						if (bestRank == (uint32_t)-1) break;
