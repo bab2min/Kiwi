@@ -33,6 +33,15 @@ if(ANDROID)
     )
 
     target_compile_options(${pkg_name} PRIVATE -O3)
+
+    # Align the shared library to 16 KB pages. Google Play requires apps to
+    # support 16 KB page size, and a library built with the default 4 KB
+    # alignment makes the whole app rejected at upload time.
+    # 16 KB aligned libraries still run on existing 4 KB devices.
+    target_link_options(${pkg_name} PRIVATE
+        "-Wl,-z,max-page-size=16384"
+        "-Wl,-z,common-page-size=16384"
+    )
 else()
     if(UNIX AND NOT APPLE)
         target_link_libraries( ${pkg_name}

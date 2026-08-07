@@ -13,6 +13,9 @@ apply plugin: 'com.android.library'
 android {
     namespace 'kr.pe.bab2min.kiwi'
     compileSdk 34
+    // 16 KB page alignment requires NDK r27 or later. Without pinning it,
+    // the build may silently pick an older NDK and drop the link options.
+    ndkVersion '27.1.12297006'
 
     defaultConfig {
         minSdk 21
