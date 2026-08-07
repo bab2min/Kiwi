@@ -4,6 +4,11 @@
 
 namespace kiwi
 {
+	// Unicode property checks backed by the bundled Unicode database.
+	bool isUnicodeLetter(char32_t c);
+	bool isUnicodeNumber(char32_t c);
+	bool isUnicodeSpace(char32_t c);
+
     char32_t toLower(char32_t c);
     char32_t toUpper(char32_t c);
 

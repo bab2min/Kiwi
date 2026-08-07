@@ -59,6 +59,7 @@ endif()
 
 set ( CORE_SRCS
   src/ArchUtils.cpp
+  src/BpeTokenizer.cpp
   src/Combiner.cpp
   src/CoNgramModel.cpp
   src/Dataset.cpp
