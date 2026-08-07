@@ -209,7 +209,7 @@ TEST(BpeTokenizerTest, CapsDigitRunsAtMaxDigitLength)
 
 	const std::vector<std::string> sentences(8, "12345 67890");
 
-	// Without a cap, each whole digit run becomes a token of its own.
+	config.maxDigitLength = 0;
 	const auto plain = trainVocab(config, nullptr, sentences);
 	EXPECT_TRUE(plain.count("12345"));
 	EXPECT_TRUE(plain.count(" 67890"));
@@ -432,6 +432,171 @@ TEST(BpeTokenizerTest, RejectsEmptyAdditionalAlphabetEntry)
 	config.vocabSize = 300;
 	config.additionalAlphabet = { "" };
 	EXPECT_THROW(BpeTokenizerTrainer{ config }, std::invalid_argument);
+}
+
+namespace
+{
+	// Longest run of one character repeating against itself, counted in codepoints —
+	// the unit the cap itself uses, so a multi-byte character counts once per character
+	// rather than once per byte.
+	size_t longestCharRepeat(const std::string& s)
+	{
+		std::vector<std::string> chars;
+		for (size_t i = 0; i < s.size(); )
+		{
+			const auto b = (unsigned char)s[i];
+			size_t len = 1;
+			if ((b & 0xF8) == 0xF0) len = 4;
+			else if ((b & 0xF0) == 0xE0) len = 3;
+			else if ((b & 0xE0) == 0xC0) len = 2;
+			chars.push_back(s.substr(i, std::min(len, s.size() - i)));
+			i += len;
+		}
+		size_t best = 0, cur = 0;
+		for (size_t i = 0; i < chars.size(); ++i)
+		{
+			cur = (i && chars[i] == chars[i - 1]) ? cur + 1 : 1;
+			best = std::max(best, cur);
+		}
+		return best;
+	}
+}
+
+// A separator line merges its way into the vocabulary on far less evidence than its
+// frequency suggests: a run of n identical characters contributes n-1 to its own pair
+// count, and each merge doubles the run, so four merges reach sixteen characters.
+TEST(BpeTokenizerTest, CapsCharacterRepeatsAtMaxRepeatLength)
+{
+	std::vector<std::string> sentences;
+	for (int i = 0; i < 200; ++i) sentences.push_back("plain sentence number " + std::to_string(i));
+	// Five occurrences only, and the only '=' anywhere in the corpus.
+	for (int i = 0; i < 5; ++i) sentences.push_back("================");
+
+	BpeTrainerConfig config;
+	config.vocabSize = 500;
+	config.minPairFrequency = 5;
+
+	config.maxRepeatLength = 0; // off
+	const auto uncapped = trainVocab(config, nullptr, sentences);
+	EXPECT_TRUE(uncapped.count("================")) << "five occurrences should have been enough";
+
+	config.maxRepeatLength = 8;
+	const auto capped = trainVocab(config, nullptr, sentences);
+	EXPECT_FALSE(capped.count("================"));
+	EXPECT_TRUE(capped.count("========")); // the cap bounds the run, it does not forbid it
+	for (const auto& token : capped)
+		EXPECT_LE(longestCharRepeat(token), config.maxRepeatLength) << "token: " << token;
+
+	// Counted per character, so a mixed run of the same class is left alone.
+	std::vector<std::string> mixed(8, "=-=-=-=-=-=-=-=-");
+	BpeTrainerConfig mixedConfig;
+	mixedConfig.vocabSize = 500;
+	mixedConfig.minPairFrequency = 2;
+	mixedConfig.maxRepeatLength = 8;
+	EXPECT_TRUE(trainVocab(mixedConfig, nullptr, mixed).count("=-=-=-=-=-=-=-=-"));
+}
+
+// The cap counts characters, not bytes, so a multi-byte run is bounded at the same
+// count as an ASCII one — "ㅋㅋㅋ…" must not get eight times the budget of "===…".
+TEST(BpeTokenizerTest, CapsRepeatsOfMultiByteCharactersToo)
+{
+	BpeTrainerConfig config;
+	config.vocabSize = 500;
+	config.minPairFrequency = 2;
+	config.maxRepeatLength = 8;
+
+	for (const char* unit : { "=", u8"©", u8"ㅋ", u8"하", u8"。", u8"😀" })
+	{
+		std::string line;
+		for (int i = 0; i < 20; ++i) line += unit;
+		std::vector<std::string> sentences(200, "plain sentence");
+		sentences.insert(sentences.end(), 20, line);
+
+		const auto vocab = trainVocab(config, nullptr, sentences);
+		size_t worst = 0;
+		std::string worstToken;
+		for (const auto& token : vocab)
+		{
+			const size_t r = longestCharRepeat(token);
+			if (r > worst) { worst = r; worstToken = token; }
+		}
+		EXPECT_EQ(worst, 8u) << "unit=" << unit << " worst token=" << worstToken;
+	}
+}
+
+// Whitespace is chunked by its own branch, so it needs its own cap; a hundred-space
+// run would otherwise become a single token however rare it is.
+TEST(BpeTokenizerTest, CapsWhitespaceRepeatsAtMaxWhitespaceRepeatLength)
+{
+	auto longestSpaceRun = [](const std::string& s)
+	{
+		size_t best = 0, cur = 0;
+		for (char c : s)
+		{
+			cur = (c == ' ') ? cur + 1 : 0;
+			best = std::max(best, cur);
+		}
+		return best;
+	};
+
+	std::vector<std::string> sentences;
+	for (int i = 0; i < 200; ++i) sentences.push_back("plain sentence " + std::to_string(i));
+	sentences.insert(sentences.end(), 20, "a" + std::string(40, ' ') + "b");
+
+	BpeTrainerConfig config;
+	config.vocabSize = 500;
+	config.minPairFrequency = 2;
+
+	config.maxWhitespaceRepeatLength = 0; // off
+	const auto uncapped = trainVocab(config, nullptr, sentences);
+	size_t worstUncapped = 0;
+	for (const auto& token : uncapped) worstUncapped = std::max(worstUncapped, longestSpaceRun(token));
+	EXPECT_GT(worstUncapped, 16u) << "the 40-space run should have merged without a cap";
+
+	config.maxWhitespaceRepeatLength = 16;
+	const auto capped = trainVocab(config, nullptr, sentences);
+	for (const auto& token : capped)
+		EXPECT_LE(longestSpaceRun(token), 16u) << "token of " << token.size() << " bytes";
+
+	// Newlines get the same treatment, counted separately from spaces.
+	std::vector<std::string> newlines(20, "a" + std::string(40, '\n') + "b");
+	newlines.insert(newlines.end(), 200, "plain sentence");
+	for (const auto& token : trainVocab(config, nullptr, newlines))
+	{
+		size_t cur = 0, best = 0;
+		for (char c : token) { cur = (c == '\n') ? cur + 1 : 0; best = std::max(best, cur); }
+		EXPECT_LE(best, 16u);
+	}
+}
+
+// Cutting inside a whitespace run must not disturb the hand-off that glues the last
+// space onto the following word, nor lose a byte.
+TEST(BpeTokenizerTest, WhitespaceCapKeepsChunkingLossless)
+{
+	BpeTrainerConfig config;
+	config.vocabSize = 300;
+	config.minPairFrequency = 1;
+	config.maxWhitespaceRepeatLength = 4;
+
+	const std::vector<std::string> awkward = {
+		"a" + std::string(4, ' ') + "b",   // exactly at the cap
+		"a" + std::string(5, ' ') + "b",   // one past it
+		"a" + std::string(9, ' ') + "b",
+		std::string(20, ' '),              // nothing but spaces
+		std::string(6, ' ') + "tail",      // leading run
+		"head" + std::string(6, ' '),      // trailing run
+		"a \t \t b",                       // mixed, no character repeats
+		"a\n\n\n\n\n\n\nb",
+	};
+
+	for (const auto& s : awkward)
+	{
+		BpeTokenizerTrainer trainer(config);
+		size_t idx = 0;
+		trainer.addSentences([&]() -> std::string { return idx++ ? std::string{} : s; });
+		const auto tokenizer = trainer.build();
+		EXPECT_EQ(tokenizer.decode(tokenizer.encode(s)), s) << "round-trip failed for " << s.size() << " bytes";
+	}
 }
 
 TEST(BpeTokenizerTest, RetainsPairsWhoseFrequencyDecreases)
