@@ -162,8 +162,8 @@ namespace kiwi
 
 		static void checkCounterRoom(CountT current, size_t delta)
 		{
-			const uint64_t room = static_cast<uint64_t>(numeric_limits<CountT>::max()) - current;
-			if (static_cast<uint64_t>(delta) > room)
+			const uint64_t room = (uint64_t)((CountT)-1) - current;
+			if ((uint64_t)delta > room)
 				throw overflow_error{ "BpeTokenizerTrainer: chunk count exceeded 32 bits; set BpeTrainerConfig::largeCounter to true" };
 		}
 
@@ -605,7 +605,7 @@ namespace kiwi
 				if (cls != ChrClass::space)
 				{
 					const size_t maxRun = (cls == ChrClass::number && maxDigitLength)
-						? maxDigitLength : numeric_limits<size_t>::max();
+						? maxDigitLength : (size_t)-1;
 					size_t runLength = 1;
 
 					char32_t repeatedCp = cp.value;
@@ -817,7 +817,7 @@ namespace kiwi
 				}
 				words.push_back(move(w));
 			});
-			if (words.size() > numeric_limits<uint32_t>::max())
+			if (words.size() > (uint32_t)-1)
 				throw length_error{ "BpeTokenizerTrainer: more than 2^32 distinct chunks" };
 
 			auto makeKey = [](uint32_t a, uint32_t b) -> uint64_t {
@@ -868,13 +868,13 @@ namespace kiwi
 					auto& tokens = w.tokens;
 					while (tokens.size() >= 2)
 					{
-						uint32_t bestRank = numeric_limits<uint32_t>::max();
+						uint32_t bestRank = (uint32_t)-1;
 						for (size_t i = 0; i + 1 < tokens.size(); ++i)
 						{
 							const auto it = merges.find(makeKey(tokens[i], tokens[i + 1]));
 							if (it != merges.end() && it->second.rank < bestRank) bestRank = it->second.rank;
 						}
-						if (bestRank == numeric_limits<uint32_t>::max()) break;
+						if (bestRank == (uint32_t)-1) break;
 
 						size_t out = 0;
 						for (size_t i = 0; i < tokens.size(); )
@@ -998,7 +998,7 @@ namespace kiwi
 					blockedPairs.insert(key);
 					// Saturate `pushed` so the pair is never pushed again: it stays
 					// adjacent inside words, so its count keeps moving.
-					stat.pushed = numeric_limits<size_t>::max();
+					stat.pushed = (size_t)-1;
 					continue;
 				}
 
