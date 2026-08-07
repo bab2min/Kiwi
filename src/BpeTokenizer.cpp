@@ -24,15 +24,6 @@ using namespace std;
 
 namespace kiwi
 {
-	// -------------------------------------------------------------------------
-	// StringArena
-	//
-	// Bump-pointer allocator for interning short UTF-8 strings.  Strings are
-	// written sequentially into a single vector<char>; no per-string heap
-	// allocation.  Callers address strings via packed uint64_t handles rather
-	// than raw pointers, so vector reallocation on grow does not invalidate
-	// any stored references.
-	// -------------------------------------------------------------------------
 	class StringArena
 	{
 		vector<char> data;
@@ -127,15 +118,7 @@ namespace kiwi
 	//   Key = packed handle (bits[63:24]=offset 40b, bits[23:0]=length 24b).
 	//   Arena size limit: ~1 TB.  Count limit: ~1.8e19.
 	//
-	// Exceeding either limit throws rather than silently wrapping.
-	//
-	// The arena is held by value (not by pointer) so the implicitly generated copy
-	// and move operations stay correct; an earlier layout kept a back-pointer into a
-	// sibling member, which would dangle as soon as the object was copied or moved.
-	//
-	// Instances are used one-per-worker inside a vector, so the type is padded to a
-	// cache line: the hot members (slots/used/arena sizes) are written on every add()
-	// and would otherwise false-share between adjacent workers.
+	// Exceeding either limit throws.
 	// -------------------------------------------------------------------------
 	template<bool largeCounter>
 	class alignas(64) WordCountMap
@@ -234,9 +217,6 @@ namespace kiwi
 		}
 	};
 
-	// BpeTokenizerTrainer::Impl  –  virtual interface.
-	// Concrete type is BpeTokenizerTrainerImpl<largeCounter> defined below,
-	// after the UTF-8 / chunk-extraction helpers it depends on.
 	struct BpeTokenizerTrainer::Impl
 	{
 		virtual ~Impl() = default;
@@ -248,8 +228,6 @@ namespace kiwi
 		                           const BpeTokenizerTrainerEventCallback& callback) const = 0;
 	};
 
-	// Progress reporting is opt-in; skip the std::function indirection entirely when
-	// no callback was installed.
 	static inline void emitEvent(const BpeTokenizerTrainerEventCallback& callback,
 	                             BpeTokenizerTrainerEvent event, size_t current, size_t total)
 	{
@@ -292,37 +270,18 @@ namespace kiwi
 		return { code, length };
 	}
 
-	// -------------------------------------------------------------------------
-	// 첫가끝 (conjoining jamo)
-	//
-	// The modern Hangul syllable block decomposes algorithmically into a lead
-	// (초성), a vowel (중성) and an optional tail (종성) drawn from the conjoining
-	// jamo block, which is what lets an unseen syllable fall back to jamo instead
-	// of to raw bytes.
-	// -------------------------------------------------------------------------
 	static constexpr char32_t hangulSyllableFirst = 0xAC00;
 	static constexpr char32_t hangulSyllableLast  = 0xD7A3;
-	static constexpr char32_t hangulLeadFirst  = 0x1100;  // U+1100..U+1112
+	static constexpr char32_t hangulOnsetFirst  = 0x1100;  // U+1100..U+1112
 	static constexpr char32_t hangulVowelFirst = 0x1161;  // U+1161..U+1175
-	static constexpr char32_t hangulTailFirst  = 0x11A8;  // U+11A8..U+11C2
-	static constexpr size_t hangulLeadCount  = 19;
+	static constexpr char32_t hangulCodaFirst  = 0x11A8;  // U+11A8..U+11C2
+	static constexpr size_t hangulOnsetCount  = 19;
 	static constexpr size_t hangulVowelCount = 21;
-	static constexpr size_t hangulTailCount  = 27;
-	// The syllable index encodes "no tail" as 0, so the stride is one more than the
-	// number of tails that actually exist.
-	static constexpr size_t hangulTailStride = hangulTailCount + 1;
+	static constexpr size_t hangulCodaCount  = 27;
+	static constexpr size_t hangulCodaStride = hangulCodaCount + 1;
 
-	// Bytes a syllable's 초성 and 중성 occupy once decomposed, i.e. how far into the
-	// decomposed syllable the 중성/종성 seam sits.
 	static constexpr size_t hangulOnsetNucleusBytes = 6;
 
-	// Rewrites every modern Hangul syllable in `str` as its conjoining jamo, copying
-	// everything else — including invalid UTF-8 — through byte for byte.
-	//
-	// `offsets`, when given, receives one entry per input byte plus a terminator, each
-	// holding the output position that byte moved to.  Bytes inside a character all map
-	// to that character's start, which is enough: every position ever looked up — a
-	// chunk edge or a morpheme boundary — is a character boundary.
 	static void decomposeHangul(string_view str, string& out, vector<uint32_t>* offsets = nullptr)
 	{
 		out.clear();
@@ -340,10 +299,10 @@ namespace kiwi
 			if (hangulSyllableFirst <= cp.value && cp.value <= hangulSyllableLast)
 			{
 				const size_t index = (size_t)(cp.value - hangulSyllableFirst);
-				const size_t tail = index % hangulTailStride;
-				utf8FromCode(out, hangulLeadFirst + (char32_t)(index / (hangulVowelCount * hangulTailStride)));
-				utf8FromCode(out, hangulVowelFirst + (char32_t)(index / hangulTailStride % hangulVowelCount));
-				if (tail) utf8FromCode(out, hangulTailFirst + (char32_t)(tail - 1));
+				const size_t tail = index % hangulCodaStride;
+				utf8FromCode(out, hangulOnsetFirst + (char32_t)(index / (hangulVowelCount * hangulCodaStride)));
+				utf8FromCode(out, hangulVowelFirst + (char32_t)(index / hangulCodaStride % hangulVowelCount));
+				if (tail) utf8FromCode(out, hangulCodaFirst + (char32_t)(tail - 1));
 			}
 			else
 			{
@@ -499,6 +458,7 @@ namespace kiwi
 		const string& str,
 		size_t maxDigitLength = 0,
 		size_t maxRepeatLength = 0,
+		size_t maxWhitespaceRepeatLength = 0,
 		bool useJamoAlphabet = false,
 		PretokenizeOption pretokenizeOption = PretokenizeOption::none,
 		const Kiwi* kiwi = nullptr
@@ -528,15 +488,6 @@ namespace kiwi
 			collectMorphemeBoundaries(boundaries, str, pretokenizeOption, useJamoAlphabet, jamoOffsets, *kiwi);
 		}
 
-		// Chunks are produced left to right and never overlap, so a single cursor
-		// walks the boundary list once for the whole string.  A boundary sitting
-		// exactly on a chunk edge is skipped rather than emitting an empty chunk.
-		//
-		// Both loops test against the running `start` rather than only against `end`.
-		// collectMorphemeBoundaries already hands the list over non-decreasing, but a
-		// boundary that slipped behind would otherwise underflow `b - start` into a
-		// span of roughly 2^64 bytes and read far outside the text, so the cheap test
-		// stays as a backstop against silent memory corruption.
 		size_t boundaryCursor = 0;
 		auto emitChunk = [&](size_t startOrig, size_t length)
 		{
@@ -584,12 +535,37 @@ namespace kiwi
 			{
 				size_t j = i;
 				size_t lastSpace = i;
+
+				char32_t repeatedCp = 0;
+				size_t repeatLength = 0;
+				bool truncated = false;
 				while (j < n)
 				{
 					const auto cp = decodeUtf8Codepoint(str, j);
 					if (classifyCodepoint(cp.value) != ChrClass::space) break;
+					if (cp.value == repeatedCp)
+					{
+						if (maxWhitespaceRepeatLength && repeatLength >= maxWhitespaceRepeatLength)
+						{
+							truncated = true;
+							break;
+						}
+						++repeatLength;
+					}
+					else
+					{
+						repeatedCp = cp.value;
+						repeatLength = 1;
+					}
 					lastSpace = j;
 					j += cp.size;
+				}
+
+				if (truncated)
+				{
+					emitChunk(start, j - start);
+					i = j;
+					continue;
 				}
 
 				if (j == n)
@@ -628,15 +604,10 @@ namespace kiwi
 				const ChrClass cls = classifyCodepoint(cp.value);
 				if (cls != ChrClass::space)
 				{
-					// The digit cap counts digits only, so the optional space consumed
-					// above does not eat into it: " 12345" with a cap of 3 yields
-					// " 123" + "45".
 					const size_t maxRun = (cls == ChrClass::number && maxDigitLength)
 						? maxDigitLength : numeric_limits<size_t>::max();
 					size_t runLength = 1;
-					// The repeat cap counts one character against itself rather than the
-					// whole run, so "===---" stays whole while "=========" is cut.  Both
-					// caps are live at once; whichever runs out first ends the chunk.
+
 					char32_t repeatedCp = cp.value;
 					size_t repeatLength = 1;
 					i += cp.size;
@@ -665,9 +636,6 @@ namespace kiwi
 		return text;
 	}
 
-	// Concrete Impl templated on largeCounter.
-	// All hot-path code (chunk extraction, counting, merging) lives here and
-	// operates directly on WordCountsT<LC> — no virtual dispatch in tight loops.
 	template<bool largeCounter>
 	struct BpeTokenizerTrainerImpl final : BpeTokenizerTrainer::Impl
 	{
@@ -679,6 +647,7 @@ namespace kiwi
 								bool addPrefixSpace,
 								size_t maxDigitLength,
 								size_t maxRepeatLength,
+								size_t maxWhitespaceRepeatLength,
 								bool useJamoAlphabet,
 								PretokenizeOption pretokenizeOption,
 								const Kiwi* kiwi,
@@ -697,7 +666,7 @@ namespace kiwi
 			// The spans come back indexed into whichever text they were cut from, so the
 			// jamo case needs no branch here.
 			const string* text = extractChunkSpans(spanBuf, jamoBuf, *workStr,
-				maxDigitLength, maxRepeatLength, useJamoAlphabet, pretokenizeOption, kiwi);
+				maxDigitLength, maxRepeatLength, maxWhitespaceRepeatLength, useJamoAlphabet, pretokenizeOption, kiwi);
 			for (auto& span : spanBuf)
 				wc.add(string_view(text->data() + span.first, span.second));
 		}
@@ -723,7 +692,7 @@ namespace kiwi
 			{
 				for (auto& s : data)
 				{
-					addChunksTo(s, config.addPrefixSpace, config.maxDigitLength, config.maxRepeatLength, config.useJamoAlphabet, config.pretokenizeOption, kiwi, targetCounts);
+					addChunksTo(s, config.addPrefixSpace, config.maxDigitLength, config.maxRepeatLength, config.maxWhitespaceRepeatLength, config.useJamoAlphabet, config.pretokenizeOption, kiwi, targetCounts);
 				}
 			};
 
@@ -776,8 +745,6 @@ namespace kiwi
 					}));
 				}
 
-				// One event per batch: the feeder gives no length, so the count is all
-				// that can be reported and the batch is the natural granularity.
 				emitEvent(callback, BpeTokenizerTrainerEvent::pretokenizeProgress, totalCount, 0);
 			}
 
@@ -859,25 +826,12 @@ namespace kiwi
 
 			unordered_map<uint64_t, MergeRule> merges;
 
-			// ---- additional alphabet ------------------------------------------------
-			// Pin each configured string by giving it a chain of merges that occupy the
-			// lowest ranks, one link per byte after the first.  Since the learned merges
-			// keep numbering from merges.size(), every pinned link outranks all of them,
-			// so encode() rebuilds the string from its bytes before anything else can cut
-			// across it.  The intermediate tokens this leaves behind (the proper prefixes
-			// of an entry) are shared: two entries agreeing on their first bytes pay for
-			// that prefix once.
-			//
-			// useJamoAlphabet appends the conjoining jamo to whatever the caller pinned,
-			// which is the half of that option that makes the other half work: the chunks
-			// arrive already decomposed, so pinning the jamo is what keeps an unseen
-			// syllable falling back to jamo rather than to its bytes.
 			vector<string> pinnedAlphabet = config.additionalAlphabet;
 			if (config.useJamoAlphabet)
 			{
-				for (size_t i = 0; i < hangulLeadCount; ++i)  pinnedAlphabet.emplace_back(utf8FromCode(hangulLeadFirst + (char32_t)i));
+				for (size_t i = 0; i < hangulOnsetCount; ++i)  pinnedAlphabet.emplace_back(utf8FromCode(hangulOnsetFirst + (char32_t)i));
 				for (size_t i = 0; i < hangulVowelCount; ++i) pinnedAlphabet.emplace_back(utf8FromCode(hangulVowelFirst + (char32_t)i));
-				for (size_t i = 0; i < hangulTailCount; ++i)  pinnedAlphabet.emplace_back(utf8FromCode(hangulTailFirst + (char32_t)i));
+				for (size_t i = 0; i < hangulCodaCount; ++i)  pinnedAlphabet.emplace_back(utf8FromCode(hangulCodaFirst + (char32_t)i));
 			}
 
 			for (const auto& entry : pinnedAlphabet)
@@ -1197,10 +1151,6 @@ namespace kiwi
 			return BpeTokenizer(move(vocab), move(merges), config.addPrefixSpace);
 		}
 	};
-
-	// =========================================================================
-	// BpeTokenizer  (unchanged)
-	// =========================================================================
 
 	static vector<uint32_t> buildByteToCharPos(const string& str)
 	{
@@ -1611,9 +1561,7 @@ namespace kiwi
 		return BpeTokenizer(move(vocab), move(merges), addPrefixSpace);
 	}
 
-	// =========================================================================
-	// BpeTokenizerTrainer
-	// =========================================================================
+	
 
 	BpeTokenizerTrainer::BpeTokenizerTrainer(const BpeTrainerConfig& config, const Kiwi* kiwi, BpeTokenizerTrainerEventCallback callback)
 		: config(config), kiwi(kiwi), callback(move(callback))

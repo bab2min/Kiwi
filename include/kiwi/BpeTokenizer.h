@@ -62,71 +62,18 @@ namespace kiwi
 	{
 		size_t vocabSize = 0;
 		size_t minPairFrequency = 5;
-		// Backstop against long non-repetitive junk — base64 blobs, hashes, URL tails —
-		// that no other rule catches.  Counted in BYTES, so what it allows depends on the
-		// script: 64 is 64 Latin characters, about 21 Hangul syllables, and about 8 once
-		// useJamoAlphabet decomposes them (a syllable averages 7.3 bytes as jamo).  Held
-		// deliberately loose; repetitive runs are maxRepeatLength's job, and tightening
-		// this far enough to shape the vocabulary costs more than it saves.  A value of
-		// numeric_limits<size_t>::max() means no length limit.
 		size_t maxTokenLength = 64;
 		bool addPrefixSpace = false;
-		// Caps how many consecutive digits may share one chunk, so that long digit runs
-		// do not spend vocabulary slots on specific numbers ("2019", "100000").  Only
-		// digits count toward the limit, not the space a chunk may start with, so
-		// " 12345" with a cap of 3 becomes " 123" + "45".  Zero means no limit.
-		//
-		// This needs no counterpart at encode time: no training chunk ever holds more
-		// than this many digits, so no merge rule can produce a longer digit token.
-		// Note that the cap bounds token length but not where an unseen number is cut,
-		// which is decided by merge ranks — "1234" may come out as "12"+"34" there.
 		size_t maxDigitLength = 3;
-		// Caps how many times one character may repeat inside a chunk, so a separator
-		// line cannot spend vocabulary slots on itself.  BPE ranks merges by how often a
-		// pair is adjacent, not by how often a token is used, and a run of n identical
-		// characters contributes n-1 to its own pair count — a "================" seen
-		// five times looks like a pair seen seventy-five, which is enough to merge it all
-		// the way in.  Four merges get there, since each one doubles the run.
-		//
-		// Counted in CODEPOINTS, not bytes, so a multi-byte character is capped at the
-		// same count as an ASCII one: "ㅋ" and "😀" run out after eight just as "=" does.
-		// Only a character repeating against itself counts, so "===---" stays whole while
-		// "=========" is cut.  Applies to letters, digits and symbols alike; where both
-		// this and maxDigitLength are set, whichever runs out first ends the chunk.
-		// Whitespace runs are chunked separately and are not affected.  Zero means no
-		// limit — note this is the one cap here that defaults to on.
 		size_t maxRepeatLength = 8;
-		// Byte strings pinned into the initial alphabet.  Each one is made reachable by
-		// merge rules holding the lowest ranks, so it is rebuilt from its bytes before
-		// any learned merge applies and can never come out split — which is what keeps
-		// a multi-byte character such as a Hangul jamo atomic.
-		//
-		// An entry of n bytes also pins one token per proper prefix, but prefixes are
-		// shared between entries: the 51 compatibility jamo cost 2 extra tokens between
-		// them.  Every pinned token counts toward vocabSize, and the order of this list
-		// decides the ranks the pinned merges get.
+		size_t maxWhitespaceRepeatLength = 16;
 		std::vector<std::string> additionalAlphabet;
-		// Trains on Hangul decomposed into 첫가끝 conjoining jamo: once the chunks are
-		// pre-tokenized, every modern syllable (U+AC00..U+D7A3) is rewritten as its
-		// 초성/중성/종성 before being counted, and all 67 conjoining jamo are pinned into
-		// the initial alphabet the way additionalAlphabet entries are.  An unseen
-		// syllable then falls back to jamo instead of to raw bytes.  Costs 71 tokens
-		// (67 jamo plus the four two-byte prefixes they share).
-		//
-		// This changes what the model is trained on, so it is NOT self-contained the way
-		// maxDigitLength is: the caller must apply the same decomposition before encode()
-		// and recompose after decode(), since neither does it.
 		bool useJamoAlphabet = false;
 		PretokenizeOption pretokenizeOption = PretokenizeOption::none;
 		// -1 selects std::thread::hardware_concurrency(), 0 disables threading, and any positive value is the number of threads to use.
 		size_t numThreads = 0;
-		// Limits how many input sentences are retained while collecting chunks.
 		size_t batchSize = 64;
-		// Use 64-bit per-chunk counters (16-byte slots) instead of the default
-		// 32-bit counters (8-byte slots).  Enable when a single chunk may appear
-		// more than ~4 billion times across the entire corpus, or when the total
-		// size of the distinct chunks exceeds 4 GB.  Exceeding either limit with
-		// largeCounter=false makes addSentences throw rather than wrap silently.
+		// Use 64-bit per-chunk counters (16-byte slots) instead of the default 32-bit counters (8-byte slots) if true.
 		bool largeCounter = false;
 	};
 
