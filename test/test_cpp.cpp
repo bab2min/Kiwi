@@ -470,34 +470,34 @@ TEST(KiwiCpp, Glue)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
 	using Chunks = std::vector<std::u16string>;
-	std::vector<bool> spaceInsertions;
+	std::vector<uint8_t> spaceInsertions;
 
 	EXPECT_EQ(kiwi.glue(Chunks{ u"그러나  알고보니 그 봉", u"지 안에 있던 것은 바로", u"레몬이었던 것이다." },
 		{}, &spaceInsertions), u"그러나  알고보니 그 봉지 안에 있던 것은 바로 레몬이었던 것이다.");
-	EXPECT_EQ(spaceInsertions, std::vector<bool>({ false, true }));
+	EXPECT_EQ(spaceInsertions, std::vector<uint8_t>({ 0, 1 }));
 
 	EXPECT_EQ(kiwi.glue(Chunks{ u"한국어", u"형태소분석기" }), u"한국어 형태소분석기");
 	// 왼쪽 조각이 영숫자로 끝나는 경우에는 항상 공백을 삽입한다.
 	EXPECT_EQ(kiwi.glue(Chunks{ u"abc", u"def" }), u"abc def");
 	EXPECT_EQ(kiwi.glue(Chunks{ u"2020", u"년에는" }), u"2020 년에는");
 	EXPECT_EQ(kiwi.glue(Chunks{ u"  앞뒤공백  ", u"  제거되나  " }), u"앞뒤공백 제거되나");
-	EXPECT_EQ(kiwi.glue(Chunks{ u"첫째 줄이다", u"둘째 줄이다" }, { true, true }), u"첫째 줄이다\n둘째 줄이다");
+	EXPECT_EQ(kiwi.glue(Chunks{ u"첫째 줄이다", u"둘째 줄이다" }, { 1, 1 }), u"첫째 줄이다\n둘째 줄이다");
 
 	EXPECT_EQ(kiwi.glue(Chunks{ u"단일조각" }, {}, &spaceInsertions), u"단일조각");
 	EXPECT_TRUE(spaceInsertions.empty());
 	EXPECT_EQ(kiwi.glue(std::vector<std::u16string>{}, {}, &spaceInsertions), u"");
 	EXPECT_TRUE(spaceInsertions.empty());
 	EXPECT_EQ(kiwi.glue(Chunks{ u"", u"" }, {}, &spaceInsertions), u" ");
-	EXPECT_EQ(spaceInsertions, std::vector<bool>({ true }));
+	EXPECT_EQ(spaceInsertions, std::vector<uint8_t>({ 1 }));
 
 	// insertNewLines가 조각 수보다 짧은 경우 값이 모자라는 지점에서 결합이 중단된다.
 	const Chunks six = { u"오늘은 날씨가", u"참 좋아서", u"산책을 나갔다",
 		u"가는 길에", u"친구를 만났고", u"함께 커피를 마셨다" };
-	EXPECT_EQ(kiwi.glue(six, { true }, &spaceInsertions), u"오늘은 날씨가\n참 좋아서");
-	EXPECT_EQ(spaceInsertions, std::vector<bool>({ true }));
-	EXPECT_EQ(kiwi.glue(six, { true, false }, &spaceInsertions),
+	EXPECT_EQ(kiwi.glue(six, { 1 }, &spaceInsertions), u"오늘은 날씨가\n참 좋아서");
+	EXPECT_EQ(spaceInsertions, std::vector<uint8_t>({ 1 }));
+	EXPECT_EQ(kiwi.glue(six, { 1, 0 }, &spaceInsertions),
 		u"오늘은 날씨가\n참 좋아서 산책을 나갔다");
-	EXPECT_EQ(spaceInsertions, std::vector<bool>({ true, true }));
+	EXPECT_EQ(spaceInsertions, std::vector<uint8_t>({ 1, 1 }));
 
 	EXPECT_EQ(kiwi.glue(std::vector<std::string>{ u8"한국어", u8"형태소분석기" }), u8"한국어 형태소분석기");
 }
@@ -505,18 +505,18 @@ TEST(KiwiCpp, Glue)
 TEST(KiwiCpp, GlueMultiThreaded)
 {
 	// 스레드풀이 있는 경우 후보들이 병렬로 분석되지만 결과는 순차 실행과 동일해야 한다.
-	Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 2, BuildOption::default_, ModelType::cong }.build();
+	Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 2, BuildOption::default_, ModelType::none }.build();
 	using Chunks = std::vector<std::u16string>;
-	std::vector<bool> spaceInsertions;
+	std::vector<uint8_t> spaceInsertions;
 
 	EXPECT_EQ(kiwi.glue(Chunks{ u"그러나  알고보니 그 봉", u"지 안에 있던 것은 바로", u"레몬이었던 것이다." },
 		{}, &spaceInsertions), u"그러나  알고보니 그 봉지 안에 있던 것은 바로 레몬이었던 것이다.");
-	EXPECT_EQ(spaceInsertions, std::vector<bool>({ false, true }));
+	EXPECT_EQ(spaceInsertions, std::vector<uint8_t>({ 0, 1 }));
 
 	EXPECT_EQ(kiwi.glue(Chunks{ u"오늘은 날씨가", u"참 좋아서", u"산책을 나갔다",
 		u"가는 길에", u"친구를 만났고", u"함께 커피를 마셨다" }, {}, &spaceInsertions),
 		u"오늘은 날씨가 참 좋아서 산책을 나갔다 가는 길에 친구를 만났고 함께 커피를 마셨다");
-	EXPECT_EQ(spaceInsertions, std::vector<bool>({ true, true, true, true, true }));
+	EXPECT_EQ(spaceInsertions, std::vector<uint8_t>({ 1, 1, 1, 1, 1 }));
 }
 
 TEST(KiwiCpp, Pretokenized)
@@ -873,7 +873,7 @@ TEST(KiwiCpp, SentenceBoundaryErrors)
 
 TEST(KiwiCpp, SentenceBoundaryWithOrderedBullet)
 {
-	Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 0, BuildOption::default_, ModelType::cong }.build();
+	Kiwi& kiwi = reuseKiwiInstance();
 
 	for (auto str : {
 		u"가. 스카이 초이스는 편당 요금을 지불",
@@ -2005,7 +2005,7 @@ TEST(KiwiCpp, Quotation)
 
 TEST(KiwiCpp, JoinRestore)
 {
-	Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 0, BuildOption::default_, ModelType::cong }.build();
+	Kiwi& kiwi = reuseKiwiInstance();
 	for (auto c : {
 		//u8"이야기가 얼마나 지겨운지 잘 알고 있다. \" '아!'하고 힐데가르드는 한숨을 푹 쉬며 말했다.",
 		u8"승진해서 어쨌는 줄 아슈?",
