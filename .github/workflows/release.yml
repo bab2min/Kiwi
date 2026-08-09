@@ -192,7 +192,7 @@ jobs:
   build-other-arch:
     strategy:
       matrix:
-        arch: [aarch64, ppc64le]
+        arch: [aarch64]
     name: Centos7-${{ matrix.arch }}
     runs-on: ${{ matrix.arch == 'aarch64' && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
     steps:
