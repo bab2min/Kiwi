@@ -175,6 +175,18 @@ std::future&lt; std::pair&lt; <a class="el" href="Types_8h.html#aa3333c7237f7db8
 <tr class="separator:ace1635ac3c363b315a478ccdd04410c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a76e537a82d994765d0f4295f2d2ffc20" id="r_a76e537a82d994765d0f4295f2d2ffc20"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::pair&lt; size_t, size_t &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1Kiwi.html#a76e537a82d994765d0f4295f2d2ffc20">splitIntoSents</a> (const std::string &amp;str, Match matchOptions=Match::allWithNormalizing, <a class="el" href="Types_8h.html#aa3333c7237f7db8aa0121560dbaa3ecb">TokenResult</a> *tokenizedResultOut=nullptr) const</td></tr>
 <tr class="separator:a76e537a82d994765d0f4295f2d2ffc20"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5fad95da183629ed6cb9bb357b521492" id="r_a5fad95da183629ed6cb9bb357b521492"><td class="memItemLeft" align="right" valign="top">std::u16string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1Kiwi.html#a5fad95da183629ed6cb9bb357b521492">space</a> (const std::u16string &amp;str, bool resetWhitespace=false) const</td></tr>
+<tr class="memdesc:a5fad95da183629ed6cb9bb357b521492"><td class="mdescLeft">&#160;</td><td class="mdescRight">입력 텍스트의 띄어쓰기를 교정하여 반환한다.  <br /></td></tr>
+<tr class="separator:a5fad95da183629ed6cb9bb357b521492"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afeea17e1d1439ff3057e7069b248b780" id="r_afeea17e1d1439ff3057e7069b248b780"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1Kiwi.html#afeea17e1d1439ff3057e7069b248b780">space</a> (const std::string &amp;str, bool resetWhitespace=false) const</td></tr>
+<tr class="memdesc:afeea17e1d1439ff3057e7069b248b780"><td class="mdescLeft">&#160;</td><td class="mdescRight">입력 텍스트의 띄어쓰기를 교정하여 반환한다. (UTF-8 버전)  <br /></td></tr>
+<tr class="separator:afeea17e1d1439ff3057e7069b248b780"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a462b62303e4b5fd834430772e37620c0" id="r_a462b62303e4b5fd834430772e37620c0"><td class="memItemLeft" align="right" valign="top">std::u16string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1Kiwi.html#a462b62303e4b5fd834430772e37620c0">glue</a> (const std::vector&lt; std::u16string &gt; &amp;textChunks, const std::vector&lt; uint8_t &gt; &amp;insertNewLines={}, std::vector&lt; uint8_t &gt; *spaceInsertionsOut=nullptr) const</td></tr>
+<tr class="memdesc:a462b62303e4b5fd834430772e37620c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">여러 텍스트 조각을 하나로 합치되, 문맥을 고려해 적절한 공백을 사이에 삽입한다.  <br /></td></tr>
+<tr class="separator:a462b62303e4b5fd834430772e37620c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3b8e56b3207f6032b786e0fc4ff8a124" id="r_a3b8e56b3207f6032b786e0fc4ff8a124"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1Kiwi.html#a3b8e56b3207f6032b786e0fc4ff8a124">glue</a> (const std::vector&lt; std::string &gt; &amp;textChunks, const std::vector&lt; uint8_t &gt; &amp;insertNewLines={}, std::vector&lt; uint8_t &gt; *spaceInsertionsOut=nullptr) const</td></tr>
+<tr class="memdesc:a3b8e56b3207f6032b786e0fc4ff8a124"><td class="mdescLeft">&#160;</td><td class="mdescRight">여러 텍스트 조각을 하나로 합치되, 문맥을 고려해 적절한 공백을 사이에 삽입한다. (UTF-8 버전)  <br /></td></tr>
+<tr class="separator:a3b8e56b3207f6032b786e0fc4ff8a124"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a56f65418030b75c1aaf31282fe0a3ae4" id="r_a56f65418030b75c1aaf31282fe0a3ae4"><td class="memTemplParams" colspan="2"><a id="a56f65418030b75c1aaf31282fe0a3ae4" name="a56f65418030b75c1aaf31282fe0a3ae4"></a>
 template&lt;class LmState &gt; </td></tr>
 <tr class="memitem:a56f65418030b75c1aaf31282fe0a3ae4"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classkiwi_1_1cmb_1_1AutoJoiner.html">cmb::AutoJoiner</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><b>newJoinerImpl</b> () const</td></tr>
@@ -741,6 +753,98 @@ template&lt;class ReaderCallback , class ResultCallback &gt; </div>
 
 </div>
 </div>
+<a id="a3b8e56b3207f6032b786e0fc4ff8a124" name="a3b8e56b3207f6032b786e0fc4ff8a124"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3b8e56b3207f6032b786e0fc4ff8a124">&#9670;&#160;</a></span>glue() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string kiwi::Kiwi::glue </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; std::string &gt; &amp;&#160;</td>
+          <td class="paramname"><em>textChunks</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; uint8_t &gt; &amp;&#160;</td>
+          <td class="paramname"><em>insertNewLines</em> = <code>{}</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::vector&lt; uint8_t &gt; *&#160;</td>
+          <td class="paramname"><em>spaceInsertionsOut</em> = <code>nullptr</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>여러 텍스트 조각을 하나로 합치되, 문맥을 고려해 적절한 공백을 사이에 삽입한다. (UTF-8 버전) </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">textChunks</td><td>합칠 텍스트 조각들의 목록. 각 조각의 앞뒤 공백은 제거된다. </td></tr>
+    <tr><td class="paramname">insertNewLines</td><td>조각 사이에 공백 대신 줄바꿈을 삽입할지 여부. </td></tr>
+    <tr><td class="paramname">spaceInsertionsOut</td><td>nullptr이 아닌 경우 조각 사이마다 공백이 삽입되었는지 여부를 기록한다. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>조각들이 합쳐진 텍스트</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><code><a class="el" href="classkiwi_1_1Kiwi.html#a462b62303e4b5fd834430772e37620c0" title="여러 텍스트 조각을 하나로 합치되, 문맥을 고려해 적절한 공백을 사이에 삽입한다.">kiwi::Kiwi::glue</a></code> </dd></dl>
+
+</div>
+</div>
+<a id="a462b62303e4b5fd834430772e37620c0" name="a462b62303e4b5fd834430772e37620c0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a462b62303e4b5fd834430772e37620c0">&#9670;&#160;</a></span>glue() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::u16string kiwi::Kiwi::glue </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; std::u16string &gt; &amp;&#160;</td>
+          <td class="paramname"><em>textChunks</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; uint8_t &gt; &amp;&#160;</td>
+          <td class="paramname"><em>insertNewLines</em> = <code>{}</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::vector&lt; uint8_t &gt; *&#160;</td>
+          <td class="paramname"><em>spaceInsertionsOut</em> = <code>nullptr</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>여러 텍스트 조각을 하나로 합치되, 문맥을 고려해 적절한 공백을 사이에 삽입한다. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">textChunks</td><td>합칠 텍스트 조각들의 목록. 각 조각의 앞뒤 공백은 제거된다. </td></tr>
+    <tr><td class="paramname">insertNewLines</td><td>조각 사이에 공백 대신 줄바꿈을 삽입할지 여부. 비어있는 경우 줄바꿈을 사용하지 않고 공백만을 사용한다. 비어있지 않으면서 크기가 <code>textChunks.size() - 1</code>보다 작은 경우, 값이 모자라는 지점에서 결합을 중단하므로 그 뒤의 조각들은 결과에 포함되지 않는다. </td></tr>
+    <tr><td class="paramname">spaceInsertionsOut</td><td>nullptr이 아닌 경우 조각 사이마다 공백이 삽입되었는지 여부를 기록한다. 기록되는 원소의 개수는 결합이 중단되지 않은 경우 <code>textChunks.size() - 1</code>이다. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>조각들이 합쳐진 텍스트</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>공백 삽입 여부는 공백을 넣은 경우와 넣지 않은 경우를 각각 분석하여 언어 모델 점수가 더 높은 쪽을 선택하는 방식으로 결정된다. </dd></dl>
+
+</div>
+</div>
 <a id="a56ef14c138b0a3aba65f14aa58153622" name="a56ef14c138b0a3aba65f14aa58153622"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a56ef14c138b0a3aba65f14aa58153622">&#9670;&#160;</a></span>isTypoTolerant()</h2>
 
@@ -823,6 +927,84 @@ template&lt;class ReaderCallback , class ResultCallback &gt; </div>
 <p>현재 <a class="el" href="classkiwi_1_1Kiwi.html" title="실제 형태소 분석을 수행하는 클래스.">Kiwi</a> 객체가 형태소 분석을 수행할 준비가 되었는지를 알려준다. </p>
 <dl class="section return"><dt>Returns</dt><dd>형태소 분석 준비가 완료된 경우 true를 반환한다.</dd></dl>
 <dl class="section note"><dt>Note</dt><dd>기본 생성자를 통해 생성된 경우 언제나 <code><a class="el" href="classkiwi_1_1Kiwi.html#a278af7fd34a725f39b2fcfd528d34b6e" title="현재 Kiwi 객체가 형태소 분석을 수행할 준비가 되었는지를 알려준다.">ready()</a> == false</code>이며, <code><a class="el" href="classkiwi_1_1KiwiBuilder.html" title="형태소 분석에 사용될 사전을 관리하고, 사전을 바탕으로 실제 형태소 분석을 수행하는 Kiwi의 인스턴스를 생성하는 클래스.">kiwi::KiwiBuilder</a></code>를 통해 생성된 경우 <code><a class="el" href="classkiwi_1_1Kiwi.html#a278af7fd34a725f39b2fcfd528d34b6e" title="현재 Kiwi 객체가 형태소 분석을 수행할 준비가 되었는지를 알려준다.">ready()</a> == true</code>이다. </dd></dl>
+
+</div>
+</div>
+<a id="afeea17e1d1439ff3057e7069b248b780" name="afeea17e1d1439ff3057e7069b248b780"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afeea17e1d1439ff3057e7069b248b780">&#9670;&#160;</a></span>space() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string kiwi::Kiwi::space </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>str</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>resetWhitespace</em> = <code>false</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>입력 텍스트의 띄어쓰기를 교정하여 반환한다. (UTF-8 버전) </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">str</td><td>띄어쓰기를 교정할 텍스트 </td></tr>
+    <tr><td class="paramname">resetWhitespace</td><td>true인 경우 이미 띄어쓰기된 부분을 붙이는 교정도 적극적으로 수행한다. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>띄어쓰기가 교정된 텍스트</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><code><a class="el" href="classkiwi_1_1Kiwi.html#a5fad95da183629ed6cb9bb357b521492" title="입력 텍스트의 띄어쓰기를 교정하여 반환한다.">kiwi::Kiwi::space</a></code> </dd></dl>
+
+</div>
+</div>
+<a id="a5fad95da183629ed6cb9bb357b521492" name="a5fad95da183629ed6cb9bb357b521492"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5fad95da183629ed6cb9bb357b521492">&#9670;&#160;</a></span>space() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::u16string kiwi::Kiwi::space </td>
+          <td>(</td>
+          <td class="paramtype">const std::u16string &amp;&#160;</td>
+          <td class="paramname"><em>str</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>resetWhitespace</em> = <code>false</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>입력 텍스트의 띄어쓰기를 교정하여 반환한다. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">str</td><td>띄어쓰기를 교정할 텍스트 </td></tr>
+    <tr><td class="paramname">resetWhitespace</td><td>true인 경우 이미 띄어쓰기된 부분을 붙이는 교정도 적극적으로 수행한다. false인 경우 붙어 있는 단어를 띄어쓰는 교정 위주로 수행한다. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>띄어쓰기가 교정된 텍스트</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>이 기능은 형태소 분석에 기반하므로 형태소 중간에 공백이 삽입된 경우 결과가 부정확할 수 있다. 이 경우 <code>KiwiConfig::spaceTolerance</code>를 조절하여 형태소 내 공백을 무시하거나, <code>resetWhitespace</code>를 true로 설정하면 결과를 개선할 수 있다. </dd></dl>
 
 </div>
 </div>

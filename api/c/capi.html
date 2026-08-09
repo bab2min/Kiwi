@@ -175,6 +175,9 @@
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv423kiwi_split_into_sents_w6kiwi_hPK9kchar16_tiP10kiwi_res_h"><code class="docutils literal notranslate"><span class="pre">kiwi_split_into_sents_w()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv421kiwi_split_into_sents6kiwi_hPKciP10kiwi_res_h"><code class="docutils literal notranslate"><span class="pre">kiwi_split_into_sents()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv415kiwi_new_joiner6kiwi_hi"><code class="docutils literal notranslate"><span class="pre">kiwi_new_joiner()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv410kiwi_space6kiwi_hPKci"><code class="docutils literal notranslate"><span class="pre">kiwi_space()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv49kiwi_glue6kiwi_hPPKciPKcPc"><code class="docutils literal notranslate"><span class="pre">kiwi_glue()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv416kiwi_free_stringPKc"><code class="docutils literal notranslate"><span class="pre">kiwi_free_string()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv410kiwi_close6kiwi_h"><code class="docutils literal notranslate"><span class="pre">kiwi_close()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv418kiwi_tag_to_string6kiwi_h7uint8_t"><code class="docutils literal notranslate"><span class="pre">kiwi_tag_to_string()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv413kiwi_res_size10kiwi_res_h"><code class="docutils literal notranslate"><span class="pre">kiwi_res_size()</span></code></a></li>
@@ -1682,6 +1685,66 @@
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>새 Joiner의 핸들. kiwi_joiner_* 함수에 사용가능합니다. 이 핸들은 사용 후 kiwi_joiner_close를 통해 반드시 해제되어야 합니다. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv410kiwi_space6kiwi_hPKci">
+<span id="_CPPv310kiwi_space6kiwi_hPKci"></span><span id="_CPPv210kiwi_space6kiwi_hPKci"></span><span id="kiwi_space__kiwi_h.cCP.i"></span><span class="target" id="capi_8h_1ae23bf7dd9fb8e8dcefc1208001e8280b"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_space</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv46kiwi_h" title="kiwi_h"><span class="n"><span class="pre">kiwi_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">text</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">reset_whitespace</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410kiwi_space6kiwi_hPKci" title="Link to this definition"></a><br /></dt>
+<dd><p>입력 텍스트의 띄어쓰기를 교정하여 반환합니다. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>반환된 문자열은 kiwi_free_string으로 반드시 해제되어야 합니다. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>handle</strong> – Kiwi. </p></li>
+<li><p><strong>text</strong> – UTF-8로 인코딩된 텍스트. </p></li>
+<li><p><strong>reset_whitespace</strong> – 0이 아닌 경우 이미 띄어쓰기된 부분을 붙이는 교정도 적극적으로 수행합니다. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>성공시 UTF-8로 인코딩된 텍스트의 포인터를 반환합니다. 실패시 null을 반환합니다. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49kiwi_glue6kiwi_hPPKciPKcPc">
+<span id="_CPPv39kiwi_glue6kiwi_hPPKciPKcPc"></span><span id="_CPPv29kiwi_glue6kiwi_hPPKciPKcPc"></span><span id="kiwi_glue__kiwi_h.cCPP.i.cCP.cP"></span><span class="target" id="capi_8h_1adfe9eab47ee3b5769b3f552046af8a18"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_glue</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv46kiwi_h" title="kiwi_h"><span class="n"><span class="pre">kiwi_h</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">chunks</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">chunk_size</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">insert_new_lines</span></span>, <span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">space_insertions</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49kiwi_glue6kiwi_hPPKciPKcPc" title="Link to this definition"></a><br /></dt>
+<dd><p>여러 텍스트 조각을 하나로 합치되, 문맥을 고려해 적절한 공백을 사이에 삽입합니다. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>반환된 문자열은 kiwi_free_string으로 반드시 해제되어야 합니다. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>handle</strong> – Kiwi. </p></li>
+<li><p><strong>chunks</strong> – UTF-8로 인코딩된 텍스트 조각들의 배열. </p></li>
+<li><p><strong>chunk_size</strong> – chunks의 길이. </p></li>
+<li><p><strong>insert_new_lines</strong> – 각 조각 사이에 공백 대신 줄바꿈을 삽입할지 여부(0 또는 1)의 배열. null인 경우 줄바꿈을 사용하지 않고 공백만을 사용합니다. null이 아닌 경우 이 배열의 크기는 chunk_size - 1 이상이어야 합니다. </p></li>
+<li><p><strong>space_insertions</strong> – null이 아닌 경우 조각 사이마다 공백이 삽입되었는지 여부가 기록됩니다. 이 버퍼의 크기는 chunk_size - 1 이상이어야 합니다. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>성공시 UTF-8로 인코딩된 텍스트의 포인터를 반환합니다. 실패시 null을 반환합니다. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv416kiwi_free_stringPKc">
+<span id="_CPPv316kiwi_free_stringPKc"></span><span id="_CPPv216kiwi_free_stringPKc"></span><span id="kiwi_free_string__cCP"></span><span class="target" id="capi_8h_1a17f5032fa1c730a556fced8c5d1426a8"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kiwi_free_string</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">str</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416kiwi_free_stringPKc" title="Link to this definition"></a><br /></dt>
+<dd><p>kiwi_space, kiwi_glue로 얻은 문자열을 해제합니다. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>str</strong> – kiwi_space 또는 kiwi_glue로 얻은 문자열. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>성공 시 0을 반환합니다. 실패 시 0이 아닌 값을 반환합니다. </p>
 </dd>
 </dl>
 </dd></dl>
