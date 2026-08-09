@@ -291,4 +291,31 @@ public class KiwiTest {
 		assertEquals(tokens[7].form, "기");
 		assertTrue((tokens[7].dialect & Kiwi.Dialect.chungcheong) != 0);
 	}
+
+	@Test
+	public void testSpace() throws Exception {
+		System.gc();
+		Kiwi kiwi = getReusableKiwi();
+		assertEquals(kiwi.space("띄어쓰기없이작성된텍스트네이걸교정해줘", false),
+			"띄어쓰기 없이 작성된 텍스트네 이걸 교정해 줘");
+		assertEquals(kiwi.space("띄 어 쓰 기 문 제 가 있 습 니 다", true), "띄어쓰기 문제가 있습니다");
+	}
+
+	@Test
+	public void testGlue() throws Exception {
+		System.gc();
+		Kiwi kiwi = getReusableKiwi();
+		String[] chunks = { "그러나  알고보니 그 봉", "지 안에 있던 것은 바로", "레몬이었던 것이다." };
+
+		Kiwi.GlueResult res = kiwi.glue(chunks, null);
+		assertEquals(res.text, "그러나  알고보니 그 봉지 안에 있던 것은 바로 레몬이었던 것이다.");
+		assertEquals(res.spaceInsertions.length, 2);
+		assertEquals(res.spaceInsertions[0], 0);
+		assertEquals(res.spaceInsertions[1], 1);
+
+		byte[] newLines = { 1, 1 };
+		Kiwi.GlueResult withNewLines = kiwi.glue(chunks, newLines);
+		assertEquals(withNewLines.text,
+			"그러나  알고보니 그 봉지 안에 있던 것은 바로\n레몬이었던 것이다.");
+	}
 }

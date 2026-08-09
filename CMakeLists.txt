@@ -75,6 +75,7 @@ set ( CORE_SRCS
   src/search.cpp
   src/ScriptType.cpp
   src/SkipBigramModel.cpp
+  src/Spacing.cpp
   src/SubstringExtractor.cpp
   src/SwTokenizer.cpp
   src/TagUtils.cpp

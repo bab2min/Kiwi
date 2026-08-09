@@ -761,6 +761,41 @@ DECL_DLL kiwi_ss_h kiwi_split_into_sents(kiwi_h handle, const char* text, int ma
 DECL_DLL kiwi_joiner_h kiwi_new_joiner(kiwi_h handle, int lm_search);
 
 /**
+ * @brief 입력 텍스트의 띄어쓰기를 교정하여 반환합니다.
+ *
+ * @param handle Kiwi.
+ * @param text UTF-8로 인코딩된 텍스트.
+ * @param reset_whitespace 0이 아닌 경우 이미 띄어쓰기된 부분을 붙이는 교정도 적극적으로 수행합니다.
+ * @return 성공시 UTF-8로 인코딩된 텍스트의 포인터를 반환합니다. 실패시 null을 반환합니다.
+ * @note 반환된 문자열은 kiwi_free_string으로 반드시 해제되어야 합니다.
+ */
+DECL_DLL const char* kiwi_space(kiwi_h handle, const char* text, int reset_whitespace);
+
+/**
+ * @brief 여러 텍스트 조각을 하나로 합치되, 문맥을 고려해 적절한 공백을 사이에 삽입합니다.
+ *
+ * @param handle Kiwi.
+ * @param chunks UTF-8로 인코딩된 텍스트 조각들의 배열.
+ * @param chunk_size chunks의 길이.
+ * @param insert_new_lines 각 조각 사이에 공백 대신 줄바꿈을 삽입할지 여부(0 또는 1)의 배열.
+ * null인 경우 줄바꿈을 사용하지 않고 공백만을 사용합니다.
+ * null이 아닌 경우 이 배열의 크기는 chunk_size - 1 이상이어야 합니다.
+ * @param space_insertions null이 아닌 경우 조각 사이마다 공백이 삽입되었는지 여부가 기록됩니다.
+ * 이 버퍼의 크기는 chunk_size - 1 이상이어야 합니다.
+ * @return 성공시 UTF-8로 인코딩된 텍스트의 포인터를 반환합니다. 실패시 null을 반환합니다.
+ * @note 반환된 문자열은 kiwi_free_string으로 반드시 해제되어야 합니다.
+ */
+DECL_DLL const char* kiwi_glue(kiwi_h handle, const char** chunks, int chunk_size, const char* insert_new_lines, char* space_insertions);
+
+/**
+ * @brief kiwi_space, kiwi_glue로 얻은 문자열을 해제합니다.
+ *
+ * @param str kiwi_space 또는 kiwi_glue로 얻은 문자열.
+ * @return 성공 시 0을 반환합니다. 실패 시 0이 아닌 값을 반환합니다.
+ */
+DECL_DLL int kiwi_free_string(const char* str);
+
+/**
  * @brief 사용이 완료된 Kiwi객체를 해제합니다.
  * 
  * @param handle Kiwi 핸들

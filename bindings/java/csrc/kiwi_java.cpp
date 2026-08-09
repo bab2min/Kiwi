@@ -22,6 +22,12 @@ struct JoinableToken
 	kiwi::cmb::Space space;
 };
 
+struct GlueResult
+{
+	std::u16string text;
+	std::vector<uint8_t> spaceInsertions;
+};
+
 struct AnalyzedMorph
 {
 	std::u16string form;
@@ -48,6 +54,10 @@ static auto gClsTokenInfo = jni::DataClassDefinition<kiwi::TokenInfo>()
 static auto gClsTokenResult = jni::DataClassDefinition<kiwi::TokenResult>()
 	.template property<&kiwi::TokenResult::first>("tokens")
 	.template property<&kiwi::TokenResult::second>("score");
+
+static auto gClsGlueResult = jni::DataClassDefinition<GlueResult>()
+	.template property<&GlueResult::text>("text")
+	.template property<&GlueResult::spaceInsertions>("spaceInsertions");
 
 static auto gClsSentence = jni::DataClassDefinition<Sentence>()
 	.template property<&Sentence::text>("text")
@@ -220,6 +230,19 @@ namespace jni
 	template<>
 	struct ValueBuilder<kiwi::TokenInfo> : public ValueBuilder<decltype(gClsTokenInfo)>
 	{
+	};
+
+	template<>
+	struct JClassName<GlueResult>
+	{
+		static constexpr auto value = std::string_view{ "kr/pe/bab2min/Kiwi$GlueResult" };
+	};
+
+	template<>
+	struct ValueBuilder<GlueResult> : public ValueBuilder<decltype(gClsGlueResult)>
+	{
+		// 데이터 클래스를 메소드의 반환값으로 직접 쓰려면 typeStr이 필요하다.
+		static constexpr auto typeStr = StringConcat_v<svL, jclassName<GlueResult>, svSC>;
 	};
 
 	template<>
@@ -486,6 +509,25 @@ public:
 			joiner.add(token.form, token.tag, token.inferRegularity, token.space);
 		}
 		return joiner.getU16();
+	}
+
+	std::u16string spaceText(const std::u16string& text, bool resetWhitespace) const
+	{
+		return Kiwi::space(text, resetWhitespace);
+	}
+
+	GlueResult glueChunks(const std::vector<std::u16string>& chunks, const std::vector<uint8_t>& insertNewLines) const
+	{
+		std::vector<uint8_t> newLines;
+		newLines.reserve(insertNewLines.size());
+		for (auto v : insertNewLines) newLines.emplace_back(!!v);
+
+		std::vector<uint8_t> inserted;
+		GlueResult ret;
+		ret.text = Kiwi::glue(chunks, newLines, &inserted);
+		ret.spaceInsertions.reserve(inserted.size());
+		for (auto v : inserted) ret.spaceInsertions.emplace_back(v ? 1 : 0);
+		return ret;
 	}
 };
 
@@ -791,13 +833,16 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved)
 			.template method<&JKiwi::analyze2>("analyze")
 			.template method<&JKiwi::asyncAnalyze>("asyncAnalyze")
 			.template method<&JKiwi::splitIntoSents>("splitIntoSents")
-			.template method<&JKiwi::join>("join"),
+			.template method<&JKiwi::join>("join")
+			.template method<&JKiwi::spaceText>("space")
+			.template method<&JKiwi::glueChunks>("_glue"),
 
 		jni::define<JStreamProvider>(),
 
 		gClsTokenInfo,
 		gClsTokenResult,
 		gClsSentence,
+		gClsGlueResult,
 		gClsJoinableToken,
 		gClsAnalyzedMorph,
 		gClsBasicToken,

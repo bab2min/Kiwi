@@ -481,3 +481,42 @@ TEST(KiwiC, FindMorphemesWithPrefix)
 	ret = kiwi_find_morphemes_with_prefix(kiwi, u8"", nullptr, -1, morphmes, 10);
 	EXPECT_GT(ret, 0);
 }
+
+TEST(KiwiC, Space)
+{
+	kiwi_h kiwi = reuse_kiwi_instance();
+
+	const char* res = kiwi_space(kiwi, u8"띄어쓰기없이작성된텍스트네이걸교정해줘", 0);
+	EXPECT_NE(res, nullptr);
+	EXPECT_STREQ(res, u8"띄어쓰기 없이 작성된 텍스트네 이걸 교정해 줘");
+	EXPECT_EQ(kiwi_free_string(res), 0);
+
+	res = kiwi_space(kiwi, u8"띄 어 쓰 기 문 제 가 있 습 니 다", 1);
+	EXPECT_NE(res, nullptr);
+	EXPECT_STREQ(res, u8"띄어쓰기 문제가 있습니다");
+	EXPECT_EQ(kiwi_free_string(res), 0);
+
+	EXPECT_EQ(kiwi_space(kiwi, nullptr, 0), nullptr);
+}
+
+TEST(KiwiC, Glue)
+{
+	kiwi_h kiwi = reuse_kiwi_instance();
+	const char* chunks[] = { u8"그러나  알고보니 그 봉", u8"지 안에 있던 것은 바로", u8"레몬이었던 것이다." };
+	char spaceInsertions[2] = { 0, };
+
+	const char* res = kiwi_glue(kiwi, chunks, 3, nullptr, spaceInsertions);
+	EXPECT_NE(res, nullptr);
+	EXPECT_STREQ(res, u8"그러나  알고보니 그 봉지 안에 있던 것은 바로 레몬이었던 것이다.");
+	EXPECT_EQ(spaceInsertions[0], 0);
+	EXPECT_EQ(spaceInsertions[1], 1);
+	EXPECT_EQ(kiwi_free_string(res), 0);
+
+	const char newLines[] = { 1, 1 };
+	res = kiwi_glue(kiwi, chunks, 3, newLines, nullptr);
+	EXPECT_NE(res, nullptr);
+	EXPECT_STREQ(res, u8"그러나  알고보니 그 봉지 안에 있던 것은 바로\n레몬이었던 것이다.");
+	EXPECT_EQ(kiwi_free_string(res), 0);
+
+	EXPECT_EQ(kiwi_glue(kiwi, nullptr, 3, nullptr, nullptr), nullptr);
+}
