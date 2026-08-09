@@ -580,9 +580,15 @@ json kiwiGlue(Kiwi& kiwi, const json& args) {
     std::vector<uint8_t> spaceInsertions;
     const std::string text = kiwi.glue(chunks, insertNewLines, &spaceInsertions);
 
+    std::vector<bool> spaceInsertionsBool;
+    spaceInsertionsBool.reserve(spaceInsertions.size());
+    for (const auto& v : spaceInsertions) {
+        spaceInsertionsBool.emplace_back(!!v);
+    }
+
     return {
         { "text", text },
-        { "spaceInsertions", spaceInsertions },
+        { "spaceInsertions", spaceInsertionsBool },
     };
 }
 
