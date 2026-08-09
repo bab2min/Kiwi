@@ -518,11 +518,11 @@ public:
 
 	GlueResult glueChunks(const std::vector<std::u16string>& chunks, const std::vector<uint8_t>& insertNewLines) const
 	{
-		std::vector<bool> newLines;
+		std::vector<uint8_t> newLines;
 		newLines.reserve(insertNewLines.size());
 		for (auto v : insertNewLines) newLines.emplace_back(!!v);
 
-		std::vector<bool> inserted;
+		std::vector<uint8_t> inserted;
 		GlueResult ret;
 		ret.text = Kiwi::glue(chunks, newLines, &inserted);
 		ret.spaceInsertions.reserve(inserted.size());

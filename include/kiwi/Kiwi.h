@@ -524,8 +524,8 @@ namespace kiwi
 		 * 언어 모델 점수가 더 높은 쪽을 선택하는 방식으로 결정된다.
 		 */
 		std::u16string glue(const std::vector<std::u16string>& textChunks,
-			const std::vector<bool>& insertNewLines = {},
-			std::vector<bool>* spaceInsertionsOut = nullptr
+			const std::vector<uint8_t>& insertNewLines = {},
+			std::vector<uint8_t>* spaceInsertionsOut = nullptr
 		) const;
 
 		/**
@@ -539,8 +539,8 @@ namespace kiwi
 		 * @sa `kiwi::Kiwi::glue`
 		 */
 		std::string glue(const std::vector<std::string>& textChunks,
-			const std::vector<bool>& insertNewLines = {},
-			std::vector<bool>* spaceInsertionsOut = nullptr
+			const std::vector<uint8_t>& insertNewLines = {},
+			std::vector<uint8_t>* spaceInsertionsOut = nullptr
 		) const;
 
 

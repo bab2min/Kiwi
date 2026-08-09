@@ -182,8 +182,8 @@ namespace kiwi
 	}
 
 	u16string Kiwi::glue(const vector<u16string>& textChunks,
-		const vector<bool>& insertNewLines,
-		vector<bool>* spaceInsertionsOut) const
+		const vector<uint8_t>& insertNewLines,
+		vector<uint8_t>* spaceInsertionsOut) const
 	{
 		if (spaceInsertionsOut) spaceInsertionsOut->clear();
 		if (textChunks.empty()) return {};
@@ -264,8 +264,8 @@ namespace kiwi
 	}
 
 	string Kiwi::glue(const vector<string>& textChunks,
-		const vector<bool>& insertNewLines,
-		vector<bool>* spaceInsertionsOut) const
+		const vector<uint8_t>& insertNewLines,
+		vector<uint8_t>* spaceInsertionsOut) const
 	{
 		vector<u16string> u16chunks;
 		u16chunks.reserve(textChunks.size());

@@ -1063,14 +1063,14 @@ const char* kiwi_glue(kiwi_h handle, const char** chunks, int chunk_size, const 
 			textChunks.emplace_back(chunks[i]);
 		}
 
-		vector<bool> newLines;
+		vector<uint8_t> newLines;
 		if (insert_new_lines && chunk_size > 1)
 		{
 			newLines.reserve(chunk_size - 1);
 			for (int i = 0; i + 1 < chunk_size; ++i) newLines.emplace_back(!!insert_new_lines[i]);
 		}
 
-		vector<bool> inserted;
+		vector<uint8_t> inserted;
 		const string ret = kiwi->glue(textChunks, newLines, space_insertions ? &inserted : nullptr);
 		if (space_insertions)
 		{

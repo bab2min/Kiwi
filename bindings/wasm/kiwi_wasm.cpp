@@ -572,12 +572,12 @@ json kiwiSpace(Kiwi& kiwi, const json& args) {
 json kiwiGlue(Kiwi& kiwi, const json& args) {
     const std::vector<std::string> chunks = args[0];
 
-    std::vector<bool> insertNewLines;
+    std::vector<uint8_t> insertNewLines;
     if (args.size() > 1 && !args.at(1).is_null()) {
-        insertNewLines = args.at(1).get<std::vector<bool>>();
+        insertNewLines = args.at(1).get<std::vector<uint8_t>>();
     }
 
-    std::vector<bool> spaceInsertions;
+    std::vector<uint8_t> spaceInsertions;
     const std::string text = kiwi.glue(chunks, insertNewLines, &spaceInsertions);
 
     return {
