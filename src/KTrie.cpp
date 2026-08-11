@@ -1044,6 +1044,18 @@ public:
 				maxLengtheningSize = lengtheningSizeLimit;
 			}
 		}
+		// 패턴 커서는 Splitter 멤버로 공유하면 안 된다. 오타 교정이 켜진 경우 같은 위치를 여러 분기가
+		// 각각 훑는데, 먼저 도달한 분기가 커서를 소비해버리면 이후 분기가 잘못된 패턴을 보게 된다.
+		// 호출 단위로 유지하면 currentPos가 j에 대해 단조 증가하므로, 진입 시 한 번만 이분 탐색하고
+		// 이후에는 증분 전진으로 문자당 O(1)에 처리할 수 있다.
+		const size_t basePos = typoNode.endPos - typoNode.form.size();
+		auto matchedPattern = matchedPatterns.cend();
+		if (typoCost == 0)
+		{
+			matchedPattern = upper_bound(matchedPatterns.cbegin(), matchedPatterns.cend(), basePos,
+				[](size_t pos, const auto& pattern) { return pos < get<0>(pattern); });
+		}
+
 		auto* curNode = state.node;
 		for (size_t j = 0; j < typoNode.form.size(); ++j)
 		{
@@ -1054,13 +1066,15 @@ public:
 				c32 = mergeSurrogate(c32, typoNode.form[j + 1]);
 			}
 
-			auto matchedPattern = matchedPatterns.cend();
 			bool isInPattern = false;
 			if (typoCost == 0)
 			{
-				const size_t currentPos = typoNode.endPos + j - typoNode.form.size();
-				matchedPattern = upper_bound(matchedPatterns.cbegin(), matchedPatterns.cend(), currentPos,
-					[](size_t pos, const auto& pattern) { return pos < get<0>(pattern); });
+				const size_t currentPos = basePos + j;
+				// 이미 지나친 패턴을 건너뛴다.
+				while (matchedPattern != matchedPatterns.cend() && get<0>(*matchedPattern) <= currentPos)
+				{
+					++matchedPattern;
+				}
 				isInPattern = matchedPattern != matchedPatterns.cend() &&
 					currentPos >= get<0>(*matchedPattern) - get<1>(*matchedPattern);
 
