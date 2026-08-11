@@ -732,7 +732,6 @@ public:
 	U16StringView rawStr;
 	size_t posMultiplierBit = 0;
 	float lengtheningTypoCost = 0;
-	Vector<tuple<size_t, uint32_t, POSTag>>::const_iterator nextMatchedPattern;
 
 	void init(
 		const Form* formBase,
@@ -853,7 +852,6 @@ public:
 		}
 		posToNs.emplace_back(nsToPos.size());
 		sort(matchedPatterns.begin(), matchedPatterns.end());
-		nextMatchedPattern = matchedPatterns.begin();
 		return n;
 	}
 
@@ -1029,6 +1027,35 @@ public:
 		}
 
 		auto lengtheningTypoNodes = state.getLengtheningTypoNodes();
+		// 장음화 오타 비용(lengtheningTypoCost * (3 + lengtheningSize))은 lengtheningSize에 대해 단조 증가하므로,
+		// 남은 오타 비용 예산으로부터 더 이상 장음화를 탐색할 필요가 없는 지점을 미리 정할 수 있다.
+		static constexpr size_t lengtheningSizeLimit = 8;
+		size_t maxLengtheningSize = 0;
+		if constexpr (lengtheningTypoTolerant)
+		{
+			if (lengtheningTypoCost > 0)
+			{
+				// TODO: 하드코딩된 장음화 오타 비용 계산식을 다른 곳과 연계하여 계산하도록 수정 필요
+				const float budget = (typoThreshold - typoCost) / lengtheningTypoCost - 3;
+				maxLengtheningSize = budget < 1 ? 0 : min(lengtheningSizeLimit, (size_t)budget);
+			}
+			else
+			{
+				maxLengtheningSize = lengtheningSizeLimit;
+			}
+		}
+		// 패턴 커서는 Splitter 멤버로 공유하면 안 된다. 오타 교정이 켜진 경우 같은 위치를 여러 분기가
+		// 각각 훑는데, 먼저 도달한 분기가 커서를 소비해버리면 이후 분기가 잘못된 패턴을 보게 된다.
+		// 호출 단위로 유지하면 currentPos가 j에 대해 단조 증가하므로, 진입 시 한 번만 이분 탐색하고
+		// 이후에는 증분 전진으로 문자당 O(1)에 처리할 수 있다.
+		const size_t basePos = typoNode.endPos - typoNode.form.size();
+		auto matchedPattern = matchedPatterns.cend();
+		if (typoCost == 0)
+		{
+			matchedPattern = upper_bound(matchedPatterns.cbegin(), matchedPatterns.cend(), basePos,
+				[](size_t pos, const auto& pattern) { return pos < get<0>(pattern); });
+		}
+
 		auto* curNode = state.node;
 		for (size_t j = 0; j < typoNode.form.size(); ++j)
 		{
@@ -1039,10 +1066,17 @@ public:
 				c32 = mergeSurrogate(c32, typoNode.form[j + 1]);
 			}
 
+			bool isInPattern = false;
 			if (typoCost == 0)
 			{
-				const bool isInPattern = nextMatchedPattern != matchedPatterns.end() &&
-					(typoNode.endPos + j - typoNode.form.size()) >= get<0>(*nextMatchedPattern) - get<1>(*nextMatchedPattern);
+				const size_t currentPos = basePos + j;
+				// 이미 지나친 패턴을 건너뛴다.
+				while (matchedPattern != matchedPatterns.cend() && get<0>(*matchedPattern) <= currentPos)
+				{
+					++matchedPattern;
+				}
+				isInPattern = matchedPattern != matchedPatterns.cend() &&
+					currentPos >= get<0>(*matchedPattern) - get<1>(*matchedPattern);
 
 				POSTag chrType = identifySpecialChr(c32);
 				ScriptType scriptType = chr2ScriptType(c32);
@@ -1104,8 +1138,8 @@ public:
 				}
 				else
 				{
-					// 공백 문자
-					if (chrType == POSTag::unknown)
+					// 공백 및 경계로 취급하는 문자
+					if (chrType == POSTag::unknown && !isInPattern)
 					{
 						if (lastSpaceBoundaryNsPos < unkFormStartNsPos)
 						{
@@ -1145,12 +1179,12 @@ public:
 				}
 			}
 
-			if (typoNode.typoCost == 0 && nextMatchedPattern != matchedPatterns.end())
+			if (typoNode.typoCost == 0 && matchedPattern != matchedPatterns.cend())
 			{
 				const auto currentEnd = typoNode.endPos + j + (c32 >= 0x10000 ? 2 : 1) - typoNode.form.size();
-				while (nextMatchedPattern != matchedPatterns.end() && get<0>(*nextMatchedPattern) == currentEnd)
+				while (matchedPattern != matchedPatterns.cend() && get<0>(*matchedPattern) == currentEnd)
 				{
-					const auto [matchedEnd, matchedLength, matchedType] = *nextMatchedPattern;
+					const auto [matchedEnd, matchedLength, matchedType] = *matchedPattern;
 					const auto matchedStart = matchedEnd - matchedLength;
 					if (lastSpaceBoundaryNsPos < unkFormStartNsPos)
 					{
@@ -1171,7 +1205,8 @@ public:
 					{
 						out.back().form = trie.value((size_t)matchedType);
 					}
-					++nextMatchedPattern;
+					lastSpaceBoundaryNsPos = specialStartNsPos = unkFormStartNsPos = posToNs[matchedEnd];
+					++matchedPattern;
 				}
 			}
 			if (typoNode.typoCost == 0 && nextPretokenizedPattern != lastPretokenizedPattern
@@ -1211,13 +1246,7 @@ public:
 				specialStartNsPos = unkFormStartNsPos = lastSpaceBoundaryNsPos = posToNs[typoNode.endPos + j + 1 - typoNode.form.size()];
 				continue;
 			}
-			if (c32 >= 0x10000)
-			{
-				++j;
-				prevChr = c32;
-				continue;
-			}
-
+			const size_t codeUnitSize = c32 >= 0x10000 ? 2 : 1;
 			if constexpr (lengtheningTypoTolerant)
 			{
 				static uint8_t lengtheningVowelTable[] = {
@@ -1245,8 +1274,7 @@ public:
 				};
 
 				const size_t prevLengtheningSize = lengtheningTypoNodes.size();
-				static constexpr size_t maxLengtheningSize = 8;
-				if (prevChr && isHangulSyllable(prevChr) &&
+				if (maxLengtheningSize && prevChr && isHangulSyllable(prevChr) &&
 					(u'아' <= c && c < u'자') && lengtheningVowelTable[extractVowel(prevChr)] == extractVowel(c))
 				{
 					lengtheningTypoNodes.emplace_back(1, curNode);
@@ -1264,7 +1292,10 @@ public:
 				for (size_t i = 0; i < prevLengtheningSize; ++i)
 				{
 					auto& node = lengtheningTypoNodes[i];
-					node.second = node.second->template nextOpt<arch>(trie, c);
+					for (size_t k = 0; k < codeUnitSize && node.second; ++k)
+					{
+						node.second = node.second->template nextOpt<arch>(trie, typoNode.form[j + k]);
+					}
 					if (!node.second) continue;
 					if (find(lengtheningTypoNodes.begin(), lengtheningTypoNodes.begin() + outputIdx, node) != lengtheningTypoNodes.begin() + outputIdx) continue;
 					lengtheningTypoNodes[outputIdx++] = node;
@@ -1277,27 +1308,34 @@ public:
 				}
 				lengtheningTypoNodes.erase(lengtheningTypoNodes.begin() + outputIdx, lengtheningTypoNodes.end());
 			}
-			prevChr = c32;
+			prevChr = isInPattern ? 0 : c32;
 
-			if (minFormLen > 0 || typoNode.typoCost > 0) ++minFormLen;
-			auto* nextNode = curNode->template nextOpt<arch>(trie, c);
-			while (!nextNode)
+			for (size_t k = 0; k < codeUnitSize; ++k)
 			{
-				curNode = curNode->fail();
-				if (!curNode) break;
-				nextNode = curNode->template nextOpt<arch>(trie, c);
-			}
-			if (nextNode)
-			{
-				curNode = nextNode;
-				// 오타가 있는 경우 전체 형태가 포함된 후보만 탐색.
-				if (typoNode.typoCost == 0 || j == typoNode.form.size() - 1)
+				if (minFormLen > 0 || typoNode.typoCost > 0) ++minFormLen;
+				const char16_t trieChr = typoNode.form[j + k];
+				auto* nextNode = curNode->template nextOpt<arch>(trie, trieChr);
+				while (!nextNode)
 				{
-					if (typoCost > 0 && curNode->depth < minFormLen)
-					{
-						// early pruning
-					}
-					else
+					curNode = curNode->fail();
+					if (!curNode) break;
+					nextNode = curNode->template nextOpt<arch>(trie, trieChr);
+				}
+				if (nextNode)
+				{
+					curNode = nextNode;
+				}
+				else
+				{
+					if (typoCost > 0) return;
+					curNode = trie.root();
+				}
+
+				const bool isLastCodeUnit = k + 1 == codeUnitSize;
+				// 오타가 있는 경우 전체 형태가 포함된 후보만 탐색.
+				if (isLastCodeUnit && (typoNode.typoCost == 0 || j + codeUnitSize == typoNode.form.size()))
+				{
+					if (nextNode && !(typoCost > 0 && curNode->depth < minFormLen)) // typoCost > 0인 경우 early pruning
 					{
 						for (auto submatcher = curNode; submatcher; submatcher = submatcher->fail())
 						{
@@ -1311,6 +1349,7 @@ public:
 						}
 					}
 
+					// 장음화 노드는 메인 탐색과 독립적인 경로이므로 메인 탐색과 무관하게 후보를 수집함.
 					if constexpr (lengtheningTypoTolerant)
 					{
 						for (auto [lengtheningSize, node] : lengtheningTypoNodes)
@@ -1325,22 +1364,7 @@ public:
 					}
 				}
 			}
-			else
-			{
-				if constexpr (lengtheningTypoTolerant)
-				{
-					lengtheningTypoNodes.clear();
-				}
-
-				if (typoCost == 0)
-				{
-					curNode = trie.root();
-				}
-				else
-				{
-					return;
-				}
-			}
+			j += codeUnitSize - 1;
 
 			const size_t endPos = typoNode.endPos + j + 1 - typoNode.form.size();
 			flushCandidates<lengtheningTypoTolerant>(posToNs[endPos], 
