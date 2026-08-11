@@ -1027,6 +1027,23 @@ public:
 		}
 
 		auto lengtheningTypoNodes = state.getLengtheningTypoNodes();
+		// 장음화 오타 비용(lengtheningTypoCost * (3 + lengtheningSize))은 lengtheningSize에 대해 단조 증가하므로,
+		// 남은 오타 비용 예산으로부터 더 이상 장음화를 탐색할 필요가 없는 지점을 미리 정할 수 있다.
+		static constexpr size_t lengtheningSizeLimit = 8;
+		size_t maxLengtheningSize = 0;
+		if constexpr (lengtheningTypoTolerant)
+		{
+			if (lengtheningTypoCost > 0)
+			{
+				// TODO: 하드코딩된 장음화 오타 비용 계산식을 다른 곳과 연계하여 계산하도록 수정 필요
+				const float budget = (typoThreshold - typoCost) / lengtheningTypoCost - 3;
+				maxLengtheningSize = budget < 1 ? 0 : min(lengtheningSizeLimit, (size_t)budget);
+			}
+			else
+			{
+				maxLengtheningSize = lengtheningSizeLimit;
+			}
+		}
 		auto* curNode = state.node;
 		for (size_t j = 0; j < typoNode.form.size(); ++j)
 		{
@@ -1243,8 +1260,7 @@ public:
 				};
 
 				const size_t prevLengtheningSize = lengtheningTypoNodes.size();
-				static constexpr size_t maxLengtheningSize = 8;
-				if (prevChr && isHangulSyllable(prevChr) &&
+				if (maxLengtheningSize && prevChr && isHangulSyllable(prevChr) &&
 					(u'아' <= c && c < u'자') && lengtheningVowelTable[extractVowel(prevChr)] == extractVowel(c))
 				{
 					lengtheningTypoNodes.emplace_back(1, curNode);
@@ -1294,56 +1310,43 @@ public:
 				if (nextNode)
 				{
 					curNode = nextNode;
-					const bool isLastCodeUnit = k + 1 == codeUnitSize;
-					// 오타가 있는 경우 전체 형태가 포함된 후보만 탐색.
-					if (isLastCodeUnit && (typoNode.typoCost == 0 || j + codeUnitSize == typoNode.form.size()))
-					{
-						if (typoCost > 0 && curNode->depth < minFormLen)
-						{
-							// early pruning
-						}
-						else
-						{
-							for (auto submatcher = curNode; submatcher; submatcher = submatcher->fail())
-							{
-								const Form* cand = submatcher->val(trie);
-								if (!cand) break;
-								else if (!trie.hasSubmatch(cand))
-								{
-									if (cand->form.size() < minFormLen) break;
-									candidates.emplace_back(cand);
-								}
-							}
-						}
-
-						if constexpr (lengtheningTypoTolerant)
-						{
-							for (auto [lengtheningSize, node] : lengtheningTypoNodes)
-							{
-								const Form* cand = node->val(trie);
-								if (cand && !trie.hasSubmatch(cand))
-								{
-									if (cand->form.size() < minFormLen) continue;
-									candidates.emplace_back(cand, lengtheningSize);
-								}
-							}
-						}
-					}
 				}
 				else
 				{
-					if constexpr (lengtheningTypoTolerant)
+					if (typoCost > 0) return;
+					curNode = trie.root();
+				}
+
+				const bool isLastCodeUnit = k + 1 == codeUnitSize;
+				// 오타가 있는 경우 전체 형태가 포함된 후보만 탐색.
+				if (isLastCodeUnit && (typoNode.typoCost == 0 || j + codeUnitSize == typoNode.form.size()))
+				{
+					if (nextNode && !(typoCost > 0 && curNode->depth < minFormLen)) // typoCost > 0인 경우 early pruning
 					{
-						lengtheningTypoNodes.clear();
+						for (auto submatcher = curNode; submatcher; submatcher = submatcher->fail())
+						{
+							const Form* cand = submatcher->val(trie);
+							if (!cand) break;
+							else if (!trie.hasSubmatch(cand))
+							{
+								if (cand->form.size() < minFormLen) break;
+								candidates.emplace_back(cand);
+							}
+						}
 					}
 
-					if (typoCost == 0)
+					// 장음화 노드는 메인 탐색과 독립적인 경로이므로 메인 탐색과 무관하게 후보를 수집함.
+					if constexpr (lengtheningTypoTolerant)
 					{
-						curNode = trie.root();
-					}
-					else
-					{
-						return;
+						for (auto [lengtheningSize, node] : lengtheningTypoNodes)
+						{
+							const Form* cand = node->val(trie);
+							if (cand && !trie.hasSubmatch(cand))
+							{
+								if (cand->form.size() < minFormLen) continue;
+								candidates.emplace_back(cand, lengtheningSize);
+							}
+						}
 					}
 				}
 			}
