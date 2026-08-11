@@ -394,18 +394,24 @@ TEST(KiwiCpp, ChineseVsEmoji)
 TEST(KiwiCpp, NonBmpBoundaries)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
-	AnalyzeOption typoOption = Match::allWithNormalizing;
-	typoOption.typoTransformer = getDefaultPreparedTypoSet(DefaultTypoSet::basicTypoSetWithContinualAndLengthening);
+
+	std::array<AnalyzeOption, 2> options = {
+		Match::allWithNormalizing,
+		Match::allWithNormalizing,
+	};
+	options[1].typoTransformer = getDefaultPreparedTypoSet(DefaultTypoSet::basicTypoSetWithContinualAndLengthening);
+
+	using TupleType = std::tuple<std::u16string, std::u16string, POSTag>;
 	for (auto& [str, specialForm, specialTag] : {
-		std::tuple{ std::u16string{ u"랠프𐐷에머슨" }, std::u16string{ u"𐐷" }, POSTag::sw },
-		std::tuple{ std::u16string{ u"랠프😀에머슨" }, std::u16string{ u"😀" }, POSTag::w_emoji },
-		std::tuple{ std::u16string{ u"랠프👍🏽에머슨" }, std::u16string{ u"👍🏽" }, POSTag::w_emoji },
+		TupleType{ u"랠프𐐷에머슨", u"𐐷", POSTag::sw },
+		TupleType{ u"랠프😀에머슨", u"😀", POSTag::w_emoji },
+		TupleType{ u"랠프👍🏽에머슨", u"👍🏽", POSTag::w_emoji },
 	})
 	{
-		for (auto option : { AnalyzeOption{ Match::allWithNormalizing }, typoOption })
+		for (auto& option : options)
 		{
 			auto res = kiwi.analyze(str, option).first;
-			ASSERT_EQ(res.size(), 3);
+			ASSERT_EQ(res.size(), 3) << " for string: " << utf16To8(str);
 			EXPECT_EQ(res[0].str, u"랠프");
 			EXPECT_EQ(res[0].position, 0);
 			EXPECT_EQ(res[0].length, 2);
@@ -418,7 +424,8 @@ TEST(KiwiCpp, NonBmpBoundaries)
 			EXPECT_EQ(res[2].length, 3);
 		}
 	}
-	for (auto option : { AnalyzeOption{ Match::allWithNormalizing }, typoOption })
+
+	for (auto& option : options)
 	{
 		auto res = kiwi.analyze(u"😀랠프", option).first;
 		ASSERT_EQ(res.size(), 2);
@@ -428,11 +435,11 @@ TEST(KiwiCpp, NonBmpBoundaries)
 		EXPECT_EQ(res[1].tag, POSTag::nnp);
 	}
 
-	const std::vector<std::u16string> userWords = {
-		std::u16string{ u"가𐐷나" },
-		std::u16string{ u"가😀나" },
-		std::u16string{ u"랠프👍🏽에머슨" },
-		std::u16string{ u"가👨‍👩‍👧‍👦나" },
+	const std::initializer_list<std::u16string> userWords = {
+		u"가𐐷나",
+		u"가😀나",
+		u"랠프👍🏽에머슨",
+		u"가👨‍👩‍👧‍👦나",
 	};
 	KiwiBuilder builder{ MODEL_PATH, 0, BuildOption::default_ };
 	for (auto& str : userWords)
@@ -442,7 +449,7 @@ TEST(KiwiCpp, NonBmpBoundaries)
 	auto userWordKiwi = builder.build();
 	for (auto& str : userWords)
 	{
-		for (auto option : { AnalyzeOption{ Match::allWithNormalizing }, typoOption })
+		for (auto& option : options)
 		{
 			auto res = userWordKiwi.analyze(str, option).first;
 			ASSERT_EQ(res.size(), 1);
@@ -451,6 +458,21 @@ TEST(KiwiCpp, NonBmpBoundaries)
 			EXPECT_EQ(res[0].position, 0);
 			EXPECT_EQ(res[0].length, str.size());
 		}
+	}
+	// 오타 교정 사례에 대한 테스트
+	for (auto s : {
+		u"가아𐐷나",
+		u"가𐐷나아",
+		u"가아😀나",
+		u"가😀나아",
+		u"렐프👍🏽에머슨",
+		u"가아👨‍👩‍👧‍👦나아",
+		})
+	{
+		auto res = userWordKiwi.analyze(s, options[1]).first;
+		EXPECT_EQ(res.size(), 1);
+		EXPECT_EQ(res[0].tag, POSTag::nnp);
+		EXPECT_EQ(res[0].position, 0);
 	}
 }
 
