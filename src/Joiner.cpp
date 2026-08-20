@@ -79,6 +79,13 @@ namespace kiwi
 			return 0;
 		}
 
+		inline bool isNonContractableVerb(U16StringView form, POSTag tag)
+		{
+			return form.size() == 1 && 
+				(form[0] == u'기' || form[0] == u'비' || form[0] == u'이') &&
+				(tag == POSTag::vv || tag == POSTag::va || tag == POSTag::vx);
+		}
+
 		void Joiner::add(U16StringView form, POSTag tag, Space space)
 		{
 			KString normForm = normalizeHangul(form);
@@ -86,8 +93,7 @@ namespace kiwi
 			{
 				ranges.emplace_back(stack.size(), stack.size() + normForm.size());
 				stack += normForm;
-				lastTag = tag;
-				return;
+				goto epilogue;
 			}
 
 			if (space == Space::insert_space || (space == Space::none && isSpaceInsertable(clearIrregular(lastTag), clearIrregular(tag), form)))
@@ -149,15 +155,27 @@ namespace kiwi
 				{
 					cv = CondVowel::none;
 				}
-				auto r = cr->combineOneImpl({ stack.data() + activeStart, stack.size() - activeStart }, lastTag, normForm, tag, cv);
-				stack.erase(stack.begin() + activeStart, stack.end());
-				ranges.back().second = activeStart + get<1>(r);
-				ranges.emplace_back(activeStart + get<2>(r), activeStart + get<0>(r).size());
-				stack += get<0>(r);
-				activeStart += get<2>(r);
+
+				if (nonContractableVerb && isEClass(tag) && normForm[0] == u'어')
+				{
+					activeStart = stack.size();
+					ranges.emplace_back(stack.size(), stack.size() + normForm.size());
+					stack += normForm;
+				}
+				else
+				{
+					auto r = cr->combineOneImpl({ stack.data() + activeStart, stack.size() - activeStart }, lastTag, normForm, tag, cv);
+					stack.erase(stack.begin() + activeStart, stack.end());
+					ranges.back().second = activeStart + get<1>(r);
+					ranges.emplace_back(activeStart + get<2>(r), activeStart + get<0>(r).size());
+					stack += get<0>(r);
+					activeStart += get<2>(r);
+				}
 			}
+		epilogue:
 			anteLastTag = lastTag;
 			lastTag = tag;
+			nonContractableVerb = isNonContractableVerb(normForm, tag);
 		}
 
 		void Joiner::add(const u16string& form, POSTag tag, Space space)
