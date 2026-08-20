@@ -53,8 +53,9 @@ namespace kiwi
 		std::shared_ptr<Vector<std::pair<std::u16string, POSTag>>> oovDict;
 		std::unique_ptr<utils::ThreadPool> workers;
 		std::shared_ptr<KiwiBuilder> dummyBuilder;
-		std::discrete_distribution<> dropout;
 		float dropoutProbOnHistory = 0;
+		std::discrete_distribution<> dropout;
+		std::discrete_distribution<> ssAugmentor;
 		std::discrete_distribution<> nounAugmentor;
 		std::discrete_distribution<> emojiAugmentor;
 		std::discrete_distribution<> sbAugmentor;
@@ -195,7 +196,7 @@ namespace kiwi
 		ChrDataset& operator=(const ChrDataset&) = delete;
 		ChrDataset& operator=(ChrDataset&&) /*noexcept*/;
 
-		void addSentence(std::string_view sentence, float weight = 1.f, std::string_view nonLabelPrefix = {});
+		void addSentence(std::string_view sentence, float weight = 1.f, std::string_view nonLabelPrefix = {}, bool reverse = false);
 
 		size_t numSents() const;
 		

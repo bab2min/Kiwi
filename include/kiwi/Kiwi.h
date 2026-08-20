@@ -46,6 +46,7 @@ namespace kiwi
 	{
 		double dropoutProb = 0;
 		double dropoutProbOnHistory = 0;
+		double ssAugmentingProb = 0;
 		double nounAugmentingProb = 0;
 		double emojiAugmentingProb = 0;
 		double sbAugmentingProb = 0;

@@ -15,6 +15,11 @@ HSDataset::HSDataset(size_t _batchSize,
 	: workers{ _workers ? make_unique<utils::ThreadPool>(_workers) : nullptr },
 	dropout{ {1 - option.dropoutProb, option.dropoutProb / 3, option.dropoutProb / 3, option.dropoutProb / 6, option.dropoutProb / 6} },
 	dropoutProbOnHistory{ (float)option.dropoutProbOnHistory },
+	ssAugmentor{ {
+			1 - option.ssAugmentingProb,
+			option.ssAugmentingProb / 3,
+			option.ssAugmentingProb / 3,
+			option.ssAugmentingProb / 3} },
 	nounAugmentor{ {
 			1 - option.nounAugmentingProb,
 			option.nounAugmentingProb / 12,
@@ -346,6 +351,28 @@ size_t HSDataset::_next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode,
 			auto sent = sents.get()[shuffledIdx[s]];
 			tokens.clear();
 			tokens.emplace_back(sent[0]);
+			auto ssAugment = sent.size() >= 5 ? ssAugmentor(local.rng) : 0;
+			if (ssAugment && (
+				sent[1] >= 0 && morphs[sent[1]].tag == POSTag::sso ||
+				sent[sent.size() - 2] >= 0 && morphs[sent[sent.size() - 2]].tag == POSTag::ssc
+			))
+			{
+				ssAugment = 0;
+			}
+
+			switch (ssAugment)
+			{
+			case 1: // circumfix with sso and ssc
+				tokens.emplace_back(getDefaultMorphemeId(POSTag::sso));
+				break;
+			case 2:
+				tokens.emplace_back(specialMorphIds[(size_t)Kiwi::SpecialMorph::singleQuoteOpen]);
+				break;
+			case 3:
+				tokens.emplace_back(specialMorphIds[(size_t)Kiwi::SpecialMorph::doubleQuoteOpen]);
+				break;
+			}
+
 			for (auto p = sent.begin() + 1; p != sent.end() - 1; ++p)
 			{
 				int32_t t = *p;
@@ -359,7 +386,12 @@ size_t HSDataset::_next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode,
 				{
 					t1 = getDefaultMorphemeId((*oovDict)[-t1 - 1].second);
 				}
-				const auto nounAugment = (morphs[t].tag == POSTag::nnp && !isSpecialClass(morphs[t1].tag)) ? nounAugmentor(local.rng) : 0;
+				auto nounAugment = (morphs[t].tag == POSTag::nnp && !isSpecialClass(morphs[t1].tag)) ? nounAugmentor(local.rng) : 0;
+				if (ssAugment && ssAugment == nounAugment)
+				{
+					nounAugment = 0;
+				}
+
 				const auto emojiAugment = 
 					(morphs[t].tag == POSTag::nnp && isJClass(morphs[t1].tag)) ? emojiAugmentor(local.rng) :
 					((morphs[t].tag == POSTag::ef && morphs[t1].tag == POSTag::sf) ? emojiAugmentor(local.rng) + 5 : 0);
@@ -471,6 +503,20 @@ size_t HSDataset::_next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode,
 					tokens.emplace_back(sbTokenIds[sbToken + 1]);
 				}
 			}
+			
+			switch (ssAugment)
+			{
+			case 1:
+				tokens.emplace_back(getDefaultMorphemeId(POSTag::ssc));
+				break;
+			case 2:
+				tokens.emplace_back(specialMorphIds[(size_t)Kiwi::SpecialMorph::singleQuoteClose]);
+				break;
+			case 3:
+				tokens.emplace_back(specialMorphIds[(size_t)Kiwi::SpecialMorph::doubleQuoteClose]);
+				break;
+			}
+
 			tokens.emplace_back(sent[sent.size() - 1]);
 			const size_t offset = local.outData.size();
 			prepareInOutData(local.inData, local.outData, tokens, local.rng);
@@ -677,6 +723,7 @@ std::vector<size_t> kiwi::HSDataset::estimVocabFrequency() const
 	std::vector<size_t> ret(vocabSize()), augs(getDefaultMorphemeId(POSTag::max));
 	for (auto t : sents.get().raw())
 	{
+		if (oovDict && t < 0) t = getDefaultMorphemeId((*oovDict)[-t - 1].second);
 		auto v = tokenToVocab[t];
 		auto fv = tokenToVocab[getDefaultMorphemeId((*morphemes)[t].tag)];
 		if (v == nonVocab) v = fv;
@@ -945,7 +992,7 @@ ChrDataset::ChrDataset(ChrDataset&&) = default;
 ChrDataset& ChrDataset::operator=(ChrDataset&&) = default;
 
 
-void ChrDataset::addSentence(std::string_view sentence, float weight, std::string_view nonLabelPrefix)
+void ChrDataset::addSentence(std::string_view sentence, float weight, std::string_view nonLabelPrefix, bool reverse)
 {
 	ChrTokenizer tokenizer;
 	thread_local Vector<int32_t> tokenBuf;
@@ -953,10 +1000,14 @@ void ChrDataset::addSentence(std::string_view sentence, float weight, std::strin
 	std::string joined;
 	joined += nonLabelPrefix;
 	joined += sentence;
-	const size_t prefixSize = tokenizer.encode(nonLabelPrefix, tokenBuf.data(), tokenBuf.size());
+	const size_t prefixSize = reverse ? 0 : tokenizer.encode(nonLabelPrefix, tokenBuf.data(), tokenBuf.size());
 	const size_t tokenCnt = tokenizer.encode(joined, tokenBuf.data(), tokenBuf.size());
 	auto& sents = this->sents.get();
 	sents.emplace_back();
+	if (reverse)
+	{
+		std::reverse(tokenBuf.begin(), tokenBuf.begin() + tokenCnt);
+	}
 	sents.insert_data(tokenBuf.begin(), tokenBuf.begin() + tokenCnt);
 	sentWeights.emplace_back(weight);
 	nonLabelPrefixSizes.emplace_back(prefixSize);
@@ -1034,6 +1085,7 @@ public:
 				if (sub) return val - 1;
 				else return -1;
 			}
+			return -1;
 		}
 		else
 		{
@@ -1193,7 +1245,7 @@ std::vector<std::pair<std::vector<uint32_t>, double>> ChrDataset::extractPrefixe
 	auto trie = counter.count();
 	if (exclusiveCnt)
 	{
-		Vector<UnorderedMap<Vector<uint32_t>, size_t>> cnts_by_length(maxLength);
+		Vector<UnorderedMap<Vector<uint32_t>, size_t>> cntsByLength(maxLength);
 		trie.traverse([&](size_t cnt, const std::vector<uint32_t>& prefix)
 		{
 			if (cnt < minCnt) return;
@@ -1202,19 +1254,19 @@ std::vector<std::pair<std::vector<uint32_t>, double>> ChrDataset::extractPrefixe
 				return;
 			}
 			Vector<uint32_t> p(prefix.begin(), prefix.end());
-			cnts_by_length[p.size() - 1].emplace(move(p), cnt);
+			cntsByLength[p.size() - 1].emplace(move(p), cnt);
 		});
 
 		Vector<uint32_t> suffix;
 		suffix.reserve(maxLength);
 		for (size_t i = 1; i < maxLength; ++i)
 		{
-			for (auto& p : cnts_by_length[i])
+			for (auto& p : cntsByLength[i])
 			{
 				suffix.clear();
 				suffix.insert(suffix.end(), p.first.begin() + 1, p.first.end());
-				auto it = cnts_by_length[i - 1].find(suffix);
-				if (it == cnts_by_length[i - 1].end() || it->second < p.second)
+				auto it = cntsByLength[i - 1].find(suffix);
+				if (it == cntsByLength[i - 1].end() || it->second < p.second)
 				{
 					throw std::runtime_error("This should not happen");
 				}
@@ -1222,7 +1274,7 @@ std::vector<std::pair<std::vector<uint32_t>, double>> ChrDataset::extractPrefixe
 			}
 		}
 
-		for (auto& cnts : cnts_by_length)
+		for (auto& cnts : cntsByLength)
 		{
 			for (auto& p : cnts)
 			{
