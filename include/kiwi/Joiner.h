@@ -30,6 +30,7 @@ namespace kiwi
 			std::vector<std::pair<uint32_t, uint32_t>> ranges;
 			size_t activeStart = 0;
 			POSTag lastTag = POSTag::unknown, anteLastTag = POSTag::unknown;
+			bool nonContractableVerb = false;
 
 			explicit Joiner(const CompiledRule& _cr);			
 			void add(U16StringView form, POSTag tag, Space space);
