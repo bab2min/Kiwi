@@ -1,0 +1,105 @@
+Kiwi — Korean Intelligent Word Identifier
+Copyright 2017-2026 Minchul Lee and the Kiwi contributors
+
+This product includes software developed by Minchul Lee (bab2min@gmail.com)
+and the Kiwi contributors, licensed under the Apache License, Version 2.0.
+See the LICENSE file for the full license text.
+
+
+================================================================================
+1. Training data attribution
+================================================================================
+
+The trained model files distributed with Kiwi (`models/`, and the model
+archives published on the release page or through the language bindings) are
+released under the Apache License, Version 2.0, together with the source code.
+
+These models were trained on the following corpora, provided by the National
+Institute of Korean Language (국립국어원):
+
+  * 21세기 세종계획 말뭉치 (Sejong Corpus)
+  * 모두의 말뭉치 (NIKL Corpora) — https://corpus.korean.go.kr
+
+The models consist of morpheme dictionaries and n-gram statistics.
+They do not contain, and cannot be used to reconstruct, the text of the source
+corpora.
+
+The source corpora themselves are NOT redistributed with Kiwi and remain
+subject to the terms of their respective providers. If you need the corpora,
+please obtain them directly from the National Institute of Korean Language.
+
+The morpheme tag set used by Kiwi is based on the Sejong POS tag set, with some
+tags added or modified by this project.
+
+
+================================================================================
+2. Third-party components
+================================================================================
+
+Kiwi bundles or links the following third-party components. Each remains under
+its own license; the copyright and license notices below must be retained in
+redistributions.
+
+--------------------------------------------------------------------------------
+Linked into the Kiwi library
+--------------------------------------------------------------------------------
+
+Eigen (third_party/eigen) — v3.4.0
+  https://gitlab.com/libeigen/eigen
+  Copyright (c) 2008-2021 the Eigen authors
+  License: MPL-2.0 (Mozilla Public License 2.0)
+  Kiwi builds Eigen with EIGEN_MPL2_ONLY defined, so no LGPL-licensed Eigen
+  module is included. See third_party/eigen/COPYING.README.
+
+cpp-btree (third_party/cpp-btree)
+  https://github.com/bab2min/cpp-btree (fork of google/cpp-btree)
+  Copyright 2013 Google Inc.
+  License: Apache-2.0
+
+streamvbyte (third_party/streamvbyte) — v2.0.0
+  https://github.com/fast-pack/streamvbyte
+  Copyright (c) 2017-2024 Daniel Lemire and contributors
+  License: Apache-2.0
+
+cpuinfo (third_party/cpuinfo) — optional, KIWI_USE_CPUINFO=ON by default
+  https://github.com/pytorch/cpuinfo
+  Copyright (c) 2019 Google LLC
+  Copyright (c) 2017-2018 Facebook Inc.
+  Copyright (C) 2012-2017 Georgia Institute of Technology
+  Copyright (C) 2010-2012 Marat Dukhan
+  License: BSD-2-Clause
+
+mimalloc (third_party/mimalloc) — optional, KIWI_USE_MIMALLOC=ON by default
+  https://github.com/microsoft/mimalloc
+  Copyright (c) 2018-2025 Microsoft Corporation, Daan Leijen
+  License: MIT
+
+JSON for Modern C++ (third_party/json) — v3.12.0
+  https://github.com/nlohmann/json
+  Copyright (c) 2013-2025 Niels Lohmann
+  License: MIT
+
+--------------------------------------------------------------------------------
+Used by the command line tools only (not part of the library)
+--------------------------------------------------------------------------------
+
+TCLAP (third_party/tclap)
+  https://github.com/mirror/tclap
+  Copyright (c) 2003 Michael E. Smoot
+  Copyright (c) 2004 Daniel Aarno
+  Copyright (c) 2017 Google Inc.
+  License: MIT
+
+--------------------------------------------------------------------------------
+Used by the test suite only (not distributed)
+--------------------------------------------------------------------------------
+
+GoogleTest (third_party/googletest) — v1.17.0
+  https://github.com/google/googletest
+  Copyright 2008, Google Inc.
+  License: BSD-3-Clause
+
+--------------------------------------------------------------------------------
+
+The full license text of each component is available in its directory under
+third_party/.

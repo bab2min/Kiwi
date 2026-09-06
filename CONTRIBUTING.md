@@ -1,6 +1,8 @@
 # 기여하기
 
-Kiwi는 LGPL v3 라이센스로 배포되며 누구든지 GitHub의 풀 리퀘스트 기능을 통해 Kiwi에 기여할 수 있습니다.
+Kiwi는 Apache License 2.0 라이센스로 배포되며 누구든지 GitHub의 풀 리퀘스트 기능을 통해 Kiwi에 기여할 수 있습니다.
+
+Kiwi에 기여하신 내용은 Apache License 2.0 제5조에 따라 동일한 라이센스로 제공되는 것으로 간주됩니다. 별도의 CLA는 필요하지 않습니다.
 
 ## 연락하기
 

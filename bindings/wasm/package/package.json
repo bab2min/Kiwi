@@ -17,7 +17,7 @@
         "tokenizer"
     ],
     "author": "bab2min <bab2min@gmail.com> (lab.bab2min.pe.kr)",
-    "license": "LGPL-2.1-or-later",
+    "license": "Apache-2.0",
     "bugs": {
         "url": "https://github.com/bab2min/Kiwi/issues"
     },

@@ -101,6 +101,9 @@ endif()
 include_directories( include/ )
 include_directories( third_party/tclap/include )
 include_directories( third_party/cpp-btree )
+# Eigen: exclude the LGPL-licensed modules so that only MPL2 (and more
+# permissive) Eigen code is compiled in. See NOTICE.
+add_definitions( -DEIGEN_MPL2_ONLY )
 include_directories( third_party/eigen )
 include_directories( third_party/json/include )
 include_directories( third_party/streamvbyte/include )
