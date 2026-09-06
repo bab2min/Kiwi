@@ -8,9 +8,10 @@ namespace kiwi
 	{
 		uint8_t singleQuote : 1;
 		uint8_t doubleQuote : 1;
-		uint8_t bulletHash : 6;
+		uint8_t parenthesis : 1;
+		uint8_t bulletHash : 5;
 
-		SpecialState() : singleQuote{ 0 }, doubleQuote{ 0 }, bulletHash{ 0 }
+		SpecialState() : singleQuote{ 0 }, doubleQuote{ 0 }, parenthesis{ 0 }, bulletHash{ 0 }
 		{
 		}
 

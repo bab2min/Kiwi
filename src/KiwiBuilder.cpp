@@ -761,7 +761,14 @@ void KiwiBuilder::_addCorpusTo(
 			return;
 		}
 
-		wids.emplace_back(getDefaultMorphemeId(POSTag::nng));
+		if (tag == POSTag::max) // NO_EOS
+		{
+			wids.emplace_back(0);
+		}
+		else
+		{
+			wids.emplace_back(getDefaultMorphemeId(POSTag::nng));
+		}
 	};
 
 	while (getline(is, line))
@@ -776,8 +783,15 @@ void KiwiBuilder::_addCorpusTo(
 			auto& o = splitOut && splitCnt >= 1 ? *splitOut : out;
 			o.emplace_back();
 			o.add_data(0);
-			o.insert_data(wids.begin(), wids.end());
-			o.add_data(1);
+			if (wids.back() != 0)
+			{
+				o.insert_data(wids.begin(), wids.end());
+				o.add_data(1);
+			}
+			else // No EOS
+			{
+				o.insert_data(wids.begin(), wids.end() - 1);
+			}
 			wids.clear();
 			splitCnt = std::fmod(splitCnt, 1.);
 			continue;
@@ -798,16 +812,29 @@ void KiwiBuilder::_addCorpusTo(
 				senseId = stol(s.begin(), s.end());
 				f = f.substr(0, spos);
 			}
-
-			auto t = toPOSTag(fields[i + 1]);
-			if (t == POSTag::max && !alreadyPrintError)
+			
+			POSTag t = POSTag::max;
+			if (i + 1 < fields.size())
 			{
-				cerr << "Unknown tag(" << utf16To8(fields[i + 1]) << ") at line " << numLine << " :\t" << line << endl;
-				alreadyPrintError = true;
+				t = toPOSTag(fields[i + 1]);
+				if (t == POSTag::max && !alreadyPrintError)
+				{
+					cerr << "Unknown tag(" << utf16To8(fields[i + 1]) << ") at line " << numLine << " :\t" << line << endl;
+					alreadyPrintError = true;
+				}
+
+				if (t == POSTag::z_siot || i == mergedIndex)
+				{
+					continue;
+				}
 			}
-
-			if (t == POSTag::z_siot || i == mergedIndex)
+			else if (f == u"NO_EOS")
 			{
+				t = POSTag::max;
+			}
+			else
+			{
+				cerr << "Missing tag at line " << numLine << " :\t" << line << endl;
 				continue;
 			}
 
@@ -844,6 +871,25 @@ void KiwiBuilder::_addCorpusTo(
 			
 			insertWord(f, t, senseId);
 		}
+	}
+
+	if (wids.size() > 1)
+	{
+		splitCnt += splitRatio;
+		auto& o = splitOut && splitCnt >= 1 ? *splitOut : out;
+		o.emplace_back();
+		o.add_data(0);
+		if (wids.back() != 0)
+		{
+			o.insert_data(wids.begin(), wids.end());
+			o.add_data(1);
+		}
+		else // No EOS
+		{
+			o.insert_data(wids.begin(), wids.end() - 1);
+		}
+		wids.clear();
+		splitCnt = std::fmod(splitCnt, 1.);
 	}
 }
 
@@ -2640,9 +2686,9 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 	return ret;
 }
 
-std::array<size_t, static_cast<size_t>(Kiwi::SpecialMorph::max)> KiwiBuilder::getSpecialMorphs() const
+std::array<uint32_t, static_cast<size_t>(Kiwi::SpecialMorph::max)> KiwiBuilder::getSpecialMorphs() const
 {
-	std::array<size_t, static_cast<size_t>(Kiwi::SpecialMorph::max)> specialMorphIds = { {0,} };
+	std::array<uint32_t, static_cast<size_t>(Kiwi::SpecialMorph::max)> specialMorphIds = { {0,} };
 	for (auto& m : morphemes)
 	{
 		if (forms[m.kform].form == u"'")

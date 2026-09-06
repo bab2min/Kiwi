@@ -345,10 +345,11 @@ size_t HSDataset::_next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode,
 		auto& local = locals[localId];
 		auto& tokens = local.tokenBuf;
 		const auto& morphs = *morphemes;
-		tokens.reserve(sents.get()[shuffledIdx[sentFirst]].size());
+		auto& sents = this->sents.get();
+		tokens.reserve(sents[shuffledIdx[sentFirst]].size());
 		for (size_t s = sentFirst; s < sentLast; ++s)
 		{
-			auto sent = sents.get()[shuffledIdx[s]];
+			auto sent = sents[shuffledIdx[s]];
 			tokens.clear();
 			tokens.emplace_back(sent[0]);
 			auto ssAugment = sent.size() >= 5 ? ssAugmentor(local.rng) : 0;
@@ -373,7 +374,7 @@ size_t HSDataset::_next(InTy in, OutTy out, LmTy lmLProbs, NgramTy outNgramNode,
 				break;
 			}
 
-			for (auto p = sent.begin() + 1; p != sent.end() - 1; ++p)
+			for (auto p = sent.begin() + 1; p < sent.end() - 1; ++p)
 			{
 				int32_t t = *p;
 				int32_t tWithOOV = *p;

@@ -83,7 +83,7 @@ namespace kiwi
 
 	inline uint8_t hashSbTypeOrder(uint8_t type, uint8_t order)
 	{
-		return ((type << 1) ^ (type >> 7) ^ order) % 63 + 1;
+		return ((type << 1) ^ (type >> 7) ^ order) % 31 + 1;
 	}
 
 	struct RuleBasedScorer
@@ -107,6 +107,8 @@ namespace kiwi
 			snEndswithPoint{ curMorph->tag == POSTag::sn && !node->uform.empty() && node->uform.back() == u'.'},
 			condP{ curMorph->polar }
 		{
+			if (curMorph->tag == POSTag::sso && node->uform == u"(") curMorphSpecialType = Kiwi::SpecialMorph::parenthesisOpen;
+			else if (curMorph->tag == POSTag::ssc && node->uform == u")") curMorphSpecialType = Kiwi::SpecialMorph::parenthesisClose;
 		}
 
 		float operator()(const Morpheme* prevMorpheme, const SpecialState prevSpState) const
@@ -147,15 +149,19 @@ namespace kiwi
 			{
 				if (static_cast<uint8_t>(curMorphSpecialType) != prevSpState.singleQuote)
 				{
-					accScore -= 2;
+					accScore -= 4;
 				}
 			}
 			else if (curMorphSpecialType <= Kiwi::SpecialMorph::doubleQuoteNA)
 			{
 				if ((static_cast<uint8_t>(curMorphSpecialType) - 3) != prevSpState.doubleQuote)
 				{
-					accScore -= 2;
+					accScore -= 4;
 				}
+			}
+			else if (curMorphSpecialType == Kiwi::SpecialMorph::parenthesisClose && prevSpState.parenthesis == 0)
+			{
+				accScore -= 3;
 			}
 
 			// discount for SB in form "[가-하]."
@@ -225,6 +231,8 @@ namespace kiwi
 			else if (ruleBasedScorer.curMorphSpecialType == Kiwi::SpecialMorph::singleQuoteClose) spState.singleQuote = 0;
 			else if (ruleBasedScorer.curMorphSpecialType == Kiwi::SpecialMorph::doubleQuoteOpen) spState.doubleQuote = 1;
 			else if (ruleBasedScorer.curMorphSpecialType == Kiwi::SpecialMorph::doubleQuoteClose) spState.doubleQuote = 0;
+			else if (ruleBasedScorer.curMorphSpecialType == Kiwi::SpecialMorph::parenthesisOpen) spState.parenthesis = 1;
+			else if (ruleBasedScorer.curMorphSpecialType == Kiwi::SpecialMorph::parenthesisClose) spState.parenthesis = 0;
 			if (ruleBasedScorer.curMorphSbType)
 			{
 				spState.bulletHash = hashSbTypeOrder(ruleBasedScorer.curMorphSbType, ruleBasedScorer.curMorphSbOrder + 1);

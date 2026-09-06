@@ -218,11 +218,13 @@ namespace kiwi
 			doubleQuoteOpen,
 			doubleQuoteClose,
 			doubleQuoteNA,
+			parenthesisOpen,
+			parenthesisClose,
 			max,
 		};
 
 	private:
-		std::array<size_t, static_cast<size_t>(SpecialMorph::max)> specialMorphIds = { { 0, } };
+		std::array<uint32_t, static_cast<size_t>(SpecialMorph::max)> specialMorphIds = { { 0, } };
 
 		template<class Str, class Pretokenized, class ...Rest>
 		auto _asyncAnalyze(Str&& str, Pretokenized&& pt, const std::optional<KiwiConfig>& overrideConfig, Rest&&... args) const;
@@ -786,7 +788,7 @@ namespace kiwi
 
 		void addAllomorphsToRule();
 
-		std::array<size_t, static_cast<size_t>(Kiwi::SpecialMorph::max)> getSpecialMorphs() const;
+		std::array<uint32_t, static_cast<size_t>(Kiwi::SpecialMorph::max)> getSpecialMorphs() const;
 
 	public:
 

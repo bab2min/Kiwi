@@ -79,7 +79,7 @@ namespace kiwi
 		size_t totalTokens = 0;
 		size_t passedSents = 0;
 		size_t passedWorkItems = 0;
-		std::array<size_t, static_cast<size_t>(Kiwi::SpecialMorph::max)> specialMorphIds = { { 0, } };
+		std::array<uint32_t, static_cast<size_t>(Kiwi::SpecialMorph::max)> specialMorphIds = { { 0, } };
 
 		size_t numValidTokensInSent(size_t sentId) const;
 
