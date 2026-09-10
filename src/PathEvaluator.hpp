@@ -76,9 +76,17 @@ namespace kiwi
 		return isVerbClass(morph->tag) && FeatureTestor::isMatched(morph->kform, CondPolarity::negative);
 	}
 
-	inline bool isVerbVowel(const Morpheme* morph)
+	inline bool isContractableVerbVowel(const Morpheme* morph)
 	{
-		return isVerbClass(morph->tag) && morph->kform && !morph->kform->empty() && !isHangulCoda(morph->kform->back());
+		if (!isVerbClass(morph->tag)) return false;
+		if (!morph->kform || morph->kform->empty()) return false;
+		if (isHangulCoda(morph->kform->back())) return false;
+		const int vowel = extractVowel(morph->kform->back());
+		if (vowel == 12) return false; // ㅛ
+		if (vowel == 16) return false; // ㅟ
+		if (vowel == 17) return false; // ㅠ
+		if (vowel == 19) return false; // ㅢ
+		return true;
 	}
 
 	inline uint8_t hashSbTypeOrder(uint8_t type, uint8_t order)
@@ -136,7 +144,7 @@ namespace kiwi
 				accScore -= 100;
 			}
 			// 아/어로 시작하는 어미가 받침 없는 동사 뒤에서 축약되지 않은 경우 벌점 부여
-			if (contractableE && isVerbVowel(prevMorpheme))
+			if (contractableE && isContractableVerbVowel(prevMorpheme))
 			{
 				accScore -= 3;
 			}
@@ -812,14 +820,16 @@ namespace kiwi
 				const auto curMorph = morphs[curId];
 				bestPathCont.clear();
 
+				const Morpheme* firstMorph;
 				const Morpheme* lastMorph;
 				if (curMorph->isSingle())
 				{
-					lastMorph = curMorph->getCombined() ? curMorph->getCombined() : curMorph;
+					firstMorph = lastMorph = curMorph->getCombined() ? curMorph->getCombined() : curMorph;
 				}
 				// if the morpheme has chunk set
 				else
 				{
+					firstMorph = curMorph->chunks[0];
 					lastMorph = curMorph->chunks[curMorph->chunks.size() - 1];
 				}
 
@@ -833,8 +843,8 @@ namespace kiwi
 					lastSeqId = lastMorph->lmMorphemeId;
 				}
 
-				RuleBasedScorer ruleBasedScorer{ kw, curMorph, node };
-				const float morphScore = kw->tagScorer.evalLeftBoundary(hasLeftBoundary(node), curMorph->tag);
+				RuleBasedScorer ruleBasedScorer{ kw, firstMorph, node };
+				const float morphScore = kw->tagScorer.evalLeftBoundary(hasLeftBoundary(node), firstMorph->tag);
 				size_t prevId = -1;
 				for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
 				{
