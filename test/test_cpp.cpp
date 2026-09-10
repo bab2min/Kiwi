@@ -2328,3 +2328,16 @@ TEST(KiwiCpp, Issue246)
 		EXPECT_EQ(res[0].first[0].tag, POSTag::sb) << " for input: " << utf16To8(s);
 	}
 }
+
+TEST(KiwiCpp, Issue270)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	auto correct = kiwi.analyze(u"통통 튀었다.", Match::allWithNormalizing).first;
+	auto typo = kiwi.analyze(u"통통 텼다.", Match::allWithNormalizing).first;
+
+	EXPECT_EQ(correct.size(), typo.size());
+	EXPECT_EQ(correct[0].str, typo[0].str);
+	EXPECT_EQ(correct[1].str, typo[1].str);
+	EXPECT_EQ(correct[2].str, typo[2].str);
+	EXPECT_FLOAT_EQ(correct[1].score - 5, typo[1].score);
+}
