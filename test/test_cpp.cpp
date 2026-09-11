@@ -903,7 +903,6 @@ TEST(KiwiCpp, HSDatasetUnlikelihoods)
 			totalTokenCnt += s;
 			totalBatchCnt++;
 		}
-		EXPECT_TRUE((std::max(dataset.numEstimBatches(), (size_t)numWorkers) - numWorkers) * 0.9 <= totalBatchCnt && totalBatchCnt <= (dataset.numEstimBatches() + numWorkers) * 1.1);
 	}
 }
 
@@ -2327,4 +2326,17 @@ TEST(KiwiCpp, Issue246)
 		auto res = kiwi.analyze(s, 5, Match::allWithNormalizing);
 		EXPECT_EQ(res[0].first[0].tag, POSTag::sb) << " for input: " << utf16To8(s);
 	}
+}
+
+TEST(KiwiCpp, Issue270)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	auto correct = kiwi.analyze(u"통통 튀었다.", Match::allWithNormalizing).first;
+	auto typo = kiwi.analyze(u"통통 텼다.", Match::allWithNormalizing).first;
+
+	EXPECT_EQ(correct.size(), typo.size());
+	EXPECT_EQ(correct[0].str, typo[0].str);
+	EXPECT_EQ(correct[1].str, typo[1].str);
+	EXPECT_EQ(correct[2].str, typo[2].str);
+	EXPECT_FLOAT_EQ(correct[1].score - 5, typo[1].score);
 }

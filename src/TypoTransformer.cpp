@@ -1149,6 +1149,7 @@ namespace kiwi
 			TypoDef{ {u"을", u"를"}, {u"을", u"를"}, 2.f, CondVowel::none },
 
 			TypoDef{ {u"ㅣ워", u"ㅣ어", u"ㅕ"}, {u"ㅣ워", u"ㅣ어", u"ㅕ"}, 1.5f, CondVowel::none},
+			TypoDef{ {u"ㅟ어"}, {u"ㅕ"}, 1.f, CondVowel::none},
 		};
 
 		static const TypoTransformer continualTypoSet = TypoTransformer::fromContinualTypoCost(1.f).addTypos({
