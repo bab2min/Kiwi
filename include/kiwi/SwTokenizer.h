@@ -2,8 +2,6 @@
  * @file SwTokenizer.h
  * @author bab2min (bab2min@gmail.com)
  * @brief 형태소 기반의 Subword Tokenizer의 인터페이스를 담고 있는 헤더 파일
- * @version 0.23.1
- * @date 2026-04-05
  *
  *
  */

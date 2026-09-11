@@ -2,8 +2,6 @@
  * @file TypoTransformer.h
  * @author bab2min (bab2min@gmail.com)
  * @brief 오타 교정에 사용되는 TypoTransformer 및 관련 클래스들을 정의합니다.
- * @version 0.23.1
- * @date 2026-04-05
  *
  *
  */
