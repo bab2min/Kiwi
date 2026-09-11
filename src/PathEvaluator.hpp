@@ -86,6 +86,7 @@ namespace kiwi
 		if (vowel == 16) return false; // ㅟ
 		if (vowel == 17) return false; // ㅠ
 		if (vowel == 19) return false; // ㅢ
+		if (vowel == 20) return false; // ㅣ
 		return true;
 	}
 
