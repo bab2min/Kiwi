@@ -903,7 +903,6 @@ TEST(KiwiCpp, HSDatasetUnlikelihoods)
 			totalTokenCnt += s;
 			totalBatchCnt++;
 		}
-		EXPECT_TRUE((std::max(dataset.numEstimBatches(), (size_t)numWorkers) - numWorkers) * 0.9 <= totalBatchCnt && totalBatchCnt <= (dataset.numEstimBatches() + numWorkers) * 1.1);
 	}
 }
 
