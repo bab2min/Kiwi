@@ -762,9 +762,9 @@ TEST(KiwiCpp, TagRoundTrip)
 TEST(KiwiCpp, UserTag)
 {
 	KiwiBuilder kw{ MODEL_PATH, 0, BuildOption::default_, ModelType::none, };
-	EXPECT_TRUE(kw.addWord(u"사용자태그", POSTag::user0, 10.f).second);
-	EXPECT_TRUE(kw.addWord(u"이것도유저", POSTag::user1, 10.f).second);
-	EXPECT_TRUE(kw.addWord(u"특수한표지", POSTag::user2, 10.f).second);
+	EXPECT_TRUE(kw.addWord(u"사용자태그", POSTag::user0, 20.f).second);
+	EXPECT_TRUE(kw.addWord(u"이것도유저", POSTag::user1, 20.f).second);
+	EXPECT_TRUE(kw.addWord(u"특수한표지", POSTag::user2, 20.f).second);
 	auto kiwi = kw.build();
 	auto res = kiwi.analyze(u"사용자태그를 사용할때는 특수한표지를 넣는다. 이것도유저의 권리이다.", 1, Match::allWithNormalizing);
 
@@ -1495,7 +1495,7 @@ TEST(KiwiCpp, ZCoda)
 			auto res3 = kiwi.analyze(s.second, (Match::allWithNormalizing | Match::oovChrFreqModel) & ~Match::zCoda);
 			EXPECT_GE(res1.second - kiwi.getGlobalConfig().typoCostWeight, res2.second);
 			EXPECT_GT(res2.second, res3.second);
-			EXPECT_EQ(res2.first[res2.first.size() - 2].tag, POSTag::z_coda);
+			EXPECT_EQ(res2.first[res2.first.size() - 2].tag, POSTag::z_coda) << " for input: " << utf16To8(s.second) << " expected z_coda, got " << utf16To8(res2.first[res2.first.size() - 2].str) << std::endl;
 		}
 	}
 }
