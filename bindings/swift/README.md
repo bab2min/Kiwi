@@ -33,7 +33,7 @@
 ```swift
 // Package.swift
 dependencies: [
-    .package(url: "https://github.com/bab2min/Kiwi.git", from: "0.22.0")
+    .package(url: "https://github.com/bab2min/Kiwi.git", from: "0.24.0")
 ],
 targets: [
     .target(

@@ -762,12 +762,13 @@ TEST(KiwiCpp, TagRoundTrip)
 TEST(KiwiCpp, UserTag)
 {
 	KiwiBuilder kw{ MODEL_PATH, 0, BuildOption::default_, ModelType::none, };
-	EXPECT_TRUE(kw.addWord(u"사용자태그", POSTag::user0, 10.f).second);
-	EXPECT_TRUE(kw.addWord(u"이것도유저", POSTag::user1, 10.f).second);
-	EXPECT_TRUE(kw.addWord(u"특수한표지", POSTag::user2, 10.f).second);
+	EXPECT_TRUE(kw.addWord(u"사용자태그", POSTag::user0, 20.f).second);
+	EXPECT_TRUE(kw.addWord(u"이것도유저", POSTag::user1, 20.f).second);
+	EXPECT_TRUE(kw.addWord(u"특수한표지", POSTag::user2, 20.f).second);
 	auto kiwi = kw.build();
-	auto tokens = kiwi.analyze(u"사용자태그를 사용할때는 특수한표지를 넣는다. 이것도유저의 권리이다.", Match::allWithNormalizing).first;
+	auto res = kiwi.analyze(u"사용자태그를 사용할때는 특수한표지를 넣는다. 이것도유저의 권리이다.", 1, Match::allWithNormalizing);
 
+	auto& tokens = res[0].first;
 	EXPECT_EQ(tokens[0].str, u"사용자태그");
 	EXPECT_EQ(tokens[0].tag, POSTag::user0);
 	EXPECT_EQ(tokens[12].str, u"이것도유저");
@@ -1011,9 +1012,9 @@ TEST(KiwiCpp, SentenceBoundaryWithOrderedBullet)
 		u"가. 편당 요금을 지불한다.  나. 편당 요금을 지불한다.  다. 편당 요금을 지불한다.",
 		u"가) 편당 요금을 지불한다.  나) 편당 요금을 지불한다.  다) 편당 요금을 지불한다.",
 		u"1) 편당 요금을 지불한다.  2) 편당 요금을 지불한다.  3) 편당 요금을 지불한다.",
-		//u"가. 편당 요금을 지불한다  나. 편당 요금을 지불한다  다. 편당 요금을 지불한다",
+		u"가. 편당 요금을 지불한다  나. 편당 요금을 지불한다  다. 편당 요금을 지불한다",
 		u"가) 편당 요금을 지불한다  나) 편당 요금을 지불한다  다) 편당 요금을 지불한다",
-		//u"1) 편당 요금을 지불한다  2) 편당 요금을 지불한다  3) 편당 요금을 지불한다",
+		u"1) 편당 요금을 지불한다  2) 편당 요금을 지불한다  3) 편당 요금을 지불한다",
 		u"가. 편당 요금을 지불  나. 편당 요금을 지불  다. 편당 요금을 지불",
 		u"가) 편당 요금을 지불  나) 편당 요금을 지불  다) 편당 요금을 지불",
 		u"1) 편당 요금을 지불  2) 편당 요금을 지불  3) 편당 요금을 지불",
@@ -1494,7 +1495,7 @@ TEST(KiwiCpp, ZCoda)
 			auto res3 = kiwi.analyze(s.second, (Match::allWithNormalizing | Match::oovChrFreqModel) & ~Match::zCoda);
 			EXPECT_GE(res1.second - kiwi.getGlobalConfig().typoCostWeight, res2.second);
 			EXPECT_GT(res2.second, res3.second);
-			EXPECT_EQ(res2.first[res2.first.size() - 2].tag, POSTag::z_coda);
+			EXPECT_EQ(res2.first[res2.first.size() - 2].tag, POSTag::z_coda) << " for input: " << utf16To8(s.second) << " expected z_coda, got " << utf16To8(res2.first[res2.first.size() - 2].str) << std::endl;
 		}
 	}
 }
@@ -1847,14 +1848,14 @@ TEST(KiwiCpp, JoinAffix)
 TEST(KiwiCpp, JoinParticleYo)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
-	auto sample1 = u"밥을 먹는다던가요";
-	auto res_without = kiwi.analyze(sample1, Match::none).first;
+	auto sample1 = u"밥을 먹을까요";
+	auto res_without = kiwi.analyze(sample1, Match::splitComplex).first;
 	auto res_with = kiwi.analyze(sample1, Match::joinParticleYo).first;
-	
-	EXPECT_EQ(res_without[res_without.size() - 2].str, u"는다던가");
+
+	EXPECT_EQ(res_without[res_without.size() - 2].str, u"을까");
 	EXPECT_EQ(res_without[res_without.size() - 1].str, u"요");
 
-	EXPECT_EQ(res_with[res_with.size() - 1].str, u"는다던가요");
+	EXPECT_EQ(res_with[res_with.size() - 1].str, u"을까요");
 }
 
 TEST(KiwiCpp, CompatibleJamo)

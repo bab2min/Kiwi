@@ -18,6 +18,23 @@ namespace kiwi
 
 	namespace qgemm
 	{
+		// 아래 두 헬퍼는 x86 SIMD 구현(_mm_mulhrs_epi16 / _mm_sign_epi16)과 결과를 비트 단위로
+		// 일치시키기 위한 것. 단순히 `v / 9`로 계산하면 곱수 절단(32768/9 = 3640.888... -> 3640)과
+		// 반올림 방식(최근접 반올림 vs 0 방향 절단) 차이 때문에 +-1 만큼 어긋날 수 있음.
+		static constexpr int16_t divideBy9 = 32768 / 9;
+
+		// _mm_mulhrs_epi16 와 동일: round(a * b / 2^15)
+		static FORCE_INLINE int16_t mulhrs(int16_t a, int16_t b)
+		{
+			return static_cast<int16_t>(((static_cast<int32_t>(a) * b >> 14) + 1) >> 1);
+		}
+
+		// _mm_sign_epi16(4, v) 와 동일: v가 0일 때는 바이어스를 더하지 않는다
+		static FORCE_INLINE int16_t signBias(int16_t v)
+		{
+			return v > 0 ? 4 : (v < 0 ? -4 : 0);
+		}
+
 		template<>
 		float requantizePackedU4<ArchType::none>(
 			size_t n,
@@ -31,7 +48,6 @@ namespace kiwi
 		{
 			const int8_t zeropointBias = 6;
 			const uint8_t scaleBias = 9;
-			const int16_t scaleDivider = 9;
 			for (size_t i = 0; i < n / 2; ++i)
 			{
 				const uint8_t packed = packedInput[i];
@@ -42,11 +58,11 @@ namespace kiwi
 				scale = (scale & 0x3F) + scaleBias;
 				
 				lower = (lower - lzp) * scale;
-				lower += (lower >= 0) ? 4 : -4; // for round up
-				lower /= scaleDivider;
+				lower += signBias(lower);
+				lower = mulhrs(lower, divideBy9);
 				upper = (upper - lzp) * scale;
-				upper += (upper >= 0) ? 4 : -4; // for round up
-				upper /= scaleDivider;
+				upper += signBias(upper);
+				upper = mulhrs(upper, divideBy9);
 				if (toUint8)
 				{
 					lower += 128;
