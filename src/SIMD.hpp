@@ -823,7 +823,7 @@ namespace kiwi
             static STRONG_INLINE float32x4_t subf(float32x4_t a, float32x4_t b) { return vsubq_f32(a, b); }
             static STRONG_INLINE float32x4_t mulf(float32x4_t a, float32x4_t b) { return vmulq_f32(a, b); }
             static STRONG_INLINE float32x4_t divf(float32x4_t a, float32x4_t b) { return vdivq_f32(a, b); }
-            static STRONG_INLINE float32x4_t maddf(float32x4_t a, float32x4_t b, float32x4_t c) { return addf(mulf(a, b), c); }
+            static STRONG_INLINE float32x4_t maddf(float32x4_t a, float32x4_t b, float32x4_t c) { return vfmaq_f32(c, a, b); }
             static STRONG_INLINE int32x4_t set1i(int32_t a) { return vdupq_n_s32(a); }
             static STRONG_INLINE float32x4_t set1f(float a) { return vdupq_n_f32(a); }
             static STRONG_INLINE float32x4_t loadf(const float* a) { return vld1q_f32(a); }
