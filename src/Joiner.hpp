@@ -11,6 +11,54 @@ namespace kiwi
 {
 	namespace cmb
 	{
+		// 형태소 l 뒤에 r이 올 때 반드시 띄어써야 하는지. Joiner의 자동 띄어쓰기와 GenerativeMADataset이 함께 쓴다.
+		inline bool isSpaceInsertable(POSTag l, POSTag r, U16StringView rform)
+		{
+			if (l == r && (POSTag::sf <= l && l <= POSTag::sn)) return true;
+			if (r == POSTag::vcp) return false;
+			if (r == POSTag::xsa || r == POSTag::xsai || r == POSTag::xsv || r == POSTag::xsn) return isJClass(l);
+			if (l == POSTag::xpn || l == POSTag::so || l == POSTag::ss || l == POSTag::sw) return false;
+			if (l == POSTag::sn && r == POSTag::nnb) return false;
+			if (!(l == POSTag::sn || l == POSTag::sl)
+				&& (r == POSTag::sl || r == POSTag::sn)) return true;
+			if (l == POSTag::sn && r == POSTag::nr) return false;
+			if (l == POSTag::sso || l == POSTag::ssc) return false;
+			if (r == POSTag::sso) return true;
+			if ((isJClass(l) || isEClass(l)) && r == POSTag::ss) return true;
+			if (l == POSTag::z_siot && isNNClass(r)) return false;
+
+			if (r == POSTag::vx && rform.size() == 1 && (rform[0] == u'하' || rform[0] == u'지')) return false;
+
+			switch (r)
+			{
+			case POSTag::nng:
+			case POSTag::nnp:
+			case POSTag::nnb:
+			case POSTag::np:
+			case POSTag::nr:
+			case POSTag::mag:
+			case POSTag::maj:
+			case POSTag::mm:
+			case POSTag::ic:
+			case POSTag::vv:
+			case POSTag::va:
+			case POSTag::vx:
+			case POSTag::vcn:
+			case POSTag::xpn:
+			case POSTag::xr:
+			case POSTag::sw:
+			case POSTag::sh:
+			case POSTag::w_email:
+			case POSTag::w_hashtag:
+			case POSTag::w_url:
+			case POSTag::w_mention:
+				return true;
+			default:
+				return false;
+			}
+			return false;
+		}
+
 		inline const char16_t* reprFormForTag(POSTag tag)
 		{
 			switch (tag)

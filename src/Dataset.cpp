@@ -1,8 +1,10 @@
 ﻿#include <kiwi/Dataset.h>
+#include <kiwi/BpeTokenizer.h>
 #include <kiwi/SubstringExtractor.h>
 #include "FrozenTrie.hpp"
 #include "RaggedVector.hpp"
 #include "StrUtils.h"
+#include "Joiner.hpp"
 
 using namespace kiwi;
 
@@ -1224,7 +1226,8 @@ std::vector<float> ChrDataset::getVocabProbs(double epsilon) const
 
 std::vector<std::pair<std::vector<uint32_t>, double>> ChrDataset::extractPrefixes(
 	float resolution, float minWeight,
-	size_t maxLength, size_t numWorkers, bool exclusiveCnt) const
+	size_t maxLength, size_t numWorkers, bool exclusiveCnt,
+	const std::vector<std::pair<uint32_t, uint32_t>>* mergeTargets) const
 {
 	using Pair = std::pair<std::vector<uint32_t>, double>;
 	std::vector<Pair> ret;
@@ -1302,4 +1305,346 @@ std::vector<std::pair<std::vector<uint32_t>, double>> ChrDataset::extractPrefixe
 		return a.second > b.second;
 	});
 	return ret;
+}
+
+static_assert(sizeof(RaggedVector<char16_t>) == sizeof(Vector<size_t>) * 2,
+	"the inline storage of `GenerativeMADataset::sents` no longer fits `RaggedVector<char16_t>`");
+
+constexpr int32_t GenerativeMADataset::padToken;
+
+GenerativeMADataset::GenerativeMADataset(
+	const BpeTokenizer& _tokenizer,
+	const GenerativeMAOption& _option,
+	size_t _batchSize,
+	size_t _maxSeqLength,
+	size_t _workers,
+	const TypoTransformer& _typos
+)
+	: tokenizer{ std::make_shared<BpeTokenizer>(_tokenizer) },
+	// 내부 포인터가 자기 문자열 풀을 가리키므로 옮기지 않고 제자리에서 만든다.
+	typoGenerator{ _option.typoProb > 0 && !_typos.empty() ? std::make_shared<PreparedTypoTransformer>(_typos, false) : nullptr },
+	workers{ _workers ? make_unique<utils::ThreadPool>(_workers) : nullptr },
+	locals( _workers ? _workers : 1 ),
+	option{ _option },
+	batchSize{ _batchSize },
+	maxSeqLength{ _maxSeqLength }
+{
+	rng.seed(currentSeed);
+}
+
+GenerativeMADataset::~GenerativeMADataset() = default;
+
+GenerativeMADataset::GenerativeMADataset(GenerativeMADataset&&) /*noexcept*/ = default;
+
+GenerativeMADataset& GenerativeMADataset::operator=(GenerativeMADataset&&) /*noexcept*/ = default;
+
+void GenerativeMADataset::addSentence(std::string_view sentence)
+{
+	thread_local std::u16string buf;
+	utf8To16(sentence, buf);
+	addSentence(std::u16string_view{ buf });
+}
+
+void GenerativeMADataset::addSentence(std::u16string_view sentence)
+{
+	auto& s = sents.get();
+	s.emplace_back();
+	s.insert_data(sentence.begin(), sentence.end());
+}
+
+size_t GenerativeMADataset::numSents() const
+{
+	return sents.get().size();
+}
+
+size_t GenerativeMADataset::numEstimBatches() const
+{
+	if (!batchSize) return 0;
+	return (numSents() * 2 + batchSize - 1) / batchSize;
+}
+
+size_t GenerativeMADataset::vocabSize() const
+{
+	return tokenizer ? tokenizer->getVocab().size() : 0;
+}
+
+void GenerativeMADataset::seed(size_t newSeed)
+{
+	currentSeed = newSeed;
+	rng.seed(newSeed);
+}
+
+void GenerativeMADataset::reset()
+{
+	while (!futures.empty())
+	{
+		futures.front().get();
+		futures.pop_front();
+	}
+	current = WorkItem{};
+	consumedRows = 0;
+	passedSents = 0;
+	truncatedSents = 0;
+	insertedTypos = 0;
+	removedSpaces = 0;
+	insertedSpaces = 0;
+
+	// rng를 다시 seed하지 않아야 epoch마다 다른 순서로 섞인다.
+	if (shuffledIdx.size() < numSents())
+	{
+		const size_t s = shuffledIdx.size();
+		shuffledIdx.resize(numSents());
+		std::iota(shuffledIdx.begin() + s, shuffledIdx.end(), (uint32_t)s);
+	}
+	std::shuffle(shuffledIdx.begin(), shuffledIdx.end(), rng);
+}
+
+uint32_t GenerativeMADataset::tagTokenId(POSTag tag) const
+{
+	const auto id = option.posTagTokenIds[(uint8_t)tag];
+	if (id) return id;
+	return option.posTagTokenIds[(uint8_t)clearIrregular(tag)];
+}
+
+size_t GenerativeMADataset::sentsPerWorkItem() const
+{
+	// 문장 하나가 2행을 만든다. 작업 단위가 너무 잘게 나뉘지 않도록 하한을 둔다.
+	return std::max((size_t)8, (batchSize + 1) / 2);
+}
+
+static void appendRow(Vector<int32_t>& out,
+	uint32_t bos,
+	const uint32_t* first, size_t firstSize,
+	uint32_t sep,
+	const uint32_t* second, size_t secondSize,
+	uint32_t eos,
+	size_t maxSeqLength)
+{
+	const size_t base = out.size();
+	out.resize(base + maxSeqLength, GenerativeMADataset::padToken);
+	auto p = out.begin() + base;
+	const auto end = p + maxSeqLength;
+	const auto putOne = [&](uint32_t t) { if (p != end) *p++ = (int32_t)t; };
+	const auto putAll = [&](const uint32_t* b, size_t n)
+	{
+		n = std::min(n, (size_t)(end - p));
+		p = std::copy(b, b + n, p);
+	};
+	putOne(bos);
+	putAll(first, firstSize);
+	putOne(sep);
+	putAll(second, secondSize);
+	putOne(eos);
+}
+
+// 어절 사이의 공백 덩어리를 지우거나 공백이 아닌 두 글자 사이에 공백을 넣는다.
+// 서로게이트 쌍의 뒷글자나 결합 문자처럼 앞 글자에 붙어야 하는 글자 앞에는 넣지 않는다.
+static void perturbSpaces(std::u16string& out, std::u16string_view text,
+	float removeProb, float insertProb, std::mt19937_64& rng,
+	size_t& numRemoved, size_t& numInserted)
+{
+	const auto attachesToPrev = [](char16_t c)
+	{
+		return isLowSurrogate(c)
+			|| (0x0300 <= c && c <= 0x036F) // 결합 분음 부호
+			|| c == 0x200D // 폭 없는 결합자(ZWJ)
+			|| (0xFE00 <= c && c <= 0xFE0F) // 이체자 선택자
+			|| (0x1160 <= c && c <= 0x11FF) // 첫가끝 한글의 중성, 종성
+			|| (0xD7B0 <= c && c <= 0xD7FF);
+	};
+	std::bernoulli_distribution removeSpace{ removeProb }, insertSpace{ insertProb };
+
+	out.clear();
+	for (size_t i = 0; i < text.size(); )
+	{
+		if (isSpace(text[i]))
+		{
+			size_t j = i;
+			while (j < text.size() && isSpace(text[j])) ++j;
+			if (i > 0 && j < text.size() && removeProb > 0 && removeSpace(rng)) ++numRemoved;
+			else out.append(text.begin() + i, text.begin() + j);
+			i = j;
+			continue;
+		}
+
+		out.push_back(text[i]);
+		const size_t next = i + 1;
+		if (insertProb > 0 && next < text.size() && !isSpace(text[next])
+			&& !isHighSurrogate(text[i]) && text[i] != 0x200D && !attachesToPrev(text[next])
+			&& insertSpace(rng))
+		{
+			out.push_back(u' ');
+			++numInserted;
+		}
+		i = next;
+	}
+}
+
+GenerativeMADataset::WorkItem GenerativeMADataset::buildWorkItem(size_t localId, size_t sentFirst, size_t sentLast, uint64_t seed)
+{
+	// 한 행에서 bos, 구분자, eos가 차지하는 자리
+	constexpr size_t rowOverhead = 3;
+	auto& local = locals[localId];
+	const auto& allSents = sents.get();
+	const AnalyzeOption analyzeOption;
+	std::mt19937_64 itemRng{ seed };
+	WorkItem ret;
+	ret.data.reserve((sentLast - sentFirst) * 2 * maxSeqLength);
+
+	for (size_t i = sentFirst; i < sentLast; ++i)
+	{
+		const auto sent = allSents[shuffledIdx[i]];
+		local.u16Buf.assign(sent.begin(), sent.end());
+		if (local.u16Buf.empty()) continue;
+
+		local.textBuf = utf16To8(local.u16Buf);
+		local.surfaceBuf.clear();
+		tokenizer->encode(local.surfaceBuf, local.textBuf);
+		if (local.surfaceBuf.empty()) continue;
+
+		const auto res = kiwiInst->analyze(local.u16Buf, analyzeOption);
+		local.morphemeBuf.clear();
+		POSTag prevTag = POSTag::unknown;
+		for (auto& t : res.first)
+		{
+			if (t.str.empty()) continue;
+			// Joiner가 띄어쓰는 자리에만 공백을 붙인다. 실제 문장에서의 모습대로 토큰화되어 토큰 수도 줄어든다.
+			const bool insertSpace = !local.morphemeBuf.empty()
+				&& cmb::isSpaceInsertable(clearIrregular(prevTag), clearIrregular(t.tag), toStringView(t.str));
+			prevTag = t.tag;
+			local.formBuf.assign(insertSpace ? 1 : 0, ' ');
+			local.formBuf += utf16To8(t.str);
+			tokenizer->encode(local.morphemeBuf, local.formBuf);
+			local.morphemeBuf.emplace_back(tagTokenId(t.tag));
+		}
+		if (local.morphemeBuf.empty()) continue;
+
+		// 잡음은 ToMorpheme 방향의 입력에만 넣는다. ToSurface 방향의 출력까지 더럽히면 모델이 잡음을 만들어내도록 배운다.
+		const std::u16string* inputText = &local.u16Buf;
+		if (typoGenerator)
+		{
+			const size_t numTypos = typoGenerator->sampleTypos(local.noisyBuf, local.u16Buf, option.typoProb, itemRng, option.typoCostThreshold, option.typoCostScale);
+			if (numTypos)
+			{
+				ret.numTypos += numTypos;
+				inputText = &local.noisyBuf;
+			}
+		}
+		// 오타 규칙의 조건이 원래 띄어쓰기로 판단되도록 띄어쓰기는 오타 다음에 흐트러뜨린다.
+		if (option.spaceRemoveProb > 0 || option.spaceInsertProb > 0)
+		{
+			size_t removed = 0, inserted = 0;
+			perturbSpaces(local.spacedBuf, *inputText, option.spaceRemoveProb, option.spaceInsertProb, itemRng, removed, inserted);
+			if (removed || inserted)
+			{
+				ret.numRemovedSpaces += removed;
+				ret.numInsertedSpaces += inserted;
+				inputText = &local.spacedBuf;
+			}
+		}
+
+		const std::vector<uint32_t>* inputSurface = &local.surfaceBuf;
+		if (inputText != &local.u16Buf)
+		{
+			local.noisySurfaceBuf.clear();
+			tokenizer->encode(local.noisySurfaceBuf, utf16To8(*inputText));
+			inputSurface = &local.noisySurfaceBuf;
+		}
+
+		if (std::max(inputSurface->size(), local.surfaceBuf.size()) + local.morphemeBuf.size() + rowOverhead > maxSeqLength)
+		{
+			++ret.numTruncatedSents;
+		}
+
+		appendRow(ret.data, option.bosTokenId,
+			inputSurface->data(), inputSurface->size(), option.toMorphemeTokenId,
+			local.morphemeBuf.data(), local.morphemeBuf.size(), option.eosTokenId, maxSeqLength);
+		appendRow(ret.data, option.bosTokenId,
+			local.morphemeBuf.data(), local.morphemeBuf.size(), option.toSurfaceTokenId,
+			local.surfaceBuf.data(), local.surfaceBuf.size(), option.eosTokenId, maxSeqLength);
+		ret.numRows += 2;
+	}
+	return ret;
+}
+
+bool GenerativeMADataset::prepareMore()
+{
+	const size_t total = shuffledIdx.size();
+	if (workers)
+	{
+		const size_t maxInFlight = workers->size() * 2;
+		while (futures.size() < maxInFlight && passedSents < total)
+		{
+			const size_t first = passedSents;
+			const size_t last = std::min(first + sentsPerWorkItem(), total);
+			passedSents = last;
+			const uint64_t seed = rng();
+			futures.emplace_back(workers->enqueue([this, first, last, seed](size_t threadId)
+			{
+				return buildWorkItem(threadId, first, last, seed);
+			}));
+		}
+		if (futures.empty()) return false;
+		current = futures.front().get();
+		futures.pop_front();
+	}
+	else
+	{
+		if (passedSents >= total) return false;
+		const size_t first = passedSents;
+		passedSents = std::min(first + sentsPerWorkItem(), total);
+		current = buildWorkItem(0, first, passedSents, rng());
+	}
+	consumedRows = 0;
+	truncatedSents += current.numTruncatedSents;
+	insertedTypos += current.numTypos;
+	removedSpaces += current.numRemovedSpaces;
+	insertedSpaces += current.numInsertedSpaces;
+	return true;
+}
+
+template<class Ty>
+size_t GenerativeMADataset::_next(Ty* inputIds)
+{
+	if (!batchSize || !maxSeqLength)
+	{
+		throw std::invalid_argument{ "`batchSize` and `maxSeqLength` must be greater than 0" };
+	}
+
+	if (!kiwiInst || !kiwiInst->ready() || !tokenizer || !tokenizer->ready())
+	{
+		throw std::runtime_error{ "GenerativeMADataset must be created by `KiwiBuilder::makeGenerativeMADataset`" };
+	}
+
+	// reset() 전이거나 reset() 이후 문장이 추가된 경우
+	if (shuffledIdx.size() != numSents()) reset();
+
+	size_t written = 0;
+	while (written < batchSize)
+	{
+		// 공백뿐인 문장만 모여 행이 0개인 작업 단위라면 다시 이 조건에 걸려 다음 것을 채운다.
+		if (consumedRows >= current.numRows)
+		{
+			if (!prepareMore()) break;
+			continue;
+		}
+
+		const size_t n = std::min(current.numRows - consumedRows, batchSize - written);
+		std::copy(current.data.begin() + consumedRows * maxSeqLength,
+			current.data.begin() + (consumedRows + n) * maxSeqLength,
+			inputIds + written * maxSeqLength);
+		consumedRows += n;
+		written += n;
+	}
+	return written;
+}
+
+size_t GenerativeMADataset::next(int32_t* input_ids)
+{
+	return _next(input_ids);
+}
+
+size_t GenerativeMADataset::next(int64_t* input_ids)
+{
+	return _next(input_ids);
 }

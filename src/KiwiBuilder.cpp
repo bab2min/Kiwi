@@ -5,6 +5,7 @@
 #include <kiwi/Kiwi.h>
 #include <kiwi/Utils.h>
 #include <kiwi/Dataset.h>
+#include <kiwi/BpeTokenizer.h>
 #include <kiwi/Knlm.h>
 #include "ArchAvailable.h"
 #include "KTrie.h"
@@ -3130,6 +3131,29 @@ HSDataset KiwiBuilder::makeHSDataset(const vector<string>& inputPathes,
 			splitDataset->contextualMapper = dataset.contextualMapper;
 		}
 	}
+	return dataset;
+}
+
+GenerativeMADataset KiwiBuilder::makeGenerativeMADataset(
+	const BpeTokenizer& tokenizer,
+	const GenerativeMAOption& option,
+	size_t batchSize,
+	size_t maxSeqLength,
+	size_t numWorkers,
+	const TypoTransformer& typos
+) const
+{
+	if (!tokenizer.ready()) throw invalid_argument{ "`tokenizer` is not ready" };
+	if (!batchSize) throw invalid_argument{ "`batchSize` must be greater than 0" };
+	if (!maxSeqLength) throw invalid_argument{ "`maxSeqLength` must be greater than 0" };
+	if (!(0 <= option.typoProb && option.typoProb <= 1)) throw invalid_argument{ "`option.typoProb` must be in [0, 1]" };
+	if (option.typoProb > 0 && typos.empty()) throw invalid_argument{ "`typos` must not be empty when `option.typoProb` > 0" };
+	if (!(option.typoCostScale >= 0 && std::isfinite(option.typoCostScale))) throw invalid_argument{ "`option.typoCostScale` must be a non-negative finite number" };
+	if (!(0 <= option.spaceRemoveProb && option.spaceRemoveProb <= 1)) throw invalid_argument{ "`option.spaceRemoveProb` must be in [0, 1]" };
+	if (!(0 <= option.spaceInsertProb && option.spaceInsertProb <= 1)) throw invalid_argument{ "`option.spaceInsertProb` must be in [0, 1]" };
+
+	GenerativeMADataset dataset{ tokenizer, option, batchSize, maxSeqLength, numWorkers, typos };
+	dataset.kiwiInst = make_shared<Kiwi>(build());
 	return dataset;
 }
 

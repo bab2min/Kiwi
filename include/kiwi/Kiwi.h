@@ -39,6 +39,9 @@ namespace kiwi
 	struct KGraphNode;
 	struct WordInfo;
 	class HSDataset;
+	class GenerativeMADataset;
+	struct GenerativeMAOption;
+	class BpeTokenizer;
 
 	struct HSDatasetOption
 	{
@@ -1032,6 +1035,27 @@ namespace kiwi
 			const std::vector<std::pair<size_t, std::vector<uint32_t>>>& contextualMapper = {},
 			HSDataset* splitDataset = nullptr,
 			const std::vector<std::pair<std::pair<std::string, POSTag>, std::vector<std::pair<std::string, POSTag>>>>* transform = nullptr
+		) const;
+
+		/**
+		 * @brief 생성형 형태소 분석 모델 학습용 데이터셋을 생성한다.
+		 *
+		 * @param tokenizer 문장 및 형태소열을 토큰화하는 데에 사용할 BpeTokenizer. 내부에 복사되어 보관된다.
+		 * @param option 토큰열에 삽입될 특수 토큰(<|ToMorpheme|>, <|ToSurface|>, 품사 태그)의 ID
+		 * @param batchSize 한 배치에 포함될 데이터의 개수
+		 * @param maxSeqLength 한 데이터의 최대 길이. 이를 초과하는 문장은 데이터셋에서 제외된다.
+		 * @param numWorkers 형태소 분석 및 토큰화에 사용할 스레드 개수. 0인 경우 별도의 스레드를 사용하지 않는다.
+		 * @param typos 원문에 오타를 넣을 때 쓸 오타 규칙. `option.typoProb`가 0보다 큰 경우에만 쓰이며,
+		 *              이때 비어있으면 안 된다. 예: `getDefaultTypoSet(DefaultTypoSet::basicTypoSetWithContinual)`
+		 * @return 문장이 하나도 추가되지 않은 빈 GenerativeMADataset. `addSentence`로 문장을 추가한 뒤 사용한다.
+		 */
+		GenerativeMADataset makeGenerativeMADataset(
+			const BpeTokenizer& tokenizer,
+			const GenerativeMAOption& option,
+			size_t batchSize,
+			size_t maxSeqLength,
+			size_t numWorkers = 0,
+			const TypoTransformer& typos = {}
 		) const;
 
 		BuildOption getOptions() const { return options; }

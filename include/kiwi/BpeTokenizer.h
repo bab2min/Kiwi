@@ -24,15 +24,33 @@ namespace kiwi
 	{
 		std::vector<std::string> vocab;
 		std::unordered_map<uint64_t, MergeRule> merges;
+
+		// Open-addressed copy of `merges` that encode() probes; built once by the constructor.
+		struct MergeSlot
+		{
+			uint64_t key;
+			MergeRule rule;
+		};
+		std::vector<MergeSlot> mergeTable;
+		size_t mergeTableMask = 0;
+
 		bool addPrefixSpace = false;
+		// Trained with useJamoAlphabet, so encode() must decompose Hangul too. Persisted as the "nfd_for_hangul" normalizer.
+		bool nfdForHangul = false;
 
 		template<class It>
 		std::string decode(It first, It last, bool ignoreErrors = true) const;
 
+		void buildMergeTable();
+		const MergeRule* findMerge(uint32_t a, uint32_t b) const;
+
 	public:
 		BpeTokenizer() = default;
-		BpeTokenizer(std::vector<std::string> vocab, std::unordered_map<uint64_t, MergeRule> merges, bool addPrefixSpace = false)
-			: vocab(std::move(vocab)), merges(std::move(merges)), addPrefixSpace(addPrefixSpace) {}
+		BpeTokenizer(std::vector<std::string> vocab, std::unordered_map<uint64_t, MergeRule> merges, bool addPrefixSpace = false, bool nfdForHangul = false)
+			: vocab(std::move(vocab)), merges(std::move(merges)), addPrefixSpace(addPrefixSpace), nfdForHangul(nfdForHangul)
+		{
+			buildMergeTable();
+		}
 
 		bool ready() const;
 
@@ -43,6 +61,8 @@ namespace kiwi
 		std::string decode(const uint32_t* ids, size_t length, bool ignoreErrors = true) const;
 
 		const std::vector<std::string>& getVocab() const { return vocab; }
+
+		bool isNfdForHangul() const { return nfdForHangul; }
 
 		std::ostream& save(std::ostream& ostr) const;
 		static BpeTokenizer load(std::istream& istr);
@@ -73,7 +93,7 @@ namespace kiwi
 		// -1 selects std::thread::hardware_concurrency(), 0 disables threading, and any positive value is the number of threads to use.
 		size_t numThreads = 0;
 		size_t batchSize = 64;
-		// Use 64-bit per-chunk counters (16-byte slots) instead of the default 32-bit counters (8-byte slots) if true.
+		// 64-bit counters (16-byte slots) instead of 32-bit ones (8-byte slots).
 		bool largeCounter = false;
 	};
 
@@ -87,24 +107,10 @@ namespace kiwi
 		mergeEnd,
 	};
 
-	// Called as (event, current, total).  `total` is zero when it cannot be known
-	// in advance, so a consumer must treat zero as "indeterminate" rather than
-	// dividing by it.
-	//
-	//   pretokenize*  emitted by addSentences, one `pretokenizeProgress` per batch.
-	//                 `current` counts the sentences consumed so far by this call;
-	//                 `total` is always zero, since the feeder announces no length.
-	//   merge*        emitted by build().  `current` is the vocabulary size, which
-	//                 starts at 256 (the byte alphabet), and `total` is the
-	//                 configured vocabSize, or zero when it is unbounded.
-	//                 `mergeProgress` is throttled to roughly 1000 events.
-	//
-	// Both `*End` events report `current == total` with the value actually reached,
-	// which may fall short of the configured target if the corpus runs out of
-	// mergeable pairs first.
-	//
-	// The callback always runs on the thread that called addSentences/build, never
-	// on a worker.  An exception thrown from it propagates out of that call.
+	// Called as (event, current, total); `total` is 0 when it can't be known in advance.
+	//   pretokenize*: from addSentences, `current` = sentences consumed so far.
+	//   merge*: from build(), `current` = vocabulary size (starting at 256), `total` = vocabSize.
+	// Always runs on the calling thread; an exception propagates out of that call.
 	using BpeTokenizerTrainerEventCallback = std::function<void(BpeTokenizerTrainerEvent, size_t, size_t)>;
 
 	class BpeTokenizerTrainer
@@ -122,11 +128,8 @@ namespace kiwi
 		BpeTokenizerTrainer(const BpeTrainerConfig& config, const Kiwi* kiwi = nullptr, BpeTokenizerTrainerEventCallback callback = {});
 		~BpeTokenizerTrainer();
 
-		// Consumes sentences from `feeder` until it returns an empty string, which is
-		// the end-of-input sentinel; `feeder` is not called again afterwards.  A blank
-		// line in the middle of a corpus therefore terminates collection, so callers
-		// must filter empty lines out themselves.  Returns the number of sentences
-		// consumed (excluding the terminating sentinel).
+		// Reads until `feeder` returns an empty string, so callers must filter out blank lines themselves.
+		// Returns the number of sentences read.
 		size_t addSentences(const std::function<std::string()>& feeder);
 		size_t addSentences(const std::function<std::u16string()>& feeder);
 

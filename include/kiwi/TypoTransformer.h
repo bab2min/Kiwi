@@ -11,6 +11,7 @@
 #include "Trie.hpp"
 #include "FrozenTrie.h"
 #include "Utils.h"
+#include <random>
 
 namespace kiwi
 {
@@ -243,6 +244,17 @@ namespace kiwi
 		* @param costThreshold 생성할 오타 후보의 비용 상한
 		*/
 		TypoCandidates<true> generate(const std::u16string& orig, float costThreshold = 2.5f) const;
+
+		/**
+		* @brief 오타가 발생할 수 있는 지점마다 `typoProb`의 확률로 오타를 하나씩 무작위로 삽입합니다.
+		* 
+		* @param costScale 각 지점의 후보는 exp(-costScale * cost)에 비례하는 확률로 뽑힙니다. 0이면 균등하게 뽑습니다.
+		* @return 삽입된 오타의 개수
+		* @note `generate`와 달리 적용 조건을 모두 검사하며, 방언 규칙과 어절 경계 조건 규칙, 받침이 음절에 합쳐지지 못하는
+		*		결과를 내는 규칙은 쓰지 않습니다. `prepare(false)`로 준비한 경우에만 의미가 있습니다.
+		*/
+		size_t sampleTypos(std::u16string& out, const std::u16string& orig, float typoProb, std::mt19937_64& rng, 
+			float costThreshold = 2.5f, float costScale = 1.f) const;
 
 		template<class Alloc>
 		size_t generateGraph(U16StringView normalizedStr, std::vector<TypoGraphNode, Alloc>& graphOut, 
