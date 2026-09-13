@@ -184,6 +184,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>convertHSData</b> (co
 <tr class="memitem:af886c89a6606d7a544e63ce707d17172" id="r_af886c89a6606d7a544e63ce707d17172"><td class="memItemLeft" align="right" valign="top"><a id="af886c89a6606d7a544e63ce707d17172" name="af886c89a6606d7a544e63ce707d17172"></a>
 <a class="el" href="classkiwi_1_1HSDataset.html">HSDataset</a>&#160;</td><td class="memItemRight" valign="bottom"><b>makeHSDataset</b> (const std::vector&lt; std::string &gt; &amp;inputPathes, size_t batchSize, size_t causalContextSize, size_t windowSize, size_t numWorkers, <a class="el" href="structkiwi_1_1HSDatasetOption.html">HSDatasetOption</a> option={}, const TokenFilter &amp;tokenFilter={}, const TokenFilter &amp;windowFilter={}, double splitRatio=0, bool separateDefaultMorpheme=false, const std::string &amp;morphemeDefPath={}, size_t morphemeDefMinCnt=0, const std::vector&lt; std::pair&lt; size_t, std::vector&lt; uint32_t &gt; &gt; &gt; &amp;contextualMapper={}, <a class="el" href="classkiwi_1_1HSDataset.html">HSDataset</a> *splitDataset=nullptr, const std::vector&lt; std::pair&lt; std::pair&lt; std::string, <a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebb">POSTag</a> &gt;, std::vector&lt; std::pair&lt; std::string, <a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebb">POSTag</a> &gt; &gt; &gt; &gt; *transform=nullptr) const</td></tr>
 <tr class="separator:af886c89a6606d7a544e63ce707d17172"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab4ec110e57d192b2e8ed1c57187b1a31" id="r_ab4ec110e57d192b2e8ed1c57187b1a31"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classkiwi_1_1GenerativeMADataset.html">GenerativeMADataset</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1KiwiBuilder.html#ab4ec110e57d192b2e8ed1c57187b1a31">makeGenerativeMADataset</a> (const <a class="el" href="classkiwi_1_1BpeTokenizer.html">BpeTokenizer</a> &amp;tokenizer, const <a class="el" href="structkiwi_1_1GenerativeMAOption.html">GenerativeMAOption</a> &amp;option, size_t batchSize, size_t maxSeqLength, size_t numWorkers=0, const <a class="el" href="classkiwi_1_1TypoTransformer.html">TypoTransformer</a> &amp;typos={}) const</td></tr>
+<tr class="memdesc:ab4ec110e57d192b2e8ed1c57187b1a31"><td class="mdescLeft">&#160;</td><td class="mdescRight">생성형 형태소 분석 모델 학습용 데이터셋을 생성한다.  <br /></td></tr>
+<tr class="separator:ab4ec110e57d192b2e8ed1c57187b1a31"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a03bbda4731d4d0181be0bc560f219a1a" id="r_a03bbda4731d4d0181be0bc560f219a1a"><td class="memItemLeft" align="right" valign="top"><a id="a03bbda4731d4d0181be0bc560f219a1a" name="a03bbda4731d4d0181be0bc560f219a1a"></a>
 <a class="el" href="Types_8h.html#a7b5ed1c7b90b79877f32c8a011c06ff3">BuildOption</a>&#160;</td><td class="memItemRight" valign="bottom"><b>getOptions</b> () const</td></tr>
 <tr class="separator:a03bbda4731d4d0181be0bc560f219a1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -678,6 +681,72 @@ template&lt;class Replacer &gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>추가된 단어의 개수 </dd></dl>
+
+</div>
+</div>
+<a id="ab4ec110e57d192b2e8ed1c57187b1a31" name="ab4ec110e57d192b2e8ed1c57187b1a31"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab4ec110e57d192b2e8ed1c57187b1a31">&#9670;&#160;</a></span>makeGenerativeMADataset()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classkiwi_1_1GenerativeMADataset.html">GenerativeMADataset</a> kiwi::KiwiBuilder::makeGenerativeMADataset </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classkiwi_1_1BpeTokenizer.html">BpeTokenizer</a> &amp;&#160;</td>
+          <td class="paramname"><em>tokenizer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structkiwi_1_1GenerativeMAOption.html">GenerativeMAOption</a> &amp;&#160;</td>
+          <td class="paramname"><em>option</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>batchSize</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>maxSeqLength</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>numWorkers</em> = <code>0</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classkiwi_1_1TypoTransformer.html">TypoTransformer</a> &amp;&#160;</td>
+          <td class="paramname"><em>typos</em> = <code>{}</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>생성형 형태소 분석 모델 학습용 데이터셋을 생성한다. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tokenizer</td><td>문장 및 형태소열을 토큰화하는 데에 사용할 <a class="el" href="classkiwi_1_1BpeTokenizer.html">BpeTokenizer</a>. 내부에 복사되어 보관된다. </td></tr>
+    <tr><td class="paramname">option</td><td>토큰열에 삽입될 특수 토큰(&lt;|ToMorpheme|&gt;, &lt;|ToSurface|&gt;, 품사 태그)의 ID </td></tr>
+    <tr><td class="paramname">batchSize</td><td>한 배치에 포함될 데이터의 개수 </td></tr>
+    <tr><td class="paramname">maxSeqLength</td><td>한 데이터의 최대 길이. 이를 초과하는 문장은 데이터셋에서 제외된다. </td></tr>
+    <tr><td class="paramname">numWorkers</td><td>형태소 분석 및 토큰화에 사용할 스레드 개수. 0인 경우 별도의 스레드를 사용하지 않는다. </td></tr>
+    <tr><td class="paramname">typos</td><td>원문에 오타를 넣을 때 쓸 오타 규칙. <code>option.typoProb</code>가 0보다 큰 경우에만 쓰이며, 이때 비어있으면 안 된다. 예: <code>getDefaultTypoSet(DefaultTypoSet::basicTypoSetWithContinual)</code> </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>문장이 하나도 추가되지 않은 빈 <a class="el" href="classkiwi_1_1GenerativeMADataset.html">GenerativeMADataset</a>. <code>addSentence</code>로 문장을 추가한 뒤 사용한다. </dd></dl>
 
 </div>
 </div>

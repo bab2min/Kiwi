@@ -48,4 +48,6 @@ digraph "include/kiwi/Kiwi.h"
   Node1 -> Node19 [id="edge24_Node000001_Node000019",color="steelblue1",style="solid",tooltip=" "];
   Node19 [id="Node000019",label="TypoTransformer.h",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$TypoTransformer_8h.html",tooltip="오타 교정에 사용되는 TypoTransformer 및 관련 클래스들을 정의합니다."];
   Node19 -> Node9 [id="edge25_Node000019_Node000009",color="steelblue1",style="solid",tooltip=" "];
+  Node19 -> Node20 [id="edge26_Node000019_Node000020",color="steelblue1",style="solid",tooltip=" "];
+  Node20 [id="Node000020",label="random",height=0.2,width=0.4,color="grey60", fillcolor="#E0E0E0", style="filled",tooltip=" "];
 }

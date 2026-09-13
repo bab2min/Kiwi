@@ -31,4 +31,6 @@ digraph "include/kiwi/TypoTransformer.h"
   Node13 [id="Node000013",label="stdexcept",height=0.2,width=0.4,color="grey60", fillcolor="#E0E0E0", style="filled",tooltip=" "];
   Node2 -> Node14 [id="edge13_Node000002_Node000014",color="steelblue1",style="solid",tooltip=" "];
   Node14 [id="Node000014",label="iostream",height=0.2,width=0.4,color="grey60", fillcolor="#E0E0E0", style="filled",tooltip=" "];
+  Node1 -> Node15 [id="edge14_Node000001_Node000015",color="steelblue1",style="solid",tooltip=" "];
+  Node15 [id="Node000015",label="random",height=0.2,width=0.4,color="grey60", fillcolor="#E0E0E0", style="filled",tooltip=" "];
 }

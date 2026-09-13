@@ -1248,6 +1248,27 @@
 <dd></dd></dl>
 
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4kiwi11KiwiBuilder23makeGenerativeMADatasetERK12BpeTokenizerRK18GenerativeMAOption6size_t6size_t6size_tRK15TypoTransformer">
+<span id="_CPPv3NK4kiwi11KiwiBuilder23makeGenerativeMADatasetERK12BpeTokenizerRK18GenerativeMAOption6size_t6size_t6size_tRK15TypoTransformer"></span><span id="_CPPv2NK4kiwi11KiwiBuilder23makeGenerativeMADatasetERK12BpeTokenizerRK18GenerativeMAOption6size_t6size_t6size_tRK15TypoTransformer"></span><span id="kiwi::KiwiBuilder::makeGenerativeMADataset__BpeTokenizerCR.GenerativeMAOptionCR.s.s.s.TypoTransformerCRC"></span><span class="target" id="classkiwi_1_1KiwiBuilder_1ab4ec110e57d192b2e8ed1c57187b1a31"></span><span class="n"><span class="pre">GenerativeMADataset</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">makeGenerativeMADataset</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">BpeTokenizer</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">tokenizer</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">GenerativeMAOption</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">option</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">batchSize</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">maxSeqLength</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">numWorkers</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">TypoTransformer</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">typos</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="p"><span class="pre">}</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4kiwi11KiwiBuilder23makeGenerativeMADatasetERK12BpeTokenizerRK18GenerativeMAOption6size_t6size_t6size_tRK15TypoTransformer" title="Link to this definition"></a><br /></dt>
+<dd><p>생성형 형태소 분석 모델 학습용 데이터셋을 생성한다. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tokenizer</strong> – 문장 및 형태소열을 토큰화하는 데에 사용할 BpeTokenizer. 내부에 복사되어 보관된다. </p></li>
+<li><p><strong>option</strong> – 토큰열에 삽입될 특수 토큰(&lt;|ToMorpheme|&gt;, &lt;|ToSurface|&gt;, 품사 태그)의 ID </p></li>
+<li><p><strong>batchSize</strong> – 한 배치에 포함될 데이터의 개수 </p></li>
+<li><p><strong>maxSeqLength</strong> – 한 데이터의 최대 길이. 이를 초과하는 문장은 데이터셋에서 제외된다. </p></li>
+<li><p><strong>numWorkers</strong> – 형태소 분석 및 토큰화에 사용할 스레드 개수. 0인 경우 별도의 스레드를 사용하지 않는다. </p></li>
+<li><p><strong>typos</strong> – 원문에 오타를 넣을 때 쓸 오타 규칙. <code class="docutils literal notranslate"><span class="pre">option.typoProb</span></code>가 0보다 큰 경우에만 쓰이며, 이때 비어있으면 안 된다. 예: <code class="docutils literal notranslate"><span class="pre">getDefaultTypoSet(DefaultTypoSet::basicTypoSetWithContinual)</span></code></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>문장이 하나도 추가되지 않은 빈 GenerativeMADataset. <code class="docutils literal notranslate"><span class="pre">addSentence</span></code>로 문장을 추가한 뒤 사용한다. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK4kiwi11KiwiBuilder10getOptionsEv">
 <span id="_CPPv3NK4kiwi11KiwiBuilder10getOptionsEv"></span><span id="_CPPv2NK4kiwi11KiwiBuilder10getOptionsEv"></span><span id="kiwi::KiwiBuilder::getOptionsC"></span><span class="target" id="classkiwi_1_1KiwiBuilder_1a03bbda4731d4d0181be0bc560f219a1a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="Types.html#_CPPv4N4kiwi11BuildOptionE" title="kiwi::BuildOption"><span class="n"><span class="pre">BuildOption</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getOptions</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4kiwi11KiwiBuilder10getOptionsEv" title="Link to this definition"></a><br /></dt>
 <dd></dd></dl>

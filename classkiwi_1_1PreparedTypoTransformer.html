@@ -116,6 +116,9 @@ float&#160;</td><td class="memItemRight" valign="bottom"><b>getLengtheningTypoCo
 <tr class="memitem:ad721dbdc05602d01815bdb3204d3f29c" id="r_ad721dbdc05602d01815bdb3204d3f29c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classkiwi_1_1TypoCandidates.html">TypoCandidates</a>&lt; true &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1PreparedTypoTransformer.html#ad721dbdc05602d01815bdb3204d3f29c">generate</a> (const std::u16string &amp;orig, float costThreshold=2.5f) const</td></tr>
 <tr class="memdesc:ad721dbdc05602d01815bdb3204d3f29c"><td class="mdescLeft">&#160;</td><td class="mdescRight">주어진 문자열에 대해 오타 후보를 생성합니다.  <br /></td></tr>
 <tr class="separator:ad721dbdc05602d01815bdb3204d3f29c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9ae0d43bf07db4afd39c94a3ca78124a" id="r_a9ae0d43bf07db4afd39c94a3ca78124a"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1PreparedTypoTransformer.html#a9ae0d43bf07db4afd39c94a3ca78124a">sampleTypos</a> (std::u16string &amp;out, const std::u16string &amp;orig, float typoProb, std::mt19937_64 &amp;rng, float costThreshold=2.5f, float costScale=1.f) const</td></tr>
+<tr class="memdesc:a9ae0d43bf07db4afd39c94a3ca78124a"><td class="mdescLeft">&#160;</td><td class="mdescRight">오타가 발생할 수 있는 지점마다 <code>typoProb</code>의 확률로 오타를 하나씩 무작위로 삽입합니다.  <br /></td></tr>
+<tr class="separator:a9ae0d43bf07db4afd39c94a3ca78124a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a439b727dd818926c4bd2a5ac1c46c024" id="r_a439b727dd818926c4bd2a5ac1c46c024"><td class="memTemplParams" colspan="2"><a id="a439b727dd818926c4bd2a5ac1c46c024" name="a439b727dd818926c4bd2a5ac1c46c024"></a>
 template&lt;class Alloc &gt; </td></tr>
 <tr class="memitem:a439b727dd818926c4bd2a5ac1c46c024"><td class="memTemplItemLeft" align="right" valign="top">size_t&#160;</td><td class="memTemplItemRight" valign="bottom"><b>generateGraph</b> (U16StringView normalizedStr, std::vector&lt; <a class="el" href="structkiwi_1_1TypoGraphNode.html">TypoGraphNode</a>, Alloc &gt; &amp;graphOut, <a class="el" href="Types_8h.html#aa9fc09d985bc896c97e2e0f5cd41c96f">Dialect</a> allowedDialect=<a class="el" href="Types_8h.html#aa9fc09d985bc896c97e2e0f5cd41c96fac00f0c4675b91fb8b918e4079a0b1bac">Dialect::standard</a>, const std::pair&lt; uint32_t, uint32_t &gt; *pretokenizedFirst=nullptr, const std::pair&lt; uint32_t, uint32_t &gt; *pretokenizedLast=nullptr, size_t *maxContinualTypoIdxOut=nullptr) const</td></tr>
@@ -164,6 +167,68 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>KiwiBuilder</b></td>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a id="a9ae0d43bf07db4afd39c94a3ca78124a" name="a9ae0d43bf07db4afd39c94a3ca78124a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9ae0d43bf07db4afd39c94a3ca78124a">&#9670;&#160;</a></span>sampleTypos()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t kiwi::PreparedTypoTransformer::sampleTypos </td>
+          <td>(</td>
+          <td class="paramtype">std::u16string &amp;&#160;</td>
+          <td class="paramname"><em>out</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::u16string &amp;&#160;</td>
+          <td class="paramname"><em>orig</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>typoProb</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::mt19937_64 &amp;&#160;</td>
+          <td class="paramname"><em>rng</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>costThreshold</em> = <code>2.5f</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>costScale</em> = <code>1.f</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>오타가 발생할 수 있는 지점마다 <code>typoProb</code>의 확률로 오타를 하나씩 무작위로 삽입합니다. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">costScale</td><td>각 지점의 후보는 exp(-costScale * cost)에 비례하는 확률로 뽑힙니다. 0이면 균등하게 뽑습니다. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>삽입된 오타의 개수 </dd></dl>
+<dl class="section note"><dt>Note</dt><dd><code>generate</code>와 달리 적용 조건을 모두 검사하며, 방언 규칙과 어절 경계 조건 규칙, 받침이 음절에 합쳐지지 못하는 결과를 내는 규칙은 쓰지 않습니다. <code>prepare(false)</code>로 준비한 경우에만 의미가 있습니다. </dd></dl>
 
 </div>
 </div>

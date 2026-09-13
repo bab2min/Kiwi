@@ -17,11 +17,14 @@ var searchData=
   ['typo_5ftransformer_14',['typo_transformer',['../structkiwi__analyze__option__t.html#ae3b9cad120d22039562539ce52de5ca9',1,'kiwi_analyze_option_t']]],
   ['typocandidates_15',['TypoCandidates',['../classkiwi_1_1TypoCandidates.html',1,'kiwi']]],
   ['typocost_16',['typoCost',['../structkiwi_1_1TokenInfo.html#a665bcabafa2c41815d0a5ad51a27e833',1,'kiwi::TokenInfo']]],
-  ['typoform_17',['TypoForm',['../structkiwi_1_1TypoForm.html',1,'kiwi']]],
-  ['typoformid_18',['typoFormId',['../structkiwi_1_1TokenInfo.html#aa77262e269fb9873c00c6fc9ad410fbb',1,'kiwi::TokenInfo']]],
-  ['typographnode_19',['TypoGraphNode',['../structkiwi_1_1TypoGraphNode.html',1,'kiwi']]],
-  ['typoiterator_20',['TypoIterator',['../classkiwi_1_1TypoIterator.html',1,'kiwi']]],
-  ['typothreshold_21',['typoThreshold',['../structkiwi_1_1AnalyzeOption.html#a223d854412aa158c13f89d644cdac93e',1,'kiwi::AnalyzeOption']]],
-  ['typotransformer_22',['typotransformer',['../classkiwi_1_1TypoTransformer.html',1,'kiwi::TypoTransformer'],['../structkiwi_1_1AnalyzeOption.html#ac2a938812be1a29bd06eb9b0fbcbad24',1,'kiwi::AnalyzeOption::typoTransformer']]],
-  ['typotransformer_2eh_23',['TypoTransformer.h',['../TypoTransformer_8h.html',1,'']]]
+  ['typocostscale_17',['typoCostScale',['../structkiwi_1_1GenerativeMAOption.html#ad3836524953ba76c736ec463bdbebc25',1,'kiwi::GenerativeMAOption']]],
+  ['typocostthreshold_18',['typoCostThreshold',['../structkiwi_1_1GenerativeMAOption.html#a950a7c71ed4383b27adec89138b42cf9',1,'kiwi::GenerativeMAOption']]],
+  ['typoform_19',['TypoForm',['../structkiwi_1_1TypoForm.html',1,'kiwi']]],
+  ['typoformid_20',['typoFormId',['../structkiwi_1_1TokenInfo.html#aa77262e269fb9873c00c6fc9ad410fbb',1,'kiwi::TokenInfo']]],
+  ['typographnode_21',['TypoGraphNode',['../structkiwi_1_1TypoGraphNode.html',1,'kiwi']]],
+  ['typoiterator_22',['TypoIterator',['../classkiwi_1_1TypoIterator.html',1,'kiwi']]],
+  ['typoprob_23',['typoProb',['../structkiwi_1_1GenerativeMAOption.html#ad3c3c30346ba0a181de41c3eeee6a4e8',1,'kiwi::GenerativeMAOption']]],
+  ['typothreshold_24',['typoThreshold',['../structkiwi_1_1AnalyzeOption.html#a223d854412aa158c13f89d644cdac93e',1,'kiwi::AnalyzeOption']]],
+  ['typotransformer_25',['typotransformer',['../classkiwi_1_1TypoTransformer.html',1,'kiwi::TypoTransformer'],['../structkiwi_1_1AnalyzeOption.html#ac2a938812be1a29bd06eb9b0fbcbad24',1,'kiwi::AnalyzeOption::typoTransformer']]],
+  ['typotransformer_2eh_26',['TypoTransformer.h',['../TypoTransformer_8h.html',1,'']]]
 ];

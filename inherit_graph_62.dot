@@ -5,5 +5,5 @@ digraph "Graphical Class Hierarchy"
   edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
   node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
   rankdir="LR";
-  Node0 [id="Node000000",label="kiwi::PreparedTypoTransformer",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$classkiwi_1_1PreparedTypoTransformer.html",tooltip="오타 생성 및 교정 준비가 완료된 오타 생성기. kiwi::TypoTransformer::prepare()로부터 생성됩니다."];
+  Node0 [id="Node000000",label="kiwi::NgramExtractor\l::Candidate",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$structkiwi_1_1NgramExtractor_1_1Candidate.html",tooltip=" "];
 }

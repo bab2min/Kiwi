@@ -14,7 +14,8 @@ var searchData=
   ['hassubmatch_3c_20size_5ft_20_3e_11',['HasSubmatch&lt; size_t &gt;',['../structkiwi_1_1utils_1_1detail_1_1HasSubmatch.html',1,'kiwi::utils::detail']]],
   ['hassubmatch_3c_20uint32_5ft_20_3e_12',['HasSubmatch&lt; uint32_t &gt;',['../structkiwi_1_1utils_1_1detail_1_1HasSubmatch.html',1,'kiwi::utils::detail']]],
   ['hiddenmember_13',['HiddenMember',['../classkiwi_1_1HiddenMember.html',1,'kiwi']]],
-  ['hiddenmember_3c_20kiwi_3a_3araggedvector_3c_20int32_5ft_20_3e_2c_20sizeof_28vector_3c_20size_5ft_20_3e_29_20_2a2_20_3e_14',['HiddenMember&lt; kiwi::RaggedVector&lt; int32_t &gt;, sizeof(Vector&lt; size_t &gt;) *2 &gt;',['../classkiwi_1_1HiddenMember.html',1,'kiwi']]],
-  ['hsdataset_15',['HSDataset',['../classkiwi_1_1HSDataset.html',1,'kiwi']]],
-  ['hsdatasetoption_16',['HSDatasetOption',['../structkiwi_1_1HSDatasetOption.html',1,'kiwi']]]
+  ['hiddenmember_3c_20kiwi_3a_3araggedvector_3c_20char16_5ft_20_3e_2c_20sizeof_28vector_3c_20size_5ft_20_3e_29_20_2a2_20_3e_14',['HiddenMember&lt; kiwi::RaggedVector&lt; char16_t &gt;, sizeof(Vector&lt; size_t &gt;) *2 &gt;',['../classkiwi_1_1HiddenMember.html',1,'kiwi']]],
+  ['hiddenmember_3c_20kiwi_3a_3araggedvector_3c_20int32_5ft_20_3e_2c_20sizeof_28vector_3c_20size_5ft_20_3e_29_20_2a2_20_3e_15',['HiddenMember&lt; kiwi::RaggedVector&lt; int32_t &gt;, sizeof(Vector&lt; size_t &gt;) *2 &gt;',['../classkiwi_1_1HiddenMember.html',1,'kiwi']]],
+  ['hsdataset_16',['HSDataset',['../classkiwi_1_1HSDataset.html',1,'kiwi']]],
+  ['hsdatasetoption_17',['HSDatasetOption',['../structkiwi_1_1HSDatasetOption.html',1,'kiwi']]]
 ];
