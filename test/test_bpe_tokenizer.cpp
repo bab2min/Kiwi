@@ -5,6 +5,7 @@
 #include <string>
 #include <set>
 #include <sstream>
+#include <thread>
 #include <tuple>
 #include <iostream>
 #include "common.h"
@@ -815,8 +816,98 @@ TEST(BpeTokenizerTest, SavedModelReloadsIdentically)
 	auto reloaded = BpeTokenizer::load(stream);
 
 	EXPECT_EQ(reloaded.getVocab(), tokenizer.getVocab());
+	EXPECT_FALSE(reloaded.isNfdForHangul());
 	const std::string input = "안녕하세요 newest lower abc123 hello world";
 	EXPECT_EQ(reloaded.encode(input), tokenizer.encode(input));
+}
+
+TEST(BpeTokenizerTest, SavedModelKeepsJamoNormalizer)
+{
+	auto jamo = [](std::initializer_list<char32_t> codes)
+	{
+		std::string s;
+		for (auto c : codes) s += utf8FromCode(c);
+		return s;
+	};
+
+	BpeTrainerConfig config;
+	config.vocabSize = 500;
+	config.minPairFrequency = 2;
+	config.useJamoAlphabet = true;
+	BpeTokenizerTrainer trainer(config);
+
+	const std::vector<std::string> sentences(8, u8"한글 자모 학습 안녕하세요");
+	size_t index = 0;
+	trainer.addSentences([&]() -> std::string {
+		return index < sentences.size() ? sentences[index++] : std::string{};
+	});
+
+	auto tokenizer = trainer.build();
+	EXPECT_TRUE(tokenizer.isNfdForHangul());
+
+	std::stringstream stream;
+	tokenizer.save(stream);
+	EXPECT_NE(stream.str().find("nfd_for_hangul"), std::string::npos);
+	stream.seekg(0);
+	auto reloaded = BpeTokenizer::load(stream);
+	EXPECT_TRUE(reloaded.isNfdForHangul());
+
+	const std::string input = u8"한글 학습 안녕하세요";
+	EXPECT_EQ(reloaded.encode(input), tokenizer.encode(input));
+
+	EXPECT_EQ(reloaded.decode(reloaded.encode(u8"한글")),
+		jamo({ 0x1112, 0x1161, 0x11AB, 0x1100, 0x1173, 0x11AF }));
+
+	std::vector<std::pair<uint32_t, uint32_t>> byteOffsets, chrOffsets;
+	const auto ids = reloaded.encode(input, &byteOffsets, false);
+	EXPECT_EQ(reloaded.encode(input, &chrOffsets, true), ids);
+	ASSERT_EQ(byteOffsets.size(), ids.size());
+	ASSERT_EQ(chrOffsets.size(), ids.size());
+	EXPECT_EQ(byteOffsets.front().first, 0u);
+	EXPECT_EQ(byteOffsets.back().second, (uint32_t)input.size());
+	EXPECT_EQ(chrOffsets.front().first, 0u);
+	EXPECT_EQ(chrOffsets.back().second, 11u); // "한글 학습 안녕하세요" is 11 characters
+	for (size_t i = 0; i < ids.size(); ++i)
+	{
+		EXPECT_LE(byteOffsets[i].first, byteOffsets[i].second);
+		EXPECT_LE(byteOffsets[i].second, (uint32_t)input.size());
+		if (i) EXPECT_LE(byteOffsets[i - 1].second, byteOffsets[i].second);
+	}
+}
+
+TEST(BpeTokenizerTest, ConcurrentEncodeMatchesSingleThreaded)
+{
+	BpeTrainerConfig config;
+	config.vocabSize = 800;
+	config.minPairFrequency = 2;
+	BpeTokenizerTrainer trainer{ config };
+	const std::vector<std::string> corpus(16, u8"사람들은 불가능하답니다 low lower lowest 테스트 문장입니다 123 456");
+	size_t idx = 0;
+	trainer.addSentences([&]() -> std::string {
+		return idx < corpus.size() ? corpus[idx++] : std::string{};
+	});
+	const auto tokenizer = trainer.build();
+
+	std::vector<std::string> inputs;
+	for (int i = 0; i < 200; ++i)
+	{
+		inputs.push_back(u8"사람들은 불가능하답니다 " + std::to_string(i));
+		inputs.push_back(u8"low lower lowest 테스트 " + std::to_string(i * 7));
+	}
+
+	std::vector<std::vector<uint32_t>> expected;
+	for (const auto& s : inputs) expected.push_back(tokenizer.encode(s));
+
+	std::vector<std::thread> threads;
+	std::vector<std::vector<std::vector<uint32_t>>> got(4);
+	for (int t = 0; t < 4; ++t)
+	{
+		threads.emplace_back([&, t]() {
+			for (const auto& s : inputs) got[t].push_back(tokenizer.encode(s));
+		});
+	}
+	for (auto& th : threads) th.join();
+	for (int t = 0; t < 4; ++t) EXPECT_EQ(got[t], expected) << "thread " << t;
 }
 
 TEST(BpeTokenizerTest, PreTokenizationIsLosslessForAwkwardInputs)

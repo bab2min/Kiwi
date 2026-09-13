@@ -1,11 +1,16 @@
 #include "gtest/gtest.h"
-#include <kiwi/Kiwi.h>
-#include <kiwi/Dataset.h>
-#include <kiwi/SubstringExtractor.h>
+#include <algorithm>
+#include <map>
 #include <unordered_map>
 #include <vector>
 #include <sstream>
+#include <kiwi/Kiwi.h>
+#include <kiwi/Dataset.h>
+#include <kiwi/BpeTokenizer.h>
+#include <kiwi/SwTokenizer.h>
+#include <kiwi/SubstringExtractor.h>
 #include "common.h"
+
 
 class TestInitializer
 {
@@ -983,7 +988,7 @@ TEST(KiwiCpp, SentenceBoundaryWithOrderedBullet)
 		{
 			for (auto& r : sentRanges)
 			{
-				std::cerr << std::u16string{ &str[r.first], r.second - r.first } << std::endl;
+				std::cerr << utf16To8(std::u16string{ &str[r.first], r.second - r.first }) << std::endl;
 			}
 			std::cerr << std::endl;
 		}
@@ -2340,4 +2345,320 @@ TEST(KiwiCpp, Issue270)
 	EXPECT_EQ(correct[1].str, typo[1].str);
 	EXPECT_EQ(correct[2].str, typo[2].str);
 	EXPECT_FLOAT_EQ(correct[1].score - 5, typo[1].score);
+}
+
+namespace
+{
+	const std::vector<std::string> generativeMACorpus = {
+		u8"이것은 분석기입니다.",
+		u8"오늘 날씨가 참 좋네요.",
+		u8"한국어 형태소 분석기 키위입니다!",
+		u8"밥을 먹었다.",
+		u8"그는 어제 학교에 갔다.",
+		u8"어제 학교에 갔던 그는 오늘 날씨가 참 좋다고 말하면서 밥을 먹었고 한국어 형태소 분석기 키위를 만들었다.",
+	};
+
+	struct GenerativeMAFixture
+	{
+		BpeTokenizer tokenizer;
+		GenerativeMAOption option;
+
+		GenerativeMAFixture()
+		{
+			// generativeMACorpus로 vocabSize = 600, minPairFrequency = 1을 주어 학습한 토크나이저
+			std::ifstream ifs{ "test/generative_ma.tokenizer.json" };
+			if (!ifs) throw std::runtime_error{ "cannot open test/generative_ma.tokenizer.json" };
+			tokenizer = BpeTokenizer::load(ifs);
+
+			// 특수 토큰은 어휘 뒤에 이어서 배정한다.
+			const uint32_t v = (uint32_t)tokenizer.getVocab().size();
+			option.bosTokenId = v;
+			option.eosTokenId = v + 1;
+			option.toMorphemeTokenId = v + 2;
+			option.toSurfaceTokenId = v + 3;
+			for (size_t i = 0; i < (size_t)POSTag::max; ++i) option.posTagTokenIds[i] = v + 4 + (uint32_t)i;
+		}
+
+		// [bos] first [sep] second [eos] 꼴의 행을 나눈다. 잘려서 eos가 없는 행이면 false를 반환한다.
+		bool split(const int32_t* row, size_t len, std::vector<uint32_t>& first, uint32_t& sep, std::vector<uint32_t>& second) const
+		{
+			first.clear();
+			second.clear();
+			sep = 0;
+			if (row[0] != (int32_t)option.bosTokenId) return false;
+			for (size_t i = 1; i < len; ++i)
+			{
+				if (row[i] == GenerativeMADataset::padToken) return false;
+				const uint32_t t = (uint32_t)row[i];
+				if (t == option.eosTokenId) return sep != 0;
+				if (!sep && (t == option.toMorphemeTokenId || t == option.toSurfaceTokenId))
+				{
+					sep = t;
+					continue;
+				}
+				(sep ? second : first).push_back(t);
+			}
+			return false;
+		}
+	};
+
+	std::vector<int32_t> drainGenerativeMADataset(GenerativeMADataset& dataset, size_t batchSize, size_t maxSeqLength)
+	{
+		std::vector<int32_t> buf(batchSize * maxSeqLength), all;
+		while (size_t n = dataset.next(buf.data()))
+		{
+			EXPECT_LE(n, batchSize);
+			all.insert(all.end(), buf.begin(), buf.begin() + n * maxSeqLength);
+		}
+		return all;
+	}
+}
+
+TEST(KiwiCpp, GenerativeMADataset)
+{
+	GenerativeMAFixture f;
+	KiwiBuilder builder{ MODEL_PATH, 0, BuildOption::default_, ModelType::none };
+	constexpr size_t batchSize = 4;
+
+	for (size_t maxSeqLength : { (size_t)128, (size_t)16 })
+	{
+		for (size_t numWorkers : { (size_t)0, (size_t)2 })
+		{
+			auto dataset = builder.makeGenerativeMADataset(f.tokenizer, f.option, batchSize, maxSeqLength, numWorkers);
+			for (size_t i = 0; i < generativeMACorpus.size(); ++i)
+			{
+				if (i % 2) dataset.addSentence(utf8To16(generativeMACorpus[i]));
+				else dataset.addSentence(generativeMACorpus[i]);
+			}
+			EXPECT_EQ(dataset.numSents(), generativeMACorpus.size());
+			dataset.seed(42);
+
+			const auto all = drainGenerativeMADataset(dataset, batchSize, maxSeqLength);
+			const size_t rows = all.size() / maxSeqLength;
+			EXPECT_EQ(rows, generativeMACorpus.size() * 2);
+
+			for (size_t r = 0; r < rows; ++r)
+			{
+				// bos로 시작하고, pad는 뒤쪽에만 연속으로 놓이며, pad가 있다면 그 직전은 eos다.
+				const int32_t* row = all.data() + r * maxSeqLength;
+				EXPECT_EQ(row[0], (int32_t)f.option.bosTokenId);
+				size_t firstPad = maxSeqLength;
+				for (size_t i = 0; i < maxSeqLength; ++i)
+				{
+					if (row[i] == GenerativeMADataset::padToken) { firstPad = i; break; }
+				}
+				for (size_t i = firstPad; i < maxSeqLength; ++i) EXPECT_EQ(row[i], GenerativeMADataset::padToken);
+				if (firstPad < maxSeqLength) EXPECT_EQ(row[firstPad - 1], (int32_t)f.option.eosTokenId);
+			}
+
+			std::vector<uint32_t> a0, b0, a1, b1;
+			uint32_t sep0, sep1;
+			size_t completePairs = 0;
+			for (size_t r = 0; r + 1 < rows; r += 2)
+			{
+				if (!f.split(all.data() + r * maxSeqLength, maxSeqLength, a0, sep0, b0)) continue;
+				if (!f.split(all.data() + (r + 1) * maxSeqLength, maxSeqLength, a1, sep1, b1)) continue;
+				EXPECT_EQ(sep0, f.option.toMorphemeTokenId);
+				EXPECT_EQ(sep1, f.option.toSurfaceTokenId);
+				EXPECT_EQ(a0, b1); // 원문
+				EXPECT_EQ(b0, a1); // 형태소열
+				const std::string surface = f.tokenizer.decode(a0);
+				EXPECT_NE(std::find(generativeMACorpus.begin(), generativeMACorpus.end(), surface), generativeMACorpus.end()) << surface;
+				++completePairs;
+			}
+
+			if (maxSeqLength == 128)
+			{
+				EXPECT_EQ(dataset.numTruncatedSents(), 0);
+				EXPECT_EQ(completePairs, generativeMACorpus.size());
+			}
+			else
+			{
+				// maxSeqLength를 넘는 부분은 버리지 않고 뒤에서 잘라낸다.
+				EXPECT_EQ(dataset.numTruncatedSents(), generativeMACorpus.size());
+			}
+			EXPECT_EQ(dataset.numInsertedTypos(), 0);
+		}
+	}
+}
+
+TEST(KiwiCpp, GenerativeMADatasetBlankSentences)
+{
+	GenerativeMAFixture f;
+	KiwiBuilder builder{ MODEL_PATH, 0, BuildOption::default_, ModelType::none };
+	constexpr size_t batchSize = 4, maxSeqLength = 64;
+
+	for (size_t numWorkers : { (size_t)0, (size_t)2 })
+	{
+		auto dataset = builder.makeGenerativeMADataset(f.tokenizer, f.option, batchSize, maxSeqLength, numWorkers);
+		// 작업 단위 하나에 문장이 8개 이상 들어가므로, 행을 만들지 못하는 빈 문장이나 공백뿐인 문장이 이어지면
+		// 행이 0개인 작업 단위가 반드시 생긴다.
+		dataset.addSentence(generativeMACorpus[0]);
+		for (int i = 0; i < 40; ++i) dataset.addSentence(i % 3 == 0 ? "" : "   ");
+		dataset.addSentence(generativeMACorpus[3]);
+		dataset.seed(1);
+
+		std::vector<int32_t> buf(batchSize * maxSeqLength);
+		size_t rows = 0, batches = 0;
+		while (size_t n = dataset.next(buf.data()))
+		{
+			rows += n;
+			ASSERT_LT(++batches, 100);
+		}
+		EXPECT_EQ(rows, 4);
+	}
+}
+
+TEST(KiwiCpp, GenerativeMADatasetTypos)
+{
+	GenerativeMAFixture f;
+	KiwiBuilder builder{ MODEL_PATH, 0, BuildOption::default_, ModelType::none };
+	const auto& typos = getDefaultTypoSet(DefaultTypoSet::basicTypoSetWithContinual);
+	constexpr size_t batchSize = 4, maxSeqLength = 256;
+
+	GenerativeMAOption option = f.option;
+	option.typoProb = 0.5f;
+	EXPECT_THROW(builder.makeGenerativeMADataset(f.tokenizer, option, batchSize, maxSeqLength, 0), std::invalid_argument);
+	{
+		GenerativeMAOption bad = option;
+		bad.typoProb = 1.5f;
+		EXPECT_THROW(builder.makeGenerativeMADataset(f.tokenizer, bad, batchSize, maxSeqLength, 0, typos), std::invalid_argument);
+		bad = option;
+		bad.typoCostScale = -1;
+		EXPECT_THROW(builder.makeGenerativeMADataset(f.tokenizer, bad, batchSize, maxSeqLength, 0, typos), std::invalid_argument);
+	}
+
+	std::vector<std::vector<int32_t>> outputs;
+	for (size_t numWorkers : { (size_t)0, (size_t)2 })
+	{
+		auto dataset = builder.makeGenerativeMADataset(f.tokenizer, option, batchSize, maxSeqLength, numWorkers, typos);
+		for (auto& s : generativeMACorpus) dataset.addSentence(s);
+		dataset.seed(123);
+
+		auto all = drainGenerativeMADataset(dataset, batchSize, maxSeqLength);
+		const size_t rows = all.size() / maxSeqLength;
+		ASSERT_EQ(rows, generativeMACorpus.size() * 2);
+
+		std::vector<uint32_t> a0, b0, a1, b1;
+		uint32_t sep0, sep1;
+		size_t noisyPairs = 0;
+		for (size_t r = 0; r < rows; r += 2)
+		{
+			ASSERT_TRUE(f.split(all.data() + r * maxSeqLength, maxSeqLength, a0, sep0, b0));
+			ASSERT_TRUE(f.split(all.data() + (r + 1) * maxSeqLength, maxSeqLength, a1, sep1, b1));
+			EXPECT_EQ(sep0, option.toMorphemeTokenId);
+			EXPECT_EQ(sep1, option.toSurfaceTokenId);
+			// 형태소열은 오타 없는 원문을 분석한 것이므로 두 방향이 같다.
+			EXPECT_EQ(b0, a1);
+			// ToSurface 방향의 출력은 오타 없는 원문이어야 한다.
+			const std::string target = f.tokenizer.decode(b1);
+			EXPECT_NE(std::find(generativeMACorpus.begin(), generativeMACorpus.end(), target), generativeMACorpus.end()) << target;
+			if (a0 != b1) ++noisyPairs;
+		}
+		EXPECT_GT(noisyPairs, 0);
+		EXPECT_GT(dataset.numInsertedTypos(), 0);
+		outputs.emplace_back(std::move(all));
+	}
+	// 작업 단위마다 주 스레드에서 시드를 정하므로 워커 수와 무관하게 결과가 같다.
+	EXPECT_EQ(outputs[0], outputs[1]);
+}
+
+TEST(KiwiCpp, GenerativeMADatasetSpacing)
+{
+	GenerativeMAFixture f;
+	KiwiBuilder builder{ MODEL_PATH, 0, BuildOption::default_, ModelType::none };
+	constexpr size_t batchSize = 4, maxSeqLength = 256;
+
+	{
+		GenerativeMAOption bad = f.option;
+		bad.spaceRemoveProb = 1.5f;
+		EXPECT_THROW(builder.makeGenerativeMADataset(f.tokenizer, bad, batchSize, maxSeqLength, 0), std::invalid_argument);
+		bad = f.option;
+		bad.spaceInsertProb = -0.1f;
+		EXPECT_THROW(builder.makeGenerativeMADataset(f.tokenizer, bad, batchSize, maxSeqLength, 0), std::invalid_argument);
+	}
+
+	// 서로게이트 쌍이 쪼개지지 않는지 보기 위해 이모지가 든 문장을 더한다.
+	std::vector<std::string> sents = generativeMACorpus;
+	sents.emplace_back(u8"좋아요👍 감사합니다");
+
+	// 깨끗한 원문(ToSurface 방향의 출력)을 열쇠로 하여 ToMorpheme 방향의 입력과 형태소열을 모은다.
+	using Collected = std::map<std::string, std::pair<std::string, std::vector<uint32_t>>>;
+	const auto collect = [&](float removeProb, float insertProb, size_t numWorkers, size_t* removed = nullptr, size_t* inserted = nullptr)
+	{
+		GenerativeMAOption option = f.option;
+		option.spaceRemoveProb = removeProb;
+		option.spaceInsertProb = insertProb;
+		auto dataset = builder.makeGenerativeMADataset(f.tokenizer, option, batchSize, maxSeqLength, numWorkers);
+		for (auto& s : sents) dataset.addSentence(s);
+		dataset.seed(7);
+
+		const auto all = drainGenerativeMADataset(dataset, batchSize, maxSeqLength);
+		const size_t rows = all.size() / maxSeqLength;
+		EXPECT_EQ(rows, sents.size() * 2);
+
+		Collected ret;
+		std::vector<uint32_t> a0, b0, a1, b1;
+		uint32_t sep0, sep1;
+		for (size_t r = 0; r + 1 < rows; r += 2)
+		{
+			EXPECT_TRUE(f.split(all.data() + r * maxSeqLength, maxSeqLength, a0, sep0, b0));
+			EXPECT_TRUE(f.split(all.data() + (r + 1) * maxSeqLength, maxSeqLength, a1, sep1, b1));
+			EXPECT_EQ(b0, a1);
+			ret[f.tokenizer.decode(b1)] = { f.tokenizer.decode(a0), b0 };
+		}
+		EXPECT_EQ(ret.size(), sents.size());
+		if (removed) *removed = dataset.numRemovedSpaces();
+		if (inserted) *inserted = dataset.numInsertedSpaces();
+		return ret;
+	};
+
+	const auto clean = collect(0, 0, 0);
+	for (auto& [target, p] : clean) EXPECT_EQ(p.first, target);
+
+	// 말뭉치의 어절은 공백 하나로만 나뉘어 있으므로, 지울 수 있는 공백은 어절 수 - 1개,
+	// 넣을 수 있는 자리는 어절마다 (코드포인트 수 - 1)개다.
+	size_t expectedRemoved = 0, expectedInserted = 0;
+	for (auto& s : sents)
+	{
+		size_t codepoints = 0;
+		for (auto c : utf8To16(s))
+		{
+			if (c == u' ')
+			{
+				++expectedRemoved;
+				expectedInserted += codepoints - 1;
+				codepoints = 0;
+			}
+			else if (!isLowSurrogate(c)) ++codepoints;
+		}
+		expectedInserted += codepoints - 1;
+	}
+
+	size_t removed = 0, inserted = 0;
+	const auto noSpaces = collect(1, 0, 0, &removed, &inserted);
+	EXPECT_EQ(removed, expectedRemoved);
+	EXPECT_EQ(inserted, 0);
+	for (auto& [target, p] : noSpaces)
+	{
+		std::string expected = target;
+		expected.erase(std::remove(expected.begin(), expected.end(), ' '), expected.end());
+		EXPECT_EQ(p.first, expected);
+		// 형태소열은 입력의 띄어쓰기와 무관하다.
+		EXPECT_EQ(p.second, clean.at(target).second) << target;
+	}
+
+	const auto allSpaced = collect(0, 1, 0, &removed, &inserted);
+	EXPECT_EQ(removed, 0);
+	EXPECT_EQ(inserted, expectedInserted);
+	EXPECT_EQ(allSpaced.at(u8"밥을 먹었다.").first, u8"밥 을 먹 었 다 .");
+	EXPECT_EQ(allSpaced.at(u8"좋아요👍 감사합니다").first, u8"좋 아 요 👍 감 사 합 니 다");
+	for (auto& [target, p] : allSpaced) EXPECT_EQ(p.second, clean.at(target).second) << target;
+
+	// 작업 단위마다 주 스레드에서 시드를 정하므로 워커 수와 무관하게 결과가 같다.
+	const auto mixed = collect(0.5f, 0.1f, 0, &removed, &inserted);
+	EXPECT_GT(removed, 0);
+	EXPECT_GT(inserted, 0);
+	EXPECT_EQ(mixed, collect(0.5f, 0.1f, 2));
+	for (auto& [target, p] : mixed) EXPECT_EQ(p.second, clean.at(target).second) << target;
 }
