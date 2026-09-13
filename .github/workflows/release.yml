@@ -320,7 +320,7 @@ jobs:
     name: Emscripten
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       id-token: write
     steps:
     - uses: actions/checkout@v3
@@ -330,7 +330,7 @@ jobs:
     - uses: mymindstorm/setup-emsdk@v14
     - uses: actions/setup-node@v4
       with:
-        node-version: '20'
+        node-version: '24'
         registry-url: 'https://registry.npmjs.org'
     - name: Build
       run: |
@@ -338,7 +338,6 @@ jobs:
         ./build.sh
     - name: Publish to npm
       run: |
-        npm install -g npm@latest
         cd bindings/wasm/package
         npm publish --provenance --access public
     - name: Build documenation
