@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include <cstddef>
 #include <cstdint>
 
 #ifdef _MSC_VER
@@ -136,14 +137,27 @@ namespace kiwi
 #endif
 		}
 
-#if defined(__APPLE__) || defined(EMSCRIPTEN)
-		inline int countTrailingZeroes(size_t v) { return countTrailingZeroes((uint64_t)v); }
-		
-		inline int countLeadingZeroes(size_t v) { return countLeadingZeroes((uint64_t)v); }
+#if defined(__APPLE__) || defined(EMSCRIPTEN) || defined(__EMSCRIPTEN__)
+		// size_t is a distinct type from both uint32_t and uint64_t here, so dispatch by its actual width.
+		inline int countTrailingZeroes(size_t v)
+		{
+			return sizeof(size_t) == 8 ? countTrailingZeroes((uint64_t)v) : countTrailingZeroes((uint32_t)v);
+		}
 
-		inline int ceilLog2(size_t v) { return ceilLog2((uint64_t)v); }
+		inline int countLeadingZeroes(size_t v)
+		{
+			return sizeof(size_t) == 8 ? countLeadingZeroes((uint64_t)v) : countLeadingZeroes((uint32_t)v);
+		}
 
-		inline size_t popcount(size_t v) { return popcount((uint64_t)v); }
+		inline int ceilLog2(size_t v)
+		{
+			return sizeof(size_t) == 8 ? ceilLog2((uint64_t)v) : ceilLog2((uint32_t)v);
+		}
+
+		inline size_t popcount(size_t v)
+		{
+			return sizeof(size_t) == 8 ? (size_t)popcount((uint64_t)v) : (size_t)popcount((uint32_t)v);
+		}
 #endif
 	}
 }
