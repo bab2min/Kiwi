@@ -581,6 +581,155 @@ TypoCandidates<true> PreparedTypoTransformer::generate(const u16string& orig, fl
 	return _generate<true>(normalizeHangul(orig), costThreshold);
 }
 
+size_t PreparedTypoTransformer::sampleTypos(u16string& out, const u16string& orig, float typoProb, mt19937_64& rng, float costThreshold, float costScale) const
+{
+	out = orig;
+	if (typoProb <= 0 || !ready()) return 0;
+
+	const KString str = normalizeHangul(orig);
+
+	// generateGraph와 같은 기준으로 적용 조건을 검사한다.
+	const auto applicableCost = [&](size_t s, size_t e, const ReplInfo& repl) -> float
+	{
+		// 방언 규칙과 어절 경계 조건 규칙(분석 중에만 판단할 수 있다)은 쓰지 않는다.
+		if (repl.dialect != Dialect::standard) return INFINITY;
+		float cost = repl.cost;
+		switch (repl.leftCond)
+		{
+		case CondVowel::none:
+			break;
+		case CondVowel::vowel:
+			if (s == 0 || !isHangulSyllable(str[s - 1])) return INFINITY;
+			break;
+		case CondVowel::any:
+			if (s == 0) return INFINITY;
+			break;
+		case CondVowel::boundary:
+			return INFINITY;
+		case CondVowel::continual:
+			if (s == 0 || !isHangulSyllable(str[s - 1]) || !isfinite(continualTypoThreshold)) return INFINITY;
+			cost *= continualTypoThreshold;
+			break;
+		default:
+			if (!FeatureTestor::isMatched(str.data(), str.data() + s, repl.leftCond)) return INFINITY;
+			break;
+		}
+		if (!(cost <= costThreshold)) return INFINITY;
+
+		// 겹받침을 쪼개는 규칙(ᆹ->ᆸᆺ 등)은 연철 오타 인식을 위한 중간 단계일 뿐이라,
+		// 음절에 합쳐지지 못한 받침이 남는 결과는 실제 오타가 아니므로 제외한다.
+		char16_t prev = s ? str[s - 1] : 0;
+		for (size_t k = 0; k < repl.length; ++k)
+		{
+			if (isHangulCoda(repl.str[k]) && !isHangulSyllable(prev)) return INFINITY;
+			prev = repl.str[k];
+		}
+		if (e < str.size() && isHangulCoda(str[e]) && !isHangulSyllable(prev)) return INFINITY;
+		return cost;
+	};
+
+	struct Candidate
+	{
+		size_t start, end;
+		const ReplInfo* repl;
+		float cost;
+		double weight;
+	};
+	using Match = pair<size_t, const PatInfo*>; // (endPos, pattern)
+	thread_local Vector<Match> matches;
+	thread_local Vector<Candidate> candidates;
+	matches.clear();
+
+	std::bernoulli_distribution applyTypo{ std::min(typoProb, 1.f) };
+	KString result;
+	size_t copied = 0; // str[copied:]는 아직 result로 옮기지 않은 부분
+	size_t numTypos = 0;
+
+	// 겹치거나 맞닿은 매치들의 구간이 한 지점이며, 오타를 넣기로 한 지점에서만 문자열을 만든다.
+	const auto flushSite = [&]()
+	{
+		candidates.clear();
+		float minCost = INFINITY;
+		for (auto& [e, pat] : matches)
+		{
+			const size_t s = e - pat->patLength;
+			for (size_t j = 0; j < pat->size; ++j)
+			{
+				const float cost = applicableCost(s, e, pat->repl[j]);
+				if (!isfinite(cost)) continue;
+				candidates.push_back({ s, e, &pat->repl[j], cost, 0. });
+				minCost = std::min(minCost, cost);
+			}
+		}
+		matches.clear();
+		if (candidates.empty() || !applyTypo(rng)) return;
+
+		double totalWeight = 0;
+		for (auto& c : candidates)
+		{
+			c.weight = std::exp(-(double)costScale * (c.cost - minCost));
+			totalWeight += c.weight;
+		}
+		double r = std::uniform_real_distribution<double>{ 0, totalWeight }(rng);
+		auto chosen = candidates.begin();
+		for (; chosen + 1 != candidates.end(); ++chosen)
+		{
+			r -= chosen->weight;
+			if (r < 0) break;
+		}
+		result.append(str.begin() + copied, str.begin() + chosen->start);
+		result.append(chosen->repl->str, chosen->repl->str + chosen->repl->length);
+		copied = chosen->end;
+		++numTypos;
+	};
+
+	auto node = patTrie.root()->nextOpt<ArchType::none>(patTrie, 0);
+	for (size_t i = 0; i < str.size(); ++i)
+	{
+		auto nnode = node->nextOpt<ArchType::none>(patTrie, str[i]);
+		while (!nnode)
+		{
+			node = node->fail();
+			if (node)
+			{
+				nnode = node->nextOpt<ArchType::none>(patTrie, str[i]);
+			}
+			else
+			{
+				node = patTrie.root();
+				break;
+			}
+		}
+		if (!nnode) continue;
+		node = nnode;
+
+		auto& v = node->val(patTrie);
+		if (patTrie.isNull(v)) continue;
+
+		const size_t endPos = i + 1;
+		if (!matches.empty() && matches.back().first < endPos - v.patLength)
+		{
+			flushSite();
+		}
+		for (auto sub = node; sub; sub = sub->fail())
+		{
+			auto& sv = sub->val(patTrie);
+			if (patTrie.isNull(sv)) break;
+			if (patTrie.hasSubmatch(sv)) continue;
+			matches.emplace_back(endPos, &sv);
+		}
+	}
+	if (!matches.empty())
+	{
+		flushSite();
+	}
+	if (!numTypos) return 0;
+
+	result.append(str.begin() + copied, str.end());
+	out = joinHangul(result);
+	return numTypos;
+}
+
 /*
 다음과 같은 오타 규칙이 있을때
 * ㄷ이 -> 지

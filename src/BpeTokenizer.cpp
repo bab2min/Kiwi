@@ -9,13 +9,10 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
-#include <exception>
-#include <limits>
 #include <queue>
 #include <set>
 #include <unordered_set>
 #include <cctype>
-#include <climits>
 #include <ostream>
 #include <istream>
 #include <nlohmann/json.hpp>
@@ -61,10 +58,7 @@ namespace kiwi
 		}
 
 	public:
-		// For largeCounter=false: stores a varint length prefix followed by the raw
-		// bytes, and returns a uint32_t offset.  The explicit length keeps chunks that
-		// contain NUL bytes intact (a NUL terminator would truncate them) and lets
-		// key comparison skip strlen().  Arena size is limited to 4 GB.
+		// largeCounter=false: varint length prefix + raw bytes (keys may contain NUL); returns a uint32_t offset (arena < 4 GB).
 		uint32_t intern(string_view sv)
 		{
 			assert(!sv.empty());
@@ -83,9 +77,7 @@ namespace kiwi
 			return { p, length };
 		}
 
-		// For largeCounter=true: stores raw bytes, returns packed handle.
-		//   bits [63:24] = byte offset (40 bits, up to ~1 TB)
-		//   bits [23: 0] = length      (24 bits, up to 16 MB)
+		// largeCounter=true: raw bytes; returns (offset << 24) | length, i.e. a 40-bit offset and a 24-bit length.
 		uint64_t internPacked(string_view sv)
 		{
 			assert(!sv.empty());
@@ -103,29 +95,16 @@ namespace kiwi
 			return { data.data() + (packed >> 24), (size_t)(packed & 0xFFFFFF) };
 		}
 
-		// Resets content but keeps allocated capacity for reuse across batches.
 		void clear() { data.clear(); }
 	};
 
-	// -------------------------------------------------------------------------
-	// WordCountMap<largeCounter>  –  open-addressing hash map that owns its arena.
-	//
-	// largeCounter=false: 8-byte slots  {uint32_t offset, uint32_t count}
-	//   Key = length-prefixed string at arena[offset].  Sentinel: offset==UINT32_MAX.
-	//   Arena size limit: 4 GB.  Count limit: ~4 billion.
-	//
-	// largeCounter=true: 16-byte slots  {uint64_t packed, uint64_t count}
-	//   Key = packed handle (bits[63:24]=offset 40b, bits[23:0]=length 24b).
-	//   Arena size limit: ~1 TB.  Count limit: ~1.8e19.
-	//
-	// Exceeding either limit throws.
-	// -------------------------------------------------------------------------
+	// Open-addressing word -> count map that owns its key arena. Exceeding the arena or count limit throws.
 	template<bool largeCounter>
 	class alignas(64) WordCountMap
 	{
 		using KeyT   = conditional_t<largeCounter, uint64_t, uint32_t>;
 		using CountT = conditional_t<largeCounter, uint64_t, uint32_t>;
-		struct Slot { KeyT key; CountT count; }; // 8B or 16B
+		struct Slot { KeyT key; CountT count; };
 		static constexpr KeyT emptyKey = largeCounter ? KeyT(0) : KeyT(UINT32_MAX);
 
 		StringArena arena;
@@ -196,7 +175,6 @@ namespace kiwi
 			++used;
 		}
 
-		// Resets content but keeps allocated capacity for reuse across batches.
 		void clear()
 		{
 			arena.clear();
@@ -233,10 +211,6 @@ namespace kiwi
 	{
 		if (callback) callback(event, current, total);
 	}
-
-	// =========================================================================
-	// UTF-8 helpers and chunk extraction (unchanged)
-	// =========================================================================
 
 	struct Utf8Codepoint
 	{
@@ -374,10 +348,7 @@ namespace kiwi
 		return coda ? (char16_t)(0x11A7 + coda) : 0;
 	}
 
-	// Boundaries come out in the coordinates the chunks will be cut in: byte positions
-	// of `str` normally, positions in the decomposed text when useJamoAlphabet is on.
-	// `jamoOffsets` is the map decomposeHangul produced for `str`, and is unused (and
-	// may be empty) otherwise.
+	// Boundaries are byte positions of `str`, or of its decomposition (mapped via `jamoOffsets`) when useJamoAlphabet is on.
 	static void collectMorphemeBoundaries(
 		vector<size_t>& boundariesOut,
 		const string& str,
@@ -447,14 +418,12 @@ namespace kiwi
 		}
 	}
 
-	// Returns the text the spans index into: `str` itself, or `jamoBuf` holding its
-	// decomposition when useJamoAlphabet is on.  The scanner below always walks the
-	// original — character classification, the digit cap and Kiwi all need syllables —
-	// and only the emitted spans are translated, which is what lets a boundary land
-	// inside a syllable without any of them knowing.
+	// Returns the text the spans index into: `str`, or its jamo decomposition in `jamoBuf` when useJamoAlphabet is on,
+	// in which case `jamoOffsets` is left holding the byte map from `str` to `jamoBuf`.
 	static const string* extractChunkSpans(
 		vector<pair<size_t, size_t>>& chunksOut,
 		string& jamoBuf,
+		vector<uint32_t>& jamoOffsets,
 		const string& str,
 		size_t maxDigitLength = 0,
 		size_t maxRepeatLength = 0,
@@ -468,10 +437,10 @@ namespace kiwi
 		if (str.empty())
 		{
 			jamoBuf.clear();
+			jamoOffsets.clear();
 			return &str;
 		}
 
-		thread_local vector<uint32_t> jamoOffsets;
 		if (useJamoAlphabet) decomposeHangul(str, jamoBuf, &jamoOffsets);
 		else jamoOffsets.clear();
 		const string* const text = useJamoAlphabet ? &jamoBuf : &str;
@@ -663,9 +632,8 @@ namespace kiwi
 			}
 			thread_local vector<pair<size_t, size_t>> spanBuf;
 			thread_local string jamoBuf;
-			// The spans come back indexed into whichever text they were cut from, so the
-			// jamo case needs no branch here.
-			const string* text = extractChunkSpans(spanBuf, jamoBuf, *workStr,
+			thread_local vector<uint32_t> jamoOffsetBuf;
+			const string* text = extractChunkSpans(spanBuf, jamoBuf, jamoOffsetBuf, *workStr,
 				maxDigitLength, maxRepeatLength, maxWhitespaceRepeatLength, useJamoAlphabet, pretokenizeOption, kiwi);
 			for (auto& span : spanBuf)
 				wc.add(string_view(text->data() + span.first, span.second));
@@ -684,7 +652,6 @@ namespace kiwi
 			vector<string> batch;
 			const size_t maxWorkerCount = config.numThreads == (size_t)-1 ? thread::hardware_concurrency() : config.numThreads;
 
-			// Per-worker accumulators: allocated once, reused across batches.
 			vector<WordCountMap<largeCounter>> localCounts(maxWorkerCount);
 			deque<future<void>> futures;
 
@@ -702,10 +669,7 @@ namespace kiwi
 				pool = make_unique<utils::ThreadPool>(maxWorkerCount);
 			}
 
-			// `feeder` signals end of input by returning an empty string.  Track that
-			// explicitly so it is never called again afterwards: the previous shape of
-			// this loop re-entered and called `feeder` once more past the sentinel,
-			// which silently required every feeder to be sticky at EOF.
+			// An empty string ends the input; `feeder` is never called again after it.
 			bool eof = false;
 			while (!eof)
 			{
@@ -777,12 +741,10 @@ namespace kiwi
 		                   const BpeTokenizerTrainerEventCallback& callback) const override
 		{
 			const size_t targetVocabSize = config.vocabSize > 0 ? config.vocabSize : (size_t)-1;
-			// Zero when unbounded: the callback contract uses it for "indeterminate".
 			const size_t reportedTotal = config.vocabSize;
 
 			vector<string> vocab;
-			// vocabSize is validated to be zero or >= 256; cap the up-front reservation
-			// so that an absurdly large request does not allocate before training.
+			// Cap the up-front reservation so an absurd vocabSize doesn't allocate before training.
 			vocab.reserve(min(config.vocabSize ? config.vocabSize : (size_t)256, (size_t)1 << 20));
 			unordered_map<string, uint32_t> vocabToId;
 
@@ -793,11 +755,7 @@ namespace kiwi
 				vocab.push_back(move(s));
 			}
 
-			// `mask` folds the word's token ids into 64 buckets, one bit each.  A clear
-			// bit proves the token is absent; a set bit only suggests it may be present.
-			// That one-sided guarantee is enough to reject a candidate word without
-			// touching its token array, which is where most of the merge loop went: 84%
-			// of candidate visits scanned a word that did not contain id2 at all.
+			// Bloom-style mask of the word's token ids: a clear bit proves a token is absent, a set bit only suggests it.
 			auto tokenBit = [](uint32_t t) -> uint64_t { return 1ull << (t & 63); };
 
 			struct Word { vector<uint32_t> tokens; size_t count = 0; uint64_t mask = 0; };
@@ -859,10 +817,7 @@ namespace kiwi
 
 			if (!merges.empty())
 			{
-				// Rewrite the words exactly the way encode() will read them: take the
-				// lowest applicable rank, apply every occurrence of it left to right,
-				// repeat.  Matching that order is what keeps training and encoding from
-				// disagreeing when two pinned entries overlap.
+				// Apply pinned entries in the order encode() will (lowest rank first, left to right) so both agree on overlaps.
 				for (auto& w : words)
 				{
 					auto& tokens = w.tokens;
@@ -899,26 +854,15 @@ namespace kiwi
 				}
 			}
 
-			// `pushed` is the value of this pair's single authoritative heap entry, and
-			// is always >= `count`.  Tracking it turns the heap into a lazy decrease-key
-			// structure: a pair is pushed only when its count rises above the entry it
-			// already has, and any popped entry that does not match `pushed` is a stale
-			// duplicate that can be dropped outright.  Without it, rewriting a word
-			// pushes every one of its pairs even though only the two adjacent to the
-			// merge site actually changed.
+			// Count carried by this pair's single authoritative heap entry (always >= `count`). It makes the heap a lazy
+			// decrease-key: push only when the count rises above it, and drop popped entries that don't match it.
 			struct PairStat { size_t count = 0; size_t pushed = 0; };
 			unordered_map<uint64_t, PairStat> pairCounts;
 			for (const auto& w : words)
 				for (size_t i = 0; i + 1 < w.tokens.size(); ++i)
 					pairCounts[makeKey(w.tokens[i], w.tokens[i + 1])].count += w.count;
 
-			// tokenToWords[t] = indices of the words that contain token t, ascending
-			// and deduplicated.  Indexed directly by token id (ids are dense), and
-			// filled in two passes so that each initial token's list is allocated at
-			// exactly its final size: pushing one entry per occurrence and deduplicating
-			// afterwards peaked at roughly 4x this footprint.  The scratch arrays are
-			// sized by the vocabulary rather than by 256, since a pinned alphabet entry
-			// puts ids above the byte range into the words before this runs.
+			// tokenToWords[t]: ascending, deduplicated indices of the words containing token t.
 			vector<vector<uint32_t>> tokenToWords(vocab.size());
 			{
 				vector<char> seen(vocab.size(), 0);
@@ -948,10 +892,7 @@ namespace kiwi
 				}
 			}
 
-			// Pairs rejected by maxTokenLength.  Kept in a separate set rather than
-			// zeroing pairCounts: the pair is still adjacent inside words, so a zeroed
-			// counter would wrap around on the next decrement and flood the heap with
-			// astronomically large phantom counts.
+			// Pairs rejected by maxTokenLength, kept apart instead of zeroing pairCounts whose next decrement would wrap around.
 			unordered_set<uint64_t> blockedPairs;
 
 			emitEvent(callback, BpeTokenizerTrainerEvent::mergeBegin, vocab.size(), reportedTotal);
@@ -966,25 +907,20 @@ namespace kiwi
 				if (blockedPairs.count(key)) continue;
 
 				const auto itCount = pairCounts.find(key);
-				if (itCount == pairCounts.end()) continue;   // pair no longer exists
+				if (itCount == pairCounts.end()) continue;
 				PairStat& stat = itCount->second;
-				// Not this pair's authoritative entry: a superseded duplicate, so drop it
-				// without a replacement push.
+				// Superseded duplicate.
 				if (count != stat.pushed) continue;
 				if (stat.count < config.minPairFrequency)
 				{
-					// Retire the entry, and reset `pushed` so that a later rise past the
-					// threshold is guaranteed to push a fresh one.
+					// Retire the entry so that a later rise pushes a fresh one.
 					stat.pushed = 0;
 					continue;
 				}
 				if (stat.count != count)
 				{
-					// Over-stated snapshot.  Correct it and re-insert rather than
-					// discarding: discarding would lose the pair outright, which is why
-					// every decrement below used to push a replacement entry.  Every
-					// push carries a count >= the pair's true count, so the first entry
-					// that matches its true count is the true maximum.
+					// Over-stated snapshot: correct it and re-insert. No entry under-states its pair's count,
+					// so the first entry that matches is the true maximum.
 					stat.pushed = stat.count;
 					maxHeap.push({ stat.count, key });
 					continue;
@@ -996,8 +932,7 @@ namespace kiwi
 				if (vocab[id1].size() + vocab[id2].size() > config.maxTokenLength)
 				{
 					blockedPairs.insert(key);
-					// Saturate `pushed` so the pair is never pushed again: it stays
-					// adjacent inside words, so its count keeps moving.
+					// Never push again; the pair stays adjacent inside words, so its count keeps moving.
 					stat.pushed = (size_t)-1;
 					continue;
 				}
@@ -1007,10 +942,7 @@ namespace kiwi
 				const auto itVocab = vocabToId.find(newStr);
 				if (itVocab != vocabToId.end())
 				{
-					// Two distinct pairs can produce the same string.  Reuse the existing
-					// id instead of appending a duplicate entry: save() keys the vocab
-					// JSON by token string, so duplicates would collapse on write and
-					// make the resulting file unloadable.
+					// Two pairs can produce the same string. Reuse the id: save() keys the vocab by string, so a duplicate would break loading.
 					newId = itVocab->second;
 				}
 				else
@@ -1023,15 +955,8 @@ namespace kiwi
 				}
 				merges.emplace(key, MergeRule{ (uint32_t)merges.size(), newId });
 
-				// newId differs from id1 and id2 (its string is strictly longer than
-				// either), so `candidates` is not appended to inside this loop and the
-				// outer vector is not resized either; the reference stays valid.
-				//
-				// The list is also compacted in place while it is walked: a word that no
-				// longer contains id1 can never match again, yet nothing used to remove
-				// it, so the lists only ever grew.  On a 5 MB corpus that left 97.6% of
-				// the 58M candidate visits scanning words that could not match.  The
-				// write cursor trails the read cursor, so this is allocation-free.
+				// newId differs from id1 and id2, so `candidates` isn't appended to here and the reference stays valid.
+				// Words that no longer contain id1 are compacted out while walking.
 				const uint64_t bit1 = tokenBit(id1), needMask = bit1 | tokenBit(id2);
 
 				auto& candidates = tokenToWords[id1];
@@ -1044,16 +969,11 @@ namespace kiwi
 
 					if ((w.mask & needMask) != needMask)
 					{
-						// At least one of the two tokens is provably absent, so the pair
-						// cannot occur.  The entry is still kept whenever id1's bit is
-						// set, because a set bit does not prove id1 is really there —
-						// dropping on it would break the superset invariant.
+						// A token is provably absent. Keep the entry while id1's bit is set, since only a clear bit proves id1 is gone.
 						if (w.mask & bit1) candidates[keptCount++] = wIdx;
 						continue;
 					}
 
-					// One scan answers both questions: does the pair occur here, and is
-					// id1 still present at all (i.e. is this entry worth keeping)?
 					bool hasPair = false, hasId1 = false;
 					for (size_t i = 0; i < w.tokens.size(); ++i)
 					{
@@ -1067,7 +987,7 @@ namespace kiwi
 						continue;
 					}
 
-					// Withdraw every pair of the current token sequence...
+					// Withdraw the old pairs,
 					for (size_t i = 0; i + 1 < w.tokens.size(); ++i)
 					{
 						const uint64_t pKey = makeKey(w.tokens[i], w.tokens[i + 1]);
@@ -1076,17 +996,11 @@ namespace kiwi
 						if (it == pairCounts.end()) continue;
 						// Counts are unsigned; drop the entry instead of ever wrapping.
 						if (it->second.count <= w.count) { pairCounts.erase(it); continue; }
-						// No push: a decrement can never make this pair the new maximum,
-						// and its existing (now over-stated) entry is corrected when it
-						// reaches the top of the heap.
+						// No push: a decrement never makes a new maximum, and the stale entry is corrected when it surfaces.
 						it->second.count -= w.count;
 					}
 
-					// ...rewrite the word in place (the result is never longer, so the
-					// write cursor always trails the read cursor), rebuilding the mask
-					// from scratch as the tokens are written out: the merge introduces
-					// newId and may retire id1 or id2, and an OR-only update could never
-					// clear a bit...
+					// rewrite the word in place (it never grows), rebuilding the mask since a merge can retire tokens,
 					size_t out = 0;
 					uint64_t newMask = 0;
 					for (size_t i = 0; i < w.tokens.size(); )
@@ -1102,17 +1016,13 @@ namespace kiwi
 					w.tokens.resize(out);
 					w.mask = newMask;
 
-					// ...and re-deposit every pair of the new sequence.
+					// and re-deposit the new pairs.
 					for (size_t j = 0; j + 1 < w.tokens.size(); ++j)
 					{
 						const uint64_t pKey = makeKey(w.tokens[j], w.tokens[j + 1]);
 						PairStat& ps = pairCounts[pKey];
 						ps.count += w.count;
-						// Only push when the count outgrows the entry this pair already
-						// has.  A pair away from the merge site is withdrawn and then
-						// re-deposited by the same amount, so it lands back at or below
-						// `pushed` and needs no entry at all — that case alone accounted
-						// for most of the heap traffic.
+						// Push only when the count outgrows this pair's existing entry.
 						if (ps.count >= config.minPairFrequency && ps.count > ps.pushed)
 						{
 							ps.pushed = ps.count;
@@ -1120,9 +1030,7 @@ namespace kiwi
 						}
 					}
 
-					// Keep the entry only while id1 actually survives in the rewritten
-					// word; every occurrence is usually consumed by the merge, and the
-					// mask settles that common case without a scan.
+					// Keep the entry only while id1 survives in the rewritten word.
 					if ((w.mask & bit1) && find(w.tokens.begin(), w.tokens.end(), id1) != w.tokens.end())
 						candidates[keptCount++] = wIdx;
 
@@ -1130,10 +1038,7 @@ namespace kiwi
 				}
 				candidates.resize(keptCount);
 
-				// Every occurrence reachable through the index has been withdrawn, so the
-				// pair is normally erased by now.  Should any residue remain, re-arm it:
-				// decrements no longer push, so it would otherwise never be revisited.
-				// Requiring a strict decrease keeps this loop finite.
+				// Re-arm any residue, since decrements no longer push. The strict decrease keeps this loop finite.
 				const auto itResidue = pairCounts.find(key);
 				if (itResidue != pairCounts.end())
 				{
@@ -1148,13 +1053,13 @@ namespace kiwi
 
 			emitEvent(callback, BpeTokenizerTrainerEvent::mergeEnd, vocab.size(), vocab.size());
 
-			return BpeTokenizer(move(vocab), move(merges), config.addPrefixSpace);
+			return BpeTokenizer(move(vocab), move(merges), config.addPrefixSpace, config.useJamoAlphabet);
 		}
 	};
 
-	static vector<uint32_t> buildByteToCharPos(const string& str)
+	static void buildByteToCharPos(vector<uint32_t>& byteToCharPos, const string& str)
 	{
-		vector<uint32_t> byteToCharPos;
+		byteToCharPos.clear();
 		byteToCharPos.reserve(str.size() + 1);
 
 		uint32_t chrPos = 0;
@@ -1196,7 +1101,71 @@ namespace kiwi
 			i += len;
 		}
 		byteToCharPos.push_back(chrPos);
-		return byteToCharPos;
+	}
+
+	namespace
+	{
+		struct TokenSpan
+		{
+			uint32_t id;
+			uint32_t start;
+			uint32_t end;
+		};
+
+		// Scratch buffers reused across calls; thread_local because encode() is const and may run concurrently.
+		struct EncodeScratch
+		{
+			string prefixed;
+			vector<pair<size_t, size_t>> spans;
+			string jamoBuf;
+			vector<uint32_t> jamoOffsets;
+			vector<uint32_t> byteToCharPos;
+			vector<TokenSpan> tokens;
+			vector<uint32_t> ranks, newIds;
+		};
+	}
+
+	// Impossible id pair (it would need a 2^32-entry vocabulary), doubling as the empty-slot marker.
+	static constexpr uint64_t emptyMergeKey = (uint64_t)-1;
+
+	static inline uint64_t mergeHash(uint64_t k)
+	{
+		k *= 0x9E3779B97F4A7C15ull;
+		return k ^ (k >> 29);
+	}
+
+	void BpeTokenizer::buildMergeTable()
+	{
+		mergeTable.clear();
+		mergeTableMask = 0;
+		if (merges.empty()) return;
+
+		size_t capacity = 16;
+		while (capacity < merges.size() * 2) capacity <<= 1; // load factor stays under 1/2
+		mergeTable.assign(capacity, MergeSlot{ emptyMergeKey, MergeRule{} });
+		mergeTableMask = capacity - 1;
+
+		for (const auto& kv : merges)
+		{
+			if (kv.first == emptyMergeKey) continue;
+			size_t idx = mergeHash(kv.first) & mergeTableMask;
+			while (mergeTable[idx].key != emptyMergeKey) idx = (idx + 1) & mergeTableMask;
+			mergeTable[idx] = { kv.first, kv.second };
+		}
+	}
+
+	const MergeRule* BpeTokenizer::findMerge(uint32_t a, uint32_t b) const
+	{
+		if (mergeTable.empty()) return nullptr;
+		const uint64_t key = ((uint64_t)a << 32) | (uint64_t)b;
+		size_t idx = mergeHash(key) & mergeTableMask;
+		for (;;)
+		{
+			const auto& slot = mergeTable[idx];
+			if (slot.key == key) return &slot.rule;
+			if (slot.key == emptyMergeKey) return nullptr;
+			idx = (idx + 1) & mergeTableMask;
+		}
 	}
 
 	bool BpeTokenizer::ready() const
@@ -1208,117 +1177,163 @@ namespace kiwi
 	{
 		if (str.empty()) return;
 
-		string workStr;
+		thread_local EncodeScratch scratch;
+
+		const string* work = &str;
 		bool prependedSpace = false;
-		if (addPrefixSpace)
+		if (addPrefixSpace && str[0] != ' ')
 		{
-			if (str[0] != ' ')
-			{
-				workStr = " " + str;
-				prependedSpace = true;
-			}
-			else
-			{
-				workStr = str;
-			}
+			scratch.prefixed.assign(1, ' ');
+			scratch.prefixed += str;
+			work = &scratch.prefixed;
+			prependedSpace = true;
 		}
-		else
+		const string& workStr = *work;
+
+		// Decompose exactly when the vocabulary was trained on jamo, or none of its merges would fire.
+		const string& text = *extractChunkSpans(scratch.spans, scratch.jamoBuf, scratch.jamoOffsets,
+			workStr, 0, 0, 0, nfdForHangul);
+
+		// Maps a position in the decomposed text back to workStr: a start rounds down to its syllable, an end rounds up.
+		// Tokens come out in position order, so a forward-only cursor suffices.
+		const auto& jamoOffsets = scratch.jamoOffsets;
+		size_t cursorPos = 0, cursorEnd = 0;
+		auto seekJamo = [&](uint32_t j)
 		{
-			workStr = str;
-		}
-
-		if (workStr.empty()) return;
-
-		vector<pair<size_t, size_t>> spans;
-		// Encoding stays byte-level: it neither decomposes nor pre-tokenizes with Kiwi,
-		// so the scratch buffer is left empty and the spans index into workStr.
-		string jamoScratch;
-		extractChunkSpans(spans, jamoScratch, workStr);
-
-		struct TokenSpan
-		{
-			uint32_t id;
-			uint32_t start;
-			uint32_t end;
+			while (cursorPos < workStr.size() && jamoOffsets[cursorEnd] <= j)
+			{
+				cursorPos = cursorEnd;
+				if (cursorPos >= workStr.size()) break;
+				cursorEnd = cursorPos + 1;
+				while (cursorEnd < workStr.size() && jamoOffsets[cursorEnd] == jamoOffsets[cursorPos]) ++cursorEnd;
+			}
 		};
+		auto mapStart = [&](uint32_t j) -> uint32_t
+		{
+			if (!nfdForHangul) return j;
+			seekJamo(j);
+			return (uint32_t)cursorPos;
+		};
+		auto mapEnd = [&](uint32_t j) -> uint32_t
+		{
+			if (!nfdForHangul) return j;
+			seekJamo(j);
+			if (cursorPos >= workStr.size()) return (uint32_t)workStr.size();
+			// Exactly on the syllable's first jamo means the token stopped in front of it.
+			return jamoOffsets[cursorPos] == j ? (uint32_t)cursorPos : (uint32_t)cursorEnd;
+		};
+		if (nfdForHangul && !workStr.empty())
+		{
+			cursorEnd = 1;
+			while (cursorEnd < workStr.size() && jamoOffsets[cursorEnd] == jamoOffsets[0]) ++cursorEnd;
+		}
 
 		auto makeKey = [](uint32_t a, uint32_t b) -> uint64_t {
 			return ((uint64_t)a << 32) | (uint64_t)b;
 		};
 
-		vector<uint32_t> byteToCharPos;
+		auto& byteToCharPos = scratch.byteToCharPos;
 		if (offset && offsetInChrLevel)
 		{
-			byteToCharPos = buildByteToCharPos(str);
+			buildByteToCharPos(byteToCharPos, str);
 		}
 
-		for (const auto& span : spans)
+		// Rank and resulting id of the merge for the pair at i, looked up again only when a merge disturbs that pair.
+		constexpr uint32_t noRank = UINT32_MAX;      // no merge rule for this pair
+		constexpr uint32_t dirtyRank = UINT32_MAX - 1; // pair changed, rank not looked up yet
+		auto& tokens = scratch.tokens;
+		auto& ranks = scratch.ranks;
+		auto& newIds = scratch.newIds;
+
+		auto lookupPair = [&](size_t i)
 		{
-			vector<TokenSpan> tokens;
-			tokens.reserve(span.second);
-			for (size_t i = 0; i < span.second; ++i)
+			const MergeRule* rule = findMerge(tokens[i].id, tokens[i + 1].id);
+			if (!rule)
 			{
-				size_t origIdx = span.first + i;
-				tokens.push_back({ (uint32_t)(unsigned char)workStr[origIdx], (uint32_t)origIdx, (uint32_t)(origIdx + 1) });
+				ranks[i] = noRank;
+			}
+			else
+			{
+				ranks[i] = rule->rank;
+				newIds[i] = rule->newId;
+			}
+		};
+
+		// No reserve(): a caller accumulating several calls into one vector would reallocate on every call.
+		for (const auto& span : scratch.spans)
+		{
+			size_t k = span.second;
+			tokens.resize(k);
+			for (size_t i = 0; i < k; ++i)
+			{
+				const size_t origIdx = span.first + i;
+				tokens[i] = { (uint32_t)(unsigned char)text[origIdx], (uint32_t)origIdx, (uint32_t)(origIdx + 1) };
 			}
 
-			while (tokens.size() >= 2)
+			if (k >= 2)
 			{
-				uint32_t bestRank = UINT32_MAX;
-				uint32_t bestNewId = 0;
+				ranks.resize(k);
+				newIds.resize(k);
+				for (size_t i = 0; i + 1 < k; ++i) lookupPair(i);
+				ranks[k - 1] = noRank;
 
-				for (size_t i = 0; i + 1 < tokens.size(); ++i)
+				for (;;)
 				{
-					uint64_t key = makeKey(tokens[i].id, tokens[i + 1].id);
-					auto it = merges.find(key);
-					if (it != merges.end() && it->second.rank < bestRank)
+					uint32_t bestRank = noRank;
+					size_t bestIdx = 0;
+					for (size_t i = 0; i + 1 < k; ++i)
 					{
-						bestRank = it->second.rank;
-						bestNewId = it->second.newId;
+						if (ranks[i] == dirtyRank) lookupPair(i);
+						if (ranks[i] < bestRank) { bestRank = ranks[i]; bestIdx = i; }
 					}
-				}
+					if (bestRank == noRank) break;
+					const uint32_t bestNewId = newIds[bestIdx];
 
-				if (bestRank == UINT32_MAX) break;
-
-				vector<TokenSpan> newTokens;
-				newTokens.reserve(tokens.size());
-
-				size_t i = 0;
-				while (i < tokens.size())
-				{
-					if (i + 1 < tokens.size())
+					// Compact in place; a merge only invalidates the pair it forms and the one before it.
+					size_t o = 0;
+					for (size_t i = 0; i < k; )
 					{
-						uint64_t key = makeKey(tokens[i].id, tokens[i + 1].id);
-						auto it = merges.find(key);
-						if (it != merges.end() && it->second.rank == bestRank)
+						if (i + 1 < k && ranks[i] == bestRank)
 						{
-							newTokens.push_back({ bestNewId, tokens[i].start, tokens[i + 1].end });
+							tokens[o] = { bestNewId, tokens[i].start, tokens[i + 1].end };
+							ranks[o] = dirtyRank;
+							if (o) ranks[o - 1] = dirtyRank;
+							++o;
 							i += 2;
-							continue;
+						}
+						else
+						{
+							tokens[o] = tokens[i];
+							ranks[o] = ranks[i];
+							newIds[o] = newIds[i];
+							++o;
+							++i;
 						}
 					}
-					newTokens.push_back(tokens[i]);
-					i++;
+					k = o;
+					ranks[k - 1] = noRank;
+					if (k < 2) break;
 				}
-				tokens = move(newTokens);
 			}
 
-			for (const auto& tok : tokens)
+			for (size_t i = 0; i < k; ++i)
 			{
+				const auto& tok = tokens[i];
 				out.push_back(tok.id);
 				if (offset)
 				{
-					uint32_t sStart = prependedSpace ? (tok.start > 0 ? tok.start - 1 : 0) : tok.start;
-					uint32_t sEnd   = prependedSpace ? (tok.end   > 0 ? tok.end   - 1 : 0) : tok.end;
+					const uint32_t tStart = mapStart(tok.start);
+					const uint32_t tEnd   = mapEnd(tok.end);
+
+					uint32_t sStart = prependedSpace ? (tStart > 0 ? tStart - 1 : 0) : tStart;
+					uint32_t sEnd   = prependedSpace ? (tEnd   > 0 ? tEnd   - 1 : 0) : tEnd;
 
 					if (sStart > str.size()) sStart = (uint32_t)str.size();
 					if (sEnd   > str.size()) sEnd   = (uint32_t)str.size();
 
 					if (offsetInChrLevel)
 					{
-						uint32_t cStart = byteToCharPos[sStart];
-						uint32_t cEnd   = byteToCharPos[sEnd];
-						offset->emplace_back(cStart, cEnd);
+						offset->emplace_back(byteToCharPos[sStart], byteToCharPos[sEnd]);
 					}
 					else
 					{
@@ -1365,9 +1380,7 @@ namespace kiwi
 		return decode(ids, ids + length, ignoreErrors);
 	}
 
-	// GPT-2 style bytes-to-unicode mapping.
-	// Bytes that are printable (ASCII 33-126, Latin-1 supplement 161-172, 174-255)
-	// map to themselves; the remaining 68 bytes map to U+0100..U+0143.
+	// GPT-2 bytes-to-unicode: printable bytes map to themselves, the other 68 to U+0100..U+0143.
 	static const array<char32_t, 256>& getBytesToUnicode()
 	{
 		static array<char32_t, 256> table = []() {
@@ -1463,7 +1476,9 @@ namespace kiwi
 		j["truncation"] = nullptr;
 		j["padding"] = nullptr;
 		j["added_tokens"] = json::array();
-		j["normalizer"] = nullptr;
+		// "nfd_for_hangul" is our own normalizer type; only our load() needs to understand it.
+		if (nfdForHangul) j["normalizer"] = { {"type", "nfd_for_hangul"} };
+		else j["normalizer"] = nullptr;
 		j["pre_tokenizer"] = {
 			{"type", "ByteLevel"},
 			{"add_prefix_space", addPrefixSpace},
@@ -1499,7 +1514,6 @@ namespace kiwi
 
 		auto j = json::parse(istr);
 
-		// Read addPrefixSpace from pre_tokenizer
 		bool addPrefixSpace = false;
 		if (j.contains("pre_tokenizer") && !j["pre_tokenizer"].is_null())
 		{
@@ -1508,9 +1522,17 @@ namespace kiwi
 				addPrefixSpace = pt["add_prefix_space"].get<bool>();
 		}
 
+		// Other normalizers are ignored.
+		bool nfdForHangul = false;
+		if (j.contains("normalizer") && j["normalizer"].is_object())
+		{
+			auto& nm = j["normalizer"];
+			if (nm.contains("type") && nm["type"].is_string())
+				nfdForHangul = nm["type"].get<string>() == "nfd_for_hangul";
+		}
+
 		auto& model = j["model"];
 
-		// Build vocab sorted by ID
 		vector<pair<uint32_t, string>> vocabPairs;
 		for (auto& [hfToken, idVal] : model["vocab"].items())
 			vocabPairs.push_back({ idVal.get<uint32_t>(), hfToRaw(hfToken) });
@@ -1528,7 +1550,6 @@ namespace kiwi
 		for (auto& [id, tok] : vocabPairs)
 			vocab[id] = tok;
 
-		// Reverse map for merge lookup
 		unordered_map<string, uint32_t> vocabToId;
 		vocabToId.reserve(vocab.size());
 		for (size_t i = 0; i < vocab.size(); ++i)
@@ -1538,7 +1559,7 @@ namespace kiwi
 			return ((uint64_t)a << 32) | (uint64_t)b;
 		};
 
-		// Build merges: index in list = rank
+		// Index in the list is the rank.
 		unordered_map<uint64_t, MergeRule> merges;
 		uint32_t rank = 0;
 		for (auto& mergeVal : model["merges"])
@@ -1558,7 +1579,7 @@ namespace kiwi
 			++rank;
 		}
 
-		return BpeTokenizer(move(vocab), move(merges), addPrefixSpace);
+		return BpeTokenizer(move(vocab), move(merges), addPrefixSpace, nfdForHangul);
 	}
 
 	
