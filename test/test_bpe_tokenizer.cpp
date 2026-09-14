@@ -297,7 +297,7 @@ TEST(BpeTokenizerTest, UseJamoAlphabetDecomposesAndPinsJamo)
 	BpeTrainerConfig config;
 	config.vocabSize = 500;
 	config.minPairFrequency = 2;
-	config.useJamoAlphabet = true;
+	config.useJamoAlphabet = JamoAlphabet::modern_only;
 
 	const std::vector<std::string> sentences(8, u8"한글 자모 학습");
 	const auto vocab = trainVocab(config, nullptr, sentences);
@@ -361,7 +361,7 @@ TEST(BpeTokenizerTest, SplitsCodaMorphemeUnderJamoAlphabet)
 	BpeTrainerConfig config;
 	config.vocabSize = 1000;
 	config.minPairFrequency = 2;
-	config.useJamoAlphabet = true;
+	config.useJamoAlphabet = JamoAlphabet::modern_only;
 
 	const std::vector<std::string> sentences(8, u8"그건 할 일");
 
@@ -380,7 +380,7 @@ TEST(BpeTokenizerTest, SplitsCodaMorphemeUnderJamoAlphabet)
 
 	// The same corpus without jamo cannot express either seam, so both stay whole.
 	BpeTrainerConfig byteConfig = config;
-	byteConfig.useJamoAlphabet = false;
+	byteConfig.useJamoAlphabet = JamoAlphabet::none;
 	const auto byteSplit = trainVocab(byteConfig, &kiwi, sentences);
 	EXPECT_TRUE(byteSplit.count(u8"그건"));
 	EXPECT_TRUE(byteSplit.count(u8" 할"));
@@ -404,7 +404,7 @@ TEST(BpeTokenizerTest, KeepsBoundariesOrderedAcrossContractedSyllables)
 	BpeTrainerConfig config;
 	config.vocabSize = 1000;
 	config.minPairFrequency = 2;
-	config.useJamoAlphabet = true;
+	config.useJamoAlphabet = JamoAlphabet::modern_only;
 	config.pretokenizeOption = PretokenizeOption::all;
 
 	// 합니다 = 하/VV(p,1) + ᆸ니다/EF(p,3): 하's end names the far side of 합 while the
@@ -833,7 +833,7 @@ TEST(BpeTokenizerTest, SavedModelKeepsJamoNormalizer)
 	BpeTrainerConfig config;
 	config.vocabSize = 500;
 	config.minPairFrequency = 2;
-	config.useJamoAlphabet = true;
+	config.useJamoAlphabet = JamoAlphabet::modern_only;
 	BpeTokenizerTrainer trainer(config);
 
 	const std::vector<std::string> sentences(8, u8"한글 자모 학습 안녕하세요");
@@ -1015,4 +1015,64 @@ TEST(BpeTokenizerTest, ReportsIndeterminateTotalWhenVocabSizeIsUnbounded)
 	EXPECT_EQ(std::get<2>(events.front()), 0u);   // zero means "indeterminate"
 	EXPECT_EQ(std::get<0>(events.back()), Event::mergeEnd);
 	EXPECT_EQ(std::get<1>(events.back()), tokenizer.getVocab().size());
+}
+
+TEST(BpeTokenizerTest, AllJamoAlphabetPinsArchaicJamo)
+{
+	BpeTrainerConfig config;
+	config.vocabSize = 1000;
+	config.minPairFrequency = 2;
+	config.useJamoAlphabet = JamoAlphabet::all;
+
+	const std::vector<std::string> sentences(8, u8"한글 자모 학습");
+	const auto vocab = trainVocab(config, nullptr, sentences);
+
+	const std::vector<std::pair<char32_t, char32_t>> blocks = { { 0x1100, 0x11FF }, { 0xA960, 0xA97F }, { 0xD7B0, 0xD7FF } };
+	size_t total = 0, present = 0;
+	for (const auto& b : blocks)
+	{
+		for (char32_t c = b.first; c <= b.second; ++c)
+		{
+			++total;
+			if (vocab.count(utf8FromCode(c))) ++present;
+		}
+	}
+	EXPECT_EQ(total, 368u);
+	EXPECT_EQ(present, total);
+
+	BpeTrainerConfig modernConfig = config;
+	modernConfig.useJamoAlphabet = JamoAlphabet::modern_only;
+	const auto modernVocab = trainVocab(modernConfig, nullptr, sentences);
+	for (char32_t c : { (char32_t)0x1113, (char32_t)0x119E, (char32_t)0xA960, (char32_t)0xD7B0 })
+	{
+		EXPECT_TRUE(vocab.count(utf8FromCode(c)));
+		EXPECT_FALSE(modernVocab.count(utf8FromCode(c)));
+	}
+
+	// Sized so the merge loop has no room: the byte alphabet, 368 jamo and the seven two-byte
+	// prefixes they share (E1 84..87, EA A5, ED 9E, ED 9F).
+	BpeTrainerConfig exactConfig = config;
+	exactConfig.vocabSize = 256 + 375;
+	EXPECT_EQ(trainVocab(exactConfig, nullptr, sentences).size(), 256u + 375u);
+
+	const auto build = [&](const BpeTrainerConfig& cfg)
+	{
+		BpeTokenizerTrainer trainer(cfg);
+		size_t idx = 0;
+		trainer.addSentences([&]() -> std::string
+		{
+			return idx < sentences.size() ? sentences[idx++] : std::string{};
+		});
+		return trainer.build();
+	};
+	const auto allTokenizer = build(config);
+	const auto modernTokenizer = build(modernConfig);
+	EXPECT_TRUE(allTokenizer.isNfdForHangul());
+
+	// ᄒᆞᆫ puts the archaic vowel U+119E between jamo the corpus did use.
+	const std::string archaic = u8"ᄒᆞᆫ";
+	EXPECT_EQ(allTokenizer.encode(archaic).size(), 3u);
+	EXPECT_GT(modernTokenizer.encode(archaic).size(), 3u);
+	EXPECT_EQ(allTokenizer.decode(allTokenizer.encode(archaic)), archaic);
+	EXPECT_EQ(allTokenizer.decode(allTokenizer.encode(u8"한글")), modernTokenizer.decode(modernTokenizer.encode(u8"한글")));
 }
