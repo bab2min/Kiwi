@@ -78,6 +78,15 @@ namespace kiwi
 		all = jClass | eClass | vcp | xsv,
 	};
 
+	enum class JamoAlphabet : uint8_t
+	{
+		none = 0,
+		// BPE 학습 시 기본 알파벳에 현대 한글 자모를 추가함
+		modern_only = 1,
+		// 현대 한글 자모뿐만 아니라 옛 한글 자모까지 모두 추가함
+		all = 2,
+	};
+
 	struct BpeTrainerConfig
 	{
 		size_t vocabSize = 0;
@@ -88,7 +97,7 @@ namespace kiwi
 		size_t maxRepeatLength = 8;
 		size_t maxWhitespaceRepeatLength = 16;
 		std::vector<std::string> additionalAlphabet;
-		bool useJamoAlphabet = false;
+		JamoAlphabet useJamoAlphabet = JamoAlphabet::none;
 		PretokenizeOption pretokenizeOption = PretokenizeOption::none;
 		// -1 selects std::thread::hardware_concurrency(), 0 disables threading, and any positive value is the number of threads to use.
 		size_t numThreads = 0;

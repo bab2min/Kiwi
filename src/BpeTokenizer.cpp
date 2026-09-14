@@ -659,7 +659,7 @@ namespace kiwi
 			{
 				for (auto& s : data)
 				{
-					addChunksTo(s, config.addPrefixSpace, config.maxDigitLength, config.maxRepeatLength, config.maxWhitespaceRepeatLength, config.useJamoAlphabet, config.pretokenizeOption, kiwi, targetCounts);
+					addChunksTo(s, config.addPrefixSpace, config.maxDigitLength, config.maxRepeatLength, config.maxWhitespaceRepeatLength, config.useJamoAlphabet != JamoAlphabet::none, config.pretokenizeOption, kiwi, targetCounts);
 				}
 			};
 
@@ -785,11 +785,17 @@ namespace kiwi
 			unordered_map<uint64_t, MergeRule> merges;
 
 			vector<string> pinnedAlphabet = config.additionalAlphabet;
-			if (config.useJamoAlphabet)
+			if (config.useJamoAlphabet == JamoAlphabet::modern_only)
 			{
 				for (size_t i = 0; i < hangulOnsetCount; ++i)  pinnedAlphabet.emplace_back(utf8FromCode(hangulOnsetFirst + (char32_t)i));
 				for (size_t i = 0; i < hangulVowelCount; ++i) pinnedAlphabet.emplace_back(utf8FromCode(hangulVowelFirst + (char32_t)i));
 				for (size_t i = 0; i < hangulCodaCount; ++i)  pinnedAlphabet.emplace_back(utf8FromCode(hangulCodaFirst + (char32_t)i));
+			}
+			else if (config.useJamoAlphabet == JamoAlphabet::all)
+			{
+				for (char32_t c = 0x1100; c <= 0x11FF; ++c) pinnedAlphabet.emplace_back(utf8FromCode(c));
+				for (char32_t c = 0xA960; c <= 0xA97F; ++c) pinnedAlphabet.emplace_back(utf8FromCode(c));
+				for (char32_t c = 0xD7B0; c <= 0xD7FF; ++c) pinnedAlphabet.emplace_back(utf8FromCode(c));
 			}
 
 			for (const auto& entry : pinnedAlphabet)
@@ -1053,7 +1059,7 @@ namespace kiwi
 
 			emitEvent(callback, BpeTokenizerTrainerEvent::mergeEnd, vocab.size(), vocab.size());
 
-			return BpeTokenizer(move(vocab), move(merges), config.addPrefixSpace, config.useJamoAlphabet);
+			return BpeTokenizer(move(vocab), move(merges), config.addPrefixSpace, config.useJamoAlphabet != JamoAlphabet::none);
 		}
 	};
 
@@ -1596,6 +1602,8 @@ namespace kiwi
 		for (const auto& entry : config.additionalAlphabet)
 			if (entry.empty())
 				throw invalid_argument("BpeTokenizerTrainer::additionalAlphabet must not contain an empty string");
+		if ((uint8_t)config.useJamoAlphabet > (uint8_t)JamoAlphabet::all)
+			throw invalid_argument("BpeTokenizerTrainer::useJamoAlphabet must be none, modern_only or all");
 
 		if (config.pretokenizeOption != PretokenizeOption::none && !kiwi)
 			throw invalid_argument("BpeTokenizerTrainer::pre-tokenization requires a valid Kiwi instance");
