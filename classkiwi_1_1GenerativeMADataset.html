@@ -108,6 +108,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>addSentence</b> (std:
 <tr class="memitem:a0ba7a1273ebebb56f09de6524b595b82" id="r_a0ba7a1273ebebb56f09de6524b595b82"><td class="memItemLeft" align="right" valign="top"><a id="a0ba7a1273ebebb56f09de6524b595b82" name="a0ba7a1273ebebb56f09de6524b595b82"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>addSentence</b> (std::u16string_view sentence)</td></tr>
 <tr class="separator:a0ba7a1273ebebb56f09de6524b595b82"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae24334aaed3d97f0a22516705f05d374" id="r_ae24334aaed3d97f0a22516705f05d374"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1GenerativeMADataset.html#ae24334aaed3d97f0a22516705f05d374">addAnalyzedCorpus</a> (std::istream &amp;is)</td></tr>
+<tr class="separator:ae24334aaed3d97f0a22516705f05d374"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a86724d5da6026f0bb8998246a8dcc76d" id="r_a86724d5da6026f0bb8998246a8dcc76d"><td class="memItemLeft" align="right" valign="top"><a id="a86724d5da6026f0bb8998246a8dcc76d" name="a86724d5da6026f0bb8998246a8dcc76d"></a>
 size_t&#160;</td><td class="memItemRight" valign="bottom"><b>numSents</b> () const</td></tr>
 <tr class="separator:a86724d5da6026f0bb8998246a8dcc76d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -169,6 +171,25 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>KiwiBuilder</b></td>
 <p>maxSeqLength를 넘는 부분은 뒤에서 잘리고(따라서 [eos]도 사라진다), 남는 자리는 <code>padToken</code>으로 채운다.</p>
 <p><code><a class="el" href="classkiwi_1_1KiwiBuilder.html#ab4ec110e57d192b2e8ed1c57187b1a31" title="생성형 형태소 분석 모델 학습용 데이터셋을 생성한다.">KiwiBuilder::makeGenerativeMADataset</a></code>으로 생성해야 한다. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="ae24334aaed3d97f0a22516705f05d374" name="ae24334aaed3d97f0a22516705f05d374"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae24334aaed3d97f0a22516705f05d374">&#9670;&#160;</a></span>addAnalyzedCorpus()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t kiwi::GenerativeMADataset::addAnalyzedCorpus </td>
+          <td>(</td>
+          <td class="paramtype">std::istream &amp;&#160;</td>
+          <td class="paramname"><em>is</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>형태소 분석된 말뭉치를 추가한다. 한 줄은 <code>어절\t형태1\t품사1\t형태2\t품사2...</code>이고, 빈 줄 하나는 문장 경계, 빈 줄 두 개 이상은 문서 경계다. 같은 문서의 연속된 문장은 행이 maxSeqLength를 넘지 않는 만큼 이어붙여 하나의 데이터로 만든다. 어미 첫 글자 '아'는 Kiwi의 분석 결과에 맞추어 '어'로 바꾸고, NA처럼 알 수 없는 품사가 있는 문장은 경고를 stderr로 출력하고 버린다. </p><dl class="section return"><dt>Returns</dt><dd>추가된 문장의 개수 </dd></dl>
+
+</div>
+</div>
 <a id="a24b56bc63b6482674dba850a260327fe" name="a24b56bc63b6482674dba850a260327fe"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a24b56bc63b6482674dba850a260327fe">&#9670;&#160;</a></span>next()</h2>
 
