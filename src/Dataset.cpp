@@ -1307,8 +1307,8 @@ std::vector<std::pair<std::vector<uint32_t>, double>> ChrDataset::extractPrefixe
 	return ret;
 }
 
-static_assert(sizeof(RaggedVector<char16_t>) == sizeof(Vector<size_t>) * 2,
-	"the inline storage of `GenerativeMADataset::sents` no longer fits `RaggedVector<char16_t>`");
+// 한 행에서 bos, 구분자, eos가 차지하는 자리
+static constexpr size_t rowOverhead = 3;
 
 constexpr int32_t GenerativeMADataset::padToken;
 
@@ -1347,9 +1347,172 @@ void GenerativeMADataset::addSentence(std::string_view sentence)
 
 void GenerativeMADataset::addSentence(std::u16string_view sentence)
 {
+	pushItem(sentence, {}, {});
+}
+
+void GenerativeMADataset::pushItem(std::u16string_view surface, std::u16string_view forms, const Vector<uint32_t>& infos)
+{
 	auto& s = sents.get();
 	s.emplace_back();
-	s.insert_data(sentence.begin(), sentence.end());
+	s.insert_data(surface.begin(), surface.end());
+	auto& f = morphemeForms.get();
+	f.emplace_back();
+	f.insert_data(forms.begin(), forms.end());
+	auto& m = morphemeInfos.get();
+	m.emplace_back();
+	m.insert_data(infos.begin(), infos.end());
+}
+
+void GenerativeMADataset::appendMorpheme(std::vector<uint32_t>& out, std::string& buf, std::u16string_view form, POSTag tag, POSTag prevTag) const
+{
+	// Joiner가 띄어쓰는 자리에만 공백을 붙인다. 실제 문장에서의 모습대로 토큰화되어 토큰 수도 줄어든다.
+	const bool insertSpace = !out.empty()
+		&& cmb::isSpaceInsertable(clearIrregular(prevTag), clearIrregular(tag), form);
+	buf.assign(insertSpace ? 1 : 0, ' ');
+	buf += utf16To8(form);
+	tokenizer->encode(out, buf);
+	out.emplace_back(tagTokenId(tag));
+}
+
+size_t GenerativeMADataset::addAnalyzedCorpus(std::istream& is)
+{
+	struct Sentence
+	{
+		std::u16string surface, forms;
+		Vector<uint32_t> infos; // (forms 안에서 형태가 끝나는 위치 << 8 | 품사)
+	};
+
+	std::u16string packSurface, packForms;
+	Vector<uint32_t> packInfos;
+	std::vector<uint32_t> packMorphemeTokens, surfaceTokens;
+	std::string buf;
+	size_t packSurfaceTokens = 0;
+
+	const auto emitPack = [&]()
+	{
+		if (packInfos.empty()) return;
+		pushItem(packSurface, packForms, packInfos);
+		packSurface.clear();
+		packForms.clear();
+		packInfos.clear();
+		packMorphemeTokens.clear();
+		packSurfaceTokens = 0;
+	};
+
+	const auto appendToPack = [&](const Sentence& sent)
+	{
+		if (!packSurface.empty()) packSurface += u' ';
+		packSurface += sent.surface;
+		const size_t formOffset = packForms.size();
+		packForms += sent.forms;
+		POSTag prevTag = packInfos.empty() ? POSTag::unknown : (POSTag)(packInfos.back() & 0xFF);
+		size_t start = 0;
+		for (const uint32_t info : sent.infos)
+		{
+			const size_t end = info >> 8;
+			const POSTag tag = (POSTag)(info & 0xFF);
+			appendMorpheme(packMorphemeTokens, buf, std::u16string_view{ sent.forms }.substr(start, end - start), tag, prevTag);
+			packInfos.emplace_back((uint32_t)((formOffset + end) << 8) | (uint8_t)tag);
+			prevTag = tag;
+			start = end;
+		}
+		surfaceTokens.clear();
+		tokenizer->encode(surfaceTokens, utf16To8(packSurface));
+		packSurfaceTokens = surfaceTokens.size();
+	};
+
+	// 같은 문서의 문장은 행이 maxSeqLength를 넘지 않는 만큼 이어붙이고, 넘치면 그때까지를 내보낸 뒤 새로 시작한다.
+	// 길이는 buildWorkItem과 같은 방식으로 인코딩해서 재므로, 잡음이 없다면 이어붙인 데이터는 잘리지 않는다.
+	const auto addToPack = [&](const Sentence& sent)
+	{
+		if (!packInfos.empty())
+		{
+			const size_t surfaceLen = packSurface.size(), formsLen = packForms.size(), infosLen = packInfos.size(),
+				morphemeTokenLen = packMorphemeTokens.size(), prevSurfaceTokens = packSurfaceTokens;
+			appendToPack(sent);
+			if (rowOverhead + packSurfaceTokens + packMorphemeTokens.size() <= maxSeqLength) return;
+
+			packSurface.resize(surfaceLen);
+			packForms.resize(formsLen);
+			packInfos.resize(infosLen);
+			packMorphemeTokens.resize(morphemeTokenLen);
+			packSurfaceTokens = prevSurfaceTokens;
+			emitPack();
+		}
+		appendToPack(sent);
+	};
+
+	Sentence sent;
+	bool dropSentence = false;
+	size_t numAdded = 0;
+	const auto finishSentence = [&]()
+	{
+		if (!dropSentence && !sent.infos.empty())
+		{
+			addToPack(sent);
+			++numAdded;
+		}
+		sent = Sentence{};
+		dropSentence = false;
+	};
+
+	std::string line;
+	std::u16string u16Line;
+	size_t lineNo = 0, blankLines = 0;
+	while (std::getline(is, line))
+	{
+		++lineNo;
+		if (line.find_first_not_of(" \t\r") == std::string::npos)
+		{
+			++blankLines;
+			continue;
+		}
+		if (blankLines)
+		{
+			// 빈 줄 하나는 문장 경계, 두 개 이상은 문서 경계다.
+			finishSentence();
+			if (blankLines >= 2) emitPack();
+			blankLines = 0;
+		}
+		if (dropSentence) continue;
+
+		if (line.back() == '\r') line.pop_back();
+		utf8To16(line, u16Line);
+		const auto fields = split(std::u16string_view{ u16Line }, u'\t');
+		if (fields.size() < 3 || fields.size() % 2 == 0)
+		{
+			std::cerr << "GenerativeMADataset::addAnalyzedCorpus: dropped a sentence with a malformed line " << lineNo << ": " << line << std::endl;
+			dropSentence = true;
+			continue;
+		}
+
+		if (!sent.surface.empty()) sent.surface += u' ';
+		sent.surface += fields[0];
+		for (size_t i = 1; i < fields.size(); i += 2)
+		{
+			auto form = fields[i];
+			const auto tagStr = fields[i + 1];
+			// 의미 번호(형태__N)는 형태에 포함시키지 않는다.
+			const size_t sensePos = form.find(u"__");
+			if (sensePos != form.npos) form = form.substr(0, sensePos);
+			const POSTag tag = toPOSTag(tagStr);
+			if (tag == POSTag::unknown || tag == POSTag::max || form.empty())
+			{
+				std::cerr << "GenerativeMADataset::addAnalyzedCorpus: dropped a sentence with the morpheme `"
+					<< utf16To8(form) << "/" << utf16To8(tagStr) << "` at line " << lineNo << std::endl;
+				dropSentence = true;
+				break;
+			}
+			// Kiwi는 어미의 첫 글자 '아'를 '어'로 통일해서 분석하므로 그에 맞춘다.
+			KString normForm = normalizeHangul(form);
+			if (normForm[0] == u'아' && tagStr[0] == u'E') normForm[0] = u'어';
+			sent.forms += joinHangul(normForm);
+			sent.infos.emplace_back((uint32_t)(sent.forms.size() << 8) | (uint8_t)tag);
+		}
+	}
+	finishSentence();
+	emitPack();
+	return numAdded;
 }
 
 size_t GenerativeMADataset::numSents() const
@@ -1482,10 +1645,10 @@ static void perturbSpaces(std::u16string& out, std::u16string_view text,
 
 GenerativeMADataset::WorkItem GenerativeMADataset::buildWorkItem(size_t localId, size_t sentFirst, size_t sentLast, uint64_t seed)
 {
-	// 한 행에서 bos, 구분자, eos가 차지하는 자리
-	constexpr size_t rowOverhead = 3;
 	auto& local = locals[localId];
 	const auto& allSents = sents.get();
+	const auto& allForms = morphemeForms.get();
+	const auto& allInfos = morphemeInfos.get();
 	const AnalyzeOption analyzeOption;
 	std::mt19937_64 itemRng{ seed };
 	WorkItem ret;
@@ -1502,20 +1665,32 @@ GenerativeMADataset::WorkItem GenerativeMADataset::buildWorkItem(size_t localId,
 		tokenizer->encode(local.surfaceBuf, local.textBuf);
 		if (local.surfaceBuf.empty()) continue;
 
-		const auto res = kiwiInst->analyze(local.u16Buf, analyzeOption);
 		local.morphemeBuf.clear();
 		POSTag prevTag = POSTag::unknown;
-		for (auto& t : res.first)
+		const auto infos = allInfos[shuffledIdx[i]];
+		if (infos.begin() == infos.end())
 		{
-			if (t.str.empty()) continue;
-			// Joiner가 띄어쓰는 자리에만 공백을 붙인다. 실제 문장에서의 모습대로 토큰화되어 토큰 수도 줄어든다.
-			const bool insertSpace = !local.morphemeBuf.empty()
-				&& cmb::isSpaceInsertable(clearIrregular(prevTag), clearIrregular(t.tag), toStringView(t.str));
-			prevTag = t.tag;
-			local.formBuf.assign(insertSpace ? 1 : 0, ' ');
-			local.formBuf += utf16To8(t.str);
-			tokenizer->encode(local.morphemeBuf, local.formBuf);
-			local.morphemeBuf.emplace_back(tagTokenId(t.tag));
+			const auto res = kiwiInst->analyze(local.u16Buf, analyzeOption);
+			for (auto& t : res.first)
+			{
+				if (t.str.empty()) continue;
+				appendMorpheme(local.morphemeBuf, local.formBuf, t.str, t.tag, prevTag);
+				prevTag = t.tag;
+			}
+		}
+		else
+		{
+			const auto forms = allForms[shuffledIdx[i]];
+			local.formsBuf.assign(forms.begin(), forms.end());
+			size_t start = 0;
+			for (const uint32_t info : infos)
+			{
+				const size_t end = info >> 8;
+				const POSTag tag = (POSTag)(info & 0xFF);
+				appendMorpheme(local.morphemeBuf, local.formBuf, std::u16string_view{ local.formsBuf }.substr(start, end - start), tag, prevTag);
+				prevTag = tag;
+				start = end;
+			}
 		}
 		if (local.morphemeBuf.empty()) continue;
 
