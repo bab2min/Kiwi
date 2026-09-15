@@ -270,7 +270,7 @@ namespace kiwi
 
 		struct ThreadLocal
 		{
-			std::u16string u16Buf, noisyBuf, spacedBuf;
+			std::u16string u16Buf, noisyBuf, spacedBuf, formsBuf;
 			std::string textBuf, formBuf;
 			std::vector<uint32_t> surfaceBuf, noisySurfaceBuf, morphemeBuf;
 		};
@@ -291,6 +291,10 @@ namespace kiwi
 		std::shared_ptr<const PreparedTypoTransformer> typoGenerator;
 		std::unique_ptr<utils::ThreadPool> workers;
 		HiddenMember<RaggedVector<char16_t>, sizeof(Vector<size_t>) * 2> sents;
+		/** 데이터마다 형태소들의 형태를 이어붙인 것. 원문만 받은 데이터는 비어있다. */
+		HiddenMember<RaggedVector<char16_t>, sizeof(Vector<size_t>) * 2> morphemeForms;
+		/** 데이터마다 형태소별 (morphemeForms 안에서 형태가 끝나는 위치 << 8 | 품사). 비어있으면 원문을 형태소 분석해서 쓴다. */
+		HiddenMember<RaggedVector<uint32_t>, sizeof(Vector<size_t>) * 2> morphemeInfos;
 		Vector<ThreadLocal> locals;
 		Vector<uint32_t> shuffledIdx;
 		Deque<std::future<WorkItem>> futures;
@@ -310,6 +314,8 @@ namespace kiwi
 
 		uint32_t tagTokenId(POSTag tag) const;
 		size_t sentsPerWorkItem() const;
+		void pushItem(std::u16string_view surface, std::u16string_view forms, const Vector<uint32_t>& infos);
+		void appendMorpheme(std::vector<uint32_t>& out, std::string& buf, std::u16string_view form, POSTag tag, POSTag prevTag) const;
 		/** `seed`는 주 스레드에서 정하므로 어느 워커가 처리하든 결과가 같다. */
 		WorkItem buildWorkItem(size_t localId, size_t sentFirst, size_t sentLast, uint64_t seed);
 		bool prepareMore();
@@ -336,6 +342,16 @@ namespace kiwi
 
 		void addSentence(std::string_view sentence);
 		void addSentence(std::u16string_view sentence);
+
+		/**
+		* 형태소 분석된 말뭉치를 추가한다. 한 줄은 `어절\t형태1\t품사1\t형태2\t품사2...`이고,
+		* 빈 줄 하나는 문장 경계, 빈 줄 두 개 이상은 문서 경계다.
+		* 같은 문서의 연속된 문장은 행이 maxSeqLength를 넘지 않는 만큼 이어붙여 하나의 데이터로 만든다.
+		* 어미 첫 글자 '아'는 Kiwi의 분석 결과에 맞추어 '어'로 바꾸고, NA처럼 알 수 없는 품사가 있는 문장은
+		* 경고를 stderr로 출력하고 버린다.
+		* @return 추가된 문장의 개수
+		*/
+		size_t addAnalyzedCorpus(std::istream& is);
 
 		size_t numSents() const;
 		size_t numEstimBatches() const;
