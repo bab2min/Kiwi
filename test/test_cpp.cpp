@@ -1863,6 +1863,50 @@ TEST(KiwiCpp, JoinParticleYo)
 	EXPECT_EQ(res_with[res_with.size() - 1].str, u"을까요");
 }
 
+TEST(KiwiCpp, JoinEp)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+
+	// 선어말어미는 어간에 붙고 어말어미만 분리된다.
+	auto res_without = kiwi.analyze(u"들어가신다", Match::none).first;
+	EXPECT_EQ(res_without.size(), 3);
+	EXPECT_EQ(res_without[1].str, u"시");
+	EXPECT_EQ(res_without[1].tag, POSTag::ep);
+
+	auto res_with = kiwi.analyze(u"들어가신다", Match::joinEp).first;
+	EXPECT_EQ(res_with.size(), 2);
+	EXPECT_EQ(res_with[0].str, u"들어가시");
+	EXPECT_EQ(res_with[0].tag, POSTag::vv);
+	EXPECT_EQ(res_with[1].str, u"ᆫ다");
+	EXPECT_EQ(res_with[1].tag, POSTag::ef);
+
+	// 선어말어미가 둘 이상이면 모두 어간에 붙는다.
+	res_with = kiwi.analyze(u"드셨겠더라", Match::joinEp).first;
+	EXPECT_EQ(res_with.size(), 2);
+	EXPECT_EQ(res_with[0].str, u"드시었겠");
+	EXPECT_EQ(res_with[0].tag, POSTag::vv);
+
+	// 형용사, 부정 지정사도 동일하게 동작한다.
+	res_with = kiwi.analyze(u"예쁘시겠어요", Match::joinEp).first;
+	EXPECT_EQ(res_with[0].str, u"예쁘시겠");
+	EXPECT_EQ(res_with[0].tag, POSTag::va);
+
+	res_with = kiwi.analyze(u"아니셨다", Match::joinEp).first;
+	EXPECT_EQ(res_with[0].str, u"아니시었");
+	EXPECT_EQ(res_with[0].tag, POSTag::vcn);
+
+	// 파생 용언의 어간은 joinVerbSuffix와 함께 써야 하나로 합쳐진다.
+	res_with = kiwi.analyze(u"공부하셨다", Match::joinEp).first;
+	EXPECT_EQ(res_with.size(), 3);
+	EXPECT_EQ(res_with[1].str, u"하시었");
+	EXPECT_EQ(res_with[1].tag, POSTag::xsv);
+
+	res_with = kiwi.analyze(u"공부하셨다", Match::joinEp | Match::joinVerbSuffix).first;
+	EXPECT_EQ(res_with.size(), 2);
+	EXPECT_EQ(res_with[0].str, u"공부하시었");
+	EXPECT_EQ(res_with[0].tag, POSTag::vv);
+}
+
 TEST(KiwiCpp, CompatibleJamo)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
