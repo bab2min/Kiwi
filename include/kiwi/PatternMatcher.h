@@ -36,6 +36,7 @@ namespace kiwi
 		splitSaisiot = 1 << 25, /**< 사이시옷이 포함된 합성명사를 분리하여 매칭한다. */
 		mergeSaisiot = 1 << 26, /**< 사이시옷이 포함된 것으로 추정되는 명사를 결합하여 매칭한다. */
 		joinParticleYo = 1 << 27, /**< 어미(EC/EF)와 조사 "요/JX"를 통합하여 매칭한다 (예: 고/EC + 요/JX => 고요/EC) */
+		joinEp = 1 << 28, /**< 선어말어미(EP)를 어간과 분리하지 않고 합쳐서 매칭한다 (예: 들어가/VV + 시/EP => 들어가시/VV) */
 
 		useOldSplitter = 1 << 30,
 
