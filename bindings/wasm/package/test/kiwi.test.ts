@@ -61,6 +61,21 @@ describe('Kiwi WASM', () => {
         expect(tokens).toContain('안녕');
     });
 
+    it('should build again after model files are unloaded', async () => {
+        if (!kiwiBuilder) return;
+
+        // build() removes the copied model files from the wasm FS after building,
+        // so a second build (with a user dictionary) must still work.
+        const userDict = new TextEncoder().encode('나파가죽\tNNP\t0\n');
+        const another = await kiwiBuilder.build({
+            modelFiles: { ...loadModelFiles(), 'user.dict': userDict },
+            userDicts: ['user.dict'],
+        });
+
+        expect(another.tokenize('나파가죽 시트').map(t => t.str)).toContain('나파가죽');
+        expect(kiwi.tokenize('안녕하세요 세계').map(t => t.str)).toContain('안녕');
+    });
+
     it('should split sentences', async () => {
         if (!kiwi) return;
 
