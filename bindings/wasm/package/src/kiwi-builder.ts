@@ -113,7 +113,9 @@ export class KiwiBuilder {
         } finally {
             // The model is fully loaded into wasm memory by now;
             // drop the copies in the virtual FS so they don't stay in memory.
-            await loadResult.unload();
+            // Cleanup is best-effort: it must not hide a build error
+            // or fail a build that already succeeded.
+            await loadResult.unload().catch(() => undefined);
         }
 
         return new Proxy({}, {
