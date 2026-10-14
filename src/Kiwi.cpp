@@ -675,10 +675,9 @@ namespace kiwi
 				
 				if (parent < ret.size())
 				{
-					// The copy gets room for the path now: growing it while the path is appended
-					// would move the whole result so far again.
 					ret.emplace_back();
 					ret.back().first.reserve(ret[parent].first.size() + pathes[i].path.size());
+					// insert, not =, so the room reserved for the path is kept.
 					ret.back().first.insert(ret.back().first.end(), ret[parent].first.begin(), ret[parent].first.end());
 					ret.back().second = ret[parent].second;
 					spStatesByRet.push_back(spStatesByRet[parent]);
