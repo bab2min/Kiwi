@@ -410,8 +410,7 @@ namespace kiwi
 			AnalyzeOption option, const std::optional<KiwiConfig>& overrideConfig = {}
 		) const
 		{
-			// Checked before any analysis is queued: an error rethrown below leaves the queued ones
-			// reading `config` after it is gone.
+			// Before anything is queued: a throw below would leave queued analyses reading a freed `config`.
 			if (topN == 0)
 			{
 				throw std::invalid_argument{ "`topN` should be > 0." };
