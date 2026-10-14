@@ -1036,6 +1036,11 @@ namespace kiwi
 		const optional<KiwiConfig>& overrideConfig
 	) const
 	{
+		if (topN == 0)
+		{
+			throw invalid_argument{ "`topN` should be > 0." };
+		}
+
 		thread_local KString normalizedStr;
 		thread_local Vector<uint32_t> positionTable;
 		thread_local PretokenizedSpanGroup pretokenizedGroup;

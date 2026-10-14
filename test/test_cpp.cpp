@@ -212,6 +212,17 @@ TEST(KiwiCpp, InitClose)
 	Kiwi& kiwi = reuseKiwiInstance();
 }
 
+TEST(KiwiCpp, ZeroTopN)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	EXPECT_THROW(kiwi.analyze(u"짧은 문장", 0, Match::allWithNormalizing), std::invalid_argument);
+	EXPECT_THROW(kiwi.analyze(0, []() { return std::u16string{ u"짧은 문장" }; }, [](std::vector<TokenResult>&&) {}, Match::allWithNormalizing), std::invalid_argument);
+
+	Kiwi pooled = KiwiBuilder{ MODEL_PATH, 1, BuildOption::default_, ModelType::none }.build();
+	EXPECT_THROW(pooled.asyncAnalyze(u"짧은 문장", 0, Match::allWithNormalizing).get(), std::invalid_argument);
+	EXPECT_THROW(pooled.analyze(0, []() { return std::u16string{ u"짧은 문장" }; }, [](std::vector<TokenResult>&&) {}, Match::allWithNormalizing), std::invalid_argument);
+}
+
 TEST(KiwiCpp, EmptyResult)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
