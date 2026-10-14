@@ -24,6 +24,7 @@ async function createKiwiApi(wasmPath: string): Promise<KiwiApi> {
             kiwi.FS.mkdir(modelPath);
 
             const fileEntries = Object.entries(files);
+            const fileNames = Object.keys(files);
 
             await Promise.all(
                 fileEntries.map(async ([name, data]) => {
@@ -47,6 +48,11 @@ async function createKiwiApi(wasmPath: string): Promise<KiwiApi> {
 
             return {
                 unload: async () => {
+                    // rmdir fails on a non-empty directory, so remove the files first.
+                    // Keep only the names here, not the file data.
+                    for (const name of fileNames) {
+                        kiwi.FS.unlink(modelPath + '/' + name);
+                    }
                     kiwi.FS.rmdir(modelPath);
                 },
                 modelPath,
@@ -98,10 +104,19 @@ export class KiwiBuilder {
             );
         }
 
-        const id = this.api.cmd({
-            method: 'build',
-            args: [apiBuildArgs],
-        }) as number;
+        let id: number;
+        try {
+            id = this.api.cmd({
+                method: 'build',
+                args: [apiBuildArgs],
+            }) as number;
+        } finally {
+            // The model is fully loaded into wasm memory by now;
+            // drop the copies in the virtual FS so they don't stay in memory.
+            // Cleanup is best-effort: it must not hide a build error
+            // or fail a build that already succeeded.
+            await loadResult.unload().catch(() => undefined);
+        }
 
         return new Proxy({}, {
             get: (_target, prop) => {
