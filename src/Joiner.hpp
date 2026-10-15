@@ -17,12 +17,12 @@ namespace kiwi
 			if (l == r && (POSTag::sf <= l && l <= POSTag::sn)) return true;
 			if (r == POSTag::vcp) return false;
 			if (r == POSTag::xsa || r == POSTag::xsai || r == POSTag::xsv || r == POSTag::xsn) return isJClass(l);
-			if (l == POSTag::xpn || l == POSTag::so || l == POSTag::ss || l == POSTag::sw) return false;
-			if (l == POSTag::sn && r == POSTag::nnb) return false;
+			if (l == POSTag::xpn || l == POSTag::so || l == POSTag::ss || l == POSTag::sw
+				|| l == POSTag::sso || l == POSTag::ssc) return false;
+			if (l == POSTag::sn && (r == POSTag::nnb || r == POSTag::sw)) return false;
 			if (!(l == POSTag::sn || l == POSTag::sl)
 				&& (r == POSTag::sl || r == POSTag::sn)) return true;
 			if (l == POSTag::sn && r == POSTag::nr) return false;
-			if (l == POSTag::sso || l == POSTag::ssc) return false;
 			if (r == POSTag::sso) return true;
 			if ((isJClass(l) || isEClass(l)) && r == POSTag::ss) return true;
 			if (l == POSTag::z_siot && isNNClass(r)) return false;

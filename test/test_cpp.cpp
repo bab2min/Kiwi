@@ -2147,6 +2147,66 @@ TEST(KiwiCpp, JoinRestore)
 	}
 }
 
+TEST(KiwiCpp, IssueP220)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+
+	// 여는 괄호 뒤, 닫는 괄호 뒤에는 오른쪽이 무엇이든 공백을 넣지 않는다.
+	auto joiner = kiwi.newJoiner();
+	joiner.add(u"(", POSTag::sso);
+	joiner.add(u"mike", POSTag::sl);
+	joiner.add(u")", POSTag::ssc);
+	EXPECT_EQ(joiner.getU16(), u"(mike)");
+
+	joiner = kiwi.newJoiner();
+	joiner.add(u"(", POSTag::sso);
+	joiner.add(u"1", POSTag::sn);
+	joiner.add(u")", POSTag::ssc);
+	EXPECT_EQ(joiner.getU16(), u"(1)");
+
+	// 숫자 뒤에 오는 기호에는 공백을 넣지 않는다.
+	joiner = kiwi.newJoiner();
+	joiner.add(u"9", POSTag::sn);
+	joiner.add(u"%", POSTag::sw);
+	joiner.add(u"씩", POSTag::mag);
+	EXPECT_EQ(joiner.getU16(), u"9%씩");
+
+	joiner = kiwi.newJoiner();
+	joiner.add(u"30", POSTag::sn);
+	joiner.add(u"℃", POSTag::sw);
+	joiner.add(u"까지", POSTag::jx);
+	EXPECT_EQ(joiner.getU16(), u"30℃까지");
+
+	// 여는 괄호 앞과 한글 뒤 기호 앞의 공백은 그대로 유지된다.
+	joiner = kiwi.newJoiner();
+	joiner.add(u"mike", POSTag::sl);
+	joiner.add(u"(", POSTag::sso);
+	joiner.add(u"a", POSTag::sl);
+	joiner.add(u")", POSTag::ssc);
+	EXPECT_EQ(joiner.getU16(), u"mike (a)");
+
+	joiner = kiwi.newJoiner();
+	joiner.add(u"사과", POSTag::nng);
+	joiner.add(u"%", POSTag::sw);
+	EXPECT_EQ(joiner.getU16(), u"사과 %");
+
+	// 분석 결과를 형태와 품사만으로 다시 이었을 때 원문이 복원되어야 한다.
+	for (auto c : {
+		u8"9%씩 올랐다.",
+		u8"(mike)에게 물었다.",
+		u8"30℃까지 오른다.",
+		})
+	{
+		auto tokens = kiwi.analyze(c, Match::allWithNormalizing).first;
+		auto j = kiwi.newJoiner();
+		for (auto& t : tokens)
+		{
+			j.add(t.str, t.tag, false);
+		}
+		EXPECT_EQ(j.getU8(), c);
+	}
+}
+
 TEST(KiwiCpp, JoinZSiot)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
