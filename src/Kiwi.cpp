@@ -500,7 +500,8 @@ namespace kiwi
 							| Match::joinAdjSuffix 
 							| Match::joinAdvSuffix 
 							| Match::mergeSaisiot
-							| Match::joinParticleYo))) return last;
+							| Match::joinParticleYo
+							| Match::joinEp))) return last;
 		if (std::distance(first, last) < 2) return last;
 
 		auto next = first;
@@ -565,6 +566,14 @@ namespace kiwi
 				current.str.back() += (0x11BA - 0x11A7);
 				concatTokens(current, *(next + 1), POSTag::nng);
 				++next;
+				++next;
+			}
+			// (V. | XSV | XSA | EP) + EP => (V. | XSV | XSA | EP)
+			else if (!!(matchOptions & Match::joinEp)
+				&& nextToken.tag == POSTag::ep
+				&& (isVerbClass(current.tag) || current.tag == POSTag::ep))
+			{
+				concatTokens(current, nextToken, current.tag);
 				++next;
 			}
 			// (EC | EF) + JX(요) => (EC | EF)

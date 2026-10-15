@@ -83,6 +83,9 @@ public struct MatchOptions: OptionSet, Codable {
     /// Join particle yo
     public static let joinParticleYo = MatchOptions(rawValue: 1 << 27)
 
+    /// Join prefinal endings into the verb stem
+    public static let joinEp = MatchOptions(rawValue: 1 << 28)
+
     /// All basic matching options
     public static let all: MatchOptions = [.url, .email, .hashtag, .mention, .serial, .emoji, .zCoda]
     
