@@ -384,7 +384,58 @@ namespace kiwi
 			uint8_t* out
 		)
 		{
-			return requantizePackedU4<ArchType::none>(n, qgroup, packedInput, localScale, globalScale, toUint8, out);
+			if (qgroup != 4 && qgroup != 8 && qgroup != 16)
+			{
+				return requantizePackedU4<ArchType::none>(n, qgroup, packedInput, localScale, globalScale, toUint8, out);
+			}
+
+			static const uint8_t broadcastIdx[3][16] = {
+				{ 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3 },
+				{ 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1 },
+				{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+			};
+			const uint8x16_t localScaleBroadcastor = vld1q_u8(broadcastIdx[qgroup / 8]);
+			const size_t scalesPerStep = 16 / qgroup;
+
+			const uint8x16_t localScaleMask = vdupq_n_u8(0x3F),
+				localScaleBias = vdupq_n_u8(9),
+				localZeroPointBias = vdupq_n_u8(6);
+			const int16x8_t roundBias = vdupq_n_s16(4), zero = vdupq_n_s16(0);
+			const int8x16_t uintBias = vdupq_n_s8(toUint8 ? -128 : 0);
+
+			const auto requantize = [&](int16x8_t v)
+			{
+				v = vaddq_s16(v, vsubq_s16(
+					vandq_s16(vreinterpretq_s16_u16(vcgtq_s16(v, zero)), roundBias),
+					vandq_s16(vreinterpretq_s16_u16(vcltq_s16(v, zero)), roundBias)));
+				return vmovn_s16(vqrdmulhq_n_s16(v, 32768 / 9));
+			};
+
+			size_t i = 0;
+			for (; i + 16 <= n; i += 16)
+			{
+				const uint8x8_t packed = vld1_u8(packedInput + i / 2);
+				const uint8x8x2_t nibbles = vzip_u8(vand_u8(packed, vdup_n_u8(0x0F)), vshr_n_u8(packed, 4));
+				const uint8x16_t vals = vcombine_u8(nibbles.val[0], nibbles.val[1]);
+
+				uint32_t rawScales = 0;
+				std::memcpy(&rawScales, localScale + i / qgroup, scalesPerStep);
+				const uint8x16_t ls = vqtbl1q_u8(vreinterpretq_u8_u32(vdupq_n_u32(rawScales)), localScaleBroadcastor);
+				const uint8x16_t lzp = vaddq_u8(vshrq_n_u8(ls, 6), localZeroPointBias);
+				const uint8x16_t scale = vaddq_u8(vandq_u8(ls, localScaleMask), localScaleBias);
+
+				const int16x8_t lo = vmulq_s16(vreinterpretq_s16_u16(vsubl_u8(vget_low_u8(vals), vget_low_u8(lzp))),
+					vreinterpretq_s16_u16(vmovl_u8(vget_low_u8(scale))));
+				const int16x8_t hi = vmulq_s16(vreinterpretq_s16_u16(vsubl_high_u8(vals, lzp)),
+					vreinterpretq_s16_u16(vmovl_high_u8(scale)));
+				const int8x16_t r = vsubq_s8(vcombine_s8(requantize(lo), requantize(hi)), uintBias);
+				vst1q_u8(out + i, vreinterpretq_u8_s8(r));
+			}
+			if (i < n)
+			{
+				requantizePackedU4<ArchType::none>(n - i, qgroup, packedInput + i / 2, localScale + i / qgroup, globalScale, toUint8, out + i);
+			}
+			return globalScale / 8;
 		}
 	}
 }
