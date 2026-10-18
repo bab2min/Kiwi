@@ -240,6 +240,22 @@ namespace kiwi
 		/** ToMorpheme 방향의 원문에서 공백이 아닌 두 글자 사이에 공백을 넣을 확률 */
 		float spaceInsertProb = 0;
 		std::array<uint32_t, 256> posTagTokenIds = { { 0, } };
+		/**
+		* 여기에 있는 (형태, 품사)의 형태소는 BPE로 쪼개지 않고 이 토큰 하나로 나타냄.
+		*/
+		UnorderedMap<std::pair<std::u16string, POSTag>, uint32_t> morphemeTokenIds;
+		/** morphemeTokenIds에 있는 형태소라도 이 확률로 BPE로 쪼개서 나타냄 */
+		float morphemeDropout = 0;
+		/** ToMorpheme 방향의 원문을 이 확률의 BPE-dropout으로 토큰화함. ToSurface 방향의 원문과 형태소열은 항상 같은 분할을 씀. */
+		float bpeDropout = 0;
+		/**
+		* ToMorpheme 방향의 원문에서 어절(공백으로 나뉜 단위)마다 이 확률로 골라, 고른 어절의 한글을 음절마다 따로 토큰화함.
+		* 1이면 문장 전체를 음절 단위로 토큰화함. bpeDropout과 함께 쓸 수 있음.
+		*/
+		float wordSyllableDropout = 0;
+		/** 데이터마다 만들 방향. 적어도 하나는 켜져 있어야 함. */
+		bool generateToMorpheme = true;
+		bool generateToSurface = true;
 	};
 
 	/**
@@ -250,15 +266,17 @@ namespace kiwi
 	* 이것은 분석기입니다. <|ToMorpheme|> 이것/NP 은/JX 분석/NNG 기/NNG 이/VCP ㅂ니다/EF ./SF
 	* 이것/NP 은/JX 분석/NNG 기/NNG 이/VCP ㅂ니다/EF ./SF <|ToSurface|> 이것은 분석기입니다.
 	* 
-	* 이렇게 1개의 입력 문장은 총 2개의 데이터를 만들어내며, 각 데이터는 BpeTokenizer에 의해 encoding되어 int 배열로 리턴된다.
+	* 이렇게 1개의 입력 문장은 총 2개의 데이터를 만들어내며(`generateToMorpheme`, `generateToSurface`로 한 방향만 만들 수도 있다), 각 데이터는 BpeTokenizer에 의해 encoding되어 int 배열로 리턴된다.
 	*
 	* 실제 토큰열은 다음과 같으며, 형태소마다 형태 뒤에 품사 태그 토큰 하나를 붙인다.
+	* 단, `morphemeTokenIds`에 있는 형태소는 형태와 태그 대신 그 토큰 하나로 나타낸다.
 	*
 	*     [bos] encode(원문) [toMorpheme] (encode(형태) [태그])... [eos]
 	*     [bos] (encode(형태) [태그])... [toSurface] encode(원문) [eos]
 	*
 	* 오타(`typoProb`)와 띄어쓰기 오류(`spaceRemoveProb`, `spaceInsertProb`)은 ToMorpheme 방향의 원문에만 넣으며,
 	* 오타를 먼저 넣고 띄어쓰기를 흐트러뜨린다. 형태소열과 ToSurface 방향의 원문은 항상 깨끗하다.
+	* `bpeDropout`과 `wordSyllableDropout`도 마찬가지로 ToMorpheme 방향의 원문을 토큰화할 때만 적용한다.
 	*
 	* maxSeqLength를 넘는 부분은 뒤에서 잘리고(따라서 [eos]도 사라진다), 남는 자리는 `padToken`으로 채운다.
 	*
@@ -291,10 +309,16 @@ namespace kiwi
 		std::shared_ptr<const PreparedTypoTransformer> typoGenerator;
 		std::unique_ptr<utils::ThreadPool> workers;
 		HiddenMember<RaggedVector<char16_t>, sizeof(Vector<size_t>) * 2> sents;
-		/** 데이터마다 형태소들의 형태를 이어붙인 것. 원문만 받은 데이터는 비어있다. */
+		/** 문장마다 형태소들의 형태를 이어붙인 것. 원문만 받은 문장은 비어있다. */
 		HiddenMember<RaggedVector<char16_t>, sizeof(Vector<size_t>) * 2> morphemeForms;
-		/** 데이터마다 형태소별 (morphemeForms 안에서 형태가 끝나는 위치 << 8 | 품사). 비어있으면 원문을 형태소 분석해서 쓴다. */
+		/** 문장마다 형태소별 (morphemeForms 안에서 형태가 끝나는 위치 << 8 | 품사). 비어있으면 원문을 형태소 분석해서 쓴다. */
 		HiddenMember<RaggedVector<uint32_t>, sizeof(Vector<size_t>) * 2> morphemeInfos;
+		/** 문장마다 새 문서의 시작인지 여부 */
+		Vector<uint8_t> newDocument;
+		/** 문장마다 인코딩했을 때의 토큰 개수. 이어붙일 범위를 정할 때만 쓰므로 원문만 받은 문장은 0이다. */
+		mutable Vector<uint32_t> tokenLengths;
+		/** 데이터 `i`는 문장 `[itemOffsets[i], itemOffsets[i + 1])`을 이어붙인 것 */
+		mutable Vector<uint32_t> itemOffsets;
 		Vector<ThreadLocal> locals;
 		Vector<uint32_t> shuffledIdx;
 		Deque<std::future<WorkItem>> futures;
@@ -306,19 +330,30 @@ namespace kiwi
 		size_t currentSeed = 0;
 		size_t batchSize = 0;
 		size_t maxSeqLength = 0;
-		size_t passedSents = 0;
+		size_t passedItems = 0;
 		size_t truncatedSents = 0;
 		size_t insertedTypos = 0;
 		size_t removedSpaces = 0;
 		size_t insertedSpaces = 0;
 
 		uint32_t tagTokenId(POSTag tag) const;
-		size_t sentsPerWorkItem() const;
-		void pushItem(std::u16string_view surface, std::u16string_view forms, const Vector<uint32_t>& infos);
-		void appendMorpheme(std::vector<uint32_t>& out, std::string& buf, std::u16string_view form, POSTag tag, POSTag prevTag) const;
+		/** morphemeTokenIds에 없으면 nullptr */
+		const uint32_t* morphemeTokenId(std::u16string_view form, POSTag tag) const;
+		size_t itemsPerWorkItem() const;
+		size_t rowsPerItem() const { return (size_t)option.generateToMorpheme + (size_t)option.generateToSurface; }
+		size_t numItems() const { return itemOffsets.empty() ? 0 : itemOffsets.size() - 1; }
+		void pushSentence(std::u16string_view surface, std::u16string_view forms, const Vector<uint32_t>& infos, bool newDoc);
+		/** `rng`가 nullptr이면 morphemeDropout이 있을 때 항상 BPE로 쪼갠다(가장 길어지는 경우). */
+		void appendMorpheme(std::vector<uint32_t>& out, std::string& buf, std::u16string_view form, POSTag tag, POSTag prevTag, std::mt19937_64* rng) const;
+		void measureTokenLengths(size_t first, size_t last) const;
+		/** 문장별 토큰 개수를 재고(워커가 있으면 병렬로) 문서 경계를 지키며 이어붙일 범위를 정한다. */
+		void buildItems() const;
+		/** 공백이 아닌 글자가 있는 데이터는 항상 rowsPerItem()행을, 없는 데이터는 0행을 만든다. */
+		bool hasContent(size_t item) const;
 		/** `seed`는 주 스레드에서 정하므로 어느 워커가 처리하든 결과가 같다. */
-		WorkItem buildWorkItem(size_t localId, size_t sentFirst, size_t sentLast, uint64_t seed);
+		WorkItem buildWorkItem(size_t localId, size_t itemFirst, size_t itemLast, uint64_t seed);
 		bool prepareMore();
+		void beginRead();
 
 		template<class Ty>
 		size_t _next(Ty* inputIds);
@@ -356,7 +391,7 @@ namespace kiwi
 		size_t numSents() const;
 		size_t numEstimBatches() const;
 
-		// 아래 개수들은 직전 `reset()` 이후의 누적값이다.
+		// 아래 개수들은 직전 `reset()` 이후의 누적값이다. `skip()`이 만들지 않고 건너뛴 데이터는 포함하지 않는다.
 		size_t numTruncatedSents() const { return truncatedSents; }
 		size_t numInsertedTypos() const { return insertedTypos; }
 		size_t numRemovedSpaces() const { return removedSpaces; }
@@ -375,5 +410,12 @@ namespace kiwi
 		*/
 		size_t next(int32_t* input_ids);
 		size_t next(int64_t* input_ids);
+
+		/**
+		* `next()`를 `numBatches`번 호출한 것과 같은 상태로 만든다. 통째로 건너뛰는 데이터는 만들지 않으므로 훨씬 빠르다.
+		* 같은 seed로 학습을 재개할 때, 이미 읽은 배치 수만큼 건너뛰면 중단 직전에 이어서 읽을 데이터부터 얻을 수 있다.
+		* @return 건너뛴 배치의 개수. epoch이 끝나면 `numBatches`보다 작을 수 있다.
+		*/
+		size_t skip(size_t numBatches);
 	};
 }
