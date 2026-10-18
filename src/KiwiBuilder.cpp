@@ -986,23 +986,32 @@ void KiwiBuilder::saveMorphBin(std::ostream& os) const
 ModelType KiwiBuilder::getModelType(const KiwiBuilder::StreamProvider& provider, bool largest)
 {
 	// Check for different model files by trying to create streams
-	try {
-		if (auto stream = provider("cong.mdl")) {
+	try 
+	{
+		if (auto stream = provider("cong.mdl")) 
+		{
 			return largest ? ModelType::congGlobal : ModelType::cong;
 		}
-	} catch (...) {}
+	}
+	catch (...) {}
 	
-	try {
-		if (auto stream = provider("skipbigram.mdl")) {
+	try 
+	{
+		if (auto stream = provider("skipbigram.mdl")) 
+		{
 			return largest ? ModelType::sbg : ModelType::knlm;
 		}
-	} catch (...) {}
+	} 
+	catch (...) {}
 	
-	try {
-		if (auto stream = provider("sj.knlm")) {
+	try 
+	{
+		if (auto stream = provider("sj.knlm")) 
+		{
 			return ModelType::knlm;
 		}
-	} catch (...) {}
+	} 
+	catch (...) {}
 	
 	return ModelType::none;
 }
@@ -2431,6 +2440,11 @@ namespace kiwi
 
 Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) const
 {
+	if (!ready())
+	{
+		return Kiwi{};
+	}
+
 	Kiwi ret{ archType, langMdl, !typos.empty(), typos.isContinualTypoEnabled(), typos.isLengtheningTypoEnabled() };
 	ret.enabledDialects = enabledDialects;
 	ret.nounChrMdl = nounChrMdl;

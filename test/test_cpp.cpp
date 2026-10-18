@@ -2254,6 +2254,24 @@ TEST(KiwiCpp, IssueP172_LengthError)
 	EXPECT_GT(res.size(), 0);
 }
 
+TEST(KiwiCpp, LongChunkOver65536)
+{
+	// 공백 없이 라틴 문자와 기호가 이어진 덩어리가 65536자를 넘으면 KGraphNode의 위치가 16비트로 잘려 크래시가 났다.
+	Kiwi& kiwi = reuseKiwiInstance();
+	for (auto p : { std::make_pair(127, 512), std::make_pair(100, 700) })
+	{
+		std::u16string text;
+		for (int i = 0; i < p.second; ++i)
+		{
+			text += std::u16string(p.first, u'A');
+			text += u"#";
+		}
+		auto res = kiwi.analyze(text, Match::allWithNormalizing).first;
+		ASSERT_GT(res.size(), 0);
+		EXPECT_EQ(res.back().position + res.back().length, text.size());
+	}
+}
+
 TEST(KiwiCpp, IssueP189)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
