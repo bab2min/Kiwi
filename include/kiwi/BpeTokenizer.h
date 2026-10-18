@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -8,6 +9,7 @@
 #include <limits>
 #include <stdexcept>
 #include <iosfwd>
+#include <random>
 #include "Types.h"
 
 namespace kiwi
@@ -34,6 +36,8 @@ namespace kiwi
 		std::vector<MergeSlot> mergeTable;
 		size_t mergeTableMask = 0;
 
+		std::array<uint32_t, 256> byteIds{};
+
 		bool addPrefixSpace = false;
 		// Trained with useJamoAlphabet, so encode() must decompose Hangul too. Persisted as the "nfd_for_hangul" normalizer.
 		bool nfdForHangul = false;
@@ -42,7 +46,9 @@ namespace kiwi
 		std::string decode(It first, It last, bool ignoreErrors = true) const;
 
 		void buildMergeTable();
+		void buildByteIds();
 		const MergeRule* findMerge(uint32_t a, uint32_t b) const;
+		void encode(std::vector<uint32_t>& out, const std::string& str, std::vector<std::pair<uint32_t, uint32_t>>* offset, bool offsetInChrLevel, float dropout, std::mt19937_64* rng) const;
 
 	public:
 		BpeTokenizer() = default;
@@ -50,12 +56,18 @@ namespace kiwi
 			: vocab(std::move(vocab)), merges(std::move(merges)), addPrefixSpace(addPrefixSpace), nfdForHangul(nfdForHangul)
 		{
 			buildMergeTable();
+			buildByteIds();
 		}
 
 		bool ready() const;
 
 		void encode(std::vector<uint32_t>& out, const std::string& str, std::vector<std::pair<uint32_t, uint32_t>>* offset = nullptr, bool offsetInChrLevel = false) const;
 		std::vector<uint32_t> encode(const std::string& str, std::vector<std::pair<uint32_t, uint32_t>>* offset = nullptr, bool offsetInChrLevel = false) const;
+		/**
+		* BPE-dropout: 병합 단계마다 병합 후보를 각각 `dropout` 확률로 건너뛰며, 모든 후보를 건너뛴 단계에서 병합을 멈춘다.
+		* 한 글자의 UTF-8 바이트끼리 합치는 병합은 건너뛰지 않으므로 글자보다 잘게 쪼개지지는 않는다.
+		*/
+		void encode(std::vector<uint32_t>& out, const std::string& str, float dropout, std::mt19937_64& rng) const;
 
 		std::string decode(const std::vector<uint32_t>& ids, bool ignoreErrors = true) const;
 		std::string decode(const uint32_t* ids, size_t length, bool ignoreErrors = true) const;

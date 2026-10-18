@@ -1128,6 +1128,7 @@ namespace kiwi
 			vector<uint32_t> byteToCharPos;
 			vector<TokenSpan> tokens;
 			vector<uint32_t> ranks, newIds;
+			vector<uint8_t> dropped;
 		};
 	}
 
@@ -1138,6 +1139,16 @@ namespace kiwi
 	{
 		k *= 0x9E3779B97F4A7C15ull;
 		return k ^ (k >> 29);
+	}
+
+	void BpeTokenizer::buildByteIds()
+	{
+		// A byte missing from the vocabulary keeps its own value as id, as before.
+		for (uint32_t b = 0; b < 256; ++b) byteIds[b] = b;
+		for (size_t i = 0; i < vocab.size(); ++i)
+		{
+			if (vocab[i].size() == 1) byteIds[(unsigned char)vocab[i][0]] = (uint32_t)i;
+		}
 	}
 
 	void BpeTokenizer::buildMergeTable()
@@ -1181,7 +1192,19 @@ namespace kiwi
 
 	void BpeTokenizer::encode(vector<uint32_t>& out, const string& str, vector<pair<uint32_t, uint32_t>>* offset, bool offsetInChrLevel) const
 	{
+		encode(out, str, offset, offsetInChrLevel, 0, nullptr);
+	}
+
+	void BpeTokenizer::encode(vector<uint32_t>& out, const string& str, float dropout, mt19937_64& rng) const
+	{
+		encode(out, str, nullptr, false, dropout, &rng);
+	}
+
+	void BpeTokenizer::encode(vector<uint32_t>& out, const string& str, vector<pair<uint32_t, uint32_t>>* offset, bool offsetInChrLevel, float dropout, mt19937_64* rng) const
+	{
 		if (str.empty()) return;
+		const bool useDropout = dropout > 0 && rng;
+		bernoulli_distribution dropMerge{ useDropout ? std::min(dropout, 1.f) : 0.f };
 
 		thread_local EncodeScratch scratch;
 
@@ -1250,6 +1273,7 @@ namespace kiwi
 		auto& tokens = scratch.tokens;
 		auto& ranks = scratch.ranks;
 		auto& newIds = scratch.newIds;
+		auto& dropped = scratch.dropped;
 
 		auto lookupPair = [&](size_t i)
 		{
@@ -1273,7 +1297,7 @@ namespace kiwi
 			for (size_t i = 0; i < k; ++i)
 			{
 				const size_t origIdx = span.first + i;
-				tokens[i] = { (uint32_t)(unsigned char)text[origIdx], (uint32_t)origIdx, (uint32_t)(origIdx + 1) };
+				tokens[i] = { byteIds[(unsigned char)text[origIdx]], (uint32_t)origIdx, (uint32_t)(origIdx + 1) };
 			}
 
 			if (k >= 2)
@@ -1283,6 +1307,7 @@ namespace kiwi
 				for (size_t i = 0; i + 1 < k; ++i) lookupPair(i);
 				ranks[k - 1] = noRank;
 
+				if (useDropout) dropped.resize(k);
 				for (;;)
 				{
 					uint32_t bestRank = noRank;
@@ -1290,6 +1315,13 @@ namespace kiwi
 					for (size_t i = 0; i + 1 < k; ++i)
 					{
 						if (ranks[i] == dirtyRank) lookupPair(i);
+						if (useDropout)
+						{
+							// 한 글자의 UTF-8 바이트끼리 합치는 병합은 건너뛰지 않는다. 글자가 바이트 조각으로 남지 않도록.
+							const bool charBoundary = ((unsigned char)text[tokens[i].end] & 0xC0) != 0x80;
+							dropped[i] = ranks[i] != noRank && charBoundary && dropMerge(*rng);
+							if (dropped[i]) continue;
+						}
 						if (ranks[i] < bestRank) { bestRank = ranks[i]; bestIdx = i; }
 					}
 					if (bestRank == noRank) break;
@@ -1299,7 +1331,7 @@ namespace kiwi
 					size_t o = 0;
 					for (size_t i = 0; i < k; )
 					{
-						if (i + 1 < k && ranks[i] == bestRank)
+						if (i + 1 < k && ranks[i] == bestRank && !(useDropout && dropped[i]))
 						{
 							tokens[o] = { bestNewId, tokens[i].start, tokens[i + 1].end };
 							ranks[o] = dirtyRank;
@@ -1570,12 +1602,24 @@ namespace kiwi
 		uint32_t rank = 0;
 		for (auto& mergeVal : model["merges"])
 		{
-			string m = mergeVal.get<string>();
-			auto sp = m.find(' ');
-			if (sp == string::npos) { ++rank; continue; }
-
-			string rawA = hfToRaw(m.substr(0, sp));
-			string rawB = hfToRaw(m.substr(sp + 1));
+			string rawA, rawB;
+			if (mergeVal.is_array() && mergeVal.size() == 2)
+			{
+				rawA = hfToRaw(mergeVal[0].get<string>());
+				rawB = hfToRaw(mergeVal[1].get<string>());
+			}
+			else if (mergeVal.is_string())
+			{
+				string m = mergeVal.get<string>();
+				auto sp = m.find(' ');
+				if (sp == string::npos) { ++rank; continue; }
+				rawA = hfToRaw(m.substr(0, sp));
+				rawB = hfToRaw(m.substr(sp + 1));
+			}
+			else
+			{
+				throw invalid_argument("BpeTokenizer::load: model merges must be an array of strings or arrays of two strings");
+			}
 
 			auto itA  = vocabToId.find(rawA);
 			auto itB  = vocabToId.find(rawB);
