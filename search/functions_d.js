@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['vowel_0',['vowel',['../structkiwi_1_1MorphemeRaw.html#ace3917dd7cfdf3035a2aa108a0296005',1,'kiwi::MorphemeRaw']]]
+  ['update_0',['update',['../classkiwi_1_1TypoTransformer.html#aec265fa45cb5c91e14d640a8ac4fc1d7',1,'kiwi::TypoTransformer']]]
 ];

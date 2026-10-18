@@ -96,6 +96,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>encode</b> (std::vect
 <tr class="memitem:a809ae5750861f07786da8c869223af39" id="r_a809ae5750861f07786da8c869223af39"><td class="memItemLeft" align="right" valign="top"><a id="a809ae5750861f07786da8c869223af39" name="a809ae5750861f07786da8c869223af39"></a>
 std::vector&lt; uint32_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>encode</b> (const std::string &amp;str, std::vector&lt; std::pair&lt; uint32_t, uint32_t &gt; &gt; *offset=nullptr, bool offsetInChrLevel=false) const</td></tr>
 <tr class="separator:a809ae5750861f07786da8c869223af39"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a660613546b4954e86ac04bd118591568" id="r_a660613546b4954e86ac04bd118591568"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1BpeTokenizer.html#a660613546b4954e86ac04bd118591568">encode</a> (std::vector&lt; uint32_t &gt; &amp;out, const std::string &amp;str, float dropout, std::mt19937_64 &amp;rng) const</td></tr>
+<tr class="separator:a660613546b4954e86ac04bd118591568"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af85011b05da4eef31061fe777d3a73cc" id="r_af85011b05da4eef31061fe777d3a73cc"><td class="memItemLeft" align="right" valign="top"><a id="af85011b05da4eef31061fe777d3a73cc" name="af85011b05da4eef31061fe777d3a73cc"></a>
 std::string&#160;</td><td class="memItemRight" valign="bottom"><b>decode</b> (const std::vector&lt; uint32_t &gt; &amp;ids, bool ignoreErrors=true) const</td></tr>
 <tr class="separator:af85011b05da4eef31061fe777d3a73cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -118,6 +120,48 @@ Static Public Member Functions</h2></td></tr>
 static <a class="el" href="classkiwi_1_1BpeTokenizer.html">BpeTokenizer</a>&#160;</td><td class="memItemRight" valign="bottom"><b>load</b> (std::istream &amp;istr)</td></tr>
 <tr class="separator:a5aef367324155f38516b3728c99f4520"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="a660613546b4954e86ac04bd118591568" name="a660613546b4954e86ac04bd118591568"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a660613546b4954e86ac04bd118591568">&#9670;&#160;</a></span>encode()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void kiwi::BpeTokenizer::encode </td>
+          <td>(</td>
+          <td class="paramtype">std::vector&lt; uint32_t &gt; &amp;&#160;</td>
+          <td class="paramname"><em>out</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>str</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>dropout</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::mt19937_64 &amp;&#160;</td>
+          <td class="paramname"><em>rng</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>BPE-dropout: 병합 단계마다 병합 후보를 각각 <code>dropout</code> 확률로 건너뛰며, 모든 후보를 건너뛴 단계에서 병합을 멈춘다. 한 글자의 UTF-8 바이트끼리 합치는 병합은 건너뛰지 않으므로 글자보다 잘게 쪼개지지는 않는다. </p>
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
 <li>include/kiwi/<b>BpeTokenizer.h</b></li>
 </ul>

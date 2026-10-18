@@ -109,10 +109,83 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>eosTokenId</b> = 
 <tr class="memitem:ad11809b290460810b7a351c073c0fef0" id="r_ad11809b290460810b7a351c073c0fef0"><td class="memItemLeft" align="right" valign="top"><a id="ad11809b290460810b7a351c073c0fef0" name="ad11809b290460810b7a351c073c0fef0"></a>
 std::array&lt; uint32_t, 256 &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>posTagTokenIds</b> = { { 0, } }</td></tr>
 <tr class="separator:ad11809b290460810b7a351c073c0fef0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab667aab6a5e69b25550d884da29aaed1" id="r_ab667aab6a5e69b25550d884da29aaed1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="Types_8h.html#a22049affb93ad297719245d28ffc10ff">UnorderedMap</a>&lt; std::pair&lt; std::u16string, <a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebb">POSTag</a> &gt;, uint32_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi_1_1GenerativeMAOption.html#ab667aab6a5e69b25550d884da29aaed1">morphemeTokenIds</a></td></tr>
+<tr class="separator:ab667aab6a5e69b25550d884da29aaed1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac95fa8b6ff0c94ff523607210a23c7a0" id="r_ac95fa8b6ff0c94ff523607210a23c7a0"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi_1_1GenerativeMAOption.html#ac95fa8b6ff0c94ff523607210a23c7a0">morphemeDropout</a> = 0</td></tr>
+<tr class="separator:ac95fa8b6ff0c94ff523607210a23c7a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af8d04786061513d4414ab1270c686798" id="r_af8d04786061513d4414ab1270c686798"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi_1_1GenerativeMAOption.html#af8d04786061513d4414ab1270c686798">bpeDropout</a> = 0</td></tr>
+<tr class="separator:af8d04786061513d4414ab1270c686798"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a50af8000151e87a8d10cc780145342d1" id="r_a50af8000151e87a8d10cc780145342d1"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi_1_1GenerativeMAOption.html#a50af8000151e87a8d10cc780145342d1">wordSyllableDropout</a> = 0</td></tr>
+<tr class="separator:a50af8000151e87a8d10cc780145342d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af33c4f3dd63057dcb00601bf9c098e9d" id="r_af33c4f3dd63057dcb00601bf9c098e9d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi_1_1GenerativeMAOption.html#af33c4f3dd63057dcb00601bf9c098e9d">generateToMorpheme</a> = true</td></tr>
+<tr class="separator:af33c4f3dd63057dcb00601bf9c098e9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a802b69a465aaa894219f004c51be35b5" id="r_a802b69a465aaa894219f004c51be35b5"><td class="memItemLeft" align="right" valign="top"><a id="a802b69a465aaa894219f004c51be35b5" name="a802b69a465aaa894219f004c51be35b5"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>generateToSurface</b> = true</td></tr>
+<tr class="separator:a802b69a465aaa894219f004c51be35b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>posTagTokenIds는 POSTag 값으로 인덱싱한다. 불규칙 활용 태그(POSTag::vvi 등)의 자리가 0이면 규칙 활용 태그의 값을 쓴다. </p>
 </div><h2 class="groupheader">Member Data Documentation</h2>
+<a id="af8d04786061513d4414ab1270c686798" name="af8d04786061513d4414ab1270c686798"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af8d04786061513d4414ab1270c686798">&#9670;&#160;</a></span>bpeDropout</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float kiwi::GenerativeMAOption::bpeDropout = 0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>ToMorpheme 방향의 원문을 이 확률의 BPE-dropout으로 토큰화함. ToSurface 방향의 원문과 형태소열은 항상 같은 분할을 씀. </p>
+
+</div>
+</div>
+<a id="af33c4f3dd63057dcb00601bf9c098e9d" name="af33c4f3dd63057dcb00601bf9c098e9d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af33c4f3dd63057dcb00601bf9c098e9d">&#9670;&#160;</a></span>generateToMorpheme</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool kiwi::GenerativeMAOption::generateToMorpheme = true</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>데이터마다 만들 방향. 적어도 하나는 켜져 있어야 함. </p>
+
+</div>
+</div>
+<a id="ac95fa8b6ff0c94ff523607210a23c7a0" name="ac95fa8b6ff0c94ff523607210a23c7a0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac95fa8b6ff0c94ff523607210a23c7a0">&#9670;&#160;</a></span>morphemeDropout</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float kiwi::GenerativeMAOption::morphemeDropout = 0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>morphemeTokenIds에 있는 형태소라도 이 확률로 BPE로 쪼개서 나타냄 </p>
+
+</div>
+</div>
+<a id="ab667aab6a5e69b25550d884da29aaed1" name="ab667aab6a5e69b25550d884da29aaed1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab667aab6a5e69b25550d884da29aaed1">&#9670;&#160;</a></span>morphemeTokenIds</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="Types_8h.html#a22049affb93ad297719245d28ffc10ff">UnorderedMap</a>&lt;std::pair&lt;std::u16string, <a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebb">POSTag</a>&gt;, uint32_t&gt; kiwi::GenerativeMAOption::morphemeTokenIds</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>여기에 있는 (형태, 품사)의 형태소는 BPE로 쪼개지 않고 이 토큰 하나로 나타냄. </p>
+
+</div>
+</div>
 <a id="aa5bfa0c17096b2eedd7f3c6ca4cc781d" name="aa5bfa0c17096b2eedd7f3c6ca4cc781d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa5bfa0c17096b2eedd7f3c6ca4cc781d">&#9670;&#160;</a></span>spaceInsertProb</h2>
 
@@ -185,6 +258,21 @@ std::array&lt; uint32_t, 256 &gt;&#160;</td><td class="memItemRight" valign="bot
       </table>
 </div><div class="memdoc">
 <p>ToMorpheme 방향의 원문에서 오타가 발생할 수 있는 지점마다 오타를 넣을 확률 </p>
+
+</div>
+</div>
+<a id="a50af8000151e87a8d10cc780145342d1" name="a50af8000151e87a8d10cc780145342d1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a50af8000151e87a8d10cc780145342d1">&#9670;&#160;</a></span>wordSyllableDropout</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float kiwi::GenerativeMAOption::wordSyllableDropout = 0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>ToMorpheme 방향의 원문에서 어절(공백으로 나뉜 단위)마다 이 확률로 골라, 고른 어절의 한글을 음절마다 따로 토큰화함. 1이면 문장 전체를 음절 단위로 토큰화함. bpeDropout과 함께 쓸 수 있음. </p>
 
 </div>
 </div>
