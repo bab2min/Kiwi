@@ -169,17 +169,35 @@ describe('Kiwi WASM', () => {
         expect(withNewLines.text).toBe('그러나  알고보니 그 봉지 안에 있던 것은 바로\n레몬이었던 것이다.');
     });
 
-    it('should analyze with the cong-global model', async () => {
-        if (!kiwiBuilder) return;
+    describe('cong-global model', () => {
+        // Shared by both tests, because building cong-global twice aborts.
+        let congGlobal: Kiwi;
 
-        // This sentence overflowed Emscripten's default 64 KB stack with cong-global.
-        const congGlobal = await kiwiBuilder.build({
-            modelFiles: loadModelFiles(),
-            modelType: 'cong-global',
+        beforeAll(async () => {
+            if (!kiwiBuilder) return;
+            congGlobal = await kiwiBuilder.build({
+                modelFiles: loadModelFiles(),
+                modelType: 'cong-global',
+            });
         });
 
-        const tokens = congGlobal.tokenize('우리는 모든 일이 생각대로 될 것이라며 기도를 드렸다.').map(t => t.str);
-        expect(tokens).toContain('생각');
-        expect(tokens).toContain('기도');
+        it('should analyze with the cong-global model', async () => {
+            if (!congGlobal) return;
+
+            // This sentence overflowed Emscripten's default 64 KB stack with cong-global.
+            const tokens = congGlobal.tokenize('우리는 모든 일이 생각대로 될 것이라며 기도를 드렸다.').map(t => t.str);
+            expect(tokens).toContain('생각');
+            expect(tokens).toContain('기도');
+        });
+
+        it('should keep the distant-token history intact', async () => {
+            if (!congGlobal) return;
+
+            // An overlapping memcpy in the distant-token history shift corrupted the
+            // history in wasm, so 지었 came out as 지/VV instead of 짓/VV-I.
+            const tokens = congGlobal.tokenize('그는 죄를 지었기 때문에 감옥에 갔다.').map(t => `${t.str}/${t.tag}`);
+            expect(tokens).toContain('짓/VV-I');
+            expect(tokens).not.toContain('지/VV');
+        });
     });
 });
