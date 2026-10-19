@@ -932,7 +932,7 @@ namespace kiwi
 			{
 				if (history[windowSize])
 				{
-					memcpy(&history[0], &history[1], windowSize * sizeof(KeyType));
+					memmove(&history[0], &history[1], windowSize * sizeof(KeyType));
 				}
 				history[windowSize] = validDistantToken ? next : 0;
 			}
