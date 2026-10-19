@@ -29,6 +29,13 @@ endif()
 if(NOT KIWI_CPU_ARCH)
   if (EMSCRIPTEN)
     set(KIWI_CPU_ARCH "wasm")
+  # Apple cross builds (iOS, simulator) don't set CMAKE_SYSTEM_PROCESSOR to the target, so a single
+  # target architecture in CMAKE_OSX_ARCHITECTURES takes precedence. Multi-arch values like "arm64;x86_64"
+  # can't be handled by one configuration; build each architecture separately and merge them with lipo.
+  elseif (APPLE AND CMAKE_OSX_ARCHITECTURES MATCHES "^arm64e?$")
+    set(KIWI_CPU_ARCH "arm64")
+  elseif (APPLE AND CMAKE_OSX_ARCHITECTURES STREQUAL "x86_64")
+    set(KIWI_CPU_ARCH "x86_64")
   elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)|(amd64)|(AMD64)"
       OR "${ANDROID_ABI}" STREQUAL "x86_64")
     set(KIWI_CPU_ARCH "x86_64")
@@ -233,7 +240,8 @@ elseif (KIWI_CPU_ARCH MATCHES "arm64")
     ${CORE_SRCS}
     src/archImpl/neon.cpp
   )
-  set_source_files_properties(src/archImpl/neon.cpp PROPERTIES COMPILE_FLAGS "-march=armv8-a -DKIWI_ARCH_ARM64=1")
+  set_source_files_properties(src/archImpl/neon.cpp PROPERTIES COMPILE_FLAGS "-march=armv8-a")
+  add_compile_definitions(KIWI_ARCH_ARM64=1)
 elseif (KIWI_CPU_ARCH MATCHES "wasm")
   message("Compiling for wasm")
 else()
