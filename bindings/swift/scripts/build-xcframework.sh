@@ -52,11 +52,6 @@ build_platform() {
     
     cmake --build . --config Release
     
-    # Create framework structure
-    local FRAMEWORK_DIR="$PLATFORM_BUILD_DIR/Kiwi.framework"
-    mkdir -p "$FRAMEWORK_DIR/Headers"
-    
-    # Copy library
     # Use find to locate the library because Xcode puts it in different places 
     # depending on the platform (e.g., Release-iphoneos, Release-iphonesimulator, Release)
     local LIB_FILE=$(find . -name "libkiwi_static.a" | grep "Release" | head -n 1)
@@ -64,7 +59,35 @@ build_platform() {
         echo "Error: libkiwi_static.a not found in $PLATFORM_BUILD_DIR"
         exit 1
     fi
-    cp "$LIB_FILE" "$FRAMEWORK_DIR/Kiwi"
+    cp "$LIB_FILE" "$PLATFORM_BUILD_DIR/libkiwi.a"
+    echo "✓ Built $PLATFORM ($ARCHS)"
+}
+
+# Create a framework from one or more single-architecture builds.
+# Each architecture is configured separately because the arch-specific sources and definitions
+# (e.g. NEON kernels and KIWI_ARCH_ARM64) are chosen per configuration; they are merged with lipo here.
+make_framework() {
+    local BUILD_SUBDIR=$1
+    shift
+    
+    local PLATFORM_BUILD_DIR="$BUILD_DIR/$BUILD_SUBDIR"
+    mkdir -p "$PLATFORM_BUILD_DIR"
+    cd "$PLATFORM_BUILD_DIR"
+    
+    # Create framework structure
+    local FRAMEWORK_DIR="$PLATFORM_BUILD_DIR/Kiwi.framework"
+    mkdir -p "$FRAMEWORK_DIR/Headers"
+    
+    # Copy library
+    local LIBS=()
+    for SUB in "$@"; do
+        LIBS+=("$BUILD_DIR/$SUB/libkiwi.a")
+    done
+    if [ ${#LIBS[@]} -eq 1 ]; then
+        cp "${LIBS[0]}" "$FRAMEWORK_DIR/Kiwi"
+    else
+        lipo -create "${LIBS[@]}" -output "$FRAMEWORK_DIR/Kiwi"
+    fi
     
     # Copy headers
     cp "$PROJECT_ROOT/include/kiwi/capi.h" "$FRAMEWORK_DIR/Headers/"
@@ -80,17 +103,22 @@ framework module Kiwi {
 }
 EOF
     
-    echo "✓ Built $PLATFORM"
+    echo "✓ Created $BUILD_SUBDIR framework"
 }
 
 # Build for iOS Device (arm64)
-build_platform "iOS" "iphoneos" "arm64" "12.0" "ios-arm64"
+build_platform "iOS" "iphoneos" "arm64" "12.0" "ios-arm64-lib"
+make_framework "ios-arm64" "ios-arm64-lib"
 
 # Build for iOS Simulator (arm64 + x86_64)
-build_platform "iOS" "iphonesimulator" "arm64;x86_64" "12.0" "ios-simulator"
+build_platform "iOS" "iphonesimulator" "arm64" "12.0" "ios-simulator-arm64"
+build_platform "iOS" "iphonesimulator" "x86_64" "12.0" "ios-simulator-x86_64"
+make_framework "ios-simulator" "ios-simulator-arm64" "ios-simulator-x86_64"
 
 # Build for macOS (arm64 + x86_64 universal)
-build_platform "Darwin" "macosx" "arm64;x86_64" "10.14" "macos"
+build_platform "Darwin" "macosx" "arm64" "10.14" "macos-arm64"
+build_platform "Darwin" "macosx" "x86_64" "10.14" "macos-x86_64"
+make_framework "macos" "macos-arm64" "macos-x86_64"
 
 # Create XCFramework
 echo "Creating XCFramework..."

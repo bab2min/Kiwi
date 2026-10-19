@@ -2914,13 +2914,15 @@ namespace kiwi
 			case 7:
 				return make_unique<CoNgramModel<archType, KeyTy, VlKeyType, 7, quantized>>(std::move(mem));
 			default:
-				throw runtime_error{ "Unsupported `window_size` : " + to_string((size_t)header.windowSize) };
+				throw SerializationException{ "Unsupported `window_size` : " + to_string((size_t)header.windowSize) };
 			};
 		}
 
 		template<ArchType archType, bool useDistantTokens, bool quantized>
 		unique_ptr<CoNgramModelBase> createOptimizedModel(utils::MemoryObject&& mem)
 		{
+			if (mem.size() < sizeof(CoNgramModelHeader))
+				throw SerializationException{ "Invalid model file" };
 			auto& header = *reinterpret_cast<const CoNgramModelHeader*>(mem.get());
 			switch (header.keySize)
 			{
@@ -2933,7 +2935,7 @@ namespace kiwi
 			case 4:
 				return createOptimizedModelWithWindowSize<archType, uint32_t, uint32_t, useDistantTokens, quantized>(std::move(mem));
 			default:
-				throw runtime_error{ "Unsupported `key_size` : " + to_string((size_t)header.keySize) };
+				throw SerializationException{ "Unsupported `key_size` : " + to_string((size_t)header.keySize) };
 			}
 		}
 
@@ -2967,7 +2969,7 @@ namespace kiwi
 				cerr << "Quantization is not supported for ArchType::" << archToStr(archType) << ". Fall back to non-quantized model." << endl;
 			}
 			auto fn = tables[useDistantTokens ? 1 : 0][static_cast<ptrdiff_t>(archType)];
-			if (!fn) throw runtime_error{ string{"Unsupported architecture : "} + archToStr(archType) };
+			if (!fn) throw SerializationException{ string{"Unsupported architecture : "} + archToStr(archType) };
 			return (*fn)(std::move(mem));
 		}
 	}
