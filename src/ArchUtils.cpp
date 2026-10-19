@@ -68,7 +68,7 @@ namespace kiwi
 		{
 			return arch;
 		}
-#elif CPUINFO_ARCH_ARM || CPUINFO_ARCH_ARM64 || KIWI_ARCH_NEON
+#elif CPUINFO_ARCH_ARM || CPUINFO_ARCH_ARM64 || KIWI_ARCH_ARM64
 		if (ArchType::neon <= arch && arch <= ArchType::neon && arch <= best)
 		{
 			return arch;
