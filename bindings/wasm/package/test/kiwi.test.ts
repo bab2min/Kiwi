@@ -168,4 +168,18 @@ describe('Kiwi WASM', () => {
         const withNewLines = kiwi.glue(chunks, [true, true]);
         expect(withNewLines.text).toBe('그러나  알고보니 그 봉지 안에 있던 것은 바로\n레몬이었던 것이다.');
     });
+
+    it('should analyze with the cong-global model', async () => {
+        if (!kiwiBuilder) return;
+
+        // This sentence overflowed Emscripten's default 64 KB stack with cong-global.
+        const congGlobal = await kiwiBuilder.build({
+            modelFiles: loadModelFiles(),
+            modelType: 'cong-global',
+        });
+
+        const tokens = congGlobal.tokenize('우리는 모든 일이 생각대로 될 것이라며 기도를 드렸다.').map(t => t.str);
+        expect(tokens).toContain('생각');
+        expect(tokens).toContain('기도');
+    });
 });
