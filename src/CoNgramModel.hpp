@@ -39,7 +39,7 @@ namespace kiwi
 		}
 
 		template<size_t windowSize, ArchType _arch, class VocabTy, class VlVocabTy, bool quantized>
-		class CoNgramState;
+		struct CoNgramState;
 
 		template<ArchType arch, class KeyType, class VlKeyType, size_t windowSize, bool quantized = true>
 		class CoNgramModel : public CoNgramModelBase
