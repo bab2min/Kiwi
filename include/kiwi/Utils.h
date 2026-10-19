@@ -302,6 +302,7 @@ namespace kiwi
 		case u'\r':
 		case u'\t':
 		case u'\v':
+		case u'\x85':
 		case u'\xA0':
 		case u'\u1680':
 		case u'\u2000':
@@ -315,6 +316,8 @@ namespace kiwi
 		case u'\u2008':
 		case u'\u2009':
 		case u'\u200A':
+		case u'\u2028':
+		case u'\u2029':
 		case u'\u202F':
 		case u'\u205F':
 		case u'\u2800':
