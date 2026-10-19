@@ -2272,6 +2272,28 @@ TEST(KiwiCpp, LongChunkOver65536)
 	}
 }
 
+TEST(KiwiCpp, UnicodeLineSeparatorsAsSpace)
+{
+	// Test for Unicode white space characters: U+0085, U+2028, U+2029
+	Kiwi& kiwi = reuseKiwiInstance();
+	auto ref = kiwi.analyze(u"사시도이다. 발명", Match::allWithNormalizing).first;
+	for (auto sep : { u"\u0085", u" ", u" " })
+	{
+		std::u16string text = u"사시도이다.";
+		text += sep;
+		text += u"발명";
+		auto res = kiwi.analyze(text, Match::allWithNormalizing).first;
+		ASSERT_EQ(res.size(), ref.size());
+		for (size_t i = 0; i < res.size(); ++i)
+		{
+			EXPECT_EQ(res[i].str, ref[i].str);
+			EXPECT_EQ(res[i].tag, ref[i].tag);
+			EXPECT_NE(res[i].tag, POSTag::sw);
+		}
+		EXPECT_EQ(res.back().position, 7);
+	}
+}
+
 TEST(KiwiCpp, IssueP189)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
