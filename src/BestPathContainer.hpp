@@ -308,7 +308,7 @@ namespace kiwi
 	template<>
 	struct BestPathContainerTraits<PathEvaluatingMode::top1Small>
 	{
-		static constexpr size_t maxSize = (sizeof(size_t) == 8 ? 64 : 32) * 2;
+		static constexpr size_t maxSize = 64 * 2;
 	};
 
 	template<>
@@ -355,28 +355,19 @@ namespace kiwi
 			auto& value = values[bucket];
 
 			size_t it = value.size();
-			size_t bits[2];
-			bits[0] = nst::findAll<archType>(hash.data(), std::min(value.size(), numBits), (uint8_t)h);
-			bits[1] = value.size() > numBits ? nst::findAll<archType>(hash.data() + numBits, value.size() - numBits, (uint8_t)h) : 0;
-			while (bits[0])
+			for (size_t offset = 0; offset < value.size(); offset += numBits)
 			{
-				const size_t i = utils::countTrailingZeroes(bits[0]);
-				if (value[i].equalTo(lmState, prevRootId, spState))
+				size_t bits = nst::findAll<archType>(hash.data() + offset, std::min(value.size() - offset, numBits), (uint8_t)h);
+				while (bits)
 				{
-					it = i;
-					goto breakloop;
+					const size_t i = utils::countTrailingZeroes(bits);
+					if (value[offset + i].equalTo(lmState, prevRootId, spState))
+					{
+						it = offset + i;
+						goto breakloop;
+					}
+					bits &= ~((size_t)1 << i);
 				}
-				bits[0] &= ~((size_t)1 << i);
-			}
-			while (bits[1])
-			{
-				const size_t i = utils::countTrailingZeroes(bits[1]);
-				if (value[i].equalTo(lmState, prevRootId, spState))
-				{
-					it = i + numBits;
-					goto breakloop;
-				}
-				bits[1] &= ~((size_t)1 << i);
 			}
 
 		breakloop:;
