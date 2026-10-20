@@ -10,6 +10,7 @@ test_c.cpp
 test_cpp.cpp
 test_sw_tokenizer.cpp
 test_bpe_tokenizer.cpp
+test_search.cpp
 )
 
 ######################################
