@@ -63,7 +63,7 @@ namespace kiwi
 		{
 			nodes = make_unique<Node[]>(numNodes);
 			values = make_unique<Value[]>(numNodes);
-			nextKeys = make_unique<Key[]>(numNexts);
+			nextKeys = make_unique<Key[]>(numNexts + keyPadding);
 			nextDiffs = make_unique<Diff[]>(numNexts);
 
 			std::copy(o.nodes.get(), o.nodes.get() + numNodes, nodes.get());
@@ -80,7 +80,7 @@ namespace kiwi
 
 			nodes = make_unique<Node[]>(numNodes);
 			values = make_unique<Value[]>(numNodes);
-			nextKeys = make_unique<Key[]>(numNexts);
+			nextKeys = make_unique<Key[]>(numNexts + keyPadding);
 			nextDiffs = make_unique<Diff[]>(numNexts);
 
 			std::copy(o.nodes.get(), o.nodes.get() + numNodes, nodes.get());
@@ -103,7 +103,7 @@ namespace kiwi
 				numNexts += trie[i].next.size();
 			}
 
-			nextKeys = make_unique<Key[]>(numNexts);
+			nextKeys = make_unique<Key[]>(numNexts + keyPadding);
 			nextDiffs = make_unique<Diff[]>(numNexts);
 
 			size_t ptr = 0;

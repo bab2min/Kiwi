@@ -91,6 +91,9 @@ namespace kiwi
 				const Value& val(const FrozenTrie& ft) const;
 			};
 		private:
+			// SIMD search loads up to 64 bytes past the last key
+			static constexpr size_t keyPadding = 64 / sizeof(Key);
+
 			size_t numNodes = 0;
 			size_t numNexts = 0;
 			std::unique_ptr<Node[]> nodes;
