@@ -1804,7 +1804,7 @@ namespace kiwi
 		{
 			for (size_t pidx = pathIndices[prev - startNode]; pidx < pathIndices[prev - startNode + 1]; ++pidx)
 			{
-				auto& p = pathes[pidx];
+				auto p = pathes[pidx]; // copy: emplace_back below can reallocate pathes
 				if (p.combineSocket) continue;
 				if (!(p.morpheme->chunks.empty() || p.morpheme->complex || p.morpheme->saisiot))
 				{
