@@ -100,6 +100,7 @@ export enum Match {
     splitSaisiot = 1 << 25,
     mergeSaisiot = 1 << 26,
     joinParticleYo = 1 << 27,
+    joinEp = 1 << 28,
     joinVSuffix = joinVerbSuffix | joinAdjSuffix,
     joinAffix = joinNounPrefix |
         joinNounSuffix |
