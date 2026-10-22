@@ -12,10 +12,10 @@ TEST(Search, FindAllFullWidth)
 	static constexpr size_t numBits = sizeof(size_t) * 8;
 	uint8_t arr[64];
 	std::fill(arr, arr + 64, 7);
-#if defined(__x86_64__) || defined(KIWI_ARCH_X86) || defined(KIWI_ARCH_X86_64)
+#if defined(__x86_64__) || defined(_M_X64) || defined(KIWI_ARCH_X86) || defined(KIWI_ARCH_X86_64)
 	EXPECT_EQ(nst::findAll<ArchType::sse2>(arr, numBits, 7), ~(size_t)0);
 #endif
-#ifdef KIWI_ARCH_ARM64
+#if defined(KIWI_ARCH_ARM64) || defined(_M_ARM64)
 	EXPECT_EQ(nst::findAll<ArchType::neon>(arr, numBits, 7), ~(size_t)0);
 #endif
 }
