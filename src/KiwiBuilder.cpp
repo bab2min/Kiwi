@@ -2524,6 +2524,19 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 		ret.morphemes.emplace_back(bake(m, ret.morphemes.data(), ret.forms.data(), newFormIdMapper));		
 	}
 
+	// 사이시옷이 포함된 경우는 saisiot을 true로, 그 외에는 complex를 true로 설정
+	for (auto& m : ret.morphemes)
+	{
+		if (!m.complex) continue;
+		for (size_t i = 0; i < m.chunks.size(); ++i)
+		{
+			if (m.chunks[i]->tag != POSTag::z_siot) continue;
+			m.complex = false;
+			m.saisiot = true;
+			break;
+		}
+	}
+
 	utils::ContinuousTrie<KTrie> formTrie{ defaultFormSize + 1 };
 	// reserve places for root node + default tag morphemes
 	for (size_t i = 0; i < defaultFormSize; ++i)

@@ -127,16 +127,14 @@ namespace kiwi
 		ret.senseId = o.senseId;
 		ret.chunks = FixedPairVector<const Morpheme*, std::pair<uint8_t, uint8_t>>{ o.chunks.size() };
 		
-		bool hasSaisiot = false;
 		for (size_t i = 0; i < o.chunks.size(); ++i)
 		{
 			ret.chunks[i] = morphBase + o.chunks[i];
 			ret.chunks.getSecond(i) = o.chunkPositions[i];
-			hasSaisiot = hasSaisiot || (morphBase[o.chunks[i]].tag == POSTag::z_siot);
 		}
-		// 사이시옷이 포함된 경우는 saisiot을 true로, 그 외에는 complex를 true로 설정
-		ret.complex = o.complex() && !hasSaisiot;
-		ret.saisiot = o.complex() && hasSaisiot;
+		// chunks can point to morphemes not baked yet; saisiot is set in KiwiBuilder::build
+		ret.complex = o.complex();
+		ret.saisiot = false;
 
 		ret.dialect = o.dialect;
 		return ret;
