@@ -67,6 +67,7 @@
     <ClCompile Include="test_combiner.cpp" />
     <ClCompile Include="test_QEncoder.cpp" />
     <ClCompile Include="bit_encode.cpp" />
+    <ClCompile Include="test_search.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common.h" />

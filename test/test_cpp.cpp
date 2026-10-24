@@ -1401,6 +1401,16 @@ TEST(KiwiCpp, AnalyzeCong)
 	EXPECT_EQ(res[0].first[8].str, u"걸");
 }
 
+TEST(KiwiCpp, AnalyzeCongFullPathBucket)
+{
+	// a path bucket reaches 64 paths here, so findAll gets a full-width chunk
+	Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 0, BuildOption::default_, ModelType::congGlobal }.build();
+	auto res = kiwi.analyze(u"이가 이래서 물을 데워 마셨다.", Match::all);
+	ASSERT_EQ(res.first.size(), 12);
+	EXPECT_EQ(res.first[6].str, u"데우");
+	EXPECT_EQ(res.first[6].tag, POSTag::vv);
+}
+
 TEST(KiwiCpp, CoNgramFunctions)
 {
 	if (sizeof(void*) != 8)
