@@ -2282,6 +2282,18 @@ TEST(KiwiCpp, LongChunkOver65536)
 	}
 }
 
+TEST(KiwiCpp, ExtractWordsWithoutWorkerThreads)
+{
+	KiwiBuilder builder{ MODEL_PATH, 0, BuildOption::default_, ModelType::none };
+	builder.extractWords([]()
+	{
+		return [i = 0]() mutable -> std::u16string
+		{
+			return i++ < 100 ? u"자연어 처리는 재미있다." : u"";
+		};
+	}, 2, 2, 0.1, -3);
+}
+
 TEST(KiwiCpp, UnicodeLineSeparatorsAsSpace)
 {
 	// Test for Unicode white space characters: U+0085, U+2028, U+2029

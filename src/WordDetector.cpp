@@ -125,6 +125,7 @@ namespace kiwi
 	template<class LocalData, class FuncReader, class FuncProc>
 	std::vector<LocalData> readProc(size_t numWorkers, const FuncReader& reader, const FuncProc& processor, LocalData&& ld = {})
 	{
+		numWorkers = std::max(numWorkers, (size_t)1);
 		utils::ThreadPool workers{ numWorkers, numWorkers * 2 };
 		std::vector<LocalData> ldByTid(workers.size(), ld);
 		while (1)
