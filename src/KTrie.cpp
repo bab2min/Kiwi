@@ -819,7 +819,7 @@ public:
 			// 문장 종결 지점이 나타나거나 Graph가 너무 길어지면 공백 문자에서 중단
 			if (chrType == POSTag::unknown && n >= (lastChrType == POSTag::sf ? 4 : 4096))
 			{
-				if (!isSpace(str[n - 3]) && !isSpace(str[n - 2]))
+				if ((!isSpace(str[n - 3]) && !isSpace(str[n - 2])) || n >= 8192)
 				{
 					break;
 				}
