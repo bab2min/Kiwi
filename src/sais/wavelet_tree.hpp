@@ -204,7 +204,7 @@ namespace sais
 			const size_t alignedSize = (length + bitAlignmentSize - 1) & ~(bitAlignmentSize - 1);
 
 			auto curBits = &bits[i * alignedSize / 8];
-			auto curSuperBlocks = &superBlocks[i * (alignedSize / superBlockBitSize)];
+			auto curSuperBlocks = superBlocks.get() + i * (alignedSize / superBlockBitSize);
 			const size_t offset = offsets[offsetIdx];
 			const size_t lOneCnt = countOne(curBits, curSuperBlocks, l + offset) - countOne(curBits, curSuperBlocks, offset);
 			const size_t rOneCnt = countOne(curBits, curSuperBlocks, r + offset) - countOne(curBits, curSuperBlocks, offset);
@@ -252,7 +252,7 @@ namespace sais
 
 			std::vector<ChrTy> buf(size * 2);
 			size_t oneCnt = writeMSBs(&bits[0], 0, data, size);
-			fillSuperBlocks<superBlockSize>(&superBlocks[0], &bits[0], alignedSize / 8);
+			fillSuperBlocks<superBlockSize>(superBlocks.get(), &bits[0], alignedSize / 8);
 			splitByMSB(&buf[0], &buf[oneCnt], data, size);
 			offsets[0] = 0;
 			offsets[(size_t)1 << (depth - 1)] = oneCnt;
@@ -262,7 +262,7 @@ namespace sais
 				auto curBuf = &buf[(i & 1) ? 0 : size];
 				auto anotherBuf = &buf[(i & 1) ? size : 0];
 				auto curBits = &bits[i * alignedSize / 8];
-				auto curSuperBlocks = &superBlocks[i * (alignedSize / superBlockBitSize)];
+				auto curSuperBlocks = superBlocks.get() + i * (alignedSize / superBlockBitSize);
 				for (size_t j = 0; j < gSize; ++j)
 				{
 					size_t start = offsets[j << (depth - i)];
@@ -287,7 +287,7 @@ namespace sais
 			{
 				if (l == 0) break;
 				auto curBits = &bits[i * alignedSize / 8];
-				auto curSuperBlocks = &superBlocks[i * (alignedSize / superBlockBitSize)];
+				auto curSuperBlocks = superBlocks.get() + i * (alignedSize / superBlockBitSize);
 				const size_t offset = offsets[offsetIdx];
 
 				const size_t oneCnt = countOne(curBits, curSuperBlocks, l + offset) - countOne(curBits, curSuperBlocks, offset);
