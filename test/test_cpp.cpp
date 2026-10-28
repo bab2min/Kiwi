@@ -1871,6 +1871,14 @@ TEST(KiwiCpp, JoinAffix)
 	EXPECT_EQ(res5.first[5].str, u"배송되");
 }
 
+TEST(KiwiCpp, JoinWithoutLmSearchOnPrefixOfForm)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	auto joiner = kiwi.newJoiner(false);
+	joiner.add(u"다히", POSTag::jkb);
+	EXPECT_EQ(joiner.getU16(), u"다히");
+}
+
 TEST(KiwiCpp, JoinParticleYo)
 {
 	Kiwi& kiwi = reuseKiwiInstance();
