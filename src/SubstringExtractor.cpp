@@ -520,7 +520,7 @@ namespace kiwi
 		kiwi->analyze(1, [&]()
 		{
 			auto str = reader();
-			rawDocs.emplace_back(str);
+			if (!str.empty()) rawDocs.emplace_back(str);
 			return str;
 		}, [&](const std::vector<TokenResult>& res)
 		{

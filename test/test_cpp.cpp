@@ -2294,6 +2294,27 @@ TEST(KiwiCpp, ExtractWordsWithoutWorkerThreads)
 	}, 2, 2, 0.1, -3);
 }
 
+TEST(KiwiCpp, NgramExtractorWithSeveralAddTexts)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	NgramExtractor extractor{ kiwi };
+	const std::u16string docs[] = {
+		u"자연어 처리 기술은 매우 중요하다. 자연어 처리 기술을 배우자.",
+		u"형태소 분석기 키위는 빠르다. 형태소 분석기 키위를 쓰자.",
+	};
+	for (auto& doc : docs)
+	{
+		size_t i = 0;
+		extractor.addTexts([&]() { return i++ < 20 ? doc : std::u16string{}; });
+	}
+	auto cands = extractor.extract(1000, 5);
+	EXPECT_FALSE(cands.empty());
+	for (auto& c : cands)
+	{
+		EXPECT_TRUE(docs[0].find(c.text) != std::u16string::npos || docs[1].find(c.text) != std::u16string::npos) << utf16To8(c.text);
+	}
+}
+
 TEST(KiwiCpp, UnicodeLineSeparatorsAsSpace)
 {
 	// Test for Unicode white space characters: U+0085, U+2028, U+2029
