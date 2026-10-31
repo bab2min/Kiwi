@@ -170,7 +170,7 @@ describe('Kiwi WASM', () => {
     });
 
     describe('cong-global model', () => {
-        // Shared by both tests, because building cong-global twice aborts.
+        // Shared by the tests below, because building cong-global twice aborts.
         let congGlobal: Kiwi;
 
         beforeAll(async () => {
@@ -198,6 +198,16 @@ describe('Kiwi WASM', () => {
             const tokens = congGlobal.tokenize('그는 죄를 지었기 때문에 감옥에 갔다.').map(t => `${t.str}/${t.tag}`);
             expect(tokens).toContain('짓/VV-I');
             expect(tokens).not.toContain('지/VV');
+        });
+
+        it('should not drop paths on 32-bit builds', async () => {
+            if (!congGlobal) return;
+
+            // The path buckets were half as large with a 32-bit size_t, so a full
+            // bucket dropped the best path and 걸었다 came out as 걸/VV instead of 걷/VV-I.
+            const tokens = congGlobal.tokenize('날이 밝아서 한참 길을 걸었다.').map(t => `${t.str}/${t.tag}`);
+            expect(tokens).toContain('걷/VV-I');
+            expect(tokens).not.toContain('걸/VV');
         });
     });
 });
