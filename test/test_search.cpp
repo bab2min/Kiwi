@@ -19,3 +19,20 @@ TEST(Search, FindAllFullWidth)
 	EXPECT_EQ(nst::findAll<ArchType::neon>(arr, numBits, 7), ~(size_t)0);
 #endif
 }
+
+TEST(Search, SearchKVSortedKeys)
+{
+	// prepareKV doesn't reorder for none, so searchKV gets sorted keys followed by their values
+	static constexpr size_t size = 100;
+	uint32_t kv[size * 2];
+	for (size_t i = 0; i < size; ++i)
+	{
+		kv[i] = (uint32_t)(i * 2 + 1);
+		kv[size + i] = (uint32_t)(i + 1);
+	}
+	for (size_t i = 0; i < size; ++i)
+	{
+		EXPECT_EQ((nst::searchKV<ArchType::none, uint32_t, uint32_t, uint32_t>(kv, size, (uint32_t)(i * 2 + 1))), i + 1);
+		EXPECT_EQ((nst::searchKV<ArchType::none, uint32_t, uint32_t, uint32_t>(kv, size, (uint32_t)(i * 2))), 0u);
+	}
+}
