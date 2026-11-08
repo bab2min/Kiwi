@@ -19,6 +19,6 @@ var searchData=
   ['morpheme_16',['Morpheme',['../structkiwi_1_1Morpheme.html',1,'kiwi']]],
   ['morphemedef_17',['MorphemeDef',['../structkiwi_1_1MorphemeDef.html',1,'kiwi']]],
   ['morphemedropout_18',['morphemeDropout',['../structkiwi_1_1GenerativeMAOption.html#ac95fa8b6ff0c94ff523607210a23c7a0',1,'kiwi::GenerativeMAOption']]],
-  ['morphemeraw_19',['morphemeraw',['../structkiwi_1_1MorphemeRaw.html',1,'kiwi::MorphemeRaw'],['../structkiwi_1_1MorphemeRaw.html#adbfe0b0a46369012e8bccab4f0f70732',1,'kiwi::MorphemeRaw::MorphemeRaw()']]],
+  ['morphemeraw_19',['MorphemeRaw',['../structkiwi_1_1MorphemeRaw.html',1,'kiwi::MorphemeRaw'],['../structkiwi_1_1MorphemeRaw.html#adbfe0b0a46369012e8bccab4f0f70732',1,'kiwi::MorphemeRaw::MorphemeRaw()']]],
   ['morphemetokenids_20',['morphemeTokenIds',['../structkiwi_1_1GenerativeMAOption.html#ab667aab6a5e69b25550d884da29aaed1',1,'kiwi::GenerativeMAOption']]]
 ];

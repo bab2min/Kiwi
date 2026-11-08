@@ -2,7 +2,7 @@ var searchData=
 [
   ['cachestore_0',['CacheStore',['../structkiwi_1_1utils_1_1ContinuousTrie_1_1CacheStore.html',1,'kiwi::utils::ContinuousTrie']]],
   ['cachestore_3c_20cont_20_2a_20_3e_1',['CacheStore&lt; Cont * &gt;',['../structkiwi_1_1utils_1_1ContinuousTrie_1_1CacheStore_3_01Cont_01_5_01_4.html',1,'kiwi::utils::ContinuousTrie']]],
-  ['candidate_2',['candidate',['../structkiwi_1_1cmb_1_1Candidate.html',1,'kiwi::cmb::Candidate&lt; LmState &gt;'],['../structkiwi_1_1NgramExtractor_1_1Candidate.html',1,'kiwi::NgramExtractor::Candidate']]],
+  ['candidate_2',['Candidate',['../structkiwi_1_1cmb_1_1Candidate.html',1,'kiwi::cmb::Candidate&lt; LmState &gt;'],['../structkiwi_1_1NgramExtractor_1_1Candidate.html',1,'kiwi::NgramExtractor::Candidate']]],
   ['candidate_3c_20lm_3a_3avoidstate_3c_20arch_20_3e_20_3e_3',['Candidate&lt; lm::VoidState&lt; arch &gt; &gt;',['../structkiwi_1_1cmb_1_1Candidate_3_01lm_1_1VoidState_3_01arch_01_4_01_4.html',1,'kiwi::cmb']]],
   ['chrdataset_4',['ChrDataset',['../classkiwi_1_1ChrDataset.html',1,'kiwi']]],
   ['chrtokenizer_5',['ChrTokenizer',['../classkiwi_1_1ChrTokenizer.html',1,'kiwi']]],

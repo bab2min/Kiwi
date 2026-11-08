@@ -4,7 +4,7 @@ var searchData=
   ['newjoiner_1',['newJoiner',['../classkiwi_1_1Kiwi.html#a38266e3408b09fe2e924f5f04fd8f19d',1,'kiwi::Kiwi']]],
   ['next_2',['next',['../classkiwi_1_1GenerativeMADataset.html#a24b56bc63b6482674dba850a260327fe',1,'kiwi::GenerativeMADataset']]],
   ['ngramextractor_3',['NgramExtractor',['../classkiwi_1_1NgramExtractor.html',1,'kiwi']]],
-  ['node_4',['node',['../structkiwi_1_1lm_1_1Node.html',1,'kiwi::lm::Node&lt; KeyType, ValueType, DiffType &gt;'],['../structkiwi_1_1utils_1_1FrozenTrie_1_1Node.html',1,'kiwi::utils::FrozenTrie&lt; _Key, _Value, _Diff, _HasSubmatch &gt;::Node']]],
+  ['node_4',['Node',['../structkiwi_1_1lm_1_1Node.html',1,'kiwi::lm::Node&lt; KeyType, ValueType, DiffType &gt;'],['../structkiwi_1_1utils_1_1FrozenTrie_1_1Node.html',1,'kiwi::utils::FrozenTrie&lt; _Key, _Value, _Diff, _HasSubmatch &gt;::Node']]],
   ['node_3c_20uint16_5ft_2c_20uint32_5ft_2c_20int32_5ft_20_3e_5',['Node&lt; uint16_t, uint32_t, int32_t &gt;',['../structkiwi_1_1lm_1_1Node_3_01uint16__t_00_01uint32__t_00_01int32__t_01_4.html',1,'kiwi::lm']]],
   ['nodetoval_6',['NodeToVal',['../structkiwi_1_1utils_1_1detail_1_1NodeToVal.html',1,'kiwi::utils::detail']]],
   ['non_5fadj_7',['non_adj',['../Types_8h.html#a7903fe33da04a788b0bb009094596894a8f72c327aea57de5c5a3f9f21b56a233',1,'kiwi']]],

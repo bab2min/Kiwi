@@ -1,7 +1,7 @@
 var searchData=
 [
   ['kform_0',['kform',['../structkiwi_1_1MorphemeRaw.html#a10ff5e61d22c88c01d594b9cf60532ad',1,'kiwi::MorphemeRaw']]],
-  ['kiwi_1',['kiwi',['../classkiwi_1_1Kiwi.html',1,'kiwi::Kiwi'],['../classkiwi_1_1Kiwi.html#a9fdcc70af2d0582e00313c0d92546aad',1,'kiwi::Kiwi::Kiwi()']]],
+  ['kiwi_1',['Kiwi',['../classkiwi_1_1Kiwi.html',1,'kiwi::Kiwi'],['../classkiwi_1_1Kiwi.html#a9fdcc70af2d0582e00313c0d92546aad',1,'kiwi::Kiwi::Kiwi()']]],
   ['kiwi_2eh_2',['Kiwi.h',['../Kiwi_8h.html',1,'']]],
   ['kiwi_5fanalyze_3',['kiwi_analyze',['../capi_8h.html#a373e08c509390311a3dba9f1101693ed',1,'capi.h']]],
   ['kiwi_5fanalyze_5fm_4',['kiwi_analyze_m',['../capi_8h.html#a7bd4bede355c2b3c000c951f774e9c26',1,'capi.h']]],
@@ -122,11 +122,11 @@ var searchData=
   ['kiwi_5fws_5fpos_5fscore_119',['kiwi_ws_pos_score',['../capi_8h.html#a25feabab022bf3be5fba1013bdbf851a',1,'capi.h']]],
   ['kiwi_5fws_5fscore_120',['kiwi_ws_score',['../capi_8h.html#a1a8749430c7b7ef9b196cb75c0ce355c',1,'capi.h']]],
   ['kiwi_5fws_5fsize_121',['kiwi_ws_size',['../capi_8h.html#a3421fe0f93fc5991dee5fbef4205a226',1,'capi.h']]],
-  ['kiwibuilder_122',['kiwibuilder',['../classkiwi_1_1KiwiBuilder.html#a5cd2c09e03ef369b42630ac5e56d735a',1,'kiwi::KiwiBuilder::KiwiBuilder()'],['../classkiwi_1_1KiwiBuilder.html',1,'kiwi::KiwiBuilder'],['../classkiwi_1_1KiwiBuilder.html#a400409ef1f682bfbfe65706a0bc5285f',1,'kiwi::KiwiBuilder::KiwiBuilder()'],['../classkiwi_1_1KiwiBuilder.html#a6338925fdfa3ac713fbd6a860866e7f7',1,'kiwi::KiwiBuilder::KiwiBuilder(const ModelBuildArgs &amp;args)'],['../classkiwi_1_1KiwiBuilder.html#aaf6cf74f8ba2b589a939932a6851e8d0',1,'kiwi::KiwiBuilder::KiwiBuilder(const std::string &amp;modelPath, const ModelBuildArgs &amp;args)'],['../classkiwi_1_1KiwiBuilder.html#a10218311643d700031d1203722b169dc',1,'kiwi::KiwiBuilder::KiwiBuilder(const std::string &amp;modelPath, size_t numThreads=-1, BuildOption options=BuildOption::default_, ModelType modelType=ModelType::none, Dialect enabledDialects=Dialect::standard)']]],
+  ['kiwibuilder_122',['KiwiBuilder',['../classkiwi_1_1KiwiBuilder.html',1,'kiwi::KiwiBuilder'],['../classkiwi_1_1KiwiBuilder.html#a400409ef1f682bfbfe65706a0bc5285f',1,'kiwi::KiwiBuilder::KiwiBuilder()'],['../classkiwi_1_1KiwiBuilder.html#a6338925fdfa3ac713fbd6a860866e7f7',1,'kiwi::KiwiBuilder::KiwiBuilder(const ModelBuildArgs &amp;args)'],['../classkiwi_1_1KiwiBuilder.html#aaf6cf74f8ba2b589a939932a6851e8d0',1,'kiwi::KiwiBuilder::KiwiBuilder(const std::string &amp;modelPath, const ModelBuildArgs &amp;args)'],['../classkiwi_1_1KiwiBuilder.html#a5cd2c09e03ef369b42630ac5e56d735a',1,'kiwi::KiwiBuilder::KiwiBuilder(StreamProvider streamProvider, size_t numThreads=-1, BuildOption options=BuildOption::default_, ModelType modelType=ModelType::none, Dialect enabledDialects=Dialect::standard)'],['../classkiwi_1_1KiwiBuilder.html#a10218311643d700031d1203722b169dc',1,'kiwi::KiwiBuilder::KiwiBuilder(const std::string &amp;modelPath, size_t numThreads=-1, BuildOption options=BuildOption::default_, ModelType modelType=ModelType::none, Dialect enabledDialects=Dialect::standard)']]],
   ['kiwiconfig_123',['KiwiConfig',['../structkiwi_1_1KiwiConfig.html',1,'kiwi']]],
   ['knlangmodelbase_124',['KnLangModelBase',['../classkiwi_1_1lm_1_1KnLangModelBase.html',1,'kiwi::lm']]],
   ['knlangmodelheader_125',['KnLangModelHeader',['../structkiwi_1_1lm_1_1KnLangModelHeader.html',1,'kiwi::lm']]],
   ['knlangmodelnode_126',['KnLangModelNode',['../structkiwi_1_1lm_1_1KnLangModelNode.html',1,'kiwi::lm']]],
   ['knlm_127',['knlm',['../Types_8h.html#af7906391a8e367cab5296bac8d4caafaaac794a38581bb3bc7fb719e2b3331b8e',1,'kiwi']]],
-  ['kstring_128',['KString',['../Types_8h.html#a1f2cff3b6a7a1d78c447635f1d84ebe1',1,'kiwi']]]
+  ['kstring_128',['KString',['../Types_8h.html#a681fbaac4957b360fe238aff1c3f5758',1,'kiwi']]]
 ];

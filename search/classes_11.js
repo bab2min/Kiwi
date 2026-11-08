@@ -5,11 +5,12 @@ var searchData=
   ['threadpool_2',['ThreadPool',['../classkiwi_1_1utils_1_1ThreadPool.html',1,'kiwi::utils']]],
   ['tokeninfo_3',['TokenInfo',['../structkiwi_1_1TokenInfo.html',1,'kiwi']]],
   ['trieiterator_4',['TrieIterator',['../classkiwi_1_1utils_1_1TrieIterator.html',1,'kiwi::utils']]],
-  ['trienode_5',['TrieNode',['../structkiwi_1_1utils_1_1TrieNode.html',1,'kiwi::utils']]],
-  ['trienodeex_6',['TrieNodeEx',['../structkiwi_1_1utils_1_1TrieNodeEx.html',1,'kiwi::utils']]],
-  ['typocandidates_7',['TypoCandidates',['../classkiwi_1_1TypoCandidates.html',1,'kiwi']]],
-  ['typoform_8',['TypoForm',['../structkiwi_1_1TypoForm.html',1,'kiwi']]],
-  ['typographnode_9',['TypoGraphNode',['../structkiwi_1_1TypoGraphNode.html',1,'kiwi']]],
-  ['typoiterator_10',['TypoIterator',['../classkiwi_1_1TypoIterator.html',1,'kiwi']]],
-  ['typotransformer_11',['TypoTransformer',['../classkiwi_1_1TypoTransformer.html',1,'kiwi']]]
+  ['trieiterator_3c_20_5fkeystore_2c_20node_20_3e_5',['TrieIterator&lt; _KeyStore, Node &gt;',['../classkiwi_1_1utils_1_1TrieIterator.html',1,'kiwi::utils']]],
+  ['trienode_6',['TrieNode',['../structkiwi_1_1utils_1_1TrieNode.html',1,'kiwi::utils']]],
+  ['trienodeex_7',['TrieNodeEx',['../structkiwi_1_1utils_1_1TrieNodeEx.html',1,'kiwi::utils']]],
+  ['typocandidates_8',['TypoCandidates',['../classkiwi_1_1TypoCandidates.html',1,'kiwi']]],
+  ['typoform_9',['TypoForm',['../structkiwi_1_1TypoForm.html',1,'kiwi']]],
+  ['typographnode_10',['TypoGraphNode',['../structkiwi_1_1TypoGraphNode.html',1,'kiwi']]],
+  ['typoiterator_11',['TypoIterator',['../classkiwi_1_1TypoIterator.html',1,'kiwi']]],
+  ['typotransformer_12',['TypoTransformer',['../classkiwi_1_1TypoTransformer.html',1,'kiwi']]]
 ];

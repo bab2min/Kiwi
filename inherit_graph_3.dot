@@ -5,5 +5,15 @@ digraph "Graphical Class Hierarchy"
   edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
   node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
   rankdir="LR";
-  Node0 [id="Node000000",label="kiwi::AnalyzeOption",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$structkiwi_1_1AnalyzeOption.html",tooltip=" "];
+  Node0 [id="Node000000",label="Concat",height=0.2,width=0.4,color="grey60", fillcolor="#E0E0E0", style="filled",tooltip=" "];
+  Node0 -> Node1 [id="edge4_Node000000_Node000001",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node1 [id="Node000001",label="kiwi::tp::gen_seq\< 0 \>",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$structkiwi_1_1tp_1_1gen__seq_3_010_01_4.html",tooltip=" "];
+  Node0 -> Node3 [id="edge5_Node000000_Node000003",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node3 [id="Node000003",label="kiwi::tp::gen_seq\< 1 \>",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$structkiwi_1_1tp_1_1gen__seq_3_011_01_4.html",tooltip=" "];
+  Node0 -> Node5 [id="edge6_Node000000_Node000005",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node5 [id="Node000005",label="kiwi::tp::gen_seq\< _n \>",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$structkiwi_1_1tp_1_1gen__seq.html",tooltip=" "];
+  Node4 [id="Node000004",label="kiwi::tp::seq\< 0 \>",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$structkiwi_1_1tp_1_1seq.html",tooltip=" "];
+  Node4 -> Node3 [id="edge7_Node000004_Node000003",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node2 [id="Node000002",label="kiwi::tp::seq\<\>",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$structkiwi_1_1tp_1_1seq.html",tooltip=" "];
+  Node2 -> Node1 [id="edge8_Node000002_Node000001",dir="back",color="steelblue1",style="solid",tooltip=" "];
 }
