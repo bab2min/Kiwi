@@ -271,7 +271,8 @@ namespace kiwi
 
 				if (node)
 				{
-					if (const Form* formHead = node->val(kiwi->formTrie))
+					const Form* formHead = node->val(kiwi->formTrie);
+					if (kiwi->formTrie.hasMatch(formHead))
 					{
 						Vector<const Morpheme*> cands;
 						foreachMorpheme(formHead, [&](const Morpheme* m)
