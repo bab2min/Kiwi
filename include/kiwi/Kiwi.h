@@ -58,6 +58,7 @@ namespace kiwi
 	{ 
 		class CompiledRule; 
 		struct Result;
+		struct LeftScan;
 	}
 
 	template<class Ty> class RaggedVector;
@@ -710,7 +711,7 @@ namespace kiwi
 		void loadMorphBin(std::istream& is);
 		void saveMorphBin(std::ostream& os) const;
 		FormRaw& addForm(const KString& form);
-		size_t addForm(Vector<FormRaw>& newForms, UnorderedMap<KString, size_t>& newFormMap, KString form) const;
+		size_t addForm(Vector<FormRaw>& newForms, UnorderedMap<KString, size_t>& newFormMap, const KString& form) const;
 
 		
 		void initMorphemes();
@@ -782,6 +783,9 @@ namespace kiwi
 			size_t leftId,
 			size_t rightId,
 			size_t ruleId,
+			const KString& leftForm,
+			const cmb::LeftScan& leftScan,
+			const cmb::LeftScan& leftScanA,
 			Map<int, int>* ruleProfilingCnt = nullptr
 		) const;
 
