@@ -1299,7 +1299,12 @@ tuple<KString, size_t, size_t> CompiledRule::combineOneImpl(
 		{
 			for (auto& p : visit(CombineVisitor{ leftForm, rightForm }, dfa[it->second]))
 			{
-				return make_tuple(p.str, p.leftEnd, p.rightBegin);
+				if (p.score >= 0) return make_tuple(p.str, p.leftEnd, p.rightBegin);
+				KString ret;
+				ret.reserve(leftForm.size() + rightForm.size());
+				ret.insert(ret.end(), leftForm.begin(), leftForm.end());
+				ret.insert(ret.end(), rightForm.begin(), rightForm.end());
+				return make_tuple(ret, leftForm.size(), leftForm.size());
 			}
 		}
 	}
