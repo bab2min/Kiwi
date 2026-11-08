@@ -1088,6 +1088,11 @@ KiwiBuilder::KiwiBuilder(StreamProvider streamProvider, size_t _numThreads, Buil
 			(modelType == ModelType::cong || modelType == ModelType::congGlobal));
 	}
 
+	if (auto stream = streamProvider("contraction.dict"))
+	{
+		loadDictionaryFromStream(*stream);
+	}
+
 	if (auto stream = streamProvider("dialect.dict"))
 	{
 		loadDictionaryFromStream(*stream);
