@@ -219,12 +219,13 @@ namespace kiwi
 			template<class IntTy, class ValueTy>
 			static ValueTy searchKV(const void* kv, size_t size, IntTy target)
 			{
-				size_t idx;
+				// prepareKV doesn't reorder when packetSize is 0, so the keys are still sorted here.
 				const IntTy* keys = reinterpret_cast<const IntTy*>(kv);
 				const ValueTy* values = reinterpret_cast<const ValueTy*>(keys + size);
-				if (search(keys, size, target, idx))
+				const IntTy* it = std::lower_bound(keys, keys + size, target);
+				if (it != keys + size && *it == target)
 				{
-					return values[idx];
+					return values[it - keys];
 				}
 				else return 0;
 			}
