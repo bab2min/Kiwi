@@ -2795,3 +2795,237 @@ TEST(KiwiCpp, GenerativeMADatasetSpacing)
 	EXPECT_EQ(mixed, collect(0.5f, 0.1f, 2));
 	for (auto& [target, p] : mixed) EXPECT_EQ(p.second, clean.at(target).second) << target;
 }
+
+namespace
+{
+	using GraphMorphs = std::vector<std::pair<std::u16string, POSTag>>;
+
+	bool matchMorph(const std::pair<std::u16string, POSTag>& graphMorph, const std::pair<std::u16string, POSTag>& morph)
+	{
+		return graphMorph.first == morph.first && (graphMorph.second == morph.second || graphMorph.second == POSTag::unknown);
+	}
+
+	// 상태 0에서 마지막 상태까지 간선의 형태소열을 이어 seq를 만드는 경로가 있는지
+	bool hasMorphPath(const MorphGraph& graph, const GraphMorphs& seq)
+	{
+		std::set<std::pair<uint32_t, size_t>> reach{ { 0, 0 } };
+		for (auto& e : graph.edges)
+		{
+			for (size_t i = 0; i <= seq.size(); ++i)
+			{
+				if (!reach.count({ e.from, i })) continue;
+				if (i + e.morphs.size() > seq.size()) continue;
+				if (!std::equal(e.morphs.begin(), e.morphs.end(), seq.begin() + i, matchMorph)) continue;
+				reach.emplace(e.to, i + e.morphs.size());
+			}
+		}
+		return reach.count({ graph.numStates - 1, seq.size() }) > 0;
+	}
+
+	// 간선이 덮는 원문 구간 [시작, 끝)
+	std::pair<uint32_t, uint32_t> edgeSpan(const MorphGraph& graph, const MorphGraphEdge& e)
+	{
+		return { graph.statePositions[e.from].first, graph.statePositions[e.to].second };
+	}
+
+	bool hasEdge(const MorphGraph& graph, uint32_t begin, uint32_t end, const GraphMorphs& morphs)
+	{
+		return std::any_of(graph.edges.begin(), graph.edges.end(), [&](const MorphGraphEdge& e)
+		{
+			return edgeSpan(graph, e) == std::make_pair(begin, end) && e.morphs == morphs;
+		});
+	}
+}
+
+TEST(KiwiCpp, MorphGraphStructure)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	const std::u16string str = u"나는 어제 학교에 갔다.";
+	auto graph = kiwi.buildMorphGraph(str, AnalyzeOption{ Match::allWithNormalizing });
+
+	ASSERT_GE(graph.numStates, 2);
+	ASSERT_GT(graph.edges.size(), 0);
+	for (size_t i = 0; i < graph.edges.size(); ++i)
+	{
+		auto& e = graph.edges[i];
+		EXPECT_LT(e.from, e.to);
+		EXPECT_LT(e.to, graph.numStates);
+		EXPECT_LT(edgeSpan(graph, e).first, edgeSpan(graph, e).second);
+		EXPECT_LE(edgeSpan(graph, e).second, str.size());
+		EXPECT_FALSE(e.morphs.empty());
+		EXPECT_EQ(e.typoCost, 0.f);
+		if (i) EXPECT_LE(graph.edges[i - 1].from, e.from);
+	}
+
+	// analyze의 최선 분석은 그래프 안의 경로여야 한다
+	for (auto s : { u"나는 어제 학교에 갔다.", u"그쵸 맞아요", u"사뮤실에서 일했다" })
+	{
+		auto g = kiwi.buildMorphGraph(s, AnalyzeOption{ Match::allWithNormalizing });
+		GraphMorphs best;
+		for (auto& t : kiwi.analyze(s, Match::allWithNormalizing).first) best.emplace_back(t.str, t.tag);
+		EXPECT_TRUE(hasMorphPath(g, best));
+	}
+}
+
+TEST(KiwiCpp, MorphGraphContraction)
+{
+	Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 0, BuildOption::default_ & ~BuildOption::loadDefaultDict }.build();
+	auto graph = kiwi.buildMorphGraph(u"석연찮은 일", AnalyzeOption{ Match::allWithNormalizing });
+	EXPECT_TRUE(hasMorphPath(graph, {
+		{ u"석연", POSTag::xr }, { u"하", POSTag::vv }, { u"지", POSTag::ec }, { u"않", POSTag::vx },
+		{ u"은", POSTag::etm }, { u"일", POSTag::nng } }));
+}
+
+TEST(KiwiCpp, MorphGraphUnkSpan)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	const AnalyzeOption option{ Match::allWithNormalizing };
+
+	// 미등록어 구간은 품사를 정하지 않고 태그 UN 하나로 낸다
+	const auto unkTagged = [](const MorphGraph& graph)
+	{
+		for (auto& e : graph.edges)
+		{
+			for (auto& m : e.morphs)
+			{
+				if (m.second == POSTag::nng || m.second == POSTag::nnp || m.second == POSTag::mag || m.second == POSTag::xr || m.second == POSTag::ic)
+				{
+					if (m.first == u"갸뱌댜" || m.first == u"김뀨뀨 씨") return true;
+				}
+			}
+		}
+		return false;
+	};
+
+	// 어절 중간에서 시작하는 미등록어 구간
+	auto graph = kiwi.buildMorphGraph(u"학교갸뱌댜에 갔다", option);
+	EXPECT_FALSE(hasEdge(graph, 2, 5, { { u"갸뱌댜", POSTag::unknown } }));
+	MorphGraphOption graphOption;
+	graphOption.maxUnkSpanSize = 10;
+	graph = kiwi.buildMorphGraph(u"학교갸뱌댜에 갔다", option, graphOption);
+	EXPECT_TRUE(hasEdge(graph, 2, 5, { { u"갸뱌댜", POSTag::unknown } }));
+	EXPECT_FALSE(unkTagged(graph));
+
+	// 공백을 낀 구간
+	graph = kiwi.buildMorphGraph(u"오늘 김뀨뀨 씨를 만났다", option);
+	EXPECT_FALSE(hasEdge(graph, 3, 8, { { u"김뀨뀨 씨", POSTag::unknown } }));
+	graphOption.maxUnkSpanSizeWithSpace = 10;
+	graph = kiwi.buildMorphGraph(u"오늘 김뀨뀨 씨를 만났다", option, graphOption);
+	EXPECT_TRUE(hasEdge(graph, 3, 8, { { u"김뀨뀨 씨", POSTag::unknown } }));
+	EXPECT_FALSE(unkTagged(graph));
+}
+
+TEST(KiwiCpp, MorphGraphFuzzyTypo)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	TypoTransformer tt;
+	tt.setFuzzyTypoCost(1.f);
+	auto ptt = tt.prepare();
+	AnalyzeOption option{ Match::allWithNormalizing };
+	option.typoTransformer = &ptt;
+
+	const GraphMorphs expected = { { u"사무실", POSTag::nng }, { u"에서", POSTag::jkb }, { u"일", POSTag::nng },
+		{ u"하", POSTag::xsv }, { u"었", POSTag::ep }, { u"다", POSTag::ef } };
+	EXPECT_FALSE(hasMorphPath(kiwi.buildMorphGraph(u"사뮤실에서 일했다", AnalyzeOption{ Match::allWithNormalizing }), expected));
+	auto graph = kiwi.buildMorphGraph(u"사뮤실에서 일했다", option);
+	EXPECT_TRUE(hasMorphPath(graph, expected));
+	for (auto& e : graph.edges)
+	{
+		if (e.morphs.front().first == u"사무실") EXPECT_EQ(e.typoCost, 1.f);
+	}
+}
+
+TEST(KiwiCpp, MorphGraphQuotedHa)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	const AnalyzeOption off{ Match::allWithNormalizing }, on{ Match::allWithNormalizing | Match::quotedHaOmission };
+	const auto hasHaEnding = [](const MorphGraph& graph, const std::u16string& ending, POSTag tag)
+	{
+		const GraphMorphs morphs = { { u"하", POSTag::vv }, { ending, tag } };
+		return std::any_of(graph.edges.begin(), graph.edges.end(), [&](const MorphGraphEdge& e) { return e.morphs == morphs; });
+	};
+
+	// 받침 없이 ㅏ·ㅑ로 끝나는 음절 + 닫는 따옴표 뒤의 어미에 생략된 하/VV를 붙인 간선
+	EXPECT_FALSE(hasHaEnding(kiwi.buildMorphGraph(u"'한정판을 구매하라'는 설명", off), u"는", POSTag::etm));
+	EXPECT_TRUE(hasHaEnding(kiwi.buildMorphGraph(u"'한정판을 구매하라'는 설명", on), u"는", POSTag::etm));
+	// 음절과 따옴표 사이의 문장부호(SF·SP·SE·SO)는 개수와 상관없이 허용한다
+	EXPECT_TRUE(hasHaEnding(kiwi.buildMorphGraph(u"\u201C좋다!\u201D며 웃었다", on), u"며", POSTag::ec));
+	EXPECT_TRUE(hasHaEnding(kiwi.buildMorphGraph(u"'그만 가라...'고 했다", on), u"고", POSTag::ec));
+	EXPECT_TRUE(hasHaEnding(kiwi.buildMorphGraph(u"'정말 좋다?!'고 물었다", on), u"고", POSTag::ec));
+	EXPECT_TRUE(hasHaEnding(kiwi.buildMorphGraph(u"\u300C좋다\uFF01\u300D며 웃었다", on), u"며", POSTag::ec));
+	// 닫는 괄호 뒤에는 넣지 않는다
+	EXPECT_FALSE(hasHaEnding(kiwi.buildMorphGraph(u"(그만 가라)고 했다", on), u"고", POSTag::ec));
+
+	// 따옴표가 없거나, 따옴표 앞 음절에 받침이 있거나 모음이 ㅏ·ㅑ가 아니면 넣지 않는다
+	EXPECT_FALSE(hasHaEnding(kiwi.buildMorphGraph(u"구매하라는 설명", on), u"는", POSTag::etm));
+	EXPECT_FALSE(hasHaEnding(kiwi.buildMorphGraph(u"'밥'며 웃었다", on), u"며", POSTag::ec));
+	EXPECT_FALSE(hasHaEnding(kiwi.buildMorphGraph(u"'나무'는 명사다", on), u"는", POSTag::etm));
+}
+
+TEST(KiwiCpp, MorphGraphPositions)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	// 공백이 여럿이어도 상태는 다음 글자 위치 하나이고, 간선의 원문 구간은 공백 앞에서 끝난다
+	auto graph = kiwi.buildMorphGraph(u"  나는  학교", AnalyzeOption{ Match::allWithNormalizing });
+	const auto find = [&](const std::u16string& form, POSTag tag) -> const MorphGraphEdge*
+	{
+		for (auto& e : graph.edges) if (e.morphs.size() == 1 && e.morphs[0] == std::make_pair(form, tag)) return &e;
+		return nullptr;
+	};
+	auto* na = find(u"나", POSTag::np);
+	auto* neun = find(u"는", POSTag::jx);
+	auto* hakgyo = find(u"학교", POSTag::nng);
+	ASSERT_TRUE(na && neun && hakgyo);
+	EXPECT_EQ(na->from, 0);
+	EXPECT_EQ(edgeSpan(graph, *na).first, 2);
+	EXPECT_EQ(neun->to, hakgyo->from);
+	EXPECT_EQ(edgeSpan(graph, *neun).second, 4);
+	EXPECT_EQ(edgeSpan(graph, *hakgyo).first, 6);
+	EXPECT_EQ(hakgyo->to, graph.numStates - 1);
+	EXPECT_TRUE(hasMorphPath(graph, { { u"나", POSTag::np }, { u"는", POSTag::jx }, { u"학교", POSTag::nng } }));
+
+	// 받침을 떼어 낸 형태소는 음절 안의 상태를 지나지만 원문 구간은 그 음절이다
+	graph = kiwi.buildMorphGraph(u"간다", AnalyzeOption{ Match::allWithNormalizing });
+	EXPECT_TRUE(hasMorphPath(graph, { { u"가", POSTag::vv }, { u"ᆫ다", POSTag::ef } }));
+	for (auto& e : graph.edges)
+	{
+		if (e.morphs == GraphMorphs{ { u"ᆫ다", POSTag::ef } }) EXPECT_EQ(edgeSpan(graph, e), std::make_pair(0u, 2u));
+		if (e.morphs == GraphMorphs{ { u"가", POSTag::vv } }) EXPECT_EQ(edgeSpan(graph, e), std::make_pair(0u, 1u));
+	}
+}
+
+TEST(KiwiCpp, MorphGraphTopPaths)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	const auto* typos = getDefaultPreparedTypoSet(DefaultTypoSet::basicTypoSetWithContinualAndLengthening);
+	for (auto s : { u"나는 어제 학교에 갔다.", u"그쵸 맞아요", u"사뮤실에서 일했다", u"배라는거래~ ㅋㅋ" })
+	{
+		for (auto* typo : { (const PreparedTypoTransformer*)nullptr, typos })
+		{
+			AnalyzeOption option{ Match::allWithNormalizing };
+			option.typoTransformer = typo;
+			MorphGraphOption graphOption;
+			EXPECT_TRUE(kiwi.buildMorphGraph(s, option, graphOption).topPaths.empty());
+
+			// 그래프를 만든 격자에서 찾은 상위 분석은 analyze의 결과와 같아야 한다
+			graphOption.topN = 3;
+			auto graph = kiwi.buildMorphGraph(s, option, graphOption);
+			auto res = kiwi.analyze(s, 3, option);
+			ASSERT_EQ(graph.topPaths.size(), res.size());
+			for (size_t i = 0; i < res.size(); ++i)
+			{
+				EXPECT_FLOAT_EQ(graph.topPaths[i].second, res[i].second);
+				ASSERT_EQ(graph.topPaths[i].first.size(), res[i].first.size());
+				for (size_t j = 0; j < res[i].first.size(); ++j)
+				{
+					auto& a = graph.topPaths[i].first[j];
+					auto& b = res[i].first[j];
+					EXPECT_EQ(a.str, b.str);
+					EXPECT_EQ(a.tag, b.tag);
+					EXPECT_EQ(a.position, b.position);
+					EXPECT_EQ(a.length, b.length);
+				}
+			}
+		}
+	}
+}
