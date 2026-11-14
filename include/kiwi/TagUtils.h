@@ -48,6 +48,16 @@ namespace kiwi
 		return POSTag::sf <= tag && tag <= POSTag::sn;
 	}
 
+	inline bool isPunctClass(POSTag tag)
+	{
+		return POSTag::sf <= tag && tag <= POSTag::sw;
+	}
+
+	inline bool isSSClass(POSTag tag)
+	{
+		return POSTag::ss <= tag && tag <= POSTag::ssc;
+	}
+
 	inline bool isUserClass(POSTag tag)
 	{
 		return POSTag::user0 <= tag && tag <= POSTag::user4;

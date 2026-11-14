@@ -113,7 +113,7 @@ namespace kiwi
 
 	inline bool isCompatibleHangulConsonant(char16_t chr)
 	{
-		return within(chr, 0x3131, 0x314E) || within(chr, 0x3165, 0x3186);
+		return within(chr, 0x3131, 0x314F) || within(chr, 0x3165, 0x3187);
 	}
 
 	char16_t toCompatibleHangulConsonant(char16_t chr);
