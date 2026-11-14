@@ -1,3 +1,4 @@
+#include <functional>
 #include <numeric>
 #include <kiwi/Types.h>
 #include <kiwi/TemplateUtils.hpp>
@@ -717,6 +718,10 @@ public:
 	inline static thread_local Vector<TypoGraphNode> typoGraph;
 	inline static thread_local Vector<Vector<SearchState<false>>> _searchStates;
 	inline static thread_local Vector<FormCandidate2<false>> _candidates;
+	// 자모 편집 오타 후보 (끝, 시작, 형태). 위치는 공백을 뺀 위치이고 (끝, 시작, 형태) 순으로 정렬됨
+	inline static thread_local Vector<tuple<uint32_t, uint32_t, const Form*>> fuzzyCands;
+	// 끝 위치별 fuzzyCands의 [first, second). 노드로 넣고 나면 empty(first = second)로 둠
+	inline static thread_local Vector<pair<uint32_t, uint32_t>> fuzzyRange;
 
 	const Form* formBase;
 	const size_t* typoPtrs;
@@ -732,6 +737,9 @@ public:
 	U16StringView rawStr;
 	size_t posMultiplierBit = 0;
 	float lengtheningTypoCost = 0;
+	float fuzzyTypoCost = INFINITY;
+	bool fuzzyRealWordErrors = false;
+	size_t fuzzyMinJamo = 3;
 
 	void init(
 		const Form* formBase,
@@ -751,6 +759,8 @@ public:
 		posToNs.clear();
 		out.clear();
 		typoGraph.clear();
+		fuzzyCands.clear();
+		fuzzyRange.clear();
 
 		this->formBase = formBase;
 		this->typoPtrs = typoPtrs;
@@ -886,10 +896,123 @@ public:
 		}
 		posMultiplierBit = log2Ceil(maxContinualTypoIdx);
 		lengtheningTypoCost = typoTransformer ? typoTransformer->getLengtheningTypoCost() : INFINITY;
+		fuzzyTypoCost = typoTransformer ? typoTransformer->getFuzzyTypoCost() : INFINITY;
+		fuzzyRealWordErrors = typoTransformer && typoTransformer->getFuzzyRealWordErrors();
+		fuzzyMinJamo = typoTransformer ? typoTransformer->getFuzzyMinJamo() : 3;
 
 		endPosMap.resize((nsToPos.size() << posMultiplierBit) + 1, make_pair(-1, -1));
 		endPosMap[0] = make_pair(0, 1);
 		out.emplace_back();
+	}
+
+	/**
+	 * 원문의 한글 구간 [시작, 끝)과 자모 편집 한 번으로 같아지는 사전 형태를 fuzzyCands에 모은다.
+	 * 편집: 한 음절의 초성 또는 중성 치환, 종성 치환, 음절 뒤 종성 삽입, 종성 삭제. 자모가 fuzzyMinJamo개 미만인 형태는 편집하지 않는다.
+	 */
+	template<ArchType arch>
+	void findFuzzyForms(const utils::FrozenTrie<kchar_t, const Form*>& trie)
+	{
+		using Node = utils::FrozenTrie<kchar_t, const Form*>::Node;
+		const auto oneJamoApart = [&](char16_t a, char16_t b)
+		{
+			if (a == b) return false;
+			if (isHangulCoda(a) && isHangulCoda(b)) return true;
+			if (!isHangulSyllable(a) || !isHangulSyllable(b)) return false;
+			const int x = a - 0xAC00, y = b - 0xAC00;
+			return (x / 588 == y / 588) != (x % 588 / 28 == y % 588 / 28);
+		};
+		const auto jamoCount = [](const KString& f)
+		{
+			size_t n = 0;
+			for (auto c : f) n += isHangulSyllable(c) ? 2 : 1;
+			return n;
+		};
+
+		// 패턴(URL 등)과 미리 분석된 구간 안에서는 찾지 않는다
+		const size_t n = rawStr.size();
+		Vector<uint8_t> usable(n);
+		for (size_t i = 0; i < n; ++i) usable[i] = isHangulSyllable(rawStr[i]) || isHangulCoda(rawStr[i]);
+		for (auto& [end, length, type] : matchedPatterns) fill(usable.begin() + (end - length), usable.begin() + end, 0);
+		for (auto& [b, e] : pretokenizedSpans) fill(usable.begin() + b, usable.begin() + e, 0);
+
+		size_t start = 0;
+		const function<void(const Node*, size_t, bool)> walk = [&](const Node* node, size_t j, bool edited)
+		{
+			if (edited)
+			{
+				const Form* f = node->val(trie);
+				if (trie.hasMatch(f) && jamoCount(f->form) >= fuzzyMinJamo) fuzzyCands.emplace_back(posToNs[j], posToNs[start], f);
+			}
+			const bool hasInput = j < n && usable[j];
+			if (hasInput)
+			{
+				if (auto* next = node->template nextOpt<arch>(trie, rawStr[j])) walk(next, j + 1, edited);
+			}
+			if (edited) return;
+			const bool codaInsertable = isHangulSyllable(rawStr[j - 1]) && !(hasInput && isHangulCoda(rawStr[j]));
+			trie.forEachChild(node, [&](kchar_t k, const Node* child)
+			{
+				if (hasInput && oneJamoApart(rawStr[j], k)) walk(child, j + 1, true);
+				else if (codaInsertable && isHangulCoda(k)) walk(child, j, true);
+			});
+			if (hasInput && isHangulCoda(rawStr[j])) walk(node, j + 1, true);
+		};
+		for (start = 0; start < n; ++start)
+		{
+			if (!usable[start] || !isHangulSyllable(rawStr[start])) continue;
+			// 첫 글자는 치환만 할 수 있다(삽입·삭제는 종성에만 하므로)
+			trie.forEachChild(trie.root(), [&](kchar_t k, const Node* child)
+			{
+				if (k == rawStr[start]) walk(child, start + 1, false);
+				else if (oneJamoApart(rawStr[start], k)) walk(child, start + 1, true);
+			});
+		}
+
+		sort(fuzzyCands.begin(), fuzzyCands.end());
+		fuzzyCands.erase(unique(fuzzyCands.begin(), fuzzyCands.end()), fuzzyCands.end());
+		// realWordErrors가 false인 경우에는 
+		// 원문 구간이 그 자체로 사전 형태인 후보를 제외하여 탐색 범위를 축소
+		if (!fuzzyRealWordErrors)
+		{
+			Vector<pair<uint32_t, uint32_t>> exact; // (끝, 시작)
+			for (size_t b = 0; b < n; ++b)
+			{
+				if (!usable[b]) continue;
+				auto* node = trie.root();
+				for (size_t j = b; j < n && usable[j] && node; ++j)
+				{
+					node = node->template nextOpt<arch>(trie, rawStr[j]);
+					if (node && trie.hasMatch(node->val(trie))) exact.emplace_back(posToNs[j + 1], posToNs[b]);
+				}
+			}
+			sort(exact.begin(), exact.end());
+			fuzzyCands.erase(remove_if(fuzzyCands.begin(), fuzzyCands.end(), [&](const auto& c)
+			{
+				return binary_search(exact.begin(), exact.end(), make_pair(get<0>(c), get<1>(c)));
+			}), fuzzyCands.end());
+		}
+		fuzzyRange.assign(nsToPos.size() + 1, make_pair(0, 0));
+		for (uint32_t i = 0; i < fuzzyCands.size(); ++i)
+		{
+			auto& r = fuzzyRange[get<0>(fuzzyCands[i])];
+			if (r.first == r.second) r.first = i;
+			r.second = i + 1;
+		}
+	}
+
+	// 끝 위치 endNs의 자모 편집 오타 후보를 노드로 넣는다. 오타가 없는 경로가 처음 이 위치에 닿을 때 한 번만 부른다
+	// (오타가 없는 경로는 위치 순으로 진행하므로, 그때는 시작 위치에서 끝나는 노드가 들어가 있다).
+	void appendFuzzyNodes(size_t endNs)
+	{
+		auto& r = fuzzyRange[endNs];
+		for (; r.first < r.second; ++r.first)
+		{
+			const auto [e, b, form] = fuzzyCands[r.first];
+			if (appendNewNode(out, endPosMap, (size_t)b << posMultiplierBit, (size_t)e << posMultiplierBit, form, fuzzyTypoCost))
+			{
+				out.back().fuzzy = true;
+			}
+		}
 	}
 
 	bool hasFormAlready(size_t multipliedStartPos, size_t multipliedEndPos) const
@@ -1370,6 +1493,7 @@ public:
 			flushCandidates<lengtheningTypoTolerant>(posToNs[endPos], 
 				startPosOffset, unkFormStartNsPos, lastSpaceBoundaryNsPos, 
 				typoCost, state.startContinualTypoIdx, typoNode.continualTypoIdx);
+			if (typoCost == 0 && !fuzzyRange.empty()) appendFuzzyNodes(posToNs[endPos]);
 		}
 		if (typoCost == 0 && lastChrType != POSTag::max && lastChrType != POSTag::unknown)
 		{
@@ -1532,6 +1656,7 @@ size_t splitByTrieUsingTypo(
 		return stopPos + startOffset;
 	}
 	splitter.buildTypoGraph(str.substr(0, stopPos), typoTransformer);
+	if (isfinite(splitter.fuzzyTypoCost)) splitter.findFuzzyForms<arch>(trie);
 	if (isfinite(splitter.lengtheningTypoCost))
 	{
 		splitter.search<arch, true>(trie, startOffset);

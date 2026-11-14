@@ -212,6 +212,9 @@ namespace kiwi
 		Vector<ReplInfo> replacements;
 		float continualTypoThreshold = INFINITY;
 		float lengtheningTypoThreshold = INFINITY;
+		float fuzzyTypoThreshold = INFINITY;
+		bool fuzzyRealWordErrors = false;
+		size_t fuzzyMinJamo = 3;
 
 		template<bool u16wrap = false>
 		TypoCandidates<u16wrap> _generate(const KString& orig, float costThreshold = 2.5f) const;
@@ -235,6 +238,21 @@ namespace kiwi
 		float getLengtheningTypoCost() const
 		{
 			return lengtheningTypoThreshold;
+		}
+
+		float getFuzzyTypoCost() const
+		{
+			return fuzzyTypoThreshold;
+		}
+
+		bool getFuzzyRealWordErrors() const
+		{
+			return fuzzyRealWordErrors;
+		}
+
+		size_t getFuzzyMinJamo() const
+		{
+			return fuzzyMinJamo;
 		}
 
 		/**
@@ -274,6 +292,9 @@ namespace kiwi
 
 		float continualTypoThreshold = INFINITY;
 		float lengtheningTypoThreshold = INFINITY;
+		float fuzzyTypoThreshold = INFINITY;
+		bool fuzzyRealWordErrors = false;
+		size_t fuzzyMinJamo = 3;
 
 		UnorderedMap<std::tuple<KString, KString, CondVowel, Dialect>, float> typos;
 
@@ -299,6 +320,7 @@ namespace kiwi
 
 		bool isContinualTypoEnabled() const;
 		bool isLengtheningTypoEnabled() const;
+		bool isFuzzyTypoEnabled() const;
 		bool empty() const;
 
 		/**
@@ -385,6 +407,39 @@ namespace kiwi
 		}
 
 		TypoTransformer copyWithNewLengtheningTypoCost(float threshold) const;
+
+		/**
+		* @brief 자모 단위 편집 오타의 비용을 새로 설정합니다.
+		* 
+		* @param threshold 자모 편집 한 번의 비용
+		* @param realWordErrors false이면 원문 구간이 이미 사전에 등록된 형태일 때는 교정을 수행하지 않습니다.
+		*        true이면 원문이 이미 사전에 등록된 경우에도 탐색을 수행하여 더 많은 오타를 교정할 수 있지만 
+		*        후보가 크게 늘어 분석이 느려집니다.
+		* @param minJamo 편집 대상이 되는 사전 형태의 최소 자모 수
+		* @note 초기값은 무한대, 즉 비활성화 상태입니다. 활성화하면 형태 하나에 자모 편집 한 번(자모 하나 치환, 삽입, 삭제)까지 허용한 형태도 후보로 찾습니다.
+		*       규칙으로 만든 오타 형태에는 겹쳐 적용되지 않습니다.
+		*/
+		void setFuzzyTypoCost(float threshold, bool realWordErrors = false, size_t minJamo = 3)
+		{
+			fuzzyTypoThreshold = threshold;
+			fuzzyRealWordErrors = realWordErrors;
+			fuzzyMinJamo = minJamo;
+		}
+
+		float getFuzzyTypoCost() const
+		{
+			return fuzzyTypoThreshold;
+		}
+
+		bool getFuzzyRealWordErrors() const
+		{
+			return fuzzyRealWordErrors;
+		}
+
+		size_t getFuzzyMinJamo() const
+		{
+			return fuzzyMinJamo;
+		}
 
 		TypoTransformer copyWithDialectOverriding(Dialect dialect) const;
 

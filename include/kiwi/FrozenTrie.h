@@ -149,6 +149,14 @@ namespace kiwi
 				traverse(std::forward<Fn>(visitor), root(), prefix, maxDepth);
 			}
 
+			template<class Fn>
+			void forEachChild(const Node* node, Fn&& fn) const
+			{
+				auto* keys = &nextKeys[node->nextOffset];
+				auto* diffs = &nextDiffs[node->nextOffset];
+				for (size_t i = 0; i < node->numNexts; ++i) fn(keys[i], node + diffs[i]);
+			}
+
 			const Node* firstChild(const Node* node) const
 			{
 				if (node->numNexts == 0) return nullptr;

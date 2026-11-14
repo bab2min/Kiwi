@@ -416,6 +416,7 @@ namespace kiwi
 					{
 						for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
 						{
+							if (prev->fuzzy) continue;
 							for (size_t p = pathIndices[prev - startNode]; p < pathIndices[prev - startNode + 1]; ++p)
 							{
 								auto lastTag = kw->morphemes[pathes[p].wid].tag;
@@ -974,6 +975,7 @@ namespace kiwi
 				{
 					for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
 					{
+						if (prev->fuzzy) continue;
 						for (size_t p = pathIndices[prev - startNode]; p < pathIndices[prev - startNode + 1]; ++p)
 						{
 							auto lastTag = kw->morphemes[pathes[p].wid].tag;
