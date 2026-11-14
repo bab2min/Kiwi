@@ -284,6 +284,12 @@ namespace kiwi
 			Vector<uint32_t>& oovNodeIdcs
 		) const;
 
+		template<class WordLL>
+		void cutOffTypoPathes(
+			Vector<WordLL>& pathes,
+			Vector<size_t>& pathIndices,
+			size_t first, size_t last) const;
+
 		template<bool useOovTotalConsistency>
 		Vector<PathResult> findBestPathDispatched();
 

@@ -1566,6 +1566,65 @@ namespace kiwi
 		return score;
 	}
 
+	/**
+	 * 끝 위치가 같은 노드 [first, last)의 경로 중, 오타 노드의 경로가 같은 시작 상태(rootId)의 상위 topN개보다
+	 * cutOffThreshold 넘게 낮으면 지워서 불필요한 탐색 경로를 줄인다.
+	 */
+	template<class LangModel>
+	template<class WordLL>
+	void BestPathFinder<LangModel>::cutOffTypoPathes(
+		Vector<WordLL>& pathes,
+		Vector<size_t>& pathIndices,
+		size_t first, size_t last) const
+	{
+		if (none_of(graph + first, graph + last, [](const KGraphNode& n) { return n.typoCost > 0; })) return;
+
+		const auto rootIdx = [](const WordLL& c) { return c.rootId == commonRootId ? (size_t)0 : (size_t)c.rootId + 1; };
+		thread_local Vector<float> maxScores;
+		maxScores.clear();
+		for (size_t p = pathIndices[first]; p < pathIndices[last]; ++p)
+		{
+			auto& c = pathes[p];
+			if (c.combineSocket) continue;
+			const size_t r = rootIdx(c);
+			if (maxScores.size() < (r + 1) * topN) maxScores.resize((r + 1) * topN, -INFINITY);
+			auto* heap = maxScores.data() + r * topN;
+			if (c.accScore > heap[0])
+			{
+				pop_heap(heap, heap + topN, greater<float>{});
+				heap[topN - 1] = c.accScore;
+				push_heap(heap, heap + topN, greater<float>{});
+			}
+		}
+
+		const size_t rangeBegin = pathIndices[first];
+		thread_local Vector<uint32_t> movedTo;
+		movedTo.assign(pathIndices[last] - rangeBegin, (uint32_t)-1);
+		size_t validPosition = rangeBegin;
+		for (size_t i = first; i < last; ++i)
+		{
+			const size_t b = pathIndices[i], e = pathIndices[i + 1];
+			pathIndices[i] = validPosition;
+			for (size_t p = b; p < e; ++p)
+			{
+				auto& c = pathes[p];
+				if (c.parent >= rangeBegin)
+				{
+					const uint32_t np = movedTo[c.parent - rangeBegin];
+					if (np == (uint32_t)-1) continue;
+					c.parent = np;
+				}
+				if (graph[i].typoCost > 0 && !c.combineSocket
+					&& c.accScore + config.cutOffThreshold < maxScores[rootIdx(c) * topN]) continue;
+				movedTo[p - rangeBegin] = (uint32_t)validPosition;
+				if (validPosition != p) pathes[validPosition] = move(pathes[p]);
+				validPosition++;
+			}
+		}
+		pathIndices[last] = validPosition;
+		pathes.resize(validPosition);
+	}
+
 	template<class LangModel>
 	template<bool useOovTotalConsistency>
 	Vector<PathResult> BestPathFinder<LangModel>::findBestPathDispatched()
@@ -1652,10 +1711,16 @@ namespace kiwi
 
 		std::array<uint32_t, sizeof(uint16_t) * 8> prevOovIdcs = {0,};
 		size_t prevOovPtrStart = 0, prevOovPtrEnd = 0;
+		size_t sameEndStart = 1;
 		// middle nodes
 		for (size_t i = 1; i < graphSize - 1; ++i)
 		{
 			auto* node = &graph[i];
+			if (node->endPos != graph[sameEndStart].endPos)
+			{
+				cutOffTypoPathes(pathes, pathIndices, sameEndStart, i);
+				sameEndStart = i;
+			}
 			const bool isPretokenizedNode = (
 				node->form 
 				&& node->form->candidate.size() == 1 
