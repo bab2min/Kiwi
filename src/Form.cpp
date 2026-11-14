@@ -71,7 +71,7 @@ namespace kiwi
 	DEFINE_SERIALIZER_OUTSIDE(FormRaw, form, candidate);
 
 	Form::Form()
-		: zCodaAppendable(0), zSiotAppendable(0)
+		: zCodaAppendable(0), zSiotAppendable(0), hasQuotedHaForm(0)
 	{
 	}
 
@@ -109,6 +109,7 @@ namespace kiwi
 		// 다음 값들은 KiwiBuilder::build에서 채워 넣는다
 		ret.hasJClass = 0;
 		ret.hasAnyFullMorphemes = 0;
+		ret.hasQuotedHaForm = 0;
 		return ret;
 	}
 

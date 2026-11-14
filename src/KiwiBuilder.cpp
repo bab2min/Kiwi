@@ -2531,6 +2531,35 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 		return a.second > b.second;
 	});
 
+	// 인용 뒤에 생략된 '하'(Match::quotedHaOmission): `어`가 아닌 어미마다 '하/VV + 어미' 형태소를 생성
+	// 이 형태소들은 어느 형태의 후보에도 넣지 않고, 아래에서 원래 Form 바로 뒤에 끼워 넣는 같은 형태의 Form에만 연결됨
+	Vector<pair<size_t, Vector<uint32_t>>> quotedHaCands; // (형태 번호, 새 형태소 번호들)
+	const size_t haId = findMorpheme(u"하", POSTag::vv);
+	if (haId != (size_t)-1)
+	{
+		for (size_t fi = defaultFormSize; fi < forms.size(); ++fi)
+		{
+			const auto& f = forms[fi];
+			if (f.form.empty() || !isHangulSyllable(f.form[0]) || (f.form[0] - 0xAC00) / 588 == 11) continue; // 초성 11: ㅇ
+			Vector<uint32_t> ids;
+			for (auto mid : f.candidate)
+			{
+				const auto& m = morphemes[mid];
+				if (!isEClass(m.tag) || !m.chunks.empty()) continue;
+				ids.emplace_back(morphemes.size() + combinedMorphemes.size());
+				combinedMorphemes.emplace_back(POSTag::unknown);
+				auto& nm = combinedMorphemes.back();
+				nm.kform = fi;
+				nm.lmMorphemeId = ids.back();
+				nm.chunks = { (uint32_t)haId, mid };
+				nm.chunkPositions = { { 0, (uint8_t)f.form.size() }, { 0, (uint8_t)f.form.size() } };
+				nm.userScore = m.userScore;
+				nm.dialect = m.dialect;
+			}
+			if (!ids.empty()) quotedHaCands.emplace_back(fi, move(ids));
+		}
+	}
+
 	ret.forms.reserve(forms.size() + combinedForms.size() + 1);
 	ret.morphemes.reserve(morphemes.size() + combinedMorphemes.size());
 	ret.combiningRule = combiningRule;
@@ -2569,6 +2598,30 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 	Vector<size_t> newFormIdMapper(ret.forms.size());
 	iota(newFormIdMapper.begin(), newFormIdMapper.begin() + defaultFormSize, 0);
 	sortFormsIgnoringSpace(ret.forms, defaultFormSize, newFormIdMapper);
+
+	// quotedHa 후보가 있는 Form마다 바로 뒤에 같은 형태의 빈 Form을 끼워 넣음(Form::hasQuotedHaForm).
+	Vector<size_t> quotedHaSlots; // quotedHaCands와 같은 순서로, 끼워 넣은 Form의 위치
+	if (!quotedHaCands.empty())
+	{
+		Vector<uint8_t> needsSlot(ret.forms.size());
+		for (auto& c : quotedHaCands) needsSlot[newFormIdMapper[c.first]] = 1;
+		Vector<size_t> shifted(ret.forms.size());
+		Vector<Form> withSlots;
+		withSlots.reserve(ret.forms.size() + quotedHaCands.size() + 1);
+		for (size_t i = 0; i < ret.forms.size(); ++i)
+		{
+			shifted[i] = withSlots.size();
+			withSlots.emplace_back(move(ret.forms[i]));
+			if (!needsSlot[i]) continue;
+			Form slot;
+			slot.form = withSlots.back().form;
+			slot.numSpaces = withSlots.back().numSpaces;
+			withSlots.emplace_back(move(slot));
+		}
+		ret.forms = move(withSlots);
+		for (auto& m : newFormIdMapper) m = shifted[m];
+		for (auto& c : quotedHaCands) quotedHaSlots.emplace_back(newFormIdMapper[c.first] + 1);
+	}
 	ret.forms.emplace_back();
 
 	uint8_t formHash = 0;
@@ -2641,6 +2694,22 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 			continue;
 		}
 		sortedForms.emplace_back(&f);
+	}
+
+	for (size_t q = 0; q < quotedHaCands.size(); ++q)
+	{
+		auto& ids = quotedHaCands[q].second;
+		auto& orig = ret.forms[quotedHaSlots[q] - 1];
+		auto& alt = ret.forms[quotedHaSlots[q]];
+		alt.formHash = orig.formHash;
+		alt.zCodaAppendable = orig.zCodaAppendable;
+		alt.zSiotAppendable = 0;
+		alt.hasJClass = orig.hasJClass;
+		alt.hasAnyFullMorphemes = 0; // 후보가 모두 '하/VV + 어미'로 나뉜 형태소다
+		alt.candidate = FixedVector<const Morpheme*>{ ids.size() };
+		for (size_t i = 0; i < ids.size(); ++i) alt.candidate[i] = &ret.morphemes[ids[i]];
+		alt.dialect = accumulate(alt.candidate.begin(), alt.candidate.end(), alt.candidate[0]->dialect, reduceDialect);
+		orig.hasQuotedHaForm = 1;
 	}
 
 	// 오타 교정이 없는 경우 일반 Trie 생성

@@ -238,7 +238,12 @@ namespace kiwi
 		uint8_t zSiotAppendable : 1;
 		uint8_t hasJClass : 1;
 		uint8_t hasAnyFullMorphemes : 1;
-		uint8_t _reserved : 4;
+		/** 
+		 * 1이면 바로 다음 Form(this + 1)이 
+		 * 같은 형태의 '하/VV + 어미' 후보만 담은 Form이 됨
+		 * (Match::quotedHaOmission 용) */
+		uint8_t hasQuotedHaForm : 1; 
+		uint8_t _reserved : 3;
 		Dialect dialect = Dialect::standard;
 
 		Form();

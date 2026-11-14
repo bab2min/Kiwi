@@ -1073,6 +1073,25 @@ public:
 		}
 	}
 
+	// 인용 뒤에 생략된 '하'(Match::quotedHaOmission)를 넣을 자리인지: 받침 없이 ㅏ·ㅑ로 끝나는 음절 + 문장부호(SF·SP·SE·SO) 0개 이상 +
+	// 닫는 따옴표(' " ’ ” 」 』) 바로 뒤
+	bool followsQuotedEnding(size_t pos) const
+	{
+		static constexpr U16StringView closingQuotes = u"'\"\u2019\u201D\u300D\u300F";
+		if (pos == 0 || closingQuotes.find(rawStr[pos - 1]) == closingQuotes.npos) return false;
+		size_t p = pos - 1;
+		for (; p > 0; --p)
+		{
+			const POSTag t = identifySpecialChr(rawStr[p - 1]);
+			if (t != POSTag::sf && t != POSTag::sp && t != POSTag::se && t != POSTag::so) break;
+		}
+		if (p == 0) return false;
+		const char16_t c = rawStr[p - 1];
+		if (!isHangulSyllable(c)) return false;
+		const size_t vowel = (c - 0xAC00) / 28 % 21;
+		return vowel == 0 || vowel == 2; // ㅏ, ㅑ
+	}
+
 	template<bool lengtheningTypoTolerant>
 	void flushCandidates(size_t endPosition, ptrdiff_t startPosOffset, 
 		size_t unkFormStartNsPos, size_t lastSpaceBoundaryNsPos, float typoCost,
@@ -1105,11 +1124,15 @@ public:
 				//if (!cand.form->numSpaces && lengthWithSpaces > formSizeWithTypos) spaceErrors = lengthWithSpaces - formSizeWithTypos; // 오타교정과 섞여있을 경우 spaceErrors 계산 고도화 필요.
 				const size_t nBeginWithCT = startContinualTypoIdx ? (nBegin << posMultiplierBit) + startContinualTypoIdx : nBegin << posMultiplierBit;
 				const size_t nEndWithCT = endContinualTypoIdx ? ((nEnd - 1) << posMultiplierBit) + endContinualTypoIdx : nEnd << posMultiplierBit;
-				if (appendNewNode(out, endPosMap,
-					nBeginWithCT, nEndWithCT,
-					cand.form, typoCost + cand.getTypoCost(lengtheningTypoCost)))
+				const float cost = typoCost + cand.getTypoCost(lengtheningTypoCost);
+				if (appendNewNode(out, endPosMap, nBeginWithCT, nEndWithCT, cand.form, cost))
 				{
 					out.back().spaceErrors = spaceErrors;
+					if (cand.form->hasQuotedHaForm && !!(matchOptions & Match::quotedHaOmission) && followsQuotedEnding(nsToPos[nBegin]))
+					{
+						appendNewNode(out, endPosMap, nBeginWithCT, nEndWithCT, cand.form + 1, cost);
+						out.back().spaceErrors = spaceErrors;
+					}
 				}
 			}
 		}
