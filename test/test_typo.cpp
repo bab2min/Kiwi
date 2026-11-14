@@ -511,3 +511,24 @@ TEST(KiwiTypo, FuzzyRealWordErrors)
 	EXPECT_FALSE(contains(analyzedForms(kiwi, u"국가 경재가 어렵다", &pNonWord), u"경제"));
 	EXPECT_TRUE(contains(analyzedForms(kiwi, u"국가 경재가 어렵다", &pRealWord), u"경제"));
 }
+
+TEST(KiwiTypo, FuzzyMinJamo)
+{
+	Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 0, BuildOption::default_, }.build();
+	const auto hasFuzzyOneSyllable = [&](size_t minJamo)
+	{
+		TypoTransformer tt;
+		tt.setFuzzyTypoCost(1.f, true, minJamo);
+		auto ptt = tt.prepare(true);
+		AnalyzeOption option{ Match::allWithNormalizing };
+		option.typoTransformer = &ptt;
+		auto graph = kiwi.buildMorphGraph(u"깡이 세다", option);
+		// 받침 있는 1음절 형태(깡 → 강)는 자모 3개
+		return std::any_of(graph.edges.begin(), graph.edges.end(), [&](const MorphGraphEdge& e)
+		{
+			return graph.statePositions[e.from].first == 0 && graph.statePositions[e.to].second == 1 && e.typoCost > 0 && e.morphs.front().first == u"강";
+		});
+	};
+	EXPECT_TRUE(hasFuzzyOneSyllable(3));
+	EXPECT_FALSE(hasFuzzyOneSyllable(4));
+}
