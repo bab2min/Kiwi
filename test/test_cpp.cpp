@@ -1349,6 +1349,25 @@ TEST(KiwiCpp, Pattern)
 	EXPECT_EQ(tokens[0].tag, POSTag::w_serial);
 }
 
+TEST(KiwiCpp, PatternAbbreviation)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	const auto forms = [&](const std::u16string& str)
+	{
+		std::vector<std::u16string> ret;
+		for (auto& t : kiwi.analyze(str, Match::allWithNormalizing).first) ret.emplace_back(t.str);
+		return ret;
+	};
+
+	// 약어는 단어 중간에서 시작하지 않는다
+	EXPECT_EQ(forms(u"trans. 참조"), (std::vector<std::u16string>{ u"trans", u".", u"참조" }));
+	EXPECT_EQ(forms(u"recruit.nhncorp.com 방문"), (std::vector<std::u16string>{ u"recruit", u".", u"nhncorp", u".", u"com", u"방문" }));
+
+	EXPECT_EQ(forms(u"e.g. 예시")[0], u"e.g.");
+	EXPECT_EQ(forms(u"U.S.A. 정부")[0], u"U.S.A.");
+	EXPECT_EQ(forms(u"Mr. Kim이 왔다")[0], u"Mr.");
+}
+
 TEST(KiwiCpp, BuilderAddWords)
 {
 	KiwiBuilder builder{ MODEL_PATH };

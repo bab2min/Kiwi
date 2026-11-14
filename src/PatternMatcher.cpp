@@ -27,7 +27,7 @@ namespace kiwi
 		size_t testMention(const char16_t* first, const char16_t* last) const;
 		size_t testNumeric(const char16_t left, const char16_t* first, const char16_t* last) const;
 		size_t testSerial(const char16_t* first, const char16_t* last) const;
-		size_t testAbbr(const char16_t* first, const char16_t* last) const;
+		size_t testAbbr(char16_t left, const char16_t* first, const char16_t* last) const;
 		size_t testEmoji(const char16_t* first, const char16_t* last) const;
 
 	public:
@@ -255,11 +255,12 @@ size_t PatternMatcherImpl::testSerial(const char16_t* first, const char16_t* las
 	return b - first;
 }
 
-size_t PatternMatcherImpl::testAbbr(const char16_t* first, const char16_t* last) const
+size_t PatternMatcherImpl::testAbbr(char16_t left, const char16_t* first, const char16_t* last) const
 {
 	const char16_t* b = first;
 
 	if (b == last || !isAlpha(*b)) return 0;
+	if (isAlpha(left) || isDigit(left)) return 0; // 단어 중간에서는 시작하지 않는다
 
 	size_t l = 0;
 	while (b != last && isAlpha(*b)) ++b, ++l;
@@ -373,7 +374,7 @@ pair<size_t, POSTag> PatternMatcherImpl::match(char16_t left, const char16_t * f
 	if (!!(matchOptions & Match::mention) && (size = testMention(first, last))) return make_pair(size, POSTag::w_mention);
 	if (!!(matchOptions & Match::url) && (size = testUrl(first, last))) return make_pair(size, POSTag::w_url);
 	if (!!(matchOptions & Match::emoji) && (size = testEmoji(first, last))) return make_pair(size, POSTag::w_emoji);
-	if ((size = testAbbr(first, last))) return make_pair(size, POSTag::sl);
+	if ((size = testAbbr(left, first, last))) return make_pair(size, POSTag::sl);
 	return make_pair(0, POSTag::unknown);
 }
 
