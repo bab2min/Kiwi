@@ -1335,7 +1335,7 @@ namespace kiwi
 				}
 				for (auto m : node.form->candidate)
 				{
-					if (!m->isDialectAllowed(option.allowedDialects) || (m->tag == POSTag::unknown && m->chunks.empty())) continue;
+					if (!isDialectAllowed(m->dialect, option.allowedDialects) || (m->tag == POSTag::unknown && m->chunks.empty())) continue;
 					if (m->tag == POSTag::z_coda)
 					{
 						zCodaNodes.emplace_back(i, m);
@@ -1383,7 +1383,7 @@ namespace kiwi
 						if (!prev->form) continue;
 						for (auto pm : prev->form->candidate)
 						{
-							if (pm->combineSocket != m->combineSocket || !pm->isSingle() || !pm->isDialectAllowed(option.allowedDialects)) continue;
+							if (pm->combineSocket != m->combineSocket || !pm->isSingle() || !isDialectAllowed(pm->dialect, option.allowedDialects)) continue;
 							Morphs fused;
 							appendMorph(fused, *pm->getCombined()->kform, pm->getCombined()->tag);
 							for (size_t ch = 1; ch < m->chunks.size(); ++ch)

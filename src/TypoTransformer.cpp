@@ -1045,7 +1045,7 @@ size_t PreparedTypoTransformer::generateGraph(U16StringView str,
 			for (size_t j = 0; j < patInfo.size; ++j)
 			{
 				auto& repl = patInfo.repl[j];
-				if (repl.dialect != Dialect::standard && !(allowedDialect & repl.dialect)) continue;
+				if (!isDialectAllowed(repl.dialect, allowedDialect)) continue;
 				
 				if (repl.leftCond == CondVowel::vowel)
 				{

@@ -1877,7 +1877,7 @@ void KiwiBuilder::buildCombinedMorphemes(
 			if (clearIrregular(tag) > POSTag::pa && tag < POSTag::unknown_feat_ha) continue;
 			if (morph.combined) continue;
 
-			if (morph.dialect != Dialect::standard && !(enabledDialects & morph.dialect))
+			if (!isDialectAllowed(morph.dialect, enabledDialects))
 			{
 				continue;
 			}
@@ -2227,7 +2227,7 @@ size_t KiwiBuilder::loadDictionaryFromStream(std::istream& is)
 			}
 		}
 
-		if (dialect != Dialect::standard && !(enabledDialects & dialect))
+		if (!isDialectAllowed(dialect, enabledDialects))
 		{
 			continue;
 		}
@@ -2689,7 +2689,7 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 		});
 
 		f.dialect = accumulate(f.candidate.begin(), f.candidate.end(), f.candidate[0]->dialect, reduceDialect);
-		if (f.dialect != Dialect::standard && !(enabledDialects & f.dialect))
+		if (!isDialectAllowed(f.dialect, enabledDialects))
 		{
 			continue;
 		}

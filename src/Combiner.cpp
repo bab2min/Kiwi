@@ -953,7 +953,7 @@ void RuleSet::loadRules(istream& istr, Dialect enabledDialects)
 				repl.emplace_back(parseReplString(KString{ r.begin(), r.end() }));
 			}
 
-			if (dialect != Dialect::standard && !(enabledDialects & dialect))
+			if (!isDialectAllowed(dialect, enabledDialects))
 			{
 				continue;
 			}

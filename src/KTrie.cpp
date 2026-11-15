@@ -3,6 +3,7 @@
 #include <kiwi/Types.h>
 #include <kiwi/TemplateUtils.hpp>
 #include <kiwi/Utils.h>
+#include <kiwi/TagUtils.h>
 #include "ArchAvailable.h"
 #include "KTrie.h"
 #include "FeatureTestor.h"
@@ -205,8 +206,8 @@ namespace kiwi
 				auto cand = &tCand->form(formBase);
 				if (FeatureTestor::isMatched(&str[0], &str[nonSpaces[nonSpaces.size() - typoFormSize]], tCand->leftCond)
 					&& FeatureTestor::isMatchedApprox(&str[0], &str[nonSpaces[nonSpaces.size() - typoFormSize]], cand->vowel, cand->polar)
-					&& (cand->dialect == Dialect::standard || !!(cand->dialect & allowedDialect))
-					&& (tCand->dialect == Dialect::standard || !!(tCand->dialect & allowedDialect)))
+					&& isDialectAllowed(cand->dialect, allowedDialect)
+					&& isDialectAllowed(tCand->dialect, allowedDialect))
 				{
 					candidates.emplace_back(cand,
 						tCand->score() + cost,
@@ -227,7 +228,7 @@ namespace kiwi
 			while (1)
 			{
 				if (FeatureTestor::isMatchedApprox(&str[0], &str[nonSpaces[nonSpaces.size() + foundCand->numSpaces - foundCand->form.size()]], foundCand->vowel, foundCand->polar)
-					&& (foundCand->dialect == Dialect::standard || !!(foundCand->dialect & allowedDialect)))
+					&& isDialectAllowed(foundCand->dialect, allowedDialect))
 				{
 					candidates.emplace_back(foundCand);
 				}
@@ -1110,7 +1111,7 @@ public:
 				&& !isHangulCoda(cand.form->form[0]))
 			{
 				const bool isSTag = cand.form->form.size() == 1 &&
-					identifySpecialChr(cand.form->form[0]) >= POSTag::sf && identifySpecialChr(cand.form->form[0]) <= POSTag::sw;
+					isPunctClass(identifySpecialChr(cand.form->form[0]));
 				if (lastSpaceBoundaryNsPos < nBegin)
 				{
 					insertUnkForm(lastSpaceBoundaryNsPos, nBegin, cand.form->hasJClass || isSTag);
@@ -1247,12 +1248,12 @@ public:
 								insertUnkForm(
 									lastSpaceBoundaryNsPos, 
 									specialStartNsPos, 
-									POSTag::sf <= lastChrType && lastChrType <= POSTag::sw);
+									isPunctClass(lastChrType));
 							}
 							insertUnkForm(
 								unkFormStartNsPos,
 								specialStartNsPos,
-								POSTag::sf <= lastChrType && lastChrType <= POSTag::sw);
+								isPunctClass(lastChrType));
 							auto str = rawStr.substr(nsToPos[specialStartNsPos], (typoNode.endPos + j - typoNode.form.size()) - nsToPos[specialStartNsPos]);
 							while (!str.empty() && isSpace(str.back())) str = str.substr(0, str.size() - 1);
 							if (appendNewNode(out, endPosMap,
@@ -1266,7 +1267,7 @@ public:
 					}
 					unkFormStartNsPos = specialStartNsPos;
 					specialStartNsPos = posToNs[typoNode.endPos + j - typoNode.form.size()];
-					if (POSTag::sf <= lastChrType && lastChrType <= POSTag::sw)
+					if (isPunctClass(lastChrType))
 					{
 						lastSpaceBoundaryNsPos = specialStartNsPos;
 					}
@@ -1527,12 +1528,12 @@ public:
 					insertUnkForm(
 						lastSpaceBoundaryNsPos,
 						specialStartNsPos,
-						POSTag::sf <= lastChrType && lastChrType <= POSTag::sw);
+						isPunctClass(lastChrType));
 				}
 				insertUnkForm(
 					unkFormStartNsPos,
 					specialStartNsPos,
-					POSTag::sf <= lastChrType && lastChrType <= POSTag::sw);
+					isPunctClass(lastChrType));
 				auto str = rawStr.substr(nsToPos[specialStartNsPos], typoNode.endPos - nsToPos[specialStartNsPos]);
 				while (!str.empty() && isSpace(str.back())) str = str.substr(0, str.size() - 1);
 				if (appendNewNode(out, endPosMap,
@@ -1543,7 +1544,7 @@ public:
 					out.back().form = trie.value((size_t)lastChrType);
 				}
 				unkFormStartNsPos = specialStartNsPos;
-				if (POSTag::sf <= lastChrType && lastChrType <= POSTag::sw)
+				if (isPunctClass(lastChrType))
 				{
 					lastSpaceBoundaryNsPos = posToNs[typoNode.endPos];
 				}

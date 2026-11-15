@@ -530,5 +530,11 @@ namespace kiwi
 		if (a == Dialect::standard || b == Dialect::standard) return true;
 		return (a & b) != Dialect::standard;
 	}
+
+	/** 표준어이거나 allowed에 포함된 방언인지 확인한다. allowed가 standard이면 방언을 허용하지 않는다(dialectHasIntersection과 다른 점) */
+	inline bool isDialectAllowed(Dialect dialect, Dialect allowed)
+	{
+		return dialect == Dialect::standard || !!(dialect & allowed);
+	}
 }
 

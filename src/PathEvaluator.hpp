@@ -409,7 +409,7 @@ namespace kiwi
 				{
 					if (splitComplex && curMorph->hasComplex()) continue;
 					if (blocklist && curMorph->hasMorpheme(*blocklist)) continue;
-					if (curMorph->dialect != Dialect::standard && !(curMorph->dialect & allowedDialect)) continue;
+					if (!isDialectAllowed(curMorph->dialect, allowedDialect)) continue;
 
 					// 덧붙은 받침(zCoda)을 위한 지름길
 					if (curMorph->tag == POSTag::z_coda)
@@ -937,7 +937,7 @@ namespace kiwi
 			{
 				if (splitComplex && curMorph->hasComplex()) continue;
 				if (blocklist && curMorph->hasMorpheme(*blocklist)) continue;
-				if (curMorph->dialect != Dialect::standard && !(curMorph->dialect & allowedDialect)) continue;
+				if (!isDialectAllowed(curMorph->dialect, allowedDialect)) continue;
 
 				// 덧붙은 받침(zCoda)을 위한 지름길
 				if (curMorph->tag == POSTag::z_coda)

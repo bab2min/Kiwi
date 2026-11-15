@@ -171,9 +171,6 @@ namespace kiwi
 		/** 현재 인스턴스가 단일 형태소인지 확인한다 */
 		bool isSingle() const { return chunks.empty() || complex || saisiot; }
 
-		/** 표준어이거나 allowed에 포함된 방언인지 확인한다 */
-		bool isDialectAllowed(Dialect allowed) const { return dialect == Dialect::standard || !!(dialect & allowed); }
-
 		bool hasComplex() const
 		{
 			if (getCombined()->complex) return true;
