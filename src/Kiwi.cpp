@@ -1,4 +1,5 @@
 #include <fstream>
+#include <numeric>
 
 #include <kiwi/Kiwi.h>
 #include <kiwi/Utils.h>
