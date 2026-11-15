@@ -10,11 +10,27 @@
 
 #include <cmath>
 #include <kiwi/Types.h>
-#include <kiwi/FixedVector.hpp>
 
 namespace kiwi
 {
 	struct Morpheme;
+
+	/** 연속 배열의 일부를 가리키는 읽기 전용 범위 */
+	template<class Ty>
+	class ConstRange
+	{
+		const Ty* first = nullptr;
+		size_t n = 0;
+	public:
+		ConstRange() = default;
+		ConstRange(const Ty* _first, size_t _n) : first{ _first }, n{ _n } {}
+
+		const Ty* begin() const { return first; }
+		const Ty* end() const { return first + n; }
+		size_t size() const { return n; }
+		bool empty() const { return n == 0; }
+		const Ty& operator[](size_t i) const { return first[i]; }
+	};
 
 	/**
 	 * @brief 형태소에 관한 모든 정보를 담는 구조체의 템플릿
@@ -134,8 +150,8 @@ namespace kiwi
 	/**
 	 * @brief 형태소에 관한 모든 정보를 담는 구조체의 템플릿
 	 * 
-	 * @note 변경 불가능한 상태로 인덱스는 모두 포인터로, std::vector는 FixedVector로 변경되어 수정이 불가능한 대신
-	 * 각 값에 효율적으로 빠르게 접근 가능하다. `kiwi::Kiwi` 내 실제 형태소 분석 단계에 쓰인다.
+	 * @note 변경 불가능한 상태로 인덱스는 모두 포인터로 변경되고, 조각 목록은 소유한 쪽(Kiwi::morphemeChunks 등)의
+	 * 연속 배열을 가리킨다. `kiwi::Kiwi` 내 실제 형태소 분석 단계에 쓰인다.
 	 */
 	struct Morpheme
 	{
@@ -148,10 +164,11 @@ namespace kiwi
 		uint8_t senseId = 0;
 		uint8_t combineSocket = 0;
 		int32_t combined = 0;
-		FixedPairVector<const Morpheme*, std::pair<uint8_t, uint8_t>> chunks;
+		const Morpheme* const* chunkData = nullptr;
 		float userScore = 0;
 		uint32_t lmMorphemeId = 0, origMorphemeId = 0;
 		Dialect dialect = Dialect::standard;
+		uint8_t chunkSize = 0;
 
 		Morpheme();
 		~Morpheme();
@@ -168,14 +185,34 @@ namespace kiwi
 		/** 분할된 형태소의 경우 원형 형태소를 반환한다. 그 외에는 자기 자신을 반환한다. */
 		const Morpheme* getCombined() const { return this + combined; }
 
+		ConstRange<const Morpheme*> chunks() const { return { chunkData, chunkSize }; }
+
+		/** 조각별 (시작, 끝) 위치. 풀에서 조각 형태소 포인터들 바로 뒤에 놓인다 */
+		ConstRange<std::pair<uint8_t, uint8_t>> chunkPositions() const
+		{
+			return { reinterpret_cast<const std::pair<uint8_t, uint8_t>*>(chunkData + chunkSize), chunkSize };
+		}
+
+		/** 조각 n개가 풀에서 차지하는 칸 수(형태소 포인터 n개 + 위치 쌍 n개) */
+		static constexpr size_t chunkSlots(size_t n)
+		{
+			return n + (n * sizeof(std::pair<uint8_t, uint8_t>) + sizeof(const Morpheme*) - 1) / sizeof(const Morpheme*);
+		}
+
+		/**
+		 * pool 끝에 조각 n개의 칸을 덧붙여 이 형태소에 연결하고, 채워 넣을 형태소 포인터 배열과 위치 쌍 배열을 돌려준다.
+		 * pool은 다시 할당되지 않도록 미리 reserve되어 있어야 한다.
+		 */
+		std::pair<const Morpheme**, std::pair<uint8_t, uint8_t>*> allocChunks(Vector<const Morpheme*>& pool, size_t n);
+
 		/** 현재 인스턴스가 단일 형태소인지 확인한다 */
-		bool isSingle() const { return chunks.empty() || complex || saisiot; }
+		bool isSingle() const { return chunkSize == 0 || complex || saisiot; }
 
 		bool hasComplex() const
 		{
 			if (getCombined()->complex) return true;
 
-			for (auto c : chunks)
+			for (auto c : chunks())
 			{
 				if (c->complex) return true;
 			}
@@ -186,7 +223,7 @@ namespace kiwi
 		bool hasMorpheme(Container&& m) const
 		{
 			if (m.count(getCombined())) return true;
-			for (auto c : chunks)
+			for (auto c : chunks())
 			{
 				if (m.count(c)) return true;
 			}
@@ -223,23 +260,30 @@ namespace kiwi
 	/**
 	 * @brief 형태에 관한 모든 정보를 담는 구조체
 	 * 
-	 * @note 이 구조체는 변경 불가능한 상태로 사용된다. 인덱스는 모두 포인터로, std::vector는 FixedVector로 변경되어 수정이 불가능한 대신
-	 * 각 값에 효율적으로 빠르게 접근 가능하다. `kiwi::Kiwi` 내에서 실제 형태소 분석 단계에 쓰인다.
+	 * @note 이 구조체는 변경 불가능한 상태로 사용된다. 인덱스는 모두 포인터로 변경되고, 후보 형태소 목록은 소유한 쪽(Kiwi::formCandidates 등)의
+	 * 연속 배열을 가리킨다. `kiwi::Kiwi` 내에서 실제 형태소 분석 단계에 쓰인다.
 	 */
 	struct Form
 	{
 		KString form;
-		FixedVector<const Morpheme*> candidate;
-		uint32_t numSpaces = 0;
+		const Morpheme* const* candidateData = nullptr;
+		uint16_t numSpaces = 0;
+		uint16_t candidateSize = 0;
 		CondVowel vowel = CondVowel::none;
 		CondPolarity polar = CondPolarity::none;
-		uint8_t formHash = 0;
-		uint8_t zCodaAppendable : 1;
-		uint8_t zSiotAppendable : 1;
-		uint8_t hasJClass : 1;
-		uint8_t hasAnyFullMorphemes : 1;
-		uint8_t _reserved : 4;
-		Dialect dialect = Dialect::standard;
+		// 아래 비트필드는 모두 16비트 타입이어야 MSVC에서도 2바이트 한 단위에 들어간다
+		/** 형태가 바뀔 때마다 0과 1이 번갈아 바뀐다. 이웃한 Form이 같은 형태인지 판별하는 데 쓴다 */
+		uint16_t formHash : 1;
+		uint16_t zCodaAppendable : 1;
+		uint16_t zSiotAppendable : 1;
+		uint16_t hasJClass : 1;
+		uint16_t hasAnyFullMorphemes : 1;
+		/** 
+		 * 1이면 바로 다음 Form(this + 1)이 
+		 * 같은 형태의 '하/VV + 어미' 후보만 담은 Form이 됨
+		 * (Match::quotedHaOmission 용) */
+		uint16_t hasQuotedHaForm : 1;
+		Dialect dialect : 10;
 
 		Form();
 		~Form();
@@ -252,6 +296,11 @@ namespace kiwi
 		bool operator<(const Form& o) const;
 
 		size_t sizeWithoutSpace() const { return form.size() - numSpaces; }
+
+		ConstRange<const Morpheme*> candidate() const { return { candidateData, candidateSize }; }
+
+		/** data는 Form보다 오래 살고 다시 할당되지 않는 배열이어야 한다 */
+		void setCandidates(const Morpheme* const* data, size_t size);
 	};
 
 	struct TypoForm
@@ -300,7 +349,9 @@ namespace kiwi
 	 * @param morphBase 형태소 배열의 시작 위치
 	 * @return 최적화된 형태 정보
 	 */
-	Form bake(const FormRaw& o, const Morpheme* morphBase, bool zCodaAppendable, bool zSiotAppendable, const Vector<uint32_t>& additionalCands = {});
+	/** 후보 형태소 포인터는 candidatePool 끝에 덧붙인다. candidatePool은 미리 충분히 reserve되어 있어야 한다 */
+	Form bake(const FormRaw& o, const Morpheme* morphBase, bool zCodaAppendable, bool zSiotAppendable,
+		Vector<const Morpheme*>& candidatePool, const Vector<uint32_t>& additionalCands = {});
 
 	/**
 	 * @brief 변경 가능한 형태소 정보를 bake하여 최적화한다.
@@ -311,5 +362,7 @@ namespace kiwi
 	 * @param formMap
 	 * @return 최적화된 형태소 정보
 	 */
-	Morpheme bake(const MorphemeRaw& o, const Morpheme* morphBase, const Form* formBase, const Vector<size_t>& formMap);
+	/** 조각 목록은 chunkPool 끝에 덧붙인다. chunkPool은 미리 충분히 reserve되어 있어야 한다 */
+	Morpheme bake(const MorphemeRaw& o, const Morpheme* morphBase, const Form* formBase, const Vector<size_t>& formMap,
+		Vector<const Morpheme*>& chunkPool);
 }

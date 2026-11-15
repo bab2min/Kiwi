@@ -1,4 +1,5 @@
 ﻿#include "gtest/gtest.h"
+#include <algorithm>
 #include <cmath>
 #include <random>
 #include "common.h"
@@ -406,4 +407,128 @@ TEST(KiwiTypo, SampleTyposCostWeighting)
 	EXPECT_NEAR(cheapToExpensiveRatio(0), 1, 0.1);
 	EXPECT_NEAR(cheapToExpensiveRatio(0.5f), std::exp(1.), 0.3);
 	EXPECT_NEAR(cheapToExpensiveRatio(1), std::exp(2.), 0.8);
+}
+
+TEST(KiwiTypo, FuzzyTypoOption)
+{
+	TypoTransformer tt;
+	EXPECT_FALSE(tt.isFuzzyTypoEnabled());
+	EXPECT_TRUE(tt.empty());
+
+	tt.setFuzzyTypoCost(1.5f, true, 4);
+	EXPECT_TRUE(tt.isFuzzyTypoEnabled());
+	EXPECT_FALSE(tt.empty());
+	EXPECT_EQ(tt.getFuzzyTypoCost(), 1.5f);
+	EXPECT_TRUE(tt.getFuzzyRealWordErrors());
+	EXPECT_EQ(tt.getFuzzyMinJamo(), 4);
+
+	auto ptt = tt.prepare(true);
+	EXPECT_EQ(ptt.getFuzzyTypoCost(), 1.5f);
+	EXPECT_TRUE(ptt.getFuzzyRealWordErrors());
+	EXPECT_EQ(ptt.getFuzzyMinJamo(), 4);
+
+	tt.scaleCost(2);
+	EXPECT_EQ(tt.getFuzzyTypoCost(), 3.f);
+
+	// fuzzy를 쓰지 않는 쪽과 합치면 fuzzy 설정은 그대로
+	TypoTransformer merged = getDefaultTypoSet(DefaultTypoSet::basicTypoSet);
+	merged.update(tt);
+	EXPECT_EQ(merged.getFuzzyTypoCost(), 3.f);
+	EXPECT_TRUE(merged.getFuzzyRealWordErrors());
+	EXPECT_EQ(merged.getFuzzyMinJamo(), 4);
+
+	// 둘 다 쓰면 비용은 작은 쪽, 최소 자모 수는 더 넓게 찾는 쪽, 실제 단어 오류는 어느 한쪽이라도 켜면 켠다
+	TypoTransformer other;
+	other.setFuzzyTypoCost(1.f, false, 3);
+	merged.update(other);
+	EXPECT_EQ(merged.getFuzzyTypoCost(), 1.f);
+	EXPECT_TRUE(merged.getFuzzyRealWordErrors());
+	EXPECT_EQ(merged.getFuzzyMinJamo(), 3);
+}
+
+namespace
+{
+	std::vector<std::u16string> analyzedForms(const Kiwi& kiwi, const std::u16string& str, const PreparedTypoTransformer* ptt)
+	{
+		AnalyzeOption option{ Match::allWithNormalizing };
+		option.typoTransformer = ptt;
+		std::vector<std::u16string> ret;
+		for (auto& t : kiwi.analyze(str, option).first) ret.emplace_back(t.str);
+		return ret;
+	}
+
+	bool contains(const std::vector<std::u16string>& forms, const std::u16string& form)
+	{
+		return std::find(forms.begin(), forms.end(), form) != forms.end();
+	}
+}
+
+TEST(KiwiTypo, AnalyzeFuzzyTypo)
+{
+	Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 0, BuildOption::default_, }.build();
+	TypoTransformer tt;
+	tt.setFuzzyTypoCost(1.f);
+	auto ptt = tt.prepare(true);
+
+	// 초성 치환, 중성 치환, 종성 삽입, 종성 삭제
+	const std::pair<std::u16string, std::u16string> cases[] = {
+		{ u"컴퓨더를 샀다", u"컴퓨터" },
+		{ u"사뮤실에서 일했다", u"사무실" },
+		{ u"어제 도서과에 갔다", u"도서관" },
+		{ u"학굣에 갔다", u"학교" },
+	};
+	for (auto& c : cases)
+	{
+		EXPECT_FALSE(contains(analyzedForms(kiwi, c.first, nullptr), c.second));
+		EXPECT_TRUE(contains(analyzedForms(kiwi, c.first, &ptt), c.second));
+	}
+
+	// 오타가 없는 문장은 그대로
+	for (auto s : { u"오늘 날씨가 맑다", u"학교에 갔다" })
+	{
+		EXPECT_EQ(analyzedForms(kiwi, s, &ptt), analyzedForms(kiwi, s, nullptr));
+	}
+
+	// 규칙 기반 오타와 함께 써도 둘 다 교정한다
+	TypoTransformer both = getDefaultTypoSet(DefaultTypoSet::basicTypoSet);
+	both.update(tt);
+	auto pboth = both.prepare(true);
+	EXPECT_TRUE(contains(analyzedForms(kiwi, u"사뮤실에서 일했다", &pboth), u"사무실"));
+	EXPECT_TRUE(contains(analyzedForms(kiwi, u"잘했따", &pboth), u"다"));
+}
+
+TEST(KiwiTypo, FuzzyRealWordErrors)
+{
+	Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 0, BuildOption::default_, }.build();
+	TypoTransformer nonWord, realWord;
+	nonWord.setFuzzyTypoCost(1.f, false);
+	realWord.setFuzzyTypoCost(1.f, true);
+	auto pNonWord = nonWord.prepare(true), pRealWord = realWord.prepare(true);
+
+	// 원문 구간이 그 자체로 사전 형태(핵교, 경재)이면 realWordErrors가 켜져 있을 때만 고친다
+	EXPECT_FALSE(contains(analyzedForms(kiwi, u"핵교에 갔다", &pNonWord), u"학교"));
+	EXPECT_TRUE(contains(analyzedForms(kiwi, u"핵교에 갔다", &pRealWord), u"학교"));
+	EXPECT_FALSE(contains(analyzedForms(kiwi, u"국가 경재가 어렵다", &pNonWord), u"경제"));
+	EXPECT_TRUE(contains(analyzedForms(kiwi, u"국가 경재가 어렵다", &pRealWord), u"경제"));
+}
+
+TEST(KiwiTypo, FuzzyMinJamo)
+{
+	Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 0, BuildOption::default_, }.build();
+	const auto hasFuzzyOneSyllable = [&](size_t minJamo)
+	{
+		TypoTransformer tt;
+		tt.setFuzzyTypoCost(1.f, true, minJamo);
+		auto ptt = tt.prepare(true);
+		AnalyzeOption option{ Match::allWithNormalizing };
+		option.typoTransformer = &ptt;
+		auto graph = kiwi.buildMorphGraph(u"깡이 세다", option);
+		// 받침 있는 1음절 형태(깡 → 강)는 자모 3개
+		return std::any_of(graph.edges.begin(), graph.edges.end(), [&](const MorphGraphEdge& e)
+		{
+			return graph.statePositions[e.from].first == 0 && graph.statePositions[e.to].second == 1 && e.typoCost > 0 && e.morphs.front().first == u"강";
+		});
+	};
+	EXPECT_TRUE(hasFuzzyOneSyllable(3));
+	EXPECT_FALSE(hasFuzzyOneSyllable(4));
 }

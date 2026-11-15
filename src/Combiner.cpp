@@ -604,6 +604,8 @@ auto MultiRuleDFA<NodeSizeTy, GroupSizeTy>::fromOther(MultiRuleDFA<_NodeSizeTy, 
 {
 	MultiRuleDFA ret;
 	ret.vocabs = move(o.vocabs);
+	ret.syllableVocabs = o.syllableVocabs;
+	ret.codaVocabs = o.codaVocabs;
 	ret.finish = move(o.finish);
 	ret.finishGroup = move(o.finishGroup);
 	ret.groupInfo = move(o.groupInfo);
@@ -633,6 +635,7 @@ MultiRuleDFAErased RuleSet::buildRules(
 	}
 
 	ret.vocabs = getVocabList(nodes);
+	ret.buildVocabTables();
 	Vector<RaggedVector<ptrdiff_t>> transitionTable;
 	for (auto& n : nodes)
 	{
@@ -950,7 +953,7 @@ void RuleSet::loadRules(istream& istr, Dialect enabledDialects)
 				repl.emplace_back(parseReplString(KString{ r.begin(), r.end() }));
 			}
 
-			if (dialect != Dialect::standard && !(enabledDialects & dialect))
+			if (!isDialectAllowed(dialect, enabledDialects))
 			{
 				continue;
 			}
@@ -990,41 +993,102 @@ CompiledRule RuleSet::compile() const
 }
 
 template<class NodeSizeTy, class GroupSizeTy>
-Vector<Result> MultiRuleDFA<NodeSizeTy, GroupSizeTy>::combine(U16StringView left, U16StringView right) const
+void MultiRuleDFA<NodeSizeTy, GroupSizeTy>::buildVocabTables()
+{
+	const auto lookup = [&](char16_t c)
+	{
+		return (uint16_t)((upper_bound(vocabs.begin(), vocabs.end(), c) - vocabs.begin()) - 1);
+	};
+	for (size_t i = 0; i < syllableVocabs.size(); ++i) syllableVocabs[i] = lookup((char16_t)(0xAC00 + i * 28));
+	for (size_t i = 0; i < codaVocabs.size(); ++i) codaVocabs[i] = lookup((char16_t)(0x11A8 + i));
+}
+
+template<class NodeSizeTy, class GroupSizeTy>
+size_t MultiRuleDFA<NodeSizeTy, GroupSizeTy>::toVocab(char16_t c) const
+{
+	if (0xAC00 <= c && c <= 0xD7A3 && (c - 0xAC00) % 28 == 0) return syllableVocabs[(c - 0xAC00) / 28];
+	if (0x11A8 <= c && c <= 0x11C2) return codaVocabs[c - 0x11A8];
+	return (size_t)(upper_bound(vocabs.begin(), vocabs.end(), c) - vocabs.begin()) - 1;
+}
+
+template<class NodeSizeTy, class GroupSizeTy>
+bool MultiRuleDFA<NodeSizeTy, GroupSizeTy>::matchesPat(U16StringView left, bool matchRuleSep) const
 {
 	static constexpr NodeSizeTy no_node = -1;
 	static constexpr GroupSizeTy no_group = -1;
-	Vector<Result> ret;
-	Vector<size_t> capturedLefts(finish.size());
-	size_t nidx = 0, cpos = 0, capturedLeft = 0, capturedRight = 0, groupCapturedR = no_group;
+	const size_t vsize = vocabs.size();
+	size_t nidx = transition[Pattern::bos];
+	for (auto c : left)
+	{
+		if (nidx == no_node) return false;
+		nidx = transition[nidx * vsize + toVocab(c)];
+	}
+	if (nidx == no_node) return false;
+	if (matchRuleSep)
+	{
+		nidx = transition[nidx * vsize + Pattern::ruleSep];
+		if (nidx == no_node) return false;
+		const size_t e = nidx + 1 < sepGroupPtrs.size() ? sepGroupPtrs[nidx + 1] : sepGroupFlatten.size();
+		return sepGroupPtrs[nidx] < e;
+	}
+	nidx = transition[nidx * vsize + Pattern::eos];
+	return nidx != no_node && finishGroup[nidx] != no_group;
+}
+
+template<class NodeSizeTy, class GroupSizeTy>
+Vector<Result> MultiRuleDFA<NodeSizeTy, GroupSizeTy>::combine(U16StringView left, U16StringView right) const
+{
+	return combine(scanLeft(left), left, right);
+}
+
+template<class NodeSizeTy, class GroupSizeTy>
+LeftScan MultiRuleDFA<NodeSizeTy, GroupSizeTy>::scanLeft(U16StringView left) const
+{
+	static constexpr NodeSizeTy no_node = -1;
+	LeftScan ret;
+	ret.capturedLefts.resize(finish.size());
+	size_t nidx = 0, cpos = 0;
 	const size_t vsize = vocabs.size();
 
 	nidx = transition[nidx * vsize + Pattern::bos];
 	groupInfo[nidx].visit([&](size_t i)
 	{
-		capturedLefts[i] = cpos;
+		ret.capturedLefts[i] = cpos;
 	});
 
 	for (auto c : left)
 	{
-		if (nidx == no_node) goto not_matched;
-		size_t v = (size_t)(upper_bound(vocabs.begin(), vocabs.end(), c) - vocabs.begin()) - 1;
+		if (nidx == no_node) return ret;
+		size_t v = toVocab(c);
 		nidx = transition[nidx * vsize + v];
-		
+
 		if (nidx != no_node) groupInfo[nidx].visit([&](size_t i)
 		{
-			capturedLefts[i] = cpos;
+			ret.capturedLefts[i] = cpos;
 		});
 		cpos++;
 	}
 
-	if (nidx == no_node) goto not_matched;
+	if (nidx == no_node) return ret;
 	nidx = transition[nidx * vsize + Pattern::ruleSep];
-	cpos = 0;
+	if (nidx != no_node) ret.node = nidx;
+	return ret;
+}
+
+template<class NodeSizeTy, class GroupSizeTy>
+Vector<Result> MultiRuleDFA<NodeSizeTy, GroupSizeTy>::combine(const LeftScan& scan, U16StringView left, U16StringView right) const
+{
+	static constexpr NodeSizeTy no_node = -1;
+	static constexpr GroupSizeTy no_group = -1;
+	Vector<Result> ret;
+	if (scan.node == (size_t)-1) return ret;
+	const auto& capturedLefts = scan.capturedLefts;
+	size_t nidx = scan.node, cpos = 0, capturedLeft = 0, capturedRight = 0, groupCapturedR = no_group;
+	const size_t vsize = vocabs.size();
 	for (auto c : right)
 	{
 		if (nidx == no_node) goto not_matched;
-		size_t v = (size_t)(upper_bound(vocabs.begin(), vocabs.end(), c) - vocabs.begin()) - 1;
+		size_t v = toVocab(c);
 		nidx = transition[nidx * vsize + v];
 		cpos++;
 		if (nidx != no_node && finishGroup[nidx] != no_group)
@@ -1104,7 +1168,7 @@ Vector<tuple<size_t, size_t, CondPolarity>> MultiRuleDFA<NodeSizeTy, GroupSizeTy
 	for (auto c : left)
 	{
 		if (nidx == no_node) goto not_matched;
-		size_t v = (size_t)(upper_bound(vocabs.begin(), vocabs.end(), c) - vocabs.begin()) - 1;
+		size_t v = toVocab(c);
 		nidx = transition[nidx * vsize + v];
 
 		if (nidx != no_node) groupInfo[nidx].visit([&](size_t i)
@@ -1299,7 +1363,12 @@ tuple<KString, size_t, size_t> CompiledRule::combineOneImpl(
 		{
 			for (auto& p : visit(CombineVisitor{ leftForm, rightForm }, dfa[it->second]))
 			{
-				return make_tuple(p.str, p.leftEnd, p.rightBegin);
+				if (p.score >= 0) return make_tuple(p.str, p.leftEnd, p.rightBegin);
+				KString ret;
+				ret.reserve(leftForm.size() + rightForm.size());
+				ret.insert(ret.end(), leftForm.begin(), leftForm.end());
+				ret.insert(ret.end(), rightForm.begin(), rightForm.end());
+				return make_tuple(ret, leftForm.size(), leftForm.size());
 			}
 		}
 	}
@@ -1327,11 +1396,6 @@ tuple<KString, size_t, size_t> CompiledRule::combineOneImpl(
 Vector<tuple<size_t, size_t, CondPolarity>> CompiledRule::testLeftPattern(U16StringView leftForm, size_t ruleId) const
 {
 	return visit(SearchLeftVisitor{ leftForm, true }, dfa[ruleId]);
-}
-
-Vector<tuple<size_t, size_t, CondPolarity>> CompiledRule::testRightPattern(U16StringView rightForm, size_t ruleId) const
-{
-	return visit(SearchLeftVisitor{ rightForm, false }, dfaRight[ruleId]);
 }
 
 vector<tuple<size_t, size_t, CondPolarity>> CompiledRule::testLeftPattern(U16StringView leftForm, POSTag leftTag, POSTag rightTag, CondVowel cv, CondPolarity cp) const
@@ -1386,6 +1450,26 @@ UnorderedMap<POSTag, Vector<size_t>> CompiledRule::getRuleIdsByRightTag() const
 Vector<Result> CompiledRule::combine(U16StringView leftForm, U16StringView rightForm, size_t ruleId) const
 {
 	return visit(CombineVisitor{ leftForm, rightForm }, dfa[ruleId]);
+}
+
+bool CompiledRule::matchesLeftPattern(U16StringView leftForm, size_t ruleId) const
+{
+	return visit([&](const auto& e) { return e.matchesPat(leftForm, true); }, dfa[ruleId]);
+}
+
+bool CompiledRule::matchesRightPattern(U16StringView rightForm, size_t ruleId) const
+{
+	return visit([&](const auto& e) { return e.matchesPat(rightForm, false); }, dfaRight[ruleId]);
+}
+
+LeftScan CompiledRule::scanLeft(U16StringView leftForm, size_t ruleId) const
+{
+	return visit([&](const auto& e) { return e.scanLeft(leftForm); }, dfa[ruleId]);
+}
+
+Vector<Result> CompiledRule::combine(const LeftScan& scan, U16StringView leftForm, U16StringView rightForm, size_t ruleId) const
+{
+	return visit([&](const auto& e) { return e.combine(scan, leftForm, rightForm); }, dfa[ruleId]);
 }
 
 vector<u16string> CompiledRule::combine(U16StringView leftForm, POSTag leftTag, U16StringView rightForm, POSTag rightTag, CondVowel cv, CondPolarity cp) const

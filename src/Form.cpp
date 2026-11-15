@@ -71,7 +71,13 @@ namespace kiwi
 	DEFINE_SERIALIZER_OUTSIDE(FormRaw, form, candidate);
 
 	Form::Form()
-		: zCodaAppendable(0), zSiotAppendable(0)
+		: formHash(0), 
+		zCodaAppendable(0), 
+		zSiotAppendable(0), 
+		hasJClass(0), 
+		hasAnyFullMorphemes(0), 
+		hasQuotedHaForm(0), 
+		dialect(Dialect::standard)
 	{
 	}
 
@@ -90,29 +96,54 @@ namespace kiwi
 		return ComparatorIgnoringSpace::less(form, o.form);
 	}
 
-	Form bake(const FormRaw& o, const Morpheme* morphBase, bool zCodaAppendable, bool zSiotAppendable, const Vector<uint32_t>& additionalCands)
+	void Form::setCandidates(const Morpheme* const* data, size_t size)
+	{
+		if (size > UINT16_MAX) throw std::length_error{ "Form has too many candidates" };
+		candidateData = data;
+		candidateSize = (uint16_t)size;
+	}
+
+	Form bake(const FormRaw& o, const Morpheme* morphBase, bool zCodaAppendable, bool zSiotAppendable,
+		Vector<const Morpheme*>& candidatePool, const Vector<uint32_t>& additionalCands)
 	{
 		Form ret;
-		ret.numSpaces = count(o.form.begin(), o.form.end(), u' ');
+		ret.numSpaces = (uint16_t)count(o.form.begin(), o.form.end(), u' ');
 		ret.form = o.form;
-		ret.candidate = FixedVector<const Morpheme*>{ o.candidate.size() + additionalCands.size()};
-		for (size_t i = 0; i < o.candidate.size(); ++i)
-		{
-			ret.candidate[i] = morphBase + o.candidate[i];
-		}
-		for (size_t i = 0; i < additionalCands.size(); ++i)
-		{
-			ret.candidate[i + o.candidate.size()] = morphBase + additionalCands[i];
-		}
+		const size_t first = candidatePool.size();
+		for (auto c : o.candidate) candidatePool.emplace_back(morphBase + c);
+		for (auto c : additionalCands) candidatePool.emplace_back(morphBase + c);
+		ret.setCandidates(candidatePool.data() + first, candidatePool.size() - first);
 		ret.zCodaAppendable = zCodaAppendable ? 1 : 0;
 		ret.zSiotAppendable = zSiotAppendable ? 1 : 0;
 		// 다음 값들은 KiwiBuilder::build에서 채워 넣는다
 		ret.hasJClass = 0;
 		ret.hasAnyFullMorphemes = 0;
+		ret.hasQuotedHaForm = 0;
 		return ret;
 	}
 
-	Morpheme bake(const MorphemeRaw& o, const Morpheme* morphBase, const Form* formBase, const Vector<size_t>& formMap)
+	std::pair<const Morpheme**, std::pair<uint8_t, uint8_t>*> Morpheme::allocChunks(Vector<const Morpheme*>& pool, size_t n)
+	{
+		if (n > UINT8_MAX) throw std::length_error{ "Morpheme has too many chunks" };
+		if (!n)
+		{
+			chunkData = nullptr;
+			chunkSize = 0;
+			return { nullptr, nullptr };
+		}
+		const size_t first = pool.size(), slots = chunkSlots(n);
+		if (first + slots > pool.capacity()) throw std::logic_error{ "chunk pool must be reserved in advance" };
+		pool.resize(first + slots);
+		const Morpheme** morphs = pool.data() + first;
+		auto* positions = reinterpret_cast<std::pair<uint8_t, uint8_t>*>(morphs + n);
+		for (size_t i = 0; i < n; ++i) new (positions + i) std::pair<uint8_t, uint8_t>{};
+		chunkData = morphs;
+		chunkSize = (uint8_t)n;
+		return { morphs, positions };
+	}
+
+	Morpheme bake(const MorphemeRaw& o, const Morpheme* morphBase, const Form* formBase, const Vector<size_t>& formMap,
+		Vector<const Morpheme*>& chunkPool)
 	{
 		Morpheme ret;
 		ret.kform = &formBase[formMap[o.kform]].form;
@@ -125,12 +156,11 @@ namespace kiwi
 		ret.lmMorphemeId = o.lmMorphemeId;
 		ret.origMorphemeId = o.origMorphemeId;
 		ret.senseId = o.senseId;
-		ret.chunks = FixedPairVector<const Morpheme*, std::pair<uint8_t, uint8_t>>{ o.chunks.size() };
-		
+		auto [chunkMorphs, chunkPositions] = ret.allocChunks(chunkPool, o.chunks.size());
 		for (size_t i = 0; i < o.chunks.size(); ++i)
 		{
-			ret.chunks[i] = morphBase + o.chunks[i];
-			ret.chunks.getSecond(i) = o.chunkPositions[i];
+			chunkMorphs[i] = morphBase + o.chunks[i];
+			chunkPositions[i] = o.chunkPositions[i];
 		}
 		// chunks can point to morphemes not baked yet; saisiot is set in KiwiBuilder::build
 		ret.complex = o.complex();

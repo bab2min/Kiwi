@@ -58,6 +58,7 @@ namespace kiwi
 	{ 
 		class CompiledRule; 
 		struct Result;
+		struct LeftScan;
 	}
 
 	template<class Ty> class RaggedVector;
@@ -170,6 +171,32 @@ namespace kiwi
 		void validate() const;
 	};
 
+	struct MorphGraphEdge
+	{
+		uint32_t from = 0, to = 0;
+		float typoCost = 0;
+		std::vector<std::pair<std::u16string, POSTag>> morphs;
+	};
+
+	/**
+	 * @brief 주어진 텍스트의 유효한 형태소 분석 결과 전부를 그래프 형태로 나타내는 구조체
+	 */
+	struct MorphGraph
+	{
+		uint32_t numStates = 0;
+		/** 상태별로 (해당 상태에서 시작하는 간선의 원문 시작 위치, 해당 상태에서 끝나는 간선의 원문 끝 위치)(char16_t 단위)를 담은 벡터.*/
+		std::vector<std::pair<uint32_t, uint32_t>> statePositions;
+		std::vector<MorphGraphEdge> edges;
+		std::vector<TokenResult> topPaths; /**< MorphGraphOption::topN > 0이면 같은 격자에서 찾은 상위 분석(analyze와 같은 결과) */
+	};
+
+	struct MorphGraphOption
+	{
+		size_t maxUnkSpanSize = 0; /**< 한글 음절만으로 된 구간을 위치와 상관없이 미등록어(UN)로 볼 최대 길이(글자 수). 0이면 Kiwi가 만든 미등록어 노드만 쓴다. 미등록어의 품사는 쓰는 쪽이 정한다. */
+		size_t maxUnkSpanSizeWithSpace = 0; /**< 공백을 낀 구간, 로마자·숫자가 섞인 구간을 미등록어(UN)로 볼 최대 길이(공백을 뺀 글자 수) */
+		size_t topN = 0; /**< 0보다 크면 그래프를 만든 격자에서 상위 topN개 분석도 찾아 MorphGraph::topPaths에 담는다 */
+	};
+
 	/**
 	 * @brief 실제 형태소 분석을 수행하는 클래스.
 	 * 
@@ -192,7 +219,9 @@ namespace kiwi
 		Dialect enabledDialects = Dialect::standard;
 
 		Vector<Form> forms;
+		Vector<const Morpheme*> formCandidates; /**< forms의 후보 형태소 목록이 가리키는 배열 */
 		Vector<Morpheme> morphemes;
+		Vector<const Morpheme*> morphemeChunks; /**< morphemes의 조각 목록이 가리키는 배열 */
 		KString typoPool;
 		Vector<size_t> typoPtrs;
 		Vector<TypoForm> typoForms;
@@ -232,6 +261,11 @@ namespace kiwi
 
 		template<class Str, class Pretokenized, class ...Rest>
 		auto _asyncAnalyzeEcho(Str&& str, Pretokenized&& pt, const std::optional<KiwiConfig>& overrideConfig, Rest&&... args) const;
+
+		template<class ChunkNodesCallback>
+		std::vector<TokenResult> analyzeWithNodes(const std::u16string& str, size_t topN, AnalyzeOption option,
+			const std::vector<PretokenizedSpan>& pretokenized, const KiwiConfig& config,
+			KString& normalizedStr, Vector<uint32_t>& positionTable, ChunkNodesCallback&& chunkNodesCallback) const;
 
 		static std::vector<PretokenizedSpan> mapPretokenizedSpansToU16(const std::vector<PretokenizedSpan>& orig, const std::vector<size_t>& bytePositions);
 
@@ -342,6 +376,23 @@ namespace kiwi
 			auto u16str = utf8To16(str, bytePositions);
 			return analyze(u16str, topN, option, mapPretokenizedSpansToU16(pretokenized, bytePositions), overrideConfig);
 		}
+
+		/**
+		 * @brief 주어진 텍스트로부터 생성 가능한 모든 형태소를 담는 '형태 그래프'를 생성하여 반환한다.
+		 *
+		 * @param str 분석할 문자열
+		 * @param option 분석 옵션
+		 * @param graphOption 형태 그래프 생성 옵션
+		 * @param overrideConfig 분석 옵션을 재정의할 KiwiConfig 객체. 빈 값이면 globalConfig를 사용한다.
+		 * 
+		 * @note 이 함수는 analyze로 형태소 분석을 할때와 동일한 과정을 거치지만, graphOption.topN이 0이면 언어 모델을 이용한 최적 경로 탐색은 수행하지 않는다.
+		 따라서 형태소 분석보다 빠르게 수행되며, 생성된 형태 그래프를 이용하여 다양한 분석을 수행할 수 있다.
+		 graphOption.topN > 0이면 같은 격자에서 상위 분석을 찾아 MorphGraph::topPaths에 담는다(analyze(str, topN, option)과 같은 결과).
+		 */
+		MorphGraph buildMorphGraph(const std::u16string& str, AnalyzeOption option,
+			const MorphGraphOption& graphOption = {},
+			const std::optional<KiwiConfig>& overrideConfig = {}
+		) const;
 
 		/**
 		 * @brief 
@@ -710,7 +761,7 @@ namespace kiwi
 		void loadMorphBin(std::istream& is);
 		void saveMorphBin(std::ostream& os) const;
 		FormRaw& addForm(const KString& form);
-		size_t addForm(Vector<FormRaw>& newForms, UnorderedMap<KString, size_t>& newFormMap, KString form) const;
+		size_t addForm(Vector<FormRaw>& newForms, UnorderedMap<KString, size_t>& newFormMap, const KString& form) const;
 
 		
 		void initMorphemes();
@@ -782,6 +833,9 @@ namespace kiwi
 			size_t leftId,
 			size_t rightId,
 			size_t ruleId,
+			const KString& leftForm,
+			const cmb::LeftScan& leftScan,
+			const cmb::LeftScan& leftScanA,
 			Map<int, int>* ruleProfilingCnt = nullptr
 		) const;
 

@@ -612,7 +612,7 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 			morph.chunks.emplace_back(lmId);
 			size_t start = fd.back()[i * 2] - u'0';
 			size_t end = fd.back()[i * 2 + 1] - u'0';
-			morph.chunkPositions.emplace_back(posMap[start], posMap[end] - posMap[start]);
+			morph.chunkPositions.emplace_back(posMap[start], posMap[end]);
 		}
 	endOfLoop2:;
 	}
@@ -970,6 +970,11 @@ void KiwiBuilder::updateMorphemes(size_t vocabSize)
 void KiwiBuilder::loadMorphBin(std::istream& is)
 {
 	serializer::readMany(is, serializer::toKey("KIWI"), forms, morphemes);
+	// 파일에는 chunkPositions가 (시작, 길이)로 저장되어 있다.
+	for (auto& m : morphemes)
+	{
+		for (auto& p : m.chunkPositions) p.second += p.first;
+	}
 	for (auto& form : forms)
 	{
 		const size_t idx = &form - &forms[0];
@@ -980,7 +985,12 @@ void KiwiBuilder::loadMorphBin(std::istream& is)
 
 void KiwiBuilder::saveMorphBin(std::ostream& os) const
 {
-	serializer::writeMany(os, serializer::toKey("KIWI"), forms, morphemes);
+	auto saved = morphemes;
+	for (auto& m : saved)
+	{
+		for (auto& p : m.chunkPositions) p.second -= p.first;
+	}
+	serializer::writeMany(os, serializer::toKey("KIWI"), forms, saved);
 }
 
 ModelType KiwiBuilder::getModelType(const KiwiBuilder::StreamProvider& provider, bool largest)
@@ -1086,6 +1096,11 @@ KiwiBuilder::KiwiBuilder(StreamProvider streamProvider, size_t _numThreads, Buil
 			archType,
 			(modelType == ModelType::congGlobal || modelType == ModelType::congGlobalFp32),
 			(modelType == ModelType::cong || modelType == ModelType::congGlobal));
+	}
+
+	if (auto stream = streamProvider("contraction.dict"))
+	{
+		loadDictionaryFromStream(*stream);
 	}
 
 	if (auto stream = streamProvider("dialect.dict"))
@@ -1606,7 +1621,7 @@ inline KString normalizeWhitespace(const KString& str)
 
 FormRaw& KiwiBuilder::addForm(const KString& form)
 {
-	auto ret = formMap.emplace(form, forms.size());
+	auto ret = formMap.try_emplace(form, forms.size());
 	if (ret.second)
 	{
 		forms.emplace_back(form);
@@ -1614,14 +1629,14 @@ FormRaw& KiwiBuilder::addForm(const KString& form)
 	return forms[ret.first->second];
 }
 
-size_t KiwiBuilder::addForm(Vector<FormRaw>& newForms, UnorderedMap<KString, size_t>& newFormMap, KString form) const
+size_t KiwiBuilder::addForm(Vector<FormRaw>& newForms, UnorderedMap<KString, size_t>& newFormMap, const KString& form) const
 {
 	auto it = formMap.find(form);
 	if (it != formMap.end())
 	{
 		return it->second;
 	}
-	auto ret = newFormMap.emplace(form, forms.size() + newForms.size());
+	auto ret = newFormMap.try_emplace(form, forms.size() + newForms.size());
 	if (ret.second)
 	{
 		newForms.emplace_back(form);
@@ -1764,6 +1779,9 @@ void KiwiBuilder::addCombinedMorphemes(
 	size_t leftId, 
 	size_t rightId, 
 	size_t ruleId,
+	const KString& leftForm,
+	const cmb::LeftScan& leftScan,
+	const cmb::LeftScan& leftScanA,
 	Map<int, int>* ruleProfilingCnt
 ) const
 {
@@ -1779,11 +1797,8 @@ void KiwiBuilder::addCombinedMorphemes(
 		else return newForms[id - forms.size()];
 	};
 
-	const auto leftMorph = getMorph(leftId);
-	auto leftForm = getForm(leftMorph.kform).form;
-	const auto rightMorph = getMorph(rightId);
-	const auto rightForm = getForm(rightMorph.kform).form;
-
+	// addCombinedMorpheme이 newMorphemes, newForms를 늘리므로 참조 대신 필요한 값을 미리 꺼내 둔다
+	const auto& leftMorph = getMorph(leftId);
 	if ((leftMorph.tag == POSTag::unknown || leftMorph.tag == POSTag::unknown_feat_ha) && 
 		find(leftMorph.chunks.begin(), leftMorph.chunks.end(), rightId) != leftMorph.chunks.end())
 	{
@@ -1791,42 +1806,24 @@ void KiwiBuilder::addCombinedMorphemes(
 		// 재귀적 생성을 방지하기 위해 탈출한다.
 		return;
 	}
+	const auto& rightMorph = getMorph(rightId);
 
-	auto res = combiningRule->combine(leftForm, rightForm, ruleId);
-	for (auto& r : res)
+	// 서로 다른 방언끼리는 결합하지 않는다
+	if (!dialectHasIntersection(leftMorph.dialect, rightMorph.dialect)) return;
+	const Dialect lrDialect = dialectAnd(leftMorph.dialect, rightMorph.dialect);
+	const CondVowel rightVowel = rightMorph.vowel();
+	const KString rightForm = getForm(rightMorph.kform).form;
+
+	const auto addResults = [&](const KString& lform, const cmb::LeftScan& scan)
 	{
-		if (!r.ignoreRCond && !FeatureTestor::isMatched(&leftForm, rightMorph.vowel()))
-		{
-			continue;
-		}
-		if (!dialectHasIntersection(r.dialect, leftMorph.dialect) ||
-			!dialectHasIntersection(r.dialect, rightMorph.dialect))
-		{
-			continue;
-		}
-
-		// trim leading space
-		if (!r.str.empty() && r.str[0] == u' ')
-		{
-			r.str.erase(0, 1);
-		}
-
-		addCombinedMorpheme(newForms, newFormMap, newMorphemes, newFormCands, leftId, rightId, r, ruleProfilingCnt);
-	}
-
-	if (isEClass(leftMorph.tag) && leftForm[0] == u'어')
-	{
-		leftForm[0] = u'아';
-
-		auto res = combiningRule->combine(leftForm, rightForm, ruleId);
+		auto res = combiningRule->combine(scan, lform, rightForm, ruleId);
 		for (auto& r : res)
 		{
-			if (!r.ignoreRCond && !FeatureTestor::isMatched(&leftForm, rightMorph.vowel()))
+			if (!r.ignoreRCond && !FeatureTestor::isMatched(&lform, rightVowel))
 			{
 				continue;
 			}
-			if (!dialectHasIntersection(r.dialect, leftMorph.dialect) ||
-				!dialectHasIntersection(r.dialect, rightMorph.dialect))
+			if (!dialectHasIntersection(r.dialect, lrDialect))
 			{
 				continue;
 			}
@@ -1839,6 +1836,14 @@ void KiwiBuilder::addCombinedMorphemes(
 
 			addCombinedMorpheme(newForms, newFormMap, newMorphemes, newFormCands, leftId, rightId, r, ruleProfilingCnt);
 		}
+	};
+
+	addResults(leftForm, leftScan);
+	if (leftScanA.node != (size_t)-1)
+	{
+		KString leftFormA = leftForm;
+		leftFormA[0] = u'아';
+		addResults(leftFormA, leftScanA);
 	}
 }
 
@@ -1882,7 +1887,7 @@ void KiwiBuilder::buildCombinedMorphemes(
 			if (clearIrregular(tag) > POSTag::pa && tag < POSTag::unknown_feat_ha) continue;
 			if (morph.combined) continue;
 
-			if (morph.dialect != Dialect::standard && !(enabledDialects & morph.dialect))
+			if (!isDialectAllowed(morph.dialect, enabledDialects))
 			{
 				continue;
 			}
@@ -1900,11 +1905,11 @@ void KiwiBuilder::buildCombinedMorphemes(
 			{
 				for (auto id : ruleLeftIds[make_tuple(tag, feat | additionalFeature)])
 				{
-					auto res = combiningRule->testLeftPattern(form, id);
-					if (res.empty()) continue;
+					if (id < combiningLeftCands.size() && !combiningLeftCands[id].empty() && combiningLeftCands[id].back() == i) continue;
+					if (!combiningRule->matchesLeftPattern(form, id)) continue;
 
 					if (combiningLeftCands.size() <= id) combiningLeftCands.resize(id + 1);
-					if (combiningLeftCands[id].empty() || combiningLeftCands[id].back() < i) combiningLeftCands[id].emplace_back(i);
+					combiningLeftCands[id].emplace_back(i);
 				}
 			}
 
@@ -1916,8 +1921,7 @@ void KiwiBuilder::buildCombinedMorphemes(
 			if (morph.tag == POSTag::unknown) continue;
 			for (auto id : ruleRightIds[tag])
 			{
-				auto res = combiningRule->testRightPattern(form, id);
-				if (res.empty()) continue;
+				if (!combiningRule->matchesRightPattern(form, id)) continue;
 
 				if (combiningRightCands.size() <= id) combiningRightCands.resize(id + 1);
 				combiningRightCands[id].emplace_back(i);
@@ -2014,20 +2018,34 @@ void KiwiBuilder::buildCombinedMorphemes(
 			const auto lmid = lower_bound(ls.begin(), ls.end(), combiningUpdateIdx);
 			const auto& rs = combiningRightCands[ruleId];
 			const auto rmid = lower_bound(rs.begin(), rs.end(), combiningUpdateIdx);
+			// 왼쪽 형태를 읽은 결과는 오른쪽 형태와 무관하므로 왼쪽 후보마다 한 번만 구한다
+			const auto combineWithRights = [&](size_t leftId, Vector<size_t>::const_iterator rfirst, Vector<size_t>::const_iterator rlast)
+			{
+				if (rfirst == rlast) return;
+				const KString leftForm = getForm(getMorph(leftId).kform).form;
+				const auto leftScan = combiningRule->scanLeft(leftForm, ruleId);
+				cmb::LeftScan leftScanA;
+				if (isEClass(getMorph(leftId).tag) && leftForm[0] == u'어')
+				{
+					KString leftFormA = leftForm;
+					leftFormA[0] = u'아';
+					leftScanA = combiningRule->scanLeft(leftFormA, ruleId);
+				}
+				if (leftScan.node == (size_t)-1 && leftScanA.node == (size_t)-1) return;
+				for (auto rit = rfirst; rit != rlast; ++rit)
+				{
+					addCombinedMorphemes(newForms, newFormMap, newMorphemes, newFormCands, leftId, *rit, ruleId, leftForm, leftScan, leftScanA, ruleProfilingCnt);
+				}
+			};
+
 			for (auto lit = lmid; lit != ls.end(); ++lit)
 			{
-				for (auto rit = rs.begin(); rit != rmid; ++rit)
-				{
-					addCombinedMorphemes(newForms, newFormMap, newMorphemes, newFormCands, *lit, *rit, ruleId, ruleProfilingCnt);
-				}
+				combineWithRights(*lit, rs.begin(), rmid);
 			}
 
 			for (auto lit = ls.begin(); lit != ls.end(); ++lit)
 			{
-				for (auto rit = rmid; rit != rs.end(); ++rit)
-				{
-					addCombinedMorphemes(newForms, newFormMap, newMorphemes, newFormCands, *lit, *rit, ruleId, ruleProfilingCnt);
-				}
+				combineWithRights(*lit, rmid, rs.end());
 			}
 		}
 		combiningUpdateIdx = updated;
@@ -2219,7 +2237,7 @@ size_t KiwiBuilder::loadDictionaryFromStream(std::istream& is)
 			}
 		}
 
-		if (dialect != Dialect::standard && !(enabledDialects & dialect))
+		if (!isDialectAllowed(dialect, enabledDialects))
 		{
 			continue;
 		}
@@ -2313,6 +2331,61 @@ size_t KiwiBuilder::loadDictionaryFromStream(std::istream& is)
 
 namespace kiwi
 {
+	/**
+	 * @brief forms[first, end)를 ComparatorIgnoringSpace::less 순서로 정렬하고, 원래 번호에 대한 새 번호를 idMapper에 쓴다.
+	 * 
+	 * @note ComparatorIgnoringSpace::less의 순서는 (공백을 뺀 문자열, 끝에 붙은 공백 수)의 사전순과 같다.
+	 * 이 키를 미리 만들고, 앞 4글자를 정수 하나로 묶어 대부분의 비교를 정수 비교로 끝낸다. 같은 형태는 원래 번호 순으로 둔다.
+	 */
+	void sortFormsIgnoringSpace(Vector<Form>& forms, size_t first, Vector<size_t>& idMapper)
+	{
+		struct Key
+		{
+			uint64_t prefix;
+			U16StringView str;
+			uint32_t trailingSpaces;
+			uint32_t idx;
+		};
+
+		const size_t n = forms.size() - first;
+		Vector<KString> strippedForms;
+		strippedForms.reserve(count_if(forms.begin() + first, forms.end(), [](const Form& f) { return f.numSpaces > 0; }));
+		Vector<Key> keys(n);
+		for (size_t i = 0; i < n; ++i)
+		{
+			const auto& form = forms[first + i].form;
+			U16StringView str{ form.data(), form.size() };
+			uint32_t trailingSpaces = 0;
+			if (forms[first + i].numSpaces)
+			{
+				while (trailingSpaces < form.size() && form[form.size() - 1 - trailingSpaces] == u' ') ++trailingSpaces;
+				strippedForms.emplace_back(removeSpace(form));
+				str = U16StringView{ strippedForms.back().data(), strippedForms.back().size() };
+			}
+			uint64_t prefix = 0;
+			for (size_t j = 0; j < 4; ++j) prefix = (prefix << 16) | (j < str.size() ? (uint64_t)str[j] : 0);
+			keys[i] = { prefix, str, trailingSpaces, (uint32_t)i };
+		}
+
+		sort(keys.begin(), keys.end(), [](const Key& a, const Key& b)
+		{
+			if (a.prefix != b.prefix) return a.prefix < b.prefix;
+			const int c = a.str.substr(min((size_t)4, a.str.size())).compare(b.str.substr(min((size_t)4, b.str.size())));
+			if (c) return c < 0;
+			if (a.trailingSpaces != b.trailingSpaces) return a.trailingSpaces < b.trailingSpaces;
+			return a.idx < b.idx;
+		});
+
+		Vector<Form> sorted;
+		sorted.reserve(n);
+		for (size_t i = 0; i < n; ++i)
+		{
+			sorted.emplace_back(move(forms[first + keys[i].idx]));
+			idMapper[first + keys[i].idx] = first + i;
+		}
+		move(sorted.begin(), sorted.end(), forms.begin() + first);
+	}
+
 	inline CondVowel reduceVowel(CondVowel v, const Morpheme* m)
 	{
 		if (v == m->vowel) return v;
@@ -2468,6 +2541,35 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 		return a.second > b.second;
 	});
 
+	// 인용 뒤에 생략된 '하'(Match::quotedHaOmission): `어`가 아닌 어미마다 '하/VV + 어미' 형태소를 생성
+	// 이 형태소들은 어느 형태의 후보에도 넣지 않고, 아래에서 원래 Form 바로 뒤에 끼워 넣는 같은 형태의 Form에만 연결됨
+	Vector<pair<size_t, Vector<uint32_t>>> quotedHaCands; // (형태 번호, 새 형태소 번호들)
+	const size_t haId = findMorpheme(u"하", POSTag::vv);
+	if (haId != (size_t)-1)
+	{
+		for (size_t fi = defaultFormSize; fi < forms.size(); ++fi)
+		{
+			const auto& f = forms[fi];
+			if (f.form.empty() || !isHangulSyllable(f.form[0]) || (f.form[0] - 0xAC00) / 588 == 11) continue; // 초성 11: ㅇ
+			Vector<uint32_t> ids;
+			for (auto mid : f.candidate)
+			{
+				const auto& m = morphemes[mid];
+				if (!isEClass(m.tag) || !m.chunks.empty()) continue;
+				ids.emplace_back(morphemes.size() + combinedMorphemes.size());
+				combinedMorphemes.emplace_back(POSTag::unknown);
+				auto& nm = combinedMorphemes.back();
+				nm.kform = fi;
+				nm.lmMorphemeId = ids.back();
+				nm.chunks = { (uint32_t)haId, mid };
+				nm.chunkPositions = { { 0, (uint8_t)f.form.size() }, { 0, (uint8_t)f.form.size() } };
+				nm.userScore = m.userScore;
+				nm.dialect = m.dialect;
+			}
+			if (!ids.empty()) quotedHaCands.emplace_back(fi, move(ids));
+		}
+	}
+
 	ret.forms.reserve(forms.size() + combinedForms.size() + 1);
 	ret.morphemes.reserve(morphemes.size() + combinedMorphemes.size());
 	ret.combiningRule = combiningRule;
@@ -2477,6 +2579,17 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 		ret.pool = make_unique<utils::ThreadPool>(numThreads);
 	}
 
+	// Form의 후보 목록은 ret.formCandidates를 가리키므로, 다시 할당되지 않도록 필요한 만큼 미리 확보한다
+	{
+		size_t numCandidates = 0;
+		for (auto& f : forms) numCandidates += f.candidate.size();
+		for (auto& f : combinedForms) numCandidates += f.candidate.size();
+		for (auto& p : newFormCands) numCandidates += p.second.size();
+		for (auto& c : quotedHaCands) numCandidates += c.second.size();
+		ret.formCandidates.reserve(numCandidates);
+	}
+	const auto* formCandidatesData = ret.formCandidates.data();
+
 	for (auto& f : forms)
 	{
 		auto it = newFormCands.find(ret.forms.size());
@@ -2484,13 +2597,13 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 		bool zSiotAppendable = isZSiotAppendable(f.form, f.candidate, morphemes, combinedMorphemes);
 		if (it == newFormCands.end())
 		{
-			ret.forms.emplace_back(bake(f, ret.morphemes.data(), zCodaAppendable, zSiotAppendable));
+			ret.forms.emplace_back(bake(f, ret.morphemes.data(), zCodaAppendable, zSiotAppendable, ret.formCandidates));
 		}
 		else
 		{
 			zCodaAppendable = zCodaAppendable || isZCodaAppendable(f.form, it->second, morphemes, combinedMorphemes);
 			zSiotAppendable = zSiotAppendable || isZSiotAppendable(f.form, it->second, morphemes, combinedMorphemes);
-			ret.forms.emplace_back(bake(f, ret.morphemes.data(), zCodaAppendable, zSiotAppendable, it->second));
+			ret.forms.emplace_back(bake(f, ret.morphemes.data(), zCodaAppendable, zSiotAppendable, ret.formCandidates, it->second));
 		}
 		
 	}
@@ -2500,37 +2613,68 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 			|| isZCodaAppendable(f.form, newFormCands[ret.forms.size()], morphemes, combinedMorphemes);
 		bool zSiotAppendable = isZSiotAppendable(f.form, f.candidate, morphemes, combinedMorphemes)
 			|| isZSiotAppendable(f.form, newFormCands[ret.forms.size()], morphemes, combinedMorphemes);
-		ret.forms.emplace_back(bake(f, ret.morphemes.data(), zCodaAppendable, zSiotAppendable, newFormCands[ret.forms.size()]));
+		ret.forms.emplace_back(bake(f, ret.morphemes.data(), zCodaAppendable, zSiotAppendable, ret.formCandidates, newFormCands[ret.forms.size()]));
 	}
 
 	Vector<size_t> newFormIdMapper(ret.forms.size());
 	iota(newFormIdMapper.begin(), newFormIdMapper.begin() + defaultFormSize, 0);
-	utils::sortWriteInvIdx(ret.forms.begin() + defaultFormSize, ret.forms.end(), newFormIdMapper.begin() + defaultFormSize, defaultFormSize);
+	sortFormsIgnoringSpace(ret.forms, defaultFormSize, newFormIdMapper);
+
+	// quotedHa 후보가 있는 Form마다 바로 뒤에 같은 형태의 빈 Form을 끼워 넣음(Form::hasQuotedHaForm).
+	Vector<size_t> quotedHaSlots; // quotedHaCands와 같은 순서로, 끼워 넣은 Form의 위치
+	if (!quotedHaCands.empty())
+	{
+		Vector<uint8_t> needsSlot(ret.forms.size());
+		for (auto& c : quotedHaCands) needsSlot[newFormIdMapper[c.first]] = 1;
+		Vector<size_t> shifted(ret.forms.size());
+		Vector<Form> withSlots;
+		withSlots.reserve(ret.forms.size() + quotedHaCands.size() + 1);
+		for (size_t i = 0; i < ret.forms.size(); ++i)
+		{
+			shifted[i] = withSlots.size();
+			withSlots.emplace_back(move(ret.forms[i]));
+			if (!needsSlot[i]) continue;
+			Form slot;
+			slot.form = withSlots.back().form;
+			slot.numSpaces = withSlots.back().numSpaces;
+			withSlots.emplace_back(move(slot));
+		}
+		ret.forms = move(withSlots);
+		for (auto& m : newFormIdMapper) m = shifted[m];
+		for (auto& c : quotedHaCands) quotedHaSlots.emplace_back(newFormIdMapper[c.first] + 1);
+	}
 	ret.forms.emplace_back();
 
-	uint8_t formHash = 0;
+	bool formHash = false;
 	for (size_t i = 1; i < ret.forms.size(); ++i)
 	{
-		if (!ComparatorIgnoringSpace::equal(ret.forms[i].form, ret.forms[i - 1].form)) ++formHash;
+		if (!ComparatorIgnoringSpace::equal(ret.forms[i].form, ret.forms[i - 1].form)) formHash = !formHash;
 		ret.forms[i].formHash = formHash;
 	}
 
+	// 형태소의 조각 목록은 ret.morphemeChunks를 가리키므로, 다시 할당되지 않도록 필요한 만큼 미리 확보한다
+	{
+		size_t numSlots = 0;
+		for (auto& m : morphemes) numSlots += Morpheme::chunkSlots(m.chunks.size());
+		for (auto& m : combinedMorphemes) numSlots += Morpheme::chunkSlots(m.chunks.size());
+		ret.morphemeChunks.reserve(numSlots);
+	}
 	for (auto& m : morphemes)
 	{
-		ret.morphemes.emplace_back(bake(m, ret.morphemes.data(), ret.forms.data(), newFormIdMapper));
+		ret.morphemes.emplace_back(bake(m, ret.morphemes.data(), ret.forms.data(), newFormIdMapper, ret.morphemeChunks));
 	}
 	for (auto& m : combinedMorphemes)
 	{
-		ret.morphemes.emplace_back(bake(m, ret.morphemes.data(), ret.forms.data(), newFormIdMapper));		
+		ret.morphemes.emplace_back(bake(m, ret.morphemes.data(), ret.forms.data(), newFormIdMapper, ret.morphemeChunks));
 	}
 
 	// 사이시옷이 포함된 경우는 saisiot을 true로, 그 외에는 complex를 true로 설정
 	for (auto& m : ret.morphemes)
 	{
 		if (!m.complex) continue;
-		for (size_t i = 0; i < m.chunks.size(); ++i)
+		for (auto c : m.chunks())
 		{
-			if (m.chunks[i]->tag != POSTag::z_siot) continue;
+			if (c->tag != POSTag::z_siot) continue;
 			m.complex = false;
 			m.saisiot = true;
 			break;
@@ -2549,45 +2693,58 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 	for (size_t i = defaultFormSize; i < ret.forms.size() - 1; ++i)
 	{
 		auto& f = ret.forms[i];
-		if (f.candidate.empty()) continue;
+		if (f.candidate().empty()) continue;
 
-		if (f.candidate[0]->vowel != CondVowel::none)
+		if (f.candidate()[0]->vowel != CondVowel::none)
 		{
-			f.vowel = accumulate(f.candidate.begin(), f.candidate.end(), f.candidate[0]->vowel, reduceVowel);
+			f.vowel = accumulate(f.candidate().begin(), f.candidate().end(), f.candidate()[0]->vowel, reduceVowel);
 		}
 
-		if (f.candidate[0]->polar != CondPolarity::none)
+		if (f.candidate()[0]->polar != CondPolarity::none)
 		{
-			f.polar = accumulate(f.candidate.begin(), f.candidate.end(), f.candidate[0]->polar, reducePolar);
+			f.polar = accumulate(f.candidate().begin(), f.candidate().end(), f.candidate()[0]->polar, reducePolar);
 		}
 
-		f.hasJClass = any_of(f.candidate.begin(), f.candidate.end(), [&](const Morpheme* m)
+		f.hasJClass = any_of(f.candidate().begin(), f.candidate().end(), [&](const Morpheme* m)
 		{
 			return isJClass(m->tag) || m->tag == POSTag::ec || m->tag == POSTag::ef;
 		});
 
-		f.hasAnyFullMorphemes = any_of(f.candidate.begin(), f.candidate.end(), [&](const Morpheme* m)
+		f.hasAnyFullMorphemes = any_of(f.candidate().begin(), f.candidate().end(), [&](const Morpheme* m)
 		{
 			const auto tag = clearIrregular(m->tag);
 			return m->dialect == Dialect::standard && tag != POSTag::unknown && tag != POSTag::pa && tag != POSTag::pv;
 		});
 
-		f.dialect = accumulate(f.candidate.begin(), f.candidate.end(), f.candidate[0]->dialect, reduceDialect);
-		if (f.dialect != Dialect::standard && !(enabledDialects & f.dialect))
+		f.dialect = accumulate(f.candidate().begin(), f.candidate().end(), f.candidate()[0]->dialect, reduceDialect);
+		if (!isDialectAllowed(f.dialect, enabledDialects))
 		{
 			continue;
 		}
 		sortedForms.emplace_back(&f);
 	}
 
+	for (size_t q = 0; q < quotedHaCands.size(); ++q)
+	{
+		auto& ids = quotedHaCands[q].second;
+		auto& orig = ret.forms[quotedHaSlots[q] - 1];
+		auto& alt = ret.forms[quotedHaSlots[q]];
+		alt.zCodaAppendable = orig.zCodaAppendable;
+		alt.zSiotAppendable = 0;
+		alt.hasJClass = orig.hasJClass;
+		alt.hasAnyFullMorphemes = 0; // 후보가 모두 '하/VV + 어미'로 나뉜 형태소다
+		const size_t first = ret.formCandidates.size();
+		for (auto id : ids) ret.formCandidates.emplace_back(&ret.morphemes[id]);
+		alt.setCandidates(ret.formCandidates.data() + first, ids.size());
+		alt.dialect = accumulate(alt.candidate().begin(), alt.candidate().end(), alt.candidate()[0]->dialect, reduceDialect);
+		orig.hasQuotedHaForm = 1;
+	}
+
+	if (ret.formCandidates.data() != formCandidatesData) throw std::logic_error{ "formCandidates was reallocated" };
+
 	// 오타 교정이 없는 경우 일반 Trie 생성
 	if (typos.empty())
 	{
-		sort(sortedForms.begin(), sortedForms.end(), [](const Form* a, const Form* b)
-		{
-			return ComparatorIgnoringSpace::less(a->form, b->form);
-		});
-
 		size_t estimatedNodeSize = 0;
 		const KString* prevForm = nullptr;
 		for (auto f : sortedForms)

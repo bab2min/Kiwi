@@ -1,4 +1,5 @@
-﻿#include <cassert>
+﻿#include <algorithm>
+#include <cassert>
 #include <fstream>
 #include <kiwi/Utils.h>
 #include <kiwi/Mmap.h>
@@ -420,9 +421,13 @@ namespace kiwi
 		return tagToKString(t);
 	}
 
-	bool ComparatorIgnoringSpace::less(const KString& a, const KString& b, const char16_t space)
+	// 공통 접두는 한 번에 건너뛰고, 처음 다른 글자가 둘 다 공백이 아니면 바로 결과를 낸다. 결과는 -1(a < b), 0(같음), 1(a > b)
+	static int compareIgnoringSpace(const KString& a, const KString& b, const kchar_t space)
 	{
-		size_t i = 0, j = 0;
+		const size_t n = std::min(a.size(), b.size());
+		size_t i = std::mismatch(a.data(), a.data() + n, b.data()).first - a.data(), j = i;
+		if (i < n && a[i] != space && b[i] != space) return a[i] < b[i] ? -1 : 1;
+
 		while (i < a.size() && j < b.size())
 		{
 			if (a[i] == space && b[j] == space)
@@ -451,48 +456,20 @@ namespace kiwi
 				continue;
 			}
 
-			return a[i] < b[j];
+			return a[i] < b[j] ? -1 : 1;
 		}
-		if (i >= a.size() && j >= b.size()) return false;
-		if (i >= a.size()) return true;
-		return false;
+		if (i >= a.size() && j >= b.size()) return 0;
+		return i >= a.size() ? -1 : 1;
+	}
+
+	bool ComparatorIgnoringSpace::less(const KString& a, const KString& b, const char16_t space)
+	{
+		return compareIgnoringSpace(a, b, space) < 0;
 	}
 
 	bool ComparatorIgnoringSpace::equal(const KString& a, const KString& b, const kchar_t space)
 	{
-		size_t i = 0, j = 0;
-		while (i < a.size() && j < b.size())
-		{
-			if (a[i] == space && b[j] == space)
-			{
-				++i;
-				++j;
-				continue;
-			}
-
-			if (a[i] == space)
-			{
-				++i;
-				continue;
-			}
-
-			if (b[j] == space)
-			{
-				++j;
-				continue;
-			}
-
-			if (a[i] == b[j])
-			{
-				++i;
-				++j;
-				continue;
-			}
-
-			return false;
-		}
-		if (i >= a.size() && j >= b.size()) return true;
-		return false;
+		return compareIgnoringSpace(a, b, space) == 0;
 	}
 
 	KString removeSpace(const KString& str, const kchar_t space)

@@ -43,14 +43,18 @@ namespace kiwi
 		Vector<Span> spans;
 		Vector<KString> formStrs;
 		Vector<Form> forms;
+		Vector<const Morpheme*> candidates; // forms의 후보 형태소 목록이 가리키는 배열
 		Vector<Morpheme> morphemes;
+		Vector<const Morpheme*> chunks; // morphemes의 조각 목록이 가리키는 배열
 
 		void clear()
 		{
 			spans.clear();
 			formStrs.clear();
 			forms.clear();
+			candidates.clear();
 			morphemes.clear();
+			chunks.clear();
 		}
 	};
 
@@ -63,6 +67,7 @@ namespace kiwi
 		float typoCost = 0;
 		uint32_t typoFormId = 0;
 		uint32_t spaceErrors = 0;
+		bool fuzzy = false;
 
 		KGraphNode(uint32_t _startPos = 0, uint32_t _endPos = 0, const Form* _form = nullptr, float _typoCost = 0) 
 			: form(_form), startPos(_startPos), endPos(_endPos), typoCost(_typoCost) {}

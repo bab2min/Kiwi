@@ -291,10 +291,10 @@ namespace kiwi
 				leftFormFirst = morphBase[prevPath.wid].kform->data();
 				leftFormLast = leftFormFirst + morphBase[prevPath.wid].kform->size();
 			}
-			else if (prevPath.morpheme->tag == POSTag::unknown && !prevPath.morpheme->chunks.empty())
+			else if (prevPath.morpheme->tag == POSTag::unknown && !prevPath.morpheme->chunks().empty())
 			{
 				// pretokenized morpheme이 이전 형태소인 경우
-				const auto* lastMorph = prevPath.morpheme->chunks[prevPath.morpheme->chunks.size() - 1];
+				const auto* lastMorph = prevPath.morpheme->chunks()[prevPath.morpheme->chunks().size() - 1];
 				leftFormFirst = lastMorph->getForm().data();
 				leftFormLast = leftFormFirst + lastMorph->getForm().size();
 			}
@@ -409,13 +409,14 @@ namespace kiwi
 				{
 					if (splitComplex && curMorph->hasComplex()) continue;
 					if (blocklist && curMorph->hasMorpheme(*blocklist)) continue;
-					if (curMorph->dialect != Dialect::standard && !(curMorph->dialect & allowedDialect)) continue;
+					if (!isDialectAllowed(curMorph->dialect, allowedDialect)) continue;
 
 					// 덧붙은 받침(zCoda)을 위한 지름길
 					if (curMorph->tag == POSTag::z_coda)
 					{
 						for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
 						{
+							if (prev->fuzzy) continue;
 							for (size_t p = pathIndices[prev - startNode]; p < pathIndices[prev - startNode + 1]; ++p)
 							{
 								auto lastTag = kw->morphemes[pathes[p].wid].tag;
@@ -463,9 +464,9 @@ namespace kiwi
 							&& curMorph->kform
 							&& curMorph->kform->size() == 1
 							&& ((*curMorph->kform)[0] == u'다' || (*curMorph->kform)[0] == u'게' || (*curMorph->kform)[0] == u'지')
-							&& curMorph->chunks[0]->kform
-							&& curMorph->chunks[0]->kform->size() == 1
-							&& (*curMorph->chunks[0]->kform)[0] == u'하')
+							&& curMorph->chunks()[0]->kform
+							&& curMorph->chunks()[0]->kform->size() == 1
+							&& (*curMorph->chunks()[0]->kform)[0] == u'하')
 						{
 							continue;
 						}
@@ -569,8 +570,8 @@ namespace kiwi
 			// if the morpheme has chunk set
 			else
 			{
-				lastMorph = curMorph->chunks[curMorph->chunks.size() - 1];
-				firstWid = curMorph->chunks[0]->lmMorphemeId;
+				lastMorph = curMorph->chunks()[curMorph->chunks().size() - 1];
+				firstWid = curMorph->chunks()[0]->lmMorphemeId;
 			}
 
 			Wid lastSeqId;
@@ -639,9 +640,9 @@ namespace kiwi
 						firstChunkScore += ll;
 						if (!curMorph->isSingle())
 						{
-							for (size_t i = 1; i < curMorph->chunks.size(); ++i)
+							for (size_t i = 1; i < curMorph->chunks().size(); ++i)
 							{
-								const auto wid = curMorph->chunks[i]->lmMorphemeId;
+								const auto wid = curMorph->chunks()[i]->lmMorphemeId;
 								if (morphBase[wid].tag == POSTag::p)
 								{
 									// prohibit <v> without <chunk>
@@ -722,7 +723,7 @@ namespace kiwi
 						}
 						else
 						{
-							firstWid = curMorph->chunks[0]->lmMorphemeId;
+							firstWid = curMorph->chunks()[0]->lmMorphemeId;
 						}
 
 						// 사이시옷 뒤에 명사가 아닌 태그가 오거나 공백이 있는 경우 제외
@@ -768,10 +769,10 @@ namespace kiwi
 							}
 							else
 							{
-								length = curMorph->chunks.size();
+								length = curMorph->chunks().size();
 								for (size_t i = 1; i < length; ++i)
 								{
-									const Wid wid = curMorph->chunks[i]->lmMorphemeId;
+									const Wid wid = curMorph->chunks()[i]->lmMorphemeId;
 									if (morphBase[wid].tag == POSTag::p)
 									{
 										goto invalidCandidate;
@@ -788,7 +789,7 @@ namespace kiwi
 						{
 							for (size_t i = 1; i < length; ++i)
 							{
-								nextWids.emplace_back(curMorph->chunks[i]->lmMorphemeId);
+								nextWids.emplace_back(curMorph->chunks()[i]->lmMorphemeId);
 							}
 						}
 						continue;
@@ -830,8 +831,8 @@ namespace kiwi
 				// if the morpheme has chunk set
 				else
 				{
-					firstMorph = curMorph->chunks[0];
-					lastMorph = curMorph->chunks[curMorph->chunks.size() - 1];
+					firstMorph = curMorph->chunks()[0];
+					lastMorph = curMorph->chunks()[curMorph->chunks().size() - 1];
 				}
 
 				Wid lastSeqId;
@@ -936,7 +937,7 @@ namespace kiwi
 			{
 				if (splitComplex && curMorph->hasComplex()) continue;
 				if (blocklist && curMorph->hasMorpheme(*blocklist)) continue;
-				if (curMorph->dialect != Dialect::standard && !(curMorph->dialect & allowedDialect)) continue;
+				if (!isDialectAllowed(curMorph->dialect, allowedDialect)) continue;
 
 				// 덧붙은 받침(zCoda)을 위한 지름길
 				if (curMorph->tag == POSTag::z_coda)
@@ -957,9 +958,9 @@ namespace kiwi
 						&& curMorph->kform
 						&& curMorph->kform->size() == 1
 						&& ((*curMorph->kform)[0] == u'다' || (*curMorph->kform)[0] == u'게' || (*curMorph->kform)[0] == u'지')
-						&& curMorph->chunks[0]->kform
-						&& curMorph->chunks[0]->kform->size() == 1
-						&& (*curMorph->chunks[0]->kform)[0] == u'하')
+						&& curMorph->chunks()[0]->kform
+						&& curMorph->chunks()[0]->kform->size() == 1
+						&& (*curMorph->chunks()[0]->kform)[0] == u'하')
 					{
 						continue;
 					}
@@ -974,6 +975,7 @@ namespace kiwi
 				{
 					for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
 					{
+						if (prev->fuzzy) continue;
 						for (size_t p = pathIndices[prev - startNode]; p < pathIndices[prev - startNode + 1]; ++p)
 						{
 							auto lastTag = kw->morphemes[pathes[p].wid].tag;
@@ -1127,8 +1129,8 @@ namespace kiwi
 			}
 			float dialectCostDiff = cur->morpheme->dialect == Dialect::standard ? 0 : dialectCost;
 			auto morpheme = cur->morpheme;
-			const size_t numNewTokens = (splitSaisiot && morpheme->saisiot) || !(morpheme->chunks.empty() || morpheme->complex || morpheme->saisiot) 
-				? morpheme->chunks.size() : 1;
+			const size_t numNewTokens = (splitSaisiot && morpheme->saisiot) || !(morpheme->chunks().empty() || morpheme->complex || morpheme->saisiot) 
+				? morpheme->chunks().size() : 1;
 			
 			const float firstScore = cur->firstChunkScore + typoCostDiff * typoCostWeight; // typoCost는 첫번째 토큰이 전부 받았었으므로
 			const float restScores = numNewTokens > 1 ? (scoreDiff - cur->firstChunkScore) / (numNewTokens - 1) : 0;
@@ -1139,9 +1141,9 @@ namespace kiwi
 			{
 				for (size_t ch = 0; ch < numNewTokens; ++ch)
 				{
-					auto& p = morpheme->chunks.getSecond(ch);
+					auto& p = morpheme->chunkPositions()[ch];
 					ret.emplace_back(
-						unifyMorpheme(morpheme->chunks[ch]),
+						unifyMorpheme(morpheme->chunks()[ch]),
 						KString{},
 						gNode.startPos + p.first,
 						gNode.startPos + p.second,
@@ -1154,7 +1156,7 @@ namespace kiwi
 				}
 				ret.back().end = gNode.endPos;
 			}
-			else if (morpheme->chunks.empty() || morpheme->complex || morpheme->saisiot)
+			else if (morpheme->chunks().empty() || morpheme->complex || morpheme->saisiot)
 			{
 				ret.emplace_back(
 					unifyMorpheme(morpheme),
@@ -1171,16 +1173,16 @@ namespace kiwi
 			else if (morpheme->combineSocket)
 			{
 				ret.back().morph = ret.back().morph->getCombined();
-				ret.back().end = gNode.startPos + morpheme->chunks.getSecond(0).second;
+				ret.back().end = gNode.startPos + morpheme->chunkPositions()[0].second;
 				ret.back().wordScore = firstScore;
 				ret.back().typoCost = typoCostDiff;
 				ret.back().dialectCost = dialectCostDiff;
 				ret.back().typoFormId = typoCostDiff ? gNode.typoFormId : 0;
 				for (size_t ch = 1; ch < numNewTokens; ++ch)
 				{
-					auto& p = morpheme->chunks.getSecond(ch);
+					auto& p = morpheme->chunkPositions()[ch];
 					ret.emplace_back(
-						unifyMorpheme(morpheme->chunks[ch]),
+						unifyMorpheme(morpheme->chunks()[ch]),
 						KString{},
 						gNode.startPos + p.first,
 						gNode.startPos + p.second,
@@ -1197,9 +1199,9 @@ namespace kiwi
 			{
 				for (size_t ch = 0; ch < numNewTokens; ++ch)
 				{
-					auto& p = morpheme->chunks.getSecond(ch);
+					auto& p = morpheme->chunkPositions()[ch];
 					ret.emplace_back(
-						unifyMorpheme(morpheme->chunks[ch]),
+						unifyMorpheme(morpheme->chunks()[ch]),
 						KString{},
 						gNode.startPos + p.first,
 						gNode.startPos + p.second,
@@ -1273,7 +1275,7 @@ namespace kiwi
 			}
 			if (graph[i].form->form.size() < 2) continue;
 			targetMorphs.clear();
-			for (auto& m : graph[i].form->candidate)
+			for (auto& m : graph[i].form->candidate())
 			{
 				if (m->tag == POSTag::nng || m->tag == POSTag::nnp)
 				{
@@ -1564,6 +1566,65 @@ namespace kiwi
 		return score;
 	}
 
+	/**
+	 * 끝 위치가 같은 노드 [first, last)의 경로 중, 오타 노드의 경로가 같은 시작 상태(rootId)의 상위 topN개보다
+	 * cutOffThreshold 넘게 낮으면 지워서 불필요한 탐색 경로를 줄인다.
+	 */
+	template<class LangModel>
+	template<class WordLL>
+	void BestPathFinder<LangModel>::cutOffTypoPathes(
+		Vector<WordLL>& pathes,
+		Vector<size_t>& pathIndices,
+		size_t first, size_t last) const
+	{
+		if (none_of(graph + first, graph + last, [](const KGraphNode& n) { return n.typoCost > 0; })) return;
+
+		const auto rootIdx = [](const WordLL& c) { return c.rootId == commonRootId ? (size_t)0 : (size_t)c.rootId + 1; };
+		thread_local Vector<float> maxScores;
+		maxScores.clear();
+		for (size_t p = pathIndices[first]; p < pathIndices[last]; ++p)
+		{
+			auto& c = pathes[p];
+			if (c.combineSocket) continue;
+			const size_t r = rootIdx(c);
+			if (maxScores.size() < (r + 1) * topN) maxScores.resize((r + 1) * topN, -INFINITY);
+			auto* heap = maxScores.data() + r * topN;
+			if (c.accScore > heap[0])
+			{
+				pop_heap(heap, heap + topN, greater<float>{});
+				heap[topN - 1] = c.accScore;
+				push_heap(heap, heap + topN, greater<float>{});
+			}
+		}
+
+		const size_t rangeBegin = pathIndices[first];
+		thread_local Vector<uint32_t> movedTo;
+		movedTo.assign(pathIndices[last] - rangeBegin, (uint32_t)-1);
+		size_t validPosition = rangeBegin;
+		for (size_t i = first; i < last; ++i)
+		{
+			const size_t b = pathIndices[i], e = pathIndices[i + 1];
+			pathIndices[i] = validPosition;
+			for (size_t p = b; p < e; ++p)
+			{
+				auto& c = pathes[p];
+				if (c.parent >= rangeBegin)
+				{
+					const uint32_t np = movedTo[c.parent - rangeBegin];
+					if (np == (uint32_t)-1) continue;
+					c.parent = np;
+				}
+				if (graph[i].typoCost > 0 && !c.combineSocket
+					&& c.accScore + config.cutOffThreshold < maxScores[rootIdx(c) * topN]) continue;
+				movedTo[p - rangeBegin] = (uint32_t)validPosition;
+				if (validPosition != p) pathes[validPosition] = move(pathes[p]);
+				validPosition++;
+			}
+		}
+		pathIndices[last] = validPosition;
+		pathes.resize(validPosition);
+	}
+
 	template<class LangModel>
 	template<bool useOovTotalConsistency>
 	Vector<PathResult> BestPathFinder<LangModel>::findBestPathDispatched()
@@ -1650,15 +1711,21 @@ namespace kiwi
 
 		std::array<uint32_t, sizeof(uint16_t) * 8> prevOovIdcs = {0,};
 		size_t prevOovPtrStart = 0, prevOovPtrEnd = 0;
+		size_t sameEndStart = 1;
 		// middle nodes
 		for (size_t i = 1; i < graphSize - 1; ++i)
 		{
 			auto* node = &graph[i];
+			if (node->endPos != graph[sameEndStart].endPos)
+			{
+				cutOffTypoPathes(pathes, pathIndices, sameEndStart, i);
+				sameEndStart = i;
+			}
 			const bool isPretokenizedNode = (
 				node->form 
-				&& node->form->candidate.size() == 1 
-				&& node->form->candidate[0]->tag == POSTag::unknown 
-				&& !node->form->candidate[0]->chunks.empty()
+				&& node->form->candidate().size() == 1 
+				&& node->form->candidate()[0]->tag == POSTag::unknown 
+				&& !node->form->candidate()[0]->chunks().empty()
 			);
 			size_t ownFormId = 0;
 			if (!node->uform.empty())
@@ -1685,13 +1752,13 @@ namespace kiwi
 			bool oovUpdated = false;
 			if (node->form)
 			{
-				evaluator(i, ownFormId, node->form->candidate, 
+				evaluator(i, ownFormId, node->form->candidate(), 
 					0.f, splitComplex, splitSaisiot, mergeSaisiot, blocklist, allowedDialects, dialectCost,
 					currentOovNodeIdcs.data(), currentOovNodeIdcs.size());
 				if (!isPretokenizedNode && node->typoCost == 0 && node->typoFormId == 0
-					&& all_of(node->form->candidate.begin(), node->form->candidate.end(), [](const Morpheme* m)
+					&& all_of(node->form->candidate().begin(), node->form->candidate().end(), [](const Morpheme* m)
 				{
-					return m->combineSocket || !(m->chunks.empty() || m->complex || m->saisiot);
+					return m->combineSocket || !(m->chunks().empty() || m->complex || m->saisiot);
 				}))
 				{
 					ownFormList.emplace_back(node->form->form);
@@ -1806,9 +1873,9 @@ namespace kiwi
 			{
 				auto p = pathes[pidx]; // copy: emplace_back below can reallocate pathes
 				if (p.combineSocket) continue;
-				if (!(p.morpheme->chunks.empty() || p.morpheme->complex || p.morpheme->saisiot))
+				if (!(p.morpheme->chunks().empty() || p.morpheme->complex || p.morpheme->saisiot))
 				{
-					if (p.morpheme->chunks.size() <= (p.morpheme->combineSocket ? 2 : 1))
+					if (p.morpheme->chunks().size() <= (p.morpheme->combineSocket ? 2 : 1))
 					{
 						if (!FeatureTestor::isMatched(nullptr, p.morpheme->vowel)) continue;
 					}

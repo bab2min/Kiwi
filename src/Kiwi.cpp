@@ -1,4 +1,5 @@
 #include <fstream>
+#include <numeric>
 
 #include <kiwi/Kiwi.h>
 #include <kiwi/Utils.h>
@@ -830,7 +831,13 @@ namespace kiwi
 		ret.spans.reserve(pretokenized.size());
 		ret.formStrs.reserve(totTokens);
 		ret.forms.reserve(pretokenized.size());
+		ret.candidates.reserve(pretokenized.size() * 2); // Form마다 후보는 둘 이하
 		ret.morphemes.reserve(totTokens);
+		{
+			size_t numSlots = 0;
+			for (auto& s : pretokenized) if (s.tokenization.size() > 1) numSlots += Morpheme::chunkSlots(s.tokenization.size());
+			ret.chunks.reserve(numSlots);
+		}
 		for (auto& s : pretokenized)
 		{
 			ret.spans.emplace_back();
@@ -851,8 +858,8 @@ namespace kiwi
 			{
 				auto formStr = normalizeHangul(s.tokenization[0].form);
 				auto* tform = findForm(formTrie, formData, formStr); 
-				if (tform && tform->candidate.size() == 1 &&
-					areTagsEqual(tform->candidate[0]->tag, s.tokenization[0].tag, !!s.tokenization[0].inferRegularity))
+				if (tform && tform->candidate().size() == 1 &&
+					areTagsEqual(tform->candidate()[0]->tag, s.tokenization[0].tag, !!s.tokenization[0].inferRegularity))
 					// reuse the predefined form & morpheme
 				{
 					span.form = tform;
@@ -866,7 +873,7 @@ namespace kiwi
 					if (tform)
 					{
 						size_t i = 0;
-						for (auto m : tform->candidate)
+						for (auto m : tform->candidate())
 						{
 							if (areTagsEqual(m->tag, s.tokenization[0].tag, s.tokenization[0].inferRegularity))
 							{
@@ -876,14 +883,13 @@ namespace kiwi
 						}
 					}
 
-					form.candidate = FixedVector<const Morpheme*>{ (size_t)(foundMorph[1] ? 2 : 1) };
-					
+					const size_t firstCand = ret.candidates.size();
 					if (foundMorph[0])
 					{
-						form.candidate[0] = foundMorph[0];
+						ret.candidates.emplace_back(foundMorph[0]);
 						if (foundMorph[1])
 						{
-							form.candidate[1] = foundMorph[1];
+							ret.candidates.emplace_back(foundMorph[1]);
 						}
 					}
 					else
@@ -897,8 +903,9 @@ namespace kiwi
 						morph.complex = 0;
 						morph.saisiot = 0;
 						morph.lmMorphemeId = getDefaultMorphemeId(s.tokenization[0].tag);
-						form.candidate[0] = &morph;
+						ret.candidates.emplace_back(&morph);
 					}
+					form.setCandidates(ret.candidates.data() + firstCand, ret.candidates.size() - firstCand);
 					span.form = &form;
 				}
 			}
@@ -906,14 +913,13 @@ namespace kiwi
 			{
 				ret.forms.emplace_back();
 				auto& form = ret.forms.back();
-				form.candidate = FixedVector<const Morpheme*>{ 1 };
 				ret.morphemes.emplace_back();
 				auto& morph = ret.morphemes.back();
 				morph.vowel = CondVowel::none;
 				morph.polar = CondPolarity::none;
 				morph.complex = 0;
 				morph.saisiot = 0;
-				morph.chunks = FixedPairVector<const Morpheme*, std::pair<uint8_t, uint8_t>>{ s.tokenization.size() };
+				auto [chunkMorphs, chunkPositions] = morph.allocChunks(ret.chunks, s.tokenization.size());
 				for (size_t i = 0; i < s.tokenization.size(); ++i)
 				{
 					auto& t = s.tokenization[i];
@@ -922,7 +928,7 @@ namespace kiwi
 					const Morpheme* foundMorph = nullptr;
 					if (tform)
 					{
-						for (auto m : tform->candidate)
+						for (auto m : tform->candidate())
 						{
 							if (m->tag == t.tag)
 							{
@@ -947,11 +953,12 @@ namespace kiwi
 						foundMorph = &cmorph;
 					}
 
-					morph.chunks[i] = foundMorph;
-					morph.chunks.getSecond(i) = make_pair(positionTable[t.begin + s.begin] - span.begin, positionTable[t.end + s.begin] - span.begin);
+					chunkMorphs[i] = foundMorph;
+					chunkPositions[i] = make_pair(positionTable[t.begin + s.begin] - span.begin, positionTable[t.end + s.begin] - span.begin);
 				}
 
-				form.candidate[0] = &morph;
+				ret.candidates.emplace_back(&morph);
+				form.setCandidates(&ret.candidates.back(), 1);
 				span.form = &form;
 			}
 		}
@@ -1035,21 +1042,12 @@ namespace kiwi
 	std::ostream* logStream = &std::cerr;
 	int doLogging = 0;
 
-	vector<TokenResult> Kiwi::analyze(const u16string& str, size_t topN, AnalyzeOption option,
-		const vector<PretokenizedSpan>& pretokenized,
-		const optional<KiwiConfig>& overrideConfig
-	) const
+	template<class ChunkNodesCallback>
+	vector<TokenResult> Kiwi::analyzeWithNodes(const u16string& str, size_t topN, AnalyzeOption option,
+		const vector<PretokenizedSpan>& pretokenized, const KiwiConfig& config,
+		KString& normalizedStr, Vector<uint32_t>& positionTable, ChunkNodesCallback&& chunkNodesCallback) const
 	{
-		if (topN == 0)
-		{
-			throw invalid_argument{ "`topN` should be > 0." };
-		}
-
-		thread_local KString normalizedStr;
-		thread_local Vector<uint32_t> positionTable;
 		thread_local PretokenizedSpanGroup pretokenizedGroup;
-
-		KiwiConfig config = overrideConfig.value_or(globalConfig);
 
 		normalizedStr.clear();
 		positionTable.clear();
@@ -1058,7 +1056,7 @@ namespace kiwi
 
 		if (!!(option.match & Match::normalizeCoda)) normalizeCoda(normalizedStr.begin(), normalizedStr.end());
 
-		if ((option.match & Match::oovMask) >= Match::oovChrModel && !nounChrMdl)
+		if (topN && (option.match & Match::oovMask) >= Match::oovChrModel && !nounChrMdl)
 		{
 			throw invalid_argument{ "`oovChrModel` option is set but the character-level noun model is not loaded." };
 		}
@@ -1085,7 +1083,7 @@ namespace kiwi
 		getWordPositions(wordPositions, str.begin(), str.end());
 		
 		SubstringCounter substringCounter;
-		if ((option.match & Match::oovMask) >= Match::oovChrFreqModel || !!(option.match & Match::oovTotalConsistency))
+		if (topN && ((option.match & Match::oovMask) >= Match::oovChrFreqModel || !!(option.match & Match::oovTotalConsistency)))
 		{
 			thread_local Vector<char16_t> filteredStr;
 			filteredStr.clear();
@@ -1164,6 +1162,8 @@ namespace kiwi
 			splitEnd = newSplitEnd;
 
 			if (nodes.size() <= 2) continue;
+			chunkNodesCallback(nodes);
+			if (!topN) continue;
 			findPretokenizedGroupOfNode(nodeInWhichPretokenized, nodes, pretokenizedPrev, pretokenizedFirst);
 
 			Vector<PathResult> res = (*reinterpret_cast<FnFindBestPath>(dfFindBestPath))(FindBestPathArgs{
@@ -1198,6 +1198,7 @@ namespace kiwi
 			}
 		}
 
+		if (!topN) return ret;
 		sort(ret.begin(), ret.end(), [](const TokenResult& a, const TokenResult& b)
 		{
 			return a.second > b.second;
@@ -1212,6 +1213,379 @@ namespace kiwi
 		}
 
 		if (ret.empty()) ret.emplace_back();
+		return ret;
+	}
+
+	vector<TokenResult> Kiwi::analyze(const u16string& str, size_t topN, AnalyzeOption option,
+		const vector<PretokenizedSpan>& pretokenized,
+		const optional<KiwiConfig>& overrideConfig
+	) const
+	{
+		if (topN == 0)
+		{
+			throw invalid_argument{ "`topN` should be > 0." };
+		}
+
+		thread_local KString normalizedStr;
+		thread_local Vector<uint32_t> positionTable;
+		return analyzeWithNodes(str, topN, option, pretokenized, overrideConfig.value_or(globalConfig),
+			normalizedStr, positionTable, [](const Vector<KGraphNode>&) {});
+	}
+
+	namespace
+	{
+		// analyze와 같은 기준: identifySpecialChr로 판정하고, 라틴 문자는 updateTokenInfoScript처럼 SL로 본다
+		inline POSTag chrTag(const u16string& str, size_t k)
+		{
+			char32_t c = str[k];
+			if (isHighSurrogate(str[k]) && k + 1 < str.size() && isLowSurrogate(str[k + 1])) c = mergeSurrogate(str[k], str[k + 1]);
+			else if (isLowSurrogate(str[k]) && k > 0 && isHighSurrogate(str[k - 1])) c = mergeSurrogate(str[k - 1], str[k]);
+			if (c < 0x10000 && (isCompatibleHangulConsonant((char16_t)c) || isHangulVowel((char16_t)c))) return POSTag::max; // 자모 구간은 analyze 노드에서 온다
+			const POSTag t = identifySpecialChr(c);
+			if ((t == POSTag::sh || t == POSTag::sw) && chr2ScriptType(c) == ScriptType::latin) return POSTag::sl;
+			if (t == POSTag::sh && !isChineseChr(c)) return POSTag::sw;
+			return t;
+		}
+
+		// 간선의 정규화 위치를 상태로 바꾸고 상태 위치 표를 채운다. 같은 간선이 여럿이면 비용이 가장 작은 것만 남긴다
+		void finalizeMorphGraph(MorphGraph& graph, const KString& normalizedStr, const Vector<uint32_t>& positionTable)
+		{
+			// 상태는 정규화된 문자열에서 공백을 건너뛴 위치이다. 같은 위치에서 끝나는 노드들은 Kiwi에서도 모두 이어질 수 있다.
+			// 앞 공백을 건너뛴 시작 위치는 0으로 둔다
+			const size_t n = normalizedStr.size();
+			Vector<uint32_t> stateOf(n + 1);
+			stateOf[n] = (uint32_t)n;
+			for (size_t i = n; i-- > 0;) stateOf[i] = isSpace(normalizedStr[i]) ? stateOf[i + 1] : (uint32_t)i;
+			const size_t start = stateOf[0];
+			for (size_t i = 0; i <= n && stateOf[i] == start; ++i) stateOf[i] = 0;
+
+			auto& edges = graph.edges;
+			for (auto& e : edges)
+			{
+				e.from = stateOf[e.from];
+				e.to = stateOf[e.to];
+			}
+
+			// positionTable[i]는 원문 i번째 글자의 정규화 위치이다. 간선은 from에서 시작해 to 앞의 공백 직전에서 끝난다.
+			graph.numStates = (uint32_t)n + 1;
+			graph.statePositions.resize(graph.numStates);
+			for (size_t s = 0; s <= n; ++s)
+			{
+				const size_t b = s ? s : start;
+				size_t en = s;
+				while (en > 0 && isSpace(normalizedStr[en - 1])) --en;
+				graph.statePositions[s].first = (uint32_t)((upper_bound(positionTable.begin(), positionTable.end(), b) - positionTable.begin()) - 1);
+				graph.statePositions[s].second = (uint32_t)(lower_bound(positionTable.begin(), positionTable.end(), en) - positionTable.begin());
+			}
+
+			sort(edges.begin(), edges.end(), [](const MorphGraphEdge& a, const MorphGraphEdge& b)
+			{
+				return tie(a.from, a.to, a.morphs, a.typoCost) < tie(b.from, b.to, b.morphs, b.typoCost);
+			});
+			edges.erase(unique(edges.begin(), edges.end(), [](const MorphGraphEdge& a, const MorphGraphEdge& b)
+			{
+				return a.from == b.from && a.to == b.to && a.morphs == b.morphs;
+			}), edges.end());
+		}
+	}
+
+	MorphGraph Kiwi::buildMorphGraph(const u16string& str, AnalyzeOption option,
+		const MorphGraphOption& graphOption,
+		const optional<KiwiConfig>& overrideConfig) const
+	{
+		const KiwiConfig config = overrideConfig.value_or(globalConfig);
+		const size_t maxUnkSpanSize = graphOption.maxUnkSpanSize, maxUnkSpanSizeWithSpace = graphOption.maxUnkSpanSizeWithSpace;
+		KString normalizedStr;
+		Vector<uint32_t> positionTable;
+		MorphGraph ret;
+		// 간선의 from, to는 우선 정규화 위치로 두고, finalizeMorphGraph에서 상태로 바꾼다
+		auto& edges = ret.edges;
+
+		const Morpheme* morphFirst = morphemes.data();
+		const size_t langVocabSize = langMdl->vocabSize();
+		const auto unifyMorpheme = [&](const Morpheme* morph)
+		{
+			if (!within(morph, morphFirst, morphFirst + langVocabSize) || morph->combined) return morph;
+			return morphFirst + morph->lmMorphemeId;
+		};
+
+		using Morphs = vector<pair<u16string, POSTag>>;
+		const auto appendMorph = [&](Morphs& out, U16StringView form, POSTag tag)
+		{
+			auto joined = joinHangul(form.begin(), form.end());
+			if (!!(option.match & Match::compatibleJamo)) toCompatibleJamo(joined);
+			out.emplace_back(move(joined), tag);
+		};
+
+		// 형태소 분석과 같은 조각·노드에서 간선을 만든다
+		const auto addNodeEdges = [&](const Vector<KGraphNode>& nodes)
+		{
+			// 노드마다 그 노드로 끝나는 간선 (번호, 시작 위치). 덧붙은 받침(z_coda)을 앞 간선에 붙일 때 쓴다.
+			thread_local Vector<Vector<pair<size_t, uint32_t>>> edgesByLastNode;
+			if (edgesByLastNode.size() < nodes.size()) edgesByLastNode.resize(nodes.size());
+			for (size_t i = 0; i < nodes.size(); ++i) edgesByLastNode[i].clear();
+			Vector<pair<size_t, const Morpheme*>> zCodaNodes;
+			const auto addNodeEdge = [&](size_t last, uint32_t begin, uint32_t end, float typoCost, Morphs&& morphs)
+			{
+				edges.push_back({ begin, end, typoCost, move(morphs) });
+				edgesByLastNode[last].emplace_back(edges.size() - 1, begin);
+			};
+			for (size_t i = 1; i + 1 < nodes.size(); ++i)
+			{
+				auto& node = nodes[i];
+				if (!node.form)
+				{
+					Morphs morphs;
+					appendMorph(morphs, node.uform, POSTag::unknown);
+					edges.push_back({ node.startPos, node.endPos, node.typoCost, move(morphs) });
+					continue;
+				}
+				for (auto m : node.form->candidate())
+				{
+					if (!isDialectAllowed(m->dialect, option.allowedDialects) || (m->tag == POSTag::unknown && m->chunks().empty())) continue;
+					if (m->tag == POSTag::z_coda)
+					{
+						zCodaNodes.emplace_back(i, m);
+						continue;
+					}
+					if (m->combineSocket && m->isSingle()) continue;
+					if (!m->combineSocket)
+					{
+						if (m->isSingle())
+						{
+							const auto u = unifyMorpheme(m);
+							// 원문 표면이 있으면 그것을, 없으면 형태소의 형태를 쓴다
+							const U16StringView form = node.uform.empty() ? U16StringView{ *u->kform } : node.uform;
+							if (!node.uform.empty() && isPunctClass(u->tag))
+							{
+								Morphs base;
+								appendMorph(base, form, POSTag::sf);
+								for (auto t = POSTag::sf; t <= POSTag::sw; t = (POSTag)((uint8_t)t + 1))
+								{
+									Morphs morphs = base;
+									morphs[0].second = t;
+									addNodeEdge(i, node.startPos, node.endPos, node.typoCost, move(morphs));
+								}
+								continue;
+							}
+							Morphs morphs;
+							appendMorph(morphs, form, u->tag);
+							addNodeEdge(i, node.startPos, node.endPos, node.typoCost, move(morphs));
+						}
+						else
+						{
+							Morphs morphs;
+							for (auto ch : m->chunks())
+							{
+								const auto uc = unifyMorpheme(ch);
+								appendMorph(morphs, *uc->kform, uc->tag);
+							}
+							addNodeEdge(i, node.startPos, node.endPos, node.typoCost, move(morphs));
+						}
+						continue;
+					}
+					// 앞 노드의 분할 형태소(더/V)와 이 노드(ㅂ/V + 어/EC → 워)를 합쳐 덥/VA + 어/EC를 내는 간선
+					for (auto prev = node.getPrev(); prev; prev = prev->getSibling())
+					{
+						if (!prev->form) continue;
+						for (auto pm : prev->form->candidate())
+						{
+							if (pm->combineSocket != m->combineSocket || !pm->isSingle() || !isDialectAllowed(pm->dialect, option.allowedDialects)) continue;
+							Morphs fused;
+							appendMorph(fused, *pm->getCombined()->kform, pm->getCombined()->tag);
+							for (size_t ch = 1; ch < m->chunks().size(); ++ch)
+							{
+								const auto uc = unifyMorpheme(m->chunks()[ch]);
+								appendMorph(fused, *uc->kform, uc->tag);
+							}
+							addNodeEdge(i, prev->startPos, node.endPos, prev->typoCost + node.typoCost, move(fused));
+						}
+					}
+				}
+			}
+
+			// 덧붙은 받침은 Kiwi의 경로 평가처럼 조사·어미로 끝나는 앞 간선에 붙인다. 자모 편집 오타 노드 뒤에는 붙이지 않는다.
+			for (auto [zi, zm] : zCodaNodes)
+			{
+				auto& z = nodes[zi];
+				const KString& coda = *unifyMorpheme(zm)->kform;
+				for (auto prev = z.getPrev(); prev; prev = prev->getSibling())
+				{
+					if (prev->fuzzy) continue;
+					for (auto [ei, begin] : edgesByLastNode[prev - nodes.data()])
+					{
+						const POSTag lastTag = edges[ei].morphs.back().second;
+						if (!isJClass(lastTag) && !isEClass(lastTag)) continue;
+						Morphs morphs = edges[ei].morphs;
+						appendMorph(morphs, coda, POSTag::z_coda);
+						edges.push_back({ begin, z.endPos, edges[ei].typoCost + z.typoCost, move(morphs) });
+					}
+				}
+			}
+		};
+		// graphOption.topN > 0이면 같은 노드에서 찾은 상위 분석도 topPaths로 받는다
+		ret.topPaths = analyzeWithNodes(str, graphOption.topN, option, {}, config, normalizedStr, positionTable, addNodeEdges);
+
+		// 글자별 태그. 끝에 unknown을 하나 두어 구간을 훑는 반복이 끝에서 멈추게 한다
+		Vector<POSTag> tags(str.size() + 1, POSTag::unknown);
+		for (size_t k = 0; k < str.size(); ++k) tags[k] = chrTag(str, k);
+
+		const auto addSpan = [&](size_t a, size_t b, u16string surface, POSTag tag)
+		{
+			Morphs morphs;
+			morphs.emplace_back(move(surface), tag);
+			edges.push_back({ positionTable[a], positionTable[b], 0, move(morphs) });
+		};
+
+		// 미등록어 구간(태그 UN): 한글 음절로만 된 구간은 어디서나, 공백을 낀 구간은 공백을 하나로 줄여서. 품사는 쓰는 쪽이 정한다
+		for (size_t a = 0; a < str.size(); ++a)
+		{
+			if (!isHangulSyllable(str[a])) continue;
+			size_t chrs = 0;
+			bool hasSpace = false;
+			u16string surface;
+			for (size_t b = a; b < str.size(); ++b)
+			{
+				if (tags[b] == POSTag::unknown)
+				{
+					if (!hasSpace || surface.back() != u' ') surface.push_back(u' ');
+					hasSpace = true;
+					continue;
+				}
+				if (!isHangulSyllable(str[b])) break;
+				surface.push_back(str[b]);
+				++chrs;
+				if (hasSpace ? chrs > maxUnkSpanSizeWithSpace : chrs > max(maxUnkSpanSize, maxUnkSpanSizeWithSpace)) break;
+				if (!hasSpace && chrs > maxUnkSpanSize) continue;
+				addSpan(a, b + 1, surface, POSTag::unknown);
+			}
+		}
+
+		// 로마자·숫자·기호가 섞인 미등록어 구간(조지 5세, FC 헤네프 05): 어절 첫머리나 여는 괄호·따옴표 뒤에서 시작한다
+		for (size_t a = 0; maxUnkSpanSizeWithSpace && a < str.size(); ++a)
+		{
+			const auto ca = tags[a];
+			if (!isHangulSyllable(str[a]) && ca != POSTag::sl && ca != POSTag::sn) continue;
+			if (a > 0 && tags[a - 1] != POSTag::unknown && !isSSClass(tags[a - 1])) continue;
+			size_t chrs = 0;
+			bool mixed = false, hasLetter = false;
+			u16string surface;
+			for (size_t b = a; b < str.size(); ++b)
+			{
+				const auto cb = tags[b];
+				if (cb == POSTag::unknown)
+				{
+					if (surface.back() != u' ') surface.push_back(u' ');
+					continue;
+				}
+				const bool syllable = isHangulSyllable(str[b]);
+				if (isSSClass(cb) || cb == POSTag::sh || (cb == POSTag::max && !syllable)) break;
+				if (++chrs > maxUnkSpanSizeWithSpace) break;
+				surface.push_back(str[b]);
+				mixed = mixed || !syllable;
+				hasLetter = hasLetter || syllable || cb == POSTag::sl;
+				// 로마자·숫자 연속 구간은 한 토큰이므로 그 구간이 끝나는 곳에서만 끊는다
+				const bool runEnd = syllable || tags[b + 1] != cb;
+				if (mixed && hasLetter && runEnd && (syllable || cb == POSTag::sl || cb == POSTag::sn)) addSpan(a, b + 1, surface, POSTag::unknown);
+			}
+		}
+
+		// 비한글 구간은 문자 종류별로도 나눈다: 로마자 SL, 숫자 SN, 한자 SH, 기호는 부분 구간마다 문장부호 태그
+		static constexpr size_t maxSymbolRun = 8;
+		for (size_t a = 0; a < str.size();)
+		{
+			const auto ca = tags[a];
+			size_t b = a + 1;
+			if (ca == POSTag::max || ca == POSTag::unknown)
+			{
+				a = b;
+				continue;
+			}
+			const bool isSym = isPunctClass(ca);
+			while (b < str.size())
+			{
+				const auto cb = tags[b];
+				if (isSym ? !isPunctClass(cb) : cb != ca) break;
+				++b;
+			}
+			if (isSym)
+			{
+				for (size_t x = a; x < b; ++x)
+				{
+					if (isLowSurrogate(str[x])) continue;
+					for (size_t y = x + 1; y <= min(b, x + maxSymbolRun); ++y)
+					{
+						if (y < b && isLowSurrogate(str[y])) continue;
+						for (auto t = POSTag::sf; t <= POSTag::sw; t = (POSTag)((uint8_t)t + 1)) addSpan(x, y, str.substr(x, y - x), t);
+					}
+				}
+			}
+			else
+			{
+				addSpan(a, b, str.substr(a, b - a), ca);
+			}
+			a = b;
+		}
+
+		// 마침표가 낀 로마자·숫자 구간: 약어는 마침표까지 SL(trans., L.Goldmann), 마침표가 둘 이상인 숫자열은 W_SERIAL(6.10., 1.2.0),
+		// http 없는 도메인은 W_URL(recruit.nhncorp.com)
+		for (size_t a = 0; a < str.size(); ++a)
+		{
+			const bool startOfRun = a == 0 || !(tags[a - 1] == POSTag::sl || tags[a - 1] == POSTag::sn || str[a - 1] == '-' || str[a - 1] == '.');
+			if (!startOfRun) continue;
+			if (tags[a] == POSTag::sl)
+			{
+				for (size_t b = a, dots = 0; b < str.size() && b - a < 32;)
+				{
+					while (tags[b] == POSTag::sl) ++b;
+					if (dots) addSpan(a, b, str.substr(a, b - a), POSTag::sl);
+					if (b >= str.size() || str[b] != '.') break;
+					++b;
+					++dots;
+					addSpan(a, b, str.substr(a, b - a), POSTag::sl);
+					if (tags[b] != POSTag::sl) break;
+				}
+			}
+			if (tags[a] == POSTag::sn)
+			{
+				for (size_t b = a, dots = 0; b < str.size() && b - a < 32;)
+				{
+					while (tags[b] == POSTag::sn) ++b;
+					if (dots >= 2) addSpan(a, b, str.substr(a, b - a), POSTag::w_serial);
+					if (b >= str.size() || str[b] != '.') break;
+					++b;
+					if (++dots >= 2) addSpan(a, b, str.substr(a, b - a), POSTag::w_serial);
+					if (tags[b] != POSTag::sn) break;
+				}
+			}
+			if (tags[a] == POSTag::sl || tags[a] == POSTag::sn || str[a] == '-')
+			{
+				size_t b = a, labels = 0, lastLabel = a;
+				while (b < str.size() && b - a < 128)
+				{
+					size_t c = b;
+					while (tags[c] == POSTag::sl || tags[c] == POSTag::sn || str[c] == '-') ++c;
+					if (c == b) break;
+					++labels;
+					lastLabel = b;
+					b = c;
+					if (b < str.size() && str[b] == '.' && (tags[b + 1] == POSTag::sl || tags[b + 1] == POSTag::sn || str[b + 1] == '-')) ++b;
+					else break;
+				}
+				size_t lower = 0;
+				for (size_t k = lastLabel; k < b; ++k) lower += 'a' <= str[k] && str[k] <= 'z';
+				if (labels >= 2 && lower == b - lastLabel && 2 <= lower && lower <= 6)  // 마지막 부분이 com, kr 같은 소문자 2~6자
+				{
+					size_t e = b;
+					while (e < str.size() && (str[e] == '/' || tags[e] == POSTag::sl || tags[e] == POSTag::sn || str[e] == '-' || str[e] == '.' || str[e] == '_' || str[e] == '?' || str[e] == '=' || str[e] == '&' || str[e] == '%')) ++e;
+					while (e > b && str[e - 1] == '.') --e;
+					addSpan(a, e, str.substr(a, e - a), POSTag::w_url);
+					if (e != b) addSpan(a, b, str.substr(a, b - a), POSTag::w_url);
+				}
+			}
+		}
+
+		finalizeMorphGraph(ret, normalizedStr, positionTable);
 		return ret;
 	}
 
@@ -1342,7 +1716,7 @@ namespace kiwi
 		auto form = (*reinterpret_cast<FnFindForm>(dfFindForm))(formTrie, forms.data(), normalized);
 		if (!form) return;
 		tag = clearIrregular(tag);
-		for (auto c : form->candidate)
+		for (auto c : form->candidate())
 		{
 			if (c->combineSocket
 				|| (tag != POSTag::unknown
@@ -1360,7 +1734,7 @@ namespace kiwi
 		auto form = (*reinterpret_cast<FnFindForm>(dfFindForm))(formTrie, forms.data(), normalized);
 		if (!form) return nullptr;
 		tag = clearIrregular(tag);
-		for (auto c : form->candidate)
+		for (auto c : form->candidate())
 		{
 			if (c->combineSocket
 				|| c->tag == POSTag::unknown
@@ -1391,7 +1765,7 @@ namespace kiwi
 		size_t cnt = 0;
 		for (; form; ++form)
 		{
-			for (auto c : form->candidate)
+			for (auto c : form->candidate())
 			{
 				if (c->combineSocket
 					|| c->tag == POSTag::unknown

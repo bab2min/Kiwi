@@ -30,7 +30,6 @@
     <ClInclude Include="..\include\kiwi\ArchUtils.h" />
     <ClInclude Include="..\include\kiwi\BitUtils.h" />
     <ClInclude Include="..\include\kiwi\BpeTokenizer.h" />
-    <ClInclude Include="..\include\kiwi\FixedVector.hpp" />
     <ClInclude Include="..\include\kiwi\Form.h" />
     <ClInclude Include="..\include\kiwi\FrozenTrie.h" />
     <ClInclude Include="..\include\kiwi\Dataset.h" />
@@ -98,7 +97,10 @@
     <ClInclude Include="..\src\SkipBigramModel.hpp" />
     <ClInclude Include="..\src\SortUtils.hpp" />
     <ClInclude Include="..\src\StrUtils.h" />
+    <ClInclude Include="..\src\SubstringCounter.hpp" />
+    <ClInclude Include="..\src\Timer.hpp" />
     <ClInclude Include="..\src\UnicodeCase.h" />
+    <ClInclude Include="..\src\UnkFormScorer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\archImpl\avx2.cpp">
@@ -142,7 +144,10 @@
     <ClCompile Include="..\src\FileUtils.cpp" />
     <ClCompile Include="..\src\Joiner.cpp" />
     <ClCompile Include="..\src\Knlm.cpp" />
-    <ClCompile Include="..\src\CoNgramModel.cpp" />
+    <ClCompile Include="..\src\CoNgramModel.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">EIGEN_VECTORIZE_AVX512;KIWI_ARCH_X86_64=1;__restrict__=__restrict;KIWI_USE_MIMALLOC;_DEBUG;_CONSOLE;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">EIGEN_VECTORIZE_AVX512;KIWI_ARCH_X86_64=1;__restrict__=__restrict;KIWI_USE_BTREE;KIWI_USE_MIMALLOC;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
     <ClCompile Include="..\src\search.cpp" />
     <ClCompile Include="..\src\SkipBigramModel.cpp" />
     <ClCompile Include="..\src\Spacing.cpp" />
@@ -208,6 +213,7 @@
     <PlatformToolset>v145</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
+    <UseDynamicDebugging>true</UseDynamicDebugging>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -356,6 +362,7 @@
       <AdditionalOptions>/Qvec-report:1 /utf-8 /D _CRT_SECURE_NO_WARNINGS=1 /bigobj %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <UseDynamicDebugging>false</UseDynamicDebugging>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

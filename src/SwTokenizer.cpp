@@ -1139,7 +1139,7 @@ void SwTokenizer::encode(vector<uint32_t>& ret, TokenIt first, TokenIt last, vec
 				}
 
 				size_t i = 0;
-				for (auto m : t.morph->chunks)
+				for (auto m : t.morph->chunks())
 				{
 					id = m - baseMorph;
 					if (id < morphToSw.size() && morphToSw[id] != -1)
@@ -1147,9 +1147,9 @@ void SwTokenizer::encode(vector<uint32_t>& ret, TokenIt first, TokenIt last, vec
 						ret.emplace_back(morphToSw[id]);
 						if (offset)
 						{
-							auto p = t.morph->chunks.getSecond(i);
+							auto p = t.morph->chunkPositions()[i];
 							uint32_t start = p.first - codaBias[p.first];
-							uint32_t end = p.first + p.second - codaBias[p.first + p.second];
+							uint32_t end = p.second - codaBias[p.second];
 							offset->emplace_back(t.position + start, t.position + end);
 						}
 					}
@@ -1178,7 +1178,7 @@ void SwTokenizer::encode(vector<uint32_t>& ret, TokenIt first, TokenIt last, vec
 			{
 				pushSubwords();
 				size_t i = 0;
-				for (auto m : t.morph->chunks)
+				for (auto m : t.morph->chunks())
 				{
 					id = m - baseMorph;
 					if (id < morphToSw.size() && morphToSw[id] != -1)
@@ -1186,8 +1186,8 @@ void SwTokenizer::encode(vector<uint32_t>& ret, TokenIt first, TokenIt last, vec
 						ret.emplace_back(morphToSw[id]);
 						if (offset)
 						{
-							auto p = t.morph->chunks.getSecond(i);
-							offset->emplace_back(t.position + p.first, t.position + p.first + p.second);
+							auto p = t.morph->chunkPositions()[i];
+							offset->emplace_back(t.position + p.first, t.position + p.second);
 						}
 					}
 					else
@@ -1697,7 +1697,7 @@ void UnigramSwTrainer::addWord(const u16string& str, const Vector<const Morpheme
 			tokenizations.add_data(-(int32_t)wid - 1);
 			tokenizations.emplace_back();
 			bool first = false;
-			for (auto m : morph->chunks)
+			for (auto m : morph->chunks())
 			{
 				if (isTagForPrefix(m->tag))
 				{
@@ -1790,7 +1790,7 @@ size_t UnigramSwTrainer::_addSentences(Feeder&& feeder)
 			if (morphBase[i].complex)
 			{
 				complexMorphemes.emplace(
-					Vector<const Morpheme*>{ morphBase[i].chunks.begin(), morphBase[i].chunks.end() }, 
+					Vector<const Morpheme*>{ morphBase[i].chunks().begin(), morphBase[i].chunks().end() }, 
 					&morphBase[i]
 				);
 			}
@@ -1892,8 +1892,8 @@ size_t UnigramSwTrainer::_addSentences(Feeder&& feeder)
 					if (!wordSuffix.count(wid))
 					{
 						Vector<const Morpheme*> submorphs{
-							token.morph->chunks.begin(),
-							token.morph->chunks.end()
+							token.morph->chunks().begin(),
+							token.morph->chunks().end()
 						};
 						Vector<int32_t> subids;
 						bool first = true;

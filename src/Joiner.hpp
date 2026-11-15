@@ -14,7 +14,7 @@ namespace kiwi
 		// 형태소 l 뒤에 r이 올 때 반드시 띄어써야 하는지. Joiner의 자동 띄어쓰기와 GenerativeMADataset이 함께 쓴다.
 		inline bool isSpaceInsertable(POSTag l, POSTag r, U16StringView rform)
 		{
-			if (l == r && (POSTag::sf <= l && l <= POSTag::sn)) return true;
+			if (l == r && isSpecialClass(l)) return true;
 			if (r == POSTag::vcp) return false;
 			if (r == POSTag::xsa || r == POSTag::xsai || r == POSTag::xsv || r == POSTag::xsn) return isJClass(l);
 			if (l == POSTag::xpn || l == POSTag::so || l == POSTag::ss || l == POSTag::sw
@@ -136,7 +136,7 @@ namespace kiwi
 				{
 					if (tformHead->score() == 0)
 					{
-						for (auto m : tformHead->form(kiwi->forms.data()).candidate)
+						for (auto m : tformHead->form(kiwi->forms.data()).candidate())
 						{
 							func(m);
 						}
@@ -148,7 +148,7 @@ namespace kiwi
 			{
 				do
 				{
-					for (auto m : formHead->candidate)
+					for (auto m : formHead->candidate())
 					{
 						func(m);
 					}

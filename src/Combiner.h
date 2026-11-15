@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <variant>
 #include <kiwi/Types.h>
 #include <kiwi/TemplateUtils.hpp>
@@ -44,6 +45,15 @@ namespace kiwi
 				additionalFeature{ _additionalFeature }
 			{
 			}
+		};
+
+		/**
+		 * @brief 왼쪽 형태를 규칙 DFA로 읽은 결과. 오른쪽 형태가 달라도 같으므로 한 번 구해 여러 오른쪽 형태에 쓴다.
+		 */
+		struct LeftScan
+		{
+			size_t node = -1; /**< ruleSep을 지난 뒤의 노드. -1이면 왼쪽에서 이미 매칭에 실패한 것 */
+			Vector<size_t> capturedLefts;
 		};
 
 		struct Replacement
@@ -153,13 +163,22 @@ namespace kiwi
 			Vector<NodeSizeTy> sepGroupPtrs;
 			Vector<utils::Bitset> groupInfo;
 			Vector<Replacement> finish;
+			// 정규화된 한글은 받침 없는 음절(399자)과 종성 자모(27자)뿐이므로 이 글자들의 어휘 번호는 표로 바로 찾는다
+			std::array<uint16_t, 19 * 21> syllableVocabs = {};
+			std::array<uint16_t, 27> codaVocabs = {};
 
 			template<class _NodeSizeTy>
 			static MultiRuleDFA fromOther(MultiRuleDFA<_NodeSizeTy, GroupSizeTy>&& o);
 
+			void buildVocabTables();
+			size_t toVocab(char16_t c) const;
+
 		public:
 			Vector<Result> combine(U16StringView left, U16StringView right) const;
+			LeftScan scanLeft(U16StringView left) const;
+			Vector<Result> combine(const LeftScan& scan, U16StringView left, U16StringView right) const;
 			Vector<std::tuple<size_t, size_t, CondPolarity>> searchLeftPat(U16StringView left, bool matchRuleSep = true) const;
+			bool matchesPat(U16StringView left, bool matchRuleSep = true) const;
 		};
 
 		namespace detail
@@ -305,17 +324,15 @@ namespace kiwi
 				U16StringView leftForm, size_t ruleId
 			) const;
 
-			/**
-			 * @return vector of tuple(replaceGroupId, capturedEndPos, replaceGroupCondition)
-			 */
-			Vector<std::tuple<size_t, size_t, CondPolarity>> testRightPattern(
-				U16StringView rightForm, size_t ruleId
-			) const;
+			bool matchesLeftPattern(U16StringView leftForm, size_t ruleId) const;
+			bool matchesRightPattern(U16StringView rightForm, size_t ruleId) const;
 
 			UnorderedMap<std::tuple<POSTag, uint8_t>, Vector<size_t>> getRuleIdsByLeftTag() const;
 			UnorderedMap<POSTag, Vector<size_t>> getRuleIdsByRightTag() const;
 
 			Vector<Result> combine(U16StringView leftForm, U16StringView rightForm, size_t ruleId) const;
+			LeftScan scanLeft(U16StringView leftForm, size_t ruleId) const;
+			Vector<Result> combine(const LeftScan& scan, U16StringView leftForm, U16StringView rightForm, size_t ruleId) const;
 
 			template<class FormsTy>
 			void addAllomorphImpl(const FormsTy& forms, POSTag tag);

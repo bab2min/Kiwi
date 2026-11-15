@@ -303,9 +303,14 @@ bool TypoTransformer::isLengtheningTypoEnabled() const
 	return isfinite(lengtheningTypoThreshold);
 }
 
+bool TypoTransformer::isFuzzyTypoEnabled() const
+{
+	return isfinite(fuzzyTypoThreshold);
+}
+
 bool TypoTransformer::empty() const
 {
-	return typos.empty() && !isContinualTypoEnabled() && !isLengtheningTypoEnabled();
+	return typos.empty() && !isContinualTypoEnabled() && !isLengtheningTypoEnabled() && !isFuzzyTypoEnabled();
 }
 
 TypoTransformer TypoTransformer::copyWithNewContinualTypoCost(float threshold) const
@@ -332,6 +337,9 @@ TypoTransformer TypoTransformer::copyWithDialectOverriding(Dialect dialect) cons
 	}
 	ret.continualTypoThreshold = continualTypoThreshold;
 	ret.lengtheningTypoThreshold = lengtheningTypoThreshold;
+	ret.fuzzyTypoThreshold = fuzzyTypoThreshold;
+	ret.fuzzyRealWordErrors = fuzzyRealWordErrors;
+	ret.fuzzyMinJamo = fuzzyMinJamo;
 	return ret;
 }
 
@@ -348,6 +356,13 @@ void TypoTransformer::update(const TypoTransformer& o)
 	
 	continualTypoThreshold = min(continualTypoThreshold, o.continualTypoThreshold);
 	lengtheningTypoThreshold = min(lengtheningTypoThreshold, o.lengtheningTypoThreshold);
+	
+	if (isfinite(o.fuzzyTypoThreshold))
+	{
+		fuzzyMinJamo = isfinite(fuzzyTypoThreshold) ? min(fuzzyMinJamo, o.fuzzyMinJamo) : o.fuzzyMinJamo;
+	}
+	fuzzyTypoThreshold = min(fuzzyTypoThreshold, o.fuzzyTypoThreshold);
+	fuzzyRealWordErrors = fuzzyRealWordErrors || o.fuzzyRealWordErrors;
 }
 
 void TypoTransformer::scaleCost(float scale)
@@ -360,6 +375,7 @@ void TypoTransformer::scaleCost(float scale)
 	}
 	if (isfinite(continualTypoThreshold)) continualTypoThreshold *= scale;
 	if (isfinite(lengtheningTypoThreshold)) lengtheningTypoThreshold *= scale;
+	if (isfinite(fuzzyTypoThreshold)) fuzzyTypoThreshold *= scale;
 }
 
 namespace kiwi
@@ -433,7 +449,8 @@ namespace kiwi
 PreparedTypoTransformer::PreparedTypoTransformer() = default;
 
 PreparedTypoTransformer::PreparedTypoTransformer(const TypoTransformer& tt, bool inverse)
-	: continualTypoThreshold{ tt.continualTypoThreshold }, lengtheningTypoThreshold{ tt.lengtheningTypoThreshold }
+	: continualTypoThreshold{ tt.continualTypoThreshold }, lengtheningTypoThreshold{ tt.lengtheningTypoThreshold },
+	fuzzyTypoThreshold{ tt.fuzzyTypoThreshold }, fuzzyRealWordErrors{ tt.fuzzyRealWordErrors }, fuzzyMinJamo{ tt.fuzzyMinJamo }
 {
 	IntermediateTypoTransformer itt;
 	for (auto& t : tt.typos)
@@ -1028,7 +1045,7 @@ size_t PreparedTypoTransformer::generateGraph(U16StringView str,
 			for (size_t j = 0; j < patInfo.size; ++j)
 			{
 				auto& repl = patInfo.repl[j];
-				if (repl.dialect != Dialect::standard && !(allowedDialect & repl.dialect)) continue;
+				if (!isDialectAllowed(repl.dialect, allowedDialect)) continue;
 				
 				if (repl.leftCond == CondVowel::vowel)
 				{
