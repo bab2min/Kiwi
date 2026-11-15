@@ -71,7 +71,13 @@ namespace kiwi
 	DEFINE_SERIALIZER_OUTSIDE(FormRaw, form, candidate);
 
 	Form::Form()
-		: zCodaAppendable(0), zSiotAppendable(0), hasQuotedHaForm(0)
+		: formHash(0), 
+		zCodaAppendable(0), 
+		zSiotAppendable(0), 
+		hasJClass(0), 
+		hasAnyFullMorphemes(0), 
+		hasQuotedHaForm(0), 
+		dialect(Dialect::standard)
 	{
 	}
 

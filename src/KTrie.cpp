@@ -232,8 +232,10 @@ namespace kiwi
 				{
 					candidates.emplace_back(foundCand);
 				}
-				if (foundCand[0].formHash != foundCand[1].formHash) break;
-				++foundCand;
+				// quotedHa Form은 따옴표 뒤에서만 따로 꺼내 쓰므로 건너뛴다
+				const Form* next = foundCand + 1 + foundCand->hasQuotedHaForm;
+				if (foundCand->formHash != next->formHash) break;
+				foundCand = next;
 			}
 		}
 		return true;

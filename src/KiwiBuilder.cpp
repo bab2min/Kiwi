@@ -2624,10 +2624,10 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 	}
 	ret.forms.emplace_back();
 
-	uint8_t formHash = 0;
+	bool formHash = false;
 	for (size_t i = 1; i < ret.forms.size(); ++i)
 	{
-		if (!ComparatorIgnoringSpace::equal(ret.forms[i].form, ret.forms[i - 1].form)) ++formHash;
+		if (!ComparatorIgnoringSpace::equal(ret.forms[i].form, ret.forms[i - 1].form)) formHash = !formHash;
 		ret.forms[i].formHash = formHash;
 	}
 
@@ -2701,7 +2701,6 @@ Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) c
 		auto& ids = quotedHaCands[q].second;
 		auto& orig = ret.forms[quotedHaSlots[q] - 1];
 		auto& alt = ret.forms[quotedHaSlots[q]];
-		alt.formHash = orig.formHash;
 		alt.zCodaAppendable = orig.zCodaAppendable;
 		alt.zSiotAppendable = 0;
 		alt.hasJClass = orig.hasJClass;

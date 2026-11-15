@@ -233,18 +233,19 @@ namespace kiwi
 		uint32_t numSpaces = 0;
 		CondVowel vowel = CondVowel::none;
 		CondPolarity polar = CondPolarity::none;
-		uint8_t formHash = 0;
-		uint8_t zCodaAppendable : 1;
-		uint8_t zSiotAppendable : 1;
-		uint8_t hasJClass : 1;
-		uint8_t hasAnyFullMorphemes : 1;
+		// 아래 비트필드는 모두 16비트 타입이어야 MSVC에서도 2바이트 한 단위에 들어간다
+		/** 형태가 바뀔 때마다 0과 1이 번갈아 바뀐다. 이웃한 Form이 같은 형태인지 판별하는 데 쓴다 */
+		uint16_t formHash : 1;
+		uint16_t zCodaAppendable : 1;
+		uint16_t zSiotAppendable : 1;
+		uint16_t hasJClass : 1;
+		uint16_t hasAnyFullMorphemes : 1;
 		/** 
 		 * 1이면 바로 다음 Form(this + 1)이 
 		 * 같은 형태의 '하/VV + 어미' 후보만 담은 Form이 됨
 		 * (Match::quotedHaOmission 용) */
-		uint8_t hasQuotedHaForm : 1; 
-		uint8_t _reserved : 3;
-		Dialect dialect = Dialect::standard;
+		uint16_t hasQuotedHaForm : 1;
+		Dialect dialect : 10;
 
 		Form();
 		~Form();
