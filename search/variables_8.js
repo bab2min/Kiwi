@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['kform_0',['kform',['../structkiwi_1_1MorphemeRaw.html#a10ff5e61d22c88c01d594b9cf60532ad',1,'kiwi::MorphemeRaw']]]
+  ['integrate_5fallomorph_0',['integrate_allomorph',['../structkiwi__config__t.html#a49bc08ad23dc8ec4f6cdef9801918030',1,'kiwi_config_t']]]
 ];

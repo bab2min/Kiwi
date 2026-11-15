@@ -14,5 +14,6 @@ var searchData=
   ['congrammodelheader_11',['CoNgramModelHeader',['../structkiwi_1_1lm_1_1CoNgramModelHeader.html',1,'kiwi::lm']]],
   ['constaccess_12',['ConstAccess',['../classkiwi_1_1utils_1_1ConstAccess.html',1,'kiwi::utils']]],
   ['constaccess_3c_20std_3a_3aunordered_5fmap_3c_20_5fkey_2c_20int32_5ft_20_3e_20_3e_13',['ConstAccess&lt; std::unordered_map&lt; _Key, int32_t &gt; &gt;',['../classkiwi_1_1utils_1_1ConstAccess.html',1,'kiwi::utils']]],
-  ['continuoustrie_14',['ContinuousTrie',['../classkiwi_1_1utils_1_1ContinuousTrie.html',1,'kiwi::utils']]]
+  ['constrange_14',['ConstRange',['../classkiwi_1_1ConstRange.html',1,'kiwi']]],
+  ['continuoustrie_15',['ContinuousTrie',['../classkiwi_1_1utils_1_1ContinuousTrie.html',1,'kiwi::utils']]]
 ];

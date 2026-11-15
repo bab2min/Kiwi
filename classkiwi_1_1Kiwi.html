@@ -130,6 +130,8 @@ ArchType&#160;</td><td class="memItemRight" valign="bottom"><b>archType</b> () c
 <tr class="memitem:a7aa217c5cd0a59c5e7d849bfce45e75a" id="r_a7aa217c5cd0a59c5e7d849bfce45e75a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="Types_8h.html#aa9d73bbf58a668d8c5e9cb56d5405857">TokenResult</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7aa217c5cd0a59c5e7d849bfce45e75a">analyze</a> (const std::string &amp;str, <a class="el" href="structkiwi_1_1AnalyzeOption.html">AnalyzeOption</a> option, const std::vector&lt; <a class="el" href="structkiwi_1_1PretokenizedSpan.html">PretokenizedSpan</a> &gt; &amp;pretokenized={}, const std::optional&lt; <a class="el" href="structkiwi_1_1KiwiConfig.html">KiwiConfig</a> &gt; &amp;overrideConfig={}) const</td></tr>
 <tr class="memitem:aa2bd364933b485110c5193abcfaf9c08" id="r_aa2bd364933b485110c5193abcfaf9c08"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="Types_8h.html#aa9d73bbf58a668d8c5e9cb56d5405857">TokenResult</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa2bd364933b485110c5193abcfaf9c08">analyze</a> (const std::u16string &amp;str, size_t topN, <a class="el" href="structkiwi_1_1AnalyzeOption.html">AnalyzeOption</a> option, const std::vector&lt; <a class="el" href="structkiwi_1_1PretokenizedSpan.html">PretokenizedSpan</a> &gt; &amp;pretokenized={}, const std::optional&lt; <a class="el" href="structkiwi_1_1KiwiConfig.html">KiwiConfig</a> &gt; &amp;overrideConfig={}) const</td></tr>
 <tr class="memitem:ac350b66386823b1fb0f47322d8e8b604" id="r_ac350b66386823b1fb0f47322d8e8b604"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="Types_8h.html#aa9d73bbf58a668d8c5e9cb56d5405857">TokenResult</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac350b66386823b1fb0f47322d8e8b604">analyze</a> (const std::string &amp;str, size_t topN, <a class="el" href="structkiwi_1_1AnalyzeOption.html">AnalyzeOption</a> option, const std::vector&lt; <a class="el" href="structkiwi_1_1PretokenizedSpan.html">PretokenizedSpan</a> &gt; &amp;pretokenized={}, const std::optional&lt; <a class="el" href="structkiwi_1_1KiwiConfig.html">KiwiConfig</a> &gt; &amp;overrideConfig={}) const</td></tr>
+<tr class="memitem:a60791454fef34490dd75ec1b3a44892d" id="r_a60791454fef34490dd75ec1b3a44892d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structkiwi_1_1MorphGraph.html">MorphGraph</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a60791454fef34490dd75ec1b3a44892d">buildMorphGraph</a> (const std::u16string &amp;str, <a class="el" href="structkiwi_1_1AnalyzeOption.html">AnalyzeOption</a> option, const <a class="el" href="structkiwi_1_1MorphGraphOption.html">MorphGraphOption</a> &amp;graphOption={}, const std::optional&lt; <a class="el" href="structkiwi_1_1KiwiConfig.html">KiwiConfig</a> &gt; &amp;overrideConfig={}) const</td></tr>
+<tr class="memdesc:a60791454fef34490dd75ec1b3a44892d"><td class="mdescLeft">&#160;</td><td class="mdescRight">주어진 텍스트로부터 생성 가능한 모든 형태소를 담는 '형태 그래프'를 생성하여 반환한다.  <br /></td></tr>
 <tr class="memitem:a26c930f6354592c40864a5eb7b672866" id="r_a26c930f6354592c40864a5eb7b672866"><td class="memItemLeft" align="right" valign="top">std::future&lt; std::vector&lt; <a class="el" href="Types_8h.html#aa9d73bbf58a668d8c5e9cb56d5405857">TokenResult</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a26c930f6354592c40864a5eb7b672866">asyncAnalyze</a> (const std::string &amp;str, size_t topN, <a class="el" href="structkiwi_1_1AnalyzeOption.html">AnalyzeOption</a> option, const std::vector&lt; <a class="el" href="structkiwi_1_1PretokenizedSpan.html">PretokenizedSpan</a> &gt; &amp;pretokenized={}, const std::optional&lt; <a class="el" href="structkiwi_1_1KiwiConfig.html">KiwiConfig</a> &gt; &amp;overrideConfig={}) const</td></tr>
 <tr class="memitem:addfca069d082d55e9f137290f2cbad06" id="r_addfca069d082d55e9f137290f2cbad06"><td class="memItemLeft" align="right" valign="top"><a id="addfca069d082d55e9f137290f2cbad06" name="addfca069d082d55e9f137290f2cbad06"></a>
 std::future&lt; std::vector&lt; <a class="el" href="Types_8h.html#aa9d73bbf58a668d8c5e9cb56d5405857">TokenResult</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>asyncAnalyze</b> (std::string &amp;&amp;str, size_t topN, <a class="el" href="structkiwi_1_1AnalyzeOption.html">AnalyzeOption</a> option, std::vector&lt; <a class="el" href="structkiwi_1_1PretokenizedSpan.html">PretokenizedSpan</a> &gt; &amp;&amp;pretokenized={}, const std::optional&lt; <a class="el" href="structkiwi_1_1KiwiConfig.html">KiwiConfig</a> &gt; &amp;overrideConfig={}) const</td></tr>
@@ -559,6 +561,49 @@ template&lt;class ReaderCallback, class ResultCallback&gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>std::future&lt;std::vector&lt;TokenResult&gt;&gt; </dd></dl>
+
+</div>
+</div>
+<a id="a60791454fef34490dd75ec1b3a44892d" name="a60791454fef34490dd75ec1b3a44892d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a60791454fef34490dd75ec1b3a44892d">&#9670;&#160;</a></span>buildMorphGraph()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structkiwi_1_1MorphGraph.html">MorphGraph</a> kiwi::Kiwi::buildMorphGraph </td>
+          <td>(</td>
+          <td class="paramtype">const std::u16string &amp;</td>          <td class="paramname"><span class="paramname"><em>str</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structkiwi_1_1AnalyzeOption.html">AnalyzeOption</a></td>          <td class="paramname"><span class="paramname"><em>option</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structkiwi_1_1MorphGraphOption.html">MorphGraphOption</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>graphOption</em></span><span class="paramdefsep"> = </span><span class="paramdefval">{}</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::optional&lt; <a class="el" href="structkiwi_1_1KiwiConfig.html">KiwiConfig</a> &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>overrideConfig</em></span><span class="paramdefsep"> = </span><span class="paramdefval">{}</span>&#160;) const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>주어진 텍스트로부터 생성 가능한 모든 형태소를 담는 '형태 그래프'를 생성하여 반환한다. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">str</td><td>분석할 문자열 </td></tr>
+    <tr><td class="paramname">option</td><td>분석 옵션 </td></tr>
+    <tr><td class="paramname">graphOption</td><td>형태 그래프 생성 옵션 </td></tr>
+    <tr><td class="paramname">overrideConfig</td><td>분석 옵션을 재정의할 <a class="el" href="structkiwi_1_1KiwiConfig.html">KiwiConfig</a> 객체. 빈 값이면 globalConfig를 사용한다.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>이 함수는 analyze로 형태소 분석을 할때와 동일한 과정을 거치지만, graphOption.topN이 0이면 언어 모델을 이용한 최적 경로 탐색은 수행하지 않는다. 따라서 형태소 분석보다 빠르게 수행되며, 생성된 형태 그래프를 이용하여 다양한 분석을 수행할 수 있다. graphOption.topN &gt; 0이면 같은 격자에서 상위 분석을 찾아 MorphGraph::topPaths에 담는다(analyze(str, topN, option)과 같은 결과). </dd></dl>
 
 </div>
 </div>

@@ -1,16 +1,18 @@
 var searchData=
 [
-  ['tag_0',['tag',['../structkiwi__token__info__t.html#a2f8255848916bffeba1eaabdc3dae17e',1,'kiwi_token_info_t::tag'],['../structkiwi__morpheme__t.html#ad262639bed4d05c27052eae1fdd75068',1,'kiwi_morpheme_t::tag'],['../structkiwi_1_1MorphemeRaw.html#a5234f7084311dc2f6e1951bb141be9f7',1,'kiwi::MorphemeRaw::tag'],['../structkiwi_1_1TokenInfo.html#a45967e9870d0b947d30e7ad8fece4898',1,'kiwi::TokenInfo::tag']]],
-  ['typo_5fcost_1',['typo_cost',['../structkiwi__token__info__t.html#ae4a0a293df8c1fabb3cc131a21590e73',1,'kiwi_token_info_t']]],
-  ['typo_5fcost_5fweight_2',['typo_cost_weight',['../structkiwi__config__t.html#a88e551f32c3b0352054542051f796a7e',1,'kiwi_config_t']]],
-  ['typo_5fform_5fid_3',['typo_form_id',['../structkiwi__token__info__t.html#abd087ff84894fd3e786670f0a4caf3b0',1,'kiwi_token_info_t']]],
-  ['typo_5fthreshold_4',['typo_threshold',['../structkiwi__analyze__option__t.html#a291e401a8555622307bd7e7b71d4b468',1,'kiwi_analyze_option_t']]],
-  ['typo_5ftransformer_5',['typo_transformer',['../structkiwi__analyze__option__t.html#ae3b9cad120d22039562539ce52de5ca9',1,'kiwi_analyze_option_t']]],
-  ['typocost_6',['typoCost',['../structkiwi_1_1TokenInfo.html#a665bcabafa2c41815d0a5ad51a27e833',1,'kiwi::TokenInfo']]],
-  ['typocostscale_7',['typoCostScale',['../structkiwi_1_1GenerativeMAOption.html#ad3836524953ba76c736ec463bdbebc25',1,'kiwi::GenerativeMAOption']]],
-  ['typocostthreshold_8',['typoCostThreshold',['../structkiwi_1_1GenerativeMAOption.html#a950a7c71ed4383b27adec89138b42cf9',1,'kiwi::GenerativeMAOption']]],
-  ['typoformid_9',['typoFormId',['../structkiwi_1_1TokenInfo.html#aa77262e269fb9873c00c6fc9ad410fbb',1,'kiwi::TokenInfo']]],
-  ['typoprob_10',['typoProb',['../structkiwi_1_1GenerativeMAOption.html#ad3c3c30346ba0a181de41c3eeee6a4e8',1,'kiwi::GenerativeMAOption']]],
-  ['typothreshold_11',['typoThreshold',['../structkiwi_1_1AnalyzeOption.html#a223d854412aa158c13f89d644cdac93e',1,'kiwi::AnalyzeOption']]],
-  ['typotransformer_12',['typoTransformer',['../structkiwi_1_1AnalyzeOption.html#ac2a938812be1a29bd06eb9b0fbcbad24',1,'kiwi::AnalyzeOption']]]
+  ['score_0',['score',['../structkiwi__token__info__t.html#a27403cec79ba0637f33534ee1ee624d7',1,'kiwi_token_info_t::score'],['../structkiwi_1_1TokenInfo.html#a9b27979bcbb4a0ddcca86fdb8ac0087c',1,'kiwi::TokenInfo::score']]],
+  ['script_1',['script',['../structkiwi__token__info__t.html#a6f716f65a91f064b4fdc68d46e82ec30',1,'kiwi_token_info_t::script'],['../structkiwi_1_1TokenInfo.html#a50b433d4d5d661c7d04ade93d7909cf9',1,'kiwi::TokenInfo::script']]],
+  ['seek_2',['seek',['../structkiwi__stream__object__t.html#aaf89407160be30a7fe32c0b5ee1959d1',1,'kiwi_stream_object_t']]],
+  ['sense_5fid_3',['sense_id',['../structkiwi__token__info__t.html#a6a6f48513896c46ae1146c0d0cd5adf4',1,'kiwi_token_info_t::sense_id'],['../structkiwi__morpheme__t.html#a42e2bac93d3a63c4a544708e944a7796',1,'kiwi_morpheme_t::sense_id']]],
+  ['senseid_4',['senseId',['../structkiwi_1_1MorphemeRaw.html#a9b66ca802e93668d9c46da65a5012fa8',1,'kiwi::MorphemeRaw::senseId'],['../structkiwi_1_1TokenInfo.html#ab7e062c457af1a22400689cdcfb66f72',1,'kiwi::TokenInfo::senseId']]],
+  ['sent_5fposition_5',['sent_position',['../structkiwi__token__info__t.html#a4c1ebc4ae5d3640f9cb43d133b9b95c5',1,'kiwi_token_info_t']]],
+  ['sentposition_6',['sentPosition',['../structkiwi_1_1TokenInfo.html#a891dbb0c4774cb1eff196e6e53815a7d',1,'kiwi::TokenInfo']]],
+  ['space_5fpenalty_7',['space_penalty',['../structkiwi__config__t.html#aad09cd3dfe0e39cff4642ea7c2e0be02',1,'kiwi_config_t']]],
+  ['space_5ftolerance_8',['space_tolerance',['../structkiwi__config__t.html#a541326da7282e397298e563f3958a5f1',1,'kiwi_config_t']]],
+  ['spaceinsertprob_9',['spaceInsertProb',['../structkiwi_1_1GenerativeMAOption.html#aa5bfa0c17096b2eedd7f3c6ca4cc781d',1,'kiwi::GenerativeMAOption']]],
+  ['spaceremoveprob_10',['spaceRemoveProb',['../structkiwi_1_1GenerativeMAOption.html#a33779d25faad7c1df6bf9beaea4445c1',1,'kiwi::GenerativeMAOption']]],
+  ['statepositions_11',['statePositions',['../structkiwi_1_1MorphGraph.html#a418c5f955f9ae8456e1cea58a573b251',1,'kiwi::MorphGraph']]],
+  ['str_12',['str',['../structkiwi_1_1TokenInfo.html#ae10c0de28c7d59c5dbb5d6e85e07b5c4',1,'kiwi::TokenInfo']]],
+  ['sub_5fsent_5fposition_13',['sub_sent_position',['../structkiwi__token__info__t.html#a091b9092a427c8d36947b83ed6b58897',1,'kiwi_token_info_t']]],
+  ['subsentposition_14',['subSentPosition',['../structkiwi_1_1TokenInfo.html#a3854dee1149cee2d42e421e4bedc6a2c',1,'kiwi::TokenInfo']]]
 ];

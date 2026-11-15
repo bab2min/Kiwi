@@ -111,6 +111,8 @@ TypoTransformer &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>oper
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>isContinualTypoEnabled</b> () const</td></tr>
 <tr class="memitem:a1f40b13bf8fc5340ba6424923b88845f" id="r_a1f40b13bf8fc5340ba6424923b88845f"><td class="memItemLeft" align="right" valign="top"><a id="a1f40b13bf8fc5340ba6424923b88845f" name="a1f40b13bf8fc5340ba6424923b88845f"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>isLengtheningTypoEnabled</b> () const</td></tr>
+<tr class="memitem:aa18364fb8239ae23bddfbc2aefbfd093" id="r_aa18364fb8239ae23bddfbc2aefbfd093"><td class="memItemLeft" align="right" valign="top"><a id="aa18364fb8239ae23bddfbc2aefbfd093" name="aa18364fb8239ae23bddfbc2aefbfd093"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>isFuzzyTypoEnabled</b> () const</td></tr>
 <tr class="memitem:a5de4a908734005ba577ed1f850bd136b" id="r_a5de4a908734005ba577ed1f850bd136b"><td class="memItemLeft" align="right" valign="top"><a id="a5de4a908734005ba577ed1f850bd136b" name="a5de4a908734005ba577ed1f850bd136b"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>empty</b> () const</td></tr>
 <tr class="memitem:a4656e48e8ad4656b72ffee7eb5aa3631" id="r_a4656e48e8ad4656b72ffee7eb5aa3631"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4656e48e8ad4656b72ffee7eb5aa3631">addTypo</a> (const std::u16string &amp;orig, const std::u16string &amp;error, float cost=1, <a class="el" href="Types_8h.html#a11856481b15f24bf19cb647734ea1085">CondVowel</a> leftCond=<a class="el" href="Types_8h.html#a11856481b15f24bf19cb647734ea1085a334c4a4c42fdb79d7ebc3e73b517e6f8">CondVowel::none</a>, <a class="el" href="Types_8h.html#aa9fc09d985bc896c97e2e0f5cd41c96f">Dialect</a> dialect=<a class="el" href="Types_8h.html#aa9fc09d985bc896c97e2e0f5cd41c96fac00f0c4675b91fb8b918e4079a0b1bac">Dialect::standard</a>)</td></tr>
@@ -131,6 +133,14 @@ TypoTransformer&#160;</td><td class="memItemRight" valign="bottom"><b>copyWithNe
 float&#160;</td><td class="memItemRight" valign="bottom"><b>getLengtheningTypoCost</b> () const</td></tr>
 <tr class="memitem:a30a817fe6f8c13e1afe8705c45d4b093" id="r_a30a817fe6f8c13e1afe8705c45d4b093"><td class="memItemLeft" align="right" valign="top"><a id="a30a817fe6f8c13e1afe8705c45d4b093" name="a30a817fe6f8c13e1afe8705c45d4b093"></a>
 TypoTransformer&#160;</td><td class="memItemRight" valign="bottom"><b>copyWithNewLengtheningTypoCost</b> (float threshold) const</td></tr>
+<tr class="memitem:aa90943cedf8d6f6fbe91135e92a9360d" id="r_aa90943cedf8d6f6fbe91135e92a9360d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa90943cedf8d6f6fbe91135e92a9360d">setFuzzyTypoCost</a> (float threshold, bool realWordErrors=false, size_t minJamo=3)</td></tr>
+<tr class="memdesc:aa90943cedf8d6f6fbe91135e92a9360d"><td class="mdescLeft">&#160;</td><td class="mdescRight">자모 단위 편집 오타의 비용을 새로 설정합니다.  <br /></td></tr>
+<tr class="memitem:a2bbf8a4d0cc342eb6e6bca44baa1e0c7" id="r_a2bbf8a4d0cc342eb6e6bca44baa1e0c7"><td class="memItemLeft" align="right" valign="top"><a id="a2bbf8a4d0cc342eb6e6bca44baa1e0c7" name="a2bbf8a4d0cc342eb6e6bca44baa1e0c7"></a>
+float&#160;</td><td class="memItemRight" valign="bottom"><b>getFuzzyTypoCost</b> () const</td></tr>
+<tr class="memitem:aef5a6661b4b0395fc462f621be006ce1" id="r_aef5a6661b4b0395fc462f621be006ce1"><td class="memItemLeft" align="right" valign="top"><a id="aef5a6661b4b0395fc462f621be006ce1" name="aef5a6661b4b0395fc462f621be006ce1"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>getFuzzyRealWordErrors</b> () const</td></tr>
+<tr class="memitem:a2a43ce80aee8c961f172864a8ddb6e7d" id="r_a2a43ce80aee8c961f172864a8ddb6e7d"><td class="memItemLeft" align="right" valign="top"><a id="a2a43ce80aee8c961f172864a8ddb6e7d" name="a2a43ce80aee8c961f172864a8ddb6e7d"></a>
+size_t&#160;</td><td class="memItemRight" valign="bottom"><b>getFuzzyMinJamo</b> () const</td></tr>
 <tr class="memitem:a4ce299c1e8945f2e80ecf63f09a9cb81" id="r_a4ce299c1e8945f2e80ecf63f09a9cb81"><td class="memItemLeft" align="right" valign="top"><a id="a4ce299c1e8945f2e80ecf63f09a9cb81" name="a4ce299c1e8945f2e80ecf63f09a9cb81"></a>
 TypoTransformer&#160;</td><td class="memItemRight" valign="bottom"><b>copyWithDialectOverriding</b> (<a class="el" href="Types_8h.html#aa9fc09d985bc896c97e2e0f5cd41c96f">Dialect</a> dialect) const</td></tr>
 <tr class="memitem:aec265fa45cb5c91e14d640a8ac4fc1d7" id="r_aec265fa45cb5c91e14d640a8ac4fc1d7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aec265fa45cb5c91e14d640a8ac4fc1d7">update</a> (const TypoTransformer &amp;o)</td></tr>
@@ -304,6 +314,51 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>PreparedTypoTransfor
   </dd>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>연철 오타의 초기값은 무한대, 즉 비활성화 상태입니다. 유한한 값으로 설정하면 연철 오타가 활성화됩니다. </dd></dl>
+
+</div>
+</div>
+<a id="aa90943cedf8d6f6fbe91135e92a9360d" name="aa90943cedf8d6f6fbe91135e92a9360d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa90943cedf8d6f6fbe91135e92a9360d">&#9670;&#160;</a></span>setFuzzyTypoCost()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void kiwi::TypoTransformer::setFuzzyTypoCost </td>
+          <td>(</td>
+          <td class="paramtype">float</td>          <td class="paramname"><span class="paramname"><em>threshold</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>realWordErrors</em></span><span class="paramdefsep"> = </span><span class="paramdefval">false</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>minJamo</em></span><span class="paramdefsep"> = </span><span class="paramdefval">3</span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>자모 단위 편집 오타의 비용을 새로 설정합니다. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">threshold</td><td>자모 편집 한 번의 비용 </td></tr>
+    <tr><td class="paramname">realWordErrors</td><td>false이면 원문 구간이 이미 사전에 등록된 형태일 때는 교정을 수행하지 않습니다. true이면 원문이 이미 사전에 등록된 경우에도 탐색을 수행하여 더 많은 오타를 교정할 수 있지만 후보가 크게 늘어 분석이 느려집니다. </td></tr>
+    <tr><td class="paramname">minJamo</td><td>편집 대상이 되는 사전 형태의 최소 자모 수 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>초기값은 무한대, 즉 비활성화 상태입니다. 활성화하면 형태 하나에 자모 편집 한 번(자모 하나 치환, 삽입, 삭제)까지 허용한 형태도 후보로 찾습니다. 규칙으로 만든 오타 형태에는 겹쳐 적용되지 않습니다. </dd></dl>
 
 </div>
 </div>

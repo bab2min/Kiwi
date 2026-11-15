@@ -10,5 +10,8 @@ var searchData=
   ['modelbuildargs_7',['ModelBuildArgs',['../structkiwi_1_1KiwiBuilder_1_1ModelBuildArgs.html',1,'kiwi::KiwiBuilder']]],
   ['morpheme_8',['Morpheme',['../structkiwi_1_1Morpheme.html',1,'kiwi']]],
   ['morphemedef_9',['MorphemeDef',['../structkiwi_1_1MorphemeDef.html',1,'kiwi']]],
-  ['morphemeraw_10',['MorphemeRaw',['../structkiwi_1_1MorphemeRaw.html',1,'kiwi']]]
+  ['morphemeraw_10',['MorphemeRaw',['../structkiwi_1_1MorphemeRaw.html',1,'kiwi']]],
+  ['morphgraph_11',['MorphGraph',['../structkiwi_1_1MorphGraph.html',1,'kiwi']]],
+  ['morphgraphedge_12',['MorphGraphEdge',['../structkiwi_1_1MorphGraphEdge.html',1,'kiwi']]],
+  ['morphgraphoption_13',['MorphGraphOption',['../structkiwi_1_1MorphGraphOption.html',1,'kiwi']]]
 ];

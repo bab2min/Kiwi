@@ -86,7 +86,6 @@ $(function() {
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;cmath&gt;</code><br />
 <code>#include &lt;<a class="el" href="Types_8h.html">kiwi/Types.h</a>&gt;</code><br />
-<code>#include &lt;kiwi/FixedVector.hpp&gt;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for Form.h:</div>
 <div class="dyncontent">
@@ -100,6 +99,7 @@ This graph shows which files directly or indirectly include this file:</div>
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
+<tr class="memitem:kiwi_3A_3AConstRange_3C_20Ty_20_3E" id="r_kiwi_3A_3AConstRange_3C_20Ty_20_3E"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1ConstRange.html">kiwi::ConstRange&lt; Ty &gt;</a></td></tr>
 <tr class="memitem:kiwi_3A_3AMorphemeRaw" id="r_kiwi_3A_3AMorphemeRaw"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi_1_1MorphemeRaw.html">kiwi::MorphemeRaw</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">형태소에 관한 모든 정보를 담는 구조체의 템플릿  <a href="structkiwi_1_1MorphemeRaw.html#details">More...</a><br /></td></tr>
 <tr class="memitem:kiwi_3A_3AMorpheme" id="r_kiwi_3A_3AMorpheme"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkiwi_1_1Morpheme.html">kiwi::Morpheme</a></td></tr>
@@ -112,17 +112,17 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:aee2f709c678999fb64969f82e86c7a35" id="r_aee2f709c678999fb64969f82e86c7a35"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structkiwi_1_1Form.html">Form</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aee2f709c678999fb64969f82e86c7a35">kiwi::bake</a> (const <a class="el" href="structkiwi_1_1FormRaw.html">FormRaw</a> &amp;o, const <a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a> *morphBase, bool zCodaAppendable, bool zSiotAppendable, const <a class="el" href="Types_8h.html#a6b4a42b733e2cf315bad79b54ed04b4c">Vector</a>&lt; uint32_t &gt; &amp;additionalCands={})</td></tr>
-<tr class="memdesc:aee2f709c678999fb64969f82e86c7a35"><td class="mdescLeft">&#160;</td><td class="mdescRight">변경가능한 형태 정보를 bake하여 최적화한다.  <br /></td></tr>
-<tr class="memitem:a9a5e003889c5c747a5650ae0a7d58f9d" id="r_a9a5e003889c5c747a5650ae0a7d58f9d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9a5e003889c5c747a5650ae0a7d58f9d">kiwi::bake</a> (const <a class="el" href="structkiwi_1_1MorphemeRaw.html">MorphemeRaw</a> &amp;o, const <a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a> *morphBase, const <a class="el" href="structkiwi_1_1Form.html">Form</a> *formBase, const <a class="el" href="Types_8h.html#a6b4a42b733e2cf315bad79b54ed04b4c">Vector</a>&lt; size_t &gt; &amp;formMap)</td></tr>
-<tr class="memdesc:a9a5e003889c5c747a5650ae0a7d58f9d"><td class="mdescLeft">&#160;</td><td class="mdescRight">변경 가능한 형태소 정보를 bake하여 최적화한다.  <br /></td></tr>
+<tr class="memitem:a283f1e9073fc89593fad81aa2ed25f72" id="r_a283f1e9073fc89593fad81aa2ed25f72"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structkiwi_1_1Form.html">Form</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a283f1e9073fc89593fad81aa2ed25f72">kiwi::bake</a> (const <a class="el" href="structkiwi_1_1FormRaw.html">FormRaw</a> &amp;o, const <a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a> *morphBase, bool zCodaAppendable, bool zSiotAppendable, <a class="el" href="Types_8h.html#a6b4a42b733e2cf315bad79b54ed04b4c">Vector</a>&lt; const <a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a> * &gt; &amp;candidatePool, const <a class="el" href="Types_8h.html#a6b4a42b733e2cf315bad79b54ed04b4c">Vector</a>&lt; uint32_t &gt; &amp;additionalCands={})</td></tr>
+<tr class="memdesc:a283f1e9073fc89593fad81aa2ed25f72"><td class="mdescLeft">&#160;</td><td class="mdescRight">변경가능한 형태 정보를 bake하여 최적화한다.  <br /></td></tr>
+<tr class="memitem:adab78359c24aa75b93b16d4b0e160c6e" id="r_adab78359c24aa75b93b16d4b0e160c6e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adab78359c24aa75b93b16d4b0e160c6e">kiwi::bake</a> (const <a class="el" href="structkiwi_1_1MorphemeRaw.html">MorphemeRaw</a> &amp;o, const <a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a> *morphBase, const <a class="el" href="structkiwi_1_1Form.html">Form</a> *formBase, const <a class="el" href="Types_8h.html#a6b4a42b733e2cf315bad79b54ed04b4c">Vector</a>&lt; size_t &gt; &amp;formMap, <a class="el" href="Types_8h.html#a6b4a42b733e2cf315bad79b54ed04b4c">Vector</a>&lt; const <a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a> * &gt; &amp;chunkPool)</td></tr>
+<tr class="memdesc:adab78359c24aa75b93b16d4b0e160c6e"><td class="mdescLeft">&#160;</td><td class="mdescRight">변경 가능한 형태소 정보를 bake하여 최적화한다.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>형태 및 형태소에 관한 정보를 담는 구조체들이 선언된 헤더 </p>
 <dl class="section author"><dt>Author</dt><dd>bab2min (<a href="#" onclick="location.href='mai'+'lto:'+'bab'+'2m'+'in@'+'gm'+'ail'+'.c'+'om'; return false;">bab2m<span class="obfuscator">.nosp@m.</span>in@g<span class="obfuscator">.nosp@m.</span>mail.<span class="obfuscator">.nosp@m.</span>com</a>)  </dd></dl>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
-<a id="aee2f709c678999fb64969f82e86c7a35" name="aee2f709c678999fb64969f82e86c7a35"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aee2f709c678999fb64969f82e86c7a35">&#9670;&#160;</a></span>bake() <span class="overload">[1/2]</span></h2>
+<a id="a283f1e9073fc89593fad81aa2ed25f72" name="a283f1e9073fc89593fad81aa2ed25f72"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a283f1e9073fc89593fad81aa2ed25f72">&#9670;&#160;</a></span>bake() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -150,6 +150,11 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype"><a class="el" href="Types_8h.html#a6b4a42b733e2cf315bad79b54ed04b4c">Vector</a>&lt; const <a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a> * &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>candidatePool</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">const <a class="el" href="Types_8h.html#a6b4a42b733e2cf315bad79b54ed04b4c">Vector</a>&lt; uint32_t &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>additionalCands</em></span><span class="paramdefsep"> = </span><span class="paramdefval">{}</span>&#160;)</td>
         </tr>
       </table>
@@ -163,12 +168,12 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>최적화된 형태 정보 </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>최적화된 형태 정보 후보 형태소 포인터는 candidatePool 끝에 덧붙인다. candidatePool은 미리 충분히 reserve되어 있어야 한다 </dd></dl>
 
 </div>
 </div>
-<a id="a9a5e003889c5c747a5650ae0a7d58f9d" name="a9a5e003889c5c747a5650ae0a7d58f9d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9a5e003889c5c747a5650ae0a7d58f9d">&#9670;&#160;</a></span>bake() <span class="overload">[2/2]</span></h2>
+<a id="adab78359c24aa75b93b16d4b0e160c6e" name="adab78359c24aa75b93b16d4b0e160c6e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adab78359c24aa75b93b16d4b0e160c6e">&#9670;&#160;</a></span>bake() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -191,7 +196,12 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="Types_8h.html#a6b4a42b733e2cf315bad79b54ed04b4c">Vector</a>&lt; size_t &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>formMap</em></span>&#160;)</td>
+          <td class="paramtype">const <a class="el" href="Types_8h.html#a6b4a42b733e2cf315bad79b54ed04b4c">Vector</a>&lt; size_t &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>formMap</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="Types_8h.html#a6b4a42b733e2cf315bad79b54ed04b4c">Vector</a>&lt; const <a class="el" href="structkiwi_1_1Morpheme.html">Morpheme</a> * &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>chunkPool</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -206,7 +216,7 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>최적화된 형태소 정보 </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>최적화된 형태소 정보 조각 목록은 chunkPool 끝에 덧붙인다. chunkPool은 미리 충분히 reserve되어 있어야 한다 </dd></dl>
 
 </div>
 </div>

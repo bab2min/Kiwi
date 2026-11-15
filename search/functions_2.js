@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['encode_0',['encode',['../classkiwi_1_1BpeTokenizer.html#a660613546b4954e86ac04bd118591568',1,'kiwi::BpeTokenizer']]]
+  ['chunkpositions_0',['chunkPositions',['../structkiwi_1_1Morpheme.html#a0171f5f957cf10a6a3a6b01ec48be694',1,'kiwi::Morpheme']]],
+  ['chunkslots_1',['chunkSlots',['../structkiwi_1_1Morpheme.html#aaf244fe9a45cca38f066fe84b7f1efaa',1,'kiwi::Morpheme']]]
 ];

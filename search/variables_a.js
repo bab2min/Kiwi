@@ -1,10 +1,8 @@
 var searchData=
 [
-  ['match_0',['match',['../structkiwi_1_1AnalyzeOption.html#a55c90d58b6b006a3d1025dc114125f8a',1,'kiwi::AnalyzeOption']]],
-  ['match_5foptions_1',['match_options',['../structkiwi__analyze__option__t.html#a048094e18d2734bae4d66d049259e80e',1,'kiwi_analyze_option_t']]],
-  ['max_5funk_5fform_5fsize_2',['max_unk_form_size',['../structkiwi__config__t.html#a446253936b9fe0c526eede46fc5feecd',1,'kiwi_config_t']]],
-  ['max_5funk_5fform_5fsize_5ffollowed_5fby_5fj_5fclass_3',['max_unk_form_size_followed_by_j_class',['../structkiwi__config__t.html#a060ab46c293b6df3eb9e9e1a775ebb41',1,'kiwi_config_t']]],
-  ['morph_4',['morph',['../structkiwi_1_1TokenInfo.html#a8036684b6884ddf24d5f013d36cb6b0a',1,'kiwi::TokenInfo']]],
-  ['morphemedropout_5',['morphemeDropout',['../structkiwi_1_1GenerativeMAOption.html#ac95fa8b6ff0c94ff523607210a23c7a0',1,'kiwi::GenerativeMAOption']]],
-  ['morphemetokenids_6',['morphemeTokenIds',['../structkiwi_1_1GenerativeMAOption.html#ab667aab6a5e69b25550d884da29aaed1',1,'kiwi::GenerativeMAOption']]]
+  ['length_0',['length',['../structkiwi__token__info__t.html#a6c22f2650a9fba79ede097a4a45790e5',1,'kiwi_token_info_t::length'],['../structkiwi_1_1TokenInfo.html#a66fb9fa90738360f753f93a568b254b8',1,'kiwi::TokenInfo::length']]],
+  ['line_5fnumber_1',['line_number',['../structkiwi__token__info__t.html#a3bd64985decbd817cbb73fb0b7435cdb',1,'kiwi_token_info_t']]],
+  ['linenumber_2',['lineNumber',['../structkiwi_1_1TokenInfo.html#ad4b895d72300bd9682e82db3400e19f3',1,'kiwi::TokenInfo']]],
+  ['lm_5fmorpheme_5fid_3',['lm_morpheme_id',['../structkiwi__morpheme__t.html#a4fe7a319c204a84fdafd4b957beb78b3',1,'kiwi_morpheme_t']]],
+  ['lmmorphemeid_4',['lmMorphemeId',['../structkiwi_1_1MorphemeRaw.html#a41db424d4bb673194931d6d3f96b8482',1,'kiwi::MorphemeRaw']]]
 ];
