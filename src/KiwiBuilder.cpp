@@ -612,7 +612,7 @@ auto KiwiBuilder::loadMorphemesFromTxt(std::istream& is, Fn&& filter) -> Morphem
 			morph.chunks.emplace_back(lmId);
 			size_t start = fd.back()[i * 2] - u'0';
 			size_t end = fd.back()[i * 2 + 1] - u'0';
-			morph.chunkPositions.emplace_back(posMap[start], posMap[end] - posMap[start]);
+			morph.chunkPositions.emplace_back(posMap[start], posMap[end]);
 		}
 	endOfLoop2:;
 	}
@@ -970,6 +970,11 @@ void KiwiBuilder::updateMorphemes(size_t vocabSize)
 void KiwiBuilder::loadMorphBin(std::istream& is)
 {
 	serializer::readMany(is, serializer::toKey("KIWI"), forms, morphemes);
+	// 파일에는 chunkPositions가 (시작, 길이)로 저장되어 있다.
+	for (auto& m : morphemes)
+	{
+		for (auto& p : m.chunkPositions) p.second += p.first;
+	}
 	for (auto& form : forms)
 	{
 		const size_t idx = &form - &forms[0];
@@ -980,7 +985,12 @@ void KiwiBuilder::loadMorphBin(std::istream& is)
 
 void KiwiBuilder::saveMorphBin(std::ostream& os) const
 {
-	serializer::writeMany(os, serializer::toKey("KIWI"), forms, morphemes);
+	auto saved = morphemes;
+	for (auto& m : saved)
+	{
+		for (auto& p : m.chunkPositions) p.second -= p.first;
+	}
+	serializer::writeMany(os, serializer::toKey("KIWI"), forms, saved);
 }
 
 ModelType KiwiBuilder::getModelType(const KiwiBuilder::StreamProvider& provider, bool largest)

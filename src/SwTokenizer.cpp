@@ -1149,7 +1149,7 @@ void SwTokenizer::encode(vector<uint32_t>& ret, TokenIt first, TokenIt last, vec
 						{
 							auto p = t.morph->chunkPositions()[i];
 							uint32_t start = p.first - codaBias[p.first];
-							uint32_t end = p.first + p.second - codaBias[p.first + p.second];
+							uint32_t end = p.second - codaBias[p.second];
 							offset->emplace_back(t.position + start, t.position + end);
 						}
 					}
@@ -1187,7 +1187,7 @@ void SwTokenizer::encode(vector<uint32_t>& ret, TokenIt first, TokenIt last, vec
 						if (offset)
 						{
 							auto p = t.morph->chunkPositions()[i];
-							offset->emplace_back(t.position + p.first, t.position + p.first + p.second);
+							offset->emplace_back(t.position + p.first, t.position + p.second);
 						}
 					}
 					else
