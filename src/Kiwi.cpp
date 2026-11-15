@@ -831,7 +831,13 @@ namespace kiwi
 		ret.spans.reserve(pretokenized.size());
 		ret.formStrs.reserve(totTokens);
 		ret.forms.reserve(pretokenized.size());
+		ret.candidates.reserve(pretokenized.size() * 2); // Form마다 후보는 둘 이하
 		ret.morphemes.reserve(totTokens);
+		{
+			size_t numSlots = 0;
+			for (auto& s : pretokenized) if (s.tokenization.size() > 1) numSlots += Morpheme::chunkSlots(s.tokenization.size());
+			ret.chunks.reserve(numSlots);
+		}
 		for (auto& s : pretokenized)
 		{
 			ret.spans.emplace_back();
@@ -852,8 +858,8 @@ namespace kiwi
 			{
 				auto formStr = normalizeHangul(s.tokenization[0].form);
 				auto* tform = findForm(formTrie, formData, formStr); 
-				if (tform && tform->candidate.size() == 1 &&
-					areTagsEqual(tform->candidate[0]->tag, s.tokenization[0].tag, !!s.tokenization[0].inferRegularity))
+				if (tform && tform->candidate().size() == 1 &&
+					areTagsEqual(tform->candidate()[0]->tag, s.tokenization[0].tag, !!s.tokenization[0].inferRegularity))
 					// reuse the predefined form & morpheme
 				{
 					span.form = tform;
@@ -867,7 +873,7 @@ namespace kiwi
 					if (tform)
 					{
 						size_t i = 0;
-						for (auto m : tform->candidate)
+						for (auto m : tform->candidate())
 						{
 							if (areTagsEqual(m->tag, s.tokenization[0].tag, s.tokenization[0].inferRegularity))
 							{
@@ -877,14 +883,13 @@ namespace kiwi
 						}
 					}
 
-					form.candidate = FixedVector<const Morpheme*>{ (size_t)(foundMorph[1] ? 2 : 1) };
-					
+					const size_t firstCand = ret.candidates.size();
 					if (foundMorph[0])
 					{
-						form.candidate[0] = foundMorph[0];
+						ret.candidates.emplace_back(foundMorph[0]);
 						if (foundMorph[1])
 						{
-							form.candidate[1] = foundMorph[1];
+							ret.candidates.emplace_back(foundMorph[1]);
 						}
 					}
 					else
@@ -898,8 +903,9 @@ namespace kiwi
 						morph.complex = 0;
 						morph.saisiot = 0;
 						morph.lmMorphemeId = getDefaultMorphemeId(s.tokenization[0].tag);
-						form.candidate[0] = &morph;
+						ret.candidates.emplace_back(&morph);
 					}
+					form.setCandidates(ret.candidates.data() + firstCand, ret.candidates.size() - firstCand);
 					span.form = &form;
 				}
 			}
@@ -907,14 +913,13 @@ namespace kiwi
 			{
 				ret.forms.emplace_back();
 				auto& form = ret.forms.back();
-				form.candidate = FixedVector<const Morpheme*>{ 1 };
 				ret.morphemes.emplace_back();
 				auto& morph = ret.morphemes.back();
 				morph.vowel = CondVowel::none;
 				morph.polar = CondPolarity::none;
 				morph.complex = 0;
 				morph.saisiot = 0;
-				morph.chunks = FixedPairVector<const Morpheme*, std::pair<uint8_t, uint8_t>>{ s.tokenization.size() };
+				auto [chunkMorphs, chunkPositions] = morph.allocChunks(ret.chunks, s.tokenization.size());
 				for (size_t i = 0; i < s.tokenization.size(); ++i)
 				{
 					auto& t = s.tokenization[i];
@@ -923,7 +928,7 @@ namespace kiwi
 					const Morpheme* foundMorph = nullptr;
 					if (tform)
 					{
-						for (auto m : tform->candidate)
+						for (auto m : tform->candidate())
 						{
 							if (m->tag == t.tag)
 							{
@@ -948,11 +953,12 @@ namespace kiwi
 						foundMorph = &cmorph;
 					}
 
-					morph.chunks[i] = foundMorph;
-					morph.chunks.getSecond(i) = make_pair(positionTable[t.begin + s.begin] - span.begin, positionTable[t.end + s.begin] - span.begin);
+					chunkMorphs[i] = foundMorph;
+					chunkPositions[i] = make_pair(positionTable[t.begin + s.begin] - span.begin, positionTable[t.end + s.begin] - span.begin);
 				}
 
-				form.candidate[0] = &morph;
+				ret.candidates.emplace_back(&morph);
+				form.setCandidates(&ret.candidates.back(), 1);
 				span.form = &form;
 			}
 		}
@@ -1334,9 +1340,9 @@ namespace kiwi
 					edges.push_back({ node.startPos, node.endPos, node.typoCost, move(morphs) });
 					continue;
 				}
-				for (auto m : node.form->candidate)
+				for (auto m : node.form->candidate())
 				{
-					if (!isDialectAllowed(m->dialect, option.allowedDialects) || (m->tag == POSTag::unknown && m->chunks.empty())) continue;
+					if (!isDialectAllowed(m->dialect, option.allowedDialects) || (m->tag == POSTag::unknown && m->chunks().empty())) continue;
 					if (m->tag == POSTag::z_coda)
 					{
 						zCodaNodes.emplace_back(i, m);
@@ -1369,7 +1375,7 @@ namespace kiwi
 						else
 						{
 							Morphs morphs;
-							for (auto ch : m->chunks)
+							for (auto ch : m->chunks())
 							{
 								const auto uc = unifyMorpheme(ch);
 								appendMorph(morphs, *uc->kform, uc->tag);
@@ -1382,14 +1388,14 @@ namespace kiwi
 					for (auto prev = node.getPrev(); prev; prev = prev->getSibling())
 					{
 						if (!prev->form) continue;
-						for (auto pm : prev->form->candidate)
+						for (auto pm : prev->form->candidate())
 						{
 							if (pm->combineSocket != m->combineSocket || !pm->isSingle() || !isDialectAllowed(pm->dialect, option.allowedDialects)) continue;
 							Morphs fused;
 							appendMorph(fused, *pm->getCombined()->kform, pm->getCombined()->tag);
-							for (size_t ch = 1; ch < m->chunks.size(); ++ch)
+							for (size_t ch = 1; ch < m->chunks().size(); ++ch)
 							{
-								const auto uc = unifyMorpheme(m->chunks[ch]);
+								const auto uc = unifyMorpheme(m->chunks()[ch]);
 								appendMorph(fused, *uc->kform, uc->tag);
 							}
 							addNodeEdge(i, prev->startPos, node.endPos, prev->typoCost + node.typoCost, move(fused));
@@ -1710,7 +1716,7 @@ namespace kiwi
 		auto form = (*reinterpret_cast<FnFindForm>(dfFindForm))(formTrie, forms.data(), normalized);
 		if (!form) return;
 		tag = clearIrregular(tag);
-		for (auto c : form->candidate)
+		for (auto c : form->candidate())
 		{
 			if (c->combineSocket
 				|| (tag != POSTag::unknown
@@ -1728,7 +1734,7 @@ namespace kiwi
 		auto form = (*reinterpret_cast<FnFindForm>(dfFindForm))(formTrie, forms.data(), normalized);
 		if (!form) return nullptr;
 		tag = clearIrregular(tag);
-		for (auto c : form->candidate)
+		for (auto c : form->candidate())
 		{
 			if (c->combineSocket
 				|| c->tag == POSTag::unknown
@@ -1759,7 +1765,7 @@ namespace kiwi
 		size_t cnt = 0;
 		for (; form; ++form)
 		{
-			for (auto c : form->candidate)
+			for (auto c : form->candidate())
 			{
 				if (c->combineSocket
 					|| c->tag == POSTag::unknown

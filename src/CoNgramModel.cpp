@@ -109,7 +109,7 @@ namespace kiwi
 				}
 				else
 				{
-					firstWid = curMorph->chunks[0]->lmMorphemeId;
+					firstWid = curMorph->chunks()[0]->lmMorphemeId;
 				}
 
 				if (morphBase[firstWid].tag == POSTag::p)
@@ -165,8 +165,8 @@ namespace kiwi
 				// if the morpheme has chunk set
 				else
 				{
-					lastMorph = curMorph->chunks[curMorph->chunks.size() - 1];
-					length = curMorph->chunks.size();
+					lastMorph = curMorph->chunks()[curMorph->chunks().size() - 1];
+					length = curMorph->chunks().size();
 				}
 
 				Wid lastSeqId;
@@ -208,7 +208,7 @@ namespace kiwi
 
 					for (size_t i = 1; i < length; ++i)
 					{
-						const auto wid = curMorph->chunks[i]->lmMorphemeId;
+						const auto wid = curMorph->chunks()[i]->lmMorphemeId;
 						if (morphBase[wid].tag == POSTag::p)
 						{
 							goto continueFor;
@@ -235,7 +235,7 @@ namespace kiwi
 				// if the morpheme has chunk set
 				else
 				{
-					lastMorph = curMorph->chunks[curMorph->chunks.size() - 1];
+					lastMorph = curMorph->chunks()[curMorph->chunks().size() - 1];
 				}
 
 				Wid lastSeqId;
@@ -277,8 +277,8 @@ namespace kiwi
 				// if the morpheme has chunk set
 				else
 				{
-					lastMorph = curMorph->chunks[curMorph->chunks.size() - 1];
-					length = curMorph->chunks.size();
+					lastMorph = curMorph->chunks()[curMorph->chunks().size() - 1];
+					length = curMorph->chunks().size();
 				}
 
 				Wid lastSeqId;
@@ -320,7 +320,7 @@ namespace kiwi
 
 					for (size_t i = 1; i < length; ++i)
 					{
-						const auto wid = curMorph->chunks[i]->lmMorphemeId;
+						const auto wid = curMorph->chunks()[i]->lmMorphemeId;
 						if (morphBase[wid].tag == POSTag::p)
 						{
 							goto continueFor2;

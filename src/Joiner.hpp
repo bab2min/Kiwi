@@ -136,7 +136,7 @@ namespace kiwi
 				{
 					if (tformHead->score() == 0)
 					{
-						for (auto m : tformHead->form(kiwi->forms.data()).candidate)
+						for (auto m : tformHead->form(kiwi->forms.data()).candidate())
 						{
 							func(m);
 						}
@@ -148,7 +148,7 @@ namespace kiwi
 			{
 				do
 				{
-					for (auto m : formHead->candidate)
+					for (auto m : formHead->candidate())
 					{
 						func(m);
 					}

@@ -219,7 +219,9 @@ namespace kiwi
 		Dialect enabledDialects = Dialect::standard;
 
 		Vector<Form> forms;
+		Vector<const Morpheme*> formCandidates; /**< forms의 후보 형태소 목록이 가리키는 배열 */
 		Vector<Morpheme> morphemes;
+		Vector<const Morpheme*> morphemeChunks; /**< morphemes의 조각 목록이 가리키는 배열 */
 		KString typoPool;
 		Vector<size_t> typoPtrs;
 		Vector<TypoForm> typoForms;

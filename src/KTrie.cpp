@@ -1815,7 +1815,7 @@ size_t kiwi::splitByTrie(
 				}
 
 				// if special character
-				if (cand.form->candidate[0] <= trie.value((size_t)POSTag::sn)->candidate[0])
+				if (cand.form->candidate()[0] <= trie.value((size_t)POSTag::sn)->candidate()[0])
 				{
 					// special character should be processed one by one chr.
 					if (!alreadySpecialChrProcessed)
@@ -1824,7 +1824,7 @@ size_t kiwi::splitByTrie(
 							(nonSpaces.size() - 1) * posMultiplier, nEndWithMultiplier,
 							U16StringView{ cand.form->form.data() + cand.form->form.size() - 1, 1 }))
 						{
-							out.back().form = trie.value((size_t)cand.form->candidate[0]->tag);
+							out.back().form = trie.value((size_t)cand.form->candidate()[0]->tag);
 						}
 						lastSpecialEndPos = nonSpaces.size();
 						alreadySpecialChrProcessed = true;

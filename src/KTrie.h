@@ -43,14 +43,18 @@ namespace kiwi
 		Vector<Span> spans;
 		Vector<KString> formStrs;
 		Vector<Form> forms;
+		Vector<const Morpheme*> candidates; // forms의 후보 형태소 목록이 가리키는 배열
 		Vector<Morpheme> morphemes;
+		Vector<const Morpheme*> chunks; // morphemes의 조각 목록이 가리키는 배열
 
 		void clear()
 		{
 			spans.clear();
 			formStrs.clear();
 			forms.clear();
+			candidates.clear();
 			morphemes.clear();
+			chunks.clear();
 		}
 	};
 
