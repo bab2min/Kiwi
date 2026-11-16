@@ -61,6 +61,17 @@ describe('Kiwi WASM', () => {
         expect(tokens).toContain('안녕');
     });
 
+    it('should score n-grams like native builds', async () => {
+        if (!kiwi) return;
+
+        // wasm runs ArchType::none, whose key-value search expected a reordered layout
+        // that prepareKV never builds, so most n-gram lookups failed and 한숨 came out
+        // as 한/XPN 숨/NNG.
+        const tokens = kiwi.tokenize('농부는 가뭄이 들어 논이 말라 가는 것을 보며 한숨을 쉬었다.').map(t => `${t.str}/${t.tag}`);
+        expect(tokens).toContain('한숨/NNG');
+        expect(tokens).not.toContain('한/XPN');
+    });
+
     it('should build again after model files are unloaded', async () => {
         if (!kiwiBuilder) return;
 

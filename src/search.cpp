@@ -219,10 +219,11 @@ namespace kiwi
 			template<class IntTy, class ValueTy>
 			static ValueTy searchKV(const void* kv, size_t size, IntTy target)
 			{
+				// prepareKV reorders the keys (and their values) into BST order.
 				size_t idx;
 				const IntTy* keys = reinterpret_cast<const IntTy*>(kv);
 				const ValueTy* values = reinterpret_cast<const ValueTy*>(keys + size);
-				if (search(keys, size, target, idx))
+				if (bstSearch(keys, size, target, idx))
 				{
 					return values[idx];
 				}

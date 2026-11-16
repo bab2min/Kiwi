@@ -64,7 +64,7 @@ namespace kiwi
 		void prepareKV(void* dest, size_t size, Vector<uint8_t>& tempBuf)
 		{
 			const size_t packetSize = detail::getPacketSizeImpl<arch>() / sizeof(IntTy);
-			if (size <= 1 || packetSize <= 1) return;
+			if (size <= 1) return;
 			auto order = detail::reorderImpl<arch>(reinterpret_cast<IntTy*>(dest), size);
 			if (order.empty()) return;
 
@@ -75,6 +75,18 @@ namespace kiwi
 			std::memcpy(tempBuf.data(), dest, (sizeof(IntTy) + sizeof(Value)) * size);
 			auto tempKeys = (IntTy*)tempBuf.data();
 			auto tempValues = (Value*)(tempKeys + size);
+			if (packetSize <= 1)
+			{
+				// no interleaving: keep all keys followed by all values, just reordered
+				auto keys = reinterpret_cast<IntTy*>(dest);
+				auto values = reinterpret_cast<Value*>(keys + size);
+				for (size_t i = 0; i < size; ++i)
+				{
+					keys[i] = tempKeys[order[i]];
+					values[i] = tempValues[order[i]];
+				}
+				return;
+			}
 			for (size_t i = 0; i < size; i += packetSize)
 			{
 				const size_t groupSize = std::min(packetSize, size - i);
