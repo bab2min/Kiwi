@@ -13,7 +13,7 @@ const MODEL_DIR = path.resolve(PROJECT_ROOT, 'models/cong/base');
 function loadModelFiles(): Record<string, Uint8Array> {
     const modelFiles: Record<string, Uint8Array> = {};
     const files = [
-        'combiningRule.txt', 'cong.mdl', 'default.dict',
+        'combiningRule.txt', 'cong.mdl', 'contraction.dict', 'default.dict',
         'dialect.dict', 'extract.mdl', 'multi.dict',
         'nounchr.mdl', 'sj.morph', 'typo.dict'
     ];

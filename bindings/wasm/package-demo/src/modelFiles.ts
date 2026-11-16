@@ -1,5 +1,6 @@
 export const requiredModelFiles = [
     'combiningRule.txt',
+    'contraction.dict',
     'default.dict',
     'extract.mdl',
     'multi.dict',
