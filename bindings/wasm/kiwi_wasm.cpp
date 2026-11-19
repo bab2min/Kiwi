@@ -163,6 +163,10 @@ const PreparedTypoTransformer* parseTypoArg(const json& args, size_t index, floa
             typoSet = DefaultTypoSet::continualTypoSet;
         } else if (typosStr == "basicWithContinual") {
             typoSet = DefaultTypoSet::basicTypoSetWithContinual;
+        } else if (typosStr == "lengthening") {
+            typoSet = DefaultTypoSet::lengtheningTypoSet;
+        } else if (typosStr == "basicWithContinualAndLengthening") {
+            typoSet = DefaultTypoSet::basicTypoSetWithContinualAndLengthening;
         }
         return getDefaultPreparedTypoSet(typoSet);
     } else {
@@ -191,6 +195,14 @@ const PreparedTypoTransformer* parseTypoArg(const json& args, size_t index, floa
 
         const float continualTypoCost = typoArg.value("continualTypoCost", 1.0f);
         typoTransformer.setContinualTypoCost(continualTypoCost);
+        if (typoArg.contains("lengtheningTypoCost")) {
+            typoTransformer.setLengtheningTypoCost(typoArg["lengtheningTypoCost"].get<float>());
+        }
+
+        if (typoArg.contains("fuzzyTypoCost")) {
+            const int fuzzyMinJamo = std::max(typoArg.value("fuzzyMinJamo", 3), 1);
+            typoTransformer.setFuzzyTypoCost(typoArg["fuzzyTypoCost"].get<float>(), typoArg.value("fuzzyRealWordErrors", false), (size_t)fuzzyMinJamo);
+        }
 
         auto [insertIt, _] = preparedTypoCache.emplace(cacheKey, typoTransformer.prepare(true));
         return &insertIt->second;

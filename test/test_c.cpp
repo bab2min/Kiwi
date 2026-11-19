@@ -46,6 +46,41 @@ TEST(KiwiC, BuilderBuildWithTypos)
 	EXPECT_EQ(kiwi_close(kw), 0);
 }
 
+TEST(KiwiC, FuzzyTypo)
+{
+	kiwi_h kw = reuse_kiwi_instance();
+	kiwi_typo_h typo = kiwi_typo_init();
+	EXPECT_EQ(kiwi_typo_set_fuzzy_typo_cost(typo, 2.0f, 0, 3), 0);
+	EXPECT_NE(kiwi_typo_set_fuzzy_typo_cost(typo, 2.0f, 0, 0), 0);
+	kiwi_prepared_typo_h ptt = kiwi_typo_prepare(typo);
+
+	kiwi_analyze_option_t option = { KIWI_MATCH_ALL_WITH_NORMALIZING, };
+	option.typo_transformer = ptt;
+	option.typo_threshold = 2.5f;
+	kiwi_res_h res = kiwi_analyze(kw, u8"사뮤실에서 일했다", 1, option, nullptr);
+	ASSERT_NE(res, nullptr);
+	EXPECT_STREQ(kiwi_res_form(res, 0, 0), u8"사무실");
+	EXPECT_GT(kiwi_res_typo_cost(res, 0, 0), 0);
+	EXPECT_EQ(kiwi_res_close(res), 0);
+	EXPECT_EQ(kiwi_prepared_typo_close(ptt), 0);
+	EXPECT_EQ(kiwi_typo_close(typo), 0);
+}
+
+TEST(KiwiC, GlobalConfigOov)
+{
+	kiwi_builder_h kb = kiwi_builder_init(MODEL_PATH, -1, KIWI_BUILD_DEFAULT, KIWI_DIALECT_STANDARD);
+	kiwi_h kw = kiwi_builder_build(kb, nullptr, 0);
+	EXPECT_EQ(kiwi_builder_close(kb), 0);
+	kiwi_config_t config = kiwi_get_global_config(kw);
+	config.oov_cut_off_threshold = 7.5f;
+	config.oov_total_smoothness = 0.25f;
+	kiwi_set_global_config(kw, config);
+	config = kiwi_get_global_config(kw);
+	EXPECT_FLOAT_EQ(config.oov_cut_off_threshold, 7.5f);
+	EXPECT_FLOAT_EQ(config.oov_total_smoothness, 0.25f);
+	EXPECT_EQ(kiwi_close(kw), 0);
+}
+
 TEST(KiwiC, BuilderAddWords)
 {
 	kiwi_builder_h kb = kiwi_builder_init(MODEL_PATH, -1, KIWI_BUILD_DEFAULT, KIWI_DIALECT_STANDARD);

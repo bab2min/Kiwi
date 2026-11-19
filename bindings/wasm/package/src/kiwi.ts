@@ -57,7 +57,18 @@ export interface TokenInfo {
      * The id of the morpheme information in the used Kiwi object. -1 indicates OOV.
      */
     morphId: number;
-
+    /**
+     * Sense (homograph) number of the morpheme.
+     */
+    senseId: number;
+    /**
+     * Script (writing system) of the morpheme, as a `ScriptType` value of Kiwi.
+     */
+    script: number;
+    /**
+     * Dialect of the morpheme, as a bit flag. 0 means standard Korean.
+     */
+    dialect: number;
 }
 
 export interface TokenResult {
@@ -101,6 +112,7 @@ export enum Match {
     splitSaisiot = 1 << 25,
     mergeSaisiot = 1 << 26,
     joinParticleYo = 1 << 27,
+    quotedHaOmission = 1 << 28,
     joinVSuffix = joinVerbSuffix | joinAdjSuffix,
     joinAffix = joinNounPrefix |
         joinNounSuffix |
@@ -207,6 +219,10 @@ export interface Kiwi {
      * @param matchOptions Specifies the special string pattern extracted. This can be set to any combination of `Match` by using the bitwise OR operator. Defaults to `Match.allWithNormalizing | Match.oovChrModel`.
      * @param blockList Specifies a list of morphemes to prohibit from appearing as candidates in the analysis.
      * @param pretokenized Predefines the result of morphological analysis of a specific segment of text prior to morphological analysis. The section of text defined by this value will always be tokenized in that way only.
+     * @param typos Typo correction to use during analysis. A preset name or a `TypoTransformer` object.
+     * @param typoCostThreshold Only typos whose cost is at most this value are corrected. Defaults to 2.5.
+     * @param allowedDialects Comma-separated dialects allowed in analysis (e.g. 'gyeongsang,jeolla', or 'all'). They must be enabled by `BuildArgs.enabledDialects`. Defaults to 'standard'.
+     * @param dialectCost Additional cost for dialect morphemes. Defaults to 3.
      * @returns A single `TokenResult` object.
      */
     analyze: (
@@ -214,8 +230,10 @@ export interface Kiwi {
         matchOptions?: Match,
         blockList?: Morph[] | MorphemeSet,
         pretokenized?: PretokenizedSpan[],
-        typos?: 'none' | 'basic' | 'continual' | 'basicWithContinual' | TypoTransformer,
-        typoCostThreshold?: number
+        typos?: 'none' | 'basic' | 'continual' | 'basicWithContinual' | 'lengthening' | 'basicWithContinualAndLengthening' | TypoTransformer,
+        typoCostThreshold?: number,
+        allowedDialects?: string,
+        dialectCost?: number
     ) => TokenResult;
     /**
      * Performs morphological analysis. Returns multiple list of tokens along with an analysis score. Use `tokenizeTopN` if the result scores are not needed. Use `analyze` if you need only one result.
@@ -224,6 +242,10 @@ export interface Kiwi {
      * @param matchOptions Specifies the special string pattern extracted. This can be set to any combination of `Match` by using the bitwise OR operator. Defaults to `Match.allWithNormalizing | Match.oovChrModel`.
      * @param blockList Specifies a list of morphemes to prohibit from appearing as candidates in the analysis.
      * @param pretokenized Predefines the result of morphological analysis of a specific segment of text prior to morphological analysis. The section of text defined by this value will always be tokenized in that way only.
+     * @param typos Typo correction to use during analysis. A preset name or a `TypoTransformer` object.
+     * @param typoCostThreshold Only typos whose cost is at most this value are corrected. Defaults to 2.5.
+     * @param allowedDialects Comma-separated dialects allowed in analysis (e.g. 'gyeongsang,jeolla', or 'all'). They must be enabled by `BuildArgs.enabledDialects`. Defaults to 'standard'.
+     * @param dialectCost Additional cost for dialect morphemes. Defaults to 3.
      * @returns A list of `TokenResult` objects.
      */
     analyzeTopN: (
@@ -232,8 +254,10 @@ export interface Kiwi {
         matchOptions?: Match,
         blockList?: Morph[] | MorphemeSet,
         pretokenized?: PretokenizedSpan[],
-        typos?: 'none' | 'basic' | 'continual' | 'basicWithContinual' | TypoTransformer,
-        typoCostThreshold?: number
+        typos?: 'none' | 'basic' | 'continual' | 'basicWithContinual' | 'lengthening' | 'basicWithContinualAndLengthening' | TypoTransformer,
+        typoCostThreshold?: number,
+        allowedDialects?: string,
+        dialectCost?: number
     ) => TokenResult[];
     /**
      * Performs morphological analysis. Returns a single list of tokens. Use `analyze` if the result score is needed. Use `tokenizeTopN` if you need multiple results.
@@ -241,6 +265,10 @@ export interface Kiwi {
      * @param matchOptions Specifies the special string pattern extracted. This can be set to any combination of `Match` by using the bitwise OR operator. Defaults to `Match.allWithNormalizing | Match.oovChrModel`.
      * @param blockList Specifies a list of morphemes to prohibit from appearing as candidates in the analysis.
      * @param pretokenized Predefines the result of morphological analysis of a specific segment of text prior to morphological analysis. The section of text defined by this value will always be tokenized in that way only.
+     * @param typos Typo correction to use during analysis. A preset name or a `TypoTransformer` object.
+     * @param typoCostThreshold Only typos whose cost is at most this value are corrected. Defaults to 2.5.
+     * @param allowedDialects Comma-separated dialects allowed in analysis (e.g. 'gyeongsang,jeolla', or 'all'). They must be enabled by `BuildArgs.enabledDialects`. Defaults to 'standard'.
+     * @param dialectCost Additional cost for dialect morphemes. Defaults to 3.
      * @returns A list of `TokenInfo` object.
      */
     tokenize: (
@@ -248,8 +276,10 @@ export interface Kiwi {
         matchOptions?: Match,
         blockList?: Morph[] | MorphemeSet,
         pretokenized?: PretokenizedSpan[],
-        typos?: 'none' | 'basic' | 'continual' | 'basicWithContinual' | TypoTransformer,
-        typoCostThreshold?: number
+        typos?: 'none' | 'basic' | 'continual' | 'basicWithContinual' | 'lengthening' | 'basicWithContinualAndLengthening' | TypoTransformer,
+        typoCostThreshold?: number,
+        allowedDialects?: string,
+        dialectCost?: number
     ) => TokenInfo[];
     /**
      * Performs morphological analysis. Returns multiple lists of tokens. Use `analyzeTopN` if the result scores are needed. Use `tokenize` if you need only one result.
@@ -258,6 +288,10 @@ export interface Kiwi {
      * @param matchOptions Specifies the special string pattern extracted. This can be set to any combination of `Match` by using the bitwise OR operator. Defaults to `Match.allWithNormalizing | Match.oovChrModel`.
      * @param blockList Specifies a list of morphemes to prohibit from appearing as candidates in the analysis.
      * @param pretokenized Predefines the result of morphological analysis of a specific segment of text prior to morphological analysis. The section of text defined by this value will always be tokenized in that way only.
+     * @param typos Typo correction to use during analysis. A preset name or a `TypoTransformer` object.
+     * @param typoCostThreshold Only typos whose cost is at most this value are corrected. Defaults to 2.5.
+     * @param allowedDialects Comma-separated dialects allowed in analysis (e.g. 'gyeongsang,jeolla', or 'all'). They must be enabled by `BuildArgs.enabledDialects`. Defaults to 'standard'.
+     * @param dialectCost Additional cost for dialect morphemes. Defaults to 3.
      * @returns A list of lists of `TokenInfo` objects.
      */
     tokenizeTopN: (
@@ -266,8 +300,10 @@ export interface Kiwi {
         matchOptions?: Match,
         blockList?: Morph[] | MorphemeSet,
         pretokenized?: PretokenizedSpan[],
-        typos?: 'none' | 'basic' | 'continual' | 'basicWithContinual' | TypoTransformer,
-        typoCostThreshold?: number
+        typos?: 'none' | 'basic' | 'continual' | 'basicWithContinual' | 'lengthening' | 'basicWithContinualAndLengthening' | TypoTransformer,
+        typoCostThreshold?: number,
+        allowedDialects?: string,
+        dialectCost?: number
     ) => TokenInfo[][];
     /**
      * Returns the input text split into sentences. This method uses stemming internally during the sentence splitting process, so it can also be used to get stemming results simultaneously with sentence splitting.

@@ -55,6 +55,23 @@ static auto gClsTokenResult = jni::DataClassDefinition<kiwi::TokenResult>()
 	.template property<&kiwi::TokenResult::first>("tokens")
 	.template property<&kiwi::TokenResult::second>("score");
 
+static auto gClsKiwiConfig = jni::DataClassDefinition<kiwi::KiwiConfig>()
+	.template property<&kiwi::KiwiConfig::integrateAllomorph>("integrateAllomorph")
+	.template property<&kiwi::KiwiConfig::cutOffThreshold>("cutOffThreshold")
+	.template property<&kiwi::KiwiConfig::oovRuleScale>("oovRuleScale")
+	.template property<&kiwi::KiwiConfig::oovRuleBias>("oovRuleBias")
+	.template property<&kiwi::KiwiConfig::oovChrBias>("oovChrBias")
+	.template property<&kiwi::KiwiConfig::oovGlobalWeight>("oovGlobalWeight")
+	.template property<&kiwi::KiwiConfig::oovLocalWeight>("oovLocalWeight")
+	.template property<&kiwi::KiwiConfig::oovGlobalMinFreq>("oovGlobalMinFreq")
+	.template property<&kiwi::KiwiConfig::spacePenalty>("spacePenalty")
+	.template property<&kiwi::KiwiConfig::typoCostWeight>("typoCostWeight")
+	.template property<&kiwi::KiwiConfig::maxUnkFormSize>("maxUnkFormSize")
+	.template property<&kiwi::KiwiConfig::maxUnkFormSizeFollowedByJClass>("maxUnkFormSizeFollowedByJClass")
+	.template property<&kiwi::KiwiConfig::spaceTolerance>("spaceTolerance")
+	.template property<&kiwi::KiwiConfig::oovCutOffThreshold>("oovCutOffThreshold")
+	.template property<&kiwi::KiwiConfig::oovTotalSmoothness>("oovTotalSmoothness");
+
 static auto gClsGlueResult = jni::DataClassDefinition<GlueResult>()
 	.template property<&GlueResult::text>("text")
 	.template property<&GlueResult::spaceInsertions>("spaceInsertions");
@@ -233,6 +250,18 @@ namespace jni
 	};
 
 	template<>
+	struct JClassName<kiwi::KiwiConfig>
+	{
+		static constexpr auto value = std::string_view{ "kr/pe/bab2min/Kiwi$KiwiConfig" };
+	};
+
+	template<>
+	struct ValueBuilder<kiwi::KiwiConfig> : public ValueBuilder<decltype(gClsKiwiConfig)>
+	{
+		static constexpr auto typeStr = StringConcat_v<svL, jclassName<kiwi::KiwiConfig>, svSC>;
+	};
+
+	template<>
 	struct JClassName<GlueResult>
 	{
 		static constexpr auto value = std::string_view{ "kr/pe/bab2min/Kiwi$GlueResult" };
@@ -347,6 +376,8 @@ public:
 	JMorphemeSet* blocklist;
 	kiwi::Dialect allowedDialects;
 	float dialectCost;
+	const kiwi::PreparedTypoTransformer* typoTransformer;
+	float typoThreshold;
 	jni::JIterator<jni::JIterator<kiwi::PretokenizedSpan>> pretokenized;
 
 	JMultipleTokenResult(jni::JUniqueGlobalRef<JKiwi>&& _dp,
@@ -356,6 +387,8 @@ public:
 		JMorphemeSet* _blocklist,
 		kiwi::Dialect _allowedDialects,
 		float _dialectCost,
+		const kiwi::PreparedTypoTransformer* _typoTransformer,
+		float _typoThreshold,
 		jni::JIterator<jni::JIterator<kiwi::PretokenizedSpan>> _pretokenized);
 	JMultipleTokenResult(JMultipleTokenResult&&) = default;
 	JMultipleTokenResult& operator=(JMultipleTokenResult&&) = default;
@@ -456,7 +489,7 @@ public:
 		jni::JIterator<jni::JIterator<kiwi::PretokenizedSpan>> pretokenized) const
 	{
 		if (!texts) throw std::bad_optional_access{};
-		return { _ref, std::move(texts), (size_t)topN, matchOption, blocklist, allowedDialects, dialectCost, std::move(pretokenized) };
+		return { _ref, std::move(texts), (size_t)topN, matchOption, blocklist, allowedDialects, dialectCost, typoTransformer, typoThreshold, std::move(pretokenized) };
 	}
 
 	std::vector<Sentence> splitIntoSents(const std::u16string& text, kiwi::Match matchOption, bool returnTokens) const
@@ -511,6 +544,16 @@ public:
 		return joiner.getU16();
 	}
 
+	kiwi::KiwiConfig getConfig() const
+	{
+		return Kiwi::getGlobalConfig();
+	}
+
+	void setConfig(kiwi::KiwiConfig config)
+	{
+		Kiwi::setGlobalConfig(config);
+	}
+
 	std::u16string spaceText(const std::u16string& text, bool resetWhitespace) const
 	{
 		return Kiwi::space(text, resetWhitespace);
@@ -543,6 +586,8 @@ JMultipleTokenResult::JMultipleTokenResult(jni::JUniqueGlobalRef<JKiwi>&& _dp,
 	JMorphemeSet* _blocklist,
 	kiwi::Dialect _allowedDialects,
 	float _dialectCost,
+	const kiwi::PreparedTypoTransformer* _typoTransformer,
+	float _typoThreshold,
 	jni::JIterator<jni::JIterator<kiwi::PretokenizedSpan>> _pretokenized
 )
 	: dp{ std::move(_dp) },
@@ -552,6 +597,8 @@ JMultipleTokenResult::JMultipleTokenResult(jni::JUniqueGlobalRef<JKiwi>&& _dp,
 	blocklist{ _blocklist },
 	allowedDialects{ _allowedDialects },
 	dialectCost{ _dialectCost },
+	typoTransformer{ _typoTransformer },
+	typoThreshold{ _typoThreshold },
 	pretokenized{ std::move(_pretokenized) }
 {
 	for (size_t i = 0; i < dp->getThreadPool()->size(); ++i)
@@ -576,10 +623,13 @@ bool JMultipleTokenResult::feed()
 		while (pt && pt.hasNext()) pretokenizedSpans.emplace_back(pt.next());
 	}
 
+	kiwi::AnalyzeOption opt{ matchOption, blocklist ? &blocklist->morphSet : nullptr, false, allowedDialects, dialectCost };
+	opt.typoTransformer = typoTransformer;
+	opt.typoThreshold = typoThreshold;
 	futures.emplace_back(static_cast<kiwi::Kiwi&>(dp.get()).asyncAnalyze(
 		texts.next(), 
 		topN, 
-		kiwi::AnalyzeOption{ matchOption, blocklist ? &blocklist->morphSet : nullptr, false, allowedDialects, dialectCost },
+		opt,
 		std::move(pretokenizedSpans)
 	));
 	return true;
@@ -613,6 +663,12 @@ public:
 	void update(const JTypoTransformer& o)
 	{
 		TypoTransformer::update(o);
+	}
+
+	void setFuzzyTypoCost(float cost, bool realWordErrors, int32_t minJamo)
+	{
+		if (minJamo < 1) throw std::invalid_argument{ "`minJamo` must be positive." };
+		TypoTransformer::setFuzzyTypoCost(cost, realWordErrors, (size_t)minJamo);
 	}
 
 	JPreparedTypoTransformer prepare() const
@@ -801,6 +857,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved)
 			.template method<&JTypoTransformer::addTypo>("_addTypo")
 			.template method<&JTypoTransformer::setContinualTypoCost>("_setContinualTypoCost")
 			.template method<&JTypoTransformer::setLengtheningTypoCost>("_setLengtheningTypoCost")
+			.template method<&JTypoTransformer::setFuzzyTypoCost>("_setFuzzyTypoCost")
 			.template method<&JTypoTransformer::copy>("copy")
 			.template method<&JTypoTransformer::update>("_update")
 			.template method<&JTypoTransformer::scaleCost>("_scaleCost")
@@ -835,7 +892,9 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved)
 			.template method<&JKiwi::splitIntoSents>("splitIntoSents")
 			.template method<&JKiwi::join>("join")
 			.template method<&JKiwi::spaceText>("space")
-			.template method<&JKiwi::glueChunks>("_glue"),
+			.template method<&JKiwi::glueChunks>("_glue")
+			.template method<&JKiwi::getConfig>("getGlobalConfig")
+			.template method<&JKiwi::setConfig>("setGlobalConfig"),
 
 		jni::define<JStreamProvider>(),
 
@@ -843,6 +902,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved)
 		gClsTokenResult,
 		gClsSentence,
 		gClsGlueResult,
+		gClsKiwiConfig,
 		gClsJoinableToken,
 		gClsAnalyzedMorph,
 		gClsBasicToken,

@@ -86,6 +86,9 @@ public struct MatchOptions: OptionSet, Codable {
     /// Join particle yo
     public static let joinParticleYo = MatchOptions(rawValue: 1 << 27)
 
+    /// Restore '하' omitted after quotations
+    public static let quotedHaOmission = MatchOptions(rawValue: 1 << 28)
+
     /// All basic matching options
     public static let all: MatchOptions = [.url, .email, .hashtag, .mention, .serial, .emoji, .zCoda]
     

@@ -39,9 +39,10 @@ public class Kiwi implements AutoCloseable  {
 		splitSaisiot = 1 << 25,
 		mergeSaisiot = 1 << 26,
 		joinParticleYo = 1 << 27,
+		quotedHaOmission = 1 << 28,
 		joinVSuffix = joinVerbSuffix | joinAdjSuffix,
 		joinAffix = joinNounPrefix | joinNounSuffix | joinVerbSuffix | joinAdjSuffix | joinAdvSuffix,
-		all = url | email | hashtag | mention | serial | zCoda,
+		all = url | email | hashtag | mention | serial | emoji | zCoda,
 		allWithNormalizing = all | normalizeCoda;
 	}
 	
@@ -294,6 +295,25 @@ public class Kiwi implements AutoCloseable  {
 		}
 	}
 
+	/** 분석 설정값. `getGlobalConfig`로 읽고 값을 바꾼 뒤 `setGlobalConfig`로 적용합니다. */
+	public static class KiwiConfig {
+		public boolean integrateAllomorph;
+		public float cutOffThreshold;
+		public float oovRuleScale;
+		public float oovRuleBias;
+		public float oovChrBias;
+		public float oovGlobalWeight;
+		public float oovLocalWeight;
+		public float oovGlobalMinFreq;
+		public float spacePenalty;
+		public float typoCostWeight;
+		public int maxUnkFormSize;
+		public int maxUnkFormSizeFollowedByJClass;
+		public int spaceTolerance;
+		public float oovCutOffThreshold;
+		public float oovTotalSmoothness;
+	}
+
 	public static class GlueResult {
 		public String text;
 		/** 조각 사이마다 공백이 삽입되었는지 여부. 길이는 chunks.length - 1이다. */
@@ -450,6 +470,8 @@ public class Kiwi implements AutoCloseable  {
 
 	/** 입력 텍스트의 띄어쓰기를 교정하여 반환한다. */
 	public native String space(String text, boolean resetWhitespace);
+	public native KiwiConfig getGlobalConfig();
+	public native void setGlobalConfig(KiwiConfig config);
 
 	/** 입력 텍스트의 띄어쓰기를 교정하여 반환한다. */
 	public String space(String text) {

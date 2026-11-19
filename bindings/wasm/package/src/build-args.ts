@@ -13,7 +13,7 @@ export interface UserWord {
      */
     word: string;
     /**
-     * Part-of-speech tag. Defaults to 'NNP'.
+     * Part-of-speech tag. Defaults to 'NNG'.
      */
     tag?: string;
     /**
@@ -95,6 +95,22 @@ export interface TypoTransformer {
      * The cost of continual typos. Defaults to 1.
      */
     continualTypoCost?: number;
+    /**
+     * The cost of lengthening typos. Lengthening typos are disabled if not given.
+     */
+    lengtheningTypoCost?: number;
+    /**
+     * The cost of a single jamo-level fuzzy edit. Fuzzy typos are disabled if not given.
+     */
+    fuzzyTypoCost?: number;
+    /**
+     * If true, fuzzy typos are also searched for spans that are already valid dictionary forms (slower). Defaults to false.
+     */
+    fuzzyRealWordErrors?: boolean;
+    /**
+     * The minimum number of jamo in a dictionary form to be edited by fuzzy typos. Defaults to 3.
+     */
+    fuzzyMinJamo?: number;
 }
 
 export interface BuildArgs {
@@ -148,4 +164,8 @@ export interface BuildArgs {
      * - `cong-global`: (experimental) Contextual N-gram embedding Language Model. It consists of lightweighted neural networks that can estimate the relationships between morphemes over large distances (up to 7 real morphemes) with high accuracy.
      */
     modelType?: 'none' | 'largest' | 'knlm' | 'sbg' | 'cong' | 'cong-global';
+    /**
+     * Comma-separated dialects to enable (e.g. 'gyeongsang,jeolla', or 'all'). Defaults to 'standard'.
+     */
+    enabledDialects?: string;
 };
