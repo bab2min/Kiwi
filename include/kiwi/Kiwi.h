@@ -1061,16 +1061,34 @@ namespace kiwi
 		/**
 		 * @brief 현재 단어 및 사전 설정을 기반으로 Kiwi 객체를 생성한다.
 		 *
-		 * @param typos
-		 * @param typoCostThreshold
 		 * @return 형태소 분석 준비가 완료된 Kiwi의 객체.
+		 * @note 오타 교정은 분석할 때 AnalyzeOption::typoTransformer로 지정한다.
 		 */
-		Kiwi build(const TypoTransformer& typos = {}, float typoCostThreshold = 2.5f) const;
+		Kiwi build() const
+		{
+			return buildImpl({}, 2.5f);
+		}
 
+		/**
+		 * @brief 오타를 사전에 포함시켜 Kiwi 객체를 생성한다.
+		 *
+		 * @deprecated 오타 없이 build()로 생성하고, 분석할 때 AnalyzeOption::typoTransformer로 오타 교정기를 지정한다.
+		 * 이 함수로 생성한 Kiwi는 AnalyzeOption::typoTransformer를 무시한다.
+		 */
+		[[deprecated("Build without typos and pass a PreparedTypoTransformer through AnalyzeOption::typoTransformer instead.")]]
+		Kiwi build(const TypoTransformer& typos, float typoCostThreshold = 2.5f) const
+		{
+			return buildImpl(typos, typoCostThreshold);
+		}
+
+		[[deprecated("Build without typos and pass a PreparedTypoTransformer through AnalyzeOption::typoTransformer instead.")]]
 		Kiwi build(DefaultTypoSet typos, float typoCostThreshold = 2.5f) const
 		{
-			return build(getDefaultTypoSet(typos), typoCostThreshold);
+			return buildImpl(getDefaultTypoSet(typos), typoCostThreshold);
 		}
+
+		/** 오타를 사전에 포함시켜 Kiwi 객체를 생성한다. C API처럼 하위 호환을 위해 이 방식을 유지해야 하는 곳에서만 쓴다. */
+		Kiwi buildImpl(const TypoTransformer& typos, float typoCostThreshold) const;
 
 		void convertHSData(
 			const std::vector<std::string>& inputPathes,

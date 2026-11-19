@@ -526,7 +526,7 @@ kiwi_h kiwi_builder_build(kiwi_builder_h handle, kiwi_typo_h typos, float typo_c
 		{
 			tt = typos;
 		}
-		return (kiwi_h)new Kiwi{ kb->build(*tt, typo_cost_threshold) };
+		return (kiwi_h)new Kiwi{ kb->buildImpl(*tt, typo_cost_threshold) };
 	}
 	catch (...)
 	{

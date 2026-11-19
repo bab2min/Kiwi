@@ -448,6 +448,8 @@ DECL_DLL kiwi_ws_h kiwi_builder_extract_add_words_w(kiwi_builder_h handle, kiwi_
  * 
  * @param handle KiwiBuilder.
  * @param typos 오타 교정기의 핸들. 오타 교정을 사용하지 않을 경우 null을 입력합니다.
+ *        (deprecated) null 대신 오타 교정기를 넣는 방식은 더 이상 권장하지 않습니다. null로 생성한 뒤 분석할 때 kiwi_analyze_option_t의 typo_transformer를 지정하십시오.
+ *        오타 교정기를 넣어 생성한 Kiwi는 typo_transformer를 무시합니다.
  * @param typo_cost_threshold 오타 교정기에서 생성하는 오타 중 비용이 이 값 이하인 오타만 사용합니다.
  * 
  * @return Kiwi의 핸들.

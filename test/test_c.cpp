@@ -26,6 +26,26 @@ TEST(KiwiC, BuilderInitClose)
 	EXPECT_EQ(kiwi_close(kw), 0);
 }
 
+TEST(KiwiC, BuilderBuildWithTypos)
+{
+	// 오타를 넣어 빌드한 Kiwi(deprecated)는 예전 splitter로 분석해야 한다. 새 splitter로 가면 TypoForm을 Form으로 읽어 죽는다.
+	kiwi_builder_h kb = kiwi_builder_init(MODEL_PATH, -1, KIWI_BUILD_DEFAULT, KIWI_DIALECT_STANDARD);
+	ASSERT_NE(kb, nullptr);
+	kiwi_h kw = kiwi_builder_build(kb, kiwi_typo_get_basic(), 2.5f);
+	ASSERT_NE(kw, nullptr);
+	EXPECT_EQ(kiwi_builder_close(kb), 0);
+
+	kiwi_analyze_option_t option = { KIWI_MATCH_ALL_WITH_NORMALIZING, };
+	for (const char* s : { u8"학교", u8"학교에서 배운 내용" })
+	{
+		kiwi_res_h res = kiwi_analyze(kw, s, 1, option, nullptr);
+		ASSERT_NE(res, nullptr);
+		EXPECT_GT(kiwi_res_word_num(res, 0), 0);
+		EXPECT_EQ(kiwi_res_close(res), 0);
+	}
+	EXPECT_EQ(kiwi_close(kw), 0);
+}
+
 TEST(KiwiC, BuilderAddWords)
 {
 	kiwi_builder_h kb = kiwi_builder_init(MODEL_PATH, -1, KIWI_BUILD_DEFAULT, KIWI_DIALECT_STANDARD);

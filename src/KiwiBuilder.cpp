@@ -2511,7 +2511,7 @@ namespace kiwi
 	}
 }
 
-Kiwi KiwiBuilder::build(const TypoTransformer& typos, float typoCostThreshold) const
+Kiwi KiwiBuilder::buildImpl(const TypoTransformer& typos, float typoCostThreshold) const
 {
 	if (!ready())
 	{
