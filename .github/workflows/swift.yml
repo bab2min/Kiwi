@@ -163,7 +163,7 @@ jobs:
 
   swift-linux-check:
     name: Swift Linux Compatibility Check
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04 # setup-swift@v2가 26.04(ubuntu-latest)를 지원하지 않는다
     
     steps:
     - uses: actions/checkout@v3

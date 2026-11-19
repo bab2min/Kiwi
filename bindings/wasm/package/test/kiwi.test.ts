@@ -54,7 +54,7 @@ describe('Kiwi WASM', () => {
 
         expect(kiwi.ready()).toBe(true);
 
-        const result = kiwi.tokenize('안녕하세요 세계');
+        const result = kiwi.tokenize('안녕하세요 세계', Match.allWithNormalizing);
         expect(result.length).toBeGreaterThan(0);
 
         const tokens = result.map(t => t.str);
@@ -67,7 +67,7 @@ describe('Kiwi WASM', () => {
         // wasm runs ArchType::none, whose key-value search expected a reordered layout
         // that prepareKV never builds, so most n-gram lookups failed and 한숨 came out
         // as 한/XPN 숨/NNG.
-        const tokens = kiwi.tokenize('농부는 가뭄이 들어 논이 말라 가는 것을 보며 한숨을 쉬었다.').map(t => `${t.str}/${t.tag}`);
+        const tokens = kiwi.tokenize('농부는 가뭄이 들어 논이 말라 가는 것을 보며 한숨을 쉬었다.', Match.allWithNormalizing).map(t => `${t.str}/${t.tag}`);
         expect(tokens).toContain('한숨/NNG');
         expect(tokens).not.toContain('한/XPN');
     });
@@ -83,8 +83,8 @@ describe('Kiwi WASM', () => {
             userDicts: ['user.dict'],
         });
 
-        expect(another.tokenize('나파가죽 시트').map(t => t.str)).toContain('나파가죽');
-        expect(kiwi.tokenize('안녕하세요 세계').map(t => t.str)).toContain('안녕');
+        expect(another.tokenize('나파가죽 시트', Match.allWithNormalizing).map(t => t.str)).toContain('나파가죽');
+        expect(kiwi.tokenize('안녕하세요 세계', Match.allWithNormalizing).map(t => t.str)).toContain('안녕');
     });
 
     it('should split sentences', async () => {
@@ -98,7 +98,7 @@ describe('Kiwi WASM', () => {
         if (!kiwi) return;
 
         // Without typo correction
-        const tokensNoTypo = kiwi.tokenize('나 죰 도와죠.');
+        const tokensNoTypo = kiwi.tokenize('나 죰 도와죠.', Match.allWithNormalizing);
         expect(tokensNoTypo.map(t => t.str)).toContain('죰');
 
         // With basic typo correction at analyze time
@@ -196,7 +196,7 @@ describe('Kiwi WASM', () => {
             if (!congGlobal) return;
 
             // This sentence overflowed Emscripten's default 64 KB stack with cong-global.
-            const tokens = congGlobal.tokenize('우리는 모든 일이 생각대로 될 것이라며 기도를 드렸다.').map(t => t.str);
+            const tokens = congGlobal.tokenize('우리는 모든 일이 생각대로 될 것이라며 기도를 드렸다.', Match.allWithNormalizing).map(t => t.str);
             expect(tokens).toContain('생각');
             expect(tokens).toContain('기도');
         });
@@ -206,7 +206,7 @@ describe('Kiwi WASM', () => {
 
             // An overlapping memcpy in the distant-token history shift corrupted the
             // history in wasm, so 지었 came out as 지/VV instead of 짓/VV-I.
-            const tokens = congGlobal.tokenize('그는 죄를 지었기 때문에 감옥에 갔다.').map(t => `${t.str}/${t.tag}`);
+            const tokens = congGlobal.tokenize('그는 죄를 지었기 때문에 감옥에 갔다.', Match.allWithNormalizing).map(t => `${t.str}/${t.tag}`);
             expect(tokens).toContain('짓/VV-I');
             expect(tokens).not.toContain('지/VV');
         });
@@ -216,7 +216,7 @@ describe('Kiwi WASM', () => {
 
             // The path buckets were half as large with a 32-bit size_t, so a full
             // bucket dropped the best path and 걸었다 came out as 걸/VV instead of 걷/VV-I.
-            const tokens = congGlobal.tokenize('날이 밝아서 한참 길을 걸었다.').map(t => `${t.str}/${t.tag}`);
+            const tokens = congGlobal.tokenize('날이 밝아서 한참 길을 걸었다.', Match.allWithNormalizing).map(t => `${t.str}/${t.tag}`);
             expect(tokens).toContain('걷/VV-I');
             expect(tokens).not.toContain('걸/VV');
         });
