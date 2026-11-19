@@ -87,6 +87,7 @@ export enum Match {
     oovChrModel = 1 << 8,
     oovChrFreqModel = 2 << 8,
     oovChrFreqBranchModel = 3 << 8,
+    oovTotalConsistency = 1 << 10,
     oovMask = 3 << 8,
     normalizeCoda = 1 << 16,
     joinNounPrefix = 1 << 17,
@@ -203,7 +204,7 @@ export interface Kiwi {
     /**
      * Performs morphological analysis. Returns a single list of tokens along with an analysis score. Use `tokenize` if the result score is not needed. Use `analyzeTopN` if you need multiple results.
      * @param str String to analyze
-     * @param matchOptions Specifies the special string pattern extracted. This can be set to any combination of `Match` by using the bitwise OR operator.
+     * @param matchOptions Specifies the special string pattern extracted. This can be set to any combination of `Match` by using the bitwise OR operator. Defaults to `Match.allWithNormalizing | Match.oovChrModel`.
      * @param blockList Specifies a list of morphemes to prohibit from appearing as candidates in the analysis.
      * @param pretokenized Predefines the result of morphological analysis of a specific segment of text prior to morphological analysis. The section of text defined by this value will always be tokenized in that way only.
      * @returns A single `TokenResult` object.
@@ -220,7 +221,7 @@ export interface Kiwi {
      * Performs morphological analysis. Returns multiple list of tokens along with an analysis score. Use `tokenizeTopN` if the result scores are not needed. Use `analyze` if you need only one result.
      * @param str String to analyze
      * @param n Number of results to return
-     * @param matchOptions Specifies the special string pattern extracted. This can be set to any combination of `Match` by using the bitwise OR operator.
+     * @param matchOptions Specifies the special string pattern extracted. This can be set to any combination of `Match` by using the bitwise OR operator. Defaults to `Match.allWithNormalizing | Match.oovChrModel`.
      * @param blockList Specifies a list of morphemes to prohibit from appearing as candidates in the analysis.
      * @param pretokenized Predefines the result of morphological analysis of a specific segment of text prior to morphological analysis. The section of text defined by this value will always be tokenized in that way only.
      * @returns A list of `TokenResult` objects.
@@ -237,7 +238,7 @@ export interface Kiwi {
     /**
      * Performs morphological analysis. Returns a single list of tokens. Use `analyze` if the result score is needed. Use `tokenizeTopN` if you need multiple results.
      * @param str String to analyze
-     * @param matchOptions Specifies the special string pattern extracted. This can be set to any combination of `Match` by using the bitwise OR operator.
+     * @param matchOptions Specifies the special string pattern extracted. This can be set to any combination of `Match` by using the bitwise OR operator. Defaults to `Match.allWithNormalizing | Match.oovChrModel`.
      * @param blockList Specifies a list of morphemes to prohibit from appearing as candidates in the analysis.
      * @param pretokenized Predefines the result of morphological analysis of a specific segment of text prior to morphological analysis. The section of text defined by this value will always be tokenized in that way only.
      * @returns A list of `TokenInfo` object.
@@ -254,7 +255,7 @@ export interface Kiwi {
      * Performs morphological analysis. Returns multiple lists of tokens. Use `analyzeTopN` if the result scores are needed. Use `tokenize` if you need only one result.
      * @param str String to analyze
      * @param n Number of results to return
-     * @param matchOptions Specifies the special string pattern extracted. This can be set to any combination of `Match` by using the bitwise OR operator.
+     * @param matchOptions Specifies the special string pattern extracted. This can be set to any combination of `Match` by using the bitwise OR operator. Defaults to `Match.allWithNormalizing | Match.oovChrModel`.
      * @param blockList Specifies a list of morphemes to prohibit from appearing as candidates in the analysis.
      * @param pretokenized Predefines the result of morphological analysis of a specific segment of text prior to morphological analysis. The section of text defined by this value will always be tokenized in that way only.
      * @returns A list of lists of `TokenInfo` objects.

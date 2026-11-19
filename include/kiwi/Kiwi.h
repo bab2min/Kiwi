@@ -74,7 +74,7 @@ namespace kiwi
 		/**
 		* @brief 형태소 분석 시 매칭 옵션
 		*/
-		Match match = Match::allWithNormalizing;
+		Match match = Match::allWithNormalizing | Match::oovChrModel;
 
 		/**
 		* @brief 분석 결과에서 제외할 형태소 목록

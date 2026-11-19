@@ -38,6 +38,9 @@ public struct MatchOptions: OptionSet, Codable {
     /// OOV: use character frequency and branch model
     public static let oovChrFreqBranchModel = MatchOptions(rawValue: 3 << 8)
 
+    /// OOV: also use the consistency of OOV forms within the whole text (combine with an OOV model)
+    public static let oovTotalConsistency = MatchOptions(rawValue: 1 << 10)
+
     /// OOV option mask
     public static let oovMask = MatchOptions(rawValue: 3 << 8)
 

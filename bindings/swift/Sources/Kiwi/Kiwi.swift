@@ -21,7 +21,7 @@ public final class Kiwi {
     /// - Parameters:
     ///   - text: Text to analyze
     ///   - topN: Number of top results to return (default: 1)
-    ///   - options: Match options (default: .allWithNormalizing)
+    ///   - options: Match options (default: [.allWithNormalizing, .oovChrModel])
     ///   - typoTransformer: Optional prepared typo transformer for typo correction
     ///   - typoThreshold: Typo cost threshold (default: 2.5)
     /// - Returns: Array of token result candidates
@@ -29,7 +29,7 @@ public final class Kiwi {
     public func analyze(
         _ text: String,
         topN: Int = 1,
-        options: MatchOptions = .allWithNormalizing,
+        options: MatchOptions = [.allWithNormalizing, .oovChrModel],
         typoTransformer: PreparedTypoTransformer? = nil,
         typoThreshold: Float = 2.5
     ) throws -> [TokenResult] {
@@ -93,14 +93,14 @@ public final class Kiwi {
     /// Tokenize text and return simple token array (uses best analysis result)
     /// - Parameters:
     ///   - text: Text to tokenize
-    ///   - options: Match options (default: .allWithNormalizing)
+    ///   - options: Match options (default: [.allWithNormalizing, .oovChrModel])
     ///   - typoTransformer: Optional prepared typo transformer for typo correction
     ///   - typoThreshold: Typo cost threshold (default: 2.5)
     /// - Returns: Array of tokens
     /// - Throws: KiwiError if tokenization fails
     public func tokenize(
         _ text: String,
-        options: MatchOptions = .allWithNormalizing,
+        options: MatchOptions = [.allWithNormalizing, .oovChrModel],
         typoTransformer: PreparedTypoTransformer? = nil,
         typoThreshold: Float = 2.5
     ) throws -> [Token] {

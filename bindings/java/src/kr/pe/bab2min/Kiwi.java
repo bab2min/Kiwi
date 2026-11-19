@@ -26,6 +26,7 @@ public class Kiwi implements AutoCloseable  {
 		oovChrFreqModel = 2 << 8,
 		oovChrFreqBranchModel = 3 << 8,
 		oovMask = 3 << 8,
+		oovTotalConsistency = 1 << 10,
 		normalizeCoda = 1 << 16,
 		joinNounPrefix = 1 << 17,
 		joinNounSuffix = 1 << 18,
@@ -198,7 +199,7 @@ public class Kiwi implements AutoCloseable  {
 		}
 
 		public AnalyzeOption() {
-			this(Match.allWithNormalizing, null, Dialect.standard, 0.0f);
+			this(Match.allWithNormalizing | Match.oovChrModel, null, Dialect.standard, 0.0f);
 		}
 	}
 
@@ -588,7 +589,7 @@ public class Kiwi implements AutoCloseable  {
 		try(Scanner input = new Scanner(System.in)) {
 			System.out.print(">> ");
 			while (input.hasNext()) {
-				Token[] tokens = kiwi.tokenize(input.nextLine(), new AnalyzeOption(Match.allWithNormalizing));
+				Token[] tokens = kiwi.tokenize(input.nextLine(), new AnalyzeOption(Match.allWithNormalizing | Match.oovChrModel));
 				System.out.println(Arrays.deepToString(tokens));
 				System.out.print(">> ");
 			}

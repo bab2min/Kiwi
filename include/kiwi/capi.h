@@ -660,7 +660,7 @@ DECL_DLL float kiwi_get_option_f(kiwi_h handle, int option);
 DECL_DLL kiwi_morphset_h kiwi_new_morphset(kiwi_h handle);
 
 typedef struct {
-	int match_options; /**< KIWI_MATCH_* 열거형 참고. 기본값은 KIWI_MATCH_ALL_WITH_NORMALIZING 입니다. */
+	int match_options; /**< KIWI_MATCH_* 열거형 참고. 권장값은 KIWI_MATCH_ALL_WITH_NORMALIZING | KIWI_MATCH_OOV_CHR_MODEL 입니다(C++ AnalyzeOption의 기본값). OOV 옵션을 주지 않으면 규칙만으로 미등재어를 찾습니다. */
 	kiwi_morphset_h blocklist; /**< 분석 후보 탐색 과정에서 blocklist에 포함된 형태소들은 배제됩니다. null 입력 시에는 blocklist를 사용하지 않습니다. */
 	int open_ending; /**< 마지막 형태소 다음 문장을 종결하지 않고 열린 상태로 끝낼지를 설정니다. 기본값은 0으로 마지막 형태소 다음 바로 문장을 종결합니다. */
 	int allowed_dialects; /**< KIWI_DIALECT_* 열거형 참고 */
