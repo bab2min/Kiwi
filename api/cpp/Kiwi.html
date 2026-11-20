@@ -197,7 +197,7 @@
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N4kiwi13AnalyzeOption5matchE">
-<span id="_CPPv3N4kiwi13AnalyzeOption5matchE"></span><span id="_CPPv2N4kiwi13AnalyzeOption5matchE"></span><span id="kiwi::AnalyzeOption::match__Match"></span><span class="target" id="structkiwi_1_1AnalyzeOption_1a55c90d58b6b006a3d1025dc114125f8a"></span><span class="n"><span class="pre">Match</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">match</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">Match</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">allWithNormalizing</span></span><a class="headerlink" href="#_CPPv4N4kiwi13AnalyzeOption5matchE" title="Link to this definition"></a><br /></dt>
+<span id="_CPPv3N4kiwi13AnalyzeOption5matchE"></span><span id="_CPPv2N4kiwi13AnalyzeOption5matchE"></span><span id="kiwi::AnalyzeOption::match__Match"></span><span class="target" id="structkiwi_1_1AnalyzeOption_1a55c90d58b6b006a3d1025dc114125f8a"></span><span class="n"><span class="pre">Match</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">match</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">Match</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">allWithNormalizing</span></span><span class="w"> </span><span class="o"><span class="pre">|</span></span><span class="w"> </span><span class="n"><span class="pre">Match</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">oovChrModel</span></span><a class="headerlink" href="#_CPPv4N4kiwi13AnalyzeOption5matchE" title="Link to this definition"></a><br /></dt>
 <dd><p>형태소 분석 시 매칭 옵션 </p>
 </dd></dl>
 
@@ -1470,26 +1470,43 @@
 <dd></dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK4kiwi11KiwiBuilder5buildERK15TypoTransformerf">
-<span id="_CPPv3NK4kiwi11KiwiBuilder5buildERK15TypoTransformerf"></span><span id="_CPPv2NK4kiwi11KiwiBuilder5buildERK15TypoTransformerf"></span><span id="kiwi::KiwiBuilder::build__TypoTransformerCR.floatC"></span><span class="target" id="classkiwi_1_1KiwiBuilder_1a1e70e60a8e5b02e69783777d5f4036fe"></span><a class="reference internal" href="#_CPPv4N4kiwi4KiwiE" title="kiwi::Kiwi"><span class="n"><span class="pre">Kiwi</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">build</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">TypoTransformer</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">typos</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="p"><span class="pre">}</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">typoCostThreshold</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">2.5f</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4kiwi11KiwiBuilder5buildERK15TypoTransformerf" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4NK4kiwi11KiwiBuilder5buildEv">
+<span id="_CPPv3NK4kiwi11KiwiBuilder5buildEv"></span><span id="_CPPv2NK4kiwi11KiwiBuilder5buildEv"></span><span id="kiwi::KiwiBuilder::buildC"></span><span class="target" id="classkiwi_1_1KiwiBuilder_1af559f6584302e821efb73365634cf4c6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N4kiwi4KiwiE" title="kiwi::Kiwi"><span class="n"><span class="pre">Kiwi</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">build</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4kiwi11KiwiBuilder5buildEv" title="Link to this definition"></a><br /></dt>
 <dd><p>현재 단어 및 사전 설정을 기반으로 <a class="reference internal" href="#classkiwi_1_1Kiwi"><span class="std std-ref">Kiwi</span></a> 객체를 생성한다. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>오타 교정은 분석할 때 AnalyzeOption::typoTransformer로 지정한다. </p>
+</div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>typos</strong> – </p></li>
-<li><p><strong>typoCostThreshold</strong> – </p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>형태소 분석 준비가 완료된 Kiwi의 객체. </p>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>형태소 분석 준비가 완료된 Kiwi의 객체. </p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4kiwi11KiwiBuilder5buildERK15TypoTransformerf">
+<span id="_CPPv3NK4kiwi11KiwiBuilder5buildERK15TypoTransformerf"></span><span id="_CPPv2NK4kiwi11KiwiBuilder5buildERK15TypoTransformerf"></span><span id="kiwi::KiwiBuilder::build__TypoTransformerCR.floatC"></span><span class="target" id="classkiwi_1_1KiwiBuilder_1af252038a4a6fbed2451b568d3f16b806"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N4kiwi4KiwiE" title="kiwi::Kiwi"><span class="n"><span class="pre">Kiwi</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">build</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">TypoTransformer</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">typos</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">typoCostThreshold</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">2.5f</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4kiwi11KiwiBuilder5buildERK15TypoTransformerf" title="Link to this definition"></a><br /></dt>
+<dd><p>오타를 사전에 포함시켜 <a class="reference internal" href="#classkiwi_1_1Kiwi"><span class="std std-ref">Kiwi</span></a> 객체를 생성한다. </p>
+<p><dl>
+<dt class="sig sig-object cpp">
+<em><span class="pre">Deprecated:</span></em></dt>
+<dd><p>오타 없이 <a class="reference internal" href="#classkiwi_1_1KiwiBuilder_1af559f6584302e821efb73365634cf4c6"><span class="std std-ref">build()</span></a>로 생성하고, 분석할 때 AnalyzeOption::typoTransformer로 오타 교정기를 지정한다. 이 함수로 생성한 Kiwi는 AnalyzeOption::typoTransformer를 무시한다. </p>
+</dd></dl>
+
+</p>
 </dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK4kiwi11KiwiBuilder5buildE14DefaultTypoSetf">
 <span id="_CPPv3NK4kiwi11KiwiBuilder5buildE14DefaultTypoSetf"></span><span id="_CPPv2NK4kiwi11KiwiBuilder5buildE14DefaultTypoSetf"></span><span id="kiwi::KiwiBuilder::build__DefaultTypoSet.floatC"></span><span class="target" id="classkiwi_1_1KiwiBuilder_1ae2f54e76a62e3558f78705e949236d70"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N4kiwi4KiwiE" title="kiwi::Kiwi"><span class="n"><span class="pre">Kiwi</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">build</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">DefaultTypoSet</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">typos</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">typoCostThreshold</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">2.5f</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4kiwi11KiwiBuilder5buildE14DefaultTypoSetf" title="Link to this definition"></a><br /></dt>
 <dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4kiwi11KiwiBuilder9buildImplERK15TypoTransformerf">
+<span id="_CPPv3NK4kiwi11KiwiBuilder9buildImplERK15TypoTransformerf"></span><span id="_CPPv2NK4kiwi11KiwiBuilder9buildImplERK15TypoTransformerf"></span><span id="kiwi::KiwiBuilder::buildImpl__TypoTransformerCR.floatC"></span><span class="target" id="classkiwi_1_1KiwiBuilder_1aa41bf601c51fb46163c354775187b257"></span><a class="reference internal" href="#_CPPv4N4kiwi4KiwiE" title="kiwi::Kiwi"><span class="n"><span class="pre">Kiwi</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">buildImpl</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">TypoTransformer</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">typos</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">typoCostThreshold</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4kiwi11KiwiBuilder9buildImplERK15TypoTransformerf" title="Link to this definition"></a><br /></dt>
+<dd><p>오타를 사전에 포함시켜 <a class="reference internal" href="#classkiwi_1_1Kiwi"><span class="std std-ref">Kiwi</span></a> 객체를 생성한다. C API처럼 하위 호환을 위해 이 방식을 유지해야 하는 곳에서만 쓴다. </p>
+</dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK4kiwi11KiwiBuilder13convertHSDataERKNSt6vectorINSt6stringEEERKNSt6stringERKNSt6stringE6size_tbPKNSt6vectorINSt4pairINSt4pairINSt6stringE6POSTagEENSt6vectorINSt4pairINSt6stringE6POSTagEEEEEEEE">

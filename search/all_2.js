@@ -8,7 +8,8 @@ var searchData=
   ['bpetokenizer_5',['BpeTokenizer',['../classkiwi_1_1BpeTokenizer.html',1,'kiwi']]],
   ['bpetokenizertrainer_6',['BpeTokenizerTrainer',['../classkiwi_1_1BpeTokenizerTrainer.html',1,'kiwi']]],
   ['bpetrainerconfig_7',['BpeTrainerConfig',['../structkiwi_1_1BpeTrainerConfig.html',1,'kiwi']]],
-  ['build_8',['build',['../classkiwi_1_1KiwiBuilder.html#a1e70e60a8e5b02e69783777d5f4036fe',1,'kiwi::KiwiBuilder']]],
-  ['buildmorphgraph_9',['buildMorphGraph',['../classkiwi_1_1Kiwi.html#a60791454fef34490dd75ec1b3a44892d',1,'kiwi::Kiwi']]],
-  ['buildoption_10',['BuildOption',['../Types_8h.html#a7b5ed1c7b90b79877f32c8a011c06ff3',1,'kiwi']]]
+  ['build_8',['build',['../classkiwi_1_1KiwiBuilder.html#af559f6584302e821efb73365634cf4c6',1,'kiwi::KiwiBuilder::build() const'],['../classkiwi_1_1KiwiBuilder.html#af252038a4a6fbed2451b568d3f16b806',1,'kiwi::KiwiBuilder::build(const TypoTransformer &amp;typos, float typoCostThreshold=2.5f) const']]],
+  ['buildimpl_9',['buildImpl',['../classkiwi_1_1KiwiBuilder.html#aa41bf601c51fb46163c354775187b257',1,'kiwi::KiwiBuilder']]],
+  ['buildmorphgraph_10',['buildMorphGraph',['../classkiwi_1_1Kiwi.html#a60791454fef34490dd75ec1b3a44892d',1,'kiwi::Kiwi']]],
+  ['buildoption_11',['BuildOption',['../Types_8h.html#a7b5ed1c7b90b79877f32c8a011c06ff3',1,'kiwi']]]
 ];

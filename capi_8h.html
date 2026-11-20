@@ -192,26 +192,29 @@ Enumerations</h2></td></tr>
 &#160;&#160;<b>KIWI_MATCH_OOV_CHR_FREQ_MODEL</b> = 2 &lt;&lt; 8
 , <b>KIWI_MATCH_OOV_CHR_FREQ_BRANCH_MODEL</b> = 3 &lt;&lt; 8
 , <b>KIWI_MATCH_OOV_MASK</b> = 3 &lt;&lt; 8
-, <b>KIWI_MATCH_NORMALIZE_CODA</b> = 1 &lt;&lt; 16
+, <b>KIWI_MATCH_OOV_TOTAL_CONSISTENCY</b> = 1 &lt;&lt; 10
 , <br />
-&#160;&#160;<b>KIWI_MATCH_JOIN_NOUN_PREFIX</b> = 1 &lt;&lt; 17
+&#160;&#160;<b>KIWI_MATCH_NORMALIZE_CODA</b> = 1 &lt;&lt; 16
+, <b>KIWI_MATCH_JOIN_NOUN_PREFIX</b> = 1 &lt;&lt; 17
 , <b>KIWI_MATCH_JOIN_NOUN_SUFFIX</b> = 1 &lt;&lt; 18
 , <b>KIWI_MATCH_JOIN_VERB_SUFFIX</b> = 1 &lt;&lt; 19
-, <b>KIWI_MATCH_JOIN_ADJ_SUFFIX</b> = 1 &lt;&lt; 20
 , <br />
-&#160;&#160;<b>KIWI_MATCH_JOIN_ADV_SUFFIX</b> = 1 &lt;&lt; 21
+&#160;&#160;<b>KIWI_MATCH_JOIN_ADJ_SUFFIX</b> = 1 &lt;&lt; 20
+, <b>KIWI_MATCH_JOIN_ADV_SUFFIX</b> = 1 &lt;&lt; 21
 , <b>KIWI_MATCH_JOIN_V_SUFFIX</b> = KIWI_MATCH_JOIN_VERB_SUFFIX | KIWI_MATCH_JOIN_ADJ_SUFFIX
 , <b>KIWI_MATCH_JOIN_AFFIX</b> = KIWI_MATCH_JOIN_NOUN_PREFIX | KIWI_MATCH_JOIN_NOUN_SUFFIX | KIWI_MATCH_JOIN_V_SUFFIX | KIWI_MATCH_JOIN_ADV_SUFFIX
-, <b>KIWI_MATCH_SPLIT_COMPLEX</b> = 1 &lt;&lt; 22
 , <br />
-&#160;&#160;<b>KIWI_MATCH_Z_CODA</b> = 1 &lt;&lt; 23
+&#160;&#160;<b>KIWI_MATCH_SPLIT_COMPLEX</b> = 1 &lt;&lt; 22
+, <b>KIWI_MATCH_Z_CODA</b> = 1 &lt;&lt; 23
 , <b>KIWI_MATCH_COMPATIBLE_JAMO</b> = 1 &lt;&lt; 24
 , <b>KIWI_MATCH_SPLIT_SAISIOT</b> = 1 &lt;&lt; 25
-, <b>KIWI_MATCH_MERGE_SAISIOT</b> = 1 &lt;&lt; 26
 , <br />
-&#160;&#160;<b>KIWI_MATCH_JOIN_PARTICLE_YO</b> = 1 &lt;&lt; 27
+&#160;&#160;<b>KIWI_MATCH_MERGE_SAISIOT</b> = 1 &lt;&lt; 26
+, <b>KIWI_MATCH_JOIN_PARTICLE_YO</b> = 1 &lt;&lt; 27
+, <b>KIWI_MATCH_QUOTED_HA_OMISSION</b> = 1 &lt;&lt; 28
 , <b>KIWI_MATCH_USE_OLD_SPLITTER</b> = 1 &lt;&lt; 30
-, <b>KIWI_MATCH_ALL</b> = KIWI_MATCH_URL | KIWI_MATCH_EMAIL | KIWI_MATCH_HASHTAG | KIWI_MATCH_MENTION | KIWI_MATCH_SERIAL | KIWI_MATCH_EMOJI | KIWI_MATCH_Z_CODA
+, <br />
+&#160;&#160;<b>KIWI_MATCH_ALL</b> = KIWI_MATCH_URL | KIWI_MATCH_EMAIL | KIWI_MATCH_HASHTAG | KIWI_MATCH_MENTION | KIWI_MATCH_SERIAL | KIWI_MATCH_EMOJI | KIWI_MATCH_Z_CODA
 , <b>KIWI_MATCH_ALL_WITH_NORMALIZING</b> = KIWI_MATCH_ALL | KIWI_MATCH_NORMALIZE_CODA
 <br />
  }</td></tr>
@@ -296,6 +299,8 @@ Functions</h2></td></tr>
 <tr class="memdesc:a8c076e366216b5642facc182981867eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">현재 오타 교정기의 연철 오타 비용을 설정합니다.  <br /></td></tr>
 <tr class="memitem:a908abd7e80b5a0bec65d1019a35ac61d" id="r_a908abd7e80b5a0bec65d1019a35ac61d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a908abd7e80b5a0bec65d1019a35ac61d">kiwi_typo_set_lengthening_typo_cost</a> (kiwi_typo_h handle, float threshold)</td></tr>
 <tr class="memdesc:a908abd7e80b5a0bec65d1019a35ac61d"><td class="mdescLeft">&#160;</td><td class="mdescRight">현재 오타 교정기의 장음화 오타 비용을 설정합니다.  <br /></td></tr>
+<tr class="memitem:ab15f55ad48f3c4c45a39f70563ce4db8" id="r_ab15f55ad48f3c4c45a39f70563ce4db8"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab15f55ad48f3c4c45a39f70563ce4db8">kiwi_typo_set_fuzzy_typo_cost</a> (kiwi_typo_h handle, float threshold, int real_word_errors, int min_jamo)</td></tr>
+<tr class="memdesc:ab15f55ad48f3c4c45a39f70563ce4db8"><td class="mdescLeft">&#160;</td><td class="mdescRight">현재 오타 교정기의 자모 편집 오타 비용을 설정합니다.  <br /></td></tr>
 <tr class="memitem:a37fd1440ce53804ce6820760ed2b2d05" id="r_a37fd1440ce53804ce6820760ed2b2d05"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a37fd1440ce53804ce6820760ed2b2d05">kiwi_typo_close</a> (kiwi_typo_h handle)</td></tr>
 <tr class="memdesc:a37fd1440ce53804ce6820760ed2b2d05"><td class="mdescLeft">&#160;</td><td class="mdescRight">생성된 오타 교정기를 해제합니다.  <br /></td></tr>
 <tr class="memitem:a1374c3d8f8e6ca221517ab07b90cd6d8" id="r_a1374c3d8f8e6ca221517ab07b90cd6d8"><td class="memItemLeft" align="right" valign="top">kiwi_prepared_typo_h&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1374c3d8f8e6ca221517ab07b90cd6d8">kiwi_typo_prepare</a> (kiwi_typo_h handle)</td></tr>
@@ -1127,7 +1132,7 @@ Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">handle</td><td>KiwiBuilder. </td></tr>
-    <tr><td class="paramname">typos</td><td>오타 교정기의 핸들. 오타 교정을 사용하지 않을 경우 null을 입력합니다. </td></tr>
+    <tr><td class="paramname">typos</td><td>오타 교정기의 핸들. 오타 교정을 사용하지 않을 경우 null을 입력합니다. (deprecated) null 대신 오타 교정기를 넣는 방식은 더 이상 권장하지 않습니다. null로 생성한 뒤 분석할 때 kiwi_analyze_option_t의 typo_transformer를 지정하십시오. 오타 교정기를 넣어 생성한 Kiwi는 typo_transformer를 무시합니다. </td></tr>
     <tr><td class="paramname">typo_cost_threshold</td><td>오타 교정기에서 생성하는 오타 중 비용이 이 값 이하인 오타만 사용합니다.</td></tr>
   </table>
   </dd>
@@ -4242,6 +4247,50 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>성공 시 0를 반환합니다. 실패 시 음수를 반환하고 에러 메세지를 설정합니다.</dd></dl>
 <dl class="section note"><dt>Note</dt><dd>연철 오타의 초기값은 무한대, 즉 비활성화 상태입니다. 유한한 값으로 설정하면 연철 오타가 활성화됩니다. </dd></dl>
+
+</div>
+</div>
+<a id="ab15f55ad48f3c4c45a39f70563ce4db8" name="ab15f55ad48f3c4c45a39f70563ce4db8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab15f55ad48f3c4c45a39f70563ce4db8">&#9670;&#160;</a></span>kiwi_typo_set_fuzzy_typo_cost()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int kiwi_typo_set_fuzzy_typo_cost </td>
+          <td>(</td>
+          <td class="paramtype">kiwi_typo_h</td>          <td class="paramname"><span class="paramname"><em>handle</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float</td>          <td class="paramname"><span class="paramname"><em>threshold</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>real_word_errors</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>min_jamo</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>현재 오타 교정기의 자모 편집 오타 비용을 설정합니다. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">handle</td><td>오타 교정기의 핸들 </td></tr>
+    <tr><td class="paramname">threshold</td><td>자모 편집 한 번의 비용 </td></tr>
+    <tr><td class="paramname">real_word_errors</td><td>0이면 원문 구간이 이미 사전에 등록된 형태일 때는 교정을 수행하지 않습니다. 0이 아니면 이 경우에도 교정을 수행하지만 분석이 느려집니다. </td></tr>
+    <tr><td class="paramname">min_jamo</td><td>편집 대상이 되는 사전 형태의 최소 자모 수. 기본값은 3입니다. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>성공 시 0를 반환합니다. 실패 시 음수를 반환하고 에러 메세지를 설정합니다.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>자모 편집 오타의 초기값은 무한대, 즉 비활성화 상태입니다. 유한한 값으로 설정하면 형태 하나에 자모 편집 한 번까지 허용한 형태도 후보로 찾습니다. </dd></dl>
 
 </div>
 </div>

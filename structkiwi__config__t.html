@@ -93,6 +93,8 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:a446253936b9fe0c526eede46fc5feecd" id="r_a446253936b9fe0c526eede46fc5feecd"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a446253936b9fe0c526eede46fc5feecd">max_unk_form_size</a></td></tr>
 <tr class="memitem:a060ab46c293b6df3eb9e9e1a775ebb41" id="r_a060ab46c293b6df3eb9e9e1a775ebb41"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a060ab46c293b6df3eb9e9e1a775ebb41">max_unk_form_size_followed_by_j_class</a></td></tr>
 <tr class="memitem:a541326da7282e397298e563f3958a5f1" id="r_a541326da7282e397298e563f3958a5f1"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a541326da7282e397298e563f3958a5f1">space_tolerance</a></td></tr>
+<tr class="memitem:a4c055d980ce560296611d76518bb468c" id="r_a4c055d980ce560296611d76518bb468c"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4c055d980ce560296611d76518bb468c">oov_cut_off_threshold</a></td></tr>
+<tr class="memitem:a933f0eaec8bc88d35f62b4efa5af85aa" id="r_a933f0eaec8bc88d35f62b4efa5af85aa"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a933f0eaec8bc88d35f62b4efa5af85aa">oov_total_smoothness</a></td></tr>
 </table>
 <a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">Member Data Documentation</h2>
 <a id="a26a2c225b9a9e746a0ba728b78386528" name="a26a2c225b9a9e746a0ba728b78386528"></a>
@@ -170,6 +172,21 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="a4c055d980ce560296611d76518bb468c" name="a4c055d980ce560296611d76518bb468c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4c055d980ce560296611d76518bb468c">&#9670;&#160;</a></span>oov_cut_off_threshold</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float kiwi_config_t::oov_cut_off_threshold</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>미등재 형태 후보 중 이 값보다 더 크게 차이가 나는 후보들은 제거합니다. </p>
+
+</div>
+</div>
 <a id="ad7bf85db6dd2af78e54770570299d9f2" name="ad7bf85db6dd2af78e54770570299d9f2"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad7bf85db6dd2af78e54770570299d9f2">&#9670;&#160;</a></span>oov_global_min_freq</h2>
 
@@ -242,6 +259,21 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>미등재 형태 추출 시 사용하는 기울기 값 </p>
+
+</div>
+</div>
+<a id="a933f0eaec8bc88d35f62b4efa5af85aa" name="a933f0eaec8bc88d35f62b4efa5af85aa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a933f0eaec8bc88d35f62b4efa5af85aa">&#9670;&#160;</a></span>oov_total_smoothness</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float kiwi_config_t::oov_total_smoothness</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>KIWI_MATCH_OOV_TOTAL_CONSISTENCY에서 사용하는 평활화 값 </p>
 
 </div>
 </div>

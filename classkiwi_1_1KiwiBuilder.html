@@ -149,10 +149,13 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>addPreAnalyzedWord</b
 std::vector&lt; <a class="el" href="structkiwi_1_1WordInfo.html">WordInfo</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>extractWords</b> (const U16MultipleReader &amp;reader, size_t minCnt=10, size_t maxWordLen=10, float minScore=0.25, float posThreshold=-3, bool lmFilter=true) const</td></tr>
 <tr class="memitem:a8f8b405aaca18ad074fa50390495bef8" id="r_a8f8b405aaca18ad074fa50390495bef8"><td class="memItemLeft" align="right" valign="top"><a id="a8f8b405aaca18ad074fa50390495bef8" name="a8f8b405aaca18ad074fa50390495bef8"></a>
 std::vector&lt; <a class="el" href="structkiwi_1_1WordInfo.html">WordInfo</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>extractAddWords</b> (const U16MultipleReader &amp;reader, size_t minCnt=10, size_t maxWordLen=10, float minScore=0.25, float posThreshold=-3, bool lmFilter=true)</td></tr>
-<tr class="memitem:a1e70e60a8e5b02e69783777d5f4036fe" id="r_a1e70e60a8e5b02e69783777d5f4036fe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classkiwi_1_1Kiwi.html">Kiwi</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1e70e60a8e5b02e69783777d5f4036fe">build</a> (const <a class="el" href="classkiwi_1_1TypoTransformer.html">TypoTransformer</a> &amp;typos={}, float typoCostThreshold=2.5f) const</td></tr>
-<tr class="memdesc:a1e70e60a8e5b02e69783777d5f4036fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">현재 단어 및 사전 설정을 기반으로 <a class="el" href="classkiwi_1_1Kiwi.html" title="실제 형태소 분석을 수행하는 클래스.">Kiwi</a> 객체를 생성한다.  <br /></td></tr>
+<tr class="memitem:af559f6584302e821efb73365634cf4c6" id="r_af559f6584302e821efb73365634cf4c6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classkiwi_1_1Kiwi.html">Kiwi</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af559f6584302e821efb73365634cf4c6">build</a> () const</td></tr>
+<tr class="memdesc:af559f6584302e821efb73365634cf4c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">현재 단어 및 사전 설정을 기반으로 <a class="el" href="classkiwi_1_1Kiwi.html" title="실제 형태소 분석을 수행하는 클래스.">Kiwi</a> 객체를 생성한다.  <br /></td></tr>
+<tr class="memitem:af252038a4a6fbed2451b568d3f16b806" id="r_af252038a4a6fbed2451b568d3f16b806"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classkiwi_1_1Kiwi.html">Kiwi</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af252038a4a6fbed2451b568d3f16b806">build</a> (const <a class="el" href="classkiwi_1_1TypoTransformer.html">TypoTransformer</a> &amp;typos, float typoCostThreshold=2.5f) const</td></tr>
+<tr class="memdesc:af252038a4a6fbed2451b568d3f16b806"><td class="mdescLeft">&#160;</td><td class="mdescRight">오타를 사전에 포함시켜 <a class="el" href="classkiwi_1_1Kiwi.html" title="실제 형태소 분석을 수행하는 클래스.">Kiwi</a> 객체를 생성한다.  <br /></td></tr>
 <tr class="memitem:ae2f54e76a62e3558f78705e949236d70" id="r_ae2f54e76a62e3558f78705e949236d70"><td class="memItemLeft" align="right" valign="top"><a id="ae2f54e76a62e3558f78705e949236d70" name="ae2f54e76a62e3558f78705e949236d70"></a>
 <a class="el" href="classkiwi_1_1Kiwi.html">Kiwi</a>&#160;</td><td class="memItemRight" valign="bottom"><b>build</b> (DefaultTypoSet typos, float typoCostThreshold=2.5f) const</td></tr>
+<tr class="memitem:aa41bf601c51fb46163c354775187b257" id="r_aa41bf601c51fb46163c354775187b257"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classkiwi_1_1Kiwi.html">Kiwi</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa41bf601c51fb46163c354775187b257">buildImpl</a> (const <a class="el" href="classkiwi_1_1TypoTransformer.html">TypoTransformer</a> &amp;typos, float typoCostThreshold) const</td></tr>
 <tr class="memitem:a8fa1823d9f1647de2d5fecfb98e70999" id="r_a8fa1823d9f1647de2d5fecfb98e70999"><td class="memItemLeft" align="right" valign="top"><a id="a8fa1823d9f1647de2d5fecfb98e70999" name="a8fa1823d9f1647de2d5fecfb98e70999"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>convertHSData</b> (const std::vector&lt; std::string &gt; &amp;inputPathes, const std::string &amp;outputPath, const std::string &amp;morphemeDefPath={}, size_t morphemeDefMinCnt=0, bool generateOovDict=false, const std::vector&lt; std::pair&lt; std::pair&lt; std::string, <a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebb">POSTag</a> &gt;, std::vector&lt; std::pair&lt; std::string, <a class="el" href="Types_8h.html#ac15313ea8fffc5cc54475e10264ddebb">POSTag</a> &gt; &gt; &gt; &gt; *transform=nullptr) const</td></tr>
 <tr class="memitem:af886c89a6606d7a544e63ce707d17172" id="r_af886c89a6606d7a544e63ce707d17172"><td class="memItemLeft" align="right" valign="top"><a id="af886c89a6606d7a544e63ce707d17172" name="af886c89a6606d7a544e63ce707d17172"></a>
@@ -505,16 +508,48 @@ template&lt;class Replacer&gt; </div>
 
 </div>
 </div>
-<a id="a1e70e60a8e5b02e69783777d5f4036fe" name="a1e70e60a8e5b02e69783777d5f4036fe"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1e70e60a8e5b02e69783777d5f4036fe">&#9670;&#160;</a></span>build()</h2>
+<a id="af559f6584302e821efb73365634cf4c6" name="af559f6584302e821efb73365634cf4c6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af559f6584302e821efb73365634cf4c6">&#9670;&#160;</a></span>build() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="classkiwi_1_1Kiwi.html">Kiwi</a> kiwi::KiwiBuilder::build </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classkiwi_1_1TypoTransformer.html">TypoTransformer</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>typos</em></span><span class="paramdefsep"> = </span><span class="paramdefval">{}</span>, </td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>현재 단어 및 사전 설정을 기반으로 <a class="el" href="classkiwi_1_1Kiwi.html" title="실제 형태소 분석을 수행하는 클래스.">Kiwi</a> 객체를 생성한다. </p>
+<dl class="section return"><dt>Returns</dt><dd>형태소 분석 준비가 완료된 Kiwi의 객체. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>오타 교정은 분석할 때 AnalyzeOption::typoTransformer로 지정한다. </dd></dl>
+
+</div>
+</div>
+<a id="af252038a4a6fbed2451b568d3f16b806" name="af252038a4a6fbed2451b568d3f16b806"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af252038a4a6fbed2451b568d3f16b806">&#9670;&#160;</a></span>build() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classkiwi_1_1Kiwi.html">Kiwi</a> kiwi::KiwiBuilder::build </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classkiwi_1_1TypoTransformer.html">TypoTransformer</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>typos</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -522,17 +557,37 @@ template&lt;class Replacer&gt; </div>
           <td class="paramtype">float</td>          <td class="paramname"><span class="paramname"><em>typoCostThreshold</em></span><span class="paramdefsep"> = </span><span class="paramdefval">2.5f</span>&#160;) const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
-<p>현재 단어 및 사전 설정을 기반으로 <a class="el" href="classkiwi_1_1Kiwi.html" title="실제 형태소 분석을 수행하는 클래스.">Kiwi</a> 객체를 생성한다. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">typos</td><td></td></tr>
-    <tr><td class="paramname">typoCostThreshold</td><td></td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>형태소 분석 준비가 완료된 Kiwi의 객체. </dd></dl>
+<p>오타를 사전에 포함시켜 <a class="el" href="classkiwi_1_1Kiwi.html" title="실제 형태소 분석을 수행하는 클래스.">Kiwi</a> 객체를 생성한다. </p>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000001">Deprecated</a></b></dt><dd>오타 없이 <a class="el" href="#af559f6584302e821efb73365634cf4c6" title="현재 단어 및 사전 설정을 기반으로 Kiwi 객체를 생성한다.">build()</a>로 생성하고, 분석할 때 AnalyzeOption::typoTransformer로 오타 교정기를 지정한다. 이 함수로 생성한 Kiwi는 AnalyzeOption::typoTransformer를 무시한다. </dd></dl>
+
+</div>
+</div>
+<a id="aa41bf601c51fb46163c354775187b257" name="aa41bf601c51fb46163c354775187b257"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa41bf601c51fb46163c354775187b257">&#9670;&#160;</a></span>buildImpl()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classkiwi_1_1Kiwi.html">Kiwi</a> kiwi::KiwiBuilder::buildImpl </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classkiwi_1_1TypoTransformer.html">TypoTransformer</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>typos</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float</td>          <td class="paramname"><span class="paramname"><em>typoCostThreshold</em></span>&#160;) const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>오타를 사전에 포함시켜 <a class="el" href="classkiwi_1_1Kiwi.html" title="실제 형태소 분석을 수행하는 클래스.">Kiwi</a> 객체를 생성한다. C API처럼 하위 호환을 위해 이 방식을 유지해야 하는 곳에서만 쓴다. </p>
 
 </div>
 </div>
