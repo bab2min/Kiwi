@@ -38,6 +38,9 @@ public struct MatchOptions: OptionSet, Codable {
     /// OOV: use character frequency and branch model
     public static let oovChrFreqBranchModel = MatchOptions(rawValue: 3 << 8)
 
+    /// OOV: also use the consistency of OOV forms within the whole text (combine with an OOV model)
+    public static let oovTotalConsistency = MatchOptions(rawValue: 1 << 10)
+
     /// OOV option mask
     public static let oovMask = MatchOptions(rawValue: 3 << 8)
 
@@ -82,6 +85,9 @@ public struct MatchOptions: OptionSet, Codable {
 
     /// Join particle yo
     public static let joinParticleYo = MatchOptions(rawValue: 1 << 27)
+
+    /// Restore '하' omitted after quotations
+    public static let quotedHaOmission = MatchOptions(rawValue: 1 << 28)
 
     /// All basic matching options
     public static let all: MatchOptions = [.url, .email, .hashtag, .mention, .serial, .emoji, .zCoda]

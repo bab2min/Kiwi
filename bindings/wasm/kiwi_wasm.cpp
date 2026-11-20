@@ -163,6 +163,10 @@ const PreparedTypoTransformer* parseTypoArg(const json& args, size_t index, floa
             typoSet = DefaultTypoSet::continualTypoSet;
         } else if (typosStr == "basicWithContinual") {
             typoSet = DefaultTypoSet::basicTypoSetWithContinual;
+        } else if (typosStr == "lengthening") {
+            typoSet = DefaultTypoSet::lengtheningTypoSet;
+        } else if (typosStr == "basicWithContinualAndLengthening") {
+            typoSet = DefaultTypoSet::basicTypoSetWithContinualAndLengthening;
         }
         return getDefaultPreparedTypoSet(typoSet);
     } else {
@@ -191,6 +195,14 @@ const PreparedTypoTransformer* parseTypoArg(const json& args, size_t index, floa
 
         const float continualTypoCost = typoArg.value("continualTypoCost", 1.0f);
         typoTransformer.setContinualTypoCost(continualTypoCost);
+        if (typoArg.contains("lengtheningTypoCost")) {
+            typoTransformer.setLengtheningTypoCost(typoArg["lengtheningTypoCost"].get<float>());
+        }
+
+        if (typoArg.contains("fuzzyTypoCost")) {
+            const int fuzzyMinJamo = std::max(typoArg.value("fuzzyMinJamo", 3), 1);
+            typoTransformer.setFuzzyTypoCost(typoArg["fuzzyTypoCost"].get<float>(), typoArg.value("fuzzyRealWordErrors", false), (size_t)fuzzyMinJamo);
+        }
 
         auto [insertIt, _] = preparedTypoCache.emplace(cacheKey, typoTransformer.prepare(true));
         return &insertIt->second;
@@ -426,7 +438,7 @@ json kiwiIsTypoTolerant(Kiwi& kiwi, const json& args) {
 
 json kiwiAnalyze(Kiwi& kiwi, const json& args) {
     const std::string str = args[0];
-    const Match matchOptions = getAtOrDefault(args, 1, Match::allWithNormalizing);
+    const Match matchOptions = getAtOrDefault(args, 1, Match::allWithNormalizing | Match::oovChrModel);
     const BlockListArg blockListArg(kiwi, args, 2);
     const auto pretokenized = parsePretokenizedArg(args, 3);
     float typoCostThreshold = 2.5f;
@@ -445,7 +457,7 @@ json kiwiAnalyze(Kiwi& kiwi, const json& args) {
 json kiwiAnalyzeTopN(Kiwi& kiwi, const json& args) {
     const std::string str = args[0];
     const int topN = args[1];
-    const Match matchOptions = getAtOrDefault(args, 2, Match::allWithNormalizing);
+    const Match matchOptions = getAtOrDefault(args, 2, Match::allWithNormalizing | Match::oovChrModel);
     const BlockListArg blockListArg(kiwi, args, 3);
     const auto pretokenized = parsePretokenizedArg(args, 4);
     float typoCostThreshold = 2.5f;
@@ -463,7 +475,7 @@ json kiwiAnalyzeTopN(Kiwi& kiwi, const json& args) {
 
 json kiwiTokenize(Kiwi& kiwi, const json& args) {
     const std::string str = args[0];
-    const Match matchOptions = getAtOrDefault(args, 1, Match::allWithNormalizing);
+    const Match matchOptions = getAtOrDefault(args, 1, Match::allWithNormalizing | Match::oovChrModel);
     const BlockListArg blockListArg(kiwi, args, 2);
     const auto pretokenized = parsePretokenizedArg(args, 3);
     float typoCostThreshold = 2.5f;
@@ -482,7 +494,7 @@ json kiwiTokenize(Kiwi& kiwi, const json& args) {
 json kiwiTokenizeTopN(Kiwi& kiwi, const json& args) {
     const std::string str = args[0];
     const int topN = args[1];
-    const Match matchOptions = getAtOrDefault(args, 2, Match::allWithNormalizing);
+    const Match matchOptions = getAtOrDefault(args, 2, Match::allWithNormalizing | Match::oovChrModel);
     const BlockListArg blockListArg(kiwi, args, 3);
     const auto pretokenized = parsePretokenizedArg(args, 4);
     float typoCostThreshold = 2.5f;

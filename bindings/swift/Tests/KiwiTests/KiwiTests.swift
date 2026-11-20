@@ -85,7 +85,7 @@ final class KiwiTests: XCTestCase {
         
         // Test basic tokenization
         let text = "안녕하세요"
-        let tokens = try kiwi.tokenize(text)
+        let tokens = try kiwi.tokenize(text, options: .allWithNormalizing)
         
         // Verify we got some tokens
         XCTAssertFalse(tokens.isEmpty, "Tokenization should return tokens")
@@ -111,7 +111,7 @@ final class KiwiTests: XCTestCase {
         
         // Test analyze with multiple results
         let text = "형태소 분석"
-        let results = try kiwi.analyze(text, topN: 2)
+        let results = try kiwi.analyze(text, topN: 2, options: .allWithNormalizing)
         
         // Should have at least one result
         XCTAssertFalse(results.isEmpty, "Analysis should return results")
@@ -188,12 +188,12 @@ final class KiwiTests: XCTestCase {
         let preparedTypo = try typoTransformer.prepare()
 
         // Without typo correction: '죰' remains as-is
-        let tokensNoTypo = try kiwi.tokenize("나 죰 도와죠.")
+        let tokensNoTypo = try kiwi.tokenize("나 죰 도와죠.", options: .allWithNormalizing)
         let formsNoTypo = tokensNoTypo.map { $0.form }
         XCTAssertTrue(formsNoTypo.contains("죰"), "Without typo correction, '죰' should remain")
 
         // With typo correction: '죰' → '좀'
-        let tokensWithTypo = try kiwi.tokenize("나 죰 도와죠.", typoTransformer: preparedTypo)
+        let tokensWithTypo = try kiwi.tokenize("나 죰 도와죠.", options: .allWithNormalizing, typoTransformer: preparedTypo)
         let formsWithTypo = tokensWithTypo.map { $0.form }
         XCTAssertTrue(formsWithTypo.contains("좀"), "With typo correction, '죰' should become '좀'")
     }
@@ -212,7 +212,9 @@ final class KiwiTests: XCTestCase {
         let typoTransformer = try TypoTransformer.default(.continualTypoSet)
         let preparedTypo = try typoTransformer.prepare()
 
-        let tokens = try kiwi.tokenize("프로그래미", typoTransformer: preparedTypo)
+        let tokens = try kiwi.tokenize("프로그래미", options: .allWithNormalizing, typoTransformer: preparedTypo)
+        XCTAssertEqual(tokens.count, 2)
+        guard tokens.count >= 2 else { return }
         XCTAssertEqual(tokens[0].form, "프로그램")
         XCTAssertEqual(tokens[1].form, "이")
     }
@@ -231,7 +233,7 @@ final class KiwiTests: XCTestCase {
         let typoTransformer = try TypoTransformer.default(.basicTypoSet)
         let preparedTypo = try typoTransformer.prepare()
 
-        let results = try kiwi.analyze("나 죰 도와죠.", topN: 1, typoTransformer: preparedTypo)
+        let results = try kiwi.analyze("나 죰 도와죠.", topN: 1, options: .allWithNormalizing, typoTransformer: preparedTypo)
         XCTAssertFalse(results.isEmpty)
         let forms = results[0].tokens.map { $0.form }
         XCTAssertTrue(forms.contains("좀"))
@@ -252,11 +254,11 @@ final class KiwiTests: XCTestCase {
         let preparedTypo = try typoTransformer.prepare()
 
         // continual typo: '프로그래미' → '프로그램' + '이'
-        let tokens1 = try kiwi.tokenize("프로그래미", typoTransformer: preparedTypo)
+        let tokens1 = try kiwi.tokenize("프로그래미", options: .allWithNormalizing, typoTransformer: preparedTypo)
         XCTAssertEqual(tokens1[0].form, "프로그램")
 
         // basic typo: '죰' → '좀'
-        let tokens2 = try kiwi.tokenize("나 죰 도와죠.", typoTransformer: preparedTypo)
+        let tokens2 = try kiwi.tokenize("나 죰 도와죠.", options: .allWithNormalizing, typoTransformer: preparedTypo)
         let forms = tokens2.map { $0.form }
         XCTAssertTrue(forms.contains("좀"))
     }

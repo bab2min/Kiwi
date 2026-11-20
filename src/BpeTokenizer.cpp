@@ -381,7 +381,7 @@ namespace kiwi
 		TokenResult res;
 		try
 		{
-			res = kiwi.analyze(u16str, AnalyzeOption{});
+			res = kiwi.analyze(u16str, AnalyzeOption{ Match::allWithNormalizing }); // AnalyzeOption 기본값의 OOV 처리와 무관하게 이전 동작을 유지한다
 		}
 		catch (const Exception&)
 		{

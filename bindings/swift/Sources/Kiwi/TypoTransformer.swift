@@ -86,6 +86,82 @@ public final class TypoTransformer {
         return TypoTransformer(handle: newHandle, shouldClose: true)
     }
     
+    /// Condition on the preceding morpheme for a typo definition
+    public enum Condition: Int32 {
+        /// No condition
+        case none = 0
+        /// Any preceding morpheme
+        case any = 1
+        /// Only after a syllable without a final consonant
+        case vowel = 2
+        /// Only after an applosive final consonant (all finals except ㄴ, ㄹ, ㅁ, ㅇ)
+        case applosive = 8
+    }
+
+    /// Add typo definitions. Every pair of `orig` and `error` is added.
+    /// - Parameters:
+    ///   - orig: Correct forms
+    ///   - error: Typo forms of `orig`
+    ///   - cost: Cost of the typo
+    ///   - condition: Condition on the preceding morpheme
+    /// - Throws: KiwiError if the operation fails (e.g. on a handle from `basic()` or `default(_:)`)
+    public func addTypo(orig: [String], error: [String], cost: Float, condition: Condition = .none) throws {
+        let origPtrs = orig.map { strdup($0) }
+        let errorPtrs = error.map { strdup($0) }
+        defer {
+            origPtrs.forEach { free($0) }
+            errorPtrs.forEach { free($0) }
+        }
+        var o = origPtrs.map { $0.map { UnsafePointer($0) } }
+        var e = errorPtrs.map { $0.map { UnsafePointer($0) } }
+        let ret = o.withUnsafeMutableBufferPointer { ob in
+            e.withUnsafeMutableBufferPointer { eb in
+                kiwi_typo_add(handle, ob.baseAddress, Int32(orig.count), eb.baseAddress, Int32(error.count), cost, condition.rawValue)
+            }
+        }
+        try check(ret, "Failed to add typo")
+    }
+
+    /// Set the cost of continual typos (연철). Disabled by default (infinite cost).
+    public func setContinualTypoCost(_ threshold: Float) throws {
+        try check(kiwi_typo_set_continual_typo_cost(handle, threshold), "Failed to set continual typo cost")
+    }
+
+    /// Set the cost of lengthening typos (장음화). Disabled by default (infinite cost).
+    public func setLengtheningTypoCost(_ threshold: Float) throws {
+        try check(kiwi_typo_set_lengthening_typo_cost(handle, threshold), "Failed to set lengthening typo cost")
+    }
+
+    /// Set the cost of jamo-level fuzzy typos
+    /// - Parameters:
+    ///   - threshold: Cost of a single jamo edit. Fuzzy typos are disabled by default (infinite cost).
+    ///   - realWordErrors: If true, also correct spans that are already valid dictionary forms (slower).
+    ///   - minJamo: Minimum number of jamo in a dictionary form to be edited
+    /// - Throws: KiwiError if the operation fails (e.g. on a handle from `basic()` or `default(_:)`)
+    public func setFuzzyTypoCost(_ threshold: Float, realWordErrors: Bool = false, minJamo: Int = 3) throws {
+        try check(kiwi_typo_set_fuzzy_typo_cost(handle, threshold, realWordErrors ? 1 : 0, Int32(minJamo)), "Failed to set fuzzy typo cost")
+    }
+
+    /// Add all typo definitions of another typo transformer
+    public func update(from other: TypoTransformer) throws {
+        try check(kiwi_typo_update(handle, other.handle), "Failed to update typo transformer")
+    }
+
+    /// Multiply all typo costs by `scale`
+    public func scaleCost(_ scale: Float) throws {
+        try check(kiwi_typo_scale_cost(handle, scale), "Failed to scale typo cost")
+    }
+
+    private func check(_ ret: Int32, _ fallback: String) throws {
+        guard ret != 0 else { return }
+        if let errorMsg = kiwi_error() {
+            let error = String(cString: errorMsg)
+            kiwi_clear_error()
+            throw KiwiError.operationFailed(error)
+        }
+        throw KiwiError.operationFailed(fallback)
+    }
+
     /// Prepare the typo transformer for use in analysis
     /// - Returns: A PreparedTypoTransformer ready for use
     /// - Throws: KiwiError if preparation fails

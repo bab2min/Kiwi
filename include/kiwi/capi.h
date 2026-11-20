@@ -81,6 +81,8 @@ typedef struct {
 	uint32_t max_unk_form_size; /**< 미등재 형태의 최대 크기 */
 	uint32_t max_unk_form_size_followed_by_j_class; /**< (조사가 뒤따르는 경우) 미등재 형태의 최대 크기 */
 	uint32_t space_tolerance; /**< 공백 허용치 */
+	float oov_cut_off_threshold; /**< 미등재 형태 후보 중 이 값보다 더 크게 차이가 나는 후보들은 제거합니다. */
+	float oov_total_smoothness; /**< KIWI_MATCH_OOV_TOTAL_CONSISTENCY에서 사용하는 평활화 값 */
 } kiwi_config_t;
 
 /*
@@ -187,6 +189,7 @@ enum
 	KIWI_MATCH_OOV_CHR_FREQ_MODEL = 2 << 8,
 	KIWI_MATCH_OOV_CHR_FREQ_BRANCH_MODEL = 3 << 8,
 	KIWI_MATCH_OOV_MASK = 3 << 8,
+	KIWI_MATCH_OOV_TOTAL_CONSISTENCY = 1 << 10,
 
 	KIWI_MATCH_NORMALIZE_CODA = 1 << 16,
 	KIWI_MATCH_JOIN_NOUN_PREFIX = 1 << 17,
@@ -202,6 +205,7 @@ enum
 	KIWI_MATCH_SPLIT_SAISIOT = 1 << 25,
 	KIWI_MATCH_MERGE_SAISIOT = 1 << 26,
 	KIWI_MATCH_JOIN_PARTICLE_YO = 1 << 27,
+	KIWI_MATCH_QUOTED_HA_OMISSION = 1 << 28,
 	KIWI_MATCH_USE_OLD_SPLITTER = 1 << 30,
 
 	KIWI_MATCH_ALL = KIWI_MATCH_URL | KIWI_MATCH_EMAIL | KIWI_MATCH_HASHTAG | KIWI_MATCH_MENTION | KIWI_MATCH_SERIAL | KIWI_MATCH_EMOJI | KIWI_MATCH_Z_CODA,
@@ -448,6 +452,8 @@ DECL_DLL kiwi_ws_h kiwi_builder_extract_add_words_w(kiwi_builder_h handle, kiwi_
  * 
  * @param handle KiwiBuilder.
  * @param typos 오타 교정기의 핸들. 오타 교정을 사용하지 않을 경우 null을 입력합니다.
+ *        (deprecated) null 대신 오타 교정기를 넣는 방식은 더 이상 권장하지 않습니다. null로 생성한 뒤 분석할 때 kiwi_analyze_option_t의 typo_transformer를 지정하십시오.
+ *        오타 교정기를 넣어 생성한 Kiwi는 typo_transformer를 무시합니다.
  * @param typo_cost_threshold 오타 교정기에서 생성하는 오타 중 비용이 이 값 이하인 오타만 사용합니다.
  * 
  * @return Kiwi의 핸들.
@@ -559,6 +565,19 @@ DECL_DLL int kiwi_typo_set_continual_typo_cost(kiwi_typo_h handle, float thresho
 DECL_DLL int kiwi_typo_set_lengthening_typo_cost(kiwi_typo_h handle, float threshold);
 
 /**
+* @brief 현재 오타 교정기의 자모 편집 오타 비용을 설정합니다.
+*
+* @param handle 오타 교정기의 핸들
+* @param threshold 자모 편집 한 번의 비용
+* @param real_word_errors 0이면 원문 구간이 이미 사전에 등록된 형태일 때는 교정을 수행하지 않습니다. 0이 아니면 이 경우에도 교정을 수행하지만 분석이 느려집니다.
+* @param min_jamo 편집 대상이 되는 사전 형태의 최소 자모 수. 기본값은 3입니다.
+* @return 성공 시 0를 반환합니다. 실패 시 음수를 반환하고 에러 메세지를 설정합니다.
+*
+* @note 자모 편집 오타의 초기값은 무한대, 즉 비활성화 상태입니다. 유한한 값으로 설정하면 형태 하나에 자모 편집 한 번까지 허용한 형태도 후보로 찾습니다.
+*/
+DECL_DLL int kiwi_typo_set_fuzzy_typo_cost(kiwi_typo_h handle, float threshold, int real_word_errors, int min_jamo);
+
+/**
  * @brief 생성된 오타 교정기를 해제합니다.
  *
  * @return 성공 시 0를 반환합니다. 실패 시 음수를 반환하고 에러 메세지를 설정합니다.
@@ -658,7 +677,7 @@ DECL_DLL float kiwi_get_option_f(kiwi_h handle, int option);
 DECL_DLL kiwi_morphset_h kiwi_new_morphset(kiwi_h handle);
 
 typedef struct {
-	int match_options; /**< KIWI_MATCH_* 열거형 참고. 기본값은 KIWI_MATCH_ALL_WITH_NORMALIZING 입니다. */
+	int match_options; /**< KIWI_MATCH_* 열거형 참고. 권장값은 KIWI_MATCH_ALL_WITH_NORMALIZING | KIWI_MATCH_OOV_CHR_MODEL 입니다(C++ AnalyzeOption의 기본값). OOV 옵션을 주지 않으면 규칙만으로 미등재어를 찾습니다. */
 	kiwi_morphset_h blocklist; /**< 분석 후보 탐색 과정에서 blocklist에 포함된 형태소들은 배제됩니다. null 입력 시에는 blocklist를 사용하지 않습니다. */
 	int open_ending; /**< 마지막 형태소 다음 문장을 종결하지 않고 열린 상태로 끝낼지를 설정니다. 기본값은 0으로 마지막 형태소 다음 바로 문장을 종결합니다. */
 	int allowed_dialects; /**< KIWI_DIALECT_* 열거형 참고 */

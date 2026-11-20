@@ -1720,7 +1720,8 @@ size_t kiwi::splitByTrie(
 	const PretokenizedSpanGroup::Span* pretokenizedLast
 )
 {
-	if (!(matchOptions & Match::useOldSplitter)) return splitByTrieUsingTypo<arch>(ret, formBase, typoPtrs, trie, str, startOffset, matchOptions, allowedDialect, maxUnkFormSize, maxUnkFormSizeFollowedByJClass, spaceTolerance, typoTransformer, typoThreshold, pretokenizedFirst, pretokenizedLast);
+	// 오타를 넣어 빌드한 사전(TypoForm)은 예전 splitter만 다룰 수 있다
+	if (!typoTolerant && !(matchOptions & Match::useOldSplitter)) return splitByTrieUsingTypo<arch>(ret, formBase, typoPtrs, trie, str, startOffset, matchOptions, allowedDialect, maxUnkFormSize, maxUnkFormSizeFollowedByJClass, spaceTolerance, typoTransformer, typoThreshold, pretokenizedFirst, pretokenizedLast);
 	/*
 	* posMultiplier는 연철 교정 모드(continualTypoTolerant)에서 사용된다.
 	* 이 경우 음절 경계로 분할되는 형태소들은 모두 4의 배수로 인덱싱되고

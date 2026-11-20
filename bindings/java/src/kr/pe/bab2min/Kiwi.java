@@ -26,6 +26,7 @@ public class Kiwi implements AutoCloseable  {
 		oovChrFreqModel = 2 << 8,
 		oovChrFreqBranchModel = 3 << 8,
 		oovMask = 3 << 8,
+		oovTotalConsistency = 1 << 10,
 		normalizeCoda = 1 << 16,
 		joinNounPrefix = 1 << 17,
 		joinNounSuffix = 1 << 18,
@@ -38,9 +39,10 @@ public class Kiwi implements AutoCloseable  {
 		splitSaisiot = 1 << 25,
 		mergeSaisiot = 1 << 26,
 		joinParticleYo = 1 << 27,
+		quotedHaOmission = 1 << 28,
 		joinVSuffix = joinVerbSuffix | joinAdjSuffix,
 		joinAffix = joinNounPrefix | joinNounSuffix | joinVerbSuffix | joinAdjSuffix | joinAdvSuffix,
-		all = url | email | hashtag | mention | serial | zCoda,
+		all = url | email | hashtag | mention | serial | emoji | zCoda,
 		allWithNormalizing = all | normalizeCoda;
 	}
 	
@@ -198,7 +200,7 @@ public class Kiwi implements AutoCloseable  {
 		}
 
 		public AnalyzeOption() {
-			this(Match.allWithNormalizing, null, Dialect.standard, 0.0f);
+			this(Match.allWithNormalizing | Match.oovChrModel, null, Dialect.standard, 0.0f);
 		}
 	}
 
@@ -291,6 +293,25 @@ public class Kiwi implements AutoCloseable  {
 		public String toString() {
 			return String.format("Sentence(text=%s, start=%d, end=%d, subSents=%s)", text, start, end, Arrays.toString(subSents));
 		}
+	}
+
+	/** 분석 설정값. `getGlobalConfig`로 읽고 값을 바꾼 뒤 `setGlobalConfig`로 적용합니다. */
+	public static class KiwiConfig {
+		public boolean integrateAllomorph;
+		public float cutOffThreshold;
+		public float oovRuleScale;
+		public float oovRuleBias;
+		public float oovChrBias;
+		public float oovGlobalWeight;
+		public float oovLocalWeight;
+		public float oovGlobalMinFreq;
+		public float spacePenalty;
+		public float typoCostWeight;
+		public int maxUnkFormSize;
+		public int maxUnkFormSizeFollowedByJClass;
+		public int spaceTolerance;
+		public float oovCutOffThreshold;
+		public float oovTotalSmoothness;
 	}
 
 	public static class GlueResult {
@@ -449,6 +470,8 @@ public class Kiwi implements AutoCloseable  {
 
 	/** 입력 텍스트의 띄어쓰기를 교정하여 반환한다. */
 	public native String space(String text, boolean resetWhitespace);
+	public native KiwiConfig getGlobalConfig();
+	public native void setGlobalConfig(KiwiConfig config);
 
 	/** 입력 텍스트의 띄어쓰기를 교정하여 반환한다. */
 	public String space(String text) {
@@ -588,7 +611,7 @@ public class Kiwi implements AutoCloseable  {
 		try(Scanner input = new Scanner(System.in)) {
 			System.out.print(">> ");
 			while (input.hasNext()) {
-				Token[] tokens = kiwi.tokenize(input.nextLine(), new AnalyzeOption(Match.allWithNormalizing));
+				Token[] tokens = kiwi.tokenize(input.nextLine(), new AnalyzeOption(Match.allWithNormalizing | Match.oovChrModel));
 				System.out.println(Arrays.deepToString(tokens));
 				System.out.print(">> ");
 			}

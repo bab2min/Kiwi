@@ -92,6 +92,7 @@ public class KiwiBuilder implements AutoCloseable  {
 		public native void _scaleCost(float scale);
 		public native void _setContinualTypoCost(float cost);
 		public native void _setLengtheningTypoCost(float cost);
+		public native void _setFuzzyTypoCost(float cost, boolean realWordErrors, int minJamo);
 
 		public TypoTransformer addTypo(String orig, String error, float cost, byte convVowel, short dialect) {
 			_addTypo(orig, error, cost, convVowel, dialect);
@@ -125,6 +126,16 @@ public class KiwiBuilder implements AutoCloseable  {
 		public TypoTransformer setLengtheningTypoCost(float cost) {
 			_setLengtheningTypoCost(cost);
 			return this;
+		}
+
+		// Set jamo-level fuzzy typo cost (inplace)
+		public TypoTransformer setFuzzyTypoCost(float cost, boolean realWordErrors, int minJamo) {
+			_setFuzzyTypoCost(cost, realWordErrors, minJamo);
+			return this;
+		}
+
+		public TypoTransformer setFuzzyTypoCost(float cost) {
+			return setFuzzyTypoCost(cost, false, 3);
 		}
 
 		// Inplace update

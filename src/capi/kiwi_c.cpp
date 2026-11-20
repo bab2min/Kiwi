@@ -526,7 +526,7 @@ kiwi_h kiwi_builder_build(kiwi_builder_h handle, kiwi_typo_h typos, float typo_c
 		{
 			tt = typos;
 		}
-		return (kiwi_h)new Kiwi{ kb->build(*tt, typo_cost_threshold) };
+		return (kiwi_h)new Kiwi{ kb->buildImpl(*tt, typo_cost_threshold) };
 	}
 	catch (...)
 	{
@@ -670,6 +670,22 @@ int kiwi_typo_set_lengthening_typo_cost(kiwi_typo_h handle, float threshold)
 	}
 }
 
+int kiwi_typo_set_fuzzy_typo_cost(kiwi_typo_h handle, float threshold, int real_word_errors, int min_jamo)
+{
+	if (!handle) return KIWIERR_INVALID_HANDLE;
+	if (min_jamo < 1) return KIWIERR_INVALID_INDEX;
+	try
+	{
+		handle->setFuzzyTypoCost(threshold, !!real_word_errors, (size_t)min_jamo);
+		return 0;
+	}
+	catch (...)
+	{
+		currentError = current_exception();
+		return -1;
+	}
+}
+
 int kiwi_typo_close(kiwi_typo_h handle)
 {
 	if (!handle) return KIWIERR_INVALID_HANDLE;
@@ -755,6 +771,8 @@ void kiwi_set_global_config(kiwi_h handle, kiwi_config_t config)
 			config.max_unk_form_size,
 			config.max_unk_form_size_followed_by_j_class,
 			config.space_tolerance,
+			config.oov_cut_off_threshold,
+			config.oov_total_smoothness,
 		};
 		kiwi->setGlobalConfig(kconfig);
 	}
@@ -785,6 +803,8 @@ kiwi_config_t kiwi_get_global_config(kiwi_h handle)
 		config.max_unk_form_size = kconfig.maxUnkFormSize;
 		config.max_unk_form_size_followed_by_j_class = kconfig.maxUnkFormSizeFollowedByJClass;
 		config.space_tolerance = kconfig.spaceTolerance;
+		config.oov_cut_off_threshold = kconfig.oovCutOffThreshold;
+		config.oov_total_smoothness = kconfig.oovTotalSmoothness;
 	}
 	catch (...)
 	{

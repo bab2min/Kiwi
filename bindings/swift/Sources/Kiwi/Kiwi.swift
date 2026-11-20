@@ -21,17 +21,25 @@ public final class Kiwi {
     /// - Parameters:
     ///   - text: Text to analyze
     ///   - topN: Number of top results to return (default: 1)
-    ///   - options: Match options (default: .allWithNormalizing)
+    ///   - options: Match options (default: [.allWithNormalizing, .oovChrModel])
     ///   - typoTransformer: Optional prepared typo transformer for typo correction
     ///   - typoThreshold: Typo cost threshold (default: 2.5)
+    ///   - blocklist: Morphemes excluded from analysis candidates (see `createMorphemeSet()`)
+    ///   - openEnding: If true, the last morpheme does not end the sentence
+    ///   - allowedDialects: Dialects allowed in analysis (they must be enabled when building)
+    ///   - dialectCost: Additional cost for dialect morphemes (default: 3.0)
     /// - Returns: Array of token result candidates
     /// - Throws: KiwiError if analysis fails
     public func analyze(
         _ text: String,
         topN: Int = 1,
-        options: MatchOptions = .allWithNormalizing,
+        options: MatchOptions = [.allWithNormalizing, .oovChrModel],
         typoTransformer: PreparedTypoTransformer? = nil,
-        typoThreshold: Float = 2.5
+        typoThreshold: Float = 2.5,
+        blocklist: MorphemeSet? = nil,
+        openEnding: Bool = false,
+        allowedDialects: Dialect = .standard,
+        dialectCost: Float = 3.0
     ) throws -> [TokenResult] {
         guard let handle = wrapper?.handle else {
             throw KiwiError.invalidHandle
@@ -39,10 +47,10 @@ public final class Kiwi {
 
         var analyzeOption = kiwi_analyze_option_t()
         analyzeOption.match_options = options.rawValue
-        analyzeOption.blocklist = nil
-        analyzeOption.open_ending = 0
-        analyzeOption.allowed_dialects = 0
-        analyzeOption.dialect_cost = 3.0
+        analyzeOption.blocklist = blocklist?.handle
+        analyzeOption.open_ending = openEnding ? 1 : 0
+        analyzeOption.allowed_dialects = allowedDialects.rawValue
+        analyzeOption.dialect_cost = dialectCost
         analyzeOption.typo_transformer = typoTransformer?.handle
         analyzeOption.typo_threshold = typoThreshold
         
@@ -93,18 +101,27 @@ public final class Kiwi {
     /// Tokenize text and return simple token array (uses best analysis result)
     /// - Parameters:
     ///   - text: Text to tokenize
-    ///   - options: Match options (default: .allWithNormalizing)
+    ///   - options: Match options (default: [.allWithNormalizing, .oovChrModel])
     ///   - typoTransformer: Optional prepared typo transformer for typo correction
     ///   - typoThreshold: Typo cost threshold (default: 2.5)
+    ///   - blocklist: Morphemes excluded from analysis candidates (see `createMorphemeSet()`)
+    ///   - openEnding: If true, the last morpheme does not end the sentence
+    ///   - allowedDialects: Dialects allowed in analysis (they must be enabled when building)
+    ///   - dialectCost: Additional cost for dialect morphemes (default: 3.0)
     /// - Returns: Array of tokens
     /// - Throws: KiwiError if tokenization fails
     public func tokenize(
         _ text: String,
-        options: MatchOptions = .allWithNormalizing,
+        options: MatchOptions = [.allWithNormalizing, .oovChrModel],
         typoTransformer: PreparedTypoTransformer? = nil,
-        typoThreshold: Float = 2.5
+        typoThreshold: Float = 2.5,
+        blocklist: MorphemeSet? = nil,
+        openEnding: Bool = false,
+        allowedDialects: Dialect = .standard,
+        dialectCost: Float = 3.0
     ) throws -> [Token] {
-        let results = try analyze(text, topN: 1, options: options, typoTransformer: typoTransformer, typoThreshold: typoThreshold)
+        let results = try analyze(text, topN: 1, options: options, typoTransformer: typoTransformer, typoThreshold: typoThreshold,
+                                  blocklist: blocklist, openEnding: openEnding, allowedDialects: allowedDialects, dialectCost: dialectCost)
         return results.first?.tokens ?? []
     }
     
