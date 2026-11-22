@@ -607,6 +607,7 @@ auto MultiRuleDFA<NodeSizeTy, GroupSizeTy>::fromOther(MultiRuleDFA<_NodeSizeTy, 
 	ret.syllableVocabs = o.syllableVocabs;
 	ret.codaVocabs = o.codaVocabs;
 	ret.finish = move(o.finish);
+	ret.notAfterGroups = move(o.notAfterGroups);
 	ret.finishGroup = move(o.finishGroup);
 	ret.groupInfo = move(o.groupInfo);
 	ret.sepGroupFlatten = move(o.sepGroupFlatten);
@@ -627,6 +628,10 @@ MultiRuleDFAErased RuleSet::buildRules(
 {
 	MultiRuleDFA<uint64_t, GroupSizeTy> ret;
 	ret.finish = move(finish);
+	for (size_t i = 0; i < ret.finish.size(); ++i)
+	{
+		if (!ret.finish[i].notAfter.empty()) ret.notAfterGroups.emplace_back((GroupSizeTy)i);
+	}
 
 	Vector<Vector<ptrdiff_t>> epsilonTable;
 	for (auto& n : nodes)
@@ -794,7 +799,7 @@ MultiRuleDFAErased RuleSet::buildRightPattern(const Vector<Rule>& rules)
 }
 
 void RuleSet::addRule(const string& lTag, const string& rTag,
-	const KString& lPat, const KString& rPat, const vector<ReplString>& results,
+	const KString& lPatWithContext, const KString& rPat, const vector<ReplString>& results,
 	CondVowel leftVowel, CondPolarity leftPolar, bool ignoreRCond, int lineNo,
 	Dialect dialect
 )
@@ -802,6 +807,23 @@ void RuleSet::addRule(const string& lTag, const string& rTag,
 	auto lTags = getSubTagset(lTag);
 	auto rTags = getSubTagset(rTag);
 	if (lTags.empty() || rTags.empty()) return;
+
+	KString lPat = lPatWithContext;
+	Vector<KString> notAfter;
+	if (lPat.compare(0, 4, u"(?<!") == 0)
+	{
+		const size_t end = lPat.find(u')');
+		if (end == KString::npos)
+		{
+			throw runtime_error{ "unclosed `(?<!` in rule: line " + to_string(lineNo) };
+		}
+		for (auto alt : split(U16StringView{ lPat.data() + 4, end - 4 }, u'|'))
+		{
+			if (alt.size() == 1 && alt[0] == u'^') notAfter.emplace_back();
+			else notAfter.emplace_back(alt.begin(), alt.end());
+		}
+		lPat.erase(0, end + 1);
+	}
 
 	bool broadcastableVowel = false;
 	char16_t lPatVowel = 0;
@@ -838,6 +860,7 @@ void RuleSet::addRule(const string& lTag, const string& rTag,
 		rules.emplace_back(lPat, rPat, Vector<ReplString>{ results.begin(), results.end() }, 
 			dialect, leftVowel, leftPolar, ignoreRCond, lineNo);
 	}
+	for (size_t i = ruleId; i < rules.size(); ++i) rules[i].repl.notAfter = notAfter;
 
 	for (auto l : lTags)
 	{
@@ -1071,7 +1094,12 @@ LeftScan MultiRuleDFA<NodeSizeTy, GroupSizeTy>::scanLeft(U16StringView left) con
 
 	if (nidx == no_node) return ret;
 	nidx = transition[nidx * vsize + Pattern::ruleSep];
-	if (nidx != no_node) ret.node = nidx;
+	if (nidx == no_node) return ret;
+	ret.node = nidx;
+	for (auto g : notAfterGroups)
+	{
+		if (isBlockedByContext(g, left.substr(0, ret.capturedLefts[g]))) ret.blockedRuleLines.emplace_back(finish[g].ruleLineNo);
+	}
 	return ret;
 }
 
@@ -1102,6 +1130,7 @@ Vector<Result> MultiRuleDFA<NodeSizeTy, GroupSizeTy>::combine(const LeftScan& sc
 	nidx = transition[nidx * vsize + Pattern::eos];
 
 	if (nidx == no_node || finishGroup[nidx] == no_group) goto not_matched;
+	if (find(scan.blockedRuleLines.begin(), scan.blockedRuleLines.end(), finish[finishGroup[nidx]].ruleLineNo) != scan.blockedRuleLines.end()) goto not_matched;
 	if (capturedRight == 0) capturedRight = cpos;
 	capturedLeft = capturedLefts[finishGroup[nidx]];
 
@@ -1203,6 +1232,16 @@ Vector<tuple<size_t, size_t, CondPolarity>> MultiRuleDFA<NodeSizeTy, GroupSizeTy
 
 not_matched:
 	return ret;
+}
+
+template<class NodeSizeTy, class GroupSizeTy>
+bool MultiRuleDFA<NodeSizeTy, GroupSizeTy>::isBlockedByContext(size_t group, U16StringView before) const
+{
+	for (auto& a : finish[group].notAfter)
+	{
+		if (a.empty() ? before.empty() : (before.size() >= a.size() && equal(a.begin(), a.end(), before.end() - a.size()))) return true;
+	}
+	return false;
 }
 
 namespace kiwi
@@ -1455,6 +1494,16 @@ Vector<Result> CompiledRule::combine(U16StringView leftForm, U16StringView right
 bool CompiledRule::matchesLeftPattern(U16StringView leftForm, size_t ruleId) const
 {
 	return visit([&](const auto& e) { return e.matchesPat(leftForm, true); }, dfa[ruleId]);
+}
+
+bool CompiledRule::isBlockedByContext(size_t ruleId, size_t group, U16StringView before) const
+{
+	return visit([&](const auto& e) { return e.isBlockedByContext(group, before); }, dfa[ruleId]);
+}
+
+int CompiledRule::getRuleLineNo(size_t ruleId, size_t group) const
+{
+	return visit([&](const auto& e) { return e.getRuleLineNo(group); }, dfa[ruleId]);
 }
 
 bool CompiledRule::matchesRightPattern(U16StringView rightForm, size_t ruleId) const

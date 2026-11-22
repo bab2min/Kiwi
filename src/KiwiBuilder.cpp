@@ -1868,7 +1868,8 @@ void KiwiBuilder::buildCombinedMorphemes(
 	};
 
 	Vector<Vector<size_t>> combiningLeftCands, combiningRightCands;
-	UnorderedMap<std::tuple<KString, POSTag, CondPolarity>, size_t> combiningSuffices;
+	UnorderedMap<std::tuple<KString, POSTag, CondPolarity, Vector<int>>, size_t> combiningSuffices;
+	UnorderedMap<size_t, Vector<int>> suffixBlockedRuleLines;
 	size_t combiningUpdateIdx = defaultFormSize + 3;
 
 	auto ruleLeftIds = combiningRule->getRuleIdsByLeftTag();
@@ -1955,13 +1956,32 @@ void KiwiBuilder::buildCombinedMorphemes(
 				Vector<uint8_t> partialFormInserted(form.size());
 				const auto cform = form;
 
+				const bool isSuffix = suffixBlockedRuleLines.find(i) != suffixBlockedRuleLines.end();
+				Vector<std::tuple<size_t, size_t, CondPolarity>> splits;
+				Vector<int> blockedRuleLines;
 				for (auto id : ids)
 				{
 					auto res = combiningRule->testLeftPattern(form, id);
-					if (res.empty()) continue;
+					const auto isBlocked = [&](const std::tuple<size_t, size_t, CondPolarity>& r)
+					{
+						return !isSuffix && combiningRule->isBlockedByContext(id, get<0>(r), U16StringView{ cform.data(), get<1>(r) });
+					};
+					const auto selected = find_if(res.begin(), res.end(), [&](const std::tuple<size_t, size_t, CondPolarity>& r) { return !isBlocked(r); });
+					if (selected == res.end()) continue;
+					for (auto& r : res)
+					{
+						if (isBlocked(r)) blockedRuleLines.emplace_back(combiningRule->getRuleLineNo(id, get<0>(r)));
+					}
+					splits.emplace_back(id, get<1>(*selected), get<2>(*selected));
+				}
+				sort(blockedRuleLines.begin(), blockedRuleLines.end());
+				blockedRuleLines.erase(unique(blockedRuleLines.begin(), blockedRuleLines.end()), blockedRuleLines.end());
 
-					auto& startPos = get<1>(res[0]);
-					auto& condPolar = get<2>(res[0]);
+				for (auto& split : splits)
+				{
+					const auto id = get<0>(split);
+					const auto startPos = get<1>(split);
+					const auto condPolar = get<2>(split);
 
 					if (startPos == 0)
 					{
@@ -1971,11 +1991,15 @@ void KiwiBuilder::buildCombinedMorphemes(
 					else
 					{
 						auto inserted = combiningSuffices.emplace(
-							make_tuple(cform.substr(startPos), tag, condPolar),
+							make_tuple(cform.substr(startPos), tag, condPolar, blockedRuleLines),
 							0
 						);
 						if (inserted.second)
 						{
+							if (combiningSuffices.size() > 0xFF)
+							{
+								throw Exception{ "Too many partial morphemes for combining rules: " + to_string(combiningSuffices.size()) };
+							}
 							const size_t fid = addForm(newForms, newFormMap, get<0>(inserted.first->first));
 							const size_t newId = morphemes.size() + newMorphemes.size();
 							inserted.first->second = newId;
@@ -1984,6 +2008,7 @@ void KiwiBuilder::buildCombinedMorphemes(
 							newMorph.kform = fid;
 							newMorph.lmMorphemeId = newId;
 							newMorph.combineSocket = combiningSuffices.size();
+							suffixBlockedRuleLines.emplace(newId, blockedRuleLines);
 						}
 
 						if (!partialFormInserted[startPos])
@@ -2023,7 +2048,9 @@ void KiwiBuilder::buildCombinedMorphemes(
 			{
 				if (rfirst == rlast) return;
 				const KString leftForm = getForm(getMorph(leftId).kform).form;
-				const auto leftScan = combiningRule->scanLeft(leftForm, ruleId);
+				auto leftScan = combiningRule->scanLeft(leftForm, ruleId);
+				const auto suffix = suffixBlockedRuleLines.find(leftId);
+				if (suffix != suffixBlockedRuleLines.end()) leftScan.blockedRuleLines = suffix->second;
 				cmb::LeftScan leftScanA;
 				if (isEClass(getMorph(leftId).tag) && leftForm[0] == u'어')
 				{
