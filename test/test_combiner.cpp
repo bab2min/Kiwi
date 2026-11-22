@@ -36,7 +36,10 @@ TEST(KiwiCppCombiner, Combine)
 	EXPECT_EQ(rule.combine(u"푸", POSTag::vv, u"어", POSTag::ec)[0], u"퍼");
 	EXPECT_EQ(rule.combine(u"따르", POSTag::vv, u"어", POSTag::ec)[0], u"따라");
 	EXPECT_EQ(rule.combine(u"돕", POSTag::vv, u"어", POSTag::ec)[0], u"도와");
-	EXPECT_EQ(rule.combine(u"하", POSTag::vv, u"도록", POSTag::ec)[0], u"토록");
+	EXPECT_EQ(rule.combine(u"하", POSTag::vv, u"도록", POSTag::ec)[0], u"하도록");
+	EXPECT_EQ(rule.combine(u"면하", POSTag::vv, u"도록", POSTag::ec)[0], u"면토록");
+	EXPECT_EQ(rule.combine(u"위하", POSTag::vv, u"기", POSTag::etn)[0], u"위하기");
+	EXPECT_EQ(rule.combine(u"대하", POSTag::vv, u"도록", POSTag::ec)[0], u"대하도록");
 	EXPECT_EQ(rule.combine(u"하", POSTag::vv, u"어", POSTag::ec)[0], u"해");
 
 	EXPECT_EQ(rule.combine(u"묻", POSTag::vvi, u"어", POSTag::ec)[0], u"물어");

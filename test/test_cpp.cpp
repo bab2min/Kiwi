@@ -2900,7 +2900,7 @@ TEST(KiwiCpp, MorphGraphContraction)
 	Kiwi kiwi = KiwiBuilder{ MODEL_PATH, 0, BuildOption::default_ & ~BuildOption::loadDefaultDict }.build();
 	auto graph = kiwi.buildMorphGraph(u"석연찮은 일", AnalyzeOption{ Match::allWithNormalizing });
 	EXPECT_TRUE(hasMorphPath(graph, {
-		{ u"석연", POSTag::xr }, { u"하", POSTag::vv }, { u"지", POSTag::ec }, { u"않", POSTag::vx },
+		{ u"석연", POSTag::xr }, { u"하", POSTag::xsa }, { u"지", POSTag::ec }, { u"않", POSTag::vx },
 		{ u"은", POSTag::etm }, { u"일", POSTag::nng } }));
 }
 
@@ -3055,5 +3055,38 @@ TEST(KiwiCpp, MorphGraphTopPaths)
 				}
 			}
 		}
+	}
+}
+
+TEST(KiwiCpp, Issue304_HaContraction)
+{
+	Kiwi& kiwi = reuseKiwiInstance();
+	for (auto [s, isNoun] : std::initializer_list<std::pair<const char16_t*, bool>>{
+		{ u"자신이 키가 훨씬 더", true },
+		{ u"물론, 이 말은 의식적으로는 자신이 키가 훨씬 더 큰 시늉을 하자는 뜻이었다.", true },
+		{ u"곧이어 그 남자와 키가 조금 작다는 것 외에는 그리 다를 것 없는 남자가 나타났다.", true },
+		{ u"다만 감국보다 산국이 키가 조금 더 크고, 꽃이 약간 작으며, 이르게 피었다가 일찍 진다.", true },
+		{ u"우선 키가 그렇게 큰 여자들은 우리나라에 그리 많지 않을 것입니다.", true },
+		{ u"정부는 내년부터 이 제도를 시행키로 했다.", false },
+		{ u"두 회사는 합작 법인을 설립키로 합의했다.", false },
+		{ u"위원회는 지원방안을 계속 추진키로 했다.", false },
+		{ u"시는 공원을 조성키로 결정했다.", false },
+		{ u"당국은 책임자를 엄중 문책키로 했다.", false },
+		{ u"하는 일이 어디 가당키나 하겠습니까.", false },
+	})
+	{
+		auto tokens = kiwi.analyze(s, 1, Match::allWithNormalizing)[0].first;
+		bool hasNoun = std::any_of(tokens.begin(), tokens.end(), [](const TokenInfo& t) { return t.str == u"키" && t.tag == POSTag::nng; });
+		EXPECT_EQ(hasNoun, isNoun) << utf16To8(s);
+	}
+
+	for (auto [s, verb] : std::initializer_list<std::pair<const char16_t*, const char16_t*>>{
+		{ u"비판을 면키 어려울 것이다.", u"면하" },
+		{ u"양갓집에서 당키나 하는 행동이냐.", u"당하" },
+	})
+	{
+		auto tokens = kiwi.analyze(s, 1, Match::allWithNormalizing)[0].first;
+		bool hasVerb = std::any_of(tokens.begin(), tokens.end(), [&](const TokenInfo& t) { return t.str == verb && t.tag == POSTag::vv; });
+		EXPECT_TRUE(hasVerb) << utf16To8(s);
 	}
 }
