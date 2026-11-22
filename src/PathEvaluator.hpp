@@ -586,7 +586,7 @@ namespace kiwi
 
 
 			bestPathCont.clear();
-			const float additionalScore = curMorph->userScore + nodeLevelDiscount + kw->tagScorer.evalLeftBoundary(hasLeftBoundary(node), curMorph->tag);
+			const float additionalScore = curMorph->userScore + nodeLevelDiscount + kw->tagScorer.evalLeftBoundary(hasLeftBoundary(node), curMorph->isSingle() ? curMorph->tag : curMorph->chunks()[0]->tag);
 
 			RuleBasedScorer ruleBasedScorer{ kw, curMorph, node };
 
