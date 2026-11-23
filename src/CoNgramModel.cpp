@@ -180,7 +180,7 @@ namespace kiwi
 				}
 
 				RuleBasedScorer ruleBasedScorer{ kw, curMorph, node };
-				const float morphScore = curMorph->userScore + nodeLevelDiscount + kw->tagScorer.evalLeftBoundary(hasLeftBoundary(node), curMorph->tag);
+				const float morphScore = curMorph->userScore + nodeLevelDiscount + kw->tagScorer.evalLeftBoundary(hasLeftBoundary(node), curMorph->isSingle() ? curMorph->tag : curMorph->chunks()[0]->tag);
 				size_t prevId = -1;
 				for (auto [prev, p] : regularPrevPathes)
 				{
@@ -248,7 +248,7 @@ namespace kiwi
 					lastSeqId = lastMorph->lmMorphemeId;
 				}
 				RuleBasedScorer ruleBasedScorer{ kw, curMorph, node };
-				const float morphScore = curMorph->userScore + nodeLevelDiscount + kw->tagScorer.evalLeftBoundary(hasLeftBoundary(node), curMorph->tag);
+				const float morphScore = curMorph->userScore + nodeLevelDiscount + kw->tagScorer.evalLeftBoundary(hasLeftBoundary(node), curMorph->isSingle() ? curMorph->tag : curMorph->chunks()[0]->tag);
 				for (auto [prev, p] : regularPrevPathes)
 				{
 					auto& prevPath = pathes[p];
@@ -292,7 +292,7 @@ namespace kiwi
 				}
 				
 				RuleBasedScorer ruleBasedScorer{ kw, curMorph, node };
-				const float morphScore = curMorph->userScore + nodeLevelDiscount + kw->tagScorer.evalLeftBoundary(hasLeftBoundary(node), curMorph->tag);
+				const float morphScore = curMorph->userScore + nodeLevelDiscount + kw->tagScorer.evalLeftBoundary(hasLeftBoundary(node), curMorph->isSingle() ? curMorph->tag : curMorph->chunks()[0]->tag);
 				for (auto& p : combiningPrevPathes)
 				{
 					auto* prev = p.first;

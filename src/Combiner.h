@@ -54,11 +54,13 @@ namespace kiwi
 		{
 			size_t node = -1; /**< ruleSep을 지난 뒤의 노드. -1이면 왼쪽에서 이미 매칭에 실패한 것 */
 			Vector<size_t> capturedLefts;
+			Vector<int> blockedRuleLines; /**< 앞 문맥 조건 `(?<!...)`에 걸려 적용하지 않는 규칙의 줄 번호 */
 		};
 
 		struct Replacement
 		{
 			Vector<ReplString> repl;
+			Vector<KString> notAfter; /**< 패턴 바로 앞에 오면 규칙을 적용하지 않는 형태. 빈 문자열은 BOS를 나타냄 */
 			Dialect dialect;
 			CondVowel leftVowel;
 			CondPolarity leftPolarity;
@@ -163,6 +165,7 @@ namespace kiwi
 			Vector<NodeSizeTy> sepGroupPtrs;
 			Vector<utils::Bitset> groupInfo;
 			Vector<Replacement> finish;
+			Vector<GroupSizeTy> notAfterGroups;
 			// 정규화된 한글은 받침 없는 음절(399자)과 종성 자모(27자)뿐이므로 이 글자들의 어휘 번호는 표로 바로 찾는다
 			std::array<uint16_t, 19 * 21> syllableVocabs = {};
 			std::array<uint16_t, 27> codaVocabs = {};
@@ -178,6 +181,8 @@ namespace kiwi
 			LeftScan scanLeft(U16StringView left) const;
 			Vector<Result> combine(const LeftScan& scan, U16StringView left, U16StringView right) const;
 			Vector<std::tuple<size_t, size_t, CondPolarity>> searchLeftPat(U16StringView left, bool matchRuleSep = true) const;
+			bool isBlockedByContext(size_t group, U16StringView before) const;
+			int getRuleLineNo(size_t group) const { return finish[group].ruleLineNo; }
 			bool matchesPat(U16StringView left, bool matchRuleSep = true) const;
 		};
 
@@ -325,6 +330,8 @@ namespace kiwi
 			) const;
 
 			bool matchesLeftPattern(U16StringView leftForm, size_t ruleId) const;
+			bool isBlockedByContext(size_t ruleId, size_t group, U16StringView before) const;
+			int getRuleLineNo(size_t ruleId, size_t group) const;
 			bool matchesRightPattern(U16StringView rightForm, size_t ruleId) const;
 
 			UnorderedMap<std::tuple<POSTag, uint8_t>, Vector<size_t>> getRuleIdsByLeftTag() const;

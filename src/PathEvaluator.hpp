@@ -36,7 +36,7 @@ namespace kiwi
 			// 닫는 괄호는 왼쪽 경계로 처리하지 않음
 			auto c = node->getPrev()->uform.back();
 			auto tag = identifySpecialChr(c);
-			if (tag == POSTag::ssc || c == u'"' || c == u'\'') return false;
+			if (tag == POSTag::ssc || c == u'"' || c == u'\'' || c == u'`') return false;
 
 			// 나머지 특수문자는 왼쪽 경계로 처리
 			if (POSTag::sf <= tag && tag <= POSTag::sb) return true;
@@ -586,7 +586,7 @@ namespace kiwi
 
 
 			bestPathCont.clear();
-			const float additionalScore = curMorph->userScore + nodeLevelDiscount + kw->tagScorer.evalLeftBoundary(hasLeftBoundary(node), curMorph->tag);
+			const float additionalScore = curMorph->userScore + nodeLevelDiscount + kw->tagScorer.evalLeftBoundary(hasLeftBoundary(node), curMorph->isSingle() ? curMorph->tag : curMorph->chunks()[0]->tag);
 
 			RuleBasedScorer ruleBasedScorer{ kw, curMorph, node };
 
