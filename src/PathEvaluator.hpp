@@ -702,6 +702,7 @@ namespace kiwi
 			evalMatrix.resize(totalPrevPathes * morphs.size());
 			nextWids.clear();
 
+			const bool leftBoundary = hasLeftBoundary(node);
 			size_t prevId = -1;
 			size_t length;
 			for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
@@ -714,8 +715,10 @@ namespace kiwi
 					for (size_t curId = 0; curId < morphs.size(); ++curId)
 					{
 						const auto curMorph = morphs[curId];
-						float candScore = prevPath.accScore + curMorph->userScore + nodeLevelDiscount;
-						float firstChunkScore = curMorph->userScore + nodeLevelDiscount;
+						const float morphScore = curMorph->userScore + nodeLevelDiscount
+							+ kw->tagScorer.evalLeftBoundary(leftBoundary, curMorph->isSingle() ? curMorph->tag : curMorph->chunks()[0]->tag);
+						float candScore = prevPath.accScore + morphScore;
+						float firstChunkScore = morphScore;
 						Wid firstWid;
 						if (curMorph->isSingle())
 						{
@@ -846,7 +849,6 @@ namespace kiwi
 				}
 
 				RuleBasedScorer ruleBasedScorer{ kw, firstMorph, node };
-				const float morphScore = kw->tagScorer.evalLeftBoundary(hasLeftBoundary(node), firstMorph->tag);
 				size_t prevId = -1;
 				for (auto* prev = node->getPrev(); prev; prev = prev->getSibling())
 				{
