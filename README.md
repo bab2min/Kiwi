@@ -170,6 +170,9 @@ iOS 12.0 이상 및 macOS 10.14 이상에서 사용 가능한 Swift binding이 �
 ### Flutter Wrapper
 [JAICHANGPARK](https://github.com/JAICHANGPARK)님께서 개발하신 Rust용 wrapper인 [flutter_kiwi_nlp](https://github.com/JAICHANGPARK/flutter_kiwi_nlp)가 있습니다. 
 
+### Julia Wrapper
+[sorrychoe](https://github.com/sorrychoe)님께서 개발하신 Julia용 wrapper인 [KiwiKorean.jl](https://github.com/sorrychoe/KiwiKorean.jl)이 있습니다.
+
 ### 응용 프로그램
 Kiwi는 C# 기반의 GUI 형태로도 제공됩니다.
 형태소 분석기는 사용해야하지만 별도의 프로그래밍 지식이 없는 경우 이 프로그램을 사용하시면 됩니다.
